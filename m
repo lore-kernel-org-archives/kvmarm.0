@@ -1,121 +1,103 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-71.mta0.migadu.com [91.218.175.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C851F3E451B
-	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 10:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626F7468C38
+	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 10:10:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789985424; cv=none; b=d5A8v7bu2TVCxWKcMhrVhyyk9M6rXpP+un9xLW3wSF0Ed1dIhSovWEyM7BLUYwQ0ax9sIksPo/Bg/Q2mxAdv5bxV7VvMg3WKm2EBrG/DYufGQCv5nqd29mcKnVr+FDNIHa1Y9y3GLXFxq2l1rdVvqterv8IsWwYmZVYdpMveg5s=
+	t=1789985439; cv=none; b=IKlyDBpEda73/zPtu+jSDxqzml9rZjkSbUc+zWWX0umO7I1FiuGWUhnvT6vQbcMj0dFndbgH4ou9vUDSgJy9swKob0vRkalMYzZ56XICe3KoKvouGvnOuCr7LRksvo66TDXGUnKeuDABwzZxZ6ZdyzL0U0XLSUQ8IDwdTrsmb5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789985424; c=relaxed/simple;
-	bh=v0P4ayQReWgnEDJQOUIqGqH/JIvX4Upl7U9Sz/eEyJc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ms920Lkm5uOmkpjata97JAC2f15BYENpNhoX5XrICeiOoxXVp7aDceEwHS9D8gjqNU3as8zc85hRUn/4Ztv+Vus68w0NgeZwOIFY90PPTaekXk5S8YaidVO3fG0azEa1cS29te0uHbsPhwCVpV7TeP6OvKkp4C4Z0XNz/akbT2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YcCYJyCf; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1789985439; c=relaxed/simple;
+	bh=Yuf6CVS5HHsFju/bVLT2UkgQQk/AjuyAU2D19bqRojI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NbEhpsC41zyHkWC6IpgtZIjUbH2Ue0uzN3co9c2GHlKj2wix7eOuFQlrldeESWuhVQWMB5HzY+yIXQLx+UUyk4zQilPYNw/tPKFPjYZE4NuFW8FoPLxHMfXPG/ZwLxZI5NsNINDFpks+Z6aKr7UrzGdhRE6/mEeqV0++nEwj7gA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Dyh42vJl; arc=none smtp.client-ip=91.218.175.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YcCYJyCf"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1789985421;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YA3vQgRKFGawP1ePJiuBgfbEVZaFG6kWjdLmIbJG/cc=;
-	b=YcCYJyCfnFUed2mgr/UqsUeBImA/JWi+KnmCKyl/AIiWu+W/4G9wZG9LJdcCXNqE1TURpN
-	7YxKD+GdE26/g/N9TtSGopF9CIK5Z0TpyjeSc0L48AWZK9tlBShalwjj2Guy+1MjlrORcI
-	hLwL7c84lxYaaOomnFrCs1kYju+/rIA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-691-OnvV6xdyO4KhUZRc_oW-vg-1; Mon, 21 Sep 2026 06:10:18 -0400
-X-MC-Unique: OnvV6xdyO4KhUZRc_oW-vg-1
-X-Mimecast-MFC-AGG-ID: OnvV6xdyO4KhUZRc_oW-vg_1789985417
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-49cdc4080ddso15687055e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 03:10:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789985417; x=1790590217;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=YA3vQgRKFGawP1ePJiuBgfbEVZaFG6kWjdLmIbJG/cc=;
-        b=SpHHU6heZ3Sf4KuBX3B5gs6NPzvl5s8w2y7iutN6YmUWMrQPB7aTUIgOrJpB63Pggg
-         DZj4Ezor3YGoTQzwmJmigZ6oMycbOxHgnfBv3Z17OsJHa69jKU/mRWoK3RuGOW1DgktP
-         C9FJmbfnBrhcwBRxyGpRFJm6oNt3wt0swp9jelNHLiPtwyVtPRhvosB9pffK+EsqomBs
-         MLAzMI7Qb+17/lfWwsGNPm0jSMBPkDfrIm6+6ObTvIweWeoeILcklS8lBio6ggIhjJ+Y
-         DpAan3ub6EZuMZdjkcLD/eDgZVKMv74z8lKsyTZFP6B8iFJZie6ZAnBvVM0LlLL3WiKY
-         3Png==
-X-Forwarded-Encrypted: i=1; AKwUvByILHBvrR5qQr0QJiKVznQGH6Hk03SmDUxY4qV2psfXZ0v7yOmZhj1uCwJol+GwOl+Mu1+18Ik=@lists.linux.dev
-X-Gm-Message-State: AFuF++lDVU9KaTeVIGkXem5xLgxRvu0rOY4dQvbFxbjj7ZB9Oivuf5/Y
-	/14hbO/6u619UetccQ6v82c+9xKmf9OtEl8/v/4nwEqWLeyIK7Aq1lWuxVJVuMHvUTcHtff7x2V
-	9Zg5mTiECuHgAL+/rXb2Mni5ZQ8vE0Mz4JZo0BevZibN0croVmsgSaRakjrx+3xE3840/52CJiw
-	Wz9o3ANdpsgJPXqcOPgiDfYe95iCK4dPhz
-X-Gm-Gg: AYBFou1cjOaSRwNKA2zhKB8UYih3OTxo/AlTdicfky5iw8igEp/Un3aVzFiyTvbS9uZ
-	z3CByl603e214SCvgcBpSyV3EcLY22NKCHidpupu43yw8euqXx6iaducGkZB0lBX0hnZa+Zh0C4
-	SWt2Hpwtwpcp1p+SbzPAlqJ2N0CHx69WmhSw+jlBj/o5whuddWL5Bt9rKVwtXBlfravIPFQUJZV
-	/c1fzBFYgePsZWVSkCQiU+2HGtWdtOGWwNYfpR3umkKuGfj6uM5nxdc9Jg0mA==
-X-Received: by 2002:a05:600c:37c3:b0:49c:e37e:4389 with SMTP id 5b1f17b1804b1-49fc4f8528cmr144125045e9.4.1789985416916;
-        Mon, 21 Sep 2026 03:10:16 -0700 (PDT)
-X-Received: by 2002:a05:600c:37c3:b0:49c:e37e:4389 with SMTP id
- 5b1f17b1804b1-49fc4f8528cmr144124745e9.4.1789985416539; Mon, 21 Sep 2026
- 03:10:16 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Dyh42vJl"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=Yuf6CVS5HHsFju/bVLT2UkgQQk/AjuyAU2D19bqRojI=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789985435; v=1; x=1790590235;
+ b=Dyh42vJlY20BNiB1peouSmWJzMaHH5EuTE1D3HavSkiCPbEeaeb0zQCBhxINxHMOYs5l5jMp
+ nOvKBVIS77Q31d31EZu1hx8KZYaXREU0iydi0FRUxC3AadNQTX//EMziJGL2MiWUoqOTagRCPjo
+ sVp/MBI2OUYY/5WSHt+d4kfY=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 26de98a1c1e4e5d7;
+	Mon, 21 Sep 2026 10:10:35 +0000
+X-Mizu-Trace-ID: 26de98a1c1e4e5d7
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Hyunwoo Kim <imv4bel@gmail.com>,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Shuah Khan <shuah@kernel.org>,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH v2 0/2] KVM: arm64: Fix a vSError staying pending after delivery under pKVM
+Date: Mon, 21 Sep 2026 11:10:28 +0100
+Message-Id: <20260921101030.1231605-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <aq7ViMljbhjibseX@kernel.org> <aq7WIW052XXHJWlL@kernel.org>
-In-Reply-To: <aq7WIW052XXHJWlL@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 21 Sep 2026 12:10:04 +0200
-X-Gm-Features: AcwNN1XAAsJ94cGxHRMtNqiGnGs3RDz6T6V8oXiFTADje5gE4RX36YH8CZ6l8Ic
-Message-ID: <CABgObfZYa8uwsAgKnr6952qMZf6jjf_AsJBmxeS8zYLLRSGD_g@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 7.3, round #1
-To: Oliver Upton <oupton@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: S4sDYK182aqmxb6C_Q2rB-HE3IQOdl0WsCB5ADAODj8_1789985417
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Sep 19, 2026 at 8:36=E2=80=AFPM Oliver Upton <oupton@kernel.org> wr=
-ote:
->
-> On Sat, Sep 19, 2026 at 11:33:45AM -0700, Oliver Upton wrote:
-> > Hi Paolo,
-> >
-> > Here's the first pile of fixes for 7.3.
-> >
-> > The diff is definitely on the larger end, although this is mostly
-> > explained by the inclusion of a selftest for the ITS table changes
-> > which are quite tricky. Also worth noting that this selftest mixed poor=
-ly
-> > in next with Sean's PPC selftest prefix due to the library changes [*].
-> >
-> > Otherwise, the most noteworthy change here is definitely the pKVM patch=
-es
-> > to unmap the EL2 hypervisor's stack pages from the host, for obvious
-> > reasons...
-> >
-> > Details on the rest of it can be found in the tag. Please expect at
-> > least one more pull for 7.3, there's some additional changes that are
-> > still brewing.
-> >
-> > Please pull.
->
-> Haven't caffeinated enough yet.
->
-> Just in case it wasn't clear, this is a
-> conflict with 7.4 material and based on the conversation I expect Sean
-> to work around it.
+Hi folks,
 
-Yep, one of us will handle it.  Pulled now, thanks and sorry for missing rc=
-4!
+Changes since v1 [1]:
+  - Added a cover letter. (Marc)
+  - Rebased on 7.3-rc4.
 
-Paolo
+Under pKVM a vSError the guest has already taken stays pending in the
+host's copy of HCR_EL2, since the lazy state sync for non-protected
+guests stopped copying VSE back on exit. That's a 7.3-rc regression.
+Patch 1 reflects VSE back on every exit. Patch 2 makes the
+external_aborts selftest check that the SError is no longer pending
+once delivered: it fails on the unpatched base and passes with the fix,
+and also passes under nVHE and VHE.
+
+The "Confine protected VM vCPU state to EL2" series [2] carries patch 1
+as its own patch 1, since its later patches change the same exit path in
+hyp-main.c and don't apply on a tree without the fix. It isn't part of
+that series: the fix lands from here, and so does the selftest, which
+that series doesn't carry.
+
+Based on Linux 7.3-rc4 (93f51579e7df2).
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20260829071120.2522788-1-fuad.tabba@linux.dev/
+[2] https://lore.kernel.org/all/20260914113338.159227-1-fuad.tabba@linux.dev/
+
+Fuad Tabba (2):
+  KVM: arm64: Sync HCR_EL2.VSE back to the host vCPU under pKVM
+  KVM: arm64: selftests: Check SError is not pending after delivery
+
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c                  | 4 ++++
+ tools/testing/selftests/kvm/arm64/external_aborts.c | 6 ++++++
+ 2 files changed, 10 insertions(+)
+
+
+base-commit: 93f51579e7df248780214094418f205253383cc5
+-- 
+2.39.5
 
