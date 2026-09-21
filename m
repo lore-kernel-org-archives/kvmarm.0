@@ -1,109 +1,122 @@
-Received: from mta0.migadu.com (out-139.mta0.migadu.com [91.218.175.139])
+Received: from mta0.migadu.com (out-214.mta0.migadu.com [91.218.175.214])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E70DF3BBFAF
-	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 07:25:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C5A73F44C9
+	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 07:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.214
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789975541; cv=none; b=cTNvDy2eCWQ6vzpRIFalNgKAzaR2Y3TFYOXtXObaC6uPOJiDPXPnEsdQhC8v+MeCTZA53XBNEnbgW2U18mAbAQcbVYuOENMPwHe+Nj8IPFMJ+0C1PkgQFlk+cxQrt6NIBpz0jpCDTD9y0AMDZ808/nrSkFppgaDaMWYlBEngR3E=
+	t=1789975811; cv=none; b=lU6yLZUsmK9Y/+/c/GW4i3/MIywO2aRtd2L/HclA71oav9caK6OyKF6pQfezI8wNUOjKjkqLCdziS8qyutfQG+UFlcyNfiTVsNIYCxBE5MB9wRdPKARrctIa/lnxiQ5I4vEX8c0cWFkpXekFi+z86QsKVc6VmGjTUenR7mE2HAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789975541; c=relaxed/simple;
-	bh=SahGD8wStb0BEVF7yvvFemwPhMiROYcEgpClXUQfv20=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R0snKeHZ+2EJF0IwjCsd7xR3WqGEmkOspi6V1IOL2sip9f1dkx44vsjqG6213d41tSk+n4GgrmJekv5cQkAHTbP+lGWhav6Jx2hrs02LPOwJ+sr++2RWZpMlFAFdK5yfqc/hU9Vu+c8/QjU7xrcynJpdFIuFBiQ3aozsxlvkfnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kx/VTCNH; arc=none smtp.client-ip=91.218.175.139
+	s=arc-20240116; t=1789975811; c=relaxed/simple;
+	bh=dZSTN0NcsGQY67yG61H65ikbY3v5eKu0/3cjf1zkqfk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fsAcsYDEFX2imvKpmo26u/nFp9CNUSHIWAhIvbvjJ+fGn1thwO3AP8n2eMMoPgXVnUSJ7tsUBch23pXvHvofg941J4Rf6WC332PEG02dSQ34eE7Z2BkT2AX4JsztI80iSpMp7ScgmqmfHH3eCa4nI1o56jWWx7is6sloGBzg9kA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o2Fq0NcX; arc=none smtp.client-ip=91.218.175.214
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kx/VTCNH"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o2Fq0NcX"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=SahGD8wStb0BEVF7yvvFemwPhMiROYcEgpClXUQfv20=;
+DKIM-Signature: a=rsa-sha256; bh=dZSTN0NcsGQY67yG61H65ikbY3v5eKu0/3cjf1zkqfk=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789975533; v=1; x=1790580333;
- b=kx/VTCNHd/zi1T33NdhUfct/g32mD02vx3b46p+1h0pvNDrOhLAMMr0+q9L4EyMJmHhlaL+f
- jM7i9mP56+UdCdFD+in1Z1/hzzp1AxvsWURMXYB6HQEadO5ZsGLsUadoJK7DmalTJZ4Lj8Xe7FT
- Uqxj2LaZ+g1bnau3NIMN2thc=
+ t=1789975804; v=1; x=1790580604;
+ b=o2Fq0NcXfjlaTRTElag84jz1HuLM6Rawp88wwMKjhz2VMa6Qny3Rw1SLWzpM/7jPPiV/jrdm
+ kKx6omdkWTX4bPc6y6kRwYQQj54n45Xvxi2EqJPR9VgV9d2dF+Kk8nJSr02IAk053motZZ/P7LK
+ 6wq+BgSbx/ICxENqI8Ncva48=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 701c831f807fab62;
-	Mon, 21 Sep 2026 07:25:33 +0000
-X-Mizu-Trace-ID: 701c831f807fab62
+Received: by smtp.migadu.com with ESMTPS id e61c963ea40c7155;
+	Mon, 21 Sep 2026 07:30:02 +0000
+X-Mizu-Trace-ID: e61c963ea40c7155
 X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5b8c42da963so7505e87.0
-        for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 00:25:33 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBz/HtCUnNJLbOwcTqpUWobN0lPLq37SCkDbhq0raaK1a9f94IKmJIcPBZHpxjOOn4y0XA5jiVE=@lists.linux.dev
-X-Gm-Message-State: AFuF++nsPf/zz0lt3hdPdxHroyvxFPtta5MMqXbgm+9gXwm0BkBLMmex
-	qpZuW+tK1eyQ0qbnCx0/pb0ZRu4pv4/p73ddMpoRvks3WaKKWDqOSsSRl0+YlQq804Bkk/DEzTD
-	12brnCfYVMeYO11bnBU8rUeh2f4KtEKjxx2hCrSfJ
-X-Received: by 2002:a05:6512:10cd:b0:5b4:9dba:7403 with SMTP id
- 2adb3069b0e04-5b8c7eaef8bmr111208e87.13.1789975532579; Mon, 21 Sep 2026
- 00:25:32 -0700 (PDT)
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Thomas Gleixner <tglx@kernel.org>,
+	Eric Auger <eauger@redhat.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Yuan Yao <yaoyuan@linux.alibaba.com>,
+	Fuad Tabba <tabba@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 0/4] irqchip/gic-v4, KVM: arm64: Fix the vgic init error paths
+Date: Mon, 21 Sep 2026 08:29:54 +0100
+Message-Id: <20260921072958.2918477-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260921063718.1604533-1-fuad.tabba@linux.dev> <arDYHSlFHm_XzGvN@kernel.org>
-In-Reply-To: <arDYHSlFHm_XzGvN@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 21 Sep 2026 08:24:56 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTz0-qS8RRhdT8XjAgWqKhgjjzbRsZ_jwTBVqM-8pXk7Vw@mail.gmail.com>
-X-Gm-Features: AcwNN1VMg6PbfnlRIzn1fjVR1-_CkT5UjrC7WdHauJujyrzeyYN_lrO0wc8jZWk
-Message-ID: <CA+EHjTz0-qS8RRhdT8XjAgWqKhgjjzbRsZ_jwTBVqM-8pXk7Vw@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: arm64: Restore the VM's feature bitmap when
- kvm_setup_vcpu() fails
-To: Oliver Upton <oupton@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, 
-	Jack Thomson <jackabt@amazon.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Oliver,
+Hi folks,
 
-On Mon, 21 Sep 2026 00:09:17 -0700, Oliver Upton <oupton@kernel.org> wrote:
-[...]
-> > Nothing in the tree loads a vCPU whose init failed, so this is latent.
-> > The upcoming series that enables KVM_PRE_FAULT_MEMORY for arm64 exposes
-> > it: the generic kvm_vcpu_pre_fault_memory() calls vcpu_load() whether
-> > or not the vCPU has been initialised.
->
-> That's a bug, not a feature. We should require an initialized vcpu for
-> the ioctl.
+Changes since v2 [1]:
+  - Patch 3: a vgic_v4_init() failure now frees only the SPI array,
+    since that function unwinds its own state; the teardown label is
+    for the routing failure. (Yuan Yao)
+  - Rebased on kvmarm/next, where the routing failure already tears
+    down the GICv5 state. Patch 3 moves that into the shared label, so
+    the SPI array is freed on that path too.
+  - Collected Reviewed-by from Yuan Yao on patches 1 and 2. (thanks!)
 
-That one is for Lorenzo then :) I'll reword the message so the stale
-bitmap comes first and the pre-fault crash is just how it showed up.
+Four fixes on the paths that run when vgic init fails partway. Each one
+needs an allocation failure to reach.
 
-[...]
-> The bitmap copy is a bit confusing because there's only two possible
-> situations:
->
->  - KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED is unset and the bitmap was
->    previously zero
->
->  - KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED is set and @init->features is
->    identical to vcpu_features (see kvm_vcpu_init_changed())
->
-> While there's nothing wrong with your diff, I'd prefer if the above
-> detail was represented directly.
->
->         ret = kvm_setup_vcpu(vcpu);
->         if (ret) {
->                 /*
->                  * Clear the bitmap if setup fails on the first vCPU to be
->                  * initialized.
->                  */
->                 if (!test_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags))
->                         bitmap_zero(kvm->arch.vcpu_features, KVM_VCPU_MAX_FEATURES);
->
->                 goto out_unlock;
->         }
+Sashiko reported the vgic_init() case [2] while reviewing the SPI-array
+leak fix, and the two irq-gic-v4.c fixes came out of chasing the first
+[3]. Then, just when I thought I'd squashed every bug Sashiko could
+find, it turned up one more in its v1 review: the pre-existing nr_vpes
+one, fixed in patch 4 as Marc suggested [4].
 
-I'd gone for the restore so the failure path didn't depend on the
-flag, but those two states are all there is and your version makes
-that explicit. I'll use it in v3.
+Patch 1 clears the irq domain and fwnode pointers at the four GICv4
+sites that free them and leave them set. Patch 2 makes
+its_alloc_vcpu_irqs() release what it allocated when the SGI loop
+fails, which is both the SGI domains and the vPE irqs, wider than the
+SGI-domain leak I described before posting v1 [3]. Patch 3 releases the
+SPI array and the vPEs on vgic_init()'s later failure paths, so
+KVM_DEV_ARM_VGIC_CTRL_INIT is all or nothing and a retry starts from
+scratch. Patch 4 is Marc's suggested fix [4] for the nr_vpes overload.
 
-Thanks,
+These patches run across two subsystems, but ordering matters, which is
+why this is one series. Patch 2 reuses its_free_sgi_irqs() from an
+error path, which only works once patch 1 has cleared the pointers.
+Patch 3 runs vgic_v4_teardown() on a path it never ran on before, which
+adds a route into what patch 1 fixes. Patch 4 is only correct on top of
+patch 3, which is what stops online_vcpus outgrowing the vPE array.
+
+Based on kvmarm/next (23ddf997ab16b).
+
+Cheers,
 /fuad
+
+[1] https://lore.kernel.org/all/20260824074245.710955-1-fuad.tabba@linux.dev/
+[2] https://lore.kernel.org/all/20260807105558.73D701F000E9@smtp.kernel.org/
+[3] https://lore.kernel.org/all/CA+EHjTyDix+y6NTLTsXP5j9Sn2VLOZcsw94LntQxg_etRBJZuA@mail.gmail.com/
+[4] https://lore.kernel.org/all/87ik51np8e.wl-maz@kernel.org/
+
+Fuad Tabba (4):
+  irqchip/gic-v4: Clear the domain and fwnode pointers after freeing
+    them
+  irqchip/gic-v4: Unwind what its_alloc_vcpu_irqs() allocated on failure
+  KVM: arm64: vgic: Tear down what vgic_init() created when it fails
+  KVM: arm64: vgic-v4: Restore nr_vpes before freeing the vPE resources
+
+ arch/arm64/kvm/vgic/vgic-init.c | 21 +++++++++++++-------
+ arch/arm64/kvm/vgic/vgic-v4.c   |  3 +++
+ drivers/irqchip/irq-gic-v4.c    | 34 +++++++++++++++++++++++++++------
+ 3 files changed, 45 insertions(+), 13 deletions(-)
+
+
+base-commit: 23ddf997ab16b5f4aa9f948f5a68f5b35e4e398f
+-- 
+2.39.5
+
