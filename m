@@ -1,132 +1,161 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE2BE3B2FDF;
-	Mon, 21 Sep 2026 10:14:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B90148489A
+	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 11:29:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789985669; cv=none; b=HogbSpxBvkMeTShiT3iyjQ/gizh5KtO5qym1VpP6/2dpf73kQn9KTHayb+/Xr0+1i4o8thtDCe0QbAfYdwah4zJ/qU33EYq0GY1mS3C57irplut/AsW8qP/S9rqzSJdFKQLBEOh6OIBptTtiysP9p/56jMY9xFlGNM0y1JTSrBQ=
+	t=1789990155; cv=none; b=lP96R1JajQKZ47+gI87har0kgbuscb4elGJZyV4Dy34sbMfmaL8VrM7rqFpN9jjgPt1BbWfpD/uaP6rLLKhiF/bMYtL1AOvAl6dmsPBgrs8DVUlmZiLPJxsndnS+V9uGMGEVKdMwzUxPOtRIx/MWyCD0FxYr7PXfiYxVL6AqWGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789985669; c=relaxed/simple;
-	bh=X21Q+N08xUOyF31kxvte0qv2v56innxWRBgC11u9YPg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=UsQFLCdzhD1iLmxlMacZM+xCcVYrUyrgfTyqfON+xw0acEFj17uqKFFEF31l2OACnLX20xPe/DzObE/AtPeEcZRC4YYpFPv5SGEpD1ppVpwml32C9rsYfd7TDExOu00rwDf6clcO8R+97cZ/vP7TzKME8WifrV1t8BOehjQHPrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=bi8wj6lS; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="bi8wj6lS"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7ED0A1CE0;
-	Mon, 21 Sep 2026 03:14:23 -0700 (PDT)
-Received: from [10.0.128.141] (unknown [10.0.128.141])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 173203F86C;
-	Mon, 21 Sep 2026 03:14:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789985667; bh=X21Q+N08xUOyF31kxvte0qv2v56innxWRBgC11u9YPg=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=bi8wj6lSXbc+slgPhtQo8H+KMor5M5yzY0r8RQQqFvDPPtgRm0RMutnIRxaToRdTG
-	 YWI+Jnobq16nw+PjJSrqSjkJr7INZTwpehy3S8gXoDGcYoHz2kHClYB+y772yLyN7Z
-	 EPCugkdEQQwCspBynGN7LkS+G00+KuamtoSo/uq0=
-Message-ID: <eb4a30a0-abd2-4334-b5f3-62621ec5a19e@arm.com>
-Date: Mon, 21 Sep 2026 11:14:22 +0100
+	s=arc-20240116; t=1789990155; c=relaxed/simple;
+	bh=xqLu/nC/RBdWWfJCzlL9gBVxPMgI4ZF+fkIfdQ+WJCY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lh+dEDJcQTQm0/06RuX48YFn4rwcy2hS1l+NLhRCNr6TRv3ZCsebfCfJUQlzy/l5TIdnvqV0f5Kf0ACXNeVP2eM8pxQuTyb3Fosw+7pmwRbKvSDvsvBFCcD+Cd6rUgFVDfctL9hemtWVCKZMcXeLBX7CNx/QTOXd7b7ZmfLJ3Vs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
+Received: from canpmsgout11.his.huawei.com (unknown [172.19.92.148])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTPS id 4hpLZf2pRLz126LsP
+	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 19:28:26 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.163])
+	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4hpLLL07YQzKm5t;
+	Mon, 21 Sep 2026 19:17:46 +0800 (CST)
+Received: from kwepemk100011.china.huawei.com (unknown [7.202.194.59])
+	by mail.maildlp.com (Postfix) with ESMTPS id 819504057A;
+	Mon, 21 Sep 2026 19:28:51 +0800 (CST)
+Received: from huawei.com (10.90.31.46) by kwepemk100011.china.huawei.com
+ (7.202.194.59) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Mon, 21 Sep
+ 2026 19:28:50 +0800
+From: Zhou Wang <wangzhou1@hisilicon.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Fuad
+ Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Steffen Eiden
+	<seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+	<yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, Will
+ Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>
+CC: <kvmarm@lists.linux.dev>, Zhou Wang <wangzhou1@hisilicon.com>, Nianyao
+ Tang <tangnianyao@huawei.com>
+Subject: [RFC PATCH] KVM: arm64: Restrict CNTP_CVAL/CNTHP_CVAL save/reload when ptimer is used
+Date: Mon, 21 Sep 2026 19:18:40 +0800
+Message-ID: <20260921111840.3000905-1-wangzhou1@hisilicon.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 1/7] firmware: arm_rmm: Add SMC definitions for
- calling the RMM
-Content-Language: en-GB
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
- will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
-References: <20260912083611.2513845-1-suzuki.poulose@arm.com>
- <20260912083611.2513845-2-suzuki.poulose@arm.com>
- <178978126540.2352296.16845657485139032765.b4-review@b4>
- <d7ccaf22-5bde-4344-8bf0-a5a17dcac0f3@arm.com>
-In-Reply-To: <d7ccaf22-5bde-4344-8bf0-a5a17dcac0f3@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemk100011.china.huawei.com (7.202.194.59)
 
-On 21/09/2026 10:27, Suzuki K Poulose wrote:
-> On 19/09/2026 02:27, Jonathan Cameron wrote:
->>> The RMM (Realm Management Monitor) provides functionality that can be
->>> accessed by SMC calls from the host.
->>>
->>> The SMC definitions are based on DEN0137[1] version 2.0-bet3
->>>
->>> [1] https://developer.arm.com/documentation/den0137/2-0bet3/
->>>
->>> Signed-off-by: Steven Price <steven.price@arm.com>
->>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>
->> With Gavin's nitpicks and the GENMASK_ULL() from sashiko, just a few
->> comments inline.  Mostly on subtle inconsistencies that really don't
->> matter that much.
->>
->>>   include/linux/arm-smccc-rmi.h | 497 ++++++++++++++++++++++++++++++++++
->>>   1 file changed, 497 insertions(+)
->>>   create mode 100644 include/linux/arm-smccc-rmi.h
->>>
->>> diff --git a/include/linux/arm-smccc-rmi.h b/include/linux/arm-smccc- 
->>> rmi.h
->>> new file mode 100644
->>> index 000000000000..214d6228dfc2
->>> --- /dev/null
->>> +++ b/include/linux/arm-smccc-rmi.h
+A guest's physical timer may be used in nested guest or directly used in
+VHE mode. We can check above cases to avoid useless CNTP_CVAL/CNTHP_CVAL save
+and reload.
 
-..
+Use lazy detection to determine whether a non-nested VHE guest actually uses
+the physical timer.
 
->>> +
->>> +struct rec_exit {
->>> +    union { /* 0x000 */
->>> +        u8 exit_reason;
->>> +        u8 padding0[0x100];
+timer_set_traps() initially traps CNTP_CTL_EL0 writes for non-nested guests.
+On the first write that sets CNTP_CTL.ENABLE=1, the trap handler records
+ptimer_used and clears the trap in CNTHCTL_EL2, allowing the guest direct
+access thereafter.
 
-...
+A test result from KUT in HiSilicon HIP12 is:
 
->>
->>> +    };
->>> +    union { /* 0x400 */
->>> +        struct {
->>> +            u64 cntp_ctl;
->>> +            u64 cntp_cval;
->>> +            u64 cntv_ctl;
->>> +            u64 cntv_cval;
->>> +        };
->>> +        u8 padding4[0x100];
->>> +    };
->>> +    union { /* 0x500 */
->>> +        struct {
->>> +            u64 ripas_base;
->>> +            u64 ripas_top;
->>> +            u8 ripas_value;
->>> +            u8 padding5[0xf];
->>
->> In various other places you just use a u64 for a u8
->> + padding. Why is this one special? And for that matter
->> various other fields later in this particular structure?
-> 
-> Please feel free to point out, if you spot any. I am happy
-> to fix them.
+                    nopatch        patch
+ hvc                758            624
+ mmio_read_user     3647           3479
+ mmio_read_vgic     949            817
+ eoi                29             29
+ ipi                2534           2302
+ lpi                2684           2442
+ timer_10ms         2393           2168
 
-I took a look and the padding is for extra "u64" bits in there.
-e.g, ripas_value offset = 0x510 and the s2ap_base is really at 0x520
-not 0x518. Same applies for the pmu_ovf_status and vsmmu.
+Reported-by: Nianyao Tang <tangnianyao@huawei.com>
+Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+---
+ arch/arm64/kvm/arch_timer.c     | 15 +++++++++++++++
+ arch/arm64/kvm/hyp/vhe/switch.c |  6 ++++--
+ include/kvm/arm_arch_timer.h    |  1 +
+ 3 files changed, 20 insertions(+), 2 deletions(-)
 
-So, I would leave them as they are. The rest are consistent.
-e.g, num_bps and num_wps. in realm_parameter
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 6ac3321f4c57..fcbd1e133ad0 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -832,6 +832,10 @@ static void timer_set_traps(struct kvm_vcpu *vcpu, struct timer_map *map)
+ 	if (!has_cntpoff() && timer_get_offset(map->direct_ptimer))
+ 		tpt = tpc = true;
+ 
++	/* Lazy ptimer detection: trap CTL until guest first enables it */
++	if (has_cntpoff() && !vcpu_has_nv(vcpu) && !vcpu_timer(vcpu)->ptimer_used)
++		tpt = true;
++
+ 	/*
+ 	 * For the poor sods that could not correctly subtract one value
+ 	 * from another, trap the full virtual timer and counter.
+@@ -1054,6 +1058,7 @@ void kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
+ 		offs->vm_offset = &vcpu->kvm->arch.timer_data.poffset;
+ 	}
+ 
++	timer->ptimer_used = false;
+ 	if (timer->enabled) {
+ 		for (int i = 0; i < nr_timers(vcpu); i++)
+ 			kvm_timer_update_irq(vcpu, false,
+@@ -1270,6 +1275,16 @@ void kvm_arm_timer_write_sysreg(struct kvm_vcpu *vcpu,
+ 		preempt_disable();
+ 		timer_save_state(timer);
+ 		kvm_arm_timer_write(vcpu, timer, treg, val);
++
++		/* Lazy ptimer detection: catch first CNTP_CTL enable */
++		if (has_cntpoff() && !vcpu_has_nv(vcpu) &&
++		    tmr == TIMER_PTIMER && treg == TIMER_REG_CTL &&
++		    (val & ARCH_TIMER_CTRL_ENABLE) &&
++		    !vcpu_timer(vcpu)->ptimer_used) {
++			vcpu_timer(vcpu)->ptimer_used = true;
++			sysreg_clear_set(cnthctl_el2, 0,
++					 CNTHCTL_EL1PCEN << 10);
++		}
+ 		timer_restore_state(timer);
+ 		preempt_enable();
+ 	}
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 7875911c0506..0cd73093878a 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -122,7 +122,8 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 
+ 	___activate_traps(vcpu, __compute_hcr(vcpu));
+ 
+-	if (has_cntpoff()) {
++	if (has_cntpoff() &&
++	    (vcpu_has_nv(vcpu) || vcpu_timer(vcpu)->ptimer_used)) {
+ 		struct timer_map map;
+ 
+ 		get_timer_map(vcpu, &map);
+@@ -156,7 +157,8 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+ 
+ 	write_sysreg_hcr(HCR_HOST_VHE_FLAGS);
+ 
+-	if (has_cntpoff()) {
++	if (has_cntpoff() &&
++	    (vcpu_has_nv(vcpu) || vcpu_timer(vcpu)->ptimer_used)) {
+ 		struct timer_map map;
+ 		u64 val, offset;
+ 
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index bc6f2fdd7ad3..f427246a7726 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -90,6 +90,7 @@ struct arch_timer_cpu {
+ 
+ 	/* Is the timer enabled */
+ 	bool			enabled;
++	bool			ptimer_used;
+ };
+ 
+ int __init kvm_timer_hyp_init(bool has_gic);
+-- 
+2.33.0
 
-Cheers
-Suzuki
-
-
->
