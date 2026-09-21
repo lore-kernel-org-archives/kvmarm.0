@@ -1,151 +1,248 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1DF43BFE2B
-	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 16:59:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8439B4E4C49
+	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 17:28:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790009964; cv=none; b=KJEvZwU1Ti9TDFWBvXTx8T3BDaBKpQ4sxRuGro3vy/WUtsRYVnkFJGX5DjNkxkQ8TY9UKMyTuqnoIRsJqXQk23kplJ26sLsXV3te/X3BRxNnlB++0va52k2iBvJRnmiTYS3SI6f+L9qVCZ6HTZyzQfYOvpOfkhXOrtvF/1pchy0=
+	t=1790011737; cv=none; b=XvMDz2Rqy0uzClYzpY/NJ1S7y/ha0wn5ijy/GWRUILugkqksG+E19/itSrZ8SiwH9QmlrVK2ZaICWqc06YxfDl83g/aJiO9xTRgxr3ewypgTsPUf5Lnn1Wp41fwds8hasuugoQG8FksJ6tIMggJKwIgkIfJNvVBr3/TgWpWv1oA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790009964; c=relaxed/simple;
-	bh=2YavPmuSqqe/BkVWIb5GEIFhtnqoYJ8ohpnLcNp6sc8=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=tvrUxY3worBSfNN81Nsz7yKHU87pI94dAuIcfmU27D4VoYyCXxa5dO7h15YTgBWAeLgKmmzXBB9xT+MwgohAxea2KOGpVNBK2wlQib75wnYtOmVr9k+jHlChBY+n0H93skUrgcubY4ipfr8Wo0wHvgHq+lia6/Zfcv5euGX1/w0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DXznph2W; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790011737; c=relaxed/simple;
+	bh=7aLTFOp/5FWdpcHQ09vRHri69YHFtnsNMHnmo76YpYs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=IP4U55YMpS9m49ZTUandlR8Aze7kzfM7VjAEgTqfJiXS+NxaqNP8rOs40WcvgmRhFoENki31/Xog7i9EQBjSJgdUXeyC162CFcCvKyWr65kUk/emLmE2p0aAP7mFttSc97r5e0RpfwSGqT0yYOE4MLpds0Di5uX66uRpWHZgCZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=tZPgfMkG; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DXznph2W"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 657751F000FF;
-	Mon, 21 Sep 2026 16:59:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790009962;
-	bh=98AdR5OQVsECzz2h4uZLhERgGE7GPsAS98uXAves/a8=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=DXznph2WjQJ159wOraSqChngEAetmgZ87JChPAKOUfWrt2dlKT0o+1TmAY4UvThRB
-	 yYNBb6tu/iPocYqeLkuW2KL+QXO0YI2g1hRIb8B2vf/KiPJudf/BQ5jear/ysyzUCc
-	 W3oWFzmPnWR4syzKmp68U7qkgmeoh3cnJbEegd7EkpOdCVhiDyy2MoJgYMOZiL/aq8
-	 m4PBWsBV8ApinvwpTPYYfUqEulJLKZuiitiG5sz2bSBdGGDypBR4BH47BYz9RN1T1q
-	 OHcghcWyZdBUI1U4nYYeCKvDhRPRMbPiNJ1hf0CwQxJZySev2EBCcJ8u6vt6GZfn/C
-	 oGfRAqHn+IgpA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 2/2] KVM: arm64: Support FFA_FN64_MEM_RECLAIM2 in host
- handler
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Snehal Koukuntla" <snehalreddy@google.com>
-Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20260921164748.2958578-3-snehalreddy@google.com>
-References: <20260921164748.2958578-1-snehalreddy@google.com>
- <20260921164748.2958578-3-snehalreddy@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 21 Sep 2026 16:59:21 +0000
-Message-Id: <20260921165922.657751F000FF@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="tZPgfMkG"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4612B1595;
+	Mon, 21 Sep 2026 10:28:51 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3D7DE3F632;
+	Mon, 21 Sep 2026 10:28:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790011734; bh=7aLTFOp/5FWdpcHQ09vRHri69YHFtnsNMHnmo76YpYs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=tZPgfMkGT/Z7wKeVwjwt4J4Px1WbkxHcwW0EeuUZmDeFvmvuwe3KD99LBpgHJApv5
+	 bZuNRiUetSKNWK3YbuPwv2pm0vdD1ReQR71sGeeJh569+1ObUpvg+BxmlJbQ5kNZsp
+	 jSs4xRQkMD7DrrZkg9hAcaboI4qraRvaDndpdnho=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>
+Subject: Re: [PATCH 05/22] KVM: arm64: nv: Pass an access descriptor for stage-2 walks
+Date: Mon, 21 Sep 2026 18:28:50 +0100
+Message-ID: <arFpUtyq7sphiJzw@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260623184201.1518871-6-oupton@kernel.org>
+References: <20260623184201.1518871-1-oupton@kernel.org> <20260623184201.1518871-6-oupton@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] kvm: arm64: incorrect buffer bounds in do_ffa_mem_reclaim2()
---
-
-commit 9e4ba2a6fb44613f009459976518be9371118818
-Author: Snehal Koukuntla <snehalreddy@google.com>
-
-KVM: arm64: Support FFA_FN64_MEM_RECLAIM2 in host handler
-
-This commit adds support for the FFA_MEM_RECLAIM2 interface in the host
-FF-A proxy handler. It forwards the SMC call to the SPMD and unshares the
-reclaimed page ranges in the host stage-2 page tables.
-
-Link: https://support.arm.com/documentation/den0140/j
-
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index 5ad74ab265b57..e0fba07a67bc9 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-[ ... ]
-> @@ -611,6 +624,107 @@ static void __do_ffa_mem_xfer(const u64 func_id,
-[ ... ]
-> +static void do_ffa_mem_reclaim2(struct arm_smccc_1_2_regs *res,
-> +				struct kvm_cpu_context *ctxt)
-> +{
-> +	DECLARE_REG(u64, handle, ctxt, 1);
-> +	DECLARE_REG(u64, flags, ctxt, 2);
-> +	DECLARE_REG(u64, x3, ctxt, 3);
-> +	DECLARE_REG(u64, x4, ctxt, 4);
-> +	DECLARE_REG(u64, x5, ctxt, 5);
-> +	u32 req_desc_cnt =3D (u32)(x3 >> 32);
-> +	u32 total_pages =3D (u32)x3;
-> +	u32 desc_size =3D (u32)x4;
-> +	u32 offset =3D (u32)x5;
-> +	u32 page_index =3D (u32)(x5 >> 32);
-[ ... ]
-> +	if (offset >=3D (u64)req_desc_cnt * desc_size) {
-> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> +		return;
-> +	}
-
-[Severity: High]
-Could this check incorrectly reject valid offsets? By checking offset again=
-st
-the total length of the requested descriptors (req_desc_cnt * desc_size), it
-seems to conflate the descriptor count with the total buffer capacity.
-
+On Tue, Jun 23, 2026 at 11:41:44AM -0700, Oliver Upton wrote:
+> Pass sufficient context to the stage-2 PTW such that access-dependent
+> features like FEAT_HAFDBS can determine the correct behavior of the
+> walk.
+> 
+> Signed-off-by: Oliver Upton <oupton@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_nested.h | 15 ++++++++++++++-
+>  arch/arm64/kvm/at.c                 | 23 +++++++++++++++++++----
+>  arch/arm64/kvm/mmu.c                | 16 +++++++++++++++-
+>  arch/arm64/kvm/nested.c             | 10 +++++-----
+>  4 files changed, 53 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 7fe6fb56c187..71814c4aac3e 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -105,7 +105,20 @@ static inline bool kvm_has_xnx(struct kvm *kvm)
+>  		kvm_has_feat(kvm, ID_AA64MMFR1_EL1, XNX, IMP);
+>  }
+>  
+> -extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+> +struct kvm_walk_access {
+> +	enum {
+> +		WALK_ACCESS_IFETCH,
+> +		WALK_ACCESS_LDST,
+> +		WALK_ACCESS_CMO,
+> +		WALK_ACCESS_AT,
+> +		WALK_ACCESS_S1PTW,
+> +	} type;
 > +
-> +	hyp_spin_lock(&host_buffers.lock);
-> +	if (!host_buffers.tx) {
-> +		ret =3D FFA_RET_INVALID_PARAMETERS;
-> +		goto out_unlock;
-> +	}
+> +	u64	ia;
+> +	bool	write;
+> +};
 > +
-> +	memcpy(hyp_buffers.tx, host_buffers.tx, (u64)req_desc_cnt * desc_size);
-
-[Severity: High]
-Is there a risk that this copies too few bytes when offset is greater than
-zero? Since the start of the required descriptors in the buffer is shifted =
-by
-offset bytes, copying only req_desc_cnt * desc_size bytes from the beginning
-of the host buffer misses the trailing descriptors.
-
-If the host EL1 intentionally issues a hypercall with an offset greater than
-zero, this might lead to the SPMD reading uninitialized or stale memory from
-the hypervisor TX buffer.
-
+> +extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, struct kvm_walk_access *access,
+>  			      struct kvm_s2_trans *result);
+>  extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
+>  				    struct kvm_s2_trans *trans);
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index 7a84495a2e6d..083014e9d86a 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -483,7 +483,19 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+>  		ipa = baddr | index;
+>  
+>  		if (wi->s2) {
+> -			ret = kvm_walk_nested_s2(vcpu, ipa, &s2_trans);
+> +			struct kvm_walk_access s2_access = {
+> +				.type	= WALK_ACCESS_S1PTW,
+> +				.ia	= ipa,
 > +
-> +	range =3D (void *)hyp_buffers.tx + offset;
-> +	if (page_index >=3D range->pg_cnt) {
-> +		ret =3D FFA_RET_INVALID_PARAMETERS;
-> +		goto out_unlock;
-> +	}
+> +				/*
+> +				 * R_JCXVS, stage-2 dirty state can be updated
+> +				 * for an S1PTW even if the stage-1 descriptor
+> +				 * isn't updated.
+> +				 */
+> +				.write	= wi->ha,
+> +			};
 > +
-> +	ffa_mem_reclaim2(res, handle, flags, x3, x4, x5);
-> +	if (res->a0 !=3D FFA_SUCCESS)
-> +		goto out_unlock;
+> +			ret = kvm_walk_nested_s2(vcpu, &s2_access, &s2_trans);
+>  			if (ret == -EAGAIN)
+>  				return ret;
+>  
+> @@ -1597,8 +1609,9 @@ int __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>  
+>  int __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>  {
+> +	struct kvm_walk_access access = {};
+>  	struct kvm_s2_trans out = {};
+> -	u64 ipa, par;
+> +	u64 par;
+>  	bool write;
+>  	int ret;
+>  
+> @@ -1642,9 +1655,11 @@ int __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>  		return 0;
+>  
+>  	/* Do the stage-2 translation */
+> -	ipa = (par & GENMASK_ULL(47, 12)) | (vaddr & GENMASK_ULL(11, 0));
+> +	access.type = WALK_ACCESS_AT;
+> +	access.ia = (par & GENMASK_ULL(47, 12)) | (vaddr & GENMASK_ULL(11, 0));
+
+What does this mask represent?
+
+Looking into PAR_EL1 in sysreg.h I can find:
+SYS_PAR_EL1_PA which is GENMASK_ULL(51, 12), and looks to match what you 
+ia means here.
+
+Are you using the mask manually because you want to make sure and 
+filter-out bits 48-51? Is there a reason?
+
+
+>  	out.esr = 0;
+> -	ret = kvm_walk_nested_s2(vcpu, ipa, &out);
 > +
-> +	reclaimed_pages =3D res->a3;
+> +	ret = kvm_walk_nested_s2(vcpu, &access, &out);
+>  	if (ret < 0)
+>  		return ret;
+>  
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index f35c4ce95473..88998195274b 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -2313,9 +2313,23 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  	 */
+>  	if (kvm_is_nested_s2_mmu(vcpu->kvm,vcpu->arch.hw_mmu) &&
+>  	    vcpu->arch.hw_mmu->nested_stage2_enabled) {
+> +		struct kvm_walk_access access = {
+> +			.ia	= fault_ipa,
+> +		};
+>  		u32 esr;
+>  
+> -		ret = kvm_walk_nested_s2(vcpu, fault_ipa, &nested_trans);
+> +		if (kvm_vcpu_abt_iss1tw(vcpu))
+> +			access.type = WALK_ACCESS_S1PTW;
+> +		else if (is_iabt)
+> +			access.type = WALK_ACCESS_IFETCH;
+> +		else if (kvm_vcpu_dabt_is_cm(vcpu))
+> +			access.type = WALK_ACCESS_CMO;
+> +		else
+> +			access.type = WALK_ACCESS_LDST;
 > +
-> +	for (in_idx =3D offset / desc_size; in_idx < req_desc_cnt; in_idx++) {
-
-[Severity: High]
-Does this loop iterate fewer times than the number of descriptors reclaimed
-by the SPMD?
-
-Starting the loop index at offset / desc_size and ending it at req_desc_cnt
-means the loop only executes (req_desc_cnt - offset / desc_size) times.
-This appears to unshare fewer descriptors than the SPMD actually processed.
-
-If the untrusted host EL1 triggers this path, it could leave the hypervisor
-stage-2 ownership tracking permanently desynchronized from the SPMD state.
-
-> +		struct ffa_mem_region_addr_range temp;
-> +		u32 pg_cnt, to_reclaim;
+> +		access.write = kvm_is_write_fault(vcpu);
 > +
-> +		if (reclaimed_count >=3D reclaimed_pages)
-> +			break;
-[ ... ]
+> +		ret = kvm_walk_nested_s2(vcpu, &access, &nested_trans);
+>  		if (ret == -EAGAIN) {
+>  			ret = 1;
+>  			goto out_unlock;
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index dcc7d0cc7c95..c2fb7290f0c8 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -280,7 +280,7 @@ static void compute_s2_permissions(struct kvm_vcpu *vcpu, struct s2_walk_info *w
+>   *
+>   * Must be called with the kvm->srcu read lock held
+>   */
+> -static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, phys_addr_t ipa,
+> +static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, struct kvm_walk_access *access,
+>  			      struct s2_walk_info *wi, struct kvm_s2_trans *out)
+>  {
+>  	int first_block_level, stride, input_size, base_lower_bound;
+> @@ -330,7 +330,7 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, phys_addr_t ipa,
+>  		phys_addr_t index;
+>  
+>  		addr_bottom = (3 - ws.level) * stride + wi->pgshift;
+> -		index = (ipa & GENMASK_ULL(addr_top, addr_bottom))
+> +		index = (access->ia & GENMASK_ULL(addr_top, addr_bottom))
+>  			>> (addr_bottom - 3);
+>  
+>  		ws.desc_pa = base_addr | index;
+> @@ -412,7 +412,7 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, phys_addr_t ipa,
+>  
+>  	/* Calculate and return the result */
+>  	out->output = (ws.desc & GENMASK_ULL(47, addr_bottom)) |
+> -		      (ipa & GENMASK_ULL(addr_bottom - 1, 0));
+> +		      (access->ia & GENMASK_ULL(addr_bottom - 1, 0));
+>  	out->block_size = 1UL << ((3 - ws.level) * stride + wi->pgshift);
+>  	compute_s2_permissions(vcpu, wi, &ws, out);
+>  	out->level = ws.level;
+> @@ -515,7 +515,7 @@ static void setup_s2_walk(struct kvm_vcpu *vcpu, struct s2_walk_info *wi)
+>  	wi->be = vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_ELx_EE;
+>  }
+>  
+> -int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+> +int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, struct kvm_walk_access *access,
+>  		       struct kvm_s2_trans *result)
+>  {
+>  	struct s2_walk_info wi;
+> @@ -528,7 +528,7 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+>  
+>  	setup_s2_walk(vcpu, &wi);
+>  
+> -	ret = walk_nested_s2_pgd(vcpu, gipa, &wi, result);
+> +	ret = walk_nested_s2_pgd(vcpu, access, &wi, result);
+>  	if (ret)
+>  		result->esr |= (kvm_vcpu_get_esr(vcpu) & ~ESR_ELx_FSC);
+>  
+> -- 
+> 2.47.3
+> 
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260921164748.2958=
-578-1-snehalreddy@google.com?part=3D2
+IIUC, in general terms most of the changes are adapting the typing on 
+kvm_walk_nested_s2() & co to make use of the new struct kvm_walk_access 
+instead of just a PA.
+
+I also see that flags & write are also added here, but not used anywhere.
+Maybe it would  be worth moving them to the patch that makes use of them, 
+instead leaving them here?
+
+Other than that, seems ok.
+
+Thanks!
+Leo
