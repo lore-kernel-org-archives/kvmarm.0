@@ -1,626 +1,336 @@
-Received: from mail-yx2-f43.google.com (mail-yx2-f43.google.com [74.125.224.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26D8C5158AB
-	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 21:00:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8909D51354A
+	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 21:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790024462; cv=none; b=ICaJnTGfR+yQFjxxdXpeo/AP3xLYB17ySm+lWOcs8f1wB4u+193FrONpKBXl00dSIXx58eXL6/sGOdLvBf0grkx+VG07TbLuy6URiJyvnBuYdsf9SoAGO2B0QJiBHG66GoO59W30y7cPSzHkFAjoUN0u6w7j4fYXxjb4P0sKcEs=
+	t=1790026045; cv=none; b=TD+9Qm68sL01+SchCR0YfIflHJZmkLjcW7Oe8+aS5tSXxpZCdFoJC8xgbsVEZ4QGVW9TsF/FpILch7ybpIfuK4fY8kKyZSO7H2ZE8NebZI933tcpLapoG9QCTv4lYzlhMfIMfyEDiRfnkXkj4ZZ8bDYGTSRdoMo9nzHyMk1IeBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790024462; c=relaxed/simple;
-	bh=6bOqs+StLJsPQ5uvaJoGvsHyNvBMdSSKxiU4ObsOTiE=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dTT50fOqg40RxvPCmqls+imre8My80Y/lrHPU21RSOH4AF1tpeHpwvQZFTM9/Qt/RLraBkF3BgCh2Nv8IczvAQ1xGmOF7bv3w55YiQzdegpgIuWe+O8mOTDjKNOuN0FMYH7YcW0f8n7Q9i+LxGg9Kz5ZP9weGM4RYYP3DD6lr1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com; spf=pass smtp.mailfrom=soleen.com; dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b=grt0Noot; arc=none smtp.client-ip=74.125.224.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soleen.com
+	s=arc-20240116; t=1790026045; c=relaxed/simple;
+	bh=S4xfAqIaDLovmRNalhGiQCzBJDPU9QZ5iqOLO7Rx0ic=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ijCG5iLmJF4lPl3v5k9nXOSrv3w/XZ33aUzIKcg9ThnrAoLjnVs/ebuSeI6sIpe4iYEjS1Xxj74emr8OO8numCLlna5KVcgNh3gGRXU6F0/GZs+TJ4rSCrqR1/DscUXRVjsklPvvn8ie0m/SvqaXaRL5S8fZrHn6soEJFq+lBXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=eqQ8O7zw; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=DQPi6sQd; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="grt0Noot"
-Received: by mail-yx2-f43.google.com with SMTP id 00721157ae682-895eaf30817so37546137b3.0
-        for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 14:00:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="eqQ8O7zw";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="DQPi6sQd"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68LKg0uJ2412289
+	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 21:27:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	9V9V3F7pGrGXJ58UfRgOG3pzS7jz6dKjyIdgzZ9kkkQ=; b=eqQ8O7zw8YlH96Fr
+	MQ7TVFu2Ep5Ocr5FzZRIIXRABxzdzTilVRORHzUsG7dPd+eX6lq5tCExX1kW68h8
+	J8Eci8XaNtHGBiN8L3fVpzjJpr9vk9NHl9jINuY0/c+fc+TDWz0YqfISorhCKbpp
+	YLJzUGy1rNAriFdREb3OTNIECkF9a3vUBN29vwa7FAwpNszMHOSDJV/od4LuTRaF
+	sGzNLmmSXqQrY47+qnnOPRmMLh6ZyGJ2UXhRjGgvWLMUJxeePWa7sYGjizCXdDh5
+	8guwEu6ROrVhQxfum73qHeMpkXuf8QN2X8GLif92dQeZqbm5ar2+wXK6ALCpn7BA
+	S/KfBA==
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4gu3csjh7v-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 21:27:22 +0000 (GMT)
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-86a59faf521so5635764b3a.2
+        for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 14:27:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=soleen.com; s=google; t=1790024456; x=1790629256; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=R9yjuK1GvA7WV81vpr4lLFMgvL9Udfn1vNj/C/kFbiw=;
-        b=grt0NootsvmApnLAZqYsHRdksmL9D/bezhGEKleXws9zt3JCbRQS6KH6dQYLfIg2Pg
-         Hh5ieSPqztnB3cwX3kksl79V+9c3pdkF4ZOjrzWDPwbta3OVIwRLzJk/qvqYCbqjUONo
-         wI8Qb2Btt5ECXe9MFUdYd9+QeVgz16R5Q1EiyNdes1YvL77FPH/kMLmG51PtIYGt1faY
-         /KExm4P1VD14+6yFmjWHa/uhSzSvOKuqXPaMlEAXUT7TdWuc/JMkGmu/7ok8bOH+nb+1
-         h0ndwkZWSbhC8/nq7b8f0miy50x+WBRt3+Fkg+ZLpAs+8iuPwps+2dRVPP/8FJOj2rfM
-         fA3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790024456; x=1790629256;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+        d=oss.qualcomm.com; s=google; t=1790026042; x=1790630842; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:mime-version:organization
+         :references:in-reply-to:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=R9yjuK1GvA7WV81vpr4lLFMgvL9Udfn1vNj/C/kFbiw=;
-        b=OFBObtzLnmfeErHnLokWI9ey/UMoayn2aYrLkaFLVSZJLsfGJsfQhxsUFdN8ClVrcP
-         07lHsaMhPOb3o2jVoyt3A5hlD0dL6vNg2Xb/m+SRiFsNzdtiRl9YhxZEUk8k3qwEB3jX
-         bZoY1xvwyR6hsiWXktIWQOrQHcIyP8o+RzW0R5rcKjdV/KKcRknH6xaauwPWFFINMAKy
-         YYgbmMpvHYKeonscJB3kEI9ZdXiT6jmHrdkKLN6VkB9M12wERdrWw+lNOoy4A3tvMTbb
-         nJR0Z0MnZAZawSX7bgQC4meb1ES5ml2UVGqWAtRvbyKhAI9vUMdizuC7DiRTQ4No1bdU
-         SoZA==
-X-Forwarded-Encrypted: i=1; AKwUvByzZhBQWEnLrKsekagzqcj2VmM8/tdtAulPhILQv+/zGlbuuqVXRhBST9wqrqbWs9IH+5kvCuY=@lists.linux.dev
-X-Gm-Message-State: AFuF++n8kmrVG1Yh8GDuG7vvD2YxU6WjUg4b/Fen8EhkLQCYWXoECE8L
-	xo5In/FfafysIahdNoSCueAlgiI0geaQqyQ7cDBeXxk832xjx9H9KwsU7rLR9V2lWNw=
-X-Gm-Gg: AYBFou0rD8C9lG90J0UIwzFoQhC8BE0dAd9WnSCaxPap9P16jb58mOBPsXYxcOYl83d
-	Wtdn927TKUVxPFGVc7lPoLceGCRjt2DLzXPT8CsLtMKl984fZkLvQLM2ngDaAXYA8dMlvYnjVWE
-	+t0RhghbB2xjBA1QkJmOGdwD9jnBQvW+1sR94MaET+h/Crh7TZqs2B8VNaLQp3aSNuqLTrcWEwB
-	aYErz7cMF+5N/SM1tgl9lYhRHM839NDaIxvAuWS718ije7t1I+sq3q+g2/B8mDREhEidD1k0g1x
-	yY4zi4JQScCASIrhiM5bpVqkpRmFDLQvX8oivwR3WUXiSgODImPD+jewA9Vpi9lyi0FxTuIB7WU
-	hJRszufvt2nLKCiiRuKZ0tcUGyLpvFjxBgKjUin06oaf3/1aAF7rGL8dkQi1CKu6OlFuzVnrTWi
-	rSENbRqcwoc4pWpBj3soSbciwbMFCOH9u1Z8gma7/+fDNTXIstHGC8bGvD7n0neX5ZSnrPS7a+O
-	UpOIftNaaWTf0OgH18l5wZMm2tgSABv9XSp0wma6576Poy39ufj/UmUfPhd34b+zjaSzpM5yfwi
-	Lej62OJ3pqyl1ceEXig=
-X-Received: by 2002:a05:690c:60c7:b0:873:5bd1:98bc with SMTP id 00721157ae682-89737319ab8mr34742607b3.46.1790024456175;
-        Mon, 21 Sep 2026 14:00:56 -0700 (PDT)
-Received: from soleen.c.googlers.com.com (16.49.199.35.bc.googleusercontent.com. [35.199.49.16])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-8a23c738bdfsm1445297b3.11.2026.09.21.14.00.54
+        bh=9V9V3F7pGrGXJ58UfRgOG3pzS7jz6dKjyIdgzZ9kkkQ=;
+        b=DQPi6sQdfRY0m5FeV5nIoOiqtgPbGERJZ+7jFnO4pj0azQIHYCeApBNvUaQbfwHk//
+         DsSdARbofjAOhMUwb08okVpqp9AI+yzQgGWEbKY4NR6+MaeU94d5Dm+6gj6ejNEtQPBp
+         zuj8Ir3C2WqxiNSXN0z2odXNliQVI0feCE1lw/O1MAjI35Eq5ZijLNLtAXCQMJCtqSOS
+         6EDOC6bYFKlE48WjfZvNWCoRnO9EzMD7goYsSvRwkDKrqIYpGgZxr//kZTUPiDBD0wD7
+         GhAgSqbksKTBrbbbGIhM91iDCF7JDM8QU4dQ7/vsCrnA1vlCpSoyTSGwUA1FlFae6Uhl
+         qx7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790026042; x=1790630842;
+        h=content-transfer-encoding:content-type:mime-version:organization
+         :references:in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=9V9V3F7pGrGXJ58UfRgOG3pzS7jz6dKjyIdgzZ9kkkQ=;
+        b=pQnBnDLX6m0q6vSUEadS4zVlE1q4GWiwQKK6VkzrtefNgWuZGo33oLAu4l1gitw1mL
+         KKRDgI+vWvmR5XS9mdtVNsgKoObQS+ryHesGKfpFTbEyEMNt5mcD5A54vxgouqqAj4NS
+         MnNJxdwG1+ipUESv2CqPw9ee+tOSIIpusCxcAjAgE4mmQmSk0cgBMzDwbCO/Gok9Vgdx
+         2ZG4hTGGjfQVsT7ZobDIF9xvPLu5jLNzPMZsxvXmof+edH9QDqw4FfvNlO9pvQ9k77uV
+         fgSrzT26YSCgY1R3pAU4f9Pgp8WUmO3wmTLXvRcw4Sw8xBRP2J1OzbE7t5I7SWYeGdI2
+         5jsg==
+X-Forwarded-Encrypted: i=1; AKwUvByavkFsGtLIrXnNNmu0WDqzVcxCav5/4DBAAUfot9zs+pDFoNjQnSW/cKdXxn+pkZiBKrawW+c=@lists.linux.dev
+X-Gm-Message-State: AFuF++l4yGeSKHLi/h3l4du+EsLqGGiPPhshsePN5ztlM/ValrBmLiEq
+	4dyJQZXRfuK/jvg0iUUWY64Tb/9C6bj2ZX7cyUYq/uJUrmx6LxT0bEQFdOKx4rZvy7xACO6k99M
+	9W2Nga2ZmN9UYP14vlDKqjgldUoTFuBbXb8EbfpgZyoSGJjXHh/21+2HJEow=
+X-Gm-Gg: AYBFou1pGw1Om4lt9cqDJsVy2ffO5xGpFP4FFzt/aQ4VLab6AnFhTOAiUH5kX7QpbUR
+	7m+7ig0fvjXleV6wsTLNDy3MfcruXsUMoAQ1doXylh167jHZpJ3NfMxSxStR8VehX06D843fPak
+	pccd7GS3sPOQHroy3eh8rFv03RfSvERa5qrRKZxYg3uOOKauswATPY8wLOVHSFA6guhjhfW08H+
+	DSTh0LlET6urq7ZjsRl9LKrjUS82ghnfo88I2P2+5qd3UQPJqZ20Z8I3N43o/+Qdu/aTmwlEWf5
+	k+R6RsYoI45hH6j0T8e2NPLn6PG3kH4qtdsx2Y5+LXrOnbg60kg6EG5POerSpO7yObu/EeDtjzB
+	8fHDd+KFO0o1E5khyJUHZ1gLPMA==
+X-Received: by 2002:a05:6a20:43ab:b0:3dd:a196:907b with SMTP id adf61e73a8af0-3dde41729a0mr297626637.69.1790026041745;
+        Mon, 21 Sep 2026 14:27:21 -0700 (PDT)
+X-Received: by 2002:a05:6a20:43ab:b0:3dd:a196:907b with SMTP id adf61e73a8af0-3dde41729a0mr297581637.69.1790026041203;
+        Mon, 21 Sep 2026 14:27:21 -0700 (PDT)
+Received: from localhost ([50.35.44.179])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33e5e95c4b9sm851620eec.0.2026.09.21.14.27.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Sep 2026 14:00:55 -0700 (PDT)
-From: Pasha Tatashin <pasha.tatashin@soleen.com>
-To: linux-kselftest@vger.kernel.org,
-	legion@kernel.org,
-	kees@kernel.org,
-	will@kernel.org,
-	ruanjinjie@huawei.com,
-	atomlin@atomlin.com,
-	rppt@kernel.org,
-	jani.nikula@intel.com,
-	hamzamahfooz@linux.microsoft.com,
-	joey.gouly@arm.com,
-	tglx@kernel.org,
-	nsc@kernel.org,
-	alexandre.chartre@oracle.com,
-	james.morse@arm.com,
-	dianders@chromium.org,
-	bp@alien8.de,
-	jpoimboe@kernel.org,
-	shuah@kernel.org,
-	catalin.marinas@arm.com,
-	linux-kbuild@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	jaredwhite@microsoft.com,
-	johan@kernel.org,
-	pbonzini@redhat.com,
-	mingo@redhat.com,
-	linux-mm@kvack.org,
-	seanjc@google.com,
-	mark.rutland@arm.com,
-	vdonnefort@google.com,
-	tarunsahu@google.com,
-	gshan@redhat.com,
-	skhan@linuxfoundation.org,
-	linux-doc@vger.kernel.org,
-	xur@google.com,
-	djbw@kernel.org,
-	oupton@kernel.org,
-	nogikh@google.com,
-	sumitg@nvidia.com,
-	linux-kernel@vger.kernel.org,
-	zengheng4@huawei.com,
-	peterz@infradead.org,
-	corbet@lwn.net,
-	suzuki.poulose@arm.com,
-	luto@kernel.org,
-	hpa@zytor.com,
-	zhangpengjie2@huawei.com,
-	x86@kernel.org,
-	yuzenghui@huawei.com,
-	jic23@kernel.org,
-	ardb@kernel.org,
-	pasha.tatashin@soleen.com,
-	petr.pavlu@suse.com,
-	ryan.roberts@arm.com,
-	kexec@lists.infradead.org,
-	pratyush@kernel.org,
-	dave.hansen@linux.intel.com,
-	rdunlap@infradead.org,
-	kvm@vger.kernel.org,
-	fuad.tabba@linux.dev,
-	maz@kernel.org,
-	mbenes@suse.cz,
-	jgross@suse.com,
-	seiden@linux.ibm.com,
-	pierre.gondois@arm.com,
-	song@kernel.org,
-	nathan@kernel.org,
-	pmladek@suse.com,
-	graf@amazon.com,
-	chao.gao@intel.com,
-	zhenglifeng1@huawei.com,
-	arnd@arndb.de,
-	sidnayyar@google.com,
-	linux-arm-kernel@lists.infradead.org,
-	vladimir.murzin@arm.com,
-	kas@kernel.org
-Subject: [RFC PATCH 46/46] KVM: arm64: Implement Caretaker vCPU run loop and LUO detach/attach lifecycle
-Date: Mon, 21 Sep 2026 17:00:34 -0400
-Message-ID: <20260921210034.180424-8-pasha.tatashin@soleen.com>
-X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
-In-Reply-To: <20260921210034.180424-1-pasha.tatashin@soleen.com>
-References: <20260920193650.3373435-1-pasha.tatashin@soleen.com>
- <20260921210034.180424-1-pasha.tatashin@soleen.com>
+        Mon, 21 Sep 2026 14:27:20 -0700 (PDT)
+Date: Mon, 21 Sep 2026 14:27:16 -0700
+From: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+        will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+        aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+        joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+        linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+        sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+        WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+Subject: Re: [PATCH v18 1/7] firmware: arm_rmm: Add SMC definitions for
+ calling the RMM
+Message-ID: <20260921142716.000073f8@oss.qualcomm.com>
+In-Reply-To: <45fb9520-7003-412f-9ab1-14e2a762c816@arm.com>
+References: <20260912083611.2513845-1-suzuki.poulose@arm.com>
+	<20260912083611.2513845-2-suzuki.poulose@arm.com>
+	<178978126540.2352296.16845657485139032765.b4-review@b4>
+	<d7ccaf22-5bde-4344-8bf0-a5a17dcac0f3@arm.com>
+	<45fb9520-7003-412f-9ab1-14e2a762c816@arm.com>
+Organization: Qualcomm
+X-Mailer: Claws Mail 4.4.0 (GTK 3.24.51; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTIxMDMxMyBTYWx0ZWRfXx9mbteCKoBaf
+ Q3+Q3ru09N9yvGfWw5UqNecu1eiNkcuRWbZNnRdrHcpAf4FtZkw/MbGhXO1hnGpdbQJKE6l1oXQ
+ axO3fKZhJRzjJeN01G8aRxnDhAJXy0Y=
+X-Proofpoint-GUID: sPVAAghezN8twJOfrCq5h4Npw0axJ5ZJ
+X-Authority-Analysis: v=2.4 cv=QovLTlyd c=1 sm=1 tr=0 ts=6ab1a13a cx=c_pps
+ a=WW5sKcV1LcKqjgzy2JUPuA==:117 a=aNnz9XPx1a4JIXSYt2cE/A==:17
+ a=8nJEP1OIZ-IA:10 a=VdqzKS8jKosA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22
+ a=7CQSdrXTAAAA:8 a=sxcT59CpA4y3w3PZQfIA:9 a=wPNLvfGTeEIA:10
+ a=OpyuDcXvxspvyRM73sMx:22 a=a-qgeE7W1pNrGK8U0ZQC:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTIxMDMxMyBTYWx0ZWRfX8P8XoMsn6i7/
+ I/W285Hw358txtfXhVJD7Hpen07SeDnwk/NKOzr0yRfZlHQbmoZXE3nFRjWNbQOG7/7g6SwLnYi
+ I8hzek3lShloFvISBQh5EnrI3eIuQ+1XZW4ujCjIhfkGeVkPpBCygtc3u6bcFsCt9mo0SbPt/XY
+ 5EXiUYqhzQ6XbqBxAAVxt82XP9PhMI6v9b410e4FWvC4k8sNT/Nv2gY7DsX4rfyrqPewlidy1AK
+ pY0Simqv/S69C7stNVXon02E5eAEAp/UvTxgThMGOyikBhc5VCPnowGXYpC4EGCWz3BxLjKCIR9
+ Pf5rsLxc0eSxnrhP63/W1sLGk2AmgI80SlRfhHuL8+6m1dmW6VbCtlPwryr1LK01nB2oBwthNjd
+ WptsCFcUCfW8amrjkYNGXJPjxSOgf0SE2XU3xC3gkr9HcyShOIdGaxxgxBcomztDoBzvFzAzjfe
+ Bee+lEQAJCseX95zJPg==
+X-Proofpoint-ORIG-GUID: sPVAAghezN8twJOfrCq5h4Npw0axJ5ZJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-21_06,2026-09-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 suspectscore=0 bulkscore=0 impostorscore=0 priorityscore=1501
+ spamscore=0 lowpriorityscore=0 phishscore=0 malwarescore=0 clxscore=1015
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609210313
 
-Complete ARM64 Caretaker vCPU execution loop, detach-time state
-serialization, and LUO integration in arch/arm64/kvm/caretaker.c.
+On Mon, 21 Sep 2026 11:02:56 +0100
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 
-Signed-off-by: Pasha Tatashin <pasha.tatashin@soleen.com>
----
- arch/arm64/kvm/Kconfig     |   1 +
- arch/arm64/kvm/Makefile    |  12 ++
- arch/arm64/kvm/caretaker.c | 243 ++++++++++++++++++++++++++++++++++++-
- arch/arm64/kvm/kvm_luo.c   | 103 ++++++++++++++++
- 4 files changed, 357 insertions(+), 2 deletions(-)
+> On 21/09/2026 10:27, Suzuki K Poulose wrote:
+> > On 19/09/2026 02:27, Jonathan Cameron wrote: =20
+> >>> The RMM (Realm Management Monitor) provides functionality that can be
+> >>> accessed by SMC calls from the host.
+> >>>
+> >>> The SMC definitions are based on DEN0137[1] version 2.0-bet3
+> >>>
+> >>> [1] https://developer.arm.com/documentation/den0137/2-0bet3/
+> >>>
+> >>> Signed-off-by: Steven Price <steven.price@arm.com>
+> >>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com> =20
+> >>
+> >> With Gavin's nitpicks and the GENMASK_ULL() from sashiko, just a few
+> >> comments inline.=A0 Mostly on subtle inconsistencies that really don't
+> >> matter that much.
+> >> =20
+> >>> =A0 include/linux/arm-smccc-rmi.h | 497 +++++++++++++++++++++++++++++=
++++++
+> >>> =A0 1 file changed, 497 insertions(+)
+> >>> =A0 create mode 100644 include/linux/arm-smccc-rmi.h
+> >>>
+> >>> diff --git a/include/linux/arm-smccc-rmi.h b/include/linux/arm-smccc-=
+=20
+> >>> rmi.h
+> >>> new file mode 100644
+> >>> index 000000000000..214d6228dfc2
+> >>> --- /dev/null
+> >>> +++ b/include/linux/arm-smccc-rmi.h
+> >>> @@ -0,0 +1,497 @@
+> >>> +/* SPDX-License-Identifier: GPL-2.0 */
+> >>> +/*
+> >>> + * Copyright (C) 2023-2026 ARM Ltd.
+> >>> + *
+> >>> + * The values and structures in this file are from the Realm=20
+> >>> Management Monitor
+> >>> + * specification (DEN0137) version 2.0-bet3:
+> >>> + * https://developer.arm.com/documentation/den0137/2-0bet3/
+> >>> + */
+> >>> +
+> >>> +#ifndef __LINUX_ARM_SMCCC_RMI_H_
+> >>> +#define __LINUX_ARM_SMCCC_RMI_H_
+> >>> +
+> >>> +#include <linux/arm-smccc.h>
+> >>> +#include <linux/bitfield.h>
+> >>> +#include <linux/bits.h>
+> >>> +#include <linux/build_bug.h>
+> >>> +#include <linux/sizes.h>
+> >>> +
+> >>> +#include <asm/page.h>
+> >>> +
+> >>> +#define SMC_RMI_CALL(func)=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0 \
+> >>> +=A0=A0=A0 ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,=A0=A0=A0=A0=A0=A0=
+=A0 \
+> >>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ARM_SMCCC_SMC_64,=A0=A0=
+=A0=A0=A0=A0=A0 \
+> >>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ARM_SMCCC_OWNER_STANDARD,=
+=A0=A0=A0 \
+> >>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 (func)) =20
+> >>
+> >> Obviously it is v18 so probably a future thing but nothing about this
+> >> is RMI specific.=A0 Could be used for ARM_SMCCC_TRNG_RND64 for instanc=
+e.
+> >> I'm not entirely sure what we'd call such a macro
+> >>
+> >> ARM_SMCCC_CALL_VAL64_STD() maybe? =20
+> >=20
+> > ARM_SMCCC_STD_CALL64_VAL() ?
+> >=20
+> > But, I would leave it as a wider cleanup in the tree as a separate
+> > series.
+> >  =20
+> >>
+> >> I'm not just not keen on macros whose names to me hint at something
+> >> special. FWIW this also matches SMC_RSI_FID() and FFA_SMC64().
+> >> Isn't it nice when we have a predictable naming scheme :)
+> >>
+> >> FID (for Function IDentifier) is in the spec, so maybe?
+> >>
+> >> Anyhow, I don't really care that much.
+> >> =20
+> >>> +
+> >>> +#define SMC_RMI_VERSION=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+ SMC_RMI_CALL(0x0150)
+> >>> + =20
+> >>
+> >> =20
+> >>> +#define RMI_ABI_MAJOR_VERSION=A0=A0=A0 2
+> >>> +#define RMI_ABI_MINOR_VERSION=A0=A0=A0 0
+> >>> +
+> >>> +#define RMI_ABI_VERSION_GET_MAJOR(version) ((version) >> 16) =20
+> >>
+> >> I'd mask it.=A0 Mostly because that would shout that it is only 15 bit=
+s.
+> >> =20
+> >=20
+> > Ack
+> >  =20
+> >>> +#define RMI_ABI_VERSION_GET_MINOR(version) ((version) & 0xFFFF)
+> >>> +#define RMI_ABI_VERSION(major, minor)=A0=A0=A0=A0=A0 (((major) << 16=
+) | (minor)) =20
+> >>
+> >> I'd go all in on FIELD_PREP() / FIELD_GET() + GENMASK just for the
+> >> sake of consistency + not having to be careful that everything is
+> >> checked for fit to keep the LLM bots happy.
+> >> =20
+> >>> +
+> >>> +#define RMI_RETURN_STATUS_MASK=A0=A0=A0=A0=A0=A0=A0 GENMASK(7, 0)
+> >>> +#define RMI_RETURN_INDEX_MASK=A0=A0=A0=A0=A0=A0=A0 GENMASK(15, 8)
+> >>> +#define RMI_RETURN_MEMREQ_MASK=A0=A0=A0=A0=A0=A0=A0 GENMASK(9, 8)
+> >>> +#define RMI_RETURN_CAN_CANCEL_MASK=A0=A0=A0 BIT(10)
+> >>> +
+> >>> +#define RMI_RETURN_STATUS(ret)       =20
+> >>> FIELD_GET(RMI_RETURN_STATUS_MASK, ret)
+> >>> +#define RMI_RETURN_INDEX(ret)       =20
+> >>> FIELD_GET(RMI_RETURN_INDEX_MASK, ret) =20
+> >>
+> >> What's this one?=A0 I can't find anything in the spec that matches it
+> >> and as far as I can tell you don't use it in this series. =20
+> >=20
+> > This is coming from RmiResultDataLevel. See RmiResult type.
+> > This was renamed after we introduce the RmiResultDataIncomplete.
+> > It is used in the KVM code to find the "level" where a command
+> > failed/walked.
+> >=20
+> > I could rename it to RMI_RESULT_DATA_LEVEL() ?
+> > Similarly RMI_RESULT_STATUS instead of RMI_RETURN_*
+> >  =20
+> >> =20
+> >>> +#define RMI_RETURN_MEMREQ(ret)       =20
+> >>> FIELD_GET(RMI_RETURN_MEMREQ_MASK, ret)
+> >>> +#define RMI_RETURN_CAN_CANCEL(ret)   =20
+> >>> FIELD_GET(RMI_RETURN_CAN_CANCEL_MASK, ret) =20
+> >  =20
+> >> These are obscure enough to find in the spec I'd give a comment just
+> >> to save the sanity of anyone looking for them. =20
+> >=20
+> > As above, they are really RMI_RESULT_DATA_INCOMPLETE_*
+> >  =20
+> >> =20
+> >>> +/*
+> >>> + * Note many of these fields are smaller than u64 but all fields=20
+> >>> have u64
+> >>> + * alignment, so use u64 to ensure correct alignment. =20
+> >>
+> >> Obviously this is only going to run on arm64 so it's not critical, but
+> >> more generally u64s aren't always 64 bit aligned.=A0 So if you 'really'
+> >> care aligned_u64 is there to ensure it.=A0 Meh, arm64 so fine. =20
+> >=20
+> > Agreed, I am worried about the churn in the consumer code. Also, like
+> > you said, this is only for ARM64. So, I would pass it.
+> >  =20
+> >> =20
+> >>> + */
+> >>> +struct rmm_config {
+> >>> +=A0=A0=A0 union { /* 0x0 */
+> >>> +=A0=A0=A0=A0=A0=A0=A0 struct {
+> >>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 u64 tracking_region_size;
+> >>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 u64 rmi_granule_size;
+> >>> +=A0=A0=A0=A0=A0=A0=A0 };
+> >>> +=A0=A0=A0=A0=A0=A0=A0 u8 sizer[SZ_4K];
+> >>> +=A0=A0=A0 };
+> >>> +};
+> >>> +
+> >>> +static_assert(sizeof(struct rmm_config) =3D=3D SZ_4K);
+> >>> +
+> >>> +#define RMI_REALM_PARAM_FLAG_SVE=A0=A0=A0=A0=A0=A0=A0 BIT(1)
+> >>> +#define RMI_REALM_PARAM_FLAG_PMU=A0=A0=A0=A0=A0=A0=A0 BIT(2)
+> >>> +#define RMI_REALM_PARAM_FLAG_DA=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 BIT=
+(3)
+> >>> +#define RMI_REALM_PARAM_FLAG_LFA_POLICY=A0=A0=A0=A0=A0=A0=A0 GENMASK=
+(6, 5)
+> >>> +#define RMI_REALM_PARAM_FLAG_MEC_POLICY=A0=A0=A0=A0=A0=A0=A0 GENMASK=
+(8, 7) =20
+> >>
+> >> Tiny bit inconsistent. When do you decide _MASK is needed and when
+> >> not?=A0 Seems a little too random for multibit fields. =20
+> >=20
+> > I will try to clean this up. =20
+>=20
+> Actually, this is used when we don't consume them from RMM. i.e.,
+> we never call FIELD_GET() on them. But thats not a reason for
+> not being consistent in naming. I can fix it
 
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index fd25b3c0d8ca..9c43010873a3 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -38,6 +38,7 @@ menuconfig KVM
- 	select GUEST_PERF_EVENTS if PERF_EVENTS
- 	select KVM_GUEST_MEMFD
- 	select HAVE_KVM_ARCH_VCPU_PRESERVE
-+	select HAVE_KVM_ARCH_CARETAKER
- 	help
- 	  Support hosting virtualized guest machines.
- 
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index d5e888d1bd50..58550a0a8160 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -12,6 +12,18 @@ obj-$(CONFIG_KVM) += hyp/
- 
- CFLAGS_sys_regs.o += -Wno-override-init
- CFLAGS_handle_exit.o += -Wno-override-init
-+KASAN_SANITIZE_caretaker.o := n
-+KCSAN_SANITIZE_caretaker.o := n
-+UBSAN_SANITIZE_caretaker.o := n
-+KCOV_INSTRUMENT_caretaker.o := n
-+CFLAGS_REMOVE_caretaker.o = $(CC_FLAGS_FTRACE)
-+CFLAGS_caretaker.o += $(call cc-option,-mbranch-protection=none) \
-+		      -fno-stack-protector \
-+		      $(call cc-option,-ftrivial-auto-var-init=uninitialized) \
-+		      $(call cc-option,-fno-jump-tables)
-+AFLAGS_caretaker_vmenter.o += -D__KVM_VHE_HYPERVISOR__
-+
-+kvm-$(CONFIG_KVM_CARETAKER) += caretaker.o caretaker_vmenter.o
- 
- kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
- 	 inject_fault.o va_layout.o handle_exit.o config.o \
-diff --git a/arch/arm64/kvm/caretaker.c b/arch/arm64/kvm/caretaker.c
-index 6980c1f6b998..8cd73099a60a 100644
---- a/arch/arm64/kvm/caretaker.c
-+++ b/arch/arm64/kvm/caretaker.c
-@@ -193,6 +193,9 @@ int arm64_kvm_caretaker_preserve(struct kvm_vcpu *vcpu,
- 	cap->ctx.vtcr_el2 = mmu->vtcr;
- 	cap->ctx.vttbr_el2 = kvm_get_vttbr(mmu);
- 
-+	if (irqchip_in_kernel(vcpu->kvm) && !vgic_initialized(vcpu->kvm))
-+		kvm_vgic_map_resources(vcpu->kvm);
-+
- 	if (vgic_initialized(vcpu->kvm)) {
- 		int i;
- 
-@@ -504,8 +507,8 @@ __caretaker_text static void caretaker_vgic_v3_save(struct vgic_v3_cpu_if *cpu_i
- 	used_lrs = min3(used_lrs, max_lrs, (unsigned int)VGIC_V3_MAX_LRS);
- 
- 	for (i = 0; i < used_lrs; i++) {
--		cpu_if->vgic_lr[i] = __gic_v3_get_lr(i);
--		__gic_v3_set_lr(0, i);
-+		cpu_if->vgic_lr[i] = caretaker_gic_v3_get_lr(i);
-+		caretaker_gic_v3_set_lr(0, i);
- 	}
- 
- 	cpu_if->vgic_vmcr = read_sysreg_s(SYS_ICH_VMCR_EL2);
-@@ -921,3 +924,239 @@ static void arm64_caretaker_sync_vcpu(struct kvm_vcpu *vcpu,
- 	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
- }
- 
-+static __caretaker_text void
-+arm64_caretaker_op_pre_run(void *data)
-+{
-+	struct caretaker_arm64_page *cap = data;
-+
-+	local_daif_mask();
-+	arm64_caretaker_save_ptrauth(&cap->ptrauth_keys);
-+
-+	/* Pre-job: load guest context */
-+	cpu_preserved_inval(cap);
-+
-+	arm64_caretaker_load_sysregs(&cap->ctx.ctxt);
-+
-+	if (cap->ctx.vgic_initialized)
-+		caretaker_vgic_v3_restore(cap);
-+
-+	write_sysreg(cap->ctx.cntvoff_el2, cntvoff_el2);
-+	write_sysreg_el0(cap->ctx.cntv_cval_el0, SYS_CNTV_CVAL);
-+	write_sysreg_el0(cap->ctx.cntv_ctl_el0, SYS_CNTV_CTL);
-+	isb();
-+
-+	if (cap->ctx.vtcr_el2 && cap->ctx.vttbr_el2) {
-+		write_sysreg(cap->ctx.vtcr_el2, vtcr_el2);
-+		write_sysreg(cap->ctx.vttbr_el2, vttbr_el2);
-+		asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
-+		__tlbi(vmalle1);
-+		asm volatile("ic iallu");
-+		dsb(nsh);
-+		isb();
-+	}
-+
-+	write_sysreg(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |
-+		     CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN,
-+		     cpacr_el1);
-+	isb();
-+
-+	fpsimd_load_state(&cap->ctx.ctxt.fp_regs);
-+
-+	gicv3_caretaker_enable_sgi();
-+	write_sysreg_s(ICC_CTLR_EL1_EOImode_drop, SYS_ICC_CTLR_EL1);
-+	write_sysreg_s(ICC_SRE_EL1_SRE, SYS_ICC_SRE_EL1);
-+	write_sysreg_s(0, SYS_ICC_BPR1_EL1);
-+	gicv3_caretaker_clear_active_priorities();
-+	write_sysreg_s(ICC_PMR_EL1_MASK, SYS_ICC_PMR_EL1);
-+	write_sysreg_s(ICC_IGRPEN1_EL1_MASK, SYS_ICC_IGRPEN1_EL1);
-+	caretaker_gic_drain_iar();
-+	dsb(sy);
-+	isb();
-+}
-+
-+static __caretaker_text void
-+arm64_caretaker_op_post_run(void *data)
-+{
-+	struct cpu_preserved_stack_context *sctx;
-+	struct caretaker_arm64_page *cap = data;
-+	int cpu = cap->abi.cb.pcpu_id;
-+	phys_addr_t pgd_pa;
-+
-+	/* Post-run: restore host hypervisor mode then save guest context */
-+	write_sysreg_s(0, SYS_CNTHP_CTL_EL2);
-+	caretaker_restore_host_el2();
-+
-+	fpsimd_save_state(&cap->ctx.ctxt.fp_regs);
-+
-+	cap->ctx.cntv_cval_el0 = read_sysreg_el0(SYS_CNTV_CVAL);
-+	cap->ctx.cntv_ctl_el0 = read_sysreg_el0(SYS_CNTV_CTL);
-+
-+	if (cap->ctx.vgic_initialized)
-+		caretaker_vgic_v3_save(&cap->ctx.vgic_v3);
-+
-+	arm64_caretaker_save_sysregs(&cap->ctx.ctxt);
-+
-+	sctx = cpu_preserved_get_stack_context();
-+	if (sctx && sctx->session_pgd_pa)
-+		pgd_pa = sctx->session_pgd_pa;
-+	else
-+		pgd_pa = cpu_preserved_get_pgd(cpu);
-+
-+	if (!pgd_pa)
-+		pgd_pa = READ_ONCE(arm64_caretaker_pgd_pa);
-+
-+	write_sysreg(0, ttbr0_el1);
-+	if (pgd_pa && read_sysreg(ttbr1_el1) != pgd_pa) {
-+		write_sysreg(pgd_pa, ttbr1_el1);
-+		isb();
-+		arm64_flush_host_tlb_local();
-+	}
-+
-+	cpu_preserved_clean(cap);
-+
-+	if (smp_load_acquire(&cap->abi.cb.state) >= KVM_CARETAKER_STOPPING ||
-+	    kvm_caretaker_should_exit(&cap->vcpu)) {
-+		local_daif_mask();
-+		isb();
-+
-+		caretaker_gic_drain_iar();
-+		gicv3_caretaker_clear_active_priorities();
-+		write_sysreg_s(0, SYS_ICC_IGRPEN1_EL1);
-+		write_sysreg_s(0, SYS_ICC_PMR_EL1);
-+		write_sysreg_s(0, SYS_ICC_BPR1_EL1);
-+		gicv3_caretaker_clear_sgi();
-+		dsb(sy);
-+		isb();
-+	}
-+
-+	arm64_caretaker_detach_serialize(cap);
-+
-+	arm64_caretaker_restore_ptrauth(&cap->ptrauth_keys);
-+	caretaker_restore_host_el2();
-+}
-+
-+static struct kvm_caretaker_ops arm64_caretaker_ops __cpu_preserved_data = {
-+	.enter_guest = arm64_caretaker_op_enter,
-+	.decode_exit = arm64_caretaker_op_decode_exit,
-+	.handle_arch_exit = arm64_caretaker_op_handle_exit,
-+	.advance_rip = arm64_caretaker_op_advance_rip,
-+	.arm_timer = arm64_caretaker_op_arm_timer,
-+	.disarm_timer = arm64_caretaker_op_disarm_timer,
-+	.pre_run = arm64_caretaker_op_pre_run,
-+	.post_run = arm64_caretaker_op_post_run,
-+};
-+
-+static __caretaker_text enum oncore_exit_reason
-+caretaker_arch_run_page(struct caretaker_arm64_page *cap, u64 deadline_ticks)
-+{
-+	enum oncore_exit_reason reason;
-+	int cpu;
-+
-+	if (!cap)
-+		return ONCORE_EXIT_ERROR;
-+
-+	cpu_preserved_inval(&cap->abi.cb);
-+	cpu = cap->abi.cb.pcpu_id;
-+	if (cpu < 0 || cpu >= ARRAY_SIZE(arm64_caretaker_faults))
-+		cpu = arm64_caretaker_get_pcpu();
-+
-+	cap->abi.cb.pcpu_id = cpu;
-+	if (cmpxchg(&cap->abi.cb.state, KVM_CARETAKER_PAUSED,
-+		    KVM_CARETAKER_RUNNING) != KVM_CARETAKER_PAUSED ||
-+	    cpu_preserved_should_exit(cpu)) {
-+		arm64_caretaker_detach_serialize(cap);
-+		smp_store_release(&cap->abi.cb.state, KVM_CARETAKER_STOPPED);
-+		cpu_preserved_clean(&cap->abi.cb);
-+		return ONCORE_EXIT_ATTACH_SIGNALED;
-+	}
-+	cpu_preserved_clean(&cap->abi.cb);
-+
-+	cap->vcpu.ops = &arm64_caretaker_ops;
-+
-+	reason = kvm_caretaker_vcpu_run(&cap->vcpu, deadline_ticks);
-+
-+	cpu_preserved_inval(&cap->abi.cb);
-+	if (reason == ONCORE_EXIT_ATTACH_SIGNALED ||
-+	    reason == ONCORE_EXIT_ERROR ||
-+	    cpu_preserved_should_exit(cpu) ||
-+	    cmpxchg(&cap->abi.cb.state, KVM_CARETAKER_RUNNING,
-+		    KVM_CARETAKER_PAUSED) != KVM_CARETAKER_RUNNING) {
-+		reason = ONCORE_EXIT_ATTACH_SIGNALED;
-+		arm64_caretaker_detach_serialize(cap);
-+		smp_store_release(&cap->abi.cb.state, KVM_CARETAKER_STOPPED);
-+		cpu_preserved_clean(&cap->abi.cb);
-+	} else {
-+		cpu_preserved_clean(&cap->abi.cb);
-+	}
-+
-+	return reason;
-+}
-+
-+__caretaker_text enum oncore_exit_reason
-+kvm_arch_vcpu_caretaker_run(void *data, u64 deadline_ticks)
-+{
-+	struct kvm_caretaker_cb_ser *cb = data;
-+
-+	/*
-+	 * @data is always a struct kvm_caretaker_cb_ser: kvm_caretaker_vcpu_preserve()
-+	 * installs it with oncore_job_set_data() before activating the job.
-+	 */
-+	if (!cb)
-+		return ONCORE_EXIT_ERROR;
-+
-+	return caretaker_arch_run_page(container_of(cb,
-+						    struct caretaker_arm64_page,
-+						    abi.cb),
-+				       deadline_ticks);
-+}
-+
-+void kvm_arch_vcpu_luo_pre_retrieve_caretaker(struct kvm_vcpu *vcpu,
-+					      struct kvm_vcpu_ser *ser)
-+{
-+	if ((ser->flags & KVM_VCPU_LUO_FLAG_CARETAKER) && ser->cb.phys) {
-+		struct kvm_caretaker_arch_ser *abi = phys_to_virt(ser->cb.phys);
-+		int pcpu = abi->cb.pcpu_id;
-+
-+		if (pcpu >= 0) {
-+			kvm_caretaker_wait_for_attach(&abi->cb, pcpu);
-+			cpu_preserved_inval(abi);
-+			if (ser->arch_state.phys) {
-+				struct kvm_vcpu_arch_ser *state =
-+					phys_to_virt(ser->arch_state.phys);
-+
-+				cpu_preserved_inval(state);
-+				cpu_preserved_inval_sz(state,
-+						       struct_size(state, sysregs,
-+								   state->num_sysregs));
-+			}
-+		}
-+	}
-+}
-+
-+void kvm_arch_vcpu_luo_attach_caretaker(struct kvm_vcpu *vcpu,
-+					struct kvm_vcpu_ser *ser)
-+{
-+	if ((ser->flags & KVM_VCPU_LUO_FLAG_CARETAKER) && ser->cb.phys) {
-+		struct kvm_caretaker_arch_ser *abi = phys_to_virt(ser->cb.phys);
-+
-+		arm64_caretaker_sync_vcpu(vcpu, abi);
-+	}
-+
-+	kvm_caretaker_post_attach_vcpu(vcpu);
-+}
-+
-+void arm64_kvm_caretaker_unpreserve(struct kvm_vcpu_ser *ser)
-+{
-+	if (ser->cb.phys) {
-+		kho_unpreserve_free(phys_to_virt(ser->cb.phys));
-+		ser->cb.phys = 0;
-+	}
-+}
-+
-+void arm64_kvm_caretaker_finish(struct kvm_vcpu_ser *ser)
-+{
-+	if (ser->cb.phys) {
-+		kho_restore_free(phys_to_virt(ser->cb.phys));
-+		ser->cb.phys = 0;
-+	}
-+}
-diff --git a/arch/arm64/kvm/kvm_luo.c b/arch/arm64/kvm/kvm_luo.c
-index 59c56836cda8..ae8baef49f97 100644
---- a/arch/arm64/kvm/kvm_luo.c
-+++ b/arch/arm64/kvm/kvm_luo.c
-@@ -6,6 +6,7 @@
-  * ARM64 KVM LUO preservation and retrieval handlers.
-  */
- 
-+#include <linux/cpu_preserve.h>
- #include <linux/kexec_handover.h>
- #include <linux/kho/abi/kvm_arm64.h>
- #include <linux/kvm_host.h>
-@@ -17,15 +18,100 @@
- #include <kvm/arm_arch_timer.h>
- #include <kvm/arm_vgic.h>
- 
-+#include "caretaker.h"
- #include "sys_regs.h"
- #include "vgic/vgic.h"
- 
-+#ifdef CONFIG_KVM_CARETAKER
-+struct arm64_stage2_kho_walk {
-+	struct kvm_kho_folios_ser *kp;
-+	unsigned int count;
-+};
-+
-+static int stage2_kho_visitor(const struct kvm_pgtable_visit_ctx *ctx,
-+			      enum kvm_pgtable_walk_flags visit)
-+{
-+	struct arm64_stage2_kho_walk *w = ctx->arg;
-+
-+	if (kvm_pte_valid(ctx->old) && ctx->level != KVM_PGTABLE_LAST_LEVEL &&
-+	    FIELD_GET(KVM_PTE_TYPE, ctx->old) == KVM_PTE_TYPE_TABLE) {
-+		u64 phys = kvm_pte_to_phys(ctx->old);
-+		struct page *p = phys_to_page(phys);
-+
-+		if (!p)
-+			return 0;
-+
-+		if (!w->kp) {
-+			w->count++;
-+			return 0;
-+		}
-+
-+		if (w->kp->nr_folios >= w->count)
-+			return -ENOSPC;
-+
-+		if (kho_preserve_folio(page_folio(p)))
-+			return -ENOMEM;
-+
-+		w->kp->folios_pa[w->kp->nr_folios++] = phys;
-+	}
-+	return 0;
-+}
-+#endif
-+
- int kvm_arch_vm_luo_preserve(struct kvm *kvm, struct kvm_luo_ser *ser)
- {
-+#ifdef CONFIG_KVM_CARETAKER
-+	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
-+	struct arm64_stage2_kho_walk walk = {};
-+	struct kvm_pgtable_walker walker = {
-+		.cb = stage2_kho_visitor,
-+		.flags = KVM_PGTABLE_WALK_TABLE_PRE,
-+		.arg = &walk,
-+	};
-+	struct kvm_kho_folios_ser *kp;
-+	int ret;
-+#endif
-+
- 	ser->type = kvm_phys_shift(&kvm->arch.mmu);
- 	if (kvm_vm_is_protected(kvm))
- 		ser->type |= KVM_VM_TYPE_ARM_PROTECTED;
- 
-+#ifdef CONFIG_KVM_CARETAKER
-+	kvm->caretaker_vm = NULL;
-+
-+	if (mmu->pgd_phys)
-+		walk.count++;
-+	if (mmu->pgt) {
-+		ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	kp = kvm_kho_folios_alloc(walk.count);
-+	if (IS_ERR(kp))
-+		return PTR_ERR(kp);
-+	walk.kp = kp;
-+
-+	if (mmu->pgd_phys) {
-+		ret = kho_preserve_folio(page_folio(phys_to_page(mmu->pgd_phys)));
-+		if (ret) {
-+			kvm_kho_folios_unpreserve(kp);
-+			return ret;
-+		}
-+		kp->folios_pa[kp->nr_folios++] = mmu->pgd_phys;
-+	}
-+
-+	if (mmu->pgt) {
-+		ret = kvm_pgtable_walk(mmu->pgt, 0, BIT(mmu->pgt->ia_bits), &walker);
-+		if (ret) {
-+			kvm_kho_folios_unpreserve(kp);
-+			return ret;
-+		}
-+	}
-+
-+	kvm->kho_folios = kp;
-+	KHOSER_STORE_PTR(ser->kho_folios, kp);
-+#endif
- 	return 0;
- }
- 
-@@ -36,6 +122,10 @@ int kvm_arch_vm_luo_retrieve(struct kvm *kvm, struct kvm_luo_ser *ser)
- 
- void kvm_arch_vm_luo_unpreserve(struct kvm *kvm, struct kvm_luo_ser *ser)
- {
-+#ifdef CONFIG_KVM_CARETAKER
-+	if (kvm)
-+		kvm->caretaker_vm = NULL;
-+#endif
- }
- 
- void kvm_arch_vm_luo_finish(struct kvm_luo_ser *ser)
-@@ -119,6 +209,17 @@ int kvm_arch_vcpu_luo_preserve(struct kvm_vcpu *vcpu, struct kvm_vcpu_ser *ser)
- 	kfree(indices);
- 
- 	KHOSER_STORE_PTR(ser->arch_state, state);
-+
-+	if (ser->flags & KVM_VCPU_LUO_FLAG_CARETAKER) {
-+		int ret = arm64_kvm_caretaker_preserve(vcpu, ser);
-+
-+		if (ret) {
-+			kho_unpreserve_free(state);
-+			ser->arch_state.phys = 0;
-+			return ret;
-+		}
-+	}
-+
- 	return 0;
- }
- 
-@@ -186,6 +287,7 @@ int kvm_arch_vcpu_luo_retrieve(struct kvm_vcpu *vcpu, struct kvm_vcpu_ser *ser)
- 
- void kvm_arch_vcpu_luo_unpreserve(struct kvm_vcpu_ser *ser)
- {
-+	arm64_kvm_caretaker_unpreserve(ser);
- 	if (ser->arch_state.phys) {
- 		kho_unpreserve_free(phys_to_virt(ser->arch_state.phys));
- 		ser->arch_state.phys = 0;
-@@ -194,6 +296,7 @@ void kvm_arch_vcpu_luo_unpreserve(struct kvm_vcpu_ser *ser)
- 
- void kvm_arch_vcpu_luo_finish(struct kvm_vcpu_ser *ser)
- {
-+	arm64_kvm_caretaker_finish(ser);
- 	if (ser->arch_state.phys) {
- 		kho_restore_free(phys_to_virt(ser->arch_state.phys));
- 		ser->arch_state.phys = 0;
--- 
-2.55.0.1082.g2b9226bbc0-goog
+Too obscure for me!  So if not too painful cleaner to just fix it.
+
+Jonathan
+
+>=20
+> Cheers
+> Suzuki
+>=20
+>=20
 
