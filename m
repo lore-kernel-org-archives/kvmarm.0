@@ -1,96 +1,89 @@
-Received: from mta1.migadu.com (out-235.mta1.migadu.com [95.215.58.235])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC214AC156
-	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 15:26:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C49248820E;
+	Mon, 21 Sep 2026 15:26:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790004372; cv=none; b=RMxGqpkmFNsjkW0Mdp7WPSO6KUAAXu/modXxuOGJqZA7BDIlGKjNYlw3vBq0/JQ1TnC813iclglkH9eI4Wc7miL/BuZ42le3nusu5mLTshpnGRWY0oLcmwNM4A3cJSnWFanba/G1B2T7Za8QGljLdn3ClGkoLWqK/Xv+fZ9TJN0=
+	t=1790004411; cv=none; b=uD2dwOyeiaHtfLqUju87Vv026QPpQynknMp5yDLUPnfHzZtYNDlppVeBlDfMNpwQADLfgL1sPBSUsRXIvNY/nTCQJfaw4+ix/ZuO1m2eGljsev/cRmA6XLBEeHZmY9KvsnubQN/JYymd4wsskv04SiObXhly9JyJlzYmiOzAJt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790004372; c=relaxed/simple;
-	bh=/8RGZVQWUyzs19cUu3Y//9Vj+1op9fq9/ZosbH4mY4I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=U0q5IBTD1dszAZdcZFZTMPJLPW/1rUWj3HiT/J3/NRc5vxo9lVSZryEiv25d4oqz27Byunl9zIzPudzLycjZYs069BSIzZUuqaZHbVCi6G/Qqwq5PruhZsAYJVnfstT3J4DVpbIf4soYxJz4b86dL+Zxp26AmHvE99QHyRVBB9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mB5AIyBo; arc=none smtp.client-ip=95.215.58.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1790004411; c=relaxed/simple;
+	bh=crAu+rO/8jjpMeszBXQph4x7yIoYqyBep9PV7qmQuK8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=hAJWDQK9ezaRTUdod/q3/ZhRt5RHfHJ/yASD+Ic5SuW1aWqw3ouBIPKk0eoduiGyQRZcmNffydfzbdjB85N4OdqdbvKu8jsn0qwXPFXEQpeHami0ZPrLZe851iY5CMIm15ziHAvt+g7AvmjvNa4sUQh7cSlA7NMl6WU5h15KNJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kXOCMPeO; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mB5AIyBo"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=/8RGZVQWUyzs19cUu3Y//9Vj+1op9fq9/ZosbH4mY4I=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790004368; v=1; x=1790609168;
- b=mB5AIyBoHdl8O95uCsQ/9MJwakI8UzRx9H+x+TrMIpR55qu8U9BbdhD/v2GxKdkeI8yc/gYi
- rxvzkSTl13R/g8MeRoI/smP+HCn0YRv9lm4zITAuLqTI18KtLbr0wqn7NcoEHUHjgjmQjRour/l
- g5e/Y4O6+7+iwiuagJJVoZco=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id d54de683c4b6e667;
-	Mon, 21 Sep 2026 15:26:08 +0000
-X-Mizu-Trace-ID: d54de683c4b6e667
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5b83c1421ecso10457e87.1
-        for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 08:26:08 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwQA2Y/oKT3po65U2oxHMDJ63ntVIX745zwEag7BxmVB/BVnDD+jhBYt+BYqLMOLfbQsQVaZwo=@lists.linux.dev
-X-Gm-Message-State: AFuF++nKgm2nW7zOVSsaOv3kp27HkKyjq4dwfDsAdNm7BEAydKKb9G5L
-	HaaYakPY3hkMGtARHYHshrSr+1pkM+BTB0EiNIUSi/Lhw+ktjU1nTo5yHPqUvpiQDBiUj1NKMq/
-	o/VndTm5KdhzfzRyR/gZ0b0eFbFpPHc0l1bhGT7t7
-X-Received: by 2002:a05:6512:3c86:b0:5b1:5141:9156 with SMTP id
- 2adb3069b0e04-5b8c7eaa535mr194108e87.9.1790004367252; Mon, 21 Sep 2026
- 08:26:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kXOCMPeO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71B931F000FF;
+	Mon, 21 Sep 2026 15:26:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790004409;
+	bh=crAu+rO/8jjpMeszBXQph4x7yIoYqyBep9PV7qmQuK8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=kXOCMPeOABC3WIWc0m2aMa53Wy1vci2Ph1we34tBe20fflS/kwx9hhp/Bh2Uo+id5
+	 e6dy3zdJ14+pNdpep6sBKlIMjn3Khyu9Fehxt5yHD/bXdzQ+/hUEwmutBQ88ho5LXl
+	 9OPClu0cxwjagvWcavMP05o/JjEt3lVfuRCHGM0taw3BZXgz/On7tIzHebY2HeJ9q+
+	 EMbKmUEBXIWCO++8CrCDYqtnvfwS9etcFOBXWgmLW2TFA3sVnOSVHEy/Oxl26bbs9y
+	 A4Jxo92CBcSprJG84NCdVoSDEbokDxtFGJwV4uc7ucTkSfhbPPRtSbgjRca+9MgtQY
+	 qJVNPaTSiDWrw==
+X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Jason Gunthorpe <jgg@ziepe.ca>,
+	Christian =?utf-8?Q?K=C3=B6nig?= <christian.koenig@amd.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	"T.J. Mercier" <tjmercier@google.com>
+Subject: Re: [PATCH v6 7/9] dma-buf: system_heap: Enforce shared-granule
+ alignment for cc-shared buffers
+In-Reply-To: <20260921123725.GN11599@ziepe.ca>
+References: <aq1V3oeDdvXobt8J@arm.com>
+ <97c30fce-9bda-4c61-b1b9-10297b89c8d9@amd.com>
+ <20260918153642.GD11599@ziepe.ca>
+ <d8123f21-d5ce-415b-a05a-392d97b8b57d@amd.com>
+ <20260918165315.GF11599@ziepe.ca>
+ <6115eaf7-21bc-49ce-8a74-08fd37a1e2c9@amd.com>
+ <20260921115141.GJ11599@ziepe.ca>
+ <45dd7a2f-8474-4388-b383-2dee3ee62206@amd.com>
+ <20260921121739.GM11599@ziepe.ca>
+ <cd2b32dc-5a80-4ef5-82bc-dd41ea96dc01@amd.com>
+ <20260921123725.GN11599@ziepe.ca>
+Date: Mon, 21 Sep 2026 20:56:41 +0530
+Message-ID: <yq5a1pam4ocu.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260921140427.2211373-1-fuad.tabba@linux.dev>
- <20260921140427.2211373-4-fuad.tabba@linux.dev> <20260921141701.33CFD1F000FF@smtp.kernel.org>
-In-Reply-To: <20260921141701.33CFD1F000FF@smtp.kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 21 Sep 2026 16:25:31 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTweK4XJZNaeKKzizReQrP+25jDT08hDkc9+zQoxWu+iYg@mail.gmail.com>
-X-Gm-Features: AcwNN1UdQ0NUVS431o0imISYD8tq6CTjYnZ7u83ldsAQHh0Mec-JjbiaaUqj-84
-Message-ID: <CA+EHjTweK4XJZNaeKKzizReQrP+25jDT08hDkc9+zQoxWu+iYg@mail.gmail.com>
-Subject: Re: [PATCH 3/3] KVM: arm64: selftests: Test a timer set past the
- counter's wrap
-To: sashiko-reviews@lists.linux.dev
-Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 21 Sept 2026 at 15:17, <sashiko-bot@kernel.org> wrote:
-[...]
+Jason Gunthorpe <jgg@ziepe.ca> writes:
+
+> On Mon, Sep 21, 2026 at 02:24:21PM +0200, Christian K=C3=B6nig wrote:
 >
-> > +/*
-> > + * With the counter at wait_ms, a tval of -(wait_ms + long_wait_ms) puts cval
-> > + * within long_wait_ms of the counter's wrap: a deadline further away than the
-> > + * counter can reach. Unmasked, so an early ISTATUS shows up as an IRQ.
-> > + */
-> > +static void test_timers_past_counter_wrap(enum arch_timer timer)
-> > +{
-> > +     s32 tval = -(s32)msec_to_cycles(test_args.wait_ms + test_args.long_wait_ms);
-> > +     int i;
-> > +
-> > +     for (i = 0; i < ARRAY_SIZE(sleep_method); i++) {
-> > +             sleep_method_t sm = sleep_method[i];
-> > +
-> > +             local_irq_disable();
-> > +             set_counter(timer, msec_to_cycles(test_args.wait_ms));
-> > +             set_tval_irq(timer, tval, CTL_ENABLE);
+>> I also don't see where mem_cc_shared_granule_size is added?
 >
-> [Severity: Medium]
-> Could this sequence lead to a flaky test on a loaded host system?
+> Patch 1:
+>
+> https://lore.kernel.org/all/20260904103452.1197239-2-aneesh.kumar@kernel.=
+org/
+>
+> Aneesh, please be sure to use get_maintainers on series like this so
+> everyone gets cc'd.
+>
 
-Yes, a stall of more than long_wait_ms between the counter write and
-the TVAL write leaves cval below the counter. This should sort it out:
+For v7, I included only the maintainer entries because the recipient
+list was getting too long, but I added the mailing lists.
 
--        s32 tval = -(s32)msec_to_cycles(test_args.wait_ms +
-test_args.long_wait_ms);
-+        u64 cval = -msec_to_cycles(test_args.long_wait_ms);
-[...]
--                set_tval_irq(timer, tval, CTL_ENABLE);
-+                set_cval_irq(timer, cval, CTL_ENABLE);
-
-Cheers,
-/fuad
+-aneesh
