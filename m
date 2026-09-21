@@ -1,131 +1,94 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E36B5492E40
-	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 13:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69EF3563E8;
+	Mon, 21 Sep 2026 13:34:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789996790; cv=none; b=dsDEHIrFw9kU5OMfKAW7S1kJfSvn/V2bfBR8N1sk6DdlqfDSX330KNKW+GPE/jqFZvfZekXaAc7HDk9P81Fd2S8oT1n4M7/TyD81iWopMxB/OixWt5rKWAgstjyEopSVPEN6W63uyvabPA3iVWOMoZ3wimLv2QtSbCd5USMaTx4=
+	t=1789997660; cv=none; b=DZ0wKarNyTRibEuc7t0tDCvCNy1M6disUt2QHKp+vBjkv27uz1BF/D8+evSrthp4qWyRDqO0NIz9gHgxtuKmlY0uRlooXsqZnkUFeKY/wJCcvkdOpEjr3xIGSTbSF4LLWV/ZxzTBIsMka9lhJbJ+7HDxl3MdQ73NSvvL2xV0BMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789996790; c=relaxed/simple;
-	bh=jPu90R1RdOAornNIigEwNsEUdl9I2dOlf5EdJ56jm1E=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ldjNi+6exHSeeUJnVOUwUIkF5kwSVM71WzznFVEK9eRu3Y0A4Uso1NIE0DXLyBnfrCK7TDfCxkGoxCNRsfMaDOh6pK9y1erfhNMisNHs9J2iVgi7S0o4URssZ18/ciZnzSEQ8bEd2tNaMj7pQggr05ZsWuIx4iGwIQHJq2vZQRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EUu04ORn; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789997660; c=relaxed/simple;
+	bh=xNPRhyk8xeBSHcVUlKVyeOqQArGPqBYlssEAVbabYyY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C6Tiy1VISr2rci4Hu3A09Gy9GbM3IIqjDO8PZwQPozaG3iyj2dzW7KOCvlNHqyOEgw8hvBdxEaGrj16qvRq8crS4sYAFTbCRTMuCVUGcyErqSm11lObyICw2NFz5RP/egLP6kL0xvkd3KPfXbC02KXGb1mxG8NW6MnJxNl42hfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SSXwlK38; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EUu04ORn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5691A1F000FF;
-	Mon, 21 Sep 2026 13:19:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SSXwlK38"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52FBC1F000FF;
+	Mon, 21 Sep 2026 13:34:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789996788;
-	bh=1/+XFmmZqNE01ZjaSSHgLfLllc6A7dqNcD5RE07i+6o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=EUu04ORnMeGgS2RmbJ7hfpLpOchLTfRFSxzjii2nh1RLcPQ5xGKu2kaiapoTqDA2q
-	 6PEbBkn8db3Gjf+sE1Mz55T4mXDbO+HZBtFUe91+Bzmux/j4Qj+qp9LZcCOhMy1ZqG
-	 i5MP3iFwoilOlxSr9W9dPvnKNO5ENT1NCaOuLChAoeJIYTXEQK+01VEqcEe+w4GvBo
-	 BSkSrbintNYcuPslKCiN+74C/1C4z6VWh0WW0BGaO9KDq3XdAbx0H4u8QOtnMYLH8I
-	 DrpwR8faj43bAQvKSTpsnTYeEc0ayxXWELxrXEDSGshEDz7wLTKWDWynvCSqlS4p9W
-	 2eQVjQKMk3tKQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x8dvt-0000000BYJr-3F2M;
-	Mon, 21 Sep 2026 13:19:46 +0000
-Date: Mon, 21 Sep 2026 14:22:49 +0100
-Message-ID: <878q4u4u3a.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Zhou Wang <wangzhou1@hisilicon.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Fuad
- Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden
-	<seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu
-	<yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will
- Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	<kvmarm@lists.linux.dev>,
-	Nianyao
- Tang <tangnianyao@huawei.com>
-Subject: Re: [RFC PATCH] KVM: arm64: Restrict CNTP_CVAL/CNTHP_CVAL save/reload when ptimer is used
-In-Reply-To: <20260921111840.3000905-1-wangzhou1@hisilicon.com>
-References: <20260921111840.3000905-1-wangzhou1@hisilicon.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1789997658;
+	bh=uPds00CPuo0sl2ypaQ/wdQWyadF9e46X9vKuCNW/M40=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=SSXwlK38kiauqEhRh8+Pr0Ahx3wVZ6QcaM1Mm03CqCH91GgKLTwH/LxcxFLbVO4Zi
+	 Fb8yRSey5wxIspybcq4fckdmq9+PkSFg47BLm9udssp5v+0jTutqSdQ1Akk4Wfohhe
+	 loJGZ8Qi53PPffCB8DpvFsyTYwJzHKXWhRERxkSC+mxrUP/6UO1z3uiRBI005jZEm3
+	 P5rNM/uZNUWZ7zbgwG2kg7GtfmM3sckK3Ow+5DrF+KDUDHOlW+K0dSUM4uQfASGmz8
+	 59D6eS5pQyGD09iMfU48lSzvSyaQ8HBd2clEYyVbp+U8zlpMzqusbkFieywHlPkOf5
+	 wTaBuLxz097tQ==
+Date: Mon, 21 Sep 2026 14:34:12 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>, Marc Zyngier <maz@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
+	Jack Thomson <jackabt@amazon.com>, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: arm64: Restore the VM's feature bitmap when
+ kvm_setup_vcpu() fails
+Message-ID: <arEskPHpAPQf5SAb@gremlin>
+References: <20260921063718.1604533-1-fuad.tabba@linux.dev>
+ <arDYHSlFHm_XzGvN@kernel.org>
+ <CA+EHjTz0-qS8RRhdT8XjAgWqKhgjjzbRsZ_jwTBVqM-8pXk7Vw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: wangzhou1@hisilicon.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, kvmarm@lists.linux.dev, tangnianyao@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTz0-qS8RRhdT8XjAgWqKhgjjzbRsZ_jwTBVqM-8pXk7Vw@mail.gmail.com>
 
-On Mon, 21 Sep 2026 12:18:40 +0100,
-Zhou Wang <wangzhou1@hisilicon.com> wrote:
-> 
-> A guest's physical timer may be used in nested guest or directly used in
-> VHE mode. We can check above cases to avoid useless CNTP_CVAL/CNTHP_CVAL save
-> and reload.
+On Mon, Sep 21, 2026 at 08:24:56AM +0100, Fuad Tabba wrote:
+> Hi Oliver,
+>
+> On Mon, 21 Sep 2026 00:09:17 -0700, Oliver Upton <oupton@kernel.org> wrote:
+> [...]
+> > > Nothing in the tree loads a vCPU whose init failed, so this is latent.
+> > > The upcoming series that enables KVM_PRE_FAULT_MEMORY for arm64 exposes
+> > > it: the generic kvm_vcpu_pre_fault_memory() calls vcpu_load() whether
+> > > or not the vCPU has been initialised.
+> >
+> > That's a bug, not a feature. We should require an initialized vcpu for
+> > the ioctl.
+>
+> That one is for Lorenzo then :) I'll reword the message so the stale
+> bitmap comes first and the pre-fault crash is just how it showed up.
 
-Why useless? What cases?
+In general this is the behaviour of _generic_ KVM code
+(kvm_vcpu_pre_fault_memory()), which itself does not require an initialised
+vCPU, and no other arch seems to requires that either in the arch-specific
+pre-fault code.
 
-> 
-> Use lazy detection to determine whether a non-nested VHE guest actually uses
-> the physical timer.
-> 
-> timer_set_traps() initially traps CNTP_CTL_EL0 writes for non-nested guests.
-> On the first write that sets CNTP_CTL.ENABLE=1, the trap handler records
-> ptimer_used and clears the trap in CNTHCTL_EL2, allowing the guest direct
-> access thereafter.
+The actual pre-faulting implementation intentionally only targets the
+canonical MMU to fault in S2 page tables, which doesn't need initialisation
+to have taken place AFAICT.
 
-I really don't want to go into these micro optimisation to paper over
-the bad state of the architecture.
+However I could add:
 
-The options are:
+	if (!kvm_vcpu_initialized(vcpu))
+		return -ENOEXEC;
 
-- Don't use any offset (offsets always set to 0), and there will not
-  be any trap
+To kvm_arch_vcpu_pre_fault_memory(), which would make this a requirement,
+though that would bring us out of line with other archs.
 
-- Use CNTPOFF, which will work just fine for an L1 guest, without
-  traps
+OTOH, I don't see why anybody would pre-fault BEFORE init, feels like
+something that should be done later on in VMM bring up right?
 
-- For nested guests, there is no solution that matches the
-  architecture (CNTPOFF doesn't nest), and you must trap.
+So I doubt doing this would really break any sane user.
 
-So where is the cost in your case?
+Let me know if you want that change in the series and I can respin it.
 
-> 
-> A test result from KUT in HiSilicon HIP12 is:
-> 
->                     nopatch        patch
->  hvc                758            624
->  mmio_read_user     3647           3479
->  mmio_read_vgic     949            817
->  eoi                29             29
->  ipi                2534           2302
->  lpi                2684           2442
->  timer_10ms         2393           2168
-
-I don't know what these numbers are. There is no unit, no indication
-of how this is run (L1, L2, Ln...), no base kernel version...
-
-Can you please explain what you are actually trying to do? Are you
-saying that accessing the physical timer (two registers) is that
-expensive?
-
-Thanks,
-
-	M.
-
--- 
-Jazz isn't dead. It just smells funny.
+--
+Cheers, Lorenzo
