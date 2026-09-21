@@ -1,118 +1,143 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC9A310645;
-	Mon, 21 Sep 2026 14:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6D7E4A2623
+	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 14:28:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790000223; cv=none; b=t8z0GV/wfEHTWpH7Im6YwPXKo56+ZrRxB1Er053UvIylTIkVsBQQc6a2UetcVzQrE5TyKGNY8IgcFEzTY+noUqWT7E2jlqbH8+qoGA9KfAAN3N0oHLHfhSGZY7RMmlUTSigpjRolnkj4ozN2kehuy+Q/1seZ9aZrZhkTfkouo9A=
+	t=1790000939; cv=none; b=DoxleWxnx3CwpadnJqgv1qUr2x9M+CaKXS6a77biiLlXHv+4JixX3J+CNgjaczLxZPLDMZ6F2Um449xNlnrt3DRQqdqZaHCj7jP8kls67Uh7p72pQ5Kv/E7+PXHrYqbhsdcSCAwBkc+wF461eNt03Tf5n4YLK04fQF5eeRFF0UI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790000223; c=relaxed/simple;
-	bh=2qq8KfM2YOSpp0BCA0r02D0yFEX0yj1ZCE2mOf/9jU8=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=Dvsnsa7tSiUGP7qrNC9KEkbhzekSkUgFJkJhZUy4RDKn/HeW0wjGQu/GUX1CsTExsXHr5l3o5rIJw3Tr4+n9oe3SeVCQ/CQT08U+tpSsBo/vgDdRpYLpZ7LJCjtVSxIZvbcOUfxjQXqMRCC8utXA73VqaMDu/ngWt50T/aSLE1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QBfd496z; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790000939; c=relaxed/simple;
+	bh=GdCBBFERQ2MnZAE4vUIvESlZ/KGfgi3JMauYWLFutKY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=Hpx6RrCo2v24GTz38P23gqS3AU7Tck/m9sFHLUUkBiS929F6kwEpVAfyQrjobpYllRWXL537AH7XvwG/AeAz4KxRC30EySqj7Hi+O1tWXGHAFclvDxzMwjYT6dU252vXnjhtmQydH8sQ1Qurm3j7+1kSOTfGKZrOcKySIpajaSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=vT9ISrEB; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QBfd496z"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33CFD1F000FF;
-	Mon, 21 Sep 2026 14:17:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790000221;
-	bh=JVtOhCEnFF4VMLoP4FDqz9BM7LYVVOhqz0dAz47yYnM=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=QBfd496z8brZlJiAq6yr49Fz4QaVh5Qg03HGrh16xJAtRh+HIlk9l6PDEhrkG65dI
-	 ekltsVd/Z4vbRFTGL02WUqDhwx5320Ni2bbK8B2KqQtYRDtEdyYNLpkZ7D4yg+BRLF
-	 tMuZMQTIsY9F8gCBCD2z+LpDN7PXLVlREPUbD1SmfXA8tL2JC598bSyDW0Sqw50TVE
-	 FhC+lit9CAR09D+jGg4onNf3MBXblWUQxF2652xGdtdYA/ygNyGOjUTl0/FYkzF+Oo
-	 eA9MabTRscmD+43/IjWikviUV+7nL/U0yVRQSnlrfuYMuum6mwf6wYNu4haQh2o6IK
-	 1YzSfFUMX9Yhg==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 3/3] KVM: arm64: selftests: Test a timer set past the
- counter's wrap
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-In-Reply-To: <20260921140427.2211373-4-fuad.tabba@linux.dev>
-References: <20260921140427.2211373-1-fuad.tabba@linux.dev>
- <20260921140427.2211373-4-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 21 Sep 2026 14:17:00 +0000
-Message-Id: <20260921141701.33CFD1F000FF@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="vT9ISrEB"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B9E3419F0;
+	Mon, 21 Sep 2026 07:28:53 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8164F3F86C;
+	Mon, 21 Sep 2026 07:28:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790000937; bh=GdCBBFERQ2MnZAE4vUIvESlZ/KGfgi3JMauYWLFutKY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=vT9ISrEB7+Z18zVsimq7PdDh0N9QjdkuO2kUdjV2nTxj6pxb2tT8duNAb44eMm0Tb
+	 PQla5NKFcP4jbzx4/d/tTgWrWui+PHzIhwZvgdT3PBoD+1bYzU8IzQyGHa5jvxteUN
+	 7YZqBzg6zMSI01xinyU83P9XziedpXrJFfiZtPhQ=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 5/5] KVM: arm64: Enable HAFDBS for guests not on migration
+Date: Mon, 21 Sep 2026 15:28:54 +0100
+Message-ID: <arE_Jh4UHiUdjrSi@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <497c6239-a75f-4087-83c8-efface3fe3d7@huawei.com>
+References: <20260901171558.2674031-1-leo.bras@arm.com> <20260901171558.2674031-6-leo.bras@arm.com> <497c6239-a75f-4087-83c8-efface3fe3d7@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] selftests: flaky test due to scheduling delay in test_timers_pas=
-t_counter_wrap
---
+On Fri, Sep 18, 2026 at 07:58:43PM +0800, Tian Zheng wrote:
+> 
+> 
+> On 9/2/2026 1:15 AM, Leonardo Bras wrote:
+> > @@ -2570,53 +2571,76 @@ int __init kvm_mmu_init(u32 hyp_va_bits)
+> >   out_destroy_pgtable:
+> >   	kvm_pgtable_hyp_destroy(hyp_pgtable);
+> >   out_free_pgtable:
+> >   	kfree(hyp_pgtable);
+> >   	hyp_pgtable = NULL;
+> >   out:
+> >   	return err;
+> >   }
+> > +static void kvm_set_hafdbs(struct kvm *kvm, bool set)
+> > +{
+> > +	/* Check if no action required */
+> > +	if (!!(kvm->arch.mmu.vtcr & VTCR_EL2_HD) == set)
+> > +		return;
+> > +
+> > +	if (set)
+> > +		kvm->arch.mmu.vtcr |= VTCR_EL2_HD;
+> > +	else
+> > +		kvm->arch.mmu.vtcr &= ~VTCR_EL2_HD;
+> > +
+> > +	kvm_make_all_cpus_request(kvm, KVM_REQ_RELOAD_STAGE2);
+> > +}
+> > +
+> 
+> Hi Leo,
+> 
+> HD alone is architecturally a no-op. According to the Arm spec, the
+> VTCR_EL2.HD field description reads: "When the Effective value of
+> VTCR_EL2.HA is 0, this field behaves as 0 for all purposes other than a
+> direct read of the value of this bit." So patch 5 as it stands never
+> actually enables stage-2 dirty management.
 
-commit 8788b1ebd8d97a89915e8766ef7a7c75ad83b3c9
-Author: Fuad Tabba <fuad.tabba@linux.dev>
+Oh, right, I missed that. :/
 
-KVM: arm64: selftests: Test a timer set past the counter's wrap
+For the above to work it would need to have the HA bit:
 
-This commit adds a KVM selftest to verify timer behavior when programmed
-with a cval past the counter's wrap point. It programs an unmasked timer
-and tests that no unexpected interrupts fire since the guest's counter
-cannot realistically reach the deadline.
++	if (set)
++		kvm->arch.mmu.vtcr |= VTCR_EL2_HA | VTCR_EL2_HD;
++	else
++		kvm->arch.mmu.vtcr &= ~(VTCR_EL2_HA |VTCR_EL2_HD);
 
-> diff --git a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c b/=
-tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
-> index d9c9377a63256..69986a7f0d37d 100644
-> --- a/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
-> +++ b/tools/testing/selftests/kvm/arm64/arch_timer_edge_cases.c
+> 
+> In the combined series, I'm planning to replace both kvm_set_hafdbs()
+> and our earlier enable/disable hooks with a single derived mode:
+> 
+> ```
+> /*
+>  *   logging && HDBSS-capable  ->  HDBSS  (HD|HA|HDBSS)
+>  *   logging, no HDBSS         ->  off
+>  *   !logging, HAFDBS-capable  ->  HAFDBS (HD|HA)
+>  */
 
-[ ... ]
+Yes, seems correct, if the performance numbers can show patch 5 provides
+performance improvements.
 
-> +/*
-> + * With the counter at wait_ms, a tval of -(wait_ms + long_wait_ms) puts=
- cval
-> + * within long_wait_ms of the counter's wrap: a deadline further away th=
-an the
-> + * counter can reach. Unmasked, so an early ISTATUS shows up as an IRQ.
-> + */
-> +static void test_timers_past_counter_wrap(enum arch_timer timer)
-> +{
-> +	s32 tval =3D -(s32)msec_to_cycles(test_args.wait_ms + test_args.long_wa=
-it_ms);
-> +	int i;
-> +
-> +	for (i =3D 0; i < ARRAY_SIZE(sleep_method); i++) {
-> +		sleep_method_t sm =3D sleep_method[i];
-> +
-> +		local_irq_disable();
-> +		set_counter(timer, msec_to_cycles(test_args.wait_ms));
-> +		set_tval_irq(timer, tval, CTL_ENABLE);
+> void kvm_arch_update_hw_dirty_mode(struct kvm *kvm)
+> {
+> 	bool logging = atomic_read(&kvm->nr_memslots_dirty_logging) != 0;
+> 	unsigned long target;
+> 
+> 	if (logging && kvm_supports_hdbss(kvm))
+> 		target = VTCR_EL2_HD | VTCR_EL2_HA | VTCR_EL2_HDBSS;
+> 	else if (logging || !kvm_supports_hafdbs(kvm))
+> 		target = 0;
+> 	else
+> 		target = VTCR_EL2_HD | VTCR_EL2_HA;
+> 	...
+> }
+> ```
 
-[Severity: Medium]
-Could this sequence lead to a flaky test on a loaded host system?
+Humm, do we actually need the atomic_read being ran when we are enabling 
+dirty_logging? Maybe we can restrain it only to the disabling part.
 
-If a host scheduling delay exceeds long_wait_ms between setting the counter
-and writing the TVAL, the guest's CNT can advance such that:
-CNT > wait_ms + long_wait_ms
+> 
+> HA is always set alongside HD by construction, so the no-op issue goes
+> away.
 
-When set_tval_irq() then executes, the hardware calculates the absolute
-deadline as CVAL =3D CNT + TVAL. Because TVAL is a negative value of
--(wait_ms + long_wait_ms), CVAL evaluates to a small positive number
-instead of wrapping around to near U64_MAX.
+Right.
 
-Since CVAL is now less than CNT, the timer condition (CNT >=3D CVAL) is
-met immediately, and the hardware legitimately fires the unmasked timer.
-This would cause the subsequent assert_irqs_handled(0) check to fail.
+> 
+> I'll fold this into the HDBSS v5 series when I send it out. Let me know
+> if you'd rather keep it in your v2 instead.
+> 
 
-> +		sm(timer, msecs_to_usecs(test_args.wait_ms) + TIMEOUT_NO_IRQ_US);
-> +		local_irq_enable();
-> +		isb();
-> +		assert_irqs_handled(0);
-> +		timer_set_ctl(timer, CTL_IMASK);
-> +	}
-> +}
+Feel free to merge your part on top of that, I will work on collecting the 
+numbers, though.
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260921140427.2211=
-373-1-fuad.tabba@linux.dev?part=3D3
+Thanks!
+Leo
