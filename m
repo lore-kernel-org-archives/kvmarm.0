@@ -1,221 +1,124 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEAB54A093F
-	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 13:46:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mta1.migadu.com (out-129.mta1.migadu.com [95.215.58.129])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B6070830
+	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 14:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.129
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789998388; cv=none; b=CxIVevnZS8VcmLL58PKenr+MwFrpSJZZqMP/Cs7QNvE8ti5eaNj8KKP4jDLvDfxXE6lfjJ2feq2DAzLxg2ItBFgJ7mzTWiIHrKww7eSwGBfcKPjjadsbldKo7HxuWy20ayvARse+WD5OxuQ5t2ldpD9/t86AIazN2fKa1/IDvmM=
+	t=1789999475; cv=none; b=bFhf2PWi9j5I7vBlpgtMWKXbSRlK7mnqHIWxO6vCYC7YdczpRbgbI4N5u2w16LgSk4+qBAnUEKaMXYSD31+9e1PqPYuTMdgUk4EeJ2ZyInsm86KlXvfew50vEYRG/1MN2N6DoZdTysVP4vGNDPbKwEya7SZRG6W23G5iAiYlt/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789998388; c=relaxed/simple;
-	bh=wMdzK8rFj97jPE2w31SymkCoy9SINsDjqzF9PxMDqWk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=Ljjld7m++t2UA2a4VXOzCoSIQMXK7FxTCE6XqJLhcWVWSdUoU13Dh9aHUrt5A8LJWB5vev+AtC2YBhwes22xtOxTHlj2VeACqQ5dbMZ0S14mdiq+qyJAaTex+tknuFs7s2g4KEpxpArtIFPe2Wji/vSKlzkCizWjbsBZpUSCNpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=WoUL8L7v; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1789999475; c=relaxed/simple;
+	bh=kGLTqSDqNKduog1GOtZuGMpqVSeUXQY7T0QuU7Ou3ok=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZZNFv2LSGIDUPOvkHJpbyjwLkFKD1GOt7JCnPs5L6Orvhuceqsn21UwzITGAHRj8U6Lkpx4cfhID38/kyj64phgio5BA6XkBmUeHru8gph0Yz8r4WIr3GPOCBdtacq7sA+ZnVtwAkRT6o7S8eeTxwdsTizp/eEbv2Ey4hfExQYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=m84gf694; arc=none smtp.client-ip=95.215.58.129
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="WoUL8L7v"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EB06219F6;
-	Mon, 21 Sep 2026 06:46:21 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0E46E3F528;
-	Mon, 21 Sep 2026 06:46:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1789998385; bh=wMdzK8rFj97jPE2w31SymkCoy9SINsDjqzF9PxMDqWk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WoUL8L7vnzhiuBxrGEaJyv0g+JZEptUbs7iPmzkY1SU08KcheC70/c/YzFCZcwIbU
-	 DehGaLgqHTgbANblo6lKY+gBSXs9WEitlP1RjXlpH7vPHDj+vwWH+ANFxmD4hIi7u5
-	 3A+eNuRYvwlWaEVpFM9RD7vb2cfjzygvnw19nMYU=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="m84gf694"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=kGLTqSDqNKduog1GOtZuGMpqVSeUXQY7T0QuU7Ou3ok=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789999469; v=1; x=1790604269;
+ b=m84gf6949J/twwPJ0E+UKYO/7oeugphoJlkbeXcQdW4hXy86TmR0OJ3+NxeSqf0vBD5ZOMOx
+ 74SSHIDqz1ybKEWbIIGVt2bs29z2MM7q/hz/utnPaiwgY6EBEy1MfiE++8hTJJON5i22pCRfuuf
+ VU/0gbErvR2ah/6DQ6PdO9Sk=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 295205c3151231b2;
+	Mon, 21 Sep 2026 14:04:29 +0000
+X-Mizu-Trace-ID: 295205c3151231b2
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>
-Subject: Re: [PATCH 02/22] KVM: arm64: nv: Consolidate computation of stage-2 permissions
-Date: Mon, 21 Sep 2026 14:46:17 +0100
-Message-ID: <arE1KVBNtkEWJDvN@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260623184201.1518871-3-oupton@kernel.org>
-References: <20260623184201.1518871-1-oupton@kernel.org> <20260623184201.1518871-3-oupton@kernel.org>
+	Zenghui Yu <zenghui.yu@linux.dev>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Will Deacon <will@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH 0/3] KVM: arm64: timers: Program CVAL from the current count when the hardware won't apply the offset
+Date: Mon, 21 Sep 2026 15:04:24 +0100
+Message-Id: <20260921140427.2211373-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 23, 2026 at 11:41:41AM -0700, Oliver Upton wrote:
-> Computing the output permissions from a translation requires
-> contextualization, as fields in the descriptors may change depending on
-> the MMU context. Centralize the computation of stage-2 permissions
-> within the table walk rather as opposed to inspecting the descriptor in
-> the case of pX and uX permissions.
-> 
-> Signed-off-by: Oliver Upton <oupton@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_nested.h  | 42 ++++++++--------------------
->  arch/arm64/include/asm/kvm_pgtable.h |  5 ++--
->  arch/arm64/kvm/nested.c              | 33 ++++++++++++++++++++--
->  3 files changed, 45 insertions(+), 35 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index cbdaaa2a2903..aa27f12cf2d4 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -87,13 +87,15 @@ extern void kvm_nested_sync_hwstate(struct kvm_vcpu *vcpu);
->  extern void kvm_nested_setup_mdcr_el2(struct kvm_vcpu *vcpu);
->  
->  struct kvm_s2_trans {
-> -	phys_addr_t output;
-> -	unsigned long block_size;
-> -	bool writable;
-> -	bool readable;
-> -	int level;
-> -	u32 esr;
-> -	u64 desc;
-> +	u64		desc;
-> +	phys_addr_t	output;
-> +	unsigned long	block_size;
-> +	int		level;
-> +	u32		esr;
-> +	bool		writable;
-> +	bool		readable;
-> +	bool		px;
-> +	bool		ux;
->  };
->  
->  static inline phys_addr_t kvm_s2_trans_output(struct kvm_s2_trans *trans)
-> @@ -129,34 +131,12 @@ static inline bool kvm_has_xnx(struct kvm *kvm)
->  
->  static inline bool kvm_s2_trans_exec_el0(struct kvm *kvm, struct kvm_s2_trans *trans)
->  {
-> -	u8 xn = FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, trans->desc);
-> -
-> -	if (!kvm_has_xnx(kvm))
-> -		xn &= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b10);
-> -
-> -	switch (xn) {
-> -	case 0b00:
-> -	case 0b01:
-> -		return true;
-> -	default:
-> -		return false;
-> -	}
-> +	return trans->ux;
->  }
->  
->  static inline bool kvm_s2_trans_exec_el1(struct kvm *kvm, struct kvm_s2_trans *trans)
->  {
-> -	u8 xn = FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, trans->desc);
-> -
-> -	if (!kvm_has_xnx(kvm))
-> -		xn &= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b10);
-> -
-> -	switch (xn) {
-> -	case 0b00:
-> -	case 0b11:
-> -		return true;
-> -	default:
-> -		return false;
-> -	}
-> +	return trans->px;
->  }
->  
->  extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 41a8687938eb..22aeb2ed18d1 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -79,6 +79,8 @@ typedef u64 kvm_pte_t;
->  #define KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR	GENMASK(5, 2)
->  #define KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R	BIT(6)
->  #define KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W	BIT(7)
-> +#define KVM_PTE_LEAF_ATTR_LO_S2_S2AP	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R |	\
-> +					 KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W)
->  #define KVM_PTE_LEAF_ATTR_LO_S2_SH	GENMASK(9, 8)
->  #define KVM_PTE_LEAF_ATTR_LO_S2_SH_IS	3
->  #define KVM_PTE_LEAF_ATTR_LO_S2_AF	BIT(10)
-> @@ -95,8 +97,7 @@ typedef u64 kvm_pte_t;
->  
->  #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
->  
-> -#define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | \
-> -					 KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | \
-> +#define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP |	\
->  					 KVM_PTE_LEAF_ATTR_HI_S2_XN)
->  
->  /* pKVM invalid pte encodings */
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 9e60c7c822ae..c9300703bd0d 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -241,6 +241,36 @@ static int swap_guest_s2_desc(struct kvm_vcpu *vcpu, phys_addr_t pa, u64 old, u6
->  	return __kvm_qat_swap_desc(vcpu->kvm, pa, old, new);
->  }
->  
-> +static void compute_s2_permissions(struct kvm_vcpu *vcpu, struct s2_walk_info *wi,
-> +				   struct s2_walk_step *ws, struct kvm_s2_trans *trans)
-> +{
-> +	u8 s2ap = FIELD_GET(KVM_PTE_LEAF_ATTR_LO_S2_S2AP, ws->desc);
-> +	u8 xn = FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, ws->desc);
-> +
-> +	if (!kvm_has_xnx(vcpu->kvm))
-> +		xn &= 0b10;
-> +
-> +	switch (xn) {
-> +	case 0b00:
-> +		trans->px = trans->ux = true;
-> +		break;
-> +	case 0b01:
-> +		trans->px = false;
-> +		trans->ux = true;
-> +		break;
-> +	case 0b10:
-> +		trans->px = trans->ux = false;
-> +		break;
-> +	case 0b11:
-> +		trans->px = true;
-> +		trans->ux = false;
-> +		break;
-> +	}
-> +
+Hi folks,
 
-Nit: couldn't the above be summarized as below?
+A guest timer can fail to fire, or fire early, once the guest's counter
+is far enough from the host's. Where the hardware won't apply the
+offset itself (the physical timer without CNTPOFF_EL2, a CNTPOFF_EL2
+host while TGE is set, the virtual timer on x1e), KVM adds it to CVAL
+and lets the hardware compare the sum against the raw counter. The
+timer condition is an unsigned compare, and adding the offset to both
+sides of it preserves it only while both sums wrap or neither does: a
+guest whose counter is ahead of the host's by more than CVAL has an
+expired timer that never fires, and one behind it can have a far-future
+timer fire at once.
 
-	trans->ux = !(xn & BIT(1));
+Patch 1 computes the programmed value from the current count instead,
+and returns a guest hypervisor's own physical CVAL from memory where it
+used to subtract the offset from the hardware value. Patch 2 does the
+same for the virtual CVAL read on x1e, which has returned CVAL + offset
+since the workaround landed. Patch 3 adds the second case, a guest
+behind the host with a far-future timer, to arch_timer_edge_cases.
 
-	if (kvm_has_xnx(vcpu->kvm) && xn & BIT(0)) 
-		trans->px = !trans->ux;
-	else
-		trans->px = trans->ux;
-					
+So far it has only shown up in the selftest, which moves the guest
+counter half its range away from the host's. On a VHE host without
+CNTPOFF_EL2 arch_timer_edge_cases hangs in its physical cval = 0 cases
+until the vCPU is next loaded, which is what Zenghui saw on a
+Kunpeng920 [1]. On a CNTPOFF_EL2 host (QEMU, here) the same cases
+livelock instead. Both go away with patch 1. The arithmetic is wrong
+for any offset once one sum wraps and the other doesn't, and the fix
+for the selftest's case should be the fix for all of them.
 
-or maybe even skip the FIELD_GET and do:
+Tested with arch_timer_edge_cases on QEMU with [2] applied, under VHE,
+nVHE and pKVM, and under VHE with CNTPOFF_EL2 removed by
+id_aa64mmfr0.ecv=1, the host class Zenghui hit. Under VHE with patch 1
+reverted the new case fails. QEMU's TCG has a separate bug with the
+same offsets, which [2] fixes. Without it the test stalls under nVHE
+and pKVM as well, where KVM emulates the physical timer and patch 1
+changes nothing. Not exercised here: patch 1's x1e paths in
+timer_save_state() and timer_restore_state() and all of patch 2, since
+nothing here runs on an x1e, and patch 1's CNTP_CVAL_EL0 read in
+kvm_hyp_handle_timer(), which only a guest hypervisor with a physical
+offset on a host without CNTPOFF_EL2 reaches.
 
-	trans->ux = !(ws->desc & KVM_PTE_LEAF_ATTR_HI_S1_UXN);
+Patch 1 carries Cc: stable for the hang and the livelock.
 
-	if (kvm_has_xnx(vcpu->kvm) &&
-	    ws->desc & KVM_PTE_LEAF_ATTR_HI_S1_PXN) 
-		trans->px = !trans->ux;
-	else
-		trans->px = trans->ux;
+Based on Linux 7.3-rc3 (fd73f4a665989).
 
+Cheers,
+/fuad
 
-Maybe it's just me, but that looks easier to understand what each bit does 
-based on the feature.
+[1] https://lore.kernel.org/r/460258be-0102-e922-c342-4e87cd94b9e5@huawei.com
+[2] https://lore.kernel.org/qemu-devel/20260921074451.3158645-1-fuad.tabba@linux.dev/
 
-In any case, LGTM.
+Fuad Tabba (3):
+  KVM: arm64: timers: Compute an offset-applied CVAL from the current
+    count
+  KVM: arm64: nv: Read a guest hypervisor's CNTV_CVAL_EL0 from memory on
+    x1e
+  KVM: arm64: selftests: Test a timer set past the counter's wrap
 
-FWIW:
-Reviewed-by: Leonardo Bras <leo.bras@arm.com>
+ arch/arm64/kvm/arch_timer.c                   | 27 +++++++++----------
+ arch/arm64/kvm/hyp/vhe/switch.c               | 21 +++++++++------
+ include/kvm/arm_arch_timer.h                  | 15 +++++++++++
+ .../kvm/arm64/arch_timer_edge_cases.c         | 25 +++++++++++++++++
+ 4 files changed, 65 insertions(+), 23 deletions(-)
 
-Thanks!
-Leo
+-- 
+2.39.5
+
