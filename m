@@ -1,127 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-121.mta0.migadu.com [91.218.175.121])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB877377010;
-	Sun, 20 Sep 2026 23:51:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE72117BB21
+	for <kvmarm@lists.linux.dev>; Mon, 21 Sep 2026 06:03:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.121
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789948312; cv=none; b=XY3fJWRP+V+k6fH5LosmcBranYBhz4wWCbvtRjr96aSkZ8+OplWLMtncJ4hwjJcfFLUrjLnCIf6d6WzKGJanXlDYbWOQmXQQ6ZZWyCigJNYfx6Yzh7uYP10wnu3V8VuuTEeEYbtlxTqij3rifIy2rM6IQsJLiHVRlSiUF31Iovw=
+	t=1789970608; cv=none; b=OcGC0fEi3rbD6NXa1JSa1BLlbw7FlffpyQyBl6i9hoZ53szOCpgN6PK6h3m9PLZ3U2Jw57ZLYTWA/ey0ZehaBbrZ++HjAdrlrjE0iKBj9TqjsFy4x21/1iMkTCDikQhWYhx3UJ2u2Mz4yLZf6T2gfeIJjca4vShLtFKGMpv97eE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789948312; c=relaxed/simple;
-	bh=U5m7WADaRLL8j4XyHtWlFJb/IzUnoMGq7dmQW6a6KpQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ew9Mhg+f7BPOFAlH4gxFkOGaD9oW8n3Pk7Yl+qFZEOfgl87j/KiBSTFSM/ahx4WjK2PQPZqarANGasgrylw1jjWFAepBpHeJtEwbFOHurpMS6RcvaqfQGnqp2COehGDaFaeQXxpYiz1mEwYC0RzlVC7H3c3u5BeYA8+KKZU6K2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oH4PGHC7; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789970608; c=relaxed/simple;
+	bh=KfFHfZ4iwgvTWzD+d7ThKP2Za/ZsPILmpf4NKUXBYSA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qajhMOBpa0qfEIxjAAxsvKHmdadcTzzOcjkkGfhxTV/33x/xLpwRVu6Rg2ltxlcGcwSclk8WIJN2+8/niSz4NI7KOrpxuQCkf7sym+eHuMupExa9jXMY+f9c3EbkHBDJL9y/Ogb97iqpTMHRiIIdSYKWe1ZO89qWBZGpZ8LziOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VFKRI3lc; arc=none smtp.client-ip=91.218.175.121
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oH4PGHC7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50B1A1F000FF;
-	Sun, 20 Sep 2026 23:51:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789948311;
-	bh=n69+NQuL0MBxH8A3qlY0/AgvLV3+f1D8QUKm2WY4ZWI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=oH4PGHC7Axy/Amkc3VJw6ozl7LfldOKz0UpByM3IxPHU7qL8yngrsdYxQzs9eGLTW
-	 C4sn78GXQp/fyHcdD+bDrxfPf7T2K+QDKtaaWH2cSzndRSH3VxWVgPBuSydUJrLB7R
-	 EGhSuoyKjzlwGWooX1oU3HhsTUGEQBbq9hu2gFOmUIfZlKCAYPYlQCGpaV7wqEVUF1
-	 yMOzXd1c/KQHw8gGicCACzqNmsZhS9/QJirj18ScOL9NFYan29trdzttHAj5Gzkjw3
-	 bpGAoTvlRa6fAITu/GAsuUlv1D53qUFZCSLR5UQNj9JNMY2XPSxoTTWtPuqmTM9bJ+
-	 RM1Yx1mPiZ5Mw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1x8RK0-0000000BJ26-4AzT;
-	Sun, 20 Sep 2026 23:51:49 +0000
-Date: Mon, 21 Sep 2026 00:54:52 +0100
-Message-ID: <87a4pb4gxf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>,
-	Yuchao Zhang <ndaugoing@gmail.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: arm64: vgic: Do not remove in-flight LPIs from AP list on disable
-In-Reply-To: <aq2N7HYbQw7zbpCq@kernel.org>
-References: <20260918040214.85580-1-ndaugoing@gmail.com>
-	<20260918040214.85580-2-ndaugoing@gmail.com>
-	<CA+EHjTx8zzvgqj99TKWfRD58X-M8v+hs9358_r_1zZonFNEsgw@mail.gmail.com>
-	<CAC2BP3K-fvW2s2j2ys+kPMuxrzeMw9yc6MrAk7U7CqCpb2WePQ@mail.gmail.com>
-	<CA+EHjTx9bTDuTnGgkrCcaAG+1S1Lx6+1BZnuhJcWNTJxWXkAHw@mail.gmail.com>
-	<aq2N7HYbQw7zbpCq@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VFKRI3lc"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=KfFHfZ4iwgvTWzD+d7ThKP2Za/ZsPILmpf4NKUXBYSA=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789970604; v=1; x=1790575404;
+ b=VFKRI3lcS9gcwiYKsLmUi/HSNJlJf4OOIrlHk/A/XhzNM0uUwiYUnCpawSorQy54P9SVHc9l
+ RsPBAbSVcWZ892+dUTvXPEage7CLVNgCMGht67OS+ZodNu17RL8dSIZpbqz+n2Cgt0Gd0qCYavB
+ BHAZbfkdMcRjvofNj9v84u5g=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 0d75f1cbf7d1e086;
+	Mon, 21 Sep 2026 06:03:24 +0000
+X-Mizu-Trace-ID: 0d75f1cbf7d1e086
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5b83c1421ecso5770e87.1
+        for <kvmarm@lists.linux.dev>; Sun, 20 Sep 2026 23:03:24 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvByyajB1N6ig2e6FFcwF32X1SS9DJQYlWFBqgS41ktIKq3TfRyvTGl7OkbaUwcPfrHOEvwseHLY=@lists.linux.dev
+X-Gm-Message-State: AFuF++msRzuj9vGuPuFdfzSUb93SVbEpnplNMD0iJS1fx9Mu1HzNDp68
+	nXGSxH5kxioM0Y5Dm/gq2l5MPAlcn+eNhaj+ubQs4XlhuG6JkbCAKy+O/CDCpQJ94dlS7+BC1T6
+	TJy/WTd0JKuVgFBQ8N/ScSVxpXcJUNBo2m70jnaum
+X-Received: by 2002:a05:6512:a95:b0:5b8:cc2e:2fe6 with SMTP id
+ 2adb3069b0e04-5b8cc2e30d0mr42846e87.5.1789970603608; Sun, 20 Sep 2026
+ 23:03:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, fuad.tabba@linux.dev, ndaugoing@gmail.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260918120553.163139-1-fuad.tabba@linux.dev> <aq1VjEOI3yhoFtpq@gremlin>
+In-Reply-To: <aq1VjEOI3yhoFtpq@gremlin>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 21 Sep 2026 07:03:00 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTyL0WXBQZcudB3AL9MFem1L7wmpC6N0_54C0-qrw7M-FA@mail.gmail.com>
+X-Gm-Features: AcwNN1VBGKS9331BRoH03j2FDN--JXQmLxd-TtWpGKfTh8lyxNGKe0BT2dp2tv4
+Message-ID: <CA+EHjTyL0WXBQZcudB3AL9MFem1L7wmpC6N0_54C0-qrw7M-FA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Restore the VM's feature bitmap when
+ kvm_setup_vcpu() fails
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
+	Jack Thomson <jackabt@amazon.com>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 18 Sep 2026 20:15:56 +0100,
-Oliver Upton <oupton@kernel.org> wrote:
-> 
-> On Fri, Sep 18, 2026 at 12:58:17PM +0100, Fuad Tabba wrote:
-> > Hi Yuchao,
-> > 
-> > On Fri, 18 Sept 2026 at 12:51, Yuchao Zhang <ndaugoing@gmail.com> wrote:
-> > >
-> > > Hi Fuad,
-> > >
-> > > Thanks a lot for pointing me to that thread! I was not aware of
-> > > Hyunwoo's earlier report and the discussion with Oliver and Marc.
-> > >
-> > > I'll read through the thread and their rationale on the ap_list_lock
-> > > approach. I'm happy to defer to Hyunwoo's effort to avoid duplicate
-> > > work.
-> > 
-> > I'm not sure you should defer to their effort. It doesn't seem like
-> > Hyunwoo has done any work on this for a while. I just wanted to point
-> > you to the existing discussion.
-> 
-> Yuchao if you have cycles I would definitely appreciate it if you can
-> pursue a fix. My view hasn't changed since before: let's make that
-> traversal of the ap_list is done under the ap_list_lock, as this is not
-> intended to be walked lock-free.
-> 
-> Taking a step back, the whole cross-vCPU LPI disabling always leaves me
-> feeling ill... Really when RWP=0 becomes visible from another vCPU we
-> need to guarantee that the LPIs have been actually retired, meaning we
-> can't have one sitting in an LR. Even with the locking fix I think we
-> miss this.
-> 
-> Given how unlikely it is for well-behaved software to disable LPIs
-> remotely in the first place, I wonder if we should just halt the VM
-> similar to how we handle accesses to the active state. That's a really
-> big hammer but we've had a lot of bugs in this department and I'm
-> somewhat biased towards an obviously correct solution.
+Hi Lorenzo,
 
-Irrespective of the whole ap_list_lock issue, I think this is the only
-valid option. Messing with the ap_list of another vcpu while it is
-running can never result in something that actually works. There's a
-hack doing that in my tree.
+On Fri, 18 Sep 2026 17:10:43 +0100, Lorenzo Stoakes (ARM)
+<ljs@kernel.org> wrote:
+[...]
+> > Nothing in the tree loads a vCPU whose init failed, so this is latent.
+> > The pending KVM_PRE_FAULT_MEMORY series for arm64 does, and the second
+>
+> I think this needs clarification :)
+>
+> The KVM_PRE_FAULT_MEMORY series doesn't do this, or rather it only exposes the
+> ability for the pre-existing generic kvm_vcpu_pre_fault_memory() function to be
+> invoked by setting flags such as to expose pre-faulting as available for arm64.
+>
+> So something like:
+>
+>     The upcoming series that enables KVM_PRE_FAULT_MEMORY exposes an
+>     existing bug in how vCPU initialisation is performed as it allows
+>     the generic kvm_vcpu_pre_fault_memory() function to be called which
+>     calls vcpu_load() before the vCPU might be initialised.
+>
+> For that bit.
 
-> We wouldn't need to do this for a vCPU disabling LPIs on its own
-> redistributor since we've already exited the guest.
+That's what "does" was standing in for. I'll say that the series
+enables the generic kvm_vcpu_pre_fault_memory(), which calls
+vcpu_load() whether or not the vCPU has been initialised.
 
-In general, we could stop the target vcpu only. But this is making
-things more complex, and I quite like the idea of a large
-hammer... ;-)
+>
+> > such load NULL-dereferences in get_s2_mmu_nested() under mmu_lock.
+>
+> Also I think this is a bit unclear, esp. the prior reference to 'second',
+> not clear what that refers to. I think you should bring in some of the
+> context you provide under the fold for the patch.
+[...]
 
-	M.
+I'll bring the two-ioctl walk up from below the fold: the first
+KVM_PRE_FAULT_MEMORY's vcpu_put() clearing hw_mmu, then the second's
+vcpu_load() reaching get_s2_mmu_nested() with no nested MMUs to find.
 
--- 
-Jazz isn't dead. It just smells funny.
+> > Fixes: 1de10b7d13a97 ("KVM: arm64: Get rid of vCPU-scoped feature bitmap")
+> > Fixes: 427733579744e ("KVM: arm64: Select default PMU in KVM_ARM_VCPU_INIT handler")
+>
+> Hmm are 2 fixes really needed? It seems to me that commit 427733579744e
+> ("KVM: arm64: Select default PMU in KVM_ARM_VCPU_INIT handler") is the
+> right one because that added a step _after_ setting the bitmap that can go
+> wrong.
+
+I'd added the first one because it's where the copy into the VM-wide
+bitmap moved ahead of the reset, but nothing after the copy could fail
+there. I'll drop it and keep 427733579744e.
+
+[...]
+> With the comments re: commit message/fixes tag addressed this seems correct
+> and a very good spot thanks! We very much need this for the pre fault
+> functionality.
+>
+> Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+
+Thanks!
+
+[...]
+> I also think you should put the stack trace in the commit message, ideally
+> decoded via scripts/decode_stacktrace.sh!
+
+Sure, will do.
+
+Thanks,
+/fuad
