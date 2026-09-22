@@ -1,94 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-246.mta0.migadu.com [91.218.175.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C44F4E325E;
-	Tue, 22 Sep 2026 20:42:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4260D549374
+	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 21:10:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790109789; cv=none; b=tFtwJ/QdQI251d3gYy320SZpRyUAlemFF46asRRRGTFAYT/fHQlc/nZs+F0lb3CmsoPX72jFdCJYk4NpkZQHo3JzPE7wZrRFWusptpn79UgdDW0wNx+fJIS4EnH59bD8a6wcM+ajbZbXDfFkvFlUee3kbsl6RIfo8HyKlz3pwQU=
+	t=1790111446; cv=none; b=OYqaUnJQYae0JaA/+l2fT+gxdKidjygH0Bz+71okINgcX52KQWJzeycEq1HlY9/tEixeF89fA4a7rYP8EuvMHjc/cdHljqdYZ9kF49LMNnHHXcrIeOvhG7fx3myLEyqdz4qJc4wBqPYGwI5SzEeHAzq/6c69Ck5JVNcjsN6t78U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790109789; c=relaxed/simple;
-	bh=j0nkk7X3qJSlJJYZKr1Wym+f63EIr4ap5LhKqaGzxVo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lsSd7wOPHGlxrUkPHzms6V2Ov3F4eqAKB/UMvep8Z5cq55/XfGobkQTPO2UWiRIE6xkF5hNTBSb/edL/d5i+9AfNIw3z42QHa3SdOZ2bK0npv374H8EmKfVkehWrQdVbmHcuoXycR4zjLTPn6rtinsjpawyfSxZQhw6ou47K1FE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ot50nqYa; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790111446; c=relaxed/simple;
+	bh=ZLzoHhwTaHnhjMBvx7XPbj3yAjurmamgiA97xqI13vA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HTzow4XGLtVzaCWvRSeqpSZ/jBzImLTc09AZHY42QviX9adtjzJlnGYu/4667IER91/Iprt5eyxpEKzP+BBzeulGMROndB5Ao/HzarD13RJhJLfNd0gUN3N/0E+wGr4CIknpo1VYbJHjSANCtIo6gDnJgCsH7r0RdV/gJsHNROI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JvyVaJaj; arc=none smtp.client-ip=91.218.175.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ot50nqYa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAB881F0089A;
-	Tue, 22 Sep 2026 20:42:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790109772;
-	bh=b9SqF1U4AYAmpuF1a0G96/WAnPd35ZdOW84UAYiJBR8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Ot50nqYa/vsD+HB2q0FRrRNgPARDAPRd+XUlcKbw2C2Nd8GheCjRiCk83nxmTP249
-	 ufuLNrMiPHtEd5o9ypLesJK1Y0+m84SUTp6pnv9gdW5siMF9JpTqBCw97jQTn3wPVg
-	 RYrHcnLnIGwkXgGFhs1tqUY3p1yqpHzemp0QTbhPGQGD9fBVk2Fc0xFeZGjkWfEc7X
-	 zKzOLUsuVaoKiVJRlg0xCX8kLlgnwBNs9tw4J0YUG4rMQiRX1gQ+/NofpzI5iValLl
-	 zPXAL9mERHl+HrEEKrN9FWJBjbLKfQTpjepOrkh0nyr4CPof6O3a+lJIKoKC1qBOeZ
-	 /uukaxJgnIjBA==
-Date: Tue, 22 Sep 2026 13:42:50 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Jack Thomson <jackabt@amazon.com>,
-	Jack Thomson <jackabt.amazon@gmail.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Leo Soares Passos <Leo.Bras@arm.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: Re: [PATCH v3 00/14] KVM: arm64: Add KVM_PRE_FAULT_MEMORY support
-Message-ID: <arLoSiMeCkzPkl9T@kernel.org>
-References: <20260922-kvm-arm-prefault-v3-0-787bd3bc7e3f@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JvyVaJaj"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=ZLzoHhwTaHnhjMBvx7XPbj3yAjurmamgiA97xqI13vA=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1790111430; v=1; x=1790716230;
+ b=JvyVaJajPn6oCPqwzZo0n1qYB2+2bfMifzQV2gk36kUt1/Jm6CaDQnEum2vHTxtUNoKbRg23
+ 2M28/6rOQzgXpuE30O480Bz9QmOk6oBsG+Nox6DQta4ONpt7JJLqcV9oWVk6NUu87ctvRggAVCc
+ S/yjnAhWstFYltSrc00hzPsE=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id b08f0698150692e9;
+	Tue, 22 Sep 2026 21:10:18 +0000
+X-Mizu-Trace-ID: b08f0698150692e9
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5b8c42da963so1011e87.0
+        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 14:10:14 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBx1C82BBtcdIt51HNDFFjZKqEaXA4PsSOaGjeNjaVQFF2AYAzXs1UPsZUIZk+ltQ7By9eVbTI0=@lists.linux.dev
+X-Gm-Message-State: AFuF++k5ZUjuVsR7VIYR43F0OPwUFoS313a8wN0A7gPfLO4A1m1IBjTJ
+	w54TANKD2UgFcptkzBPtGbxnU3VWaMcRFIgdXYEO0tiHYd2dsutwllou8WTrGDd9RiFgdJ2sq9f
+	QRWFA38PTJSHMHZsRsgkHkhJRL4An8tWnF+x9r34b
+X-Received: by 2002:a05:6512:a84:b0:5b1:ca0b:25d2 with SMTP id
+ 2adb3069b0e04-5b8d87fcb57mr47663e87.4.1790111413647; Tue, 22 Sep 2026
+ 14:10:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260922-kvm-arm-prefault-v3-0-787bd3bc7e3f@kernel.org>
+References: <20260922181430.3532371-1-fuad.tabba@linux.dev> <arLbbtuRuOrxlh1Y@kernel.org>
+In-Reply-To: <arLbbtuRuOrxlh1Y@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 22 Sep 2026 22:09:37 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTx8JsXfrjKUbhhrfSmFPrWxyYaTbKqMeYAJPt-vqGfLvA@mail.gmail.com>
+X-Gm-Features: AclHuK98e37nffnaw1F9q5cHTfaeClpU9qBwO_qQHRPF451CnbaMSkO3wxXcRx0
+Message-ID: <CA+EHjTx8JsXfrjKUbhhrfSmFPrWxyYaTbKqMeYAJPt-vqGfLvA@mail.gmail.com>
+Subject: Re: [PATCH v1] arm64/boot: Disable trapping of PMZR_EL0 writes to EL2
+To: Oliver Upton <oupton@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring <robh@kernel.org>, 
+	James Clark <james.clark@linaro.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Randy Dunlap <rdunlap@infradead.org>, Shuah Khan <skhan@linuxfoundation.org>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Sep 22, 2026 at 03:17:54PM +0100, Lorenzo Stoakes (ARM) wrote:
-> ---
-> Jack Thomson (3):
->       KVM: arm64: Pass walk flags to kvm_pgtable_get_leaf()
->       KVM: selftests: Enable pre_fault_memory_test for arm64
->       KVM: selftests: Add option for different backing in pre-fault tests
-> 
-> Lorenzo Stoakes (ARM) (11):
->       KVM: Allow architectures to disallow pre-fault
->       arm64: Add ESR fault helpers
->       KVM: arm64: Use ESR helpers in guest abort handling
->       KVM: arm64: Propagate and use esr in s2fd when handling guest aborts
->       KVM: arm64: Propagate and use mmu in s2fd when handling guest aborts
->       KVM: arm64: Propagate and use kvm_s2_fault_result on S2 fault
->       KVM: arm64: Size the stage-2 memcache from the fault MMU
->       KVM: arm64: Propagate EHWPOISON in kvm_s2_fault_pin_pfn()
->       KVM: arm64: Implement KVM_PRE_FAULT_MEMORY
->       Documentation: KVM: document arm64 KVM_PRE_FAULT_MEMORY
->       KVM: selftests: Add nested pre-fault test for arm64
+Hi Oliver,
 
-Besides the usual nitpicking, this series is looking good to me. Thank
-you for picking this up Lorenzo!
+On Tue, 22 Sep 2026 20:47:58 +0100, Oliver Upton <oupton@kernel.org> wrote:
+[...]
+> We can trim 3 instructions from this by using the read-trap bits as the
+> starting point for the write-trap bits, like below. It also makes clear
+> the point that most of our trap bits are symmetrical for read and write.
 
-Reviewed-by: Oliver Upton <oupton@kernel.org>
+I did consider that, and went the other way for two reasons.
 
-Thanks,
-Oliver
+The read side has three bits with no write-side counterpart
+(nPMSSDATA, nSPMDEVAFF_EL1, nSPMID), so copying x0 into x2 writes ones
+into three RES0 bits of HDFGWTR2_EL2. Harmless today, but it's this
+bug in reverse: the first revision that defines one of those positions
+in the write register turns the copy into a silent behaviour change.
+Building each mask from its own register's names can't do that.
+
+It also matches __init_el2_fgt, which already keeps x0 and x2 apart
+for HDFGRTR_EL2 and HDFGWTR_EL2. And even in that form the copy would
+have to sit just before the msr_s, after the SPE block, or
+nPMSDSFR_EL1 only lands in x0.
+
+Cheers,
+/fuad
