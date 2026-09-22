@@ -1,139 +1,153 @@
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013062.outbound.protection.outlook.com [40.93.196.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535BD2264A6
-	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 18:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.198
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790102787; cv=none; b=c/+4E6aF0oFRv2vi2bbZOld9BRsOzWRlEMZP8pWOLKtuFig5H2k45ivXhZMo2XWYG2cqfk7pygqGkSpt+NKo1AiITfz100Ov0LQ6O5es7SeuZTUKNkEqG7NqlKvp2pNSXovdluoh2BDcD7eqQo+ha8gUpmcC2c+gi12LwBSyFNo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790102787; c=relaxed/simple;
-	bh=P2oNbUgzNKbPC97q99tgXWb/Iok5vLJAaFSYPNe8o2w=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ibj65+4AtwIP4OoTUmrPW0YfyCPtgCfYjnqwaKr/9d0a4U3a6rDLJbVxsAFZThzlT2JCXYdhQhNBwF1D7HvUWD0gbf4GQ7m3uA5NZ7oYF9ULHS93AgbVE32Rkndn5JkGTdU4lTs0vh/DGUN6kF7ZTpEUQuI7hAS7G2w5CiFqls0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aGtgGdiP; arc=none smtp.client-ip=209.85.215.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2941340BCD1;
+	Tue, 22 Sep 2026 18:46:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.62
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790102788; cv=fail; b=jrnVitMX59EIKDtI+yovWXbmGk3IAAOnMcPivrOIvyKZ359L6MP+48opLvqus4o1+LDr1IDYNpg0aezbbJVOlopMZgSgv/8lHSAo/lowHu8m8UcZxzqeH1EJIg9V1H6sz5Gy15UsxcIXq0Ln8dUCB3fKAUwjiK+u84JhVwU2j5U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790102788; c=relaxed/simple;
+	bh=N+xfj16cayIxF/qp7sa0gnfzZZqqwC9C8rN3z6Mwqhs=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LV7qWHbHNxN+2BnRcY6TeZAG6Ipgzd51iVvAEWNxzYvGuZbYVw16vBCEZvEgobavi0+NLLPhUxKeGr5/h486WZ4wiwfTvAVAcBdxzGn/XjRC9A2rr8oaB6nK6e6TTKqgW2sq0kPdNyfOnEo2SlrzszLkoDknsoh9GfTuYflH5eA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mXCXe5fd; arc=fail smtp.client-ip=40.93.196.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aGtgGdiP"
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-cc1b80835d5so227557a12.2
-        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 11:46:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790102779; x=1790707579; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=wsMfNykkK/cvGUxGrrzkLoJGO5iJ1c5hJgEqfch5614=;
-        b=aGtgGdiPd40aw1mPcvjiWYNuHBhSbOOZc0lkCyXfHWR5iLIRGmF2yj7Lm+m/yNdLaV
-         SZXxwx2Zswx3JIZqMGzP3HUWEu/SnnOCiPg/nvrOwD+WE6fbg27tJMdcquhXnOCBvjKN
-         arbSzUBYWO0jZWN4xAgyb/lwn7bX5uu47cWP2eNuxBKNdfhDCcEZ50stHG9n7qQHd76b
-         R1iFk+muBluK0EzmRLTOQQzZA5NT5VtkZDckZaSmPVRJfnwmm1gO1kWh09LLpkjA5HDX
-         hxyIOtml0PGEvGYPUdzFkLTbUxX3EP5U0/DI2v41GDm3NBH5bjT2CS/UJsyC9dIs96Yu
-         C4Dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790102779; x=1790707579;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=wsMfNykkK/cvGUxGrrzkLoJGO5iJ1c5hJgEqfch5614=;
-        b=AaPnh30HXZZqFsBsDu/2FyIeQOunBCEybrr+2QtdEcETM8KYffUVTk5BqEFG0WR7d7
-         +7qDRUs5lN5YDj5cObqWKXzilNCfWxO8OhBDCa8YA8cLnzCuDgzEiOynLE+jZNjWzlo/
-         KcxYgCsTw1MuhnR8PyHUjHOnBcZICUvdaKXgbYMx2CuMYBZupy1DLVBNioLkTkTMKwq6
-         rYDyxYwAJGb0huoMlgq1kSyCvZe0psuIm95dmob/ms32xnzl1Vl5esh1kbuI/PIBBygH
-         8QMd9q4FxQscjKIoQs51ObV60tyxBfuDM/zwDhoKR0k9YDjJsXJgxTU94kOeS/pPOxmK
-         lB0w==
-X-Forwarded-Encrypted: i=1; AKwUvBxsuzwaEIGL7MgJ7jR4pK/jjfF+GuPMQmawFA14SBQBrIzs0HppiPRRC9DVKvbrilaAkremNpo=@lists.linux.dev
-X-Gm-Message-State: AFuF++mJQTdi+Mz1+Rmix+eJMRfryjQ2RnofN+rJHLMdPYydAuVznLDd
-	Z0cFsaWROSlsszoykw72ObIHWmofIyN27lmZ59p6Mb1eJpRZxQX/1cdhp9+sKIIdqAI8E6DKTFH
-	ospOsSw==
-X-Received: from pgdh8.prod.google.com ([2002:a05:6a02:5188:b0:cc5:1d7c:ddeb])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:1bc3:b0:3dd:a197:cf2a
- with SMTP id adf61e73a8af0-3ddf82c4849mr289558637.78.1790102779162; Tue, 22
- Sep 2026 11:46:19 -0700 (PDT)
-Date: Tue, 22 Sep 2026 11:46:18 -0700
-In-Reply-To: <arLJ4AbNN9Y_IUna@gremlin>
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mXCXe5fd"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kQjKLcpCuAlEoeN2vyRI2CvT112+qQ/1OTm1b0H8FuinDvyYJPvAdoAf5HSiYAzEm5AP0W5fLEVYZ4rP/0s7mYN9sJ2h8lqZrk/F56mKwbwq3rg9ZnREo0NkTXRgL3R8NEf1bHzjJHD8DqPEowGhGcb/gZzYq+9ncGRXu5tNA7IKUYIVop87faTnNbpcxJmSzlml3DHZnqQmuQWv53Eg2bRnTrOBtVRCLY4NLVRgGy9kPVbZ3RXqq0vBjyrp6QBWe29leC/w+nzKanNpTCjFVBF6i+jDX23vSe9Cd8d0rCcFznx4LOR5d5tdXxljajB3Y68cv8FtdwB0v3ZV1Sg4Ow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zmXqDnxSrnYvTngLdEs/crWatn8WH9CnuTWJ5gIYNN0=;
+ b=e3yBSPmRvFfjFvRdjy5Ft9rCPvhymklSKPejRtthlZwacviNYLJhwqQETfgq3LllRG80HjZFKhS4///5u1cAYblCCq2bo8KtEu2D/dgBU2pN+66tAiDutpAZkTZrU4cRIFnMOfJ8IBxxAai87l6jJpG0wJbt/JZADNhw0lnfX1fbBE2RML9MCBMYofuBZJz/oug5gptwtfvLWfBf4MH6tcfFByCUtPHwIHNp91t2x2qb7ajcp2xaVS1z4gbM7NqO4f147cT9EobjmmxIbTiCQ47xjB+KiODSHvhx6I2myyRO301dP2tXG2EDFcFHU1Zc+Q2aV7Dn6+z2rOdufxxX+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zmXqDnxSrnYvTngLdEs/crWatn8WH9CnuTWJ5gIYNN0=;
+ b=mXCXe5fdAqgu2lPCxFfSL3St+OPKUzQulzgHJc/9LlOcbPowzaVJn/foPMZ1LK4WnDHlW59+gwbOO5R3Q7cXIpvhJHrUYQ3n3+8kkRzLESo/jaGBuI/GLas9fCyDy14HcCOkc8ZFJ+Cm7Fp6+12mY+6NV8E8fsN2hGORQenA81okfadljyJVXzjGjGfLWXxnzfUcjkK8q4T6t7E/QqXdYNTkLZweX9ZK4i8d/fnhXcdJQd9vyFxI6ZzPHzCBY3EeJCj72PAewfiRzXPAhviD0Iumz9cEbrO/SPE43/GyNShrpNxxcjz+1e4M8fIrGIBUEqa4O6pbdc2coTuXMDHOIA==
+Received: from YT4PR01CA0200.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b01:ad::29)
+ by CH3PR12MB8710.namprd12.prod.outlook.com (2603:10b6:610:173::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.451.13; Tue, 22 Sep
+ 2026 18:46:05 +0000
+Received: from BY1PEPF00026964.namprd05.prod.outlook.com
+ (2603:10b6:b01:ad:cafe::13) by YT4PR01CA0200.outlook.office365.com
+ (2603:10b6:b01:ad::29) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.428.16 via Frontend Transport; Tue,
+ 22 Sep 2026 18:46:05 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BY1PEPF00026964.mail.protection.outlook.com (10.167.244.148) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.451.8 via Frontend Transport; Tue, 22 Sep 2026 18:46:04 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.49; Tue, 22 Sep
+ 2026 11:45:34 -0700
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.49; Tue, 22 Sep
+ 2026 11:45:34 -0700
+Received: from nvidia.com (10.127.8.12) by mail.nvidia.com (10.129.68.10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.49 via Frontend
+ Transport; Tue, 22 Sep 2026 11:45:32 -0700
+Date: Tue, 22 Sep 2026 11:45:29 -0700
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: Mostafa Saleh <smostafa@google.com>
+CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>, <iommu@lists.linux.dev>, <catalin.marinas@arm.com>,
+	<will@kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>,
+	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
+	<joro@8bytes.org>, <jgg@ziepe.ca>, <mark.rutland@arm.com>,
+	<qperret@google.com>, <tabba@google.com>, <vdonnefort@google.com>,
+	<sebastianene@google.com>, <keirf@google.com>
+Subject: Re: [PATCH v8 03/25] iommu/arm-smmu-v3: Introduce RangeInval
+ encoding helpers
+Message-ID: <arLMyd80BJJcthJI@nvidia.com>
+References: <20260922131259.2975334-1-smostafa@google.com>
+ <20260922131259.2975334-4-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260922-kvm-arm-prefault-v3-0-787bd3bc7e3f@kernel.org>
- <20260922-kvm-arm-prefault-v3-1-787bd3bc7e3f@kernel.org> <arKxjsxuO1F5ExrY@kernel.org>
- <arK5n9HrbZMCOHOt@google.com> <arK5ynpRi7VbY7Ek@gremlin> <arK8seJVT9wYgVCP@google.com>
- <arLD-eZ6dRvfZ52q@kernel.org> <arLJ4AbNN9Y_IUna@gremlin>
-Message-ID: <arLM-vJDoO7gQJXM@google.com>
-Subject: Re: [PATCH v3 01/14] KVM: Allow architectures to disallow pre-fault
-From: Sean Christopherson <seanjc@google.com>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
-	Randy Dunlap <rdunlap@infradead.org>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Jack Thomson <jackabt@amazon.com>, Jack Thomson <jackabt.amazon@gmail.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Vincent Donnefort <vdonnefort@google.com>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Leo Soares Passos <Leo.Bras@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260922131259.2975334-4-smostafa@google.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BY1PEPF00026964:EE_|CH3PR12MB8710:EE_
+X-MS-Office365-Filtering-Correlation-Id: 658f9136-3a6e-450f-d674-08df18d9c1f2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|1800799024|23010399003|36860700016|82310400026|4143699003|10067099003|56012099006|11063799006|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	yddUDTzC6VDt2vJd4cW1Olj4GEUowWw/LXP2cS7t9lNwAbXQn2WqZ86YNT2LQWceUYWcOxOte3TwQMVlPukxSe/yj+J0Cts9UPCsfmeLPBPQuu0+yHYhwP5C5PzwJC7TudNyNZLkUk3fu8mO/PW+D5kyqHdUACkjhV1Otr9+7AzAWweYup7MocO5vcHLKIeVjSzA2yC7Rb9GXudmLV52gv89lj/B+ohoDqLHARmPIC9FE1PBIh0kDXNUtuobXovMmw9btE2iK+N+jthNZTqHWFejFRpporsZcDa8yAVf39Pl/n2bkA0zkyyFtlTHM+qpqe0x+/D3LF5zFJlrVAaezg6bukpoNfD7U0Z9eUZe2tZ2htoVtFWSr3rEH6L2Zq++sWhYF92xNq0ZiSAZf8oF2TAsshQPk2QUi7kUxTCyU4Ebv5AC59uhjLiyBG3XImDPz3z9yEJurRYC8Fg5rl44aTDtnrlVesFLWQ+NCTL5ZxweuMjnLk/IEO5gfsRJz06mZKxDHap9SMau16HuLRDhinzk1NipswlWgElPGbcNWw0/irIC/1k4pRxqadFkYT9Efy+pDunCSBC8VrIEsipueLBXwif90jAactwCRzHubzcFwHKlhYvqPpyxiwActkVTG0AdOjuA6DEbtTtoLdGtxFJD6FuTSZN5WJAV7T7WKLfa1xxAed2L6Y1VpWw47UlONk9KGWPI94dpD+0kGrAUyA==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(23010399003)(36860700016)(82310400026)(4143699003)(10067099003)(56012099006)(11063799006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	tEAgVlDTGjv4bDG7N4YsQAQGOmX893kbsu7AOmj/12GylDqvNawe1s0aaH/VhBxNZhWaqrPJ3f85Fa9XNrRmBxUlLNPtGgYQLLSz4fXaFLXKkIt6FWnHgVmjaRVKQM+lCf69gYQhv5neT/LgH/V7TnPZYCQil+UlKMlWgshUASFmdSo37M8qhE+MjO7YR9kax2Ef3WOaD99zTyjhAeMGnAZZZwc6IXN11PMxLL2Z/0e+hpBrvHk3dFHSGSdRzrAB6rvdbQZCY7toIeq/S3BLW3Kjq4+DAyb/kzC0QHp0NGdD5RbVwzAnwpi++wZI+GkSwBLCkik6Lr4lfD8/Y1l5ZyplEDcjwBkd6jbYPMHrGkyP14x/FUodEz20Hx7CQj7gbrRADmC2yP6smNAkNECb4oeA83MYJXvnbM7+VfqLud2KgO5neP0ZchSX/XoKbKK3
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2026 18:46:04.9416
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 658f9136-3a6e-450f-d674-08df18d9c1f2
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BY1PEPF00026964.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8710
 
-On Tue, Sep 22, 2026, Lorenzo Stoakes (ARM) wrote:
-> On Tue, Sep 22, 2026 at 11:07:53AM -0700, Oliver Upton wrote:
-> > On Tue, Sep 22, 2026 at 10:36:49AM -0700, Sean Christopherson wrote:
-> > > On Tue, Sep 22, 2026, Lorenzo Stoakes (ARM) wrote:
-> > > > On Tue, Sep 22, 2026 at 10:23:43AM -0700, Sean Christopherson wrote:
-> > > > > Rather than have kvm_arch_vcpu_allow_pre_fault_memory(), what if we add a more
-> > > > > generic kvm_is_vcpu_loadable()?  That way we don't need to worry as much about
-> > > > > the return value, the connection to vcpu_load() is obvious, and we don't need to
-> > > > > add another pre-check if future (or cleaned-up existing?) ioctls want to do
-> > > > > vcpu_load() in common code.
-> > > >
-> > > > ...this is exactly what I started out with.
-> > > >
-> > > > But then you are in a pickle, because _really_ you need to do that check in
-> > > > vcpu_load(). Which is a void function. Which is called by every single
-> > > > architecture all over the place.
-> > > >
-> > > > So you'd have actually no way of signalling the error back.
-> > > >
-> > > > Of course those places are arch code and you could say 'arches should know
-> > > > better and if they call it it's fine not to call the arch 'can you load'
-> > > > function.
-> > >
-> > > Yes, that's my vote.  It'd be easy enough to clarify that "rule" with a comment
-> > > in linux/kvm_host.h.
-> >
-> > I feel like trying to make this generic will wind up under-documenting
-> > the single example we have with the pre fault ioctl. Putting the comment
-> > into a header practically guarantees that nobody will read it either.
-> >
-> > I'd favor doing something like below and sticking the comment inline in
-> > the ioctl handler. Unless I'm missing something blatantly obvious, I
-> > don't see why the x86 or s390 pre-conditions can't be tested early too.
+On Tue, Sep 22, 2026 at 01:12:36PM +0000, Mostafa Saleh wrote:
+> +/* Convert page size of 12,14,16 (log2) to 1,2,3 */
+> +static inline u8 arm_smmu_tlb_inv_tg_enc(size_t tg)
 
-Oh, they definitely can.  I'm a-ok with using kvm_arch_pre_fault_allowed() on
-s390 and x86, the only option I am against is adding kvm_arch_pre_fault_allowed()
-but then not using it on architectures that obviously perform that exact check.
+The prefix "arm_smmu_tlb_" is used by the iommu_flush_ops.
 
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -3961,6 +3961,11 @@ bool __weak kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu)
-> >  	return false;
-> >  }
-> >
-> > +int __weak kvm_arch_pre_fault_allowed(struct kvm_vcpu *vcpu)
-> > +{
-> > +	return 0;
-> > +}
+How about arm_smmu_cmd_tlbi_tg_enc?
 
-There should be no need for a __weak placeholder since this code is guarded by
-CONFIG_KVM_GENERIC_PRE_FAULT_MEMORY=y.  I.e. force architectures to define the
-API.  I don't think it's a coincidence that all of arm64, s390, and x86 ended up
-with restrictions; pre-faulting is far from a simple operation.
+> +static inline u64 arm_smmu_tlb_inv_addr(unsigned long iova, bool leaf, u8 ttl, u8 tg_enc)
+> +{
+> +	return FIELD_PREP(CMDQ_TLBI_1_LEAF, leaf) |
+> +		FIELD_PREP(CMDQ_TLBI_1_TTL, ttl) |
+> +		FIELD_PREP(CMDQ_TLBI_1_TG, tg_enc) |
+> +		(iova & ~GENMASK_U64(11, 0));
+> +}
 
-Actually, that's an argument for a dedicated kvm_arch_pre_fault_allowed() versus
-a generic kvm_is_vcpu_loadable(): it helps force future architectures to actually
-think about when exactly pre-faulting is safe.
+This actually covers entire data1 than just "addr", so maybe
+arm_smmu_cmd_tlbi_data1_enc?
+
+> +/*
+> + * @num: Number of 2^scale granules, must be >= 1.
+> + */
+
+Nit: single-line style
+
+> +static inline u64 arm_smmu_tlb_inv_range_enc(u8 num, u8 scale)
+> +{
+> +	/* Keep the pre-DS 5-bit truncation when scale > 31 */
+> +	return FIELD_PREP(CMDQ_TLBI_0_NUM, num - 1) |
+> +		FIELD_PREP(CMDQ_TLBI_0_SCALE, scale & 0x1f);
+
+And this could be arm_smmu_cmd_tlbi_data0_enc that takes orig too,
+matching with data1_enc().
+
+Nicolin
