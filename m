@@ -1,126 +1,248 @@
-Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011018.outbound.protection.outlook.com [40.107.208.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D43A38DC74;
-	Tue, 22 Sep 2026 18:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790101433; cv=fail; b=b+wpKaM0M1JL9kdPhDvcN8Vvy2gbKzQBzMxd3KQpU9G0MfK/+5GHrvH0ufaDr5HfB+0VNswf2//btACS2U6+kXA5Jc9DywLUXUhazuS32AUBrLbmqySION9tEjZX7S4fl9gnzKQxZqjW0muNoW7ChzsYSGpXFjQdJtd2//18hKc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790101433; c=relaxed/simple;
-	bh=qx9tjfkWc4//Ko3o3ZApuPrx9CgoCy9GEhAmtHPeUxE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OJLBMSns+6RHmzdlZ0RBwBnUQvWpsvowaMqMuFKG879UnJAqL/2l4Oq/SxdEZMONUCEvZrhIUowepijBk8XSJUdTd28UwulJzG+kgsyvxLLoLs/j3KwlMZzxm1qnXSOezNiZZyWjy2oXzdkTRdaJpno8PC+sjeFH/+E8I/JDR9E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lXdnlxZu; arc=fail smtp.client-ip=40.107.208.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F102486B99;
+	Tue, 22 Sep 2026 18:35:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790102117; cv=none; b=BLl4dxEWMVVjhGtYwlhHqxJYkdc2N1kDcTXpP1dGGj/dPTueruMd9L+ldYza6NVu7KwVO3j94wY04hAaTgHKsj6N+ipjR4YEzI5VpScZ0KUqor9LTnS5fK8Rzw4msx2CTIy3kXTFERzrul7ueeSol8xR6cjMuGYlZNlM9TzfwZ8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790102117; c=relaxed/simple;
+	bh=IVlpFEDWfSAfJLkX+yFwnPAe6E+OntAzgc8fkBaOFsE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qU35ubY+JB0a/rYJ2yOqVUecyCwnkGYJjsPJ6TGkEsGBxOJ/tk73UbmFrE07mLw7T8O/DYKiKtbC9pAtC6/t0kSn0NpO+xgRG6bvpJr8WNWmUQSrxvBFyyPpT6Jel7EJiOb1r2R9bMgVCKMnAfcuV5ghuKj/YQVby+3a8DAImag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gS7H4VV1; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lXdnlxZu"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fta3U01juUnohiAk7KVbwjcQxuAk3TDlq8+fe4P0hWwKl1y7sojSbDN8qXSv+96X4mVW/fbx2NOvjT0ewKGH7mKe5bD1wK+DXrMv6qJtssogckoBkX2ybZ6/QZ3VykrgfnTr37c+8wmSlnO0BJhTCXi7+Ufs30tx9mVoLbrL0Jh/MGd2pUqrhE5mtH4UUwDN+SkNc4aHji0h97RhkDzRd77xbaxTtF9DHjPT1n1q5Z00pODoiKw1z6YUFRgLqtmw7dyejSeEYIUA68RhG4JAxstuW8RkevNZD4Iqm9ruCLwVfnsFMiEv2dNAubT7f/Igr+0oj+3IbUOV0OvQVsJAsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PJ2vLxRJOkQPloNa2sZzRcDluTyH6MwkjdlwHIgY+k0=;
- b=M73gY6+Wgkzv0BIMGIFZC6PEdevU/g+wVstYw03o1GpaL8IzlGibUow25y65l6yvnAIexfZKMQRfkI0z2bnQqnEz9XBzYwqF5kGZdA6dk4SqDKA91Yiulv+0Q9GBEdA6J7/4gXYe1XM0w73FLMQAWv0leRPvzWy1Geb3RCAHcn8bFwkPzK2Ss9MeL/x6OnqSq8mtVzKgja1JlQY1r6XrZ2X9ltX/AxHXbmSbGAwLa6ynPBacSr7Scd48W4/H210suwabSTWNeSJ1o32DDRBkRSflA/VSbWTFPYd0OxqcJ3RSfNqHkAWfpJxRUs88sG1CbCsR5GcZwo5bM86tqL4+BQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PJ2vLxRJOkQPloNa2sZzRcDluTyH6MwkjdlwHIgY+k0=;
- b=lXdnlxZuMzq5/uoVFEnlx/uzZMcyOne5RISWS6oObn/FW/Urp7Bckba97Tq5YIqb7Eg7CvbF9up+iyanFN0zK7QUvxsBSNzpeO2fA/5EVkwSu6d3C+Dz4neRsllUouvm9MxyGgbCGNuWJyxQ1RS14aR7HJYU9zg1MVHA/LKxi8RTpsXfxYAGaA07visMhcBrOJKVhWTXScZ9/p7bx0Rm2z3o+uKsSISOQ3VcuARQv35kZ9ECCW6UfGWTDWfL98kP9YfhgFmWO6UWJf/5Hcg0LPSra9q4BHZs34dUcHklMzSfj+SsTTa4rquMCjgzYRb4zJX3QBNUPQn0PrC70YO9dw==
-Received: from DS7PR03CA0188.namprd03.prod.outlook.com (2603:10b6:5:3b6::13)
- by SJ0PR12MB5675.namprd12.prod.outlook.com (2603:10b6:a03:42d::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.428.16; Tue, 22 Sep
- 2026 18:23:46 +0000
-Received: from BL02EPF00021F6C.namprd02.prod.outlook.com
- (2603:10b6:5:3b6:cafe::69) by DS7PR03CA0188.outlook.office365.com
- (2603:10b6:5:3b6::13) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.428.16 via Frontend Transport; Tue,
- 22 Sep 2026 18:23:46 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BL02EPF00021F6C.mail.protection.outlook.com (10.167.249.8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.451.8 via Frontend Transport; Tue, 22 Sep 2026 18:23:45 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.49; Tue, 22 Sep
- 2026 11:23:15 -0700
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.49; Tue, 22 Sep
- 2026 11:23:15 -0700
-Received: from nvidia.com (10.127.8.12) by mail.nvidia.com (10.129.68.10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.49 via Frontend
- Transport; Tue, 22 Sep 2026 11:23:12 -0700
-Date: Tue, 22 Sep 2026 11:23:11 -0700
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: Mostafa Saleh <smostafa@google.com>
-CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>, <iommu@lists.linux.dev>, <catalin.marinas@arm.com>,
-	<will@kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
-	<joro@8bytes.org>, <jgg@ziepe.ca>, <mark.rutland@arm.com>,
-	<qperret@google.com>, <tabba@google.com>, <vdonnefort@google.com>,
-	<sebastianene@google.com>, <keirf@google.com>
-Subject: Re: [PATCH v8 02/25] iommu/arm-smmu-v3: Move Queue and STE functions
- to header
-Message-ID: <arLHj4/aXNBlUFvM@nvidia.com>
-References: <20260922131259.2975334-1-smostafa@google.com>
- <20260922131259.2975334-3-smostafa@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gS7H4VV1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 575E61F000FF;
+	Tue, 22 Sep 2026 18:35:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790102115;
+	bh=V2Wnj5RPep/Gg6xTG2yJLcOcZWZlxZ40baoPjkIZDiI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=gS7H4VV15RsjyjT0PbQmFK2HFd32m/D7+DDeNvMhGVYWksjlGofm/M9HiqrSYX2TV
+	 JRovjuYETfq/88zMYxw4w0+Ki1klGj7H3zpzdqFXuHvyNThugWFqn4kkcqIOYIToaj
+	 AhUe4m3XXJ+IViD1k6FmV92REZDTseLIXQcPqYgsEUzILWmpAU/Sx+Gxykl/j2i3hB
+	 30uM1juMZRb0rsJQelVrYbEYU5iJiDW38igpw9qFtHwS3jWGj+maui80P5nNtG9ltK
+	 wWQpTzIrNHeMBWh7k9HUGaocCddJsWYub0pLTqGBMZU/LE9w+YLPUVSRtWVXqvFRHA
+	 smLpJQLrdrPGg==
+Date: Tue, 22 Sep 2026 19:35:06 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Sean Christopherson <seanjc@google.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
+	Randy Dunlap <rdunlap@infradead.org>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Jack Thomson <jackabt@amazon.com>, Jack Thomson <jackabt.amazon@gmail.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Vincent Donnefort <vdonnefort@google.com>, 
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Leo Soares Passos <Leo.Bras@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>
+Subject: Re: [PATCH v3 01/14] KVM: Allow architectures to disallow pre-fault
+Message-ID: <arLJ4AbNN9Y_IUna@gremlin>
+References: <20260922-kvm-arm-prefault-v3-0-787bd3bc7e3f@kernel.org>
+ <20260922-kvm-arm-prefault-v3-1-787bd3bc7e3f@kernel.org>
+ <arKxjsxuO1F5ExrY@kernel.org>
+ <arK5n9HrbZMCOHOt@google.com>
+ <arK5ynpRi7VbY7Ek@gremlin>
+ <arK8seJVT9wYgVCP@google.com>
+ <arLD-eZ6dRvfZ52q@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260922131259.2975334-3-smostafa@google.com>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF00021F6C:EE_|SJ0PR12MB5675:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9d31df3e-a6ce-409f-2509-08df18d6a3ac
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|7416014|82310400026|376014|36860700016|1800799024|6133799003|18002099003|22082099003|4143699003|10067099003|11063799006|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	P76+DNMHZdaJmtmOTL7TtTEoKs8qXGTEsS3bEAhtTO+8CDAcvkzHzhxN2r4u0Ik0NSxlLvWbMW8DhP2BtN8W4X9lY9Tk9tBpg4Iswa4ATiGv6KDanwgRh4MOvqiedNTPkIUWBeXa+wckYSbaYsBRWrpzs/JwF341llLYenVSde43fgJCmDI3H1vL/gozQLvE7OUyW7M36G2lk1Ni3wAD93vH3lVfd+xNWo3zNqaGo6sEp509Dsq2MNqL8/nQP1j+8jL+MuC0EDJNqRzrT4d7cRCttfp/XSbfXKVK/wlHOOeWZVmbGlc0f9Bm30TL1ttTeR8MFP5i5aiv3b1HVa7JIzaYuP525ugMwChmhk+SpLf23X/gONfdQhKQWAen4BjG+3i0DVx/4eq/JJJdoH9OE0dZAj8eBMKylxIVQQckE542699w54p9N73wzlmXpXC6WSmX2kmTV8x6kc3CW4ub6xWDO1HEK/4SDGpLnTiFIBF6RPDcW3MPNGs3SbAOkY/jYQV7h+4ObeoU2am2OwZSuKfkEYmLIL/EUVU2m4rOW+WUvfKul7QHgWuu7sIwuXzPF6BKyxBw7zDtEFYtmSsuVzydK8XGYRqBibRrZjrvelJB9Ange32iZYjyXZOe7lAqhHUt7D6Zw+AjcG8yWra2xm39bD+xc253Q/k5zDszclBmlPyJGs8ZQfl2NdcC5z2xFMNzfRH7ZzCrqVHRK3lQ+Q==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(82310400026)(376014)(36860700016)(1800799024)(6133799003)(18002099003)(22082099003)(4143699003)(10067099003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	NiZU+9ofmNEaFHsVmJ+FdmOI6wFjcv69ypjNuOc+16igF4Sw1EbQcSWSsKJXclNiegGU9JThciv0633eklBYGJZYXHGj7eZFj+3o5MwDzd6bjt4I758AB2oPEI1Je8jc9dOHkGfDkwsldsKcUhcj2C633ry5FALYBcsWBDtc9PwAX1sMXDXkLyBluf78VYmEyj6L4g7cG2RnExFYmfyLopPxYgVmLHNQRzKMbMAh91QuUECiQS4740/AjVPlJiqokX65IrUqNm47BHHcRwTbCRcc6bgp5bb/hgFHS5n7J/EpWUXduqOp/PtlGQ48t/RUlT/2mR37THZRVftztwxJ90obgBqWrGpD2KlKcI9Appq8GkebUOJXH0arnDms4FFjWJHjNvamFzKLzi0mFIrGABy8NofwUa4lwgKTDE2hGAK25D37ErCyUdWiUckcqcxS
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2026 18:23:45.6020
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9d31df3e-a6ce-409f-2509-08df18d6a3ac
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF00021F6C.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5675
+In-Reply-To: <arLD-eZ6dRvfZ52q@kernel.org>
 
-On Tue, Sep 22, 2026 at 01:12:35PM +0000, Mostafa Saleh wrote:
-> The KVM SMMUv3 driver would re-use some of the CMDQ and STE code
-> inside the hypervisor. Move those functions to the header file that
-> would be shared between the host kernel and the hypervisor.
-> 
-> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+On Tue, Sep 22, 2026 at 11:07:53AM -0700, Oliver Upton wrote:
+> On Tue, Sep 22, 2026 at 10:36:49AM -0700, Sean Christopherson wrote:
+> > On Tue, Sep 22, 2026, Lorenzo Stoakes (ARM) wrote:
+> > > On Tue, Sep 22, 2026 at 10:23:43AM -0700, Sean Christopherson wrote:
+> > > > Rather than have kvm_arch_vcpu_allow_pre_fault_memory(), what if we add a more
+> > > > generic kvm_is_vcpu_loadable()?  That way we don't need to worry as much about
+> > > > the return value, the connection to vcpu_load() is obvious, and we don't need to
+> > > > add another pre-check if future (or cleaned-up existing?) ioctls want to do
+> > > > vcpu_load() in common code.
+> > >
+> > > ...this is exactly what I started out with.
+> > >
+> > > But then you are in a pickle, because _really_ you need to do that check in
+> > > vcpu_load(). Which is a void function. Which is called by every single
+> > > architecture all over the place.
+> > >
+> > > So you'd have actually no way of signalling the error back.
+> > >
+> > > Of course those places are arch code and you could say 'arches should know
+> > > better and if they call it it's fine not to call the arch 'can you load'
+> > > function.
+> >
+> > Yes, that's my vote.  It'd be easy enough to clarify that "rule" with a comment
+> > in linux/kvm_host.h.
+>
+> I feel like trying to make this generic will wind up under-documenting
+> the single example we have with the pre fault ioctl. Putting the comment
+> into a header practically guarantees that nobody will read it either.
+>
+> I'd favor doing something like below and sticking the comment inline in
+> the ioctl handler. Unless I'm missing something blatantly obvious, I
+> don't see why the x86 or s390 pre-conditions can't be tested early too.
+>
+> But I don't care enough to bikeshed this any further.
 
-Reviewed-by: Nicolin Chen <nicolinc@nvidia.com>
+Haha yup :) this is eminately bikesheddable territory.
+
+>
+> Thanks,
+> Oliver
+
+I'm fine with the below if x86/s390 people are.
+
+The inline comment is a cheeky trick that should help clarify intent (I think
+perhaps Sean that's what you meant re: people assuming it would check some local
+state?)
+
+Anyway if people think that's sane I can do on respin and we can settle on the
+lovely shade of purple or whatever the shed looks like now ;)
+
+>
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 8b080804bc90..396e64875fe7 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1852,6 +1852,14 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>  	return __kvm_arm_vcpu_set_events(vcpu, events);
+>  }
+>
+> +int kvm_arch_pre_fault_allowed(struct kvm_vcpu *vcpu)
+> +{
+> +	if (!kvm_vcpu_initialized(vcpu))
+> +		return -ENOEXEC;
+> +
+> +	return 0;
+> +}
+> +
+>  long kvm_arch_vcpu_ioctl(struct file *filp,
+>  			 unsigned int ioctl, unsigned long arg)
+>  {
+> diff --git a/arch/s390/kvm/s390/s390.c b/arch/s390/kvm/s390/s390.c
+> index 5c73f43782a7..47fe032444f4 100644
+> --- a/arch/s390/kvm/s390/s390.c
+> +++ b/arch/s390/kvm/s390/s390.c
+> @@ -5784,6 +5784,14 @@ void kvm_arch_commit_memory_region(struct kvm *kvm, struct kvm_memory_slot *old,
+>  	s390_kvm_mmu_commit_memory_region(kvm, old, new, change);
+>  }
+>
+> +int kvm_arch_pre_fault_allowed(struct kvm_vcpu *vcpu)
+> +{
+> +	if (kvm_is_ucontrol(vcpu->kvm))
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+>  /**
+>   * kvm_arch_vcpu_pre_fault_memory() -- pre-fault and link gmap dat tables
+>   * @vcpu: the vcpu that shall appear to have generated the fault-in.
+> @@ -5810,9 +5818,6 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu, struct kvm_pre_fault_
+>  	gpa_t end;
+>  	int rc;
+>
+> -	if (kvm_is_ucontrol(vcpu->kvm))
+> -		return -EINVAL;
+> -
+>  	rc = kvm_s390_faultin_gfn(vcpu, NULL, &f);
+>  	if (rc == PGM_ADDRESSING)
+>  		return -ENOENT;
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 064ecc33b926..c35fd2868c20 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5086,6 +5086,14 @@ static int kvm_tdp_page_prefault(struct kvm_vcpu *vcpu, gpa_t gpa,
+>  	}
+>  }
+>
+> +int kvm_arch_pre_fault_allowed(struct kvm_vcpu *vcpu)
+> +{
+> +	if (!vcpu->kvm->arch.pre_fault_allowed)
+> +		return -EOPNOTSUPP;
+> +
+> +	return 0;
+> +}
+> +
+>  long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+>  				    struct kvm_pre_fault_memory *range)
+>  {
+> @@ -5095,9 +5103,6 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+>  	u64 end;
+>  	int r;
+>
+> -	if (!vcpu->kvm->arch.pre_fault_allowed)
+> -		return -EOPNOTSUPP;
+> -
+>  	if (kvm_is_gfn_alias(vcpu->kvm, gpa_to_gfn(range->gpa)))
+>  		return -EINVAL;
+>
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 03bfc92864b6..bff842548c04 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1693,6 +1693,7 @@ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
+>  bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu);
+>  bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu);
+>  bool kvm_arch_vcpu_preempted_in_kernel(struct kvm_vcpu *vcpu);
+> +int kvm_arch_pre_fault_allowed(struct kvm_vcpu *vcpu);
+>  void kvm_arch_pre_destroy_vm(struct kvm *kvm);
+>  void kvm_arch_create_vm_debugfs(struct kvm *kvm);
+>
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 65eb26a0520d..07f2ce7a3cb3 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3961,6 +3961,11 @@ bool __weak kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu)
+>  	return false;
+>  }
+>
+> +int __weak kvm_arch_pre_fault_allowed(struct kvm_vcpu *vcpu)
+> +{
+> +	return 0;
+> +}
+> +
+>  void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+>  {
+>  	int nr_vcpus, start, i, idx, yielded;
+> @@ -4353,7 +4358,7 @@ static int kvm_vcpu_ioctl_get_stats_fd(struct kvm_vcpu *vcpu)
+>  static int kvm_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+>  				     struct kvm_pre_fault_memory *range)
+>  {
+> -	int idx;
+> +	int idx, ret;
+>  	long r;
+>  	u64 full_size;
+>
+> @@ -4365,6 +4370,14 @@ static int kvm_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+>  	    range->gpa + range->size <= range->gpa)
+>  		return -EINVAL;
+>
+> +	/*
+> +	 * Certain architectures (e.g. arm64) need to reject the ioctl 'early'
+> +	 * before vcpu_load().
+> +	 */
+> +	ret = kvm_arch_pre_fault_allowed(vcpu);
+> +	if (ret)
+> +		return ret;
+> +
+>  	vcpu_load(vcpu);
+>  	idx = srcu_read_lock(&vcpu->kvm->srcu);
+>
+> Thanks,
+> Oliver
+
+--
+Cheers, Lorenzo
