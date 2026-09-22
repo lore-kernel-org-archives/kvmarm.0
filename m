@@ -1,275 +1,193 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54485556B86;
-	Tue, 22 Sep 2026 14:19:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52EF51DE1F;
+	Tue, 22 Sep 2026 14:22:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790086785; cv=none; b=dInUwaWuUFjQ61lDXCWcppMLJ/tluGvB9PHyHyB/1L0mGWEnidTGiTL3XJsmeIlX/i2FBXw3XhDLlZqAVaw00gxW/F79VKRHHy8OWyz3DJHY3tGFasOq2F3EIlppRRGYJXAT70u0agEU1+AvCFd5Ah7iBcYhtuejq6kO9FwhCTI=
+	t=1790086959; cv=none; b=r85+CXgkgxIODpsxoiAzokTztD80EOgcG7FBBv5FoFr5/+ISPcx7W7AKUg3r2ZYJTiJ92D2AdYOoNbQq7OAUc8V44ySui+eeXZR82pJapnhcUYxOgHko2PPnmhhJWONHP5EnfhjliXiHibb3Oo1Se7veFny23P4gYIfH0hx6PBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790086785; c=relaxed/simple;
-	bh=lYNhvOmtl8x3eG3JzJ1ufKePrvQwLNKR6wf0Cd9MA9E=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=U4ucDILwEMnl+ZYU0PVh4rGRQsHTGRLEChKrYFFez8ChYjyYLNJeeybdcCY1AMm5wtkjMapM2UIJ2Y9u1XXgY2pbKzpJ/03zcXZN4IPGab0ylqFTyJg6WOdzAlLxtVpoln8/zORrY4sLZEqYtK+Lfguc0vtcrIh8pmOSw22kw+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NsOrsrOx; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790086959; c=relaxed/simple;
+	bh=msjJuGaxSoQQshOdxCcSplNXF6DjNI5rv4QST/Zjo0s=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=DnuxNK/RgLd43sGpqjF4gSGGwCTSJKPvISi8p5X697TrH9NpNyyNRbXhw2zBfuJNZqAxTQjH1S+ilTQtkUNpRgAjUgVUNtx98Q5UgmdJhFa2s0wf2KkSmcTKMsb70nDTNgOsNnJekK5OxxWHGIjloQd6lThk4J+KUrMd0a72Iho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oKHS5DRa; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NsOrsrOx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9009C1F00893;
-	Tue, 22 Sep 2026 14:19:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oKHS5DRa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 145C31F000FF;
+	Tue, 22 Sep 2026 14:22:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790086783;
-	bh=XgRHq7+1jqr2wU62ZWV9jXu7/qZx15n3kymagUR1wMA=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=NsOrsrOxZj0nm/8ucByePfIZhqc68WuUHJjOHYkES9wRrc4MpndRF3nJoWNLEP5/k
-	 n322GbCn3aDp8ur3Q+RP30hbuUSRa+ByiYQgmcwmGZKsvqE3BDslrCo2rd6QF39aaC
-	 1rwYNziaiL+gw9zl7yMw/zQ0XfBEzHw7Mhy3dlBL/DY+7E9riXeIa5mVW19XdEXHT/
-	 HO3V1CIaUXT9gBMLe+jbuwya/ublZOh1w6HafXeIsK+nDEdHSIgRQNPiX59zxCZkzQ
-	 GwmOC2vyCV0g2PB/ahqJ11biazLvAd9rd14aSFOD14MFzaafeSnNEyhvOgEeEDHGzS
-	 9tUjiOx8SPTCg==
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Date: Tue, 22 Sep 2026 15:18:08 +0100
-Subject: [PATCH v3 14/14] KVM: selftests: Add nested pre-fault test for
- arm64
+	s=k20260515; t=1790086957;
+	bh=L3oO91V4IF4G60vcONMUAfnhjyKqf9fK8HxPqZ7yDx8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=oKHS5DRaI08HjzcvWtYe1RxTCulSKE9K7GAetzK1gAmlKpTZtwVOLsZGx+vxwsIoF
+	 4Fc0Mpej6Jcl6qB59u6qmZuL/+YTub0JsQVybmm6RTyI7v0Jc4UxNynINCYcqAYyW0
+	 NYoQhMY5BLRmt+GhwBGFKduN/BOXph8W1gyKSjcp7z+JdYuGyjY7WwsNHrETDFwZ0a
+	 nyH5Hqi31sadWwRn4whOeg/UOMWCcDyVHsD4okuN88AvFXXac7qasNQ1QrBwPhQqN7
+	 Fl2HjDnnomdmMKFbIv9ftdOEOq/4D5bQZpbVWAvFeve0a6jmcSu42XdS8Mh5BuB2Qj
+	 WY0Nem/ttVZzg==
+X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Jack Thomson <jackabt@amazon.com>,
+	Jack Thomson <jackabt.amazon@gmail.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Leo Soares Passos <Leo.Bras@arm.com>
+Subject: Re: [PATCH v2 00/13] KVM: arm64: Add KVM_PRE_FAULT_MEMORY support
+In-Reply-To: <arKB2imOcg4MhXMF@gremlin>
+References: <20260914-kvm-arm-prefault-v2-0-26fb47f74b73@kernel.org>
+ <yq5abj9p38vq.fsf@kernel.org> <arJ1BDEzY5CANjjB@gremlin>
+ <yq5a8q4t305j.fsf@kernel.org> <arKB2imOcg4MhXMF@gremlin>
+Date: Tue, 22 Sep 2026 19:52:25 +0530
+Message-ID: <yq5a5wzx2wny.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260922-kvm-arm-prefault-v3-14-787bd3bc7e3f@kernel.org>
-References: <20260922-kvm-arm-prefault-v3-0-787bd3bc7e3f@kernel.org>
-In-Reply-To: <20260922-kvm-arm-prefault-v3-0-787bd3bc7e3f@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
- Steffen Eiden <seiden@linux.ibm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
- Jonathan Corbet <corbet@lwn.net>, Mark Rutland <mark.rutland@arm.com>, 
- Fuad Tabba <fuad.tabba@linux.dev>, Randy Dunlap <rdunlap@infradead.org>, 
- Fuad Tabba <fuad.tabba@linux.dev>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Jack Thomson <jackabt@amazon.com>, 
- Jack Thomson <jackabt.amazon@gmail.com>, 
- Alexandru Elisei <alexandru.elisei@arm.com>, 
- Vincent Donnefort <vdonnefort@google.com>, 
- "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, 
- Sean Christopherson <seanjc@google.com>, 
- Claudio Imbrenda <imbrenda@linux.ibm.com>, 
- Leo Soares Passos <Leo.Bras@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>, 
- "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6315; i=ljs@kernel.org;
- h=from:subject:message-id; bh=lYNhvOmtl8x3eG3JzJ1ufKePrvQwLNKR6wf0Cd9MA9E=;
- b=owGbwMvMwCV2fu7ZrsZH9SKMp9WSGLI29UnZLmH+dfOn+AMtx7NzFEKWBojkqeusbfuXp7PWV
- Wr68ZLQjlIWBjEuBlkxRZbnX8T3B4mEzeu84O8GM4eVCWQIAxenAEyE+wwjwym5OZKBXIZbNpas
- +Dht0xUOOxmfpVYXzbdmVjlOFJvnVcPwP/3qkXvPrr9ZmsV4M2R2wePZeeYNp5YL3i7RfR6u96h
- alR8A
-X-Developer-Key: i=ljs@kernel.org; a=openpgp;
- fpr=E7F417BF5214569E89D04F46CF9DCD8A81E27F14
+Content-Type: text/plain
 
-Add an arm64 nested-virtualisation selftest for KVM_PRE_FAULT_MEMORY.
+"Lorenzo Stoakes (ARM)" <ljs@kernel.org> writes:
 
-The guest enters vEL2, sets up its EL2 translation configuration into the
-real EL1 registers then ERETs to vEL1 and exits to userspace so its vCPU
-last-run context is nested backed by a shadow stage 2 MMU.
+> On Tue, Sep 22, 2026 at 06:37:04PM +0530, Aneesh Kumar K.V wrote:
+>> "Lorenzo Stoakes (ARM)" <ljs@kernel.org> writes:
+>>
+>> > On Tue, Sep 22, 2026 at 03:28:33PM +0530, Aneesh Kumar K.V wrote:
+>> >> > This is because pKVM instantiates vCPUs upon run,
+>> >> >
+>> >>
+>> >> Can pKVM instantiate the hyp vCPU during pre-faulting ?
+>> >
+>> > It would be an unusual and unexpected thing to do - suddenly a pre-fault
+>> > operation is initialising a vCPU explicitly for pKVM.
+>> >
+>> > A caller is not going to reasonably expect this and might treat a failure to
+>> > pre-alloc as fine to carry on whereas in fact it was a failure to initailised a
+>> > pKVM vCPU.
+>> >
+>> > It'd also require significant changes to how pKVM is set up, right now it's
+>> > hardcoded to be done unconditionally at run via kvm_arch_vcpu_run_pid_change()
+>> > -> pkvm_create_hyp_vcpu(), so all that would have to change and be checked and
+>> > tested and... that'd be really out of scope I think :)
+>> >
+>> > And pre-faulting really makes most sense BEFORE you run a VM. It doesn't make so
+>> > much sense mid-run.
+>> >
+>> > But more fundamentally, the stage 2 page tables, as I understand it, are owned
+>> > by pKVM and so aren't really available to be pre-faulted.
+>> >
+>> > Maybe unprotected-under-pKVM VMs but then it's questionable as to how useful
+>> > that would be given that it would be confusing to users vs. how it works for
+>> > other VMs.
+>> >
+>> > So in general, no I don't think it's a good idea.
+>> >
+>> > And even if we wanted to pursue some version of this, it's _definitely_ out
+>> > of scope for the initial pre-faulting bring-up series.
+>> >
+>> >>
+>> >>
+>> >> > but pre-faulting is  typically performed before a vCPU is run.  It would be confusing and
+>> >> > inconsistent to error out on non-running vCPUs but to pre-fault running
+>> >> > ones.
+>> >>
+>> >>
+>> >> I use KVM pre-faulting when transitioning pages from shared to private
+>> >
+>> > You mean you'd prefer to use? Or you are using it on another arch?
+>> >
+>> >> with CoCo guest. This ensures that a trusted device can DMA to private
+>> >> memory before the guest accesses it.
+>> >
+>> > Hm what do you mean by private memory?
+>> >
+>> > I see:
+>> >
+>> > #ifndef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+>> > static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
+>> > {
+>> > 	return false;
+>> > }
+>> > #endif
+>> >
+>> > And only x86 selects KVM_GENERIC_MEMORY_ATTRIBUTES?
+>> >
+>> > Do you mean something else?
+>> >
+>>
+>> I am using this with ARM CCA-DA, based on the patch series from Jack Thomson <jackabt.amazon@gmail.com>.
+>>
+>> https://gitlab.arm.com/linux-arm/kvmtool-cca/-/commit/80e7aad61c5639de2f0cb4a5525dad0c96156428
+>>
+>> We do this while the VM is running.
+>
+> Right, that's a non-mainline kernel I guess? Which presumably implements private memory.
+>
+> Jack himself experienced a panic with his pKVM code, so the code you're using is
+> not upstreamable, unfortunately. And he'd already shelved pKVM support AFAICT.
+>
+> And reviewers pointed out actually implementing the pKVM stuff properly would be
+> quite involved, even if you wanted to do that (hence follow-up).
+>
+> Also you end up stuck with the same problems as I mentioned above - you can't
+> sanely bring the vCPU pre-run, so now you have extremely weird behaviour - only
+> pre-faults if vCPU initialised, running, and unprotected pKVM.
+>
 
-The test then asserts that pre-faulting ignores that and instead targets
-the canonical stage 2 page tables only.
+IIUC, pkvm_pgtable_stage2_map() only uses the hyp vCPU's pKVM memcache
+(&vcpu->vcpu.arch.pkvm_memcache). I agree that this does not need to be
+addressed in this series. However, there is also a desire to keep the CCA
+and pKVM code paths similar by using helpers such as kvm_vm_is_protected().
+Since an RMM can create a stage-2 mapping without a REC (vCPU), rejecting
+pre-faulting for all protected VM configurations may be incorrect. I can
+handle this in my series though.
 
-Userspace cannot observe a mistargeted pre-fault, so simply assert that the
-pre-faulting works correctly when the last-run context was nested.
+I also want to point out that there are use cases for pre-faulting while
+the VM is running.
 
-Based on a patch by Jack Thomson with gratitude. The test here is
-simplified and focused on what can be asserted.
+>
+> Protected pKVM support is a whole other layer of complexity and it's not obvious
+> that you're really achieving what pre-fault is supposed to.
+>
+> In any case Oliver literally just asked me to _simplify_ weird edge cases for
+> this series :) so I am not sure something like that is going to be accepted.
+>
+> Are you sure you're actually running in pKVM mode btw? CCA doesn't AFAICT? In
+> which case this series _should_ work fine for you.
+>
 
-Link: https://lore.kernel.org/kvmarm/20260612162354.73378-6-jackabt.amazon@gmail.com/
-Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
----
- tools/testing/selftests/kvm/Makefile.kvm           |   1 +
- .../selftests/kvm/arm64/nv_pre_fault_memory_test.c | 158 +++++++++++++++++++++
- 2 files changed, 159 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 874ff9097384..908bdc7cf4f5 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -178,6 +178,7 @@ TEST_GEN_PROGS_arm64 += arm64/debug-exceptions
- TEST_GEN_PROGS_arm64 += arm64/hello_el2
- TEST_GEN_PROGS_arm64 += arm64/host_sve
- TEST_GEN_PROGS_arm64 += arm64/hypercalls
-+TEST_GEN_PROGS_arm64 += arm64/nv_pre_fault_memory_test
- TEST_GEN_PROGS_arm64 += arm64/external_aborts
- TEST_GEN_PROGS_arm64 += arm64/mmio_sign_ext
- TEST_GEN_PROGS_arm64 += arm64/page_fault_test
-diff --git a/tools/testing/selftests/kvm/arm64/nv_pre_fault_memory_test.c b/tools/testing/selftests/kvm/arm64/nv_pre_fault_memory_test.c
-new file mode 100644
-index 000000000000..09c1db303856
---- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/nv_pre_fault_memory_test.c
-@@ -0,0 +1,158 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * nv_pre_fault_memory_test - Test KVM_PRE_FAULT_MEMORY on a vCPU whose
-+ * last-run context is nested.
-+ *
-+ * The guest enters vEL2, sets up its EL2 translation configuration into the
-+ * real EL1 registers then ERETs to vEL1 and exits to userspace so its vCPU
-+ * last-run context is nested backed by a shadow stage 2 MMU.
-+ *
-+ * Assert that pre-faulting ignores that and targets the canonical stage-2
-+ * page tables only.
-+ */
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+#include "ucall.h"
-+
-+#include <asm/sysreg.h>
-+#include <linux/sizes.h>
-+
-+#define TEST_MEM_SLOT		10
-+#define TEST_MEM_SIZE		SZ_2M
-+#define TEST_MEM_GPA		SZ_1G
-+
-+static void guest_el1_code(void)
-+{
-+	u64 offset;
-+
-+	GUEST_ASSERT_EQ(get_current_el(), 1);
-+
-+	/* Exit to userspace with the vEL1 (nested) context live. */
-+	GUEST_SYNC(1);
-+
-+	/*
-+	 * Touch the prefaulted range. vstage-2 is disabled, so the shadow
-+	 * stage-2 is a 1:1 view of the canonical IPA space.
-+	 */
-+	for (offset = 0; offset < TEST_MEM_SIZE; offset += SZ_4K)
-+		READ_ONCE(*(u64 *)(TEST_MEM_GPA + offset));
-+
-+	GUEST_DONE();
-+}
-+
-+static void guest_code(void)
-+{
-+	u64 sp;
-+
-+	GUEST_ASSERT_EQ(get_current_el(), 2);
-+
-+	/*
-+	 * Mirror the EL2 translation regime into the real EL1 registers so
-+	 * that vEL1 runs on the test's stage-1 page tables. With E2H=1, the
-+	 * _EL1 accessors read the EL2 registers, and the _EL12 accessors
-+	 * write the real EL1 registers.
-+	 */
-+	write_sysreg_s(read_sysreg(sctlr_el1), SYS_SCTLR_EL12);
-+	write_sysreg_s(read_sysreg(tcr_el1), SYS_TCR_EL12);
-+	write_sysreg_s(read_sysreg(ttbr0_el1), SYS_TTBR0_EL12);
-+	write_sysreg_s(read_sysreg(mair_el1), SYS_MAIR_EL12);
-+	write_sysreg_s(read_sysreg(cpacr_el1), SYS_CPACR_EL12);
-+
-+	/* Run vEL1 on the same stack. */
-+	asm volatile("mov %0, sp" : "=r"(sp));
-+	write_sysreg(sp, sp_el1);
-+
-+	/*
-+	 * Drop TGE so that vEL1 is a nested context rather than host EL0.
-+	 * KVM backs it with a shadow stage-2 MMU even though vstage-2 is
-+	 * disabled (HCR_EL2.VM=0).
-+	 */
-+	write_sysreg(read_sysreg(hcr_el2) & ~HCR_EL2_TGE, hcr_el2);
-+	isb();
-+
-+	write_sysreg(PSR_MODE_EL1h | PSR_F_BIT | PSR_I_BIT | PSR_A_BIT |
-+		     PSR_D_BIT, spsr_el2);
-+	write_sysreg((u64)guest_el1_code, elr_el2);
-+	asm volatile("eret");
-+
-+	GUEST_ASSERT(false);
-+}
-+
-+static void pre_fault(struct kvm_vcpu *vcpu, u64 gpa, u64 size)
-+{
-+	struct kvm_pre_fault_memory range = {
-+		.gpa = gpa,
-+		.size = size,
-+	};
-+	int ret;
-+
-+	do {
-+		ret = __vcpu_ioctl(vcpu, KVM_PRE_FAULT_MEMORY, &range);
-+	} while ((!ret && range.size) ||
-+		 (ret < 0 && (errno == EINTR || errno == EAGAIN)));
-+
-+	TEST_ASSERT(!ret, "KVM_PRE_FAULT_MEMORY failed, ret: %d errno: %d",
-+		    ret, errno);
-+	TEST_ASSERT_EQ(range.size, 0);
-+}
-+
-+int main(void)
-+{
-+	struct kvm_vcpu_init init;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+	u64 npages;
-+
-+	TEST_REQUIRE(test_supports_el2());
-+	TEST_REQUIRE(kvm_check_cap(KVM_CAP_PRE_FAULT_MEMORY));
-+
-+	vm = vm_create(1);
-+
-+	kvm_get_default_vcpu_target(vm, &init);
-+	init.features[0] |= BIT(KVM_ARM_VCPU_HAS_EL2);
-+	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-+	kvm_arch_vm_finalize_vcpus(vm);
-+
-+	npages = TEST_MEM_SIZE / vm->page_size;
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, TEST_MEM_GPA,
-+				    TEST_MEM_SLOT, npages, 0);
-+	virt_map(vm, TEST_MEM_GPA, TEST_MEM_GPA, npages);
-+
-+	/* Run the guest until it has ERET'd from vEL2 to vEL1. */
-+	vcpu_run(vcpu);
-+	switch (get_ucall(vcpu, &uc)) {
-+	case UCALL_SYNC:
-+		TEST_ASSERT_EQ(uc.args[1], 1);
-+		break;
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT(uc);
-+		break;
-+	default:
-+		TEST_FAIL("Unhandled ucall: %ld", uc.cmd);
-+	}
-+
-+	/*
-+	 * The vCPU's last-run context is vEL1, so its hw_mmu is a shadow
-+	 * stage-2 MMU.
-+	 *
-+	 * Pre-faulting must ignore that and populate the canonical stage-2.
-+	 */
-+	pre_fault(vcpu, TEST_MEM_GPA, TEST_MEM_SIZE);
-+
-+	/* Resume at vEL1 and touch the prefaulted range. */
-+	vcpu_run(vcpu);
-+	switch (get_ucall(vcpu, &uc)) {
-+	case UCALL_DONE:
-+		break;
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT(uc);
-+		break;
-+	default:
-+		TEST_FAIL("Unhandled ucall: %ld", uc.cmd);
-+	}
-+
-+	kvm_vm_free(vm);
-+	return 0;
-+}
+It is not pKVM; it runs in Realm mode.
 
--- 
-2.55.0
+>
+> Anyway, if we really do need to add something for pKVM it needs to be a follow
+> up. Let's get the basics working first :)
+>
 
+sure.
+
+> (Note that kvmtool will need to be updated to retry pre-fault on -EAGAIN, -EINTR
+>  as this series can, albeit unlikely, return -EAGAIN.)
+>
+
+I will check this when I rebase my kernel onto this series.
+
+-aneesh
