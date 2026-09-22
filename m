@@ -1,51 +1,46 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EBBD5678EC;
-	Tue, 22 Sep 2026 16:26:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37ADA44F54B
+	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 16:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790094372; cv=none; b=U93aPJx46RjoI//Rudj7i7rNJbsXq08XRNYKqTFvyHf+O0PyVyeaWdyitladpEkHOkTKj2q8MiIGujJA2NQV5HYhwGOBqdtKuTc9PKm0vQeE+vJHFJFGlK9D9PzJq9okZZH9kxtQltwl/o5KkIlwu4n6+rLqymYeEB+CnKdxDCY=
+	t=1790094684; cv=none; b=otxv7VYbM/wGN5hl8N9o0vKnFiMwQRsf55oyRQum9eqHOiHJczHoHk0I9QvN2bFUNRdfx2XQ32O5bMnIJxpGd/mHEcfz3CcBzFVhcfeesLlGLRhp4K3QhdW3AK+EORosvJs4kNL6r5Uuv3ZcyvIZdQZPDe7cMoFwXH3SdoMmRqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790094372; c=relaxed/simple;
-	bh=ayic+nVzRT7jF2h19D33qb2NxY0nfyFpS1c2IauCEkw=;
+	s=arc-20240116; t=1790094684; c=relaxed/simple;
+	bh=XN0s95ypj8J5gPR1tswKVOKPD7UVx6eRcPXxSlJNCFQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qtvoCghwzwLfdukLQx0rv2f3QpVmBL5TmduFl+//n+A6pmYmxw4v9swJgQmBVvyBqnYJWLzgnuYT7wincQJ/y+ueQRNx5Ly+haKtLzsMFq7zOhTvHGIMJZ50Asbbo+2ApmBFKf6Twsne2ePQuM6askMzrBSJeOcwo1gSeKpCaaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=vLKpHlXy; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=Okyw5f76jPxnG4kCAs6hkHT9qBHsSQyHnSeqJsCukXfQCQjw9GsRvYlbwIcp0IxbqdlK3CUERlv3zzf6bkshVVsxzm4s/teLj8uSsXqOncLov5+qbw3yrWHXTLyQ3KYQTtC1C2qNjfrKtTcMdvAlGMV+T+kGvJ1yXZ9hot32jjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jxRwCwJu; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="vLKpHlXy"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 177FF1576;
-	Tue, 22 Sep 2026 09:26:00 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 06CF23F632;
-	Tue, 22 Sep 2026 09:26:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790094363; bh=ayic+nVzRT7jF2h19D33qb2NxY0nfyFpS1c2IauCEkw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vLKpHlXy9TeAxplzn8LuOxnhs+NZZT08I8jSb7+j1I6L64gZFqCGnchXfZ3Dqibh8
-	 eQMv80pCWNlnv73z0GmxiYSywlJm2UuyVrhWN9MyheshF5MMnKprwZkReiNsEO3hTc
-	 KddnGGEGanHe0MFeVvE3aGvk5G7QNuyyTWu9q8xw=
-Date: Tue, 22 Sep 2026 17:25:58 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	iommu@lists.linux.dev, Andrew Morton <akpm@linux-foundation.org>,
-	christian.koenig@amd.com, Jason Gunthorpe <jgg@ziepe.ca>,
-	Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jxRwCwJu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63CF21F000FF;
+	Tue, 22 Sep 2026 16:31:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790094676;
+	bh=dMhHdlDHVweaqwGCHyW6aVpgCIq4u/jNK61gKZglJYk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=jxRwCwJu198opJ9FV7TuRu/EDlnGbc3kSavRHQyurtAwyaSsc10ACv1ZPUL2VLH3q
+	 8lRCkJuskb+VHWXUhwQnHOG/4VUWgjQIChk9BBkMTGM5OLbVcyYF/JHOc/Wl/WdmbD
+	 nJpXRcKZsPZ+2D9ugjDdrTEaSuZbnxaBpZ/thGqza2m0BQi92H6f1EWRbMCR7g/C5e
+	 H1i+q8mwel78zyJORL/VVsq35rCfXBZoO3S6dM43U3fJkStz3c011WCUZO8j0YbcDq
+	 5zgeGLUYX+hn/kX/OHWqo7iwcTd4gCk637rAlOtjLz1nOUItRbSiy8VQhdOaR+AgpO
+	 75CwTfOTwfj7w==
+Date: Tue, 22 Sep 2026 09:31:15 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: Leonardo Bras <leo.bras@arm.com>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@kernel.org>, Will Deacon <will@kernel.org>,
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [RFC PATCH v7 02/13] mm: Add an allocator for CoCo shared memory
-Message-ID: <arKsFofudnTYpXj1@arm.com>
-References: <20260921144847.501151-1-aneesh.kumar@kernel.org>
- <20260921144847.501151-3-aneesh.kumar@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>
+Subject: Re: [PATCH 06/22] KVM: arm64: nv: Use a helper for stage-2
+ descriptor updates
+Message-ID: <arKtU9KVmyDmWYyL@kernel.org>
+References: <20260623184201.1518871-1-oupton@kernel.org>
+ <20260623184201.1518871-7-oupton@kernel.org>
+ <arKpWwN_KrcPtSpx@LeoBrasDK>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,60 +49,71 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260921144847.501151-3-aneesh.kumar@kernel.org>
+In-Reply-To: <arKpWwN_KrcPtSpx@LeoBrasDK>
 
-On Mon, Sep 21, 2026 at 08:18:36PM +0530, Aneesh Kumar K.V (Arm) wrote:
-> +int alloc_cc_shared_pages_node(int nid, gfp_t gfp,
-> +		size_t requested, struct cc_shared_pages *mem)
-> +{
-> +	struct cc_shared_layout layout;
-> +	struct page *page;
-> +	unsigned int order;
-> +	bool zero = gfp & __GFP_ZERO;
-> +	int ret;
-> +
-> +	if (!mem)
-> +		return -EINVAL;
-> +
-> +	ret = cc_shared_calc_layout(requested, &layout);
-> +	if (ret)
-> +		return ret;
-> +
-> +	order = get_order(layout.shared_size);
-> +	if (order > MAX_PAGE_ORDER)
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * State transitions require a linear-map address and may modify memory.
-> +	 * Allocate from low memory and defer requested zeroing until afterwards.
-> +	 */
-> +	gfp &= ~(__GFP_HIGHMEM | __GFP_ZERO);
-> +	if (nid == NUMA_NO_NODE)
-> +		page = alloc_pages(gfp, order);
-> +	else
-> +		page = alloc_pages_node(nid, gfp, order);
-> +	if (!page)
-> +		return -ENOMEM;
-> +
-> +	ret = cc_make_shared(page_address(page), layout.shared_size);
-> +	if (ret) {
-> +		if (!cc_make_private(page_address(page), layout.shared_size))
-> +			__free_pages(page, order);
-> +		else
-> +			pr_warn_ratelimited("leaking %zu bytes with uncertain shared state\n",
-> +					    layout.shared_size);
-> +		return ret;
-> +	}
-> +
-> +	if (zero)
-> +		memset(page_address(page), 0, layout.shared_size);
+On Tue, Sep 22, 2026 at 05:14:19PM +0100, Leonardo Bras wrote:
+> > @@ -386,21 +403,9 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, struct kvm_walk_access *acc
+> >  		return 1;
+> >  	}
+> >  
+> > -	if (wi->ha)
+> > -		new_desc |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
+> > -
+> > -	if (new_desc != ws.desc) {
+> > -		ret = swap_guest_s2_desc(vcpu, ws.desc_pa, ws.desc, new_desc, wi);
+> > -		if (ret == -EAGAIN)
+> > -			return ret;
+> > -		if (ret) {
+> > -			out->esr = ESR_ELx_FSC_SEA_TTW(ws.level);
+> > -			out->desc = ws.desc;
+> > -			return 1;
+> > -		}
+> > -
+> > -		ws.desc = new_desc;
+> > -	}
+> > +	ret = handle_desc_update(vcpu, wi, &ws, out, access);
+> > +	if (ret)
+> > +		return ret;
+> >  
+> >  	if (!(ws.desc & KVM_PTE_LEAF_ATTR_LO_S2_AF)) {
+> >  		out->esr = compute_fsc(ws.level, ESR_ELx_FSC_ACCESS);
+> > -- 
+> > 2.47.3
+> > 
+> 
+> IIUC, you pulled stuff around swap_guest_s2_desc() and put it inside it, 
+> while changing the function name to handle_desc_update(), so it should be 
+> the same logic.
+> 
+> It looks much better this way, and most things seem to have the same efect.
+> 
+> The only thing that I notice was "ws->desc = new":
+> The previous version would do that only after running __kvm_at_swap_desc() 
+> and only when the return value is zero. 
+> 
+> The new version does that every time "old != new", and before running 
+> __kvm_at_swap_desc() and does not take into account it's return value.
+> 
+> This means that on this new version if __kvm_at_swap_desc() returns 1:
+> 	ws->desc = new;
+> 	ret = 1;
+> 	out->desc = ws->desc; //(i.e. new)
+> 
+> And in the previous version, it would make out->desc = ws->desc, that being 
+> the original value, not the new one.
+> 
+> Is this ok? 
+> (I am commenting because it could be unintentional)
 
-Does the memset() post sharing logic work for pKVM as well? If nothing
-clears it, we have a small window where guest data is leaked to the
-host.
+Yes, this is ok.
 
-Is there a case where we *do not* need the memory cleared? If not, maybe
-we can move the logic in the arch set_memory_decrypted().
+If __kvm_at_swap_desc() returns -EAGAIN we replay the faulting
+instruction. No consumption of the walk result.
 
--- 
-Catalin
+If __kvm_at_swap_desc() returns anything else we return an SEA TTW
+fault via the walk result struct. Notice that it is a union, and
+readers are expected to dereference the right sub-struct based on
+s1_walk_result::failed.
+
+Thanks,
+Oliver
