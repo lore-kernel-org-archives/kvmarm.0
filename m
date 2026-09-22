@@ -1,96 +1,149 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9A7576ED3;
-	Tue, 22 Sep 2026 17:15:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B03576ECB
+	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 17:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790097344; cv=none; b=ijNzjTDOWixmwZwWMA6w2YR445aB+j4OJWpBbFf0r0V8vUQBQfDOnNdFzNic+E9dQW3R0kNwTrunBXMCQUAr80r1IdhkddaIa90rjQEm+KNxCvE0Asr5YWTUUlPqq+ImKxcImOd9IfT0hORmvfQ+znKjrRyGiwtIytvZ1I1ybwg=
+	t=1790097826; cv=none; b=ld1D03qW9fEVl+RYVCVgzdvW2lNv6N8JA5++7yqe3EOrJ4ZWAPcuPpdmkC6VLfabpN6oSnGoHnfsvHPjCaep9UuHkwo+l/9LHaIXw87pm8Ph6l1D6W5LCJRxEetxEUOK8st+zBV85ayjMOtaNUDnFjjRslIms+wvZrUJOFWJMc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790097344; c=relaxed/simple;
-	bh=m8JfzfQ/K7ynxAP+mIg5GPu1v2WwEh4hWVjoye9kaWU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G+kaOGbsxq+jozG616ZClrjzKyVjHhY58+f0NiaSPTh23obnHO/8QMm+dzDNuvV62WZxYFvwcxEzPVwc3nWPa5pP9RHsCFwtIee8THrOJ9H3/Rv8VA3/3qRlgWEtmURgxOLkwobEaYAR5EyAQmtmn0GxFglCvgjrPZV6B5Kxg3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MGRoPx0g; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790097826; c=relaxed/simple;
+	bh=YagJ7G/Lr2bkyPLb96nex2Ieu1fELferKNmlqik77Pg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=YogpRZdfb05huRCU38pSI9RwqNNKquEgzbo9jhPOJ4qJJCu8T8br3nifrhTvbzKRHCpF5PKCATxTmCqEVu8zski4WACjd3Wgjyyui03MXxfVJ1lYwR8GTwGb3T+/vHucLEakyuWFJ7YSgqwphVffU9naOzAwIwTglyqS3d/X58Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YO12W/lf; arc=none smtp.client-ip=209.85.215.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MGRoPx0g"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 904A21F00893;
-	Tue, 22 Sep 2026 17:15:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790097342;
-	bh=KwQN7WVhANwtG21qRW2cXhG1KlqZnmnqp3LyL8PiblQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=MGRoPx0gFeoZ620M+h6hVml1cmstZ36RtqWY65JVSsUD5TMarzlFWrri8h+HdC4fV
-	 tb3O2T8Z9k0tiACSeV/L/YdcNDoDkcmo5S6d+2gsXo1v7ZuLSr6xYIWNvegc6TufBK
-	 eg5RUuFKBcIK0G2An7KcyBk/RLadzP4pFEQw7yeQhdN3ofhyFPBi93dJvIyWDpuwMP
-	 BcOeNuR4b1fXl7ZVbsnBNPnyMtaoynBi4uhbqvKUdD5haCJvQJoEPoyLcnb3iFhxCW
-	 iU1VzelR+8iiGNSduR4hDUo+gQfKMHArnhh/H9uEoLVkrxlwAexfAEyPfNAZrT7A4z
-	 VbqQwSaYdEhQQ==
-Date: Tue, 22 Sep 2026 18:15:34 +0100
-From: Will Deacon <will@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
-	catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
-	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
-	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
-Subject: Re: [PATCH v18] arm64: mm: Handle Granule Protection Faults (GPFs)
-Message-ID: <arK3tsTV6EDhI-nt@willie-the-truck>
-References: <20260913070459.2547407-1-suzuki.poulose@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YO12W/lf"
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-cc4ac5feaa4so237743a12.1
+        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 10:23:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790097825; x=1790702625; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Ql6e6uyZc8xZzxZ3KoRlBfpeEOGwWkJ5hNC8a9M29d8=;
+        b=YO12W/lf8o+v7jPuduI1YveMW5vo9nQfZ8QddSNG+S1HAOeEq4V4nLh5G69TlrEbl8
+         YGdnzBCBKVrWdnmZqY6oDq9Rni9uEcbn52OSvpxXy3r97FdAitGByQGXiV/3SPdBf+gC
+         /WKQ17d+kemtuYqI35ZfC3MN+1FPlaYg9VG4PHeNxn1zvQHYW/pey+IoRrQ6egOfitiT
+         dsmDfbeVp2+Pf9BBGxVKlS9ndkQ72IlmGKZ8BNuk72KAooh69UoFNdhHHzP4dvC70krr
+         LPHv2RUEpwlhWAqnsRhw8tXcRdcsSkdySKYBTwQFfs0lryzBAehs9y4yxLCxeyFA69KU
+         kvEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790097825; x=1790702625;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Ql6e6uyZc8xZzxZ3KoRlBfpeEOGwWkJ5hNC8a9M29d8=;
+        b=h+JtZGMR6WiNUbM5XkFL4CVNtOeFW0MAtYXIGKWyNBUpvn67rPhLyDLBTogUtRVI2v
+         5MHAPt1C04p3raomqsjG57jTF0gOhSIOHbtBhroQjEPRStwS0lrtbdb7kRlHE4y1i37x
+         xVgEPRd5fnAtvp+YHbiW86cwfsENbhwlz+1CbiAnOl1FZgcU/032wssViPkhKGIsaZ3O
+         iw5FizAMXyoGHjeQOjjHRxHWsSz8r06wVhF1RrW6o2hHWQO+I/DZP4yJl7WgIQ+JmHpJ
+         22qc/7a4vHC5vextxYtMD2unX/XA9STb6G8tLGioIVLMybPLJ2HOq7srnTSL2WFPu2XM
+         kXMg==
+X-Forwarded-Encrypted: i=1; AKwUvBzKOnNOvahQRs1LRoifEyXId4OyKSkw7c0N3YkwS/BBYZmi0h6dGyNQ2/D0qG0AcLqArljCyuQ=@lists.linux.dev
+X-Gm-Message-State: AFuF++k+HCuIZ8786vkIh5czL5neY+DzIHdKZzJW5Up4PuMvbZ6Lj8OM
+	KNpkpOiG7oTwOKnLRUj5h4lS8JDfcubcsQhZvd7th9FAWZClCBRNxczFcQV0IRleKYyUs32WCgh
+	fg+gIEw==
+X-Received: from pgdg5.prod.google.com ([2002:a05:6a02:51c5:b0:cc5:111b:b53f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1848:b0:2dd:c100:7cb7
+ with SMTP id d9443c01a7336-2df69de9aaamr563645ad.51.1790097824659; Tue, 22
+ Sep 2026 10:23:44 -0700 (PDT)
+Date: Tue, 22 Sep 2026 10:23:43 -0700
+In-Reply-To: <arKxjsxuO1F5ExrY@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260913070459.2547407-1-suzuki.poulose@arm.com>
+Mime-Version: 1.0
+References: <20260922-kvm-arm-prefault-v3-0-787bd3bc7e3f@kernel.org>
+ <20260922-kvm-arm-prefault-v3-1-787bd3bc7e3f@kernel.org> <arKxjsxuO1F5ExrY@kernel.org>
+Message-ID: <arK5n9HrbZMCOHOt@google.com>
+Subject: Re: [PATCH v3 01/14] KVM: Allow architectures to disallow pre-fault
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
+	Randy Dunlap <rdunlap@infradead.org>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Jack Thomson <jackabt@amazon.com>, Jack Thomson <jackabt.amazon@gmail.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Vincent Donnefort <vdonnefort@google.com>, 
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Leo Soares Passos <Leo.Bras@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Sun, Sep 13, 2026 at 08:04:58AM +0100, Suzuki K Poulose wrote:
-> From: Steven Price <steven.price@arm.com>
+On Tue, Sep 22, 2026, Oliver Upton wrote:
+> Hi Lorenzo,
 > 
-> If the host attempts to access granules that have been delegated for use
-> in a realm these accesses will be caught and will trigger a Granule
-> Protection Fault (GPF).
+> On Tue, Sep 22, 2026 at 03:17:55PM +0100, Lorenzo Stoakes (ARM) wrote:
+> > +bool __weak kvm_arch_vcpu_allow_pre_fault_memory(struct kvm_vcpu *vcpu)
+> > +{
+> > +	return true;
+> > +}
+> > +
+> >  void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+> >  {
+> >  	int nr_vcpus, start, i, idx, yielded;
+> > @@ -4365,6 +4370,9 @@ static int kvm_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+> >  	    range->gpa + range->size <= range->gpa)
+> >  		return -EINVAL;
+> >  
+> > +	if (!kvm_arch_vcpu_allow_pre_fault_memory(vcpu))
+> > +		return -ENOEXEC;
+> > +
 > 
-> A fault during a page walk signals a bug in the kernel and is handled by
-> oopsing the kernel. A non-page walk fault could be caused by user space
-> having access to a page which has been delegated to the kernel and will
-> trigger a SIGBUS to allow debugging why user space is trying to access a
-> delegated page.
-> 
-> There is work in progress to unmap the guest_memfd backed private pages from the
-> linear map. Until we get that support, we could get spurious GPFs from within
-> the kernel, e.g., load_unaligned_zeropad(). So, try to fix them up for now.
-> 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
-> Changes since v17:
->  * Pass untagged address to die_kernel_fault() - Sashiko
->  * Explicitly check !user_mode() for fixups - Catalin
->  * Switch to BUS_OBJERR for si_code from SI_KERNEL - Catalin
->  * Clarify the commit description about the upcoming work on
->    unmapping guest_memfd backed pages from linear map
-> Changes since v16:
->  * Update the commit description to indicate why we try to fixup GPFs
-> Changes since v10:
->  * Don't call arm64_notify_die() in do_gpf() but simply return 1.
-> Changes since v2:
->  * Include missing "Granule Protection Fault at level -1"
-> ---
->  arch/arm64/mm/fault.c | 30 ++++++++++++++++++++++++------
->  1 file changed, 24 insertions(+), 6 deletions(-)
+> nit: it'd be better to let the arch hook return an error of its choosing
+> but in reality this is only going to be used by arm64.
 
-I still don't think we should do this, given that the plan is to unmap
-the memory from the linear map. If this thing fires, it's a kernel bug
-and it should be fatal.
+Heh, except x86 already has something similar.
 
-Will
+	if (!vcpu->kvm->arch.pre_fault_allowed)
+		return -EOPNOTSUPP;
+
+As does s390:
+	
+	if (kvm_is_ucontrol(vcpu->kvm))
+		return -EINVAL;
+
+I also don't like that this is subtly about avoiding vcpu_load(); it will be all
+too easy to overlook that detail in the future.
+
+Rather than have kvm_arch_vcpu_allow_pre_fault_memory(), what if we add a more
+generic kvm_is_vcpu_loadable()?  That way we don't need to worry as much about
+the return value, the connection to vcpu_load() is obvious, and we don't need to
+add another pre-check if future (or cleaned-up existing?) ioctls want to do
+vcpu_load() in common code.
+
+I'd also be tempted to say it can be a macro, not a __weak function.  E.g.
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 27fe0cd5b2d7..99613df254cf 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1533,6 +1533,7 @@ static inline bool __vcpu_has_feature(const struct kvm_arch *ka, int feature)
+ #define vcpu_has_feature(v, f)	__vcpu_has_feature(&(v)->kvm->arch, (f))
+ 
+ #define kvm_vcpu_initialized(v) vcpu_get_flag(v, VCPU_INITIALIZED)
++#define kvm_is_vcpu_loadable kvm_vcpu_initialized
+ 
+ int kvm_trng_call(struct kvm_vcpu *vcpu);
+ #ifdef CONFIG_KVM
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 3dd04605f2e5..02401b080507 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1053,6 +1053,9 @@ int kvm_trylock_all_vcpus(struct kvm *kvm);
+ int kvm_lock_all_vcpus(struct kvm *kvm);
+ void kvm_unlock_all_vcpus(struct kvm *kvm);
+ 
++#ifndef kvm_is_vcpu_loadable
++#define kvm_is_vcpu_loadable(v) true
++#endif
+ void vcpu_load(struct kvm_vcpu *vcpu);
+ void vcpu_put(struct kvm_vcpu *vcpu);
