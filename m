@@ -1,146 +1,217 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 040D45326B1
-	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 22:54:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A91A4EFFC8;
+	Tue, 22 Sep 2026 22:55:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790117689; cv=none; b=c2v3bPrdmPnsOXNgnnQlC7sTYA4krt3EclZKMJnzuu3qjTqVvKxgQX12s8RRksjKzuZahoma2EXyRA0p0thzzGuc2Pq90omT2pn4qPHqShy/TGU9vpzGQu+lKg5McMZnFfqrKKK5szfxFEhjZq5Hw+tiZMyaYLNywLxOFu2kZMw=
+	t=1790117764; cv=none; b=pSwVlFCwvj/oXvQ4xtEg1Xkt03F5dnOocaazCtBDql/nHbXF5z6j3wJgpB1UqAy1tBK8VMAT37S7wVPjf17LFqdLFsfDFVHXgc5jLyUuz2gFSlRkbfFDLQJfqg6Pp1ozzK/a2qiAjGWAZSLHsUaelDw0m8lX+20BYVjNOvJJFj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790117689; c=relaxed/simple;
-	bh=ySnK+hmdvoPJVkgFkjfrLJlNaWN5LOaQraKbC5hMV2M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E/wT60x5JYUbF2piab6YzfMZG3dllF1KMuB3fkep3bCSgnNhVGBDFvsu8hVXiDAVDp5ZROJF6mC1VoWV9Y1wzUKQuIHgolaUG9DdSfEc1GzOSZ75hgMO6GP8mNiZsuhYBC8vOZOGfR9fb+mSctMJ8QsoYyurpiwL+2ps39NYh7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=TgC+Jg22; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=P+QzJyKZ; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1790117764; c=relaxed/simple;
+	bh=qVCjW+bKUVgRJaxooxblKpYN+hplHE+53CuW6GhbhWg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a+BSCTDlXaTVu+icciRFvMyUiGxoQcrn8ERi1anX1Sr9Q/nGqK0B5vH2RGitMvqVlBkrpuEI59Awm1gz3mlAvZzjAVW6PQEi0R6GcJ/kjjAr9UnNWSfX1VFDbhYHO51P+yYn+69BuLA/HDnA6PZlmXrPrRwfjcOHjbTt4+XX/dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=NYFlzv5R; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="TgC+Jg22";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="P+QzJyKZ"
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68MJBhIQ3897576
-	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 22:54:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	LYxvfTdm3oz7TymPids4imwzrOSBJe+ux30GQWYD/WQ=; b=TgC+Jg227JT54tl4
-	P5oAiVK2B3oGJAAJMrXG0Kz8oLZBB5wfKqJ/JTsnu6gDea3KvxyAXIqy06rrQHxJ
-	BPTXp5Bw1Cy9Fx8d/V8xAxo+P/+OiHNzL9zUc6Wsok79fsbGQhIzId94CBYHb4bp
-	skBUEfTUJYU+vlOqfF0o1arAozn4tgbQaZTjqQGXJKuL6nusRUJBJ3LRUKtFj13l
-	aXK52LiNDgboYOpBgBX3YDbe7Ba/CY6ZfpjL8mVgbTDTaYgR0eW/eX3v1VCLU+/R
-	aJ4fgVdyZjItZV3h+Jut4PysymBjF7GY/dpYwi6CNF1CHWgEUmcVoZBrwjvk4SCb
-	hqqqFA==
-Received: from mail-dy1-f198.google.com (mail-dy1-f198.google.com [74.125.82.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4guyma0xn3-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 22:54:44 +0000 (GMT)
-Received: by mail-dy1-f198.google.com with SMTP id 5a478bee46e88-30f1b904861so385240eec.0
-        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 15:54:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1790117684; x=1790722484; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:mime-version:organization
-         :references:in-reply-to:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=LYxvfTdm3oz7TymPids4imwzrOSBJe+ux30GQWYD/WQ=;
-        b=P+QzJyKZ7i3nq5JolGkI8EADR3/EndzfOiXwIExcPygyWYEvxesu2+oSmlEca0eUol
-         sqUoJ186QLtMbCJ7NU6IoenFh3HyBWz8N8u4GOr42EqgPUQQXHjrS1zHuPYh6esqiN4s
-         cXG7ub9fNkgrv5npLwOYwlcjAWku5LGVXU0FEraTkYwPpsRJXclPLZO3X8ndvvHvSoLu
-         USM84xcW+qxDY4Tat9R4PHP1Ham59aSUKpkQKwklloKRmUp0ugnTnOEWan6i486a4R2A
-         AL0sjXddKFxqqY+ZuoJjqF9qWXhwt5p4wF5spibeUf5gt/KeKjfhGhlXYB/pr+rtTqdA
-         nBYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790117684; x=1790722484;
-        h=content-transfer-encoding:content-type:mime-version:organization
-         :references:in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=LYxvfTdm3oz7TymPids4imwzrOSBJe+ux30GQWYD/WQ=;
-        b=yFYoZu3cMIDlMcnp5diGZe/nxbKGrP8rFD/DhM9h6FzJPGU6e8GGxMOGbrbBw91qml
-         6Bnvt6nrVrl3mm61LUKma5colNSPoDmJctxmU+VsgICvUaCLUV1QbzLiQ+u4A1/kqoHb
-         gtJfCGXpWkUyc9caT4jIrygIkQpBXmfsuDfUjnkSORYr7r/HnFtmImsdODICQgWekixZ
-         IaEkzFUANKfR1s3CNxbCZYS7VMpR0Nxf4L5xW/wgsz7wIRVt+4tl26+D7OsKy53Ydqc1
-         FAW1PbMknfthhejj4o/QyNKIS7ISR0Q8lULNinLNGLXlBi2ZclP/CeNhonIt0ybmpG0c
-         e6Fg==
-X-Forwarded-Encrypted: i=1; AKwUvBwu+U/PXkIS6OCvN0uq3Qygx31v9m4BitSg0Lo5zJ2pvMRWuofvoFp+XdBOHt+jdwLh5pa31d8=@lists.linux.dev
-X-Gm-Message-State: AFuF++lzf26gH9Ju58n9nZZfAzStmeL6fL3Q7W/iJWSK0CnAnNVLVWvj
-	/ZpCTLyzj4czU8sPD4fHZW3Rw+D02KlRArYpB3N+/olQWZkBfRUgIQD+1xKPHNVYu4diMqEccXy
-	fijPYDJ8jzjwYUPTJBLCm00DfAglYX2fpSCY37oWlVBT4eveatHpPtrCVl+E=
-X-Gm-Gg: AYBFou3LWW9wBzyCzJuX8bVVMNEEcbeCh3ZXRL3d1Sf/NPNRlBIN0oP9BzoMA4Vf6Nx
-	VWvtPfDx6j8Goa0EFcoZHzbQ+dxsk0OhlCbjAnVG6QFGI8c9IENSsE92cPUDRBKRcYWu6TDNTOa
-	JKQDiWar6AGYReSX6TLlUam+rQQTMiFq3Fd+L5eN05lzDukOUIIPOV51MIlfz2skC6b8njdWzBP
-	zbnoEqeNJlIk0wgSgxyf9DvJq7iuNhFFZedv7Kuul0Rxtai7E3AZd/G3lqeWdnf3at4Ohb0XzVS
-	PslIBSefkjIH3gOI1ZMFzevrFP4xQYeA5vIpt7fK/PEhDJG4qVSmOuPxJ8JcWimG64llRLCkNkb
-	G199H2sX84PocPKLr6LbnjcHDaMGAdMMsKqOYC76lVsyb3kdCd5sr5g==
-X-Received: by 2002:a05:693c:638c:10b0:33e:6a54:b3ef with SMTP id 5a478bee46e88-33e8c05f69amr760383eec.18.1790117684085;
-        Tue, 22 Sep 2026 15:54:44 -0700 (PDT)
-X-Received: by 2002:a05:693c:638c:10b0:33e:6a54:b3ef with SMTP id 5a478bee46e88-33e8c05f69amr760352eec.18.1790117683534;
-        Tue, 22 Sep 2026 15:54:43 -0700 (PDT)
-Received: from localhost (i-global254.qualcomm.com. [199.106.103.254])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33e96e48e3esm1320134eec.26.2026.09.22.15.54.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Sep 2026 15:54:43 -0700 (PDT)
-Date: Tue, 22 Sep 2026 15:54:38 -0700
-From: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
-        will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
-        aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
-        joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
-        linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
-        sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
-        WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
-Subject: Re: [PATCH v19 17/20] KVM: arm64: CCA: WARN on injected undef
- exceptions
-Message-ID: <20260922155438.00000f3d@oss.qualcomm.com>
-In-Reply-To: <20260920212845.707-18-suzuki.poulose@arm.com>
-References: <20260920212845.707-1-suzuki.poulose@arm.com>
-	<20260920212845.707-18-suzuki.poulose@arm.com>
-Organization: Qualcomm
-X-Mailer: Claws Mail 4.4.0 (GTK 3.24.51; x86_64-w64-mingw32)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="NYFlzv5R"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 267771576;
+	Tue, 22 Sep 2026 15:55:53 -0700 (PDT)
+Received: from [10.57.9.113] (unknown [10.57.9.113])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A07BB3F632;
+	Tue, 22 Sep 2026 15:55:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790117756; bh=qVCjW+bKUVgRJaxooxblKpYN+hplHE+53CuW6GhbhWg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=NYFlzv5R7+kCofQIFQDwJs6xa1Tp35O7ZW6qtSA9fT4Pygzy9yDpBiIqnoRsXfoCU
+	 Iog5eoTK90Q60dmjkNHrvRS3Q5CEV4M8UtI0CW1l5b4iP1hxxa3rR2tGoXJzpqMeaj
+	 c5IADN5feKzMA5TDTPUIgueobeOVzZWzDfkDuvhM=
+Message-ID: <2164b046-bbbb-4cfb-b797-5df27fbe313f@arm.com>
+Date: Tue, 22 Sep 2026 23:55:52 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: JRHUidvEyA3paOSAapqUUQe9kGN5kjdH
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTIyMDMwNCBTYWx0ZWRfX9jKT0RH/cxjG
- bYoUv7ac5OXL1BAe5wxe4ZEyNGVeWBHlYfZqUglJk0IsgLlMX9pL9ROajfdnCeLwheZGLUI/Udy
- hc3w9Kn3meN6yz4mqG+48rdr66REH/E=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTIyMDMwNCBTYWx0ZWRfX9ET0yXcFo19v
- M+NGKHW7onJkMv+vr4MDmvr9dKtB+xyVYB1WYfLmKE8OXtLwD4TCtYT1K6IIMqfBgFwd45TC6PB
- b7KGUH3AG3ja7+UNZsvFCI5bs1ESpuBFr33l72NBO9oOb6vMmwigHLl3ehI7XRL5Xx8eM8NUMom
- Hj2B/fQtO1NSTMAkeSRttvhSXZdPRq9iOkxEB3j0am2BYsiH/cMsRGn7HfNKL8EyZGBonK9iXHa
- UlXKJwOhffwt5hIOFSqvQiu6Tacnf6h3A4d9ko1xtyqxgEVWGY+um6MJWsLJeC8hb5NpYZS6+mh
- /uAesYNJujpJZXRh/+ezJtfF/AwUAmTB+k8LT/WYPJWaQjiqnYBptSeSKwpkYgwgtXakbCYjVyG
- dXnqgsusIMXXeYaz8xn8fsWRpejV7ckEhNBELi4uaWvRqIejQGaC41y4ECVW+dzZpn4i5qJR5pn
- TqzNJhbPY194XW9aXuQ==
-X-Authority-Analysis: v=2.4 cv=N828hG9B c=1 sm=1 tr=0 ts=6ab30734 cx=c_pps
- a=wEP8DlPgTf/vqF+yE6f9lg==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22
- a=7CQSdrXTAAAA:8 a=EUspDBNiAAAA:8 a=DI-nzRUvp28q1R9r8mgA:9 a=CjuIK1q_8ugA:10
- a=bBxd6f-gb0O0v-kibOvt:22 a=a-qgeE7W1pNrGK8U0ZQC:22
-X-Proofpoint-GUID: JRHUidvEyA3paOSAapqUUQe9kGN5kjdH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-22_03,2026-09-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 clxscore=1015 malwarescore=0 adultscore=0 spamscore=0
- impostorscore=0 bulkscore=0 phishscore=0 lowpriorityscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609220304
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18 6/7] firmware: arm_rmm: Ensure the RMM has GPT entries
+ for memory
+Content-Language: en-GB
+To: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+ will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+References: <20260912083611.2513845-1-suzuki.poulose@arm.com>
+ <20260912083611.2513845-7-suzuki.poulose@arm.com>
+ <178978126543.2352296.12214136703168879825.b4-review@b4>
+ <65b0c03b-36b9-4e60-aa55-c3b4b85e21ee@arm.com>
+ <93aea89c-0a05-4b5a-905d-2e8c14a9e894@arm.com>
+ <20260921145838.00003b04@oss.qualcomm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20260921145838.00003b04@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sun, 20 Sep 2026 22:28:42 +0100
-Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+On 21/09/2026 22:58, Jonathan Cameron wrote:
+> 
+>>>>>    static int __init arm64_init_rmi(void)
+>>>>>    {
+>>>>>        int ret;
+>>>>> @@ -786,8 +970,24 @@ static int __init arm64_init_rmi(void)
+>>>>>        if (ret) {
+>>>>>            pr_err("RMM activate failed\n");
+>>>>>            ret = ret < 0 ? ret : -ENXIO;
+>>>>> +        return ret;
+>>>>
+>>>> Why did this change?
+>>>
+>>> Rebase messed up. I will restore it.
+>>
+>> Actually this is not. We dont have to check the metadata if
+>> we couldn't activate the RMM. Also, the failure path at the
+>> bottom has "deactivate", which again is not needed. So
+>> it is the right thing to do.
+> 
+> Only after this patch? Not from the previous patch?
+> 
+>>
+>>>    
+>>>>   
+>>>>>        }
+>>>>> +    ret = rmi_init_metadata();
+>>>>> +    if (ret)
+>>>>
+>>>> And this is hitting another bit of guidance in cleanup.h.
+>>>> Functions shouldn't be mixing __free and friends with
+>>>> gotos.  Again, not a bug here but there are large ugly
+>>>> monsters around this stuff, hence the blanket guidance.
+>>>> I haven't thought that hard on how you avoid it here, but
+>>>> usually it's a combination of suitable helpers and wrappers
+>>>> and resulting code is often more readable as a result.
+>>
+>> I could change the hunk to something like, but that looks ugly.
+>>
+>> @@ -1010,20 +1010,12 @@ static int __init arm64_init_rmi(void)
+>>                   return ret;
+>>           }
+>>
+>> -       ret = rmi_init_metadata();
+>> -       if (ret)
+>> -               goto out_deactivate;
+>> +       if (!rmi_init_metadata() &&
+>> !register_memory_notifier(&rmi_memory_nb)) {
+>> +               arm64_rmi_is_available = true;
+>> +               pr_info("RMI configured\n");
+>> +               return 0;
+>> +       }
+>>
+>> -       ret = register_memory_notifier(&rmi_memory_nb);
+>> -       if (ret)
+>> -               goto out_deactivate;
+>> -
+>> -       arm64_rmi_is_available = true;
+>> -       pr_info("RMI configured\n");
+>> -
+>> -       return 0;
+>> -
+>> -out_deactivate:
+>>           WARN_ON(rmi_sro_memxfer_cmd(sro, GFP_KERNEL,
+>> SMC_RMI_RMM_DEACTIVATE));
+>>           return ret;
+>>    }
+>>
+>>
+>> Either ways, we have to cleanup the object on return, no matter
+>> the route we take. So the original form is much more readable
+>> for me.
+> 
+> Agree to more readable, but that fragility of mixing __free() and
+> goto is a real problem that has tripped many folk up - hence
+> the perhaps overly strict guidance.  Rather than avoiding the goto, I'd just
+> not use __free()  - go old school and have two labels for errors
+> and an extra manual free in the good path.
+> 
+> 	pr_info("RMI configured\n:);
+> 	kfree(sro);
+> 
+> 	return 0;
+> 
+> out_deactivate:
+> 	WARN_ON(rmi_sro_memxfer_cmd(sro, GFP_KERNEL, SMC_RMI_RMM_DEACTIVATE));
+> out_free_sro:
+> 	kfree(sro);
+> 	return ret;
+> }
+> 
+> Sometime the new toys aren't the right answer.
 
-> From: Steven Price <steven.price@arm.com>
+I have the following hunk on top of this patch, that could do the trick.
+
+diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
+index bcdbed26cf08d..4385f49068965 100644
+--- a/drivers/firmware/arm_rmm/rmi.c
++++ b/drivers/firmware/arm_rmm/rmi.c
+@@ -1033,20 +1033,19 @@ static int __init arm64_init_rmi(void)
+                 return ret;
+         }
+
+-       ret = rmi_init_metadata();
+-       if (ret)
+-               goto out_deactivate;
+-
+-       ret = register_memory_notifier(&rmi_memory_nb);
+-       if (ret)
+-               goto out_deactivate;
+-
+-       arm64_rmi_is_available = true;
+-       pr_info("RMI configured\n");
+-
+-       return 0;
+-
+-out_deactivate:
++       do {
++               ret = rmi_init_metadata();
++               if (ret)
++                       break;
++               ret = register_memory_notifier(&rmi_memory_nb);
++               if (ret)
++                       break;
++               arm64_rmi_is_available = true;
++               pr_info("RMI configured\n");
++               return 0;
++       } while (0);
++
++       /* De-activate the RMM and reclaim any donated memory */
+         WARN_ON(rmi_sro_memxfer_cmd(sro, GFP_KERNEL, 
+SMC_RMI_RMM_DEACTIVATE));
+         return ret;
+
+Cheers
+Suzuki
+
 > 
-> The RMM doesn't allow injection of a undefined exception into a realm
-> guest. Add a WARN to catch if this ever happens.
+> Jonathan
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+> 
+> 
+> 
+>>
+>> Cheers
+>> Suzuki
+>>
+>>>>   
+>>>
+>>> I will see if I can improve it.
+>>>
+>>> Cheers
+>>> Suzuki
+>>>    
+>>
+> 
+
