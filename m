@@ -1,73 +1,96 @@
-Received: from mta1.migadu.com (out-66.mta1.migadu.com [95.215.58.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 813C2572667
-	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 17:08:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9A7576ED3;
+	Tue, 22 Sep 2026 17:15:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790096920; cv=none; b=SEUy7LBTq7D1CxgQ4qAuZhUr2/yU4W1p+3tmYE2wzaCfMYIsKIzKgV8rPPs/YIovzIU8PDJSYCRjyuLP+7PS7ULLoEFYcE0wpLmGCP/qP39cvue16ZWIDpD8QsC6ztZnxMjZmeENzd+o687GICjMoBtG3ot+rt/7TNNC756NjEM=
+	t=1790097344; cv=none; b=ijNzjTDOWixmwZwWMA6w2YR445aB+j4OJWpBbFf0r0V8vUQBQfDOnNdFzNic+E9dQW3R0kNwTrunBXMCQUAr80r1IdhkddaIa90rjQEm+KNxCvE0Asr5YWTUUlPqq+ImKxcImOd9IfT0hORmvfQ+znKjrRyGiwtIytvZ1I1ybwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790096920; c=relaxed/simple;
-	bh=eX/1NASofdyRydQxppyJHOAcf0kyETrv5J8Ql/c4zbk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OqCZPXOLF6kR2dldknXkdouVbclWkOhFi2Fw+HiVPoSzdzLiYQ4ykCyqTWY15/M8OxCIn7XsdVdrYHuuge98j6IvgdOkvXt1oKzxwJSw7We+sEESyTHUYZC/PwiSdFfWEsh6UtyhSkt3apGGaAVSbQO9yk6GfWrUTKvHMzJT5PU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=H8qq6okK; arc=none smtp.client-ip=95.215.58.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1790097344; c=relaxed/simple;
+	bh=m8JfzfQ/K7ynxAP+mIg5GPu1v2WwEh4hWVjoye9kaWU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G+kaOGbsxq+jozG616ZClrjzKyVjHhY58+f0NiaSPTh23obnHO/8QMm+dzDNuvV62WZxYFvwcxEzPVwc3nWPa5pP9RHsCFwtIee8THrOJ9H3/Rv8VA3/3qRlgWEtmURgxOLkwobEaYAR5EyAQmtmn0GxFglCvgjrPZV6B5Kxg3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MGRoPx0g; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="H8qq6okK"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=eX/1NASofdyRydQxppyJHOAcf0kyETrv5J8Ql/c4zbk=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790096916; v=1; x=1790701716;
- b=H8qq6okKdCAm6lxAPSz310S8Aw1q8SnEnFbqtbQsgmqeb1g5f1zTCrj1C3lHhvNTOC79C3rP
- PAqpq7tRh/qa7UK2A2iBii2S4Ww8LtmvkWMANm8VP6abjHQasdtXM7QY4k8RRUU/fs9YP0W061c
- MpwNufc4S0YgWz5vAYmCt3mo=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 9153cb274da2b908;
-	Tue, 22 Sep 2026 17:08:36 +0000
-X-Mizu-Trace-ID: 9153cb274da2b908
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Yuchao Zhang <ndaugoing@gmail.com>
-Cc: sashiko-reviews@lists.linux.dev,
-	kvmarm@lists.linux.dev,
-	Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v2] KVM: selftests: arm64: Add test for cross-vCPU LPI disable race
-Date: Tue, 22 Sep 2026 18:08:34 +0100
-Message-Id: <20260922170834.3228429-1-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260922105331.40498-1-ndaugoing@gmail.com>
-References: <20260922102959.41FFA1F000FF@smtp.kernel.org> <20260922105331.40498-1-ndaugoing@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MGRoPx0g"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 904A21F00893;
+	Tue, 22 Sep 2026 17:15:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790097342;
+	bh=KwQN7WVhANwtG21qRW2cXhG1KlqZnmnqp3LyL8PiblQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=MGRoPx0gFeoZ620M+h6hVml1cmstZ36RtqWY65JVSsUD5TMarzlFWrri8h+HdC4fV
+	 tb3O2T8Z9k0tiACSeV/L/YdcNDoDkcmo5S6d+2gsXo1v7ZuLSr6xYIWNvegc6TufBK
+	 eg5RUuFKBcIK0G2An7KcyBk/RLadzP4pFEQw7yeQhdN3ofhyFPBi93dJvIyWDpuwMP
+	 BcOeNuR4b1fXl7ZVbsnBNPnyMtaoynBi4uhbqvKUdD5haCJvQJoEPoyLcnb3iFhxCW
+	 iU1VzelR+8iiGNSduR4hDUo+gQfKMHArnhh/H9uEoLVkrxlwAexfAEyPfNAZrT7A4z
+	 VbqQwSaYdEhQQ==
+Date: Tue, 22 Sep 2026 18:15:34 +0100
+From: Will Deacon <will@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+	catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+Subject: Re: [PATCH v18] arm64: mm: Handle Granule Protection Faults (GPFs)
+Message-ID: <arK3tsTV6EDhI-nt@willie-the-truck>
+References: <20260913070459.2547407-1-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260913070459.2547407-1-suzuki.poulose@arm.com>
 
-Hi Yuchao,
+On Sun, Sep 13, 2026 at 08:04:58AM +0100, Suzuki K Poulose wrote:
+> From: Steven Price <steven.price@arm.com>
+> 
+> If the host attempts to access granules that have been delegated for use
+> in a realm these accesses will be caught and will trigger a Granule
+> Protection Fault (GPF).
+> 
+> A fault during a page walk signals a bug in the kernel and is handled by
+> oopsing the kernel. A non-page walk fault could be caused by user space
+> having access to a page which has been delegated to the kernel and will
+> trigger a SIGBUS to allow debugging why user space is trying to access a
+> delegated page.
+> 
+> There is work in progress to unmap the guest_memfd backed private pages from the
+> linear map. Until we get that support, we could get spurious GPFs from within
+> the kernel, e.g., load_unaligned_zeropad(). So, try to fix them up for now.
+> 
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+> Changes since v17:
+>  * Pass untagged address to die_kernel_fault() - Sashiko
+>  * Explicitly check !user_mode() for fixups - Catalin
+>  * Switch to BUS_OBJERR for si_code from SI_KERNEL - Catalin
+>  * Clarify the commit description about the upcoming work on
+>    unmapping guest_memfd backed pages from linear map
+> Changes since v16:
+>  * Update the commit description to indicate why we try to fixup GPFs
+> Changes since v10:
+>  * Don't call arm64_notify_die() in do_gpf() but simply return 1.
+> Changes since v2:
+>  * Include missing "Granule Protection Fault at level -1"
+> ---
+>  arch/arm64/mm/fault.c | 30 ++++++++++++++++++++++++------
+>  1 file changed, 24 insertions(+), 6 deletions(-)
 
-The test passes on an unpatched 7.3-rc3 for me, so it doesn't reproduce
-the bug yet.
+I still don't think we should do this, given that the plan is to unmap
+the memory from the linear map. If this thing fires, it's a kernel bug
+and it should be fatal.
 
-On Tue, 22 Sep 2026 11:53:31 +0100, Yuchao Zhang <ndaugoing@gmail.com> wrote:
-[...]
-> On unpatched kernels, this race can lead to a use-after-free or host
-> kernel panic in vgic_fold_lr_state() due to a dangling last_lr_irq
-> pointer. With the fix in place (stopping the VM and holding a
-> refcount on last_lr_irq), the test runs to completion without errors.
-
-With only LPIs in flight EOIcount stays 0, so the fold breaks out of the
-ap_list walk before it dereferences anything past the stale last_lr_irq.
-To crash, the target vcpu has to EOI a non-LPI interrupt that's active
-outside the LRs, with the remote disable landing while it's still in the
-guest.
-
-Cheers,
-/fuad
-
+Will
