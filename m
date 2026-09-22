@@ -1,49 +1,59 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F65A3E51C6;
-	Tue, 22 Sep 2026 18:01:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183A741A575;
+	Tue, 22 Sep 2026 18:07:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790100118; cv=none; b=Te6rU1I8b6Vd5OnUdjqLoQFQ++o9hKP5h/cOnbHlTrDY+ydGCxTgodH2HweFeFBuYuHxEk90FS8Q0AeFOiMib9jpRSwEF+YjBV4X/SOuphmvgS+8eQeX5qicq4hITJlVaUQuXGNvp5nLZjNq3cLYYAi1yWlvz7jePjyIUDAwQ3Y=
+	t=1790100476; cv=none; b=fFkaioBpLksR8e8SqseO6ZYzaMD03usXH5ifS2WgC2s/W+QQA2AWm7WPDxe3WvNaZLG/QPlfDY6Fn+d6rMebX3IlxvOoWudGB2ERa4mKwHtzDvMvvexPEQllIuq7kkr15LGBe8jOttPG3GN36FD5YodQ+KhZr+ONivq+fq8E5KI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790100118; c=relaxed/simple;
-	bh=6gafUH01UEnEOFZ/RPOfxlqwmZj2EPGoGIHEuVJ2b30=;
+	s=arc-20240116; t=1790100476; c=relaxed/simple;
+	bh=O5NoYloG7xYDgVh/bOtDr0EbSnoomHvovkii+n0xso4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ieZK1rKS1GEFW+9R9kwc1tU7YRu/oUxdx/Blc2xOGwyvT0iQpX3UVOlPUPpsaRJs90jsz7nQPSTifIASayCvuzf6uvhzE+HPa8jF8D7nTKPwxZipVKsq+N7ZWUYS9DFEqSswHtq79/3lr19X5pCI+0Glcx4lkNTRx9L+tG3hHrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cTFAgg2F; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=PepuXattCgmLiVKgkwaXB/Qu36u7vRryfS0jzF6nIy0UfvZieHLHhUOSDQU0udBzSp6QSTzUuErJj4wKMsm04bc95j1/O/xRKhjybmsjylmUZ+iAuDn6jxrU+4fSOsqNRCevTbhWrbhS9wr9uNZyAFA0vzQ2eKeW7iltfG18nEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hrInqBzN; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cTFAgg2F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C74781F000FF;
-	Tue, 22 Sep 2026 18:01:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hrInqBzN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47A8E1F000FF;
+	Tue, 22 Sep 2026 18:07:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790100116;
-	bh=XYSOqVERmoLufYUc+VgdIGa26F88+bWdDgX4ohmoDow=;
+	s=k20260515; t=1790100474;
+	bh=kb+JzYBVjZ9xE5OHKGAs6buy9QveH8O/36VzTdTmQvE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=cTFAgg2FOfaMX2m8EsEsOewd3kmF8o+nqmZIgHsg1+9dfNvjg7UsJBnBr7cQLe1gc
-	 NRZa7rq/dJvOZbE4iJ8qwH9xFN5HvTNU602lYu19aCdlJ8/ZK8eFBFvjLwON208EmW
-	 XDFJRh666HOdgBM4mCysh18oZxVAtffvfijp+CEreSklJcAeStfU5ZVdmz/W+G1cMw
-	 tvX2+GxoohyHrtHGMZv+Cxrry+VZhichA61P71tzJM/TfaD+SUPE5zsm6ygKShkw1+
-	 aQtV+4k7suG2DbR/RXLPSqzlhNoXCFydrrlCIBti5D3+SZI3a/BwrfTF6KEv229og0
-	 k/Vt3CWjh0zuQ==
-Date: Tue, 22 Sep 2026 19:01:48 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+	b=hrInqBzNV4tJiXiZRrcGk9/EK7PT8Ecw9NiMTg5FJ+q93MSdUGUuLcoW1mSD2L/Ju
+	 TKFIt/lc06QBmc2Fd7Mtmf6ExYIqb1ttPPbfAIAd2RXWTIA3C8fgvHsFs2Mc3cWG8z
+	 9Dgr8xK6tf/XvvZnNpFYNU4yhMWGtXEavvbww5rbd8dp35z5Uy6MERA6AKszfldh16
+	 WvlFBegdMarxEIkPVrYigek7HKcfSkQAEBNRg8Q2v/zItd9+0vj8BzZdSQ144qY7P8
+	 HbsZMWiU7mbGNeWzxcsWReXhu/OZbZ5gW2+IsG+Edhrxr7FPtfMi5M9/rnDrI0eSe9
+	 ATAE9RwR8JiKg==
+Date: Tue, 22 Sep 2026 11:07:53 -0700
+From: Oliver Upton <oupton@kernel.org>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Oliver Upton <oupton@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
-	Randy Dunlap <rdunlap@infradead.org>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Jack Thomson <jackabt@amazon.com>, Jack Thomson <jackabt.amazon@gmail.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Vincent Donnefort <vdonnefort@google.com>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Leo Soares Passos <Leo.Bras@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>
+Cc: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Jack Thomson <jackabt@amazon.com>,
+	Jack Thomson <jackabt.amazon@gmail.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Leo Soares Passos <Leo.Bras@arm.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>
 Subject: Re: [PATCH v3 01/14] KVM: Allow architectures to disallow pre-fault
-Message-ID: <arK8-Hec3-5o4jYs@gremlin>
+Message-ID: <arLD-eZ6dRvfZ52q@kernel.org>
 References: <20260922-kvm-arm-prefault-v3-0-787bd3bc7e3f@kernel.org>
  <20260922-kvm-arm-prefault-v3-1-787bd3bc7e3f@kernel.org>
  <arKxjsxuO1F5ExrY@kernel.org>
@@ -68,90 +78,163 @@ On Tue, Sep 22, 2026 at 10:36:49AM -0700, Sean Christopherson wrote:
 > > > the return value, the connection to vcpu_load() is obvious, and we don't need to
 > > > add another pre-check if future (or cleaned-up existing?) ioctls want to do
 > > > vcpu_load() in common code.
-> >
+> > 
 > > ...this is exactly what I started out with.
-> >
+> > 
 > > But then you are in a pickle, because _really_ you need to do that check in
 > > vcpu_load(). Which is a void function. Which is called by every single
 > > architecture all over the place.
-> >
+> > 
 > > So you'd have actually no way of signalling the error back.
-> >
+> > 
 > > Of course those places are arch code and you could say 'arches should know
 > > better and if they call it it's fine not to call the arch 'can you load'
 > > function.
->
+> 
 > Yes, that's my vote.  It'd be easy enough to clarify that "rule" with a comment
 > in linux/kvm_host.h.
 
-I note you dodge the actually difficult question of what this wrapper function
-would look like ;)
+I feel like trying to make this generic will wind up under-documenting
+the single example we have with the pre fault ioctl. Putting the comment
+into a header practically guarantees that nobody will read it either.
 
-So maybe like:
+I'd favor doing something like below and sticking the comment inline in
+the ioctl handler. Unless I'm missing something blatantly obvious, I
+don't see why the x86 or s390 pre-conditions can't be tested early too.
 
-static int kvm_vcpu_load(struct kvm_vcpu *vcpu)
-{
-	int err;
+But I don't care enough to bikeshed this any further.
 
-	err = kvm_arch_allow_vcpu_load(vcpu);
-	if (err)
-		return err;
+Thanks,
+Oliver
 
-	vcpu_load(vcpu);
-	return 0;
-}
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 8b080804bc90..396e64875fe7 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1852,6 +1852,14 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+ 	return __kvm_arm_vcpu_set_events(vcpu, events);
+ }
+ 
++int kvm_arch_pre_fault_allowed(struct kvm_vcpu *vcpu)
++{
++	if (!kvm_vcpu_initialized(vcpu))
++		return -ENOEXEC;
++
++	return 0;
++}
++
+ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 			 unsigned int ioctl, unsigned long arg)
+ {
+diff --git a/arch/s390/kvm/s390/s390.c b/arch/s390/kvm/s390/s390.c
+index 5c73f43782a7..47fe032444f4 100644
+--- a/arch/s390/kvm/s390/s390.c
++++ b/arch/s390/kvm/s390/s390.c
+@@ -5784,6 +5784,14 @@ void kvm_arch_commit_memory_region(struct kvm *kvm, struct kvm_memory_slot *old,
+ 	s390_kvm_mmu_commit_memory_region(kvm, old, new, change);
+ }
+ 
++int kvm_arch_pre_fault_allowed(struct kvm_vcpu *vcpu)
++{
++	if (kvm_is_ucontrol(vcpu->kvm))
++		return -EINVAL;
++
++	return 0;
++}
++
+ /**
+  * kvm_arch_vcpu_pre_fault_memory() -- pre-fault and link gmap dat tables
+  * @vcpu: the vcpu that shall appear to have generated the fault-in.
+@@ -5810,9 +5818,6 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu, struct kvm_pre_fault_
+ 	gpa_t end;
+ 	int rc;
+ 
+-	if (kvm_is_ucontrol(vcpu->kvm))
+-		return -EINVAL;
+-
+ 	rc = kvm_s390_faultin_gfn(vcpu, NULL, &f);
+ 	if (rc == PGM_ADDRESSING)
+ 		return -ENOENT;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 064ecc33b926..c35fd2868c20 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5086,6 +5086,14 @@ static int kvm_tdp_page_prefault(struct kvm_vcpu *vcpu, gpa_t gpa,
+ 	}
+ }
+ 
++int kvm_arch_pre_fault_allowed(struct kvm_vcpu *vcpu)
++{
++	if (!vcpu->kvm->arch.pre_fault_allowed)
++		return -EOPNOTSUPP;
++
++	return 0;
++}
++
+ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+ 				    struct kvm_pre_fault_memory *range)
+ {
+@@ -5095,9 +5103,6 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+ 	u64 end;
+ 	int r;
+ 
+-	if (!vcpu->kvm->arch.pre_fault_allowed)
+-		return -EOPNOTSUPP;
+-
+ 	if (kvm_is_gfn_alias(vcpu->kvm, gpa_to_gfn(range->gpa)))
+ 		return -EINVAL;
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 03bfc92864b6..bff842548c04 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1693,6 +1693,7 @@ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
+ bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu);
+ bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu);
+ bool kvm_arch_vcpu_preempted_in_kernel(struct kvm_vcpu *vcpu);
++int kvm_arch_pre_fault_allowed(struct kvm_vcpu *vcpu);
+ void kvm_arch_pre_destroy_vm(struct kvm *kvm);
+ void kvm_arch_create_vm_debugfs(struct kvm *kvm);
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 65eb26a0520d..07f2ce7a3cb3 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3961,6 +3961,11 @@ bool __weak kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu)
+ 	return false;
+ }
+ 
++int __weak kvm_arch_pre_fault_allowed(struct kvm_vcpu *vcpu)
++{
++	return 0;
++}
++
+ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+ {
+ 	int nr_vcpus, start, i, idx, yielded;
+@@ -4353,7 +4358,7 @@ static int kvm_vcpu_ioctl_get_stats_fd(struct kvm_vcpu *vcpu)
+ static int kvm_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+ 				     struct kvm_pre_fault_memory *range)
+ {
+-	int idx;
++	int idx, ret;
+ 	long r;
+ 	u64 full_size;
+ 
+@@ -4365,6 +4370,14 @@ static int kvm_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+ 	    range->gpa + range->size <= range->gpa)
+ 		return -EINVAL;
+ 
++	/*
++	 * Certain architectures (e.g. arm64) need to reject the ioctl 'early'
++	 * before vcpu_load().
++	 */
++	ret = kvm_arch_pre_fault_allowed(vcpu);
++	if (ret)
++		return ret;
++
+ 	vcpu_load(vcpu);
+ 	idx = srcu_read_lock(&vcpu->kvm->srcu);
 
-?
-
-And I do like that you'd actually gate the right thing, I feel you on that,
-obviously since this kind of predicate is what I started out with.
-
-But I'm also looking to do the smallest possible thing here that fits the series
-and doesn't preface it with a 'change how core kvm does something'.
-
-But if Oliver/Marc feel this is viable then sure can go with it.
-
-(Also naming is hard, kvm_vcpu_load()? do_vcpu_load()? maybe_vcpu_load()?
-checked_vcpu_load()? vcpu_load_checked()? :P)
-
->
-> > But you're still stuck with the problem of where exactly you put this check.
-> >
-> > So then do you put that check in a wrapper around it?
-> >
-> > Instead you can make the predicate 'don't prefault on a not-yet-initialised
-> > vCPU' which is pretty sensible I think, have a specific place to put it and
-> > all's well with the world.
->
-> But look at it from an x86 perspective.  Pretty much everyone will look at this
-> and expect:
->
->   bool kvm_arch_vcpu_allow_pre_fault_memory(struct kvm_vcpu *vcpu)
->   {
-> 	return vcpu->kvm->arch.pre_fault_allowed;
->   }
-
-I'm not sure I really get your point here at all? :)
-
-Why would it matter what people who are too lazy to go check the implementation
-assume about an arch hook?
-
->
-> > > I'd also be tempted to say it can be a macro, not a __weak function.  E.g.
-> >
-> > Yeah it can be many things but why would you want a macro if you could possibly
-> > avoid it? :)
->
-> Because it allows arch code to dererefence "struct kvm_vcpu" in kvm_host.h,
-> i.e. allows "inlining" the check.
-
-Yeah I mean, micro-optimising a path run on a costly startup operation seems a
-little unnecessary? :)
-
-It seems the convention is __weak but I'm not going to die on this hill.
-
-(C type safety is something of a myth but I do prefer to try to have what
-little protection it offers when possible :)
-
---
-Cheers, Lorenzo
+Thanks,
+Oliver
