@@ -1,136 +1,201 @@
-Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2F154855D
-	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 13:44:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8EBB549386
+	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 13:45:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790084685; cv=none; b=jRdTorqg7cKahZWo76qGV9YpB6INIpsck3qY0au3jzYfYEkts1tEO9ZTvo24tqvvS1S/umysirQEC8OIqrGhHiFqxKcCUjiesGDyW1YRZBjG/pPHhAS8ACK8OzvTUPSYxNIdB0cwiT6dMhsxm8q5dWYp74SGIe0R5OVDmZYu4uE=
+	t=1790084714; cv=none; b=NoJf5c2R8QDxSKwrJTLY5VGxTYnRsPBhF7nANQQRUKmZZ3luD5QYadMDhBlomg1WvT/w/ygukPlqUAQse4xrsHWpn83fy1Xe3cYiAUTJyJh2Rqwf4w9FUzECvg+m/N5gjdfvPX5EQZdd34CkBgwH5JEGWYJRSzgJ0qovvYOE9k4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790084685; c=relaxed/simple;
-	bh=0SFlIh2a1t3j3rT/bk6IJh8ffwrgGJ66xEj1bDplnm8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qCGpzc+Ey5gfnEKrz+iAr06dMJWv75MJVvLCxvW9hrXdqMu1HdYrpVbjAHMpLZyapIP4f9IcWGkXnsvbOyKSFiED5sfW0tYmVhBypQ04oaOWCkHg7iymXQXk5CfZU6dUFSHXMFJM6oSHyxK57MAbsEp4igmBDdeVas0tOdkwc5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=aE0xEjAK; arc=none smtp.client-ip=74.125.225.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1790084714; c=relaxed/simple;
+	bh=qjiH/5v6WT6bDeKHAg7PzMuV21LGxTFbDpub1ztcliY=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=k3C3yxkDu6Uuq09kMB7pSEJ3ZYqYJNkK9cZEIO9V7EWtd6ProJ3nQKaF8ngLPMuNFOgl9m4HxOEer5FcLW7NUDxkdfL9Dj2Ohfgz9+wWIzNbbGj6mxZhPk725+6atgXEHH53mRqB/ZF1Kz98AbTU84vk3Tt+3gIb8oUz9//xsg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WdecfdMV; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="aE0xEjAK"
-Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49d1ca5b0d6so31034485e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 06:44:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1790084681; x=1790689481; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=4EtP8Gib+oGUfFDioYcMAZLGT/7xIaokAymk9C8xEMA=;
-        b=aE0xEjAKw1ECHD1SpbpDR+K2dEvDsSv2kNUc/fHmOuE6UPtfh+3WK7D4wxiUjysmxc
-         BPUbrOiowMvNHxWLVwZ9KMcsxMFk1+vKoLsVhpc2Ilv/9iYMPowqOeP7iwFxUUrm7pjB
-         4YeM28YW+eeN9e+GrwoTzAU3+OazdSinWHX2NF0s2EATlCcX9lprUGctNyu1tcE6LU1L
-         9R/asoYZTe7S9eJcMDhB5rl2kOiNg3lFcpUXVPg+nJoDyVPZheTnODdkAcfS0ObREurP
-         7n3+0plt1tUT4m9GZOQx096zz2i6NRUgtH9fRpjHt6uOTGLrlVbHQ6Zs01Z7/wwiDWjW
-         YfKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790084681; x=1790689481;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=4EtP8Gib+oGUfFDioYcMAZLGT/7xIaokAymk9C8xEMA=;
-        b=H0toLIpqg8n5MYLCT4XMljKFBOra38GuH4TXv7JPHPJyvuyI2fGxXpP/1G9STFCALe
-         bIMLRAFfDO0D0EUySPLg7kVWXApgfUt0mBCoiwl5VrZP6Jn4z8KIAD+zskVo9Svgg3rs
-         pUIPvb6LCHg5vzcmNL4K9mLCChlT9Z6mojzz/7PiMtZQyblsHb+FxYvyuXDsG6ACUdrD
-         L5e9rovlT8T11TxpSeNNY0VosBQ45KFIwqkXTOP9nx2zTWOcLgK8n+I0RDBPL4T/oQxv
-         msZgFKtyEZrwsm9UrCHIHpUB1B6ATggNKtu23J/+aqoPGz7+sEhPO/GfCSDf89d8pnj/
-         X2tw==
-X-Forwarded-Encrypted: i=1; AKwUvBzJTG2xSVDFmsSPHgS8XmJyRZ3JfHvh5FLt2rIneSNl9VReNNs4guY1kuuhj19LHCi/MzcOjC8=@lists.linux.dev
-X-Gm-Message-State: AFuF++nQC5p2IAfvMARUpw6Wpvbpx7R0jqY1AdMcm9tlImFZXV4lPkO2
-	VrJjK/rELjayCdvHjU+a7QWmlcju1vhEKF6cjfuhVi+irS2Kn9ksfGpwan7esNeFEtI=
-X-Gm-Gg: AYBFou0f1C4xm6H9jA+KEi/O8QxXSdMqxZwezPHsQj0htxNgByHyycspyXgJEG1Au9M
-	YBK5gfB2Ty8Iog8j7U1E4PSk13xMpI2Bfh1KKoJQfwZ/xVn6PM/kn+UHf/VO6xGwbTOQ4mzdCia
-	1ktJwey7Y3HBWTlK0uPBS1DQw1SZ7+SL+Aj51Uvu99Wd6S00LvEEFfzM8CdSphF8dbGfXN1JT9p
-	m13iGeg8hnQK/oKdo77jhd+PwwbarEjIAlz2nf3LfXAk9TNlqYZ+au+jYoQih0gA8EgF1lMXwe4
-	7VaAy/UM5HJjkslvfamE+g3Z38idVRzVSwHA6WDk+kqbGhqYuaHVCOBXHtgL0DE8/KwDXv9RDYu
-	nrkWuNDc47nlUFrmLO+SUkRLAwxDdOUfI3EudkjG3Oji9jv7Nwob2GAm7kVv78nXGCOYMPBSaA7
-	RFNKvlibNjcmTTCjeCtpOqwMyjtWJynCGKcG3slqdoFPerKdvzMzZUGWnYbVOWvV993Gr8b2oOk
-	w==
-X-Received: by 2002:a05:600c:474e:b0:49e:7cff:f8ca with SMTP id 5b1f17b1804b1-49fc5743c69mr189508785e9.29.1790084681055;
-        Tue, 22 Sep 2026 06:44:41 -0700 (PDT)
-Received: from localhost.localdomain ([2001:af0:8000:1409:193:86:92:181])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fdad2a3e0sm72269425e9.5.2026.09.22.06.44.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Sep 2026 06:44:40 -0700 (PDT)
-Date: Tue, 22 Sep 2026 15:44:38 +0200
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	James Houghton <jthoughton@google.com>, Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>, 
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, cgroups@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] selftests/cgroup: Make the object directory an
- order-only prerequisite
-Message-ID: <arKFe3JRF3n2h-26@localhost.localdomain>
-References: <20260922071945.693714-1-fuad.tabba@linux.dev>
- <20260922071945.693714-3-fuad.tabba@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WdecfdMV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 180151F000FF;
+	Tue, 22 Sep 2026 13:45:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790084712;
+	bh=/J0Ny/WTz1xpBrONFd5t7IHdohI5AKOMOGxBCnLGUEE=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=WdecfdMVXLX6fc1FC9lkAupxb6YguF5VhvW1N04nLVLvLAhLrEwE7Jhb488Ut7p5R
+	 6JDHTP+8WnXl9VYjH1Tmc5c43jwArOd0pSWbwsGCBTkddxyA3rMA/VeMFROtF8xSM8
+	 fKh/uDBbYLu5uUyKp/ji0/jr+aVziHOoDprfwLo6R5p/90pkDufSVqtt5iAndy+qZc
+	 QzrDR0FkWOIrZGOwMJhBaiUyzGJfHI6rTg/5i4NsM5oLdt6OgTjhU8WA0LQ3NlkiIf
+	 BjkDVBKG7CP2X1WyijbBLs0Mz/aA//Kkq0EFL30Ua7wssFjXQ2EIPBbO10j/x98PkR
+	 Ee6uwp2SBHS5w==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v8 23/25] iommu/arm-smmu-v3-kvm: Invalidate the SMMU
+ TLBs
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Mostafa Saleh" <smostafa@google.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260922131259.2975334-24-smostafa@google.com>
+References: <20260922131259.2975334-1-smostafa@google.com>
+ <20260922131259.2975334-24-smostafa@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 22 Sep 2026 13:45:11 +0000
+Message-Id: <20260922134512.180151F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="wz67vp63rqm7k2iu"
-Content-Disposition: inline
-In-Reply-To: <20260922071945.693714-3-fuad.tabba@linux.dev>
 
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] iommu/arm-smmu-v3-kvm: dead-branch traps and incorrect WARN_ON u=
+sage at EL2
+--
 
---wz67vp63rqm7k2iu
-Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v2 2/2] selftests/cgroup: Make the object directory an
- order-only prerequisite
-MIME-Version: 1.0
+commit 12e407f77295df6bfe7066853a3a177e9465aaf7
+Author: Mostafa Saleh <smostafa@google.com>
 
-On Tue, Sep 22, 2026 at 08:19:45AM +0100, Fuad Tabba <fuad.tabba@linux.dev>=
- wrote:
-> libcgroup.mk names $(LIBCGROUP_O_DIRS) as a regular prerequisite of
-> cgroup_util.o. The directory's mtime moves whenever an object is
-> created or replaced in it, so an incremental KVM selftests build that
-> rebuilt anything in lib/ recompiles cgroup_util.o and relinks every
-> test on the following run.
+iommu/arm-smmu-v3-kvm: Invalidate the SMMU TLBs
 
-I'd expect the other test would recompile stuff in lib/ but not in
-cgroup/lib/, however that distinction is likely lost when $(OUTPUT) is
-expanded from the included *.mk file.
+This commit implements the io-pgtable flush operations to invalidate the
+shadow stage-2 in every SMMU. It tracks whether the SMMU command queue is
+enabled and issues invalidation commands to the hardware when active.
 
-> Make the directory order-only, as libvfio.mk does.
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c b/drivers/i=
+ommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
+> index 6f0ea3a4e48df..5417a5c2bf58a 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
+> +++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
 
-Sensible approach given that vfio.
+[ ... ]
 
->=20
-> Fixes: 2c754a84ff16a ("cgroup: selftests: Move cgroup_util into its own l=
-ibrary")
-> Assisted-by: LLM
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->  tools/testing/selftests/cgroup/lib/libcgroup.mk | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> @@ -221,17 +220,139 @@ static int smmu_send_cmd(struct hyp_arm_smmu_v3_de=
+vice *smmu,
+>  	return smmu_sync_cmd(smmu);
+>  }
+> =20
+> +static int smmu_tlb_inv_vmid(struct hyp_arm_smmu_v3_device *smmu)
 
-Acked-by: Michal Koutn=FD <mkoutny@suse.com>
+[ ... ]
 
---wz67vp63rqm7k2iu
-Content-Type: application/pgp-signature; name="signature.asc"
+> +static void smmu_tlb_inv_range(unsigned long iova, size_t size, size_t g=
+ranule,
+> +			       bool leaf)
+> +{
+> +	struct hyp_arm_smmu_v3_device *smmu;
+> +
+> +	for_each_smmu(smmu) {
+> +		hyp_spin_lock(&smmu->hw_lock);
+> +		/*
+> +		 * Don't bother if CMDQ is disabled, this would be useful for the case
+> +		 * when RPM is supported to avoid touching the SMMU MMIO when disabled.
+> +		 * The hypervisor also asserts CMDQEN is enabled before the SMMU is
+> +		 * enabled. As otherwise the host can prevent the hypervisor from doing
+> +		 * TLB invalidations.
+> +		 * When the SMMU is re-enabled the hypervisor cleans the TLBs.
+> +		 */
+> +		if (smmu->cmdq_active)
+> +			WARN_ON(smmu_tlb_inv_range_smmu(smmu, iova, size,
+> +							granule, leaf));
 
------BEGIN PGP SIGNATURE-----
+[Severity: Medium]
+Does this WARN_ON() panic the hypervisor if the hardware command queue
+stalls?
 
-iJEEABYKADkWIQRCE24Fn/AcRjnLivR+PQLnlNv4CAUCarKGQhsUgAAAAAAEAA5t
-YW51MiwyLjUrMS4xMiwyLDIACgkQfj0C55Tb+Ah2DgEA8Xdl3JGOJIGtK6hwQh4u
-Jb+PcelMIF9Zbpm+LvcVQysA/2EdCxDp5Lq6779UZxftUj9At2iFIuFnLA5vHe4p
-ZbcI
-=BJVd
------END PGP SIGNATURE-----
+At EL2, WARN_ON() expands to a fatal BRK instruction. If the SMMU command
+queue is full or stalls for >1ms, smmu_wait() returns -ETIMEDOUT, which
+will bubble up here and cause an unrecoverable hypervisor panic.
 
---wz67vp63rqm7k2iu--
+> +		hyp_spin_unlock(&smmu->hw_lock);
+> +	}
+> +}
+
+[ ... ]
+
+> @@ -725,6 +873,8 @@ static void smmu_emulate_enable(struct hyp_arm_smmu_v=
+3_device *smmu)
+>  		return;
+> =20
+>  	WARN_ON(smmu_update_ste_shadow(smmu, true));
+> +	/* Clean the TLBs each time the SMMU is enabled. */
+> +	WARN_ON(smmu_flush_all_tlb(smmu));
+>  }
+
+[Severity: Medium]
+This isn't a bug introduced by this patch, but looking at the existing code
+just above this in smmu_emulate_enable():
+
+	if (WARN_ON(!is_cmdq_enabled(smmu)))
+		return;
+
+Does this create a dead-branch trap? Because WARN_ON() is fatal at EL2, the
+intended graceful return on an invalid host state is unreachable, as the
+warning itself panics the hypervisor.
+
+[ ... ]
+
+> @@ -745,6 +895,13 @@ static void smmu_emulate_cmdq_enable(struct hyp_arm_=
+smmu_v3_device *smmu)
+> =20
+>  static void smmu_emulate_cmdq_disable(struct hyp_arm_smmu_v3_device *smm=
+u)
+>  {
+> +	/*
+> +	 * We can not enable the SMMU if the CMDQ is disabled and similarly
+> +	 * we can not disable the CMDQ if the SMMU is enabled, as that can
+> +	 * lead to stale TLBs.
+> +	 */
+> +	WARN_ON(is_smmu_enabled(smmu));
+
+[Severity: Medium]
+Does this allow the host to trivially panic the hypervisor by issuing an
+invalid sequence?
+
+Since WARN_ON() expands to a panic at EL2, asserting directly on
+host-controlled state (disabling the CMDQ while the SMMU is enabled)
+turns a host misconfiguration into a hypervisor panic, bringing down the
+host and all protected guests.
+
+> +
+>  	WARN_ON(smmu_unshare_pages(smmu->cmdq_host.base_dma,
+>  				   cmdq_size(&smmu->cmdq_host)));
+>  }
+
+[ ... ]
+
+> @@ -1020,6 +1177,20 @@ static bool smmu_dabt_device(struct hyp_arm_smmu_v=
+3_device *smmu,
+>  		else
+>  			writel_relaxed(val & mask, smmu->base + off);
+> =20
+> +		/*
+> +		 * Make sure writes to CR0 are immediately observed, that is important
+> +		 * when synchronizing with TLB invalidation as reading CR0 is not enou=
+gh
+> +		 * to deduce the SMMU state, and we have to enforce the ack with the
+> +		 * hw_lock acquired.
+> +		 */
+> +		if (off =3D=3D ARM_SMMU_CR0) {
+> +			u32 cr0 =3D val;
+> +
+> +			WARN_ON(smmu_wait(false,
+> +					  readl_relaxed(smmu->base + ARM_SMMU_CR0ACK) =3D=3D cr0));
+
+[Severity: Medium]
+Could this strict equality check predictably time out and panic the
+hypervisor if the host writes reserved bits?
+
+If the host writes RES0 bits to CR0, the hardware drops them, making the
+strict readl_relaxed(...) =3D=3D cr0 check fail. The poll will then time ou=
+t,
+and the WARN_ON() will fatally panic the hypervisor.
+
+> +			smmu->cmdq_active =3D !!(cr0 & CR0_CMDQEN);
+> +		}
+> +
+>  		hyp_spin_unlock(&smmu->hw_lock);
+>  		return true;
+>  	}
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260922131259.2975=
+334-1-smostafa@google.com?part=3D23
