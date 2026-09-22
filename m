@@ -1,94 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4814D539778
-	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 11:03:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6F2538D95
+	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 11:16:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790075008; cv=none; b=izkkCjVbsXTk9YYNb70YEorYO1bsjnzje+PS+8E5NPK9wRES30Eh2WLDs/MO/SLWw9zcuxoChdzd5BRp1CW/fiqiZyYXRHZrFwgNrurw2eIcQ06TwsSaWojshYWeS9KbF1Oj4EBA8ysXGmC5PtTguzxRyDvw62NseKxobXJkbdQ=
+	t=1790075817; cv=none; b=oxlk64W1o8YSNe2sb4vhZ2rpkkaTErUaxcQ2FxhNtpSaEqhp1OUN2DeVfhrKCApnHpgEWXhTyow4ByD7C2dvaG/BEFMyqn8mTd2xjr7jEIHyszRM/l1x/3k+KfS4I/bTLXmSvZrB1cGyCV6HR5SYwvnV8MvQ0wquf5WpiUC+J0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790075008; c=relaxed/simple;
-	bh=AGHGlmQ2CTK7S4T59r44uJ665Z7OII1thpuwfU1M+nk=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=O3bX/LtskA76dYcbeRvqo5WYSVRlc3jOamCPVi49/4PfPH17n1Sg+bt5TjS4c0T/RRJAdPOg2JKOeBLkWRU1zawbI44pD03x6DOuNi+XQ/235BuVZ2vqBwu5fSCu5gNBVeZc1g3JlAMTbX86+I/3kObKsUqM8d3ULUHFIQcEk90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g02WpONc; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790075817; c=relaxed/simple;
+	bh=X0vNJnpNs6hOMaqFf2v45FfFc3LhXGrCSlWSamftktA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=IoPP70Y5kjqfOlHHkB8RKget7f5TCr6U3NUoMaz0uFgeD+ZBnQiJdgjeqOU57qZBFNMX3fb4MtdSuIN22gaWv+yNy1eSz5D63+vQztzFqAimftD3OzDaseqcv8p5SKkNPXxFt8xnSMZG3e8ETKo1Yzw8KUsEcc8UTHGCWtwEJ+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--snehalreddy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GAC/5TK4; arc=none smtp.client-ip=209.85.128.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--snehalreddy.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g02WpONc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA0491F000FF;
-	Tue, 22 Sep 2026 11:03:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790075006;
-	bh=u0N2S2HDxSKdRHxt7f1PIFt1Xy8P3j0sqGZeA8QvaRA=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=g02WpONcQo8hHyH1aL/OJQ51S1dRCGpHJOAXDQckJnDoSNC24+a+oY5AOnZZz5tyx
-	 eEk/2vXyh8B219E1gOCznDmPfF7YSRRWOEs6GuPQLr8/Sv/3vUjogDsZrqNmYpck7M
-	 VeKtynZIPlqUPE1DANcNo0NULYGtntCSgRuYcDIBqER6M9tgq5E3B+8Ak/XyfnaQbj
-	 vg+w8Gn1JFSykaxnSjNM3aqkGbIqS+Xp+uIcefgbpSKaN3id3gwQUnmZ3Kc0C1Iojt
-	 uplUXxOZEJXRZwxsx7ElskyB8x/mu52yHciHSCsoOhWcADDVpuUDmWC/8/G59BQUZ1
-	 LqOEeVPWZLIrA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2] KVM: selftests: arm64: Add test for cross-vCPU LPI
- disable race
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Yuchao Zhang" <ndaugoing@gmail.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260922105331.40498-1-ndaugoing@gmail.com>
-References: <20260922102959.41FFA1F000FF@smtp.kernel.org>
- <20260922105331.40498-1-ndaugoing@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Sep 2026 11:03:26 +0000
-Message-Id: <20260922110326.AA0491F000FF@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GAC/5TK4"
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-49fcd86b8d3so28424255e9.3
+        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 04:16:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790075814; x=1790680614; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=pz5XMLJlH/ksqI/ieLps3ISvdTbA9aZ9LqHyagA1F+o=;
+        b=GAC/5TK4qXtJ7F1bIGdACwSaLwKgD6NcUIncfUj/3xHDXGPoDow1h1hYLrJNgbFCdF
+         pLA1YM9/1WcfUt5ZjBRmnAEJEQVcoZu5YaRDKwBAhy8cuon/jDxTL7VrqdO1UocYFJHn
+         mF3i1U6/OkFhCBzIpq8mlhLBdJ+8UjaF/iPHBtlCo4ByS5xE+w/c4iJRhHlHO9bXoqyA
+         4q7qU04V1Y4KA3G1dq8OL/TvZ5FdoXPjlQqjensLKIY/kGiLNBxFPy1Fa6pNpB3s43Za
+         P38h0q92I+pWQH02NwelQvsKchmtzxk4mlJOpD+nAjU4s4HhXjVcoJ/Yn1BAoW/QLl/J
+         rr3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790075814; x=1790680614;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=pz5XMLJlH/ksqI/ieLps3ISvdTbA9aZ9LqHyagA1F+o=;
+        b=vZv7NEp3J/0xCdzEZq7WJee7nLP7McinYqo1hCYNiS5+r9xWYYehx+uAoDwRS3+2SF
+         ELnVYgLTHqsI5Wk//iqmjrzk0g9H9zYLWQRQehMdcxUBRx24Z/OKhNMij1yEZyrkpNbD
+         522QhdfsZAFDaGlLzJyc/Yu6ElYm5ZJNMd9hB+jzNlBN7w9kMVOQvJVbE49L04zh9xq4
+         9TBK+Wb2IdGvSUEENeV0DUT/iO8+Ve4denWBRvzAP+q3dWbY9UfvstEjPYioSKgoM/Lg
+         bItMnUjvHVlWsDJOl7OEhl7CHJSBF/7ylP7zUbkLYGnQ99Nnw/z0WstO2jvjpvTOD2hB
+         Qxpw==
+X-Forwarded-Encrypted: i=1; AKwUvBy3Gqcm1Fddz2k03Jgv5rBnbnPLm6KYh0JpHWEBNphMBaO5wah6zY9aK66nV1tqVVlm2sV92kA=@lists.linux.dev
+X-Gm-Message-State: AFuF++ki8dbxGu/X6a4Ybz0VqBrZRIzQqMvOcHpCsrq0/NTa36kcHCh5
+	9JXaUSQCv9ooPClSg7dfjvSunlLckpZtRAlBsaC/pQuBYRfNBSEiaZawZLjpkSQMnz5yjxW+BzM
+	FPdqNaJ/MHBrTfvyJS3j6iqLgwg==
+X-Received: from wmdp20.prod.google.com ([2002:a05:600c:5d4:b0:49e:8337:332])
+ (user=snehalreddy job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:3b8e:b0:49f:bc43:9e96 with SMTP id 5b1f17b1804b1-49fc57144aamr246286785e9.8.1790075813829;
+ Tue, 22 Sep 2026 04:16:53 -0700 (PDT)
+Date: Tue, 22 Sep 2026 11:16:52 +0000
+In-Reply-To: <20260921165841.93EE21F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+Mime-Version: 1.0
+References: <20260921165841.93EE21F000FF@smtp.kernel.org>
+X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
+Message-ID: <20260922111652.1024606-1-snehalreddy@google.com>
+Subject: Re: [PATCH 1/2] firmware: arm_ffa: Add FFA_FN64_MEM_RECLAIM2 function ID
+From: Snehal Koukuntla <snehalreddy@google.com>
+To: Sudeep Holla <sudeep.holla@arm.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Vincent Donnefort <vdonnefort@google.com>, Snehal Koukuntla <snehalreddy@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] selftests: kvm: missing mandatory kvm_arch_has_default_irqchip()=
- check
---
+On Mon, Sep 21, 2026 at 04:58:41PM +0000, sashiko-bot wrote:
+> [Severity: Low]
+> Does the missing 32-bit counterpart for FFA_FN64_MEM_RECLAIM2 break
+> FFA_FN_NATIVE() compatibility on 32-bit architectures?
+> 
+> Every other FFA_FN64_ prefix in the header has a 32-bit counterpart. If
+> FFA_FN_NATIVE(MEM_RECLAIM2) is ever used on a 32-bit build, it will evaluate
+> to FFA_MEM_RECLAIM2 due to the architecture-conditional logic, which does
+> not exist here, and would cause a compilation failure.
+> 
+> For 64-bit exclusive ABIs like FFA_MSG_SEND_DIRECT_REQ2, the convention
+> is to omit the FN64_ prefix entirely.
 
-commit 41b2f5071c9e0e643d02d3f1806d75461776914a
-Author: Yuchao Zhang <ndaugoing@gmail.com>
+Ack, I will rename this to FFA_MEM_RECLAIM2 in v2 to follow the existing
+convention for 64-bit-only ABIs in arm_ffa.h.
 
-KVM: selftests: arm64: Add test for cross-vCPU LPI disable race
-
-This patch adds a selftest to validate the behavior of remote LPI disabling
-while the target vCPU has in-flight or overflowing LPIs. It configures an
-ITS with multiple LPIs targeting vCPU 0, forcing its List Registers to
-overflow, while vCPU 1 repeatedly toggles GICR_CTLR.EnableLPIs on vCPU 0's
-redistributor.
-
-> diff --git a/tools/testing/selftests/kvm/arm64/vgic_lpi_disable.c b/tools=
-/testing/selftests/kvm/arm64/vgic_lpi_disable.c
-> new file mode 100644
-> index 0000000000000..d3480369d7607
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/arm64/vgic_lpi_disable.c
-[ ... ]
-> +int main(int argc, char **argv)
-> +{
-> +	int opt;
-> +
-> +	TEST_REQUIRE(kvm_supports_vgic_v3());
-
-[Severity: Medium]
-Should this code also include a check for kvm_arch_has_default_irqchip()?
-
-The KVM subsystem guidelines mandate that any selftest requiring an in-kern=
-el
-IRQ chip must call TEST_REQUIRE(kvm_arch_has_default_irqchip()). This ensur=
-es
-the test is correctly skipped on platforms without default IRQ chip support.
-
-> +
-> +	while ((opt =3D getopt(argc, argv, "i:e:h")) !=3D -1) {
-> +		switch (opt) {
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260922105331.4049=
-8-1-ndaugoing@gmail.com?part=3D1
+Thanks,
+Snehal
