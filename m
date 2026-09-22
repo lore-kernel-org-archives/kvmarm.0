@@ -1,149 +1,106 @@
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
+Received: from mail-oi2-f43.google.com (mail-oi2-f43.google.com [74.125.231.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B03576ECB
-	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 17:23:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE14577E47
+	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 17:26:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790097826; cv=none; b=ld1D03qW9fEVl+RYVCVgzdvW2lNv6N8JA5++7yqe3EOrJ4ZWAPcuPpdmkC6VLfabpN6oSnGoHnfsvHPjCaep9UuHkwo+l/9LHaIXw87pm8Ph6l1D6W5LCJRxEetxEUOK8st+zBV85ayjMOtaNUDnFjjRslIms+wvZrUJOFWJMc8=
+	t=1790098008; cv=none; b=h3dZ6hGENDTCebB1p8QBPWIjSHcMC47Z4HMVrZSDJeXzttVpTgEIiUSqL6diCkece/jEyxm/sfk2kJpwdj/1YkKVGJm1NewaRlu4TYTu8BvmvQkBkkZZKhSfLfNq19xq/909VT5Son61SSoTdDQivtkhtXDuRMjhQSBeXQGmwsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790097826; c=relaxed/simple;
-	bh=YagJ7G/Lr2bkyPLb96nex2Ieu1fELferKNmlqik77Pg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YogpRZdfb05huRCU38pSI9RwqNNKquEgzbo9jhPOJ4qJJCu8T8br3nifrhTvbzKRHCpF5PKCATxTmCqEVu8zski4WACjd3Wgjyyui03MXxfVJ1lYwR8GTwGb3T+/vHucLEakyuWFJ7YSgqwphVffU9naOzAwIwTglyqS3d/X58Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YO12W/lf; arc=none smtp.client-ip=209.85.215.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1790098008; c=relaxed/simple;
+	bh=ZsMda0uwAQyf/r755/L9LfI3ibTlAaDp5ifNzI89+Ro=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RZYYI27691CP4Z8jvW3jHlWoDbX85QObxH7m1s7ZtFc1EKs45TCphNSUkj5j9UalY1gXIjQe0EdwK2xdpVyxVy+hOy75RCDJYiOiY3e6LUOxaUDx3cTiA2oLz8sBoH6n/SPBSNAZRuRrueUZ4WyUsR88StCAf9KLcJf+RCbKL2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=TAA+MgB5; arc=none smtp.client-ip=74.125.231.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YO12W/lf"
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-cc4ac5feaa4so237743a12.1
-        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 10:23:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="TAA+MgB5"
+Received: by mail-oi2-f43.google.com with SMTP id 46e09a7af769-8137b129131so138451a34.2
+        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 10:26:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790097825; x=1790702625; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Ql6e6uyZc8xZzxZ3KoRlBfpeEOGwWkJ5hNC8a9M29d8=;
-        b=YO12W/lf8o+v7jPuduI1YveMW5vo9nQfZ8QddSNG+S1HAOeEq4V4nLh5G69TlrEbl8
-         YGdnzBCBKVrWdnmZqY6oDq9Rni9uEcbn52OSvpxXy3r97FdAitGByQGXiV/3SPdBf+gC
-         /WKQ17d+kemtuYqI35ZfC3MN+1FPlaYg9VG4PHeNxn1zvQHYW/pey+IoRrQ6egOfitiT
-         dsmDfbeVp2+Pf9BBGxVKlS9ndkQ72IlmGKZ8BNuk72KAooh69UoFNdhHHzP4dvC70krr
-         LPHv2RUEpwlhWAqnsRhw8tXcRdcsSkdySKYBTwQFfs0lryzBAehs9y4yxLCxeyFA69KU
-         kvEQ==
+        d=ziepe.ca; s=google; t=1790098005; x=1790702805; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=ZsMda0uwAQyf/r755/L9LfI3ibTlAaDp5ifNzI89+Ro=;
+        b=TAA+MgB5i3cj5yTmEWtVqFhtQ64ZDiqeHgy6UZGJ03kUNPjdmLb0ZCE7n/yjJYMM1m
+         phFG0a+ZHJO7whgI3lU5UKeyeYguMaZxJ6+L8V56K1aMGKekK6b94dM2iyGco+r0NRvC
+         1OZCOPVzFU7zeZ+CCE9lDDPooBBSiEMAJlnqKtPA4yDVWFN6Kf/QeNFjESVxVDxVWL2G
+         y2zR9vS7crazIU8I4BnupTjsUVtDkAFP5CTelWMs4y+6vdyh5kNsT0Z/o+V6l280QkJG
+         sNhTBtksjk1GKBAHXLL9e4dRx0s+qHaSfGiI7act45TzAASFOWxDDbtX9BhFADV/dsWL
+         VQwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790097825; x=1790702625;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Ql6e6uyZc8xZzxZ3KoRlBfpeEOGwWkJ5hNC8a9M29d8=;
-        b=h+JtZGMR6WiNUbM5XkFL4CVNtOeFW0MAtYXIGKWyNBUpvn67rPhLyDLBTogUtRVI2v
-         5MHAPt1C04p3raomqsjG57jTF0gOhSIOHbtBhroQjEPRStwS0lrtbdb7kRlHE4y1i37x
-         xVgEPRd5fnAtvp+YHbiW86cwfsENbhwlz+1CbiAnOl1FZgcU/032wssViPkhKGIsaZ3O
-         iw5FizAMXyoGHjeQOjjHRxHWsSz8r06wVhF1RrW6o2hHWQO+I/DZP4yJl7WgIQ+JmHpJ
-         22qc/7a4vHC5vextxYtMD2unX/XA9STb6G8tLGioIVLMybPLJ2HOq7srnTSL2WFPu2XM
-         kXMg==
-X-Forwarded-Encrypted: i=1; AKwUvBzKOnNOvahQRs1LRoifEyXId4OyKSkw7c0N3YkwS/BBYZmi0h6dGyNQ2/D0qG0AcLqArljCyuQ=@lists.linux.dev
-X-Gm-Message-State: AFuF++k+HCuIZ8786vkIh5czL5neY+DzIHdKZzJW5Up4PuMvbZ6Lj8OM
-	KNpkpOiG7oTwOKnLRUj5h4lS8JDfcubcsQhZvd7th9FAWZClCBRNxczFcQV0IRleKYyUs32WCgh
-	fg+gIEw==
-X-Received: from pgdg5.prod.google.com ([2002:a05:6a02:51c5:b0:cc5:111b:b53f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1848:b0:2dd:c100:7cb7
- with SMTP id d9443c01a7336-2df69de9aaamr563645ad.51.1790097824659; Tue, 22
- Sep 2026 10:23:44 -0700 (PDT)
-Date: Tue, 22 Sep 2026 10:23:43 -0700
-In-Reply-To: <arKxjsxuO1F5ExrY@kernel.org>
+        d=1e100.net; s=20260707; t=1790098005; x=1790702805;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ZsMda0uwAQyf/r755/L9LfI3ibTlAaDp5ifNzI89+Ro=;
+        b=uPfkjsYc8ohsvaZFov79XfQFxMwTbfja9MvVnFhsV7CNYJWI/eKa5APg0Jp9oX1GEB
+         Yl6+GSpTUZ7RJsztdWDQkrBzIDgDcvLRFpp2aarjyXrWrGTWZmPPl5bjBYm5CZoDB8uq
+         BNGHwTOdTrd1cI8MTEAVUJUO6HYM8uWmto5XD8xoozgQJOBkPxKKPEkCfnIUwPntQNzX
+         6Fjoi+94AmgxOKMoxK9c+SWTHB0t4q6+0IjnbPbzetc+LPZW473OZJU3L3ycgeyw+GA0
+         oCFIThA8QHwwwpSazgmfrHawY8YyQRvZYM2OMcIwvFBmtP1uiBHGColXCV3UQsfmbPpO
+         5tcw==
+X-Forwarded-Encrypted: i=1; AKwUvBwjwHd/cDp83oYUpydIYK5wuo/m2DqckdcJRHLVC5TDGdnjrpVqIKsStpt+GwsLe9p89d3lkl8=@lists.linux.dev
+X-Gm-Message-State: AFuF++l6zcGfiM66iEuMIMMO0QIESAvBA0rIVYFImkv4pVE+L2oQcrMq
+	PQhZFHKhsHgTtB0+tDywajPaWst6dhCAuSNjQjrcBmRjwcVvRkZu049mnHyKOWCteeE=
+X-Gm-Gg: AYBFou2GUDeoYHdmLeI/AMQG/ai8G/+oa9XKjGzw4dXSwlsFkjOU+18FQkzim/CtM6i
+	t+9IcBvh7VdaN04twCvKYBP0wKWa2zYLabyQpuAMDhls0YIeuzNKA5m5jolBZI3WgJDWKgFaixK
+	lpCKEIkmn5yEmn/QPW478BJhN7r4FexStB7JG87I9d7UvXLxLjh1PDhhs00Wgm8MN6n1GIZhcdU
+	mOrNR1YZF1Re8hqQwYdyvGTK3c+r2i8ANTPQw7z/yJTdOhFGaDl0WKbd0X9H6b0lCb6XkX40Oo8
+	KqyDQ6k2cBWcEQKsuPVol6KRUQr9OhiYOmnV6w2oatIeCx0zSbsqJZ4357vEf/zgfdYHbKSzDkv
+	0t3aedjJvStPoOxtyP/iwp4W/zgjjmVl8Gv07qg0dYQyDY8wYNmLfI0hIFEUt21oKQwg8SFreoT
+	jwJMvneZZMSt+2R3a9y0K3Ck+n4pybQP2B1Mrj2MS8m46i
+X-Received: by 2002:a05:6830:82ee:b0:7e9:e488:3bce with SMTP id 46e09a7af769-815f0071c0bmr324985a34.6.1790098005310;
+        Tue, 22 Sep 2026 10:26:45 -0700 (PDT)
+Received: from ziepe.ca ([130.41.10.202])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-81603fc79dcsm103564a34.14.2026.09.22.10.26.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Sep 2026 10:26:44 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1x93id-0000000AWlt-1Oeu;
+	Tue, 22 Sep 2026 13:51:47 -0300
+Date: Tue, 22 Sep 2026 13:51:47 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+	linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	iommu@lists.linux.dev, Andrew Morton <akpm@linux-foundation.org>,
+	christian.koenig@amd.com, Joerg Roedel <joro@8bytes.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>, Will Deacon <will@kernel.org>,
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+	linux-media@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [RFC PATCH v7 02/13] mm: Add an allocator for CoCo shared memory
+Message-ID: <20260922165147.GD1540250@ziepe.ca>
+References: <20260921144847.501151-1-aneesh.kumar@kernel.org>
+ <20260921144847.501151-3-aneesh.kumar@kernel.org>
+ <arKsFofudnTYpXj1@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260922-kvm-arm-prefault-v3-0-787bd3bc7e3f@kernel.org>
- <20260922-kvm-arm-prefault-v3-1-787bd3bc7e3f@kernel.org> <arKxjsxuO1F5ExrY@kernel.org>
-Message-ID: <arK5n9HrbZMCOHOt@google.com>
-Subject: Re: [PATCH v3 01/14] KVM: Allow architectures to disallow pre-fault
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
-	Randy Dunlap <rdunlap@infradead.org>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Jack Thomson <jackabt@amazon.com>, Jack Thomson <jackabt.amazon@gmail.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Vincent Donnefort <vdonnefort@google.com>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Leo Soares Passos <Leo.Bras@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <arKsFofudnTYpXj1@arm.com>
 
-On Tue, Sep 22, 2026, Oliver Upton wrote:
-> Hi Lorenzo,
-> 
-> On Tue, Sep 22, 2026 at 03:17:55PM +0100, Lorenzo Stoakes (ARM) wrote:
-> > +bool __weak kvm_arch_vcpu_allow_pre_fault_memory(struct kvm_vcpu *vcpu)
-> > +{
-> > +	return true;
-> > +}
-> > +
-> >  void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
-> >  {
-> >  	int nr_vcpus, start, i, idx, yielded;
-> > @@ -4365,6 +4370,9 @@ static int kvm_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
-> >  	    range->gpa + range->size <= range->gpa)
-> >  		return -EINVAL;
-> >  
-> > +	if (!kvm_arch_vcpu_allow_pre_fault_memory(vcpu))
-> > +		return -ENOEXEC;
-> > +
-> 
-> nit: it'd be better to let the arch hook return an error of its choosing
-> but in reality this is only going to be used by arm64.
+On Tue, Sep 22, 2026 at 05:25:58PM +0100, Catalin Marinas wrote:
+> Does the memset() post sharing logic work for pKVM as well? If nothing
+> clears it, we have a small window where guest data is leaked to the
+> host.
 
-Heh, except x86 already has something similar.
+Same question for RMM? Or did they define that the RMM zeros on these
+transitions?
 
-	if (!vcpu->kvm->arch.pre_fault_allowed)
-		return -EOPNOTSUPP;
-
-As does s390:
-	
-	if (kvm_is_ucontrol(vcpu->kvm))
-		return -EINVAL;
-
-I also don't like that this is subtly about avoiding vcpu_load(); it will be all
-too easy to overlook that detail in the future.
-
-Rather than have kvm_arch_vcpu_allow_pre_fault_memory(), what if we add a more
-generic kvm_is_vcpu_loadable()?  That way we don't need to worry as much about
-the return value, the connection to vcpu_load() is obvious, and we don't need to
-add another pre-check if future (or cleaned-up existing?) ioctls want to do
-vcpu_load() in common code.
-
-I'd also be tempted to say it can be a macro, not a __weak function.  E.g.
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 27fe0cd5b2d7..99613df254cf 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1533,6 +1533,7 @@ static inline bool __vcpu_has_feature(const struct kvm_arch *ka, int feature)
- #define vcpu_has_feature(v, f)	__vcpu_has_feature(&(v)->kvm->arch, (f))
- 
- #define kvm_vcpu_initialized(v) vcpu_get_flag(v, VCPU_INITIALIZED)
-+#define kvm_is_vcpu_loadable kvm_vcpu_initialized
- 
- int kvm_trng_call(struct kvm_vcpu *vcpu);
- #ifdef CONFIG_KVM
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 3dd04605f2e5..02401b080507 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1053,6 +1053,9 @@ int kvm_trylock_all_vcpus(struct kvm *kvm);
- int kvm_lock_all_vcpus(struct kvm *kvm);
- void kvm_unlock_all_vcpus(struct kvm *kvm);
- 
-+#ifndef kvm_is_vcpu_loadable
-+#define kvm_is_vcpu_loadable(v) true
-+#endif
- void vcpu_load(struct kvm_vcpu *vcpu);
- void vcpu_put(struct kvm_vcpu *vcpu);
+Jason
