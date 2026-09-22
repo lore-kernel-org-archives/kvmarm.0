@@ -1,56 +1,56 @@
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E06EF3C1D78
-	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 13:08:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A0D5476CE
+	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 13:08:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790082511; cv=none; b=WZn7mOawNiBQD4L3m5MIkJKtGRCCxI+b6vmP3DszKZgQQtkDS2kN7jmNO8SvX8vBKi6QbhQVq+dS1LYjzWXCnrVXyvfaTb9tu7fX3XxYKPvzr7Hl9onCKsRlOQ6HNj0IKpEoDXssedXIFoYk/AbUkAT6Qgam9S5MEuDV9BmX3KI=
+	t=1790082512; cv=none; b=b0doJ1lmzLlUVPMsVBdRY9rq6JFl7g7yP+CsJZE4Sy77lFqNLK3geT95Vkl6NJnEGh6kn1J3C40k7RkSbuS0DObXIjbOvB4zuDjtUOi4WsOk/q7ttiMsrUOpB3Hej8j8aprANau8dudEs+24UVzypv9X7yd78rWGa057pq7jH38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790082511; c=relaxed/simple;
-	bh=1k9aPgIrhWVz7kyI+MbaJLM88saK4NRG7GeaISzNm84=;
+	s=arc-20240116; t=1790082512; c=relaxed/simple;
+	bh=Tho010afSR5e7M2RVrV8CHpMF5HcDnKnirdqutgi/Qc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=itBQB30qLynVLyhkQmRJaaVf8I7pGyirh0alOO7uZsKeei++o250Whmx0ieOnZOaFmi7r1TIkYljbKTYvTNZk0tXyGdBpGSmVuPo0GLOfGZrWOWjQsKd9tzCrZ+K90XD29ZZuuTaPwvz/iSuYPu+KdZQ6jZ7MVmHu5N1lYDO7cA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kqUbS9+I; arc=none smtp.client-ip=209.85.128.70
+	 To:Cc:Content-Type; b=IpFgOUZAza5OUXVycrZxmBaUd7anLGLL7gNmrjP0UpmS9BRjGisdjH9qEICL1ewAnqqeu/fOh3iz3t56qaqAcN1FtDSAt9G7WiHAvpKwgJ3SrE/uDKje8MyCRj5Vp/D+3BySBw8zPcQD2KHizrwFHOXMr/eEHVSiPhnTmAVB73E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n3QjX1rW; arc=none smtp.client-ip=209.85.128.69
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kqUbS9+I"
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-49e6862e924so30298565e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 06:08:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n3QjX1rW"
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-49e661c6440so23026635e9.3
+        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 06:08:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790082508; x=1790687308; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1790082509; x=1790687309; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=NiGAzCGrKNlXiWDXOy73S85m7H6z+aGxCerVB6vGef0=;
-        b=kqUbS9+IldFnX8rhRL8uabgwkAFVLKcMTRe1RuFaGuiYoBNXCtLClJ9P5I2FyjzfHR
-         0RbjqDYoRvM8j3qPD9kvLnblr9RyvF6Jl9RlhLToLDLQZU8tnyj73YCfy/13xqgq6yn8
-         BnIO4+wEyy9w6PXW6iBELs9X+HwT4gWV070uo8tq844IbU4Cp92MDCBexlXkQujMbIrf
-         aZCxMJBexyukjB59d1e+ywgTSlyDiLm6FdAcB5/yc3lxkU0uAlSKVTwoHUwyZyM0rkDS
-         GIgUb3NsJlPOQN8MToJfoo6pHCX756Qi3ia8rex94JRIYFc9VmYMsHHEEE2N/Ltn+JHq
-         jv+g==
+        bh=oOKAAp8+OItHea6211ysyzU6E4IDtXCLElD0UjeYReI=;
+        b=n3QjX1rW135BmN580Pb+arS2fjVTgSBoLe2wJTjqK1WjaaJ0/xsPAtwZaiPdUpDfIA
+         igzXM2KvnmawCIx1UQVF0DxQYeBnsT/fyJQfEgBYWpzf4LSqdgueWzdaE21nxez5bji6
+         7G7F4rfEgzz+RNIktje5HB9b35KzLCx2FDrgaitfN47VKHUX7GkClulzmacs4aXa37P1
+         BuHh4ExWfS5Rr85J/KVPsuvkRFDUFKSl9odC8sZdlBfwxWNgFJ3EhpfvxUhQqGxo/uuc
+         0h8F5p2XMjtA+TUfoXyVfCfmjVHnf4dWsmkIlcy7pn2C38N/jx5zaZN2HGkqrMNsWPYZ
+         uPvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790082508; x=1790687308;
+        d=1e100.net; s=20260707; t=1790082509; x=1790687309;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=NiGAzCGrKNlXiWDXOy73S85m7H6z+aGxCerVB6vGef0=;
-        b=FfIQIxDuPTYAcEr5CpDLN1Da7j++wN0NAfS0gBC3GJ8KvyOBiPJ8gpI6IFdWrRJW0B
-         TAW9hkCn2uRTdJVWxjFWKWnfvtD64SxnEgwPr/LGbOaol2/RM8yHdrF7xd1Oh0UjLP+F
-         Ylx+9YM2DYCK0neuGkyC1fJ1VU5Xq7XpMuxrHOLWzIen2XuRSN8q09agnjPX3m/yy1Dc
-         Npntuuy1q5kM7zIklU/nI0+gNhT/mqlvIwZA441fjpqVlbgOqmU+24pSId11rzRxBV15
-         xQFo9HWBEtQCtzjAeIv4w3M5u1O9+FSakWgrVCOFATS+i0ZqXO6KWzanX5FJSTfzaiYi
-         f7Dg==
-X-Forwarded-Encrypted: i=1; AKwUvByKX36JihN5u/OuwrFi76PBVUSZcYaFb+MRmveu5sDRyCDaAvjKmv6ZIg6jQJI4gIyqrSRT0uo=@lists.linux.dev
-X-Gm-Message-State: AFuF++mcNV6IM2iU/DK/K9zKndZQQnAqrVVkT1shYhVRfhTvP4tep16/
-	rN5tMhPvJ0UCnB9eOfl6BDNHOMeAmY1EjdXTZ7SJjNpYG7eGiTW4YwrSA35xRGy5ZZ/e6J9zpE2
-	+4GKMjObmMSkfBdzh22F8bQ==
-X-Received: from wmoo4.prod.google.com ([2002:a05:600d:104:b0:49c:d71f:ccaa])
+        bh=oOKAAp8+OItHea6211ysyzU6E4IDtXCLElD0UjeYReI=;
+        b=FEq+eyLdV87OBOzonIVk5omQqs9WOERr0Vyyauw1/bw74XUiYiiDfqmavKNjk2ykBf
+         r1bxV7jQ/hJn2RXfAAHEv5GFKtbs6tmRoGXNMaB4VSFGCpMwy/n/GylDV6OwCgL6QtyK
+         yCwdUOyKIgCxtUKNZXekGHYwNTVYpvexyj+X1hhYbugqe6wp8HT8j67q3rA0o9y8+7K6
+         ngtPHBHJ8GAt+nVmlXMJgc3HUG/xK3uMpVmKsy8hjMAoFWE3pNnzEP740hQDKdEgz0aN
+         Blsd4d1RvFfLmUUTcbq/AswwzGCETfJrQwczVeeL1gX2TZu9S9tWsHrECEzMZrzFR3yW
+         WHoQ==
+X-Forwarded-Encrypted: i=1; AKwUvBygZTTxFG2dTVpDKLJpJhNfotho3bgPcw6NO5de82YCVjtmnRmIv5BdpSer/eeIPekSfQ2Q/uI=@lists.linux.dev
+X-Gm-Message-State: AFuF++l1ToxznH9pw9JAIf2O3h++oKbAebz+mOYA6SpK12TVLwKW7zBB
+	XYSA7wLaJ5oV/4u2m59Y1ZbqCVQb/SSYbBpS6kuCvnGgeu+9ZQwz5+3feVUEZVaMmBOSVPaBdpe
+	aBll9F1HH0DyMxnJDmudY7A==
+X-Received: from wmbf23.prod.google.com ([2002:a05:600c:5957:b0:49d:6bb2:d0f4])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:6612:b0:49f:dc8e:6211 with SMTP id 5b1f17b1804b1-49fdc8e6c34mr15259695e9.16.1790082507824;
- Tue, 22 Sep 2026 06:08:27 -0700 (PDT)
-Date: Tue, 22 Sep 2026 14:08:17 +0100
+ 2002:a05:600c:a14:b0:49d:7f5:4cdd with SMTP id 5b1f17b1804b1-49fc574be1dmr194770765e9.27.1790082509065;
+ Tue, 22 Sep 2026 06:08:29 -0700 (PDT)
+Date: Tue, 22 Sep 2026 14:08:18 +0100
 In-Reply-To: <20260922130821.1666713-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -60,8 +60,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260922130821.1666713-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
-Message-ID: <20260922130821.1666713-3-vdonnefort@google.com>
-Subject: [PATCH v1 2/6] KVM: arm64: Pass kvm_s2_fault_desc to fault_supports_stage2_huge_mapping()
+Message-ID: <20260922130821.1666713-4-vdonnefort@google.com>
+Subject: [PATCH v1 3/6] KVM: arm64: Move pkvm_mem_abort()
 From: Vincent Donnefort <vdonnefort@google.com>
 To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -71,113 +71,172 @@ Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
 	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Pass the fault descriptor to fault_supports_stage2_huge_mapping() instead
-of passing memslot and hva separately so it can access other s2fd
-members such as vcpu.
+Move pkvm_mem_abort() below kvm_s2_fault_get_vma_info() so it can
+resolve stage-2 fault VMA metadata without forward declarations.
 
 No functional change intended.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 ---
- arch/arm64/kvm/mmu.c | 39 +++++++++++++++++++--------------------
- 1 file changed, 19 insertions(+), 20 deletions(-)
+ arch/arm64/kvm/mmu.c | 138 +++++++++++++++++++++----------------------
+ 1 file changed, 69 insertions(+), 69 deletions(-)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 9ba86450fe4a..9dfaf4f277b5 100644
+index 9dfaf4f277b5..242f63066252 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1353,12 +1353,21 @@ static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
- 	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
- }
+@@ -1706,75 +1706,6 @@ struct kvm_s2_fault_vma_info {
+ 	bool		map_non_cacheable;
+ };
  
--static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
--					       unsigned long hva,
-+struct kvm_s2_fault_desc {
-+	struct kvm_vcpu		*vcpu;
-+	phys_addr_t		fault_ipa;
-+	struct kvm_s2_trans	*nested;
-+	struct kvm_memory_slot	*memslot;
-+	unsigned long		hva;
-+};
-+
-+static bool fault_supports_stage2_huge_mapping(const struct kvm_s2_fault_desc *s2fd,
- 					       unsigned long map_size)
- {
--	gpa_t gpa_start;
-+	struct kvm_memory_slot *memslot = s2fd->memslot;
-+	unsigned long hva = s2fd->hva;
- 	hva_t uaddr_start, uaddr_end;
-+	gpa_t gpa_start;
- 	size_t size;
- 
- 	/* The memslot and the VMA are guaranteed to be aligned to PAGE_SIZE */
-@@ -1427,9 +1436,9 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
-  * Returns the size of the mapping.
-  */
- static long
--transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
--			    unsigned long hva, kvm_pfn_t *pfnp, gfn_t *gfnp)
-+transparent_hugepage_adjust(const struct kvm_s2_fault_desc *s2fd, kvm_pfn_t *pfnp, gfn_t *gfnp)
- {
-+	struct kvm *kvm = s2fd->vcpu->kvm;
- 	kvm_pfn_t pfn = *pfnp;
- 	gfn_t gfn = *gfnp;
- 
-@@ -1438,8 +1447,8 @@ transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 	 * sure that the HVA and IPA are sufficiently aligned and that the
- 	 * block map is contained within the memslot.
- 	 */
--	if (fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE)) {
--		int sz = get_user_mapping_size(kvm, hva);
-+	if (fault_supports_stage2_huge_mapping(s2fd, PMD_SIZE)) {
-+		int sz = get_user_mapping_size(kvm, s2fd->hva);
- 
- 		if (sz < 0)
- 			return sz;
-@@ -1597,14 +1606,6 @@ static enum kvm_pgtable_prot adjust_nested_exec_perms(struct kvm *kvm,
- 	return prot;
- }
- 
--struct kvm_s2_fault_desc {
--	struct kvm_vcpu		*vcpu;
--	phys_addr_t		fault_ipa;
--	struct kvm_s2_trans	*nested;
--	struct kvm_memory_slot	*memslot;
--	unsigned long		hva;
--};
+-static int pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+-{
+-	unsigned int flags = FOLL_HWPOISON | FOLL_LONGTERM | FOLL_WRITE;
+-	struct kvm_vcpu *vcpu = s2fd->vcpu;
+-	struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
+-	struct mm_struct *mm = current->mm;
+-	struct kvm *kvm = vcpu->kvm;
+-	void *hyp_memcache;
+-	struct page *page;
+-	int ret;
 -
- static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
- {
- 	bool write_fault, exec_fault;
-@@ -1791,7 +1792,7 @@ static short kvm_s2_resolve_vma_size(const struct kvm_s2_fault_desc *s2fd,
- 	switch (vma_shift) {
- #ifndef __PAGETABLE_PMD_FOLDED
- 	case PUD_SHIFT:
--		if (fault_supports_stage2_huge_mapping(s2fd->memslot, s2fd->hva, PUD_SIZE))
-+		if (fault_supports_stage2_huge_mapping(s2fd, PUD_SIZE))
- 			break;
- 		fallthrough;
- #endif
-@@ -1799,7 +1800,7 @@ static short kvm_s2_resolve_vma_size(const struct kvm_s2_fault_desc *s2fd,
- 		vma_shift = PMD_SHIFT;
- 		fallthrough;
- 	case PMD_SHIFT:
--		if (fault_supports_stage2_huge_mapping(s2fd->memslot, s2fd->hva, PMD_SIZE))
-+		if (fault_supports_stage2_huge_mapping(s2fd, PMD_SIZE))
- 			break;
- 		fallthrough;
- 	case CONT_PTE_SHIFT:
-@@ -2049,9 +2050,7 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
- 		if (perm_fault_granule > PAGE_SIZE) {
- 			mapping_size = perm_fault_granule;
- 		} else {
--			mapping_size = transparent_hugepage_adjust(kvm, s2fd->memslot,
--								   s2fd->hva, &pfn,
--								   &gfn);
-+			mapping_size = transparent_hugepage_adjust(s2fd, &pfn, &gfn);
- 			if (mapping_size < 0) {
- 				ret = mapping_size;
- 				goto out_unlock;
+-	hyp_memcache = get_mmu_memcache(vcpu);
+-	ret = topup_mmu_memcache(vcpu, hyp_memcache);
+-	if (ret)
+-		return -ENOMEM;
+-
+-	ret = account_locked_vm(mm, 1, true);
+-	if (ret)
+-		return ret;
+-
+-	mmap_read_lock(mm);
+-	ret = pin_user_pages(s2fd->hva, 1, flags, &page);
+-	mmap_read_unlock(mm);
+-
+-	if (ret == -EHWPOISON) {
+-		kvm_send_hwpoison_signal(s2fd->hva, PAGE_SHIFT);
+-		ret = 0;
+-		goto dec_account;
+-	} else if (ret != 1) {
+-		ret = -EFAULT;
+-		goto dec_account;
+-	} else if (!folio_test_swapbacked(page_folio(page))) {
+-		/*
+-		 * We really can't deal with page-cache pages returned by GUP
+-		 * because (a) we may trigger writeback of a page for which we
+-		 * no longer have access and (b) page_mkclean() won't find the
+-		 * stage-2 mapping in the rmap so we can get out-of-whack with
+-		 * the filesystem when marking the page dirty during unpinning
+-		 * (see cc5095747edf ("ext4: don't BUG if someone dirty pages
+-		 * without asking ext4 first")).
+-		 *
+-		 * Ideally we'd just restrict ourselves to anonymous pages, but
+-		 * we also want to allow memfd (i.e. shmem) pages, so check for
+-		 * pages backed by swap in the knowledge that the GUP pin will
+-		 * prevent try_to_unmap() from succeeding.
+-		 */
+-		ret = -EIO;
+-		goto unpin;
+-	}
+-
+-	write_lock(&kvm->mmu_lock);
+-	ret = pkvm_pgtable_stage2_map(pgt, s2fd->fault_ipa, PAGE_SIZE,
+-				      page_to_phys(page), KVM_PGTABLE_PROT_RWX,
+-				      hyp_memcache, 0);
+-	write_unlock(&kvm->mmu_lock);
+-	if (ret) {
+-		if (ret == -EAGAIN)
+-			ret = 0;
+-		goto unpin;
+-	}
+-
+-	return 0;
+-unpin:
+-	unpin_user_pages(&page, 1);
+-dec_account:
+-	account_locked_vm(mm, 1, false);
+-	return ret;
+-}
+-
+ static short kvm_s2_resolve_vma_size(const struct kvm_s2_fault_desc *s2fd,
+ 				     struct kvm_s2_fault_vma_info *s2vi,
+ 				     struct vm_area_struct *vma)
+@@ -2235,6 +2166,75 @@ int kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
+ 	return 0;
+ }
+ 
++static int pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
++{
++	unsigned int flags = FOLL_HWPOISON | FOLL_LONGTERM | FOLL_WRITE;
++	struct kvm_vcpu *vcpu = s2fd->vcpu;
++	struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
++	struct mm_struct *mm = current->mm;
++	struct kvm *kvm = vcpu->kvm;
++	void *hyp_memcache;
++	struct page *page;
++	int ret;
++
++	hyp_memcache = get_mmu_memcache(vcpu);
++	ret = topup_mmu_memcache(vcpu, hyp_memcache);
++	if (ret)
++		return -ENOMEM;
++
++	ret = account_locked_vm(mm, 1, true);
++	if (ret)
++		return ret;
++
++	mmap_read_lock(mm);
++	ret = pin_user_pages(s2fd->hva, 1, flags, &page);
++	mmap_read_unlock(mm);
++
++	if (ret == -EHWPOISON) {
++		kvm_send_hwpoison_signal(s2fd->hva, PAGE_SHIFT);
++		ret = 0;
++		goto dec_account;
++	} else if (ret != 1) {
++		ret = -EFAULT;
++		goto dec_account;
++	} else if (!folio_test_swapbacked(page_folio(page))) {
++		/*
++		 * We really can't deal with page-cache pages returned by GUP
++		 * because (a) we may trigger writeback of a page for which we
++		 * no longer have access and (b) page_mkclean() won't find the
++		 * stage-2 mapping in the rmap so we can get out-of-whack with
++		 * the filesystem when marking the page dirty during unpinning
++		 * (see cc5095747edf ("ext4: don't BUG if someone dirty pages
++		 * without asking ext4 first")).
++		 *
++		 * Ideally we'd just restrict ourselves to anonymous pages, but
++		 * we also want to allow memfd (i.e. shmem) pages, so check for
++		 * pages backed by swap in the knowledge that the GUP pin will
++		 * prevent try_to_unmap() from succeeding.
++		 */
++		ret = -EIO;
++		goto unpin;
++	}
++
++	write_lock(&kvm->mmu_lock);
++	ret = pkvm_pgtable_stage2_map(pgt, s2fd->fault_ipa, PAGE_SIZE,
++				      page_to_phys(page), KVM_PGTABLE_PROT_RWX,
++				      hyp_memcache, 0);
++	write_unlock(&kvm->mmu_lock);
++	if (ret) {
++		if (ret == -EAGAIN)
++			ret = 0;
++		goto unpin;
++	}
++
++	return 0;
++unpin:
++	unpin_user_pages(&page, 1);
++dec_account:
++	account_locked_vm(mm, 1, false);
++	return ret;
++}
++
+ /**
+  * kvm_handle_guest_abort - handles all 2nd stage aborts
+  * @vcpu:	the VCPU pointer
 -- 
 2.55.0.1082.g2b9226bbc0-goog
 
