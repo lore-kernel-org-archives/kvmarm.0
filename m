@@ -1,73 +1,114 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE1144DA548;
-	Tue, 22 Sep 2026 22:38:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC735221CE;
+	Tue, 22 Sep 2026 22:38:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790116708; cv=none; b=YMszqht2cAOafAcXnHgHZ1qJtTSMksLULJ/uCCNoV2rCSoFYk+3UNx7fM+c3UWBzdz9VMZ2zhmwqpVKD8qU86btaPIideXD+/Trd2I+960FJAvSpjiGWMctyuhLEG0YFnJvfcwW1q1UHy/9srKLoCOj8zeZR4QltBcFLQdOPCAI=
+	t=1790116709; cv=none; b=dtPgDZ3Ehcc+ypsbyE1AdyJIGXP5/lhd4WHh0qNhWPfreQiMmj8Xah7oj1KfVd12E48Cc4M9jJQ70XxwI7Tl5+lGBKoDwQHod55IJjK5QcnfKRVaevQC+buoGcz4BFbMk3g1CZ7LiGBp9E7eWqmPfwdUgTEbwON0Qs10pXgm2PQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790116708; c=relaxed/simple;
-	bh=PNUmfXo4J0SHVv/YatpV90GEMqCEfbkZL6wCJK6i17s=;
+	s=arc-20240116; t=1790116709; c=relaxed/simple;
+	bh=7QL8zI6/wDv+GRPyt2EbimkIRRmmiJ1E+yJQG+nwMYs=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=jUGvGtCjAB7fCrW8HGNh7sNsSoaJmysJJDp/qKPi1s22y9amyOnrwlCdYVZ9YAA8bfFta/arXeRfv+xTLXfGLngNsJZF5BmDT/vMAsLbLKDFW0NXCOiGQ4QIXVm0MW0Df1pCGW1m1WBRkKpwJ5zgTk84ZuXMtZFE4YpDwsO6JiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m4vsfPyu; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=Li6D/5ptOGG/qM0sVj77QE14u3xLKBnhUeg4uPQ46iTqmJG/purMBQ4H7oM0qdr+7kT8ecYlLmyk9E+pc3yYSSnJe7c2EW+fU9QOjfZVqewIbKdQvWlPN8xb0/CkXXh59xT0CIdeidSdzpnXQJ333kQxFVVgACKsMIlVVIxqX9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fg0M/PeF; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m4vsfPyu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62FF41F008A1;
-	Tue, 22 Sep 2026 22:38:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fg0M/PeF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E4201F0089F;
+	Tue, 22 Sep 2026 22:38:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1790116691;
-	bh=PNUmfXo4J0SHVv/YatpV90GEMqCEfbkZL6wCJK6i17s=;
+	bh=bDXrAxR+KD7svLSNhKvedjEx+oYWs46xcK7EYZZGKlk=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=m4vsfPyuSLtyNsZvaSFOjxn/m3ju0lyc9rQN8kBGnfmw5NIhmP/lyZANhLZQLxW85
-	 QNGKS9cvtfjjc1JYX5PhvGeOAi+69BbPypmWdms7ic5cAhCxODy5LykagV9IrPCJdU
-	 ZTQBBr96iwMneXrAh7avRwajVkY3h9eGzRAzKApKQH4xpqfbtP32ecuAICmAI9AMwH
-	 Kf+0/MOk0GPdwSx1mSVDpBLnzat2R8rLbatTJlAkvRrfwfTTn1V/ZwnGhVG44kU1Z7
-	 aectmrGrrfvOTFHHsVrkbB0Zj4hzwu6xNbWgWd8a+wNY21q7d14nco3Bgn6dA8aZcH
-	 k0kATuYH+qmvQ==
+	b=Fg0M/PeFBIuQd98l7h0j37uHQHEerF2dJy+bUIiaGjEznB9WXojS+/nEuAht1fGPC
+	 RKE6y5eWgFCblsZpGOljpCOIttsgQUDREd+5BT5cv9s+SVWxsQMBMxdxFchPnQZaPu
+	 3MQHcpcP1vtdAiCSqPeAMhhB7bFliH1xinr/nnIFrer31I3IyY3IPqF/1Ge4l1afzI
+	 MOnOyh1BCTd3ibuoRp45a6pWAIpb0vMJpknuAphEYNWujm7A1x57GJDxLU8uKkGAVI
+	 CjsL/SDNEAxe7/Mm5VOsElPlI4AnGhi9UUl2YMIMAkebPPJYu99KUNImbynYVXFY8o
+	 Q0ctW36fqxTGw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v7 10/10] vfio: selftests: mlx5 driver - add send_msi
- support
+Subject: Re: [PATCH v7 09/10] vfio: selftests: Add mlx5 driver - data path
+ and memcpy ops
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Jason Gunthorpe" <jgg@nvidia.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, linux-rdma@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <10-v7-c6d30e8ce1e4+3dfa6-mlx5st_jgg@nvidia.com>
-References: <10-v7-c6d30e8ce1e4+3dfa6-mlx5st_jgg@nvidia.com>
+Cc: linux-rdma@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Marc
+ Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <9-v7-c6d30e8ce1e4+3dfa6-mlx5st_jgg@nvidia.com>
+References: <9-v7-c6d30e8ce1e4+3dfa6-mlx5st_jgg@nvidia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Sep 2026 22:38:11 +0000
-Message-Id: <20260922223811.62FF41F008A1@smtp.kernel.org>
+Date: Tue, 22 Sep 2026 22:38:10 +0000
+Message-Id: <20260922223810.9E4201F0089F@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-> Wire an MSI-X vector to a dedicated EQ so the mlx5 driver supports
-> send_msi().
->=20
-> Each EQ can be linked to an MSI-X vector, and the CQ can be set up
-> to deliver an event to the EQ. Thus, when everything is armed, an
-> RDMA WRITE posted to the QP generates a CQE, which generates an
-> EQE, which generates an MSI-X.
->=20
-> To keep things simple this just re-uses all the existing QPs and
-> CQs, so they generate single MSIs during memcpy.
->=20
-> send_msi() drains any accumulated MSI EQ events from prior memcpy
-> completions, posts a small signaled RDMA Write, then polls the CQ to
-> consume the resulting CQE (avoiding stale completions on subsequent
-> test cycles).
->=20
-> Assisted-by: Claude:claude-opus-4.6
-> Acked-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] hw race condition in mlx5st_poll_cq_batch due to premature CQ do=
+orbell update
+--
 
-Sashiko has reviewed this patch and found no issues. It looks great!
+commit 6b2a87450d158c064575c07067d4356a0b0950cd
+Author: Jason Gunthorpe <jgg@ziepe.ca>
+
+vfio: selftests: Add mlx5 driver - data path and memcpy ops
+
+Complete the mlx5 driver by adding CQ/QP creation, QP state
+transitions, WQE posting, CQ polling, and the
+memcpy_start/memcpy_wait callbacks.
+
+> diff --git a/tools/testing/selftests/vfio/lib/drivers/mlx5/mlx5.c b/tools=
+/testing/selftests/vfio/lib/drivers/mlx5/mlx5.c
+> index 5a87d070dc425..fff3babef5e78 100644
+> --- a/tools/testing/selftests/vfio/lib/drivers/mlx5/mlx5.c
+> +++ b/tools/testing/selftests/vfio/lib/drivers/mlx5/mlx5.c
+
+[ ... ]
+
+> +static int mlx5st_poll_cq_batch(struct mlx5st_device *dev,
+> +				unsigned int max_cqe)
+> +{
+> +	unsigned int polled =3D 0;
+> +
+> +	while (polled < max_cqe) {
+> +		unsigned int idx =3D dev->cq_ci % CQ_CQE_CNT;
+> +		struct mlx5st_cqe64 *cqe =3D &dev->cq_buf[idx];
+> +		u8 owner, opcode;
+> +
+> +		owner =3D MLX5_GET_ONCE(cqe64, cqe, owner);
+> +		if (owner !=3D ((dev->cq_ci >> LOG_CQ_SIZE) & 1))
+> +			break;
+> +
+> +		dma_rmb();
+> +
+> +		opcode =3D MLX5_GET(cqe64, cqe, opcode);
+> +
+> +		dev->cq_ci++;
+> +		WRITE_ONCE(dev->cq_dbrec.recv_counter,
+> +			   cpu_to_be32(dev->cq_ci & 0xffffff));
+> +
+> +		if (opcode =3D=3D MLX5_CQE_REQ) {
+> +			dev->sq_ci =3D
+> +				(u16)(MLX5_GET(cqe64, cqe, wqe_counter) + 1);
+
+[Severity: Medium]
+Could this sequence cause a read-after-release hardware race regression?
+
+Looking at mlx5st_poll_cq_batch(), dev->cq_ci is incremented and the CQ
+doorbell (recv_counter) is updated before extracting wqe_counter or the err=
+or
+syndrome from the CQE.
+
+Updating the doorbell record releases the CQE slot back to the device.
+If the hardware is actively pushing new completions, could it overwrite
+the CQE memory via DMA while the CPU is still extracting the necessary
+fields from it?
+
+[ ... ]
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/0-v7-c6d30e8ce1e4+3=
-dfa6-mlx5st_jgg@nvidia.com?part=3D10
-
+dfa6-mlx5st_jgg@nvidia.com?part=3D9
