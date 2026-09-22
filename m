@@ -1,138 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A3CF544D55;
-	Tue, 22 Sep 2026 13:07:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7AF9545D9A
+	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 13:08:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790082438; cv=none; b=Y1y4MG4FjBolXUUdGbYivB+lQq44QmuPLd5CWty0Y7g97JK111gAPfnnSWdH/CY5q6OvAM2F7HkRpZUz5liiVlCL97c2s+zCmW4EceL2D333NuppP88cY/5GTZue1yUuoaQ1PPymYiHck9V+jp6Jk1LSehW8vdSxbiGedv6FWRs=
+	t=1790082509; cv=none; b=S8GLmW3++s5phmH7d9xnhG+VcsEEKZhui4oLLCKJAiI7cE0egEu02U4FaNdvA3FpWFY6PHPJTUV3vV+l8Evc/HcN47WWwGdcVfbRMV0+Tu2VAQRDBghkRgfbGUqSwuDDlaeQZNmNWFS31rB7RwSRL3H7Oag583DZB4Y3Sl59Nx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790082438; c=relaxed/simple;
-	bh=9feO8jW6RAb6EQNHE4b5q7Qo8TwdCz9gi79AiYIq2tY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=HK2zDo1wfEwyUYOLJg7FpEjnk9svNTFhlfQObfIbaxTxp7KM3+8dogHcN9/K01zlI2RmUyaCzz0jvls9I7ohg6Y0v7cOe8PqugvoBUhFfJ9RaBb94IDeS38OXPeazrO1E76Qg8BkZoXD+PJchdThsLtNyO5+I1f5vwuf2HAmghg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VdlNOHdA; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790082509; c=relaxed/simple;
+	bh=DJGEjAkbqRq6VN709DgCul86Vg0kk1bVBI8TH3PU9yw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=NqKfGLXTiiORnCuitVm22dTQ5i17IH8hkzfi6WEGNuZjA/51q/pg/hI98k/ptShX8fZxy3L2nfgkkKzbph3aV4VMUITERFAIb3gAfK6xXaBAbDgQomHXX3Rp5BkxXfkdyMdjeKugDnNSOauZxWRghbtUf1W5v2ARDrOrAY23OyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c2R+f9HH; arc=none smtp.client-ip=209.85.221.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VdlNOHdA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DAA91F000FF;
-	Tue, 22 Sep 2026 13:07:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790082436;
-	bh=aHQl5p9sQAY9/zxya+ObUaa13h85sMUF9P0ssFuwzDg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=VdlNOHdACDAc7b8xtcwHdLrXhTtZt4/tmONM2O45OuWA7k2PW4mXWxpcwjlhGX88y
-	 7pr64y+yxcXtSN3h+sK4hYTZDVwzHIg55H+1w3jq5kqYDVCneoxOoWzpv4JduwXmtZ
-	 y+z5DcDaFbJ79zNbKjIlE9ac2nM2KzSwQ6Hv//SM5hKcQMZH6Q2sGrta3SjQ5z6I48
-	 O7vcq0cxQ1Tje0vwIkNYafgq/ZKpgxBKRKmMVm91o7gj8nRG63agpj3JY25N9m2PRH
-	 cNdG0i6LALMT4QJsSVsmulhpujl0s1R9YKGExxkyvs91i65ihDH+YW/zHMM9WYQuiR
-	 dXYIbA1dolPZg==
-X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Jack Thomson <jackabt@amazon.com>,
-	Jack Thomson <jackabt.amazon@gmail.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Leo Soares Passos <Leo.Bras@arm.com>
-Subject: Re: [PATCH v2 00/13] KVM: arm64: Add KVM_PRE_FAULT_MEMORY support
-In-Reply-To: <arJ1BDEzY5CANjjB@gremlin>
-References: <20260914-kvm-arm-prefault-v2-0-26fb47f74b73@kernel.org>
- <yq5abj9p38vq.fsf@kernel.org> <arJ1BDEzY5CANjjB@gremlin>
-Date: Tue, 22 Sep 2026 18:37:04 +0530
-Message-ID: <yq5a8q4t305j.fsf@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c2R+f9HH"
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-4870af30a85so640300f8f.1
+        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 06:08:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790082506; x=1790687306; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ilx8e+rSH9u6ZnDUv38L7O/GoBWQdLqlZUaHwlvmxkY=;
+        b=c2R+f9HHz41c3w/FK8AIB70eK/tebueqjy463B9Bo18NYp2lyoqUYwJmTXuATuNRbK
+         S1Lx4LxS9D7hwyZLRsfnTFUaKztBr3pLSi3OjfsSuB+lXRZX/PNN+ITrD/cfV0wur1E+
+         4781IBHu0+lNbskEBTPc5Lvg0frC+Iu9v/Av1tdyLF7xhwvPwo0/58qU+cnX4QfWtrAa
+         Nw84p2yamKn18gAXh1UDGYzDFwU8T3pn4C9SaSEG4IbCxE/I4okGXXpu6R+iVzTfl+jF
+         5RPMr9AQf438ugHfrixefEJCbDr/vzR4sk4wlHCNLtKKSR1pUD1qWcf4nTgNA5MeE8Eb
+         VBWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790082506; x=1790687306;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ilx8e+rSH9u6ZnDUv38L7O/GoBWQdLqlZUaHwlvmxkY=;
+        b=aNo4scMwk6aci1HcWzq4qfefcNl3o7o1bIFSX65xTlLGrMt73nyxCZ/1GJ3W4qY+wC
+         VzCgXLnF6Mq4YX6qr7nVOYqxBPcO5KNw2S0nEGTMczveSn6orCAxT1UetMHJlKPvijv2
+         gVhTE+tXXn817pugfx87tpzPSvw+rate9jcfjdn94Q4cmJSm6f4QWCDpKxg/Vm9m0PQ/
+         2FIRgdUPIIAPUushvcZ18KDkQYJumSBap2sku5n0oo8/KQAXl/T6UvihuA0xzc/kGX6y
+         X+3JlqYr9LyXUzQRd1wxoS4TTwJgwGK/v5enYfRTiTo8rSp9p94PCvte/9Z/lWl7sOgt
+         4XGw==
+X-Forwarded-Encrypted: i=1; AKwUvBxqyoknYXaXjju+hDu3TLR4Y46PN0nFj2ga5Q36LL1EorZYC/5wE0cI4Haczlh5YqRVYAcNx8M=@lists.linux.dev
+X-Gm-Message-State: AFuF++nMZKOV4yuangxXQ1X36ZHirTJBQHgZiPfWg5/nS4iuwBs4J6XI
+	+YrvlU2DA8dJKmPSOa60h/tUSOf3WI4EZgkyYie7GGJ9UadLJvtDTxeB4GgA9uGwG8aZ44R36HO
+	5FadHtj4VC+qXJTu4405hEw==
+X-Received: from wrwu1.prod.google.com ([2002:a5d:6ac1:0:b0:488:3cea:199f])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6000:420d:b0:484:361a:1c7b with SMTP id ffacd0b85a97d-48860f8a582mr4928028f8f.7.1790082505714;
+ Tue, 22 Sep 2026 06:08:25 -0700 (PDT)
+Date: Tue, 22 Sep 2026 14:08:15 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
+Message-ID: <20260922130821.1666713-1-vdonnefort@google.com>
+Subject: [PATCH v1 0/6] Fix guest_memfd and protected VMs on systems with
+ pages larger than 4K
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-"Lorenzo Stoakes (ARM)" <ljs@kernel.org> writes:
+This series allows booting protected VMs and guest_memfd-back VMs on
+systems with a page size larger than 4K.
 
-> On Tue, Sep 22, 2026 at 03:28:33PM +0530, Aneesh Kumar K.V wrote:
->> > This is because pKVM instantiates vCPUs upon run,
->> >
->>
->> Can pKVM instantiate the hyp vCPU during pre-faulting ?
->
-> It would be an unusual and unexpected thing to do - suddenly a pre-fault
-> operation is initialising a vCPU explicitly for pKVM.
->
-> A caller is not going to reasonably expect this and might treat a failure to
-> pre-alloc as fine to carry on whereas in fact it was a failure to initailised a
-> pKVM vCPU.
->
-> It'd also require significant changes to how pKVM is set up, right now it's
-> hardcoded to be done unconditionally at run via kvm_arch_vcpu_run_pid_change()
-> -> pkvm_create_hyp_vcpu(), so all that would have to change and be checked and
-> tested and... that'd be really out of scope I think :)
->
-> And pre-faulting really makes most sense BEFORE you run a VM. It doesn't make so
-> much sense mid-run.
->
-> But more fundamentally, the stage 2 page tables, as I understand it, are owned
-> by pKVM and so aren't really available to be pre-faulted.
->
-> Maybe unprotected-under-pKVM VMs but then it's questionable as to how useful
-> that would be given that it would be confusing to users vs. how it works for
-> other VMs.
->
-> So in general, no I don't think it's a good idea.
->
-> And even if we wanted to pursue some version of this, it's _definitely_ out
-> of scope for the initial pre-faulting bring-up series.
->
->>
->>
->> > but pre-faulting is  typically performed before a vCPU is run.  It would be confusing and
->> > inconsistent to error out on non-running vCPUs but to pre-fault running
->> > ones.
->>
->>
->> I use KVM pre-faulting when transitioning pages from shared to private
->
-> You mean you'd prefer to use? Or you are using it on another arch?
->
->> with CoCo guest. This ensures that a trusted device can DMA to private
->> memory before the guest accesses it.
->
-> Hm what do you mean by private memory?
->
-> I see:
->
-> #ifndef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
-> {
-> 	return false;
-> }
-> #endif
->
-> And only x86 selects KVM_GENERIC_MEMORY_ATTRIBUTES?
->
-> Do you mean something else?
->
+Currently, the fault handling assumes 4K alignment, as HPFAR_EL2
+provides the IPA minus the bottom 12 bits regardless of the system page
+size. This leads to mapping failures on 16K and 64K systems.
 
-I am using this with ARM CCA-DA, based on the patch series from Jack Thomson <jackabt.amazon@gmail.com>.
+This series addresses the alignment mismatch by relying on struct
+kvm_s2_fault_vma_info in both gmem_abort() and pkvm_mem_abort() to
+retrieve correctly page-aligned addresses.
 
-https://gitlab.arm.com/linux-arm/kvmtool-cca/-/commit/80e7aad61c5639de2f0cb4a5525dad0c96156428
+This series bundles the following previously discussed fixes:
 
-We do this while the VM is running.
+ 1. https://lore.kernel.org/all/20260915091606.2111217-1-vdonnefort@google.com
+ 2. https://lore.kernel.org/all/20260915084438.2076072-1-vdonnefort@google.com
 
--aneesh
+Fuad Tabba (2):
+  KVM: arm64: Move gmem_abort()
+  KVM: arm64: Use kvm_s2_fault_vma_info in gmem_abort()
+
+Vincent Donnefort (4):
+  KVM: arm64: Fix MMFR0 TGRAN advertisement for pVMs
+  KVM: arm64: Pass kvm_s2_fault_desc to
+    fault_supports_stage2_huge_mapping()
+  KVM: arm64: Move pkvm_mem_abort()
+  KVM: arm64: Use kvm_s2_fault_vma_info in pkvm_mem_abort()
+
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c |   3 +
+ arch/arm64/kvm/mmu.c               | 357 +++++++++++++++--------------
+ arch/arm64/kvm/pkvm.c              |   3 +
+ 3 files changed, 186 insertions(+), 177 deletions(-)
+
+
+base-commit: 93f51579e7df248780214094418f205253383cc5
+-- 
+2.55.0.1082.g2b9226bbc0-goog
+
