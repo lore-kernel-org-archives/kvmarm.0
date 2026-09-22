@@ -1,165 +1,74 @@
-Received: from mail-ej2-f12.google.com (mail-ej2-f12.google.com [74.125.228.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E9D53A3A3
-	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 11:25:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.140
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790076308; cv=pass; b=by7/HTRHPzXQ/iMm0M6oSDubqtTyIdxhzk0MKiJDGdj7W9ibGyEa37UDDM15ETMIhapWtdl/qHNkuNgf+CeQobII4GyCqQLHPpNWWqZmXuKlhgbL8U44XVXh+bpOph9dkxF9RFjmNUmcMR3QwpnrJj+YZrUc3SYiHmY6YtOETGI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790076308; c=relaxed/simple;
-	bh=EmhzqAZw/qsy9hPwoqGI05KwTWaUgfqEurYCk0QECGg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qK9Jfx0e6Ud7xw3BumVaD13Sn/Fw82RZws7kTzP6pi/0PAmkOAWnnMfY569s5mk/ZlQf55ImMzfW3InsV2zU0YIyGj2mNTpRnHQ8pibw7SSH4EXrkBwcBHhoKdVQwNiae+95k/6aJG8UIcmqFMmcXifoxTP8J/MbNpFDkywA7xc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FeSsiBKl; arc=pass smtp.client-ip=74.125.228.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B2841A918;
+	Tue, 22 Sep 2026 12:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790079354; cv=none; b=poXj7JM2QJL+daPyhLpL/nnx8CiDXChT7tW+6UroXQtXIEdJUUIb+Y8ROfGiw4ZzMhlNmss9Fn7pLZ1V971JlImBuEKerl19IpBrvfUZ34if0AuXcjrT80d7XHy16pQkj0HSIKBNmF6Ar1VrC84m0wOqEZ9TVbddctI1hUE4xzw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790079354; c=relaxed/simple;
+	bh=VPNUyX3TZtl3siFsSmkMbcAFhvr7f98/I/jvNA3v3bI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pARENrB0yPho4qu3a0ZpRLqw7zycB62rvoomACmNUJ/ZD6jnagFH9XK16+6rlzIbyCS8dhtkp4z4ZVD0oSihhpYbi0wXZpD8uk1ysIfT9Lxdez/HXsRb2YqiLBd0qY1qd+s9FL8m5zKt4P6nnI49LrL1RIUpZwsYuW9whqVFju8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fj4Nz8fB; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FeSsiBKl"
-Received: by mail-ej2-f12.google.com with SMTP id a640c23a62f3a-c254f9f7db0so485982266b.3
-        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 04:25:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790076299; cv=none;
-        d=google.com; s=arc-20260327;
-        b=p84Opjmi1RptywX1u500VahcQtsTaO+W7Y+/Q7RfQlMZrRG9Ce6U5/mdLHKYhlXZcv
-         82Zl6SmmsBlQL0WGUfuZna8EFv5Bx5aOM7KwVNnzzZAabHuyYwXcBEqUscEn/nQS83yE
-         az4GHajQCFVWi2u4SrscjiX+A2aUlp84lKev8ZW7yPiHo7hbxNur0wPZu1VyCkm1z83L
-         rXQNHxxYXFY2lAfsyCrsviXQshKfT7sgKCXOm5n/B3jemCt1AZDIQJgyfkVMRG2eGysL
-         ZK0z6stU45Ir1zxMFkQVqrNerbtfYQxQJ8ew1DINcnhEFYbwymlqIDY0AeATgOMrDwim
-         VDJw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=fzm1mrvF9kERqoNz+AruuNv230gzZVpxKexqbqU/OgM=;
-        fh=HhTV4G5+xnJ3thQDc6cpcOYMN3AitX7qB0zPfKB89LY=;
-        b=OO8L9GBXXk8UBXkKq5mP9b6Nn/PqwmhR+I1jkqwiDhav2RDgOyvqquLZ8DUxYSb49S
-         /G7RnVTy+iM8eWDcVM1+7C9Vou10WFBXWHSYcSv8FjlDnJLegDEBNMZvIHDsrS5KJMxd
-         bdbLVpC5Yr3p/pclClGHC1RiivlQ2UuPac1sKld5LMie7Be2HQCSLXpdyjy7WpLAgMNp
-         9TXfNGdFEG8QYdZYO0u70nU9bXFP0fOXaJ5TEUUA5J5WVNUjLyu0Wa6fCnT0+wMRU1jS
-         v6Bv1qldNbkWqJnJobIIufaBDHmeudrLsvMpJCDrLS9WyJHpB/A2TMrc/uHSPM6xAGvR
-         QKJw==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790076299; x=1790681099; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=fzm1mrvF9kERqoNz+AruuNv230gzZVpxKexqbqU/OgM=;
-        b=FeSsiBKlYvaDWTvVDpoGaYAPORQOFnrBXA9PUvEMX+YjvKY9W7vTWq1EIKO7wAj5wM
-         YROm0T9R7dJ2vRqTnXoBH6oMwZhhYQB+U7TLyLEit77qIsXlgrMTuzqdTlzn90rI+Qob
-         XsX9f7jAO1kktntBmbtxurjxTI1QfO3Nx2oezxlgwdUYxv216aUnwnIBQ2+O2NHBofBH
-         0vwMrbIn29Dys4EN7Z7VTbMxzLD5M5xYqrKcNAW6R0K3BmdX9ixVugF8BQwl9JVci4kf
-         MtcSBa3x6fNdIPXhkkAACdZmQHTdBP2WTNiyszr35UVZASHAljgnEkG0zDB+zOGfHmT6
-         oIpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790076299; x=1790681099;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=fzm1mrvF9kERqoNz+AruuNv230gzZVpxKexqbqU/OgM=;
-        b=AmXtTmmyR6WntxMldLKElor9gGSpD6AYHiCuRMs+J3zpd31NdwtBO79sisERmwshdx
-         EyPf1+l9t9uRfEEC4Rh22nmpxV0j6urIpvJLqzvs5etQKCXH1sthLHGzKa2UOVFI8M+z
-         ksNiMO3zYhSaG15tIPSQaeO55JguTzeiLrBYMz20ZF5ZBWQrG/7CVhXTKXf5DCZiHDfK
-         b/iUlh3ptG3wKydmxGFUHpwj0JBeXBpsk5vxRpthVoTHBJP7l2l3bQxJ/vCaOHqHavxQ
-         AA4QJXhZgGS6QCSj9Yf2qwppPLyAD9tcJF2LrWN71Ok8DPLlcWgBT0c4qMNWMGPp21zS
-         L9jA==
-X-Gm-Message-State: AFuF++mcBXzVR9stSxHUkxIvcDsgV4wtabWZ5ztz0SpP1IK1VEpQqOiy
-	nJdim4lvTZoZvAoDWPs/5GDAlOkE2Fjfi3s/kLO4NjSl7zSBCNWGR0MYOJ77rAzSc+h3vMKfK4o
-	PncsTW+1L/H2z+aYcvEzpYhwzj5kdRIU=
-X-Gm-Gg: AYBFou2vmbU6UhnJrXLhO6wnUZ4V2DQu288SQlr8Y1o1EAnqUND7ytlgfrSOlleqPvk
-	6i1l3gOXBw+wkUBAoUznbJam391WNd0LkSFe1gR3/MC6S8J+LRMq80na6pdRIQj5l9CulKAtvpe
-	d0e98MQSeSjKHYBoD8jmLs88JzhYMgM3oXPQXlc2Sq6BIK4Gq3wN1Pzg01enVwFgz6VdtnfgGxa
-	IIRDmi/Yof3qg6397fLsfy3EApJDe3uc8Uf8GtRPKj3qt1B44swPjGBpKWjWO7ah6nIzPMvw89u
-	v2J2VHJKwiIls8Vh2eEkx9QEa+0U53VXPD/+CsRxTrdxTEEbEsSsf/g=
-X-Received: by 2002:a17:906:4fc9:b0:c29:4b79:e41a with SMTP id
- a640c23a62f3a-c2a157097c1mr1120236066b.20.1790076298901; Tue, 22 Sep 2026
- 04:24:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fj4Nz8fB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A9C51F00893;
+	Tue, 22 Sep 2026 12:15:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790079352;
+	bh=JIYSRvzS+lTZK1y1XxDKW9rrYSsqjNnfXKv1cTCBldM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=fj4Nz8fBrlIMtPAwuvyzWYgk2LXF8Lpt0kYzJikISSS2f0gxq5cu91MkPgMyWhjmi
+	 TYz4m2gkgQqLrmbKjfBYcSmLKtH9wodN2/Y73RJQFK/57b5LQAdtG2hb2KfS+yWqCf
+	 uNGH+Od6166rVnHDSiH0YgzkLIKrgic57G4b6NwkebXfJEq90QcRbBTIoiN+jCNjab
+	 YExQKEHAAB7yOuSq+JSzzcGGcPv8ESaG5JOBvLB4k0H0oXfFsb46GRQRjewGO8R2SG
+	 3PR5daWjK6PZ94j72UK/IRJGiA/l4632P8gg4blm110z9uU7grk6wVndtuhCAc7xSE
+	 9eHOmJN2e4u4g==
+Date: Tue, 22 Sep 2026 13:15:48 +0100
+From: Sudeep Holla <sudeep.holla@kernel.org>
+To: Snehal Koukuntla <snehalreddy@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Mostafa Saleh <smostafa@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] firmware: arm_ffa: Add FFA_FN64_MEM_RECLAIM2
+ function ID
+Message-ID: <20260922-chubby-cicada-of-exercise-bbb429@sudeepholla>
+References: <20260921164748.2958578-1-snehalreddy@google.com>
+ <20260921164748.2958578-2-snehalreddy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260922102959.41FFA1F000FF@smtp.kernel.org> <20260922105331.40498-1-ndaugoing@gmail.com>
- <20260922110326.AA0491F000FF@smtp.kernel.org>
-In-Reply-To: <20260922110326.AA0491F000FF@smtp.kernel.org>
-From: Yuchao Zhang <ndaugoing@gmail.com>
-Date: Tue, 22 Sep 2026 19:24:46 +0800
-X-Gm-Features: AcwNN1V-zFTo6izci1n096lh7CG88Kkqv-Mn4cwhqLSFmEQdDbqY8YXhQayNhi8
-Message-ID: <CAC2BP3L1ATH2xS7Rp3RwqAjpd6ffSiavfNgxxQTruO1m2eMT5A@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: selftests: arm64: Add test for cross-vCPU LPI
- disable race
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260921164748.2958578-2-snehalreddy@google.com>
 
-Thanks for the review.
+On Mon, Sep 21, 2026 at 04:47:47PM +0000, Snehal Koukuntla wrote:
+> FF-A v1.3 ALP5 (DEN0140 rev J) introduces the optional FFA_MEM_RECLAIM2
+> (0xC4000091) ABI, which enables an Owner to reclaim exclusive access to
+> a subset of pages of a memory region without requiring the Relayer to
+> maintain intermediate transaction state.
+> 
+> Add the FFA_FN64_MEM_RECLAIM2 function ID definition to arm_ffa.h.
+> 
 
-The test already gates on TEST_REQUIRE(kvm_supports_vgic_v3()), which
-is the check used by every vgic test in arm64/ (e.g. vgic_lpi_stress.c,
-vgic_irq.c, arch_timer.c).
+Since the spec is still at ALPHA, I suggest to add RFC in the subject
+if you post newer version so that it is *NOT* considered for merging
+until spec reaches *BETA*.
 
-On arm64, kvm_arch_has_default_irqchip() is request_vgic &&
-kvm_supports_vgic_v3(), and the VM here is created with
-vm_create_with_vcpus(), so request_vgic is set and the two checks
-are equivalent. The arch-neutral helper is for the top-level
-cross-arch tests; no change needed.
-
-Thanks,
-Yuchao
-
-<sashiko-bot@kernel.org> =E4=BA=8E2026=E5=B9=B49=E6=9C=8822=E6=97=A5=E5=91=
-=A8=E4=BA=8C 19:03=E5=86=99=E9=81=93=EF=BC=9A
->
-> Thank you for your contribution! Sashiko AI review found 1 potential issu=
-e(s) to consider:
-> - [Medium] selftests: kvm: missing mandatory kvm_arch_has_default_irqchip=
-() check
-> --
->
-> commit 41b2f5071c9e0e643d02d3f1806d75461776914a
-> Author: Yuchao Zhang <ndaugoing@gmail.com>
->
-> KVM: selftests: arm64: Add test for cross-vCPU LPI disable race
->
-> This patch adds a selftest to validate the behavior of remote LPI disabli=
-ng
-> while the target vCPU has in-flight or overflowing LPIs. It configures an
-> ITS with multiple LPIs targeting vCPU 0, forcing its List Registers to
-> overflow, while vCPU 1 repeatedly toggles GICR_CTLR.EnableLPIs on vCPU 0'=
-s
-> redistributor.
->
-> > diff --git a/tools/testing/selftests/kvm/arm64/vgic_lpi_disable.c b/too=
-ls/testing/selftests/kvm/arm64/vgic_lpi_disable.c
-> > new file mode 100644
-> > index 0000000000000..d3480369d7607
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/kvm/arm64/vgic_lpi_disable.c
-> [ ... ]
-> > +int main(int argc, char **argv)
-> > +{
-> > +     int opt;
-> > +
-> > +     TEST_REQUIRE(kvm_supports_vgic_v3());
->
-> [Severity: Medium]
-> Should this code also include a check for kvm_arch_has_default_irqchip()?
->
-> The KVM subsystem guidelines mandate that any selftest requiring an in-ke=
-rnel
-> IRQ chip must call TEST_REQUIRE(kvm_arch_has_default_irqchip()). This ens=
-ures
-> the test is correctly skipped on platforms without default IRQ chip suppo=
-rt.
->
-> > +
-> > +     while ((opt =3D getopt(argc, argv, "i:e:h")) !=3D -1) {
-> > +             switch (opt) {
->
-> --
-> Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260922105331.40=
-498-1-ndaugoing@gmail.com?part=3D1
+-- 
+Regards,
+Sudeep
