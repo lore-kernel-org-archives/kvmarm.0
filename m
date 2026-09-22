@@ -1,160 +1,215 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C391354B1CC;
-	Tue, 22 Sep 2026 14:49:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2133E53D0B1
+	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 15:13:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790088569; cv=none; b=m9yQio+150qFiTCOdNW10Y44Zfe8aybNnFlhiQxolj73pi/Wi4V7CxtgqSHXNHmLheisLIF+gATHoaLTNuyTjvm2xhvySQ572KysLL1HG/QFjvnft08asrfuT6MgkRtE5b0Vo2sNx4Ojef4+V0NbgsVwLVzdtBFIjmnTCEksB6Q=
+	t=1790089989; cv=none; b=FJIrsxNVlemy8q4KhwY95ZmUHzJtD7hfBP1n6/qaNL0C/o7Wo/FFKCIeNaw1kKH2isd1VYspUP6TTUt05M4DL1XdfHFnLBQ04JqK3lVgUkUrLIPw8J5UE0k9rsJ6OHu6k15En1BQ/bWNO+3dN4X98/Z+qNwzbafihGgNJ5YwsMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790088569; c=relaxed/simple;
-	bh=3ADT03e+3kuTvq3FfT1tH4j9tCOVnK8BWBH0nxFQfxg=;
+	s=arc-20240116; t=1790089989; c=relaxed/simple;
+	bh=BYdjDLssy8JKv6FM/v/3nDxGoG02feMVhVR5WwpnGqo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ETeml5e0o/cpqC0SGBl0/fhMmvE+ZHtp45I6gkEvr2OBfsSZrgtvmv/pvnWS34GqWAK7Y+aoNm4JZt5BhRnKizCk1j3b9tpey4Agtn7iS1YIGefVjVdxWqv7rw4d4uNFwP6Qmj23JCuR2HGcp3ca5fJ0szRVVDj4hpMZZzvd4PI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=XwZBF6rW; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=bz65ADZ56Z+FyjcnviwkykexrSeSSjTl2zV5vadJhY8FsU3LLTz2XFkxilvRXddTBhuXZLjZ5wLUCKb28gBPSmoXujciKEHFCIr1JscULjbBmsoQEXuDu2bZZxXCnHM5GcODIr8sjwKa8h00GwC5hxa/p7kynfXVQVSfU9jFfK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bjJFsP4G; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="XwZBF6rW"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A69931576;
-	Tue, 22 Sep 2026 07:49:23 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 95C323F632;
-	Tue, 22 Sep 2026 07:49:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790088567; bh=3ADT03e+3kuTvq3FfT1tH4j9tCOVnK8BWBH0nxFQfxg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XwZBF6rWwzr6nDBg1vFdoiS7Bi2BwNNA+cdlH8IlqYlWxR9hZHb9XOn4BDemjc51L
-	 G+vRlUhQAygN5p69nlZMm8zPr+jmPxRQALLypxDglVnA7UpaVLAxuLjs/Gfv1kLiDB
-	 R5NPr7Gb3xNo9tUx0vL0IHRZlFSpPisAWlx8zHRs=
-Date: Tue, 22 Sep 2026 15:49:22 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
-	will@kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
-	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
-	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
-Subject: Re: [PATCH v18] arm64: mm: Handle Granule Protection Faults (GPFs)
-Message-ID: <arKVcjCOJf8p9rWL@arm.com>
-References: <20260913070459.2547407-1-suzuki.poulose@arm.com>
- <aqrGPK0lFBFXL2qY@arm.com>
- <985520fa-99b0-4620-bfee-8e6321b36104@arm.com>
- <aqvCwM_73qMpqzvV@arm.com>
- <749ab0c9-810d-4989-8fa5-1706124f05bc@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bjJFsP4G"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-49ccf12bed0so51545e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 08:13:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790089984; x=1790694784; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ycaWp9SoS5hGz6SolD0/sJBzyQ5A16vDCKKDe4NgaW8=;
+        b=bjJFsP4GTgbWlBulSEBf28nbfc5dQjMqcZaXuSYH1oQj7n3YmpoGzUuwMuL6Rab0hP
+         /RKLamWatRGjFKlUCIegib5bzzWukpCdWcfizCUaXmeSTkWs0hIpxW4WOc0xOYX5ayra
+         FVTHbrQj8xRpdF0cTMKk8okg6KSe5RmTwBnJkWtMXfY1zwrJ3se98uBCA+80oKtkrcpz
+         xXBRDK2xKmTVpZvx9NsG5D3EuzBKpl8F+hSk1c4wi864m+wiGUP0fNlxhO3VzSaco3hU
+         aX7GcORDsVy15gAECWDQ77GToOi6qzIr2osjc18+hdoWLCMCjpoL/RnZB4FpbGgMflrS
+         YlKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790089984; x=1790694784;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=ycaWp9SoS5hGz6SolD0/sJBzyQ5A16vDCKKDe4NgaW8=;
+        b=CFuwHFDGSVly/N6Q9hRL8NN7j8LDN6hLNrZFiWTx4T7j8DTuZq7nuyI5shBMPxS1Qg
+         f9JjaaO2h4fJ/IrcsGb6pajD52vQOxKZd6klfzt2yLpgv0kOMpDHTLPM2ynYk0XfNXIC
+         kMNmEQCPTzuCzHy3ATUvSRKBQzfpbELL59SuFSZWuUVhaA3ZTrsDoFtLqpVAN/1fH3q3
+         RCRyTSS69dgY+V5UKSZMkziOgV0+pngq9Gt1gWJ0Qfc0TyqNBoI3Nw81nh+eI34MCWKi
+         wD06aJmmTKiguYkW8nrjJomBvNV7FVe+fEQFp0hFzmHMTyTS1cWicbzPmLKDgE2fIpoQ
+         Vjxg==
+X-Forwarded-Encrypted: i=1; AKwUvBwdVNXPrv9xdm22Njim7Lu7wSSarleH7vQdhoFmvwYIzhLbZvzYl+hJ+hXHM3oTMRfH5/crY30=@lists.linux.dev
+X-Gm-Message-State: AFuF++kiiT2bOux6VlyAzAefFGHc/z+o1+ny+Pa4NCZAHEIDWuvnMjIj
+	V+HIi1jz7v4ewfeEgxuvL1mBBgDqutv8Lmv9j9a798sKdwCpj8NYFCvlQg8IYJkEkZ5gfjJ0nvP
+	xEKARtg==
+X-Gm-Gg: AYBFou1vcqymkHM9Z1x4UL4HtIyk1FDYme0SrOZYKmKHXFnBH7vRdw15WIYZyAPBo+n
+	cDagehMQZ11jTBvAU26OL96S2Ff93d+mcWDI8CHRNvfqnImUjVYCoXne0ED5bAelFYBkFm7NWjE
+	HZvIT0psNWMP2ACr8aRlxD17KEblE+OmUBq5t7ZrdEyU8susXuMy+oy9m+uqM8OEt1TVTv6CwMk
+	6Pk2AH8cBd4reqmhPX4KXiRxrwzA601cIIKFXDdF/VFn9GPwk6rWhWUnVQDFRU1ATohR4XsX1+r
+	i+axFC1ybQUqEXGfTURB4f28GUHSW0anLGUVluUbEj0aSvuOHhnsL0tnFU9goSG9CvK3XLWlKcC
+	yaI8ecZ6qeWE7szPo5LUoxbIUGnIOHtH5QzFeGag1KvfpXEW8KOd2qh+n3Z+rKUI3Lh193FLifQ
+	NOsojMi0uYyJCtgBV5b5a4Pyx0eHrgvNYLr4+su/hhUsyAMp415UoDib1RVAWdT3NGCQWB7Z/Gk
+	6cy0k390eOK5AogvQzzUvgRqKRd1AV2SmdTcjmDYw==
+X-Received: by 2002:a05:600c:6005:b0:49e:642a:9279 with SMTP id 5b1f17b1804b1-49fdd97d911mr116335e9.4.1790089983699;
+        Tue, 22 Sep 2026 08:13:03 -0700 (PDT)
+Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fddfdce15sm1497315e9.10.2026.09.22.08.13.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Sep 2026 08:13:03 -0700 (PDT)
+Date: Tue, 22 Sep 2026 15:12:59 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: sashiko-reviews@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v8 11/25] iommu/arm-smmu-v3-kvm: Add the kernel driver
+Message-ID: <arKa-8QbSSQFrUbJ@google.com>
+References: <20260922131259.2975334-1-smostafa@google.com>
+ <20260922131259.2975334-12-smostafa@google.com>
+ <20260922132814.D398D1F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <749ab0c9-810d-4989-8fa5-1706124f05bc@arm.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260922132814.D398D1F000FF@smtp.kernel.org>
 
-On Tue, Sep 22, 2026 at 02:21:13PM +0100, Suzuki K Poulose wrote:
-> I had another look and we could handle this via kvm_fault_is_gmem_abort()
-> see in arch/arm64/kvm/mmu.c:
+On Tue, Sep 22, 2026 at 01:28:14PM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
+> - [Critical] iommu: pKVM DMA isolation bypass via unbound SMMUs falling back to host driver
+> - [High] iommu: Use-after-free of smmu during platform_device removal
+> --
 > 
+> commit a8ae8dbe858fbefdcb8b149d519f07175f91d794
+> Author: Mostafa Saleh <smostafa@google.com>
 > 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 87e49251e0447..af5a4bf961aae 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1731,6 +1731,9 @@ static int gmem_abort(const struct kvm_s2_fault_desc
-> *s2fd)
->         gfn_t gfn;
->         int ret;
+> iommu/arm-smmu-v3-kvm: Add the kernel driver
 > 
-> +       if (!kvm_slot_has_gmem(s2fd->memslot))
-> +               return -EINVAL;
+> This commit introduces the pKVM host driver for the Arm SMMUv3, allowing
+> the hypervisor to trap and emulate SMMU management when KVM runs in
+> protected mode. The driver probes these SMMUs and creates auxiliary
+> devices for them on the aux bus.
+> 
+> > diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
+> > new file mode 100644
+> > index 0000000000000..9947d3a44304b
+> > --- /dev/null
+> > +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
+> [ ... ]
+> > +static int smmuv3_nesting_probe(struct platform_device *pdev)
+> > +{
+> > +	struct hyp_arm_smmu_v3_device *smmu = &kvm_arm_smmu_array[kvm_arm_smmu_cur];
+> > +	struct device *dev = &pdev->dev;
+> > +	struct resource *res;
+> > +
+> > +	/* Only device tree, ACPI not supported. */
+> > +	if (!dev->of_node)
+> > +		return -EINVAL;
+> 
+> [Severity: Critical]
+> Can an adversary bypass pKVM stage-2 memory protections here?
+> 
+> If an SMMU fails to bind to the hypervisor due to early returns in this
+> probe function (like missing a device tree node or hitting the cavium
+> erratum below), it is excluded from kvm_arm_smmu_array and the hypervisor
+> does not trap its MMIO.
+> 
+> When the native host arm_smmu_driver registers at device_initcall, it can
+> successfully bind to this unbound SMMU. Does this allow an adversary host
+> kernel at EL1 to natively program this untrapped SMMU to perform arbitrary
+> DMA into hypervisor or guest memory?
 
-I wonder whether we should add a KVM_BUG_ON() here. With the rest of the
-changes, we should never get in this situation. Well, to be revisited
-for private devices.
+Yes, nothing really we can do about this, the system might have:
+- Incompatible SMMUv3 instance.
+- Device behind another IOMMUs.
+- Devices without IOMMUs.
 
-Also maybe move it to the caller, kvm_vm_mem_abort(), and not change
-kvm_fault_is_gmem_abort(). Something like:
+A system shipping this code should ensure that the driver is probed
+successfully on their HW.
 
-	if (private_ipa_fault(kvm, s2fd->fault_ipa) &&
-	    KVM_BUG_ON(!kvm_slot_has_gmem(s2fd->memslot), kvm))
-		return -EIO;
-
-To me it makes more sense for gmem_abort() to be called only *if* it's a
-gmem slot. So any inconsistency, avoiding user_mem_abort() for private
-memory, should be done in the caller. I assume the caller will also have
-to route the private device path as well rather than rely on
-gmem_abort().
-
-> +
->         if (!perm_fault) {
->                 memcache = get_mmu_memcache(vcpu);
->                 ret = topup_mmu_memcache(vcpu, memcache);
-> @@ -2277,10 +2280,12 @@ static bool private_ipa_fault(struct kvm *kvm,
-> phys_addr_t fault_ipa);
->  static bool kvm_fault_is_gmem_abort(struct kvm *kvm,
->                                     const struct kvm_s2_fault_desc *s2fd)
->  {
-> -       if (!kvm_slot_has_gmem(s2fd->memslot))
-> -               return false;
->         if (kvm_memslot_is_gmem_only(s2fd->memslot))
->                 return true;
-> +       /*
-> +        * For Realms, all private faults must be backed by GMEM.
-> +        * TODO: Handle Trusted device private memory mappings.
-> +        */
->         if (private_ipa_fault(kvm, s2fd->fault_ipa))
->                 return true;
->         return false;
 > 
+> > +
+> > +	if (kvm_arm_smmu_cur >= kvm_arm_smmu_count)
+> > +		return -ENOSPC;
+> > +
+> > +	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+> > +	if (!res)
+> > +		return -ENODEV;
+> > +
+> > +	if (of_property_read_bool(dev->of_node, "cavium,cn9900-broken-page1-regspace"))
+> > +		return -EINVAL;
+> [ ... ]
+> > diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> > index 2043c6dc1bdf8..d6d1e2d30ef63 100644
+> > --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> > +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> [ ... ]
+> > +static int arm_smmu_device_probe_emu(struct auxiliary_device *auxdev,
+> > +				     const struct auxiliary_device_id *id)
+> > +{
+> > +	struct device *parent = auxdev->dev.parent;
+> > +	void *group;
+> > +	int ret;
+> > +
+> > +	dev_info(&auxdev->dev, "Probing from %s\n", dev_name(parent));
+> > +	group = devres_open_group(parent, NULL, GFP_KERNEL);
+> > +	if (!group)
+> > +		return -ENOMEM;
+> > +
+> > +	ret = arm_smmu_device_probe(to_platform_device(parent));
 > 
-> Also, I have the following hunk for preventing memslot modifications.
-> I will add this to v20 integration branch, which is almost ready ;-)
+> [Severity: High]
+> Can this devres setup lead to a use-after-free during platform device
+> removal?
 > 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 582b48e34486b..87e49251e0447 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -2783,6 +2783,18 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
->         }
->  }
+> If the parent physical platform device is destroyed (for example, via
+> dynamic DT overlay removal), the driver core calls devres_release_all()
+> which processes cleanups in reverse order of addition (LIFO).
 > 
-> +static bool kvm_prevents_memslot_change(struct kvm *kvm, enum kvm_mr_change change)
-> +{
-> +       /* Cannot modify memslots once a pVM has run or Realm created */
-> +       if (change != KVM_MR_DELETE && change != KVM_MR_MOVE)
-> +               return false;
-> +
-> +       if ((kvm_vm_is_protected_pkvm(kvm) && pkvm_hyp_vm_is_created(kvm)) ||
-> +            kvm_realm_is_created(kvm))
-> +               return true;
-> +       return false;
-> +}
-> +
->  int kvm_arch_prepare_memory_region(struct kvm *kvm,
->                                    const struct kvm_memory_slot *old,
->                                    struct kvm_memory_slot *new,
-> @@ -2791,12 +2803,9 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->         hva_t hva, reg_end;
->         int ret = 0;
-> 
-> -       if (kvm_vm_is_protected_pkvm(kvm)) {
-> -               /* Cannot modify memslots once a pVM has run. */
-> -               if (pkvm_hyp_vm_is_created(kvm) &&
-> -                   (change == KVM_MR_DELETE || change == KVM_MR_MOVE)) {
-> +       if (kvm_vm_is_protected(kvm)) {
-> +               if (kvm_prevents_memslot_change(kvm, change))
->                         return -EPERM;
-> -               }
-> 
->                 if (new &&
->                     new->flags & (KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY)) {
+> Because arm_smmu_device_probe() adds the smmu allocation to the parent's
+> devres list after the auxiliary device was created in
+> smmu_create_aux_device(), the smmu memory gets freed first.
 
-I think this should work.
+Two points:
+1) At the moment the device can't be released as suppress_bind_attrs is
+   true. There is no kernel user for the dynamic overlay it is added
+   for testing AFAIU.
 
-Thanks.
+2) AFAICT, __devm_auxiliary_device_create() calls, devm_add_action_or_reset()
+   for the device destroy, so the aux device will destroyed before the
+   platform device.
 
--- 
-Catalin
+> 
+> Following that, the auxiliary_device_destroy devres action executes,
+> unregistering the aux device and triggering driver unbind via
+> arm_smmu_device_remove_emu() and arm_smmu_device_remove(). Does this
+> result in dereferencing the already freed smmu struct?
+> 
+
+Same as above.
+
+Thanks,
+Mostafa
+
+> > +	if (ret)
+> > +		devres_release_group(parent, group);
+> > +	else
+> > +		devres_close_group(parent, group);
+> > +	return ret;
+> > +}
+> > +
+> > +static void arm_smmu_device_remove_emu(struct auxiliary_device *auxdev)
+> > +{
+> > +	arm_smmu_device_remove(to_platform_device(auxdev->dev.parent));
+> > +}
+> 
+> -- 
+> Sashiko AI review · https://sashiko.dev/#/patchset/20260922131259.2975334-1-smostafa@google.com?part=11
