@@ -1,179 +1,205 @@
-Received: from mail-lf2-f12.google.com (mail-lf2-f12.google.com [74.125.229.204])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7766739EF20
-	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 14:34:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.204
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790087673; cv=none; b=ZhtNEPolurYSzTJtdPX9umqi/SJwhf+G8oplXq01ZeLbm6t2NaXuaAAlrF93YNERwATyNeHoMMbdsiEth7sseMjizfUsE2WbYUzJGXHMbOfDY+hgiD7LqaZVhimGDiHfjgbGGlmebkCGo520meC4f8l/E07+Yf2sDZ/oYZeHMoI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790087673; c=relaxed/simple;
-	bh=OSpr8vZBZSILiOyuY44tAAoQRF+Mre7i03lUP3vPqEw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e5/Ex58ZY8PkSmoQRiLwds9CbsUky3iwUHNrJt88cTXw91VVIV7gm4xobkIDbYyYcGLfn1RGqC2Dk/PCmEtfvPYZliBe3bBt1WZFgd8fyy/9CHmMQADpKESA0tTzsPdyzhW+0ayfTx7+a7WqemrY9ZNgH3ISjPBAoZIOqI9qBfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e2DsXUcP; arc=none smtp.client-ip=74.125.229.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F61439F77
+	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 14:35:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790087754; cv=pass; b=gTyqgcsajGyzN4jVx9uPbA7ac/aY/5Fs70f9yoTFSk97Eu/ZI2KXfM3jfOWIivlIlQJKtmeMchLqbRt+bZ2HUEcDHOOAa2Xg1OsBqE6OmCnGmsJlMhfUXkjkcihd7AjpNqOov9eXejfX8Q16pRceBO06b9Vg0AGU2huP2c8yXWs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790087754; c=relaxed/simple;
+	bh=F6DxW3SXJZHdbOOUfkwznpoF++sRCvwou8e7w4hV31c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ScL5VhDEMKsCrMfGijXeEMJ5lJ9pIlTIMNDwuTubfQcwmWh51R4BLTV/EPysRABl6zyWzXk8YxTUWCSymUAaNsxqKEYFXf5e8w3F00HZgKBKcaJDUTIgpAWWDGeIqv0Ez0XOeSL5dzMabhM3ki3CgAEOUwmXwza6u1mnLytcQwk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hd43E4rk; arc=pass smtp.client-ip=209.85.208.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e2DsXUcP"
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b5e4f13d77so4803068e87.0
-        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 07:34:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hd43E4rk"
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6aa13d8d9d0so12135a12.0
+        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 07:35:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790087751; cv=none;
+        d=google.com; s=arc-20260327;
+        b=HJYWMnUHNE6p94QsjV3EA4x3IJ8itOS3rBW96KcDZcqSwA3DiYVlhZSnuMzFu9OCSF
+         7aqWvoPrgJSvN8xRU9XhdDlKv0JAHOWcXxr7l6V2EIVfApPvOZ4XiaYslp8Y+ripwRGI
+         hCsTQRqrjc3DPr4ijx2bITRgWCJd3E5cx+uRWS3vWDNYSk2FjyO1YRJnebT5d3/nQViu
+         XYn7lVY6MDtwcP7Sl0mwFLoc3EjrBCZc9Z8tkYbp9NmesGR1gRh8ysGsTGnI1+8nbANG
+         Qr0gled4syXqLW/hzE3AUS4kmowuokMeI6xo5lHB3twhDx50WdlvtP47H3xWLSkGw7EY
+         JC5A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=KdISmA3ixIlNjIAB3K7umMj0lq95tzNubXcY7qdlJJ4=;
+        fh=LojhdoFLhYGkxDegyCY3vvyTkINavhNJCncKWlEzotI=;
+        b=fxTGKigKtQJfd33C80ySyftL/fgd80UyL7z/mzctQzfn13fQYl3rNEU6OgUyZHem1B
+         UFVs2hNTr1tDETbVr/yiEH5BwirG9Wi4xNUWOhLfB5flcjVZ58gzi6tRPmg4XAM1/Dux
+         zCdIAykYxdWUn8HWNWU37A283oeuKwzVsaqx7rjpoIHaEoee20KbQFt1CJ8EML++nMEs
+         GxYDGNAF1+XvVyv+bgFSc1iSybEbruaChIYshWh2BM6S1raQqYoLPKRoyI9+j9oL7uoj
+         YQcKwtv3VBKqbX9pgQAHQor+dcWDf2po3/KttHJ//eYj4A3lmP+f7mnnz1ZVMBujl2Jr
+         MKnQ==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790087668; x=1790692468; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+        d=google.com; s=20251104; t=1790087751; x=1790692551; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=r0HTz7i0csHEzPxGHorQVXPbwITXujz+YYUQK1Bj5/w=;
-        b=e2DsXUcPQau0AJPpoyCJKa3RzkPV//Gwc2/AoRdCqkcPHUURqjS14HAVvYbSiO1xMq
-         MAbQ7ekc6ePL+GJ8vGeff/lNvr0Xi5X8xJLuWec08W/G6x6PPRxAUg2+l8Bg4VzyDnEo
-         QYtPFykuozw8GWwqpO7EnEDGhLXT04kDHlPCN+GwNeLXOmZF+y/r9qVYf6abWRkz5b3l
-         RngP4kXPoH1bCEEL5+smIhEMCVPo79C6nURm+tb9cTmnaOtS0td83OMqKIc3JifpBwHy
-         SSHI3HKgu+u+BRs5YsbdamziHdBnp48m/29uuYsT3/PUh3AbKc0xLyZwrFrs9BWm17T+
-         x1Pw==
+        bh=KdISmA3ixIlNjIAB3K7umMj0lq95tzNubXcY7qdlJJ4=;
+        b=Hd43E4rkR8EFR8V/2U/3IcEacH1E2V2Zs1RRhDvNZYW74T4Y2qG19VYDkFRhLZUhsE
+         fo8JzUpXjK4zvKARvk1gq0qtWMXeSDr/RyzZnqc8mX3vV9l2rgLUHaHo+ktLss9C0vp/
+         E8tAruk6v1I6+YbqaVtpc0lYXSzf16C6R/hgMfJpMfBMszjo3QT4FJIw2Mw7FdKQzUk5
+         e6yfDfHnQHw+Op8Yb7EuF5kzShiAnyJW/Q5EbPztTWpvOiSMmABt1S8bGViQV0HvZy9e
+         ZscOk3W8FJLG72dpaUr4e7couMlZFiB3owjbRoOpFGI5gKDsFtMHssuh4+z4ueRoA7AX
+         /XLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790087668; x=1790692468;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20260707; t=1790087751; x=1790692551;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=r0HTz7i0csHEzPxGHorQVXPbwITXujz+YYUQK1Bj5/w=;
-        b=kVJFJed5+9jdavqXX4BaPEP/E6fmrohgKvwPiwai1qqGyliaPsK6p+PDPLHKv3NehQ
-         VnpHheIRycQEHJz6ixZD+tk1iH1ph8r/DR3NFwmpd1wRpKmo2RzIiXKEGva+uxhafLov
-         uLUj6LHrYDQCm/YU67c4Syz1+uonEmqjeP4l9m7SizJco+tWy2CQOrFHiynePZelAq6+
-         38VqUjVTyQewpIemr4669CaoF/F85ShRHVQ9k8xVL8k1p1KrmzUalvu0G2bUODO/esDs
-         I8/L2e01GuKxmsTa6lF1RAFHM3k6goIyVzD4igexfCC4Le8YzgYoxGpAXWTGOWiEobUP
-         XJJw==
-X-Forwarded-Encrypted: i=1; AKwUvBweITAGiIytqFKF696LuWTIr+q4SgGqxRE/PRUWaUUEMrDuA/3nqqfh7Y7eiN0u2U4pzE2M+sI=@lists.linux.dev
-X-Gm-Message-State: AFuF++k4+9alA1AnHf50Kj+6TPIWYXC3Do7bxp8/VpU2h9A3g33wVrB2
-	B2ouz3RLF2YPdpqHWcyIpHOqOUBXHauLYtypNeu1Hcl8tgvlYijn75xUI5XscwZ48g==
-X-Gm-Gg: AYBFou3m+4qZbWtbtPBzWuE7w3jRLK4uFffjyz/blg3sE6vG69LwcQArd8seBheKPox
-	UNwIyl7ZDTc5+8CZlABM69toPaRTritFN8UlnhxXyjFvOb6q8stekh3xla0a0cEtK8DkkXFJnlK
-	PYtkGSHtiPZCqZmfEmZjkA8gucIvQ+lhKvxEs3bvY0RuNX05aijrQ1HhKF/eLfMGJjtYzon44lp
-	qa+GcqL2V5GF/E1FDWKlnUPHW/7UuflTMkjOViR4rcqlODWAMXIWz4VYbB4Qfka5rMLEcolsy8D
-	RZaA1kC9IklWksmoE33slAcYetq1iaPUjZNOFKroLHPLkhhx11L/x9kUZS5PuXXp+Mc51wA8o/u
-	eCXru+YCuj5eZZdiRaq6qd1jpE4+HFvbLMt99w45WCsz1iCJaY7cGTnVpt/8OLNFqCyOL3JqdTR
-	kGmjOHMXJCFM9xnj3DPbi7Q1G43GWvEfA2OTnZSeu7QSZESd1EO3G4/rG4AZfnKzRXybVHPx9S9
-	zmX352SoeycPL4km/YW96d8ZW7tx6o4DEvULpfFT0ZfJb+dYx36IA==
-X-Received: by 2002:a05:6512:3e1b:b0:5b6:1a7c:21 with SMTP id 2adb3069b0e04-5b8c184e320mr4889993e87.36.1790087667742;
-        Tue, 22 Sep 2026 07:34:27 -0700 (PDT)
-Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b8d46e871dsm604660e87.60.2026.09.22.07.34.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Sep 2026 07:34:27 -0700 (PDT)
-Date: Tue, 22 Sep 2026 15:34:22 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com,
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	mark.rutland@arm.com, steven.price@arm.com, qperret@google.com,
-	tabba@google.com
-Subject: Re: [PATCH v3 04/18] KVM: arm64: Disable steal time for protected VMs
-Message-ID: <arKR7gJaeCpWqA5j@google.com>
-References: <20260914113338.159227-1-fuad.tabba@linux.dev>
- <20260914113338.159227-5-fuad.tabba@linux.dev>
+        bh=KdISmA3ixIlNjIAB3K7umMj0lq95tzNubXcY7qdlJJ4=;
+        b=1viF/S9NnKRnGatxYwHpGJoMXClboQw5GfGl4x2CaMHvdhmhxf2MkR5n1xDPYeGYMj
+         Ev7fC93RHxE4+3WBnoIQrji0RZVA4vW96OSFDgsRhESWoENiv/YgmIhF5EnUVsbyfa3T
+         6R1GwGw7MFrgl9oSxDI+d4kQQ4f99SiaZaohoYfYQJnAXddn13eebZ85PHmC9DDKtjPO
+         VTcX5It6wUCiO0h1lhOvu07HkzRw2lD9iMJaqiAn4vjU+rPRPkxal3mmikBKbjWAto/Z
+         rLSMoDndH/z2wCve784PnP8oCxioMMZQS0HDYVkscrKIw68fvzYNpVr8y02zIWTGlkZe
+         Pleg==
+X-Forwarded-Encrypted: i=1; AKwUvBzpQar61lHr8gWLg/i16L2S5xDGVaxw56mZEhrBmN6yy5Y81WnJQBa/sHeDGfGNbog4p2A6KSY=@lists.linux.dev
+X-Gm-Message-State: AFuF++mhX1KYi4qqe/NGQcpV/uUO4IpTIHUSDPRYLIfMlHE4890mMRgP
+	HhWg1t7Z8vwJtTwucQakh8rjTHYkXkEyR4VXWrf6/6Fu72ZShpXXVXVfF1nogCRY0rr8fwbvUVI
+	7Sc/6x4mohRVhXUO8SgcwXjT9QEecu4oZnGjXwLgK
+X-Gm-Gg: AYBFou2ML8DaAFAzLzjXeUgRNVV8iAhW+5FHJxwsjH7XnSbIdEFaDB7HlrZR0+xydHg
+	mKpqhvxXhZuA45ZtOKCTjLOAPsxpUnSPAvWTjgB8zPPMKsg4Cp17xwaaNCurHETRnuUO6KnFJRv
+	iUv9gp8uJeJZ3z8F7PD002o5A84ZQnJlg1tGsDGUI9T3LTIWt0BKeLzWhqSv7mP0B76TJ5eVAuY
+	fLfwONzmAgcj9aC3jnhRaXVy5S1Jfw1QXxLL/lS/8cFGprcKxSL2teUhwCvGVvxbwYjSajCtZSL
+	UH898h1ni7X8MMKPCAUzXctzhS0qYtTsEmuVDGKUirwWFFsSXKufGYarEuMnML8sDepkLjrx5+f
+	PAxXuaUb6eesVLQ==
+X-Received: by 2002:a05:6402:23c8:b0:6a6:f2a5:1b4f with SMTP id
+ 4fb4d7f45d1cf-6aaac5924eemr8663a12.4.1790087750560; Tue, 22 Sep 2026 07:35:50
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260914113338.159227-5-fuad.tabba@linux.dev>
+References: <20260715150125.2798116-1-smostafa@google.com>
+In-Reply-To: <20260715150125.2798116-1-smostafa@google.com>
+From: Mostafa Saleh <smostafa@google.com>
+Date: Tue, 22 Sep 2026 15:35:38 +0100
+X-Gm-Features: AclHuK-rurQJCakbPVql7LeaZWXspdhQDHQ-9g658VqXPpUrYK4ePYQ8b4RsihE
+Message-ID: <CAFgf54rT1wvmGqm+8JqrKShhh+5pEWDS0f4FReT9CJBbcjnk1A@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Use consistent type for pool size
+To: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oupton@kernel.org, seiden@linux.ibm.com, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, 
+	tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 14, 2026 at 12:33:24PM +0100, Fuad Tabba wrote:
-> pKVM doesn't support steal time for protected guests, and
-> KVM_CAP_STEAL_TIME already reads 0 for them on the VM file descriptor,
-> but kvm_arm_pvtime_supported() doesn't know the VM, so the host still
-> accepts the KVM_ARM_VCPU_PVTIME_CTRL attribute, whose IPA would point
-> kvm_update_stolen_time() at the guest's private memory on every vCPU
-> load. Pass the VM in and return false for a protected one, so the
-> attribute returns -ENXIO as it does where steal time isn't implemented.
-> 
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+On Wed, Jul 15, 2026 at 4:01=E2=80=AFPM Mostafa Saleh <smostafa@google.com>=
+ wrote:
+>
+> All the pool sizes in the hypervisor are "unsigned long" but when
+> they get passed to hyp_early_alloc_contig() or hyp_pool_init() they get
+> truncated to 32-bits.
+>
+> That is not a big problem at the moment as to overflow this we need
+> 4G bytes of carveout (2 TB of host or guest system memory).
+>
+> However when new users are added (as IOMMU) it is hard to reason
+> about the carveout size anymore.
+>
+> Signed-off-by: Mostafa Saleh <smostafa@google.com>
 
-Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+Ping, as Sashiko reminded me about this:
+https://lore.kernel.org/all/20260922132359.BB0381F000FF@smtp.kernel.org/
+
+This has already been reviewed.
+
+Thanks,
+Mostafa
 
 > ---
->  arch/arm64/include/asm/kvm_host.h |  2 +-
->  arch/arm64/kvm/arm.c              |  2 +-
->  arch/arm64/kvm/pvtime.c           | 10 +++++-----
->  3 files changed, 7 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 27fe0cd5b2d7a..286489a69dff5 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1346,7 +1346,7 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu);
->  gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu);
->  void kvm_update_stolen_time(struct kvm_vcpu *vcpu);
->  
-> -bool kvm_arm_pvtime_supported(void);
-> +bool kvm_arm_pvtime_supported(struct kvm *kvm);
->  int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
->  			    struct kvm_device_attr *attr);
->  int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 8b080804bc90b..db36815630790 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -447,7 +447,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  		r = system_supports_mte();
->  		break;
->  	case KVM_CAP_STEAL_TIME:
-> -		r = kvm_arm_pvtime_supported();
-> +		r = kvm_arm_pvtime_supported(kvm);
->  		break;
->  	case KVM_CAP_ARM_EL1_32BIT:
->  		r = cpus_have_final_cap(ARM64_HAS_32BIT_EL1);
-> diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
-> index 4ceabaa4c30bd..053fe831fa541 100644
-> --- a/arch/arm64/kvm/pvtime.c
-> +++ b/arch/arm64/kvm/pvtime.c
-> @@ -67,9 +67,9 @@ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
->  	return base;
+> For example in the SMMUv3 to avoid this overflow, I add a cap
+> for the pools size to UINT_MAX to work around this:
+> https://lore.kernel.org/linux-iommu/20260715115906.2664882-9-smostafa@goo=
+gle.com/
+> ---
+>  arch/arm64/kvm/hyp/include/nvhe/early_alloc.h | 2 +-
+>  arch/arm64/kvm/hyp/include/nvhe/gfp.h         | 4 ++--
+>  arch/arm64/kvm/hyp/nvhe/early_alloc.c         | 2 +-
+>  arch/arm64/kvm/hyp/nvhe/page_alloc.c          | 6 +++---
+>  4 files changed, 7 insertions(+), 7 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/early_alloc.h b/arch/arm64/k=
+vm/hyp/include/nvhe/early_alloc.h
+> index dc61aaa56f31..462883c4e325 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/early_alloc.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/early_alloc.h
+> @@ -7,7 +7,7 @@
+>  void hyp_early_alloc_init(void *virt, unsigned long size);
+>  unsigned long hyp_early_alloc_nr_used_pages(void);
+>  void *hyp_early_alloc_page(void *arg);
+> -void *hyp_early_alloc_contig(unsigned int nr_pages);
+> +void *hyp_early_alloc_contig(unsigned long nr_pages);
+>
+>  extern struct kvm_pgtable_mm_ops hyp_early_alloc_mm_ops;
+>
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/gfp.h b/arch/arm64/kvm/hyp/i=
+nclude/nvhe/gfp.h
+> index 3766333bace9..3a428dc40b14 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+> @@ -29,6 +29,6 @@ void hyp_get_page(struct hyp_pool *pool, void *addr);
+>  void hyp_put_page(struct hyp_pool *pool, void *addr);
+>
+>  /* Used pages cannot be freed */
+> -int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
+> -                 unsigned int reserved_pages);
+> +int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned long nr_pages=
+,
+> +                 unsigned long reserved_pages);
+>  #endif /* __KVM_HYP_GFP_H */
+> diff --git a/arch/arm64/kvm/hyp/nvhe/early_alloc.c b/arch/arm64/kvm/hyp/n=
+vhe/early_alloc.c
+> index 00de04153cc6..9fef0c7d2185 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/early_alloc.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/early_alloc.c
+> @@ -21,7 +21,7 @@ unsigned long hyp_early_alloc_nr_used_pages(void)
+>         return (cur - base) >> PAGE_SHIFT;
 >  }
->  
-> -bool kvm_arm_pvtime_supported(void)
-> +bool kvm_arm_pvtime_supported(struct kvm *kvm)
+>
+> -void *hyp_early_alloc_contig(unsigned int nr_pages)
+> +void *hyp_early_alloc_contig(unsigned long nr_pages)
 >  {
-> -	return !!sched_info_on();
-> +	return !!sched_info_on() && (!kvm || !kvm_vm_is_protected(kvm));
+>         unsigned long size =3D (nr_pages << PAGE_SHIFT);
+>         void *ret =3D (void *)cur;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nv=
+he/page_alloc.c
+> index 57f86aa0f82f..51460d420c94 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+> @@ -229,12 +229,12 @@ void *hyp_alloc_pages(struct hyp_pool *pool, u8 ord=
+er)
+>         return hyp_page_to_virt(p);
 >  }
->  
->  int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
-> @@ -81,7 +81,7 @@ int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
->  	int ret = 0;
->  	int idx;
->  
-> -	if (!kvm_arm_pvtime_supported() ||
-> +	if (!kvm_arm_pvtime_supported(kvm) ||
->  	    attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
->  		return -ENXIO;
->  
-> @@ -110,7 +110,7 @@ int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
->  	u64 __user *user = (u64 __user *)attr->addr;
->  	u64 ipa;
->  
-> -	if (!kvm_arm_pvtime_supported() ||
-> +	if (!kvm_arm_pvtime_supported(vcpu->kvm) ||
->  	    attr->attr != KVM_ARM_VCPU_PVTIME_IPA)
->  		return -ENXIO;
->  
-> @@ -126,7 +126,7 @@ int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
+>
+> -int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
+> -                 unsigned int reserved_pages)
+> +int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned long nr_pages=
+,
+> +                 unsigned long reserved_pages)
 >  {
->  	switch (attr->attr) {
->  	case KVM_ARM_VCPU_PVTIME_IPA:
-> -		if (kvm_arm_pvtime_supported())
-> +		if (kvm_arm_pvtime_supported(vcpu->kvm))
->  			return 0;
->  	}
->  	return -ENXIO;
-> -- 
-> 2.39.5
-> 
-
--- 
-Vincent
+>         phys_addr_t phys =3D hyp_pfn_to_phys(pfn);
+>         struct hyp_page *p;
+> -       int i;
+> +       unsigned long i;
+>
+>         hyp_spin_lock_init(&pool->lock);
+>         pool->max_order =3D min(MAX_PAGE_ORDER,
+> --
+> 2.55.0.141.g00534a21ce-goog
+>
