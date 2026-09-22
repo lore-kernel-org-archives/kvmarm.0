@@ -1,148 +1,127 @@
-Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011027.outbound.protection.outlook.com [52.101.57.27])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD2E41A575;
-	Tue, 22 Sep 2026 18:08:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.27
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790100497; cv=fail; b=lZHoAxUdNGdwp0uUV9TyVTaIBn7BrVloa31mAxLtw5spDPWhNSm3HJvA8uT7WJ54/I8h/6IDwHQttoUiKWMSvDwOPXUkU69SJsDkcPvQtkpjReyt2d03eMjIq8wF9xHfwDjRgZ2Kz5yANgA44rhTrB+HscbvTujHLHKHS17wK30=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790100497; c=relaxed/simple;
-	bh=clkUJp7AU9dapoTN48M0L2B1nHNe/WL/BYHOO9/9LAE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DaZyDw8kRHDHJ5RfrnH92RFKKnrWmcnJfQheDiadNl5VzZkPw+7X8LYg7+Ta2XB6ozVrJIUKc2t3Ny8uboa2plteXKNQNbm8/DR8U4XDIFrNlbgeDOxoLoi/4sq51/sLOl6ySihv9abYOG4ApCHL+I9r67+9eOcwN3H2Rey/Be8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=NkPmMGUq; arc=fail smtp.client-ip=52.101.57.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3084648640E;
+	Tue, 22 Sep 2026 18:13:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790100785; cv=none; b=ZzJ0J48DCUbXQQZSt8ZSmiNvmt0nTSuNGF6IMzfd6RoYbA/Hyis5myzayJ6zDJaoVao9EM6RNZ/gvmk94tDCNkgfJvcioB7T1AbZnMCAJnZIhx7Cq7ZTQDxjXszwGw6xbwE3O1jEtqNZR4hfp9ddzeHczacT+drDzuHBexaTMqI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790100785; c=relaxed/simple;
+	bh=0ZZoTTvBclLSkUaE6pJ6RJ5I4n4escQFucYderbNDyo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CEyVJXoyrvAoHj7t7kCD0WnGPTd/hwFHk20A5001RAz+hWj9Nidqw0bY3SxeZlHKwP4i6eTO/j2i0Go0r7aPWZkYMRqwDb0T/8KTM2JorafRaCtdigUzLHxp4VPgGlQAx/Kc7tQ6WW7vrDSq8s8KL1LrMexLhY5S2Me/kUT8H+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aEnsGW0y; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="NkPmMGUq"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KGGd4adTf3dcWeMQwjAKneYGtL3iyWqZomblfzxXN0lxq4PczxurLK4napx9oKnwxjRVIgSA3h8PDywVGhqOyvJA7TTPiutxmtyTgJIP6WCEUr6CLtOLnuqnQSd6a1/NTTETS2X7elyCwF5wG0D1xzI4SdvFU8RXJr6ljlMWycqIE6rznfbFgiFrwphmhJX5M8tu7WU7MLK8vb30SXR/YXuUdjI7CTm7aA5m0Z8jW/Y239vZoNXmLF5isXVA4grTuTGXGEqFbOX50BCkCV8p0xFoCUDRPOWTLPi3oHFGs3QimbKfooW/gMS63WnsOVT5jX/c4ENGudlG58hfjEgOFg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4vP+yZ6CuPux1IREGIyRsDuJtb/YVOpEFKLWIiLb0uU=;
- b=lhZUFsa2qm4YXAU5dZgYHBiueMCAxqIrGUd+VOvXA0mnH2MzK31bpB3oopjdSvXJHHUnmNR13F4QaZRS8flZoJ8Y6l3FOFgaqv6QYynrmUNlj84qqF3ZIUtVQO1WgxY7GPwNDgAxQ6ePLnatEkky5YWat6n5QghGgMdtj5niJPauPS00LnAoJfizsVjqm0t2iwhu+6aymNCbwahzKjAqhd9rFn3lYP7Q9Vzd3i0QGV8YGFDGG+dUVOp5lB5NBkJE7uLjNEffn0sAhT3zej8BWKVNeomiQV6rSYynMjase+ImMU6KwnRfZLv2LdS6gKrkdcTFT4Ke1/Yu3m3lpYh37g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4vP+yZ6CuPux1IREGIyRsDuJtb/YVOpEFKLWIiLb0uU=;
- b=NkPmMGUqZ4YsQIxom/pOcu3HFJHCt2hNvorRa4jY1suS7jy1PiYH2HUwuHd/py/u4yVKP+opAkumsRdu2mYT30+7v7oEUis+xhWMV9OkT9nI7NEUHE61qTbKYo+RIiUaUps5U3EQZpuJ1DKRdTtF6MtJZX/ayxVmpt8CNZaEEOFIw8TXEys3+5ihogBXTaeatgEXMA9eEOGzpd4Q4Bi/SXNwySV7l2P/5N71ZnDRw0/YBhOnx+c+1lcUVUx8C9/N1bRu71z43hn4i1cS6R/V/3PV1ctTHC1Ip21qKwGPqdf+awM5b9w0VC2X/37kpiHTFQmE3J92WgvXalOXjkB7lg==
-Received: from MN2PR22CA0020.namprd22.prod.outlook.com (2603:10b6:208:238::25)
- by PH0PR12MB7984.namprd12.prod.outlook.com (2603:10b6:510:26f::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.428.13; Tue, 22 Sep
- 2026 18:08:10 +0000
-Received: from BN6PEPF00000071.namprd03.prod.outlook.com
- (2603:10b6:208:238:cafe::6f) by MN2PR22CA0020.outlook.office365.com
- (2603:10b6:208:238::25) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.428.16 via Frontend Transport; Tue,
- 22 Sep 2026 18:08:09 +0000
-X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
- is 216.228.117.161) smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BN6PEPF00000071.mail.protection.outlook.com (10.167.248.198) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.451.8 via Frontend Transport; Tue, 22 Sep 2026 18:08:08 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.49; Tue, 22 Sep
- 2026 11:07:28 -0700
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.49; Tue, 22 Sep
- 2026 11:07:28 -0700
-Received: from nvidia.com (10.127.8.12) by mail.nvidia.com (10.129.68.7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.49 via Frontend
- Transport; Tue, 22 Sep 2026 11:07:21 -0700
-Date: Tue, 22 Sep 2026 11:07:18 -0700
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: Mostafa Saleh <smostafa@google.com>
-CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>, <iommu@lists.linux.dev>, <catalin.marinas@arm.com>,
-	<will@kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
-	<joro@8bytes.org>, <jgg@ziepe.ca>, <mark.rutland@arm.com>,
-	<qperret@google.com>, <tabba@google.com>, <vdonnefort@google.com>,
-	<sebastianene@google.com>, <keirf@google.com>
-Subject: Re: [PATCH v8 00/25] KVM: arm64: SMMUv3 driver for pKVM (trap and
- emulate)
-Message-ID: <arLD1qj8E+tE2MYw@nvidia.com>
-References: <20260922131259.2975334-1-smostafa@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aEnsGW0y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89B2B1F000FF;
+	Tue, 22 Sep 2026 18:13:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790100784;
+	bh=CkCRLFxPHHGYCNcpfamPUAWq4+0JQ01hkaddMI1o5c0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=aEnsGW0yAgw4LKhTybjTtlcqCi/fZB3g6qFJkA4kXBn1yUrqJyBxJzpOQAX/hUpUC
+	 ZAJRHQspZybQ7ZzGv/GdWpa2tvJfCUTqAC6ZZJp/oV8xUtiBjvLpc//89ADZF4TvpI
+	 KQJ0T16D3hJwV88PhMcUfsnhEI/h1wCQSFRTSgW1dbeVA01Med4Y3Nc6OxkLy5dG+B
+	 b5OLTCoae+BMC/IHCa84m4y3H7c7P9/vo8dU6t5VAFYf0w4SQjsv04OJ3Tbbmo7HP+
+	 poTO7r99P8IjzoEM2qzkAmuXldgPsljt/60qH78l2y/OYoQ5EN+3spVB92F1wcveIk
+	 k5NgQ9ESfR2bg==
+Date: Tue, 22 Sep 2026 11:13:02 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Jack Thomson <jackabt@amazon.com>,
+	Jack Thomson <jackabt.amazon@gmail.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Leo Soares Passos <Leo.Bras@arm.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>
+Subject: Re: [PATCH v3 02/14] arm64: Add ESR fault helpers
+Message-ID: <arLFLp6keTbFmXMB@kernel.org>
+References: <20260922-kvm-arm-prefault-v3-0-787bd3bc7e3f@kernel.org>
+ <20260922-kvm-arm-prefault-v3-2-787bd3bc7e3f@kernel.org>
+ <arK0N7H1w-pcixba@kernel.org>
+ <arK8ZnBSFwmjizuk@gremlin>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260922131259.2975334-1-smostafa@google.com>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN6PEPF00000071:EE_|PH0PR12MB7984:EE_
-X-MS-Office365-Filtering-Correlation-Id: a5788847-d4a0-43ee-0cd6-08df18d47558
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700016|23010399003|1800799024|376014|7416014|10067099003|18002099003|22082099003|56012099006|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	WMb5lgJa2vojHqcsEAqN5I+m77YsAb+W5nLf+WnWP1+KRqa6H7SLsNaRu2ebPgqIJrVI2nKdS1GQkdtFZE/bA+z58g4FoAQgh3Zg9OONu7ddqk1fOsmPmAla6QDMnNc2AWHDUzaKLbWJ+yW7w3jZNV7GDFe3TnhWIaWZpU2jkqS2Adki39URoL/PiCHDNv5M0S2Fa2L8S52Tvz1ltV0i5P9XUhqh/Vnai8X6pKI8v4xa2wlo7U+VRrABmKsGjBIThkmm2ryIc/FQRnJ/9bW9WS5mC8Iqc+1JHESSoFC6QeT6efwX6U7zGQWhv/N5LMRfaoVXHvsYX7refCHxtJOj/yRzTrTz/bKWuhtPyQwOI2yTuCZRmpJaCz9TXvkiuA1OBXcgmgJKvh3HUko5VBMEDz03ftIEe3s692yEPjT7uN7L/Gf227+X7YwVyTKeQyi2iHcWEzGA4IlWacFgb+48EtKOgMEGqk63KYHt8Cn4C3LOYUR7SJ/C/E8AgLIY5/LApuX62tSWg2ct4060yNBaw63YhPDDu1w9r86f2mhu4IVSbMAcgvyvbQ6hBLvQCVAYr8gaB5d+bZcuVk/Fj1hZmW2Ucyf6eMI08OOo3oFTKXpz7KsssIiQK0Qqnh7k+x1jPdDhrqTiR9v1DsCi4XrCZG3QepG7DCuRGp1+xtDUAkt+dJzVeQA4DZzIyDq2mt5X04qRF4x7YTMwno7yYgVykg==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(23010399003)(1800799024)(376014)(7416014)(10067099003)(18002099003)(22082099003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	wtEsNFKNhHw5RtOoKBmnxwqrqUk3nc0koEBqtgvNvjuclXVwZ5c6KiZectWP0MMKaW42QcZfnvOc1HK2+wKLUIio6gt4F9CbOXxhR6e5kilqRAqpAqhJsqHJSjQrgxTyz33jkJHhQYSn0cfP7o+lZS68eN52zo69IuQ9Y+PgIlKc7kN57P0uctzSfA71560NW7nuh2ZOH9HTRoPCY51SAqn4wm6EJX5O4u/WUw8+e9yuQm+oFURDSwalwj+5g+NMekBOyTvi+uOvSDLjw1NZtKZmLtOCmv0jVaibXb5jFmh+nSwlcxv2wFovF6Qy9kkBuCJotnur1A50a5Ht3yvI82MRDMCn98eJ22cy5sqGp5+mvl5Fov1zT7RbJzw9M24Ei3ia6SaPKhCHBtmnnPqscLOp0h4zCAt5XRhyrIF01Lz+IlPdhwG4otSOLNOevnmM
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2026 18:08:08.8883
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a5788847-d4a0-43ee-0cd6-08df18d47558
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN6PEPF00000071.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7984
+In-Reply-To: <arK8ZnBSFwmjizuk@gremlin>
 
-On Tue, Sep 22, 2026 at 01:12:33PM +0000, Mostafa Saleh wrote:
-> Notes about Sashiko
-> ===================
-> I ran Sashiko locally and it was helpful in discovering problems in
-> the series. However, it still shows large number of critical and high
-> severity issues, I went through them and I believe they are false
-> positives, mainly because (in the order of frequently reported):
-> - It doesn't understand WARNs are fatal in the hypervisor.
-> - It doesn't understand that a malicious host can DoS the system and
->   pKVM doesn't guarantee availability
-> - It doesn't understand the SMMUv3 spec and makes stuff up (eg. about
->   CMD_SYC CS field it makes up an non-existent encoding or wrong
->   semantics for the gbpa register)
+On Tue, Sep 22, 2026 at 06:45:43PM +0100, Lorenzo Stoakes (ARM) wrote:
+> On Tue, Sep 22, 2026 at 10:00:39AM -0700, Oliver Upton wrote:
+> > On Tue, Sep 22, 2026 at 03:17:56PM +0100, Lorenzo Stoakes (ARM) wrote:
+> > > Add helper functions which operate directly on an ESR value rather than
+> > > trying to access the register itself.
+> > >
+> > > These mirror equivalent KVM vCPU wrappers in kvm_emulate.h and allow those
+> > > wrappers and KVM's stage-2 fault handling to operate on a plain ESR value.
+> > >
+> > > This is needed to later generate a synthetic fault for the stage-2 page
+> > > table pre-faulting mechanism.
+> > >
+> > > No functional change intended.
+> > >
+> > > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+> > > ---
+> > >  arch/arm64/include/asm/esr.h | 44 ++++++++++++++++++++++++++++++++++++++++++++
+> > >  1 file changed, 44 insertions(+)
+> > >
+> > > diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+> > > index f816f5d77f1a..9c0205983d9a 100644
+> > > --- a/arch/arm64/include/asm/esr.h
+> > > +++ b/arch/arm64/include/asm/esr.h
+> > > @@ -437,6 +437,50 @@
+> > >  #ifndef __ASSEMBLER__
+> > >  #include <asm/types.h>
+> > >
+> > > +static __always_inline u8 esr_get_ec(unsigned long esr)
+> > > +{
+> > > +	return ESR_ELx_EC(esr);
+> > > +}
+> >
+> > Why do we need to wrap the macro in an inline function?
+> 
+> It seemed like a more consistent way of doing this but looking through the code
+> ESR_ELx_EC() is referenced directly in quite a few places so will swap out.
+> 
+> >
+> > > +static __always_inline bool esr_trap_is_iabt(unsigned long esr)
+> > > +{
+> > > +	return esr_get_ec(esr) == ESR_ELx_EC_IABT_LOW;
+> > > +}
+> > > +
+> > > +static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
+> > > +{
+> > > +	return esr & ESR_ELx_S1PTW;
+> > > +}
+> >
+> > This helper doesn't make a ton of sense outside of KVM, since
+> > ESR_ELx.S1PTW is RES0 (not RAZ) outside of a stage-2 abort.
+> 
+> OK, kvm_emulate.h better?
 
-Just my two cents here:
+Works for me, thanks!
 
-From my experience, making commit messages or inline notes slightly
-clearer against the findings that Sashiko reported could simply help
-it understand things better and mute most of the false positives.
-
-Otherwise, the number of the findings is a bit scaring; reviewers
-would have to go through the long list of findings to check whether
-each of them fits into one of the false-positive categories :-/
-
-> - It seems to look at one patch at a time and not the whole series, and
->   as the series is written in a way to be bisectable that confuses it.
-
-Yea, that happens too. Usually I would add a line at the end of the
-commit message "a subsequent change will do X", which could clarify.
-
-Nicolin
+Best,
+Oliver
