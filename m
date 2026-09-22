@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42012544D70;
-	Tue, 22 Sep 2026 14:18:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC055427F9;
+	Tue, 22 Sep 2026 14:18:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790086697; cv=none; b=IcjRuGvbkjbpoGjrGtBW1Xn/pe1+45o+YwoChbIb76aTZaMmSaxr2ImP07jz1xxO3huKnOWSXt6D1siDJSxL7NctRuHSmbvXqtVJHUXQykLzsynoBQ6miOV2J48HXTRwQmeBc9hORyw3nfLa3Da1wcqWORfiHlD9k9kVYXk80x8=
+	t=1790086704; cv=none; b=u1MmbB/S/IG+NVY4x8eZq0ipDjKwwc61OCiR3YBq0mi6dglCwa7Q1uPywWjWhWt1kR3sS2bC/g8OtQ3D4F1IyAeEaSi2K3srbWVbPymHGNEaYV4/kLBvVlawkW0ky4BiICadtWuXgm3a3SnEZ3HZupoWgeqSl7RCfBIVh54ZHq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790086697; c=relaxed/simple;
-	bh=n2iNqrUWXUV6kG9gmr7Ss+/9sq490YsJlL1ITkgMOl8=;
+	s=arc-20240116; t=1790086704; c=relaxed/simple;
+	bh=FkM4itvypge8Pbdv2hNT3etSW8HCq6WaKSFba5FDN3g=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Hwf06FEL4H+FWwVvZct4We7eJiQ1uFns7bEIHvkA8KLlERXnCcQ4MMaCHAlqiDGLs6Q019VqNEpEwt8ekzvle4PN0Vi2Z/B18D294nQaIkV9jmf9HRoJzATeDqwl7xdGLjTpSks5PKXMim/z0PaAk756TtE7Yr9sDj2YUBwg1hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O8GdP5ha; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=HKIl2XxlomB5EH8lbX93syzaX1QWYdz8MRfBZxfXGOthLNmeT5She/HWl6pL7eYmgjhJhtdWXvsHBqLf0wVkf0oUsgav2pbMrydsVlxRCbwET8VlsNqD78lFLESjcwZgDoPBL8fgigVplNZ8KboQ4dpc/WNfQIb/FFlun+xtYw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WCX+1zzi; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O8GdP5ha"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D1641F00893;
-	Tue, 22 Sep 2026 14:18:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WCX+1zzi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41CFD1F00898;
+	Tue, 22 Sep 2026 14:18:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790086695;
-	bh=hL0Li77JYhUykO/PcEIaG0Lr5kXBzYPYWXnvLOO0g1s=;
+	s=k20260515; t=1790086702;
+	bh=IltVU/Tm8cDWFzMWlzQM5EZpC+rhcddrPgEAjZb7DaQ=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=O8GdP5ha9c+k9+oOKFcpcha3fi6tMAnBquRG3oH7rwacA3peCM0pjg53ElzhgR5nc
-	 lb7A6bYwXCU4y+prUCbDS6cE7qV1ezapEQzgCwaDkENa/p56W3Nu8/vTkITVHqxoK/
-	 d4iQfXfHCnWijYTvht/Ww8x9G4fxbfefGFi/9ID54mV3mUCl+lrC6RWm6B8fvRo15u
-	 wq1hZBWxC2uItwjsjOQCTWA66fTBoHKLO53YKPXjOvJrcgwirPVUWrYjSXD63D2PUn
-	 vv+GWtwK0S0K1Qshz2x+hTZ7/MIDwBQ851dNZSkNuIvKnO5z9E3acwy6cDm/U6jE4r
-	 AhJqf0zQnzMWA==
+	b=WCX+1zziOqvwnSDV0CrvCAt9PRPizag4cgOjWKj/kGemqc/tQZ7EHtnsGB9+0zVFT
+	 6FxbvPriCQ+57wp1Qrbx8YHOSY64EC2bY1LiUjWxhAUOOHWs2hxJ2Z0oPBlVjOYANF
+	 E4Rz3r5hIDuNqXQ/5cMcG/2rQv3oC4XL4/Vdhn3l8xRb62RedMmWrAlLudNSIehcZl
+	 tz5v8M0mXwnBw9SP451CY79iP56g4eRSyiT+HahWrE/k+wdXB7z119Skbxr9zNcn6u
+	 YcGGO46LjaAAH358HOhZl2yGf+/RjZle2uuomOCRdZ1vLeeO2ozxlkigBCXeWPYUvs
+	 GLl+gpHO+ZcGA==
 From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Date: Tue, 22 Sep 2026 15:17:55 +0100
-Subject: [PATCH v3 01/14] KVM: Allow architectures to disallow pre-fault
+Date: Tue, 22 Sep 2026 15:17:56 +0100
+Subject: [PATCH v3 02/14] arm64: Add ESR fault helpers
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260922-kvm-arm-prefault-v3-1-787bd3bc7e3f@kernel.org>
+Message-Id: <20260922-kvm-arm-prefault-v3-2-787bd3bc7e3f@kernel.org>
 References: <20260922-kvm-arm-prefault-v3-0-787bd3bc7e3f@kernel.org>
 In-Reply-To: <20260922-kvm-arm-prefault-v3-0-787bd3bc7e3f@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>, 
@@ -61,77 +61,86 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
  Leo Soares Passos <Leo.Bras@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>, 
  "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2328; i=ljs@kernel.org;
- h=from:subject:message-id; bh=n2iNqrUWXUV6kG9gmr7Ss+/9sq490YsJlL1ITkgMOl8=;
- b=owGbwMvMwCV2fu7ZrsZH9SKMp9WSGLI29Ulw6bSX8/x6eEtmwteg4PN61fYFF3fqN35wF6plV
- 27t8XfuKGVhEONikBVTZHn+RXx/kEjYvM4L/m4wc1iZQIYwcHEKwEQe3WP4Hx5zzc3eN/nUmp8r
- f0V7M/E+OfLUaslcTmVHk+z5sXX8xYwMTxUEOZ5Hrv+XzLPxnrNLzOT0+pvicvo3H79/9z0+RlK
- ZFwA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2048; i=ljs@kernel.org;
+ h=from:subject:message-id; bh=FkM4itvypge8Pbdv2hNT3etSW8HCq6WaKSFba5FDN3g=;
+ b=owGbwMvMwCV2fu7ZrsZH9SKMp9WSGLI29Uk0PzCI5K5XY7D60CleH2wneruGS2ZxXuSNv+dve
+ 7476OTTUcrCIMbFICumyPL8i/j+IJGweZ0X/N1g5rAygQxh4OIUgIkkZzEynOi/PuFDxl/FWtml
+ B6sfu628rrh6USmDlbDt4U9uXVkcsxn+6eV8SFpYtpy3Tijj5/YEdaGjov9uRiV4bn4rsbcn9t0
+ 9TgA=
 X-Developer-Key: i=ljs@kernel.org; a=openpgp;
  fpr=E7F417BF5214569E89D04F46CF9DCD8A81E27F14
 
-Currently kvm_vcpu_pre_fault_memory() is the only place where generic code
-can call vcpu_load() on a vCPU that has not yet been initialised.
+Add helper functions which operate directly on an ESR value rather than
+trying to access the register itself.
 
-This can be problematic, as being uninitialised, a vCPU might not be in a
-state where it is correct to do so.
+These mirror equivalent KVM vCPU wrappers in kvm_emulate.h and allow those
+wrappers and KVM's stage-2 fault handling to operate on a plain ESR value.
 
-Provide kvm_arch_vcpu_allow_pre_fault_memory() to allow architectures to
-override this behaviour before the load is attempted.
+This is needed to later generate a synthetic fault for the stage-2 page
+table pre-faulting mechanism.
 
-Implement it as a __weak symbol defaulting to the current state where it is
-always permitted.
+No functional change intended.
 
-This lays the foundation for a future change which implements pre-faulting
-for arm64 which will wish to disallow this for uninitialised vCPUs.
-
-As no architecture currently overrides it, no functional change intended.
-
-Suggested-by: Oliver Upton <oupton@kernel.org>
 Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 ---
- include/linux/kvm_host.h | 1 +
- virt/kvm/kvm_main.c      | 8 ++++++++
- 2 files changed, 9 insertions(+)
+ arch/arm64/include/asm/esr.h | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 03bfc92864b6..c11fda8704a3 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1693,6 +1693,7 @@ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
- bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu);
- bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu);
- bool kvm_arch_vcpu_preempted_in_kernel(struct kvm_vcpu *vcpu);
-+bool kvm_arch_vcpu_allow_pre_fault_memory(struct kvm_vcpu *vcpu);
- void kvm_arch_pre_destroy_vm(struct kvm *kvm);
- void kvm_arch_create_vm_debugfs(struct kvm *kvm);
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index f816f5d77f1a..9c0205983d9a 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -437,6 +437,50 @@
+ #ifndef __ASSEMBLER__
+ #include <asm/types.h>
  
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 65eb26a0520d..9662baf2bfca 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3961,6 +3961,11 @@ bool __weak kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu)
- 	return false;
- }
- 
-+bool __weak kvm_arch_vcpu_allow_pre_fault_memory(struct kvm_vcpu *vcpu)
++static __always_inline u8 esr_get_ec(unsigned long esr)
 +{
-+	return true;
++	return ESR_ELx_EC(esr);
 +}
 +
- void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
- {
- 	int nr_vcpus, start, i, idx, yielded;
-@@ -4365,6 +4370,9 @@ static int kvm_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
- 	    range->gpa + range->size <= range->gpa)
- 		return -EINVAL;
- 
-+	if (!kvm_arch_vcpu_allow_pre_fault_memory(vcpu))
-+		return -ENOEXEC;
++static __always_inline bool esr_trap_is_iabt(unsigned long esr)
++{
++	return esr_get_ec(esr) == ESR_ELx_EC_IABT_LOW;
++}
 +
- 	vcpu_load(vcpu);
- 	idx = srcu_read_lock(&vcpu->kvm->srcu);
- 
++static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
++{
++	return esr & ESR_ELx_S1PTW;
++}
++
++/* Always check for S1PTW *before* using this. */
++static __always_inline bool esr_dabt_is_write(unsigned long esr)
++{
++	return esr & ESR_ELx_WNR;
++}
++
++static __always_inline bool esr_dabt_is_cm(unsigned long esr)
++{
++	return esr & ESR_ELx_CM;
++}
++
++static __always_inline bool esr_abt_is_exec_fault(unsigned long esr)
++{
++	return esr_trap_is_iabt(esr) && !esr_abt_is_s1ptw(esr);
++}
++
++static __always_inline bool esr_abt_is_sea(unsigned long esr)
++{
++	switch (esr & ESR_ELx_FSC) {
++	case ESR_ELx_FSC_EXTABT:
++	case ESR_ELx_FSC_SEA_TTW(-1) ... ESR_ELx_FSC_SEA_TTW(3):
++	case ESR_ELx_FSC_SECC:
++	case ESR_ELx_FSC_SECC_TTW(-1) ... ESR_ELx_FSC_SECC_TTW(3):
++		return true;
++	default:
++		return false;
++	}
++}
++
+ static inline unsigned long esr_brk_comment(unsigned long esr)
+ {
+ 	return esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
 
 -- 
 2.55.0
