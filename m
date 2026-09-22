@@ -1,127 +1,136 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CFF8544D73
-	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 13:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2F154855D
+	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 13:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790084297; cv=none; b=VfQchd6qL3/2wbDKaimMMCoq54aT89Mg9eecb3zD3t3awqXDm9bM/xDfgKzZ4SUZS0pznZprA209mRGpW+uGS84uRT/M/Ckc0E/toNvm6j96SG28f1SgKemZ+9PBHq1srydoscf9f0nogj6DUZcrQVosL4xICICPxRIrctUf+iM=
+	t=1790084685; cv=none; b=jRdTorqg7cKahZWo76qGV9YpB6INIpsck3qY0au3jzYfYEkts1tEO9ZTvo24tqvvS1S/umysirQEC8OIqrGhHiFqxKcCUjiesGDyW1YRZBjG/pPHhAS8ACK8OzvTUPSYxNIdB0cwiT6dMhsxm8q5dWYp74SGIe0R5OVDmZYu4uE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790084297; c=relaxed/simple;
-	bh=XJMwCrhKdI2OE2gCrCUozLldRa3InFzWdAv1r/YwVz8=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=bx9lGX40MwsyiDcLNNhL5gtnG2S8pDAYNgEsgbw/8I8Tbjl3sBiVkajE28muGxEUY5TkamFyh2xKSIJk0/ylC2zf9UFFT+ar4JGa0ePXyem+F+kj9mgubzERnk0W9PyM14C4ynthYAB6CRBacz1R+056lgLsY4umX3meLKcibfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lPoCfMme; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790084685; c=relaxed/simple;
+	bh=0SFlIh2a1t3j3rT/bk6IJh8ffwrgGJ66xEj1bDplnm8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qCGpzc+Ey5gfnEKrz+iAr06dMJWv75MJVvLCxvW9hrXdqMu1HdYrpVbjAHMpLZyapIP4f9IcWGkXnsvbOyKSFiED5sfW0tYmVhBypQ04oaOWCkHg7iymXQXk5CfZU6dUFSHXMFJM6oSHyxK57MAbsEp4igmBDdeVas0tOdkwc5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=aE0xEjAK; arc=none smtp.client-ip=74.125.225.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lPoCfMme"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C415D1F000FF;
-	Tue, 22 Sep 2026 13:38:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790084296;
-	bh=Y/2ihmSMrHA9gD8biN7rdshYMphDwrowgO6qN8/sD+c=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=lPoCfMmeYOYCABrp/J1LXk5a3ul0Lq11zz1gjk0QyvZRmz7fzyeCfUG1V16eEplTj
-	 OfUgD95BoHLkzNmwl/Ynva3gUp8r8TwF2DO/aIuf1l4AgEviKjoq29ZGVR0J8TtzN2
-	 UHeIQwj3Vj+X5W56H5SeBorJHSxQUXTCY1UV/Fh7SHWoqreP8PRyUlvQlq3Ns99T6O
-	 FA6FxlKJ68WpxVd4Kf5//pvfvANXONk3Ny0FjIA1f98ypbGcL7D5i9B+V9rxHFuSIh
-	 ui/0rhFhwv0fdq/k8XbwfhBHXEkEyrWeEOVYgp3eand42Mpx6QOp6tcLcqBGsdLbf/
-	 G8r1lMLuxxX5w==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v8 22/25] iommu/arm-smmu-v3-kvm: Shadow the CPU stage-2
- page table
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Mostafa Saleh" <smostafa@google.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260922131259.2975334-23-smostafa@google.com>
-References: <20260922131259.2975334-1-smostafa@google.com>
- <20260922131259.2975334-23-smostafa@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Sep 2026 13:38:15 +0000
-Message-Id: <20260922133815.C415D1F000FF@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="aE0xEjAK"
+Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49d1ca5b0d6so31034485e9.0
+        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 06:44:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1790084681; x=1790689481; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=4EtP8Gib+oGUfFDioYcMAZLGT/7xIaokAymk9C8xEMA=;
+        b=aE0xEjAKw1ECHD1SpbpDR+K2dEvDsSv2kNUc/fHmOuE6UPtfh+3WK7D4wxiUjysmxc
+         BPUbrOiowMvNHxWLVwZ9KMcsxMFk1+vKoLsVhpc2Ilv/9iYMPowqOeP7iwFxUUrm7pjB
+         4YeM28YW+eeN9e+GrwoTzAU3+OazdSinWHX2NF0s2EATlCcX9lprUGctNyu1tcE6LU1L
+         9R/asoYZTe7S9eJcMDhB5rl2kOiNg3lFcpUXVPg+nJoDyVPZheTnODdkAcfS0ObREurP
+         7n3+0plt1tUT4m9GZOQx096zz2i6NRUgtH9fRpjHt6uOTGLrlVbHQ6Zs01Z7/wwiDWjW
+         YfKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790084681; x=1790689481;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=4EtP8Gib+oGUfFDioYcMAZLGT/7xIaokAymk9C8xEMA=;
+        b=H0toLIpqg8n5MYLCT4XMljKFBOra38GuH4TXv7JPHPJyvuyI2fGxXpP/1G9STFCALe
+         bIMLRAFfDO0D0EUySPLg7kVWXApgfUt0mBCoiwl5VrZP6Jn4z8KIAD+zskVo9Svgg3rs
+         pUIPvb6LCHg5vzcmNL4K9mLCChlT9Z6mojzz/7PiMtZQyblsHb+FxYvyuXDsG6ACUdrD
+         L5e9rovlT8T11TxpSeNNY0VosBQ45KFIwqkXTOP9nx2zTWOcLgK8n+I0RDBPL4T/oQxv
+         msZgFKtyEZrwsm9UrCHIHpUB1B6ATggNKtu23J/+aqoPGz7+sEhPO/GfCSDf89d8pnj/
+         X2tw==
+X-Forwarded-Encrypted: i=1; AKwUvBzJTG2xSVDFmsSPHgS8XmJyRZ3JfHvh5FLt2rIneSNl9VReNNs4guY1kuuhj19LHCi/MzcOjC8=@lists.linux.dev
+X-Gm-Message-State: AFuF++nQC5p2IAfvMARUpw6Wpvbpx7R0jqY1AdMcm9tlImFZXV4lPkO2
+	VrJjK/rELjayCdvHjU+a7QWmlcju1vhEKF6cjfuhVi+irS2Kn9ksfGpwan7esNeFEtI=
+X-Gm-Gg: AYBFou0f1C4xm6H9jA+KEi/O8QxXSdMqxZwezPHsQj0htxNgByHyycspyXgJEG1Au9M
+	YBK5gfB2Ty8Iog8j7U1E4PSk13xMpI2Bfh1KKoJQfwZ/xVn6PM/kn+UHf/VO6xGwbTOQ4mzdCia
+	1ktJwey7Y3HBWTlK0uPBS1DQw1SZ7+SL+Aj51Uvu99Wd6S00LvEEFfzM8CdSphF8dbGfXN1JT9p
+	m13iGeg8hnQK/oKdo77jhd+PwwbarEjIAlz2nf3LfXAk9TNlqYZ+au+jYoQih0gA8EgF1lMXwe4
+	7VaAy/UM5HJjkslvfamE+g3Z38idVRzVSwHA6WDk+kqbGhqYuaHVCOBXHtgL0DE8/KwDXv9RDYu
+	nrkWuNDc47nlUFrmLO+SUkRLAwxDdOUfI3EudkjG3Oji9jv7Nwob2GAm7kVv78nXGCOYMPBSaA7
+	RFNKvlibNjcmTTCjeCtpOqwMyjtWJynCGKcG3slqdoFPerKdvzMzZUGWnYbVOWvV993Gr8b2oOk
+	w==
+X-Received: by 2002:a05:600c:474e:b0:49e:7cff:f8ca with SMTP id 5b1f17b1804b1-49fc5743c69mr189508785e9.29.1790084681055;
+        Tue, 22 Sep 2026 06:44:41 -0700 (PDT)
+Received: from localhost.localdomain ([2001:af0:8000:1409:193:86:92:181])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fdad2a3e0sm72269425e9.5.2026.09.22.06.44.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Sep 2026 06:44:40 -0700 (PDT)
+Date: Tue, 22 Sep 2026 15:44:38 +0200
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	James Houghton <jthoughton@google.com>, Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>, 
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev, cgroups@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] selftests/cgroup: Make the object directory an
+ order-only prerequisite
+Message-ID: <arKFe3JRF3n2h-26@localhost.localdomain>
+References: <20260922071945.693714-1-fuad.tabba@linux.dev>
+ <20260922071945.693714-3-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="wz67vp63rqm7k2iu"
+Content-Disposition: inline
+In-Reply-To: <20260922071945.693714-3-fuad.tabba@linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] arm-smmu-v3-kvm: panic on EL2 allocation failure during STE reshad=
-ow
---
 
-commit 866d2f52e473ce62e2402494a1198d807826d481
-Author: Mostafa Saleh <smostafa@google.com>
-Subject: iommu/arm-smmu-v3-kvm: Shadow the CPU stage-2 page table
+--wz67vp63rqm7k2iu
+Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v2 2/2] selftests/cgroup: Make the object directory an
+ order-only prerequisite
+MIME-Version: 1.0
 
-The hypervisor calls back into the driver on every change to the host
-stage-2 page table.
-Mirror those changes into an identity mapped stage-2 for the SMMUv3,
-That would be attached to all active SIDs.
+On Tue, Sep 22, 2026 at 08:19:45AM +0100, Fuad Tabba <fuad.tabba@linux.dev>=
+ wrote:
+> libcgroup.mk names $(LIBCGROUP_O_DIRS) as a regular prerequisite of
+> cgroup_util.o. The directory's mtime moves whenever an object is
+> created or replaced in it, so an incremental KVM selftests build that
+> rebuilt anything in lib/ recompiles cgroup_util.o and relinks every
+> test on the following run.
 
-[ ... ]
+I'd expect the other test would recompile stuff in lib/ but not in
+cgroup/lib/, however that distinction is likely lost when $(OUTPUT) is
+expanded from the included *.mk file.
 
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c b/drivers/i=
-ommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
-> index 6e023e968ed3a..6f0ea3a4e48df 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
+> Make the directory order-only, as libvfio.mk does.
 
-[ ... ]
+Sensible approach given that vfio.
 
-[Severity: High]
-Can a routine allocation failure lead to a hypervisor panic here?
+>=20
+> Fixes: 2c754a84ff16a ("cgroup: selftests: Move cgroup_util into its own l=
+ibrary")
+> Assisted-by: LLM
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>  tools/testing/selftests/cgroup/lib/libcgroup.mk | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Looking at smmu_reshadow_ste() in drivers/iommu/arm/arm-smmu-v3/pkvm/arm-sm=
-mu-v3.c,
-the dynamic allocation can legitimately fail with -ENOMEM when the pool is
-exhausted:
+Acked-by: Michal Koutn=FD <mkoutny@suse.com>
 
-drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c:smmu_reshadow_ste() {
-	...
-			l2table =3D pkvm_iommu_alloc_pages(get_order(sizeof(*l2table)));
-			if (!l2table)
-				return -ENOMEM;
-	...
-}
+--wz67vp63rqm7k2iu
+Content-Type: application/pgp-signature; name="signature.asc"
 
-This -ENOMEM error is mapped to a true return value in smmu_filter_command(=
-):
+-----BEGIN PGP SIGNATURE-----
 
-drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c:smmu_filter_command() {
-	...
-		ret =3D smmu_reshadow_ste(smmu, sid, leaf);
-		hyp_spin_lock(&smmu->hw_lock);
-		if (ret)
-			return true;
-	...
-}
+iJEEABYKADkWIQRCE24Fn/AcRjnLivR+PQLnlNv4CAUCarKGQhsUgAAAAAAEAA5t
+YW51MiwyLjUrMS4xMiwyLDIACgkQfj0C55Tb+Ah2DgEA8Xdl3JGOJIGtK6hwQh4u
+Jb+PcelMIF9Zbpm+LvcVQysA/2EdCxDp5Lq6779UZxftUj9At2iFIuFnLA5vHe4p
+ZbcI
+=BJVd
+-----END PGP SIGNATURE-----
 
-Which is then wrapped in a WARN_ON() in smmu_emulate_cmdq_insert():
-
-drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c:smmu_emulate_cmdq_insert()=
- {
-	...
-		skip =3D smmu_filter_command(smmu, cmd);
-		if (WARN_ON(skip))
-			continue;
-	...
-}
-
-Does this WARN_ON() turn the -ENOMEM condition into a fatal hypervisor
-panic?
-
-At EL2, WARN_ON() expands to a fatal BRK instruction, crashing the hypervis=
-or.
-Host userspace processes can trigger this path (e.g., via VFIO device
-assignment) by configuring multiple devices to exhaust the L2 table pool,
-leading to a host-userspace-reachable panic.
-
-Could this be updated to handle hyp_alloc_pages() failures without
-triggering a fatal assertion?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260922131259.2975=
-334-1-smostafa@google.com?part=3D22
+--wz67vp63rqm7k2iu--
