@@ -1,127 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-21.mta1.migadu.com [95.215.58.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3084648640E;
-	Tue, 22 Sep 2026 18:13:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B36F488DB6
+	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 18:14:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790100785; cv=none; b=ZzJ0J48DCUbXQQZSt8ZSmiNvmt0nTSuNGF6IMzfd6RoYbA/Hyis5myzayJ6zDJaoVao9EM6RNZ/gvmk94tDCNkgfJvcioB7T1AbZnMCAJnZIhx7Cq7ZTQDxjXszwGw6xbwE3O1jEtqNZR4hfp9ddzeHczacT+drDzuHBexaTMqI=
+	t=1790100878; cv=none; b=AcpWB4FXu+kCR5vpqorKzaNGV4He0p2qa2obzhN2Oxt4vR7Tq9AYJ3BRO0YQ8Eh2IN9Gv7+zV4uFVkj/xSCnXRO3IpBGycfwvnyVJU1UKK2+CI+32pHBP/1467f2HlM1CNdn7JviCn7ZLgupmIapALh2TS2/bkzjxJ7d+dCpDag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790100785; c=relaxed/simple;
-	bh=0ZZoTTvBclLSkUaE6pJ6RJ5I4n4escQFucYderbNDyo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CEyVJXoyrvAoHj7t7kCD0WnGPTd/hwFHk20A5001RAz+hWj9Nidqw0bY3SxeZlHKwP4i6eTO/j2i0Go0r7aPWZkYMRqwDb0T/8KTM2JorafRaCtdigUzLHxp4VPgGlQAx/Kc7tQ6WW7vrDSq8s8KL1LrMexLhY5S2Me/kUT8H+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aEnsGW0y; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790100878; c=relaxed/simple;
+	bh=f0jYPFzuM0NSkHRaWJjNo2NpwpZEF5TCkw4mIszCYR0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qSeZI1F50IoIz247P5HpI7Ih0aNY+3ohdfqIGyu1wOX2DkTCNQHfEoVn60EtLzJJATGKQEhq+M+lf5j5uafr06gWvamm2D+brqX2IoYKVarfeM0bPOWn2H/hMi0GzxpJJvFBt7jmjqBCotw6irDjV2gIWlm0wBr7nqs5+bmirLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cVPpxj+/; arc=none smtp.client-ip=95.215.58.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aEnsGW0y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89B2B1F000FF;
-	Tue, 22 Sep 2026 18:13:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790100784;
-	bh=CkCRLFxPHHGYCNcpfamPUAWq4+0JQ01hkaddMI1o5c0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=aEnsGW0yAgw4LKhTybjTtlcqCi/fZB3g6qFJkA4kXBn1yUrqJyBxJzpOQAX/hUpUC
-	 ZAJRHQspZybQ7ZzGv/GdWpa2tvJfCUTqAC6ZZJp/oV8xUtiBjvLpc//89ADZF4TvpI
-	 KQJ0T16D3hJwV88PhMcUfsnhEI/h1wCQSFRTSgW1dbeVA01Med4Y3Nc6OxkLy5dG+B
-	 b5OLTCoae+BMC/IHCa84m4y3H7c7P9/vo8dU6t5VAFYf0w4SQjsv04OJ3Tbbmo7HP+
-	 poTO7r99P8IjzoEM2qzkAmuXldgPsljt/60qH78l2y/OYoQ5EN+3spVB92F1wcveIk
-	 k5NgQ9ESfR2bg==
-Date: Tue, 22 Sep 2026 11:13:02 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cVPpxj+/"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=f0jYPFzuM0NSkHRaWJjNo2NpwpZEF5TCkw4mIszCYR0=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1790100872; v=1; x=1790705672;
+ b=cVPpxj+/gMzD00QLbrzPiVpX4jGeDu1ZIKweRkMJoS4NkDU9ROPDoN+dPdA/oKgQYChGRi7k
+ ka0T59yGq+3HAXRSDZFOpbjUEhcCGNAUZSCE0KcsCjkRbfIqZIS1BukHVTnSeWiIVlmZTL7y9sn
+ T1JIvIeKZF1QNkaBAWDW7FII=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id bac53cbccdb42169;
+	Tue, 22 Sep 2026 18:14:32 +0000
+X-Mizu-Trace-ID: bac53cbccdb42169
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>,
 	Mark Rutland <mark.rutland@arm.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	James Clark <james.clark@linaro.org>,
+	Jonathan Corbet <corbet@lwn.net>,
 	Randy Dunlap <rdunlap@infradead.org>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Jack Thomson <jackabt@amazon.com>,
-	Jack Thomson <jackabt.amazon@gmail.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Leo Soares Passos <Leo.Bras@arm.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: Re: [PATCH v3 02/14] arm64: Add ESR fault helpers
-Message-ID: <arLFLp6keTbFmXMB@kernel.org>
-References: <20260922-kvm-arm-prefault-v3-0-787bd3bc7e3f@kernel.org>
- <20260922-kvm-arm-prefault-v3-2-787bd3bc7e3f@kernel.org>
- <arK0N7H1w-pcixba@kernel.org>
- <arK8ZnBSFwmjizuk@gremlin>
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Fuad Tabba <tabba@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v1] arm64/boot: Disable trapping of PMZR_EL0 writes to EL2
+Date: Tue, 22 Sep 2026 19:14:30 +0100
+Message-Id: <20260922181430.3532371-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <arK8ZnBSFwmjizuk@gremlin>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 22, 2026 at 06:45:43PM +0100, Lorenzo Stoakes (ARM) wrote:
-> On Tue, Sep 22, 2026 at 10:00:39AM -0700, Oliver Upton wrote:
-> > On Tue, Sep 22, 2026 at 03:17:56PM +0100, Lorenzo Stoakes (ARM) wrote:
-> > > Add helper functions which operate directly on an ESR value rather than
-> > > trying to access the register itself.
-> > >
-> > > These mirror equivalent KVM vCPU wrappers in kvm_emulate.h and allow those
-> > > wrappers and KVM's stage-2 fault handling to operate on a plain ESR value.
-> > >
-> > > This is needed to later generate a synthetic fault for the stage-2 page
-> > > table pre-faulting mechanism.
-> > >
-> > > No functional change intended.
-> > >
-> > > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> > > ---
-> > >  arch/arm64/include/asm/esr.h | 44 ++++++++++++++++++++++++++++++++++++++++++++
-> > >  1 file changed, 44 insertions(+)
-> > >
-> > > diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> > > index f816f5d77f1a..9c0205983d9a 100644
-> > > --- a/arch/arm64/include/asm/esr.h
-> > > +++ b/arch/arm64/include/asm/esr.h
-> > > @@ -437,6 +437,50 @@
-> > >  #ifndef __ASSEMBLER__
-> > >  #include <asm/types.h>
-> > >
-> > > +static __always_inline u8 esr_get_ec(unsigned long esr)
-> > > +{
-> > > +	return ESR_ELx_EC(esr);
-> > > +}
-> >
-> > Why do we need to wrap the macro in an inline function?
-> 
-> It seemed like a more consistent way of doing this but looking through the code
-> ESR_ELx_EC() is referenced directly in quite a few places so will swap out.
-> 
-> >
-> > > +static __always_inline bool esr_trap_is_iabt(unsigned long esr)
-> > > +{
-> > > +	return esr_get_ec(esr) == ESR_ELx_EC_IABT_LOW;
-> > > +}
-> > > +
-> > > +static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
-> > > +{
-> > > +	return esr & ESR_ELx_S1PTW;
-> > > +}
-> >
-> > This helper doesn't make a ton of sense outside of KVM, since
-> > ESR_ELx.S1PTW is RES0 (not RAZ) outside of a stage-2 abort.
-> 
-> OK, kvm_emulate.h better?
+__init_el2_fgt2() writes one mask to both HDFGRTR2_EL2 and HDFGWTR2_EL2.
+PMZR_EL0 is write-only, so its trap bit, nPMZR_EL0, exists only in
+HDFGWTR2_EL2 and is therefore never set: a PMZR_EL0 write from the host
+traps to EL2, where the nVHE hypervisor has no handler and BUG()s. The
+kernel never writes PMZR_EL0, but kernel.perf_user_access=1 has the PMU
+driver set PMUSERENR_EL0.UEN for a task with a user-read event, so a
+write from EL0 reaches the trap and takes the host down without a panic
+message.
 
-Works for me, thanks!
+Accumulate the HDFGWTR2_EL2 bits separately, as __init_el2_fgt() already
+does for HDFGWTR_EL2, and set nPMZR_EL0 with the other FEAT_PMUv3p9
+bits.
 
-Best,
-Oliver
+Fixes: 858c7bfcb35e1 ("arm64/boot: Enable EL2 requirements for FEAT_PMUv3p9")
+Cc: stable@vger.kernel.org
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+Based on Linux 7.3-rc4 (93f51579e7df2).
+
+ Documentation/arch/arm64/booting.rst | 1 +
+ arch/arm64/include/asm/el2_setup.h   | 9 ++++++++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
+index 13ef311dace83..3fea4b14ef7c2 100644
+--- a/Documentation/arch/arm64/booting.rst
++++ b/Documentation/arch/arm64/booting.rst
+@@ -465,6 +465,7 @@ Before jumping into the kernel, the following conditions must be met:
+     - HDFGWTR2_EL2.nPMICNTR_EL0 (bit 2) must be initialised to 0b1.
+     - HDFGWTR2_EL2.nPMICFILTR_EL0 (bit 3) must be initialised to 0b1.
+     - HDFGWTR2_EL2.nPMUACR_EL1 (bit 4) must be initialised to 0b1.
++    - HDFGWTR2_EL2.nPMZR_EL0 (bit 21) must be initialised to 0b1.
+ 
+   For CPUs with SPE data source filtering (FEAT_SPE_FDS):
+ 
+diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+index aa8ec9df80243..87560d8b254e6 100644
+--- a/arch/arm64/include/asm/el2_setup.h
++++ b/arch/arm64/include/asm/el2_setup.h
+@@ -418,6 +418,7 @@
+ 	b.lt	.Lskip_fgt2_\@
+ 
+ 	mov	x0, xzr
++	mov	x2, xzr
+ 	mrs	x1, id_aa64dfr0_el1
+ 	ubfx	x1, x1, #ID_AA64DFR0_EL1_PMUVer_SHIFT, #4
+ 	cmp	x1, #ID_AA64DFR0_EL1_PMUVer_V3P9
+@@ -426,6 +427,11 @@
+ 	orr	x0, x0, #HDFGRTR2_EL2_nPMICNTR_EL0
+ 	orr	x0, x0, #HDFGRTR2_EL2_nPMICFILTR_EL0
+ 	orr	x0, x0, #HDFGRTR2_EL2_nPMUACR_EL1
++	orr	x2, x2, #HDFGWTR2_EL2_nPMICNTR_EL0
++	orr	x2, x2, #HDFGWTR2_EL2_nPMICFILTR_EL0
++	orr	x2, x2, #HDFGWTR2_EL2_nPMUACR_EL1
++	/* PMZR_EL0 is write-only, so it has no read trap to disable */
++	orr	x2, x2, #HDFGWTR2_EL2_nPMZR_EL0
+ .Lskip_pmuv3p9_\@:
+ 	/* If SPE is implemented, */
+ 	__spe_vers_imp .Lskip_spefds_\@, ID_AA64DFR0_EL1_PMSVer_IMP, x1
+@@ -436,10 +442,11 @@
+ 	cbz	x1, .Lskip_spefds_\@
+ 	/* disable traps of PMSDSFR to EL2. */
+ 	orr	x0, x0, #HDFGRTR2_EL2_nPMSDSFR_EL1
++	orr	x2, x2, #HDFGWTR2_EL2_nPMSDSFR_EL1
+ 
+ .Lskip_spefds_\@:
+ 	msr_s   SYS_HDFGRTR2_EL2, x0
+-	msr_s   SYS_HDFGWTR2_EL2, x0
++	msr_s   SYS_HDFGWTR2_EL2, x2
+ 	msr_s   SYS_HFGRTR2_EL2, xzr
+ 	msr_s   SYS_HFGWTR2_EL2, xzr
+ 	msr_s   SYS_HFGITR2_EL2, xzr
+
+base-commit: 93f51579e7df248780214094418f205253383cc5
+-- 
+2.39.5
+
