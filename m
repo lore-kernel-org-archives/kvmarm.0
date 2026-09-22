@@ -1,230 +1,125 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970FE54CF6C
-	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 14:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB3202F260C;
+	Tue, 22 Sep 2026 14:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790087359; cv=none; b=VDKmOTCR0c/+djD2VRsXdB6HC3SrCUesmSz4E/OOPCe22Gj1FQ2arvEsUUyq3vtHvB1zxeLQDOKkFiS4MVtv7XwaZ4HahVXKxaeBqhT+Ow/zYGTFUCwDsyYY0MeSYbEERPOii7/Ey0msXi3kPJkjN8Wm9GDHafBl+GA/xheifK4=
+	t=1790087519; cv=none; b=dfnMkLORx6oyb0J2sjn64CKy2vO7aw5eGKP9bq8OivtCKX8LRYAsXHIKEB8q923FkOpL0snuM1GDqYwbr0ovUiV360W3F3r+F0PozaRS78Co0mbxszpDYrs1nv0nW6za9XvKKbwpF4ASrrAqcBpFT8NfSgzqPJwnDtfWuDulanE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790087359; c=relaxed/simple;
-	bh=OpHY4NXD+atdw7gjGIar2AdTVmoZTKzjqsFs3l0/n1k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t8bSnNJUn10rtJ7gMrP4XoGdBDxdTe7yZ57b8A+4SNmWnOGFat7/PKg5QE8xUDjkAmvC+D3O9B1QC4iamT6hSfvZFP4f7IjikpW3vCpYtUYX4yb7agyuFygoTGy3JarpYST3ZlU1R66txtEAB0IWmEDk+hgU4hKhmFAA/7Kdhfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TO9wIkjC; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1790087519; c=relaxed/simple;
+	bh=6IImLfTKxPhGIdpizcT4cnoXrUZEZ+xiZp14YeweZOg=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=J6dTvu4DP6A2scMnEM8zWdZMwibF6EywtOiDtLPJGFnyk874dT9Y0vSSk9Iof2Cf/P2Dnqj/NAEYtQ2q3H6z9TJvzCF0UtNfW3aBy9sbo2l2Sm+ZDwB3F5GfEn5FZf/e5nLIdTQAX8imWA+h32FLplSK2gpPbHqUS9Swujdeaas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oduosniq; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TO9wIkjC"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-498012a61f6so43315e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 07:29:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790087356; x=1790692156; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=5d8FCrARkicIkXoFfwK1llal0qOCc070vJfaXSpy94Q=;
-        b=TO9wIkjCGVzFJsrY5uSFS0ZrhbcATKGdV/R2E0LOWJs3IEUYgMluv6ysssJ+HmsZf8
-         s19AMi8o0VqTTEGKXrhvtmE3noQ3S596b6EnEeUklU4LpNTPPzaBJ8g5wIFtWentOxwJ
-         LaG96r0uCbY1YvWA5Q0noOK2uZ+opZRajTkPuf6y0CIfAtwCt41AYLvNSi03g+W504ox
-         krNZl6AlHDxAgGh+90+iXwr9O+Gqz4XE17nygUlLczGPEPbaabo6jp+EZcUfIsM56HD6
-         mfMRyUTcdECGPGvoiZRtYg0aGn9iqg5hmeaD8hSiJgEO5XQ2T1C546OgZA49YfAPvS1E
-         /G4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790087356; x=1790692156;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=5d8FCrARkicIkXoFfwK1llal0qOCc070vJfaXSpy94Q=;
-        b=ZT/r8QePFN5xVDllG//SYwBIwdWs3q4F9NxlWoKX/oofJoWg6N/C7/38rzIynWbOPm
-         gN+PhOeMrTyKscCMKS58bsYGNwFvoBf+jIm7nhfK0G0gP0Ix8EkrhG5R4hKxZ2mOIznS
-         itoCRm47dfMgvgNxdrYNpsNlCBvsFtD3IS8+SdTt4BhH5lnJcKLsHF4wkfJgviK2Bzl5
-         Qhd+ewcw6ZbieIA8/nx8Y/QHSTdiYDbVV7t8OE9zakboF3xBMdeT+fcvj2wXq4997F7W
-         Y7gQmsKt7sJ3JG4oNlJKUfH9f97ALu1+aSxMeFlXMxOkLCwi7vEoLjcuACP3Kehs8ett
-         ORGg==
-X-Gm-Message-State: AFuF++lhoncMgkw8HAI/6zfSqHiWNr1ROM1I4dyRlxiiDEI2p2n3RtCv
-	pr0LFydcXNY7si4A7hHv0qYDJTS7FWSDY+7BEXHkVVZpXh/w3lZES+/mlA0cWN5j8A==
-X-Gm-Gg: AYBFou3lQqG79pYH0a95B+4oDXSTHAQ3srtHDzhH99Nz0QzuvqUUeJQq94QA5XI19Sb
-	DBtcHc5o28mquCXUWLS7CJ3I5upEmrgPp8S99mLrsyfMndiEfax/OB+SyLg6eXmWfhXX5gQl+tL
-	S8IXJD3vkzRd/s2w26QapQ83/C7Sf25FTh99atxQNkDF5nEwxSHkFcVcOx7DAey1vq4dpyLT7XY
-	cg9iw/o6Mr0YWzEYHDS8FT9QmmGQZgIL0P0k77//mYl4QtnQAuwb3wfwnnwyLuTT2qUeRFeNdSw
-	gh21QN2jJn0fCMCoBILTl0WFk43aubqPS7US6C/cqBfPcSNMjW4X2UgjVqWJfN/gr6EFtFe7rtI
-	KG37P9Obo49outP4fARNUG46XdxFENAYAfKZZw7dOFnaBncrO73xOnuzoPwsuH4NHu6iX1wV46F
-	1Q0DtOiJ5BhZD4g5izmatPZlzQ3FI6ghwKrWjNqPiFmcQbHSCYNa6wjTVnmXtJDvRXD8+P4esNx
-	ejYdW+D/mwWQNADC0fGzsH8nfPSlAyOPhbau+lW
-X-Received: by 2002:a05:600c:22d2:b0:49c:fee1:5095 with SMTP id 5b1f17b1804b1-49fdd9c6041mr107385e9.16.1790087355306;
-        Tue, 22 Sep 2026 07:29:15 -0700 (PDT)
-Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fdab0c240sm38368285e9.4.2026.09.22.07.29.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Sep 2026 07:29:14 -0700 (PDT)
-Date: Tue, 22 Sep 2026 14:29:10 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v8 07/25] KVM: arm64: iommu: Shadow host stage-2 page
- table
-Message-ID: <arKQttZkiX-kqMZN@google.com>
-References: <20260922131259.2975334-1-smostafa@google.com>
- <20260922131259.2975334-8-smostafa@google.com>
- <20260922132359.BB0381F000FF@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oduosniq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E84B1F000FF;
+	Tue, 22 Sep 2026 14:31:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790087517;
+	bh=w/jfGaM0qWyYXl2OytFCyasVG0o2ZzBWvSGfH33ibz8=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=oduosniqM5wZzM/Oy8KUIAo4sHwzuvLkS1A9KFRQ/AZMmiSUfibVrUIbawmWHs/Fi
+	 4kfY48XN42PTV8QJ7beUlp3hL31X34Nfm2t3v7qo6kzPmL7ApDOwXHLbsxhITuAT06
+	 wfwgce69whe9sEB82VSqub0XhRqQI/ySgLTwRFwI08zzMZJByA8gyQ534NMf67RXQh
+	 +yP1GFlnOx+stTNk206mZc70UgakvoBBVh0iOPFo9McL7qHVc1U8xyTJ9g+/I4vS0c
+	 dDfeu2VU2awim8xAA26Ej1QqT0Z2Wea97RYc0+AZNnHkH5GBTTCIOr6w+0pv8pxs5+
+	 Zkx4OMYX/RCeg==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v3 07/14] KVM: arm64: Size the stage-2 memcache from the
+ fault MMU
+Reply-To: sashiko-reviews@lists.linux.dev
+To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
+Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
+ Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
+In-Reply-To: <20260922-kvm-arm-prefault-v3-7-787bd3bc7e3f@kernel.org>
+References: <20260922-kvm-arm-prefault-v3-0-787bd3bc7e3f@kernel.org>
+ <20260922-kvm-arm-prefault-v3-7-787bd3bc7e3f@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 22 Sep 2026 14:31:56 +0000
+Message-Id: <20260922143157.0E84B1F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260922132359.BB0381F000FF@smtp.kernel.org>
 
-On Tue, Sep 22, 2026 at 01:23:59PM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] kvm: arm64: pkvm: guest-triggerable hyp panic due to WARN_ON misuse
-> --
-> 
-> commit 68e26689446b14f6e5c91a79e4493c62586f9fb4
-> Author: Mostafa Saleh <smostafa@google.com>
-> Subject: KVM: arm64: iommu: Shadow host stage-2 page table
-> 
-> This commit creates a page-table for the IOMMU that shadows the host CPU
-> stage-2 to establish DMA isolation. An initial snapshot is created after
-> the driver init, and on permission changes, a callback updates the IOMMU
-> page table.
-> 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/iommu.c b/arch/arm64/kvm/hyp/nvhe/iommu.c
-> > index ef456eff42d29..3637b0327d9e8 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/iommu.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/iommu.c
-> 
-> [ ... ]
-> 
-> > @@ -4,16 +4,138 @@
-> >  int pkvm_iommu_init(void)
-> >  {
-> > +	int ret;
-> > +
-> >  	/* Keep DMA isolation optional. */
-> > -	if (!pkvm_iommu_ops || !pkvm_iommu_ops->init)
-> > +	if (!pkvm_iommu_ops || !pkvm_iommu_ops->init ||
-> > +	    !pkvm_iommu_ops->host_stage2_idmap)
-> >  		return 0;
-> >  
-> > -	return pkvm_iommu_ops->init();
-> > +	ret = pkvm_iommu_ops->init();
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	return WARN_ON(pkvm_iommu_snapshot_host_stage2());
-> 
-> [Severity: High]
-> Does this unintentionally cause a hypervisor panic if the snapshot fails?
-> 
-> At EL2 (nVHE/pKVM), WARN_ON expands to a fatal BRK instruction rather than
-> a warn-and-continue. Wrapping a fallible operation like this triggers a
-> panic during initialization instead of returning the error.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] arm64: kvm: spurious allocation in kvm_s2_fault_map during prefa=
+ult
+--
 
-That is intentional as there is no roll-back beyond this point, this
-pattern is commonly used with pKVM.
+commit 9bf98edb6fb89edb3f2ce746e5754cac7f11bfe0
+Author: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+KVM: arm64: Size the stage-2 memcache from the fault MMU
 
-> 
-> > +}
-> 
-> [ ... ]
-> 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > index c1a8fd811c0fa..da5014e4e96b6 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> 
-> [ ... ]
-> 
-> > @@ -603,16 +604,15 @@ static int host_stage2_set_owner_metadata_locked(phys_addr_t addr, u64 size,
-> >  	ret = host_stage2_try(kvm_pgtable_stage2_annotate, &host_mmu.pgt,
-> >  			      addr, size, &host_s2_pool,
-> >  			      KVM_HOST_INVALID_PTE_TYPE_DONATION, annotation);
-> > -	if (!ret) {
-> > -		/*
-> > -		 * After stage2 maintenance has happened, but before the page
-> > -		 * owner has changed.
-> > -		 */
-> > -		pkvm_sme_dvmsync_fw_call();
-> > -		__host_update_page_state(addr, size, PKVM_NOPAGE);
-> > -	}
-> > -
-> > -	return ret;
-> > +	if (ret)
-> > +		return ret;
-> > +	/*
-> > +	 * After stage2 maintenance has happened, but before the page
-> > +	 * owner has changed.
-> > +	 */
-> > +	pkvm_sme_dvmsync_fw_call();
-> > +	__host_update_page_state(addr, size, PKVM_NOPAGE);
-> > +	return WARN_ON(pkvm_iommu_host_stage2_idmap(addr, addr + size, 0));
-> 
-> [Severity: High]
-> Does this create a dead-branch trap that skips rolling back the page state?
-> 
-> Since WARN_ON acts as a panic at EL2, any failure in the IOMMU mapping call
-> will immediately crash the hypervisor. It also leaves the earlier mutation
-> from __host_update_page_state without a rollback path on failure.
+This commit modifies topup_mmu_memcache() to use the target MMU from s2fd->=
+mmu
+rather than the active vCPU MMU. This is a preparatory step for stage-2
+pre-faulting, which needs to target the canonical MMU regardless of the vCP=
+U's
+context.
 
-This is added for readability, not really a problem.
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 5c429065a4feb..221ea069f9bb6 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -2251,7 +2251,7 @@ static int user_mem_abort(const struct kvm_s2_fault=
+_desc *s2fd,
+>  	memcache =3D get_mmu_memcache(s2fd->vcpu);
+>  	if (!perm_fault || memslot_is_logging(s2fd->memslot) ||
+>  	    is_protected_kvm_enabled()) {
+> -		ret =3D topup_mmu_memcache(s2fd->vcpu, memcache);
+> +		ret =3D topup_mmu_memcache(s2fd->mmu, memcache);
+>  		if (ret)
+>  			return ret;
+>  	}
 
-> 
-> >  }
-> >  
-> >  int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id)
-> > @@ -625,8 +625,10 @@ int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id)
-> >  			return -EPERM;
-> >  
-> >  		ret = host_stage2_idmap_locked(addr, size, PKVM_HOST_MEM_PROT);
-> > -		if (!ret)
-> > -			__host_update_page_state(addr, size, PKVM_PAGE_OWNED);
-> > +		if (ret)
-> > +			break;
-> > +		__host_update_page_state(addr, size, PKVM_PAGE_OWNED);
-> > +		ret = WARN_ON(pkvm_iommu_host_stage2_idmap(addr, addr + size, PKVM_HOST_MEM_PROT));
-> 
-> [Severity: High]
-> Is it intentional that a failure here panics instead of returning the error?
-> 
-> Assigning WARN_ON to a variable suggests an expectation that it returns,
-> but at EL2 it triggers a fatal BRK instruction. This also leaves the prior
-> page state update without a rollback.
+[Severity: Medium]
+Does this decoupling of s2fd->mmu and vcpu->arch.hw_mmu cause a spurious
+allocation downstream in kvm_s2_fault_map()?
 
-No need for rollback as it panics.
+When pre-faulting is executed on a nested vCPU, s2fd->mmu is set to the
+non-nested canonical MMU, while vcpu->arch.hw_mmu remains nested. In
+kvm_s2_fault_map(), the allocation of the mapping struct is gated on the ac=
+tive
+vCPU MMU:
 
-> 
-> >  		break;
-> 
-> [ ... ]
-> 
-> > @@ -1029,6 +1031,7 @@ int __pkvm_guest_share_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn)
-> >  				       pkvm_mkstate(KVM_PGTABLE_PROT_RWX, PKVM_PAGE_SHARED_OWNED),
-> >  				       &vcpu->vcpu.arch.pkvm_memcache, 0));
-> >  	WARN_ON(__host_set_page_state_range(phys, PAGE_SIZE, PKVM_PAGE_SHARED_BORROWED));
-> > +	WARN_ON(pkvm_iommu_host_stage2_idmap(phys, phys + PAGE_SIZE, PKVM_HOST_MEM_PROT));
-> 
-> [Severity: High]
-> Can an untrusted guest intentionally trigger a host denial of service here?
-> 
-> By triggering memory sharing hypercalls, a guest might exhaust the IOMMU
-> page pool, forcing an allocation failure in pkvm_iommu_host_stage2_idmap.
-> Wrapping this fallible outcome in WARN_ON will trigger a hypervisor panic.
-> 
+arch/arm64/kvm/mmu.c:kvm_s2_fault_map() {
+	if (kvm_is_nested_s2_mmu(kvm, s2fd->vcpu->arch.hw_mmu)) {
+		mapping =3D kmalloc_obj(struct kvm_guest_s2_mapping,
+				      GFP_KERNEL_ACCOUNT);
+		if (!mapping) {
+			kvm_release_page_unused(s2vi->page);
+			return -ENOMEM;
+		}
+	}
+}
 
-The IOMMU can't be exhasuted by design, the same WARN_ON() exist in the
-line above for the CPU page table update also.
+However, the consumption and tracking of this mapping relies on pgt->mmu, w=
+hich
+resolves to the target s2fd->mmu:
 
-Thanks,
-Mostafa
+arch/arm64/kvm/mmu.c:kvm_s2_fault_map() {
+		if ((ret =3D=3D 0 || ret =3D=3D -EAGAIN) && kvm_is_nested_s2_mmu(kvm, pgt=
+->mmu)) {
+			kvm_record_guest_s2_mapping(pgt->mmu, canonical_ipa,
+						    gfn_to_gpa(gfn), mapping_size, mapping);
+			mapping =3D NULL;
+		}
+}
 
-> >  unlock:
-> 
-> -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260922131259.2975334-1-smostafa@google.com?part=7
+Because kvm_is_nested_s2_mmu() for pgt->mmu evaluates to false during a
+pre-fault, the allocation is never used and is subsequently safely freed at=
+ the
+end of the function.
+
+Could this lead to an unnecessary allocation in the ioctl path that might
+spuriously fail and return -ENOMEM to userspace?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260922-kvm-arm-pr=
+efault-v3-0-787bd3bc7e3f@kernel.org?part=3D7
