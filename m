@@ -1,214 +1,230 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDA54F391B;
-	Tue, 22 Sep 2026 14:27:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970FE54CF6C
+	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 14:29:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790087229; cv=none; b=kLof6iSdoCVHxlEpwpdjrd6uG+jfEj8GZDM82Pj67vb3/K9idDHmuhKHAVWwthk50VX1JLSUgeuIF/x+FZt7udn/bI8sjE5mth84anz6UcXA67A0IWJuZ1lJr/sVm7n9rNKEK+ZBWeTnFe16gZ/20hkaY4BU1jTHZbgDJGLiCT8=
+	t=1790087359; cv=none; b=VDKmOTCR0c/+djD2VRsXdB6HC3SrCUesmSz4E/OOPCe22Gj1FQ2arvEsUUyq3vtHvB1zxeLQDOKkFiS4MVtv7XwaZ4HahVXKxaeBqhT+Ow/zYGTFUCwDsyYY0MeSYbEERPOii7/Ey0msXi3kPJkjN8Wm9GDHafBl+GA/xheifK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790087229; c=relaxed/simple;
-	bh=oW1pJRQnRgSl6wxKhscSM9KdCKWSZpH9pzzrsXbdVhQ=;
+	s=arc-20240116; t=1790087359; c=relaxed/simple;
+	bh=OpHY4NXD+atdw7gjGIar2AdTVmoZTKzjqsFs3l0/n1k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YGtF63SIqbuyWiwyYcIEMv5ePA/CDbMsjnqsY1+NcBYCd3BNGXInFtd7+uXjaBQuDbrf9VDuhxv4p9E+clwvvDG2GU3ynGtEVyoQy67VwJuAFaXNKDzLQg3h56itoXwxkg768do21pxhJXuA/UzRqZgzfagKRmaDonXnsJtnlIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rsdna0yX; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=t8bSnNJUn10rtJ7gMrP4XoGdBDxdTe7yZ57b8A+4SNmWnOGFat7/PKg5QE8xUDjkAmvC+D3O9B1QC4iamT6hSfvZFP4f7IjikpW3vCpYtUYX4yb7agyuFygoTGy3JarpYST3ZlU1R66txtEAB0IWmEDk+hgU4hKhmFAA/7Kdhfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TO9wIkjC; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rsdna0yX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DEE21F000FF;
-	Tue, 22 Sep 2026 14:27:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790087227;
-	bh=XJEL2Hm1vrdb6vMcqZseArACQHb75K/NoVu74tGPz+g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Rsdna0yXsjKvBSzuthMoCSnDu2jjoQf+l1qOm4qgITDB6a2BUcBKPtwC+70FFu+20
-	 uwhXwuWgh742TWvlJe+ml677jWpT20vg969DYMFWuG+hzKFutgD0Hup3AsIlzCrFfw
-	 PoeFR6LbBVTOIZpSm6+Q/om6pqsczH3bkLkVKuwvg01eJQcR3r+B1BeznFtoIYQ5xj
-	 w9T8SXPGv7SKjq1hXkoZCf5XX/IlPr8kaLdv3/FkctDtjJFEqSdwyAG9N6WtNdrLib
-	 qncToIC8KGgXQm27vIOgF57ncJx8MR9bfogklv6cJ1/3a0zmS/sQ6NDblPNSJT+EFZ
-	 Ctyb1MY0Trv2g==
-Date: Tue, 22 Sep 2026 15:26:58 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Jack Thomson <jackabt@amazon.com>, Jack Thomson <jackabt.amazon@gmail.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Vincent Donnefort <vdonnefort@google.com>, 
-	Sean Christopherson <seanjc@google.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Leo Soares Passos <Leo.Bras@arm.com>
-Subject: Re: [PATCH v2 00/13] KVM: arm64: Add KVM_PRE_FAULT_MEMORY support
-Message-ID: <arKPnPBZFqvFQlTO@gremlin>
-References: <20260914-kvm-arm-prefault-v2-0-26fb47f74b73@kernel.org>
- <yq5abj9p38vq.fsf@kernel.org>
- <arJ1BDEzY5CANjjB@gremlin>
- <yq5a8q4t305j.fsf@kernel.org>
- <arKB2imOcg4MhXMF@gremlin>
- <yq5a5wzx2wny.fsf@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TO9wIkjC"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-498012a61f6so43315e9.0
+        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 07:29:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790087356; x=1790692156; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=5d8FCrARkicIkXoFfwK1llal0qOCc070vJfaXSpy94Q=;
+        b=TO9wIkjCGVzFJsrY5uSFS0ZrhbcATKGdV/R2E0LOWJs3IEUYgMluv6ysssJ+HmsZf8
+         s19AMi8o0VqTTEGKXrhvtmE3noQ3S596b6EnEeUklU4LpNTPPzaBJ8g5wIFtWentOxwJ
+         LaG96r0uCbY1YvWA5Q0noOK2uZ+opZRajTkPuf6y0CIfAtwCt41AYLvNSi03g+W504ox
+         krNZl6AlHDxAgGh+90+iXwr9O+Gqz4XE17nygUlLczGPEPbaabo6jp+EZcUfIsM56HD6
+         mfMRyUTcdECGPGvoiZRtYg0aGn9iqg5hmeaD8hSiJgEO5XQ2T1C546OgZA49YfAPvS1E
+         /G4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790087356; x=1790692156;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=5d8FCrARkicIkXoFfwK1llal0qOCc070vJfaXSpy94Q=;
+        b=ZT/r8QePFN5xVDllG//SYwBIwdWs3q4F9NxlWoKX/oofJoWg6N/C7/38rzIynWbOPm
+         gN+PhOeMrTyKscCMKS58bsYGNwFvoBf+jIm7nhfK0G0gP0Ix8EkrhG5R4hKxZ2mOIznS
+         itoCRm47dfMgvgNxdrYNpsNlCBvsFtD3IS8+SdTt4BhH5lnJcKLsHF4wkfJgviK2Bzl5
+         Qhd+ewcw6ZbieIA8/nx8Y/QHSTdiYDbVV7t8OE9zakboF3xBMdeT+fcvj2wXq4997F7W
+         Y7gQmsKt7sJ3JG4oNlJKUfH9f97ALu1+aSxMeFlXMxOkLCwi7vEoLjcuACP3Kehs8ett
+         ORGg==
+X-Gm-Message-State: AFuF++lhoncMgkw8HAI/6zfSqHiWNr1ROM1I4dyRlxiiDEI2p2n3RtCv
+	pr0LFydcXNY7si4A7hHv0qYDJTS7FWSDY+7BEXHkVVZpXh/w3lZES+/mlA0cWN5j8A==
+X-Gm-Gg: AYBFou3lQqG79pYH0a95B+4oDXSTHAQ3srtHDzhH99Nz0QzuvqUUeJQq94QA5XI19Sb
+	DBtcHc5o28mquCXUWLS7CJ3I5upEmrgPp8S99mLrsyfMndiEfax/OB+SyLg6eXmWfhXX5gQl+tL
+	S8IXJD3vkzRd/s2w26QapQ83/C7Sf25FTh99atxQNkDF5nEwxSHkFcVcOx7DAey1vq4dpyLT7XY
+	cg9iw/o6Mr0YWzEYHDS8FT9QmmGQZgIL0P0k77//mYl4QtnQAuwb3wfwnnwyLuTT2qUeRFeNdSw
+	gh21QN2jJn0fCMCoBILTl0WFk43aubqPS7US6C/cqBfPcSNMjW4X2UgjVqWJfN/gr6EFtFe7rtI
+	KG37P9Obo49outP4fARNUG46XdxFENAYAfKZZw7dOFnaBncrO73xOnuzoPwsuH4NHu6iX1wV46F
+	1Q0DtOiJ5BhZD4g5izmatPZlzQ3FI6ghwKrWjNqPiFmcQbHSCYNa6wjTVnmXtJDvRXD8+P4esNx
+	ejYdW+D/mwWQNADC0fGzsH8nfPSlAyOPhbau+lW
+X-Received: by 2002:a05:600c:22d2:b0:49c:fee1:5095 with SMTP id 5b1f17b1804b1-49fdd9c6041mr107385e9.16.1790087355306;
+        Tue, 22 Sep 2026 07:29:15 -0700 (PDT)
+Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fdab0c240sm38368285e9.4.2026.09.22.07.29.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Sep 2026 07:29:14 -0700 (PDT)
+Date: Tue, 22 Sep 2026 14:29:10 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v8 07/25] KVM: arm64: iommu: Shadow host stage-2 page
+ table
+Message-ID: <arKQttZkiX-kqMZN@google.com>
+References: <20260922131259.2975334-1-smostafa@google.com>
+ <20260922131259.2975334-8-smostafa@google.com>
+ <20260922132359.BB0381F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <yq5a5wzx2wny.fsf@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260922132359.BB0381F000FF@smtp.kernel.org>
 
-On Tue, Sep 22, 2026 at 07:52:25PM +0530, Aneesh Kumar K.V wrote:
-> "Lorenzo Stoakes (ARM)" <ljs@kernel.org> writes:
->
-> > On Tue, Sep 22, 2026 at 06:37:04PM +0530, Aneesh Kumar K.V wrote:
-> >> "Lorenzo Stoakes (ARM)" <ljs@kernel.org> writes:
-> >>
-> >> > On Tue, Sep 22, 2026 at 03:28:33PM +0530, Aneesh Kumar K.V wrote:
-> >> >> > This is because pKVM instantiates vCPUs upon run,
-> >> >> >
-> >> >>
-> >> >> Can pKVM instantiate the hyp vCPU during pre-faulting ?
-> >> >
-> >> > It would be an unusual and unexpected thing to do - suddenly a pre-fault
-> >> > operation is initialising a vCPU explicitly for pKVM.
-> >> >
-> >> > A caller is not going to reasonably expect this and might treat a failure to
-> >> > pre-alloc as fine to carry on whereas in fact it was a failure to initailised a
-> >> > pKVM vCPU.
-> >> >
-> >> > It'd also require significant changes to how pKVM is set up, right now it's
-> >> > hardcoded to be done unconditionally at run via kvm_arch_vcpu_run_pid_change()
-> >> > -> pkvm_create_hyp_vcpu(), so all that would have to change and be checked and
-> >> > tested and... that'd be really out of scope I think :)
-> >> >
-> >> > And pre-faulting really makes most sense BEFORE you run a VM. It doesn't make so
-> >> > much sense mid-run.
-> >> >
-> >> > But more fundamentally, the stage 2 page tables, as I understand it, are owned
-> >> > by pKVM and so aren't really available to be pre-faulted.
-> >> >
-> >> > Maybe unprotected-under-pKVM VMs but then it's questionable as to how useful
-> >> > that would be given that it would be confusing to users vs. how it works for
-> >> > other VMs.
-> >> >
-> >> > So in general, no I don't think it's a good idea.
-> >> >
-> >> > And even if we wanted to pursue some version of this, it's _definitely_ out
-> >> > of scope for the initial pre-faulting bring-up series.
-> >> >
-> >> >>
-> >> >>
-> >> >> > but pre-faulting is  typically performed before a vCPU is run.  It would be confusing and
-> >> >> > inconsistent to error out on non-running vCPUs but to pre-fault running
-> >> >> > ones.
-> >> >>
-> >> >>
-> >> >> I use KVM pre-faulting when transitioning pages from shared to private
-> >> >
-> >> > You mean you'd prefer to use? Or you are using it on another arch?
-> >> >
-> >> >> with CoCo guest. This ensures that a trusted device can DMA to private
-> >> >> memory before the guest accesses it.
-> >> >
-> >> > Hm what do you mean by private memory?
-> >> >
-> >> > I see:
-> >> >
-> >> > #ifndef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> >> > static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
-> >> > {
-> >> > 	return false;
-> >> > }
-> >> > #endif
-> >> >
-> >> > And only x86 selects KVM_GENERIC_MEMORY_ATTRIBUTES?
-> >> >
-> >> > Do you mean something else?
-> >> >
-> >>
-> >> I am using this with ARM CCA-DA, based on the patch series from Jack Thomson <jackabt.amazon@gmail.com>.
-> >>
-> >> https://gitlab.arm.com/linux-arm/kvmtool-cca/-/commit/80e7aad61c5639de2f0cb4a5525dad0c96156428
-> >>
-> >> We do this while the VM is running.
-> >
-> > Right, that's a non-mainline kernel I guess? Which presumably implements private memory.
-> >
-> > Jack himself experienced a panic with his pKVM code, so the code you're using is
-> > not upstreamable, unfortunately. And he'd already shelved pKVM support AFAICT.
-> >
-> > And reviewers pointed out actually implementing the pKVM stuff properly would be
-> > quite involved, even if you wanted to do that (hence follow-up).
-> >
-> > Also you end up stuck with the same problems as I mentioned above - you can't
-> > sanely bring the vCPU pre-run, so now you have extremely weird behaviour - only
-> > pre-faults if vCPU initialised, running, and unprotected pKVM.
-> >
->
-> IIUC, pkvm_pgtable_stage2_map() only uses the hyp vCPU's pKVM memcache
-> (&vcpu->vcpu.arch.pkvm_memcache). I agree that this does not need to be
-> addressed in this series. However, there is also a desire to keep the CCA
-> and pKVM code paths similar by using helpers such as kvm_vm_is_protected().
-> Since an RMM can create a stage-2 mapping without a REC (vCPU), rejecting
-> pre-faulting for all protected VM configurations may be incorrect. I can
-> handle this in my series though.
+On Tue, Sep 22, 2026 at 01:23:59PM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [High] kvm: arm64: pkvm: guest-triggerable hyp panic due to WARN_ON misuse
+> --
+> 
+> commit 68e26689446b14f6e5c91a79e4493c62586f9fb4
+> Author: Mostafa Saleh <smostafa@google.com>
+> Subject: KVM: arm64: iommu: Shadow host stage-2 page table
+> 
+> This commit creates a page-table for the IOMMU that shadows the host CPU
+> stage-2 to establish DMA isolation. An initial snapshot is created after
+> the driver init, and on permission changes, a callback updates the IOMMU
+> page table.
+> 
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/iommu.c b/arch/arm64/kvm/hyp/nvhe/iommu.c
+> > index ef456eff42d29..3637b0327d9e8 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/iommu.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/iommu.c
+> 
+> [ ... ]
+> 
+> > @@ -4,16 +4,138 @@
+> >  int pkvm_iommu_init(void)
+> >  {
+> > +	int ret;
+> > +
+> >  	/* Keep DMA isolation optional. */
+> > -	if (!pkvm_iommu_ops || !pkvm_iommu_ops->init)
+> > +	if (!pkvm_iommu_ops || !pkvm_iommu_ops->init ||
+> > +	    !pkvm_iommu_ops->host_stage2_idmap)
+> >  		return 0;
+> >  
+> > -	return pkvm_iommu_ops->init();
+> > +	ret = pkvm_iommu_ops->init();
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	return WARN_ON(pkvm_iommu_snapshot_host_stage2());
+> 
+> [Severity: High]
+> Does this unintentionally cause a hypervisor panic if the snapshot fails?
+> 
+> At EL2 (nVHE/pKVM), WARN_ON expands to a fatal BRK instruction rather than
+> a warn-and-continue. Wrapping a fallible operation like this triggers a
+> panic during initialization instead of returning the error.
 
-Ack, understood. Feel free to cc- me on that when you send it out!
+That is intentional as there is no roll-back beyond this point, this
+pattern is commonly used with pKVM.
 
->
-> I also want to point out that there are use cases for pre-faulting while
-> the VM is running.
+> 
+> > +}
+> 
+> [ ... ]
+> 
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > index c1a8fd811c0fa..da5014e4e96b6 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> 
+> [ ... ]
+> 
+> > @@ -603,16 +604,15 @@ static int host_stage2_set_owner_metadata_locked(phys_addr_t addr, u64 size,
+> >  	ret = host_stage2_try(kvm_pgtable_stage2_annotate, &host_mmu.pgt,
+> >  			      addr, size, &host_s2_pool,
+> >  			      KVM_HOST_INVALID_PTE_TYPE_DONATION, annotation);
+> > -	if (!ret) {
+> > -		/*
+> > -		 * After stage2 maintenance has happened, but before the page
+> > -		 * owner has changed.
+> > -		 */
+> > -		pkvm_sme_dvmsync_fw_call();
+> > -		__host_update_page_state(addr, size, PKVM_NOPAGE);
+> > -	}
+> > -
+> > -	return ret;
+> > +	if (ret)
+> > +		return ret;
+> > +	/*
+> > +	 * After stage2 maintenance has happened, but before the page
+> > +	 * owner has changed.
+> > +	 */
+> > +	pkvm_sme_dvmsync_fw_call();
+> > +	__host_update_page_state(addr, size, PKVM_NOPAGE);
+> > +	return WARN_ON(pkvm_iommu_host_stage2_idmap(addr, addr + size, 0));
+> 
+> [Severity: High]
+> Does this create a dead-branch trap that skips rolling back the page state?
+> 
+> Since WARN_ON acts as a panic at EL2, any failure in the IOMMU mapping call
+> will immediately crash the hypervisor. It also leaves the earlier mutation
+> from __host_update_page_state without a rollback path on failure.
 
-Ack yeah understood! And it does support that fine :)
+This is added for readability, not really a problem.
 
-I added further reasoning about pKVM in the cover/commit msg in the respin
-([0]) so hopefully that helps clarify from that sid eof things.
+> 
+> >  }
+> >  
+> >  int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id)
+> > @@ -625,8 +625,10 @@ int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id)
+> >  			return -EPERM;
+> >  
+> >  		ret = host_stage2_idmap_locked(addr, size, PKVM_HOST_MEM_PROT);
+> > -		if (!ret)
+> > -			__host_update_page_state(addr, size, PKVM_PAGE_OWNED);
+> > +		if (ret)
+> > +			break;
+> > +		__host_update_page_state(addr, size, PKVM_PAGE_OWNED);
+> > +		ret = WARN_ON(pkvm_iommu_host_stage2_idmap(addr, addr + size, PKVM_HOST_MEM_PROT));
+> 
+> [Severity: High]
+> Is it intentional that a failure here panics instead of returning the error?
+> 
+> Assigning WARN_ON to a variable suggests an expectation that it returns,
+> but at EL2 it triggers a fatal BRK instruction. This also leaves the prior
+> page state update without a rollback.
 
+No need for rollback as it panics.
 
->
-> >
-> > Protected pKVM support is a whole other layer of complexity and it's not obvious
-> > that you're really achieving what pre-fault is supposed to.
-> >
-> > In any case Oliver literally just asked me to _simplify_ weird edge cases for
-> > this series :) so I am not sure something like that is going to be accepted.
-> >
-> > Are you sure you're actually running in pKVM mode btw? CCA doesn't AFAICT? In
-> > which case this series _should_ work fine for you.
-> >
->
->
-> It is not pKVM; it runs in Realm mode.
+> 
+> >  		break;
+> 
+> [ ... ]
+> 
+> > @@ -1029,6 +1031,7 @@ int __pkvm_guest_share_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn)
+> >  				       pkvm_mkstate(KVM_PGTABLE_PROT_RWX, PKVM_PAGE_SHARED_OWNED),
+> >  				       &vcpu->vcpu.arch.pkvm_memcache, 0));
+> >  	WARN_ON(__host_set_page_state_range(phys, PAGE_SIZE, PKVM_PAGE_SHARED_BORROWED));
+> > +	WARN_ON(pkvm_iommu_host_stage2_idmap(phys, phys + PAGE_SIZE, PKVM_HOST_MEM_PROT));
+> 
+> [Severity: High]
+> Can an untrusted guest intentionally trigger a host denial of service here?
+> 
+> By triggering memory sharing hypercalls, a guest might exhaust the IOMMU
+> page pool, forcing an allocation failure in pkvm_iommu_host_stage2_idmap.
+> Wrapping this fallible outcome in WARN_ON will trigger a hypervisor panic.
+> 
 
-Ack yeah, then the series should hopefully work for you.
+The IOMMU can't be exhasuted by design, the same WARN_ON() exist in the
+line above for the CPU page table update also.
 
-If you could test it and report any issues I'd be grateful! Thanks :)
+Thanks,
+Mostafa
 
->
-> >
-> > Anyway, if we really do need to add something for pKVM it needs to be a follow
-> > up. Let's get the basics working first :)
-> >
->
-> sure.
-
-Thanks!
-
->
-> > (Note that kvmtool will need to be updated to retry pre-fault on -EAGAIN, -EINTR
-> >  as this series can, albeit unlikely, return -EAGAIN.)
-> >
->
-> I will check this when I rebase my kernel onto this series.
-
-OK cool, let me know if you hit any issues.
-
->
-> -aneesh
-
---
-Cheers, Lorenzo
-
-[0]: https://lore.kernel.org/kvmarm/20260922-kvm-arm-prefault-v3-0-787bd3bc7e3f@kernel.org/T/#t
+> >  unlock:
+> 
+> -- 
+> Sashiko AI review · https://sashiko.dev/#/patchset/20260922131259.2975334-1-smostafa@google.com?part=7
