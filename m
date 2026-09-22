@@ -1,52 +1,61 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F729566C69;
-	Tue, 22 Sep 2026 16:39:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16BAD52FE4E;
+	Tue, 22 Sep 2026 16:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790095154; cv=none; b=BmpRjTu+AyS49xAJq01GLmjwluEQLJCmeQPWkClFtEqKer+0Yf7+G/OrZhYwb0Oec0RXEasd6Jag0DhxmerMFWg0FIL+D9DOMpbqx2WgAfaQinrBXB5p3NxGYTot7oBpjwsuI1KohofiMz2QTQVHlS1hHryplq4quhhz6scQatw=
+	t=1790095762; cv=none; b=aM5tMTx0O0SfVoQBSEidYsAKNZTXhZm68iqyezhuXeXC24DpgFD6/7Gwg8LH4GCfTGap7ywPE7IZonVfBFEn4EsS6XpIJuqPgpMzvxQhc9Y9VEBzsrq5aizLzTfmwezDv7Ab10zZEIiVa+wDJ580jDsbd+yAxkiq40e1t2E2bzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790095154; c=relaxed/simple;
-	bh=YQf4ZF9UrIZkju53+FMc2/Zw5dM/iafRxTRYEbJms0o=;
+	s=arc-20240116; t=1790095762; c=relaxed/simple;
+	bh=prIXwhQ54/LAQl2GDN5y6lppyuyJ4FjHuDqhUxnLRuE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eAQQtT5412Q3j1pmcQKXGwNT91trNbgjHtIbmrCXCQgyRJdCSObPxRZ3514zHXmbQ5BnvimaXCxCDcQs+DSqauPB++FdMl3KE2kKZYChXDpPqqJT1Qy+v7utxDPnL654nDWMVbD0bbRL9uEv+pbor/uqdjLM7pMV9Rroru/Fa9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=AYzw/dZB; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=LjpgNG4MK2sXjI3pOIV/DmAcfCOWA+xNdVfYU8Q7tIEF/yVKqwX+vGpI4AZnkf0H1aLrLdS3EaifpN1GCXNh/BOBcTtZsTrwJLqKZOBRE79b4rB9d7JMY2mtR+SGHJU+YX776v7dmeLU6987Yuc6UoafDJDJ6OoJ9xPPg2KwVDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DI4wOHa1; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="AYzw/dZB"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7C0461576;
-	Tue, 22 Sep 2026 09:39:06 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E3D7A3F632;
-	Tue, 22 Sep 2026 09:39:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790095150; bh=YQf4ZF9UrIZkju53+FMc2/Zw5dM/iafRxTRYEbJms0o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AYzw/dZBDBEYe9/IfefTSuDA9ATgbB7Dnmm7bUOXpXYL7xrhaOG6WNWM89zKFywgX
-	 Hca5ai3qk4fYLZscOfPi0Qh5fdm128r5ziOOA5TBgZtWFVOg+iJJUHDyzqYjkftVAr
-	 3sHOOYEiFcjjnuFpaEP+biIIhTBY6lijgPOKAanM=
-Date: Tue, 22 Sep 2026 17:39:04 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	iommu@lists.linux.dev, Andrew Morton <akpm@linux-foundation.org>,
-	christian.koenig@amd.com, Jason Gunthorpe <jgg@ziepe.ca>,
-	Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DI4wOHa1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03A231F000FF;
+	Tue, 22 Sep 2026 16:49:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790095760;
+	bh=R4AexOQ3ACPOmP3EG8HHzPByHhgFEckUB6lzdNEoOVg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=DI4wOHa1jlK/tZ5Aohia2c4vC/sHBoYOV9lXGW5rdftXypESRR6UQTmXvokxO+0ST
+	 jOKi/wnZW31ZepETxPHNJABRK2qKpaizlemVBP1OZFMUizMAXM0XK1KsWR5BL8D1g8
+	 5m1jdNshgWjb94mV6ixKg2nVbUzZGQTXrYcA8T5hDQvy7RAa/amsAsjuB5F+I5m16Y
+	 M2Q3xlmgjCkFSt2RwjYS7Dl3/nfeljdJpacgDE0pEUddYmHhL578RG/Iq2txVLYeAJ
+	 nUtZFx/YPSggq+ZMlbJLVN/ujZIZyyrsSRCrxvZqAxTrsg+K1NT3pX5+jGFMUT5hK+
+	 HIyhaHcp1jzAQ==
+Date: Tue, 22 Sep 2026 09:49:18 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@kernel.org>, Will Deacon <will@kernel.org>,
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [RFC PATCH v7 12/13] dma-buf: system_heap: Allocate shared
- buffers using CoCo shared memory allocator
-Message-ID: <arKvKME-_wNeW7ea@arm.com>
-References: <20260921144847.501151-1-aneesh.kumar@kernel.org>
- <20260921144847.501151-13-aneesh.kumar@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Jack Thomson <jackabt@amazon.com>,
+	Jack Thomson <jackabt.amazon@gmail.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Leo Soares Passos <Leo.Bras@arm.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>
+Subject: Re: [PATCH v3 01/14] KVM: Allow architectures to disallow pre-fault
+Message-ID: <arKxjsxuO1F5ExrY@kernel.org>
+References: <20260922-kvm-arm-prefault-v3-0-787bd3bc7e3f@kernel.org>
+ <20260922-kvm-arm-prefault-v3-1-787bd3bc7e3f@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -55,27 +64,31 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260921144847.501151-13-aneesh.kumar@kernel.org>
+In-Reply-To: <20260922-kvm-arm-prefault-v3-1-787bd3bc7e3f@kernel.org>
 
-On Mon, Sep 21, 2026 at 08:18:46PM +0530, Aneesh Kumar K.V (Arm) wrote:
-> @@ -405,6 +396,7 @@ static struct dma_buf *system_heap_allocate(struct dma_heap *heap,
+Hi Lorenzo,
+
+On Tue, Sep 22, 2026 at 03:17:55PM +0100, Lorenzo Stoakes (ARM) wrote:
+> +bool __weak kvm_arch_vcpu_allow_pre_fault_memory(struct kvm_vcpu *vcpu)
+> +{
+> +	return true;
+> +}
+> +
+>  void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
 >  {
->  	struct system_heap_buffer *buffer;
->  	DEFINE_DMA_BUF_EXPORT_INFO(exp_info);
-> +	struct cc_shared_layout layout;
->  	unsigned long size_remaining = len;
->  	unsigned long sg_remaining = len;
->  	unsigned int max_order = orders[0];
-> @@ -417,6 +409,14 @@ static struct dma_buf *system_heap_allocate(struct dma_heap *heap,
->  	struct page *page, *tmp_page;
->  	int i, ret = -ENOMEM;
+>  	int nr_vcpus, start, i, idx, yielded;
+> @@ -4365,6 +4370,9 @@ static int kvm_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+>  	    range->gpa + range->size <= range->gpa)
+>  		return -EINVAL;
 >  
-> +	if (cc_shared) {
-> +		ret = cc_shared_calc_layout(len, &layout);
+> +	if (!kvm_arch_vcpu_allow_pre_fault_memory(vcpu))
+> +		return -ENOEXEC;
+> +
 
-You should not override 'ret' here, it was set to -ENOMEM for a reason.
-cc_shared_calc_layout() succeeds resetting 'ret' and some further down
-allocation failure, goto free will return ERR_PTR(0).
+nit: it'd be better to let the arch hook return an error of its choosing
+but in reality this is only going to be used by arm64.
 
--- 
-Catalin
+Not worth a respin on its own though.
+
+Thanks,
+Oliver
