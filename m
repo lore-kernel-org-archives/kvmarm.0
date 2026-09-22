@@ -1,149 +1,153 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E0A44AB82
-	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 22:01:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE19440641;
+	Tue, 22 Sep 2026 22:04:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790114493; cv=none; b=SHDJ5HMmfz9UV4zR0tu5GCOzgA1XX21YrVyB2uJrbbBLOSXdlp7ar5jD5Z3pLca2Qh8O2Ubbv0FMWkYoMk+rAKEj/7Qn6YSKXQYoTtO2r92QBAAwyc6MXg5VkqlBdtlhOtQNh3oAGX51FDVztVBs1tcOohMu1gllhGMzLdviBgc=
+	t=1790114696; cv=none; b=qWJlJ9cxG3xinK45cH1sHDWUArTndttJysqjRo9IQP15AH4EZM0Pv6S2453gcfebl7NJp995CJ1OiGH6IlpFe8eYC7MwBOBoPQ/ThYdWGM+QXyC3RP1SRKnJetk77msiiug5vm3tIu4PsAUWsD9K0Pv4TZzdyfCtH2iv4/9zo8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790114493; c=relaxed/simple;
-	bh=xzz/7RpLGNvy+d/LoMdg0MdbRE4abERBR8GhHaN1YXc=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=Bg8p6TJNlOfMXH7iu2l7ZeEzZ1i5jRHA1AFPjlrtTyO0RumnTkhNvH6Fspr43g6xhBmFDAAYJwKd6I+44NauwKESM/fz3oGQtzAhnz0rjBgdgGzsDhUUGYGw7rKXy4OYAuHT9So7kI5CXkuYrMeoIVys5FRyw6cd1funzcbfS24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dyRCLsDy; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790114696; c=relaxed/simple;
+	bh=Pme4KNcFZXJCIoYwtV2Ju4v44jpGiA6KmoFoYffHKlo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AluAu39u6E4+rN4JVzFX2UucaZFBuSHUn8JjynSTcCKDnqdIMO2FeLaHdTdpXF1Qf/JJ2vcJyHNol97BKos2spNA3WMKLqPz34oKjY+dDF78ALTFIwMW5sGZR9v/P0eIKJXDG+kqrb4DRXHw6A8lV4SXYu/tHCr8ZFtAAsh+IsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=iUzMrFNN; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dyRCLsDy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91CC01F000FF;
-	Tue, 22 Sep 2026 22:01:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790114485;
-	bh=m67M8/VrlC8kuuUWywaLZOHOLyElKT7uuhfib8m9lDA=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=dyRCLsDyMtna1NQjp11z0SBhp5IcdlkiBS2osUxVB8ROD6JHDE06rGxetccaOCqxB
-	 buWrD7DPbxVc3MyJTzvHg05RluDXWlNxotDd8rOukTduFoWyaahrGdn5HYig2fIiFC
-	 rAJSu4RfYWQVZ7rT1IPTAqo8y7LnaBanC11QTnKNcxXVgdyrrUnp3Syj/7+LnKy4d5
-	 6L/pViQ9DqsdT9ZVm5sUxKizb16VBmQTKPWOIPfn0nSUD3/Jn6wqtc4dwXDGkI0x5U
-	 8p2tD3UAnmaaBOuG93lPlhb5cQJ6Myl5vs9uSDkUuUh1hynn1PgB0X49QwIG+QzKni
-	 V0vVc7nnOqNwQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 3/3] KVM: arm64: vgic: Stop the VM when disabling LPIs
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Marc Zyngier" <maz@kernel.org>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260922214212.3327146-4-maz@kernel.org>
-References: <20260922214212.3327146-1-maz@kernel.org>
- <20260922214212.3327146-4-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Sep 2026 22:01:25 +0000
-Message-Id: <20260922220125.91CC01F000FF@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="iUzMrFNN"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D76001576;
+	Tue, 22 Sep 2026 15:04:43 -0700 (PDT)
+Received: from [10.57.9.113] (unknown [10.57.9.113])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3A9ED3F632;
+	Tue, 22 Sep 2026 15:04:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790114687; bh=Pme4KNcFZXJCIoYwtV2Ju4v44jpGiA6KmoFoYffHKlo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=iUzMrFNN2YDLQ/vBLkf5ziJp0MauZmc6HYaYVirUs9GjhN/W5+KiMaqyM/TSCVOSZ
+	 pNVGncyNZjg1NMBjqp+vvC8eTuIBydnjAOYGnLuEN87pTaXuSNq9gIUFCO49EjZzxL
+	 eUOm6uN1kKE8gf+vWa19FeEJ1R64dIb4XZcoflDY=
+Message-ID: <fa2f4766-0795-464a-80ca-2f3fd1c5140b@arm.com>
+Date: Tue, 22 Sep 2026 23:04:42 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 01/20] KVM: arm64: protected VM: Handle user writes to
+ CNTVCT_EL0/CNTPCT_EL0
+Content-Language: en-GB
+To: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+ will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+References: <20260920212845.707-1-suzuki.poulose@arm.com>
+ <20260920212845.707-2-suzuki.poulose@arm.com>
+ <20260922122542.00006868@oss.qualcomm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20260922122542.00006868@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [High] kvm: arm64: vgic: race in vcpu->arch.pause unpause due to missing =
-VM lock
-- [High] kvm: arm64: vgic: stale LR state during vgic_flush_pending_lpis()
---
+On 22/09/2026 20:25, Jonathan Cameron wrote:
+> On Sun, 20 Sep 2026 22:28:26 +0100
+> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+> 
+> Hi Suzuki,
+> 
+>> Protected VMs doesn't allow setting offsets for virtual and phyiscal
+> 
+> physical
+> 
+>> counters, as the offset is always fixed to 0. The VM ioclt is filtered
+> 
+> ioctl
+> 
+>> out based on the cap. However we don't prevent the userspace from trying
+>> to write to the CNTVCT/CNTPCT registers. This would lead to KVM triggering
+>> a WARN() in timer_set_offset() as the vm_offset pointer is set to NULL.
+>>
+>> Fix this by always "fixing" the timer offsets to 0 and marking that the
+>> timer offset is set in the kvm->arch.flags at KVM init time for protected
+>> VMs. A userspace writing to the CNT*CT_EL0 would observe success, without
+>> any real effect. This was chosen over preventing the writes to these
+>> registers and returning -EPERM.
+> 
+> Why?  I don't mind the decision but telling us what was chosen is something
+> we can see in the code - patch description should give us the stuff we
+> can't see.
+> 
+> One comment on the comment below.
+>>
+>> Reported by Sashiko
+>>
+>> Link: https://lore.kernel.org/all/20260908164641.416911F00A3A@smtp.kernel.org
+>> Fixes: f7d05ee84a6a ("KVM: arm64: Prevent host from managing timer offsets for protected VMs")
+>> Suggested-by: Marc Zyngier <maz@kernel.org>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> ---
+>> Changes since v18:
+>>   - Retain NULL vm_offset for protected VMs to avoid host tampering with the
+>>     offset.
+>>   - Moved the flag setting into kvm_timer_init_vm(), where it should have been
+>>     in the first place
+>> ---
+>>   arch/arm64/kvm/arch_timer.c | 12 ++++++++++--
+>>   1 file changed, 10 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+>> index 6ac3321f4c575..226cd5a495c8b 100644
+>> --- a/arch/arm64/kvm/arch_timer.c
+>> +++ b/arch/arm64/kvm/arch_timer.c
+>> @@ -1110,8 +1110,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+>>   		timer_context_init(vcpu, i);
+>>   
+>>   	/* Synchronize offsets across timers of a VM if not already provided */
+>> -	if (!vcpu_is_protected(vcpu) &&
+>> -	    !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
+>> +	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
+>>   		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
+>>   		timer_set_offset(vcpu_ptimer(vcpu), 0);
+>>   	}
+>> @@ -1133,6 +1132,15 @@ void kvm_timer_init_vm(struct kvm *kvm)
+>>   	 */
+>>   	for (int i = 0; i < NR_KVM_TIMERS; i++)
+>>   		kvm->arch.timer_data.ppi[i] = get_vgic_ppi(kvm, default_ppi[i]);
+>> +
+>> +	/*
+>> +	 * Protected VMs don't allow any offset being set from userspace,
+>> +	 * either set via writes to the counters or using the dedicated
+> This sentence confused me.  Second clause isn't obviously the ways that
+> are being blocked. Maybe shorten to:
+> 
+> 	Protected VMs don't allow the offset to be set from userspace,
+> 	whether via writes to the counters or the dedicated ioctl.
 
-commit 81f0f5ee375a1e011fabe86a70b81c8175c5fd88
-Author: Marc Zyngier <maz@kernel.org>
+LLM suggests:
 
-KVM: arm64: vgic: Stop the VM when disabling LPIs
 
-Disabling LPIs modifies the AP list of the affected CPU, which could be
-running. This commit aims to safely manipulate the state by pausing all
-vCPUs so they are in a quiescent state when disabling LPIs.
+    * Protected VMs don't allow userspace to set counter offsets,
+    * either via counter register writes or the dedicated ioctl.
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgi=
-c-mmio-v3.c
-> index 5913a20d83019..adefc42964732 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> @@ -303,9 +303,19 @@ static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu=
- *vcpu,
->  		if (ctlr !=3D GICR_CTLR_ENABLE_LPIS)
->  			return;
-> =20
-> +		/*
-> +		 * Yes, disabling LPIs is painful, since it can be done from
-> +		 * a *remote* vcpu! So let's not take any chance, and make
-> +		 * sure that everybody has written their LRs back to the irq
-> +		 * structures, and release any reference they would have.
-> +		 *
-> +		 * If it hurts, don't do it.
-> +		 */
-> +		kvm_arm_halt_guest(vcpu->kvm);
->  		vgic_flush_pending_lpis(vcpu);
+Have updated the comment.
 
-[Severity: High]
-Does the asynchronous halt ensure the target vCPU has fully synchronized its
-hardware state back to software state before proceeding to flush?
+Cheers
+Suzuki
 
-kvm_arm_halt_guest() uses kvm_make_all_cpus_request(kvm, KVM_REQ_SLEEP).
-If the target vCPU has exited guest mode and set vcpu->mode =3D OUTSIDE_GUE=
-ST_MODE
-but has not yet executed kvm_vgic_sync_hwstate() to fold its LRs,
-kvm_make_all_cpus_request() will skip waiting for it:
+> 
+>> +	 * ioctl. Pretend the offset has already been set and rely on the
+>> +	 * default offset being 0.
+>> +	 */
+>> +	if (kvm_vm_is_protected(kvm))
+>> +		set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
+>>   }
+>>   
+>>   void kvm_timer_cpu_up(void)
+> 
 
-virt/kvm/kvm_main.c:kvm_request_needs_ipi() {
-    ...
-	if (req & KVM_REQUEST_WAIT)
-		return mode !=3D OUTSIDE_GUEST_MODE;
-    ...
-}
-
-If the wait is skipped, could the flushing vCPU clear the ap_list in
-vgic_flush_pending_lpis() just before the target vCPU folds its LRs?=20
-Would this incorrectly resurrect the deleted LPI state and cause ghost
-interrupts?
-
->  		vgic_its_invalidate_all_caches(vcpu->kvm);
->  		atomic_set_release(&vgic_cpu->ctlr, 0);
-> +		kvm_arm_resume_guest(vcpu->kvm);
-
-[Severity: High]
-Does this block need to hold a VM-wide lock?
-
-Since vgic_mmio_write_v3r_ctlr() only synchronizes locally using an atomic
-cmpxchg on the target vgic_cpu->ctlr, multiple vCPUs could concurrently
-write to different VGIC redistributors to disable their LPIs.
-
-If this happens, multiple vCPUs will concurrently call kvm_arm_halt_guest()
-and race to set vcpu->arch.pause =3D true:
-
-arch/arm64/kvm/arm.c:kvm_arm_halt_guest() {
-    ...
-	kvm_for_each_vcpu(i, vcpu, kvm)
-		vcpu->arch.pause =3D true;
-    ...
-}
-
-The first vCPU to finish flushing will call kvm_arm_resume_guest() which
-unconditionally clears the pause boolean:
-
-arch/arm64/kvm/arm.c:kvm_arm_resume_guest() {
-    ...
-	kvm_for_each_vcpu(i, vcpu, kvm) {
-		vcpu->arch.pause =3D false;
-		__kvm_vcpu_wake_up(vcpu);
-	}
-    ...
-}
-
-Could this unpause the VM prematurely while another vCPU is still tearing
-down VGIC state in vgic_flush_pending_lpis(), allowing guests to run and
-modify their VGIC state concurrently?
-
->  	} else {
->  		ctlr =3D atomic_cmpxchg_acquire(&vgic_cpu->ctlr, 0,
->  					      GICR_CTLR_ENABLE_LPIS);
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260922214212.3327=
-146-1-maz@kernel.org?part=3D3
