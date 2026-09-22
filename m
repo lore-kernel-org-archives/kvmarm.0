@@ -1,88 +1,160 @@
-Received: from mta0.migadu.com (out-246.mta0.migadu.com [91.218.175.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4260D549374
-	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 21:10:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0199552952
+	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 21:42:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790111446; cv=none; b=OYqaUnJQYae0JaA/+l2fT+gxdKidjygH0Bz+71okINgcX52KQWJzeycEq1HlY9/tEixeF89fA4a7rYP8EuvMHjc/cdHljqdYZ9kF49LMNnHHXcrIeOvhG7fx3myLEyqdz4qJc4wBqPYGwI5SzEeHAzq/6c69Ck5JVNcjsN6t78U=
+	t=1790113358; cv=none; b=kOCeBSYS4vsreq3DOIuA/snzzrXyATP/x0eJbQequHgEBq0eq2I64w7hRxLth2Bpi1u5kqldnW3owG4ySJovVifJNqbsrsyMe0LAHHrj9ChRX1Tw3QJoGZJD3v0/twWikO1LBAICh+UC7eHtsNZ/kSrZZ+vK9/xdywaNMPeXK1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790111446; c=relaxed/simple;
-	bh=ZLzoHhwTaHnhjMBvx7XPbj3yAjurmamgiA97xqI13vA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HTzow4XGLtVzaCWvRSeqpSZ/jBzImLTc09AZHY42QviX9adtjzJlnGYu/4667IER91/Iprt5eyxpEKzP+BBzeulGMROndB5Ao/HzarD13RJhJLfNd0gUN3N/0E+wGr4CIknpo1VYbJHjSANCtIo6gDnJgCsH7r0RdV/gJsHNROI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JvyVaJaj; arc=none smtp.client-ip=91.218.175.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1790113358; c=relaxed/simple;
+	bh=EAVIhCYjnPTzLgJDhLrHuY+z77qpu9v/v8IJ9BzqlDU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AH+OjVcTMY6rzkCWLhTdSl+zh+t0ZnaLGopZZ6fCQ8Zjq9PWZYiMxT1S36as2QljpKimM881T/PfRoZ/PQ7as3GcFs2JuwGaAK5jNL/jkd2DszTZxoEPi0X/fzo0qzVcvihCUMn19Z3pO98p0c4XAXYsKd4iPBwnwYq0Ilss6oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A0RqsZ1D; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JvyVaJaj"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=ZLzoHhwTaHnhjMBvx7XPbj3yAjurmamgiA97xqI13vA=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790111430; v=1; x=1790716230;
- b=JvyVaJajPn6oCPqwzZo0n1qYB2+2bfMifzQV2gk36kUt1/Jm6CaDQnEum2vHTxtUNoKbRg23
- 2M28/6rOQzgXpuE30O480Bz9QmOk6oBsG+Nox6DQta4ONpt7JJLqcV9oWVk6NUu87ctvRggAVCc
- S/yjnAhWstFYltSrc00hzPsE=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id b08f0698150692e9;
-	Tue, 22 Sep 2026 21:10:18 +0000
-X-Mizu-Trace-ID: b08f0698150692e9
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5b8c42da963so1011e87.0
-        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 14:10:14 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBx1C82BBtcdIt51HNDFFjZKqEaXA4PsSOaGjeNjaVQFF2AYAzXs1UPsZUIZk+ltQ7By9eVbTI0=@lists.linux.dev
-X-Gm-Message-State: AFuF++k5ZUjuVsR7VIYR43F0OPwUFoS313a8wN0A7gPfLO4A1m1IBjTJ
-	w54TANKD2UgFcptkzBPtGbxnU3VWaMcRFIgdXYEO0tiHYd2dsutwllou8WTrGDd9RiFgdJ2sq9f
-	QRWFA38PTJSHMHZsRsgkHkhJRL4An8tWnF+x9r34b
-X-Received: by 2002:a05:6512:a84:b0:5b1:ca0b:25d2 with SMTP id
- 2adb3069b0e04-5b8d87fcb57mr47663e87.4.1790111413647; Tue, 22 Sep 2026
- 14:10:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A0RqsZ1D"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B989E1F00893;
+	Tue, 22 Sep 2026 21:42:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790113344;
+	bh=iA22YnUtIcv1KaIC572i8+H/hJXB2ylgtwm/SjWDh5A=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=A0RqsZ1DPb87+r55lcOxquYoRHIjAVabDJY/tFh3pdh1Fclip7K/G2yXByFVzSPJe
+	 TJ5j7F0k13Hc2BnPeig+ZJ3sH9GyGCk2yPzhc4ry6aEvoR4aF3eMzCVsSQZ75xg+CZ
+	 0kDlYz1Bptkc5AVDw2/Nky0bHrhEQdB5f+SpNF/34FkXjER/JSATKviMvjTFRGF+aY
+	 WV46AK10FVS7ukci2/7R4/66UoNw6mH+07lE1QHxArYfm7rjZg2+ZtwU0+oK3u+Bnp
+	 bTWhqjWpMD029jav0pFByUbYqafhHAGoa6mYjqT86PdMWNrH0N8hDSyDx6iKVczgjM
+	 GtmHgyr07e6Zg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x98Fq-0000000CFxJ-2kHw;
+	Tue, 22 Sep 2026 21:42:22 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Yuchao Zhang <ndaugoing@gmail.com>
+Subject: [PATCH 1/3] KVM: arm64: vgic: Allow last_lr_irq to be NULL when LRs are not overflowing
+Date: Tue, 22 Sep 2026 22:42:10 +0100
+Message-ID: <20260922214212.3327146-2-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260922214212.3327146-1-maz@kernel.org>
+References: <20260922214212.3327146-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260922181430.3532371-1-fuad.tabba@linux.dev> <arLbbtuRuOrxlh1Y@kernel.org>
-In-Reply-To: <arLbbtuRuOrxlh1Y@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 22 Sep 2026 22:09:37 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTx8JsXfrjKUbhhrfSmFPrWxyYaTbKqMeYAJPt-vqGfLvA@mail.gmail.com>
-X-Gm-Features: AclHuK98e37nffnaw1F9q5cHTfaeClpU9qBwO_qQHRPF451CnbaMSkO3wxXcRx0
-Message-ID: <CA+EHjTx8JsXfrjKUbhhrfSmFPrWxyYaTbKqMeYAJPt-vqGfLvA@mail.gmail.com>
-Subject: Re: [PATCH v1] arm64/boot: Disable trapping of PMZR_EL0 writes to EL2
-To: Oliver Upton <oupton@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring <robh@kernel.org>, 
-	James Clark <james.clark@linaro.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Randy Dunlap <rdunlap@infradead.org>, Shuah Khan <skhan@linuxfoundation.org>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, ndaugoing@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Oliver,
+last_lr_irq is always populated when there is any interrupt populated in
+the AP list. Not only this is not necessary (it is only useful when we
+completely fill the LRs), but this is in the way of further fixes.
 
-On Tue, 22 Sep 2026 20:47:58 +0100, Oliver Upton <oupton@kernel.org> wrote:
-[...]
-> We can trim 3 instructions from this by using the read-trap bits as the
-> starting point for the write-trap bits, like below. It also makes clear
-> the point that most of our trap bits are symmetrical for read and write.
+Make sure last_lr_irq is kept to NULL when we LRs are not completely
+full.
 
-I did consider that, and went the other way for two reasons.
+Fixes: 6da5e537f5afe ("KVM: arm64: vgic: Pick EOIcount deactivations from AP-list tail")
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: stable@vger.kernel.org
+---
+ arch/arm64/kvm/vgic/vgic-v2.c | 6 ++++--
+ arch/arm64/kvm/vgic/vgic-v3.c | 6 ++++--
+ arch/arm64/kvm/vgic/vgic.c    | 8 +++-----
+ 3 files changed, 11 insertions(+), 9 deletions(-)
 
-The read side has three bits with no write-side counterpart
-(nPMSSDATA, nSPMDEVAFF_EL1, nSPMID), so copying x0 into x2 writes ones
-into three RES0 bits of HDFGWTR2_EL2. Harmless today, but it's this
-bug in reverse: the first revision that defines one of those positions
-in the write register turns the copy into a silent behaviour change.
-Building each mask from its own register's names can't do that.
+diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
+index 7182f63fc9382..70cc53ba810ad 100644
+--- a/arch/arm64/kvm/vgic/vgic-v2.c
++++ b/arch/arm64/kvm/vgic/vgic-v2.c
+@@ -122,6 +122,10 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 	for (int lr = 0; lr < vgic_cpu->vgic_v2.used_lrs; lr++)
+ 		vgic_v2_fold_lr(vcpu, cpuif->vgic_lr[lr]);
+ 
++	cpuif->used_lrs = 0;
++	if (!irq)
++		return;
++
+ 	/* See the GICv3 equivalent for the EOIcount handling rationale */
+ 	list_for_each_entry_continue(irq, &vgic_cpu->ap_list_head, ap_list) {
+ 		u32 lr;
+@@ -144,8 +148,6 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		vgic_v2_fold_lr(vcpu, lr);
+ 		eoicount--;
+ 	}
+-
+-	cpuif->used_lrs = 0;
+ }
+ 
+ void vgic_v2_deactivate(struct kvm_vcpu *vcpu, u32 val)
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 726e20a1da6e7..346bacb3198f2 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -155,6 +155,10 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 	for (int lr = 0; lr < cpuif->used_lrs; lr++)
+ 		vgic_v3_fold_lr(vcpu, cpuif->vgic_lr[lr]);
+ 
++	cpuif->used_lrs = 0;
++	if (!irq)
++		return;
++
+ 	/*
+ 	 * EOIMode=0: use EOIcount to emulate deactivation. We are
+ 	 * guaranteed to deactivate in reverse order of the activation, so
+@@ -188,8 +192,6 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		vgic_v3_fold_lr(vcpu, lr);
+ 		eoicount--;
+ 	}
+-
+-	cpuif->used_lrs = 0;
+ }
+ 
+ void vgic_v3_deactivate(struct kvm_vcpu *vcpu, u64 val)
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index b25303d9919fd..425503e0c5825 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -866,9 +866,6 @@ static void vgic_fold_state(struct kvm_vcpu *vcpu)
+ 		return;
+ 	}
+ 
+-	if (!*host_data_ptr(last_lr_irq))
+-		return;
+-
+ 	if (kvm_vgic_global_state.type == VGIC_V2)
+ 		vgic_v2_fold_lr_state(vcpu);
+ 	else
+@@ -1021,11 +1018,12 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+ 		scoped_guard(raw_spinlock,  &irq->irq_lock) {
+ 			if (likely(vgic_target_oracle(irq) == vcpu)) {
+ 				vgic_populate_lr(vcpu, irq, count++);
+-				*host_data_ptr(last_lr_irq) = irq;
++				if (count == kvm_vgic_global_state.nr_lr)
++					*host_data_ptr(last_lr_irq) = irq;
+ 			}
+ 		}
+ 
+-		if (count == kvm_vgic_global_state.nr_lr)
++		if (*host_data_ptr(last_lr_irq))
+ 			break;
+ 	}
+ 
+-- 
+2.47.3
 
-It also matches __init_el2_fgt, which already keeps x0 and x2 apart
-for HDFGRTR_EL2 and HDFGWTR_EL2. And even in that form the copy would
-have to sit just before the msr_s, after the SPE block, or
-nPMSDSFR_EL1 only lands in x0.
-
-Cheers,
-/fuad
