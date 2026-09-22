@@ -1,56 +1,56 @@
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A95E551981
-	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 13:13:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF86654B1B8
+	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 13:13:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790082808; cv=none; b=CJx7i3wv9Pt+tJqTVfh0NM3GFtY7xoipfWpL/p8bfGbcEBxQWXeJJ0pZWDsbzPTDCY82vkCMGRlQoaiPgrequ9LaYYat9OQbYJmJfEWxJ0qA20qDc+JmM0uf+wxIJDjCivkE/zuVEADD4NXaGJ9J7oLJqEfXGKMliZQqZ1XoaG8=
+	t=1790082810; cv=none; b=rvcvJA+XINvWmCQquwQCC87154xiO5IPOj0mGMzzg1v2P5sjEugKYVP9+BUpvPjNmxWhxaHZlcAVs7BrlRPIbWXK0XB60muXBN+xw3eCpk5jvQVZ0jn6b1X84/cvv6lk5ixv8jPkIswaZqzGxsH//qxri/jzOJUvlRzG0LKJoFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790082808; c=relaxed/simple;
-	bh=SDlatHrQDm3u2/GILmSmdipnZmcn0kcwzdwaLFS/+sA=;
+	s=arc-20240116; t=1790082810; c=relaxed/simple;
+	bh=BmMSrhluolb6Av9guAg0Y9lbw2f/ziZAkRd5YJsY8PU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fe7jvj4EF1Fn9SpEgGi5gOctCHYH5qsUBSj/gigIibM620Zspop13zvsnZ+T5qRcMGPxWnHyIhtNcl3ag9ESIN1SvQbtspVb0iy4p2xl2Hl9SmCVJK7akbFDL+pRZ1sIhunUM2ypr5bZ15uS5DrBhi8YgTp3fV4ohqZUgbMIsfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kNIxbZ4f; arc=none smtp.client-ip=209.85.128.70
+	 To:Cc:Content-Type; b=TJ59q7gsNLdPcKg2nEBPaAV+kL/ZwjeWTzrjNicNtovhIR0Vk6HVb+KpMVRXUwkxAhET6FQ1c1Fbhj4uAqE22SJGo8dLekDEwQqyV9BTQNyQJosZxMmI6wO6WRLq6W9gw9E/kzUiwfFnXSZBAQvHjKb19rrZt6FHo+iM51XmIMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=enGiUeD1; arc=none smtp.client-ip=209.85.221.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kNIxbZ4f"
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-49e64b80b94so30067965e9.3
-        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 06:13:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="enGiUeD1"
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-4870ee5618aso2693237f8f.1
+        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 06:13:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790082802; x=1790687602; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1790082804; x=1790687604; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=00AhV3k+li4lYucaDcO3o5UE2oHbgVQJ9mR0kZROZeQ=;
-        b=kNIxbZ4fDZ77AENm6lw2WD149Ebpbs1REak1kqYUD/8orF6MnmwdQBBMvGwOg8l0+q
-         HGIKq/DYJ9Jnog1Hgl5OSSEHCzD5W9Re/AvHA7I+tZq7ledhZ8QnTuAHe1CiyDfQ+VmF
-         I8qr7zGDRrhN2JLFvZWW2hf2NUh2EixAjwmYXDdBN/FjAkDsog/DInaVqRaggUKPY3Tu
-         6PJf5W72AeGlOquHi38i53a3r//WZVUFMb3tTcZ9djw3Ji8ELg+brVUFLdeMEgaT3nMN
-         6HokPsM12R3Qaf0H/v1a/Y4ydtuMCHzBbxrzqlWEZTyLmzIdCYdhCSTMv5D9rbJd3yrg
-         lgpw==
+        bh=VNp5S66G25hEx/lXvBHBQ4zrD/Jw7dlUu7oI6jfC/Cc=;
+        b=enGiUeD1ne30v7J21SpFcasxnrjOO/Az0mgSHsEbBcQSUO1Swvkf3/yhfnY2wOg307
+         Cq9jlAEmX/+NibaWXalgbBurIeDf0rMKquQzc85oR8JnBehoIABrFFybfA0QiTJkS5FA
+         j9xcB6X4CoqS+Xb0HdX/yw3528L2yzNFxkknFlKWhA8nMtaMuyYG0JT4kP5k9Bt1rJuP
+         1v9aQtZ/ZzON74FdD15gK6NGAK8Xt3a5YbMuhwfp3DIYpjbHZXsalVIFft88rraWmPDP
+         /ACEq5v6e0zk62NS1OBHrPEl2LPxgSTwWWI/Brkem0JMXcBga8grVGSE43YIDt3e+MN9
+         9N1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790082802; x=1790687602;
+        d=1e100.net; s=20260707; t=1790082804; x=1790687604;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=00AhV3k+li4lYucaDcO3o5UE2oHbgVQJ9mR0kZROZeQ=;
-        b=Xx3ldksmAnclaukdC0naKiQJ1K53xUseIWwW7o59e9otzgzpFstdHND2/jNX1I1FfW
-         +bWc5gnsYtlwP1+vwFFvCI2k3L3PQ869axWyQGM/XcZllFEbww1MfX4QCZz3tidNRyPN
-         DXro3V6BJOVj/Kz7xlo/9hvGz4KRPnZE4Yqc5gxn19SZZ0NTWPQANLdFOa5YfMKvF0eH
-         wMXReKJ3Zhp6VvoGaExmDOgugwde/y8kHSeWGTqhYykfcSTwMqjFrARqvQ4CvYt09bSc
-         4ywhTcurlf2tbX42s+cav7wtzQq9cnRnPoElW6KJAMS0goZzPu+n2PIPvs0pX1Hyuj2K
-         ByBA==
-X-Forwarded-Encrypted: i=1; AKwUvBz4g1HHqu9/ZW/22HHJTIZ2dI++DsYyVO20tAVXXGX++zVtygZ/2ohY+NrYyT7v30FUgQB/0i0=@lists.linux.dev
-X-Gm-Message-State: AFuF++naE55uU2nHAtl7p4AU3dK5N6anHS8choohR0FroPoBh3qOipjE
-	LoBWOAmMtxn5TjeGNvG2y2qnKJG0WA6WlVhzopFN44f2tZAjRct0ZEwA/NmXCd6HEnW5bGsLcDE
-	ZeaPSVXexEJh9WA==
-X-Received: from wmqy9.prod.google.com ([2002:a05:600c:3649:b0:49c:d3c6:97b4])
+        bh=VNp5S66G25hEx/lXvBHBQ4zrD/Jw7dlUu7oI6jfC/Cc=;
+        b=EqdLDqM5+vwyL4DmmFvQYv5DPRuDTV7B1DUmTybdwGVrZ7hCwI7PatwfuL9FDNufI+
+         eGccmwiboUsihNBIEt/ZfLHE3N+Kizv3YG8n6xON5slxRGjAul288BmOu8/nFUtU2wd8
+         T8vPfJVt8/mkX7uZOgpgaF2bqJIVG+g6Z4Nwy9Rlr41MYuQCJQUfKPtfpLhcdja1GtMT
+         uHtDPQoHHD5J7BZS+NKm4f6W98gThcfacZMSRdcmLfL608Sli3H1hHe0q94vvdyGIKMh
+         QzTQaDmF0aQRK3FynAWt2ZX1ACtqPcOE9w7BlM5oqK2my7ipIxVnZG7J7mmrWoJr53x0
+         h/gw==
+X-Forwarded-Encrypted: i=1; AKwUvByWXQw7cwcZWEIS1HjxE7aN+cIxNgO1nnv8go+HTpV8PUZkLaf95AuRb1J7/ddlum9lvxjAxEs=@lists.linux.dev
+X-Gm-Message-State: AFuF++kyTQnGx/L0/uEM4ZOgmF8CpKMy2gW2/NIrJ2KnpT7saATTxQoZ
+	6J6CKz65yl7FZuqSOKsYJMuR0tDh9crSE6ZWS+AQy68nl4rGy/CkQoVRDjuSSld14cyBs6BtvPh
+	Dnl4NSy3NbhQhBg==
+X-Received: from wmbg12.prod.google.com ([2002:a05:600c:a40c:b0:499:bc15:b29b])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600d:4441:10b0:49f:ce78:3572 with SMTP id 5b1f17b1804b1-49fce783674mr94578205e9.35.1790082802190;
- Tue, 22 Sep 2026 06:13:22 -0700 (PDT)
-Date: Tue, 22 Sep 2026 13:12:49 +0000
+ 2002:a05:600c:34c7:b0:49c:ff8d:b548 with SMTP id 5b1f17b1804b1-49fc5726cfcmr270659405e9.11.1790082804465;
+ Tue, 22 Sep 2026 06:13:24 -0700 (PDT)
+Date: Tue, 22 Sep 2026 13:12:51 +0000
 In-Reply-To: <20260922131259.2975334-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -60,8 +60,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260922131259.2975334-1-smostafa@google.com>
 X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
-Message-ID: <20260922131259.2975334-17-smostafa@google.com>
-Subject: [PATCH v8 16/25] iommu/arm-smmu-v3-kvm: Emulate CMDQ for host
+Message-ID: <20260922131259.2975334-19-smostafa@google.com>
+Subject: [PATCH v8 18/25] iommu/arm-smmu-v3-kvm: Shadow STEs
 From: Mostafa Saleh <smostafa@google.com>
 To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
 	kvmarm@lists.linux.dev, iommu@lists.linux.dev
@@ -73,219 +73,188 @@ Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
 	Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Don't allow access to the command queue from the host:
-- ARM_SMMU_CMDQ_BASE: Only allowed to be written when CMDQ is disabled, we
-  use it to keep track of the host command queue base.
-  Reads return the saved value.
-- ARM_SMMU_CMDQ_PROD: Writes trigger command queue emulation which sanitise
-  and filters the whole range. Reads returns the host copy.
-- ARM_SMMU_CMDQ_CONS: Writes move the sw copy of the cons, but the host
-  can't skip commands once submitted. Reads return the emulated value and
-  the error bits in the actual cons.
+Add STE emulation, when the host sends the CFGI_STE command.
 
-Also add emulation for IDR1.CMDQS to return the hypervisor command queue
-size which can be equal to or smaller to the HW size.
+Copy the STE as is to the shadow owned by the hypervisor,
+which is the one seen by HW.
+In the next patch, stage-2 page table will be attached.
 
 Signed-off-by: Mostafa Saleh <smostafa@google.com>
 ---
- .../iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c  | 151 +++++++++++++++++-
- 1 file changed, 146 insertions(+), 5 deletions(-)
+ .../iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c  | 124 +++++++++++++++++-
+ 1 file changed, 118 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
-index 38b8ecc5cc10..8c67e348f4a3 100644
+index 54049b8b1363..cb9aa7e4a394 100644
 --- a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
 +++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
-@@ -111,7 +111,6 @@ static int smmu_unshare_pages(phys_addr_t addr, size_t size)
+@@ -24,6 +24,9 @@ struct hyp_arm_smmu_v3_device *kvm_hyp_arm_smmu_v3_smmus;
+ #define strtab_split(smmu)	(FIELD_GET(STRTAB_BASE_CFG_SPLIT, (smmu)->host_ste_cfg))
+ #define strtab_l1_size(smmu)	((1UL << (strtab_log2size(smmu) - strtab_split(smmu))) * \
+ 				 (sizeof(struct arm_smmu_strtab_l1)))
++#define strtab_hyp_base(smmu)	((smmu)->features & ARM_SMMU_FEAT_2_LVL_STRTAB ? \
++				 (u64 *)(smmu)->strtab_cfg.l2.l1tab :\
++				 (u64 *)(smmu)->strtab_cfg.linear.table)
+ 
+ #define for_each_smmu(smmu) \
+ 	for ((smmu) = kvm_hyp_arm_smmu_v3_smmus; \
+@@ -287,6 +290,91 @@ static int smmu_init_cmdq(struct hyp_arm_smmu_v3_device *smmu)
  	return 0;
  }
  
--__maybe_unused
- static bool smmu_cmdq_has_space(struct arm_smmu_queue *cmdq, u32 n)
- {
- 	struct arm_smmu_ll_queue *llq = &cmdq->llq;
-@@ -340,6 +339,105 @@ static int smmu_init(void)
- 	return ret;
- }
- 
-+static bool smmu_filter_command(struct hyp_arm_smmu_v3_device *smmu, u64 *command)
++static int smmu_get_host_l2_ste(struct hyp_arm_smmu_v3_device *smmu, u32 sid,
++				struct arm_smmu_ste *host_ste_out)
 +{
-+	u64 type = FIELD_GET(CMDQ_0_OP, command[0]);
++	u64 *host_ste_base = hyp_phys_to_virt(strtab_host_base(smmu));
++	struct arm_smmu_strtab_l1 host_l1_desc;
++	struct arm_smmu_strtab_l2 *l2ptr;
++	phys_addr_t host_l2_tab;
++	int ret, i;
 +
-+	switch (type) {
-+	case CMDQ_OP_CFGI_STE:
-+		/* TBD: SHADOW_STE*/
-+		break;
-+	case CMDQ_OP_CFGI_ALL:
-+	{
-+		/*
-+		 * Linux doesn't use range STE invalidation, and only use this
-+		 * for CFGI_ALL, which is done on reset and not on an new STE
-+		 * being used.
-+		 * Although, this is not architectural we rely on the current Linux
-+		 * implementation.
-+		 */
-+		if ((FIELD_GET(CMDQ_CFGI_1_RANGE, command[1]) != 31))
-+			return true;
-+		break;
-+	}
-+	case CMDQ_OP_TLBI_NH_ASID:
-+	case CMDQ_OP_TLBI_NH_VA:
-+	case CMDQ_OP_TLBI_NH_ALL:
-+	case 0x13: /* CMD_TLBI_NH_VAA: Not used by Linux */
-+	{
-+		/* Only allow VMID = 0 */
-+		if (FIELD_GET(CMDQ_TLBI_0_VMID, command[0]) != 0)
-+			return true;
-+		break;
-+	}
-+	case CMDQ_OP_PREFETCH_CFG:
-+	case CMDQ_OP_CFGI_CD:
-+	case CMDQ_OP_CFGI_CD_ALL:
-+	case CMDQ_OP_TLBI_NSNH_ALL:
-+	case CMDQ_OP_PRI_RESP:
-+	case CMDQ_OP_RESUME:
-+		break;
-+	case CMDQ_OP_CMD_SYNC:
-+		if (FIELD_GET(CMDQ_SYNC_0_CS, command[0]) == CMDQ_SYNC_0_CS_IRQ) {
-+			/* Do not allow MSI */
-+			command[0] &= ~CMDQ_SYNC_0_CS;
-+			command[0] |= FIELD_PREP(CMDQ_SYNC_0_CS, CMDQ_SYNC_0_CS_SEV);
-+			command[1] &= ~CMDQ_SYNC_1_MSIADDR_MASK;
-+		}
-+		break;
-+	default:
-+		/* Deny unknown commands */
-+		return true;
-+	}
++	host_l1_desc.l2ptr = READ_ONCE(host_ste_base[arm_smmu_strtab_l1_idx(sid)]);
++	if (!(le64_to_cpu(host_l1_desc.l2ptr) & STRTAB_L1_DESC_SPAN))
++		return -EINVAL;
 +
-+	return false;
-+}
-+
-+static int smmu_emulate_cmdq_insert(struct hyp_arm_smmu_v3_device *smmu)
-+{
-+	u64 *host_cmdq = hyp_phys_to_virt(smmu->cmdq_host.base_dma);
-+	bool use_wfe = smmu->features & ARM_SMMU_FEAT_SEV;
-+	u64 cmd[CMDQ_ENT_DWORDS];
-+	int idx, ret;
-+	u32 pending;
-+	bool skip;
-+
-+	if (!is_cmdq_enabled(smmu))
-+		return 0;
-+
-+	pending = (1 << (smmu->cmdq_host.llq.max_n_shift)) - queue_space(&smmu->cmdq_host.llq);
-+
-+	hyp_spin_lock(&smmu->hw_lock);
-+	/* Wait for the command queue to have some space. */
-+	ret = smmu_wait(use_wfe, smmu_cmdq_has_space(&smmu->cmdq, pending));
-+	if (ret) {
-+		hyp_spin_unlock(&smmu->hw_lock);
++	host_l2_tab = le64_to_cpu(host_l1_desc.l2ptr) & STRTAB_L1_DESC_L2PTR_MASK;
++	/* Share and pin the table before accessing it. */
++	ret = smmu_share_pages(host_l2_tab, sizeof(struct arm_smmu_strtab_l2));
++	if (ret)
 +		return ret;
-+	}
 +
-+	while (pending--) {
-+		int i;
++	l2ptr = hyp_phys_to_virt(host_l2_tab);
 +
-+		idx = Q_IDX(&smmu->cmdq_host.llq, smmu->cmdq_host.llq.cons);
-+		queue_inc_cons(&smmu->cmdq_host.llq);
++	for (i = 0; i < STRTAB_STE_DWORDS; ++i)
++		host_ste_out->data[i] =
++			READ_ONCE(l2ptr->stes[arm_smmu_strtab_l2_idx(sid)].data[i]);
 +
-+		/* Copy the command to local buffer avoiding TOCTOU */
-+		for (i = 0; i < CMDQ_ENT_DWORDS; ++i)
-+			cmd[i] = le64_to_cpu(READ_ONCE(host_cmdq[idx * CMDQ_ENT_DWORDS + i]));
-+
-+		skip = smmu_filter_command(smmu, cmd);
-+		if (WARN_ON(skip))
-+			continue;
-+		smmu_add_cmd_raw(smmu, cmd);
-+	}
-+
-+	writel(smmu->cmdq.llq.prod, smmu->cmdq.prod_reg);
-+
-+	ret = smmu_wait(use_wfe, smmu_cmdq_empty(&smmu->cmdq));
-+	hyp_spin_unlock(&smmu->hw_lock);
-+	return ret;
++	WARN_ON(smmu_unshare_pages(host_l2_tab, sizeof(struct arm_smmu_strtab_l2)));
++	return 0;
 +}
 +
- static void smmu_emulate_cmdq_enable(struct hyp_arm_smmu_v3_device *smmu)
++static int smmu_reshadow_ste(struct hyp_arm_smmu_v3_device *smmu, u32 sid, bool leaf)
++{
++	struct arm_smmu_strtab_cfg *cfg = &smmu->strtab_cfg;
++	struct arm_smmu_ste *hyp_ste_ptr, *host_ste_ptr, host_ste_copy;
++	u64 *hyp_ste_base = strtab_hyp_base(smmu);
++	int ret, i;
++
++	/* Leaf = 0 is not supported, as the kernel driver. */
++	if (!leaf || !is_smmu_enabled(smmu) ||
++	    (sid >= (1UL << strtab_log2size(smmu))))
++		return -EINVAL;
++
++	if (!(smmu->features & ARM_SMMU_FEAT_2_LVL_STRTAB)) {
++		struct arm_smmu_ste *hyp_table = (struct arm_smmu_ste *)hyp_ste_base;
++		u64 *host_ste_base = hyp_phys_to_virt(strtab_host_base(smmu));
++		struct arm_smmu_ste *host_table = (struct arm_smmu_ste *)host_ste_base;
++
++		if (sid >= cfg->linear.num_ents)
++			return -E2BIG;
++
++		hyp_ste_ptr = &hyp_table[sid];
++		host_ste_ptr = &host_table[sid];
++	} else {
++		struct arm_smmu_strtab_l1 *l1tab = (struct arm_smmu_strtab_l1 *)hyp_ste_base;
++		u32 l1_idx = arm_smmu_strtab_l1_idx(sid);
++		struct arm_smmu_strtab_l2 *l2ptr;
++
++		if (l1_idx >= cfg->l2.num_l1_ents)
++			return -E2BIG;
++
++		host_ste_ptr = &host_ste_copy;
++		ret = smmu_get_host_l2_ste(smmu, sid, host_ste_ptr);
++		if (ret)
++			return ret;
++
++		/* No hypervisor entry, first time the L2 is populated. */
++		if (!l1tab[l1_idx].l2ptr) {
++			struct arm_smmu_strtab_l2 *l2table;
++
++			l2table = pkvm_iommu_alloc_pages(get_order(sizeof(*l2table)));
++			if (!l2table)
++				return -ENOMEM;
++			/* Ensure L2 is observed before writing the ptr. */
++			dma_wmb();
++			arm_smmu_write_strtab_l1_desc(&l1tab[l1_idx], hyp_virt_to_phys(l2table));
++		}
++		l2ptr = hyp_phys_to_virt(le64_to_cpu(l1tab[l1_idx].l2ptr) &
++				STRTAB_L1_DESC_L2PTR_MASK);
++		hyp_ste_ptr = &l2ptr->stes[arm_smmu_strtab_l2_idx(sid)];
++	}
++
++	for (i = 0; i < STRTAB_STE_DWORDS; ++i)
++		WRITE_ONCE(hyp_ste_ptr->data[i], host_ste_ptr->data[i]);
++	return 0;
++}
++
+ static int smmu_init_strtab(struct hyp_arm_smmu_v3_device *smmu)
  {
- 	u32 shift = smmu->cmdq_host.q_base & Q_BASE_LOG2SIZE;
-@@ -381,18 +479,51 @@ static bool smmu_dabt_device(struct hyp_arm_smmu_v3_device *smmu,
- 		 */
- 		mask = read_only & ~(IDR0_S2P | IDR0_VMID16 | IDR0_MSI | IDR0_HYP | IDR0_ATS);
- 		break;
--	/* Passthrough the register access for bisectability, handled later */
- 	case ARM_SMMU_CMDQ_BASE:
+ 	struct arm_smmu_strtab_cfg *cfg = &smmu->strtab_cfg;
+@@ -406,8 +494,24 @@ static bool smmu_filter_command(struct hyp_arm_smmu_v3_device *smmu, u64 *comman
+ 
+ 	switch (type) {
+ 	case CMDQ_OP_CFGI_STE:
+-		/* TBD: SHADOW_STE*/
++	{
++		u32 leaf = FIELD_GET(CMDQ_CFGI_1_LEAF, command[1]);
++		u32 sid = FIELD_GET(CMDQ_CFGI_0_SID, command[0]);
++		int ret;
++
 +		/*
-+		 * Although allowed to use smaller size, we rely on the SMMUv3 driver
-+		 * using 64-bit store instruction for simplicity.
++		 * If STE update is required, flush the CMDQ and drop the lock as that
++		 * might require to update the host page table and acquire its lock.
 +		 */
++		writel(smmu->cmdq.llq.prod, smmu->cmdq.prod_reg);
++		hyp_spin_unlock(&smmu->hw_lock);
++		ret = smmu_reshadow_ste(smmu, sid, leaf);
++		hyp_spin_lock(&smmu->hw_lock);
++		if (ret)
++			return true;
++
+ 		break;
++	}
+ 	case CMDQ_OP_CFGI_ALL:
+ 	{
+ 		/*
+@@ -624,25 +728,33 @@ static bool smmu_dabt_device(struct hyp_arm_smmu_v3_device *smmu,
+ 			val = smmu->cmdq_host.llq.cons | (CMDQ_CONS_ERR & cons);
+ 			goto out_update_regs;
+ 		}
+-	/* Passthrough the register access for bisectability, handled later */
+ 	case ARM_SMMU_STRTAB_BASE:
 +		if (len != sizeof(u64))
 +			break;
  		if (is_write) {
- 			/* Not allowed by the architecture */
- 			if (is_cmdq_enabled(smmu))
+ 			/* Must only be written when SMMU_CR0.SMMUEN == 0.*/
+ 			if (is_smmu_enabled(smmu))
  				break;
- 			smmu->cmdq_host.q_base = val;
+ 			smmu->host_ste_base = val;
 +			goto out_ret;
 +		} else {
-+			val = smmu->cmdq_host.q_base;
++			val = smmu->host_ste_base;
 +			goto out_update_regs;
  		}
 -		mask = read_write;
 -		break;
- 	case ARM_SMMU_CMDQ_PROD:
-+		if (len != sizeof(u32))
-+			break;
-+		if (is_write) {
-+			smmu->cmdq_host.llq.prod = val;
-+			WARN_ON(smmu_emulate_cmdq_insert(smmu));
-+			goto out_ret;
-+		} else {
-+			val = smmu->cmdq_host.llq.prod;
-+			goto out_update_regs;
-+		}
- 	case ARM_SMMU_CMDQ_CONS:
-+		if (len != sizeof(u32))
-+			break;
-+		if (is_write) {
-+			if (WARN_ON(is_cmdq_enabled(smmu)))
-+				break;
-+
-+			smmu->cmdq_host.llq.cons = val;
-+			goto out_ret;
-+		} else {
-+			/* Propagate errors back to the host.*/
-+			u32 cons = readl_relaxed(smmu->base + ARM_SMMU_CMDQ_CONS);
-+
-+			val = smmu->cmdq_host.llq.cons | (CMDQ_CONS_ERR & cons);
-+			goto out_update_regs;
-+		}
-+	/* Passthrough the register access for bisectability, handled later */
- 	case ARM_SMMU_STRTAB_BASE:
  	case ARM_SMMU_STRTAB_BASE_CFG:
++		if (len != sizeof(u32))
++			break;
+ 		if (is_write) {
+ 			/* Must only be written when SMMU_CR0.SMMUEN == 0.*/
+ 			if (is_smmu_enabled(smmu))
+ 				break;
+ 			smmu->host_ste_cfg = val;
++			goto out_ret;
++		} else {
++			val = smmu->host_ste_cfg;
++			goto out_update_regs;
+ 		}
+-		mask = read_write;
+-		break;
++	/* Passthrough the register access for bisectability, handled later */
  	case ARM_SMMU_GBPA:
-@@ -468,10 +599,20 @@ static bool smmu_dabt_device(struct hyp_arm_smmu_v3_device *smmu,
  		mask = read_write;
  		break;
- 	/* Allowed RO 32 bit registers. */
-+	case ARM_SMMU_IDR1:
-+		if (len != sizeof(u32))
-+			break;
-+		/* Cap CMDQS to the shadow queue size. */
-+		if (!is_write) {
-+			val = readl_relaxed(smmu->base + ARM_SMMU_IDR1);
-+			val &= ~IDR1_CMDQS;
-+			val |= FIELD_PREP(IDR1_CMDQS, smmu->cmdq.llq.max_n_shift);
-+			goto out_update_regs;
-+		}
-+	fallthrough;
- 	case ARM_SMMU_IIDR:
- 	case ARM_SMMU_IDR5:
- 	case ARM_SMMU_IDR3:
--	case ARM_SMMU_IDR1:
- 	case ARM_SMMU_GERROR:
- 		if (len != sizeof(u32))
- 			break;
 -- 
 2.55.0.1082.g2b9226bbc0-goog
 
