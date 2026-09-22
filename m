@@ -1,193 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52EF51DE1F;
-	Tue, 22 Sep 2026 14:22:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214D4550DB1
+	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 14:24:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790086959; cv=none; b=r85+CXgkgxIODpsxoiAzokTztD80EOgcG7FBBv5FoFr5/+ISPcx7W7AKUg3r2ZYJTiJ92D2AdYOoNbQq7OAUc8V44ySui+eeXZR82pJapnhcUYxOgHko2PPnmhhJWONHP5EnfhjliXiHibb3Oo1Se7veFny23P4gYIfH0hx6PBU=
+	t=1790087093; cv=none; b=mk4ENYdIQoiV9nm6XxyJzhNodA0mgpxonAteMq32kSk8IQqr6kOBPoWTfTiF3gxc4r8ayDkPXQOHx9obs/vrCSDwmwPyRW2kuhvVJSZn5diEJpmUb+PhNS5Ac9WvRdT0fkp/h04h0X81Ha64CZtS0bvnMrRp1c1PobaiZxL033s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790086959; c=relaxed/simple;
-	bh=msjJuGaxSoQQshOdxCcSplNXF6DjNI5rv4QST/Zjo0s=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=DnuxNK/RgLd43sGpqjF4gSGGwCTSJKPvISi8p5X697TrH9NpNyyNRbXhw2zBfuJNZqAxTQjH1S+ilTQtkUNpRgAjUgVUNtx98Q5UgmdJhFa2s0wf2KkSmcTKMsb70nDTNgOsNnJekK5OxxWHGIjloQd6lThk4J+KUrMd0a72Iho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oKHS5DRa; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790087093; c=relaxed/simple;
+	bh=u/g5efqH+jc8ciQaTB35dBHovDc5O+i+qioI2dmQUZY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=hffJ7Z7nllv1Sf/3/lCbO6bWONsXcWTxXwoS9u4AGKMiq2lo0nzHRAwZn8vVik1IsClO417HNp1BPr7OilX2wFvQx+4smj7DSQnz84iFLqSDjOqjyF6CzFL2DrvxU6bQZHu4GeYh1Wm+5Ft7wnceTX9WEJ4seQWh/lxJn8jBBaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=iLCfD13P; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oKHS5DRa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 145C31F000FF;
-	Tue, 22 Sep 2026 14:22:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790086957;
-	bh=L3oO91V4IF4G60vcONMUAfnhjyKqf9fK8HxPqZ7yDx8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=oKHS5DRaI08HjzcvWtYe1RxTCulSKE9K7GAetzK1gAmlKpTZtwVOLsZGx+vxwsIoF
-	 4Fc0Mpej6Jcl6qB59u6qmZuL/+YTub0JsQVybmm6RTyI7v0Jc4UxNynINCYcqAYyW0
-	 NYoQhMY5BLRmt+GhwBGFKduN/BOXph8W1gyKSjcp7z+JdYuGyjY7WwsNHrETDFwZ0a
-	 nyH5Hqi31sadWwRn4whOeg/UOMWCcDyVHsD4okuN88AvFXXac7qasNQ1QrBwPhQqN7
-	 Fl2HjDnnomdmMKFbIv9ftdOEOq/4D5bQZpbVWAvFeve0a6jmcSu42XdS8Mh5BuB2Qj
-	 WY0Nem/ttVZzg==
-X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="iLCfD13P"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AA5E11595;
+	Tue, 22 Sep 2026 07:24:46 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B52803F632;
+	Tue, 22 Sep 2026 07:24:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790087090; bh=u/g5efqH+jc8ciQaTB35dBHovDc5O+i+qioI2dmQUZY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=iLCfD13PVOi4mAY9kiqxVhYlvcUYxmV5/K11mBTxYJNdBkBNQdTERlnqGtgWdd9GR
+	 HNdVis5ZmyJbt+MPbXOLv2cVPPJLT+GPgheryqKhcnbTKVgn93rHJ/cBTOwYJavPl5
+	 wkQvdhN1lYbQfiQM2xpf4kMenHNu/PeCRAgABhEM=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Jack Thomson <jackabt@amazon.com>,
-	Jack Thomson <jackabt.amazon@gmail.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Leo Soares Passos <Leo.Bras@arm.com>
-Subject: Re: [PATCH v2 00/13] KVM: arm64: Add KVM_PRE_FAULT_MEMORY support
-In-Reply-To: <arKB2imOcg4MhXMF@gremlin>
-References: <20260914-kvm-arm-prefault-v2-0-26fb47f74b73@kernel.org>
- <yq5abj9p38vq.fsf@kernel.org> <arJ1BDEzY5CANjjB@gremlin>
- <yq5a8q4t305j.fsf@kernel.org> <arKB2imOcg4MhXMF@gremlin>
-Date: Tue, 22 Sep 2026 19:52:25 +0530
-Message-ID: <yq5a5wzx2wny.fsf@kernel.org>
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>
+Subject: Re: [PATCH 05/22] KVM: arm64: nv: Pass an access descriptor for stage-2 walks
+Date: Tue, 22 Sep 2026 15:24:46 +0100
+Message-ID: <arKPdReKg0XreEFp@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <arGllj6E0C33cc20@kernel.org>
+References: <20260623184201.1518871-1-oupton@kernel.org> <20260623184201.1518871-6-oupton@kernel.org> <arFpUtyq7sphiJzw@LeoBrasDK> <arGllj6E0C33cc20@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-"Lorenzo Stoakes (ARM)" <ljs@kernel.org> writes:
+On Mon, Sep 21, 2026 at 02:45:58PM -0700, Oliver Upton wrote:
+> On Mon, Sep 21, 2026 at 06:28:50PM +0100, Leonardo Bras wrote:
+> > > @@ -1642,9 +1655,11 @@ int __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+> > >  		return 0;
+> > >  
+> > >  	/* Do the stage-2 translation */
+> > > -	ipa = (par & GENMASK_ULL(47, 12)) | (vaddr & GENMASK_ULL(11, 0));
+> > > +	access.type = WALK_ACCESS_AT;
+> > > +	access.ia = (par & GENMASK_ULL(47, 12)) | (vaddr & GENMASK_ULL(11, 0));
+> > 
+> > What does this mask represent?
+> 
+> Keep in mind, this is pre-existing code... This mask is taking the GFN
+> from the output address of stage-1 translation and using it as the input
+> for stage-2.
+> 
+> Keep in mind nested only supports up to 48 bits of PA space.
 
-> On Tue, Sep 22, 2026 at 06:37:04PM +0530, Aneesh Kumar K.V wrote:
->> "Lorenzo Stoakes (ARM)" <ljs@kernel.org> writes:
->>
->> > On Tue, Sep 22, 2026 at 03:28:33PM +0530, Aneesh Kumar K.V wrote:
->> >> > This is because pKVM instantiates vCPUs upon run,
->> >> >
->> >>
->> >> Can pKVM instantiate the hyp vCPU during pre-faulting ?
->> >
->> > It would be an unusual and unexpected thing to do - suddenly a pre-fault
->> > operation is initialising a vCPU explicitly for pKVM.
->> >
->> > A caller is not going to reasonably expect this and might treat a failure to
->> > pre-alloc as fine to carry on whereas in fact it was a failure to initailised a
->> > pKVM vCPU.
->> >
->> > It'd also require significant changes to how pKVM is set up, right now it's
->> > hardcoded to be done unconditionally at run via kvm_arch_vcpu_run_pid_change()
->> > -> pkvm_create_hyp_vcpu(), so all that would have to change and be checked and
->> > tested and... that'd be really out of scope I think :)
->> >
->> > And pre-faulting really makes most sense BEFORE you run a VM. It doesn't make so
->> > much sense mid-run.
->> >
->> > But more fundamentally, the stage 2 page tables, as I understand it, are owned
->> > by pKVM and so aren't really available to be pre-faulted.
->> >
->> > Maybe unprotected-under-pKVM VMs but then it's questionable as to how useful
->> > that would be given that it would be confusing to users vs. how it works for
->> > other VMs.
->> >
->> > So in general, no I don't think it's a good idea.
->> >
->> > And even if we wanted to pursue some version of this, it's _definitely_ out
->> > of scope for the initial pre-faulting bring-up series.
->> >
->> >>
->> >>
->> >> > but pre-faulting is  typically performed before a vCPU is run.  It would be confusing and
->> >> > inconsistent to error out on non-running vCPUs but to pre-fault running
->> >> > ones.
->> >>
->> >>
->> >> I use KVM pre-faulting when transitioning pages from shared to private
->> >
->> > You mean you'd prefer to use? Or you are using it on another arch?
->> >
->> >> with CoCo guest. This ensures that a trusted device can DMA to private
->> >> memory before the guest accesses it.
->> >
->> > Hm what do you mean by private memory?
->> >
->> > I see:
->> >
->> > #ifndef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
->> > static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
->> > {
->> > 	return false;
->> > }
->> > #endif
->> >
->> > And only x86 selects KVM_GENERIC_MEMORY_ATTRIBUTES?
->> >
->> > Do you mean something else?
->> >
->>
->> I am using this with ARM CCA-DA, based on the patch series from Jack Thomson <jackabt.amazon@gmail.com>.
->>
->> https://gitlab.arm.com/linux-arm/kvmtool-cca/-/commit/80e7aad61c5639de2f0cb4a5525dad0c96156428
->>
->> We do this while the VM is running.
->
-> Right, that's a non-mainline kernel I guess? Which presumably implements private memory.
->
-> Jack himself experienced a panic with his pKVM code, so the code you're using is
-> not upstreamable, unfortunately. And he'd already shelved pKVM support AFAICT.
->
-> And reviewers pointed out actually implementing the pKVM stuff properly would be
-> quite involved, even if you wanted to do that (hence follow-up).
->
-> Also you end up stuck with the same problems as I mentioned above - you can't
-> sanely bring the vCPU pre-run, so now you have extremely weird behaviour - only
-> pre-faults if vCPU initialised, running, and unprotected pKVM.
->
+Humm, I see.
+Maybe adding a define for that bitmask would be a better idea, then, as a 
+new define could make the limitation clear, and even be easier to change if 
+nested gets to support more than 48 bits of PA space.
 
-IIUC, pkvm_pgtable_stage2_map() only uses the hyp vCPU's pKVM memcache
-(&vcpu->vcpu.arch.pkvm_memcache). I agree that this does not need to be
-addressed in this series. However, there is also a desire to keep the CCA
-and pKVM code paths similar by using helpers such as kvm_vm_is_protected().
-Since an RMM can create a stage-2 mapping without a REC (vCPU), rejecting
-pre-faulting for all protected VM configurations may be incorrect. I can
-handle this in my series though.
+> 
+> > 
+> > IIUC, in general terms most of the changes are adapting the typing on 
+> > kvm_walk_nested_s2() & co to make use of the new struct kvm_walk_access 
+> > instead of just a PA.
+> > 
+> > I also see that flags & write are also added here, but not used anywhere.
+> > Maybe it would  be worth moving them to the patch that makes use of them, 
+> > instead leaving them here?
+> 
+> I can do that
+> 
 
-I also want to point out that there are use cases for pre-faulting while
-the VM is running.
-
->
-> Protected pKVM support is a whole other layer of complexity and it's not obvious
-> that you're really achieving what pre-fault is supposed to.
->
-> In any case Oliver literally just asked me to _simplify_ weird edge cases for
-> this series :) so I am not sure something like that is going to be accepted.
->
-> Are you sure you're actually running in pKVM mode btw? CCA doesn't AFAICT? In
-> which case this series _should_ work fine for you.
->
-
-
-It is not pKVM; it runs in Realm mode.
-
->
-> Anyway, if we really do need to add something for pKVM it needs to be a follow
-> up. Let's get the basics working first :)
->
-
-sure.
-
-> (Note that kvmtool will need to be updated to retry pre-fault on -EAGAIN, -EINTR
->  as this series can, albeit unlikely, return -EAGAIN.)
->
-
-I will check this when I rebase my kernel onto this series.
-
--aneesh
+Awesome, thanks!
+Leo
