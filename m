@@ -1,124 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-247.mta0.migadu.com [91.218.175.247])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E545C34752B;
-	Tue, 22 Sep 2026 07:31:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B3E3321C2
+	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 07:38:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.247
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790062302; cv=none; b=psIrtwg5RlfVIAFTFVB+pzcY/j9yU46uIC1XVtQNVEqXo1CL7qUJ9zetSMGfdHqqCt5psl8Tgtfqbu1rrg4ASp999Rzpm1OUhUigg6/BB/U+NVDbh1J4tgJHhSJ0J8gZTyDikGQrlOpXFW8yWW+DEsi5wpjzhSE2zMZ7G3Mp10g=
+	t=1790062726; cv=none; b=WxmdDG8t0W0UJHFTIvStBOSWz9awei9vHbVqM5lCcGCobtTioRTcE8ya/nMKA+vNc89d8SroXvnilo2tYq+PPo6GUKVczIEvX6weoq4sjbJ+s3zcgVeQwkFWEWGZmKfX69yT0bjcVPeVBvUgRvQfVRy4e09iWjCxr6VWg6w2VhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790062302; c=relaxed/simple;
-	bh=o0qWAnoL5ufMjUFGTime3vOTzNtsg1Wg910VgGJQN0g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lg6MQsJRdy4j0CiYQnmtGK8LebpNNxWFHWGWOa6cV2SHFDMqwz4yAW10I8XRc3dZWn6BvHoWoOu3BwQdUUwtqiZJxmhmPVmG9Ny45gWnnmb40s2UTyNqKLQ/zomRC/54GbfRfrQJoJbR1czodtB5/cue1c4GEst1EBZVAc7LAmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BZwa4M/2; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790062726; c=relaxed/simple;
+	bh=KUW89faoHHYWgqCz8nIDgkYnfX7c9yryPkJWlGTaNK8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=mD6eGORsNSIJv4D0PW3ehn52NP7915GN3MCYFMD5zwLI3WAevFz5Jf26IAmehp+4xvna80+yYy/XBk9jLVu9QsrdvvQjO1MkpbCiR1VEN0UHZ/uajHEKGUnFYz3kKtl0C+D+za2yiteM3Od8kZmxRfsokboOIIZR24d9GlOBNX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OSYdRr0f; arc=none smtp.client-ip=91.218.175.247
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BZwa4M/2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A3971F000FF;
-	Tue, 22 Sep 2026 07:31:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790062300;
-	bh=kwVjp+9NRkhTrHQ6lOsmCYjRc+NANOmRhBWGOeoo5hI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=BZwa4M/2BNk6kG/mhdHrAj+q70LOVgtLAGXPthMVF4Bd5k6pwtWn+ohSgr4gAebMj
-	 b0DiKpETzRYI35CNcXLDq9LyYACLI6NYt606rcAexy1PjdxYt42I1JGS3Xg1gZSlCm
-	 fVslbiFj91bF5j23VFWjN1ostE5zjl+293ia1Eg1vxhAxaU7pCNR7fmqsR2aF+ftib
-	 MstyVpD4lk5ckWSF3sTjc+BbCgd1T8k51xx5FpFPt0aW+7pNYu2FrPHZoqODsmwGSj
-	 3o8nKMts+Slsqrp9mQOtVnmJA+OKX/37D532XMGRiv2ciVnznw1nZy0Xv9QR/8Lr+b
-	 MybdVeQ4VQ4OA==
-Date: Tue, 22 Sep 2026 08:31:34 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>, Marc Zyngier <maz@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
-	Jack Thomson <jackabt@amazon.com>, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: arm64: Restore the VM's feature bitmap when
- kvm_setup_vcpu() fails
-Message-ID: <arIucuNna38Zlf3s@gremlin>
-References: <20260921063718.1604533-1-fuad.tabba@linux.dev>
- <arDYHSlFHm_XzGvN@kernel.org>
- <CA+EHjTz0-qS8RRhdT8XjAgWqKhgjjzbRsZ_jwTBVqM-8pXk7Vw@mail.gmail.com>
- <arEskPHpAPQf5SAb@gremlin>
- <arF55dt3_i4nxoSA@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OSYdRr0f"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=KUW89faoHHYWgqCz8nIDgkYnfX7c9yryPkJWlGTaNK8=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1790062722; v=1; x=1790667522;
+ b=OSYdRr0fGPy2D1S9U6xWX44CKWx8Jjqulhl3rC8oOpJmHxUI/awWk1r6QZM5OP8myxIOJ4ok
+ 2VV1cRSlHUw7Cr9E/KDDuOLQwAgl7TzHbTaEVNDqnjdxaKfCAp9QoqQDs/jNsYTS73ONi/G8Xal
+ nsdXNFzMKRDOT0gXbXJuvH1M=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 2b90d64f45864352;
+	Tue, 22 Sep 2026 07:38:42 +0000
+X-Mizu-Trace-ID: 2b90d64f45864352
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: maz@kernel.org,
+	oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: catalin.marinas@arm.com,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	mark.rutland@arm.com,
+	vdonnefort@google.com,
+	qperret@google.com,
+	Sascha.Bischoff@arm.com,
+	steven.price@arm.com
+Subject: Re: [PATCH 6/7] KVM: arm64: vgic: Do not access the GICv5 CPU interface from EL1
+Date: Tue, 22 Sep 2026 08:38:37 +0100
+Message-Id: <20260922073837.705872-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20260915123846.2317931-7-fuad.tabba@linux.dev>
+References: <20260915123846.2317931-1-fuad.tabba@linux.dev> <20260915123846.2317931-7-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <arF55dt3_i4nxoSA@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 21, 2026 at 11:39:33AM -0700, Oliver Upton wrote:
-> Hey Lorenzo,
->
-> On Mon, Sep 21, 2026 at 02:34:12PM +0100, Lorenzo Stoakes (ARM) wrote:
-> > On Mon, Sep 21, 2026 at 08:24:56AM +0100, Fuad Tabba wrote:
-> > > Hi Oliver,
-> > >
-> > > On Mon, 21 Sep 2026 00:09:17 -0700, Oliver Upton <oupton@kernel.org> wrote:
-> > > [...]
-> > > > > Nothing in the tree loads a vCPU whose init failed, so this is latent.
-> > > > > The upcoming series that enables KVM_PRE_FAULT_MEMORY for arm64 exposes
-> > > > > it: the generic kvm_vcpu_pre_fault_memory() calls vcpu_load() whether
-> > > > > or not the vCPU has been initialised.
-> > > >
-> > > > That's a bug, not a feature. We should require an initialized vcpu for
-> > > > the ioctl.
-> > >
-> > > That one is for Lorenzo then :) I'll reword the message so the stale
-> > > bitmap comes first and the pre-fault crash is just how it showed up.
-> >
-> > In general this is the behaviour of _generic_ KVM code
-> > (kvm_vcpu_pre_fault_memory()), which itself does not require an initialised
-> > vCPU, and no other arch seems to requires that either in the arch-specific
-> > pre-fault code.
-> >
-> > The actual pre-faulting implementation intentionally only targets the
-> > canonical MMU to fault in S2 page tables, which doesn't need initialisation
-> > to have taken place AFAICT.
-> >
-> > However I could add:
-> >
-> > 	if (!kvm_vcpu_initialized(vcpu))
-> > 		return -ENOEXEC;
-> >
-> > To kvm_arch_vcpu_pre_fault_memory(), which would make this a requirement,
-> > though that would bring us out of line with other archs.
->
-> Actually, we need this enforcement to happen before the arch-generic
-> implementation calls vcpu_load(). So that would be some amount of
-> kvm_arch_* boilerplate added to the generic code to enforce this
-> requirement like we do on the other vCPU ioctls.
+Hi,
 
-Ack, will do!
+On Tue, 15 Sep 2026 13:38:45 +0100, Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> can_access_vgic_from_kernel() excludes only the GICv3 system register
+> interface, so on a native GICv5 system without FEAT_GCIE_LEGACY it
+> returns true under nVHE. The kernel then saves and restores the CPU
+> interface from EL1, where ICH_VMCR_EL2 and the ICH_PPI_* registers are
+> UNDEFINED, and the nVHE world switch already does that work at EL2.
 
->
-> I'm not too worried about aligning this with other architectures; the
-> idea of a half-baked vCPU getting loaded is worrying.
+FWIW, I've since run this on the FVP GICv5 model (support_virtualization=1, kvm-arm.mode=nvhe). On kvmarm/next at 23ddf997ab16b the vgic_v5 selftest oopses the host at the first KVM_RUN:
 
-Yeah and I don't think anybody in their right mind is relying on being able
-to pre-fault before init anyway.
+  Internal error: Oops - Undefined instruction: 0000000002000000 [#1]  SMP
+  pc : __vgic_v5_restore_ppi_state+0x10/0x9c
+  lr : vgic_v5_restore_state+0x28/0x3c
+  Code: d503245f a941240a d0012448 91160108 (d51cca0a)
 
->
-> > OTOH, I don't see why anybody would pre-fault BEFORE init, feels like
-> > something that should be done later on in VMM bring up right?
-> >
-> > So I doubt doing this would really break any sane user.
-> >
-> > Let me know if you want that change in the series and I can respin it.
->
-> Please do, thank you for addressing this.
+d51cca0a is the ICH_PPI_DVIR0_EL2 write, from EL1. With this patch applied the same run passes.
 
-No worries, will put a commit or 2 at the start of the series to action
-this and respin.
-
->
-> Best,
-> Oliver
-
---
-Cheers, Lorenzo
+Cheers,
+/fuad
