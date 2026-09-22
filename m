@@ -1,88 +1,94 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C16F44DD3BB;
-	Tue, 22 Sep 2026 22:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA31C4DAF90;
+	Tue, 22 Sep 2026 22:38:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790116281; cv=none; b=e544wq/zCgFF0stJQhdc9v64efHolwzpPM4TIez6plrBWO95A+EGdgRN8sGBhAYT+GDLUE88t9J3ox7mzSGu8Ib0zSZtl2lmYWnzCsW+9rLElfS5s6Ovp/v+bKlAi/oDe/uZJJSZwNtwVQRZrGH85+dzZgNdLvgES5ggE1fLk5g=
+	t=1790116696; cv=none; b=DZU9zEChxfZYqrt9IkGAwcnVmANF3e7q5VXqQriQqCl1ZZJtfKD/1DQ5XzGCdBXvV8+iyete9UcG59oXpAfyuSE5TWXWVGiJejSBIezVEHFY15rA7EkIWyccxkKm1qGSZmO7NzkAWMKK54OqZ6aaUDHFXOH07gNz+YDEfIDKI3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790116281; c=relaxed/simple;
-	bh=Rpa/JhaOrTNxG9TXI4IZE4KyNsNWqjwf3WCmhD60xMM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=szHHuMFM59LwZCz5rgMvBdSzsiiSnYPuAbNBv5UM4n1I8GcbMwATpFsGJ8/HKu/kEH8Eol17P1XOPTS5t6/+3CLzlgm3cM8WFczE68+KNryWjZ9AYmqKeKK8Qp4WQlWtbT2sjvgEKMJG4x/AUrxnZk+6Sh5dUv6J68me0IJH3V8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m2fT1Cnb; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790116696; c=relaxed/simple;
+	bh=XOtSeaBSEJG5Nyu0X/2yfu6QlkZfINwxz0nOuYYlE0I=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=RzLTQ5zgFvFdxmCPh+g5evTHKhhC8pGNrw2zHK5wQdvlnAhD2H70b3/CqhxY3L+xkS+uJsIhN/wEdmhV9UlL140mC8frducOFC8HrfVoa9u5IOrovDlubj3ENTdaXj8SmyJSSbtjGarnqFaZGwT49gBqelEEW0/NHwqahmdSOZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=frvl2gKE; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m2fT1Cnb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21A971F000FF;
-	Tue, 22 Sep 2026 22:31:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="frvl2gKE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F3471F00899;
+	Tue, 22 Sep 2026 22:38:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790116264;
-	bh=SHdoMtqTcyEFnKcEGKtf+gXpBwhRndA3VPqIQwhO6u0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=m2fT1CnbsmgDLs/vXAhUi2PVTPtWv77mptNg9sblMISCnW0xAzYZ1R25XouRGAjOV
-	 Put7EPbRYBxpDjBnKTIdgahacBMn3ufCNKC4v0uYRLWYYL+/Rj/LJqne0KQXBtupdL
-	 xOyDeiHhETN5ztTnyxtpKlXIyw3A8hweXtqpqcNyN8LfT1dYlVx+Fi9fjcdSK1L5lg
-	 QUcDUChYP9Y/tDVyfA94SI7pt5OhjtBCipFTO9mpdRS1I/wrs6r8UbvvQcYpi6RPxG
-	 brUkfPgIQmLxF5T7asvuadoVHci1b724RNcLuBskqrKciETeVAjqLGEcUXPV3wLEJ8
-	 KmRDsqcxqpbyg==
-Date: Tue, 22 Sep 2026 15:31:02 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Rob Herring <robh@kernel.org>, James Clark <james.clark@linaro.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1] arm64/boot: Disable trapping of PMZR_EL0 writes to EL2
-Message-ID: <arMBpmlUi1Hm9hIB@kernel.org>
-References: <20260922181430.3532371-1-fuad.tabba@linux.dev>
- <arLbbtuRuOrxlh1Y@kernel.org>
- <CA+EHjTx8JsXfrjKUbhhrfSmFPrWxyYaTbKqMeYAJPt-vqGfLvA@mail.gmail.com>
+	s=k20260515; t=1790116685;
+	bh=1//ShhnULQsAqUGIEA2Ml+6e70gM/W+I5Wd+7Id+92s=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=frvl2gKEXAuhWndlU8S+4EsfPG1QAyzEpOmbKeFtLMn1w4CNqBQ0q3MNdMXU2C8nc
+	 Xdh+zl5woS3C2DZPzsVK/Are/4oe8N1QCgFF/w17gfvA8eHCY12G+k+du+/AwHZRR2
+	 /R07UMHycLq/C3J8ZnKseX+7aVJBmmcHL8sQ+zZIZC26oczQ1rJcwY16IEPuzQW/YM
+	 iWAPJ9YRWMsY5LULavm9D5TeRjFJlqmrxF6XpeCozdTU3fKaJJGM+voTFP17WPc037
+	 dDCKcG6FQriA1M9OnzAGL+/9QEwFStrPKFtwbwucRBfqk6uZcq+xW7ziaDmtGmr4Ll
+	 BM9hGQoNqzvQw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v7 04/10] net/mlx5: Add ONCE and MMIO accessor variants
+ to mlx5_ifc_macros.h
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Jason Gunthorpe" <jgg@nvidia.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-rdma@vger.kernel.org
+In-Reply-To: <4-v7-c6d30e8ce1e4+3dfa6-mlx5st_jgg@nvidia.com>
+References: <4-v7-c6d30e8ce1e4+3dfa6-mlx5st_jgg@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 22 Sep 2026 22:38:04 +0000
+Message-Id: <20260922223805.2F3471F00899@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTx8JsXfrjKUbhhrfSmFPrWxyYaTbKqMeYAJPt-vqGfLvA@mail.gmail.com>
 
-On Tue, Sep 22, 2026 at 10:09:37PM +0100, Fuad Tabba wrote:
-> Hi Oliver,
-> 
-> On Tue, 22 Sep 2026 20:47:58 +0100, Oliver Upton <oupton@kernel.org> wrote:
-> [...]
-> > We can trim 3 instructions from this by using the read-trap bits as the
-> > starting point for the write-trap bits, like below. It also makes clear
-> > the point that most of our trap bits are symmetrical for read and write.
-> 
-> I did consider that, and went the other way for two reasons.
-> 
-> The read side has three bits with no write-side counterpart
-> (nPMSSDATA, nSPMDEVAFF_EL1, nSPMID), so copying x0 into x2 writes ones
-> into three RES0 bits of HDFGWTR2_EL2. Harmless today, but it's this
-> bug in reverse: the first revision that defines one of those positions
-> in the write register turns the copy into a silent behaviour change.
-> Building each mask from its own register's names can't do that.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] mlx5: missing array element size check in MLX5_ARRAY_GET64
+--
 
-My thinking was that we could have a third block, but...
+commit f06ec3773a4462f249bea83375fa4f6bce249d9b
+Author: Jason Gunthorpe <jgg@ziepe.ca>
+net/mlx5: Add ONCE and MMIO accessor variants to mlx5_ifc_macros.h
 
-> It also matches __init_el2_fgt, which already keeps x0 and x2 apart
-> for HDFGRTR_EL2 and HDFGWTR_EL2. And even in that form the copy would
-> have to sit just before the msr_s, after the SPE block, or
-> nPMSDSFR_EL1 only lands in x0.
+This commit adds ONCE and MMIO variants to the MLX5 IFC macros for touching
+ownership bits and accessing the init segment using IFC offsets. It also ad=
+ds
+MLX5_ARRAY_GET64() as the missing counterpart to MLX5_ARRAY_SET64().
 
-new feature-specific initialization blocks will make this an absolute
-mess. So I agree, this is the right fix.
+> --- a/include/linux/mlx5/mlx5_ifc_macros.h
+> +++ b/include/linux/mlx5/mlx5_ifc_macros.h
+> @@ -85,6 +85,13 @@ __mlx5_mask(typ, fld))
+>  	__MLX5_SET64(typ, p, fld[idx], v); \
+>  } while (0)
+> =20
+> +#define MLX5_ARRAY_GET64(typ, p, fld, idx)                              =
+     \
+> +	({                                                                   \
+> +		BUILD_BUG_ON(__mlx5_bit_off(typ, fld) % 64);                 \
 
-Reviewed-by: Oliver Upton <oupton@kernel.org>
+[Severity: Medium]
+Should there be a compile-time check for the element size here?
 
-Best,
-Oliver
+MLX5_ARRAY_GET64 performs pointer arithmetic on a __be64 *, which
+implicitly scales the index by 8 bytes. If this macro is used on an array
+with elements that are not exactly 64 bits (e.g., 32-bit elements), could
+it silently compute incorrect memory offsets and read from the wrong
+location?
+
+The direct counterpart API, MLX5_ARRAY_SET64, enforces this exact
+precondition via BUILD_BUG_ON(__mlx5_bit_sz(typ, fld) !=3D 64) inside
+__MLX5_SET64(). Would it be safer to add a similar BUILD_BUG_ON() to
+MLX5_ARRAY_GET64 to avoid an asymmetric safety gap?
+
+> +		be64_to_cpu(                                                 \
+> +			*((__be64 *)(p) + __mlx5_64_off(typ, fld) + (idx))); \
+> +	})
+> +
+[ ... ]
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/0-v7-c6d30e8ce1e4+3=
+dfa6-mlx5st_jgg@nvidia.com?part=3D4
