@@ -1,128 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-121.mta0.migadu.com [91.218.175.121])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DEBF2EC081;
-	Tue, 22 Sep 2026 06:55:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 100E44FE2E1
+	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 07:10:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.121
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790060107; cv=none; b=pB+FQYvEijyJq04kS2dENg53k1DuO2UuuDS1w55t5/SssyMRjHJZ7PUDc34CSCe+/qH/IRlyuuiPMchZ1nUzammghO1Zkq4vRDdnOCHuh26N1zvRWYb/jmDpKaxTVnhBUcwKLvEwAxdNdrEDaEUgWIcwvgvRwAvkUo02GuNPois=
+	t=1790061027; cv=none; b=jTKV+RUGiLWQRtsORJtx7sBpJg+dNxjYE7NGoHjOmao3dwvY4yFNLs0EB5CvFhMKFK5268h+R1jT/CtlM9s6ykc7mWQjWBD/hCoM1pCN932taLSw08IYGAQry6EH3n82/wUa2K29wjsDAHIZEuLHHdshGeADHDRP6gPLFj/wo4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790060107; c=relaxed/simple;
-	bh=UD/Wey0mlBHk4woxCvw/WFilxzvjerSV6mWFxQdTJFw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ea+4ZNv0lrcdUrE4hF8cIXpA+Y7cxEmVPk3465i/YSlDjjrLSFIiVd/QyA2WH8CyPlYCGZ8gdKEtBIo8z/e+HL4Rhqe4ioko1+bp9/F7y/hEbAAnnP8rcQcUcWQrjGVFABrG5j60IN2RP7UmeCE/8whoGBR9EtytwlISF3cO7Ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y+XhOINw; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790061027; c=relaxed/simple;
+	bh=3MK+mM+3TL+vIpJDgBfEo1/4CmjZ/g4CLaacnDtPy8g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bj59frE6P5l0iPXMl+Z4+HP+8v6/7JVK382Pr61nIClWVWuH3SMQ262JUtOXX89M09sUVBtvkkEB4ODLSafWU1l0YF1rv0YU4uKDW7eWoLgkzzkyNsL+t1TCAJdz4VzPArkwEijxfcXS+/4sSxk6z+LcbMvfx7tQ6/MZqm15hU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vkxuVSTi; arc=none smtp.client-ip=91.218.175.121
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y+XhOINw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73D001F000FF;
-	Tue, 22 Sep 2026 06:55:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790060100;
-	bh=wLtGitIi2OiQg65dHRRJxop72DcmDI+o2e1E/zKQ5w4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Y+XhOINwZrcWlKpSEiXQdt3+zD3L2auPC/GvaE9XFlhSeO55CilXFon618dPN5Bdv
-	 uxufpsWcq93lGy2ApXIVLgqzT4PjyICZ1lbQpGF0GOaBTqi6nWl6MQ3RkEIcLDiE2U
-	 1ckswNCmhQBlLRHZCgtcbzXOGstotD8lln9xpOUS9r9QXeAGj/Cm0nBiV9oCKAxQFl
-	 eQYTiy4mTW3KSjJdc6ebQ7N+m3pkfwVFX4ENoNkHpVEfIwmu2f0wj+6X8n/yRhXl4c
-	 TPqME9qdENyh0vk1zkBEOzJMe9tLlQXGXnxJ2lbdnHBmDNjtmshkXm0g8gZfz0evXa
-	 ErmpPYPKqeVTQ==
-Date: Mon, 21 Sep 2026 23:54:59 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Yury Norov <yury.norov@gmail.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Andrew Jones <andrew.jones@oss.qualcomm.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shannon Zhao <shannon.zhao@linaro.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-	devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v11 09/21] KVM: arm64: PMU: Recreate events after
- MDCR_EL2 changes
-Message-ID: <arImQ6SG7s1k9uJk@kernel.org>
-References: <20260920-hybrid-v11-0-03618771b0e1@rsg.ci.i.u-tokyo.ac.jp>
- <20260920-hybrid-v11-9-03618771b0e1@rsg.ci.i.u-tokyo.ac.jp>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vkxuVSTi"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=3MK+mM+3TL+vIpJDgBfEo1/4CmjZ/g4CLaacnDtPy8g=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1790061021; v=1; x=1790665821;
+ b=vkxuVSTil4afT2c7Go//Xr/Iah+NABcWEL4VGtVCyOUCUFQGo3ZeWCfXYGwn9LA13z1oh3Co
+ 0kTDqS3UyyL+tixiq1A53sBJiUPFPRoowBlx1oLk6NZKnQlIRNJLcaaOoRumkCFy2Wk9LLuFOn1
+ pK7SPk/VN3vA3vzj+xiY0wzY=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id d174f1e6b2de58e0;
+	Tue, 22 Sep 2026 07:10:21 +0000
+X-Mizu-Trace-ID: d174f1e6b2de58e0
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5b8c42da963so4171e87.0
+        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 00:10:20 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBxxTvU4hEOHywkYKJFt843rarJtpdoycJPE7YYuMX9JH0yZJ8izgbOSB7Zw75b/ReMdC1kFEcw=@lists.linux.dev
+X-Gm-Message-State: AFuF++lkn92fGRMIjJ8gKgWCXPf94gVliVnDsheGrtWzn3G3d8frdDMl
+	NDt5r/gMVacRA1QDUQJ/fz+eW782KkqygpmEr8NUi1t/L7wqLj++YE26Im0i5vGsfbxlKYuhLjm
+	50cf0jtcs+SyqIeUKLKmbLChgdffgPVT4off5/H6i
+X-Received: by 2002:a05:6512:1394:b0:5b1:ca0b:25d2 with SMTP id
+ 2adb3069b0e04-5b8d324c0a7mr113236e87.4.1790061019960; Tue, 22 Sep 2026
+ 00:10:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260920-hybrid-v11-9-03618771b0e1@rsg.ci.i.u-tokyo.ac.jp>
+References: <20260902134118.2718200-1-fuad.tabba@linux.dev> <arGRhHgP_izSwW4T@kernel.org>
+In-Reply-To: <arGRhHgP_izSwW4T@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 22 Sep 2026 08:09:43 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTy5saEDGkP-19n4L19AbSd+ZtjpDVsPABiZkek6D7AN5A@mail.gmail.com>
+X-Gm-Features: AclHuK8I6JcWPH-f3J63av1v70AyMxgZAJlJPzSXAdNB-ZOaq8jKoUkgDKbDOTY
+Message-ID: <CA+EHjTy5saEDGkP-19n4L19AbSd+ZtjpDVsPABiZkek6D7AN5A@mail.gmail.com>
+Subject: Re: [PATCH] KVM: selftests: Fix arm64 sysreg header dependencies
+To: Oliver Upton <oupton@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Shuah Khan <shuah@kernel.org>, Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, Sep 20, 2026 at 08:15:50PM +0900, Akihiko Odaki wrote:
-> +void kvm_pmu_apply_mdcr(struct kvm_vcpu *vcpu, u64 old, u64 val)
-> +{
-> +	u64 changed = old ^ val;
-> +
-> +	/*
-> +	 * HPMN determines which counters HPMD and HLP apply to. Changes to
-> +	 * these fields require new perf event filters and sample periods.
-> +	 */
-> +	if (changed & (MDCR_EL2_HPMN | MDCR_EL2_HPMD | MDCR_EL2_HLP))
-> +		kvm_pmu_request_recreate(vcpu);
-> +	else if (changed & MDCR_EL2_HPME)
-> +		kvm_make_request(KVM_REQ_RELOAD_PMU, vcpu);
-> +}
-> +
+On Mon, 21 Sept 2026 at 21:20, Oliver Upton <oupton@kernel.org> wrote:
+>
+> Hey Fuad,
+>
+> Thanks for the fix here.
+>
+> On Wed, Sep 02, 2026 at 02:41:18PM +0100, Fuad Tabba wrote:
+> > ---
+> > Unlike the two existing sysreg-defs.h rules, this one's recipe is a recursive
+> > make, so its prerequisites are not the recipe's arguments. They only decide
+> > whether to recurse, which is a question tools/arch/arm64/tools/Makefile already
+> > answers. An alternative is therefore to drop the two explicit inputs in favour
+> > of:
+> >
+> >       $(GEN_SYSREG_DEFS): FORCE
+> >
+> > leaving that Makefile as the only place naming the generator's inputs. Both
+> > forms regenerate the header and rebuild the dependents in the same invocation,
+> > and neither rebuilds anything when nothing changed. I kept the explicit
+> > prerequisites so that the recursion stays conditional, but I am happy to respin
+> > with FORCE if you would rather.
+>
+> This might be the better approach at this point. In the unlikely event
+> that new dependencies get added to the kernel side of this, I'll give it
+> approximately a 0% chance that the author will update this rule :)
 
-Urgh... I'm not a fan of this. Can you just modify kvm_vcpu_reload_pmu()
-to discard all backing perf events and recompute them only for enabled
-PMCs? We set KVM_REQ_RELOAD_PMU pretty rarely.
+I'm on it!
+/fuad
 
->  	__vcpu_rmw_sys_reg(vcpu, PMOVSSET_EL0, &=, mask);
->  	__vcpu_rmw_sys_reg(vcpu, PMINTENSET_EL1, &=, mask);
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 75624725adf1..7dd2cafce247 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -3114,17 +3114,22 @@ static bool access_mdcr(struct kvm_vcpu *vcpu,
->  	}
->  
->  	__vcpu_assign_sys_reg(vcpu, MDCR_EL2, val);
-> -
-> -	/*
-> -	 * Request a reload of the PMU to enable/disable the counters
-> -	 * affected by HPME.
-> -	 */
-> -	if ((old ^ val) & MDCR_EL2_HPME)
-> -		kvm_make_request(KVM_REQ_RELOAD_PMU, vcpu);
-> +	kvm_pmu_apply_mdcr(vcpu, old, val);
->  
->  	return true;
->  }
-
-> +static int set_mdcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> +		    u64 val)
-> +{
-> +	u64 old = __vcpu_sys_reg(vcpu, MDCR_EL2);
-> +
-> +	__vcpu_assign_sys_reg(vcpu, MDCR_EL2, val);
-> +	kvm_pmu_apply_mdcr(vcpu, old, val);
-> +
-> +	return 0;
-> +}
-> +
-
-Just keep the old ^ new test inline for access_mdcr() and set the
-request unconditionally from set_mdcr(). In the usual case
-KVM_REQ_RELOAD_PMU is already set on a vCPU that userspace is restoring.
-
-Thanks,
-Oliver
+>
+> Thanks,
+> Oliver
