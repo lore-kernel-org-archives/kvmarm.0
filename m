@@ -1,183 +1,161 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0E45625F0
-	for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 15:57:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B1E5650F7;
+	Tue, 22 Sep 2026 16:01:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790092633; cv=none; b=FTjacMBEPXdRejw2wFsjTKiC59H/yIegfxXHSlkXWpd8AIx5gfpiQ+z8G5s6TQAYxJZQbF7dKez9z3uSrdXuo9nOxfkZ/xVeqbBUmsmn6+fA7xEXV5tNH6XX3+LpW3g+WfXwkLJxRv22IWrzcK7T3TXMt3FswLBz51rxaOu32Go=
+	t=1790092909; cv=none; b=TnN94kZODT5GY+zT5zUbvyEbtdstjDkx/HCSBt/lb/ZYNNfh9nUC/QcTqxM25YXG/Lf7X//qO50AjltAOPvClZbxU3dpUNVW1UCFySN1lXFpmvrDGM1MtYq9khDqp4wqM29eukXdzJXTZPRQKp99GIgAJwAFZQW+rkIcH6p2Ds4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790092633; c=relaxed/simple;
-	bh=PFs5N1QRY/lF0PmUBLw54rV+mEjwTgLurYi1P0tnIxc=;
+	s=arc-20240116; t=1790092909; c=relaxed/simple;
+	bh=8juOv1uaDdY6IuaTC3vffouy8oZLz41SERNmmIQ7Wlo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YC+QMBSI1ZuReN+BqVpjTc5X7ZQ83foP3J4csZ6I9CS0g1Covi5gqEIMQmoa6KJsiMZJdNKK4fHrV7pY99K22S6h1MSTzuaHAqKvjCM+3YZQ1XxTwDQRo89dQtGic8u5AMvfJQTpNAa49/NrarveF+RrFBwkf0saBHn0261Tfng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rjfp/hMK; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=koXNAMswExXT5wPHLosWWyOw7Aqmz8CZeUf1WCEsxUClJt9Y2URo/wiFPiBSwLkDlXLNAMxswCSvmLzPHnyai7Cxo+6iVggrXquJW9FgJEddPBvVCoJWZRYGgAUPnCsJBofPCQkCqdyBwMYRU0Uggc9ca541+lfzGB7n/3F5gPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TgHOkTxp; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rjfp/hMK"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-49e65a8f70eso48365e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 22 Sep 2026 08:57:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790092630; x=1790697430; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=5TpKHAnlgFCarQTDeOf8zyy4gJ8n9kWvIOm7HPEEJnU=;
-        b=rjfp/hMKyUdLfPuKCy+p0ws3C4KgYdzpASHfzYM504Iv3SAJizvrAMJDvRAyzBZoZM
-         iCPDq+qvL4NUKe6gtof0zoBfVPhjYW3dNaJyhWdbLCVjmgVA8FVPiAN6L9nPXd6DVrVE
-         eBz6sgzx/iw7Cp01DBEf4ZmVtUegg6LtFKqkl+dUtIjBHQUatXRezEoQZ1kgRhuJRMWg
-         6ojIxwuHLACvc6512uH4fVLur/PxtreOA2T5snBlls2I9yAY2gxNqp8pbrxcXMZG+WSP
-         Kk/ttosfJxfJ/cdh0Elx5DQ+JN78HCahKVcun9pYJmybG8vVWzAPwnYydpGCs7CsxDkC
-         BPyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790092630; x=1790697430;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=5TpKHAnlgFCarQTDeOf8zyy4gJ8n9kWvIOm7HPEEJnU=;
-        b=fiFxmA3svmLQBT9l8npiLHOqQi2bwP70B4kgUYJh3z6Ez5caZ7OEYMGj1FcodWRUCj
-         23seJykqg4YQUX8mbLqVDl63QpXi9sqiz5Jg1ORYZ0OxumJhGGxv5hf98WrdmwBYigGG
-         rc5O6a7eo097AHK8OdYhaw+tEUbVCPUPEBwVSfhskKGwYxezDJFEePP6v5bCLwHdctAS
-         6uAqMPz2ODryAB3/n3hQJux8v/H8dpuJqkiIGALUa/V4zuN9bfaFtNfzohPBq9t7TRbu
-         uX+ejGzxDfrAlMZq7G6I1/+NiZ21t3ikgWxkZDwVRuegpojyHJ5m4mdoLXpV/GLk3800
-         IxDQ==
-X-Forwarded-Encrypted: i=1; AKwUvBwB/QtcegQzGgiepydzpyLaKeS2lFELeKm8mJOk0dZn/f7l0LyPo26IgQuqgjp788Xvud0waf4=@lists.linux.dev
-X-Gm-Message-State: AFuF++n9yISeZbc56ZyfZNg1UaE/GQoC9v75SZpF2jabbm9fAYTqPj1h
-	CgMgxQ+EBrEkFoZUUvB4YReQqfsgsin6HK3BTBz/ZoLJZab+pV9IfisTI/TdevOoPiso/emspuS
-	2ErlqeQ==
-X-Gm-Gg: AYBFou0gfLO3/tbCmiTRvIAALMfMDav+mA2RfPzi1tKegKT1YDJm7dFIF7PkDq3itWd
-	uX38lqO+KgYMVGlVMQOCSAPH6ePtW1aNtaNkHmMzuyZ9GRFgl625jGb7XhQSvvI4qZRN/mPIqjb
-	7O6w04o4f7KgzIX+Aar9I225YPkdO6MTigpEpqlBJzdssSsxENqXMa2CCqnchx5P8jx+rq871ul
-	1S+9Mszf+NoCfEYEtVH5WQTGMAj7VykxyqY+yGQVgQGcacjeMFWvrWuUfDbjZtFayxqcgJNxsqU
-	/5tGBrhhp/CS8cOIOD0VujzBjLhhaisO2/HO9JpDV/AN3C3PubYn2J2RIXccANSVd+AEdkT2dlm
-	1AXJV5WIfS8j93MAVamcvZ4HOGQUS1dw9lxb2xJdrADUZq/CP6Dbp+ikc2UhLiSRlkd0TM9OFao
-	3ZMEHXpMIEEtG0HWU1JjDS1l9+LBEh9xg0GjBkHpltPjj62I0/SucYQ7ufVtEpMvxB7MYOv2w8F
-	kmyfRRDbNP8iflcz1IvJwSNLeAG1POto1p8gbZq
-X-Received: by 2002:a05:600c:43c7:b0:49e:62d0:4653 with SMTP id 5b1f17b1804b1-49fdd974593mr123865e9.2.1790092629439;
-        Tue, 22 Sep 2026 08:57:09 -0700 (PDT)
-Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fde1aca52sm117415e9.14.2026.09.22.08.57.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Sep 2026 08:57:08 -0700 (PDT)
-Date: Tue, 22 Sep 2026 15:57:05 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v8 24/25] iommu/arm-smmu-v3-kvm: Enable nesting
-Message-ID: <arKlUTZLw_CF1mMv@google.com>
-References: <20260922131259.2975334-1-smostafa@google.com>
- <20260922131259.2975334-25-smostafa@google.com>
- <20260922134959.16CBB1F000FF@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TgHOkTxp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61E421F0089B;
+	Tue, 22 Sep 2026 16:01:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790092906;
+	bh=Fj8qv/s1QXBda8PJDTUNriPLEJtaxLhFWQtl59nKm2g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=TgHOkTxpKTkCp2koCURoESESmBJBN0clKbStRr6qZEszbQCwdNdvQlCngTcc4FXyT
+	 X3ciCuZGg4tsjBvDauLeGD99T9LKFTC38AG7YYn2SE8tKI0MP9RYZpjh6VPGp1mrE6
+	 QnB8WRl9Ahwhvj8TkU40GxcT1CyqaqHBay5DfVSXfFnwlbl5Y63YYFGLiaRO3yPeA5
+	 ghBCXsnSifEuUsagpHdAwCvn/VOzPBB26gUJnEDMOaPnt4BCcA+/70UlAGxb8A2v0G
+	 Kj8Y7aeLSig6sJTwRB2DHqMDIhfmnxtkMdTQPa+M9BMRFJZIorJ4+Ep0yymWA2X/4+
+	 v62pUHjkSJF0g==
+Date: Tue, 22 Sep 2026 17:01:40 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
+	Jack Thomson <jackabt@amazon.com>, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v3] KVM: arm64: Clear the VM's feature bitmap when
+ kvm_setup_vcpu() fails
+Message-ID: <arKmKAehWmYxfEp3@gremlin>
+References: <20260921190843.107881-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260922134959.16CBB1F000FF@smtp.kernel.org>
+In-Reply-To: <20260921190843.107881-1-fuad.tabba@linux.dev>
 
-On Tue, Sep 22, 2026 at 01:49:58PM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] iommu/arm-smmu-v3: missing ATTR_TYPES_OVR check before setting STE.SHCFG
+On Mon, Sep 21, 2026 at 08:08:43PM +0100, Fuad Tabba wrote:
+> __kvm_vcpu_set_target() copies the requested features into the VM-wide
+> bitmap before kvm_setup_vcpu() runs and doesn't undo it when setup
+> fails, so a rejected KVM_ARM_VCPU_INIT leaves the VM recording features
+> that were never set up. With HAS_EL2 | HAS_EL2_E2H0 on a host without
+> FEAT_NV1, kvm_vcpu_init_nested() returns -EINVAL before it allocates any
+> nested stage-2 MMU, and vcpu_has_nv() is then true with
+> nested_mmus_size == 0; its -ENOMEM paths do the same on a VM's first
+> INIT.
+>
+> Until one INIT has succeeded, every INIT that passes the feature check
+> rewrites the bitmap and a failure leaves it there; once
+> KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED is set, kvm_vcpu_init_changed()
+> has already required the requested features to equal the bitmap, so
+> the copy is a no-op. Clear the bitmap on failure while the flag is
+> clear.
+>
+> This showed up with the series that enables KVM_PRE_FAULT_MEMORY for
+> arm64, since the generic kvm_vcpu_pre_fault_memory() calls vcpu_load()
+> without checking that the vCPU has been initialised. After the rejected
+> INIT, the first call's vcpu_load() reads hw_mmu still set to the
+> canonical MMU and leaves it alone, but its vcpu_put() takes the
+> vcpu_has_nv() branch into kvm_vcpu_put_hw_mmu(), which clears hw_mmu.
+> The second call's vcpu_load() reads hw_mmu as NULL and takes the
+> nested branch into get_s2_mmu_nested(), whose search over
+> nested_mmus_size == 0 leaves s2_mmu NULL for the
+> BUG_ON(atomic_read(&s2_mmu->refcnt)), under mmu_lock. On kvmarm/next
+> with the series applied:
+
+This is no longer accurate at the latest revision of my series ([0])but maybe worth
+keeping for historic detail?
+
+[0]: https://lore.kernel.org/kvmarm/20260922-kvm-arm-prefault-v3-0-787bd3bc7e3f@kernel.org/
+
+>
+>   Unable to handle kernel NULL pointer dereference at virtual address 0000000000000074
+>   Call trace:
+>    kvm_vcpu_load_hw_mmu (arch/arm64/kvm/nested.c:891) (P)
+>    kvm_arch_vcpu_load (arch/arm64/kvm/arm.c:662)
+>    kvm_vcpu_pre_fault_memory (virt/kvm/kvm_main.c:170 virt/kvm/kvm_main.c:4349)
+>    kvm_vcpu_ioctl (virt/kvm/kvm_main.c:4639)
+>
+> Fixes: 427733579744e ("KVM: arm64: Select default PMU in KVM_ARM_VCPU_INIT handler")
+> Suggested-by: Oliver Upton <oupton@kernel.org>
+> Link: https://lore.kernel.org/r/20260825-kvm-arm-prefault-v1-0-befe8947702e@kernel.org/
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+
+Seems reasonable to me so:
+
+Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+
+> ---
+> v3:
+>  - Clear the bitmap on failure instead of saving and restoring it, only
+>    while KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED is clear, since with the
+>    flag set the copy was a no-op (Oliver).
+>  - Commit message: drop the "latent, exposed by the series" framing and
+>    state the flag invariant behind the clear; the pre-fault crash is
+>    how the bug showed up.
+>  - Dropped Lorenzo's Reviewed-by since the code changed.
+>
+> v2:
+>  - Commit message: say what the prefault series enables, bring the
+>    two-ioctl walk and the trace up from below the fold, the trace
+>    decoded, and drop the Fixes: on 1de10b7d13a97, which had nothing
+>    fallible after the copy (Lorenzo).
+>  - Fold Lorenzo's Reviewed-by.
+>
+> Reproduced on kvmarm/next plus the series under QEMU (-cpu max with an
+> Apple M2 MIDR, which has_nv1() denies; kvm-arm.mode=nested):
+> KVM_ARM_VCPU_INIT with HAS_EL2 | HAS_EL2_E2H0 returns -EINVAL, then
+> KVM_PRE_FAULT_MEMORY twice. With the fix both calls return -ENOENT and
+> the host is unaffected. Based on kvmarm/fixes; applies cleanly to
+> v7.3-rc4 and to kvmarm/next.
+>
+> v2: https://lore.kernel.org/r/20260921063718.1604533-1-fuad.tabba@linux.dev/
+> v1: https://lore.kernel.org/r/20260918120553.163139-1-fuad.tabba@linux.dev/
+>
+>  arch/arm64/kvm/arm.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index eaf583b771931..bd19f64ae82ef 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1698,8 +1698,16 @@ static int __kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+>  	bitmap_copy(kvm->arch.vcpu_features, &features, KVM_VCPU_MAX_FEATURES);
+>
+>  	ret = kvm_setup_vcpu(vcpu);
+> -	if (ret)
+> +	if (ret) {
+> +		/*
+> +		 * Clear the bitmap if setup fails on the first vCPU to be
+> +		 * initialized.
+> +		 */
+> +		if (!test_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags))
+> +			bitmap_zero(kvm->arch.vcpu_features, KVM_VCPU_MAX_FEATURES);
+> +
+>  		goto out_unlock;
+> +	}
+>
+>  	/* Now we know what it is, we can reset it. */
+>  	kvm_reset_vcpu(vcpu);
+>
+> base-commit: 6b1bca1b1ab77f60a62087337bfe6e2f0efb9e6d
 > --
-> 
-> commit 9a13859889ae6cece3b72c3b06628dae2d48b4cf
-> Author: Mostafa Saleh <smostafa@google.com>
-> 
-> iommu/arm-smmu-v3-kvm: Enable nesting
-> 
-> As now the hypervisor controls the command queue, stream table, and shadows
-> the stage-2 page table, we enable stage-2 translation in case the host puts
-> an STE in bypass or stage-1. The hypervisor will control the S2 part of the
-> STE and sanitize it.
-> 
-> > diff --git a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
-> > index 5417a5c2bf58a..39c97404e0397 100644
-> > --- a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
-> > +++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
-> > @@ -461,6 +461,57 @@ static int smmu_init_cmdq(struct hyp_arm_smmu_v3_device *smmu)
-> >  	return 0;
-> >  }
-> >  
-> > +static int smmu_attach_stage_2(struct arm_smmu_ste *ste)
-> > +{
-> [ ... ]
-> > +	sl = pgt_cfg->arm_lpae_s2_cfg.vtcr.sl;
-> > +	ts = pgt_cfg->arm_lpae_s2_cfg.vtcr.tsz;
-> > +
-> > +	ste->data[1] &= ~cpu_to_le64(STRTAB_STE_1_SHCFG);
-> > +	ste->data[1] |= cpu_to_le64(FIELD_PREP(STRTAB_STE_1_SHCFG, STRTAB_STE_1_SHCFG_INCOMING));
-> 
-> [Severity: High]
-> Does this code write to a RES0 field on hardware lacking the ATTR_TYPES_OVR
-> feature?
-> 
-> On hardware where the ATTR_TYPES_OVR feature is not supported, the
-> STRTAB_STE_1_SHCFG field is RES0. Writing a non-zero value to it triggers a
-> hardware event that aborts the transaction and breaks DMA functionally for
-> the device.
-> 
-> In the host kernel driver, this is guarded by a check for
-> smmu->features & ARM_SMMU_FEAT_ATTR_TYPES_OVR. Is it possible to add a
-> similar feature check here in smmu_attach_stage_2 before setting the
-> STRTAB_STE_1_SHCFG_INCOMING flag?
-> 
+> 2.39.5
+>
 
-Technically true, although this was unchecked for the kernel for years,
-so I doubt any HW cares, but I will fix it.
-
-> > +
-> > +	ste->data[1] &= ~cpu_to_le64(STRTAB_STE_1_EATS | STRTAB_STE_1_S2FWB | STRTAB_STE_1_STRW);
-> [ ... ]
-> > @@ -520,8 +599,7 @@ static int smmu_reshadow_ste(struct hyp_arm_smmu_v3_device *smmu, u32 sid, bool
-> >  		if (l1_idx >= cfg->l2.num_l1_ents)
-> >  			return -E2BIG;
-> >  
-> > -		host_ste_ptr = &host_ste_copy;
-> > -		ret = smmu_get_host_l2_ste(smmu, sid, host_ste_ptr);
-> > +		ret = smmu_get_host_l2_ste(smmu, sid, &target);
-> >  		if (ret)
-> >  			return ret;
-> >  
-> >  		/* No hypervisor entry, first time the L2 is populated. */
-> >  		if (!l1tab[l1_idx].l2ptr) {
-> >  			struct arm_smmu_strtab_l2 *l2table;
-> >  
-> >  			l2table = pkvm_iommu_alloc_pages(get_order(sizeof(*l2table)));
-> >  			if (!l2table)
-> >  				return -ENOMEM;
-> 
-> [Severity: High]
-> This is a pre-existing issue, but does this out of memory condition trigger
-> a fatal panic at EL2?
-> 
-> When pkvm_iommu_alloc_pages fails here in smmu_reshadow_ste, the ENOMEM
-> error propagates up to smmu_filter_command.
-> 
-> The caller, smmu_emulate_cmdq_insert, will then hit WARN_ON(skip). At EL2,
-> WARN_ON expands to a fatal break instruction, crashing the entire host
-> system.
-> 
-> Since unprivileged host userspace can influence device mappings and exhaust
-> the hypervisor L2 table memory pool, can this error path be handled without
-> causing a hypervisor panic?
-
-
-Same as discussed before.
-
-Thanks,
-Mostafa
-
-> 
-> >  			/* Ensure L2 is observed before writing the ptr. */
-> >  			dma_wmb();
-> >  			arm_smmu_write_strtab_l1_desc(&l1tab[l1_idx], hyp_virt_to_phys(l2table));
-> 
-> -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260922131259.2975334-1-smostafa@google.com?part=24
+--
+Cheers, Lorenzo
