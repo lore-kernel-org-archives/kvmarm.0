@@ -1,63 +1,57 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F88E2264DB;
-	Wed, 23 Sep 2026 05:05:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB513DDDB1;
+	Wed, 23 Sep 2026 05:53:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790139965; cv=none; b=RD4HK96SbqSX+v5a8sm8sDpt/iDMpHrqXlvR3pVRf42xPnY+Hw1gAHXGw+9H4V8786ifL/WJ8DKtQlGVtkMkjP5db9vQJvzbZanAF/G1wkxL72POUMeJviBS7x/fVIU05XApHvRdA8J1pcTWmpOWcdk/XHsM4io0UbFqx52PMbU=
+	t=1790142819; cv=none; b=qM4mq2H6qTZ9sSpxeFyW9kuU9Mo50wx4MULtBvP4vRVXiwdHKLA2ykYxwI14qrLRp4VKHDbNxbyNT4U7soC2uOWA/GEUHFfdSwjpI1UQMSffBy9nqg1+Idv1KdMh6pSkjQyZW4P3f364pNX8QrBBf+2FPxAsusFDERo6Rt5dfmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790139965; c=relaxed/simple;
-	bh=aQo6QARKM7YACcOwS6dF6e3qFBVcNCrooJjp0JvFmXA=;
+	s=arc-20240116; t=1790142819; c=relaxed/simple;
+	bh=SizAW2/qNUHUEFI/k5gafiEU85XtrtxInmg/6FaOLvo=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=iBMMBH4pgDhnbiuQxJ+p/4mn7ambTrE0ColB+ssDSQJKQTxO5xK/H4ZFMaTdLap4gRtKWZtwjMZWJOsjN5KIk7bCSPHV7NF9/ri/cRWqUqmiF9GxsdF1bNewVL2DdMOnB51ss986Lotiw4nhbf5lk+VtSINqBdMvOW6BRqEXK2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m4pTLW9/; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=SBcAhpK9Ha+1K1L0eYtbT85bBaZkQL31rdmM5d1PQHJnjiQwVfSPvzGWhQyA6mdc0mtHIq8QM6/YH+2L6jMGOvgL6jhPV5HApNI8clIXI2e36qE4zmJVpnMioQUH5VVbYaPQcYTMngDh0+6q4cg4lOyfGsWU9H1dLNvhWtsIyyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dfiMSTdw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m4pTLW9/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79C081F000FF;
-	Wed, 23 Sep 2026 05:05:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dfiMSTdw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B328E1F000FF;
+	Wed, 23 Sep 2026 05:53:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790139952;
-	bh=5Bt5dcvEtscZwbFsTWKayy1TU+NMdGF6W9YAquY9XwI=;
+	s=k20260515; t=1790142817;
+	bh=NLg7eC5tmmPMhZrdk3Y2A4+KtVVGLpx4Z4IOl6QmxuU=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=m4pTLW9/ipMMEsohyLQEKqXjzHcwkN0abxqiFKnpytgFKVUrqceMZuAAbjlrBMffF
-	 CdO1sqCGy/I+4fa+zUShWoTBNHwKuZyGA0wUgCZuN/1qgzhc19lMpVXwyE3kopIDPh
-	 xsaF5GYCT9jld3YBh7sBjzHUGLsx/yj0S9EyAhn3oG6QwlUWCR4A3ADfsDf0GA8d70
-	 LLyo/WDzrdcRjJT3saEv0417Vyorzdv9KtCxM/YNHdqRTmqIJwT5iDboIP2AvVAhAl
-	 9BI9XEA2qlyxB1A/jRfmI8xO2B26EOiIXB5Dudw7TzaVJ3eh185kcBwpIEV1sD+FUg
-	 BVMT6WrzF0mJg==
+	b=dfiMSTdwFtu0GCkhWemNFDgm+eZPZTNwX9NfJANQl2p7VUL12gPuLOT5GFrp9s1/W
+	 gYHsfaLK7hikvujYiuXBUn8tMKa90RN/oaYf2S0NAbKARN3nHId0g1n9dBJrUeJeqm
+	 1Q44Iafx85llSabeXDEcOdxXWocXCUP5y+CfG+SLeH3LQKK2DCfDxkDMtcFBDaOqJv
+	 3HMHpRbUUmlsMii5otr4W/LYqrG4eJChKhKMXRP42VluhoUFMzhKQPjXcnsbxGFGAB
+	 eSZq2hnozQ8Ha+TQTKHYQZsH+7U8XaqMquyRiYdYscnEhoNd02LZ7qoYGMlm0AwCPg
+	 wXpHkFmSzOfPQ==
 X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
 From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>,
-	Christian K?nig <christian.koenig@amd.com>,
-	linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
+	Andrew Morton <akpm@linux-foundation.org>,
+	christian.koenig@amd.com, Jason Gunthorpe <jgg@ziepe.ca>,
+	Joerg Roedel <joro@8bytes.org>,
 	Marc Zyngier <maz@kernel.org>,
 	Marek Szyprowski <m.szyprowski@samsung.com>,
 	Robin Murphy <robin.murphy@arm.com>,
 	Steven Price <steven.price@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Thomas Gleixner <tglx@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	"T.J. Mercier" <tjmercier@google.com>
-Subject: Re: [PATCH v6 7/9] dma-buf: system_heap: Enforce shared-granule
- alignment for cc-shared buffers
-In-Reply-To: <arKhCKdlqNQwZn8E@arm.com>
-References: <20260918153642.GD11599@ziepe.ca>
- <d8123f21-d5ce-415b-a05a-392d97b8b57d@amd.com>
- <20260918165315.GF11599@ziepe.ca>
- <6115eaf7-21bc-49ce-8a74-08fd37a1e2c9@amd.com>
- <20260921115141.GJ11599@ziepe.ca>
- <45dd7a2f-8474-4388-b383-2dee3ee62206@amd.com>
- <20260921121739.GM11599@ziepe.ca>
- <cd2b32dc-5a80-4ef5-82bc-dd41ea96dc01@amd.com>
- <20260921123725.GN11599@ziepe.ca> <yq5a1pam4ocu.fsf@kernel.org>
- <arKhCKdlqNQwZn8E@arm.com>
-Date: Wed, 23 Sep 2026 10:35:44 +0530
-Message-ID: <yq5ald8s36c7.fsf@kernel.org>
+	Will Deacon <will@kernel.org>, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, linux-media@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: Re: [RFC PATCH v7 02/13] mm: Add an allocator for CoCo shared memory
+In-Reply-To: <arKsFofudnTYpXj1@arm.com>
+References: <20260921144847.501151-1-aneesh.kumar@kernel.org>
+ <20260921144847.501151-3-aneesh.kumar@kernel.org>
+ <arKsFofudnTYpXj1@arm.com>
+Date: Wed, 23 Sep 2026 11:23:27 +0530
+Message-ID: <yq5aik3w344o.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -68,48 +62,76 @@ Content-Type: text/plain
 
 Catalin Marinas <catalin.marinas@arm.com> writes:
 
-> On Mon, Sep 21, 2026 at 08:56:41PM +0530, Aneesh Kumar K.V wrote:
->> Jason Gunthorpe <jgg@ziepe.ca> writes:
->> 
->> > On Mon, Sep 21, 2026 at 02:24:21PM +0200, Christian Knig wrote:
->> >
->> >> I also don't see where mem_cc_shared_granule_size is added?
->> >
->> > Patch 1:
->> >
->> > https://lore.kernel.org/all/20260904103452.1197239-2-aneesh.kumar@kernel.org/
->> >
->> > Aneesh, please be sure to use get_maintainers on series like this so
->> > everyone gets cc'd.
->> 
->> For v7, I included only the maintainer entries because the recipient
->> list was getting too long, but I added the mailing lists.
+> On Mon, Sep 21, 2026 at 08:18:36PM +0530, Aneesh Kumar K.V (Arm) wrote:
+>> +int alloc_cc_shared_pages_node(int nid, gfp_t gfp,
+>> +		size_t requested, struct cc_shared_pages *mem)
+>> +{
+>> +	struct cc_shared_layout layout;
+>> +	struct page *page;
+>> +	unsigned int order;
+>> +	bool zero = gfp & __GFP_ZERO;
+>> +	int ret;
+>> +
+>> +	if (!mem)
+>> +		return -EINVAL;
+>> +
+>> +	ret = cc_shared_calc_layout(requested, &layout);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	order = get_order(layout.shared_size);
+>> +	if (order > MAX_PAGE_ORDER)
+>> +		return -EINVAL;
+>> +
+>> +	/*
+>> +	 * State transitions require a linear-map address and may modify memory.
+>> +	 * Allocate from low memory and defer requested zeroing until afterwards.
+>> +	 */
+>> +	gfp &= ~(__GFP_HIGHMEM | __GFP_ZERO);
+>> +	if (nid == NUMA_NO_NODE)
+>> +		page = alloc_pages(gfp, order);
+>> +	else
+>> +		page = alloc_pages_node(nid, gfp, order);
+>> +	if (!page)
+>> +		return -ENOMEM;
+>> +
+>> +	ret = cc_make_shared(page_address(page), layout.shared_size);
+>> +	if (ret) {
+>> +		if (!cc_make_private(page_address(page), layout.shared_size))
+>> +			__free_pages(page, order);
+>> +		else
+>> +			pr_warn_ratelimited("leaking %zu bytes with uncertain shared state\n",
+>> +					    layout.shared_size);
+>> +		return ret;
+>> +	}
+>> +
+>> +	if (zero)
+>> +		memset(page_address(page), 0, layout.shared_size);
 >
-> I could not see Christian in the recipients of v7. Sometimes the list cc
-> is enough but my inbox for example is already around 4000 new email, so
-> easy to miss.
+> Does the memset() post sharing logic work for pKVM as well? If nothing
+> clears it, we have a small window where guest data is leaked to the
+> host.
+>
+> Is there a case where we *do not* need the memory cleared? If not, maybe
+> we can move the logic in the arch set_memory_decrypted().
 >
 
-He is already on the Cc list for v7.
+I don't think every architecture or platform can unconditionally zero
+memory in set_memory_decrypted(). Some callers may need to share valid
+contents with the host.
 
->
-> Recommendation: add Cc: lines to each patch with the people that must
-> ack your changes (the maintainers for those specific patches). You can
-> then collate all the cc's from your patches, add them to the cover
-> letter and use --cc-cover with git send-email.
->
+Also, if zeroing is added only to the CCA implementation, the allocator
+must retain __GFP_ZERO for platforms such as pKVM. This would cause the
+memory to be zeroed twice on CCA.
 
-I'll do this 
+How about extending cc_make_shared() with a flag indicating that the
+memory must be zeroed, and passing that requirement down to the
+architecture-specific implementation? The implementation could then zero
+the memory at the appropriate point: before sharing for pKVM and after
+the destructive transition for CCA.
 
->
-> Of course, the list can get large. You can then make a call with who to
-> drop: colleagues you talk to regularly can be skipped for example, maybe
-> reviewers if there are too many for a subsystem. I would not drop people
-> that gave you feedback already on a previous version and not the
-> maintainers you need acks from (you can drop them if they already acked
-> your patches).
->
-
-sure.
+The allocator could derive this flag from __GFP_ZERO, remove __GFP_ZERO
+before calling alloc_pages(), and let the sharing operation perform the
+requested zeroing with the correct ordering.
 
 -aneesh
