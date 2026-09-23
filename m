@@ -1,216 +1,179 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D9804E73C5;
-	Wed, 23 Sep 2026 17:07:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155004E77EF
+	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 17:08:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790183262; cv=none; b=SOwvH2oE3tovfm/f8JEsL/awomwhyiF+QQs3fYAVBrTQxq+zLubAJX99peLQ+NGTqniYri8lwzQOp6zwOpo+A20VisY2vJqn0EJqJVuzfHOchxXHNFE+CsUXql8uvRz2QS0z2BF3K73deKudOhHOYcNPnt5XU8POgAAEnWcwblY=
+	t=1790183285; cv=none; b=Ys7tLCSDFLFmfHdlI/4m3Az0xmM56xc3/7yUcMh0jgEnkrfo8Wkj2gDVqXVmjTlefFFHkB5TiD6sP9lm1LKM/5rHOPHoNLDCeOHMMozPSXn9iAqx/tCCREMJddWVx/dOx6+7HBYs6kuQI7siOjDaW5pKY+fRTPKrwrYApiJ/K/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790183262; c=relaxed/simple;
-	bh=dY5VEKC+MHSoJK6lwGGGvjwFMDTn23WTI6Yxn6zXOoA=;
+	s=arc-20240116; t=1790183285; c=relaxed/simple;
+	bh=cNl6b6j0ZD9iEUUf0B0ghdkeaT66llrYIqOEGQey0qQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ql7lUO1RySwXq0AAwVruFx/wOT5lkzo+sXn5RMPhFhxgTz5qNQm1hdZchA8XiLfjaRqQmQMgSRgGRIeKnoQzui/otgKHBbVAhyds0l3zum+SN+xxlwVPL+yNCqvJ0KXEcISstCqwKlxc65DgG6eNxlSFkp/49OuV465XzfAf+sY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i12XGUT+; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=elTIDraMjLN7yBUvgETfnQXzzj7KiRnksS1XabaG5r0Kx1NtcPmGa0xfUk9lGf4gSDUxOBq4m8PLgNyanazxBvSCFNVA3mBMAynf/p9yQcJ2yTDEYG0gJiQNcdMCh8L0FgZ+DMXjfrkFC/xHlSc8Zyx47W1HXoNQZjYcpyFoHn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SVZi0vuM; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i12XGUT+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 370A61F000FF;
-	Wed, 23 Sep 2026 17:07:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790183260;
-	bh=DPNB6bW0x8y7Uu11BgHcG7CSR1tZ//UGOmZllbw9Ljw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=i12XGUT+ELGTRJSrycRVzqTit3D2pyM9ZR0ZSTlIa0mojim7gB9yUZwmIu+wgWYZK
-	 Ybyv+CV/Yh7wSmglW9QNbCpnx18TWoVPczcRHqo0Q/mnJsqjZQ3eFn2cP25qIt7fM9
-	 +POE/rp3vRI+Oxpo8QK9N4EfOTJ5jI0dLtJ432mM7IKfaNA3MKzBEomsWln5bFOqPN
-	 PxFbALYbyklQCFhfUINibcEvNCNrhcGgRwqd9F7gXGPywV48eYeWHkrJqezKwBbst0
-	 GSXVIWXaPeEYe4X28qZjKKxCsy9Q0ESN1tzaw+iT6CqBpO8zm4Si1SUtWVa2wxKSZ8
-	 vegFjunsRBTBA==
-Date: Wed, 23 Sep 2026 18:07:07 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Suren Baghdasaryan <surenb@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	"Liam R. Howlett" <liam@infradead.org>, Vlastimil Babka <vbabka@kernel.org>, 
-	Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
-	David Hildenbrand <david@kernel.org>, Mike Rapoport <rppt@kernel.org>, Michal Hocko <mhocko@suse.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>, 
-	Stephen Smalley <stephen.smalley.work@gmail.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
-	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
-	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <mkp@kernel.org>, 
-	Jaya Kumar <jayalk@intworks.biz>, Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, 
-	Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
-	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
-	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
-	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
-	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
-	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev
-Subject: Re: [PATCH v3 02/40] mm/vma: predicate setting mmap_prepare VMA
- fields on new vma alloc
-Message-ID: <arQCCzmMARX81-3y@gremlin>
-References: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org>
- <20260917-b4-mmap-prepare-vma-flag-sanify-v3-2-4583d8a23bca@kernel.org>
- <CAJuCfpEa8tUmYJBjx-cRdAE8y-jcKY0C81kAOa1QZS7F6tKdfQ@mail.gmail.com>
- <arP0oJgrgZlgtrb6@gremlin>
- <CAJuCfpFPPGaK-grNx9qiQOhzAXbxU+SO+95Fht1571TGREx2oQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SVZi0vuM"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-49e65a8f70eso1235e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 10:08:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790183282; x=1790788082; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=+sWyggwBV1D9IUYjZa6aLkPXJtAz+OTvh2XpzdjOSmY=;
+        b=SVZi0vuMGx3BobVbLY8KLjNIzeFZzkiDkQQ+U1RzSVfJYUw6ERltw4dgxeKC48W98r
+         Fjn+60ltX3rIrID+u3JOExY8oCIxQTPu8izWMyWmsHZaqi7q92DSVOeTbwm1V5E2ipU1
+         O+PpPJUZHS24SkWOfEWfrETxL8BsfrE7jCtUiR/fhDOTXFXV+cEMUP3ju8pvA/A8PO14
+         r+bU83eiycbgPQpqhZi/Pf50w04hfqGl7x1UNsevurqNJPJSmNIi7gl30jHACOFlIJtF
+         gioo7BD1dyGwCyP/6MmcoXu85x4poEa24MUsGdK/R0FvYrKpzTovp1wHCMFQWqYOzb6e
+         eaHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790183282; x=1790788082;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=+sWyggwBV1D9IUYjZa6aLkPXJtAz+OTvh2XpzdjOSmY=;
+        b=aEayJVIEi7ZdvgUpE0V8Ci+px0GfNaIiUgN2H5ueJqu5JH9bRUgBT3Fxs8fiFQZvhD
+         H4DB7PDqqERTAxrvIQpXaw3eDcqlqEj/wI/o6gFhtTX1/3DX0qEpjv7EcrHMtHntiGl0
+         RodJKOWNYyr1UKHWWgJUHpDIfow/GkWgUKM/AjeMquH/k+OR39TM4BxSlTHNLAl3sw4d
+         rKo90L3FY010zTIOHdt2auWMA2VJ51/tr/0AIBM4FQjqi9lkR+WB3mNfmsjCWEdv3Jdr
+         +0mQJtqN6tEDd1EMPmMZtqdTOMaro+GAtHig816Yt4c1UCABPX6g8+JwK7ZAUgPFrAQr
+         iIKQ==
+X-Forwarded-Encrypted: i=1; AKwUvBwzRa1uYWy7AvB/A9w20GUMWtN97GSRbQJw9HtT++4JehQpFNKBRNIV1yVyA2GjM7n0psCuswU=@lists.linux.dev
+X-Gm-Message-State: AFuF++ky7OuK5pWX0FI+opa/s7evYNmrU4whuSFsg0G90gc/C6hX3krn
+	YYyHjT5u2C21QF5NlpccqR8d+5jDufP/5Dav0Fm8jyrVqHytVXPDu1lRhyc5OoJdRw==
+X-Gm-Gg: AYBFou2jGTVfxa64W5Wgw6uaG8w3QYNIY6QstEK4ILf4isyBK0GcmB5GE58dPZ1PXwl
+	ISwKfxlyQf54fd3kfxBh4ik2k9MYxkmjOuW++t9C7lGVfz4mwrJBVthLUhFhUY/VXzVJ9StkSam
+	rJz9CkSObJvCvkxTS7okbqVlOjcr+qOsOuMxNsr34g0JDQ2t0uU3w4b+/9+zK41hXAD8zLjN+Jo
+	HnTHE6hRY98YaDHHGBHh3OobtEIWvharAbwMX5Hf2LLvb/a9YWAxzdNG1Dm3HG7tLPS8Z0rLhBD
+	oUFm/5rYBqUMCuFFizXk7QgvfeGw1Kqc+PMTzhNj1EECP/UQok09itrtFrgAgU/xoeRPMwXEgtA
+	iDKpEc8EAMe5X55YYT7w3i/OKS9W3cnPcOfCywSUt4ohwXmuSx7dHltouwK+4NrzW+xFKzA0hJG
+	fMReMpeldc0pLDLPz98qoKY6Z6zhCB4JYDDIodn5nqxukaye9qY2zK1C93k9TMVBOBvLm1WWGl5
+	aKeF6e60ptn2esmSpVSdK4u/L/eEZOEttJr/Ai7
+X-Received: by 2002:a05:600c:4e8a:b0:49f:e185:f3ae with SMTP id 5b1f17b1804b1-49fe55e13a1mr140635e9.2.1790183281720;
+        Wed, 23 Sep 2026 10:08:01 -0700 (PDT)
+Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fe5bae53dsm575695e9.4.2026.09.23.10.07.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Sep 2026 10:08:00 -0700 (PDT)
+Date: Wed, 23 Sep 2026 17:07:54 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Nicolin Chen <nicolinc@nvidia.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joro@8bytes.org, mark.rutland@arm.com,
+	qperret@google.com, tabba@google.com, vdonnefort@google.com,
+	sebastianene@google.com, keirf@google.com
+Subject: Re: [PATCH v8 11/25] iommu/arm-smmu-v3-kvm: Add the kernel driver
+Message-ID: <arQHamIHuaUqlJyy@google.com>
+References: <20260922131259.2975334-1-smostafa@google.com>
+ <20260922131259.2975334-12-smostafa@google.com>
+ <arMbxX+sqTS3gByB@nvidia.com>
+ <arO9hGmEx7c9mZAj@google.com>
+ <20260923155507.GJ1540250@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJuCfpFPPGaK-grNx9qiQOhzAXbxU+SO+95Fht1571TGREx2oQ@mail.gmail.com>
+In-Reply-To: <20260923155507.GJ1540250@ziepe.ca>
 
-On Wed, Sep 23, 2026 at 09:09:38AM -0700, Suren Baghdasaryan wrote:
-> On Wed, Sep 23, 2026 at 8:54 AM Lorenzo Stoakes (ARM) <ljs@kernel.org> wrote:
-> >
-> > On Wed, Sep 23, 2026 at 08:32:43AM -0700, Suren Baghdasaryan wrote:
-> > > On Thu, Sep 17, 2026 at 9:24 AM Lorenzo Stoakes (ARM) <ljs@kernel.org> wrote:
-> > > >
-> > > > It only makes sense to manipulate VMA fields if we allocated a new VMA,
-> > > > rather than merged it.
-> > > >
-> > > > VMA merging does not compare vm_ops or vm_private_data, so a merged VMA
-> > > > keeps its own, which is also what the legacy f_op->mmap path does since it
-> > > > never touches an existing VMA. Previously set_vma_user_defined_fields()
-> > > > overwrote the merged VMA's fields with those set for the new mapping. In
-> > > > practice these are the same values, with rare exceptions such as shmem
-> > > > selecting vm_ops based on whether the file has been unlinked, so no
-> > > > user-visible change is expected.
-> > > >
-> > > > Make this dependency explicit, and additionally constify have_mmap_prepare
-> > > > while we're here.
-> > >
-> > > The fact that we might be overriding attributes of an existing VMA
-> > > that we merged with is technically a bug even if we never hit it,
-> > > right? If so, should we have:
-> > >
-> > > Fixes: c84bf6dd2b83 ("mm: introduce new .mmap_prepare() file callback")
-> >
-> > It's not a bug, it is an in-built assumption that the state used to assess
-> > mergeability implies the same properties.
->
-> Hmm. What prevents two VMAs with different vm_private_data members to
-> be merged? IIUC is_mergeable_vma() does not check vm_private_data. In
-> such a case set_vma_user_defined_fields() would override
-> vm_private_data of an existing VMA, no?
+On Wed, Sep 23, 2026 at 12:55:07PM -0300, Jason Gunthorpe wrote:
+> On Wed, Sep 23, 2026 at 11:52:36AM +0000, Mostafa Saleh wrote:
+> > I can add more info in the cover letter about the code split. Mainly:
+> > - arm-smmu-v3-kvm.c: Is the kernel driver for KVM SMMUv3 (this runs in
+> >   EL1 and can use all the kernel functions).
+> >   The main job of this driver is for discovery, it doesn't do anything
+> >   else in the runtime.
+> 
+> Maybe call this el1 stub or something like that?
+> 
+> guest_pkvm_stub.c
+> pkvm/hyp.c
+> 
 
-I think you're right that it should be a fix patch, I'll put it out of the
-series and send it as one.
+It is not really a stub and I was following the convention of
+arm-smmu-v3-(iommufd/test/sva) I think for the pkvm/ one it can be:
+- pkvm/arm-smmu-v3-pkvm.c
+- pkvm/arm-smmu-v3-nested.c
+- pkvm/arm-smmu-v3-el2.c
+- pkvm/arm-smmu-v3-hyp.c
 
-The issue here is more so vm_private_data than vm_ops. And really it's that
-vm_ops->mapped() wasn't called so you could have a refcount go to zero and
-stay at zero when it shouldn't have been, for instance.
+All of those are fine and for the other one:
+- arm-smmu-v3-{pkvm, nested, el2, hyp}-init.c
+- arm-smmu-v3-pkvm-el1.c
 
-But in general though if you remove mmap_prepare and ask the same question:
+Anything along this lines, otherwise it's too vague IMHO.
 
-What prevents a merge of 2 existing VMAs that were mapped using the
-traditional mmap hook which somehow have entirely distinct vm_private_data
-and vm_ops but the same file?
+> ?
+> 
+> > > > +extern struct pkvm_iommu_ops kvm_nvhe_sym(smmu_ops);
+> > > > +
+> > > > +static size_t				kvm_arm_smmu_count;
+> > > > +static struct hyp_arm_smmu_v3_device	*kvm_arm_smmu_array;
+> > > > +static size_t				kvm_arm_smmu_cur;
+> > > 
+> > > That spaces/tabs in those two lines look a bit odd..
+> > > 
+> > 
+> > These are tabs to indent the variables, similar cases exist in the
+> > SMMUv3 driver, check arm_smmu_cmdq and friends for example.
+> 
+> Personally I hate this style, it is a huge PITA for maintenance and
+> makes diffs bigger than they need to do. I remove it whenever I have
+> the chance :)
 
-The answer is nothing prevents that, but there's an underlying assumption
-that this state is fungible for a VMA over a given range given the same
-file.
+No strong opinion I can change it.
 
-In that case, for anything where an allocation or e.g. refcount change
-occurred, then vm_ops->close() will handle the decrement, and the original
-VMA's state should suffice.
+> 
+> > TBH, this is a bit of a hack. The hypervisor can not allocate memory
+> > at the runtime. All of the hypervisor memory comes from a carveout
+> > allocated at boot (see kvm_hyp_reserve())
+> > 
+> > So we allocate the worst case for memory mapping with leaf granule. But
+> > the hypervisor also need to allocate L2 pointers and the SID space can
+> > be massive making the upper limit for this too large.
+> > 
+> > However, smmu_hyp_pgt_pages() defines the minimum pages required,
+> > actual allocation comes from the command line, so it is possible to
+> > tune the system without re-compiling the kernel.
+> > 
+> > Thinking about it now, we can just drop the 500 as this is the lower
+> > bound, earlier versions of this series would allocate the carveout
+> > based on this size, but it is not needed anymore.
+> 
+> I see, and you can't scan the ACPI to figure out all the SIDs used at
+> this point to get an exact estimation?
 
-But here it's a problem because you overwrite it + don't call
-vm_ops->mapped()...
+I thought about it, but it is complicated to scan the DT/ACPI/platform
+bus and I don't think a driver should be doing that; going through each
+device with IOMMUs, duplicating existing logic...
 
->
-> >
-> > And if it was, it'd need fixing a different way (check the field for instance)
-> > and would apply to the legacy mmap hook also.
-> >
-> > This change is needed for the series though.
-> >
-> > >
-> > > >
-> > > > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> > >
-> > > Reviewed-by: Suren Baghdasaryan <surenb@google.com>
-> >
-> > Thanks!
-> >
-> > >
-> > > > ---
-> > > >  mm/vma.c | 4 ++--
-> > > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/mm/vma.c b/mm/vma.c
-> > > > index fa784f069da4..4b74b48c29b7 100644
-> > > > --- a/mm/vma.c
-> > > > +++ b/mm/vma.c
-> > > > @@ -2894,7 +2894,7 @@ static unsigned long __mmap_region(struct file *file, unsigned long addr,
-> > > >  {
-> > > >         struct mm_struct *mm = current->mm;
-> > > >         struct vm_area_struct *vma = NULL;
-> > > > -       bool have_mmap_prepare = file && file->f_op->mmap_prepare;
-> > > > +       const bool have_mmap_prepare = file && file->f_op->mmap_prepare;
-> > > >         VMA_ITERATOR(vmi, mm, addr);
-> > > >         const pgoff_t anon_pgoff = addr >> PAGE_SHIFT;
-> > > >         MMAP_STATE(map, mm, &vmi, addr, len, pgoff, anon_pgoff, vma_flags, file);
-> > > > @@ -2937,7 +2937,7 @@ static unsigned long __mmap_region(struct file *file, unsigned long addr,
-> > > >                 allocated_new = true;
-> > > >         }
-> > > >
-> > > > -       if (have_mmap_prepare && !map_is_anon(&map))
-> > > > +       if (have_mmap_prepare && allocated_new && !map_is_anon(&map))
-> > > >                 set_vma_user_defined_fields(vma, &map);
-> > > >
-> > > >         __mmap_complete(&map, vma);
-> > > >
-> > > > --
-> > > > 2.55.0
-> > > >
-> >
-> > --
-> > Cheers, Lorenzo
+And even with that, things as PCI won't be there as they are dynamic.
 
---
-Cheers, Lorenzo
+I think the best way is to remove the 500 as it is hacky, and rely
+on the command line option.
+
+> 
+> Not being able to manage memory after boot is rather an extreme
+> limitation.. But a huge amount of RMM's API complexity comes from its
+> granular memory management so I can't really fault that..
+> 
+
+Yes, that was one of the main sources of complexity with the
+para-virtual approach also.
+
+Thanks,
+Mostafa
+
+> Jason
