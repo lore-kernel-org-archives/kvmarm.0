@@ -1,69 +1,69 @@
-Received: from mail-dy2-f43.google.com (mail-dy2-f43.google.com [74.125.229.43])
+Received: from mail-dl2-f26.google.com (mail-dl2-f26.google.com [74.125.229.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F4D1524AE0
-	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 13:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA77B4A0929
+	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 13:06:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790168437; cv=none; b=honWTJz60QHu6GQFTbZQbOEu+y/61pWlltsau8ceFnHXa/GGhlDLIY1xI/T/ZIi5CYXUB7U5faaXirKR3TP9yD20i41dp0xtkVEeZ/foC4AjMigRkTgDfc7upLlFpYXsJ90Lyxir0P6cz+AxeLjiBx978Z1JV7KT0B6VkB8O3Fk=
+	t=1790168776; cv=none; b=VKs1a4BMjYBAWgCDBsq7T9kMEx51KYetFVBg157tPVifZ2/k1DegO1p1A+hK8MfLwTC/UgYvx0I9UR29O+7ef59/YIwxbZE6OtETTeTSv4UAFI2V4ZCbek5DKEz4BgOuK278sr+BwF/6YyeYvMotBdcGQ5z3LgRHuYBemiR9UX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790168437; c=relaxed/simple;
-	bh=3lvjhy1fcuALXtgW37aXB9csFPun7VRHCuWT7ETMTgM=;
+	s=arc-20240116; t=1790168776; c=relaxed/simple;
+	bh=ih23spaVgrDHOFSey9aqnpQ7LFap1dWio/xJjG+h0zE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hwSA8JlJHTxxHO1MUmdeNGngpi4GmQ7ZPZgTPOMo8+pp+N9CUCrt4r37GXZA8kW0WWoxdTJ5+HAp1AvdFyqZ6Yur8LcGTkZlxmpywnYX74P57VLwIBc/MMI9BwHEDpE2248K2nkvMhgGXpdf6usulvY1715qWKvlrygp+6EYroA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=o0m2Hhx8; arc=none smtp.client-ip=74.125.229.43
+	 Content-Type:Content-Disposition:In-Reply-To; b=L8ZowKXtLOuMFFERxvY7dG6IeItPutozM0WvQcf7RCdnvkSq96kF3mh7Gk8e1d4sfqfK6p9f6QEwPgiXcu+kwZ36dIAUsR6zVb2PyaSxxIeBjIO2IQ3SVYthhbxe+V9eKVhPuk4y9rXESpGYSSyoB93YpDpCSuv+nzeFYHsFWco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=eCTbKQBv; arc=none smtp.client-ip=74.125.229.154
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="o0m2Hhx8"
-Received: by mail-dy2-f43.google.com with SMTP id 5a478bee46e88-33bfb26865fso728311eec.2
-        for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 06:00:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="eCTbKQBv"
+Received: by mail-dl2-f26.google.com with SMTP id a92af1059eb24-144f47a9b57so943677c88.2
+        for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 06:06:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1790168434; x=1790773234; darn=lists.linux.dev;
+        d=ziepe.ca; s=google; t=1790168774; x=1790773574; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=3lvjhy1fcuALXtgW37aXB9csFPun7VRHCuWT7ETMTgM=;
-        b=o0m2Hhx8QDoOfr7nyg9T4HPPr46PS7MbTIk/6zzbcJZtF6FKeJf3BnJ9kY0iMnBJBB
-         hnDPqzQ2Ly0QPA+e12giMhdHs/4FCzoaErNG7jZ5UGOy1XUDeXbsEaszAHm3yOa8hSoh
-         +oCnBJO+aMfALgiWaIocd02AtYg1elXBKWz2EBp4r2G+0c6ZohBp3tlp08gsv+Bg4nZT
-         +5Y8x3IfukVcrsQPLje0MMWyjjDz/pmlasBo3N8gbvTemEyKoNzm3k7qYXqnfIJEZIp4
-         MUWZoKboilrB6IxLbpE1dD90KrUpydYaAv8ttVgdhkIvhpf5rzi9QXZCrMJWydOiCmRc
-         VWCw==
+        bh=ih23spaVgrDHOFSey9aqnpQ7LFap1dWio/xJjG+h0zE=;
+        b=eCTbKQBvSxJTopQ7hizAXUgVCSMoLgzGCIJznBHhD+Pk9lhzW/XqpaLX0bpveLpW0R
+         dzwOYriXIBzERszea2HrTy/4EeDDapgBnTFWIQ2YOsCaW3vo2dNUyQTzTQ02wZC2kIDY
+         WsI2f1GZ5vF9oSTJcjKvc2o1vY+JOBCqUcsvPZnr/hFWzA6vbbzsE/1SIinmlcQ4yRSN
+         xpy0iZ0Qk5UFIQsj8H3hWBpHBKp+fMu9FEO67WldVjLTeY4xCMk2NNEUYwDjkBzRcu1T
+         ll0xuOGg1tfwvr6tT9PPSkaNq7E825yvN1F+kKE77AMpsvSXxb3asoUI6FQRCzCrLFny
+         HmHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790168434; x=1790773234;
+        d=1e100.net; s=20260707; t=1790168774; x=1790773574;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=3lvjhy1fcuALXtgW37aXB9csFPun7VRHCuWT7ETMTgM=;
-        b=UVbYV7Yi5mFEIbddn/6h+dcsWOfNdpzxD5OWmb3XgtxoqJT5WSLmbZhLnF5/lbVMB6
-         V2pIMasI5DRRYsBdkJAY1OZdFM1qSW6xRd0cgy9HhL+ASvMd/vsZAqhQDheOxHQT0Yku
-         173CZzFWnP0FGXZvcifyTMj+Hs80pJaqIGWqP9VxVSa+RIEpjfbK/xBWwhLYsqQ5mUEZ
-         MKoiJoWZT2lcV4Irm1FEIr822RKGh3Bn9b4GE7c9UdjwVJ9mBNtcE8cJs2CJe4whh5/M
-         BdEvfiPT4+Yo+KnM40MWRvR7DIBq/Aw8qwq/aLkFrnv6ugXKCHtXI9DtmELYSq94u+UE
-         vIOA==
-X-Forwarded-Encrypted: i=1; AKwUvByD08Yxqjamm1gJml7hg9tmR5dOJPlpv1PWN+F5aTnIc7x1HJtYjvQnzClgMImX4U46B1GBMhY=@lists.linux.dev
-X-Gm-Message-State: AFuF++mivqNlxGNkC45gF2T2CgL9CnTjWkvmjU/PDTpd0c+OahsLzPYI
-	q+DdN4DYzr9F3zd47vcez8hDO1+XXwhKyzfujcS6tRxbEvwl6FnwZsA66G/CFTKrctU=
-X-Gm-Gg: AYBFou0V58dqS/FZ3OETFBMgaGx+gXWb29LxxGrrWYgpJRHT+oLY4Ad6Nu8p+UbxcHD
-	ebdgbAGZZkpOT7oMnCPuttOt39KMpzmeQtPU2PAGku1kf3pF+Yqb19Sa7jwPSgY/vQYurRz8J2V
-	LuAIilVaaLIqnubd/dTacBKYzSb1zGkhhBvUtA1ktr7zXaBR4eiRUebnADLKw5nPB5co9fh4kjh
-	0CcU5i5UlvlQxXA1PyT3onudArqt5+TsApnYLQVEUi6J18ApjS7LWpQxarE6fLFA2WY9KywcX8X
-	5BjMfxldKIkaVFDvzTLji9qfX65LzlUtyUTT09pFuRHnXNhbtbRG1pt+RF3m3opJYpFmtMiozLz
-	IcpQCRkDO5w8vxUoZ6p7LjrfYZWsFa124lwAh5oTHMYvdfACf3Szsm0vLXu5B+hjsrnP8dgKRG7
-	HyEOGlmuVqHFy8bq2OJhUQQXaGY9KsoFEaA7663hXE4pHFJfKrQfRM87g=
-X-Received: by 2002:a05:7300:7949:b0:31e:b832:be with SMTP id 5a478bee46e88-33e8c24a34bmr2627336eec.10.1790168434062;
-        Wed, 23 Sep 2026 06:00:34 -0700 (PDT)
+        bh=ih23spaVgrDHOFSey9aqnpQ7LFap1dWio/xJjG+h0zE=;
+        b=Lbcgw293+efE0SdLAPrDRTbsGgtVds+dD5QI4pkA3Ad0+jbZiR3BuBTL8c9ot8gwT+
+         Hw1NLQPcuaruq8zG79oaxnDa94m3s8D5DzpYJp9WhRjY1iG0renL7g8hpRZLGquffm+U
+         ToBkopyJvAV1rocSNO8IEV3SE953U9W6mFv6RohXdK+qzm70exxlSeg5LUV6BvNtdeRX
+         lIGIaF5wuja/oNCWan3itR3oIsHWZ1hLsjzFD5aAR9wjoYmrbRMWcOeFwGoxOYys9IjN
+         bY28pDybJkD92tPKcedRZmyipOVwQBmtBhDssTs4lbpnvk5NvH1mUcf6voDnxv+8ClXI
+         3d5Q==
+X-Forwarded-Encrypted: i=1; AKwUvBwnDAW9OD+528e4b1lGMLWp9uDp+sxfcw/D8BxrkHHrEP+754PEIOYBi4JRLANUAPdxkefNT44=@lists.linux.dev
+X-Gm-Message-State: AFuF++lu56zZkRl8zMgbQIksKGHirEzE3VDnHfEh9GGxELxBHh/3dMOk
+	le2CfONVSZDd9ozzCtDhHHkSdIhrgQnwW6Lvbj5vU7QYV7ctEKXw0JmEo+S6UHgecgE=
+X-Gm-Gg: AYBFou14TjHdeCTY1mW15i+SXpW0eK7T9QZfAu1L0mPukyrUk3Xu8A/o3G9qKXLGwLv
+	AIhCSEZMPJ5Y55oZCw1cCI8xfMhIE79Hs6YTQXygsYMfNOMXpif3SyJLxVOg9OtgkiIDMLNcxGS
+	jm8wgd29I4+6FVRxTE3mRsmLn1z3BKbQR+QXX8LQbJHz+8F5JdMwc6UvLAL96fN8+yvezcUkz2r
+	LqXjQtkELfZ3T5SpDcCUs0C34Us7LguRhJiUT/uIavhQ8T7Pa4KUX1zxcVq7CRKjUbpdRDMzoYx
+	+h6OpIxIhiy/XihoVUjgzuiD9OL/L+GswReXaPk6Bb2gZPKmeEj+bu/Fn9EjnwlnGq5Hwb1KJcf
+	+qogt+jsK8NoMUQsNal9J37IKoLnV0J7Bnnusv4A/WYm3Ec9mar9VQTwJtYBKlmER92VtKxgrDm
+	qOyZuN31yaGx+yP1R8bJPn+RyvP355z5RyDUypItvkEj7D
+X-Received: by 2002:a05:7022:1402:b0:143:2719:566c with SMTP id a92af1059eb24-144f9198b49mr2872815c88.40.1790168773123;
+        Wed, 23 Sep 2026 06:06:13 -0700 (PDT)
 Received: from ziepe.ca ([130.41.10.202])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33e96358e2bsm6859478eec.16.2026.09.23.06.00.33
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-144f98a288esm10833873c88.13.2026.09.23.06.06.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Sep 2026 06:00:33 -0700 (PDT)
+        Wed, 23 Sep 2026 06:06:12 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.97)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1x9MaO-0000000DYPQ-01dr;
-	Wed, 23 Sep 2026 10:00:32 -0300
-Date: Wed, 23 Sep 2026 10:00:31 -0300
+	id 1x9Mfr-0000000DZ6d-2NEP;
+	Wed, 23 Sep 2026 10:06:11 -0300
+Date: Wed, 23 Sep 2026 10:06:11 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
 To: Catalin Marinas <catalin.marinas@arm.com>
 Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
@@ -81,12 +81,14 @@ Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
 	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
 	linux-media@vger.kernel.org, linux-mm@kvack.org
 Subject: Re: [RFC PATCH v7 02/13] mm: Add an allocator for CoCo shared memory
-Message-ID: <20260923130031.GE1540250@ziepe.ca>
+Message-ID: <20260923130611.GF1540250@ziepe.ca>
 References: <20260921144847.501151-1-aneesh.kumar@kernel.org>
  <20260921144847.501151-3-aneesh.kumar@kernel.org>
  <arKsFofudnTYpXj1@arm.com>
  <yq5aik3w344o.fsf@kernel.org>
  <arOfD6syXOgQhZYA@arm.com>
+ <yq5a5wzw2ree.fsf@kernel.org>
+ <arOspFxWZ1DjgcAr@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -95,28 +97,28 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <arOfD6syXOgQhZYA@arm.com>
+In-Reply-To: <arOspFxWZ1DjgcAr@arm.com>
 
-On Wed, Sep 23, 2026 at 10:42:39AM +0100, Catalin Marinas wrote:
+On Wed, Sep 23, 2026 at 11:40:36AM +0100, Catalin Marinas wrote:
 
-> On pKVM, we want set_memory_decrypted() to zero the buffer
-> before the host can access it (I guess currently relying on __GFP_ZERO
-> allocations). Since no cryptographic encryption takes place, there's not
-> much point in memset'ing again after the operation as the content was
-> already zeroed.
+> The simplest is probably to always zero in the backend and ignore
+> __GFP_ZERO to the allocator. But it's probably only marginally smaller
+> than passing a CC_SHARED_ZERO flag down. Get codex to try this as well
+> and compare the diffstat.
 
-It sounds like this a pkvm unique thing, since RMM always makes the
-memory hidden, pkvm flow should do it too. Either inside its guest
-set_memory_decrypted() or inside the hypervisor like RMM.
+For patch ordering I would convert to use the allocator first
 
-Hypervisor doing it is the right place, hypervisor always needs to
-ensure guest memory is cleansed whenever the guest gives it up. Either
-via a private to shared, unmap or just exiting.
+The semantics of the new API should be clear
 
-> I don't think cc_make_shared() has the right information on how to
-> safely and efficiently do the zeroing. That's only known to the
-> set_memory_* backend. So you'd have to propagate the flag down.
+If you pass GFP_ZERO then the resulting allocated memory is zero
 
-+1
+Otherwise the allocator does Whatever The Arch Needs to not leak
+private data out.
+
+Once places are converted to the allocator lets go see what is left
+and ask why it is left and what API it actually needs.
+
+I think HCH was right that nobody should be calling this in driver
+code, lets aim to unexport set_memory_decrypted as an ideal goal
 
 Jason
