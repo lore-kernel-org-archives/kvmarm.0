@@ -1,169 +1,157 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E803468C22;
-	Wed, 23 Sep 2026 08:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65DE1C695;
+	Wed, 23 Sep 2026 08:31:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790151254; cv=none; b=QkkydmTFgWKAv42om4OWOTP2WXvd+NDzpqIbfBr2bbIQB/StloH9myvyumT1py3C5kxnJMf7DgQA4YfbdXf3dn6W8Fx1t/qvt0Bq2V3E0futs8NLiGhSsiuaL5B0D5i08i0ES9psdiyw84kHOie5pMk3Y+zcvsi0JNyfjboKJns=
+	t=1790152283; cv=none; b=mmvoUaD+W8DBkHSTKIFmMCzLcnHvy1aoO0/aavdEU6HONEKFB4IBIE56d3RfI0CidWd3mZMRMxwTYA9E1GuqDghKglwx4Z6Z9dhQA0VCq9UlpvSobkr7IFzq1kac6geJINBD7RkjAZQGyui5yY49l+26yKsJf+RB4Tx15SYJeck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790151254; c=relaxed/simple;
-	bh=aN2ZWo/23w37qNKgpNUnQ0H6NGD03WPhBvg03+MG/94=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HR064HOt5Vnx77PFMZX0U1VDnIMihgT7audwW0G9+h8lBGhW6m4zH+0Zu06olSrHZnuTsQH47N4NPhfOE/ee1UP8ci5iG6uHAU/yt2ufBcMHAmqs71yOo97b1iHdkL1yvuM0CZ8JXayl+R78fG8Bce5Xkd7XBoxGrFXU7BRYeQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mCJlfOwt; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790152283; c=relaxed/simple;
+	bh=paNO5eY1DEgK8W03rG7sbOrBlMZLVg8sLc5gM/Q+wQQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=EdzOMN9n7DHG/EbxEX47/MWsGC+a6HOtaEegg/Lj+7XJ03H/GSYzmGUsNMYYcVEU2n4fqluH3tYhV70+7IDwM8O8ZfWmH/irM+mrqF/F7b65PKp4rBUJ0X7P9biJ77pWMFm+QmEzpyyZpR7v2xBJ/r8NIPsmdvyhdW2vXPsyTZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OTkYlM77; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mCJlfOwt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 376301F000FF;
-	Wed, 23 Sep 2026 08:13:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OTkYlM77"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C62941F000FF;
+	Wed, 23 Sep 2026 08:31:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790151252;
-	bh=4asDkf1r4nhSOrT7R8hAyZcEQKKYrXhZ/zPFbXlZHas=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=mCJlfOwtX67y203buKELQIT2TJkfDrkJVRWjviTUThii3FIl01hNmt/2/N5niDJsO
-	 pMfVhn9hKYcyv1hPNTj3q8nO0Pds6VFO+rGQe1AtibuYmlGhfEvG5fzsVNd5VZj00d
-	 fkgcgDIaUfRNs16fD4U8B+bk8I0EVqFfud76K+T15hPjY5Wnzx7h17G1IEpBvKdbdT
-	 fwOMBpLGIgd0Nxsna3HHhcpWKXrmzcnrf1IYhuJaw4NDIion+IMG6MmbJbYDpOjNxG
-	 ds54K/vBGhy978o0s9QlAtQmkuOq1eOy+SdadnN3yilV4MeGzEJApyN21XCzbDlSMz
-	 y5uiJtnDQNScw==
-Date: Wed, 23 Sep 2026 09:13:40 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Suren Baghdasaryan <surenb@google.com>
-Cc: "David Hildenbrand (Arm)" <david@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, "Liam R. Howlett" <liam@infradead.org>, 
-	Vlastimil Babka <vbabka@kernel.org>, Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
-	Mike Rapoport <rppt@kernel.org>, Michal Hocko <mhocko@suse.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
-	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
-	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
-	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <mkp@kernel.org>, 
-	Jaya Kumar <jayalk@intworks.biz>, Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, 
-	Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
-	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
-	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
-	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
-	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
-	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev, 
-	Takashi Iwai <tiwai@suse.de>
-Subject: Re: [PATCH v2 00/40] mm: make VMA flag semantics explicit, eliminate
- VM_SPECIAL
-Message-ID: <arOCPN02xB7mykju@gremlin>
-References: <20260914-b4-mmap-prepare-vma-flag-sanify-v2-0-7d9781ed5361@kernel.org>
- <20260914180811.057cba8fcc48d6e0b53a2683@linux-foundation.org>
- <0b064fe6-ddb3-4f26-a1f2-2e9dd88d590f@kernel.org>
- <CAJuCfpFBichJH4OcmSHTb1rOuQBT6k5pXeua9_KgpWjDBKvsYw@mail.gmail.com>
- <aq6kzpK7wPl3iFGe@gremlin>
- <aq6lW9FvL69QeA9H@gremlin>
+	s=k20260515; t=1790152278;
+	bh=XxmbCQ7HTgeDaajizNY6/YBNTKC18nSpZXzsHrNVM84=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=OTkYlM77Ug42qVxwfxT90vI8uqJaGZuINeDuY7JZQ7999GuMgboyvG3xtQK4xUOl6
+	 zd/wjFpIioagBtMBTbIRO4+LWzQDIAK3I7vBM0rpdAp3+D48idK6/rLGv/wp810wau
+	 kBIp+Yuzbff5wJbTofP8TTmKYmwVjL0T+CpHEPlOh1dCtBCBbY6Li6SfZcSRBy1ZqV
+	 6HKD6TB9iq8dr86QgVxPCe/DU6JyTmmONL36429SSJxW5oOsL1SHztUpZ/FQDboYkM
+	 lciZ4ZYh3Nxzy1apRUyFKvXJd6RsZiuZRR7Ov/HZwLWG+HsGzKjqSxB30w84hYznIo
+	 wOWxilA16da9A==
+X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
+	Andrew Morton <akpm@linux-foundation.org>,
+	christian.koenig@amd.com, Jason Gunthorpe <jgg@ziepe.ca>,
+	Joerg Roedel <joro@8bytes.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Will Deacon <will@kernel.org>, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, linux-media@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: Re: [RFC PATCH v7 02/13] mm: Add an allocator for CoCo shared memory
+In-Reply-To: <yq5aik3w344o.fsf@kernel.org>
+References: <20260921144847.501151-1-aneesh.kumar@kernel.org>
+ <20260921144847.501151-3-aneesh.kumar@kernel.org>
+ <arKsFofudnTYpXj1@arm.com> <yq5aik3w344o.fsf@kernel.org>
+Date: Wed, 23 Sep 2026 14:01:08 +0530
+Message-ID: <yq5afqz02wtv.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aq6lW9FvL69QeA9H@gremlin>
+Content-Type: text/plain
 
-On Sat, Sep 19, 2026 at 04:09:13PM +0100, Lorenzo Stoakes (ARM) wrote:
-> On Sat, Sep 19, 2026 at 04:05:57PM +0100, Lorenzo Stoakes (ARM) wrote:
-> > On Fri, Sep 18, 2026 at 01:31:24PM -0700, Suren Baghdasaryan wrote:
-> > > On Fri, Sep 18, 2026 at 1:21 PM David Hildenbrand (Arm)
-> > > <david@kernel.org> wrote:
-> > > >
-> > > > On 9/15/26 03:08, Andrew Morton wrote:
-> > > > > On Mon, 14 Sep 2026 15:57:20 +0100 "Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
-> > > > >
-> > > > >> The VM_SPECIAL / VMA_SPECIAL_FLAGS mask conflates several unrelated
-> > > > >> properties:
-> > > > >>
-> > > > >> ...
-> > > > >>
-> > > > >> It's all rather a mess.
-> > > > >>
-> > > > >> This series brings some order to things by both limiting what drivers can
-> > > > >> do with VMA flags and switching to using predicates that describe
-> > > > >> behaviour, not arbitrary flags.
-> > > > >
-> > > > > That's a lot of patches.
-> > > > >
-> > > > > Review is thin and I expect this won't improve a lot.  Lots of "no
-> > > > > functional changes" changes.
-> > > >
-> > > > I'll expect to go through all of them. Might just take a bit ;)
-> > >
-> > > ditto
-> >
-> > Thanks guys!
+Aneesh Kumar K.V <aneesh.kumar@kernel.org> writes:
+
+> Catalin Marinas <catalin.marinas@arm.com> writes:
 >
-> Note v3 has been posted to fix a stupid bug in 1/40 + attack some very trivial
-> sashiko stuff
+>> On Mon, Sep 21, 2026 at 08:18:36PM +0530, Aneesh Kumar K.V (Arm) wrote:
+>>> +int alloc_cc_shared_pages_node(int nid, gfp_t gfp,
+>>> +		size_t requested, struct cc_shared_pages *mem)
+>>> +{
+>>> +	struct cc_shared_layout layout;
+>>> +	struct page *page;
+>>> +	unsigned int order;
+>>> +	bool zero = gfp & __GFP_ZERO;
+>>> +	int ret;
+>>> +
+>>> +	if (!mem)
+>>> +		return -EINVAL;
+>>> +
+>>> +	ret = cc_shared_calc_layout(requested, &layout);
+>>> +	if (ret)
+>>> +		return ret;
+>>> +
+>>> +	order = get_order(layout.shared_size);
+>>> +	if (order > MAX_PAGE_ORDER)
+>>> +		return -EINVAL;
+>>> +
+>>> +	/*
+>>> +	 * State transitions require a linear-map address and may modify memory.
+>>> +	 * Allocate from low memory and defer requested zeroing until afterwards.
+>>> +	 */
+>>> +	gfp &= ~(__GFP_HIGHMEM | __GFP_ZERO);
+>>> +	if (nid == NUMA_NO_NODE)
+>>> +		page = alloc_pages(gfp, order);
+>>> +	else
+>>> +		page = alloc_pages_node(nid, gfp, order);
+>>> +	if (!page)
+>>> +		return -ENOMEM;
+>>> +
+>>> +	ret = cc_make_shared(page_address(page), layout.shared_size);
+>>> +	if (ret) {
+>>> +		if (!cc_make_private(page_address(page), layout.shared_size))
+>>> +			__free_pages(page, order);
+>>> +		else
+>>> +			pr_warn_ratelimited("leaking %zu bytes with uncertain shared state\n",
+>>> +					    layout.shared_size);
+>>> +		return ret;
+>>> +	}
+>>> +
+>>> +	if (zero)
+>>> +		memset(page_address(page), 0, layout.shared_size);
+>>
+>> Does the memset() post sharing logic work for pKVM as well? If nothing
+>> clears it, we have a small window where guest data is leaked to the
+>> host.
+>>
+>> Is there a case where we *do not* need the memory cleared? If not, maybe
+>> we can move the logic in the arch set_memory_decrypted().
+>>
 >
-> https://lore.kernel.org/linux-mm/20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org/
-
-Just a gentle nudge on this :)
-
-If you guys or anybody else has some time it'd be appreciated! (obv. the v3 as
-linked above not this v2!)
-
-I know the series seems intimidating but most of the commits are very small and
-it's been in -next for a while.
-
+> I don't think every architecture or platform can unconditionally zero
+> memory in set_memory_decrypted(). Some callers may need to share valid
+> contents with the host.
 >
-> >
-> > >
-> > > >
-> > > > --
-> > > > Cheers,
-> > > >
-> > > > David
-> >
-> > --
-> > Cheers, Lorenzo
+> Also, if zeroing is added only to the CCA implementation, the allocator
+> must retain __GFP_ZERO for platforms such as pKVM. This would cause the
+> memory to be zeroed twice on CCA.
 >
-> --
-> Cheers, Lorenzo
+> How about extending cc_make_shared() with a flag indicating that the
+> memory must be zeroed, and passing that requirement down to the
+> architecture-specific implementation? The implementation could then zero
+> the memory at the appropriate point: before sharing for pKVM and after
+> the destructive transition for CCA.
+>
+> The allocator could derive this flag from __GFP_ZERO, remove __GFP_ZERO
+> before calling alloc_pages(), and let the sharing operation perform the
+> requested zeroing with the correct ordering.
+>
 
---
-Cheers, Lorenzo
+I was pointed to this email thread:
+
+https://lore.kernel.org/all/c25502d3-35c6-4281-a9ec-856f789fb1b4@arm.com
+
+This makes a stronger case for having a CoCo shared memory allocator
+that captures all these restrictions. It also means that
+alloc_cc_shared_pages_node() needs:
+
+	if (WARN_ON_ONCE(!gfpflags_allow_blocking(gfp)))
+		return -EINVAL;
+
+	might_sleep();
+
+I guess this also requires the VPE L1 tables to be preallocated from a sleepable context.
+
+-aneesh
+
+
