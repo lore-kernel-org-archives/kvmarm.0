@@ -1,177 +1,146 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs2-f40.google.com (mail-vs2-f40.google.com [74.125.227.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A0053C3D2;
-	Wed, 23 Sep 2026 15:54:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C927D535FCC
+	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 15:55:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790178847; cv=none; b=UK7KiHlHPMcx95JFhpXTcYBH7GDGmOUMFggzglJP2tMI5qCVhk3xox24s5DXWpVTV9RmZTc23ExJKqJxDrdeMqkh/UySaiMMJlk8RNatcHuL5khtffZYrL7sFD7LmaBFM8rSTxgRbkx6vDy+9Po94XKNxvVCqMFWKhsY2WWkzQs=
+	t=1790178913; cv=none; b=rQ8qhEee+33HuNmHytkHECpktAS3Uf+xBxxN8ssMU1DlQqFUl41eLYELzxfy8S1bkmPT2D0RbJ4hq2mPSWz3ru+U3ujpIdAT0XYFuVxBWnBH+jh7+lqj9XwYE0NM+IExRYb+fK0fgeBRFyYCj61KE3KnbYGyhA9KvjL8QUweQJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790178847; c=relaxed/simple;
-	bh=J6iRxLrD4DDe9CKcU5VUOBrrbnObxkIIizlaLKxQ6Vs=;
+	s=arc-20240116; t=1790178913; c=relaxed/simple;
+	bh=b8T/ubLHuLaCB4whaPYyYa1q8z2vcOAafgGggYdRfXI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WxYEXPgLYsZD9MjhXDPfCqF9E6MRnAWrJGvmqcfgA/DG0Rm2l1Lt2xvLtR/tZSfGX5IZR2Mi7cfnNGk9dx4ZStl3AWqpDpWQ8zqec6wLyNUcDvh5cA7nDlCCOnKVtlBw6f9JILzCHtJLRlz9bc5bmIPXvkWE+vCMsNMn62NVfcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kO69tl0G; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=lRJ6FfHMmNo1qNnLOaQVZFKPitZkhE5i3A2RXf1VBcigSMjpAj6wq4j9U7Iz5o8wn8oi7zNSDXs9ShojOPx8Q2nKYjfU842O9tej0T+rCVVYeflwBOJT5BgZiIo07rYHd7EYNU4mR08VIDXaCbbss2Y5aVNfkX0FY/ddOzg5fAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Z2WoyxhQ; arc=none smtp.client-ip=74.125.227.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kO69tl0G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EF3C1F000FF;
-	Wed, 23 Sep 2026 15:53:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790178845;
-	bh=wAV8stNGXVD0suD8B1a8qtsl7mm0RfyqHixhi/NZx3k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=kO69tl0GVqEJBDtzXtj722GeS02r981KicvQg4cQHtdo8zYbHSuzX4xKugLSuxZ80
-	 hNKF+inpI1rG93f1F5QhrTtVFxLcKRCTL+snyRWCp/N/q3HEczsFeIqExmwrr7tt/Y
-	 BvYVVTOYIPgApkyrBXMn24Qh05xMwuFcGHVzqgJTNe/gle65zMUCXYN6+65S4HSHY7
-	 tGBuhIwWJ1Pazb14YseddKo0V64lXM6Wy4pe1LmUGi7p3l+GZYljbhlHPVyxqBuygF
-	 nqC8DLo3R+mPNhwr+2JNkPsIA6gODez9Nt0VUzmMq2DMdlQhA1/ymS6rMHMT1y9mfa
-	 Lr1sgEWelyeVQ==
-Date: Wed, 23 Sep 2026 16:53:33 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Suren Baghdasaryan <surenb@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	"Liam R. Howlett" <liam@infradead.org>, Vlastimil Babka <vbabka@kernel.org>, 
-	Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
-	David Hildenbrand <david@kernel.org>, Mike Rapoport <rppt@kernel.org>, Michal Hocko <mhocko@suse.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>, 
-	Stephen Smalley <stephen.smalley.work@gmail.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
-	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
-	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <mkp@kernel.org>, 
-	Jaya Kumar <jayalk@intworks.biz>, Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, 
-	Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
-	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
-	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
-	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
-	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
-	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev
-Subject: Re: [PATCH v3 02/40] mm/vma: predicate setting mmap_prepare VMA
- fields on new vma alloc
-Message-ID: <arP0oJgrgZlgtrb6@gremlin>
-References: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org>
- <20260917-b4-mmap-prepare-vma-flag-sanify-v3-2-4583d8a23bca@kernel.org>
- <CAJuCfpEa8tUmYJBjx-cRdAE8y-jcKY0C81kAOa1QZS7F6tKdfQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Z2WoyxhQ"
+Received: by mail-vs2-f40.google.com with SMTP id 71dfb90a1353d-5c9b0bdf5b5so486326e0c.0
+        for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 08:55:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1790178911; x=1790783711; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=L2p6lfpmyK6oEUo0D1kSTcomcrX7eHQSl2rXfKoXoeA=;
+        b=Z2WoyxhQCENBKMt9/W7B0cJEx0bnHr8DuEgZ16CGk1sfZifAbVz/hOSD2jY+zOYWE0
+         luzitrLouQpnKIww/Lq39RLrbNTUV/HDD11DjwIGA/I9bfRktDe0pRjdbjgZkvVbLB/Z
+         N02ul/wkwQnXnPX50qY94gYM9jSOaPFEKfk7tmjvGdby4F/uLOAMiAvlpPQOo2j2ZwnH
+         fCcR2ToXvfVsGpIUW/ixl37xYHA5PEp3FMaavPpXh3p4uSvww3dJyne+lnpgZ8owoLm4
+         cMFz6hxApp6Jl0U+JM+SB81r0Xiq0q7hiRhcBxbZAZI+oha0Wg8Y/HHb51jQh0IXePbK
+         SPNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790178911; x=1790783711;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=L2p6lfpmyK6oEUo0D1kSTcomcrX7eHQSl2rXfKoXoeA=;
+        b=PNcQe3yfrkCFD2rZo/JsEca//TbNq6L4z3KCglhk150fvJ1pnE1oEIf+PKWkru2B9M
+         kWgpEjmK5Qs3O0lXDBuFyNgW0KR3NDc7hF0Qee5xhTMymDirMxOsV2l9m4t5obEoOLO5
+         Vyc98m68/a9wJ5pT3ZPdk1AKXbvNpVwhY/0R8cZapgZpMstzr38ivB+fYOyujgBPjMGO
+         RsJzqaGaQf6vxJChHNA8fLJnQ1+elU/NTBk4vbqYj/68ecYQ16ekvrTaBJ3oRyybkiLn
+         TvB/DQ3+8vdao0GIeRDHsL904rExluSVtWk81FKa3phPz+eFS9kVWa167QvKFdj+y+qH
+         W3rA==
+X-Forwarded-Encrypted: i=1; AKwUvByn0w8/3OTZ96TRX7bZuu5CEg7b+GBeKt4Pz7M06glDsnV7bqZJM9Uqq4ApMjY3wicI80O6Sdw=@lists.linux.dev
+X-Gm-Message-State: AFuF++mgbXFvtxqekEkKixF0sWeqbr/GNw7/50oAoyKprK/+Q1um02SD
+	wTlYFbSOww76OMV2TzCitw5Pss8K8BC2qMGAd12GT8bBbPsVPV++1mBUjdrTUS8cf80=
+X-Gm-Gg: AYBFou05TndsGX+LcD1WVUyJWxSAUZUFpBurLHfIZ4tZMHatZmMeAKqjkF1CP5nAsXD
+	H8eGr8wDFKdY7KIQSf8LncEiDnJBizt8/aphhYe61gTfS+SuBvh5hqG5sAbIXj64TGjVWBQqYrU
+	OibAwsRgebtZN1r/OoTARFOhXaZeaNRxMsu1wHlwcP1kV55u/UVcMu3Q/EmRpW4ezT6Bd5kPw0O
+	fGu/EkFFobdGggo4MsyBWUUsw2ON7qH4du1zUnzPhrRA6AxD5Y009UMNcMjwCe90UobUy7uiO8p
+	sERWhOeRH50+7DiSoCKH2cv2M/YN6HdbN9qk18AP5U+SyVzHFlWcBE5hThk4Hcw3l0V8HgOwbeF
+	bSuAGkpavzTR49mlzMhl8uV7DMuYD8QmErCUtaaGpHfN3zdnaRjcu40FOyK73Q8opqA2ua7PekH
+	LEVqsO+BEuusuhc9N2uogKvbNG8f5Gt+I7nN5QRXxfs668zBqSY0wUhxM=
+X-Received: by 2002:a05:6122:338f:b0:5c9:a60b:e5c8 with SMTP id 71dfb90a1353d-5c9f1666ee8mr3394069e0c.11.1790178910702;
+        Wed, 23 Sep 2026 08:55:10 -0700 (PDT)
+Received: from ziepe.ca ([130.41.10.202])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c9f0551688sm3382770e0c.15.2026.09.23.08.55.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Sep 2026 08:55:09 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1x9PJM-0000000DwH2-043G;
+	Wed, 23 Sep 2026 12:55:08 -0300
+Date: Wed, 23 Sep 2026 12:55:07 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: Nicolin Chen <nicolinc@nvidia.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joro@8bytes.org, mark.rutland@arm.com,
+	qperret@google.com, tabba@google.com, vdonnefort@google.com,
+	sebastianene@google.com, keirf@google.com
+Subject: Re: [PATCH v8 11/25] iommu/arm-smmu-v3-kvm: Add the kernel driver
+Message-ID: <20260923155507.GJ1540250@ziepe.ca>
+References: <20260922131259.2975334-1-smostafa@google.com>
+ <20260922131259.2975334-12-smostafa@google.com>
+ <arMbxX+sqTS3gByB@nvidia.com>
+ <arO9hGmEx7c9mZAj@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJuCfpEa8tUmYJBjx-cRdAE8y-jcKY0C81kAOa1QZS7F6tKdfQ@mail.gmail.com>
+In-Reply-To: <arO9hGmEx7c9mZAj@google.com>
 
-On Wed, Sep 23, 2026 at 08:32:43AM -0700, Suren Baghdasaryan wrote:
-> On Thu, Sep 17, 2026 at 9:24 AM Lorenzo Stoakes (ARM) <ljs@kernel.org> wrote:
-> >
-> > It only makes sense to manipulate VMA fields if we allocated a new VMA,
-> > rather than merged it.
-> >
-> > VMA merging does not compare vm_ops or vm_private_data, so a merged VMA
-> > keeps its own, which is also what the legacy f_op->mmap path does since it
-> > never touches an existing VMA. Previously set_vma_user_defined_fields()
-> > overwrote the merged VMA's fields with those set for the new mapping. In
-> > practice these are the same values, with rare exceptions such as shmem
-> > selecting vm_ops based on whether the file has been unlinked, so no
-> > user-visible change is expected.
-> >
-> > Make this dependency explicit, and additionally constify have_mmap_prepare
-> > while we're here.
->
-> The fact that we might be overriding attributes of an existing VMA
-> that we merged with is technically a bug even if we never hit it,
-> right? If so, should we have:
->
-> Fixes: c84bf6dd2b83 ("mm: introduce new .mmap_prepare() file callback")
+On Wed, Sep 23, 2026 at 11:52:36AM +0000, Mostafa Saleh wrote:
+> I can add more info in the cover letter about the code split. Mainly:
+> - arm-smmu-v3-kvm.c: Is the kernel driver for KVM SMMUv3 (this runs in
+>   EL1 and can use all the kernel functions).
+>   The main job of this driver is for discovery, it doesn't do anything
+>   else in the runtime.
 
-It's not a bug, it is an in-built assumption that the state used to assess
-mergeability implies the same properties.
+Maybe call this el1 stub or something like that?
 
-And if it was, it'd need fixing a different way (check the field for instance)
-and would apply to the legacy mmap hook also.
+guest_pkvm_stub.c
+pkvm/hyp.c
 
-This change is needed for the series though.
+?
 
->
-> >
-> > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
->
-> Reviewed-by: Suren Baghdasaryan <surenb@google.com>
+> > > +extern struct pkvm_iommu_ops kvm_nvhe_sym(smmu_ops);
+> > > +
+> > > +static size_t				kvm_arm_smmu_count;
+> > > +static struct hyp_arm_smmu_v3_device	*kvm_arm_smmu_array;
+> > > +static size_t				kvm_arm_smmu_cur;
+> > 
+> > That spaces/tabs in those two lines look a bit odd..
+> > 
+> 
+> These are tabs to indent the variables, similar cases exist in the
+> SMMUv3 driver, check arm_smmu_cmdq and friends for example.
 
-Thanks!
+Personally I hate this style, it is a huge PITA for maintenance and
+makes diffs bigger than they need to do. I remove it whenever I have
+the chance :)
 
->
-> > ---
-> >  mm/vma.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/mm/vma.c b/mm/vma.c
-> > index fa784f069da4..4b74b48c29b7 100644
-> > --- a/mm/vma.c
-> > +++ b/mm/vma.c
-> > @@ -2894,7 +2894,7 @@ static unsigned long __mmap_region(struct file *file, unsigned long addr,
-> >  {
-> >         struct mm_struct *mm = current->mm;
-> >         struct vm_area_struct *vma = NULL;
-> > -       bool have_mmap_prepare = file && file->f_op->mmap_prepare;
-> > +       const bool have_mmap_prepare = file && file->f_op->mmap_prepare;
-> >         VMA_ITERATOR(vmi, mm, addr);
-> >         const pgoff_t anon_pgoff = addr >> PAGE_SHIFT;
-> >         MMAP_STATE(map, mm, &vmi, addr, len, pgoff, anon_pgoff, vma_flags, file);
-> > @@ -2937,7 +2937,7 @@ static unsigned long __mmap_region(struct file *file, unsigned long addr,
-> >                 allocated_new = true;
-> >         }
-> >
-> > -       if (have_mmap_prepare && !map_is_anon(&map))
-> > +       if (have_mmap_prepare && allocated_new && !map_is_anon(&map))
-> >                 set_vma_user_defined_fields(vma, &map);
-> >
-> >         __mmap_complete(&map, vma);
-> >
-> > --
-> > 2.55.0
-> >
+> TBH, this is a bit of a hack. The hypervisor can not allocate memory
+> at the runtime. All of the hypervisor memory comes from a carveout
+> allocated at boot (see kvm_hyp_reserve())
+> 
+> So we allocate the worst case for memory mapping with leaf granule. But
+> the hypervisor also need to allocate L2 pointers and the SID space can
+> be massive making the upper limit for this too large.
+> 
+> However, smmu_hyp_pgt_pages() defines the minimum pages required,
+> actual allocation comes from the command line, so it is possible to
+> tune the system without re-compiling the kernel.
+> 
+> Thinking about it now, we can just drop the 500 as this is the lower
+> bound, earlier versions of this series would allocate the carveout
+> based on this size, but it is not needed anymore.
 
---
-Cheers, Lorenzo
+I see, and you can't scan the ACPI to figure out all the SIDs used at
+this point to get an exact estimation?
+
+Not being able to manage memory after boot is rather an extreme
+limitation.. But a huge amount of RMM's API complexity comes from its
+granular memory management so I can't really fault that..
+
+Jason
