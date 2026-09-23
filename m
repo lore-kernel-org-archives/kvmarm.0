@@ -1,85 +1,85 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7AE639CD0A
-	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 16:51:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E71B93B2FF6
+	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 16:54:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790182296; cv=none; b=uGp9POPy3BJ9gyGNnnnIe3wVgEct3zGE/Wp56l19YwThrSPTjsnI39+eD6v0axXuvCuAj5pvP3WALbKk2KiNuaZASwgS9BbWUG5I+quaaJPKwI9f04KYSIICygwMpoAWDUhL07wQuRE1UD9RRj3iXgXL1UJmMp8dxSMKAYKbL8c=
+	t=1790182494; cv=none; b=h7AbfcRmrJX/L1oTwtsWnyEjD3D+zdhkK8cNJVzKnbt4fHe9VSB3Boe0EKfS1+5r1BCvD6KoihUF4d4GEgEPLegS6cWa2CH/a59F6MkzC1PvlKaFNHjXFBZnBRPcADAh2+9+Ef3m9dRWPG/dGu0njn7/IWD1zzqGPnNfkd9GU9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790182296; c=relaxed/simple;
-	bh=5uQE2nAN6JX8QjSvUav79qHnjIuloRrBM4/qaaznXm0=;
+	s=arc-20240116; t=1790182494; c=relaxed/simple;
+	bh=VrlzXIxy8Fp+qeOGPoQZqyU4YzmW9HF543x3NzyMjfA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Okphi42uZv0ah+cibANyk8niKXhOW5eG/8MWQ6VuIZReGdVDdpjWfOQaoXFEl4ALw24hmTzC3NiJeKIhc4X6ypaUaII8UYK4JQNN7c+sSYWCqjVYzGHVOeU5wlBFh+TzAZ3il87AiOCq/1tQdyKJqPOD19RHwNrm2RkBImneK1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=i9oRYKy3; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=K5t/tbLX; arc=none smtp.client-ip=205.220.168.131
+	 MIME-Version:Content-Type; b=OR7c0uTFwNFdpSBkHUoVsyOYBNTNUJ9QBjdylRoDUS5qDaX6GcTlULvSMtRuNhnaF9xCeZ8aOx3lTs06JAFCoEB9zVu0Uyn7mPxiSrm0PtaBupacgxUhTEsP42ZW4bS/Pg+GI01VNtgZeqEJH4DOZCn9jsiZ32hD6Gg9kpBu+Pc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Seum9zPq; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=dfae8/xH; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="i9oRYKy3";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="K5t/tbLX"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Seum9zPq";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="dfae8/xH"
 Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68NGUGn43281284
-	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 16:51:34 GMT
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68NGUL0B3281524
+	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 16:54:52 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	PBQUzucMPHhE43vcKCEgSbYL6NQCAu/bzyKeHz+O5EA=; b=i9oRYKy3vL47wL3Z
-	TQiRtvSmmPuInfzryvrI89KQN+dcSf+ocCQvznV+sZqK2iSvtcq7BXyS401jaGhT
-	zcGov9ln9gi/I7/ZYoQ/0o8keNSHp6Urwj3f6RXjyJYxmyCUBVijSDP0+K5VDMNq
-	rzDkITKd+6gVSxn5bpeWejr6OUPWFfTzlpnq9t4fxXp6UZuty8fwK9UrEXehmIZb
-	XUbz5eza6OybsyPp9UvlDbrkxWrQ194e83mOMXXPU0lmFAgm0qGatu1o/9U3yyLm
-	U++9FQu8kXv4higPKiI06eI6bFqf5wPHXQab6mqq91q/D4mDzOCDArwOW5GhxxVV
-	4IfuUw==
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com [209.85.210.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4gv9bqjqdy-1
+	zlDwEtbUvjpRubwATEGCqUpsne2yYQHkp6iqY3VINLE=; b=Seum9zPqFF1bAFs9
+	2SAgWuOtEzV4WMAmZskMjMP9xFgcocCq5t/P4Btc3uXm/yPP+5dFmh5MvrsC6Woe
+	cL0t9T8Uk0hJD7dxIFSFHKlwoz8kF0IlCF4G+vCAYHnQ5iI/2KTdeJcGSx2awi+g
+	zRh0sCoZKCovDiw8hhNMIlveeyEBS1Vj1OLdNgsBWkZcIG4Bx1Im5Y0tYnE2BZgY
+	80heXHTTt8VxnPYBz3mzkSgrfEctt7TgufuAh5IddJeFRDHIZOHddDlWhucY9Wj/
+	WeQF9cQwlA6a6DWFbbrnt6l8QhQDXPVALVsLhoBblQDFI7hp0SxbGW7fL6jVBLnP
+	KHIFfw==
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com [209.85.215.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4gv9bqjqub-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 16:51:33 +0000 (GMT)
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-86a74698972so963709b3a.0
-        for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 09:51:33 -0700 (PDT)
+	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 16:54:52 +0000 (GMT)
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-cc4e496e5c3so685428a12.0
+        for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 09:54:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1790182293; x=1790787093; darn=lists.linux.dev;
+        d=oss.qualcomm.com; s=google; t=1790182489; x=1790787289; darn=lists.linux.dev;
         h=content-transfer-encoding:content-type:mime-version:organization
          :references:in-reply-to:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to:content-type;
-        bh=PBQUzucMPHhE43vcKCEgSbYL6NQCAu/bzyKeHz+O5EA=;
-        b=K5t/tbLXLkuJ2ZMQEYNqNa+NsHPrmVKnFurMgvQ9v8xbx2gpYmFf9YFxyhwowzE7ov
-         dhHkCboZ08SaQNZ9SVq9fpRhk+c5c/iwkGB873w2+bRNBcyyt4SGgmoKdx+F/hyVkhMv
-         8zkDk3+mHNTjFFKEAbWor8sOcHdPMDmKWDBGg2oxyJkdlbbLiSaqCCatxJ4I5LSOcK5Q
-         rssah4IRV9W1J5kTr5NrGQzNnT5R0B9Cuv6D4uRxIoqzH7UqZcrU9MVEbJd2xuD+Rrjj
-         /RoyhespNARqBD2k0JCPOUeT/AucPxRvbe5tkWPMJidO0J2oqMqhPwUUXa7mJ/Evefv0
-         14+g==
+        bh=zlDwEtbUvjpRubwATEGCqUpsne2yYQHkp6iqY3VINLE=;
+        b=dfae8/xHEtXBlV1q+JYLbS7guFqigXImSb29vRsgk84vdb0dDif7v42J0dUTJ+1aEq
+         agfzSUxuqUYVUmb3QNkeJH/12lWuzu1wH+D3YlQwicap9fJCR0i/d2vTUOCofHuJpM+b
+         3g4ZNdVrfJeqJSiGLX7KwYfM9P8mhF0XX0yJbY1yhEq3sa4kJmQvyX1Pphy4gF8zB+tg
+         n2+Pf9KFmyMmYdOW69etacRpmVAO3zPRwDpRtTA4B5b+q/MXKoiu3g/zdMHsmDHnNI37
+         PoCWCg4CSMvYSvNVoUl7VwbDbeegeLPymfZFK0Sqe22sEwQVzxTHDbC3ZAiOnTE+pnFA
+         YnTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790182293; x=1790787093;
+        d=1e100.net; s=20260707; t=1790182489; x=1790787289;
         h=content-transfer-encoding:content-type:mime-version:organization
          :references:in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=PBQUzucMPHhE43vcKCEgSbYL6NQCAu/bzyKeHz+O5EA=;
-        b=M1I0wd0DhlRKDFHVxlnnYulTG+Y9tbTA2qiqIpW7hLnkWeKPKGk0MijV03H4smAT0D
-         1s9zW/nPvqAIQyVl3Ki0yPdzYrgA0HYhIZDazWvsJIiSjmHqgKLE+2VETcJTYZKEvYpa
-         MfW6piFtIASfLwORzRU+8TSoLmhuc2Lk+D/5FQ9s0/wHoB/mNar9dZ0PEFyNczu2aHIB
-         k4+lN0HGOJ9rqm07gTIdehBOCGtpK2wlQrazjeVp9l/NX5ZL47ptogXIcdr4bDpvRGZD
-         vc4eSJsqBtl35auzUpA04QAu1ZVJsXVCE4FV5q/T0l3V3qkBiSJlArxmSzYLCoSRLqjK
-         G7lQ==
-X-Forwarded-Encrypted: i=1; AKwUvBwMd/6xe/JT2rrJRndBKrnuSmb7iwjT4cqoE9NzJwfA3zgVJUBf9W6k+OJOdtTemDChGQqU+fU=@lists.linux.dev
-X-Gm-Message-State: AFuF++nhMhi9DgYlyfABvro2mBlY/njEEUiar4GFMiRP1Z1/W4dpQnb2
-	QbQQllr4vBAUGwbtF+kiZiGMo+KkUbkcfDx/qwPqTmZ2M1GLlXAKE42cuQM+R5nHweA9nxq7rae
-	LUfnjR4v/0Cij72qRvoTLjibFHbRN8176+7SdzwlYXx7w5wTMrOoml8MdF6k=
-X-Gm-Gg: AYBFou1yBg6CTLPZh/cdUtLvF2xDim8KSQhI4cTGXEDbnlREBIurwKV4O5UZHVHh46L
-	5l5QJeE/ZB/rp8fHZ27s0yxZXwVP3rpNazScp7ZnBOFGxH+7fckQHnesbmhTHmtF6cX8rLvkEYx
-	svIR3y2kJBNcrA7EWXTAkW7l/hll4fT9WX8n+AI6l3Co8+i9zYR6uT+LKiN3Bg5u73oiKzo+CiP
-	T6pLo5RFuRUWSLS4hbIZEvzEQtjvyKAmbJcDwQy9ymNcuG7wmcTMsTKMBXnlviI1iHXn/TcJkkU
-	T1SjZBUeLXrx3g7gErnbUL25TMdYwmMEV0lF+Cfe/Tw8+d8i+rTpre+AjcSPxZ5Yzna/Stz5DPk
-	2N9fVxEST09k7th2NWD0J5ckcgWhEoIMDmEaSy+weTGGfBK4RTFBp1g==
-X-Received: by 2002:a05:6a00:3316:b0:874:705d:f648 with SMTP id d2e1a72fcca58-87d1c9ba6femr2832640b3a.42.1790182293058;
-        Wed, 23 Sep 2026 09:51:33 -0700 (PDT)
-X-Received: by 2002:a05:6a00:3316:b0:874:705d:f648 with SMTP id d2e1a72fcca58-87d1c9ba6femr2832601b3a.42.1790182292399;
-        Wed, 23 Sep 2026 09:51:32 -0700 (PDT)
+        bh=zlDwEtbUvjpRubwATEGCqUpsne2yYQHkp6iqY3VINLE=;
+        b=YmvDxwzqijATYg8qbozwmcLNorfvkgouQ/qklpTkjuRq+asMXzxvhYudVtp/QNv/yf
+         JV0vQsG8CId2BxevEsQZbUvmCu8Xstd8AhxXhT7fElYs/cJbWPGyCJkTDLpn32nvRMsD
+         eVKGcrrOvB8t6xtfRayO2S/0O2+HhL/Skb+wEhP3aSBSTdv+iYZrubVmIbXbo+XbsKyZ
+         M45791YzIzjc9dNxA6FUnczu43YtXac3uM1VR50eRzg0/9mgKr+2yVStcI1aQw7E1qAJ
+         J4eCEixLOz2L1fHNcoXLbKPCgY6zBiSyr0oo8SKy8Ha0cYNhd4C/tgadaO8wlmP8JIwP
+         ygEg==
+X-Forwarded-Encrypted: i=1; AKwUvBxjXnj/ccAryWoa89ovlmTDtSJAs4mtIiSAhUvDEm72zD733liv8Shc3aQs94k5sAe3CrI7b24=@lists.linux.dev
+X-Gm-Message-State: AFuF++lR6H5Wa7yZQr4Rwzfy7DDywJgzSkjzlXvl5BCaP7aBNbpbvD7Y
+	lgswgCRiehyVwoan8Ay/INU03RRVvX6WQGuVfnEdbJNZO6E4Vc99MteaOqrCsRmdPb+0JzKBSKn
+	XGfwucA7Y36eiol2wXL7S72p5NUmFG1dwOiyDi2D6ZhhCsTYC83IrYJJmasM=
+X-Gm-Gg: AYBFou1Szr/aGqpylAR5IvM8vX+UNQW3vhMLASPN1+mIEQa7QEJQGMU5z8nIhnPA+57
+	arAOgi+2FOWKyl6zWu4cSXj9ABy1hUqZNSAA4QRJ0gT/xGZ7hp9YtQDxP7H0CxWdYRB/aLLsjMK
+	MWPNYLZcjYnA/GIXhCE95Q5FISWAKza3oLOiWLPlCp25kMfik3Bjl4EjTqkiiOhd5f0q2j0XXmC
+	y36+FuDLAI5OetDONjEDaYUB0Y+/s0w9T88gKqk0UEL5Ft2lOMcr/JAiFrPt7dm9Lf7LnsftTjG
+	YeEJFhZnOju5De+CNoJuMUVjOQ8wEYpmB8E3ngcPXmfFTlGjiMX0f1s8bLHiEhvF77pw1jDYQKt
+	eSxMjqyncoljSaao6onxa5BLm4s3Y7UBbvx0RJazVErEB43rZG/Ivp5ni1BGg4T5d+g==
+X-Received: by 2002:a17:902:f549:b0:2da:eb8f:b4e4 with SMTP id d9443c01a7336-2df69d261dfmr29630295ad.7.1790182489347;
+        Wed, 23 Sep 2026 09:54:49 -0700 (PDT)
+X-Received: by 2002:a17:902:f549:b0:2da:eb8f:b4e4 with SMTP id d9443c01a7336-2df69d261dfmr29630075ad.7.1790182488834;
+        Wed, 23 Sep 2026 09:54:48 -0700 (PDT)
 Received: from localhost (i-global254.qualcomm.com. [199.106.103.254])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-87d1cfbbfb5sm1725238b3a.18.2026.09.23.09.51.29
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2df6a5f4219sm14535985ad.68.2026.09.23.09.54.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Sep 2026 09:51:31 -0700 (PDT)
-Date: Wed, 23 Sep 2026 09:51:26 -0700
+        Wed, 23 Sep 2026 09:54:48 -0700 (PDT)
+Date: Wed, 23 Sep 2026 09:54:43 -0700
 From: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
 To: Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
@@ -90,14 +90,14 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
         linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
         sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
         WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
-Subject: Re: [PATCH v19 01/20] KVM: arm64: protected VM: Handle user writes
- to CNTVCT_EL0/CNTPCT_EL0
-Message-ID: <20260923095126.0000241d@oss.qualcomm.com>
-In-Reply-To: <fa2f4766-0795-464a-80ca-2f3fd1c5140b@arm.com>
+Subject: Re: [PATCH v19 09/20] KVM: arm64: Add VM specific callback for S2
+ MMU operations
+Message-ID: <20260923095443.0000378c@oss.qualcomm.com>
+In-Reply-To: <0d5201f0-359e-4748-92da-946dedf51bcf@arm.com>
 References: <20260920212845.707-1-suzuki.poulose@arm.com>
-	<20260920212845.707-2-suzuki.poulose@arm.com>
-	<20260922122542.00006868@oss.qualcomm.com>
-	<fa2f4766-0795-464a-80ca-2f3fd1c5140b@arm.com>
+	<20260920212845.707-10-suzuki.poulose@arm.com>
+	<20260922152914.00001221@oss.qualcomm.com>
+	<0d5201f0-359e-4748-92da-946dedf51bcf@arm.com>
 Organization: Qualcomm
 X-Mailer: Claws Mail 4.4.0 (GTK 3.24.51; x86_64-w64-mingw32)
 Precedence: bulk
@@ -108,25 +108,25 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: c7Vak2k3nd_Y44XXXJ-98GDHGq2Z2Gfc
-X-Proofpoint-ORIG-GUID: c7Vak2k3nd_Y44XXXJ-98GDHGq2Z2Gfc
-X-Authority-Analysis: v=2.4 cv=WZuZ+EhX c=1 sm=1 tr=0 ts=6ab40395 cx=c_pps
- a=m5Vt/hrsBiPMCU0y4gIsQw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+X-Proofpoint-GUID: ZP4hs9PVUy9QwJfyxzqtTAcIC96Yf-j6
+X-Proofpoint-ORIG-GUID: ZP4hs9PVUy9QwJfyxzqtTAcIC96Yf-j6
+X-Authority-Analysis: v=2.4 cv=WZuZ+EhX c=1 sm=1 tr=0 ts=6ab4045c cx=c_pps
+ a=rz3CxIlbcmazkYymdCej/Q==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
  a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=s4-Qcg_JpJYA:10
  a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22
- a=VwQbUJbxAAAA:8 a=7CQSdrXTAAAA:8 a=7RKtW5IRJYTtfXkaynwA:9 a=CjuIK1q_8ugA:10
- a=IoOABgeZipijB_acs4fv:22 a=a-qgeE7W1pNrGK8U0ZQC:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTIzMDA2NyBTYWx0ZWRfX1kc5awJOkNfw
- PRjLt9982AN7YeeCtHuxcEWZ+91voO46bLSBrH0LBhv7EU74EF9hbyb7CQMUOi5ciKcbBrn2mRn
- UZx3MUdPlFskoGxKMDe6sFhWXTyR6Ws=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTIzMDA2NyBTYWx0ZWRfX3ma7gk+u9jhl
- IVY7Vs99BUfvBVP2AcrwfYX4cCDgKR8gnDKJEeedG+uoUEBz+3qVWrJ/ofj+JPU1hjmPxzFUslC
- IJhUgHlw1pqW5iWhcperieGP0QkQ5yPjJI89sm8pXzYP9RV5FwmP/tCLQCqNmisP65vHSUe6KdV
- tJiiwo25Bqbv3z+dWn4/aT8VZDn0rBmddWRqPf3co2R/BEY9QYX4ePO7sP1yPk2O4AulY8zBKnP
- RTimMtAd1uD7Cc5BlwvgwfXLsjrtlgtypHB90mTSF2pQyoxM2wGePxrHajqDtVViEd0ZRjR1WOf
- xjwFb4sPWFSzoy+fN663SsBuHHSS9EDE/0XNLthQSM9jVzFMhtKZLXI4si0TUlNh03ShPmqP8nl
- oRrtdeV9vB8R3z7Xrde35dNBUmyHIJJzoJybifSvLUV6g7KyvKZqyNV1Rn0Y1jGlTv3hNvBXxDx
- sSQAp8J+BZdbsgyeDSw==
+ a=7CQSdrXTAAAA:8 a=EUspDBNiAAAA:8 a=OqzaOk1-375Rtnrp2FUA:9 a=CjuIK1q_8ugA:10
+ a=bFCP_H2QrGi7Okbo017w:22 a=a-qgeE7W1pNrGK8U0ZQC:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTIzMDA2NyBTYWx0ZWRfX1Si8noV+g8aE
+ h4maX+q2MNJ6uB2eM9S1HR5T1vdLCIOGTCntm/vLtI8HvQvuiNy8Ye+dyewK+CnnWUyPJ0HsVBK
+ phikmoPZQRvSs/LBkV5kxidvlwvxSqo=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTIzMDA2NyBTYWx0ZWRfX3SNcxc3/zwLE
+ pfcluS2rWGFFcB5L6JU+L40bmWeelAbNHtMyCCMsEtKCwTBn+DyfX7IBoZljow5H7EuXud6hu3E
+ FjNkoaA7YKDt/AomlR/9w+0A0nmuXLfiI4w6c6XcIdFvMgqz5M1Xj/7eG82tsyKqmFVXCAQsltI
+ zXSiwoR2ya53kPavfUFhF2TqIFhWjfguL4YkNXDxhAEy77FilAEMbtoltx5SnDQHD+/9HCK6mpN
+ NIyPMKwTEXZ/7SFvQll+zPxQXQX8gbmsNdNrab/JHQAAIzKCqsVLvOf5QR2JUQXzliyMsnLgnXb
+ QgwJo33wiILIkpxV8e4p64wTsPHp2DPxF2VO/qYHGet9EpgSxnKN7tYS8b4c8b1Abynx9i1mx2J
+ puocN0c1zpri4O71eBW/Li0SFsodC1eHohIgWMoPEIvgrcImxE+FdWkups4keav26WlAIfKJ0Ep
+ ceRIv5XrAYAG+AT4PVQ==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-09-23_06,2026-09-21_02,2025-10-01_01
@@ -136,107 +136,86 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609230067
 
-On Tue, 22 Sep 2026 23:04:42 +0100
+On Wed, 23 Sep 2026 00:21:58 +0100
 Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 
-> On 22/09/2026 20:25, Jonathan Cameron wrote:
-> > On Sun, 20 Sep 2026 22:28:26 +0100
+> On 22/09/2026 23:29, Jonathan Cameron wrote:
+> > On Sun, 20 Sep 2026 22:28:34 +0100
 > > Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
-> > 
-> > Hi Suzuki,
 > >   
-> >> Protected VMs doesn't allow setting offsets for virtual and phyiscal  
+> >> Add VM type specific S2 MMU operation backends which can be initialized per
+> >> VM flavor, to keep the handling cleaner.
+> >>
+> >> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>  
 > > 
-> > physical
+> > A small suggestion inline that makes it explicit when there isn't
+> > range operation and a full flush of tlb is needed.
+> > 
+> > I don't mind either way, but thought I'd mention it anyway in case
+> > you hadn't already dismissed it.
+> > 
+> > Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+> > 
 > >   
-> >> counters, as the offset is always fixed to 0. The VM ioclt is filtered  
-> > 
-> > ioctl
-> >   
-> >> out based on the cap. However we don't prevent the userspace from trying
-> >> to write to the CNTVCT/CNTPCT registers. This would lead to KVM triggering
-> >> a WARN() in timer_set_offset() as the vm_offset pointer is set to NULL.
-> >>
-> >> Fix this by always "fixing" the timer offsets to 0 and marking that the
-> >> timer offset is set in the kvm->arch.flags at KVM init time for protected
-> >> VMs. A userspace writing to the CNT*CT_EL0 would observe success, without
-> >> any real effect. This was chosen over preventing the writes to these
-> >> registers and returning -EPERM.  
-> > 
-> > Why?  I don't mind the decision but telling us what was chosen is something
-> > we can see in the code - patch description should give us the stuff we
-> > can't see.
-> > 
-> > One comment on the comment below.  
-> >>
-> >> Reported by Sashiko
-> >>
-> >> Link: https://lore.kernel.org/all/20260908164641.416911F00A3A@smtp.kernel.org
-> >> Fixes: f7d05ee84a6a ("KVM: arm64: Prevent host from managing timer offsets for protected VMs")
-> >> Suggested-by: Marc Zyngier <maz@kernel.org>
-> >> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> >> ---
-> >> Changes since v18:
-> >>   - Retain NULL vm_offset for protected VMs to avoid host tampering with the
-> >>     offset.
-> >>   - Moved the flag setting into kvm_timer_init_vm(), where it should have been
-> >>     in the first place
-> >> ---
-> >>   arch/arm64/kvm/arch_timer.c | 12 ++++++++++--
-> >>   1 file changed, 10 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> >> index 6ac3321f4c575..226cd5a495c8b 100644
-> >> --- a/arch/arm64/kvm/arch_timer.c
-> >> +++ b/arch/arm64/kvm/arch_timer.c
-> >> @@ -1110,8 +1110,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
-> >>   		timer_context_init(vcpu, i);
+> >> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> >> index 03f2017a7404a..d97a4a1bca23f 100644
+> >> --- a/arch/arm64/kvm/mmu.c
+> >> +++ b/arch/arm64/kvm/mmu.c
+> >> @@ -37,6 +37,8 @@ static unsigned long __ro_after_init io_map_base;
 > >>   
-> >>   	/* Synchronize offsets across timers of a VM if not already provided */
-> >> -	if (!vcpu_is_protected(vcpu) &&
-> >> -	    !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
-> >> +	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
-> >>   		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
-> >>   		timer_set_offset(vcpu_ptimer(vcpu), 0);
-> >>   	}
-> >> @@ -1133,6 +1132,15 @@ void kvm_timer_init_vm(struct kvm *kvm)
-> >>   	 */
-> >>   	for (int i = 0; i < NR_KVM_TIMERS; i++)
-> >>   		kvm->arch.timer_data.ppi[i] = get_vgic_ppi(kvm, default_ppi[i]);
-> >> +
-> >> +	/*
-> >> +	 * Protected VMs don't allow any offset being set from userspace,
-> >> +	 * either set via writes to the counters or using the dedicated  
-> > This sentence confused me.  Second clause isn't obviously the ways that
-> > are being blocked. Maybe shorten to:
+> >>   #define KVM_PGT_FN(fn)		(!is_protected_kvm_enabled() ? fn : p ## fn)
+> >>     
+> >   
+> >>   /**
+> >>    * kvm_arch_flush_remote_tlbs() - flush all VM TLB entries for v7/8
+> >>    * @kvm:	pointer to kvm structure.
+> >> @@ -174,26 +188,36 @@ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
+> >>    */
+> >>   int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
+> >>   {
+> >> -	if (is_protected_kvm_enabled())
+> >> -		kvm_call_hyp_nvhe(__pkvm_tlb_flush_vmid, kvm->arch.pkvm.handle);
+> >> -	else
+> >> -		kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
+> >> -	return 0;
+> >> +	if (!kvm->arch.vm_s2_ops->vm_flush_remote_tlbs)
+> >> +		return 1;  
 > > 
-> > 	Protected VMs don't allow the offset to be set from userspace,
-> > 	whether via writes to the counters or the dedicated ioctl.  
+> > For consistency with other cases and because it looks nicer
+> > blank line here.  
 > 
-> LLM suggests:
+> Ack
 > 
+> >   
+> >> +	return kvm->arch.vm_s2_ops->vm_flush_remote_tlbs(kvm);
+> >>   }
+> >>   
+> >> -int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
+> >> -				      gfn_t gfn, u64 nr_pages)
+> >> +static int pkvm_flush_remote_tlbs_range(struct kvm *kvm,
+> >> +					gfn_t gfn, u64 nr_pages)
+> >> +{
+> >> +	return pkvm_flush_remote_tlbs(kvm);  
+> > 
+> > For the cases where there isn't a range call, perhaps you should just
+> > not provide the op and have the wrapper fall back to
+> > calling the 'flush all' variant if there is no range one available?  
 > 
->     * Protected VMs don't allow userspace to set counter offsets,
->     * either via counter register writes or the dedicated ioctl.
+> The core KVM falls back to flushing all TLBs if the range one
+> returns true anyways. So, I would leave it as it is.
 
-Hmm.  I'd not combine a negative with either.  Still good enough I think!
-Our Booker prize may be a way off yet :)
+That sounds like a reason to stub them to return true always rather
+than call the flush all so we don't have fallbacks added at two
+layers of the stack?
 
-> 
-> Have updated the comment.
 > 
 > Cheers
 > Suzuki
 > 
+> 
 > >   
-> >> +	 * ioctl. Pretend the offset has already been set and rely on the
-> >> +	 * default offset being 0.
-> >> +	 */
-> >> +	if (kvm_vm_is_protected(kvm))
-> >> +		set_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &kvm->arch.flags);
-> >>   }
-> >>   
-> >>   void kvm_timer_cpu_up(void)  
+> >> +}  
+> > 
 > >   
 > 
 
