@@ -1,195 +1,183 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E50A511E8A
-	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 14:31:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790173880; cv=pass; b=c1Zf9YpBcL2n/xwfcF9sbQnpM963xG83awoYyyq88eneJV18v6JJ4EIt3ggyQ3D579V3MCJhTuxd6xHjNILTRW16HPm9bSNjMZGAFGB+kcgEyDOJqmqiB8P9eODjyGB+yC/X5Oesr+okBDSeDdPzVO94yeUYg+7G4hOA7gT2ce8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790173880; c=relaxed/simple;
-	bh=3IRQTfCkVu29EAhzhIq8HL8xV9bhN+vmwTvfaTzW1hg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cyvsirm6Jati/jRBgkeVRi1IfPbmyUbefUto8JrJoQLyx1wXicDkuOSjPtRKQddMbBlBvVzuUk5UPJL0ZEs86NuWglWqiSk5aAHLemBvEG4whatry4G6Ku7eGunmtRCIz+oy/eAXCqZTP2X/MZFU9V6dNDUbE2k0bWMUPxhl7S4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oS0nl4pW; arc=pass smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1009C52FE2A
+	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 14:31:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790173903; cv=none; b=MpbFcnGjwjIz1rQtYKHWyShixUBrNYSjdnFwvGoDQoneDkFuJmKjdP4vO4q+LloavVrd2WiKtqXZMpPmIOguhzqYNgpQo4FZ7DDqNLqY82aB3YYRSBrHxp96xH12+uLC+Vu51FYNkazAvZA6uC7Z+odDpVH9Rh8ULNkn9VEZKuk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790173903; c=relaxed/simple;
+	bh=MUzrLs0lR/Oe8D54eAsDUY6kfGDrpGhi+dVUR8nDw7Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kdpBnWSGO7ksMQqbCHqyNw5W2iF7i6c0RsSw1pjtAzb8Er9nvOGtCxbHZFQVQP1WfebfwvDLF/v/2/x+pFXsRUyBO0EMo2L8IIi9AVZT9LQGl+6KauS02LDXTfcixbI1WixqJkCAELVNByVwk3aTbc7IQKw+qZPxIWFRjFg1G7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ui59tHZq; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oS0nl4pW"
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-53113d72966so260611cf.1
-        for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 07:31:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790173876; cv=none;
-        d=google.com; s=arc-20260327;
-        b=M0VK3Uo2MPOXKQWcfIZ+cGx0wJ2Xek9GwKh366WVQp+vX8AtzCw8489MTk7nh8S2SJ
-         WNnlb5dqipaJa/HMMgwAT6G22sTV+deuqD69Etxzx27O4nRW0O9D0BYf53Fsp24ZCBqm
-         p+LuCBUj+KFuQruO8H6ZKBD4cy4ZYjrX1CBejVXT+bzXgeZVErAz1C81OQqXPkAIUQOS
-         zTVLiUY5KqodEzUWqyrQuVq7yLnb5KKyDg+H/FB1JafLX9dTqQmdbIiZd/+Z8yKQYy/a
-         uR2ABlZ8RvFSk5aTwierGj0z6hdIUGwvF6CLOtLwg9eDo9+gcvA7t38NvBWxDq2zuflm
-         rGKg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=3IRQTfCkVu29EAhzhIq8HL8xV9bhN+vmwTvfaTzW1hg=;
-        fh=veVAqyYbElJV842SzjTcnY8Ig60BlMqjylACGAFrB7w=;
-        b=Si7RuJuH3Hd/uh3UekiK++e2axaeajkSqSBlpEJAUECbLD5Z6HfJfQglEBu4ZfKznK
-         UMdiGGJR41F/harlihMn+uSW3huGXkcV8BEeZu6aAB9c9fZL+MM5CFZkYsc2S/jm71n9
-         jM8WD2ZF88SDe343TJlNTp0ZA7p57Pw3cAYTwcMqfFayNWGFWR6a0mkw2yeMKd/2kbOl
-         ZtiyOvrq7cXbVqLF/QiaQTdVmxSNb0rETq7PrOD8fDyH+5Ayfr4kzjrol5d+viK27F40
-         8P727KIPJMbndOCUgwSg72hWNBS1xitZmlldrUcNdCtH11YJCGPaAROx2VG44JHU1Rsc
-         rExQ==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790173876; x=1790778676; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=3IRQTfCkVu29EAhzhIq8HL8xV9bhN+vmwTvfaTzW1hg=;
-        b=oS0nl4pWRlrNyEOwpNkKXpsMS5i0z5ylwRTW7qYTeLf84ktkIDzcEoYkjW2Y5J1KdB
-         /ti9FFHd1UlNTfvIpiLR6xasCKByaHQNX29XY6D/cpr1Uw+mhuUBqgyrIHxxIhGv1n/5
-         LNUpVVeqfEsKMPcFY4KjL5W8rcmn9uphAddJDPZuc/myD/5+tvPct7F8NoTIpoHPweY/
-         ang+6A53f1D1FytSDboOp+wCVFWykrLv0i5YWOeYbDo50Bp4I2OFNeQdOnKmfROFg64m
-         5lJW11VC4f+Z615Ta4JOAsKXFk6PWtx2R94JvXTTpuuTppAUYSlSdYFNvTNjA1Dp6Uhg
-         HM0w==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ui59tHZq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1790173900;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oxDyo6wS9tLNRj9z6xsNaM4tf77SpHmeasoP+i9z6qY=;
+	b=Ui59tHZqa2z3EtwP28XTFKxprfdtpskVCi4hkD/ygnLkLKOI04+3i+e+g9Nt7ijlWL0P8N
+	YgLFUGmVGWbE7YFl6yHmmc93eLvwteHz+pIY4iCzCzTLwb3odT0g/SZT5dXSVqasSo5+9E
+	aZvcFu0uJ5nUZrQh4MdtCtbqEYtvtCE=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-328-CLgIHSt-OoiRLYMgz1gbWw-1; Wed, 23 Sep 2026 10:31:39 -0400
+X-MC-Unique: CLgIHSt-OoiRLYMgz1gbWw-1
+X-Mimecast-MFC-AGG-ID: CLgIHSt-OoiRLYMgz1gbWw_1790173898
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-48704504d61so299217f8f.3
+        for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 07:31:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790173876; x=1790778676;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=3IRQTfCkVu29EAhzhIq8HL8xV9bhN+vmwTvfaTzW1hg=;
-        b=vvNezj4BJZmRdNsTUXE4f9jtWNUQbRrtKzUEk1GOFW5nrxK7xLjlaqPVwjV7J5+DiU
-         VwnelueZr6ZTuz09nlRNtHaUOSRHTTGj7ObBlOo9AtjG6ktwRYmb+XGWdwoFF/8UVHeW
-         7TM1P7WXqNFGPJjgneKSa1HySVJ1NgeC/JZQRbOUNH35bbDz5+DGpO0TbB9343+SnnhA
-         gtzBUj+14xkscg47hJ/fxb5jB5C3zrU1+1K+CTMfsMHsKnBcUmYcIl5KAKGSxo4SkWHl
-         WgMQ/jbRSRZd5nDcxsSwgy/va71HzqadlaLysnNU/pNuZuMGezhmshlrmit+A3hpQRbf
-         mCSg==
-X-Forwarded-Encrypted: i=1; AKwUvBzXL8Vrhz/dVp+Cng6OpiQ6Z4u4PuBe8JR6OX5v9laDD84ExTkHCYKp3iNZBFBvGxwMmMNF5RI=@lists.linux.dev
-X-Gm-Message-State: AFuF++nyA4ArBYXQKxKj1Hb0TzXSXORBHPvjUxXCAPkB8Og4GKIDYlSB
-	QCzj4eBTbREoeIdtEAA/6zP3VgYDMIK/ErirTlynuLNhLBuJY+D5m2rSzQbhHaS7ZiIEJn+DUZ3
-	wBFXIRKykqbHmbNseVp0Qd+fhCisQ1TeZKkLXxcO/
-X-Gm-Gg: AYBFou2vBZXl0ZN5obHaOKnLF8dBtGqYBCWftCoz1uzUSSWiXkGvX+a3N/IlK/NceRU
-	+QrI/xdvI7aIBl8YTfbHBKtCnRgrizmZ4pTehrSTsKIu+IR1lAHh2qJ0KJ+7jY1A9dAe7wjNXuw
-	C3KotCJ/2Y2jG4xYKw6Le8fC5Kv/N0/xsjOfn82WFg48GdBDvJuFbG4tZsK+oHLQ1zn6uMBPMKk
-	lh29XPMKhR71Vr2OfApfzu4lHZ7Syc5Q01IhccFS7w+uP6o4J4DPyzj2ZZZmeko8u/A4bKfqAPn
-	oo5p4qx9PWpgp89+zOz2i8wAUDjNjYgJAMfWsX1kHon0x2LTizei0L4gKVInOlvWzMXrOt8j4XF
-	VYpebq0beVQ==
-X-Received: by 2002:a05:622a:260e:b0:532:9d15:2e5a with SMTP id
- d75a77b69052e-532ede89b29mr14598791cf.1.1790173874906; Wed, 23 Sep 2026
- 07:31:14 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1790173898; x=1790778698;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=oxDyo6wS9tLNRj9z6xsNaM4tf77SpHmeasoP+i9z6qY=;
+        b=snhwMQCI48RRVpVonpiDEHCny6G3MgfsjxbEJfiX4SJQ4ShF2Ydh/gKH1nKaWSyKeI
+         E9/EzMu/0zpSr7ri0WP3BN1k/nJNTqO8+xTV7PvnSxl5pGEXCIuyT5GKENBzN34AsfIp
+         dipkF4wW1g9kICw8Y2O8PzcGoTb02BiWfTFA5GDAWOO9iB9O3mamHCrUpZAOe+Caxsac
+         EFmYEwRtgx6n6Dbs7Q2MdNzLPnjpHfcflhijqGj46WpD8G4IR4NvHYc0JAuK/9WGs4LE
+         1851PGlftfR254CTw0Twj2f0fzV62Gvf/XQbYG/zyEIw4TYgTis11o8zGczqgiJxCzFJ
+         3d+w==
+X-Forwarded-Encrypted: i=1; AKwUvByTFGV9nr289gP+ecR4kl+63km+Kf+SfDu2KMStnRvS4eFI1fXSppFemYFFnqSfi0fG1Xe2mGs=@lists.linux.dev
+X-Gm-Message-State: AFuF++ndMe6na+GFp2If8JH1nBEGTJEj49OSTXYAIKZhje13GcEMw2Rt
+	ngF7WGWYmaU599/NvP99ilJ3+talgitgWFpY1Mtn+CSzmQqv/sX32P/h6eWNGsEG4dOeSmkDgiP
+	gz/mhIGu73rM0OYO81broZymmOAPPHQDCFys1qPzOvR559uFZyVJxTLUqZg==
+X-Gm-Gg: AYBFou0R12WooiVdo/XmE8X4U/P0gncXqpj7lZoAAxGZ8w2MMMrnl1CMaLAdXqDHOZU
+	xAWhcmtSFw8I8+XHGx4LHYh+gEDOv/+HZ4RFf7xqA1Y8gV7r/mkDkedtmJTZx+vCCJ2SzkxLqCd
+	i/vVMEWI/i+06rUNnNxDP2Erqkft7Fw+UYtgrkXg6g1ZODXrK/zjKvUcfLkrWQoGuU3CTYc5rIz
+	LUvgSi+vo8LJlgHIuF1a1sToSsqBUVLvRZ9C9+ZPnCjvf9e2RcpHIjfWXaO4Dlm23y6uZjq2pFe
+	QB804MWiFZ22rDiG/2kHS9UjBTKCEQpc22/u/U0MWF9+JXX8OOYK8KWxM3g/BCUR8bVRzqg8ATG
+	t0elk1+5jKq/tSoNsaSfaT+bH3QhAP7wLTHVi0+isFpo13qhdpQ5WqD/z3wk=
+X-Received: by 2002:a5d:5f88:0:b0:485:8a46:b3cc with SMTP id ffacd0b85a97d-488670c51fcmr4871180f8f.52.1790173898241;
+        Wed, 23 Sep 2026 07:31:38 -0700 (PDT)
+X-Received: by 2002:a5d:5f88:0:b0:485:8a46:b3cc with SMTP id ffacd0b85a97d-488670c51fcmr4871097f8f.52.1790173897738;
+        Wed, 23 Sep 2026 07:31:37 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-488682673bdsm7322098f8f.2.2026.09.23.07.31.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Sep 2026 07:31:37 -0700 (PDT)
+Message-ID: <1ccea6d2-418c-481a-85ff-072d3dd837b3@redhat.com>
+Date: Wed, 23 Sep 2026 16:31:35 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260914-b4-mmap-prepare-vma-flag-sanify-v2-0-7d9781ed5361@kernel.org>
- <20260914180811.057cba8fcc48d6e0b53a2683@linux-foundation.org>
- <0b064fe6-ddb3-4f26-a1f2-2e9dd88d590f@kernel.org> <CAJuCfpFBichJH4OcmSHTb1rOuQBT6k5pXeua9_KgpWjDBKvsYw@mail.gmail.com>
- <aq6kzpK7wPl3iFGe@gremlin> <aq6lW9FvL69QeA9H@gremlin> <arOCPN02xB7mykju@gremlin>
- <b007cd0f-29ef-457a-8e44-63ab26f3bcd0@kernel.org>
-In-Reply-To: <b007cd0f-29ef-457a-8e44-63ab26f3bcd0@kernel.org>
-From: Suren Baghdasaryan <surenb@google.com>
-Date: Wed, 23 Sep 2026 07:31:02 -0700
-X-Gm-Features: AclHuK_ZGTwaB8ygIyiOyIIeQNRzbEtns-G_Cds8CuZ4q61CHw7YMjTifucik0o
-Message-ID: <CAJuCfpHL=dHjT=O4S88ZBvT1DyodAtCL9QTryepzs3EMwoECDQ@mail.gmail.com>
-Subject: Re: [PATCH v2 00/40] mm: make VMA flag semantics explicit, eliminate VM_SPECIAL
-To: "David Hildenbrand (Arm)" <david@kernel.org>
-Cc: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	"Liam R. Howlett" <liam@infradead.org>, Vlastimil Babka <vbabka@kernel.org>, Jann Horn <jannh@google.com>, 
-	Pedro Falcato <pfalcato@suse.de>, Mike Rapoport <rppt@kernel.org>, Michal Hocko <mhocko@suse.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>, 
-	Stephen Smalley <stephen.smalley.work@gmail.com>, Jaroslav Kysela <perex@perex.cz>, 
-	Takashi Iwai <tiwai@suse.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
-	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
-	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <mkp@kernel.org>, Jaya Kumar <jayalk@intworks.biz>, Simona Vetter <simona@ffwll.ch>, 
-	Helge Deller <deller@gmx.de>, Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, 
-	Peter Xu <peterx@redhat.com>, Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, 
-	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Muchun Song <muchun.song@linux.dev>, 
-	Oscar Salvador <osalvador@suse.de>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, 
-	Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>, 
-	Ying Huang <ying.huang@linux.alibaba.com>, Alistair Popple <apopple@nvidia.com>, 
-	Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
-	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, 
-	Baoquan He <baoquan.he@linux.dev>, Youngjun Park <youngjun.park@lge.com>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Qi Zheng <qi.zheng@linux.dev>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
-	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-usb@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	selinux@vger.kernel.org, linux-sound@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, 
-	fuse-devel@lists.linux.dev, Takashi Iwai <tiwai@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v9 03/26] target/arm/cpu-sysregs.h.inc: Update with
+ automatic generation
+To: Khushit Shah <khushit.shah@nutanix.com>
+Cc: "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ Shaju Abraham <shaju.abraham@nutanix.com>,
+ "yangjinqian1@huawei.com" <yangjinqian1@huawei.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "sebott@redhat.com" <sebott@redhat.com>,
+ "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
+ "philmd@oss.qualcomm.com" <philmd@oss.qualcomm.com>,
+ "maz@kernel.org" <maz@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "abologna@redhat.com" <abologna@redhat.com>,
+ "jdenemar@redhat.com" <jdenemar@redhat.com>
+References: <20260916144721.751810-1-eric.auger@redhat.com>
+ <20260916144721.751810-4-eric.auger@redhat.com>
+ <ECC98331-BFD5-4630-ADBC-FEDA0B32F889@nutanix.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <ECC98331-BFD5-4630-ADBC-FEDA0B32F889@nutanix.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: QZQ5THLd6e-X_jhTs1twU5oL4h0uuw779zAV0uWo3tE_1790173898
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 23, 2026 at 1:40=E2=80=AFAM David Hildenbrand (Arm)
-<david@kernel.org> wrote:
->
-> On 9/23/26 10:13, Lorenzo Stoakes (ARM) wrote:
-> > On Sat, Sep 19, 2026 at 04:09:13PM +0100, Lorenzo Stoakes (ARM) wrote:
-> >> On Sat, Sep 19, 2026 at 04:05:57PM +0100, Lorenzo Stoakes (ARM) wrote:
-> >>>
-> >>> Thanks guys!
-> >>
-> >> Note v3 has been posted to fix a stupid bug in 1/40 + attack some very=
- trivial
-> >> sashiko stuff
-> >>
-> >> https://lore.kernel.org/linux-mm/20260917-b4-mmap-prepare-vma-flag-san=
-ify-v3-0-4583d8a23bca@kernel.org/
-> >
-> > Just a gentle nudge on this :)
-> >
-> > If you guys or anybody else has some time it'd be appreciated! (obv. th=
-e v3 as
-> > linked above not this v2!)
-> >
-> > I know the series seems intimidating but most of the commits are very s=
-mall and
-> > it's been in -next for a while.
->
-> Busy with too many other things sorry. Its time will come.
 
-Had to take care of the pile of bugs but I'm on it now.
 
+On 9/23/26 11:13 AM, Khushit Shah wrote:
 >
-> --
-> Cheers,
+>> On 16 Sep 2026, at 8:15 PM, Eric Auger <eric.auger@redhat.com> wrote:
+>>
+>> !-------------------------------------------------------------------|
+>>  CAUTION: External Email
+>>
+>> |-------------------------------------------------------------------!
+>>
+>> Generated definitions with scripts/update-aarch64-cpu-sysregs-header.py
+>> based on "AARCHMRS containing the JSON files for Arm A-profile
+>> architecture (2026-03)" Registers.json file.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>> Reviewed-by: Shameer Kolothum <skolothumtho@nvidia.com>
+>> ---
+>> target/arm/cpu-sysregs.h.inc | 11 +++++++++++
+>> 1 file changed, 11 insertions(+)
+>>
+>> diff --git a/target/arm/cpu-sysregs.h.inc b/target/arm/cpu-sysregs.h.inc
+>> index ec5a12b0f4..8b77c490d4 100644
+>> --- a/target/arm/cpu-sysregs.h.inc
+>> +++ b/target/arm/cpu-sysregs.h.inc
+>> @@ -1,11 +1,18 @@
+>> /* SPDX-License-Identifier: GPL-2.0-or-later */
+>> +
+>> +/* This file is autogenerated by scripts/update-aarch64-cpu-sysregs-header.py */
+>> +/* DEF(<name>, <op0>, <op1>, <crn>, <crm>, <op2>) */
+>> +
+>> +DEF(AIDR_EL1, 3, 1, 0, 0, 7)
+>> DEF(CLIDR_EL1, 3, 1, 0, 0, 1)
+>> DEF(CTR_EL0, 3, 3, 0, 0, 1)
+>> DEF(DCZID_EL0, 3, 3, 0, 0, 7)
+>> +DEF(GMID_EL1, 3, 1, 0, 0, 4)
+>> DEF(ID_AA64AFR0_EL1, 3, 0, 0, 5, 4)
+>> DEF(ID_AA64AFR1_EL1, 3, 0, 0, 5, 5)
+>> DEF(ID_AA64DFR0_EL1, 3, 0, 0, 5, 0)
+>> DEF(ID_AA64DFR1_EL1, 3, 0, 0, 5, 1)
+>> +DEF(ID_AA64DFR2_EL1, 3, 0, 0, 5, 2)
+>> DEF(ID_AA64FPFR0_EL1, 3, 0, 0, 4, 7)
+>> DEF(ID_AA64ISAR0_EL1, 3, 0, 0, 6, 0)
+>> DEF(ID_AA64ISAR1_EL1, 3, 0, 0, 6, 1)
+>> @@ -40,6 +47,10 @@ DEF(ID_MMFR5_EL1, 3, 0, 0, 3, 6)
+>> DEF(ID_PFR0_EL1, 3, 0, 0, 1, 0)
+>> DEF(ID_PFR1_EL1, 3, 0, 0, 1, 1)
+>> DEF(ID_PFR2_EL1, 3, 0, 0, 3, 4)
+>> +DEF(MIDR_EL1, 3, 0, 0, 0, 0)
+>> +DEF(MPIDR_EL1, 3, 0, 0, 0, 5)
+>> DEF(MVFR0_EL1, 3, 0, 0, 3, 0)
+>> DEF(MVFR1_EL1, 3, 0, 0, 3, 1)
+>> DEF(MVFR2_EL1, 3, 0, 0, 3, 2)
+>> +DEF(REVIDR_EL1, 3, 0, 0, 0, 6)
+>> +DEF(SMIDR_EL1, 3, 1, 0, 0, 6)
+> After this, we should probably refactor cpu->midr/revidr/mp_affinity into the idregs[]?
+
+Hum yes. We can now rely on MIDR, REVIDR and MPIDR storage in
+isar.idregs[]. I will handle that in v10
+
+Thanks
+
+Eric
 >
-> David
+> Warm Regards,
+> Khushit
+>> -- 
+>> 2.53.0
+>>
+
