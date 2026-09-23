@@ -1,148 +1,204 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4A574718D7;
-	Wed, 23 Sep 2026 10:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50EB0488D95
+	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 10:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790159329; cv=none; b=tCaAqQuxmglMXfdb90xTnPXFLhIJ/vOB48WbMsrC6+mJTPo31VjMSJTtcp9VvBAcbj+oip7xjNqOdwHQ5CPFLWNUrHvz/ZWBS+fpESGOZ2gf1zOul44kX+iblJMCJr4vQEQr9Q5f+wF7AQmRba9RDrPYfESIqkCOdlA4hnIFLM0=
+	t=1790159422; cv=none; b=BETTfKxbNbX8ALE6tbzW/P+3ucPVd0f8DtPDe63/U9snp7zY3/jsXwhqKp3kvTkHqQQ4LUJmIJz6Hua4SAifH4rTHE2HxrTWeYO1nlhyO2XO3VoRVmd62cRoZR9MezslwOpPuA+USiipHIJ2mpKtaq+n67kfmDJX3CBJVyEK3V0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790159329; c=relaxed/simple;
-	bh=ykhV2yYRbKnz9dLHP70QvxnNkLVjPCv8Rq6GYFSCfxs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ujfRaIFniTfNHok7fHX+t6cOB6g53mmoHXEPnpqlJ5Hy2NzWkH8vvfC+sb251CDf3Qx9nLjubkY9u6BJQNHzKggncOojgS8oYPYyaQi7W695gr9zLM5V4F9b/8K2pegunQqX5QKLxVnNOQWLY2cP7sy8eFd/JK3XgO5bidlPE3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gfeKGD7Z; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790159422; c=relaxed/simple;
+	bh=RH724JkT1TH0BVBbfq0vo+soCwQoN0cmU8izeXTd2vY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kjaW5URiJweUfgoYanNCEggdFRKhZ/3MlyKEBF5+cWyryCGH6Epqbwlb5F6X2wHsHlLkAgKsx5vSjzsKjH24zSG0qSw4gBgx+CqUkkuGetO0j2U7khO50BfsbUGueYgBoOfsGl67oUYfzaWAcqXXfAt3or55vnswOgw9rtgGQb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CqVVvPNF; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gfeKGD7Z"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7196B1F000FF;
-	Wed, 23 Sep 2026 10:28:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790159314;
-	bh=Tw+YzFR1Q3RDJ/ocFl7RH+C/kpA7xkpXpKPh0rT8+YE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=gfeKGD7Zx1t68oVKPD3pJdIls6095LdyIYbLzcbi2lWu0uZc4Ag6czwUu/3rMOVvu
-	 5DkKG7QVnUdoUJyu1nzlZlhO5qsE27dTDKv4KVUeUxS/0fGMmnV48ACdIVTacKhMLM
-	 Kp2Etb2iursi6SlXAk2q9a0Y6ZYslY12NqaBGyj2gFaxqHvu92+46mMlc5J8MMsSdD
-	 HGiK3yV1AdehOFvWHLjpPcT/57yOMwlxfev62t4C+oD/yqe8IWaG9c7HzZhanNfFx0
-	 V7SG8BRuoVDTolq0VsrAo7+8om8W5vw2V1IN/4OrxXJcM2FyWTn+Eqh0SDfkr9xU/H
-	 iMGeRqREn7XNA==
-X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
-	Andrew Morton <akpm@linux-foundation.org>,
-	christian.koenig@amd.com, Jason Gunthorpe <jgg@ziepe.ca>,
-	Joerg Roedel <joro@8bytes.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Will Deacon <will@kernel.org>, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, linux-media@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: Re: [RFC PATCH v7 02/13] mm: Add an allocator for CoCo shared memory
-In-Reply-To: <arOfD6syXOgQhZYA@arm.com>
-References: <20260921144847.501151-1-aneesh.kumar@kernel.org>
- <20260921144847.501151-3-aneesh.kumar@kernel.org>
- <arKsFofudnTYpXj1@arm.com> <yq5aik3w344o.fsf@kernel.org>
- <arOfD6syXOgQhZYA@arm.com>
-Date: Wed, 23 Sep 2026 15:58:25 +0530
-Message-ID: <yq5a5wzw2ree.fsf@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CqVVvPNF"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-49ccf12bed0so33535e9.1
+        for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 03:30:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790159410; x=1790764210; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=ovOwY8bLaV9a90WmLe0SJbMjYqolqHUHY1GzJaJp6yo=;
+        b=CqVVvPNFKmkIkc1XPcBvsz/sNGZu/egCVHwZo7pz/mGo5xQGXT0SrIg+A0+FD075+H
+         eCXxZ2XKN5zA3GHhj5LmM8hKKct/k3di4o9C+WYRoZI8J2mAIJtLMJte6ucqeltOf42B
+         NhYB2O+i1anVt4P6sEikqNlovUgbsOVX9BHJjyyud+DLlf2WCFhmV7mnVQFcax3cNDVa
+         +Dj+4H6YHqw3sentgmT145OSwkMa53/ozrJKnu4HSsMzIfXO4uQo3lqh1Y93oUpRk5bv
+         QKSJH6T7fl+AUv+alKVkv9c2o/bZc9hqD+0SWXL6N2zu1K76wN3g/C5U0UXe8VRwatln
+         WgcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790159410; x=1790764210;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ovOwY8bLaV9a90WmLe0SJbMjYqolqHUHY1GzJaJp6yo=;
+        b=BKFh5+8rhKSjSx2Y8yXBGIA/rITHvv2kKAwOYnJGPGpXE3rW8hFwTD7yLueFUBWB6q
+         WalcUmJhrlZ1sjqB1C8r8yXpyfDLJGvEXDqjeFtsPzKjj9WN3lpRct3EKe2bzQKozixA
+         AYVTc20RmQVUIJguFXWtNuY91fQH6XS13rxlTWuW4xibRsiSqQphCNJui/mICw2sOG3I
+         hd93HvfacvD7Tt4Ce8Jf0Gplc99/iiA+9QiJHUH6zGsVxVfsZ/ciuthMDXJX2mp+3SGa
+         /Y006/9XDB1kP/D1mg8BM6OfQfBV+c8K8e9rpjL3Qmes6J04KUqpy458t+nxNLK5i9f6
+         6lIw==
+X-Forwarded-Encrypted: i=1; AKwUvBzUu9eiRLhtFWc0DH52zF6UcTm1ykmuSqswqMxyLhsv4i7fTFoEGASn9+cJsrcxAdwW52T2xkM=@lists.linux.dev
+X-Gm-Message-State: AFuF++lnTcObVnX0l8IHU+wFNLJRZtC5UBw6V6RESRSPjE4TB1+Z5K49
+	V/l9Jz6uOmmfu7DGnnLIMPcTd3LepnlNLJg5MMTCFl4uKHBCLW5L0PbJyE0phkuOJg==
+X-Gm-Gg: AYBFou3Q7LjayJ4OACzId6KjEPsdCXIatO4ztpmV0YyFKzblXyN8R0Uq1vggXyfUXHo
+	su7rn/fjllWfD0F0PcIJbg38ZVjPMuNMS01A9FQDWmbPREzWFPkXugfYiHFYx742/JgWNjXStMv
+	WtNqZR8jTfJJGifJe3BwxQ8w80ddxZGEn3zf+tsYev9nySCrmrokJFHAXkIH632eRtcHx3s5kDX
+	BtAbjkaUQKl1pRGKoP8fzSk8/SRSF23j2MgEuh7ZYIy0tuaeklWQtTGxM3CavIcwBgLllN90ROL
+	Lep/+E+m70HwFqodM3QRuruOdYtf9CY5PtoHNRI8KpB9Z+QX9zbVJzmUxpsyyJ7cSy01uytiExK
+	+T+Lb/92+/SPdcryHq9J6KDQ4g+oUdQgAM3QujNKrGKtkk1PTlh+dDpI/4uz+w4Dc0hzPJkIpme
+	89IZXNT12cxp5jsAG/28wtPPZcXJCgVW2b3YCUkEBh+9+Ae1zSeya48d0Z/qEGbRauyT69Zy0aA
+	p4nh0l5/65bkWGFnqvcFjSdfv45Xt8Epz3nElbO
+X-Received: by 2002:a05:600c:8588:b0:48a:623c:8859 with SMTP id 5b1f17b1804b1-49fe1a55d46mr425265e9.7.1790159409353;
+        Wed, 23 Sep 2026 03:30:09 -0700 (PDT)
+Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fde185329sm68031695e9.1.2026.09.23.03.30.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Sep 2026 03:30:08 -0700 (PDT)
+Date: Wed, 23 Sep 2026 10:30:05 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Nicolin Chen <nicolinc@nvidia.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joro@8bytes.org, jgg@ziepe.ca,
+	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
+	vdonnefort@google.com, sebastianene@google.com, keirf@google.com,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>
+Subject: Re: [PATCH v8 10/25] iommu/arm-smmu-v3-kvm: Add SMMUv3 driver
+Message-ID: <arOqLQTOsofAzCmg@google.com>
+References: <20260922131259.2975334-1-smostafa@google.com>
+ <20260922131259.2975334-11-smostafa@google.com>
+ <arMDiPHiMvHVHsBr@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <arMDiPHiMvHVHsBr@nvidia.com>
 
-Catalin Marinas <catalin.marinas@arm.com> writes:
+On Tue, Sep 22, 2026 at 03:39:04PM -0700, Nicolin Chen wrote:
+> On Tue, Sep 22, 2026 at 01:12:43PM +0000, Mostafa Saleh wrote:
+> > From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > 
+> > Add the skeleton for an Arm SMMUv3 driver at EL2.
+> > 
+> > The driver rely on an array of SMMUv3s on the system, where at
+> 
+> s/rely/relies
 
-> On Wed, Sep 23, 2026 at 11:23:27AM +0530, Aneesh Kumar K.V wrote:
->> Catalin Marinas <catalin.marinas@arm.com> writes:
->> > On Mon, Sep 21, 2026 at 08:18:36PM +0530, Aneesh Kumar K.V (Arm) wrote:
->> >> +int alloc_cc_shared_pages_node(int nid, gfp_t gfp,
->> >> +		size_t requested, struct cc_shared_pages *mem)
->> >> +{
->> >> +	struct cc_shared_layout layout;
->> >> +	struct page *page;
->> >> +	unsigned int order;
->> >> +	bool zero = gfp & __GFP_ZERO;
->> >> +	int ret;
->> >> +
->> >> +	if (!mem)
->> >> +		return -EINVAL;
->> >> +
->> >> +	ret = cc_shared_calc_layout(requested, &layout);
->> >> +	if (ret)
->> >> +		return ret;
->> >> +
->> >> +	order = get_order(layout.shared_size);
->> >> +	if (order > MAX_PAGE_ORDER)
->> >> +		return -EINVAL;
->> >> +
->> >> +	/*
->> >> +	 * State transitions require a linear-map address and may modify memory.
->> >> +	 * Allocate from low memory and defer requested zeroing until afterwards.
->> >> +	 */
->> >> +	gfp &= ~(__GFP_HIGHMEM | __GFP_ZERO);
->> >> +	if (nid == NUMA_NO_NODE)
->> >> +		page = alloc_pages(gfp, order);
->> >> +	else
->> >> +		page = alloc_pages_node(nid, gfp, order);
->> >> +	if (!page)
->> >> +		return -ENOMEM;
->> >> +
->> >> +	ret = cc_make_shared(page_address(page), layout.shared_size);
->> >> +	if (ret) {
->> >> +		if (!cc_make_private(page_address(page), layout.shared_size))
->> >> +			__free_pages(page, order);
->> >> +		else
->> >> +			pr_warn_ratelimited("leaking %zu bytes with uncertain shared state\n",
->> >> +					    layout.shared_size);
->> >> +		return ret;
->> >> +	}
->> >> +
->> >> +	if (zero)
->> >> +		memset(page_address(page), 0, layout.shared_size);
->> >
->> > Does the memset() post sharing logic work for pKVM as well? If nothing
->> > clears it, we have a small window where guest data is leaked to the
->> > host.
->> >
->> > Is there a case where we *do not* need the memory cleared? If not, maybe
->> > we can move the logic in the arch set_memory_decrypted().
->> >
->> 
->> I don't think every architecture or platform can unconditionally zero
->> memory in set_memory_decrypted(). Some callers may need to share valid
->> contents with the host.
->
-> Is there any? That would be a bad assumptions in the caller. Most
-> set_memory_* backends don't preserve the content as they change the
-> encryption key. So properly written code shouldn't rely on this unless
-> it knows specifically it's only running on pKVM for example. The only
-> use-case I see to avoid explicit zeroing is when the caller doesn't care
-> about the page initialisation and wants to save some cycles. The
-> encryption key change would take care of the security aspect.
->
+Will do.
 
-I checked this, and you are right. We cannot expect the contents to
-remain valid across sharing; set_memory_decrypted() is destructive in
-that sense. Since pKVM does not rely on memory encryption, it needs to
-zero the memory unconditionally in set_memory_decrypted() to avoid
-exposing existing guest data. Other CoCo implementations may omit the
-memset(0). We still need to zero the memory when the caller requests
-__GFP_ZERO, where the memory location is expected to be zero.
+> 
+> > +++ b/drivers/iommu/arm/Kconfig
+> > @@ -141,3 +141,15 @@ config QCOM_IOMMU
+> >  	select ARM_DMA_USE_IOMMU
+> >  	help
+> >  	  Support for IOMMU on certain Qualcomm SoCs.
+> > +
+> > +config ARM_SMMU_V3_PKVM
+> > +	bool "ARM SMMUv3 support for protected Virtual Machines"
+> > +	depends on KVM && ARM_SMMU_V3=y
+> 
+> Should it depend on OF?
 
-We could either zero the memory unconditionally or pass a flag to allow
-this micro-optimization. We would also need to audit all call paths to
-avoid redundant zeroing after set_memory_decrypted(). Let me know if you
-have a preference for either approach.
+Makes sense, I will add it.
 
--aneesh
+> 
+> > +	help
+> > +	  Enable a SMMUv3 driver in the KVM hypervisor, to protect VMs against
+> 
+> s/a SMMUv3/an SMMUv3
+
+Will do.
+
+> 
+> > +++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.h
+> > @@ -0,0 +1,31 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +#ifndef __KVM_ARM_SMMU_V3_HYP_H
+> > +#define __KVM_ARM_SMMU_V3_HYP_H
+> > +
+> > +#include <asm/kvm_asm.h>
+> > +
+> > +/*
+> > + * Parameters from the trusted host:
+> > + * @mmio_addr		base address of the SMMU registers
+> > + * @mmio_size		size of the registers resource
+> 
+> Are these still in the host's physical address space or guest's?
+> 
+> If it's still "host" (though trusted), what's different from the
+> ioaddr in the main driver?
+
+This is the physical address of the SMMUv3 as read from the device
+tree.
+
+The "base" pointer is for the hypervisor virtual address which is
+created in the private mapping range (similar to ioremap())
+
+The hypervisor doesn't keep the host VA anywhere. Also note that
+there is no guest support at the moment, only the host.
+
+> 
+> > +size_t __ro_after_init kvm_hyp_arm_smmu_v3_count;
+> > +struct hyp_arm_smmu_v3_device *kvm_hyp_arm_smmu_v3_smmus;
+> 
+> Should kvm_hyp_arm_smmu_v3_smmus be __ro_after_init as well?
+
+That won't work at the moment as the hypervisor writes this pointer
+after __ro_after_init to convert the kernel VA to hypervisor VA
+unlike the count which is set once at boot.
+It might be possible to make the kernel do this conversion early, I
+will need to double check.
+
+It's worth noting that __ro_after_init is just for the hypervisor
+hardening and not for protection as those are protected by stage-2
+MMU.
+
+> 
+> > +
+> > +#define for_each_smmu(smmu) \
+> > +	for ((smmu) = kvm_hyp_arm_smmu_v3_smmus; \
+> > +	     (smmu) != &kvm_hyp_arm_smmu_v3_smmus[kvm_hyp_arm_smmu_v3_count]; \
+> > +	     (smmu)++)
+> 
+> "smmu" sounds too generic. Maybe for_each_pkvm_smmu?
+
+This macro is private to this driver, so I guess that's enough, also
+smmu is used everywhere else, but no strong opinion.
+
+> 
+> > +/* Called while is the host is still trusted. */
+> > +static int smmu_init(void)
+> 
+> s/while is/while
+
+Will do.
+
+> 
+> > +/* Shared with the kernel driver in EL1 */
+> > +struct pkvm_iommu_ops smmu_ops = {
+> > +	.init				= smmu_init,
+> > +	.host_stage2_idmap		= smmu_host_stage2_idmap,
+> 
+> Can we add a "pvkm_arm_smmu_" prefix for the ops and functions here?
+
+Similar to above, these symbols are private to this file and the
+hypervisor symbols gets prefixed with "__kvm_nvhe_" anyway, so they
+never clash with the kernel. But no strong opinon.
+
+Thanks,
+Mostafa
+
+> 
+> Nicolin
