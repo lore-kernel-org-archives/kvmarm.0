@@ -1,195 +1,169 @@
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F9345C6E9
-	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 07:57:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E803468C22;
+	Wed, 23 Sep 2026 08:14:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790150282; cv=none; b=qZmtNkh0BwdY/AlK9xAIoP+He+BHWL6/u382EZSjEXqHvSGyffDO3MQcWbE7ysqmEFCRBQWzqNgoJpDwmivsOym04BspokRl7MNkOPcNCWq6cOXhtMZlPOBdBFByA19ZP0GDwR0eFDjU3Kuyeq1aH7xTkUn1e3LHjuB5UCS+gq8=
+	t=1790151254; cv=none; b=QkkydmTFgWKAv42om4OWOTP2WXvd+NDzpqIbfBr2bbIQB/StloH9myvyumT1py3C5kxnJMf7DgQA4YfbdXf3dn6W8Fx1t/qvt0Bq2V3E0futs8NLiGhSsiuaL5B0D5i08i0ES9psdiyw84kHOie5pMk3Y+zcvsi0JNyfjboKJns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790150282; c=relaxed/simple;
-	bh=F/xUFkJvmLxfYiU4hY5D9bGAeBitPds/5LbK8elM1nE=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=josSrd4sMnnSKUjg63ERKd4lfb48q//p3vM65dJ8FZG3mzFSrxerVlS+GrzG7T9kE22lY75FXwCzOCJ2PFpo0o2LXw3TLFdZpLPqm+u8j4eoXa1mb9C7m0PV0j9sm1I8D/EJ7gZIy2JhiEBuQFGcupcAn8jcLfyv9gs1KenddoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=g+WmWdQv; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1790151254; c=relaxed/simple;
+	bh=aN2ZWo/23w37qNKgpNUnQ0H6NGD03WPhBvg03+MG/94=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HR064HOt5Vnx77PFMZX0U1VDnIMihgT7audwW0G9+h8lBGhW6m4zH+0Zu06olSrHZnuTsQH47N4NPhfOE/ee1UP8ci5iG6uHAU/yt2ufBcMHAmqs71yOo97b1iHdkL1yvuM0CZ8JXayl+R78fG8Bce5Xkd7XBoxGrFXU7BRYeQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mCJlfOwt; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="g+WmWdQv"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=/YHAq84eIsnUQBlwdqCYIzHZKGq0Ac3NhMXy9IeqxAA=;
-	b=g+WmWdQv34ML57rPaosxhODhg//6wGbyYSSxXKMW/k0puhS/BDTaqSKfB+lsGJzlA6/XyThA8
-	qF2zCQF4qbNZsDmZ62ZoY2DfB2hGnQZZUrwnYMVHsR+CQOIn3o2CtAtb3zOZXbY0S7C34xRPE42
-	IqVqoMkgb57QqLwSSIpwAf0=
-Received: from mail.maildlp.com (unknown [172.19.162.144])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4hqTYq22trz12LFc;
-	Wed, 23 Sep 2026 15:46:39 +0800 (CST)
-Received: from dggpemr200003.china.huawei.com (unknown [7.185.36.25])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7C7D340538;
-	Wed, 23 Sep 2026 15:57:43 +0800 (CST)
-Received: from [10.174.185.234] (10.174.185.234) by
- dggpemr200003.china.huawei.com (7.185.36.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.46; Wed, 23 Sep 2026 15:57:42 +0800
-Message-ID: <83ffedd4-5912-4a6b-af02-850c556c2fac@huawei.com>
-Date: Wed, 23 Sep 2026 15:57:41 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mCJlfOwt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 376301F000FF;
+	Wed, 23 Sep 2026 08:13:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790151252;
+	bh=4asDkf1r4nhSOrT7R8hAyZcEQKKYrXhZ/zPFbXlZHas=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=mCJlfOwtX67y203buKELQIT2TJkfDrkJVRWjviTUThii3FIl01hNmt/2/N5niDJsO
+	 pMfVhn9hKYcyv1hPNTj3q8nO0Pds6VFO+rGQe1AtibuYmlGhfEvG5fzsVNd5VZj00d
+	 fkgcgDIaUfRNs16fD4U8B+bk8I0EVqFfud76K+T15hPjY5Wnzx7h17G1IEpBvKdbdT
+	 fwOMBpLGIgd0Nxsna3HHhcpWKXrmzcnrf1IYhuJaw4NDIion+IMG6MmbJbYDpOjNxG
+	 ds54K/vBGhy978o0s9QlAtQmkuOq1eOy+SdadnN3yilV4MeGzEJApyN21XCzbDlSMz
+	 y5uiJtnDQNScw==
+Date: Wed, 23 Sep 2026 09:13:40 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Suren Baghdasaryan <surenb@google.com>
+Cc: "David Hildenbrand (Arm)" <david@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, "Liam R. Howlett" <liam@infradead.org>, 
+	Vlastimil Babka <vbabka@kernel.org>, Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
+	Mike Rapoport <rppt@kernel.org>, Michal Hocko <mhocko@suse.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
+	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
+	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
+	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
+	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <mkp@kernel.org>, 
+	Jaya Kumar <jayalk@intworks.biz>, Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, 
+	Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
+	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
+	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
+	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
+	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
+	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
+	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev, 
+	Takashi Iwai <tiwai@suse.de>
+Subject: Re: [PATCH v2 00/40] mm: make VMA flag semantics explicit, eliminate
+ VM_SPECIAL
+Message-ID: <arOCPN02xB7mykju@gremlin>
+References: <20260914-b4-mmap-prepare-vma-flag-sanify-v2-0-7d9781ed5361@kernel.org>
+ <20260914180811.057cba8fcc48d6e0b53a2683@linux-foundation.org>
+ <0b064fe6-ddb3-4f26-a1f2-2e9dd88d590f@kernel.org>
+ <CAJuCfpFBichJH4OcmSHTb1rOuQBT6k5pXeua9_KgpWjDBKvsYw@mail.gmail.com>
+ <aq6kzpK7wPl3iFGe@gremlin>
+ <aq6lW9FvL69QeA9H@gremlin>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RESEND][PATCH 0/2] Batch register access for live migration
- optimization
-From: Yize Wang <wangyize7@huawei.com>
-To: Marc Zyngier <maz@kernel.org>
-CC: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <oupton@kernel.org>,
-	<catalin.marinas@arm.com>, <will@kernel.org>, <fuad.tabba@linux.dev>,
-	<joey.gouly@arm.com>, <seiden@linux.ibm.com>, <suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>, <mark.rutland@arm.com>, <zhengchuan@huawei.com>,
-	<jiangjiacheng@huawei.com>, <yize_w1110@163.com>
-References: <20260918081930.4014735-1-wangyize7@huawei.com>
- <861paq69te.wl-maz@kernel.org>
- <68de0ad8-967b-49d4-872a-a9fdff7485fb@huawei.com>
-In-Reply-To: <68de0ad8-967b-49d4-872a-a9fdff7485fb@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- dggpemr200003.china.huawei.com (7.185.36.25)
+In-Reply-To: <aq6lW9FvL69QeA9H@gremlin>
 
-kindly ping
+On Sat, Sep 19, 2026 at 04:09:13PM +0100, Lorenzo Stoakes (ARM) wrote:
+> On Sat, Sep 19, 2026 at 04:05:57PM +0100, Lorenzo Stoakes (ARM) wrote:
+> > On Fri, Sep 18, 2026 at 01:31:24PM -0700, Suren Baghdasaryan wrote:
+> > > On Fri, Sep 18, 2026 at 1:21 PM David Hildenbrand (Arm)
+> > > <david@kernel.org> wrote:
+> > > >
+> > > > On 9/15/26 03:08, Andrew Morton wrote:
+> > > > > On Mon, 14 Sep 2026 15:57:20 +0100 "Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
+> > > > >
+> > > > >> The VM_SPECIAL / VMA_SPECIAL_FLAGS mask conflates several unrelated
+> > > > >> properties:
+> > > > >>
+> > > > >> ...
+> > > > >>
+> > > > >> It's all rather a mess.
+> > > > >>
+> > > > >> This series brings some order to things by both limiting what drivers can
+> > > > >> do with VMA flags and switching to using predicates that describe
+> > > > >> behaviour, not arbitrary flags.
+> > > > >
+> > > > > That's a lot of patches.
+> > > > >
+> > > > > Review is thin and I expect this won't improve a lot.  Lots of "no
+> > > > > functional changes" changes.
+> > > >
+> > > > I'll expect to go through all of them. Might just take a bit ;)
+> > >
+> > > ditto
+> >
+> > Thanks guys!
+>
+> Note v3 has been posted to fix a stupid bug in 1/40 + attack some very trivial
+> sashiko stuff
+>
+> https://lore.kernel.org/linux-mm/20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org/
 
-在 2026/9/20 20:12, Yize Wang 写道:
+Just a gentle nudge on this :)
+
+If you guys or anybody else has some time it'd be appreciated! (obv. the v3 as
+linked above not this v2!)
+
+I know the series seems intimidating but most of the commits are very small and
+it's been in -next for a while.
+
 >
-> 在 2026/9/18 20:08, Marc Zyngier 写道:
->> On Fri, 18 Sep 2026 09:18:13 +0100,
->> Yize Wang <wangyize7@huawei.com> wrote:
->>> This series adds batch register access support to KVM/arm64 to reduce
->>> syscall overhead during VM live migration.
->>>
->>> Currently, QEMU issues one ioctl per register when saving/restoring 
->>> VGIC
->>> state. On large VM configurations this means tens of thousands of 
->>> syscalls,
->>> where lock acquisition and context switch overhead dominates migration
->>> downtime. Thus, we provide a batch register method to allow userspace
->>> read/write multiple distributor and redistributor registers in a 
->>> single call.
->>> In this way, we can significantly reduce syscalls and migration 
->>> downtime.
->>>
->>> Test the VM migration time under pressure conditions.
->>> The VM specifications for migration are as follows:
->>> - VM use 4-K page;
->>> - the number of VCPU is 160;
->>> - the total memory is 320Gigabit;
->>> - use 'Redis SET-benchmark' to pressurize VM;
->>>
->>> Performance results (3-run average, ms):
->>>      | Metric              | Without patch | With patch | Improvement |
->>> |---------------------|---------------|------------|-------------|
->>>      | Migration downtime  |        536    |     321    | 40%     |
->>>      | Source (total)      |        344    |     230    | 33%     |
->>>      |   - VGIC put        |        158    |      40    | 75%     |
->>>      |   - VGIC get        |        120    |      19    | 84%     |
->>>      | Destination (total) |        192    |      91    | 53%     |
->>>      |   - VGIC put        |        132    |      27    | 80%     |
->>>
->>> Yize Wang (2):
->>>    KVM: arm64: Add batch group constant and data structure to UAPI 
->>> header
->>>    KVM: arm64: Add VGIC v3 batch register access implementation
->> Questions:
->>
->> - Why only the MMIO registers?
->>
->> - Why not the sysregs?
->>
->> - Why only the GIC?
->>
->> - Why not all of the state?
->>
->> - Where is the corresponding userspace code?
->>
->> More importantly, since this is about batching system calls:
->>
->> - Why can't this be done with io_uring instead?
->>
->>     M.
+> >
+> > >
+> > > >
+> > > > --
+> > > > Cheers,
+> > > >
+> > > > David
+> >
+> > --
+> > Cheers, Lorenzo
 >
->
-> Hi, Marc! Thank you for the review.
->
->
-> These patches focus on optimizing GICv3 register access during live 
-> migration. We found that there are a large number of locks (kvm->lock, 
-> vcpus, config_lock) in the GIC, these lock operations wil cost large 
-> time waste. The batches of sysreg for vcpu optimization will come in 
-> follow as a separate series. And let me address these questions one by 
-> one.
->
->
-> 1. Why only the MMIO registers?
->
-> In vgic_v3_batch_access(), we use 'entries' structure to implement 
-> batch read/write of register status. The structure is 'struct 
-> kvm_dev_arm_vgic_batch_entry', where the group information can be 
-> freely specified by userspace. Thus, vgic_v3_batch_access() supports 
-> all VGIC device attr groups, not only MMIO registers.
->
->
-> 2. Why not the sysregs?
->
-> The newly added vgic_v3_batch_access() just forwards the groups 
-> received fromQEMU in batches to 'vgic_v3_attr_regs_access()'. And this 
-> function already has 'KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS' to handle 
-> sysregs. Our patch does not modify the existing sysreg handling logic.
->
->
-> 3. Why only the GIC?
->
-> During live migration, the GIC is the device with the largest number 
-> of registers, and we found that there are a large number of locks in 
-> it. If each register is locked and unlocked individually, it would 
-> cause large time consumption. Thus, we want to optimize the GIC 
-> register time consumption during live migrate. The experimental 
-> results also show that batch processing significantly reduces VGIC 
-> handling time during migration.
->
-> Similarly, vCPU register save/restore also costs significantly time. 
-> The patch of vCPU sysreg batch access will be submitted separately in 
-> the future.
->
->
-> 4. Why not all of the state?
->
-> As different devices have different lock hierarchies and access 
-> paths(e.g., GIC goes through the device fd, CPU regs go through the 
-> vcpu fd), it's difficult for us to realize in a single batch handler. 
-> Additionally, introducing too many changes at once would make review 
-> harder. These patches focus on GIC-related optimization, and a 
-> separate series for vCPU batch processing will follow.
->
->
-> 5. Where is the corresponding userspace code?
->
-> The QEMU-side implementation has been posted to qemu-devel. The link 
-> is below:
->
-> https://lore.kernel.org/qemu-devel/20260918092120.370805-1-wangyize7@huawei.com/T/#t 
->
->
->
-> 6. Why can't this be done with io_uring instead?
->
-> The core idea of io_uring is to reduce the number of context switches 
-> between user space and kernel space by utilizing two ring buffers. 
-> However, each SQE is still processed independently in kernel space. 
-> For the VGIC registers, each SQE still require lock -> read/write -> 
-> unlock, so the per-register lock overhead remains unchanged. We hope 
-> to read/write a set of register states with a single lock operation to 
-> reduce the time cost. Therefore, io_uring does not meet our needs.
+> --
+> Cheers, Lorenzo
+
+--
+Cheers, Lorenzo
