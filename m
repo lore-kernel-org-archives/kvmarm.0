@@ -1,183 +1,150 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj2-f42.google.com (mail-pj2-f42.google.com [74.125.227.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1009C52FE2A
-	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 14:31:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E82EF531AF9
+	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 14:32:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790173903; cv=none; b=MpbFcnGjwjIz1rQtYKHWyShixUBrNYSjdnFwvGoDQoneDkFuJmKjdP4vO4q+LloavVrd2WiKtqXZMpPmIOguhzqYNgpQo4FZ7DDqNLqY82aB3YYRSBrHxp96xH12+uLC+Vu51FYNkazAvZA6uC7Z+odDpVH9Rh8ULNkn9VEZKuk=
+	t=1790173968; cv=none; b=Efr4fIv6/l8Z2gxaCc+7fs1CYUQsIKmWll14V+5M/c5hmueFAWqYRG6sHb4D5Jog+RBaCfNx7KGZsPie1mDUSMPKsBGc62fQtinm3EMcvdymI1G8FUH9Ir5a3POVy46zM/cADjdNgDUw+dXsAdR5oD756F/C3Ewfr8lXQtXMePA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790173903; c=relaxed/simple;
-	bh=MUzrLs0lR/Oe8D54eAsDUY6kfGDrpGhi+dVUR8nDw7Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kdpBnWSGO7ksMQqbCHqyNw5W2iF7i6c0RsSw1pjtAzb8Er9nvOGtCxbHZFQVQP1WfebfwvDLF/v/2/x+pFXsRUyBO0EMo2L8IIi9AVZT9LQGl+6KauS02LDXTfcixbI1WixqJkCAELVNByVwk3aTbc7IQKw+qZPxIWFRjFg1G7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ui59tHZq; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1790173968; c=relaxed/simple;
+	bh=S7rAkPuZSZMbYQIfkDVKURs4Ono2lI5WQLQVCr5CGDI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uxbxLWA8wNrjdzU5mhH4nrbeTq7BDMzeY44+rXgdtJ3Lhb8tk2xDwBhNPk5ZZdm0kXPExkGzDLzeg0ZxTOp1AcouhjHPJjRKIFWiiESjJUVCnWLPl46THcft0zsdJrJQjCw1UQXqgOgqbGPv/V6eAmcitMUxEeoucKUK5BtVJvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lo90lvrx; arc=none smtp.client-ip=74.125.227.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ui59tHZq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1790173900;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oxDyo6wS9tLNRj9z6xsNaM4tf77SpHmeasoP+i9z6qY=;
-	b=Ui59tHZqa2z3EtwP28XTFKxprfdtpskVCi4hkD/ygnLkLKOI04+3i+e+g9Nt7ijlWL0P8N
-	YgLFUGmVGWbE7YFl6yHmmc93eLvwteHz+pIY4iCzCzTLwb3odT0g/SZT5dXSVqasSo5+9E
-	aZvcFu0uJ5nUZrQh4MdtCtbqEYtvtCE=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-328-CLgIHSt-OoiRLYMgz1gbWw-1; Wed, 23 Sep 2026 10:31:39 -0400
-X-MC-Unique: CLgIHSt-OoiRLYMgz1gbWw-1
-X-Mimecast-MFC-AGG-ID: CLgIHSt-OoiRLYMgz1gbWw_1790173898
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-48704504d61so299217f8f.3
-        for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 07:31:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lo90lvrx"
+Received: by mail-pj2-f42.google.com with SMTP id 98e67ed59e1d1-39b5b07ec78so571391a91.3
+        for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 07:32:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1790173966; x=1790778766; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=7rhO8zdKOr8jmD+SfzN1wHrIhUden50az9FhzT+ZY8k=;
+        b=lo90lvrxCDZsiMQsdk2e3j4WWLuWyGrLDc2sVpOKphV04WLX7Xp4XnJ8DtZLzxy5Op
+         zZbJRYdET1WB9J79NHJbFYd4SkK3SD0lC3Jtw4/wkwIJZKdpwX0zL1OfzkhHuEA4NsK8
+         7joADV3MS021FicsPtynqpsQ7pIPBWowYojyNJIuXHyOGqobus20nwZqg0B63zqgqDF9
+         sNMRmOF6w6p3jBfFjxqRmBTAQq8y0UWEUp525LE21wZNtp5aXYWv5ldNeKPBDcpWG34I
+         MYOZz/poQhB71zewNLjP5H66CYQMoPWbO2ADECrNVugYhZJK27n8xYseJJ3KOvpSluW8
+         yuGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790173898; x=1790778698;
-        h=content-transfer-encoding:content-type:in-reply-to:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=oxDyo6wS9tLNRj9z6xsNaM4tf77SpHmeasoP+i9z6qY=;
-        b=snhwMQCI48RRVpVonpiDEHCny6G3MgfsjxbEJfiX4SJQ4ShF2Ydh/gKH1nKaWSyKeI
-         E9/EzMu/0zpSr7ri0WP3BN1k/nJNTqO8+xTV7PvnSxl5pGEXCIuyT5GKENBzN34AsfIp
-         dipkF4wW1g9kICw8Y2O8PzcGoTb02BiWfTFA5GDAWOO9iB9O3mamHCrUpZAOe+Caxsac
-         EFmYEwRtgx6n6Dbs7Q2MdNzLPnjpHfcflhijqGj46WpD8G4IR4NvHYc0JAuK/9WGs4LE
-         1851PGlftfR254CTw0Twj2f0fzV62Gvf/XQbYG/zyEIw4TYgTis11o8zGczqgiJxCzFJ
-         3d+w==
-X-Forwarded-Encrypted: i=1; AKwUvByTFGV9nr289gP+ecR4kl+63km+Kf+SfDu2KMStnRvS4eFI1fXSppFemYFFnqSfi0fG1Xe2mGs=@lists.linux.dev
-X-Gm-Message-State: AFuF++ndMe6na+GFp2If8JH1nBEGTJEj49OSTXYAIKZhje13GcEMw2Rt
-	ngF7WGWYmaU599/NvP99ilJ3+talgitgWFpY1Mtn+CSzmQqv/sX32P/h6eWNGsEG4dOeSmkDgiP
-	gz/mhIGu73rM0OYO81broZymmOAPPHQDCFys1qPzOvR559uFZyVJxTLUqZg==
-X-Gm-Gg: AYBFou0R12WooiVdo/XmE8X4U/P0gncXqpj7lZoAAxGZ8w2MMMrnl1CMaLAdXqDHOZU
-	xAWhcmtSFw8I8+XHGx4LHYh+gEDOv/+HZ4RFf7xqA1Y8gV7r/mkDkedtmJTZx+vCCJ2SzkxLqCd
-	i/vVMEWI/i+06rUNnNxDP2Erqkft7Fw+UYtgrkXg6g1ZODXrK/zjKvUcfLkrWQoGuU3CTYc5rIz
-	LUvgSi+vo8LJlgHIuF1a1sToSsqBUVLvRZ9C9+ZPnCjvf9e2RcpHIjfWXaO4Dlm23y6uZjq2pFe
-	QB804MWiFZ22rDiG/2kHS9UjBTKCEQpc22/u/U0MWF9+JXX8OOYK8KWxM3g/BCUR8bVRzqg8ATG
-	t0elk1+5jKq/tSoNsaSfaT+bH3QhAP7wLTHVi0+isFpo13qhdpQ5WqD/z3wk=
-X-Received: by 2002:a5d:5f88:0:b0:485:8a46:b3cc with SMTP id ffacd0b85a97d-488670c51fcmr4871180f8f.52.1790173898241;
-        Wed, 23 Sep 2026 07:31:38 -0700 (PDT)
-X-Received: by 2002:a5d:5f88:0:b0:485:8a46:b3cc with SMTP id ffacd0b85a97d-488670c51fcmr4871097f8f.52.1790173897738;
-        Wed, 23 Sep 2026 07:31:37 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-488682673bdsm7322098f8f.2.2026.09.23.07.31.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Sep 2026 07:31:37 -0700 (PDT)
-Message-ID: <1ccea6d2-418c-481a-85ff-072d3dd837b3@redhat.com>
-Date: Wed, 23 Sep 2026 16:31:35 +0200
+        d=1e100.net; s=20260707; t=1790173966; x=1790778766;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=7rhO8zdKOr8jmD+SfzN1wHrIhUden50az9FhzT+ZY8k=;
+        b=d1lpZB5Uik/VTpcd2fUx8+0NMm4F9UF39CdNV52BP1QM4tTCQZpAUtGJ1YxJpO0Q67
+         lK45qMKOYdK98pEWVxm9qidnBWVAvCkIyDWiEhsPIQN2QRDySOB8kiJ7mcaCX/Yqxehk
+         WhQRW5IPadOITFY29xNKEnbbks35lf8ihxqXljN952debCh3TZ6rlRVMtRN3XBbwCmE/
+         OIx0MuGuMy0tk2Pi2PeXkUoAGtaWxrbxjzXu28CdFP5RMB+JcuD9dLmM4TNyCxW0IcmI
+         4bP1O7kkynN4nd4mvu58g1Ssl0i8h5fwktO5W3ED0vHKuOhp4UFXfX+YW8R+xuGHKpoR
+         1oiw==
+X-Forwarded-Encrypted: i=1; AKwUvBzODXxVHevfF6OpYHev6m1VR/OIktoOx8en8YLGCZmUoBPmwdfYKFLG0Go6EFGODSyt66dAqE0=@lists.linux.dev
+X-Gm-Message-State: AFuF++m04QGy2SvQvv4ycR9T266yZpc8T1Y1+Jvl7vbuOtfo/FgfRA0v
+	Am7C/uciCM1D0KenwY68MbI0utc5O0MulcW1dy4rLW9WhnBz+FggTFgXsehGgnMoYiM=
+X-Gm-Gg: AYBFou2Ht1ds6OVWWKKrZHJbRsPqO7pr6iuhRYSDU7eG4/NamnZQAked99zEO2euMfh
+	bK3z/+uVU86SScAWT4DQznXF2GD7TpNeEKodUIH7a7h24u2v05DOyTKd4RLwTdW33VOYjJr+H27
+	wVpvG5qECkLVNYvQb7RvAk4Xf+Ynz8CvTkAjRsw9zOHlT8iLR0f/ajKh+hDEcHTvZVTWBj5W4LU
+	hUD0IMuqB1BOB8CtF8W4QjBNpKsxJnh+8ukI9ZkgATg5XhIsNuDSbxCsBwJLO7B3hSHrUyMwwP+
+	AGzpCqCeQCrdj25moCewtb87dGGmflQRL4Pk6qPC4N6mxI9OFE8RC4h9KfxFepKxHNpYzpGMYAN
+	KDDQntCWzOGwwJmCfd+CBBqYUbOoM60RwemXvwUg3k/wxV5RoXF9NDzkx0DhzG3DbbKcKE6qDJ7
+	DswuRtrOO1dHzyJpmFIJOKMWho67pfh5/cAhLc1TuGWrPLqX40EmvEwD5ipj8LAWQwSw9vBpU5p
+	U672BUTUA==
+X-Received: by 2002:a17:90b:2552:b0:398:9c39:520f with SMTP id 98e67ed59e1d1-3a07e51cf1fmr2382544a91.15.1790173965946;
+        Wed, 23 Sep 2026 07:32:45 -0700 (PDT)
+Received: from p14s ([2604:3d09:148c:c800:b4a:dc6a:68e:2592])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a07db882a5sm5446811a91.1.2026.09.23.07.32.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Sep 2026 07:32:45 -0700 (PDT)
+Date: Wed, 23 Sep 2026 08:32:41 -0600
+From: Mathieu Poirier <mathieu.poirier@linaro.org>
+To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, maz@kernel.org, will@kernel.org,
+	catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+	oupton@kernel.org, gshan@redhat.com, joey.gouly@arm.com,
+	tabba@google.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev,
+	gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com,
+	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com,
+	lpieralisi@kernel.org, enju.kohei@fujitsu.com
+Subject: Re: [PATCH v18 00/23] KVM: arm64: CCA: Add basic plumbing for Realms
+Message-ID: <arPjCZL2IfvTKMml@p14s>
+References: <20260915160141.3543048-1-suzuki.poulose@arm.com>
+ <aqrsmUTxDVbKJn8k@p14s>
+ <yq5aecel3aj3.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v9 03/26] target/arm/cpu-sysregs.h.inc: Update with
- automatic generation
-To: Khushit Shah <khushit.shah@nutanix.com>
-Cc: "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- Shaju Abraham <shaju.abraham@nutanix.com>,
- "yangjinqian1@huawei.com" <yangjinqian1@huawei.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "sebott@redhat.com" <sebott@redhat.com>,
- "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
- "philmd@oss.qualcomm.com" <philmd@oss.qualcomm.com>,
- "maz@kernel.org" <maz@kernel.org>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "abologna@redhat.com" <abologna@redhat.com>,
- "jdenemar@redhat.com" <jdenemar@redhat.com>
-References: <20260916144721.751810-1-eric.auger@redhat.com>
- <20260916144721.751810-4-eric.auger@redhat.com>
- <ECC98331-BFD5-4630-ADBC-FEDA0B32F889@nutanix.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <ECC98331-BFD5-4630-ADBC-FEDA0B32F889@nutanix.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: QZQ5THLd6e-X_jhTs1twU5oL4h0uuw779zAV0uWo3tE_1790173898
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <yq5aecel3aj3.fsf@kernel.org>
 
+On Tue, Sep 22, 2026 at 02:52:56PM +0530, Aneesh Kumar K.V wrote:
+> Mathieu Poirier <mathieu.poirier@linaro.org> writes:
+> 
+> > Hi Suzuki,
+> >
+> > On Tue, Sep 15, 2026 at 05:01:18PM +0100, Suzuki K Poulose wrote:
+> 
+>  [ ... 42 lines skipped ... ] 
+> 
+> >> 
+> >> [0] Arm CCA KVM Support v16 : https://lore.kernel.org/all/20260803134403.80630-1-steven.price@arm.com
+> >> [1] Linux firmware RMI https://lore.kernel.org/all/20260912083611.2513845-1-suzuki.poulose@arm.com
+> >> [2] Linux GPF Host https://lore.kernel.org/all/20260913070459.2547407-1-suzuki.poulose@arm.com
+> >> [3] https://git.gitlab.arm.com/linux-arm/linux-cca/ cca/cca-host/kvm-v18/integration
+> >> [4] https://support.arm.com/documentation/den0137/2-0bet3/
+> >
+> > When testing on the FVP model with the above baselines, I get the following
+> > error messagaes in a loop, preventing the system from reaching the command line:
+> >
+> > [    3.112577] Freeing unused kernel memory: 3520K
+> > [    3.115398] Run /sbin/init as init process
+> > [    3.142926] virtio-pci 0000:00:02.0: swiotlb buffer is full (sz: 4096 bytes),
+> > total 512 (slots), used 511 (slots)
+> > [    3.150111] virtio-pci 0000:00:02.0: swiotlb buffer is full (sz: 4096 bytes),
+> > total 512 (slots), used 511 (slots)
+> > [    3.177190] virtio-pci 0000:00:02.0: swiotlb buffer is full (sz: 4096 bytes),
+> > total 512 (slots), used 511 (slots)
+> > [    3.197194] virtio-pci 0000:00:02.0: swiotlb buffer is full (sz: 4096 bytes),
+> > total 512 (slots), used 511 (slots)
+> > [    3.217188] virtio-pci 0000:00:02.0: swiotlb buffer is full (sz: 4096 bytes),
+> > total 512 (slots), used 511 (slots)
+> > [    3.237194] virtio-pci 0000:00:02.0: swiotlb buffer is full (sz: 4096 bytes),
+> > total 512 (slots), used 511 (slots)
+> > [    3.257181] virtio-pci 0000:00:02.0: swiotlb buffer is full (sz: 4096 bytes),
+> > total 512 (slots), used 511 (slots)
+> > [    3.277189] virtio-pci 0000:00:02.0: swiotlb buffer is full (sz: 4096 bytes),
+> > total 512 (slots), used 511 (slots)
+> > [    3.297193] virtio-pci 0000:00:02.0: swiotlb buffer is full (sz: 4096 bytes),
+> > total 512 (slots), used 511 (slots)
+> > [    3.317188] virtio-pci 0000:00:02.0: swiotlb buffer is full (sz: 4096 bytes),
+> > total 512 (slots), used 511 (slots)
+> > [    8.157185] swiotlb_tbl_map_single: 241 callbacks suppressed
+> >
+> > I get the same result with v17.  Have you seen this before?  Perhaps a kernel
+> > option that needs to be adjusted?
+> >
+> 
+> This is due to a change in the swiotlb setup.
+> 
+> https://lore.kernel.org/all/yq5azeyxyfol.fsf@kernel.org
+> 
+> You can increase the swiotlb size using the swiotlb= kernel command-line
 
+What size do you recommend setting it at?
 
-On 9/23/26 11:13 AM, Khushit Shah wrote:
->
->> On 16 Sep 2026, at 8:15 PM, Eric Auger <eric.auger@redhat.com> wrote:
->>
->> !-------------------------------------------------------------------|
->>  CAUTION: External Email
->>
->> |-------------------------------------------------------------------!
->>
->> Generated definitions with scripts/update-aarch64-cpu-sysregs-header.py
->> based on "AARCHMRS containing the JSON files for Arm A-profile
->> architecture (2026-03)" Registers.json file.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->> Reviewed-by: Shameer Kolothum <skolothumtho@nvidia.com>
->> ---
->> target/arm/cpu-sysregs.h.inc | 11 +++++++++++
->> 1 file changed, 11 insertions(+)
->>
->> diff --git a/target/arm/cpu-sysregs.h.inc b/target/arm/cpu-sysregs.h.inc
->> index ec5a12b0f4..8b77c490d4 100644
->> --- a/target/arm/cpu-sysregs.h.inc
->> +++ b/target/arm/cpu-sysregs.h.inc
->> @@ -1,11 +1,18 @@
->> /* SPDX-License-Identifier: GPL-2.0-or-later */
->> +
->> +/* This file is autogenerated by scripts/update-aarch64-cpu-sysregs-header.py */
->> +/* DEF(<name>, <op0>, <op1>, <crn>, <crm>, <op2>) */
->> +
->> +DEF(AIDR_EL1, 3, 1, 0, 0, 7)
->> DEF(CLIDR_EL1, 3, 1, 0, 0, 1)
->> DEF(CTR_EL0, 3, 3, 0, 0, 1)
->> DEF(DCZID_EL0, 3, 3, 0, 0, 7)
->> +DEF(GMID_EL1, 3, 1, 0, 0, 4)
->> DEF(ID_AA64AFR0_EL1, 3, 0, 0, 5, 4)
->> DEF(ID_AA64AFR1_EL1, 3, 0, 0, 5, 5)
->> DEF(ID_AA64DFR0_EL1, 3, 0, 0, 5, 0)
->> DEF(ID_AA64DFR1_EL1, 3, 0, 0, 5, 1)
->> +DEF(ID_AA64DFR2_EL1, 3, 0, 0, 5, 2)
->> DEF(ID_AA64FPFR0_EL1, 3, 0, 0, 4, 7)
->> DEF(ID_AA64ISAR0_EL1, 3, 0, 0, 6, 0)
->> DEF(ID_AA64ISAR1_EL1, 3, 0, 0, 6, 1)
->> @@ -40,6 +47,10 @@ DEF(ID_MMFR5_EL1, 3, 0, 0, 3, 6)
->> DEF(ID_PFR0_EL1, 3, 0, 0, 1, 0)
->> DEF(ID_PFR1_EL1, 3, 0, 0, 1, 1)
->> DEF(ID_PFR2_EL1, 3, 0, 0, 3, 4)
->> +DEF(MIDR_EL1, 3, 0, 0, 0, 0)
->> +DEF(MPIDR_EL1, 3, 0, 0, 0, 5)
->> DEF(MVFR0_EL1, 3, 0, 0, 3, 0)
->> DEF(MVFR1_EL1, 3, 0, 0, 3, 1)
->> DEF(MVFR2_EL1, 3, 0, 0, 3, 2)
->> +DEF(REVIDR_EL1, 3, 0, 0, 0, 6)
->> +DEF(SMIDR_EL1, 3, 1, 0, 0, 6)
-> After this, we should probably refactor cpu->midr/revidr/mp_affinity into the idregs[]?
-
-Hum yes. We can now rely on MIDR, REVIDR and MPIDR storage in
-isar.idregs[]. I will handle that in v10
-
-Thanks
-
-Eric
->
-> Warm Regards,
-> Khushit
->> -- 
->> 2.53.0
->>
-
+> option. I also have a patch series in progress to address this issue:
+> 
+> https://lore.kernel.org/all/20260921063628.362078-1-aneesh.kumar@kernel.org
+> 
+> -aneesh
+> 
