@@ -1,167 +1,177 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9BB0486402
-	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 15:47:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A0053C3D2;
+	Wed, 23 Sep 2026 15:54:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790178480; cv=none; b=ULrT1Sq/ZsIcD2/PC61lOzGOIPumA00n4NWg9JumH0vrz6u/AS/9tTfMro6jlbH4IquSvGEDeJeeQrqh2CL+TWTnQ870eGlPrkcEOmKHhpI8w0luHJrELkN1CE48LPzPleLd190MSkP2OLLooFBsurMHe6B4FSan4TvZ/ZqoCQM=
+	t=1790178847; cv=none; b=UK7KiHlHPMcx95JFhpXTcYBH7GDGmOUMFggzglJP2tMI5qCVhk3xox24s5DXWpVTV9RmZTc23ExJKqJxDrdeMqkh/UySaiMMJlk8RNatcHuL5khtffZYrL7sFD7LmaBFM8rSTxgRbkx6vDy+9Po94XKNxvVCqMFWKhsY2WWkzQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790178480; c=relaxed/simple;
-	bh=gvz6l43Mi62JVl44l3v8h6z20+ZQ+frZU+NjV8Okg5U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=WFDceq4w4zPkaXbAc3Ndb7NRVAym1y2HsBDLzYni24KoOvpy/rEBxqDGV/xJ9zupE2P1t0oojFf9a/6c6HWX+yXDSQod48uRhhGcAMtwyUbZcVVmhSjLxoZbAoYl95rX0eftJB1sVgJ1GzMpP1oISBQOWT4058JdJ0ezVM84Y8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=IjW6c7JQ; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1790178847; c=relaxed/simple;
+	bh=J6iRxLrD4DDe9CKcU5VUOBrrbnObxkIIizlaLKxQ6Vs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WxYEXPgLYsZD9MjhXDPfCqF9E6MRnAWrJGvmqcfgA/DG0Rm2l1Lt2xvLtR/tZSfGX5IZR2Mi7cfnNGk9dx4ZStl3AWqpDpWQ8zqec6wLyNUcDvh5cA7nDlCCOnKVtlBw6f9JILzCHtJLRlz9bc5bmIPXvkWE+vCMsNMn62NVfcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kO69tl0G; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="IjW6c7JQ"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0966A1570;
-	Wed, 23 Sep 2026 08:47:54 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5629B3F86F;
-	Wed, 23 Sep 2026 08:47:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790178477; bh=gvz6l43Mi62JVl44l3v8h6z20+ZQ+frZU+NjV8Okg5U=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IjW6c7JQy+PV3W+wBTHVMe9Lpl937nsNtN9/9V7tdqFPCpaxBZGtOtYBYS9FJsvcR
-	 DZ4CJeP7SyULbpDNOxB0WJcw6WsgYeyOeO08i7vmTve3zgNXh5xFmkvmkAdYi/Jrhq
-	 WUWZ/Ooz6GuWQBnVrp2/bTP8tB6J/BFyzA57HntM=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>
-Subject: Re: [PATCH 09/22] KVM: arm64: Compute S1 permissions as part of s1_walk()
-Date: Wed, 23 Sep 2026 16:47:50 +0100
-Message-ID: <arP0pquAK8KvnAR8@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260623184201.1518871-10-oupton@kernel.org>
-References: <20260623184201.1518871-1-oupton@kernel.org> <20260623184201.1518871-10-oupton@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kO69tl0G"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EF3C1F000FF;
+	Wed, 23 Sep 2026 15:53:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790178845;
+	bh=wAV8stNGXVD0suD8B1a8qtsl7mm0RfyqHixhi/NZx3k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=kO69tl0GVqEJBDtzXtj722GeS02r981KicvQg4cQHtdo8zYbHSuzX4xKugLSuxZ80
+	 hNKF+inpI1rG93f1F5QhrTtVFxLcKRCTL+snyRWCp/N/q3HEczsFeIqExmwrr7tt/Y
+	 BvYVVTOYIPgApkyrBXMn24Qh05xMwuFcGHVzqgJTNe/gle65zMUCXYN6+65S4HSHY7
+	 tGBuhIwWJ1Pazb14YseddKo0V64lXM6Wy4pe1LmUGi7p3l+GZYljbhlHPVyxqBuygF
+	 nqC8DLo3R+mPNhwr+2JNkPsIA6gODez9Nt0VUzmMq2DMdlQhA1/ymS6rMHMT1y9mfa
+	 Lr1sgEWelyeVQ==
+Date: Wed, 23 Sep 2026 16:53:33 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Suren Baghdasaryan <surenb@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	"Liam R. Howlett" <liam@infradead.org>, Vlastimil Babka <vbabka@kernel.org>, 
+	Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
+	David Hildenbrand <david@kernel.org>, Mike Rapoport <rppt@kernel.org>, Michal Hocko <mhocko@suse.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Leon Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>, 
+	Stephen Smalley <stephen.smalley.work@gmail.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
+	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
+	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
+	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <mkp@kernel.org>, 
+	Jaya Kumar <jayalk@intworks.biz>, Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, 
+	Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
+	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
+	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
+	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
+	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
+	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
+	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev
+Subject: Re: [PATCH v3 02/40] mm/vma: predicate setting mmap_prepare VMA
+ fields on new vma alloc
+Message-ID: <arP0oJgrgZlgtrb6@gremlin>
+References: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org>
+ <20260917-b4-mmap-prepare-vma-flag-sanify-v3-2-4583d8a23bca@kernel.org>
+ <CAJuCfpEa8tUmYJBjx-cRdAE8y-jcKY0C81kAOa1QZS7F6tKdfQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJuCfpEa8tUmYJBjx-cRdAE8y-jcKY0C81kAOa1QZS7F6tKdfQ@mail.gmail.com>
 
-On Tue, Jun 23, 2026 at 11:41:48AM -0700, Oliver Upton wrote:
-> Implementing support for hardware dirty state means that the table
-> walker needs to have visibility into the permissions on the final
-> translation.
-> 
-> Compute the S1 permissions as part of s1_walk() and initialize
-> s1_walk_result before checking all fault conditions. The appropriate
-> fields will be reinitialized if the walk happens to fail at a later
-> point.
-> 
-> Signed-off-by: Oliver Upton <oupton@kernel.org>
-> ---
->  arch/arm64/kvm/at.c | 41 ++++++++++++++++++++---------------------
->  1 file changed, 20 insertions(+), 21 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index 083014e9d86a..6930bc3bc86b 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -461,6 +461,10 @@ static int kvm_swap_s1_desc(struct kvm_vcpu *vcpu, u64 pa, u64 old, u64 new,
->  	return __kvm_at_swap_desc(vcpu->kvm, pa, old, new);
->  }
->  
-> +static void compute_s1_permissions(struct kvm_vcpu *vcpu,
-> +				   struct s1_walk_info *wi,
-> +				   struct s1_walk_result *wr);
-> +
->  static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
->  		   struct s1_walk_result *wr, u64 va)
->  {
-> @@ -590,6 +594,20 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
->  	if (check_output_size(baddr & GENMASK(52, va_bottom), wi))
->  		goto addrsz;
->  
-> +	va_bottom += contiguous_bit_shift(desc, wi, level);
-> +
-> +	wr->failed = false;
-> +	wr->level = level;
-> +	wr->desc = desc;
-> +	wr->pa = baddr & GENMASK(52, va_bottom);
-> +	wr->pa |= va & GENMASK_ULL(va_bottom - 1, 0);
-> +
-> +	wr->nG = (wi->regime != TR_EL2) && (desc & PTE_NG);
-> +	if (wr->nG)
-> +		wr->asid = get_asid_by_regime(vcpu, wi->regime);
-> +
-> +	compute_s1_permissions(vcpu, wi, wr);
-> +
->  	if (wi->ha)
->  		new_desc |= PTE_AF;
->  
-> @@ -615,18 +633,6 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
->  		return -EACCES;
->  	}
->  
-> -	va_bottom += contiguous_bit_shift(desc, wi, level);
-> -
-> -	wr->failed = false;
-> -	wr->level = level;
-> -	wr->desc = desc;
-> -	wr->pa = baddr & GENMASK(52, va_bottom);
-> -	wr->pa |= va & GENMASK_ULL(va_bottom - 1, 0);
-> -
-> -	wr->nG = (wi->regime != TR_EL2) && (desc & PTE_NG);
-> -	if (wr->nG)
-> -		wr->asid = get_asid_by_regime(vcpu, wi->regime);
-> -
->  	return 0;
->  
->  addrsz:
-> @@ -1365,8 +1371,6 @@ static int handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr, u64 *par)
->  	if (ret)
->  		goto compute_par;
->  
-> -	compute_s1_permissions(vcpu, &wi, &wr);
-> -
->  	switch (op) {
->  	case OP_AT_S1E1RP:
->  	case OP_AT_S1E1R:
+On Wed, Sep 23, 2026 at 08:32:43AM -0700, Suren Baghdasaryan wrote:
+> On Thu, Sep 17, 2026 at 9:24 AM Lorenzo Stoakes (ARM) <ljs@kernel.org> wrote:
+> >
+> > It only makes sense to manipulate VMA fields if we allocated a new VMA,
+> > rather than merged it.
+> >
+> > VMA merging does not compare vm_ops or vm_private_data, so a merged VMA
+> > keeps its own, which is also what the legacy f_op->mmap path does since it
+> > never touches an existing VMA. Previously set_vma_user_defined_fields()
+> > overwrote the merged VMA's fields with those set for the new mapping. In
+> > practice these are the same values, with rare exceptions such as shmem
+> > selecting vm_ops based on whether the file has been unlinked, so no
+> > user-visible change is expected.
+> >
+> > Make this dependency explicit, and additionally constify have_mmap_prepare
+> > while we're here.
+>
+> The fact that we might be overriding attributes of an existing VMA
+> that we merged with is technically a bug even if we never hit it,
+> right? If so, should we have:
+>
+> Fixes: c84bf6dd2b83 ("mm: introduce new .mmap_prepare() file callback")
 
+It's not a bug, it is an in-built assumption that the state used to assess
+mergeability implies the same properties.
 
-Up to this point, everything seems straightforward with the commit message:
-wr setting is moved up in walk_s1(), and compute_s1_permissions() is moved 
-to inside walk_s1(), from it's place in handle_at_slow() where it was 
-called after walk_s1() so it should be fine for any other user that needed 
-it before. 
+And if it was, it'd need fixing a different way (check the field for instance)
+and would apply to the legacy mmap hook also.
 
-> @@ -1690,15 +1694,10 @@ int __kvm_translate_va(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
->  	if (wr->level == S1_MMU_DISABLED) {
->  		wr->ur = wr->uw = wr->ux = true;
->  		wr->pr = wr->pw = wr->px = true;
-> -	} else {
-> -		ret = walk_s1(vcpu, wi, wr, va);
-> -		if (ret)
-> -			return ret;
-> -
-> -		compute_s1_permissions(vcpu, wi, wr);
-> +		return 0;
->  	}
->  
-> -	return 0;
-> +	return walk_s1(vcpu, wi, wr, va);
->  }
+This change is needed for the series though.
 
-Here the else clause is optimized-out, as the if returns in the end.
-Since you run compute_s1_permissions() inside walk_s1() now, there is no 
-need to test walk_s1() return value anymore. Good improvement.
-
-FWIW:
-Reviewed-by: Leonardo Bras <leo.bras@arm.com>
+>
+> >
+> > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+>
+> Reviewed-by: Suren Baghdasaryan <surenb@google.com>
 
 Thanks!
-Leo
+
+>
+> > ---
+> >  mm/vma.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/mm/vma.c b/mm/vma.c
+> > index fa784f069da4..4b74b48c29b7 100644
+> > --- a/mm/vma.c
+> > +++ b/mm/vma.c
+> > @@ -2894,7 +2894,7 @@ static unsigned long __mmap_region(struct file *file, unsigned long addr,
+> >  {
+> >         struct mm_struct *mm = current->mm;
+> >         struct vm_area_struct *vma = NULL;
+> > -       bool have_mmap_prepare = file && file->f_op->mmap_prepare;
+> > +       const bool have_mmap_prepare = file && file->f_op->mmap_prepare;
+> >         VMA_ITERATOR(vmi, mm, addr);
+> >         const pgoff_t anon_pgoff = addr >> PAGE_SHIFT;
+> >         MMAP_STATE(map, mm, &vmi, addr, len, pgoff, anon_pgoff, vma_flags, file);
+> > @@ -2937,7 +2937,7 @@ static unsigned long __mmap_region(struct file *file, unsigned long addr,
+> >                 allocated_new = true;
+> >         }
+> >
+> > -       if (have_mmap_prepare && !map_is_anon(&map))
+> > +       if (have_mmap_prepare && allocated_new && !map_is_anon(&map))
+> >                 set_vma_user_defined_fields(vma, &map);
+> >
+> >         __mmap_complete(&map, vma);
+> >
+> > --
+> > 2.55.0
+> >
+
+--
+Cheers, Lorenzo
