@@ -1,54 +1,83 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC34647C0E6;
-	Wed, 23 Sep 2026 10:10:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52EFD480DF3
+	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 10:13:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790158243; cv=none; b=GmZxezSA5JTpb84Ccj6UyXWiczSo7OsnLHR4fqhIOWG8EV1s0rVmSejYyqBnTUZUO2zxH1xItnAh8KWTGYBBDs7O+OIYLEhPGJUfM0bIxOppCgeQG3xekO7D/cuDuS5ULIRMvQHYQiA6JkPnMDffsjOn1SVT1Sg9WSoorQVerxo=
+	t=1790158425; cv=none; b=gJJmb0mIriR5xMaxiO8vQN95+aTTEfxi9gZCA28Shlc8KVp46XCdRZV/gMPbsGHTHelkvio6+J0z/m/WwFohGE/hR8GrNvQfDpAySs8HLdhgTHVmmXRH7lnGFnfKAzK9PXi3kZyhCJmw9zcpkFpDAg/g5KiRTkm0WoQz8X3K6Z4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790158243; c=relaxed/simple;
-	bh=aJd5PwgdVPJ9tE7A7OasMy/wKrzLGbTgJY/jXplpFIQ=;
+	s=arc-20240116; t=1790158425; c=relaxed/simple;
+	bh=86tGOrPEB/iivl/l0MEf2yHA5M2eh28fX8Zw5dM3jqY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EhKK8D20EawzDcEKovYX29DCszNBgQEc0Q77U+MS8HyoG9997bXX5z/rJGQtgewSbqadTROZhWXNZn2v5otQWleYR/Mm+YU3WxYZGAuuxUw2I8V/vHxA/x8D2W3xWVYk9eW54IBLEsD05p8HL0Mj8k3tYgGjNvRonyWFYbn/7Xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=N3sYQleb; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=F5bCAYJXnPYdHLtWJIUxatBmpwlKNRLOaZz38qAQ4YFJInKmaE4vwu/tKN+sEt8VmSjLxP0kRyj76u8H3T6oJbkWpmpxUQ9eAGcuhVSwQseNDlOg7mFhbYAYwphT+y/MnmW0dq59k3A0lQdUORCUHcab10YrD4ZJbb4th9uwrZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ln02HIXw; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="N3sYQleb"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A8480152B;
-	Wed, 23 Sep 2026 03:10:34 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 146163F86C;
-	Wed, 23 Sep 2026 03:10:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790158238; bh=aJd5PwgdVPJ9tE7A7OasMy/wKrzLGbTgJY/jXplpFIQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=N3sYQlebo9JuaPrX/aY4BYXg4kl12bBh2l+dg5S1TpD/sd1OrXwH32xGOiPW5K434
-	 UuBzqurGcjPFaH0amX7WpALPGj4+fE2hTuRxrmfBQJcpZcj2x3NVvhpckvNi+KxnQI
-	 AtUULuSivZdyBUiepK0KoTPupOCiWcVRdZmElWyM=
-Date: Wed, 23 Sep 2026 11:10:32 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ln02HIXw"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-49e6425f96eso35845e9.1
+        for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 03:13:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790158416; x=1790763216; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=vdEIBnHA/8T+E7XayOUCjgaZYlTP8ZfuwSF0Dftqz2M=;
+        b=Ln02HIXwsbl8xs9zc124170piWgfJpsk5IRhLVrSa4G82/QME7/uTQTHqHDWZpOs0q
+         gaH5eltfXC4S3wJIR/p+a1WcZNpHkSurpfvZmAPTPLqkHhAZ1mW6W0Bf5YRNTgLKItBF
+         pqDOpGTEioBYD6T+pqd8/QFPg0Bz8/IgUAU3eTjQIQUiUCEOuNsEomMdUTHTbQwHy4gS
+         inHctEnc1aNHb+KozRNZ02PF4VJI619t/NaLhhWcDxIJk2tb8gMQtX+rFHfVu7o+Xj73
+         QmbsfHsPTwWrX0VSzcNFKK8cGmFiAAr+nQn0cEE8C/6/2ycHUobsrQF03LhhLj4Qh+NO
+         bMKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790158416; x=1790763216;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=vdEIBnHA/8T+E7XayOUCjgaZYlTP8ZfuwSF0Dftqz2M=;
+        b=AgWK4rANpesongKlcj2BSt5xmvec7NHHAQCkJYPQXaCT2gqNJ82eEgJ6eFyw5+hWDz
+         rpri1WYRrGR1JQT/ERuSyxTLHoyVMLfAfciTetln7SyR/gDl7rSYOJiLKGoeyErZoNvs
+         vfVAV88+0egB+Ygh3qLxHtF6KNW4/zr5jB4QuSg+6dBANa/eO8uifbMGVa/cYA/PdX3S
+         iLtjbYyGn8h42Hzh9ksYPhKtfCzR/A4H4OUofRJuG08BHgzK5DMR2FZKGhxjlMNrVXGp
+         q/t2TxOjamo4IIiQXjkLm8imARtyMiLTl34VoJtZKVenRfWZNlehLd5PZahxYs0B9tcY
+         idzQ==
+X-Forwarded-Encrypted: i=1; AKwUvBwmVvkMtQwQ2wfqs0pTu6v67iBicxX6Zbj1HiOW+6NvdgP/uaUVJK9jGtj0zDQONQ19k4HudKQ=@lists.linux.dev
+X-Gm-Message-State: AFuF++mNiWBJyCE6IvelByF4xrQb8JAtPm8thV3Vjz0CjeyZL6wu9f3J
+	2ogW1u9QzkHBTmPP/3Q703qnHzXnFeNHt+s+hWf7fdHA+twPq8gKZaMRidmbCxBmmg==
+X-Gm-Gg: AYBFou0aEnFwkEipkJ3vddh7Skx9XqIcYbbPilHwM78fpv/80rsDau0bYb6FPeywvj3
+	ox/MsrSAATHk6R42xA+tlvo+5jxJkmlnW+xdWKEqhjZ7F7VHmGKJ4cbmutZPBM8RB+GA/0Y4Rsx
+	0HyTSV31USNu5nVDhyk69PtVZ09iH9+5ZlgFJOb76denyBC/CDXcXOrY6mAuG9aJNKAH0ssNxRJ
+	Pqjbk9NLThuQSGaGuevHrQpEwbjMhHT1dGhABrzIUfC9nlnh3Q1YehsPgXEs2cGq2ZSf6ywd8rj
+	2gOfdcvXv+I/2vUpmNSCuU+iHeNlvWJJxh/Tzse4RTv0xHTksaHNSXn8ZFwxrE4b1egVUFGy8wj
+	/ShAqMG82MNF/rVdIT3dLQgQhCrPoGtFtvEF8gi/QT9JKLuQRq60Iz7mN3AUN5Yyhk3DUv749U/
+	Gcay/8CbYMiv+lm/qsNDwG1vtQMHmcgCguG6vWYw1Yc6uLHJGNtPaakz2q34rjJ1grRci/V0P0A
+	cjPUN8jsIdj0cqes4FsH2AFxeFhFWptzMQB9oOrWA==
+X-Received: by 2002:a05:600d:8653:20b0:49f:e0f7:257e with SMTP id 5b1f17b1804b1-49fe0f725e4mr416395e9.6.1790158415606;
+        Wed, 23 Sep 2026 03:13:35 -0700 (PDT)
+Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48868486408sm5194076f8f.9.2026.09.23.03.13.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Sep 2026 03:13:34 -0700 (PDT)
+Date: Wed, 23 Sep 2026 10:13:31 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Nicolin Chen <nicolinc@nvidia.com>,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	iommu@lists.linux.dev, Andrew Morton <akpm@linux-foundation.org>,
-	christian.koenig@amd.com, Jason Gunthorpe <jgg@ziepe.ca>,
-	Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@kernel.org>, Will Deacon <will@kernel.org>,
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [RFC PATCH v7 02/13] mm: Add an allocator for CoCo shared memory
-Message-ID: <arOlmBBWdZTi8Xre@arm.com>
-References: <20260921144847.501151-1-aneesh.kumar@kernel.org>
- <20260921144847.501151-3-aneesh.kumar@kernel.org>
- <arKsFofudnTYpXj1@arm.com>
- <yq5aik3w344o.fsf@kernel.org>
- <yq5afqz02wtv.fsf@kernel.org>
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joro@8bytes.org, mark.rutland@arm.com,
+	qperret@google.com, tabba@google.com, vdonnefort@google.com,
+	sebastianene@google.com, keirf@google.com
+Subject: Re: [PATCH v8 04/25] iommu/arm-smmu-v3: Move IDR parsing to common
+ functions
+Message-ID: <arOmSxqRxhd717Xy@google.com>
+References: <20260922131259.2975334-1-smostafa@google.com>
+ <20260922131259.2975334-5-smostafa@google.com>
+ <arLa0E3xq5dGuPpd@nvidia.com>
+ <20260922214818.GA2545495@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,31 +86,55 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <yq5afqz02wtv.fsf@kernel.org>
+In-Reply-To: <20260922214818.GA2545495@nvidia.com>
 
-On Wed, Sep 23, 2026 at 02:01:08PM +0530, Aneesh Kumar K.V wrote:
-> I was pointed to this email thread:
+On Tue, Sep 22, 2026 at 06:48:18PM -0300, Jason Gunthorpe wrote:
+> On Tue, Sep 22, 2026 at 12:45:20PM -0700, Nicolin Chen wrote:
 > 
-> https://lore.kernel.org/all/c25502d3-35c6-4281-a9ec-856f789fb1b4@arm.com
+> > Also, Jason's suggestion in v7 was hyp_arm_smmu_v3_device, which
+> > looks nicer than ARM_SMMU_OBJ...
 > 
-> This makes a stronger case for having a CoCo shared memory allocator
-> that captures all these restrictions. It also means that
-> alloc_cc_shared_pages_node() needs:
+> I guess the point is to emphasis the substition technique, I don't
+> mind.
 > 
-> 	if (WARN_ON_ONCE(!gfpflags_allow_blocking(gfp)))
-> 		return -EINVAL;
+> > > +	if (coherent && !disable_msipolling &&
+> > > +	    smmu->features & ARM_SMMU_FEAT_MSI)
+> > > +		smmu->options |= ARM_SMMU_OPT_MSIPOLL;
+> > 
+> > Will pKVM ever use MSIPOLL?
 > 
-> 	might_sleep();
+> Not sure I understood the approach in this patch, why was anything
+> left behind? I imagined everything would be moved?
+> 
+> Maybe a few more remarks in the commit message?
 
-I think gfpflags_allow_blocking() is the wrong predicate. It checks for
-__GFP_DIRECT_RECLAIM but we have callers like dma-buf which clear the
-flag (see HIGH_ORDER_GFP). ITS allocations also use GFP_NOWAIT, so
-they'll fail here.
+As replied to Nicolin, because it is a module param, I am ok with
+adding this in the commit message, or passing disable_msipolling
+as a function arg and moving the logic.
 
-I'd just keep a might_sleep() in cc_make_*() and ignore gfp flags
-checking. Passing a no-blocking GFP flag doesn't necessarily mean the
-caller cannot sleep. It might also happen early enough (like its_init())
-not to care - __might_resched() skips the warning if SYSTEM_BOOTING.
+> 
+> > > +	if (smmu->features & ARM_SMMU_FEAT_HYP &&
+> > > +	    cpus_have_cap(ARM64_HAS_VIRT_HOST_EXTN))
+> > > +		smmu->features |= ARM_SMMU_FEAT_E2H;
+> > 
+> > Why is ARM64_HAS_VIRT_HOST_EXTN left behind?
+> 
+> +1
+> 
+> And the TT_LE/BE and S1/S2 checks, and ...
+> 
+> If kvm doesn't want to dev_err log that's fine, we should able to
+> #define that away too shouldn't we? And maybe it does want to log?
 
--- 
-Catalin
+The hypervisor can not print to the kernel console, so dev_err()
+will not compile, I'd rather keep that outside and let the caller
+decide what is a probe failure and print it's own message that keeping
+the code and stubbing dev_err().
+
+Thanks,
+Mostafa
+
+> 
+> This seems pretty close otherwise
+> 
+> Jason
