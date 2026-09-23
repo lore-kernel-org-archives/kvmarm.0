@@ -1,80 +1,130 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B5B9486436;
-	Wed, 23 Sep 2026 15:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF99353F6A3;
+	Wed, 23 Sep 2026 15:45:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790177627; cv=none; b=qVwlGQtsQB08bMrZtNIFLCbTIosBQGrx4TQ7DK+h/HxirmKd+00XESHbVSOyggx+F7xCe29xuVsp075GV66V8GI0M3jSPpFvGbLxdA83FRLa3aVm/k2Spbul1X5kN4QNqzV84KKrsKt8yLPA/mH/r5Tffo58jhyqKU/tMP3eLqo=
+	t=1790178345; cv=none; b=SDmDMZON07cSy+/ebBO9qzd5rUdYFSqF8Epy5YbFzN8PgQYNqT+2VQ+W8oT+7bfDZM4x+U/wDDli0bPuQy4i2hiwllT/2FWRlwphfbt6g0zR7MCiMYsEvWPZ9PrWV85jcT6Pl4kP7BVd7Gn1NiUXpbkTiQpdyAaP5BvAXvX4jzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790177627; c=relaxed/simple;
-	bh=nfcBUkxf7GmOM9fXdro1DBro9LPGTVEToHl9km0dfgw=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=rjIkPglajEMgJuxTlbFp/Lb0+70x3XVV49l/B4up8dxhdK2jmmWZzirHf4lnRwB/QtuZAi/IYnSaJfQno6knpdjjQ7+d8OhqS9A+qJHUCnPr+fmS9ukTw08yi5iLED/IQupvAj8bX1IWp7pOJ65A0S8sB1MyF0SM4/0XQVbPTBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d+h+M4lH; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790178345; c=relaxed/simple;
+	bh=oNky5tLCjol95LoJjVzCouM1AqenJcOzo/Hm66wzqaM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R1ZkbWbOQ/l0cxP3L3xEs80jQjpzJGMjvAVn3rLqAmSbZgHkUoi5Z/wlbzJuUsZFy7IkyLJ9sBMn/pFY+OrOjZ1aEY2OLDCvsb042T9Dmo551FaslRWMrlhCS6CQwSu+MwUuD+T/MP/IOs0ltD25/9FZ0iu90GXaibJy/Oi+/8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KapfSIup; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d+h+M4lH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61B081F000FF;
-	Wed, 23 Sep 2026 15:33:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KapfSIup"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B5741F00893;
+	Wed, 23 Sep 2026 15:45:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790177625;
-	bh=nfcBUkxf7GmOM9fXdro1DBro9LPGTVEToHl9km0dfgw=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=d+h+M4lHcfsXuahQ8WVuEdoZdzU1zkZV0LQ3xrciITNq4oECb30KdDXMJzHsq+jxU
-	 t0+05+j/7MaPfrwoSBj1HTpYq+FikK1b6orLHlHAucAib677nqwcqDiJd2qw+8wBaL
-	 J9a+Zuk6jTCfdjDUx6yLDat+mxl72HLxxuebA1TM0Fil2zqDLVZP3tA1eBOd8l/quG
-	 IQYGuBoHuNcZ3DW182V4nxEZGtvr6PCBoqUYYbzau10vR8R2bFK43bJChuQNs0olo6
-	 rm7Zffgs6zm1bvH2IbBalclbHk+9FTdC1IXbUBeeMWfTDA1omGjaIKoBSRNyahxP6w
-	 CnfRu9ApzO6vw==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 10/14] KVM: arm64: Implement KVM_PRE_FAULT_MEMORY
-Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
-Cc: kvm@vger.kernel.org, "Heiko Carstens" <hca@linux.ibm.com>, "Alexander
- Gordeev" <agordeev@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>, "Marc
- Zyngier" <maz@kernel.org>, "Christian Borntraeger" <borntraeger@linux.ibm.com>, kvmarm@lists.linux.dev, "Oliver
- Upton" <oupton@kernel.org>, linux-s390@vger.kernel.org
-In-Reply-To: <20260923-kvm-arm-prefault-v4-10-d4b0b4dfa8c3@kernel.org>
-References: <20260923-kvm-arm-prefault-v4-0-d4b0b4dfa8c3@kernel.org>
- <20260923-kvm-arm-prefault-v4-10-d4b0b4dfa8c3@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 23 Sep 2026 15:33:44 +0000
-Message-Id: <20260923153345.61B081F000FF@smtp.kernel.org>
+	s=k20260515; t=1790178343;
+	bh=xBhwM6wbqAw5a+cVNgYvlXlXJxCKVG4pNRvbUVKP8IA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=KapfSIupahzymrJQOac0ZZru85avmkuCFsYN2BBX6hl8axXNJnffgnyqlm+GAqWFQ
+	 xzT7HNgoPLukmPtZQiUBGjAAgsMTd8mBODvU/qvqBoVlLs8WPfPnrRxVZn6ihew8bP
+	 vmmMP0HpYQBzSv0xarrSJFoDT0NNFmAVaJN5trYsm/T8kdBaP69tAOT9Jceqe5C9/t
+	 LV8Gui+KCanV+FtQ1aix6tIz7u0R/FbAIq7lEskqqpVMZDrB8GsXpeMSh9MekmkAQ3
+	 7ZMPHiPPDsji0EEtsNO5GjhuQJSJsjKHq/vLBxDvftss4APctbzOGdwKH6KmH4FoDW
+	 ATZpPB7e1lFyQ==
+Date: Wed, 23 Sep 2026 16:45:36 +0100
+From: Will Deacon <will@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, maz@kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
+	gshan@redhat.com, joey.gouly@arm.com, tabba@google.com,
+	yuzenghui@huawei.com, linux-coco@lists.linux.dev,
+	gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com,
+	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com,
+	lpieralisi@kernel.org, enju.kohei@fujitsu.com
+Subject: Re: [PATCH v18] arm64: mm: Handle Granule Protection Faults (GPFs)
+Message-ID: <arP0IF0MjFUv36AP@willie-the-truck>
+References: <20260913070459.2547407-1-suzuki.poulose@arm.com>
+ <arK3tsTV6EDhI-nt@willie-the-truck>
+ <arOyp8WUrYBAjrGH@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <arOyp8WUrYBAjrGH@arm.com>
 
-> Implement KVM stage 2 page table pre-faulting for the arm64 architecture,
-> with the core of the implementation in kvm_arch_vcpu_pre_fault_memory().
->=20
-> Pre-fault by first trying a page table walk under the MMU read lock then,
-> if it fails, injecting a synthetic data abort at the page table level
-> at which the page table walk failed.
->=20
-> This is necessarily racey as reclaim might happen at any time. Successful=
-ly
-> pre-faulting can therefore only guarantee that each GPA was observed to be
-> mapped at least once.
->=20
-> Protected KVM (pKVM) is not supported at all because pKVM creates VMs and
-> vCPUs when first run, meaning any attempt to pre-fault prior to this cann=
-ot
-> succeed.
->=20
-> [ ... ]
-> previous revisions and the feedback they received.
->=20
-> Link: https://patch.msgid.link/20260612162354.73378-1-jackabt.amazon@gmai=
-l.com/
-> Reviewed-by: Oliver Upton <oupton@kernel.org>
-> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+On Wed, Sep 23, 2026 at 12:06:15PM +0100, Catalin Marinas wrote:
+> On Tue, Sep 22, 2026 at 06:15:34PM +0100, Will Deacon wrote:
+> > On Sun, Sep 13, 2026 at 08:04:58AM +0100, Suzuki K Poulose wrote:
+> > > From: Steven Price <steven.price@arm.com>
+> > > 
+> > > If the host attempts to access granules that have been delegated for use
+> > > in a realm these accesses will be caught and will trigger a Granule
+> > > Protection Fault (GPF).
+> > > 
+> > > A fault during a page walk signals a bug in the kernel and is handled by
+> > > oopsing the kernel. A non-page walk fault could be caused by user space
+> > > having access to a page which has been delegated to the kernel and will
+> > > trigger a SIGBUS to allow debugging why user space is trying to access a
+> > > delegated page.
+> > > 
+> > > There is work in progress to unmap the guest_memfd backed private pages from the
+> > > linear map. Until we get that support, we could get spurious GPFs from within
+> > > the kernel, e.g., load_unaligned_zeropad(). So, try to fix them up for now.
+> > > 
+> > > Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> > > Signed-off-by: Steven Price <steven.price@arm.com>
+> > > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > > ---
+> > > Changes since v17:
+> > >  * Pass untagged address to die_kernel_fault() - Sashiko
+> > >  * Explicitly check !user_mode() for fixups - Catalin
+> > >  * Switch to BUS_OBJERR for si_code from SI_KERNEL - Catalin
+> > >  * Clarify the commit description about the upcoming work on
+> > >    unmapping guest_memfd backed pages from linear map
+> > > Changes since v16:
+> > >  * Update the commit description to indicate why we try to fixup GPFs
+> > > Changes since v10:
+> > >  * Don't call arm64_notify_die() in do_gpf() but simply return 1.
+> > > Changes since v2:
+> > >  * Include missing "Granule Protection Fault at level -1"
+> > > ---
+> > >  arch/arm64/mm/fault.c | 30 ++++++++++++++++++++++++------
+> > >  1 file changed, 24 insertions(+), 6 deletions(-)
+> > 
+> > I still don't think we should do this, given that the plan is to unmap
+> > the memory from the linear map. If this thing fires, it's a kernel bug
+> > and it should be fatal.
+> 
+> If the linear unmapping gets merged first, I agree, no need to handle
+> these faults. I haven't followed that series, so no idea where it is at.
+> 
+> However, I'd still keep part of this patch - the reporting and panic but
+> without the actual exception table recovery. There's some value in
+> killing user-space and WARN (or pr_ratelimited) without a full panic, it
+> helps with debugging. That's what do_bad() via arm64_notify_die() gives
+> us currently anyway.
+> 
+> So maybe we can keep it to just:
+> 
+> static int do_gpf(unsigned long far, unsigned long esr, struct pt_regs *regs)
+> {
+> 	if (user_mode(regs)) {
+> 		pr_alert_ratelimited("%s[%d]: granule protection fault at 0x%016lx\n",
+> 				current->comm, task_pid_nr(current),
+> 				untagged_addr(far));
+> 		mem_abort_decode(esr);
+> 	}
+> 
+> 	return 1;
+> }
+> 
+> and we get the SIGBUS or panic via do_mem_abort(). No recovery for
+> uaccess though, we get the same kernel panic.
 
-Sashiko has reviewed this patch and found no issues. It looks great!
+But how can this ever occur in user mode? I'm fine with making that part
+unconditional.
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260923-kvm-arm-pr=
-efault-v4-0-d4b0b4dfa8c3@kernel.org?part=3D10
-
+Will
