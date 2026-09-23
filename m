@@ -1,288 +1,377 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A4B53FD49
-	for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 16:23:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790180644; cv=pass; b=jWR0baldSTquja1iDiWQjVCSA/RI3jBbvLFV1WA+BjoF2dQH/mS1/+sVow0brfLAZp6ZJEDTAISD6G8k9I439O5FEU01su+EpauH6f5Cr0I3nTca+Kg2gJ/E6kd/Py4YBPTseJiYTMQWKKXyIu5HOn3lgYPFFX/Mpu7aYd/KWKo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790180644; c=relaxed/simple;
-	bh=2Oteq2LQAfmMQohvmzQdfax4JBAWgMtdwlOqmBNmox8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fXhLlaY9dz2MNk2pi1ss1KQ4HNlNNFHnEoQysKJRQES72k7nQXDE2w8Mn8TO/M4yeLO/iq3t48BhEo1pJp9dG5Bkw0oh4yNXKOUrGhz+GEhKvQ/9jInOmPry3BWD6snTb6h1HlEVdf+cB/7pKjGFZzOHYGbW7i/VaMbDl6kQyeo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YzDFT1D0; arc=pass smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C96F5401A01;
+	Wed, 23 Sep 2026 16:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790180884; cv=none; b=W/7aUB3jZuebZvbxPdBWUlX3HODkOJiH1KhTKfNgCBEddPxDz0v2sIzb1t30x/L0eIZpj3RPXi76CToD0JMf7tBQ06OXziW0sVNsu6euAHI9Q5Eyj9djoj438E8o7lbPZYa5XsNqrG/9fBrSJlOdMTntV83GQRP+ILfuK8IKjEs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790180884; c=relaxed/simple;
+	bh=SkE92eXVkjOuIpLBMIdtCOfv2cM9Kb8L9GqLftZbQLc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C1oO1Rw39hB3I23HaPHjUmTBxNZfyTLbeZVdPt8I+sf/Q0jRzDwUHkdqvjcqOr6nhAqgX6StQhm6qrfT5gmRAm6mNxlzSw3fYn0czK0l6KABtRMIlKA77j/3duFbd2snZqQxLQBKCofB3WoRX9QXn6xmztNnQAN9QDt7VPC8sUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=dQuZULRJ; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YzDFT1D0"
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-530e8c6fb80so276701cf.1
-        for <kvmarm@lists.linux.dev>; Wed, 23 Sep 2026 09:23:58 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790180637; cv=none;
-        d=google.com; s=arc-20260327;
-        b=Kfeb+3ag3K11Eutg9iQsP9385UqUcJZJOmFC++6/3YqEhvfpVlVvUl8U1HNnkkvAbA
-         quhOPerseLMcWd64z1TwCW1NizpIfybOrmlcd/CiwCnuegs3NA9NRjncpCqunJiEYoNg
-         HFTshf4k5hUXOcqfCJFxtg+NrrsZSRIV2y7HHmUuNyTwpVfH6R01j/AC6OhesPIHuT7C
-         TFfpP5iSf7a3eosENLFG5gtqM4g4JZpH2AMXRDS8HTm8tXBk7kwY4Uw1ducCzehY8Fqo
-         lwJJsEAOav9VdpoWEgF3KQStFOA+rFu76hyg0QFXTMTub475I+DrOOBPjtcPrSkC+anq
-         VA3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=3FzOqkymgnKp+HaLHwhofGZjaEcw2lbzuDYsddlgiEM=;
-        fh=8s+yHIsQzW6UFhc2pRclIRs3leA7uY+n4B5TzGFEtaE=;
-        b=CQ7jmW2U6c43/svVG/omVLf1thsz5QsFxvKfFsK9BzYae+3Uj9yIpLs3vurmI5owVF
-         H/ua/5AvLYyrgufRkCXNu7w+V+4PjG71ZCmsYxh/WyJPQjAUihxQ8C9+SJSJh5Q+MLIf
-         3hT8H69jf+DPC5y5fatzMVWS15rSGmOFZwOZIWsPy/u7dvJRyk9tRCByR2aIL3a59j/G
-         xZV9Sn/3dT6ENOknJWz7DxjQvlF7VOA66z4cMKcmjJBC1gkZ86jhxwlkuVaMm9Su6WAH
-         UHTYdbPUqOa2ADVQvO9g+CEsiDoTQ2XRWpXqRvvV+tG9MiwFyZ8Exa59J5F0Fo7uagxM
-         VUWA==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790180637; x=1790785437; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=3FzOqkymgnKp+HaLHwhofGZjaEcw2lbzuDYsddlgiEM=;
-        b=YzDFT1D0ykJlgTwp0UpNcJIe6bUn02SPRfCRwr1KUChU5wQNjGKQQ/SDNUV9LPf97+
-         3zOz6xBDYosLd2eIbz6Axf1uzvgOTY4ofIQsuJ02WUQLsDPmm7tqittdM0pT7FJQkuFN
-         EXEi3XC03IH6v+TTEv4qUt8sFRt51/vIdmotxANf4Ew4s8plsSUr+Ivj5GqLj+uBsjAL
-         d/OuaLEX24Otu/Cib3i6N7Z6o9FBpEzuqr+nmgqE/Esty56L21ZDn8KF4getdr10iD4b
-         L+XrPMHka7AZROW1YhxlnxDxucE42JD5g6cQocCvQ10cbQtvzk0GzKDkFKPKZNohtBa8
-         aeCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790180637; x=1790785437;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=3FzOqkymgnKp+HaLHwhofGZjaEcw2lbzuDYsddlgiEM=;
-        b=0Brv+xBXhv4IffAb5YNInfldXRz/q2+/a1Unv5pVODWSoMNBFslVp/9CemXENH/sX7
-         7tt+xSxK4nDgrgDkjx8LkR2APjSGRQDtEOQYjFFXP/7HBW0GrGY/5IMNkCsM2evx0fsW
-         kkC8AkmNjxUCRTrv4FThSDrrlh2eeJKPLauonEkmVay6tL/iGAKsm6U/qv/2raJdMYKE
-         kEs+kHP0J8oIX5yzEzrE3SHNWIen2AMyw7TWBQt0f2L/l+b/pOi6Zwz1xmFsZZhZ4gKz
-         HYojMYyeJyL4HTSrh1NjFHM31VAcMjSiaS2xw1p0WS9gmGjiRGPUelOZahAUEVwKmY3L
-         oSBA==
-X-Forwarded-Encrypted: i=1; AKwUvByMs/8+xT13p4zv58DdcOwzIAkfAhqXYdJyx7xs2klPXMDoPVsSzEK0Su/iV5r2zgZlTfn7cfM=@lists.linux.dev
-X-Gm-Message-State: AFuF++lLnjxVPJ9zhjvT9LC6VpDQ4bxd50ObTNOjL8U1s92JLWZ/ZffZ
-	qy8Y7Q9oWhQEaNv6DS4uw7kTZx7FD7nhGKVLr1K8ycoebSsqgDI+JpSJpkoKsENVvTewWx8Gr7m
-	w+BTCjeUJ4+Pi+mRbvzmZb70Y9FEW2BNVLn0fpLmd
-X-Gm-Gg: AYBFou3OVeyiE+r3vrLTzixtAnYscekCiRfMeVb8AVQLUMynQngS6iH9f3/ZFfTt7Cj
-	s/VKbynlZia8iHQ2RDEz9pfI3NYDKlS/1PY44vnEtasZVgUMrahFjlqmbx2lOTm/rY2fBt81nia
-	Eo4sDQcwAs9SyZwEClyacpq16mB8j8tNLcy5wRpgstAMQpsBJ3v2l79LEKNiw0OWAEaes+NDPjd
-	9hw2aPjIF6BHIPb1Mvv0lERH9D3IlmUUfWD5YffUH8VDOWe5YKetIWL4m39HatebIRQtBTckUkx
-	1b0RDLmpGdioNBeXtZr4fJsdX5rCcloD0bCAw3MVMfRVY5AFX9JYSgwDTJNJF4xAXOi5yEtvNzz
-	xsXaCdexgQA==
-X-Received: by 2002:a05:622a:609:b0:531:282:6560 with SMTP id
- d75a77b69052e-532f9d4a86emr439391cf.15.1790180636277; Wed, 23 Sep 2026
- 09:23:56 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="dQuZULRJ"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9196E1477;
+	Wed, 23 Sep 2026 09:27:57 -0700 (PDT)
+Received: from [10.57.8.94] (unknown [10.57.8.94])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1108B3F632;
+	Wed, 23 Sep 2026 09:27:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790180881; bh=SkE92eXVkjOuIpLBMIdtCOfv2cM9Kb8L9GqLftZbQLc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=dQuZULRJ9ntFQBxkw1xJ83pHA0zrZ6+qgxuZCHaZybWrWukSClmB6EY9BHWSvZYv8
+	 Nzmfh6XBoI1GJnmJEdlQxuNiCtbw4sm1IgcQT3bKqIY+OG2bGtul1eq1nfjNDHLuL3
+	 v1CwSYhixMl3A9m4y56LsWnn+dN+eGLpGDYvcWF8=
+Message-ID: <f61aa43b-ed90-4b6e-8bef-35e0fe2e6dc2@arm.com>
+Date: Wed, 23 Sep 2026 17:27:56 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org>
- <20260917-b4-mmap-prepare-vma-flag-sanify-v3-3-4583d8a23bca@kernel.org>
-In-Reply-To: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-3-4583d8a23bca@kernel.org>
-From: Suren Baghdasaryan <surenb@google.com>
-Date: Wed, 23 Sep 2026 09:23:45 -0700
-X-Gm-Features: AcwNN1U-1rGp6GFHFrF0qqhOHTzivX5krrdmfBch0hMHABT_yaCwm6D93D-Dyz8
-Message-ID: <CAJuCfpE0WCr1Kp=+4EVJB7UdbH22HuCouOEtGMNCL+a8TnCQPQ@mail.gmail.com>
-Subject: Re: [PATCH v3 03/40] mm/vma: introduce and use vma_[flags_]can_merge()
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, "Liam R. Howlett" <liam@infradead.org>, 
-	Vlastimil Babka <vbabka@kernel.org>, Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
-	David Hildenbrand <david@kernel.org>, Mike Rapoport <rppt@kernel.org>, Michal Hocko <mhocko@suse.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Leon Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>, 
-	Stephen Smalley <stephen.smalley.work@gmail.com>, Jaroslav Kysela <perex@perex.cz>, 
-	Takashi Iwai <tiwai@suse.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
-	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
-	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <mkp@kernel.org>, Jaya Kumar <jayalk@intworks.biz>, Simona Vetter <simona@ffwll.ch>, 
-	Helge Deller <deller@gmx.de>, Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, 
-	Peter Xu <peterx@redhat.com>, Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, 
-	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Muchun Song <muchun.song@linux.dev>, 
-	Oscar Salvador <osalvador@suse.de>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, 
-	Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>, 
-	Ying Huang <ying.huang@linux.alibaba.com>, Alistair Popple <apopple@nvidia.com>, 
-	Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
-	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, 
-	Baoquan He <baoquan.he@linux.dev>, Youngjun Park <youngjun.park@lge.com>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Qi Zheng <qi.zheng@linux.dev>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
-	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-usb@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	selinux@vger.kernel.org, linux-sound@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, 
-	fuse-devel@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 05/20] KVM: arm64: Track the type of VM in kvm_arch
+Content-Language: en-GB
+To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+References: <20260920212845.707-1-suzuki.poulose@arm.com>
+ <20260920212845.707-6-suzuki.poulose@arm.com>
+ <69ff265b-a110-46c5-a061-a875b2f86c03@redhat.com>
+ <e1bd3155-acb2-4c80-b963-6cd7865c9ce3@redhat.com>
+ <672c4905-09c9-4e40-97ea-c87a987bda19@arm.com>
+ <0ddf1529-a198-413d-bffb-1dbc7b6ee25f@redhat.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <0ddf1529-a198-413d-bffb-1dbc7b6ee25f@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 17, 2026 at 9:24=E2=80=AFAM Lorenzo Stoakes (ARM) <ljs@kernel.o=
-rg> wrote:
->
-> Replace the open-coded VMA_SPECIAL_FLAGS check in the VMA merge logic wit=
-h
-> two new functions vma_flags_can_merge() and vma_can_merge() and update th=
-e
-> merge logic to use the former.
->
-> This abstracts the check and expresses it in terms of the desired behavio=
-ur
-> rather than an arbitrary and confusing VMA flag.
->
-> This also lays the groundwork for making further improvements in VMA flag
-> usage.
->
-> Also update the userland VMA tests to reflect the change.
->
-> No functional change intended.
->
-> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+On 23/09/2026 14:23, Gavin Shan wrote:
+> On 9/23/26 8:24 PM, Suzuki K Poulose wrote:
+>> On 23/09/2026 07:19, Gavin Shan wrote:
+>>> On 9/23/26 4:05 PM, Gavin Shan wrote:
+>>>> On 9/21/26 7:28 AM, Suzuki K Poulose wrote:
+>>>>> KVM arm64 has different types of VMs with all the different modes 
+>>>>> in which
+>>>>> the hypervisor code can be run. e.g., VHE, nVHE, pKVM etc. Then 
+>>>>> there is
+>>>>> protected VM and normal VMs with pKVM. We might soon add other types,
+>>>>> e.g., Arm CCA Realm. So in an effort to make the handling of these
+>>>>> different types of VMs a bit more friendly to the eyes, add a VM 
+>>>>> flavor to
+>>>>> the kvm_arch and we could then add handlers for different 
+>>>>> operations based
+>>>>> on the VM type.
+>>>>>
+>>>>> Keep the flavor initialisation at the beginning to allow for the 
+>>>>> detection
+>>>>> early enough and fail out on any unsupported requests.
+>>>>>
+>>>>> With that, add wrappers for checking the "type" of a VM and replace 
+>>>>> the
+>>>>> existing users with the new wrappers.
+>>>>>
+>>>>> Given we already have the construct of "kvm_vm_is_protected" in the 
+>>>>> core
+>>>>> KVM code, use that for all confidential compute guests including 
+>>>>> Realms
+>>>>> that we are about to add.
+>>>>>
+>>>>> Adds __VM_PROTECTED marker vm flavor to generalize 
+>>>>> kvm_vm_is_protected()
+>>>>> to predicate all confidential guests running on KVM. In later 
+>>>>> patches, we
+>>>>> would add Realm VMs, which would also be classified as protected.
+>>>>>
+>>>>> Add explicit helper to detect if a given VM is a "protected" VM 
+>>>>> under pKVM.
+>>>>> Change the existing users that precisely want to check the VM type. 
+>>>>> These
+>>>>> include :
+>>>>>    - kvm_arch_prepare_memory_region - For preventing memslot 
+>>>>> changes after
+>>>>>      pVM creation.
+>>>>>
+>>>>> All the others are retained as a wider check for confidential guest 
+>>>>> VMs.
+>>>>> These are:
+>>>>>   - kvm_vm_ioctl_set_counter_offset - For disallowing timer offset
+>>>>>     configuration
+>>>>>   - io_mem_abort for dabt handling without valid syndrome information
+>>>>>
+>>>>> Both of which are true for Realms too.
+>>>>>
+>>>>> Realms support is restricted to VHE host and thus 
+>>>>> "kvm_vm_is_protected()"
+>>>>> checks in the pkvm hyp specific code doesn't need to change, as the 
+>>>>> only
+>>>>> protected guests it deals with is "protected pKVM" guests. To 
+>>>>> tighten this
+>>>>> init_pkvm_hyp_vm() restricts the hyp copy of the vm_flavor to the 
+>>>>> ones it
+>>>>> supports.
+>>>>>
+>>>>> Suggested-by: Marc Zyngier <maz@kernel.org>
+>>>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>>> ---
+>>>>> Changes since v18:
+>>>>>   - Merge the __VM_PROTECTED marker and the widening of 
+>>>>> kvm_vm_is_protected()
+>>>>>     to this patch.
+>>>>>   - Merge the use of kvm_vm_is_unprotected_pkvm() for ! 
+>>>>> kvm_vm_is_protected()
+>>>>>     given the scope changes here.
+>>>>>   - Drop Fuad's review tag, as this patch has multiple merges
+>>>>>   - Restrict the VM flavors to the supported types in 
+>>>>> init_pkvm_hyp_vm().
+>>>>>   - Drop kvm_vm_hyp_is_pkvm() and revert to is_protected_kvm_enabled()
+>>>>>   - Use is_protected_kvm_enabled() to make the pKVM guest flavor 
+>>>>> checks.
+>>>>>   - s/PKVM/pKVM for commit descriptions too
+>>>>>
+>>>>> Changes since v17:
+>>>>>   * s/PKVM/pKVM for the comments
+>>>>>   * Drop type argument for pkvm_init_host_vm and also drop 
+>>>>> protected variable.
+>>>>>   * Add helpers for checking if the VM is running on pKVM 
+>>>>> (kvm_vm_hyp_is_pkvm())
+>>>>>   * Use kvm_vm_hyp_is_pkvm() to replace is_protected_kvm_enabled() 
+>>>>> with valid
+>>>>>     kvm instance
+>>>>> ---
+>>>>>   arch/arm64/include/asm/kvm_host.h | 22 +++++++++++++++++++---
+>>>>>   arch/arm64/include/asm/kvm_pkvm.h |  4 ++--
+>>>>>   arch/arm64/kvm/arm.c              | 31 +++++++++++++++++++++++++ 
+>>>>> +-----
+>>>>>   arch/arm64/kvm/handle_exit.c      |  2 +-
+>>>>>   arch/arm64/kvm/hyp/nvhe/pkvm.c    |  6 +++++-
+>>>>>   arch/arm64/kvm/mmu.c              |  2 +-
+>>>>>   arch/arm64/kvm/pkvm.c             |  6 ++----
+>>>>>   7 files changed, 56 insertions(+), 17 deletions(-)
+>>>>>
+>>>>
+>>>> This causes broken nVHE mode. I applied PATCH[01-05] to v7.3.rc4 
+>>>> whose head commit
+>>>> is f0100363d8c3, and kselftests/kvm/guest_print causes host crash 
+>>>> (as below). I don't
+>>>> see the crash if only PATCH[01-04] are applied.
+>>>>
+>>>> host$ cat /proc/cmdline | grep kvm-arm\.mode
+>>>> BOOT_IMAGE=(hd0,gpt2)/vmlinuz-7.3.0-rc4-gavin+ root=/dev/mapper/ 
+>>>> rhel_nvidia--grace--hopper--01-root ro 
+>>>> crashkernel=2G-4G:406M,4G-64G:470M,64G-:726M rd.lvm.lv=rhel_nvidia- 
+>>>> grace-hopper-01/root rd.lvm.lv=rhel_nvidia-grace-hopper-01/swap 
+>>>> video=simplefb:off kvm-arm.mode=nvhe
+>>>>
+>>>> host$ cd linux/tools/testing/selftests/kvm
+>>>> host$ ./guest_print_test
+>>>> Random seed: 0x193a0ed3
+>>>> [  192.754328] kvm [6674]: nVHE hyp panic at: [<ffff8000811da044>] 
+>>>> __kvm_nvhe___timer_enable_traps+0x4/0x160!
+>>>> [  192.754338] kvm [6674]: nVHE call trace:
+>>>> [  192.754339] kvm [6674]:  [<ffff8000811dcf34>] 
+>>>> __kvm_nvhe_hyp_panic+0xb4/0xe0
+>>>> [  192.754342] kvm [6674]:  [<ffff8000811dcba4>] 
+>>>> __kvm_nvhe___kvm_vcpu_run+0x164/0x440
+>>>> [  192.754344] kvm [6674]:  [<ffff8000811dfe90>] 
+>>>> __kvm_nvhe_handle___kvm_vcpu_run+0x40/0x1f0
+>>>> [  192.754346] kvm [6674]:  [<ffff8000811e0238>] 
+>>>> __kvm_nvhe_handle_trap+0x158/0x280
+>>>> [  192.754347] kvm [6674]:  [<ffff8000811dd8fc>] 
+>>>> __kvm_nvhe___skip_pauth_save+0x4/0x4
+>>>> [  192.754348] kvm [6674]: ---[ end nVHE call trace ]---
+>>>> [  192.754350] Code: d2818002 17fffff7 d503201f f9400001 (b94a6821)
+>>>> [  192.754350] kvm [6674]: Hyp Offset: 0xfffeb0d7fe2e0000
+>>>> [  192.754351] Kernel panic - not syncing: HYP panic:
+>>>> [  192.754351] PS:834003c9 PC:0000cf2882efa044 ESR:0000000096000004
+>>>> [  192.754351] FAR:ffff00009b286a68 HPFAR:8000000000000000 
+>>>> PAR:1d00ec7edbadc8de
+>>>> [  192.754351] VCPU:0000cf011848a350
+>>>> [  192.845154] CPU: 12 UID: 0 PID: 6674 Comm: guest_print_tes Kdump: 
+>>>> loaded Not tainted 7.3.0-rc4-gavin+ #7 PREEMPT(full)
+>>>> [  192.856182] Hardware name:  GH200 P5042, BIOS 02.04.01 20250422
+>>>> [  192.862231] Call trace:
+>>>> [  192.864725]  show_stack+0x20/0x38 (C)
+>>>> [  192.868471]  dump_stack_lvl+0x88/0xb8
+>>>> [  192.872215]  dump_stack+0x18/0x30
+>>>> [  192.875598]  vpanic+0x280/0x498
+>>>> [  192.878806]  panic+0x68/0x70
+>>>> [  192.881745]  nvhe_hyp_panic_handler+0x184/0x190
+>>>> [  192.886372]  kvm_arm_vcpu_enter_exit+0x24/0x100
+>>>> [  192.891003]  kvm_arch_vcpu_ioctl_run+0x254/0x7c0
+>>>> [  192.895726]  kvm_vcpu_ioctl+0x174/0xb40
+>>>> [  192.899645]  __arm64_sys_ioctl+0xb0/0x120
+>>>> [  192.903745]  invoke_syscall.constprop.0+0xa8/0x100
+>>>> [  192.908639]  do_el0_svc+0xb8/0xe0
+>>>> [  192.912022]  el0_svc+0x48/0x1f8
+>>>> [  192.915228]  el0t_64_sync_handler+0xa0/0xe8
+>>>> [  192.919500]  el0t_64_sync+0x1ac/0x1b0
+>>>> [  192.923243] SMP: stopping secondary CPUs
+>>>> [  192.927653] Starting crashdump kernel...
+>>>> [  192.931658] Bye!
+>>>>
+>>>
+>>> With the following changes applied after PATCH[01-05] on top of 
+>>> v7.3.rc4, the crash
+>>> is avoided.
+>>>
+>>> In arch/arm64/include/asm/kvm_host.h:
+>>>
+>>> -#define kvm_vm_is_protected(kvm)       ((kvm)->arch.vm_flavor >= 
+>>> __VM_PROTECTED)
+>>> +#define kvm_vm_is_protected(kvm)       \
+>>> +       (is_protected_kvm_enabled() && (kvm)->arch.vm_flavor >= 
+>>> __VM_PROTECTED)
+>>
+>> That only papers over the problem. We can't use the vcpu_is_*
+>> constructs from nvhe hyp, without converting the vcpu->kvm to
+>> the hyp address, before accessing it. The fix is a bit more
+>> involved. One option is to define the vcpu_is_* helpers only
+>> for the !NVHE hyp code in the kvm_host.h (to avoid pulling
+>> in the asm/kvm_mmu.h in to kvm_host.h and then make a mess
+>> with header dependencies) and define the NVHE version in
+>> asm/kvm_hyp.h. Something like :
+>>
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/ 
+>> asm/kvm_host.h
+>> index 46a7f6c1e426c..4016d09ed39c3 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -1545,11 +1545,14 @@ struct kvm *kvm_arch_alloc_vm(void);
+>>   #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+>>
+>>   #define kvm_vm_is_protected(kvm)       ((kvm)->arch.vm_flavor >= 
+>> __VM_PROTECTED)
+>> +
+>> +#ifndef __KVM_NVHE_HYPERVISOR__
+>>   #define vcpu_is_protected(vcpu) kvm_vm_is_protected((vcpu)->kvm)
+>> +#define vcpu_is_protected_pkvm(vcpu) kvm_vm_is_protected_pkvm((vcpu)- 
+>> >kvm)
+>> +#endif
+>>
+>>   #define kvm_vm_is_protected_pkvm(kvm)          \
+>>          (is_protected_kvm_enabled() && ((kvm)->arch.vm_flavor == 
+>> VM_PROTECTED_PKVM))
+>> -#define vcpu_is_protected_pkvm(vcpu)   kvm_vm_is_protected_pkvm(vcpu- 
+>> >kvm)
+>>
+>>   #define kvm_vm_is_unprotected_pkvm(kvm)                \
+>>          (is_protected_kvm_enabled() && ((kvm)->arch.vm_flavor == 
+>> VM_PKVM))
+>> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/ 
+>> asm/kvm_hyp.h
+>> index 4974492744cc8..3bf87e81af430 100644
+>> --- a/arch/arm64/include/asm/kvm_hyp.h
+>> +++ b/arch/arm64/include/asm/kvm_hyp.h
+>> @@ -137,6 +137,19 @@ int __pkvm_init(phys_addr_t phys, unsigned long 
+>> size, unsigned long *per_cpu_bas
+>>   void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
+>>   #endif
+>>
+>> +#ifdef __KVM_NVHE_HYPERVISOR__
+>> +#define vcpu_is_protected(vcpu)        \
+>> +       ({                                                              \
+>> +               struct kvm *__kvm = READ_ONCE((vcpu)->kvm);             \
+>> +               __kvm && kvm_vm_is_protected((kern_hyp_va(__kvm)));     \
+>> +       })
+>> +#define vcpu_is_protected_pkvm(vcpu)                                   \
+>> +       ({                                                              \
+>> +               struct kvm *__kvm = READ_ONCE((vcpu)->kvm);             \
+>> +               __kvm && kvm_vm_is_protected_pkvm((kern_hyp_va(__kvm)));\
+>> +       })
+>> +#endif
+>> +
+>>
+>>
+>> Or explicitly convert all nvhe accessors to a new 
+>> "nvhe_vcpu_is_protected"
+>>
+>> The second one sounds like a better option to me.
+>>
+> 
+> We just need to include "asm/kvm_mmu.h" to "arch/arm64/mmio.c". With it,
+> we can have unified functions (macros) in kvm_host.h to accomodate all
+> cases, like below.
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/ 
+> kvm_host.h
+> index 9b1cf9c59e81..b9c9a9f203f9 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1514,11 +1514,36 @@ struct kvm *kvm_arch_alloc_vm(void);
+>   #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+> 
+>   #define kvm_vm_is_protected(kvm)       ((kvm)->arch.vm_flavor >= 
+> __VM_PROTECTED)
+> -#define vcpu_is_protected(vcpu)                
+> kvm_vm_is_protected((vcpu)->kvm)
+> +#define 
+> vcpu_is_protected(vcpu)                                                \
+> +       ({                                                              \
+> +               struct kvm *__kvm = READ_ONCE((vcpu)->kvm);             \
+> +               bool __protected = false;                               \
+> +                                                                       \
+> +               if (__kvm) {                                            \
+> +                       if (is_nvhe_hyp_code())                         \
+> +                               __kvm = kern_hyp_va(__kvm);             \
+> +                       __protected = kvm_vm_is_protected(__kvm);       \
+> +               }                                                       \
+> +                                                                       \
+> +               __protected;                                            \
+> +        })
+> +
+> 
+>   #define kvm_vm_is_protected_pkvm(kvm)          \
+>          (is_protected_kvm_enabled() && ((kvm)->arch.vm_flavor == 
+> VM_PROTECTED_PKVM))
+> -#define vcpu_is_protected_pkvm(vcpu)   kvm_vm_is_protected_pkvm(vcpu->kvm)
+> +#define vcpu_is_protected_pkvm(vcpu)                                   \
+> +       ({                                                              \
+> +               struct kvm *__kvm = READ_ONCE((vcpu)->kvm);             \
+> +               bool __protected = false;                               \
+> +                                                                       \
+> +               if (__kvm) {                                            \
+> +                       if (is_nvhe_hyp_code())                         \
+> +                               __kvm = kern_hyp_va(__kvm);             \
+> +                       __protected = kvm_vm_is_protected_pkvm(__kvm);  \
+> +               }                                                       \
+> +                                                                       \
+> +               __protected;                                            \
+> +        })
+> 
+>   #define kvm_vm_is_unprotected_pkvm(kvm)                \
+>          (is_protected_kvm_enabled() && ((kvm)->arch.vm_flavor == VM_PKVM))
+> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+> index d1c3a352d5a2..ab1d2fef9a52 100644
+> --- a/arch/arm64/kvm/mmio.c
+> +++ b/arch/arm64/kvm/mmio.c
+> @@ -6,6 +6,7 @@
+> 
+>   #include <linux/kvm_host.h>
+>   #include <asm/kvm_emulate.h>
+> +#include <asm/kvm_mmu.h>
+>   #include <trace/events/kvm.h>
+> 
+>   #include "trace.h"
+> 
 
-Reviewed-by: Suren Baghdasaryan <surenb@google.com>
+Thanks Gavin, that works and looks neat. I will incorporate it.
 
-> ---
->  include/linux/mm.h              | 21 +++++++++++++++++++++
->  mm/vma.c                        | 19 +++++++++++--------
->  tools/testing/vma/include/dup.h |  5 +++++
->  3 files changed, 37 insertions(+), 8 deletions(-)
->
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index 969594074fd2..68250ece4219 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -1612,6 +1612,27 @@ static inline bool vma_is_shared_maywrite(const st=
-ruct vm_area_struct *vma)
->         return is_shared_maywrite(&vma->flags);
->  }
->
-> +/**
-> + * vma_flags_can_merge() - Do the specified VMA flags permit the VMA to =
-be
-> + * merged with another?
-> + * @flags: The VMA flags to test.
-> + * Returns: true if the flags permit merging, false otherwise.
-> + */
-> +static inline bool vma_flags_can_merge(const vma_flags_t *flags)
-> +{
-> +       return !vma_flags_test_any_mask(flags, VMA_SPECIAL_FLAGS);
-> +}
-> +
-> +/**
-> + * vma_can_merge() - Do @vma's flags permit it to be merged with another=
- VMA?
-> + * @vma: The VMA to test.
-> + * Returns: true if the flags permit merging, otherwise false.
-> + */
-> +static inline bool vma_can_merge(const struct vm_area_struct *vma)
-> +{
-> +       return vma_flags_can_merge(&vma->flags);
-> +}
-> +
->  /**
->   * vma_kernel_pagesize - Default page size granularity for this VMA.
->   * @vma: The user mapping.
-> diff --git a/mm/vma.c b/mm/vma.c
-> index 4b74b48c29b7..05d2c676672e 100644
-> --- a/mm/vma.c
-> +++ b/mm/vma.c
-> @@ -924,13 +924,14 @@ static __must_check struct vm_area_struct *vma_merg=
-e_existing_range(
->
->         vmg->state =3D VMA_MERGE_NOMERGE;
->
-> +       if (!vma_flags_can_merge(&vmg->vma_flags))
-> +               return NULL;
->         /*
-> -        * If a special mapping or if the range being modified is neither=
- at the
-> -        * furthermost left or right side of the VMA, then we have no cha=
-nce of
-> -        * merging and should abort.
-> +        * If the range being modified is neither at the furthermost left=
- or
-> +        * right side of the VMA, then we have no chance of merging and s=
-hould
-> +        * abort.
->          */
-> -       if (vma_flags_test_any_mask(&vmg->vma_flags, VMA_SPECIAL_FLAGS) |=
-|
-> -           (!left_side && !right_side))
-> +       if (!left_side && !right_side)
->                 return NULL;
->
->         if (left_side)
-> @@ -1152,9 +1153,11 @@ struct vm_area_struct *vma_merge_new_range(struct =
-vma_merge_struct *vmg)
->
->         vmg->state =3D VMA_MERGE_NOMERGE;
->
-> -       /* Special VMAs are unmergeable, also if no prev/next. */
-> -       if (vma_flags_test_any_mask(&vmg->vma_flags, VMA_SPECIAL_FLAGS) |=
-|
-> -           (!prev && !next))
-> +       if (!vma_flags_can_merge(&vmg->vma_flags))
-> +               return NULL;
-> +
-> +       /* VMAs with no prev/next are unmergeable. */
-> +       if (!prev && !next)
->                 return NULL;
->
->         can_merge_left =3D can_vma_merge_left(vmg);
-> diff --git a/tools/testing/vma/include/dup.h b/tools/testing/vma/include/=
-dup.h
-> index 16c09dac59d9..2fd422789717 100644
-> --- a/tools/testing/vma/include/dup.h
-> +++ b/tools/testing/vma/include/dup.h
-> @@ -1647,3 +1647,8 @@ static inline bool file_is_dev_zero(const struct fi=
-le *file)
->  {
->         return file && file->f_op =3D=3D &zero_fops;
->  }
-> +
-> +static inline bool vma_flags_can_merge(const vma_flags_t *flags)
-> +{
-> +       return !vma_flags_test_any_mask(flags, VMA_SPECIAL_FLAGS);
-> +}
->
-> --
-> 2.55.0
->
+Cheers
+Suzuki
+
+> Thanks,
+> Gavin
+> 
+
