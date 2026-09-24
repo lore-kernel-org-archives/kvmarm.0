@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A4E3F327F;
-	Thu, 24 Sep 2026 10:06:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B073E44F3;
+	Thu, 24 Sep 2026 10:06:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790244413; cv=none; b=sL5HTogkD7qz0a7Ztoe4Hhq50Yaklu6YydM5Sw+XTKaHAd/87ev14RmUVKH2WflQPxblvjOUiWaGli+y9G/rp4JnQ2OIX7ZyYqLks6YcqrWRWBVA4GDOhwiLa8EfOX07PRzSNnIrF/uxwBFZgmM+VQnhNqqg2SbLEWD5HEg9Ypc=
+	t=1790244425; cv=none; b=fVL0JJZGtElu8LyKD7aGYrGvIMUOTxDV3pahZQJnJrpqezqQSv3OFt+23+TwjXcmpqvs11ZRwIaA4fFcHnrQ1opNzkfbfXbZ2CRSBx2NcFFqznj+d7oFJ+dhYGmiZBqqhe4jAEQeYljOrhXmQ+6JnrmGkcHs2M3K9MUibRcZAcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790244413; c=relaxed/simple;
-	bh=iewJ/UzRcwvim8mGh0VCVWZcnN1eKM0tebXGdS7Tqsw=;
+	s=arc-20240116; t=1790244425; c=relaxed/simple;
+	bh=Z0tay+mZQxzzjyDmj//51K3kjDG5Z6SEp4+DBkaYiS8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bSzzLI0X8ahSTcQ6ahx3jatlrT4nXf6Dbxbrt5GuKmyZ4eK95OFgFnUe2xqe0iDn1RlDDuIOKw7HGy4Unk026agLLVkf+7xRKfsbUE0Ar/uyiq/yxMY2AblpdLkWm9WBEmbm/sulz/Ym4TDi7tqwksscmi57lWYxl61t3u0umPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OA0Wwjkr; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=YvImHReubClSm/68cZ1W04ZBm7DDVdxK13zZrOWrtc/kBmhTKjB+tfziiTjOJhcQ4kOs0U6S8943weBD423bNjVMKXV6eZdtQtM3TcF4FQ2Yixk0atrHDrXyyefoecxFk+YLviOQNi64Qy3OgkaKmYgo6QbB2lgOqH7YRIcKcP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MBbTPQiM; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OA0Wwjkr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 982691F00898;
-	Thu, 24 Sep 2026 10:06:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MBbTPQiM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FDE41F000FF;
+	Thu, 24 Sep 2026 10:06:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790244400;
-	bh=+jezVnsczHca2+N3DdTe1/ZWux4ulhsHRjwwcueBcvY=;
+	s=k20260515; t=1790244417;
+	bh=waix5vjh+pKFV3Wslxy857438fq/HyMRB7bQ/yb+Wag=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=OA0Wwjkrad2J01S7AVOXgv9vB7OxITzitM9cqnBHo/R+SMmR/Wb6JnEi/VOvV2Mr5
-	 2GQ0T5KPCERTOQQyaKhjIMcAEoJCmXuPc/1IlVl4GqUieGyYG9M7bq9V9hdPzuGu75
-	 zm5bZ6Vq9QKL5c2wtyNV07tR16E9ZCOrsDt/JCGwoBvTAiOwutEZ44qNObS1JXTIQm
-	 thqkWUr0JA9TdGwc9tUQRVAHzwZRsT4bDyZTeHuozNp3wPg4eqZQgmF/val0gVwhXN
-	 oIIrRZN/VaX3X3Ibu2efYFQqrrjq3udn0ykeO2gGCkLVxqnNNfkpFsX/NM1LKugnmA
-	 wsfiHOZHqec5A==
+	b=MBbTPQiMrIlhFnAQgodW4mh3L6x9pAnVoy9CpXDiD5kwwKVpSU3cW85m6YO3TllUe
+	 +8u1KpU1qq8ya8T0dvH9jh9swr5NkeWtJ0Jd25sXVXkLI4kJPPUC12YjRJqZRefRui
+	 Dr8TzQTF2X7fdYDA28ugxZlsWVSwiyDXVbEOHF18q78gXVUmWvnjBgJTLq7m5529Ex
+	 8vXjEnYwjiugyhtg4AKJmlx9fPxgE3qm1L6Pf7xfudwJrSN6SlBAc1JbgB/SJzlNwz
+	 dtHD71eWILpn/kglR9wjXyVr+pY2jUtdefsLu9FHGEk86hCjUr/+mEpozltE+1KBYE
+	 +LiKQH7VzRRKA==
 From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 To: linux-coco@lists.linux.dev,
 	kvmarm@lists.linux.dev,
@@ -89,9 +89,9 @@ Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
 	linaro-mm-sig@lists.linaro.org,
 	linux-media@vger.kernel.org,
 	linux-mm@kvack.org
-Subject: [RFC PATCH v8 03/14] irqchip/gic-v3-its: Resolve the default NUMA node explicitly
-Date: Thu, 24 Sep 2026 15:35:18 +0530
-Message-ID: <20260924100529.1398790-4-aneesh.kumar@kernel.org>
+Subject: [RFC PATCH v8 04/14] irqchip/gic-v3-its: Allocate shared tables using CoCo shared memory allocator
+Date: Thu, 24 Sep 2026 15:35:19 +0530
+Message-ID: <20260924100529.1398790-5-aneesh.kumar@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260924100529.1398790-1-aneesh.kumar@kernel.org>
 References: <20260924100529.1398790-1-aneesh.kumar@kernel.org>
@@ -103,45 +103,115 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-alloc_pages_node() resolves NUMA_NO_NODE to numa_mem_id() internally. In
-preparation for switching ITS allocations to the CoCo shared memory
-allocator, resolve the default node explicitly in its_alloc_pages().
+ITS command queues and tables are shared with the host in a
+confidential-computing guest. The ITS allocator currently assumes that
+the guest PAGE_SIZE is sufficient for both allocation alignment and
+private/shared state changes.
 
-The CoCo shared memory allocator interprets NUMA_NO_NODE as a request to
-apply the current task's memory policy. Passing numa_mem_id() instead
-preserves the existing nearest-memory-node placement across the
-allocator switch. This patch does not change the current allocation
-behavior.
+Route ITS page allocations through alloc_cc_shared_pages_node(). Keep
+the tracked table size based on the ITS-requested order. On release,
+reconstruct the common allocation metadata from the original ITS order
+and the architecture granule size so the same transitioned range and
+buddy order are used.
 
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Thomas Gleixner <tglx@kernel.org>
 Cc: Radu Rendec <radu@rendec.net>
 Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/irqchip/irq-gic-v3-its.c | 40 ++++++++++++--------------------
+ 1 file changed, 15 insertions(+), 25 deletions(-)
 
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index e9807af23537..ac5507acb1a0 100644
+index ac5507acb1a0..4814161df02e 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -32,6 +32,7 @@
- #include <linux/set_memory.h>
+@@ -8,6 +8,7 @@
+ #include <linux/acpi_iort.h>
+ #include <linux/bitfield.h>
+ #include <linux/bitmap.h>
++#include <linux/cc_shared.h>
+ #include <linux/cpu.h>
+ #include <linux/crash_dump.h>
+ #include <linux/delay.h>
+@@ -19,7 +20,6 @@
+ #include <linux/irqdomain.h>
+ #include <linux/list.h>
+ #include <linux/log2.h>
+-#include <linux/mem_encrypt.h>
+ #include <linux/memblock.h>
+ #include <linux/mm.h>
+ #include <linux/msi.h>
+@@ -29,7 +29,6 @@
+ #include <linux/of_pci.h>
+ #include <linux/of_platform.h>
+ #include <linux/percpu.h>
+-#include <linux/set_memory.h>
  #include <linux/slab.h>
  #include <linux/syscore_ops.h>
-+#include <linux/topology.h>
- 
- #include <linux/irqchip.h>
- #include <linux/irqchip/arm-gic-v3.h>
-@@ -236,7 +237,7 @@ static struct page *its_alloc_pages_node(int node, gfp_t gfp,
- 
- static struct page *its_alloc_pages(gfp_t gfp, unsigned int order)
+ #include <linux/topology.h>
+@@ -214,25 +213,13 @@ static gfp_t gfp_flags_quirk;
+ static struct page *its_alloc_pages_node(int node, gfp_t gfp,
+ 					 unsigned int order)
  {
--	return its_alloc_pages_node(NUMA_NO_NODE, gfp, order);
-+	return its_alloc_pages_node(numa_mem_id(), gfp, order);
+-	struct page *page;
+-	int ret = 0;
+-
+-	page = alloc_pages_node(node, gfp | gfp_flags_quirk, order);
+-
+-	if (!page)
+-		return NULL;
++	struct cc_shared_pages mem;
+ 
+-	ret = set_memory_decrypted((unsigned long)page_address(page),
+-				   1 << order);
+-	/*
+-	 * If set_memory_decrypted() fails then we don't know what state the
+-	 * page is in, so we can't free it. Instead we leak it.
+-	 * set_memory_decrypted() will already have WARNed.
+-	 */
+-	if (ret)
++	if (alloc_cc_shared_pages_node(node, gfp | gfp_flags_quirk,
++				       PAGE_SIZE << order, &mem))
+ 		return NULL;
+ 
+-	return page;
++	return mem.page;
  }
  
+ static struct page *its_alloc_pages(gfp_t gfp, unsigned int order)
+@@ -242,13 +229,15 @@ static struct page *its_alloc_pages(gfp_t gfp, unsigned int order)
+ 
  static void its_free_pages(void *addr, unsigned int order)
+ {
+-	/*
+-	 * If the memory cannot be encrypted again then we must leak the pages.
+-	 * set_memory_encrypted() will already have WARNed.
+-	 */
+-	if (set_memory_encrypted((unsigned long)addr, 1 << order))
++	struct cc_shared_layout layout;
++	struct cc_shared_pages mem;
++
++	if (WARN_ON(cc_shared_calc_layout(PAGE_SIZE << order, &layout)))
+ 		return;
+-	free_pages((unsigned long)addr, order);
++
++	mem.page = virt_to_page(addr);
++	mem.shared_size = layout.shared_size;
++	free_cc_shared_pages(&mem);
+ }
+ 
+ static struct gen_pool *itt_pool;
+@@ -273,7 +262,8 @@ static void *itt_alloc_pool(int node, int size)
+ 		if (!page)
+ 			break;
+ 
+-		gen_pool_add(itt_pool, (unsigned long)page_address(page), PAGE_SIZE, node);
++		gen_pool_add(itt_pool, (unsigned long)page_address(page),
++			     cc_shared_granule_size(), node);
+ 	} while (!addr);
+ 
+ 	return (void *)addr;
 -- 
 2.43.0
 
