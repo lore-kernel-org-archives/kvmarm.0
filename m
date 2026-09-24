@@ -1,60 +1,47 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6B23CF218;
-	Thu, 24 Sep 2026 08:28:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B73D3ED5C3;
+	Thu, 24 Sep 2026 08:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790238495; cv=none; b=M1oUGs8mSfldJwQC12q2GlPjv5yGgQHKtAKdndtoJeNj91uIml5q/EGN2gmKTI1SIg+H4pc1abWeZSZL7iaXLXGYooVfQbEUNeJtFQA+0+1DKJ8haeKWYSNZrMQgrgV0vyx/VVYqhnWi24fP5xRwu1TvKO9kRk/2l+r8KT5fpog=
+	t=1790238615; cv=none; b=r7mP66fIDKcUkT1GDdy8ZFAuaKxFk5J87V6D6XWbXYd+0pJlYoc2YcDPbjZhHfqVE+XzP8o4mwF6fUMgHptg4LNB7tiLpDpaU7AnwWZwh+xWSwlt02uvsvIpeDyNyhWkoUz/lcK1xqD929OJBUdOVZjWLfZOpC2uBWaVgacCh18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790238495; c=relaxed/simple;
-	bh=WQD6DJ9hn20A4LJfFdIJHvCjUt0Ry1c58LGa64z0pak=;
+	s=arc-20240116; t=1790238615; c=relaxed/simple;
+	bh=+Fmxs1VxO4v21VbTg/4NsPWKXYijbNKsTM1NdF20K/w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZWuG6EdPmctEa0yVxyk1B+smU/4gRqMva9AgpfQubp7OVDqqUregZ4y7NlNPwMVxG+kq0mpHdphfFRswa34lGIkUkgrvcsk29tWVriQjeRueK8tBl/f5h9KdFibQrPRCcCVEI1c08i3nrYqVy02oxxF8CLfgoZczCMhelvCQfho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AkMJC5JA; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=k3ncxShLxPD6I1WsvnGG7ylrFCMZ26yIPDjskGlUJJXYLi/fGzcnB2ZPjBpsqF0Jvsa+etK6+Qp+WDBeOEoB581165dGx4PkWtXeqinqsdD+wpShs+00GmUVlo5jBp2qqC27UXtPJMQcc1Kx/RpFAnjlyRNMnmT/yEvxEAhW6zA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XE3JpDcy; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AkMJC5JA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 922081F000FF;
-	Thu, 24 Sep 2026 08:28:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XE3JpDcy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB6A41F000FF;
+	Thu, 24 Sep 2026 08:30:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790238494;
-	bh=GsmgnhaFqTMEMgV8Zn0uR04tPAkg7R3E1Z3BnGPBPGU=;
+	s=k20260515; t=1790238612;
+	bh=Q2zQUJ23idUHk5KbjgrSsNpQFZ6X6k1nsitKWBxEjOM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=AkMJC5JAXk/pX/+kR1K2A+X2qR9dHg/cylkIMUSRwxnRpKTJ8o90TZd6MY9zQFCgt
-	 OqAf46Hj4z8Mm/IgP1xpEh9SMBAnhYIqehxrr1GWRYnLDX5YCkgJDQLpAhF7xz8y+p
-	 WB6yMcowxeNwJSKaCYZk2KnXTLf6vcUYIc8o/MXvCU/4SHrXx7guEr5MWwkscKgopx
-	 WwInTzGX2U50sJSoJ/pD7y/ZcejotJCWowo8ra/iIr7o6GyeHHr3t9tt2la+h/6Hu6
-	 YzO1iqOvVMXiO5kuKSXZ5sITsGtan+25tRvkmvx82GrE3OpJFbPXDsN2aQojmTeehj
-	 KpCOSPkuwbljg==
-Date: Thu, 24 Sep 2026 09:28:02 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+	b=XE3JpDcyKgv66BxukYFgGmEjQwDrMczbTevv4ZcszBIlpl8KJY3CacKcNQQPtgbbZ
+	 VmD4CdC6Q2YiM6/r9a0oRFxSnsgIzzRR5Sa/KOQTNZQBBzJOwakExAzw2GIHUCo0vf
+	 GRlUGdYaeL5qehGKK4tDTQ0G8nY3SHbyK+WJfRpgY2vkENDWqDBVwxpcUUpNQeQP/2
+	 Co3gEwVstJd8QF3cZCS8ORpdJZk4RCc+jck4Z8q1lOC8/ojDRQPzr9erFh1rCr9fpm
+	 HWLOsgoEut2jtJs/3HN7cTEiUJQILcDTvFz1Y3aUlw+PcxvpBXHq5XAKUvxsmgUdxP
+	 +I90F8jJItjUQ==
+Date: Thu, 24 Sep 2026 09:30:06 +0100
+From: Will Deacon <will@kernel.org>
 To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Mark Rutland <mark.rutland@arm.com>, Randy Dunlap <rdunlap@infradead.org>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	David Hildenbrand <david@kernel.org>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Shuah Khan <shuah@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Jack Thomson <jackabt@amazon.com>, Jack Thomson <jackabt.amazon@gmail.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Vincent Donnefort <vdonnefort@google.com>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Sean Christopherson <seanjc@google.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Leo Soares Passos <Leo.Bras@arm.com>, 
-	Wei-Lin Chang <weilin.chang@arm.com>, linux-s390@vger.kernel.org
-Subject: Re: [PATCH v4 13/14] KVM: selftests: Add option for different
- backing in pre-fault tests
-Message-ID: <arTe9AprfA3CVs9Y@gremlin>
-References: <20260923-kvm-arm-prefault-v4-0-d4b0b4dfa8c3@kernel.org>
- <20260923-kvm-arm-prefault-v4-13-d4b0b4dfa8c3@kernel.org>
- <CA+EHjTyPyy-Z=HAMOz6pUHrz_X4O+Lx3cQ6Ay_Wt+tnc1WDU_w@mail.gmail.com>
+Cc: Vincent Donnefort <vdonnefort@google.com>, maz@kernel.org,
+	oupton@kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	catalin.marinas@arm.com, joey.gouly@arm.com, seiden@linux.ibm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com,
+	steven.price@arm.com, qperret@google.com
+Subject: Re: [PATCH v3 10/18] KVM: arm64: Handle PSCI calls for protected VMs
+ at EL2
+Message-ID: <arTfjgvZIhmXLrw1@willie-the-truck>
+References: <20260914113338.159227-1-fuad.tabba@linux.dev>
+ <20260914113338.159227-11-fuad.tabba@linux.dev>
+ <arK1tHUEJsCQEKzn@google.com>
+ <CA+EHjTx+foVF4CRU5D8bQv8bAqDphMN12UrV+_doUryn2ow6bg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -63,43 +50,43 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CA+EHjTyPyy-Z=HAMOz6pUHrz_X4O+Lx3cQ6Ay_Wt+tnc1WDU_w@mail.gmail.com>
+In-Reply-To: <CA+EHjTx+foVF4CRU5D8bQv8bAqDphMN12UrV+_doUryn2ow6bg@mail.gmail.com>
 
-On Thu, Sep 24, 2026 at 07:08:52AM +0100, Fuad Tabba wrote:
-> Hi Lorenzo,
->
-> On Wed, 23 Sep 2026 16:15:56 +0100, "Lorenzo Stoakes (ARM)"
-> <ljs@kernel.org> wrote:
-> [...]
-> > diff --git a/tools/testing/selftests/kvm/pre_fault_memory_test.c b/tools/testing/selftests/kvm/pre_fault_memory_test.c
-> [...]
-> > @@ -189,24 +195,28 @@ static void __test_pre_fault_memory(enum vm_guest_mode guest_mode, void *arg)
-> [...]
-> >          test_config.test_size = align_up(TEST_BASE_SIZE + test_config.page_size,
-> > -                                         host_page_size);
-> > +                                         mem_page_size);
-> >          test_config.test_num_pages = vm_calc_num_guest_pages(vm->mode, test_config.test_size);
->
-> With -s anonymous_hugetlb_1gb, test_size becomes 1G and setup aborts
-> on 4K guest modes, as memslot 0 has no room for the page tables that
-> map it:
->
->      No guest physical page available, min_gpa: 0x180000 page_size:
-> 0x1000 memslot: 0
->
-> As a followup, could you compute test_num_pages before creating the VM
-> and pass it as extra_mem_pages, as arm64/sea_to_user.c does?
+On Wed, Sep 23, 2026 at 10:51:34AM +0100, Fuad Tabba wrote:
+> Hi Vincent,
+> 
+> > > +/*
+> > > + * Returns true when handled at EL2, false when the host must stop scheduling
+> > > + * the vCPU.
+> > > + */
+> > > +static bool pvm_psci_vcpu_off(struct pkvm_hyp_vcpu *hyp_vcpu)
+> > > +{
+> > > +        /* No other writer runs while this vCPU is ON and executing. */
+> > > +        WARN_ON(READ_ONCE(hyp_vcpu->power_state) != PSCI_0_2_AFFINITY_LEVEL_ON);
+> > > +
+> > > +        /*
+> > > +         * Orders pkvm_reset_vcpu()'s clear of reset_state.reset before OFF, so
+> > > +         * a CPU_ON that wins on OFF republishes after it. Pairs with the
+> > > +         * cmpxchg in pvm_psci_vcpu_on().
+> > > +         */
+> > > +        smp_store_release(&hyp_vcpu->power_state, PSCI_0_2_AFFINITY_LEVEL_OFF);
+> >
+> > Is there an issue either with the comment or with pvm_psci_vcpu_on()? the
+> > cmpxchg is relaxed. I would have expected cmpxchg_acquire().
+> 
+> It's the comment. The ordering it describes holds with the relaxed
+> cmpxchg. The release of OFF orders the clear before OFF. The winner's
+> smp_store_release(&reset_state->reset, true) orders its cmpxchg before
+> that store. So the clear can't land after the republish. The comment
+> should name that store-release as the pair, not the cmpxchg.
 
-Ack, can look into that and send a follow up patch after!
+Sorry, but I'm really confused by this and it appears to be different to
+what we've got in Android as well. Why do we need release semantics for
+the store to 'hyp_vcpu->power_state' in pvm_psci_vcpu_off()? What is it
+that we are publishing here? The comment talks about pkvm_reset_vcpu(),
+but how is that relevant to the vCPU _off_ path? You say the comment is
+wrong, but what _should_ it say?
 
->
-> Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+I'm a bit baffled!
 
-Thanks!
-
->
-> Cheers,
-> /fuad
-
---
-Cheers, Lorenzo
+Will
