@@ -1,126 +1,111 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 649D1459AC7
-	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 10:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E63E46D570;
+	Thu, 24 Sep 2026 10:21:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790245190; cv=none; b=s2C4J4Kl9aIqnRDiFN7qpJvdBnd6MYOoCMESp7jsH00PI622IOh0e7tt928vGVAf4YIgAL2qXPiwxfhwPjGfYIMIQr67TlGfSvhs9/11Goxgvv7/u/5yjrsDU4poAFJQ14/j88wiUj/Fj+/osg7cdbgLDhZC7YMabsqU8h5KUXI=
+	t=1790245303; cv=none; b=QbWSI3qv5vscNW9qpl3s8zWwMZX0vwUXADOtp6zMnqmGpl93ehlklPat3ECRCxp8zdoCPNDKsNZtmtH61T3ftTWTxIIY2frZ6Us0dw6efmViEIWw2xlVs87GUQ07LurCbekbqN61Jp4qV7G4oBdFO2jANVFtPgnOnor7uW4LbV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790245190; c=relaxed/simple;
-	bh=7goD9MpOQJfv7oKoBEVuoHTm1msKL7XRGBaH2/pNE5k=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=QDa4Gl5s2f8kOyx8e+ITjvBybmro9a4bLCZ37iv9OIel8vuQhKdA+bqM5LsWC8imQav2bWENQtsIxLzu1zPxsnRmAbo/SHMZ5G7v8kPxe3tyCReDC4/BsTgFOTXReRNMlZvTDnmwiOq2nh7q1gCNGlOGT0cJ3p+AFWjEC8j6mms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EQbFilMW; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790245303; c=relaxed/simple;
+	bh=8JtrStaYuRSBRMvWNSYCvXES213ZcR4nN845YnL9zj8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t2XkLN2slMNtwk51K8aMtjIErHXDHvMciLoRXgNRAd0wFLVjct7MR24qa0GXrYBOVrrcUhr4hBLtQFVaIglpw0ujF3iYCuvFOHF1Gv2FGMcy6Zq3jWLHASTV/0UpV+JwmRmET0iDjq6Dw3XSaybYqawoMR+A3yp8fOSI75qaR4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kGkEvjDM; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EQbFilMW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95D7F1F000FF;
-	Thu, 24 Sep 2026 10:19:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kGkEvjDM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABC031F000FF;
+	Thu, 24 Sep 2026 10:21:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790245186;
-	bh=/gxa1IwjEcYJPW+usTwOk+STx1BGzePZXC02PrSy/PI=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=EQbFilMWFOx8gLbcg9xGAHKwo9MLJCRMLa705Fjc0ZhdXcJCxNw2ySTUmTXr7lI1N
-	 E47/pvNF0y1HkHScYRhdhvT1YNVD7+nK0rQTvGXpeBIyNX7qY2sZYKywLRiPDkyx6A
-	 uelkjIvzg0XCNuiSlGfPPyuN+yxxuwg+g++hKeHb0k4fVfjYjZTzYyaXHMJZ4NHtrt
-	 YcfiItbON1TYcdMU7zNwN+0svt/UapQOJoRxEPSRhhhL/5Po8kHBHAC2I4sBxjVE5Z
-	 neVb+DKdHuGRadn7wh5/W2OXDDh0AwVVW4mnv4yi1taTexgTWK3mk2WPoUiu39S5WA
-	 nKSNzU+jSxNZg==
-From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH v8 06/14] dma-pool: Allocate CoCo atomic pools using
- CoCo shared memory allocator
-Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?QW5lZXNoIEt1bWFyIEsuViAoQXJtKQ==?= <aneesh.kumar@kernel.org>
-Cc: "Marc Zyngier" <maz@kernel.org>, dri-devel@lists.freedesktop.org, media-ci@linuxtv.org, kvmarm@lists.linux.dev, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260924100529.1398790-7-aneesh.kumar@kernel.org>
-References: <20260924100529.1398790-1-aneesh.kumar@kernel.org>
- <20260924100529.1398790-7-aneesh.kumar@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 24 Sep 2026 10:19:45 +0000
-Message-Id: <20260924101945.95D7F1F000FF@smtp.kernel.org>
+	s=k20260515; t=1790245301;
+	bh=5MDTtMD6afFelOIcTq7k9liLCAKGpA6j8Nmw+cyJu0M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=kGkEvjDMzPW27fY1HkTF00AU0znEB3Gyp4m8m1hR0k/f4qggxQBCJqGjd9CWbDz/F
+	 M0y1SvvOPq4yUHmQnBmmk/zHxiLKwk8bdniJxMDAnQJFD8JL9IVLgs9YYgUShjftxL
+	 fzq+AeTbP2NSP3MZZq+t9YGKbLx/9ZuXmk5RaS0mwSXMtIIM3x0SteKmlYbDrmjY4B
+	 ADZqFJzdo0iA59Rx1p+Es3npbjhiln69opfVKWdl3hvHfMESY2u3HJkULAOWvkU8oN
+	 vnT+Lufabt0xGR7NQLdJzbSwMPZnkXiyyBzXEEI6Q5Xn9aqsN4skFT2L7WWqVnF/YT
+	 PKvtLJsgSOvLw==
+Date: Thu, 24 Sep 2026 11:21:35 +0100
+From: Will Deacon <will@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	James Morse <james.morse@arm.com>, Ben Horgan <ben.horgan@arm.com>,
+	Xi Ruoyao <xry111@xry111.site>, Mark Rutland <mark.rutland@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>, Gavin Shan <gshan@redhat.com>,
+	Yuan Yao <yaoyuan@linux.alibaba.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] KVM: arm64: Trap guest MPAM accesses whenever MPAM is
+ implemented
+Message-ID: <arT5r6Tqg9PnSYLz@willie-the-truck>
+References: <20260911104715.307500-1-fuad.tabba@linux.dev>
+ <868q5579ol.wl-maz@kernel.org>
+ <CA+EHjTw0U0d91Cv4NYEJvUuT=JabwZeeYwpZ2P1xyVeOVX46Ew@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTw0U0d91Cv4NYEJvUuT=JabwZeeYwpZ2P1xyVeOVX46Ew@mail.gmail.com>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] dma-pool: atomic_pool_expand() falsely returns success on failure
---
+On Tue, Sep 15, 2026 at 07:51:00PM +0100, Fuad Tabba wrote:
+> On Sun, 13 Sept 2026 at 11:00, Marc Zyngier <maz@kernel.org> wrote:
+> [...]
+> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> [...]
+> > >  static void cpu_hyp_init_context(void)
+> > >  {
+> > > + u64 pfr0 = __read_sysreg_by_encoding(SYS_ID_AA64PFR0_EL1);
+> > > + u64 pfr1 = __read_sysreg_by_encoding(SYS_ID_AA64PFR1_EL1);
+> > > +
+> >
+> > Why not directly read_sysreg(id_aa64pfr0_el1) and co?
+> > __read_sysreg_by_encoding() is useful when the encoding comes from a
+> > variable, but it looks odd in the case of a literal sysreg.
+> 
+> It applies the arm64.nompam override, which is what
+> finalise_el2_state() tests. With the override set, EL2 setup leaves
+> the MPAM traps alone, and a raw read_sysreg() would still see MPAM in
+> the ID registers, so KVM would write MPAM2_EL2 on exactly the firmware
+> the option exists for. I'll add a comment.
+> 
+> [...]
+> > > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> [...]
+> > > @@ -298,14 +298,17 @@ static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
+> [...]
+> > >   /* trap guest access to MPAMIDR_EL1 */
+> > > - if (system_supports_mpam_hcr()) {
+> > > + if (read_sysreg_s(SYS_MPAMIDR_EL1) & MPAMIDR_EL1_HAS_HCR) {
+> >
+> > This is going to suck under NV. The host hypervisor is of course going
+> > to set MPAMHCR_EL2.TRAP_MPAMIDR_EL1, and we're in for a recursive trap
+> > on the hottest possible path in KVM. Which is silly as the actual
+> > write to MPAMHCR_EL2 is free (it lands in NVMem[]).
+> >
+> > This really should be replaced by a flag called HAS_MPAM_HCR, just
+> > like you have HAS_MPAM.
+> 
+> I'll probe MPAMIDR_EL1.HAS_HCR once in cpu_hyp_init_context(), next to
+> HAS_MPAM, and test the flag in both trap functions instead.
+> 
+> I'll hold off on v4 until Will has had a chance to comment as well.
 
-commit 7de8bc3a8ea9e2bbef83e09d72fa88999ce898b9
-Author: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+I'm planning to generalise the logic you added recently in
+gmid_el1_accessible() so that __cpuinfo_store_cpu() stores the values
+in 'struct cpuinfo_arm64' with the overrides already applied. I don't
+think that directly impacts this patch, but it should make the general
+shape of things easier to reason about. I also need it for the parallel
+hotplug work.
 
-dma-pool: Allocate CoCo atomic pools using CoCo shared memory allocator
+If you fancy helping with that, please let me know.
 
-This commit modifies atomic DMA pools to use the CoCo shared memory allocat=
-or.
-It prevents allocation fallback below the required shared granule size, and
-uses the cc_make_shared() helper to transition the backing allocations in a
-sleepable context.
-
-> diff --git a/kernel/dma/pool.c b/kernel/dma/pool.c
-> index 70b7f64b17ab5..f059312c15aa5 100644
-> --- a/kernel/dma/pool.c
-> +++ b/kernel/dma/pool.c
-[ ... ]
-> @@ -85,6 +85,9 @@ static bool cma_in_zone(gfp_t gfp)
->  static int atomic_pool_expand(struct dma_gen_pool *dma_pool, size_t pool=
-_size,
->  			      gfp_t gfp)
->  {
-> +	struct cc_shared_layout layout;
-> +	unsigned long attrs =3D 0;
-> +	unsigned int min_order =3D 0;
->  	unsigned int order;
->  	struct page *page =3D NULL;
->  	bool leak_pages =3D false;
-> @@ -92,6 +95,17 @@ static int atomic_pool_expand(struct dma_gen_pool *dma=
-_pool, size_t pool_size,
->  	int ret =3D -ENOMEM;
->  	pgprot_t prot __maybe_unused;
-> =20
-> +	if (dma_pool->cc_shared) {
-> +		ret =3D cc_shared_calc_layout(pool_size, &layout);
-> +		if (ret)
-> +			goto out;
-
-[Severity: High]
-If cc_shared_calc_layout() succeeds, it returns 0 and overwrites the initial
-ret =3D -ENOMEM. Could this cause the function to falsely return 0 (success=
-) on
-subsequent failures?
-
-For instance, if page allocation fails below, the function jumps to out and
-returns the current value of ret:
-
-    if (!page)
-        goto out;
-
-Similarly, if remapping fails later in the function:
-
-    addr =3D dma_common_contiguous_remap(...)
-    if (!addr)
-        goto free_page;
-
-In both cases, ret will be 0 instead of -ENOMEM. Would it be better to reset
-ret back to -ENOMEM when these failures occur, or use a separate variable
-for the cc_shared_calc_layout() return value?
-
-> +		pool_size =3D layout.shared_size;
-> +		min_order =3D get_order(layout.alignment);
-> +		if (min_order > MAX_PAGE_ORDER)
-> +			return -E2BIG;
-> +		attrs =3D __DMA_ATTR_ALLOC_CC_SHARED;
-> +	}
-> +
->  	/* Cannot allocate larger than MAX_PAGE_ORDER */
->  	order =3D min(get_order(pool_size), MAX_PAGE_ORDER);
->
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260924100529.1398=
-790-1-aneesh.kumar@kernel.org?part=3D6
+Will
