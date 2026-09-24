@@ -1,173 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EDE533F599;
-	Thu, 24 Sep 2026 14:08:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from mail.8bytes.org (mail.8bytes.org [85.214.250.239])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 071F23515F1;
+	Thu, 24 Sep 2026 14:10:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.250.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790258929; cv=none; b=l2oRRg+RBGLsxLhDewtor24YcNKzXh+CDCvFkyhbf166jcXU1bSoJ9NZ02Zu1CsyYBeEtIn540p5Hu2E/eb+cehlejZNROnQTAmjvA6RODfVKkLMyXhZDepPt8xQQEnojNOeLeB9sTEcZ32ZPHII17zLEHnaSeu7wnopvYubn/8=
+	t=1790259051; cv=none; b=HTgDyCFkXZ0xXTCI5NaSyMOqpLgbyvT1XqOqpk6e/407PSyqI8Xv9rs+rn9OJKHIsB1arOkxS49J+AEYh9vdDKAOMem2ZuJcCmcSIquGDvO0dPUpn1/LGjf+EBuRq8xKfJxwTJXT3ilD4KN2d264+bP8O32XnTytIpZf6XSLvjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790258929; c=relaxed/simple;
-	bh=GtTOHyQXXnDz7lV95xuO452mPKWK/Quc+tZqURSxA4M=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=PvGjHOY4QcsTnWPu+CyhG4IsPYTRc6dphlGhHPVas5c9aq1xpHF2VNOvrYJVbGAnwV0Z3TIZDVZ+7YdLmH2M8LPN3zXThbHgaTAYADTJjkquymHsMamuyGoDqmccbjY5reB0Y2gxS7US15FmaCgCwhl7SOdNkIjOrvp4pRJV/Vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fw34UQ93; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fw34UQ93"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFA411F000FF;
-	Thu, 24 Sep 2026 14:08:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790258928;
-	bh=/oui4jQMtGu5qJSIxw36N2MNjQMxKXaizUrOad25/kY=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=fw34UQ93vMo4jabb0tJGcabHdKbRBZfWcwCR+q/x+eZchCtLrqwrqJoQ9P0Cp3y7I
-	 pcTlha/Fc4L+GOfPDvbmsxjAuiold5fEBbOSLFtJSxuptcK3VavPRdh58jC+80kxJE
-	 u3FQosD3cM4TLaWZZAqnGteaFkG3FDkUViwDfdWwTqywQR8BKst3O7RUa82wtXG069
-	 iCZKKpMmf/NOlQvnVMdBCF/RtES+3hrgkOBf7/7J6gaJC1EZ2PiG4yQhYyQUlDqeCs
-	 wSQnBUxJ7Yxg2OeKST2ETre91Cz6FiJj02T+XOpa5/jcbiTzp4bXa6Cnp68kTZcIzs
-	 tt4CX7jSTURPw==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v19 4/7] firmware: arm_rmm: Add support for SRO
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Suzuki K Poulose" <suzuki.poulose@arm.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260924135201.850038-5-suzuki.poulose@arm.com>
-References: <20260924135201.850038-1-suzuki.poulose@arm.com>
- <20260924135201.850038-5-suzuki.poulose@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 24 Sep 2026 14:08:47 +0000
-Message-Id: <20260924140847.AFA411F000FF@smtp.kernel.org>
+	s=arc-20240116; t=1790259051; c=relaxed/simple;
+	bh=9TgDyFwJ+7DDH6AX96a9gn3Z9AGTUD/r7aNoQfYxkzw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kmXMF/VkL5ic2k8xY/pvP9AztbgccvS35Y0i7Ovdxg4WlwZeikri8kW/fayXtqfYLG3PKoMzGGaT8LQLiHzsGISLy7hI4Qt1OHiT0n0/+le2wHKoRV2WDHliasS82S9QjUrtVy/WQwR4Qo9+m9fucW0XiH3HoDWDao9kb4c/+Qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org; spf=pass smtp.mailfrom=8bytes.org; arc=none smtp.client-ip=85.214.250.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=8bytes.org
+Received: from 8bytes.org (p200300f6af404a00e4ccc4fdbbd66590.dip0.t-ipconnect.de [IPv6:2003:f6:af40:4a00:e4cc:c4fd:bbd6:6590])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.8bytes.org (Postfix) with ESMTPSA id 561341C7465;
+	Thu, 24 Sep 2026 16:10:47 +0200 (CEST)
+Date: Thu, 24 Sep 2026 16:10:46 +0200
+From: =?utf-8?B?SsO2cmcgUsO2ZGVs?= <joro@8bytes.org>
+To: James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, Tom Lendacky <thomas.lendacky@amd.com>, ashish.kalra@amd.com, 
+	michael.roth@amd.com, nsaenz@amazon.com, anelkz@amazon.de, 
+	Melody Wang <huibo.wang@amd.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kvmarm@lists.linux.dev, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, x86@kernel.org, 
+	coconut-svsm@lists.linux.dev, joerg.roedel@amd.com
+Subject: Re: [PATCH 35/60] kvm: Add VCPU plane-scheduling state and helpers
+Message-ID: <arUtYyK25eKQYY7j@8bytes.org>
+References: <20260608144252.351443-1-joro@8bytes.org>
+ <20260608144252.351443-36-joro@8bytes.org>
+ <e7eb0dba-790a-4644-9895-5c9a7420d7fe@redhat.com>
+ <aib8n5lO6HKbLC4Y@8bytes.org>
+ <CABgObfbUsDeStnZF-7oyR-W-Bvd4qTMoeUwGizgn10UTdKtZ2A@mail.gmail.com>
+ <aigE2EvJyZlYDz0V@8bytes.org>
+ <570f82e8b8bc968a31a4ba859145f6c324e41247.camel@HansenPartnership.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <570f82e8b8bc968a31a4ba859145f6c324e41247.camel@HansenPartnership.com>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] arm_rmm: SRO cancellation loop prematurely exits, leaving operatio=
-ns suspended
---
+Hi James,
 
-commit 95084224252b24a8efc8b9db3fa71d3058e8d228
-Author: Steven Price <steven.price@arm.com>
+On Fri, Jul 17, 2026 at 10:35:10AM -0400, James Bottomley wrote:
+> So this all depends how the planes are started.  If you're starting
+> them from an IGVM file that loads the most privileged code and then
+> runs the guest in a different plane, absolutely, it can work as you
+> describe.  However, the common use case for serviceable security
+> enclaves is you start the kernel first (necessarily in plane 0) and
+> then bring up the enclaves later which means the planes > 0 are
+> technically higher privilege since they're running hidden security
+> code.  HOWEVER, there's no reason at all to trust a security enclave
+> that's doing something like guarding private keys to be able to poke
+> anywhere it wants in the guest ... that's a security breach waiting to
+> happen, so it would really be better if the model were not
+> hierarchical, but more akin to the ability to seal planes off from each
+> other, so the kernel can start the enclave, which would then set itself
+> and the communication area up, but then the plane 0 kernel would remove
+> access to most memory from the enclave.
+> 
+> In this sealing model, there's no absolute privilege levels; each plane
+> would decide what the other planes can see of its memory space and, on
+> security grounds, we'd likely configure the enclaves to have the least
+> possible privilege.
+> 
+> Now, Windows applications expect VSM to be strictly hierarchical in
+> terms of privilege, but if we create a sealing primitive as described
+> above, we can get it to build the strict VSM privilege hierarchy in the
+> hyper-v driver.
 
-firmware: arm_rmm: Add support for SRO
-   =20
-RMM v2.0 introduces the concept of "Stateful RMI Operations" (SRO). This
-commit adds support for executing SROs, including donating and reclaiming
-memory dynamically as requested by the RMM. It also implements cancellation
-support for these operations.
+I mostly agree with this and have to say that my statement in the cover letter
+about plane hierarchies was a bit broad.
 
-> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rm=
-i.c
-> index c9ea964fd9081..035f21d3f26b6 100644
-> --- a/drivers/firmware/arm_rmm/rmi.c
-> +++ b/drivers/firmware/arm_rmm/rmi.c
+The main assumption this patch-set makes about plane 0 is that it is the plane
+which does the IRQ scheduling. Say a VM has Plane 0,1, and 2. A VCPU runs plane
+2 and KVM wants to inject an IRQ into plane 1 of that VCPU. Now KVM needs the
+VCPU to decide whether it wants to run plane 1 to handle the IRQ or continue
+with plane 2 because it currently has higher-priority work to do.
 
-[ ... ]
+This decision is made on plane 0 in this patch-set, which it needs to be for
+VMPLs. Does VSM have a similar concept for IRQ scheduling between VTLs or will
+the hypervisor take care to run a VTL when it has IRQs?
 
-> +		if (ret) {
-> +			/*
-> +			 * All memory donating SROs must be cancellable. So a
-> +			 * failure in memory allocation shouldn't be an issue.
-> +			 * However, if we encounter a random failure (e.g.,
-> +			 * buggy RMM), don't loop forever, just give up.
-> +			 */
-> +			if (WARN_ON_ONCE(!can_cancel))
-> +				return ret;
-> +			/*
-> +			 * If we have already cancelled, and came back here due
-> +			 * to an error in MEMREQ, then there is no point
-> +			 * in going in loops.
-> +			 */
-> +			if (WARN_ON_ONCE(cancelled))
-> +				break;
-> +			rmi_op_cancel(sro_handle, regs);
-> +			cancelled =3D true;
-> +
-> +			if (WARN_ON_ONCE(RMI_RESULT_STATUS(regs->a0) !=3D RMI_INCOMPLETE))
-> +				return ret;
 
-[Severity: High]
-Does this error path permanently leave the SRO suspended in the RMM?
-
-The commit message notes that after requesting cancellation, the host must
-still "continue the operation until it has completed (otherwise the incompl=
-ete
-operation may cause future RMM operations to fail)".
-
-However, when rmi_op_cancel() issues SMC_RMI_OP_CANCEL, it returns RMI_SUCC=
-ESS
-to acknowledge the cancel request, overwriting regs->a0. As a result,
-RMI_RESULT_STATUS(regs->a0) !=3D RMI_INCOMPLETE evaluates to true, triggeri=
-ng
-this WARN_ON_ONCE and causing an immediate return. The host fails to issue =
-the
-required SMC_RMI_OP_CONTINUE calls to drive the cancellation to completion.
-
-> +		}
-> +	}
-> +
-> +	if (cancelled)
-> +		return -ECANCELED;
-> +
-> +	return regs->a0;
-> +}
-> +EXPORT_SYMBOL_GPL(rmi_sro_memxfer_execute);
-
-[ ... ]
-
-> +long rmi_sro_execute(struct arm_smccc_1_2_regs *regs)
-> +{
-> +	bool cancelled =3D false;
-> +	unsigned long sro_handle =3D regs->a1;
-> +
-> +	rmi_smccc_invoke(regs);
-> +
-> +	sro_handle =3D regs->a1;
-> +	while (RMI_RESULT_STATUS(regs->a0) =3D=3D RMI_INCOMPLETE) {
-> +		bool can_cancel =3D RMI_RESULT_CAN_CANCEL(regs->a0) =3D=3D RMI_OP_CAN_=
-CANCEL;
-> +
-> +		switch (RMI_RESULT_MEMREQ(regs->a0)) {
-> +		case RMI_OP_MEM_REQ_NONE:
-> +			rmi_op_continue(sro_handle, RMI_CONTINUE_KEEP_GOING,
-> +					regs);
-> +			break;
-> +		default:
-> +			WARN_ON_ONCE(1);
-> +			if (!can_cancel)
-> +				return regs->a0;
-> +			/*
-> +			 * We can't get here normally, but handle this anyway
-> +			 * for a buggy RMM implementation.
-> +			 */
-> +			if (cancelled)
-> +				return -ECANCELED;
-> +			rmi_op_cancel(sro_handle, regs);
-> +			cancelled =3D true;
-> +		}
-> +	}
-
-[Severity: High]
-Does this loop terminate prematurely without continuing the cancelled SRO?
-
-Similar to rmi_sro_memxfer_execute() above, after rmi_op_cancel() updates
-regs->a0 to RMI_SUCCESS, the while loop condition
-(RMI_RESULT_STATUS(regs->a0) =3D=3D RMI_INCOMPLETE) evaluates to false. The
-function exits immediately without calling SMC_RMI_OP_CONTINUE to complete
-the cancellation.
-
-> +
-> +	if (cancelled)
-> +		return -ECANCELED;
-> +
-> +	return regs->a0;
-> +}
-> +EXPORT_SYMBOL_GPL(rmi_sro_execute);
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260924135201.8500=
-38-1-suzuki.poulose@arm.com?part=3D4
+-Joerg
