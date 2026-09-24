@@ -1,226 +1,236 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B763457E6D
-	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 10:22:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80D2E47255A;
+	Thu, 24 Sep 2026 10:22:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790245334; cv=none; b=uct/cmgLVi3X2Ygd4WkxaIjQ8CBV0qPaTZZoVF0S3p9wkUvrZWOQ8sV37yyPNnNGRi18jhPyojmUGx43SVo3PZngu50Lrh68pP33a/mzf4QBtdMuzhXFEqHJbjxOvaePH900RWbY7xnyRbEhtza4ashnaiubckqkS/x7i2z9UsI=
+	t=1790245342; cv=none; b=CSWHBXrJofu5Q9q6UwjWp/cjDpezTNFtn6x9iS6RFztIejDmXIfzwu5ADUJ8pgOAwH3Askao0lSNfhCf40lFKQuTgKOA3FV/t6iZV5ha0iasxyp6UbS+Bab/eQcHW+bIRLNpmNNIn3reBeHiSViTPQez8igmrHhJ/dag9+0K4NQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790245334; c=relaxed/simple;
-	bh=vXefGUv5PqK3RYCDK4oZNQUPoju384n9r7GEy10XmD0=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=Dw2PSOSwbxDxEHMGCorJ0dkN9TPeXB2BL2krg4w+5+IjVPnNnzVEIslPOmI/c/bYmraGzEDnMzDCD0QTRyV1Uj56aburXBPp+KlZhS+5C+f5wMhruia8cOpu5I/8MyLXODJQzcA9KjttSxR0zJBNMjpQnsACUooZNg2ZN41o82g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VtnUwN3h; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790245342; c=relaxed/simple;
+	bh=OEAvVEvSSYrtFac6frED2AShJLA9smPR3WlZU2YjXiA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sLk8ZWKAzosq6zgGp9i/GMBo2veFrjj6lUBk4PvN8FKoKl8p8Hzs6b8yiFAMOVFeLW3HV+Yi9ah2G5KDcSd7wpI+jUNfyTQ5RNUitkrjKAXskJ8CVgTIG7MeKFZVelWD/RSC2pu6kIBivC3TcL41GOLyytx5YNZfzODJp0QOInQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bK5oWCb3; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VtnUwN3h"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 429C41F00893;
-	Thu, 24 Sep 2026 10:22:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bK5oWCb3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75DC61F000FF;
+	Thu, 24 Sep 2026 10:21:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790245332;
-	bh=zKYx3kDRPb7Z8P9stq2bQ3C8P/z3NFTA0Vy7a1Abkrk=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=VtnUwN3hmlGtKm7aUuxUL0lihyN2yKK9BFg7UhHR0If8SGHk+6zFkxE2VsPR/unrS
-	 IVHVwv+c5Roz6HVtWGq+tXo7EcpThrSRndnF7cbgZhtKuh1mPOizDN5xamnLkME33O
-	 iWm7ptSXtxDiI+KYnWfx1dHn8CROqItmUwYT6aL+QkIdPRetCumMSlvtxImySq7h6a
-	 kLg43kTBDKVjpvll0/beXX3rlkOwGI17fEZu9CGt4rcU1wdanH7PiiRMk2HdWa5ag4
-	 1ATsqQK102l/HhxLpJRMcA5qjfHXL43W8G9oShYHVvS+R5YAl7n1PYfYBhULBZioRe
-	 pnjZjP4Uc5qPg==
-From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH v8 02/14] mm: Zero memory during shared memory
- transitions
-Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?QW5lZXNoIEt1bWFyIEsuViAoQXJtKQ==?= <aneesh.kumar@kernel.org>
-Cc: "Oliver Upton" <oupton@kernel.org>, media-ci@linuxtv.org, dri-devel@lists.freedesktop.org, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260924100529.1398790-3-aneesh.kumar@kernel.org>
-References: <20260924100529.1398790-1-aneesh.kumar@kernel.org>
- <20260924100529.1398790-3-aneesh.kumar@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 24 Sep 2026 10:22:11 +0000
-Message-Id: <20260924102212.429C41F00893@smtp.kernel.org>
+	s=k20260515; t=1790245340;
+	bh=/kufuYs8c40R6+aOEF8XLRCigB/kXlHZjyeo0hfMBwU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=bK5oWCb3icJZsdzewTtJXUj2g8+OdPY584wvobmFjH9caA6XHPZPOxLC+ENgAYis7
+	 FMWfW3kg0b1pKU0W7dpIcpkH9wgepYgd+Vs0xeodvPvhS2Z2eCR6zzIfxbc+F4vYn1
+	 crr7Q7r6oewUJpom74jt6mX2gF6IAipPmH/f96jRZvGrtuVNztKClju5BP2uHo6kW6
+	 734wktJAnH1jO9c7SkfE4BGx5XUqUo3nH1YffnP3W3u3mHAJ7/dU+/pRlEDaapTJOL
+	 hEriCB9vp3MVrONwH7vOYcoqLNO15CHvH8FuBJLz8aDKeueJxc7YfwK4KfyNmRNl7E
+	 8UCm0PUzGxdsg==
+Date: Thu, 24 Sep 2026 11:21:49 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Zi Yan <ziy@nvidia.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	"Liam R. Howlett" <liam@infradead.org>, Vlastimil Babka <vbabka@kernel.org>, 
+	Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
+	David Hildenbrand <david@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
+	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Baolin Wang <baolin.wang@linux.alibaba.com>, 
+	Nico Pache <nico.pache@linux.dev>, Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, 
+	Barry Song <baohua@kernel.org>, Lance Yang <lance.yang@linux.dev>, 
+	Usama Arif <usama.arif@linux.dev>, Kiryl Shutsemau <kas@kernel.org>, 
+	Doug Gilbert <dgilbert@interlog.com>, "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
+	"Martin K. Petersen" <mkp@kernel.org>, Jaya Kumar <jayalk@intworks.biz>, 
+	Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, Sebastian Reichel <sre@kernel.org>, 
+	John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
+	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
+	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
+	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
+	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
+	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
+	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev
+Subject: Re: [PATCH v3 24/40] mm/mlock: eliminate weird VMA_IO_BIT abuse and
+ simplify
+Message-ID: <arT3K71l86fUVldk@gremlin>
+References: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org>
+ <20260917-b4-mmap-prepare-vma-flag-sanify-v3-24-4583d8a23bca@kernel.org>
+ <93672B94-BB0C-4713-8F8A-3619D81DB7BB@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <93672B94-BB0C-4713-8F8A-3619D81DB7BB@nvidia.com>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [Critical] mm: ciphertext garbage in shared mappings due to zeroing in pr=
-epare callback
-- [High] hv: uninitialized kernel memory leaked on non-confidential VMs
+On Wed, Sep 23, 2026 at 04:06:14PM -0400, Zi Yan wrote:
+> On 17 Sep 2026, at 12:22, Lorenzo Stoakes (ARM) wrote:
+>
+> > When performing mlock() or munlock() otherwise normal VMAs have VMA_IO_BIT
+> > solely to fix a race with migration which might otherwise double-count
+> > mlock VMAs.
+> >
+> > This is unnecessary - at the point of applying folio mlock state, whether
+> > setting or clearing PG_mlocked, we know whether or not we are locking.
+> >
+> > Solve this in two ways - thread a boolean through the page table walk
+> > indicating whether a lock or unlock is being performed, and run a locking
+> > walk with VMA_LOCKONFAULT_BIT set and VMA_LOCKED_BIT cleared.
+> >
+> > This state never occurs otherwise, as VMA_LOCKONFAULT_BIT always implies
+> > VMA_LOCKED_BIT. These are also always cleared together.
+> >
+> > Then, update folio_add_lru_vma() and mlock_folio() to check only for
+> > VMA_LOCKED_BIT, and update try_to_unmap_one() to check for VMA_LOCKED_MASK
+> > instead.
+> >
+> > Also remove the useless invocation of allow_mlock_munlock() which simply
+> > returns true if unlocking and instead rename it to allow_mlock() and only
+> > call it when locking.
+> >
+> > Finally, with the other mlock abuse of VMA_IO_BIT addressed, update
+> > mlock_vma_folio() and folio_add_lru_vma() to simply test for
+> > VMA_LOCKED_BIT. munlock_vma_folio() tests VMA_LOCKED_MASK instead, as an
+> > unmap racing with the locking walk must still munlock folios the walk has
+> > already counted.
+> >
+> > While here, also replace some deprecated VMA flag predicates.
+> >
+> > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+> > ---
+> >  mm/folio.c    |  2 +-
+> >  mm/internal.h | 10 +++++++---
+> >  mm/mlock.c    | 51 +++++++++++++++++++--------------------------------
+> >  mm/rmap.c     |  4 +++-
+> >  4 files changed, 30 insertions(+), 37 deletions(-)
+> >
+> > diff --git a/mm/folio.c b/mm/folio.c
+> > index 47a437e0f7fd..35e242b48870 100644
+> > --- a/mm/folio.c
+> > +++ b/mm/folio.c
+> > @@ -505,7 +505,7 @@ void folio_add_lru_vma(struct folio *folio, struct vm_area_struct *vma)
+> >  {
+> >  	VM_BUG_ON_FOLIO(folio_test_lru(folio), folio);
+> >
+> > -	if (unlikely((vma->vm_flags & (VM_LOCKED | VM_SPECIAL)) == VM_LOCKED))
+> > +	if (vma_test(vma, VMA_LOCKED_BIT))
+>
+> I think it is worth documenting VMA_LOCKONFAULT_BIT alone means mlock in
+> progress, like you did in munlock_vma_folio(). Just to keep the protocol
+> explicit for all the readers.
+
+Well I'm not sure it's necessary here honestly, because this never checked
+VMA_LOCKED_MASK anyway, and VMA_LOCKONFAULT_BIT never made a difference.
+
+So the meaning of VMA_LOCKED_BIT here is strictly 'is it locked' and it's
+correctly handled.
+
+And I fear that it becomes whack-a-mole - the neat thing about this change is
+that you no longer have to special case the stupid VM_SPECIAL thing, and can in
+fact do the 'normal' thing of _just checking_ VMA_LOCKED_BIT :)
+
+So I think it's better not to.
+
+>
+> >  		mlock_new_folio(folio);
+> >  	else
+> >  		folio_add_lru(folio);
+> > diff --git a/mm/internal.h b/mm/internal.h
+> > index b2c6c9435021..84aa3e6c8bac 100644
+> > --- a/mm/internal.h
+> > +++ b/mm/internal.h
+> > @@ -971,8 +971,7 @@ void mlock_folio(struct folio *folio);
+> >  static inline void mlock_vma_folio(struct folio *folio,
+> >  				struct vm_area_struct *vma)
+> >  {
+> > -	/* The VM_IO check prevents migration from double-counting during mlock. */
+> > -	if (unlikely((vma->vm_flags & (VM_LOCKED|VM_SPECIAL)) == VM_LOCKED))
+> > +	if (vma_test(vma, VMA_LOCKED_BIT))
+>
+> Ditto.
+
+Similar reasoning to above.
+
+>
+> >  		mlock_folio(folio);
+> >  }
+> >
+> > @@ -989,7 +988,12 @@ static inline void munlock_vma_folio(struct folio *folio,
+> >  	 * always munlock the folio and page reclaim will correct it
+> >  	 * if it's wrong.
+> >  	 */
+> > -	if (unlikely(vma->vm_flags & VM_LOCKED))
+> > +	/*
+> > +	 * VMA_LOCKONFAULT_BIT alone marks an mlock walk in progress, see
+> > +	 * mlock_vma_pages_range(). An unmap racing with the walk must still
+> > +	 * munlock folios the walk has already counted.
+> > +	 */
+
+Here it's worth mentioning, as it's specifically relying on the new
+behaviour. Although it's neatly using the VMA_LOCKED_MASK to handle both the
+locked case and the 'being locked' case :)
+
+> > +	if (unlikely(vma_test_any_mask(vma, VMA_LOCKED_MASK)))
+> >  		munlock_folio(folio);
+> >  }
+> >
+>
+> Why I am commenting in the middle of the series? Because I am taking
+> a quiz given by LLM based on this series to get myself enough background
+> knowledge to review this series. This mlock part came up at part E
+> and I only have part F left before I can do the full review. :)
+
+Thanks! :) I really appreciate you taking the time to look at this! Sorry it's
+so large.
+
+I held this series back from last cycle to help with review load, then spent
+some time fixing various AI-discovered things, and all the patches are necessary
+(well for the most part) to get where the series needs to go.
+
+I think the change is worth it though!
+
+>
+> Best Regards,
+> Yan, Zi
+
 --
-
-commit 0b9cafc26c64a65c124d5f6d15281e2bb9c41b6e
-Author: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
-
-mm: Zero memory during shared memory transitions
-
-This commit makes zeroing an implicit property of set_memory_decrypted().
-Each architecture clears memory at a safe point in its transition, and
-redundant post-transition memset() calls are removed from standard allocato=
-rs.
-
-> diff --git a/arch/x86/coco/tdx/tdx.c b/arch/x86/coco/tdx/tdx.c
-> --- a/arch/x86/coco/tdx/tdx.c
-> +++ b/arch/x86/coco/tdx/tdx.c
-> @@ -978,6 +978,9 @@ static int tdx_enc_status_change_prepare(unsigned lon=
-g vaddr, int numpages,
->  					 bool enc)
->  {
-> +	if (!enc)
-> +		memset((void *)vaddr, 0, (size_t)numpages << PAGE_SHIFT);
-> +
-
-[Severity: Critical]
-Does this write encrypted zeroes into RAM? Because this memset() in
-tdx_enc_status_change_prepare() happens before the PTE encryption bit is
-cleared, writing zeroes through the encrypted mapping results in ciphertext
-being stored. When the mapping later transitions to shared, reading this
-memory will yield that raw ciphertext.
-
-[ ... ]
-
-> diff --git a/arch/x86/mm/mem_encrypt_amd.c b/arch/x86/mm/mem_encrypt_amd.c
-> --- a/arch/x86/mm/mem_encrypt_amd.c
-> +++ b/arch/x86/mm/mem_encrypt_amd.c
-> @@ -285,6 +286,9 @@ static void enc_dec_hypercall(unsigned long vaddr, un=
-signed long size, bool enc)
-> =20
->  static int amd_enc_status_change_prepare(unsigned long vaddr, int npages=
-, bool enc)
->  {
-> +	if (!enc)
-> +		memset((void *)vaddr, 0, (size_t)npages << PAGE_SHIFT);
-> +
-
-[Severity: Critical]
-Could amd_enc_status_change_prepare() suffer from the same ciphertext issue?
-Writing zeroes to the private encrypted mapping before the transition leaves
-ciphertext in RAM, which will appear as garbage once the page is mapped as
-decrypted and shared.
-
-[ ... ]
-
-> diff --git a/drivers/hv/hv.c b/drivers/hv/hv.c
-> --- a/drivers/hv/hv.c
-> +++ b/drivers/hv/hv.c
-> @@ -123,12 +123,13 @@ static int hv_alloc_page(void **page, bool decrypt,=
- const char *note)
->  	if (!*page)
->  		return -ENOMEM;
-> =20
-> -	if (decrypt)
-> +	if (decrypt) {
->  		ret =3D set_memory_decrypted((unsigned long)*page, 1);
-> -	if (ret)
-> -		goto failed;
-> -
-> -	memset(*page, 0, PAGE_SIZE);
-> +		if (ret)
-> +			goto failed;
-> +	} else {
-> +		memset(*page, 0, PAGE_SIZE);
-> +	}
->  	return 0;
-
-[Severity: High]
-Does hv_alloc_page() bypass memset() on non-confidential VMs? On standard
-VMs, decrypt can evaluate to true. set_memory_decrypted() is a no-op that
-returns 0 there, and since __get_free_page() doesn't use __GFP_ZERO, this
-path could return completely uninitialized kernel memory to the hypervisor.
-
-[ ... ]
-
-> diff --git a/drivers/hv/hv_common.c b/drivers/hv/hv_common.c
-> --- a/drivers/hv/hv_common.c
-> +++ b/drivers/hv/hv_common.c
-> @@ -505,8 +505,6 @@ int hv_common_cpu_init(unsigned int cpu)
->  				/* It may be unsafe to free 'mem' */
->  				return ret;
->  			}
-> -
-> -			memset(mem, 0x00, pgcount * HV_HYP_PAGE_SIZE);
->  		}
-
-[Severity: High]
-Could hv_common_cpu_init() leak uninitialized memory here? The
-kmalloc_array() allocation above doesn't use __GFP_ZERO, so removing this
-memset() leaves the hypercall input/output page uninitialized on standard
-VMs.
-
-[ ... ]
-
-> diff --git a/kernel/dma/direct.c b/kernel/dma/direct.c
-> --- a/kernel/dma/direct.c
-> +++ b/kernel/dma/direct.c
-> @@ -324,7 +324,9 @@ void *dma_direct_alloc(struct device *dev, size_t siz=
-e,
->  		cpu_addr =3D page_address(page);
->  	}
-> =20
-> -	memset(cpu_addr, 0, size);
-> +	/* Zero after remapping because the page may be in HighMem. */
-> +	if (!mark_mem_decrypt)
-> +		memset(cpu_addr, 0, size);
-> =20
->  	if (set_uncached) {
-
-[Severity: Critical]
-Is it safe to bypass this memset() for shared CC memory in
-dma_direct_alloc()? Since the memset() inside the x86 prepare callbacks
-leaves ciphertext in memory, skipping the post-transition zeroing here means
-we will return garbage-filled memory to callers expecting clean DMA buffers.
-
-[ ... ]
-
-> @@ -457,11 +463,13 @@ struct page *dma_direct_alloc_pages(struct device *=
-dev, size_t size,
->  		return NULL;
-> =20
->  	cpu_addr =3D page_address(page);
-> -	if ((attrs & __DMA_ATTR_ALLOC_CC_SHARED) &&
-> -	    dma_set_decrypted(dev, cpu_addr, size))
-> -		goto out_leak_pages;
->  setup_page:
-> -	memset(cpu_addr, 0, size);
-> +	if (mark_mem_decrypt) {
-> +		if (dma_set_decrypted(dev, cpu_addr, size))
-> +			goto out_leak_pages;
-> +	} else {
-> +		memset(cpu_addr, 0, size);
-> +	}
->  	*dma_handle =3D phys_to_dma_direct(dev, page_to_phys(page),
->  					 attrs & __DMA_ATTR_ALLOC_CC_SHARED);
-
-[Severity: Critical]
-Does skipping the zeroing here in dma_direct_alloc_pages() for
-mark_mem_decrypt also expose callers to raw ciphertext in the returned
-buffer?
-
-[ ... ]
-
-> diff --git a/mm/cc_shared.c b/mm/cc_shared.c
-> --- a/mm/cc_shared.c
-> +++ b/mm/cc_shared.c
-> @@ -137,9 +137,6 @@ static int __alloc_cc_shared_pages_node(int nid, gfp_=
-t gfp,
->  		return ret;
->  	}
-> =20
-> -	if (zero)
-> -		memset(page_address(page), 0, layout.shared_size);
-> -
->  	mem->page =3D page;
->  	mem->shared_size =3D layout.shared_size;
-
-[Severity: Critical]
-Can removing this memset() cause __alloc_cc_shared_pages_node() to return
-memory containing ciphertext? Callers expecting zeroed memory will receive
-garbage instead.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260924100529.1398=
-790-1-aneesh.kumar@kernel.org?part=3D2
+Cheers, Lorenzo
