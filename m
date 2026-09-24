@@ -1,192 +1,80 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-51.mta0.migadu.com [91.218.175.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CD354A386D;
-	Thu, 24 Sep 2026 18:07:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A9B4078CC
+	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 18:19:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790273241; cv=none; b=bXQZLAjN9qkbmQgpH9Z9DWx+/rQ+3/4McnbR+KplQE/LThbv5Hvxc6oxMpkWBrpbGIeG4kS7yBBqoK59Mm+1YuBuAzwKOgMik1TnOWL8UrkILF1fHhuJYUoJIPMcO5RaEQbT/WAstlHutnj/dUcLCM8RLu/lGeCfyYzC9jOVK50=
+	t=1790273965; cv=none; b=b+s62ycZGzmR6KxMvhyJl+ST03y2fKqSb8/rKuO1vtsgAHGh4dN/gobbhb+if9m+55KjUd1AMio9GAaxAfryXFWnooPjusq8JRVlHiHQuZy0Ow7h/eGDrCtZnek9PFHfXiy18R2XX+LvCK2u7oGvF07WhXWfwEvaXw9z/ldz+rw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790273241; c=relaxed/simple;
-	bh=QTADa+FhIxUlxG6MXI1foJIul5G3DiJBAFn/qjY0HNw=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=CS8t2x3AS1B7Zvb5nvmkiNJjVneKJnKSDxS7TUtGYd+L6f2SSyjU8DWv7mJWpy7ZfxmTO1/dycxbMU0cjUPfwnkfkzQOOBU89/n6Ga1EGdhBGH3Ry455lMos9WuZ38Yk5R6aOuUTeCKfeWpsr/1llPZHWWHYUL6UbDWx/fuYtqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nl0xuJIT; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790273965; c=relaxed/simple;
+	bh=IvUR2431T4OLwHWTHJUJSLYNuzeAJuOHiFRGzJguyA8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nQ6eQg5lDnZRqC+sqkCoXzCmDjtY/ONX+BH4CmqYYn+TsY3YgDMH36z6DCGmj7Pg+J1L5FxaY292ftGFc4BgmvSNqWwo8XX812vHIS3icH5/B4prpY8SmEafcsnDeXE5FYuvvA8CJ+gQHwCbYKRAfXwro8He7sRhwwrdG14jG28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=teN5b8t9; arc=none smtp.client-ip=91.218.175.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nl0xuJIT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93DF81F000FF;
-	Thu, 24 Sep 2026 18:07:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790273240;
-	bh=g/EOuW3OQyQk+/jztAPPOuiWKoxO/McPBzlGeSgrEOQ=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Nl0xuJITVygldgfdyf706DX7nG34pg7uHEwKUBL6eKWKzVisoJQ90dmp3FHsVO4Pv
-	 Ulz+2HwOvhixfCWyCO2d+jR59xj3hlxAYZS4umURLi24t0WM+gV4gk5pZW/fesywrA
-	 gxYv/84vy6ieduqwGtqEtw/8u9JsPQFYRkhnTQ7HN6OJSVGl/cYGAAZFjdR/ib2Qpw
-	 +H38B+OqtJxAx7Sle5n2/0l3YJmPIMZq/gAlIUc8zUgM3TBhwGwAKuK5zOreqdxXuE
-	 PQWDXE4QfscEaeu5u3aPrOg+4+9ZbMJdH+5bIzTACv8i9L5eDC/gGNP00AzDn+Zz7z
-	 NWrC42d/u6Upg==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v9 19/22] KVM: arm64: Detect overflows for the
- Partitioned PMU
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Colton Lewis" <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver
- Upton" <oupton@kernel.org>, linux-perf-users@vger.kernel.org
-In-Reply-To: <20260924172928.2110956-20-coltonlewis@google.com>
-References: <20260924172928.2110956-1-coltonlewis@google.com>
- <20260924172928.2110956-20-coltonlewis@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 24 Sep 2026 18:07:19 +0000
-Message-Id: <20260924180719.93DF81F000FF@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="teN5b8t9"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=IvUR2431T4OLwHWTHJUJSLYNuzeAJuOHiFRGzJguyA8=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1790273960; v=1; x=1790878760;
+ b=teN5b8t9bKbTUQ3Lj30hIJgvaD0bf+Ce8XzvZ/BHc0exHNHnNPcepAb1TpvRp+7xdyXe3qqZ
+ SR8+78GPwvWvbAueVDPu+FfMJ2h4uFMZmWrLawh+YYfM7grWVhSX+dXe1hLwQ/6JZGXOcy9RO7L
+ WsMqE7GiDtBV3nubUms/VtFo=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 2b9a23ca893f4a86;
+	Thu, 24 Sep 2026 18:19:20 +0000
+X-Mizu-Trace-ID: 2b9a23ca893f4a86
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5b83c1421ecso974e87.1
+        for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 11:19:20 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBxbUKvGKzJCjuS/wbxM9x4X5xgtNly81h/0cB/RA8zh7BFaP9NoBtTkzuuq9yP5uYEoEZ4+7EM=@lists.linux.dev
+X-Gm-Message-State: AFuF++lCj3Rd4HVbDD9FyyBoBxAfDOmpPQF+33yqEGN920TWW8yfRcAN
+	Y3kjzwvfiEaKiszwV7EJ0wz5BG1NP1YkEmaEESiUb62VmLd4PbxmyVRN9QUkFL9QQLQKdZNB/OM
+	jgZkIp+R4kbM80XoylprmOA/aePzKuEIeTurbFRsZ
+X-Received: by 2002:a05:6512:3ca9:b0:5b8:e262:d32e with SMTP id
+ 2adb3069b0e04-5b8e57821dcmr16882e87.1.1790273959309; Thu, 24 Sep 2026
+ 11:19:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+References: <20260922071945.693714-1-fuad.tabba@linux.dev> <20260922071945.693714-2-fuad.tabba@linux.dev>
+ <arVQutV75u2gGVr4@google.com>
+In-Reply-To: <arVQutV75u2gGVr4@google.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Thu, 24 Sep 2026 19:18:43 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTz=n2Tnq73amL3cok0=_vn-cigesdd1r-emt=+__Xatog@mail.gmail.com>
+X-Gm-Features: AclHuK8gQuMnh5G0uSWpcfUI1aukInqrdbq0WmB1N5HLh0hWNnycc7FfERA0vUQ
+Message-ID: <CA+EHjTz=n2Tnq73amL3cok0=_vn-cigesdd1r-emt=+__Xatog@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] KVM: selftests: Fix arm64 sysreg header dependencies
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Oliver Upton <oupton@kernel.org>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	=?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
+	James Houghton <jthoughton@google.com>, Will Deacon <will@kernel.org>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, cgroups@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
-s) to consider:
-- [Critical] kvm: arm64: PMU partition clears hardware PMOVSSET_EL0 without=
- restore
-- [High] kvm: arm64: Data race in PMOVSSET_EL0 update against NMI handler
-- [Medium] kvm: arm64: kvm_pmu_should_notify_user() indirectly alters hardw=
-are PMU state
---
+Hi Sean,
 
-commit ff8f6a7646a20c591702abbe44679f3e9bd4462d
-Author: Colton Lewis <coltonlewis@google.com>
+On Thu, 24 Sep 2026 17:32:58 +0100, Sean Christopherson
+<seanjc@google.com> wrote:
+[...]
+> Definitely doesn't have to be now, but at some point should we split out some of
+> this arch-specific sub-Makefiles?  It's nice not having to hunt around to figure
+> out which tests are supported by which arch, but the amount of arch specific goo
+> we're accruing is getting unwieldy.
 
-KVM: arm64: Detect overflows for the Partitioned PMU
+I think so. I'd keep the test lists where they are and move the
+per-arch build logic (the ifeq ($(ARCH),...) blocks) into arch-specific
+sub-Makefiles. I could send that as a follow-up once this patch lands.
 
-When re-entering the VM or synchronizing PMU state after a guest counter
-overflow interrupt, evaluate whether any enabled and unmasked guest
-counter has overflowed and update the virtual PMU interrupt level in
-the vGIC accordingly.
-
-> diff --git a/arch/arm64/kvm/pmu-direct.c b/arch/arm64/kvm/pmu-direct.c
-> --- a/arch/arm64/kvm/pmu-direct.c
-> +++ b/arch/arm64/kvm/pmu-direct.c
-
-[ ... ]
-
-> @@ -534,6 +534,61 @@ void kvm_pmu_handle_guest_irq(u64 pmovsr)
-> =20
->  	for_each_set_bit(i, (unsigned long *)&govf, 64)
->  		set_bit(i, (unsigned long *)__ctxt_sys_reg(&vcpu->arch.ctxt, PMOVSSET_=
-EL0));
-> +
-> +	if (kvm_pmu_part_overflow_status(vcpu)) {
-> +		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
-> +
-> +		if (!in_nmi())
-> +			kvm_vcpu_kick(vcpu);
-> +		else
-> +			irq_work_queue(&vcpu->arch.pmu.overflow_work);
-> +	}
-> +}
-> +
-> +/**
-> + * kvm_pmu_part_overflow_status() - Determine if any guest counters have=
- overflowed
-[ ... ]
-> +bool kvm_pmu_part_overflow_status(struct kvm_vcpu *vcpu)
-> +{
-> +	u64 mask =3D kvm_vcpu_pmu_guest_counter_mask(vcpu);
-> +	u64 pmovs, pmint, pmcr;
-> +	unsigned long flags;
-> +	bool overflow;
-> +
-> +	local_irq_save(flags);
-> +	if (vcpu->arch.pmu.loaded_on_cpu &&
-> +	    vcpu =3D=3D kvm_get_running_vcpu()) {
-> +		u64 hw_ovf =3D read_sysreg(pmovsset_el0) & mask;
-> +
-> +		if (hw_ovf) {
-> +			__vcpu_rmw_sys_reg(vcpu, PMOVSSET_EL0, |=3D, hw_ovf);
-
-[Severity: High]
-Is this non-atomic update vulnerable to a race with pseudo-NMIs?
-
-Since local_irq_save() does not mask pseudo-NMIs on ARM64, the PMU interrupt
-can fire as an NMI and invoke kvm_pmu_handle_guest_irq(), which updates this
-exact software state using an atomic set_bit().
-
-When the NMI returns, this interrupted non-atomic read-modify-write
-operation will complete and could silently overwrite the NMI handler's
-updates, resulting in lost interrupts and corrupted hardware state.
-
-> +			write_sysreg(hw_ovf, pmovsclr_el0);
-
-[Severity: Critical]
-Does this break the guest's ability to read the overflow bit?
-
-The hardware overflow register is cleared here and the state is saved to the
-software context, but the canonical software state is never written back to
-the hardware before the guest accesses it directly.
-
-Because the partitioned PMU grants the guest direct, untrapped EL0/EL1
-access to PMOVSSET_EL0 for its assigned counters, failing to restore this
-will cause the guest to read a cleared hardware register (a 0 value) upon
-resuming execution, permanently breaking its ability to identify which
-counter overflowed.
-
-> +		}
-> +		pmint =3D read_pmintenset();
-> +		pmcr =3D read_pmcr();
-> +	} else {
-> +		pmint =3D __vcpu_sys_reg(vcpu, PMINTENSET_EL1);
-> +		pmcr =3D __vcpu_sys_reg(vcpu, PMCR_EL0);
-> +	}
-> +
-> +	pmovs =3D __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
-> +	local_irq_restore(flags);
-> +
-> +	overflow =3D (pmcr & ARMV8_PMU_PMCR_E) && (mask & pmovs & pmint);
-> +
-> +	if (overflow && kvm_pmu_get_access(vcpu) =3D=3D VCPU_PMU_ACCESS_FREE)
-> +		kvm_pmu_set_guest_owned(vcpu);
-> +
-> +	return overflow;
->  }
-
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-
-[ ... ]
-
-> @@ -296,8 +296,14 @@ bool kvm_pmu_should_notify_user(struct kvm_vcpu *vcp=
-u)
->  {
->  	struct kvm_sync_regs *sregs =3D &vcpu->run->s.regs;
->  	bool run_level =3D sregs->device_irq_level & KVM_ARM_DEV_PMU;
-> +	bool overflow;
-> =20
-> -	return kvm_pmu_overflow_status(vcpu) !=3D run_level;
-> +	if (kvm_pmu_is_partitioned(vcpu->kvm))
-> +		overflow =3D kvm_pmu_part_overflow_status(vcpu);
-
-[Severity: Medium]
-Does this call introduce hardware-altering side effects into a runnable
-status predicate?
-
-kvm_arch_vcpu_runnable() evaluates kvm_pmu_should_notify_user() in sleep
-polling loops (like kvm_vcpu_block). However, kvm_pmu_part_overflow_status()
-conditionally transitions PMU access to VCPU_PMU_ACCESS_GUEST_OWNED and
-invokes kvm_pmu_load(), forcing hardware register writes from a pure getter.
-
-Triggering hardware reprogramming inside waitqueue checks violates
-architectural layering and could introduce latency or synchronization issue=
-s.
-
-> +	else
-> +		overflow =3D kvm_pmu_emul_overflow_status(vcpu);
-> +
-> +	return overflow !=3D run_level;
->  }
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260924172928.2110=
-956-1-coltonlewis@google.com?part=3D19
+Cheers,
+/fuad
