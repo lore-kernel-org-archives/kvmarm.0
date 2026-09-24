@@ -1,190 +1,159 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817CB3AFB06;
-	Thu, 24 Sep 2026 14:22:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DBC0488226;
+	Thu, 24 Sep 2026 15:11:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790259773; cv=none; b=RZlscYeR+eyHxXxpEWsPmJw7QaFCE9toUo5jQzPAlEumK++okEcUxDzNqH3xmVFpxs7DLUMKM/HnZYqs+sGd2T5R5XdeCo4RFJ3NWESRE8Vso1NgyxlezacsRZjn9ud04J95an0SQvGDMt9O5p1X8PfPfrnN6YNxYdHM3G5GUCg=
+	t=1790262701; cv=none; b=Zjo2u5hNcnVtV5cOemqQVQQyEM9gHx/JQCD6zspLS2v00YGW7l5sZwjFwoCq84vBomqe+mALGyz1DJQRRnTc0hcew7LWhip75MhRUSe4Rk/HL+f+38P5IMwvZY2LiTnRbtMUa2tELybkfy1KYCqaMufICnJNFMAlY2CNMG0okoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790259773; c=relaxed/simple;
-	bh=HcgilLYHpxyoqmigxbps8RHK8zFGBv5PTxUhVX50ys0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=WtINspKq0OWtNeUyJOekEX8J7EiC9xSjaDQo7O9t4sbbsR62cxxcDom3gInb9QKzJjg2sCZED+C1Lm2QJt2aMj9+r2/ME8etaPUd8NGCq2hExMeM70YMFkWRiL6XBYihgyU70Cjpaywaz2SWcyUfM9jsByqz93EPoZdd/beRXJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iJLjQ+z3; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790262701; c=relaxed/simple;
+	bh=q4dWjwb38KokSVbUsb7YtW3icmXBs3RfGPuSgIZBYkk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kTyP8Ets/hy3np+q5V8FJmo299Vq6yVd0Uuaf1tts8Aj2ibZLt5naFbPAOPN2J2babW4bkS/juxpfgBuIuG2r/Vr3FCsQDL9kD0jEJETNYngl8UbQ3ChY6qUqi5pAcf5nsHDvl3NkoOWUJ4FhJOst+40paFEW72Ghv7gKmXzQOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=tHEAz0nD; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iJLjQ+z3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3F791F000FF;
-	Thu, 24 Sep 2026 14:22:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790259766;
-	bh=j5t8Z8t0hCyzALZcT8Uztk064hS1Vk/1yGtt+yian+I=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=iJLjQ+z3yyBT7V5gaptAQEHSv7FTz/FXSmqHiO42Xo42m/OKfDyHmm/iO9/9MUoSs
-	 J45fM7pL+Ot6+gX1Fpq48VbXjG4uXEU5cnrLrh5SH0tZbo+e0bpeH2oMr0dwc47jdq
-	 GZPtGzBbdsMj7b49J6R7n83Ug9s3KMqW8ssG7BX1SWji3S5NxFM9gme2Zcc130wqCx
-	 d8EiTZh/xomFPqCEEoOQ8Rn5bCnqjDAcLE/538AMBOIHAx3UnOVpnBVjhdHZVeQIIN
-	 +pVqoAgWP4vIhy4oIPBBsj7Kuwax8eDlSOP9d2FsbWpNMcZGyepNsrl72ahyUqgj8W
-	 e7rQ7140vEEiQ==
-X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: dri-devel@lists.freedesktop.org, media-ci@linuxtv.org,
-	Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: [RFC PATCH v8 01/14] mm: Add an allocator for CoCo shared memory
-In-Reply-To: <20260924101907.5C6261F000FF@smtp.kernel.org>
-References: <20260924100529.1398790-1-aneesh.kumar@kernel.org>
- <20260924100529.1398790-2-aneesh.kumar@kernel.org>
- <20260924101907.5C6261F000FF@smtp.kernel.org>
-Date: Thu, 24 Sep 2026 19:52:39 +0530
-Message-ID: <yq5a1pai4tlc.fsf@kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="tHEAz0nD"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 75C14143D;
+	Thu, 24 Sep 2026 08:11:34 -0700 (PDT)
+Received: from [10.57.10.88] (unknown [10.57.10.88])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5DE283F86F;
+	Thu, 24 Sep 2026 08:11:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790262697; bh=q4dWjwb38KokSVbUsb7YtW3icmXBs3RfGPuSgIZBYkk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=tHEAz0nDfxc56wS5hf0Vt2Q2mTH8C6sHybp9ZwdNQm4rqxk1mvxEl6g+DFjIf6FHu
+	 uUfK/9S1p0ML8R4x55nfK0h6h4u7OaVDDRBuLOIrl2EaIzIQWS0FK47KJ5Scs1PVI9
+	 uSTJeFmVO99K2qa7/0cwwlDghVVDqOyJ9p/h4ShE=
+Message-ID: <5f7dfa2a-b4f4-49ce-828d-60d799769bf9@arm.com>
+Date: Thu, 24 Sep 2026 16:11:30 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 09/20] KVM: arm64: Add VM specific callback for S2 MMU
+ operations
+Content-Language: en-GB
+To: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+ will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+References: <20260920212845.707-1-suzuki.poulose@arm.com>
+ <20260920212845.707-10-suzuki.poulose@arm.com>
+ <20260922152914.00001221@oss.qualcomm.com>
+ <0d5201f0-359e-4748-92da-946dedf51bcf@arm.com>
+ <20260923095443.0000378c@oss.qualcomm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20260923095443.0000378c@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-sashiko-bot@kernel.org writes:
+On 23/09/2026 17:54, Jonathan Cameron wrote:
+> On Wed, 23 Sep 2026 00:21:58 +0100
+> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+> 
+>> On 22/09/2026 23:29, Jonathan Cameron wrote:
+>>> On Sun, 20 Sep 2026 22:28:34 +0100
+>>> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+>>>    
+>>>> Add VM type specific S2 MMU operation backends which can be initialized per
+>>>> VM flavor, to keep the handling cleaner.
+>>>>
+>>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>
+>>> A small suggestion inline that makes it explicit when there isn't
+>>> range operation and a full flush of tlb is needed.
+>>>
+>>> I don't mind either way, but thought I'd mention it anyway in case
+>>> you hadn't already dismissed it.
+>>>
+>>> Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+>>>
+>>>    
+>>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>>> index 03f2017a7404a..d97a4a1bca23f 100644
+>>>> --- a/arch/arm64/kvm/mmu.c
+>>>> +++ b/arch/arm64/kvm/mmu.c
+>>>> @@ -37,6 +37,8 @@ static unsigned long __ro_after_init io_map_base;
+>>>>    
+>>>>    #define KVM_PGT_FN(fn)		(!is_protected_kvm_enabled() ? fn : p ## fn)
+>>>>      
+>>>    
+>>>>    /**
+>>>>     * kvm_arch_flush_remote_tlbs() - flush all VM TLB entries for v7/8
+>>>>     * @kvm:	pointer to kvm structure.
+>>>> @@ -174,26 +188,36 @@ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
+>>>>     */
+>>>>    int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
+>>>>    {
+>>>> -	if (is_protected_kvm_enabled())
+>>>> -		kvm_call_hyp_nvhe(__pkvm_tlb_flush_vmid, kvm->arch.pkvm.handle);
+>>>> -	else
+>>>> -		kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
+>>>> -	return 0;
+>>>> +	if (!kvm->arch.vm_s2_ops->vm_flush_remote_tlbs)
+>>>> +		return 1;
+>>>
+>>> For consistency with other cases and because it looks nicer
+>>> blank line here.
+>>
+>> Ack
+>>
+>>>    
+>>>> +	return kvm->arch.vm_s2_ops->vm_flush_remote_tlbs(kvm);
+>>>>    }
+>>>>    
+>>>> -int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
+>>>> -				      gfn_t gfn, u64 nr_pages)
+>>>> +static int pkvm_flush_remote_tlbs_range(struct kvm *kvm,
+>>>> +					gfn_t gfn, u64 nr_pages)
+>>>> +{
+>>>> +	return pkvm_flush_remote_tlbs(kvm);
+>>>
+>>> For the cases where there isn't a range call, perhaps you should just
+>>> not provide the op and have the wrapper fall back to
+>>> calling the 'flush all' variant if there is no range one available?
+>>
+>> The core KVM falls back to flushing all TLBs if the range one
+>> returns true anyways. So, I would leave it as it is.
+> 
+> That sounds like a reason to stub them to return true always rather
+> than call the flush all so we don't have fallbacks added at two
+> layers of the stack?
 
-> Thank you for your contribution! Sashiko AI review found 3 potential issue(s) to consider:
-> - [High] mm: alloc_cc_shared_pages_node fails to strip __GFP_MOVABLE
-> - [Medium] mm: alloc_cc_shared_pages_node fails to strip __GFP_HIGHMEM in fallback path
-> - [Medium] mm: cc_make_shared and cc_make_private are not exported for modular callers
-> --
->
-> commit 3978c8ce72bbc2aa23e57a460b585808665262a4
-> Author: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
-> mm: Add an allocator for CoCo shared memory
->
-> This commit introduces a common allocator for confidential-computing guests
-> to allocate shared memory. It provides helpers to allocate properly aligned
-> contiguous pages and transition them to shared state. It also adds helpers
-> for transitioning memory states when callers manage their own backing memory.
->
->> diff --git a/mm/cc_shared.c b/mm/cc_shared.c
->> new file mode 100644
->> index 0000000000000..85e16f4504b8f
->> --- /dev/null
->> +++ b/mm/cc_shared.c
-> [ ... ]
->> +int cc_make_shared(void *addr, size_t size)
->> +{
->> +	int ret = cc_validate_transition(addr, size);
->> +
->> +	if (ret)
->> +		return ret;
->> +
->> +	return set_memory_decrypted((unsigned long)addr, size >> PAGE_SHIFT);
->> +}
->
-> [Severity: Medium]
-> Will this function be unavailable to dynamically loadable modules since it
-> is missing an EXPORT_SYMBOL_GPL() macro?
->
-> The commit message states it should be usable by callers managing their own
-> backing memory, but virtio or guest drivers won't be able to link to it
-> without an export.
->
->> +
->> +int cc_make_private(void *addr, size_t size)
->> +{
->> +	int ret = cc_validate_transition(addr, size);
->> +
->> +	if (ret)
->> +		return ret;
->> +
->> +	return set_memory_encrypted((unsigned long)addr, size >> PAGE_SHIFT);
->> +}
->
-> [Severity: Medium]
-> Does this function also need an EXPORT_SYMBOL_GPL() macro so that modules
-> can successfully link and call it?
->
+But that doesn't help, as the only one that matters is pKVM, which
+handles this anyway. If tlbs_range is not available, then the
+all tlbs call back also return the same value. So, the core is
+anyway going to call the full version anyways.
+
+So I have left it as it is. A sensible backend could do
+something like the pKVM does.
+
+Cheers
+Suzuki
 
 
-I guess we don't want the cc_make_shared() and cc_make_private() APIs to be
-called by modules. Modules that need CoCo shared memory should use
-alloc_cc_shared_pages().
 
+> 
+>>
+>> Cheers
+>> Suzuki
+>>
+>>
+>>>    
+>>>> +}
+>>>
+>>>    
+>>
+> 
+> 
 
->
-> [ ... ]
->> +static int __alloc_cc_shared_pages_node(int nid, gfp_t gfp,
->> +					size_t requested,
->> +					struct cc_shared_pages *mem)
->> +{
-> [ ... ]
->> +	/*
->> +	 * State transitions require a linear-map address and may modify memory.
->> +	 * Allocate from low memory and defer requested zeroing until afterwards.
->> +	 */
->> +	gfp &= ~(__GFP_HIGHMEM | __GFP_ZERO);
->
-> [Severity: High]
-> Does this code inadvertently leave __GFP_MOVABLE intact if passed by the
-> caller?
->
-> Pages are returned as shared memory, but they lack migration hooks
-> (movable_operations) to handle encryption state transitions during page
-> migration.
->
-> If a caller passes __GFP_MOVABLE, the page might be placed in ZONE_MOVABLE.
-> Since the kernel migration code does not know how to handle encryption state
-> transitions, the page cannot be safely migrated. Could this permanently pin
-> the movable zone, thereby breaking memory hot-unplug and compaction?
->
-
-I don't think we want CoCo shared memory allocations to be movable, but
-I'm also not sure whether we should filter out all of these GFP flags.
-
->
->> +	if (nid == NUMA_NO_NODE)
->> +		page = alloc_pages(gfp, order);
-> [ ... ]
->> +int alloc_cc_shared_pages_node(int nid, gfp_t gfp,
->> +			       size_t requested,
->> +			       struct cc_shared_pages *mem)
->> +{
-> [ ... ]
->> +	if (cc_platform_has(CC_ATTR_MEM_ENCRYPT))
->> +		return __alloc_cc_shared_pages_node(nid, gfp, requested, mem);
->> +
->> +	order = get_order(requested);
->> +	if (order > MAX_PAGE_ORDER)
->> +		return -EINVAL;
->> +
->> +	if (nid == NUMA_NO_NODE)
->> +		page = alloc_pages(gfp, order);
->> +	else
->> +		page = alloc_pages_node(nid, gfp, order);
->
-> [Severity: Medium]
-> Can this fallback path inadvertently allocate a highmem page?
->
-> The function's kernel-doc explicitly guarantees: "A memory-state transition
-> requires a valid linear-map address, so such allocations never come from
-> high memory".
->
-
-Only when a private-to-shared transition is required.
-
->
-> In the non-encrypted fallback path, the caller's unmodified gfp flags
-> (potentially containing __GFP_HIGHMEM) are passed directly to alloc_pages()
-> or alloc_pages_node() without any masking.
->
-> If a caller passes a flag mask containing __GFP_HIGHMEM (e.g., GFP_HIGHUSER)
-> on a system without memory encryption, the fallback path will allocate a
-> highmem page. Any subsequent attempt by the caller to access the memory via
-> page_address() could return NULL and cause a crash, breaking the API
-> contract. Should the gfp flags be sanitized in this path as well?
->
-
-From the allocation API's perspective, both GFP flags are supported. The
-only restriction is that memory cannot come from highmem when the
-allocation requires a private-to-shared transition.
-
--aneesh
