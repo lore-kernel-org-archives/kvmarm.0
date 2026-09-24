@@ -1,130 +1,133 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51BE13A9DBE;
-	Thu, 24 Sep 2026 22:16:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA073BFE3B;
+	Thu, 24 Sep 2026 22:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790288165; cv=none; b=iz7e2zPSp3uX6qUpA4MlRpO2iq2Js+h27KACrxKg8VZ12yZxIp8jsLN7LngHk+oxfU+f+ok5gX/RE2ugdq/kK8AVcJFpSI8ahhrtalVpJVOqiFlJnewkLcpoeA852789s2CEDIckgLO+HoqrFMRG1NCODDPAwkzwxi6/LA4JzxU=
+	t=1790288963; cv=none; b=I0rgtNxh6yuznoWL0wiT8qQQAl4ZZ7fsivIG7TEjmdfCkSmhUbI9gs0ozMCXu4DjmKqIHLe1fGSap2nRuAFU6G14c6+aRXHPXoSUyd0x9wWO0iEYTcFwmuEBRNeUn2ZhkTsBtx+5aMiZSA+vHzuPewyw/5wLzGKm/bgHBsXXa+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790288165; c=relaxed/simple;
-	bh=w55oFxyasq/JaOo+eWuI/wiOSjEK/BHz20zexwH7QsQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RsS38oIQ9O88t0149+GjJ/pBTgwnt+XHF786PSIYUCpk9EcL3vDmBwJmDgfqfJyHxamtvSg5HD584DYzlkhmr7WXwqk5UDUlRG+eVgT2BwoPrvmgShdKPbhZZYGaKmiiqK/d7sRZ1ZrZpy3sYEfrbO+FpyVCzbxtkLiHtaq9WTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=M/IB9ZOe; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1790288963; c=relaxed/simple;
+	bh=G0VbTNBezTrnJ+kACz3WLvngr1Xlvbi/75cjXrI/Buc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XH31PcodDpgClG5jqNI5AQPsbRkcEzSJWDWVRYVyA9nZ2MqwmU8iBeBNSwNcjHmu1DNwtBoyGcgLCK10i3FBMm7fbT0Csu1ZTqbEvmC445LXlv/PEWES8MYsh8FUzJn/uHIg1ihaLZl+a2pVDrWTpFnmraweEFr0O35/HFNHDKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cm9MLLdM; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="M/IB9ZOe"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DAC5F1E5E;
-	Thu, 24 Sep 2026 15:15:55 -0700 (PDT)
-Received: from [10.57.10.88] (unknown [10.57.10.88])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B9B93F86F;
-	Thu, 24 Sep 2026 15:15:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790288159; bh=w55oFxyasq/JaOo+eWuI/wiOSjEK/BHz20zexwH7QsQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=M/IB9ZOemKQDQEvic71j4jcxtkn8nKprm3yJOeOepBTucL2LNaNr4+jija45pf2Gt
-	 yJvU0/cC4QCnbExWxwxkmvMeuvnvToVzhRmaJ4YlAUqJMpt6RS6gljojzVhiCRvsdB
-	 W5CPqP48trn08kPjTZSYhtiSlr2uToEKU1gwDEX0=
-Message-ID: <aa877f31-0ae7-4042-bab2-6a818003d26e@arm.com>
-Date: Thu, 24 Sep 2026 23:15:49 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cm9MLLdM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0B1A1F000FF;
+	Thu, 24 Sep 2026 22:29:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790288961;
+	bh=9lTk9HKkaCEZkNbTtcdgRDBlqeemuAp3XPisqKa2/VE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Cm9MLLdMqefLdn0f4fB3SmLd0hLcSZ+vRIzYltU3WJeSP2uQBClxrlvCK52bKVzNH
+	 RZxyrR5yNE2ldL3BfleuXHv4Eu3pJ5ywTr+S/+WBO3VYKtA2rTvgIkvPQ0M5ASmEeA
+	 Js0blZ9LHCZGaFn0ec4UZ7aBSm9u1HVOMN56H87T/HDohCipgfL2pLWzS2gr1lpV3N
+	 uhItfsNx0GBvwlGsmeeulP+Fzq2oMAxxPQDFNheAIpVyA/QcFnLpUA1+/Lybe/N3iK
+	 bH30foLXBEjjJwX669zgjgrjONlko3Ynd9Z2ECo9yJDyEZTAMPOScqprzEzFKvibL5
+	 aqFowxSQz1EWA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x9rwN-0000000DEyP-27Eo;
+	Thu, 24 Sep 2026 22:29:19 +0000
+Date: Thu, 24 Sep 2026 23:29:18 +0100
+Message-ID: <86h5je4729.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	David Hildenbrand <david@kernel.org>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Jack Thomson <jackabt@amazon.com>,
+	Jack Thomson <jackabt.amazon@gmail.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Leo Soares Passos <Leo.Bras@arm.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	linux-s390@vger.kernel.org
+Subject: Re: [PATCH v4 01/14] KVM: Allow architectures to disallow pre-fault
+In-Reply-To: <arTdxHgk_3gGySOO@gremlin>
+References: <20260923-kvm-arm-prefault-v4-0-d4b0b4dfa8c3@kernel.org>
+	<20260923-kvm-arm-prefault-v4-1-d4b0b4dfa8c3@kernel.org>
+	<CA+EHjTzDYSuBVEc+SMdDa41sq-ET=m_oWW0gL9dYf+AumPYPUg@mail.gmail.com>
+	<arTdxHgk_3gGySOO@gremlin>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 1/7] firmware: arm_rmm: Add SMC definitions for
- calling the RMM
-Content-Language: en-GB
-To: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
- will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
- sudeep.holla@arm.com
-References: <20260924135201.850038-1-suzuki.poulose@arm.com>
- <20260924135201.850038-2-suzuki.poulose@arm.com>
- <20260924095712.00004057@oss.qualcomm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260924095712.00004057@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ljs@kernel.org, fuad.tabba@linux.dev, catalin.marinas@arm.com, will@kernel.org, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, corbet@lwn.net, mark.rutland@arm.com, rdunlap@infradead.org, borntraeger@linux.ibm.com, frankja@linux.ibm.com, david@kernel.org, hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com, svens@linux.ibm.com, tglx@kernel.org, mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, skhan@linuxfoundation.org, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, jackabt@amazon.com, jackabt.amazon@gmail.com, alexandru.elisei@arm.com, vdonnefort@google.com, aneesh.kumar@kernel.org, seanjc@google.com, imbrenda@linux.ibm.com, Leo.Bras@arm.com, weilin.chang@arm.com, linux-s390@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 24/09/2026 17:57, Jonathan Cameron wrote:
-> On Thu, 24 Sep 2026 14:51:55 +0100
-> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+On Thu, 24 Sep 2026 09:22:47 +0100,
+"Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
 > 
->> From: Steven Price <steven.price@arm.com>
->>
->> The RMM (Realm Management Monitor) provides functionality that can be
->> accessed by SMC calls from the host.
->>
->> The SMC definitions are based on DEN0137[1] version 2.0-bet3
->>
->> [1] https://developer.arm.com/documentation/den0137/2-0bet3/
->>
->> Reviewed-by: Gavin Shan <gshan@redhat.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> On Wed, Sep 23, 2026 at 07:52:27PM +0100, Fuad Tabba wrote:
+> > Hi Lorenzo,
+> >
+> > On Wed, 23 Sep 2026 16:15:44 +0100, "Lorenzo Stoakes (ARM)"
+> > <ljs@kernel.org> wrote:
+> > [...]
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > [...]
+> > > +int kvm_arch_pre_fault_allowed(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +        if (!vcpu->kvm->arch.pre_fault_allowed)
+> > > +                return -EOPNOTSUPP;
+> > > +
+> > > +        return 0;
+> > > +}
+> >
+> > nit: the comment above the smp_rmb() in tdx_sept_map_leaf_spte() still
+> > says pre_fault_allowed is read by kvm_arch_vcpu_pre_fault_memory(),
+> > but after this patch it's read here.
 > 
-> Hi Suzuki,
-> 
-> One small thing I didn't really care about but where I thought you
-> said you were going to tweak things.
-> 
-> Either way
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+> Ack can fix up I need to respin!
 
-Thanks !
+I've updated the comment locally.
 
-> 
->> +struct rec_exit {
->> +	union { /* 0x000 */
->> +		u8 exit_reason;
->> +		u8 padding0[0x100];
->> +	};
->> +	union { /* 0x100 */
->> +		struct {
->> +			u64 esr;
->> +			u64 far;
->> +			u64 hpfar;
->> +			u64 rtt_tree;
->> +		};
->> +		u8 padding1[0x100];
->> +	};
->> +	union { /* 0x200 */
->> +		u64 gprs[REC_RUN_GPRS];
->> +		u8 padding2[0x100];
->> +	};
->> +	union { /* 0x300 */
->> +		u8 padding3[0x100];
-> 
-> I thought plan was to fold into the padding above?
-> 
-> https://lore.kernel.org/all/d7ccaf22-5bde-4344-8bf0-a5a17dcac0f3@arm.com/
+	M.
 
-Yep, I missed it :facepalm:,  Apologies. I will fix it straight awy.
-
-Cheers
-Suzuki
-
-> 
->> +	};
->> +	union { /* 0x400 */
->> +		struct {
->> +			u64 cntp_ctl;
->> +			u64 cntp_cval;
->> +			u64 cntv_ctl;
->> +			u64 cntv_cval;
->> +		};
->> +		u8 padding4[0x100];
->> +	};
-> 
-> 
-
+-- 
+Without deviation from the norm, progress is not possible.
