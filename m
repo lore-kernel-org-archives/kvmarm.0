@@ -1,144 +1,231 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F6C47DD76;
-	Thu, 24 Sep 2026 12:14:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F3C477282;
+	Thu, 24 Sep 2026 12:56:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790252048; cv=none; b=QYfzznACzIydnSCfhyFaOQvHooMc1J6BlaVnq9fxike6XnMeXWNuqEmqNBfan7UJDtliCtKqaGM+S6cee3ooDwyZSevz83QTo7GuhISgL8cAzZjB/hgh2YI1ZRzzKEObU1cas9vgrLMIC2e5TVIGxy8sYMxW6SL4bxTy/iHcLvg=
+	t=1790254614; cv=none; b=rs0g7tV8YPEUr1gdDU6OYSdkc5VY85n6C3sMKHFCv4FTZzxPIlk6xdxXj6ZNLJZMPCJRmh1XIHYiJyFhFFrmHhGbyPJ4qD7q8oc9OHCwkrg0UnIaMOFQOfJPZyXUraeXNW4oQSpoQQM9c901eo9qFLfc00zaJbQbHqjVhX0sprk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790252048; c=relaxed/simple;
-	bh=rsAn2KeX2+WQ5TV0HToZYuawnaTCR3LFzkUhDdID7oI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KP4eZ10PW36qzTtNa0BARJAb0fRkCdIid1o01uyQrv/8xhOQePLbcgUqlv7xBb+ZRANXXaML6E8vqBind2ynfwODQxv/AiyGwK1sb02VqwNcW2b7zUe6c71JYQZk1diL2KQYaJP/a2qOrpq+pqasa9TtTdlyWGUuQ1XW6xnpxT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OnMD1tUM; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790254614; c=relaxed/simple;
+	bh=9KFP333nBL3cE3MWpAffOS+SZ2NE4xEC9rmyuPBFGBs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VCvBhbYniQtIGlraDdVUb6qr5PqvvSSROgEe+AvB4/aWmcMZ3y5RIjVXKw2jqK4GlAlZ5KWAWISN2/FL6tqp4wLCiHzJ8LBQ2dsFpPnFmWmnUu2z0zj+Hsf4sHPKAZx0GAkzW30MUW5bMU+al0P5aTwFheH+a4oe4StzzvGJsLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=SfDv2A2m; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hPDQhnza; arc=none smtp.client-ip=103.168.172.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OnMD1tUM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 040451F000FF;
-	Thu, 24 Sep 2026 12:14:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790252046;
-	bh=505orE5OpmF0rqgVrMUI2fkr4bM3eg+OhX8WPM6vgh0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=OnMD1tUMoY172Zuqhc6k4sQDczxnt/xSjWt5fb0mFNF8AFsCYlsRj9UVVsdG3ExB4
-	 rCC0g+fh+YoPb3LIxF48kpXphBeotD+Yy13z0+TuNYbMG8fLz0Ap5odtNVNe7/5Yrx
-	 icRT35m5mDtlzz8XcqONoajG5RjWIZ/drMfLHwgZKvQ9nDkLuXhjhoHs/3smj1ho5f
-	 CPyPEm9i3q1GdTiffSaCZ2o0ukewZei7I/cj0ejUxAc3t7VQpaqbr/yBLc+J4BkM0w
-	 xlM02lNJJY+duviRgIv/Ca8wLoyyvrgKZJyjfXpuyuSo8DXu2gs8maipQC2yqAg73E
-	 dKRqj2RQc2FDg==
-Date: Thu, 24 Sep 2026 13:14:00 +0100
-From: Will Deacon <will@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Vincent Donnefort <vdonnefort@google.com>, maz@kernel.org,
-	oupton@kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	catalin.marinas@arm.com, joey.gouly@arm.com, seiden@linux.ibm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com,
-	steven.price@arm.com, qperret@google.com
-Subject: Re: [PATCH v3 10/18] KVM: arm64: Handle PSCI calls for protected VMs
- at EL2
-Message-ID: <arUUCFHamX1nOrB1@willie-the-truck>
-References: <20260914113338.159227-1-fuad.tabba@linux.dev>
- <20260914113338.159227-11-fuad.tabba@linux.dev>
- <arK1tHUEJsCQEKzn@google.com>
- <CA+EHjTx+foVF4CRU5D8bQv8bAqDphMN12UrV+_doUryn2ow6bg@mail.gmail.com>
- <arTfjgvZIhmXLrw1@willie-the-truck>
- <CA+EHjTxe0JE-tCX4YcEEafdnxjuZLj3EBucZfZF0HCP2PQAekg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="SfDv2A2m";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hPDQhnza"
+Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
+	by mailfout.phl.internal (Postfix) with ESMTP id 8A2C1EC006C;
+	Thu, 24 Sep 2026 08:56:49 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-11.internal (MEProxy); Thu, 24 Sep 2026 08:56:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1790254609;
+	 x=1790341009; bh=nh5lY07F/XdtpzZWisBcou4EdetqWlxWEhSWH7F4qoU=; b=
+	SfDv2A2mrCaoAZJYIg+Gdd5VA7VdxBZbvuu2ggT9DdEBxG9zdV7rTuHSEkdp2muC
+	RrKs1Ca7dVpiS45RImV8oYv+FoCsLmwQD3kkyb+4+C2iNKThGf9SWJoIu2b6PgYv
+	vZcIM/pQOrPURQUUMWcywq/mJv9M4Spdmnm5RAAc41f0uhx81mNomQAjmA2nDhxU
+	+8LlYteXhm/Pc5N2bEAm1UeTQ8PsFO2uox+rLk1WibktQi656HxEJ62wXfUGdKdk
+	WWgGVzAQbQxDrbUjTkHDEoJ3QDP8hcpdgbfVbUWumn5d2XbwRUz6GiB5EYFMuKPQ
+	brbE8PDidMo+hX1w+fZA/w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1790254609; x=
+	1790341009; bh=nh5lY07F/XdtpzZWisBcou4EdetqWlxWEhSWH7F4qoU=; b=h
+	PDQhnza67R40uz4KVjCagCuK/1ooUwva9Er/NXECJ0FHEjMoMBoke2aHuIF2ssXJ
+	QsG6/RCqtJNK/IZzLbY0mngXIEhP7YJdFnZEgu44m0ROGyqO4yEL8LA0oeg6hdiv
+	g+4BV8T2xgDx+1+sH6oOz7vY0K9damZ4tMI7KMy/1EJCGdwDy7HOLikaDy+JfnLX
+	6ceMFdyezhDzCrzOLqL6xFG+ahmA+HuwZgt1Quxl3FtMB7QbzKyIolhlTc3W51ft
+	1HO6VkDpAhH89/pvPW98PePu5IgoTQb8T4nDUYoG+ICHwCQxGQCVMj+gRn/fkw6q
+	oDCYZqON4IQ53LirsjKSQ==
+X-ME-Sender: <xms:EB61ag6hannoEnoGHm6M8Td2p4HPwBZaXj4x4b9wNZ05UmtIGoWlIg>
+    <xme:EB61ajnCXa8dcuv_zjPzBiXZBLBc6SilmBzOljFoB43fww6ABJ517VLYOPGLIdCA0
+    EfKyxUGve3geURx3lvzvz7lryK1DCOfJ2dyFr_G9eIdujkUFOKC8vA>
+X-ME-Received: <xmr:EB61ai6Z9V5eFqttc2Xvt_ymbI2pa28pxkVrhI-YoRi6duOZ1uWRfDQBgIn8MA>
+X-ME-Proxy-Cause: dmFkZTF32quzzh7iukCEspo2//2/EETePHBVgKSDjotfiMLGFMKMi36qp1G2l6m0603LrJ
+    etTQuK4n5psitazgA7NI8ZNAj7Boz3Iz2PTvtSHc4YlI+thZ+g9AxqEWr6smXP4eTxr12L
+    j4iqpnH1GtJD2uV9oEuEdNTFWS+cbDLo5wkX85Q/VxLJ3pJBv3fDm5p4L0ICSGL2DRf+46
+    Zml5juxNyzXgitBUARzy5Q+nGWTe5JIDB908ZQufVLIQOoOBXqBBTkAU9StkEDBWH3HPm1
+    ntYntvDmBSd8joOmDn8RlxUIhT6RE2mlz7OAGRk1ORprL1NHSpdJ4EtNFWlP7TEPEI2LL+
+    pYpBOVi8BAwOPzs8KcdsKkIryA6tKwcjIx9YbxHEmrYndho1FvpUUtTEwlPkk7X/dQD9Ri
+    ojMeInjDm3Qf5JrK4MBzkNA7Dt3NJ6cqbP3mXwlxY66VM1OQkoplQn+y8dqGjimJQChM0H
+    X/OWXCexHTyaKnsGcaXBBz4P6OIry6aIZOK+2kHFAjj6C2QgTN1cKSnEM8fuIS6PcDd0+W
+    qERUKkVymlRMm2x+LmGNo26NcGSU5Ypn9oOO6KRxrdQT6g4w9CrjoWNMiED9/ya8srtUMd
+    ZvrlCrWUre43Cm5+vQfUS0dE4wk7Jh2khI5DPdNo3cIJyUXSXDtSlgOb28sw
+X-ME-Proxy: <xmx:EB61ak-CCIp6-CYCczNih1SN9_54-HNNmAHQY0ICnnl0s8AO4EmszA>
+    <xmx:EB61aqjS8hEqWBBS_8_EGr-7wJVSDCuh5GhtYl6xKl0pHw9uD66TrA>
+    <xmx:EB61aq4gadEPI3rZSlrTz5wkDYHf32dqAFu2Lg2_LiD0KyoCtx3ypw>
+    <xmx:EB61avZEX_jEZucgTShjdxZtDWzWj6mznxYhBi5hg5Z0SqiIAAABXg>
+    <xmx:ER61aii1kJ3fAXJc8Rp40Kh9XAv9uxpj6Ga3ZpCPvgjzzFsOuVxOhPuQ>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 24 Sep 2026 08:56:45 -0400 (EDT)
+Date: Thu, 24 Sep 2026 06:56:42 -0600
+From: Alex Williamson <alex@shazbot.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, David Matlack <dmatlack@google.com>,
+ Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+ kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-kselftest@vger.kernel.org,
+ linux-rdma@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Mark Bloch
+ <mbloch@nvidia.com>, netdev@vger.kernel.org, Oliver Upton
+ <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, Sean Christopherson <seanjc@google.com>, Steffen Eiden
+ <seiden@linux.ibm.com>, Shuah Khan <shuah@kernel.org>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Tariq Toukan <tariqt@nvidia.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, patches@lists.linux.dev, alex@shazbot.org
+Subject: Re: [PATCH v7 00/10] mlx5 support for VFIO self test
+Message-ID: <20260924065642.125986a4@shazbot.org>
+In-Reply-To: <0-v7-c6d30e8ce1e4+3dfa6-mlx5st_jgg@nvidia.com>
+References: <0-v7-c6d30e8ce1e4+3dfa6-mlx5st_jgg@nvidia.com>
+X-Mailer: Claws Mail 4.4.0 (GTK 3.24.52; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTxe0JE-tCX4YcEEafdnxjuZLj3EBucZfZF0HCP2PQAekg@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 24, 2026 at 12:26:25PM +0100, Fuad Tabba wrote:
-> On Thu, 24 Sep 2026 09:30:06 +0100, Will Deacon <will@kernel.org> wrote:
-> [...]
-> > Sorry, but I'm really confused by this and it appears to be different to
-> > what we've got in Android as well. Why do we need release semantics for
-> > the store to 'hyp_vcpu->power_state' in pvm_psci_vcpu_off()? What is it
-> > that we are publishing here? The comment talks about pkvm_reset_vcpu(),
-> > but how is that relevant to the vCPU _off_ path? You say the comment is
-> > wrong, but what _should_ it say?
-> >
-> > I'm a bit baffled!
+
+Leon, can we get your ack on 1-4?  I'll publish an rc1-based branch for
+any conflict management.  Thanks,
+
+Alex
+
+On Mon, 21 Sep 2026 19:35:40 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> Add an mlx5 driver to VFIO self test. This is largely a remix of the
+> existing VFIO mlx5 driver in rdma-core. It uses an RDMA loopback QP
+> to issue RDMA WRITE operations which effectively perform memory
+> copies using DMA. Since mlx5 has a stable programming ABI this
+> should work on devices from CX5 to current HW. The device FW must
+> support the QP loopback configuration.
 > 
-> It's not publishing data, it's handing reset_state back.
-
-What's the difference? The usual pattern for acquire/release is:
-
-<write data>
-<store-release flag>
-
-on one CPU and then on another:
-
-<load-acquire flag>	// If this reads from the release above...
-<read data>		// ... then this is guaranteed to read the written data
-
-That's a message-passing shape and you would normally say that the first
-CPU (the producer) is publishing the data to the other CPU (the consumer).
-
-Is this what is happening with the 'reset_state' (data) and the
-'power_state' (flag)? If not, then what is the shape?
-
-> The CPU_ON winner writes reset_state.{pc, r0, be}, then reset_state.reset
-> with a release. The target reads them and clears reset in pkvm_reset_vcpu()
-> on its next run
-
-By 'next run' you mean, at EL2 on the entry path into the guest following
-a successful CPU_ON operation?
-
-> and its CPU_OFF hands reset_state on to the next
-> CPU_ON. The release on OFF orders those reads and that clear before
-> OFF, and an acquire on the winner's cmpxchg orders its writes after
-> it: release on the way out, acquire on the way in, like a lock.
-
-That doesn't make sense to me, sorry. You're saying that the release
-store in the EL2 CPU_OFF hypercall handler is ordering stores that were
-made during the initial CPU_ON handling on that vCPU? Since then, we've
-been in and out of the guest. We really shouldn't need extra barriers to
-create order there.
-
-> Without the release, the target's clear of reset can become visible
-> after the next winner's reset = true, and the target's next
-> pkvm_reset_vcpu() then reads a clear flag and returns -ECANCELED,
-> leaving the vCPU stuck at ON_PENDING.
-
-This needs a litmus test because I can't see it myself. As above,
-CPU_OFF does not clear the reset state, so it's bizarre to put the
-release there.
-
-> The comment described the flag ordering, which holds through the
-> winner's release on reset even with a relaxed cmpxchg, and named the
-> cmpxchg as its pair when the cmpxchg wasn't an acquire. The acquire is
-> for the winner's plain writes of pc/r0/be: nothing else orders them
-> after the target's reads. v4 has cmpxchg_acquire() and the two
-> comments name what's ordered and each other:
+> Also support send_msi by arming completion events of the RDMA WRITE
+> to trigger MSI delivery.
 > 
->         /*
->          * Orders pkvm_reset_vcpu()'s accesses to reset_state before OFF. Pairs
->          * with the acquire cmpxchg in pvm_psci_vcpu_on().
->          */
->         smp_store_release(&hyp_vcpu->power_state, PSCI_0_2_AFFINITY_LEVEL_OFF);
+> mlx5 device startup is very complex and most of this code is just
+> booting the device, with a smaller amount for operating the QP.
 > 
-> and in pvm_psci_vcpu_on():
+> This entire series was coded by Claude Code in about 4 days. It
+> used about 4.5M output tokens, 30 individual sessions and 5600 lines
+> of AI-generated .md files. I spent an annoying amount of time
+> de-slopping and cleaning its work product to make it presentable.
+> However, previous VFIO drivers have taken on the order of 1-2
+> months to write, so getting one in a week is pretty remarkable.
 > 
->         /*
->          * vCPUs race to power on the same target. The acquire pairs with the
->          * release of OFF in pvm_psci_vcpu_off(): the target's accesses to
->          * reset_state in pkvm_reset_vcpu() precede the writes below.
->          */
->         power_state = cmpxchg_acquire(&target->power_state,
->                                       PSCI_0_2_AFFINITY_LEVEL_OFF,
->                                       PSCI_0_2_AFFINITY_LEVEL_ON_PENDING);
+> For those interested, the flow I used was broadly a prompt sequence
+> sort of like:
+> 
+>  - Hey Claude, go look at the falcon series, VFIO self test, the
+>    mlx5 driver, rdma-core and some PDF documentation and make a
+>    plan to put mlx5 under the selftest.
+>  - Write an rdma-core application using the built-in VFIO provider
+>    that can do the required memcpy operations that vfio selftests
+>    wants.
+>    (This resulted in a 1k loc C file that compiled and ran the
+>     first time but had a few bugs related to device programming
+>     that the AI resolved.)
+>  - Replace the rdma-core components with open-coded versions to
+>    create a fully stand-alone program that does the DMA memcpy.
+>  - Review and audit the thing.
+>  [Pause and de-slop it]
+>  - Make it work on a PF too (this is surprisingly hard!).
+>  [Move to a kernel tree and copy all the .md files and .c program
+>   it made]
+>  - Hey Claude, look at all this stuff and make a broad plan to
+>    actually build a VFIO self test.
+>  - Here is my 1 sentence advice on what each patch should look
+>    like, make a detailed plan to make a patch for every one.
+>  [Pause and polish the patch plans]
+>  - Execute plan X then commit it [pause and de-slop each patch,
+>    repeat].
+>  [Review and final polish]
+> 
+> v7:
+>  - Fix some compilation problems, kvm and the igb
+> v6: https://patch.msgid.link/r/0-v6-8af36cf7b73f+e2-mlx5st_jgg@nvidia.com
+>  - Rebase on v7.3-rc3
+>  - Correct some minor sashiko remarks
+> v5: https://patch.msgid.link/r/0-v5-4cacb99249f6+1b4-mlx5st_jgg@nvidia.com
+>  - Rebase on v7.3-rc1
+>  - Adjust how region_size is computed to min it to getpagesize()
+> v4: https://patch.msgid.link/r/0-v4-021df3fb5a3f+98e-mlx5st_jgg@nvidia.com
+>  - Rebase on vfio next, update igb and falcon
+>  - Move rounding to iova_allocator_alloc()
+>  - Remove arm barrier changes
+> v3: https://patch.msgid.link/r/0-v3-76f117ad04f1+28a90-mlx5st_jgg@nvidia.com
+>  - Move max into vfio_pci_driver_probe()
+>  - Rebase on v7.2-rc3
+> v2: https://patch.msgid.link/r/0-v2-72e9640932fd+2c64-mlx5st_jgg@nvidia.com
+>  - Rebase on v7.1-rc3, drop falcon patches
+>  - dev_dbg checks the format string even in non debug builds
+>  - Sort includes
+>  - Adjust comments/commit messageas
+>  - Use linux/pci_ids.h
+>  - Compute the driver.max_memcpy_size the same as mlx5 kernel driver, it
+>    should be GBs now on most devices
+>  - Put region_size into all drivers instead of allowing 0
+> v1: https://patch.msgid.link/r/0-v1-dc5fa250ca1d+3213-mlx5st_jgg@nvidia.com
+> 
+> Jason Gunthorpe (10):
+>   net/mlx5: Add IFC structures for CQE and WQE
+>   net/mlx5: Move HW constant groups from device.h/cq.h to mlx5_ifc.h
+>   net/mlx5: Extract MLX5_SET/GET macros into mlx5_ifc_macros.h
+>   net/mlx5: Add ONCE and MMIO accessor variants to mlx5_ifc_macros.h
+>   selftests: Add additional kernel functions to tools/include/
+>   vfio: selftests: Allow drivers to specify required region size
+>   vfio: selftests: Add dev_dbg
+>   vfio: selftests: Add mlx5 driver - HW init and command interface
+>   vfio: selftests: Add mlx5 driver - data path and memcpy ops
+>   vfio: selftests: mlx5 driver - add send_msi support
+> 
+>  include/linux/mlx5/cq.h                       |   10 -
+>  include/linux/mlx5/device.h                   |  231 +-
+>  include/linux/mlx5/mlx5_ifc.h                 |  178 ++
+>  include/linux/mlx5/mlx5_ifc_macros.h          |  185 ++
+>  tools/arch/arm64/include/asm/barrier.h        |    4 +
+>  tools/arch/x86/include/asm/barrier.h          |    5 +
+>  tools/include/asm-generic/io.h                |   28 +
+>  tools/include/asm/barrier.h                   |    8 +
+>  tools/include/linux/stddef.h                  |   10 +
+>  .../selftests/kvm/include/arm64/processor.h   |    4 +-
+>  tools/testing/selftests/kvm/irq_test.c        |    2 -
+>  .../selftests/vfio/lib/drivers/dsa/dsa.c      |    1 +
+>  .../selftests/vfio/lib/drivers/igb/igb.c      |    1 +
+>  .../selftests/vfio/lib/drivers/ioat/ioat.c    |    1 +
+>  .../selftests/vfio/lib/drivers/mlx5/mlx5.c    | 1928 +++++++++++++++++
+>  .../selftests/vfio/lib/drivers/mlx5/mlx5_hw.h |  114 +
+>  .../vfio/lib/drivers/mlx5/mlx5_ifc.h          |    1 +
+>  .../vfio/lib/drivers/mlx5/mlx5_ifc_fpga.h     |    1 +
+>  .../vfio/lib/drivers/mlx5/mlx5_ifc_macros.h   |    1 +
+>  .../vfio/lib/drivers/nv_falcon/nv_falcon.c    |    1 +
+>  .../lib/include/libvfio/vfio_pci_device.h     |   11 +
+>  .../lib/include/libvfio/vfio_pci_driver.h     |    6 +
+>  .../selftests/vfio/lib/iova_allocator.c       |    7 +-
+>  tools/testing/selftests/vfio/lib/libvfio.mk   |    1 +
+>  .../selftests/vfio/lib/vfio_pci_driver.c      |    6 +
+>  .../selftests/vfio/vfio_pci_driver_test.c     |    3 +-
+>  26 files changed, 2502 insertions(+), 246 deletions(-)
+>  create mode 100644 include/linux/mlx5/mlx5_ifc_macros.h
+>  create mode 100644 tools/include/linux/stddef.h
+>  create mode 100644 tools/testing/selftests/vfio/lib/drivers/mlx5/mlx5.c
+>  create mode 100644 tools/testing/selftests/vfio/lib/drivers/mlx5/mlx5_hw.h
+>  create mode 120000 tools/testing/selftests/vfio/lib/drivers/mlx5/mlx5_ifc.h
+>  create mode 120000 tools/testing/selftests/vfio/lib/drivers/mlx5/mlx5_ifc_fpga.h
+>  create mode 120000 tools/testing/selftests/vfio/lib/drivers/mlx5/mlx5_ifc_macros.h
+> 
+> 
+> base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
 
-This confused me more :( Why are you talking about accesses preceding an
-acquire? An acquire only orders later accesses.
-
-I really think we need some litmus tests to understand the general ordering
-problems we have here before adding the memory barriers.
-
-Will
