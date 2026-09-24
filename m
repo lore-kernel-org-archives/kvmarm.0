@@ -1,31 +1,30 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8A8444C645
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A5D38CFFA
 	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 09:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790243440; cv=none; b=qMgGgXwD0weXOk2daZZNyFrUZHQ+vr32KEqH0wi0imgLUrEutYPHpk9hy4t/opnBP56TXpFW3hEwDNipp1R+LQcNYav5/7ADnFf1kquZz2ZOnePgJYLqTbUWO1K+IKIYmvuhI/0sxMyao/eq6nwLzH2fqTnKkMqKoHluh8HI7Ps=
+	t=1790243448; cv=none; b=MglUr8PU5TkLtm57vtGwauAfjctXEaE9SLlEYFaxofX5t7qNGR02EVFQXLAcmDXKjbYCqd4akTw95V9xbofrYJGtg/XJ/q0z7sASInMGytjIf/Cj4qGtVRVXNj4SSUqVhDgoNeTK1Vsk3oVYbgDsm+LdaiG1QompX0s5KWs5STs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790243440; c=relaxed/simple;
-	bh=8EeDJUKWzmbKZHvSf5EzOlL7Hm/HRnxcUKk/qxOp0jQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F4y1XBTEuTqKdIaZoy45KAggAqtdGzKk+C2Sp1TS8zdtK/6QjPvcsmUIUN63cK144Dd1vFPlVCLTGuf5DvtD6+u1ZUcjhX/T8KbTN/5dO1lYkqJ1KLtLXDsQvQq3+c+wVRBNo2eb911+4wQcFib17ok/SbPSDt6iCKTVD3Y4a18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=qfWYrEUB; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1790243448; c=relaxed/simple;
+	bh=mi5Wn3XblNBZBdzwFD0WPka+R8QrTCI4hMJ2QLpSJKc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HGL4RDIBH86BvIoI8VvsUSJVWpSFGh9dI7BYclD/gKBrcWyLTG//haSHKxwMjatZAiyrG9gXIZo2As/BDiwrVEr8xU5HzCDRpH/0XMo14pq1ftfxBAcImUmwJIoSkyc+y+E2WqOKgAZWb+3hky7wgaPlwinZyxhcrsTJrZkUS3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=OrtdVcaA; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="qfWYrEUB"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="OrtdVcaA"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 97B80152B;
-	Thu, 24 Sep 2026 02:50:29 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AC9011516;
+	Thu, 24 Sep 2026 02:50:26 -0700 (PDT)
 Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7FEA13F86F;
-	Thu, 24 Sep 2026 02:50:30 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CDA4B3F86F;
+	Thu, 24 Sep 2026 02:50:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790243433; bh=8EeDJUKWzmbKZHvSf5EzOlL7Hm/HRnxcUKk/qxOp0jQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qfWYrEUB5j3U+8mgY0E3CjMBvSOqzbpp456E3vbet8uflDlSnbRssfEFdaOBqUsLN
-	 NuyhALNLlfoYjc1CRYHyltNa52hifvRoDEucaedFOBaGznMxbD5JoEDvQZVvbOpFv1
-	 txrpvLYdBl2qL2VEEhGWnLaqbkkOXlX9/VbRJWaI=
+	t=1790243430; bh=mi5Wn3XblNBZBdzwFD0WPka+R8QrTCI4hMJ2QLpSJKc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=OrtdVcaA0ELnCObfDLlNBy3QZD8DKR+WXofPdq4ZtXOxCsx9815P5JHazuM5gerAK
+	 GLHDdNOBALmRZd0SmIxEdxxNKzAahbqhsCHopWavBXEwlqZAFQnQbO9Vr0zPVPyCig
+	 xbigpkydr2nnNx8nht1izSUp0kbFW/1qpLr8PqxA=
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
@@ -43,15 +42,11 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Sebastian Ene <sebastianene@google.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Itaru Kitayama <itaru.kitayama@fujitsu.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Sashiko AI <sashiko-bot@kernel.org>,
-	stable@vger.kernel.org
-Subject: [PATCH v4 1/2] KVM: arm64: ptdump: Check the page tables aren't freed when accessing
-Date: Thu, 24 Sep 2026 10:49:50 +0100
-Message-ID: <20260924094951.727352-2-weilin.chang@arm.com>
+	Wei-Lin Chang <weilin.chang@arm.com>
+Subject: [PATCH v4 0/2] KVM: arm64: ptdump: Shadow ptdump fixes
+Date: Thu, 24 Sep 2026 10:49:49 +0100
+Message-ID: <20260924094951.727352-1-weilin.chang@arm.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260924094951.727352-1-weilin.chang@arm.com>
-References: <20260924094951.727352-1-weilin.chang@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -61,122 +56,58 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-An open debugfs file keeps the KVM structure alive, but does not prevent
-mmu notifier release from freeing the stage-2 page tables when the VMM’s
-address space is torn down. Therefore page tables belonging to the mmus
-could have been freed when a thread opens or reads the ptdump files.
-Take the mmu_lock and check mmu->pgt is still alive before accessing the
-page tables.
+Hi,
 
-Also for the ipa_range file and stage2_levels file, switch from keeping
-the pointer to the page tables to keeping the pointer to the mmu.
+This is v4 of fixing the sleep-in-atomic problem of the shadow ptdump.
+This version relaxes a few write_lock to read_lock, and collected tags.
+Please see the details below.
 
-Fixes: 7c4f73548ed1 ("KVM: arm64: Register ptdump with debugfs on guest creation")
-Reported-by: Sashiko AI <sashiko-bot@kernel.org>
-Closes: https://lore.kernel.org/kvmarm/20260623144054.B91D21F000E9@smtp.kernel.org/
-Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
-Tested-by: Vincent Donnefort <vdonnefort@google.com>
-Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: stable@vger.kernel.org
----
- arch/arm64/kvm/ptdump.c | 43 +++++++++++++++++++++++++++++++----------
- 1 file changed, 33 insertions(+), 10 deletions(-)
+* Changes from v3 [1]:
 
-diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-index 69899797dbad..b5a0584260e8 100644
---- a/arch/arm64/kvm/ptdump.c
-+++ b/arch/arm64/kvm/ptdump.c
-@@ -115,15 +115,28 @@ static int kvm_ptdump_build_levels(struct ptdump_pg_level *level, u32 start_lvl)
- 
- static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm_s2_mmu *mmu)
- {
-+	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
- 	struct kvm_ptdump_guest_state *st;
--	struct kvm_pgtable *pgtable = mmu->pgt;
-+	s8 start_level;
- 	int ret;
- 
-+	/*
-+	 * We only need the pgt start level to initialize the ptdump, get it
-+	 * while holding the mmu_lock. It's fine if the pgt gets freed
-+	 * afterwards, we'll check again when doing the actual dump.
-+	 */
-+	scoped_guard(read_lock, &kvm->mmu_lock) {
-+		if (mmu->pgt)
-+			start_level = mmu->pgt->start_level;
-+		else
-+			return ERR_PTR(-ENOENT);
-+	}
-+
- 	st = kzalloc_obj(struct kvm_ptdump_guest_state, GFP_KERNEL_ACCOUNT);
- 	if (!st)
- 		return ERR_PTR(-ENOMEM);
- 
--	ret = kvm_ptdump_build_levels(&st->level[0], pgtable->start_level);
-+	ret = kvm_ptdump_build_levels(&st->level[0], start_level);
- 	if (ret) {
- 		kfree(st);
- 		return ERR_PTR(ret);
-@@ -149,6 +162,9 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
- 	};
- 
- 	guard(write_lock)(&kvm->mmu_lock);
-+	if (!mmu->pgt)
-+		return 0;
-+
- 	st->parser_state = (struct ptdump_pg_state) {
- 		.marker		= &st->ipa_marker[0],
- 		.end_address	= BIT(mmu->pgt->ia_bits),
-@@ -211,17 +227,27 @@ static const struct file_operations kvm_ptdump_guest_fops = {
- 
- static int kvm_pgtable_range_show(struct seq_file *m, void *unused)
- {
--	struct kvm_pgtable *pgtable = m->private;
-+	struct kvm_s2_mmu *mmu = m->private;
-+	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
-+
-+	guard(read_lock)(&kvm->mmu_lock);
-+
-+	if (mmu->pgt)
-+		seq_printf(m, "%2u\n", mmu->pgt->ia_bits);
- 
--	seq_printf(m, "%2u\n", pgtable->ia_bits);
- 	return 0;
- }
- 
- static int kvm_pgtable_levels_show(struct seq_file *m, void *unused)
- {
--	struct kvm_pgtable *pgtable = m->private;
-+	struct kvm_s2_mmu *mmu = m->private;
-+	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
-+
-+	guard(read_lock)(&kvm->mmu_lock);
-+
-+	if (mmu->pgt)
-+		seq_printf(m, "%1d\n", KVM_PGTABLE_MAX_LEVELS - mmu->pgt->start_level);
- 
--	seq_printf(m, "%1d\n", KVM_PGTABLE_MAX_LEVELS - pgtable->start_level);
- 	return 0;
- }
- 
-@@ -230,15 +256,12 @@ static int kvm_pgtable_debugfs_open(struct inode *m, struct file *file,
- {
- 	struct kvm_s2_mmu *mmu = m->i_private;
- 	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
--	struct kvm_pgtable *pgtable;
- 	int ret;
- 
- 	if (!kvm_get_kvm_safe(kvm))
- 		return -ENOENT;
- 
--	pgtable = mmu->pgt;
--
--	ret = single_open(file, show, pgtable);
-+	ret = single_open(file, show, mmu);
- 	if (ret < 0)
- 		kvm_put_kvm(kvm);
- 	return ret;
+  - Take read_lock instead of write_lock when getting pgt metadata.
+    (Vincent)
+
+  - Collected Tested-bys and Reviewed-by from Vincent and Itaru.
+    (Thanks!)
+
+Below is mostly the same content from the v3 cover letter:
+
+The approach taken now is simply creating a file for each nested mmu.
+
+The ptdump files are created alongside the nested mmus in
+kvm_vcpu_init_nested(), in a sleepable context, and removed when the VM
+is destroyed (kvm_destroy_vm_debugfs(), before the nested mmus are freed
+in kvm_destroy_nested()). This allows us to store the kvm_s2_mmu pointers
+in the ptdump code, after Marc's nested mmu lifecycle fixes [2].
+
+For the shadow ptdump, for valid nested mmus the first line will show
+the nested context's VTTBR and VTCR values, and whether s2 is enabled or
+not. The ptdump then follows.
+
+The first patch fixes mmu->pgt accesses after the VM MMU teardown in
+ptdump.c, the second patch switches from per nested context ptdumps to
+per nested mmu ptdumps.
+
+Tested with CONFIG_PROVE_LOCKING, CONFIG_DEBUG_ATOMIC_SLEEP, and
+CONFIG_KASAN.
+
+Series based on kvmarm/fixes.
+
+Thanks!
+
+[1]: https://lore.kernel.org/kvmarm/20260916230337.4162485-1-weilin.chang@arm.com/
+[2]: https://lore.kernel.org/kvmarm/20260911162203.1919330-1-maz@kernel.org/
+
+Wei-Lin Chang (2):
+  KVM: arm64: ptdump: Check the page tables aren't freed when accessing
+  KVM: arm64: ptdump: Fix shadow ptdump sleep-in-atomic-context problem
+
+ arch/arm64/include/asm/kvm_host.h |  4 --
+ arch/arm64/include/asm/kvm_mmu.h  |  6 +--
+ arch/arm64/kvm/nested.c           |  9 ++--
+ arch/arm64/kvm/ptdump.c           | 75 ++++++++++++++++++++-----------
+ 4 files changed, 54 insertions(+), 40 deletions(-)
+
 -- 
 2.43.0
 
