@@ -1,466 +1,490 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310554BA9E7;
-	Thu, 24 Sep 2026 19:01:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EDCF4BC018
+	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 19:14:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790276528; cv=none; b=rZJOkWt6c2mWEVNY3yatoGH/qWWphaMy+CusF+k9MmxJFlpBMis3mH49mxn+wYghqkkE5BMclK0Oov4EQB/yqVFfhuVDKlwIIgsUv4bpXn18/HGdpdpVSh/xLnqC8yI3Cc9sTrGLPc6u9cYGqs5Dk9lwNeUy2dADnvLsnddj4VA=
+	t=1790277246; cv=none; b=U2pOg8rPeK8a979+UPnnoZQEuhaxIPbbFlF8C6nhhycxtNqOBAUHlLYcVMJZCo8yLvNHypxqGYhxZZ6Byb+K2pGTS/k8wNRVYtsf9YecHZnn1mr6m3ZqecvUArGwtJnqxNUNTWZWpFdniOAYZ8FyWyf7WzT58itA2S6gw0yXWog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790276528; c=relaxed/simple;
-	bh=iwlf8sID3tCr+06uUwq9igfzj0ELQpzLTZxP24BKhLE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ho5+uBUTY7D2pWbol6TM7uaSxJhuRZ9CjfAgOa020gRGjYpabOPPkLAhfZK0j92F/NaSeDZ3ab1TywNegmP9oK/TfoERITFl/rt3t6uah9aZU9FM2DNLOeqF2XnVgOT4IurHRKB2mhSWvGswrtfcWciVG+Ggj0xmljupMJjEMlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=FYgk52Th; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1790277246; c=relaxed/simple;
+	bh=EwBJUIoyp9JY6RVbxRaq5HHhHm5yl1iuR6dtegQ7JlA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FO5zW2mY+aLBvrvq2Mv47Z+zrcwuSXH/HIui8tL8oWwoQuWm6Z3WCfGPXVqXq/4m0gB+I5fVijvIqrMKH+m2qMhc6MDZ9kidqvtkLDDTiP1vG6kLLytyDBAN7YjJJUU4TnV0Tcbm/8yUB1TGuo4N9SMMPbl/YcvVT4Mo5i4deqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=grAZx5ct; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=gQRNFoAz; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FYgk52Th"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=HT2Ml+ISXk6pok3vxI33pkVK1ocoHgpWDhXVV3G6I18=; b=FYgk52ThT0GturbYOGgjvSTSti
-	M0t3v/yJ6VIFbHUYgOy3BxQgCziLaMIO1d2qljIzScYy6qwT/J0alwe3yE45e6JGQ0GqsiVXaGd5E
-	EJOpSwHVqfDPZl5330GYNPlZXkeiLP5rt59tkwR3q44C6A97ueXeu7yr2nwIlAq03kJWl2IpE/5oe
-	yVCLTroFRAbVBE8QSeRjX0rV0Ukn8qfegfvcYpm8PanyE502VPwfyEoZYmxSd0pOk66Tj0zys4uPO
-	dA9UiU6Z7VmxzOB8+sVk0yPzZDHFwBY12KURqeD+cSUIgRqzRq1zHJyaxPLMqsJ2KIc7Os75rY7Me
-	bOW9/yrg==;
-Received: from [38.23.173.23] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1x9ogl-0000000BzNV-1nWv;
-	Thu, 24 Sep 2026 19:00:59 +0000
-Date: Thu, 24 Sep 2026 15:00:44 -0400
-From: "Liam R. Howlett" <liam@infradead.org>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Vlastimil Babka <vbabka@kernel.org>, Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
-	David Hildenbrand <david@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
-	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
-	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
-	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <mkp@kernel.org>, 
-	Jaya Kumar <jayalk@intworks.biz>, Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, 
-	Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
-	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
-	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
-	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
-	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
-	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev
-Subject: Re: [PATCH v3 01/40] mm/vma: fix mmap_prepare file handling, remove
- file_doesnt_need_get
-Message-ID: <qpkcjtl5jbip46zxcpyogsk4phmhetfvrvgftxhsxlbxjhucnn@h3a64dfoxcmj>
-References: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org>
- <20260917-b4-mmap-prepare-vma-flag-sanify-v3-1-4583d8a23bca@kernel.org>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="grAZx5ct";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="gQRNFoAz"
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68OIdjdW4001896
+	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 19:14:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	7v7mwV3kL+pNqZlpuPeN3iMHS9Dj14zbCE44HBuwDdc=; b=grAZx5ctnOkhdTlJ
+	Tbx3UTtNyuHD/sr5o5S9iAosrcwL9vTgFX5n+qgkBa8eJlCDluGlJmxRGLzQFDp9
+	DNTotWQ7bej5dT0xfn70EAehqKhfhEvCn3M9xVQrr3bE6g8+ythywAZx/OeJitpd
+	N58VTQPEmBCKldJPszmeAMbxozdDm3HfnGTEFFMBUwRnLZP+l9asNVg8vEV0aBhS
+	B47EBSt9mP94NZbIGO1X1Y/YrRm6XrQwu8J4zQDrIgiYlXT/tP86H8pL55G7Lf8f
+	e22DjROzCJFkF16UcHQcoqsBhj2kMOts7bn6k0M/hwe6kJItxVTabXAQga7Wyqm6
+	eidmPg==
+Received: from mail-dy1-f199.google.com (mail-dy1-f199.google.com [74.125.82.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4gw1raje5p-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 19:14:03 +0000 (GMT)
+Received: by mail-dy1-f199.google.com with SMTP id 5a478bee46e88-33310847fcaso134362eec.1
+        for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 12:14:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1790277243; x=1790882043; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:mime-version:organization
+         :references:in-reply-to:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=7v7mwV3kL+pNqZlpuPeN3iMHS9Dj14zbCE44HBuwDdc=;
+        b=gQRNFoAzxDr2rQenVNnuqYmpuEnniJYsJJfVE4K+JltxJ43tLdJrqoXs4T9og01uVU
+         zglrlPYoWKlXqz22hElD1imUD6/x/inFXMr1EeMWYos8HgKocnyq42rZ1wFrEmHWsB+I
+         ZygqXu6s/NZR5TsYlKzdqceIlFjGQugaoZYCwSJ46ODzsj0io6eBlVlKGOhfMA32syu4
+         FFFKO/3StWvsjBiE7nFNY3BKzi8NZSmxLoxQ1hS64IDnU54Z51aTBXXWiVBT9cVQUj2i
+         4ohRkLJSxH9qFvaNWGF1Iu9WoK8Ags9c31BzDMAjutW1n8XAF+neK+c8//2Z9LXmA37u
+         E1EQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790277243; x=1790882043;
+        h=content-transfer-encoding:content-type:mime-version:organization
+         :references:in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=7v7mwV3kL+pNqZlpuPeN3iMHS9Dj14zbCE44HBuwDdc=;
+        b=i75Oe282TX6Rr1axUQpabmOMYf9N9Du+naX+OCIQAZJhesmJOxnJ7kgf1ZrsCwn5m7
+         46YrXhcJWmzHzGtDIzKVPhIHC1xMkbWdiB3rcsG53llHiBeKIi6C7z3eCbnTO9xqibfc
+         FVISuCDncnh5B5r5ceADlNsfAfATVN2KbBLVW1G5dIC1XlTaAXzyKsUtUVO9ODKTxpiT
+         I9f3uizcDnwve3e95tly1kkaJrwCgOFF+CoouYUYpUz4hBVVnSAXfww4SNp4DySFH1MD
+         QVg8j2zpMOh65503uJMHVZg23wCR/uWkDsvEPy1/r8spJPCAsvIQpQtjxlUMBdFjuWAn
+         aj2w==
+X-Forwarded-Encrypted: i=1; AKwUvBx1jGIcZs1ZnbIDMOTJ8d+I1goZeHY7/fGpo7cc/+tTY/UA893hPR4GqByWkABdrRgcOLyY76g=@lists.linux.dev
+X-Gm-Message-State: AFuF++lDB0IpjDp2mV5g7JVjBgFlqBTsL8dsHcme6AV52WU/uYtIvu7a
+	EyA9owQng7/Z8mE0arWwWdCHf5PLJantPi3HLXju7H339MxDeif5UpfG4YtNfoqHhyMgtQ6I1Vj
+	IJjDtT7aJYthtvPSv1KOiXF5eAiJfw6qtP2wpOgXwvQdtVvYFb1EHSc5aFYk=
+X-Gm-Gg: AYBFou1ucNknULukHP2+hNTZOtgdJmf8+pIFgDmwzT2dA7FRr5Soyd2jHap9kjMbe/K
+	9O9qPcamnjSrUHkOirzc+ybdGyxAGxvq5K63gOB/QHKCLjid7+xifeGOKqrlnHUJaqJ00zClGIT
+	qlQycduTd8FYVWi7y9xGtv+J9nvZtcsq3cjlmvQDOTDeqMmV7gOEyYAjKRJXdYUrntA7bg0Jgf/
+	t0TyIY2yEYO2vtgbQbveWSQs279asbI0Zri8Vcg1CZxVg1eGU6eU5IHsuESGLjztwd0oP5QNenq
+	HupAYl8t1/IxScctl3e7z7Lw7y9SLvDL85E1MqoXVqNrqQD/1Qeloc1oNT3bFEsdrfDiWevlEPm
+	MzaDSfpaRtJnlEhYvAQyqVDbyr762sZHZcsdXU3QlHtpvqsmha7aydA==
+X-Received: by 2002:a05:7300:1905:b0:33b:fc17:e786 with SMTP id 5a478bee46e88-33fff65015fmr3559975eec.16.1790277242539;
+        Thu, 24 Sep 2026 12:14:02 -0700 (PDT)
+X-Received: by 2002:a05:7300:1905:b0:33b:fc17:e786 with SMTP id 5a478bee46e88-33fff65015fmr3559927eec.16.1790277241676;
+        Thu, 24 Sep 2026 12:14:01 -0700 (PDT)
+Received: from localhost (i-global254.qualcomm.com. [199.106.103.254])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-341447576b9sm641843eec.15.2026.09.24.12.13.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Sep 2026 12:14:01 -0700 (PDT)
+Date: Thu, 24 Sep 2026 12:13:56 -0700
+From: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+        will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+        aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+        joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+        linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+        sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+        WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+        sudeep.holla@arm.com
+Subject: Re: [PATCH v19 4/7] firmware: arm_rmm: Add support for SRO
+Message-ID: <20260924121356.00000d4d@oss.qualcomm.com>
+In-Reply-To: <20260924135201.850038-5-suzuki.poulose@arm.com>
+References: <20260924135201.850038-1-suzuki.poulose@arm.com>
+	<20260924135201.850038-5-suzuki.poulose@arm.com>
+Organization: Qualcomm
+X-Mailer: Claws Mail 4.4.0 (GTK 3.24.51; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-1-4583d8a23bca@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTI0MDA3OCBTYWx0ZWRfX9+Uhof96QyAA
+ 3lk5TzH8Tou54Cm10d3QlyQnUH9q/MviAco2VFTGvxEvX/bdjqAddp0OMfKBhqegNzVxFJYkI5X
+ mExBSWEW6/I8v+3GBrmjHjrBYYrx3vkKznQ693GoaOrepUUilP2Uf4iqizl+zfhYbBeCOluTPkG
+ b8+T/6dK+WY0KARS3p2XH9kTJConGMde0llJY+rXNIoUlxXJYXHLFZKh5xV8jxTbzsH59+6Ytwa
+ T7r/GDZTMO+oHsCc+0YyiMatyy3hrypX7VzCWu1ELO6rDUT49ibBnWe/0x+isLb65opUcCKp6eN
+ ihIwNiAmYgygw8ygbZnbQVb/MbL7RSqOuxkCwbwqJCcw1NOKwVxlnmQVMWFTYRcxij+gl9o4S4t
+ ISO4iCxNVE7ZgHz8JtT0NcZT73ugxzfuTBHspriY1pykybtKQNb8JVvpUrWX6+aX8d0B7BSVQ/2
+ PcxGY/DPhTEhlDTmQMg==
+X-Proofpoint-ORIG-GUID: lA08bm5b6FaaNzUzFn1C3pveape0435u
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTI0MDA3OCBTYWx0ZWRfX5zSx4C3dCnoj
+ tvNfWm6E9zgEFYo62hvAdojheo0nPF/igrGuFr8XHoe9pltcLbSutnmGVlzVoeRzCmq6rNCWRfa
+ 2rz4aL2s3eLlmgQUmRRkD0N6eCeaGas=
+X-Authority-Analysis: v=2.4 cv=fvpJ914f c=1 sm=1 tr=0 ts=6ab5767b cx=c_pps
+ a=cFYjgdjTJScbgFmBucgdfQ==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22
+ a=7CQSdrXTAAAA:8 a=EUspDBNiAAAA:8 a=g7tT_HrEe4iQpSKoiZcA:9 a=CjuIK1q_8ugA:10
+ a=scEy_gLbYbu1JhEsrz4S:22 a=a-qgeE7W1pNrGK8U0ZQC:22
+X-Proofpoint-GUID: lA08bm5b6FaaNzUzFn1C3pveape0435u
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-24_05,2026-09-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 lowpriorityscore=0 suspectscore=0 impostorscore=0
+ adultscore=0 spamscore=0 malwarescore=0 clxscore=1015 bulkscore=0
+ phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
+ definitions=main-2609240078
 
-On 26/09/17 05:22PM, Lorenzo Stoakes (ARM) wrote:
-> The map->file_doesnt_need_get flag is confusing and the existing
-> implementation has holes.
+On Thu, 24 Sep 2026 14:51:58 +0100
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+
+> From: Steven Price <steven.price@arm.com>
 > 
-> Drivers are permitted to change the owning file of a mapping. If they do
-> so, they are required to take a reference on that file.
+> RMM v2.0 introduces the concept of "Stateful RMI Operations" (SRO). This
+> means that an SMC can return with an operation still in progress. The
+> host is expected to continue the operation until it reaches a conclusion
+> (either success or failure). During this process the RMM can request
+> additional memory ('donate') or hand memory back to the host
+> ('reclaim'). The host can request an in progress operation is cancelled,
+> but still continue the operation until it has completed (otherwise the
+> incomplete operation may cause future RMM operations to fail).
 > 
-> The mmap() operation which ultimately invokes __mmap_region() is guaranteed
-> to drop the refcount for the original file the mapping was made under, but
-> this is not true for the replaced file.
+> The SRO is tracked using a struct rmi_sro_state object which keeps track
+> of any memory which has been allocated but not yet consumed by the RMM
+> or reclaimed from the RMM. This allows the memory to be reused in a
+> future request within the same operation. It will also permit an
+> operation to be done in a context where memory allocation may be
+> difficult (e.g. atomic context) with the option to abort the operation
+> and retry the memory allocation outside of the atomic context. The
+> memory stored in the struct rmi_sro_state object can then be reused on
+> the subsequent attempt.
 > 
-> This has been addressed so far by tracking map->file_doesnt_need_get, which
-> is rather poorly named and unfortunately fails to correctly track whether
-> or not an additional put were needed in a number of cases.
+> Wrappers for SRO RMI commands are also provided here because they depend
+> on the rmi_sro_execute() implementation added by this patch.
+> Delegate/undelegate handles are also added here because they now use the
+> SRO/stateful command infrastructure and are also used for the memory
+> DONATE/RECLAIM flows.
 > 
-> Make life easier by removing this flag, and instead drop the reference for
-> both mmap_prepare and the deprecated mmap callback in a new function
-> put_map().
-> 
-> Track whether this needs to be done by aligning mmap_state with
-> vm_area_desc and store the original file in the map->file field, keeping
-> the updated file in map->vm_file.
-> 
-> In order to have the same behaviour for both types of hooks, only drop the
-> reference __mmap_new_file_vma() itself took in its error path, deferring
-> the replaced file's reference to put_map().
-> 
-> To make this work correctly, map->vm_file has to be updated before any
-> error handling, so update __mmap_new_file_vma() and call_mmap_prepare() to
-> set this field first.
-> 
-> Also when mmap_prepare() changes the file and is then merged, the reference
-> count also must be decremented, so update the logic to call put_map() in
-> this case too.
-> 
-> Also update __compat_vma_mmap() to manually perform this step for stacked
-> file systems using the compatibility layer, and update
-> compat_set_vma_from_desc() to replace vma_set_file() with a correct
-> refcount/file update.
-> 
-> No in-tree driver is impacted by the incorrect implementation of this
-> currently (no driver that does this is mergeable for one), so this does not
-> need to be a fix.
-> 
-> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+
+Nice.  Everything I spotted this time around is pretty trivial.
+So assuming you'll clean up and bits that make sense to you for v20
+
+Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+
+
 > ---
->  mm/internal.h |  1 +
->  mm/util.c     |  5 +++-
->  mm/vma.c      | 83 +++++++++++++++++++++++++++++++++++------------------------
->  mm/vma.h      |  6 +++--
->  4 files changed, 59 insertions(+), 36 deletions(-)
+>  drivers/firmware/arm_rmm/rmi.c | 666 +++++++++++++++++++++++++++++++++
+>  include/linux/arm-rmi-cmds.h   |  41 ++
+>  2 files changed, 707 insertions(+)
 > 
-> diff --git a/mm/internal.h b/mm/internal.h
-> index 0dca33db068f..fe576d468af4 100644
-> --- a/mm/internal.h
-> +++ b/mm/internal.h
-> @@ -7,6 +7,7 @@
->  #ifndef __MM_INTERNAL_H
->  #define __MM_INTERNAL_H
->  
-> +#include <linux/file.h>
->  #include <linux/fs.h>
->  #include <linux/khugepaged.h>
->  #include <linux/mm.h>
-> diff --git a/mm/util.c b/mm/util.c
-> index bf0513d1d3d0..016932780925 100644
-> --- a/mm/util.c
-> +++ b/mm/util.c
-> @@ -1228,8 +1228,11 @@ int __compat_vma_mmap(struct vm_area_desc *desc,
->  
->  	/* Perform any preparatory tasks for mmap action. */
->  	err = mmap_action_prepare(desc);
-> -	if (err)
-> +	if (err) {
-> +		if (desc->vm_file != vma->vm_file)
-> +			fput(desc->vm_file);
->  		return err;
+> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
+> index c9ea964fd9081..035f21d3f26b6 100644
+> --- a/drivers/firmware/arm_rmm/rmi.c
+> +++ b/drivers/firmware/arm_rmm/rmi.c
+
+> +
+> +int rmi_undelegate_range(phys_addr_t phys,
+> +			 unsigned long size)
+> +{
+> +	long ret = 0;
+> +	unsigned long top = phys + size;
+> +	unsigned long out_top;
+> +
+> +	while (phys < top) {
+> +		ret = rmi_granule_range_undelegate(phys, top, &out_top);
+> +
+> +		if (ret == RMI_SUCCESS) {
+> +			/* Buggy RMM ? Let the caller leak the pages */
+> +			if (WARN_ON(out_top <= phys))
+> +				return -ENXIO;
+> +			phys = out_top;
+> +		} else {
+
+Similar to below, why not deal with error case first and reduce indent of
+the good path.
+
+> +			break;
+> +		}
 > +	}
->  	/* Update the VMA from the descriptor. */
->  	compat_set_vma_from_desc(vma, desc);
->  	/* Complete any specified mmap actions. */
-> diff --git a/mm/vma.c b/mm/vma.c
-> index 55917d097933..fa784f069da4 100644
-> --- a/mm/vma.c
-> +++ b/mm/vma.c
-> @@ -24,7 +24,8 @@ struct mmap_state {
->  		vm_flags_t vm_flags;
->  		vma_flags_t vma_flags;
->  	};
-> -	struct file *file;
-> +	struct file *file;	/* mmap()-specified file. */
-
-I guess renaming file to mmaped_file would be a lot more changes.
-
-> +	struct file *vm_file;	/* May be updated by mmap_prepare. */
->  	pgprot_t page_prot;
->  
->  	/* User-defined fields, perhaps updated by .mmap_prepare(). */
-> @@ -43,8 +44,6 @@ struct mmap_state {
->  
->  	/* Determine if we can check KSM flags early in mmap() logic. */
->  	bool check_ksm_early :1;
-> -	/* If .mmap_prepare changed the file, we don't need to pin. */
-> -	bool file_doesnt_need_get :1;
->  };
->  
->  #define MMAP_STATE(name, mm_, vmi_, addr_, len_, pgoff_, anon_pgoff_, vma_flags_, file_) \
-> @@ -58,6 +57,7 @@ struct mmap_state {
->  		.pglen = PHYS_PFN(len_),				\
->  		.vma_flags = vma_flags_,				\
->  		.file = file_,						\
-> +		.vm_file = file_,					\
->  		.page_prot = vma_flags_to_page_prot(vma_flags_),	\
->  	}
->  
-> @@ -70,7 +70,7 @@ struct mmap_state {
->  		.vma_flags = (map_)->vma_flags,				\
->  		.pgoff = (map_)->pgoff,					\
->  		.anon_pgoff = (map_)->anon_pgoff,			\
-> -		.file = (map_)->file,					\
-> +		.file = (map_)->vm_file,				\
->  		.prev = (map_)->prev,					\
->  		.middle = vma_,						\
->  		.next = (vma_) ? NULL : (map_)->next,			\
-> @@ -2447,7 +2447,7 @@ void mm_drop_all_locks(struct mm_struct *mm)
->   */
->  static bool accountable_mapping(struct mmap_state *map)
->  {
-> -	const struct file *file = map->file;
-> +	const struct file *file = map->vm_file;
->  
->  	/*
->  	 * hugetlb has its own accounting separate from the core VM
-> @@ -2496,7 +2496,7 @@ static void vms_abort_munmap_vmas(struct vma_munmap_struct *vms,
->  
->  static void update_ksm_flags(struct mmap_state *map)
->  {
-> -	map->vma_flags = ksm_vma_flags(map->mm, map->file, map->vma_flags);
-> +	map->vma_flags = ksm_vma_flags(map->mm, map->vm_file, map->vma_flags);
->  }
->  
->  static void set_desc_from_map(struct vm_area_desc *desc,
-> @@ -2506,7 +2506,7 @@ static void set_desc_from_map(struct vm_area_desc *desc,
->  	desc->end = map->end;
->  
->  	desc->pgoff = map->pgoff;
-> -	desc->vm_file = map->file;
-> +	desc->vm_file = map->vm_file;
->  	desc->vma_flags = map->vma_flags;
->  	desc->page_prot = map->page_prot;
->  }
-> @@ -2586,6 +2586,10 @@ static int __mmap_setup(struct mmap_state *map, struct vm_area_desc *desc,
->  	return 0;
->  }
->  
-> +static bool map_same_file(struct mmap_state *map)
-> +{
-> +	return map->vm_file == map->file;
+> +
+> +	return ret;
 > +}
->  
->  static int __mmap_new_file_vma(struct mmap_state *map,
->  			       struct vm_area_struct *vma)
-> @@ -2593,20 +2597,23 @@ static int __mmap_new_file_vma(struct mmap_state *map,
->  	struct vma_iterator *vmi = map->vmi;
->  	int error;
->  
-> -	vma->vm_file = map->file;
-> -	if (!map->file_doesnt_need_get)
-> -		get_file(map->file);
-> +	vma->vm_file = map->vm_file;
-> +	if (map_same_file(map))
-> +		get_file(map->vm_file);
->  
-> -	if (!map->file->f_op->mmap)
-> +	if (!map->vm_file->f_op->mmap)
->  		return 0;
->  
->  	error = mmap_file(vma->vm_file, vma);
-> +	map->vm_file = vma->vm_file;
-> +
+> +EXPORT_SYMBOL_GPL(rmi_undelegate_range);
 
-You set vma->vm_file to map->vm_file unconditionally above, is this
-necessary?
-
->  	if (error) {
->  		UNMAP_STATE(unmap, vmi, vma, vma->vm_start, vma->vm_end,
->  			    map->prev, map->next);
-> -		fput(vma->vm_file);
-> -		vma->vm_file = NULL;
-> +		if (map_same_file(map))
-> +			fput(map->vm_file);
->  
-> +		vma->vm_file = NULL;
->  		vma_iter_set(vmi, vma->vm_end);
->  		/* Undo any partial mapping done by a device driver. */
->  		unmap_region(&unmap);
-> @@ -2623,7 +2630,6 @@ static int __mmap_new_file_vma(struct mmap_state *map,
->  			!vma_flags_test(&map->vma_flags, VMA_MAYWRITE_BIT) &&
->  			vma_test(vma, VMA_MAYWRITE_BIT));
->  
-> -	map->file = vma->vm_file;
->  	map->vma_flags = vma->flags;
->  
->  	return 0;
-> @@ -2631,7 +2637,7 @@ static int __mmap_new_file_vma(struct mmap_state *map,
->  
->  static void map_set_anon(struct mmap_state *map)
->  {
-> -	map->file = NULL;
-> +	map->vm_file = NULL;
->  	map->vm_ops = NULL;
->  	map->pgoff = map->addr >> PAGE_SHIFT;
->  }
-> @@ -2643,7 +2649,7 @@ static bool map_is_private(const struct mmap_state *map)
->  
->  static bool map_is_anon(const struct mmap_state *map)
->  {
-> -	return map_is_private(map) && !map->file;
-> +	return map_is_private(map) && !map->vm_file;
->  }
->  
->  /*
-> @@ -2688,7 +2694,7 @@ static int __mmap_new_vma(struct mmap_state *map, struct vm_area_struct **vmap,
->  	}
->  
->  	/* Invoke callbacks. */
-> -	if (map->file)
-> +	if (map->vm_file)
->  		error = __mmap_new_file_vma(map, vma);
->  	else if (!is_anon)
->  		error = shmem_zero_setup(vma);
-> @@ -2797,11 +2803,15 @@ static int call_mmap_prepare(struct mmap_state *map,
->  	int err;
->  
->  	/* Invoke the hook. */
-> -	err = vfs_mmap_prepare(map->file, desc);
-> +	err = vfs_mmap_prepare(map->vm_file, desc);
->  	if (err)
->  		return err;
->  
-> -	/* It's invalid for mmap_preprare hooks to clear vm_ops. */
-> +	/* Update first so file refcount tracked correctly. */
-> +	if (desc->vm_file != map->vm_file)
-> +		map->vm_file = desc->vm_file;
-> +
-> +	/* It's invalid for mmap_prepare hooks to clear vm_ops. */
-
-The less rare of prepare ;)
-
->  	if (!desc->vm_ops)
->  		return -EINVAL;
->  
-> @@ -2811,10 +2821,6 @@ static int call_mmap_prepare(struct mmap_state *map,
->  
->  	/* Update fields permitted to be changed. */
->  	map->pgoff = desc->pgoff;
-> -	if (desc->vm_file != map->file) {
-> -		map->file_doesnt_need_get = true;
-> -		map->file = desc->vm_file;
-> -	}
->  	map->vma_flags = desc->vma_flags;
->  	map->page_prot = desc->page_prot;
->  	/* User-defined fields. */
-> @@ -2826,7 +2832,7 @@ static int call_mmap_prepare(struct mmap_state *map,
->  	 * anonymous mappings. Rather than allowing these mappings to be odd
->  	 * outliers, simply make them truly anonymous.
->  	 */
-> -	if (map_is_private(map) && file_is_dev_zero(map->file))
-> +	if (map_is_private(map) && file_is_dev_zero(map->vm_file))
->  		map_set_anon(map);
->  
->  	return 0;
-> @@ -2845,7 +2851,7 @@ static void set_vma_user_defined_fields(struct vm_area_struct *vma,
->   */
->  static bool can_set_ksm_flags_early(struct mmap_state *map)
->  {
-> -	struct file *file = map->file;
-> +	struct file *file = map->vm_file;
->  
->  	/* Anonymous mappings have no driver which can change them. */
->  	if (!file)
-> @@ -2868,6 +2874,20 @@ static bool can_set_ksm_flags_early(struct mmap_state *map)
->  	return false;
->  }
->  
-> +static void put_map(struct mmap_state *map)
-
-
-I like the put_map_file() instead, like Suren suggested.. but maybe
-put_map_vm_file(), especially since it could be read as put to the file
-pointer instead of vm_file.
-
-
+> +/*
+> + * rmi_delegate_range: Delegate a physically contiguous range.
+> + * We iterate over the range until we hit an error. So we may
+> + * return an error, but with a partially delegated range. The
+> + * caller must always look at the @out_phys to figure out, how
+> + * much progress was made.
+> + *
+> + * @phys:	Base of the physical address range
+> + * @size:	Size of the physical address range
+> + * @out_phys:	Top of the range that was completed. This is always
+> + *		valid, irrespective of the result.
+> + *
+> + * Returns RMI_SUCCESS on successful completion. Otherwise, returns
+> + * the Linux error number or the RMI status code as described
+> + * by the RMM spec for RMI_GRANULE_DELEGATE_RANGE or RMI_BLOCKED.
+> + */
+> +int rmi_delegate_range(phys_addr_t phys,
+> +		       unsigned long size,
+> +		       phys_addr_t *out_phys)
 > +{
+> +	long ret = 0;
+> +	unsigned long top = phys + size;
+> +	unsigned long out_top;
+> +
+> +	while (phys < top) {
+> +		ret = rmi_granule_range_delegate(phys, top, &out_top);
+> +
+> +		if (ret == RMI_SUCCESS) {
+
+My instinct here would be to flip this and have the error out of line given
+it breaks anyway and that gives you smaller indent for that ocmment block.
+
+		if (ret != RMI_SUCCESS)
+			break;
+
+		/*
+		 * Buggy RMM ? Let the caller handle the failure. We can't know
+		 * how far the RMM delegated in this iteration, so we return 
+ 		 * the best known good limit. RMM can deal with granules 
+		 * already in "undelegated" in a given range. So, it is fine
+		 * for the caller to try the range we return.
+		 */
+		if (WARN_ON...
+
+> +			/*
+> +			 * Buggy RMM ? Let the caller handle the failure.
+> +			 * We can't know how far the RMM delegated in this
+> +			 * iteration, so we return the best known good limit.
+> +			 * RMM can deal with granules already in "undelegated"
+> +			 * in a given range. So, it is fine for the caller to
+> +			 * try the range we return.
+> +			 */
+> +			if (WARN_ON(out_top <= phys)) {
+> +				ret = -ENXIO;
+> +				break;
+> +			}
+> +			phys = out_top;
+> +		} else {
+> +			break;
+> +		}
+> +	}
+> +
+> +	if (out_phys)
+> +		*out_phys = phys;
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(rmi_delegate_range);
+
+...
+
+> +
+> +static int rmi_sro_donate_noncontig(struct rmi_sro_state *sro,
+> +				    unsigned long sro_handle,
+> +				    unsigned long donatereq,
+> +				    struct arm_smccc_1_2_regs *out_regs,
+> +				    gfp_t gfp)
+> +{
+
+...
+
+> +
+> +	/* Gather the suitable entries to the end of the list */
+> +	i = 0;
+> +	while (i <  addr_list_start && found < count) {
+> +		unsigned long entry = sro->addr_list[i];
+> +
+> +		if (RMI_ADDR_RANGE_BLOCK_SIZE(entry) == block_size_fld &&
+> +		    RMI_ADDR_RANGE_COUNT(entry) == 1 &&
+> +		    RMI_ADDR_RANGE_STATE(entry) == state) {
+> +			addr_list_start--;
+> +			swap(sro->addr_list[addr_list_start],
+> +			     sro->addr_list[i]);
+> +			found++;
+> +			/* Continue from the swapped in entry */
+> +			continue;
+> +		}
+> +		/* skip past the entry */
+
+Bit random on comment capitalization.  Have a quick final look through.
+For instance I think this one is Skip to match Continue above.
+
+> +		i++;
+> +	}
+
+...
+
+
+> +
+> +static int rmi_sro_reclaim(struct rmi_sro_state *sro,
+> +			   unsigned long sro_handle,
+> +			   struct arm_smccc_1_2_regs *out_regs)
+> +{
+> +	unsigned long capacity;
+> +
 > +	/*
-> +	 * An error occurred or the VMA was merged.
-> +	 *
-> +	 * If the file was changed by the driver (which is required to increment
-> +	 * the replacement file's reference count), drop its reference count.
-> +	 *
-> +	 * On error, the caller always drops the original file regardless.
+> +	 * We don't do a partial free of the entries. So for
+> +	 * now free the entire address list as we prepare
+> +	 * to reclaim more from the RMM.
+
+Rewrap to use all that nice space up to 80 chars!  I guess a refactoring
+side effect.
+
 > +	 */
-> +	if (map->vm_file && !map_same_file(map))
-> +		fput(map->vm_file);
-> +}
+> +	if (rmi_sro_ensure_capacity(sro, 1))
+> +		rmi_sro_free(sro);
 > +
->  static unsigned long __mmap_region(struct file *file, unsigned long addr,
->  		unsigned long len, vma_flags_t vma_flags,
->  		unsigned long pgoff, struct list_head *uf)
-> @@ -2922,7 +2942,10 @@ static unsigned long __mmap_region(struct file *file, unsigned long addr,
->  
->  	__mmap_complete(&map, vma);
->  
-> -	if (have_mmap_prepare && allocated_new) {
-> +	if (!allocated_new) {
-> +		/* Merged, so need to drop refcount. */
-> +		put_map(&map);
-> +	} else if (have_mmap_prepare) {
->  		error = mmap_action_complete(vma, &desc.action,
->  					     /*is_compat=*/false);
->  		if (error)
-> @@ -2936,13 +2959,7 @@ static unsigned long __mmap_region(struct file *file, unsigned long addr,
->  	if (map.charged)
->  		vm_unacct_memory(map.charged);
->  abort_munmap:
-> -	/*
-> -	 * This indicates that .mmap_prepare has set a new file, differing from
-> -	 * desc->vm_file. But since we're aborting the operation, only the
-> -	 * original file will be cleaned up. Ensure we clean up both.
-> -	 */
-> -	if (map.file_doesnt_need_get)
-> -		fput(map.file);
-> +	put_map(&map);
->  	vms_abort_munmap_vmas(&map.vms, &map.mas_detach);
->  	return error;
->  }
-> diff --git a/mm/vma.h b/mm/vma.h
-> index e97bd2dfa786..f15faa83f3d6 100644
-> --- a/mm/vma.h
-> +++ b/mm/vma.h
-> @@ -394,8 +394,10 @@ static inline void compat_set_vma_from_desc(struct vm_area_struct *vma,
->  
->  	/* Mutable fields. Populated with initial state. */
->  	vma_set_pgoff(vma, desc->pgoff);
-> -	if (desc->vm_file != vma->vm_file)
-> -		vma_set_file(vma, desc->vm_file);
-> +	if (desc->vm_file != vma->vm_file) {
-> +		fput(vma->vm_file);
-> +		vma->vm_file = desc->vm_file;
+> +	capacity = RMI_MAX_ADDR_LIST - sro->addr_count;
+> +
+> +	rmi_op_mem_reclaim(sro_handle,
+> +			   virt_to_phys(&sro->addr_list[sro->addr_count]),
+> +			   capacity, out_regs);
+> +
+> +	/*
+> +	 * RMI_OP_MEM_RECLAIM always return RMI_INCOMPLETE, except when the
+> +	 * input parameters were invalid.
+> +	 */
+> +	if (WARN_ON_ONCE(RMI_RESULT_STATUS(out_regs->a0) != RMI_INCOMPLETE))
+> +		return -EINVAL;
+> +	if (WARN_ON_ONCE(out_regs->a1 > capacity))
+> +		out_regs->a1 = capacity;
+> +
+> +	sro->addr_count += out_regs->a1;
+> +
+> +	return 0;
+> +}
 
-This isn't going to be racy somehow, right?
+> +
+> +long rmi_sro_memxfer_execute(struct rmi_sro_state *sro, gfp_t gfp)
+> +{
+> +	struct arm_smccc_1_2_regs *regs = &sro->regs;
+> +	bool cancelled = false;
+> +	unsigned long sro_handle;
+> +
+> +	rmi_smccc_invoke(regs);
+> +
+> +	sro_handle = regs->a1;
+> +	while (RMI_RESULT_STATUS(regs->a0) == RMI_INCOMPLETE) {
+> +		bool can_cancel = RMI_RESULT_CAN_CANCEL(regs->a0) == RMI_OP_CAN_CANCEL;
 
+For a flag that is "can" or "cannot", do we need the RMI_OP_CAN_CANCEL (1) / RMI_OP_CANNOT_CANCEL (0)
+defines?  Doesn't feel like we'll ever get RMI_OP_UNKNOWN_IF_IT_CAN_CANCEL and I can't think
+of any other more reasonable options that would justify needing the explicit field value
+match.
+
+To me
+
+		bool can_cancel = RMI_RESULT_CAN_CANCEL(regs->a0);
+
+is obvious enough.  I don't care that much though so up to you.
+
+
+> +		int ret = 0;
+> +
+> +		switch (RMI_RESULT_MEMREQ(regs->a0)) {
+> +		case RMI_OP_MEM_REQ_NONE:
+> +			rmi_op_continue(sro_handle, RMI_CONTINUE_KEEP_GOING,
+> +					regs);
+> +			break;
+> +		case RMI_OP_MEM_REQ_DONATE:
+> +			ret = rmi_sro_donate(sro, sro_handle, regs->a2, regs,
+> +					     gfp);
+> +			break;
+> +		case RMI_OP_MEM_REQ_RECLAIM:
+> +			ret = rmi_sro_reclaim(sro, sro_handle, regs);
+> +			break;
+> +		default:
+> +			WARN_ON_ONCE(1);
+> +			ret = -ENXIO;
+> +			break;
+> +		}
+> +
+> +		if (ret) {
+> +			/*
+> +			 * All memory donating SROs must be cancellable. So a
+> +			 * failure in memory allocation shouldn't be an issue.
+> +			 * However, if we encounter a random failure (e.g.,
+> +			 * buggy RMM), don't loop forever, just give up.
+> +			 */
+> +			if (WARN_ON_ONCE(!can_cancel))
+> +				return ret;
+> +			/*
+> +			 * If we have already cancelled, and came back here due
+> +			 * to an error in MEMREQ, then there is no point
+> +			 * in going in loops.
+> +			 */
+> +			if (WARN_ON_ONCE(cancelled))
+> +				break;
+> +			rmi_op_cancel(sro_handle, regs);
+> +			cancelled = true;
+> +
+> +			if (WARN_ON_ONCE(RMI_RESULT_STATUS(regs->a0) != RMI_INCOMPLETE))
+> +				return ret;
+> +		}
 > +	}
->  	vma->flags = desc->vma_flags;
->  	vma->vm_page_prot = desc->page_prot;
->  
-> 
-> -- 
-> 2.55.0
-> 
+> +
+> +	if (cancelled)
+> +		return -ECANCELED;
+> +
+> +	return regs->a0;
+> +}
+> +EXPORT_SYMBOL_GPL(rmi_sro_memxfer_execute);
+> +
+> +/*
+> + * rmi_sro_execute: Execute an RMI command that is Stateful but not memory
+> + * tranfserring. Takes regs, filled with the FIDs and the arguments in place.
+
+Spell check. Transferring.  Also why does Stateful get a capital letter and
+Memory Transferring does not.  They seem to both be properties of the comman
+so I'd expect some consistency.
+
+> + *
+> + * Returns :
+> + *  -ECANCELLED - If the operation had to be aborted and SRO was cancellable.
+> + *  Otherwise, returns the result of the RMI command.
+> + */
+> +long rmi_sro_execute(struct arm_smccc_1_2_regs *regs)
+> +{
+> +	bool cancelled = false;
+> +	unsigned long sro_handle = regs->a1;
+> +
+> +	rmi_smccc_invoke(regs);
+> +
+> +	sro_handle = regs->a1;
+> +	while (RMI_RESULT_STATUS(regs->a0) == RMI_INCOMPLETE) {
+> +		bool can_cancel = RMI_RESULT_CAN_CANCEL(regs->a0) == RMI_OP_CAN_CANCEL;
+> +
+> +		switch (RMI_RESULT_MEMREQ(regs->a0)) {
+> +		case RMI_OP_MEM_REQ_NONE:
+> +			rmi_op_continue(sro_handle, RMI_CONTINUE_KEEP_GOING,
+> +					regs);
+> +			break;
+> +		default:
+> +			WARN_ON_ONCE(1);
+> +			if (!can_cancel)
+> +				return regs->a0;
+> +			/*
+> +			 * We can't get here normally, but handle this anyway
+> +			 * for a buggy RMM implementation.
+> +			 */
+> +			if (cancelled)
+> +				return -ECANCELED;
+> +			rmi_op_cancel(sro_handle, regs);
+> +			cancelled = true;
+> +		}
+> +	}
+> +
+> +	if (cancelled)
+> +		return -ECANCELED;
+> +
+> +	return regs->a0;
+> +}
+> +EXPORT_SYMBOL_GPL(rmi_sro_execute);
+
