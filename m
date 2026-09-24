@@ -1,211 +1,380 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BAEF389111;
-	Thu, 24 Sep 2026 10:06:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2AB54718C3;
+	Thu, 24 Sep 2026 10:07:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790244426; cv=none; b=WAK3f+UPmfhIe+iFYK+N0VyDAIFIMi/8gCuxFyvfjXiahNwaOTR3bW3Pz81Fdklyd7ihKmFDoKBGRIyQj3RlXzhPL204rfWx2jnnHyPuSlFa2FXffAdWbw8COVCOGjzY9tJsgxOqJG7htr2k6L0+h9EjHJaAJ2F9rEkKbMjBL3c=
+	t=1790244446; cv=none; b=N8kxde95roQBpYEr/ugiWROA6NfGx++WDTqUGZUGv+IX0Nxe4J5gP8GJTC1+icOm10xZ/7YlZeT9Ebm9IyVPT0x8SV+4YRCTEye0APsQkOu0UBXAsVuw9SlQTwUZosoqH3cGA2uxb8O5WJ0yF7rwdbJC6HaRJ4ZF46rtS9P6y1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790244426; c=relaxed/simple;
-	bh=3BdFtZaQx/hN1F8B7NWjXGwFzEqYe+EiIIZXC/z69vI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dy7kV6WcyzC+RPhPDp8Z+ppMFtXxCI9seff01cMnschqi0aoK+bc0pA+Q584fgFoyW6W+vCKH7SEyDAPukkjZRkGWVfVYKES6yRzHNPfv7DbRh5eyxaDFBLCI4gMvcC0FgBZxtsy7LmassO1EE8cK1vhQaREznCKooR2knDS/Jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PLQwBAOG; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790244446; c=relaxed/simple;
+	bh=5FjY2hxzRnVVGENuXbN0QPkVDmjXfmmSiENd3va9wqI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=GNNP2xlljfwKoPIn2DYs/GNe2Ndc5vDtmH5ckgRoxmoU6AxYr74uMnTbdZimxyXYDzE3I74ymFvN2xS7DEll/TZigVBKAJkeiApaRKb4PYHUkhYPEmCKLYJnGeyE0r8rznpYrsuPOhF12E+Lxc1fEQ4ksl3vnWDEMGYcME6d8rM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P4weohzL; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PLQwBAOG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2C321F00893;
-	Thu, 24 Sep 2026 10:06:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P4weohzL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 471DA1F00898;
+	Thu, 24 Sep 2026 10:06:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790244413;
-	bh=Tmln/mtpzj8HRD3oGhB2G+T5+fAuKHxHe9EIDa4XupE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=PLQwBAOGo9zDSHvR7HKzryQ/BMyFMtzGN+nCViQmJtAxtR/cVtie3h8+uTfYAAuqI
-	 031IL8YiCRbRgN3Lu0GdOWHF3up1c5eAkeUhEPdxuJ9q/SthtjUJM4e5DTQk3971Cv
-	 +R/NIvQEe5TAium5bmdEyB/qSUVvrKQ3N2k6WtmzwCU8Hw7KqZ3HuHqonUNceqtFUI
-	 gkBAcKeGMzG5vw33mskB8GCIprFrs11XV7eTU1DX4P4aEFuLfxG1bzkZcra4RB+dUr
-	 UBz/croW/YGWjUjo9iUnRJL3m1e4m9BS//Qzg5nKK/0JyOftW1GHHLTSp3iQSWnW2G
-	 YCgs9xZC0a5iw==
-Date: Thu, 24 Sep 2026 11:06:21 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Zi Yan <ziy@nvidia.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	"Liam R. Howlett" <liam@infradead.org>, Vlastimil Babka <vbabka@kernel.org>, 
-	Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
-	David Hildenbrand <david@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
-	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Baolin Wang <baolin.wang@linux.alibaba.com>, 
-	Nico Pache <nico.pache@linux.dev>, Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, 
-	Barry Song <baohua@kernel.org>, Lance Yang <lance.yang@linux.dev>, 
-	Usama Arif <usama.arif@linux.dev>, Kiryl Shutsemau <kas@kernel.org>, 
-	Doug Gilbert <dgilbert@interlog.com>, "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <mkp@kernel.org>, Jaya Kumar <jayalk@intworks.biz>, 
-	Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, Sebastian Reichel <sre@kernel.org>, 
-	John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
-	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
-	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
-	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
-	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
-	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev
-Subject: Re: [PATCH v3 04/40] mm: consistently validate VMA state after
- mmap[_prepare] hooks
-Message-ID: <arT1xJpWlFlRHUFY@gremlin>
-References: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org>
- <20260917-b4-mmap-prepare-vma-flag-sanify-v3-4-4583d8a23bca@kernel.org>
- <DLN7FLRJGS5Y.1T8T274W2NS6L@nvidia.com>
+	s=k20260515; t=1790244434;
+	bh=3VEiNyRElR21dM0ldw2tBNyPvjJVs1EiiOGwEtuW83w=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=P4weohzLy5CJIC6NuQMtaN228WRSyTv1qq2kfyS1SqVpAoivQBh8rbXTWcgdPM8Vm
+	 VkkcKKNe815WzpckDV2vo5sLg6oY90jZ+O7Gsbe2IyHqMt3ths8C3qowAtvY9pyuMb
+	 BLNm9sLUo2KCev6yRDGHrv2jlxYgCizHAZmwA0FgSr73VZ4nhceMq7E5IbgrJ9i855
+	 NVMxhiRGI4wBX+25qxXp+4gTVOp/T+V6wF5ql7Pqx1cI/HG4Elq5MQ9PyHKdZUov1x
+	 Q6OiNyChps0dsTSqSw6oo9mcoRb5XaZdDEVCFf8DpX8VwhVWCRhURI9TR4YLA+7jTL
+	 bqdnABkbNAlrw==
+From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+To: linux-coco@lists.linux.dev,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	iommu@lists.linux.dev
+Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Baoquan He <baoquan.he@linux.dev>,
+	Mike Rapoport <rppt@kernel.org>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Pratyush Yadav <pratyush@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Joerg Roedel <joro@8bytes.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Benjamin Gaignard <benjamin.gaignard@collabora.com>,
+	Brian Starkey <Brian.Starkey@arm.com>,
+	John Stultz <jstultz@google.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Radu Rendec <radu@rendec.net>,
+	"T.J. Mercier" <tjmercier@google.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <chleroy@kernel.org>,
+	Ritesh Harjani <ritesh.list@gmail.com>,
+	Shrikanth Hegde <sshegde@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Kiryl Shutsemau <kas@kernel.org>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	"K . Y . Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org,
+	linux-media@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: [RFC PATCH v8 05/14] dma-contiguous: Derive shared alignment from DMA attributes
+Date: Thu, 24 Sep 2026 15:35:20 +0530
+Message-ID: <20260924100529.1398790-6-aneesh.kumar@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260924100529.1398790-1-aneesh.kumar@kernel.org>
+References: <20260924100529.1398790-1-aneesh.kumar@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DLN7FLRJGS5Y.1T8T274W2NS6L@nvidia.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 23, 2026 at 10:52:06PM -0400, Zi Yan wrote:
-> On Thu Sep 17, 2026 at 12:22 PM EDT, Lorenzo Stoakes (ARM) wrote:
-> > When the f_op->mmap_prepare or deprecated f_op->mmap hooks are invoked, the
-> > driver might have done something crazy that is not permitted by the kernel.
-> >
-> > Currently we check for three such cases in __mmap_new_file_vma(), but only
-> > if the legacy f_op->mmap hook is used:
-> >
-> > * Did sparc ADI result in invalid flags?
-> >
-> > * Did the driver alter vma->vm_start?
-> >
-> > * Did the driver make a file-backed mapping on a read-only file writable?
-> >
-> > Generalise these checks for both mmap_prepare and mmap and apply to all
-> > invocations of mmap_file(), the f_op->mmap and f_op->mmap_prepare handling
-> > in the core VMA code and the mmap_prepare compatibility layer.
-> >
-> > Also extend the vm_start check to vm_end also - drivers must not change the
-> > VMA range at all.
-> >
-> > We also WARN_ON_ONCE() on these conditions as they are things that should
-> > simply not occur in the kernel and it's important to call it out when it
-> > does.
-> >
-> > We invoke mmap_prepare_validate() after mmap_action_prepare(), as mmap
-> > actions often manipulate state in the descriptor thus providing the final
-> > state the VMA will be derived from.
-> >
-> > Also call mmap_validate_vma_flags() in insert_vm_struct() to ensure that
-> > special regions which are inserted (such as a VDSO or VVAR) also satisfy
-> > the sanity checks.
-> >
-> > This way every VMA established through an mmap hook, whether via mmap() or
-> > the compatibility layer, or inserted via insert_vm_struct(), has been
-> > validated. brk() VMAs never pass through a driver hook and so need no such
-> > check.
-> >
-> > While we're here, also fixup a couple disjoint blocks of #ifdef CONFIG_MMU.
-> >
-> > Finally, update the VMA userland tests to reflect the change.
-> >
-> > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> > ---
-> >  mm/internal.h                   |  51 ++++++++++++--------
-> >  mm/util.c                       |  19 ++++++--
-> >  mm/vma.c                        | 100 ++++++++++++++++++++++++++++++++++------
-> >  mm/vma.h                        |  25 ++++++++--
-> >  tools/testing/vma/include/dup.h |  10 ++++
-> >  5 files changed, 163 insertions(+), 42 deletions(-)
-> >
-> <snip>
-> > +
-> > +/* Check to ensure a driver hasn't done something crazy. */
-> > +static int mmap_validate(unsigned long prev_start, unsigned long prev_end,
-> > +			 unsigned long curr_start, unsigned long curr_end,
-> > +			 const vma_flags_t *prev_flags,
-> > +			 const vma_flags_t *curr_flags)
-> > +{
-> > +	bool was_maywrite, is_maywrite;
-> > +
-> > +	/* Drivers cannot alter the range of the VMA. */
-> > +	if (WARN_ON_ONCE(prev_start != curr_start || prev_end != curr_end))
-> > +		return -EINVAL;
-> > +
-> > +	was_maywrite = vma_flags_test(prev_flags, VMA_MAYWRITE_BIT);
-> > +	is_maywrite = vma_flags_test(curr_flags, VMA_MAYWRITE_BIT);
-> > +
-> > +	/* A driver may not make a previously unwritable mapping writable. */
-> > +	if (WARN_ON_ONCE(!was_maywrite && is_maywrite))
->
-> Is it driver specific or generally applicable to all mmap(_preppare)
-> operations? Is the comment too specific?
->
-> During my LLM quiz, making memfd write seals writable via a
-> hypothetically wrong shmem_mmap_prepare() implementation is an example
-> for this WARN_ON_ONCE. It is not driver related. Let me know if I get it
-> wrong.
+Confidential-computing shared DMA allocations require CMA backing memory
+to be aligned to the architecture shared-memory granule. Passing explicit
+alignment orders through the DMA allocation stack exposes this derived
+constraint to callers and requires separate preferred and mandatory values.
 
-Driver is taken to mean anything with an mmap or mmap_prepare hook, like a
-general term for that.
+The DMA core already records whether an allocation needs shared backing in
+__DMA_ATTR_ALLOC_CC_SHARED. Pass allocation attributes to the DMA-contiguous
+entry points and derive the mandatory alignment there before calling CMA.
+Preserve the existing alignment clamping for ordinary allocations, while
+rejecting shared allocations whose granule exceeds CONFIG_CMA_ALIGNMENT so
+callers can fall back to the page allocator.
 
-If we start getting into calling it different if it's a file system or memfd or
-something then it becomes quite hard to talk about it.
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: Robin Murphy <robin.murphy@arm.com>
+Cc: "Joerg Roedel (AMD)" <joro@8bytes.org>
+Cc: Will Deacon <will@kernel.org>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Baoquan He <baoquan.he@linux.dev>
+Cc: Mike Rapoport <rppt@kernel.org>
+Cc: Pasha Tatashin <pasha.tatashin@soleen.com>
+Cc: Pratyush Yadav <pratyush@kernel.org>
+Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+---
+ arch/arm/mm/dma-mapping.c   |  5 +++--
+ drivers/iommu/dma-iommu.c   |  2 +-
+ include/linux/dma-map-ops.h |  9 ++++----
+ kernel/dma/contiguous.c     | 41 +++++++++++++++++++++++++++----------
+ kernel/dma/direct.c         |  2 +-
+ kernel/dma/ops_helpers.c    |  2 +-
+ kernel/dma/pool.c           |  2 +-
+ kernel/kexec_file.c         |  3 ++-
+ 8 files changed, 44 insertions(+), 22 deletions(-)
 
-And yeah I hate that it's not a good name because driver makes you think
-something in drivers/* or an OOT one or something but the kernel makes it vague
-:)
+diff --git a/arch/arm/mm/dma-mapping.c b/arch/arm/mm/dma-mapping.c
+index 7761099dde9e..9714fcd51941 100644
+--- a/arch/arm/mm/dma-mapping.c
++++ b/arch/arm/mm/dma-mapping.c
+@@ -398,7 +398,8 @@ static void *__alloc_from_contiguous(struct device *dev, size_t size,
+ 	struct page *page;
+ 	void *ptr = NULL;
+ 
+-	page = dma_alloc_from_contiguous(dev, count, order, gfp & __GFP_NOWARN);
++	page = dma_alloc_from_contiguous(dev, count, order, 0,
++					 gfp & __GFP_NOWARN);
+ 	if (!page)
+ 		return NULL;
+ 
+@@ -866,7 +867,7 @@ static struct page **__iommu_alloc_buffer(struct device *dev, size_t size,
+ 		unsigned long order = get_order(size);
+ 		struct page *page;
+ 
+-		page = dma_alloc_from_contiguous(dev, count, order,
++		page = dma_alloc_from_contiguous(dev, count, order, 0,
+ 						 gfp & __GFP_NOWARN);
+ 		if (!page)
+ 			goto error;
+diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+index 58c624513cd4..59baf2687612 100644
+--- a/drivers/iommu/dma-iommu.c
++++ b/drivers/iommu/dma-iommu.c
+@@ -1627,7 +1627,7 @@ static void *iommu_dma_alloc_pages(struct device *dev, size_t size,
+ 	struct page *page = NULL;
+ 	void *cpu_addr;
+ 
+-	page = dma_alloc_contiguous(dev, alloc_size, gfp);
++	page = dma_alloc_contiguous(dev, alloc_size, gfp, 0);
+ 	if (!page)
+ 		page = alloc_pages_node(node, gfp, get_order(alloc_size));
+ 	if (!page)
+diff --git a/include/linux/dma-map-ops.h b/include/linux/dma-map-ops.h
+index 8fae2b7deb20..f3490dd3f8ac 100644
+--- a/include/linux/dma-map-ops.h
++++ b/include/linux/dma-map-ops.h
+@@ -99,10 +99,11 @@ int __init dma_contiguous_reserve_area(phys_addr_t size, phys_addr_t base,
+ 		phys_addr_t limit, struct cma **res_cma, bool fixed);
+ 
+ struct page *dma_alloc_from_contiguous(struct device *dev, size_t count,
+-				       unsigned int order, bool no_warn);
++		unsigned int order, unsigned long attrs, bool no_warn);
+ bool dma_release_from_contiguous(struct device *dev, struct page *pages,
+ 				 int count);
+-struct page *dma_alloc_contiguous(struct device *dev, size_t size, gfp_t gfp);
++struct page *dma_alloc_contiguous(struct device *dev, size_t size,
++				  gfp_t gfp, unsigned long attrs);
+ void dma_free_contiguous(struct device *dev, struct page *page, size_t size);
+ 
+ void dma_contiguous_early_fixup(phys_addr_t base, unsigned long size);
+@@ -125,7 +126,7 @@ static inline int dma_contiguous_reserve_area(phys_addr_t size,
+ 	return -ENOSYS;
+ }
+ static inline struct page *dma_alloc_from_contiguous(struct device *dev,
+-		size_t count, unsigned int order, bool no_warn)
++		size_t count, unsigned int order, unsigned long attrs, bool no_warn)
+ {
+ 	return NULL;
+ }
+@@ -136,7 +137,7 @@ static inline bool dma_release_from_contiguous(struct device *dev,
+ }
+ /* Use fallback alloc() and free() when CONFIG_DMA_CMA=n */
+ static inline struct page *dma_alloc_contiguous(struct device *dev, size_t size,
+-		gfp_t gfp)
++		gfp_t gfp, unsigned long attrs)
+ {
+ 	return NULL;
+ }
+diff --git a/kernel/dma/contiguous.c b/kernel/dma/contiguous.c
+index 66093460584e..1a29565c9185 100644
+--- a/kernel/dma/contiguous.c
++++ b/kernel/dma/contiguous.c
+@@ -39,6 +39,7 @@
+ 
+ #include <asm/page.h>
+ 
++#include <linux/cc_shared.h>
+ #include <linux/memblock.h>
+ #include <linux/err.h>
+ #include <linux/sizes.h>
+@@ -357,19 +358,29 @@ int __init dma_contiguous_reserve_area(phys_addr_t size, phys_addr_t base,
+  * dma_alloc_from_contiguous() - allocate pages from contiguous area
+  * @dev:   Pointer to device for which the allocation is performed.
+  * @count: Requested number of pages.
+- * @align: Requested alignment of pages (in PAGE_SIZE order).
++ * @align: Preferred alignment of pages (in PAGE_SIZE order).
++ * @attrs: DMA allocation attributes.
+  * @no_warn: Avoid printing message about failed allocation.
+  *
+  * This function allocates memory buffer for specified device. It uses
+  * device specific contiguous memory area if available or the default
+  * global one. Requires architecture specific dev_get_cma_area() helper
+  * function.
++ *
++ * The preferred alignment is capped at CONFIG_CMA_ALIGNMENT. The internal
++ * shared-allocation attribute requires at least the architecture shared
++ * granule alignment and fails if that exceeds the CMA alignment limit.
+  */
+ struct page *dma_alloc_from_contiguous(struct device *dev, size_t count,
+-				       unsigned int align, bool no_warn)
++		unsigned int align, unsigned long attrs, bool no_warn)
+ {
+-	if (align > CONFIG_CMA_ALIGNMENT)
+-		align = CONFIG_CMA_ALIGNMENT;
++	unsigned int required_align = 0;
++
++	if (attrs & __DMA_ATTR_ALLOC_CC_SHARED)
++		required_align = get_order(cc_shared_granule_size());
++	if (required_align > CONFIG_CMA_ALIGNMENT)
++		return NULL;
++	align = min(max(align, required_align), CONFIG_CMA_ALIGNMENT);
+ 
+ 	return cma_alloc(dev_get_cma_area(dev), count, align, no_warn);
+ }
+@@ -390,10 +401,9 @@ bool dma_release_from_contiguous(struct device *dev, struct page *pages,
+ 	return cma_release(dev_get_cma_area(dev), pages, count);
+ }
+ 
+-static struct page *cma_alloc_aligned(struct cma *cma, size_t size, gfp_t gfp)
++static struct page *cma_alloc_aligned(struct cma *cma, size_t size, gfp_t gfp,
++				      unsigned int align)
+ {
+-	unsigned int align = min(get_order(size), CONFIG_CMA_ALIGNMENT);
+-
+ 	return cma_alloc(cma, size >> PAGE_SHIFT, align, gfp & __GFP_NOWARN);
+ }
+ 
+@@ -402,6 +412,7 @@ static struct page *cma_alloc_aligned(struct cma *cma, size_t size, gfp_t gfp)
+  * @dev:   Pointer to device for which the allocation is performed.
+  * @size:  Requested allocation size.
+  * @gfp:   Allocation flags.
++ * @attrs: DMA allocation attributes.
+  *
+  * tries to use device specific contiguous memory area if available, or it
+  * tries to use per-numa cma, if the allocation fails, it will fallback to
+@@ -412,8 +423,11 @@ static struct page *cma_alloc_aligned(struct cma *cma, size_t size, gfp_t gfp)
+  * there is no need to waste CMA pages for that kind; it also helps reduce
+  * fragmentations.
+  */
+-struct page *dma_alloc_contiguous(struct device *dev, size_t size, gfp_t gfp)
++struct page *dma_alloc_contiguous(struct device *dev, size_t size,
++				  gfp_t gfp, unsigned long attrs)
+ {
++	unsigned int required_align = 0;
++	unsigned int align = get_order(size);
+ #ifdef CONFIG_DMA_NUMA_CMA
+ 	int nid = dev_to_node(dev);
+ #endif
+@@ -421,8 +435,13 @@ struct page *dma_alloc_contiguous(struct device *dev, size_t size, gfp_t gfp)
+ 	/* CMA can be used only in the context which permits sleeping */
+ 	if (!gfpflags_allow_blocking(gfp))
+ 		return NULL;
++	if (attrs & __DMA_ATTR_ALLOC_CC_SHARED)
++		required_align = get_order(cc_shared_granule_size());
++	if (required_align > CONFIG_CMA_ALIGNMENT)
++		return NULL;
++	align = min(max(align, required_align), CONFIG_CMA_ALIGNMENT);
+ 	if (dev->cma_area)
+-		return cma_alloc_aligned(dev->cma_area, size, gfp);
++		return cma_alloc_aligned(dev->cma_area, size, gfp, align);
+ 	if (size <= PAGE_SIZE)
+ 		return NULL;
+ 
+@@ -431,7 +450,7 @@ struct page *dma_alloc_contiguous(struct device *dev, size_t size, gfp_t gfp)
+ 		struct cma *cma = dma_contiguous_numa_area[nid];
+ 		struct page *page;
+ 		if (cma) {
+-			page = cma_alloc_aligned(cma, size, gfp);
++			page = cma_alloc_aligned(cma, size, gfp, align);
+ 			if (page)
+ 				return page;
+ 		}
+@@ -440,7 +459,7 @@ struct page *dma_alloc_contiguous(struct device *dev, size_t size, gfp_t gfp)
+ 	if (!dma_contiguous_default_area)
+ 		return NULL;
+ 
+-	return cma_alloc_aligned(dma_contiguous_default_area, size, gfp);
++	return cma_alloc_aligned(dma_contiguous_default_area, size, gfp, align);
+ }
+ 
+ /**
+diff --git a/kernel/dma/direct.c b/kernel/dma/direct.c
+index 356d4e09e1c8..cb14419f8a09 100644
+--- a/kernel/dma/direct.c
++++ b/kernel/dma/direct.c
+@@ -124,7 +124,7 @@ static struct page *__dma_direct_alloc_pages(struct device *dev, size_t size,
+ 	WARN_ON_ONCE(!PAGE_ALIGNED(size));
+ 
+ 	gfp |= dma_direct_optimal_gfp_mask(dev, &phys_limit);
+-	page = dma_alloc_contiguous(dev, size, gfp);
++	page = dma_alloc_contiguous(dev, size, gfp, 0);
+ 	if (page) {
+ 		if (dma_coherent_ok(dev, page_to_phys(page), size) &&
+ 		    (allow_highmem || !PageHighMem(page)))
+diff --git a/kernel/dma/ops_helpers.c b/kernel/dma/ops_helpers.c
+index 6b5f9208d31c..8320cc0fada5 100644
+--- a/kernel/dma/ops_helpers.c
++++ b/kernel/dma/ops_helpers.c
+@@ -66,7 +66,7 @@ struct page *dma_common_alloc_pages(struct device *dev, size_t size,
+ 	struct page *page;
+ 	phys_addr_t phys;
+ 
+-	page = dma_alloc_contiguous(dev, size, gfp);
++	page = dma_alloc_contiguous(dev, size, gfp, 0);
+ 	if (!page)
+ 		page = alloc_pages_node(dev_to_node(dev), gfp, get_order(size));
+ 	if (!page)
+diff --git a/kernel/dma/pool.c b/kernel/dma/pool.c
+index 00f422a1e896..70b7f64b17ab 100644
+--- a/kernel/dma/pool.c
++++ b/kernel/dma/pool.c
+@@ -99,7 +99,7 @@ static int atomic_pool_expand(struct dma_gen_pool *dma_pool, size_t pool_size,
+ 		pool_size = 1 << (PAGE_SHIFT + order);
+ 		if (cma_in_zone(gfp))
+ 			page = dma_alloc_from_contiguous(NULL, 1 << order,
+-							 order, false);
++							 order, 0, false);
+ 		if (!page)
+ 			page = alloc_pages(gfp | __GFP_NOWARN, order);
+ 	} while (!page && order-- > 0);
+diff --git a/kernel/kexec_file.c b/kernel/kexec_file.c
+index 59fb9d71e9d8..2a337ce7264e 100644
+--- a/kernel/kexec_file.c
++++ b/kernel/kexec_file.c
+@@ -682,7 +682,8 @@ static int kexec_alloc_contig(struct kexec_buf *kbuf)
+ 	if (kbuf->image->type == KEXEC_TYPE_CRASH)
+ 		return -EPERM;
+ 
+-	p = dma_alloc_from_contiguous(NULL, nr_pages, get_order(kbuf->buf_align), true);
++	p = dma_alloc_from_contiguous(NULL, nr_pages,
++				      get_order(kbuf->buf_align), 0, true);
+ 	if (!p)
+ 		return -ENOMEM;
+ 
+-- 
+2.43.0
 
-Naming is hard...
-
->
-> Otherwise, LGTM.
->
-> Reviewed-by: Zi Yan <ziy@nvidia.com>
-
-Thanks!
-
->
->
-> --
-> Best Regards,
-> Yan, Zi
->
-
---
-Cheers, Lorenzo
