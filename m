@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C46D04734D0;
-	Thu, 24 Sep 2026 10:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41D3C472F9D;
+	Thu, 24 Sep 2026 10:09:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790244556; cv=none; b=V7ef3nuWPCbyc5CIm+Bu1HA6Fo1IKLjJHFxxG+AIwr7UUcWNOKOegS53+00q8rlvcMNUPcKXd9KcKxpRnShEBEU8R/04I0Pg4Eunln+9jrn0tmH0n3uZyxMhCffWFs5D/EXd1UAjHyonHOHvet6P7qPd1QyypA/1AGS4Hqi55Vk=
+	t=1790244569; cv=none; b=bJk/EY6i28z8puFMQMxY4XFoTU3ysTszplK9sS6YahQuHIVHASgyL488UlEUKCGxaDXCuZvbr0X6/vvqAf3oGSHKUVIRkcNlzR8KHzWiZ6H2uvb2vdJMlWlkc0b+SgQP1gq2Ny3vV/HBmDi/zNkIGxOUkMZRxRTTuMD3+3LUHIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790244556; c=relaxed/simple;
-	bh=9T+jVTSN5hZQjYfq9qtnzx226IldZZujAZIyb4HEuQQ=;
+	s=arc-20240116; t=1790244569; c=relaxed/simple;
+	bh=lDW6U1FnScxJsSNN6Pa4/AWXZj02eRphfqM01/LbbKM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MhgryeU5PIX/wav1acnauvjJx3xuyfHwWUdZqaWTta3sGbH655dgQHNA+CHdGf8tdstv5JCXdjorgFtNEsqK83stvDPiVaLlEnQKseMFzOhf1APZ+D3596S10OPSzETpn2PVM4tHMFTxWa52iHb0WSzO5uaGio5EgpKvqC6MUGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UuUMyUgz; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=jwiEswtdEa7ce70TcpVxFiRcjyjMytbhoq4bZsCUS207OAxSIQV2VPw4w2snn0BGbibUz2td4XQuZ9McEA5PqN0z5HWu96wAlI7zLeqzSY1pEce3XpSxIVNTu1Ih8sWEb13O/kHqt6vPaQfyeK9HpenMcuLuSNWiW7m0Wl3yiSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AO84OOU6; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UuUMyUgz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70A8A1F00893;
-	Thu, 24 Sep 2026 10:08:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AO84OOU6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E3321F00898;
+	Thu, 24 Sep 2026 10:08:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790244535;
-	bh=/F4y/7yxyUDiC6xbvLu9ph4vBP4DM40ibzlyQTAOh0c=;
+	s=k20260515; t=1790244552;
+	bh=FjLv3i6JJ122LJ7wUfvpGm0WJbMJkppUMfbaqHtvr8U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=UuUMyUgzUZWtthyh61vaCwP7ZLcWxHojwv+uEizpKSKXauzTbqg6EVPm0mJDppj3X
-	 ztyjgCs08HO+QzCrg8WCWibDXFvPYpFUKjIYI4O6sAoOJr+8RltFEDWZuHR05Mmh3j
-	 drE4nAushbHuhZXqr7khJTBd9CfA7GwiknoMQ8yVPjKzfEYauZlDgzQk77n+jj0y3T
-	 q8sHWy4IAz2LpKhmDLPNDY5p9N9napTpJ2vyOkZCuS505Ogd89yBRjUeGWBX4ZwPsU
-	 cgg41AK1Qx1QJI002BGvsJUwlMCFUqXRoyHGKNpPql89lBdfad+a7TqNmPIQYO3YtP
-	 eNHWgKjV1jtWQ==
+	b=AO84OOU6N+eaEkLdLQBjyQ/t1HP1RG2S2enaWx2C+z4bHKjzh2wO9UHy+bjDug10m
+	 qqpDXV03jBDwD1QvXv6r7BGWk1YxbBM77iHGeE1PuNEz7eZq011ieT3+ptwXy1/01f
+	 mRcAhqBbBLGPtfoyZji6bRl6UCa4FPjUFvBuyBNLXNf0FljNqb86DW9nAs2mhaVKwt
+	 71ieV5+ZFfHUU3s+hcb8awOchCzEpLPuRD44lMHFYnXqkdQOkNUfAYTSob85+18+sT
+	 uf5uYl+M706JqXG4oAF1584cr54KQZrL4+V5Q3r2oj5mY/ie1Afu34xkkrghnL8SU6
+	 jX3DHt2ADqFTQ==
 From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 To: linux-coco@lists.linux.dev,
 	kvmarm@lists.linux.dev,
@@ -89,9 +89,9 @@ Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
 	linaro-mm-sig@lists.linaro.org,
 	linux-media@vger.kernel.org,
 	linux-mm@kvack.org
-Subject: [RFC PATCH v8 11/14] dma-buf: system_heap: Allocate shared buffers using CoCo shared memory allocator
-Date: Thu, 24 Sep 2026 15:35:26 +0530
-Message-ID: <20260924100529.1398790-12-aneesh.kumar@kernel.org>
+Subject: [RFC PATCH v8 12/14] swiotlb: Make rounded shared pool capacity allocatable
+Date: Thu, 24 Sep 2026 15:35:27 +0530
+Message-ID: <20260924100529.1398790-13-aneesh.kumar@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260924100529.1398790-1-aneesh.kumar@kernel.org>
 References: <20260924100529.1398790-1-aneesh.kumar@kernel.org>
@@ -101,259 +101,142 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The system_cc_shared heap currently allocates its backing pages using the
-normal system-heap order policy and changes each resulting compound page to
-shared state. That is unsafe when an architecture requires state changes in
-units larger than PAGE_SIZE: an order-0 tail is neither sufficiently aligned
-nor large enough to transition independently.
+CoCo shared memory may need to be allocated and transitioned in units larger
+than the requested object. Before this change, users handled the resulting
+capacity as follows:
 
-Use the common CoCo shared-page allocator for every backing allocation of the
-shared heap. Preserve the existing preferred-order search and its GFP policy:
-each candidate order is passed to the common allocator as a byte request, and
-that allocator rounds it up when the architecture shared granule is larger.
+  User                         Rounded capacity reused
+  dma-buf system heap          no
+  DMA-direct                   no
+  regular GIC tables           no
+  small GIC ITTs               yes, through a gen_pool
+  early SWIOTLB pool           no
+  late SWIOTLB pool            yes
+  persistent dynamic SWIOTLB   no
+  transient dynamic SWIOTLB    no, one mapping only
+  atomic DMA pools             yes, through a gen_pool
+  restricted SWIOTLB pool      no additional padding
 
-Add __GFP_COMP for shared allocations because an order-0 candidate can
-be rounded into a high-order allocation. The system heap uses
-compound_order() and page_size() for accounting and release, so the
-returned allocation must retain compound-page semantics.
+Improve the early and persistent dynamic SWIOTLB pools. They already own
+and transition backing rounded to the shared granule size, and SWIOTLB
+is itself a suballocator. Advertise the rounded extent as slots, size
+the slot metadata to match. This makes the extra capacity available
+without reserving more backing memory.
 
-Calculate a rounded internal backing length but retain the original
-length in dma_buf::size. The preceding scatterlist-length change ensures
-that the rounded tail is not included in DMA mappings or other
-operations. This permits a 4 KiB request on a 64 KiB shared-granule
-system without exposing the extra 60 KiB to an importer.
+Keep transient dynamic pools unchanged. A transient pool belongs to one
+DMA mapping and is destroyed when that mapping is unmapped, so its spare
+backing cannot satisfy a later request without changing the lifetime
+model.
 
-Cc: Sumit Semwal <sumit.semwal@linaro.org>
-Cc: Benjamin Gaignard <benjamin.gaignard@collabora.com>
-Cc: Brian Starkey <Brian.Starkey@arm.com>
-Cc: John Stultz <jstultz@google.com>
-Cc: "T.J. Mercier" <tjmercier@google.com>
-Cc: "Christian König" <christian.koenig@amd.com>
+Do not attempt the same optimization for dma-buf, DMA-direct or regular
+GIC objects. Those allocations have independent caller-visible sizes and
+lifetimes. Reusing their padding requires a shared-granule suballocator
+with reference counting, per-object mappings and accounting.
+
+Note:
+For the current 64 KiB CCA shared granule size, SWIOTLB pool sizes are
+already multiples of the 256 KiB IO_TLB segment size. Consequently, the
+rounding does not change any runtime values on current CCA systems. It
+instead makes the code express the intended invariant that pool metadata
+describes the complete shared-granule-aligned backing allocation.
+
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Robin Murphy <robin.murphy@arm.com>
 Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 ---
- drivers/dma-buf/heaps/system_heap.c | 121 ++++++++++++----------------
- 1 file changed, 53 insertions(+), 68 deletions(-)
+ kernel/dma/swiotlb.c | 30 ++++++++++++++++++++++++------
+ 1 file changed, 24 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/dma-buf/heaps/system_heap.c b/drivers/dma-buf/heaps/system_heap.c
-index b5b8cdf65f23..5970b76416ae 100644
---- a/drivers/dma-buf/heaps/system_heap.c
-+++ b/drivers/dma-buf/heaps/system_heap.c
-@@ -11,14 +11,13 @@
-  */
- 
- #include <linux/cc_platform.h>
-+#include <linux/cc_shared.h>
- #include <linux/dma-buf.h>
- #include <linux/dma-mapping.h>
- #include <linux/dma-heap.h>
- #include <linux/err.h>
- #include <linux/highmem.h>
--#include <linux/mem_encrypt.h>
- #include <linux/mm.h>
--#include <linux/set_memory.h>
- #include <linux/module.h>
- #include <linux/pgtable.h>
- #include <linux/scatterlist.h>
-@@ -65,34 +64,6 @@ static gfp_t order_flags[] = {HIGH_ORDER_GFP, HIGH_ORDER_GFP, LOW_ORDER_GFP};
- static const unsigned int orders[] = {8, 4, 0};
- #define NUM_ORDERS ARRAY_SIZE(orders)
- 
--static int system_heap_set_page_decrypted(struct page *page)
--{
--	unsigned long addr = (unsigned long)page_address(page);
--	unsigned int nr_pages = 1 << compound_order(page);
--	int ret;
--
--	ret = set_memory_decrypted(addr, nr_pages);
--	if (ret)
--		pr_warn_ratelimited("dma-buf system heap: failed to decrypt page at %p\n",
--				    page_address(page));
--
--	return ret;
--}
--
--static int system_heap_set_page_encrypted(struct page *page)
--{
--	unsigned long addr = (unsigned long)page_address(page);
--	unsigned int nr_pages = 1 << compound_order(page);
--	int ret;
--
--	ret = set_memory_encrypted(addr, nr_pages);
--	if (ret)
--		pr_warn_ratelimited("dma-buf system heap: failed to re-encrypt page at %p, leaking memory\n",
--				    page_address(page));
--
--	return ret;
--}
--
- static int dup_sg_table(struct sg_table *from, struct sg_table *to)
- {
- 	struct scatterlist *sg, *new_sg;
-@@ -337,6 +308,20 @@ static void system_heap_vunmap(struct dma_buf *dmabuf, struct iosys_map *map)
- 	iosys_map_clear(map);
+diff --git a/kernel/dma/swiotlb.c b/kernel/dma/swiotlb.c
+index 5f65b11260e0..8d71f2e0fd85 100644
+--- a/kernel/dma/swiotlb.c
++++ b/kernel/dma/swiotlb.c
+@@ -330,6 +330,14 @@ static inline unsigned long nr_slots(u64 val)
+ 	return DIV_ROUND_UP(val, IO_TLB_SIZE);
  }
  
-+static void system_heap_free_page(struct page *page, bool cc_shared)
++static unsigned long swiotlb_align_nslabs(unsigned long nslabs)
 +{
-+	struct cc_shared_pages mem;
++	unsigned long granule_nslabs;
 +
-+	if (!cc_shared) {
-+		__free_pages(page, compound_order(page));
-+		return;
-+	}
-+
-+	mem.page = page;
-+	mem.shared_size = page_size(page);
-+	free_cc_shared_pages(&mem);
++	granule_nslabs = cc_shared_granule_size() >> IO_TLB_SHIFT;
++	return ALIGN(nslabs, granule_nslabs);
 +}
 +
- static void system_heap_dma_buf_release(struct dma_buf *dmabuf)
+ static void swiotlb_mark_pool_used(struct io_tlb_pool *pool)
  {
- 	struct system_heap_buffer *buffer = dmabuf->priv;
-@@ -345,19 +330,8 @@ static void system_heap_dma_buf_release(struct dma_buf *dmabuf)
- 	int i;
- 
- 	table = &buffer->sg_table;
--	for_each_sgtable_sg(table, sg, i) {
--		struct page *page = sg_page(sg);
--
--		/*
--		 * Intentionally leak pages that cannot be re-encrypted
--		 * to prevent shared memory from being reused.
--		 */
--		if (cc_shared_buffer(buffer) &&
--		    system_heap_set_page_encrypted(page))
--			continue;
--
--		__free_pages(page, compound_order(page));
--	}
-+	for_each_sgtable_sg(table, sg, i)
-+		system_heap_free_page(sg_page(sg), cc_shared_buffer(buffer));
- 	sg_free_table(table);
- 	kfree(buffer);
+ 	unsigned long i;
+@@ -433,11 +441,12 @@ static void add_mem_pool(struct io_tlb_mem *mem, struct io_tlb_pool *pool)
  }
-@@ -375,22 +349,39 @@ static const struct dma_buf_ops system_heap_buf_ops = {
- 	.release = system_heap_dma_buf_release,
- };
  
-+static struct page *system_heap_alloc_order(unsigned int order,
-+	     gfp_t flags, bool cc_shared)
-+{
-+	struct cc_shared_pages mem;
-+
-+	if (!cc_shared)
-+		return alloc_pages(flags, order);
-+
-+	/* The shared granule can raise the actual allocation order. */
-+	flags |= __GFP_COMP;
-+	if (alloc_cc_shared_pages(flags, PAGE_SIZE << order, &mem))
-+		return NULL;
-+
-+	return mem.page;
-+}
-+
- static struct page *alloc_largest_available(unsigned long size,
--					    unsigned int max_order)
-+		unsigned int max_order, bool cc_shared)
+ static void __init *swiotlb_memblock_alloc(unsigned long nslabs,
+-		unsigned int flags,
++		unsigned long *alloc_nslabs, unsigned int flags,
+ 		int (*remap)(void *tlb, unsigned long nslabs))
  {
- 	struct page *page;
--	int i;
- 	gfp_t flags;
-+	int i;
++	unsigned long aligned_nslabs = swiotlb_align_nslabs(nslabs);
++	size_t bytes = aligned_nslabs << IO_TLB_SHIFT;
+ 	void *tlb;
+-	size_t bytes = ALIGN(nslabs << IO_TLB_SHIFT, cc_shared_granule_size());
  
- 	for (i = 0; i < NUM_ORDERS; i++) {
- 		if (size <  (PAGE_SIZE << orders[i]))
- 			continue;
- 		if (max_order < orders[i])
- 			continue;
-+
- 		flags = order_flags[i];
- 		if (mem_accounting)
- 			flags |= __GFP_ACCOUNT;
--		page = alloc_pages(flags, orders[i]);
-+		page = system_heap_alloc_order(orders[i], flags, cc_shared);
- 		if (!page)
- 			continue;
- 		return page;
-@@ -405,6 +396,7 @@ static struct dma_buf *system_heap_allocate(struct dma_heap *heap,
- {
- 	struct system_heap_buffer *buffer;
- 	DEFINE_DMA_BUF_EXPORT_INFO(exp_info);
-+	struct cc_shared_layout layout;
- 	unsigned long size_remaining = len;
- 	unsigned long sg_remaining = len;
- 	unsigned int max_order = orders[0];
-@@ -417,6 +409,16 @@ static struct dma_buf *system_heap_allocate(struct dma_heap *heap,
- 	struct page *page, *tmp_page;
- 	int i, ret = -ENOMEM;
- 
-+	if (cc_shared) {
-+		int err;
-+
-+		err = cc_shared_calc_layout(len, &layout);
-+		if (err)
-+			return ERR_PTR(err);
-+
-+		size_remaining = layout.shared_size;
-+	}
-+
- 	buffer = kzalloc_obj(*buffer);
- 	if (!buffer)
- 		return ERR_PTR(-ENOMEM);
-@@ -439,7 +441,8 @@ static struct dma_buf *system_heap_allocate(struct dma_heap *heap,
- 			goto free_buffer;
- 		}
- 
--		page = alloc_largest_available(size_remaining, max_order);
-+		page = alloc_largest_available(size_remaining, max_order,
-+					       cc_shared);
- 		if (!page)
- 			goto free_buffer;
- 
-@@ -464,14 +467,6 @@ static struct dma_buf *system_heap_allocate(struct dma_heap *heap,
- 		list_del(&page->lru);
+ 	/*
+ 	 * By default allocate the bounce buffer memory from low memory, but
+@@ -455,12 +464,13 @@ static void __init *swiotlb_memblock_alloc(unsigned long nslabs,
+ 		return NULL;
  	}
  
--	if (cc_shared_buffer(buffer)) {
--		for_each_sgtable_sg(table, sg, i) {
--			ret = system_heap_set_page_decrypted(sg_page(sg));
--			if (ret)
--				goto free_pages;
--		}
--	}
--
- 	/* create the dmabuf */
- 	exp_info.exp_name = dma_heap_get_name(heap);
- 	exp_info.ops = &system_heap_buf_ops;
-@@ -486,22 +481,12 @@ static struct dma_buf *system_heap_allocate(struct dma_heap *heap,
- 	return dmabuf;
+-	if (remap && remap(tlb, nslabs) < 0) {
++	if (remap && remap(tlb, aligned_nslabs) < 0) {
+ 		memblock_free(tlb, bytes);
+ 		pr_warn("%s: Failed to remap %zu bytes\n", __func__, bytes);
+ 		return NULL;
+ 	}
  
- free_pages:
--	for_each_sgtable_sg(table, sg, i) {
--		struct page *p = sg_page(sg);
--
--		/*
--		 * Intentionally leak pages that cannot be re-encrypted
--		 * to prevent shared memory from being reused.
--		 */
--		if (cc_shared_buffer(buffer) &&
--		    system_heap_set_page_encrypted(p))
--			continue;
--		__free_pages(p, compound_order(p));
--	}
-+	for_each_sgtable_sg(table, sg, i)
-+		system_heap_free_page(sg_page(sg), cc_shared);
- 	sg_free_table(table);
- free_buffer:
- 	list_for_each_entry_safe(page, tmp_page, &pages, lru)
--		__free_pages(page, compound_order(page));
-+		system_heap_free_page(page, cc_shared);
- 	kfree(buffer);
++	*alloc_nslabs = aligned_nslabs;
+ 	return tlb;
+ }
  
- 	return ERR_PTR(ret);
+@@ -473,6 +483,7 @@ void __init swiotlb_init_remap(bool addressing_limit, unsigned int flags,
+ {
+ 	struct io_tlb_pool *mem = &io_tlb_default_mem.defpool;
+ 	unsigned long nslabs;
++	unsigned long alloc_nslabs;
+ 	unsigned int nareas;
+ 	size_t alloc_size;
+ 	void *tlb;
+@@ -497,13 +508,14 @@ void __init swiotlb_init_remap(bool addressing_limit, unsigned int flags,
+ 		swiotlb_adjust_nareas(num_possible_cpus());
+ 
+ 	nslabs = default_nslabs;
+-	nareas = limit_nareas(default_nareas, nslabs);
+-	while ((tlb = swiotlb_memblock_alloc(nslabs, flags, remap)) == NULL) {
++	while ((tlb = swiotlb_memblock_alloc(nslabs, &alloc_nslabs, flags,
++					     remap)) == NULL) {
+ 		if (nslabs <= IO_TLB_MIN_SLABS)
+ 			return;
+ 		nslabs = ALIGN(nslabs >> 1, IO_TLB_SEGSIZE);
+-		nareas = limit_nareas(nareas, nslabs);
+ 	}
++	nslabs = alloc_nslabs;
++	nareas = limit_nareas(default_nareas, nslabs);
+ 
+ 	if (default_nslabs != nslabs) {
+ 		pr_info("SWIOTLB bounce buffer size adjusted %lu -> %lu slabs",
+@@ -869,6 +881,12 @@ static struct io_tlb_pool *swiotlb_alloc_pool(struct device *dev,
+ 		tlb_size = nslabs << IO_TLB_SHIFT;
+ 	}
+ 
++	/* Transient pools are tied to one mapping and cannot reuse padding. */
++	if (mem->cc_shared && !dev) {
++		nslabs = swiotlb_align_nslabs(nslabs);
++		tlb_size = nslabs << IO_TLB_SHIFT;
++	}
++
+ 	slot_order = get_order(array_size(sizeof(*pool->slots), nslabs));
+ 	pool->slots = (struct io_tlb_slot *)
+ 		__get_free_pages(gfp, slot_order);
 -- 
 2.43.0
 
