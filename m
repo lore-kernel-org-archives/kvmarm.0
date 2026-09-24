@@ -1,193 +1,147 @@
-Received: from mail-qv2-f12.google.com (mail-qv2-f12.google.com [74.125.230.140])
+Received: from mail-qk2-f13.google.com (mail-qk2-f13.google.com [74.125.230.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE924B95D3
-	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 17:05:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.230.140
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790269509; cv=pass; b=E/aq7MZFxKuzOPA0OzAtiKGZosDnSPHB/DdmBTtQ56GbHxmjWwRjXqDNnIXI1J/H35HfHGlWSfcpTipK463XQX6ComGDLNB6R4Xj7CMPUJYe3uCdxszm1YB6tJJ3qLiYF/wO9IQ3BRW5qsn/h/4sqF5ndtdSfA+E9lWrQNK0Vgo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790269509; c=relaxed/simple;
-	bh=1F8/rz3ypcsoCgDUnUPkG7WkBCl4kCGuN1jCJU9T35k=;
-	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UfdxAd7NdHAKTvimgFU3WASYBPl9JmtYPditECzJ+Clf5JTHclTdfk6jD423iEBElQMqpxc+UTmEJA4xDfHMIrlwCT1vXcYM7wDIflaYcTJXD0+xLanwzkAJFR/zjNKg8NHmrhjUECt9Moh8xqOuS2sCBDRVnWaHmPGGkeiK2VI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tBdWuHyL; arc=pass smtp.client-ip=74.125.230.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC98040D588
+	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 17:17:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.205
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790270253; cv=none; b=bKTde8g1aqW7XqZ8AOhEVDsOsCg+d+Rd6ptRYD2ILzGdGgdFdjjtjqkwIKONiJNpKvxXLQGF8iBYU3ZMSGlFVNhJIxcnF49xAxO1OIp69UPm2CLIugGjRFEPmOIopQVprwFzIdPjfx6dd2zy413r2Boifk8jkfpsO/4IK/ADL8o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790270253; c=relaxed/simple;
+	bh=N9G2xDWLJkhjpVHjPudlC9eB56JQvy0Q3UFpvQ70GnM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H433k9nZ7WItkhGxf23c2Tznwfg8Zs8lW8P0+w0t59YNLvVsr7i/wcOgVywW/NeEzd05ub/25rrplxZYlx7ILrDWiWhrzZIlkgwkDOrevzwyIAHpLqTdeG+ybbko5EhVLVu8y9FXARph8Qg6lnKrBdcGU0OBOqBZULYh9CPSW1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net; spf=pass smtp.mailfrom=gourry.net; dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b=ErZ/HyKx; arc=none smtp.client-ip=74.125.230.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gourry.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gourry.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tBdWuHyL"
-Received: by mail-qv2-f12.google.com with SMTP id 6a1803df08f44-91235f46716so852566d6.1
-        for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 10:05:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790269506; cv=none;
-        d=google.com; s=arc-20260327;
-        b=EwEGGD4LQdvfhoJLz1OQekg0MToPLKYUAPg1rEBPPAOpH7B5Ql23qZ6yihAjeDApI7
-         ASQDmek1Xad5ARFgqy9cmJ7e3/3s9xW8EGYoMt/f1Ir20pjUwrTDL7C9KUeO6zorfsoQ
-         a2ZV/HKnF3cUMaslZGEA4k+O36yV39kxjrYpydZza755MUWBzONUJxXQFzWNOHoOYvNO
-         ntHDK+X3EKwVf7h6sWMVR6QdeRKT8FzlVCuofXz+l+TNyn1ZSwfFNDitLYtH1TmV/nV3
-         M7iaogzsqB1nFknmBVlRj5zF4h/7zh7IG1suoQ8dRNMiYDocapilE2J/V7czfdRjHWah
-         y9Ag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:dkim-signature;
-        bh=OHcWMQ1Z3aW3bHAxm3qzvYkMiIOMbOZVWxnCDEHnj30=;
-        fh=wzhmHLgbhIYtuEdd/6BLuyPmvz4zt/PjCT1/RWKQ1Ps=;
-        b=UwPGNwC/7F29Y6gxqkFyUK98rDGsvYje25nRfECCx5zRYNc6CLnWt+qQvaI4/nJyhp
-         jp4bV8v/yWJIbAxUk11XkZO+lz5NaPN8G91z/aowMkCIwR2rZJOXrhQmlnKWat4eyOrk
-         L8xewPH4m+Z7F1IWgOGnWkkCCjp7WbGGqjXw9IHdS9S0sdtRYLLbXIc8px6nqyLT/bse
-         sz26yGv9IOZc9MtwrO7UWcAkRAkIrlQ5OhPejP3OyfAevRye7s0IOHGq+aGafvSUPJa9
-         7LlUJrh8R99kcMIwzd8WP85K/Pqv/gFINuA2KTV6nX4jGwHbulSzRUXPlHK3iaoDN/D7
-         ugVg==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gourry.net header.i=@gourry.net header.b="ErZ/HyKx"
+Received: by mail-qk2-f13.google.com with SMTP id d75a77b69052e-52fb76bcb1fso765481cf.0
+        for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 10:17:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790269506; x=1790874306; darn=lists.linux.dev;
-        h=content-type:cc:to:subject:message-id:date:mime-version:references
-         :in-reply-to:from:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=OHcWMQ1Z3aW3bHAxm3qzvYkMiIOMbOZVWxnCDEHnj30=;
-        b=tBdWuHyLJvA8/LxCcBoAWpCa/MF9+TfiyGey5aQL5Cdao3qhhyXUXlHe+d3Dx+hmOa
-         3Uh6KMNjyWSCexLztjoisWu8H/W6/eLiht6NjiXOqGtwUkbLN9d/EBY+QQV9724NCckP
-         r4GRFnsNMcdk9bVlvgPmd9GtMfAbz0Hb3e6N7TAyLSZxubfgYGl5fxvvuRfKcM5P8NME
-         ivrs0vCuGxmIk45YlujdFkGFZCxmqjLh5F22B+5kvL+8L89zXXEroyVAdpbjg5NRB30J
-         /sufYlzjm+BU7TCN67wlhW0OwDW36/n15D57u8+pER096ncrHRxSdTyoL+jNFjP2CPyE
-         V2jQ==
+        d=gourry.net; s=google; t=1790270251; x=1790875051; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=feTLx7y3sxZ57LB+c+M8YbdddVhljMzyHzPRAu6TpA4=;
+        b=ErZ/HyKxEzPtildauaVvuG9CsrkCE6rm90GrsxhZ/9dR1VJHQ5TU0zqxk8vUTUvjZs
+         nJfyJJbwj0WcrVO6bO1gj4yRQ0M9Di5Jisek2cm8rrcYFX0jcc7dN2hVJ0lCOu1QH7AM
+         i/0CdBvG8AO1gsINCUVhBbouPdCcqVPUwQWIhojRh+IF2Co7KLlN0Wp8RLgRAZYztdQ7
+         IhYYWy4GaPusM+8lZBXZYlihTwBNWhFju5P8C8w632FQVCZrJSSOmPvcZZF50mt6NQAM
+         1nLMmPt86xun46DnSski/v1DDns+vtvdzzInnhmh3HeVJYognTzwuDg9bZeAtSgzp2Gh
+         Gp4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790269506; x=1790874306;
-        h=content-type:cc:to:subject:message-id:date:mime-version:references
-         :in-reply-to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=OHcWMQ1Z3aW3bHAxm3qzvYkMiIOMbOZVWxnCDEHnj30=;
-        b=Z0Kd3HYt5yxHqhypuFy5Kp8xUgcAzfC9XffXLFen0qvZKoVqxBD5T8WfRmTkFzYzdS
-         0gCsw05JGBvHoZcL3ktC4TcqERKwz+VAwh9e0jsgBoH8ml34b3k2jJ/jzCN8S1f+tb5Y
-         KVggemL1NYTpmPPoIeJhmsd6SPFzfM5ibKyRAA7/dkdot2ZZ2uNmNzdLcNGrIQUA7qwt
-         yUl++F6nBlDH/KnXEk91QzjM3zOjmqZo6Ivb5v+xuQtytUll7euZPmH/qR9NIwtXx+i0
-         J7iU+bgIt30jAiQu9uS2/SPlnB3XOL6VPZlS3hsFvJrVqohV7b4lkARYkjn9XVCG6eW0
-         D/ZQ==
-X-Forwarded-Encrypted: i=1; AKwUvByLd/VvKE/z1HXAn6G7E0VGBqYV6Ehx93nqYAjU3JwXhNrv9zs8rrXDOdfdemXdhyL9uT8V9YY=@lists.linux.dev
-X-Gm-Message-State: AFuF++lW/okT+k6PUV9j1GnCOodDz4rh6YBcXolcJqwQmkBATnPL028y
-	mUSf4ce1dBHxOJgR4z6t48dUx/lkU3Q4pQpRwhFbnZP9BMOgnasn9Tl2gda07zl/6kA8v0CldBB
-	qwGKP3bB2OP9jrbwgHNP+uXs58PqehGQ8jPLmfdH/
-X-Gm-Gg: AYBFou2Qmw9cGWoK7Rv0fVGCakxJa8LAoQ+W2d46L7GOdZAIWqx2QvdXSNSeY0DOcGs
-	X6lqEE4P/nVmF5+Jhqg0pCSiY18bc6Ff6W8XUo30LqHvVNpu3ykbXYECaMwDzMEC/aX0vCX6M78
-	lqogAIUTBEsdnYYChzWHFNMHQ7srpRI0FToh+hq8Bg29GIsqLshZyVF2d4kjMp4n3zgWWPCEOZQ
-	e01voIwzUFsjf5SH/DVOITy/Xxob1f5GmGh6e6Y6la2OYZtuhSUB7Fp7tygqfXHI14dMiI4d5qZ
-	zuy186DdqLCFrKIK6bp9/1/2S5OQXS81OzeqRa7FXoJwjZZ4OgHk4A9LHfwlGFbqJSb9jzpOMqp
-	v4W9WuTub549pFu9MO0s4x1TQ5EsuQpoCIionqPPkuA==
-X-Received: by 2002:a05:6214:4a83:b0:912:cec:7450 with SMTP id
- 6a1803df08f44-91421b1851amr31284116d6.0.1790269505101; Thu, 24 Sep 2026
- 10:05:05 -0700 (PDT)
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 24 Sep 2026 10:05:04 -0700
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 24 Sep 2026 10:05:04 -0700
-From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <20260924135201.850038-2-suzuki.poulose@arm.com>
-References: <20260924135201.850038-1-suzuki.poulose@arm.com> <20260924135201.850038-2-suzuki.poulose@arm.com>
+        d=1e100.net; s=20260707; t=1790270251; x=1790875051;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=feTLx7y3sxZ57LB+c+M8YbdddVhljMzyHzPRAu6TpA4=;
+        b=DTrLXfHFm3MAR3GgdQV1/rmqK7TX1ICA1FfO01dHkP0nOoa3RUftPedZMnNDST1g3d
+         O/UB4sJHNikT3YmDp2lsUwP+QEJ73HAKWRbV3Sf7Ir3thO1XZrK+vrTC+uL9r4thqIi7
+         oYO4ZV36ZvYSJ43YuAVWE4mU4TEPpP8dOPNLFgW9JB9LBB8eTyePo8oDFhqmL4MCfEn2
+         azj/ezeqS0U+ZELdA+u22p2UOSHSeTlvpmK2QgxHX5Fn1Vkm4WF4OFrISEkuJ3DxEF0U
+         kn8O4soRv6s4tfrFzSc7MIT3cEpjFr6yzEVkivHt0dHj/wGSp821ARtB/RR2MKTLrvl6
+         HFDA==
+X-Forwarded-Encrypted: i=1; AKwUvBz+c2E8MvhJ0VONiwmsZLa+UXWhscfzXa1e5SOlIBkhvLHmUQ/D7vsDJE0PE11obkVDaDrP2Ns=@lists.linux.dev
+X-Gm-Message-State: AFuF++mlCaO7eju0lcwaAhYv407eNrdZDA/TAZSRo07G2S0bHMyoFKe1
+	qegV2WtlSE4JHCrsPgpU/W3WMhxsAZyugeuEZRxD09eS3T/VZS6sqaCzVP5IN3zdgi0=
+X-Gm-Gg: AYBFou1NPofWQ/sl19OLKs0UWI7jMuFfBhtYG301N67lF51fCsJAtXC05MGJxMraadI
+	6JYrYI0E64fHxFD5xm5IMKSUSpjx6elfqphC11Wt+HukRJw+N9hQEGldBagEjcFGCYAXfl27YKl
+	Y1QneB/YUADZiW3DWINj/9kOmRolbnWOn2CNE7G7pJj+y/tkqDd1Sr72UzsaW0F9RHtubtuGnMh
+	GgkU2/wfyI4nMLouhedC6MH8fPpdol/cVP6UvXqbqbUqnoCrMIDhEGQ7svfAxK6pFhtOhIa3rH1
+	LqeVfKztfcsA7W6EYRqGxiQxbGrg46e9Kflwwrb1UYPSbem2rakAu/U6r8HnM9qMYrJsxs7QiFv
+	iHXQloAh+H/22Mzg03ad9+sqxB/ZPaxZmW1DL7J+ZKEaLX54IsdVlxkrbZfQBdV1ieqJ4l9A9o6
+	Q5CxauOoHxzMemfbHRS1JWsE2BWxulo3zz+1v7DXRzyqniqt8k4P5ZfOhuvaQOpG4T1lq0KixCi
+	gwpR6870jEURP3SqvphiYT+4hm/tV9ae8toXB4Cj6QidawITPD3ypw=
+X-Received: by 2002:a05:622a:2b05:b0:530:42e4:f001 with SMTP id d75a77b69052e-532feb3025amr31555731cf.46.1790270250746;
+        Thu, 24 Sep 2026 10:17:30 -0700 (PDT)
+Received: from gourry-fedora-PF4VCD3F (pool-173-79-60-52.washdc.fios.verizon.net. [173.79.60.52])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-532f8b7174asm25743881cf.14.2026.09.24.10.17.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Sep 2026 10:17:30 -0700 (PDT)
+Date: Thu, 24 Sep 2026 13:17:28 -0400
+From: Gregory Price <gourry@gourry.net>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev
+Subject: Re: [PATCH v3 04/40] mm: consistently validate VMA state after
+ mmap[_prepare] hooks
+Message-ID: <arVW5i8pvySq6Co2@gourry-fedora-PF4VCD3F>
+References: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org>
+ <20260917-b4-mmap-prepare-vma-flag-sanify-v3-4-4583d8a23bca@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Date: Thu, 24 Sep 2026 10:05:04 -0700
-X-Gm-Features: AclHuK_DlezgNpJkyQ6-N0Dq0ZFyu15Ut5n5SPUx6_YH9nitYJ5xMl_wRWW9wVM
-Message-ID: <CAEvNRgH8Hwt6_VaFxJVvytZ4La1R7bUN2emc37_fWecF9j2-YA@mail.gmail.com>
-Subject: Re: [PATCH v19 1/7] firmware: arm_rmm: Add SMC definitions for
- calling the RMM
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, 
-	gshan@redhat.com, joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com, 
-	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, 
-	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, 
-	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com, 
-	sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-4-4583d8a23bca@kernel.org>
 
-Suzuki K Poulose <suzuki.poulose@arm.com> writes:
+On Thu, Sep 17, 2026 at 05:22:13PM +0100, Lorenzo Stoakes (ARM) wrote:
+>  static inline int mmap_file(struct file *file, struct vm_area_struct *vma)
+>  {
+...
+> +	err = mmap_hook_validate(prev_start, prev_end, &prev_flags, vma);
+> +	if (unlikely(err)) {
+> +		vma->vm_start = prev_start;
+> +		vma->vm_end = prev_end;
+> +		vma_close(vma);
+>  	}
+> +
+> +	return err;
+>  }
+>  
 
->
-> [...snip...]
->
-> +
-> +/*
-> + * Note many of these fields are smaller than u64 but all fields have u64
-> + * alignment, so use u64 to ensure correct alignment.
-> + */
-> +struct rmm_config {
-> +	union { /* 0x0 */
-> +		struct {
-> +			u64 tracking_region_size;
-> +			u64 rmi_granule_size;
-> +		};
-> +		u8 sizer[SZ_4K];
-> +	};
-> +};
-> +
-> +static_assert(sizeof(struct rmm_config) == SZ_4K);
-> +
-> +#define RMI_REALM_PARAM_FLAG_MEC_POLICY_MASK	GENMASK(8, 7)
-> +#define RMI_REALM_PARAM_FLAG_LFA_POLICY_MASK	GENMASK(6, 5)
-> +#define RMI_REALM_PARAM_FLAG_DA			BIT(3)
-> +#define RMI_REALM_PARAM_FLAG_PMU		BIT(2)
-> +#define RMI_REALM_PARAM_FLAG_SVE		BIT(1)
-> +
-> +#define RMI_HASH_SHA_256			0
-> +#define RMI_HASH_SHA_512			1
-> +#define RMI_HASH_SHA_384			2
-> +
-> +struct realm_params {
-> +	union { /* 0x0 */
-> +		struct {
-> +			u64 flags0;
-> +			u64 s2sz;
-> +			u64 sve_vl;
-> +			u64 num_bps;
-> +			u64 num_wps;
-> +			u64 pmu_num_ctrs;
-> +			u64 hash_algo;
-> +			u64 num_aux_planes;
-> +		};
-> +		u8 padding0[0x400];
+I indepdeantly validated the sashiko report on this chunk.  Seems like
+close() should be deferred until after __map_new_file_vma() calls
+unmap_region().
 
-The union + sizer concept is cool. Technically this one isn't a padding,
-it's also a sizer? (same for the other structs below.
+suggested fix is to drop vma_close() from mmap_file()  and update the
+cleanup in __mmap_new_file_vma() 
 
-> +	};
-> +	union { /* 0x400 */
-> +		struct {
-> +			u8 rpv[64];
-> +			u64 ats_plane;
-> +		};
-> +		u8 padding1[0x400];
-> +	};
-> +	union { /* 0x800 */
-> +		struct {
-> +			u64 padding2;
-> +			u64 rtt_base;
-> +			s64 rtt_level_start;
-> +			u64 rtt_num_start;
-> +			u64 flags1;
-> +			u64 max_num_vdevs;
-> +		};
-> +		u8 padding3[0x700];
-> +	};
-> +	union { /* 0xf00 */
-> +		struct {
-> +			u8 padding4[0x80];
-> +			u64 aux_rtt_base[3];
-> +		};
-> +		u8 padding5[0x100];
-> +	};
-> +};
-> +
-> +static_assert(sizeof(struct realm_params) == SZ_4K);
-> +
+if (error) {
+	UNMAP_STATE(unmap, vmi, vma, vma->vm_start, vma->vm_end,
+		    map->prev, map->next);
+	vma_iter_set(vmi, vma->vm_end);
+	unmap_region(&unmap);
 
-Does declaring this struct as packed matter? I guess the static_assert()
-has the same effect.
+	/* Release driver state only after its mappings are gone. */
+	vma_close(vma);
 
->
-> [...snip...]
->
+	if (map_same_file(map))
+		fput(map->vm_file);
+	vma->vm_file = NULL;
+
+	return error;
+}
+
+Example race:
+
+  Thread A                              Thread B
+
+  mmap(MAP_FIXED, address A)
+    driver remap_pfn_range(A, page P)
+                                         load/store at known address A
+                                         hardware finds the new present PTE
+    validation fails
+    ->close() frees page P
+                                         UAF
+    unmap_region()
+    TLB shootdown
+
+With that fix
+
+Reviewed-by: Gregory Price (Meta) <gourry@gourry.net>
+
+~Gregory
+
