@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6744BA1CA;
-	Thu, 24 Sep 2026 16:06:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16D9E4BA1FB;
+	Thu, 24 Sep 2026 16:06:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790265989; cv=none; b=qZaKZQpNGIlS7gvfmtRHC3MzQrv10UadPCNq9EYcFcvsTCFvu1VhOivgLLCei9o02CQdm5yZB9FNvADEmr/IEaz5Q5321auU/dQldS3dGWuqMnGtTuGjpsLvcCwZLRhKhRp1BgPLLif5KU9+l1mMZ6JYMzEI7SPsTBnffONfrMk=
+	t=1790265993; cv=none; b=GM+44lLRqbSNHZZRNR83o4M3+a25Xj1jUKnJc8GWS6E6mvyKWXWL5fZ/8fV3rYAnrjHZPlXtxPenuWwPf3VXDTzNtu1m4laNgqhTj8Din5HIhiTHO6SVpyj7lYlXBrKiIWUMfxSGKqppXf3SaSyHNyzJRqdr2m6mvFVSvJMXhZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790265989; c=relaxed/simple;
-	bh=p+zcxg7BECsR89IwYH5uWpbzH4ouiCsroF6MFra80bY=;
+	s=arc-20240116; t=1790265993; c=relaxed/simple;
+	bh=J4qcShf5sghV5L5Y2wcHcCrDh9c4LPadyYpHFo9qgwE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JbZ1TFvOr6OluqE1hmN+3Ssxt648sPO1FAo8XGA+JHVZ4iNfEWDhctLG9rPU0gqxoYb+QqNrd0QjtXcPX2CoBGxBCZff963LMbyY65Ch1qqKCLznrGNw87mxpm46hUvCCRh15zuhkQ1KMUBDFyHNREISLIdYkGqL3f0LxiRlwK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=JlgDOHtG; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=RtQXvyoZ3u2K44i6u9OOm8zeSY8CDffXqTyxnRMBzjzitJxTXFoPuP0U+bk+qRTXonMyZ3f6Z9nEdYF/GixYNiqSL/2TdQpQgibeK/dmpnvCK18+gHqQvHnb1SnMt5VKtoh8jQNZYh/jcw6HD/y6BNdIjXSgzozOnGPPJhaWSX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=aVuot4se; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="JlgDOHtG"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="aVuot4se"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 868011E8D;
-	Thu, 24 Sep 2026 09:06:23 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1BFEA1E7D;
+	Thu, 24 Sep 2026 09:06:28 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id C8CDB3F86C;
-	Thu, 24 Sep 2026 09:06:22 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 64CBF3FAB1;
+	Thu, 24 Sep 2026 09:06:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790265987; bh=p+zcxg7BECsR89IwYH5uWpbzH4ouiCsroF6MFra80bY=;
+	t=1790265991; bh=J4qcShf5sghV5L5Y2wcHcCrDh9c4LPadyYpHFo9qgwE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JlgDOHtGK5OW9l4IiNRluCiZPy2X9nhDgQdxRJ8KAdYTzJLRgF5nKtkOZcg6uy1wM
-	 +dqjqhMhNb2RFXTjwH+ZhqvEZQacUUpjLYkBDuzYNRhwXclEi0Df59hBlowtj//9I0
-	 e8ekQNgKHRo+YTzD+I/9kRcNwjQkoHXjbPHQPrQ4=
+	b=aVuot4serLCoRiU+s6wSR2runjB+8k9giQ14cbikSaWMXrY/Ru9b+Y4oTOX6lUyp9
+	 1fllwkIVQxlBTs1OZVU3E6g96MI0pa54Bpf3hHH/CiDRdwC9StDwTk+MfRxBGnKs6i
+	 1Vl4dZDxf7l0oBa2Uyoj1TKRpIrk5NylkBzZXOs8=
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -52,9 +52,9 @@ Cc: maz@kernel.org,
 	sudeep.holla@arm.com,
 	jonathan.cameron@oss.qualcomm.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v20 15/22] KVM: arm64: CCA: Add VCPU load/put for Realms
-Date: Thu, 24 Sep 2026 17:04:57 +0100
-Message-ID: <20260924160504.853911-16-suzuki.poulose@arm.com>
+Subject: [PATCH v20 16/22] KVM: arm64: CCA: Add bare minimal S2 operations for Realm
+Date: Thu, 24 Sep 2026 17:04:58 +0100
+Message-ID: <20260924160504.853911-17-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260924160504.853911-1-suzuki.poulose@arm.com>
 References: <20260924160504.853911-1-suzuki.poulose@arm.com>
@@ -66,60 +66,69 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-RMM controls the VCPU settings and most are hidden from the KVM, except
-for the VGIC and timer bits.
+Add bare minimal MMU operation hooks for Realms. The mem_abort handling
+is chosen as the default KVM variant. However this cannot be reached for
+Realms yet and we would need real RMI command support to make it fully
+functional.
 
-A later patch would add syncing the VCPU state into the Realm REC related
-SMC parameters.
+RMM takes care of the TLB flushing as required, when the Stage2 is
+modified. So host doesn't need to do anything explicitly. RMM doesn't
+support access flags for the stage2, even for the shared IPA.
 
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm64/kvm/arm.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ arch/arm64/kvm/mmu.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 3ab722f2af7c8..8b1beddd80ea5 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -802,6 +802,13 @@ static void pkvm_vcpu_load(struct kvm_vcpu *vcpu)
- 			  &vcpu->arch.vgic_cpu.vgic_v3);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 8f21652d3625c..1d2265801e7aa 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -180,6 +180,12 @@ static int kvm_vm_flush_remote_tlbs(struct kvm *kvm)
+ 	return 0;
  }
  
-+static void realm_vcpu_load(struct kvm_vcpu *vcpu)
++static int realm_vm_flush_remote_tlbs(struct kvm *kvm)
 +{
-+	kvm_timer_vcpu_load(vcpu);
-+	kvm_vgic_load(vcpu);
-+	vcpu_set_wfx_traps(vcpu);
++	/* Nothing to do here, RMM takes care of this */
++	return 0;
 +}
 +
- void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	vcpu->cpu = cpu;
-@@ -854,6 +861,12 @@ static void pkvm_vcpu_put(struct kvm_vcpu *vcpu)
- 	kvm_vcpu_pmu_restore_host(vcpu);
+ /**
+  * kvm_arch_flush_remote_tlbs() - flush all VM TLB entries for v7/8
+  * @kvm:	pointer to kvm structure.
+@@ -210,6 +216,13 @@ static int kvm_vm_flush_remote_tlbs_range(struct kvm *kvm,
+ 	return 0;
  }
  
-+static void realm_vcpu_put(struct kvm_vcpu *vcpu)
++static int realm_vm_flush_remote_tlbs_range(struct kvm *kvm,
++					   gfn_t gfn, u64 nr_pages)
 +{
-+	kvm_timer_vcpu_put(vcpu);
-+	kvm_vgic_put(vcpu);
++	/* Nothing to do here, RMM takes care of this */
++	return 0;
 +}
 +
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
+ 				     gfn_t gfn, u64 nr_pages)
  {
- 	vcpu->arch.vcpu_ops->vcpu_put(vcpu);
-@@ -2211,6 +2224,11 @@ static const struct kvm_vcpu_ops pkvm_vcpu_ops = {
- 	.vcpu_put = pkvm_vcpu_put,
+@@ -2880,6 +2893,17 @@ static const struct kvm_vm_s2_ops kvm_default_vm_s2_ops = {
+ 	.vm_mem_abort			= kvm_vm_mem_abort,
  };
  
-+static const struct kvm_vcpu_ops realm_vcpu_ops = {
-+	.vcpu_load = realm_vcpu_load,
-+	.vcpu_put = realm_vcpu_put,
++static const struct kvm_vm_s2_ops realm_vm_s2_ops = {
++	.vm_flush_remote_tlbs		= realm_vm_flush_remote_tlbs,
++	.vm_flush_remote_tlbs_range	= realm_vm_flush_remote_tlbs_range,
++	.vm_mem_abort			= kvm_vm_mem_abort,
++	/*
++	 * Not supported for Realms
++	 *	.vm_age_gfn			= realm_vm_age_gfn,
++	 *	.vm_test_age_gfn		= realm_vm_test_age_gfn,
++	 */
 +};
 +
- #define KVM_VCPU_OPS(flavor, ops)		\
- 	[(flavor)] = (ops)
- 
+ #define KVM_VM_S2_OPS(flavor, ops)		\
+ 		[flavor] = ops
+ static const struct kvm_vm_s2_ops *arm64_vm_s2_ops[] = {
 -- 
 2.43.0
 
