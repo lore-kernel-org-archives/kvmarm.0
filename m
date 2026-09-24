@@ -1,172 +1,168 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B671470139
-	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 10:19:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10033A6F17
+	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 10:19:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790245150; cv=none; b=lXKcM7lDhZM3T6+LqBiuQGobZTTAAguJzqDwZpfwXO8xnyfO9Mk4RAbkYP95oN4UvB86cgImR3QuvbXHKpUCX/68p20XZYOeOCa+b8Zjg3kJGabFIvZucaj8ZBUTL0eBfmrmarSykypByir8ntVJsdkCz3rKXHOX3Zg1Co8we6w=
+	t=1790245171; cv=none; b=W1qmWhNeVB6j5GDULF4yLvg35bNpo9wsT3wytssGBzh7pffuER+A7j2fGZG9cJrXQ8AdBcWv792BXS4WFwS0Qul7eOLJTUbOQZ8tbfXhtY42tE1CaMTj4lGhvMUCm00wnHCSIlgXwOXx0+qoJq7OZcrf0Efkh2GsfxfgC8g8z1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790245150; c=relaxed/simple;
-	bh=kd/bnDOt/8UiWtWgaEnLygaWvFuGxfVn/eDNFi4Znjs=;
+	s=arc-20240116; t=1790245171; c=relaxed/simple;
+	bh=aSkUoBACrMb1+fMHQy4g6fg2LS4hFd7jdsR6DSN/+vo=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=ZulfAJizUOdXWTYX0wDgQ6HdEblx9TwycUcNB/63czzrJxTGQU2j7ISXLLzeEl61QFsGrDNFI7tnV4KW1xpw0W/b1ylF1gkUO/DLXUZxWeR7PuVJuwgS6vSt+6msdti3GTyNgSaYeqBHSKUKhgwIhQhCVSAKqqaRWhb0k6pds4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j2yN0y6k; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=os13/jSgLMiUE1wZN1Db9efnuYjAfsqyYyKDqEKTWu3Htb4n6pio+gK9U70rZ62l3vT5YNhu/BGHdd5+QKoeNwuwwHA1xp5lbqs4EKREwB7V5kJZjdD7F4AJyTyrwNafMoGCcF28sepbou4WXObXke0nwnPrxQSZQ5mu5GIKXBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UzlCm7eL; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j2yN0y6k"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C6261F000FF;
-	Thu, 24 Sep 2026 10:19:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UzlCm7eL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 380661F000FF;
+	Thu, 24 Sep 2026 10:19:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790245147;
-	bh=Tbrr7J6E2HeXxkSKuLh9nUnClr0ZU1/BUwzAxPApq2k=;
+	s=k20260515; t=1790245168;
+	bh=nuSQK0KGrBiN3Zx6hqBuheOEmTM+OywKkeE2rJ4Sths=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=j2yN0y6k4mm+PzayMQwfe58boRPOo/pom2eLmQtMu+/HLt2tevug/3Gkksx7SP0yt
-	 mWh+rcMG/x4nFWJBr9WDoULFgYt8M2EqU6CYRtjYtl/LTWfVEVKLbdQJXyhJ9gcdrH
-	 4p0hJbl6iprxRAdKR6ExjX/JHA+r5q5hOw1pm2tyMw3Ubch59yRo4gKl5O3N0nOQiz
-	 22BYd5xxV07cOx8W/cmoDm97p4J1+j//IM39Gy1J6ZbF9zH9fqXNihL7sx/UCy46tt
-	 OtqWaGLLbhQ217qAW3LOe2TIp5kuNZaIDxlbaGGsYBK7/TgtxNelUop+ZAqkcieA2/
-	 dpuImRpmnsroA==
+	b=UzlCm7eLR/7fDo6d96CbFSSPOpI9GYYaO9jP7fGbbVAj41YB6bo3t0vnIVJwjK6EQ
+	 C0ykvNy2DqfaAsHK1fUjxbr+ywt4vvlaNcePdMT2A0YZ0rL3xjces8WlbWm6wb/OUs
+	 hwvf3Xc+X4tcpu5Nh1Uc4UgM77de4HAjpgpX2x4hE1tmTRQSCWbA44xsZul9NQwsnU
+	 7cppybhuQLUvvxJOJR0OBDzNg1IDG+Njvk/4HEY313b2BaWovrf5rPNuwqzzufe4Hu
+	 kCgwtZMpaokzPrjlSjxXzFPzBSygCD5MbwEfnxFTvY+0V07dSYn6IONyVs9gW70qgU
+	 KOizQW0HHtpHg==
 From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH v8 01/14] mm: Add an allocator for CoCo shared
- memory
+Subject: Re: [RFC PATCH v8 04/14] irqchip/gic-v3-its: Allocate shared tables
+ using CoCo shared memory allocator
 Reply-To: sashiko-reviews@lists.linux.dev
 To: =?utf-8?b?QW5lZXNoIEt1bWFyIEsuViAoQXJtKQ==?= <aneesh.kumar@kernel.org>
-Cc: dri-devel@lists.freedesktop.org, media-ci@linuxtv.org, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260924100529.1398790-2-aneesh.kumar@kernel.org>
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, dri-devel@lists.freedesktop.org, media-ci@linuxtv.org
+In-Reply-To: <20260924100529.1398790-5-aneesh.kumar@kernel.org>
 References: <20260924100529.1398790-1-aneesh.kumar@kernel.org>
- <20260924100529.1398790-2-aneesh.kumar@kernel.org>
+ <20260924100529.1398790-5-aneesh.kumar@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 24 Sep 2026 10:19:06 +0000
-Message-Id: <20260924101907.5C6261F000FF@smtp.kernel.org>
+Date: Thu, 24 Sep 2026 10:19:27 +0000
+Message-Id: <20260924101928.380661F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] mm: alloc_cc_shared_pages_node fails to strip __GFP_MOVABLE
-- [Medium] mm: alloc_cc_shared_pages_node fails to strip __GFP_HIGHMEM in f=
-allback path
-- [Medium] mm: cc_make_shared and cc_make_private are not exported for modu=
-lar callers
+- [High] irqchip/gic-v3-its: buddy allocator corruption due to discarded sh=
+ared_size
 --
 
-commit 3978c8ce72bbc2aa23e57a460b585808665262a4
+commit d897529703a71c914b0334abcb563ffb37979469
 Author: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
-mm: Add an allocator for CoCo shared memory
 
-This commit introduces a common allocator for confidential-computing guests
-to allocate shared memory. It provides helpers to allocate properly aligned
-contiguous pages and transition them to shared state. It also adds helpers
-for transitioning memory states when callers manage their own backing memor=
-y.
+irqchip/gic-v3-its: Allocate shared tables using CoCo shared memory allocat=
+or
 
-> diff --git a/mm/cc_shared.c b/mm/cc_shared.c
-> new file mode 100644
-> index 0000000000000..85e16f4504b8f
-> --- /dev/null
-> +++ b/mm/cc_shared.c
-[ ... ]
-> +int cc_make_shared(void *addr, size_t size)
-> +{
-> +	int ret =3D cc_validate_transition(addr, size);
-> +
-> +	if (ret)
-> +		return ret;
-> +
-> +	return set_memory_decrypted((unsigned long)addr, size >> PAGE_SHIFT);
-> +}
+This commit updates the ITS allocator to route page allocations through
+alloc_cc_shared_pages_node(). It reconstructs common allocation metadata
+from the original ITS order and the architecture granule size on release.
 
-[Severity: Medium]
-Will this function be unavailable to dynamically loadable modules since it
-is missing an EXPORT_SYMBOL_GPL() macro?
-
-The commit message states it should be usable by callers managing their own
-backing memory, but virtio or guest drivers won't be able to link to it
-without an export.
-
-> +
-> +int cc_make_private(void *addr, size_t size)
-> +{
-> +	int ret =3D cc_validate_transition(addr, size);
-> +
-> +	if (ret)
-> +		return ret;
-> +
-> +	return set_memory_encrypted((unsigned long)addr, size >> PAGE_SHIFT);
-> +}
-
-[Severity: Medium]
-Does this function also need an EXPORT_SYMBOL_GPL() macro so that modules
-can successfully link and call it?
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v=
+3-its.c
+> index ac5507acb1a0c..4814161df02ed 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
 
 [ ... ]
-> +static int __alloc_cc_shared_pages_node(int nid, gfp_t gfp,
-> +					size_t requested,
-> +					struct cc_shared_pages *mem)
-> +{
-[ ... ]
-> +	/*
-> +	 * State transitions require a linear-map address and may modify memory.
-> +	 * Allocate from low memory and defer requested zeroing until afterward=
-s.
-> +	 */
-> +	gfp &=3D ~(__GFP_HIGHMEM | __GFP_ZERO);
+
+> @@ -214,25 +213,13 @@ static gfp_t gfp_flags_quirk;
+>  static struct page *its_alloc_pages_node(int node, gfp_t gfp,
+>  					 unsigned int order)
+>  {
+> -	struct page *page;
+> -	int ret =3D 0;
+> -
+> -	page =3D alloc_pages_node(node, gfp | gfp_flags_quirk, order);
+> -
+> -	if (!page)
+> -		return NULL;
+> +	struct cc_shared_pages mem;
+> =20
+> -	ret =3D set_memory_decrypted((unsigned long)page_address(page),
+> -				   1 << order);
+> -	/*
+> -	 * If set_memory_decrypted() fails then we don't know what state the
+> -	 * page is in, so we can't free it. Instead we leak it.
+> -	 * set_memory_decrypted() will already have WARNed.
+> -	 */
+> -	if (ret)
+> +	if (alloc_cc_shared_pages_node(node, gfp | gfp_flags_quirk,
+> +				       PAGE_SIZE << order, &mem))
+>  		return NULL;
+> =20
+> -	return page;
+> +	return mem.page;
+>  }
 
 [Severity: High]
-Does this code inadvertently leave __GFP_MOVABLE intact if passed by the
-caller?
+Is it safe to discard mem.shared_size here? The API contract seems to requi=
+re
+callers to retain the true allocated size so it can be passed back when
+freeing the pages.
 
-Pages are returned as shared memory, but they lack migration hooks
-(movable_operations) to handle encryption state transitions during page
-migration.
-
-If a caller passes __GFP_MOVABLE, the page might be placed in ZONE_MOVABLE.
-Since the kernel migration code does not know how to handle encryption state
-transitions, the page cannot be safely migrated. Could this permanently pin
-the movable zone, thereby breaking memory hot-unplug and compaction?
-
-> +	if (nid =3D=3D NUMA_NO_NODE)
-> +		page =3D alloc_pages(gfp, order);
-[ ... ]
-> +int alloc_cc_shared_pages_node(int nid, gfp_t gfp,
-> +			       size_t requested,
-> +			       struct cc_shared_pages *mem)
-> +{
-[ ... ]
-> +	if (cc_platform_has(CC_ATTR_MEM_ENCRYPT))
-> +		return __alloc_cc_shared_pages_node(nid, gfp, requested, mem);
+>  static struct page *its_alloc_pages(gfp_t gfp, unsigned int order)
+> @@ -242,13 +229,15 @@ static struct page *its_alloc_pages(gfp_t gfp, unsi=
+gned int order)
+> =20
+>  static void its_free_pages(void *addr, unsigned int order)
+>  {
+> -	/*
+> -	 * If the memory cannot be encrypted again then we must leak the pages.
+> -	 * set_memory_encrypted() will already have WARNed.
+> -	 */
+> -	if (set_memory_encrypted((unsigned long)addr, 1 << order))
+> +	struct cc_shared_layout layout;
+> +	struct cc_shared_pages mem;
 > +
-> +	order =3D get_order(requested);
-> +	if (order > MAX_PAGE_ORDER)
-> +		return -EINVAL;
+> +	if (WARN_ON(cc_shared_calc_layout(PAGE_SIZE << order, &layout)))
+>  		return;
+> -	free_pages((unsigned long)addr, order);
 > +
-> +	if (nid =3D=3D NUMA_NO_NODE)
-> +		page =3D alloc_pages(gfp, order);
-> +	else
-> +		page =3D alloc_pages_node(nid, gfp, order);
+> +	mem.page =3D virt_to_page(addr);
+> +	mem.shared_size =3D layout.shared_size;
+> +	free_cc_shared_pages(&mem);
+>  }
 
-[Severity: Medium]
-Can this fallback path inadvertently allocate a highmem page?
+[Severity: High]
+Does recalculating the size here cause a mismatch on non-CC platforms?
 
-The function's kernel-doc explicitly guarantees: "A memory-state transition
-requires a valid linear-map address, so such allocations never come from
-high memory".=20
+When memory encryption is disabled, alloc_cc_shared_pages_node() does not
+round up the allocation to the granule size; it simply allocates the
+requested order.
 
-In the non-encrypted fallback path, the caller's unmodified gfp flags
-(potentially containing __GFP_HIGHMEM) are passed directly to alloc_pages()
-or alloc_pages_node() without any masking.
+However, cc_shared_calc_layout() unconditionally rounds up to the
+architectural granule size. If the granule size exceeds the requested
+allocation size, free_cc_shared_pages() will call __free_pages() with a
+higher order than was actually allocated. Can this corrupt the buddy
+allocator by freeing unallocated pages?
 
-If a caller passes a flag mask containing __GFP_HIGHMEM (e.g., GFP_HIGHUSER)
-on a system without memory encryption, the fallback path will allocate a
-highmem page. Any subsequent attempt by the caller to access the memory via
-page_address() could return NULL and cause a crash, breaking the API
-contract. Should the gfp flags be sanitized in this path as well?
+>  static struct gen_pool *itt_pool;
+> @@ -273,7 +262,8 @@ static void *itt_alloc_pool(int node, int size)
+>  		if (!page)
+>  			break;
+> =20
+> -		gen_pool_add(itt_pool, (unsigned long)page_address(page), PAGE_SIZE, n=
+ode);
+> +		gen_pool_add(itt_pool, (unsigned long)page_address(page),
+> +			     cc_shared_granule_size(), node);
+>  	} while (!addr);
+> =20
+>  	return (void *)addr;
+
+[Severity: High]
+Will adding a hardcoded granule size to the generic pool advertise unalloca=
+ted
+out-of-bounds memory to consumers?
+
+On non-CC platforms, the underlying allocation size is just a single page,
+but this adds the full cc_shared_granule_size() bytes to the pool. Could
+this lead to pool consumers accessing memory beyond what was actually
+allocated?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260924100529.1398=
-790-1-aneesh.kumar@kernel.org?part=3D1
+790-1-aneesh.kumar@kernel.org?part=3D4
