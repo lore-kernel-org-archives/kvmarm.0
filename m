@@ -1,177 +1,257 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4F3E34EEE5
-	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 17:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com [209.85.167.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644E241D23D
+	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 17:29:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790270551; cv=none; b=VABURy6A1BgVQcra0wWptrdY9E7smpwFQc0gXLkzKtm0uY9AiPLN8t+LFVBBpOebacUxeNnQ8R1zscpLPv3Cx5daKZDXBFL4+PZrmAxa6wpXr0V1zMrOOvj/jOP/xSwR8zJjs6keFG6cy/9HedT7Fvd5yZQJ5ZKvxAit1JZbT7I=
+	t=1790270973; cv=none; b=NiiAet9rk8awe+byeCoq/jLP3D0+Fp0EH+gJbSz0mKs/T9JRnbS6xXWfpEMoDz+dPb+RBmQ1p4Ny49x97s19l/3rrwXM79BWLYZA9CYKYcRWnxGB7yGlNvd2MnwtZxBLsaTCtfbDjNn1QK0sdgyusKZcX5P5gHWz166yd9E8JoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790270551; c=relaxed/simple;
-	bh=860Ojr3v0ayDbG7KiIyixbDOOgrZDzkEsMJgGNgAg4w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=BjhXuXDjnAMTJkSxrNxDNxYbsvbCtU+4GR1P6idxop7DGahX7y3Lzc0k613pViqdgdpwNgPD0WaCkH4aKMLPgjvyt2ZmbAmd+vAk+W8ayrRMsWiUSB9MrePmJE5N359UNTDBQKZ68D7JsNUCCG+zoy6j9vtC2KXgWufUEeW9G9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ZG6XqqL0; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1790270973; c=relaxed/simple;
+	bh=Th/gdb82q0l15jjXh7OyXa5eh1Parw2GpJ00iFt/BI8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=GreY/jOxk/d5oCD1Knbg/+Np8/jQuFzVL8JuLkZe2NmBKlKiOls42lfkyM24Ct2uTzFoUAfXO/8vYviloTLbQWCvpla2GrHpT1j28RrLye9NYdGbTZaReAEwfQj61vkTcOx+ZL1DjEkDvgeJxRNgmvxKh19Kr9xtJ90FcLnnUXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kDnHkBbM; arc=none smtp.client-ip=209.85.167.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ZG6XqqL0"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 596E31E4D;
-	Thu, 24 Sep 2026 10:22:24 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B2E353F86F;
-	Thu, 24 Sep 2026 10:22:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790270547; bh=860Ojr3v0ayDbG7KiIyixbDOOgrZDzkEsMJgGNgAg4w=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZG6XqqL0D4QPzo2kTqF5l2dtLuw+Sc6ia+hsJTEX0+UIDRrsOn2bXjacowzicKSG3
-	 6Le123RWy9ORcKyW1oIJEELu7BoSZ5ezSGNOGLF+M9/e4bJjqSgVSwOogNVK/qdbe1
-	 OCGyYBKsVCOTekVRLmvpiEZsrHN5oSSma4xGXELE=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>
-Subject: Re: [PATCH 08/22] KVM: arm64: nv: Treat DBM as writable at stage-2
-Date: Thu, 24 Sep 2026 18:22:21 +0100
-Message-ID: <arVcTZ2frgLH1wRR@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <arQJVgtalOI1A8ip@kernel.org>
-References: <20260623184201.1518871-1-oupton@kernel.org> <20260623184201.1518871-9-oupton@kernel.org> <arPka0PldKvd0jzc@LeoBrasDK> <arQJVgtalOI1A8ip@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kDnHkBbM"
+Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-4c55ba309c2so191233b6e.1
+        for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 10:29:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790270970; x=1790875770; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=5+HVoWUpl0qaj6LVCbO//92JCksvBDFuswRRe0vTxAA=;
+        b=kDnHkBbMW4Ad36O1OV/htTcaxZNJlXL2BX2zwOVZZstMjSuI3+52D01OWjyuvAwXL4
+         GNSLU7VBuOX0C/U0GuN1SZSJEICghagd28eqSD8mPA5Pl/ocV8LcPawl/9K93O9cpcHo
+         9JKYvEGnlH7fJEdpH7kouDiVrrWQDcB5XqZNEy1u0bFFoKsYwLfIlQLQp2Nshy7bfyAL
+         mF4KVfYR+ZDsBOj8x09k+BUobRp7sRXQZ8h36Kxb/67Jdv7BvzrELVIkRA8AFhaRLWCe
+         xDmiBKK663aFIDN6SQaivpWGigmE9+kSX9QXaVpBdGSPpAejqqvrIvW5oSgGQuDd6Zvg
+         EfnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790270970; x=1790875770;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=5+HVoWUpl0qaj6LVCbO//92JCksvBDFuswRRe0vTxAA=;
+        b=18Mc4xQUVMaonK2ADoLbz623aGB5Ny5FJTXzUovu7MQAU7OxKk2XYBwz+MbStVDBeV
+         uuhE8/qPTThLuDXWaQyyPR0ueiwuDtW2HO2iRmw9F15VUxISNTWMsvNAAtsNMjzc3vkz
+         1Qq3WNE7KFgB8JYaL2VkoZN1ld2PsftXz6Iqb43RzDrJsmhrhoQoYO+KMlYLGrmEnsCC
+         7UKncIIpnrOI0GQDwp3Vg9IKx9uiSi2rwsc8s4N8vxes476M9S+FgkyaL8CMPn/CCh1N
+         pMc+ihO8LzhCJgUyY+nnxnOznAKPpUapTfCxsyzD4M443Qmgjl3M8y4ilCZ/dRik84CO
+         Qfdw==
+X-Forwarded-Encrypted: i=1; AKwUvBxEDE0j4RcElEPcOntfoQQesLU1M4Sw62uWlDHe3o0Y7BkRAN6H+hmqOlMr7Q1fySMaBM0mSoo=@lists.linux.dev
+X-Gm-Message-State: AFuF++kXwyKAJ/ZW1QXb2aqE9rX8TVbWkFlQs1w6z4zPkMeUci1d9Fdr
+	pMRGgT1EPYtGRYAgKVq3iUuIqrcD1EXAaRuYFsIKX5v9UgJzo6bu6bm+hqDPyykxhUWe0Nm20mC
+	/8HLiMh5rIQ+L6A6ZDjRmyJXnyg==
+X-Received: from ilbdr2.prod.google.com ([2002:a05:6e02:3f02:b0:509:22e1:470c])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6808:17aa:b0:4bc:2295:1687 with SMTP id 5614622812f47-4d72df6ccaamr3402135b6e.40.1790270969819;
+ Thu, 24 Sep 2026 10:29:29 -0700 (PDT)
+Date: Thu, 24 Sep 2026 17:29:06 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.rc1.315.gc6ed9934b7-goog
+Message-ID: <20260924172928.2110956-1-coltonlewis@google.com>
+Subject: [PATCH v9 00/22] ARM64 PMU Partitioning
+From: Colton Lewis <coltonlewis@google.com>
+To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Fuad Tabba <fuad.tabba@linux.dev>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	James Clark <james.clark@linaro.org>, Robin Murphy <robin.murphy@arm.com>, 
+	Zide Chen <zide.chen@intel.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Mingwei Zhang <mizhang@google.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Russell King <linux@armlinux.org.uk>, Shuah Khan <shuah@kernel.org>, 
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Sep 23, 2026 at 10:16:06AM -0700, Oliver Upton wrote:
-> On Wed, Sep 23, 2026 at 03:38:36PM +0100, Leonardo Bras wrote:
-> > On Tue, Jun 23, 2026 at 11:41:47AM -0700, Oliver Upton wrote:
-> > > When using direct permissions, the DBM bit has the effect of granting
-> > > the write permission. And, depending on the access, it could grant write
-> > > permission without a dirty state update.
-> > > 
-> > > Signed-off-by: Oliver Upton <oupton@kernel.org>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_pgtable.h |  1 +
-> > >  arch/arm64/kvm/nested.c              | 11 +++++++++++
-> > >  2 files changed, 12 insertions(+)
-> > > 
-> > > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > > index 22aeb2ed18d1..6ae36973686c 100644
-> > > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > > @@ -94,6 +94,7 @@ typedef u64 kvm_pte_t;
-> > >  #define KVM_PTE_LEAF_ATTR_HI_S1_PXN	BIT(53)
-> > >  
-> > >  #define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
-> > > +#define KVM_PTE_LEAF_ATTR_HI_S2_DBM	BIT(51)
-> > >  
-> > >  #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
-> > >  
-> > > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > > index e5a407fc0880..4f13f37e560b 100644
-> > > --- a/arch/arm64/kvm/nested.c
-> > > +++ b/arch/arm64/kvm/nested.c
-> > > @@ -305,6 +305,17 @@ static void compute_s2_permissions(struct kvm_vcpu *vcpu, struct s2_walk_info *w
-> > >  		break;
-> > >  	}
-> > >  
-> > > +	/*
-> > > +	 * Descriptors with the DBM bit set while hardware dirty state are
-> > > +	 * considered writable, even though certain accesses (like AT instructions)
-> > > +	 * don't actually update the dirty state.
-> > > +	 *
-> > > +	 * Assume that walk_nestd_s2_pgd() made the necessary descriptor updates
-> > > +	 * for the access and just treat DBM as writable here.
-> > > +	 */
-> > > +	if (wi->hd && ws->desc & KVM_PTE_LEAF_ATTR_HI_S2_DBM)
-> > > +		s2ap |= BIT(1);
-> > > +
-> > >  	trans->readable = s2ap & BIT(0);
-> > >  	trans->writable = s2ap & BIT(1);
-> > >  
-> > > -- 
-> > > 2.47.3
-> > > 
-> > 
-> > 
-> > Okay, now I see why were you doing that on the previous patch.
-> > 
-> > Here you test DBM and set writable to 1, and change nothing else, as s2ap 
-> > is a local variable that is only used to set writable if DBM is set.
-> > 
-> > This feels weird, though. That way it looks like DBM is changing s2ap, 
-> > which is not.
-> > 
-> > I suggest doing something like:
-> > 
-> > +     if (wi->hd && ws->desc & KVM_PTE_LEAF_ATTR_HI_S2_DBM)
-> > +             trans->writable = true;
-> > +
-> >        trans->readable =  s2ap & BIT(0);
-> > -      trans->writable = s2ap & BIT(1);
-> > +      trans->writable |= s2ap & BIT(1);
-> > 
-> > Although, this is odd, as S2AP[1] is supposed to be the dirty-bit.
-> > Maybe it's fine, as in our case, dirty implies writable.
-> > 
-> > IHMO, the best approach to this would be to make the movement to 
-> > DBM = writable, then have something like:
-> > 
-> > +	trans->readable =  s2ap & BIT(0);
-> > +	trans->dirty    =  s2ap & BIT(1);
-> > +	trans->writable =  ws->desc & KVM_PTE_LEAF_ATTR_HI_S2_DBM;
-> > 
-> > +	/* Dirty implies on writable, was used alone on older systems */
-> > +	trans->writable |= trans->dirty;
-> > 
-> > (And we assume DBM always means writable, and not only when VTCR_EL2.HD=1.
-> 
-> The Arm ARM is clear as mud in this area but this doesn't pass the smell
-> test. Look at R_HBFHL and R_FQNDX, which suggests that S2AP is the
-> authoritative field for write permissions through a descriptor.
->
-> > What do you think?
-> 
-> So the current shape of the code is a byproduct of looking at the Arm
-> pseudocode. Granted, AArch64.S1DirectBasePermissions() is the one
-> changing the effective value of AP based on the dirty state of the
-> descriptor.
+This series creates a new PMU scheme on ARM, a partitioned PMU that
+allows reserving a subset of counters for more direct guest access,
+significantly reducing overhead. More details, including performance
+benchmarks, can be read in the v1 cover letter linked below.
 
-Oh, right, the pseudocode.
-Yeah, it looks very much like your code, even the use of DBM+HD to reset 
-AP[2]. But that's S1, right?
+There is no longer a kernel command line parameter
+(`arm_pmuv3.reserved_host_counters`); PMU partitioning is now completely
+controlled via the KVM API using `KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION`
+and `KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS` vCPU device attributes. When
+partitioning is enabled for a VM, userspace must explicitly configure a
+guest event counter count strictly less than the maximum general-purpose
+counters implemented by the PMU (leaving at least one general-purpose
+counter for the host) prior to calling `KVM_ARM_VCPU_PMU_V3_INIT`. A QEMU
+patch demonstrating how to use the uAPI is sent separately.
 
-Stage2 has a different form [*], yet carries the same idea:
-writable = S2AP[1] || (DBM && HD && (!HDBSS || HDBSS_NOT_FULL()));
+An overview of what this series accomplishes was presented at KVM
+Forum 2025. Slides [1] and video [2] are linked below.
 
-Most interestingly, in that order.
-So DBM is not a writable bit, in fact. :(
-It's just a bit that, with HD=1, can change the permission of a page 
-to writable.
+v9:
 
-Right, that fits better with the whole HAFDBS feature as well.
+* Rebase on top of v7.3-rc4.
 
-Reading the code again, the only difference with the pseudocode is that you 
-evaluate DBM & HD before even checking S2AP[1], but that is not relevant as 
-the end result is the same.
+* Drop the `arm_pmuv3.reserved_host_counters` module parameter so
+  partitioning is completely controlled via the KVM vCPU device
+  attribute uAPI (`KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION` and
+  `KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS`), and document the new
+  attribute and counter allocation rules in
+  `Documentation/virt/kvm/devices/vcpu.rst` (James Clark).
 
-FWIW:
-Reviewed-by: Leonardo Bras <leo.bras@arm.com>
+* Move the dynamic counter allocation mask (`cntr_mask`) from global
+  `struct arm_pmu` to per-CPU `struct pmu_hw_events` (`cpuc->cntr_mask`)
+  in a dedicated `drivers/perf` patch, fixing multi-pCPU counter
+  reservation clobbering on vCPU migration and eliminating the
+  `cpu_pm_pmu_setup()` cpuidle `WARN_ON_ONCE` (Zide Chen, James Clark).
 
-Thanks for your patience!
-Leo
+* Synchronously propagate trapped guest writes to `PMEVTYPER<n>_EL0`
+  and `PMCCFILTR_EL0` to hardware via `kvm_pmu_apply_single_event_filter()`
+  when guest-owned, fixing in-guest `perf stat` event count skew across
+  runs (James Clark, Sashiko AI Review).
+
+* Refactor `armv8pmu_can_use_pmccntr()` and `armv8pmu_get_event_idx()`
+  to check `cntr_mask` inside `armv8pmu_can_use_pmccntr()` and un-nest
+  the 64-bit user-access check so cycle events fall back cleanly to
+  general-purpose counters when `PMCCNTR_EL0` is reserved by a guest
+  (Robin Murphy).
+
+* Restrict the lazy transition to `VCPU_PMU_ACCESS_GUEST_OWNED` to when
+  the guest actively enables counting (`PMCR_EL0.E = 1` or setting guest
+  counter bits in `PMCNTENSET_EL0` / `PMINTENSET_EL1`), preventing guest
+  boot-time PMU probing from prematurely claiming hardware counters and
+  triggering spurious host counter preemption warnings (James Clark).
+
+* Fix patch dependency ordering and series bisectability across all
+  commits, removing intermediate `max_guest_counters` / `hw_cntr_impl`
+  churn and squashing the selftest exception relaxation into the
+  Partitioned PMU selftest patch (James Clark).
+
+* Fix compiler warning for `struct arm_pmu` declaration in
+  `include/kvm/arm_pmu.h` (kernel test robot) and guard
+  `kvm_pmu_host_counter_mask()` when KVM is compiled in but not active
+  (wuyifan).
+
+* Track physical CPU PMU residency in `vcpu->arch.pmu.loaded_on_cpu`
+  separately from `VCPU_PMU_ACCESS_GUEST_OWNED`, and toggle
+  `MDCR_EL2.HPME` via `kvm_pmu_host_start()` / `kvm_pmu_host_stop()`
+  instead of `PMCR_EL0.E` when starting/stopping host perf events while
+  a partitioned guest is loaded.
+
+* Allow `kvm_vcpu_pmu_resync_el0()` to resynchronize VHE EL0 event
+  filters (`PMEVTYPER<n>_EL0.U`) in process context and order
+  `kvm_pmu_put()` before `kvm_vcpu_pmu_restore_host()` in
+  `kvm_arch_vcpu_put()`.
+
+* Address additional Sashiko AI Review findings:
+  - Check `idx - 1` against `cpuc->cntr_mask` in `armv8pmu_get_chain_idx()`
+    to prevent 64-bit chained host events from crossing an odd `HPMN`
+    partition boundary, and use `cpuc->cntr_mask` in
+    `armv8pmu_enable_user_access()`.
+  - Latch live hardware `PMOVSSET_EL0` overflow bits for guest counters
+    with IRQs disabled (`local_irq_save()`) in `kvm_pmu_part_overflow_status()`
+    and during trapped guest accesses to `PMOVS{SET,CLR}_EL0`.
+  - Add mandatory `isb()` barriers after control-plane system register
+    writes (`mdcr_el2`, `pmcntenclr_el0`, `pmintenclr_el1`), preserve
+    guest `PMSELR_EL0` / `PMUSERENR_EL0` when `MDCR_EL2.TPM == 0`, and
+    restore host `PMCR_EL0` control flags on `kvm_pmu_put()`.
+
+v8:
+https://lore.kernel.org/kvmarm/20260612192909.1153907-1-coltonlewis@google.com/
+
+v7:
+https://lore.kernel.org/kvmarm/20260504211813.1804997-1-coltonlewis@google.com/
+
+v6:
+https://lore.kernel.org/kvmarm/20260209221414.2169465-1-coltonlewis@google.com/
+
+v5:
+https://lore.kernel.org/kvmarm/20251209205121.1871534-1-coltonlewis@google.com/
+
+v4:
+https://lore.kernel.org/kvmarm/20250714225917.1396543-1-coltonlewis@google.com/
+
+v3:
+https://lore.kernel.org/kvm/20250626200459.1153955-1-coltonlewis@google.com/
+
+v2:
+https://lore.kernel.org/kvm/20250620221326.1261128-1-coltonlewis@google.com/
+
+v1:
+https://lore.kernel.org/kvm/20250602192702.2125115-1-coltonlewis@google.com/
+
+[1] https://gitlab.com/qemu-project/kvm-forum/-/raw/main/_attachments/2025/Optimizing__itvHkhc.pdf
+[2] https://www.youtube.com/watch?v=YRzZ8jMIA6M&list=PLW3ep1uCIRfxwmllXTOA2txfDWN6vUOHp&index=9
+
+Colton Lewis (21):
+  arm64: cpufeature: Add cpucap for HPMN0
+  KVM: arm64: Reorganize PMU functions
+  perf: arm_pmuv3: Generalize counter bitmasks
+  perf: arm_pmuv3: Move counter allocation mask to per-CPU struct
+    pmu_hw_events
+  perf: arm_pmuv3: Check cntr_mask before using pmccntr
+  perf: arm_pmuv3: Allocate counter indices from high to low
+  KVM: arm64: Add initial scaffolding for Partitioned PMU
+  KVM: arm64: Set up FGT for Partitioned PMU
+  KVM: arm64: Add Partitioned PMU register trap handlers
+  KVM: arm64: Set up MDCR_EL2 to handle a Partitioned PMU
+  KVM: arm64: Context swap Partitioned PMU guest registers
+  KVM: arm64: Enforce PMU event filter at vcpu_load()
+  perf: Add perf_pmu_resched_update()
+  KVM: arm64: Allow kvm_vcpu_pmu_resync_el0() to resync filters in
+    process context
+  KVM: arm64: Apply dynamic guest counter reservations
+  KVM: arm64: Implement lazy PMU context swaps
+  perf: arm_pmuv3: Handle IRQs for Partitioned PMU guest counters
+  KVM: arm64: Detect overflows for the Partitioned PMU
+  KVM: arm64: Add vCPU device attr to partition the PMU
+  KVM: selftests: Add find_bit to KVM library
+  KVM: arm64: selftests: Add test case for Partitioned PMU
+
+Marc Zyngier (1):
+  KVM: arm64: Reorganize PMU includes
+
+ Documentation/virt/kvm/devices/vcpu.rst       |  42 +-
+ arch/arm/include/asm/arm_pmuv3.h              |  16 +
+ arch/arm64/include/asm/arm_pmuv3.h            |   7 +-
+ arch/arm64/include/asm/kvm_host.h             |  18 +-
+ arch/arm64/include/asm/kvm_types.h            |   6 +-
+ arch/arm64/include/uapi/asm/kvm.h             |   2 +
+ arch/arm64/kernel/cpufeature.c                |  10 +-
+ arch/arm64/kvm/Makefile                       |   2 +-
+ arch/arm64/kvm/arm.c                          |   4 +-
+ arch/arm64/kvm/config.c                       |  49 +-
+ arch/arm64/kvm/debug.c                        |  41 +-
+ arch/arm64/kvm/pmu-direct.c                   | 636 ++++++++++++++
+ arch/arm64/kvm/pmu-emul.c                     | 718 +---------------
+ arch/arm64/kvm/pmu.c                          | 787 +++++++++++++++++-
+ arch/arm64/kvm/sys_regs.c                     | 334 ++++++--
+ arch/arm64/tools/cpucaps                      |   1 +
+ arch/arm64/tools/sysreg                       |   6 +-
+ drivers/perf/arm_pmu.c                        |   7 +-
+ drivers/perf/arm_pmuv3.c                      |  97 ++-
+ include/kvm/arm_pmu.h                         |  93 ++-
+ include/linux/perf/arm_pmu.h                  |   2 +
+ include/linux/perf/arm_pmuv3.h                |  14 +-
+ include/linux/perf_event.h                    |   3 +
+ kernel/events/core.c                          |  31 +-
+ tools/include/perf/arm_pmuv3.h                |  12 +-
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/arm64/vpmu_counter_access.c | 129 ++-
+ tools/testing/selftests/kvm/lib/find_bit.c    |   2 +
+ 28 files changed, 2200 insertions(+), 870 deletions(-)
+ create mode 100644 arch/arm64/kvm/pmu-direct.c
+ create mode 100644 tools/testing/selftests/kvm/lib/find_bit.c
 
 
-[*] https://support.arm.com/documentation/ddi0487/mc/-Part-J-Architectural-Pseudocode/-Chapter-J1-A-profile-Architecture-Pseudocode/-J1-2-Pseudocode-for-AArch64-operation/-J1-2-676-AArch64-S2DirectBasePermissions?lang=en
-
+base-commit: 93f51579e7df248780214094418f205253383cc5
+-- 
+2.56.0.rc1.310.g51773c2048-goog
 
