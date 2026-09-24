@@ -1,490 +1,261 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010010.outbound.protection.outlook.com [52.101.56.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EDCF4BC018
-	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 19:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790277246; cv=none; b=U2pOg8rPeK8a979+UPnnoZQEuhaxIPbbFlF8C6nhhycxtNqOBAUHlLYcVMJZCo8yLvNHypxqGYhxZZ6Byb+K2pGTS/k8wNRVYtsf9YecHZnn1mr6m3ZqecvUArGwtJnqxNUNTWZWpFdniOAYZ8FyWyf7WzT58itA2S6gw0yXWog=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790277246; c=relaxed/simple;
-	bh=EwBJUIoyp9JY6RVbxRaq5HHhHm5yl1iuR6dtegQ7JlA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FO5zW2mY+aLBvrvq2Mv47Z+zrcwuSXH/HIui8tL8oWwoQuWm6Z3WCfGPXVqXq/4m0gB+I5fVijvIqrMKH+m2qMhc6MDZ9kidqvtkLDDTiP1vG6kLLytyDBAN7YjJJUU4TnV0Tcbm/8yUB1TGuo4N9SMMPbl/YcvVT4Mo5i4deqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=grAZx5ct; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=gQRNFoAz; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9482429036;
+	Thu, 24 Sep 2026 19:28:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790278133; cv=fail; b=drcxMDqn2nZ1CYPcxHxGGDP1uM9TFkqn0zh5t7usoFDdAXZHRkMA0MPpAZxvubSQwACe4Uw5GTY3UYwzAQsMcsPYT7+tTsOLFX6ziLw3GmdDCwu4CVN1ijKRKQZD+YpHSNrClbr6y616U+bZzra9Qmf6V0NPL+cEuOSumKteXeQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790278133; c=relaxed/simple;
+	bh=ny8EbEvtbt9iqrScwz/pOR9WAVgerwBO6QW8MPc9WV8=;
+	h=Content-Type:Date:Message-Id:Cc:To:From:Subject:References:
+	 In-Reply-To:MIME-Version; b=Z4WGsvYd5mi09vSoFRvCqIm86reAhIGUHuOoTwVSTCzlD1tjJ314bi52EsOWL2+oplY98SToQldviPww8o1ZUITb+SPd5A1CZI2JfEQ/wMQVDUHhFyehBagWx39lmPFNcc+/wSKln9HTTjYZsYyhcDZ/xxwswm1XJCIqbZCjmIA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=h+WaXW9a; arc=fail smtp.client-ip=52.101.56.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="grAZx5ct";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="gQRNFoAz"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68OIdjdW4001896
-	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 19:14:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	7v7mwV3kL+pNqZlpuPeN3iMHS9Dj14zbCE44HBuwDdc=; b=grAZx5ctnOkhdTlJ
-	Tbx3UTtNyuHD/sr5o5S9iAosrcwL9vTgFX5n+qgkBa8eJlCDluGlJmxRGLzQFDp9
-	DNTotWQ7bej5dT0xfn70EAehqKhfhEvCn3M9xVQrr3bE6g8+ythywAZx/OeJitpd
-	N58VTQPEmBCKldJPszmeAMbxozdDm3HfnGTEFFMBUwRnLZP+l9asNVg8vEV0aBhS
-	B47EBSt9mP94NZbIGO1X1Y/YrRm6XrQwu8J4zQDrIgiYlXT/tP86H8pL55G7Lf8f
-	e22DjROzCJFkF16UcHQcoqsBhj2kMOts7bn6k0M/hwe6kJItxVTabXAQga7Wyqm6
-	eidmPg==
-Received: from mail-dy1-f199.google.com (mail-dy1-f199.google.com [74.125.82.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4gw1raje5p-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 19:14:03 +0000 (GMT)
-Received: by mail-dy1-f199.google.com with SMTP id 5a478bee46e88-33310847fcaso134362eec.1
-        for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 12:14:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1790277243; x=1790882043; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:mime-version:organization
-         :references:in-reply-to:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=7v7mwV3kL+pNqZlpuPeN3iMHS9Dj14zbCE44HBuwDdc=;
-        b=gQRNFoAzxDr2rQenVNnuqYmpuEnniJYsJJfVE4K+JltxJ43tLdJrqoXs4T9og01uVU
-         zglrlPYoWKlXqz22hElD1imUD6/x/inFXMr1EeMWYos8HgKocnyq42rZ1wFrEmHWsB+I
-         ZygqXu6s/NZR5TsYlKzdqceIlFjGQugaoZYCwSJ46ODzsj0io6eBlVlKGOhfMA32syu4
-         FFFKO/3StWvsjBiE7nFNY3BKzi8NZSmxLoxQ1hS64IDnU54Z51aTBXXWiVBT9cVQUj2i
-         4ohRkLJSxH9qFvaNWGF1Iu9WoK8Ags9c31BzDMAjutW1n8XAF+neK+c8//2Z9LXmA37u
-         E1EQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790277243; x=1790882043;
-        h=content-transfer-encoding:content-type:mime-version:organization
-         :references:in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=7v7mwV3kL+pNqZlpuPeN3iMHS9Dj14zbCE44HBuwDdc=;
-        b=i75Oe282TX6Rr1axUQpabmOMYf9N9Du+naX+OCIQAZJhesmJOxnJ7kgf1ZrsCwn5m7
-         46YrXhcJWmzHzGtDIzKVPhIHC1xMkbWdiB3rcsG53llHiBeKIi6C7z3eCbnTO9xqibfc
-         FVISuCDncnh5B5r5ceADlNsfAfATVN2KbBLVW1G5dIC1XlTaAXzyKsUtUVO9ODKTxpiT
-         I9f3uizcDnwve3e95tly1kkaJrwCgOFF+CoouYUYpUz4hBVVnSAXfww4SNp4DySFH1MD
-         QVg8j2zpMOh65503uJMHVZg23wCR/uWkDsvEPy1/r8spJPCAsvIQpQtjxlUMBdFjuWAn
-         aj2w==
-X-Forwarded-Encrypted: i=1; AKwUvBx1jGIcZs1ZnbIDMOTJ8d+I1goZeHY7/fGpo7cc/+tTY/UA893hPR4GqByWkABdrRgcOLyY76g=@lists.linux.dev
-X-Gm-Message-State: AFuF++lDB0IpjDp2mV5g7JVjBgFlqBTsL8dsHcme6AV52WU/uYtIvu7a
-	EyA9owQng7/Z8mE0arWwWdCHf5PLJantPi3HLXju7H339MxDeif5UpfG4YtNfoqHhyMgtQ6I1Vj
-	IJjDtT7aJYthtvPSv1KOiXF5eAiJfw6qtP2wpOgXwvQdtVvYFb1EHSc5aFYk=
-X-Gm-Gg: AYBFou1ucNknULukHP2+hNTZOtgdJmf8+pIFgDmwzT2dA7FRr5Soyd2jHap9kjMbe/K
-	9O9qPcamnjSrUHkOirzc+ybdGyxAGxvq5K63gOB/QHKCLjid7+xifeGOKqrlnHUJaqJ00zClGIT
-	qlQycduTd8FYVWi7y9xGtv+J9nvZtcsq3cjlmvQDOTDeqMmV7gOEyYAjKRJXdYUrntA7bg0Jgf/
-	t0TyIY2yEYO2vtgbQbveWSQs279asbI0Zri8Vcg1CZxVg1eGU6eU5IHsuESGLjztwd0oP5QNenq
-	HupAYl8t1/IxScctl3e7z7Lw7y9SLvDL85E1MqoXVqNrqQD/1Qeloc1oNT3bFEsdrfDiWevlEPm
-	MzaDSfpaRtJnlEhYvAQyqVDbyr762sZHZcsdXU3QlHtpvqsmha7aydA==
-X-Received: by 2002:a05:7300:1905:b0:33b:fc17:e786 with SMTP id 5a478bee46e88-33fff65015fmr3559975eec.16.1790277242539;
-        Thu, 24 Sep 2026 12:14:02 -0700 (PDT)
-X-Received: by 2002:a05:7300:1905:b0:33b:fc17:e786 with SMTP id 5a478bee46e88-33fff65015fmr3559927eec.16.1790277241676;
-        Thu, 24 Sep 2026 12:14:01 -0700 (PDT)
-Received: from localhost (i-global254.qualcomm.com. [199.106.103.254])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-341447576b9sm641843eec.15.2026.09.24.12.13.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Sep 2026 12:14:01 -0700 (PDT)
-Date: Thu, 24 Sep 2026 12:13:56 -0700
-From: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
-        will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
-        aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
-        joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
-        linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
-        sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
-        WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
-        sudeep.holla@arm.com
-Subject: Re: [PATCH v19 4/7] firmware: arm_rmm: Add support for SRO
-Message-ID: <20260924121356.00000d4d@oss.qualcomm.com>
-In-Reply-To: <20260924135201.850038-5-suzuki.poulose@arm.com>
-References: <20260924135201.850038-1-suzuki.poulose@arm.com>
-	<20260924135201.850038-5-suzuki.poulose@arm.com>
-Organization: Qualcomm
-X-Mailer: Claws Mail 4.4.0 (GTK 3.24.51; x86_64-w64-mingw32)
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="h+WaXW9a"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cjqlYp28LVRA1tlUe3pHgpcNtzuPmx8HtsSywXuC1NR+ZPFwniUWW/Qm6rQ/0M1T1eyUdRFAEd4TyZEpMXDUX7oVci/J5WN6Cw6jdc4Km+3FjnffxDISj1anGv3tyCEFbWi3iQ94ERo2TKcB00sXxNtAAppYz7pQl2AvHD6W0v1/3VY4YgaFKWzPXc/sUX6GdocahoDGUm4NVoIj2jDau0bhEWnGdHSXeqrsDD2efPXHZMYirzrezZz5WwoBs0FR4uwgkqaW0X7/o4ZxqvD0bdTihipeMxYRvC6blZuLRzqyL5LmaZ50M78kgpyUxYWBVhCaE+jOzUgVi+2LyYoAFg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BanIIEJzpCiYkyUQdKsWNp/eZgx6p5TAqP8UPbXSTJI=;
+ b=rCFzHE3rtPzAT2pO1Yzb9+YdowGNLOBxmdKJPzpJJD6IKidCRMPbK6PZ5z+9cR6oX80fc+pwQqpVp+/eq+ZB42PvjsF8PINhz7Du6dO0YUlCqhqlcnEkvTCS5xTpWWanNb0KwI52t2gy1ku88ZlP+2M2Jrl56poHrdtNj0QSfpYYi0L9rGr7lwvmJxHIlLMSJtZauH5fd9UtKE3Zfbyic7qOxEQy4hdX+D8pxQW+MvxMMuIZAXVzPKMz0V3olxlw5tQLOaDe8x7j5j8uvyAf3uXAEEOGfuasWqy20pO8VyzVZlkInH3nII0+fPo4my/16ebvh+svHH1agIxvTcPt9Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BanIIEJzpCiYkyUQdKsWNp/eZgx6p5TAqP8UPbXSTJI=;
+ b=h+WaXW9a+e0rH30DQ/pbEOlAmWReoVVlftVQhSSoR6JAI1e31yewFWsS7UzhNHrs2EmzGy9pOm2lhENGwGL6RqDTm9f17Dmynq4tP/FUIBl9bVFO5Q+XoSJpo7K/7/gz91QJUyA+BsUl5C7rCN55SM91p92IindNt/y2Q4+wt1pTuNYE/tsg2Rn+oCpYKMt7EU64qYRMl2JbBYI5Z/V2mSWsn7YE/pItFbhaoStic+h56FdNtzyDKeKG+AQO7zIWw2AX01TLa6MGmGsWcjNJRdKUGLCTmIENy4/ZXwgyKRJwxws3F+BFlSczhH30reLmIDQEg+aEtEuZm4i8g1+xwQ==
+Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from IA0PR12MB8374.namprd12.prod.outlook.com (2603:10b6:208:40e::7)
+ by SJ5PPF4D350AC80.namprd12.prod.outlook.com (2603:10b6:a0f:fc02::993) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.451.18; Thu, 24 Sep
+ 2026 19:28:17 +0000
+Received: from IA0PR12MB8374.namprd12.prod.outlook.com
+ ([fe80::d85f:4c87:ae84:3f16]) by IA0PR12MB8374.namprd12.prod.outlook.com
+ ([fe80::d85f:4c87:ae84:3f16%6]) with mapi id 15.21.0451.014; Thu, 24 Sep 2026
+ 19:28:16 +0000
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 24 Sep 2026 15:28:10 -0400
+Message-Id: <DLNSM8R8JS9A.1850RMXAG9NSR@nvidia.com>
+Cc: <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>,
+ <linux-doc@vger.kernel.org>, <linux-usb@vger.kernel.org>,
+ <linux-rdma@vger.kernel.org>, <selinux@vger.kernel.org>,
+ <linux-sound@vger.kernel.org>, <bpf@vger.kernel.org>,
+ <linux-scsi@vger.kernel.org>, <linux-fbdev@vger.kernel.org>,
+ <dri-devel@lists.freedesktop.org>, <linux-trace-kernel@vger.kernel.org>,
+ <linux-perf-users@vger.kernel.org>, <linux-arch@vger.kernel.org>,
+ <linux-fsdevel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <kvmarm@lists.linux.dev>, <linuxppc-dev@lists.ozlabs.org>,
+ <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
+ <linux-riscv@lists.infradead.org>, <linux-s390@vger.kernel.org>,
+ <sparclinux@vger.kernel.org>, <fuse-devel@lists.linux.dev>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>, "Andrew Morton"
+ <akpm@linux-foundation.org>, "Liam R. Howlett" <liam@infradead.org>,
+ "Vlastimil Babka" <vbabka@kernel.org>, "Jann Horn" <jannh@google.com>,
+ "Pedro Falcato" <pfalcato@suse.de>, "David Hildenbrand" <david@kernel.org>,
+ "Mike Rapoport" <rppt@kernel.org>, "Suren Baghdasaryan"
+ <surenb@google.com>, "Michal Hocko" <mhocko@suse.com>, "Jonathan Corbet"
+ <corbet@lwn.net>, "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Dennis Dalessandro" <dennis.dalessandro@cornelisnetworks.com>, "Jason
+ Gunthorpe" <jgg@ziepe.ca>, "Leon Romanovsky" <leon@kernel.org>, "Paul
+ Moore" <paul@paul-moore.com>, "Stephen Smalley"
+ <stephen.smalley.work@gmail.com>, "Jaroslav Kysela" <perex@perex.cz>,
+ "Takashi Iwai" <tiwai@suse.com>, "Alexei Starovoitov" <ast@kernel.org>,
+ "Daniel Borkmann" <daniel@iogearbox.net>, "Andrii Nakryiko"
+ <andrii@kernel.org>, "Eduard Zingerman" <eddyz87@gmail.com>, "Kumar
+ Kartikeya Dwivedi" <memxor@gmail.com>, "Baolin Wang"
+ <baolin.wang@linux.alibaba.com>, "Nico Pache" <nico.pache@linux.dev>, "Ryan
+ Roberts" <ryan.roberts@arm.com>, "Dev Jain" <dev.jain@arm.com>, "Barry
+ Song" <baohua@kernel.org>, "Lance Yang" <lance.yang@linux.dev>, "Usama
+ Arif" <usama.arif@linux.dev>, "Kiryl Shutsemau" <kas@kernel.org>, "Doug
+ Gilbert" <dgilbert@interlog.com>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, "Martin K. Petersen"
+ <mkp@kernel.org>, "Jaya Kumar" <jayalk@intworks.biz>, "Simona Vetter"
+ <simona@ffwll.ch>, "Helge Deller" <deller@gmx.de>, "Sebastian Reichel"
+ <sre@kernel.org>, "John Hubbard" <jhubbard@nvidia.com>, "Peter Xu"
+ <peterx@redhat.com>, "Masami Hiramatsu" <mhiramat@kernel.org>, "Oleg
+ Nesterov" <oleg@redhat.com>, "Peter Zijlstra" <peterz@infradead.org>,
+ "Thomas Gleixner" <tglx@kernel.org>, "Ingo Molnar" <mingo@redhat.com>,
+ "Borislav Petkov" <bp@alien8.de>, "Dave Hansen"
+ <dave.hansen@linux.intel.com>, <x86@kernel.org>, "Arnaldo Carvalho de Melo"
+ <acme@kernel.org>, "Namhyung Kim" <namhyung@kernel.org>, "Mark Rutland"
+ <mark.rutland@arm.com>, "Rik van Riel" <riel@surriel.com>, "Harry Yoo"
+ <harry@kernel.org>, "Juri Lelli" <juri.lelli@redhat.com>, "Vincent Guittot"
+ <vincent.guittot@linaro.org>, "Maarten Lankhorst"
+ <maarten.lankhorst@linux.intel.com>, "Maxime Ripard" <mripard@kernel.org>,
+ "Thomas Zimmermann" <tzimmermann@suse.de>, "David Airlie"
+ <airlied@gmail.com>, "Will Deacon" <will@kernel.org>, "Aneesh Kumar K.V"
+ <aneesh.kumar@kernel.org>, "Nick Piggin" <npiggin@gmail.com>, "Arnd
+ Bergmann" <arnd@arndb.de>, "Muchun Song" <muchun.song@linux.dev>, "Oscar
+ Salvador" <osalvador@suse.de>, "Matthew Wilcox (Oracle)"
+ <willy@infradead.org>, "Jan Kara" <jack@suse.cz>, "Marc Zyngier"
+ <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, "Catalin Marinas"
+ <catalin.marinas@arm.com>, "Madhavan Srinivasan" <maddy@linux.ibm.com>,
+ "Anup Patel" <anup@brainfault.org>, "Paul Walmsley" <pjw@kernel.org>,
+ "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>,
+ "Christian Borntraeger" <borntraeger@linux.ibm.com>, "Janosch Frank"
+ <frankja@linux.ibm.com>, "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
+ "Alexander Gordeev" <agordeev@linux.ibm.com>, "Gerald Schaefer"
+ <gerald.schaefer@linux.ibm.com>, "Heiko Carstens" <hca@linux.ibm.com>,
+ "Vasily Gorbik" <gor@linux.ibm.com>, "David S. Miller"
+ <davem@davemloft.net>, "Andreas Larsson" <andreas@gaisler.com>, "Alexander
+ Viro" <viro@zeniv.linux.org.uk>, "Christian Brauner" <brauner@kernel.org>,
+ "Matthew Brost" <matthew.brost@intel.com>, "Joshua Hahn"
+ <joshua.hahnjy@gmail.com>, "Rakie Kim" <rakie.kim@sk.com>, "Byungchul Park"
+ <byungchul@sk.com>, "Gregory Price" <gourry@gourry.net>, "Ying Huang"
+ <ying.huang@linux.alibaba.com>, "Alistair Popple" <apopple@nvidia.com>,
+ "Chris Li" <chrisl@kernel.org>, "Kairui Song" <kasong@tencent.com>, "Kemeng
+ Shi" <shikemeng@huaweicloud.com>, "Nhat Pham" <nphamcs@gmail.com>, "Baoquan
+ He" <baoquan.he@linux.dev>, "Youngjun Park" <youngjun.park@lge.com>,
+ "Johannes Weiner" <hannes@cmpxchg.org>, "Qi Zheng" <qi.zheng@linux.dev>,
+ "Shakeel Butt" <shakeel.butt@linux.dev>, "Axel Rasmussen"
+ <axelrasmussen@google.com>, "Yuanchu Xie" <yuanchu@google.com>, "Wei Xu"
+ <weixugc@google.com>, "Chengming Zhou" <chengming.zhou@linux.dev>, "Michal
+ Hocko" <mhocko@kernel.org>, "Miklos Szeredi" <miklos@szeredi.hu>, "Xu Xin"
+ <xu.xin@linux.dev>
+From: "Zi Yan" <ziy@nvidia.com>
+Subject: Re: [PATCH v3 05/40] mm/vma: ensure mmap_prepare doesn't set
+ actions on a mergeable vma
+X-Mailer: aerc 0.22.0
+References: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org> <20260917-b4-mmap-prepare-vma-flag-sanify-v3-5-4583d8a23bca@kernel.org>
+In-Reply-To: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-5-4583d8a23bca@kernel.org>
+X-ClientProxiedBy: YQBPR0101CA0171.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:c01:f::14) To IA0PR12MB8374.namprd12.prod.outlook.com
+ (2603:10b6:208:40e::7)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTI0MDA3OCBTYWx0ZWRfX9+Uhof96QyAA
- 3lk5TzH8Tou54Cm10d3QlyQnUH9q/MviAco2VFTGvxEvX/bdjqAddp0OMfKBhqegNzVxFJYkI5X
- mExBSWEW6/I8v+3GBrmjHjrBYYrx3vkKznQ693GoaOrepUUilP2Uf4iqizl+zfhYbBeCOluTPkG
- b8+T/6dK+WY0KARS3p2XH9kTJConGMde0llJY+rXNIoUlxXJYXHLFZKh5xV8jxTbzsH59+6Ytwa
- T7r/GDZTMO+oHsCc+0YyiMatyy3hrypX7VzCWu1ELO6rDUT49ibBnWe/0x+isLb65opUcCKp6eN
- ihIwNiAmYgygw8ygbZnbQVb/MbL7RSqOuxkCwbwqJCcw1NOKwVxlnmQVMWFTYRcxij+gl9o4S4t
- ISO4iCxNVE7ZgHz8JtT0NcZT73ugxzfuTBHspriY1pykybtKQNb8JVvpUrWX6+aX8d0B7BSVQ/2
- PcxGY/DPhTEhlDTmQMg==
-X-Proofpoint-ORIG-GUID: lA08bm5b6FaaNzUzFn1C3pveape0435u
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTI0MDA3OCBTYWx0ZWRfX5zSx4C3dCnoj
- tvNfWm6E9zgEFYo62hvAdojheo0nPF/igrGuFr8XHoe9pltcLbSutnmGVlzVoeRzCmq6rNCWRfa
- 2rz4aL2s3eLlmgQUmRRkD0N6eCeaGas=
-X-Authority-Analysis: v=2.4 cv=fvpJ914f c=1 sm=1 tr=0 ts=6ab5767b cx=c_pps
- a=cFYjgdjTJScbgFmBucgdfQ==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22
- a=7CQSdrXTAAAA:8 a=EUspDBNiAAAA:8 a=g7tT_HrEe4iQpSKoiZcA:9 a=CjuIK1q_8ugA:10
- a=scEy_gLbYbu1JhEsrz4S:22 a=a-qgeE7W1pNrGK8U0ZQC:22
-X-Proofpoint-GUID: lA08bm5b6FaaNzUzFn1C3pveape0435u
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-24_05,2026-09-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 lowpriorityscore=0 suspectscore=0 impostorscore=0
- adultscore=0 spamscore=0 malwarescore=0 clxscore=1015 bulkscore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
- definitions=main-2609240078
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA0PR12MB8374:EE_|SJ5PPF4D350AC80:EE_
+X-MS-Office365-Filtering-Correlation-Id: 81cafa58-af46-454b-9d3b-08df1a71fb9d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|7416014|23010399003|366016|6133799003|22082099003|18002099003|921020|56012099006|5023799004|11063799006|10067099003|4143699003;
+X-Microsoft-Antispam-Message-Info:
+	Ax/xivLGah5Be3D2je1u4kNuIHeKMWbPC8BT9QSSH+82ViHzGTE6r/CWbSFnTw48A101tMVCkTNv/MuXOijbtgoiIzzL1HtzYb/MR4RoYfbXgZ/cB4yb1+rrIDzSnHw/b4WJ1HBHrl/h/ZOaA3Ya4iD5C39QAI9/foOXNKtx12hE9xh97iC2WisOmfoDxHYZetWYVPpM17b9r9RdikF5duFcJuI0Pktc8PQVjeEWLcUTE4MvZU31TEX8yB+V4NLARZ1WgT7FtYoI4z/jcu4FnA9ZCTNrHDGrtlqpDKDa2B7wtYtyIC0xezTlb+st76fncctMnR1NIGRhoTwbha1UzcwvzyfbuXeKyB/tTyrPA+q8O66+1qofEtxIhP4gtCaMr6+Bs+Jp7H1w5vZ78O0OX/zKt5/Ca+HnC1qpQsG+13PRmHe5VuulxrdRKY/9CzlmUwso94qTs2MwxDLK3lc9LZdDbDNFEqQ3A9KHk+UGFHfUuK7qxyOTaqGg3lCG3oaG17gTGLEqHOUvOVpahMvPnFMAY4e2AJc2euiwFraL9hbmisCcu/7LbbZsCjcqODvjrDRzGHXV8PE2abhyv9nwWX8ZeeP5EcEQWtREreZf2/CT4T4+hai04IzuKrL09qfgdLDiERLGkF115Qle7LEfJKzJN+jvdPALyhuFWvkxDqA7nrT65scA85BQ6HmjsjrGyNw4/QqgwBTQIvCu/Q2ZPQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PR12MB8374.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(23010399003)(366016)(6133799003)(22082099003)(18002099003)(921020)(56012099006)(5023799004)(11063799006)(10067099003)(4143699003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TFJRa3hZU2JUMFpLQTd3N3EwaUFualBZakRQazRkMDNNN0ptazg1eENRZWtJ?=
+ =?utf-8?B?T2M0dTAzUDM4a1pPbEVqaHJxU0ZYOTBjYk1mS0p4VXU1QytOMjNwcGwrMmd1?=
+ =?utf-8?B?ZFR4R1lYSytvZFU2U2pKOE1sT2k0eHNONWhqTElQTDFyQXNRaGgyeGwyOXo0?=
+ =?utf-8?B?cUhwWmdHdWVvOVUvUHc2TzUyZGJIejVmTHJPMm8wR2dXRDJpV0Y0SWlxSzB5?=
+ =?utf-8?B?Vy9vVU1uU2hWOTk0MDdjSzBScW94RVVldnREY3lNcEN5RnViU2FQdUpVYTFH?=
+ =?utf-8?B?L2xaVnhnaWt3SE5wMFFIQlRnb0lMOEp5cVVqYXJoSkNIcmNmTVhMSWM0TG8y?=
+ =?utf-8?B?QkpGdFh6MWg2dG5hOVA0MSsxQzBSVGZXbHI4RTdCZDA2am9kKy9wVG53WUpu?=
+ =?utf-8?B?dkU0Qk1WcUlzcUoraURKOHg1RHJnczl2SXhwK2Q3enRBTkY1b3Q5V3lac1VP?=
+ =?utf-8?B?OFJmZktVbmc0NUt3ZEppSFY1cmM2Um9YajAyM2c0dzdSTzVybjN2Z0tadkRG?=
+ =?utf-8?B?ZXppQndsSkRDbWpzMzhweFNQN2xXc1F4ZjBNUXJNZ1lCUjM1Z3BSdTE0TzVm?=
+ =?utf-8?B?NGZQQTNjTWpxdkx1b0JxYlhYbHdjOHBrMGhCQndBNUlIbGNVY2plWTRCMWpW?=
+ =?utf-8?B?VzI4R2RPdlNTQVpmWjR1U0R5NlZnVThpUTYrUitvSlBnRTBKREZjcHkvSGNr?=
+ =?utf-8?B?UDhKV3BNWVFnWUp0SjJkZjhZaDhKSzRlUS84V3hSWHVDcHNnd3NsTXgwSUdu?=
+ =?utf-8?B?N2FlNmVsbnZoQVN2cmplNmViQ3dJRWxGOGNaRnpYekYreUNzdnpVQmdrTWhV?=
+ =?utf-8?B?bTdycHlZaDVjcGZ5eEpFaUJhNlUwVk8zVmRLclpQbXR4c1VBeWpXOFVBS2xy?=
+ =?utf-8?B?cDZOcnJTT3VET3cxck9JdmRjNjUrUTdXU2gyN28rZDBnVnBpN3dhQ0R2MXlJ?=
+ =?utf-8?B?UUhRcWhvVlFDamJhcE1JbW5CY3ZSVURDamgzSFJCL3NtU1QxSHBSa2Y1Q2Vn?=
+ =?utf-8?B?b2FEWHF0bFFIdEMzSUdHMjZuMGREeTFncHpicXNicDV3aVJGQzA4aU9RVHho?=
+ =?utf-8?B?dFVwVGFETnlmaWIvNFVuQUhHUU1UV3RYYjNiQ0NYSWFzUDFnbWZqdVlWR2Ro?=
+ =?utf-8?B?bDZGakRqd0k1R0I5bDl0UDBxS3A3VHVHSkhrYzkvQkNMRVZyMGIwOUlIaUph?=
+ =?utf-8?B?OExMVlV2bU1OM1ZaS2d2dGxDaVVQbzNRVysvK29nYXF6ZDZrczUwZzJObDFv?=
+ =?utf-8?B?czZnMVE3QnN6NjZtdGx6T2hCZVg5UFhIOG5pWU50NWFTbHpTenhFdzJmKzhP?=
+ =?utf-8?B?QjNYM082Rk9zRmxtd29IblBYODFVU3p1VytabzV3OWxrL04vUWV0RUlteTZl?=
+ =?utf-8?B?d3VVcXNCN3NldHhyRzJjSGF1UktycTJaY1FUNDRXVkdiUzZGYmUwOXV5a0hF?=
+ =?utf-8?B?REwzdHR1Y3lTbjdpK2pKdDVuc1RETnpKWmx2Tkc5a2tsbklUNFpiR3IzcmxT?=
+ =?utf-8?B?emVKdXFMaWJpcTNLbU4wbmYrMVJiU21ab3JVZkdFL0FRb3doOFB3SjVESTdI?=
+ =?utf-8?B?a2JuM3NEYnNDcWVvMUxiUDc0NFpzVmtrbnRYZ0s4UnN5eGRIczhrQmxqL2ll?=
+ =?utf-8?B?enNWMGVSQzN6Y2R0bTlUR0lSaWpDYUxWWXZFNG9HRXhnejlVTGJPaElRYWs5?=
+ =?utf-8?B?eUhnV1JpY2FNbVdXT2VzSVcyZ2Jpc3hJTDZwRmVlUURqSWFZK3ZHdFBlTzl3?=
+ =?utf-8?B?aFFNK2xxenNOQlJ1VzJsTDlpZUkrNWJjNGlPZWdwWDlWVUNzUXYrbDllZjUr?=
+ =?utf-8?B?K2hCSlpHMTk1bU9IT0R4MVV6OEZYL3dmL2ZhbUFxUmR2RFVEa2IrNVVmcFgx?=
+ =?utf-8?B?WGQ1WjFmY2l1SzUwdHdCNGFOS1ZjUXNVVDgxZGZtWG42WHJhTXR0a3JtYmFr?=
+ =?utf-8?B?eFFPd2RXdnZhei9TNkRQMi8wR2FLS1U4SGZVeTFpdmYrK2ZYVWEyYkZlWlBw?=
+ =?utf-8?B?eUFUUEZmdXRWa241Vm0vTkhnMG9WMEg1bENyc1Nha1N5bDJRQWRzOGx1a3RG?=
+ =?utf-8?B?bjNEZ0hUOEFzdC9LZTdrWkpUcEF3b3lqdGRhUzZnZXZuZVVHaERKc09OSXQ1?=
+ =?utf-8?B?SjdJRzM5dG1RRlh5N0RDSGs5QkYwczF5UWs0VXhPQzNUVXhrQWQvaEMvT3lq?=
+ =?utf-8?B?T0trck9hVkxlWndDN2FSQU1pZGFYOXBVMGVJdzBWSFo1cEhwOEJvaVNNVFVk?=
+ =?utf-8?B?N0xjK2JKUS9tN1ZtaVJhMnR3ckFYUE43MmVZVjVTUnpXMUZLMy9veFNVWk1J?=
+ =?utf-8?Q?mnhPx5KyssRyBx3roV?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 81cafa58-af46-454b-9d3b-08df1a71fb9d
+X-MS-Exchange-CrossTenant-AuthSource: IA0PR12MB8374.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Sep 2026 19:28:16.6733
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZiW9MVdMq6VFSl8GT1lYphVqy9SethyWUgkCOI3oIPh50dtSXfkTKjmN2rT8UU8a
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF4D350AC80
 
-On Thu, 24 Sep 2026 14:51:58 +0100
-Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
-
-> From: Steven Price <steven.price@arm.com>
-> 
-> RMM v2.0 introduces the concept of "Stateful RMI Operations" (SRO). This
-> means that an SMC can return with an operation still in progress. The
-> host is expected to continue the operation until it reaches a conclusion
-> (either success or failure). During this process the RMM can request
-> additional memory ('donate') or hand memory back to the host
-> ('reclaim'). The host can request an in progress operation is cancelled,
-> but still continue the operation until it has completed (otherwise the
-> incomplete operation may cause future RMM operations to fail).
-> 
-> The SRO is tracked using a struct rmi_sro_state object which keeps track
-> of any memory which has been allocated but not yet consumed by the RMM
-> or reclaimed from the RMM. This allows the memory to be reused in a
-> future request within the same operation. It will also permit an
-> operation to be done in a context where memory allocation may be
-> difficult (e.g. atomic context) with the option to abort the operation
-> and retry the memory allocation outside of the atomic context. The
-> memory stored in the struct rmi_sro_state object can then be reused on
-> the subsequent attempt.
-> 
-> Wrappers for SRO RMI commands are also provided here because they depend
-> on the rmi_sro_execute() implementation added by this patch.
-> Delegate/undelegate handles are also added here because they now use the
-> SRO/stateful command infrastructure and are also used for the memory
-> DONATE/RECLAIM flows.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-
-Nice.  Everything I spotted this time around is pretty trivial.
-So assuming you'll clean up and bits that make sense to you for v20
-
-Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
-
-
+On Thu Sep 17, 2026 at 12:22 PM EDT, Lorenzo Stoakes (ARM) wrote:
+> When a user requests an mmap_action be performed in mmap_prepare, this
+> involves populating the VMA range with data.
+>
+> However, if the VMA is mergeable, it might then mistakenly be merged with
+> another VMA without having populated the range.
+>
+> Every mmap action currently available sets VMA flags such that the VMA
+> cannot be merged.
+>
+> However, to ensure that no future mmap action falls foul of this, assert
+> that this is the case upon mmap_prepare validation.
+>
+> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 > ---
->  drivers/firmware/arm_rmm/rmi.c | 666 +++++++++++++++++++++++++++++++++
->  include/linux/arm-rmi-cmds.h   |  41 ++
->  2 files changed, 707 insertions(+)
-> 
-> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
-> index c9ea964fd9081..035f21d3f26b6 100644
-> --- a/drivers/firmware/arm_rmm/rmi.c
-> +++ b/drivers/firmware/arm_rmm/rmi.c
-
-> +
-> +int rmi_undelegate_range(phys_addr_t phys,
-> +			 unsigned long size)
-> +{
-> +	long ret = 0;
-> +	unsigned long top = phys + size;
-> +	unsigned long out_top;
-> +
-> +	while (phys < top) {
-> +		ret = rmi_granule_range_undelegate(phys, top, &out_top);
-> +
-> +		if (ret == RMI_SUCCESS) {
-> +			/* Buggy RMM ? Let the caller leak the pages */
-> +			if (WARN_ON(out_top <= phys))
-> +				return -ENXIO;
-> +			phys = out_top;
-> +		} else {
-
-Similar to below, why not deal with error case first and reduce indent of
-the good path.
-
-> +			break;
-> +		}
-> +	}
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(rmi_undelegate_range);
-
-> +/*
-> + * rmi_delegate_range: Delegate a physically contiguous range.
-> + * We iterate over the range until we hit an error. So we may
-> + * return an error, but with a partially delegated range. The
-> + * caller must always look at the @out_phys to figure out, how
-> + * much progress was made.
-> + *
-> + * @phys:	Base of the physical address range
-> + * @size:	Size of the physical address range
-> + * @out_phys:	Top of the range that was completed. This is always
-> + *		valid, irrespective of the result.
-> + *
-> + * Returns RMI_SUCCESS on successful completion. Otherwise, returns
-> + * the Linux error number or the RMI status code as described
-> + * by the RMM spec for RMI_GRANULE_DELEGATE_RANGE or RMI_BLOCKED.
-> + */
-> +int rmi_delegate_range(phys_addr_t phys,
-> +		       unsigned long size,
-> +		       phys_addr_t *out_phys)
-> +{
-> +	long ret = 0;
-> +	unsigned long top = phys + size;
-> +	unsigned long out_top;
-> +
-> +	while (phys < top) {
-> +		ret = rmi_granule_range_delegate(phys, top, &out_top);
-> +
-> +		if (ret == RMI_SUCCESS) {
-
-My instinct here would be to flip this and have the error out of line given
-it breaks anyway and that gives you smaller indent for that ocmment block.
-
-		if (ret != RMI_SUCCESS)
-			break;
-
-		/*
-		 * Buggy RMM ? Let the caller handle the failure. We can't know
-		 * how far the RMM delegated in this iteration, so we return 
- 		 * the best known good limit. RMM can deal with granules 
-		 * already in "undelegated" in a given range. So, it is fine
-		 * for the caller to try the range we return.
-		 */
-		if (WARN_ON...
-
-> +			/*
-> +			 * Buggy RMM ? Let the caller handle the failure.
-> +			 * We can't know how far the RMM delegated in this
-> +			 * iteration, so we return the best known good limit.
-> +			 * RMM can deal with granules already in "undelegated"
-> +			 * in a given range. So, it is fine for the caller to
-> +			 * try the range we return.
-> +			 */
-> +			if (WARN_ON(out_top <= phys)) {
-> +				ret = -ENXIO;
-> +				break;
-> +			}
-> +			phys = out_top;
-> +		} else {
-> +			break;
-> +		}
-> +	}
-> +
-> +	if (out_phys)
-> +		*out_phys = phys;
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(rmi_delegate_range);
-
-...
-
-> +
-> +static int rmi_sro_donate_noncontig(struct rmi_sro_state *sro,
-> +				    unsigned long sro_handle,
-> +				    unsigned long donatereq,
-> +				    struct arm_smccc_1_2_regs *out_regs,
-> +				    gfp_t gfp)
-> +{
-
-...
-
-> +
-> +	/* Gather the suitable entries to the end of the list */
-> +	i = 0;
-> +	while (i <  addr_list_start && found < count) {
-> +		unsigned long entry = sro->addr_list[i];
-> +
-> +		if (RMI_ADDR_RANGE_BLOCK_SIZE(entry) == block_size_fld &&
-> +		    RMI_ADDR_RANGE_COUNT(entry) == 1 &&
-> +		    RMI_ADDR_RANGE_STATE(entry) == state) {
-> +			addr_list_start--;
-> +			swap(sro->addr_list[addr_list_start],
-> +			     sro->addr_list[i]);
-> +			found++;
-> +			/* Continue from the swapped in entry */
-> +			continue;
-> +		}
-> +		/* skip past the entry */
-
-Bit random on comment capitalization.  Have a quick final look through.
-For instance I think this one is Skip to match Continue above.
-
-> +		i++;
-> +	}
-
-...
-
-
-> +
-> +static int rmi_sro_reclaim(struct rmi_sro_state *sro,
-> +			   unsigned long sro_handle,
-> +			   struct arm_smccc_1_2_regs *out_regs)
-> +{
-> +	unsigned long capacity;
-> +
+>  mm/vma.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/mm/vma.c b/mm/vma.c
+> index d6ed10cefc8f..62f2ce1ad5a1 100644
+> --- a/mm/vma.c
+> +++ b/mm/vma.c
+> @@ -2809,6 +2809,15 @@ static int mmap_validate(unsigned long prev_start,=
+ unsigned long prev_end,
+>  int mmap_prepare_validate(const struct vm_area_desc *prev_desc,
+>  			  const struct vm_area_desc *desc)
+>  {
 > +	/*
-> +	 * We don't do a partial free of the entries. So for
-> +	 * now free the entire address list as we prepare
-> +	 * to reclaim more from the RMM.
+> +	 * It is not valid to execute mmap actions for VMAs which can be merged=
+,
 
-Rewrap to use all that nice space up to 80 chars!  I guess a refactoring
-side effect.
+Is it better to say "for VMAs ... after mmap_action_prepare()"? When I
+first read this, I wonder why the check is done after
+mmap_action_prepare(), which does some work based on action.type. Then,
+I realize mmap_action_prepare() changes desc->vma_flags and affect its
+mergeablitiy.
 
+> +	 * as any such merge would leave portions of the mapping incorrectly
+> +	 * unmapped.
 > +	 */
-> +	if (rmi_sro_ensure_capacity(sro, 1))
-> +		rmi_sro_free(sro);
-> +
-> +	capacity = RMI_MAX_ADDR_LIST - sro->addr_count;
-> +
-> +	rmi_op_mem_reclaim(sro_handle,
-> +			   virt_to_phys(&sro->addr_list[sro->addr_count]),
-> +			   capacity, out_regs);
-> +
-> +	/*
-> +	 * RMI_OP_MEM_RECLAIM always return RMI_INCOMPLETE, except when the
-> +	 * input parameters were invalid.
-> +	 */
-> +	if (WARN_ON_ONCE(RMI_RESULT_STATUS(out_regs->a0) != RMI_INCOMPLETE))
+> +	if (vma_flags_can_merge(&desc->vma_flags) &&
+> +	    WARN_ON_ONCE(desc->action.type !=3D MMAP_NOTHING))
 > +		return -EINVAL;
-> +	if (WARN_ON_ONCE(out_regs->a1 > capacity))
-> +		out_regs->a1 = capacity;
 > +
-> +	sro->addr_count += out_regs->a1;
-> +
-> +	return 0;
-> +}
-
-> +
-> +long rmi_sro_memxfer_execute(struct rmi_sro_state *sro, gfp_t gfp)
-> +{
-> +	struct arm_smccc_1_2_regs *regs = &sro->regs;
-> +	bool cancelled = false;
-> +	unsigned long sro_handle;
-> +
-> +	rmi_smccc_invoke(regs);
-> +
-> +	sro_handle = regs->a1;
-> +	while (RMI_RESULT_STATUS(regs->a0) == RMI_INCOMPLETE) {
-> +		bool can_cancel = RMI_RESULT_CAN_CANCEL(regs->a0) == RMI_OP_CAN_CANCEL;
-
-For a flag that is "can" or "cannot", do we need the RMI_OP_CAN_CANCEL (1) / RMI_OP_CANNOT_CANCEL (0)
-defines?  Doesn't feel like we'll ever get RMI_OP_UNKNOWN_IF_IT_CAN_CANCEL and I can't think
-of any other more reasonable options that would justify needing the explicit field value
-match.
-
-To me
-
-		bool can_cancel = RMI_RESULT_CAN_CANCEL(regs->a0);
-
-is obvious enough.  I don't care that much though so up to you.
+>  	return mmap_validate(prev_desc->start, prev_desc->end,
+>  			     desc->start, desc->end,
+>  			     &prev_desc->vma_flags, &desc->vma_flags);
 
 
-> +		int ret = 0;
-> +
-> +		switch (RMI_RESULT_MEMREQ(regs->a0)) {
-> +		case RMI_OP_MEM_REQ_NONE:
-> +			rmi_op_continue(sro_handle, RMI_CONTINUE_KEEP_GOING,
-> +					regs);
-> +			break;
-> +		case RMI_OP_MEM_REQ_DONATE:
-> +			ret = rmi_sro_donate(sro, sro_handle, regs->a2, regs,
-> +					     gfp);
-> +			break;
-> +		case RMI_OP_MEM_REQ_RECLAIM:
-> +			ret = rmi_sro_reclaim(sro, sro_handle, regs);
-> +			break;
-> +		default:
-> +			WARN_ON_ONCE(1);
-> +			ret = -ENXIO;
-> +			break;
-> +		}
-> +
-> +		if (ret) {
-> +			/*
-> +			 * All memory donating SROs must be cancellable. So a
-> +			 * failure in memory allocation shouldn't be an issue.
-> +			 * However, if we encounter a random failure (e.g.,
-> +			 * buggy RMM), don't loop forever, just give up.
-> +			 */
-> +			if (WARN_ON_ONCE(!can_cancel))
-> +				return ret;
-> +			/*
-> +			 * If we have already cancelled, and came back here due
-> +			 * to an error in MEMREQ, then there is no point
-> +			 * in going in loops.
-> +			 */
-> +			if (WARN_ON_ONCE(cancelled))
-> +				break;
-> +			rmi_op_cancel(sro_handle, regs);
-> +			cancelled = true;
-> +
-> +			if (WARN_ON_ONCE(RMI_RESULT_STATUS(regs->a0) != RMI_INCOMPLETE))
-> +				return ret;
-> +		}
-> +	}
-> +
-> +	if (cancelled)
-> +		return -ECANCELED;
-> +
-> +	return regs->a0;
-> +}
-> +EXPORT_SYMBOL_GPL(rmi_sro_memxfer_execute);
-> +
-> +/*
-> + * rmi_sro_execute: Execute an RMI command that is Stateful but not memory
-> + * tranfserring. Takes regs, filled with the FIDs and the arguments in place.
+Otherwise, LGTM.
 
-Spell check. Transferring.  Also why does Stateful get a capital letter and
-Memory Transferring does not.  They seem to both be properties of the comman
-so I'd expect some consistency.
+Reviewed-by: Zi Yan <ziy@nvidia.com>
 
-> + *
-> + * Returns :
-> + *  -ECANCELLED - If the operation had to be aborted and SRO was cancellable.
-> + *  Otherwise, returns the result of the RMI command.
-> + */
-> +long rmi_sro_execute(struct arm_smccc_1_2_regs *regs)
-> +{
-> +	bool cancelled = false;
-> +	unsigned long sro_handle = regs->a1;
-> +
-> +	rmi_smccc_invoke(regs);
-> +
-> +	sro_handle = regs->a1;
-> +	while (RMI_RESULT_STATUS(regs->a0) == RMI_INCOMPLETE) {
-> +		bool can_cancel = RMI_RESULT_CAN_CANCEL(regs->a0) == RMI_OP_CAN_CANCEL;
-> +
-> +		switch (RMI_RESULT_MEMREQ(regs->a0)) {
-> +		case RMI_OP_MEM_REQ_NONE:
-> +			rmi_op_continue(sro_handle, RMI_CONTINUE_KEEP_GOING,
-> +					regs);
-> +			break;
-> +		default:
-> +			WARN_ON_ONCE(1);
-> +			if (!can_cancel)
-> +				return regs->a0;
-> +			/*
-> +			 * We can't get here normally, but handle this anyway
-> +			 * for a buggy RMM implementation.
-> +			 */
-> +			if (cancelled)
-> +				return -ECANCELED;
-> +			rmi_op_cancel(sro_handle, regs);
-> +			cancelled = true;
-> +		}
-> +	}
-> +
-> +	if (cancelled)
-> +		return -ECANCELED;
-> +
-> +	return regs->a0;
-> +}
-> +EXPORT_SYMBOL_GPL(rmi_sro_execute);
+
+--=20
+Best Regards,
+Yan, Zi
 
