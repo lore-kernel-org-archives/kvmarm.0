@@ -1,135 +1,144 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A833AD515
-	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 11:47:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F6C47DD76;
+	Thu, 24 Sep 2026 12:14:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790250471; cv=none; b=Th2G+asKwyLYL0tls3Casp3wx4p7vXSTZo/Y69IsT+e+EJZg+zgbic28LSfX89irudFuN2tR5MZ8KUxcTnt0+0T/ePVP40t3UUrN7uUVBRfKSVDuUkfnNC/DuJi/tcQ1jfi8OFn5q71giq2hpaNegvcOzALj+Rb/Bjx4HGDK/Nw=
+	t=1790252048; cv=none; b=QYfzznACzIydnSCfhyFaOQvHooMc1J6BlaVnq9fxike6XnMeXWNuqEmqNBfan7UJDtliCtKqaGM+S6cee3ooDwyZSevz83QTo7GuhISgL8cAzZjB/hgh2YI1ZRzzKEObU1cas9vgrLMIC2e5TVIGxy8sYMxW6SL4bxTy/iHcLvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790250471; c=relaxed/simple;
-	bh=zFEpJJW2Ygnswic7m+wgOQUXXnuzXBT68x93F9YM8Dk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AtDSW+SVI/mP52jqctuWj5I9EvxSH/kYFbYdIL91LZanlWlqAWnM8I/DaMo3CYWp6bPMsABg1/K40GR7RkdVnus66FdbJfH+sETQCoYKiMOETlxJ1EgooOCreKzIZpCd3Mtw6lupFODtDPR8QyD+BZ43U3BLDe6+Sk/woZCwKy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fKKQmUyI; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1790252048; c=relaxed/simple;
+	bh=rsAn2KeX2+WQ5TV0HToZYuawnaTCR3LFzkUhDdID7oI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KP4eZ10PW36qzTtNa0BARJAb0fRkCdIid1o01uyQrv/8xhOQePLbcgUqlv7xBb+ZRANXXaML6E8vqBind2ynfwODQxv/AiyGwK1sb02VqwNcW2b7zUe6c71JYQZk1diL2KQYaJP/a2qOrpq+pqasa9TtTdlyWGUuQ1XW6xnpxT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OnMD1tUM; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fKKQmUyI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1790250469;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zFEpJJW2Ygnswic7m+wgOQUXXnuzXBT68x93F9YM8Dk=;
-	b=fKKQmUyILl+qlW3zZBR61Vmj3x6WPMjc5cuV9iU2RhC19UDmm+a0dvY8D5poQSKLn6RZp1
-	m+uo0oj+G4XC2Fzg5YFxk3pT/xrGkx4RQtJCuAAfXcqIZTmlgI8g7IgojSuXZaApGiAQdL
-	GFTNLVWOyhC9YaJZi4hSsEvBgpzPg7Y=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-76-dIj7yPiINsSVkuX3tyWYBw-1; Thu, 24 Sep 2026 07:47:46 -0400
-X-MC-Unique: dIj7yPiINsSVkuX3tyWYBw-1
-X-Mimecast-MFC-AGG-ID: dIj7yPiINsSVkuX3tyWYBw_1790250465
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-486f3c0d896so988690f8f.3
-        for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 04:47:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790250465; x=1790855265;
-        h=content-transfer-encoding:content-type:in-reply-to:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=zFEpJJW2Ygnswic7m+wgOQUXXnuzXBT68x93F9YM8Dk=;
-        b=v6f+7AMOXJ1zqdnjdX6+YxO2t8LzDpso+7G3s5+MXqCuTt0F3bfVamB4rOQSRfKc/f
-         SIlR1RF//o2qQ3/APeeSuJxtJnvPWqyc/yl2jiCuA+CODFqfcHuzN4hJ+tjd41mZk/K6
-         MSLnIgmebeQinB1f8fSSf57zm3AGroL7SRztyivwxzrUnA/oOCuXOWEUfd6CX+Epq+a9
-         GXT0hEH3xrTZWylpj4UWPCkR4i+Q7wur3BYXxp1WU5St4PDMTRNvaemqoF4Ssot2kqbl
-         KbjcfmssRK7JsewhFwCsvDOeGY+/TLbAS5IGD6aaKdu0oLuIWHXTPGhQXTVjBbo+auum
-         OJEw==
-X-Forwarded-Encrypted: i=1; AKwUvBydYFozyMly3OXqCUHvcWU/FH0ts1kzDYjL+DgMVZxgkLltyBiTQEJmLOIG2wpGAxYBs3Po7o0=@lists.linux.dev
-X-Gm-Message-State: AFuF++mSrxcI0rJ2AS5pIX78LiqZx4ue2ufyUbrMyUnER451GJTeJOK1
-	s64AueOJx9uh5R7y+bFcsjL+Pn0eyd/AHRkaHXc5wQp7I7M5b1yEWAHsHw68Vsy7gC4bsGZf0bM
-	EUkkvA0cVCrg4dt7lMOLI5fXWa4tzJmx03NAhUzLQFGiDOMrH3KqXb/T/Yw==
-X-Gm-Gg: AYBFou16EeECkj0vIKEft9XoTSHYXr6cuE5W+pTkuQvhV1nK47Sbp2YDtFyX2b2DyKV
-	IQYwXwnVibdjfK4xN0u2OvJob8WDFI/GEiUr4MUcnIgKOJ+Q3PJzCozG7CRDwiEmysjuuENf0he
-	IzIy+75GZE/0HRAmb2IlL7hYVfLzJThtA+kaB1x2bsDvPM+5ze8IUMit7s7YBuT/2mYu6ouoDGu
-	8HmfLNc9yGRoxMrBvWfSdu86H85xqIXCJTq5zLwRmvAeKT4OaAP/wTpB6Z9tMK+DAZDZFhE+swm
-	6DvS3iaWNlJbABmIARNUEArUR7eorOlTciiUx/4854pBenjre2wj5piGIImoaIrz/3MD2cc3jIe
-	rSiRnkeEYlEa1mbF6ZY3gKEsVOYu5iQPGitCdDBWPSZKpVtyP
-X-Received: by 2002:a05:6000:4012:b0:487:930:8acc with SMTP id ffacd0b85a97d-488717168c1mr3343499f8f.16.1790250464703;
-        Thu, 24 Sep 2026 04:47:44 -0700 (PDT)
-X-Received: by 2002:a05:6000:4012:b0:487:930:8acc with SMTP id ffacd0b85a97d-488717168c1mr3343461f8f.16.1790250464334;
-        Thu, 24 Sep 2026 04:47:44 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4886877c379sm13964440f8f.29.2026.09.24.04.47.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Sep 2026 04:47:43 -0700 (PDT)
-Message-ID: <b32547b3-c6ac-4887-8a10-59ee84b28938@redhat.com>
-Date: Thu, 24 Sep 2026 13:47:42 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OnMD1tUM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 040451F000FF;
+	Thu, 24 Sep 2026 12:14:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790252046;
+	bh=505orE5OpmF0rqgVrMUI2fkr4bM3eg+OhX8WPM6vgh0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=OnMD1tUMoY172Zuqhc6k4sQDczxnt/xSjWt5fb0mFNF8AFsCYlsRj9UVVsdG3ExB4
+	 rCC0g+fh+YoPb3LIxF48kpXphBeotD+Yy13z0+TuNYbMG8fLz0Ap5odtNVNe7/5Yrx
+	 icRT35m5mDtlzz8XcqONoajG5RjWIZ/drMfLHwgZKvQ9nDkLuXhjhoHs/3smj1ho5f
+	 CPyPEm9i3q1GdTiffSaCZ2o0ukewZei7I/cj0ejUxAc3t7VQpaqbr/yBLc+J4BkM0w
+	 xlM02lNJJY+duviRgIv/Ca8wLoyyvrgKZJyjfXpuyuSo8DXu2gs8maipQC2yqAg73E
+	 dKRqj2RQc2FDg==
+Date: Thu, 24 Sep 2026 13:14:00 +0100
+From: Will Deacon <will@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Vincent Donnefort <vdonnefort@google.com>, maz@kernel.org,
+	oupton@kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	catalin.marinas@arm.com, joey.gouly@arm.com, seiden@linux.ibm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com,
+	steven.price@arm.com, qperret@google.com
+Subject: Re: [PATCH v3 10/18] KVM: arm64: Handle PSCI calls for protected VMs
+ at EL2
+Message-ID: <arUUCFHamX1nOrB1@willie-the-truck>
+References: <20260914113338.159227-1-fuad.tabba@linux.dev>
+ <20260914113338.159227-11-fuad.tabba@linux.dev>
+ <arK1tHUEJsCQEKzn@google.com>
+ <CA+EHjTx+foVF4CRU5D8bQv8bAqDphMN12UrV+_doUryn2ow6bg@mail.gmail.com>
+ <arTfjgvZIhmXLrw1@willie-the-truck>
+ <CA+EHjTxe0JE-tCX4YcEEafdnxjuZLj3EBucZfZF0HCP2PQAekg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [RFC PATCH v4 08/25] target/arm/kvm: handle writeback for special
- ID register fields
-To: Khushit Shah <khushit.shah@nutanix.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "maz@kernel.org" <maz@kernel.org>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "abologna@redhat.com" <abologna@redhat.com>,
- "jdenemar@redhat.com" <jdenemar@redhat.com>,
- "gshan@redhat.com" <gshan@redhat.com>,
- "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
- "sebott@redhat.com" <sebott@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "philmd@linaro.org" <philmd@linaro.org>,
- "yangjinqian1@huawei.com" <yangjinqian1@huawei.com>,
- Shaju Abraham <shaju.abraham@nutanix.com>,
- Mark Cave-Ayland <mark.caveayland@nutanix.com>,
- "ping@khushitshah.com" <ping@khushitshah.com>,
- Sandesh Patel <sandesh.patel@nutanix.com>
-References: <20260921123249.1708067-1-khushit.shah@nutanix.com>
- <20260921123249.1708067-9-khushit.shah@nutanix.com>
- <aabcb61b-8341-423f-b113-e7ab2b34c2ac@redhat.com>
- <C220B122-8B4A-43DF-A665-AF1B9DCE3734@nutanix.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <C220B122-8B4A-43DF-A665-AF1B9DCE3734@nutanix.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: UrokQTPC_0x5AF2iQnkBZLIPB5_Hm5ueUTovOxeqKBQ_1790250465
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTxe0JE-tCX4YcEEafdnxjuZLj3EBucZfZF0HCP2PQAekg@mail.gmail.com>
 
+On Thu, Sep 24, 2026 at 12:26:25PM +0100, Fuad Tabba wrote:
+> On Thu, 24 Sep 2026 09:30:06 +0100, Will Deacon <will@kernel.org> wrote:
+> [...]
+> > Sorry, but I'm really confused by this and it appears to be different to
+> > what we've got in Android as well. Why do we need release semantics for
+> > the store to 'hyp_vcpu->power_state' in pvm_psci_vcpu_off()? What is it
+> > that we are publishing here? The comment talks about pkvm_reset_vcpu(),
+> > but how is that relevant to the vCPU _off_ path? You say the comment is
+> > wrong, but what _should_ it say?
+> >
+> > I'm a bit baffled!
+> 
+> It's not publishing data, it's handing reset_state back.
 
+What's the difference? The usual pattern for acquire/release is:
 
-On 9/24/26 12:21 PM, Khushit Shah wrote:
->
->> On 24 Sep 2026, at 3:27 PM, Eric Auger <eric.auger@redhat.com> wrote:
->>
->> v9 has changed the way new field values are stored. writable field props
->> and non writable field props could have different setters. A non
->> writable field setter just needs to check the new value is the same as
->> the current host value. No need to record the new value in the hashtable
->> for further commitment.
-> How will that work? as based on certain vCPU init options, non-writable fields will change… right?
-I meant the new value does not need to be written into KVM because it
-must be equal to the current value. But maybe I missed your point
+<write data>
+<store-release flag>
 
-Eric
->
-> Warm Regards,
-> Khushit
+on one CPU and then on another:
 
+<load-acquire flag>	// If this reads from the release above...
+<read data>		// ... then this is guaranteed to read the written data
+
+That's a message-passing shape and you would normally say that the first
+CPU (the producer) is publishing the data to the other CPU (the consumer).
+
+Is this what is happening with the 'reset_state' (data) and the
+'power_state' (flag)? If not, then what is the shape?
+
+> The CPU_ON winner writes reset_state.{pc, r0, be}, then reset_state.reset
+> with a release. The target reads them and clears reset in pkvm_reset_vcpu()
+> on its next run
+
+By 'next run' you mean, at EL2 on the entry path into the guest following
+a successful CPU_ON operation?
+
+> and its CPU_OFF hands reset_state on to the next
+> CPU_ON. The release on OFF orders those reads and that clear before
+> OFF, and an acquire on the winner's cmpxchg orders its writes after
+> it: release on the way out, acquire on the way in, like a lock.
+
+That doesn't make sense to me, sorry. You're saying that the release
+store in the EL2 CPU_OFF hypercall handler is ordering stores that were
+made during the initial CPU_ON handling on that vCPU? Since then, we've
+been in and out of the guest. We really shouldn't need extra barriers to
+create order there.
+
+> Without the release, the target's clear of reset can become visible
+> after the next winner's reset = true, and the target's next
+> pkvm_reset_vcpu() then reads a clear flag and returns -ECANCELED,
+> leaving the vCPU stuck at ON_PENDING.
+
+This needs a litmus test because I can't see it myself. As above,
+CPU_OFF does not clear the reset state, so it's bizarre to put the
+release there.
+
+> The comment described the flag ordering, which holds through the
+> winner's release on reset even with a relaxed cmpxchg, and named the
+> cmpxchg as its pair when the cmpxchg wasn't an acquire. The acquire is
+> for the winner's plain writes of pc/r0/be: nothing else orders them
+> after the target's reads. v4 has cmpxchg_acquire() and the two
+> comments name what's ordered and each other:
+> 
+>         /*
+>          * Orders pkvm_reset_vcpu()'s accesses to reset_state before OFF. Pairs
+>          * with the acquire cmpxchg in pvm_psci_vcpu_on().
+>          */
+>         smp_store_release(&hyp_vcpu->power_state, PSCI_0_2_AFFINITY_LEVEL_OFF);
+> 
+> and in pvm_psci_vcpu_on():
+> 
+>         /*
+>          * vCPUs race to power on the same target. The acquire pairs with the
+>          * release of OFF in pvm_psci_vcpu_off(): the target's accesses to
+>          * reset_state in pkvm_reset_vcpu() precede the writes below.
+>          */
+>         power_state = cmpxchg_acquire(&target->power_state,
+>                                       PSCI_0_2_AFFINITY_LEVEL_OFF,
+>                                       PSCI_0_2_AFFINITY_LEVEL_ON_PENDING);
+
+This confused me more :( Why are you talking about accesses preceding an
+acquire? An acquire only orders later accesses.
+
+I really think we need some litmus tests to understand the general ordering
+problems we have here before adding the memory barriers.
+
+Will
