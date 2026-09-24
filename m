@@ -1,107 +1,130 @@
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C104E8E12
-	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 21:53:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.71
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51BE13A9DBE;
+	Thu, 24 Sep 2026 22:16:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790286793; cv=none; b=RLVi3gPurHrMKme7BJuG2jO9WIEgyCxnUmcJPrnl0QKig66jVmRIGyMxLXLtWGxSQSYsPg1jfuP3Ykre2HZ+UdRK7d2s9EQJQWS9SNEUwOCDZ/FRSAARR0RF5nSMWaMhFgEP8qBE9pdVrT4uop+GtMvSSlQsnduU+j/lDNTrdSg=
+	t=1790288165; cv=none; b=iz7e2zPSp3uX6qUpA4MlRpO2iq2Js+h27KACrxKg8VZ12yZxIp8jsLN7LngHk+oxfU+f+ok5gX/RE2ugdq/kK8AVcJFpSI8ahhrtalVpJVOqiFlJnewkLcpoeA852789s2CEDIckgLO+HoqrFMRG1NCODDPAwkzwxi6/LA4JzxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790286793; c=relaxed/simple;
-	bh=RbSuvXpZGJzj7DyvR5wUr6ym4Nnq30Ym0ZQqCgZv2e4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NIG0JE/j7GIflKzHQoQjigZaVjKHqne+MlaFTP6Ts4W9OQmiS+J2rLdCmUTx6nMxiCvDhg+9V6TxO1xADTgr3PTwPGyrxcaWgd7eYLo3QgihE3xAx3PRjQcusmBEA7B19JdwZpB9q2g9dDy9eTDvLpHHgEbDtbRUOLKGFR1BAJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DBqRGMSG; arc=none smtp.client-ip=209.85.216.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1790288165; c=relaxed/simple;
+	bh=w55oFxyasq/JaOo+eWuI/wiOSjEK/BHz20zexwH7QsQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RsS38oIQ9O88t0149+GjJ/pBTgwnt+XHF786PSIYUCpk9EcL3vDmBwJmDgfqfJyHxamtvSg5HD584DYzlkhmr7WXwqk5UDUlRG+eVgT2BwoPrvmgShdKPbhZZYGaKmiiqK/d7sRZ1ZrZpy3sYEfrbO+FpyVCzbxtkLiHtaq9WTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=M/IB9ZOe; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DBqRGMSG"
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-39b77130a7fso268413a91.2
-        for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 14:53:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790286791; x=1790891591; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=6LkhgjIPo4LQGHd0bFnsw+pSTli362MQLpClW50HsSw=;
-        b=DBqRGMSG9dWDD7std5XL7Uw3SRonlKSPkKPntzNJ0Y0fYgo+ENdj11VJCXNncWacfU
-         YGsn0QaWq//kpjhTnDlKXxqPZCARVWLs4AJB0Muld7qM/xOZgAjzDPquFdmpgZR4niA4
-         Z+jbo/YsIFiJhYQ8KwK1UVPm9Cd6S6O+muaFt4BEgPEvFTSJGDyeJaEEuC0ZTli/OzEI
-         I+n1ABNHZGktzlgFbOjB/gXPjZWkTTX/WvdVEtOohuwqliYPdlulNx4LY7V/l7TuYkHh
-         nHBdM/m68fpZpN98TjoxaZAZjDYCieiQJgqOpY4onIl/H2V8xm5m9wKZD68z1q30c8zi
-         TN1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790286791; x=1790891591;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=6LkhgjIPo4LQGHd0bFnsw+pSTli362MQLpClW50HsSw=;
-        b=in4Xs3vFNbiuWB5oRtaV6aIjsO5tJIF4PtP/MsYdnoY+ibX/TX/sJlR4sxjsPSdsiV
-         KP1Y20ahmL6qKkIFsKDqQrifC19RwjKBfpap4HBjB5AiSyq0HrgJPyNCcRlOdv2hR3DR
-         hSdB80tXnxnjLq7Bc1nAHXyQ+eBGz2U2Tq9Gb0K0IYp4RXsEaThL7F0l1olciQPmwtE1
-         o5wu5SdQlQ1p5QqRoXBKIp8YmUpvldiv+kA2MGEZWPQe1bAonEXDNbc2Fl1otzQZR9z0
-         8EeL3O/EQ0vavTEbqMoUpUZweTmKroHqLy+a2bOMcEsnu23lQn+fIvkIkYq0Odfx+tRW
-         u/Kw==
-X-Forwarded-Encrypted: i=1; AKwUvBwZDU2ee0KVI8YbVKOwSvR9z3aE0HX1tiQorp9717HEuc6EhMVxXFLXsHUZRNYKq7Jz/6oT9Oo=@lists.linux.dev
-X-Gm-Message-State: AFuF++nftCrVRApsIxMeZyzvD6lwUFRAxHumdY6H5Cdt+3tG5y9xc/jW
-	XdMyHu+8uBRD4qRDxTZxgkJUTNuw+i0nqHbJ+dnG8P2vS83MF4wfJJN35ARCjKDbVjr2wQO8cJS
-	ED+RhOA==
-X-Received: from pjrv22.prod.google.com ([2002:a17:90a:bb96:b0:3a0:9658:1de6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2703:b0:3a0:2ffd:1a4b
- with SMTP id 98e67ed59e1d1-3a098ce5269mr3354853a91.25.1790286791218; Thu, 24
- Sep 2026 14:53:11 -0700 (PDT)
-Date: Thu, 24 Sep 2026 14:51:51 -0700
-In-Reply-To: <20260826-gmem-no-return-page-v4-0-3bb9c1ddb4e3@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="M/IB9ZOe"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DAC5F1E5E;
+	Thu, 24 Sep 2026 15:15:55 -0700 (PDT)
+Received: from [10.57.10.88] (unknown [10.57.10.88])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B9B93F86F;
+	Thu, 24 Sep 2026 15:15:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790288159; bh=w55oFxyasq/JaOo+eWuI/wiOSjEK/BHz20zexwH7QsQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=M/IB9ZOemKQDQEvic71j4jcxtkn8nKprm3yJOeOepBTucL2LNaNr4+jija45pf2Gt
+	 yJvU0/cC4QCnbExWxwxkmvMeuvnvToVzhRmaJ4YlAUqJMpt6RS6gljojzVhiCRvsdB
+	 W5CPqP48trn08kPjTZSYhtiSlr2uToEKU1gwDEX0=
+Message-ID: <aa877f31-0ae7-4042-bab2-6a818003d26e@arm.com>
+Date: Thu, 24 Sep 2026 23:15:49 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260826-gmem-no-return-page-v4-0-3bb9c1ddb4e3@google.com>
-X-Mailer: git-send-email 2.56.0.rc1.315.gc6ed9934b7-goog
-Message-ID: <179028368772.2007408.8775233545709825615.b4-ty@b4>
-Subject: Re: [PATCH v4 0/5] Stop returning struct page from guest_memfd PFN lookup
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Ashish Kalra <ashish.kalra@amd.com>, 
-	Michael Roth <michael.roth@amd.com>, Brijesh Singh <brijesh.singh@amd.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, David Hildenbrand <david@kernel.org>, Yan Zhao <yan.y.zhao@intel.com>, 
-	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, Vishal Annapurve <vannapurve@google.com>, 
-	Fuad Tabba <fuad.tabba@linux.dev>, Ackerley Tng <ackerleytng@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 1/7] firmware: arm_rmm: Add SMC definitions for
+ calling the RMM
+Content-Language: en-GB
+To: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+ will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+ sudeep.holla@arm.com
+References: <20260924135201.850038-1-suzuki.poulose@arm.com>
+ <20260924135201.850038-2-suzuki.poulose@arm.com>
+ <20260924095712.00004057@oss.qualcomm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20260924095712.00004057@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 26 Aug 2026 09:01:45 +0000, Ackerley Tng wrote:
-> v4 splits out a new patch (3) that makes use of KVM MMU invalidation logic
-> introduced into the RMP fault handling in patch 2 to avoid warning on a
-> benign case.
+On 24/09/2026 17:57, Jonathan Cameron wrote:
+> On Thu, 24 Sep 2026 14:51:55 +0100
+> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 > 
-> Other changes in v4:
+>> From: Steven Price <steven.price@arm.com>
+>>
+>> The RMM (Realm Management Monitor) provides functionality that can be
+>> accessed by SMC calls from the host.
+>>
+>> The SMC definitions are based on DEN0137[1] version 2.0-bet3
+>>
+>> [1] https://developer.arm.com/documentation/den0137/2-0bet3/
+>>
+>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > 
-> + Took Sean's version of the changelog for patch 2
-> + Picked up Fuad's Reviewed-by: and Tested-by:
+> Hi Suzuki,
 > 
-> [...]
+> One small thing I didn't really care about but where I thought you
+> said you were going to tweak things.
+> 
+> Either way
+> Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
 
-Applied to kvm-x86 coco, thanks!
+Thanks !
 
-[1/5] KVM: SEV: Treat unassigned RMP entry as benign race on PSMASH failure
-      https://github.com/kvm-x86/linux/commit/211606532680
-[2/5] KVM: SEV: Drop page refcount early during RMP fault handling
-      https://github.com/kvm-x86/linux/commit/375b32931b5d
-[3/5] KVM: SEV: Check for invalidation before warning on unassigned RMP entry
-      https://github.com/kvm-x86/linux/commit/acafcf32c83e
-[4/5] KVM: SEV: Drop page refcount early in VMSA reload
-      https://github.com/kvm-x86/linux/commit/3c427e5c0347
-[5/5] KVM: guest_memfd: Stop returning struct page from PFN lookup
-      https://github.com/kvm-x86/linux/commit/89fbe3de01cc
+> 
+>> +struct rec_exit {
+>> +	union { /* 0x000 */
+>> +		u8 exit_reason;
+>> +		u8 padding0[0x100];
+>> +	};
+>> +	union { /* 0x100 */
+>> +		struct {
+>> +			u64 esr;
+>> +			u64 far;
+>> +			u64 hpfar;
+>> +			u64 rtt_tree;
+>> +		};
+>> +		u8 padding1[0x100];
+>> +	};
+>> +	union { /* 0x200 */
+>> +		u64 gprs[REC_RUN_GPRS];
+>> +		u8 padding2[0x100];
+>> +	};
+>> +	union { /* 0x300 */
+>> +		u8 padding3[0x100];
+> 
+> I thought plan was to fold into the padding above?
+> 
+> https://lore.kernel.org/all/d7ccaf22-5bde-4344-8bf0-a5a17dcac0f3@arm.com/
 
---
-https://github.com/kvm-x86/linux/tree/next
+Yep, I missed it :facepalm:,  Apologies. I will fix it straight awy.
+
+Cheers
+Suzuki
+
+> 
+>> +	};
+>> +	union { /* 0x400 */
+>> +		struct {
+>> +			u64 cntp_ctl;
+>> +			u64 cntp_cval;
+>> +			u64 cntv_ctl;
+>> +			u64 cntv_cval;
+>> +		};
+>> +		u8 padding4[0x100];
+>> +	};
+> 
+> 
+
