@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9622B4AA1D2;
-	Thu, 24 Sep 2026 16:06:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2F4C4B512D;
+	Thu, 24 Sep 2026 16:06:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790265971; cv=none; b=R8fXGqeHmmPdThrqW8w0w/OEh3MzMR77BMHltc6m2rDP0s17e9nHXP+4px+825qeBmjiLtEUQ2J+5Kk6xx2+vDVmd9u8IhuBqmU7+yOMpnU4Ka9tQ5ufrECErWUOna+YxGkQ5kmnsjEguygYXlLeIGmpHqge+x+X94nvEROwWEQ=
+	t=1790265975; cv=none; b=Ci4yEaVSVmk6J9yu9VSqCAiNM+Q4YAix2cVn1B2kUReO2lAjjtVSoJ4V95VcEn8o7qZGn7LLn3Zwa7JX7YFwtPXdxVCftD0WM4sQiRy34WaNK5P2mbGd6Mf0FuPYITIWeDjkC/rTOUvoaECdMk0ZS3zpGTZK+W2LJi7YFRU0VJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790265971; c=relaxed/simple;
-	bh=XKUI0O+yupvbzqqTCtUZd6FFNrWihRgYRS3Pt81HQOM=;
+	s=arc-20240116; t=1790265975; c=relaxed/simple;
+	bh=n7yz3W9kIeBZupUqbrSWGGV1frVjZNOBUu35dpOGsW4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G3mDFAVP7/zZZ29QsmxQ0LTNK5yvPWcLYEmD9YQcWzTGucMfhJUiR0Dy7XwGYT2y7glkRADUADBiu80YudOd7HJmEsaca8c6Nxu2EGYgO7KzzaJs2+q6YvzOiCV+wBaDRuzN7EwN3Drs/TwnBO7/KtSqlBGXSGxWParDTmUIAaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ZLo+LMYO; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=Q5K1515P51X9Gt3OSHjI4eXMOcW3XdGsmPZm/GYSY+wHWDZJGd8wEmjrtWMiRG/3K8KiTRuqcTRFFG+a+0BZKf5PYYeCwfnocfY0hXYybUGnpsk+VFCEiEVLFPttbNjmJNT21rHyMaV4wyiegrKHQuYsQW9TG5ZkwPB/Xh2528A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ag2masPk; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ZLo+LMYO"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ag2masPk"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 692B01E7D;
-	Thu, 24 Sep 2026 09:06:05 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C08771E8D;
+	Thu, 24 Sep 2026 09:06:09 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id D4CF43F86C;
-	Thu, 24 Sep 2026 09:06:04 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 49B003F86C;
+	Thu, 24 Sep 2026 09:06:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790265968; bh=XKUI0O+yupvbzqqTCtUZd6FFNrWihRgYRS3Pt81HQOM=;
+	t=1790265973; bh=n7yz3W9kIeBZupUqbrSWGGV1frVjZNOBUu35dpOGsW4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZLo+LMYOo3zDlgRnvgVuTcBsAZj2x1FVzaGN9lIWkFfFwBijU/CUySO2+3dxbw6ec
-	 HlyqqMi01NHfvhhb7UEOr/x4o7le5+19zMdQGJ3wDZdQ8g61abJ8lsRr0HwRTuhWiU
-	 QYIWHZyxYfEYXCAbiHGhvJrH4Xxm265z3Gn7d75Q=
+	b=ag2masPkvZvyDP1TmM+xdPRFyN5L/1Y1gFz+h/8n8gGQMFGChtjAUw+S78JoQRC9e
+	 /8DRQe21byPh9MdIVJjRWyKeG3jXw8ILnsMs4tBLMuTpxXX4GRkEWrpjSNbTuJ8sKS
+	 B227iVBMt41jm6DYSIZG5gwjRItM3B6PaA18cWfI=
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -52,9 +52,9 @@ Cc: maz@kernel.org,
 	sudeep.holla@arm.com,
 	jonathan.cameron@oss.qualcomm.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v20 11/22] KVM: arm64: Use a local kvm pointer in kvm_handle_guest_abort()
-Date: Thu, 24 Sep 2026 17:04:53 +0100
-Message-ID: <20260924160504.853911-12-suzuki.poulose@arm.com>
+Subject: [PATCH v20 12/22] KVM: arm64: Abstract out memory abort handling
+Date: Thu, 24 Sep 2026 17:04:54 +0100
+Message-ID: <20260924160504.853911-13-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260924160504.853911-1-suzuki.poulose@arm.com>
 References: <20260924160504.853911-1-suzuki.poulose@arm.com>
@@ -66,84 +66,128 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-kvm_handle_guest_abort() repeatedly obtains the VM from vcpu->kvm.
+Move the memory abort handling under VM specific s2 operation.
 
-Introduce a local kvm pointer and use it throughout the function. While
-touching the code, fix the missing whitespace in the
-kvm_is_nested_s2_mmu() call.
-
-Suggested-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+Tested-by: Gavin Shan <gshan@redhat.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm64/kvm/mmu.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+Changes since v19:
+ - Drop local variable ret and directly return from if..else for kvm_vm_mem_abort
+Changes since v18:
+ - Ensure vm_mem_abort handler is always !NULL
+---
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ arch/arm64/kvm/mmu.c              | 35 ++++++++++++++++++-------------
+ 2 files changed, 22 insertions(+), 15 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index f01df02dabfe1..871f503e9f164 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -156,6 +156,7 @@ struct kvm_vcpu_ops {
+ };
+ 
+ struct kvm_gfn_range;
++struct kvm_s2_fault_desc;
+ 
+ struct kvm_vm_s2_ops {
+ 	bool (*vm_age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
+@@ -166,6 +167,7 @@ struct kvm_vm_s2_ops {
+ 	void (*vm_stage2_unmap_range)(struct kvm_s2_mmu *mmu,
+ 				      phys_addr_t start, u64 size,
+ 				      bool may_block);
++	int (*vm_mem_abort)(const struct kvm_s2_fault_desc *s2fd);
+ };
+ 
+ struct kvm_s2_mmu {
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 92cdbeb44807e..8fe7178c40bec 100644
+index 8fe7178c40bec..8e092efdf0825 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -2287,6 +2287,7 @@ int kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
-  */
- int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+@@ -1743,7 +1743,7 @@ struct kvm_s2_fault_vma_info {
+ 	bool		map_non_cacheable;
+ };
+ 
+-static int pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
++static int protected_vm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
  {
-+	struct kvm *kvm = vcpu->kvm;
- 	struct kvm_s2_trans nested_trans, *nested = NULL;
- 	unsigned long esr;
- 	phys_addr_t fault_ipa; /* The address we faulted on */
-@@ -2307,7 +2308,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 	 * with an SEA.
- 	 */
- 	ipa = fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
--	if (KVM_BUG_ON(ipa == INVALID_GPA, vcpu->kvm))
-+	if (KVM_BUG_ON(ipa == INVALID_GPA, kvm))
- 		return -EFAULT;
+ 	unsigned int flags = FOLL_HWPOISON | FOLL_LONGTERM | FOLL_WRITE;
+ 	struct kvm_vcpu *vcpu = s2fd->vcpu;
+@@ -2181,6 +2181,20 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+ 	return kvm_s2_fault_map(s2fd, &s2vi, prot, memcache);
+ }
  
- 	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
-@@ -2342,7 +2343,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 		return -EFAULT;
- 	}
- 
--	idx = srcu_read_lock(&vcpu->kvm->srcu);
-+	idx = srcu_read_lock(&kvm->srcu);
- 
- 	/*
- 	 * We may have faulted on a shadow stage 2 page table if we are
-@@ -2357,7 +2358,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 	 * nothing to walk and we treat it as a 1:1 before going through the
- 	 * canonical translation.
- 	 */
--	if (kvm_is_nested_s2_mmu(vcpu->kvm,vcpu->arch.hw_mmu) &&
-+	if (kvm_is_nested_s2_mmu(kvm, vcpu->arch.hw_mmu) &&
- 	    vcpu->arch.hw_mmu->nested_stage2_enabled) {
- 		u32 esr;
- 
-@@ -2385,7 +2386,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 	}
- 
- 	gfn = ipa >> PAGE_SHIFT;
--	memslot = gfn_to_memslot(vcpu->kvm, gfn);
-+	memslot = gfn_to_memslot(kvm, gfn);
- 	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
- 	write_fault = kvm_is_write_fault(vcpu);
- 	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
-@@ -2449,7 +2450,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
++static int kvm_vm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
++{
++	struct kvm_vcpu *vcpu = s2fd->vcpu;
++
++	VM_WARN_ON_ONCE(kvm_vcpu_trap_is_permission_fault(vcpu) &&
++			!kvm_is_write_fault(vcpu) &&
++			!kvm_vcpu_trap_is_exec_fault(vcpu));
++
++	if (kvm_slot_has_gmem(s2fd->memslot))
++		return gmem_abort(s2fd);
++	else
++		return user_mem_abort(s2fd);
++}
++
+ /* Resolve the access fault by making the page young again. */
+ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ {
+@@ -2450,19 +2464,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
  		.hva		= hva,
  	};
  
--	if (kvm_vm_is_protected(vcpu->kvm)) {
-+	if (kvm_vm_is_protected(kvm)) {
- 		ret = pkvm_mem_abort(&s2fd);
- 	} else {
- 		VM_WARN_ON_ONCE(kvm_vcpu_trap_is_permission_fault(vcpu) &&
-@@ -2468,7 +2469,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 	if (ret == -ENOEXEC)
- 		ret = kvm_inject_sea_iabt(vcpu, kvm_vcpu_get_hfar(vcpu));
- out_unlock:
--	srcu_read_unlock(&vcpu->kvm->srcu, idx);
-+	srcu_read_unlock(&kvm->srcu, idx);
- 	return ret;
- }
+-	if (kvm_vm_is_protected(kvm)) {
+-		ret = pkvm_mem_abort(&s2fd);
+-	} else {
+-		VM_WARN_ON_ONCE(kvm_vcpu_trap_is_permission_fault(vcpu) &&
+-				!write_fault &&
+-				!kvm_vcpu_trap_is_exec_fault(vcpu));
+-
+-		if (kvm_slot_has_gmem(memslot))
+-			ret = gmem_abort(&s2fd);
+-		else
+-			ret = user_mem_abort(&s2fd);
+-	}
+-
++	ret = kvm->arch.vm_s2_ops->vm_mem_abort(&s2fd);
+ 	if (ret == 0)
+ 		ret = 1;
+ out:
+@@ -2857,6 +2859,7 @@ static const struct kvm_vm_s2_ops protected_pkvm_vm_s2_ops = {
+ 	 * .vm_test_age_gfn
+ 	 * .vm_stage2_unmap_range
+ 	 */
++	.vm_mem_abort			= protected_vm_mem_abort,
+ };
  
+ static const struct kvm_vm_s2_ops pkvm_vm_s2_ops = {
+@@ -2865,6 +2868,7 @@ static const struct kvm_vm_s2_ops pkvm_vm_s2_ops = {
+ 	.vm_age_gfn			= kvm_vm_age_gfn,
+ 	.vm_test_age_gfn		= kvm_vm_test_age_gfn,
+ 	.vm_stage2_unmap_range		= kvm_vm_stage2_unmap_range,
++	.vm_mem_abort			= kvm_vm_mem_abort,
+ };
+ 
+ static const struct kvm_vm_s2_ops kvm_default_vm_s2_ops = {
+@@ -2873,6 +2877,7 @@ static const struct kvm_vm_s2_ops kvm_default_vm_s2_ops = {
+ 	.vm_age_gfn			= kvm_vm_age_gfn,
+ 	.vm_test_age_gfn		= kvm_vm_test_age_gfn,
+ 	.vm_stage2_unmap_range		= kvm_vm_stage2_unmap_range,
++	.vm_mem_abort			= kvm_vm_mem_abort,
+ };
+ 
+ #define KVM_VM_S2_OPS(flavor, ops)		\
+@@ -2889,7 +2894,7 @@ static int kvm_vm_init_vm_s2_ops(struct kvm *kvm)
+ 	BUILD_BUG_ON(ARRAY_SIZE(arm64_vm_s2_ops) != VM_FLAVOR_MAX);
+ 
+ 	kvm->arch.vm_s2_ops = arm64_vm_s2_ops[kvm->arch.vm_flavor];
+-	if (WARN_ON(!kvm->arch.vm_s2_ops))
++	if (WARN_ON(!kvm->arch.vm_s2_ops || !kvm->arch.vm_s2_ops->vm_mem_abort))
+ 		return -EINVAL;
+ 	return 0;
+ }
 -- 
 2.43.0
 
