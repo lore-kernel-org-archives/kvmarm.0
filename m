@@ -1,110 +1,218 @@
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D34415F0B
-	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 09:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C64422E2E
+	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 09:57:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790243540; cv=none; b=CpIs2jxnRsMO1Vg4aOFJ8YByVYM2yU0vb6KpNx7xUaMTH0+stg/oom8cWQND3UNqv9sNmZWQ7WNxb0kNRcuhhJa4ivO2FqmoFd99MrCK1t+gbLpmNIVCx804L2aOn5Bbp1gl3NEq1aM+AEgRd7A0l3cMx8liYP0cytC87dAYl/k=
+	t=1790243858; cv=none; b=p3s8Cde0btVok10RvIu1GilvUqJrcpG6N7fS8H6cjoKqehGTw0MMSKUXCfHKEvmihZkDaMOCqlkyNLTlmujOHJQ5BTz9OMk8YtCeEiojKYn1FVeezaRntEZMk9R+RQMD0sgpBrGyL27bv4MBs0GXQbRvSULEZ0ZGeACAUcK5FoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790243540; c=relaxed/simple;
-	bh=+wwRzPbd0D/O70oJCkHWQQemR606EvamjHUJcIxpNiM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Me9lY6YGYNTtze91cVTSUgyCrb8ULDM5OVmbhNB9/fm46eMVDqaQObfPZiHepRfawGpo5+N3ANm7I0pb1erg4W+OiALZJAg1ZawOsyZroyakDuyLXxaLecNTAdsLUG2w6x89LiJNuFaGeDTC/woUGEzGfexAsAQR8DKsWZOhdik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OA8Rwf0J; arc=none smtp.client-ip=209.85.221.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
+	s=arc-20240116; t=1790243858; c=relaxed/simple;
+	bh=i+XpXtZaI3xXSr8IERjYFqaGrG3Momb087jJOSf/WDo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SA/swB4c1pvUByVPsFS502SGHy6c9Z9Xh6iJvbgOCzMlGNHRGGDlNn7V1bgMjkBbrC3Exam6wb22Y1i74h/S4nRR+IxYdByyZPT3roDr1l9d4hK7N9bVRSw9csbRC8QSaeGRXGS90e51CRDUTGOyO81r3yeYwTqaoKBIMHwzQqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nf/8oCnH; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OA8Rwf0J"
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-4886448d257so1261388f8f.1
-        for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 02:52:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790243522; x=1790848322; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Teg2xf6fWRrl/zBr5cBFx6F6XwrP4vrM+fvmVBE3SQE=;
-        b=OA8Rwf0JZT6REkYGcDDtELPZmG1ASb+myTj89gNVgtv1bBy5AKJM3pcw7BCTUguTV0
-         Go2Kd08UIERZ0yEp8ma0+NGF8F6TvEvrdpg4318FbmAsOlI0KaRWyu9tEQm5SDlXYMjI
-         QzFw8WEhXn9E8NhVF/o/lXDZynUhpGRAFcEQj0BiRtVUKXpQEXUzRUipqyRGQ6EJj+Vv
-         JuW2lWWtXsBAnaHNHsbaBlJxih80G0S4gvQp6j9GJFOhr5ZD0jR/I+EJ7MzEp6ysyOk4
-         u9nZWuxP+jIFVT2HxoXWvfMSvDQB7Ze7OkaixEn3GqC+6N0OH4i8ZrZ5LGWOqDCPyc2g
-         t3Bw==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nf/8oCnH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1790243842;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XPDUYn2sNH+tuYff9vyFITqIs0ucy3tacjD7MAHGCvo=;
+	b=Nf/8oCnHeACcdpJoVKdN3mGN1ZKXNuwIPQsBzeoqIcEq3CQN1B6e392GLDYf/ROz2su6Fh
+	QRWdIsHOT9aZG5fnCXQ3TDxbwFJWZ3F0R6VzBU//JI+8aVC3+/oM3qRf1e1E8CUc9ahJU3
+	L/jsp8GETl9Xj1kaAnBq9VSx+gDsVmU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-379-Sk2sOInxN9a0OlGvmaO8yw-1; Thu, 24 Sep 2026 05:57:20 -0400
+X-MC-Unique: Sk2sOInxN9a0OlGvmaO8yw-1
+X-Mimecast-MFC-AGG-ID: Sk2sOInxN9a0OlGvmaO8yw_1790243839
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-4843e59c32dso1490603f8f.3
+        for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 02:57:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790243522; x=1790848322;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Teg2xf6fWRrl/zBr5cBFx6F6XwrP4vrM+fvmVBE3SQE=;
-        b=gIraKVHTAYHr/nC6NjECCB5K+mWFQu2VVwQBKgBxTPBPfRuaHBOm2vYCwickUpkrrf
-         W6njQKd1hDo2AXjXCTIm8/ifcbd6FrR40b1aIuah4rWtvf5rYXqiWk2tVOtctE1HxBVK
-         xyA+rQa+cNadRYqA2syBcx/5k0wzkmSIQ1WHftXPoFmNVnWOT3N/0A6YlyYsYKtkBmHW
-         /XCuNeUNnzGuoQEUnPqbxn32qeHf9vndhlDoeTrlcPL+1Mb1/hi+e7lXGrZKHux9jYvO
-         EdbRmgnfbv3bZXIbvqVzNOUWgo4a0IVLC1TvXo6IqlI8v2LwbpVuOBpu5mFKadplpwuD
-         GvGg==
-X-Forwarded-Encrypted: i=1; AKwUvByifDxWmNhmN5vVI88UZ/QGfrhs8Nb27WwwxnDzTmnmbB2Mo5/pMQtcy/+xsImw7esq96rX/uk=@lists.linux.dev
-X-Gm-Message-State: AFuF++mTslMz6S5npdgM3mdJiLhkzg3ofS16Kkngn4RNbToNqVgClIFp
-	zYPD0uq9/MdYvf1UvKU69jik9R7vHugc0GhxuOS7bZSBo7Effty7qi7S3JsKvEy9m0bTvrDXfxF
-	FQ43rw2Bttb7Qt0cKX0Do/Q==
-X-Received: from wrzq8.prod.google.com ([2002:a05:6000:1368:b0:488:7479:3b57])
- (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a5d:64c7:0:b0:487:765:46bf with SMTP id ffacd0b85a97d-4887171d2aemr2945649f8f.19.1790243521432;
- Thu, 24 Sep 2026 02:52:01 -0700 (PDT)
-Date: Thu, 24 Sep 2026 10:51:54 +0100
+        d=1e100.net; s=20260707; t=1790243839; x=1790848639;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=XPDUYn2sNH+tuYff9vyFITqIs0ucy3tacjD7MAHGCvo=;
+        b=vdAmKXUNj8qgjzVvwxbNgjp3p23JEGTAz8DOyd04HtodxIP8LWjGdT4TtxMtvr3vQz
+         jY42fH3eKoZM44dgUfjld2eShVy21B8puB5padJfCAjQfmFukiJx8t30M/tNQhEbJFKf
+         /IA8Vr9wAUV8YNRU2PJE3c2ucA3qvK+A94smlJtTbAtCjchYxQgXjy24nSkCLAvcMWKH
+         nfUg/4Rq0cKd18zHqGo9ZLaVYW5WhRLfdFucJ1J3J+PK5AZNg+KZ47i5rfrNQjSdqoM+
+         CL2zX3dcQ8nGH/HXnDKNZ2Uql6/7L419gFomwe4tYXoe1aICSJTBDGNgRcBxRV3HVHm/
+         kPig==
+X-Forwarded-Encrypted: i=1; AKwUvBzfVxWA2Yf8cQ2rtHsMETt51fDDQLp3ceI1dq/2wwdMCjFZM2Jyt7TODV8/oZ8AEcQ2qO9ZHUM=@lists.linux.dev
+X-Gm-Message-State: AFuF++leYmUynpX9v3yD5iaFBNjUB8ikJfjZnatnSWi4N14jemBSJbuT
+	Oel3Y6VEwc6jgx3cAUGRZ7jq/FeeSjblT1Z4p/k+8kLlBEXSkPfvd1JX8venmZl8neVnFBMEdSI
+	OJwwen4gSRjLe0J6pD6h2ZG/DRCaxt7zZQatL8O+3TZWhJ2BuOainWYi6WQ==
+X-Gm-Gg: AYBFou1noibaLeRktIl1RLDPMCcCBia43mspD+rfee90hKyBKRa+euNAjXOl4QijgOo
+	/rOBgV2bm1NXsk2WBIDFqZO01UMas68fvT7XuoWn6MEqsVGsdBSvD+kr2MW4cv5JMdKe1hGnqOl
+	C7Wty1p5crvIn9DCvW5VRojnYO2utJ11aV97q08Mb3ofneaR5LLwUPUDgY8/IMUb7YqHAp2Mba3
+	tCXKO+OprH1BEV8I+khwD1GlVdMgLa/AAH6KPu2SxwLw+vwXSBdAojJ9ufl+KxtfRiW9TI9IMXD
+	YYZ8y0yPCl2/Ex+3r60KmsDT5Eq0gE10DkjdvTv+/Q35ePji0veezYn6BiLioUiaXw/0PpvA/it
+	z812G9blgEEcavX50Tihyw2bfQAbYyiSraBZG0wJjh9w8UKLf
+X-Received: by 2002:a05:6000:2913:b0:488:6078:8aef with SMTP id ffacd0b85a97d-48871725c5fmr3067136f8f.20.1790243839448;
+        Thu, 24 Sep 2026 02:57:19 -0700 (PDT)
+X-Received: by 2002:a05:6000:2913:b0:488:6078:8aef with SMTP id ffacd0b85a97d-48871725c5fmr3067097f8f.20.1790243838957;
+        Thu, 24 Sep 2026 02:57:18 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48868889337sm13769957f8f.34.2026.09.24.02.57.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Sep 2026 02:57:18 -0700 (PDT)
+Message-ID: <aabcb61b-8341-423f-b113-e7ab2b34c2ac@redhat.com>
+Date: Thu, 24 Sep 2026 11:57:16 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.56.0.rc1.310.g51773c2048-goog
-Message-ID: <20260924095154.807726-1-vdonnefort@google.com>
-Subject: [PATCH] KVM: arm64: Remove PAGE_SIZE alignment for hyp event ELF sections
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org
-Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	kernel-team@android.com, fuad.tabba@linux.dev, 
-	Vincent Donnefort <vdonnefort@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [RFC PATCH v4 08/25] target/arm/kvm: handle writeback for special
+ ID register fields
+To: Khushit Shah <khushit.shah@nutanix.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, kvmarm@lists.linux.dev
+Cc: cohuck@redhat.com, peter.maydell@linaro.org,
+ richard.henderson@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
+ berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
+ gshan@redhat.com, skolothumtho@nvidia.com, sebott@redhat.com,
+ armbru@redhat.com, philmd@linaro.org, yangjinqian1@huawei.com,
+ shaju.abraham@nutanix.com, mark.caveayland@nutanix.com,
+ ping@khushitshah.com, sandesh.patel@nutanix.com
+References: <20260921123249.1708067-1-khushit.shah@nutanix.com>
+ <20260921123249.1708067-9-khushit.shah@nutanix.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20260921123249.1708067-9-khushit.shah@nutanix.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: NRBAOByuUiCVkvid0lEDcIZWM413IOu7eFEhh8Od47I_1790243839
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-.hyp.event_ids is mapped as part of .hyp.rodata. As a consequence this
-section does not need any page-alignment. Remove it to save a page worth
-of memory.
 
-Fixes: 0a90fbc8a170 ("KVM: arm64: Add event support to the nVHE/pKVM hyp and trace remote")
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
----
- arch/arm64/kernel/vmlinux.lds.S   | 2 +-
- arch/arm64/kvm/hyp/nvhe/hyp.lds.S | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kernel/vmlinux.lds.S b/arch/arm64/kernel/vmlinux.lds.S
-index af1d72020976..c0b090db8be4 100644
---- a/arch/arm64/kernel/vmlinux.lds.S
-+++ b/arch/arm64/kernel/vmlinux.lds.S
-@@ -15,7 +15,7 @@
- 
- #ifdef CONFIG_NVHE_EL2_TRACING
- #define HYPERVISOR_EVENT_IDS 					\
--	. = ALIGN(PAGE_SIZE);					\
-+	. = ALIGN(SZ_8);					\
- 	__hyp_event_ids_start = .;				\
- 	*(HYP_SECTION_NAME(.event_ids))				\
- 	__hyp_event_ids_end = .;
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp.lds.S b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
-index 7a02837203d1..89222425359a 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp.lds.S
-@@ -17,7 +17,6 @@ SECTIONS {
- 	HYP_SECTION(.data..ro_after_init)
- 	HYP_SECTION(.rodata)
- #ifdef CONFIG_NVHE_EL2_TRACING
--	. = ALIGN(PAGE_SIZE);
- 	BEGIN_HYP_SECTION(.event_ids)
- 		*(SORT(.hyp.event_ids.*))
- 	END_HYP_SECTION
+On 9/21/26 2:32 PM, Khushit Shah wrote:
+> Some fields should not be written back to KVM for various reasons:
+>  - ID_AA64PFR0_EL1.GIC / ID_PFR1_EL1.GIC are fabricated by KVM based on
+>    the gic-version property.
+>  - KVM does not allow writing 0 to ID_DFR0_EL1.CopDbg, which breaks
+>    booting an AArch64-only guest on a host that also supports AArch32.
+>  - ID_DFR0_EL1.PerfMon is populated by KVM even for AArch64-only guests
+>    but is not writable there.
+>  - MPIDR_EL1 is managed by KVM based on vCPU index.
+>  - Hold off writing back CLIDR_EL1 until we properly support exposing
+>    cache topology to a KVM guest.
+>
+> Signed-off-by: Khushit Shah <khushit.shah@nutanix.com>
+> ---
+>  target/arm/cpu-idregs.c |  6 ++++++
+>  target/arm/cpu-idregs.h |  2 ++
+>  target/arm/kvm.c        | 40 +++++++++++++++++++++++++++++++++++++++-
+>  3 files changed, 47 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/arm/cpu-idregs.c b/target/arm/cpu-idregs.c
+> index d58b8ed063..1f7ebfe9bb 100644
+> --- a/target/arm/cpu-idregs.c
+> +++ b/target/arm/cpu-idregs.c
+> @@ -107,3 +107,9 @@ bool arm_field_is_writable(const ARM64SysRegField *field)
+>      return (arm64_id_regs[field->index].writable_mask & field_mask)
+>             == field_mask;
+>  }
+> +
+> +bool field_matches(const ARM64SysRegField *field, ARMIDRegisterIdx index,
+> +                   const char *name)
+> +{
+> +    return field->index == index && !strcmp(field->name, name);
+> +}
+> diff --git a/target/arm/cpu-idregs.h b/target/arm/cpu-idregs.h
+> index aab1a79db1..8ef3f9350e 100644
+> --- a/target/arm/cpu-idregs.h
+> +++ b/target/arm/cpu-idregs.h
+> @@ -35,4 +35,6 @@ extern ARM64SysReg arm64_id_regs[NUM_ID_IDX];
+>  
+>  uint64_t arm_get_field_mask(const ARM64SysRegField *field);
+>  bool arm_field_is_writable(const ARM64SysRegField *field);
+> +bool field_matches(const ARM64SysRegField *field, ARMIDRegisterIdx index,
+> +                   const char *name);
+>  #endif
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 2d94b3a884..70d9a07580 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -1317,10 +1317,40 @@ bool kvm_arm_cpu_post_load(ARMCPU *cpu)
+>      return true;
+>  }
+>  
+> +static bool arm_field_skip_writeback_always(const ARM64SysRegField *field)
+> +{
+> +    /*
+> +     * GIC is controlled by the gic-version property and fabricated by KVM
+> +     * when the vGIC device is created, so a named CPU model must not touch
+> +     * it. KVM also rejects writing 0 to ID_DFR0_EL1.CopDbg, which breaks
+> +     * booting a model that lacks AArch32 support on a host that supports
+> +     * it. MPIDR_EL1 is managed by KVM based on vCPU index, skip writing it
+> +     * back. Similarly, skip writing back CLIDR_EL1 till we properly
+> +     * support exposing cache for KVM guest.
+> +     */
+> +    return field_matches(field, ID_AA64PFR0_EL1_IDX, "GIC")
+> +        || field_matches(field, ID_PFR1_EL1_IDX, "GIC")
+> +        || field_matches(field, ID_DFR0_EL1_IDX, "CopDbg")
+> +        || field->index == MPIDR_EL1_IDX
+> +        || field->index == CLIDR_EL1_IDX;
 
-base-commit: 93f51579e7df248780214094418f205253383cc5
--- 
-2.56.0.rc1.310.g51773c2048-goog
+what does happen for SMIDR_EL1 and GMID_EL1 whose value could not be
+initialized from host. The setter for any of their field shall fail.
+> +}
+> +
+> +static bool
+> +arm_field_skip_writeback_if_not_writable(const ARM64SysRegField *field)
+> +{
+> +    /*
+> +     * KVM populates ID_DFR0_EL1.PerfMon even for AArch64-only guests but
+> +     * does not expose it as writable there, so skip it when it is not
+> +     * writable.
+> +     */
+> +    return field_matches(field, ID_DFR0_EL1_IDX, "PerfMon");
+> +}
+> +
+>  /*
+>   * Copy writable ID reg fields from isar.idregs[] into the KVM cpreg list,
+>   * so the subsequent write_list_to_kvmstate() pushes them to KVM.
+> - * Only writable fields are copied.
+> + * Only writable fields are copied; fields that must not be written back
+> + * (see arm_field_skip_writeback_*) are skipped.
+>   * Returns -1 if any vCPU's ID reg value differs from the host value and the
+>   * field is not writable.
+>   */
+> @@ -1357,6 +1387,14 @@ static int kvm_arm_write_idregs_to_cpreg_list(ARMCPU *cpu)
+>                  continue;
+>              }
+>  
+> +            if (arm_field_skip_writeback_always(field) ||
+> +                (!arm_field_is_writable(field) &&
+> +                 arm_field_skip_writeback_if_not_writable(field))) {
+> +                /* Never write this field back; keep KVM's value. */
+> +                writable_mask &= ~field_mask;
+> +                continue;
+> +            }
+> +
+>              if (!arm_field_is_writable(field)) {
+>                  error_report("%s.%s is not writable: host=0x%" PRIx64
+>                               ", requested=0x%" PRIx64,
+v9 has changed the way new field values are stored. writable field props
+and non writable field props could have different setters. A non
+writable field setter just needs to check the new value is the same as
+the current host value. No need to record the new value in the hashtable
+for further commitment.
+
+Eric
 
