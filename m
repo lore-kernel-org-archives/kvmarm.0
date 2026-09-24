@@ -1,111 +1,127 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C5D41D123;
-	Thu, 24 Sep 2026 17:57:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 740A73EC829
+	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 17:59:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790272640; cv=none; b=oWGFezvOunKpw0b+shfydjaVLaUPFXjw23YfA8F/fynEvk2IUNDJBuZLudmUucq4lghEzUjcDAAELMqVEh7ZevVRLFtkLex4/+5tIdx/Wptz/94BKqw9DBWHPTpQmR3T1GQd5O8CgAoUY2qQv50W/eddyUXxZ+gaMYuxTwbQb6E=
+	t=1790272743; cv=none; b=HlMxE94RKE5k7ZrPMn+fCWehq8psCMppkMofgCSKx+qE0/iGe8jrhO/BQ22PWwIZRqX2QactgXD7lzjKMkHYAgGw48bJ4RxqhDnQLOfMTPOsAAmoq8tXcMs+Q3I6xE8Xr7STuzzibdgOsEo03kxgW2AhaHvG7qEdUEw98f2vsHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790272640; c=relaxed/simple;
-	bh=3VAlqzQuzZWfBgiUeb7nQGDzHp/BIaYrBLhN0sKWBq8=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=cB1WM9yNT5P/w9+8/vK+Y/idwWRHt72q8/YE7Q3V/O0cIKI2NCO/wv+E3iJvqwc19fMdS4HPrqmtG4IEF7ny4G3NRzGTT7JDorgX4+DvYNQnns8WdDDweA9B0Hiv0aRz2KVrNIbqZsNewPShZhzFJVHFPp+fga4pVdrkYDa18CM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IoJAdnbX; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790272743; c=relaxed/simple;
+	bh=zD3yQ3i4r2o2kgt+jqHutsH2dsjM14HdhAJPyeLKUXs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Q3FSeoVPWWeCH6mUfahftPp2ycnyvMSbaM+KVtr/lgD94MRkwOZEGu+P+6mTc+ajX23ijZsmoUiWiV2nNgNAEgA/ZxXcL28rH8BGdhYi5VcqitcRQXSfnjwXJNeyadDVltl4dLagXL8y+3vbZ0U6CDSBysYoF7eYhVy8OmxsvuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J6YZiGbI; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IoJAdnbX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB8531F000FF;
-	Thu, 24 Sep 2026 17:57:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J6YZiGbI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF5681F000FF;
+	Thu, 24 Sep 2026 17:59:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790272639;
-	bh=UULohrnjbNERGWV5ZJQglQCTj277GJNSDJh6ouL0i+U=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=IoJAdnbXdd+WSS4ahJfK9ZDYyNmtFmRQoVsWaLuSbqCQNt0zP7JvyGBYzKNyVFzPl
-	 TUbVo6TB8xz1g7KnYSjsRx9E0jY0cKqVoKLvIhw7txquq/CnDfB0mwmMOimqfg4sHk
-	 G6NHzROIpUTDiEX4OnHOPEn/pPM+bbLV/XAV1rBg7imrQF5b+CA5I371AUEnFlsmZ+
-	 IVuX+Nr/XFGlAxUSvsJxtwipiH/SlaioTzFm2LBd67IA38PZbpYaljcpG0Q/Pai+AJ
-	 vyPjTgOsBgew1ggzeUbN+NL+vaVlZp0GAjDcENQXNZ8C9m968gkpPpMsIFsSCLGmnO
-	 qgeQ2DfpcqzKg==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v9 16/22] KVM: arm64: Apply dynamic guest counter
- reservations
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Colton Lewis" <coltonlewis@google.com>
-Cc: linux-perf-users@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver
- Upton" <oupton@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-In-Reply-To: <20260924172928.2110956-17-coltonlewis@google.com>
-References: <20260924172928.2110956-1-coltonlewis@google.com>
- <20260924172928.2110956-17-coltonlewis@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 24 Sep 2026 17:57:18 +0000
-Message-Id: <20260924175718.AB8531F000FF@smtp.kernel.org>
+	s=k20260515; t=1790272742;
+	bh=g4ZSJD2C2qZshSSYWRnJbqCzYekqXpyat6zwmTmHcZM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=J6YZiGbIXyuNSZW0ofNcWMd3qL1x4HBekloMctnhs5ZyL35zJnDvtvdS37LV78asN
+	 eDwWbCXLGOd+fxJEUZQuMwCq+BV+wbuqYDo2+dbTYkdP2arLAdqoNk6LhQcxWIjOJY
+	 z/+xOwyeshIhFd6qmj+C+td2R8HNh4zfbi3aoFsbBZ+ZpXlzSi9fHjaWUtefY1e7g5
+	 8CpucCIUIn8xy6CUP2spegbYvf8Vy7+24REzaJfjZmW5YRxc7ljr7StOE6OImx9bSj
+	 00scLRpZyYZ7sIkrQjTooHtTfcUBdBHSm3ZqYk5tCPyW925c0NUEgD5dYaWRVtGXuO
+	 ec+bb/3KE5TtA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x9nil-0000000D9CS-3qic;
+	Thu, 24 Sep 2026 17:59:00 +0000
+Date: Thu, 24 Sep 2026 18:58:59 +0100
+Message-ID: <86mrt64jks.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Zhou Wang <wangzhou1@hisilicon.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey
+ Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K
+ Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin
+ Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark
+ Rutland <mark.rutland@arm.com>,
+	<kvmarm@lists.linux.dev>,
+	Nianyao Tang
+	<tangnianyao@huawei.com>
+Subject: Re: [RFC PATCH] KVM: arm64: Restrict CNTP_CVAL/CNTHP_CVAL save/reload when ptimer is used
+In-Reply-To: <6975605e-6635-f3c6-39ee-8faaae6d9856@hisilicon.com>
+References: <20260921111840.3000905-1-wangzhou1@hisilicon.com>
+	<878q4u4u3a.wl-maz@kernel.org>
+	<6975605e-6635-f3c6-39ee-8faaae6d9856@hisilicon.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: wangzhou1@hisilicon.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, kvmarm@lists.linux.dev, tangnianyao@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] kvm: arm64: guest PMU overflow state lost on partition without FEA=
-T_FGT
---
+On Tue, 22 Sep 2026 11:16:36 +0100,
+Zhou Wang <wangzhou1@hisilicon.com> wrote:
+> 
+> On 2026/9/21 21:22, Marc Zyngier wrote:
+> > On Mon, 21 Sep 2026 12:18:40 +0100,
+> > Zhou Wang <wangzhou1@hisilicon.com> wrote:
+> >>
+> >> A guest's physical timer may be used in nested guest or directly used in
+> >> VHE mode. We can check above cases to avoid useless CNTP_CVAL/CNTHP_CVAL save
+> >> and reload.
+> > 
+> > Why useless? What cases?
+> 
+> I mean we do not use ptimer at least in current Linux kernel, however, for system
+> which has ECV_CNTPOFF capability, we have to handle related logic here.
+> 
+> So we can detect if ptimer is been used, if it is been used, then we run into the
+> related codes.
 
-commit 59a912c6296a832c23a72990ddffa47591b8277e
-Author: Colton Lewis <coltonlewis@google.com>
+But where is the actual cost? Is it the saving of these registers?
+Something else?
 
-KVM: arm64: Apply dynamic guest counter reservations
+> 
+> I am not familiar with the nested cases, so just not change related logic.
+> 
+> > 
+> >>
+> >> Use lazy detection to determine whether a non-nested VHE guest actually uses
+> >> the physical timer.
+> >>
+> >> timer_set_traps() initially traps CNTP_CTL_EL0 writes for non-nested guests.
+> >> On the first write that sets CNTP_CTL.ENABLE=1, the trap handler records
+> >> ptimer_used and clears the trap in CNTHCTL_EL2, allowing the guest direct
+> >> access thereafter.
+> > 
+> > I really don't want to go into these micro optimisation to paper over
+> > the bad state of the architecture.
+> > 
+> > The options are:
+> > 
+> > - Don't use any offset (offsets always set to 0), and there will not
+> >   be any trap
+> 
+> Do you mean that in non-nested case, we can make offset always be 0, so
+> related logic in __activate_traps/__deactivate_traps can be skipped?
+>
 
-Reserve and release guest PMU counters dynamically during vCPU load and
-put rather than statically at VM creation.
+The *trapping* of the physical timer/counter will be skipped.
 
-> diff --git a/arch/arm64/kvm/pmu-direct.c b/arch/arm64/kvm/pmu-direct.c
-> index a22c9258c2452..31d5afc44f36e 100644
-> --- a/arch/arm64/kvm/pmu-direct.c
-> +++ b/arch/arm64/kvm/pmu-direct.c
-[ ... ]
-> @@ -269,7 +341,9 @@ void kvm_pmu_load(struct kvm_vcpu *vcpu)
-> =20
->  	preempt_disable();
-> =20
-> +	pmu =3D vcpu->kvm->arch.arm_pmu;
->  	guest_counters =3D kvm_vcpu_pmu_guest_counter_mask(vcpu);
-> +	kvm_pmu_set_guest_counters(pmu, guest_counters);
->  	kvm_pmu_apply_event_filter(vcpu);
-> =20
->  	for_each_set_bit(i, &guest_counters, ARMPMU_MAX_HWEVENTS) {
+	M.
 
-[Severity: High]
-Can this result in silently dropped guest overflow interrupts when partitio=
-ning
-is enabled on hardware without fine-grained traps?
-
-Further down in kvm_pmu_load(), the physical hardware overflow register is
-cleared unconditionally:
-
-	/* Clear the hardware overflow flags so there is no chance of
-	 * creating spurious interrupts. The hardware here is never
-	 * the canonical version anyway.
-	 */
-	write_sysreg(mask, pmovsclr_el0);
-
-	val =3D __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
-
-However, there is no corresponding write to pmovsset_el0 to restore the
-guest's accumulated overflow state from
-vcpu->arch.ctxt.sys_regs[PMOVSSET_EL0] before entering the guest.=20
-
-When trap bits are cleared to allow untrapped guest register accesses, and
-fine-grained traps are not available to intercept pmovsset_el0, the guest's
-interrupt handler will read this cleared hardware register directly. It will
-observe 0 instead of the actual overflow state, causing the interrupt to be
-dropped without processing.
-
-Should the guest's saved overflow bits be restored here so the untrapped re=
-ads
-observe the correct state?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260924172928.2110=
-956-1-coltonlewis@google.com?part=3D16
+-- 
+Without deviation from the norm, progress is not possible.
