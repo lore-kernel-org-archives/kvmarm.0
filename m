@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5EB73749E2;
-	Thu, 24 Sep 2026 13:52:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AD83280331;
+	Thu, 24 Sep 2026 13:52:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790257963; cv=none; b=i494YhEyfdvSgDDcTufrDApFrzIoFR5R+stV+7d5wB+d6FBJ2cvhQOwEpKmfnmNY8s0mue0tqHKcnEsIj5GP3jUTkGW2y2+e7P7wEQbi9cSEZLo4tB82tjCYdppegcMbmQTkQjU0AYkTHtBdJB0zQFquH9qWiNGIwqNfNvDAQsA=
+	t=1790257968; cv=none; b=rz/uhI3bckrPzj9rC59cy05JrONeDVu0tx5Um1E+qrLl8XiwxiUtVBessYNe6mtRD6TiiWSD6T0yuiFfAJKKDXsaEB+n4/jpePGWMBzr/scSfc2D64fVLNCcTMt+qd+9MB24GEX3hq72KnDF6242+D2xHEIycLEpNonf6RLoP0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790257963; c=relaxed/simple;
-	bh=lV5yv3cWcp4YpJYiISJ2z8s3Fb776mQ7IQF9eHK36Vs=;
+	s=arc-20240116; t=1790257968; c=relaxed/simple;
+	bh=EHgsuJzyCnnuzzC592J30h86GPpl+wuJ6rcZ66EicdA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QCSlcIy65IuyAYZaNKBm02dOGravsnvHBOOsnpFX77Uit3Lsj71RW8z5bMQlbPjHH+ZqgcfRKgHtLBDibII9h4N2rWkl1Eb3TqErnmy6UlRT0sk1Ly3fT7bkH62TaLpeXYnn0y4xEg2U4yQ3MdkO2DxJGRFL1rEgNjny30AhifA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=j52vHFxC; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=GJXdc1MNsGqQbA41goW7lIjg5RLMFWZMfPjP6VE61tGlAYNJ8t21uY1eRRbY22q+8hofMpTbNexcpu3cWu6z8DO4ydiY/DKrxIh5cvKc1nG/z3ipOsr12AdFHt2cTt2CMAYiysGAAeJCZS4cpj1pXIW+61ItwViUOqk9cCh4SZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=BxCAva8R; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="j52vHFxC"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="BxCAva8R"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D51531476;
-	Thu, 24 Sep 2026 06:52:36 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 815A21756;
+	Thu, 24 Sep 2026 06:52:40 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 076803F86F;
-	Thu, 24 Sep 2026 06:52:36 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id A7B363F86F;
+	Thu, 24 Sep 2026 06:52:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790257960; bh=lV5yv3cWcp4YpJYiISJ2z8s3Fb776mQ7IQF9eHK36Vs=;
+	t=1790257964; bh=EHgsuJzyCnnuzzC592J30h86GPpl+wuJ6rcZ66EicdA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=j52vHFxCf4XK1h6JbAXCIcWXiKyRpCcE6D1cQJyDzcmmvGGouJYcs8Pr5qWSDfnY6
-	 Hcgvodc9+FzvdgiUkiZZQIRTupzE7mFiUZZGaY5HNYTqx8wcQ6Wk0akI8hyM+t8D47
-	 xqfkenBpx+zL+ot3L8ObTj1dunBptU5YYtEtSMRs=
+	b=BxCAva8RvlKjtk7AvOamk2vvA7wPUppxiaqT4+HBigGqILmiA0A0to2148E2ivJkF
+	 vfJIcxJbPvsexit2tK9LS5Dowhz7AcSpR6a5AE6KK/TgxtXcLTNBSUhyq8iFbSzoU0
+	 6RIBUWYo7a42kjdsVvVpWEUTuGR5fp8dSIuYJxqQ=
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -52,9 +52,9 @@ Cc: maz@kernel.org,
 	sudeep.holla@arm.com,
 	jonathan.cameron@oss.qualcomm.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v19 6/7] firmware: arm_rmm: Ensure the RMM has GPT entries for memory
-Date: Thu, 24 Sep 2026 14:52:00 +0100
-Message-ID: <20260924135201.850038-7-suzuki.poulose@arm.com>
+Subject: [PATCH v19 7/7] firmware: arm_rmm: Add wrappers for Realm related RMI commands
+Date: Thu, 24 Sep 2026 14:52:01 +0100
+Message-ID: <20260924135201.850038-8-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260924135201.850038-1-suzuki.poulose@arm.com>
 References: <20260924135201.850038-1-suzuki.poulose@arm.com>
@@ -68,330 +68,508 @@ Content-Transfer-Encoding: 8bit
 
 From: Steven Price <steven.price@arm.com>
 
-The RMM maintains the state of all the granules in the system to make
-sure that the host is abiding by the rules. This state can be maintained
-at different granularity, per page (TRACKING_FINE) or per region
-(TRACKING_COARSE or TRACKING_INTERMEDIATE). The region size depends on the
-underlying "RMI_GRANULE_SIZE". For a "coarse"/"intermediate" region,
-all pages in the region must be of the same state, this implies we need to
-have "fine" tracking for DRAM, so that we can delegate individual pages.
+Introduce wrappers for the RMI functions needed for creating and
+managing realm guests. This will be used by the KVM to manage the
+Realms
 
-For now we only support a statically carved out memory for tracking
-granules for the "fine" regions. This can be extended in the future to
-allow modifying the tracking granularity and remove the need for a
-static allocation by the firmware.
-
-Similarly, the firmware may create L0 GPT entries describing the total
-address space. But if we change the "PAS" (Physical Address Space) of a
-granule, then the firmware may need to create L1 tables to track the PAS
-at a finer granularity. Linux therefore checks if the platform firmware
-manages the PAR region. i.e., the firmware is in charge of managing the
-L1 GPTs (creation and the required memory for the GPT tables - via static
-carveouts) without host intervention. Support for dynamic GPT creation by
-the host will be added later.
-
-If the firmware requires us to manage the tracking or GPT memory,
-deactivate the RMM and reclaim any memory donated at RMM activation.
-
-Apply the same checks when hotplugged memory is brought online.
-
+Reviewed-by: Gavin Shan <gshan@redhat.com>
+Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
-[ Switch to RMI_GPT_L1_INFO for checking GPTs and deactivate RMM ]
-Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- Changes since v19:
-     * Avoid mixing gotos with __free cleanups for arm64_init_rmi()
- Changes since v18:
-     * Handle buggy RMM to make forward progress for RMI_GPT_INFO and
-       RMI_GRANULE_TRACKING_GET
-     * Make sure the memory ranges are not inverted and reject such ranges.
-     * Move granule_tracking_get/gpt_info wrappers closer to the callers
-       Drop "inline", let the compiler do its job
- Changes since v17:
-     * Move wrappers that may not be used elsewhere, out of arm-rmi-cmds.h
- Changes since v16:
-     * Check fine tracking and create L1 GPTs for hotplug-added memory.
-     * Clarify the L1 GPT setup and move the explanatory comment.
-     * Switch to using RMI_GPT_INFO command for checking the GPTs.
-     * Deactivate the RMM and reclaim the memory if we can't proceed.
- Changes since v15:
-     * Skip firmware-reserved NOMAP memory in rmi_init_metadata()
-     * Handle negative error codes from wrappers.
- Changes since v14:
-     * Move the implementation into drivers/firmware/arm_rmm.
- Changes since v13:
-     * Moved out of KVM
+Changes since v18:
+  * Convert the last man standing nesting if - Gavin
+  * Pass out_top for RMI_ERROR_RTT for rmi_rtt_destroy()
+Changes since v17:
+  * Avoid nesting if conditions for output populating RMI calls
+  * Clean up comments
+  * Always use arm_smccc_1_2_invoke() for RMI calls.
+Changes since v16:
+  * Split into a separate patch and move away from arch/arm64 to
+    include/linux/.
+  * Also moved into the firmware_rmm series from the KVM CCA support.
+    This is done in a hope to reduce the merge conflicts and make
+    the KVM CCA upstreaming in independent parallel chunks
 ---
- drivers/firmware/arm_rmm/rmi.c | 218 ++++++++++++++++++++++++++++++++-
- include/linux/arm-rmi-cmds.h   |   2 +
- 2 files changed, 219 insertions(+), 1 deletion(-)
+ include/linux/arm-rmi-cmds.h | 467 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 467 insertions(+)
 
-diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
-index 0859f256e192b..1a8f3debd844a 100644
---- a/drivers/firmware/arm_rmm/rmi.c
-+++ b/drivers/firmware/arm_rmm/rmi.c
-@@ -5,6 +5,7 @@
- 
- #include <linux/cpufeature.h>
- #include <linux/memblock.h>
-+#include <linux/memory.h>
- #include <linux/arm-rmi-cmds.h>
- #include <linux/slab.h>
- 
-@@ -13,6 +14,7 @@
- 
- /* RMM defines RmiFeatureRegister0 to RmiFeatureRegister5. */
- static unsigned long rmi_feat_reg_cache[5] __ro_after_init;
-+static bool arm64_rmi_is_available;
- 
- /**
-  * rmi_granule_range_undelegate() - Undelegate a range of granules
-@@ -817,6 +819,210 @@ static int rmi_configure(void)
- 	return ret;
- }
+diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
+index 5b177bb176326..e03dd8316695d 100644
+--- a/include/linux/arm-rmi-cmds.h
++++ b/include/linux/arm-rmi-cmds.h
+@@ -88,4 +88,471 @@ long rmi_sro_execute(struct arm_smccc_1_2_regs *regs);
+ 	__ret;								\
+ })
  
 +/**
-+ * rmi_granule_tracking_get() - Get configuration of a Granule tracking region
-+ * @start: Base PA of the tracking region
-+ * @end: End of the PA region
-+ * @out_category: Memory category
-+ * @out_state: Tracking region state
-+ * @out_top: Top of the memory region
++ * rmi_rtt_data_map_init() - Create a mapping at protected IPA, copying contents
++ *			     from a given non-secure source granule.
++ * @rd: PA of the RD
++ * @data: PA of the target granule mapped in the guest
++ * @ipa: IPA at which the granule @data will be mapped in the guest
++ * @src: PA of the source granule with contents
++ * @flags: RMI_MEASURE_CONTENT if the contents should be measured
 + *
-+ * Return: RMI return code
++ * Create a mapping from Protected IPA space to conventional memory, copying
++ * contents from a Non-secure Granule provided by the caller.
++ *
++ * Return: 0 on success, positive RMI result code or negative Linux error code
 + */
-+static int rmi_granule_tracking_get(unsigned long start,
-+				    unsigned long end,
-+				    unsigned long *out_category,
-+				    unsigned long *out_state,
++static inline long rmi_rtt_data_map_init(unsigned long rd, unsigned long data,
++					 unsigned long ipa, unsigned long src,
++					 unsigned long flags)
++{
++	struct arm_smccc_1_2_regs regs = {
++		SMC_RMI_RTT_DATA_MAP_INIT, rd, data, ipa, src, flags
++	};
++
++	return rmi_sro_execute(&regs);
++}
++
++/**
++ * rmi_rtt_data_map() - Create mappings in protected IPA range with unknown contents
++ * @rd: PA of the RD
++ * @base: Base of the target IPA range
++ * @top: Top of the target IPA range
++ * @flags: Flags
++ * @oaddr: Output address set descriptor
++ * @out_top: Top address of range which was processed.
++ *
++ * Return: 0 on success, positive RMI result code or negative Linux error code
++ */
++static inline long rmi_rtt_data_map(unsigned long rd,
++				    unsigned long base,
++				    unsigned long top,
++				    unsigned long flags,
++				    unsigned long oaddr,
 +				    unsigned long *out_top)
 +{
 +	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_GRANULE_TRACKING_GET, start, end,
++		SMC_RMI_RTT_DATA_MAP, rd, base, top, flags, oaddr
 +	};
++	long ret;
 +
-+	rmi_smccc_invoke(&regs);
++	ret = rmi_sro_execute(&regs);
 +
-+	if (regs.a0 != RMI_SUCCESS)
-+		return regs.a0;
++	if (ret == RMI_SUCCESS && out_top)
++		*out_top = regs.a1;
 +
-+	if (out_category)
-+		*out_category = regs.a1;
-+	if (out_state)
-+		*out_state = regs.a2;
-+	if (out_top)
-+		*out_top = regs.a3;
-+
-+	return RMI_SUCCESS;
++	return ret;
 +}
 +
-+/*
-+ * Make sure the area is tracked by RMM at FINE granularity.
-+ * We do not support changing the tracking yet.
++/**
++ * rmi_rtt_data_unmap() - Remove mappings to conventional memory at a protected
++ *			  IPA range
++ * @rd: PA of the RD
++ * @base: Base of the target IPA range
++ * @top: Top of the target IPA range
++ * @flags: Flags
++ * @oaddr: Output address set descriptor
++ * @out_top: Returns top IPA of range which has been unmapped
++ * @out_range: Output address range
++ * @out_count: Number of entries in output address list
++ *
++ * Removes mappings to convention memory with a target Protected IPA range.
++ *
++ * Return: 0 on success, positive RMI result code or negative Linux error code
 + */
-+static int rmi_verify_memory_tracking(phys_addr_t start, phys_addr_t end)
-+{
-+	while (start < end) {
-+		unsigned long ret, category, state, next;
-+
-+		ret = rmi_granule_tracking_get(start, end, &category, &state, &next);
-+		if (ret != RMI_SUCCESS)
-+			return -ENOMEM;
-+
-+		if (WARN_ON(next <= start))
-+			return -ENXIO;
-+
-+		if (state != RMI_TRACKING_FINE ||
-+		    category != RMI_MEM_CATEGORY_CONVENTIONAL) {
-+			/* TODO: Set granule tracking in this case */
-+			pr_err("Granule tracking for region isn't fine/conventional: %llx-%lx\n",
-+			       start, next);
-+			return -ENODEV;
-+		}
-+		start = next;
-+	}
-+
-+	return 0;
-+}
-+
-+/*
-+ * rmi_gpt_info - Query the GPT info for the given PAR.
-+ * @start: Base of the physical address region
-+ * @end: Top of the physical address region
-+ * @out_top: Top of the physical address region for which
-+ *		the GPT @out_gpt_par_state is valid
-+ * @out_gpt_par_state: State of the GPT covered by [start, out_top)
-+ */
-+static long rmi_gpt_info(unsigned long start, unsigned long end,
-+			 unsigned long *out_top,
-+			 unsigned long *out_gpt_par_state)
++static inline long rmi_rtt_data_unmap(unsigned long rd,
++				      unsigned long base,
++				      unsigned long top,
++				      unsigned long flags,
++				      unsigned long oaddr,
++				      unsigned long *out_top,
++				      unsigned long *out_range,
++				      unsigned long *out_count)
 +{
 +	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_GPT_INFO, start, end,
++		SMC_RMI_RTT_DATA_UNMAP, rd, base, top, flags, oaddr
 +	};
++	long ret;
 +
-+	rmi_smccc_invoke(&regs);
-+	if (regs.a0 != RMI_SUCCESS)
-+		return regs.a0;
++	ret = rmi_sro_execute(&regs);
++
++	if (ret != RMI_SUCCESS)
++		return ret;
 +
 +	if (out_top)
 +		*out_top = regs.a1;
-+	if (out_gpt_par_state)
-+		*out_gpt_par_state = regs.a2;
++	if (out_range)
++		*out_range = regs.a2;
++	if (out_count)
++		*out_count = regs.a3;
 +
 +	return RMI_SUCCESS;
 +}
 +
-+/*
-+ * We do not support creating L1 GPTs yet. So, make sure that
-+ * all the regions are managed by the firmware.
++/**
++ * rmi_psci_complete() - Complete pending PSCI command
++ * @calling_rec: PA of the calling REC
++ * @status: Status of the PSCI request
++ *
++ * Completes a pending PSCI command.
++ *
++ * Return: RMI return code
 + */
-+static int rmi_verify_gpt_firmware_managed(phys_addr_t start, phys_addr_t end)
++static inline long rmi_psci_complete(unsigned long calling_rec,
++				     unsigned long status)
 +{
-+	unsigned long l0gpt_sz;
-+	unsigned long next, par_state;
++	struct arm_smccc_1_2_regs regs = {
++		SMC_RMI_PSCI_COMPLETE, calling_rec, status,
++	};
 +
-+	l0gpt_sz = 1UL << (30 + FIELD_GET(RMI_FEATURE_REGISTER_1_L0GPTSZ,
-+					  rmi_feat_reg(1)));
-+	start = ALIGN_DOWN(start, l0gpt_sz);
-+	end = ALIGN(end, l0gpt_sz);
++	rmi_smccc_invoke(&regs);
++	return regs.a0;
++}
 +
-+	while (start < end) {
-+		long ret = rmi_gpt_info(start, end, &next, &par_state);
++/**
++ * rmi_realm_activate() - Activate a realm
++ * @rd: PA of the RD
++ *
++ * Mark a realm as Active, signalling that creation is completed, allowing
++ * execution of the realm.
++ *
++ * Return: RMI return code
++ */
++static inline long rmi_realm_activate(unsigned long rd)
++{
++	struct arm_smccc_1_2_regs regs = {
++		SMC_RMI_REALM_ACTIVATE, rd,
++	};
 +
-+		if (ret != RMI_SUCCESS)
-+			return -ENOMEM;
++	rmi_smccc_invoke(&regs);
++	return regs.a0;
++}
 +
-+		if (WARN_ON(next <= start))
-+			return -ENXIO;
++/**
++ * rmi_realm_create() - Create a realm
++ * @rd: PA of the RD
++ * @params: PA of realm parameters
++ * @sro: Preallocated SRO context
++ *
++ * Create a new realm using the given parameters.
++ *
++ * Return: 0 on success, positive RMI result code or negative Linux error code
++ */
++static inline long rmi_realm_create(unsigned long rd, unsigned long params,
++				    struct rmi_sro_state *sro)
++{
++	return rmi_sro_memxfer_cmd(sro, GFP_KERNEL,
++				   SMC_RMI_REALM_CREATE, rd, params);
++}
 +
-+		if (par_state != RMI_GPT_PAR_PLAT) {
-+			pr_err("GPT for the region is not managed by firmware %llx-%lx\n",
-+				start, next);
-+			return -ENOMEM;
-+		}
-+		start = next;
++/**
++ * rmi_realm_terminate() - Terminate a realm
++ * @rd: PA of the RD
++ * @sro: Preallocated SRO context
++ *
++ * Terminates a realm, moving it into a ZOMBIE state
++ *
++ * Return: 0 on success, positive RMI result code or negative Linux error code
++ */
++static inline long rmi_realm_terminate(unsigned long rd,
++				       struct rmi_sro_state *sro)
++{
++	return rmi_sro_memxfer_cmd(sro, GFP_KERNEL,
++				   SMC_RMI_REALM_TERMINATE, rd);
++}
++
++/**
++ * rmi_realm_destroy() - Destroy a realm
++ * @rd: PA of the RD
++ * @sro: Preallocated SRO context
++ *
++ * Destroys a realm, all objects belonging to the realm must be destroyed first.
++ *
++ * Return: 0 on success, positive RMI result code or negative Linux error code
++ */
++static inline long rmi_realm_destroy(unsigned long rd,
++				     struct rmi_sro_state *sro)
++{
++	return rmi_sro_memxfer_cmd(sro, GFP_KERNEL,
++				   SMC_RMI_REALM_DESTROY, rd);
++}
++
++/**
++ * rmi_rec_create() - Create a REC
++ * @rd: PA of the RD
++ * @rec: PA of the target REC
++ * @params: PA of REC parameters
++ * @sro: Allocated SRO context to be used
++ *
++ * Create a REC using the parameters specified in the struct rec_params pointed
++ * to by @params.
++ *
++ * Return: 0 on success, positive RMI result code or negative Linux error code
++ */
++static inline long rmi_rec_create(unsigned long rd,
++				  unsigned long rec,
++				  unsigned long params,
++				  struct rmi_sro_state *sro)
++{
++	long ret;
++
++	sro->addr_count = 0;
++	sro->regs = (struct arm_smccc_1_2_regs) {
++		SMC_RMI_REC_CREATE, rd, rec, params
++	};
++	ret = rmi_sro_memxfer_execute(sro, GFP_KERNEL);
++	rmi_sro_free(sro);
++
++	return ret;
++}
++
++/**
++ * rmi_rec_destroy() - Destroy a REC
++ * @rec: PA of the target REC
++ * @sro: Allocated SRO context to be used
++ *
++ * Destroys a REC. The REC must not be running.
++ *
++ * Return: 0 on success, positive RMI result code or negative Linux error code
++ */
++static inline long rmi_rec_destroy(unsigned long rec,
++				   struct rmi_sro_state *sro)
++{
++	return rmi_sro_memxfer_cmd(sro, GFP_KERNEL, SMC_RMI_REC_DESTROY, rec);
++}
++
++/**
++ * rmi_rec_enter() - Enter a REC
++ * @rec: PA of the target REC
++ * @run_ptr: PA of RecRun structure
++ *
++ * Starts (or continues) execution within a REC.
++ *
++ * Return: RMI return code
++ */
++static inline long rmi_rec_enter(unsigned long rec, unsigned long run_ptr)
++{
++	struct arm_smccc_1_2_regs regs = {
++		SMC_RMI_REC_ENTER, rec, run_ptr,
++	};
++
++	rmi_smccc_invoke(&regs);
++	return regs.a0;
++}
++
++/**
++ * rmi_rtt_create() - Creates an RTT
++ * @rd: PA of the RD
++ * @rtt: PA of the target RTT
++ * @ipa: Base of the IPA range described by the RTT
++ * @level: Depth of the RTT within the tree
++ *
++ * Creates an RTT (Realm Translation Table) at the specified level for the
++ * translation of the specified address within the realm.
++ *
++ * Return: 0 on success, positive RMI result code or negative Linux error code
++ */
++static inline long rmi_rtt_create(unsigned long rd, unsigned long rtt,
++				  unsigned long ipa, long level)
++{
++	struct arm_smccc_1_2_regs regs = {
++		SMC_RMI_RTT_CREATE, rd, rtt, ipa, level
++	};
++
++	return rmi_sro_execute(&regs);
++}
++
++/**
++ * rmi_rtt_destroy() - Destroy an RTT
++ * @rd: PA of the RD
++ * @ipa: Base of the IPA range described by the RTT
++ * @level: RTT level
++ * @out_rtt: Pointer to write the PA of the RTT which was destroyed
++ * @out_top: Pointer to write the top IPA of non-live RTT entries, from entry
++ * at which the RTT walk terminated.
++ *
++ * Destroys an RTT. The RTT must be non-live, i.e. none of the entries in the
++ * table are in ASSIGNED or TABLE state.
++ *
++ * Return: 0 on success, positive RMI result code or negative Linux error code.
++ */
++static inline long rmi_rtt_destroy(unsigned long rd,
++				   unsigned long ipa,
++				   long level,
++				   unsigned long *out_rtt,
++				   unsigned long *out_top)
++{
++	struct arm_smccc_1_2_regs regs = {
++		SMC_RMI_RTT_DESTROY, rd, ipa, level
++	};
++	long ret = rmi_sro_execute(&regs);
++
++	switch (RMI_RESULT_STATUS(ret)) {
++	case RMI_SUCCESS:
++		if (out_rtt)
++			*out_rtt = regs.a1;
++		fallthrough;
++	case RMI_ERROR_RTT:
++		if (out_top)
++			*out_top = regs.a2;
++		break;
++	default:
++		break;
 +	}
 +
-+	return 0;
++	return ret;
 +}
 +
-+static int rmi_prepare_memory(phys_addr_t start, phys_addr_t end)
++/**
++ * rmi_rtt_fold() - Fold an RTT
++ * @rd: PA of the RD
++ * @ipa: Base of the IPA range described by the RTT
++ * @level: Depth of the RTT within the tree
++ * @out_rtt: Pointer to write the PA of the RTT which was destroyed
++ *
++ * Folds an RTT. If all entries with the RTT are 'homogeneous' the RTT can be
++ * folded into the parent and the RTT destroyed.
++ *
++ * Return: 0 on success, positive RMI result code or negative Linux error code
++ */
++static inline long rmi_rtt_fold(unsigned long rd, unsigned long ipa,
++				long level, unsigned long *out_rtt)
 +{
-+	int ret;
++	struct arm_smccc_1_2_regs regs = {
++		SMC_RMI_RTT_FOLD, rd, ipa, level
++	};
++	long ret = rmi_sro_execute(&regs);
 +
-+	if (start >= end)
-+		return -EINVAL;
++	if (ret == RMI_SUCCESS && out_rtt)
++		*out_rtt = regs.a1;
 +
-+	ret = rmi_verify_memory_tracking(start, end);
-+	if (ret)
++	return ret;
++}
++
++/**
++ * rmi_rtt_init_ripas() - Set RIPAS for new realm
++ * @rd: PA of the RD
++ * @base: Base of target IPA region
++ * @top: Top of target IPA region
++ * @out_top: Top IPA of range whose RIPAS was modified
++ *
++ * Sets the RIPAS of a target IPA range to RAM, for a realm in the NEW state.
++ *
++ * Return: 0 on success, positive RMI result code or negative Linux error code
++ */
++static inline long rmi_rtt_init_ripas(unsigned long rd, unsigned long base,
++				      unsigned long top, unsigned long *out_top)
++{
++	struct arm_smccc_1_2_regs regs = {
++		SMC_RMI_RTT_INIT_RIPAS, rd, base, top
++	};
++	long ret = rmi_sro_execute(&regs);
++
++	if (ret == RMI_SUCCESS && out_top)
++		*out_top = regs.a1;
++
++	return ret;
++}
++
++/**
++ * rmi_rtt_unprot_map() - Map unprotected granules into a realm
++ * @rd: PA of the RD
++ * @base: Base IPA of the mapping
++ * @top: Top of the target IPA range
++ * @flags: Flags
++ * @oaddr: Output address set descriptor
++ * @out_top: Top IPA of range which has been mapped
++ *
++ * Create mappings to memory within a target unprotected IPA range.
++ *
++ * Return: 0 on success, positive RMI result code or negative Linux error code
++ */
++static inline long rmi_rtt_unprot_map(unsigned long rd,
++				      unsigned long base,
++				      unsigned long top,
++				      unsigned long flags,
++				      unsigned long oaddr,
++				      unsigned long *out_top)
++{
++	struct arm_smccc_1_2_regs regs = {
++		SMC_RMI_RTT_UNPROT_MAP, rd, base, top, flags, oaddr
++	};
++	long ret = rmi_sro_execute(&regs);
++
++	if (ret == RMI_SUCCESS && out_top)
++		*out_top = regs.a1;
++
++	return ret;
++}
++
++/**
++ * rmi_rtt_set_ripas() - Set RIPAS for an running realm
++ * @rd: PA of the RD
++ * @rec: PA of the REC making the request
++ * @base: Base of target IPA region
++ * @top: Top of target IPA region
++ * @out_top: Pointer to write top IPA of range whose RIPAS was modified
++ *
++ * Completes a request made by the realm to change the RIPAS of a target IPA
++ * range.
++ *
++ * Return: 0 on success, positive RMI result code or negative Linux error code
++ */
++static inline long rmi_rtt_set_ripas(unsigned long rd, unsigned long rec,
++				     unsigned long base, unsigned long top,
++				     unsigned long *out_top)
++{
++	struct arm_smccc_1_2_regs regs = {
++		SMC_RMI_RTT_SET_RIPAS, rd, rec, base, top
++	};
++	long ret = rmi_sro_execute(&regs);
++
++	if (ret == RMI_SUCCESS && out_top)
++		*out_top = regs.a1;
++
++	return ret;
++}
++
++/**
++ * rmi_rtt_unprot_unmap() - Remove mappings within an unprotected IPA range
++ * @rd: PA of the RD
++ * @base: Base IPA of the mapping
++ * @top: Top of the target IPA range
++ * @flags: Flags
++ * @oaddr: Output address set descriptor
++ * @out_top: Top IPA which has been unmapped
++ * @out_range: Output address range
++ * @out_count: Number of entries in output address list
++ *
++ * Removes mappings to memory within a target unprotected IPA range.
++ *
++ * Return: 0 on success, positive RMI result code or negative Linux error code
++ */
++static inline long rmi_rtt_unprot_unmap(unsigned long rd,
++					unsigned long base,
++					unsigned long top,
++					unsigned long flags,
++					unsigned long oaddr,
++					unsigned long *out_top,
++					unsigned long *out_range,
++					unsigned long *out_count)
++{
++	struct arm_smccc_1_2_regs regs = {
++		SMC_RMI_RTT_UNPROT_UNMAP, rd, base, top, flags, oaddr
++	};
++	long ret = rmi_sro_execute(&regs);
++
++	if (ret != RMI_SUCCESS)
 +		return ret;
 +
-+	return rmi_verify_gpt_firmware_managed(start, end);
++	if (out_top)
++		*out_top = regs.a1;
++	if (out_range)
++		*out_range = regs.a2;
++	if (out_count)
++		*out_count = regs.a3;
++
++	return RMI_SUCCESS;
 +}
 +
-+static int rmi_init_metadata(void)
-+{
-+	phys_addr_t start, end;
-+	struct memblock_region *r;
-+
-+	for_each_mem_region(r) {
-+		int ret;
-+
-+		/* Firmware-reserved NOMAP regions are not usable system RAM */
-+		if (memblock_is_nomap(r))
-+			continue;
-+
-+		start = PAGE_ALIGN(r->base);
-+		end = PAGE_ALIGN_DOWN(r->base + r->size);
-+		/* Too small ? */
-+		if (start >= end)
-+			continue;
-+
-+		ret = rmi_prepare_memory(start, end);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static int rmi_memory_notifier(struct notifier_block *nb,
-+			       unsigned long action, void *data)
-+{
-+	struct memory_notify *arg = data;
-+	phys_addr_t start, end;
-+	int ret;
-+
-+	if (action != MEM_GOING_ONLINE)
-+		return NOTIFY_DONE;
-+
-+	start = PFN_PHYS(arg->start_pfn);
-+	end = PFN_PHYS(arg->start_pfn + arg->nr_pages);
-+	ret = rmi_prepare_memory(start, end);
-+
-+	return notifier_from_errno(ret);
-+}
-+
-+static struct notifier_block rmi_memory_nb = {
-+	.notifier_call = rmi_memory_notifier,
-+};
-+
-+bool is_rmi_available(void)
-+{
-+	return arm64_rmi_is_available;
-+}
-+EXPORT_SYMBOL_GPL(is_rmi_available);
-+
-+static int rmi_init_memory(void)
-+{
-+	int ret;
-+
-+	ret = rmi_init_metadata();
-+	if (ret)
-+		return ret;
-+
-+	return register_memory_notifier(&rmi_memory_nb);
-+}
-+
- static int __init arm64_init_rmi(void)
- {
- 	int ret;
-@@ -843,9 +1049,19 @@ static int __init arm64_init_rmi(void)
- 	if (ret) {
- 		pr_err("RMM activate failed (%d)\n", ret);
- 		ret = ret < 0 ? ret : -ENXIO;
-+		return ret;
- 	}
- 
--	return ret;
-+	ret = rmi_init_memory();
-+	if (ret) {
-+		/* Deactivate the RMM */
-+		WARN_ON(rmi_sro_memxfer_cmd(sro, GFP_KERNEL, SMC_RMI_RMM_DEACTIVATE));
-+		return ret;
-+	}
-+
-+	arm64_rmi_is_available = true;
-+	pr_info("RMI configured\n");
-+	return 0;
- }
- 
- /*
-diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
-index b03974fd8168c..5b177bb176326 100644
---- a/include/linux/arm-rmi-cmds.h
-+++ b/include/linux/arm-rmi-cmds.h
-@@ -70,6 +70,8 @@ static inline int rmi_undelegate_page(phys_addr_t phys)
- 	return rmi_undelegate_range(phys, PAGE_SIZE);
- }
- 
-+bool is_rmi_available(void);
-+
- long rmi_sro_memxfer_execute(struct rmi_sro_state *sro, gfp_t gfp);
- void rmi_sro_free(struct rmi_sro_state *sro);
- long rmi_sro_execute(struct arm_smccc_1_2_regs *regs);
+ #endif
 -- 
 2.43.0
 
