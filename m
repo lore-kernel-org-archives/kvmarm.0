@@ -1,80 +1,92 @@
-Received: from mta0.migadu.com (out-51.mta0.migadu.com [91.218.175.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A9B4078CC
-	for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 18:19:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656CC3932F9;
+	Thu, 24 Sep 2026 18:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790273965; cv=none; b=b+s62ycZGzmR6KxMvhyJl+ST03y2fKqSb8/rKuO1vtsgAHGh4dN/gobbhb+if9m+55KjUd1AMio9GAaxAfryXFWnooPjusq8JRVlHiHQuZy0Ow7h/eGDrCtZnek9PFHfXiy18R2XX+LvCK2u7oGvF07WhXWfwEvaXw9z/ldz+rw=
+	t=1790274193; cv=none; b=Y29KsjeJon78Hsj9MH1VFZIJUwXuj4S6duRDJQIz+GA9SrA9FbzX3I7ErFxE7dmIv/dodaCrkSCKAQuUqIr3Qdscc37NimLpzeZtrehfjKh0WRF3JuKTVRHjnJdpnUYehDeoYkmmvRDav5daB3ROWJuhkHB1Wkc2y3CECG38xrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790273965; c=relaxed/simple;
-	bh=IvUR2431T4OLwHWTHJUJSLYNuzeAJuOHiFRGzJguyA8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nQ6eQg5lDnZRqC+sqkCoXzCmDjtY/ONX+BH4CmqYYn+TsY3YgDMH36z6DCGmj7Pg+J1L5FxaY292ftGFc4BgmvSNqWwo8XX812vHIS3icH5/B4prpY8SmEafcsnDeXE5FYuvvA8CJ+gQHwCbYKRAfXwro8He7sRhwwrdG14jG28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=teN5b8t9; arc=none smtp.client-ip=91.218.175.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1790274193; c=relaxed/simple;
+	bh=ThY+aOhqOAs0ChelKPf0sM0NHX9A6M0pDMIBNLYdFsQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SqYf5Rjx6k+LH4gb8ktCAPS3TccqCzwIelylb9zvKWnNo7z8bqGAAUzzwv5qiqU798+X+yJc78lWpTsGzHaMABcasrUJcmjLYLt4qNjb9sbtna9Mzrimi3tW8L8JFxS6Hg7doK5rJuQPwkGfWCLZKe8+yKxDc/DJ4jaQac8jiVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=edIIEwrW; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="teN5b8t9"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=IvUR2431T4OLwHWTHJUJSLYNuzeAJuOHiFRGzJguyA8=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790273960; v=1; x=1790878760;
- b=teN5b8t9bKbTUQ3Lj30hIJgvaD0bf+Ce8XzvZ/BHc0exHNHnNPcepAb1TpvRp+7xdyXe3qqZ
- SR8+78GPwvWvbAueVDPu+FfMJ2h4uFMZmWrLawh+YYfM7grWVhSX+dXe1hLwQ/6JZGXOcy9RO7L
- WsMqE7GiDtBV3nubUms/VtFo=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 2b9a23ca893f4a86;
-	Thu, 24 Sep 2026 18:19:20 +0000
-X-Mizu-Trace-ID: 2b9a23ca893f4a86
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5b83c1421ecso974e87.1
-        for <kvmarm@lists.linux.dev>; Thu, 24 Sep 2026 11:19:20 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxbUKvGKzJCjuS/wbxM9x4X5xgtNly81h/0cB/RA8zh7BFaP9NoBtTkzuuq9yP5uYEoEZ4+7EM=@lists.linux.dev
-X-Gm-Message-State: AFuF++lCj3Rd4HVbDD9FyyBoBxAfDOmpPQF+33yqEGN920TWW8yfRcAN
-	Y3kjzwvfiEaKiszwV7EJ0wz5BG1NP1YkEmaEESiUb62VmLd4PbxmyVRN9QUkFL9QQLQKdZNB/OM
-	jgZkIp+R4kbM80XoylprmOA/aePzKuEIeTurbFRsZ
-X-Received: by 2002:a05:6512:3ca9:b0:5b8:e262:d32e with SMTP id
- 2adb3069b0e04-5b8e57821dcmr16882e87.1.1790273959309; Thu, 24 Sep 2026
- 11:19:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="edIIEwrW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1CDA1F000FF;
+	Thu, 24 Sep 2026 18:23:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790274192;
+	bh=1rT3iAcNKN3CIsNAZsMz38eVN8WYGGW5v5DII5ENAjk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=edIIEwrWeWggBFTvgr+bbPHwZtpX7N39My3UWMq4+1+l5NRt0zCP77Pu80O5Z9Ok2
+	 PyfgUkUTwEU+thWrqhUai0xQu+HRifkbZ7yAJn1McDoCFIFiWiEyuQTJPml6JpIn7d
+	 amqgFtOIiNI5u/q8A3a/cr3fJ/8H0PSVGAN7Jk1FdbAik4wQABSQrTon9qmS20uZKP
+	 +Ulo+sF1OxDgZLpRrMp5fdmXoHcr01h6EmfhN10/M/OUppPFNzQdB/bysfibyAR0uT
+	 8nOYSXEQRvw0yAtQ7JBgVh6s8rgfoYwX2tRloaG4ywG6iDtP7emrmF0q9b7cvC5RKD
+	 SdQkKYydlnwFA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1x9o69-0000000DA1f-3uMi;
+	Thu, 24 Sep 2026 18:23:10 +0000
+Date: Thu, 24 Sep 2026 19:23:09 +0100
+Message-ID: <86ld8q4igi.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Hao Zhang <hao_zhang_kdev@163.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: arm64: pvtime: Don't lose stolen time on failed updates
+In-Reply-To: <arD24ru13owcE1Ms@192.168.1.215>
+References: <arD24ru13owcE1Ms@192.168.1.215>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260922071945.693714-1-fuad.tabba@linux.dev> <20260922071945.693714-2-fuad.tabba@linux.dev>
- <arVQutV75u2gGVr4@google.com>
-In-Reply-To: <arVQutV75u2gGVr4@google.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 24 Sep 2026 19:18:43 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTz=n2Tnq73amL3cok0=_vn-cigesdd1r-emt=+__Xatog@mail.gmail.com>
-X-Gm-Features: AclHuK8gQuMnh5G0uSWpcfUI1aukInqrdbq0WmB1N5HLh0hWNnycc7FfERA0vUQ
-Message-ID: <CA+EHjTz=n2Tnq73amL3cok0=_vn-cigesdd1r-emt=+__Xatog@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] KVM: selftests: Fix arm64 sysreg header dependencies
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	=?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
-	James Houghton <jthoughton@google.com>, Will Deacon <will@kernel.org>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, cgroups@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: hao_zhang_kdev@163.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Sean,
+On Mon, 21 Sep 2026 10:20:34 +0100,
+Hao Zhang <hao_zhang_kdev@163.com> wrote:
+> 
+> From: Hao Zhang <zhanghao1@kylinos.cn>
+> 
+> kvm_update_stolen_time() advances last_steal before checking whether
+> kvm_put_guest() successfully writes the updated value to guest memory.
+> 
+> If the write fails, the updated stolen time is not visible to the guest,
+> but the corresponding run delay has already been consumed from KVM's
+> accounting state.  A later successful update therefore starts from the
+> advanced last_steal value and permanently loses that interval.
 
-On Thu, 24 Sep 2026 17:32:58 +0100, Sean Christopherson
-<seanjc@google.com> wrote:
-[...]
-> Definitely doesn't have to be now, but at some point should we split out some of
-> this arch-specific sub-Makefiles?  It's nice not having to hunt around to figure
-> out which tests are supported by which arch, but the amount of arch specific goo
-> we're accruing is getting unwieldy.
+I'm sceptical.
 
-I think so. I'd keep the test lists where they are and move the
-per-arch build logic (the ifeq ($(ARCH),...) blocks) into arch-specific
-sub-Makefiles. I could send that as a follow-up once this patch lands.
+A "transient" write failure means that userspace has unmapped the page
+this should have been stored to. Userspace is in charge of the VM --
+it literally is the owner.
 
-Cheers,
-/fuad
+Why should we prevent it from shooting itself in the foot? Userspace
+can equally stop the vcpu from running, and this is "stolen time"
+that is not accounted for.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
