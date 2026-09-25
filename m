@@ -1,49 +1,50 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 213884DF4B5;
-	Fri, 25 Sep 2026 16:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 628FF3D9549;
+	Fri, 25 Sep 2026 17:07:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790354589; cv=none; b=lMFP6CaPKl/sUKtE2ER/B2OT2RN7vBOH+odiK8ElIgQKeYY0KFniFLjMVtonfWSPEtVKM/DfjNtFRshdGtFIUdvZF5NKUuMLpp/+g4PDjpvZ+CUt6grNt0q9SeKRU+OScEzW+5JEa4fZXCeDeuBM6DjKa3RJUZ9EwBAAiByOsjg=
+	t=1790356040; cv=none; b=ghEmQ7gpZ5ZXvWp86rfb9MQtiq6AH3H5ANuq8OLxxafpKNesSoeehWFRFn7xc98rpmfbfVeAVps8HZ6D2rc90qH7wnVunOr+CUuG4ye62uAfHxaQJ/uNHrIaUKyF0jU2XEoHLg/ZqiEePuglMI9SOtsG5w4uvucC2y6NfVwzdE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790354589; c=relaxed/simple;
-	bh=O5sbNKI/8hIC1rgKBOybPs1hHlK7ry3JZUBZbb/JU/g=;
+	s=arc-20240116; t=1790356040; c=relaxed/simple;
+	bh=ixzfrU8lMEsDTomOcbMGSENbu/A9XPEY12QX9G9g3I0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XPbme+uuoHEnIu4e8TclgfoPy8dRbV2XvcwLChXAxZT1Ce5tOxKKrk00QqvazEnw1WPczKcNt4eQtZU6ZXZQToDkfmtSrBr8XERAs7riR7tMQrlVDNXCVNC1V5imVAJOCVuT8bC2RuwlI8TKJoSzykehsNMJpYheaqbVQLMnKrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hVf2XdSc; arc=none smtp.client-ip=217.140.110.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=bSUEjpcZ5SGlYp13ID5+wj0M9iJNwIrMWvIQw7rckN1Tx2aGZJyFZprS/Dgl2srf/w7HeTlRj7C5M/fgDGNtZJnoCVtjcwThE+4lVteX2tq8NpI9gnhQoUK297QJIRx1qMJAnjfpJzZE+8cekK7Xqhxh2d9dbRHA2HrvrEx9xus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=EHpt1dnk; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hVf2XdSc"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="EHpt1dnk"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5F19A169C;
-	Fri, 25 Sep 2026 09:42:36 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0B9EF169C;
+	Fri, 25 Sep 2026 10:07:11 -0700 (PDT)
 Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0B87E3F86F;
-	Fri, 25 Sep 2026 09:42:36 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6F93D3F86F;
+	Fri, 25 Sep 2026 10:07:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790354559; bh=O5sbNKI/8hIC1rgKBOybPs1hHlK7ry3JZUBZbb/JU/g=;
+	t=1790356034; bh=ixzfrU8lMEsDTomOcbMGSENbu/A9XPEY12QX9G9g3I0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hVf2XdScH/58yUk45BIMnxm19IlI7CCdS1+PH4A3lE0oPIlF/VnruTYA9tdwfB++q
-	 tPALc4GdmxDZeRm3O69AumG5nuzFw10fti+WPdDM8P/WWPcR06/EG2TuL4kXguw8FS
-	 tOxXhZwLUBa3ggNoDVUh/E34iEH5FW3oavECMG3c=
-Date: Fri, 25 Sep 2026 17:42:34 +0100
+	b=EHpt1dnkgmEtCXRicfI03eywssdpZdbGJitm2LyU3/txbYynDGJW9GXrNQawbZEyw
+	 3QDLIL1w9E0vjFWl3xfYaRKn3caSX1J1hyvAayOZ7OCj9NKUhHV57vPR+0QirXYeeJ
+	 MOzJAeppFl24SLREnFIB5jWlehs2ggbnYJhv2Z8s=
+Date: Fri, 25 Sep 2026 18:07:08 +0100
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
-	will@kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
-	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
-	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
-	sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
-Subject: Re: [PATCH v19 5/7] firmware: arm_rmm: Activate the RMM
-Message-ID: <araketG70TIKeNuf@arm.com>
-References: <20260924135201.850038-1-suzuki.poulose@arm.com>
- <20260924135201.850038-6-suzuki.poulose@arm.com>
- <arZmXFw5Jw2IbAmA@arm.com>
- <a11aba04-eaaa-43fd-988b-a2581b1b2fdb@arm.com>
+Cc: Will Deacon <will@kernel.org>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, maz@kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
+	gshan@redhat.com, joey.gouly@arm.com, tabba@google.com,
+	yuzenghui@huawei.com, linux-coco@lists.linux.dev,
+	gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com,
+	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com,
+	lpieralisi@kernel.org, enju.kohei@fujitsu.com
+Subject: Re: [PATCH v18] arm64: mm: Handle Granule Protection Faults (GPFs)
+Message-ID: <araqPCdcSnqZqPWz@arm.com>
+References: <20260913070459.2547407-1-suzuki.poulose@arm.com>
+ <arK3tsTV6EDhI-nt@willie-the-truck>
+ <arOyp8WUrYBAjrGH@arm.com>
+ <arP0IF0MjFUv36AP@willie-the-truck>
+ <49dcab27-1d03-4df2-b7cb-4df4eda6d909@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,100 +53,85 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a11aba04-eaaa-43fd-988b-a2581b1b2fdb@arm.com>
+In-Reply-To: <49dcab27-1d03-4df2-b7cb-4df4eda6d909@arm.com>
 
-On Fri, Sep 25, 2026 at 04:02:24PM +0100, Suzuki K Poulose wrote:
-> On 25/09/2026 13:17, Catalin Marinas wrote:
-> > On Thu, Sep 24, 2026 at 02:51:59PM +0100, Suzuki K Poulose wrote:
-> > > From: Steven Price <steven.price@arm.com>
+On Wed, Sep 23, 2026 at 05:04:06PM +0100, Suzuki K Poulose wrote:
+> On 23/09/2026 16:45, Will Deacon wrote:
+> > On Wed, Sep 23, 2026 at 12:06:15PM +0100, Catalin Marinas wrote:
+> > > On Tue, Sep 22, 2026 at 06:15:34PM +0100, Will Deacon wrote:
+> > > > On Sun, Sep 13, 2026 at 08:04:58AM +0100, Suzuki K Poulose wrote:
+> > > > > From: Steven Price <steven.price@arm.com>
+> > > > > 
+> > > > > If the host attempts to access granules that have been delegated for use
+> > > > > in a realm these accesses will be caught and will trigger a Granule
+> > > > > Protection Fault (GPF).
+> > > > > 
+> > > > > A fault during a page walk signals a bug in the kernel and is handled by
+> > > > > oopsing the kernel. A non-page walk fault could be caused by user space
+> > > > > having access to a page which has been delegated to the kernel and will
+> > > > > trigger a SIGBUS to allow debugging why user space is trying to access a
+> > > > > delegated page.
+> > > > > 
+> > > > > There is work in progress to unmap the guest_memfd backed private pages from the
+> > > > > linear map. Until we get that support, we could get spurious GPFs from within
+> > > > > the kernel, e.g., load_unaligned_zeropad(). So, try to fix them up for now.
+> > > > > 
+> > > > > Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > > > > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > > > > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> > > > > Signed-off-by: Steven Price <steven.price@arm.com>
+> > > > > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > > > > ---
+> > > > > Changes since v17:
+> > > > >   * Pass untagged address to die_kernel_fault() - Sashiko
+> > > > >   * Explicitly check !user_mode() for fixups - Catalin
+> > > > >   * Switch to BUS_OBJERR for si_code from SI_KERNEL - Catalin
+> > > > >   * Clarify the commit description about the upcoming work on
+> > > > >     unmapping guest_memfd backed pages from linear map
+> > > > > Changes since v16:
+> > > > >   * Update the commit description to indicate why we try to fixup GPFs
+> > > > > Changes since v10:
+> > > > >   * Don't call arm64_notify_die() in do_gpf() but simply return 1.
+> > > > > Changes since v2:
+> > > > >   * Include missing "Granule Protection Fault at level -1"
+> > > > > ---
+> > > > >   arch/arm64/mm/fault.c | 30 ++++++++++++++++++++++++------
+> > > > >   1 file changed, 24 insertions(+), 6 deletions(-)
+> > > > 
+> > > > I still don't think we should do this, given that the plan is to unmap
+> > > > the memory from the linear map. If this thing fires, it's a kernel bug
+> > > > and it should be fatal.
 > > > 
-> > > Activate the RMM after the basic configuration. This is a memory
-> > > transferring stateful operation.
-> > > 
-> > > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > > Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
-> > > Signed-off-by: Steven Price <steven.price@arm.com>
-> > > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > > ---
-> > > Changes since v17:
-> > >   * Inline RMM_ACTIVATE command and remove the definitions from arm-rmi-cmds.h
-> > >   * Use scope-based cleanup to free sro object
-> > > Changes since v16:
-> > >   * Split into a new patch
-> > > ---
-> > >   drivers/firmware/arm_rmm/rmi.c | 13 ++++++++++++-
-> > >   1 file changed, 12 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
-> > > index 035f21d3f26b6..0859f256e192b 100644
-> > > --- a/drivers/firmware/arm_rmm/rmi.c
-> > > +++ b/drivers/firmware/arm_rmm/rmi.c
-> > > @@ -834,7 +834,18 @@ static int __init arm64_init_rmi(void)
-> > >   	if (ret)
-> > >   		return ret;
-> > > -	return 0;
-> > > +	/* Activate the RMM */
-> > > +	struct rmi_sro_state *sro __free(kfree) = kmalloc_obj(*sro);
-> > > +	if (!sro)
-> > > +		return -ENOMEM;
-> > > +
-> > > +	ret = rmi_sro_memxfer_cmd(sro, GFP_KERNEL, SMC_RMI_RMM_ACTIVATE);
-> > > +	if (ret) {
-> > > +		pr_err("RMM activate failed (%d)\n", ret);
-> > > +		ret = ret < 0 ? ret : -ENXIO;
-> > > +	}
-> > > +
-> > > +	return ret;
-> > 
-> > It was raised earlier this year [1] but I'm not sure it concluded. How
-> > do we handle kexec and kdump? I think RMI_RMM_DEACTIVATE only succeeds
-> > if nothing is delegated, so it would need all realms torn down first. If
-> > that's not feasible, we could at least block (non-crash) kexec like pKVM
-> > does.
+> > > If the linear unmapping gets merged first, I agree, no need to handle
+> > > these faults. I haven't followed that series, so no idea where it is at.
 > 
-> You are right, we can't DEACTIVATE until all granules have been
-> "undelegated" back. Not just the Realms, but also the GPTs/Tracking
-> Metadata etc would need to be reclaimed (when we get to support
-> dynamic GPT/Tracking metadata). For now, we should block the kexec.
-
-Looking more into this (and the memory hotplug story), I find it strange
-that simply having RME and a valid RMM imposes all these restrictions
-even if we never run or intend to run a realm. How common will
-RME-capable systems with RMM firmware be that are not used for CoCo? Or
-do we expect only CoCo systems to have capable/configured firmware (RME
-may be present in silicon anyway)?
-
-Ideally we'd defer the RMM configuration and activation (and the
-tracking/GPT checks) until we first attempt to start a realm, keeping
-only the RMI_VERSION/FEATURES probing at boot. Not sure how feasible
-this is (memory is more fragmented by then for any contiguous donation).
-If we manage it, kexec and memory hotplug just work on hosts that never
-start a realm.
-
-The next best thing for kexec is to tear down the realms, undelegate
-the granules and deactivate the RMM before invoking kexec (with kdump
-that's harder as we likely no longer have a controlled shutdown).
-
-Similarly with memory hotplug, allow it if we haven't started any realms
-and refuse realm creation afterwards if untracked memory was onlined.
-Also, if the memory is onlined to ZONE_MOVABLE, neither guest_memfd nor
-the kernel allocations we delegate come from there, so we could allow
-it even with realms running.
-
-> > Kdump gets even more interesting if it starts accessing delegated pages
-> > and getting GPF.
-> > 
-> > [1] https://lore.kernel.org/r/CABpDEukEO4Y_fg8fv5Nr1_Pw_qOK=2UmioXk=WyPEzoEprPcGA@mail.gmail.com
+> There doesn't seem to be much progress on that series. Brendan
+> volunteered to resurrect the series, taking over from Nikita [0].
+> But looks like Brendan is not working on this anymore. Will see
+> if someone is really planning to look at it.
 > 
-> Kdump may be a bit more easier, as the kdump kernel is supposed to use
-> the "reserved" region and vmcore access could handle the GPF and
-> provide "0"s to the reader ? May be this is one case where the
-> host needs to be able to handle GPFs.
+> [0] https://lore.kernel.org/all/DJJ35VLH2PE5.DFD8OYXEOH97@linux.dev
 
-Yes, I think so. I now realised that metadata delegation to the RMM
-doesn't come from guest_memfd, so that's another case not helped by the
-old series to unmap guest_memfd from the linear map. I'll reply to the
-GPF thread.
+I just realised that this only solves part of the problem. Normal kernel
+allocations are delegated RMM metadata and they'll also trigger GPF
+faults. Kdump is another point raised here:
+
+https://lore.kernel.org/all/a11aba04-eaaa-43fd-988b-a2581b1b2fdb@arm.com/
+
+I think rmi_delegate_range() covers the non-kdump cases, both for
+metadata and realm memory, we could unmap the linear map there (map it
+back in rmi_undelegate_range()).
+
+For kdump, we have /proc/vmcore that may be mmap'ed or read() syscalls.
+I think Alper proposed an idea to use copy_from_kernel_nofault() (with
+exception recovery in do_gpf()) but we'd still need to block
+mmap_vmcore() or somehow handle SIGBUS in makedumpfile unless it does
+this already.
+
+So, I think we should revisit the GPF handling. If we manage to unmap
+all delegated pages, we could limit the exception handling to
+is_kdump_kernel(). Otherwise we keep the exception handling as proposed
+earlier, maybe with some warnings like EL0 access.
 
 -- 
 Catalin
