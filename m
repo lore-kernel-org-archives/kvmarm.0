@@ -1,46 +1,49 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A28361973
-	for <kvmarm@lists.linux.dev>; Fri, 25 Sep 2026 16:34:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 213884DF4B5;
+	Fri, 25 Sep 2026 16:42:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790354047; cv=none; b=BDuugiLpSI/04WQAMbHedRGe8bh2BB4g+04RFXDB/3daRcIMEPdpOYPVL8BOhjuOMkAUAg3IVKmv/H/we6KUzbFmvTnPUUrWqriJ8O+lwWV7K8dzVbpk/8sFprrxn6wTr4npZVYPFXb4hoBExB3mYY090HIKU4E0c/5WiLR5Seg=
+	t=1790354589; cv=none; b=lMFP6CaPKl/sUKtE2ER/B2OT2RN7vBOH+odiK8ElIgQKeYY0KFniFLjMVtonfWSPEtVKM/DfjNtFRshdGtFIUdvZF5NKUuMLpp/+g4PDjpvZ+CUt6grNt0q9SeKRU+OScEzW+5JEa4fZXCeDeuBM6DjKa3RJUZ9EwBAAiByOsjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790354047; c=relaxed/simple;
-	bh=z1MMBW/k+eb49Qcp/2rEAdku+hrMenCSSpsg1SGiR6E=;
+	s=arc-20240116; t=1790354589; c=relaxed/simple;
+	bh=O5sbNKI/8hIC1rgKBOybPs1hHlK7ry3JZUBZbb/JU/g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CTXT9mnl2e+6GOJoHJy8R/TfTD3xdW3ELmitKfs2R0N/M+kPbXmDgj0CGHE4JhlJbvWjgL9l3YTrYV1t8vSXdNIIrvtiQ8QwA+hGJ6fZUa87xo9ZBbkmDfcYHdwKcQ+PXvrIRwF1w7nnL1rm0ueYSGN5NCeda+V3D3C5J/gpFac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=UAfsBFPJ; arc=none smtp.client-ip=217.140.110.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=XPbme+uuoHEnIu4e8TclgfoPy8dRbV2XvcwLChXAxZT1Ce5tOxKKrk00QqvazEnw1WPczKcNt4eQtZU6ZXZQToDkfmtSrBr8XERAs7riR7tMQrlVDNXCVNC1V5imVAJOCVuT8bC2RuwlI8TKJoSzykehsNMJpYheaqbVQLMnKrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hVf2XdSc; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="UAfsBFPJ"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hVf2XdSc"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0C1EA169C;
-	Fri, 25 Sep 2026 09:34:01 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 135E43F86F;
-	Fri, 25 Sep 2026 09:34:00 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5F19A169C;
+	Fri, 25 Sep 2026 09:42:36 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0B87E3F86F;
+	Fri, 25 Sep 2026 09:42:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790354044; bh=z1MMBW/k+eb49Qcp/2rEAdku+hrMenCSSpsg1SGiR6E=;
+	t=1790354559; bh=O5sbNKI/8hIC1rgKBOybPs1hHlK7ry3JZUBZbb/JU/g=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UAfsBFPJw7gPQ3SEOl4sjuq+C4NIG+QvCaZyg5xh4qIysSIbcRSEWQXPZRw7Fochj
-	 QgIzag8v8ZZWI5/+gZdT244vkTar1eEHFB7IiJDATTpjYHuxBDiRhIAozS9FgV9+vC
-	 DxiQY9F6qIxqeuSBpJwiOlUSIdCnvf77/QH7Af/Q=
-Date: Fri, 25 Sep 2026 17:33:47 +0100
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Fuad Tabba <fuad.tabba@linux.dev>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Quentin Perret <qperret@google.com>, Vincent Donnefort <vdonnefort@google.com>, 
-	Fuad Tabba <tabba@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 1/4] KVM: arm64: Don't WARN on an unsupported TLBI OS
- from vEL1
-Message-ID: <qn2q3e3hagurkljew23gnpbf5xg5dwagzzujw4z5c7vutyic3x@fvhragb3jlz6>
-References: <20260925090619.852995-1-fuad.tabba@linux.dev>
- <20260925090619.852995-2-fuad.tabba@linux.dev>
+	b=hVf2XdScH/58yUk45BIMnxm19IlI7CCdS1+PH4A3lE0oPIlF/VnruTYA9tdwfB++q
+	 tPALc4GdmxDZeRm3O69AumG5nuzFw10fti+WPdDM8P/WWPcR06/EG2TuL4kXguw8FS
+	 tOxXhZwLUBa3ggNoDVUh/E34iEH5FW3oavECMG3c=
+Date: Fri, 25 Sep 2026 17:42:34 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+	will@kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+	sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
+Subject: Re: [PATCH v19 5/7] firmware: arm_rmm: Activate the RMM
+Message-ID: <araketG70TIKeNuf@arm.com>
+References: <20260924135201.850038-1-suzuki.poulose@arm.com>
+ <20260924135201.850038-6-suzuki.poulose@arm.com>
+ <arZmXFw5Jw2IbAmA@arm.com>
+ <a11aba04-eaaa-43fd-988b-a2581b1b2fdb@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,57 +52,100 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260925090619.852995-2-fuad.tabba@linux.dev>
+In-Reply-To: <a11aba04-eaaa-43fd-988b-a2581b1b2fdb@arm.com>
 
-On Fri, Sep 25, 2026 at 10:06:16AM +0100, Fuad Tabba wrote:
-> A VMM can trigger the WARN_ON(!vcpu_is_el2()) in handle_tlbi_el1() on a
-> CPU with FEAT_EVT2 and FEAT_TLBIOS but no FEAT_FGT, by setting
-> ID_AA64ISAR0_EL1.TLB to NI and having the guest execute TLBI VMALLE1OS.
+On Fri, Sep 25, 2026 at 04:02:24PM +0100, Suzuki K Poulose wrote:
+> On 25/09/2026 13:17, Catalin Marinas wrote:
+> > On Thu, Sep 24, 2026 at 02:51:59PM +0100, Suzuki K Poulose wrote:
+> > > From: Steven Price <steven.price@arm.com>
+> > > 
+> > > Activate the RMM after the basic configuration. This is a memory
+> > > transferring stateful operation.
+> > > 
+> > > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > > Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+> > > Signed-off-by: Steven Price <steven.price@arm.com>
+> > > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > > ---
+> > > Changes since v17:
+> > >   * Inline RMM_ACTIVATE command and remove the definitions from arm-rmi-cmds.h
+> > >   * Use scope-based cleanup to free sro object
+> > > Changes since v16:
+> > >   * Split into a new patch
+> > > ---
+> > >   drivers/firmware/arm_rmm/rmi.c | 13 ++++++++++++-
+> > >   1 file changed, 12 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
+> > > index 035f21d3f26b6..0859f256e192b 100644
+> > > --- a/drivers/firmware/arm_rmm/rmi.c
+> > > +++ b/drivers/firmware/arm_rmm/rmi.c
+> > > @@ -834,7 +834,18 @@ static int __init arm64_init_rmi(void)
+> > >   	if (ret)
+> > >   		return ret;
+> > > -	return 0;
+> > > +	/* Activate the RMM */
+> > > +	struct rmi_sro_state *sro __free(kfree) = kmalloc_obj(*sro);
+> > > +	if (!sro)
+> > > +		return -ENOMEM;
+> > > +
+> > > +	ret = rmi_sro_memxfer_cmd(sro, GFP_KERNEL, SMC_RMI_RMM_ACTIVATE);
+> > > +	if (ret) {
+> > > +		pr_err("RMM activate failed (%d)\n", ret);
+> > > +		ret = ret < 0 ? ret : -ENXIO;
+> > > +	}
+> > > +
+> > > +	return ret;
+> > 
+> > It was raised earlier this year [1] but I'm not sure it concluded. How
+> > do we handle kexec and kdump? I think RMI_RMM_DEACTIVATE only succeeds
+> > if nothing is delegated, so it would need all realms torn down first. If
+> > that's not feasible, we could at least block (non-crash) kexec like pKVM
+> > does.
 > 
-> Without FGT, HCR_EL2.TTLBOS traps the instruction. KVM records no FGT
-> trap information on such a host, so triage_sysreg_trap() doesn't UNDEF
-> it. The instruction reaches handle_tlbi_el1(), which warns before
-> checking whether the guest supports it.
-> 
-> Check support before the warning.
-> 
-> Fixes: 0cb8aae226768 ("KVM: arm64: nv: Add handling of outer-shareable TLBI operations")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> You are right, we can't DEACTIVATE until all granules have been
+> "undelegated" back. Not just the Realms, but also the GPTs/Tracking
+> Metadata etc would need to be reclaimed (when we get to support
+> dynamic GPT/Tracking metadata). For now, we should block the kexec.
 
-Looks correct to me:
+Looking more into this (and the memory hotplug story), I find it strange
+that simply having RME and a valid RMM imposes all these restrictions
+even if we never run or intend to run a realm. How common will
+RME-capable systems with RMM firmware be that are not used for CoCo? Or
+do we expect only CoCo systems to have capable/configured firmware (RME
+may be present in silicon anyway)?
 
-Reviewed-by: Wei-Lin Chang <weilin.chang@arm.com>
+Ideally we'd defer the RMM configuration and activation (and the
+tracking/GPT checks) until we first attempt to start a realm, keeping
+only the RMI_VERSION/FEATURES probing at boot. Not sure how feasible
+this is (memory is more fragmented by then for any contiguous donation).
+If we manage it, kexec and memory hotplug just work on hosts that never
+start a realm.
 
-> ---
->  arch/arm64/kvm/sys_regs.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+The next best thing for kexec is to tear down the realms, undelegate
+the granules and deactivate the RMM before invoking kexec (with kdump
+that's harder as we likely no longer have a controlled shutdown).
+
+Similarly with memory hotplug, allow it if we haven't started any realms
+and refuse realm creation afterwards if untracked memory was onlined.
+Also, if the memory is onlined to ZONE_MOVABLE, neither guest_memfd nor
+the kernel allocations we delegate come from there, so we could allow
+it even with realms running.
+
+> > Kdump gets even more interesting if it starts accessing delegated pages
+> > and getting GPF.
+> > 
+> > [1] https://lore.kernel.org/r/CABpDEukEO4Y_fg8fv5Nr1_Pw_qOK=2UmioXk=WyPEzoEprPcGA@mail.gmail.com
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 44aae52c473d7..0ce29ce678b08 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -4257,6 +4257,10 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  {
->  	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
->  
-> +	/* Without FGT, HCR_EL2.TTLBOS also traps a hidden TLBI OS from vEL1 */
-> +	if (!kvm_supported_tlbi_s1e1_op(vcpu, sys_encoding))
-> +		return undef_access(vcpu, p, r);
-> +
->  	/*
->  	 * If we're here, this is because we've trapped on a EL1 TLBI
->  	 * instruction that affects the EL1 translation regime while
-> @@ -4279,9 +4283,6 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  
->  	WARN_ON(!vcpu_is_el2(vcpu));
->  
-> -	if (!kvm_supported_tlbi_s1e1_op(vcpu, sys_encoding))
-> -		return undef_access(vcpu, p, r);
-> -
->  	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)) {
->  		kvm_handle_s1e2_tlbi(vcpu, sys_encoding, p->regval);
->  		return true;
-> -- 
-> 2.39.5
-> 
+> Kdump may be a bit more easier, as the kdump kernel is supposed to use
+> the "reserved" region and vmcore access could handle the GPF and
+> provide "0"s to the reader ? May be this is one case where the
+> host needs to be able to handle GPFs.
+
+Yes, I think so. I now realised that metadata delegation to the RMM
+doesn't come from guest_memfd, so that's another case not helped by the
+old series to unmap guest_memfd from the linear map. I'll reply to the
+GPF thread.
+
+-- 
+Catalin
