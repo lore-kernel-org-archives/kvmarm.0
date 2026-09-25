@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2554CEE75
-	for <kvmarm@lists.linux.dev>; Fri, 25 Sep 2026 15:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E79BB4D8DBF
+	for <kvmarm@lists.linux.dev>; Fri, 25 Sep 2026 15:54:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790351522; cv=none; b=CrbwqSwxfC90pi42Z+m7IWT7dm63G7o7NSrveOSzDr4p4h2MR6Y1gSX8Qm5fGTA08d7M9VTa237n4tYyER/Sn2HHTiuX9IE4f0E8nmgGAsqrxeaGwti5RfnByqdoZP6Ay74QvZZFYwjcMrIve3ZgL6jwOt/VvZDqAktEQ7rsg+U=
+	t=1790351650; cv=none; b=Une5KdqtAvYQuphbe3uK3KUT2LaTiN/xNs+8F2B+Fp/djUoJBOZvE6tPKv5V/WwaIWv558XfKNsa/o9fG6chsI1n6eiBeWtW0kEmPX4/BOVLHtBjStNqYg8qPGgCeSVgJxuEZYlEdwTJUuf1lkEj9vOfbQqL1gg00WEQPHEbcfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790351522; c=relaxed/simple;
-	bh=O8UecQmp1X5oftek2FhEpGS0Nrpn7t3tl6EEW3PJlSA=;
+	s=arc-20240116; t=1790351650; c=relaxed/simple;
+	bh=g663YX9Fr6L7+XWdnhZTVBhUO4IibM0cx81qljccie8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=fgn/SXj9jDATwxTuI4FY+iaPi2DoNVbA/DQYHUHp+4F8JIgTd6mYra1o1oWvykjZ7U8gJetgyMqCJwS04WYx0DojqjkavFkMo1UwsjrmYah9EQ7mCB7Cg3iWkJ+RFVHxg573WsdWxC2ZdSKoAKszJGOqRfJcx3L1sL+ps7YrHz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=XkRGgzcm; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version:Content-Type:Content-Disposition; b=N+wNdOcyPjBJAi471rBYeIyjidUtaB9omyAXdAhL9bp8lWaG57BA9O+BncJFKuesilRmoeux19X9HAmgmt2FaZxyi9AKYpoM50UvfUyFHWP0RO/NtfrYcmnU2avq2HLTOvZ/s/08KSMX+OljmxE28iGWrk7ArJKK9JqhuRCtQHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=nO5sF56A; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="XkRGgzcm"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="nO5sF56A"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B48D81BB2;
-	Fri, 25 Sep 2026 08:51:46 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 43B27169C;
+	Fri, 25 Sep 2026 08:54:00 -0700 (PDT)
 Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BEDC43F86F;
-	Fri, 25 Sep 2026 08:51:48 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4E7FD3F86F;
+	Fri, 25 Sep 2026 08:54:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790351510; bh=O8UecQmp1X5oftek2FhEpGS0Nrpn7t3tl6EEW3PJlSA=;
+	t=1790351643; bh=g663YX9Fr6L7+XWdnhZTVBhUO4IibM0cx81qljccie8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XkRGgzcmnEh5sB+yqSvQPlYj1aoCQXgGii+lsftJQgaC/GpxIxDdSJHh4Yppe+Fv6
-	 mz/TUMk2bzFKvAbsh5FqUxZoqLjQSmO2WotN7n73+ozguZgv/XuM8Smw17xg/8DU9j
-	 MIuKiMBg+niq/zDXpNP6Aw9AA9TmJMre4AabLROs=
+	b=nO5sF56As61L2ShxTRgADUUKBJE/IhcyPJ4r8aLZNcpdmIuir4PmF53MVj6V2ui8p
+	 xUgnbN010lkq0JGY9PPnq5jING+mSM1ZWmzHaB8dvTwmCGHA7rMTrmucCKN9tPsypU
+	 nvJJbdb/23bv9KnzzH/Cd1tbPxmAhOHDUaLb+IB0=
 From: Leonardo Bras <leo.bras@arm.com>
 To: Oliver Upton <oupton@kernel.org>
 Cc: Leonardo Bras <leo.bras@arm.com>,
@@ -36,12 +36,12 @@ Cc: Leonardo Bras <leo.bras@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>
-Subject: Re: [PATCH 15/22] KVM: arm64: Don't update descriptors for "non-arch" access
-Date: Fri, 25 Sep 2026 16:51:46 +0100
-Message-ID: <araYkodBdZIsQnf-@LeoBrasDK>
+Subject: Re: [PATCH 16/22] KVM: arm64: nv: Expose FEAT_HAFDBS
+Date: Fri, 25 Sep 2026 16:53:59 +0100
+Message-ID: <araZFy_-gphqMs0G@LeoBrasDK>
 X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260623184201.1518871-16-oupton@kernel.org>
-References: <20260623184201.1518871-1-oupton@kernel.org> <20260623184201.1518871-16-oupton@kernel.org>
+In-Reply-To: <20260623184201.1518871-17-oupton@kernel.org>
+References: <20260623184201.1518871-1-oupton@kernel.org> <20260623184201.1518871-17-oupton@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,113 +52,33 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 23, 2026 at 11:41:54AM -0700, Oliver Upton wrote:
-> WALK_ACCESS_NONARCH is a special indicator that the page table walk
-> request is not due to an architectural behavior and instead used
-> internally for KVM. Currently, the only user of this is SEA injection to
-> identify the correct translation level that generated the abort.
-> 
-> Ensure "non-arch" table walks are not made visible to the guest and
-> explicitly avoid descriptor updates. These accesses are not expected to
-> be used for pseudo-TLB fills, nor are they used to dirty any memory.
+On Tue, Jun 23, 2026 at 11:41:55AM -0700, Oliver Upton wrote:
+> Everything is in place now to support hardware dirty state management.
+> Flip the corresponding bit and advertise the feature to the guest.
 > 
 > Signed-off-by: Oliver Upton <oupton@kernel.org>
 > ---
->  arch/arm64/kvm/at.c     | 15 ++++++++++++++-
->  arch/arm64/kvm/nested.c | 12 +++++++++++-
->  2 files changed, 25 insertions(+), 2 deletions(-)
+>  arch/arm64/kvm/nested.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index faffb69c2eef..8d76eaf463c9 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -459,6 +459,15 @@ static int kvm_read_s1_desc(struct kvm_vcpu *vcpu, u64 pa, u64 *desc,
->  	return 0;
->  }
->  
-> +static bool should_set_access_flag(struct s1_walk_info *wi, struct s1_walk_step *ws,
-> +				   struct kvm_walk_access *access)
-> +{
-> +	if (access->type == WALK_ACCESS_NONARCH)
-> +		return false;
-> +
-> +	return wi->ha;
-> +}
-> +
->  static bool should_set_dirty_state(struct s1_walk_info *wi, struct s1_walk_step *ws,
->  				   struct s1_walk_result *wr, struct kvm_walk_access *access)
->  {
-> @@ -468,6 +477,7 @@ static bool should_set_dirty_state(struct s1_walk_info *wi, struct s1_walk_step
->  	/* R_RKMHW */
->  	case WALK_ACCESS_CMO:
->  	case WALK_ACCESS_AT:
-> +	case WALK_ACCESS_NONARCH:
->  		return false;
->  	default:
->  		/* R_NSXRD */
-> @@ -484,7 +494,7 @@ static int handle_desc_update(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
->  
->  	old = new = ws->desc;
->  
-> -	if (wi->ha)
-> +	if (should_set_access_flag(wi, ws, access))
->  		new |= PTE_AF;
->  
->  	if (should_set_dirty_state(wi, ws, wr, access))
-> @@ -555,6 +565,9 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
->  				.write	= wi->ha,
->  			};
->  
-> +			if (access->type == WALK_ACCESS_NONARCH)
-> +				s2_access.type = WALK_ACCESS_NONARCH;
-> +
->  			ret = kvm_walk_nested_s2(vcpu, &s2_access, &ws.s2_trans);
->  			if (ret == -EAGAIN)
->  				return ret;
 > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 54228db30371..4d128003ae7a 100644
+> index 4d128003ae7a..2408d604a1e1 100644
 > --- a/arch/arm64/kvm/nested.c
 > +++ b/arch/arm64/kvm/nested.c
-> @@ -228,6 +228,15 @@ static int read_guest_s2_desc(struct kvm_vcpu *vcpu, struct s2_walk_step *ws,
->  	return 0;
->  }
+> @@ -1790,7 +1790,7 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
+>  		if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features))
+>  			val &= ~ID_AA64MMFR1_EL1_VH;
 >  
-> +static bool should_set_access_flag(struct s2_walk_info *wi, struct s2_walk_step *ws,
-> +				   struct kvm_walk_access *access)
-> +{
-> +	if (access->type == WALK_ACCESS_NONARCH)
-> +		return false;
-> +
-> +	return wi->ha;
-> +}
-> +
->  static bool should_set_dirty_state(struct s2_walk_info *wi, struct s2_walk_step *ws,
->  				   struct kvm_s2_trans *out, struct kvm_walk_access *access)
->  {
-> @@ -235,6 +244,7 @@ static bool should_set_dirty_state(struct s2_walk_info *wi, struct s2_walk_step
->  	/* R_RKMHW */
->  	case WALK_ACCESS_CMO:
->  	case WALK_ACCESS_AT:
-> +	case WALK_ACCESS_NONARCH:
->  		return false;
->  	default:
->  		/* R_NSXRD */
-> @@ -251,7 +261,7 @@ static int handle_desc_update(struct kvm_vcpu *vcpu, struct s2_walk_info *wi,
+> -		val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR1_EL1, HAFDBS, AF);
+> +		val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR1_EL1, HAFDBS, DBM);
+>  		break;
 >  
->  	old = new = ws->desc;
->  
-> -	if (wi->ha)
-> +	if (should_set_access_flag(wi, ws, access))
->  		new |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
->  
->  	if (should_set_dirty_state(wi, ws, out, access))
+>  	case SYS_ID_AA64MMFR2_EL1:
 > -- 
 > 2.47.3
 > 
 
-Avoids update to AF and S2AP[1]/AP[2], LGTM.
-
-FWIW:
+LGTM! FWIW:
 Reviewed-by: Leonardo Bras <leo.bras@arm.com>
 
 Thanks!
