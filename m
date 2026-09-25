@@ -1,201 +1,120 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ABB04C14FC;
-	Fri, 25 Sep 2026 15:11:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15D044C4F6C
+	for <kvmarm@lists.linux.dev>; Fri, 25 Sep 2026 15:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790349110; cv=none; b=jTewiJkXnAaXcVpR9GVbeanVOmOxdaMxZNzKiSjhf/X1v6x8pf+Fjw8c51RQBZoD0uF/AL/0dylYDOur/53FzgXp4xPiocK35heIhKdWBzhj2aOTqhp+YOZEF5b8rhdOJLPEm3fAtgMCQHMskBxXNeSBK1MH6OZ5q8QnhK8XHO0=
+	t=1790349549; cv=none; b=GndULvBTWhFujRfxpZKcwmgWsiNeyscM7WJ3B7TbHkK9kH55DvwSJftOHTeQ3kegPiIOleN1/0dk/U49ND9Jzxhija2tyRdEMidbxAQilV3lru7WkequrAifOIFsV/SThGdVYNNXgPjQ0s2Nl0XEFlVs2KC4J8wzXZep9utjkDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790349110; c=relaxed/simple;
-	bh=wPC5lNilhf3g0ykmlhDe9z3lcOVejBMEEngMil4nDQo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C0jXSpvhTjSIE+7cG/vJB7kf6xNBnhv/yg8NTwrFvTD+/Zy6hm1I0gTOviyBUr5uES67lAzYf67cLOe5sMCGbrf417YYmBZK+HGMS85cc5+Phje6oQKKpGhuud8pd/p4feYSPMOljZe47qWrIuTirzx9K2jdHskQiiGePJ22if4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=jQXFy/Z+; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1790349549; c=relaxed/simple;
+	bh=R05+Lt91G2/g2cAbUpujVOaCkpFF33VyxVL3k+3S3/k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=W07Z5Z89LtQAbQU11ikOxxw1VHs/1pUa3p1QPotlycLa51tPiTWgaxcMAYuwAIYknWOCg0+AoZZWyK5GAAX10XDUpUdxbK70nB+Mz/GclPudtWC9lgiKrwYsNhqWX2b6pP8JvyqmXAsOjaQPbIzAVSPj19TNb0Kjd0pWC9nB3MQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=pb2ARhBI; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="jQXFy/Z+"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="pb2ARhBI"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 108581688;
-	Fri, 25 Sep 2026 08:11:31 -0700 (PDT)
-Received: from [10.57.10.17] (unknown [10.57.10.17])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5DAFF3F86F;
-	Fri, 25 Sep 2026 08:11:31 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 72FC71688;
+	Fri, 25 Sep 2026 08:18:53 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7BBDB3F86F;
+	Fri, 25 Sep 2026 08:18:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790349094; bh=wPC5lNilhf3g0ykmlhDe9z3lcOVejBMEEngMil4nDQo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=jQXFy/Z+hOKQzu4smPueogxcbPLKqe0jGtvG3FjpRmixbGar4J4NYMXhPcPqog6MN
-	 HqUWHnxdA4c+Za2T8HTRoyf8J3kkA2wTdECa34oWJL1t6xpZsznO0zJkB+9tFCcylg
-	 YDluTrvH3SJmD+BpUvnInL/ivQfaLlpO2Q65Iqtg=
-Message-ID: <0c959443-6d4f-4dba-957c-420cb128b7cc@arm.com>
-Date: Fri, 25 Sep 2026 16:11:29 +0100
+	t=1790349536; bh=R05+Lt91G2/g2cAbUpujVOaCkpFF33VyxVL3k+3S3/k=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=pb2ARhBIlfYuBg0XWQkTB98LMAz0mPFbeQUgb1vnNrYxKSni7Bcti0k2tQkt7rIja
+	 yn+/6uQMvEIh2GfIdqXMWBKIrkFOaPTTFiGWjF+CSSw4e/y25IwKS9AO5PELiXdivX
+	 Oalhj19z8x7TWo7sXVdfEPWeswbw1f5nc5A3xN48=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>
+Subject: Re: [PATCH 14/22] KVM: arm64: Grant write permission when DBM is set at S1
+Date: Fri, 25 Sep 2026 16:18:53 +0100
+Message-ID: <araQ3A24w6sqlO75@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260623184201.1518871-15-oupton@kernel.org>
+References: <20260623184201.1518871-1-oupton@kernel.org> <20260623184201.1518871-15-oupton@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 4/7] firmware: arm_rmm: Add support for SRO
-Content-Language: en-GB
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
- will@kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
- sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
-References: <20260924135201.850038-1-suzuki.poulose@arm.com>
- <20260924135201.850038-5-suzuki.poulose@arm.com> <arZgDmHV8uK1kv8R@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <arZgDmHV8uK1kv8R@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On 25/09/2026 12:50, Catalin Marinas wrote:
-> On Thu, Sep 24, 2026 at 02:51:58PM +0100, Suzuki K Poulose wrote:
->> +static int rmi_sro_donate_contig(struct rmi_sro_state *sro,
->> +				 unsigned long sro_handle,
->> +				 unsigned long donatereq,
->> +				 struct arm_smccc_1_2_regs *out_regs,
->> +				 gfp_t gfp)
->> +{
->> +	unsigned long block_size_fld = RMI_DONATE_BLOCK_SIZE(donatereq);
->> +	unsigned long block_size = rmi_addr_block_size_to_bytes(block_size_fld);
->> +	unsigned long count = RMI_DONATE_COUNT(donatereq);
->> +	unsigned long state = RMI_DONATE_STATE(donatereq);
->> +	unsigned long size = block_size * count;
->> +	unsigned long addr_range;
->> +	unsigned long donated_granules;
->> +	unsigned long donated_size;
->> +	int ret;
->> +	void *virt;
->> +	phys_addr_t phys;
->> +
->> +	/*
->> +	 * The RMM specification requires contiguous allocations are always a
->> +	 * power of 2
->> +	 */
->> +	if (WARN_ON_ONCE(!is_power_of_2(size)))
->> +		return -EINVAL;
->> +
->> +	/* Reuse the cached address range if we have one */
->> +	for (int i = 0; i < sro->addr_count; i++) {
->> +		unsigned long entry = sro->addr_list[i];
->> +
->> +		if (RMI_ADDR_RANGE_BLOCK_SIZE(entry) == block_size_fld &&
->> +		    RMI_ADDR_RANGE_COUNT(entry) == count &&
->> +		    RMI_ADDR_RANGE_STATE(entry) == state &&
->> +		    IS_ALIGNED(RMI_ADDR_RANGE_ADDR(entry), size)) {
->> +			sro->addr_count--;
->> +			swap(sro->addr_list[sro->addr_count],
->> +			     sro->addr_list[i]);
->> +
->> +			goto mem_donate;
->> +		}
->> +	}
->> +
->> +	ret = rmi_sro_ensure_capacity(sro, 1);
->> +	if (ret)
->> +		return ret;
->> +
->> +	virt = alloc_pages_exact(size, gfp);
->> +	if (!virt)
->> +		return -ENOMEM;
->> +	phys = virt_to_phys(virt);
->> +
->> +	if (state == RMI_OP_MEM_DELEGATED) {
->> +		phys_addr_t delegated_phys;
->> +
->> +		if (rmi_delegate_range(phys, size, &delegated_phys)) {
->> +			if (!rmi_undelegate_range(phys, delegated_phys - phys))
->> +				free_pages_exact(virt, size);
->> +			return -ENXIO;
->> +		}
->> +	}
->> +
->> +	addr_range = phys & RMI_ADDR_RANGE_ADDR_MASK;
->> +	FIELD_MODIFY(RMI_ADDR_RANGE_BLOCK_SIZE_MASK, &addr_range, block_size_fld);
->> +	FIELD_MODIFY(RMI_ADDR_RANGE_COUNT_MASK, &addr_range, count);
+On Tue, Jun 23, 2026 at 11:41:53AM -0700, Oliver Upton wrote:
+> The DBM bit effectively behaves as a permission bit when using direct
+> permissions, especially so in the context of accesses that do not update
+> the dirty state (like AT).
 > 
-> Courtesy of an LLM - if we get a contiguous/4K pages request for 4MB
-> (1024 pages), the above 10-bit field becomes 0. Should we reject the
-> request or the updated spec will guarantee this won't happen?
+> Treat AP[1] == 0 for the purposes of computing permissions, relying on
+> the walker to abort if it fails to set the dirty state where required.
+> 
+> Signed-off-by: Oliver Upton <oupton@kernel.org>
+> ---
+>  arch/arm64/kvm/at.c | 16 ++++++++++++++--
+>  1 file changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index bfba31b270a9..faffb69c2eef 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -1077,11 +1077,23 @@ static void compute_s1_direct_permissions(struct kvm_vcpu *vcpu,
+>  					  struct s1_walk_info *wi,
+>  					  struct s1_walk_result *wr)
+>  {
+> +	u8 ap = FIELD_GET(PTE_USER | PTE_RDONLY, wr->desc);
+>  	bool wxn;
+>  
+> +	/*
+> +	 * Descriptors with the DBM bit set while hardware dirty state are
+> +	 * considered writable, even though certain accesses (like AT instructions)
+> +	 * don't actually update the dirty state.
+> +	 *
+> +	 * Assume that walk_s1() made the necessary descriptor updates for the
+> +	 * access and just treat DBM as writable here.
+> +	 */
+> +	if (wi->hd && (wr->desc & PTE_DBM))
+> +		ap &= ~BIT(1);
 
-The spec is being updated to clamp the "maximum" count to match the
-granule size. (Also called out in the Cover letter as "Known Issues")
-This will be available with beta4 version of the spec.
+So for S1, mark the page writable if HD && DBM=1, which HAFDBS should do.
 
-> 
-> Somewhat related, with RMI_BLOCK_L2 or higher and appropriate count we
-> can easily go over the MAX_PAGE_ORDER allocation and fail alloc_pages()
-> (the contig case). IIUC, the kernel can reject the donation but current
-> TF-RMM does not report RMI_OP_CAN_CANCEL (R_SZVNK says it can be
-> cancelled). It gets complicated if we want to support large contiguous
-
-Ack, I will get this fixed in the TF-RMM.
-
-> allocations here (e.g. alloc_contig_pages() can sleep). I'd rather just
-> cancel the request, not support such large sizes.
-> 
-> [...]
-> 
->> +static int rmi_sro_donate_noncontig(struct rmi_sro_state *sro,
->> +				    unsigned long sro_handle,
->> +				    unsigned long donatereq,
->> +				    struct arm_smccc_1_2_regs *out_regs,
->> +				    gfp_t gfp)
->> +{
->> +	unsigned long block_size_fld = RMI_DONATE_BLOCK_SIZE(donatereq);
->> +	unsigned long block_size = rmi_addr_block_size_to_bytes(block_size_fld);
->> +	unsigned long count = RMI_DONATE_COUNT(donatereq);
->> +	unsigned long state = RMI_DONATE_STATE(donatereq);
->> +	unsigned long found = 0;
->> +	unsigned long donated_granules;
->> +	unsigned long granules_per_block = block_size >> PAGE_SHIFT;
->> +	unsigned long consumed_blocks;
->> +	int addr_list_start = sro->addr_count;
->> +	int ret, i;
-> 
-> [...]
-> 
->> +	for (int i = 0, src = addr_list_start + consumed_blocks;
-> 
-> Nit: we have 'int ret, i' earlier already, so you can drop the 'int'
-> here.
-> 
-> [...]
-> 
->> +/*
->> + * rmi_sro_execute: Execute an RMI command that is Stateful but not memory
->> + * tranfserring. Takes regs, filled with the FIDs and the arguments in place.
->> + *
->> + * Returns :
->> + *  -ECANCELLED - If the operation had to be aborted and SRO was cancellable.
-> 
-> Nit: -ECANCELED.
+> +
+>  	/* Non-hierarchical part of AArch64.S1DirectBasePermissions() */
+>  	if (wi->regime != TR_EL2) {
+> -		switch (FIELD_GET(PTE_USER | PTE_RDONLY, wr->desc)) {
+> +		switch (ap) {
+>  		case 0b00:
+>  			wr->pr = wr->pw = true;
+>  			wr->ur = wr->uw = false;
+> @@ -1105,7 +1117,7 @@ static void compute_s1_direct_permissions(struct kvm_vcpu *vcpu,
+>  	} else {
+>  		wr->ur = wr->uw = wr->ux = false;
+>  
+> -		if (!(wr->desc & PTE_RDONLY)) {
+> +		if (!(ap & BIT(1))) {
+>  			wr->pr = wr->pw = true;
+>  		} else {
+>  			wr->pr = true;
+> -- 
+> 2.47.3
 > 
 
-Ack
+The rest is just using 'ap' as a proxy for wr->desc.AP[], which mimics 
+AArch64.S1DirectBasePermissions() as it should be.
 
->> + *  Otherwise, returns the result of the RMI command.
->> + */
->> +long rmi_sro_execute(struct arm_smccc_1_2_regs *regs)
->> +{
->> +	bool cancelled = false;
->> +	unsigned long sro_handle = regs->a1;
->> +
->> +	rmi_smccc_invoke(regs);
->> +
->> +	sro_handle = regs->a1;
-> 
-> Nit: drop the first initialisation maybe?
+So, FWIW:
+Reviewed-by: Leonardo Bras <leo.bras@arm.com>
 
-Of course, I will do that. Thanks for spotting.
-
-Suzuki
-
-> 
-
+Thanks!
+Leo
