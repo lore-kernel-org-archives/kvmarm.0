@@ -1,153 +1,185 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110F84BB5C5;
-	Fri, 25 Sep 2026 14:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4BA381AF0
+	for <kvmarm@lists.linux.dev>; Fri, 25 Sep 2026 15:02:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790348326; cv=none; b=swH6E+UO/c0FI1wDBh2jAX3h5tEWhICCzQpkAmjzN63CVFVWsUjxQBYCtcNPFtainwwy205eO2R5FOD39wTfkKyIOGuSjqjjSLMs2RxLP0iGWtdLjvKTqhqWBxbqg540J0Yn7vpkAAX0kGYH+argsVdJVQg6M6G8o0WdRWft57Y=
+	t=1790348564; cv=none; b=LyqpvchABEMERB50FgVCwL2IpS7f1TJ6DziLZv9D+QsPR6DMAKo7AQ5AiiEe6bnLOqFkRZ25rsWe+RxItS78Rqvpuxjfy/ZInyzuSVac1WETdnToFFOpPSPFuYi43DnFpxWJMqI6MRUUZXEvif//VRn3q1vWy7Oz3PqOEVk0cto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790348326; c=relaxed/simple;
-	bh=8nACMrCWfwp+pDLedguEFOlRFkQtwRvV070jPpnQZcI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C+MxyXYIKLGJS0n5ifPMYKG/pERIjAK+qt96sne/HENJTbkJkZO7RNR0rCVK7KEsp5Hht6s6FlNwlkVGuvqydQnFARClUDCHOEroDtib1ec1dpVPNpvvnxsH6iPnvrkiWZcBChNIR3+QM1yI1E5ru005R5E1YtI/Fq7JfLYy6cg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GLQX+T31; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790348564; c=relaxed/simple;
+	bh=rTrm4vM2zJ0jSJraYrYS+k71Y/VdjxgDn0ElPc4aI1I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M6efPLz/89q3TOKSFS6F2kp6zs695OM8gAsmBdKoexSp2Z0x6Xqb/Wde+pqqkjPsvNGp7bX4YJaDusasJkVcM+rebp5kkm27wZGzf7ni82Yuy6eZg49eQdAOs+rapy99R/Efwg2vtjtUKBh6PSJc391M46serdOi7QsjTQwzMo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wBEYOrPQ; arc=none smtp.client-ip=74.125.225.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GLQX+T31"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 334E91F000FF;
-	Fri, 25 Sep 2026 14:58:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790348314;
-	bh=8nMofoqgrFqPqCj7VNyHsWfuBiFqNeg+a4J6+g7v+aE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=GLQX+T31c4UsJlZtCr8REqO8vk0SkFPyCmn/7l35tabF4Uum3jA83EUjh4WNYCvjL
-	 rrClSmbkpoIQ8utrVflFSsG6pBGPOteHQelXisB2dBNBSGdatDU1zK5sLL3j0IgerE
-	 MHXcM8MLur1n1ePSe3QhyzSHFEtdafoF/iXJuS7SfJFsMR8V08Ly+0OgyAYd2CWDCw
-	 eZmUPtzY1eN1rLnEv2/uzkymlQoKKSzJiMwBR6m0ySODliT1e0p2LlEX/uJNk2OSx3
-	 61XPjUZT9RJ9KecmS2ZdzHZDV85Q1CeP4Sm052YuXDNbiyYv7IZ5DrgeaIDmH/JdBg
-	 dV98Y6ky1Hm4Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xA7Nf-0000000DUVE-2g6D;
-	Fri, 25 Sep 2026 14:58:32 +0000
-Date: Fri, 25 Sep 2026 16:01:35 +0100
-Message-ID: <8733ux4bow.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Quentin Perret <qperret@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 2/4] KVM: arm64: Clear HCR_EL2.RW for 32-bit non-protected vCPUs
-In-Reply-To: <20260925090619.852995-3-fuad.tabba@linux.dev>
-References: <20260925090619.852995-1-fuad.tabba@linux.dev>
-	<20260925090619.852995-3-fuad.tabba@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wBEYOrPQ"
+Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49e6598dd44so6243235e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 25 Sep 2026 08:02:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790348555; x=1790953355; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=uQbHVyvOfJT59Z1tjcStlzFu/GfhyqjlrHuEPmE7uTg=;
+        b=wBEYOrPQy00fDiMal7JEh1zzSUvu2WdYAYTmza1eAWYSwsXbLuev0yKdp09WKGn2fp
+         OO41nAtPzVsd7Nj9na+R6sXdEHLCxVjUtnwhLNr3De6qR/FkiXO7nLKAiNSSRJ0DL32Z
+         yxd/LVNRfr6pXgE+DhB/NUUZQ1oaqic9yRCN3r1Nj5rzLM2ovo8M+EHuDvDN72PFlt1h
+         iO2AfatHlREn26GsQRJTPuEvmL+7TFNoPkEMNAUupI9H8GFq7FF9moPAkcU09ophzL0C
+         UlQPJsbQd//ajYqBGWKs2JkJCfA/U21N82laO+2uF9u9KZoPqG3t8uE+UJ0cCKeGnqyz
+         R5HQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790348555; x=1790953355;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=uQbHVyvOfJT59Z1tjcStlzFu/GfhyqjlrHuEPmE7uTg=;
+        b=QiihbHPlrP1qDrQq3j0jpw82EYh3qlqk357M6zxu3V2k68xD5zpo/Whl7WzOwf5IPP
+         Ob3aViy6+a7pmR1Q8AZ+ES0FleZLa4NVWdr60WV05soZa3pjZhpkNTswX6CyNgqIgwEl
+         KXVzLCbyJW4JqeRPSFeFsHiLTYMryar4KE2OD9XZkgBy1Oh+I60tFl07x5XLG3SybTnq
+         xB99g/243gEb0+qlDcDXD4NkisGPhkV1i9DdaKuu6/uRu4/GakDxKehCu1lxIe7HlL66
+         eP4XjgNMQCSnoFqnOnrn7asBVQvXL/x9U2BDwSnJtXjjjlbvUCRpdBHQtGfEoPgFyphN
+         S4Tw==
+X-Forwarded-Encrypted: i=1; AKwUvBwGJiTs2RYfcsgYlAWhi/7Par9hMlTqwbYNjJfE3DIbOaoSGi9WnHJcaM6u1mYC5BnsxphPMIc=@lists.linux.dev
+X-Gm-Message-State: AFuF++l2lK+7Y9fsBgxhg7PV6i4Ho1kJTVVzQDSgt8t2KRj5gnTNye5g
+	629BxPZbbKSl+M0Ydw3aLzcraoB008ygLe/XLy3nm6JSTPzy5HcXWSbX6TEh2wqa7g==
+X-Gm-Gg: AYBFou0+v4rfYuavcONY9HbrNfc0hjZTM5pmlDcpxhI0w90pzgoHZ09P4bRexa4KvTB
+	fYVWlskzRI6wbNzFpvcIaG2eb52rm1pR4Fs7L8fYp9rdg3Mk9vZwAV2og91rMXhkq2LEkX3VGCf
+	5Ea1nn7xGhreWIuyV1XYXpl/IUiQQLcE76LoAbhdA4g/KywSUUT9EmJiAhr2S/+ByYbQ9ctP5TT
+	jRv+E337yHaDUWL1FCpxaOZB7PrFGsBSRx7a5fmQT/L8On82DzuQzr1PK8LJ5FJfoUu5eylWbRx
+	mn5F/Cn8WbpUOS2DUSwx7Rldka9DffJePDzmRqg4+nku064Gp9i3hr/1MUCipcw9L9NhtCU4wy/
+	JLIY+5w9rMH2wOiZp/aZTTSmS507NRdWZwOafFPeBSaJJon0RMgIvJDeieg9m8Icm2NJ4+Ny83R
+	oFj/YLmslBuCW1MHN4ZmDnGKCEqNASGDjMhxEfjny14mn0tI2GOrxDmWCOxlfoJy5qynz4QjgR4
+	WUyTLzhLzV2/xa9l/pBxwjvZ1wwzxSTn8x1T9S2Efg=
+X-Received: by 2002:a05:600c:4594:b0:49e:6249:268b with SMTP id 5b1f17b1804b1-49fe6707f69mr117966225e9.32.1790348554298;
+        Fri, 25 Sep 2026 08:02:34 -0700 (PDT)
+Received: from google.com (135.91.155.104.bc.googleusercontent.com. [104.155.91.135])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49ff06bdef2sm66540075e9.11.2026.09.25.08.02.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Sep 2026 08:02:31 -0700 (PDT)
+Date: Fri, 25 Sep 2026 16:02:27 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com,
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com,
+	fuad.tabba@linux.dev, qperret@google.com, weilin.chang@arm.com,
+	Keir Fraser <keirf@google.com>
+Subject: Re: [PATCH v2 01/22] KVM: arm64: Prefault host stage-2 entries on
+ block split
+Message-ID: <araNAy968NbQkfer@google.com>
+References: <20260911135053.146435-1-vdonnefort@google.com>
+ <20260911135053.146435-2-vdonnefort@google.com>
+ <arVgKRqRRon00wTD@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seiden@linux.ibm.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, qperret@google.com, vdonnefort@google.com, tabba@google.com, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <arVgKRqRRon00wTD@google.com>
 
-On Fri, 25 Sep 2026 10:06:17 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
+On Thu, Sep 24, 2026 at 05:38:49PM +0000, Mostafa Saleh wrote:
+> On Fri, Sep 11, 2026 at 02:50:32PM +0100, 'Vincent Donnefort' via kernel-team wrote:
+> > From: Keir Fraser <keirf@google.com>
+> > 
+> > For the host stage-2 that is idmap, we can avoid lazy-mapping on block
+> > splitting by propagating existing valid mappings to neighbouring entries
+> > of the new table.
+> > 
+> > Signed-off-by: Keir Fraser <keirf@google.com>
+> > Co-developed-by: Quentin Perret <qperret@google.com>
+> > Signed-off-by: Quentin Perret <qperret@google.com>
+> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/pgtable.c | 32 ++++++++++++++++++++++++++++++++
+> >  1 file changed, 32 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index b74dd5ce1efd..34f78a58cded 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -1030,10 +1030,39 @@ static int stage2_map_walk_table_pre(const struct kvm_pgtable_visit_ctx *ctx,
+> >  	return 0;
+> >  }
+> >  
+> > +static void stage2_map_prefault_idmap(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t *ptep)
+> > +{
+> > +	kvm_pte_t block_pte = ctx->old;
+> > +	u64 pa;
+> > +	int i;
+> > +
+> > +	if (!kvm_pte_valid(block_pte))
+> > +		return;
+> > +
+> > +	pa = ALIGN_DOWN(ctx->addr, kvm_granule_size(ctx->level));
+> > +	for (i = 0; i < PTRS_PER_PTE; ++i, ++ptep, pa += kvm_granule_size(ctx->level + 1)) {
+> > +		kvm_pte_t pte = kvm_init_valid_leaf_pte(pa, block_pte, ctx->level + 1);
+> > +
+> > +		/*
+> > +		 * Skip ptes in the range being modified by the caller if we're
+> > +		 * installing last level entries. Otherwise, we need to
+> > +		 * temporarily put in a valid mapping to make sure the
+> > +		 * prefaulting logic is triggered on the next
+> > +		 * stage2_map_walk_leaf(). This adds an unnecessary TLBI as
+> > +		 * we'll presumably re-break the freshly installed block, but
+> > +		 * that should happen very infrequently.
+> > +		 */
+> > +		if ((ctx->level < (KVM_PGTABLE_LAST_LEVEL - 1)) ||
+> > +		    (pa < ctx->addr) || (pa >= ctx->end))
+> > +			*ptep = pte;
 > 
-> In pKVM, KVM_RUN on a vCPU created with KVM_ARM_VCPU_EL1_32BIT fails
-> with KVM_EXIT_FAIL_ENTRY. pkvm_vcpu_reset_hcr(), pKVM's EL2 counterpart
-> of vcpu_set_hcr(), never clears HCR_EL2.RW, so the first ERET into the
-> vCPU is an illegal exception return. Protected VMs are AArch64-only, so
-> only non-protected VMs are affected.
-> 
-> Clear RW for 32-bit vCPUs. The vCPU's features come from the host, and
-> on a CPU without AArch32 EL1 a cleared RW would make EL2 switch
-> registers that are UNDEFINED there. Clear it only when the system has
-> AArch32 EL1, the same check system_supported_vcpu_features() makes on
-> the host.
+> Do we need now to call get_page() on the table as we are installing a
+> new PTE?
 
-Apologies from repainting the proverbial bike shed, but I find the way
-the above is written very hard to understand, because you are
-describing minute aspects of the code without giving the big picture
-upfront.
+Ouch, I really start mixing android branches with upstream... I thought this
+wasn't an issue because the host stage-2 doesn't refcount valid PTE... but this
+is only true on Android branches, not in the current upstream...
 
-I'd rather see something like:
-
-"pKVM maintains its own copy of a per-vcpu HCR_EL2. On initialisation
-of the hypervisor's private vcpu structure, HCR_EL2.RW is set to 1
-unconditionally.  However, nothing forbids userspace to create a
-non-protected, AArch32 guest. Since HCR_EL2.RW==1, entering the guest
-fails with an IL exception.
-
-Make sure HCR_EL2.RW is cleared when the vcpu is AArch32 at EL1, and
-that the HW actually supports this."
-
-which describes the problem without the reader having to dig into
-code. It makes matching the description and the code very easy. At
-least for me, YMMV...
+So yes, you are right (and so were Wei-Lin who reported it as well on v1), I
+should move the if (counted) get_page() from PATCH2 into PATCH1.
 
 > 
-> Fixes: b56680de9c648 ("KVM: arm64: Initialize trap register values in hyp in pKVM")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->  arch/arm64/kvm/hyp/nvhe/pkvm.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
+> Also, I think we need a WRITE_ONCE() for the PTE write.
+
+This one though I am pretty sure it isn't needed because of the
+smp_store_release() when replacing the PTE with a table.
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 459bd9eb7e4bc..affc9595fda20 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -54,6 +54,14 @@ static void pkvm_vcpu_reset_hcr(struct kvm_vcpu *vcpu)
->  	else
->  		vcpu->arch.hcr_el2 |= HCR_TID2;
->  
-> +	/*
-> +	 * At EL2, vcpu_el1_is_32bit() reads HCR_EL2.RW, and EL2 switches the
-> +	 * *32_EL2 registers when it returns true; they're UNDEFINED without AArch32 EL1.
-> +	 */
-
-That's another example: yes, this is all true. But how relevant is it?
-Are you clearing RW just for the sake of vcpu_el1_is_32bit() to work
-and prevent an UNDEF? No. It is so that 32bit guests do work. The
-above really is only paraphrasing the ARM ARM.
-
-What you don't describe is that if ARM64_HAS_32BIT_EL1 is not
-implemented, you let the vcpu walk to the cliff with RW==1, and rely
-on the CPU generating an IL exception. For me, this is the important
-piece of information that needs to be captured.
-
-> +	if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT) &&
-> +	    cpus_have_final_cap(ARM64_HAS_32BIT_EL1))
-> +		vcpu->arch.hcr_el2 &= ~HCR_RW;
-> +
->  	if (vcpu_has_ptrauth(vcpu))
->  		vcpu->arch.hcr_el2 |= (HCR_API | HCR_APK);
->  
-
-Other than that, the patch looks great! :)
-
-Thanks,
-
-	M.
+> Thanks,
+> Mostafa
+> 
+> > +	}
+> > +}
+> > +
+> >  static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+> >  				struct stage2_map_data *data)
+> >  {
+> >  	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> > +	struct kvm_pgtable *pgt = data->mmu->pgt;
+> >  	kvm_pte_t *childp, new;
+> >  	int ret;
+> >  
+> > @@ -1051,6 +1080,9 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+> >  	if (!childp)
+> >  		return -ENOMEM;
+> >  
+> > +	if (pgt->flags & KVM_PGTABLE_S2_IDMAP)
+> > +		stage2_map_prefault_idmap(ctx, childp);
+> > +
+> >  	if (!stage2_try_break_pte(ctx, data->mmu)) {
+> >  		mm_ops->put_page(childp);
+> >  		return -EAGAIN;
+> > -- 
+> > 2.55.0.1007.g17ff1f9808-goog
+> > 
+> > To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
+> > 
 
 -- 
-Jazz isn't dead. It just smells funny.
+Vincent
