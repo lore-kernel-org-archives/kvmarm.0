@@ -1,285 +1,271 @@
-Received: from mta0.migadu.com (out-20.mta0.migadu.com [91.218.175.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1E047D93E
-	for <kvmarm@lists.linux.dev>; Fri, 25 Sep 2026 09:06:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B473C47C10B;
+	Fri, 25 Sep 2026 09:13:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790327187; cv=none; b=keB/Jb5JhCxVHLhxAe2/R6qFhsTi/6RwDAx2r6li54acPQJ4wyhb5h5uD6FpRO1nfHV+XjrhGlRTXKqmTLVZiEecxsZw14Gojn4zTC3ZrvrTONIsP2y4LWpS93zkOFRzuQVLaFUmRPgr4OgsbxmxjjfNnFfsKINLYyo9BjW5aLk=
+	t=1790327603; cv=none; b=ufAi36bI2WKzbCs9M2pYVB9XZy3C7k5gRxmjHgMUAZoiCxXM0/6R84sYnllDGSUq5TzZi3ow5dZK4TSlWNjJdnC5Mk0SL5fVJ0k7VEglVHEt6Vr1ehWFEe8TrWo/+hXFjYHiuxS8Ap3HRe69asyX3WA1BC44T6EPC8mS3N3Muuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790327187; c=relaxed/simple;
-	bh=O1l056xqARvD1RNEki93f2/Djl/k6smWQ7BMr3/NITQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sqwWAfg49JcwMtknnjTKceFmhV6lTyRMeHLsJ0H/bn3qL79s1o13HFouVbAPrKOOOiMHvi94bcU+o15ZLI8ETlJeGhyeeQafqY2uy5eORbHYcPBRYZqZghltEPKVkHQJX45b3KoMeLECtYWWbDUaawVbzYYPcz1mz3dAxh1mQmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fF3pBgj4; arc=none smtp.client-ip=91.218.175.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1790327603; c=relaxed/simple;
+	bh=Tk8lnLCIykMhwm4FM62K4d7d7QJOAD1dpQSl1O/g2h4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BMuTZigNeyXY/MMRlXWwpVhOMZOOi8C7EA4/h615K5aeMjPdPGqKPC+T/5cryzp/VTJ9d0VGzrgfBuMgfLPrLYRWHn9B5xbeyD+F14wIWdlIXLTBnsVxYVZFMjgzHcjBtbeSH9e4cj/51QQprRD4r4+8O+qccaR/RWw2zv10Pbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K2qi0Whp; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fF3pBgj4"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=O1l056xqARvD1RNEki93f2/Djl/k6smWQ7BMr3/NITQ=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790327182; v=1; x=1790931982;
- b=fF3pBgj42Xhlj6IfA7CRjQ8DQQdKHVw7SSdDPANGQ0Cuivf+23CZbbGnjWVdYGsiSj6iwteo
- EfYb5s9qzW+bfpYKi/digz6L0Kg8PpcnT7dNJWRlDgu/yJzesf0Y3BQQbd7jgSM+nYdWFfMDueg
- AUUsUvzLkqp7+Agpb/b7sOFs=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 21230619e030cab0;
-	Fri, 25 Sep 2026 09:06:22 +0000
-X-Mizu-Trace-ID: 21230619e030cab0
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Quentin Perret <qperret@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v1 4/4] KVM: arm64: selftests: Check a feature hidden in an ID register is UNDEF
-Date: Fri, 25 Sep 2026 10:06:19 +0100
-Message-Id: <20260925090619.852995-5-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260925090619.852995-1-fuad.tabba@linux.dev>
-References: <20260925090619.852995-1-fuad.tabba@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K2qi0Whp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00A0E1F000FF;
+	Fri, 25 Sep 2026 09:12:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790327601;
+	bh=yfSL2ku4OKsR1ZwNLU9aq+Cv4BSlDAV3gm6yCuANvXg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=K2qi0Whp5/6TRdhA6MhlGYRilQhTQ8jPlG08QvTUUmQwkWOHWgmSx5AdhFTFi0qw/
+	 r4+3OumzOouGc7txXhbbk80xasHy05dho7/yw8n5cfGkWIhweFLORuSQD6wUTgF3bF
+	 dlK10/x8cBD+DlIEYdpY/JpYJifQA5N4twHg7jDXzl6B1XyEXIXzNDQx16+MJsnNtN
+	 sTXe6Jh9EmnWLdP4R1YQtEnnOP8lnDSORnscuubhZoG/xGcNI3ROCCX9s0YjPIJIxI
+	 MdK5fq25MLwiukRwd6j6BdAO4Z4mjaXg/lCXJQXPIaGguKLjAmtHiggDOa9mUzFR4Z
+	 ur0MJU3/gDHOA==
+Date: Fri, 25 Sep 2026 10:12:50 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: "Liam R. Howlett" <liam@infradead.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	Vlastimil Babka <vbabka@kernel.org>, Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
+	David Hildenbrand <david@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
+	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
+	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
+	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
+	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <mkp@kernel.org>, 
+	Jaya Kumar <jayalk@intworks.biz>, Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, 
+	Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
+	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
+	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
+	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
+	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
+	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
+	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev
+Subject: Re: [PATCH v3 01/40] mm/vma: fix mmap_prepare file handling, remove
+ file_doesnt_need_get
+Message-ID: <arY3xqkPCgZj3IVD@gremlin>
+References: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org>
+ <20260917-b4-mmap-prepare-vma-flag-sanify-v3-1-4583d8a23bca@kernel.org>
+ <qpkcjtl5jbip46zxcpyogsk4phmhetfvrvgftxhsxlbxjhucnn@h3a64dfoxcmj>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <qpkcjtl5jbip46zxcpyogsk4phmhetfvrvgftxhsxlbxjhucnn@h3a64dfoxcmj>
 
-Userspace can hide a feature from a guest by clearing its field in a
-writable ID register, and KVM then makes the feature's instructions
-UNDEFINED in the guest by trapping or disabling them. No selftest checks
-that. In pKVM, a hidden TLBI OS executed on a CPU without FGT until
-"KVM: arm64: Use the host's HCR_EL2 for non-protected VMs in pKVM".
+(forgive my possibly semi-broken efforts to trim the mail)
 
-Add a test that runs the instruction of each of TLBI OS, MOPS, TCR2_EL1
-and FPMR once with its field as advertised and once with it cleared, and
-expects an UNDEF only when cleared. A feature the vCPU doesn't advertise
-is skipped, as is hidden TLBI OS on a CPU with neither FGT nor
-FEAT_EVT2, where KVM can't trap it.
+On Thu, Sep 24, 2026 at 03:00:44PM -0400, Liam R. Howlett wrote:
+> On 26/09/17 05:22PM, Lorenzo Stoakes (ARM) wrote:
 
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/arm64/hidden_features.c     | 184 ++++++++++++++++++
- 2 files changed, 185 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/hidden_features.c
+> > diff --git a/mm/internal.h b/mm/internal.h
+> > index 0dca33db068f..fe576d468af4 100644
+> > --- a/mm/internal.h
+> > +++ b/mm/internal.h
+> > @@ -7,6 +7,7 @@
+> >  #ifndef __MM_INTERNAL_H
+> >  #define __MM_INTERNAL_H
+> >
+> > +#include <linux/file.h>
+> >  #include <linux/fs.h>
+> >  #include <linux/khugepaged.h>
+> >  #include <linux/mm.h>
+> > diff --git a/mm/util.c b/mm/util.c
+> > index bf0513d1d3d0..016932780925 100644
+> > --- a/mm/util.c
+> > +++ b/mm/util.c
+> > @@ -1228,8 +1228,11 @@ int __compat_vma_mmap(struct vm_area_desc *desc,
+> >
+> >  	/* Perform any preparatory tasks for mmap action. */
+> >  	err = mmap_action_prepare(desc);
+> > -	if (err)
+> > +	if (err) {
+> > +		if (desc->vm_file != vma->vm_file)
+> > +			fput(desc->vm_file);
+> >  		return err;
+> > +	}
+> >  	/* Update the VMA from the descriptor. */
+> >  	compat_set_vma_from_desc(vma, desc);
+> >  	/* Complete any specified mmap actions. */
+> > diff --git a/mm/vma.c b/mm/vma.c
+> > index 55917d097933..fa784f069da4 100644
+> > --- a/mm/vma.c
+> > +++ b/mm/vma.c
+> > @@ -24,7 +24,8 @@ struct mmap_state {
+> >  		vm_flags_t vm_flags;
+> >  		vma_flags_t vma_flags;
+> >  	};
+> > -	struct file *file;
+> > +	struct file *file;	/* mmap()-specified file. */
+>
+> I guess renaming file to mmaped_file would be a lot more changes.
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 96bab7002d39e..864fdca7f362e 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -194,6 +194,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_v5
- TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
- TEST_GEN_PROGS_arm64 += arm64/no-vgic
- TEST_GEN_PROGS_arm64 += arm64/idreg-idst
-+TEST_GEN_PROGS_arm64 += arm64/hidden_features
- TEST_GEN_PROGS_arm64 += arm64/kvm-uuid
- TEST_GEN_PROGS_arm64 += access_tracking_perf_test
- TEST_GEN_PROGS_arm64 += arch_timer
-diff --git a/tools/testing/selftests/kvm/arm64/hidden_features.c b/tools/testing/selftests/kvm/arm64/hidden_features.c
-new file mode 100644
-index 0000000000000..194d746e7605e
---- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/hidden_features.c
-@@ -0,0 +1,184 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * hidden_features - Check that a feature's instruction runs in the guest when
-+ * its ID register field is advertised, and is UNDEFINED when userspace clears
-+ * the field.
-+ *
-+ * Copyright (c) 2026 Google LLC
-+ * Author: Fuad Tabba <fuad.tabba@linux.dev>
-+ */
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+
-+static volatile bool undef;
-+
-+static void guest_tlbi_os(void)
-+{
-+	/* tlbi vmalle1os */
-+	asm volatile("sys #0, c8, c1, #0\n\tdsb ish\n\tisb" ::: "memory");
-+}
-+
-+static void guest_mops(void)
-+{
-+	register u64 *d asm("x0");
-+	register u64 n asm("x1");
-+	register u64 s asm("x2");
-+	u64 buf[8];
-+
-+	d = buf;
-+	n = sizeof(buf);
-+	s = 0;
-+	/* setp [x0]!, x1!, x2; setm; sete */
-+	asm volatile(".inst 0x19c20420\n\t.inst 0x19c24420\n\t.inst 0x19c28420"
-+		     : "+r"(d), "+r"(n) : "r"(s) : "cc", "memory");
-+}
-+
-+static void guest_tcr2(void)
-+{
-+	read_sysreg_s(SYS_TCR2_EL1);
-+}
-+
-+static void guest_fpmr(void)
-+{
-+	read_sysreg_s(SYS_FPMR);
-+}
-+
-+struct feature {
-+	const char *name;
-+	u64 id_reg;
-+	u64 mask;
-+	u8 shift;
-+	u64 min;
-+	void (*insn)(void);
-+	bool (*trappable)(struct kvm_vcpu *vcpu);
-+};
-+
-+/* Without FGT, KVM traps a hidden TLBI OS only through HCR_EL2.TTLBOS (FEAT_EVT2). */
-+static bool tlbi_os_trappable(struct kvm_vcpu *vcpu)
-+{
-+	u64 mmfr0 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR0_EL1));
-+	u64 mmfr2 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR2_EL1));
-+
-+	return SYS_FIELD_GET(ID_AA64MMFR0_EL1, FGT, mmfr0) >= ID_AA64MMFR0_EL1_FGT_IMP ||
-+	       SYS_FIELD_GET(ID_AA64MMFR2_EL1, EVT, mmfr2) >= ID_AA64MMFR2_EL1_EVT_TTLBxS;
-+}
-+
-+#define FEATURE(n, reg, field, min_val, fn, trap)		\
-+{								\
-+	.name		= n,					\
-+	.id_reg		= SYS_##reg,				\
-+	.mask		= reg##_##field##_MASK,			\
-+	.shift		= reg##_##field##_SHIFT,		\
-+	.min		= reg##_##field##_##min_val,		\
-+	.insn		= fn,					\
-+	.trappable	= trap,					\
-+}
-+
-+static const struct feature features[] = {
-+	FEATURE("TLBI OS", ID_AA64ISAR0_EL1, TLB, OS, guest_tlbi_os, tlbi_os_trappable),
-+	FEATURE("MOPS", ID_AA64ISAR2_EL1, MOPS, IMP, guest_mops, NULL),
-+	FEATURE("TCR2_EL1", ID_AA64MMFR3_EL1, TCRX, IMP, guest_tcr2, NULL),
-+	FEATURE("FPMR", ID_AA64PFR2_EL1, FPMR, IMP, guest_fpmr, NULL),
-+};
-+
-+static void guest_code(const struct feature *feat)
-+{
-+	undef = false;
-+	feat->insn();
-+	GUEST_SYNC(undef);
-+	GUEST_DONE();
-+}
-+
-+static void guest_undef_handler(struct ex_regs *regs)
-+{
-+	undef = true;
-+	regs->pc += 4;
-+}
-+
-+static bool run(const struct feature *feat, bool hide)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+	bool got = false;
-+	u64 val;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, (void *)guest_code);
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vcpu);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ESR_ELx_EC_UNKNOWN, guest_undef_handler);
-+	vcpu_args_set(vcpu, 1, feat);
-+
-+	if (hide) {
-+		val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(feat->id_reg));
-+		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(feat->id_reg), val & ~feat->mask);
-+	}
-+
-+	for (;;) {
-+		vcpu_run(vcpu);
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_SYNC:
-+			got = uc.args[1];
-+			break;
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		case UCALL_DONE:
-+			kvm_vm_free(vm);
-+			return got;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	}
-+}
-+
-+static void probe_feature(const struct feature *feat, bool *present, bool *trappable)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	u64 val;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, NULL);
-+	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(feat->id_reg));
-+	*present = ((val & feat->mask) >> feat->shift) >= feat->min;
-+	*trappable = !feat->trappable || feat->trappable(vcpu);
-+	kvm_vm_free(vm);
-+}
-+
-+int main(void)
-+{
-+	const struct feature *feat;
-+	bool present, trappable;
-+	int i;
-+
-+	test_disable_default_vgic();
-+
-+	ksft_print_header();
-+	ksft_set_plan(ARRAY_SIZE(features) * 2);
-+
-+	for (i = 0; i < ARRAY_SIZE(features); i++) {
-+		feat = &features[i];
-+
-+		probe_feature(feat, &present, &trappable);
-+		if (!present) {
-+			ksft_test_result_skip("%s advertised, not supported\n", feat->name);
-+			ksft_test_result_skip("%s hidden, not supported\n", feat->name);
-+			continue;
-+		}
-+
-+		if (run(feat, false))
-+			ksft_test_result_fail("%s advertised, UNDEF\n", feat->name);
-+		else
-+			ksft_test_result_pass("%s advertised\n", feat->name);
-+
-+		if (!trappable)
-+			ksft_test_result_skip("%s hidden, not trappable\n", feat->name);
-+		else if (run(feat, true))
-+			ksft_test_result_pass("%s hidden\n", feat->name);
-+		else
-+			ksft_test_result_fail("%s hidden, no UNDEF\n", feat->name);
-+	}
-+
-+	ksft_finished();
-+}
--- 
-2.39.5
+Yeah :) and want to keep things sync'd with vm_area_desc.
 
+Can always obviously follow up later with renames sync'd across both.
+
+<snip>
+
+> >  static int __mmap_new_file_vma(struct mmap_state *map,
+> >  			       struct vm_area_struct *vma)
+> > @@ -2593,20 +2597,23 @@ static int __mmap_new_file_vma(struct mmap_state *map,
+> >  	struct vma_iterator *vmi = map->vmi;
+> >  	int error;
+> >
+> > -	vma->vm_file = map->file;
+> > -	if (!map->file_doesnt_need_get)
+> > -		get_file(map->file);
+> > +	vma->vm_file = map->vm_file;
+> > +	if (map_same_file(map))
+> > +		get_file(map->vm_file);
+> >
+> > -	if (!map->file->f_op->mmap)
+> > +	if (!map->vm_file->f_op->mmap)
+> >  		return 0;
+> >
+> >  	error = mmap_file(vma->vm_file, vma);
+> > +	map->vm_file = vma->vm_file;
+> > +
+>
+> You set vma->vm_file to map->vm_file unconditionally above, is this
+> necessary?
+
+Yeah, because the mmap hook can change vma->vm_file, and this is necessary
+for the correct file refcount accounting.
+
+The accounting is actually very tricky, because the file that was passed
+via mmap() is fput() after the operation is done but if its swapped then
+you have to make sure everything works out correctly on both error and
+success paths.
+
+Which this patch does (with a lot of AI review checking to make sure it's
+not broken! FWIW)
+
+<snip>
+
+> > @@ -2688,7 +2694,7 @@ static int __mmap_new_vma(struct mmap_state *map, struct vm_area_struct **vmap,
+> >  	}
+> >
+> >  	/* Invoke callbacks. */
+> > -	if (map->file)
+> > +	if (map->vm_file)
+> >  		error = __mmap_new_file_vma(map, vma);
+> >  	else if (!is_anon)
+> >  		error = shmem_zero_setup(vma);
+> > @@ -2797,11 +2803,15 @@ static int call_mmap_prepare(struct mmap_state *map,
+> >  	int err;
+> >
+> >  	/* Invoke the hook. */
+> > -	err = vfs_mmap_prepare(map->file, desc);
+> > +	err = vfs_mmap_prepare(map->vm_file, desc);
+> >  	if (err)
+> >  		return err;
+> >
+> > -	/* It's invalid for mmap_preprare hooks to clear vm_ops. */
+> > +	/* Update first so file refcount tracked correctly. */
+> > +	if (desc->vm_file != map->vm_file)
+> > +		map->vm_file = desc->vm_file;
+> > +
+> > +	/* It's invalid for mmap_prepare hooks to clear vm_ops. */
+>
+> The less rare of prepare ;)
+
+Haha 'It's a rare prepare that would dare' is what I'd LIKE to put here as a
+comment but probably can't :P
+
+<snip>
+
+> > +static void put_map(struct mmap_state *map)
+>
+>
+> I like the put_map_file() instead, like Suren suggested.. but maybe
+> put_map_vm_file(), especially since it could be read as put to the file
+> pointer instead of vm_file.
+
+Ack, and of course to bikeshed it a bit :P maybe map_put_vm_file() so the
+'put vm_file' bit is clearer?
+
+<snip>
+
+> > diff --git a/mm/vma.h b/mm/vma.h
+> > index e97bd2dfa786..f15faa83f3d6 100644
+> > --- a/mm/vma.h
+> > +++ b/mm/vma.h
+> > @@ -394,8 +394,10 @@ static inline void compat_set_vma_from_desc(struct vm_area_struct *vma,
+> >
+> >  	/* Mutable fields. Populated with initial state. */
+> >  	vma_set_pgoff(vma, desc->pgoff);
+> > -	if (desc->vm_file != vma->vm_file)
+> > -		vma_set_file(vma, desc->vm_file);
+> > +	if (desc->vm_file != vma->vm_file) {
+> > +		fput(vma->vm_file);
+> > +		vma->vm_file = desc->vm_file;
+>
+> This isn't going to be racy somehow, right?
+
+No, at this point the VMA write lock is held and everything should be
+pinned correctly.
+
+The vma_set_file() dance was the problematic bit here as it didn't
+handle the file refcount properly.
+
+>
+> > +	}
+> >  	vma->flags = desc->vma_flags;
+> >  	vma->vm_page_prot = desc->page_prot;
+> >
+> >
+> > --
+> > 2.55.0
+> >
+
+--
+Cheers, Lorenzo
