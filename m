@@ -1,150 +1,328 @@
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013042.outbound.protection.outlook.com [40.93.201.42])
+Received: from flow-a6-smtp.messagingengine.com (flow-a6-smtp.messagingengine.com [103.168.172.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A80C4423E98;
-	Sat, 26 Sep 2026 11:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790422397; cv=fail; b=VCue1wUDMCb1BCZYXf6JT+LGrv/NNRJRoZfSJuSXbG72tw+N/vYgC2ujuXplhNCHlCXV1Te3x8BG6rnn7dPtCczRviRNM0Qd+GQ6XAYubpdJq0QzHzkKRFUC2jZlY5Mf6PMKJn8xOJ+GvlG6JPzGFvHYRRvb+SV4zb4GWvSlH2s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790422397; c=relaxed/simple;
-	bh=aDsUTFHpgYSoGE4GMgTY2p54I1ZK7Jy6oQelWXVm60g=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=bkcAvcelj2yHWuSQboda0CLD68sfVLb7P0EYhiJCx3Unbz+xlWg3zyrIMWn0KRSKbncaG393iqTiI6iJiXVbhz1HiweqIojjthYAjpj1lPvhNfUcuJNtXNYY6wWyGM9L4GhykuZryUzYKe4YSq3jK8w5BWXvwx/3sbkyQ9wm/48=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=EpKOip7Q; arc=fail smtp.client-ip=40.93.201.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CABFD442FA4;
+	Sat, 26 Sep 2026 13:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.141
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790428043; cv=none; b=VYoW4VvXO7j67NztL6D3UOwyltAK4agptYRhCY+mHyXFvAFR2E2M7gzt3i4fQGGTeDyc6ctCJhRwR4GtdIp+u8H0LCLMuD5aCvCLgG1O9A86BxkqD7iLcymM6Cgd97tVsEPVy/L4/8rvY0N5EbYIxS2yuOGiQD4LXj9GwHh3yK0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790428043; c=relaxed/simple;
+	bh=wko7kmHoPQKSvHJFu02PIBG+REawZo/0kXd/Igypq3o=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=DRc+lXMdU7s9lC4rO4ejsTCWHb4OZ8kvngUAqATK6bLMysAKLhWEUZVeOyt9F0NdTLdo5okamWPreEk4aKGohQKFtZUN2Xi4K25J9bknOfW74aYXZpt12ghJB26L02ZC+c2oZo4sUVwd+UAO+sA38QVxOPESE8Bny9IwtCn8pVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=JY6ej2Ga; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=w0Cytzi8; arc=none smtp.client-ip=103.168.172.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="EpKOip7Q"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YV0rUbIEUKw/qSZyQi9eTkBFZDL5CI17ZFgAipwDr+2WklFWJZrB4vs4KCd9sWKybJyraZ17MO+fOcNdLkRbO8SEbhfK0Plu3Xxv9LWCfEC8GJUTghRi3MKbrzzfE0xK6o6Gg3Jdh8ABSxMRKuRStsljXCaxbVccIrFRmKluUGf4h2KVR2jgA1Tup+fFHWrcWkZ7oQuW5oXX37BpzSACflxc25tedEMbRhmMf4oa942zLhQvKUG4YPAfpBojZRSSYJPUK0y40KYHzXoNMLKvnUUsUJbXijGj9lJ0BcFh1sv8US+W1P+cCI6dH044Nw4QaQLkkc/7GGj6MnNMW0Nt/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aDsUTFHpgYSoGE4GMgTY2p54I1ZK7Jy6oQelWXVm60g=;
- b=JDv8wXpNVNIF1wq+MuI1jZqmihIVypXlrtbZ0fJR4qw79dLfoD/m7KxRM0wp0fmeYiDFF8lQh+StbfnorF8Q4eL0uZLX27y3FhxEnaCDgrdvIuZ7v9NglVTdk6d6dhifXBfg9dnSIiZwfQK4sRUBVpEvCJTd5As9Pfxg4ytAVuiKSrBEFdcLWf4khQJF9KaT7pd6BSsPkwdDmVR5+Vtf++8oR5tvRa82L1V6slCm25q+9OvDlJ/mfIjUMCi8Yjp0j0ZiO7AhncnHibvqxsHh3C5Cg6lPCo0oCqJBEt7EtPF+iDjU3N0twO0mR7pe7nVZoVm6G414X/GRcM4wOSZadw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aDsUTFHpgYSoGE4GMgTY2p54I1ZK7Jy6oQelWXVm60g=;
- b=EpKOip7QJ4ZUkYIdgernN6bbJDi7eFSgRDWfMOnHGv8DiZN8CDnS4kVfIdSHLlyRuNZs5MJRhb+4urWoxySOmVX5BF7LU8uuJM022ftwgP5Z9dGxqR38NNVjkolkgboGdv/hODsprS09k3qdjK+cckmqMJtslHlzfscx5IVyuy2hPtLdSDFxeZ/PDT/AnUMk2Kvd595HBMN5bgmfNEo44zdSIbD8gWIy8tX4qn4c/9D1tAfNO1Ri6oIh6AHgQEdTeVlksycGewrajAR4prdasafTRXM5uq4wAwg4Ishb/4fXQLRRv/ffcrwxAMZwfPSjDMfWY2sfQN0ipCD4rCKl7Q==
-Received: from SAWPR12MB999267.namprd12.prod.outlook.com
- (2603:10b6:806:55f::17) by SA3PR12MB7902.namprd12.prod.outlook.com
- (2603:10b6:806:305::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.451.18; Sat, 26 Sep
- 2026 11:33:09 +0000
-Received: from SAWPR12MB999267.namprd12.prod.outlook.com
- ([fe80::fe35:8a00:d9eb:40f9]) by SAWPR12MB999267.namprd12.prod.outlook.com
- ([fe80::fe35:8a00:d9eb:40f9%4]) with mapi id 15.21.0451.014; Sat, 26 Sep 2026
- 11:33:09 +0000
-From: Ankit Agrawal <ankita@nvidia.com>
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-CC: Alexey Kardashevskiy <aik@amd.com>, Catalin Marinas
-	<catalin.marinas@arm.com>, Dan Williams <dan.j.williams@intel.com>, Jason
- Gunthorpe <jgg@ziepe.ca>, Jonathan Cameron <jic23@kernel.org>, Marc Zyngier
-	<maz@kernel.org>, Samuel Ortiz <sameo@rivosinc.com>, Steven Price
-	<steven.price@arm.com>, Suzuki K Poulose <Suzuki.Poulose@arm.com>, Will
- Deacon <will@kernel.org>, Xu Yilun <yilun.xu@linux.intel.com>
-Subject: Re: [PATCH v5 11/15] coco: host: arm64: Connect RMM pdev streams for
- IDE devices
-Thread-Topic: [PATCH v5 11/15] coco: host: arm64: Connect RMM pdev streams for
- IDE devices
-Thread-Index: AQHdQTBNZsWT6J6bdkaQWvWFEK2da7bg0YGq
-Date: Sat, 26 Sep 2026 11:33:09 +0000
-Message-ID:
- <SAWPR12MB99926745B6BD6A876FC837D32DB08F2@SAWPR12MB999267.namprd12.prod.outlook.com>
-References: <20260910140509.868402-1-aneesh.kumar@kernel.org>
- <20260910140509.868402-12-aneesh.kumar@kernel.org>
-In-Reply-To: <20260910140509.868402-12-aneesh.kumar@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SAWPR12MB999267:EE_|SA3PR12MB7902:EE_
-x-ms-office365-filtering-correlation-id: 06b24f39-4015-4edc-9b5b-08df1bc1f112
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|7416014|1800799024|366016|23010399003|18002099003|22082099003|10067099003|38070700021|56012099006|11063799006|4143699003;
-x-microsoft-antispam-message-info:
- kRVYnv7029FVcXToD9BOXBL6dC7tbVVVibNsLU+SyNTKTkaY4haJubtaF9cXSVzRL5V08E3mEvWtmuZOuN6B+NkLDoe9YpZ+xxSRz8nsJjB5F1ml6z91FGHRTkc24nnFh0qF64oAfDmdfg7fEVyj/KL3fk7m40MI6adsEh64uWZgVF0Oq6+XEZ4F2k6awSdWH27ZoWngH137XjQql9lZD+6rHIsQ26vq3/jTE3dyUwWGQ8x5pHXxk+iZVraRKY706oWecBKRA0YEGjWnBdqnJLLSGxOxD1/1For2fbGGRpvC+MFmEj0V+XVsYWMSQrwAldmor7FgqUurcU9dH/IJCP/BD0YZE3UzwxiBUOOfRqZSyd85fVQ/mFLtZc/bz6jsO4kFfxC1UL+2+2HarMiH3PZQxQbyu4+gMZrCiNw5o/+RR5a2lp7LhCto5RzSi5LR9E6okMmmyDSdnweE5eF8a6gqXyjgzDuiKNvu+sRrJcvgjulkN77SzsIznrr3XjW+MNqNCFyRFqNF0rckyorB5S4qjZ/m9x4D5nVyp6k1+RVjkhTTs/oc1mHb1gC1LzZXFBHgsXTUg75bFJFDct1VKiyt1GpZasYmS3ZtUnma5KssCsjpslveX594sbFYZZ3YKZlWjx4k/cIQB7U15EOyMVV75YcOMEZ08w57OQRpi2IM96m/P87xBfRzIHMa2INNwDSvB1AmRy+5JIHvqn/8nCCsOsAq/hPnkrheBebCUUA=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SAWPR12MB999267.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(23010399003)(18002099003)(22082099003)(10067099003)(38070700021)(56012099006)(11063799006)(4143699003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?MHIPlg9+A29+LmfJYO5zQkgXGSDGdsg1nleRSAg+OVP656JsUzNockOE8E?=
- =?iso-8859-1?Q?HbXZ0ujP8oEPssdUl/9HTCSVo29ibbe2xsjnY/+BxHfAcL38AdIsG2PhB3?=
- =?iso-8859-1?Q?Z17758E1cV70padzmH/e4+/v4XD+SwgZacBuKqvV5B19FFjuLtKfqhESrw?=
- =?iso-8859-1?Q?7PvQ7gmZOSDLG4SeVNMPCy7X2lRU2Q5xEMw+szIPLan3jjpLPsDspB6RVR?=
- =?iso-8859-1?Q?k1fmGGJVZ6BbyV2Suxc+9h732mZoyvPLg0gw3Ge2DrvMx5Baf7IdTO/deT?=
- =?iso-8859-1?Q?MHXWLF/GDqq2Ba7tCQ4+MyPnOZyB6LcNX7ZfFGglbd9gBMQVtJ6mykpG/t?=
- =?iso-8859-1?Q?o5cR4lamlfLLAvYX9M2q73CWiuWsZilSVbosRkBA6y0oSYYIRQ/jid4kr9?=
- =?iso-8859-1?Q?GvVpAg+yxE1zP8O7P7yhWvitLcXfVUkTnX5/yoyHxkRn72o1owawQyPxU0?=
- =?iso-8859-1?Q?yHJl72al9+Xe3suVLLxsIcHl6tjpFxmqM69idr6PjsSG+Y1XtZKRjpd13u?=
- =?iso-8859-1?Q?6IUqEdvF423XkCSc8HAfxaoG4xOhTmOvIZPNyV1EdDQRufyEceTpeNZCWJ?=
- =?iso-8859-1?Q?oRx5bKLSTy+Fk/jVSvtKZ9aTTb5Sxrm2Gj8OZLcSNLHta+TR/D8QX9b+pO?=
- =?iso-8859-1?Q?Q9KSC7+nvvFumGinPQN5VrJ7qOxxnUQLOM56AjGwS8wpKnR92GzdmAcd0w?=
- =?iso-8859-1?Q?spi2rdSA3g2qxSpm2n81E+qghiqKzy++EQiexWUHUjWEWEJjPMkQlhuTjU?=
- =?iso-8859-1?Q?XeP9UukpcFaq1AnTDqFDbbwlLjrRMBLgfa7CdT1Ft2pVcZIqP2BvFvkaNN?=
- =?iso-8859-1?Q?f5twJ+hWWIgPEBgspyTKH5I4Xrzxkzt11ZCTLdD6qTcej1XnOTW0LbWOKq?=
- =?iso-8859-1?Q?UIRm1Q0NcJ5MRPE69pvviIey/QX42FHiEj1ovF5zmX5vUPKx2xEImXFtwP?=
- =?iso-8859-1?Q?hUuLB01TMC7D+8z655q0X7eXNWX9fiFltWzg68RnCY7p3I9zLcsByszf/3?=
- =?iso-8859-1?Q?A/60Cz5tJgdRstJZI8e8n5dska8Aj+f7pEly4mFZ7GdH7eSZUZ51MW0t19?=
- =?iso-8859-1?Q?I1qWE35fj+U5kLhlgSs7xDUXGYvfnIP0Qm9Jnjcai0VUbTvkiL7is1iJkC?=
- =?iso-8859-1?Q?xRR6p0EsPl2Ec18mlAG+U9Zf+1t0gJ8Zpmgu29K9L0dxYmZ0HLd7GN6G4a?=
- =?iso-8859-1?Q?hdMwhmkjp+zx67FpjZw0ZIc9a6N6yF45DWYqwJQp6PFP3ejWFJsxQ0Bbky?=
- =?iso-8859-1?Q?6Hw4lTHTScPBh/GY8/nBV+gONfpAXB386I4MUQWkBxZgMzjjX01HHjEPze?=
- =?iso-8859-1?Q?C7FLedFXvPxHGOLzljGvNOz1sd5V6IauOpX+TqfZ1eF0P9qtvkzm9zURFs?=
- =?iso-8859-1?Q?jAKFiYiNRNXPlFEzsksJdHbVke+yOUI/ioLpR5DUsea2DxYgMtW7nmwt3D?=
- =?iso-8859-1?Q?hJY2aAzAgAomXgjrqd+40P426HLsNUqpxO162Y4mxQ+OY6wzCNHXdz5En+?=
- =?iso-8859-1?Q?pMM/5vhTISgSfF9OESjiMzZQWGO7Nt94lOftcvIsTN9F6e1KQAHgU6HLPb?=
- =?iso-8859-1?Q?z4fP3eDLw67RGWA7e+D7rUUAGd68pPu+BczLC/Z7lkoV75kNwb81APqvHh?=
- =?iso-8859-1?Q?JKkfF6tGLBseHO6kOOexEaADsZJPQlwHd6l7B7X3rX16IW9Vfhi/m6CVok?=
- =?iso-8859-1?Q?IerjPBQAdfNg3/m9fX/KN43/SluQW6R6xrd8o79PugXjrFglT2laC6308n?=
- =?iso-8859-1?Q?8fDkE2Bwx4gOnKW3Vsir2RJhravMKvCZLGh9X0v+fxTjAo?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="JY6ej2Ga";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="w0Cytzi8"
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailflow.phl.internal (Postfix) with ESMTP id C06B913804B0;
+	Sat, 26 Sep 2026 09:07:16 -0400 (EDT)
+Received: from ams-imap-03 ([10.64.2.23])
+  by ams-compute-02.internal (MEProxy); Sat, 26 Sep 2026 09:07:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1790428036;
+	 x=1790435236; bh=E/0Aixz4MoGQbluxHxh98fr8xrgoH3pVa08CacPtFqs=; b=
+	JY6ej2GaMU5tFQx4P4L7xpK0hMl18csetiXOfr6O0dqdVPmShWq0JPpifDXCAXS1
+	WAsyKi8pjs7t6RWq759bpX8FHUqqgB3ix677GOzcftzN7F9N8PLmthIECeaNfa/A
+	P+2uJuuFBTTgZAQ7EbICe01O/JdcPwKinMgJvLho7IluNFj8RTtGxVmNjqIKiYpj
+	UR3vOmenvvoHhh4I2ZiYEvackkexMn3lXYx3KuwIgkOFVskKsEp+lc6xtXygxdEK
+	AjntRnwlwzXroiH47DzyeX4QFd/GKDl/9E642yS7DF2Kw0s0p/0L0Ubu+WuXNN9t
+	Dwqap0O2x84uyGP2aDdDPA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1790428036; x=
+	1790435236; bh=E/0Aixz4MoGQbluxHxh98fr8xrgoH3pVa08CacPtFqs=; b=w
+	0Cytzi8wSmj+mFhvAnjabMb+QZf7M3dVCKLEj9/Dbx70AK0JLhjm4IvD59f8aPoW
+	M3lSl46dKAne7di/wMTJ76iJeR/YN2CWmJ273SA+/BycJRtz2TadIIcXjRQRA6Fw
+	d1PjbiAXLrHehMn9sWL+H1plV3O0I6zA4hqQ8L1CMVdgSuWipTkep6zve4YfEqP0
+	Zs6j6tUUMO1riGOt8v1vffbaH/NF18IOy7CG4zw9bmOLTzHJKqkXp4V6OtaaRa5H
+	2eR47nryPx9zkA9F1ahtgW9c9sl4Pip3yYqEADEeqnrzG3MzERSbC2635R8ZhKrg
+	pwU3ej5l8FK+5aoJABjXA==
+X-ME-Sender: <xms:d8O3ag1HENOK2aqX5Hwlw6Q8RFPRNjCrvC5EQg62Q5MwZ2X8bbKZZw>
+    <xme:d8O3al7CTh-qdNdQdYHKlYAc2HK5Pct0chw4_Wh6lTausRDuhvnXgNqkprm7sdGdM
+    5U4_BMYkuFoj-4mearySbRTQ_cmndooZhYXir5Lfas9_vbxa-3XFA>
+X-ME-Proxy-Cause: dmFkZTGluhR8DaufX6B/O8p7kobwL+s/+e2WxIV1ftwgdk4MOyOBMt7LN1vTfG/eVZk0Du
+    poDENDPAZWU/+DFm2TqDnNDFfgVA6hHaGe30H4n6HeZKXNfngYWBIprCqpApIrE+Fbsucg
+    3T43On08Mo6RNjVXL9te8gsrxz2WjOyw/W95nmJYPc0JMOu2PQIIsRRzHlvn+vNrT8LUbX
+    mmoYyzTpLxtlzDHIP0u3kK4ktm0M9xoXlmDPLfcWfL49p+EPf/LNIMvJJMcvl0MfSqseyk
+    Rsr0fjsMhmDFEIX9RQVpOsEW/sifidIp5PFecnwP38g63Y0mVjJCAlVER9svaUec6rZbmC
+    qbtQKRzPvL8vBpUlrACJ+50qfVABYjsNU7+coMpX7EK9rz3tWqDsshpIrekmR1EYoFIwzi
+    MFzRtA6nyv0gSEWy8V3Jxg6yoM9xEoGlhkpmswvoPC+1yCzJfj9aqpNmAvG77toghXLpW3
+    oSZGIcXZugioQhzHy9zw5o5cRzaVDoEyD+WlhlAIT7/5QdIXyAicupFVuieBjIjNc7MSLE
+    ZTeTptEMpLzGLB31HwOxannZP+AQz43E3ZUxZlcqdrZ09Q6mzAI3aJNRZ88M2AiEhJSkoF
+    SRPUmVb1bqKMeD4YM6wIkw8UjM82p5rtkv7hDfqSo1lynYzWf8HPL9EYqClQ
+X-ME-Proxy: <xmx:fcO3asP_JZb7_pe9MebtKK8m1oQZ2mFysi4LzvtqxqjkK-xmQJG7oA>
+    <xmx:fcO3ahdCUIGe_-N0_11cq50k2hB7qoMtAn8OQ0p4v_cKD3b-BZ1GSQ>
+    <xmx:fcO3auH0MA2jXNBVepFNbfn0NcMhLJ0i9yrj76_mSiuk373fUnS0zA>
+    <xmx:fcO3aq71vFxuFeuj5WpfAshyYTTqDxV9SfXlvv_NrYetkbnGCsY2Uw>
+    <xmx:hMO3aqB8ADUszpbuD6K9q4F8d_--PVT7Q9k3xSG4B02mLBEY0FvpthMT>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id 577F132A0087; Sat, 26 Sep 2026 09:07:03 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SAWPR12MB999267.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 06b24f39-4015-4edc-9b5b-08df1bc1f112
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Sep 2026 11:33:09.6132
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: uTpbvobMeWzkpWpP9D7XhQCuorqVI2gfukXCj8WJ531Rrslws/59kwYRbVp/NE12heL3q382Q/F0Q09J8yUs4w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7902
+X-ThreadId: AJwEWD5WPnhk
+Date: Sat, 26 Sep 2026 15:06:33 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Lorenzo Stoakes" <ljs@kernel.org>
+Cc: "Andrew Morton" <akpm@linux-foundation.org>,
+ "Liam R. Howlett" <liam@infradead.org>,
+ "Vlastimil Babka (SUSE)" <vbabka@kernel.org>,
+ "Jann Horn" <jannh@google.com>, "Pedro Falcato" <pfalcato@suse.de>,
+ "David Hildenbrand (Red Hat)" <david@kernel.org>,
+ "Mike Rapoport" <rppt@kernel.org>,
+ "Suren Baghdasaryan" <surenb@google.com>,
+ "Michal Hocko" <mhocko@suse.com>, "Jonathan Corbet" <corbet@lwn.net>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Dennis Dalessandro" <dennis.dalessandro@cornelisnetworks.com>,
+ "Jason Gunthorpe" <jgg@ziepe.ca>, "Leon Romanovsky" <leon@kernel.org>,
+ "Paul Moore" <paul@paul-moore.com>,
+ "Stephen Smalley" <stephen.smalley.work@gmail.com>,
+ "Jaroslav Kysela" <perex@perex.cz>, "Takashi Iwai" <tiwai@suse.com>,
+ "Alexei Starovoitov" <ast@kernel.org>,
+ "Daniel Borkmann" <daniel@iogearbox.net>,
+ "Andrii Nakryiko" <andrii@kernel.org>,
+ "Eduard Zingerman" <eddyz87@gmail.com>,
+ "Kumar Kartikeya Dwivedi" <memxor@gmail.com>, "Zi Yan" <ziy@nvidia.com>,
+ "Baolin Wang" <baolin.wang@linux.alibaba.com>,
+ "Nico Pache" <nico.pache@linux.dev>,
+ "Ryan Roberts" <ryan.roberts@arm.com>, "Dev Jain" <dev.jain@arm.com>,
+ "Barry Song" <baohua@kernel.org>, "Lance Yang" <lance.yang@linux.dev>,
+ "Usama Arif" <usama.arif@linux.dev>,
+ "Kirill A. Shutemov" <kas@kernel.org>,
+ "Doug Gilbert" <dgilbert@interlog.com>,
+ "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
+ "Martin K. Petersen" <mkp@kernel.org>,
+ "Jaya Kumar" <jayalk@intworks.biz>, "Simona Vetter" <simona@ffwll.ch>,
+ "Helge Deller" <deller@gmx.de>, "Sebastian Reichel" <sre@kernel.org>,
+ "John Hubbard" <jhubbard@nvidia.com>, peterx <peterx@redhat.com>,
+ "Masami Hiramatsu" <mhiramat@kernel.org>,
+ "Oleg Nesterov" <oleg@redhat.com>,
+ "Peter Zijlstra" <peterz@infradead.org>,
+ "Thomas Gleixner" <tglx@kernel.org>, "Ingo Molnar" <mingo@redhat.com>,
+ "Borislav Petkov" <bp@alien8.de>,
+ "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "Arnaldo Carvalho de Melo" <acme@kernel.org>,
+ "Namhyung Kim" <namhyung@kernel.org>,
+ "Mark Rutland" <mark.rutland@arm.com>, "Rik van Riel" <riel@surriel.com>,
+ "Harry Yoo" <harry@kernel.org>, "Juri Lelli" <juri.lelli@redhat.com>,
+ "Vincent Guittot" <vincent.guittot@linaro.org>,
+ "Maarten Lankhorst" <maarten.lankhorst@linux.intel.com>,
+ "Maxime Ripard" <mripard@kernel.org>,
+ "Thomas Zimmermann" <tzimmermann@suse.de>,
+ "Dave Airlie" <airlied@gmail.com>, "Will Deacon" <will@kernel.org>,
+ "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+ "Nicholas Piggin" <npiggin@gmail.com>,
+ "Muchun Song" <muchun.song@linux.dev>,
+ "Oscar Salvador" <osalvador@suse.de>,
+ "Matthew Wilcox" <willy@infradead.org>, "Jan Kara" <jack@suse.cz>,
+ "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>,
+ "Catalin Marinas" <catalin.marinas@arm.com>,
+ "Madhavan Srinivasan" <maddy@linux.ibm.com>,
+ "Anup Patel" <anup@brainfault.org>, "Paul Walmsley" <pjw@kernel.org>,
+ "Palmer Dabbelt" <palmer@dabbelt.com>,
+ "Albert Ou" <aou@eecs.berkeley.edu>,
+ "Christian Borntraeger" <borntraeger@linux.ibm.com>,
+ "Janosch Frank" <frankja@linux.ibm.com>,
+ "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
+ "Alexander Gordeev" <agordeev@linux.ibm.com>,
+ "Gerald Schaefer" <gerald.schaefer@linux.ibm.com>,
+ "Heiko Carstens" <hca@linux.ibm.com>,
+ "Vasily Gorbik" <gor@linux.ibm.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Andreas Larsson" <andreas@gaisler.com>,
+ "Alexander Viro" <viro@zeniv.linux.org.uk>,
+ "Christian Brauner" <brauner@kernel.org>,
+ "Matthew Brost" <matthew.brost@intel.com>,
+ "Joshua Hahn" <joshua.hahnjy@gmail.com>, "Rakie Kim" <rakie.kim@sk.com>,
+ "Byungchul Park" <byungchul@sk.com>, "Gregory Price" <gourry@gourry.net>,
+ "Ying Huang" <ying.huang@linux.alibaba.com>,
+ "Alistair Popple" <apopple@nvidia.com>, "Chris Li" <chrisl@kernel.org>,
+ "Kairui Song" <kasong@tencent.com>,
+ "Kemeng Shi" <shikemeng@huaweicloud.com>,
+ "Nhat Pham" <nphamcs@gmail.com>, "Baoquan He" <baoquan.he@linux.dev>,
+ "Youngjun Park" <youngjun.park@lge.com>,
+ "Johannes Weiner" <hannes@cmpxchg.org>, "Qi Zheng" <qi.zheng@linux.dev>,
+ "Shakeel Butt" <shakeel.butt@linux.dev>,
+ "Axel Rasmussen" <axelrasmussen@google.com>,
+ "Yuanchu Xie" <yuanchu@google.com>, "Wei Xu" <weixugc@google.com>,
+ "Chengming Zhou" <chengming.zhou@linux.dev>,
+ "Michal Hocko" <mhocko@kernel.org>, "Miklos Szeredi" <miklos@szeredi.hu>,
+ "Xu Xin" <xu.xin@linux.dev>, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-rdma@vger.kernel.org,
+ selinux@vger.kernel.org, linux-sound@vger.kernel.org,
+ bpf@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-trace-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ Linux-Arch <linux-arch@vger.kernel.org>, linux-fsdevel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, sparclinux@vger.kernel.org,
+ fuse-devel@lists.linux.dev, "Takashi Iwai" <tiwai@suse.de>,
+ "Emil Tsalapatis" <emil@etsalapatis.com>
+Message-Id: <408aef6e-5b0a-482f-8ba8-f8c20ee870e5@app.fastmail.com>
+In-Reply-To: <areSEI5pWBadkqIe@gremlin>
+References: 
+ <20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org>
+ <d4d7d4c2-a1d5-41d0-b1c8-8ea0cc5a0397@app.fastmail.com>
+ <areSEI5pWBadkqIe@gremlin>
+Subject: Re: [PATCH v3 00/40] mm: make VMA flag semantics explicit, eliminate
+ VM_SPECIAL
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Hi Aneesh=0A=
-=0A=
-It isn't clear to me why does pci_dev_addr_range() derive addr_range=0A=
-from the upstream bridge PCI_BRIDGE_MEM_WINDOW /=0A=
-PCI_BRIDGE_PREF_MEM_WINDOW rather than from pdev's own=0A=
-regions? Should it be filled up with device regions instead?=0A=
-=0A=
-IIUC, there may be a couple of issues with the current approach:=0A=
-1. The bridge's window can be wider than what pdev actually owns due=0A=
-to alignment padding.=0A=
-2. If the bridge has multiple downstream devices (are there any?),=0A=
-the window spans address space belonging to sibling devices too=0A=
-and not just this pdev. So RMM would get a range that isn't=0A=
-exclusive to the pdev/stream being connected.=0A=
+On Sat, Sep 26, 2026, at 11:40, Lorenzo Stoakes (ARM) wrote:
+> On Sat, Sep 26, 2026 at 12:06:22AM +0200, Arnd Bergmann wrote:
+>>
+>> mm/vma.c: In function '__mmap_region':
+>> mm/vma.c:3083:1: error: the frame size of 1552 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]
+>>
+>> I don't immediately see anything that you did that would have introduced
+>> something bad that wasn't already there, so it's likely just gone from
+>> just below the limit I was using for my testing to just above. The 1536
+>> byte limit is what I use on 64-bit builds with KASAN and otherwise
+>> still has a clean build (with a small number of local fixup patches).
+>
+> Hmm are you specifying this limit manually somehow?
+
+It's a Kconfig setting upstream, but the way I'm doing it is to have
+patch that calculates a sensible default based on other options that
+is a little smaller than the default (currently 2048 bytes) on x86-64
+to catch more cases where something sticks out.
+
+>> If I sprinkle some 'noinline_for_stack' annotations on functions
+>> called by __mmap_region(), I can get the size down to 1144 in this
+>> config, but that doesn't sound like a great workaround.
+>>
+>> The large stack usage is potentially harmful if this ends up
+>> in call chains that have additional large stack usage (e.g.
+>> kmalloc() leading to reclaim). Any ideas for how to reduce it here?
+>
+> That can never happen :) this call chain is _only_ for an mmap() call.
+
+I mean more functions called /from/ here, something like
+
+  __mmap_region()
+  __mmap_new_vma()
+  vm_area_alloc()
+  kmem_cache_alloc(..., GFP_KERNEL)
+  slab_alloc_node()
+  allocate_slab()
+  alloc_slab_page()
+  __alloc_pages_slowpath()
+  __alloc_pages_direct_reclaim()
+  __perform_reclaim()
+  try_to_free_pages()
+  shrink_zones()
+  shrink_node()
+  lru_gen_shrink_node()
+  shrink_many()
+  shrink_one()
+  try_to_shrink_lruvec()
+  evict_folios()
+  shrink_folio_list()
+  pageout()
+  shmem_writeout()
+  swap_writeout()
+  swap_add_folio()
+  swap_write_submit()
+  nfs_swap_submit_write()
+  nfs_file_direct_write()
+  nfs_direct_extract_pages()
+  nfs_do_recoalesce()
+  __nfs_pageio_add_request()
+  nfs_pageio_doio()
+  pnfs_generic_pg_writepages()
+  pnfs_do_write()
+  pnfs_try_to_write_data()
+  filelayout_write_pagelist()
+  nfs_initiate_pgio()
+  nfs_local_doio()
+  nfs_local_do_write()
+  nfs_local_call_write()
+  ->write_iter()
+  generic_file_write_iter()
+  generic_write_sync()
+  vfs_fsync_range()
+  ->fsync()
+  xfs_file_fsync()
+  file_write_and_wait_range()
+  filemap_fdatawrite_range()
+  filemap_writeback()
+  do_writepages()
+  ->writepages()
+  xfs_vm_writepages()
+  iomap_writepages()
+  iomap_writeback_folio()
+  iomap_writeback_range()
+  ->writeback_range()
+  xfs_zoned_writeback_range()
+  iomap_add_to_ioend()
+  ->writeback_submit()
+  xfs_zoned_writeback_submit()
+  xfs_zone_alloc_and_submit()
+  xfs_submit_zoned_bio()
+  submit_bio()
+  submit_bio_noacct()
+  submit_bio_noacct_nocheck()
+  __submit_bio_noacct()
+  __submit_bio()
+  blk_mq_submit_bio()
+  blk_mq_run_dispatch_ops()
+  blk_mq_try_issue_directly()
+  blk_mq_run_hw_queue()
+  blk_mq_sched_dispatch_requests()
+  blk_mq_do_dispatch_sched()
+  __blk_mq_do_dispatch_sched()
+  blk_mq_dispatch_rq_list()
+  ->queue_rq()
+  scsi_queue_rq()
+  scsi_dispatch_cmd()
+  ->queuecommand()
+  ata_scsi_queuecmd()
+  __ata_scsi_queuecmd()
+  ata_scsi_translate()
+  ata_scsi_qc_issue()
+  ata_qc_issue()
+  qc_issue()
+  ata_sff_qc_issue()
+  ata_sff_queue_pio_task()
+
+There are many ways the call chain can go of course, but the actual
+stack overflows do tend to follow this pattern where you are at a
+function with high stack usage and call kmalloc() during low memory
+condition and that ends up waiting for a block I/O down the line.
+(you normally don't go through swap and nfs, I was just looking
+for the worst case I could easily see in the code)
+
+> In general I am absolutely taking this seriously and will find a way to
+> reduce this, but my only question is whether this is actually something
+> that needs to be done in this series?
+>
+> Because it's already huge and I would rather avoid adding yet another patch
+> to it if possible.
+>
+> If I can do it as a follow-up that'd be ideal!
+
+What I was hoping for is that as you are already deep into the
+exact code that caused the warning and you can already see something
+in there that may help.
+
+I don't think it's urgent, I just don't want it to be forgotten.
+
+     Arnd
