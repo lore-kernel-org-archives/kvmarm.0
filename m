@@ -1,286 +1,237 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from flow-a3-smtp.messagingengine.com (flow-a3-smtp.messagingengine.com [103.168.172.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F7A43DA26
-	for <kvmarm@lists.linux.dev>; Sat, 26 Sep 2026 13:39:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2720D38657D;
+	Sat, 26 Sep 2026 17:14:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790429952; cv=none; b=TNLgE47uKdRXAHNKElqG/l1hXg/70/yAuEoMH9Mca+6kG707hdZeUkELSz7x8NlP/U6sPD+WtX1XVaqbGnnAC71pLpGX5GjdVVXCh0WEr77s/5iWN6WeooBgXj1kM0/43l+Mgxf9/LbTyOzt2KZO8aKha3sCNK+y0+ZEDrpV2fw=
+	t=1790442893; cv=none; b=idFkI/CVc3ycxvDfNOBFhaQ2tpDYR3YoD5nn+CHkJvyF0qx/icBdE3Aw49iKrOdD7Wmr07RJI9ur+/gduPgIG/5lcSsg9zvugGl8bJhfasodGbXHjRraUHWBi1xpSnCzCZwA+p3O1CyKpHoLZbh3e+iXCjPupLFqHQIg6pVHwxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790429952; c=relaxed/simple;
-	bh=kxpM4woXbVN3C61iCkKOMRV76lDdpJXI6TiGREDFTAA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CkvZjciRjjJ/z9xD6V9J2AR4wBSXepczs/rLmeoQIIO4NiXMxVKgFvlBp8TCegDgN9NIg0Ysr5TksVIRtq7+uthQf0QYE/Vp7OSti0ZJ3sVXQ/j335eJY+cAib6/nGSMQokeYYxreZ0J8p7Bdicc8q3vBOP4kcMWdyPuyZVxtbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=U3LxcIkF; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=kCY/x/x0; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1790442893; c=relaxed/simple;
+	bh=gojmdYDsD3StNnB/hDyqo1gXIHc8O8nZybk73It5oqU=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=F2q26YzU3oaINIbbzBFePri8N28TFCe0sd248jYo8gOAWhJe92gR5SJmYJ3kmpGtjCqh7Zw8gg8FkRsyNxtFvhvRokesweu11m5qsWa9rsIc8UFa4su6bPWb4FvtE5/Doiy4fjjIj54M6f4ygun31K5Rtv030XnrtgJUusJCyMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=dE1RFAps; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LFqYjy/y; arc=none smtp.client-ip=103.168.172.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="U3LxcIkF";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="kCY/x/x0"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68QAnkvJ3045262
-	for <kvmarm@lists.linux.dev>; Sat, 26 Sep 2026 13:39:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	ryy0TaceLombIiL4TAr0+o046iePkO13SoMlmGHBezM=; b=U3LxcIkFYFlytTfx
-	jKLMqAGBDdHcRGSfy0eyL488h3TuiAXRHbKaj7yFfM6RsQi2DGKYQR1l4GU8vTBH
-	FVsE9fjpyCIH3hhsfyWB+2RtyVBl3cHaimRcA5bJUME2qFn3NxV9PW6qvlRrnXje
-	EZ3Yoxe81pVs0c+0h7OdHZyjv/eXPVRL+0tpz+AtiYFTdUjz3FwVVLMvt6p9J4aG
-	+9uAgrGKAbdbrQLIfqt+o6hQvMaF5Wm0jGf6WunNnLuB4j6x6IDi9/4r5dyzDMjm
-	HMl/oSGx736WTdqJY+JoJM8PGofxMkuJj6k/k/fcnWf+rYABFktjTvUsdb3aTKio
-	ojh1iw==
-Received: from mail-dy1-f197.google.com (mail-dy1-f197.google.com [74.125.82.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4gx6e80wff-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <kvmarm@lists.linux.dev>; Sat, 26 Sep 2026 13:39:09 +0000 (GMT)
-Received: by mail-dy1-f197.google.com with SMTP id 5a478bee46e88-342a0e1d8c4so3555882eec.1
-        for <kvmarm@lists.linux.dev>; Sat, 26 Sep 2026 06:39:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1790429948; x=1791034748; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ryy0TaceLombIiL4TAr0+o046iePkO13SoMlmGHBezM=;
-        b=kCY/x/x0QY7N+VOO8LPiYWEo+pqfQz2AXsZz0fZrlYt5UsmYtV7byxDe9theAwuN9G
-         KEV3VPyxFuEYTQfWltsC1sIhCYFGa5rf1UmTROX346tSnqQNM8yZZFmsHwpMYEhYJ/bC
-         W7y6uWJz4/xvo/vpBqqBUHhgu8qOuT5XYoIX8M0OtolzwH+7jSGQUDGL9OMRhWUx0kKt
-         9lp1NISOZ8AOWR0XO/bW8dbc1QPbo7SKs7jbBRV1bHXMAQXyrcURq7vDzO4Fe4GGhyU9
-         FsUAeu3v0eFWpHQiEJe7bMJgANRpbi4x9OdKBv/3zG6aimjOmUwPFeRwLPXVFDjkpL79
-         GIyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790429948; x=1791034748;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=ryy0TaceLombIiL4TAr0+o046iePkO13SoMlmGHBezM=;
-        b=OqZJ8AFMXfcRUVq5ciocOGHyackOC2bYE0LYDQeah6pdVoZBd/xL+T0WZ7/wT7wOVQ
-         G49XtSkzcSJliuKMLXfviqQoNb7HNCSSAEwtVGUXN+M4t4Ckj3/IBNVyUF8aWW/YdfW3
-         UzJm+IC0Fl0fQdCS/Ypc3FVKvSxGauReK5vcn2ei8GYX77GxDfkQ0AYmcWajqhzbNQAq
-         tGuYDq3ns/B08IDLhTD0EIG6nPdxj9UfLAuKPbLFaC6SZvTM3cBQr14nP5zfdYiM2fOK
-         F+tZkII7JCEhmK6WLFz7G/0+2ISuA7yWR2vvOlCJ8RHlV7Obb9eULxYFjV7o2cuksKHo
-         M/IA==
-X-Forwarded-Encrypted: i=1; AKwUvBzICWZIWLenYOpRv1UAYA7E6IIwfv332vhMX3iwk0w7+MMZhAkwi/4ZrN1g0EYPXxYyoByo4j0=@lists.linux.dev
-X-Gm-Message-State: AFq9FYL9NQNTcopEPW07b1gtKihAg3Bjhoy6TFORqeNQOYcPZP6S4GvI
-	Fi7GjxAuQ8j6GzTMRJ+zR3aX67cluEeQhn+Vo/4ja1StuB/chDwBLWB/4PQduKi4/5yvhJVCmJo
-	eycPBN7hWU/tQOIAGnaEw6HPGrJCFSi4NwsP6LKVMpOdKLMr2/FQiSK+sVbk=
-X-Gm-Gg: AYBFou2vquy9i9O6bEVzXoDu9qud9M5JU8hyJR+ZPclFMvHYg44ujWAAny/Wcmb9pVK
-	w6nN3ifTgnUxaON9LX3fCKVtVesf/YqlRuxIuAeiteXBIAiVOv+7dNrrClsGqewgxKw6QKT/Fb4
-	st+/lI9GnamLm53iIljRUltYsRZ3mXDVInBpFTrLPpAsv9Fji3PlJI0hzQcIw9uoCTkVM71JYDu
-	ALkQ5HiBgSdxEthBqgUSV2Fd6/Pbfsp5s9qrcaFbW/p+W5plxoyBx4xHfKD6HfKuE0HP5M7rmPw
-	/idI0UwOL9Z7WKk07c5ByYeUkmdpaCy7m7ohMwwjCtUENe95wnNAI6zM/UdDGQT8hGabSbqljpX
-	XiZigU0JcvUPzI2QD/JdtbkwJw7ojglJYLcc=
-X-Received: by 2002:a05:7300:3b28:b0:328:2ea5:bd39 with SMTP id 5a478bee46e88-342705b94bcmr4840104eec.4.1790429948288;
-        Sat, 26 Sep 2026 06:39:08 -0700 (PDT)
-X-Received: by 2002:a05:7300:3b28:b0:328:2ea5:bd39 with SMTP id 5a478bee46e88-342705b94bcmr4839926eec.4.1790429945792;
-        Sat, 26 Sep 2026 06:39:05 -0700 (PDT)
-Received: from [192.168.68.104] ([49.207.195.115])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-34141a4a00dsm15522844eec.1.2026.09.26.06.38.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 26 Sep 2026 06:39:05 -0700 (PDT)
-Message-ID: <23f281ef-d724-4fdb-aa1d-408c368d941c@oss.qualcomm.com>
-Date: Sat, 26 Sep 2026 19:08:38 +0530
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="dE1RFAps";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LFqYjy/y"
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailflow.phl.internal (Postfix) with ESMTP id 178B413800C5;
+	Sat, 26 Sep 2026 13:14:47 -0400 (EDT)
+Received: from ams-imap-03 ([10.64.2.23])
+  by ams-compute-02.internal (MEProxy); Sat, 26 Sep 2026 13:14:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1790442886;
+	 x=1790450086; bh=tGTq2YiYGuZgWk5ZY7JZMyWu45IuuL1ykMMcgPEJafg=; b=
+	dE1RFApslPrSXAIEUR7zYCnrfR6vWyYxLHf2mps7m16cLN5ynFqwRrqagDCdLt5m
+	YGRbmWqMeuJZtlHPeeOXNw4YOCr4WJ6Mx0NBGForSSyaTMKmirJa1d3T2lnduVHI
+	rsG6gUbympIQqV0TgHZcoaLCS4Np+hjwdRsk5xnTjJWQAspIaZDsh56Wd+ZL1Q9P
+	guB+47QlTtdPYoLG8jeKzxdNJlNY8FOh1EE+3+tKu9V2DYSkeblqIQPL6x4FiFqi
+	37BVGgjvon0RgSlw4AbAROwgO5Lo55li4rPUTLQ9IBrXkmPCZHI9T0Ji1alFsVXg
+	+dWgvw0N90MVm2Z635R8Zg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1790442886; x=
+	1790450086; bh=tGTq2YiYGuZgWk5ZY7JZMyWu45IuuL1ykMMcgPEJafg=; b=L
+	FqYjy/yVFlEv/wmLmbEHRnoCYINCfyu+CrEq8Z1fyh4tz9qIiMya3S3yY3OFrTAj
+	kbwJ1H7p0hlPQkLTIbo3q91ouu2AqnlXl5AXAUacs9gWfltmW1YlpP2JQRX6xaDG
+	BIlnaq23mgNxIHZvkc5sn32cnf0vgx81JvFvLJXh30/EkXzOIDF2jBGju20aWRpQ
+	r+U4sr/EsBDJPkf1NNPApHB0wtpHKJnfgD68NUX259cKVa0+Te+WR7YSLWz3+AYG
+	NY5HM9amaFG4UKU2VWfYypsTDrNO67ys7nqOEDOLSOI0kUSbd6LrrDfi5G6ZeLOj
+	guHR/v4b83Xt/fUVhxgQg==
+X-ME-Sender: <xms:ev23aqEfCNjet-2YbYWWzRXflqtzqi8hwMuw-sOV-SpumEa7LG2shg>
+    <xme:ev23amLx2unnBtPfhChzlb1fRZ2Od9LfU9yDqP0ez7conwhJcOBcipgwHXcNic6Vd
+    ihyMWwi_TyPeTUyTmoikaAeCIv-aWaHbyLCC6Ub4m_6V1cork6IqRQ>
+X-ME-Proxy-Cause: dmFkZTE6NCtyMLNoS8hrfLFpEVvHnZq+KuaY8H+9LmihRjQuIS2tAlukOayEfreBF4n2zt
+    VM1Xb2o3pLojfbA1Q3K/syWPA1rTM+rS4TL1sKcoS7DFAfYGpLW2jXD87OlXNKqEST0xN/
+    cCB9d0v2iX9PJOBVVmY1Q/2SAi/Mg+fUIg3v4HzozejY4wwxdLDProktJHZEibcEbdkK9A
+    DsbLRqLfari181EQsuwTU6q2VoX8ASbKad+pD4D4x5fnBcBEsLw1S0g0DqkX98pTL00H96
+    s7WDOTgZX/sRdKZFzHVYGuDUWUJen+c2yA8PP101rXcEkHHLoEMw3Y2mH/kj+PJ6Jg4phW
+    ZPtHSWVzfsMi/uo7wINTVSLDSLjRI4Nrcb+iIceGEJgwfznIyowU/XB7wjZK1vQwvmWNfh
+    Xsf2CcydvUcV328L0LwSnRsCbh10PhtfXwxt1AdrlAnXwA/tpDhQGwkJwWPe8a1uDDSIgR
+    FuRPcva3YSO3dMEwljCPu2EQ9gdo7QVG5vdPgtLNw84R0kUyuYuZE3uKBRMlgr4529/DqD
+    DjCSn1ux1tr4q9apeaHlutLLSq0hzxv+TC86iyQ80tvVgpfvwCR7R2k16RICYFops8dGKe
+    orvK37Cs5fQgJyBNeJVlwb2UjdrY+qi1eBLaiX0vwatLO6jmf2NBuSQeeCRg
+X-ME-Proxy: <xmx:gP23aluqnoTw4Kp_p7Myy76Cg9h3zOKmotAVHEwJf7Xg8wiaBQaRtA>
+    <xmx:gP23atVx8P31dhvH6TSVp8JBe56LI4k3auajT3v0qFyKlytMy_bmLA>
+    <xmx:gP23apJheLHk8ePOwgYDLSw0f2H4aAcZiX3L2QUNgpYltbdfKVe22A>
+    <xmx:gP23ahPAx3Etc-AdLxQIy0Ipz5Y_4EKVj1jjlEnECLU6wC7z8PJW4Q>
+    <xmx:hv23aunjCQ20lqB8ZAJCIhTa2AfrZr7JcwsQqJyvJGCpuVigaepn1ADv>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id 7CCAA32A0087; Sat, 26 Sep 2026 13:14:34 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 3/7] firmware: arm_rmm: Configure the RMM with the
- host's page size
-To: Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
-        will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
-        aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
-        joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
-        linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
-        sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
-        WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
-        sudeep.holla@arm.com, trilok.soni@oss.qualcomm.com
-References: <20260924135201.850038-1-suzuki.poulose@arm.com>
- <20260924135201.850038-4-suzuki.poulose@arm.com>
- <20260924100313.00003be7@oss.qualcomm.com>
- <d4b768e5-c942-43cf-aea2-c266a8bab353@oss.qualcomm.com>
- <bb4a6fa1-721c-44f8-a8d2-54e80b5449c6@arm.com>
-Content-Language: en-US
-From: Venkata Rao Kakani <venkata.kakani@oss.qualcomm.com>
-In-Reply-To: <bb4a6fa1-721c-44f8-a8d2-54e80b5449c6@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: NTdBXS6POIrKTJ7132k7aq23fSeccKzp
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTI2MDA1NCBTYWx0ZWRfX5DRK3xN3oiQj
- fL0vEEi7XDtL3Liz1tEreGj3T11dEyULzFSldUIcG2D+mVa/MKmK8nGlRUwq2NC9ERJK+ffZG+t
- Fs4bfysKD4hwmH4FnOxP8oc/lCHqwUlifMlDIf62szPLQ3Zbf8y8oEOEQWN+jdKIzCVveHJ+sd/
- emA68eottNEyhLlgriK7fF8PnGmdvbFGSIrBolHY9uR0u4Nlwi4QmcctrKHbyQ6wSGxLMaUgSeZ
- Nt83VS25Sm8fYHhsssyQe5sFznEZ3livl9Rk6oFfeQ9xHjxY8hQahQ8W4kTRS0s3gkD0s6cZy5C
- zaksLQ6dYzFIjlSZw4mARvr4U22fGAqRfFORauzIzypYsg0hgq1RjHRdBKNIN0r3Gy0ZNiyTY0X
- m3DpSwLOyTBji55XmEXQB/h1SYi3wIIaN4D6r+gF4ntsjitjQozX20SsDjjX2xe52Wydrhv8FOo
- P2odVFOHjuq0BEajQpA==
-X-Proofpoint-ORIG-GUID: NTdBXS6POIrKTJ7132k7aq23fSeccKzp
-X-Authority-Analysis: v=2.4 cv=aIFlOr9m c=1 sm=1 tr=0 ts=6ab7cafd cx=c_pps
- a=Uww141gWH0fZj/3QKPojxA==:117 a=lfboiZ0IWGQn+/ls2+s3/g==:17
- a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yx91gb_oNiZeI1HMLzn7:22
- a=7CQSdrXTAAAA:8 a=EUspDBNiAAAA:8 a=VEZfdOmQvSGR4K_WtDcA:9 a=3ZKOabzyN94A:10
- a=QEXdDO2ut3YA:10 a=PxkB5W3o20Ba91AHUih5:22 a=a-qgeE7W1pNrGK8U0ZQC:22
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTI2MDA1NCBTYWx0ZWRfXwESpZrK27Rq0
- eX+SH5cOnALpvCfNSi++QK2Y8qmFIyH69siSCFWsDst4KvHKU/XTVM3TIDFFZwWLceHJ/2JXvNj
- 5vFyhpK5evKofwITYZygG4i4PJ+fzQI=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-26_03,2026-09-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 impostorscore=0 suspectscore=0 adultscore=0 priorityscore=1501
- clxscore=1015 malwarescore=0 spamscore=0 bulkscore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609260054
+X-ThreadId: AJwEWD5WPnhk
+Date: Sat, 26 Sep 2026 19:14:14 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Lorenzo Stoakes" <ljs@kernel.org>
+Cc: "Andrew Morton" <akpm@linux-foundation.org>,
+ "Liam R. Howlett" <liam@infradead.org>,
+ "Vlastimil Babka (SUSE)" <vbabka@kernel.org>,
+ "Jann Horn" <jannh@google.com>, "Pedro Falcato" <pfalcato@suse.de>,
+ "David Hildenbrand (Red Hat)" <david@kernel.org>,
+ "Mike Rapoport" <rppt@kernel.org>,
+ "Suren Baghdasaryan" <surenb@google.com>,
+ "Michal Hocko" <mhocko@suse.com>, "Jonathan Corbet" <corbet@lwn.net>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Dennis Dalessandro" <dennis.dalessandro@cornelisnetworks.com>,
+ "Jason Gunthorpe" <jgg@ziepe.ca>, "Leon Romanovsky" <leon@kernel.org>,
+ "Paul Moore" <paul@paul-moore.com>,
+ "Stephen Smalley" <stephen.smalley.work@gmail.com>,
+ "Jaroslav Kysela" <perex@perex.cz>, "Takashi Iwai" <tiwai@suse.com>,
+ "Alexei Starovoitov" <ast@kernel.org>,
+ "Daniel Borkmann" <daniel@iogearbox.net>,
+ "Andrii Nakryiko" <andrii@kernel.org>,
+ "Eduard Zingerman" <eddyz87@gmail.com>,
+ "Kumar Kartikeya Dwivedi" <memxor@gmail.com>, "Zi Yan" <ziy@nvidia.com>,
+ "Baolin Wang" <baolin.wang@linux.alibaba.com>,
+ "Nico Pache" <nico.pache@linux.dev>,
+ "Ryan Roberts" <ryan.roberts@arm.com>, "Dev Jain" <dev.jain@arm.com>,
+ "Barry Song" <baohua@kernel.org>, "Lance Yang" <lance.yang@linux.dev>,
+ "Usama Arif" <usama.arif@linux.dev>,
+ "Kirill A. Shutemov" <kas@kernel.org>,
+ "Doug Gilbert" <dgilbert@interlog.com>,
+ "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
+ "Martin K. Petersen" <mkp@kernel.org>,
+ "Jaya Kumar" <jayalk@intworks.biz>, "Simona Vetter" <simona@ffwll.ch>,
+ "Helge Deller" <deller@gmx.de>, "Sebastian Reichel" <sre@kernel.org>,
+ "John Hubbard" <jhubbard@nvidia.com>, peterx <peterx@redhat.com>,
+ "Masami Hiramatsu" <mhiramat@kernel.org>,
+ "Oleg Nesterov" <oleg@redhat.com>,
+ "Peter Zijlstra" <peterz@infradead.org>,
+ "Thomas Gleixner" <tglx@kernel.org>, "Ingo Molnar" <mingo@redhat.com>,
+ "Borislav Petkov" <bp@alien8.de>,
+ "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "Arnaldo Carvalho de Melo" <acme@kernel.org>,
+ "Namhyung Kim" <namhyung@kernel.org>,
+ "Mark Rutland" <mark.rutland@arm.com>, "Rik van Riel" <riel@surriel.com>,
+ "Harry Yoo" <harry@kernel.org>, "Juri Lelli" <juri.lelli@redhat.com>,
+ "Vincent Guittot" <vincent.guittot@linaro.org>,
+ "Maarten Lankhorst" <maarten.lankhorst@linux.intel.com>,
+ "Maxime Ripard" <mripard@kernel.org>,
+ "Thomas Zimmermann" <tzimmermann@suse.de>,
+ "Dave Airlie" <airlied@gmail.com>, "Will Deacon" <will@kernel.org>,
+ "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+ "Nicholas Piggin" <npiggin@gmail.com>,
+ "Muchun Song" <muchun.song@linux.dev>,
+ "Oscar Salvador" <osalvador@suse.de>,
+ "Matthew Wilcox" <willy@infradead.org>, "Jan Kara" <jack@suse.cz>,
+ "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>,
+ "Catalin Marinas" <catalin.marinas@arm.com>,
+ "Madhavan Srinivasan" <maddy@linux.ibm.com>,
+ "Anup Patel" <anup@brainfault.org>, "Paul Walmsley" <pjw@kernel.org>,
+ "Palmer Dabbelt" <palmer@dabbelt.com>,
+ "Albert Ou" <aou@eecs.berkeley.edu>,
+ "Christian Borntraeger" <borntraeger@linux.ibm.com>,
+ "Janosch Frank" <frankja@linux.ibm.com>,
+ "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
+ "Alexander Gordeev" <agordeev@linux.ibm.com>,
+ "Gerald Schaefer" <gerald.schaefer@linux.ibm.com>,
+ "Heiko Carstens" <hca@linux.ibm.com>,
+ "Vasily Gorbik" <gor@linux.ibm.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Andreas Larsson" <andreas@gaisler.com>,
+ "Alexander Viro" <viro@zeniv.linux.org.uk>,
+ "Christian Brauner" <brauner@kernel.org>,
+ "Matthew Brost" <matthew.brost@intel.com>,
+ "Joshua Hahn" <joshua.hahnjy@gmail.com>, "Rakie Kim" <rakie.kim@sk.com>,
+ "Byungchul Park" <byungchul@sk.com>, "Gregory Price" <gourry@gourry.net>,
+ "Ying Huang" <ying.huang@linux.alibaba.com>,
+ "Alistair Popple" <apopple@nvidia.com>, "Chris Li" <chrisl@kernel.org>,
+ "Kairui Song" <kasong@tencent.com>,
+ "Kemeng Shi" <shikemeng@huaweicloud.com>,
+ "Nhat Pham" <nphamcs@gmail.com>, "Baoquan He" <baoquan.he@linux.dev>,
+ "Youngjun Park" <youngjun.park@lge.com>,
+ "Johannes Weiner" <hannes@cmpxchg.org>, "Qi Zheng" <qi.zheng@linux.dev>,
+ "Shakeel Butt" <shakeel.butt@linux.dev>,
+ "Axel Rasmussen" <axelrasmussen@google.com>,
+ "Yuanchu Xie" <yuanchu@google.com>, "Wei Xu" <weixugc@google.com>,
+ "Chengming Zhou" <chengming.zhou@linux.dev>,
+ "Michal Hocko" <mhocko@kernel.org>, "Miklos Szeredi" <miklos@szeredi.hu>,
+ "Xu Xin" <xu.xin@linux.dev>, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-rdma@vger.kernel.org,
+ selinux@vger.kernel.org, linux-sound@vger.kernel.org,
+ bpf@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-trace-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ Linux-Arch <linux-arch@vger.kernel.org>, linux-fsdevel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, sparclinux@vger.kernel.org,
+ fuse-devel@lists.linux.dev, "Takashi Iwai" <tiwai@suse.de>,
+ "Emil Tsalapatis" <emil@etsalapatis.com>
+Message-Id: <4a3a089c-3ade-494d-8f83-f9cb710e9ad1@app.fastmail.com>
+In-Reply-To: <arfGmNiEngnO3JKm@gremlin>
+References: 
+ <20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org>
+ <d4d7d4c2-a1d5-41d0-b1c8-8ea0cc5a0397@app.fastmail.com>
+ <areSEI5pWBadkqIe@gremlin>
+ <408aef6e-5b0a-482f-8ba8-f8c20ee870e5@app.fastmail.com>
+ <arfGmNiEngnO3JKm@gremlin>
+Subject: Re: [PATCH v3 00/40] mm: make VMA flag semantics explicit, eliminate
+ VM_SPECIAL
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
+On Sat, Sep 26, 2026, at 15:22, Lorenzo Stoakes (ARM) wrote:
+> On Sat, Sep 26, 2026 at 03:06:33PM +0200, Arnd Bergmann wrote:
+>>
+>> It's a Kconfig setting upstream, but the way I'm doing it is to have
+>> patch that calculates a sensible default based on other options that
+>> is a little smaller than the default (currently 2048 bytes) on x86-64
+>> to catch more cases where something sticks out.
+>
+> So this is an early warning more or less :)
 
-On 25-09-2026 08:26 pm, Suzuki K Poulose wrote:
-> On 25/09/2026 14:23, Venkata Rao Kakani wrote:
->> Hi Suzuki,
+Yes, a surprising number of these just point to stupid mistakes
+where the developer had no they were adding a large object to
+the stack. This instance here is unfortunately not an obvious
+case.
+
+>> There are many ways the call chain can go of course, but the actual
+>> stack overflows do tend to follow this pattern where you are at a
+>> function with high stack usage and call kmalloc() during low memory
+>> condition and that ends up waiting for a block I/O down the line.
+>> (you normally don't go through swap and nfs, I was just looking
+>> for the worst case I could easily see in the code)
+>
+> You certainly found quite the example haha.
+
+I have previously toyed around with using VMALLOC_STACK on a reduced
+stack size and syzcaller, so I knew roughly where the worst offenders
+lie, but the list was from looking through the code just today.
+
+>> > If I can do it as a follow-up that'd be ideal!
 >>
->
-> Hi Venkat,
->
->> Now, with this patch Host can set RMM Granule size equal to 
->> PAGE_SIZE. Does RMM send the request to root to set GPT physical 
->> granule size = PAGE_SIZE?
->
-> I don't think FIRME lets you do that and it would be too complex. Please
-> remember that the GPT is not just for the Non-secure/Realm world, but
-> also for the Secure world.
-> So, the Physical Granule size would be statically configured to 4KB on a
-> platform unless it supports the 4KB granule size, to support all
-> possible Sofware components.
->
->
+>> What I was hoping for is that as you are already deep into the
+>> exact code that caused the warning and you can already see something
+>> in there that may help.
 >>
->> In a scenario where, GPT granule size (|GPCCR_EL3|) set to 64K and 
->> Host PAGE_SIZE set to 4K, how does root handle GPT granule mappings, 
->> when Host send RMI_GRANULE_DELEGATE(PAGE_SIZE)?
+>> I don't think it's urgent, I just don't want it to be forgotten.
 >
-> If GPCCR_EL3 is set to 64K, RMM must not report it supports 4K GRANULE
-> size.
+> It won't be, it's now on my TODO and I see it as a relatively high priority
+> thing to follow up with.
 >
-> nit: Please avoid top posting your comments and use plain text for
-> discussions on the list.
->
-> Suzuki
->
->
->
->
->>
->>
->> -- Venkat
->>
->> On 24-09-2026 10:33 pm, Jonathan Cameron wrote:
->>> On Thu, 24 Sep 2026 14:51:57 +0100
->>> Suzuki K Poulose<suzuki.poulose@arm.com> wrote:
->>>
->>>> RMM v2.0 brings the ability to set the RMM's granule size. Check the
->>>> feature registers and configure the RMM so that it matches the host's
->>>> page size. This means that operations can be done with a granularity
->>>> equal to PAGE_SIZE.
->>>>
->>>> Signed-off-by: Steven Price<steven.price@arm.com>
->>>> Signed-off-by: Suzuki K Poulose<suzuki.poulose@arm.com>
->>> Hi Suzuki,
->>>
->>> Some trivial stuff inline.  Assuming that is addressed.
->>>
->>> Reviewed-by: Jonathan Cameron<jonathan.cameron@oss.qualcomm.com>
->>>
->>>> ---
->>>>   drivers/firmware/arm_rmm/rmi.c | 70 
->>>> ++++++++++++++++++++++++++++++++++
->>>>   1 file changed, 70 insertions(+)
->>>>
->>>> diff --git a/drivers/firmware/arm_rmm/rmi.c 
->>>> b/drivers/firmware/arm_rmm/rmi.c
->>>> index 3baba931f92e4..c9ea964fd9081 100644
->>>> --- a/drivers/firmware/arm_rmm/rmi.c
->>>> +++ b/drivers/firmware/arm_rmm/rmi.c
->>>> +
->>>> +static int rmi_configure(void)
->>>> +{
->>>> +    unsigned long granule_feature;
->>>> +    unsigned long granule_size;
->>>> +    int ret = 0;
->>> Value not used.  Fine if it is future churn reduction, but I didn't 
->>> spot
->>> where if so. I'm guessing left over from refactoring
->>>
->>>> +
->>>> +    switch (PAGE_SIZE) {
->>>> +    case SZ_4K:
->>>> +        granule_size = RMI_GRANULE_SIZE_4KB;
->>>> +        granule_feature = RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_4KB;
->>>> +        break;
->>>> +    case SZ_16K:
->>>> +        granule_size = RMI_GRANULE_SIZE_16KB;
->>>> +        granule_feature = RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_16KB;
->>>> +        break;
->>>> +    case SZ_64K:
->>>> +        granule_size = RMI_GRANULE_SIZE_64KB;
->>>> +        granule_feature = RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_64KB;
->>>> +        break;
->>>> +    default:
->>>> +        BUILD_BUG();
->>>> +    }
->>>> +
->>>> +    if (!(rmi_feat_reg(1) & granule_feature)) {
->>>> +        pr_err("RMM does not support %luKB granules\n",
->>>> +               PAGE_SIZE >> 10);
->>>> +        return -ENXIO;
->>>> +    }
->>>> +
->>>> +    struct rmm_config *config __free(free_page) =
->>>> +        (struct rmm_config *)get_zeroed_page(GFP_KERNEL);
->>>> +
->>>> +    if (!config) {
->>>> +        pr_err("Unable to allocate memory for RMM config\n");
->>>> +        return -ENOMEM;
->>>> +    }
->>>> +
->>>> +    config->rmi_granule_size = granule_size;
->>>> +
->>>> +    /*
->>>> +     * For now we set the tracking_region_size to 0 which is the 
->>>> only option
->>>> +     * for 4KB PAGE_SIZE (1GB for 4KB PAGE_SIZE, 32MB/512MB for 
->>>> 16KB/64KB).
->>>> +     * TODO: Support other tracking sizes via Kconfig option for 
->>>> other
->>>> +     * PAGE_SIZES
->>>> +     */
->>>> +    config->tracking_region_size = 0;
->>>> +
->>>> +    ret = rmi_rmm_config_set(virt_to_phys(config));
->>>> +    if (ret) {
->>>> +        pr_err("RMM config set failed (%d)\n", ret);
->>>> +        ret = -EINVAL;
->>>         return -EINVAL;
->>>
->>>> +    }
->>>> +
->>>> +    return ret;
->>>     return 0;
->>>
->>> So obvious this is the good path without anyone having to think 
->>> about it!
->>>
->>> I did quick check on whether this was to reduce churn due to later 
->>> changes
->>> but couldn't immediately spot anything
->>>
->>>
->>>> +}
->
-Understood. Thanks Suzuki.
+> Will likely send a patch for it next cycle (this is about the worst cycle I've
+> seen workload-size for mm so I don't really want to send anything more this time
+> around).
+
+Sounds good, I'll keep the local hack to mark functions as noinline for the
+moment then. Thanks,
+
+      Arnd
