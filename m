@@ -1,270 +1,286 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9EB41F34E;
-	Sat, 26 Sep 2026 13:22:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F7A43DA26
+	for <kvmarm@lists.linux.dev>; Sat, 26 Sep 2026 13:39:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790428959; cv=none; b=WW3v1fzi7rfj4wLs5OeWwq9Uc7WjZnPP/IPbetj0bvrsa1f+URRYH5z31klatUY0F/C1Iom2i1Zk0vsd3VKr61GzFITsZehMPlEURYtEH3/hCpPAQL6M/ZQW7BGA3bvESH8zvkve1+eDZj6ZE1oRP3VfeCj/02opgeA44qXyslQ=
+	t=1790429952; cv=none; b=TNLgE47uKdRXAHNKElqG/l1hXg/70/yAuEoMH9Mca+6kG707hdZeUkELSz7x8NlP/U6sPD+WtX1XVaqbGnnAC71pLpGX5GjdVVXCh0WEr77s/5iWN6WeooBgXj1kM0/43l+Mgxf9/LbTyOzt2KZO8aKha3sCNK+y0+ZEDrpV2fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790428959; c=relaxed/simple;
-	bh=ytgc6Ysa5Go78zHXRVtTHpX/QUpJmBMDXx19p/scRAY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A82A1SGCy+DX7VqbBf+MM6daTdJLcwBu61VGloCtV/fbone2163TKqYXLtMuk8ZGf05JdZH07uVnwDv6qdAS2mk9QW3m3sAh0FB6juTcbK2fMFPE2u9Q9V8QCblNhQhIp7Abh68hwdue+mcCW07qAdGzLH9regM4RUODbFg1JG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gn1PEczg; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790429952; c=relaxed/simple;
+	bh=kxpM4woXbVN3C61iCkKOMRV76lDdpJXI6TiGREDFTAA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CkvZjciRjjJ/z9xD6V9J2AR4wBSXepczs/rLmeoQIIO4NiXMxVKgFvlBp8TCegDgN9NIg0Ysr5TksVIRtq7+uthQf0QYE/Vp7OSti0ZJ3sVXQ/j335eJY+cAib6/nGSMQokeYYxreZ0J8p7Bdicc8q3vBOP4kcMWdyPuyZVxtbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=U3LxcIkF; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=kCY/x/x0; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gn1PEczg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B984F1F000FF;
-	Sat, 26 Sep 2026 13:22:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790428957;
-	bh=Ho6ODA6dlgcOvdPnhowd9GgmBiom3Zlo2XTvzY/VTW0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=gn1PEczgsD5J29kex3G7noDS0spUTsU0srsr+zO1nZZFuyKKVJFH88OWSVdctFAta
-	 v7+cMia70kZ1YiuCIVpgK+S7YUkcgPcfUscXxMIVNy2T0tNen4vpOI9UIX+1BDQbbc
-	 ePRW1SWCr2qEbUMLcslI3kLtHSdkz6HzShrhvUDCAIXM9cTBfN59vnzkvSpAY5sH1A
-	 HiO3kEDoHq52UM6A/hwkWmFG1rbuJuaaijRW4+S7BnYNa61yNGGxIUvVs8xVjcKOaU
-	 2ZsrOuBc7LttfpdBhGRS97sgpAQW2anj2l9mfgb3mnYHtFFH+/VpzMj5GLRW0f0MCb
-	 rDkMkQL9UaUiA==
-Date: Sat, 26 Sep 2026 14:22:06 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	"Liam R. Howlett" <liam@infradead.org>, "Vlastimil Babka (SUSE)" <vbabka@kernel.org>, 
-	Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
-	"David Hildenbrand (Red Hat)" <david@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
-	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
-	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
-	"Kirill A. Shutemov" <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
-	"James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <mkp@kernel.org>, 
-	Jaya Kumar <jayalk@intworks.biz>, Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, 
-	Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, peterx <peterx@redhat.com>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	Dave Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
-	"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, 
-	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
-	Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, "David S . Miller" <davem@davemloft.net>, 
-	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
-	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
-	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
-	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
-	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
-	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, Linux-Arch <linux-arch@vger.kernel.org>, 
-	linux-fsdevel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, 
-	fuse-devel@lists.linux.dev, Takashi Iwai <tiwai@suse.de>, 
-	Emil Tsalapatis <emil@etsalapatis.com>
-Subject: Re: [PATCH v3 00/40] mm: make VMA flag semantics explicit, eliminate
- VM_SPECIAL
-Message-ID: <arfGmNiEngnO3JKm@gremlin>
-References: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org>
- <d4d7d4c2-a1d5-41d0-b1c8-8ea0cc5a0397@app.fastmail.com>
- <areSEI5pWBadkqIe@gremlin>
- <408aef6e-5b0a-482f-8ba8-f8c20ee870e5@app.fastmail.com>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="U3LxcIkF";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="kCY/x/x0"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68QAnkvJ3045262
+	for <kvmarm@lists.linux.dev>; Sat, 26 Sep 2026 13:39:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	ryy0TaceLombIiL4TAr0+o046iePkO13SoMlmGHBezM=; b=U3LxcIkFYFlytTfx
+	jKLMqAGBDdHcRGSfy0eyL488h3TuiAXRHbKaj7yFfM6RsQi2DGKYQR1l4GU8vTBH
+	FVsE9fjpyCIH3hhsfyWB+2RtyVBl3cHaimRcA5bJUME2qFn3NxV9PW6qvlRrnXje
+	EZ3Yoxe81pVs0c+0h7OdHZyjv/eXPVRL+0tpz+AtiYFTdUjz3FwVVLMvt6p9J4aG
+	+9uAgrGKAbdbrQLIfqt+o6hQvMaF5Wm0jGf6WunNnLuB4j6x6IDi9/4r5dyzDMjm
+	HMl/oSGx736WTdqJY+JoJM8PGofxMkuJj6k/k/fcnWf+rYABFktjTvUsdb3aTKio
+	ojh1iw==
+Received: from mail-dy1-f197.google.com (mail-dy1-f197.google.com [74.125.82.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4gx6e80wff-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <kvmarm@lists.linux.dev>; Sat, 26 Sep 2026 13:39:09 +0000 (GMT)
+Received: by mail-dy1-f197.google.com with SMTP id 5a478bee46e88-342a0e1d8c4so3555882eec.1
+        for <kvmarm@lists.linux.dev>; Sat, 26 Sep 2026 06:39:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1790429948; x=1791034748; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ryy0TaceLombIiL4TAr0+o046iePkO13SoMlmGHBezM=;
+        b=kCY/x/x0QY7N+VOO8LPiYWEo+pqfQz2AXsZz0fZrlYt5UsmYtV7byxDe9theAwuN9G
+         KEV3VPyxFuEYTQfWltsC1sIhCYFGa5rf1UmTROX346tSnqQNM8yZZFmsHwpMYEhYJ/bC
+         W7y6uWJz4/xvo/vpBqqBUHhgu8qOuT5XYoIX8M0OtolzwH+7jSGQUDGL9OMRhWUx0kKt
+         9lp1NISOZ8AOWR0XO/bW8dbc1QPbo7SKs7jbBRV1bHXMAQXyrcURq7vDzO4Fe4GGhyU9
+         FsUAeu3v0eFWpHQiEJe7bMJgANRpbi4x9OdKBv/3zG6aimjOmUwPFeRwLPXVFDjkpL79
+         GIyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790429948; x=1791034748;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=ryy0TaceLombIiL4TAr0+o046iePkO13SoMlmGHBezM=;
+        b=OqZJ8AFMXfcRUVq5ciocOGHyackOC2bYE0LYDQeah6pdVoZBd/xL+T0WZ7/wT7wOVQ
+         G49XtSkzcSJliuKMLXfviqQoNb7HNCSSAEwtVGUXN+M4t4Ckj3/IBNVyUF8aWW/YdfW3
+         UzJm+IC0Fl0fQdCS/Ypc3FVKvSxGauReK5vcn2ei8GYX77GxDfkQ0AYmcWajqhzbNQAq
+         tGuYDq3ns/B08IDLhTD0EIG6nPdxj9UfLAuKPbLFaC6SZvTM3cBQr14nP5zfdYiM2fOK
+         F+tZkII7JCEhmK6WLFz7G/0+2ISuA7yWR2vvOlCJ8RHlV7Obb9eULxYFjV7o2cuksKHo
+         M/IA==
+X-Forwarded-Encrypted: i=1; AKwUvBzICWZIWLenYOpRv1UAYA7E6IIwfv332vhMX3iwk0w7+MMZhAkwi/4ZrN1g0EYPXxYyoByo4j0=@lists.linux.dev
+X-Gm-Message-State: AFq9FYL9NQNTcopEPW07b1gtKihAg3Bjhoy6TFORqeNQOYcPZP6S4GvI
+	Fi7GjxAuQ8j6GzTMRJ+zR3aX67cluEeQhn+Vo/4ja1StuB/chDwBLWB/4PQduKi4/5yvhJVCmJo
+	eycPBN7hWU/tQOIAGnaEw6HPGrJCFSi4NwsP6LKVMpOdKLMr2/FQiSK+sVbk=
+X-Gm-Gg: AYBFou2vquy9i9O6bEVzXoDu9qud9M5JU8hyJR+ZPclFMvHYg44ujWAAny/Wcmb9pVK
+	w6nN3ifTgnUxaON9LX3fCKVtVesf/YqlRuxIuAeiteXBIAiVOv+7dNrrClsGqewgxKw6QKT/Fb4
+	st+/lI9GnamLm53iIljRUltYsRZ3mXDVInBpFTrLPpAsv9Fji3PlJI0hzQcIw9uoCTkVM71JYDu
+	ALkQ5HiBgSdxEthBqgUSV2Fd6/Pbfsp5s9qrcaFbW/p+W5plxoyBx4xHfKD6HfKuE0HP5M7rmPw
+	/idI0UwOL9Z7WKk07c5ByYeUkmdpaCy7m7ohMwwjCtUENe95wnNAI6zM/UdDGQT8hGabSbqljpX
+	XiZigU0JcvUPzI2QD/JdtbkwJw7ojglJYLcc=
+X-Received: by 2002:a05:7300:3b28:b0:328:2ea5:bd39 with SMTP id 5a478bee46e88-342705b94bcmr4840104eec.4.1790429948288;
+        Sat, 26 Sep 2026 06:39:08 -0700 (PDT)
+X-Received: by 2002:a05:7300:3b28:b0:328:2ea5:bd39 with SMTP id 5a478bee46e88-342705b94bcmr4839926eec.4.1790429945792;
+        Sat, 26 Sep 2026 06:39:05 -0700 (PDT)
+Received: from [192.168.68.104] ([49.207.195.115])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-34141a4a00dsm15522844eec.1.2026.09.26.06.38.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 26 Sep 2026 06:39:05 -0700 (PDT)
+Message-ID: <23f281ef-d724-4fdb-aa1d-408c368d941c@oss.qualcomm.com>
+Date: Sat, 26 Sep 2026 19:08:38 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <408aef6e-5b0a-482f-8ba8-f8c20ee870e5@app.fastmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 3/7] firmware: arm_rmm: Configure the RMM with the
+ host's page size
+To: Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+        will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+        aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+        joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+        linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+        sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+        WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+        sudeep.holla@arm.com, trilok.soni@oss.qualcomm.com
+References: <20260924135201.850038-1-suzuki.poulose@arm.com>
+ <20260924135201.850038-4-suzuki.poulose@arm.com>
+ <20260924100313.00003be7@oss.qualcomm.com>
+ <d4b768e5-c942-43cf-aea2-c266a8bab353@oss.qualcomm.com>
+ <bb4a6fa1-721c-44f8-a8d2-54e80b5449c6@arm.com>
+Content-Language: en-US
+From: Venkata Rao Kakani <venkata.kakani@oss.qualcomm.com>
+In-Reply-To: <bb4a6fa1-721c-44f8-a8d2-54e80b5449c6@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: NTdBXS6POIrKTJ7132k7aq23fSeccKzp
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTI2MDA1NCBTYWx0ZWRfX5DRK3xN3oiQj
+ fL0vEEi7XDtL3Liz1tEreGj3T11dEyULzFSldUIcG2D+mVa/MKmK8nGlRUwq2NC9ERJK+ffZG+t
+ Fs4bfysKD4hwmH4FnOxP8oc/lCHqwUlifMlDIf62szPLQ3Zbf8y8oEOEQWN+jdKIzCVveHJ+sd/
+ emA68eottNEyhLlgriK7fF8PnGmdvbFGSIrBolHY9uR0u4Nlwi4QmcctrKHbyQ6wSGxLMaUgSeZ
+ Nt83VS25Sm8fYHhsssyQe5sFznEZ3livl9Rk6oFfeQ9xHjxY8hQahQ8W4kTRS0s3gkD0s6cZy5C
+ zaksLQ6dYzFIjlSZw4mARvr4U22fGAqRfFORauzIzypYsg0hgq1RjHRdBKNIN0r3Gy0ZNiyTY0X
+ m3DpSwLOyTBji55XmEXQB/h1SYi3wIIaN4D6r+gF4ntsjitjQozX20SsDjjX2xe52Wydrhv8FOo
+ P2odVFOHjuq0BEajQpA==
+X-Proofpoint-ORIG-GUID: NTdBXS6POIrKTJ7132k7aq23fSeccKzp
+X-Authority-Analysis: v=2.4 cv=aIFlOr9m c=1 sm=1 tr=0 ts=6ab7cafd cx=c_pps
+ a=Uww141gWH0fZj/3QKPojxA==:117 a=lfboiZ0IWGQn+/ls2+s3/g==:17
+ a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yx91gb_oNiZeI1HMLzn7:22
+ a=7CQSdrXTAAAA:8 a=EUspDBNiAAAA:8 a=VEZfdOmQvSGR4K_WtDcA:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10 a=PxkB5W3o20Ba91AHUih5:22 a=a-qgeE7W1pNrGK8U0ZQC:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTI2MDA1NCBTYWx0ZWRfXwESpZrK27Rq0
+ eX+SH5cOnALpvCfNSi++QK2Y8qmFIyH69siSCFWsDst4KvHKU/XTVM3TIDFFZwWLceHJ/2JXvNj
+ 5vFyhpK5evKofwITYZygG4i4PJ+fzQI=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-26_03,2026-09-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 impostorscore=0 suspectscore=0 adultscore=0 priorityscore=1501
+ clxscore=1015 malwarescore=0 spamscore=0 bulkscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609260054
 
-On Sat, Sep 26, 2026 at 03:06:33PM +0200, Arnd Bergmann wrote:
-> On Sat, Sep 26, 2026, at 11:40, Lorenzo Stoakes (ARM) wrote:
-> > On Sat, Sep 26, 2026 at 12:06:22AM +0200, Arnd Bergmann wrote:
-> >>
-> >> mm/vma.c: In function '__mmap_region':
-> >> mm/vma.c:3083:1: error: the frame size of 1552 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]
-> >>
-> >> I don't immediately see anything that you did that would have introduced
-> >> something bad that wasn't already there, so it's likely just gone from
-> >> just below the limit I was using for my testing to just above. The 1536
-> >> byte limit is what I use on 64-bit builds with KASAN and otherwise
-> >> still has a clean build (with a small number of local fixup patches).
-> >
-> > Hmm are you specifying this limit manually somehow?
+
+On 25-09-2026 08:26 pm, Suzuki K Poulose wrote:
+> On 25/09/2026 14:23, Venkata Rao Kakani wrote:
+>> Hi Suzuki,
+>>
 >
-> It's a Kconfig setting upstream, but the way I'm doing it is to have
-> patch that calculates a sensible default based on other options that
-> is a little smaller than the default (currently 2048 bytes) on x86-64
-> to catch more cases where something sticks out.
-
-I see.
-
-So this is an early warning more or less :)
-
+> Hi Venkat,
 >
-> >> If I sprinkle some 'noinline_for_stack' annotations on functions
-> >> called by __mmap_region(), I can get the size down to 1144 in this
-> >> config, but that doesn't sound like a great workaround.
-> >>
-> >> The large stack usage is potentially harmful if this ends up
-> >> in call chains that have additional large stack usage (e.g.
-> >> kmalloc() leading to reclaim). Any ideas for how to reduce it here?
-> >
-> > That can never happen :) this call chain is _only_ for an mmap() call.
+>> Now, with this patch Host can set RMM Granule size equal to 
+>> PAGE_SIZE. Does RMM send the request to root to set GPT physical 
+>> granule size = PAGE_SIZE?
 >
-> I mean more functions called /from/ here, something like
+> I don't think FIRME lets you do that and it would be too complex. Please
+> remember that the GPT is not just for the Non-secure/Realm world, but
+> also for the Secure world.
+> So, the Physical Granule size would be statically configured to 4KB on a
+> platform unless it supports the 4KB granule size, to support all
+> possible Sofware components.
 >
->   __mmap_region()
->   __mmap_new_vma()
->   vm_area_alloc()
->   kmem_cache_alloc(..., GFP_KERNEL)
->   slab_alloc_node()
->   allocate_slab()
->   alloc_slab_page()
->   __alloc_pages_slowpath()
->   __alloc_pages_direct_reclaim()
->   __perform_reclaim()
->   try_to_free_pages()
->   shrink_zones()
->   shrink_node()
->   lru_gen_shrink_node()
->   shrink_many()
->   shrink_one()
->   try_to_shrink_lruvec()
->   evict_folios()
->   shrink_folio_list()
->   pageout()
->   shmem_writeout()
->   swap_writeout()
->   swap_add_folio()
->   swap_write_submit()
->   nfs_swap_submit_write()
->   nfs_file_direct_write()
->   nfs_direct_extract_pages()
->   nfs_do_recoalesce()
->   __nfs_pageio_add_request()
->   nfs_pageio_doio()
->   pnfs_generic_pg_writepages()
->   pnfs_do_write()
->   pnfs_try_to_write_data()
->   filelayout_write_pagelist()
->   nfs_initiate_pgio()
->   nfs_local_doio()
->   nfs_local_do_write()
->   nfs_local_call_write()
->   ->write_iter()
->   generic_file_write_iter()
->   generic_write_sync()
->   vfs_fsync_range()
->   ->fsync()
->   xfs_file_fsync()
->   file_write_and_wait_range()
->   filemap_fdatawrite_range()
->   filemap_writeback()
->   do_writepages()
->   ->writepages()
->   xfs_vm_writepages()
->   iomap_writepages()
->   iomap_writeback_folio()
->   iomap_writeback_range()
->   ->writeback_range()
->   xfs_zoned_writeback_range()
->   iomap_add_to_ioend()
->   ->writeback_submit()
->   xfs_zoned_writeback_submit()
->   xfs_zone_alloc_and_submit()
->   xfs_submit_zoned_bio()
->   submit_bio()
->   submit_bio_noacct()
->   submit_bio_noacct_nocheck()
->   __submit_bio_noacct()
->   __submit_bio()
->   blk_mq_submit_bio()
->   blk_mq_run_dispatch_ops()
->   blk_mq_try_issue_directly()
->   blk_mq_run_hw_queue()
->   blk_mq_sched_dispatch_requests()
->   blk_mq_do_dispatch_sched()
->   __blk_mq_do_dispatch_sched()
->   blk_mq_dispatch_rq_list()
->   ->queue_rq()
->   scsi_queue_rq()
->   scsi_dispatch_cmd()
->   ->queuecommand()
->   ata_scsi_queuecmd()
->   __ata_scsi_queuecmd()
->   ata_scsi_translate()
->   ata_scsi_qc_issue()
->   ata_qc_issue()
->   qc_issue()
->   ata_sff_qc_issue()
->   ata_sff_queue_pio_task()
-
-Ugh delightful :)
-
 >
-> There are many ways the call chain can go of course, but the actual
-> stack overflows do tend to follow this pattern where you are at a
-> function with high stack usage and call kmalloc() during low memory
-> condition and that ends up waiting for a block I/O down the line.
-> (you normally don't go through swap and nfs, I was just looking
-> for the worst case I could easily see in the code)
-
-You certainly found quite the example haha.
-
+>>
+>> In a scenario where, GPT granule size (|GPCCR_EL3|) set to 64K and 
+>> Host PAGE_SIZE set to 4K, how does root handle GPT granule mappings, 
+>> when Host send RMI_GRANULE_DELEGATE(PAGE_SIZE)?
 >
-> > In general I am absolutely taking this seriously and will find a way to
-> > reduce this, but my only question is whether this is actually something
-> > that needs to be done in this series?
-> >
-> > Because it's already huge and I would rather avoid adding yet another patch
-> > to it if possible.
-> >
-> > If I can do it as a follow-up that'd be ideal!
+> If GPCCR_EL3 is set to 64K, RMM must not report it supports 4K GRANULE
+> size.
 >
-> What I was hoping for is that as you are already deep into the
-> exact code that caused the warning and you can already see something
-> in there that may help.
+> nit: Please avoid top posting your comments and use plain text for
+> discussions on the list.
 >
-> I don't think it's urgent, I just don't want it to be forgotten.
-
-It won't be, it's now on my TODO and I see it as a relatively high priority
-thing to follow up with.
-
-Will likely send a patch for it next cycle (this is about the worst cycle I've
-seen workload-size for mm so I don't really want to send anything more this time
-around).
-
+> Suzuki
 >
->      Arnd
-
---
-Cheers, Lorenzo
+>
+>
+>
+>>
+>>
+>> -- Venkat
+>>
+>> On 24-09-2026 10:33 pm, Jonathan Cameron wrote:
+>>> On Thu, 24 Sep 2026 14:51:57 +0100
+>>> Suzuki K Poulose<suzuki.poulose@arm.com> wrote:
+>>>
+>>>> RMM v2.0 brings the ability to set the RMM's granule size. Check the
+>>>> feature registers and configure the RMM so that it matches the host's
+>>>> page size. This means that operations can be done with a granularity
+>>>> equal to PAGE_SIZE.
+>>>>
+>>>> Signed-off-by: Steven Price<steven.price@arm.com>
+>>>> Signed-off-by: Suzuki K Poulose<suzuki.poulose@arm.com>
+>>> Hi Suzuki,
+>>>
+>>> Some trivial stuff inline.  Assuming that is addressed.
+>>>
+>>> Reviewed-by: Jonathan Cameron<jonathan.cameron@oss.qualcomm.com>
+>>>
+>>>> ---
+>>>>   drivers/firmware/arm_rmm/rmi.c | 70 
+>>>> ++++++++++++++++++++++++++++++++++
+>>>>   1 file changed, 70 insertions(+)
+>>>>
+>>>> diff --git a/drivers/firmware/arm_rmm/rmi.c 
+>>>> b/drivers/firmware/arm_rmm/rmi.c
+>>>> index 3baba931f92e4..c9ea964fd9081 100644
+>>>> --- a/drivers/firmware/arm_rmm/rmi.c
+>>>> +++ b/drivers/firmware/arm_rmm/rmi.c
+>>>> +
+>>>> +static int rmi_configure(void)
+>>>> +{
+>>>> +    unsigned long granule_feature;
+>>>> +    unsigned long granule_size;
+>>>> +    int ret = 0;
+>>> Value not used.  Fine if it is future churn reduction, but I didn't 
+>>> spot
+>>> where if so. I'm guessing left over from refactoring
+>>>
+>>>> +
+>>>> +    switch (PAGE_SIZE) {
+>>>> +    case SZ_4K:
+>>>> +        granule_size = RMI_GRANULE_SIZE_4KB;
+>>>> +        granule_feature = RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_4KB;
+>>>> +        break;
+>>>> +    case SZ_16K:
+>>>> +        granule_size = RMI_GRANULE_SIZE_16KB;
+>>>> +        granule_feature = RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_16KB;
+>>>> +        break;
+>>>> +    case SZ_64K:
+>>>> +        granule_size = RMI_GRANULE_SIZE_64KB;
+>>>> +        granule_feature = RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_64KB;
+>>>> +        break;
+>>>> +    default:
+>>>> +        BUILD_BUG();
+>>>> +    }
+>>>> +
+>>>> +    if (!(rmi_feat_reg(1) & granule_feature)) {
+>>>> +        pr_err("RMM does not support %luKB granules\n",
+>>>> +               PAGE_SIZE >> 10);
+>>>> +        return -ENXIO;
+>>>> +    }
+>>>> +
+>>>> +    struct rmm_config *config __free(free_page) =
+>>>> +        (struct rmm_config *)get_zeroed_page(GFP_KERNEL);
+>>>> +
+>>>> +    if (!config) {
+>>>> +        pr_err("Unable to allocate memory for RMM config\n");
+>>>> +        return -ENOMEM;
+>>>> +    }
+>>>> +
+>>>> +    config->rmi_granule_size = granule_size;
+>>>> +
+>>>> +    /*
+>>>> +     * For now we set the tracking_region_size to 0 which is the 
+>>>> only option
+>>>> +     * for 4KB PAGE_SIZE (1GB for 4KB PAGE_SIZE, 32MB/512MB for 
+>>>> 16KB/64KB).
+>>>> +     * TODO: Support other tracking sizes via Kconfig option for 
+>>>> other
+>>>> +     * PAGE_SIZES
+>>>> +     */
+>>>> +    config->tracking_region_size = 0;
+>>>> +
+>>>> +    ret = rmi_rmm_config_set(virt_to_phys(config));
+>>>> +    if (ret) {
+>>>> +        pr_err("RMM config set failed (%d)\n", ret);
+>>>> +        ret = -EINVAL;
+>>>         return -EINVAL;
+>>>
+>>>> +    }
+>>>> +
+>>>> +    return ret;
+>>>     return 0;
+>>>
+>>> So obvious this is the good path without anyone having to think 
+>>> about it!
+>>>
+>>> I did quick check on whether this was to reduce churn due to later 
+>>> changes
+>>> but couldn't immediately spot anything
+>>>
+>>>
+>>>> +}
+>
+Understood. Thanks Suzuki.
