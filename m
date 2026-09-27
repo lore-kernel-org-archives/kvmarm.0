@@ -1,89 +1,90 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20832A95E
-	for <kvmarm@lists.linux.dev>; Sun, 27 Sep 2026 16:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3528A3BF68F;
+	Sun, 27 Sep 2026 16:35:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790526523; cv=none; b=SETFYxmpsTH6sz5TJjORJJl4PBUGtgv+U9yabWNJdHcZGUPM0w/7wy1lhMRcEd//MY3Ox936oS1Z4tJjqTQBm5oi9SwiZD5znLDQi0uHOKnkfropIS5ECwl10OJ+0gyXf/BjqdK0FXb5S/MCx6MC71F46rPwEEfOQm0fO8FRyZg=
+	t=1790526911; cv=none; b=CJdY1uq2uMy1NyB1fCD2sQQ4ZnV3dz7sOIPO/tziB/BmfDvSPFTVb2mhxL8eDD+H0cjLQqHzrVOswqTBempV3siuumopBSTiW53K5ad/E0m3O/7EzB2s68KtLRNI+70M8nMHhHXjZYBfeAQXndDcsUxCZ/EkJfLE72Fj7Gk62Cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790526523; c=relaxed/simple;
-	bh=t/0HcZZceFOovrgJo/GG/DTHnY74uRJzIh9RtbbFXbk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OfsE95a1mVvwkmLrpZXqA8WpPzgFDGcFe1vBnbfiEZAuA3/UT2Y7LBu1x3c0RvyeoQ4muTJf493f8QevHsFtFajd4A4DnYbErJ2a3QYWu9PqBVKg9K0dk25J8bGu6mW8xjKNNrfA7aF6rYFke6KPsfeHSKEQ+p8uYV2NFzrGycc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OB+DctYv; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790526911; c=relaxed/simple;
+	bh=eOWrkJHSt+NiEPARVQRnbswzc8cM5mhNb/mu2flfBnI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=meiIw+gk3k852X3HzxQ5DhpGaj+b/mSnvogVGo0IC6c/RK6yvZAZ52hoqRAa92VJFEGc3TIlRViMQqYOQygkdbRFO2RRdDiMCvUVDYVCMQhgA/MZlbGl+CZEBt8ypSeXbGw3tVeajmhc2nTjNycP5wg5A4AscW20+aYzZ5yBauQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RcA3jvfg; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OB+DctYv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC2D81F00893;
-	Sun, 27 Sep 2026 16:28:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RcA3jvfg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D2001F000FF;
+	Sun, 27 Sep 2026 16:35:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790526521;
-	bh=0bGvAPMgrvKzOfMkF0bYH3byGkkwHKG8AkJQ8RyeWDI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=OB+DctYvvuNiqvL2L2UKXWB6BR8fNRjcEOEhdWuqR8E1GMPdFngZb3mKfnEYTbI0r
-	 nFsAw6wSyaMytkaKAqpNtNOFe5sVzHK5zci9/VIoFxyB5dTA9v5uHE77a91y+8jZl5
-	 99+1Nru15JwJ2xkMP55saXLlfmOuivyRcNca8EIuSFfz0P6tRhDguWDn+C5TJbOV7r
-	 fw4QIYS3f09jvlPh0tQ0L1UwaVg+CulO1OazUJquRe09wGzuE9LPCmRvBJSv5JlN+/
-	 GVX3MkfcnL6sPxgN0Nuo48bLwgu0k1Z5hqnubF7Dlqb7dXqUEwh6/SPIsC4rOsMhSk
-	 U2cO2Rxw48E3A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	s=k20260515; t=1790526908;
+	bh=RujpUbO0P+3HoDW6lFgN2NaCd44XmjPJC5yHMUlOFrg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=RcA3jvfgqnPMNyRGlqN0CgN02mPLov1sw6eJux27LWTLQwbXs7AkfDKsDMEBikvPx
+	 ptoQbXFsHQTinml1srSBUafLUmTNBSIgrpC7JHWPwUFDRe6yC1foPjSI9FI/Wu4VCF
+	 7GX364aXDAXiURlsz/9UT46fEoGOsuUTDZSZrcOMHvRnJxOt59PHl3bLW0XqJ1nNqT
+	 QsxoYsBEmIGVkiXNwZm70kZBYoHX1DmAfQzpm+UKRAf+Ha7XThjOfsVPo1FMjKSAHz
+	 /MVUb7+iMkciuDM8ZjR8wou1Qog3P9E6DL7VPANVpfdXr/XjTNaj2oqLJVUgtXbOAI
+	 gcuJb6EQ3yYCQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1xArjz-0000000E2GR-3X7f;
-	Sun, 27 Sep 2026 16:28:39 +0000
-Date: Sun, 27 Sep 2026 17:31:48 +0100
-Message-ID: <87pkxy3bbf.wl-maz@kernel.org>
+	id 1xArqE-0000000E2Sa-3OLw;
+	Sun, 27 Sep 2026 16:35:06 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: oupton@kernel.org,
-	kvmarm@lists.linux.dev,
+To: Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	kernel-team@android.com,
-	fuad.tabba@linux.dev,
-	qperret@google.com
-Subject: Re: [PATCH v1 3/6] KVM: arm64: Move pkvm_mem_abort()
-In-Reply-To: <20260922130821.1666713-4-vdonnefort@google.com>
-References: <20260922130821.1666713-1-vdonnefort@google.com>
-	<20260922130821.1666713-4-vdonnefort@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: arm64: Report SMCCC_VERSION and SMCCC_ARCH_FEATURES as implemented
+Date: Sun, 27 Sep 2026 17:35:03 +0100
+Message-ID: <179052685156.3528802.11780401181301860028.b4-ty@b4>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260914125827.1645980-1-fuad.tabba@linux.dev>
+References: <20260914125827.1645980-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vdonnefort@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com
+X-SA-Exim-Rcpt-To: oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 22 Sep 2026 14:08:18 +0100,
-Vincent Donnefort <vdonnefort@google.com> wrote:
+On Mon, 14 Sep 2026 13:58:26 +0100, Fuad Tabba wrote:
+> KVM reports SMCCC v1.1 to guests, which makes SMCCC_VERSION and
+> SMCCC_ARCH_FEATURES mandatory, and DEN0028H 7.3.6 requires
+> SMCCC_ARCH_FEATURES to return SUCCESS for both function ids: "This
+> function must return SUCCESS when arch_func_id is the SMCCC_VERSION or
+> SMCCC_ARCH_FEATURES function id." With arch_func_id set to either, KVM's
+> guest handler returns NOT_SUPPORTED. Return SUCCESS.
 > 
-> Move pkvm_mem_abort() below kvm_s2_fault_get_vma_info() so it can
-> resolve stage-2 fault VMA metadata without forward declarations.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> [...]
 
-Honestly, I vastly prefer forward declaration to code movement. It
-makes backporting easier, and results in fewer patches. Same for the
-following patch.
+Applied to next, thanks!
 
-Thanks,
+[1/2] KVM: arm64: Report SMCCC_VERSION and SMCCC_ARCH_FEATURES as implemented
+      commit: 7ef1b9e11dd7b3832124e26a6fee703b342d6f7f
+[2/2] KVM: arm64: selftests: Check the mandatory SMCCC_ARCH_FEATURES queries
+      commit: 67d00fcc00761e9fe4debeac781eb4f992dd8506
+
+Cheers,
 
 	M.
-
 -- 
-Jazz isn't dead. It just smells funny.
+Without deviation from the norm, progress is not possible.
+
+
