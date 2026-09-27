@@ -1,56 +1,59 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29E03BBFB1
-	for <kvmarm@lists.linux.dev>; Sun, 27 Sep 2026 08:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D61EADC;
+	Sun, 27 Sep 2026 09:12:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790498236; cv=none; b=HOIy3JeSzxiSfY1pddHdZMa3kDBL1v++YKyWjRbXvEYIZY1wGkkt15hXiLldbWc8KRBlJ2lf78OD5C4xrEG5D/ZCcKSt7avjoH0TDvUcoU2YztnEn0gpRCkhANMc3fg2vp3Wxgx6zkUuFbQuFAW3sSijJ405HkjTTbQ6GH+1Pq4=
+	t=1790500323; cv=none; b=QoTJ/TCf8S3QCNiaKeCSCldH/mbh4Cri0+v0dgyXRaTXrNAaJc2N/eoEa/LIoBxeiUnBSsj8g6IhtHD/pnuYfQDuV7gL8d2pINSD5tFkkcatZhH984zblZDHCU8Mivk7SRNa3nH1fZ8fgep0ocfqFf/oXxlTS4GZoLn7KhuQgWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790498236; c=relaxed/simple;
-	bh=JZ5VstCEXISByVqcZCDCVNLtHIAhuKxGOi1noul67ww=;
+	s=arc-20240116; t=1790500323; c=relaxed/simple;
+	bh=rusPoAtfE1HGkEPckjvesieCpOr9LmURaCGuH16o3LM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mmTp3C0KhdqFpFH6zUJaohePcK+fpOMmW1reDAdCWNd6sNYs8/Eply0kd5vKBNRhahWKvvMpfq/GfphNTUeYLuSP/H8IoRhwpO3gyrKI72Xn9a27VrhObHwZ2nbC8Ge4iaeUCDyDl5FqN6nTE2SfSvh0U7VCPuoXAbBwuQzWlAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k/G4+Q/o; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=Z7z7Frl7cpfvZC4hLxGyGsFQaHigZZ/a97aQlnpsvq2vU1OHjYkB58Az4VHqAhnC2IuFq6H3MTg/fRxX4hDtACTPOjTf2p23Y0PeTGIdmG7abekN0bsRnnqCUmcN2PgqRmvvws/JTDD1blJTgmudGpUTFJopVuSjhv6b2dJWjDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RgjbsX/p; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k/G4+Q/o"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B9641F000FF;
-	Sun, 27 Sep 2026 08:37:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RgjbsX/p"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37D981F000FF;
+	Sun, 27 Sep 2026 09:12:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790498234;
-	bh=899MDx3EJ3AoKnMe6g2fG4UCe2OzBFO/jrXfzKh7DOc=;
+	s=k20260515; t=1790500321;
+	bh=pE/5x1B9xdKFypHayV9J1lDYCmJcDgCZVV9ZL+4ifL4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=k/G4+Q/oNdW0Oj7HZuHBv5NmaksPbEb8QWtIRP3WPDPWOEwX/RF96bkk57paV/9vx
-	 gl9Ze8n++4gXqEid/Kaqkg6ZZ1dNZww2HC33FzDxc65VlkjFyDiwdH5v4UHS7ghU/s
-	 HPyjcp8+3OChVXYEfQSroRJXedeZ9HHMldkFtACn2ENhfY/aUElfue+Ub/MOkpxNgT
-	 Qp7U/wDShBj08hGfo+uMx1C67Qk7qu4dw+UeGf1juHUNgnJoMGjHaMbS7I0dfHlzbK
-	 oELQ1SqSV0OyLVnmGeHmLC/c6SaYsy3utU6h5jjDt3fY8cmvX0+TnLhdGzpShNj9Ob
-	 JyWof/sHhGtAA==
+	b=RgjbsX/p/VXXRJ2MSHIB5CBHwCxGp9ORiyhpRcehI2ihGUnAn3kjILyGQwGM20sKr
+	 Ee6y1Z9RSQoEQKfw0zRw+j9U9Ezpeaz9lTGHJJ9EmoRSiVPAre7oCz8dy8VbFx5pha
+	 NGXeiX+7GlsylGrFwDVFl+9pkcIh+8hKD+FsKPbiAn3IbmNR39muGox/86gdfSCWKA
+	 AKQSHfwrJLOjFmFfAu451Sg+xM3KT07iPNxz6E3XNLxR0j8xluzuDN0zFZVmka1b7Y
+	 OGOsqpMFN8/nGlU2k1Q9JPNxOEyQ7+BfT6lL4i0+gunKOIBFSRJ2KjlF3VofwFsxj7
+	 kmIiA7iXIEjMw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1xAkNk-0000000DwHF-0Reo;
-	Sun, 27 Sep 2026 08:37:12 +0000
-Date: Sun, 27 Sep 2026 09:40:20 +0100
-Message-ID: <87zex32ikr.wl-maz@kernel.org>
+	id 1xAkvO-0000000Dx1q-3qdl;
+	Sun, 27 Sep 2026 09:11:59 +0000
+Date: Sun, 27 Sep 2026 10:15:07 +0100
+Message-ID: <87y0cn2gys.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Vincent Donnefort <vdonnefort@google.com>,
-	oupton@kernel.org,
+Cc: Oliver Upton <oupton@kernel.org>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	kernel-team@android.com
-Subject: Re: [PATCH] KVM: arm64: Remove PAGE_SIZE alignment for hyp event ELF sections
-In-Reply-To: <CA+EHjTzOZi-N4XCRKGBKqa2=PJZRyVskooGgT4HWAwErUTMROA@mail.gmail.com>
-References: <20260924095154.807726-1-vdonnefort@google.com>
-	<CA+EHjTzOZi-N4XCRKGBKqa2=PJZRyVskooGgT4HWAwErUTMROA@mail.gmail.com>
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Quentin Perret <qperret@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 3/4] KVM: arm64: Use the host's HCR_EL2 for non-protected VMs in pKVM
+In-Reply-To: <20260925090619.852995-4-fuad.tabba@linux.dev>
+References: <20260925090619.852995-1-fuad.tabba@linux.dev>
+	<20260925090619.852995-4-fuad.tabba@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -62,28 +65,118 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, vdonnefort@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seiden@linux.ibm.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, qperret@google.com, vdonnefort@google.com, tabba@google.com, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 24 Sep 2026 17:14:54 +0100,
+On Fri, 25 Sep 2026 10:06:18 +0100,
 Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> Hi Vincent,
+> In pKVM, a non-protected VM gets only TWI, TWE and VSE from the HCR_EL2
+> the host computes for it. EL2 sets the rest in pkvm_vcpu_reset_hcr(),
+> which covers only part of vcpu_set_hcr(). On a CPU with MTE the VM can
+> then read GMID_EL1, on one without FGT it can execute a TLBI OS its ID
+> registers hide, and it never gets the host's TVM, VI or VF.
 > 
-> On Thu, 24 Sep 2026 10:51:54 +0100, Vincent Donnefort
-> <vdonnefort@google.com> wrote:
-> > .hyp.event_ids is mapped as part of .hyp.rodata. As a consequence this
-> > section does not need any page-alignment. Remove it to save a page worth
-> > of memory.
-> >
-> > Fixes: 0a90fbc8a170 ("KVM: arm64: Add event support to the nVHE/pKVM hyp and trace remote")
+> Use the host's HCR_EL2 on every entry instead, except for the bits EL2
+> owns. The other bits only control what the VM's own execution traps on
+> and which virtual exceptions are pending for it. The host computes them
+> from the vCPU's features, ID registers and flags, which EL2 already
+> takes from the host for a non-protected VM, as it takes MDCR_EL2,
+> HCRX_EL2 and the fine-grained traps.
 > 
-> Could you either drop the Fixes: tag or say in the message what goes
-> wrong without this patch? As it stands the message describes a
-> one-page saving, and the tag makes it a candidate for stable.
+> ATA, an owned bit, stays clear, as pKVM doesn't support MTE for any
+> guest. TID2 and TID4 move to pvm_init_traps_hcr(), since EL2 now sets
+> them only for a protected VM. A protected VM's HCR_EL2 is unchanged.
 
-I've dropped the tag when applying the patch.
+But the host does set these bits for non-protected VMs. What is going
+to honor these traps?
+
+No mention of why you are adding HCR_EL2_GPF here?
+
+>
+> Fixes: b56680de9c648 ("KVM: arm64: Initialize trap register values in hyp in pKVM")
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h       |  1 +
+>  arch/arm64/kvm/hyp/include/nvhe/pkvm.h | 13 +++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c     |  7 ++++---
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c         | 18 ++++++++----------
+>  4 files changed, 26 insertions(+), 13 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 4bfbd827c5aa7..8d187650e463e 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -30,6 +30,7 @@
+>  #define HCR_AMVOFFEN	__HCR(AMVOFFEN)
+>  #define HCR_TICAB	__HCR(TICAB)
+>  #define HCR_TID4	__HCR(TID4)
+> +#define HCR_GPF		__HCR(GPF)
+>  #define HCR_FIEN	__HCR(FIEN)
+>  #define HCR_FWB		__HCR(FWB)
+>  #define HCR_NV2		__HCR(NV2)
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> index c904647d2f760..75b1122db4c91 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> @@ -12,6 +12,19 @@
+>  #include <nvhe/gfp.h>
+>  #include <nvhe/spinlock.h>
+>  
+> +/*
+> + * HCR_EL2 bits EL2 owns for a non-protected VM, whatever the host sets: those
+> + * that restrict the guest, configure EL2 or what it switches (E2H, RW), or
+> + * enable state EL2 doesn't switch or support. RES0 is included, so a bit comes
+> + * from the host only once arch/arm64/tools/sysreg describes it.
+> + */
+> +#define PKVM_HCR_EL2_OWNED	((HCR_GUEST_FLAGS & ~(HCR_TWI | HCR_TWE)) | HCR_BSU |	\
+> +				 HCR_E2H | HCR_TGE | HCR_TEA | HCR_GPF | HCR_TERR |	\
+> +				 HCR_FWB | HCR_DC | HCR_ID | HCR_CD | HCR_NV |		\
+> +				 HCR_NV1 | HCR_NV2 | HCR_API | HCR_APK | HCR_ATA |	\
+> +				 HCR_DCT | HCR_FIEN | HCR_AMVOFFEN | HCR_ENSCXT |	\
+> +				 HCR_EL2_RES0)
+> +
+
+The name of the macro doesn't indicate that this only applies to
+protected VM.
+
+Also, please don't add new uses of the compat HCR macros. I really
+want to remove them (probably post -rc1).
+
+>  /*
+>   * Holds the relevant data for maintaining the vcpu state completely at hyp.
+>   */
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 9a3b92e626adb..dec99d5bbee78 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -216,6 +216,7 @@ static void sync_debug_state(struct pkvm_hyp_vcpu *hyp_vcpu)
+>  static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+>  {
+>  	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
+> +	u64 host_hcr_mask = HCR_TWI | HCR_TWE | HCR_VSE;
+>  
+>  	fpsimd_sve_flush();
+>  	flush_debug_state(hyp_vcpu);
+> @@ -228,6 +229,7 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+>  	if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
+>  		if (vcpu_get_flag(host_vcpu, PKVM_HOST_STATE_DIRTY))
+>  			flush_hyp_vcpu_state(hyp_vcpu);
+> +		host_hcr_mask = ~PKVM_HCR_EL2_OWNED;
+
+This feels fragile. You start with a restrictive set (TWI, TWE, VSE),
+and then drop it all. At this point, I have no idea what you are
+letting in.
+
+It would be better to express things in a consistent way:
+
+- either the bits that are controlled by the host for either protected
+  and non-protected guests,
+
+- or the bits that are controlled by the hypervisor for either cases.
+
+Here, you're mixing both, and that's confusing.
 
 Thanks,
 
