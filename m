@@ -1,237 +1,179 @@
-Received: from flow-a3-smtp.messagingengine.com (flow-a3-smtp.messagingengine.com [103.168.172.138])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2720D38657D;
-	Sat, 26 Sep 2026 17:14:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0621145B27;
+	Sun, 27 Sep 2026 08:17:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790442893; cv=none; b=idFkI/CVc3ycxvDfNOBFhaQ2tpDYR3YoD5nn+CHkJvyF0qx/icBdE3Aw49iKrOdD7Wmr07RJI9ur+/gduPgIG/5lcSsg9zvugGl8bJhfasodGbXHjRraUHWBi1xpSnCzCZwA+p3O1CyKpHoLZbh3e+iXCjPupLFqHQIg6pVHwxI=
+	t=1790497067; cv=none; b=Tl6D/ZUKSv59ojNIBdssaQpwvGngn6tIuSJWtAXokX4JEbGI4JXYbylmVy5qz52kirZghiUZpSDq6IsiVHqxQXz7hX2NG3elpKiq29j10CfDmk7zkEvd6u9/Q6kqTbDZDYnitSr/swt+d3/1fEOUKfa3CxjRnzQSO5HQLjmG+W0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790442893; c=relaxed/simple;
-	bh=gojmdYDsD3StNnB/hDyqo1gXIHc8O8nZybk73It5oqU=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=F2q26YzU3oaINIbbzBFePri8N28TFCe0sd248jYo8gOAWhJe92gR5SJmYJ3kmpGtjCqh7Zw8gg8FkRsyNxtFvhvRokesweu11m5qsWa9rsIc8UFa4su6bPWb4FvtE5/Doiy4fjjIj54M6f4ygun31K5Rtv030XnrtgJUusJCyMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=dE1RFAps; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LFqYjy/y; arc=none smtp.client-ip=103.168.172.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1790497067; c=relaxed/simple;
+	bh=ML8N1pLH170Rl2gYqm2NQBY58tCaaiV1dlthEjJT2DU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CRZJgg3SM9IZAghwTKezRuoxHINBMBcKVDAd8FrwYEJh5K8G1KUiEee209yl/IxKmgIu7nOzwRwJao5ROYk1ty/b3ZuUFztQ5F1WM/J5hQEvGahGDsWysduh4mGtWQX0n12ePOtsJZBawxVL0B38cduMISgIHFuc21M1jtBT91s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LkuTICPd; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="dE1RFAps";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LFqYjy/y"
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailflow.phl.internal (Postfix) with ESMTP id 178B413800C5;
-	Sat, 26 Sep 2026 13:14:47 -0400 (EDT)
-Received: from ams-imap-03 ([10.64.2.23])
-  by ams-compute-02.internal (MEProxy); Sat, 26 Sep 2026 13:14:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1790442886;
-	 x=1790450086; bh=tGTq2YiYGuZgWk5ZY7JZMyWu45IuuL1ykMMcgPEJafg=; b=
-	dE1RFApslPrSXAIEUR7zYCnrfR6vWyYxLHf2mps7m16cLN5ynFqwRrqagDCdLt5m
-	YGRbmWqMeuJZtlHPeeOXNw4YOCr4WJ6Mx0NBGForSSyaTMKmirJa1d3T2lnduVHI
-	rsG6gUbympIQqV0TgHZcoaLCS4Np+hjwdRsk5xnTjJWQAspIaZDsh56Wd+ZL1Q9P
-	guB+47QlTtdPYoLG8jeKzxdNJlNY8FOh1EE+3+tKu9V2DYSkeblqIQPL6x4FiFqi
-	37BVGgjvon0RgSlw4AbAROwgO5Lo55li4rPUTLQ9IBrXkmPCZHI9T0Ji1alFsVXg
-	+dWgvw0N90MVm2Z635R8Zg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1790442886; x=
-	1790450086; bh=tGTq2YiYGuZgWk5ZY7JZMyWu45IuuL1ykMMcgPEJafg=; b=L
-	FqYjy/yVFlEv/wmLmbEHRnoCYINCfyu+CrEq8Z1fyh4tz9qIiMya3S3yY3OFrTAj
-	kbwJ1H7p0hlPQkLTIbo3q91ouu2AqnlXl5AXAUacs9gWfltmW1YlpP2JQRX6xaDG
-	BIlnaq23mgNxIHZvkc5sn32cnf0vgx81JvFvLJXh30/EkXzOIDF2jBGju20aWRpQ
-	r+U4sr/EsBDJPkf1NNPApHB0wtpHKJnfgD68NUX259cKVa0+Te+WR7YSLWz3+AYG
-	NY5HM9amaFG4UKU2VWfYypsTDrNO67ys7nqOEDOLSOI0kUSbd6LrrDfi5G6ZeLOj
-	guHR/v4b83Xt/fUVhxgQg==
-X-ME-Sender: <xms:ev23aqEfCNjet-2YbYWWzRXflqtzqi8hwMuw-sOV-SpumEa7LG2shg>
-    <xme:ev23amLx2unnBtPfhChzlb1fRZ2Od9LfU9yDqP0ez7conwhJcOBcipgwHXcNic6Vd
-    ihyMWwi_TyPeTUyTmoikaAeCIv-aWaHbyLCC6Ub4m_6V1cork6IqRQ>
-X-ME-Proxy-Cause: dmFkZTE6NCtyMLNoS8hrfLFpEVvHnZq+KuaY8H+9LmihRjQuIS2tAlukOayEfreBF4n2zt
-    VM1Xb2o3pLojfbA1Q3K/syWPA1rTM+rS4TL1sKcoS7DFAfYGpLW2jXD87OlXNKqEST0xN/
-    cCB9d0v2iX9PJOBVVmY1Q/2SAi/Mg+fUIg3v4HzozejY4wwxdLDProktJHZEibcEbdkK9A
-    DsbLRqLfari181EQsuwTU6q2VoX8ASbKad+pD4D4x5fnBcBEsLw1S0g0DqkX98pTL00H96
-    s7WDOTgZX/sRdKZFzHVYGuDUWUJen+c2yA8PP101rXcEkHHLoEMw3Y2mH/kj+PJ6Jg4phW
-    ZPtHSWVzfsMi/uo7wINTVSLDSLjRI4Nrcb+iIceGEJgwfznIyowU/XB7wjZK1vQwvmWNfh
-    Xsf2CcydvUcV328L0LwSnRsCbh10PhtfXwxt1AdrlAnXwA/tpDhQGwkJwWPe8a1uDDSIgR
-    FuRPcva3YSO3dMEwljCPu2EQ9gdo7QVG5vdPgtLNw84R0kUyuYuZE3uKBRMlgr4529/DqD
-    DjCSn1ux1tr4q9apeaHlutLLSq0hzxv+TC86iyQ80tvVgpfvwCR7R2k16RICYFops8dGKe
-    orvK37Cs5fQgJyBNeJVlwb2UjdrY+qi1eBLaiX0vwatLO6jmf2NBuSQeeCRg
-X-ME-Proxy: <xmx:gP23aluqnoTw4Kp_p7Myy76Cg9h3zOKmotAVHEwJf7Xg8wiaBQaRtA>
-    <xmx:gP23atVx8P31dhvH6TSVp8JBe56LI4k3auajT3v0qFyKlytMy_bmLA>
-    <xmx:gP23apJheLHk8ePOwgYDLSw0f2H4aAcZiX3L2QUNgpYltbdfKVe22A>
-    <xmx:gP23ahPAx3Etc-AdLxQIy0Ipz5Y_4EKVj1jjlEnECLU6wC7z8PJW4Q>
-    <xmx:hv23aunjCQ20lqB8ZAJCIhTa2AfrZr7JcwsQqJyvJGCpuVigaepn1ADv>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 7CCAA32A0087; Sat, 26 Sep 2026 13:14:34 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LkuTICPd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34A9E1F000FF;
+	Sun, 27 Sep 2026 08:17:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790497066;
+	bh=fItMYEYFxRZozAGThUr9nMPH+C4/6G6ZtlrfAYGEGZQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=LkuTICPdiKXjSEy5TexoCBRONDl83Lj/gqzP/WNb5L/dw7AuzwErgwPYEq25OI3zu
+	 jW7HLf1qzEFI8XjXQpIx1V/owXFJhCEa+Fh+gnPIORstaScdgLCujj34Sqw7rOVLUC
+	 FMxOcieFYM7taFoeLYTYvoHSnoJ7Uudv38jQyW4cu+7IHOwwLc27VWZA1a3ht4sryf
+	 H816Yi7JiVSN79KDLsYVV65y+hZns1CerKMrb++IKsngAApEUnjP8vgjB15NyjfnRv
+	 eCIorX9Nb8F6gA8+hxhvbEnd2nZrD+zRTd1syKuHtNRc+qXBzxAu/+8JoHbiQCu/pv
+	 yIXIADufnXYtg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xAk4t-0000000Dw13-3aXr;
+	Sun, 27 Sep 2026 08:17:43 +0000
+Date: Sun, 27 Sep 2026 09:20:52 +0100
+Message-ID: <871paf3y1n.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>,
+	oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	catalin.marinas@arm.com,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	mark.rutland@arm.com,
+	steven.price@arm.com,
+	vdonnefort@google.com,
+	qperret@google.com
+Subject: Re: [PATCH v3 15/18] KVM: arm64: Reject host access to protected VM private state
+In-Reply-To: <aq0628Ci4pfEj0KG@willie-the-truck>
+References: <20260914113338.159227-1-fuad.tabba@linux.dev>
+	<20260914113338.159227-16-fuad.tabba@linux.dev>
+	<86a4ph5fb9.wl-maz@kernel.org>
+	<CA+EHjTzCQkeXQQcCDwABLR2w+NTmKTG3V6RSmhzYNayaoYXw3g@mail.gmail.com>
+	<865x045mke.wl-maz@kernel.org>
+	<aq0628Ci4pfEj0KG@willie-the-truck>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-ThreadId: AJwEWD5WPnhk
-Date: Sat, 26 Sep 2026 19:14:14 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Lorenzo Stoakes" <ljs@kernel.org>
-Cc: "Andrew Morton" <akpm@linux-foundation.org>,
- "Liam R. Howlett" <liam@infradead.org>,
- "Vlastimil Babka (SUSE)" <vbabka@kernel.org>,
- "Jann Horn" <jannh@google.com>, "Pedro Falcato" <pfalcato@suse.de>,
- "David Hildenbrand (Red Hat)" <david@kernel.org>,
- "Mike Rapoport" <rppt@kernel.org>,
- "Suren Baghdasaryan" <surenb@google.com>,
- "Michal Hocko" <mhocko@suse.com>, "Jonathan Corbet" <corbet@lwn.net>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Dennis Dalessandro" <dennis.dalessandro@cornelisnetworks.com>,
- "Jason Gunthorpe" <jgg@ziepe.ca>, "Leon Romanovsky" <leon@kernel.org>,
- "Paul Moore" <paul@paul-moore.com>,
- "Stephen Smalley" <stephen.smalley.work@gmail.com>,
- "Jaroslav Kysela" <perex@perex.cz>, "Takashi Iwai" <tiwai@suse.com>,
- "Alexei Starovoitov" <ast@kernel.org>,
- "Daniel Borkmann" <daniel@iogearbox.net>,
- "Andrii Nakryiko" <andrii@kernel.org>,
- "Eduard Zingerman" <eddyz87@gmail.com>,
- "Kumar Kartikeya Dwivedi" <memxor@gmail.com>, "Zi Yan" <ziy@nvidia.com>,
- "Baolin Wang" <baolin.wang@linux.alibaba.com>,
- "Nico Pache" <nico.pache@linux.dev>,
- "Ryan Roberts" <ryan.roberts@arm.com>, "Dev Jain" <dev.jain@arm.com>,
- "Barry Song" <baohua@kernel.org>, "Lance Yang" <lance.yang@linux.dev>,
- "Usama Arif" <usama.arif@linux.dev>,
- "Kirill A. Shutemov" <kas@kernel.org>,
- "Doug Gilbert" <dgilbert@interlog.com>,
- "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
- "Martin K. Petersen" <mkp@kernel.org>,
- "Jaya Kumar" <jayalk@intworks.biz>, "Simona Vetter" <simona@ffwll.ch>,
- "Helge Deller" <deller@gmx.de>, "Sebastian Reichel" <sre@kernel.org>,
- "John Hubbard" <jhubbard@nvidia.com>, peterx <peterx@redhat.com>,
- "Masami Hiramatsu" <mhiramat@kernel.org>,
- "Oleg Nesterov" <oleg@redhat.com>,
- "Peter Zijlstra" <peterz@infradead.org>,
- "Thomas Gleixner" <tglx@kernel.org>, "Ingo Molnar" <mingo@redhat.com>,
- "Borislav Petkov" <bp@alien8.de>,
- "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
- "Arnaldo Carvalho de Melo" <acme@kernel.org>,
- "Namhyung Kim" <namhyung@kernel.org>,
- "Mark Rutland" <mark.rutland@arm.com>, "Rik van Riel" <riel@surriel.com>,
- "Harry Yoo" <harry@kernel.org>, "Juri Lelli" <juri.lelli@redhat.com>,
- "Vincent Guittot" <vincent.guittot@linaro.org>,
- "Maarten Lankhorst" <maarten.lankhorst@linux.intel.com>,
- "Maxime Ripard" <mripard@kernel.org>,
- "Thomas Zimmermann" <tzimmermann@suse.de>,
- "Dave Airlie" <airlied@gmail.com>, "Will Deacon" <will@kernel.org>,
- "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
- "Nicholas Piggin" <npiggin@gmail.com>,
- "Muchun Song" <muchun.song@linux.dev>,
- "Oscar Salvador" <osalvador@suse.de>,
- "Matthew Wilcox" <willy@infradead.org>, "Jan Kara" <jack@suse.cz>,
- "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>,
- "Catalin Marinas" <catalin.marinas@arm.com>,
- "Madhavan Srinivasan" <maddy@linux.ibm.com>,
- "Anup Patel" <anup@brainfault.org>, "Paul Walmsley" <pjw@kernel.org>,
- "Palmer Dabbelt" <palmer@dabbelt.com>,
- "Albert Ou" <aou@eecs.berkeley.edu>,
- "Christian Borntraeger" <borntraeger@linux.ibm.com>,
- "Janosch Frank" <frankja@linux.ibm.com>,
- "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
- "Alexander Gordeev" <agordeev@linux.ibm.com>,
- "Gerald Schaefer" <gerald.schaefer@linux.ibm.com>,
- "Heiko Carstens" <hca@linux.ibm.com>,
- "Vasily Gorbik" <gor@linux.ibm.com>,
- "David S . Miller" <davem@davemloft.net>,
- "Andreas Larsson" <andreas@gaisler.com>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>,
- "Christian Brauner" <brauner@kernel.org>,
- "Matthew Brost" <matthew.brost@intel.com>,
- "Joshua Hahn" <joshua.hahnjy@gmail.com>, "Rakie Kim" <rakie.kim@sk.com>,
- "Byungchul Park" <byungchul@sk.com>, "Gregory Price" <gourry@gourry.net>,
- "Ying Huang" <ying.huang@linux.alibaba.com>,
- "Alistair Popple" <apopple@nvidia.com>, "Chris Li" <chrisl@kernel.org>,
- "Kairui Song" <kasong@tencent.com>,
- "Kemeng Shi" <shikemeng@huaweicloud.com>,
- "Nhat Pham" <nphamcs@gmail.com>, "Baoquan He" <baoquan.he@linux.dev>,
- "Youngjun Park" <youngjun.park@lge.com>,
- "Johannes Weiner" <hannes@cmpxchg.org>, "Qi Zheng" <qi.zheng@linux.dev>,
- "Shakeel Butt" <shakeel.butt@linux.dev>,
- "Axel Rasmussen" <axelrasmussen@google.com>,
- "Yuanchu Xie" <yuanchu@google.com>, "Wei Xu" <weixugc@google.com>,
- "Chengming Zhou" <chengming.zhou@linux.dev>,
- "Michal Hocko" <mhocko@kernel.org>, "Miklos Szeredi" <miklos@szeredi.hu>,
- "Xu Xin" <xu.xin@linux.dev>, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-usb@vger.kernel.org, linux-rdma@vger.kernel.org,
- selinux@vger.kernel.org, linux-sound@vger.kernel.org,
- bpf@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-trace-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- Linux-Arch <linux-arch@vger.kernel.org>, linux-fsdevel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org, sparclinux@vger.kernel.org,
- fuse-devel@lists.linux.dev, "Takashi Iwai" <tiwai@suse.de>,
- "Emil Tsalapatis" <emil@etsalapatis.com>
-Message-Id: <4a3a089c-3ade-494d-8f83-f9cb710e9ad1@app.fastmail.com>
-In-Reply-To: <arfGmNiEngnO3JKm@gremlin>
-References: 
- <20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org>
- <d4d7d4c2-a1d5-41d0-b1c8-8ea0cc5a0397@app.fastmail.com>
- <areSEI5pWBadkqIe@gremlin>
- <408aef6e-5b0a-482f-8ba8-f8c20ee870e5@app.fastmail.com>
- <arfGmNiEngnO3JKm@gremlin>
-Subject: Re: [PATCH v3 00/40] mm: make VMA flag semantics explicit, eliminate
- VM_SPECIAL
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, steven.price@arm.com, vdonnefort@google.com, qperret@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, Sep 26, 2026, at 15:22, Lorenzo Stoakes (ARM) wrote:
-> On Sat, Sep 26, 2026 at 03:06:33PM +0200, Arnd Bergmann wrote:
->>
->> It's a Kconfig setting upstream, but the way I'm doing it is to have
->> patch that calculates a sensible default based on other options that
->> is a little smaller than the default (currently 2048 bytes) on x86-64
->> to catch more cases where something sticks out.
->
-> So this is an early warning more or less :)
+Hi Will,
 
-Yes, a surprising number of these just point to stupid mistakes
-where the developer had no they were adding a large object to
-the stack. This instance here is unfortunately not an obvious
-case.
+Sorry for the delay replying, I'm catching up on email between
+travels...
 
->> There are many ways the call chain can go of course, but the actual
->> stack overflows do tend to follow this pattern where you are at a
->> function with high stack usage and call kmalloc() during low memory
->> condition and that ends up waiting for a block I/O down the line.
->> (you normally don't go through swap and nfs, I was just looking
->> for the worst case I could easily see in the code)
->
-> You certainly found quite the example haha.
+On Fri, 18 Sep 2026 14:21:31 +0100,
+Will Deacon <will@kernel.org> wrote:
+> 
+> Hi Marc, Fuad,
 
-I have previously toyed around with using VMALLOC_STACK on a reduced
-stack size and syzcaller, so I knew roughly where the worst offenders
-lie, but the list was from looking through the code just today.
+[...]
 
->> > If I can do it as a follow-up that'd be ideal!
->>
->> What I was hoping for is that as you are already deep into the
->> exact code that caused the warning and you can already see something
->> in there that may help.
->>
->> I don't think it's urgent, I just don't want it to be forgotten.
->
-> It won't be, it's now on my TODO and I see it as a relatively high priority
-> thing to follow up with.
->
-> Will likely send a patch for it next cycle (this is about the worst cycle I've
-> seen workload-size for mm so I don't really want to send anything more this time
-> around).
+> > > > I'm not keen on returning -EPERM for the ONE_REG stuff. For a start,
+> > > > X0 *is* valid on MMIO, and when you want to support LD64B and co,
+> > > > you'll need to show the actual data there.
+> > > >
+> > > > I'd rather return what is in the host vcpu structure, as normal.
+> 
+> I just wanted to chuck my thoughts in here, as some of this is my fault
+> and it would be really helpful to discuss it on the list. As you probably
+> know, on Android, pKVM has the semantics you describe above: the ONE_REG
+> calls succeed, but the register state isn't propagated to the guest once
+> it's started running. I think we largely did it this way because we were
+> solving a million problems at once during the initial development and
+> having to pipe-clean VMMs wasn't particularly appealing at the time.
+> It's also worth adding that, to my knowledge, we've never had any issues
+> in Android because of this decision.
+> 
+> So, based on that, it really sounds like it's the best option. If it ain't
+> broke, don't fix it!
+> 
+> *However*, I can't think of another upstream interface that behaves like
+> that and, when we came to document it, it was quite difficult to explain
+> it in a way that could be extended in the future. If we say that ONE_REG
+> doesn't propagate to the vCPU after first run and returns whatever was
+> last written, then userspace could (even accidentally) rely on that. If
+> we wanted to extend it, I think we'd not only need a method to advertise
+> the new behaviour (which I think you probably want even if ONE_REG
+> returned an error before) but also an opt-in for userspace to say that
+> it's ok with the new behaviour. In some ways, it feels a bit like the
+> "unchecked flags" problem for syscall arguments.
 
-Sounds good, I'll keep the local hack to mark functions as noinline for the
-moment then. Thanks,
+My take on this is that by asking for a protected VM, userspace has
+already acknowledged that it may not be able to access the guest state
+at all, and that trying to access it could result in stale data being
+obtained.
 
-      Arnd
+For example, we don't have any particular "buy-in" for the anonymous
+memory that the guest has mapped and that userspace then tries to
+access. We don't slap it on the wrist, but instead give it a page full
+of zeroes.
+
+[...]
+
+> > > once the vCPU has run, the copy is the VMM's
+> > > boot state plus what the exit handlers copy out, and the VMM can't
+> > > distinguish them. x0 on MMIO is one of those fields, but the VMM reads
+> > > it from kvm_run->mmio. For LD64B, EL2 would copy the operands out the
+> > > same way and the error could be relaxed to those registers. Loosening
+> > > later breaks nobody. The comment and the message do overstate it by
+> > > calling the copy "not the guest's state", and I'll reword both in v4.
+> > > More on the kvmtool thread [1].
+> > 
+> > A protected-aware VMM already knows it cannot obtain the registers.
+> 
+> I think you can use that argument both ways: if the VMM knows it cannot
+> obtain the registers, then it's fine to return an error if the VMM does
+> something wrong.
+
+But this is introducing unnecessary friction for userspace to support
+pKVM/CCA/whatever hypervisors.
+
+> 
+> In our recent investigation, it turned out that both kvmtool and crosvm
+> were perfectly happy with ONE_REG returning an error in normal operation
+> but we needed a handful of fixes for kvmtool [1] to handle things like
+> the 'debug' command.
+> 
+> If it's helpful, we can ask the crosvm developers here if they have
+> opinions for/against the two behaviours?
+
+I guess that'd be useful to know what they'd prefer, and also to look
+into what QEMU does in this case -- I'm not exactly a good judge when
+it comes to UAPI definition... ;-)
+
+> 
+> > I don't want to have to revisit the userspace interface once you have
+> > to relax it, because I know for sure that you will have to.
+> 
+> I think we'll have to do that either way, no? The VMM needs a way to
+> know that ONE_REG works and the situations in which it works. If the old
+> behaviour wasn't to return an error, it's also going to need a way to
+> enable the new behaviour.
+
+As above: my take is that this is being covered by creating a
+protected VM. But let's find out from the VMM folks what behaviour
+they prefer. After all, they have to deal with this...
+
+Thanks,
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
