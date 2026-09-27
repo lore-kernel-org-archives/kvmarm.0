@@ -1,404 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-97.mta0.migadu.com [91.218.175.97])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EED539B4AD
-	for <kvmarm@lists.linux.dev>; Sun, 27 Sep 2026 10:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59CE3A1687
+	for <kvmarm@lists.linux.dev>; Sun, 27 Sep 2026 12:38:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790504392; cv=none; b=gijZn/Sxg0zj+ILS2MAkp55p/Ly3/ExNFOSMY8eHWEx2eCkzBewdRrubIIfNhebTqHbYz45XAbYghT45GOkKH1aKx+ZnOLtGRdyDf4u6l7c/zzb9jTOVtJ9Z5qk1S8vrb8uAz/t8O/rLLx8ubVEZfuEnDWdETY5b+CBEn89+CLg=
+	t=1790512692; cv=none; b=JlEv7O/nYWVwJR1c7FEtc6x4yQwe3VZH+kM5rl1Wf1KFs7jNsU20OzigxGo9j6UnOS/my+anGld3mI6iH0XZiSK506U8sZ0X/d5zy+0IjcnmW1NEBN+MjWSx5bPcnbTJyB+9C9K29m2Pq+0I2fb8Od+Fj/6r3eFvUh0gaMOVjE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790504392; c=relaxed/simple;
-	bh=NcKmALAlLZ7OnaPHyyGUlphOElwbjQ8vId4PPjMTEzY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M53PDimKYIHa1yooVnDlWR8FFV6uXkUhywZ+LnUv/NRBMQ0ZHUPOm+MAD2C4+lVMpohjZcjQKcHlSvV5FGUXoANEdcAwTDOqFs28rsqOceYp2kuVCrtS2+nchY8DrOgFYxjEAEEVmZ21C1BZ5HpEVPxlk1Ai4v15fSkE/26zsu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SmZf4F/U; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790512692; c=relaxed/simple;
+	bh=NuKsMEW2bmL3HYEzGzn4/Q1vMLgkj5WzRXYhVoZ/eTE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=B0XQi8mo6JiPM4M+9W4FUeeBwqzsweA+Ri83/3F9zy3LA+etpikrmWIFT5wWLqA9dTS+aCHQZUOLE1yBlw8PVAX7zdv/P0tO9KquZbOBjoQTWZYnjoNESmtfJVaWPgzcZFGqB6AbtReSsdMnvLabyDeduSUoI14SWbk8ksyHKQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YoOy7FYI; arc=none smtp.client-ip=91.218.175.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SmZf4F/U"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F9221F000FF;
-	Sun, 27 Sep 2026 10:19:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790504391;
-	bh=RcSdkn6nD9TyI/dhz9WpZ/FnxrEQXfP+A9HrldpwPyA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=SmZf4F/U9SLycJzVnNDN6qPQziHrRsKH8Jw5iivbECCJdLvh2goEmM090qekD5AWu
-	 dsFC8qwBpVWWvs/pZJLxL9aJGikyHrqE/tdxbl/WmsiKuzA3XrfAJHjqXYMPBEGznG
-	 y1oNguIuNOlpCvUWRAShDE8Uiq7eRMcbBbsUtYRS38IttqWZKvz8fOd2OLmDk76JTa
-	 GyO+eVIsgp+gud2nIDIWXZlV/fmWza0aMIPlRi93Z/AH+CMkGddbaoXwS1ia4j3/YU
-	 B/S2527y1g1wnB/5hDgdShimtaZf+8nmNv1wqvEpCkjAW7hvJ63HD0YXhwpvaAMI2s
-	 OMJRkA9VZIucg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xAlz3-0000000DxvQ-16Ag;
-	Sun, 27 Sep 2026 10:19:49 +0000
-Date: Sun, 27 Sep 2026 11:22:57 +0100
-Message-ID: <87tsnb2dtq.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Matthias Goergens <matthias.goergens@gmail.com>,
-    Steffen Eiden <seiden@linux.ibm.com>
-Cc: oupton@kernel.org,
-	fuad.tabba@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [RFC PATCH] Documentation/process: Add a maintainer entry profile for KVM/arm64
-In-Reply-To: <20260925085621.562448-1-matthias.goergens@gmail.com>
-References: <20260924033536.3624334-1-matthias.goergens@gmail.com>
-	<877bkb3zjq.wl-maz@kernel.org>
-	<20260924083036.1744194-1-matthias.goergens@gmail.com>
-	<875wzu4vuv.wl-maz@kernel.org>
-	<20260925085621.562448-1-matthias.goergens@gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YoOy7FYI"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=NuKsMEW2bmL3HYEzGzn4/Q1vMLgkj5WzRXYhVoZ/eTE=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1790512687; v=1; x=1791117487;
+ b=YoOy7FYI07NfKhq/rxl+c8ufiWB9B28zFEShCUlnm5Y7nQYNHkw9kZsJr7lIobFgRXspYp7n
+ 0EcrpMr/wVykj3uZyhMO/VAnkuU1o6IlmIikfEa23q9V09g26IcWWyi3S17EtSANCYAYqk+OP4B
+ /wM4Qld+qoUW7E8/+6jn0HGc=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id d51077b25c52af03;
+	Sun, 27 Sep 2026 12:38:07 +0000
+X-Mizu-Trace-ID: d51077b25c52af03
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5b8e81e2a0bso6240e87.0
+        for <kvmarm@lists.linux.dev>; Sun, 27 Sep 2026 05:38:02 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvByhcEKaGPHotdxouy9oprOQwv4IRKVDfCl5tw0iujGYPdPpPost0OPwnqgCUq21X/1p5IktoAw=@lists.linux.dev
+X-Gm-Message-State: AFq9FYKHMi0Gw6KQK7/ZRLRQiXtL7o02d+Q3JWfvPo750QlNKWGWOQar
+	2sTCL18jkbv5uL3qY1Uov7rzmIjhadP86jcERYTaFJCQ0YOnjLSzMtrnPcVal7NKnKKX5vQrxtB
+	/uYbJIejOKN2i1LmGg9HOywh4ER3yqP2JOuRmgpgP
+X-Received: by 2002:a05:6512:b8d:b0:5b6:bcb:26c4 with SMTP id
+ 2adb3069b0e04-5b8ef285eb3mr99786e87.16.1790512681261; Sun, 27 Sep 2026
+ 05:38:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: matthias.goergens@gmail.com, seiden@linux.ibm.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260914113338.159227-1-fuad.tabba@linux.dev> <20260914113338.159227-16-fuad.tabba@linux.dev>
+ <86a4ph5fb9.wl-maz@kernel.org> <CA+EHjTzCQkeXQQcCDwABLR2w+NTmKTG3V6RSmhzYNayaoYXw3g@mail.gmail.com>
+ <865x045mke.wl-maz@kernel.org> <aq0628Ci4pfEj0KG@willie-the-truck> <871paf3y1n.wl-maz@kernel.org>
+In-Reply-To: <871paf3y1n.wl-maz@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Sun, 27 Sep 2026 13:37:25 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTzmGzwhVg=6jkHxzV6LF_WsdR1drobOFNTVWNyB1ZDGiw@mail.gmail.com>
+X-Gm-Features: AclHuK83YcLXY0C9NhVVfgcTUZxPrypRPxP9P25GK7wvjm4osxpyz56DMnGRBu4
+Message-ID: <CA+EHjTzmGzwhVg=6jkHxzV6LF_WsdR1drobOFNTVWNyB1ZDGiw@mail.gmail.com>
+Subject: Re: [PATCH v3 15/18] KVM: arm64: Reject host access to protected VM
+ private state
+To: Marc Zyngier <maz@kernel.org>
+Cc: Will Deacon <will@kernel.org>, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	catalin.marinas@arm.com, joey.gouly@arm.com, seiden@linux.ibm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, 
+	steven.price@arm.com, vdonnefort@google.com, qperret@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Matthias,
+Hi Marc, Will,
 
-On Fri, 25 Sep 2026 09:56:21 +0100,
-Matthias Goergens <matthias.goergens@gmail.com> wrote:
-> 
-> KVM/arm64 has no P: entry in MAINTAINERS, so nothing tells a contributor
-> that the kvmarm tree is used for integration only, or that most patches
-> are expected to be based on a tag from Linus' tree rather than on
-> kvmarm/next or linux-next.  Marc Zyngier said a profile would help and
-> pointed at the KVM x86 one as a starting point, noting where KVM/arm64
-> differs: the absence of topic branches, the references to documentation,
-> and the base for most patches.
-> 
-> Add a profile covering the trees and how changes flow through them, the
-> base for patches, recipients, subject prefixes, architecture references,
-> testing, key cycle dates and review cadence, and point the KVM/arm64
-> entry at it.
-> 
-> Link: https://lore.kernel.org/all/875wzu4vuv.wl-maz@kernel.org/
-> Signed-off-by: Matthias Goergens <matthias.goergens@gmail.com>
-> ---
-> Marc, this is the profile you said would help, in the thread this
-> replies to.  Where you and Oliver haven't said anything on the list, it
-> follows the KVM x86 profile and general practice, so please correct
-> anything that doesn't match how you work.  Three things need your call
-> in particular; they are marked [?: ...] in the text:
-> 
-> - master: once it follows -rc1, should the profile mention it?
-> 
-> - Cross-tree changes: the draft says there are no standing topic
->   branches for contributors, and that when a series also touches arm64
->   code the maintainers may set up a shared stable branch on an -rc tag.
->   Is that right?
-> 
-> - Cut-offs: which is the last -rc for new features, and when do you
->   decide what goes into the merge window?
-> 
-> I've kept this RFC to the people in this thread.  Once you're happy
-> with it, I'll widen the circle to the documentation maintainers and
-> lists.
+On Sun, 27 Sep 2026 09:20:52 +0100, Marc Zyngier <maz@kernel.org> wrote:
+[...]
+> > and it would be really helpful to discuss it on the list. As you probably
+> > know, on Android, pKVM has the semantics you describe above: the ONE_REG
+> > calls succeed, but the register state isn't propagated to the guest once
+> > it's started running. I think we largely did it this way because we were
+> > solving a million problems at once during the initial development and
+> > having to pipe-clean VMMs wasn't particularly appealing at the time.
+> > It's also worth adding that, to my knowledge, we've never had any issues
+> > in Android because of this decision.
 
-Thanks for starting this, much appreciated. See my remarks below.
+That's Android 15 (6.6). Android 16 and 17 reject ONE_REG once a
+protected vCPU is finalized, except x0-x3 during one forwarded
+hypercall so the VMM can complete it [1]. crosvm has shipped against
+that on both.
 
-> 
->  .../process/maintainer-kvm-arm64.rst          | 163 ++++++++++++++++++
->  MAINTAINERS                                   |   2 +
->  2 files changed, 165 insertions(+)
->  create mode 100644 Documentation/process/maintainer-kvm-arm64.rst
-> 
-> diff --git a/Documentation/process/maintainer-kvm-arm64.rst b/Documentation/process/maintainer-kvm-arm64.rst
-> new file mode 100644
-> index 000000000000..deba2f812cef
-> --- /dev/null
-> +++ b/Documentation/process/maintainer-kvm-arm64.rst
-> @@ -0,0 +1,163 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +KVM/arm64
-> +=========
-> +
-> +This document describes how KVM/arm64 (``arch/arm64/kvm/`` and the other
-> +files listed under "KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" in
-> +MAINTAINERS) is maintained.  It supplements
-> +Documentation/process/submitting-patches.rst.
-> +
-> +Overview
-> +--------
-> +
-> +KVM/arm64 is maintained by Marc Zyngier and Oliver Upton, assisted by the
-> +reviewers listed in MAINTAINERS.  Patches are discussed on
-> +kvmarm@lists.linux.dev, and linux-arm-kernel@lists.infradead.org is Cc'd as
-> +well.
+[...]
+> > If it's helpful, we can ask the crosvm developers here if they have
+> > opinions for/against the two behaviours?
+>
+> I guess that'd be useful to know what they'd prefer, and also to look
+> into what QEMU does in this case -- I'm not exactly a good judge when
+> it comes to UAPI definition... ;-)
 
-I don't think we need this. This should directly point to MAINTAINERS,
-and let that file be the reference. Maintainers and MLs have changed
-over time, and are likely to change again.
+QEMU stops syncing registers once it has marked the guest state
+protected [2] (bar the virtual counter save/restore on stop/cont), and
+the QEMU CCA series sets that flag when the VM starts [3].
 
-> +
-> +Trees
-> +~~~~~
-> +
-> +The KVM/arm64 tree is::
-> +
-> +  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git
-> +
-> +This tree is used for integration only: no development happens in it, and
-> +most patches should not be based on it (see `Base for patches`_).  Its
-> +branches are:
-> +
-> +``next``
-> +  Changes queued for the next merge window.  linux-next merges this branch.
-> +
-> +``fixes``
-> +  Fixes for the release currently in its -rc phase.  linux-next merges this
-> +  branch too.
-> +
-> +[?: ``master`` still points at a 2020 commit.  Once it follows -rc1, should
-> +this document mention it?]
+On the kernel side, the CCA series rejects a SET_ONE_REG for a realm
+outside the GPRs, PC and two configuration registers with -EINVAL, and
+lets GET return what its message calls "(stale)" values [4].
 
-I've pushed 7.3-rc3 there already.
+Given that, are you ok with v4 keeping the error? :D
 
-> +
-> +Changes leave the tree as signed tags, which are pulled into the main KVM tree
-> +(``git://git.kernel.org/pub/scm/virt/kvm/kvm.git``) and from there reach Linus
-> +Torvalds.
-> +
-> +Unlike the KVM x86 tree, KVM/arm64 has no standing topic branches for
-> +contributors to base their work on.  Where a series also touches code
-> +maintained elsewhere, most often the arm64 architecture code, the maintainers
-> +may set up a shared stable branch, based on an -rc tag, that both trees merge.
-> +Say in the cover letter which parts of a series touch other subsystems.
-> +[?: Is this an accurate description of topic branches and of how
-> +cross-tree changes are handled?]
+Cheers,
+/fuad
 
-Yes, this is correct. Topic branches are directly managed by the
-maintainers in private trees, and only the result of the integration
-is pushed out. The exception to this is of course shared branches that
-are published when necessary.
-
-As for the impact on arch code, we are about to have extended
-dependencies with other architectures (s390). Steffen, can you have a
-look and prepare a short addition to this text that would apply to the
-KVM/arm64-on-S390 contraption?
-
-> +
-> +Base for patches
-> +~~~~~~~~~~~~~~~~
-> +
-> +Base your patches on a tag published in Linus Torvalds' tree.  Patches based
-> +on linux-next or on ``kvmarm/next`` are discouraged.
-
-It is best to base the work on -rc1 to -rc3. If you rely on something
-past -rc3, please explain why (dependency on fixes merged in-rc4, for
-example).
-
-> +
-> +If your series depends on something that is not yet in mainline, such as
-> +another series under review or work already queued in ``kvmarm/next``, say so
-> +in the cover letter and name exactly what it applies on top of.  The
-> +maintainers may also ask for a series to be rebased onto ``kvmarm/next`` when
-> +it conflicts with work queued there.
-
-It is extremely rare that we'd ask for something of the sort. For a
-start, the -next branch is rebuilt very regularly, so picking a
-kvmarm/next commit is generally wrong. And we actually want to see
-conflicts, because this is a good indication that we need to dig a bit
-deeper. On the other hand, we welcome a proposed resolution of the
-conflicts.
-
-The only exception I can think of is when a series is a strict
-continuation of another one that has already been queued.
-
-> +
-> +Use ``git format-patch --base`` so that the base commit is recorded in the
-> +patches.
-> +
-> +Submit Checklist Addendum
-> +-------------------------
-> +
-> +Recipients and threading
-> +~~~~~~~~~~~~~~~~~~~~~~~~
-> +
-> +Send the whole series to all of the maintainers and reviewers listed for
-> +KVM/arm64, not a selection of them.  Post each new version as a new thread,
-> +with a cover letter for anything longer than a single patch.
-
-The "new thread" is quite important, at least to me. I nearly missed
-this patch as you didn't follow this recommendation! :-/
-
-> +
-> +Subject lines
-> +~~~~~~~~~~~~~
-> +
-> +Changes to KVM/arm64 use the ``KVM: arm64:`` prefix, often followed by a
-> +sub-topic such as ``nv:`` or ``vgic:``.  Selftest changes use ``KVM: arm64:
-> +selftests:`` or ``KVM: selftests:``.
-> +``git log --oneline`` on the files you touch shows what is in use.
-
-nit: whatever comes out of the prefix list should start with a capital
-letter ("KVM: arm64: nv: Fix inverted frobinator polarity"). Yes, I
-have OCD... ;-)
-
-> +
-> +Architecture references
-> +~~~~~~~~~~~~~~~~~~~~~~~
-> +
-> +KVM/arm64 code tracks the Arm Architecture Reference Manual (the "Arm ARM",
-> +document DDI0487) closely.  Where a change depends on architected behavior,
-> +explain why the change is needed and cite the Arm ARM in the commit message
-> +or in a comment.  Section numbers change between revisions of the Arm ARM,
-> +so give the revision along with the section, for example ``DDI0487L.a
-> +D24.2.70``.
-
-Even better: when available, quote the rule identifier ("R_WXYZT")
-instead of the section. Such ids are immutable across versions, while
-the section numbers aren't. This also applies to other architecture
-documents (the ARM ARM is not the only one).
-
-> +
-> +This differs from KVM x86, whose profile asks contributors not to cite
-> +section numbers.
-
-I don't think we need to name "the other architecture"... ;-)
-
-> +
-> +Testing
-> +~~~~~~~
-> +
-> +Say in the cover letter how the series was tested: which tests, and on which
-> +hardware or model.  The KVM selftests (``tools/testing/selftests/kvm/``) and
-> +kvm-unit-tests are the usual test suites.  Put selftest changes in patches of
-> +their own, separate from the KVM changes.
-
-... and usually at the end of the series.
-
-> +
-> +KVM/arm64 can run in several modes, which are described under
-> +``kvm-arm.mode=`` in Documentation/admin-guide/kernel-parameters.txt.  Test
-> +the modes your change can affect.
-> +
-> +Do not draw conclusions about performance on hardware from measurements made
-> +on a software model such as QEMU or the Arm FVP.
-
-If you submit a patch that aims to improve performance, describe the
-exact methodology you used to evaluate the performance, and provide
-enough information so that others can reproduce your findings.
-
-> +
-> +Changes to nested virtualization in particular are unlikely to be merged
-> +without test coverage.
-
-That's not really true. Our NV coverage is incredibly poor, and yet we
-take patches for it. It is encouraged though.
-
-> Depending on the change, selftests may not be enough;
-> +the maintainers may ask for testing with a VMM, for example.
-> +
-> +Userspace API
-> +~~~~~~~~~~~~~
-> +
-> +Document changes to the userspace API, usually in
-> +Documentation/virt/kvm/api.rst or in the files under
-> +Documentation/virt/kvm/devices/ and Documentation/virt/kvm/arm/.
-> +
-> +Fixes
-> +~~~~~
-> +
-> +Add a ``Fixes:`` tag for bug fixes.  If the fix should go to stable kernels,
-> +add ``Cc: stable@vger.kernel.org``; the maintainers may add it when applying
-> +if the bug calls for it.
-> +
-> +Key Cycle Dates
-> +---------------
-> +
-> +Fixes for the current release are queued on ``fixes`` and sent throughout
-> +the -rc phase.  Changes for the next merge window are queued on ``next``.
-> +
-> +[?: What are the cut-offs: the last -rc for submitting new features, and the
-> +last -rc at which the maintainers decide what goes into the next merge
-> +window?]
-
-We usually stop merging new features once -rc6 is published, and only
-queue fixes from that point onward. This is not a hard rule, but one
-that we try to follow for our own sanity. Obviously, posting patches
-for a new feature just before -rc6 doesn't guarantee anything other
-than a French shrug...
-
-For fixes that are not part of the initial drop for a release, they
-are accumulated and sent upstream on a semi-regular basis, depending
-on the severity of the bugs that are being fixed. There is no cut-off
-for those, but maintainers may decide to defer a low priority fix to
-the following merge window.
-
-> +
-> +Review Cadence
-> +--------------
-> +
-> +Unless the maintainers ask for a new version sooner, allow at least a week
-> +between versions of a series, and only post a new version once there has
-> +been enough review to justify it.  Posting more often
-> +delays review rather than speeding it up.
-> +
-> +Pinging a series that has had no response is fine.
-> +
-> +Applied patches are normally acknowledged in reply to the posting, naming the
-> +branch (``next`` or ``fixes``) and the commits.  Commit IDs can still change
-> +before they reach mainline.
-
-They can change, but we try hard not to. However, note that commit IDs
-for merges are almost guaranteed to change, even if the commit IDs for
-individual patches are stable.
-
-I'd like to also add that reviews performed by bots (sashiko and co)
-are expected to be answered, even if it is to point out that they are
-plain wrong.
-
-However, for pre-existing problems outlined by these bots, we
-generally don't expect them to be addressed as part of the initial
-posting if they are unrelated issues. Yes, this is a fine line...
-
-> +
-> +Minor problems are often fixed up by the maintainers when applying; if they
-> +say "no need to resend", don't.
-> +
-> +Security issues
-> +---------------
-> +
-> +Bugs that let a guest attack its host, or a nested guest attack its guest
-> +hypervisor, should be reported as described in
-> +Documentation/process/security-bugs.rst.
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 140eafcbbd78..129d7ef2c3ec 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -14301,7 +14301,9 @@ R:	Zenghui Yu <yuzenghui@huawei.com>
->  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
->  L:	kvmarm@lists.linux.dev
->  S:	Maintained
-> +P:	Documentation/process/maintainer-kvm-arm64.rst
->  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git
-> +F:	Documentation/process/maintainer-kvm-arm64.rst
->  F:	Documentation/virt/kvm/arm/
->  F:	Documentation/virt/kvm/devices/arm*
->  F:	arch/arm64/include/asm/kvm*
-> 
-> base-commit: 62f4c998b297cf233997a2b4cd6fc2d2df0319c9
-
-This otherwise looks pretty good to me. Let's see what Oliver says,
-but I'm otherwise inclined to take something like this in 7.4.
-
-Thanks again,
-
-	M.
-
--- 
-Jazz isn't dead. It just smells funny.
+[1] https://android.googlesource.com/kernel/common/+/cfc696b1fb110
+[2] https://gitlab.com/qemu-project/qemu/-/commit/5c3131c392f84c660033d511ec39872d8beb4b1e
+[3] https://lore.kernel.org/all/20260903193611.1058589-5-mathieu.poirier@linaro.org/
+[4] https://lore.kernel.org/all/20260924160504.853911-23-suzuki.poulose@arm.com/
