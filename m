@@ -1,63 +1,56 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0621145B27;
-	Sun, 27 Sep 2026 08:17:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29E03BBFB1
+	for <kvmarm@lists.linux.dev>; Sun, 27 Sep 2026 08:37:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790497067; cv=none; b=Tl6D/ZUKSv59ojNIBdssaQpwvGngn6tIuSJWtAXokX4JEbGI4JXYbylmVy5qz52kirZghiUZpSDq6IsiVHqxQXz7hX2NG3elpKiq29j10CfDmk7zkEvd6u9/Q6kqTbDZDYnitSr/swt+d3/1fEOUKfa3CxjRnzQSO5HQLjmG+W0=
+	t=1790498236; cv=none; b=HOIy3JeSzxiSfY1pddHdZMa3kDBL1v++YKyWjRbXvEYIZY1wGkkt15hXiLldbWc8KRBlJ2lf78OD5C4xrEG5D/ZCcKSt7avjoH0TDvUcoU2YztnEn0gpRCkhANMc3fg2vp3Wxgx6zkUuFbQuFAW3sSijJ405HkjTTbQ6GH+1Pq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790497067; c=relaxed/simple;
-	bh=ML8N1pLH170Rl2gYqm2NQBY58tCaaiV1dlthEjJT2DU=;
+	s=arc-20240116; t=1790498236; c=relaxed/simple;
+	bh=JZ5VstCEXISByVqcZCDCVNLtHIAhuKxGOi1noul67ww=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CRZJgg3SM9IZAghwTKezRuoxHINBMBcKVDAd8FrwYEJh5K8G1KUiEee209yl/IxKmgIu7nOzwRwJao5ROYk1ty/b3ZuUFztQ5F1WM/J5hQEvGahGDsWysduh4mGtWQX0n12ePOtsJZBawxVL0B38cduMISgIHFuc21M1jtBT91s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LkuTICPd; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=mmTp3C0KhdqFpFH6zUJaohePcK+fpOMmW1reDAdCWNd6sNYs8/Eply0kd5vKBNRhahWKvvMpfq/GfphNTUeYLuSP/H8IoRhwpO3gyrKI72Xn9a27VrhObHwZ2nbC8Ge4iaeUCDyDl5FqN6nTE2SfSvh0U7VCPuoXAbBwuQzWlAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k/G4+Q/o; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LkuTICPd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34A9E1F000FF;
-	Sun, 27 Sep 2026 08:17:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k/G4+Q/o"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B9641F000FF;
+	Sun, 27 Sep 2026 08:37:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790497066;
-	bh=fItMYEYFxRZozAGThUr9nMPH+C4/6G6ZtlrfAYGEGZQ=;
+	s=k20260515; t=1790498234;
+	bh=899MDx3EJ3AoKnMe6g2fG4UCe2OzBFO/jrXfzKh7DOc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=LkuTICPdiKXjSEy5TexoCBRONDl83Lj/gqzP/WNb5L/dw7AuzwErgwPYEq25OI3zu
-	 jW7HLf1qzEFI8XjXQpIx1V/owXFJhCEa+Fh+gnPIORstaScdgLCujj34Sqw7rOVLUC
-	 FMxOcieFYM7taFoeLYTYvoHSnoJ7Uudv38jQyW4cu+7IHOwwLc27VWZA1a3ht4sryf
-	 H816Yi7JiVSN79KDLsYVV65y+hZns1CerKMrb++IKsngAApEUnjP8vgjB15NyjfnRv
-	 eCIorX9Nb8F6gA8+hxhvbEnd2nZrD+zRTd1syKuHtNRc+qXBzxAu/+8JoHbiQCu/pv
-	 yIXIADufnXYtg==
+	b=k/G4+Q/oNdW0Oj7HZuHBv5NmaksPbEb8QWtIRP3WPDPWOEwX/RF96bkk57paV/9vx
+	 gl9Ze8n++4gXqEid/Kaqkg6ZZ1dNZww2HC33FzDxc65VlkjFyDiwdH5v4UHS7ghU/s
+	 HPyjcp8+3OChVXYEfQSroRJXedeZ9HHMldkFtACn2ENhfY/aUElfue+Ub/MOkpxNgT
+	 Qp7U/wDShBj08hGfo+uMx1C67Qk7qu4dw+UeGf1juHUNgnJoMGjHaMbS7I0dfHlzbK
+	 oELQ1SqSV0OyLVnmGeHmLC/c6SaYsy3utU6h5jjDt3fY8cmvX0+TnLhdGzpShNj9Ob
+	 JyWof/sHhGtAA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1xAk4t-0000000Dw13-3aXr;
-	Sun, 27 Sep 2026 08:17:43 +0000
-Date: Sun, 27 Sep 2026 09:20:52 +0100
-Message-ID: <871paf3y1n.wl-maz@kernel.org>
+	id 1xAkNk-0000000DwHF-0Reo;
+	Sun, 27 Sep 2026 08:37:12 +0000
+Date: Sun, 27 Sep 2026 09:40:20 +0100
+Message-ID: <87zex32ikr.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>,
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Vincent Donnefort <vdonnefort@google.com>,
 	oupton@kernel.org,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	catalin.marinas@arm.com,
 	joey.gouly@arm.com,
 	seiden@linux.ibm.com,
 	suzuki.poulose@arm.com,
 	yuzenghui@huawei.com,
-	mark.rutland@arm.com,
-	steven.price@arm.com,
-	vdonnefort@google.com,
-	qperret@google.com
-Subject: Re: [PATCH v3 15/18] KVM: arm64: Reject host access to protected VM private state
-In-Reply-To: <aq0628Ci4pfEj0KG@willie-the-truck>
-References: <20260914113338.159227-1-fuad.tabba@linux.dev>
-	<20260914113338.159227-16-fuad.tabba@linux.dev>
-	<86a4ph5fb9.wl-maz@kernel.org>
-	<CA+EHjTzCQkeXQQcCDwABLR2w+NTmKTG3V6RSmhzYNayaoYXw3g@mail.gmail.com>
-	<865x045mke.wl-maz@kernel.org>
-	<aq0628Ci4pfEj0KG@willie-the-truck>
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	kernel-team@android.com
+Subject: Re: [PATCH] KVM: arm64: Remove PAGE_SIZE alignment for hyp event ELF sections
+In-Reply-To: <CA+EHjTzOZi-N4XCRKGBKqa2=PJZRyVskooGgT4HWAwErUTMROA@mail.gmail.com>
+References: <20260924095154.807726-1-vdonnefort@google.com>
+	<CA+EHjTzOZi-N4XCRKGBKqa2=PJZRyVskooGgT4HWAwErUTMROA@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -69,107 +62,28 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, steven.price@arm.com, vdonnefort@google.com, qperret@google.com
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, vdonnefort@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Will,
-
-Sorry for the delay replying, I'm catching up on email between
-travels...
-
-On Fri, 18 Sep 2026 14:21:31 +0100,
-Will Deacon <will@kernel.org> wrote:
+On Thu, 24 Sep 2026 17:14:54 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> Hi Marc, Fuad,
-
-[...]
-
-> > > > I'm not keen on returning -EPERM for the ONE_REG stuff. For a start,
-> > > > X0 *is* valid on MMIO, and when you want to support LD64B and co,
-> > > > you'll need to show the actual data there.
-> > > >
-> > > > I'd rather return what is in the host vcpu structure, as normal.
+> Hi Vincent,
 > 
-> I just wanted to chuck my thoughts in here, as some of this is my fault
-> and it would be really helpful to discuss it on the list. As you probably
-> know, on Android, pKVM has the semantics you describe above: the ONE_REG
-> calls succeed, but the register state isn't propagated to the guest once
-> it's started running. I think we largely did it this way because we were
-> solving a million problems at once during the initial development and
-> having to pipe-clean VMMs wasn't particularly appealing at the time.
-> It's also worth adding that, to my knowledge, we've never had any issues
-> in Android because of this decision.
+> On Thu, 24 Sep 2026 10:51:54 +0100, Vincent Donnefort
+> <vdonnefort@google.com> wrote:
+> > .hyp.event_ids is mapped as part of .hyp.rodata. As a consequence this
+> > section does not need any page-alignment. Remove it to save a page worth
+> > of memory.
+> >
+> > Fixes: 0a90fbc8a170 ("KVM: arm64: Add event support to the nVHE/pKVM hyp and trace remote")
 > 
-> So, based on that, it really sounds like it's the best option. If it ain't
-> broke, don't fix it!
-> 
-> *However*, I can't think of another upstream interface that behaves like
-> that and, when we came to document it, it was quite difficult to explain
-> it in a way that could be extended in the future. If we say that ONE_REG
-> doesn't propagate to the vCPU after first run and returns whatever was
-> last written, then userspace could (even accidentally) rely on that. If
-> we wanted to extend it, I think we'd not only need a method to advertise
-> the new behaviour (which I think you probably want even if ONE_REG
-> returned an error before) but also an opt-in for userspace to say that
-> it's ok with the new behaviour. In some ways, it feels a bit like the
-> "unchecked flags" problem for syscall arguments.
+> Could you either drop the Fixes: tag or say in the message what goes
+> wrong without this patch? As it stands the message describes a
+> one-page saving, and the tag makes it a candidate for stable.
 
-My take on this is that by asking for a protected VM, userspace has
-already acknowledged that it may not be able to access the guest state
-at all, and that trying to access it could result in stale data being
-obtained.
-
-For example, we don't have any particular "buy-in" for the anonymous
-memory that the guest has mapped and that userspace then tries to
-access. We don't slap it on the wrist, but instead give it a page full
-of zeroes.
-
-[...]
-
-> > > once the vCPU has run, the copy is the VMM's
-> > > boot state plus what the exit handlers copy out, and the VMM can't
-> > > distinguish them. x0 on MMIO is one of those fields, but the VMM reads
-> > > it from kvm_run->mmio. For LD64B, EL2 would copy the operands out the
-> > > same way and the error could be relaxed to those registers. Loosening
-> > > later breaks nobody. The comment and the message do overstate it by
-> > > calling the copy "not the guest's state", and I'll reword both in v4.
-> > > More on the kvmtool thread [1].
-> > 
-> > A protected-aware VMM already knows it cannot obtain the registers.
-> 
-> I think you can use that argument both ways: if the VMM knows it cannot
-> obtain the registers, then it's fine to return an error if the VMM does
-> something wrong.
-
-But this is introducing unnecessary friction for userspace to support
-pKVM/CCA/whatever hypervisors.
-
-> 
-> In our recent investigation, it turned out that both kvmtool and crosvm
-> were perfectly happy with ONE_REG returning an error in normal operation
-> but we needed a handful of fixes for kvmtool [1] to handle things like
-> the 'debug' command.
-> 
-> If it's helpful, we can ask the crosvm developers here if they have
-> opinions for/against the two behaviours?
-
-I guess that'd be useful to know what they'd prefer, and also to look
-into what QEMU does in this case -- I'm not exactly a good judge when
-it comes to UAPI definition... ;-)
-
-> 
-> > I don't want to have to revisit the userspace interface once you have
-> > to relax it, because I know for sure that you will have to.
-> 
-> I think we'll have to do that either way, no? The VMM needs a way to
-> know that ONE_REG works and the situations in which it works. If the old
-> behaviour wasn't to return an error, it's also going to need a way to
-> enable the new behaviour.
-
-As above: my take is that this is being covered by creating a
-protected VM. But let's find out from the VMM folks what behaviour
-they prefer. After all, they have to deal with this...
+I've dropped the tag when applying the patch.
 
 Thanks,
 
