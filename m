@@ -1,43 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488C93B27EA;
-	Sun, 27 Sep 2026 16:26:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20832A95E
+	for <kvmarm@lists.linux.dev>; Sun, 27 Sep 2026 16:28:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790526420; cv=none; b=JionWRSdmOVpnN6HhGNQw8Odu3LppShhno9J/dN+D6OXYFsV8wkesEr0y/twA3YAOozo70F7OXG9IqUHtWLtfJHXdkgaqJG/4e/ldlqsbDHSnSWLH40OCOeW0SsxEWT+PZ4dGUetu1OfKfct6qkonsyVMV35123IMZhKyo6XqKI=
+	t=1790526523; cv=none; b=SETFYxmpsTH6sz5TJjORJJl4PBUGtgv+U9yabWNJdHcZGUPM0w/7wy1lhMRcEd//MY3Ox936oS1Z4tJjqTQBm5oi9SwiZD5znLDQi0uHOKnkfropIS5ECwl10OJ+0gyXf/BjqdK0FXb5S/MCx6MC71F46rPwEEfOQm0fO8FRyZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790526420; c=relaxed/simple;
-	bh=6A5xFIWDpJx3rVrbilD5Zv15HcRr67kq2q2m6q1tNoY=;
+	s=arc-20240116; t=1790526523; c=relaxed/simple;
+	bh=t/0HcZZceFOovrgJo/GG/DTHnY74uRJzIh9RtbbFXbk=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fsM/ar3VHzhGVR7CaXACeJOILteNFhEnxFGJCVcISKyQmHHgRt6Ae8lI5QZENBfzGgw0+R2wvDKCRTzg1T2kLYGP4XULe5+EY7wJDgnwTQkpUW101DBMXBAvF7P+SRgDtRb+Aeiobm/vAXDxmWl3FDAQai+RYb5BTwD+Gfwnb9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kqOdXy5K; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=OfsE95a1mVvwkmLrpZXqA8WpPzgFDGcFe1vBnbfiEZAuA3/UT2Y7LBu1x3c0RvyeoQ4muTJf493f8QevHsFtFajd4A4DnYbErJ2a3QYWu9PqBVKg9K0dk25J8bGu6mW8xjKNNrfA7aF6rYFke6KPsfeHSKEQ+p8uYV2NFzrGycc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OB+DctYv; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kqOdXy5K"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C42401F000FF;
-	Sun, 27 Sep 2026 16:26:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OB+DctYv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC2D81F00893;
+	Sun, 27 Sep 2026 16:28:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790526418;
-	bh=7kW7yGXjKhbeDUHOmR2h0QTxavzpIFMKdj9dx2ZV444=;
+	s=k20260515; t=1790526521;
+	bh=0bGvAPMgrvKzOfMkF0bYH3byGkkwHKG8AkJQ8RyeWDI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=kqOdXy5Ke1C4DXMhLh+tKnpi1VA6ACyj2ZCmtln93wuOHC0CZYNXqBC5DcX/HVSUw
-	 tcgmukQomsbc2JVRGFIuORep+DRAqGwpuP9jMPA6tmnYol4uLHfhOUmuP3tukUUF4r
-	 0OVKuAliLvavecpPcItmrPAh22SWniGndqa0I3Wcd2Z9Z3RER6HxuPlM26380u+c1G
-	 lZ2GLm04mH4CsjPf0kRs6+43lbluRPwtR9gw3+xOhZ16mPGEKSnJUIKccslE4qrBlU
-	 8xnS2a7IdA/Gh/KRBm9VrP1mXGHH4z2vQ71jFe5unBvo2djW+vjsBvVEzyVhpsCLnT
-	 tsWxMiqF7tnIA==
+	b=OB+DctYvvuNiqvL2L2UKXWB6BR8fNRjcEOEhdWuqR8E1GMPdFngZb3mKfnEYTbI0r
+	 nFsAw6wSyaMytkaKAqpNtNOFe5sVzHK5zci9/VIoFxyB5dTA9v5uHE77a91y+8jZl5
+	 99+1Nru15JwJ2xkMP55saXLlfmOuivyRcNca8EIuSFfz0P6tRhDguWDn+C5TJbOV7r
+	 fw4QIYS3f09jvlPh0tQ0L1UwaVg+CulO1OazUJquRe09wGzuE9LPCmRvBJSv5JlN+/
+	 GVX3MkfcnL6sPxgN0Nuo48bLwgu0k1Z5hqnubF7Dlqb7dXqUEwh6/SPIsC4rOsMhSk
+	 U2cO2Rxw48E3A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1xAriK-0000000E2Eb-1Xaj;
-	Sun, 27 Sep 2026 16:26:56 +0000
-Date: Sun, 27 Sep 2026 17:30:04 +0100
-Message-ID: <87qzie3beb.wl-maz@kernel.org>
+	id 1xArjz-0000000E2GR-3X7f;
+	Sun, 27 Sep 2026 16:28:39 +0000
+Date: Sun, 27 Sep 2026 17:31:48 +0100
+Message-ID: <87pkxy3bbf.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: Vincent Donnefort <vdonnefort@google.com>,
-	oupton@kernel.org,
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: oupton@kernel.org,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	joey.gouly@arm.com,
@@ -48,14 +47,11 @@ Cc: Vincent Donnefort <vdonnefort@google.com>,
 	will@kernel.org,
 	kernel-team@android.com,
 	fuad.tabba@linux.dev,
-	qperret@google.com,
-	Sashiko <sashiko-bot@kernel.org>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v1 5/6] KVM: arm64: Use kvm_s2_fault_vma_info in gmem_abort()
-In-Reply-To: <am2rfnuwjkglavbtzkt2lk2gclahvca5irrv5me4vppzkotexf@yauajpybhsnm>
+	qperret@google.com
+Subject: Re: [PATCH v1 3/6] KVM: arm64: Move pkvm_mem_abort()
+In-Reply-To: <20260922130821.1666713-4-vdonnefort@google.com>
 References: <20260922130821.1666713-1-vdonnefort@google.com>
-	<20260922130821.1666713-6-vdonnefort@google.com>
-	<am2rfnuwjkglavbtzkt2lk2gclahvca5irrv5me4vppzkotexf@yauajpybhsnm>
+	<20260922130821.1666713-4-vdonnefort@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,105 +63,25 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: weilin.chang@arm.com, vdonnefort@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com, sashiko-bot@kernel.org, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: vdonnefort@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 25 Sep 2026 18:36:42 +0100,
-Wei-Lin Chang <weilin.chang@arm.com> wrote:
+On Tue, 22 Sep 2026 14:08:18 +0100,
+Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> On Tue, Sep 22, 2026 at 02:08:20PM +0100, Vincent Donnefort wrote:
-> > From: Fuad Tabba <fuad.tabba@linux.dev>
-> > 
-> > gmem_abort() maps at s2fd->fault_ipa, which HPFAR_EL2 holds at 4K
-> > granularity whatever the page size. The generic page-table code aligns
-> > it, but pkvm_pgtable_stage2_map() looks up existing mappings over
-> > [addr, addr + size), so on a pKVM host with pages larger than 4K a
-> > guest_memfd-backed guest that faults past the first 4K of a page can
-> > find its neighbour's mapping, get -EAGAIN and take the same fault
-> > forever.
-> > 
-> > Take the addresses from kvm_s2_fault_vma_info instead, as
-> > user_mem_abort() does, and report the gfn kvm_gmem_get_pfn() failed on
-> > in the memory fault exit. kvm_s2_fault_get_vma_info() itself isn't
-> > called: a guest_memfd memslot's userspace_addr doesn't need to be
-> > backed by a VMA.
-> > 
-> > Fixes: a7b57e0995927 ("KVM: arm64: Handle guest_memfd-backed guest page faults")
-> > Reported-by: Sashiko <sashiko-bot@kernel.org>
-> > Closes: https://lore.kernel.org/r/20260913175105.A57AC1F000FF@smtp.kernel.org
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> > ---
-> >  arch/arm64/kvm/mmu.c | 28 +++++++++++++---------------
-> >  1 file changed, 13 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 5aac624b0442..ee0fcca838c1 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -1953,11 +1953,9 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
-> >  	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
-> >  	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-> >  	struct kvm_pgtable *pgt = s2fd->vcpu->arch.hw_mmu->pgt;
-> > -	unsigned long mmu_seq;
-> > -	struct page *page;
-> > +	struct kvm_s2_fault_vma_info s2vi = {};
+> Move pkvm_mem_abort() below kvm_s2_fault_get_vma_info() so it can
+> resolve stage-2 fault VMA metadata without forward declarations.
 > 
-> I'd say it's unfortunate this struct's name contains vma :P
+> No functional change intended.
+> 
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-If that was the only thing that is wrong in the MMU code, we'd be in a
-pretty good position! ;-)
+Honestly, I vastly prefer forward declaration to code movement. It
+makes backporting easier, and results in fewer patches. Same for the
+following patch.
 
-> 
-> >  	struct kvm *kvm = s2fd->vcpu->kvm;
-> >  	void *memcache = NULL;
-> > -	kvm_pfn_t pfn;
-> >  	gfn_t gfn;
-> >  	int ret;
-> >  
-> > @@ -1968,23 +1966,22 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
-> >  			return ret;
-> >  	}
-> >  
-> > -	if (s2fd->nested)
-> > -		gfn = kvm_s2_trans_output(s2fd->nested) >> PAGE_SHIFT;
-> > -	else
-> > -		gfn = s2fd->fault_ipa >> PAGE_SHIFT;
-> > +	s2vi.vma_pagesize = PAGE_SIZE;
-> > +	s2vi.gfn = ALIGN_DOWN(s2fd->fault_ipa, s2vi.vma_pagesize) >> PAGE_SHIFT;
-> > +	gfn = get_canonical_gfn(s2fd, &s2vi);
-> 
-> Perhaps it is worth reserving plain "gfn" for the value we use as the
-> IA of the (shadow) page table, and name this variable something like
-> canonical_gfn. Similar to what kvm_s2_fault_map() does.
-
-Maybe. We have gfn in the vncr fault handling code as well, but that
-one is the result of a S1 walk, so maybe more obvious.
-
-> 
-> >  
-> >  	write_fault = kvm_is_write_fault(s2fd->vcpu);
-> >  	exec_fault = kvm_vcpu_trap_is_exec_fault(s2fd->vcpu);
-> >  
-> >  	VM_WARN_ON_ONCE(write_fault && exec_fault);
-> >  
-> > -	mmu_seq = kvm->mmu_invalidate_seq;
-> > +	s2vi.mmu_seq = kvm->mmu_invalidate_seq;
-> >  	/* Pairs with the smp_wmb() in kvm_mmu_invalidate_end(). */
-> >  	smp_rmb();
-> >  
-> > -	ret = kvm_gmem_get_pfn(kvm, s2fd->memslot, gfn, &pfn, &page, NULL);
-> > +	ret = kvm_gmem_get_pfn(kvm, s2fd->memslot, gfn, &s2vi.pfn, &s2vi.page, NULL);
-> >  	if (ret) {
-> > -		kvm_prepare_memory_fault_exit(s2fd->vcpu, s2fd->fault_ipa, PAGE_SIZE,
-> > +		kvm_prepare_memory_fault_exit(s2fd->vcpu, gfn_to_gpa(gfn), s2vi.vma_pagesize,
-> 
-> Huh, I guess you also fixed a bug here? s2fd->fault_ipa could be the
-> nested ipa instead of the canonical ipa.
-
-Yeah, it appears so. Worth capturing in Fixes: as well.
+Thanks,
 
 	M.
 
