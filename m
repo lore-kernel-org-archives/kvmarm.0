@@ -1,56 +1,56 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3528A3BF68F;
-	Sun, 27 Sep 2026 16:35:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADCC340B116
+	for <kvmarm@lists.linux.dev>; Sun, 27 Sep 2026 16:35:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790526911; cv=none; b=CJdY1uq2uMy1NyB1fCD2sQQ4ZnV3dz7sOIPO/tziB/BmfDvSPFTVb2mhxL8eDD+H0cjLQqHzrVOswqTBempV3siuumopBSTiW53K5ad/E0m3O/7EzB2s68KtLRNI+70M8nMHhHXjZYBfeAQXndDcsUxCZ/EkJfLE72Fj7Gk62Cs=
+	t=1790526914; cv=none; b=Gk8sM/KeBx0XjjhZZxJp3dme2igFwtUzGxdZIzvvc9yUSm7GnJrr37wRRyP68qnAHhY8AFfNWesv4S+bAI+Xe8zIYEV13N8Ux/X3FpKMF0jGqm7B1H88t7lh5NKVLD5dGdlGfRezMOeBQ0f+QSDo3OCLigXDgnJXKHy7KdioOPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790526911; c=relaxed/simple;
-	bh=eOWrkJHSt+NiEPARVQRnbswzc8cM5mhNb/mu2flfBnI=;
+	s=arc-20240116; t=1790526914; c=relaxed/simple;
+	bh=AjTwMs2WKRCAS4daBNNL79qWHO0Gxu9X96E44j6a/SM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=meiIw+gk3k852X3HzxQ5DhpGaj+b/mSnvogVGo0IC6c/RK6yvZAZ52hoqRAa92VJFEGc3TIlRViMQqYOQygkdbRFO2RRdDiMCvUVDYVCMQhgA/MZlbGl+CZEBt8ypSeXbGw3tVeajmhc2nTjNycP5wg5A4AscW20+aYzZ5yBauQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RcA3jvfg; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=rRSHDvi5oknSjEg94t3pkkyxMIcPCCdxfCRdX+rIZDsa/7ON69LMXGdINfGqLv2nAN6EQm9/YrfBuRtg3RMgEjCnGUaRE+TX3QcPXcWhC6CK02o4vL00JGww2JKE1+5nGgIkfULa8p/110LbSlrV0QeN+HoU40K52CNrleGa1T8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DJnh36nn; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RcA3jvfg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D2001F000FF;
-	Sun, 27 Sep 2026 16:35:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DJnh36nn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 160FD1F0089A;
+	Sun, 27 Sep 2026 16:35:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790526908;
-	bh=RujpUbO0P+3HoDW6lFgN2NaCd44XmjPJC5yHMUlOFrg=;
+	s=k20260515; t=1790526911;
+	bh=iPKgJC8RbpP+9ibDNCnvvFbPTYvz5LnInWapqFpnif0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=RcA3jvfgqnPMNyRGlqN0CgN02mPLov1sw6eJux27LWTLQwbXs7AkfDKsDMEBikvPx
-	 ptoQbXFsHQTinml1srSBUafLUmTNBSIgrpC7JHWPwUFDRe6yC1foPjSI9FI/Wu4VCF
-	 7GX364aXDAXiURlsz/9UT46fEoGOsuUTDZSZrcOMHvRnJxOt59PHl3bLW0XqJ1nNqT
-	 QsxoYsBEmIGVkiXNwZm70kZBYoHX1DmAfQzpm+UKRAf+Ha7XThjOfsVPo1FMjKSAHz
-	 /MVUb7+iMkciuDM8ZjR8wou1Qog3P9E6DL7VPANVpfdXr/XjTNaj2oqLJVUgtXbOAI
-	 gcuJb6EQ3yYCQ==
+	b=DJnh36nn6WxhyaCJbJGkTanQoKzCjItyolhMxnEc22pXRpCgSLUh9BRCw4+lEcamN
+	 tIKd68LpYeUBraUKB2vRpJgNBIAXb0J7s6cYm3xfwsUsoL5SoXwHg0v81/rVOOIlUz
+	 tzrgQwQ04P9WXmsMGOw0rNNiDhNHIRnxhp3YHtSMIlxjsulriBl3KBQ9cx9WB/XxQV
+	 C+w7Gkmb7UsPZoAkXXCR0aOVWkghV7qt9E8nCip5ebUhL7xTeqa1Z9XrqJ23Kurrm/
+	 JWWE/nD5R7pRguabfOazZd/5OrSaHSSx24R/egUC792zx9KO0P65cnc+B10CicfYr5
+	 dZ8Khc/DmNzEg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1xArqE-0000000E2Sa-3OLw;
-	Sun, 27 Sep 2026 16:35:06 +0000
+	id 1xArqH-0000000E2Sj-1J3a;
+	Sun, 27 Sep 2026 16:35:09 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
+To: oupton@kernel.org,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: arm64: Report SMCCC_VERSION and SMCCC_ARCH_FEATURES as implemented
-Date: Sun, 27 Sep 2026 17:35:03 +0100
-Message-ID: <179052685156.3528802.11780401181301860028.b4-ty@b4>
+	linux-arm-kernel@lists.infradead.org,
+	Vincent Donnefort <vdonnefort@google.com>
+Cc: joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	kernel-team@android.com,
+	fuad.tabba@linux.dev
+Subject: Re: [PATCH] KVM: arm64: Remove PAGE_SIZE alignment for hyp event ELF sections
+Date: Sun, 27 Sep 2026 17:35:06 +0100
+Message-ID: <179052685160.3528802.5901671854382290571.b4-ty@b4>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260914125827.1645980-1-fuad.tabba@linux.dev>
-References: <20260914125827.1645980-1-fuad.tabba@linux.dev>
+In-Reply-To: <20260924095154.807726-1-vdonnefort@google.com>
+References: <20260924095154.807726-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -60,26 +60,19 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, vdonnefort@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, fuad.tabba@linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 14 Sep 2026 13:58:26 +0100, Fuad Tabba wrote:
-> KVM reports SMCCC v1.1 to guests, which makes SMCCC_VERSION and
-> SMCCC_ARCH_FEATURES mandatory, and DEN0028H 7.3.6 requires
-> SMCCC_ARCH_FEATURES to return SUCCESS for both function ids: "This
-> function must return SUCCESS when arch_func_id is the SMCCC_VERSION or
-> SMCCC_ARCH_FEATURES function id." With arch_func_id set to either, KVM's
-> guest handler returns NOT_SUPPORTED. Return SUCCESS.
-> 
-> [...]
+On Thu, 24 Sep 2026 10:51:54 +0100, Vincent Donnefort wrote:
+> .hyp.event_ids is mapped as part of .hyp.rodata. As a consequence this
+> section does not need any page-alignment. Remove it to save a page worth
+> of memory.
 
 Applied to next, thanks!
 
-[1/2] KVM: arm64: Report SMCCC_VERSION and SMCCC_ARCH_FEATURES as implemented
-      commit: 7ef1b9e11dd7b3832124e26a6fee703b342d6f7f
-[2/2] KVM: arm64: selftests: Check the mandatory SMCCC_ARCH_FEATURES queries
-      commit: 67d00fcc00761e9fe4debeac781eb4f992dd8506
+[1/1] KVM: arm64: Remove PAGE_SIZE alignment for hyp event ELF sections
+      commit: 8642afb74be6de014e49937c2c4de7576f45531c
 
 Cheers,
 
