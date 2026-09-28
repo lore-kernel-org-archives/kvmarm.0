@@ -1,95 +1,113 @@
-Received: from mta1.migadu.com (out-191.mta1.migadu.com [95.215.58.191])
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE27B35C1BC
-	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 09:29:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6F047AF68
+	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 09:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790587776; cv=none; b=hvrF7WmAyrPf6YG+qWUeeJECl+3lxSniodnqL4mFXpl9pFmEE75qkfcClkh2jng+O7canvUcSGt54TbW42u87LiZTNUxCn7icgT3+FtkkmeuHmfIUK5uwXh6MfKuocHaWKW3NUs6eGYUX/iLssfth02ioPDKemZXht5rXr+ctL8=
+	t=1790589308; cv=none; b=E1FOAIqupFAqrcvohI6BcT/D1FW0QU2E68PQMP1BBJ0q/4TJwlJaW2clK0wvf3ixJYpahkek9L4xyrC9xd02e7J0O8egXhUXLAPFEcZynvhdCixLLZk8OHEyualFo4/sv+4SNe/VQNzFm0jk/UJ8GwPsSBitTABI4TzeAF1uyFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790587776; c=relaxed/simple;
-	bh=mNyW1L2Kl7XsWs4BhSwMHQIYW+aVztuR3efDX2CQxJ8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dREB9EfystHvKgsGJE4KTegxdtnkze9g3osUquCi/eOLT3iQf7LW0LN5IfLX9SxUePxRtlopS30S7HiJH3YzX2b4bIjCYUBBFtjCQoQZThl12pb530/UQX9vpyxNjIz7mf1OSLA2bPkVF+uXjU7wP277FEqkrOeXdiLbyjuAhtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kurcTqjw; arc=none smtp.client-ip=95.215.58.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1790589308; c=relaxed/simple;
+	bh=/se4oIgnwRvYOg4j3UbDL/rPnFIf7czgq2FijQT83zU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=EIYlyvmrbdfv3Oyvq1iAalgmcyMB8X9Q3JKH7PDVMhs9oGOzNL2xojd6oeID2Il/l+CXapSyE7WmrEGW4wavnVio3jt4V4wohXK0bjOqSKFDmvIVfiKHufupoGUasDrTx+0lZ71N2stwGMVhp5+fzpYmtGswY5vNex2BxgRR2es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ichz6rMG; arc=none smtp.client-ip=209.85.128.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kurcTqjw"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=mNyW1L2Kl7XsWs4BhSwMHQIYW+aVztuR3efDX2CQxJ8=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790587772; v=1; x=1791192572;
- b=kurcTqjwX2ebHI06+vUBDs5nR6tN7BH7aNipDyaCscPxBJjwGkCmd5OKNgEa5IT1UXBD9nu+
- teJGc5t8e4/AkjIRitAowmu4YFZjoVAnj75z5z7A8XE6GSx17vBsV/BfeimDCsZcqbR4Ib7bl0a
- G75KA1cm92A+c8xQmJrzgK0g=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 8a9b806800588ff0;
-	Mon, 28 Sep 2026 09:29:32 +0000
-X-Mizu-Trace-ID: 8a9b806800588ff0
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5b8f42bb8a9so4988e87.1
-        for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 02:29:31 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvByWf0sRZsV/kUSunsGcztmc5r7/4CGLNlucATmREjYeE7AmQj2sceiQJQ3xfRVnqwz2EcgsM3w=@lists.linux.dev
-X-Gm-Message-State: AFq9FYJBCKHYNmzBErskRLk9d3BvUByFhCxDFKxYyJCvUmEY+FNDDC+Q
-	8CWrRpTOPDBEji7QNeMpRBzeQqYikYTIl9ytt6+VGpo5SyNPb6huLgj3OawWL141UzYzDYTtlCz
-	LEA11mJ8m8YqDRJfOErwHNSaGBz9x1vtPkyL1VFqy
-X-Received: by 2002:a05:6512:3d8e:b0:5b8:c8f2:16c4 with SMTP id
- 2adb3069b0e04-5b8ef255fa0mr175606e87.10.1790587770867; Mon, 28 Sep 2026
- 02:29:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ichz6rMG"
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-49e661c6440so19112435e9.3
+        for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 02:55:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790589305; x=1791194105; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=JVt9PTQ3gJ/ArVKfT3hU8hseiFwEBqxTroAJlxW9cEQ=;
+        b=ichz6rMG0GEwBfk+pZVKx1WUbHrCnsXyfjCBtgn07z4U3JikUZYEi7Dkj0ey6lT1aY
+         4MmPI3/8hRSbT+4htvcHYZZ2oqVd2bmhm5CWy+SmMBsgd3aKzVVnbnhbly+SOuWqE/WT
+         N4a+5KOVB3adCisEPIF1nbncSuuFndPwuYminC7lFt09rM442Ps2ElQ78weqCiz87It9
+         w+5dY0+uGpnmc+ROxMaQx572MG3iqzjQqEwuW4MgeMMORc6DBo3PG5Ri6VNmvroLoBhT
+         cerZM+KJvOzMDU3V39Du6d8ETf9mm9rtX+iDi2qNZUFYWIclUS3e+sYvBJ+3NVFXKM/M
+         U9fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790589305; x=1791194105;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=JVt9PTQ3gJ/ArVKfT3hU8hseiFwEBqxTroAJlxW9cEQ=;
+        b=lKmqDGdiRjNeRWwqFc65XzL01KSFgz0mrFyil4QM/HghJjbyOM0r3ScPhSOhgoBz9X
+         N8YGnJhavAHDuFyYTspcUQAb53JnFTOQJVveGSRqIreyysrxewmIXTQpf9HLakjNY6df
+         9USODErsVnlryDRR4YAes7OKD77WAkCJXXHeb1PU172AFGNyjm7P67MoaAl9HqlppmHV
+         VNfGeptPwXkP3AgLgCIxzVClKk4tocp7sdV+kida0JM5Qgo9zkzcWw4JGzLxXhIqA3cA
+         vcLT01aF/+qibMYebRpZHraJSHBgOIMGSRW6qnhEETOqJ6ltpkUrwzxFbZ5u5+l7ndWw
+         6r7g==
+X-Forwarded-Encrypted: i=1; AKwUvBzdX67bfVvPSQ+9XEkwx4s7yiLfALsKfWq0HGdnsRAp5S0bwB65PArTyFdVUvr4881Y4bYxm78=@lists.linux.dev
+X-Gm-Message-State: AFuF++laOef+6HDRIQJsBSQhSZNldCYexYjY/QTuwsBbYebrlGXs7svN
+	aLLAUZS3/ZqyuH4QM5QqSlCB9+VBJ4MXszHZL0GSLt3CgL6+XmefuK4wEMGsX8w3Py02qvhGGa8
+	5AiS7cP23txOFnWUWisH3sg==
+X-Received: from wmdv19.prod.google.com ([2002:a05:600c:12d3:b0:49f:e401:6ca4])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:4fc2:b0:49e:7d69:83b7 with SMTP id 5b1f17b1804b1-49fe66d397fmr217648495e9.13.1790589304426;
+ Mon, 28 Sep 2026 02:55:04 -0700 (PDT)
+Date: Mon, 28 Sep 2026 10:54:49 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260928064643.3265087-1-fuad.tabba@linux.dev>
- <20260928064643.3265087-5-fuad.tabba@linux.dev> <4095827e-dbbb-4ab9-8610-1bc317aa096f@oss.qualcomm.com>
-In-Reply-To: <4095827e-dbbb-4ab9-8610-1bc317aa096f@oss.qualcomm.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 28 Sep 2026 10:28:54 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxwffM9vQ0c8MQgsojsXOAUOzo8qD1=aoRK_zGvBF0XgA@mail.gmail.com>
-X-Gm-Features: AclHuK9Tx9jSnIhG13zjawNFq0tNHoDD4fS1QJa_ek8GgO61EjctlFamlrJQUSM
-Message-ID: <CA+EHjTxwffM9vQ0c8MQgsojsXOAUOzo8qD1=aoRK_zGvBF0XgA@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] KVM: arm64: selftests: Check a feature hidden in
- an ID register is UNDEF
-To: Venkata Rao Kakani <venkata.kakani@oss.qualcomm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Quentin Perret <qperret@google.com>, Vincent Donnefort <vdonnefort@google.com>, 
-	Wei-Lin Chang <weilin.chang@arm.com>, linux-kernel@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.rc1.315.gc6ed9934b7-goog
+Message-ID: <20260928095454.3255918-1-vdonnefort@google.com>
+Subject: [PATCH v2 0/4] Fix guest_memfd and protected VMs on systems with
+ pages larger than 4K
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com, 
+	weilin.chang@arm.com, Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Venkata,
+This series allows booting protected VMs and guest_memfd-back VMs on
+systems with a page size larger than 4K.
 
-On Mon, 28 Sep 2026 at 10:20, Venkata Rao Kakani
-<venkata.kakani@oss.qualcomm.com> wrote:
-> > +     for (;;) {
-> > +             vcpu_run(vcpu);
-> > +             switch (get_ucall(vcpu, &uc)) {
-> > +             case UCALL_SYNC:
-> > +                     got = uc.args[1];
-> > +                     break;
-> > +             case UCALL_ABORT:
-> > +                     REPORT_GUEST_ASSERT(uc);
-> > +                     break;
-> > +             case UCALL_DONE:
-> > +                     kvm_vm_free(vm);
-> > +                     return got;
-> > +             default:
-> > +                     TEST_FAIL("Unknown ucall %lu", uc.cmd);
-> > +             }
-> > +     }
->      Return missing?
+Currently, the fault handling assumes 4K alignment, as HPFAR_EL2
+provides the IPA minus the bottom 12 bits regardless of the system page
+size. This leads to mapping failures on 16K and 64K systems.
 
-No, the loop never falls through: the breaks only leave the switch,
-UCALL_DONE is the one way out and returns there, and the ABORT and
-default cases end the test. So control can't reach the end of the
-function.
+This series addresses the alignment mismatch by relying on struct
+kvm_s2_fault_vma_info in both gmem_abort() and pkvm_mem_abort() to
+retrieve correctly page-aligned addresses.
 
-Thanks for having a look,
-/fuad
+This series bundles the following previously discussed fixes:
+
+ 1. https://lore.kernel.org/all/20260915091606.2111217-1-vdonnefort@google.com
+ 2. https://lore.kernel.org/all/20260915084438.2076072-1-vdonnefort@google.com
+
+v2:
+  - Use forward declarations (Marc)
+  - gmem_abort(): rename local gfn to canonical_gfn (Wei-Lin)
+  - Pick up Reviewed-by and Tested-by tags
+  - Rebase on v7.3-rc5
+
+v1: https://lore.kernel.org/all/20260922130821.1666713-1-vdonnefort@google.com/
+
+Fuad Tabba (1):
+  KVM: arm64: Use kvm_s2_fault_vma_info in gmem_abort()
+
+Vincent Donnefort (3):
+  KVM: arm64: Fix MMFR0 TGRAN advertisement for pVMs
+  KVM: arm64: Pass kvm_s2_fault_desc to
+    fault_supports_stage2_huge_mapping()
+  KVM: arm64: Use kvm_s2_fault_vma_info in pkvm_mem_abort()
+
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c |   3 +
+ arch/arm64/kvm/mmu.c               | 129 +++++++++++++++--------------
+ arch/arm64/kvm/pkvm.c              |   3 +
+ 3 files changed, 75 insertions(+), 60 deletions(-)
+
+
+base-commit: 72d3fcf802c45d00b300f25b848a93c3a2bd7c7e
+-- 
+2.56.0.rc1.315.gc6ed9934b7-goog
+
