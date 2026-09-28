@@ -1,285 +1,89 @@
-Received: from mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
+Received: from mta0.migadu.com (out-191.mta0.migadu.com [91.218.175.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D307F35201A
-	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 06:46:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5273B8D7B
+	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 07:45:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790578010; cv=none; b=ECEhz61WWh5HKy8t1ndlS9BA04CqR5DP2ZMZnhpnLv4VYArwUnrgk8pqpDLDt1NCulqXDMel9TuqmUAbypZlvrsBD9tUosSILSzO58pNkphf2LFE+R50RaOQ5F4ICIKkfUFo7sIMZFNy2ySnK7LPD7gLGfZMX6u7zcAlyHUyhDc=
+	t=1790581520; cv=none; b=eS8D7l2oYTuC+z+r92NBtH/Ycg/IaMH9eB1X+ZOWvyE6I0BMNLG438kamP/HM9uAytsibJ2SPhqhZz67StFRjaIG5stxkUg5TE/14/ENUHnDPMesPWK/a+fp0jbU145MOd0//JVQaU3H7NLH231AvI7JaxngeitxaqBBAycUuM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790578010; c=relaxed/simple;
-	bh=9u1xb87yGfGazyR96ri6hSUGdO9iU79tn1MK3OJoWjI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mDtZAvYv7D7Rqq9tBt7hnm6KHLJlv1j9fAt5zlQAVa8s8RhMwIG3azl55lllRi9V0EqZnHkBqKDsVQZazIvZFsJy9ACDQiS+lHGxiEe7u09ke8n6OqmNZtigOIzeTAS3qiXKD4zBYSDBF4XabYO+xLJ5sDGkaQLTGDQSTHv+rL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=boOHR2Ux; arc=none smtp.client-ip=95.215.58.184
+	s=arc-20240116; t=1790581520; c=relaxed/simple;
+	bh=szjlKSRr4QKhQ/BXliXytwAbzwuxRJ9hxfloPYxH0y4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sd1b4WuNhTO5q65EUAr7Qv3EAAXCNLXZOoN6SOf5o6lnWcn9QIfGTLIue5O+xXZ/7tQp283Ntn/IBXJiwWYje86d6pyfSRljRRI0blF7z4sEy0E3DEGpB7tEmGkgXYilpLhwSDrw3AOhvJprVY/8iaPS5MB5duJua4zeTWvFBXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ys1MQIke; arc=none smtp.client-ip=91.218.175.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="boOHR2Ux"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ys1MQIke"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=9u1xb87yGfGazyR96ri6hSUGdO9iU79tn1MK3OJoWjI=;
+DKIM-Signature: a=rsa-sha256; bh=szjlKSRr4QKhQ/BXliXytwAbzwuxRJ9hxfloPYxH0y4=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790578006; v=1; x=1791182806;
- b=boOHR2UxeJ7jBFL+Jk2bTeQRL7o9TdLQux6C0tcTmYNwDLAQw+uEJNKC+V3ykc1AV3JBCPDk
- 7wmx8Gj35zJW2ZchwyBHIh6xc0kfCtw73i3kXtmR0+AsOnSli03AG+QNN9tsRxpsF2FelTR2YsT
- 6DkawIv/514TlP8sPjGps9/8=
+ t=1790581516; v=1; x=1791186316;
+ b=Ys1MQIkeV/eujertlX2VWFwU5ezKap/9dVAzfbmEUf6DnUlEv6WYezG9dz1+jOx+y/kygCmf
+ E2Xhp5k25mlYqXyOL/YxtHl/EB3OaMU3Fehd+dE86cLoeZNIy9JYdk79KTmR5rCWZM7RY+6/9lv
+ RyZDhXCfnIXPT3us1N30YlYk=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 93d6d6c6cfc30250;
-	Mon, 28 Sep 2026 06:46:46 +0000
-X-Mizu-Trace-ID: 93d6d6c6cfc30250
+Received: by smtp.migadu.com with ESMTPS id ed11c0e404fd6af9;
+	Mon, 28 Sep 2026 07:45:16 +0000
+X-Mizu-Trace-ID: ed11c0e404fd6af9
 X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Quentin Perret <qperret@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 4/4] KVM: arm64: selftests: Check a feature hidden in an ID register is UNDEF
-Date: Mon, 28 Sep 2026 07:46:43 +0100
-Message-Id: <20260928064643.3265087-5-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260928064643.3265087-1-fuad.tabba@linux.dev>
-References: <20260928064643.3265087-1-fuad.tabba@linux.dev>
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5b8c42da963so9545e87.0
+        for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 00:45:11 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBwKo9FIDhpeObMi7GffUj1PQ89ZuOzpjbsqv3TxXihuqo4kcXB7oq5t3oxXYaL8HvLubrg7f3Y=@lists.linux.dev
+X-Gm-Message-State: AFq9FYK3JSK3uE9pkuTrDsCNe4VOUqNnkor6lzl9QcEdzV7qSpvjtFAu
+	k8VP3Ry/VvR5cX1Niw1tjGH8Sx3c4gPWDBm+XiP3sQQ6ke4cKDLQDSPVSRjV+WGeHQD7YjXjZ8V
+	RL3mJ0Sc8DESfSzjbOeolwuoOac2hvUwp/rHCK79J
+X-Received: by 2002:a05:6512:1386:b0:5ae:cf5f:4a88 with SMTP id
+ 2adb3069b0e04-5b8ef2571demr154509e87.8.1790581510337; Mon, 28 Sep 2026
+ 00:45:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260922130821.1666713-1-vdonnefort@google.com>
+ <20260922130821.1666713-6-vdonnefort@google.com> <am2rfnuwjkglavbtzkt2lk2gclahvca5irrv5me4vppzkotexf@yauajpybhsnm>
+ <87qzie3beb.wl-maz@kernel.org>
+In-Reply-To: <87qzie3beb.wl-maz@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 28 Sep 2026 08:44:33 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTwwxL3Cs-7B2NgEyedu-ZQFt96ck_V-erCUaTB=hrh5eg@mail.gmail.com>
+X-Gm-Features: AclHuK-ALEhQXkggSsAxXnC2DJjXeZyCoNf81U4HcBABH4AnShcbMTLpdrkikjI
+Message-ID: <CA+EHjTwwxL3Cs-7B2NgEyedu-ZQFt96ck_V-erCUaTB=hrh5eg@mail.gmail.com>
+Subject: Re: [PATCH v1 5/6] KVM: arm64: Use kvm_s2_fault_vma_info in gmem_abort()
+To: Marc Zyngier <maz@kernel.org>
+Cc: Wei-Lin Chang <weilin.chang@arm.com>, Vincent Donnefort <vdonnefort@google.com>, oupton@kernel.org, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	kernel-team@android.com, qperret@google.com, Sashiko <sashiko-bot@kernel.org>, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Userspace can hide a feature from a guest by clearing its field in a
-writable ID register, and KVM then makes the feature's instructions
-UNDEFINED in the guest by trapping or disabling them. No selftest checks
-that.
+Hi Marc, Wei-Lin,
 
-Add a test that runs the instruction of each of TLBI OS, MOPS, TCR2_EL1
-and FPMR once with its field as advertised and once with it cleared, and
-expects an UNDEF only when cleared. A feature the vCPU doesn't advertise
-is skipped, as is hidden TLBI OS on a CPU with neither FGT nor
-FEAT_EVT2, where KVM can't trap it.
+On Sun, 27 Sep 2026 17:30:04 +0100, Marc Zyngier <maz@kernel.org> wrote:
+[...]
+> > Perhaps it is worth reserving plain "gfn" for the value we use as the
+> > IA of the (shadow) page table, and name this variable something like
+> > canonical_gfn. Similar to what kvm_s2_fault_map() does.
+>
+> Maybe. We have gfn in the vncr fault handling code as well, but that
+> one is the result of a S1 walk, so maybe more obvious.
 
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/arm64/hidden_features.c     | 184 ++++++++++++++++++
- 2 files changed, 185 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/hidden_features.c
+Agreed, now that s2vi.gfn sits next to it. I'll rename it to
+canonical_gfn for v2.
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 96bab7002d39e..864fdca7f362e 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -194,6 +194,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_v5
- TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
- TEST_GEN_PROGS_arm64 += arm64/no-vgic
- TEST_GEN_PROGS_arm64 += arm64/idreg-idst
-+TEST_GEN_PROGS_arm64 += arm64/hidden_features
- TEST_GEN_PROGS_arm64 += arm64/kvm-uuid
- TEST_GEN_PROGS_arm64 += access_tracking_perf_test
- TEST_GEN_PROGS_arm64 += arch_timer
-diff --git a/tools/testing/selftests/kvm/arm64/hidden_features.c b/tools/testing/selftests/kvm/arm64/hidden_features.c
-new file mode 100644
-index 0000000000000..194d746e7605e
---- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/hidden_features.c
-@@ -0,0 +1,184 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * hidden_features - Check that a feature's instruction runs in the guest when
-+ * its ID register field is advertised, and is UNDEFINED when userspace clears
-+ * the field.
-+ *
-+ * Copyright (c) 2026 Google LLC
-+ * Author: Fuad Tabba <fuad.tabba@linux.dev>
-+ */
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+
-+static volatile bool undef;
-+
-+static void guest_tlbi_os(void)
-+{
-+	/* tlbi vmalle1os */
-+	asm volatile("sys #0, c8, c1, #0\n\tdsb ish\n\tisb" ::: "memory");
-+}
-+
-+static void guest_mops(void)
-+{
-+	register u64 *d asm("x0");
-+	register u64 n asm("x1");
-+	register u64 s asm("x2");
-+	u64 buf[8];
-+
-+	d = buf;
-+	n = sizeof(buf);
-+	s = 0;
-+	/* setp [x0]!, x1!, x2; setm; sete */
-+	asm volatile(".inst 0x19c20420\n\t.inst 0x19c24420\n\t.inst 0x19c28420"
-+		     : "+r"(d), "+r"(n) : "r"(s) : "cc", "memory");
-+}
-+
-+static void guest_tcr2(void)
-+{
-+	read_sysreg_s(SYS_TCR2_EL1);
-+}
-+
-+static void guest_fpmr(void)
-+{
-+	read_sysreg_s(SYS_FPMR);
-+}
-+
-+struct feature {
-+	const char *name;
-+	u64 id_reg;
-+	u64 mask;
-+	u8 shift;
-+	u64 min;
-+	void (*insn)(void);
-+	bool (*trappable)(struct kvm_vcpu *vcpu);
-+};
-+
-+/* Without FGT, KVM traps a hidden TLBI OS only through HCR_EL2.TTLBOS (FEAT_EVT2). */
-+static bool tlbi_os_trappable(struct kvm_vcpu *vcpu)
-+{
-+	u64 mmfr0 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR0_EL1));
-+	u64 mmfr2 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR2_EL1));
-+
-+	return SYS_FIELD_GET(ID_AA64MMFR0_EL1, FGT, mmfr0) >= ID_AA64MMFR0_EL1_FGT_IMP ||
-+	       SYS_FIELD_GET(ID_AA64MMFR2_EL1, EVT, mmfr2) >= ID_AA64MMFR2_EL1_EVT_TTLBxS;
-+}
-+
-+#define FEATURE(n, reg, field, min_val, fn, trap)		\
-+{								\
-+	.name		= n,					\
-+	.id_reg		= SYS_##reg,				\
-+	.mask		= reg##_##field##_MASK,			\
-+	.shift		= reg##_##field##_SHIFT,		\
-+	.min		= reg##_##field##_##min_val,		\
-+	.insn		= fn,					\
-+	.trappable	= trap,					\
-+}
-+
-+static const struct feature features[] = {
-+	FEATURE("TLBI OS", ID_AA64ISAR0_EL1, TLB, OS, guest_tlbi_os, tlbi_os_trappable),
-+	FEATURE("MOPS", ID_AA64ISAR2_EL1, MOPS, IMP, guest_mops, NULL),
-+	FEATURE("TCR2_EL1", ID_AA64MMFR3_EL1, TCRX, IMP, guest_tcr2, NULL),
-+	FEATURE("FPMR", ID_AA64PFR2_EL1, FPMR, IMP, guest_fpmr, NULL),
-+};
-+
-+static void guest_code(const struct feature *feat)
-+{
-+	undef = false;
-+	feat->insn();
-+	GUEST_SYNC(undef);
-+	GUEST_DONE();
-+}
-+
-+static void guest_undef_handler(struct ex_regs *regs)
-+{
-+	undef = true;
-+	regs->pc += 4;
-+}
-+
-+static bool run(const struct feature *feat, bool hide)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+	bool got = false;
-+	u64 val;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, (void *)guest_code);
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vcpu);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ESR_ELx_EC_UNKNOWN, guest_undef_handler);
-+	vcpu_args_set(vcpu, 1, feat);
-+
-+	if (hide) {
-+		val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(feat->id_reg));
-+		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(feat->id_reg), val & ~feat->mask);
-+	}
-+
-+	for (;;) {
-+		vcpu_run(vcpu);
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_SYNC:
-+			got = uc.args[1];
-+			break;
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		case UCALL_DONE:
-+			kvm_vm_free(vm);
-+			return got;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	}
-+}
-+
-+static void probe_feature(const struct feature *feat, bool *present, bool *trappable)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	u64 val;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, NULL);
-+	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(feat->id_reg));
-+	*present = ((val & feat->mask) >> feat->shift) >= feat->min;
-+	*trappable = !feat->trappable || feat->trappable(vcpu);
-+	kvm_vm_free(vm);
-+}
-+
-+int main(void)
-+{
-+	const struct feature *feat;
-+	bool present, trappable;
-+	int i;
-+
-+	test_disable_default_vgic();
-+
-+	ksft_print_header();
-+	ksft_set_plan(ARRAY_SIZE(features) * 2);
-+
-+	for (i = 0; i < ARRAY_SIZE(features); i++) {
-+		feat = &features[i];
-+
-+		probe_feature(feat, &present, &trappable);
-+		if (!present) {
-+			ksft_test_result_skip("%s advertised, not supported\n", feat->name);
-+			ksft_test_result_skip("%s hidden, not supported\n", feat->name);
-+			continue;
-+		}
-+
-+		if (run(feat, false))
-+			ksft_test_result_fail("%s advertised, UNDEF\n", feat->name);
-+		else
-+			ksft_test_result_pass("%s advertised\n", feat->name);
-+
-+		if (!trappable)
-+			ksft_test_result_skip("%s hidden, not trappable\n", feat->name);
-+		else if (run(feat, true))
-+			ksft_test_result_pass("%s hidden\n", feat->name);
-+		else
-+			ksft_test_result_fail("%s hidden, no UNDEF\n", feat->name);
-+	}
-+
-+	ksft_finished();
-+}
--- 
-2.39.5
+> > Huh, I guess you also fixed a bug here? s2fd->fault_ipa could be the
+> > nested ipa instead of the canonical ipa.
+>
+> Yeah, it appears so. Worth capturing in Fixes: as well.
 
+That one came in with a7b57e0995927 too, so the existing Fixes: covers
+it. I'll mention it in the commit message.
+
+Cheers,
+/fuad
