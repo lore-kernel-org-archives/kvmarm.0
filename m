@@ -1,174 +1,160 @@
-Received: from mail-oo2-f36.google.com (mail-oo2-f36.google.com [74.125.231.164])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25084D8DBD
-	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 14:07:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.231.164
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790604476; cv=pass; b=lx7UI+fwlM9I45jpSYougm1wr2jfyQ/2Z1DfVSzPt6Zn7FBXLUJS/019zUO/hsOlC7mfraDdbOi9YnlcpOh4T5kXq2FHfASwTE5CXdCoIrbiKHOnQ0kShae4YptrWFXXfh9mQQFts0tyV5SxDyQSXMOJB3VwwmSE0FC/aYg7Sh0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790604476; c=relaxed/simple;
-	bh=g/9FLDAua0C/8CqfTr7Fn8gQSHiF4d0O4k+A5Uh+fvY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=p54WDmoEvc8jr/dhhe3LfnIIY3osjta144i6DuTW7YmU3GC0ktQZJ3xtryrS98SIceZx1AaL7CHX8JF0Mi9OBpP0e6Yo75szBRJxxVzC+Xdcgq5Gt8HCJFqq1Tu2LHCDP50Az/zv5TIYCbtD02U0idOK6Cif23nWaw18g87Rk3s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jPJJc1+3; arc=pass smtp.client-ip=74.125.231.164
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AEB94D17BE
+	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 14:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790604986; cv=none; b=HjJyqdF0D0CNmmaY4+VagQEVaud4hbTkbc5pX1v7Ql6unwxba6aFERxZ6Hi/yMSAf+AMINlkcMDWC6JjJc34PksT5vpQvjOdngW3F3LeQ6fCG7Ib2642ujY8g9Oz7sx2Ms3FjoTzUVqpPe/zB9s4T1FTZh1Vi/NT5IY70QNz1iM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790604986; c=relaxed/simple;
+	bh=QbZ5UsXrWS0owgzj5i50hnc+v3PF+lldVQgfA/R/4ZQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rOtPQBYHS6vQCjV1tGOtv1FNat+7geAGLDa2/f9jgjtb+0ZmawTTFjRzkcJr+LTn37eoZv87SgYW46vrC8vMn12BwSpBcrflXBaRMrZ+ohz3HIQoF1ji1PiwhyEjlw5V3Lv5tC8W05evC8XRmswW67iSU3Ai5NI6HHiP6YFc8ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WbDo8fIe; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jPJJc1+3"
-Received: by mail-oo2-f36.google.com with SMTP id 006d021491bc7-6d77aa5735aso1026765eaf.1
-        for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 07:07:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790604470; cv=none;
-        d=google.com; s=arc-20260327;
-        b=jDPIrNTBnR/9WXUkZywmUVaInuSEptPuVF/aecfwumZgmGaNl4st4SXs1csvAIsHDM
-         eeA0Y1fqw4dyIP2eB94CVC5Re/TkiNvnlwIXQ84OBKi3/IqGNIOla3k4tVgzrtDxkSmB
-         ft4vXYC+5xBDi6u2H8AMIoHdfDVu2zX4uk1E6WtuArgD9JOsmTGojT2CA6lbMYlMy2Po
-         6ETS1N/MteQRqRAiph+qSR55WUj4KY8+zVLMdOGolCYcaMXz5PQ89/VqVJsrbCP7slJH
-         38bjldELvsUrRvLxl/7M/kjzriz/5tOro1WEoqWyAyafyhGbbVtQ1KyY7VSKZrxpgA0E
-         2LeA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=gVo78a/wlP80EbN8BDeCX3xsqSYxql3c+VM4RzW0dd4=;
-        fh=N/KNPtvrYaLbuwAJ+rDRgPOgh4L1gguFZdezrIE+g18=;
-        b=Hl+bdIJFHgeqlp5wJf/jYsUZWDdvTPAuXnqdNrLQLqo0+yrsgcrunoM6DcErqloCDg
-         RlFh8Ocz/HsAdKowOs76P9nBZH+zXIfx3j3ClXhMMndFPFdzoUug5Ip6Iz9FQjhKAXBi
-         fsni+lnvDaTdXzah9ps3PMbViUoRLWREzlu137GcfT5Df4sRiHa/CqGsuD2jfDz64qJx
-         XHt/oG5J84d5LXJK4onnNJaq6/6ERxqkLPMfliXh2Wws18f3v3HVbcsGRaN2Tl/PalJ4
-         8qFRdIOAPRdD29HQQAycJVw3ZErkN9V4Bi9TJVZNUjjb+muGNVO6gAiYAc6hrFrAJ3l6
-         1H1w==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1790604470; x=1791209270; darn=lists.linux.dev;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=gVo78a/wlP80EbN8BDeCX3xsqSYxql3c+VM4RzW0dd4=;
-        b=jPJJc1+33T7zQJ1glsO79W91hNRivAwqMh/nNUZg1HQOybVH59+Jup9EBX/RDbXpFN
-         fbyHUkh1QfozZdq0rrPt/Nj+efRNoNVNx5oICBu5MQ+AN6HuCIc6J72iut1HhRNrlLyB
-         /UVYZsmLf/EWX+OeNbq2/QkA270Oi26XDFcVWcc3EGYUiGvzm2d2sJXrG0i/IsP8OU0P
-         +aPN8k177myzg0sQUHr9adWSIb22uGe+PmmMNcMMukX4Pf/peyyAT0xoseDleEkQfi6M
-         C7VRguO161LOcY75MigKQGB6nO///9C4rqL2oqPBmc0xtZVUyp48SoIjMC3n5eKDZA+B
-         J6Ww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790604470; x=1791209270;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=gVo78a/wlP80EbN8BDeCX3xsqSYxql3c+VM4RzW0dd4=;
-        b=aWopKQyCTW+qmxZ9lBMc0m1e2d5EE0u+PmdhlOQgkP9PrDxKZGi3JO1v2breo7Pcjj
-         Aa6/AQ17+s2jAnL6BEqo4PowABvcW2HMrTFii8kcXM5om0QBwh/LN/BPmRRIyFKE2vJJ
-         vk86219/aTCf1qVXUTHIv5t8ucUFwWwgMXx0ZRoKVTTAOj4MK8sMG5tyyjwNahhDVsZt
-         vlmE6kignOBvO/LFV7OXAyI2vXNgubLRWaDruTmkTir6wHv3tUqN8DOJwNRMwbPWh7xZ
-         3AgspiMfUKu4KvxIM9/BNRvIzibB6RI2YZaR8JtAw7sf2lkA+sVSxsQ7nz411cfzFth4
-         aoEg==
-X-Forwarded-Encrypted: i=1; AKwUvByivX167r33GK8Db6m9LtfDbZcER/bnH1exXFiWkvSSJMpiBYmWVSl2GTNM6Uw1eGZJxy43mPk=@lists.linux.dev
-X-Gm-Message-State: AFuF++lqkVX/78eVaKISYPSmW9aLk+6K8FHq+fMZVHZABgmBdZ4vDTbR
-	+fNjmHTkRcxehRXmOA5ZqFEs3fLkUo5c3Vnsqj5XVNNe9f7/fsNzNotyDVtGdLGYZA69lil9S5d
-	qBMZjmhAMU2piWc/yGrLaqWjpkt1DJdpyIQyZz89yY65XRY8ukqe1aqA=
-X-Gm-Gg: AYBFou0qHpRMszCGSBFgHAGLHf/FAk6hbJeEQ2zeeUxnEIXru2GUJ2b4W+EmvxCcOYr
-	yR1snSQC3w1FFQik+2rSsgKh88aiM2bbEys3DdJUjZ8ObmhFX7Vy4fJmNHBskw7IpRLi/ohIFJL
-	4GBm1VgZBT3pek8yr36Pq3tMgjZijeO7lTYI7gfwxhQCAykEH1OW0asZfqZfLxsIUY6yystM2Hd
-	kL18lBgcYSbOG6I7xSbD7uLn1aUVU9z5ho6b3oVTi7Ek19F7BkQdKBT+8e3JmRTBBzzl2DdgHTy
-	dTPClzeZWL18AldFzpb/AyZpmmZJe7ujJLBPUYC7JygKMVCQrrsd4IkZkZo+GKtvoWsSfhXN98T
-	lDdb3NyRE5J3ECtOXuwKcd3MwcjkRVarK/CrT0gw=
-X-Received: by 2002:a05:690e:169e:b0:667:b503:4d2e with SMTP id
- 956f58d0204a3-672ed1d4e4bmr6799180d50.37.1790604105100; Mon, 28 Sep 2026
- 07:01:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WbDo8fIe"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68SBZwWd3971640;
+	Mon, 28 Sep 2026 14:16:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:sender:subject:to; s=pp1; bh=AhCRB9NLLW8bdkoAECwyNoY
+	+xY+rBOaD+BK919XDM0M=; b=WbDo8fIeaTKnBfjK/pVvpw/oChstda5C+Yb1tvz
+	XgMWR9NLexh9wlD4QGlbRttOz5xFIUcCHBALQZ0yKwInkbf+KeaNeplwHZ//whbw
+	OqxQ7Za+DrUsyQuDFefQpniEAnX7BzX9b5Ql7V6hT9JqgjEzQReqcCidznpPiLr4
+	V0X+5ErzjrOtOiX7JYZbz+xV6QWteo5+X8BMrwvw6omOQhCKUkdactsmDPSSjvZ6
+	MFlk6/nGS8yMsBuOv0OZoEcBHg/s9e/2H42TeCo2pDVPyPVH9GCLfT2/IgzETLIt
+	ha96CONDR3QJRJYetRJX5sd01ThkMUqZB3X1k6nfa1cXEkQ==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gx4fe1hqg-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 28 Sep 2026 14:16:06 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68SBHtjM076695;
+	Mon, 28 Sep 2026 14:16:06 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gxsvhdg4v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 28 Sep 2026 14:16:06 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68SEFxuh32637348
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 28 Sep 2026 14:15:59 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 72A242004D;
+	Mon, 28 Sep 2026 14:15:59 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 55A3D2005A;
+	Mon, 28 Sep 2026 14:15:59 +0000 (GMT)
+Received: from vela (unknown [9.111.89.89])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 28 Sep 2026 14:15:59 +0000 (GMT)
+Received: from brueckner by vela with local (Exim 4.99.5)
+	(envelope-from <brueckner@linux.ibm.com>)
+	id 1xBC98-0000000C3I8-3ejc;
+	Mon, 28 Sep 2026 16:15:58 +0200
+Date: Mon, 28 Sep 2026 16:15:58 +0200
+From: Hendrik Brueckner <brueckner@linux.ibm.com>
+To: Steffen Eiden <seiden@linux.ibm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v8 23/29] KVM: s390: Add basic arm64 kvm module
+Message-ID: <arp2njz3Dro0sQ6Z@linux.ibm.com>
+References: <20260918133107.1042730-1-seiden@linux.ibm.com>
+ <20260918133107.1042730-24-seiden@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260924172928.2110956-1-coltonlewis@google.com> <20260924173051.2117637-1-coltonlewis@google.com>
-In-Reply-To: <20260924173051.2117637-1-coltonlewis@google.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 28 Sep 2026 15:01:32 +0100
-X-Gm-Features: AclHuK-1ibztR8QVF_T1w6zQp7WvVuCy3F9mqxT4-ubotzdPTVl79C5Fj0zkGKo
-Message-ID: <CAFEAcA9Rwrffx8bYiOxrtQGdg31QAz1oBm8okzpfqHZ6yK0Y7A@mail.gmail.com>
-Subject: Re: [PATCH] target/arm: Enable KVM PMU partitioning and counter limit
-To: Colton Lewis <coltonlewis@google.com>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvmarm@lists.linux.dev, 
-	Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Will Deacon <will@kernel.org>, James Clark <james.clark@linaro.org>, 
-	Mingwei Zhang <mizhang@google.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260918133107.1042730-24-seiden@linux.ibm.com>
+Sender: Hendrik Brueckner <brueckner@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=FYWiV5+6 c=1 sm=1 tr=0 ts=6aba76a7 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=VnNF1IyMAAAA:8
+ a=nnIaaF498kqO1bEHNMIA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTI4MDA1NiBTYWx0ZWRfX72hKPbHn0oBk
+ RVFuvBqH8UHPWEoKzXdQr64GJWDGGWKnIO1MVn7goXs69X8xC7jB4YwC1auPz/wXgY+NIiJmji4
+ d2xLMIzsZPnbCNiU1IPsNlQcBk50BGk=
+X-Proofpoint-ORIG-GUID: c8k90I_35h1vfDy12bjJ-4_B4O-n2PNu
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTI4MDA1NiBTYWx0ZWRfX6cPRFJGxV5Ug
+ TAb9cNc5k7WfJCqfLczGDe5HlTRxPb4/jrOu3EyqNFsXiIXGE/HTuUQWdIlsPCB0lyUVd9ijXGK
+ qrkARkw5fH5VyeBdLrYhaxLZ7HEZJNw2FMXASvcymwIkuVHt7IiIGR3KZB3l6+lzE+7CAbGjzG2
+ 3HjsWMAQp0EgYWgXjqplQGXaouXCHjnM4HLI5S/fIDehHStPOKdeDOsMYXUyVOdX2XadHW4ssU2
+ XY82J2DcaQDjianPr97X326Q21kz6kvzfoDn+QIeW3SFViYyExlRCwwlJD+QT9AtrNul/nKFGm/
+ zP02XnFqeHjAqDTQJUjG7ijPg45l5Qs19aZaLW6wbbBMjTLBa66EJZYiFauL+kFRkFcZtQ4jm8S
+ paXA0duaRBpGf0gY/k7Lqy/jtAI2xhiNBzXOi8F3cpvQ01wt8Fln72L34jmpDg2doVfTq6T1HVh
+ 2zGyVeJyg0a5Tx+qyoA==
+X-Proofpoint-GUID: gQs0JtJQ3bmijgSPG4xGjgWcJAErDcqK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-28_03,2026-09-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 clxscore=1011 impostorscore=0 spamscore=0 phishscore=0
+ priorityscore=1501 malwarescore=0 bulkscore=0 lowpriorityscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
+ definitions=main-2609280056
 
-On Thu, 24 Sept 2026 at 18:30, Colton Lewis <coltonlewis@google.com> wrote:
->
-> Add CPU properties to configure KVM ARM64 PMU counter partitioning:
-> - 'pmu-partition' (bool): enables KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION
-> - 'pmu-num-counters' (uint32): sets KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS
->
-> When 'pmu-partition=on' and 'pmu-num-counters=N' are passed via -cpu,
-> QEMU enables hardware PMU partitioning and reserves N general-purpose
-> event counters for the guest prior to calling KVM_ARM_VCPU_PMU_V3_INIT.
->
-> Note that this patch is an example to demonstrate the KVM ARM64 PMU
-> Partitioning uAPI [1]. That is why it aborts immediately if setting the
-> device attributes does not succeed.
->
-> [1] https://lore.kernel.org/kvmarm/20260924172928.2110956-1-coltonlewis@google.com/
->
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-
-FYI for next time around, QEMU patches that depend on not-yet-accepted
-kernel ABI changes should be tagged RFC, please.
-
+On Fri, Sep 18, 2026 at 03:31:00PM +0200, Steffen Eiden wrote:
+> Add basic code for the new arm64 on s390 KVM implementation.
+> Add kernel module boilerplate code and trivial functions.
+> Add tracing scaffolding.
+> 
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 > ---
->  target/arm/cpu.c | 20 ++++++++++++++++++++
->  target/arm/cpu.h |  4 ++++
->  target/arm/kvm.c | 32 ++++++++++++++++++++++++++++++++
+>  arch/s390/kvm/arm64/arm.c   | 147 ++++++++++++++++++++++++++++++++++++
+>  arch/s390/kvm/arm64/arm.h   |  44 +++++++++++
+>  arch/s390/kvm/arm64/guest.c |  92 ++++++++++++++++++++++
+>  arch/s390/kvm/arm64/trace.h |  18 +++++
+>  4 files changed, 301 insertions(+)
+>  create mode 100644 arch/s390/kvm/arm64/arm.c
+>  create mode 100644 arch/s390/kvm/arm64/arm.h
+>  create mode 100644 arch/s390/kvm/arm64/guest.c
+>  create mode 100644 arch/s390/kvm/arm64/trace.h
+> 
+> diff --git a/arch/s390/kvm/arm64/arm.c b/arch/s390/kvm/arm64/arm.c
+> new file mode 100644
+> index 000000000000..8b056fc836d7
+> --- /dev/null
+> +++ b/arch/s390/kvm/arm64/arm.c
 
-New CPU properties should be documented in docs/system/arm/cpu-features.rst .
+[..]
 
->  3 files changed, 56 insertions(+)
->
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index f58a1db843..7538c6a24c 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -1359,6 +1359,20 @@ static bool arm_get_pmu(Object *obj, Error **errp)
->      return cpu->has_pmu;
->  }
->
-> +static bool arm_get_pmu_partition(Object *obj, Error **errp)
+> +static int __init kvm_s390_arm64_init(void)
 > +{
-> +    ARMCPU *cpu = ARM_CPU(obj);
-> +
-> +    return cpu->kvm_pmu_partition;
-> +}
-> +
-> +static void arm_set_pmu_partition(Object *obj, bool value, Error **errp)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(obj);
-> +
-> +    cpu->kvm_pmu_partition = value;
-> +}
+> +	if (!sclp.has_aef)
+> +		return -ENXIO;
 
-If your getter/setter are only updating the struct field,
-you can use a DEFINE_PROP_BOOL to avoid having to have them
-(compare arm_cpu_has_el2_property etc.)
-
-> +
->  static void arm_set_pmu(Object *obj, bool value, Error **errp)
->  {
->      ARMCPU *cpu = ARM_CPU(obj);
-> @@ -1604,6 +1618,12 @@ static void arm_cpu_post_init(Object *obj)
->      if (arm_feature(&cpu->env, ARM_FEATURE_PMU)) {
->          cpu->has_pmu = true;
->          object_property_add_bool(obj, "pmu", arm_get_pmu, arm_set_pmu);
-> +        object_property_add_bool(obj, "pmu-partition",
-> +                                 arm_get_pmu_partition,
-> +                                 arm_set_pmu_partition);
-> +        object_property_add_uint32_ptr(obj, "pmu-num-counters",
-> +                                       &cpu->kvm_pmu_nr_counters,
-> +                                       OBJ_PROP_FLAG_READWRITE);
-
-What should we do with these properties if we're not using KVM
-(i.e. for TCG, hvf, etc) ?
-
-thanks
--- PMM
+I suggest to use -ENODEV here to be consistent with s390 kvm module.
+The arm64 module also return -ENODEV when not available.
