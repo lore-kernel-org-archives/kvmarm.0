@@ -1,33 +1,33 @@
-Received: from mta1.migadu.com (out-35.mta1.migadu.com [95.215.58.35])
+Received: from mta0.migadu.com (out-249.mta0.migadu.com [91.218.175.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E294E73CA
-	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 15:25:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E691C4E77E6
+	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 15:25:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790609144; cv=none; b=SxorXYe7k+WGIX0tBBw2Y5kbH5rf7NZGfGU8BRABxPezwybBHw0tVuIdAGVvqSzVS5O7JMri/hUGHcCxlKx02r25U0Sa6RO3P3Lnp+xckA10tE4BNw7Rq69iyNivTQcvYfc716+I2GVkSTO28UxRBE3iFZ/Qy5SqEfSO7m16Neg=
+	t=1790609144; cv=none; b=qftZ+qTluYzQn5DlSyuuoBrV60jlD2JCNqBy9OR+NEdl2dbXKMa1Ba2TVj4wPEReHY9Edy9TbzzmIUbP4mX0/qr25JhatKRgNNgupSI2p5PW/kas7RbfGcVbTuTPt83CBOIMTlW3o67taOOIIJ0OowRA1huMKc2pg60pSARkQX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1790609144; c=relaxed/simple;
-	bh=P0RVNuENs3vpENd0HRdOYdMiYWEyBhUlAVznVoI9ctM=;
+	bh=4/J0Nyoe1OYgfmPuqQeHxdHnDki4Fb0pleDZiROcdZs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Hjuodz4NKX+YtMeeEoJAOUhen0cq84NQxSp+uSdxk2NAOPwwqfW5CfwvGJaXNbHqwbNzIqCF+sdMer0LwDWPn05MZXvo6GrVY65gXU5QJFmal8abILoPUie5xLgjT+CZYAb/l+W+JfASnWjmH6FwZd6okE4x3aC9Ub59CgsQq3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZRQLRpgS; arc=none smtp.client-ip=95.215.58.35
+	 MIME-Version; b=I3b9Z/rsrmdaOgkBqxha2wYbAQKABKsjNjlZoEBPfcdNYdgSHmzLDkD1QjhKUjCVCpJlXWgG+eNBg1MRdUItYewZNRp8tKj4ODUCswyuOrvQuyT04YbaQEbxyaFMglLnvQ6baglu81R1cfBG90HIssYV5sVjAx32DvidgIP8T1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IzvP/c5N; arc=none smtp.client-ip=91.218.175.249
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZRQLRpgS"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IzvP/c5N"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=P0RVNuENs3vpENd0HRdOYdMiYWEyBhUlAVznVoI9ctM=;
+DKIM-Signature: a=rsa-sha256; bh=4/J0Nyoe1OYgfmPuqQeHxdHnDki4Fb0pleDZiROcdZs=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
  t=1790609140; v=1; x=1791213940;
- b=ZRQLRpgShNNXptQTnoo4geZPAESCFlaXdtTyBZGmZvRv7slOY508pIK0WglY3qge1J5D0ZNf
- 7Pt18O2rA+qfSwCEV4isbB1s8GwLQ3Imr04gcSlmwwe3UEXWU8B+CQrjk8oJXFTI9Q9mqRa+zDt
- j+wE2DdWydpDT9aOfDRagLT4=
+ b=IzvP/c5NYZk3BFXp8jMIfpmYWQ2d2xJF5VMCJT1LLH+EW0SpRJ4qqsTk3qLUDCqMEEVYOp8V
+ OQrrR3ByF34TuaOF4JcYhbRKduvk/G6pWYQHUBJIYxDoiSIkeI2ku/8JB7xl4b55kypGiCsSY3M
+ Zg2xAekMK3fW4eRkSGA8hYRE=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 7f3a0b0fc5a4363a;
+Received: by smtp.migadu.com with ESMTPS id de1ed31cb70c73c5;
 	Mon, 28 Sep 2026 15:25:40 +0000
-X-Mizu-Trace-ID: 7f3a0b0fc5a4363a
+X-Mizu-Trace-ID: de1ed31cb70c73c5
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -47,9 +47,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	kvm@vger.kernel.org,
 	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v1 03/10] KVM: arm64: nv: Don't loop on AT S12E{0,1}{R,W} with an invalid VTCR_EL2
-Date: Mon, 28 Sep 2026 16:25:00 +0100
-Message-Id: <20260928152507.2116110-4-fuad.tabba@linux.dev>
+Subject: [PATCH v1 04/10] KVM: arm64: nv: Return a failed stage-2 descriptor read as a fault
+Date: Mon, 28 Sep 2026 16:25:01 +0100
+Message-Id: <20260928152507.2116110-5-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20260928152507.2116110-1-fuad.tabba@linux.dev>
 References: <20260928152507.2116110-1-fuad.tabba@linux.dev>
@@ -61,52 +61,39 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When KVM walks an L1 guest's stage-2 tables, a positive return means
-the walk faulted with the syndrome in out->esr, and a negative one
-means KVM couldn't complete it and the caller has to retry. The
-VTCR_EL2.T0SZ and SL0 checks return -EFAULT for what is the guest's
-own misconfiguration: an invalid SL0 is a stage-2 level 0 Translation
-fault (AArch64_S2InvalidSL()), and so is an out of range T0SZ that the
-implementation doesn't clamp (AArch64_S2TxSZFaults()).
+When KVM walks an L1 guest's stage-2 tables and can't read a
+descriptor, for example because the guest points a table at an IPA with
+no memslot, it sets a synchronous external abort on the walk but
+returns the -EFAULT from kvm_read_guest(). As with an invalid
+VTCR_EL2, KVM then leaves AT S12E{0,1}{R,W} unretired, so the guest
+retries it forever. On an L2 abort, KVM injects the abort and
+returns -EFAULT from KVM_RUN.
 
-An L1 guest that programs either value therefore executes
-AT S12E{0,1}{R,W} forever, since the AT is never retired, and on an L2
-abort KVM injects the fault and then returns -EFAULT from KVM_RUN. The
-T0SZ check also left the syndrome unset, so where a fault was reported
-at all, on an L2 abort or in PAR_EL1 after a stage-1 AT, it was an
-Address size fault.
-
-Return 1 with a level 0 Translation fault from both checks, as the walk
-does for the guest's other stage-2 faults.
+Return 1, as the walk already does when it can't update a descriptor,
+leaving -EAGAIN from a descriptor race as its only negative return.
+The AT then retires with the external abort in PAR_EL1, which is what a
+stage-1 walk records for a descriptor it can't read.
 
 Fixes: fd276e71d1e7b ("KVM: arm64: nv: Handle shadow stage 2 page faults")
 Fixes: 92c6443222ca4 ("KVM: arm64: Propagate PTW errors up to AT emulation")
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/nested.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/nested.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 98c1f8c193319..a67be19e73250 100644
+index a67be19e73250..f9a2e50c0b567 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -275,13 +275,10 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, phys_addr_t ipa,
+@@ -304,7 +304,7 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, phys_addr_t ipa,
+ 		ret = read_guest_s2_desc(vcpu, paddr, &desc, wi);
+ 		if (ret < 0) {
+ 			out->esr = ESR_ELx_FSC_SEA_TTW(level);
+-			return ret;
++			return 1;
+ 		}
  
- 	stride = wi->pgshift - 3;
- 	input_size = get_ia_size(wi);
--	if (input_size > 48 || input_size < 25)
--		return -EFAULT;
--
--	ret = check_base_s2_limits(vcpu, wi, level, input_size, stride);
--	if (ret) {
-+	if (input_size > 48 || input_size < 25 ||
-+	    check_base_s2_limits(vcpu, wi, level, input_size, stride)) {
- 		out->esr = compute_fsc(0, ESR_ELx_FSC_FAULT);
--		return ret;
-+		return 1;
- 	}
- 
- 	base_lower_bound = 3 + input_size - ((3 - level) * stride +
+ 		new_desc = desc;
 -- 
 2.39.5
 
