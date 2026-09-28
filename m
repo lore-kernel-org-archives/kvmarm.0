@@ -1,78 +1,130 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85D2F4E236B;
-	Mon, 28 Sep 2026 15:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D5A4E0202;
+	Mon, 28 Sep 2026 15:58:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790610881; cv=none; b=WIA3iAIETy2vyZwRxCv/gsx/57pzsFHG/nftEhMetLNoZ3FQ8oBJwI8S+fA5fMHxqGL+0Ccqd1apcvdIVyvCkfZlIM3PrlYBGg+i+qSWvdBW0Z1uCtxTOP1Wn1vT7un619uKRRHrVmEoVrEKEve5ujSi5JDHw2NJP9lWA0nYj50=
+	t=1790611119; cv=none; b=jQZYp8stJVf62H9TA85fQMC+InmZP3dkHTf22ymcJi4bjxmscLK+ewyM7KvKGvbewkhJq9Aly86fcN4SOyriXftuFZARFQq/eOk4HVEEHg7I8KGVJloZwyW4IFrAYnp6KqUNWAd0B1gtP/GB/95xrI+Z+d9PMhHjhkWeUD6D1pE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790610881; c=relaxed/simple;
-	bh=AsS3VpKdMJIReZJdOEyUNKFQyUQXieCfXs3/1MIC+O4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tIVevW+ioAGHNlacXNnh9O8MPLU9C5fzcM444/fclr0cb+CBteXHCFY037pCysqXRuETlxQVQhtvAQMUlKiSkGTS361FmJ0gqhGBmL/vq1fpuFrMLp9D+cF5jLJ+LOfUQKUqF9tfH7952iXHZarozTLDRJAo6O7GQcRO6erp8S0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EUzQVflN; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790611119; c=relaxed/simple;
+	bh=IIZlNVEjc6NoJs8qFG5usy5vutf9Tt3Y7Wx/O5zOyk8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NjvK6Y6rUlejHLmVJOVLZzcQAU0XgcLRNX1G7w750iZIFgnyzVRU1HThacQgJOh4iQMiRm2LRabNsk/Nea7vBp1tsJh42yCOgPfKAjgxviVRu9lz8cZuBk1bdHMJg5HpcZp2NvvTj5POVcncDHhqjWS9WrPKNm/RSj/Kj00YuSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/jlsU+X; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EUzQVflN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C93281F00899;
-	Mon, 28 Sep 2026 15:54:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/jlsU+X"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D44751F000FF;
+	Mon, 28 Sep 2026 15:58:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790610877;
-	bh=sQo85MG3wyU15nJBOnccgwY1g6/b71wSOeHZX0glVCQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=EUzQVflNxx2xlAMFvK9LtMnYf1JF6PHS0LxGgnNYv71HTDC912f5UeQTlMnHcfXm9
-	 PIhsaN3KsOHCYuewbTYdbEwssXqESYM9dpZrbbFpJP6DQfW0CiTCqDbbt6Z0PNoQAG
-	 8A+B+zmUb+9DOgbOi/0NFEh926QoQfEtMFWISDOeXvGgjvZ6J80VSIcAUtHGFzLlsU
-	 EwjCeWs9Qrwrylo1O/AofcPiFLz8rRcmLjHEMLmP50TfQRi3I3NZuyxa7D9yrSGOrR
-	 67SiLU5pvKHj0iTiSgAWbyUfMxQ3OwN2wp5yy5PMnFXgbYvMV6zguU2bWz3RGs1eU5
-	 ZxvEgUzI/S3+w==
-Date: Mon, 28 Sep 2026 08:54:35 -0700
-From: Oliver Upton <oupton@kernel.org>
+	s=k20260515; t=1790611117;
+	bh=L09WXLeVI8ZZO4N5TRjN+sDhuH/Uq2FZQIL3+yQNvvw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=D/jlsU+X0Rg00FW5O7hps2Z3kBE+sXzCZUEc/YJcmYwiMNGAbGwMU+zUTFabNB0jy
+	 X/wqtBnKWbsgMIHGGHv9FofyUW6TbxNo4U2QKsDg6Eah9WJBPKuxQtWwj5knwyUSdI
+	 PJhQtV5NJ1KHZSl6lVTN1R/lkheKKMymGaCPYxB6/qXFULvL6q7VgM/ZkK4cnPM7m4
+	 0rQMqtKjmHRFjKqlTukfWE1HB24KHD+4YCK9icioekkEoPD6N+mXPK5rGaaLFi7NEF
+	 555fHEM44T1/DXdZFrUcQlk/Z/Cu89mogFvQuFfePU7Wszt8YJV+vo1w4VhTHeSATQ
+	 hITvJo2dCc+Eg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xBDkR-0000000ER3N-1OLK;
+	Mon, 28 Sep 2026 15:58:35 +0000
+Date: Mon, 28 Sep 2026 16:58:34 +0100
+Message-ID: <86cxtx4bbp.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+Cc: Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
 	Jing Zhang <jingzhangos@google.com>,
 	Karl Mehltretter <kmehltretter@gmail.com>,
-	Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 01/10] KVM: arm64: Don't WARN on SMCCC filter reserved
- range allocation failure
-Message-ID: <arqNu0rSxIz4-Mue@kernel.org>
+	Fuad Tabba <tabba@google.com>,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 00/10] KVM: arm64: Nested stage-2 walk error handling and other small fixes
+In-Reply-To: <20260928152507.2116110-1-fuad.tabba@linux.dev>
 References: <20260928152507.2116110-1-fuad.tabba@linux.dev>
- <20260928152507.2116110-2-fuad.tabba@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260928152507.2116110-2-fuad.tabba@linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seiden@linux.ibm.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, jingzhangos@google.com, kmehltretter@gmail.com, tabba@google.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Fuad,
-
-On Mon, Sep 28, 2026 at 04:24:58PM +0100, Fuad Tabba wrote:
-> The first time userspace sets an SMCCC filter, kvm_smccc_set_filter()
-> inserts the reserved architecture ranges into the maple tree and WARNs
-> if that fails. The tree is empty and config_lock is held, so the only
-> way it can fail is -ENOMEM. The allocation is GFP_KERNEL_ACCOUNT, so a
-> memory cgroup limit is enough to hit the WARN from userspace.
+On Mon, 28 Sep 2026 16:24:57 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> The WARN goes back to when the ranges were inserted at VM creation and
-> the error was dropped. Since commit d34b76489ea0c ("KVM: arm64: Only
-> insert reserved ranges when SMCCC filter is used") the tree is emptied
-> on failure and the error reaches userspace. Drop the WARN.
+> Hi folks,
+> 
+> Small KVM/arm64 fixes that came out of reviewing Karl's SMCCC filter
+> series [1], and it just kept growing.
+> 
+> The first two are WARNs that userspace or a guest can trigger: the
+> SMCCC filter one on an allocation failure userspace can force with a
+> memory cgroup limit, which Sashiko raised [2], the nested one when an
+> L1 guest programs an invalid VTCR_EL2. Patches 3 and 4 are the same
+> walk's return values. With an invalid VTCR_EL2 or a stage-2 descriptor
+> KVM can't read, AT S12E{0,1}{R,W} was retried forever instead of
+> retiring with the fault in PAR_EL1. Reporting the unreadable descriptor
+> as a Data Abort instead, for the stage-1 walks too, is a separate
+> change I'll send later.
 
-Eh, the warn is still useful. You could potentially add a check for
--ENOMEM but any other return value is a sign of something wrong in
-KVM.
+Why later?
 
-Thanks,
-Oliver
+> Patch 5 extends the AT selftest to cover the
+> SL0 case.
+> 
+> The three documentation patches fix identifiers in api.rst that don't
+> exist anywhere in the tree, and the last two fix selftest leaks.
+
+<rant>
+What is this series about? Suppressing spurious warnings? Fixing the
+PTWs?  Fixing the documentation for something totally unrelated?
+Random selftest maintenance?
+
+To give you an idea, here's what my -next branch looks like:
+
+maz@valley-girl:~/hot-poop/arm-platforms$ git log --oneline --merges v7.3-rc3..kvmarm-master/next
+5c49bb52faf38 Merge branch kvm-arm64/misc-7.4 into kvmarm-master/next
+c345ec7f39efd Merge branch kvm-arm64/pre-faulting into kvmarm-master/next
+2716832906bd9 Merge branch kvm-arm64/s2-rmap into kvmarm-master/next
+edeb68e3d4e0c Merge tag 'kvmarm-fixes-7.3-1' into kvm-arm64/s2-rmap
+ede721366f1bf Merge branch kvm-arm64/gicv5-7.4 into kvmarm-master/next
+062cbcbae3e00 Merge branch kvm-arm64/gicv5-7.4 into kvmarm-master/next
+928737a70c491 Merge branch kvm-arm64/hyp-type-checking-7.4 into kvmarm-master/next
+1f99916b2a3d7 Merge branch kvm-arm64/selftests-7.4 into kvmarm-master/next
+a8f9576fa8466 Merge branch kvm-arm64/doc-7.4 into kvmarm-master/next
+7413af8a61612 Merge branch kvm-arm64/ffa-7.4 into kvmarm-master/next
+
+Where does this series fit? What is the theme? Do you really expect me
+to cherry-pick one patch after the other and build 3 or 4 consistent
+series out of this? Or should simply apply it as kvm-arm64/random-stuff-from-fuad-7.4?
+
+My definition of a series is "an ordered set of changes that have a
+common theme or form a progression towards a precise goal". This is
+not a series, but a patch dump.
+</rant>
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
