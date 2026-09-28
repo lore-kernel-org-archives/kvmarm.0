@@ -1,79 +1,215 @@
-Received: from mta0.migadu.com (out-65.mta0.migadu.com [91.218.175.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05AA4BD0E0
-	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 16:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF6444D1793
+	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 16:16:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790612144; cv=none; b=Jqd1KCSWzzP8ZIChQYznIM5DbhrCh1hmczP8uydbewnw7R4yvutgYmjE9fQa/lbz7nNqjsqXkUWY50MvttSejKC0W6spn8fNAqbmQEAryBWbZyQsvLb1+RqkFYf5Z+ZZYM17MgeqbQut8CxNFUc0rKvRfw5KzZuxQRzDqtkmmRU=
+	t=1790612184; cv=none; b=V6uSnuZu9p3tV2EnN0dZwFGH3VwnkMZ4Na5xYIzzo08bXWNzgoIFgfuCPSk95WUvzq4sJSYXoRrU3ccR2GWvcOnHB6Ja1oot1nMNm6BJk7MqaD39mvl3U0RQ7GhNo0VswmifF4606iGCN3J5TpRUevL7+CbWsU/B798v/uZg9Kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790612144; c=relaxed/simple;
-	bh=c06SVugHWJJNDeT83SdkPtIHJEt16Y1SGd4fojskXEI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KV/HZGbk0WzO54EorS42lUVVwV93IuSHz6SH85wMS8mAQSVGlLzHxLLZCy1SF2IYYDX+A1TSmMTEL6GUe2mJa/EEddw1UhGdpyoYOchR87XZk9AJXDufJRiDAcNtgGk6LybmfbKP617ezOh3vafjSqJdjCEwq0GPkUbwap5H4+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vKluE1yj; arc=none smtp.client-ip=91.218.175.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1790612184; c=relaxed/simple;
+	bh=DtdCHxnUaXbzaIkavnA16JdKEeULygl5SHR+qf3JWHU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MXMNxIxUKq9239w+GqnWcXFnAHg7zTYrhWF2zHY0UOuej+u3frN/SqIeBzxkh7ASuN5EXQhPXctG7KrCW49PSBDZuKv+7VkzjQ9Pf6OkWDCUHGe/bZmfflH3UWn6YZleyC7B6QWV/J/w0vhAs3U7O8QzFwBrKxvtW0h7yIdQBcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=k99btnrm; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vKluE1yj"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=c06SVugHWJJNDeT83SdkPtIHJEt16Y1SGd4fojskXEI=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790612134; v=1; x=1791216934;
- b=vKluE1yjdGr+r63jTd2Z5NMfzdedKowkOL8KxBqleTza0glCdut4v4F5iYoDrXrlaIE/4VUb
- VQIdGCiAax8It5F2ChRL9ILVuxjFUtruH7PSD7Sx5yLip2njcAgO/00nviDUw9o7GqB3NDC0Ndc
- m/joe0oB1pXyw6nIq4qYAt68=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 5bfebf2c2ae7ea9f;
-	Mon, 28 Sep 2026 16:15:34 +0000
-X-Mizu-Trace-ID: 5bfebf2c2ae7ea9f
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5b8ea0ca5baso11813e87.1
-        for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 09:15:29 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBygAiY5YWADOm1FDAt8SQgBlb2lzXjIhrdM8UZ2qImheanQlAbfS8zny5+ItBTs/epJ7AlruSE=@lists.linux.dev
-X-Gm-Message-State: AFq9FYKR+PXGgmbPazLkJdNceB0bjzKdLiVFYg0w8q0D6xuv6ShtqLNN
-	+WrilMU3zIpLgoirh1RIH8C+Rg6sOB5S0hL2ce8UwEZHIIWKenVsGu+bH4lCj7hFmcb0Fxr+hnE
-	jwDvXydGT2RzCVRSl0a6lZfFqZe0E2hJZyt2SPqRE
-X-Received: by 2002:a05:6512:220c:b0:5ae:b726:5f1f with SMTP id
- 2adb3069b0e04-5b8ef277c63mr220456e87.8.1790612128596; Mon, 28 Sep 2026
- 09:15:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="k99btnrm"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68SF5UR5216848;
+	Mon, 28 Sep 2026 16:15:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=tqCY0tWphzhWyHFpdwjWwuig9ZhPkf
+	5YqjbeUt1I6uA=; b=k99btnrmIQbXQhiNFlOlpqOSkqX6x4ivkIceiZAgkVkPmp
+	90Wr5xTzDine7WgmavgI1Ytag/Br2PCOhmSwR20Nl+6F5P4xz6spfuXVXTByiO3z
+	HVtzEHFV048q9X290W8Scx/NHbEyEAMwHNjUlLkXItUv+0fiQ1LfP//RJIJU7Msd
+	zPo3tZKilcjaWb3MCLHmPaY8fpQJ9DiYsZRwTGSw6tJvLVkV0yZDlIcjNja/H8MT
+	nP+PPpJJs81hmjGcOTPGPOBqQBtq3QU29ZsDMmNa4TyA+8dZpcBrRhwqh50IJZaq
+	g5Oefq9WkK2P7TYpVGjBHp9T4BHb7sCbd3AqiByQ==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gx4fe27nq-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 28 Sep 2026 16:15:56 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68SElVgA251961;
+	Mon, 28 Sep 2026 16:15:56 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gxsck61mn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 28 Sep 2026 16:15:56 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68SGFnOn54460908
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 28 Sep 2026 16:15:49 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1FBC920043;
+	Mon, 28 Sep 2026 16:15:49 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3F8C620040;
+	Mon, 28 Sep 2026 16:15:48 +0000 (GMT)
+Received: from osiris (unknown [9.87.129.112])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 28 Sep 2026 16:15:48 +0000 (GMT)
+Date: Mon, 28 Sep 2026 18:15:46 +0200
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: Ilya Leoshkevich <iii@linux.ibm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v8 20/29] s390: Introduce Start Arm Execution instruction
+Message-ID: <20260928161546.428362-B-seiden@linux.ibm.com>
+References: <20260918133107.1042730-1-seiden@linux.ibm.com>
+ <20260918133107.1042730-21-seiden@linux.ibm.com>
+ <1e3b65b3-0c21-466f-ae09-8426eeacb97d@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260928152507.2116110-1-fuad.tabba@linux.dev>
- <20260928152507.2116110-2-fuad.tabba@linux.dev> <arqNu0rSxIz4-Mue@kernel.org>
-In-Reply-To: <arqNu0rSxIz4-Mue@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 28 Sep 2026 17:14:52 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTwiqsvxXV7fm8emQHWW7qYrQ79J4V+5Erot5Df2=YaLXQ@mail.gmail.com>
-X-Gm-Features: AclHuK89NS8J3Mx20bby02ytOoblOsUcBV9_SKsrfeTNez43AkDgos1HN6Dw7f0
-Message-ID: <CA+EHjTwiqsvxXV7fm8emQHWW7qYrQ79J4V+5Erot5Df2=YaLXQ@mail.gmail.com>
-Subject: Re: [PATCH v1 01/10] KVM: arm64: Don't WARN on SMCCC filter reserved
- range allocation failure
-To: Oliver Upton <oupton@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Jing Zhang <jingzhangos@google.com>, Karl Mehltretter <kmehltretter@gmail.com>, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1e3b65b3-0c21-466f-ae09-8426eeacb97d@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=FYWiV5+6 c=1 sm=1 tr=0 ts=6aba92bd cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=VnNF1IyMAAAA:8
+ a=e3H7mCSiy_dY2-7_aUoA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTI4MDA2NCBTYWx0ZWRfX3FSm3poY32ru
+ XNpcZw6G5JilofWjVWIAL3oP4Ur3C8GgIIfLeX1MeJGeUvA+tByS9z0RHBt9xL4zxRF9vJaef8f
+ NIGNJmu/RKV8WlV/FMOZH0MbVUwyyTg=
+X-Proofpoint-ORIG-GUID: u7gi_9HJKgoAJZK9_WrkyB0fwXIjcwUQ
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTI4MDA2NCBTYWx0ZWRfX6DJMgiDneped
+ QSRu5a4Y/OkaqXFWEb5fmEwOY/3QV3AbBPgXGGv5B9jhsW5sdO51LB/lWwvdQOuMIX8xx8pHfq4
+ bEPo7AIYAOxJzo4vgZ+CRTxb8Y5bOVl6Xj1S1suhouAJjFIst8GSNDYQj1otUv9o4eeeqF04Ind
+ 2CIREBrvbcTKBikSaD1MivFC/xg6YfsOEvxK1AS8lTTBuDThSDdJxNZr9lUOmkV9g68YxvZl7tb
+ anrOkjnQMnN6fjMAT035LPxzGd8IAFZ4PDVYNzMWao59alb/XDdFJa141lC7Ux2Vko4KCJEP0t7
+ InhU1EMnFF9RZBBZGG5NdOUDNVEJHWmaS4b7k/YsA0YpRgk571Ms7AbnAW4IQl2bYyIV5zEP2Tn
+ y9z8eVpGMf0DmsQ8oNmbgk4BhnXNBR+X1WsDJfbgl+HmZCyLDrv8O1Wqv+mRlszk98FPt26E0/0
+ mYYFsmG+FgH/gT5vd9A==
+X-Proofpoint-GUID: P2tX3rfu3_XjSxABuwj_-1RkrjrsE3wJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-28_04,2026-09-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 clxscore=1015 impostorscore=0 spamscore=0 phishscore=0
+ priorityscore=1501 malwarescore=0 bulkscore=0 lowpriorityscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
+ definitions=main-2609280064
 
-Hi Oliver,
+On Mon, Sep 28, 2026 at 05:53:33PM +0200, Ilya Leoshkevich wrote:
+> 
+> 
+> On 9/18/26 15:30, Steffen Eiden wrote:
+> > The Start Arm Execution (SAE) instruction is the centerpiece for
+> > executing arm64 (KVM) guests on s390. Its purpose is, similar to SIE, to
+> > enable accelerated execution of arm64 virtual machines. SAE expects the
+> > physical address of a control block as the only argument.
+> > 
+> > The host is responsible to save & restore
+> >   - GPRs 0-13
+> >   - access register 0-15
+>              ^^^^^^^^
+>              registers>   - breaking event register (BEAR)
+> >   - vector/floating point registers
+> > between SAE executions to guarantee host consistency.
+> > 
+> > GPRs and BEAR are save and restores in the asm functions. The other
+>                     ^^^^^^^^^^^^^^^^^
+>                     saved and restored
+> 
+> > register are handled in within C code. Access registers are handled in a
+>   ^^^^^^^^             ^^
+>   registers            not needed probably?
+> 
+> > later patch and SVEs will be handled when they are introduced in a
+> > future series. Most arm64 registers are handled by a satellite block
+> > called save_area. Some registers, frequently used by hypervisors, are
+> > placed into the SAE control block itself.
+> > 
+> > Enlighten asm/kvm_host_types.h for the new header variant. The new
+> > header is chosen instead of asm/kvm_host_s390_types.h if KVM_S390_ARM64
+> > is defined.
+> > 
+> > Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
+> > Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
+> > Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> > ---
+> >   arch/s390/include/asm/asm-prototypes.h       |   1 +
+> >   arch/s390/include/asm/kvm_host_arm64_types.h | 124 +++++++++++++++++++
+> >   arch/s390/include/asm/kvm_host_types.h       |   4 +
+> >   arch/s390/include/asm/sae.h                  |  58 +++++++++
+> >   arch/s390/include/asm/stacktrace.h           |   5 +
+> >   arch/s390/kernel/asm-offsets.c               |   1 +
+> >   arch/s390/kernel/entry.S                     |  22 ++++
+> >   arch/s390/tools/opcodes.txt                  |   3 +
+> >   8 files changed, 218 insertions(+)
+> >   create mode 100644 arch/s390/include/asm/kvm_host_arm64_types.h
+> >   create mode 100644 arch/s390/include/asm/sae.h
+> 
+> [...]
+>    > +#if IS_ENABLED(CONFIG_KVM)
+> > +/*
+> > + * __sae64a calling convention:
+> > + * %r2 pointer to sae control block physical address
+>           ^^^^^^^^^^ I guess it's just a physical address and not a
+>                      pointer to it?
+> 
+yes. Fixing.
 
-On Mon, 28 Sep 2026 16:54:35 +0100, Oliver Upton <oupton@kernel.org> wrote:
-[...]
-> Eh, the warn is still useful. You could potentially add a check for
-> -ENOMEM but any other return value is a sign of something wrong in
-> KVM.
 
-Ack, I'll keep the WARN and exempt -ENOMEM in v2 (or the new series
-this becomes part of).
+>                      ^^^ sometimes it's called "sae", sometimes "SAE" -
+>                          it would be nice to have some consistency> + */
+Thanks, I will convert everything to SAE
 
-Cheers,
-/fuad
+
+> > +SYM_FUNC_START(__sae64a)
+> > +	stmg	%r6,%r14,__SF_GPRS(%r15)	# store kernel registers
+> 
+> Strictly speaking we don't need to save %r14, but I guess you do this
+> for unwinding?
+yes. Also, some later (unsent) patch needs this and before I forget this, let's
+do it now. 
+
+> 
+> > +	STBEAR	__SF_SAE_BEAR(%r15)		# save breaking event address register
+> > +	.insn	rre,0xb9a50000,%r2,0		# Start Arm Execution
+> > +	LBEAR	__SF_SAE_BEAR(%r15)		# restore breaking event address register
+> > +	lmg	%r6,%r14,__SF_GPRS(%r15)	# restore kernel registers
+> > +	xgr	%r0,%r0				# clear guest registers to
+> > +	xgr	%r1,%r1				# prevent speculative use
+> > +	xgr	%r2,%r2
+> > +	xgr	%r3,%r3
+> > +	xgr	%r4,%r4
+> > +	xgr	%r5,%r5
+> > +	BR_EX	%r14
+> > +SYM_FUNC_END(__sae64a)
+> > +EXPORT_SYMBOL(__sae64a)
+> > +#endif
+> [...]
