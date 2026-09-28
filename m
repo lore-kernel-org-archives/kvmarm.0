@@ -1,32 +1,33 @@
-Received: from mta0.migadu.com (out-234.mta0.migadu.com [91.218.175.234])
+Received: from mta1.migadu.com (out-28.mta1.migadu.com [95.215.58.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA9B4E77F2
-	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 15:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE304E5321
+	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 15:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790609124; cv=none; b=q3JMOPXSDTNOLW9PXfoAA0Oeeobyg2BXXyJjVXpvkKHbw+Pe6aPsDOPb23AfC61x93/GTqmQaFFgXYIa8R1b+VhV32vq114bYU7Nm1plQZ9um2HyJtMFV/Vh9vUq2Eq4XIvA9Zsnfxn4KeyNw7bmfCskQH6ZgQP6CTUfBoebBJI=
+	t=1790609142; cv=none; b=XSHVGk6dsHNE1KqXQ23ZceJ1g2ed0uHVkYbaFjD5HSSxb5OoVw3GpSe1iwvyXWzK94G2Vd9tbio7syOtQL6dyAHQY+atr3uXD6beCAC28JevFrmHGfRFskzDyrEy/0E/H6VyXrWHewU4acXTx/F5cvJiuRv3gSUcER52NXZaClA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790609124; c=relaxed/simple;
-	bh=s41ieSguAC04yFXFLtnQHHE7zfUrtIP1s8AWwaR+J+o=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ol0ItkaWnrxteZO3wdoidfsIj4W1zT106q/uMj7QB3EArHXMEf3wwgZUgnYshLYR29tblyArWKBTvhdlIjbsdABDrXAMyTmfUMRxooUPZAI0Z5UQEN2IqIp3YIWwTKOu2jDQWQKX0KAWbZ9k3ocr7ngTA46lkTE+/wKBonmIXys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aJkhOgCl; arc=none smtp.client-ip=91.218.175.234
+	s=arc-20240116; t=1790609142; c=relaxed/simple;
+	bh=UsrrMKeoU6FyB7ktPMuLLTHGrlKvgJcUMP9CZWK2MkQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=O7pjzzAdh44YKIcAOuqfO78eAnah1LesUFU0rfTctxmhLZo6JNqYHrYOqHqlhjVITgUwd8xuKjrk1wW9j+77XAoomNaeV2GeTKihQ7N8I0Nfuzxi01IvXU/0CwWDE+TYNs3fpqY9DCklP6Kni3tZIcb0kf58T8BG1I0ZYIYn0bc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nYt5ziIv; arc=none smtp.client-ip=95.215.58.28
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aJkhOgCl"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nYt5ziIv"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=s41ieSguAC04yFXFLtnQHHE7zfUrtIP1s8AWwaR+J+o=;
+DKIM-Signature: a=rsa-sha256; bh=UsrrMKeoU6FyB7ktPMuLLTHGrlKvgJcUMP9CZWK2MkQ=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790609120; v=1; x=1791213920;
- b=aJkhOgClikIGW3RXgcQsgdeV6izOZyebeTFujAZByNICUXxRvSTb0FARI52xruatE0zQXh/6
- hVSoyxHQyqoqaRyeUFkhtGI47mhd127mtzKipSlv5NcIKY3t+9V7UBN1UjZSSvMEP/FOqFoG/3b
- HY/T/rhXbimnkoyBwIF4dKR4=
+ t=1790609139; v=1; x=1791213939;
+ b=nYt5ziIv/3E20y3DRnAM19W1Yns0ZSvwjweI4mhJwzoz+yuzHfSfNw8FeqnCdt9hupruQpSh
+ TTWfbJgMJfP9J5F/cI8RLuIs6TKRdCQH3lKxCe9zib9GpYBYM2xRUGJRjdgkZLkWyHbrpGDzaED
+ vXmxoA0NZNdmOqXFkaIxTd0A=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 8f5f8dc529bfd712;
-	Mon, 28 Sep 2026 15:25:09 +0000
-X-Mizu-Trace-ID: 8f5f8dc529bfd712
+Received: by smtp.migadu.com with ESMTPS id 1db0060865db2ffe;
+	Mon, 28 Sep 2026 15:25:17 +0000
+X-Mizu-Trace-ID: 1db0060865db2ffe
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -46,10 +47,12 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	kvm@vger.kernel.org,
 	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v1 00/10] KVM: arm64: Nested stage-2 walk error handling and other small fixes
-Date: Mon, 28 Sep 2026 16:24:57 +0100
-Message-Id: <20260928152507.2116110-1-fuad.tabba@linux.dev>
+Subject: [PATCH v1 02/10] KVM: arm64: nv: Don't WARN on an invalid VTCR_EL2
+Date: Mon, 28 Sep 2026 16:24:59 +0100
+Message-Id: <20260928152507.2116110-3-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20260928152507.2116110-1-fuad.tabba@linux.dev>
+References: <20260928152507.2116110-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,59 +61,33 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi folks,
+Before walking an L1 guest's stage-2 tables, KVM checks the starting
+level in VTCR_EL2.SL0 and the IPA size from T0SZ against the granule
+and PA size, and sets a stage-2 level 0 Translation fault when either
+is invalid. The check also WARNs, so an L1 guest that programs an
+invalid VTCR_EL2 triggers the WARN on every walk.
 
-Small KVM/arm64 fixes that came out of reviewing Karl's SMCCC filter
-series [1], and it just kept growing.
+Drop the WARN.
 
-The first two are WARNs that userspace or a guest can trigger: the
-SMCCC filter one on an allocation failure userspace can force with a
-memory cgroup limit, which Sashiko raised [2], the nested one when an
-L1 guest programs an invalid VTCR_EL2. Patches 3 and 4 are the same
-walk's return values. With an invalid VTCR_EL2 or a stage-2 descriptor
-KVM can't read, AT S12E{0,1}{R,W} was retried forever instead of
-retiring with the fault in PAR_EL1. Reporting the unreadable descriptor
-as a Data Abort instead, for the stage-1 walks too, is a separate
-change I'll send later. Patch 5 extends the AT selftest to cover the
-SL0 case.
+Fixes: 61e30b9eef7ff ("KVM: arm64: nv: Implement nested Stage-2 page table walk logic")
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ arch/arm64/kvm/nested.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The three documentation patches fix identifiers in api.rst that don't
-exist anywhere in the tree, and the last two fix selftest leaks.
-
-Based on Linux 7.3-rc3 (fd73f4a665989; also applies to torvalds/master
-fd179f8a05be3).
-
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/20260829054856.70549-1-kmehltretter@gmail.com/
-[2] https://lore.kernel.org/all/20260829055809.29AD31F000E9@smtp.kernel.org/
-
-Fuad Tabba (10):
-  KVM: arm64: Don't WARN on SMCCC filter reserved range allocation
-    failure
-  KVM: arm64: nv: Don't WARN on an invalid VTCR_EL2
-  KVM: arm64: nv: Don't loop on AT S12E{0,1}{R,W} with an invalid
-    VTCR_EL2
-  KVM: arm64: nv: Return a failed stage-2 descriptor read as a fault
-  KVM: arm64: selftests: Test AT S12E1R with an invalid VTCR_EL2.SL0
-  Documentation: KVM: Fix the name of the SMCCC filter attribute
-  Documentation: KVM: Fix the name of KVM_ARM_SET_COUNTER_OFFSET
-  Documentation: KVM: Fix the name of KVM_ARM_FEATURE_ID_RANGE_IDX
-  KVM: arm64: selftests: Free the VMs in smccc_filter and psci_test
-  KVM: arm64: selftests: Free the thread arrays in vgic_lpi_stress
-
- Documentation/virt/kvm/api.rst                |  6 ++--
- arch/arm64/kvm/hypercalls.c                   |  2 +-
- arch/arm64/kvm/nested.c                       | 11 +++-----
- tools/testing/selftests/kvm/arm64/at.c        | 28 +++++++++++++++++++
- tools/testing/selftests/kvm/arm64/psci_test.c |  5 +++-
- .../selftests/kvm/arm64/smccc_filter.c        |  2 ++
- .../selftests/kvm/arm64/vgic_lpi_stress.c     |  3 ++
- 7 files changed, 45 insertions(+), 12 deletions(-)
-
-
-base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 3c4fc566eafc6..98c1f8c193319 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -279,7 +279,7 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, phys_addr_t ipa,
+ 		return -EFAULT;
+ 
+ 	ret = check_base_s2_limits(vcpu, wi, level, input_size, stride);
+-	if (WARN_ON(ret)) {
++	if (ret) {
+ 		out->esr = compute_fsc(0, ESR_ELx_FSC_FAULT);
+ 		return ret;
+ 	}
 -- 
 2.39.5
 
