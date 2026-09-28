@@ -1,47 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F0D4EB87F;
-	Mon, 28 Sep 2026 16:29:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C2C2DC765;
+	Mon, 28 Sep 2026 16:32:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790612970; cv=none; b=tfjGQ/+TL9g8dWtIYf79mL6udYWoER0hRiL+w1/MW6KVHzu27s6fxf1l18Hq2+FO46JqcBRpgF8Lx42k3bvZItl/Rdtcii9o+XmQcELO7L+MXLUbgXyHly4IGxF9PR25fZbTjDE+Bylym5D1olGZJ8T5kVpPadje3ZjMmPpu2rM=
+	t=1790613123; cv=none; b=YQDW9vTpLwPSHEWhRwMIUjrFhsLcBh8ZeEVNy4WrviSWS3+jvBKPuJfBrpAhxcZAjTuwq2SnMBDVVRDlYEa2hXhrQSe1pEb9D2lhyrO0ikcsnJu3cyDD3KgiJQxcDkSpEstlJN4XP3Ajda2EZ7H4tLHcPbR7qSJgZkmmTF+4RdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790612970; c=relaxed/simple;
-	bh=jsC7eTXb861JGQRBOV+oF6UcxdvctYqJhowMoD7P874=;
+	s=arc-20240116; t=1790613123; c=relaxed/simple;
+	bh=LSSkPt0tyd7BePBQ11bLsPWDs6ALcf5DvYsfQdZG8n4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fYbDYLik+fm7xSflpmFtupEibMVOmZPeekpBPeQEnynuIxx/BLjH+7XqvJcL+5+eai+Hpx/SGcI+r641Q5sykrDxzmEoPatVh85azl6qEtn6JXgkseenIy5FJlZo1MAb8L65wt6Ih3l2a6QXy2kKMxigmG6ICqW/t5TnoGe95hU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DGNsSm5C; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=t9Ck1dSRxFqej1UXacpLKTTt8ZajjeAmgb+0qe4jjL123YsyCLffLlz468GuiN9eqRBs7iRT24MT1q/miWYFLTXDEC4qYMaEf00+p6HxFzRc61h5ZtmBewanRyJWTrKStVDOh4SE/6NlFW8XzL0clI3KPGwwn4kEVPNAYxdRYzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LpNXrGFn; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DGNsSm5C"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 187C71F000FF;
-	Mon, 28 Sep 2026 16:29:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LpNXrGFn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 606F91F000FF;
+	Mon, 28 Sep 2026 16:31:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790612969;
-	bh=+K5yiCqW9C+tRMYZ/wwccsdp0OS3k1cMcrj4lVdzjRc=;
+	s=k20260515; t=1790613122;
+	bh=LSSkPt0tyd7BePBQ11bLsPWDs6ALcf5DvYsfQdZG8n4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=DGNsSm5CeSch8qKbicKiPS+/iTe9NVwwVAY1o2qvMrigSCn7ZW5izpAY4X8yUhJlZ
-	 XC5f77ZgevAcosylEbZnqnE9p612ztQWIkhempJZQH1ec+eXBPIA8N6ZqwLKjhgvvd
-	 jUFyuiU1lCHqyrcRATKg+IzIqMYNTYvPMjR3klJaqD2ABO4G84iRb91Hago/EJW9cr
-	 YeLcZXBw6k4lGXcpKbwrOa6lSCiDyAs111UWnGibka9Gu+1tE9KGfdon5JFh8oPWq5
-	 2cZyNrh7hTuu/TNWld91/aVkopMYRMuTz1hZnPRbBD4753VRHPGsVaEZ3ECk3DCVsf
-	 izAy266OL5oQg==
-Date: Mon, 28 Sep 2026 17:29:24 +0100
+	b=LpNXrGFnb9HaIuC8KX+e1iSYACFonoGQ0XWZS0Jcu7fAbYY/0JFYUISitpzMeAumN
+	 kzlUFfKyoXMMm0pixrV6hJcU7BE4QZk88lJ+QiX+FPnePwDm5fyD67vn5zX22lAGqS
+	 Pj30lD989kxJg3QZwidBzL+PiG5Az2MOsktAxVPi1HH+yaMKJLUx67ebxL2/EbhTqd
+	 JttFmrpIeh7P9efWcxk0tcq4ct1PhGu7NgzjeVhiTd3ARNba+ataEd+qF1oX6paRtF
+	 nbbrjoVuFG01AlYzLZdhQoC1UmsZ3nBcZMlhpwF9hGP/bmi+ViviPcEInsV/nT2j8Q
+	 3CL+lz7I9f2MQ==
+Date: Mon, 28 Sep 2026 17:31:56 +0100
 From: Mark Brown <broonie@kernel.org>
 To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Ben Horgan <ben.horgan@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+	Peter Maydell <peter.maydell@linaro.org>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 1/3] KVM: selftests: arm64: Report set_id_reg reads of
- test registers as tests
-Message-ID: <0cd3acab-b974-41e4-a4a5-639ddadba1d7@sirena.org.uk>
-References: <20260901-kvm-arm64-set-id-regs-aarch64-v7-0-7b065b0bda9a@kernel.org>
- <20260901-kvm-arm64-set-id-regs-aarch64-v7-1-7b065b0bda9a@kernel.org>
- <arqE3CNeYyQpgcMf@gremlin>
+Subject: Re: [PATCH v3 3/3] KVM: arm64: selftests: Check ID regs are
+ immutable after a failed run
+Message-ID: <83a389d3-6328-4762-a96f-46f9f7145b0e@sirena.org.uk>
+References: <20260901-kvm-arm64-idreg-final-v3-0-a0ffa06fa872@kernel.org>
+ <20260901-kvm-arm64-idreg-final-v3-3-a0ffa06fa872@kernel.org>
+ <arp7mig_PrD9Jbc7@gremlin>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,67 +52,42 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="fdLDzAIjJR2VDlrJ"
+	protocol="application/pgp-signature"; boundary="AAMnBzaO3gKbG6DA"
 Content-Disposition: inline
-In-Reply-To: <arqE3CNeYyQpgcMf@gremlin>
+In-Reply-To: <arp7mig_PrD9Jbc7@gremlin>
 X-Cookie: All is fear in love and war.
 
 
---fdLDzAIjJR2VDlrJ
+--AAMnBzaO3gKbG6DA
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 28, 2026 at 04:26:57PM +0100, Lorenzo Stoakes (ARM) wrote:
-> On Tue, Sep 01, 2026 at 07:50:01PM +0100, Mark Brown wrote:
+On Mon, Sep 28, 2026 at 03:46:51PM +0100, Lorenzo Stoakes (ARM) wrote:
+> On Tue, Sep 01, 2026 at 07:18:50PM +0100, Mark Brown wrote:
+> > From: Fuad Tabba <fuad.tabba@linux.dev>
 
-> > +	switch (id) {
-> > +	case SYS_MPIDR_EL1:
-> > +		return "MPIDR_EL1";
-> > +	case SYS_CLIDR_EL1:
-> > +		return "CLIDR_EL1";
-> > +	case SYS_CTR_EL0:
-> > +		return "CTR_EL0";
-> > +	case SYS_MIDR_EL1:
-> > +		return "MIDR_EL1";
-> > +	case SYS_REVIDR_EL1:
-> > +		return "REVIDR_EL1";
-> > +	case SYS_AIDR_EL1:
-> > +		return "AIDR_EL1";
-> > +	default:
-> > +		TEST_FAIL("Unknown register");
-> > +	}
+> > Assisted-by: Antigravity:gemini-3.1-pro
 
-> I guess these are for GUEST_REG_SYNC() registers, etc. that don't appear =
-in the
-> TEST_REG() list?
+> NIT: we changed the rules for the Assisted-by tag, it only needs to be
+> 'Assisted-by: LLM' now. Not a huge big deal but FYI :>)
 
-Yes.
+> https://docs.kernel.org/process/coding-assistants.html
 
-> > @@ -828,7 +872,7 @@ int main(void)
-> >
-> >  	ksft_print_header();
-> >
-> > -	test_cnt =3D 3 + MPAM_IDREG_TEST + MTE_IDREG_TEST;
-> > +	test_cnt =3D 3 + MPAM_IDREG_TEST + MTE_IDREG_TEST + GUEST_READ_TEST;
->=20
-> I guess because you made things use TAP now?
+That's Fuad's tag not mine, I've just picked up his change verbatim.
 
-Yes.
-
---fdLDzAIjJR2VDlrJ
+--AAMnBzaO3gKbG6DA
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmq6leMACgkQJNaLcl1U
-h9BjmAf/USPitIAZrXSGRtz8RmYTAZ6Zu7zIOqOnzA05aYcufhrgg0JlTCO5i2jF
-WUsJEsqePHFiy+W/ydFn7+BZ1hDHABtDvR3k08GrqNyh1zquMnDvPqqppNs0ZHDo
-YdYrGjdQF+ujDqk+ZgYwflBO37HWmvceyR/kwjImXyoVo7OP0yrAJIvkUo1CATB6
-CtpOujxpIounDRqj7/nvCL6u9n2lfuNXGm4zfpLpNsxw1lMBuMS+ahe5laA6wcx5
-XO56EdJkdk8rxJYq5wvq/6AzLFRxJeIS/J82wtz0x53Ljq0IiqFTxmQ33Y9+85kS
-6vt6rGEnMmQvzFPK1aSrnqpQlzgwmw==
-=1OOp
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmq6lnwACgkQJNaLcl1U
+h9BSHgf/dsZOGOdrRnI26oAZQKyMEaKtzUE+S6oc46T6NARbYeekbnDVX+NeLJr3
+hKjGjgbwagGXC7mYmPcOvunoatLjeFrgga/aOwpJqB5gucMNB8O5nQtyx6OWrKH4
+Zoom+ewSdp5kuH+pVTu7IGFQQmFNbeHI3hD7SFxwInLViJaRP0NGOF/N+Rg1XhAL
+jdvpj10jddzOQ3gBHqTktod5VGImbBz2VNxcSW0EAGQ3bhQS+vm/DNmkxDksnswS
+m/Brc/kZfm1Q/UlxXODXX9fu00f98IoxU4YXCwTcmukOUc15gI+xK6JD4+XZ5UCZ
+6NpGPSsLPeWNUOcBDeV6n3fWCYmiQQ==
+=Y4zb
 -----END PGP SIGNATURE-----
 
---fdLDzAIjJR2VDlrJ--
+--AAMnBzaO3gKbG6DA--
