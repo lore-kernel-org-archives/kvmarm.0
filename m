@@ -1,204 +1,136 @@
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ECC949363C
-	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 09:55:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.69
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D074963C1;
+	Mon, 28 Sep 2026 10:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790589315; cv=none; b=IH5AJtGmhxAXAZvB7JOJa9041fyzt5sjnhLg+N14v2nVQstNdC2tIdOf+evY4eeWgDDXDRUxDr0VKBbfVGLJjxFjvMea710NR9N3DbrAtnQPpMyO8dJ1eitwFgN5ohbHBHIG1JRwi9x7h9OFW4Gzem0H8lz5L2uRgQT+e9hxF8E=
+	t=1790590431; cv=none; b=mlo9zmOhYIyLOsaA+cz9GLPeGhXpgeFqtozpwyWUDU+I8MbCQzfKoFjFHEUYV7Daoq+y1K5Lj7xAr2LXBKBXe6DCzh4vmkRBU61eTon213i0KzeIGOHL4L5Whi57ZwE+j24/j51oKA+uRZSAaHk+TPE/IHfP0uXsTb7o2EHK/s0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790589315; c=relaxed/simple;
-	bh=tcJcJcQ6qPCVfTV/ZV4kLnVjnpFTdhAiLFxdblw46Bk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uOIcL2bNtGxsbIbnn5UaoB3GQG3Era2rzBqEotCCrmTX8yUzg890Fiui+u1c50CU13iJS3hHxlmzmjSnAhpaPiZAPW2BVggrp5/s5sF8LM8+p9S4OyMl5VkkXgzjQe3I337g1Jmfift6ByN7Qn743rKOHYh9ZR3HfoY2PF+o0WI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I+qAjc4i; arc=none smtp.client-ip=209.85.128.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
+	s=arc-20240116; t=1790590431; c=relaxed/simple;
+	bh=L4rj5sebU0MgVvbIqYSRSR7LTOTUxoD15WXyP2ljPok=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ckaujv0NF8Du1ThoddQ3PWA2z+PWpX5nGv9LcSu785L1o5lolhyhaiHYIOWUGZU5kxCFHLCzzv/47QIpw+2EVMbx21XfaQe/ay2zytBoT9otsRIMNQqQn75OSurTChKL4ivoOO3UkMrB0VoMXyoz/8MAlZrBGCkPku23bpfSlow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=FtXcuGe5; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I+qAjc4i"
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-49953abe51fso18562775e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 02:55:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790589312; x=1791194112; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=FUMLMkfrYG7ovAWGgH8OISX4nHJaEyCyIq32R+fyFGQ=;
-        b=I+qAjc4i7AlRg3actSIJpJ/vjp0fIItCoRvfqFClyQQc2LzE3nrcxDCk0JL5ZJQMuj
-         6o2tSvUzq7MFrWDCPbJsgK6swrdG59eX8rsPfOoJf950EDIFuQQKLmwUqmISYmpHRP1b
-         msLRxXdj3sYRz0U3lgQfGBxxtXrWNecIpFuf5220gCMhy8ZWnvKbH1sUx2OCSF/8iMN9
-         Lc2+doTcKrpZf+IYpqmc8jx6NygB5DVeT6jwc70bCR/vRK9+bll1xBB9vpwxZZi03kzR
-         I0ikTlNkulL7NRHJTOWi+F/FahzuQaYa+jSOWT5765HFEzpa3IRe3H9dZ4S/xLwRIZaL
-         R0fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790589312; x=1791194112;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=FUMLMkfrYG7ovAWGgH8OISX4nHJaEyCyIq32R+fyFGQ=;
-        b=SN1IjDcM+0iLN4n9qAkybOYbF42YGFvYA6+MVUbQYMUgKry6PMcL5Iu+LV1BqDvPAJ
-         fa1t24F1E5EzkQDU2x2DvS3cxsrwk3i+f+r9XJCZJ9gmgqfi6PDmw8tYQYtonvher+HY
-         ZnfGp80sztf1B2V3TSwUAU4bh5wf+ITRUIQKvbCunfmnPmQnMWtwRErboqpmJ5KofwUk
-         A6RMjO+wkQKOvdVKigUKFD19Mo7ujgYDAGW8+vpQpqrZE7FBWzNt1StiMGHtA9+t9RJ2
-         s7DX4IDAp97sNgoZk95dYpdPo4YVhtvHXyKLWaOg9vsUn1RFcEF1ru62TtxqpvduC7PI
-         FpIw==
-X-Forwarded-Encrypted: i=1; AKwUvByWc1/WPGcj4Zm7IQ1NudcZY/yM/NVfzoYpf3iko/aznbN4dO+WikqYdNB0NQdF1QPcKP/yMr0=@lists.linux.dev
-X-Gm-Message-State: AFuF++m6EAVMnBEDIBvEIPuVFvQbTEZVvIousE67YeK7m4SFgvdKmdcr
-	w8aO7ajQ3xItCjkON83uJvW1IjIZXFtyvjpgLWKOR136n9nSrBHHGzMSFz9fC3gGONGYR6ycsOE
-	jC912GuebKc8pm9X0M3abRg==
-X-Received: from wmdv19.prod.google.com ([2002:a05:600c:12d3:b0:49f:e401:6ca4])
- (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:348e:b0:49e:8191:e5cb with SMTP id 5b1f17b1804b1-49ff06b2ef6mr163475965e9.5.1790589311187;
- Mon, 28 Sep 2026 02:55:11 -0700 (PDT)
-Date: Mon, 28 Sep 2026 10:54:53 +0100
-In-Reply-To: <20260928095454.3255918-1-vdonnefort@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="FtXcuGe5"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 83A0D1595;
+	Mon, 28 Sep 2026 03:13:40 -0700 (PDT)
+Received: from [10.57.12.79] (unknown [10.57.12.79])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8F3253F86F;
+	Mon, 28 Sep 2026 03:13:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790590424; bh=L4rj5sebU0MgVvbIqYSRSR7LTOTUxoD15WXyP2ljPok=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=FtXcuGe5Bf9/0/FkzKwLKEy+JoJg8ovzaYSX2D2/AliXaV5Mu/9pP37XIhE5v6fV3
+	 zwG/SPm1X9FHl8h9u4+rG242LQ2Y7sNXNJEj09s0mPMYE1rl1NvyZRqzOeDT+hBKCE
+	 BAvBPp1hyT7DyFZ0607j5nyKtRA6XXRnoD1oNYF4=
+Message-ID: <4fabad44-280f-40e6-95bb-49011cd2f185@arm.com>
+Date: Mon, 28 Sep 2026 11:13:39 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260928095454.3255918-1-vdonnefort@google.com>
-X-Mailer: git-send-email 2.56.0.rc1.315.gc6ed9934b7-goog
-Message-ID: <20260928095454.3255918-5-vdonnefort@google.com>
-Subject: [PATCH v2 4/4] KVM: arm64: Use kvm_s2_fault_vma_info in pkvm_mem_abort()
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org
-Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com, 
-	weilin.chang@arm.com, Vincent Donnefort <vdonnefort@google.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 4/7] firmware: arm_rmm: Add support for SRO
+Content-Language: en-GB
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+ will@kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+ sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com,
+ Gareth Stockwell <Gareth.Stockwell@arm.com>
+References: <20260924135201.850038-1-suzuki.poulose@arm.com>
+ <20260924135201.850038-5-suzuki.poulose@arm.com> <arozNIQ-fQ0XQViI@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <arozNIQ-fQ0XQViI@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-To paraphrase Marc in commit 08f97454b7fa ("KVM: arm64: Fix protected
-mode handling of pages larger than 4kB"), pkvm_pgtable_stage2_map()
-assumes the address passed as a parameter is aligned to the size of the
-intended mapping, while HPFAR_EL2 gives the IPA minus the bottom 12
-bits, regardless of the system page size configuration.
+On 28/09/2026 10:28, Catalin Marinas wrote:
+> On Thu, Sep 24, 2026 at 02:51:58PM +0100, Suzuki K Poulose wrote:
+>> +long rmi_sro_memxfer_execute(struct rmi_sro_state *sro, gfp_t gfp)
+>> +{
+>> +	struct arm_smccc_1_2_regs *regs = &sro->regs;
+>> +	bool cancelled = false;
+>> +	unsigned long sro_handle;
+>> +
+>> +	rmi_smccc_invoke(regs);
+>> +
+>> +	sro_handle = regs->a1;
+>> +	while (RMI_RESULT_STATUS(regs->a0) == RMI_INCOMPLETE) {
+>> +		bool can_cancel = RMI_RESULT_CAN_CANCEL(regs->a0) == RMI_OP_CAN_CANCEL;
+>> +		int ret = 0;
+>> +
+>> +		switch (RMI_RESULT_MEMREQ(regs->a0)) {
+>> +		case RMI_OP_MEM_REQ_NONE:
+>> +			rmi_op_continue(sro_handle, RMI_CONTINUE_KEEP_GOING,
+>> +					regs);
+>> +			break;
+>> +		case RMI_OP_MEM_REQ_DONATE:
+>> +			ret = rmi_sro_donate(sro, sro_handle, regs->a2, regs,
+>> +					     gfp);
+>> +			break;
+>> +		case RMI_OP_MEM_REQ_RECLAIM:
+>> +			ret = rmi_sro_reclaim(sro, sro_handle, regs);
+>> +			break;
+>> +		default:
+>> +			WARN_ON_ONCE(1);
+>> +			ret = -ENXIO;
+>> +			break;
+>> +		}
+> 
+> Another thing I came across while looking whether we can defer the
+> activation. It seems that the spec (I_JVYCH) lists some SROs as
+> PE-bound. Nothing here or in rmi_sro_execute() disables migration and
+> the memory allocation paths can even sleep with GFP_KERNEL.
 
-To fix this alignment, bring support for kvm_s2_fault_vma_info in
-pkvm_mem_abort() and use its members where possible. They do contain the
-page-alignment we need to fix the fault on system with pages larger than
-4K.
+No, this is not required. I agree this is confusing. I will get it
+clarified.
 
-Also, add a check at the start of pkvm_pgtable_stage2_map(), it does not
-support !PAGE_ALIGNED arguments.
+So, there are two different sources for the SRO contexts. One is a 
+global pool and the other an Object.
 
-Fixes: ea03466e806f ("KVM: arm64: Handle aborts from protected VMs")
-Cc: stable@vger.kernel.org
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- arch/arm64/kvm/mmu.c  | 27 ++++++++++++++++++---------
- arch/arm64/kvm/pkvm.c |  3 +++
- 2 files changed, 21 insertions(+), 9 deletions(-)
+e.g., For an RMI operation on an Object, SRO context can be the object
+itself (e.g., REC_CREATE, REALM_ACTIVATE etc.)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 5c89b6684b02..d48e4beab483 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1383,9 +1383,11 @@ static bool fault_supports_stage2_huge_mapping(const struct kvm_s2_fault_desc *s
- 	if (map_size == PAGE_SIZE)
- 		return true;
- 
--	/* pKVM only supports PMD_SIZE huge-mappings */
--	if (is_protected_kvm_enabled() && map_size != PMD_SIZE)
--		return false;
-+	/* pKVM only supports PMD_SIZE huge-mappings for non-protected VMs */
-+	if (is_protected_kvm_enabled()) {
-+		if (vcpu_is_protected(s2fd->vcpu) || map_size != PMD_SIZE)
-+			return false;
-+	}
- 
- 	size = memslot->npages * PAGE_SIZE;
- 
-@@ -1630,6 +1632,9 @@ struct kvm_s2_fault_vma_info {
- 	bool		map_non_cacheable;
- };
- 
-+static int kvm_s2_fault_get_vma_info(const struct kvm_s2_fault_desc *s2fd,
-+				     struct kvm_s2_fault_vma_info *s2vi);
-+
- static gfn_t get_canonical_gfn(const struct kvm_s2_fault_desc *s2fd,
- 			       const struct kvm_s2_fault_vma_info *s2vi);
- 
-@@ -1719,12 +1724,12 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
- static int pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
- {
- 	unsigned int flags = FOLL_HWPOISON | FOLL_LONGTERM | FOLL_WRITE;
-+	struct kvm_s2_fault_vma_info s2vi = {};
- 	struct kvm_vcpu *vcpu = s2fd->vcpu;
- 	struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
- 	struct mm_struct *mm = current->mm;
- 	struct kvm *kvm = vcpu->kvm;
- 	void *hyp_memcache;
--	struct page *page;
- 	int ret;
- 
- 	hyp_memcache = get_mmu_memcache(vcpu);
-@@ -1732,12 +1737,16 @@ static int pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
- 	if (ret)
- 		return -ENOMEM;
- 
-+	ret = kvm_s2_fault_get_vma_info(s2fd, &s2vi);
-+	if (ret)
-+		return ret;
-+
- 	ret = account_locked_vm(mm, 1, true);
- 	if (ret)
- 		return ret;
- 
- 	mmap_read_lock(mm);
--	ret = pin_user_pages(s2fd->hva, 1, flags, &page);
-+	ret = pin_user_pages(s2fd->hva, 1, flags, &s2vi.page);
- 	mmap_read_unlock(mm);
- 
- 	if (ret == -EHWPOISON) {
-@@ -1747,7 +1756,7 @@ static int pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
- 	} else if (ret != 1) {
- 		ret = -EFAULT;
- 		goto dec_account;
--	} else if (!folio_test_swapbacked(page_folio(page))) {
-+	} else if (!folio_test_swapbacked(page_folio(s2vi.page))) {
- 		/*
- 		 * We really can't deal with page-cache pages returned by GUP
- 		 * because (a) we may trigger writeback of a page for which we
-@@ -1767,8 +1776,8 @@ static int pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
- 	}
- 
- 	write_lock(&kvm->mmu_lock);
--	ret = pkvm_pgtable_stage2_map(pgt, s2fd->fault_ipa, PAGE_SIZE,
--				      page_to_phys(page), KVM_PGTABLE_PROT_RWX,
-+	ret = pkvm_pgtable_stage2_map(pgt, gfn_to_gpa(s2vi.gfn), PAGE_SIZE,
-+				      page_to_phys(s2vi.page), KVM_PGTABLE_PROT_RWX,
- 				      hyp_memcache, 0);
- 	write_unlock(&kvm->mmu_lock);
- 	if (ret) {
-@@ -1779,7 +1788,7 @@ static int pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
- 
- 	return 0;
- unpin:
--	unpin_user_pages(&page, 1);
-+	unpin_user_page(s2vi.page);
- dec_account:
- 	account_locked_vm(mm, 1, false);
- 	return ret;
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 8e4c6e4bec12..c298a5b9b12a 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -414,6 +414,9 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 	u64 end = addr + size;
- 	int ret;
- 
-+	if (WARN_ON_ONCE(!PAGE_ALIGNED(addr | size)))
-+		return -EINVAL;
-+
- 	lockdep_assert_held_write(&kvm->mmu_lock);
- 	mapping = pkvm_mapping_iter_first(&pgt->pkvm_mappings, addr, end - 1);
- 
--- 
-2.56.0.rc1.315.gc6ed9934b7-goog
+However, when there is no reliable object for the command (e.g., 
+RMI_GRANULE_RANGE_DELEGATE), the RMM must allocate a context from
+the global pool. Now, the "PE" in there comes from a recommendation
+to the RMM implementations, that the global pool size must depend on
+the number of PEs on the system. This doesn't mean that the SRO
+handles are only bound to those PEs. I will get this clarified
+in the RMM spec.
+
+Cheers
+Suzuki
+
+
+
+> 
+> Do we need to disable preemption (only for rmi_sro_execute()) or at
+> least migration (the memxfer path)? We did something similar for the RSI
+> attestation token loop, commit 24f55f511b9e ("virt: arm-cca-guest: use
+> migrate_disable() for attestation token requests").
+> 
+> With only migration disabled, another thread on the same CPU
+> issuing a PE-bound SRO would get RMI_BLOCKED (R_NDXSG). In theory, we
+> can get a priority inversion case (maybe this doesn't happen with the
+> current implementation, just looking at the API design). The RMI_BLOCKED
+> fix not to loop forever probably saves us but the caller would have to
+> actively sleep or give up before retrying (i.e. don't move the busy loop
+> higher app the call stack).
+> 
+> Another option is to have a per-CPU mutex here and serialise the SROs
+> which are PE-bound (there are some precedents for per-CPU mutexes in the
+> kernel).
+> 
 
