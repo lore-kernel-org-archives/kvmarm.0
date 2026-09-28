@@ -1,87 +1,47 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE96E1F12F8
-	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 14:23:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C14614DA9AF
+	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 14:33:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790605409; cv=none; b=Guou48V2PK2MjwkwkdWIQ9oUae1cxo/tUUrQ/NHD9OfQ+8B+4d3s5wZkwzx09lqu7NhzAlyEdq3gtKttXnnG0Wfb3PvVll6jEhvautlhjy39RErE8R2FimYPU0I6g4BS816wZeRtRGJ1hQMkaKQtPPQcATqn/Q4wyNj6ZhFtci0=
+	t=1790606027; cv=none; b=ntbYHRs8EG0aGApRA8RjckqMY1QmYqicm3NPkqbHuntG2dfUG7E9+4hz9nwabfJw64MjBx5Sx9H+TvcO4i/QvyswfAzRM2dtSlDMnnDBIhy9M1VkL/My82qnu9der4ibWx+u4TtNLH0JpG6LLzW45wPXhzmnvL/BBTHBe5r8hJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790605409; c=relaxed/simple;
-	bh=P9PqO5qfr930naBjEJYBYKBsPVV2btuw00OrnlZSvyg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RncgGmbJbIbutGzYeA11I8P/uH6fTgruOHhCHMrZDA6NwI7bZ7vaoio1JAwApp4WFh4vYfD/kdRMVUP3I08slQfO+fT2wf5iUQFWR/+zGP5YVAImcOqJY6VZi3zvHUnfxYkREh5hbUp/4CTO2lL5wMPadiIak0t4cfQrj7rYT/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=SgtpN1qA; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1790606027; c=relaxed/simple;
+	bh=XC6HFt0tb5L+4UeZfQQh8FgYKXKhYcLG7uqzy72ksiI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=B0VTm26C3802h0fERj4lQPIbA67mK035EomRFJOsmH4KCMHTS7ANznGnjkdbrUrikDuorCrZEU0IIw6KrMFEaXUFfinra66dWZjq7oT8eUh+hZXWrggZ8+UFbbsS2wh06ZQZ7SecmkUdlnu2IrzkzNvhx4cnx9W1UIWsAEk9slQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=lWq+advh; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SgtpN1qA"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68SBZZVv1047082;
-	Mon, 28 Sep 2026 14:23:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=269Qr/2f+mli5iZf5LjqCG3Wsfifp4
-	/qh4IuSPn08jE=; b=SgtpN1qASY6d0PD/W/Oe9D2ym8/5/iRdQSQ2eFEdKDxVVH
-	j6H0M5X2Zyhsgvl4VyUy6p0mmA8bpfwCe6Eb3/MFepx1LTfznN21FX09qLp7krhi
-	IpbWporLsvfFTZkapCZ7CSjWSgzzAhRUwMNSzOse2Z6j65mkUzJWhS6/Fm6azY5v
-	VrTIlF8e5POPLfPhDBoZC21D3QuJcW6VF/5OC6sVdHbOQ83gsNC+iNCXxdKkphGB
-	SeCA3e4xtKDID0US2EbHCiRrqw7xYWMds29o7dxeiWY+IKDjoeMqIdVh5rjdVQDv
-	HsKmQgvgBsXLojZD8vL+2FUuu2PeWvPxlEaJsYTg==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gx5j51y8x-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Mon, 28 Sep 2026 14:23:13 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68SBHufQ076700;
-	Mon, 28 Sep 2026 14:23:12 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4gxsvhdgya-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 28 Sep 2026 14:23:11 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68SEN1Zh55705980
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 28 Sep 2026 14:23:01 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 38ABC20040;
-	Mon, 28 Sep 2026 14:23:01 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5552B2004D;
-	Mon, 28 Sep 2026 14:23:00 +0000 (GMT)
-Received: from osiris (unknown [9.87.129.112])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 28 Sep 2026 14:23:00 +0000 (GMT)
-Date: Mon, 28 Sep 2026 16:22:58 +0200
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Hendrik Brueckner <brueckner@linux.ibm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v8 23/29] KVM: s390: Add basic arm64 kvm module
-Message-ID: <20260928142258.53077-B-seiden@linux.ibm.com>
-References: <20260918133107.1042730-1-seiden@linux.ibm.com>
- <20260918133107.1042730-24-seiden@linux.ibm.com>
- <arp2njz3Dro0sQ6Z@linux.ibm.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="lWq+advh"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6C8081758;
+	Mon, 28 Sep 2026 07:33:33 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6C3E23FA1F;
+	Mon, 28 Sep 2026 07:33:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790606016; bh=XC6HFt0tb5L+4UeZfQQh8FgYKXKhYcLG7uqzy72ksiI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=lWq+advhQFekRwy7FBxnDjKQs/djOrGjau0cEcKqatmM1RNIeOUJwScuygLv4vaxK
+	 sIWUmJm2wNVB1h8o12TS1XqQr6XOsfxDotxr8by30OptLsoo5yqSvnXODf2mN9yYwq
+	 4CmkHJVNjsIooul3dnaJ1LKcNpugc1WUZvqX4I1I=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>
+Subject: Re: [PATCH 17/22] KVM: arm64: Set Access flag on table descriptors at stage-1
+Date: Mon, 28 Sep 2026 15:33:21 +0100
+Message-ID: <arp6sUI422jJSaxB@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260623184201.1518871-18-oupton@kernel.org>
+References: <20260623184201.1518871-1-oupton@kernel.org> <20260623184201.1518871-18-oupton@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -90,70 +50,114 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <arp2njz3Dro0sQ6Z@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTI4MDA1NiBTYWx0ZWRfX5dsVumWdYdWF
- AZKYtE84fjB98wl/6dKGXlvs+Ly0IWzRCQtvVYltXc1mz74v1LhjwW6iWDIHvD2yRLVeoi+m7Mu
- yIk64PRIjmPyPlIfSdGB+VOWLJva8y4=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTI4MDA1NiBTYWx0ZWRfX1BAFPlgJV6Nv
- OXuy0WD/1RHa0kE+XIyTFbFO0IriHeyB0GcbFKbrEk8jdJ0wmFsNwH5qPRXpsYgmjbSg+5w0LIQ
- tcxLO+zEOA+xHAAbg1KOw+eY5rjOUvN8sHC7rD5TEMrFcGeULBy1iIklCpZ/dkV+M+UzrPLQ9+E
- cnBqCflGGYWtjXzUZWTWpeVt6yiq+hbX/zgc1c2pgY0eUKYVn2vsJAFhZkrVqmaYBEmwCa+Nq5+
- jOrXaFxPCoQZZjWm46w595wiEMMZkm1EvkInymRJ4ZBlGi/qDLOAJeabAu97U4X2g0vcrKKbdTQ
- 3thPAiKwu33JqADp2A6jHwtzHwyUCz0jU+nM9gT4zH1H1a5VhJvDpf6VoTQgvEDMRXpIOYHNW90
- 6hRy/f0GcczR20Nvqz10T/S8rpOrc80UtbSY+6nijgyTmln/Yok1fUAu5oQKbbhHcNprHz7Sy+k
- dzmHX6gNcIvh7qwV4XA==
-X-Proofpoint-GUID: -opRUxCBQ87ofTNi4olODdbsoM2GysKf
-X-Authority-Analysis: v=2.4 cv=RKcmjIi+ c=1 sm=1 tr=0 ts=6aba7851 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=kj9zAlcOel0A:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
- a=kmqKt6rW6CT7MOcbZeAA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-ORIG-GUID: QDIhRafS2tv1KtcByMsVqsVtQuv9E7le
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-28_03,2026-09-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 priorityscore=1501 spamscore=0 bulkscore=0 impostorscore=0
- adultscore=0 lowpriorityscore=0 suspectscore=0 malwarescore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609280056
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 28, 2026 at 04:15:58PM +0200, Hendrik Brueckner wrote:
-> On Fri, Sep 18, 2026 at 03:31:00PM +0200, Steffen Eiden wrote:
-> > Add basic code for the new arm64 on s390 KVM implementation.
-> > Add kernel module boilerplate code and trivial functions.
-> > Add tracing scaffolding.
-> > 
-> > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> > ---
-> >  arch/s390/kvm/arm64/arm.c   | 147 ++++++++++++++++++++++++++++++++++++
-> >  arch/s390/kvm/arm64/arm.h   |  44 +++++++++++
-> >  arch/s390/kvm/arm64/guest.c |  92 ++++++++++++++++++++++
-> >  arch/s390/kvm/arm64/trace.h |  18 +++++
-> >  4 files changed, 301 insertions(+)
-> >  create mode 100644 arch/s390/kvm/arm64/arm.c
-> >  create mode 100644 arch/s390/kvm/arm64/arm.h
-> >  create mode 100644 arch/s390/kvm/arm64/guest.c
-> >  create mode 100644 arch/s390/kvm/arm64/trace.h
-> > 
-> > diff --git a/arch/s390/kvm/arm64/arm.c b/arch/s390/kvm/arm64/arm.c
-> > new file mode 100644
-> > index 000000000000..8b056fc836d7
-> > --- /dev/null
-> > +++ b/arch/s390/kvm/arm64/arm.c
+On Tue, Jun 23, 2026 at 11:41:56AM -0700, Oliver Upton wrote:
+> Implement access flag updates on table descriptors as required by
+> FEAT_HAFT. Note that unlike leaf descriptors, access flags on table
+> descriptors never generate a fault.
 > 
-> [..]
+> Signed-off-by: Oliver Upton <oupton@kernel.org>
+> ---
 > 
-> > +static int __init kvm_s390_arm64_init(void)
-> > +{
-> > +	if (!sclp.has_aef)
-> > +		return -ENXIO;
+> Same comment as TCR_ELx.HD, will fix in v2.
 > 
-> I suggest to use -ENODEV here to be consistent with s390 kvm module.
-> The arm64 module also return -ENODEV when not available.
+>  arch/arm64/include/asm/kvm_nested.h  |  1 +
+>  arch/arm64/include/asm/kvm_pgtable.h | 11 +++++++++++
+>  arch/arm64/kvm/at.c                  | 11 ++++++++++-
+>  arch/arm64/kvm/hyp/pgtable.c         | 11 -----------
+>  4 files changed, 22 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 1bb070328b1c..b52cf869333c 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -317,6 +317,7 @@ struct s1_walk_info {
+>  	bool			pa52bit;
+>  	bool			ha;
+>  	bool			hd;
+> +	bool			haft;
+>  };
+>  
+>  struct s1_walk_result {
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 6ae36973686c..67601ed6370d 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -131,6 +131,17 @@ static inline bool kvm_pte_valid(kvm_pte_t pte)
+>  	return pte & KVM_PTE_VALID;
+>  }
+>  
+> +static inline bool kvm_pte_table(kvm_pte_t pte, s8 level)
+> +{
+> +	if (level == KVM_PGTABLE_LAST_LEVEL)
+> +		return false;
+> +
+> +	if (!kvm_pte_valid(pte))
+> +		return false;
+> +
+> +	return FIELD_GET(KVM_PTE_TYPE, pte) == KVM_PTE_TYPE_TABLE;
+> +}
+> +
 
-Makes sense. Thanks
+Moved here for availability.
 
-	Steffen
+>  static inline u64 kvm_pte_to_phys(kvm_pte_t pte)
+>  {
+>  	u64 pa;
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index 8d76eaf463c9..31a55b9d3385 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -416,6 +416,8 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+>  	wi->hd &= (wi->regime == TR_EL2 ?
+>  		  FIELD_GET(TCR_EL2_HD, tcr) :
+>  		  FIELD_GET(TCR_HD, tcr));
+> +	wi->haft  = kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, HAFDBS, HAFT) &&
+> +		    FIELD_GET(TCR2_EL1_HAFT, effective_tcr2(vcpu, wi->regime));
+>  
+>  	return 0;
+>  
+> @@ -465,7 +467,7 @@ static bool should_set_access_flag(struct s1_walk_info *wi, struct s1_walk_step
+>  	if (access->type == WALK_ACCESS_NONARCH)
+>  		return false;
+>  
+> -	return wi->ha;
+> +	return kvm_pte_table(ws->desc, ws->level) ? wi->haft : wi->ha;
+>  }
+>  
+
+Right, adding support for tables' Access flag.
+
+
+>  static bool should_set_dirty_state(struct s1_walk_info *wi, struct s1_walk_step *ws,
+> @@ -473,6 +475,9 @@ static bool should_set_dirty_state(struct s1_walk_info *wi, struct s1_walk_step
+>  {
+>  	bool perm = wi->as_el0 ? wr->uw : wr->pw;
+>  
+> +	if (kvm_pte_table(ws->desc, ws->level))
+> +		return false;
+> +
+
+Right, tables don't get dirty/writable.
+
+
+>  	switch (access->type) {
+>  	/* R_RKMHW */
+>  	case WALK_ACCESS_CMO:
+> @@ -620,6 +625,10 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+>  		if (ws.level == 3)
+>  			break;
+>  
+> +		ret = handle_desc_update(vcpu, wi, &ws, wr, access);
+> +		if (ret)
+> +			return ret;
+> +
+
+And this is to update the table descriptor, IIUC.
+
+If I got that right, then FWIW:
+Reviewed-by: Leonardo Bras <leo.bras@arm.com>
+
+Thanks!
+Leo
