@@ -1,42 +1,42 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191F33D75D3;
-	Mon, 28 Sep 2026 10:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3099537A843;
+	Mon, 28 Sep 2026 10:56:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790592614; cv=none; b=r3czZCDJTkdHFt0vKkaQyOenvPFH/2Nf7Lk1Pl0sbHfY/s+WpoBzaWgBfPkUYkGyZlCVoEfDMSLcf5GDfcWy4vvg2WF15NYDhWG4UMR5lNqHTLchZ41b5pFnFz4SYw8flZt7++LCZQgzTwtM0iKDAUZwtEFZdELR2vU4Z0KsBwk=
+	t=1790592975; cv=none; b=nM/R9str89uFNehBI+qWKXll9jp+TbQPb0DDpF1qg/GwMDTxv7rQcAl2HHwzHPZf6eiXtxvEnpn+KqNfzoB259KJvo6U8JBPX0gRgPhwNEpTc2RWPnIyAs04EmSsXm3r7Y643jAdDoKsniX21k/42jYsj182LBdk6kkD4zn15Zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790592614; c=relaxed/simple;
-	bh=9tV5Pn8ooPxhrLztnSQxkF37uFI7GsTa1JPkqGqqzFo=;
+	s=arc-20240116; t=1790592975; c=relaxed/simple;
+	bh=4ZDYUKK7hOkkuW853RREZKTeQzSVG3+xdenNOiJCiu8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q7thtzY4bDHCNLTM4Uk0r2Za06yV9P0yUfQBqQskmAIlgciLkKdljAJC4IXrezh5XmaZyxrTu+N4WZs5pIMqy1YsTOIeWk+Fqa9w5IT/1Z6oA59gFsaXQYt+hzLcBoQiX794x+jOSFrSYOcDkAPPhEc8P2Ko/pZJJnHnDUUe6YQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hfvAdTd1; arc=none smtp.client-ip=217.140.110.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=W3fNKHkey3FWyqNlv6hQruXC68IGouB8EgA5mD+hWqjfLQ3Wse0+IBmN5jmaR9xMhS0sPhBw13Ap+wjd3WuGOTXaEYAqNNJnzSc36iuCbCvSFX4bC09RihEw9HhFXETimlNiTCAKK3M3nA4BN+Nd1slH6JrE0G2fILTXKfZmOgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=RwAPO1m6; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hfvAdTd1"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="RwAPO1m6"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1537B1595;
-	Mon, 28 Sep 2026 03:50:09 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CDA5E1595;
+	Mon, 28 Sep 2026 03:56:09 -0700 (PDT)
 Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9C9E43F86F;
-	Mon, 28 Sep 2026 03:50:11 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 407163F86F;
+	Mon, 28 Sep 2026 03:56:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790592612; bh=9tV5Pn8ooPxhrLztnSQxkF37uFI7GsTa1JPkqGqqzFo=;
+	t=1790592973; bh=4ZDYUKK7hOkkuW853RREZKTeQzSVG3+xdenNOiJCiu8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hfvAdTd10gjJiRGpBvkXYx8H/qPQJmd3XfXW5vEcVef2RdaTFLvQNRd4FIpOZMceL
-	 aXlsDWOkRnFBNTFBxEiO2FaQpn/gqW68Lr/FdQWHrClHxPrExbUMk2tWgSCB6HW9HW
-	 aZdYg3k20hE9ERIsNq8idf9yFUMRdPRg1ANj+FdE=
-Date: Mon, 28 Sep 2026 11:50:00 +0100
+	b=RwAPO1m6ueQDCoe7BwagSGk7/imEh9oCpN0sB+LocdRIxt9mqz3LBRJTRj0rJ1Eg+
+	 kKIZa8QMyNmU2NY7aqju1Plx5tQPUbqS3R1imrJ7Wov6LtNpFsGFHooOreadgmPN1l
+	 NEStHyVr5cNqcmNatJpe9KjCcLWgGMii0xafwFZU=
+Date: Mon, 28 Sep 2026 11:56:06 +0100
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: sashiko-reviews@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: [PATCH v2 1/4] KVM: arm64: nv: Don't advertise FEAT_LPA2 for
- guest stage-1
-Message-ID: <2fyohrzjogtj4dr2otnfpftsfn24wsycwlmwc7enpyq464vfi5@botsrehddt5y>
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 4/4] KVM: arm64: Convert TCR_EL2 to config-driven
+ sanitisation
+Message-ID: <zgq6ehb6ddllbp5wetdmuyq23tf26i74hznzpmiyu76b4pi4tf@vdy7l23kktcu>
 References: <20260917214215.74135-1-weilin.chang@arm.com>
- <20260917214215.74135-2-weilin.chang@arm.com>
- <20260917215144.B50A91F000FF@smtp.kernel.org>
+ <20260917214215.74135-5-weilin.chang@arm.com>
+ <20260917220029.4D9911F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,75 +46,90 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260917215144.B50A91F000FF@smtp.kernel.org>
+In-Reply-To: <20260917220029.4D9911F000FF@smtp.kernel.org>
 
-On Thu, Sep 17, 2026 at 09:51:44PM +0000, sashiko-bot@kernel.org wrote:
+On Thu, Sep 17, 2026 at 10:00:28PM +0000, sashiko-bot@kernel.org wrote:
 > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Medium] arm64: kvm: exact equality check for FEAT_LPA2 leaks future CPU features to guest
+> - [High] kvm: arm64: static TCR_EL2 mask based on FEAT_E2H0 breaks dynamic E2H layouts
 > --
 > 
-> commit 04c3c148ddb66ae2c7e9c401ce8ccd1c725fafd5
+> commit 18ffaaa0986bf7864d7ed4beba6765c60e2a26c1
 > Author: Wei-Lin Chang <weilin.chang@arm.com>
 > 
-> KVM: arm64: nv: Don't advertise FEAT_LPA2 for guest stage-1
+> KVM: arm64: Convert TCR_EL2 to config-driven sanitisation
+>     
+> This commit converts the translation control register TCR_EL2 to use the
+> config-driven sanitisation framework. It extracts feature dependencies
+> from the BSD-licensed AARCHMRS Registers.json, applying some manual
+> deviations for dependencies like TCR_EL2.TCMA and FEAT_ASID16.
 > 
-> This commit sanitizes ID_AA64MMFR0_EL1 to prevent advertising FEAT_LPA2
-> to nested guests for non-stage-2 granule size fields (TGRAN4, TGRAN16).
-> It explicitly clears and resets the fields to IMP when the 52-bit values
-> are detected.
+> > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> > index 1053676551aff..080b3510b7831 100644
+> > --- a/arch/arm64/kvm/config.c
+> > +++ b/arch/arm64/kvm/config.c
+> [ ... ]
+> > @@ -1611,6 +1718,12 @@ struct resx get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg)
+> >  	case SCTLR2_EL2:
+> >  		resx = compute_reg_resx_bits(kvm, &sctlr2_desc, 0, 0);
+> >  		break;
+> > +	case TCR_EL2:
+> > +		if (kvm_has_feat(kvm, FEAT_E2H0))
+> > +			resx = compute_reg_resx_bits(kvm, &tcr_el2_desc, 0, 0);
+> > +		else
+> > +			resx = compute_reg_resx_bits(kvm, &vhe_tcr_el2_desc, 0, 0);
+> > +		break;
+> 
+> [Severity: High]
+> Does this static choice in get_reg_fixed_bits() break dynamic E2H layouts for
+> nested guests? When FEAT_E2H0 is present on the host, this restricts the sysreg
+> mask to the E2H=0 layout for all TCR_EL2 accesses, ignoring that guests can
+> still dynamically enter E2H=1 mode.
+> 
+> If a nested hypervisor runs on a host with FEAT_E2H0, sets HCR_EL2.E2H = 1,
+> and writes to TCR_EL2 expecting the VHE layout, KVM will intercept the write.
+> When passed to kvm_vcpu_apply_reg_masks(), the VHE-specific bits (e.g., EPD1,
+> T1SZ, TG1, IPS) will be cleared because they overlap with RES0 bits in the
+> static nVHE mask. Could this corrupt translation table configurations and
+> cause translation aborts?
+
+No. VMs can't change their effective HCR_EL2.E2H value.
+
+> 
+> >  	case TCR2_EL2:
+> >  		resx = compute_reg_resx_bits(kvm, &tcr2_el2_desc, 0, 0);
+> >  		break;
 > 
 > > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index 7f13f0077c9f4..3e01123d00ca0 100644
 > > --- a/arch/arm64/kvm/nested.c
 > > +++ b/arch/arm64/kvm/nested.c
-> 
 > [ ... ]
-> 
-> > @@ -1731,6 +1731,17 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
-> >  		/* Hide CNTPOFF if present */
-> >  		val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR0_EL1, ECV, IMP);
+> > @@ -1957,6 +1957,10 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
+> >  	resx = get_reg_fixed_bits(kvm, HFGITR2_EL2);
+> >  	set_sysreg_masks(kvm, HFGITR2_EL2, resx);
 > >  
-> > +		/* NV does not support FEAT_LPA2. */
-> > +		if (SYS_FIELD_GET(ID_AA64MMFR0_EL1, TGRAN4, val) == ID_AA64MMFR0_EL1_TGRAN4_52_BIT) {
-> > +			val &= ~ID_AA64MMFR0_EL1_TGRAN4;
-> > +			val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR0_EL1, TGRAN4, IMP);
-> > +		}
+> > +	/* TCR_EL2 */
+> > +	resx = get_reg_fixed_bits(kvm, TCR_EL2);
+> > +	set_sysreg_masks(kvm, TCR_EL2, resx);
 > 
-> [Severity: Medium]
-> Could this exact equality check fail to cap future values of TGRAN4?
+> [Severity: High]
+> Does this application in kvm_init_nv_sysregs() cause valid guest writes to be
+> clobbered?
 > 
-> If a future hardware extension introduces a CPUID value where TGRAN4 is
-> greater than ID_AA64MMFR0_EL1_TGRAN4_52_BIT, this condition would be
-> bypassed. This could expose unsupported capabilities to nested guests on
-> future hardware, potentially leading to guest crashes or page table
-> corruption when the guest attempts to use 52-bit translation granules.
+> Since the wrongly computed static mask is applied to the VM's sysreg_masks
+> array here, it looks like it will break nested virtualization for any nested
+> guest running in VHE mode.
 
-This is the same comment from Sashiko as v1, and it was Nack'd by the
-maintainer.
-
-> 
-> > +
-> > +		if (SYS_FIELD_GET(ID_AA64MMFR0_EL1, TGRAN16, val) == ID_AA64MMFR0_EL1_TGRAN16_52_BIT) {
-> > +			val &= ~ID_AA64MMFR0_EL1_TGRAN16;
-> > +			val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR0_EL1, TGRAN16, IMP);
-> > +		}
-> 
-> [Severity: Medium]
-> Similarly, could this equality check leak future values of TGRAN16 greater
-> than ID_AA64MMFR0_EL1_TGRAN16_52_BIT?
-> 
-> Would it be safer to handle both of these limits using
-> ID_REG_LIMIT_FIELD_ENUM instead of exact equality checks to ensure
-> future monotonic CPUID values remain properly capped?
-
-Same here.
+No. VMs can't change their effective HCR_EL2.E2H value.
 
 Thanks,
 Wei-Lin Chang
 
 > 
 > > +
-> >  		/* Disallow unsupported S2 page sizes */
-> >  		switch (PAGE_SIZE) {
+> >  	/* TCR2_EL2 */
+> >  	resx = get_reg_fixed_bits(kvm, TCR2_EL2);
+> >  	set_sysreg_masks(kvm, TCR2_EL2, resx);
 > 
 > -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20260917214215.74135-1-weilin.chang@arm.com?part=1
+> Sashiko AI review · https://sashiko.dev/#/patchset/20260917214215.74135-1-weilin.chang@arm.com?part=4
