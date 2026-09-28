@@ -1,47 +1,64 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F59F367F26
-	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 16:01:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47DCF4BEE37
+	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 16:08:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790611320; cv=none; b=TfTirWbpFs5aPLjRL9d9sFeueLhW719b6mPZnNVaCms+BPPXcQV4apNdH7z3DIP+Ys1zz7Jl2YUjrId1mKPaL1wWiWGOsUf6/u6uk5Aw2lBWzL5k55XH5Alu0qxnx5C+IvjxdAV+MZXEJpvggm8WgX9SEWaGBLYd3HwQuTCD/ZA=
+	t=1790611682; cv=none; b=P0S9/V8Oi5od5lzC4FoetnHJv1TBO4d8QLhLVq6tYNmpg/UP6Q2/KmSfz7NpCO9BJNz3x/jf2Fxxjd77elF1K/GkqaKDgWCm/yfX/0aETCmt+yhiSco1L6nnNDrq/OAJ0s/HLO7brZe7DbV62WXnBtSL8XwPbbKsMi9W7yMh4aA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790611320; c=relaxed/simple;
-	bh=P57+Mq0JBY8tMh9uwDgpAXGb5R4q7qXPEcatPTTVm2g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=IS4PaifhI3PvQVjnK1xuv7/WYN3/pC7cxtqQdjQ7YqgerNoQgHBSrSoJoDZzAcTzmjJ2vaqzuZVN9hDNTT5lWTSoUA5bYmqfYRdLzledtPnfCyY//VIR42Mft/xWihBInE/gdYj51iDqyVNJivgXi5GIFyLtYsKRwvUA0lXTcSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=MqYb9ccQ; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1790611682; c=relaxed/simple;
+	bh=c5FHfUVz5VVHTSc2j+d6ycLo0NpKTyx2202wpOOflXM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J47jgVJzaMW6NEnC41qJ15EKQwD484FPCD/cegCvvTDHEhCmfEU2PrOre3u7RiSV9CPksetZNrDHXGAobPBnx6SJDqgpeeW8VvtMT1yymVVLpLJ9d3IGFaCZMAIy9ZQfPjAfjaY+05uftjdNwij3sOBYUMVzhI8dRFkKf6yDsCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=OwU/63mP; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="MqYb9ccQ"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="OwU/63mP"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 670811655;
-	Mon, 28 Sep 2026 09:01:54 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9D34E3F763;
-	Mon, 28 Sep 2026 09:01:56 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 384901655;
+	Mon, 28 Sep 2026 09:07:56 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 47AEC3FA1F;
+	Mon, 28 Sep 2026 09:07:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790611317; bh=P57+Mq0JBY8tMh9uwDgpAXGb5R4q7qXPEcatPTTVm2g=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MqYb9ccQ+S/rDF3her3n4aoiwwRrYE39ExWodPdewQIVolQ9s2H+R7jHQCT7UHPiq
-	 KktClRnlG6mV3RVeLFQkbP2MevcQAaudfEjlrb4JbZHcly6G7Ec0oRHU44/BnlUUCM
-	 UipbAozfyrxqUr5UBS8TTco7ZFElY247BR+MgygM=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
+	t=1790611679; bh=c5FHfUVz5VVHTSc2j+d6ycLo0NpKTyx2202wpOOflXM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OwU/63mP+mDZeSRe60JhpPQnlr7sDP3cia+ZLhZhxhc/Iyn6lkPHoIlEV+vofTcIG
+	 QYnJuy+WgYfE6nrh8qbtZjjUn/b0kG5vKGmJ6Po2u7w7hWulE4bsqKG2cFxY7tmd66
+	 l70A93Xu6/3iN2DQ+wYq1ZM3q40cP1SV7Pj/jrIc=
+Date: Mon, 28 Sep 2026 17:07:52 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Steffen Eiden <seiden@linux.ibm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Andreas Grapentin <gra@linux.ibm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@kernel.org>,
+	Friedrich Welter <fritz@linux.ibm.com>,
+	Fuad Tabba <tabba@google.com>, Gautam Gala <ggala@linux.ibm.com>,
+	Hariharan Mari <hari55@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Hendrik Brueckner <brueckner@linux.ibm.com>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
+	Nico Boehr <nrb@linux.ibm.com>,
+	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+	Oliver Upton <oupton@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>
-Subject: Re: [PATCH 20/22] KVM: arm64: selftests: Only test AF behavior for emulated AT insns
-Date: Mon, 28 Sep 2026 17:01:48 +0100
-Message-ID: <arqPbFRxSVfYTuRS@LeoBrasDK>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260623184201.1518871-21-oupton@kernel.org>
-References: <20260623184201.1518871-1-oupton@kernel.org> <20260623184201.1518871-21-oupton@kernel.org>
+	Sven Schnelle <svens@linux.ibm.com>,
+	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v8 16/29] arm64: Share arm64 headers with s390
+Message-ID: <arqQ2Eat4VUBbl49@arm.com>
+References: <20260918133107.1042730-1-seiden@linux.ibm.com>
+ <20260918133107.1042730-17-seiden@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,139 +67,95 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260918133107.1042730-17-seiden@linux.ibm.com>
 
-On Tue, Jun 23, 2026 at 11:41:59AM -0700, Oliver Upton wrote:
-> The original intent of the test was to test KVM's slowpath AT emulation,
-> specifically including a test for KVM's IMP DEF choice that AT
-> instructions set the access flag.
-> 
-> While it is possible to force AT instructions to take the slow path in
-> KVM, this is only effective for an out-of-context regime wherein the
-> stage-2 translations are guaranteed to be invalid. As such, the
-> inclusion of AT S1E2* instructions muddied this a bit, as they operate
-> on the in-context EL2&0 regime.
-> 
-> Restore the original intent of the test and get rid of the AT S1E2* test
-> cases entirely.
-> 
-> Signed-off-by: Oliver Upton <oupton@kernel.org>
-> ---
->  tools/testing/selftests/kvm/arm64/at.c | 38 ++++++++++++++++----------
->  1 file changed, 24 insertions(+), 14 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/arm64/at.c b/tools/testing/selftests/kvm/arm64/at.c
-> index ce5d312ef6ba..d7289f3df04f 100644
-> --- a/tools/testing/selftests/kvm/arm64/at.c
-> +++ b/tools/testing/selftests/kvm/arm64/at.c
-> @@ -13,6 +13,7 @@
+On Fri, Sep 18, 2026 at 03:30:53PM +0200, Steffen Eiden wrote:
+> diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
+> index 6b005c8fef70..12cbad460258 100644
+> --- a/arch/arm64/Makefile
+> +++ b/arch/arm64/Makefile
+> @@ -45,6 +45,11 @@ KBUILD_CFLAGS	+= $(CC_FLAGS_NO_FPU) \
+>  KBUILD_CFLAGS	+= $(call cc-disable-warning, psabi)
+>  KBUILD_AFLAGS	+= $(compat_vdso)
 >  
->  enum {
->  	CLEAR_ACCESS_FLAG,
-> +	TEST_ACCESS_FLAG,
->  };
->  
->  static u64 *ptep_hva;
-> @@ -48,21 +49,12 @@ do {											\
->  		GUEST_ASSERT_EQ(FIELD_GET(SYS_PAR_EL1_ATTR, par), MAIR_ATTR_NORMAL);	\
->  		GUEST_ASSERT_EQ(FIELD_GET(SYS_PAR_EL1_SH, par), PTE_SHARED >> 8);	\
->  		GUEST_ASSERT_EQ(par & SYS_PAR_EL1_PA, TEST_ADDR);			\
-> +		GUEST_SYNC(TEST_ACCESS_FLAG);						\
->  	}										\
->  } while (0)
->  
->  static void test_at(bool expect_fault)
->  {
-> -	test_at_insn(S1E2R, expect_fault);
-> -	test_at_insn(S1E2W, expect_fault);
+> +# Enable all code shared to s390
+> +KBUILD_CFLAGS	+= -DARM64_S390_COMMON
+> +KBUILD_AFLAGS	+= -DARM64_S390_COMMON
+> +KBUILD_CPPFLAGS	+= -DARM64_S390_COMMON
 
-This seems to be the getting rid of AT S1E2* tests.
+Do we actually need these defines? They seem only to be used as markers
+for the awk scripts to extract the definitions. Why do we need the C
+preprocessor involved at all? Could we not just have comment markers:
 
-> -
-> -	/* Reuse the stage-1 MMU context from EL2 at EL1 */
-> -	copy_el2_to_el1(SCTLR);
-> -	copy_el2_to_el1(MAIR);
-> -	copy_el2_to_el1(TCR);
-> -	copy_el2_to_el1(TTBR0);
-> -	copy_el2_to_el1(TTBR1);
-> -
->  	/* Disable stage-2 translation and enter a non-host context */
->  	write_sysreg(0, vtcr_el2);
->  	write_sysreg(0, vttbr_el2);
-> @@ -71,11 +63,21 @@ static void test_at(bool expect_fault)
+/* ARM64_S390_COMMON_BEGIN */
+...
+/* ARM64_S390_COMMON_END */
+
+(also the CPPFLAGS definition was enough, it gets copied into the others
+automatically)
+
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index ab205f9db94a..1c5c4df260be 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -16,6 +16,8 @@
 >  
->  	test_at_insn(S1E1R, expect_fault);
->  	test_at_insn(S1E1W, expect_fault);
+>  #include <asm/gpr-num.h>
+>  
+> +#ifdef ARM64_S390_COMMON
 > +
-> +	sysreg_clear_set(hcr_el2, 0, HCR_EL2_TGE | HCR_EL2_VM);
-> +	isb();
-
-Setting bits that were clean in the start.
-
->  }
+>  /*
+>   * ARMv8 ARM reserves the following encoding for system registers:
+>   * (Ref: ARMv8 ARM, Section: "System instruction class encoding overview",
+> @@ -50,6 +52,8 @@
+>  #define sys_reg_CRm(id)	(((id) >> CRm_shift) & CRm_mask)
+>  #define sys_reg_Op2(id)	(((id) >> Op2_shift) & Op2_mask)
 >  
->  static void guest_code(void)
->  {
-> -	sysreg_clear_set(tcr_el1, TCR_HA, 0);
-> +	/* Reuse the stage-1 MMU context from EL2 at EL1 */
-> +	copy_el2_to_el1(SCTLR);
-> +	copy_el2_to_el1(MAIR);
-> +	copy_el2_to_el1(TCR);
-> +	copy_el2_to_el1(TTBR0);
-> +	copy_el2_to_el1(TTBR1);
-
-Set them only once instead of on every test, since they should not change.
-
+> +#endif /* ARM64_S390_COMMON */
 > +
-> +	sysreg_clear_set_s(SYS_TCR_EL12, TCR_HA, 0);
->  	isb();
+>  #ifndef CONFIG_BROKEN_GAS_INST
 >  
->  	test_at(true);
-> @@ -83,7 +85,11 @@ static void guest_code(void)
->  	if (!SYS_FIELD_GET(ID_AA64MMFR1_EL1, HAFDBS, read_sysreg(id_aa64mmfr1_el1)))
->  		GUEST_DONE();
+>  #ifdef __ASSEMBLER__
+> @@ -123,6 +127,8 @@
+>  #define GSB_SYS_BARRIER_INSN		__SYS_BARRIER_INSN(1, 0, 12, 0, 0, 31)
+>  #define GSB_ACK_BARRIER_INSN		__SYS_BARRIER_INSN(1, 0, 12, 0, 1, 31)
 >  
-> -	sysreg_clear_set(tcr_el1, 0, TCR_HA);
-> +	/*
-> +	 * KVM's software PTW makes the implementation choice that the AT
-> +	 * instruction sets the access flag.
-> +	 */
-> +	sysreg_clear_set_s(SYS_TCR_EL12, 0, TCR_HA);
-
-clear_set -> clear_set_s and added some docs
-
->  	isb();
->  	test_at(false);
+> +#ifdef ARM64_S390_COMMON
+> +
+>  /* Data cache zero operations */
+>  #define SYS_DC_ISW			sys_insn(1, 0, 7, 6, 2)
+>  #define SYS_DC_IGSW			sys_insn(1, 0, 7, 6, 4)
+> @@ -832,6 +838,8 @@
+>  #define SCTLR_ELx_A	 (BIT(1))
+>  #define SCTLR_ELx_M	 (BIT(0))
 >  
-> @@ -96,8 +102,8 @@ static void handle_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
->  	case CLEAR_ACCESS_FLAG:
->  		/*
->  		 * Delete + reinstall the memslot to invalidate stage-2
-> -		 * mappings of the stage-1 page tables, allowing KVM to
-> -		 * potentially use the 'slow' AT emulation path.
-> +		 * mappings of the stage-1 page tables, forcing KVM to
-> +		 * use the 'slow' AT emulation path.
+> +#endif /* ARM64_S390_COMMON */
+> +
+>  #ifdef CONFIG_CPU_BIG_ENDIAN
+>  #define ENDIAN_SET_EL2		SCTLR_ELx_EE
+>  #else
+> @@ -866,6 +874,7 @@
+>  	 SCTLR_EL1_LSMAOE | SCTLR_EL1_nTLSMD | SCTLR_EL1_EIS   | \
+>  	 SCTLR_EL1_TSCXT  | SCTLR_EL1_EOS)
+>  
+> +#ifdef ARM64_S390_COMMON
+>  /* MAIR_ELx memory attributes (used by Linux) */
+>  #define MAIR_ATTR_DEVICE_nGnRnE		UL(0x00)
+>  #define MAIR_ATTR_DEVICE_nGnRE		UL(0x04)
+> @@ -1102,6 +1111,8 @@
+>  #define GICV5_GICR_CDNMIA_TYPE_MASK	GENMASK_ULL(31, 29)
+>  #define GICV5_GICR_CDNMIA_ID_MASK	GENMASK_ULL(23, 0)
+>  
+> +#endif /* ARM64_S390_COMMON */
 
-After the removal of AT S1E2*, this should always cause KVM to use the 
-slow path.
+I haven't checked them all but there are a few definitions in here that
+depend on arm64-specific configs: e.g. GCR depends on KASAN, TGRAN
+macros depend on page size, PA_BITS_52 influences some other values.
 
->  		 *
->  		 * This and clearing the access flag from host userspace
->  		 * ensures that the access flag cannot be set speculatively
-> @@ -106,6 +112,10 @@ static void handle_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
->  		clear_bit(__ffs(PTE_AF), ptep_hva);
->  		vm_mem_region_reload(vcpu->vm, vcpu->vm->memslots[MEM_REGION_PT]);
->  		break;
-> +	case TEST_ACCESS_FLAG:
-> +		TEST_ASSERT(test_bit(__ffs(PTE_AF), ptep_hva),
-> +			    "Expected access flag to be set (desc: %lu)", *ptep_hva);
-> +		break;
+I think they should be outside the common definitions shared with s390.
+In addition, the awk scripts should reject any CONFIG_ (or at least
+CONFIG_ARM64_) lines in the copied files. Ideally report an error rather
+than silently masking them out.
 
-For testing the access flag when a fault is not expected, during the AT 
-test.
-
-If I got the reasonings above correctly, then FWIW:
-Reviewed-by: Leonardo Bras <leo.bras@arm.com>
-
-Thanks!
-Leo
+-- 
+Catalin
