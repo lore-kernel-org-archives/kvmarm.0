@@ -1,130 +1,182 @@
-Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 297C547605C
-	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 08:30:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD0A35C1BC;
+	Mon, 28 Sep 2026 09:08:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790584248; cv=none; b=sH+j6vv7AL7nbF3zFq+2IxuDM3zM8sqP+5DK9xOIjy03etY3z7qwIwiix9VtptmaqvpsntTreRxtYBq9ACzVY/JfHl7Ne55OJuWyLN2YTvaO8G5CzcjCCHcohYSxEenSBxoaFRONhdkx3JQmbI3usGmREOrjMJA6hipIdXiUzN8=
+	t=1790586504; cv=none; b=VhsaxG+KnDlYL4GaFN3W3ZJ8fKJj6x8LpDHKnTASmwKzTXQIOqbesojz50jzZ4l+aaB0y7k1eM2g8VrC0ln2Dv8gE4oWiTtmIdtiOWe7vzRxnrslMYyKTUDLBISuMYoUJA98sgxwITLTduTlMnEZ7zX7Lj5HOJ1qfAd4oTHQzH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790584248; c=relaxed/simple;
-	bh=EXOjLPcF+VLIg3vJR9iV1apAo+paTwpRlhGz1p2GyNA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=TtKawi7T/coujVopzp7TngANNiXTjoN2J3uF38h/e9rKFwd50VLatCZAP4Y22eVyJgbr/La4cVeuin36RATVCN9VI/mr11tUvOA5pBR3ZwzrQPmBF6iNW3oXy1ioeFMBvIMxuB1tSsULTcBLRUk4zFmN7zU+Gu1HucA7Gcvxyfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.162.144])
-	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4htZ2C208mz1prn0;
-	Mon, 28 Sep 2026 16:18:27 +0800 (CST)
-Received: from kwepemk100011.china.huawei.com (unknown [7.202.194.59])
-	by mail.maildlp.com (Postfix) with ESMTPS id 650BB40538;
-	Mon, 28 Sep 2026 16:30:37 +0800 (CST)
-Received: from [10.67.121.115] (10.67.121.115) by
- kwepemk100011.china.huawei.com (7.202.194.59) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Mon, 28 Sep 2026 16:30:36 +0800
-Message-ID: <0ed13d49-fd34-ff80-bd07-be9a998e3d76@hisilicon.com>
-Date: Mon, 28 Sep 2026 16:30:35 +0800
+	s=arc-20240116; t=1790586504; c=relaxed/simple;
+	bh=8QxEVS0jJi+6e55UXb8k9bqPSxR74dQMx6bz8LUh3ys=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=RQUMPXF+IFVjhvJyNCckfRd4N4VTuY/W3vnMHaU5TJPa0m+8KgZ4CmoehHThlH7QNC5PpDaFh3+0B2bk0keYwLi72fBJ8+1HzbZC1Ioee27fmhA4tU79gOFM4uXBozIUEOO11Qsd9Nc4byfwJy49Lla8wpLzm5/UwMPwDcijmKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=j9M6RMu3; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="j9M6RMu3"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D25C71570;
+	Mon, 28 Sep 2026 02:08:17 -0700 (PDT)
+Received: from [10.57.12.79] (unknown [10.57.12.79])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 10D593F763;
+	Mon, 28 Sep 2026 02:08:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790586501; bh=8QxEVS0jJi+6e55UXb8k9bqPSxR74dQMx6bz8LUh3ys=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=j9M6RMu3S8zakwg6JRtfvWLDrHJer7eiDjZZICaHfH7tODt9uE2w10JBizs5wuZzJ
+	 +hKgRXyHRXZh6mhrqMviEKCa1NwBCIrInUtLBX0qgTjeJZjGDXo/fZ+aTFLMaCPcxm
+	 uvcWJu2CK82TmeKxYQJ2qV4ezrldT1X+rzjyJYpA=
+Message-ID: <70d47475-e26e-40e1-b409-b0c16aecb8c0@arm.com>
+Date: Mon, 28 Sep 2026 10:08:16 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [RFC PATCH] KVM: arm64: Restrict CNTP_CVAL/CNTHP_CVAL save/reload
- when ptimer is used
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-CC: Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>, Joey
- Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Catalin
- Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Mark
- Rutland <mark.rutland@arm.com>, <kvmarm@lists.linux.dev>, Nianyao Tang
-	<tangnianyao@huawei.com>
-References: <20260921111840.3000905-1-wangzhou1@hisilicon.com>
- <878q4u4u3a.wl-maz@kernel.org>
- <6975605e-6635-f3c6-39ee-8faaae6d9856@hisilicon.com>
- <86mrt64jks.wl-maz@kernel.org>
-From: Zhou Wang <wangzhou1@hisilicon.com>
-In-Reply-To: <86mrt64jks.wl-maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemk100011.china.huawei.com (7.202.194.59)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 5/7] firmware: arm_rmm: Activate the RMM
+Content-Language: en-GB
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+ will@kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+ sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
+References: <20260924135201.850038-1-suzuki.poulose@arm.com>
+ <20260924135201.850038-6-suzuki.poulose@arm.com> <arZmXFw5Jw2IbAmA@arm.com>
+ <a11aba04-eaaa-43fd-988b-a2581b1b2fdb@arm.com> <araketG70TIKeNuf@arm.com>
+ <12e83d88-de4c-4230-aac2-1796123320ad@arm.com>
+In-Reply-To: <12e83d88-de4c-4230-aac2-1796123320ad@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 2026/9/25 1:58, Marc Zyngier wrote:
-> On Tue, 22 Sep 2026 11:16:36 +0100,
-> Zhou Wang <wangzhou1@hisilicon.com> wrote:
->>
->> On 2026/9/21 21:22, Marc Zyngier wrote:
->>> On Mon, 21 Sep 2026 12:18:40 +0100,
->>> Zhou Wang <wangzhou1@hisilicon.com> wrote:
+On 25/09/2026 18:50, Suzuki K Poulose wrote:
+> Hi Catalin
+> 
+> On 25/09/2026 17:42, Catalin Marinas wrote:
+>> On Fri, Sep 25, 2026 at 04:02:24PM +0100, Suzuki K Poulose wrote:
+>>> On 25/09/2026 13:17, Catalin Marinas wrote:
+>>>> On Thu, Sep 24, 2026 at 02:51:59PM +0100, Suzuki K Poulose wrote:
+>>>>> From: Steven Price <steven.price@arm.com>
+>>>>>
+>>>>> Activate the RMM after the basic configuration. This is a memory
+>>>>> transferring stateful operation.
+>>>>>
+> 
+> ...
+> 
+>>>>> +
+>>>>> +    ret = rmi_sro_memxfer_cmd(sro, GFP_KERNEL, SMC_RMI_RMM_ACTIVATE);
+>>>>> +    if (ret) {
+>>>>> +        pr_err("RMM activate failed (%d)\n", ret);
+>>>>> +        ret = ret < 0 ? ret : -ENXIO;
+>>>>> +    }
+>>>>> +
+>>>>> +    return ret;
 >>>>
->>>> A guest's physical timer may be used in nested guest or directly used in
->>>> VHE mode. We can check above cases to avoid useless CNTP_CVAL/CNTHP_CVAL save
->>>> and reload.
+>>>> It was raised earlier this year [1] but I'm not sure it concluded. How
+>>>> do we handle kexec and kdump? I think RMI_RMM_DEACTIVATE only succeeds
+>>>> if nothing is delegated, so it would need all realms torn down 
+>>>> first. If
+>>>> that's not feasible, we could at least block (non-crash) kexec like 
+>>>> pKVM
+>>>> does.
 >>>
->>> Why useless? What cases?
+>>> You are right, we can't DEACTIVATE until all granules have been
+>>> "undelegated" back. Not just the Realms, but also the GPTs/Tracking
+>>> Metadata etc would need to be reclaimed (when we get to support
+>>> dynamic GPT/Tracking metadata). For now, we should block the kexec.
 >>
->> I mean we do not use ptimer at least in current Linux kernel, however, for system
->> which has ECV_CNTPOFF capability, we have to handle related logic here.
->>
->> So we can detect if ptimer is been used, if it is been used, then we run into the
->> related codes.
+>> Looking more into this (and the memory hotplug story), I find it strange
+>> that simply having RME and a valid RMM imposes all these restrictions
+>> even if we never run or intend to run a realm. How common will
+>> RME-capable systems with RMM firmware be that are not used for CoCo? Or
+>> do we expect only CoCo systems to have capable/configured firmware (RME
+>> may be present in silicon anyway)?
 > 
-> But where is the actual cost? Is it the saving of these registers?
-> Something else?
+> There is another angle to this :
+> 
+> RMM may act as a TSM (as in the Trusted Security Manager in PCI TDISP)
+> context and provide setting up IDE connection between the RootPort/
+> EndPoint. So, the trigger point for the RMM activation would become the 
+> "First Delegate" request.
+> 
+> Running an RMM just for the "TSM" functionality is not ideal.
+> In the absence of RMM, Linux can act as the baremetal TSM. But when the
+> RMM is present, we must use the RMM as the TSM, especially if the
+> Device will be assigned to a Realm.
+> 
+> FEAT_RME capable systems don't need to enable RMM unless they want to
+> run CoCo guests.
+> 
+>>
+>> Ideally we'd defer the RMM configuration and activation (and the
+>> tracking/GPT checks) until we first attempt to start a realm, keeping
+>> only the RMI_VERSION/FEATURES probing at boot. Not sure how feasible
+>> this is (memory is more fragmented by then for any contiguous donation).
+>> If we manage it, kexec and memory hotplug just work on hosts that never
+>> start a realm.
+>>
+>> The next best thing for kexec is to tear down the realms, undelegate
+>> the granules and deactivate the RMM before invoking kexec (with kdump
+>> that's harder as we likely no longer have a controlled shutdown).
+> 
+> This is quite complicated, when we get the dynamic metadata support,
+> especially with the self-describing L1GPT and Tracking metadata.
+> But not impossible.
 
-Just save the cost of the codes in has_cntpoff branch in __activate_traps/__deactivate_traps.
+Looking at this again we could :
 
-From the KUT test results, for VHE in non-nested mode, it will save:
-hvc		758ns		624ns		17.68%
-mmio_read_user	3647ns		3479ns		4.61%
-mmio_read_vgic	949ns		817ns		13.91%
-eoi		29ns		29ns		0.00%
-ipi		2534ns		2302ns		9.16%
-lpi		2684ns		2442ns		9.02%
-timer_10ms	2393ns		2168ns		9.40%
+a. If the user triggers a graceful kexec reboot, i.e, without forced,
+    we should be able to deactivate the RMM. Since all processes are
+    killed, Realm VMs must be off and all granules reclaimed.
+    When we get to dynamic GPT/Tracking, we should additionally
+    reclaim them back.
+b. For forced reboot kexec, I don't think there is a safe way.
 
-I am not sure it deserves a hacking like this patch, key point is that it seems
-we rarely use ptimer, but we have to handle it every VM in/exit.
+We have two options here :
+
+1. Disable kexec reboot (allowing kexec kdump) when the RMM is active
+    at kexec_load. I prefer this for now, and we could goto 2 eventually.
+
+2. Back out from machine_kexec() if the RMM was still active.
+    This allows (a) above.
 
 > 
 >>
->> I am not familiar with the nested cases, so just not change related logic.
->>
->>>
->>>>
->>>> Use lazy detection to determine whether a non-nested VHE guest actually uses
->>>> the physical timer.
->>>>
->>>> timer_set_traps() initially traps CNTP_CTL_EL0 writes for non-nested guests.
->>>> On the first write that sets CNTP_CTL.ENABLE=1, the trap handler records
->>>> ptimer_used and clears the trap in CNTHCTL_EL2, allowing the guest direct
->>>> access thereafter.
->>>
->>> I really don't want to go into these micro optimisation to paper over
->>> the bad state of the architecture.
->>>
->>> The options are:
->>>
->>> - Don't use any offset (offsets always set to 0), and there will not
->>>   be any trap
->>
->> Do you mean that in non-nested case, we can make offset always be 0, so
->> related logic in __activate_traps/__deactivate_traps can be skipped?
->>
+>> Similarly with memory hotplug, allow it if we haven't started any realms
+>> and refuse realm creation afterwards if untracked memory was onlined.
+>> Also, if the memory is onlined to ZONE_MOVABLE, neither guest_memfd nor
+>> the kernel allocations we delegate come from there, so we could allow
+>> it even with realms running.
 > 
-> The *trapping* of the physical timer/counter will be skipped.
+> I will double check this.
 
-Thanks, I saw related trap setting in timer_set_traps.
+Yep, we could do this, and I have added the following hunk :
 
-Best,
-Zhou
+diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
+index b7332b066044d..51343e9d5c2a9 100644
+--- a/drivers/firmware/arm_rmm/rmi.c
++++ b/drivers/firmware/arm_rmm/rmi.c
+@@ -997,6 +997,11 @@ static int rmi_memory_notifier(struct 
+notifier_block *nb,
 
-> 
-> 	M.
-> 
+         start = PFN_PHYS(arg->start_pfn);
+         end = PFN_PHYS(arg->start_pfn + arg->nr_pages);
++
++       /* Neither guest-memfd nor the kernel allocations can come from 
+MOVABLE */
++       if (page_zonenum(phys_to_page(start)) == ZONE_MOVABLE)
++               return NOTIFY_DONE;
++
+         ret = rmi_prepare_memory(start, end);
+
+         return notifier_from_errno(ret);
+
+Suzuki
