@@ -1,146 +1,188 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2E14E80BD
-	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 15:58:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F59F367F26
+	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 16:01:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790611134; cv=none; b=j36IxKTOZadyfpLilIYgjOGdDh1BDy7f9ya1VIDQnvJZ9FNZOI4v2c3lOUv9l+Yz+4LeHLnNN5qvBFFQQIgcE0CfIOSurZtJfSh3N6/kgvc20GFN1iofapgJwt+eAN6+kN5TZg7md5Wp3MNzYqPm5rKFxZ1YsxGVXHLMqMaMXdc=
+	t=1790611320; cv=none; b=TfTirWbpFs5aPLjRL9d9sFeueLhW719b6mPZnNVaCms+BPPXcQV4apNdH7z3DIP+Ys1zz7Jl2YUjrId1mKPaL1wWiWGOsUf6/u6uk5Aw2lBWzL5k55XH5Alu0qxnx5C+IvjxdAV+MZXEJpvggm8WgX9SEWaGBLYd3HwQuTCD/ZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790611134; c=relaxed/simple;
-	bh=04Ifz2k31JE157sSuBCrUq92PK7BGbZhITDHVUXzOwA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Rc/GHm7QgXLRWsS2GArYydFgtahwKXWLDis3YH1vMpfDh8F1DS7Cxb4R1FJdVLBOBr0iGcPg0WcVzSyrdatLPO4vbWSdCihCwosnSUR7Kc11dBiaEUqXravher+9UXAl+58TpvIUI+lDBcWQMOKyPLik9JF4ZDtLLQlrEq4yEYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=grNeGLQF; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1790611320; c=relaxed/simple;
+	bh=P57+Mq0JBY8tMh9uwDgpAXGb5R4q7qXPEcatPTTVm2g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=IS4PaifhI3PvQVjnK1xuv7/WYN3/pC7cxtqQdjQ7YqgerNoQgHBSrSoJoDZzAcTzmjJ2vaqzuZVN9hDNTT5lWTSoUA5bYmqfYRdLzledtPnfCyY//VIR42Mft/xWihBInE/gdYj51iDqyVNJivgXi5GIFyLtYsKRwvUA0lXTcSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=MqYb9ccQ; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="grNeGLQF"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68SF5YEY216947;
-	Mon, 28 Sep 2026 15:58:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=rzyibD
-	QTpQayQMJ6uE+DAwnjNSVqg9HDPjxKT/D4jMY=; b=grNeGLQFIcNppKXXDKI0rl
-	ThLMbnF6URl5Sg70BHzDbIBGMok1PcGBVunzH4LH80tr5xSz0JZgBdUTDZwRYHxS
-	sPLeXAsV+2g7y/1QeXKOwJi+CBPnrVSh6M58EEb19sVkUCLXuNH73/d43igI4Lli
-	JIm5jWsL+kNDUw2AMi6JTy76JKeM7uMDdqAtGyFMj8mgI//ioIOlpUw0HgPAMb2w
-	FmziXcuPqxjwmI66ZF/hq9/GbOY0SjLKxmEjJVdLkzSeHV8i7SQL2HRx+OEz9P52
-	rkRsPmPP+LcPyiKu0/0CZNVYsVQrktc9BQraPckbPlQujcnoT6tX0u4kT7FBgobw
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gx4fe24r7-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Mon, 28 Sep 2026 15:58:36 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68SElYxt290963;
-	Mon, 28 Sep 2026 15:58:35 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4gxu2y5qq2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 28 Sep 2026 15:58:35 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68SFwWBo44040678
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 28 Sep 2026 15:58:32 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 02D2620043;
-	Mon, 28 Sep 2026 15:58:32 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0680920040;
-	Mon, 28 Sep 2026 15:58:31 +0000 (GMT)
-Received: from [0.0.0.0] (unknown [9.111.81.16])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 28 Sep 2026 15:58:30 +0000 (GMT)
-Message-ID: <c97ae089-fadf-4a29-b7df-4947ea8d6592@linux.ibm.com>
-Date: Mon, 28 Sep 2026 17:58:30 +0200
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="MqYb9ccQ"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 670811655;
+	Mon, 28 Sep 2026 09:01:54 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9D34E3F763;
+	Mon, 28 Sep 2026 09:01:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790611317; bh=P57+Mq0JBY8tMh9uwDgpAXGb5R4q7qXPEcatPTTVm2g=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=MqYb9ccQ+S/rDF3her3n4aoiwwRrYE39ExWodPdewQIVolQ9s2H+R7jHQCT7UHPiq
+	 KktClRnlG6mV3RVeLFQkbP2MevcQAaudfEjlrb4JbZHcly6G7Ec0oRHU44/BnlUUCM
+	 UipbAozfyrxqUr5UBS8TTco7ZFElY247BR+MgygM=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>
+Subject: Re: [PATCH 20/22] KVM: arm64: selftests: Only test AF behavior for emulated AT insns
+Date: Mon, 28 Sep 2026 17:01:48 +0100
+Message-ID: <arqPbFRxSVfYTuRS@LeoBrasDK>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260623184201.1518871-21-oupton@kernel.org>
+References: <20260623184201.1518871-1-oupton@kernel.org> <20260623184201.1518871-21-oupton@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 22/29] s390/hwcaps: Report SAE support as hwcap
-To: Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter
- <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik
- <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-References: <20260918133107.1042730-1-seiden@linux.ibm.com>
- <20260918133107.1042730-23-seiden@linux.ibm.com>
-Content-Language: en-US
-From: Ilya Leoshkevich <iii@linux.ibm.com>
-In-Reply-To: <20260918133107.1042730-23-seiden@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=FYWiV5+6 c=1 sm=1 tr=0 ts=6aba8ead cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=VnNF1IyMAAAA:8
- a=-Vzjgo3omqpRI_WBrZcA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTI4MDA2MiBTYWx0ZWRfX4XV4UOxcfS7P
- 0BbtHhPo3KhYsVIOb3OM9DJGdbUgdubsZz0PgqbsxfIQwCL713wGVSEIxXAo1kV+BTSks25F7J1
- NVpWyNmQFAq7cQFI010E63gNGvAYwws=
-X-Proofpoint-ORIG-GUID: Mtrun8DKU0SK8lBZtLKEIDFHUbwLPE0S
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTI4MDA2MiBTYWx0ZWRfX4DHV58DlNGDR
- 9T8Sp1CTOSVq/jLjjCsS4ZVoacGNvlbSs81VEvfmGDzJH7xQPd5kW/ZXg3Nx3PGSX8aJXvts/25
- uPF5HZMFIqBiDWtUBsv9pXd0ySQAPRYoAk1Ts1gpFYITkvhSZ7jyT93LxmzdafpHLywZxlC6b7t
- ZVQijeYBuyC8/bFU8HmvxfvehGbwo69D7uMTsWPDikZYOlUw0SASC23aAA5DybNNk6IZ/Yz3Sk+
- EplkGTF5eA3FTz57P8lCxrJ3bBRJythk0gvQ4/kiN7KP2MwOhVw/lJCcZpm70bEHzo/juFjkfMK
- qQWz26gJabzwTI3Em2OVpMB3etfotcopkdiz/bmB3g0aFyT5t2nBiQM1aF4Ah60SleCIwvkRZjY
- QlwDz2wZfHGJ4Z06HyOdXmby4zPzD/MX4ZFloFI7OPbKGOMl1XcW3Yx3UWLRT2o4qIJt6Ftlvm+
- XaaNGoeWKs0fPoD/law==
-X-Proofpoint-GUID: VIifUq-Wtvu10B-gtNGluxlt-RnrP-Q4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-28_04,2026-09-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 clxscore=1015 impostorscore=0 spamscore=0 phishscore=0
- priorityscore=1501 malwarescore=0 bulkscore=0 lowpriorityscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
- definitions=main-2609280062
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-
-
-On 9/18/26 15:30, Steffen Eiden wrote:
-> From: Hendrik Brueckner <brueckner@linux.ibm.com>
+On Tue, Jun 23, 2026 at 11:41:59AM -0700, Oliver Upton wrote:
+> The original intent of the test was to test KVM's slowpath AT emulation,
+> specifically including a test for KVM's IMP DEF choice that AT
+> instructions set the access flag.
 > 
-> Report SAE support as hwcap (and /proc/cpuinfo)
+> While it is possible to force AT instructions to take the slow path in
+> KVM, this is only effective for an out-of-context regime wherein the
+> stage-2 translations are guaranteed to be invalid. As such, the
+> inclusion of AT S1E2* instructions muddied this a bit, as they operate
+> on the in-context EL2&0 regime.
 > 
-> Signed-off-by: Hendrik Brueckner <brueckner@linux.ibm.com>
-> Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+> Restore the original intent of the test and get rid of the AT S1E2* test
+> cases entirely.
+> 
+> Signed-off-by: Oliver Upton <oupton@kernel.org>
 > ---
->   arch/s390/include/asm/elf.h    | 2 ++
->   arch/s390/include/asm/sclp.h   | 5 ++++-
->   arch/s390/kernel/processor.c   | 3 +++
->   drivers/s390/char/sclp_early.c | 1 +
->   4 files changed, 10 insertions(+), 1 deletion(-)
-Reviewed-by: Ilya Leoshkevich <iii@linux.ibm.com>
+>  tools/testing/selftests/kvm/arm64/at.c | 38 ++++++++++++++++----------
+>  1 file changed, 24 insertions(+), 14 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/arm64/at.c b/tools/testing/selftests/kvm/arm64/at.c
+> index ce5d312ef6ba..d7289f3df04f 100644
+> --- a/tools/testing/selftests/kvm/arm64/at.c
+> +++ b/tools/testing/selftests/kvm/arm64/at.c
+> @@ -13,6 +13,7 @@
+>  
+>  enum {
+>  	CLEAR_ACCESS_FLAG,
+> +	TEST_ACCESS_FLAG,
+>  };
+>  
+>  static u64 *ptep_hva;
+> @@ -48,21 +49,12 @@ do {											\
+>  		GUEST_ASSERT_EQ(FIELD_GET(SYS_PAR_EL1_ATTR, par), MAIR_ATTR_NORMAL);	\
+>  		GUEST_ASSERT_EQ(FIELD_GET(SYS_PAR_EL1_SH, par), PTE_SHARED >> 8);	\
+>  		GUEST_ASSERT_EQ(par & SYS_PAR_EL1_PA, TEST_ADDR);			\
+> +		GUEST_SYNC(TEST_ACCESS_FLAG);						\
+>  	}										\
+>  } while (0)
+>  
+>  static void test_at(bool expect_fault)
+>  {
+> -	test_at_insn(S1E2R, expect_fault);
+> -	test_at_insn(S1E2W, expect_fault);
 
+This seems to be the getting rid of AT S1E2* tests.
+
+> -
+> -	/* Reuse the stage-1 MMU context from EL2 at EL1 */
+> -	copy_el2_to_el1(SCTLR);
+> -	copy_el2_to_el1(MAIR);
+> -	copy_el2_to_el1(TCR);
+> -	copy_el2_to_el1(TTBR0);
+> -	copy_el2_to_el1(TTBR1);
+> -
+>  	/* Disable stage-2 translation and enter a non-host context */
+>  	write_sysreg(0, vtcr_el2);
+>  	write_sysreg(0, vttbr_el2);
+> @@ -71,11 +63,21 @@ static void test_at(bool expect_fault)
+>  
+>  	test_at_insn(S1E1R, expect_fault);
+>  	test_at_insn(S1E1W, expect_fault);
+> +
+> +	sysreg_clear_set(hcr_el2, 0, HCR_EL2_TGE | HCR_EL2_VM);
+> +	isb();
+
+Setting bits that were clean in the start.
+
+>  }
+>  
+>  static void guest_code(void)
+>  {
+> -	sysreg_clear_set(tcr_el1, TCR_HA, 0);
+> +	/* Reuse the stage-1 MMU context from EL2 at EL1 */
+> +	copy_el2_to_el1(SCTLR);
+> +	copy_el2_to_el1(MAIR);
+> +	copy_el2_to_el1(TCR);
+> +	copy_el2_to_el1(TTBR0);
+> +	copy_el2_to_el1(TTBR1);
+
+Set them only once instead of on every test, since they should not change.
+
+> +
+> +	sysreg_clear_set_s(SYS_TCR_EL12, TCR_HA, 0);
+>  	isb();
+>  
+>  	test_at(true);
+> @@ -83,7 +85,11 @@ static void guest_code(void)
+>  	if (!SYS_FIELD_GET(ID_AA64MMFR1_EL1, HAFDBS, read_sysreg(id_aa64mmfr1_el1)))
+>  		GUEST_DONE();
+>  
+> -	sysreg_clear_set(tcr_el1, 0, TCR_HA);
+> +	/*
+> +	 * KVM's software PTW makes the implementation choice that the AT
+> +	 * instruction sets the access flag.
+> +	 */
+> +	sysreg_clear_set_s(SYS_TCR_EL12, 0, TCR_HA);
+
+clear_set -> clear_set_s and added some docs
+
+>  	isb();
+>  	test_at(false);
+>  
+> @@ -96,8 +102,8 @@ static void handle_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
+>  	case CLEAR_ACCESS_FLAG:
+>  		/*
+>  		 * Delete + reinstall the memslot to invalidate stage-2
+> -		 * mappings of the stage-1 page tables, allowing KVM to
+> -		 * potentially use the 'slow' AT emulation path.
+> +		 * mappings of the stage-1 page tables, forcing KVM to
+> +		 * use the 'slow' AT emulation path.
+
+After the removal of AT S1E2*, this should always cause KVM to use the 
+slow path.
+
+>  		 *
+>  		 * This and clearing the access flag from host userspace
+>  		 * ensures that the access flag cannot be set speculatively
+> @@ -106,6 +112,10 @@ static void handle_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
+>  		clear_bit(__ffs(PTE_AF), ptep_hva);
+>  		vm_mem_region_reload(vcpu->vm, vcpu->vm->memslots[MEM_REGION_PT]);
+>  		break;
+> +	case TEST_ACCESS_FLAG:
+> +		TEST_ASSERT(test_bit(__ffs(PTE_AF), ptep_hva),
+> +			    "Expected access flag to be set (desc: %lu)", *ptep_hva);
+> +		break;
+
+For testing the access flag when a fault is not expected, during the AT 
+test.
+
+If I got the reasonings above correctly, then FWIW:
+Reviewed-by: Leonardo Bras <leo.bras@arm.com>
+
+Thanks!
+Leo
