@@ -1,130 +1,146 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D5A4E0202;
-	Mon, 28 Sep 2026 15:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2E14E80BD
+	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 15:58:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790611119; cv=none; b=jQZYp8stJVf62H9TA85fQMC+InmZP3dkHTf22ymcJi4bjxmscLK+ewyM7KvKGvbewkhJq9Aly86fcN4SOyriXftuFZARFQq/eOk4HVEEHg7I8KGVJloZwyW4IFrAYnp6KqUNWAd0B1gtP/GB/95xrI+Z+d9PMhHjhkWeUD6D1pE=
+	t=1790611134; cv=none; b=j36IxKTOZadyfpLilIYgjOGdDh1BDy7f9ya1VIDQnvJZ9FNZOI4v2c3lOUv9l+Yz+4LeHLnNN5qvBFFQQIgcE0CfIOSurZtJfSh3N6/kgvc20GFN1iofapgJwt+eAN6+kN5TZg7md5Wp3MNzYqPm5rKFxZ1YsxGVXHLMqMaMXdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790611119; c=relaxed/simple;
-	bh=IIZlNVEjc6NoJs8qFG5usy5vutf9Tt3Y7Wx/O5zOyk8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NjvK6Y6rUlejHLmVJOVLZzcQAU0XgcLRNX1G7w750iZIFgnyzVRU1HThacQgJOh4iQMiRm2LRabNsk/Nea7vBp1tsJh42yCOgPfKAjgxviVRu9lz8cZuBk1bdHMJg5HpcZp2NvvTj5POVcncDHhqjWS9WrPKNm/RSj/Kj00YuSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/jlsU+X; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790611134; c=relaxed/simple;
+	bh=04Ifz2k31JE157sSuBCrUq92PK7BGbZhITDHVUXzOwA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Rc/GHm7QgXLRWsS2GArYydFgtahwKXWLDis3YH1vMpfDh8F1DS7Cxb4R1FJdVLBOBr0iGcPg0WcVzSyrdatLPO4vbWSdCihCwosnSUR7Kc11dBiaEUqXravher+9UXAl+58TpvIUI+lDBcWQMOKyPLik9JF4ZDtLLQlrEq4yEYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=grNeGLQF; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/jlsU+X"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D44751F000FF;
-	Mon, 28 Sep 2026 15:58:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790611117;
-	bh=L09WXLeVI8ZZO4N5TRjN+sDhuH/Uq2FZQIL3+yQNvvw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=D/jlsU+X0Rg00FW5O7hps2Z3kBE+sXzCZUEc/YJcmYwiMNGAbGwMU+zUTFabNB0jy
-	 X/wqtBnKWbsgMIHGGHv9FofyUW6TbxNo4U2QKsDg6Eah9WJBPKuxQtWwj5knwyUSdI
-	 PJhQtV5NJ1KHZSl6lVTN1R/lkheKKMymGaCPYxB6/qXFULvL6q7VgM/ZkK4cnPM7m4
-	 0rQMqtKjmHRFjKqlTukfWE1HB24KHD+4YCK9icioekkEoPD6N+mXPK5rGaaLFi7NEF
-	 555fHEM44T1/DXdZFrUcQlk/Z/Cu89mogFvQuFfePU7Wszt8YJV+vo1w4VhTHeSATQ
-	 hITvJo2dCc+Eg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xBDkR-0000000ER3N-1OLK;
-	Mon, 28 Sep 2026 15:58:35 +0000
-Date: Mon, 28 Sep 2026 16:58:34 +0100
-Message-ID: <86cxtx4bbp.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Karl Mehltretter <kmehltretter@gmail.com>,
-	Fuad Tabba <tabba@google.com>,
-	kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 00/10] KVM: arm64: Nested stage-2 walk error handling and other small fixes
-In-Reply-To: <20260928152507.2116110-1-fuad.tabba@linux.dev>
-References: <20260928152507.2116110-1-fuad.tabba@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="grNeGLQF"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68SF5YEY216947;
+	Mon, 28 Sep 2026 15:58:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=rzyibD
+	QTpQayQMJ6uE+DAwnjNSVqg9HDPjxKT/D4jMY=; b=grNeGLQFIcNppKXXDKI0rl
+	ThLMbnF6URl5Sg70BHzDbIBGMok1PcGBVunzH4LH80tr5xSz0JZgBdUTDZwRYHxS
+	sPLeXAsV+2g7y/1QeXKOwJi+CBPnrVSh6M58EEb19sVkUCLXuNH73/d43igI4Lli
+	JIm5jWsL+kNDUw2AMi6JTy76JKeM7uMDdqAtGyFMj8mgI//ioIOlpUw0HgPAMb2w
+	FmziXcuPqxjwmI66ZF/hq9/GbOY0SjLKxmEjJVdLkzSeHV8i7SQL2HRx+OEz9P52
+	rkRsPmPP+LcPyiKu0/0CZNVYsVQrktc9BQraPckbPlQujcnoT6tX0u4kT7FBgobw
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gx4fe24r7-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 28 Sep 2026 15:58:36 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68SElYxt290963;
+	Mon, 28 Sep 2026 15:58:35 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4gxu2y5qq2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 28 Sep 2026 15:58:35 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68SFwWBo44040678
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 28 Sep 2026 15:58:32 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 02D2620043;
+	Mon, 28 Sep 2026 15:58:32 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0680920040;
+	Mon, 28 Sep 2026 15:58:31 +0000 (GMT)
+Received: from [0.0.0.0] (unknown [9.111.81.16])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 28 Sep 2026 15:58:30 +0000 (GMT)
+Message-ID: <c97ae089-fadf-4a29-b7df-4947ea8d6592@linux.ibm.com>
+Date: Mon, 28 Sep 2026 17:58:30 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seiden@linux.ibm.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, jingzhangos@google.com, kmehltretter@gmail.com, tabba@google.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 22/29] s390/hwcaps: Report SAE support as hwcap
+To: Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter
+ <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik
+ <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+References: <20260918133107.1042730-1-seiden@linux.ibm.com>
+ <20260918133107.1042730-23-seiden@linux.ibm.com>
+Content-Language: en-US
+From: Ilya Leoshkevich <iii@linux.ibm.com>
+In-Reply-To: <20260918133107.1042730-23-seiden@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=FYWiV5+6 c=1 sm=1 tr=0 ts=6aba8ead cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=VnNF1IyMAAAA:8
+ a=-Vzjgo3omqpRI_WBrZcA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTI4MDA2MiBTYWx0ZWRfX4XV4UOxcfS7P
+ 0BbtHhPo3KhYsVIOb3OM9DJGdbUgdubsZz0PgqbsxfIQwCL713wGVSEIxXAo1kV+BTSks25F7J1
+ NVpWyNmQFAq7cQFI010E63gNGvAYwws=
+X-Proofpoint-ORIG-GUID: Mtrun8DKU0SK8lBZtLKEIDFHUbwLPE0S
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTI4MDA2MiBTYWx0ZWRfX4DHV58DlNGDR
+ 9T8Sp1CTOSVq/jLjjCsS4ZVoacGNvlbSs81VEvfmGDzJH7xQPd5kW/ZXg3Nx3PGSX8aJXvts/25
+ uPF5HZMFIqBiDWtUBsv9pXd0ySQAPRYoAk1Ts1gpFYITkvhSZ7jyT93LxmzdafpHLywZxlC6b7t
+ ZVQijeYBuyC8/bFU8HmvxfvehGbwo69D7uMTsWPDikZYOlUw0SASC23aAA5DybNNk6IZ/Yz3Sk+
+ EplkGTF5eA3FTz57P8lCxrJ3bBRJythk0gvQ4/kiN7KP2MwOhVw/lJCcZpm70bEHzo/juFjkfMK
+ qQWz26gJabzwTI3Em2OVpMB3etfotcopkdiz/bmB3g0aFyT5t2nBiQM1aF4Ah60SleCIwvkRZjY
+ QlwDz2wZfHGJ4Z06HyOdXmby4zPzD/MX4ZFloFI7OPbKGOMl1XcW3Yx3UWLRT2o4qIJt6Ftlvm+
+ XaaNGoeWKs0fPoD/law==
+X-Proofpoint-GUID: VIifUq-Wtvu10B-gtNGluxlt-RnrP-Q4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-28_04,2026-09-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 clxscore=1015 impostorscore=0 spamscore=0 phishscore=0
+ priorityscore=1501 malwarescore=0 bulkscore=0 lowpriorityscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
+ definitions=main-2609280062
 
-On Mon, 28 Sep 2026 16:24:57 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
+
+
+On 9/18/26 15:30, Steffen Eiden wrote:
+> From: Hendrik Brueckner <brueckner@linux.ibm.com>
 > 
-> Hi folks,
+> Report SAE support as hwcap (and /proc/cpuinfo)
 > 
-> Small KVM/arm64 fixes that came out of reviewing Karl's SMCCC filter
-> series [1], and it just kept growing.
-> 
-> The first two are WARNs that userspace or a guest can trigger: the
-> SMCCC filter one on an allocation failure userspace can force with a
-> memory cgroup limit, which Sashiko raised [2], the nested one when an
-> L1 guest programs an invalid VTCR_EL2. Patches 3 and 4 are the same
-> walk's return values. With an invalid VTCR_EL2 or a stage-2 descriptor
-> KVM can't read, AT S12E{0,1}{R,W} was retried forever instead of
-> retiring with the fault in PAR_EL1. Reporting the unreadable descriptor
-> as a Data Abort instead, for the stage-1 walks too, is a separate
-> change I'll send later.
+> Signed-off-by: Hendrik Brueckner <brueckner@linux.ibm.com>
+> Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/elf.h    | 2 ++
+>   arch/s390/include/asm/sclp.h   | 5 ++++-
+>   arch/s390/kernel/processor.c   | 3 +++
+>   drivers/s390/char/sclp_early.c | 1 +
+>   4 files changed, 10 insertions(+), 1 deletion(-)
+Reviewed-by: Ilya Leoshkevich <iii@linux.ibm.com>
 
-Why later?
-
-> Patch 5 extends the AT selftest to cover the
-> SL0 case.
-> 
-> The three documentation patches fix identifiers in api.rst that don't
-> exist anywhere in the tree, and the last two fix selftest leaks.
-
-<rant>
-What is this series about? Suppressing spurious warnings? Fixing the
-PTWs?  Fixing the documentation for something totally unrelated?
-Random selftest maintenance?
-
-To give you an idea, here's what my -next branch looks like:
-
-maz@valley-girl:~/hot-poop/arm-platforms$ git log --oneline --merges v7.3-rc3..kvmarm-master/next
-5c49bb52faf38 Merge branch kvm-arm64/misc-7.4 into kvmarm-master/next
-c345ec7f39efd Merge branch kvm-arm64/pre-faulting into kvmarm-master/next
-2716832906bd9 Merge branch kvm-arm64/s2-rmap into kvmarm-master/next
-edeb68e3d4e0c Merge tag 'kvmarm-fixes-7.3-1' into kvm-arm64/s2-rmap
-ede721366f1bf Merge branch kvm-arm64/gicv5-7.4 into kvmarm-master/next
-062cbcbae3e00 Merge branch kvm-arm64/gicv5-7.4 into kvmarm-master/next
-928737a70c491 Merge branch kvm-arm64/hyp-type-checking-7.4 into kvmarm-master/next
-1f99916b2a3d7 Merge branch kvm-arm64/selftests-7.4 into kvmarm-master/next
-a8f9576fa8466 Merge branch kvm-arm64/doc-7.4 into kvmarm-master/next
-7413af8a61612 Merge branch kvm-arm64/ffa-7.4 into kvmarm-master/next
-
-Where does this series fit? What is the theme? Do you really expect me
-to cherry-pick one patch after the other and build 3 or 4 consistent
-series out of this? Or should simply apply it as kvm-arm64/random-stuff-from-fuad-7.4?
-
-My definition of a series is "an ordered set of changes that have a
-common theme or form a progression towards a precise goal". This is
-not a series, but a patch dump.
-</rant>
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
