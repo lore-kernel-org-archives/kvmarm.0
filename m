@@ -1,102 +1,79 @@
-Received: from mta0.migadu.com (out-143.mta0.migadu.com [91.218.175.143])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9165D4E77EE
-	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 16:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.143
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2309B4F3906;
+	Mon, 28 Sep 2026 17:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790614662; cv=none; b=UObESN2U9d+Q6TMOlAJv44KvyLBdK7VcZ7ddIU9VVs7zULRXa+nSniyCd+9ztuSyltrpn0PFwLclIMXxZmbJo1JuVX7iKvyV4OqrCMTXDZT+8FYpaIxhmRVUFc79pVIR4hD18JtBlbVkXU3xiYr67gIGqy6OuaopoyDj89wtRpI=
+	t=1790615112; cv=none; b=pPSzFoKVQs7dHaIhb7O3IagmBbETuC5+th+ppjkkd3GufOkdeiU9BWhzXfKB0JsikVLmn1ddtmcLb2d5H5lAsVFSmdBLal5j0jbZMK5O2AJ06WkC5MCBrQdF+3ktBYZj3Jx+Pw8B8I33zaEKu00ZgGHplBcEU6qlVkfhWEWthXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790614662; c=relaxed/simple;
-	bh=n/OY102PNQOkr+cQRPgs6kcL1DdXHbQTCuyeQ/Mtw1c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tWZeI3Pwhd3SZmXwTCiKsvXJZfSasaQhH20WIlclmHA20bZzfoOKH7O8eAhJdIExagVOP33SRDGzWpwzLTQhn+umlIm0kGvQd5O5YTiWAtymCq5QKdZNOFontUNyUdBARRtiwgTSdsRY5prJLaeac5REkrGlZTwpmsVeYa98P2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JmkelVyz; arc=none smtp.client-ip=91.218.175.143
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1790615112; c=relaxed/simple;
+	bh=yoXTXqPzTE35yeLLUFkb8ceBe47d/S/Yap+eGL4p4bI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DvZ5n4Tcil9kS9iOUBruFDIuLFLHr4PuyaHYWJdMShiDoaJqsAOgJ1l4bkLGQqDqfYu11Sjz+7DpmJBBYVxsBSYCAU66cahXj2Z08zBwP+9OOqu5Qxe4svjBp4abHuBoPZ1kg66wy2Zh56R12JgHlXt1t62W5A9rK1IrcfLBlKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QdQwx718; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JmkelVyz"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=n/OY102PNQOkr+cQRPgs6kcL1DdXHbQTCuyeQ/Mtw1c=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790614656; v=1; x=1791219456;
- b=JmkelVyzxQlp4zKW/UijXHNyA3c2XOgcuTyhSE632xxEa9rYX1kK8HWXGLiigmAgRQn9b56W
- mgGusNL06FrOPKKR8ayl8sVP3G6sZ/KDXRs7dRbSXXlSAnEgQkvvrPUsX+KNP/fPaM+btj3mL+S
- +v2GBDoMR7exyqWJ1FkJLP8c=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id fd69fa683b8212c4;
-	Mon, 28 Sep 2026 16:57:36 +0000
-X-Mizu-Trace-ID: fd69fa683b8212c4
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5b8ea0ca5baso262e87.1
-        for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 09:57:31 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBzXg7OmfZIgcASKIDjj3Sn7Xa0y5ZjP7nB8FLfC1g9UutHcLnD7x89izgsQxLPlICbq9xSVuTQ=@lists.linux.dev
-X-Gm-Message-State: AFq9FYLjj0YOjoEEI3/hMzPGVf7vzYuZHWt1NubnlMSVrvziw0FGlMMB
-	zoJT8ULNl3scx76o0F6CQOpaMB9aJihu12UxPFDvLEEyfp9VYJn7bwM2Ce7mQfBQCQq5w3hTwsz
-	R/Y1EwqKzyMhYuSVpeLbsmabkXpSoK27e1cji4e1L
-X-Received: by 2002:a05:6512:10cd:b0:5b8:c95d:529c with SMTP id
- 2adb3069b0e04-5b8ef0ddd19mr213006e87.0.1790614651041; Mon, 28 Sep 2026
- 09:57:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QdQwx718"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C955C1F00893;
+	Mon, 28 Sep 2026 17:05:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790615111;
+	bh=yoXTXqPzTE35yeLLUFkb8ceBe47d/S/Yap+eGL4p4bI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=QdQwx718ik84L+Mq45KEayXLdVMUAcnmUhtWIQfGQXGH9vNemnBJYzTv7sICCtRE+
+	 39+4B+n3qedPT1V8sl+2ygYB09kLPI75LxEkCv+ptk3g6uZl3mI84+2geK26zblJVE
+	 dU3VPa+mYT9RQGE2FWVdw4TEfsCGJJTAjLV9ro+gbqN5ctgqWbX0iNcdk7KDcxbZTS
+	 9OSzG3RytUq0zqCEU4v7C/uqLpG35ZMCaMpPw3ZhQXrShg9Xi0z7w/ReikxlR0bMJF
+	 +xQJVbH2q5IZtgeGlH69O9wfIiwUTppVz0/Msyj/Uyt34iWlg7pBcpkIunSyMvzIR/
+	 2wBtg1LjB0MIA==
+Date: Mon, 28 Sep 2026 10:05:09 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Quentin Perret <qperret@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>, Fuad Tabba <tabba@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/4] KVM: arm64: Don't WARN on an unsupported TLBI OS
+ from vEL1
+Message-ID: <arqeRSIoEwurSrya@kernel.org>
+References: <20260928064643.3265087-1-fuad.tabba@linux.dev>
+ <20260928064643.3265087-2-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260901-kvm-arm64-idreg-final-v3-0-a0ffa06fa872@kernel.org>
- <20260901-kvm-arm64-idreg-final-v3-3-a0ffa06fa872@kernel.org> <arp7mig_PrD9Jbc7@gremlin>
-In-Reply-To: <arp7mig_PrD9Jbc7@gremlin>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 28 Sep 2026 17:56:54 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxi=BrJYMb5z9QyGd7k_Ty7x5AbMNJinB5i8GT=BD2L_w@mail.gmail.com>
-X-Gm-Features: AclHuK_NPvCKoTUsp1F5W2JZ-hpSJQcM6rQqImNAWwVW-ibb3CFddo_4yf4cCdI
-Message-ID: <CA+EHjTxi=BrJYMb5z9QyGd7k_Ty7x5AbMNJinB5i8GT=BD2L_w@mail.gmail.com>
-Subject: Re: [PATCH v3 3/3] KVM: arm64: selftests: Check ID regs are immutable
- after a failed run
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Peter Maydell <peter.maydell@linaro.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260928064643.3265087-2-fuad.tabba@linux.dev>
 
-Hi Lorenzo,
+Hi Fuad,
 
-On Mon, 28 Sep 2026 15:46:51 +0100, "Lorenzo Stoakes (ARM)"
-<ljs@kernel.org> wrote:
-> On Tue, Sep 01, 2026 at 07:18:50PM +0100, Mark Brown wrote:
-[...]
-> > Assisted-by: Antigravity:gemini-3.1-pro
->
-> NIT: we changed the rules for the Assisted-by tag, it only needs to be
-> 'Assisted-by: LLM' now. Not a huge big deal but FYI :>)
->
-> https://docs.kernel.org/process/coding-assistants.html
+On Mon, Sep 28, 2026 at 07:46:40AM +0100, Fuad Tabba wrote:
+> KVM hides TLBI OS from a guest whose ID registers don't advertise it by
+> trapping the instructions: through the fine-grained traps on a CPU with
+> FGT, and through HCR_EL2.TTLBOS on one with FEAT_EVT2. With FGT,
+> triage_sysreg_trap() makes a trapped TLBI OS UNDEFINED. Without it, the
+> instruction reaches handle_tlbi_el1(), which assumes an EL1 TLBI only
+> traps from a guest at vEL2 and WARNs before checking whether the guest
+> supports it. The guest still gets its UNDEF after the WARN. A VMM can
+> trigger the WARN by hiding TLBI OS and having the guest execute one.
 
-That tag dates from way back when the format was still
-AGENT_NAME:MODEL_VERSION :)
+So the FGUs don't actually require any hardware support, they're just a
+representation of our UNDEF emulation that can be applied even on
+non-FGT. That's actually the way we had them wired before the whole
+config.c rewrite.
 
-[...]
-> > diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-[...]
-> > +static void test_idreg_frozen_after_failed_run(void)
-[...]
-> > +        /* Creating an in-kernel irqchip would change the ID registers too. */
-> > +        if (kvm_supports_vgic_v3()) {
-> > +                r = __kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3);
-> > +                TEST_ASSERT(r < 0 && errno == EBUSY,
-> > +                            "vGIC creation after failed first run: r=%d errno=%d",
-> > +                            r, errno);
->
-> I guess in general it's making sure - where there should now be finalisation on
-> reg setting that this is actually enforced?
-
-Yes. The test exercises each of the userspace-facing checks that 2/3
-moves to KVM_ARCH_FLAG_ID_REGS_FINAL: set_id_reg(), set_imp_id_reg()
-and kvm_vgic_create().
+Can you look into reinstating the FGUs?
 
 Thanks,
-/fuad
+Oliver
