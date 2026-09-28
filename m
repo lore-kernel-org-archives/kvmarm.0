@@ -1,236 +1,101 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63BD9371D1F;
-	Mon, 28 Sep 2026 18:28:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mta0.migadu.com (out-199.mta0.migadu.com [91.218.175.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846DD3FE37B
+	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 19:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790620109; cv=none; b=u5SAfST5bsJKVA2oFpI0LAIXqKrMal7V1PJ52IWvJIFIxXPf9zkfAu+3hSJRPKrgv+bUZaCLzaiEYh0XrYoPCiNYDzfVyuTLoSDnOcbnyXVXUmHw1uYWaZnHlPAXskaG84EmsA4qA5YTjpmLpUOmgrtST0mVU4PVoTL1YxAKX8I=
+	t=1790622091; cv=none; b=MRPS70ErB8I9KJbNXngoGGJ/0zZ0w0ts31Zw+WAiMyXFo15flZ/DpBC1d3Ef4U1D+uIBQUVpFo1+wPuU1p/3lMh7TdKuZTboE+b4lNB9iwwpKMwf87MZNK9wpsLKHUGWP9nCQXa6tlAWTiceb9Mi/PAtIM53hMVRtuVRCANFeaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790620109; c=relaxed/simple;
-	bh=f3DvkzW2iQw+m17VNhkq0p0aYIFiioIzjPtp6J3TSN0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D0S9MgncwxV9/65T5YF37TRP2gzXMSYfWGsTfmN2v20S+cwG0gdZNv3OMGuLA0sRQ3MB5uRrQvUeWrBHyl2YYBO4TXOUH6y7CoF5M5pATtNsQLFhd4S6vB8JacE1IL81TE8vuHvvq/ie6o5OdFCa4rCPcUnqNoVEnsUoOXUtmn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=mcFYTgd3; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1790622091; c=relaxed/simple;
+	bh=LoJoWSdVtQQnsqJJIZm/2aBV/AIaM+6m2UreLj3Rv8o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=si0mMkGUsUhIfXtKRNfOyIQqX3rAERvVf049RNcjDOZ/SMjlI08TVSa4l853+DgMf2uiMqtQEdCvQqvMpgVbjmXlOcTgueoyHSItnIPZnWmrwKUKd8zdxNiw/Tz/PFqIjP/f37rLZTfCG4VGZcKl9uHEktPGQpsw13OWoQm0iG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JSOmEqcb; arc=none smtp.client-ip=91.218.175.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="mcFYTgd3"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D31A21655;
-	Mon, 28 Sep 2026 11:28:21 -0700 (PDT)
-Received: from [10.57.12.116] (unknown [10.57.12.116])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C842E3F86F;
-	Mon, 28 Sep 2026 11:28:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790620105; bh=f3DvkzW2iQw+m17VNhkq0p0aYIFiioIzjPtp6J3TSN0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=mcFYTgd3hxYj+1w/iSFFS3RH+8JRKNJWnhBdjTsuGBthMAC1uKMNQnAKX49dFPQK/
-	 aCHMuuEO/8X+Qh6W0KhSteXcdZ1MZBTTEq1Z0cbjJ5cixApf3fkgJfOe2QV6RJnv+7
-	 l0MvfPq0sy15NUOC9H508RTlXCsTaCSD63LFvBTo=
-Message-ID: <0f68dcff-1dfe-4515-9912-515ca6457674@arm.com>
-Date: Mon, 28 Sep 2026 19:28:20 +0100
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JSOmEqcb"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=LoJoWSdVtQQnsqJJIZm/2aBV/AIaM+6m2UreLj3Rv8o=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1790622083; v=1; x=1791226883;
+ b=JSOmEqcbPFoWnDBos6a1r5yhOdiFTWvcVzNDyqMq6lbe1qf3Jd5uYjfRy6mQCPef5HcKgGt/
+ +B+T7acmpLhBTyCa9z1XrrBaH/WhpA7tt9beYJjl0zOBhmqIlVFDTCGwsA7gX2PAKxa/78t5sGR
+ /iA2QJ3DzcQL5fvvyWr1MMo4=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 4aa66393504a70c5;
+	Mon, 28 Sep 2026 19:01:23 +0000
+X-Mizu-Trace-ID: 4aa66393504a70c5
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5b8e81e2a0bso1619e87.0
+        for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 12:01:19 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBy47/CwJ0Yofrg83RUYc7fbrJlniPGRyG2nK+xPBJtw+4u3RQ9XQFXCTJ5LqVXyKgxXfeOwn9I=@lists.linux.dev
+X-Gm-Message-State: AFq9FYIq1RICRY5vzk5LPnjy1nid1yDAxu02oga6Cr7qCgMWUkhlhY3x
+	2AjN0Ajs+GVVQxp63fKQ3bhmv3Fqm/B8MHhXphN1BFxaUlsB5xBJoNQdbEqt7lN7JL/vRXE9+MU
+	pz3P2jNS56ROBd0h6WOT2FORJT57wmVcTbCZVhlZt
+X-Received: by 2002:a05:6512:23aa:b0:5b8:c230:1241 with SMTP id
+ 2adb3069b0e04-5ba2e786d94mr6222e87.10.1790622078768; Mon, 28 Sep 2026
+ 12:01:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 5/7] firmware: arm_rmm: Activate the RMM
-Content-Language: en-GB
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
- will@kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
- sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
-References: <20260924135201.850038-1-suzuki.poulose@arm.com>
- <20260924135201.850038-6-suzuki.poulose@arm.com> <arZmXFw5Jw2IbAmA@arm.com>
- <a11aba04-eaaa-43fd-988b-a2581b1b2fdb@arm.com> <araketG70TIKeNuf@arm.com>
- <12e83d88-de4c-4230-aac2-1796123320ad@arm.com>
- <70d47475-e26e-40e1-b409-b0c16aecb8c0@arm.com>
- <195cdfe4-a55a-453f-9c34-620738eca244@arm.com> <arqrZ_Auk9BYOopa@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <arqrZ_Auk9BYOopa@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20260914113338.159227-1-fuad.tabba@linux.dev> <20260914113338.159227-16-fuad.tabba@linux.dev>
+ <86a4ph5fb9.wl-maz@kernel.org> <CA+EHjTzCQkeXQQcCDwABLR2w+NTmKTG3V6RSmhzYNayaoYXw3g@mail.gmail.com>
+ <865x045mke.wl-maz@kernel.org> <aq0628Ci4pfEj0KG@willie-the-truck> <871paf3y1n.wl-maz@kernel.org>
+In-Reply-To: <871paf3y1n.wl-maz@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 28 Sep 2026 20:00:42 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTw5yJ7PjCkHmg-kuZjdXL2cDa+5StZfiFOVT38FiJCS3g@mail.gmail.com>
+X-Gm-Features: AclHuK_A3LGm0XhIK4uWtuZLyyMDjjb433L7Zm1vN8E8cf96YxS-xxb0mI7O9p4
+Message-ID: <CA+EHjTw5yJ7PjCkHmg-kuZjdXL2cDa+5StZfiFOVT38FiJCS3g@mail.gmail.com>
+Subject: Re: [PATCH v3 15/18] KVM: arm64: Reject host access to protected VM
+ private state
+To: Marc Zyngier <maz@kernel.org>
+Cc: Will Deacon <will@kernel.org>, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	catalin.marinas@arm.com, joey.gouly@arm.com, seiden@linux.ibm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, 
+	steven.price@arm.com, vdonnefort@google.com, qperret@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Catalin
+Hi Marc, Will,
 
-On 28/09/2026 19:01, Catalin Marinas wrote:
-> On Mon, Sep 28, 2026 at 02:55:11PM +0100, Suzuki K Poulose wrote:
->> firmware: rmm: Deactivate RMM at reboot
->>
->> Deactivate the RMM at system shutdown. This would allow a normal kexec to
->> cleanup the state and boot into a new kernel gracefully.
->>
->> Kdump kernels need not worry about an active RMM, as long as it can
->> handle the GPF on access to the Delegated granules.
->>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> ---
->>   arch/arm64/kernel/machine_kexec.c |  2 +
->>   drivers/firmware/arm_rmm/rmi.c    | 63 ++++++++++++++++++++++++++++++-
->>   include/linux/arm-rmi-cmds.h      | 10 +++++
->>   3 files changed, 73 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/arm64/kernel/machine_kexec.c
->> b/arch/arm64/kernel/machine_kexec.c
->> index 8f9bc2327dc85..8f16f92a5d389 100644
->> --- a/arch/arm64/kernel/machine_kexec.c
->> +++ b/arch/arm64/kernel/machine_kexec.c
->> @@ -6,6 +6,7 @@
->>    * Copyright (C) Huawei Futurewei Technologies.
->>    */
->>
->> +#include <linux/arm-rmi-cmds.h>
->>   #include <linux/interrupt.h>
->>   #include <linux/irq.h>
->>   #include <linux/kernel.h>
->> @@ -171,6 +172,7 @@ void machine_kexec(struct kimage *kimage)
->>   	BUG_ON(!in_kexec_crash && (stuck_cpus || (num_online_cpus() > 1)));
->>   	WARN(in_kexec_crash && (stuck_cpus || smp_crash_stop_failed()),
->>   		"Some CPUs may be stale, kdump will be unreliable.\n");
->> +	WARN(!in_kexec_crash && is_rmm_active(), "RMM is active, kexec will be
->> unreliable.\n");
->>
->>   	pr_info("Bye!\n");
->>
->> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
->> index 51343e9d5c2a9..5b695f3155b1c 100644
->> --- a/drivers/firmware/arm_rmm/rmi.c
->> +++ b/drivers/firmware/arm_rmm/rmi.c
->> @@ -7,6 +7,7 @@
->>   #include <linux/memblock.h>
->>   #include <linux/memory.h>
->>   #include <linux/arm-rmi-cmds.h>
->> +#include <linux/reboot.h>
->>   #include <linux/slab.h>
->>
->>   #include <asm/memory.h>
->> @@ -15,6 +16,13 @@
->>   /* RMM v2.0 defines RmiFeatureRegister0 to RmiFeatureRegister4. */
->>   static unsigned long rmi_feat_reg_cache[5] __ro_after_init;
->>   static bool arm64_rmi_is_available;
->> +static bool arm64_rmm_active;
->> +
->> +bool is_rmm_active(void)
->> +{
->> +	return arm64_rmm_active;
->> +}
->> +EXPORT_SYMBOL_GPL(is_rmm_active);
->>
->>   /**
->>    * rmi_granule_range_undelegate() - Undelegate a range of granules
->> @@ -1017,6 +1025,53 @@ bool is_rmi_available(void)
->>   }
->>   EXPORT_SYMBOL_GPL(is_rmi_available);
->>
->> +static int rmi_rmm_deactivate(struct rmi_sro_state *sro)
->> +{
->> +	int ret;
->> +
->> +	if (!READ_ONCE(arm64_rmm_active))
->> +		return 0;
->> +
->> +	ret = WARN_ON(rmi_sro_memxfer_cmd(sro, GFP_KERNEL, SMC_RMI_RMM_DEACTIVATE));
->> +	if (ret)
->> +		return ret;
->> +
->> +	WRITE_ONCE(arm64_rmm_active, false);
->> +	WRITE_ONCE(arm64_rmi_is_available, false);
->> +
->> +	return ret;
->> +}
->> +
->> +static int rmi_reboot_notifier(struct notifier_block *nb,
->> +			       unsigned long action, void *data)
->> +{
->> +	int ret;
->> +
->> +	switch (action) {
->> +	case SYS_RESTART:
->> +	case SYS_HALT:
->> +	case SYS_POWER_OFF:
->> +		break;
->> +	default:
->> +		return NOTIFY_DONE;
->> +	}
->> +
->> +	struct rmi_sro_state *sro __free(kfree) = kmalloc_obj(*sro);
->> +
->> +	if (!sro)
->> +		return -ENOMEM;
-> 
-> Nit: it needs a NOTIFY_* value.
+On Sun, 27 Sept 2026 at 09:17, Marc Zyngier <maz@kernel.org> wrote:
+[...]
+> > > > once the vCPU has run, the copy is the VMM's
+> > > > boot state plus what the exit handlers copy out, and the VMM can't
+> > > > distinguish them. x0 on MMIO is one of those fields, but the VMM reads
+> > > > it from kvm_run->mmio. For LD64B, EL2 would copy the operands out the
+> > > > same way and the error could be relaxed to those registers. Loosening
+> > > > later breaks nobody. The comment and the message do overstate it by
+> > > > calling the copy "not the guest's state", and I'll reword both in v4.
+> > > > More on the kvmtool thread [1].
+> > >
+> > > A protected-aware VMM already knows it cannot obtain the registers.
+> >
+> > I think you can use that argument both ways: if the VMM knows it cannot
+> > obtain the registers, then it's fine to return an error if the VMM does
+> > something wrong.
+[...]
+> > If it's helpful, we can ask the crosvm developers here if they have
+> > opinions for/against the two behaviours?
+>
+> I guess that'd be useful to know what they'd prefer, and also to look
+> into what QEMU does in this case -- I'm not exactly a good judge when
+> it comes to UAPI definition... ;-)
 
-Thanks, Yep, I have fixed it locally based on codex review ;-)
-> 
->> +
->> +	ret = rmi_rmm_deactivate(sro);
->> +	if (ret)
->> +		pr_emerg("RMM Deactivation failed: %d\n", ret);
->> +
->> +	return NOTIFY_DONE;
->> +}
->> +
->> +static struct notifier_block rmi_reboot_nb = {
->> +	.notifier_call = rmi_reboot_notifier,
->> +};
-> 
-> Thinking some more about this, it's a good aim but I think it only works
-> if we do a systemctl kexec that tears down the processes (including the
-> VMMs). For a direct kexec -e, we happily reboot with pages still
-> delegated. Now, such tear-down in the kernel is painful, I think a lot
-> more work to figure out the delegated pages.
+I asked Frederick Mayle (CC'ed, AVF/pKVM support in crosvm) about what
+they think in crosvm. Their preference is an error rather than a
+silent failure: an explicit failure is easier to debug, and the
+earlier the error surfaces, the easier it is to correlate with the
+misbehaviour. Frederick also raised the MMIO case as a concrete risk
+of the silent option: a VMM could reasonably think it can complete an
+MMIO access with SET_ONE_REG and never find out that it was a no-op.
 
-nit: kexec -e uses normal reboot path, it is only the kexec -f which
-skips shutdown path. But yes, forced kexec won't work and that would
-probably never work reliably with RMM in place.
-
-> 
-> Also we don't cancel the kexec here even if we return an error, just
-> warn and continue into the new kernel.
-
-Correct, and that could fail with delegated granules in place.
-
-> 
-> So maybe blocking the kexec (e.g. machine_kexec_prepare()) in the first
-> place would be a better option for the time being. But I'd like, if
-
-Ack
-
-> possible, to defer the RMM activation until the first user (still do the
-> RMI probing as an initcall). If we run on RME-capable hardware and
-> firmware but don't care about realms or TSM, we still get the normal OS
-> functionality.
-
-Would you prefer this in the first drop of the RMM ? Or is this
-something we could add as a separate series ?
-
-> 
-> If this deferring works, I'd also make memory hotplug dependent on this
-> (RMM activated => no hotplug; hotplug before activation => don't
-> activate the RMM). Maybe later, if we have a request for hotplug in
-> ZONE_MOVABLE and we can guarantee guest_memfd doesn't allocate from
-> there, we can relax this requirement.
-
-Right now guest_memfd doesn't allocate from the ZONE_MOVABLE. But that 
-might change in the future and we would need RMM to support it.
-Not supported with RMM v2.0 spec.
-
-> 
-> That said, we may have a problem with hibernation as well if it tries to
-> read the delegated pages. I don't know how it interacts with guest_memfd
-> and the non-gmem pages we delegate. Maybe cpus_are_stuck_in_kernel() is
-> the right place, it prevents hibernation as well.
-
-Ack.
-
-
-Cheers
-Suzuki
-
+Cheers,
+/fuad
