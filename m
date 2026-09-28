@@ -1,89 +1,96 @@
-Received: from mta0.migadu.com (out-191.mta0.migadu.com [91.218.175.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5273B8D7B
-	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 07:45:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.191
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C15B46D2DD;
+	Mon, 28 Sep 2026 08:05:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790581520; cv=none; b=eS8D7l2oYTuC+z+r92NBtH/Ycg/IaMH9eB1X+ZOWvyE6I0BMNLG438kamP/HM9uAytsibJ2SPhqhZz67StFRjaIG5stxkUg5TE/14/ENUHnDPMesPWK/a+fp0jbU145MOd0//JVQaU3H7NLH231AvI7JaxngeitxaqBBAycUuM0=
+	t=1790582733; cv=none; b=j27vsfPxAmpZ3kjPrviMz6P8Y32O8QS/HnvVxtyeQuXU/bB5ihAiDUSllCeSibUjHNqGPvNLtqZA7gsQmVk5o1zjDfyXj/TmkgowXmrWSzMMU5RPsDECphy+LFHZ0k3xyBdRx9qUzUaYXrzLwNCAl/AdjQiXS3eekdzBEmqLfRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790581520; c=relaxed/simple;
-	bh=szjlKSRr4QKhQ/BXliXytwAbzwuxRJ9hxfloPYxH0y4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sd1b4WuNhTO5q65EUAr7Qv3EAAXCNLXZOoN6SOf5o6lnWcn9QIfGTLIue5O+xXZ/7tQp283Ntn/IBXJiwWYje86d6pyfSRljRRI0blF7z4sEy0E3DEGpB7tEmGkgXYilpLhwSDrw3AOhvJprVY/8iaPS5MB5duJua4zeTWvFBXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ys1MQIke; arc=none smtp.client-ip=91.218.175.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1790582733; c=relaxed/simple;
+	bh=ZoYd2sdPRi7PYnEG0IlvFGd13KoF/WZCPDZleG3Y+cw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VrpNlQxPWhc4DnAGOIsvvf5OVKsiTC1sKp0Jth2SwwEGgNq61UeCUabXa4KfqWYXMZ3e9u+aM08xzRIPN5+xkSdfFhbRA++UXkMv49YXrQCYx8dgdEMUUIvxnmtCx12Vf9sf4SfKsDRqrPu2ohEWLKwlZIzUuyFhAA9FTeeWdsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=GZFpwPFl; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ys1MQIke"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=szjlKSRr4QKhQ/BXliXytwAbzwuxRJ9hxfloPYxH0y4=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790581516; v=1; x=1791186316;
- b=Ys1MQIkeV/eujertlX2VWFwU5ezKap/9dVAzfbmEUf6DnUlEv6WYezG9dz1+jOx+y/kygCmf
- E2Xhp5k25mlYqXyOL/YxtHl/EB3OaMU3Fehd+dE86cLoeZNIy9JYdk79KTmR5rCWZM7RY+6/9lv
- RyZDhXCfnIXPT3us1N30YlYk=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id ed11c0e404fd6af9;
-	Mon, 28 Sep 2026 07:45:16 +0000
-X-Mizu-Trace-ID: ed11c0e404fd6af9
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5b8c42da963so9545e87.0
-        for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 00:45:11 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwKo9FIDhpeObMi7GffUj1PQ89ZuOzpjbsqv3TxXihuqo4kcXB7oq5t3oxXYaL8HvLubrg7f3Y=@lists.linux.dev
-X-Gm-Message-State: AFq9FYK3JSK3uE9pkuTrDsCNe4VOUqNnkor6lzl9QcEdzV7qSpvjtFAu
-	k8VP3Ry/VvR5cX1Niw1tjGH8Sx3c4gPWDBm+XiP3sQQ6ke4cKDLQDSPVSRjV+WGeHQD7YjXjZ8V
-	RL3mJ0Sc8DESfSzjbOeolwuoOac2hvUwp/rHCK79J
-X-Received: by 2002:a05:6512:1386:b0:5ae:cf5f:4a88 with SMTP id
- 2adb3069b0e04-5b8ef2571demr154509e87.8.1790581510337; Mon, 28 Sep 2026
- 00:45:10 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="GZFpwPFl"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 72046169E;
+	Mon, 28 Sep 2026 01:05:24 -0700 (PDT)
+Received: from [10.57.12.79] (unknown [10.57.12.79])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 949CB3F86F;
+	Mon, 28 Sep 2026 01:05:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790582727; bh=ZoYd2sdPRi7PYnEG0IlvFGd13KoF/WZCPDZleG3Y+cw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=GZFpwPFl7ovI3rDNT/2mn4+w0i4sXv4nTmdNKJvdtEoZbukSO66jtaCM+F9CsbXdb
+	 ZQvnQ+cf9fHw3YVxkeX+xcls+suLYnK7BcC2DCPEW+ZevQmsUlgnB7EwYSwF+Huj6z
+	 s6cD2Zr1h9Xg0ltB6Jac4THbkfTIu9l/lUMJZmoE=
+Message-ID: <88bd2049-d25b-4767-81f8-83c99749fd11@arm.com>
+Date: Mon, 28 Sep 2026 09:05:21 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260922130821.1666713-1-vdonnefort@google.com>
- <20260922130821.1666713-6-vdonnefort@google.com> <am2rfnuwjkglavbtzkt2lk2gclahvca5irrv5me4vppzkotexf@yauajpybhsnm>
- <87qzie3beb.wl-maz@kernel.org>
-In-Reply-To: <87qzie3beb.wl-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 28 Sep 2026 08:44:33 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTwwxL3Cs-7B2NgEyedu-ZQFt96ck_V-erCUaTB=hrh5eg@mail.gmail.com>
-X-Gm-Features: AclHuK-ALEhQXkggSsAxXnC2DJjXeZyCoNf81U4HcBABH4AnShcbMTLpdrkikjI
-Message-ID: <CA+EHjTwwxL3Cs-7B2NgEyedu-ZQFt96ck_V-erCUaTB=hrh5eg@mail.gmail.com>
-Subject: Re: [PATCH v1 5/6] KVM: arm64: Use kvm_s2_fault_vma_info in gmem_abort()
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 2/7] firmware: arm_rmm: Check for RMI support at init
+Content-Language: en-GB
 To: Marc Zyngier <maz@kernel.org>
-Cc: Wei-Lin Chang <weilin.chang@arm.com>, Vincent Donnefort <vdonnefort@google.com>, oupton@kernel.org, 
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	kernel-team@android.com, qperret@google.com, Sashiko <sashiko-bot@kernel.org>, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, will@kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+ sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
+References: <20260924135201.850038-1-suzuki.poulose@arm.com>
+ <20260924135201.850038-3-suzuki.poulose@arm.com> <arZQCiF3iqp9eCsy@arm.com>
+ <f7662116-ef8e-4f97-90a4-07173236617b@arm.com> <87v77r2ga5.wl-maz@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <87v77r2ga5.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Marc, Wei-Lin,
+On 27/09/2026 10:29, Marc Zyngier wrote:
+> On Fri, 25 Sep 2026 16:23:49 +0100,
+> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+>>
+>> On 25/09/2026 11:42, Catalin Marinas wrote:
+>>> On Thu, Sep 24, 2026 at 02:51:56PM +0100, Suzuki K Poulose wrote:
+>>>> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+>>>> index 32102c3912fa7..e8b29983b0021 100644
+>>>> --- a/arch/arm64/kernel/cpufeature.c
+>>>> +++ b/arch/arm64/kernel/cpufeature.c
+>>>> @@ -293,6 +293,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar3[] = {
+>>>>    static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
+>>>>    	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_CSV3_SHIFT, 4, 0),
+>>>>    	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_CSV2_SHIFT, 4, 0),
+>>>> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_RME_SHIFT, 4, 0),
+>>>
+>>> I think we end up exposing this to (any) guest unless we mask it out in
+>>> sanitise_id_aa64dfr0_el1(). Do the guests care about the RME version? I
+>>
+>> Valid point. I personally don't think this matters. The FEAT_RME alone
+>> is not useful or harmful. I could mask it in KVM as a safe bet.
+> 
+> Is there *any* case where the guest (realm or not) should know it is
+> running on RME enabled HW? I can perfectly imagine that someone would
 
-On Sun, 27 Sep 2026 17:30:04 +0100, Marc Zyngier <maz@kernel.org> wrote:
-[...]
-> > Perhaps it is worth reserving plain "gfn" for the value we use as the
-> > IA of the (shadow) page table, and name this variable something like
-> > canonical_gfn. Similar to what kvm_s2_fault_map() does.
->
-> Maybe. We have gfn in the vncr fault handling code as well, but that
-> one is the result of a S1 walk, so maybe more obvious.
+We don't do that for Linux Guests at least. The Realms rely on the 
+presence of RSI ABI.
 
-Agreed, now that s2vi.gfn sits next to it. I'll rename it to
-canonical_gfn for v2.
+Cheers
+Suzuki
 
-> > Huh, I guess you also fixed a bug here? s2fd->fault_ipa could be the
-> > nested ipa instead of the canonical ipa.
->
-> Yeah, it appears so. Worth capturing in Fixes: as well.
 
-That one came in with a7b57e0995927 too, so the existing Fixes: covers
-it. I'll mention it in the commit message.
+> implement something looking like CCA on non-RME systems.
 
-Cheers,
-/fuad
+
+> 
+> 	M.
+> 
+
