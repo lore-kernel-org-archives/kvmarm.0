@@ -1,147 +1,267 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69D7D49E5F3;
-	Mon, 28 Sep 2026 17:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF674E9C16
+	for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 17:34:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790616518; cv=none; b=krhiwZCWwhi8dRDS0+2AR+T4eeE7kA4z6N5WE2lKGU5PWzeB8ILxM+dHxPer42ZsixUf/FK1Nu328TORoi5hX3J81ZTax262uwIKCyNWC0+I7/sbmjoa/GVwMFVyHDSQoMMzrP1+uTxYLqiCVQq5SQVFSc8KP7CTNVWPVZ8fRXo=
+	t=1790616874; cv=none; b=MMUciOZXrhAVSoMAh+CmukQRmvMl3G2XbHm2ZMdehctkXtZlgoOeElGzayLSuzqGqZzEUFRoPFjCMpYM70e0HOXL/gKjRlv4O2YAQwz8YQLxGoxSE/41PGEK9CA+83A202IU13Dmp6hBQkT4NuhBQXgXHR4dJwaWZmhj+QtG4vw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790616518; c=relaxed/simple;
-	bh=NOwlg1fLIhsJpwRRWJEx28YKpYmKtZ7WGDsI1WtfweU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jJCnP9lWKVGEAg5TiEWRj4/9PGIzcaqc7lUvzTjAvL6x//QWM87ueAiICAsZVsiGghmLbWyXU5/rNfPmN/RpDXbIloeyB6AjZplHSk/3hC8KJyexAXwsDCeSU5sDXx7X6+8wNHM7vn274bbQs4ZPdBxF2AXLw9jC/Xy/dVH/3oY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=JYxAo8jR; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1790616874; c=relaxed/simple;
+	bh=uh3nNIwDJbvQlWzXnPw0CQRfGHkttdb5zQRUKng+0mA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c6PWHWVxhpfyARUBkKBR6npqJNodx+7mcdu7PUkxSmwYxA1MW1bl1GkBjp5U24HDZnSU6PZMFKyqMz/OuqFwyBQTLRTd4y+4MrtZKO/cLywCtXbnUHSOkf8FgDc+iTzRTWPeNLjdyv+ZylQEtREUlh1QjmO2lZxm6lCU1enXIWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cy1ocs6D; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="JYxAo8jR"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4497D1655;
-	Mon, 28 Sep 2026 10:28:32 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3B4EC3F763;
-	Mon, 28 Sep 2026 10:28:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790616515; bh=NOwlg1fLIhsJpwRRWJEx28YKpYmKtZ7WGDsI1WtfweU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JYxAo8jR8/FlcEOgF0lfNeAhVBe1YM6gGqbAJOGgGoAcD5TwzeszFXE3Luz4YDa0X
-	 Ii/FE5eavzr3+dGKMrbQA2TWWA6/IxxcwbgeXhtUiWM9WbdL+yBH7ESoJ6RA3MNwWo
-	 qBK3Y8YEHYJu6sms16eIB8qUYi/47RJEbNZY0ywA=
-Date: Mon, 28 Sep 2026 18:28:21 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
-	will@kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
-	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
-	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
-	sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com,
-	Gareth Stockwell <Gareth.Stockwell@arm.com>
-Subject: Re: [PATCH v19 4/7] firmware: arm_rmm: Add support for SRO
-Message-ID: <arqjteW-Y5u2XX2r@arm.com>
-References: <20260924135201.850038-1-suzuki.poulose@arm.com>
- <20260924135201.850038-5-suzuki.poulose@arm.com>
- <arozNIQ-fQ0XQViI@arm.com>
- <4fabad44-280f-40e6-95bb-49011cd2f185@arm.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cy1ocs6D"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1790616869;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6QcRmKAZPk4+69MBsW2Ao6CpwFSl1GoQnOOgz4WoGyo=;
+	b=cy1ocs6DxgB0NxA/S6PyphkDIw6Pe0AUn/kWiS3VkTVeDPWJRDEQq4tVbHHRL0nYV9DrmY
+	JPKTrJzp+gs0PswyONfWtZ8dZbMs19ofNW08Sb+ZU7P8z70Wd0GxhxV1nPPl37lWVIBw6A
+	p2Ntz8Tt3/0MYfRGiR/dWTw2f1YigtE=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-655-SEg6QisYOqqF77ykwSbR2g-1; Mon, 28 Sep 2026 13:34:27 -0400
+X-MC-Unique: SEg6QisYOqqF77ykwSbR2g-1
+X-Mimecast-MFC-AGG-ID: SEg6QisYOqqF77ykwSbR2g_1790616867
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4a0032846d7so13746015e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 28 Sep 2026 10:34:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790616867; x=1791221667;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=6QcRmKAZPk4+69MBsW2Ao6CpwFSl1GoQnOOgz4WoGyo=;
+        b=HrT/3/Ptb5Z6ltfIDeOu0B0/QjPB9tIkL2Ut+vZVvI8AxJnAH3J7gGkjiYon2oxfww
+         86XqWmSEo0fIa/aS3EBkL8eTZiqgM5sBpnOC6ReZ+NIZ1qp9ctsmCcWDb+LgkKiLeNoU
+         9vsgPFMEI1hFI2MLVCT3THjh9cL5DjGph2MOGPxKtrKEp8Q6MFMNTQR8KodgF6zjJpEu
+         /A86vuGfZ/mJ05WqDj5U2BiZAM/O9jnsKaHympFt+4n6wH4DZ3QCIaKVHl2pIY1zOQ5z
+         q+BKboIhWcElPGyy2ydpxDqI0AzmYZrn+FyEjxZYDAJFM6p3FuQ7wUw2fNOrExhgTK9K
+         mN8A==
+X-Forwarded-Encrypted: i=1; AKwUvBy3W3J1LotQs6LPIDh9rK5hhYM9VBa0OvhNPTK5Y+GkIghYHku9MTxDLxyIgK7DPcsahPPIuQ8=@lists.linux.dev
+X-Gm-Message-State: AFuF++mGJA64OVWtfwCG5h4kumGVTHfeXraVzlqAgFFtnMprf1JZi/W+
+	4QnEjQzm4OkTONDS6fPZM1Q2H2tefgzrG8Lb9X6I7ytzcYNBsYLYDcr2jPsUHuAnRGPNdEu6ynb
+	fYdS4dYLXyeX1gloJDzSnX0i++nFRnQF7RlnHtkl6dg9ax4vHX42/4xm6ew==
+X-Gm-Gg: AYBFou0F2UB4k5KA39TUwLz6/oHKNB/XmiIb2UVPeTsxKly8eBO6pBopZqvAKJEpes0
+	kdftsV9TS9l0VR1YGrXXf1wwRaeCGD0ooJxwxg8I13w54vJlh2WUfpmpuTlPTkNlRQbO0YzY7a3
+	qnCIE5XP46qiZk+Mran8iE8HElAdaQpe7/81THCRlEXzRfgzvjjU1NhZmKuSpNSnWtUvbA5WYnL
+	T/pYEiG9yn1YtvOmBBDnxR5vVpa6DIPu3pHshslOfZH8RrmucIMQZwXjCbvpYo5BvpEpQDuGMVr
+	lZPZiN6+kogOojs5oRgkMw2ErC+Q4Gv3Y/7wXcLwbgiLEKEe8e9vGYF4BnLhP8OIevx9mS3r2Fc
+	kpq3QoxJhDtpuUQQIMzSK7dMcK9nQMe3SWKZ1mazSx36URZTh
+X-Received: by 2002:a05:600c:3b1b:b0:49f:e4d4:dd70 with SMTP id 5b1f17b1804b1-49fe6705bd7mr249667135e9.31.1790616866672;
+        Mon, 28 Sep 2026 10:34:26 -0700 (PDT)
+X-Received: by 2002:a05:600c:3b1b:b0:49f:e4d4:dd70 with SMTP id 5b1f17b1804b1-49fe6705bd7mr249666885e9.31.1790616866176;
+        Mon, 28 Sep 2026 10:34:26 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a00cfa57d7sm7988175e9.10.2026.09.28.10.34.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Sep 2026 10:34:25 -0700 (PDT)
+Message-ID: <3bcc8ccf-6daf-47a1-8620-a69915adf8ae@redhat.com>
+Date: Mon, 28 Sep 2026 19:34:24 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4fabad44-280f-40e6-95bb-49011cd2f185@arm.com>
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v9 12/26] arm/kvm: Initialize isar.idregs[] with all
+ writable host ID regs
+To: Khushit Shah <khushit.shah@nutanix.com>
+Cc: "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ Shaju Abraham <shaju.abraham@nutanix.com>,
+ "yangjinqian1@huawei.com" <yangjinqian1@huawei.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "sebott@redhat.com" <sebott@redhat.com>,
+ "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
+ "philmd@oss.qualcomm.com" <philmd@oss.qualcomm.com>,
+ "maz@kernel.org" <maz@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "abologna@redhat.com" <abologna@redhat.com>,
+ "jdenemar@redhat.com" <jdenemar@redhat.com>
+References: <20260916144721.751810-1-eric.auger@redhat.com>
+ <20260916144721.751810-13-eric.auger@redhat.com>
+ <8C1A034C-C3E7-4EC3-89CF-6E3AD99AE90C@nutanix.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <8C1A034C-C3E7-4EC3-89CF-6E3AD99AE90C@nutanix.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: GipW2dpagNv45MyIm5mjNHO7kzAy6IHkFk4rat-S5KQ_1790616867
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 28, 2026 at 11:13:39AM +0100, Suzuki K Poulose wrote:
-> On 28/09/2026 10:28, Catalin Marinas wrote:
-> > On Thu, Sep 24, 2026 at 02:51:58PM +0100, Suzuki K Poulose wrote:
-> > > +long rmi_sro_memxfer_execute(struct rmi_sro_state *sro, gfp_t gfp)
-> > > +{
-> > > +	struct arm_smccc_1_2_regs *regs = &sro->regs;
-> > > +	bool cancelled = false;
-> > > +	unsigned long sro_handle;
-> > > +
-> > > +	rmi_smccc_invoke(regs);
-> > > +
-> > > +	sro_handle = regs->a1;
-> > > +	while (RMI_RESULT_STATUS(regs->a0) == RMI_INCOMPLETE) {
-> > > +		bool can_cancel = RMI_RESULT_CAN_CANCEL(regs->a0) == RMI_OP_CAN_CANCEL;
-> > > +		int ret = 0;
-> > > +
-> > > +		switch (RMI_RESULT_MEMREQ(regs->a0)) {
-> > > +		case RMI_OP_MEM_REQ_NONE:
-> > > +			rmi_op_continue(sro_handle, RMI_CONTINUE_KEEP_GOING,
-> > > +					regs);
-> > > +			break;
-> > > +		case RMI_OP_MEM_REQ_DONATE:
-> > > +			ret = rmi_sro_donate(sro, sro_handle, regs->a2, regs,
-> > > +					     gfp);
-> > > +			break;
-> > > +		case RMI_OP_MEM_REQ_RECLAIM:
-> > > +			ret = rmi_sro_reclaim(sro, sro_handle, regs);
-> > > +			break;
-> > > +		default:
-> > > +			WARN_ON_ONCE(1);
-> > > +			ret = -ENXIO;
-> > > +			break;
-> > > +		}
-> > 
-> > Another thing I came across while looking whether we can defer the
-> > activation. It seems that the spec (I_JVYCH) lists some SROs as
-> > PE-bound. Nothing here or in rmi_sro_execute() disables migration and
-> > the memory allocation paths can even sleep with GFP_KERNEL.
-> 
-> No, this is not required. I agree this is confusing. I will get it
-> clarified.
-> 
-> So, there are two different sources for the SRO contexts. One is a global
-> pool and the other an Object.
-> 
-> e.g., For an RMI operation on an Object, SRO context can be the object
-> itself (e.g., REC_CREATE, REALM_ACTIVATE etc.)
-> 
-> However, when there is no reliable object for the command (e.g.,
-> RMI_GRANULE_RANGE_DELEGATE), the RMM must allocate a context from
-> the global pool. Now, the "PE" in there comes from a recommendation
-> to the RMM implementations, that the global pool size must depend on
-> the number of PEs on the system. This doesn't mean that the SRO
-> handles are only bound to those PEs. I will get this clarified
-> in the RMM spec.
 
-This part of the spec needs rewriting, not clarifying. No matter how
-hard you try, there's no way you can read it as a "global pool". For
-example:
 
-D_GZLMRA	SRO context is bound to one of the following:
-		  - A PE
-		  - An RMM object
+On 9/25/26 3:27 PM, Khushit Shah wrote:
+>
+>> On 16 Sep 2026, at 8:15 PM, Eric Auger <eric.auger@redhat.com> wrote:
+>>
+>> !-------------------------------------------------------------------|
+>>  CAUTION: External Email
+>>
+>> |-------------------------------------------------------------------!
+>>
+>> kvm_arm_get_host_cpu_features() already retrieves the values of some
+>> host id registers to analyze the available vcpu features.
+>>
+>> Eventually we want to be able to allow the user to change the value
+>> of writable ID reg fields. So we need to store the initial value of all
+>> writable ID regs into isar.idregs[].
+>>
+>> Introduce a new get_host_cpu_idregs() helper that populates isar.idregs[]
+>> and call it from kvm_arm_get_host_cpu_features.
+>>
+>> This patch has no impact on cpreg values. isar.idregs[] is only
+>> used as a temporary storage for register values to be updated in place
+>> later.  Also it does not handle the writeback of isar.idregs[] into cpreg
+>> value list after user update. This will be handled separately.
+>>
+>> Note the host values are retrieved from the scratch vcpu initialized with
+>> all the available capabilities exposed by KVM, independently on the
+>> final choice made by the suer.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> Hi Eric,
+>
+> As we discussed, in v10, there will be an option to also read all the ID registers, not only writable.
+yes we can do that. reviewers may advocate the leave as is though as the
+only call site in
+this series will use writable mode.
+>> ---
+>> v8 -> v9:
+>> - improve the commit msg. Only initialize in this patch and move the
+>>  write back to cpreg value list in a different patch.
+>> - Do not hack CLIDR here. The correct way to fix that temporarily is to
+>>  do that in the machine instead.
+>>
+>> v7 -> v8
+>> - fix indent and added Khushit's R-b
+>>
+>> v6 -> v7
+>> - remove vcpu from prototypes (Khushit)
+>>
+>> v5 -> v6
+>> - do not check writable_map anymore
+>> ---
+>> target/arm/kvm.c        | 43 ++++++++++++++++++++++++++++++++++++++++-
+>> target/arm/trace-events |  2 ++
+>> 2 files changed, 44 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+>> index c6eac41991..958b25e550 100644
+>> --- a/target/arm/kvm.c
+>> +++ b/target/arm/kvm.c
+>> @@ -43,6 +43,7 @@
+>> #include "hw/acpi/ghes.h"
+>> #include "target/arm/gtimer.h"
+>> #include "migration/blocker.h"
+>> +#include "cpu-idregs.h"
+>>
+>> const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+>>     KVM_CAP_INFO(DEVICE_CTRL),
+>> @@ -290,7 +291,44 @@ static int kvm_feature_idx_to_idregs_idx(int kidx)
+>>     return get_sysreg_idx(sysreg);
+>> }
+>>
+>> -static void kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>> +/*
+>> + * get_host_cpu_idregs: Read all the writable ID reg host values
+>> + *
+>> + * Need to be called once the writable mask has been populated
+>> + * Note we may want to read all the known id regs but some of them are not
+>> + * writable and return an error, hence the choice of reading only those which
+>> + * are writable. Those are also readable!
+>> + */
+>> +static int get_host_cpu_idregs(int fd, ARMHostCPUFeatures *ahcf)
+>> +{
+>> +    int err = 0;
+>> +    int i;
+>> +
+>> +    for (i = 0; i < NUM_ID_IDX; i++) {
+>> +        ARM64SysReg *sysregdesc = &arm64_id_regs[i];
+>> +        ARMSysRegs sysreg = id_register_sysreg[i];
+>> +        uint64_t *reg;
+>> +        int ret;
+>> +
+>> +        if (!sysregdesc->writable_mask) {
+>> +            continue;
+>> +        }
+>> +
+>> +        reg = &ahcf->isar.idregs[i];
+>> +        ret = read_sys_reg64(fd, reg, idregs_sysreg_to_kvm_reg(sysreg));
+>> +        trace_get_host_cpu_idregs(sysregdesc->name, *reg);
+>> +        if (ret) {
+>> +            error_report("%s error reading value of host %s register (%m)",
+>> +                         __func__, sysregdesc->name);
+>> +
+>> +            err = ret;
+>> +        }
+>> +    }
+>> +    return err;
+>> +}
+>> +
+>> +static void
+>> +kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>> {
+>>     /* Identify the feature bits corresponding to the host CPU, and
+>>      * fill out the ARMHostCPUClass fields accordingly. To do this
+>> @@ -376,6 +414,9 @@ static void kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>>         SET_IDREG(&ahcf->isar, ID_AA64PFR0, 0x00000011); /* EL1&0, AArch64 only */
+>>         err = 0;
+>>     } else {
+>> +        /* Make sure all writable ID reg values are initialized */
+>> +        err |= get_host_cpu_idregs(fd, ahcf);
+>> +
+> Perhaps if we read “all” the ID registers, we should be able to get rid of all the manual reads below.
+Yes if all are read, we can remove this. But for now this is depends on
+the host capabilities, better to
+leave as is I think.
+>
+>>         err |= get_host_cpu_reg(fd, ahcf, ID_AA64PFR1_EL1_IDX);
+>>         err |= get_host_cpu_reg(fd, ahcf, ID_AA64PFR2_EL1_IDX);
+>>         err |= get_host_cpu_reg(fd, ahcf, ID_AA64SMFR0_EL1_IDX);
+>> diff --git a/target/arm/trace-events b/target/arm/trace-events
+>> index 8502fb3265..c25d2a1191 100644
+>> --- a/target/arm/trace-events
+>> +++ b/target/arm/trace-events
+>> @@ -13,6 +13,8 @@ arm_gt_update_irq(int timer, int irqstate) "gt_update_irq: timer %d irqstate %d"
+>>
+>> # kvm.c
+>> kvm_arm_fixup_msi_route(uint64_t iova, uint64_t gpa) "MSI iova = 0x%"PRIx64" is translated into 0x%"PRIx64
+>> +get_host_cpu_idregs(const char *name, uint64_t value) "scratch vcpu host value for %s is 0x%"PRIx64
+>> +kvm_arm_writable_idregs_to_cpreg_list(const char *name, uint64_t previous, uint64_t new) "%s overwrite default 0x%"PRIx64" with 0x%”PRIx64
+> ^^ leaked into this commit.
+yup. Thanks!
 
-And take a random command:
+Eric
+>
+> Warm Regards,
+> Khushit
+>
+>> # cpu.c
+>> arm_cpu_reset(uint64_t mp_aff) "cpu %" PRIu64
+>> -- 
+>> 2.53.0
+>>
 
-B4.5.2 RMI_DPT_L0_CREATE command
-	Create a Level 0 DPT.
-	The RMI_DPT_L0_CREATE command may initiate a Stateful RMI
-	Operation whose context is bound to the current PE.
-
-"bound to the current PE" pretty clearly shows the intention was to
-disable preemption. It also doesn't say what happens when this pool is
-exhausted (presumably it returns RMI_BLOCKED).
-
-TBH, that's a pretty significant change for a bet3/4 release, though
-arguably it can be seen as a relaxation. Code that relies on disabling
-preemption should still work (somewhat, assuming the global pool is at
-least the number of PEs and the host plays nicely to complete or cancel
-all SROs).
-
-That said, such pool is a limited resource and we need some way to probe
-its size if we want to do something smarter in the kernel, like a
-semaphore to ensure we don't randomly fail because of an RMM limitation.
-I don't really see how the number of PEs is relevant to this global
-pool sizing, it's not that we limit the realms we can start to the
-online CPUs.
-
--- 
-Catalin
