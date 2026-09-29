@@ -1,171 +1,149 @@
-Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4481F50C2B8
-	for <kvmarm@lists.linux.dev>; Tue, 29 Sep 2026 10:30:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF338511204;
+	Tue, 29 Sep 2026 10:30:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790677831; cv=none; b=cMpOaEvsnAo+Wd/d2/3G8a04GF4TQDoBxTkRriISpseow7g1kHYFW4OreCH8Tq+Q9BWB9QWYakhyyDAbDJ7Z/6f8nHKL3ow4zhePBYsjp6IjT4k+lPx3G325CNoxY53TYKYNLfWCsF8t/646VEZTIrLFF+4IelNMpFmL9RtFjzg=
+	t=1790677862; cv=none; b=ucS/rMn5XM34TbeYX3bridtEEQF9HxjSleLmNTDxmKeKQ2DK583VUa84oB7i7XK7+XRNEFvYZMq55DVS5RXmcySddRudBafUPoRNcFQgx5VPVa8CLK0mY/z7YIwm2uQJcp+9LV8u/NWnSlCBYOkOjsi8FAwPIqGalSC5N3ozI5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790677831; c=relaxed/simple;
-	bh=DntTCIUQ0j7NgeaLTznwteean8OpyslV/Zs4s5i2tdw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=MCeLK3hjIDsvWWk8z32+LR+5hkXOpkH3eQMreK1EMzw6gK8giERT4dfj3sWXix71Mq91QBo5ilZTpSxnO4JI8DceHc2ozknXr+/t2d0y2PsWqnOooGj9YznhyUjbnBgoBCSmODf33rZMPKenuSz64efagEJdCVHD1Ny7jE7let8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=oQDMyzVG; arc=none smtp.client-ip=113.46.200.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1790677862; c=relaxed/simple;
+	bh=bbdhp9RZEsefco1R5gH5jLRUViZzbWUqmj9Bx9zoiTc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X4ImegX9A4aWuHPRXpGhcdaQH6jQUDo17gBHn9tkIo7FQmfONqpA+mXkRhtglKWcja9s1s1iNDe457E7M9rbHQD8ine2v4M1q9rVBJwkpB9+H7//9TiXp0I6PYMJ+pIZpH364CU4TUfDFlmQXLpxAEc7LnazFXRf+eKPn54fXkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=MLBHJe93; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="oQDMyzVG"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=EkLqdPxdSLJ7raVGNPbHVI/2jD90kTakfFHeUisjhwo=;
-	b=oQDMyzVG0KUbNXrlQWQVUUgqlaxkHcIvP0UyRXSYha/jMxqpVXzhuX7JzocEF+KHQ8CFuZWfQ
-	RVkrmt5LsNqvHKSsgtLnndDZqHoZkw0pdq20Iamax3CgIsFWe1TahupnpVNy6Uctf2+KKGlgdsJ
-	lnasTD8Tzgck/G26vQR3kaw=
-Received: from mail.maildlp.com (unknown [172.19.163.0])
-	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4hvDdv3WJpz1T4dr;
-	Tue, 29 Sep 2026 18:18:11 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 924A140537;
-	Tue, 29 Sep 2026 18:30:11 +0800 (CST)
-Received: from [10.67.120.103] (10.67.120.103) by
- kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Tue, 29 Sep 2026 18:30:10 +0800
-Message-ID: <10e3784d-fcb0-4d61-b9e1-27a0ad5c9113@huawei.com>
-Date: Tue, 29 Sep 2026 18:30:10 +0800
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="MLBHJe93"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CB946497;
+	Tue, 29 Sep 2026 03:30:46 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 271D63F86F;
+	Tue, 29 Sep 2026 03:30:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790677850; bh=bbdhp9RZEsefco1R5gH5jLRUViZzbWUqmj9Bx9zoiTc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MLBHJe93XO2/suJRTcJpd3d4VEm0QBv3ll9AmKrC3PLu63rQA+ZjIfvlmGw0l4Fg/
+	 pn3iR6FRBOK0ZZVq/LUXYds0tfwqvFJSZjbEJg0Mtj/plMhkNfHCl4NB87iBvhgMYP
+	 n2YEYlSP+47rcFYeJ5VCkKHGP9+6+xkTR/GwyuXk=
+Date: Tue, 29 Sep 2026 11:30:36 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Will Deacon <will@kernel.org>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, maz@kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
+	gshan@redhat.com, joey.gouly@arm.com, tabba@google.com,
+	yuzenghui@huawei.com, linux-coco@lists.linux.dev,
+	gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com,
+	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com,
+	lpieralisi@kernel.org, enju.kohei@fujitsu.com
+Subject: Re: [PATCH v18] arm64: mm: Handle Granule Protection Faults (GPFs)
+Message-ID: <aruTTJiIheHigPSJ@arm.com>
+References: <20260913070459.2547407-1-suzuki.poulose@arm.com>
+ <arK3tsTV6EDhI-nt@willie-the-truck>
+ <arOyp8WUrYBAjrGH@arm.com>
+ <arP0IF0MjFUv36AP@willie-the-truck>
+ <49dcab27-1d03-4df2-b7cb-4df4eda6d909@arm.com>
+ <araqPCdcSnqZqPWz@arm.com>
+ <3934b4c9-6b1f-44fa-847e-4fb1e67a58e7@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 1/5] KVM: arm64: pgtables: Change write bit from
- S2AP_W to DBM
-To: Leonardo Bras <leo.bras@arm.com>
-CC: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>, Fuad
- Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Steffen Eiden
-	<seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
-	<yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, Will
- Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Raghavendra
- Rao Ananta <rananta@google.com>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <linux-kernel@vger.kernel.org>
-References: <20260901171558.2674031-1-leo.bras@arm.com>
- <20260901171558.2674031-2-leo.bras@arm.com> <86bja17cg7.wl-maz@kernel.org>
- <aql8jY4o8SzjJuFU@LeoBrasDK> <aqnku2TcFzIKhjQl@kernel.org>
- <aqp73SxO78o7LJTs@LeoBrasDK>
- <eb629070-a02f-426a-92ee-b2c8f9e2aa9a@huawei.com>
- <arE8EOPh1-NWtFIU@LeoBrasDK>
-From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <arE8EOPh1-NWtFIU@LeoBrasDK>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3934b4c9-6b1f-44fa-847e-4fb1e67a58e7@arm.com>
 
+On Mon, Sep 28, 2026 at 11:38:01AM +0100, Suzuki K Poulose wrote:
+> On 25/09/2026 18:07, Catalin Marinas wrote:
+> > On Wed, Sep 23, 2026 at 05:04:06PM +0100, Suzuki K Poulose wrote:
+> > > On 23/09/2026 16:45, Will Deacon wrote:
+> > > > On Wed, Sep 23, 2026 at 12:06:15PM +0100, Catalin Marinas wrote:
+> > > > > On Tue, Sep 22, 2026 at 06:15:34PM +0100, Will Deacon wrote:
+> > > > > > On Sun, Sep 13, 2026 at 08:04:58AM +0100, Suzuki K Poulose wrote:
+> > > > > > > From: Steven Price <steven.price@arm.com>
+> > > > > > > 
+> > > > > > > If the host attempts to access granules that have been delegated for use
+> > > > > > > in a realm these accesses will be caught and will trigger a Granule
+> > > > > > > Protection Fault (GPF).
+> > > > > > > 
+> > > > > > > A fault during a page walk signals a bug in the kernel and is handled by
+> > > > > > > oopsing the kernel. A non-page walk fault could be caused by user space
+> > > > > > > having access to a page which has been delegated to the kernel and will
+> > > > > > > trigger a SIGBUS to allow debugging why user space is trying to access a
+> > > > > > > delegated page.
+> > > > > > > 
+> > > > > > > There is work in progress to unmap the guest_memfd backed private pages from the
+> > > > > > > linear map. Until we get that support, we could get spurious GPFs from within
+> > > > > > > the kernel, e.g., load_unaligned_zeropad(). So, try to fix them up for now.
+> > > > > > > 
+> > > > > > > Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > > > > > > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > > > > > > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> > > > > > > Signed-off-by: Steven Price <steven.price@arm.com>
+> > > > > > > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > > > > > > ---
+> > > > > > > Changes since v17:
+> > > > > > >    * Pass untagged address to die_kernel_fault() - Sashiko
+> > > > > > >    * Explicitly check !user_mode() for fixups - Catalin
+> > > > > > >    * Switch to BUS_OBJERR for si_code from SI_KERNEL - Catalin
+> > > > > > >    * Clarify the commit description about the upcoming work on
+> > > > > > >      unmapping guest_memfd backed pages from linear map
+> > > > > > > Changes since v16:
+> > > > > > >    * Update the commit description to indicate why we try to fixup GPFs
+> > > > > > > Changes since v10:
+> > > > > > >    * Don't call arm64_notify_die() in do_gpf() but simply return 1.
+> > > > > > > Changes since v2:
+> > > > > > >    * Include missing "Granule Protection Fault at level -1"
+> > > > > > > ---
+> > > > > > >    arch/arm64/mm/fault.c | 30 ++++++++++++++++++++++++------
+> > > > > > >    1 file changed, 24 insertions(+), 6 deletions(-)
+> > > > > > 
+> > > > > > I still don't think we should do this, given that the plan is to unmap
+> > > > > > the memory from the linear map. If this thing fires, it's a kernel bug
+> > > > > > and it should be fatal.
+> > > > > 
+> > > > > If the linear unmapping gets merged first, I agree, no need to handle
+> > > > > these faults. I haven't followed that series, so no idea where it is at.
+> > > 
+> > > There doesn't seem to be much progress on that series. Brendan
+> > > volunteered to resurrect the series, taking over from Nikita [0].
+> > > But looks like Brendan is not working on this anymore. Will see
+> > > if someone is really planning to look at it.
+> > > 
+> > > [0] https://lore.kernel.org/all/DJJ35VLH2PE5.DFD8OYXEOH97@linux.dev
+> > 
+> > I just realised that this only solves part of the problem. Normal kernel
+> > allocations are delegated RMM metadata and they'll also trigger GPF
+> 
+> Other than Kdump, kernel shouldn't try to touch these metadata pages
+> unless there is a kernel bug ?
 
+Hibernate but we need to reject this as well since there's no way you
+can save and restore the realm memory.
 
-On 9/21/2026 10:15 PM, Leonardo Bras wrote:
-> On Fri, Sep 18, 2026 at 05:39:17PM +0800, Tian Zheng wrote:
->>
->>
->> On 9/16/2026 7:22 PM, Leonardo Bras wrote:
->>> On Tue, Sep 15, 2026 at 05:37:15PM -0700, Oliver Upton wrote:
->>>> On Tue, Sep 15, 2026 at 06:12:45PM +0100, Leonardo Bras wrote:
->>>>>> Yes, the HW should ignore it. But we have also
->>>>>> seen quite a few broken designs in this area...
->>>>>>
->>>>>
->>>>> I lack experience on what bad thing could happen. So I will expand on what
->>>>> I belive to understand up to here:
->>>>>
->>>>> - The PTE is in memory, so the DBM bit can be set regardless of being RES0
->>>>> - For SW pagetable walking, I don't think 'bit 51 == 0' is checked
->>>>> - For HW pagetable walking, maybe some faulty implementation may rely on
->>>>>     bit51 being RES0, and fault otherwise.
->>>>>
->>>>> If that's the case, then we would have to actually support both encodings,
->>>>> and only enable the new one if HAFDBS is available in the system.
->>>>>
->>>>> I just wonder how high are the chances to have such a broken design,
->>>>> or other broken designs did not come to my mind, and if we have to start
->>>>> with that multiple-encoding option.
->>>>
->>>> FWIW, the host stage-1 already uses the DBM bit unconditionally,
->>>> treating it as a software bit on implementations without HAFDBS.
->>>> Although given the quality of any garden variety Arm MMU I understand
->>>> where Marc is coming from.
->>>>
->>>> I don't think the HAFDBS enablement is complicated enough to be done in
->>>> a separate series without any meaningful users, nor would I really be
->>>> interested in taking it without, say, HDBSS.
->>>>
->>>> Can you please work with Tian to get a combined series out for this?
->>>>
->>>
->>> Hi Oliver, thanks for reviewing!
->>>
->>> Sure, one of the reasons I sent like this is so Tian could use it as a base
->>> for his next version.
->>>
->>>
->>
->> Hi Oliver, Leo,
->>
->> Works for us. I plan to send HDBSS v5 maybe next week with this series
->> merged in. Both dirty-tracking consumers are already built on top of the
->> DBM approach: dirty ring and dirty bitmap.
->>
->> Leo, with your blessing, I'd like to pick patches 1-4 into the HDBSS
->> tree with your Signed-off-by preserved and mine added on top, plus some
->> bug fixes on top of this RFC series.
-> 
-> Yeah, no problem on my side. I would just observe the maintainers' comments
-> on those before merging them.
-> 
+> And the userspace wouldn't have a mapping for them anyways ?
 
-All right, thanks.
+That's the aim but proposed KVM/CCA support still allows non-gmem slots
+to end up delegated (I haven't checked the latest if addressed).
 
-Tian
+> > https://lore.kernel.org/all/a11aba04-eaaa-43fd-988b-a2581b1b2fdb@arm.com/
+> > 
+> > I think rmi_delegate_range() covers the non-kdump cases, both for
+> > metadata and realm memory, we could unmap the linear map there (map it
+> > back in rmi_undelegate_range()).
+> 
+> We could explore that option for the kernel allocations too.
 
->>
->> For patch 5, I'd like to rework it into a derived hardware dirty mode
->> that replaces both kvm_set_hafdbs() and our earlier HDBSS enable/disable
->> hooks, so the whole thing lands as one series.
->>
-> 
-> My intention when I wrote that patch was to add a base so you could add
-> HDBSS on kvm_arch_commit_memory_region() with new patch such as:
-> 
-> 	/* Disable HAFDBS when dirty-logging starts */
-> 	if (kvm_supports_hafdbs(kvm))
-> 		kvm_set_hafdbs(kvm, 0);
-> +	else
-> +		kvm_enable_hdbss(kvm);
-> ...
-> 
-> 	/* If dirty-logging was canceled, set HAFDBS back on */
-> 	if (kvm_supports_hafdbs(kvm) &&
-> 	    atomic_read(&kvm->nr_memslots_dirty_logging) == 0)
-> 		kvm_set_hafdbs(kvm, 1);
-> +	else
-> +		kvm_disable_hdbss(kvm);
-> 
-> 
-> That being said, I need to run tests to make sure the usage of HAFDBS
-> outside of dirty_tracking makes any sense in terms of performance, but if
-> that's not the case, it would be fine to rework it so it does not
-> enable/disable HAFDBS there.
-> 
->> Performance looks good in both dirty ring and dirty bitmap scenarios so
->> far.
->>
-> 
-> Awesome!
-> 
-> Thanks!
-> Leo
-> 
+I do wonder what we gain from unmapping. If architecturally we get a
+synchronous fault when accessing delegated pages, it's only marginally
+more code to do_gpf() (and we might need this function anyway for
+kdump) and we avoid linear map fragmentation. So, I think we just need
+to agree what's fatal and what can safely recover. We do need Alper's
+patch for kdump, otherwise we can't fix it up in do_gpf().
 
+-- 
+Catalin
