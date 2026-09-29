@@ -1,120 +1,140 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D26453E319
-	for <kvmarm@lists.linux.dev>; Tue, 29 Sep 2026 17:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mta0.migadu.com (out-229.mta0.migadu.com [91.218.175.229])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CD143A6B81
+	for <kvmarm@lists.linux.dev>; Tue, 29 Sep 2026 18:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.229
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790701229; cv=none; b=MRGQs41vnOpLaaEW7Dmov3c3Df64WDNpK3o6GwpdH03lN0xKSDB5j64psUOR+GSwkmdSWBunOMZSwlj84OIMkr4NnbBZyX6XIEz9R347nSTfbRmssihex+3fj6f7fFxXkRUHpNuj86IbrWrMuxW+Tw1C/pHLmxdLrZdMLN1Hfgk=
+	t=1790705744; cv=none; b=XeHz4rQ0ggVwZkmeTyOFY+W6eUZ4Waxsd9WW3CLKzeP9OIAimO4BkDexqkLzxP++WI249w+RE5kf2cBuIBa2kHtryEgBDq3PoAZGvYFh5CxjVZRTTT3/i9K2Tr9m69aDsUzvIEI5rT8Ntq+eAoI1ZcYbdmvAOftD2cMiubvSMb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790701229; c=relaxed/simple;
-	bh=JOH3/jvzoj8I30I9E7kqxaEsc2Cplh2etaLYcI+/ZEo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zd7b9ff4NtA9o9X5XmnigljUk03pW1+fQethfUqW2vzFqPXphLhsgN96D9pQftrckzvqaZfWVIbbJ94X6rSIbYCgJ3gRmK69BCRu/FVNoNevVDQdoLxVmUBSHv8xlj9ORnmvuZavzGNfvnPBgGXwn/JyZIUQnHqaayEe2j5MVfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=nzbmtfKi; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1790705744; c=relaxed/simple;
+	bh=PS53pggHQszgAXTyeJLWzhz2Iy6aaILaNoIH2bVSKrk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fSRXufO7O9VHjCIhxKR1zeFNIM39sz9P47xva4zbp2FUNQV4Xq346FXTl5HeZbDcezXf9BiSGjsZyR43VOSEInsw/smRoMdrC3OVJqdeYWtMJPAbTPU2k9THWOS3Y3e3OvD3KNV70MPvCzMBuTuWAYNHwFDsIkyMcNOYFvtMuo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cHbUxT/6; arc=none smtp.client-ip=91.218.175.229
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="nzbmtfKi"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8F3EF1655;
-	Tue, 29 Sep 2026 10:00:23 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 55F753F85F;
-	Tue, 29 Sep 2026 10:00:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790701227; bh=JOH3/jvzoj8I30I9E7kqxaEsc2Cplh2etaLYcI+/ZEo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nzbmtfKi8hy7Cc/yT4F+PGL6tW6kIHItKwVzh05TXYNazNIP2VPxFmRX+iByTzJci
-	 vkpKv707Z8drHTA6cAUBWSs41lcGj8D84X8Ul4eZUyi05Lu5EFRpj5sH9ciUXEZV9J
-	 JuiircUcRlGb+buJ2IlH/gTkk8HxtKdcSyyrp3Zo=
-Date: Tue, 29 Sep 2026 18:00:12 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Andreas Grapentin <gra@linux.ibm.com>
-Cc: Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Fuad Tabba <tabba@google.com>, Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-	Oliver Upton <oupton@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v8 16/29] arm64: Share arm64 headers with s390
-Message-ID: <arvunF8epgpWh1YT@arm.com>
-References: <20260918133107.1042730-1-seiden@linux.ibm.com>
- <20260918133107.1042730-17-seiden@linux.ibm.com>
- <arqQ2Eat4VUBbl49@arm.com>
- <20260928162345.428362-C-seiden@linux.ibm.com>
- <ars6Jh5DiendDT7G@li-d8547bcc-2d90-11b2-a85c-a70f2a37009a.ibm.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cHbUxT/6"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=PS53pggHQszgAXTyeJLWzhz2Iy6aaILaNoIH2bVSKrk=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1790705740; v=1; x=1791310540;
+ b=cHbUxT/6N5ra0eNZlkn9gvqk2qpnnFroUCW3kiR2Je/QSPmpvmxKCwSuo51/iAGZnAker1BA
+ 2HmMw2ldm6tFFwPd46Od9uoNvSIS+oWmmMCCjy57Q9letEtGRc37sD1ru45+zQpXLI9MYe7QP4j
+ Xf2ky9W2RflgXTpup/mMeTaU=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id c962b6b174160663;
+	Tue, 29 Sep 2026 18:15:26 +0000
+X-Mizu-Trace-ID: c962b6b174160663
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5b8f42bb8a9so917e87.1
+        for <kvmarm@lists.linux.dev>; Tue, 29 Sep 2026 11:15:25 -0700 (PDT)
+X-Gm-Message-State: AFq9FYIh0zjyrVBY0nvnHDFWiJpbesdjurgdiSbYUPcVYxb78Bwy9Ymq
+	1aX/YL8GfLdHrJCA65nDCEO1lUkrM4tgyqSSFD3TFIsC1XfcxD2M5UlKONWX0kcNaQd21IQBDaW
+	pAkN0F6E2BGdL+eqHaDRy5yRNx6UJv5PV5Uha3SOh
+X-Received: by 2002:a05:6512:3d04:b0:5b8:d830:be30 with SMTP id
+ 2adb3069b0e04-5ba2f9ac722mr166505e87.16.1790705724240; Tue, 29 Sep 2026
+ 11:15:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ars6Jh5DiendDT7G@li-d8547bcc-2d90-11b2-a85c-a70f2a37009a.ibm.com>
+References: <20260929093548.3598547-1-maz@kernel.org> <20260929093548.3598547-7-maz@kernel.org>
+In-Reply-To: <20260929093548.3598547-7-maz@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 29 Sep 2026 19:14:48 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTyRRJjhaud-OHyAWh0z4Pj=o-jmvN8tJ=3h+Qrb6Lzm5w@mail.gmail.com>
+X-Gm-Features: AclHuK9Zph6dxjBIAdQsEIxcU3zk8Se6Fy_owHYC72h8LnPnQU2hVuTRl5zAeJ8
+Message-ID: <CA+EHjTyRRJjhaud-OHyAWh0z4Pj=o-jmvN8tJ=3h+Qrb6Lzm5w@mail.gmail.com>
+Subject: Re: [PATCH v2 6/7] KVM: arm64: vgic-its: Fix MOVALL handling of
+ source redistributor
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	Steffen Eiden <seiden@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Yuchao Zhang <ndaugoing@gmail.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Sep 29, 2026 at 06:19:20AM +0200, Andreas Grapentin wrote:
-> On Sep 28 26, Steffen Eiden wrote:
-> > On Mon, Sep 28, 2026 at 05:07:52PM +0100, Catalin Marinas wrote:
-> > > On Fri, Sep 18, 2026 at 03:30:53PM +0200, Steffen Eiden wrote:
-> > > > +# Enable all code shared to s390
-> > > > +KBUILD_CFLAGS	+= -DARM64_S390_COMMON
-> > > > +KBUILD_AFLAGS	+= -DARM64_S390_COMMON
-> > > > +KBUILD_CPPFLAGS	+= -DARM64_S390_COMMON
-> > > 
-> > > Do we actually need these defines? They seem only to be used as markers
-> > > for the awk scripts to extract the definitions. Why do we need the C
-> > > preprocessor involved at all? Could we not just have comment markers:
-> > > 
-> > > /* ARM64_S390_COMMON_BEGIN */
-> > > ...
-> > > /* ARM64_S390_COMMON_END */
-> > >
-> > No technically we do not need those. They could be useful if we find out
-> > that AWK is the wrong tool and move to a C Preprocessor + diff based
-> > approach. 
-> > 
-> > if the ifdev is not closed the compiler will complain, but an 'arm did
-> > not destroy us' verifiaction tool ( I will send one soonish) could do
-> > the same.
-> 
-> iirc the last time we discussed this we didn't think that load-bearing
-> comments were the right tool here. We also briefly floated the idea of
-> using a #pragma region based approach, but in the end we went with the
-> #ifdef preprocessor directives instead, as the least invasive
-> non-comment marker that was available.
+On Tue, 29 Sept 2026 at 10:36, Marc Zyngier <maz@kernel.org> wrote:
+>
+> The MOVALL command moves the pending state of all LPIs targeting a given
+> redistributor to another one. However, we seem to have lost the
+> filtering on the source RD, which means we move all LPIs to the target.
+>
+> Not quite what the spec mandates.
+>
+> Hack update_affinity() to take an optional source vcpu that is used as a
+> filter when non-NULL, restoring the filtering that was performed by
+> vgic_copy_lpi_list() back in the days.
+>
+> Fixes: 11f4f8f3e6e06 ("KVM: arm64: vgic-its: Walk LPI xarray in vgic_its_cmd_handle_movall()")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org
 
-The downside is that the macro affects the preprocessed code. We need to
-ensure they don't leak in uapi headers for example. Not a fan of this
-approach but I don't have a better suggestion either. At least we could
-write them as:
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+Tested-by: Fuad Tabba < fuad.tabba@linux.dev>
 
-#if ARM64_S390_COMMON == 1
+Cheers,
+/fuad
 
-so we get an error if someone misspells the macro name (or they leak in
-uapi headers, vDSO).
 
-It would also be useful for the awk scripts look for the paired #endif
-rather than relying on the comment at the end of the line. Otherwise
-it's not really different from just sticking to comments.
-
--- 
-Catalin
+> ---
+>  arch/arm64/kvm/vgic/vgic-its.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 9e782a4fea7e5..cc02d9b62bd95 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -319,12 +319,16 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+>         return ret;
+>  }
+>
+> -static int update_affinity(struct vgic_irq *irq, struct kvm_vcpu *vcpu)
+> +static int update_affinity(struct vgic_irq *irq,
+> +                          struct kvm_vcpu *from_vcpu, struct kvm_vcpu *vcpu)
+>  {
+>         struct its_vlpi_map map;
+>         int ret;
+>
+>         guard(raw_spinlock_irqsave)(&irq->irq_lock);
+> +       if (from_vcpu && irq->target_vcpu != from_vcpu)
+> +               return 0;
+> +
+>         irq->target_vcpu = vcpu;
+>
+>         if (!irq->hw)
+> @@ -362,7 +366,7 @@ static void update_affinity_ite(struct kvm *kvm, struct its_ite *ite)
+>                 return;
+>
+>         vcpu = collection_to_vcpu(kvm, ite->collection);
+> -       update_affinity(ite->irq, vcpu);
+> +       update_affinity(ite->irq, NULL, vcpu);
+>  }
+>
+>  /*
+> @@ -856,7 +860,7 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
+>
+>         vgic_its_invalidate_cache(its);
+>
+> -       return update_affinity(ite->irq, vcpu);
+> +       return update_affinity(ite->irq, NULL, vcpu);
+>  }
+>
+>  static bool __is_visible_gfn_locked(struct vgic_its *its, gpa_t gpa)
+> @@ -1383,7 +1387,7 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
+>                 if (!irq)
+>                         continue;
+>
+> -               update_affinity(irq, vcpu2);
+> +               update_affinity(irq, vcpu1, vcpu2);
+>
+>                 vgic_put_irq(kvm, irq);
+>         }
+> --
+> 2.47.3
+>
