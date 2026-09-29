@@ -1,165 +1,164 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BAB2513557;
-	Tue, 29 Sep 2026 10:41:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27DA751EDE0;
+	Tue, 29 Sep 2026 10:42:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790678471; cv=none; b=rwfjv0BUkXOPfSGDwXfERHUERhETaq2hNrupI6oAaqvOsVytpGyZ3YAl2OGoZAU0QYbY1BsU0/UL5+9Hxn37jm4wmBAesxEBcRBft5kacj1SmKpkbbjnFBQS8tbJlzelds9ZyOJG0/KxA1gZRBChpe8jL98Q6ChAMg5Fv9IAxSY=
+	t=1790678547; cv=none; b=HO+UmiLm4djYKIR0G0ADCi/NOmZzrW38ejSVRn+Ca1a4XFYTmpO3N1mKpiz/cmwquo6aenbnqvX1DiR8JwrxpKHQhCNVQ1aOe/K/x0zpnj9sTXnpbVClGsOcYGXlCBUn/9XDIVEjLEqJhINL8hg6AExnc4XX751vW/Ax2MaEqF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790678471; c=relaxed/simple;
-	bh=UZr89XgYGJTx/73Z6djBBnqWD8Mg/Y/eUHrTZhuEFYQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k+Ei+GfCYXZbSiC6QB5EM4oEtrIMrGfUVFjfxbSZbqFl+6+SCXBBXbd3WDKe3ky8D0S5iPpOEBPD9itk1J1qrWkJggg67s5HaBG6St2VS9rcEvDqThmw4fcYD4AFkH3MG4iDQfMJjIW/o8x9bmFtVf67gmyTJNEJOa2jPvELgLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=jIm3ldFb; arc=none smtp.client-ip=217.140.110.172
+	s=arc-20240116; t=1790678547; c=relaxed/simple;
+	bh=7/qDNxbBp1ADohJnweYVMAso5g2WF/JpQG/PO2h7y30=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AFWoFAoERaveo1O+iLyUQG1JDMb3VU01awVRngZYBqtRwZg7n6RHS4VJtNTQlI2fK3tGrkGPpVpjz0vcB7u1mTZgt3CN/BBoxkEpPSjowTIRbWyep/48aEG8u1A2sLl/DrP8a8vD7b/NpObyf9/nRQhucX6J9CqK7zbtJB7IDUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=PC0ik/yd; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="jIm3ldFb"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="PC0ik/yd"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 66642497;
-	Tue, 29 Sep 2026 03:40:56 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 44B443F86F;
-	Tue, 29 Sep 2026 03:40:57 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2BA63497;
+	Tue, 29 Sep 2026 03:42:07 -0700 (PDT)
+Received: from [10.57.12.116] (unknown [10.57.12.116])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A904A3F86F;
+	Tue, 29 Sep 2026 03:42:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790678459; bh=UZr89XgYGJTx/73Z6djBBnqWD8Mg/Y/eUHrTZhuEFYQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jIm3ldFb5pk3+tqKp3bdQ7jRyTBU1tt/T+9urehbXxS751TBWNYOlsCXfYtzsid40
-	 pjThz3FBE7KeWWRNb56VbfgtpD+nqCUsLGsts7sSKdMDUhbcN0SzuK7+DnrWg1A1hz
-	 gpXx3jj1Rs1nnhyI/5x63AX1JHz53K4I6IZrCOS8=
-Date: Tue, 29 Sep 2026 11:40:46 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
-	will@kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
-	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
-	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
-Subject: Re: [PATCH v18] arm64: mm: Handle Granule Protection Faults (GPFs)
-Message-ID: <aruVrvQcYCGe0HJ6@arm.com>
-References: <20260913070459.2547407-1-suzuki.poulose@arm.com>
- <aqrGPK0lFBFXL2qY@arm.com>
- <985520fa-99b0-4620-bfee-8e6321b36104@arm.com>
- <aqvCwM_73qMpqzvV@arm.com>
- <749ab0c9-810d-4989-8fa5-1706124f05bc@arm.com>
- <arKVcjCOJf8p9rWL@arm.com>
- <4e315360-5b7a-4a0e-99c0-679a0271e625@arm.com>
+	t=1790678530; bh=7/qDNxbBp1ADohJnweYVMAso5g2WF/JpQG/PO2h7y30=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=PC0ik/ydlxF//U+lOzOT0FQMQrw91+SgzqjHx8bSSGqPb2dUxJ8O169VPU4eiTqnA
+	 fm3nTXkhVLT4Z/MtxA698ns0dQ477LlEA5AfOd7bC58zuZOSRkbEXUw6qxg/8JlVG1
+	 CQlrL5P0hFD8zGPUViyWR8naA+LE5p96UT9StgiU=
+Message-ID: <eacadf9d-439d-48c4-a874-49df7e403f86@arm.com>
+Date: Tue, 29 Sep 2026 11:42:06 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4e315360-5b7a-4a0e-99c0-679a0271e625@arm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v18] arm64: mm: Handle Granule Protection Faults (GPFs)
+Content-Language: en-GB
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, maz@kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+References: <20260913070459.2547407-1-suzuki.poulose@arm.com>
+ <arK3tsTV6EDhI-nt@willie-the-truck> <arOyp8WUrYBAjrGH@arm.com>
+ <arP0IF0MjFUv36AP@willie-the-truck>
+ <49dcab27-1d03-4df2-b7cb-4df4eda6d909@arm.com> <araqPCdcSnqZqPWz@arm.com>
+ <3934b4c9-6b1f-44fa-847e-4fb1e67a58e7@arm.com> <aruTTJiIheHigPSJ@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <aruTTJiIheHigPSJ@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Sep 28, 2026 at 12:01:18PM +0100, Suzuki K Poulose wrote:
-> On 22/09/2026 15:49, Catalin Marinas wrote:
-> > On Tue, Sep 22, 2026 at 02:21:13PM +0100, Suzuki K Poulose wrote:
-> > > I had another look and we could handle this via kvm_fault_is_gmem_abort()
-> > > see in arch/arm64/kvm/mmu.c:
-> > > 
-> > > 
-> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > index 87e49251e0447..af5a4bf961aae 100644
-> > > --- a/arch/arm64/kvm/mmu.c
-> > > +++ b/arch/arm64/kvm/mmu.c
-> > > @@ -1731,6 +1731,9 @@ static int gmem_abort(const struct kvm_s2_fault_desc
-> > > *s2fd)
-> > >          gfn_t gfn;
-> > >          int ret;
-> > > 
-> > > +       if (!kvm_slot_has_gmem(s2fd->memslot))
-> > > +               return -EINVAL;
-> > 
-> > I wonder whether we should add a KVM_BUG_ON() here. With the rest of the
-> > changes, we should never get in this situation. Well, to be revisited
-> > for private devices.
-> > 
-> > Also maybe move it to the caller, kvm_vm_mem_abort(), and not change
-> > kvm_fault_is_gmem_abort(). Something like:
-> > 
-> > 	if (private_ipa_fault(kvm, s2fd->fault_ipa) &&
-> > 	    KVM_BUG_ON(!kvm_slot_has_gmem(s2fd->memslot), kvm))
-> > 		return -EIO;
-> > 
-> > To me it makes more sense for gmem_abort() to be called only *if* it's a
-> > gmem slot. So any inconsistency, avoiding user_mem_abort() for private
-> > memory, should be done in the caller. I assume the caller will also have
-> > to route the private device path as well rather than rely on
-> > gmem_abort().
-> > 
-> > > +
-> > >          if (!perm_fault) {
-> > >                  memcache = get_mmu_memcache(vcpu);
-> > >                  ret = topup_mmu_memcache(vcpu, memcache);
-> > > @@ -2277,10 +2280,12 @@ static bool private_ipa_fault(struct kvm *kvm,
-> > > phys_addr_t fault_ipa);
-> > >   static bool kvm_fault_is_gmem_abort(struct kvm *kvm,
-> > >                                      const struct kvm_s2_fault_desc *s2fd)
-> > >   {
-> > > -       if (!kvm_slot_has_gmem(s2fd->memslot))
-> > > -               return false;
-> > >          if (kvm_memslot_is_gmem_only(s2fd->memslot))
-> > >                  return true;
-> > > +       /*
-> > > +        * For Realms, all private faults must be backed by GMEM.
-> > > +        * TODO: Handle Trusted device private memory mappings.
-> > > +        */
-> > >          if (private_ipa_fault(kvm, s2fd->fault_ipa))
-> > >                  return true;
-> > >          return false;
-> > > 
-> > > 
-> > > Also, I have the following hunk for preventing memslot modifications.
-> > > I will add this to v20 integration branch, which is almost ready ;-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > index 582b48e34486b..87e49251e0447 100644
-> > > --- a/arch/arm64/kvm/mmu.c
-> > > +++ b/arch/arm64/kvm/mmu.c
-> > > @@ -2783,6 +2783,18 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
-> > >          }
-> > >   }
-> > > 
-> > > +static bool kvm_prevents_memslot_change(struct kvm *kvm, enum kvm_mr_change change)
-> > > +{
-> > > +       /* Cannot modify memslots once a pVM has run or Realm created */
-> > > +       if (change != KVM_MR_DELETE && change != KVM_MR_MOVE)
-> > > +               return false;
-> > > +
-> > > +       if ((kvm_vm_is_protected_pkvm(kvm) && pkvm_hyp_vm_is_created(kvm)) ||
-> > > +            kvm_realm_is_created(kvm))
-> > > +               return true;
-> > > +       return false;
-> > > +}
-> > > +
+On 29/09/2026 11:30, Catalin Marinas wrote:
+> On Mon, Sep 28, 2026 at 11:38:01AM +0100, Suzuki K Poulose wrote:
+>> On 25/09/2026 18:07, Catalin Marinas wrote:
+>>> On Wed, Sep 23, 2026 at 05:04:06PM +0100, Suzuki K Poulose wrote:
+>>>> On 23/09/2026 16:45, Will Deacon wrote:
+>>>>> On Wed, Sep 23, 2026 at 12:06:15PM +0100, Catalin Marinas wrote:
+>>>>>> On Tue, Sep 22, 2026 at 06:15:34PM +0100, Will Deacon wrote:
+>>>>>>> On Sun, Sep 13, 2026 at 08:04:58AM +0100, Suzuki K Poulose wrote:
+>>>>>>>> From: Steven Price <steven.price@arm.com>
+>>>>>>>>
+>>>>>>>> If the host attempts to access granules that have been delegated for use
+>>>>>>>> in a realm these accesses will be caught and will trigger a Granule
+>>>>>>>> Protection Fault (GPF).
+>>>>>>>>
+>>>>>>>> A fault during a page walk signals a bug in the kernel and is handled by
+>>>>>>>> oopsing the kernel. A non-page walk fault could be caused by user space
+>>>>>>>> having access to a page which has been delegated to the kernel and will
+>>>>>>>> trigger a SIGBUS to allow debugging why user space is trying to access a
+>>>>>>>> delegated page.
+>>>>>>>>
+>>>>>>>> There is work in progress to unmap the guest_memfd backed private pages from the
+>>>>>>>> linear map. Until we get that support, we could get spurious GPFs from within
+>>>>>>>> the kernel, e.g., load_unaligned_zeropad(). So, try to fix them up for now.
+>>>>>>>>
+>>>>>>>> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>>>>>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>>>>>>>> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+>>>>>>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>>>>>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>>>>>> ---
+>>>>>>>> Changes since v17:
+>>>>>>>>     * Pass untagged address to die_kernel_fault() - Sashiko
+>>>>>>>>     * Explicitly check !user_mode() for fixups - Catalin
+>>>>>>>>     * Switch to BUS_OBJERR for si_code from SI_KERNEL - Catalin
+>>>>>>>>     * Clarify the commit description about the upcoming work on
+>>>>>>>>       unmapping guest_memfd backed pages from linear map
+>>>>>>>> Changes since v16:
+>>>>>>>>     * Update the commit description to indicate why we try to fixup GPFs
+>>>>>>>> Changes since v10:
+>>>>>>>>     * Don't call arm64_notify_die() in do_gpf() but simply return 1.
+>>>>>>>> Changes since v2:
+>>>>>>>>     * Include missing "Granule Protection Fault at level -1"
+>>>>>>>> ---
+>>>>>>>>     arch/arm64/mm/fault.c | 30 ++++++++++++++++++++++++------
+>>>>>>>>     1 file changed, 24 insertions(+), 6 deletions(-)
+>>>>>>>
+>>>>>>> I still don't think we should do this, given that the plan is to unmap
+>>>>>>> the memory from the linear map. If this thing fires, it's a kernel bug
+>>>>>>> and it should be fatal.
+>>>>>>
+>>>>>> If the linear unmapping gets merged first, I agree, no need to handle
+>>>>>> these faults. I haven't followed that series, so no idea where it is at.
+>>>>
+>>>> There doesn't seem to be much progress on that series. Brendan
+>>>> volunteered to resurrect the series, taking over from Nikita [0].
+>>>> But looks like Brendan is not working on this anymore. Will see
+>>>> if someone is really planning to look at it.
+>>>>
+>>>> [0] https://lore.kernel.org/all/DJJ35VLH2PE5.DFD8OYXEOH97@linux.dev
+>>>
+>>> I just realised that this only solves part of the problem. Normal kernel
+>>> allocations are delegated RMM metadata and they'll also trigger GPF
+>>
+>> Other than Kdump, kernel shouldn't try to touch these metadata pages
+>> unless there is a kernel bug ?
 > 
-> This needs to be tweaked for Realm to support non-secure device assignment.
-> Aneesh reports that the Device assignment fails now,
-> because the Device BAR reset deletes the memory slot and re-registers
-> it, which the above change prevents.
+> Hibernate but we need to reject this as well since there's no way you
+> can save and restore the realm memory.
+
+Ack. I have disabled both kexec (including kdump for now, more on that
+below) and hibernate when RMM is active.
+
 > 
-> I will modify that to
-> 1. Prevent "Guest-memfd" backed memory slot deletion. Makes sure that
->    nothing can replace a private memory slot.
-> 2. Allow non-Guest-memfd backed memory slots to be created
->   after the Realm is created. We anyways prevent "private" memory
->   to be mapped from a non-Guest-memfd memslot.
+>> And the userspace wouldn't have a mapping for them anyways ?
+> 
+> That's the aim but proposed KVM/CCA support still allows non-gmem slots
+> to end up delegated (I haven't checked the latest if addressed).
 
-Yes, I think this should be fine. But at least with the last version I
-looked at, we did not prevent private memory from being mapped from
-non-guest_memfd slots (there was a way to delete the gmem slot, add a
-normal one while the guest does a private IPA access). If we prevent
-gmem slot deletion, we no longer have this issue, although we should
-warn somewhere on the user_mem_abort() both.
+This has been addressed in v20 integration branch here :
 
-Anyway, to be discussed on the KVM patches, not here. I raised it
-initially here as I was looking whether a non-gmem slot ever ends up
-private and trigger the GPF.
+https://git.gitlab.arm.com/linux-arm/linux-cca/-/commit/0e697f0f3b2c11855192ae6e80d6036e9374ccef?file_path=arch%2Farm64%2Fkvm%2Fmmu.c#line_b12897615_A2307
 
--- 
-Catalin
+> 
+>>> https://lore.kernel.org/all/a11aba04-eaaa-43fd-988b-a2581b1b2fdb@arm.com/
+>>>
+>>> I think rmi_delegate_range() covers the non-kdump cases, both for
+>>> metadata and realm memory, we could unmap the linear map there (map it
+>>> back in rmi_undelegate_range()).
+>>
+>> We could explore that option for the kernel allocations too.
+> 
+> I do wonder what we gain from unmapping. If architecturally we get a
+> synchronous fault when accessing delegated pages, it's only marginally
+> more code to do_gpf() (and we might need this function anyway for
+> kdump) and we avoid linear map fragmentation. So, I think we just need
+> to agree what's fatal and what can safely recover. We do need Alper's
+> patch for kdump, otherwise we can't fix it up in do_gpf().
+
+Ack. We could add that in later series. For now we block all kexecs.
+
+Cheers
+Suzuki
+
+
+> 
+
