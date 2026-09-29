@@ -1,108 +1,144 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86912518148;
-	Tue, 29 Sep 2026 10:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804862E0B5C;
+	Tue, 29 Sep 2026 10:53:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790679184; cv=none; b=CmtGELTK9EgXRoA5BM2uqiJ+1njRdUk3zkbK7T54OU0+751o0KAAuI4IHV4flpllAouQa/pNvJ4o+RorT2z1DIqBQg9Fl+uGVHP2fwnz+wIgvGIvMrFlS9a4mly1uUfNDF3Y3ueA+EkG+ErSn9R89KZhDoN6VOxkTOtbUFrojNc=
+	t=1790679234; cv=none; b=VHhRle19KbalEuXop3ZQEOs51LYsD2SN7rEEjDUg1X8K6Sf9SqI6NeJYBOsSzicjW3AkvhSUrEffE+H4/g5fRv1dO+lrSuPUqFWS+deTtaUr9ge9IpbiV552Wh7/rNAIiaqIQq9tRkK2tr64YGYQvRvLooK6VlkYAYPBYzRTKt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790679184; c=relaxed/simple;
-	bh=/qXfc2PyXlmCFAbb81VSUKjPWUvH0mHQzbUqFXTq6nA=;
+	s=arc-20240116; t=1790679234; c=relaxed/simple;
+	bh=7O/e9Ld8xUYI9IBX6OlAxL3SOSLv92tRZwVO46ntfXg=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=bI8vWERuXcBP6YO4twax+H4qeG2ocWwQEGdQpLmB+203QT4D59nzw2kMCXFVTBHTeiHUY59Ukp5XZLUXwIH2XIf0hLD93PFJ6fLetZPPO+DYEFGLZ6K0UBm9xJBIDkuTGT4817QKwllkYgHer+Yt08aKm7mqcW73nShvBGRnK58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZnpmvC2D; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=M4eJSxap4sOdOV7JkmfkP3z12+J7W673kZYljGgSFQgTBMYxZJbh91TUhX/vD1zpHsJSQ42Y2sauTNGIgQv+AiymCazxWr+5g4s4tbK5TBancmFNKX/u7kwZ4TJVL3TqxdUdcFTvSQkMiebMMKR1wVGSdXY+BrcAXFzplLhXlSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ofHGj+/x; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZnpmvC2D"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A2031F000FF;
-	Tue, 29 Sep 2026 10:52:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ofHGj+/x"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3CB21F000FF;
+	Tue, 29 Sep 2026 10:53:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790679173;
-	bh=qcvb+HcDFBPgFiYCSFMpPsOjJNWfSEvLog2yvY4plsE=;
+	s=k20260515; t=1790679229;
+	bh=fLauXofaVGzaJUTrfNYISw7i+jXs1j6Mat75lwXeeFc=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=ZnpmvC2DNT6WCfmdUkhUBs5rMzAVpikQIPO8fAjHGRzmxxW02u6R9+2sB3++8vrXm
-	 tPr5P2YoJn7Ss7uigQralhDUmpICMzT9WUIFzhhA7IekWPy3ghb26ISo4DzF35J75r
-	 UTaVKEsL99+2yMBAc0gsngT0dVgy/B3poWa3Jr7vMGkj8cqQlcB+q026jCg/zCULLM
-	 rceRcF+h4XEh2Nva/JgU99IZmfjQM3BD1D8egACbA5UPaz94AvIyGUDK9eo20aTtC5
-	 GhI4+sSKbce98KU35aBVDv+x9lxqt07Uuf/Zffs8uFkFVBK+9bLWSJaiHIk1jxavKu
-	 mRru3aixVg+sA==
+	b=ofHGj+/xknncoqwZPuIGIlnFEYbRf8Y0wZ6f8uy+gX13gKblb7QIp01oAxGkxo2v6
+	 vHSOlQD0dN6AftIg2OJYNzB9th26pIpCPAWh/lDun0sxXlwnXZnXlU72pmyLJrss3i
+	 EchjAg20GRc5wo/FsL4vsZTB06C6uOzoNsnXzu9apFzDrMaOss7TxiSEcWv1RFfRzH
+	 +xFda1lDPAkSzYP81SJJkzioNCUQRem77gz3kn3FcwKrgsV4W08r7ju54l4auuFzw3
+	 mQnMd0xYidLjMCZANbge5OaKFfmgWy6Z+K/fzJopbZ/rHfRyyVI2i3Mljz3Ox4IGYL
+	 kAwoLuuF5K4Hw==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 10/15] KVM: Add kvm_arch_dirty_ring_size_updated()
- hook
+Subject: Re: [PATCH v5 09/15] KVM: arm64: Handle HDBSS faults
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Tian Zheng" <zhengtian10@huawei.com>
-Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260929103655.85107-11-zhengtian10@huawei.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+In-Reply-To: <20260929103655.85107-10-zhengtian10@huawei.com>
 References: <20260929103655.85107-1-zhengtian10@huawei.com>
- <20260929103655.85107-11-zhengtian10@huawei.com>
+ <20260929103655.85107-10-zhengtian10@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 29 Sep 2026 10:52:52 +0000
-Message-Id: <20260929105253.0A2031F000FF@smtp.kernel.org>
+Date: Tue, 29 Sep 2026 10:53:48 +0000
+Message-Id: <20260929105348.E3CB21F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [Low] kvm: missing kvm_arch_dirty_ring_size_updated() stub causes build f=
-ailure
+- [High] arm64: KVM checks DABT-specific HDBSSF bit on Instruction Aborts
+- [High] KVM: guest-reachable WARN_ON_ONCE assertions in HDBSS fault handler
 --
 
-commit 78c5608c44701deb8c1679c3f53cbd1303655474
-Author: Tian Zheng <zhengtian10@huawei.com>
+commit 93c9cd523cd96ee876cb40ad4d3ecad32cc8aeff
+Author: Eillon <yezhenyu2@huawei.com>
 
-KVM: Add kvm_arch_dirty_ring_size_updated() hook
+KVM: arm64: Handle HDBSS faults
 
-This commit adds a kvm_arch_dirty_ring_size_updated() hook called right
-after kvm->dirty_ring_size is recorded. It provides a weak no-op default
-implementation for architectures to override.
+This commit introduces handling for hardware stopped promoting writable-cle=
+an
+descriptors, which raises a stage-2 Permission fault with ESR_EL2.ISS2.HDBS=
+SF.
+It dispatches these from kvm_handle_guest_abort() via a new helper to clear
+the fault and report -EFAULT.
 
-> diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_rin=
-g.h
-> index eb10d87adf7d5..c2b922791530d 100644
-> --- a/include/linux/kvm_dirty_ring.h
-> +++ b/include/linux/kvm_dirty_ring.h
-> @@ -73,6 +73,7 @@ static inline void kvm_dirty_ring_free(struct kvm_dirty=
-_ring *ring)
->  #else /* CONFIG_HAVE_KVM_DIRTY_RING */
-> =20
->  int kvm_cpu_dirty_log_size(struct kvm *kvm);
-> +void kvm_arch_dirty_ring_size_updated(struct kvm *kvm);
-
-[Severity: Low]
-Does this cause a build failure on architectures that do not define
-CONFIG_HAVE_KVM_DIRTY_RING?
-
-The prototype is placed inside the #else block (when the feature is
-enabled), but there is no static inline stub provided in the #ifndef
-block. Furthermore, virt/kvm/dirty_ring.c (which contains the weak
-definition) is not linked when the config is disabled.
-
+> diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
+> index be0d12555c848..893a8c4248bcc 100644
+> --- a/arch/arm64/kvm/dirty_bit.c
+> +++ b/arch/arm64/kvm/dirty_bit.c
 [ ... ]
+> +int kvm_handle_hdbss_fault(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 prod;
+> +	u64 fsc;
+> +
+> +	if (WARN_ON_ONCE(!system_supports_hdbss()))
+> +		return -EFAULT;
+> +
+> +	if (WARN_ON_ONCE(!vcpu_hdbss_enabled(vcpu)))
+> +		return -EFAULT;
 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 85f42289748dc..d109062f6a1cf 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -5011,6 +5011,7 @@ static int kvm_vm_ioctl_enable_dirty_log_ring(struc=
-t kvm *kvm, u32 size)
->  		r =3D -EINVAL;
->  	} else {
->  		kvm->dirty_ring_size =3D size;
-> +		kvm_arch_dirty_ring_size_updated(kvm);
->  		r =3D 0;
->  	}
+[Severity: High]
+Are these WARN_ON_ONCE assertions safe to expose on a guest-reachable path?
 
-[Severity: Low]
-Since kvm_vm_ioctl_enable_dirty_log_ring() is unconditionally compiled,
-will calling kvm_arch_dirty_ring_size_updated() here trigger an implicit
-function declaration and link error on architectures like s390x or powerpc
-that do not enable the dirty ring?
+If a guest manages to inadvertently route execution here (for instance, via=
+=20
+an Instruction Abort matching the HDBSSF bit in its ISS2 field), these=20
+assertions can be triggered directly by the guest.
+
+If the host has panic_on_warn enabled, this could lead to a host kernel
+panic and a complete denial of service. Should these be standard error
+returns without the warnings instead?
+
+> +
+> +	prod =3D read_sysreg_s(SYS_HDBSSPROD_EL2);
+> +	fsc =3D FIELD_GET(HDBSSPROD_EL2_FSC_MASK, prod);
+> +
+> +	if (fsc =3D=3D HDBSSPROD_EL2_FSC_OK)
+> +		/* Buffer full: the exit path drained it before handle_exit. */
+> +		return 1;
+> +
+> +	if (fsc !=3D HDBSSPROD_EL2_FSC_ExternalAbort &&
+> +	    fsc !=3D HDBSSPROD_EL2_FSC_GPF)
+> +		WARN_ONCE(1,
+
+[Severity: High]
+Similarly, could this WARN_ONCE be triggered by a guest-driven event?
+
+> +			  "Unexpected HDBSS fault type, FSC: 0x%llx (prod=3D0x%llx, vcpu=3D%d=
+)\n",
+> +			  fsc, prod, vcpu->vcpu_id);
+> +
+> +	/* Clear FSC so hardware dirty state updates can resume. */
+> +	write_sysreg_s(prod & ~HDBSSPROD_EL2_FSC_MASK, SYS_HDBSSPROD_EL2);
+> +	return -EFAULT;
+> +}
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 85a98d2c23a99..7bf82d65041c8 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+[ ... ]
+> @@ -2315,6 +2316,9 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+> =20
+>  	is_iabt =3D kvm_vcpu_trap_is_iabt(vcpu);
+> =20
+> +	if (esr_iss2_is_hdbssf(esr))
+> +		return kvm_handle_hdbss_fault(vcpu);
+> +
+
+[Severity: High]
+Does this inadvertently check the HDBSSF bit for Instruction Aborts?
+
+The esr_iss2_is_hdbssf() helper in arch/arm64/include/asm/esr.h extracts
+the ISS2 bit without verifying the Exception Class. Because the ISS layout
+is per-EC, an Instruction Abort's ISS2 field might coincidentally have this
+bit set for an entirely unrelated reason.=20
+
+If that happens, a valid Instruction Abort would be misidentified as a
+HDBSS fault, routing execution into kvm_handle_hdbss_fault() and causing
+guest breakage. Should this check be gated by !is_iabt or a specific
+Exception Class check?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260929103655.8510=
-7-1-zhengtian10@huawei.com?part=3D10
+7-1-zhengtian10@huawei.com?part=3D9
