@@ -1,118 +1,153 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899183E49C4;
-	Tue, 29 Sep 2026 11:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7B1650B436;
+	Tue, 29 Sep 2026 11:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790679640; cv=none; b=Up+0GZBhn5nNpAFIWx6c+MJtCR9B3/uf9LFbTTAlrg9E33sGYAZ7Rt6V4UYnwrOg0k94wJgkZ1Rn1T7G1ElWq4R20jyTLh4KXR5bFpdo6kT+mWPOi42Ic8mxvLD+P3emvqXWZ9wnmepF0l2yVkGvSQi+j1UMvQX4m5djo9ozHbg=
+	t=1790679703; cv=none; b=sTKKt2tqRd6FCHaoIFf4RpMlhFY65eazKN3Ts9jL6WHSSLtUd6WJHEuPX4U/aMF8XOzK9+B2pByDSWoTR6JD7QGj2HYx6KVN88jgHNHGjTEsKBYnRTN4t/m6o599xsQv+oI47ia/HA0B9ZPlZDtMDG4n7RjpFMoKKltrGXeMhpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790679640; c=relaxed/simple;
-	bh=lS+0A+DdmauQ+xlTKpMHOI3V3lsXJfd6BmK3X3NPW00=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=bwP0hyMTy9DiNT3LPrzcTkdIT/C9XQKgniyF/Mhhmr5LlzGLMOtY6nawnwMMKtqlAKqpKUrVKXlB6JxvBQRqj2kultpp0ScnV4HeBbx3pRK0X3RXzGIPruhjKwfmnC0z4fVyyM50Q0Q9M1ZRl2UkEjvaD3JLflBuMmPFO41qt7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kG4oloR7; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790679703; c=relaxed/simple;
+	bh=Rpzw0ZWBwUreMmYoy4UjzmcXitYDynavT/IpC3eZEb0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M3YvTh6UvKc/zFku2KpD9f4cKf0DiAOCpQnHJ20Nf2ZGlvBvYiohRE7VfUoQ4PcLxUppg5XiPnqxkZUXNY5zFhoZkeFITth8t4XdBTXEuaMtUbY7ZKgkyOHRA7uRS6cXjPeAeYS22BLPKUQnpw9+hEO7DX4+5V2tCOWFseot7qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=BPltN72V; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kG4oloR7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71FB41F000FF;
-	Tue, 29 Sep 2026 11:00:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790679635;
-	bh=7kKZtyyvkJsdy+7BuXlZ0qrabjEcLoNuV3CPN4wtZwQ=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=kG4oloR7vT0HAbyfBPV00EsMVRhR3ZbFxJUQw8uUhGHCi7OB8/zv9AqU4/9xYMVzo
-	 UJIcMN+8sz2ZvhoMLh7LqthGCGR7+95IHjMu9sDPGz8w3eZgu1k42ic2JojXVyVhNP
-	 +2lK6gILinQDW88MxQzVAo/k5fliyg24c3pqF2RthaKweR1uaoA/dMujEVX2oqglSs
-	 sRSnhJQn1655xte1HWGmm6xI6OFXswn091O8ioC4D/jWwDsa6GwPHWZBGueDAKvKh3
-	 o/2S0XATcBB7XO3QWE3DY7HQQQyo7CbZZfCSJJSRmLEyDIAI205Pn63qXOjX5+Ihqm
-	 FULIXI63d7pWQ==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 11/15] KVM: arm64: Reserve dirty ring space for the
- HDBSS buffer
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Tian Zheng" <zhengtian10@huawei.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260929103655.85107-12-zhengtian10@huawei.com>
-References: <20260929103655.85107-1-zhengtian10@huawei.com>
- <20260929103655.85107-12-zhengtian10@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 29 Sep 2026 11:00:35 +0000
-Message-Id: <20260929110035.71FB41F000FF@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="BPltN72V"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EC2AA1476;
+	Tue, 29 Sep 2026 04:01:31 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 99FBA3F86F;
+	Tue, 29 Sep 2026 04:01:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790679695; bh=Rpzw0ZWBwUreMmYoy4UjzmcXitYDynavT/IpC3eZEb0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BPltN72Vlfh8ep8ZYrPiJ25xeFhxXn1AjH+dSMLOj2OQWnFkXSQkcKPPsdCdatRu9
+	 fvtPj88NOaLO3mxAkQBwC+LFg1+eZzWuHx4/KB8SNtSLgyjB8pniVvIKJaQeZiDZME
+	 A62mmIRSEfeBwwvYrzqWTYIVPGYqnm40zrR8w1dE=
+Date: Tue, 29 Sep 2026 12:01:29 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+	will@kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+	sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
+Subject: Re: [PATCH v19 6/7] firmware: arm_rmm: Ensure the RMM has GPT
+ entries for memory
+Message-ID: <aruaeLI76_kcvIhp@arm.com>
+References: <20260924135201.850038-1-suzuki.poulose@arm.com>
+ <20260924135201.850038-7-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260924135201.850038-7-suzuki.poulose@arm.com>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] arm64: kvm: UAPI breakage for dirty ring size on 64KB page systems
---
-
-commit 38dde0ab2f10c37402c620c7b1328624808205ad
-Author: Tian Zheng <zhengtian10@huawei.com>
-
-KVM: arm64: Reserve dirty ring space for the HDBSS buffer
-
-This commit reserves space in the dirty ring for CPU-side dirty buffers by
-implementing kvm_cpu_dirty_log_size(). It also pins the HDBSS buffer size to
-PAGE_SIZE when the dirty ring is enabled.
-
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 7bf82d65041c8..c1e09ba98d48a 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-[ ... ]
-> @@ -2841,3 +2841,11 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool =
-was_enabled)
-> =20
->  	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
->  }
-> +
-> +int kvm_cpu_dirty_log_size(struct kvm *kvm)
+On Thu, Sep 24, 2026 at 02:52:00PM +0100, Suzuki K Poulose wrote:
+> +/*
+> + * Make sure the area is tracked by RMM at FINE granularity.
+> + * We do not support changing the tracking yet.
+> + */
+> +static int rmi_verify_memory_tracking(phys_addr_t start, phys_addr_t end)
 > +{
-> +	if (!system_supports_hdbss())
-> +		return 0;
+> +	while (start < end) {
+> +		unsigned long ret, category, state, next;
 > +
-> +	return kvm_hdbss_buffer_size(kvm) / sizeof(u64);
+> +		ret = rmi_granule_tracking_get(start, end, &category, &state, &next);
+> +		if (ret != RMI_SUCCESS)
+> +			return -ENOMEM;
+> +
+> +		if (WARN_ON(next <= start))
+> +			return -ENXIO;
+> +
+> +		if (state != RMI_TRACKING_FINE ||
+> +		    category != RMI_MEM_CATEGORY_CONVENTIONAL) {
+> +			/* TODO: Set granule tracking in this case */
+> +			pr_err("Granule tracking for region isn't fine/conventional: %llx-%lx\n",
+> +			       start, next);
+> +			return -ENODEV;
+> +		}
+> +		start = next;
+> +	}
+> +
+> +	return 0;
 > +}
+> +
+> +/*
+> + * rmi_gpt_info - Query the GPT info for the given PAR.
+> + * @start: Base of the physical address region
+> + * @end: Top of the physical address region
+> + * @out_top: Top of the physical address region for which
+> + *		the GPT @out_gpt_par_state is valid
+> + * @out_gpt_par_state: State of the GPT covered by [start, out_top)
+> + */
+> +static long rmi_gpt_info(unsigned long start, unsigned long end,
+> +			 unsigned long *out_top,
+> +			 unsigned long *out_gpt_par_state)
+> +{
+> +	struct arm_smccc_1_2_regs regs = {
+> +		SMC_RMI_GPT_INFO, start, end,
+> +	};
+> +
+> +	rmi_smccc_invoke(&regs);
+> +	if (regs.a0 != RMI_SUCCESS)
+> +		return regs.a0;
+> +
+> +	if (out_top)
+> +		*out_top = regs.a1;
+> +	if (out_gpt_par_state)
+> +		*out_gpt_par_state = regs.a2;
+> +
+> +	return RMI_SUCCESS;
+> +}
+> +
+> +/*
+> + * We do not support creating L1 GPTs yet. So, make sure that
+> + * all the regions are managed by the firmware.
+> + */
+> +static int rmi_verify_gpt_firmware_managed(phys_addr_t start, phys_addr_t end)
+> +{
+> +	unsigned long l0gpt_sz;
+> +	unsigned long next, par_state;
+> +
+> +	l0gpt_sz = 1UL << (30 + FIELD_GET(RMI_FEATURE_REGISTER_1_L0GPTSZ,
+> +					  rmi_feat_reg(1)));
+> +	start = ALIGN_DOWN(start, l0gpt_sz);
+> +	end = ALIGN(end, l0gpt_sz);
+> +
+> +	while (start < end) {
+> +		long ret = rmi_gpt_info(start, end, &next, &par_state);
+> +
+> +		if (ret != RMI_SUCCESS)
+> +			return -ENOMEM;
 
-[Severity: High]
-Does this calculation break the UAPI for standard dirty ring size requests =
-on
-64KB page systems?
+Nit: what does -ENOMEM actually mean here? Was there any allocation?
+Maybe -ENXIO is better suited, as the one below. Also, is it useful to
+print something like we do further down?
 
-Since KVM_ARM_HDBSS_DEFAULT_SIZE is tied to PAGE_SIZE, this calculation sca=
-les
-with the system page size. On a 64KB page system, kvm_hdbss_buffer_size() y=
-ields
-65536 bytes, returning 8192 reserved entries (65536 / 8).
+Same comment for rmi_verify_memory_tracking().
 
-When a userspace process requests a standard dirty ring size of 65536 bytes
-(64KB) via KVM_ENABLE_CAP for KVM_CAP_DIRTY_LOG_RING, it seems the ioctl wi=
-ll
-now fail:
+> +		if (WARN_ON(next <= start))
+> +			return -ENXIO;
+> +
+> +		if (par_state != RMI_GPT_PAR_PLAT) {
+> +			pr_err("GPT for the region is not managed by firmware %llx-%lx\n",
+> +				start, next);
+> +			return -ENOMEM;
 
-virt/kvm/kvm_main.c:kvm_vm_ioctl_enable_cap() {
-    ...
-	if (size < kvm_dirty_ring_get_rsvd_entries(kvm) *
-	    sizeof(struct kvm_dirty_gfn) || size < PAGE_SIZE)
-		return -EINVAL;
-    ...
-}
+Nit: in v18, Gavin suggested returning -ENODEV here (the hunk he
+proposed). I think it makes more sense and it matches the -ENODEV in
+rmi_verify_memory_tracking().
 
-Because (8192 + 64) * 16 =3D 132096 bytes is greater than the requested 655=
-36
-bytes, the ioctl rejects previously valid userspace configurations with -EI=
-NVAL,
-which would cause QEMU and other VMMs to fail to start VMs.
-
-Could this buffer size be decoupled from PAGE_SIZE to avoid the entry infla=
-tion
-and ABI breakage on 64KB page systems?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260929103655.8510=
-7-1-zhengtian10@huawei.com?part=3D11
+-- 
+Catalin
