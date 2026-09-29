@@ -1,69 +1,108 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56C2651AEDE;
-	Tue, 29 Sep 2026 10:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86912518148;
+	Tue, 29 Sep 2026 10:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790679069; cv=none; b=PsZ7BRA+MBUCae4OQzyWUH8NLTGKRTAUbfPSryLVaL9a/uRvwKpZtdQ5qyKJ5z8G3PCNi/sNOrgE/GsMZDLbLSWSWUC5uIL6cdYj/zvylwVfz4/VpsuiJd42i0cBWrafrMEDv/dcnLR+UnWDaHrl+yg/cJZiUbkXUh240rI38y8=
+	t=1790679184; cv=none; b=CmtGELTK9EgXRoA5BM2uqiJ+1njRdUk3zkbK7T54OU0+751o0KAAuI4IHV4flpllAouQa/pNvJ4o+RorT2z1DIqBQg9Fl+uGVHP2fwnz+wIgvGIvMrFlS9a4mly1uUfNDF3Y3ueA+EkG+ErSn9R89KZhDoN6VOxkTOtbUFrojNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790679069; c=relaxed/simple;
-	bh=x5DMhANbWDxXz6e9rKTqJx8Hdqk+thHnj9yygpRPhng=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=skSsqduNg2OEO0Yk82rRBuiZXL9EiV6Z0qSOoqC0HefP6BBbKN2F+ZCgdJNCgAX6alv47o9Mxb9LjUzC5YE7P47bCQQuGzMEFvOz5wzqw72uWyS20VJD6fbGIxfAhwRhotQLBKSiROgM9yRVIK8/RHbkCTfcrnPrNmFzqnR07rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=I5ZrEQ9b; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1790679184; c=relaxed/simple;
+	bh=/qXfc2PyXlmCFAbb81VSUKjPWUvH0mHQzbUqFXTq6nA=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=bI8vWERuXcBP6YO4twax+H4qeG2ocWwQEGdQpLmB+203QT4D59nzw2kMCXFVTBHTeiHUY59Ukp5XZLUXwIH2XIf0hLD93PFJ6fLetZPPO+DYEFGLZ6K0UBm9xJBIDkuTGT4817QKwllkYgHer+Yt08aKm7mqcW73nShvBGRnK58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZnpmvC2D; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="I5ZrEQ9b"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3CA40143D;
-	Tue, 29 Sep 2026 03:50:41 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 597E93F86F;
-	Tue, 29 Sep 2026 03:50:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790679044; bh=x5DMhANbWDxXz6e9rKTqJx8Hdqk+thHnj9yygpRPhng=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=I5ZrEQ9bGn2rdwPFtyyjCXCgK1HyER2LL6tqrJSFRwFSiklCEegQIXEvBlESinUHx
-	 wYQsdl8ukvfHurffs9W/WX3vmnMOzRI8JmdpoyUPY92+wjsLUqIklbr92nD/V5kIOs
-	 R8FNSIB3TCWI36S0yj9nEaCqB9w4XHmSZmjIkPPg=
-Date: Tue, 29 Sep 2026 11:50:30 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
-	will@kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
-	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
-	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
-	sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
-Subject: Re: [PATCH v19 0/7] firmware: arm_rmm: Add RMM v2.0 base RMI support
-Message-ID: <aruWz-QkcdD9ETbC@arm.com>
-References: <20260924135201.850038-1-suzuki.poulose@arm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZnpmvC2D"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A2031F000FF;
+	Tue, 29 Sep 2026 10:52:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790679173;
+	bh=qcvb+HcDFBPgFiYCSFMpPsOjJNWfSEvLog2yvY4plsE=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=ZnpmvC2DNT6WCfmdUkhUBs5rMzAVpikQIPO8fAjHGRzmxxW02u6R9+2sB3++8vrXm
+	 tPr5P2YoJn7Ss7uigQralhDUmpICMzT9WUIFzhhA7IekWPy3ghb26ISo4DzF35J75r
+	 UTaVKEsL99+2yMBAc0gsngT0dVgy/B3poWa3Jr7vMGkj8cqQlcB+q026jCg/zCULLM
+	 rceRcF+h4XEh2Nva/JgU99IZmfjQM3BD1D8egACbA5UPaz94AvIyGUDK9eo20aTtC5
+	 GhI4+sSKbce98KU35aBVDv+x9lxqt07Uuf/Zffs8uFkFVBK+9bLWSJaiHIk1jxavKu
+	 mRru3aixVg+sA==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v5 10/15] KVM: Add kvm_arch_dirty_ring_size_updated()
+ hook
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Tian Zheng" <zhengtian10@huawei.com>
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, kvm@vger.kernel.org, "Oliver
+ Upton" <oupton@kernel.org>
+In-Reply-To: <20260929103655.85107-11-zhengtian10@huawei.com>
+References: <20260929103655.85107-1-zhengtian10@huawei.com>
+ <20260929103655.85107-11-zhengtian10@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 29 Sep 2026 10:52:52 +0000
+Message-Id: <20260929105253.0A2031F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260924135201.850038-1-suzuki.poulose@arm.com>
 
-On Thu, Sep 24, 2026 at 02:51:54PM +0100, Suzuki K Poulose wrote:
->  arch/arm64/Kconfig                |    1 +
->  arch/arm64/kernel/cpufeature.c    |    1 +
->  drivers/firmware/Kconfig          |    1 +
->  drivers/firmware/Makefile         |    1 +
->  drivers/firmware/arm_rmm/Kconfig  |   25 +
->  drivers/firmware/arm_rmm/Makefile |    2 +
->  drivers/firmware/arm_rmm/rmi.c    | 1072 +++++++++++++++++++++++++++++
->  include/linux/arm-rmi-cmds.h      |  558 +++++++++++++++
->  include/linux/arm-smccc-rmi.h     |  505 ++++++++++++++
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Low] kvm: missing kvm_arch_dirty_ring_size_updated() stub causes build f=
+ailure
+--
 
-One more nit: patches 1 and 2 I think add new header files without a
-MAINTAINERS entry. You can add them to arm64.
+commit 78c5608c44701deb8c1679c3f53cbd1303655474
+Author: Tian Zheng <zhengtian10@huawei.com>
 
--- 
-Catalin
+KVM: Add kvm_arch_dirty_ring_size_updated() hook
+
+This commit adds a kvm_arch_dirty_ring_size_updated() hook called right
+after kvm->dirty_ring_size is recorded. It provides a weak no-op default
+implementation for architectures to override.
+
+> diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_rin=
+g.h
+> index eb10d87adf7d5..c2b922791530d 100644
+> --- a/include/linux/kvm_dirty_ring.h
+> +++ b/include/linux/kvm_dirty_ring.h
+> @@ -73,6 +73,7 @@ static inline void kvm_dirty_ring_free(struct kvm_dirty=
+_ring *ring)
+>  #else /* CONFIG_HAVE_KVM_DIRTY_RING */
+> =20
+>  int kvm_cpu_dirty_log_size(struct kvm *kvm);
+> +void kvm_arch_dirty_ring_size_updated(struct kvm *kvm);
+
+[Severity: Low]
+Does this cause a build failure on architectures that do not define
+CONFIG_HAVE_KVM_DIRTY_RING?
+
+The prototype is placed inside the #else block (when the feature is
+enabled), but there is no static inline stub provided in the #ifndef
+block. Furthermore, virt/kvm/dirty_ring.c (which contains the weak
+definition) is not linked when the config is disabled.
+
+[ ... ]
+
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 85f42289748dc..d109062f6a1cf 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -5011,6 +5011,7 @@ static int kvm_vm_ioctl_enable_dirty_log_ring(struc=
+t kvm *kvm, u32 size)
+>  		r =3D -EINVAL;
+>  	} else {
+>  		kvm->dirty_ring_size =3D size;
+> +		kvm_arch_dirty_ring_size_updated(kvm);
+>  		r =3D 0;
+>  	}
+
+[Severity: Low]
+Since kvm_vm_ioctl_enable_dirty_log_ring() is unconditionally compiled,
+will calling kvm_arch_dirty_ring_size_updated() here trigger an implicit
+function declaration and link error on architectures like s390x or powerpc
+that do not enable the dirty ring?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260929103655.8510=
+7-1-zhengtian10@huawei.com?part=3D10
