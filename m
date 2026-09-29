@@ -1,272 +1,165 @@
-Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6206751A128
-	for <kvmarm@lists.linux.dev>; Tue, 29 Sep 2026 10:37:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BAB2513557;
+	Tue, 29 Sep 2026 10:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790678251; cv=none; b=mnUUoWa1ovPqmlw6mJjmp8piWJbx98ENNKx/vlnvhnDrXguo6NxqHqdMLNIGm9IaTpl4mrHD5QEXk8JBGBmBd72ARKrvLzDUJTNRRx67lKEwUQbQx0MaB7KxS+Lx4QomRem1sGXJS409Eus2A+y3VGDMb0TFubxHBk5W9BGDqYw=
+	t=1790678471; cv=none; b=rwfjv0BUkXOPfSGDwXfERHUERhETaq2hNrupI6oAaqvOsVytpGyZ3YAl2OGoZAU0QYbY1BsU0/UL5+9Hxn37jm4wmBAesxEBcRBft5kacj1SmKpkbbjnFBQS8tbJlzelds9ZyOJG0/KxA1gZRBChpe8jL98Q6ChAMg5Fv9IAxSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790678251; c=relaxed/simple;
-	bh=tgG+2nD/E61nkV/W3IiYt7H0jtYf+9wl3Uv9RGfHQJA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pIFEqSYv2ZbCuqeea9kfi1z4vgzG5IDRe2ckYoKC3UjLB8rneaXaX5EyxnIM/WiW7abVgJqawNFtZsXTTXSqsObd/R4pfQF+373oZatdEBkNAM+f9cgvkoFjJ1hP0ATOl8C+b9GjL0VtUcUNRYbLOVNeByuI3rcRHpA+/pdsF74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=QPNRPNxj; arc=none smtp.client-ip=113.46.200.224
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1790678471; c=relaxed/simple;
+	bh=UZr89XgYGJTx/73Z6djBBnqWD8Mg/Y/eUHrTZhuEFYQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k+Ei+GfCYXZbSiC6QB5EM4oEtrIMrGfUVFjfxbSZbqFl+6+SCXBBXbd3WDKe3ky8D0S5iPpOEBPD9itk1J1qrWkJggg67s5HaBG6St2VS9rcEvDqThmw4fcYD4AFkH3MG4iDQfMJjIW/o8x9bmFtVf67gmyTJNEJOa2jPvELgLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=jIm3ldFb; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="QPNRPNxj"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=76CIBP4H7EHvQiPkpaJ4BZqjj5jFIlrcHq0F+WJzE3o=;
-	b=QPNRPNxj53Z83AQ082PUc0ysOfKsvgBR9/nwqNMuCIFcP1D27lpB6ny4oQ8PPiispsxpANzQK
-	rqrssDfkVBe5YZvgbZ+3VoL9aHeYvSItzkxP7CdzrWJ5gHFh7de0LomBLtjnc8VSHcqrR0J2R0p
-	VmLHvAt9Irm0Y+jPbxXKxwM=
-Received: from mail.maildlp.com (unknown [172.19.163.15])
-	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4hvDpv6k1sz1cyVf;
-	Tue, 29 Sep 2026 18:25:59 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 064BB40578;
-	Tue, 29 Sep 2026 18:37:06 +0800 (CST)
-Received: from huawei.com (10.50.163.32) by kwepemr100010.china.huawei.com
- (7.202.195.125) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Tue, 29 Sep
- 2026 18:37:05 +0800
-From: Tian Zheng <zhengtian10@huawei.com>
-To: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
-	<will@kernel.org>, <corbet@lwn.net>, <pbonzini@redhat.com>,
-	<zhengtian10@huawei.com>, <leo.bras@arm.com>
-CC: <yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>,
-	<yangjinqian1@huawei.com>, <caijian11@h-partners.com>,
-	<liuyonglong@huawei.com>, <tangchengchang@huawei.com>,
-	<yezhenyu2@huawei.com>, <yubihong@huawei.com>, <linuxarm@huawei.com>,
-	<joey.gouly@arm.com>, <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<seiden@linux.ibm.com>, <suzuki.poulose@arm.com>, <fuad.tabba@linux.dev>,
-	<mark.rutland@arm.com>, <seanjc@google.com>, <rdunlap@infradead.org>,
-	<linux-doc@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<skhan@linuxfoundation.org>
-Subject: [PATCH v5 12/15] KVM: arm64: Derive the VM hardware dirty mode from dirty logging
-Date: Tue, 29 Sep 2026 18:36:52 +0800
-Message-ID: <20260929103655.85107-13-zhengtian10@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20260929103655.85107-1-zhengtian10@huawei.com>
-References: <20260929103655.85107-1-zhengtian10@huawei.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="jIm3ldFb"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 66642497;
+	Tue, 29 Sep 2026 03:40:56 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 44B443F86F;
+	Tue, 29 Sep 2026 03:40:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790678459; bh=UZr89XgYGJTx/73Z6djBBnqWD8Mg/Y/eUHrTZhuEFYQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jIm3ldFb5pk3+tqKp3bdQ7jRyTBU1tt/T+9urehbXxS751TBWNYOlsCXfYtzsid40
+	 pjThz3FBE7KeWWRNb56VbfgtpD+nqCUsLGsts7sSKdMDUhbcN0SzuK7+DnrWg1A1hz
+	 gpXx3jj1Rs1nnhyI/5x63AX1JHz53K4I6IZrCOS8=
+Date: Tue, 29 Sep 2026 11:40:46 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+	will@kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
+Subject: Re: [PATCH v18] arm64: mm: Handle Granule Protection Faults (GPFs)
+Message-ID: <aruVrvQcYCGe0HJ6@arm.com>
+References: <20260913070459.2547407-1-suzuki.poulose@arm.com>
+ <aqrGPK0lFBFXL2qY@arm.com>
+ <985520fa-99b0-4620-bfee-8e6321b36104@arm.com>
+ <aqvCwM_73qMpqzvV@arm.com>
+ <749ab0c9-810d-4989-8fa5-1706124f05bc@arm.com>
+ <arKVcjCOJf8p9rWL@arm.com>
+ <4e315360-5b7a-4a0e-99c0-679a0271e625@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4e315360-5b7a-4a0e-99c0-679a0271e625@arm.com>
 
-Both HAFDBS and HDBSS flip VTCR_EL2.HD at memslot-update time. Two
-independent toggles allow an intermediate HDBSS-set/HD-clear state,
-an illegal combination, and need locking against concurrent updates.
+On Mon, Sep 28, 2026 at 12:01:18PM +0100, Suzuki K Poulose wrote:
+> On 22/09/2026 15:49, Catalin Marinas wrote:
+> > On Tue, Sep 22, 2026 at 02:21:13PM +0100, Suzuki K Poulose wrote:
+> > > I had another look and we could handle this via kvm_fault_is_gmem_abort()
+> > > see in arch/arm64/kvm/mmu.c:
+> > > 
+> > > 
+> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > index 87e49251e0447..af5a4bf961aae 100644
+> > > --- a/arch/arm64/kvm/mmu.c
+> > > +++ b/arch/arm64/kvm/mmu.c
+> > > @@ -1731,6 +1731,9 @@ static int gmem_abort(const struct kvm_s2_fault_desc
+> > > *s2fd)
+> > >          gfn_t gfn;
+> > >          int ret;
+> > > 
+> > > +       if (!kvm_slot_has_gmem(s2fd->memslot))
+> > > +               return -EINVAL;
+> > 
+> > I wonder whether we should add a KVM_BUG_ON() here. With the rest of the
+> > changes, we should never get in this situation. Well, to be revisited
+> > for private devices.
+> > 
+> > Also maybe move it to the caller, kvm_vm_mem_abort(), and not change
+> > kvm_fault_is_gmem_abort(). Something like:
+> > 
+> > 	if (private_ipa_fault(kvm, s2fd->fault_ipa) &&
+> > 	    KVM_BUG_ON(!kvm_slot_has_gmem(s2fd->memslot), kvm))
+> > 		return -EIO;
+> > 
+> > To me it makes more sense for gmem_abort() to be called only *if* it's a
+> > gmem slot. So any inconsistency, avoiding user_mem_abort() for private
+> > memory, should be done in the caller. I assume the caller will also have
+> > to route the private device path as well rather than rely on
+> > gmem_abort().
+> > 
+> > > +
+> > >          if (!perm_fault) {
+> > >                  memcache = get_mmu_memcache(vcpu);
+> > >                  ret = topup_mmu_memcache(vcpu, memcache);
+> > > @@ -2277,10 +2280,12 @@ static bool private_ipa_fault(struct kvm *kvm,
+> > > phys_addr_t fault_ipa);
+> > >   static bool kvm_fault_is_gmem_abort(struct kvm *kvm,
+> > >                                      const struct kvm_s2_fault_desc *s2fd)
+> > >   {
+> > > -       if (!kvm_slot_has_gmem(s2fd->memslot))
+> > > -               return false;
+> > >          if (kvm_memslot_is_gmem_only(s2fd->memslot))
+> > >                  return true;
+> > > +       /*
+> > > +        * For Realms, all private faults must be backed by GMEM.
+> > > +        * TODO: Handle Trusted device private memory mappings.
+> > > +        */
+> > >          if (private_ipa_fault(kvm, s2fd->fault_ipa))
+> > >                  return true;
+> > >          return false;
+> > > 
+> > > 
+> > > Also, I have the following hunk for preventing memslot modifications.
+> > > I will add this to v20 integration branch, which is almost ready ;-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > index 582b48e34486b..87e49251e0447 100644
+> > > --- a/arch/arm64/kvm/mmu.c
+> > > +++ b/arch/arm64/kvm/mmu.c
+> > > @@ -2783,6 +2783,18 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+> > >          }
+> > >   }
+> > > 
+> > > +static bool kvm_prevents_memslot_change(struct kvm *kvm, enum kvm_mr_change change)
+> > > +{
+> > > +       /* Cannot modify memslots once a pVM has run or Realm created */
+> > > +       if (change != KVM_MR_DELETE && change != KVM_MR_MOVE)
+> > > +               return false;
+> > > +
+> > > +       if ((kvm_vm_is_protected_pkvm(kvm) && pkvm_hyp_vm_is_created(kvm)) ||
+> > > +            kvm_realm_is_created(kvm))
+> > > +               return true;
+> > > +       return false;
+> > > +}
+> > > +
+> 
+> This needs to be tweaked for Realm to support non-secure device assignment.
+> Aneesh reports that the Device assignment fails now,
+> because the Device BAR reset deletes the memory slot and re-registers
+> it, which the above change prevents.
+> 
+> I will modify that to
+> 1. Prevent "Guest-memfd" backed memory slot deletion. Makes sure that
+>    nothing can replace a private memory slot.
+> 2. Allow non-Guest-memfd backed memory slots to be created
+>   after the Realm is created. We anyways prevent "private" memory
+>   to be mapped from a non-Guest-memfd memslot.
 
-Replace both with kvm_arch_update_hw_dirty_mode(), a pure function
-of the static capabilities and the number of logging memslots:
+Yes, I think this should be fine. But at least with the last version I
+looked at, we did not prevent private memory from being mapped from
+non-guest_memfd slots (there was a way to delete the gmem slot, add a
+normal one while the guest does a private IPA access). If we prevent
+gmem slot deletion, we no longer have this issue, although we should
+warn somewhere on the user_mem_abort() both.
 
-  - logging && HDBSS-capable  -> HD|HA|HDBSS
-  - logging, no HDBSS         -> off
-  - !logging && HAFDBS-cap.   -> HD|HA
+Anyway, to be discussed on the KVM patches, not here. I raised it
+initially here as I was looking whether a non-gmem slot ever ends up
+private and trigger the GPF.
 
-Recomputing rather than toggling needs no locking against racing
-writers, and a vCPU created mid-migration inherits the current mode
-from the shared VTCR at its first vcpu_load().
-
-The HAFDBS leg is not gated on nested virtualization: shadow MMUs
-build their own VTCR without HD, and the L1-visible HAFDBS ID is
-capped at AF-only. The HDBSS leg stays gated for now, as the nested
-exit-flush and harvest paths are unaudited.
-
-kvm_s2_fault_compute_prot() consults the live HD state of the target
-MMU rather than the canonical VTCR, so a nested read fault does not
-install a writable-clean shadow entry, which is read-only under the
-HD-less shadow VTCR.
-
-The mode switch issues one KVM_REQ_RELOAD_STAGE2 followed by a
-VMID-wide TLB invalidation, as the request only reloads VTCR_EL2 and
-cached translations outlive the old mode. HA is always set together
-with HD, as FEAT_HDBSS requires VTCR_EL2.{HDBSS,HA,HD}.
-
-Also factor kvm_has_nv() out of vcpu_has_nv() for the VM-level HDBSS
-check.
-
-This is a rework of Leonardo Bras' "Enable HAFDBS for guests not on
-migration".
-
-Link: https://lore.kernel.org/all/20260901171558.2674031-6-leo.bras@arm.com/
-Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
----
- arch/arm64/include/asm/kvm_mmu.h    | 18 ++++++++++
- arch/arm64/include/asm/kvm_nested.h |  9 +++--
- arch/arm64/kvm/hyp/pgtable.c        | 14 ++++++--
- arch/arm64/kvm/mmu.c                | 56 ++++++++++++++++++++++++++++-
- 4 files changed, 91 insertions(+), 6 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 6eae7e7e2a68..24407194444a 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -390,6 +390,24 @@ static inline bool kvm_supports_cacheable_pfnmap(void)
- 	       cpus_have_final_cap(ARM64_HAS_CACHE_DIC);
- }
-
-+static inline bool kvm_supports_hafdbs(void)
-+{
-+	return IS_ENABLED(CONFIG_ARM64_HW_AFDBM) && has_vhe() &&
-+		cpus_have_final_cap(ARM64_HW_DBM);
-+}
-+
-+static inline bool kvm_supports_hdbss(struct kvm *kvm)
-+{
-+	return system_supports_hdbss() && !kvm_has_nv(kvm);
-+}
-+
-+void kvm_arch_update_hw_dirty_mode(struct kvm *kvm);
-+
-+static inline bool kvm_hw_dirty_enabled(struct kvm_s2_mmu *mmu)
-+{
-+	return mmu->vtcr & VTCR_EL2_HD;
-+}
-+
- #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
- void kvm_s2_ptdump_create_debugfs(struct kvm *kvm);
- void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu);
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 586026e85903..6226b330d7c8 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -7,11 +7,16 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_pgtable.h>
-
--static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
-+static inline bool kvm_has_nv(const struct kvm *kvm)
- {
- 	return (!__is_defined(__KVM_NVHE_HYPERVISOR__) &&
- 		cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) &&
--		vcpu_has_feature(vcpu, KVM_ARM_VCPU_HAS_EL2));
-+		kvm_vcpu_has_feature(kvm, KVM_ARM_VCPU_HAS_EL2));
-+}
-+
-+static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
-+{
-+	return kvm_has_nv(vcpu->kvm);
- }
-
- /* Translation helpers from non-VHE EL2 to EL1 */
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 9dde7e779699..0472edcb63b9 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1313,9 +1313,17 @@ static int stage2_wrprotect_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 		ctx->mm_ops->mark_page_dirty(kvm_pte_to_phys(ctx->old));
-
- 	/*
--	 * We may race with the CPU trying to set the access flag here,
--	 * but worst-case the access flag update gets lost and will be
--	 * set on the next access instead.
-+	 * The plain WRITE_ONCE races with hardware updates; both are
-+	 * benign.
-+	 *
-+	 * AF: the update may be lost, and is set on the next access.
-+	 *
-+	 * Dirty state: we only rewrite entries whose old value had S2AP[1]
-+	 * set, while hardware only promotes entries with S2AP[1] clear, so
-+	 * the two never touch the same entry. The one overlap is DBM removal
-+	 * on writable-clean blocks: a racing promotion is demoted back to
-+	 * read-only, but the write is still recorded in the HDBSS buffer and
-+	 * the folio was marked dirty at fault-in, so nothing is lost.
- 	 */
- 	if (kvm_pte_valid(ctx->old) && ctx->old != new)
- 		WRITE_ONCE(*ctx->ptep, new);
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index c1e09ba98d48..17786453c004 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -2022,7 +2022,19 @@ static int kvm_s2_fault_compute_prot(const struct kvm_s2_fault_desc *s2fd,
- 	if (s2vi->map_writable) {
- 		*prot |= KVM_PGTABLE_PROT_W;
-
--		if (s2vi->device || !memslot_is_logging(s2fd->memslot) ||
-+		/*
-+		 * Check the live HD state of the MMU being installed
-+		 * into, not the static capability: HD is off for the
-+		 * whole VM as soon as any memslot logs, and under HD=0 a
-+		 * writable-clean entry behaves as read-only, costing an
-+		 * extra permission fault per page. Shadow MMUs never
-+		 * carry HD, so nested installs are always writable-dirty.
-+		 * A racing flip is benign: at worst one page takes one
-+		 * extra fault.
-+		 */
-+		if (s2vi->device ||
-+		    !(memslot_is_logging(s2fd->memslot) ||
-+		      kvm_hw_dirty_enabled(s2fd->vcpu->arch.hw_mmu)) ||
- 		    kvm_is_write_fault(s2fd->vcpu))
- 			*prot |= KVM_PGTABLE_PROT_DIRTY;
- 	}
-@@ -2617,6 +2629,45 @@ int __init kvm_mmu_init(u32 hyp_va_bits)
- 	return err;
- }
-
-+/*
-+ * The VM's hardware dirty-management mode is a derived value, a pure
-+ * function of the static capabilities and the number of logging
-+ * memslots, so recomputing it on every event cannot lose an update
-+ * and needs no locking against racing writers:
-+ *
-+ *   logging && HDBSS-capable  ->  HD|HA|HDBSS (hardware tracking)
-+ *   logging, no HDBSS         ->  off (write-protect faults)
-+ *   !logging && HAFDBS-cap.   ->  HD|HA (only written pages go dirty)
-+ */
-+void kvm_arch_update_hw_dirty_mode(struct kvm *kvm)
-+{
-+	unsigned long cur, target;
-+	bool logging = atomic_read(&kvm->nr_memslots_dirty_logging) != 0;
-+
-+	if (logging && kvm_supports_hdbss(kvm))
-+		target = VTCR_EL2_HD | VTCR_EL2_HA | VTCR_EL2_HDBSS;
-+	else if (logging || !kvm_supports_hafdbs())
-+		target = 0;
-+	else
-+		target = VTCR_EL2_HD | VTCR_EL2_HA;
-+
-+	cur = kvm->arch.mmu.vtcr & (VTCR_EL2_HD | VTCR_EL2_HA | VTCR_EL2_HDBSS);
-+	if (cur == target)
-+		return;
-+
-+	kvm->arch.mmu.vtcr = (kvm->arch.mmu.vtcr &
-+			      ~(VTCR_EL2_HD | VTCR_EL2_HA | VTCR_EL2_HDBSS)) |
-+			     target;
-+
-+	kvm_make_all_cpus_request(kvm, KVM_REQ_RELOAD_STAGE2);
-+
-+	/*
-+	 * The request only reloads VTCR_EL2; cached translations keep
-+	 * the old permissions until invalidated.
-+	 */
-+	kvm_flush_remote_tlbs(kvm);
-+}
-+
- void kvm_arch_commit_memory_region(struct kvm *kvm,
- 				   struct kvm_memory_slot *old,
- 				   const struct kvm_memory_slot *new,
-@@ -2624,6 +2675,9 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
- {
- 	bool log_dirty_pages = new && new->flags & KVM_MEM_LOG_DIRTY_PAGES;
-
-+	/* Derive the hardware dirty mode from the new logging state. */
-+	kvm_arch_update_hw_dirty_mode(kvm);
-+
- 	/*
- 	 * At this point memslot has been committed and there is an
- 	 * allocated dirty_bitmap[], dirty pages will be tracked while the
---
-2.43.0
-
+-- 
+Catalin
