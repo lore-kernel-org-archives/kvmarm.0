@@ -1,486 +1,401 @@
-Received: from mail-yx2-f39.google.com (mail-yx2-f39.google.com [74.125.224.167])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-002c1b01.pphosted.com (mx0b-002c1b01.pphosted.com [148.163.155.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC989282F06
-	for <kvmarm@lists.linux.dev>; Tue, 29 Sep 2026 13:35:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.167
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED5F52CCE4
+	for <kvmarm@lists.linux.dev>; Tue, 29 Sep 2026 13:40:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.155.12
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790688906; cv=pass; b=KDEXdgdBM7y+u6abPTxIhbewAg7Cncm+WWKH6/QTsmMc7c57FFsY2WRSZiLyGK1Wu1kY1992wh7w9nNAGCQ/y9GCdAgoOlfqdGZZ/OcpJ5ke9IcsDrMZjvbakqSlla4g3VR51vMtRP4L4EbXY1AIpizSuit4x9vl5RIwsqMa9iw=
+	t=1790689248; cv=fail; b=K8Dq+wBU1xFrtteeEFbd6Gx4cchpry/2r74Y80CZKnW2H6U+plqKhsdsEqit6/T1znDgQcMTQV9irDzx8n75NpFD6qqewTvTkcdIJrlu6yH/SIOSuaP0c4Mw5sRccFjqt1XD0IFX6McfJxh614q9usI1bnECOG6xz2EdI0o+ySQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790688906; c=relaxed/simple;
-	bh=/tc9oQ2dzlmLeYdO5vX1NZl1Se2vgA63V7Zb+Q3n0PE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pdgy/JJrxvLp1PamYNvShe5ORt7vI9NdRyxz/wwO6p7Ojo9vpEKQJpJNiIcpcJ3SkEcGnESVaOIOvsJlN7d+D9mca9yP3E5ZlAGA3C9odPKU/asYKM/Y8nbvizw83IkRt/wpzsvQlWN6isanzz9UDnobJnUydH8v0wnjUtrblnc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gRgO40Rw; arc=pass smtp.client-ip=74.125.224.167
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1790689248; c=relaxed/simple;
+	bh=1a/fyVnQNH7SV6ZDliQObjj43kk0d0/fgB9+dUxL3aE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=nY2dpvFTeMlTeiCX4KXc9KWeNhcOQBBFlc0FfU96PQi/OT1Bxvok9xOsZjj50tzG2FDZ6FAHyhwDsqHziDwQ7WMYCF7sli/TW1h7Vxq4qbVaa43aKvMaAn71IuaMO6ItDWCSkbGir/rbZvzB85rrW26UIxo+g4RSCRq6fHpITSE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=O/7CkdsQ; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=vzBwbNcr; arc=fail smtp.client-ip=148.163.155.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gRgO40Rw"
-Received: by mail-yx2-f39.google.com with SMTP id 956f58d0204a3-67559a09ec2so1278186d50.0
-        for <kvmarm@lists.linux.dev>; Tue, 29 Sep 2026 06:35:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790688903; cv=none;
-        d=google.com; s=arc-20260327;
-        b=NY8E2UAGWCyaMCP+I9pUUVGDgVK77/jNLqUN8I1mqUjTQoWCI1p/a9hV6hP8APytuL
-         jWNNo6KI939WzRem/3TROPM7jokolSH7ebC9GchSvDiDZqdWcmpofhHrDXqJyTTz0Dsh
-         XBSmm7KuX9/0jYBZqxK+96kLo9lhbGPuDCRCmvKhhBiHOzXAR+rI/7NjT8Rd0L+LoQs9
-         jv98V0jYinuiaXuDua+lXr+DuxQogoD/B7+eWmn+1ah9TdECpW6kGgdhBsb1InO+Cr63
-         st31OGxHR8x4vY6UcXUq9++lInEKvjgA+ktTJolOYuKazue4g8kkv3qeG5S/lNrlXMA4
-         6kSA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=CMqmTdvAS89k83oYXVNW5NcZm+vCN1W6BXXzB1vwMug=;
-        fh=qXnTfogbtMnIX0/TPsrttPvALlr5iCyilMsa2vTTmI4=;
-        b=Fpn9XBiu1ho0qQqFNIFfDsvf6FcG+cMOqbUpb9pHGOtmQ0MRGcOuRUbDzzwHw1sfJB
-         yeH4YqGDXWUFc7ikKi9SRx8iKe09NVL0fNiKDKqfThC2xbM2De1PcKjXQDx/sWdTfBws
-         059zSxI9VTzjacufPok7B0UtkPoourOZlSRP78G4fPfW9uxJ5UrM7YcZHYLWUXrR7Umw
-         mu6CC+ur/ezXw0tiUZUwmHKaZvV0EVcmBV2TQbxdqOGY8DJ0JHKdEnJWaBzacpfnlx0F
-         uJXvZITufBfhSXOCmoiOgFBCP4gAUKzw/00MVUEA50og687CZL8cKCNxERIOW6GuQsIU
-         cE2A==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790688903; x=1791293703; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=CMqmTdvAS89k83oYXVNW5NcZm+vCN1W6BXXzB1vwMug=;
-        b=gRgO40RwCxqsijXXip83chCIj3V+w8qwQ71s0lQp8wI46FIIVQjgXDNMrGrpQtTzZg
-         eC7k5HHr277xcjHDy1Q52vSOD2H3YfUGEveeMxdIUpp61knUDPL2ve9KW75NjHDW9mfL
-         NOY11NFDXSbmbtRBn7kUj1cDWW23m/mT4q7f9sG4JwnpPNXlthr9ky0szTyaVt2s0E7N
-         BnG0oWa1f/kpdVuuedqTWrgOWpbmN9MhM9k9YXcWaG0TJMO2TXt/HEiM7LTd2Ix7nXyM
-         s6sew0GtsfL6KcEgbylGwuv/5o+wDVQ7QDel/epiAgSe8jf9fX6CqUGlJdoBZxDLkcHj
-         C2SA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790688903; x=1791293703;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=CMqmTdvAS89k83oYXVNW5NcZm+vCN1W6BXXzB1vwMug=;
-        b=tH/YQBSfn+Smkddvbx/6jEitZnnByt8pLFCEOrjL5k5/p/65R8z1FbMKviTYGUJJHc
-         NGstba7zY7ngaaHV8xRHO5zLbVjGXzQzjpij3HVhwN+i3Cv8X1J4pWqARjRt0BZqQhed
-         yMBAukLFNy9Nr8EbORcB5UOf9bRESSGoNJck79gz0aOJ1Bw4JWgSbg4L1VvIyyjFaxZP
-         vAB0N7VIzDTB+6Orsw2KKq09RrD47QyK0Vhjy9ClSa14IglgmuefWlaPXrK/IYNqcXfw
-         yi71uUAyADs0y9Okl+c8+gEjldQE1g9w7DEmrsx1MnqGxqEPLCASNETfnjEwoUWph/3I
-         N/ww==
-X-Forwarded-Encrypted: i=1; AKwUvBykS7BOFJyRCtImJhLReqp5KjujAXF2XCTjOw3XTQUd3YPJWIHPPhvUD9HpPm/d5SEpaxIM5OA=@lists.linux.dev
-X-Gm-Message-State: AFq9FYI5983DsVexdrPI2ndej8WIvVHDY5R0Gvgu/3qUZb1qfmvIEq5P
-	KYzCR8cMryw4VXykffalvQhMKo1K3GrkFR79UBIwTA27AK0k2xVlMYVSMb87Sakh81MoWmFxHbB
-	r7ZvqVRtIEn6JEIC8sI+r2M7daG6mMXSql2jyBXXj
-X-Gm-Gg: AYBFou0FP4H5dxyN4FQIVNfLCJUQVSEk0+G+MybPOwtj7iqfzTpyCo1mRNnk00xUzcB
-	7QKIA9humEkiessJciyvi+ePbUTzOORm0MNpcaHZKAQAAznv+3AluHECydVgjhMHnqtcZV77E1j
-	EMIb/YuTDQqqyenp75Vg2/FdoZxEEI3IDoQ1EbtTPEvMe5nNJ9qJdjatQiNzkNs5wQmfX+oyGkU
-	r76EHSOiDyoV3DiTvHeOUGf5ek9hTIBLhKLxPVPZClq6oLAIfhknkSKHBN1XaAc0IbPYc4ZUAUm
-	d7aYT9tI+xNHQzfgb0eq9TTGHaMhMO7k7ovEMgybBPxCCJMIEMT+WW44Q7LEQtHaTKBD24h3SXL
-	JSbqBdfs6ot5+hMcwpMjReFlwG8VQ4ZvbEfCz1MbE71dsghiSGd9v+ZzjcHeFghCSmLQL3DF5N7
-	pf8goN3iv9Lg==
-X-Received: by 2002:a05:690e:806:10b0:671:8e1:2386 with SMTP id
- 956f58d0204a3-672ed2d1ef2mr4268077d50.44.1790688901718; Tue, 29 Sep 2026
- 06:35:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="O/7CkdsQ";
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="vzBwbNcr"
+Received: from pps.filterd (m0127842.ppops.net [127.0.0.1])
+	by mx0b-002c1b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68TAkNQt2944637;
+	Tue, 29 Sep 2026 06:40:20 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
+	cc:content-id:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	proofpoint20171006; bh=1a/fyVnQNH7SV6ZDliQObjj43kk0d0/fgB9+dUxL3
+	aE=; b=O/7CkdsQ9owZSabPT9KkazuRaMZn8TfJqLsY493ScofDRQn02IzrwevIN
+	4kuWwYriH8BM9aJyfSyH7QRSyz5h6smE8IXlefpk0xAhtE9MkUQYfXWFmrpr+9H/
+	SfjJygqBBccWHLPb2g9vAdtwfodEUIEDCUywkbUZyDBpFcXIoasAb+5GPrYkpQyk
+	UXUuNrAKqIDdh8uOkcRJWZoNdUU+6j/wonRHkTyQMAERnWhGDAQ6fwiC3ZGRZ7mp
+	xWgqZ4UQTISltOnTpQqeEz3HrLb4E4UvAQqXvmHjkDQ2BArZYOM/7Bh77AedP3CM
+	dQ7S35B9XRU9DZ66xzUfYp5gvPo7w==
+Received: from ph8pr06cu001.outbound.protection.outlook.com (mail-westus3azon11022099.outbound.protection.outlook.com [40.107.209.99])
+	by mx0b-002c1b01.pphosted.com (PPS) with ESMTPS id 4gxdccebjg-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 29 Sep 2026 06:40:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WheHR3iXmfJT0V3wc8fidpdkJMdab/i9RccBN8BYH6S0NXsecHh30LjqwXX6qQrlSQbRMdOUaEBHCUfQ2TXXSPS8nTPzHdr0zRHJ2KqjHDH5+jdCkuIKzs3LEzLkZ5nZ7yYy3iVTUHAvhZ/419gmcCRsRuOOgad/S/jvfnC0d39wvQQjW5UtESZLLMk8QgmACJOzeFficOLW8IMDBBPY1IRQ/cVkEmDfwqMLHLOdWAqxxpwB1gK5MmM/e83kxmkJSVhaoXiWvV2XZajm5wEPDtsh6Gb8bnlLsi8PSBTQrNVfPK8wBO2jgaPQQwBuSDPGoG9+6tlnebTQU6BZDIyJXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1a/fyVnQNH7SV6ZDliQObjj43kk0d0/fgB9+dUxL3aE=;
+ b=sSpCZu5vn4MMgNXPzQKiH+5wxoJA/n6k6YmnjQg3/66Mztxzj9S0AkaWZfO7GOcbELU4FC2o3B7LhQU6XilVu3RidRH7wRN2EgzhyLpfU4+tcPTd5Dox63VibEdpzWSmy0NI8bJqxDtakwLUBJwrhkZKMkIl4XhlZ1I423mWBlXGZA9nZyftmB9B8a9v80CwPdSPFZvs6IJsfODw10HYzxA1fUxOIKnY87btWTubzWbMynuwjRu31+LOykF7h4RnrG1eVRQ2Lm2gW/3KcMfluz+6TP+3q7re4lGbs0EvS5MhjZRIchfhNC3u+xtPA8gDC5QXB5J8lqEl4VJUcHEbPA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1a/fyVnQNH7SV6ZDliQObjj43kk0d0/fgB9+dUxL3aE=;
+ b=vzBwbNcrQwgRMLcS7DPrRyI2zrRQzLTfgcqEjlwX1HhnmyXfOlX1AmTq+ZMU/JVtf3h2gthkHIu68dtTbW98JT2svfnMgKXZ0oXL2pvwaWb9IXP4PjCKraLIL5QMjblpwXDgpWcBiu9OSnr5TnM+O6FbyKKfeF5qimi4LD/6sGIsKg7xg74Et8Q2zc9GghcP5qpKms2yi4mublfxTsY2E6VtL6aVn/YC1NsWwqAT5ImWGWBxo2zCGMeZn8LO/H/K6KbSgXeozc5ht6UO1br4VOBvxFkCzydb4ZO5QpsF+f7ge4/8pqgiux4I7Wx1qPfidzGUo2MhAyfZCOAV4Z+eXQ==
+Received: from SA2PR02MB7564.namprd02.prod.outlook.com (2603:10b6:806:146::23)
+ by CH2PR02MB6982.namprd02.prod.outlook.com (2603:10b6:610:8a::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.451.24; Tue, 29 Sep
+ 2026 13:40:17 +0000
+Received: from SA2PR02MB7564.namprd02.prod.outlook.com
+ ([fe80::1ea5:acb6:ebe1:e1c4]) by SA2PR02MB7564.namprd02.prod.outlook.com
+ ([fe80::1ea5:acb6:ebe1:e1c4%5]) with mapi id 15.21.0451.026; Tue, 29 Sep 2026
+ 13:40:14 +0000
+From: Khushit Shah <khushit.shah@nutanix.com>
+To: "eric.auger@redhat.com" <eric.auger@redhat.com>
+CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "qemu-arm@nongnu.org"
+	<qemu-arm@nongnu.org>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+        "richard.henderson@linaro.org"
+	<richard.henderson@linaro.org>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+        "berrange@redhat.com"
+	<berrange@redhat.com>,
+        "abologna@redhat.com" <abologna@redhat.com>,
+        "jdenemar@redhat.com" <jdenemar@redhat.com>,
+        "gshan@redhat.com"
+	<gshan@redhat.com>,
+        "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
+        "sebott@redhat.com" <sebott@redhat.com>,
+        "armbru@redhat.com"
+	<armbru@redhat.com>,
+        "philmd@linaro.org" <philmd@linaro.org>,
+        "yangjinqian1@huawei.com" <yangjinqian1@huawei.com>,
+        Shaju Abraham
+	<shaju.abraham@nutanix.com>,
+        Mark Cave-Ayland <mark.caveayland@nutanix.com>,
+        "ping@khushitshah.com" <ping@khushitshah.com>,
+        Sandesh Patel
+	<sandesh.patel@nutanix.com>
+Subject: Re: [RFC PATCH v4 09/25] target/arm: introduce named CPU model
+ infrastructure
+Thread-Topic: [RFC PATCH v4 09/25] target/arm: introduce named CPU model
+ infrastructure
+Thread-Index: AQHdScVnGYC5tZAlYUmhP0pAa7CODbbdv54AgAfc5oA=
+Date: Tue, 29 Sep 2026 13:40:14 +0000
+Message-ID: <C0EF18E7-1AC0-4A8A-ABFE-14575634C8B2@nutanix.com>
+References: <20260921123249.1708067-1-khushit.shah@nutanix.com>
+ <20260921123249.1708067-10-khushit.shah@nutanix.com>
+ <872fd689-3a28-4c0d-ab0f-86a7062bf974@redhat.com>
+In-Reply-To: <872fd689-3a28-4c0d-ab0f-86a7062bf974@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nutanix.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA2PR02MB7564:EE_|CH2PR02MB6982:EE_
+x-ms-office365-filtering-correlation-id: cf1fdb3b-cd5d-41fc-2743-08df1e2f30fb
+x-proofpoint-crosstenant: true
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|366016|1800799024|23010399003|38070700021|260925021311599003|56012099006|260925021911599003|6133799003|3023799007|260925022911599003|10067099003|18002099003|4143699003|22082099003;
+x-microsoft-antispam-message-info:
+ d6tUKeF6S+8bOuzrdylwtwFd1b4+p+LDSTAdxvzk2uiQzb++I65b+cHQLNVk62HmqIBKJVM4y7WvskItPVQ/Xpv4pC1QcdSFl378iwIiWH4u7kuv4f5gGXUSZUw0tbngYFQqpjZG2PG8zLoLUhJ8P/3tSTmF4ikzxmJyctvGlaY/IxAFTQg1c2Hxnc7DKx05YL/bcAXQJcYoH68nlcX5MEUV1T+NCutICxrlNYvjNca7LljUTu9/7nXRHOjkpTN/NhyOwBakVCX72eKg98WCjoJffj+bNuz1xIJTHSKkJBzUa5SIOzu6aMOksnWcjzNRts45b2/M6Ao8GnuB2z0dr1Inl9qzk3HCApKvCjri9i/vKSLdT+yVhWHIZhJUufkAoPyxr49UCxxm8gfY3E9UL4IbF+7UQmLC6i4kNGRfg+iB9XAVhVvgzzd7AHpRDNE5qG1fgF0vv2q/I7sVCz4doBto2A3GyA5VvEtYOLt836iq6znluC4HW90FGt71qJkCNVcTTf+/BIAZjYSoS2tqJxSIka+wtb4/UfGflUHv4QWmrl2WyxUfN5uG79S51uX/t4PSKJtSclKr4SfPY5dlhLP1/n3suNVnN9KWKaW5taWYnWxffMmV/aeOMtaGCWoWFf3UjVq+1YgK8F6+vsYEMN+iLMLmjIJReXmnUAYZ8cPwgKWIJe6zDfFx0QtD5D4m7nc8FwnM+vltB17j5wclKvNoZopPXK+XzP4Q97EI0GI=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA2PR02MB7564.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(23010399003)(38070700021)(260925021311599003)(56012099006)(260925021911599003)(6133799003)(3023799007)(260925022911599003)(10067099003)(18002099003)(4143699003)(22082099003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?WXhWRDAyN25zVTczWmNEdlBGTXc4RU4yVlAyYllpdE9wRzcrQ0dpSEcrMmpa?=
+ =?utf-8?B?eUttQ3pBczdTdkNtVlFCeE5kcTlQaGF6eGdJNHVmR0w2cHVRNG9rVkpBRFNn?=
+ =?utf-8?B?bWhKcGROVWM2VUZoWTRJOE5HLytCU3hwWHZRNkIwSWFPcGVUanNsWDBsNGlp?=
+ =?utf-8?B?U216NXUwSGVYR0FmSUE3MHhIZHpoUW4waUdkSUVQV0ZWMVIrejZuVzVzNFR3?=
+ =?utf-8?B?dkxaUGNueWZjWkgxM0hFU0xIeGRWaFhEUkFKY3Joc1RQTlhva0pFdXNZdlZt?=
+ =?utf-8?B?REF1VGdaQmN0ci8ySjYxNWdXV3RsSDFkS1U1NWFEa0NnVzBoRWhwOFhQaGZO?=
+ =?utf-8?B?T2NZRVdjdzVVLzFYV25nWWdwV1lYdnZHMFBIdUhDbk9qeXlJVCtIazVQYktx?=
+ =?utf-8?B?WmVWeVlBSitidVY5Mk1ndU5MdlpKdEtGUkk0NVJDdjN0dGtLRDAveEFaNjZj?=
+ =?utf-8?B?V0dNejBPem1NMFZ3WU8vdGxlYjNKYnFpZTRCVlhkQUg0YjFTa01kblJhWi8y?=
+ =?utf-8?B?aFJnU3RhSnJScTJkaXpNTzZNeGJyL2VMbU9qSkpBVVFYNCsrRHJUMk5aNDR3?=
+ =?utf-8?B?VlpsWWlBa1dvNTA3S0JHaTRvZHQ0YkJUT2ZyTkVhZUFldmhrdENZSHRud0NR?=
+ =?utf-8?B?UUtjM1dJUnRlbU91enRrdkhRdy9NT1c5SCtESUJUcnlTVWJOVFN3Z2V3V0sx?=
+ =?utf-8?B?eDBJRGE4MlNlRVpTeStXSUdSWHFydThlZGZSamFQVTd0REdEbkhjU041blAv?=
+ =?utf-8?B?c2ZGRDJ3MHJSOSs4OVVwWkkxcm51THhnNzl5Z0V2dWdYUDhMVTM1bGtDUHhK?=
+ =?utf-8?B?am84Z2hYbG1UQnZrZkl0enBiNE9KSitiUlVxWmRyaUd0STcyTDMrY01kbytD?=
+ =?utf-8?B?SFZ5Q1dIYS9YYm5EY09sTVdDbVYxb0NSVnNqdFA0TGZCbEpraG9JRWdhdHNZ?=
+ =?utf-8?B?NXhHZVRvMTJJR0lpaXRoWGNuZ0xnY3VQbUhER0pNOWMyZzN3bUY5VzhPWUJM?=
+ =?utf-8?B?MndGRkMxeVFJNlkybHVNTkUxWXR2NlNEdFBCQWpEMzk4ci9vVEY5QStjU3Mw?=
+ =?utf-8?B?MDJjblR4L1lyL3gzOVpyQnpyUGlwWDNzTDNCRWt2REJQb1RoNzZWNXhFQ2pm?=
+ =?utf-8?B?VjcvWUJlSWxrNFR1RWtjRFRQT2RXS3BPZlR3WjE2UGpveW8veE1uZkpLK1FF?=
+ =?utf-8?B?TVpKS2hKNGZiSkJlZlppTzh5bUdJK2RSaFRiRTlTajJpeGZDZE9aVmhhQWJ1?=
+ =?utf-8?B?UWd0NzAxN1NGOXVFYUxQRllQWVZaNk5tcFFnc2FkcFZJNmQ4bTBxT1hBc0dr?=
+ =?utf-8?B?WFJyQWhmTndGdGdxVFdKM2gyTE03QkdOQis0a0RkQlFpZlJKeGMyTnBMMjNT?=
+ =?utf-8?B?TlF1bUh6TktGeXZvL2pZbVpjS0FJNElCeHdqV3dWd1QyMy81NFVxZ1RKQmFT?=
+ =?utf-8?B?NjI4NHVXYktHMmttM2svQlN0eHhtNkwzN1Zoc1VRWE14eXJ6UmNLMDRwNk5s?=
+ =?utf-8?B?RWlGZE5NNGNlbmF0ZEVNeXVIRWdOZ2MvT1ZNcjdlZ0JCNUIzRlRaeVhTTXJn?=
+ =?utf-8?B?T3Z5WkVTZlh4eVVLcEN3a3dSbTM0dDU2Z3dja3JvblRhdGhRSWNiWGhuazF5?=
+ =?utf-8?B?Rlk1QWI1N2UzNFdzNTljaURFWWRSMktFLzhWbURGT1hkeTl1Q2xOSzN3Zlc0?=
+ =?utf-8?B?SXNOZGlzbnhseGsvR2Rzb1VrT3MwcndURXpSRG5pRFFnbVJVdGZmblZ4MVVr?=
+ =?utf-8?B?WVlrL2pIOHFWdHRpYitSN1ZJVFVBdFZ0dVRIa1FyRnR4TUNXR2hMY0IzN05n?=
+ =?utf-8?B?VkxlVHpJeHFVWVZyWmlSelZzUVpmZ0IvcHhaT2ZaOFNCVGcwQnFQVXc2V0VC?=
+ =?utf-8?B?U0w3cnR6SUFEZkF0MVBHeUs2bUcvZnhTWURLekNyMnREa0RCZ3AzRVdJRGxZ?=
+ =?utf-8?B?UWx5TnZYVHk2emFmWmx5SFY4YThiZjAzVFB3ajBUSGlkaTJ2Z21RT3BseFFP?=
+ =?utf-8?B?UnNkR25ORzFFekRQSFA5akxOUUFoQkFnSHNTV2pUVWxUOHpUTjBHUXcxNG41?=
+ =?utf-8?B?Y1dkbTByenlkRFk0UmVscmUrQXpUb3pJRnYvU1pETTRaVTB0SjNHbzVMVjNI?=
+ =?utf-8?B?cWRES243VTNidWJPOGhsVHIrVVprZWNBNUJuTzNVcTAvQ2tVV1VMRkRZcGFy?=
+ =?utf-8?B?V0YzVTlHQnRVeEVMNjlTOFltOEVkcTlFTFVKSXE4NGhVMDRWdUZWaVdkdnNj?=
+ =?utf-8?B?YmVSTVM4QmdJN0lCYUQ5UkNxaFVCVXFOTFpoVDltNG9xNWFJaEZHMno0V1pH?=
+ =?utf-8?B?YWZHcjVFVlFWK1hNRHlRY2hFUmhRN0Y4ZnlXTnpLYjlzbzhoUlNyL0hGcWw3?=
+ =?utf-8?Q?DP+AtlMr9H+edAKM=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <51DEC4CA51BE6049A2C2E8B7828F5039@namprd02.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260728121138.1103610-1-tarunsahu@google.com>
-In-Reply-To: <20260728121138.1103610-1-tarunsahu@google.com>
-From: Tarun Sahu <tarunsahu@google.com>
-Date: Tue, 29 Sep 2026 15:34:49 +0200
-X-Gm-Features: AclHuK-iNXjjkSWmw5QuOGuFFhmaybIp8bRIbWdcOO220zD0oN-VSK2-cXwF8Q0
-Message-ID: <CALe+6DyB-6ShgC3GFA7Htw6YOyke6jC5iQd_a+PH83M85Y=gkQ@mail.gmail.com>
-Subject: Re: [PATCH v4 00/11] liveupdate: kvm: Guest_memfd preservation
-To: ackerleytng@google.com, fuad.tabba@linux.dev, 
-	Andrew Morton <akpm@linux-foundation.org>, seanjc@google.com, dmatlack@google.com, 
-	Shuah Khan <skhan@linuxfoundation.org>, Jonathan Corbet <corbet@lwn.net>, david@redhat.com, 
-	Tarun Sahu <tarunsahu@google.com>, Pasha Tatashin <pasha.tatashin@soleen.com>, 
-	Pratyush Yadav <pratyush@kernel.org>, sagis@google.com, Paolo Bonzini <pbonzini@redhat.com>, 
-	Mike Rapoport <rppt@kernel.org>, Alexander Graf <graf@amazon.com>
-Cc: linux-kselftest@vger.kernel.org, andre.przywara@arm.com, 
-	michael.roth@amd.com, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	will@kernel.org, vannapurve@google.com, maz@kernel.org, fvdl@google.com, 
-	kvm@vger.kernel.org, oliver.upton@linux.dev, kvmarm@lists.linux.dev, 
-	alexandru.elisei@arm.com, skhawaja@google.com, aneesh.kumar@kernel.org, 
-	linux-doc@vger.kernel.org, David Hildenbrand <david@kernel.org>, yan.y.zhao@intel.com, 
-	kexec@lists.infradead.org, suzuki.poulose@arm.com, 
-	Logan Odell <loganodell@google.com>, Jason Gunthorpe <jgg@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Exchange-RoutingPolicyChecked:
+	lC5b2xEmHAVCgpvvHk9SltiQXyC+wQOdMAx9LfIqzJB1GFdvI72BREif/KVMMExjYLnxr/XHLaAOzleuVj1Skp2lUrBEAZL6Mpd9m5YpzpLVeBJIilR9QS2rLs486URFhttMUUjnKjT8teYR5w/K8R8r8gsgoOy2LN5qYsslVyjwiQbpe8kI7WM87UngwB1c+V1vxMkV0PQX395JpVkLbYn5NEaaQwp/FQBx401Y2l039n7ECG2JmfuU8r+DFLKQILTWziWBTYx8xJvUmOY24u8vw2GH8ltTGOdS3ufsPwqVMHGs2fNZBGls7H3n2sVE8m4107bCXP4QSi22nof5XQ==
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA2PR02MB7564.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cf1fdb3b-cd5d-41fc-2743-08df1e2f30fb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Sep 2026 13:40:14.3496
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: D5i3NQWhwe+GShCw8PdRL4+YCVx9d+kBz4qvhJpWXpXcz+tN2aRmmvKkBPYLTtZ8kRtxuMFfiEVhBJWqK19K1ve1Dmip13j8hkUvgwU3W08=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR02MB6982
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTI5MDA1NCBTYWx0ZWRfXyXEi60tz6Jat
+ m5Drl8Cre005hicSEo8qE06iGsOjcbxK0cInSER+CV39znqYd/g6hV93pFA/842ncSPLlJVjTPM
+ z1KXsVCR74UgoVvbcZsAdJBrL4GAl0redxasMuqEQ06e17J1BVVDVfcZcIy7aLlQp9PmzAqAKgr
+ 9DGgPvwsFmau7hJght4nws5mNkM7YMciuzl9pSGDRBrqoAscAvHLGbRKC6T1OeATkkp425sJ1c3
+ 99h1yvHiJXvez0uEzrT+EvRuUAR/RJkVGOQGG2+sr+9/JXbQTPDb9qoMQ/mvGWnJhyXBv1FJJvq
+ Xos1ROZzFRjIduu6DVtjQ3VlBTvca35ZLGVC6rymL9YZiZkmcvJdpuhBPGfuCtH6GMjZao7bjil
+ UlqhIzX4Skex5SZIdsBBKV3jf+5fgwvSDQEDREKcOfQTxNElnkJ7lDaN9+HCnS3HHuugS0PBpaf
+ WOb0xf619uACnikAaXg==
+X-Proofpoint-ORIG-GUID: tf7_HBTv6anoArWzd4QhijcuspTR4MHb
+X-Authority-Analysis: v=2.4 cv=fP2sTpae c=1 sm=1 tr=0 ts=6abbbfc4 cx=c_pps
+ a=TyCWzW9CAQ5Ogo61w8w6wA==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=VdqzKS8jKosA:10 a=0kUYKlekyDsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VofLwUrZ8Iiv6rRUPXIb:22 a=VUi8bpU7OL1Oj2-RSIOF:22 a=20KFwNOVAAAA:8
+ a=64Cc0HZtAAAA:8 a=_5I9fX6HVNos-OcG9soA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTI5MDA1NCBTYWx0ZWRfX0jat56eGBQ/S
+ BQhCSLyRPabxXEwj/vO19bQp7zg5Ocbw7h9ebZ669T0XN8w1oFr5fAIAkEJumoBvklUGaaZkMqE
+ hKZrPHO6MfFAj0eGKrmYewi3NVoC0Ic=
+X-Proofpoint-GUID: tf7_HBTv6anoArWzd4QhijcuspTR4MHb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-29_04,2026-09-21_02,2025-10-01_01
+X-Proofpoint-Spam-Reason: safe
 
-Hello,
-
-As per the discussion on the series, I will try to layout the future
-plan of guest_memfd preservation and VM preservation via LUO. Though
-guest_memfd itself is in development phase, Deducing the exact plan and
-ABI beforehand is quite impossible. So I will propose tentative plan as
-per my current understanding.
-
-Introduction:
-        Guest_memfd was developed only for CocoVM use-case, But now its
-        target is to unify guest memory for cocoVM and non-cocoVM.
-        Though not all user will be onboarded on using guest_memfd with
-        non-CocoVM, I see current development in guest_memfd for e.g
-        multiple backends will provide its usefulness for non-CocoVM
-        (Maybe get rid of hugetlbfs - traditional PITA).
-
-        This preservation series and future development targets the
-        preservation for both cocoVM and non-cocoVM.
-
-Tentative Plan (Overview):
-        I plan on supporting the guest_memfd preservation on incremental
-        steps. This series builds the foundation for it and only support
-        fully shared guest_memfd backed by PAGE_SIZE pages. Currently,
-        For this base series, Only potential user would be non-CocoVM.
-        But due to performance reasons, at this stage it can not be used
-        (as it is backed by PAGE_SIZE).
-
-        Incremental Steps:
-                    A. This base foundation series (Fully shared backed
-                    by PAGE_SIZE pages) also require VM preservation
-                    [1]. but currently preserving single field
-                    only (VM_TYPE).
-                    This sets the foundation for VM preservation via
-                    LUO as well. Present KVM uAPIs can support
-                    preservation for non-CocoVM backed by
-                    non-guest_memfd memory. But they are not sufficient to
-                    preserve the cocoVM [2].
-
-                    B. Next Step, Private guest_memfd preservation on top o=
-f
-                    in-place conversion series (merged in KVM x86
-                    cocoVM tree) again backed by PAGE_SIZE pages. This
-                    will also include VM preservation, for example the
-                    data structures that are TDX protected can not be
-                    preserved with current KVM uAPIs [2].
-
-                    C. Parallel to B, guest_memfd preservation for
-                    non-CocoVM backed by hugetlb. This work will be on
-                    top of guest_memfd support for hugetlb backend [3][4].
-                    Currently, How this support will be developed is in
-                    upstream discussion. But The work on preservation
-                    will pick it as soon as hugetlb support is integrated.
-
-                    D. On Top of C, Extends guest_memfd preservation for hu=
-getlb
-                    backend for cocoVM (Integrating private guest_memfd sup=
-port)
-
-                    E. Preservation for any other backend that will be
-                    supported in future.
-
-VM Preservation:
-        Guest_memfd preservation can not be supported alone, it needs VM
-        preservation as well [1][2]. Even though there are no current
-        user, But there are users who want guest_memfd preservation for
-        non-cocoVM and cocoVM both. And that opens the door for VM
-        preservation as well because present KVM uAPIs are not
-        sufficient (for cocoVM case [2]). This will unify preservation
-        mechanism for VM (and its memory) in linux.
-
-        Presently, for non-CocoVM, KVM provides uAPIs to preserve the
-        state of the VM for e.g. vCPU + device state through the
-        (KVM_GET/SET_REGS, SREGS2, XSAVE, MSRS, LAPIC,
-        VCPU_EVENTS, MP_STATE, NESTED_STATE, CLOCK, ...))
-
-        Now, for cocoVM, we need to preserve the TD state of the VM and
-        global TDX module state. For which preservation of the following
-        will be needed (Not everything included, it is as much I could
-        think at this time, Also I am not expert on TDX, I will try)
-
-        **Global State (Will use LUO FLB objects)**:
-        1. TDMRs + PAMT locations
-        2. In-use HKID bitmap
-
-        **Per-TD/VM (part of per-VM preservation, It can open door to unify
-        the place of preservation for other fields as well. But again
-        open for discussion)**
-        3. VM_TYPE (already preserved)
-        4. TDR Page
-        5. TDCS Page
-        6. HKID
-        7. S-EPT non-leaf pages
-        8. S-EPT leaf maps
-        9. per VM memory attributes (unrelated to TDX)
-
-        **per-vCPUs (preserved via vCPU fd)**
-        10. vCPU ID
-        11. TDVPR page
-        12. TDCX page
-        etc.
-        Note: Also, why not extends
-        the support for full preservation of vCPUs ignoring existing KVM
-        uAPIs to unify everything at one place: Open to discussion and
-        can be discussed thoroughly once RFC for TDX preservation will be
-        sent.
-
-Guest_memfd Preservation:
-        1. per gmem memory attributes
-        2. folios preservation (size/number of pages per folio, index etc)
-        3. State of hugetlb preservation (again LUO FLB object will be
-        needed to preserve system shared pool information)
-        4. SPLIT information for hugetlb for shared pages
-        5. backing type of guest_memfd
-        6. gmem related flags
-        7. mem policy
-        etc.
-
-The above plan is currently based on my current understanding which can
-be changed as guest_memfd evolve and new findings come to the light while
-during the work/review of RFC of individual features.
-
-[1]: https://lore.kernel.org/all/9huzo6ezv288.fsf@tarunix.c.googlers.com/#:=
-~:text=3DGuest_memfd%20can%27t%20be,KVM%20side%20preservation.
-[2]
-KVM uAPI fetch data to userspace and restore it back in new kernel. for
-TDX case, that is not possible becuase of 2 major reasons:
-    A. all control data structures are protected and encrypted,
-       Host cannot access them if they do not belong to host.
-       While LUO just have to handover the PFN to new kernel,
-       So LUO does not access the underlying data.
-    B. TDX module can not be freshly initialized, it will lose
-       the state of the protected VMs and their relation data.
-       So preserving using KVM uAPIs and reinitializing it and
-       populating it via userspace is not an option. It has to be
-       done from kernel. and kexec handover/LUO can handle it very
-       well by updating TDX initializing sequence in kernel (This
-       is one of the Idea currently in my mind, topic is open for
-       exploration).
-
-[3]: https://lore.kernel.org/all/20260720111259.122911-1-dwmw2@infradead.or=
-g/
-[4]: https://lore.kernel.org/all/20260925-gmem-tmpfs-backend-v1-0-d36159822=
-d18@google.com/
-
-I wanted to send this before LPC so that we can pick up this for
-discussion on Tues in either KVM MC (13:00 KVM and Live Update) Slot [5]
-or Live Update (16:10 Guest_Memfd Preservation For Live Update) Slot [6]
-or for general discussion on liveupdate ABI (15:50 Live Update
-Compatibility) Slot [7].
-
-
-[5]: https://lpc.events/event/20/contributions/2632/
-[6]: https://lpc.events/event/20/contributions/2610/
-[7]: https://lpc.events/event/20/contributions/2613/
-
-[5] is before [6] & [7], So, We can also have any other slots as per [8]
-on wed.
-
-[8]: https://lore.kernel.org/all/2vxzse2x46ol.fsf@kernel.org/#r
-
-~Tarun
-
-
-On Tue, Jul 28, 2026 at 2:11=E2=80=AFPM Tarun Sahu <tarunsahu@google.com> w=
-rote:
->
-> Hello,
->
-> This is v4 of guest_memfd preservation during liveupdate. As per
-> the discussion from bi-weekly guest-memfd meeting, This series
-> will be go to linux via kvm tree. And Planning to get it merged
-> in upcoming merge window. (7.2-rc1 for release in 7.3)
->
-> The changes are rebased on:
->         kvm/next + liveupdate/next (merge) + [4] + [5]
->         Where,
->         [4]: luo: APIs to retrieve file internally from session
->         [5]: selftests: liveupdate sefltests library
-> Here is the github repo:
->         https://github.com/tar-unix/linux/tree/gmem-pre
->
-> Patches [4] and [5] are prequisite of this series and they are
-> rebased/merged on liveupdate/next. kvm/next is behind few patches
-> from liveupdate/next, hence direct cherry-pick of [4] and [5] is
-> not possible. On Linux 7.2 they will be aligned. If we
-> succeed in merging it before I can request liveupdate maintainer
-> to provide the tag.
->
-> Steps to test:
-> 1. Compile Kernel with CONFIG_LIVEUPDATE_GUEST_MEMFD=3Dy
-> 2. boot kernel with command line: kho=3Don liveupdate=3Don
-> 3. run the following kselftest
->         $ .selftests/kvm/guest_memfd_preservation_test --s 1
->         $ <kexec> --reuse-cmdline
->         $ .selftests/kvm/guest_memfd_preservation_test --s 2
->
-> NOTE: Assert the following:
->         $ ls /dev/liveupdate
->         $ ls /dev/kvm
->         $ dmesg | grep liveupdate # (should have kvm_vm_luo &&
->                 # guest_memfd_luo handler registered)
->
-> V4 <- V3
-> 1. Split the refactoring patch into multiple patches [2, 3, 4]
-> 2. Updated commits msg as per the kvm documentation and suggestions
-> 3. Removed KHOSER_PTR and using raw pointer, as series [3] not yet
->    decided to go in the next cycle
-> 4. Implemented more tests in guest_memfd_preservation_test
->    allocation during frozen gmem_inode, non-guest_memfd preservation
-> 5. Moved the vm_create_from_fd to kvm_util.c from the
->    guest_memfd_preservation_test.c
-> 5. Minor updates as per the suggestions
->
-> V3 <- RFC V2 [2]
-> 1. Finalize the design
-> 2. resolve sashiko reported bugs
-> 3. Use of KHOSER_PTR instead of raw serialized_data as per [3]
->
-> RFC V2 [2] <- RFC V1 [1]
-> 1. Removed mem_attr_array as it is not needed for fully-shared
-> 2. Removed pre-faulted condition
-> 3. Added vm_type preservation for ARM64.
-> 4. Removed liveupdate_get_file_incoming api patch as it is sent
->    separately [4] by Samiullah.
->
->
-> **GUEST MEMFD PRESERVATION**
-> Below is the cover letter of the series which explains the design.
->
-> SCOPE:
-> 1. Fully Shared Guest_memfd
-> 2. Guest_memfd backed by PAGE_SIZE pages
->
-> Any VM whose memory is backed by such guest_memfd and satisfy the
-> above conditions can be preserved across liveupdate.
->
-> To Add support for liveupdate of any subsystem, we need to implement
-> the following calls: (e.g: subsystem: guest_memfd)
->
-> guest_memfd_luo_can_preserve: used by luo subsystem to filter the
->                               guest_memfd files
-> guest_memfd_luo_preserve: triggered from userspace by PRESERVE ioctl
->                           If can_preserve says the file is preservable
->                           by guest_memfd_luo_preserve
-> guest_memfd_luo_retrieve: triggered from userspace by RETRIEVE ioctl,
->                           recognised by the passed token from userspace.
->                           Used in new kernel after kexec.
-> guest_memfd_luo_unpreserve: triggered from userspace when a session is
->                             closed, which inherently calls unpreserve of
->                             all preserved files.
-> guest_memfd_luo_freeze: triggered just before kexec automatically in
->                         kernel. no userspace involvement.
-> guest_memfd_luo_finish: triggered by userspace when all files are
->                         retrieved and want to finish the session
->                         retrieval.
->
-> *PART A: KVM VM preservation*
-> Introdcued the kvm_luo.c to preserve the vm_file during liveupdate.
-> Currently it only preserve vm_type. This can be expanded to preserve
-> more details in future as need arises for example data related to
-> cocoVM (SEPT etc.).
->
->         int kvm_fd =3D open("/dev/kvm", O_RDWR);
->         int vm_fd =3D ioctl(kvm_fd, KVM_CREATE_VM, 0);
->         preserve_arg =3D {
->         .size =3D sizeof(preserve_arg),
->             .fd =3D vm_fd,
->             .token =3D VM_TOKEN,
->         };
->         ioctl(session_fd, LIVEUPDATE_SESSION_PRESERVE_FD, &preserve_arg);
->
-> This VM_TOKEN is used by guest_memfd preservation. guest_memfd
-> preservation save this token (fetched internally by luo apis [4]) to
-> associates the guest_memfd with its vm_file. On retrieval, guest_memfd
-> retrieves the vm_file using this token and use its struct kvm to
-> retrieve itself.
->
-> PART B: Guest_memfd preservation
-> Introduce guest_memfd_luo.c to preserve the guest_memfd file during
-> liveupdate. Currently it only preserve guest_memfd files that have:
->
-> 1. INIT_SHARED flag ensures intially all the memory is shared
-> 2. !kvm_arch_has_private_mem() which ensures no shared pages can be
->    converted to private after [6] lands.
->
-> Preservation first freezes the gmem_inode introduced in PATCH [07/11]
-> and preserve each allocated folios from guest_memfd page_cache using
-> KHO.
->
-> luo_freeze (not the gmem_inode freeze PATCH[07/11]) call update the
-> vm_token which is preserved across kexec.
->
-> Retrieval retrieves the vm_file using vm_token and create the
-> guest_memfd with vm_file->kvm and populate the preserved folios
-> to guest_memfd page_cache.
->
-> Added the Documentation for VMM on guest_memfd preservation guidelines
-> To know more about, PATCH[10/11] can be referred which has the more
-> detailed documentation.
->
-> Future Plan:
->         1. Make preservation immune to new allocation and fallocate
->         calls so that we can remove freeze call
->         2. In future, When IOMMU will use guest_memfd and can allocate
->         page tables for DMA in that area, Later it will be a problem if
->         other user of guest_memfd do punch hole before preservation,
->         that will make the pages to be lost after preservation. This
->         will be taken care of when IOMMU will add support for
->         guest_memfd.
->         3. guest_memfd preservation for private pages + in-place
->         conversion.
->         4. In future, when guest_memfd will have hugetlb page support,
->         add support its preservation.
->
-> [1]: https://lore.kernel.org/all/cover.1779080766.git.tarunsahu@google.co=
-m/
-> [2]: https://lore.kernel.org/all/cover.1780667929.git.tarunsahu@google.co=
-m/
->      https://lore.kernel.org/all/c054ba0fb2639932bbe354420d3f4f84cce84905=
-.1780676742.git.tarunsahu@google.com/
-> [3]: https://lore.kernel.org/all/20260622184851.2309827-1-tarunsahu@googl=
-e.com/
-> [4]: https://git.kernel.org/pub/scm/linux/kernel/git/liveupdate/linux.git=
-/commit/?h=3Dnext&id=3Df4d2e4f0d12d88155cd1128ed3294f7827bf4c5d
-> [5]: https://git.kernel.org/pub/scm/linux/kernel/git/liveupdate/linux.git=
-/commit/?h=3Dnext&id=3D2f3f53a3735a7e67bbe9e580cb49372bf9261967
->      https://git.kernel.org/pub/scm/linux/kernel/git/liveupdate/linux.git=
-/commit/?h=3Dnext&id=3Ddf1a0d068d481b7d175c5af3970043206409a062
-> [6]: https://lore.kernel.org/all/20260618-gmem-inplace-conversion-v8-0-9d=
-2959357853@google.com/
->
-> Tarun Sahu (11):
->   liveupdate: Add LIVEUPDATE_GUEST_MEMFD config option
->   KVM: Introduce kvm_create_vm_file() helper
->   KVM: Export kvm_uevent_notify_vm_create()
->   KVM: Track weak reference to vm_file in struct kvm
->   KVM: LUO: Support VM preservation across live updates
->   KVM: guest_memfd: Move internal definitions to internal header
->   KVM: guest_memfd: Add support for freezing mappings
->   KVM: guest_memfd: Add support for preservation via LUO
->   docs: liveupdate: Add documentation for VM and guest_memfd
->     preservation
->   KVM: selftests: Split ____vm_create() and add vm_create_from_fd()
->   KVM: selftests: Add guest_memfd_preservation_test
->
->  Documentation/core-api/liveupdate.rst         |   1 +
->  Documentation/liveupdate/vmm.rst              | 107 ++++
->  MAINTAINERS                                   |  14 +
->  include/linux/kho/abi/kvm.h                   | 106 ++++
->  include/linux/kvm_host.h                      |  14 +
->  kernel/liveupdate/Kconfig                     |  15 +
->  tools/testing/selftests/kvm/Makefile.kvm      |   6 +-
->  .../kvm/guest_memfd_preservation_test.c       | 357 ++++++++++++
->  .../testing/selftests/kvm/include/kvm_util.h  |   3 +
->  tools/testing/selftests/kvm/lib/kvm_util.c    |  49 +-
->  virt/kvm/Makefile.kvm                         |   1 +
->  virt/kvm/guest_memfd.c                        | 185 +++++--
->  virt/kvm/guest_memfd.h                        |  44 ++
->  virt/kvm/guest_memfd_luo.c                    | 515 ++++++++++++++++++
->  virt/kvm/kvm_luo.c                            | 195 +++++++
->  virt/kvm/kvm_main.c                           |  94 +++-
->  virt/kvm/kvm_mm.h                             |  15 +
->  17 files changed, 1640 insertions(+), 81 deletions(-)
->  create mode 100644 Documentation/liveupdate/vmm.rst
->  create mode 100644 include/linux/kho/abi/kvm.h
->  create mode 100644 tools/testing/selftests/kvm/guest_memfd_preservation_=
-test.c
->  create mode 100644 virt/kvm/guest_memfd.h
->  create mode 100644 virt/kvm/guest_memfd_luo.c
->  create mode 100644 virt/kvm/kvm_luo.c
->
->
-> base-commit: a204badd8432f93b7e862e7dac6db0fe3d65f370
-> --
-> 2.55.0.229.g6434b31f56-goog
->
+DQoNCj4gT24gMjQgU2VwIDIwMjYsIGF0IDc6MDXigK9QTSwgRXJpYyBBdWdlciA8ZXJpYy5hdWdl
+ckByZWRoYXQuY29tPiB3cm90ZToNCj4gDQo+ICEtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tfA0KPiAgQ0FVVElPTjogRXh0
+ZXJuYWwgRW1haWwNCj4gDQo+IHwtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tIQ0KPiANCj4gSGkgS2h1c2hpdCwNCj4gDQo+
+IE9uIDkvMjEvMjYgMjozMiBQTSwgS2h1c2hpdCBTaGFoIHdyb3RlOg0KPj4gQWRkIHNjYWZmb2xk
+aW5nIGZvciBuYW1lZCBDUFUgbW9kZWxzIG9uIEFybSBvbiB0b3Agb2YgdGhlIHByb3BlcnR5DQo+
+PiBsYXllci4gQSBtb2RlbCBpcyBhIGxpc3Qgb2YgKHByb3BlcnR5LCB2YWx1ZSkgb3ZlcnJpZGVz
+IHBsdXMgYW4NCj4+IG9wdGlvbmFsIHBhcmVudDsgYSBjaGlsZCBpbmhlcml0cyBpdHMgcGFyZW50
+J3MgcHJvcGVydHkgdmFsdWVzIGFuZCBtYXkNCj4+IG92ZXJyaWRlIHRoZW0uDQo+PiANCj4+IElu
+c3RhbmNlIGluaXQgc3RlcHM6DQo+PiAgICAtIGhvc3QgZmVhdHVyZSBkaXNjb3ZlcnkuDQo+PiAg
+ICAtIHplcm8gb3V0IGlzYXIuaWRyZWdzW10gYW5kIHJlc3RvcmUgUkVTMSBmaWVsZHMuDQo+PiAg
+ICAtIGluc3RhbGwgU1lTUkVHXyBhbmQgc3ZlKiBwcm9wZXJ0aWVzLg0KPj4gICAgLSB3YWxrIHRo
+ZSBwYXJlbnQgY2hhaW4gcm9vdC1maXJzdCBhbmQgYXBwbHkgZWFjaCBsZXZlbCdzDQo+PiAgICAg
+IHByb3BlcnRpZXMuDQo+IHlvdSBzaG91bGQgZXhwbGFpbiBhYm91dCBwcm9wIHR5cGVzLiBJIHNl
+ZSB0aGV5IGFyZSBlaXRoZXIgYm9vbCBvciB1aW50Lg0KPiBHaXZlbiB0aGUgcGFyZW50IHNlcmll
+cyBib29sIHVzYWdlIGlzIG5vdCBvYnZpb3VzLg0KSGkgRXJpYywNCg0KVGhpbmtpbmcgYWJvdXQg
+dGhpcyBtb3JlLCB0aGUgY3VycmVudCBhcHByb2FjaCB3aWxsIHJlcXVpcmUgc29tZSB0d2Vha2lu
+ZyBub3cNCmFzIHRoZSB1bmRlcmx5aW5nIHByb3BlcnR5IGluZnJhc3RydWN0dXJlIG5vdyBzZXRz
+IHRoZSBwcm9wZXJ0eSB2YWx1ZXMgYWZ0ZXINCnRoZSB2Q1BVIGhhcyBiZWVuIGNyZWF0ZWQuIA0K
+DQpTb21lIG9mIHRoZSBmaWVsZHMgdGhhdCB0aGUgbW9kZWwgZGVmaW5lcyAoU1ZFL1BBVVRIKSBk
+ZXRlcm1pbmVzIHRoZSB2Q1BVIGluaXQNCmZsYWdzLg0KDQpZb3VyIHN1Z2dlc3Rpb24gb2YgZGlm
+ZmVyZW50IHNldHRlcnMgaXMgdGhlIHdheSB0byBnbyBoZXJlIDopDQoNCj4+IFRoaXMgYXNzdW1l
+cyB0aGF0IGVhY2ggcHJvcGVydHkgaXMgaWRlbXBvdGVudC4gYHBhdXRoYCBpcyBpbnRlbnRpb25h
+bGx5DQo+PiBub3QgaW5zdGFsbGVkIGJlY2F1c2UgdGhlIG1vZGVsJ3MgSUQgcmVnaXN0ZXIgdmll
+dyBpcyBhdXRob3JpdGF0aXZlDQo+PiBhbmQgY2FuIGJlIGNvbmZpZ3VyZWQgdGhyb3VnaCBTWVNS
+RUdfIHByb3BlcnRpZXMuDQo+PiANCj4+IE5vIG1vZGVscyBhcmUgZGVmaW5lZCB5ZXQuDQo+PiAN
+Cj4+IFNpZ25lZC1vZmYtYnk6IEtodXNoaXQgU2hhaCA8a2h1c2hpdC5zaGFoQG51dGFuaXguY29t
+Pg0KPj4gLS0tDQo+PiB0YXJnZXQvYXJtL2NwdS1tb2RlbHMuYyB8IDE5MSArKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+PiB0YXJnZXQvYXJtL2NwdS1tb2RlbHMuaCB8
+ICAzNiArKysrKysrKw0KPj4gdGFyZ2V0L2FybS9tZXNvbi5idWlsZCAgfCAgIDEgKw0KPj4gMyBm
+aWxlcyBjaGFuZ2VkLCAyMjggaW5zZXJ0aW9ucygrKQ0KPj4gY3JlYXRlIG1vZGUgMTAwNjQ0IHRh
+cmdldC9hcm0vY3B1LW1vZGVscy5jDQo+PiBjcmVhdGUgbW9kZSAxMDA2NDQgdGFyZ2V0L2FybS9j
+cHUtbW9kZWxzLmgNCj4+IA0KPj4gZGlmZiAtLWdpdCBhL3RhcmdldC9hcm0vY3B1LW1vZGVscy5j
+IGIvdGFyZ2V0L2FybS9jcHUtbW9kZWxzLmMNCj4+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0DQo+PiBp
+bmRleCAwMDAwMDAwMDAwLi5mZWQzMTk3MTg2DQo+PiAtLS0gL2Rldi9udWxsDQo+PiArKysgYi90
+YXJnZXQvYXJtL2NwdS1tb2RlbHMuYw0KPj4gQEAgLTAsMCArMSwxOTEgQEANCj4+ICsvKg0KPj4g
+KyAqIEFSTSBuYW1lZCBDUFUgbW9kZWxzLg0KPj4gKyAqDQo+PiArICogRWFjaCBtb2RlbCBpcyBk
+ZWZpbmVkIGFzIGFuIGFycmF5IG9mIE1PREVMX1BST1AgbWFjcm9zLCBsaXN0aW5nIG9ubHkNCj4+
+ICsgKiB0aGUgcHJvcGVydGllcyB0aGF0IERJRkZFUiBmcm9tIHRoZSBwYXJlbnQgbW9kZWwuDQo+
+PiArICoNCj4+ICsgKiBJbml0aWFsaXphdGlvbiBzdGFydHMgd2l0aCBhIHplcm9lZCBpZHJlZ3Nb
+XSBhcnJheS4NCj4+ICsgKg0KPj4gKyAqIER1cmluZyBpbml0aWFsaXphdGlvbiwgdGhlIHBhcmVu
+dCBjaGFpbiBpcyB3YWxrZWQgcm9vdC1maXJzdCBhbmQgZXZlcnkNCj4+ICsgKiBsZXZlbCdzIHBy
+b3BlcnRpZXMgYXJlIGFwcGxpZWQgdmlhIFFPTSwgc28gdGhlIGxlYWYncyB2YWx1ZXMgbmF0dXJh
+bGx5DQo+PiArICogb3ZlcnJpZGUgaXRzIGFuY2VzdG9ycy4NCj4+ICsgKg0KPj4gKyAqIEFzc3Vt
+cHRpb25zOg0KPj4gKyAqICAgICAtIEFsbCBuYW1lZCBDUFUgbW9kZWwgcHJvcGVydGllcyBhcmUg
+aWRlbXBvdGVudC4NCj4+ICsgKg0KPj4gKyAqIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwt
+Mi4wLW9yLWxhdGVyDQo+PiArICovDQo+PiArDQo+PiArI2luY2x1ZGUgInFlbXUvb3NkZXAuaCIN
+Cj4+ICsjaW5jbHVkZSAicWFwaS9lcnJvci5oIg0KPj4gKyNpbmNsdWRlICJxZW11L2Vycm9yLXJl
+cG9ydC5oIg0KPj4gKyNpbmNsdWRlICJzeXN0ZW0va3ZtLmgiDQo+PiArI2luY2x1ZGUgImNwdS5o
+Ig0KPj4gKyNpbmNsdWRlICJpbnRlcm5hbHMuaCINCj4+ICsjaW5jbHVkZSAia3ZtX2FybS5oIg0K
+Pj4gKyNpbmNsdWRlICJjcHUtaWRyZWdzLmgiDQo+PiArI2luY2x1ZGUgImNwdS1tb2RlbHMuaCIN
+Cj4+ICsNCj4+ICsjZGVmaW5lIE1PREVMX1BST1BfRklFTERfU1RSICBzdHINCj4+ICsjZGVmaW5l
+IE1PREVMX1BST1BfRklFTERfQk9PTCBiDQo+PiArI2RlZmluZSBNT0RFTF9QUk9QX0ZJRUxEX05V
+TSAgbnVtDQo+PiArDQo+PiArI2RlZmluZSBNT0RFTF9QUk9QKF9uYW1lLCBfdHlwZSwgX3ZhbHVl
+KSBcDQo+PiArICAgIHsgLm5hbWUgPSAoX25hbWUpLCAudHlwZSA9IEFSTV9NT0RFTF9QUk9QXyMj
+X3R5cGUsIFwNCj4+ICsgICAgICAudS5NT0RFTF9QUk9QX0ZJRUxEXyMjX3R5cGUgPSAoX3ZhbHVl
+KSB9DQo+PiArDQo+PiArI2RlZmluZSBNT0RFTF9QUk9QX0VORCAgeyAubmFtZSA9IE5VTEwgfQ0K
+Pj4gKw0KPj4gKy8qIE1heGltdW0gcGFyZW50LWNoYWluIGRlcHRoIGZvciBuYW1lZCBDUFUgbW9k
+ZWxzLiAqLw0KPiBpbmhlcml0ZW5jZSBkZXB0aD8NClllcywgd2lsbCBmaXguDQoNCj4+ICsjZGVm
+aW5lIEFSTV9OQU1FRF9DUFVfTU9ERUxfTUFYX0RFUFRIIDE2DQo+PiArDQo+PiArc3RhdGljIGNv
+bnN0IEFybU5hbWVkQ3B1TW9kZWwgYXJtX2NwdV9tb2RlbHNbXSA9IHsNCj4+ICsgICAge05VTEws
+IE5VTEwsIE5VTEx9DQo+PiArfTsNCj4+ICsNCj4+ICtjb25zdCBBcm1OYW1lZENwdU1vZGVsICph
+cm1fZmluZF9tb2RlbChjb25zdCBjaGFyICpuYW1lKQ0KPj4gK3sNCj4+ICsgICAgZm9yIChzaXpl
+X3QgaSA9IDA7IGkgPCBBUlJBWV9TSVpFKGFybV9jcHVfbW9kZWxzKTsgaSsrKSB7DQo+PiArICAg
+ICAgICBpZiAoIWFybV9jcHVfbW9kZWxzW2ldLm5hbWUpIHsNCj4+ICsgICAgICAgICAgICBicmVh
+azsNCj4+ICsgICAgICAgIH0NCj4+ICsNCj4+ICsgICAgICAgIGlmIChnX3N0cl9lcXVhbChhcm1f
+Y3B1X21vZGVsc1tpXS5uYW1lLCBuYW1lKSkgew0KPj4gKyAgICAgICAgICAgIHJldHVybiAmYXJt
+X2NwdV9tb2RlbHNbaV07DQo+PiArICAgICAgICB9DQo+PiArICAgIH0NCj4+ICsgICAgcmV0dXJu
+IE5VTEw7DQo+PiArfQ0KPj4gKw0KPj4gK3ZvaWQgYXJtX2FwcGx5X21vZGVsX3Byb3BzKE9iamVj
+dCAqb2JqLCBjb25zdCBBcm1Nb2RlbFByb3BWYWx1ZSAqcHJvcHMsDQo+PiArICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKQ0KPj4gK3sNCj4+ICsgICAgY29uc3QgQXJtTW9k
+ZWxQcm9wVmFsdWUgKnB2Ow0KPj4gKyAgICBFUlJQX0dVQVJEKCk7DQo+PiArDQo+PiArICAgIGZv
+ciAocHYgPSBwcm9wczsgcHYtPm5hbWU7IHB2KyspIHsNCj4+ICsgICAgICAgIHN3aXRjaCAocHYt
+PnR5cGUpIHsNCj4+ICsgICAgICAgIGNhc2UgQVJNX01PREVMX1BST1BfQk9PTDoNCj4+ICsgICAg
+ICAgICAgICBvYmplY3RfcHJvcGVydHlfc2V0X2Jvb2wob2JqLCBwdi0+bmFtZSwgcHYtPnUuYiwg
+ZXJycCk7DQo+PiArICAgICAgICAgICAgYnJlYWs7DQo+PiArICAgICAgICBjYXNlIEFSTV9NT0RF
+TF9QUk9QX05VTToNCj4+ICsgICAgICAgICAgICBvYmplY3RfcHJvcGVydHlfc2V0X3VpbnQob2Jq
+LCBwdi0+bmFtZSwgcHYtPnUubnVtLCBlcnJwKTsNCj4+ICsgICAgICAgICAgICBicmVhazsNCj4+
+ICsgICAgICAgIGRlZmF1bHQ6DQo+PiArICAgICAgICAgICAgZ19hc3NlcnRfbm90X3JlYWNoZWQo
+KTsNCj4+ICsgICAgICAgIH0NCj4+ICsNCj4+ICsgICAgICAgIGlmICgqZXJycCkgew0KPj4gKyAg
+ICAgICAgICAgIGVycm9yX3ByZXBlbmQoZXJycCwgInByb3BlcnR5ICclcyc6ICIsIHB2LT5uYW1l
+KTsNCj4+ICsgICAgICAgICAgICByZXR1cm47DQo+PiArICAgICAgICB9DQo+PiArICAgIH0NCj4+
+ICt9DQo+PiArDQo+PiArdm9pZCBhcm1fcmVhbGl6ZV9tb2RlbF9jaGFpbihPYmplY3QgKm9iaiwg
+Y29uc3QgQXJtTmFtZWRDcHVNb2RlbCAqbW9kZWwsDQo+PiArICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBFcnJvciAqKmVycnApDQo+PiArew0KPj4gKyAgICBjb25zdCBBcm1OYW1lZENwdU1v
+ZGVsICpjdXIsICpwYXJlbnQ7DQo+PiArICAgIGNvbnN0IEFybU5hbWVkQ3B1TW9kZWwgKmNoYWlu
+W0FSTV9OQU1FRF9DUFVfTU9ERUxfTUFYX0RFUFRIXTsNCj4+ICsgICAgc2l6ZV90IGRlcHRoID0g
+MDsNCj4+ICsNCj4+ICsgICAgZm9yIChjdXIgPSBtb2RlbDsgY3VyOyApIHsNCj4+ICsgICAgICAg
+IGlmIChkZXB0aCA+PSBBUlJBWV9TSVpFKGNoYWluKSkgew0KPj4gKyAgICAgICAgICAgIGVycm9y
+X3NldGcoZXJycCwgIm1vZGVsICclcyc6IHBhcmVudCBjaGFpbiB0b28gZGVlcCIsIG1vZGVsLT5u
+YW1lKTsNCj4+ICsgICAgICAgICAgICByZXR1cm47DQo+PiArICAgICAgICB9DQo+PiArICAgICAg
+ICBjaGFpbltkZXB0aCsrXSA9IGN1cjsNCj4gUGxlYXNlIGFkZCBhIGNvbW1lbnQgYWJvdXQgdGhl
+IHNvLWNhbGxlZCBjaGFpbiBhbmQgZXNwZWNpYWxseSBkZXNjcmliaW5nDQo+IHRoYXQgY2hhaW5b
+MF0gaXMgdGhlIGNoaWxkIGFuZCBoaWdoLWxldmVsIGVpbmRleCBsZW1lbnRzIGFyZSB0aGUgcGFy
+ZW50cw0KPiBpdCBkZXJpdmVzIGZyb20uDQoNCldpbGwgZG8uDQo+PiArDQo+PiArICAgICAgICBp
+ZiAoIWN1ci0+cGFyZW50KSB7DQo+PiArICAgICAgICAgICAgYnJlYWs7DQo+PiArICAgICAgICB9
+DQo+PiArICAgICAgICBwYXJlbnQgPSBhcm1fZmluZF9tb2RlbChjdXItPnBhcmVudCk7DQo+IEkg
+Z3Vlc3MgeW91IGRpcmVjdGx5IGFzc2VydA0KDQpPa2F5Lg0KPj4gKyAgICAgICAgaWYgKCFwYXJl
+bnQpIHsNCj4+ICsgICAgICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJtb2RlbCAnJXMnOiB1bmtu
+b3duIHBhcmVudCAnJXMnIiwgY3VyLT5uYW1lLA0KPj4gKyAgICAgICAgICAgICAgICBjdXItPnBh
+cmVudCk7DQo+PiArICAgICAgICAgICAgcmV0dXJuOw0KPj4gKyAgICAgICAgfQ0KPj4gKyAgICAg
+ICAgY3VyID0gcGFyZW50Ow0KPj4gKyAgICB9DQo+PiArDQo+PiArICAgIHdoaWxlIChkZXB0aC0t
+KSB7DQo+PiArICAgICAgICBhcm1fYXBwbHlfbW9kZWxfcHJvcHMob2JqLCBjaGFpbltkZXB0aF0t
+PnByb3BzLCBlcnJwKTsNCj4+ICsgICAgICAgIGlmICgqZXJycCkgew0KPj4gKyAgICAgICAgICAg
+IHJldHVybjsNCj4+ICsgICAgICAgIH0NCj4+ICsgICAgfQ0KPj4gK30NCj4+ICsNCj4+ICtzdGF0
+aWMgdm9pZCByZXNldF9yZXMxX2ZpZWxkcyhBUk1DUFUgKmNwdSkNCj4+ICt7DQo+PiArICAgIGZv
+ciAoc2l6ZV90IGkgPSAwOyBpIDwgTlVNX0lEX0lEWDsgaSsrKSB7DQo+PiArICAgICAgICBmb3Ig
+KHNpemVfdCBqID0gMDsgaiA8IGFybTY0X2lkX3JlZ3NbaV0uZmllbGRzX2NvdW50OyBqKyspIHsN
+Cj4+ICsgICAgICAgICAgICBpZiAoc3RyY21wKGFybTY0X2lkX3JlZ3NbaV0uZmllbGRzW2pdLm5h
+bWUsICJSRVMxIikgPT0gMCkgew0KPj4gKyAgICAgICAgICAgICAgICBjcHUtPmlzYXIuaWRyZWdz
+W2ldID0gZGVwb3NpdDY0KGNwdS0+aXNhci5pZHJlZ3NbaV0sDQo+PiArICAgICAgICAgICAgICAg
+ICAgICBhcm02NF9pZF9yZWdzW2ldLmZpZWxkc1tqXS5zaGlmdCwNCj4+ICsgICAgICAgICAgICAg
+ICAgICAgIGFybTY0X2lkX3JlZ3NbaV0uZmllbGRzW2pdLmxlbmd0aCwNCj4+ICsgICAgICAgICAg
+ICAgICAgICAgIE1BS0VfNjRCSVRfTUFTSygwLCBhcm02NF9pZF9yZWdzW2ldLmZpZWxkc1tqXS5s
+ZW5ndGgpKTsNCj4+ICsgICAgICAgICAgICB9DQo+PiArICAgICAgICB9DQo+PiArICAgIH0NCj4+
+ICt9DQo+PiArDQo+PiArc3RhdGljIHZvaWQgYXJtX25hbWVkX2NwdV9pbml0Zm4oT2JqZWN0ICpv
+YmopDQo+PiArew0KPj4gKyAgICBBUk1DUFUgKmNwdSA9IEFSTV9DUFUob2JqKTsNCj4+ICsgICAg
+QVJNQ1BVQ2xhc3MgKmFjYyA9IEFSTV9DUFVfR0VUX0NMQVNTKG9iaik7DQo+PiArICAgIGNvbnN0
+IEFybU5hbWVkQ3B1TW9kZWwgKm1vZGVsID0gYXJtX2ZpbmRfbW9kZWwoYWNjLT5pbmZvLT5uYW1l
+KTsNCj4+ICsNCj4+ICsgICAgaWYgKCFtb2RlbCkgew0KPj4gKyAgICAgICAgZXJyb3JfcmVwb3J0
+KCInJXMnIENQVSBtb2RlbCBlbnRyeSBub3QgZm91bmQiLA0KPj4gKyAgICAgICAgICAgICAgICAg
+ICAgIGFjYy0+aW5mby0+bmFtZSk7DQo+PiArICAgICAgICByZXR1cm47DQo+PiArICAgIH0NCj4+
+ICsNCj4+ICsgICAgaWYgKCFrdm1fZW5hYmxlZCgpKSB7DQo+PiArICAgICAgICBlcnJvcl9yZXBv
+cnQoIiclcycgQ1BVIG1vZGVsIHJlcXVpcmVzIEtWTSAoLWFjY2VsIGt2bSkiLA0KPj4gKyAgICAg
+ICAgICAgICAgICAgICAgIGFjYy0+aW5mby0+bmFtZSk7DQo+PiArICAgICAgICByZXR1cm47DQo+
+PiArICAgIH0NCj4+ICsNCj4+ICsgICAga3ZtX2FybV9zZXRfY3B1X2ZlYXR1cmVzX2Zyb21faG9z
+dChjcHUpOw0KPj4gKyAgICBpZiAoIWFybV9mZWF0dXJlKCZjcHUtPmVudiwgQVJNX0ZFQVRVUkVf
+QUFSQ0g2NCkpIHsNCj4+ICsgICAgICAgIHJldHVybjsNCj4+ICsgICAgfQ0KPj4gKw0KPj4gKyAg
+ICAvKiAxLmEgUmVzZXQgSUQgcmVncyB0byAwICovDQo+PiArICAgIG1lbXNldChjcHUtPmlzYXIu
+aWRyZWdzLCAwLCBzaXplb2YoY3B1LT5pc2FyLmlkcmVncykpOw0KPj4gKw0KPj4gKyAgICAvKiAx
+LmIgUHJvcGVybHkgc2V0IFJFUzEgZmllbGRzLiAqLw0KPj4gKyAgICByZXNldF9yZXMxX2ZpZWxk
+cyhjcHUpOw0KPj4gKw0KPj4gKyAgICAvKiAyLiBBZGQgc3ZlTk5OTiBhbmQgU1lTUkVHXyBwcm9w
+ZXJ0aWVzICovDQo+PiArICAgIGFhcmNoNjRfYWRkX3N2ZV9wcm9wZXJ0aWVzKG9iaik7DQo+PiAr
+ICAgIGFhcmNoNjRfYWRkX2lkcmVnc19wcm9wZXJ0aWVzKG9iaik7DQo+IENhbiB5b3UgZ2l2ZSBt
+b3JlIGV4cGxhbmF0aW9ucyBhYm91dCB3aHkgd2UgZG9uJ3QgaGF2ZQ0KPiBhYXJjaDY0X2FkZF9w
+YXV0aF9wcm9wZXJ0aWVzKCkNCj4ga3ZtX2FybV9zZXRfY3ByZWdfbWlnX3RvbGVyYW5jZXMoKQ0K
+SGF2ZW7igJl0IGxvb2tlZCBpbnRvIGt2bV9hcm1fc2V0X2NwcmVnX21pZ190b2xlcmFuY2VzKCks
+IHdpbGwgZG8uDQoNCj4gDQo+IGF0IGxlYXN0Lg0KPiANCj4gQnkgdGhlIHdheSBpdCBpcyBub3Qg
+Y2xlYXIgd2hhdCB3aWxsIGJlY29tZSBsZWdhY3kgY29tcG9zaXRpdmUgb3B0aW9ucw0KPiB3aXRo
+IG5hbWVkIHZjcHUgbW9kZWxzLiBJIHNlZSB5b3Uga2VlcCBzdmUgYnV0IHdoYXQgYWJvdXQgdGhl
+IG90aGVycy4NCg0KQXMgbm93IHlvdXIgc2VyaWVzIGhhbmRsZXMgdGhlIGNvbmZsaWN0c+KApiBJ
+IHdpbGwgdGFrZSBzaW1pbGFyIGFwcHJvYWNoLA0KdXNlciB3aWxsIG5vdCBoYXZlIHR3byB3YXlz
+IHRvIHNldCB0aGUgc2FtZSBzZXR0aW5ncy4NCj4+ICsNCj4+ICsgICAgLyogMy4gUmVhbGl6ZSB0
+aGUgbW9kZWwgY2hhaW4uICovDQo+PiArICAgIGFybV9yZWFsaXplX21vZGVsX2NoYWluKG9iaiwg
+bW9kZWwsICZlcnJvcl9hYm9ydCk7DQo+PiArfQ0KPj4gKw0KPj4gK3ZvaWQgYXJtX3JlZ2lzdGVy
+X25hbWVkX2NwdV9tb2RlbHModm9pZCkNCj4+ICt7DQo+PiArICAgIHN0YXRpYyBBUk1DUFVJbmZv
+ICphcm1fbmFtZWRfY3B1X2luZm9zOw0KPj4gKyAgICBzaXplX3QgaSwgbiA9IEFSUkFZX1NJWkUo
+YXJtX2NwdV9tb2RlbHMpOw0KPj4gKw0KPj4gKyAgICBpZiAoIW4pIHsNCj4+ICsgICAgICAgIHJl
+dHVybjsNCj4+ICsgICAgfQ0KPj4gKw0KPj4gKyAgICBhcm1fbmFtZWRfY3B1X2luZm9zID0gZ19u
+ZXcwKEFSTUNQVUluZm8sIG4pOw0KPj4gKyAgICBmb3IgKGkgPSAwOyBpIDwgbjsgaSsrKSB7DQo+
+PiArICAgICAgICBpZiAoIWFybV9jcHVfbW9kZWxzW2ldLm5hbWUpIHsNCj4+ICsgICAgICAgICAg
+ICBicmVhazsNCj4+ICsgICAgICAgIH0NCj4+ICsNCj4+ICsgICAgICAgIGFybV9uYW1lZF9jcHVf
+aW5mb3NbaV0ubmFtZSA9IGFybV9jcHVfbW9kZWxzW2ldLm5hbWU7DQo+PiArICAgICAgICBhcm1f
+bmFtZWRfY3B1X2luZm9zW2ldLmluaXRmbiA9IGFybV9uYW1lZF9jcHVfaW5pdGZuOw0KPj4gKyAg
+ICAgICAgYXJtX2NwdV9yZWdpc3RlcigmYXJtX25hbWVkX2NwdV9pbmZvc1tpXSk7DQo+PiArICAg
+IH0NCj4+ICt9DQo+PiArDQo+PiArdHlwZV9pbml0KGFybV9yZWdpc3Rlcl9uYW1lZF9jcHVfbW9k
+ZWxzKQ0KPj4gZGlmZiAtLWdpdCBhL3RhcmdldC9hcm0vY3B1LW1vZGVscy5oIGIvdGFyZ2V0L2Fy
+bS9jcHUtbW9kZWxzLmgNCj4+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0DQo+PiBpbmRleCAwMDAwMDAw
+MDAwLi4xNDQ3Nzg3NDRlDQo+PiAtLS0gL2Rldi9udWxsDQo+PiArKysgYi90YXJnZXQvYXJtL2Nw
+dS1tb2RlbHMuaA0KPj4gQEAgLTAsMCArMSwzNiBAQA0KPj4gKy8qIFNQRFgtTGljZW5zZS1JZGVu
+dGlmaWVyOiBHUEwtMi4wLW9yLWxhdGVyICovDQo+PiArI2lmbmRlZiBBUk1fQ1BVX01PREVMU19I
+DQo+PiArI2RlZmluZSBBUk1fQ1BVX01PREVMU19IDQo+PiArDQo+PiArI2luY2x1ZGUgInFhcGkv
+ZXJyb3IuaCINCj4+ICsjaW5jbHVkZSAicW9tL29iamVjdC5oIg0KPj4gKw0KPj4gK3R5cGVkZWYg
+ZW51bSBBcm1Nb2RlbFByb3BUeXBlIHsNCj4+ICsgICAgQVJNX01PREVMX1BST1BfQk9PTCwNCj4+
+ICsgICAgQVJNX01PREVMX1BST1BfTlVNLA0KPj4gK30gQXJtTW9kZWxQcm9wVHlwZTsNCj4+ICsN
+Cj4+ICt0eXBlZGVmIHN0cnVjdCBBcm1Nb2RlbFByb3BWYWx1ZSB7DQo+PiArICAgIGNvbnN0IGNo
+YXIgKm5hbWU7DQo+PiArICAgIEFybU1vZGVsUHJvcFR5cGUgdHlwZTsNCj4+ICsgICAgdW5pb24g
+ew0KPj4gKyAgICAgICAgYm9vbCBiOw0KPj4gKyAgICAgICAgdWludDY0X3QgbnVtOw0KPj4gKyAg
+ICB9IHU7DQo+PiArfSBBcm1Nb2RlbFByb3BWYWx1ZTsNCj4+ICsNCj4+ICt0eXBlZGVmIHN0cnVj
+dCBBcm1OYW1lZENwdU1vZGVsIHsNCj4+ICsgICAgY29uc3QgY2hhciAqbmFtZTsNCj4+ICsgICAg
+Y29uc3QgY2hhciAqcGFyZW50Ow0KPiBhbnkgcmVhc29uIHdoeSB5b3UgZG9uJ3QgcG9pbnQgdG8g
+dGhlIHBhdGVudCBBcm1OYW1lZENwdU1vZGVsIHBvaW50ZXINCj4gaW5zdGVhZD8NCk5vIHNwZWNp
+ZmljIHJlYXNvbiwgd2lsbCBjaGFuZ2UgdG8gQXJtTmFtZWRDcHVNb2RlbCBwb2ludGVyLg0KDQpU
+aGFua3MsDQpLaHVzaGl0DQo+PiArICAgIGNvbnN0IEFybU1vZGVsUHJvcFZhbHVlICpwcm9wczsN
+Cj4+ICt9IEFybU5hbWVkQ3B1TW9kZWw7DQo+PiArDQo+PiArdm9pZCBhcm1fcmVnaXN0ZXJfbmFt
+ZWRfY3B1X21vZGVscyh2b2lkKTsNCj4+ICsNCj4+ICtjb25zdCBBcm1OYW1lZENwdU1vZGVsICph
+cm1fZmluZF9tb2RlbChjb25zdCBjaGFyICpuYW1lKTsNCj4+ICt2b2lkIGFybV9hcHBseV9tb2Rl
+bF9wcm9wcyhPYmplY3QgKm9iaiwgY29uc3QgQXJtTW9kZWxQcm9wVmFsdWUgKnByb3BzLA0KPj4g
+KyAgICAgICAgICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJycCk7DQo+PiArdm9pZCBhcm1f
+cmVhbGl6ZV9tb2RlbF9jaGFpbihPYmplY3QgKm9iaiwgY29uc3QgQXJtTmFtZWRDcHVNb2RlbCAq
+bW9kZWwsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICBFcnJvciAqKmVycnApOw0K
+Pj4gKw0KPj4gKyNlbmRpZiAvKiBBUk1fQ1BVX01PREVMU19IICovDQo+PiBkaWZmIC0tZ2l0IGEv
+dGFyZ2V0L2FybS9tZXNvbi5idWlsZCBiL3RhcmdldC9hcm0vbWVzb24uYnVpbGQNCj4+IGluZGV4
+IDM4NGQ5MGM1MzAuLmRkMjgxNDZjNTIgMTAwNjQ0DQo+PiAtLS0gYS90YXJnZXQvYXJtL21lc29u
+LmJ1aWxkDQo+PiArKysgYi90YXJnZXQvYXJtL21lc29uLmJ1aWxkDQo+PiBAQCAtMzIsNiArMzIs
+NyBAQCBhcm1fY29tbW9uX3N5c3RlbV9zcy5hZGQoZmlsZXMoDQo+PiAgICdhcm0tcW1wLWNtZHMu
+YycsDQo+PiAgICdjcHUtaWRyZWdzLmMnLA0KPj4gKSkNCj4+ICthcm1fc3lzdGVtX3NzLmFkZCh3
+aGVuOiAnVEFSR0VUX0FBUkNINjQnLCBpZl90cnVlOiBmaWxlcygnY3B1LW1vZGVscy5jJykpDQo+
+PiBhcm1fc3lzdGVtX3NzLmFkZCh3aGVuOiAnQ09ORklHX0tWTScsIGlmX3RydWU6IGZpbGVzKCdo
+eXBfZ2Ric3R1Yi5jJywgJ2t2bS5jJykpDQo+PiBhcm1fc3lzdGVtX3NzLmFkZCh3aGVuOiAnQ09O
+RklHX0hWRicsIGlmX3RydWU6IGZpbGVzKCdoeXBfZ2Ric3R1Yi5jJykpDQo+PiANCj4gRXJpYw0K
+DQoNCg==
