@@ -1,181 +1,115 @@
-Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42DAA5172E8
-	for <kvmarm@lists.linux.dev>; Tue, 29 Sep 2026 11:31:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490433DC856;
+	Tue, 29 Sep 2026 11:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790681468; cv=none; b=G4U4yGm96zFV4QX/0beDHTGtL1cWr5sLSSg/KheoDQl/MLuxd2oJgUaCsPgEUKT06bKFc04EZB5JCJnYsg5ShP92GrFxVDm5s2RrxXOjpTMb8VDxE37kba+dc3mZNbAbT5zC39Wbai9KVrJuqKAGmsF6SNmUfHTC5ssIH2Zu6f8=
+	t=1790683111; cv=none; b=hDXoSZ/LyQCkVOOeJaXu74ST0TwNMZnAK8Ya7FeimnoHInsHZkqXbMGvZCJ677H1Yv9QAgHiIlm8uNALCIpHw3r/onNLERqEE9ajMHbZHy+9venwlp14Cygrd3M/eq+zBbxWtG8ajmPKPzV73mAw4HYFf0ujX9xb773k4rV2ihk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790681468; c=relaxed/simple;
-	bh=wqs3vpKaDCWtWgprbaqXrOrXrz0kKNMOWmvho3fZQ3Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=mltsji7RN0lHTlNeKkr9CjKE2Glh/TVcRxzSn2pmHI3r5KMBsTInaSLwHb2xB73rk0E88+i6tmfCoGijL/zjWSM0V940n732OBppNOkuCYrnm/YF70MrWqDFUGa0IH1rw+jXFIj1la7IvWftYUURV5gcELMv/V5/hAn5twoZrB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=IS67ruVh; arc=none smtp.client-ip=113.46.200.224
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1790683111; c=relaxed/simple;
+	bh=3fRHoFrdFC/+mzB3bxZWw4z3Bm5m1AurpfMP4seD45M=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Y3YAK/WW+x41sRhWEvs2mXNJUkGTEftG3dYpAXcK2eYHJ2VFjGuIcl7XlUjtafxzJhW6e2X+TIaNq476xUvjZobVTGi25XoHC3go/2hVSb4j9fzJ3m43y2DGGb0saAqgDaDIDvP3QhnHTQLUg9Rh+8rpn+t7Tax09PRXtd072qU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XLPSLl//; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="IS67ruVh"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=i999MGH5SdNPcu4Q8VB0Q3AdAc6DTMs0HY0/qk7ot9g=;
-	b=IS67ruVhdS/g2OwlEG9o0G9CqS+WcM/qqKiiXSqtCwqQ0In275KUqJnyy6fjdepPQnCc+cdiE
-	EXSs8oNfsVBWwoCv7CrDKzK4diJNMtcNdqxQZ8m/uUaCQRv5yoC6O+fYDu8VbMT+mcjhwfo1eOc
-	n8cXeuqeY5dDOZAdlOzHBC4=
-Received: from mail.maildlp.com (unknown [172.19.163.214])
-	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4hvG146RK8z1cyPY;
-	Tue, 29 Sep 2026 19:19:52 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 05A164057C;
-	Tue, 29 Sep 2026 19:30:59 +0800 (CST)
-Received: from [10.67.120.103] (10.67.120.103) by
- kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Tue, 29 Sep 2026 19:30:58 +0800
-Message-ID: <3e23f91a-38d0-486a-b3f8-d94bd24d377f@huawei.com>
-Date: Tue, 29 Sep 2026 19:30:58 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XLPSLl//"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4866F1F00893;
+	Tue, 29 Sep 2026 11:58:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790683109;
+	bh=2ZtNrk6Feyb46SX9NsCxGZaoPNBMUhdFMGziOw7Z23U=;
+	h=From:Subject:Date:To:Cc;
+	b=XLPSLl//hsV/lQrXXyHVg2sTRVxKvp6MFRqspNnu+geEl68vjOq9iZvgKdd8AYZG4
+	 9kAJPNdv1FaaW0dGg5AuXLLsPvphF+YBOI5RRZxIcD8Ri9hMdjP9MYHAu4lNvDljer
+	 pSK0EY5n7eUJFCHm8aPCC/YP53VovWjg66gQkS2i3hT8c3FH1zSGYq9reXDkzbTc3A
+	 UoCWTzSI159TbR6nmKKLhVdRtgIPPNYbl7M/Hv4Y/3qaMa0SoEfth3n0ViYZTUVDLl
+	 yM6jT8PQw/gcQ9ZUXx6d+omsMsbiHCK2awcQvuS026dMZ60LMmkMqSEHoOhqvjRCiB
+	 8gp0STOG49l5g==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v4 0/3] KVM: arm64: ID register finalisation fixes
+Date: Tue, 29 Sep 2026 12:57:57 +0100
+Message-Id: <20260929-kvm-arm64-idreg-final-v4-0-75296dde994d@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 5/5] KVM: arm64: Enable HAFDBS for guests not on
- migration
-To: Leonardo Bras <leo.bras@arm.com>
-CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>
-References: <20260901171558.2674031-1-leo.bras@arm.com>
- <20260901171558.2674031-6-leo.bras@arm.com>
- <497c6239-a75f-4087-83c8-efface3fe3d7@huawei.com>
- <arE_Jh4UHiUdjrSi@LeoBrasDK>
-From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <arE_Jh4UHiUdjrSi@LeoBrasDK>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+X-B4-Tracking: v=1; b=H4sIAMWnu2oC/3XOTQ7CIBAF4Ks0rMVQoNC68h7GBYWhxZ/WgBJN0
+ 7tLq0ljTJcvM/O9GVAA7yCgXTYgD9EF13cp8E2GdKu6BrAzKSNKqCCSVvgcr1j5q+Bp4KHB1nX
+ qgqXUteaiLopSoXR782Ddc3YPx08Oj/oE+j5h00brwr33r7k45tPet4PlKx0xxwQzA1QVIhdGi
+ /0ZfAeXbe8bNJVEujAlYWsMTYyRRgIHqwUnfwxbmIqsfsMSo4i1igirSkl/mHEc31WJFvBbAQA
+ A
+X-Change-ID: 20260729-kvm-arm64-idreg-final-77cbc46b558a
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+ Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Peter Maydell <peter.maydell@linaro.org>, 
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>, 
+ Fuad Tabba <fuad.tabba@linux.dev>, "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+X-Mailer: b4 0.17-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1905; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=3fRHoFrdFC/+mzB3bxZWw4z3Bm5m1AurpfMP4seD45M=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqu6feKMIrvZsHSK/zFAg3R5tYhRpxnNfzrr2qH
+ Zyvimut24GJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCarun3gAKCRAk1otyXVSH
+ 0DLeB/448XCpgPI9But5nNSXH4cx69w/oaJ0novPibHHj8MYUFDozhfVSeBKksleTevffKxKmHA
+ etGGGl/S3qWJMIg+LVqJX2M8bNZn6ocs4EX4uAUu+1rq7sJYDyR3MyrRvQXm7nOEqsjwQNgkWD1
+ RZvgsWadIF4fW8K4NtyPn9XKkswV58cDgTI2I5wcDQKE9sy9xdM0Lgq5hEktxDU4JXypTFwJW9A
+ tsduRmSd7eP1dKQU2dwGGB+vUZMH5sRh0J92yR3v9iqiiMjWjfK8Hi+MMPUPEr/pKGpmm+1ewIE
+ QKt7SLcO3U3VyC/HKx7EXJzZ2a3z5hrB3xkURcEac4oviJOn
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
+While looking at some feature enablement I noticed that there are some
+scenarios where we can end up with an inconsistently configured vCPU due
+to finalizing configuration based on ID registers before we have blocked
+writes to the ID registers. This series aims to clean up these issues.
 
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v4:
+- Rebase onto v7.3-rc3.
+- Add a lockdep assert.
+- Update Fuad's LLM tag.
+- Link to v3: https://patch.msgid.link/20260901-kvm-arm64-idreg-final-v3-0-a0ffa06fa872@kernel.org
 
-On 9/21/2026 10:28 PM, Leonardo Bras wrote:
-> On Fri, Sep 18, 2026 at 07:58:43PM +0800, Tian Zheng wrote:
->>
->>
->> On 9/2/2026 1:15 AM, Leonardo Bras wrote:
->>> @@ -2570,53 +2571,76 @@ int __init kvm_mmu_init(u32 hyp_va_bits)
->>>    out_destroy_pgtable:
->>>    	kvm_pgtable_hyp_destroy(hyp_pgtable);
->>>    out_free_pgtable:
->>>    	kfree(hyp_pgtable);
->>>    	hyp_pgtable = NULL;
->>>    out:
->>>    	return err;
->>>    }
->>> +static void kvm_set_hafdbs(struct kvm *kvm, bool set)
->>> +{
->>> +	/* Check if no action required */
->>> +	if (!!(kvm->arch.mmu.vtcr & VTCR_EL2_HD) == set)
->>> +		return;
->>> +
->>> +	if (set)
->>> +		kvm->arch.mmu.vtcr |= VTCR_EL2_HD;
->>> +	else
->>> +		kvm->arch.mmu.vtcr &= ~VTCR_EL2_HD;
->>> +
->>> +	kvm_make_all_cpus_request(kvm, KVM_REQ_RELOAD_STAGE2);
->>> +}
->>> +
->>
->> Hi Leo,
->>
->> HD alone is architecturally a no-op. According to the Arm spec, the
->> VTCR_EL2.HD field description reads: "When the Effective value of
->> VTCR_EL2.HA is 0, this field behaves as 0 for all purposes other than a
->> direct read of the value of this bit." So patch 5 as it stands never
->> actually enables stage-2 dirty management.
-> 
-> Oh, right, I missed that. :/
-> 
-> For the above to work it would need to have the HA bit:
-> 
-> +	if (set)
-> +		kvm->arch.mmu.vtcr |= VTCR_EL2_HA | VTCR_EL2_HD;
-> +	else
-> +		kvm->arch.mmu.vtcr &= ~(VTCR_EL2_HA |VTCR_EL2_HD);
-> 
+Changes in v3:
+- Rebase onto v7.3-rc1.
+- Explain why KVM_ARCH_FLAG_ID_REGS_INITIALIZED is not reused.
+- Pull in Fuad's test cases.
+- Link to v2: https://patch.msgid.link/20260803-kvm-arm64-idreg-final-v2-0-d7d7e4efc640@kernel.org
 
-Hi Leo,
+Changes in v2:
+- Also replace the kvm_vm_has_ran_once() usage in kvm_set_vm_id_rg() and
+  kvm_vm_finalize_sys_regs() with kvm_id_regs_final().
+- Link to v1: https://patch.msgid.link/20260731-kvm-arm64-idreg-final-v1-0-3de2a5616dc6@kernel.org
 
-Yep, I've already fixed this in v5.
+---
+Fuad Tabba (1):
+      KVM: arm64: selftests: Check ID regs are immutable after a failed run
 
->>
->> In the combined series, I'm planning to replace both kvm_set_hafdbs()
->> and our earlier enable/disable hooks with a single derived mode:
->>
->> ```
->> /*
->>   *   logging && HDBSS-capable  ->  HDBSS  (HD|HA|HDBSS)
->>   *   logging, no HDBSS         ->  off
->>   *   !logging, HAFDBS-capable  ->  HAFDBS (HD|HA)
->>   */
-> 
-> Yes, seems correct, if the performance numbers can show patch 5 provides
-> performance improvements.
-> 
+Mark Brown (2):
+      KVM: arm64: Finalize guest-wide sysregs prior to per-vCPU sysregs
+      KVM: arm64: Block ID register changes after we rely on the values
 
-Right, I've added this function in patch 12 of the HDBSS v5 series.
-Performance numbers look good so far.
+ arch/arm64/include/asm/kvm_host.h               |   8 ++
+ arch/arm64/kvm/arm.c                            |   2 +-
+ arch/arm64/kvm/sys_regs.c                       |  57 ++++++++-----
+ arch/arm64/kvm/sys_regs.h                       |   2 +-
+ arch/arm64/kvm/vgic/vgic-init.c                 |   6 +-
+ tools/testing/selftests/kvm/arm64/set_id_regs.c | 106 +++++++++++++++++++++++-
+ 6 files changed, 154 insertions(+), 27 deletions(-)
+---
+base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
+change-id: 20260729-kvm-arm64-idreg-final-77cbc46b558a
 
->> void kvm_arch_update_hw_dirty_mode(struct kvm *kvm)
->> {
->> 	bool logging = atomic_read(&kvm->nr_memslots_dirty_logging) != 0;
->> 	unsigned long target;
->>
->> 	if (logging && kvm_supports_hdbss(kvm))
->> 		target = VTCR_EL2_HD | VTCR_EL2_HA | VTCR_EL2_HDBSS;
->> 	else if (logging || !kvm_supports_hafdbs(kvm))
->> 		target = 0;
->> 	else
->> 		target = VTCR_EL2_HD | VTCR_EL2_HA;
->> 	...
->> }
->> ```
-> 
-> Humm, do we actually need the atomic_read being ran when we are enabling
-> dirty_logging? Maybe we can restrain it only to the disabling part.
-> 
-
-True, but it's just a plain load. Keeping it unconditional avoids
-tracking the transition direction, so I'd prefer to keep it. Looking
-forward to your further review.
-
->>
->> HA is always set alongside HD by construction, so the no-op issue goes
->> away.
-> 
-> Right.
-> 
->>
->> I'll fold this into the HDBSS v5 series when I send it out. Let me know
->> if you'd rather keep it in your v2 instead.
->>
-> 
-> Feel free to merge your part on top of that, I will work on collecting the
-> numbers, though.
-> 
-> Thanks!
-> Leo
-> 
-
-Sorry for the late reply. I was running HDBSS+DBM tests over the past
-few days. The HDBSS v5 series with your DBM code merged is now sent out
-to the community. Feedback welcome:
-
-https://lore.kernel.org/all/20260929103655.85107-1-zhengtian10@huawei.com/
-
-Thanks!
-Tian
+Best regards,
+--  
+Mark Brown <broonie@kernel.org>
 
