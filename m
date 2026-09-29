@@ -1,258 +1,127 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 709BB4FECEA;
-	Tue, 29 Sep 2026 11:06:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F3E502561;
+	Tue, 29 Sep 2026 11:12:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790680001; cv=none; b=ZGFxzJSdvwlFVPT2JmVrfqpbCK0x6kFZGBaDQiFXntJ3ZoHSHrci/x2C8QFJHA1DAxj6sdqPt0VUQBgbB7zDyEc2JZDc7PdZJfNm0upIHQJfpfT1iwLvBAB54sX5yyex6X29l2q1mN+G8JCJ2Vr0r1JnQa6ISryccHJR/YsoHMo=
+	t=1790680339; cv=none; b=PiM1WO/DknW/97aa//ftGdnlxjR9k8iU50WF/aCGKM5djXC/BAh1IeJoWVXfrD97ukg4d0mr/fI6PwdJ4FKx1CzZEhySA45f/2tPTyuEkpCgQQaaI2ynSkJrVJKR6aZT95YlEb+1IfAbucL2GNZHbxgR7DCgOhz1oaiKlooLXF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790680001; c=relaxed/simple;
-	bh=xo99Uqbz4winsFycjLoBbZOBDB4IgEKD6IeoGvlzROY=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=JqkxsfMjbOe59hxRmN75KtA3Sm5UB4FJwb+3LcJNZNoWcWABN7M+W0Uzm2fZ3oX7RrPnTJ/HaVaQ4YNRVdVopV8etCNmpJeB7BWgZLP+U2Fj3bE2btN0c21unhtLZXlv6e//nD0amK+XkhuCAJxlrlQLA8I2xmGROIt7hFH01xY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jd/PVxO5; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790680339; c=relaxed/simple;
+	bh=Oa+fncOJqLBSPNYLEUbP6b6zgvqPNXaiiMRC+IOlcgE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ovKic9+gueVbh4fO04M1oX+aAE2S1f3x4oyQpFSc+pRXYnsQClhXX56IaPpKbYuZJtl/Fo632RDoRBuO/SdIYjgNw2zhIxa+qvMYYkNlXqVa+MPhk/CUnxP4J4RBbt1BfbapF3kwdRui/xKuknsdJBVeFx5jFh7AQJRxi14+188=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BV88qyIr; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jd/PVxO5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D19171F000FF;
-	Tue, 29 Sep 2026 11:06:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BV88qyIr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD0241F000FF;
+	Tue, 29 Sep 2026 11:11:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790679999;
-	bh=x7xpjkH/+Y+E+QqPl1IPWhcctgJIBF+u5LKGMwCv304=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Jd/PVxO5dqtpJiY3lOtt8/Ab+ilruJ1HYAdbGUAXJEy1uKN/InG4JO74wuuQPe+SY
-	 mecC//sqaow0SOSto48WK9Y9r1Sq0lOUHv8AL9CwsLUbSxnyJmM6Kft1J83PUiKdsH
-	 EfUwIkA6s46sf558388Ylo6G1COgFwvOktPsnpta0kG/q6VkC9rANjlHgH+FTnnBf1
-	 Io5HibFONgzqm5Tv6Bk40aYG1ariGxIzL6SugmOhMuZSx6AfjeLAzRKgBO6WE8qKGR
-	 1jZzfHeIN6ZyoBkdbXfQihj4yJ4dpEFjVUMDfpjKeGHjO/IYUHP6HS5fRPE6Q4d9Ry
-	 ZgPcaFiIbO+MA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 14/15] KVM: arm64: Document HDBSS buffer size ioctl
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Tian Zheng" <zhengtian10@huawei.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver
- Upton" <oupton@kernel.org>
-In-Reply-To: <20260929103655.85107-15-zhengtian10@huawei.com>
-References: <20260929103655.85107-1-zhengtian10@huawei.com>
- <20260929103655.85107-15-zhengtian10@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 29 Sep 2026 11:06:38 +0000
-Message-Id: <20260929110638.D19171F000FF@smtp.kernel.org>
+	s=k20260515; t=1790680337;
+	bh=OtKLzSVjKPRZshz2AefRxKxu1viQOmmc/Cl7ueutcPM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=BV88qyIrUdemgCTc7/Nc1a5HencKOCtUUeQF/4yuDOy+E9lTQJTXaqexwwEa+KENc
+	 IHnvm++5OlPA7wQp78zpEfhb13SxfqeGtE8x0Tr4lJuOODJoVnitMUth71d8TyI8FL
+	 qF9QPvRMYORpyuleZ9gBZ9acR1tOtNY6T0V0l2wM3DCoWKv97l9wnJfOLBz3QVXNcf
+	 zuCeflofP0AyEaKrVdS0ufY5NE8KthdOm5n6A3n0TzkRrDI50QFp3WVuF5iK4VLw/2
+	 /u7yd0WDEAicCMf2zjaEZ1eoZuTrAugZMtLq/8C7LYHaANp8hLzVqESeam3NBy6sPL
+	 fqbmJ7n5T9GCg==
+Date: Tue, 29 Sep 2026 12:11:42 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Suren Baghdasaryan <surenb@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	"Liam R. Howlett" <liam@infradead.org>, Vlastimil Babka <vbabka@kernel.org>, 
+	Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
+	David Hildenbrand <david@kernel.org>, Mike Rapoport <rppt@kernel.org>, Michal Hocko <mhocko@suse.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Leon Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>, 
+	Stephen Smalley <stephen.smalley.work@gmail.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
+	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
+	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
+	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <mkp@kernel.org>, 
+	Jaya Kumar <jayalk@intworks.biz>, Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, 
+	Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
+	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
+	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
+	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
+	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
+	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
+	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev
+Subject: Re: [PATCH v3 08/40] mm: add mmap action for discontiguous kernel
+ page mapping
+Message-ID: <aruboNztyLjlrXiG@gremlin>
+References: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org>
+ <20260917-b4-mmap-prepare-vma-flag-sanify-v3-8-4583d8a23bca@kernel.org>
+ <CAJuCfpEawD2NUO9EoqKnR6YR59XMdYrtUrj8KEwJVwO8AOk8Lw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJuCfpEawD2NUO9EoqKnR6YR59XMdYrtUrj8KEwJVwO8AOk8Lw@mail.gmail.com>
 
-Thank you for your contribution! Sashiko AI review found 4 potential issue(=
-s) to consider:
-- [Critical] kvm: arm64: missing vCPU kick in kvm_arch_update_hw_dirty_mode=
- causes data corruption
-- [High] kvm: arm64: stage2_wrprotect_walker clobbers concurrent hardware P=
-TE updates
-- [Medium] kvm: uapi: enabling dirty ring silently resets HDBSS buffer size
-- [Low] kvm: uapi: KVM_CHECK_EXTENSION misused to return mutable VM state
+On Sun, Sep 27, 2026 at 02:44:18PM -0700, Suren Baghdasaryan wrote:
+> On Thu, Sep 17, 2026 at 9:27 AM Lorenzo Stoakes (ARM) <ljs@kernel.org> wrote:
+
+> > diff --git a/include/linux/mm.h b/include/linux/mm.h
+> > index a1f2d375cf7d..2a92193ac6a5 100644
+> > --- a/include/linux/mm.h
+> > +++ b/include/linux/mm.h
+
+> > +static inline void
+> > +discontig_kernel_map_page_range(struct discontig_kernel_page_state *state,
+> > +                               struct page **page_arr, unsigned long nr_pages)
+> > +{
+> > +       state->action = DISCONTIG_KERNEL_PAGE_MAP_PAGE_RANGE;
+> > +       state->__page_arr = page_arr;
+> > +       state->__nr_pages = nr_pages;
+>
+> Shouldn't we cap state->__nr_pages at state->nr_pages_remain like you
+> do in discontig_kernel_map_page()?
+
+Ack yeah good point, will do!
+
 --
-
-commit ad3d8df658768bdca959742e1b61e3dd3914fdd8
-Author: Tian Zheng <zhengtian10@huawei.com>
-
-KVM: arm64: Document HDBSS buffer size ioctl
-   =20
-Document KVM_CAP_ARM_HDBSS_BUFFER_SIZE, which lets userspace configure the
-per-vCPU HDBSS buffer size for hardware-assisted dirty tracking during live
-migration.
-
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
-rst
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -9056,6 +9056,34 @@ enabled, cmma can't be enabled anymore and pfmfi a=
-nd the storage key
->  interpretation are disabled. If cmma has already been enabled or the
->  hpage_2g module parameter is not set to 1, -EINVAL is returned.
-> =20
-> +7.48 KVM_CAP_ARM_HDBSS_BUFFER_SIZE
-> +-----------------------------------
-> +
-> +:Architectures: arm64
-> +:Target: VM
-> +:Parameters: args[0] is the per-vCPU HDBSS buffer size in bytes
-> +:Returns: 0 on success; -EINVAL if the size is invalid or vCPUs have alr=
-eady
-> +          been created; -EBUSY if the buffer size was already configured.
-> +
-> +This capability configures the per-vCPU HDBSS buffer size used for
-> +hardware-assisted dirty tracking during live migration.
-> +
-> +Userspace sets the size in bytes via KVM_ENABLE_CAP. KVM allocates
-> +per-vCPU HDBSS buffers of the requested size.
-> +
-> +KVM_CHECK_EXTENSION returns the maximum supported size (``SZ_2M``)
-> +when queried without a VM, or the configured per-VM size (default
-> +``PAGE_SIZE``) when queried with a VM.
-
-[Severity: Low]
-KVM_CHECK_EXTENSION is designed to advertise static feature support and
-limits, not to serve as a GET interface for mutable, dynamically configured
-VM attributes.
-
-Would it be better to use a dedicated interface to read back this dynamic
-state instead of KVM_CHECK_EXTENSION?
-
-> +
-> +Constraints:
-> +
-> +- The size must be a power of two in [``PAGE_SIZE``, ``SZ_2M``].
-> +- Dirty-bitmap mode only: rejected with -EINVAL once the dirty ring
-> +  (``KVM_CAP_DIRTY_LOG_RING``) is enabled, and enabling the ring after
-> +  a size was set resets it to the default.
-
-[Severity: Medium]
-The KVM guidelines mandate that new memslot and vCPU flags default to
-immutable.=20
-
-Instead of silently mutating previously configured state (which can lead to
-unpredictable state-machine transitions that userspace is not prepared
-for), should this incompatible capability configuration fail explicitly by
-returning an error like -EINVAL?
-
-> +- Must be set before any vCPU is created; a second setting is rejected
-> +  with -EBUSY.
-> =20
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-
-[ ... ]
-
-> @@ -1285,12 +1298,47 @@ static int stage2_update_leaf_attrs(struct kvm_pg=
-table *pgt, u64 addr,
->  	return 0;
->  }
-> =20
-> +static int stage2_wrprotect_walker(const struct kvm_pgtable_visit_ctx *c=
-tx,
-> +				   enum kvm_pgtable_walk_flags visit)
-> +{
-> +	kvm_pte_t new =3D ctx->old & ~KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-> +
-> +	/* We remove DBM on blocks so they can fault and get split */
-> +	if (ctx->level < KVM_PGTABLE_LAST_LEVEL)
-> +		new &=3D ~KVM_PTE_LEAF_ATTR_HI_S2_DBM;
-> +
-> +	if (kvm_pte_valid(ctx->old) && ctx->old !=3D new &&
-> +	    (ctx->old & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W) &&
-> +	    ctx->mm_ops->mark_page_dirty)
-> +		ctx->mm_ops->mark_page_dirty(kvm_pte_to_phys(ctx->old));
-> +
-> +	/*
-> +	 * The plain WRITE_ONCE races with hardware updates; both are
-> +	 * benign.
-> +	 *
-> +	 * AF: the update may be lost, and is set on the next access.
-> +	 *
-> +	 * Dirty state: we only rewrite entries whose old value had S2AP[1]
-> +	 * set, while hardware only promotes entries with S2AP[1] clear, so
-> +	 * the two never touch the same entry. The one overlap is DBM removal
-> +	 * on writable-clean blocks: a racing promotion is demoted back to
-> +	 * read-only, but the write is still recorded in the HDBSS buffer and
-> +	 * the folio was marked dirty at fault-in, so nothing is lost.
-> +	 */
-> +	if (kvm_pte_valid(ctx->old) && ctx->old !=3D new)
-> +		WRITE_ONCE(*ctx->ptep, new);
-
-[Severity: High]
-The global review guidelines strictly mandate: When KVM updates SPTE bits t=
-hat
-the hardware page-table walker also writes (Dirty/Access on leaf entries), =
-the
-update must not clobber a concurrent hardware update.
-
-Since WRITE_ONCE unconditionally overwrites the PTE with the old masked
-value, could this non-atomic write in stage2_wrprotect_walker() clobber
-concurrent hardware updates to the Access Flag (AF) or Dirty Bit on leaf
-PTEs?
-
-> +
-> +	return 0;
-> +}
-> +
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-
-[ ... ]
-
-> @@ -2581,6 +2629,45 @@ int __init kvm_mmu_init(u32 hyp_va_bits)
->  	return err;
->  }
-> =20
-> +/*
-> + * The VM's hardware dirty-management mode is a derived value, a pure
-> + * function of the static capabilities and the number of logging
-> + * memslots, so recomputing it on every event cannot lose an update
-> + * and needs no locking against racing writers:
-> + *
-> + *   logging && HDBSS-capable  ->  HD|HA|HDBSS (hardware tracking)
-> + *   logging, no HDBSS         ->  off (write-protect faults)
-> + *   !logging && HAFDBS-cap.   ->  HD|HA (only written pages go dirty)
-> + */
-> +void kvm_arch_update_hw_dirty_mode(struct kvm *kvm)
-> +{
-> +	unsigned long cur, target;
-> +	bool logging =3D atomic_read(&kvm->nr_memslots_dirty_logging) !=3D 0;
-> +
-> +	if (logging && kvm_supports_hdbss(kvm))
-> +		target =3D VTCR_EL2_HD | VTCR_EL2_HA | VTCR_EL2_HDBSS;
-> +	else if (logging || !kvm_supports_hafdbs())
-> +		target =3D 0;
-> +	else
-> +		target =3D VTCR_EL2_HD | VTCR_EL2_HA;
-> +
-> +	cur =3D kvm->arch.mmu.vtcr & (VTCR_EL2_HD | VTCR_EL2_HA | VTCR_EL2_HDBS=
-S);
-> +	if (cur =3D=3D target)
-> +		return;
-> +
-> +	kvm->arch.mmu.vtcr =3D (kvm->arch.mmu.vtcr &
-> +			      ~(VTCR_EL2_HD | VTCR_EL2_HA | VTCR_EL2_HDBSS)) |
-> +			     target;
-> +
-> +	kvm_make_all_cpus_request(kvm, KVM_REQ_RELOAD_STAGE2);
-> +
-> +	/*
-> +	 * The request only reloads VTCR_EL2; cached translations keep
-> +	 * the old permissions until invalidated.
-> +	 */
-> +	kvm_flush_remote_tlbs(kvm);
-
-[Severity: Critical]
-Inside kvm_arch_update_hw_dirty_mode(), kvm_make_all_cpus_request() is issu=
-ed
-with KVM_REQ_RELOAD_STAGE2, which is defined as:
-
-#define KVM_REQ_RELOAD_STAGE2 \
-	KVM_ARCH_REQ_FLAGS(12, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-
-The KVM_REQUEST_NO_WAKEUP flag prevents the request from interrupting runni=
-ng
-vCPUs. The subsequent kvm_flush_remote_tlbs() executes a hardware broadcast=
- TLBI
-and also does not send IPIs.=20
-
-Because running vCPUs are never kicked out of guest mode, won't they
-continue executing with their physical VTCR_EL2 register holding the
-stale state (HD=3D1)?
-
-If software dirty logging is active but HDBSS is not correctly synchronized
-on the CPU, the hardware page table walker could silently promote
-writable-clean PTEs to writable-dirty without trapping. Since KVM never
-sees the write, could this cause silent data loss during live migration?
-
-> +}
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260929103655.8510=
-7-1-zhengtian10@huawei.com?part=3D14
+Cheers, Lorenzo
