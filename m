@@ -1,117 +1,69 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D5C51DAEA;
-	Tue, 29 Sep 2026 10:50:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56C2651AEDE;
+	Tue, 29 Sep 2026 10:50:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790679061; cv=none; b=EfSHtsXls9ErHUi5juOWDW/UMAMhYjyUTUgQZ3buw3I7Q6LB/v5KGUpePTA0W4V2+Qd5jK0GrUDlZSGdb7LGWvi2mOf19OeJk//D+BbyDka04OGCZiHEQQLNHjBY1THuD7tOv6WrlFHU3sid3eiGWQZYHQJmFmdgMiI7HEX+5yw=
+	t=1790679069; cv=none; b=PsZ7BRA+MBUCae4OQzyWUH8NLTGKRTAUbfPSryLVaL9a/uRvwKpZtdQ5qyKJ5z8G3PCNi/sNOrgE/GsMZDLbLSWSWUC5uIL6cdYj/zvylwVfz4/VpsuiJd42i0cBWrafrMEDv/dcnLR+UnWDaHrl+yg/cJZiUbkXUh240rI38y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790679061; c=relaxed/simple;
-	bh=USJ6sjNKDRu6tG4ZlA5fL23mzLtJ3UbJoLwk/ctppnk=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=tilHHUssgEGUI9rreGBV744LDRWbDVJ0pIegMX1JUdfl+ccKaj5TPUZeD+XKR+g9E63yoUU80Y51Fj6PnKMbCfGns9IS3U37cEN5X+9FcCuKE1ULaKy8zroGRHNsaqir8m4bqmHRRK/nzfmbXEWcXxSiOW8QypGBMFu1x3A50kA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a+ayOBlT; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790679069; c=relaxed/simple;
+	bh=x5DMhANbWDxXz6e9rKTqJx8Hdqk+thHnj9yygpRPhng=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=skSsqduNg2OEO0Yk82rRBuiZXL9EiV6Z0qSOoqC0HefP6BBbKN2F+ZCgdJNCgAX6alv47o9Mxb9LjUzC5YE7P47bCQQuGzMEFvOz5wzqw72uWyS20VJD6fbGIxfAhwRhotQLBKSiROgM9yRVIK8/RHbkCTfcrnPrNmFzqnR07rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=I5ZrEQ9b; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a+ayOBlT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED3781F000FF;
-	Tue, 29 Sep 2026 10:50:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790679039;
-	bh=ppQtqrkFicTanaRvuvwAvso1XMMqQRvA2bty9+a5yes=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=a+ayOBlTnFys61HZg2TKPnlnnRhdAkQMrGZma6D40PHqkZfQlTcrVwXl++sXRzmO7
-	 6ahDYzpC8mwdWgkTtk1UbrImf6GmbXlO+/bU4ejCDOuCKN6hnyk33kEUEyZ5bT2qyv
-	 5n1o8AvO0c0vZ58GDYkbj1zJBHPmDCJMr3c8LKqtY2SyQlGPobP/Dz/U0+71xmnABO
-	 4U5G1JogXTbB51J+lfzx6BsO7b/R8UE+S0eg3oLO1rb/npDWWOjeUhrymbCASYF8dU
-	 SkS9qCw3woLa2dUtPpCQScpQ3Icr93AwegNpMy0YthPLdVNSzqINmVf3+/G2lZtoWQ
-	 7g4lZCRHxQZuA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 04/15] KVM: arm64: Add KVM_REQ_RELOAD_STAGE2
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Tian Zheng" <zhengtian10@huawei.com>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
-In-Reply-To: <20260929103655.85107-5-zhengtian10@huawei.com>
-References: <20260929103655.85107-1-zhengtian10@huawei.com>
- <20260929103655.85107-5-zhengtian10@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 29 Sep 2026 10:50:38 +0000
-Message-Id: <20260929105038.ED3781F000FF@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="I5ZrEQ9b"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3CA40143D;
+	Tue, 29 Sep 2026 03:50:41 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 597E93F86F;
+	Tue, 29 Sep 2026 03:50:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790679044; bh=x5DMhANbWDxXz6e9rKTqJx8Hdqk+thHnj9yygpRPhng=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=I5ZrEQ9bGn2rdwPFtyyjCXCgK1HyER2LL6tqrJSFRwFSiklCEegQIXEvBlESinUHx
+	 wYQsdl8ukvfHurffs9W/WX3vmnMOzRI8JmdpoyUPY92+wjsLUqIklbr92nD/V5kIOs
+	 R8FNSIB3TCWI36S0yj9nEaCqB9w4XHmSZmjIkPPg=
+Date: Tue, 29 Sep 2026 11:50:30 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+	will@kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+	sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
+Subject: Re: [PATCH v19 0/7] firmware: arm_rmm: Add RMM v2.0 base RMI support
+Message-ID: <aruWz-QkcdD9ETbC@arm.com>
+References: <20260924135201.850038-1-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260924135201.850038-1-suzuki.poulose@arm.com>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Critical] kvm: arm64: host panic on nVHE due to EL1 access of EL2 sysreg=
-s in __load_stage2
---
+On Thu, Sep 24, 2026 at 02:51:54PM +0100, Suzuki K Poulose wrote:
+>  arch/arm64/Kconfig                |    1 +
+>  arch/arm64/kernel/cpufeature.c    |    1 +
+>  drivers/firmware/Kconfig          |    1 +
+>  drivers/firmware/Makefile         |    1 +
+>  drivers/firmware/arm_rmm/Kconfig  |   25 +
+>  drivers/firmware/arm_rmm/Makefile |    2 +
+>  drivers/firmware/arm_rmm/rmi.c    | 1072 +++++++++++++++++++++++++++++
+>  include/linux/arm-rmi-cmds.h      |  558 +++++++++++++++
+>  include/linux/arm-smccc-rmi.h     |  505 ++++++++++++++
 
-commit 982e8feb07630370c5da59ed6e47706db5188e18
-Author: Leonardo Bras <leo.bras@arm.com>
-Subject: KVM: arm64: Add KVM_REQ_RELOAD_STAGE2
+One more nit: patches 1 and 2 I think add new header files without a
+MAINTAINERS entry. You can add them to arm64.
 
-This commit adds a vcpu request to exit the guest, reload stage-2, and come
-back to the guest, anticipating subsequent patches for S2 HAFDBS and HDBSS.
-
-Link: https://lore.kernel.org/all/20260901171558.2674031-5-leo.bras@arm.com/
-
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 0576c2022ef57..d9ad765943d9e 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-
-[ ... ]
-
-> @@ -1175,6 +1175,14 @@ static int check_vcpu_requests(struct kvm_vcpu *vc=
-pu)
->  		if (kvm_dirty_ring_check_request(vcpu))
->  			return 0;
-> =20
-> +		if (kvm_check_request(KVM_REQ_RELOAD_STAGE2, vcpu)) {
-> +			unsigned long flags;
-> +
-> +			local_irq_save(flags);
-> +			__load_stage2(vcpu->arch.hw_mmu);
-
-[Severity: Critical]
-Could this trigger a host kernel panic on systems running in nVHE or
-pKVM mode?
-
-In nVHE or pKVM mode, the host kernel runs at EL1. The check_vcpu_requests()
-function executes from the host context. If a KVM_REQ_RELOAD_STAGE2 request
-is processed here, it calls __load_stage2(), which performs the following:
-
-arch/arm64/include/asm/kvm_mmu.h:__load_stage2() {
-    write_sysreg(mmu->vtcr, vtcr_el2);
-    write_sysreg(kvm_get_vttbr(mmu), vttbr_el2);
-    ...
-}
-
-Because vtcr_el2 and vttbr_el2 are EL2 system registers, writing to them
-from EL1 will cause an UNDEFINED instruction exception. This causes the CPU
-to trap to the hypervisor, which will intentionally panic upon receiving an
-unexpected sysreg trap from the host, crashing the system.
-
-Since any unprivileged user with access to /dev/kvm could potentially trigg=
-er
-a memory region update that sets KVM_REQ_RELOAD_STAGE2, it seems this might
-provide a trivial path to trigger a host Denial of Service.
-
-Would it be possible to add a has_vhe() guard here or handle the reload via
-a hypercall for non-VHE systems?
-
-> +			local_irq_restore(flags);
-> +		}
-> +
->  		check_nested_vcpu_requests(vcpu);
->  	}
->
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260929103655.8510=
-7-1-zhengtian10@huawei.com?part=3D4
+-- 
+Catalin
