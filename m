@@ -1,227 +1,301 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 208B551AEDE;
-	Tue, 29 Sep 2026 11:58:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D1F51DAE8
+	for <kvmarm@lists.linux.dev>; Tue, 29 Sep 2026 12:14:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790683120; cv=none; b=dAGpqhi9DwgZih0BR504C/cXm8nU8x/RFwg7mwDMEBUKD/4WasAGs8FMKN1XyzbRsUIHPYjWnuMCq3mbo8hzS+l2VIXXY4w/yUxQGz52OJBM2fCVuAIUkTC1CsJOEcIJLaOI9LEIoE00TBjpOikhEtOB6EgUZlE510hF++5QKD8=
+	t=1790684044; cv=none; b=hVu1J1dXoEbSFAKWYlbxIGUDzYsphaKlxMvqd6jufjIp4GqPL6OIap7B7OfaJt9JULoRm2hJuZ4uE6guWIMlnzYvyNdxMvuAhzBybEt7y6Yjm+64B8JedXgPsMMtzmHZgwg0TBwwTHuP2e1NAnQhQpSsZ4vK+yLQnKRa3UiZruw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790683120; c=relaxed/simple;
-	bh=21OENh3wiuy2hkOt0sg1kbEyd5xBBJKJst+cyHiOzf0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=j1C9jjR6XSnGx1tudcPWgA4Ea6dSaBlfLbUDkEmgrNM+Ds1s2wBRi4BFhtyKKVJLk1vKYOCRMYESM4TDGOAf21DBga/AxsNwfbtIe+/isQFkm3I33k31mTZxTWBG/nnGg4VhX3vI0Z8IRqRDUzqL5HFSVJwu0cWeSeFtsIwY2dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oJ+Ri+Jj; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790684044; c=relaxed/simple;
+	bh=rH6D3wtfhQo6Gq1yRP66NXvmVq5gvlDfRS/TXs6FdXA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FgS28Z8jHhLWMgB4WhvDAJG4p5a0tt8mdZJLTFonlpnNzeuKsmHdq+DwtNcpnec/3wUXFWtHy7/l9zGLZn7PzAyy3u9UL5p3O9VFYU3w881s9ZTwER6ADOIJ0V1+iMqHUuGMdvnDeA+MWhC9TIQsvXgext7k16oRQxmBZe2cth4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aqbD9WtB; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oJ+Ri+Jj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34B221F000FF;
-	Tue, 29 Sep 2026 11:58:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790683118;
-	bh=/aHhaa9iwWLj4k3qkP/UV/W0Eq2e/p8sJav6sO7R2Kg=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=oJ+Ri+JjhGVh3jkGb6ij7D1qQx//rs5djlnS9ak2YkJ+YCnyVoiTGE2CQ0Vu+DaKN
-	 6wKeofZEicCqmr/gugcvKVk6Ys4kKAm2+ttppmxvemXcAiDM3zmgsGTpnaF4xx8ywh
-	 LhKJ5ZHTxJ28dJ7QiX6fgXIyZMM4qfwZdzEzd+rDipcKwGMwpN1tWXagpWE4jFIw+C
-	 eeyJ7dMIZf2Vte5fiedIdCTsEuVBYDP7Cf4mBNufrS4bqe4VlD47PvkPnhmxHlylrI
-	 39tamqwoirSfbucw0G+cfn6ZVoyZhth559zChQoZcJA+5X4Cfef5rQapOwl978GCId
-	 48xI6APAdIKiQ==
-From: Mark Brown <broonie@kernel.org>
-Date: Tue, 29 Sep 2026 12:58:00 +0100
-Subject: [PATCH v4 3/3] KVM: arm64: selftests: Check ID regs are immutable
- after a failed run
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aqbD9WtB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1790684041;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0p9GsPyqfCLG6Q3eZpXp3Aciwh0Q5G37w2jNJDtV/CM=;
+	b=aqbD9WtB2IcBuwpYBLoftOyqE/rF87M+eMk2XsHudswx2ExzKt1QX16eGm3DxjiXrpGJor
+	RT5AP5lhkmNtLafTGZ/UWZKg0zGx1T1bTtCJQG3B2auxd2aSppWizT7WXQ2dzCvDeQHPCJ
+	Y8atqzJHD7BJsBETAapgUrvk7KuoTs0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-646-RBLhrLZLPnWXre9rDNGOJQ-1; Tue, 29 Sep 2026 08:13:58 -0400
+X-MC-Unique: RBLhrLZLPnWXre9rDNGOJQ-1
+X-Mimecast-MFC-AGG-ID: RBLhrLZLPnWXre9rDNGOJQ_1790684037
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-49fcd86b8d3so34690215e9.3
+        for <kvmarm@lists.linux.dev>; Tue, 29 Sep 2026 05:13:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790684037; x=1791288837;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=0p9GsPyqfCLG6Q3eZpXp3Aciwh0Q5G37w2jNJDtV/CM=;
+        b=nPZiEPrM0kYMPWMYCzRsgHKpYB34jDjk6NBXjLXWRNRGCAkTGJktYlcX4wHR5dmURo
+         A7dPnRGDzVPVkFnPD13cFtJz5KxXGe16KQiNiesJJFStNYItpS6o4A4KAYhhRWXm4dNb
+         IJpgWRCW5Bzyx/GlIGIEV+oAwtf3D9Buzv96qFG7kXD0YPu2PyI2Bx+OizQNlRd/k2ON
+         1SZN2Fqu9apOLzW69yFdh0ucUKCtdo6H33L31YlfoLyC9aeZ9nXhxzcWJP6XUJTIJh50
+         sUn1Mk6C9GcjUajgasxRYwCXxZJvj5/8Dli/cJ4tnEOWppTvhO+mtOC3AtrvAIikZJVR
+         QRmw==
+X-Forwarded-Encrypted: i=1; AKwUvBzUmUmtdmbMLysgJ+erf6y6zM2KlktSqPkhDPPH4RIooOlLsFJRxbKBnDL7LvjbpSRzUa/Jsvo=@lists.linux.dev
+X-Gm-Message-State: AFuF++mEr4tyABlmMnwrVv41Xdr9iFWjFUDC4fZXfc/plES1iznGYXX6
+	q9BddynC4E7nTmlAWtry2GymxwwQm3OvSTj1SRHFITpgIjSO08R/DwRy+0UKEfHnFFmi0CXvTo1
+	8zNjoIhKB+CQXZ0L1yfii1pm6w1Xo7iKVyELR+Pgi722XH7viBQscMiELTQ==
+X-Gm-Gg: AYBFou2s+GxHoK4En2qviUsWJYLj2deMmMeBhLpMlWRPrg3E3qimC3PlXAIk9uPR7dM
+	DUpA1AODEPEnq13gNC/IpVchkU99CiNiHTGDgi4yG1uWy8pdT6uzTL22hqocmHV6xegjcY+8Ga9
+	x4Z3hAIFLQUt3FhO4b2VpxYO10lBsxEApc/uPzghx5gNshbbwUL5VCDHE/r0arVE+b3XrcDvb1K
+	nQuKsByKfM2HWVyTeTd2UG2fB22vz5fkTF9F8IJTaBR50BrNCJLDtLa+Cp8gZTGzs7NpCjRgmTn
+	/EUTKK6SEUjraWtbqkCWkKmPc+bA91T1TbJ3XJ2HBuhXRSTYnMxFd0/Dow3OM5vKynJwWE+KYqW
+	DaJFVMrm9RbMAeAn3ynaT/vlNQYfGRxiCOf04D/f7WEuh2ivB
+X-Received: by 2002:a05:600c:c094:b0:49f:f997:7ed7 with SMTP id 5b1f17b1804b1-49ff997807amr116111885e9.11.1790684036870;
+        Tue, 29 Sep 2026 05:13:56 -0700 (PDT)
+X-Received: by 2002:a05:600c:c094:b0:49f:f997:7ed7 with SMTP id 5b1f17b1804b1-49ff997807amr116111335e9.11.1790684036397;
+        Tue, 29 Sep 2026 05:13:56 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a00c10c656sm111735875e9.2.2026.09.29.05.13.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Sep 2026 05:13:55 -0700 (PDT)
+Message-ID: <1ce67e00-1037-4de0-84c5-8248fd4d4e97@redhat.com>
+Date: Tue, 29 Sep 2026 14:13:53 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260929-kvm-arm64-idreg-final-v4-3-75296dde994d@kernel.org>
-References: <20260929-kvm-arm64-idreg-final-v4-0-75296dde994d@kernel.org>
-In-Reply-To: <20260929-kvm-arm64-idreg-final-v4-0-75296dde994d@kernel.org>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
- Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Zenghui Yu <yuzenghui@huawei.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Peter Maydell <peter.maydell@linaro.org>, 
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>, 
- Fuad Tabba <fuad.tabba@linux.dev>, "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5225; i=broonie@kernel.org;
- h=from:subject:message-id; bh=ARpusrkiKBa7FifX/OtnNfFMe6PS+8J/LSSKLcTpZEw=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqu6fg/oLBcwiuYcHLVB5M28oUJNC6iWq+STB8r
- RodK8DO1VaJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCarun4AAKCRAk1otyXVSH
- 0EYqB/9lW9ImwLWPPu8fCnJQVG72KrXPFpqGOywDtAFEBGRjWmrMgdiw9u1GYvHuHmXPYyvtF35
- Jo0zgM0KqNAD4X/+K/vPW9iMZCyitItu/+mcRWM6qoB9JBv9xxT4QE5xoheZfhmeiKkx3uPeV+a
- X3k8Vt7OTp1LjlNPC5LcytxZFTdevKJVEIhA11ZY8FiPY0XNd9lZE+M1+/nN3s3FuWkAxqERLqQ
- pYqGxFViXbLeW16wyofXXmktUlrrNJaRTYOqLG3wvdb9EuBLiqaeo+rtgUVH1vdjslDqHzuqIKZ
- snnSyKMygjIFe5Jp465/qkxvh0qe0cMVM6D7bh/M0QgsfcI9
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v9 17/26] target/arm/kvm: Add consistency checking for
+ SYSREG props
+To: Khushit Shah <khushit.shah@nutanix.com>
+Cc: "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ Shaju Abraham <shaju.abraham@nutanix.com>,
+ "yangjinqian1@huawei.com" <yangjinqian1@huawei.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "sebott@redhat.com" <sebott@redhat.com>,
+ "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
+ "philmd@oss.qualcomm.com" <philmd@oss.qualcomm.com>,
+ "maz@kernel.org" <maz@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "abologna@redhat.com" <abologna@redhat.com>,
+ "jdenemar@redhat.com" <jdenemar@redhat.com>
+References: <20260916144721.751810-1-eric.auger@redhat.com>
+ <20260916144721.751810-18-eric.auger@redhat.com>
+ <7C929003-175E-450D-885B-CAB243B89645@nutanix.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <7C929003-175E-450D-885B-CAB243B89645@nutanix.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: tZHo5uWvSnzwlSdE9aZ9XvSgnW1RuX57iWj71SOSswA_1790684037
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-From: Fuad Tabba <fuad.tabba@linux.dev>
+Hi Khushit,
 
-Add a set_id_regs case covering ID register immutability when a vCPU's
-first KVM_RUN fails after finalization but before
-KVM_ARCH_FLAG_HAS_RAN_ONCE is set. The test provokes such a failure with
-a PMUv3-enabled vCPU whose PMU is left uninitialized, then checks that
-KVM_SET_ONE_REG on the feature and implementation ID registers, and
-KVM_CREATE_DEVICE for a vGIC, are all rejected with -EBUSY.
+On 9/28/26 2:53 PM, Khushit Shah wrote:
+> Hi Eric,
+>
+>> On 16 Sep 2026, at 8:15 PM, Eric Auger <eric.auger@redhat.com> wrote:
+>>
+>> !-------------------------------------------------------------------|
+>>  CAUTION: External Email
+>>
+>> |-------------------------------------------------------------------!
+>>
+>> Since legacy composite options (such as SVE, virtualization, ...)
+>> and new SYSREG props coexist, add some basic consistency checks.
+>>
+>> Those checks are performed both in kvm_arch_init_vcpu() before
+>> applying the SYSREG props at the end of the initialization chain.
+> Where else?
+nowhere, I shall remove the 'both'
+>
+>> Some ID reg fields corresponding to legacy composite option scope
+>> are not writable. In that case we just check that the field has
+>> not become writable.
+> I don’t understand where the above happens in code.
+Everywhere you have:
 
-Assisted-by: LLM
-[Fixed for latest tag standard -- broonie]
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-Link: https://patch.msgid.link/20260805064740.3013538-1-fuad.tabba@linux.dev
-Acked-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-Tested-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/kvm/arm64/set_id_regs.c | 106 +++++++++++++++++++++++-
- 1 file changed, 105 insertions(+), 1 deletion(-)
++        error_setg(errp, "%s is now exposed but qemu is not ready to support it",
++                   propname);
 
-diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index 7429a1055df5..10849d21c0dd 100644
---- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -13,6 +13,7 @@
- #include "kvm_util.h"
- #include "processor.h"
- #include "test_util.h"
-+#include "vgic.h"
- #include <linux/bitfield.h>
- 
- enum ftr_type {
-@@ -803,6 +804,107 @@ static void test_reset_preserves_id_regs(struct kvm_vcpu *vcpu)
- 	ksft_test_result_pass("%s\n", __func__);
- }
- 
-+/*
-+ * ID registers must stay immutable even when a vCPU's first KVM_RUN fails
-+ * after finalization but before KVM_ARCH_FLAG_HAS_RAN_ONCE is set.
-+ */
-+static void test_idreg_frozen_after_failed_run(void)
-+{
-+	static const u32 imp_id_regs[] = {
-+		SYS_MIDR_EL1,
-+		SYS_REVIDR_EL1,
-+		SYS_AIDR_EL1,
-+	};
-+	struct kvm_vcpu_init init;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	int r;
-+
-+	if (!kvm_has_cap(KVM_CAP_ARM_PMU_V3)) {
-+		ksft_print_msg("PMUv3 unsupported, cannot fail the first run\n");
-+		ksft_test_result_skip("%s\n", __func__);
-+		return;
-+	}
-+
-+	/* Skip the default vGIC so the KVM_CREATE_DEVICE gate is reachable. */
-+	test_disable_default_vgic();
-+
-+	vm = vm_create(1);
-+	vm_enable_cap(vm, KVM_CAP_ARM_WRITABLE_IMP_ID_REGS, 0);
-+	kvm_get_default_vcpu_target(vm, &init);
-+	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
-+	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-+	kvm_arch_vm_finalize_vcpus(vm);
-+
-+	/*
-+	 * A PMUv3 vCPU left without PMU init is rejected by
-+	 * kvm_arm_pmu_v3_enable(), which runs after sysreg finalization.
-+	 */
-+	r = _vcpu_run(vcpu);
-+	TEST_ASSERT(r < 0 && errno == EINVAL,
-+		    "first KVM_RUN should fail post-finalization: r=%d errno=%d",
-+		    r, errno);
-+
-+	/*
-+	 * Feature ID registers: use values that would have been accepted before
-+	 * finalization, so that a rejection means the registers are final
-+	 * rather than the value being invalid.
-+	 */
-+	for (int i = 0; i < ARRAY_SIZE(test_regs); i++) {
-+		const struct reg_ftr_bits *ftr_bits = test_regs[i].ftr_bits;
-+		u64 reg = KVM_ARM64_SYS_REG(test_regs[i].reg);
-+		u64 val = vcpu_get_reg(vcpu, reg);
-+
-+		for (int j = 0; ftr_bits[j].type != FTR_END; j++) {
-+			u64 ftr = (val & ftr_bits[j].mask) >> ftr_bits[j].shift;
-+			u64 safe = get_safe_value(&ftr_bits[j], ftr);
-+			u64 new_val;
-+
-+			if (safe == ftr)
-+				continue;
-+
-+			new_val = (val & ~ftr_bits[j].mask) |
-+				  (safe << ftr_bits[j].shift);
-+
-+			r = __vcpu_set_reg(vcpu, reg, new_val);
-+			TEST_ASSERT(r < 0 && errno == EBUSY,
-+				    "%s write after failed first run: r=%d errno=%d",
-+				    ftr_bits[j].name, r, errno);
-+			TEST_ASSERT_EQ(vcpu_get_reg(vcpu, reg), val);
-+		}
-+
-+		/* A write matching the finalized value is still accepted. */
-+		vcpu_set_reg(vcpu, reg, val);
-+	}
-+
-+	/*
-+	 * The VM-wide implementation ID registers are gated separately. Bit 0
-+	 * is within the writable mask of all three, so flipping it is a change
-+	 * KVM would otherwise accept.
-+	 */
-+	for (int i = 0; i < ARRAY_SIZE(imp_id_regs); i++) {
-+		u64 reg = KVM_ARM64_SYS_REG(imp_id_regs[i]);
-+		u64 val = vcpu_get_reg(vcpu, reg);
-+
-+		r = __vcpu_set_reg(vcpu, reg, val ^ 1);
-+		TEST_ASSERT(r < 0 && errno == EBUSY,
-+			    "implementation ID reg write after failed first run: r=%d errno=%d",
-+			    r, errno);
-+		TEST_ASSERT_EQ(vcpu_get_reg(vcpu, reg), val);
-+	}
-+
-+	/* Creating an in-kernel irqchip would change the ID registers too. */
-+	if (kvm_supports_vgic_v3()) {
-+		r = __kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3);
-+		TEST_ASSERT(r < 0 && errno == EBUSY,
-+			    "vGIC creation after failed first run: r=%d errno=%d",
-+			    r, errno);
-+	}
-+
-+	kvm_vm_free(vm);
-+	ksft_test_result_pass("%s\n", __func__);
-+}
-+
- int main(void)
- {
- 	struct kvm_vcpu *vcpu;
-@@ -828,7 +930,7 @@ int main(void)
- 
- 	ksft_print_header();
- 
--	test_cnt = 3 + MPAM_IDREG_TEST + MTE_IDREG_TEST;
-+	test_cnt = 4 + MPAM_IDREG_TEST + MTE_IDREG_TEST;
- 	for (i = 0; i < ARRAY_SIZE(test_regs); i++)
- 		for (j = 0; test_regs[i].ftr_bits[j].type != FTR_END; j++)
- 			test_cnt++;
-@@ -847,5 +949,7 @@ int main(void)
- 
- 	kvm_vm_free(vm);
- 
-+	test_idreg_frozen_after_failed_run();
-+
- 	ksft_finished();
- }
+I modified the commit description with:
 
--- 
-2.47.3
+Some ID reg fields corresponding to legacy composite option scope
+are not (yet) writable (EL3, MTE, SVE, ...). As such they are not
+supposed to be exposed through SYSREG properties. However in the
+hypothesis they would become writable, and thus would be exposed
+and attempted to be set, we need to reject any setting because no
+consistency check is implemented yet.
+
+
+
+>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>> target/arm/kvm.c | 105 +++++++++++++++++++++++++++++++++++++++++++++++
+>> 1 file changed, 105 insertions(+)
+>>
+>> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+>> index ddf320d0e6..f52c03745e 100644
+>> --- a/target/arm/kvm.c
+>> +++ b/target/arm/kvm.c
+>> @@ -340,6 +340,107 @@ static ARM64SysRegField *get_field(int i, ARM64SysReg *reg)
+>>     return NULL;
+>> }
+>>
+>> +
+>> +/**
+>> + * kvm_arm_vcpu_validate_sysreg:
+>> + *
+>> + * Validate a SYSREG field value is consistent with legacy composite options
+>> + * Some checks are not implemented because the corresponding sysreg field
+>> + * is not currently writable. In that case we make sure the field has not
+>> + * become writable, which would mean the user had the capability to set the
+>> + * corresponding property.
+>> + *
+>> + * return true if consistent. false if it is not, along with an error handle
+>> + */
+>> +static bool kvm_arm_vcpu_validate_sysreg(ARMCPU *cpu, ARM64SysRegField *field,
+>> +                                         uint64_t value, Error **errp)
+>> +{
+>> +    const char *fieldname = field->name;
+>> +    ARM64SysReg *sysregdesc = &arm64_id_regs[field->index];
+>> +    const char *regname = sysregdesc->name;
+>> +    g_autofree char *propname = g_strdup_printf("SYSREG_%s_%s", regname, fieldname);
+> I don’t see a reason to build property name here.
+
+a field is fully discriminated by the reg name string/index + the field name string/index. So I imagined I could use the prop name directly which has both. Now I can also remove "SYSREG_" if this was you prefer?
+
+
+>> +
+>> +    /* virtualization */
+>> +    if (!strcmp(propname, "SYSREG_ID_AA64PFR0_EL1_EL2")) {
+>> +        /* consistency with machine virtualization property */
+>> +        if (cpu->has_el2 && value == 0) {
+>> +            error_setg(errp,
+>> +                "Inconsistent -machine virtualization=on and "
+>> +                "%s=0", propname);
+>> +            return false;
+>> +        } else if (!cpu->has_el2 && value > 0) {
+>> +            error_setg(errp,
+>> +                "Inconsistent -machine virtualization=off and "
+>> +                "%s > 0", propname);
+>> +            return false;
+>> +        }
+>> +    /* secure */
+>> +    } else if (!strcmp(propname, "SYSREG_ID_AA64PFR0_EL1_EL3") && value > 0) {
+>> +        /* consistency with machine secure property */
+>> +        error_setg(errp, "%s is set but qemu is not ready to support it",
+>> +                   propname);
+>> +        return false;
+>> +    /* MTE */
+>> +    } else if (!strcmp(propname, "SYSREG_ID_AA64PFR1_EL1_MTE")) {
+>> +        error_setg(errp, "%s is now exposed but qemu is not ready to support it",
+>> +                   propname);
+>> +        return false;
+>> +    /* SVE */
+>> +    } else if (!strcmp(propname, "SYSREG_ID_AA64PFR0_EL1_SVE")) {
+>> +        error_setg(errp, "%s is now exposed but qemu is not ready to support it",
+>> +                   propname);
+>> +        return false;
+>> +    } else if (!strcmp(propname, "SYSREG_ID_AA64ZFR0_EL1_SVEver")) {
+>> +        if (cpu_isar_feature(aa64_sve, cpu) && value == 0) {
+>> +            error_setg(errp, "sve is set but %s is set to 0", propname);
+>> +            return false;
+> This is actually an valid configuration.
+OK I removed that
+
+Thanks!
+
+Eric
+>
+>> +        } else if (!cpu_isar_feature(aa64_sve, cpu) && value > 0) {
+>> +            error_setg(errp, "sve is not set but %s is greater than 0",
+>> +                       propname);
+>> +            return false;
+>> +        }
+>> +    /* PAUTH */
+>> +    } else if (!strcmp(propname, "SYSREG_ID_AA64ISAR1_EL1_APA")) {
+>> +        /* PAUTH QARMA5 address authentification */
+>> +        error_setg(errp, "%s is now exposed but qemu is not ready to support it",
+>> +                   propname);
+>> +        return false;
+>> +    } else if (!strcmp(propname, "SYSREG_ID_AA64ISAR1_EL1_API")) {
+>> +        /* PAUTH Impl Defined address authentification */
+>> +        error_setg(errp, "%s is now exposed but qemu is not ready to support it",
+>> +                   propname);
+>> +        return false;
+>> +    } else if (!strcmp(propname, "SYSREG_ID_AA64ISAR1_EL1_GPA")) {
+>> +        /* QARMA5 generic code authentification */
+>> +        error_setg(errp, "%s is now exposed but qemu is not ready to support it",
+>> +                   propname);
+>> +        return false;
+>> +    } else if (!strcmp(propname, "SYSREG_ID_AA64ISAR1_EL1_GPI")) {
+>> +        /* QARMA5 generic code authentification */
+>> +        error_setg(errp, "%s is now exposed but qemu is not ready to support it",
+>> +                   propname);
+>> +        return false;
+>> +    /* PMU */
+>> +    } else if (!strcmp(propname, "SYSREG_ID_AA64DFR0_EL1_PMUVer")) {
+>> +        if (cpu->has_pmu && value == 0) {
+>> +            error_setg(errp, "%s is 0 whereas pmu is set", propname);
+>> +            return false;
+>> +        } else if (!cpu->has_pmu && value) {
+>> +            error_setg(errp, "%s is non null whereas pmu is unset", propname);
+>> +            return false;
+>> +        }
+>> +    /* aarch64 false */
+>> +    } else if (!arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
+>> +        if ((!strcmp(propname, "SYSREG_ID_AA64PFR0_EL1_EL0") ||
+>> +             !strcmp(propname, "SYSREG_ID_AA64PFR0_EL1_EL1") ||
+>> +             !strcmp(propname, "SYSREG_ID_AA64PFR0_EL1_EL2")) && value < 2)
+>> +            error_setg(errp, "%s is < 2 while aarch64 is set to off",
+>> +                       propname);
+>> +            return false;
+> return should be covered in braces.
+>
+> Warm Regards,
+> Khushit
+>> +    }
+>> +    return true;
+>> +}
+>> +
+>> #define MAKE_IDREG_KEY(reg_idx, field_shift) \
+>>     (((uint64_t)(reg_idx) << 8) | ((uint64_t)(field_shift) & 0xFF))
+>>
+>> @@ -2241,6 +2342,10 @@ static int kvm_arm_apply_sysreg_props(ARMCPU *cpu, Error **errp)
+>>         uint64_t oldfv;
+>>         int ret;
+>>
+>> +        if (!kvm_arm_vcpu_validate_sysreg(cpu, field, value, errp)) {
+>> +            return -1;
+>> +        }
+>> +
+>>         mask = MAKE_64BIT_MASK(lower, length);
+>>         value = value << lower;
+>>
+>> -- 
+>> 2.53.0
+>>
 
