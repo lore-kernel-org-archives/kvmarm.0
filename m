@@ -1,171 +1,111 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9DDD501F25;
-	Tue, 29 Sep 2026 16:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90BA3DC4D9;
+	Tue, 29 Sep 2026 16:34:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790699153; cv=none; b=ODB6KguYVSNk6fEQWB/MHeaQuufDktVuq/jY3KrV/i6ZLxV+q8gOnhGSGBMdJ19pwl8ado4Xpdpuz6DeXFT+PWV3M8ngI1GdLTuLoIl5ep9rMyO1DnkkgTLMviWcQ5RK7usdrDknLLBC8g5FGelr3XyaWWMEeXjpYDV02JVVaBI=
+	t=1790699686; cv=none; b=mOjiHrlCtOFF3IUmNaVai6CVQei+eDt3C98W/H3z+DC+6fnnD/SjT6Z0rrn3emSigGW1WlP67a9Lm2w/sMBrQ0Y8ud4tnAz2jxHY0J3Ew5wkr11bYZl4k7d2wEbcG75SK94jFkOpsUTCYmlhj1VQYhMG7PfOFgQwYaOdoatyGjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790699153; c=relaxed/simple;
-	bh=Kwt7NK9oH5FmK5X09UqbhhtL97/yzBABChsZOu0XnUc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=lPUMDY6naJ2xwsVsoO38oKLxRib7rr2YZBEQ4/jbg7c2DzDH5FOMEDd9Uwj3C1c4UGl5s75Iz0G4xxKD8hWXHZtR7Lem70FRO7FoePT0PEb+gmD58xCcC+shoiEKUyMTPcd6ACce4WvZmqhkBQied7zXWO1jCnqwBzYzpaUD8jc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T6qOf9cS; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790699686; c=relaxed/simple;
+	bh=/RlUaNp7ESsUNTsQ78aDLbcIgYZBCJnfMT0JwG/EBVA=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=PQLvsy/TVOAAEPPlLhs+4B+mV6YHLCzLf34bVWvu0hAdRCB6Ex3rZ/P7EX+sDjt5dV1m9XTnO/O50GBAXFaAg3PMv0Oq9jEcUQzkBd5cjEGKYNR4cukBtZcKkPTxwK35SxhhtG3IyxL1t5TDLRbK0P0KFR3IXDgGZiCXzrNcJu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ATdZgBV2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T6qOf9cS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C1E91F00893;
-	Tue, 29 Sep 2026 16:25:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ATdZgBV2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D9331F000FF;
+	Tue, 29 Sep 2026 16:34:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790699151;
-	bh=FDsvSmIYjY7Wlu5xjH/XblAkB0TRMYrgy/Yq1eEWrDQ=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=T6qOf9cS1m3QYKzDLkO+yE9M1yE4okzFEsCnW9ZxmdTNTyhgW+WTIbbgMOyFDWbkf
-	 2NomCNw0Q5PN4n2w7oyNxstUvfJ+kOPCpWSYunwu9qyTDcQzJMIAV0pVL1sHrkq/vI
-	 5/SUozIZv4GW9Ql1a+/UZIF41MCXgJ/Y5kX7u2odPS9T2mGMxlDHHwnN/QSNSEHZOn
-	 pXr1mjS+uySi+wr4JF77nWG+Gz7ZjTPgyazZ/IF6J5smCsVt2KFwf0N22lrDQt7Lnu
-	 I3hQ8M9j6SYGtvPqg8rEWfzyDq/uhUdS15j/jXUuShlPDM21udtaRxYfDc/zyzHW3B
-	 U46GpymF6dIJA==
-From: Mark Brown <broonie@kernel.org>
-Date: Tue, 29 Sep 2026 17:16:54 +0100
-Subject: [PATCH v8 3/3] KVM: selftests: arm64: Make set_id_regs bitfield
+	s=k20260515; t=1790699685;
+	bh=hxVpYW1U5mn59DtEB4a2wle1hjbaPLJ4tafyEETllNE=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=ATdZgBV21gNXmdEwF8irAXfO3dLUZGA+7DHP2yXxXPabQLh765LnaP5doxKuO1aVv
+	 djwg5aajBcuyMEyC+2qt/QKhkPDwHVNWdnoqyZFwV/NItBW/0fpil9FXtYnLZL3M42
+	 K+C6jqHzCnC+E8RagRbZfkQzROkRXqG+BTK2J8JNvzh9AnU9NHvnvUH8ZqfqGt0Yjm
+	 ag4GJLAp/kAZtKc7JRJrspQKQqYTOI8dDGxiJ0pwKcjRRqsL2tKEtvRLhPMSnCtZ4o
+	 s5e9Vfqr0mSdXNTpVrcUt75bhTl6ok/EecM+lb0uk2gpqF49totdehVZW05L1E17/Z
+	 spfLgU2BWfcwg==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v8 3/3] KVM: selftests: arm64: Make set_id_regs bitfield
  validity checks non-fatal
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Mark Brown" <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvm@vger.kernel.org
+In-Reply-To: <20260929-kvm-arm64-set-id-regs-aarch64-v8-3-58aabe2c2fac@kernel.org>
+References: <20260929-kvm-arm64-set-id-regs-aarch64-v8-0-58aabe2c2fac@kernel.org>
+ <20260929-kvm-arm64-set-id-regs-aarch64-v8-3-58aabe2c2fac@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 29 Sep 2026 16:34:44 +0000
+Message-Id: <20260929163445.0D9331F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260929-kvm-arm64-set-id-regs-aarch64-v8-3-58aabe2c2fac@kernel.org>
-References: <20260929-kvm-arm64-set-id-regs-aarch64-v8-0-58aabe2c2fac@kernel.org>
-In-Reply-To: <20260929-kvm-arm64-set-id-regs-aarch64-v8-0-58aabe2c2fac@kernel.org>
-To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
- Oliver Upton <oupton@kernel.org>
-Cc: Ben Horgan <ben.horgan@arm.com>, linux-arm-kernel@lists.infradead.org, 
- kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Mark Brown <broonie@kernel.org>, "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3917; i=broonie@kernel.org;
- h=from:subject:message-id; bh=Kwt7NK9oH5FmK5X09UqbhhtL97/yzBABChsZOu0XnUc=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqu+aBqXzx00nzUEuB2LfTbrWnbVSZTlb7CkI00
- lr3/p6auLyJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCarvmgQAKCRAk1otyXVSH
- 0FVSB/9oxGazFsvlXdHLhoAUYTxZ7MgTCm6AnNbR8S3Bo1cSBe98pqQklokTY94QfIQnBhqvGWr
- /3mWeQYDvkAfp+T3M+8q4TLwGx32vcdnuoi+erCxlvZJfqBWHejyH+OWgOOj14iY0FgIS0j1pPm
- UFzArso7o4QCiLfjUvGo/lCDIjHttYH5rW8Uo7O4ywvswSROtO6XBg48Kz3qt7eETZntI8fXVwd
- ErW4oQkcClL1DjiS/z8BTIeTacrXw0Ih6jfAuQ+HYDsTl+5KzgS6oVGuXdqxG0UphC5S78HhZqd
- +csfIxak8Vgw5PJltY57mZz9H5ez1FLywLN3q8pUBMPIEzSz
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-Currently when set_id_regs encounters a problem checking validation of
-writes to feature registers it uses an immediately fatal assert to report
-the problem. This is not idiomatic for kselftest, and it is also not great
-for usability. The affected bitfield is not clearly reported and further
-tests do not have their results reported.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Low] selftests: set_id_regs uses fatal vcpu_set_reg() for valid writes
+--
 
-Switch to using standard kselftest result reporting for the asserts we
-do, these are non-fatal asserts so allow the program to continue and the
-test names include the affected field.
+commit d230119197ae572759175fc9da082ab1dada3cca
+Author: Mark Brown <broonie@kernel.org>
 
-Reviewed-by: Ben Horgan <ben.horgan@arm.com>
-Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/kvm/arm64/set_id_regs.c | 31 ++++++++++++++++++-------
- 1 file changed, 23 insertions(+), 8 deletions(-)
+KVM: selftests: arm64: Make set_id_regs bitfield validity checks non-fatal
 
-diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index 3aa8886e8b70..43dd9506036c 100644
---- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -422,6 +422,7 @@ static u64 test_reg_set_success(struct kvm_vcpu *vcpu, u64 reg,
- 	u8 shift = ftr_bits->shift;
- 	u64 mask = ftr_bits->mask;
- 	u64 val, new_val, ftr;
-+	bool match;
- 
- 	val = vcpu_get_reg(vcpu, reg);
- 	ftr = (val & mask) >> shift;
-@@ -434,7 +435,10 @@ static u64 test_reg_set_success(struct kvm_vcpu *vcpu, u64 reg,
- 
- 	vcpu_set_reg(vcpu, reg, val);
- 	new_val = vcpu_get_reg(vcpu, reg);
--	TEST_ASSERT_EQ(new_val, val);
-+	match = new_val == val;
-+	if (!match)
-+		ksft_print_msg("%lx != %lx\n", new_val, val);
-+	ksft_test_result(match, "%s valid write succeeded\n", ftr_bits->name);
- 
- 	return new_val;
- }
-@@ -446,6 +450,7 @@ static void test_reg_set_fail(struct kvm_vcpu *vcpu, u64 reg,
- 	u64 mask = ftr_bits->mask;
- 	u64 val, old_val, ftr;
- 	int r;
-+	bool match;
- 
- 	val = vcpu_get_reg(vcpu, reg);
- 	ftr = (val & mask) >> shift;
-@@ -458,11 +463,19 @@ static void test_reg_set_fail(struct kvm_vcpu *vcpu, u64 reg,
- 	val |= ftr;
- 
- 	r = __vcpu_set_reg(vcpu, reg, val);
--	TEST_ASSERT(r < 0 && errno == EINVAL,
--		    "Unexpected KVM_SET_ONE_REG error: r=%d, errno=%d", r, errno);
-+	if (r >= 0 || errno != EINVAL) {
-+		ksft_print_msg("Unexpected KVM_SET_ONE_REG error: r=%d, errno=%d (%s)\n",
-+			       r, errno, strerror(errno));
-+		ksft_test_result_fail("%s invalid write rejected\n",
-+				      ftr_bits->name);
-+		return;
-+	}
- 
- 	val = vcpu_get_reg(vcpu, reg);
--	TEST_ASSERT_EQ(val, old_val);
-+	match = val == old_val;
-+	if (!match)
-+		ksft_print_msg("%lx != %lx\n", val, old_val);
-+	ksft_test_result(match, "%s invalid write rejected\n", ftr_bits->name);
- }
- 
- static u64 test_reg_vals[KVM_ARM_FEATURE_ID_RANGE_SIZE];
-@@ -502,7 +515,11 @@ static void test_vm_ftr_id_regs(struct kvm_vcpu *vcpu, bool aarch64_only)
- 		for (int j = 0;  ftr_bits[j].type != FTR_END; j++) {
- 			/* Skip aarch32 reg on aarch64 only system, since they are RAZ/WI. */
- 			if (aarch64_only && sys_reg_CRm(reg_id) < 4) {
--				ksft_test_result_skip("%s on AARCH64 only system\n",
-+				ksft_print_msg("%s on AARCH64 only system\n",
-+					       ftr_bits[j].name);
-+				ksft_test_result_skip("%s invalid write rejected\n",
-+						      ftr_bits[j].name);
-+				ksft_test_result_skip("%s valid write succeeded\n",
- 						      ftr_bits[j].name);
- 				continue;
- 			}
-@@ -514,8 +531,6 @@ static void test_vm_ftr_id_regs(struct kvm_vcpu *vcpu, bool aarch64_only)
- 
- 			test_reg_vals[idx] = test_reg_set_success(vcpu, reg,
- 								  &ftr_bits[j]);
--
--			ksft_test_result_pass("%s\n", ftr_bits[j].name);
- 		}
- 	}
- }
-@@ -882,7 +897,7 @@ int main(void)
- 		ID_REG_RESET_UNCHANGED_TEST;
- 	for (i = 0; i < ARRAY_SIZE(test_regs); i++)
- 		for (j = 0; test_regs[i].ftr_bits[j].type != FTR_END; j++)
--			test_cnt++;
-+			test_cnt += 2;
- 
- 	ksft_set_plan(test_cnt);
- 
+This commit modifies the set_id_regs selftest to use standard kselftest
+reporting instead of fatal assertions when validating writes to feature
+registers. This allows the test program to continue executing and report
+all affected bitfields even if some validation checks fail.
 
--- 
-2.47.3
+> diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/test=
+ing/selftests/kvm/arm64/set_id_regs.c
+> index 3aa8886e8b70e..43dd9506036cf 100644
+> --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
+> +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+[ ... ]
+> @@ -422,6 +422,7 @@ static u64 test_reg_set_success(struct kvm_vcpu *vcpu=
+, u64 reg,
+>  	u8 shift =3D ftr_bits->shift;
+>  	u64 mask =3D ftr_bits->mask;
+>  	u64 val, new_val, ftr;
+> +	bool match;
+> =20
+>  	val =3D vcpu_get_reg(vcpu, reg);
+>  	ftr =3D (val & mask) >> shift;
+> @@ -434,7 +435,10 @@ static u64 test_reg_set_success(struct kvm_vcpu *vcp=
+u, u64 reg,
+> =20
+>  	vcpu_set_reg(vcpu, reg, val);
 
+[Severity: Low]
+Does using vcpu_set_reg() here defeat the stated goal of making write
+validation checks non-fatal?=20
+
+In the KVM selftests framework, vcpu_set_reg() contains a fatal assertion
+that triggers if the underlying ioctl fails. If KVM unexpectedly rejects a
+"valid" write by returning an error like -EINVAL, wouldn't this still fatal=
+ly
+abort the test suite instead of printing the affected bitfield and continui=
+ng?
+
+Looking at test_reg_set_fail() further down in this patch, it explicitly
+uses __vcpu_set_reg() and manually checks the return code and errno to
+avoid fatal assertions on the ioctl. Should __vcpu_set_reg() be used here
+in test_reg_set_success() as well?
+
+>  	new_val =3D vcpu_get_reg(vcpu, reg);
+> -	TEST_ASSERT_EQ(new_val, val);
+> +	match =3D new_val =3D=3D val;
+> +	if (!match)
+> +		ksft_print_msg("%lx !=3D %lx\n", new_val, val);
+> +	ksft_test_result(match, "%s valid write succeeded\n", ftr_bits->name);
+> =20
+>  	return new_val;
+>  }
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260929-kvm-arm64-=
+set-id-regs-aarch64-v8-0-58aabe2c2fac@kernel.org?part=3D3
