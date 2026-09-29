@@ -1,38 +1,37 @@
 Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0669D51A75E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 064B351A725
 	for <kvmarm@lists.linux.dev>; Tue, 29 Sep 2026 10:37:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790678251; cv=none; b=acK3D8J8v1mjdDluoPJtxKTmjZ7lE6Jo+AvbOGk9Z/M/AHthN6pS0vxZrnHM94RlkYQpsDu3QQ5ANJyNgU4fkK1owjMQY6BgkBoXXEsXLUwWRrtoxs/wbJOXs6WahS//gWYfXTC++JBHEu3BwNIlW1d0RngDHIN1TsrERZKi4qM=
+	t=1790678250; cv=none; b=DwLqEvEcG7bSu9jIb8kZdr+QbPR7pf63UZGQtqgnOKFDXKw1kh/xo9S9Rn8CNOvMJA2kvhYjZxNzX5Z5BMipIbJnTkcqzgXrkH6oWKd3tLjhyDbk8pYwnj6zZon1FnTQO790i4OqOHyR8WbqAnKE8/Cnx0IXaLY6UdNdkkAm0ak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790678251; c=relaxed/simple;
-	bh=wexqvs0yfeS2C0Bj81AiN5APyJC+KK2qBppJdH0KoDQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GgfZoqCM+0+uKxt4jqgFnKrxo7o5uYmJeTjOgwFw3aGljicjzIs6ccorxbDGVSW6PQhu/NsVtPPe6BQdHFTLs7eUkliIZZq95qhOXfqj7gB2d6ajjYDIBi8D1TyTB0KpEnGwAfo064bRImxwYaKUTGUJMjI/gvB2mIuv5lo5+mY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=HvLJpW9C; arc=none smtp.client-ip=113.46.200.224
+	s=arc-20240116; t=1790678250; c=relaxed/simple;
+	bh=fJgD9BLKeKavki2hraGLOgH8idZOq4RJ7lN/nj7PlJI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IgG7yvQP3z8VMNRwOoaTsOIJw9ANnz1x9IMJAcef8Q/m18fRX4MT2kiGYtcDni5N6UqsTqUE+elNTVwzPdun6y8obzgTGdT1EBknDRO3cXaGN0cwOueTypc11ci5APzC0SBn7VTeZDGnd9DVZa/YkqdpaoYQTqAxYZISzcE2lsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=DjPMdWc9; arc=none smtp.client-ip=113.46.200.224
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="HvLJpW9C"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="DjPMdWc9"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=QD12wy70TSq/tTZOlQTiNE7N6Wmf5bjie5E1X0Lng3g=;
-	b=HvLJpW9Cosxcsx/1j+ZjQo0fHaeFOExk2G1PwxmWEeqad9RWHDo8pB3EejDa9fDLm2fWh9WMD
-	dAH7tCRk/A4zNr96l+JQ6aSChhQryazK01Pojqvj6zpepgs8ATJUlTgZCfPWD395gWS1YG5meow
-	HrO/qz73uwssvQQgW+36Qh0=
-Received: from mail.maildlp.com (unknown [172.19.163.163])
-	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4hvDpq1cL3z1cyS4;
-	Tue, 29 Sep 2026 18:25:55 +0800 (CST)
+	bh=BTYbqIl27tkLsfYQLjeiceAlSl6nFmNQvil4C5coGo8=;
+	b=DjPMdWc9fCMMgRs+uzDdgUQahiOtTiIA3Db27qniDoDwUOx2ohxoGSjPCxqjHJ1X4Cg2mJvP5
+	MJ0B2BXIcxLlOCkTKyCkCIfH5PoLo5F3VtFKQRDqaYn2o5eQ0q3ym7Bw3+Q3R+vDFKqOL+6EJ1E
+	/gc1oAk/bhkSIlpIR6ftwnQ=
+Received: from mail.maildlp.com (unknown [172.19.163.127])
+	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4hvDpk4VSWz1cyQh;
+	Tue, 29 Sep 2026 18:25:50 +0800 (CST)
 Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4CA904048B;
-	Tue, 29 Sep 2026 18:37:01 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id A9CBC40561;
+	Tue, 29 Sep 2026 18:36:56 +0800 (CST)
 Received: from huawei.com (10.50.163.32) by kwepemr100010.china.huawei.com
  (7.202.195.125) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Tue, 29 Sep
- 2026 18:37:00 +0800
+ 2026 18:36:55 +0800
 From: Tian Zheng <zhengtian10@huawei.com>
 To: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
 	<will@kernel.org>, <corbet@lwn.net>, <pbonzini@redhat.com>,
@@ -47,12 +46,10 @@ CC: <yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>,
 	<mark.rutland@arm.com>, <seanjc@google.com>, <rdunlap@infradead.org>,
 	<linux-doc@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
 	<skhan@linuxfoundation.org>
-Subject: [PATCH v5 06/15] KVM: arm64: Add support for FEAT_HDBSS
-Date: Tue, 29 Sep 2026 18:36:46 +0800
-Message-ID: <20260929103655.85107-7-zhengtian10@huawei.com>
+Subject: [PATCH v5 00/15] KVM: arm64: FEAT_HDBSS support for stage-2 dirty tracking
+Date: Tue, 29 Sep 2026 18:36:40 +0800
+Message-ID: <20260929103655.85107-1-zhengtian10@huawei.com>
 X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20260929103655.85107-1-zhengtian10@huawei.com>
-References: <20260929103655.85107-1-zhengtian10@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -64,82 +61,209 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
  kwepemr100010.china.huawei.com (7.202.195.125)
 
-Armv9.5 introduces the Hardware dirty state tracking structure
-(HDBSS), indicated by ID_AA64MMFR1_EL1.HAFDBS == 0b0100.
+This series implements hardware-assisted stage-2 dirty tracking on
+arm64 using FEAT_HDBSS. It combines Leonardo Bras' HAFDBS descriptor
+rework [1] with the HDBSS buffer support built on top of it, as
+requested during the review of [1].
 
-Add CPU capability detection for HDBSS. The capability is restricted
-to VHE systems, as the buffer registers HDBSSBR_EL2 and HDBSSPROD_EL2
-are EL2-only and are programmed directly from host context. A
-system_supports_hdbss() helper is provided for the rest of the series.
+Patches 1-4 are from Leonardo's RFC, reworked per the review; patch 5
+adds the folio-account harvest from the HDBSS validation work. The
+descriptor encoding moves the stage-2 write permission from S2AP[1]
+to DBM and reuses S2AP[1] as the dirty state:
 
-Suggested-by: Zhou Wang <wangzhou1@hisilicon.com>
-Co-developed-by: Eillon <yezhenyu2@huawei.com>
-Signed-off-by: Eillon <yezhenyu2@huawei.com>
+    RO  (DBM=0, S2AP[1]=0)  read-only, write -> permission fault
+    WC  (DBM=1, S2AP[1]=0)  writable-clean, hw promotes on write
+    WD  (DBM=1, S2AP[1]=1)  writable-dirty
+
+The remaining patches implement the HDBSS buffer machinery: the
+buffer size is configured before the first vCPU is created, the
+buffers are allocated at vCPU creation, a full buffer raises a fault
+that forces an exit, and every VM exit flushes the entries into the
+dirty bitmap or the dirty ring. The size ioctl only applies to
+dirty-bitmap mode, as dirty-ring mode pins the buffer size to
+PAGE_SIZE. A single derived hardware-dirty mode selects the
+configuration:
+
+    migration with HDBSS  -> HD|HA|HDBSS
+    migration without     -> HD off, write-protect faults
+    no migration          -> HD|HA, only written pages go dirty
+
+The HDBSS registers are programmed on vCPU load (patch 7): HDBSS can
+be enabled while a vCPU is mid-KVM_RUN, and hardware appends dirty
+entries without any fault, so HDBSSBR_EL2 must already point at the
+running vCPU's buffer.
+
+HAFDBS is not gated on nested virtualization: shadow stage-2 MMUs
+build their own VTCR without HD via kvm_get_vtcr(). HDBSS stays
+gated, as the nested exit-flush and harvest paths are unaudited.
+This series was only tested on non-nested guests, so reviewer
+attention on the nested paths is appreciated.
+
+The KVM_CAP_ARM_HDBSS_BUFFER_SIZE interface is exercised by a new
+selftest (patch 15), including the contract that dirty-ring mode
+pins the buffer size to the default.
+
+Comments welcome, especially on:
+
+  - allocating the HDBSS buffer at vCPU creation and programming the
+    HDBSSBR_EL2 and HDBSSPROD_EL2 registers on vCPU load (patch 7),
+    rather than at each mode switch,
+  - keeping HDBSS NV-gated while HAFDBS is not (patch 12),
+  - using the target MMU's live HD state (kvm_hw_dirty_enabled())
+    instead of the hardware capability (patch 12), so shadow MMUs
+    keep installing writable-dirty entries as before.
+
+Relative to Leonardo's RFC [1]:
+
+  - Patch 1 keeps reading stage-2 writability from S2AP[1] in the
+    nested walker, as DBM is RES0 from L1's perspective.
+  - Patch 2 splits the two dirty ledgers on the fault paths: the
+    host folio account is marked speculatively on PROT_W while the
+    KVM dirty bitmap is only marked on PROT_DIRTY.
+  - Patch 5's HAFDBS toggle becomes the derived mode (patch 12),
+    which computes the full VTCR_EL2 dirty configuration (off,
+    HAFDBS or HDBSS) from the capabilities and the logging state.
+  - The folio-account harvest, the dirty-ring reservation and the
+    buffer-size UAPI are new.
+
+Changes since v4 [2]:
+
+- Rebased onto Leonardo's descriptor rework [1]: write permission
+  moves to DBM, S2AP[1] becomes the pure dirty state. Replaces v4's
+  auto-DBM patch and drops the eager-splitting dependency, as the
+  walker clears DBM on blocks so lazy splitting keeps working.
+- New: harvest of the stage-2 dirty state into the host folio
+  account at unmap/write-protect time.
+- Buffer lifetime tied to the vCPU: allocated at creation, freed at
+  destruction, registers programmed on ownership. Closes the
+  use-after-free window on a concurrent mode switch.
+- Auto enable/disable replaced by a single derived mode: no illegal
+  intermediate VTCR_EL2 state, no locking.
+- Outside migration, HAFDBS is now enabled (Leonardo's RFC [1]):
+  read faults install writable-clean pages, hardware promotes them
+  on write, and only pages actually written to become dirty.
+- Flush and HDBSS fault handling split into separate patches, with
+  the flush unified at VM exit so that entries pushed to the dirty
+  ring are accounted for before the vCPU re-enters the guest.
+- New: dirty-ring support (ring reserves room for a full flush,
+  buffer pinned to PAGE_SIZE) and the KVM_CAP_ARM_HDBSS_BUFFER_SIZE
+  UAPI with documentation and a selftest.
+
+Changes since v3 [3]:
+
+- Merge sysreg definitions into the FEAT_HDBSS detection patch (was a
+  separate patch in v3).
+- Add auto DBM (Dirty Bit Modifier) support as a new patch, suggested
+  by Leonardo Bras. DBM is now controlled as a page-table level flag
+  (KVM_PGTABLE_S2_DBM) rather than per-PTE. Note that DBM is injected
+  at stage-2 MMU creation time, not lazily on first dirty access. This
+  means the first write to a dirty-logged page does not generate a
+  page fault, which is a key reason for the mandatory dependency on
+  Leonardo's eager hugepage splitting patch.
+- Split the v3 "Enable HDBSS support and handle HDBSSF events" patch
+  into three patches: per-vCPU buffer management, fault handling and
+  buffer flush, and auto enable/disable on dirty logging change. This
+  implements kernel-managed automatic HDBSS enable/disable.
+- Remove the KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl for manual HDBSS
+  on/off. HDBSS is now automatically enabled/disabled based on dirty
+  logging state via kvm_arch_commit_memory_region().
+- Change HDBSS buffer flush triggers to vcpu_put, check_vcpu_requests,
+  and kvm_handle_guest_abort.
+- Store hdbss_order at VM level (kvm->arch.hdbss_order) instead of
+  per-vCPU, since all vCPUs share the same order.
+- Document patch is not included in this version; will be sent in a
+  follow-up series.
+
+Changes since v2 [4]:
+
+- Remove the ARM64_HDBSS configuration option and ensure this feature
+  is only enabled in VHE mode.
+- Move HDBSS-related variables to the arch-independent portion of the
+  kvm structure.
+- Remove error messages during HDBSS enable/disable operations.
+- Change HDBSS buffer flushing from handle_exit to vcpu_put,
+  check_vcpu_requests, and kvm_handle_guest_abort.
+- Add fault handling for HDBSS including buffer full, external abort,
+  and general protection fault (GPF).
+- Add support for a 4KB HDBSS buffer size, mapped to the value 0b0000.
+- Add a second argument to the ioctl to turn HDBSS on or off.
+
+Changes since v1 [5]:
+
+- Removed redundant macro definitions and switched to tool-generated.
+- Split HDBSS interface and implementation into separate patches.
+- Integrate system_supports_hdbss() into ARM feature initialization.
+- Refactored HDBSS data structure to store meaningful values instead
+  of raw register contents.
+- Fixed permission checks when applying DBM bits in page tables to
+  prevent potential memory corruption.
+- Removed unnecessary dsb instructions.
+- Drop the debugging printks.
+- Merged the two patches "using ioctl to enable/disable the HDBSS
+  feature" and "support to handle the HDBSSF event" into one.
+
+[1] https://lore.kernel.org/all/20260901171558.2674031-1-leo.bras@arm.com/
+[2] https://lore.kernel.org/all/20260709104026.2612599-1-zhengtian10@huawei.com/
+[3] https://lore.kernel.org/all/20260225040421.2683931-1-zhengtian10@huawei.com/
+[4] https://lore.kernel.org/all/20251121092342.3393318-1-zhengtian10@huawei.com/
+[5] https://lore.kernel.org/all/20250311040321.1460-1-yezhenyu2@huawei.com/
+
 Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
----
- arch/arm64/include/asm/cpufeature.h |  5 +++++
- arch/arm64/kernel/cpufeature.c      | 12 ++++++++++++
- arch/arm64/tools/cpucaps            |  1 +
- 3 files changed, 18 insertions(+)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 4f04ad82ea34..0592e6f6b4d7 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -856,6 +856,11 @@ static inline bool system_supports_haft(void)
- 	return cpus_have_final_cap(ARM64_HAFT);
- }
+Eillon (3):
+  KVM: arm64: Add HDBSS per-vCPU buffer management
+  KVM: arm64: Flush the HDBSS buffer on VM exit
+  KVM: arm64: Handle HDBSS faults
 
-+static inline bool system_supports_hdbss(void)
-+{
-+	return cpus_have_final_cap(ARM64_HAS_HDBSS);
-+}
-+
- static __always_inline bool system_supports_mpam(void)
- {
- 	return alternative_has_cap_unlikely(ARM64_MPAM);
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 32102c3912fa..12fa37328dd2 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -2158,6 +2158,11 @@ static bool hvhe_possible(const struct arm64_cpu_capabilities *entry,
- 	return arm64_test_sw_feature_override(ARM64_SW_FEATURE_OVERRIDE_HVHE);
- }
+Leonardo Bras (4):
+  KVM: arm64: pgtables: Change write bit from S2AP_W to DBM
+  KVM: arm64: Add KVM_PGTABLE_PROT_DIRTY
+  KVM: arm64: Introduce a dedicated walker for stage2 write-protect
+  KVM: arm64: Add KVM_REQ_RELOAD_STAGE2
 
-+static bool has_vhe_hdbss(const struct arm64_cpu_capabilities *entry, int scope)
-+{
-+	return is_kernel_in_hyp_mode() && has_cpuid_feature(entry, scope);
-+}
-+
- bool cpu_supports_bbml3(void)
- {
- 	/* CPUs that support BBML3 but dont advertise through ID_AA64MMFR2_EL1 */
-@@ -2816,6 +2821,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HAFT)
- 	},
- #endif
-+	{
-+		.desc = "Hardware dirty state tracking structure (HDBSS)",
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.capability = ARM64_HAS_HDBSS,
-+		.matches = has_vhe_hdbss,
-+		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HDBSS)
-+	},
- 	{
- 		.desc = "CRC32 instructions",
- 		.capability = ARM64_HAS_CRC32,
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 2775ba3359cf..8acb3db980c9 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -71,6 +71,7 @@ HAS_VA52
- HAS_VIRT_HOST_EXTN
- HAS_WFXT
- HAS_XNX
-+HAS_HDBSS
- HAFT
- HW_DBM
- KVM_HVHE
---
+Tian Zheng (8):
+  KVM: arm64: Harvest stage-2 dirty state into the host folio account
+  KVM: arm64: Add support for FEAT_HDBSS
+  KVM: Add kvm_arch_dirty_ring_size_updated() hook
+  KVM: arm64: Reserve dirty ring space for the HDBSS buffer
+  KVM: arm64: Derive the VM hardware dirty mode from dirty logging
+  KVM: arm64: Add HDBSS buffer size ioctl for dirty-bitmap mode
+  KVM: arm64: Document HDBSS buffer size ioctl
+  KVM: arm64: selftests: Add HDBSS buffer size ioctl interface test
+
+ Documentation/virt/kvm/api.rst                |  28 +++
+ arch/arm64/include/asm/cpufeature.h           |   5 +
+ arch/arm64/include/asm/esr.h                  |   5 +
+ arch/arm64/include/asm/kvm_dirty_bit.h        |  44 ++++
+ arch/arm64/include/asm/kvm_host.h             |  15 ++
+ arch/arm64/include/asm/kvm_mmu.h              |  18 ++
+ arch/arm64/include/asm/kvm_nested.h           |   9 +-
+ arch/arm64/include/asm/kvm_pgtable.h          |  14 +-
+ arch/arm64/include/asm/sysreg.h               |   9 +
+ arch/arm64/kernel/cpufeature.c                |  12 +
+ arch/arm64/kvm/Makefile                       |   1 +
+ arch/arm64/kvm/arm.c                          |  84 ++++++-
+ arch/arm64/kvm/dirty_bit.c                    | 129 ++++++++++
+ arch/arm64/kvm/hyp/pgtable.c                  |  74 +++++-
+ arch/arm64/kvm/hyp/vhe/switch.c               |  17 ++
+ arch/arm64/kvm/mmu.c                          | 118 ++++++++-
+ arch/arm64/kvm/nested.c                       |   5 +
+ arch/arm64/kvm/ptdump.c                       |  10 +-
+ arch/arm64/kvm/reset.c                        |   3 +
+ arch/arm64/tools/cpucaps                      |   1 +
+ include/linux/kvm_dirty_ring.h                |   1 +
+ include/uapi/linux/kvm.h                      |   1 +
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../testing/selftests/kvm/arm64/hdbss_test.c  | 224 ++++++++++++++++++
+ virt/kvm/dirty_ring.c                         |   4 +
+ virt/kvm/kvm_main.c                           |   1 +
+ 26 files changed, 803 insertions(+), 30 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_dirty_bit.h
+ create mode 100644 arch/arm64/kvm/dirty_bit.c
+ create mode 100644 tools/testing/selftests/kvm/arm64/hdbss_test.c
+
+
+base-commit: 72d3fcf802c45d00b300f25b848a93c3a2bd7c7e
+-- 
 2.43.0
 
