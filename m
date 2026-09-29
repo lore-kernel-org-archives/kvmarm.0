@@ -1,58 +1,54 @@
-Received: from mta0.migadu.com (out-37.mta0.migadu.com [91.218.175.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C0904E36F5
-	for <kvmarm@lists.linux.dev>; Tue, 29 Sep 2026 09:01:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179D13C13E6;
+	Tue, 29 Sep 2026 09:36:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790672487; cv=none; b=bwMeG+TK2Ou2HfaU5J07iXEB6hmaAGRzkivX6+c7qb0z5Fuc2Fjz0npRCMq7teM0Yc+UhvNuJKjmbUJQfNd9vWU0ADYatAdzyNcdJisuwWfiQiCzL5pgljafUee9DMSst0eh29sh0Fmhg5UGhSdlnTUmJgJ1ra6qX57VzuU0L5g=
+	t=1790674602; cv=none; b=hlZqN7S9HriYFSo6xdzqUIKLx0pTzrZiru8N6x5p5vv1ZHB5Og5LLo3Mn6M2f5x0fGu+iop9XnYphDuSL9SEzEZ60rzChTuezV9JQH3ckicjXN0aX6Nl4crTrCREvziyWjV+OdZzvK9lHWTO7uyuiYfnrXMyt6li6cSNRBX0804=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790672487; c=relaxed/simple;
-	bh=9u1xb87yGfGazyR96ri6hSUGdO9iU79tn1MK3OJoWjI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fngVvi89KMWTB6hlQhmZxQNAt/V5y11xp9r+gbrCWDABFbHH6uuseBns6zRCqRhwlZFXuk4STFba13V9wmaB2E5pIwwV3q49wsZeXKIln5FWOMkFhmWXlxTNwewpLYC2chNj23NtNiDn2g85+J+eDu3sNhlaD9f6EN7Hi0btcjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eUjol+GI; arc=none smtp.client-ip=91.218.175.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1790674602; c=relaxed/simple;
+	bh=VZD8Yjru++WZZgwhQ0iPvVb5zdGKeoldZOymTVTN7Ac=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=UZDP31DijX66HgP6Pn2oT3so1bKfUJL0vuzGfAY6roBR5dIclDFJTilzGk3v7zW2gb6peH6Y8CYOgzSEfyISx4sytnI3BrG95BeizrAcogvIZVZ1jZ2zJhOXSpTfeh9Xy1Tr5NFgPG+bymOBktj9ku/hk4aHXi1aiEMrFN+ykCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mtnY2C39; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eUjol+GI"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=9u1xb87yGfGazyR96ri6hSUGdO9iU79tn1MK3OJoWjI=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790672483; v=1; x=1791277283;
- b=eUjol+GI/vZmVtUYQtJOjOyU6H1WzxwpjObLOgva+y+7YDk0RbRu+wZvHzoc/SugoXilQH1C
- wt4WgGaCQnmN4yHcihVgJpESiAtJvY4P1nnFh8rH+0+jrt20pi9M2xXwyDM2tITFopN3JWS68bW
- F3TH1vznqLLDRZ5XyXjS0458=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id cd8c479a161a7a38;
-	Tue, 29 Sep 2026 09:01:23 +0000
-X-Mizu-Trace-ID: cd8c479a161a7a38
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mtnY2C39"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B60821F00899;
+	Tue, 29 Sep 2026 09:36:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790674600;
+	bh=9Eud5GNNPrAatHu+qEWY3UADBf1pHyyoCW3I8vnbr84=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=mtnY2C395UzD37gI5Ru1SgJroz8xkEZh1aCzNM+3r0wJIl1Xhjr/CKEMnA0CqH2Kl
+	 lsrmE0vsWr9HCKYaatW/qqDbTV0drjW+EUk4Pce1F3h4jjMLni3+Qrt4kWO7ByhoKm
+	 wvA2lF/pX3mbTmbhKp+VBrICKS6rjkofe5hRvODIxqAq8euIxELpBVhyYdjiss73ma
+	 FLVSCfSpGeiEgZ+yVTtEG6MxdAMqbci2u+8HzPoIJ8CbOe8VFWLHv9RbWleswzS5dT
+	 AYAY6IqVZ/nUwdM6+zW8c7sHDftSg/8DYysFIe+gRIOmq4rg7jqs1BD3m/RHLlYUk6
+	 mBCMw8nehyucQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xBUGM-0000000ElEa-3Ng9;
+	Tue, 29 Sep 2026 09:36:38 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
+Cc: Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Quentin Perret <qperret@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Venkata Rao Kakani <venkata.kakani@oss.qualcomm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 4/4] KVM: arm64: selftests: Check a feature hidden in an ID register is UNDEF
-Date: Tue, 29 Sep 2026 10:00:31 +0100
-Message-Id: <20260929090031.3829185-5-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260929090031.3829185-1-fuad.tabba@linux.dev>
-References: <20260929090031.3829185-1-fuad.tabba@linux.dev>
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Yuchao Zhang <ndaugoing@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2 2/7] KVM: arm64: Turn vcpu->arch.pause into a counter
+Date: Tue, 29 Sep 2026 10:35:43 +0100
+Message-ID: <20260929093548.3598547-3-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260929093548.3598547-1-maz@kernel.org>
+References: <20260929093548.3598547-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -60,227 +56,115 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, ndaugoing@gmail.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Userspace can hide a feature from a guest by clearing its field in a
-writable ID register, and KVM then makes the feature's instructions
-UNDEFINED in the guest by trapping or disabling them. No selftest checks
-that.
+We have situations where we can call kvm_arm_halt_guest() without
+holding config_lock, which means that halt and resume can overlap in
+funny ways when called from separate contexts, and result in situations
+where a vcpu is resumed while other parts of KVM assume it is halted.
+Consequences are left to the imagination of the reader.
 
-Add a test that runs the instruction of each of TLBI OS, MOPS, TCR2_EL1
-and FPMR once with its field as advertised and once with it cleared, and
-expects an UNDEF only when cleared. A feature the vCPU doesn't advertise
-is skipped, as is hidden TLBI OS on a CPU with neither FGT nor
-FEAT_EVT2, where KVM can't trap it.
+Fix this sorry situation by turning kvm_vcpu_arch::pause into an
+atomic counter, which makes the races described above harmless.
 
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+Fixes: 3b92830ad41b2 ("KVM: arm/arm64: implement kvm_arm_[halt,resume]_guest")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: stable@vger.kernel.org
 ---
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/arm64/hidden_features.c     | 184 ++++++++++++++++++
- 2 files changed, 185 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/hidden_features.c
+ arch/arm64/include/asm/kvm_host.h |  7 +++----
+ arch/arm64/kvm/arm.c              | 21 ++++++++++++---------
+ 2 files changed, 15 insertions(+), 13 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 96bab7002d39e..864fdca7f362e 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -194,6 +194,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_v5
- TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
- TEST_GEN_PROGS_arm64 += arm64/no-vgic
- TEST_GEN_PROGS_arm64 += arm64/idreg-idst
-+TEST_GEN_PROGS_arm64 += arm64/hidden_features
- TEST_GEN_PROGS_arm64 += arm64/kvm-uuid
- TEST_GEN_PROGS_arm64 += access_tracking_perf_test
- TEST_GEN_PROGS_arm64 += arch_timer
-diff --git a/tools/testing/selftests/kvm/arm64/hidden_features.c b/tools/testing/selftests/kvm/arm64/hidden_features.c
-new file mode 100644
-index 0000000000000..194d746e7605e
---- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/hidden_features.c
-@@ -0,0 +1,184 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * hidden_features - Check that a feature's instruction runs in the guest when
-+ * its ID register field is advertised, and is UNDEFINED when userspace clears
-+ * the field.
-+ *
-+ * Copyright (c) 2026 Google LLC
-+ * Author: Fuad Tabba <fuad.tabba@linux.dev>
-+ */
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+
-+static volatile bool undef;
-+
-+static void guest_tlbi_os(void)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 27fe0cd5b2d7a..66ea2372f9870 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -889,11 +889,10 @@ struct kvm_vcpu_arch {
+ 	/*
+ 	 * Don't run the guest (internal implementation need).
+ 	 *
+-	 * Contrary to the flags above, this is set/cleared outside of
+-	 * a vcpu context, and thus cannot be mixed with the flags
+-	 * themselves (or the flag accesses need to be made atomic).
++	 * Contrary to the flags above, this is updated outside of
++	 * a vcpu context, and thus cannot be mixed with the flags.
+ 	 */
+-	bool pause;
++	atomic_t pause;
+ 
+ 	/*
+ 	 * We maintain more than a single set of debug registers to support
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 5f5dd8bead4b9..9a4871cd796bc 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -561,6 +561,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 	kvm_arm_pvtime_vcpu_init(&vcpu->arch);
+ 
+ 	vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
++	atomic_set(&vcpu->arch.pause, 0);
+ 
+ 	/*
+ 	 * This vCPU may have been created after mpidr_data was initialized.
+@@ -835,6 +836,11 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+ 	return ret;
+ }
+ 
++static bool vcpu_can_run(struct kvm_vcpu *vcpu)
 +{
-+	/* tlbi vmalle1os */
-+	asm volatile("sys #0, c8, c1, #0\n\tdsb ish\n\tisb" ::: "memory");
++	return !kvm_arm_vcpu_stopped(vcpu) && !atomic_read(&vcpu->arch.pause);
 +}
 +
-+static void guest_mops(void)
-+{
-+	register u64 *d asm("x0");
-+	register u64 n asm("x1");
-+	register u64 s asm("x2");
-+	u64 buf[8];
-+
-+	d = buf;
-+	n = sizeof(buf);
-+	s = 0;
-+	/* setp [x0]!, x1!, x2; setm; sete */
-+	asm volatile(".inst 0x19c20420\n\t.inst 0x19c24420\n\t.inst 0x19c28420"
-+		     : "+r"(d), "+r"(n) : "r"(s) : "cc", "memory");
-+}
-+
-+static void guest_tcr2(void)
-+{
-+	read_sysreg_s(SYS_TCR2_EL1);
-+}
-+
-+static void guest_fpmr(void)
-+{
-+	read_sysreg_s(SYS_FPMR);
-+}
-+
-+struct feature {
-+	const char *name;
-+	u64 id_reg;
-+	u64 mask;
-+	u8 shift;
-+	u64 min;
-+	void (*insn)(void);
-+	bool (*trappable)(struct kvm_vcpu *vcpu);
-+};
-+
-+/* Without FGT, KVM traps a hidden TLBI OS only through HCR_EL2.TTLBOS (FEAT_EVT2). */
-+static bool tlbi_os_trappable(struct kvm_vcpu *vcpu)
-+{
-+	u64 mmfr0 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR0_EL1));
-+	u64 mmfr2 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR2_EL1));
-+
-+	return SYS_FIELD_GET(ID_AA64MMFR0_EL1, FGT, mmfr0) >= ID_AA64MMFR0_EL1_FGT_IMP ||
-+	       SYS_FIELD_GET(ID_AA64MMFR2_EL1, EVT, mmfr2) >= ID_AA64MMFR2_EL1_EVT_TTLBxS;
-+}
-+
-+#define FEATURE(n, reg, field, min_val, fn, trap)		\
-+{								\
-+	.name		= n,					\
-+	.id_reg		= SYS_##reg,				\
-+	.mask		= reg##_##field##_MASK,			\
-+	.shift		= reg##_##field##_SHIFT,		\
-+	.min		= reg##_##field##_##min_val,		\
-+	.insn		= fn,					\
-+	.trappable	= trap,					\
-+}
-+
-+static const struct feature features[] = {
-+	FEATURE("TLBI OS", ID_AA64ISAR0_EL1, TLB, OS, guest_tlbi_os, tlbi_os_trappable),
-+	FEATURE("MOPS", ID_AA64ISAR2_EL1, MOPS, IMP, guest_mops, NULL),
-+	FEATURE("TCR2_EL1", ID_AA64MMFR3_EL1, TCRX, IMP, guest_tcr2, NULL),
-+	FEATURE("FPMR", ID_AA64PFR2_EL1, FPMR, IMP, guest_fpmr, NULL),
-+};
-+
-+static void guest_code(const struct feature *feat)
-+{
-+	undef = false;
-+	feat->insn();
-+	GUEST_SYNC(undef);
-+	GUEST_DONE();
-+}
-+
-+static void guest_undef_handler(struct ex_regs *regs)
-+{
-+	undef = true;
-+	regs->pc += 4;
-+}
-+
-+static bool run(const struct feature *feat, bool hide)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+	bool got = false;
-+	u64 val;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, (void *)guest_code);
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vcpu);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ESR_ELx_EC_UNKNOWN, guest_undef_handler);
-+	vcpu_args_set(vcpu, 1, feat);
-+
-+	if (hide) {
-+		val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(feat->id_reg));
-+		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(feat->id_reg), val & ~feat->mask);
-+	}
-+
-+	for (;;) {
-+		vcpu_run(vcpu);
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_SYNC:
-+			got = uc.args[1];
-+			break;
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		case UCALL_DONE:
-+			kvm_vm_free(vm);
-+			return got;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	}
-+}
-+
-+static void probe_feature(const struct feature *feat, bool *present, bool *trappable)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	u64 val;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, NULL);
-+	val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(feat->id_reg));
-+	*present = ((val & feat->mask) >> feat->shift) >= feat->min;
-+	*trappable = !feat->trappable || feat->trappable(vcpu);
-+	kvm_vm_free(vm);
-+}
-+
-+int main(void)
-+{
-+	const struct feature *feat;
-+	bool present, trappable;
-+	int i;
-+
-+	test_disable_default_vgic();
-+
-+	ksft_print_header();
-+	ksft_set_plan(ARRAY_SIZE(features) * 2);
-+
-+	for (i = 0; i < ARRAY_SIZE(features); i++) {
-+		feat = &features[i];
-+
-+		probe_feature(feat, &present, &trappable);
-+		if (!present) {
-+			ksft_test_result_skip("%s advertised, not supported\n", feat->name);
-+			ksft_test_result_skip("%s hidden, not supported\n", feat->name);
-+			continue;
-+		}
-+
-+		if (run(feat, false))
-+			ksft_test_result_fail("%s advertised, UNDEF\n", feat->name);
-+		else
-+			ksft_test_result_pass("%s advertised\n", feat->name);
-+
-+		if (!trappable)
-+			ksft_test_result_skip("%s hidden, not trappable\n", feat->name);
-+		else if (run(feat, true))
-+			ksft_test_result_pass("%s hidden\n", feat->name);
-+		else
-+			ksft_test_result_fail("%s hidden, no UNDEF\n", feat->name);
-+	}
-+
-+	ksft_finished();
-+}
+ /**
+  * kvm_arch_vcpu_runnable - determine if the vcpu can be scheduled
+  * @v:		The VCPU pointer
+@@ -850,8 +856,7 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
+ 		      (kvm_timer_should_notify_user(v) ||
+ 		       kvm_pmu_should_notify_user(v)));
+ 
+-	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
+-		&& !kvm_arm_vcpu_stopped(v) && !v->arch.pause);
++	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v)) && vcpu_can_run(v));
+ }
+ 
+ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+@@ -1014,7 +1019,7 @@ void kvm_arm_halt_guest(struct kvm *kvm)
+ 	struct kvm_vcpu *vcpu;
+ 
+ 	kvm_for_each_vcpu(i, vcpu, kvm)
+-		vcpu->arch.pause = true;
++		atomic_inc(&vcpu->arch.pause);
+ 	kvm_make_all_cpus_request(kvm, KVM_REQ_SLEEP);
+ }
+ 
+@@ -1024,8 +1029,8 @@ void kvm_arm_resume_guest(struct kvm *kvm)
+ 	struct kvm_vcpu *vcpu;
+ 
+ 	kvm_for_each_vcpu(i, vcpu, kvm) {
+-		vcpu->arch.pause = false;
+-		__kvm_vcpu_wake_up(vcpu);
++		if (atomic_dec_and_test(&vcpu->arch.pause))
++			__kvm_vcpu_wake_up(vcpu);
+ 	}
+ }
+ 
+@@ -1033,11 +1038,9 @@ static void kvm_vcpu_sleep(struct kvm_vcpu *vcpu)
+ {
+ 	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
+ 
+-	rcuwait_wait_event(wait,
+-			   (!kvm_arm_vcpu_stopped(vcpu)) && (!vcpu->arch.pause),
+-			   TASK_INTERRUPTIBLE);
++	rcuwait_wait_event(wait, vcpu_can_run(vcpu), TASK_INTERRUPTIBLE);
+ 
+-	if (kvm_arm_vcpu_stopped(vcpu) || vcpu->arch.pause) {
++	if (!vcpu_can_run(vcpu)) {
+ 		/* Awaken to handle a signal, request we sleep again later. */
+ 		kvm_make_request(KVM_REQ_SLEEP, vcpu);
+ 	}
 -- 
-2.39.5
+2.47.3
 
