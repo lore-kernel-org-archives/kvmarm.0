@@ -1,120 +1,88 @@
-Received: from mta1.migadu.com (out-115.mta1.migadu.com [95.215.58.115])
+Received: from mta0.migadu.com (out-19.mta0.migadu.com [91.218.175.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F513D5661
-	for <kvmarm@lists.linux.dev>; Tue, 29 Sep 2026 18:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.115
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D9CE54705E
+	for <kvmarm@lists.linux.dev>; Tue, 29 Sep 2026 19:04:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790707551; cv=none; b=HXFc7qnLhw5Zmfmu3PsZCcHlPHQtNUW/IWP8B2aYFMgyDsrVYRONSRlSjJErX6oDQy1sGJuxbmJRQ7LuzmP9owQ/MM4RNNUiuo+jVBpS8bHGsE1iTzvh6Oai6shdAFgCEaS+S0AZSCPFTX3VnRRip2yblFP/JDzC7LIo4jreZsA=
+	t=1790708702; cv=none; b=clP9umIrRfA6Urdz/my9cakHZml6wRBXP3+I1OH7FYqotzkXh2Pt1qiem/uI7ye5eCOg3vFq96ja5wfwZkRTuCR6ZdlexC4XnqDOZvrXDCwjzvEA4th2Wi2hZjFd9XV7D4BbVYaBFdexFmOdD9x5MOCK3K28XMcyJaCcHtVJk2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790707551; c=relaxed/simple;
-	bh=mx1pndh9NACF4v//8sWUqY+ii9IXnTRJQEeestc8TIE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B/3SJS3JmwUo6A8Dgh/yLwSgB7DkcPxOfO8GaGApQl4b3iIOluryMbtYe3kWPRrQA/8elGXlcEHOnqkfIvJ2jAGg6RKLi99unq+wd5lBmWQ5DKZWnyspXss8ZTz+jbTojTUmmJ+5gFARwN+JR/fJbg58yXVyLvz2sMXMbI6qu2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kYCDV+Wz; arc=none smtp.client-ip=95.215.58.115
+	s=arc-20240116; t=1790708702; c=relaxed/simple;
+	bh=Wv2LAC871pIKGb/ciNqR/Im7/rPMRTvo6hq+2IOPT14=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=EYU663KRIC60MeAOdt4//SOMWNJiXwlLiVL/YXjZ8oFV5XebgUdlhUSvKo9YzeGIywTZmR9Mfxuv3AQPtteoA5Dazqsp84Ya3nbeiWxl/LQb9Bwew9FmUX5GeR3Fl3HIjD5DSb1cCXrLo2IZeYoYhrCFxHOQqyZzwk2jy2HRRSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mNMLys/w; arc=none smtp.client-ip=91.218.175.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kYCDV+Wz"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mNMLys/w"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=mx1pndh9NACF4v//8sWUqY+ii9IXnTRJQEeestc8TIE=;
+DKIM-Signature: a=rsa-sha256; bh=Wv2LAC871pIKGb/ciNqR/Im7/rPMRTvo6hq+2IOPT14=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790707547; v=1; x=1791312347;
- b=kYCDV+Wz/oIiw/7CAqYDLaSdzzN3PSBeNDAZGP4AeCK5U+uPdtNR2c8+Lk0DsAgQX8254jnC
- Z9PvhTn7nl/8aGcTMHAK+h6cSkrXKPOsiaGiDWrOF3jD4MW3TLJr/sS1+PpbfuGHn9rZlyGzORB
- jeYwiUR15f4xteH/9JeVpxL0=
+ t=1790708696; v=1; x=1791313496;
+ b=mNMLys/wi2jHhDzR0Yiyty/LtQf0xUIYF2VClxECQS1/0RLOxA9ik3HlpadGd1lpDR/rR1s+
+ XaPSW6DpTXfShhoDnGhGfnhqQfRPwFyznHlGkC3aLoIVxikPTQQ348nZO/VVhlpWip3Au+mozvM
+ 81q9fjUBb319pfxsgGzSp54U=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 4445f44e488d0c9f;
-	Tue, 29 Sep 2026 18:45:46 +0000
-X-Mizu-Trace-ID: 4445f44e488d0c9f
+Received: by smtp.migadu.com with ESMTPS id e8e09ddc74236482;
+	Tue, 29 Sep 2026 19:04:56 +0000
+X-Mizu-Trace-ID: e8e09ddc74236482
 X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5b8ea0ca5baso1078e87.1
-        for <kvmarm@lists.linux.dev>; Tue, 29 Sep 2026 11:45:42 -0700 (PDT)
-X-Gm-Message-State: AFq9FYK6RH3qBpU7eaJbeEaOYLBLvW5KgivUcs5Jpq3wtRX0aLMhtxNN
-	PcsyF4adECrATmsqf4l3dvpRxsvQobEK8lZrnHdMXs/L1JaHHSTXPKybRAoZQdcuZ5hgW9hPq6I
-	o4pNurmkTmTts6KOQzSqRuCjN2z4COVT8pXa6+huL
-X-Received: by 2002:a05:6512:1052:b0:5b8:c95d:529c with SMTP id
- 2adb3069b0e04-5ba3c039e63mr21526e87.0.1790707541274; Tue, 29 Sep 2026
- 11:45:41 -0700 (PDT)
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Yuchao Zhang <ndaugoing@gmail.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH v1 0/2] KVM: arm64: selftests: Cover the ITS MOVALL command
+Date: Tue, 29 Sep 2026 20:04:50 +0100
+Message-Id: <cover.1790708299.git.fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20260929093548.3598547-1-maz@kernel.org>
+References: <20260929093548.3598547-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260929093548.3598547-1-maz@kernel.org> <20260929093548.3598547-8-maz@kernel.org>
-In-Reply-To: <20260929093548.3598547-8-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 29 Sep 2026 19:45:05 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTyT7_DvnnPM3H4=o=aTkBksNQuQTTyXB=Jh=uzpRsnEXQ@mail.gmail.com>
-X-Gm-Features: AclHuK9ckX2XdpBIMn2iv43c3Ok9eDLeQw0Pba9h2d2_EeCe5NJES3JhNqa7_ho
-Message-ID: <CA+EHjTyT7_DvnnPM3H4=o=aTkBksNQuQTTyXB=Jh=uzpRsnEXQ@mail.gmail.com>
-Subject: Re: [PATCH v2 7/7] KVM: arm64: vgic-its: Stop the VM when handling MOVALL
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	Steffen Eiden <seiden@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Yuchao Zhang <ndaugoing@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Tue, 29 Sept 2026 at 10:36, Marc Zyngier <maz@kernel.org> wrote:
->
-> MOVALL is a royal pain, as it requires us to iterate over all the LPIs
-> and move them around if they are on the correct source vcpu, and
-> requiring locking for each of them.
->
-> This locking can result in contention for vcpus that enter and exit
-> the guest, and hinders forward progress. In order to make sure such
-> process is not contended, just stop the VM altogether.
->
-> Nobody in their right mind uses MOVALL anyway, as this is a rather
-> braindead aspect of the GICv3 architecture.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Hi Marc,
 
-This is the only patch in the series without Cc: stable. Was that deliberate?
+I wrote this to test your series [1]. It fails without patch 6 and
+passes with the whole series, on QEMU with pKVM, VHE and nVHE hosts. On
+an Apple M4 host, the series boots and runs protected and non-protected
+guests. The M4's GIC has no ITS, so the test doesn't run there.
 
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-Tested-by: Fuad Tabba < fuad.tabba@linux.dev>
+Feel free to take it with your series if you think it's useful.
+
+Based on kvmarm/next (5c49bb52faf38).
 
 Cheers,
 /fuad
 
+[1] https://lore.kernel.org/all/20260929093548.3598547-1-maz@kernel.org/
 
-> ---
->  arch/arm64/kvm/vgic/vgic-its.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index cc02d9b62bd95..094eede267e54 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -1382,6 +1382,15 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
->         if (vcpu1 == vcpu2)
->                 return 0;
->
-> +       /*
-> +        * Bulk operations such as MOVALL are a pain, as they can clash
-> +        * badly locking-wise with other vcpus entering and exiting the
-> +        * guest, should they be affected by it. Stopping the guest is a
-> +        * safer bet to ensure uncontended access and ultimately forward
-> +        * progress. Yeah...
-> +        */
-> +       kvm_arm_halt_guest(kvm);
-> +
->         xa_for_each(&dist->lpi_xa, intid, irq) {
->                 irq = vgic_get_irq(kvm, intid);
->                 if (!irq)
-> @@ -1394,6 +1403,8 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
->
->         vgic_its_invalidate_cache(its);
->
-> +       kvm_arm_resume_guest(kvm);
-> +
->         return 0;
->  }
->
-> --
-> 2.47.3
->
+Fuad Tabba (2):
+  KVM: arm64: selftests: Add a MOVALL command to the ITS library
+  KVM: arm64: selftests: Add an ITS MOVALL test
+
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/arm64/vgic_its_movall.c     | 341 ++++++++++++++++++
+ .../selftests/kvm/include/arm64/gic_v3_its.h  |   1 +
+ .../selftests/kvm/lib/arm64/gic_v3_its.c      |  16 +
+ 4 files changed, 359 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/arm64/vgic_its_movall.c
+
+
+base-commit: 5c49bb52faf38ddf9c3383807b1d814ef8769b80
+-- 
+2.39.5
+
