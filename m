@@ -1,236 +1,117 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92B1F496D31;
-	Tue, 29 Sep 2026 10:47:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D5C51DAEA;
+	Tue, 29 Sep 2026 10:50:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790678834; cv=none; b=nSksDf9RimoSzgB9S92iGELWtH8rew5tPpmapaIUjc/7QlypKBiq8D1eayORKYJ5fXI535+02z3Jon1cxPsx6cpUBiBJ55GvoMlwzQIkread9Y+ZJhqefWhkTCl/D+MUdg2ZReFq+sWBFB+/dF2cs3+td+mdbB0+4lH5aUNwPDU=
+	t=1790679061; cv=none; b=EfSHtsXls9ErHUi5juOWDW/UMAMhYjyUTUgQZ3buw3I7Q6LB/v5KGUpePTA0W4V2+Qd5jK0GrUDlZSGdb7LGWvi2mOf19OeJk//D+BbyDka04OGCZiHEQQLNHjBY1THuD7tOv6WrlFHU3sid3eiGWQZYHQJmFmdgMiI7HEX+5yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790678834; c=relaxed/simple;
-	bh=hDXphX09qKnZTaJnf2uETn6cTi5T0p2DOBdhFYlOQCQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=heDUCBNiaKr9UMjMKN9jFTRjkV2duKObi+D1j+LEUD+03/d4SeoRNaO1MazPHuzA+QeipBgokXBbpCuGqscIfJ438JJS7xwMZYIdLin8U4yiMzuNATsOEjrEfdlPEoBKQmeiyE3RAJsdmOrMaSHoWAi3UUHemIAet5oLOckZipU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=lKxkrxDj; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1790679061; c=relaxed/simple;
+	bh=USJ6sjNKDRu6tG4ZlA5fL23mzLtJ3UbJoLwk/ctppnk=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=tilHHUssgEGUI9rreGBV744LDRWbDVJ0pIegMX1JUdfl+ccKaj5TPUZeD+XKR+g9E63yoUU80Y51Fj6PnKMbCfGns9IS3U37cEN5X+9FcCuKE1ULaKy8zroGRHNsaqir8m4bqmHRRK/nzfmbXEWcXxSiOW8QypGBMFu1x3A50kA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a+ayOBlT; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="lKxkrxDj"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0CFC0143D;
-	Tue, 29 Sep 2026 03:47:02 -0700 (PDT)
-Received: from [10.57.12.116] (unknown [10.57.12.116])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 87A813F86F;
-	Tue, 29 Sep 2026 03:47:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790678825; bh=hDXphX09qKnZTaJnf2uETn6cTi5T0p2DOBdhFYlOQCQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=lKxkrxDjvga5FOjH3t6Yj1iKwWagsd/wMmWoA1WYkVLzMM4llvhziG7QgcnfVdXib
-	 tu+C5uVpMbjZ+ckSbcRTtXaNmdq6FjJcWtA3LYkyHniieLc6R7hR35T/CrN9ou94HE
-	 IH6YjWHpRHoYZRCC0zogCsU5b0m6BAEs3zlVuGUQ=
-Message-ID: <26e097b4-58f6-42e1-ad7e-1b5c67673a21@arm.com>
-Date: Tue, 29 Sep 2026 11:47:01 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a+ayOBlT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED3781F000FF;
+	Tue, 29 Sep 2026 10:50:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790679039;
+	bh=ppQtqrkFicTanaRvuvwAvso1XMMqQRvA2bty9+a5yes=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=a+ayOBlTnFys61HZg2TKPnlnnRhdAkQMrGZma6D40PHqkZfQlTcrVwXl++sXRzmO7
+	 6ahDYzpC8mwdWgkTtk1UbrImf6GmbXlO+/bU4ejCDOuCKN6hnyk33kEUEyZ5bT2qyv
+	 5n1o8AvO0c0vZ58GDYkbj1zJBHPmDCJMr3c8LKqtY2SyQlGPobP/Dz/U0+71xmnABO
+	 4U5G1JogXTbB51J+lfzx6BsO7b/R8UE+S0eg3oLO1rb/npDWWOjeUhrymbCASYF8dU
+	 SkS9qCw3woLa2dUtPpCQScpQ3Icr93AwegNpMy0YthPLdVNSzqINmVf3+/G2lZtoWQ
+	 7g4lZCRHxQZuA==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v5 04/15] KVM: arm64: Add KVM_REQ_RELOAD_STAGE2
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Tian Zheng" <zhengtian10@huawei.com>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>, kvm@vger.kernel.org
+In-Reply-To: <20260929103655.85107-5-zhengtian10@huawei.com>
+References: <20260929103655.85107-1-zhengtian10@huawei.com>
+ <20260929103655.85107-5-zhengtian10@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 29 Sep 2026 10:50:38 +0000
+Message-Id: <20260929105038.ED3781F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18] arm64: mm: Handle Granule Protection Faults (GPFs)
-Content-Language: en-GB
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
- will@kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com
-References: <20260913070459.2547407-1-suzuki.poulose@arm.com>
- <aqrGPK0lFBFXL2qY@arm.com> <985520fa-99b0-4620-bfee-8e6321b36104@arm.com>
- <aqvCwM_73qMpqzvV@arm.com> <749ab0c9-810d-4989-8fa5-1706124f05bc@arm.com>
- <arKVcjCOJf8p9rWL@arm.com> <4e315360-5b7a-4a0e-99c0-679a0271e625@arm.com>
- <aruVrvQcYCGe0HJ6@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <aruVrvQcYCGe0HJ6@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 29/09/2026 11:40, Catalin Marinas wrote:
-> On Mon, Sep 28, 2026 at 12:01:18PM +0100, Suzuki K Poulose wrote:
->> On 22/09/2026 15:49, Catalin Marinas wrote:
->>> On Tue, Sep 22, 2026 at 02:21:13PM +0100, Suzuki K Poulose wrote:
->>>> I had another look and we could handle this via kvm_fault_is_gmem_abort()
->>>> see in arch/arm64/kvm/mmu.c:
->>>>
->>>>
->>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->>>> index 87e49251e0447..af5a4bf961aae 100644
->>>> --- a/arch/arm64/kvm/mmu.c
->>>> +++ b/arch/arm64/kvm/mmu.c
->>>> @@ -1731,6 +1731,9 @@ static int gmem_abort(const struct kvm_s2_fault_desc
->>>> *s2fd)
->>>>           gfn_t gfn;
->>>>           int ret;
->>>>
->>>> +       if (!kvm_slot_has_gmem(s2fd->memslot))
->>>> +               return -EINVAL;
->>>
->>> I wonder whether we should add a KVM_BUG_ON() here. With the rest of the
->>> changes, we should never get in this situation. Well, to be revisited
->>> for private devices.
->>>
->>> Also maybe move it to the caller, kvm_vm_mem_abort(), and not change
->>> kvm_fault_is_gmem_abort(). Something like:
->>>
->>> 	if (private_ipa_fault(kvm, s2fd->fault_ipa) &&
->>> 	    KVM_BUG_ON(!kvm_slot_has_gmem(s2fd->memslot), kvm))
->>> 		return -EIO;
->>>
->>> To me it makes more sense for gmem_abort() to be called only *if* it's a
->>> gmem slot. So any inconsistency, avoiding user_mem_abort() for private
->>> memory, should be done in the caller. I assume the caller will also have
->>> to route the private device path as well rather than rely on
->>> gmem_abort().
->>>
->>>> +
->>>>           if (!perm_fault) {
->>>>                   memcache = get_mmu_memcache(vcpu);
->>>>                   ret = topup_mmu_memcache(vcpu, memcache);
->>>> @@ -2277,10 +2280,12 @@ static bool private_ipa_fault(struct kvm *kvm,
->>>> phys_addr_t fault_ipa);
->>>>    static bool kvm_fault_is_gmem_abort(struct kvm *kvm,
->>>>                                       const struct kvm_s2_fault_desc *s2fd)
->>>>    {
->>>> -       if (!kvm_slot_has_gmem(s2fd->memslot))
->>>> -               return false;
->>>>           if (kvm_memslot_is_gmem_only(s2fd->memslot))
->>>>                   return true;
->>>> +       /*
->>>> +        * For Realms, all private faults must be backed by GMEM.
->>>> +        * TODO: Handle Trusted device private memory mappings.
->>>> +        */
->>>>           if (private_ipa_fault(kvm, s2fd->fault_ipa))
->>>>                   return true;
->>>>           return false;
->>>>
->>>>
->>>> Also, I have the following hunk for preventing memslot modifications.
->>>> I will add this to v20 integration branch, which is almost ready ;-)
->>>>
->>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->>>> index 582b48e34486b..87e49251e0447 100644
->>>> --- a/arch/arm64/kvm/mmu.c
->>>> +++ b/arch/arm64/kvm/mmu.c
->>>> @@ -2783,6 +2783,18 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
->>>>           }
->>>>    }
->>>>
->>>> +static bool kvm_prevents_memslot_change(struct kvm *kvm, enum kvm_mr_change change)
->>>> +{
->>>> +       /* Cannot modify memslots once a pVM has run or Realm created */
->>>> +       if (change != KVM_MR_DELETE && change != KVM_MR_MOVE)
->>>> +               return false;
->>>> +
->>>> +       if ((kvm_vm_is_protected_pkvm(kvm) && pkvm_hyp_vm_is_created(kvm)) ||
->>>> +            kvm_realm_is_created(kvm))
->>>> +               return true;
->>>> +       return false;
->>>> +}
->>>> +
->>
->> This needs to be tweaked for Realm to support non-secure device assignment.
->> Aneesh reports that the Device assignment fails now,
->> because the Device BAR reset deletes the memory slot and re-registers
->> it, which the above change prevents.
->>
->> I will modify that to
->> 1. Prevent "Guest-memfd" backed memory slot deletion. Makes sure that
->>     nothing can replace a private memory slot.
->> 2. Allow non-Guest-memfd backed memory slots to be created
->>    after the Realm is created. We anyways prevent "private" memory
->>    to be mapped from a non-Guest-memfd memslot.
-> 
-> Yes, I think this should be fine. But at least with the last version I
-> looked at, we did not prevent private memory from being mapped from
-> non-guest_memfd slots (there was a way to delete the gmem slot, add a
-> normal one while the guest does a private IPA access). If we prevent
-> gmem slot deletion, we no longer have this issue, although we should
-> warn somewhere on the user_mem_abort() both.
-> 
-> Anyway, to be discussed on the KVM patches, not here. I raised it
-> initially here as I was looking whether a non-gmem slot ever ends up
-> private and trigger the GPF.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Critical] kvm: arm64: host panic on nVHE due to EL1 access of EL2 sysreg=
+s in __load_stage2
+--
 
-Agree. For the record here is what the change looks like, to be included
-in v21 kvm-integration. We can discuss it with KVM changes.
+commit 982e8feb07630370c5da59ed6e47706db5188e18
+Author: Leonardo Bras <leo.bras@arm.com>
+Subject: KVM: arm64: Add KVM_REQ_RELOAD_STAGE2
 
+This commit adds a vcpu request to exit the guest, reload stage-2, and come
+back to the guest, anticipating subsequent patches for S2 HAFDBS and HDBSS.
 
+Link: https://lore.kernel.org/all/20260901171558.2674031-5-leo.bras@arm.com/
 
-KVM: arm64: CCA: Prevent memslot modifications after Realm creation
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 0576c2022ef57..d9ad765943d9e 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
 
-Once the Realm is created, prevent any changes to guest_memfd backed
-memslots, as the private memory is provided by slots backed by gmem.
-This is also validated when we handle a fault for Realm Stage2.
+[ ... ]
 
-Additionally, similar to pKVM, we do not support dirty logging or
-read-only memslots.
+> @@ -1175,6 +1175,14 @@ static int check_vcpu_requests(struct kvm_vcpu *vc=
+pu)
+>  		if (kvm_dirty_ring_check_request(vcpu))
+>  			return 0;
+> =20
+> +		if (kvm_check_request(KVM_REQ_RELOAD_STAGE2, vcpu)) {
+> +			unsigned long flags;
+> +
+> +			local_irq_save(flags);
+> +			__load_stage2(vcpu->arch.hw_mmu);
 
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+[Severity: Critical]
+Could this trigger a host kernel panic on systems running in nVHE or
+pKVM mode?
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 2e584a187602f..ea14f66ed9f29 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -2726,17 +2726,28 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
-         hva_t hva, reg_end;
-         int ret = 0;
+In nVHE or pKVM mode, the host kernel runs at EL1. The check_vcpu_requests()
+function executes from the host context. If a KVM_REQ_RELOAD_STAGE2 request
+is processed here, it calls __load_stage2(), which performs the following:
 
-+       if (kvm_vm_is_protected(kvm)) {
-+               if (new &&
-+                   new->flags & (KVM_MEM_LOG_DIRTY_PAGES | 
-KVM_MEM_READONLY)) {
-+                       return -EPERM;
-+               }
-+       }
-+
-         if (kvm_vm_is_protected_pkvm(kvm)) {
-                 /* Cannot modify memslots once a pVM has run. */
-                 if (pkvm_hyp_vm_is_created(kvm) &&
-                     (change == KVM_MR_DELETE || change == KVM_MR_MOVE)) {
-                         return -EPERM;
-                 }
--
--               if (new &&
--                   new->flags & (KVM_MEM_LOG_DIRTY_PAGES | 
-KVM_MEM_READONLY)) {
-+       } else if (kvm_realm_is_created(kvm)) {
-+               /*
-+                * Once the Realm is created, we cannot modify any slots 
-that
-+                * could be providing private memory. i.e., guest_memfd 
-backed
-+                * slots.
-+                * TODO: Handle trusted device private memory slots
-+                */
-+               if (kvm_slot_has_gmem(old) || kvm_slot_has_gmem(new))
-                         return -EPERM;
--               }
-         }
+arch/arm64/include/asm/kvm_mmu.h:__load_stage2() {
+    write_sysreg(mmu->vtcr, vtcr_el2);
+    write_sysreg(kvm_get_vttbr(mmu), vttbr_el2);
+    ...
+}
 
-         if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
-diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-index 8756ea4c76619..5755422ddcb49 100644
---- a/arch/arm64/kvm/rmi.c
-+++ b/arch/arm64/kvm/rmi.c
-@@ -1196,6 +1196,7 @@ int kvm_activate_realm(struct kvm *kvm)
-         if (kvm_realm_state(kvm) >= REALM_STATE_ACTIVE)
-                 return 0;
+Because vtcr_el2 and vttbr_el2 are EL2 system registers, writing to them
+from EL1 will cause an UNDEFINED instruction exception. This causes the CPU
+to trap to the hypervisor, which will intentionally panic upon receiving an
+unexpected sysreg trap from the host, crashing the system.
 
-+       guard(mutex)(&kvm->slots_lock);
-         guard(mutex)(&kvm->arch.config_lock);
-         /* Check again with the lock held */
-         if (kvm_realm_state(kvm) >= REALM_STATE_ACTIVE)
+Since any unprivileged user with access to /dev/kvm could potentially trigg=
+er
+a memory region update that sets KVM_REQ_RELOAD_STAGE2, it seems this might
+provide a trivial path to trigger a host Denial of Service.
 
-> 
+Would it be possible to add a has_vhe() guard here or handle the reload via
+a hypercall for non-VHE systems?
 
+> +			local_irq_restore(flags);
+> +		}
+> +
+>  		check_nested_vcpu_requests(vcpu);
+>  	}
+>
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260929103655.8510=
+7-1-zhengtian10@huawei.com?part=3D4
