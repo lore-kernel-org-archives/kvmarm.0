@@ -1,132 +1,101 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE134CDDE4;
-	Tue, 29 Sep 2026 09:36:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2AF23AB87;
+	Tue, 29 Sep 2026 09:57:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790674603; cv=none; b=F2eXofcaBtPwPSxt7D/Ohq5GOp7KK/85xDtajMoODGQD09r1u668hMWbdr8E/OXS1jIqrAtg64Gt6Uvcr4gb7nrwDkyygOA8aFjHQfXeLI9plUt+rka21+aC07yeH1VQW4Ar4Obp9mbP6PXNtRClfx9tvEUY0aK35aoZbQlaFFc=
+	t=1790675860; cv=none; b=C2o5dyOMWIcYycudKp3W/ShkbArDybZaUphCtNylLn/aVb1JRWqkdJNjwS6mjP7KXeSzrPpZfuaz7X9+m75dOUKChMxU8Em9h5z6DQnYFphWMGJWHu4a/rJpdicRKO85lVCwILa49+lP9vhaut3z8imk+e2qhjAhHJzwHuygVnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790674603; c=relaxed/simple;
-	bh=5guw0H8KXXcoeLk2Z3fzw6vhyj24zAD5pHFjtwhYKWQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gcoaHbYlseY7wKc4vz83gpYzFeoUO+KvYjvIxFoOhEcvSfDEaKUaZ/B3lwfovl5/nIl0/zsRFd0XtmCetGw/3u+ZT35ayPZGgPwE+UWY81bjIuLXpsG9MK7w2eBnyUD52pb1UUhIpgseHK9T/4qMNzfFFraexdKYb6ZM+NDQOvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UYI23eZt; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790675860; c=relaxed/simple;
+	bh=d+ZKEwDqXXq3Ti4vG+eDqs4fFJkDtP2g/+xFxH/lmgc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MLz9lXbu3nt07gDQaokTeRiMWgzrANDblD00Dx0RAxeBv/OXX12PP9XnQH37BCSsp7CxrrHU4R8cfqlv3l0pYrxNlqGwJACcq0HbIxX0K5YODXL/6jLZFpOVdp8mQhxjjA/iViLiRq0v0A058uP1P+f0P/WO07LNifms84cK6lY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fb2WyCyl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UYI23eZt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 821E61F0089A;
-	Tue, 29 Sep 2026 09:36:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fb2WyCyl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2EEC1F00893;
+	Tue, 29 Sep 2026 09:57:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790674601;
-	bh=f6sEMz+sle2+vRKQR9x7yi93xoB+ZcFnzxRhK6q+PUo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=UYI23eZt/xXaG0hcQNuVsIHd5hhQ2VDuJyUpjdaWB9A+uDuqTVObPko0oGFhFZEy+
-	 wDAV4q0TvbqUWta/xzGFvg9sVur3hAWD5y7/dHotJoSpUYiXiVgnMh4XwASpsIPri3
-	 gClEEyIdWWeEi6SuOr32JNO5aKyQYxh2wjWFD5MHMj9h/fs7UMkVVVyJr7edNs6yIu
-	 UCgZAOzmlKblV3zMzqnrtjznj+vqOKSBOOS7/csVIXUrFqA4ZXDKEbXEGKnA/uZdAd
-	 QJCmK0QMl/SYqAMVvpP1umYKfB5s9BQYFTUJLnF9Kl3vk3ZicUWlw4Nn2u+A1ZWAzI
-	 bKzOVxo0lc+zw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xBUGN-0000000ElEa-3EdP;
-	Tue, 29 Sep 2026 09:36:39 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Steffen Eiden <seiden@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Yuchao Zhang <ndaugoing@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v2 6/7] KVM: arm64: vgic-its: Fix MOVALL handling of source redistributor
-Date: Tue, 29 Sep 2026 10:35:47 +0100
-Message-ID: <20260929093548.3598547-7-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260929093548.3598547-1-maz@kernel.org>
-References: <20260929093548.3598547-1-maz@kernel.org>
+	s=k20260515; t=1790675858;
+	bh=8QDt2eM8KLNzQYvt3HoPDvG4s9lElCOsMyOXh8TJHgc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=fb2WyCylrbLcaNREN+dUZDyYRwrWTjL83EhF8Ycu4sbI3KNNqSe+lU31se6ItPfX2
+	 SLbetG/f7f1hZtKNGPfFQLcGHvjzK1vg8v2UALtSyg2EMYH//chuFdNUshlXWZWVlV
+	 n+AuJT8IAZ9UBLrw8+nVqByJUCyGnq+eVH86MT9sUbD29mz9dKKVi6Ypg2nCn170Fi
+	 uHsulutxILrJdf9h5FIsakNwk8ac+p5DOQHHqfaYlLcWzZco1gH3ZeSKDhJDKu+Soz
+	 kEcRYxYKzlbDxJe6FoNVkzefxQWqEpD72gJWaoyUUEgSH8lJ2C7qf8RHMMuMuVoO0/
+	 JQgnLkL7kJ5Lw==
+Date: Tue, 29 Sep 2026 10:57:31 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Peter Maydell <peter.maydell@linaro.org>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 3/3] KVM: arm64: selftests: Check ID regs are
+ immutable after a failed run
+Message-ID: <aruLe0suMqy7J3Os@gremlin>
+References: <20260901-kvm-arm64-idreg-final-v3-0-a0ffa06fa872@kernel.org>
+ <20260901-kvm-arm64-idreg-final-v3-3-a0ffa06fa872@kernel.org>
+ <arp7mig_PrD9Jbc7@gremlin>
+ <CA+EHjTxi=BrJYMb5z9QyGd7k_Ty7x5AbMNJinB5i8GT=BD2L_w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, ndaugoing@gmail.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTxi=BrJYMb5z9QyGd7k_Ty7x5AbMNJinB5i8GT=BD2L_w@mail.gmail.com>
 
-The MOVALL command moves the pending state of all LPIs targeting a given
-redistributor to another one. However, we seem to have lost the
-filtering on the source RD, which means we move all LPIs to the target.
+On Mon, Sep 28, 2026 at 05:56:54PM +0100, Fuad Tabba wrote:
+> Hi Lorenzo,
+>
+> On Mon, 28 Sep 2026 15:46:51 +0100, "Lorenzo Stoakes (ARM)"
+> <ljs@kernel.org> wrote:
+> > On Tue, Sep 01, 2026 at 07:18:50PM +0100, Mark Brown wrote:
+> [...]
+> > > Assisted-by: Antigravity:gemini-3.1-pro
+> >
+> > NIT: we changed the rules for the Assisted-by tag, it only needs to be
+> > 'Assisted-by: LLM' now. Not a huge big deal but FYI :>)
+> >
+> > https://docs.kernel.org/process/coding-assistants.html
+>
+> That tag dates from way back when the format was still
+> AGENT_NAME:MODEL_VERSION :)
 
-Not quite what the spec mandates.
+Ack yeah it's not a big deal :)
 
-Hack update_affinity() to take an optional source vcpu that is used as a
-filter when non-NULL, restoring the filtering that was performed by
-vgic_copy_lpi_list() back in the days.
+>
+> [...]
+> > > diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+> [...]
+> > > +static void test_idreg_frozen_after_failed_run(void)
+> [...]
+> > > +        /* Creating an in-kernel irqchip would change the ID registers too. */
+> > > +        if (kvm_supports_vgic_v3()) {
+> > > +                r = __kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3);
+> > > +                TEST_ASSERT(r < 0 && errno == EBUSY,
+> > > +                            "vGIC creation after failed first run: r=%d errno=%d",
+> > > +                            r, errno);
+> >
+> > I guess in general it's making sure - where there should now be finalisation on
+> > reg setting that this is actually enforced?
+>
+> Yes. The test exercises each of the userspace-facing checks that 2/3
+> moves to KVM_ARCH_FLAG_ID_REGS_FINAL: set_id_reg(), set_imp_id_reg()
+> and kvm_vgic_create().
 
-Fixes: 11f4f8f3e6e06 ("KVM: arm64: vgic-its: Walk LPI xarray in vgic_its_cmd_handle_movall()")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org
----
- arch/arm64/kvm/vgic/vgic-its.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+Great thanks! :)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 9e782a4fea7e5..cc02d9b62bd95 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -319,12 +319,16 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
- 	return ret;
- }
- 
--static int update_affinity(struct vgic_irq *irq, struct kvm_vcpu *vcpu)
-+static int update_affinity(struct vgic_irq *irq,
-+			   struct kvm_vcpu *from_vcpu, struct kvm_vcpu *vcpu)
- {
- 	struct its_vlpi_map map;
- 	int ret;
- 
- 	guard(raw_spinlock_irqsave)(&irq->irq_lock);
-+	if (from_vcpu && irq->target_vcpu != from_vcpu)
-+		return 0;
-+
- 	irq->target_vcpu = vcpu;
- 
- 	if (!irq->hw)
-@@ -362,7 +366,7 @@ static void update_affinity_ite(struct kvm *kvm, struct its_ite *ite)
- 		return;
- 
- 	vcpu = collection_to_vcpu(kvm, ite->collection);
--	update_affinity(ite->irq, vcpu);
-+	update_affinity(ite->irq, NULL, vcpu);
- }
- 
- /*
-@@ -856,7 +860,7 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
- 
- 	vgic_its_invalidate_cache(its);
- 
--	return update_affinity(ite->irq, vcpu);
-+	return update_affinity(ite->irq, NULL, vcpu);
- }
- 
- static bool __is_visible_gfn_locked(struct vgic_its *its, gpa_t gpa)
-@@ -1383,7 +1387,7 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
- 		if (!irq)
- 			continue;
- 
--		update_affinity(irq, vcpu2);
-+		update_affinity(irq, vcpu1, vcpu2);
- 
- 		vgic_put_irq(kvm, irq);
- 	}
--- 
-2.47.3
+>
+> Thanks,
+> /fuad
 
+--
+Cheers, Lorenzo
