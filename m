@@ -1,47 +1,47 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 730E33DD526;
-	Tue, 29 Sep 2026 23:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C00AD2AF1D;
+	Tue, 29 Sep 2026 23:02:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790722802; cv=none; b=OT6h+y6y55DxlzqAetlFTRHwUiLw2hKxfqwajfJFBkdguZbwWrGbg1GvwQwk6fY0IemSZ9OOLHxutb/X7u1+a1k5hdFcz2Af5SsZKXvhYW4NvMjwjIc0aLipWVLQFZTRHPelBYSbARbzJHxYrdkRPLvw5ioJy3/OEJ6gitVFPIM=
+	t=1790722945; cv=none; b=CNqbKyM+/NoStNsi9CwV3feWW5pltsqsI1OonJo7i8B//g5YGgTALIQCSEOG8oFeC5b8vChFPB4aMHg6bE2qFbN7m5LE3DRiQjA3ulf9ZONX3PjtZnkQrGP6h9wXYNRxCYpd4HDxUIe0B6MurinXTgHlo6ihq0lCJA6M/aJUNdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790722802; c=relaxed/simple;
-	bh=KCmLIXUl2UzeoIhT2ORXpA3bNkdrxiygSBBf4A1hvGA=;
+	s=arc-20240116; t=1790722945; c=relaxed/simple;
+	bh=AlezsuwdXKU96nosGq08Sdrfu3J5rACKi8PcjOcLuOA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kFTs+DHVgHftHfitZHgaAgDGzbekI7KjS/qH8ayyuiPgw9L/fEfH3U/wIKrz76pDlriFPvfzXCkaVXGnYxz8FKywwZ9FVZR/7eQzhBOoWg8I/YvAMPkmb/HB6HaNyEtWP3Ha6C1Ku5gvUDrypksqxacFuXkWta5xA1uJp7Noc5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OnPa72df; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=mJjLsmn0V1kfCTcWfvqpoKn6s/Nkywwrvsbpmks0WyyuoNM7rdm0bjTkDBPtpU7c66owxAwxpJKMvMvOK4GlsaQ3G9dRSRiGdQLVmtjzj3UdOA/opTivw8TVk+IM1Ew3f8eSmqLMCmyF9uc5CF7wSwrSHmr0WXlUTpbTR/O/Jw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BkBWs7S7; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OnPa72df"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0A151F000FF;
-	Tue, 29 Sep 2026 23:00:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BkBWs7S7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DD831F000FF;
+	Tue, 29 Sep 2026 23:02:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790722801;
-	bh=jDBZFkLz0GggeQl7SlWwkqdUmwc7HPIN1BkTH8Y1iZ8=;
+	s=k20260515; t=1790722944;
+	bh=c34lg2SSqJP/prfJ37melYcw0xJkVhsVpZy4ROI6WNQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=OnPa72dfC8teWOzySRtS1+oOP4l6EM26lnfhkoDLScdBQn7mcgGaoF3QPfpoyWXcO
-	 rz0CoAWmDS19pHfyRb8awgt0CimJq2Ij+4DqMZmObiRw2mcHuy+iMH2zgViUS5VobF
-	 y84si221qWShTl8trROLRPJbpufBLxVWZRu+2yt1UiWGjVhgsNnQ0aukxmBP3PVRfi
-	 GdfeaK5HR+PMH2VKF2ISntx5GRVl+yEkcyGoqzqt+43V/7LTSUquyemVgAV61shxy8
-	 Xh7vhitFiZuGr+cYjj3bx1392mFs7nPJZSSnPedIctRpK9WySGjdVY5a698+pX6bXB
-	 zk+joXQjOUIOQ==
-Date: Tue, 29 Sep 2026 15:59:59 -0700
+	b=BkBWs7S7hjdEq6uQaiSmWQOfcDATgPWULZ+J7guuGa/CU28Q6gfTkC+xbHVOa7zs7
+	 nH8RqrxpXqmeeiv4pA4MwgjKL8ROwIfLjpax4MKm8UKqaheqx447y8hifovoEIGaaT
+	 PhurxWdQI7W3gaqoym/sj5LVd3M5OZLKKQXCtfGNBUYC6g2q9k2LH4lt4taA1+Xp8T
+	 PNfVW6O+KTAbYQQsF1s0A6bROVcYg/8PQr/Q64mS1FJCGaLdVpXbbCFVygH/CLR0Tf
+	 wkq3K5hcLAS9B+jUmby2sJPK6crtqvW7RCrMCMO27wbmLp7wsCKNAvPS6wUog1sIUV
+	 mn4T4WaGnv1Cg==
+Date: Tue, 29 Sep 2026 16:02:23 -0700
 From: Oliver Upton <oupton@kernel.org>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Check ID_AA64DFR0_EL1.PMUVer in
- reset_pmevtyper()
-Message-ID: <arxC7w36HrgRQiRy@kernel.org>
-References: <20260929220411.3756519-1-coltonlewis@google.com>
+	Will Deacon <will@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	"Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Subject: Re: [PATCH v4 0/3] KVM: arm64: ID register finalisation fixes
+Message-ID: <arxDf3AHHjKCv6rD@kernel.org>
+References: <20260929-kvm-arm64-idreg-final-v4-0-75296dde994d@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,95 +50,48 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260929220411.3756519-1-coltonlewis@google.com>
+In-Reply-To: <20260929-kvm-arm64-idreg-final-v4-0-75296dde994d@kernel.org>
 
-Hi Colton,
+Hi,
 
-On Tue, Sep 29, 2026 at 10:04:11PM +0000, Colton Lewis wrote:
-> When userspace initializes a vCPU with KVM_ARM_VCPU_PMU_V3 but sets
-> ID_AA64DFR0_EL1.PMUVer to NI (0) or IMP_DEF (0xf, which is sanitized to
-> NI), resetting the vCPU invokes reset_pmevtyper(). Because
-> reset_pmevtyper() only checks kvm_vcpu_has_pmu(), it proceeds to call
-> kvm_pmu_evtyper_mask(), which reads PMUVer == 0 from ID_AA64DFR0_EL1 and
-> triggers a WARN_ONCE("Unknown PMU version 0") in __kvm_pmu_event_mask().
+On Tue, Sep 29, 2026 at 12:57:57PM +0100, Mark Brown wrote:
+> While looking at some feature enablement I noticed that there are some
+> scenarios where we can end up with an inconsistently configured vCPU due
+> to finalizing configuration based on ID registers before we have blocked
+> writes to the ID registers. This series aims to clean up these issues.
 > 
-> Check ID_AA64DFR0_EL1.PMUVer directly in reset_pmevtyper() via
-> kvm_has_feat() instead of kvm_vcpu_has_pmu() so that PMEVTYPER<n>_EL0
-> resets to 0 without querying the event mask when PMUv3 is not exposed to
-> the guest.
-
-So this goes a bit further than just this WARN_ONCE()... Ultimately if
-FEAT_PMUv3 is hidden via the ID registers then we should expect KVM to
-emulate these sysregs as UNDEF.
-
-> Fixes: bc512d6a9b92 ("KVM: arm64: Make PMEVTYPER<n>_EL0.NSH RES0 if EL2 isn't advertised")
-> Suggested-by: Oliver Upton <oupton@kernel.org>
-> Cc: stable@vger.kernel.org
-
-Avoiding a WARN_ONCE() is not stable material.
-
-> Assisted-by: LLM
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->  arch/arm64/kvm/sys_regs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Changes in v4:
+> - Rebase onto v7.3-rc3.
+> - Add a lockdep assert.
+> - Update Fuad's LLM tag.
+> - Link to v3: https://patch.msgid.link/20260901-kvm-arm64-idreg-final-v3-0-a0ffa06fa872@kernel.org
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index a2f4e769a4282..0bb3c2f10a22c 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1060,7 +1060,7 @@ static u64 reset_pmevcntr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->  static u64 reset_pmevtyper(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->  {
->  	/* This thing will UNDEF, who cares about the reset value? */
-> -	if (!kvm_vcpu_has_pmu(vcpu))
-> +	if (!kvm_has_feat(vcpu->kvm, ID_AA64DFR0_EL1, PMUVer, IMP))
->  		return 0;
+> Changes in v3:
+> - Rebase onto v7.3-rc1.
+> - Explain why KVM_ARCH_FLAG_ID_REGS_INITIALIZED is not reused.
+> - Pull in Fuad's test cases.
+> - Link to v2: https://patch.msgid.link/20260803-kvm-arm64-idreg-final-v2-0-d7d7e4efc640@kernel.org
+> 
+> Changes in v2:
+> - Also replace the kvm_vm_has_ran_once() usage in kvm_set_vm_id_rg() and
+>   kvm_vm_finalize_sys_regs() with kvm_id_regs_final().
+> - Link to v1: https://patch.msgid.link/20260731-kvm-arm64-idreg-final-v1-0-3de2a5616dc6@kernel.org
+> 
+> ---
+> Fuad Tabba (1):
+>       KVM: arm64: selftests: Check ID regs are immutable after a failed run
+> 
+> Mark Brown (2):
+>       KVM: arm64: Finalize guest-wide sysregs prior to per-vCPU sysregs
+>       KVM: arm64: Block ID register changes after we rely on the values
 
-I have this diff locally, separating the visibility change into a
-separate patch. Do you want to give it a spin?
+I'm not too terribly jazzed about testing the relative ordering of
+errors in the selftest, but I see why we need to do it. Otherwise,
+everything looks good.
+
+Reviewed-by: Oliver Upton <oupton@kernel.org>
 
 Thanks,
 Oliver
-
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 5b1af7e2176f..e2b28dbc0451 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -50,8 +50,11 @@ static u32 __kvm_pmu_event_mask(unsigned int pmuver)
- 	case ID_AA64DFR0_EL1_PMUVer_V3P5:
- 	case ID_AA64DFR0_EL1_PMUVer_V3P7:
- 		return GENMASK(15, 0);
--	default:		/* Shouldn't be here, just for sanity */
-+	default:
-+		/* Shouldn't be here, just for sanity */
- 		WARN_ONCE(1, "Unknown PMU version %d\n", pmuver);
-+		fallthrough;
-+	case ID_AA64DFR0_EL1_PMUVer_NI:
- 		return 0;
- 	}
- }
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 44aae52c473d..8315a188676f 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1028,7 +1028,7 @@ static unsigned int hidden_visibility(const struct kvm_vcpu *vcpu,
- static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
- 				   const struct sys_reg_desc *r)
- {
--	if (kvm_vcpu_has_pmu(vcpu))
-+	if (kvm_has_feat(vcpu->kvm, ID_AA64DFR0_EL1, PMUVer, IMP))
- 		return 0;
- 
- 	return REG_HIDDEN;
-@@ -1058,10 +1058,6 @@ static u64 reset_pmevcntr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 
- static u64 reset_pmevtyper(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- {
--	/* This thing will UNDEF, who cares about the reset value? */
--	if (!kvm_vcpu_has_pmu(vcpu))
--		return 0;
--
- 	reset_unknown(vcpu, r);
- 	__vcpu_rmw_sys_reg(vcpu, r->reg, &=, kvm_pmu_evtyper_mask(vcpu->kvm));
- 
