@@ -1,263 +1,100 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6207E3515D1
-	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 17:43:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D12751DDFB
+	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 21:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790790201; cv=none; b=m7OSo98A8Y9Sc3PwLi/Mmi/DOwPIQutc1XguQRjKsv2qayT2YSngXRjLX4LJFQdwU4KVTYhlODgvg4sX6ACYzM2aOChh1G7frbZ5P0axWOiAQ7BiYUGnEZQXFB4WJk70yA8mQ7b7F8fl8WI1sE4h6Mip8inkehD/sZXvwqpvAXE=
+	t=1790803117; cv=none; b=KieD2YNxRDdq3kR22yrb45vIN/CYcmqeJrfjMvkRkn8xn/+yWCkAoR3C/6KOsCKYYbABKwrpp6aPpR5zqtHsQNElo9YLQ08rKdJYa4vgNfmfx4om+zHawGf9vxH/6tLx0nJ4RWvGjZ7IEJmFxL2HY4sqNMdIeUxIlcFDrjsKNBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790790201; c=relaxed/simple;
-	bh=3LPLz8jd5fohmm2jQ9ljnF2HcO8sP6UNrmc9A/WOfJs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hnZbCsjsa1mDdZJhp0okg+Wqdjmzg8mglWu1BCpuJE2WO/Ow25ppmx5Hj/kHfjGuEcnRoBHE5HLhdx6at2cMSSibkDmg72ZrHKP6BqDp7+aS9+QZTP7yZrgYZS4SiOuq5Tp0JdxUh1M90DFKORCqFAxQywWYyKtRunwh0bdSbGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gIotmULE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1790803117; c=relaxed/simple;
+	bh=bBIz71XabS8gsl10MkZY2WdwbNn2woPnnwp8G7PdlC4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=G8SQk/DeqvpS/FrElwhHd9SwkIO87EeM1fFgH+6XVlCtQFCHkRwZ+TdutEHoGPxsoJVyVw4grCtDtZ6gDAbtdbyLPd0x/e3iupRYz9Z45dN6quwAwzsOfVeoSvGcJoqClPBTqDP3rrwSAD+4fOotGIe6O6/8Px/M2CsNvzCedcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CTzXCYlh; arc=none smtp.client-ip=209.85.167.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gIotmULE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1790790198;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SiFzGMFKKl+ozvaauMYdUK2l9xfAclZr0fBl6EjIlYQ=;
-	b=gIotmULEQ/AbwXJAIkOaJzPNWBv/0pZs3mHsP+p6nd7L+ynZ0Y3ga9MZtR1oTO2ibecE2v
-	3pII317HezDTD0ixW/koVFLAfwd0RsZ4tEFfXQFH47V4tnxc7hs3SVLGB0GdF2IfOOBhkQ
-	ga1irk4Rpr7gitZLbS803CEj6NkG1uw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-616-DLVwF0dMP8yGsWVjNAYdgw-1; Wed, 30 Sep 2026 13:43:16 -0400
-X-MC-Unique: DLVwF0dMP8yGsWVjNAYdgw-1
-X-Mimecast-MFC-AGG-ID: DLVwF0dMP8yGsWVjNAYdgw_1790790195
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-4887f71b1baso4663376f8f.2
-        for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 10:43:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CTzXCYlh"
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-4b28dafb8e1so9949858b6e.2
+        for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 14:18:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790803115; x=1791407915; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=631pnrFuqDRXd3BfizV2s6nQYFa+PIycK6cr0Zp6o9g=;
+        b=CTzXCYlhH58t0zDZdx6gDq3QKKzMSVmixqIrtGXYtUJV325QZh9EYxjXG0X4UyWBT/
+         4IJ8MCkwZRvFgz6+6L1nYXa7Py0Q/BO0BmUwiVi1kqg7RcLlMwxULyw0k9mPv8TTJVna
+         pN7NPgdf+NL/bd2smNPT2OZO8xg5kREdiKpUcSfgKQpemZ20S1tm5pMrP1LPH5C3U6ta
+         ZKrf3wBekBh53EDqLqTlQAW5bm/5h9nvyglrQ15iio1AESAKp6p8vjBbdaBJ2capzmxc
+         ug55WdXQ6YZhLK09+k3NZaHciPywa+h4SVe4tlF7TKRt5JMOw0446Va1TId1bmRjgUxq
+         a9/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790790195; x=1791394995;
-        h=content-transfer-encoding:content-type:in-reply-to:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=SiFzGMFKKl+ozvaauMYdUK2l9xfAclZr0fBl6EjIlYQ=;
-        b=qYnijnDUWaGqOErqCxoxSGVip/2/+0aReMK52wCpzsE3iVyV78UkcHd9uqdGL/szCG
-         f9+hA6pBJBLtOsnEOuBboSiNlXfBVZayt5oabjKQC0FtYq1wRxefm10W5arR17Kp/TRM
-         PI2lyKxMh83WECDBzuNN8cv/ycp+dEvzbSVJ+GlJndWMjxOeZXa7p6UzLkgU+kb9b0b6
-         jm7YfIevsCMUnZOHlhSJaWq7V11YfOhNbnR0OeZrT3FYAaVFY9WPmMbfxOHVvm+2o9XJ
-         FHmLNwGVQXW33vyXbwxmpMa5bDgpl3bYurds8Bps1h1+IOMK/fF0MhA3XbNLGcDCNlO7
-         N61Q==
-X-Forwarded-Encrypted: i=1; AKwUvBwtQ9cB2E6Gmn3Vi/QxocDs+iCtm22CrEsKuTyYj/rpRrikzen+iz0o+49Kt5Dpr/IojFF9QNs=@lists.linux.dev
-X-Gm-Message-State: AFq9FYKZtih+XXkO5FCLvvHyRGv1+rUZZqUddwru6QgvBh6HGhJLlX+z
-	azt0ytNQzkhPHaritsjHg4by6H8mjISBp/xvzq0PdpJwUJEcYzNmLktwnaks56N7fo03psGx5Hh
-	L0ST58phOd3yA45BH4JVbrtBN7EErgLZSamG7F+ApiFEwQxQhMnk/NWFhIg==
-X-Gm-Gg: AYBFou1HLoufjWtK/0Lu4wuvkAcecBN8OOgZ+6hxK8qCK6AFmvyknMezPmry2nDEu2Q
-	/CZWAmQxnCzMT0BDMvyUYm1pkFfsjLnSmeZH0zSFg99K+by518dPHPVArA2tOyD4gbUvvVg76Ul
-	qLpYkqcLaWn+13hJJzIAY5VC0ATIqfuYwwHbYgsLTOP56ib/0RT0yWOum6+uQfYMT9qiWpIw6td
-	9Kfcpyrrf40jC4xOxBz0GAyI0YmyH8m3sIkXNKLDDjIHDhzLPqvP9/9Le+zy4pYViCefLaVLQJy
-	L0iCGxLE3a+cRNSf7JCVxua1b+khODaiiGpTW+ruKQGN5U4FeNrtA1k0JkTEFQyiKE+SE9XV+HD
-	CmFlBC3e3m2g2DcyJsGrbb8el6wr/7oM4TA6/CcJNpXvrPc2c
-X-Received: by 2002:a05:6000:4029:b0:488:5d44:6680 with SMTP id ffacd0b85a97d-48b025083c4mr4389593f8f.36.1790790195187;
-        Wed, 30 Sep 2026 10:43:15 -0700 (PDT)
-X-Received: by 2002:a05:6000:4029:b0:488:5d44:6680 with SMTP id ffacd0b85a97d-48b025083c4mr4389553f8f.36.1790790194789;
-        Wed, 30 Sep 2026 10:43:14 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48b06a2d12fsm526748f8f.31.2026.09.30.10.43.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Sep 2026 10:43:14 -0700 (PDT)
-Message-ID: <aca67e8c-7599-45aa-a6c7-542c0461ad19@redhat.com>
-Date: Wed, 30 Sep 2026 19:43:12 +0200
+        d=1e100.net; s=20260707; t=1790803115; x=1791407915;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=631pnrFuqDRXd3BfizV2s6nQYFa+PIycK6cr0Zp6o9g=;
+        b=vRwONMGFNEdYder85S/8RnxfO7r4+MKY5jLj+D59bspXAugOQ4aZ37ddrw0s/QCJGV
+         MIHPTPcypWMIPlnCzC/OlF4zfgwRmLtT/STvijwN1DhnKyCBYXhPBoen9/W9kns2Fbvq
+         iVJcrQgYLr4znlafCbJn8uVdP5okmjoE9+s85BeQ8GN/RadiXfurUENxDkK/j4ItpedE
+         BT5cUTKAoOD1pnSmqLa1FCeMp3Z2t946n6eKBNh8hhifu7nLKGxxPclBmntXKquFTKvF
+         SqvDCo0u4p/KaTxBm4qpg1tdfLMclAA0yCBV4LE7h9irCfxLcWuf2HDN/qfADKbJXIRX
+         /rcw==
+X-Gm-Message-State: AFuF++kIxZ7HZSX3ZhMsTRXVye68CMaOozxlqIbvEabkBSojYYDImwIE
+	YRZmQ0j1koUKmo4ckr8Y28JC2bzY+zTjmmnE6/96q+ZUPdI6QI0S5bDQD1SXrAE1zX3Tf8UsEHa
+	Hfm76zaJE0olW0MNNjrfAAwAGNsns1Gv4J+ce7dTlLz5DFlv1HvtkgHkqwfWaEG0p/zWlizF+uM
+	FX5XoPmd/29tnQZVNVSqr+bQ+oIhKJHuMiFFA5RMpNkBDmHpKGg4A9TVfs8QpvEjw=
+X-Received: from iocrj27.prod.google.com ([2002:a05:6602:a71b:b0:9c7:5b85:f7d6])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6808:14ca:b0:4d6:92b3:5c8d with SMTP id 5614622812f47-4f1bafb3d3bmr3357156b6e.67.1790803114797;
+ Wed, 30 Sep 2026 14:18:34 -0700 (PDT)
+Date: Wed, 30 Sep 2026 21:18:32 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v9 21/26] target/arm/kvm: add helper to test SYSREG props
- against a scratch vcpu
-To: Khushit Shah <khushit.shah@nutanix.com>
-Cc: "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- Shaju Abraham <shaju.abraham@nutanix.com>,
- "yangjinqian1@huawei.com" <yangjinqian1@huawei.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "sebott@redhat.com" <sebott@redhat.com>,
- "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
- "philmd@oss.qualcomm.com" <philmd@oss.qualcomm.com>,
- "maz@kernel.org" <maz@kernel.org>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "abologna@redhat.com" <abologna@redhat.com>,
- "jdenemar@redhat.com" <jdenemar@redhat.com>
-References: <20260916144721.751810-1-eric.auger@redhat.com>
- <20260916144721.751810-22-eric.auger@redhat.com>
- <E471D5C1-D254-4DC9-BD22-E02660DE144F@nutanix.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <E471D5C1-D254-4DC9-BD22-E02660DE144F@nutanix.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: hyIuQawJuaqOCRPO_MmIlin948zswmkAkgDBNwwYFjI_1790790195
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.rc1.315.gc6ed9934b7-goog
+Message-ID: <20260930211834.2773546-1-coltonlewis@google.com>
+Subject: [PATCH v2 0/2] KVM: arm64: Handle hidden FEAT_PMUv3 in ID_AA64DFR0_EL1
+From: Colton Lewis <coltonlewis@google.com>
+To: kvmarm@lists.linux.dev
+Cc: maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
+When userspace initializes a vCPU with KVM_ARM_VCPU_PMU_V3 and hides
+FEAT_PMUv3 via ID_AA64DFR0_EL1.PMUVer, KVM hits a WARN_ONCE("Unknown PMU
+version 0") during reset_pmevtyper() and continues to expose PMU system
+registers instead of emulating guest accesses as UNDEF.
 
+Patch 1 handles ID_AA64DFR0_EL1_PMUVer_NI in __kvm_pmu_event_mask() and
+removes the redundant kvm_vcpu_has_pmu() check in reset_pmevtyper().
+Patch 2 updates pmu_visibility() to check ID_AA64DFR0_EL1.PMUVer via
+kvm_has_feat() so PMU registers are marked REG_HIDDEN when FEAT_PMUv3 is
+not advertised.
 
-On 9/28/26 3:34 PM, Khushit Shah wrote:
->
->> On 16 Sep 2026, at 8:15 PM, Eric Auger <eric.auger@redhat.com> wrote:
->>
->> !-------------------------------------------------------------------|
->>  CAUTION: External Email
->>
->> |-------------------------------------------------------------------!
->>
->> Add kvm_idreg_write_scratch_vcpu helper that will be used
->> by qmp_query_cpu_model_expansion code to test SYSREG settings
->> against a scratch vcpu. Indeed when the expansion code is called
->> the actual vcpu has not been initialized so we use a scratch vcpu.
->> This latter has been initialized with features taken from
->> legacy compositive options (EL2, SVE, ...). So the trial is
->> very close to the final setup.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->> target/arm/kvm_arm.h    |  4 ++++
->> target/arm/kvm-stub.c   |  7 ++++++
->> target/arm/kvm.c        | 51 +++++++++++++++++++++++++++++++++++++++++
->> target/arm/trace-events |  1 +
->> 4 files changed, 63 insertions(+)
->>
->> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
->> index 2b3474cc36..bace69efed 100644
->> --- a/target/arm/kvm_arm.h
->> +++ b/target/arm/kvm_arm.h
->> @@ -14,6 +14,7 @@
->> #include "qapi/qapi-types-misc-arm.h"
->> #include "system/kvm.h"
->> #include "target/arm/cpu-qom.h"
->> +#include "cpu-idregs.h"
->>
->> #define KVM_ARM_VGIC_V2   (1 << 0)
->> #define KVM_ARM_VGIC_V3   (1 << 1)
->> @@ -250,4 +251,7 @@ void arm_gic_cap_kvm_probe(GICCapability *v2, GICCapability *v3);
->>  */
->> char *kvm_print_register_name(uint64_t regidx);
->>
->> +bool kvm_idreg_write_scratch_vcpu(ARMCPU *cpu, int cpufd,
->> +                                  ARM64SysRegField *field, uint64_t newfv,
->> +                                  Error **errp);
->> #endif
->> diff --git a/target/arm/kvm-stub.c b/target/arm/kvm-stub.c
->> index 88cbe8d85c..8e6fae0a4d 100644
->> --- a/target/arm/kvm-stub.c
->> +++ b/target/arm/kvm-stub.c
->> @@ -119,3 +119,10 @@ char *kvm_print_register_name(uint64_t regidx)
->> {
->>     g_assert_not_reached();
->> }
->> +
->> +bool kvm_idreg_write_scratch_vcpu(ARMCPU *cpu, int cpufd,
->> +                                  ARM64SysRegField *field, uint64_t newfv,
->> +                                  Error **errp)
->> +{
->> +    g_assert_not_reached();
->> +}
->> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
->> index 537673177a..f7ca0e0250 100644
->> --- a/target/arm/kvm.c
->> +++ b/target/arm/kvm.c
->> @@ -447,6 +447,57 @@ static bool kvm_arm_vcpu_validate_sysreg(ARMCPU *cpu, ARM64SysRegField *field,
->> #define KEY_TO_REG_IDX(key)     ((uint32_t)(((uint64_t)(key)) >> 8))
->> #define KEY_TO_SHIFT(key)       ((uint8_t)(((uint64_t)(key)) & 0xFF))
->>
->> +bool kvm_idreg_write_scratch_vcpu(ARMCPU *cpu, int cpufd,
->> +                                  ARM64SysRegField *field, uint64_t newfv,
->> +                                  Error **errp)
->> +{
->> +    uint64_t mask, old_reg_val, new_reg_val, oldfv;
->> +    struct kvm_one_reg reg;
->> +    int lower = field->shift;
->> +    int length = field->length;
->> +    int index = field->index;
->> +    uint64_t kidx;
->> +    int ret;
->> +
->> +    mask = MAKE_64BIT_MASK(lower, length);
->> +
->> +    if (!kvm_arm_vcpu_validate_sysreg(cpu, field, newfv, errp)) {
->> +        return false;
->> +    };
->> +
->> +    kidx = idregs_sysreg_to_kvm_reg(id_register_sysreg[index]);
->> +    ret = read_sys_reg64(cpufd, &old_reg_val, kidx);
->> +    if (ret) {
->> +        error_setg(errp, "failed to read the scratch vcpu value for field %s %m",
->> +                   field->name);
->> +        return false;
->> +    }
->> +    oldfv = (old_reg_val & mask) >> lower;
->> +
->> +    new_reg_val = old_reg_val & ~mask;
->> +    new_reg_val |= newfv << lower;
->> +
->> +    reg.id = kidx;
->> +    reg.addr = (uintptr_t)&new_reg_val;
->> +    ret = ioctl(cpufd, KVM_SET_ONE_REG, &reg);
->> +    if (ret) {
->> +        error_setg(errp, "failed to apply new value 0x%"PRIx64" for field %s "
->> +                   "(previous is 0x%"PRIx64"): %m", newfv, field->name, oldfv);
->> +        return false;
->> +    } else {
->> +        uint64_t check_val, actualfv;
->> +
->> +        ret = read_sys_reg64(cpufd, &check_val, kidx);
->> +        if (ret) {
->> +            error_setg(errp, "failed to read the new reg value: %m");
->> +            return false;
->> +        }
->> +        actualfv = (check_val & mask) >> lower;
->> +        trace_kvm_idreg_write_scratch_vcpu(field->name, oldfv, newfv, actualfv);
->> +    }
->> +    return true;
->> +}
->> +
-> Hi Eric,
->
-> This looks similar to kvm_arm_apply_sysreg_props(), we maybe be able to abstract out kvm_arm_apply_sysreg_prop(),
-> which can then be used by both these functions.
+Changes in v2:
+- Handle ID_AA64DFR0_EL1_PMUVer_NI in __kvm_pmu_event_mask() and drop
+  the kvm_vcpu_has_pmu() check in reset_pmevtyper() (Oliver)
+- Drop Cc: stable@vger.kernel.org (Oliver)
+- Add patch 2 to check ID_AA64DFR0_EL1.PMUVer in pmu_visibility()
+  (Oliver)
+- Link to v1: https://lore.kernel.org/r/20260929220411.3756519-1-coltonlewis@google.com
 
-done in v10
+Colton Lewis (2):
+  KVM: arm64: Handle ID_AA64DFR0_EL1.PMUVer == NI in
+    __kvm_pmu_event_mask()
+  KVM: arm64: Check ID_AA64DFR0_EL1.PMUVer in pmu_visibility()
 
-Thanks!
+ arch/arm64/kvm/pmu-emul.c | 5 ++++-
+ arch/arm64/kvm/sys_regs.c | 6 +-----
+ 2 files changed, 5 insertions(+), 6 deletions(-)
 
-Eric
->
->> static void set_sysreg_prop(Object *obj, Visitor *v,
->>                             const char *name, void *opaque,
->>                             Error **errp)
->> diff --git a/target/arm/trace-events b/target/arm/trace-events
->> index 2a9cc67035..7a3f499a0e 100644
->> --- a/target/arm/trace-events
->> +++ b/target/arm/trace-events
->> @@ -21,6 +21,7 @@ set_sysreg_prop(const char *name, uint64_t old, uint64_t mask, uint64_t field_va
->> apply_sysreg_prop(const char *reg_name, const char *field_name, uint64_t old, uint64_t current, uint64_t mask, uint64_t field_value, uint64_t new) "%s.%s old=0x%"PRIx64" current=0x%"PRIx64" mask=0x%"PRIx64" new field value=0x%"PRIx64" new=0x%"PRIx64
->> nb_sysreg_props(const char *name, int count) "%s: %d SYSREG properties"
->> unexpected_writable_reserved_field(const char *reg_name, const char *field_name, int lower, int upper) "Unexpected writable reserved field: %s.%s [%d,%d], skip it ..."
->> +kvm_idreg_write_scratch_vcpu(const char *name, uint64_t oldfv, uint64_t newfv, uint64_t actualfv) "successful dry-run for %s old=0x%"PRIx64" new=0x%"PRIx64" actual=0x%"PRIx64
->>
->> # cpu.c
->> arm_cpu_reset(uint64_t mp_aff) "cpu %" PRIu64
->> -- 
->> 2.53.0
->>
+-- 
+2.56.0.rc1.315.gc6ed9934b7-goog
 
