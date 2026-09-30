@@ -1,53 +1,53 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D815208BA
-	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 17:35:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EA6521207
+	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 17:35:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790789707; cv=none; b=LUWTsHDpNv7Ui1qgDQYgfUEt7m2dnS09uTfHrp27RRYxBb+rC8rGcXdOfp4wwzY/wiB2/tobvFCSIgHOBw6fGSsnaggVgOSPW810R+lxxwFUWPHHzHvY6uGw+0NFMr+baykJR0+8WWgzDAd9e0BI2/KJXKaxNTF2mBhhZRSFhE4=
+	t=1790789707; cv=none; b=nKK3Mf8VNfpdV6tjqbpSsdrDy+j+fw/NJ+9sYvQcI+TbNe1xbb0tLFUQuwqZL3ZvW0ZoJRQDK8Metyywxh8Tz/ELlsltryB2UcgpBOYo28V3tor/JO23bgjjurAQnMxjD3hmqZTi9mtslBy/v4SvpflKKVmApRcnAEhhSkUY57U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1790789707; c=relaxed/simple;
-	bh=PIexe2PnQF562NHGLaTvYNxdLtgGmaImXurYvUZlFQw=;
+	bh=Hbv7OBkr/CtFSsO/SzruW9SzmMiUBQEndBr0jpmIWvk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EMIahzpv0KPtU71/pTqUET9Bg2A9QZCvgQciw1ndvtIFh1kjqt1oMOCwkCA8OiWoFqh7FFQ+/SF0JTnoACnrWES5wRHGgnYcyH3fmhqsiB9NGm8AoU24vwIkWr7z3iDpcJVbGmI24T+6Vk/X1K4M3qzwg40BMQHWFsadmvfg7zM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oIzKBUx+; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=JkWDiJrNTEzRYacf6SI9/Aa/F5ee3ltcB6RLR85gLuS4nN2ULmsunxoss3IBcLtUV3cimd/c5ZZs/GkP64ap4o7HjPPGy8o5VjyTqAWpvXgBs4lzHjCJQAEdroOMHyb6YZRm9vWLPzRAMDH4KNLKbA4OK+v1TqvOuXVpJdkmEfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gF+VzitW; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oIzKBUx+"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68UE5peB3167026;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gF+VzitW"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68UE5b681335969;
 	Wed, 30 Sep 2026 17:34:48 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=44r0A2CFOq6JReY/4
-	GE3p0OlkUobo8w/rH33MZTpyE4=; b=oIzKBUx+/C6n3YeuPOuswmZiH9INESDvW
-	Kh2VTS0+EXoEh2xwhDjUJ8w1fjc7SFyMSRYlA6QVH61bM5ppCs6AQ7io44J6m394
-	sfdtpPmc4bZzi9/dvDRQvz59rzr/tLD3sDE7hk+0hL3wBQUlk+vDKP/sScGIeMAw
-	TBGYnnmR+PNNwREk9315fnmES9mJF5/ekFM3TUukxwr8Z3Gq6K3xyHzkAT+xD59B
-	ZL/itI1lgRktVO9xp+NUJhaD1nG9gp68dUXZeudRmXLdIm9KF8OWNw9W16j/6BdX
-	elVqHlPKJOjSnqH1M2OwrFKIvFy4JNPog92cqUt1yGu9bYCWT1+VA==
+	:mime-version:references:subject:to; s=pp1; bh=D+cH6zlMDcjRMgQ1f
+	3UVNfoKthtX5qW8nk9SHqibgAA=; b=gF+VzitWWHRfXL123+yUh/EDrShXeOmRn
+	aXKf1FTl6MalgVOsUxDAVJa0YJO1SbDxL7sT/xWBLDABurrQcH6hFf/P8q+8IZcd
+	B9NpiJxK1Zac3vmnIGVOmcp7TpVMGTz8jSVrw9KPaalWCIiLi8D70onSr5bZ5zn7
+	dsXzNAj8F+COynrkTB1f90tABTxAxybkruonCriQw2mm9XAfl9l6TGyCVLVnqobP
+	pGLvO8iw2Ffv5+NdaBq9bnoZjjVZTUzRhv3m8PBQjyVEkBIEmry0LcCU7QgoZWMW
+	sORZUSyVti+w/44Qoms3YAIbWnbOzi6HGdsgwUuSBBm9WQ2c+Sw2Q==
 Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gx5ptdj5r-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gx5qrehb0-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 30 Sep 2026 17:34:47 +0000 (GMT)
+	Wed, 30 Sep 2026 17:34:48 +0000 (GMT)
 Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68UE37Pi2287765;
+	by ppma13.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68UE383t2287805;
 	Wed, 30 Sep 2026 17:34:47 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4h0q4pbmjx-1
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4h0q4pbmjw-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 30 Sep 2026 17:34:46 +0000 (GMT)
+	Wed, 30 Sep 2026 17:34:47 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68UHYhW143254192
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68UHYgTl49545700
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Wed, 30 Sep 2026 17:34:43 GMT
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2D0D92005A;
-	Wed, 30 Sep 2026 17:34:43 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id C2B742004D;
+	Wed, 30 Sep 2026 17:34:42 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C87012004F;
+	by IMSVA (Postfix) with ESMTP id 669762005A;
 	Wed, 30 Sep 2026 17:34:42 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -78,9 +78,9 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v9 03/24] KVM: Replace CONFIG_KVM_MMIO with KVM_NO_MMIO
-Date: Wed, 30 Sep 2026 19:34:18 +0200
-Message-ID: <20260930173441.66762-4-seiden@linux.ibm.com>
+Subject: [PATCH v9 02/24] KVM: Move architecture capability Kconfigs to header defines
+Date: Wed, 30 Sep 2026 19:34:17 +0200
+Message-ID: <20260930173441.66762-3-seiden@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260930173441.66762-1-seiden@linux.ibm.com>
 References: <20260930173441.66762-1-seiden@linux.ibm.com>
@@ -93,306 +93,392 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-ORIG-GUID: DkpQcTAuSRigzjaCigPS11A0Y5C91PzQ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTMwMDA2OCBTYWx0ZWRfX/i1/oh13B8zy
- 1moRJaL9eLdHIetC5SHRBMcL5ouXSkZ1zLAldJW4HTVD7UW8eacpbSHp4nBBtBCGb+ZLiHHv0Rs
- xKyK2VGChW6or/3P0+dgDWFwYnGrLmKr98Sk1AjOnKdh3ZTrc2qZ765uMJwBq5ahEs8z5eWzqlt
- GKmCOCG3ZJ66+MpCWJ4TvqoiZ5rZFTxFSYZR4+RsuV5sOjQz2SjdpYRJpCbm7X8uW9vImNJh8Kh
- U+UU4bknwHjYsjHSNwce7Twz9CTWFHQH0wVN2oyoipecLBJyaZrukSi4Gk6pGnurm4ZqotnJeRU
- AZ09VouLoOtb3M/obfeHoZCvwKiUL6XLkqjFNWipWK4dRiNHWaemMhQUKEFoFI0+YlK9sZV1KhS
- PPGxCucxb5nVaVvKFOEIQGFajFhzWDYd/o8gj1FiDTKlSGCrzBG5aI6O5kk82oYAh6kkmnd925V
- orUMFtKaYSHWKyseRpw==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTMwMDA2OCBTYWx0ZWRfXxhlbq1O1Svhe
- ge8pfFrmjU25z2F17S5d6FPIHaHDvYyejo8epKV7I/KemnaWvdW6LmDzuyHp/p95ru4bvbGg6dq
- /dpDPlz8QGA9aCUzqJBs12c3wGCrGek=
-X-Authority-Analysis: v=2.4 cv=EY5d0/mC c=1 sm=1 tr=0 ts=6abd4838 cx=c_pps
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTMwMDA2OCBTYWx0ZWRfX54Fx17UODp4S
+ jKY0guQRFi4CIa9jkjJY4GOcL4fS+roDr6lH7UI8axTFofucaRkSdLKqlVM6W+Msf8jJUx5pgG6
+ Fxha9qInq3h4bvbUqdGGom7O8qGMogtO96+Y8EYqpIiCXQOkKeH897ABEVhNpNYXTmRTJZA4QRB
+ WHPCcK8/F7Jrv5EHmWpCwAVeJppePEFV1SSHbshoJ2M73agXEOLaxc67cfOgQeOR6rm7cLSokkr
+ pQdVvxOwfP446d+g2NQRZyVbelsgYQkiHi4oBqdeLM/MksYvBlk6MucrL9TCBc/BtBtsepLq54Y
+ m5ILla7nnwmqIu45DaQhgB8AM/hDl+u6z7w5qHsTkFe1q31KBoH/2j8IDI8eiPDZVZhqJiMJ0CP
+ BOiqyxxt2lo1JV2SLiZWJPVi/X3XQnvqgokCZd7lYAz/H/h8rDSLDHBEgW7nW0m28866iDVx/nv
+ hw0XqdDjjU1Zurbu0hA==
+X-Authority-Analysis: v=2.4 cv=SPbXx+vH c=1 sm=1 tr=0 ts=6abd4838 cx=c_pps
  a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
  a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=RzCfie-kr_QcCd8fBx8p:22 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8
- a=b18d5-NrEheKXPzz568A:9 a=ysjONUepx5X5FVbz:21
-X-Proofpoint-GUID: XfmX1e97HGxy-j7eR66lVM6lE0aZRDCN
+ a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8 a=43XmKtFRw13_1s8YYrEA:9
+ a=nhjZEc3S35jqr8fL:21
+X-Proofpoint-ORIG-GUID: iDtXQr3AeNku8JPgkQsrzNQE9N2uDFVH
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTMwMDA2OCBTYWx0ZWRfX1C4UtXdxir2R
+ Ebd1A+5o8e8iAjf9TlXZ2unI4j48CQk0ejyiBZU+XdSKgPja6z/Wo/WmzYewqAm1ZZ6Qu3l/B1q
+ Rz4ugj6ENgssI/MQT3+gP47XOypuP+U=
+X-Proofpoint-GUID: xr9NQN0UvWfa1DzCsMWNlL-kdo_sPNoN
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-09-30_03,2026-09-21_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 priorityscore=1501 suspectscore=0 adultscore=0 clxscore=1015
- malwarescore=0 impostorscore=0 spamscore=0 lowpriorityscore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609300068
+ priorityscore=1501 suspectscore=0 clxscore=1015 spamscore=0
+ lowpriorityscore=0 malwarescore=0 adultscore=0 bulkscore=0 impostorscore=0
+ phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
+ definitions=main-2609300068
 
-Defining KVM_MMIO is not flexible enough for multi-KVM systems where one
-KVM implements MMIO but others do not. Therefore, remove KVM_MMIO from
-the config space and use the macro KVM_NO_MMIO instead.
-Define KVM_NO_MMIO for KVM/s390 and for selected KVM/powerpc
-configurations.
+Historically, KVM feature opt-ins and callbacks were configured globally
+via Kconfig symbols (CONFIG_HAVE_KVM_* and CONFIG_KVM_*).
 
-coalesced_mmio.c is now always compiled&linked. However, for
-architectures/configurations defining KVM_NO_MMIO this effectively
-collapses to an empty object with no mmio code.
+With s390 hosting multiple independent KVM implementations within the
+same kernel build (native s390 KVM and arm64 on s390), global Kconfig
+selections force both implementations to inherit options that only apply
+to one of them.
 
-No functional changes.
+Replace these global Kconfig options with architecture-specific opt-in
+defines in <asm/kvm_host.h> and standardize their naming by dropping the
+HAVE_ prefix:
+  - KVM_INVALID_WAKEUPS
+  - KVM_MSI			(formerly HAVE_KVM_MSI)
+  - KVM_NO_POLL			(formerly HAVE_KVM_NO_POLL)
+  - KVM_READONLY_MEM		(formerly HAVE_KVM_READONLY_MEM)
+  - KVM_VCPU_RUN_PID_CHANGE	(formerly HAVE_KVM_VCPU_RUN_PID_CHANGE)
 
-Suggested-by: Marc Zyngier <maz@kernel.org>
+This allows each architecture and guest implementation to configure its
+supported capabilities independently in its kvm_host header and eliminates
+unnecessary fallback stubs across different KVM targets.
+
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/arm64/kvm/Kconfig                | 1 -
- arch/loongarch/kvm/Kconfig            | 1 -
- arch/mips/kvm/Kconfig                 | 1 -
- arch/powerpc/include/asm/kvm_host.h   | 7 +++++++
- arch/powerpc/kvm/Kconfig              | 4 ----
- arch/riscv/kvm/Kconfig                | 1 -
- arch/s390/include/asm/kvm_host_s390.h | 2 ++
- arch/x86/kvm/Kconfig                  | 1 -
- include/linux/kvm_host.h              | 2 +-
- virt/kvm/Kconfig                      | 3 ---
- virt/kvm/Makefile.kvm                 | 4 ++--
- virt/kvm/coalesced_mmio.c             | 4 ++++
- virt/kvm/coalesced_mmio.h             | 2 +-
- virt/kvm/kvm_main.c                   | 8 ++++----
- 14 files changed, 21 insertions(+), 20 deletions(-)
+ arch/arm64/include/asm/kvm_host.h     |  3 +++
+ arch/arm64/kvm/Kconfig                |  3 ---
+ arch/loongarch/include/asm/kvm_host.h |  2 ++
+ arch/loongarch/kvm/Kconfig            |  2 --
+ arch/mips/include/asm/kvm_host.h      |  1 +
+ arch/mips/kvm/Kconfig                 |  1 -
+ arch/powerpc/include/asm/kvm_host.h   |  3 +++
+ arch/powerpc/kvm/Kconfig              |  1 -
+ arch/riscv/include/asm/kvm_host.h     |  2 ++
+ arch/riscv/kvm/Kconfig                |  2 --
+ arch/s390/include/asm/kvm_host_s390.h |  3 +++
+ arch/s390/kvm/Kconfig                 |  2 --
+ arch/x86/include/asm/kvm_host.h       |  3 +++
+ arch/x86/kvm/Kconfig                  |  3 ---
+ include/linux/kvm_host.h              | 18 +++++++++++-------
+ virt/kvm/Kconfig                      | 15 ---------------
+ virt/kvm/kvm_main.c                   |  4 ++--
+ 17 files changed, 30 insertions(+), 38 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index cd9b9d2462f9..db002e5ac9d4 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -30,6 +30,9 @@
+ #include <asm/vncr_mapping.h>
+ 
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
++#define KVM_MSI
++#define KVM_READONLY_MEM
++#define KVM_VCPU_RUN_PID_CHANGE
+ 
+ #define KVM_HALT_POLL_NS_DEFAULT 500000
+ 
 diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 7329124deb2f..8475f32ad9e6 100644
+index 449154f9a485..7329124deb2f 100644
 --- a/arch/arm64/kvm/Kconfig
 +++ b/arch/arm64/kvm/Kconfig
-@@ -22,7 +22,6 @@ menuconfig KVM
- 	select KVM_COMMON
- 	select KVM_GENERIC_HARDWARE_ENABLING
- 	select HAVE_KVM_CPU_RELAX_INTERCEPT
--	select KVM_MMIO
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select VIRT_XFER_TO_GUEST_WORK
+@@ -28,12 +28,9 @@ menuconfig KVM
  	select KVM_VFIO
+ 	select HAVE_KVM_DIRTY_RING_ACQ_REL
+ 	select NEED_KVM_DIRTY_RING_WITH_BITMAP
+-	select HAVE_KVM_MSI
+ 	select HAVE_KVM_IRQCHIP
+ 	select HAVE_KVM_IRQ_ROUTING
+ 	select HAVE_KVM_IRQ_BYPASS
+-	select HAVE_KVM_READONLY_MEM
+-	select HAVE_KVM_VCPU_RUN_PID_CHANGE
+ 	select SCHED_INFO
+ 	select GUEST_PERF_EVENTS if PERF_EVENTS
+ 	select KVM_GUEST_MEMFD
+diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
+index 65d91c3ce313..4cb370a8d09b 100644
+--- a/arch/loongarch/include/asm/kvm_host.h
++++ b/arch/loongarch/include/asm/kvm_host.h
+@@ -26,6 +26,8 @@
+ #include <asm/loongarch.h>
+ 
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
++#define KVM_MSI
++#define KVM_READONLY_MEM
+ 
+ /* Loongarch KVM register ids */
+ #define KVM_GET_IOC_CSR_IDX(id)		((id & KVM_CSR_IDX_MASK) >> LOONGARCH_REG_SHIFT)
 diff --git a/arch/loongarch/kvm/Kconfig b/arch/loongarch/kvm/Kconfig
-index a427429a2b05..fd387326d2f2 100644
+index 15da2d88c0c1..a427429a2b05 100644
 --- a/arch/loongarch/kvm/Kconfig
 +++ b/arch/loongarch/kvm/Kconfig
-@@ -26,7 +26,6 @@ config KVM
+@@ -23,8 +23,6 @@ config KVM
+ 	select HAVE_KVM_DIRTY_RING_ACQ_REL
+ 	select HAVE_KVM_IRQ_ROUTING
+ 	select HAVE_KVM_IRQCHIP
+-	select HAVE_KVM_MSI
+-	select HAVE_KVM_READONLY_MEM
  	select KVM_COMMON
  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
  	select KVM_GENERIC_HARDWARE_ENABLING
--	select KVM_MMIO
- 	select VIRT_XFER_TO_GUEST_WORK
- 	select SCHED_INFO
- 	select GUEST_PERF_EVENTS if PERF_EVENTS
+diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
+index c14b10821817..8e484bb482ba 100644
+--- a/arch/mips/include/asm/kvm_host.h
++++ b/arch/mips/include/asm/kvm_host.h
+@@ -893,5 +893,6 @@ static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+ 
+ #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
++#define KVM_READONLY_MEM
+ 
+ #endif /* __MIPS_KVM_HOST_H__ */
 diff --git a/arch/mips/kvm/Kconfig b/arch/mips/kvm/Kconfig
-index c24b872afbcb..849ce7c7c4df 100644
+index b1b9a1d67758..c24b872afbcb 100644
 --- a/arch/mips/kvm/Kconfig
 +++ b/arch/mips/kvm/Kconfig
-@@ -22,7 +22,6 @@ config KVM
- 	select EXPORT_UASM
- 	select KVM_COMMON
+@@ -24,7 +24,6 @@ config KVM
  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
--	select KVM_MMIO
+ 	select KVM_MMIO
  	select KVM_GENERIC_HARDWARE_ENABLING
+-	select HAVE_KVM_READONLY_MEM
  	help
  	  Support for hosting Guest kernels.
+ 
 diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index ad7c34e9b227..620f163d65a9 100644
+index 2d139c807577..ad7c34e9b227 100644
 --- a/arch/powerpc/include/asm/kvm_host.h
 +++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -29,6 +29,13 @@
+@@ -49,6 +49,9 @@
+ #endif /* CONFIG_KVM_BOOK3S_HV_POSSIBLE */
  
- #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
- 
-+#if !defined(CONFIG_KVM_BOOK3S_32_HANDLER) && \
-+	!defined(CONFIG_KVM_BOOK3S_PR_POSSIBLE) && \
-+	!defined(CONFIG_KVM_E500V2) && \
-+	!defined(CONFIG_KVM_E500MC)
-+#define KVM_NO_MMIO
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
++#ifdef CONFIG_KVM_MPIC
++#define KVM_MSI
 +#endif
-+
- #define KVM_MAX_VCPUS		NR_CPUS
- #define KVM_MAX_VCORES		NR_CPUS
+ 
+ #define KVM_HALT_POLL_NS_DEFAULT 10000	/* 10 us */
  
 diff --git a/arch/powerpc/kvm/Kconfig b/arch/powerpc/kvm/Kconfig
-index 1fae2de8fa68..cacc22e34afd 100644
+index b6bc2fc86dca..1fae2de8fa68 100644
 --- a/arch/powerpc/kvm/Kconfig
 +++ b/arch/powerpc/kvm/Kconfig
-@@ -30,7 +30,6 @@ config KVM_BOOK3S_HANDLER
- config KVM_BOOK3S_32_HANDLER
- 	bool
- 	select KVM_BOOK3S_HANDLER
--	select KVM_MMIO
- 
- config KVM_BOOK3S_64_HANDLER
- 	bool
-@@ -38,7 +37,6 @@ config KVM_BOOK3S_64_HANDLER
- 
- config KVM_BOOK3S_PR_POSSIBLE
- 	bool
--	select KVM_MMIO
- 
- config KVM_BOOK3S_HV_POSSIBLE
- 	bool
-@@ -201,7 +199,6 @@ config KVM_E500V2
- 	depends on PPC_E500 && !PPC_E500MC
- 	depends on !CONTEXT_TRACKING_USER
- 	select KVM
--	select KVM_MMIO
+@@ -232,7 +232,6 @@ config KVM_MPIC
+ 	depends on KVM && PPC_E500
+ 	select HAVE_KVM_IRQCHIP
+ 	select HAVE_KVM_IRQ_ROUTING
+-	select HAVE_KVM_MSI
  	help
- 	  Support running unmodified E500 guest kernels in virtual machines on
- 	  E500v2 host processors.
-@@ -216,7 +213,6 @@ config KVM_E500MC
- 	depends on PPC_E500MC
- 	depends on !CONTEXT_TRACKING_USER
- 	select KVM
--	select KVM_MMIO
- 	select KVM_BOOKE_HV
- 	help
- 	  Support running unmodified E500MC/E5500/E6500 guest kernels in
+ 	  Enable support for emulating MPIC devices inside the
+ 	  host kernel, rather than relying on userspace to emulate.
+diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+index a30600579231..23b5560e97ba 100644
+--- a/arch/riscv/include/asm/kvm_host.h
++++ b/arch/riscv/include/asm/kvm_host.h
+@@ -47,6 +47,8 @@
+ #define KVM_REQ_STEAL_UPDATE		KVM_ARCH_REQ(6)
+ 
+ #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
++#define KVM_MSI
++#define KVM_READONLY_MEM
+ 
+ #define KVM_HAVE_MMU_RWLOCK
+ 
 diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
-index 3cb4f8037300..2e3c4e6c1cd7 100644
+index ec2cee0a39e0..3cb4f8037300 100644
 --- a/arch/riscv/kvm/Kconfig
 +++ b/arch/riscv/kvm/Kconfig
-@@ -26,7 +26,6 @@ config KVM
+@@ -22,8 +22,6 @@ config KVM
+ 	depends on RISCV_SBI && MMU
+ 	select HAVE_KVM_IRQCHIP
+ 	select HAVE_KVM_IRQ_ROUTING
+-	select HAVE_KVM_MSI
+-	select HAVE_KVM_READONLY_MEM
+ 	select HAVE_KVM_DIRTY_RING_ACQ_REL
  	select KVM_COMMON
  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select KVM_GENERIC_HARDWARE_ENABLING
--	select KVM_MMIO
- 	select VIRT_XFER_TO_GUEST_WORK
- 	select SCHED_INFO
- 	select GUEST_PERF_EVENTS if PERF_EVENTS
 diff --git a/arch/s390/include/asm/kvm_host_s390.h b/arch/s390/include/asm/kvm_host_s390.h
-index bd42c84b8b16..a653b2a73303 100644
+index 9519b8028b10..bd42c84b8b16 100644
 --- a/arch/s390/include/asm/kvm_host_s390.h
 +++ b/arch/s390/include/asm/kvm_host_s390.h
-@@ -39,6 +39,8 @@
+@@ -34,6 +34,9 @@
  
+ #define KVM_INTERNAL_MEM_SLOTS 1
+ 
++#define KVM_INVALID_WAKEUPS
++#define KVM_NO_POLL
++
  #define KVM_S390_MANAGES_S390_GUEST 1
  
-+#define KVM_NO_MMIO
-+
  /*
-  * These seem to be used for allocating ->chip in the routing table, which we
-  * don't use. 1 is as small as we can get to reduce the needed memory. If we
+diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
+index 8d3ee17a1bcb..9045ae20fd89 100644
+--- a/arch/s390/kvm/Kconfig
++++ b/arch/s390/kvm/Kconfig
+@@ -25,8 +25,6 @@ config KVM
+ 	select KVM_COMMON
+ 	select HAVE_KVM_IRQCHIP
+ 	select HAVE_KVM_IRQ_ROUTING
+-	select HAVE_KVM_INVALID_WAKEUPS
+-	select HAVE_KVM_NO_POLL
+ 	select KVM_VFIO
+ 	select VIRT_XFER_TO_GUEST_WORK
+ 	select KVM_MMU_LOCKLESS_AGING
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index e460073ff176..d8f6333de323 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -47,6 +47,9 @@
+ #define kvm_file_to_kvm_arch x86
+ 
+ #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
++#define KVM_MSI
++#define KVM_NO_POLL
++#define KVM_READONLY_MEM
+ 
+ /*
+  * CONFIG_KVM_MAX_NR_VCPUS is defined iff CONFIG_KVM!=n, provide a dummy max if
 diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 294684b217bb..42e79c3c87ff 100644
+index 538ed1e80332..294684b217bb 100644
 --- a/arch/x86/kvm/Kconfig
 +++ b/arch/x86/kvm/Kconfig
-@@ -31,7 +31,6 @@ config KVM_X86
+@@ -28,7 +28,6 @@ config KVM_X86
+ 	select HAVE_KVM_DIRTY_RING_ACQ_REL
+ 	select HAVE_KVM_IRQ_BYPASS
+ 	select HAVE_KVM_IRQ_ROUTING
+-	select HAVE_KVM_READONLY_MEM
  	select VHOST_TASK
  	select KVM_ASYNC_PF
  	select USER_RETURN_NOTIFIER
--	select KVM_MMIO
- 	select SCHED_INFO
+@@ -37,9 +36,7 @@ config KVM_X86
  	select PERF_EVENTS
  	select GUEST_PERF_EVENTS
+ 	select PERF_GUEST_MEDIATED_PMU
+-	select HAVE_KVM_MSI
+ 	select HAVE_KVM_CPU_RELAX_INTERCEPT
+-	select HAVE_KVM_NO_POLL
+ 	select VIRT_XFER_TO_GUEST_WORK
+ 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+ 	select KVM_VFIO
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index a0e9cc55a6a4..acdde26c739d 100644
+index 160e3e64ec6d..a0e9cc55a6a4 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -847,7 +847,7 @@ struct kvm {
- 	struct kvm_vm_stat stat;
- 	struct kvm_arch arch;
- 	refcount_t users_count;
--#ifdef CONFIG_KVM_MMIO
-+#ifndef KVM_NO_MMIO
- 	struct kvm_coalesced_mmio_ring *coalesced_mmio_ring;
- 	spinlock_t ring_lock;
- 	struct list_head coalesced_zones;
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index f3d7f66746c8..24d7dfceb828 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -40,9 +40,6 @@ config NEED_KVM_DIRTY_RING_WITH_BITMAP
- 	bool
- 	depends on HAVE_KVM_DIRTY_RING
+@@ -750,7 +750,11 @@ static inline u64 kvm_gmem_get_supported_flags(struct kvm *kvm)
+ #ifndef kvm_arch_has_readonly_mem
+ static inline bool kvm_arch_has_readonly_mem(struct kvm *kvm)
+ {
+-	return IS_ENABLED(CONFIG_HAVE_KVM_READONLY_MEM);
++#ifdef KVM_READONLY_MEM
++	return true;
++#else
++	return false;
++#endif
+ }
+ #endif
  
--config KVM_MMIO
--       bool
--
- config KVM_ASYNC_PF
-        bool
+@@ -2486,7 +2490,7 @@ void kvm_arch_update_irqfd_routing(struct kvm_kernel_irqfd *irqfd,
+ 				   struct kvm_kernel_irq_routing_entry *new);
+ #endif /* CONFIG_HAVE_KVM_IRQ_BYPASS */
  
-diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
-index b39f7b2a5f6e..ec7da5942354 100644
---- a/virt/kvm/Makefile.kvm
-+++ b/virt/kvm/Makefile.kvm
-@@ -10,9 +10,9 @@ KVM_DEV_MINOR ?= KVM_MINOR
+-#ifdef CONFIG_HAVE_KVM_INVALID_WAKEUPS
++#ifdef KVM_INVALID_WAKEUPS
+ /* If we wakeup during the poll time, was it a sucessful poll? */
+ static inline bool vcpu_valid_wakeup(struct kvm_vcpu *vcpu)
+ {
+@@ -2498,9 +2502,9 @@ static inline bool vcpu_valid_wakeup(struct kvm_vcpu *vcpu)
+ {
+ 	return true;
+ }
+-#endif /* CONFIG_HAVE_KVM_INVALID_WAKEUPS */
++#endif /* KVM_INVALID_WAKEUPS */
  
- ccflags-y +=-DKVM_DEV_NAME=$(KVM_DEV_NAME) -DKVM_DEV_MINOR=$(KVM_DEV_MINOR)
+-#ifdef CONFIG_HAVE_KVM_NO_POLL
++#ifdef KVM_NO_POLL
+ /* Callback that tells if we must not poll */
+ bool kvm_arch_no_poll(struct kvm_vcpu *vcpu);
+ #else
+@@ -2508,18 +2512,18 @@ static inline bool kvm_arch_no_poll(struct kvm_vcpu *vcpu)
+ {
+ 	return false;
+ }
+-#endif /* CONFIG_HAVE_KVM_NO_POLL */
++#endif /* KVM_NO_POLL */
  
--kvm-y := $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
-+kvm-y := $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o \
-+	 $(KVM)/coalesced_mmio.o
- kvm-$(CONFIG_KVM_VFIO) += $(KVM)/vfio.o
--kvm-$(CONFIG_KVM_MMIO) += $(KVM)/coalesced_mmio.o
- kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/async_pf.o
- kvm-$(CONFIG_HAVE_KVM_IRQ_ROUTING) += $(KVM)/irqchip.o
- kvm-$(CONFIG_HAVE_KVM_DIRTY_RING) += $(KVM)/dirty_ring.o
-diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
-index 6b1d90161099..d6cae6855237 100644
---- a/virt/kvm/coalesced_mmio.c
-+++ b/virt/kvm/coalesced_mmio.c
-@@ -15,6 +15,8 @@
- #include <linux/slab.h>
- #include <linux/kvm.h>
+ void kvm_arch_guest_memory_reclaimed(struct kvm *kvm);
  
-+#ifndef KVM_NO_MMIO
-+
- #include "coalesced_mmio.h"
- 
- static inline struct kvm_coalesced_mmio_dev *to_mmio(struct kvm_io_device *dev)
-@@ -188,3 +190,5 @@ int kvm_vm_ioctl_unregister_coalesced_mmio(struct kvm *kvm,
- 	 */
+-#ifdef CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE
++#ifdef KVM_VCPU_RUN_PID_CHANGE
+ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu);
+ #else
+ static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+ {
  	return 0;
  }
-+
-+#endif /* !KVM_NO_MMIO */
-diff --git a/virt/kvm/coalesced_mmio.h b/virt/kvm/coalesced_mmio.h
-index 36f84264ed25..bcaa34fce1e8 100644
---- a/virt/kvm/coalesced_mmio.h
-+++ b/virt/kvm/coalesced_mmio.h
-@@ -11,7 +11,7 @@
-  *
-  */
+-#endif /* CONFIG_HAVE_KVM_VCPU_RUN_PID_CHANGE */
++#endif /* KVM_VCPU_RUN_PID_CHANGE */
  
--#ifdef CONFIG_KVM_MMIO
-+#ifndef KVM_NO_MMIO
+ #ifdef CONFIG_VIRT_XFER_TO_GUEST_WORK
+ static inline void kvm_handle_signal_exit(struct kvm_vcpu *vcpu)
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index c3c0ee253fc7..f3d7f66746c8 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -50,21 +50,12 @@ config KVM_ASYNC_PF
+ config KVM_ASYNC_PF_SYNC
+        bool
  
- #include <linux/list.h>
+-config HAVE_KVM_MSI
+-       bool
+-
+-config HAVE_KVM_READONLY_MEM
+-       bool
+-
+ config HAVE_KVM_CPU_RELAX_INTERCEPT
+        bool
+ 
+ config KVM_VFIO
+        bool
+ 
+-config HAVE_KVM_INVALID_WAKEUPS
+-       bool
+-
+ config KVM_GENERIC_DIRTYLOG_READ_PROTECT
+        bool
+ 
+@@ -79,12 +70,6 @@ config HAVE_KVM_IRQ_BYPASS
+        tristate
+        select IRQ_BYPASS_MANAGER
+ 
+-config HAVE_KVM_VCPU_RUN_PID_CHANGE
+-       bool
+-
+-config HAVE_KVM_NO_POLL
+-       bool
+-
+ config VIRT_XFER_TO_GUEST_WORK
+        bool
  
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index cd2d752816ab..7fe3a3cdc84f 100644
+index f62901b7e23d..cd2d752816ab 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -4086,7 +4086,7 @@ static vm_fault_t kvm_vcpu_fault(struct vm_fault *vmf)
- 	else if (vmf->pgoff == KVM_PIO_PAGE_OFFSET)
- 		page = virt_to_page(vcpu->arch.pio_data);
+@@ -4916,7 +4916,7 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+ 	case KVM_CAP_DESTROY_MEMORY_REGION_WORKS:
+ 	case KVM_CAP_JOIN_MEMORY_REGIONS_WORKS:
+ 	case KVM_CAP_INTERNAL_ERROR_DATA:
+-#ifdef CONFIG_HAVE_KVM_MSI
++#ifdef KVM_MSI
+ 	case KVM_CAP_SIGNAL_MSI:
  #endif
--#ifdef CONFIG_KVM_MMIO
-+#ifndef KVM_NO_MMIO
- 	else if (vmf->pgoff == KVM_COALESCED_MMIO_PAGE_OFFSET)
- 		page = virt_to_page(vcpu->kvm->coalesced_mmio_ring);
- #endif
-@@ -4927,7 +4927,7 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- 	case KVM_CAP_ENABLE_CAP_VM:
- 	case KVM_CAP_HALT_POLL:
- 		return 1;
--#ifdef CONFIG_KVM_MMIO
-+#ifndef KVM_NO_MMIO
- 	case KVM_CAP_COALESCED_MMIO:
- 		return KVM_COALESCED_MMIO_PAGE_OFFSET;
- 	case KVM_CAP_COALESCED_PIO:
-@@ -5268,7 +5268,7 @@ static long kvm_vm_ioctl(struct file *filp,
+ #ifdef CONFIG_HAVE_KVM_IRQCHIP
+@@ -5306,7 +5306,7 @@ static long kvm_vm_ioctl(struct file *filp,
+ 		r = kvm_ioeventfd(kvm, &data);
  		break;
  	}
- #endif
--#ifdef CONFIG_KVM_MMIO
-+#ifndef KVM_NO_MMIO
- 	case KVM_REGISTER_COALESCED_MMIO: {
- 		struct kvm_coalesced_mmio_zone zone;
+-#ifdef CONFIG_HAVE_KVM_MSI
++#ifdef KVM_MSI
+ 	case KVM_SIGNAL_MSI: {
+ 		struct kvm_msi msi;
  
-@@ -5597,7 +5597,7 @@ static long kvm_dev_ioctl(struct file *filp,
- #ifdef CONFIG_X86
- 		r += PAGE_SIZE;    /* pio data page */
- #endif
--#ifdef CONFIG_KVM_MMIO
-+#ifndef KVM_NO_MMIO
- 		r += PAGE_SIZE;    /* coalesced mmio ring page */
- #endif
- 		break;
 -- 
 2.53.0
 
