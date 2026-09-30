@@ -1,168 +1,156 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB792DF128;
-	Wed, 30 Sep 2026 15:55:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379C94E324D
+	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 15:56:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790783751; cv=none; b=R190P4N8/MoDi0VIPFl1zqwDYlGZVFjikLAyGyOiFQIYFgp/XqJq6l37xLzxoZqDxmxL/Ucc+hv5aozQ6hnsXNCfFzpgZPjfp6QK2N7NajaqCajW+XKFl+emDNtpujip2f4kZu47fNqsqVYHcdOiAVzDjGvaQu6CaKkBfxPyZsw=
+	t=1790783820; cv=none; b=YlZTfcIK0dem6Qoeb+LhyqoFuN2vGxSL3j+rf84BR68xaNHEsJmYcjpibJva6FWSduwr1+bjbMob60GoFGOa1RlBReGLpZupcmD/99SnzF1Iife1w9B9/RuOAtCJzzOSo/S+CLU3YekKDU5M3ZYMIjXMYB/LMkszERHzq+3JLeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790783751; c=relaxed/simple;
-	bh=Bc5mWey1FMzal2RQfaDFWEDiyRbRNQu+XKVSnU+udT4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IUD/P989HLAJZN0e32ncs0s7RRvEUS06WQ/M0+QjKwv8zc/DahMZrDjSJgEU7z9A3Zi8QROtf9U+M4siD2HmXvur4Me2W63vsiL1IJ5Wp166uKd3lndofnVv+HUt/j4zwO4UfZSyoA5VhkEa7xNCByVJ/rXlLe0YJV80AU3bA2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=pTyBwWCd; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1790783820; c=relaxed/simple;
+	bh=r23wN9j1Kl5sBQwf3MqrazuAz45jz1qM4uXDgnaa/gY=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=fmD4MaJKCzdvyze3axF3nD9xgkQRf1OOjUeg6FtNFaDzKmRg5OYeQv+q7e88Gd/5QV/7sxmWP1J8dDsogocHFbONu2RdUeodylWkHMN70g0b4mz71CLW41F4j8uunhkTsZ6uYQgpvn61nxFRwuUshNljTvFuBVNH/WI9ODYN7kM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iqaCZUGH; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="pTyBwWCd"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A554C2F;
-	Wed, 30 Sep 2026 08:55:39 -0700 (PDT)
-Received: from [10.57.9.178] (unknown [10.57.9.178])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ADFAF3F86F;
-	Wed, 30 Sep 2026 08:55:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790783743; bh=Bc5mWey1FMzal2RQfaDFWEDiyRbRNQu+XKVSnU+udT4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=pTyBwWCdjrYPTJJSYO92B4a1mS3MpLniYzgmdympuLvTm1K6xYAkgDEYfr1yvjVgt
-	 q/y+ffzRccdbw11Z4sxKlJWU2Z8rQwyBLJiTwd+lucIgdcuxmmZI6Y/vMdyE6KYcHB
-	 0dgbg4WFuEyRcOmFkUu0RPcCwQ1GUN6EPm+GPTis=
-Message-ID: <210c0b27-c7cb-447a-b6ee-bf6b3fb63acc@arm.com>
-Date: Wed, 30 Sep 2026 16:55:38 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iqaCZUGH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E63E1F0089C;
+	Wed, 30 Sep 2026 15:56:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790783815;
+	bh=3cSZcqMuqPUE31rN9amGh9+/5u4x0Z686KaZJIFmXe4=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=iqaCZUGH9yMuo2InbTZKSo8Ridba9+Hggvv95RV1DwoIMERNRQAmGlrilvD5ThUbi
+	 XfABB0hZ3ZHfvZGafCNl4UzdWNQMCR+aYlOWpLh+KsdhMgTxbHM5zq3TV6nL/ZAhrg
+	 bVIkiFvkESKiimjOIEL9b5AfywQJOAtHe7G/2A4qVejpktZXYV2SUaf6VaXRIc8DBB
+	 GHJ2n25LAgZ7zUi/cGatGv+5qmHCd1dciwvhX5N04ibrS7Rg1SUqVz6/e9DFVbZEyj
+	 lCWc1Db7Hk0C2V7IecRGMEHKz9Yo1E4DOXMx7sjpsvQA74AZTej/LqiNWOzp+YedhG
+	 FtpQ3hutAfPPw==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v3 4/4] KVM: arm64: Add hyp_printk event to nVHE/pKVM
+ hyp
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Vincent Donnefort" <vdonnefort@google.com>
+Cc: kvmarm@lists.linux.dev, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>
+In-Reply-To: <20260930153505.2144559-5-vdonnefort@google.com>
+References: <20260930153505.2144559-1-vdonnefort@google.com>
+ <20260930153505.2144559-5-vdonnefort@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 30 Sep 2026 15:56:55 +0000
+Message-Id: <20260930155655.8E63E1F0089C@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 6/9] firmware: arm_rmm: Ensure the RMM has GPT entries
- for memory
-Content-Language: en-GB
-To: Sudeep Holla <sudeep.holla@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
- will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
- jonathan.cameron@oss.qualcomm.com
-References: <20260929221623.1342076-1-suzuki.poulose@arm.com>
- <20260929221623.1342076-7-suzuki.poulose@arm.com>
- <20260930-judicious-loris-of-will-dea0a3@sudeepholla>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260930-judicious-loris-of-will-dea0a3@sudeepholla>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-Hi Sudeep
+Thank you for your contribution! Sashiko AI review found 3 potential issue(=
+s) to consider:
+- [High] trace: trace_hyp_printk calculates invalid ring_buffer_event point=
+er causing memory corruption
+- [Medium] trace: trace_hyp_printk lacks compile-time format string validat=
+ion
+- [Medium] trace: trace_hyp_printk macro shadows caller variables named fmt
+--
 
-On 30/09/2026 15:44, Sudeep Holla wrote:
-> On Tue, Sep 29, 2026 at 11:16:20PM +0100, Suzuki K Poulose wrote:
->> From: Steven Price <steven.price@arm.com>
->>
->> The RMM maintains the state of all the granules in the system to make
->> sure that the host is abiding by the rules. This state can be maintained
->> at different granularity, per page (TRACKING_FINE) or per region
->> (TRACKING_COARSE or TRACKING_INTERMEDIATE). The region size depends on the
->> underlying "RMI_GRANULE_SIZE". For a "coarse"/"intermediate" region,
->> all pages in the region must be of the same state, this implies we need to
->> have "fine" tracking for DRAM, so that we can delegate individual pages.
->>
->> For now we only support a statically carved out memory for tracking
->> granules for the "fine" regions. This can be extended in the future to
->> allow modifying the tracking granularity and remove the need for a
->> static allocation by the firmware.
->>
->> Similarly, the firmware may create L0 GPT entries describing the total
->> address space. But if we change the "PAS" (Physical Address Space) of a
->> granule, then the firmware may need to create L1 tables to track the PAS
->> at a finer granularity. Linux therefore checks if the platform firmware
->> manages the PAR region. i.e., the firmware is in charge of managing the
->> L1 GPTs (creation and the required memory for the GPT tables - via static
->> carveouts) without host intervention. Support for dynamic GPT creation by
->> the host will be added later.
->>
->> If the firmware requires us to manage the tracking or GPT memory,
->> deactivate the RMM and reclaim any memory donated at RMM activation.
->>
->> Apply the same checks when hotplugged memory is brought online.
->>
-...
+commit 26cdec70ff2d60c665c546592ecab1e31f40820e
+Author: Vincent Donnefort <vdonnefort@google.com>
 
->> ---
->>   drivers/firmware/arm_rmm/rmi.c | 247 ++++++++++++++++++++++++++++++++-
->>   include/linux/arm-rmi-cmds.h   |  18 +++
->>   2 files changed, 264 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
->> index d982cf158f8da..d4d098448e46e 100644
->> --- a/drivers/firmware/arm_rmm/rmi.c
->> +++ b/drivers/firmware/arm_rmm/rmi.c
-> 
-> [...]
-> 
->> +static int rmi_verify_gpt_firmware_managed(phys_addr_t start, phys_addr_t end)
->> +{
->> +	unsigned long l0gpt_sz;
->> +	unsigned long next, par_state;
->> +
->> +	l0gpt_sz = 1UL << (30 + FIELD_GET(RMI_FEATURE_REGISTER_1_L0GPTSZ,
->> +					  rmi_feat_reg(1)));
->> +	start = ALIGN_DOWN(start, l0gpt_sz);
->> +	end = ALIGN(end, l0gpt_sz);
->> +
-> 
-> Is it guaranteed that end with not be = PASZ ? The spec says RMI_GPT_INFO
-> will return RMI_GPT_INFO when top >= pasz. Unlike start, end for good
-> reason is aligned up(ceil) instead of aligned down, but that also means
-> end will become PASZ when we reach end of memory, no ?
+KVM: arm64: Add hyp_printk event to nVHE/pKVM hyp
 
-Good point. The RMM spec needs to be fixed to make the condition
+Create an event to allow developers to log pretty much anything into the
+hypervisor tracing buffer with trace_hyp_printk(), just like the kernel
+tracing has the function trace_printk().
 
-  top > pasz
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/trace.h b/arch/arm64/kvm/hyp=
+/include/nvhe/trace.h
+> index 8813ff250f8e0..3d0b5c634bb3f 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/trace.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/trace.h
+[ ... ]
+> +
+> +#define trace_hyp_printk(__fmt, __args...)						\
+> +do {											\
+> +	static struct hyp_string_fmt __used __section("_hyp_string_fmts") fmt =
+=3D {	\
 
-as the top, is really the top the region and is not inclusive.
+[Severity: Medium]
+Will this shadow caller variables named fmt? If a caller passes a local
+variable named fmt as one of the format arguments, it seems it would resolve
+to this static struct instead of the intended variable, logging the struct
+address or causing a compilation error.
 
-This is already a known issue, tracked by FENIMORE-1807. The proposed
-fix is :
+[Severity: Medium]
+Does this macro validate the format string at compile time?
 
-pre: UInt(top) > rmm.static.pasz
+Since __trace_hyp_printk() does not use a __printf compiler attribute, pass=
+ing
+unsupported specifiers like %s or %p, or providing mismatched arguments, wo=
+n't
+trigger a compiler warning. This could cause a host panic when
+trace_seq_printf() attempts to dereference an EL2 pointer at runtime.
 
+> +		.fmt =3D __fmt								\
+> +	};										\
+> +	BUILD_BUG_ON(sizeof(__fmt) > HYP_STRING_FMT_MAX_SIZE);				\
+> +	/* __TO_U64 prepends a comma if there are arguments */				\
+> +	__trace_hyp_printk(&fmt, COUNT_ARGS(__args) __TO_U64(__args));			\
+> +} while (0)
+> =20
+>  int __tracing_load(unsigned long desc_va, size_t desc_size);
+[ ... ]
+> diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
+> index 8faaec899f92c..9d4378bcad74b 100644
+> --- a/arch/arm64/kvm/hyp_trace.c
+> +++ b/arch/arm64/kvm/hyp_trace.c
+[ ... ]
+> @@ -421,6 +424,61 @@ static const char *__hyp_enter_exit_reason_str(u8 re=
+ason)
+>  	return strs[min(reason, HYP_REASON_UNKNOWN)];
+>  }
+> =20
+> +static void __hyp_trace_printk(struct remote_event_format_hyp_printk *en=
+try, struct trace_seq *seq)
+> +{
+> +	const char *fmt =3D (const char *)(&__hyp_string_fmts_start[entry->fmt_=
+id]);
+> +	struct ring_buffer_event *evt =3D (void *)entry - RB_EVNT_HDR_SIZE;
 
-> 
-> Sorry if I am missing something, trying to understand bits and piece of
-> RME still, just getting started.
+[Severity: High]
+Does this pointer arithmetic correctly locate the event header?
 
-Thanks for looking !
+Since this event is allocated by simple_ring_buffer_reserve(), the payload
+starts at array[1] (offset 8) rather than immediately after a standard ring
+buffer header. Subtracting RB_EVNT_HDR_SIZE (4 bytes) appears to result in a
+misaligned pointer pointing to array[0] instead of the event header.
 
-Cheers
-Suzuki
+> +	int nr_args;
+> +
+> +	trace_seq_putc(seq, ' ');
+> +
+> +	if ((void *)fmt >=3D (void *)__hyp_string_fmts_end) {
+> +		trace_seq_printf(seq, "Unknown hyp_string_fmt ID %d\n", entry->fmt_id);
+> +		return;
+> +	}
+> +
+> +	nr_args =3D (ring_buffer_event_length(evt) -
+> +		   offsetof(struct remote_event_format_hyp_printk, args)) / sizeof(ent=
+ry->args[0]);
 
-> 
->> +	while (start < end) {
->> +		long ret = rmi_gpt_info(start, end, &next, &par_state);
->> +
->> +		if (ret != RMI_SUCCESS) {
->> +			pr_err("RMI_GPT_INFO failed for %llx-%llx: (%ld)\n",
->> +				start, end, ret);
->> +			return -ENXIO;
->> +		}
->> +
->> +		if (WARN_ON(next <= start))
->> +			return -ENXIO;
->> +
->> +		if (par_state != RMI_GPT_PAR_PLAT) {
->> +			pr_err("GPT for the region is not managed by firmware %llx-%lx\n",
->> +				start, next);
->> +			return -ENODEV;
->> +		}
->> +		start = next;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
-> 
+[Severity: High]
+Does ring_buffer_event_length() read garbage data here?
 
+If the evt pointer is misaligned, interpreting the payload data as the event
+header could yield a garbage nr_args value. This could lead to out-of-bounds
+memory reads or information leaks of uninitialized host stack/registers when
+trace_seq_printf() is called below.
+
+> +	switch (nr_args) {
+> +	case 0:
+> +		trace_seq_printf(seq, fmt);
+> +		break;
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260930153505.2144=
+559-1-vdonnefort@google.com?part=3D4
