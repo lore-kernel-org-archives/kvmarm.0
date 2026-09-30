@@ -1,181 +1,124 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91EC8468C06;
-	Wed, 30 Sep 2026 11:12:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790766773; cv=none; b=r9vo9ErjeB2Y2IwILFyBERkGTop01UVhFc+kYtLDDU7VQZT5RcV4LUGLY/lKZY4WvfOQdmRg9y0d3Wea0jqUo+IGer/fmYh5C6q4dNs/9AgaTjxl/V0avmb2perSRzVuEAupnv6fazd4Gs6NO+8TsVOpMNwjWRwz3+pX1cr9uPA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790766773; c=relaxed/simple;
-	bh=mGVGsgI+LoKKOBBSuTeiqQ/U4Wa7b7v4sQLVV1j3RUg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PnGKStUuOxqlKAAFcfVxYnNAgJuVM0gsJ1ChbBcr2NZ+7DgKAU4DEpIH5zUpKaauG3PVm7BY/Dm4g+BWP4s/lZxwlI+zD6ORU/DnfvZO5GwRfYTLEWSFGYib/tkGsLAcU3GOddh6W3xUCVd25gqZ2jW/5glWZQwQPGP+fLB9fdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=JKNynVOw; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from mail-yx2-f38.google.com (mail-yx2-f38.google.com [74.125.224.166])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE842AEEB
+	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 11:35:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.166
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790768116; cv=pass; b=Zr20IjBA4l7hP8lPLTbiwgP2MIDUBm3qxLEMoho1NXJltMEiMjGuSN7rlXkiqQm9MckttDlSJufUxJQoek9nKt58eTHX8M7aMi8AF3FkhmiGYLTylcgjLEwz1x8ET2pnTQL4JvVnnCa7P74wui3wZKcGiOJLDVSPRa0HU5Tsug4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790768116; c=relaxed/simple;
+	bh=SeY6Z1jmk7ymRLBox8aezw1ZLI+jut6EQpLQBAspM3Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=J8kY9dtMW8c+AaBXMrwRRLHFzjf+78AD9qnqILMmpgxe+bi11Io9I8wmot0UZT9Lo1KdDF4iSyeI6HVjQBxDPP1ZxNzq1zruL1Z0TKJfFdk/sZgrz0jMmSch8TZUpkDLJOPi8zudEgEtCiTTKfbdJWDOf+oPyjk6eL65mxypx5M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CgT7RmeG; arc=pass smtp.client-ip=74.125.224.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="JKNynVOw"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A506E497;
-	Wed, 30 Sep 2026 04:12:47 -0700 (PDT)
-Received: from [10.57.9.178] (unknown [10.57.9.178])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 94F263F86F;
-	Wed, 30 Sep 2026 04:12:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790766771; bh=mGVGsgI+LoKKOBBSuTeiqQ/U4Wa7b7v4sQLVV1j3RUg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=JKNynVOwYWLWdlva3F5wvNG6YjN8ks30JQEHIlFc4eTde+VcWvns2RKVRyMpiZ6mN
-	 OB+6TqoTqR6q07OZyAwYdKbTaAcvNZnXC2PM4TsMV/6D9h5mLSmWvxqsODPaPxfJfk
-	 DV0ZRcH0K7if5MLGJczbgRRPIVYrWQTee0kNPo7I=
-Message-ID: <d012e283-b7d8-439b-9b09-a88b07dc5d2b@arm.com>
-Date: Wed, 30 Sep 2026 12:12:48 +0100
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CgT7RmeG"
+Received: by mail-yx2-f38.google.com with SMTP id 00721157ae682-8ac47074e38so2681617b3.1
+        for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 04:35:15 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790768114; cv=none;
+        d=google.com; s=arc-20260327;
+        b=Dqg/vO0Ihcb7cd0QNovYjFdbmleqMHKnMlGfRvAH+0fvjCHssXh0NJq0qq7W0sJMcb
+         WVh1IdlDth6BX3FB39VZz0p4sIUBIDmmGacBCv2aBNq7DedWVCBWYuPi3tw4C7HYKjoQ
+         kpjb2RnUJGi4O99/WcMdDb9oIKq9btxweTjnEPn6i0fI+48LZjK2ym07FHVpYQr8E5kW
+         z95VFAMlMlgPl17+KkQJBWH/C5nXEQBwgsCQh5RyZo7/Sp6wSZhW88GJ/KLUKsLuNiNB
+         wtfzYN0S3+6QrrOaIMimdwesSn/ZBmFc2gSS3ku4mmIZVIRLe36fk/sQghnVpH8yNjOV
+         RqcQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=SeY6Z1jmk7ymRLBox8aezw1ZLI+jut6EQpLQBAspM3Y=;
+        fh=qC2zI3EtmVc+YB98pA1e6rK/pIWZeseBh8OWQpfD7Tw=;
+        b=gyPn0R5g4js3yMCYCB2WAoRGRZykpFHKhWLmw8Y98U2cTt2nYZ/z/4dL3JWgwtPK9y
+         58POqVQDbqj82n1vp1bo70bUH/HZXyfjfl9bZ6dq9zqFWYBgeVd5SjFjl2yGtr0DtksQ
+         JlRHLlBNLHYngYSbiHpYxOa+k8cPMPdmohjUtPJoNmxPm/teCo/TOOEQ+AYt0xZsoNKf
+         yITkKqBnPfTlWVIOfr4ru3fPmC6vjnzzN1d/eJnvQ45jZv9WpkeoQzok0WdO4h1Jrt1F
+         2m1LyxBJoIQvIL/3EWX7+VC0EfUHa1WxGfIkrsq89mK9JBi+87yNBply4XqJUr2s5YHF
+         bdJQ==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1790768114; x=1791372914; darn=lists.linux.dev;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=SeY6Z1jmk7ymRLBox8aezw1ZLI+jut6EQpLQBAspM3Y=;
+        b=CgT7RmeGTy0r6r/FfAZmtq2HHszOt2HcVMdBuiH0ycrOepxwSNPKQk1FNSJbvtFAoD
+         p5paAGHK1OmLk/1XDwWjKEj593Twf0Fzvg5BubXqGuK/WyVEaHZn6JDdBL0MHmfpRpoS
+         vzoXlsKSQHSEAWjQuJbVRVuR1v6AVLrHrLdwvBxdyIkuE+2lA4nIQ5BOnobaunW2wN9J
+         WcLGvyfm8YPBoZMDnoyqHH2aT8bJN/2V0bYRjyT4c0aAMt9Vbmpl22e1xdXw+qGVUccS
+         dXHuIcvPsVju+oG03u9S7NVtq0X2hw0jGQFpAaJeHBowvE4YpKcb+iDZWQlH3QNlYHJS
+         43sA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790768114; x=1791372914;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=SeY6Z1jmk7ymRLBox8aezw1ZLI+jut6EQpLQBAspM3Y=;
+        b=CvCPA75lVdT3J5XHvyb6QFTzLQCwncKi1PRJyYkDEhhrnouoQg868sAj/Dv/TQxD8n
+         Z9Vfrdni786BjXOxsm/qjnXt7G70Qwpm9W5Y5mwXS1vryXC1BUSKXDgTao3WeZIdu4+M
+         a3TcIevfDbCJ6YcylGMJm3P6HB19mUaRhZhwGHiAgi1Z1/cJFKsM0ZvaG3Ud+qvyEKXi
+         fhIv7yird34l00KaMv6ncJUj6ydsgBAUtiHiP1eKxtulLB3eIKd1fVv/L8kCClVmlHMO
+         L8T6pPiZqqY5IWu3eagXJvwj8aorwCLQoqA9QSbJMJC75zbxW0DgnFO3vrbGJUPZQhfR
+         gGyw==
+X-Forwarded-Encrypted: i=1; AKwUvBzwnQWIoly90+Rwem6jwRIDdagbzeBR1wisfScaLA1NaZIElcBJre+4GCqzzkphuNzudRQogBs=@lists.linux.dev
+X-Gm-Message-State: AFq9FYKEJw4uSVn5/ZtJ779gT06HUbA1ofI8zxcjwyheLf/hrCopi4KC
+	XKNe/H48h2xRvq7gBiKe7szd7MSALXxajZUGA1a4KTK0BJWkLHjC8H+krB3t4j3FoCayIF3f6E+
+	fjIpekz0udNWnooaATG6bOERkPVE6Kf/JKdzFTogOWQ==
+X-Gm-Gg: AYBFou1KgkEm5aT1Xa+9CY0nh+dEGxg+N5TOgTov9Xa2v7YDJBqKTUUor2IUJ1uzaff
+	8tUueKLPzzhDbHpYoJgsFtrmqr1nObZ9bN6bJWZ7OvfksNbnOcGOV9aTXtc88HGiSDPSstr3aVo
+	1skl4wDw2XJfD4ChxHr5jY3OhNhIcI984XwZFAasHTUNnJJ/ZU1BzBDuOH1bwSmDiK4zDnn2Bhq
+	0ECVTLKns3TXqQ9KOmqtaV1QDTp8YBziHhgRvec5O19lO4+JLNU5fo3iF6+qJ4FwM/q6We8tqzP
+	HqoHoZXQjJOz7h6rw61XaFWGA5seXIUxKlp9dJdjdnLeN3zes/OPZaDOHOebl7bd/BDXTGhBI5z
+	FS0cSR1Dscz+7Lik4RYPQpFgTozE8tUG/z7QZuMI=
+X-Received: by 2002:a05:690c:ec3:b0:885:cf67:95dd with SMTP id
+ 00721157ae682-8ac97909b55mr3191337b3.31.1790768114223; Wed, 30 Sep 2026
+ 04:35:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 8/9] firmware: arm_rmm: Add wrappers for Realm related
- RMI commands
-Content-Language: en-GB
-To: sashiko-reviews@lists.linux.dev
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>,
- Steven Price <steven.price@arm.com>,
- "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Gavin Shan
- <gshan@redhat.com>, Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-References: <20260929221623.1342076-1-suzuki.poulose@arm.com>
- <20260929221623.1342076-9-suzuki.poulose@arm.com>
- <20260929222936.8344F1F000FF@smtp.kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260929222936.8344F1F000FF@smtp.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20260924172928.2110956-1-coltonlewis@google.com>
+ <20260924173051.2117637-1-coltonlewis@google.com> <CAFEAcA9Rwrffx8bYiOxrtQGdg31QAz1oBm8okzpfqHZ6yK0Y7A@mail.gmail.com>
+ <20260929212102.3659389-1-coltonlewis@google.com>
+In-Reply-To: <20260929212102.3659389-1-coltonlewis@google.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 30 Sep 2026 12:35:02 +0100
+X-Gm-Features: AclHuK8bFLv0KvzZpr3GNRdEy1zBXYO_hECfn1oR1UjooEwhow1ZvPDksGAca58
+Message-ID: <CAFEAcA9DYo3GW_59eZjsk1qL0--3amYd7ufPqt80O2qv=Qm_pw@mail.gmail.com>
+Subject: Re: [PATCH] target/arm: Enable KVM PMU partitioning and counter limit
+To: Colton Lewis <coltonlewis@google.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvmarm@lists.linux.dev, 
+	Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Will Deacon <will@kernel.org>, James Clark <james.clark@linaro.org>, 
+	Mingwei Zhang <mizhang@google.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 29/09/2026 23:29, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
-> - [Critical] arm_rmm: Range-based RMI wrappers drop progress indicator on error, risking GPF
-> - [High] arm_rmm: SRO cancellation flow aborts prematurely, leaving SRO dangling
-> --
-> 
-> commit 206f9f5530d9fa5eb129cd6fc6e598e72857683a
-> Author: Steven Price <steven.price@arm.com>
-> 
-> firmware: arm_rmm: Add wrappers for Realm related RMI commands
-> 
-> This commit introduces static inline wrappers for executing Realm
-> Management Interface (RMI) commands. These wrappers call into lower-level
-> SMC execution functions to manage Realm guests.
-> 
->> diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
->> index 5d005054f3c6c..4f0d6a8006a4a 100644
->> --- a/include/linux/arm-rmi-cmds.h
->> +++ b/include/linux/arm-rmi-cmds.h
->> @@ -104,4 +104,464 @@ static inline bool is_rmi_available(void)
->>   }
->>   #endif	/* CONFIG_ARM_RMM_RMI */
->>   
->> +
->> +/**
->> + * rmi_rtt_data_map_init() - Create a mapping at protected IPA, copying contents
->> + *			     from a given non-secure source granule.
->> + * @rd: PA of the RD
->> + * @data: PA of the target granule mapped in the guest
->> + * @ipa: IPA at which the granule @data will be mapped in the guest
->> + * @src: PA of the source granule with contents
->> + * @flags: RMI_MEASURE_CONTENT if the contents should be measured
->> + *
->> + * Create a mapping from Protected IPA space to conventional memory, copying
->> + * contents from a Non-secure Granule provided by the caller.
->> + *
->> + * Return: 0 on success, positive RMI result code or negative Linux error code
->> + */
->> +static inline long rmi_rtt_data_map_init(unsigned long rd, unsigned long data,
->> +					 unsigned long ipa, unsigned long src,
->> +					 unsigned long flags)
->> +{
->> +	struct arm_smccc_1_2_regs regs = {
->> +		SMC_RMI_RTT_DATA_MAP_INIT, rd, data, ipa, src, flags
->> +	};
->> +
->> +	return rmi_sro_execute(&regs);
-> 
-> [Severity: High]
-> Does the SRO cancellation flow in the underlying rmi_sro_execute() and
-> rmi_sro_memxfer_execute() abort prematurely when returning to these wrappers?
-> 
-> In rmi_sro_execute(), the cancellation path does this:
-> 
-> 	rmi_op_cancel(sro_handle, regs);
-> 	cancelled = true;
-> 
-> According to the RMM specification, SMC_RMI_OP_CANCEL returns RMI_SUCCESS when
-> accepted. Since RMI_SUCCESS is 0, the loop condition in rmi_sro_execute():
+On Tue, 29 Sept 2026 at 22:21, Colton Lewis <coltonlewis@google.com> wrote:
+>
+> Hi Peter,
+>
+> Thanks for reviewing!
+>
+> On Mon, Sep 28, 2026 at 03:01:32PM +0100, Peter Maydell wrote:
+> > What should we do with these properties if we're not using KVM
+> > (i.e. for TCG, hvf, etc) ?
+>
+> PMU partitioning is specific to KVM, so moving it into
+> kvm_arm_add_vcpu_properties() (which is only called when kvm_enabled())
+> and naming it "kvm-pmu-partition" per the KVM VCPU Features convention
+> in docs/system/arm/cpu-features.rst seems to make the most sense.
+>
+> For the counter limit property, would you prefer that it also live in
+> kvm_arm_add_vcpu_properties() as "kvm-pmu-num-counters" (KVM-only), or
+> keep "pmu-num-counters" general so TCG can also use it to override
+> PMCR_EL0.N in reset_pmcr_el0?
 
-RMI_OP_CANCEL never returns RMI_SUCCESS. It returns RMI_INCOMPLETE to 
-trigger any memory reclaim paths. See R-RVLNV and R-GGSTJ
+If it can reasonably easily be implemented (or potentially implemented)
+for TCG, then I guess the general name makes most sense.
 
-> 
-> 	while (RMI_RESULT_STATUS(regs->a0) == RMI_INCOMPLETE)
-> 
-> evaluates to false. This breaks out of the loop and skips the mandatory
-> RMI_OP_CONTINUE calls needed to fully unwind the SRO.
-
-As above.
-
-> 
-> Similarly, in rmi_sro_memxfer_execute(), there is an explicit assertion:
-> 
-> 	if (WARN_ON_ONCE(RMI_RESULT_STATUS(regs->a0) != RMI_INCOMPLETE))
-> 		return ret;
-> 
-> which immediately aborts when rmi_op_cancel() correctly returns RMI_SUCCESS.
-> 
-> Can this leave SRO operations permanently in the CANCELLING state within the
-> RMM, leading to resource leaks and preventing realms from being properly
-> destroyed?
-> 
-> [ ... ]
-> 
->> +static inline long rmi_rtt_data_unmap(unsigned long rd,
->> +				      unsigned long base,
->> +				      unsigned long top,
->> +				      unsigned long flags,
->> +				      unsigned long oaddr,
->> +				      unsigned long *out_top,
->> +				      unsigned long *out_range,
->> +				      unsigned long *out_count)
->> +{
->> +	struct arm_smccc_1_2_regs regs = {
->> +		SMC_RMI_RTT_DATA_UNMAP, rd, base, top, flags, oaddr
->> +	};
->> +	long ret;
->> +
->> +	ret = rmi_sro_execute(&regs);
->> +
->> +	if (ret != RMI_SUCCESS)
->> +		return ret;
->> +
->> +	if (out_top)
->> +		*out_top = regs.a1;
-> 
-> [Severity: Critical]
-> If a range-based RMI SRO executes partially and returns an error (such as
-> RMI_ERROR_INPUT), the architecture specifies that the address of the first
-> unprocessed granule is returned in regs.a1.
-> 
-> Does this wrapper drop the Top progress marker on failure?
-
-This is wrong. If the RMM encounters a failure after partial progress,
-RMI_SUCCESS with partial response is returned. The next call would
-encounter the RMI_ERROR_INPUT. Also see the following known issue in the
-cover-letter:
-
-* Clarify RMI_RTT_DATA_UNMAP, output_count, output_range are only valid 
-when result is RMI_SUCCESS (FENIMORE-1746)
-
-Suzuki
-
-
+-- PMM
