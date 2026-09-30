@@ -1,165 +1,136 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA0C459AC4;
-	Wed, 30 Sep 2026 07:55:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E43C36B907;
+	Wed, 30 Sep 2026 08:17:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790754954; cv=none; b=P5ihpH/GE5ObpJGND37WioO64q52bdXQDfEMJsaB1S2AsM7UNTNRhnl1AHwBiWqiRyR6WvZXT3Bye+Jh+hqkvSNTNsYM3r95nrJ4StQfEwvNa3TpN1Nu6EPQw03VYO2k30g84JYrdIYR9VmrFRKcZIMpz494SdF8ZVR7ULgtn4g=
+	t=1790756231; cv=none; b=DzObGLpvUJyhiH/g5pFS0Ppj8CcVCmAzIwURPJWySVN4eC5q6xar2nlKxcpcAftdF2WpsbRxmw+1Psez91dTUKAzqQBbbpRe6M6Ghot5EmVnu+MdJKJ6rcLpUUMPi2pu56Crr8WPuxCqk98l1+Us8cPdU5Y0Yebbl3QIeXr++o0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790754954; c=relaxed/simple;
-	bh=cwBMrbgvJXrU6jUHOIJVJAfxp+QQ8oRRQFz3Ew/7r2A=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RKYdCOkf0lcN/FqHG5S2YU7zacC3YrwddvsAp5tSjzH82T5J88JyIVpzxqDxAzrUvgdYfXCRMYvsSw3ZB+Y7WWsAyGZi/QRH7uVG+2UVHGBbkrPmoSWarVP/5GsuBuSyWCSUvwqPSK3zL2B07GgA8Yrb3V01z1OjiEt3JDbHLfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PEXWQbhT; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790756231; c=relaxed/simple;
+	bh=GNXZa7j1/VTmq7tnRy/t6ruvY0i6WuGqOi1nPlTRzL8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eGWBAfqNY18OE5pB51vdAxCHozarbQgqGd4AVI5/Ftdtozrp2hCwvCMAijxOnQqBJg9fxXNieLw+cAv5cnc/7gjcc/tFDOEheADnV0teprgCfChXlPyg71iTCS5zEUX5Xtl5LeR1/usCXkgNmjuv8VFm6Zv9MDOMZnMFtv8ng4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=BKFn+Xi7; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PEXWQbhT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 279831F000FF;
-	Wed, 30 Sep 2026 07:55:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790754952;
-	bh=3A83WqLQprn5b6H5t3n4CWTPEwg+k48YSwSUTlBs4Ec=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=PEXWQbhT9MYlJFyvmHMFKYk2atOL8sNTEfJVIz2DUHK/o59vz9qV+cVeNPEyAr5jM
-	 sHK6QTFInakN3Kigofd7hCp9LtzUQxEIA4H3wpdQmb1jlIwRnH/c0PZenVCk8AZHYF
-	 8IIaxypwOmLqaNQ0PZvNoGjVF53cxrXJgVpRz/zbEEc8B5vwallDuPUjvoQ6dI+/pa
-	 WmztZ4eprdfMWauBWD+BKP9vzZqOuRJW775RPtmNOHYRfpkK6AK1OJuj69SJvfiVvA
-	 VeCT//NBjj/ZzGvEyvF7cEMQtJZoE7+ruI2gEPwIlgcTGL//PanIV2uFjLoPuUQosn
-	 NWVeov1TIcMkw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xBpAL-0000000FCJl-38EW;
-	Wed, 30 Sep 2026 07:55:49 +0000
-Date: Wed, 30 Sep 2026 08:55:49 +0100
-Message-ID: <865wzn41h6.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Andreas Grapentin <gra@linux.ibm.com>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-	Oliver Upton <oupton@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v8 16/29] arm64: Share arm64 headers with s390
-In-Reply-To: <20260930072803.664031-A-seiden@linux.ibm.com>
-References: <20260918133107.1042730-1-seiden@linux.ibm.com>
-	<20260918133107.1042730-17-seiden@linux.ibm.com>
-	<arqQ2Eat4VUBbl49@arm.com>
-	<20260928162345.428362-C-seiden@linux.ibm.com>
-	<ars6Jh5DiendDT7G@li-d8547bcc-2d90-11b2-a85c-a70f2a37009a.ibm.com>
-	<arvunF8epgpWh1YT@arm.com>
-	<20260930072803.664031-A-seiden@linux.ibm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="BKFn+Xi7"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1AFC61477;
+	Wed, 30 Sep 2026 01:17:01 -0700 (PDT)
+Received: from [192.168.1.148] (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CAA463F85F;
+	Wed, 30 Sep 2026 01:17:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790756224; bh=GNXZa7j1/VTmq7tnRy/t6ruvY0i6WuGqOi1nPlTRzL8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=BKFn+Xi71PDm13PN8c8mgumEtRVu6FdNVGMRI1NxBTY3+SXllrtsQ3wOiOa9C9yGH
+	 50qcRfxA51AqF4pH++UxpnBh8vGYwXCVwWTAkE001/+beCOgzfLMxE2tz0ga5977lw
+	 wFuOCDVKLSU2T89a1BcDCSroJtJc5QdZ9Gr6OJe0=
+Message-ID: <af49e948-3120-401f-a00d-74c853ee17b9@arm.com>
+Date: Wed, 30 Sep 2026 09:17:00 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, catalin.marinas@arm.com, gra@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, arnd@arndb.de, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, tabba@google.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 6/7] firmware: arm_rmm: Ensure the RMM has GPT entries
+ for memory
+Content-Language: en-GB
+To: Shanker Donthineni <sdonthineni@nvidia.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
+ gshan@redhat.com, joey.gouly@arm.com, tabba@google.com,
+ yuzenghui@huawei.com, linux-coco@lists.linux.dev,
+ gankulkarni@os.amperecomputing.com, alpergun@google.com,
+ fj0570is@fujitsu.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org,
+ enju.kohei@fujitsu.com, sudeep.holla@arm.com,
+ jonathan.cameron@oss.qualcomm.com
+References: <20260924135201.850038-1-suzuki.poulose@arm.com>
+ <20260924135201.850038-7-suzuki.poulose@arm.com>
+ <a27970c6-a7d2-4abc-84c3-7e50225f0a1a@nvidia.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <a27970c6-a7d2-4abc-84c3-7e50225f0a1a@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, 30 Sep 2026 08:28:03 +0100,
-Steffen Eiden <seiden@linux.ibm.com> wrote:
+On 29/09/2026 23:29, Shanker Donthineni wrote:
+> Hi Suzuki,
 > 
-> On Tue, Sep 29, 2026 at 06:00:12PM +0100, Catalin Marinas wrote:
-> > On Tue, Sep 29, 2026 at 06:19:20AM +0200, Andreas Grapentin wrote:
-> > > On Sep 28 26, Steffen Eiden wrote:
-> > > > On Mon, Sep 28, 2026 at 05:07:52PM +0100, Catalin Marinas wrote:
-> > > > > On Fri, Sep 18, 2026 at 03:30:53PM +0200, Steffen Eiden wrote:
-> > > > > > +# Enable all code shared to s390
-> > > > > > +KBUILD_CFLAGS	+= -DARM64_S390_COMMON
-> > > > > > +KBUILD_AFLAGS	+= -DARM64_S390_COMMON
-> > > > > > +KBUILD_CPPFLAGS	+= -DARM64_S390_COMMON
-> > > > > 
-> > > > > Do we actually need these defines? They seem only to be used as markers
-> > > > > for the awk scripts to extract the definitions. Why do we need the C
-> > > > > preprocessor involved at all? Could we not just have comment markers:
-> > > > > 
-> > > > > /* ARM64_S390_COMMON_BEGIN */
-> > > > > ...
-> > > > > /* ARM64_S390_COMMON_END */
-> > > > >
-> > > > No technically we do not need those. They could be useful if we find out
-> > > > that AWK is the wrong tool and move to a C Preprocessor + diff based
-> > > > approach. 
-> > > > 
-> > > > if the ifdev is not closed the compiler will complain, but an 'arm did
-> > > > not destroy us' verifiaction tool ( I will send one soonish) could do
-> > > > the same.
-> > > 
-> > > iirc the last time we discussed this we didn't think that load-bearing
-> > > comments were the right tool here. We also briefly floated the idea of
-> > > using a #pragma region based approach, but in the end we went with the
-> > > #ifdef preprocessor directives instead, as the least invasive
-> > > non-comment marker that was available.
-> > 
-> > The downside is that the macro affects the preprocessed code. We need to
-> > ensure they don't leak in uapi headers for example. Not a fan of this
-> > approach but I don't have a better suggestion either. At least we could
-> > write them as:
-> > 
-> > #if ARM64_S390_COMMON == 1
+> On 9/24/2026 8:52 AM, Suzuki K Poulose wrote:
+>> External email: Use caution opening links or attachments
+>>
+>>
+>> From: Steven Price <steven.price@arm.com>
+>>
+>> The RMM maintains the state of all the granules in the system to make
+>> sure that the host is abiding by the rules. This state can be maintained
+>> at different granularity, per page (TRACKING_FINE) or per region
+>> (TRACKING_COARSE or TRACKING_INTERMEDIATE). The region size depends on 
+>> the
+>> underlying "RMI_GRANULE_SIZE". For a "coarse"/"intermediate" region,
+>> all pages in the region must be of the same state, this implies we 
+>> need to
+>> have "fine" tracking for DRAM, so that we can delegate individual pages.
+>>
+>> For now we only support a statically carved out memory for tracking
+>> granules for the "fine" regions. This can be extended in the future to
+>> allow modifying the tracking granularity and remove the need for a
+>> static allocation by the firmware.
+
+...
+
+>> +
+>> +/*
+>> + * We do not support creating L1 GPTs yet. So, make sure that
+>> + * all the regions are managed by the firmware.
+>> + */
+>> +static int rmi_verify_gpt_firmware_managed(phys_addr_t start, 
+>> phys_addr_t end)
+>> +{
+>> +       unsigned long l0gpt_sz;
+>> +       unsigned long next, par_state;
+>> +
+>> +       l0gpt_sz = 1UL << (30 + FIELD_GET(RMI_FEATURE_REGISTER_1_L0GPTSZ,
+>> +                                         rmi_feat_reg(1)));
+>> +       start = ALIGN_DOWN(start, l0gpt_sz);
+>> +       end = ALIGN(end, l0gpt_sz);
+>> +
+>> +       while (start < end) {
+>> +               long ret = rmi_gpt_info(start, end, &next, &par_state);
+>> +
+>> +               if (ret != RMI_SUCCESS)
+>> +                       return -ENOMEM;
+>> +
+>> +               if (WARN_ON(next <= start))
+>> +                       return -ENXIO;
+>> +
+>> +               if (par_state != RMI_GPT_PAR_PLAT) {
+>> +                       pr_err("GPT for the region is not managed by 
+>> firmware %llx-%lx\n",
+>> +                               start, next);
+>> +                       return -ENOMEM;
 > 
-> This is a great idea and an improvement. Thanks.
+> Accepting only RMI_GPT_PAR_PLAT rules out the host ever creating its own
+> L1 GPTs. On NVIDIA platforms the PARs backing system RAM come up as
+> RMI_GPT_PAR_HOST_NOT_CREATED, so this returns -ENOMEM and CCA cannot be
+> enabled at all.
+
+Like I mentioned in the previous response, this is staged upstreaming.
+The dynamic GPT/Tracking will follow after. This also calls for 
+on-demand activation which Catalin requested and can be combined together,
+as we dedicate quite a lot of memory for the metadata and L1GPTs.
+
+
 > 
-> @Marc: Shall I sent a v9 of this series or do you want to pick v8 and I
-> send this as an improvement once picked?
+> With local changes to promote granule tracking via RMI_GRANULE_TRACKING_SET
+> and to create the host L1 GPTs, I was able to boot a Realm with multiple
+> vCPUs and exercise basic boot functionality on NVIDIA silicon.
 
-Please send a v9. That's invasive enough that it warrants it.
+Thanks for the testing !
 
-> > It would also be useful for the awk scripts look for the paired #endif
-> > rather than relying on the comment at the end of the line. Otherwise
-> > it's not really different from just sticking to comments.
-> > 
-> 
-> Are you suggesting that the AWK scripts should track the #if% and #endif
-> in the code and warn or reject if the marked endif for the shared code
-> does not match pairing with the starting #if? That makes sense yes. I'll
-> investigate and would add this as an improvement later on.
-
-I think the suggestion is to teach the script about the #if/#endif
-nesting, and therefore to not require the trailing comment on #endif
-(i.e. the script acts as a normal cpp).
-
-It should only be a matter of counting the #{if,ifdef}s and #endif
-past the ARM64_S390_COMMON guard.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Cheers
+Suzuki
