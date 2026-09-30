@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EBA452E04E;
-	Wed, 30 Sep 2026 21:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B64F252CCC6;
+	Wed, 30 Sep 2026 21:49:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790804954; cv=none; b=It1sjcdjm0z/mJqoUse50niNlHtYAyUE4E/6IWHzSxJBRUoi4asl0bxoRpG5ysGnrOSCLc3UlNIfYKFWFMmi9vSaYlOHMykaDWt42msbkFf0VoB5YemugcvNyJlfrmZaSta2S84qcK49dfcUJUa04EVCnaKoVcygjTsgDraj5zE=
+	t=1790804958; cv=none; b=Dld1h9Q0YUGg+2JtwjxTleQ+5gruuPFyJsqg8szrAe6P9MeMCkyK48yPh8exYTVS438Ucb7ZG0TLCG/eV/QoXr6i2Ips8MOBESS46vqHfgKl8qKQucxD78m18sZrnIK6GNDb+5Twtx2vZdj90pakOawsO4pZxvZ4V6JaAa9ua7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790804954; c=relaxed/simple;
-	bh=aNoJ3V8nZd2+GGpGyDVqbDlbmnpADLGv/VzgqgiASdI=;
+	s=arc-20240116; t=1790804958; c=relaxed/simple;
+	bh=bBnQDLmdMm1YnC+rDRboHwuSsLquBFG/4uNykMXfTLU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=s8t5QVxr+rQ2DFW6AgSSjgZ1jsdaxdtjVwFfhoSs+KMP7KuZv24Zo4WW7JsxOcaS44oblrs7tYOm6g6wBsqse9PGcE1CC1oENg+ubZPpNJTh8Wv0m8XIIfAY0GpsZ+objbsnPVC4AchEivF8wsbp/zVzTotWWy11mAIgqJQ9ka0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V4RynEcj; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=gA9xreFbCOTP+SS3q4DQ4WB+g4gSinP3hDsrz/H+VzUfuFSkRBkG+uJmEJssCrWUj7sdVIL/7N5Fl85JGRxqZwW0AV1tp2Gx11W6NY3ZAx7n0K9+dW79xT4PHrK6IrY/LifgcniSInjXYVWUC2vR35DVBJY4P0W6incJh4axG6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZD/bGzTd; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V4RynEcj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3E091F000FF;
-	Wed, 30 Sep 2026 21:49:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZD/bGzTd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58BE31F00898;
+	Wed, 30 Sep 2026 21:49:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790804952;
-	bh=dFLnt75MTV/WN//EyOWGqDTK+6P19LegSAMQd0i6wA0=;
+	s=k20260515; t=1790804956;
+	bh=0RFak+FihnONiTiEOAUxLCIOKirVYlhzx9YeUDFVJDk=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=V4RynEcj1NgscFf1Rmry4WY+8F+TmzdpbxNgnCVPngptpncfalTSgs2rWPYlHupox
-	 XrAu28S9nGwLAOQX/DK1V8417eNPdZzFypD2XMUXQrgYFwnCBlgkeD8FwJE1vUwy2H
-	 GJzZueBmQb2oUmTIXJ9K2TB8+S/n45m+fFhfq7uGPVLn5lZzcRKmhV4FREQ2iplTlb
-	 tChlv2GcALcEaHW21fN3Q5EEl3ubIREJKWQmOrlL9EPSu4bc6LCUeFKK6j68CjjnV5
-	 8JlNdrM8sjf7M47oZSzCnKGIVR2BDhm/515dTYOVSTlK1P8fm8JdaFlU2OtcyNKBBn
-	 pCSpjlbWeN87Q==
+	b=ZD/bGzTdv6v1PNnNdFQSLCKIKGjX3DYJnaE9iFCxT2nnwmPFcTrxwTqCxtegvIr5e
+	 A04E6WWP8DAOKxGRBHsz664uDYFutOcb/b6Al2KCfaVxKY9PPUmlscFx04XPmwMpQw
+	 EG0yXIGgg9x4LB++okGpiYzpJ0oGCtwszIOJyp8m+PRyb0nBUWbcQ6dbtbdgYZJU4l
+	 ZrVRYTnaRQlXANish8rhMRRj40Hiczq6pt9Fa7Bte4kwNvXNcxLESOSFxYWCaSxp/C
+	 0FXgSMN/FWcPObu5DTxbZWZe7C3hNNDF4u7mSSI9oZiqgQMC1/QekyEbph55z6g9Wk
+	 p+9Q9NXoIPVdA==
 From: Mark Brown <broonie@kernel.org>
-Date: Wed, 30 Sep 2026 22:48:15 +0100
-Subject: [PATCH v21 05/15] KVM: arm64: Set PSTATE.EXLOCK when entering an
- exception
+Date: Wed, 30 Sep 2026 22:48:16 +0100
+Subject: [PATCH v21 06/15] KVM: arm64: Validate GCS exception lock when
+ emulating ERET
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,7 +38,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260930-arm64-gcs-v21-5-3556644cd927@kernel.org>
+Message-Id: <20260930-arm64-gcs-v21-6-3556644cd927@kernel.org>
 References: <20260930-arm64-gcs-v21-0-3556644cd927@kernel.org>
 In-Reply-To: <20260930-arm64-gcs-v21-0-3556644cd927@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>, 
@@ -53,98 +53,122 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
  linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2795; i=broonie@kernel.org;
- h=from:subject:message-id; bh=aNoJ3V8nZd2+GGpGyDVqbDlbmnpADLGv/VzgqgiASdI=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqvYO3BxMtZg6CNKL6cawCHZ4SM+hDNUqT1FuaX
- +YU+cxcc36JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCar2DtwAKCRAk1otyXVSH
- 0JVLB/wJXVZCHypd/SUA/b8N6mo1O143FlQqywKn9p/iLfCyUgNap6EJOFkMcXEzrxJToKzZO/z
- 8wZjUoMpmSEFpJLVzZD45NFQT03xyXjUJXYXLrphq8ptEI0C5BzLhWErc9qs6vETUs+3+Qkn8s7
- AMbd6NMTu9V8x9bKqUCrbEbBOC17Pny7Lipidd9NX+wnl5CSISVfw4ijwZi49JgAMuEELpA4Vb9
- Vi1QORQM60PHSqnJvU7TJDKpfUyG98GgiZ9sCbEX8HwohL9YUVs5APP10AFRVpN1LX9cgulP0Ol
- 38wEuhoR/6tTOsbb0qrnO8CzYMTYztpgQNVpw/e0umjj6U0/
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3854; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=bBnQDLmdMm1YnC+rDRboHwuSsLquBFG/4uNykMXfTLU=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqvYO4BhrNor4NfGVDZghSRfCcwZSvFZk+reGqp
+ fL8NgZ41iSJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCar2DuAAKCRAk1otyXVSH
+ 0AF/B/0TgqsSBrk0vQJPq3g1ZMqss1vydZqimIRNMTu3o5sZFfy+KdQVwHVja5gnDplQX6cSw6y
+ QawHZwWv21+fBfbw3khP02m4eirPe/IZ7q0SpZpXG5PmwORLdlxbsbb2TWVdfo2LfWjxg33fJ9d
+ sbTskoGsl2nbKk5OzgUzxth/2FZfZOGEaqz1H9c4oUqGfW40WCPmIcUoIIh41gLUtFhUA1xKnxi
+ k12APuqVzfX0Kf6XGu0aWQTsJgf0Zmffuubfdp/SYsfQocwqBaywj0to8rVLnaavMn0KFUskFDI
+ T+QWTD0SOxsZiM10z3ncs6mTb8G2SkCStJ2v2Szmf2L5hi7o
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-As per DDI 0487 R_WTXBY we need to manage PSTATE.EXLOCK when entering an
-exception, when the exception is entered from a lower EL the bit is cleared
-while if entering from the same EL it is set to GCSCR_ELx.EXLOCKEN.
-Implement this behaviour in enter_exception64().
+As per DDI0487 R_TYTWB GCS adds an additional case where an illegal
+exception return can be generated. If all of:
 
-Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
+ - PSTATE.EXLOCK is 0.
+ - The EL is not being changed by the ERET.
+ - GCSCR_ELx.EXLOCKEN is 1.
+
+are true then the return is illegal. Emulate this behaviour when
+emulating ERET for nested guests, while we're at it using the symbolic
+definition for EXLOCK in SPSR.
+
 Reviewed-by: Leonardo Bras <leo.bras@arm.com>
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/include/uapi/asm/ptrace.h |  1 +
- arch/arm64/kvm/hyp/exception.c       | 37 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+)
+ arch/arm64/include/asm/kvm_nested.h | 32 ++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/emulate-nested.c     |  5 ++++-
+ arch/arm64/kvm/hyp/vhe/switch.c     |  4 ++++
+ 3 files changed, 40 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/uapi/asm/ptrace.h b/arch/arm64/include/uapi/asm/ptrace.h
-index 15649a253a57..eed7f1226be6 100644
---- a/arch/arm64/include/uapi/asm/ptrace.h
-+++ b/arch/arm64/include/uapi/asm/ptrace.h
-@@ -56,6 +56,7 @@
- #define PSR_C_BIT	0x20000000
- #define PSR_Z_BIT	0x40000000
- #define PSR_N_BIT	0x80000000
-+#define PSR_EXLOCK_BIT 0x400000000
- 
- #define PSR_BTYPE_SHIFT		10
- 
-diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-index 754e2dc1df54..820849631df9 100644
---- a/arch/arm64/kvm/hyp/exception.c
-+++ b/arch/arm64/kvm/hyp/exception.c
-@@ -49,6 +49,37 @@ static void __vcpu_write_spsr_und(struct kvm_vcpu *vcpu, u64 val)
- 		vcpu->arch.ctxt.spsr_und = val;
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 1ed708335809..9e595e8e7642 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -240,6 +240,38 @@ static inline bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr)
  }
+ #endif
  
-+static bool set_exlock(struct kvm_vcpu *vcpu, unsigned long mode,
-+		       unsigned long target_mode)
++#ifdef CONFIG_ARM64_GCS
++/* See IllegalExceptionReturn() pseudocode */
++static inline bool kvm_check_illegal_exlock_return(struct kvm_vcpu *vcpu,
++						   u64 spsr)
 +{
-+	u64 gcscr;
++	u64 pstate, cur_mode, target_mode;
 +
-+	if (!kvm_has_gcs(kern_hyp_va(vcpu->kvm)))
++	if (!kvm_has_gcs(vcpu->kvm))
 +		return false;
 +
-+	/* GCS can't be enabled for 32 bit */
-+	if (mode & PSR_MODE32_BIT)
++	if (vcpu->arch.ctxt.regs.pstate & PSR_EXLOCK_BIT)
 +		return false;
 +
-+	/* When taking an exception to a higher EL EXLOCK is cleared. */
-+	if ((mode | PSR_MODE_THREAD_BIT) != target_mode)
++	/* Check the EL only, ignore thread mode */
++	pstate = vcpu->arch.ctxt.regs.pstate;
++	cur_mode = (pstate & PSR_MODE_MASK) | PSR_MODE_THREAD_BIT;
++	target_mode = (spsr & PSR_MODE_MASK) | PSR_MODE_THREAD_BIT;
++
++	if (cur_mode != target_mode)
 +		return false;
 +
-+	/*
-+	 * When taking an exception to the same EL EXLOCK is set to
-+	 * the effective value of GCSCR_ELx.EXLOCKEN.
-+	 */
-+	if (is_hyp_ctxt(vcpu))
-+		gcscr = vcpu_read_sys_reg(vcpu, GCSCR_EL2);
-+	else
-+		gcscr = vcpu_read_sys_reg(vcpu, GCSCR_EL1);
-+
-+	if (gcscr & GCSCR_ELx_EXLOCKEN)
-+		return true;
-+
-+	return false;
++	return vcpu_read_sys_reg(vcpu, GCSCR_EL2) & GCSCR_ELx_EXLOCKEN;
 +}
 +
- /*
-  * This performs the exception entry at a given EL (@target_mode), stashing PC
-  * and PSTATE into ELR and SPSR respectively, and compute the new PC/PSTATE.
-@@ -138,6 +169,12 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
- 	// PSTATE.BTYPE is set to zero upon any exception to AArch64
- 	// See ARM DDI 0487E.a, pages D1-2293 to D1-2294.
- 
-+	// PSTATE.EXLOCK is set to 0 upon any exception to a higher
-+	// EL, or to GCSCR_ELx.EXLOCKEN for an exception to the same
-+	// exception level.  See ARM DDI 0487 R_WTXBY.
-+	if (set_exlock(vcpu, mode, target_mode))
-+		new |= PSR_EXLOCK_BIT;
++#else
++static inline bool kvm_check_illegal_exlock_return(struct kvm_vcpu *vcpu,
++						   u64 spsr)
++{
++	return false;
++}
++#endif
 +
- 	new |= PSR_D_BIT;
- 	new |= PSR_A_BIT;
- 	new |= PSR_I_BIT;
+ #define KVM_NV_GUEST_MAP_SZ	(KVM_PGTABLE_PROT_SW1 | KVM_PGTABLE_PROT_SW0)
+ 
+ static inline u64 kvm_encode_nested_level(struct kvm_s2_trans *trans)
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 625604019fb3..5aa26384720a 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -2748,10 +2748,13 @@ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
+ 	 * - trying to return to an illegal M value
+ 	 * - trying to return to a 32bit EL
+ 	 * - trying to return to EL1 with HCR_EL2.TGE set
++	 * - GCSCR_ELx.EXLOCKEN is 1 and PSTATE.EXLOCK is 0 when attempting
++	 *   to return from ELx the same EL.
+ 	 */
+ 	if (mode == PSR_MODE_EL3t   || mode == PSR_MODE_EL3h ||
+ 	    mode == 0b00001         || (mode & BIT(1))       ||
+ 	    (spsr & PSR_MODE32_BIT) ||
++	    kvm_check_illegal_exlock_return(vcpu, spsr) ||
+ 	    (vcpu_el2_tge_is_set(vcpu) && (mode == PSR_MODE_EL1t ||
+ 					   mode == PSR_MODE_EL1h))) {
+ 		u64 mask;
+@@ -2778,7 +2781,7 @@ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
+ 
+ 		mask = PSR_MODE_MASK | PSR_MODE32_BIT;
+ 		if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, GCS, IMP))
+-			mask |= BIT_ULL(34);	/* PSTATE.EXLOCK */
++			mask |= PSR_EXLOCK_BIT;
+ 
+ 		spsr |= *vcpu_cpsr(vcpu) & mask;
+ 		spsr |= PSR_IL_BIT;
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 7875911c0506..af59d1bf51ad 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -383,6 +383,10 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 		return false;
+ 	}
+ 
++	/* Push GCS exception lock failures into the slow path */
++	if (kvm_check_illegal_exlock_return(vcpu, spsr))
++		return false;
++
+ 	/* If ERETAx fails, take the slow path */
+ 	if (esr_iss_is_eretax(esr)) {
+ 		if (!(vcpu_has_ptrauth(vcpu) && kvm_auth_eretax(vcpu, &elr)))
 
 -- 
 2.47.3
