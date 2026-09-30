@@ -1,103 +1,69 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2303E4F5E0E
-	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 15:44:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3FD21C84A2;
+	Wed, 30 Sep 2026 15:52:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790783066; cv=none; b=e7zIIAk3t4yX8aD50QDTB+sDm7P+CaQ8ZPZW+8vpSzA6K2EsWPrwSOon6AuOoKaAUs/+sFeXryLYobPYHunzsuWli6dabDCw+8Hgk70x/dPPrjPDJduJcRFhOv843+A4S3oPeoaYkTsgQFzmyeJ4khGxrLCnYhptkt+Ao/zwn3A=
+	t=1790783532; cv=none; b=GbU4tGfB2sKkMxyq/PigPVxkYFfY2YBinMVnN/2gwffhhOMMh3llzYWm+qDa30GbcvMqzNyH4K56NaUNrm6NC5YkNu0BqrWtoE0NgvEwcte0jW6ok6vdmTDWZQdXVq5tlVVWgxmQM8shFh+wBNs64PegMJHTbMIgsBQ/2WKbxII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790783066; c=relaxed/simple;
-	bh=n2w0f2BUpWFG6UBWcHupqkdiNXU0uKV812nFX28fzow=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=eBaxQLuLrUBP4OJ2oHP5mwEwLBccFvSs2zwHBWFpmnm4robMXxcqDLJoQ/HS7h6UeoPelkEUiXphcVUeXalPLXeyCnQr9axINdsH9ylZhrJE3drrKvQTOO+08QRjVlhXWa+bGbaurUUobCUAX/gjXh55QJkUVY2EpeC1okjz1/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QFCAmkOV; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790783532; c=relaxed/simple;
+	bh=extdkEulctGCgO2FHv6ak30k/drcOE/SZVDLQoZy8hI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D6TYYv3AzMNWTmxMgNFXAQwlJaFLuD+jGIub7vSX5KEcwJULqRg3mQ6hC4xkcmHijXj1R8WC4qT/FwtDDWKobM58khVe4S3Jd72SqCZLEokfbkcs5neKfrTQEc4YpG7WlTxn+aEVjwIdS6j0SpxQCgVXbH3/yITxS6xHcO21kaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=IEvD+ATK; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QFCAmkOV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7CC21F000FF;
-	Wed, 30 Sep 2026 15:44:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790783057;
-	bh=FMzUWP/gHY//zU7ZFHJo2aaa46I8A9yWFF2zm9QMAdM=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=QFCAmkOVTGbbZV8pwyEGmS0NoEkbQhzPHLrykeI53xihLtoraqla48y5lQkc11Gm4
-	 MPX/lTdBCWMj09+J3S8VwsSPgczx4xc2yF4h7AXSdj3X7pltqX14KP+TQBRa8tp5L6
-	 KSI93KlPi2AFMjSUeqion1RShp627DAZEj7a6hIMAoV6TG9NDY7B5Oc6/rKRSDeV4E
-	 Q75iVfFu7QAQBxyePlVZxM4kTMb8XOrlIiY5Q9PrEWkVU/yRGfvXJLNXuLEtC+QKxS
-	 apTVSDz2wGbAuwfxQMDgj8MRHQLCJmSzUFL06cBSbywHj9fCfaBl2F3sXkrg3bNpLJ
-	 rh7c5nUcg2B/w==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 3/4] tracing/remotes: Add
- REMOTE_EVENT_CUSTOM_PRINTK() helper
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Vincent Donnefort" <vdonnefort@google.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20260930153505.2144559-4-vdonnefort@google.com>
-References: <20260930153505.2144559-1-vdonnefort@google.com>
- <20260930153505.2144559-4-vdonnefort@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 30 Sep 2026 15:44:16 +0000
-Message-Id: <20260930154416.C7CC21F000FF@smtp.kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="IEvD+ATK"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 96D6F497;
+	Wed, 30 Sep 2026 08:52:02 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 381783F86F;
+	Wed, 30 Sep 2026 08:52:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790783526; bh=extdkEulctGCgO2FHv6ak30k/drcOE/SZVDLQoZy8hI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IEvD+ATKXF9d0sdMTwmIQ3m3lKlBJW7Iol3YRJYx4IFZW298KVvqcvV/+g9cEv7zm
+	 yk3KvnDWzo7Sw8uYR7yfKzY51SINwDJW1hlhnOV5dscxRtw8KJ7Hm3dS4UYth7rGyf
+	 wYB8VggKOOJZazD+/Qh8R9gYXUSG6q91BUHifJVI=
+Date: Wed, 30 Sep 2026 16:51:57 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+	will@kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+	sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
+Subject: Re: [PATCH v20 8/9] firmware: arm_rmm: Add wrappers for Realm
+ related RMI commands
+Message-ID: <ar0v1lOT7OW1KkGo@arm.com>
+References: <20260929221623.1342076-1-suzuki.poulose@arm.com>
+ <20260929221623.1342076-9-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260929221623.1342076-9-suzuki.poulose@arm.com>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] tracing/remotes: invalid unquoted print fmt string breaks libtra=
-ceevent
---
+On Tue, Sep 29, 2026 at 11:16:22PM +0100, Suzuki K Poulose wrote:
+> From: Steven Price <steven.price@arm.com>
+> 
+> Introduce wrappers for the RMI functions needed for creating and
+> managing realm guests. This will be used by the KVM to manage the
+> Realms
+> 
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-commit c1fe85ccb9998d0f07df828f87f45a8f874da608
-Author: Vincent Donnefort <vdonnefort@google.com>
-
-tracing/remotes: Add REMOTE_EVENT_CUSTOM_PRINTK() helper
-
-The current REMOTE_EVENT() takes as a __printk argument a string format
-and a list of arguments. Add a REMOTE_EVENT_CUSTOM_PRINTK() where the
-__printk argument can be a function. This intends to support the creation
-of a "printk" event for the arm64 nVHE/pKVM hypervisor with a dynamic
-prototype and by extension a dynamic print format.
-
-> diff --git a/include/trace/define_remote_events.h b/include/trace/define_=
-remote_events.h
-> index 676e803dc144d..4f4d58e37b84b 100644
-> --- a/include/trace/define_remote_events.h
-> +++ b/include/trace/define_remote_events.h
-
-[ ... ]
-
-> @@ -70,4 +79,8 @@ do {											\
->  		.print_fmt	=3D remote_event_print_fmt_##__name,			\
->  		.print		=3D remote_event_print_##__name,				\
->  	}
-> +
-> +#define REMOTE_EVENT_CUSTOM_PRINTK(__name, __id, __struct, __printk)			\
-> +	REMOTE_EVENT(__name, __id, RE_STRUCT(__struct), "Unknown")
-
-[Severity: Medium]
-Does this unquoted print fmt string break libtraceevent parsing?
-
-This macro assigns the literal "Unknown" directly to the event's print_fmt
-field. The tracefs format file outputs this field directly, which results in
-print fmt: Unknown instead of the expected print fmt: "Unknown".
-
-The standard libtraceevent parser expects the format string to be enclosed
-in double quotes. Encountering an unquoted string causes it to be misparsed
-as a field variable (which does not exist) rather than a literal string,
-preventing userspace tools like perf and trace-cmd from parsing the event
-format correctly.
-
-Should this be escaped as "\"Unknown\"" to preserve UAPI formatting
-expectations?
-
-> +
->  #include REMOTE_EVENT_INCLUDE(REMOTE_EVENT_INCLUDE_FILE)
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260930153505.2144=
-559-1-vdonnefort@google.com?part=3D3
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
