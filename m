@@ -1,56 +1,56 @@
-Received: from mta0.migadu.com (out-157.mta0.migadu.com [91.218.175.157])
+Received: from mta1.migadu.com (out-119.mta1.migadu.com [95.215.58.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 960504D9575
-	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 13:26:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D554CC63A
+	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 13:34:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790774803; cv=none; b=JRSZ5wBXlyZ/4CE9QYCqGuctF38fo1e7Foj0Yz2CSMzjbKbt0v4HHGAw0Ze+tQmvLKp8eFEpQ6oqnJ60fe0XuPJ7T0qSzyDWhtg0S6ORPxn6xRmG29DEk81ePJzp5VcthaCULmo0U8uPkieW1ZiWzDOqD7Vxr+zFdevs2n6GTUw=
+	t=1790775272; cv=none; b=i96ztgT+5ogY5HNCz3rkNMh099gae8OUTOhah5dNaf/tLj3Dan7pwFBsC5T0ZtBbeFfIpHPt8Xtf+XcX4bTn6kHliDmL2hswKi0I4+RKwNGpv060J0zj7oPku+tgQg6tZREiwmOCOFIPjo4FoLrzPKpHTb3cYTptu8rBmNloLQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790774803; c=relaxed/simple;
-	bh=lxx1cBwC6h3Ltn5Ta3Dy4dQZzezMDhmC3HIMM3DY5eA=;
+	s=arc-20240116; t=1790775272; c=relaxed/simple;
+	bh=dN7iIkrg2M+jf5Tj2Vy0WrS/Nd7WiyAkyWWbyMwdKQo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dckXU4ahgYVEHHH4IFDxUuPqZ78/BrtdPSnoS5iGdZz/ZmWQeo9ohRAEM8Fm7oYNa8/zzdFEizhcAf3ZaYU/SU0UfpANVAPM0ABc4pkqwxrzqmWEs6RNWRIcZO6J088tDhjDqpRPQx5Qy3BiITAUTL8+iZP0DmsMoz42igI26rk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eNhRDTHv; arc=none smtp.client-ip=91.218.175.157
+	 To:Cc:Content-Type; b=ftiQAoauceFf2NAYIei1mEJ1fBtfa0MyKckfRv6GyEH7lm75qEde5mCqBwQ/WkZiZgEcihOHXEpqGatBYRJpc57pqI4Cqd255Vb3ZdONtONl8s5dvh2eWnzwZIHU3WUPOytuQLYYShJWbkQXkGjGEfmSA2fDEcMCeI6LDhZ4FyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Shgzquwo; arc=none smtp.client-ip=95.215.58.119
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eNhRDTHv"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Shgzquwo"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=lxx1cBwC6h3Ltn5Ta3Dy4dQZzezMDhmC3HIMM3DY5eA=;
+DKIM-Signature: a=rsa-sha256; bh=dN7iIkrg2M+jf5Tj2Vy0WrS/Nd7WiyAkyWWbyMwdKQo=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790774786; v=1; x=1791379586;
- b=eNhRDTHv+FJ4ECTeEXiv0zavlKvsP2ZQ11JCqLVvMW3ULImJPnvU0mvQ20q4mujnykeTzpZ7
- Pnp79qvFlallyyEJwi0u4dyUOV4YlT3BlUuT7wOdcd/WbPgU6srumyDsBl6+eF+o2fULqHZ4EiG
- EDiWSn6S0/VBT/zTyFOrrmqA=
+ t=1790775260; v=1; x=1791380060;
+ b=Shgzquwokc5/rGOxQdywbmDJeloIc7EbuWEKKs3/3LIyfoQCi5LC3dgoLP6MYq5m2aEpUk9B
+ qirRmomOTKqxGoZOuVc8KNxbzVY8cu+ndyumXh13IHh3EiHN3st+IWkiZoLVxm6oANyELUnKzTk
+ sjlUwtaEBVO4tJ2loao2AHbY=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 202c3d1405de6b66;
-	Wed, 30 Sep 2026 13:26:26 +0000
-X-Mizu-Trace-ID: 202c3d1405de6b66
+Received: by smtp.migadu.com with ESMTPS id 1454421c7059c8a3;
+	Wed, 30 Sep 2026 13:34:20 +0000
+X-Mizu-Trace-ID: 1454421c7059c8a3
 X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5ba4065fa07so973e87.0
-        for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 06:26:26 -0700 (PDT)
-X-Gm-Message-State: AFq9FYKhPH7UG/cTwCi+fQD529tsPXr0nIwjV11f9Snm+uRp25DWYs3m
-	hFEkwoQwfwR1hUmHkWSJAxT/wEVF/39mRy5L9VCvLvxdoNYAqkMTz9vqlgUOpq6EpXuQ7N+q7ML
-	i8ujtKy66eI96ZmUZ7Me6tbMV5mZ3I7DV4z1Gg8qc
-X-Received: by 2002:a05:6512:1195:b0:5b8:b502:9a76 with SMTP id
- 2adb3069b0e04-5ba3f6f3408mr83956e87.13.1790774785500; Wed, 30 Sep 2026
- 06:26:25 -0700 (PDT)
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5ba3d1ea20cso1132e87.0
+        for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 06:34:16 -0700 (PDT)
+X-Gm-Message-State: AFq9FYIUy57YeVTEKYFbfs0PXUgnVSGfKzDApVbnhXl9j0NWP6j6isFc
+	bdQ9KOoNYZoqbyqBWZc1gUSjbtT/+qKpBNTc+FjV4cZqKjfqB85lB3rqFgVktuPjktJmv+vSDdS
+	E1FB5N+zwAArO05ovN2v6wqYvwuXs5fUe5CjgQzKr
+X-Received: by 2002:a05:6512:12d1:b0:5b2:a967:c0e1 with SMTP id
+ 2adb3069b0e04-5ba3f6d7e5fmr77593e87.0.1790775255802; Wed, 30 Sep 2026
+ 06:34:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260929212925.31775-1-oupton@kernel.org>
-In-Reply-To: <20260929212925.31775-1-oupton@kernel.org>
+References: <20260929212925.31775-1-oupton@kernel.org> <20260929212925.31775-2-oupton@kernel.org>
+In-Reply-To: <20260929212925.31775-2-oupton@kernel.org>
 From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 30 Sep 2026 14:25:48 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxzhjEhOWGG6MgaOLE=SnUf3ehs+0H6x9ivX8DOWWNYWQ@mail.gmail.com>
-X-Gm-Features: AclHuK_ZEx3tjeWUeBLg9d5fuRBugRA_iNCzZwXyqsEympPqUw62klsbc4nEo7w
-Message-ID: <CA+EHjTxzhjEhOWGG6MgaOLE=SnUf3ehs+0H6x9ivX8DOWWNYWQ@mail.gmail.com>
-Subject: Re: [PATCH 0/4] KVM: arm64: vgic: Stop migrating IRQ from vgic_prune_ap_list()
+Date: Wed, 30 Sep 2026 14:33:39 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTzjnJGXNZFLFKEv0QTCPA=-+zbiqArLPn0DnekzTLgVSA@mail.gmail.com>
+X-Gm-Features: AclHuK9OdjQrdOGNR-0ecHL1vfChY5nIiN5ci0GNgWKucq05y1exXxSSPTfBarM
+Message-ID: <CA+EHjTzjnJGXNZFLFKEv0QTCPA=-+zbiqArLPn0DnekzTLgVSA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] KVM: arm64: Add helpers to halt a vCPU
 To: Oliver Upton <oupton@kernel.org>
 Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
@@ -59,48 +59,23 @@ Content-Type: text/plain; charset="UTF-8"
 
 Hi Oliver,
 
-On Tue, 29 Sept 2026 at 22:29, Oliver Upton <oupton@kernel.org> wrote:
+On Tue, 29 Sep 2026 22:29:22 +0100, Oliver Upton <oupton@kernel.org> wrote:
 [...]
-> Marc, this series applies on top of your own for LPI malice [1]. You'll
-> note that I've taken some of it for 7.3 while leaving the rest for you
-> to take in 7.4, I'm perfectly happy with Patch 3 and 4 getting squashed
-> into the corresponding bits of your own series if you prefer.
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+[...]
+> +void kvm_pause_vcpu(struct kvm_vcpu *vcpu)
+> +{
+> +        atomic_inc(&vcpu->arch.pause);
+> +        kvm_make_request_and_kick(KVM_REQ_SLEEP, vcpu);
+> +}
 
-My Tested-by on the applied patches went out with a stray space in the
-address, so they didn't get applied.
-
-Sorry about that.
+Could this wait like kvm_arm_halt_guest() does? The halt sends an IPI
+to any vCPU that isn't OUTSIDE_GUEST_MODE, but this only sends one if
+its own cmpxchg takes the vCPU out of IN_GUEST_MODE. After an earlier
+kick the vCPU can still have its LRs loaded when this returns. A
+scratch test moving a pending LPI back and forth with MOVI hits the
+WARN_ON(irq->on_lr) in vgic_v3_compute_lr(), and doesn't once this
+waits.
 
 Cheers,
 /fuad
-
-
-
-> Tested semi-rigorously on an Altra machine and the Orion board, using
-> both real guests and an LLM-generated selftest specific for migrating
-> pending LPIs. The latter was way too big to make sense of, I'll try and
-> post a test if I can it into something tidy.
->
-> [1]: https://lore.kernel.org/kvmarm/20260929093548.3598547-1-maz@kernel.org/
->
-> Oliver Upton (4):
->   KVM: arm64: Add helpers to halt a vCPU
->   KVM: arm64: vgic: Move IRQ migrations out of vgic_prune_ap_list()
->   KVM: arm64: vgic-v3: Only pause the targeted vCPU when disabling LPIs
->   KVM: arm64: vgic-v3: Pause the source vCPU when processing MOVALL cmd
->
->  arch/arm64/include/asm/kvm_host.h  |   2 +
->  arch/arm64/kvm/arm.c               |  18 ++-
->  arch/arm64/kvm/vgic/vgic-its.c     |  19 ++-
->  arch/arm64/kvm/vgic/vgic-mmio-v2.c |  11 +-
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c |  18 ++-
->  arch/arm64/kvm/vgic/vgic.c         | 184 +++++++++++++++++------------
->  arch/arm64/kvm/vgic/vgic.h         |  24 ++++
->  include/kvm/arm_vgic.h             |   1 +
->  8 files changed, 164 insertions(+), 113 deletions(-)
->
->
-> base-commit: cfaf3b76669d386912a91103671691692f81c316
-> --
-> 2.47.3
->
