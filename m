@@ -1,124 +1,182 @@
-Received: from mail-yx2-f38.google.com (mail-yx2-f38.google.com [74.125.224.166])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE842AEEB
-	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 11:35:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.166
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790768116; cv=pass; b=Zr20IjBA4l7hP8lPLTbiwgP2MIDUBm3qxLEMoho1NXJltMEiMjGuSN7rlXkiqQm9MckttDlSJufUxJQoek9nKt58eTHX8M7aMi8AF3FkhmiGYLTylcgjLEwz1x8ET2pnTQL4JvVnnCa7P74wui3wZKcGiOJLDVSPRa0HU5Tsug4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790768116; c=relaxed/simple;
-	bh=SeY6Z1jmk7ymRLBox8aezw1ZLI+jut6EQpLQBAspM3Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J8kY9dtMW8c+AaBXMrwRRLHFzjf+78AD9qnqILMmpgxe+bi11Io9I8wmot0UZT9Lo1KdDF4iSyeI6HVjQBxDPP1ZxNzq1zruL1Z0TKJfFdk/sZgrz0jMmSch8TZUpkDLJOPi8zudEgEtCiTTKfbdJWDOf+oPyjk6eL65mxypx5M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CgT7RmeG; arc=pass smtp.client-ip=74.125.224.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A4B23E410D
+	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 12:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790770915; cv=none; b=ewvsuTIKabe16ZIs3sanIJRb6TWxkegNau1oe8J65TYoeq3hHxrtGT9TDXb42IujdNqK4PepYILhPqHLmfwIOwq8weEVL/DkAwBAoE80SIHrvopPrG+EehoKoOZUSF7qnGXucvteH25oI2BykplYRiC1crMzwahIkb9f1MnttaE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790770915; c=relaxed/simple;
+	bh=esZ9I1R2d4eGNBAf4nkCzm3T23UfWjGyfq/9qby2hPA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=R8i61/AN18t+aArZHy9iHHO4OFYnWsBORXO2ozAgcQZrZxDrJVpoP3BYDKz+IPfBFgOHpBXFQMpakDEbkvtoM+UIyOG8uKOo2RzBDQG3kSeV91FJPr8vnJwF8aLyHtW1VZlZKUgLJ/KoWf+QoKc5snoaYgxD/8Ffd5pm1qR+7Tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RUL/62yV; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CgT7RmeG"
-Received: by mail-yx2-f38.google.com with SMTP id 00721157ae682-8ac47074e38so2681617b3.1
-        for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 04:35:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790768114; cv=none;
-        d=google.com; s=arc-20260327;
-        b=Dqg/vO0Ihcb7cd0QNovYjFdbmleqMHKnMlGfRvAH+0fvjCHssXh0NJq0qq7W0sJMcb
-         WVh1IdlDth6BX3FB39VZz0p4sIUBIDmmGacBCv2aBNq7DedWVCBWYuPi3tw4C7HYKjoQ
-         kpjb2RnUJGi4O99/WcMdDb9oIKq9btxweTjnEPn6i0fI+48LZjK2ym07FHVpYQr8E5kW
-         z95VFAMlMlgPl17+KkQJBWH/C5nXEQBwgsCQh5RyZo7/Sp6wSZhW88GJ/KLUKsLuNiNB
-         wtfzYN0S3+6QrrOaIMimdwesSn/ZBmFc2gSS3ku4mmIZVIRLe36fk/sQghnVpH8yNjOV
-         RqcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=SeY6Z1jmk7ymRLBox8aezw1ZLI+jut6EQpLQBAspM3Y=;
-        fh=qC2zI3EtmVc+YB98pA1e6rK/pIWZeseBh8OWQpfD7Tw=;
-        b=gyPn0R5g4js3yMCYCB2WAoRGRZykpFHKhWLmw8Y98U2cTt2nYZ/z/4dL3JWgwtPK9y
-         58POqVQDbqj82n1vp1bo70bUH/HZXyfjfl9bZ6dq9zqFWYBgeVd5SjFjl2yGtr0DtksQ
-         JlRHLlBNLHYngYSbiHpYxOa+k8cPMPdmohjUtPJoNmxPm/teCo/TOOEQ+AYt0xZsoNKf
-         yITkKqBnPfTlWVIOfr4ru3fPmC6vjnzzN1d/eJnvQ45jZv9WpkeoQzok0WdO4h1Jrt1F
-         2m1LyxBJoIQvIL/3EWX7+VC0EfUHa1WxGfIkrsq89mK9JBi+87yNBply4XqJUr2s5YHF
-         bdJQ==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1790768114; x=1791372914; darn=lists.linux.dev;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=SeY6Z1jmk7ymRLBox8aezw1ZLI+jut6EQpLQBAspM3Y=;
-        b=CgT7RmeGTy0r6r/FfAZmtq2HHszOt2HcVMdBuiH0ycrOepxwSNPKQk1FNSJbvtFAoD
-         p5paAGHK1OmLk/1XDwWjKEj593Twf0Fzvg5BubXqGuK/WyVEaHZn6JDdBL0MHmfpRpoS
-         vzoXlsKSQHSEAWjQuJbVRVuR1v6AVLrHrLdwvBxdyIkuE+2lA4nIQ5BOnobaunW2wN9J
-         WcLGvyfm8YPBoZMDnoyqHH2aT8bJN/2V0bYRjyT4c0aAMt9Vbmpl22e1xdXw+qGVUccS
-         dXHuIcvPsVju+oG03u9S7NVtq0X2hw0jGQFpAaJeHBowvE4YpKcb+iDZWQlH3QNlYHJS
-         43sA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790768114; x=1791372914;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=SeY6Z1jmk7ymRLBox8aezw1ZLI+jut6EQpLQBAspM3Y=;
-        b=CvCPA75lVdT3J5XHvyb6QFTzLQCwncKi1PRJyYkDEhhrnouoQg868sAj/Dv/TQxD8n
-         Z9Vfrdni786BjXOxsm/qjnXt7G70Qwpm9W5Y5mwXS1vryXC1BUSKXDgTao3WeZIdu4+M
-         a3TcIevfDbCJ6YcylGMJm3P6HB19mUaRhZhwGHiAgi1Z1/cJFKsM0ZvaG3Ud+qvyEKXi
-         fhIv7yird34l00KaMv6ncJUj6ydsgBAUtiHiP1eKxtulLB3eIKd1fVv/L8kCClVmlHMO
-         L8T6pPiZqqY5IWu3eagXJvwj8aorwCLQoqA9QSbJMJC75zbxW0DgnFO3vrbGJUPZQhfR
-         gGyw==
-X-Forwarded-Encrypted: i=1; AKwUvBzwnQWIoly90+Rwem6jwRIDdagbzeBR1wisfScaLA1NaZIElcBJre+4GCqzzkphuNzudRQogBs=@lists.linux.dev
-X-Gm-Message-State: AFq9FYKEJw4uSVn5/ZtJ779gT06HUbA1ofI8zxcjwyheLf/hrCopi4KC
-	XKNe/H48h2xRvq7gBiKe7szd7MSALXxajZUGA1a4KTK0BJWkLHjC8H+krB3t4j3FoCayIF3f6E+
-	fjIpekz0udNWnooaATG6bOERkPVE6Kf/JKdzFTogOWQ==
-X-Gm-Gg: AYBFou1KgkEm5aT1Xa+9CY0nh+dEGxg+N5TOgTov9Xa2v7YDJBqKTUUor2IUJ1uzaff
-	8tUueKLPzzhDbHpYoJgsFtrmqr1nObZ9bN6bJWZ7OvfksNbnOcGOV9aTXtc88HGiSDPSstr3aVo
-	1skl4wDw2XJfD4ChxHr5jY3OhNhIcI984XwZFAasHTUNnJJ/ZU1BzBDuOH1bwSmDiK4zDnn2Bhq
-	0ECVTLKns3TXqQ9KOmqtaV1QDTp8YBziHhgRvec5O19lO4+JLNU5fo3iF6+qJ4FwM/q6We8tqzP
-	HqoHoZXQjJOz7h6rw61XaFWGA5seXIUxKlp9dJdjdnLeN3zes/OPZaDOHOebl7bd/BDXTGhBI5z
-	FS0cSR1Dscz+7Lik4RYPQpFgTozE8tUG/z7QZuMI=
-X-Received: by 2002:a05:690c:ec3:b0:885:cf67:95dd with SMTP id
- 00721157ae682-8ac97909b55mr3191337b3.31.1790768114223; Wed, 30 Sep 2026
- 04:35:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RUL/62yV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1F871F00893;
+	Wed, 30 Sep 2026 12:21:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790770913;
+	bh=wbnq+E++cImxNLsHc1xBt+/AJpyKloWUAjUGIfft+Uw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=RUL/62yVZtFdGN5Ebnz10BC0cO9q87LtOYTXztxig2qcgS2rV7uKQnP89B731dDPl
+	 /iC5MiDm69ELaZlIzZqN/BKEeGAEN+KWsHwOFq02yfczZ2Y+mxa8WbI8oXZprwqz89
+	 rEGt3HndQEAc8mhEVz8DGZFbPAjE0fFbTA9pZ9LVTSTZP/PWFA9nV1pfU+tm3DZxXc
+	 9DK0nFeRyc6FGCxZxqSApSWMeBPtew6ZCDh99zcJiMJlk2I/6rq2wZOPYUnNlaqNUK
+	 yJcVCWyTAPm+o5XlcIiElMC75I982yBdqgtpjgwF542o58RY41ksy4miknPoihdFa5
+	 9c9M71Jklsk6g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xBtJn-0000000FJ5O-2v6B;
+	Wed, 30 Sep 2026 12:21:51 +0000
+Date: Wed, 30 Sep 2026 13:21:51 +0100
+Message-ID: <861pab3p5s.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Yuchao Zhang <ndaugoing@gmail.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v1 2/2] KVM: arm64: selftests: Add an ITS MOVALL test
+In-Reply-To: <e6bf4bc51a311df19866a0ee3e27970846257b70.1790708299.git.fuad.tabba@linux.dev>
+References: <20260929093548.3598547-1-maz@kernel.org>
+	<cover.1790708299.git.fuad.tabba@linux.dev>
+	<e6bf4bc51a311df19866a0ee3e27970846257b70.1790708299.git.fuad.tabba@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260924172928.2110956-1-coltonlewis@google.com>
- <20260924173051.2117637-1-coltonlewis@google.com> <CAFEAcA9Rwrffx8bYiOxrtQGdg31QAz1oBm8okzpfqHZ6yK0Y7A@mail.gmail.com>
- <20260929212102.3659389-1-coltonlewis@google.com>
-In-Reply-To: <20260929212102.3659389-1-coltonlewis@google.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 30 Sep 2026 12:35:02 +0100
-X-Gm-Features: AclHuK8bFLv0KvzZpr3GNRdEy1zBXYO_hECfn1oR1UjooEwhow1ZvPDksGAca58
-Message-ID: <CAFEAcA9DYo3GW_59eZjsk1qL0--3amYd7ufPqt80O2qv=Qm_pw@mail.gmail.com>
-Subject: Re: [PATCH] target/arm: Enable KVM PMU partitioning and counter limit
-To: Colton Lewis <coltonlewis@google.com>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvmarm@lists.linux.dev, 
-	Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Will Deacon <will@kernel.org>, James Clark <james.clark@linaro.org>, 
-	Mingwei Zhang <mizhang@google.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, ndaugoing@gmail.com, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 29 Sept 2026 at 22:21, Colton Lewis <coltonlewis@google.com> wrote:
->
-> Hi Peter,
->
-> Thanks for reviewing!
->
-> On Mon, Sep 28, 2026 at 03:01:32PM +0100, Peter Maydell wrote:
-> > What should we do with these properties if we're not using KVM
-> > (i.e. for TCG, hvf, etc) ?
->
-> PMU partitioning is specific to KVM, so moving it into
-> kvm_arm_add_vcpu_properties() (which is only called when kvm_enabled())
-> and naming it "kvm-pmu-partition" per the KVM VCPU Features convention
-> in docs/system/arm/cpu-features.rst seems to make the most sense.
->
-> For the counter limit property, would you prefer that it also live in
-> kvm_arm_add_vcpu_properties() as "kvm-pmu-num-counters" (KVM-only), or
-> keep "pmu-num-counters" general so TCG can also use it to override
-> PMCR_EL0.N in reset_pmcr_el0?
+On Tue, 29 Sep 2026 20:04:52 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> 
+> Map LPI A to vCPU0's collection and LPI B to vCPU1's, remap vCPU0's
+> collection to vCPU2 and MOVALL vCPU0's LPIs there, then inject both. A
+> must be taken on vCPU2 and B on vCPU1. KVM's MAPC handling already moves
+> A to vCPU2, so only MOVALL handling can move B: without "KVM: arm64:
+> vgic-its: Fix MOVALL handling of source redistributor", it moves B to
+> vCPU2 as well.
 
-If it can reasonably easily be implemented (or potentially implemented)
-for TCG, then I guess the general name makes most sense.
+MOVALL is about moving the pending bits (see 5.3.13 in the IHI0069H.b
+spec).  Doing MOVALL first and only then injecting the interrupts
+doesn't quite check the MOVALL requirement. That doesn't impact KVM
+itself (we don't use pending tables at all), but you probably don't
+want to hardcode implementation specific behaviours here.
 
--- PMM
+> 
+> Assisted-by: LLM
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+>  .../selftests/kvm/arm64/vgic_its_movall.c     | 341 ++++++++++++++++++
+>  2 files changed, 342 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/arm64/vgic_its_movall.c
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+> index 908bdc7cf4f58..fb0bc99242975 100644
+> --- a/tools/testing/selftests/kvm/Makefile.kvm
+> +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> @@ -190,6 +190,7 @@ TEST_GEN_PROGS_arm64 += arm64/stage2_block_transitions
+>  TEST_GEN_PROGS_arm64 += arm64/vcpu_width_config
+>  TEST_GEN_PROGS_arm64 += arm64/vgic_init
+>  TEST_GEN_PROGS_arm64 += arm64/vgic_irq
+> +TEST_GEN_PROGS_arm64 += arm64/vgic_its_movall
+>  TEST_GEN_PROGS_arm64 += arm64/vgic_its_save
+>  TEST_GEN_PROGS_arm64 += arm64/vgic_lpi_stress
+>  TEST_GEN_PROGS_arm64 += arm64/vgic_v5
+> diff --git a/tools/testing/selftests/kvm/arm64/vgic_its_movall.c b/tools/testing/selftests/kvm/arm64/vgic_its_movall.c
+> new file mode 100644
+> index 0000000000000..41918576bdf63
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/arm64/vgic_its_movall.c
+> @@ -0,0 +1,341 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * vgic_its_movall - MOVALL does not move the LPIs of other redistributors.
+> + *
+> + * Two LPIs, A and B, target two different redistributors. A's collection is
+> + * remapped to a third redistributor with MAPC, followed by MOVALL from the
+> + * first redistributor to the third. Both LPIs are then injected. A must be
+> + * taken on the third redistributor, and B must stay on its own, which is not
+> + * MOVALL's source.
+> + *
+> + * Copyright (c) 2026 Google LLC
+> + * Author: Fuad Tabba <fuad.tabba@linux.dev>
+> + */
+> +
+> +#include <linux/sizes.h>
+> +#include <pthread.h>
+> +#include <stdatomic.h>
+> +
+> +#include "kvm_util.h"
+> +#include "gic.h"
+> +#include "gic_v3.h"
+> +#include "gic_v3_its.h"
+> +#include "processor.h"
+> +#include "ucall.h"
+> +#include "vgic.h"
+> +
+> +#define TEST_MEMSLOT_INDEX	1
+> +
+> +#define GIC_LPI_OFFSET		8192
+> +#define NR_VCPUS		3
+> +#define NR_LPIS			2
+> +#define DEVICE_ID		0
+> +
+> +/* LPI A (event 0) starts on vCPU0 and moves to vCPU2; B (event 1) stays on vCPU1 */
+> +#define LPI_A_COLL		0
+> +#define LPI_B_COLL		1
+> +#define MOVALL_FROM		0
+> +#define MOVALL_TO		2
+> +#define LPI_B_VCPU		1
+> +
+> +#define LPI_PROP_DEFAULT_PRIO	0xa0
+> +
+> +static gpa_t gpa_base;
+> +
+> +static struct kvm_vm *vm;
+> +static struct kvm_vcpu *vcpus[NR_VCPUS];
+> +static int its_fd;
+> +
+> +static struct test_data {
+> +	bool		request_vcpus_stop;
+> +
+> +	gpa_t		device_table;
+> +	gpa_t		collection_table;
+> +	gpa_t		cmdq_base;
+> +	void		*cmdq_base_va;
+> +	gpa_t		itt_table;
+> +
+> +	gpa_t		lpi_prop_table;
+> +	gpa_t		lpi_pend_tables;
+> +} test_data;
+
+There seem to be a lot of commonality with the existing
+vgic_lpi_stress test.  I'd rather we make this test the container for
+most ITS-related tests, instead of coming up with new individual
+tests.
+
+Thanks,
+
+	N,
+
+-- 
+Without deviation from the norm, progress is not possible.
