@@ -1,105 +1,227 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9672C51B182
-	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 17:23:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD63351FCA3
+	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 17:35:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790789025; cv=none; b=NbH4Bh7sz3fEIfIAPO9vQFmQ0RzqtQiSeVEZSzrEAXkU4Tv+GBuYPOScTJI/3o5fN+/i421HNDX0kMnRZFGdyiYf4FqDq9fqbzPU0Dv1ewZThrICQQPlUIoY3BayRrvsVm/oV8BwxRcY3Apeq7gDLqmn5fmAOACpsVdwg9twAW4=
+	t=1790789705; cv=none; b=YBnvYVccKuEwGSNo3iOPYQ5vL/vtEyCz8SgYjKi09RItQu6iP9wvkxz8FqlyhOja7IRUdqQ4qc5qCXdG5d4RS89oh/K42+SLdYeKd3BG4YUJq5SiMcsb0+rOPm395x4nIX9Qva7IqFsTJXllw4nAXkJPf3aAhv51sJmX1Jg3oU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790789025; c=relaxed/simple;
-	bh=Hl+8S3N2mqoCQjLHJajTSd+0DIMoIu1+UBhREoQ7E5E=;
+	s=arc-20240116; t=1790789705; c=relaxed/simple;
+	bh=VJLvBmoGaiO2DPEj5Ki5mtnYK7RD0RLOEtV1h9jvYcY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fDr9czOi6IoIx4YVJVUQLi9ZgxfYZqTyi09Qnw6/daBop8Ax/RT0X13KtktyoepnuyN6pWVxr+RB7jCNiKYmH0aGw/j2fDRweGcYXwX3dDUclefdjvr0IaQgaiqEdrO1tb4PBxbZrpUUblQTo/ZWJQBcWNCarlK4FHAf93lDPhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=A0J2Ev4z; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 MIME-Version; b=BAzgGLytoYeA4LOoOUC1Pl6tKA3x+RMhpfl9M8G/WFAqYsNk7OM5898ZoeKToK8zeT3jERqTNPpMj/2QpCUv8uPA9/vRYXWPk9O/o/xYJb4j4anJRPKIMSy/XTLLhjPvinLrJzM/J3uREb/xGxtcoPAkDTURzONa50+863Ojv2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ICHO1pKj; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="A0J2Ev4z"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 904551596;
-	Wed, 30 Sep 2026 10:23:40 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1C33C3F86F;
-	Wed, 30 Sep 2026 10:23:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790789024; bh=Hl+8S3N2mqoCQjLHJajTSd+0DIMoIu1+UBhREoQ7E5E=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=A0J2Ev4zxOvmeICuM6sr2SP/MNQJJAzkgT+mHgYrRrAM0xjPkd/j3G4KgK+8CWqOL
-	 jpODEMDtc4lxLc1kvAIUYNLR3OGi4d7rwN1p2r+Qr2dVIF5v0+ygyVo/a2HtTKGmgY
-	 yWVbrXH4eclnM6BEJE9zo36al3QFL8HSr2j7YRmU=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Leonardo Bras <leo.bras@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 3/3] KVM: arm64: Make stage2_split_walker() skip unnecessary walks
-Date: Wed, 30 Sep 2026 18:22:23 +0100
-Message-ID: <20260930172226.2459423-5-leo.bras@arm.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260930172226.2459423-2-leo.bras@arm.com>
-References: <20260930172226.2459423-2-leo.bras@arm.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ICHO1pKj"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68UE5vIw3167177;
+	Wed, 30 Sep 2026 17:34:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pp1; bh=ihC3cLkRFCy3VMN0Y
+	OVT+1xOka210qaHcOn3v4ow/tc=; b=ICHO1pKjJC7gEdxraLGcR14qNoGmbs5oA
+	DwluL+z/wFUJa3QkOnAFA4f6sVAHOBmz3Tcpw4Nuzh+4j5NVzJ25MwllZI4OyXJe
+	692nc4/LQNy3HZGWZOChsKIIkw9CN/2bC9qAY0gNvWC7ZYEmz/ThR28Bj2CZveAO
+	/69n7uJKEzJ7+eGvgZmIUGBugJcaURea01R8Shqy/kns4Frkp9rDjP6MsaMlCeFn
+	d1s1jfnfZzW9EJ81SgsFowwJkgBXntIFw63z64uwtUIqPSnepJOaM0Tyq5aRnRv6
+	3mr/J5BYG/A6ldkUoPItEh4kC78HoWIM7FmeyqIOxaUsEDeJ5ZIYw==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gx5ptdj60-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 30 Sep 2026 17:34:48 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68UEHwJ73569222;
+	Wed, 30 Sep 2026 17:34:48 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4h0xcsa66e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 30 Sep 2026 17:34:48 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68UHYiFq15991178
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 30 Sep 2026 17:34:44 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3869A20049;
+	Wed, 30 Sep 2026 17:34:44 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D8A492005A;
+	Wed, 30 Sep 2026 17:34:43 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 30 Sep 2026 17:34:43 +0000 (GMT)
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v9 06/24] arm64: sysreg: Convert SPSR_ELx to automatic register generation
+Date: Wed, 30 Sep 2026 19:34:21 +0200
+Message-ID: <20260930173441.66762-7-seiden@linux.ibm.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260930173441.66762-1-seiden@linux.ibm.com>
+References: <20260930173441.66762-1-seiden@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1489; i=leo.bras@arm.com; h=from:subject; bh=Hl+8S3N2mqoCQjLHJajTSd+0DIMoIu1+UBhREoQ7E5E=; b=owGbwMvMwCX2pizjszvTwvWMp9WSGLL2uvqpX3YSb36wrWWSz+clXRLKsrEP3wU7Vp60fr4oN ehKaY5KRykLgxgXg6yYIovso/mreL5PyThy5ccCmDmsTCBDGLg4BWAi9QWMDEctfK7M+Mjfahge ps2/a0Vk0fw5flv3/InYPGdS4+e+5ysY/gcrXC6PvXsqKeCtstDvLUc0y5/Mr1S+1/jl+wwh5d0 PN/IBAA==
-X-Developer-Key: i=leo.bras@arm.com; a=openpgp; fpr=36E6C95AE0F111CC5B6F4D2E688C33F8A0C5B0C5
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-ORIG-GUID: k9F2T8FcywoYCR2wRgMveNwcjR4TRNJ-
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTMwMDA2OCBTYWx0ZWRfXzIgZteHUORgK
+ b1DldQwfDAYANapQ1Jtvp3MYKSZaoyzORBVlvxbkBuXNNzYoJgROvc1Cr+HKtub/JXjcZq7brbG
+ r36LaD92sLuE7p5z9pGN83KBI7P4yTjKyspy3K7DM7N04uwc1c6LRFCxPnhX4myq1XynYiXqOPF
+ b2tTffBB1un3q/Pt+EXMB96yxJWl/YhuWvoMmwS7y9ioZ8n/XU7dMmexP3qdascGDJJTpbbaNOn
+ eZtNcQNsynS7eoKDDaE5o/vMgQn4/QsciFLfCTuPWcX8YY5G1GMSnid2FboFc9tMvazPSDqUmNI
+ IW6VAYgi4RPq1mrJZXWALqOezgGwOTu595DSLAfXYs+tEJO/Q9Vm36uuAqmg4UJxIThE0+vTmb4
+ h0kma3gclBmtpe5TGZKcRlweObFAEjAB058rt7uJjUIWmYmzs3CLQmFUULMWklWnDDIBJQZdMsO
+ QRQzZoR+rga8pLhLnjw==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTMwMDA2OCBTYWx0ZWRfX+BHDjJirDX3X
+ j63YcmboUMzt2lMnSfv2XwZVR/EiJQHGXtat5Q3/qsuMzZv7sBbKwcM12/YpXsSMrnJ+soivHgS
+ BiDSFTwee4yBEUgdsSc+IelH6mtClQY=
+X-Authority-Analysis: v=2.4 cv=EY5d0/mC c=1 sm=1 tr=0 ts=6abd4839 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
+ a=RzCfie-kr_QcCd8fBx8p:22 a=7CQSdrXTAAAA:8 a=VnNF1IyMAAAA:8
+ a=qAnUzrOnmDNqMeXR4cMA:9 a=a-qgeE7W1pNrGK8U0ZQC:22
+X-Proofpoint-GUID: B5fYK2fGV5ZYFD3BwqrcJpPxiHE4avfw
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-30_03,2026-09-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 priorityscore=1501 suspectscore=0 adultscore=0 clxscore=1015
+ malwarescore=0 impostorscore=0 spamscore=0 lowpriorityscore=0 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609300068
 
-Currently, when splitting, all the child nodes will be walked, with the
-walker just returning earlier if there is nothing to do. This means all
-pagetable entries in the splitting range get a callback from the walker
-function, even if it was a level-3 entry.
+Convert SPSR_EL{1, 2, 12} to automatic register generation as per
+DDI0601.
 
-Optimize splitting by skipping all level-3 entries, as they are already the
-smallest block size and can't be split any further.
-(i.e. set flag KVM_PGTABLE_WALK_SKIP_LEVEL3)
+No functional change.
 
-Signed-off-by: Leonardo Bras <leo.bras@arm.com>
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/arm64/kvm/hyp/pgtable.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/sysreg.h |  3 --
+ arch/arm64/tools/sysreg         | 51 +++++++++++++++++++++++++++++++++
+ 2 files changed, 51 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 80744478c810..f75cb666a103 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1565,21 +1565,22 @@ static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 	new = kvm_init_table_pte(childp, mm_ops);
- 	stage2_make_pte(ctx, new);
- 	return 0;
- }
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 4bfdac9401bd..1aa601c95188 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -295,7 +295,6 @@
+ #define SYS_APGAKEYLO_EL1		sys_reg(3, 0, 2, 3, 0)
+ #define SYS_APGAKEYHI_EL1		sys_reg(3, 0, 2, 3, 1)
  
- int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 			     struct kvm_mmu_memory_cache *mc)
- {
- 	struct kvm_pgtable_walker walker = {
- 		.cb	= stage2_split_walker,
--		.flags	= KVM_PGTABLE_WALK_LEAF,
-+		.flags	= KVM_PGTABLE_WALK_LEAF |
-+			  KVM_PGTABLE_WALK_SKIP_LEVEL3,
- 		.arg	= mc,
- 	};
- 	int ret;
+-#define SYS_SPSR_EL1			sys_reg(3, 0, 4, 0, 0)
+ #define SYS_ELR_EL1			sys_reg(3, 0, 4, 0, 1)
  
- 	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
- 	dsb(ishst);
- 	return ret;
- }
+ #define SYS_ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
+@@ -518,7 +517,6 @@
+ #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
  
- int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+ #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
+-#define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
+ #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
+ #define SYS_SP_EL1			sys_reg(3, 4, 4, 1, 0)
+ #define SYS_SPSR_irq			sys_reg(3, 4, 4, 3, 0)
+@@ -604,7 +602,6 @@
+ #define SYS_BRBCR_EL12			sys_reg(2, 5, 9, 0, 0)
+ #define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
+ #define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
+-#define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
+ #define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
+ #define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
+ #define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index e2d37ee221b8..893b5f9df575 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -401,6 +401,57 @@ Res0	3:1
+ Field	0	SO
+ EndSysreg
+ 
++SysregFields	SPSR_ELx
++Res0	63:37
++Field	36	UINJ
++Field	35	PACM
++Field	34	EXLOCK
++Res0	33
++Field	32	PM
++Field	31	N
++Field	30	Z
++Field	29	C
++Field	28	V
++Res0	27:26
++Field	25	TCO
++Field	24	DIT
++Field	23	UAO
++Field	22	PAN
++Field	21	SS
++Field	20	IL
++Res0	19:14
++Field	13	ALLINT
++Field	12	SSBS
++Field	11:10	BTYPE
++Field	9	D
++Field	8	A
++Field	7	I
++Field	6	F
++Res0	5
++Field	4	M4
++Enum	3:0	M
++	0b0000	EL0
++	0b0100	EL1t
++	0b0101	EL1h
++	0b1000	EL2t
++	0b1001	EL2h
++	0b1100	EL3t
++	0b1101	EL3h
++EndEnum
++EndSysregFields
++
++Sysreg	SPSR_EL1	3	0	4	0	0
++Fields	SPSR_ELx
++EndSysreg
++
++Sysreg	SPSR_EL2	3	4	4	0	0
++Fields	SPSR_ELx
++EndSysreg
++
++Sysreg	SPSR_EL12	3	5	4	0	0
++Mapping	SPSR_EL1
++EndSysreg
++
+ Sysreg ID_PFR0_EL1	3	0	0	1	0
+ Res0	63:32
+ UnsignedEnum	31:28	RAS
 -- 
-2.55.0
+2.53.0
 
