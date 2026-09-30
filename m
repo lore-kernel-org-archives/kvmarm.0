@@ -1,73 +1,73 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 153B94F85C5
-	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 15:08:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0AF74EDCAF
+	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 15:11:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790780913; cv=none; b=aG0tFFkkzjj2YawPA1GbIHss2VOTe6Id1QQi412ICFYUMPxcAyJPXpnDMQ2IXSsDxf1NIjScVs1YBu6U9C7rK/Y0KPzDJ5Hb3L0G9s7uajyRa3ubTJq8DDMAx3uxuEavvp28pbUVPD4nO7bjikwUltRBzLpCuSRPJ8GcjArAWnU=
+	t=1790781103; cv=none; b=gx/MwqHaueZWQB255ScgpO8Oc8u4ssJm8T5bzrYJocMMrdyDOFm7UZY2taB9tABRsjeI1YNcfcERK7B9+kRDcgLLQZ4DKVYxU/MlP/4kGNRaAHwj20C6FY9luSqhEBJyYvwepZN9ifZAeL5+wKyVMcrMXNNDNQ4K2ANoafR3GEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790780913; c=relaxed/simple;
-	bh=pTqrQFkAmhNA6M1rsaOwKmxx6/dEPTFtcacQf6zer8M=;
+	s=arc-20240116; t=1790781103; c=relaxed/simple;
+	bh=YkqY5uptDFb5jMRAWYG2uoG8eSMzL0l9ljw5EgjUHeI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r2o+MjzDXdmVUDnAcBLRe5RpOEko81sSPVIPDZWbLDJ8fZik9jz17LwvwEbR9qilrPRmLmagBWIQSgtNM5s+OlO7dONPhqyB4mLcLUeK/6KKSBJW5utOZH3gr5H9aorcDJSwYWGoqVlwX/W4s+ZK6HOaA4NGndmQrsP4eZ12ffY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NPXvbOhe; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=pKmqmAGNDdL9pOTkXCcMenox9pWD9mtSxZwI4zxBgcjJqlJqlGNfvzIycphlLPXZ+L+vjFclrr3GiuZykuW3Vm+meHIkQ2ZMybLLJJnIbR3oLKUtY0TttAD8ahy+8K/BTRCZPwK+jfAYFi7qTQE3SpKp7kI/SncGcT17oouHs1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LegREHjG; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NPXvbOhe"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LegREHjG"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1790780896;
+	s=mimecast20190719; t=1790781090;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Ns+huMlBjpBINTzATYtJG6y2085LhnRydQuWQ6U4h1s=;
-	b=NPXvbOheyZuwEOxnbmK9GXgDbpf0dI13D1fGzQJhDB4qAXG7W7R4JPCul2gmVkfyISAKBw
-	YxMqMt865+k+iBx1XrsIVQ63T7AsN0VLeaTNiIRNkF8c0s6r1EexUrocqCGLgFLIdK7TDh
-	nQgJS72pw62JZyzgQ/+vapf1li/9Vlc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=7wSWouChO3YJdVcdwVjl9u7Qj6YLaKikGf1NY1itGlY=;
+	b=LegREHjGwZGvz/pBbt5W9oDrYzBSGyCks/u5W7nUPiABYoGkSdWRlaRoruppeDLUChDE43
+	qQ28qfSs7FAXpiT+qmMSJDs46ulmwSa3LYkHEoE9GDcb0sPXGjYOGt2mE2N+YAMwTWSe1m
+	Sr/138DfmAVi710tFHixUOroTel3MoM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-688-KtYLvSSQOee5UKWwDsgetw-1; Wed, 30 Sep 2026 11:08:15 -0400
-X-MC-Unique: KtYLvSSQOee5UKWwDsgetw-1
-X-Mimecast-MFC-AGG-ID: KtYLvSSQOee5UKWwDsgetw_1790780894
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-49e65bee41aso18073315e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 08:08:14 -0700 (PDT)
+ us-mta-479-UPBfv8MUM_yJTFukKw7MsQ-1; Wed, 30 Sep 2026 11:11:29 -0400
+X-MC-Unique: UPBfv8MUM_yJTFukKw7MsQ-1
+X-Mimecast-MFC-AGG-ID: UPBfv8MUM_yJTFukKw7MsQ_1790781088
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-49fff093efcso51457955e9.1
+        for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 08:11:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790780894; x=1791385694;
+        d=1e100.net; s=20260707; t=1790781088; x=1791385888;
         h=content-transfer-encoding:content-type:in-reply-to:from:references
          :cc:to:content-language:subject:reply-to:user-agent:mime-version
          :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=Ns+huMlBjpBINTzATYtJG6y2085LhnRydQuWQ6U4h1s=;
-        b=keEKScVhj++QcAGt0Y6qhvwftfZDuetlQNajQq/hm3eu2LWzxOhScPRegKfRejXqgy
-         Ci9KqVgmzrtY3aFUH5tmykcNw4cdMdf/L35HF7whuVGPCW2mjvoKOqGe4B3UwnExTnLP
-         qIVNteywEJtu8u+mjZn7O0q3IY7XM5L8BUv6tyx6weoDXlRseFbUd19LjOzdRcGc5PpC
-         oQkWkbkBex2lYHFouZiJOycDo0+x7+ii/gn9BkmgkS3i6BVDwFap8O27v4Wp/zudiWsf
-         B2Rs+aSlTOocRXCZOZsyYmD8NsCowHyYZXNZQkfau8daf2z7xGzC/yv7saTKDyM9J/FD
-         G0Wg==
-X-Forwarded-Encrypted: i=1; AKwUvBzK78s1D6Rl4s1CF3RvvV9jGNm30tRoJTxAhhvbQbGbnz6WhX54b5MADTkyEbYjYy9SPtvlblk=@lists.linux.dev
-X-Gm-Message-State: AFuF++kBh3NLjEmtJIBCPocEvnAePcUZSMItr3NCfO4FNCuqSEvx0hO/
-	lsXTrdbaYhFuQwXzf99U7l1Rw/JTOEEYCu8SAXoyq4VvKR/VnsoSE1VWjIsTO/KHksIwYpsWP1o
-	PEAzU6/FoJzdzViMCjUo138rsYMwym3CXlB5WzYcvOlviRMj5pKFuTuRBaQ==
-X-Gm-Gg: AYBFou2fu0UhtLrXpBqo7g7Vrh7+2uSKOazNirDqzKypqBmUCnTuCgffygbRl7iSaN+
-	T4cve7t8RDGJjq5BHA31im+f9oWSfSiuEN9biRUCjeIQmLYTSfba0QupfECjGXW/uNrGglAAw+T
-	pPKglq2FIN4EDmxPebJR8D8EYqI3xOgdlIa2A387BSJQiQ6IhgQscxZgf0VdIZPhcB9dUvec19b
-	GmmbYSv8/85GdeuTkO+Ih8j7gS+wA/RsEyvjC2pxHtqgU4ACw4oGnTQWcyIVtKU/Am297wOGuCL
-	5cAj5c+fiYHGA7wgBTt7KLTBiIbalEpeONJ1MbsypIZ/Zvqbp57XITSA53vF590UnWuEoSnkoKg
-	Plt8/j93Ch1yk4cYSZTVR3MgPGPwrvwcJAwNCfCDSgcYzBK0D
-X-Received: by 2002:a05:600d:82c4:b0:49c:e37e:4389 with SMTP id 5b1f17b1804b1-4a01b188e38mr32968415e9.4.1790780893288;
-        Wed, 30 Sep 2026 08:08:13 -0700 (PDT)
-X-Received: by 2002:a05:600d:82c4:b0:49c:e37e:4389 with SMTP id 5b1f17b1804b1-4a01b188e38mr32967005e9.4.1790780892124;
-        Wed, 30 Sep 2026 08:08:12 -0700 (PDT)
+        bh=7wSWouChO3YJdVcdwVjl9u7Qj6YLaKikGf1NY1itGlY=;
+        b=XV2jTu0q8AM8EDtKQusHcBu1Q7sRRHtY3pnIJpcPCSoG/3gBM/kJcbjhccgUFM7rW3
+         Pr7QmrxsvLO4D5g6G+VJsXWmXlxszG5j7a1fkI0SYJjuz2nuARyOBsFgedow31Y4TreZ
+         ILcietDiuo36xx17zSM0c/nTGYkCAsH+7nQ87gxUJDN0qKGARNmoJXHacVDVPDCWn8Bt
+         dzVFgRVw6j87s+K9zaLT6HuU9gZCjkmBqhJUTTt24vz/Wou81s0vhjgp9h0owRE2gD/b
+         QhUDn64VVKD+uLXKZdkJlA7Y/plEUYaJWDrUrbDQFBZicIJ3e8hfY63j4PlBM8xZKJ4X
+         R6Og==
+X-Forwarded-Encrypted: i=1; AKwUvBzaoZ/loh36AYFjguDsWxp8SPrZ97BjeDtGID/kQVG/aQGLkDSyqPzSROqSXATz+gKHOyq7/pE=@lists.linux.dev
+X-Gm-Message-State: AFuF++nrN7AmTDM2G2J+paiYq621hUA2zKTHULa5272wKfinNA/K493J
+	YzHJJ3rRvz1J+21GloRd4/eCoM3L7Ozx0ZX79VAe/PT0eSxkmHm7xi8Gd8obdxfvj/iu3/bXdm8
+	qSoX4FlZ9EMpKVk0r0Jjzl+gQjd2cb2Rvxpqdsz8Pn6OR2nMvicOAjiMQYQ==
+X-Gm-Gg: AYBFou2ngt9msytpk2+sUp+OtGazfZdXmcVNGDLPMsBIXQ4rS+bpj5ZjobQQgXoJ94/
+	hm86W2BX3pMtr4L2M6MKwv1kKqVl4fyEEMF0oqEtBUGE2VEr3UpBzDOwSQ/eexqatShP3E1dt6w
+	CudgXw2NTfZlJJdZ99xHaMHdj8NVKUALjTWxdJmiB+OVs8orCcjeUpuDhb+5NCbpkKwJVsvePj6
+	y804NgKwj77Cdtjo/AN1peaXqEJZDBVpDFWnp5SIpnAnAhFZDfDAyHlFSaSCqQ7Vh/5libK4K1K
+	tbwUisd11WgWvrW49mbc9uuhBBy/XXoICgr9IHeeftiaHj1TRjkUWMW2FKtqSFvUmxrLG5+RQTu
+	N0e6GFRKWEBgkNhxBg6JASOSRKiYkq/TthCWumU3IVz6DYaDW
+X-Received: by 2002:a05:600c:3111:b0:49f:bc28:e8bc with SMTP id 5b1f17b1804b1-4a01afe731dmr31701715e9.17.1790781088248;
+        Wed, 30 Sep 2026 08:11:28 -0700 (PDT)
+X-Received: by 2002:a05:600c:3111:b0:49f:bc28:e8bc with SMTP id 5b1f17b1804b1-4a01afe731dmr31701265e9.17.1790781087824;
+        Wed, 30 Sep 2026 08:11:27 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a01cd6cd2bsm10750735e9.4.2026.09.30.08.08.10
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a01e66b39csm4907525e9.15.2026.09.30.08.11.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Sep 2026 08:08:11 -0700 (PDT)
-Message-ID: <bd747536-c8eb-4c21-a859-ac1f2a28794f@redhat.com>
-Date: Wed, 30 Sep 2026 17:08:09 +0200
+        Wed, 30 Sep 2026 08:11:27 -0700 (PDT)
+Message-ID: <f7e35493-02a4-4aa6-ac37-8d37369fa4e7@redhat.com>
+Date: Wed, 30 Sep 2026 17:11:25 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -104,13 +104,13 @@ References: <20260916144721.751810-1-eric.auger@redhat.com>
 From: Eric Auger <eric.auger@redhat.com>
 In-Reply-To: <8F110441-6D38-4134-9196-76AFA021250F@nutanix.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: KpvcoxftF6ZChxwYPwL6qdHY779OJx8Hn9Mq-x-WAJ4_1790780894
+X-Mimecast-MFC-PROC-ID: PrndyPtS_OJc4RzdWxEiKi6FLbss-5nfr_bZRKY1sWY_1790781088
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi Khushit,
+
 
 On 9/28/26 12:44 PM, Khushit Shah wrote:
 >
@@ -129,16 +129,6 @@ On 9/28/26 12:44 PM, Khushit Shah wrote:
 >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > With this, I suppose, what named models will do is directly write to
 > ID register state, As it also defines state which affects vCPU init flags also.
-That's not what I had in mind. I thought you would apply the SYSREG
-settings at the same time. As mentionned, I don't think those settings
-are meant to substitute to legacy composite options that affect vcpu
-init settings.
-Besides the principle of this preparatory series is that the props for
-writable ID reg fields are meant to be fully reusable for named vcpu
-models. Only props for non writable fields should be specific to named
-vcpu models as they do not make sense on host/max vcpu model
-
-
 >
 >> ---
 >> target/arm/kvm.c        | 65 +++++++++++++++++++++++++++++++++++++++++
@@ -206,7 +196,6 @@ vcpu models as they do not make sense on host/max vcpu model
 >> +        kvm_reg.addr = (uintptr_t)&idregs[reg_idx];
 >> +
 > We can ignore this if value == old value
-sure, modified
 >
 >> +        ret = ioctl(cs->kvm_fd, KVM_SET_ONE_REG, &kvm_reg);
 >> +        if (ret) {
@@ -235,14 +224,12 @@ sure, modified
 >> +    }
 >> +
 > This should also happen on vCPU reset.
-On which path is it needed? on qmp system_reset I can see that the
-former values applied with SYSREG settings are kept.
-
-Thanks
-
-Eric
 >
 > Overall, I like this approach as if the user does not provide any property overrides, it should behave the same as older builds.
+to me the risky part if the initialization of all cpu->isar.idregs[]
+from host which can have side effects like the CLDIR_EL1 story.
+
+Eric
 >
 > Warm Regards,
 > Khushit
