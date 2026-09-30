@@ -1,44 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C48573CAA3A
-	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 22:05:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8A1A4D8D93
+	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 22:14:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790805952; cv=none; b=d25ZoprHxGbnYsAN/m3wnSGxzRh3CaKTrCrRc0W4FUORBXdsixc/+Jnbr/Xq88lFM8Bbj+scRmNf46vj8BHcfu3wW/YsD3bz01sNsFl+mrLOEPv548oqQxYUzHbOWnY2XlLyb8RI+9NAx9fZcUsqEPDhAGb0rYsUiwORjMnwGgA=
+	t=1790806472; cv=none; b=HrcwYZ7AncvVKqXEQ8kN2y4wBjhkOiDu3VPxmyLX2+PsTQ88uMo0Ko4cRIIyWQGJsw6oF2ubVkZ1KJwViHmNVZQw5uvLYqj1fFTBcyAI4IhTQzUVOFIHzoeT+xTqwpwRVfxpTVfjm1v71Z10CbhwVVWv42KEYV1IPvz6k4yhoH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790805952; c=relaxed/simple;
-	bh=37jaK42kR4hlKDVjcN1QZbGI9p7Cr726ukexTJmO+4k=;
+	s=arc-20240116; t=1790806472; c=relaxed/simple;
+	bh=DD2ChJDZgs8K9aSaGOYPMda61mrpTtplqwFwDl6UiVQ=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=pTZqy1ntiER4W0wNAzsLZxMF3tQi3cTPrWvdKMUIfv8pZj7R+Fii1B1/cEyyWTDubcgCRP9C6cOjE3Wb3Q8HqXMYc6FSw6FgEx3f22HbVAG+qgfO9u8uTUbgjGnwokP76MTQ4a3Zqfu12PvVTVyrSdl3+aqwhQKeNMkiIRrYqZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ai3ninsT; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=T6Ob+d0qKr6m1Q+CYcbFFSqNQ24PyqhUyHtGoDB1MwwvtyFTEp92U1fdNwwut7AfyqlD1lJqz1BuJBGHjAQZjksM4itlLjro5xhxrxekTsAW5QLsV4y1pCcvTO1wkbqbpLOKgOGvdm/jpjEQu9Gefkz7msUq6xT4/PQK7uEoYbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FhMljKDI; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ai3ninsT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 014471F000FF;
-	Wed, 30 Sep 2026 22:05:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FhMljKDI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A7291F000FF;
+	Wed, 30 Sep 2026 22:14:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790805951;
-	bh=+dAXqnbG3ZkwSaLzTvCaXYGAD5/KCPFVviy+E8ULsEk=;
+	s=k20260515; t=1790806470;
+	bh=cctNTqKtVUYy6+6vzwwagGb9rbHgKyqcWT9g12HXSbQ=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Ai3ninsTWWad2n0RGT8j0oO58N26epWblmPU53qIpivvkW6a5x/eSqu8GS59P4NPI
-	 VeQsK0SkjG04kbQ9b0CQt6yUOQ88SW6J3dMOqOpRGJj0T0GYznB6Rhs73UOEpEYHZI
-	 HomjM7RaaLfNhrgK3XImHKjTV+xpMkD4uFmCfJRcVZkBUemacRsvL2w6pFGXcHUAcW
-	 IdTqUGfFdMtOP4+KDj9hm3F2R+ab6NWTs+kf6lw8dpRTMKEc2XycHCW9mFDLuSyLm7
-	 FDHTiYoe610IWxtgNtcApzjLoKXsSbRGfQFUUOctBNqyjyxoj+po0E3ZQPMkKytkVa
-	 G4KGSkWnkz7mA==
+	b=FhMljKDIFoBibaGt0b6a/vM1a0jD61C+O6jQiv8wPzQUYCrET1PoaoWbYjYiIlOHt
+	 0Ok7kIptNCdRU1kJQMdk9UVyCcqJ/FCibNKz9dKrgYXCwXl+uuoEpo/6Jul4pI6FrK
+	 2LHM6DWn/fYzzDUY0ReYkXGwqv++xClswnSTlI+QpG/gnPqXXrP35X18HDtwcDe/Cb
+	 IX5tDnL7x9fX1RFhYtNpZ4eWlcok83Cg/pGWt8ORJ/XvFQLBtXD9CO/MXkNnXIl6qP
+	 aqzL/nWEOLirlaNjccEI3qSotNAcUYXqZqZgRaPs8SVfUcKbQEfwx1hboocmIcPw2a
+	 WKc4xUujcTN/g==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v21 02/15] KVM: arm64: Refuse to start a guest with
- S1PIE or S1POE but not TCR2
+Subject: Re: [PATCH v21 14/15] tools: Synchronise the kernel esr.h
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Mark Brown" <broonie@kernel.org>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20260930-arm64-gcs-v21-2-3556644cd927@kernel.org>
+Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20260930-arm64-gcs-v21-14-3556644cd927@kernel.org>
 References: <20260930-arm64-gcs-v21-0-3556644cd927@kernel.org>
- <20260930-arm64-gcs-v21-2-3556644cd927@kernel.org>
+ <20260930-arm64-gcs-v21-14-3556644cd927@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 30 Sep 2026 22:05:50 +0000
-Message-Id: <20260930220551.014471F000FF@smtp.kernel.org>
+Date: Wed, 30 Sep 2026 22:14:29 +0000
+Message-Id: <20260930221430.3A7291F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,61 +46,54 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Critical] kvm: arm64: TOCTOU race bypasses S1PIE/TCR2 ID register valida=
-tion
+- [Medium] tools: incorrect mapping of ESR_ELx_FSC_ADDRSZ_nL for level -1
 --
 
-commit ecf3602b27fe0cb6f8ce76b1a8c6698e3dee08f4
+commit 29c713adc7b9f4531e116d3021bff33ab6d602a4
 Author: Mark Brown <broonie@kernel.org>
 
-KVM: arm64: Refuse to start a guest with S1PIE or S1POE but not TCR2
+tools: Synchronise the kernel esr.h
 
-This commit adds validation to reject starting a guest with FEAT_S1PIE or
-FEAT_S1POE enabled if FEAT_TCR2 is disabled, as the hypervisor requires
-TCR2 to properly context-switch these registers.
+This commit synchronizes the tools version of the arm64 esr.h header with
+the main kernel header to pick up definitions for GCS.
 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 44aae52c473d7..3ae293798b270 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-
+> diff --git a/tools/arch/arm64/include/asm/esr.h b/tools/arch/arm64/includ=
+e/asm/esr.h
+> index f3c6403e5ef2b..24c6ebe3fd416 100644
+> --- a/tools/arch/arm64/include/asm/esr.h
+> +++ b/tools/arch/arm64/include/asm/esr.h
 [ ... ]
-
-> @@ -5928,6 +5946,9 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
->  		kvm_vgic_finalize_idregs(kvm);
->  	}
-> =20
-> +	if (!kvm_validate_id_regs(vcpu->kvm))
-> +		return -EINVAL;
+> @@ -119,6 +123,16 @@
+>  #define ESR_ELx_FSC_SEA_TTW(n)	(0x14 + (n))
+>  #define ESR_ELx_FSC_SECC	(0x18)
+>  #define ESR_ELx_FSC_SECC_TTW(n)	(0x1c + (n))
+> +#define ESR_ELx_FSC_EXCL_ATOMIC	(0x35)
+> +#define ESR_ELx_FSC_ADDRSZ	(0x00)
 > +
+> +/*
+> + * Annoyingly, the negative levels for Address size faults aren't laid o=
+ut
+> + * contiguously (or in the desired order)
+> + */
+> +#define ESR_ELx_FSC_ADDRSZ_nL(n)	((n) =3D=3D -1 ? 0x25 : 0x2C)
 
-[Severity: Critical]
-Does this introduce a Time-Of-Check to Time-Of-Use (TOCTOU) regression
-that bypasses the S1PIE/TCR2 ID register check?
+[Severity: Medium]
+Does this ESR_ELx_FSC_ADDRSZ_nL macro incorrectly map level -1 Address
+Size faults to 0x25 instead of 0x29?
 
-If Thread A executes the first KVM_RUN, it passes this kvm_validate_id_regs=
-()
-check because the invalid configuration hasn't been set yet. The config_lock
-is then released.
+If tools/arch/arm64/include/asm/esr.h is meant to be synchronized with the
+kernel header, diverging here causes user-space tools (such as KVM selftests
+or perf) to misdecode or incorrectly inject Address Size faults for level -=
+1.
+Any tool compiling against this header and invoking ESR_ELx_FSC_ADDRSZ_L(-1)
+would receive 0x25 rather than the correct hardware encoding 0x29.
 
-Thread B could then execute KVM_SET_ONE_REG for the ID register, take
-config_lock, and inject the invalid S1PIE=3D1/TCR2=3D0 configuration via
-set_id_reg() in arch/arm64/kvm/sys_regs.c, bypassing the immutability check
-because KVM_ARCH_FLAG_HAS_RAN_ONCE is not yet set.
-
-When Thread A proceeds to execute kvm_calculate_traps(), it reads the
-maliciously modified ID registers and disables the traps, before finally
-setting KVM_ARCH_FLAG_HAS_RAN_ONCE in kvm_arch_vcpu_run_pid_change() in
-arch/arm64/kvm/arm.c.
-
-This regression allows KVM to configure traps based on S1PIE, disabling the
-trap for PIRE0_EL1, but skipping context-switching the register because TCR2
-is disabled. Could this allow the guest to directly overwrite the host's
-physical PIRE0_EL1 register?
-
->  	return 0;
->  }
+> +#define ESR_ELx_FSC_ADDRSZ_L(n)		((n) < 0 ? ESR_ELx_FSC_ADDRSZ_nL(n) : \
+> +						   (ESR_ELx_FSC_ADDRSZ + (n)))
+> =20
+>  /* Status codes for individual page table levels */
+>  #define ESR_ELx_FSC_ACCESS_L(n)	(ESR_ELx_FSC_ACCESS + (n))
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260930-arm64-gcs-=
-v21-0-3556644cd927@kernel.org?part=3D2
+v21-0-3556644cd927@kernel.org?part=3D14
