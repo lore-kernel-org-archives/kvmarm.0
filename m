@@ -1,245 +1,267 @@
-Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4922D369990
-	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 14:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 153B94F85C5
+	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 15:08:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790779850; cv=none; b=jozgup4SQ7Dct5IrWLFdxnLTwwqDxLnzhVsULfLp5HFHDEIWVquAm8KAC9/KXiq4MI9T70/fJ9J8XjlehXjQzrPiRv3CQQtHPRgXrmGdDGSoJBNkhtH54VQRDMtYtXKMckj6risvUyA4Kv9M+x+aiElVNfIbTZPCNIxzEcJg9vU=
+	t=1790780913; cv=none; b=aG0tFFkkzjj2YawPA1GbIHss2VOTe6Id1QQi412ICFYUMPxcAyJPXpnDMQ2IXSsDxf1NIjScVs1YBu6U9C7rK/Y0KPzDJ5Hb3L0G9s7uajyRa3ubTJq8DDMAx3uxuEavvp28pbUVPD4nO7bjikwUltRBzLpCuSRPJ8GcjArAWnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790779850; c=relaxed/simple;
-	bh=lbw6QDjvmAOom4BsQ6obu0qG9SHaZVacueJ3ljC1rII=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CsX+MCo4k5fbJ+gd2lCFhcnFHG/SImZFYkCap6DgjaMDm439GZ0YQoQA3LBVVmFL+MAAiVYtUx5YX1ZqEgWk2JQgvjae8qlL4HMPFaea0GPA0ivS1aFsIG8p8Ya2sl+S9JjmbXYLisYynyvVwPU113xLcoHIUswswhqnef/HehU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=icGCLbKc; arc=none smtp.client-ip=74.125.225.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1790780913; c=relaxed/simple;
+	bh=pTqrQFkAmhNA6M1rsaOwKmxx6/dEPTFtcacQf6zer8M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r2o+MjzDXdmVUDnAcBLRe5RpOEko81sSPVIPDZWbLDJ8fZik9jz17LwvwEbR9qilrPRmLmagBWIQSgtNM5s+OlO7dONPhqyB4mLcLUeK/6KKSBJW5utOZH3gr5H9aorcDJSwYWGoqVlwX/W4s+ZK6HOaA4NGndmQrsP4eZ12ffY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NPXvbOhe; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="icGCLbKc"
-Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49ce364488dso7223255e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 07:50:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790779837; x=1791384637; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=ugl/kEsibxaOMxwiAB8ohvG+dBs5XjVCSnq2cxUbe8c=;
-        b=icGCLbKccKh7oeRTiQGthmm7FWasE6N23DkaQdK/bY2CRB2eKAgjZXxKqSNWTuVP53
-         CMmKUg+PuN7tMVoA/+n49TJfTl2w90EH67skKQk3zAA5kP/u1x3NI6fOiDXBs2Dbaqyc
-         HKxJS5T6CdB9SL1ABxC6N7BX3utN/oISwUunoHmQIxRxG3mP5gVhPtPFqjEDiTLDwGFu
-         TUepy9RE91BP3lL4SCO/Os2zXAEkRUeSL9oPfcw1e/dpnZi+CGprkfKO2jMSh7RpH537
-         +ex4tilYElqp4TSv/+fuFzBYr7RmwB8dEkvZo9TKtMSXHpWpms9ANAgDnR58bNdNVDmi
-         4LDA==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NPXvbOhe"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1790780896;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ns+huMlBjpBINTzATYtJG6y2085LhnRydQuWQ6U4h1s=;
+	b=NPXvbOheyZuwEOxnbmK9GXgDbpf0dI13D1fGzQJhDB4qAXG7W7R4JPCul2gmVkfyISAKBw
+	YxMqMt865+k+iBx1XrsIVQ63T7AsN0VLeaTNiIRNkF8c0s6r1EexUrocqCGLgFLIdK7TDh
+	nQgJS72pw62JZyzgQ/+vapf1li/9Vlc=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-688-KtYLvSSQOee5UKWwDsgetw-1; Wed, 30 Sep 2026 11:08:15 -0400
+X-MC-Unique: KtYLvSSQOee5UKWwDsgetw-1
+X-Mimecast-MFC-AGG-ID: KtYLvSSQOee5UKWwDsgetw_1790780894
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-49e65bee41aso18073315e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 08:08:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790779837; x=1791384637;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ugl/kEsibxaOMxwiAB8ohvG+dBs5XjVCSnq2cxUbe8c=;
-        b=eIIxMDenWoEjb8dVhEQc80tcWxzBzPDYibU1J+oGtgaSRz5LnjeUmkflQWBpCLkaLz
-         X0OwM++1nu2WZ97FsjUJkhYDRU7RdGB7C2Jzvc5bNtIeQSvmm297GHiwP2wMvs0KXwGR
-         fMESlyypJv9EJsb1CFg6xo1gQsnRvgyBpmbUWNyxiNwrwbcKnw4/D84aBx1/C8UtbJeO
-         I4OmPPg7vezYZZTWv7P6e9dG7Ndv0/jDj7/ViV4GnlMrGf7jXZgbHwbZtFaPQwZDq1d/
-         D1njiqDWXOYzP0t7C0UfgdMJtLvo3IaPtqIoe4rv7WZHOhVMfcO7w1VFTXHmiRMSOeCA
-         gDrw==
-X-Forwarded-Encrypted: i=1; AKwUvBw5I5TkfCj/rFhCjqSuFQA7UgyvpoF9OSdgftjkDjVdWsaoKw7gf7dYY9xb1w7/TPufDT9Ua28=@lists.linux.dev
-X-Gm-Message-State: AFuF++mAQVmNMCl29v9qf4ETAJsQoXrKXze3kJKlCDwVMiAmzrA6HpXd
-	EtFR9vDz1TGVb9WsKCV9OKA9qVPQXglx3DOw7A6eVl+Rws09ER1Xt+PYyL3TmrM8UcmiXz3Rocz
-	2CnLgl5Rv
-X-Gm-Gg: AYBFou2JhM2SnyXul1pVeBf/uRILg0EiuJawm2Jp3fvdsFlHCInLwBdZGhVdMsCWk1J
-	hsK3ljca3FGeM9EqpWZI8EH2s1qdcvYreK/91ZGjejeTrw0KqYbDL0cwUH6bpS/Lca32hwgx37i
-	IUxwiyhvhU3ihn1rPd5mNqMMQrzlVv0AyKWjU5hrj7XyNeb6uSHM4+0UpMii9n+/431HB2CZVB5
-	GNJtmdoFzBnGIXd7xYAAAnbLGH+BcwDEB0f/2ZhY86qkkSmVXV/E8vt5pBrwzwMxtsThgRCJeIm
-	9eCASV7w9/l1uJxgZOVEQqJOekBoKPIxlIh+ptZBxjvg9WdxsrhhGCmLW/CKFQC5jTPDO4YdCFf
-	ALZOOrETLKCwngqohSk1iZ6MIpmy3C/H0YVUcqFU29Yid2yzoQV3KCitb6Q8/AGG1h3OV9AszKq
-	O/X/Rw/kCFXDpemyMFG/8R3KRzUaSXj1ZEMq3l/Zm+sC4uq2UGaARVnbdMZC6VgXC7b6PRpR3mn
-	MkEE1J9iTZMm5X4yxWDG1q6Wazwh0ptBSWqlZDaf6E=
-X-Received: by 2002:a05:600c:1f95:b0:49f:c5aa:9ef4 with SMTP id 5b1f17b1804b1-4a01b1a1138mr26323985e9.8.1790779836298;
-        Wed, 30 Sep 2026 07:50:36 -0700 (PDT)
-Received: from google.com (197.183.140.34.bc.googleusercontent.com. [34.140.183.197])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a01e67e01esm3856325e9.13.2026.09.30.07.50.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Sep 2026 07:50:33 -0700 (PDT)
-Date: Wed, 30 Sep 2026 15:50:29 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-	kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com
-Subject: Re: [PATCH v5 00/18] KVM: arm64: Introduce pKVM hypervisor heap
- allocator
-Message-ID: <ar0htZydVZdB9zVk@google.com>
-References: <20260901080941.997769-1-vdonnefort@google.com>
+        d=1e100.net; s=20260707; t=1790780894; x=1791385694;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Ns+huMlBjpBINTzATYtJG6y2085LhnRydQuWQ6U4h1s=;
+        b=keEKScVhj++QcAGt0Y6qhvwftfZDuetlQNajQq/hm3eu2LWzxOhScPRegKfRejXqgy
+         Ci9KqVgmzrtY3aFUH5tmykcNw4cdMdf/L35HF7whuVGPCW2mjvoKOqGe4B3UwnExTnLP
+         qIVNteywEJtu8u+mjZn7O0q3IY7XM5L8BUv6tyx6weoDXlRseFbUd19LjOzdRcGc5PpC
+         oQkWkbkBex2lYHFouZiJOycDo0+x7+ii/gn9BkmgkS3i6BVDwFap8O27v4Wp/zudiWsf
+         B2Rs+aSlTOocRXCZOZsyYmD8NsCowHyYZXNZQkfau8daf2z7xGzC/yv7saTKDyM9J/FD
+         G0Wg==
+X-Forwarded-Encrypted: i=1; AKwUvBzK78s1D6Rl4s1CF3RvvV9jGNm30tRoJTxAhhvbQbGbnz6WhX54b5MADTkyEbYjYy9SPtvlblk=@lists.linux.dev
+X-Gm-Message-State: AFuF++kBh3NLjEmtJIBCPocEvnAePcUZSMItr3NCfO4FNCuqSEvx0hO/
+	lsXTrdbaYhFuQwXzf99U7l1Rw/JTOEEYCu8SAXoyq4VvKR/VnsoSE1VWjIsTO/KHksIwYpsWP1o
+	PEAzU6/FoJzdzViMCjUo138rsYMwym3CXlB5WzYcvOlviRMj5pKFuTuRBaQ==
+X-Gm-Gg: AYBFou2fu0UhtLrXpBqo7g7Vrh7+2uSKOazNirDqzKypqBmUCnTuCgffygbRl7iSaN+
+	T4cve7t8RDGJjq5BHA31im+f9oWSfSiuEN9biRUCjeIQmLYTSfba0QupfECjGXW/uNrGglAAw+T
+	pPKglq2FIN4EDmxPebJR8D8EYqI3xOgdlIa2A387BSJQiQ6IhgQscxZgf0VdIZPhcB9dUvec19b
+	GmmbYSv8/85GdeuTkO+Ih8j7gS+wA/RsEyvjC2pxHtqgU4ACw4oGnTQWcyIVtKU/Am297wOGuCL
+	5cAj5c+fiYHGA7wgBTt7KLTBiIbalEpeONJ1MbsypIZ/Zvqbp57XITSA53vF590UnWuEoSnkoKg
+	Plt8/j93Ch1yk4cYSZTVR3MgPGPwrvwcJAwNCfCDSgcYzBK0D
+X-Received: by 2002:a05:600d:82c4:b0:49c:e37e:4389 with SMTP id 5b1f17b1804b1-4a01b188e38mr32968415e9.4.1790780893288;
+        Wed, 30 Sep 2026 08:08:13 -0700 (PDT)
+X-Received: by 2002:a05:600d:82c4:b0:49c:e37e:4389 with SMTP id 5b1f17b1804b1-4a01b188e38mr32967005e9.4.1790780892124;
+        Wed, 30 Sep 2026 08:08:12 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a01cd6cd2bsm10750735e9.4.2026.09.30.08.08.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 30 Sep 2026 08:08:11 -0700 (PDT)
+Message-ID: <bd747536-c8eb-4c21-a859-ac1f2a28794f@redhat.com>
+Date: Wed, 30 Sep 2026 17:08:09 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260901080941.997769-1-vdonnefort@google.com>
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v9 16/26] target/arm/kvm: Apply SYSREG props to the final
+ vcpu
+To: Khushit Shah <khushit.shah@nutanix.com>
+Cc: "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ Shaju Abraham <shaju.abraham@nutanix.com>,
+ "yangjinqian1@huawei.com" <yangjinqian1@huawei.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "sebott@redhat.com" <sebott@redhat.com>,
+ "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
+ "philmd@oss.qualcomm.com" <philmd@oss.qualcomm.com>,
+ "maz@kernel.org" <maz@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "abologna@redhat.com" <abologna@redhat.com>,
+ "jdenemar@redhat.com" <jdenemar@redhat.com>
+References: <20260916144721.751810-1-eric.auger@redhat.com>
+ <20260916144721.751810-17-eric.auger@redhat.com>
+ <8F110441-6D38-4134-9196-76AFA021250F@nutanix.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <8F110441-6D38-4134-9196-76AFA021250F@nutanix.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: KpvcoxftF6ZChxwYPwL6qdHY779OJx8Hn9Mq-x-WAJ4_1790780894
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Gentle ping for this series, 
+Hi Khushit,
 
-It's been fully reviewed by Fuad and is already based on 7.3-rc1.
+On 9/28/26 12:44 PM, Khushit Shah wrote:
+>
+>> On 16 Sep 2026, at 8:15 PM, Eric Auger <eric.auger@redhat.com> wrote:
+>>
+>> !-------------------------------------------------------------------|
+>>  CAUTION: External Email
+>>
+>> |-------------------------------------------------------------------!
+>>
+>> SYSREG prop settings were recorded in a hashtable but they
+>> are not yet injected on guest. Iterate over all set fields and
+>> apply the new value through KVM_SET_ONE_REG. The new field
+>> value overrides the current observable vcpu register value.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> With this, I suppose, what named models will do is directly write to
+> ID register state, As it also defines state which affects vCPU init flags also.
+That's not what I had in mind. I thought you would apply the SYSREG
+settings at the same time. As mentionned, I don't think those settings
+are meant to substitute to legacy composite options that affect vcpu
+init settings.
+Besides the principle of this preparatory series is that the props for
+writable ID reg fields are meant to be fully reusable for named vcpu
+models. Only props for non writable fields should be specific to named
+vcpu models as they do not make sense on host/max vcpu model
 
--- 
-Vincent
 
-On Tue, Sep 01, 2026 at 09:09:23AM +0100, Vincent Donnefort wrote:
-> pKVM historically lacked a dynamic memory allocator: all hypervisor-side
-> VM and VCPU structures had to be sized on the host, allocated as
-> contiguous pages and donated to the hypervisor.
-> 
-> This design tightly coupled the hypervisor's memory footprint to
-> host-side constraints, complicated memory reclaim, and severely
-> restricted VM scalability.
-> 
-> This patch series introduces a dynamically-mapped custom heap allocator
-> (hyp_allocator) to the pKVM hypervisor. The initial users are the
-> pkvm_hyp_vm and pkvm_hyp_vcpu structs, and the hypervisor tracing
-> metadata.
-> 
-> In the near future, this heap allocator is expected to be leveraged to
-> support SVE in protected VMs and in the distant future, it will also
-> support dynamic device assignment.
-> 
-> By moving to a hypervisor-managed dynamic allocator, we also allow
-> deduplicating the donation/reclaim path of EL2-private structures.
-> 
-> The main building blocks for this series are:
-> 
-> 1. pkvm_hyp_req:
-> ----------------
-> When the hypervisor heap allocator goes out of memory (-ENOMEM), it
-> suspends the hypercall, embeds a PKVM_HYP_REQ_HYP_ALLOC top-up request
-> into the SMCCC HVC return registers, and exits back to the host.
-> 
-> This building block will also be useful for the future huge-mapping
-> support in protected guests, allowing EL2 to raise requests such as
-> block splitting back to the host.
-> 
-> 2. hyp_allocator:
-> ----------------
-> This heap allocator manages a reserved VA space range, dynamically
-> mapping and unmapping physical pages on-demand to minimise the pKVM
-> hypervisor footprint. As memory is reclaimed and relinquished to the
-> host, unmapped holes are introduced within the VA space. To prevent
-> orphan mapped regions, neighboring unused chunks cannot be merged if
-> they are separated by an unmapped region.
-> 
-> The allocator chunk metadata is stored directly into the VA space range.
-> To minimize metadata overhead, chunks only link to each other via a
-> relative 32-bit offset.
-> 
-> A simple hardening of the metadata is added via a simple 32-bit hash.
-> 
-> 3. shrinker:
-> ------------
-> As the heap allocator isn't reclaimed actively on VM or tracing
-> teardown, a shrinker is added to allow the host to reclaim unused memory
-> from the hypervisor when the host is under heavy memory pressure.
-> 
-> Changelog
-> ---------
-> 
-> v5:
-> 
->   - Remove unreachable !prev checks in hyp_allocator_destroy_chunk() (Fuad)
->   - Add kerneldoc to pkvm_call_hyp_req() (Fuad)
->   - Avoid duplicate handle___pkvm_hyp_alloc_selftest() definitions when !CONFIG_NVHE_EL2_DEBUG
->   - Chunk pkvm_hyp_reclaim() with cond_resched() to avoid blocking in EL2
->   - Allow shrinker to scan across all runtime topup IDs
->   - Reclaim chunks before draining allocator->mc in hyp_allocator_reclaim() (Fuad)
->   - Make is_ttbr1_addr() check in __kern_hyp_va() conditional to pKVM (Fuad)
->   - Rename pkvm_memcache to stage2_mc
->   - Rebased on 7.3-rc1
-> 
-> v4: https://lore.kernel.org/all/20260731143541.956291-1-vdonnefort@google.com/
-> 
->   - Add kerneldoc to pkvm_remove_mappings
->   - Allow pkvm_private_va_range_pa() to work with block-level mappings (Sashiko)
->   - Add rollback and harden pkvm_map_private_va_range input (Sashiko)
->   - Add missing mc count into reclaimable memory
->   - Differentiate -ENOMEM from hyp_alloc in errno_to_smccc() (Sashiko)
->   - Collect Fuad's Tested-by
-> 
-> v3: https://lore.kernel.org/all/20260720171513.1415357-1-vdonnefort@google.com/
-> 
->   - Remove unsafe WARN_ON(hyp_spin_is_locked(&pkvm_pgd_lock)) check in hyp_allocator_alloc() (Sashiko)
->   - Modify MIN_ALLOC_SIZE to 16-bytes to comply with FPSIMD alignment requirements (Sashiko)
->   - Allow hyp topup/reclaim HVCs pre-deprivilege
->   - Add enum symbols to pkvm_hyp_req_handle event (Fuad)
->   - Various clarification in commit descriptions (Fuad)
->   - Restore unmap_donated_memory() for PGD on error path (Fuad)
->   - Renamed __hyp_allocator_map -> pkvm_map_private_va_range (Fuad)
->   - Collected Fuad's Reviewed-by tags
->   - Rebased on 7.2-rc4
-> 
-> v2: https://lore.kernel.org/all/20260706175415.2604046-1-vdonnefort@google.com/
-> 
->   - Rebased series on 7.2-rc2.
->   - Use scope-based hyp_spinlock.
->   - Fix best_missing/best_data_size priority in hyp_allocator_find_efficient_chunk() (Sashiko)
->   - Fix missing free_hyp_memcache() in pkvm_hyp_topup() (Sashiko)
->   - Fix unused selftest_init() warning when !CONFIG_NVHE_EL2_DEBUG (Sashiko)
->   - Fix missing shrinker_free() in teardown_hyp_mode() (Sashiko)
-> 
-> v1: https://lore.kernel.org/r/20260520152650.4107895-1-vdonnefort@google.com
-> 
-> Vincent Donnefort (18):
->   KVM: arm64: Add pkvm_private_va_range_pa
->   KVM: arm64: Add pkvm_remove_mappings
->   KVM: arm64: Add pkvm_map_private_va_range
->   KVM: arm64: Add a heap allocator for the pKVM hyp
->   KVM: arm64: Allow kvm_hyp_memcache usage outside of stage-2
->   KVM: arm64: Add pkvm_hyp_req infrastructure
->   KVM: arm64: Add PKVM_HYP_REQ_HYP_ALLOC request
->   KVM: arm64: Add reclaim interface for the pKVM heap alloc
->   KVM: arm64: Add selftests for the pKVM heap allocator
->   KVM: arm64: Add a shrinker for pKVM
->   KVM: arm64: Filter out non-kernel addresses in kern_hyp_va
->   KVM: arm64: Move hyp_vm refcount into the structure
->   KVM: arm64: Alloc pkvm_hyp_vm using pKVM heap allocator
->   KVM: arm64: Alloc pkvm_hyp_vcpu using pKVM heap allocator
->   KVM: arm64: Rename vCPU pkvm_memcache to stage2_mc
->   KVM: arm64: Reject hyp trace descriptors with fewer CPUs than
->     hyp_nr_cpus
->   KVM: arm64: Reject hyp trace descriptors with fewer than 3 pages
->   KVM: arm64: Alloc simple_buffer_page using pKVM hyp allocator
-> 
->  arch/arm64/include/asm/kvm_asm.h           |    4 +
->  arch/arm64/include/asm/kvm_host.h          |   16 +-
->  arch/arm64/include/asm/kvm_mmu.h           |    3 +
->  arch/arm64/include/asm/kvm_pkvm.h          |  117 ++
->  arch/arm64/kvm/arm.c                       |    4 +-
->  arch/arm64/kvm/hyp/hyp-constants.c         |    2 -
->  arch/arm64/kvm/hyp/include/nvhe/alloc.h    |   28 +
->  arch/arm64/kvm/hyp/include/nvhe/mm.h       |    3 +
->  arch/arm64/kvm/hyp/include/nvhe/pkvm.h     |   19 +-
->  arch/arm64/kvm/hyp/include/nvhe/spinlock.h |    4 +
->  arch/arm64/kvm/hyp/nvhe/Makefile           |    2 +-
->  arch/arm64/kvm/hyp/nvhe/alloc.c            | 1211 ++++++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c         |  125 +-
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c      |   10 +-
->  arch/arm64/kvm/hyp/nvhe/mm.c               |   79 ++
->  arch/arm64/kvm/hyp/nvhe/pkvm.c             |  104 +-
->  arch/arm64/kvm/hyp/nvhe/setup.c            |    6 +
->  arch/arm64/kvm/hyp/nvhe/trace.c            |   70 +-
->  arch/arm64/kvm/hyp_trace.c                 |   15 +-
->  arch/arm64/kvm/mmu.c                       |    6 +-
->  arch/arm64/kvm/pkvm.c                      |  200 +++-
->  arch/arm64/kvm/trace_pkvm.h                |   45 +
->  22 files changed, 1915 insertions(+), 158 deletions(-)
->  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/alloc.h
->  create mode 100644 arch/arm64/kvm/hyp/nvhe/alloc.c
->  create mode 100644 arch/arm64/kvm/trace_pkvm.h
-> 
-> 
-> base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
-> -- 
-> 2.55.0.897.gb25b4bd76c-goog
-> 
+>
+>> ---
+>> target/arm/kvm.c        | 65 +++++++++++++++++++++++++++++++++++++++++
+>> target/arm/trace-events |  1 +
+>> 2 files changed, 66 insertions(+)
+>>
+>> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+>> index 3ec2618cc1..ddf320d0e6 100644
+>> --- a/target/arm/kvm.c
+>> +++ b/target/arm/kvm.c
+>> @@ -343,6 +343,9 @@ static ARM64SysRegField *get_field(int i, ARM64SysReg *reg)
+>> #define MAKE_IDREG_KEY(reg_idx, field_shift) \
+>>     (((uint64_t)(reg_idx) << 8) | ((uint64_t)(field_shift) & 0xFF))
+>>
+>> +#define KEY_TO_REG_IDX(key)     ((uint32_t)(((uint64_t)(key)) >> 8))
+>> +#define KEY_TO_SHIFT(key)       ((uint8_t)(((uint64_t)(key)) & 0xFF))
+>> +
+>> static void set_sysreg_prop(Object *obj, Visitor *v,
+>>                             const char *name, void *opaque,
+>>                             Error **errp)
+>> @@ -2215,6 +2218,63 @@ int kvm_arch_pre_create_vcpu(CPUState *cpu, Error **errp)
+>>     return 0;
+>> }
+>>
+>> +static int kvm_arm_apply_sysreg_props(ARMCPU *cpu, Error **errp)
+>> +{
+>> +    uint64_t *idregs = cpu->isar.idregs;
+>> +    gpointer key_ptr, value_ptr;
+>> +    CPUState *cs = CPU(cpu);
+>> +    GHashTableIter iter;
+>> +
+>> +    g_hash_table_iter_init(&iter, cpu->sysreg_props);
+>> +
+>> +    while (g_hash_table_iter_next(&iter, &key_ptr, &value_ptr)) {
+>> +        uint64_t key = (uint64_t)key_ptr;
+>> +        uint64_t value = (uint64_t)value_ptr;
+>> +        uint32_t reg_idx = KEY_TO_REG_IDX(key);
+>> +        uint8_t lower    = KEY_TO_SHIFT(key);
+>> +        ARM64SysReg *reg = &arm64_id_regs[reg_idx];
+>> +        struct kvm_one_reg kvm_reg;
+>> +        uint64_t current, old, mask;
+>> +        uint64_t kvm_idx;
+>> +        ARM64SysRegField *field = get_field(lower, reg);
+>> +        int length = field->length;
+>> +        uint64_t oldfv;
+>> +        int ret;
+>> +
+>> +        mask = MAKE_64BIT_MASK(lower, length);
+>> +        value = value << lower;
+>> +
+>> +        old = idregs[reg_idx];
+>> +
+>> +        kvm_idx = idregs_sysreg_to_kvm_reg(id_register_sysreg[reg_idx]);
+>> +        ret = read_sys_reg64(cs->kvm_fd, &current, kvm_idx);
+>> +        if (ret) {
+>> +            error_setg(errp, "failed to read the current value of %s",
+>> +                       reg->name);
+>> +            return ret;
+>> +        }
+>> +        oldfv = (current & mask) >> lower;
+>> +
+>> +        idregs[reg_idx] = current & ~mask;
+>> +        idregs[reg_idx] |= value;
+>> +        kvm_reg.id = kvm_idx;
+>> +        kvm_reg.addr = (uintptr_t)&idregs[reg_idx];
+>> +
+> We can ignore this if value == old value
+sure, modified
+>
+>> +        ret = ioctl(cs->kvm_fd, KVM_SET_ONE_REG, &kvm_reg);
+>> +        if (ret) {
+>> +            error_setg(errp, "failed to apply new value 0x%"PRIx64" for field %s.%s "
+>> +                       "(previous is 0x%"PRIx64"): %m", idregs[reg_idx],
+>> +                       reg->name, field->name, oldfv);
+>> +            return ret;
+>> +        }
+>> +
+>> +        trace_apply_sysreg_prop(reg->name, field->name, old, current,
+>> +                                mask, value, idregs[reg_idx]);
+>> +    }
+>> +    return 0;
+>> +}
+>> +
+>> int kvm_arch_init_vcpu(CPUState *cs, Error **errp)
+>> {
+>>     int ret;
+>> @@ -2315,6 +2375,11 @@ int kvm_arch_init_vcpu(CPUState *cs, Error **errp)
+>>     }
+>>     cpu->mp_affinity = mpidr & ARM64_AFFINITY_MASK;
+>>
+>> +    ret = kvm_arm_apply_sysreg_props(cpu, errp);
+>> +    if (ret) {
+>> +        return ret;
+>> +    }
+>> +
+> This should also happen on vCPU reset.
+On which path is it needed? on qmp system_reset I can see that the
+former values applied with SYSREG settings are kept.
+
+Thanks
+
+Eric
+>
+> Overall, I like this approach as if the user does not provide any property overrides, it should behave the same as older builds.
+>
+> Warm Regards,
+> Khushit
+>>     return kvm_arm_init_cpreg_list(cpu);
+>> }
+>>
+>> diff --git a/target/arm/trace-events b/target/arm/trace-events
+>> index d72ad6b671..b4d2b45a7d 100644
+>> --- a/target/arm/trace-events
+>> +++ b/target/arm/trace-events
+>> @@ -18,6 +18,7 @@ kvm_arm_writable_idregs_to_cpreg_list(const char *name, uint64_t previous, uint6
+>> decode_idreg_writemap(const char* name, int lower, int upper, char *prop_name) "%s [%d:%d] is writable (prop %s)"
+>> get_sysreg_prop(const char *name, uint64_t value) "%s 0x%"PRIx64
+>> set_sysreg_prop(const char *name, uint64_t old, uint64_t mask, uint64_t field_value, uint64_t new) "%s old reg value=0x%"PRIx64" mask=0x%"PRIx64" new field value=0x%"PRIx64" new reg value=0x%"PRIx64
+>> +apply_sysreg_prop(const char *reg_name, const char *field_name, uint64_t old, uint64_t current, uint64_t mask, uint64_t field_value, uint64_t new) "%s.%s old=0x%"PRIx64" current=0x%"PRIx64" mask=0x%"PRIx64" new field value=0x%"PRIx64" new=0x%"PRIx64
+>> nb_sysreg_props(const char *name, int count) "%s: %d SYSREG properties"
+>>
+>> # cpu.c
+>> -- 
+>> 2.53.0
+>>
+
