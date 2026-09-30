@@ -1,97 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C06C30C147;
-	Wed, 30 Sep 2026 09:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E08CF3EEAE1;
+	Wed, 30 Sep 2026 09:52:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790760761; cv=none; b=Kf9Zr2uNjv45FwLGm/pDi1s5K2fOqWiFNkJULWX0rtrHJR2A2ylYuyTTb6Y6CNrBQsxkHIzSVOLDvh1Wl1jHIMaDPkjhtJGP530xZog4U5RaDZ5MftPSguEzABYKK+nl4CKzV3ZyZm2VikY0kM9frmh5EZYnmgWPqK9zzcQien8=
+	t=1790761935; cv=none; b=H7IBmXHSCMtV8cmatHGApctGo6WKqJxNInkm3D0ICoSkHMrx43qtYIt2vyGwYLlkTU1YtokxyuTgK9Z1xtdT7PHWuqiWzFqgP3epcvKtxe296+0kY2y2ViPzT48Y0dB7JKKW5qGl93HMYq/bMbh859Hh6R2ZKV+jSIsJ9uW1rys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790760761; c=relaxed/simple;
-	bh=TlzHEJQt+34xYjujqXxuq3JcjM0wYp8ZviYUagsVkog=;
+	s=arc-20240116; t=1790761935; c=relaxed/simple;
+	bh=Hh/kEdyKxDItZL2czsn11te4PfKPTHpLWgBl2v8d60M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=garWEN3pTPZ7+NgDU1WHoJtjfajbeOywY3CMAhthbp1Wn6S/ZR7JDL1COPGG16xzzNMad5wxSVwPmmJwNRV0wutckgUP6s9N+LHPXG14nlYHw3+dWd5gAqMX8XpHnmCS89rzNhvWXYrh3iR4CfWqOLZv34HFKanSM5TiA59WRWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A/WFPBAH; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=DkBuPY99Wkx2+KLCqFDBcb6eg8UEN2ZD1XDXK0pakKYrYyOW2GJ8dbXoV06BrxWreB9JELUIgAs/4OMLHI7Z3FvZ/HrWnmuuYzTomi7kgkOSCevQw7mg8NJkMBbfbDHrnS+opwr30GohRIjsQquLF8STBbrVRzFqs9lAjhQ85xE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=cwcKnvvq; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A/WFPBAH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD21A1F000FF;
-	Wed, 30 Sep 2026 09:32:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790760760;
-	bh=GUhUebTYwdNTDsFDAgKX2XUga1p/xniYtUmuBOcAkD0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=A/WFPBAH7Qma+9hcX287RuSKWlORpntiWFjFLaPigU8Y75ISxg3KEjLTfteawEyBe
-	 2g/cYh4OEqr71nkWwJpVQnorMprUQRkz1eix+QLOCr/CPst8lLD0ChCfFd8YGM4jfy
-	 Fksx04sLagSxxR88vp09QnJZCikrL8s15UEcYtyj8cHuNrsfav7blbRqRE5dyxX7SB
-	 IKNdTpYGGoAU9JjY6jjqMsEYQfRaLoK1HI3j102H2WUj2d2AjX7kJd1tm0yEuZtXim
-	 rxv3PmM3a58m4CHKDbt2tmNwqyH0M2+G0zuIAT/AqLpxmsAoL5566Xt1IaKFXihiLq
-	 k8Bhh/EDc3Mrg==
-Date: Wed, 30 Sep 2026 10:32:09 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Zi Yan <ziy@nvidia.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	"Liam R. Howlett" <liam@infradead.org>, Vlastimil Babka <vbabka@kernel.org>, 
-	Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
-	David Hildenbrand <david@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
-	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Baolin Wang <baolin.wang@linux.alibaba.com>, 
-	Nico Pache <nico.pache@linux.dev>, Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, 
-	Barry Song <baohua@kernel.org>, Lance Yang <lance.yang@linux.dev>, 
-	Usama Arif <usama.arif@linux.dev>, Kiryl Shutsemau <kas@kernel.org>, 
-	Doug Gilbert <dgilbert@interlog.com>, "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <mkp@kernel.org>, Jaya Kumar <jayalk@intworks.biz>, 
-	Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, Sebastian Reichel <sre@kernel.org>, 
-	John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
-	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
-	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
-	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
-	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
-	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev
-Subject: Re: [PATCH v3 34/40] mm: eliminate VMA_SPECIAL_FLAGS usage when
- hugetlb explicitly tested
-Message-ID: <arzXDWOaouPMGtxL@gremlin>
-References: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org>
- <20260917-b4-mmap-prepare-vma-flag-sanify-v3-34-4583d8a23bca@kernel.org>
- <DLSAZ4ZQY8Q3.3OKOCCOQAFVCC@nvidia.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="cwcKnvvq"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0A999497;
+	Wed, 30 Sep 2026 02:52:04 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A35523F86F;
+	Wed, 30 Sep 2026 02:52:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790761927; bh=Hh/kEdyKxDItZL2czsn11te4PfKPTHpLWgBl2v8d60M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cwcKnvvqIEmedSeZQQhoIZ9dMjD4/8L9sRmwwDRYpF5LBg5tSZ3uGXpFfSzpOWsAE
+	 5QIsULyPjCo/L2kedtkgNo68EQY4Kvo3Bsy16uGAYj2vLK1PKkBxuRmJLMY8KQf31B
+	 vE6J/QkCbSMwI/cvCYa8EsEhr/Y4u7g6ZdL/mC4g=
+Date: Wed, 30 Sep 2026 10:51:53 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+	will@kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+	sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
+Subject: Re: [PATCH v20 1/9] firmware: arm_rmm: Add SMC definitions for
+ calling the RMM
+Message-ID: <arzbue4Sdjt61lTu@arm.com>
+References: <20260929221623.1342076-1-suzuki.poulose@arm.com>
+ <20260929221623.1342076-2-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -100,72 +51,22 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <DLSAZ4ZQY8Q3.3OKOCCOQAFVCC@nvidia.com>
+In-Reply-To: <20260929221623.1342076-2-suzuki.poulose@arm.com>
 
-On Tue, Sep 29, 2026 at 10:42:00PM -0400, Zi Yan wrote:
-> On Thu Sep 17, 2026 at 12:22 PM EDT, Lorenzo Stoakes (ARM) wrote:
-> > It is now an invariant that VMA_IO_BIT is not set except by kernel-owned
-> > mappings, so each existing VMA_SPECIAL_FLAGS test need only test for
-> > VMA_DONTEXPAND_BIT, VMA_PFNMAP_BIT and VMA_MIXEDMAP_BIT.
-> >
-> > This is precisely a test for a kernel-owned or fixed mapping.
-> >
-> > Update a number of callsites which already explicitly handle hugetlb
-> > mappings.
-> >
-> > vma_supports_mlock() and ksm_compatible() also explicitly bail on droppable
-> > mappings - detecting kernel-owned, fixed or droppable mappings is handled
-> > by vma_is_persistent(), so in these cases use this predicate.
-> >
-> > should_skip_vma() tests for locked, kernel-owned or fixed memory (having
-> > already excluded hugetlb mappings) so simply test for those there.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> > ---
-> >  mm/internal.h | 4 +---
-> >  mm/ksm.c      | 4 +---
-> >  mm/vmscan.c   | 3 ++-
-> >  3 files changed, 4 insertions(+), 7 deletions(-)
-> >
->
-> <snip>
->
-> > diff --git a/mm/vmscan.c b/mm/vmscan.c
-> > index 12ed3388ee41..09ff20c3df5b 100644
-> > --- a/mm/vmscan.c
-> > +++ b/mm/vmscan.c
-> > @@ -3477,7 +3477,8 @@ static int should_skip_vma(unsigned long start, unsigned long end, struct mm_wal
-> >  	if (!vma_has_recency(vma))
-> >  		return true;
-> >
-> > -	if (vma->vm_flags & (VM_LOCKED | VM_SPECIAL))
-> > +	if (vma_test(vma, VMA_LOCKED_BIT) || vma_is_kernel_owned(vma) ||
->
-> At this point, mmap_lock is held, there is no mlock WIP, so
-> VMA_LOCKED_BIT is enough.
+On Tue, Sep 29, 2026 at 11:16:15PM +0100, Suzuki K Poulose wrote:
+> From: Steven Price <steven.price@arm.com>
+> 
+> The RMM (Realm Management Monitor) provides functionality that can be
+> accessed by SMC calls from the host.
+> 
+> The SMC definitions are based on DEN0137[1] version 2.0-bet3
+> 
+> [1] https://developer.arm.com/documentation/den0137/2-0bet3/
+> 
+> Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Tested-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-Yes indeed :)
-
->
-> > +	    vma_is_fixed_mapping(vma))
-> >  		return true;
-> >
-> >  	if (vma == get_gate_vma(vma->vm_mm))
->
-> LGTM.
->
-> Reviewed-by: Zi Yan <ziy@nvidia.com>
-
-Thanks!
-
->
->
-> --
-> Best Regards,
-> Yan, Zi
->
-
---
-Cheers, Lorenzo
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
