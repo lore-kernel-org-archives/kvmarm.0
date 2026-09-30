@@ -1,49 +1,77 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD474DD3A2;
-	Wed, 30 Sep 2026 14:44:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4922D369990
+	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 14:50:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790779517; cv=none; b=LVYqLSqB+v2L91vWoSaCTy9y76QJ7UX7PRbG2BiXopYh89RfdMuEfFnUZKgIuLNLlPzTePexc+l0PbMF8rjiJTgm2rIIEqtdSAlx8jtoyFjICwbdpKCJfvsKFZs/VyIkbHxUBSeksT3e3DPJKr936M6xIET3rKsrX+hzqhFiX08=
+	t=1790779850; cv=none; b=jozgup4SQ7Dct5IrWLFdxnLTwwqDxLnzhVsULfLp5HFHDEIWVquAm8KAC9/KXiq4MI9T70/fJ9J8XjlehXjQzrPiRv3CQQtHPRgXrmGdDGSoJBNkhtH54VQRDMtYtXKMckj6risvUyA4Kv9M+x+aiElVNfIbTZPCNIxzEcJg9vU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790779517; c=relaxed/simple;
-	bh=HLlUQWER5GPL4c57fjFMJARLSJZqROvDyga3Zux6cPQ=;
+	s=arc-20240116; t=1790779850; c=relaxed/simple;
+	bh=lbw6QDjvmAOom4BsQ6obu0qG9SHaZVacueJ3ljC1rII=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P5qNvLu31oX4RkOqXJsEQF+THtvWIJNc9kmXWdI2YEx0Zy+9jFhvmqQIMS4TqLhKP31tJx05VURYVrPs+Hn59Efi9dIVXnKQrP9bnpoWEGT3dhYWQxeGyg/cZKYUadgCs6X+xglCCrd+n4pIgoLnoKkNPFiQP+lrixYR0+r1/Ow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GsUrGiZN; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=CsX+MCo4k5fbJ+gd2lCFhcnFHG/SImZFYkCap6DgjaMDm439GZ0YQoQA3LBVVmFL+MAAiVYtUx5YX1ZqEgWk2JQgvjae8qlL4HMPFaea0GPA0ivS1aFsIG8p8Ya2sl+S9JjmbXYLisYynyvVwPU113xLcoHIUswswhqnef/HehU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=icGCLbKc; arc=none smtp.client-ip=74.125.225.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GsUrGiZN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F7A61F00893;
-	Wed, 30 Sep 2026 14:44:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790779495;
-	bh=k6UVIhzsdZx5yMbBC0Hj1Zqo66sKEDFFBwKg4yISoQA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=GsUrGiZNeVEfDds38/qWXHLJJrm/I2CKdi8vnv1FAypbuJjpvIwfMxaiNI8ab7Hz3
-	 4rXJ2AudUts1c0RlsO3FEGCBqRwJ6b8i5Xq0QwNJJio7Xyz6MaLNeazj6xtZBg/6X5
-	 Hl9/Dv8QDXQbWIXNCXVwI7/ZzcL3C/s35dnMMLl1YzUkBdb1M4SKaZ4H70QAu31irJ
-	 mm1nD4kKqLuHwMDOMShiL8OEf/d5hd12bk/e/VRcsqqamB0wfZ0+q5M1r39N4N5R1p
-	 PgjA66UB1FlQ+OjL1OYn+aPt+sKVZg9wzdqqCWa5FOfnPGOnKYoWBi9IZEPQh7PZbv
-	 4GjgvggLJT6CA==
-Date: Wed, 30 Sep 2026 15:44:49 +0100
-From: Sudeep Holla <sudeep.holla@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
-	Sudeep Holla <sudeep.holla@kernel.org>, will@kernel.org,
-	catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
-	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
-	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
-	jonathan.cameron@oss.qualcomm.com
-Subject: Re: [PATCH v20 6/9] firmware: arm_rmm: Ensure the RMM has GPT
- entries for memory
-Message-ID: <20260930-judicious-loris-of-will-dea0a3@sudeepholla>
-References: <20260929221623.1342076-1-suzuki.poulose@arm.com>
- <20260929221623.1342076-7-suzuki.poulose@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="icGCLbKc"
+Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49ce364488dso7223255e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 07:50:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790779837; x=1791384637; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=ugl/kEsibxaOMxwiAB8ohvG+dBs5XjVCSnq2cxUbe8c=;
+        b=icGCLbKccKh7oeRTiQGthmm7FWasE6N23DkaQdK/bY2CRB2eKAgjZXxKqSNWTuVP53
+         CMmKUg+PuN7tMVoA/+n49TJfTl2w90EH67skKQk3zAA5kP/u1x3NI6fOiDXBs2Dbaqyc
+         HKxJS5T6CdB9SL1ABxC6N7BX3utN/oISwUunoHmQIxRxG3mP5gVhPtPFqjEDiTLDwGFu
+         TUepy9RE91BP3lL4SCO/Os2zXAEkRUeSL9oPfcw1e/dpnZi+CGprkfKO2jMSh7RpH537
+         +ex4tilYElqp4TSv/+fuFzBYr7RmwB8dEkvZo9TKtMSXHpWpms9ANAgDnR58bNdNVDmi
+         4LDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790779837; x=1791384637;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ugl/kEsibxaOMxwiAB8ohvG+dBs5XjVCSnq2cxUbe8c=;
+        b=eIIxMDenWoEjb8dVhEQc80tcWxzBzPDYibU1J+oGtgaSRz5LnjeUmkflQWBpCLkaLz
+         X0OwM++1nu2WZ97FsjUJkhYDRU7RdGB7C2Jzvc5bNtIeQSvmm297GHiwP2wMvs0KXwGR
+         fMESlyypJv9EJsb1CFg6xo1gQsnRvgyBpmbUWNyxiNwrwbcKnw4/D84aBx1/C8UtbJeO
+         I4OmPPg7vezYZZTWv7P6e9dG7Ndv0/jDj7/ViV4GnlMrGf7jXZgbHwbZtFaPQwZDq1d/
+         D1njiqDWXOYzP0t7C0UfgdMJtLvo3IaPtqIoe4rv7WZHOhVMfcO7w1VFTXHmiRMSOeCA
+         gDrw==
+X-Forwarded-Encrypted: i=1; AKwUvBw5I5TkfCj/rFhCjqSuFQA7UgyvpoF9OSdgftjkDjVdWsaoKw7gf7dYY9xb1w7/TPufDT9Ua28=@lists.linux.dev
+X-Gm-Message-State: AFuF++mAQVmNMCl29v9qf4ETAJsQoXrKXze3kJKlCDwVMiAmzrA6HpXd
+	EtFR9vDz1TGVb9WsKCV9OKA9qVPQXglx3DOw7A6eVl+Rws09ER1Xt+PYyL3TmrM8UcmiXz3Rocz
+	2CnLgl5Rv
+X-Gm-Gg: AYBFou2JhM2SnyXul1pVeBf/uRILg0EiuJawm2Jp3fvdsFlHCInLwBdZGhVdMsCWk1J
+	hsK3ljca3FGeM9EqpWZI8EH2s1qdcvYreK/91ZGjejeTrw0KqYbDL0cwUH6bpS/Lca32hwgx37i
+	IUxwiyhvhU3ihn1rPd5mNqMMQrzlVv0AyKWjU5hrj7XyNeb6uSHM4+0UpMii9n+/431HB2CZVB5
+	GNJtmdoFzBnGIXd7xYAAAnbLGH+BcwDEB0f/2ZhY86qkkSmVXV/E8vt5pBrwzwMxtsThgRCJeIm
+	9eCASV7w9/l1uJxgZOVEQqJOekBoKPIxlIh+ptZBxjvg9WdxsrhhGCmLW/CKFQC5jTPDO4YdCFf
+	ALZOOrETLKCwngqohSk1iZ6MIpmy3C/H0YVUcqFU29Yid2yzoQV3KCitb6Q8/AGG1h3OV9AszKq
+	O/X/Rw/kCFXDpemyMFG/8R3KRzUaSXj1ZEMq3l/Zm+sC4uq2UGaARVnbdMZC6VgXC7b6PRpR3mn
+	MkEE1J9iTZMm5X4yxWDG1q6Wazwh0ptBSWqlZDaf6E=
+X-Received: by 2002:a05:600c:1f95:b0:49f:c5aa:9ef4 with SMTP id 5b1f17b1804b1-4a01b1a1138mr26323985e9.8.1790779836298;
+        Wed, 30 Sep 2026 07:50:36 -0700 (PDT)
+Received: from google.com (197.183.140.34.bc.googleusercontent.com. [34.140.183.197])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a01e67e01esm3856325e9.13.2026.09.30.07.50.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Sep 2026 07:50:33 -0700 (PDT)
+Date: Wed, 30 Sep 2026 15:50:29 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+	kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com
+Subject: Re: [PATCH v5 00/18] KVM: arm64: Introduce pKVM hypervisor heap
+ allocator
+Message-ID: <ar0htZydVZdB9zVk@google.com>
+References: <20260901080941.997769-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,127 +80,166 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260929221623.1342076-7-suzuki.poulose@arm.com>
+In-Reply-To: <20260901080941.997769-1-vdonnefort@google.com>
 
-On Tue, Sep 29, 2026 at 11:16:20PM +0100, Suzuki K Poulose wrote:
-> From: Steven Price <steven.price@arm.com>
-> 
-> The RMM maintains the state of all the granules in the system to make
-> sure that the host is abiding by the rules. This state can be maintained
-> at different granularity, per page (TRACKING_FINE) or per region
-> (TRACKING_COARSE or TRACKING_INTERMEDIATE). The region size depends on the
-> underlying "RMI_GRANULE_SIZE". For a "coarse"/"intermediate" region,
-> all pages in the region must be of the same state, this implies we need to
-> have "fine" tracking for DRAM, so that we can delegate individual pages.
-> 
-> For now we only support a statically carved out memory for tracking
-> granules for the "fine" regions. This can be extended in the future to
-> allow modifying the tracking granularity and remove the need for a
-> static allocation by the firmware.
-> 
-> Similarly, the firmware may create L0 GPT entries describing the total
-> address space. But if we change the "PAS" (Physical Address Space) of a
-> granule, then the firmware may need to create L1 tables to track the PAS
-> at a finer granularity. Linux therefore checks if the platform firmware
-> manages the PAR region. i.e., the firmware is in charge of managing the
-> L1 GPTs (creation and the required memory for the GPT tables - via static
-> carveouts) without host intervention. Support for dynamic GPT creation by
-> the host will be added later.
-> 
-> If the firmware requires us to manage the tracking or GPT memory,
-> deactivate the RMM and reclaim any memory donated at RMM activation.
-> 
-> Apply the same checks when hotplugged memory is brought online.
-> 
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Tested-by: Gavin Shan <gshan@redhat.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  Changes since v19:
->    * Wrap comments to 80spaces.
->    * Add a comment on ALIGN_DOWN the end of memory range.
->    * Add is_rmm_active() to indicate if the RMM is active
->    * Switch errors to -ENODEV from -ENOMEM when RMM doesn't manage the region
->    * Print error messages when RMI_GPT_INFO/RMI_GRANULE_TRACKIN_GET fails
->  Changes since v18:
->    * Avoid mixing gotos with __free cleanups for arm64_init_rmi()
->    * Handle buggy RMM to make forward progress for RMI_GPT_INFO and
->      RMI_GRANULE_TRACKING_GET
->    * Make sure the memory ranges are not inverted and reject such ranges.
->    * Move granule_tracking_get/gpt_info wrappers closer to the callers
->      Drop "inline", let the compiler do its job
->  Changes since v17:
->    * Move wrappers that may not be used elsewhere, out of arm-rmi-cmds.h
->  Changes since v16:
->    * Check fine tracking and create L1 GPTs for hotplug-added memory.
->    * Clarify the L1 GPT setup and move the explanatory comment.
->    * Switch to using RMI_GPT_INFO command for checking the GPTs.
->    * Deactivate the RMM and reclaim the memory if we can't proceed.
->  Changes since v15:
->    * Skip firmware-reserved NOMAP memory in rmi_init_metadata()
->    * Handle negative error codes from wrappers.
->  Changes since v14:
->    * Move the implementation into drivers/firmware/arm_rmm.
->  Changes since v13:
->    * Moved out of KVM
-> ---
->  drivers/firmware/arm_rmm/rmi.c | 247 ++++++++++++++++++++++++++++++++-
->  include/linux/arm-rmi-cmds.h   |  18 +++
->  2 files changed, 264 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
-> index d982cf158f8da..d4d098448e46e 100644
-> --- a/drivers/firmware/arm_rmm/rmi.c
-> +++ b/drivers/firmware/arm_rmm/rmi.c
+Gentle ping for this series, 
 
-[...]
-
-> +static int rmi_verify_gpt_firmware_managed(phys_addr_t start, phys_addr_t end)
-> +{
-> +	unsigned long l0gpt_sz;
-> +	unsigned long next, par_state;
-> +
-> +	l0gpt_sz = 1UL << (30 + FIELD_GET(RMI_FEATURE_REGISTER_1_L0GPTSZ,
-> +					  rmi_feat_reg(1)));
-> +	start = ALIGN_DOWN(start, l0gpt_sz);
-> +	end = ALIGN(end, l0gpt_sz);
-> +
-
-Is it guaranteed that end with not be = PASZ ? The spec says RMI_GPT_INFO
-will return RMI_GPT_INFO when top >= pasz. Unlike start, end for good
-reason is aligned up(ceil) instead of aligned down, but that also means
-end will become PASZ when we reach end of memory, no ?
-
-Sorry if I am missing something, trying to understand bits and piece of
-RME still, just getting started.
-
-> +	while (start < end) {
-> +		long ret = rmi_gpt_info(start, end, &next, &par_state);
-> +
-> +		if (ret != RMI_SUCCESS) {
-> +			pr_err("RMI_GPT_INFO failed for %llx-%llx: (%ld)\n",
-> +				start, end, ret);
-> +			return -ENXIO;
-> +		}
-> +
-> +		if (WARN_ON(next <= start))
-> +			return -ENXIO;
-> +
-> +		if (par_state != RMI_GPT_PAR_PLAT) {
-> +			pr_err("GPT for the region is not managed by firmware %llx-%lx\n",
-> +				start, next);
-> +			return -ENODEV;
-> +		}
-> +		start = next;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
+It's been fully reviewed by Fuad and is already based on 7.3-rc1.
 
 -- 
-Regards,
-Sudeep
+Vincent
+
+On Tue, Sep 01, 2026 at 09:09:23AM +0100, Vincent Donnefort wrote:
+> pKVM historically lacked a dynamic memory allocator: all hypervisor-side
+> VM and VCPU structures had to be sized on the host, allocated as
+> contiguous pages and donated to the hypervisor.
+> 
+> This design tightly coupled the hypervisor's memory footprint to
+> host-side constraints, complicated memory reclaim, and severely
+> restricted VM scalability.
+> 
+> This patch series introduces a dynamically-mapped custom heap allocator
+> (hyp_allocator) to the pKVM hypervisor. The initial users are the
+> pkvm_hyp_vm and pkvm_hyp_vcpu structs, and the hypervisor tracing
+> metadata.
+> 
+> In the near future, this heap allocator is expected to be leveraged to
+> support SVE in protected VMs and in the distant future, it will also
+> support dynamic device assignment.
+> 
+> By moving to a hypervisor-managed dynamic allocator, we also allow
+> deduplicating the donation/reclaim path of EL2-private structures.
+> 
+> The main building blocks for this series are:
+> 
+> 1. pkvm_hyp_req:
+> ----------------
+> When the hypervisor heap allocator goes out of memory (-ENOMEM), it
+> suspends the hypercall, embeds a PKVM_HYP_REQ_HYP_ALLOC top-up request
+> into the SMCCC HVC return registers, and exits back to the host.
+> 
+> This building block will also be useful for the future huge-mapping
+> support in protected guests, allowing EL2 to raise requests such as
+> block splitting back to the host.
+> 
+> 2. hyp_allocator:
+> ----------------
+> This heap allocator manages a reserved VA space range, dynamically
+> mapping and unmapping physical pages on-demand to minimise the pKVM
+> hypervisor footprint. As memory is reclaimed and relinquished to the
+> host, unmapped holes are introduced within the VA space. To prevent
+> orphan mapped regions, neighboring unused chunks cannot be merged if
+> they are separated by an unmapped region.
+> 
+> The allocator chunk metadata is stored directly into the VA space range.
+> To minimize metadata overhead, chunks only link to each other via a
+> relative 32-bit offset.
+> 
+> A simple hardening of the metadata is added via a simple 32-bit hash.
+> 
+> 3. shrinker:
+> ------------
+> As the heap allocator isn't reclaimed actively on VM or tracing
+> teardown, a shrinker is added to allow the host to reclaim unused memory
+> from the hypervisor when the host is under heavy memory pressure.
+> 
+> Changelog
+> ---------
+> 
+> v5:
+> 
+>   - Remove unreachable !prev checks in hyp_allocator_destroy_chunk() (Fuad)
+>   - Add kerneldoc to pkvm_call_hyp_req() (Fuad)
+>   - Avoid duplicate handle___pkvm_hyp_alloc_selftest() definitions when !CONFIG_NVHE_EL2_DEBUG
+>   - Chunk pkvm_hyp_reclaim() with cond_resched() to avoid blocking in EL2
+>   - Allow shrinker to scan across all runtime topup IDs
+>   - Reclaim chunks before draining allocator->mc in hyp_allocator_reclaim() (Fuad)
+>   - Make is_ttbr1_addr() check in __kern_hyp_va() conditional to pKVM (Fuad)
+>   - Rename pkvm_memcache to stage2_mc
+>   - Rebased on 7.3-rc1
+> 
+> v4: https://lore.kernel.org/all/20260731143541.956291-1-vdonnefort@google.com/
+> 
+>   - Add kerneldoc to pkvm_remove_mappings
+>   - Allow pkvm_private_va_range_pa() to work with block-level mappings (Sashiko)
+>   - Add rollback and harden pkvm_map_private_va_range input (Sashiko)
+>   - Add missing mc count into reclaimable memory
+>   - Differentiate -ENOMEM from hyp_alloc in errno_to_smccc() (Sashiko)
+>   - Collect Fuad's Tested-by
+> 
+> v3: https://lore.kernel.org/all/20260720171513.1415357-1-vdonnefort@google.com/
+> 
+>   - Remove unsafe WARN_ON(hyp_spin_is_locked(&pkvm_pgd_lock)) check in hyp_allocator_alloc() (Sashiko)
+>   - Modify MIN_ALLOC_SIZE to 16-bytes to comply with FPSIMD alignment requirements (Sashiko)
+>   - Allow hyp topup/reclaim HVCs pre-deprivilege
+>   - Add enum symbols to pkvm_hyp_req_handle event (Fuad)
+>   - Various clarification in commit descriptions (Fuad)
+>   - Restore unmap_donated_memory() for PGD on error path (Fuad)
+>   - Renamed __hyp_allocator_map -> pkvm_map_private_va_range (Fuad)
+>   - Collected Fuad's Reviewed-by tags
+>   - Rebased on 7.2-rc4
+> 
+> v2: https://lore.kernel.org/all/20260706175415.2604046-1-vdonnefort@google.com/
+> 
+>   - Rebased series on 7.2-rc2.
+>   - Use scope-based hyp_spinlock.
+>   - Fix best_missing/best_data_size priority in hyp_allocator_find_efficient_chunk() (Sashiko)
+>   - Fix missing free_hyp_memcache() in pkvm_hyp_topup() (Sashiko)
+>   - Fix unused selftest_init() warning when !CONFIG_NVHE_EL2_DEBUG (Sashiko)
+>   - Fix missing shrinker_free() in teardown_hyp_mode() (Sashiko)
+> 
+> v1: https://lore.kernel.org/r/20260520152650.4107895-1-vdonnefort@google.com
+> 
+> Vincent Donnefort (18):
+>   KVM: arm64: Add pkvm_private_va_range_pa
+>   KVM: arm64: Add pkvm_remove_mappings
+>   KVM: arm64: Add pkvm_map_private_va_range
+>   KVM: arm64: Add a heap allocator for the pKVM hyp
+>   KVM: arm64: Allow kvm_hyp_memcache usage outside of stage-2
+>   KVM: arm64: Add pkvm_hyp_req infrastructure
+>   KVM: arm64: Add PKVM_HYP_REQ_HYP_ALLOC request
+>   KVM: arm64: Add reclaim interface for the pKVM heap alloc
+>   KVM: arm64: Add selftests for the pKVM heap allocator
+>   KVM: arm64: Add a shrinker for pKVM
+>   KVM: arm64: Filter out non-kernel addresses in kern_hyp_va
+>   KVM: arm64: Move hyp_vm refcount into the structure
+>   KVM: arm64: Alloc pkvm_hyp_vm using pKVM heap allocator
+>   KVM: arm64: Alloc pkvm_hyp_vcpu using pKVM heap allocator
+>   KVM: arm64: Rename vCPU pkvm_memcache to stage2_mc
+>   KVM: arm64: Reject hyp trace descriptors with fewer CPUs than
+>     hyp_nr_cpus
+>   KVM: arm64: Reject hyp trace descriptors with fewer than 3 pages
+>   KVM: arm64: Alloc simple_buffer_page using pKVM hyp allocator
+> 
+>  arch/arm64/include/asm/kvm_asm.h           |    4 +
+>  arch/arm64/include/asm/kvm_host.h          |   16 +-
+>  arch/arm64/include/asm/kvm_mmu.h           |    3 +
+>  arch/arm64/include/asm/kvm_pkvm.h          |  117 ++
+>  arch/arm64/kvm/arm.c                       |    4 +-
+>  arch/arm64/kvm/hyp/hyp-constants.c         |    2 -
+>  arch/arm64/kvm/hyp/include/nvhe/alloc.h    |   28 +
+>  arch/arm64/kvm/hyp/include/nvhe/mm.h       |    3 +
+>  arch/arm64/kvm/hyp/include/nvhe/pkvm.h     |   19 +-
+>  arch/arm64/kvm/hyp/include/nvhe/spinlock.h |    4 +
+>  arch/arm64/kvm/hyp/nvhe/Makefile           |    2 +-
+>  arch/arm64/kvm/hyp/nvhe/alloc.c            | 1211 ++++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c         |  125 +-
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c      |   10 +-
+>  arch/arm64/kvm/hyp/nvhe/mm.c               |   79 ++
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c             |  104 +-
+>  arch/arm64/kvm/hyp/nvhe/setup.c            |    6 +
+>  arch/arm64/kvm/hyp/nvhe/trace.c            |   70 +-
+>  arch/arm64/kvm/hyp_trace.c                 |   15 +-
+>  arch/arm64/kvm/mmu.c                       |    6 +-
+>  arch/arm64/kvm/pkvm.c                      |  200 +++-
+>  arch/arm64/kvm/trace_pkvm.h                |   45 +
+>  22 files changed, 1915 insertions(+), 158 deletions(-)
+>  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/alloc.h
+>  create mode 100644 arch/arm64/kvm/hyp/nvhe/alloc.c
+>  create mode 100644 arch/arm64/kvm/trace_pkvm.h
+> 
+> 
+> base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
+> -- 
+> 2.55.0.897.gb25b4bd76c-goog
+> 
