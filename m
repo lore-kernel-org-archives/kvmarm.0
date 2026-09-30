@@ -1,81 +1,93 @@
-Received: from mta1.migadu.com (out-119.mta1.migadu.com [95.215.58.119])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D554CC63A
-	for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 13:34:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.119
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3B04FC8CD;
+	Wed, 30 Sep 2026 13:39:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790775272; cv=none; b=i96ztgT+5ogY5HNCz3rkNMh099gae8OUTOhah5dNaf/tLj3Dan7pwFBsC5T0ZtBbeFfIpHPt8Xtf+XcX4bTn6kHliDmL2hswKi0I4+RKwNGpv060J0zj7oPku+tgQg6tZREiwmOCOFIPjo4FoLrzPKpHTb3cYTptu8rBmNloLQs=
+	t=1790775574; cv=none; b=bR3CzzD0IJ3aAPU7vQ/jLoUh30bzh7at4/7x1n0TcvOstiYDfq/AOr0R0HrG4BrWPBN7s/Wzn4qrNbggLkO1sAsBE/TfaTzCc1gLv3MyNVL7hJXymUxPYlPoB06legrSze7vuSNQXpkV7mqPL9wY5jr1NuPcP0sgV2Npxr2diXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790775272; c=relaxed/simple;
-	bh=dN7iIkrg2M+jf5Tj2Vy0WrS/Nd7WiyAkyWWbyMwdKQo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ftiQAoauceFf2NAYIei1mEJ1fBtfa0MyKckfRv6GyEH7lm75qEde5mCqBwQ/WkZiZgEcihOHXEpqGatBYRJpc57pqI4Cqd255Vb3ZdONtONl8s5dvh2eWnzwZIHU3WUPOytuQLYYShJWbkQXkGjGEfmSA2fDEcMCeI6LDhZ4FyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Shgzquwo; arc=none smtp.client-ip=95.215.58.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1790775574; c=relaxed/simple;
+	bh=WrLZ5gfj597SIIguCgOUtqlPTHgYb9tcuWrI/gHAH10=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dWQ9fefZ2c+aVYvq3JSNRWsAQo/8XW/pHdtv3mWkcQ5rfA/CLzTsLhnLGdXcXWYHomWkg2A+BHUw0UkfsIwcOqjdxElhAUqjPFiVIfeE6nidxsanyujTHNNERxwmcifmstHTzIK3dzR5MWiJ5s+u6a9TPGupE0dpmgFNOa7r9Hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Pcj3sxhu; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Shgzquwo"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=dN7iIkrg2M+jf5Tj2Vy0WrS/Nd7WiyAkyWWbyMwdKQo=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790775260; v=1; x=1791380060;
- b=Shgzquwokc5/rGOxQdywbmDJeloIc7EbuWEKKs3/3LIyfoQCi5LC3dgoLP6MYq5m2aEpUk9B
- qirRmomOTKqxGoZOuVc8KNxbzVY8cu+ndyumXh13IHh3EiHN3st+IWkiZoLVxm6oANyELUnKzTk
- sjlUwtaEBVO4tJ2loao2AHbY=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 1454421c7059c8a3;
-	Wed, 30 Sep 2026 13:34:20 +0000
-X-Mizu-Trace-ID: 1454421c7059c8a3
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5ba3d1ea20cso1132e87.0
-        for <kvmarm@lists.linux.dev>; Wed, 30 Sep 2026 06:34:16 -0700 (PDT)
-X-Gm-Message-State: AFq9FYIUy57YeVTEKYFbfs0PXUgnVSGfKzDApVbnhXl9j0NWP6j6isFc
-	bdQ9KOoNYZoqbyqBWZc1gUSjbtT/+qKpBNTc+FjV4cZqKjfqB85lB3rqFgVktuPjktJmv+vSDdS
-	E1FB5N+zwAArO05ovN2v6wqYvwuXs5fUe5CjgQzKr
-X-Received: by 2002:a05:6512:12d1:b0:5b2:a967:c0e1 with SMTP id
- 2adb3069b0e04-5ba3f6d7e5fmr77593e87.0.1790775255802; Wed, 30 Sep 2026
- 06:34:15 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Pcj3sxhu"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 08061497;
+	Wed, 30 Sep 2026 06:39:12 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1B1893F86F;
+	Wed, 30 Sep 2026 06:39:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790775555; bh=WrLZ5gfj597SIIguCgOUtqlPTHgYb9tcuWrI/gHAH10=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Pcj3sxhuzrhm1E/ig/tQbFU+vGp68EdZ3hS1A4ER37ixvE4v7iH8lKDH1EWxVDw4P
+	 q+VI/Tvjrv3VA4weqNAi0Sk4uHAMzZk+rQoW1zI+4kSSTimnPuEZWd4Op4GrayP4c0
+	 6U0s8zjk3oI005UNqWKJnYD8xBQpRrTB5+UdNchM=
+Date: Wed, 30 Sep 2026 14:39:04 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+	will@kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+	sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
+Subject: Re: [PATCH v20 6/9] firmware: arm_rmm: Ensure the RMM has GPT
+ entries for memory
+Message-ID: <ar0Q-F92FaPEiEbc@arm.com>
+References: <20260929221623.1342076-1-suzuki.poulose@arm.com>
+ <20260929221623.1342076-7-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260929212925.31775-1-oupton@kernel.org> <20260929212925.31775-2-oupton@kernel.org>
-In-Reply-To: <20260929212925.31775-2-oupton@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 30 Sep 2026 14:33:39 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzjnJGXNZFLFKEv0QTCPA=-+zbiqArLPn0DnekzTLgVSA@mail.gmail.com>
-X-Gm-Features: AclHuK9OdjQrdOGNR-0ecHL1vfChY5nIiN5ci0GNgWKucq05y1exXxSSPTfBarM
-Message-ID: <CA+EHjTzjnJGXNZFLFKEv0QTCPA=-+zbiqArLPn0DnekzTLgVSA@mail.gmail.com>
-Subject: Re: [PATCH 1/4] KVM: arm64: Add helpers to halt a vCPU
-To: Oliver Upton <oupton@kernel.org>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Wei-Lin Chang <weilin.chang@arm.com>, Steffen Eiden <seiden@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260929221623.1342076-7-suzuki.poulose@arm.com>
 
-Hi Oliver,
+On Tue, Sep 29, 2026 at 11:16:20PM +0100, Suzuki K Poulose wrote:
+> From: Steven Price <steven.price@arm.com>
+> 
+> The RMM maintains the state of all the granules in the system to make
+> sure that the host is abiding by the rules. This state can be maintained
+> at different granularity, per page (TRACKING_FINE) or per region
+> (TRACKING_COARSE or TRACKING_INTERMEDIATE). The region size depends on the
+> underlying "RMI_GRANULE_SIZE". For a "coarse"/"intermediate" region,
+> all pages in the region must be of the same state, this implies we need to
+> have "fine" tracking for DRAM, so that we can delegate individual pages.
+> 
+> For now we only support a statically carved out memory for tracking
+> granules for the "fine" regions. This can be extended in the future to
+> allow modifying the tracking granularity and remove the need for a
+> static allocation by the firmware.
+> 
+> Similarly, the firmware may create L0 GPT entries describing the total
+> address space. But if we change the "PAS" (Physical Address Space) of a
+> granule, then the firmware may need to create L1 tables to track the PAS
+> at a finer granularity. Linux therefore checks if the platform firmware
+> manages the PAR region. i.e., the firmware is in charge of managing the
+> L1 GPTs (creation and the required memory for the GPT tables - via static
+> carveouts) without host intervention. Support for dynamic GPT creation by
+> the host will be added later.
+> 
+> If the firmware requires us to manage the tracking or GPT memory,
+> deactivate the RMM and reclaim any memory donated at RMM activation.
+> 
+> Apply the same checks when hotplugged memory is brought online.
+> 
+> Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Tested-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-On Tue, 29 Sep 2026 22:29:22 +0100, Oliver Upton <oupton@kernel.org> wrote:
-[...]
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-[...]
-> +void kvm_pause_vcpu(struct kvm_vcpu *vcpu)
-> +{
-> +        atomic_inc(&vcpu->arch.pause);
-> +        kvm_make_request_and_kick(KVM_REQ_SLEEP, vcpu);
-> +}
-
-Could this wait like kvm_arm_halt_guest() does? The halt sends an IPI
-to any vCPU that isn't OUTSIDE_GUEST_MODE, but this only sends one if
-its own cmpxchg takes the vCPU out of IN_GUEST_MODE. After an earlier
-kick the vCPU can still have its LRs loaded when this returns. A
-scratch test moving a pending LPI back and forth with MOVI hits the
-WARN_ON(irq->on_lr) in vgic_v3_compute_lr(), and doesn't once this
-waits.
-
-Cheers,
-/fuad
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
