@@ -1,118 +1,91 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E864534A9;
-	Wed, 30 Sep 2026 08:19:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B964345A2BD;
+	Wed, 30 Sep 2026 08:20:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790756345; cv=none; b=l+Zgkb6kxpqfzIR/px2C4xvTGS7jAQbmEuoVKBEvZt9Ri3m+tLkXJvlUnUEms4m2MrJl2e5cAnvfoIP9w/UPrQU11jjE6IMHH+y9xwdpzcNgUt695mbO8UUiacfJaM8ImHeD6R9PNQBcXMr/sNQAku4/7U4PS1R9N5UzlIFZLIA=
+	t=1790756459; cv=none; b=IsjE+/r2TizD9Igjpmrgfj6DULrZ6RmxAxxydnAzKOz8HhoRx0DMCOgSBWQrrwRL+0W/TZkvGNiW3unnkOB7PwkgqYXoE9hWDUbASn1kC+lLlU1vu3CNbDiO7xZHR5OZL8ZfA38SNFsGER+KJbrBEWSVShVxYulA5xJJ7fSc9+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790756345; c=relaxed/simple;
-	bh=lfZj10nJ+gasYMBDGKcSc2OvOyFn1EF5uOIn79yazxk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XU9thT38LeZqmKKhlcDFCWNPdCHtEBC18PJRy4f6H8tQDcySM86EpDE4HqMhGK/NEeejXGFfFGnmJH3MzsgQ4UJpEujhivHxoJwdo0/5BDJMf4ivv2EEDMlf2HoxElttoi57OfbUZ9ZiNxUyBkds9q2aEmk6GKWEANMRTfAi0jU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=X4XrG4y1; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1790756459; c=relaxed/simple;
+	bh=u016q+T3ZG95kX40mCqacc5cB+rNEjOrL5eR9KhIkCs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=g3cMco80ApKk2sS9ggYjeqbMHGiQYXHZKPjvUPRStNH8fSwmfj/Zx79iaQNTuQ0er9Oznwy0v9/Lff3YdjDKRp9qxQ+XMK0iKs9eHL0i6t00e2Is6QemcDn/cA8F8uEpZSpbah6pG1B/i96Cww/OLjgd0jtHUn4GJW1wpgpg80I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BYfxPu8/; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="X4XrG4y1"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1CA441477;
-	Wed, 30 Sep 2026 01:18:55 -0700 (PDT)
-Received: from [192.168.1.148] (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B25F33F85F;
-	Wed, 30 Sep 2026 01:18:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790756338; bh=lfZj10nJ+gasYMBDGKcSc2OvOyFn1EF5uOIn79yazxk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=X4XrG4y16Lmyoe4sTOZYwsAKt48rAIotXDiltM4j9FIReVUaQnHf9IrOQrN+z0OFJ
-	 VsH2FnJlV6yDMnGMECKpp+apeLoZYmM5wO2kDlYapzyCcJ3796TH2yDBgEUIqIFNb6
-	 IPiT9bczlCoThFlDr7b7BSnQ8jvXIhCNdA9yO23s=
-Message-ID: <a2fa2bd1-6888-4ed5-9e2f-233eacb600a5@arm.com>
-Date: Wed, 30 Sep 2026 09:18:48 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BYfxPu8/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C1A11F000FF;
+	Wed, 30 Sep 2026 08:20:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790756457;
+	bh=8Kl5UcJrGEhp2IPa8cWZX2IgI14wRtDck030fk2wpo0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=BYfxPu8/AekEa34JEpsE65qz0QWzoF4W7RjDh1tFhBVHQrbik9vAbAGCTKXVf3r/G
+	 yy0DRqV4kKEuZsI7oGF83xPgqRFBg5GunS1Hc+OrfEP5DBR1hqlBUl460eXiad08yy
+	 0rZZw9O787nzndvfPQzXtd8zmRWdkJPe2K/w7/9xvb5niqNU/FLHUnNRN8kJmRFE+T
+	 XUCPIDUlfriM6lCZZrWO4VfbbBNK6zLib4+IEa4wgOj4R8PILpMNhvxOIMwIxU+rXp
+	 xOYt4RSozj97uYVtmYvg0L2gm+Eu5iiJEaNr9u8EnCCX/bdNdCV3DYniGcUNErQKjq
+	 tgEpNyFDcrNYQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xBpYc-0000000FCz3-37bI;
+	Wed, 30 Sep 2026 08:20:54 +0000
+Date: Wed, 30 Sep 2026 09:20:54 +0100
+Message-ID: <864if740bd.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	"Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Subject: Re: [PATCH v4 2/3] KVM: arm64: Block ID register changes after we rely on the values
+In-Reply-To: <20260929-kvm-arm64-idreg-final-v4-2-75296dde994d@kernel.org>
+References: <20260929-kvm-arm64-idreg-final-v4-0-75296dde994d@kernel.org>
+	<20260929-kvm-arm64-idreg-final-v4-2-75296dde994d@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 2/9] firmware: arm_rmm: Check for RMI support at init
-Content-Language: en-GB
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, Marc Zyngier
- <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
-References: <20260929221623.1342076-1-suzuki.poulose@arm.com>
- <20260929221623.1342076-3-suzuki.poulose@arm.com>
- <20260929222840.A0E821F000FF@smtp.kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260929222840.A0E821F000FF@smtp.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, fuad.tabba@linux.dev, peter.maydell@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, ljs@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 29/09/2026 23:28, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
-> - [High] arm_rmm: unbounded spin loop on RMI_BUSY without scheduling
-> - [Medium] arm_rmm: commit message and code mismatch on feature registers count
-> --
-> 
-> commit 5ddd90a4b6dcf005d84ebc9f9003eb3f383394f8
-> Author: Steven Price <steven.price@arm.com>
-> 
-> firmware: arm_rmm: Check for RMI support at init
-> 
-> This commit queries the RMI version to ensure compatibility and reads
-> feature registers from the Realm Management Monitor (RMM). It also exposes
-> these feature registers for future use.
-> 
->> The first two feature registers are read and exposed for future code to
->> use.
-> 
-> [Severity: Medium]
-> Is this description accurate? The commit message explicitly claims that the
-> first two feature registers are read, whereas the actual implementation in
-> rmi_read_features() iterates over ARRAY_SIZE(rmi_feat_reg_cache) (which is
-> 5) to read all 5 feature registers. This looks like the commit message
-> might have missed the v19 code change.
+On Tue, 29 Sep 2026 12:57:59 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 
-Ack. I have fixed this locally.
+[...]
 
-> 
->> diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
->> new file mode 100644
->> index 0000000000000..911489b636522
->> --- /dev/null
->> +++ b/include/linux/arm-rmi-cmds.h
-> [ ... ]
->> +static inline void rmi_smccc_invoke(struct arm_smccc_1_2_regs *regs)
->> +{
->> +	struct arm_smccc_1_2_regs args = *regs;
->> +	long status;
->> +	int i = 0;
->> +
->> +	while (i < RMM_BLOCKED_RETRY_COUNT) {
->> +		arm_smccc_1_2_invoke(&args, regs);
->> +
->> +		status = RMI_RESULT_STATUS(regs->a0);
->> +		if (status != RMI_BUSY && status != RMI_BLOCKED)
->> +			break;
->> +		if (status == RMI_BLOCKED)
->> +			i++;
->> +		cpu_relax();
->> +	}
-> 
-> [Severity: High]
-> Does this sequence create an unbounded spin loop if the firmware continuously
-> returns RMI_BUSY?
-> 
-> If the status returned by arm_smccc_1_2_invoke() is RMI_BUSY, the loop
-> continues without incrementing the exit counter i. It issues cpu_relax()
-> but does not yield the CPU (e.g., via cond_resched()) or impose a timeout.
-> If the RMM firmware remains busy, this could cause the host kernel to lock
-> up indefinitely.
+> +#define kvm_id_regs_final(kvm)						\
+> +	test_bit(KVM_ARCH_FLAG_ID_REGS_FINAL, &(kvm)->arch.flags)
+> +
+> +#define vcpu_id_regs_final(vcpu)					\
+> +	kvm_id_regs_final((vcpu)->kvm)
+> +
 
-This is like "spinlock contention". RMM returns EBUSY when a resource is
-locked temporarily. We should be able to make progress, unlike the
-RMI_BLOCKED, which is blocking due to a long running operation.
+This second helper really gives the wrong idea (idregs are never
+vcpu-specific with KVM). I've dropped it when applying this series.
 
-Cheers
-Suzuki
+Thanks,
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
