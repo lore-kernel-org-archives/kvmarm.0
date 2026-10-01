@@ -1,382 +1,203 @@
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
+Received: from mta0.migadu.com (out-248.mta0.migadu.com [91.218.175.248])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8CD521203
-	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 14:30:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F22AF348C7F
+	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 14:32:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.248
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790865024; cv=none; b=OvRHh2FbvMANgnJ/fik3DvgaXblZYayfeaezRdYreI09IFKQY9VP0fKTIeBpSFfYUR1dKot+S16+VP1dgLKnJqWAQPNrtu4XKaizUyzjp6jm08U8lme00MQX6ZtbkJ+Bz0+GTlCvjctPrnCwC2wp1x9cWGm/k+G4M0eeeYSXv6o=
+	t=1790865159; cv=none; b=FXTmSFa+vUoqh+9D3NV54OjONSewMjsBbsgWwHuPKhkbgqjeju6mGF9I5r4GtwG8w1NnO4uTPnrXqpk4iMxsZp2mQqObycTr5el/Mb5tKvoXeLI1uvvZEf4kvCX6d591tdJuepIzb7BevFg3nXex2+bfai2iHlrOhEr6UK7S91M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790865024; c=relaxed/simple;
-	bh=p2F6aCNVv/Mbuln4S2BXzpo6jI+DdR+8VMpJe1ewD4I=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dnjMX3bcUlWjXqjZ/m2vrZY+JcO/D9OyCFsItizOPiUX8z64PRKfDKm8+pQzTgCWCdo0FPz9+JA6OPH9COZU+mtvJlEPUi7KsXqgTkwBl3fu6aSqrK6UJP8kmOlSJfrduGpMoMcpyaB20uCzC8jy/GDKlDuM5pFCfElRpo0bPAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nZTmfg1o; arc=none smtp.client-ip=209.85.221.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
+	s=arc-20240116; t=1790865159; c=relaxed/simple;
+	bh=999ozKnr12qqAVi3LloNIavbUCDjUOpW5yhPr1EvpdY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UTiXsm9fWfSU/FdgYEJssTROOjfyReg/AoI3zq61YK1B0EYvp5jLpZZ29GILU+dRttFEPOErRBzeJJ/kJj+3fPtTwz+hZjgyUAooWbxdIUEd8xRc/EHerZ+oywtocAmFiuruwoOA0VfzuClfyK8gPX8QCF2GiEgmrD2W3Ev2dnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vh45FxGZ; arc=none smtp.client-ip=91.218.175.248
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nZTmfg1o"
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-48b02d63407so1222783f8f.0
-        for <kvmarm@lists.linux.dev>; Thu, 01 Oct 2026 07:30:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790865017; x=1791469817; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=IrBFhkITbSN8UWPGppEwnUycZpASHfPM0q0E2Ptifos=;
-        b=nZTmfg1oEEgZS2BEPQZUtXusuUuOO7rEz6HDxEAc983NjbRS736QP9jHaZNXQpu/c9
-         BdsDjNn3mKPl96+TpV1pAglzBE3NdPk2JnkUmRoS2RpjH/xof+zDbC5i5E67xz75s9Sj
-         elIZqkrQd6WNWg1sW7dPjJ93kX0snPB/iCr5/3aMixR+/Hq5zmBRqgsRqTIUjV3Go90Z
-         L9HbIOXR4u7uZ1yPpU/JCNLtv93OFFizID6F00PX92l71KcaG+Vgs5f42037/vLCAcfn
-         SrGi2snheaso62eAzxt7MnIxi4Sz50UQDB3ggtag9cisNYDXu0ioFQhZgQIMqERHsXd0
-         tmdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790865017; x=1791469817;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=IrBFhkITbSN8UWPGppEwnUycZpASHfPM0q0E2Ptifos=;
-        b=UPFfwurr2Uytq+FNt7hz787dTzhHbl8VbqyPnDvI0dKU8yOa4goRJuuyyfb+04iSow
-         +jQeLi9fmW5VSIpCtEURnG2XFZIkMEBL6786hJ2+GZGKxWdCCbHADD20xQNvRoS+4/L9
-         n9WiB9Af+gZ7BzB5LefJauE4bxIGmLPVSMgJWi+YbailxuPz/FDO6TMMdnD+0wOwL+vT
-         HwusSrhYQO5bOZ5w/G75Arjm3QR2ugQm3nfnRW6+/MSvsNgQYo0csjJN1irAcwpOPGdE
-         QIo1UzSU1nq1PIg6D6rLe/fvzXMKydkZO2ibwgbmWvpCzUxL7y5uV6nXFDotIP58j4+5
-         T+oA==
-X-Forwarded-Encrypted: i=1; AKwUvByOMl/7JTnEe8Fa/vJnQchGqLpgKN0koD0335tWa3WShZOOKLbCqLBrgN7dqoMfz9JEP9hokow=@lists.linux.dev
-X-Gm-Message-State: AFq9FYLoXBzaGoMLY+EgZli6Vv4/EVg6VEWsUqMQVP4LhA8ArVfjS06T
-	nxVVKZUx5ATij1xZMeHIThIXkGIqYe9Nyc7Alafd1ktKWtEISFBlJz5Eu18kGScDvcPkDELHhgo
-	33lcP9ztojzJd67r+eqQG4A==
-X-Received: from wrio15.prod.google.com ([2002:a5d:648f:0:b0:48b:175:52cf])
- (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6000:2007:b0:487:baa:aa6b with SMTP id ffacd0b85a97d-48b02541506mr8294054f8f.43.1790865013573;
- Thu, 01 Oct 2026 07:30:13 -0700 (PDT)
-Date: Thu,  1 Oct 2026 15:30:00 +0100
-In-Reply-To: <20261001143000.3371786-1-vdonnefort@google.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vh45FxGZ"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=999ozKnr12qqAVi3LloNIavbUCDjUOpW5yhPr1EvpdY=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1790865152; v=1; x=1791469952;
+ b=vh45FxGZMYL2NJUlXzuF6T2deLvIi8t9sUvqZH/u5CklXNGXoQgiKwWnGyOyLaDz4cazp/Qo
+ 9+KiQxZPEDjOFquuLTk7prQ6gR+DE48cRnFUKU1StDsyvk7m2ynexpTWOin2rDJ3NQaYaaqXsVl
+ vVgpHg1HMpt5Nbmy+g4yhwsc=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id c9971480cf311f5e;
+	Thu, 01 Oct 2026 14:32:32 +0000
+X-Mizu-Trace-ID: c9971480cf311f5e
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5ba429b64c5so8158e87.1
+        for <kvmarm@lists.linux.dev>; Thu, 01 Oct 2026 07:32:32 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBzGt4tzzM1CE6r2mqlS5ZXQ/F9FIYWHbjbE71s1Cfqx7hKISBPvwLHpuUuQOKfK26NLR8BSBXk=@lists.linux.dev
+X-Gm-Message-State: AFq9FYIVOk8BG28YIzmy+yzexSh3X0V6AqDKlh8Iurpn/0oV/p00J9d3
+	oKcnrqeZ7X77v/m3On57xDIPm5pg1XkHFuoS/x/qUDin1TJ0A5m3gQOEURmL66CGQ9TrE5T9Rhk
+	Stx1mGLvyhfyu6qu/oPNrikCQqfmBr7IsiMPdJc2G
+X-Received: by 2002:a05:6512:3194:b0:5b8:d04b:a1be with SMTP id
+ 2adb3069b0e04-5bb7944842dmr58567e87.2.1790865151162; Thu, 01 Oct 2026
+ 07:32:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20261001143000.3371786-1-vdonnefort@google.com>
-X-Mailer: git-send-email 2.56.0.rc1.315.gc6ed9934b7-goog
-Message-ID: <20261001143000.3371786-5-vdonnefort@google.com>
-Subject: [PATCH v5 4/4] KVM: arm64: Add hyp_printk event to nVHE/pKVM hyp
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org
-Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	kernel-team@android.com, fuad.tabba@linux.dev, 
-	Vincent Donnefort <vdonnefort@google.com>, Fuad Tabba <tabba@google.com>
+MIME-Version: 1.0
+References: <20261001135711.1640520-1-fuad.tabba@linux.dev>
+In-Reply-To: <20261001135711.1640520-1-fuad.tabba@linux.dev>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Thu, 1 Oct 2026 15:31:55 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTyiwG6=VT1kSfyt+A1aMoTG4q6wdYkNmnDuwAbkz3YsMg@mail.gmail.com>
+X-Gm-Features: AclHuK8-UiMlAsIzvUJY49qlEjdh0TC9CmnSfweB2LsKfWfa236H8RRsE5ESvog
+Message-ID: <CA+EHjTyiwG6=VT1kSfyt+A1aMoTG4q6wdYkNmnDuwAbkz3YsMg@mail.gmail.com>
+Subject: Re: [PATCH v4 00/18] KVM: arm64: Confine protected VM vCPU state to EL2
+To: maz@kernel.org
+Cc: catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, 
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	mark.rutland@arm.com, steven.price@arm.com, vdonnefort@google.com, 
+	qperret@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Create an event to allow developers to log pretty much anything into the
-hypervisor tracing buffer with trace_hyp_printk(), just like the kernel
-tracing has the function trace_printk().
+Hi Marc,
 
-  #include <asm/kvm_hypevents.h>
+Here's a link to the series based on kvmarm/next, conflicts resolved:
 
-  trace_hyp_printk("foobar");
-  trace_hyp_printk("foo=%d", foo);
-  trace_hyp_printk("foo=%d bar=0x%016llx", foo, bar);
+https://android-kvm.googlesource.com/linux/+/refs/heads/tabba/pkvm-core-b-v4-kvmarm-next
 
-To ensure writing into the tracing buffer is fast, store the string
-format into a kernel-accessible ELF section. The hypervisor only has to
-write into the event the string ID, which is the delta between the
-hyp_string_fmt and the start of the ELF section.
+Cheers,
+/fuad
 
-The string format is parsed by the kernel. It is therefore not possible
-to dereference hypervisor pointers and the format specifier %s is not
-supported. Also the %p specifiers will fail to find the hypervisor
-function.
-
-To not waste tracing buffer data, use a dynamic size. Each argument is 8
-bytes.
-
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-Reviewed-by: Fuad Tabba <tabba@google.com>
-Tested-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/include/asm/kvm_hypevents.h        | 14 ++++
- arch/arm64/include/asm/kvm_hyptrace.h         |  9 +++
- arch/arm64/kernel/image-vars.h                |  1 +
- arch/arm64/kernel/vmlinux.lds.S               |  8 +++
- .../kvm/hyp/include/nvhe/define_events.h      |  2 -
- arch/arm64/kvm/hyp/include/nvhe/trace.h       | 66 +++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/events.c              |  6 ++
- arch/arm64/kvm/hyp_trace.c                    | 61 +++++++++++++++++
- 8 files changed, 165 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_hypevents.h b/arch/arm64/include/asm/kvm_hypevents.h
-index 5f6e6789d121..3396deb1a1f8 100644
---- a/arch/arm64/include/asm/kvm_hypevents.h
-+++ b/arch/arm64/include/asm/kvm_hypevents.h
-@@ -58,4 +58,18 @@ HYP_EVENT(selftest,
- 	),
- 	RE_PRINTK("id=%llu", __entry->id)
- );
-+
-+/*
-+ * trace_hyp_printk() has too many specificities to be declared with HYP_EVENT().
-+ * However, we can use a REMOTE_EVENT macro to automatically do the declaration
-+ * for the kernel side.
-+ */
-+REMOTE_EVENT_CUSTOM_PRINTK(hyp_printk,
-+	0, /* id will be overwritten during hyp event init */
-+	RE_STRUCT(
-+		re_field(u16, fmt_id)
-+		re_field(u64, args[])
-+	),
-+	__hyp_trace_printk(evt, seq)
-+);
- #endif
-diff --git a/arch/arm64/include/asm/kvm_hyptrace.h b/arch/arm64/include/asm/kvm_hyptrace.h
-index de133b735f72..16e8d60abba9 100644
---- a/arch/arm64/include/asm/kvm_hyptrace.h
-+++ b/arch/arm64/include/asm/kvm_hyptrace.h
-@@ -23,4 +23,13 @@ extern struct remote_event __hyp_events_end[];
- extern struct hyp_event_id __hyp_event_ids_start[];
- extern struct hyp_event_id __hyp_event_ids_end[];
- 
-+#define HYP_STRING_FMT_MAX_SIZE 127
-+
-+struct hyp_string_fmt {
-+	const char	fmt[HYP_STRING_FMT_MAX_SIZE];
-+	u8		nr_args;
-+};
-+
-+extern const struct hyp_string_fmt __hyp_string_fmts_start[];
-+extern const struct hyp_string_fmt __hyp_string_fmts_end[];
- #endif
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index 14beb7b9d304..ef9875a95f95 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -143,6 +143,7 @@ KVM_NVHE_ALIAS(__hyp_rodata_end);
- #ifdef CONFIG_NVHE_EL2_TRACING
- KVM_NVHE_ALIAS(__hyp_event_ids_start);
- KVM_NVHE_ALIAS(__hyp_event_ids_end);
-+KVM_NVHE_ALIAS(__hyp_string_fmts_start);
- #endif
- 
- /* pKVM static key */
-diff --git a/arch/arm64/kernel/vmlinux.lds.S b/arch/arm64/kernel/vmlinux.lds.S
-index af1d72020976..69ef676e659d 100644
---- a/arch/arm64/kernel/vmlinux.lds.S
-+++ b/arch/arm64/kernel/vmlinux.lds.S
-@@ -214,6 +214,14 @@ SECTIONS
- 
- 	HYPERVISOR_RODATA_SECTIONS
- 
-+#ifdef CONFIG_NVHE_EL2_TRACING
-+	.rodata.hyp_string_fmts : {
-+		__hyp_string_fmts_start = .;
-+		*(_hyp_string_fmts)
-+		__hyp_string_fmts_end = .;
-+	}
-+#endif
-+
- 	.got : { *(.got) }
- 	/*
- 	 * Make sure that the .got.plt is either completely empty or it
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/define_events.h b/arch/arm64/kvm/hyp/include/nvhe/define_events.h
-index 776d4c6cb702..370e8c2d39fe 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/define_events.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/define_events.h
-@@ -10,5 +10,3 @@
- #define HYP_EVENT_MULTI_READ
- #include <asm/kvm_hypevents.h>
- #undef HYP_EVENT_MULTI_READ
--
--#undef HYP_EVENT
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/trace.h b/arch/arm64/kvm/hyp/include/nvhe/trace.h
-index 8813ff250f8e..d38e0fb284f8 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/trace.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/trace.h
-@@ -46,6 +46,70 @@ static inline pid_t __tracing_get_vcpu_pid(struct kvm_cpu_context *host_ctxt)
- void *tracing_reserve_entry(unsigned long length);
- void tracing_commit_entry(void);
- 
-+/*
-+ * The trace_hyp_printk boilerplate is too fiddly to be declared with
-+ * HYP_EVENT():
-+ *
-+ * The string format is stored into a kernel-accessible ELF section. The
-+ * hypervisor only writes the format ID.
-+ *
-+ * The function has a variadic prototype. We have no easy way to know each
-+ * argument width so they must all cast to u64.
-+ */
-+#define REMOTE_EVENT_CUSTOM_PRINTK(...)
-+
-+#define __TO_U64_0()
-+#define __TO_U64_1(x)			, (u64)(x)
-+#define __TO_U64_2(x, ...)		, (u64)(x) __TO_U64_1(__VA_ARGS__)
-+#define __TO_U64_3(x, ...)		, (u64)(x) __TO_U64_2(__VA_ARGS__)
-+#define __TO_U64_4(x, ...)		, (u64)(x) __TO_U64_3(__VA_ARGS__)
-+#define __TO_U64_5(x, ...)		, (u64)(x) __TO_U64_4(__VA_ARGS__)
-+#define __TO_U64_6(x, ...)		, (u64)(x) __TO_U64_5(__VA_ARGS__)
-+#define __TO_U64_7(x, ...)		, (u64)(x) __TO_U64_6(__VA_ARGS__)
-+#define __TO_U64_8(x, ...)		, (u64)(x) __TO_U64_7(__VA_ARGS__)
-+
-+#define __TO_U64_X(N, ...)		CONCATENATE(__TO_U64_, N)(__VA_ARGS__)
-+#define __TO_U64(...)			__TO_U64_X(COUNT_ARGS(__VA_ARGS__), ##__VA_ARGS__)
-+
-+REMOTE_EVENT_FORMAT(hyp_printk, HE_STRUCT(he_field(u16, fmt_id) he_field(u64, args[])));
-+extern struct hyp_event_id hyp_event_id_hyp_printk;
-+
-+static __always_inline void __trace_hyp_printk(const struct hyp_string_fmt *fmt, int nr_args, ...)
-+{
-+	struct remote_event_format_hyp_printk *entry;
-+	va_list va;
-+	int i;
-+
-+	if (!atomic_read(&hyp_event_id_hyp_printk.enabled))
-+		return;
-+
-+	entry = tracing_reserve_entry(struct_size(entry, args, nr_args));
-+	if (!entry)
-+		return;
-+
-+	entry->hdr.id = hyp_event_id_hyp_printk.id;
-+	entry->fmt_id = fmt - __hyp_string_fmts_start;
-+
-+	va_start(va, nr_args);
-+	for (i = 0; i < nr_args; i++)
-+		entry->args[i] = va_arg(va, u64);
-+	va_end(va);
-+
-+	tracing_commit_entry();
-+}
-+
-+#define trace_hyp_printk(__fmt, __args...)						\
-+do {											\
-+	static const struct hyp_string_fmt __used __section("_hyp_string_fmts")		\
-+	__hyp_str_fmt  = {								\
-+		.fmt		= __fmt,						\
-+		.nr_args	= COUNT_ARGS(__args),					\
-+	};										\
-+	BUILD_BUG_ON(sizeof(__fmt) > HYP_STRING_FMT_MAX_SIZE);				\
-+	/* __TO_U64 prepends a comma if there are arguments */				\
-+	__trace_hyp_printk(&__hyp_str_fmt, COUNT_ARGS(__args) __TO_U64(__args));	\
-+} while (0)
-+
- int __tracing_load(unsigned long desc_va, size_t desc_size);
- void __tracing_unload(void);
- int __tracing_enable(bool enable);
-@@ -58,6 +122,8 @@ static inline void *tracing_reserve_entry(unsigned long length) { return NULL; }
- static inline void tracing_commit_entry(void) { }
- #define HYP_EVENT(__name, __proto, __struct, __assign, __printk)      \
- 	static inline void trace_##__name(__proto) {}
-+#define REMOTE_EVENT_CUSTOM_PRINTK(...)
-+#define trace_hyp_printk(fmt, args...) do { } while (0)
- 
- static inline int __tracing_load(unsigned long desc_va, size_t desc_size) { return -ENODEV; }
- static inline void __tracing_unload(void) { }
-diff --git a/arch/arm64/kvm/hyp/nvhe/events.c b/arch/arm64/kvm/hyp/nvhe/events.c
-index add9383aadb5..12223d2e3618 100644
---- a/arch/arm64/kvm/hyp/nvhe/events.c
-+++ b/arch/arm64/kvm/hyp/nvhe/events.c
-@@ -9,6 +9,12 @@
- 
- #include <nvhe/define_events.h>
- 
-+/*
-+ * The hyp_printk event is not declared with HYP_EVENT in kvm_hypevents.h,
-+ * so we manually add the boilerplate here.
-+ */
-+HYP_EVENT(hyp_printk, 0, 0, 0, 0);
-+
- int __tracing_enable_event(unsigned short id, bool enable)
- {
- 	struct hyp_event_id *event_id = &__hyp_event_ids_start[id];
-diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
-index 8faaec899f92..c61488d16f4c 100644
---- a/arch/arm64/kvm/hyp_trace.c
-+++ b/arch/arm64/kvm/hyp_trace.c
-@@ -402,6 +402,9 @@ static struct trace_remote_callbacks trace_remote_callbacks = {
- 
- static const char *__hyp_enter_exit_reason_str(u8 reason);
- 
-+struct remote_event_format_hyp_printk;
-+static void __hyp_trace_printk(struct remote_event_format_hyp_printk *entry, struct trace_seq *seq);
-+
- #include "define_hypevents.h"
- 
- static const char *__hyp_enter_exit_reason_str(u8 reason)
-@@ -421,6 +424,61 @@ static const char *__hyp_enter_exit_reason_str(u8 reason)
- 	return strs[min(reason, HYP_REASON_UNKNOWN)];
- }
- 
-+static void __hyp_trace_printk(struct remote_event_format_hyp_printk *entry, struct trace_seq *seq)
-+{
-+	const struct hyp_string_fmt *hyp_str_fmt;
-+	const char *fmt;
-+
-+	trace_seq_putc(seq, ' ');
-+
-+	if (entry->fmt_id >= (__hyp_string_fmts_end - __hyp_string_fmts_start)) {
-+		trace_seq_printf(seq, "Unknown hyp_string_fmt ID %u\n", entry->fmt_id);
-+		return;
-+	}
-+
-+	hyp_str_fmt = &__hyp_string_fmts_start[entry->fmt_id];
-+	fmt = hyp_str_fmt->fmt;
-+
-+	switch (hyp_str_fmt->nr_args) {
-+	case 0:
-+		trace_seq_puts(seq, fmt);
-+		break;
-+	case 1:
-+		trace_seq_printf(seq, fmt, entry->args[0]);
-+		break;
-+	case 2:
-+		trace_seq_printf(seq, fmt, entry->args[0], entry->args[1]);
-+		break;
-+	case 3:
-+		trace_seq_printf(seq, fmt, entry->args[0], entry->args[1], entry->args[2]);
-+		break;
-+	case 4:
-+		trace_seq_printf(seq, fmt, entry->args[0], entry->args[1], entry->args[2],
-+				 entry->args[3]);
-+		break;
-+	case 5:
-+		trace_seq_printf(seq, fmt, entry->args[0], entry->args[1], entry->args[2],
-+				 entry->args[3], entry->args[4]);
-+		break;
-+	case 6:
-+		trace_seq_printf(seq, fmt, entry->args[0], entry->args[1], entry->args[2],
-+				 entry->args[3], entry->args[4], entry->args[5]);
-+		break;
-+	case 7:
-+		trace_seq_printf(seq, fmt, entry->args[0], entry->args[1], entry->args[2],
-+				 entry->args[3], entry->args[4], entry->args[5], entry->args[6]);
-+		break;
-+	default:
-+		trace_seq_printf(seq, fmt, entry->args[0], entry->args[1],
-+				 entry->args[2], entry->args[3], entry->args[4], entry->args[5],
-+				 entry->args[6], entry->args[7]);
-+		break;
-+	}
-+
-+	if (trace_seq_used(seq) && seq->buffer[trace_seq_used(seq) - 1] != '\n')
-+		trace_seq_putc(seq, '\n');
-+}
-+
- static void __init hyp_trace_init_events(void)
- {
- 	struct hyp_event_id *hyp_event_id = __hyp_event_ids_start;
-@@ -430,6 +488,9 @@ static void __init hyp_trace_init_events(void)
- 	/* Events on both sides hypervisor are sorted */
- 	for (; event < __hyp_events_end; event++, hyp_event_id++, id++)
- 		event->id = hyp_event_id->id = id;
-+
-+	WARN(__hyp_string_fmts_end - __hyp_string_fmts_start > U16_MAX + 1,
-+	     "Too many trace_hyp_printk() callsites\n");
- }
- 
- int __init kvm_hyp_trace_init(void)
--- 
-2.56.0.rc1.315.gc6ed9934b7-goog
-
+On Thu, 1 Oct 2026 at 14:57, Fuad Tabba <fuad.tabba@linux.dev> wrote:
+>
+> Hi folks,
+>
+> Changes since v3 [1]:
+>   - A protected vCPU that EL2 holds powered off reads as
+>     KVM_MP_STATE_UNINITIALIZED, in place of a new bool. (Marc)
+>   - The marshalling and PSCI patches access the host copy through the
+>     vCPU accessors, with every assignment on one line. (Marc)
+>   - The PC adjustment pair is kvm_adjust_pc_get()/put() and tests for
+>     the hyp vCPU directly. (Marc)
+>   - CPU_OFF clears the reset flag before its release of OFF, CPU_ON's
+>     relaxed cmpxchg is ordered by its control dependency, and the
+>     CPU_ON rollback stores OFF with a release. pkvm_reset_vcpu()
+>     carries the CPU_ON/CPU_OFF sequence as a comment and drops its
+>     WARN_ON(). (Vincent, Will)
+>   - Collected Reviewed-bys.
+>
+> Following the vCPU state-sync series [3], this series completes the
+> job for protected VMs: a protected guest's register state stays at
+> EL2, and the host sees only what handling each exit requires.
+>
+> EL2 marshals a protected vCPU's state per exception class instead of
+> copying the whole context both ways. It owns the vCPU's trap
+> configuration, system register reset and HVC handling, and implements
+> PSCI itself: AFFINITY_INFO is left to the host, and CPU_ON and CPU_OFF
+> are resolved at EL2 with the host only scheduling the target or
+> stopping it. A protected guest's TRNG calls, which the host handled
+> until now, return NOT_SUPPORTED until TRNG for protected guests
+> follows. EL2 implements PSCI 1.1, so a protected guest also loses the
+> functions the host supports above that version, SYSTEM_OFF2 included.
+> Host ioctls that would reach the state EL2 owns fail with -EPERM, so a
+> protected VM's state isn't save/restorable. All of this is scoped
+> to KVM_VM_TYPE_ARM_PROTECTED, and pkvm.rst describes the resulting API.
+>
+> The kvmtool changes that go with this are posted separately [4].
+>
+> Patches 1 to 3 go out separately: the HCR_EL2.VSE fix [5], and the
+> host vCPU VM read and pin fixes, patches 4 and 5 of the host hypercall
+> fixes series [2]. None of the three is part of this series. They're
+> carried so the series applies as is and Sashiko can run on it.
+>
+> The KVM_ARM_PREFERRED_TARGET documentation fix [6] went out just ahead
+> of v1. Nothing here depends on it to apply, but patch 18 documents vCPU
+> feature availability as something the capabilities report, while
+> api.rst 4.83 still points userspace at a bitmap that has always been
+> empty.
+>
+> The series is structured as follows:
+>
+>   01:     The HCR_EL2.VSE fix, posted separately.
+>   02-03:  The host vCPU VM read and pin fixes, posted separately.
+>   04:     Steal time disabled for protected VMs.
+>   05-06:  Per-exception-class entry handlers; EL2 owns a protected
+>           vCPU's trap configuration.
+>   07-09:  Timer state, system register reset and HVC handling at EL2.
+>   10-11:  PSCI at EL2, and the KVM_ARM_VCPU_INIT and PSCI version
+>           restrictions.
+>   12-14:  Host PC adjustments blocked; an UNDEF at EL2 for exit
+>           classes the host doesn't emulate; per-class state
+>           marshalling.
+>   15-16:  Host changes to private state, and host power-on of a vCPU
+>           EL2 holds powered off, rejected.
+>   17:     Capability allowlist.
+>   18:     Documentation.
+>
+> Still to come: selftests, TRNG, self-hosted debug and SVE for protected
+> guests, and much more, as separate series.
+>
+> Based on v7.3-rc3 (fd73f4a665989).
+>
+> Cheers,
+> /fuad
+>
+> [1] https://lore.kernel.org/all/20260914113338.159227-1-fuad.tabba@linux.dev/
+> [2] https://lore.kernel.org/all/20260915123846.2317931-1-fuad.tabba@linux.dev/
+> [3] https://lore.kernel.org/all/20260729131823.2021516-1-fuad.tabba@linux.dev/
+> [4] https://lore.kernel.org/all/20260831192406.1341841-1-fuad.tabba@linux.dev/
+> [5] https://lore.kernel.org/all/20260829071120.2522788-1-fuad.tabba@linux.dev/
+> [6] https://lore.kernel.org/all/20260831162815.269851-1-fuad.tabba@linux.dev/
+>
+> Fuad Tabba (16):
+>   KVM: arm64: Sync HCR_EL2.VSE back to the host vCPU under pKVM
+>   KVM: arm64: Validate the host vCPU's VM before reading it under pKVM
+>   KVM: arm64: Pin the host vCPU before adjusting its PC under pKVM
+>   KVM: arm64: Disable steal time for protected VMs
+>   KVM: arm64: Skip fixed-feature state flush for protected vCPUs
+>   KVM: arm64: Add system register reset framework for protected VMs
+>   KVM: arm64: Implement HVC handling for protected guests at EL2
+>   KVM: arm64: Handle PSCI calls for protected VMs at EL2
+>   KVM: arm64: Restrict KVM_ARM_VCPU_INIT and PSCI version for protected
+>     VMs
+>   KVM: arm64: Prevent host PC adjustments for protected vCPUs
+>   KVM: arm64: Inject an UNDEF at EL2 for unhandled protected guest exits
+>   KVM: arm64: Add per-EC entry/exit state marshalling for protected
+>     guests
+>   KVM: arm64: Reject host access to protected VM private state
+>   KVM: arm64: Reject host power-on of a vCPU that EL2 holds powered off
+>   KVM: arm64: Advertise the capabilities that protected VMs support
+>   KVM: arm64: Document the protected VM userspace API
+>
+> Marc Zyngier (2):
+>   KVM: arm64: Introduce per-EC entry handlers for pKVM
+>   KVM: arm64: Add {flush,sync}_hyp_timer_state() primitives
+>
+>  Documentation/virt/kvm/api.rst                |  27 +-
+>  .../virt/kvm/arm/fw-pseudo-registers.rst      |   2 +
+>  Documentation/virt/kvm/arm/pkvm.rst           | 164 ++++-
+>  Documentation/virt/kvm/devices/vcpu.rst       |   3 +-
+>  arch/arm64/include/asm/kvm_host.h             |  22 +-
+>  arch/arm64/include/asm/kvm_hyp.h              |   4 +
+>  arch/arm64/include/asm/kvm_pkvm.h             |  33 +
+>  arch/arm64/kvm/arm.c                          |  76 ++-
+>  arch/arm64/kvm/guest.c                        |  11 +
+>  arch/arm64/kvm/hyp/exception.c                |  26 +-
+>  arch/arm64/kvm/hyp/include/hyp/adjust_pc.h    |  48 ++
+>  arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |  20 +
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 595 +++++++++++++++++-
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c                | 422 ++++++++++++-
+>  arch/arm64/kvm/hyp/nvhe/switch.c              |  29 +-
+>  arch/arm64/kvm/hyp/nvhe/sys_regs.c            |  60 ++
+>  arch/arm64/kvm/hypercalls.c                   |   7 +
+>  arch/arm64/kvm/pkvm.c                         |  21 +-
+>  arch/arm64/kvm/psci.c                         |  11 +-
+>  arch/arm64/kvm/pvtime.c                       |  10 +-
+>  20 files changed, 1503 insertions(+), 88 deletions(-)
+>
+>
+> base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
+> --
+> 2.39.5
+>
