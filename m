@@ -1,160 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com [209.85.210.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4ECC49BD7F;
-	Thu,  1 Oct 2026 21:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45475349B6
+	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 21:21:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790889117; cv=none; b=h0WGeUGOEqqZiW5ax8iJl1bs8QfQNGY92/1SWlOIL05nnO2LfBns89TbUw/Xd8Gq/3diCFA+VFjxF+ufn1zp3fQ3UlOkiS5ulvrTNNw3oLshybkryFYoHa21T28wTkguwz2z/xAiOb43g7ZOkSiDewWZU7N5HDiVUDCyPCgnzdM=
+	t=1790889666; cv=none; b=qnRvd43oTBReg0J7Fcfu5leOklnpeVji2FZAYqsFtv7e4Yhw+MNPg750OP1vcPwEaVkUyJn2+FHwydYQtWGlQ1Md6DPmU1bYyPh1OOtQDuVrXchPYHCf0ouQKyaCtETter4FFL6gxJzTV0M72TsjwwV9KPqiwpvcVoG5HDVZzmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790889117; c=relaxed/simple;
-	bh=3Zx7mZTcZxBEPzyMjLgv3nmr1xCwyHk4Zs8Em19mPuw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NcGGEJZ7tsOuqcIvpW60ujdBvPc3UBIJIwkeOVW/CNTxNXRBYAxhxo4U6spV7DH+QzXdZbUI47JMUeInC11DNtuxCGpv4Po72jXm/Pw3jCWBzUfezh/hdeMZsgqZCctTwMUmgwCPwE8NLyJOIp93ziXGVsNgLCGZ006vjyN8GZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VLvG3LAB; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790889666; c=relaxed/simple;
+	bh=SbI9zuwpLoviGTLgjhQIkxJ0mcfP+lQtKKioVT52hTM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=jINciH8WHwn8f+h4zlg0+v1ttOkbs4ALhuaFDN+U79ozUWtWn4GxGJ15zVTMyMi+wpJvKJf+dbBU/LE6HwwhEw0VCvbmnrAYmKFSmbnwlBM1tLiwlImZfifgd1ekIhfkYO9RurDEIUyjTxtP2OgSZ4hJTbDSpnePlyy1AOPnpaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IBQfZJdm; arc=none smtp.client-ip=209.85.210.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VLvG3LAB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92AC51F000FF;
-	Thu,  1 Oct 2026 21:11:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790889116;
-	bh=ZRl45zOulKSzHu0gpa5gJKuaLYcXh2vCa43UARtQmaM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=VLvG3LABMRXOFV0rgrekJzhEHgOaAUj51pCohlr6tbG0Kfz2+O31tpT/VOJmKa2qv
-	 aoqtWaO1OHmw6NEuOwkkzH+ITshRx/cFcvuH30U6Z3Z+1f5M2XRpJW5j0kZQMfBpNm
-	 aDJiV/OkpNSN247u+74LZ2vH1rAJrHOISVEvOLsSU/SkHlDUq8HY1dMdUOolhLzS4O
-	 mNj00cw/HyADcX5F9EhC+DfLOsZJiBgJnAxDjXk7eheCEFsSCfLQQ8G0dWHfPfNsvP
-	 XfEfksywZyaJ74TR0NoPtMy+hlIkUHjIHexpIJSmCzCsK9XTgP8DkePoYwHX0nhJjT
-	 /zuYeQ4/jGOFw==
-Date: Thu, 1 Oct 2026 22:11:49 +0100
-From: Mark Brown <broonie@kernel.org>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Leonardo Bras <leo.bras@arm.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v21 08/15] KVM: arm64: Enforce EXLOCK for SPSR and ELR
-Message-ID: <659cba01-3c53-4eb8-9124-7c62d266a64f@sirena.org.uk>
-References: <20260930-arm64-gcs-v21-0-3556644cd927@kernel.org>
- <20260930-arm64-gcs-v21-8-3556644cd927@kernel.org>
- <ar5thpZI5GiCfVRR@gremlin>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IBQfZJdm"
+Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-806004ec379so6787649a34.1
+        for <kvmarm@lists.linux.dev>; Thu, 01 Oct 2026 14:21:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790889661; x=1791494461; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=dIr4K7N8tWlFElP154T0gDhZmtv6PLeTBLURDyjAzjU=;
+        b=IBQfZJdmtupUw9sFfKlvti7qcNLXHHh+nn5XA49As6omiS2ylbKgC3y6Mb4eZ68jHa
+         hlhS9/hbttV19cmwsVvg6seaMM5Iq3HkIm4FfWbUTUichtFQWVZTVptqMt/kuDNLhlZf
+         y1lC4hE217JN2/8W18Q7RtZycXBE8Hg2Axsw9zlY1QuJo3K3dZI2T7cVo7XgHG559jnw
+         jDafoxQ9yEdpf1LaFDwGWiHcUDwbdXkaWS5qsPLTsCgxtl1EfHJ5WO8AT/yEtO5JjqvK
+         U7Pw17O96aC6S93Ov96RTS50C4rS+WXEu8WBLT2ccppyTUu2EgCjBLTRj6kKrAbv+6Gz
+         u2GQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790889661; x=1791494461;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=dIr4K7N8tWlFElP154T0gDhZmtv6PLeTBLURDyjAzjU=;
+        b=Mg9MoZfD4eBPPoI2BOwkgA93DjbcW1t57Jxtl9epMCb/iTtnJWuIWdk571qsP67awZ
+         /ZzMViuwW8U802LCHQOzWyJSWD8ZmNx4chaorUCLROEBIlmJHhqZHFW1QbsS3nVfNz47
+         dVyaNldxl6UMfT00PwVBfxwdkZda0A8m949hyDhQSK1Z6dT4ctdFuuOKTjaDlNTURJem
+         VWEGGWQ9apa+9LlCos0QlZnkea+/nVEiaJ5DINSADdj1w/LcD2fC/qvIIA7nIt6oQfZ5
+         VQu/4VUcICaF8R2Tk7qUx6A0LtOtfM9/v0ct9PEcZYYqrzPvhfnWqELLMluV/XXPesnG
+         nOJw==
+X-Forwarded-Encrypted: i=1; AKwUvBx2T97eX7hj7HNTXoOSsX5fxMS2jm2GdN0YTDEjEWLqo7ghytxfByXOlysZ6F+o45tJ9k3uGlQ=@lists.linux.dev
+X-Gm-Message-State: AFuF++m37jcZvZV5eKd8iBHux5a7EBK+qwX7DkhqIMCPdYDC52MdlRfw
+	6ByuRdc4MvanotCl6PncZxqsl8jcdwVx316B5kEa924hUmkK72PxXQE1j3SPy3pWRDRYRfA2U4q
+	RhBamErXgpD/ymqPLFDP/3XTqGA==
+X-Received: from iobir24.prod.google.com ([2002:a05:6602:7158:b0:9c3:8b15:2c82])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6808:6905:b0:4c3:a091:52f9 with SMTP id 5614622812f47-4f526747d3fmr385353b6e.2.1790889660625;
+ Thu, 01 Oct 2026 14:21:00 -0700 (PDT)
+Date: Thu,  1 Oct 2026 21:21:00 +0000
+In-Reply-To: <56d86280-fcea-4d2d-b6b9-b47449f3408d@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="q9J3ZXhLEIPLOZjy"
-Content-Disposition: inline
-In-Reply-To: <ar5thpZI5GiCfVRR@gremlin>
-X-Cookie: Do not stamp.
+Mime-Version: 1.0
+References: <20260924172928.2110956-1-coltonlewis@google.com>
+ <20260924172928.2110956-21-coltonlewis@google.com> <56d86280-fcea-4d2d-b6b9-b47449f3408d@linaro.org>
+X-Mailer: git-send-email 2.56.0.rc1.315.gc6ed9934b7-goog
+Message-ID: <20261001212100.2035442-1-coltonlewis@google.com>
+Subject: Re: [PATCH v9 20/22] KVM: arm64: Add vCPU device attr to partition
+ the PMU
+From: Colton Lewis <coltonlewis@google.com>
+To: James Clark <james.clark@linaro.org>
+Cc: Colton Lewis <coltonlewis@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Robin Murphy <robin.murphy@arm.com>, Zide Chen <zide.chen@intel.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Mingwei Zhang <mizhang@google.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Russell King <linux@armlinux.org.uk>, Shuah Khan <shuah@kernel.org>, 
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 
+Hi James,
 
---q9J3ZXhLEIPLOZjy
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Wed, Sep 30, 2026 at 04:27:27PM +0100, James Clark wrote:
+> > @@ -77,7 +80,9 @@ Parameters: in:imaan address of a u32 value (N)
+> >   Returns:
+> >   	 =======  ====================================================
+> >   	 -EBUSY   PMUv3 already initialized, or a vCPU has already run
+> > -	 -EINVAL  No PMUv3 explicitly selected, or value of N out of range
+> > +	 -EINVAL  No PMUv3 explicitly selected, or value of N out of
+> > +		  range (>= max_counters when partitioning is
+> > +		  enabled)
+>
+> "No PMUv3 explicitly selected, or value of N > max_counters, or N >
+> max_counters - 1 when partitioning is enabled".
+>
+> That might be clearer, otherwise it seems like max_counters being relevant
+> to "out of range" only applies to when partitioning is enabled, not that
+> it's max_counters all the time but one is -1.
 
-On Thu, Oct 01, 2026 at 05:26:41PM +0100, Lorenzo Stoakes (ARM) wrote:
-> On Wed, Sep 30, 2026 at 10:48:18PM +0100, Mark Brown wrote:
-> > As per I_CFFNS and the pseudocode for the SPSR_ELx and ELR_ELx registers
-> > a GCS exception with ExType 1 is generated for attempts to write to
-> > those registers when both GCSCR_ELx.EXLOCKEN and PSTATE.EXLOCK are set.
+Agreed, that reads much better. I will update it to your phrasing in
+v10.
 
-> From [4] I see I_CFFNS is defined as:
-
-> "When an MSR instruction would write to the relevant ELR_ELx or SPSR_ELx
-> for the current Exception level ELy, the Effective value of
-> GCSCR_ELy.EXLOCKEN and PSTATE.EXLOCK may prevent the write."
-
-> So the lock applies to writes to the current EL's own ELR/SPSR rather than
-> to any ELR_ELx/SPSR_ELx the current EL can write to?
-
-VHE and NV complicate things so "own" isn't just the same ELx, but my
-text above definitely oversimplifies too much and so is wrong.
-
-For example refering to the pseudocode for ELR_EL1 and SPSR_EL1 we see
-in the MSR handling:
-
-  elsif PSTATE.EL =3D=3D EL2 then
-      if IsFeatureImplemented(FEAT_GCS) && GetCurrentEXLOCKEN() && !Halted(=
-) && PSTATE.EXLOCK =3D=3D '1' && ELIsInHost(EL2) then
-          EXLOCKException();
-
-and note the use of ELx for ELR/SPSR and ELy for the current exception
-level and GCSCR in I_CFFNS (ie, ELx vs ELy).  My interpretation here is
-that the use of "the relevant" rather than just using ELx throughout is
-an effort to cover the complications resulting from VHE and NV.  With
-the above pseudocode writes to the EL1 register from EL2 are also
-covered when we're in host mode - the fact that we're in host mode makes
-the EL1 access relevant.
-
-I'll reword what I've written in the commit log, like I say it's wrong.
-
-> So... TL;DR is, shouldn't this function look like:
->=20
-> static inline bool sysregs_exlocked(struct kvm_vcpu *vcpu)
-> {
-> 	if (!kvm_has_gcs(vcpu->kvm))
-> 		return false;
->=20
-> 	if (!(vcpu->arch.ctxt.regs.pstate & PSR_EXLOCK_BIT))
-> 		return false;
->=20
-> 	if (is_hyp_ctxt(vcpu))
-> 		return false;
->=20
-> 	return vcpu_read_sys_reg(vcpu, GCSCR_EL1) & GCSCR_ELx_EXLOCKEN;
-> }
-
-I think so, but I'll check through again.
-
-The confusions you identified in the bit of your mail above this were
-the result of me doing some but on all of the simplifications.  I was
-trying to make things clearer by including some code that couldn't run
-so it was more obvious that things correspond to the pseudocode, but
-really that shouldn't have had any simplifications in it - we should
-either have all the simplifications or none of them.  I'll add more
-comments instead.
-
-> > +	/*
-> > +	 * Note that the EXLOCKEN for the running EL is checked
-> > +	 * regardless of the register written to.
-> > +	 */
->=20
-> This seems to contradict [4] - the register written to is what decides
-> whether the lock applies?
-
-[4] is section D11.4.1 of DDI0487 M.d, containing rule I_CFFNS discussed
-above.  My intent there is to express that if EXLOCK exceptions might be
-generated we check EXLOCKEN for the running EL, not one influenced by
-the written register.  Some combinations of register, EL and system
-state do not generate exceptions but those that do use the current EL's
-EXLOCKEN rather than an _ELx register using GCSCR_ELx.EXLOCKEN.
-
---q9J3ZXhLEIPLOZjy
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmq+zJUACgkQJNaLcl1U
-h9BVtAf+PDpVuQacuftSkXtdJrBZMHKg8vNuetDKBvz9KvhrxoYoWQjRmPVuAoX2
-OcGHpNojxajl33f7aKUa28MSH8eOOSZuypPQ1cvORyeyrLK7fTnN7r/MVRpccdQl
-VgMAgLADQyNtyXisrzEFNQorksK5ns7ifIN7qsf6hRMZM11ZMHhxQ0jM4EdhmLX2
-OmHFYM3ynGbTgwltOCO3mXd4DWQOw/QFxzBXc7Y83BNhW7oWphPC0qw098y7WbRo
-pTQnmDtpms4njthjpsM8eSwsTJ+geholf5xtxuI9ssE3JhR1tuN5Su3E3hKjQM5y
-Livc7aiNwu7yvT6t0SYfIcx3omJ/Tg==
-=yzBf
------END PGP SIGNATURE-----
-
---q9J3ZXhLEIPLOZjy--
+Thanks,
+Colton
