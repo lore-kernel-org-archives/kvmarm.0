@@ -1,107 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF9CD4DAFB5
-	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 09:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E6FC3FA5FE;
+	Thu,  1 Oct 2026 10:50:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790848501; cv=none; b=fIYXrDA/pBKRjliyzO4m+FnM0/CkB8VE5yAW+rmozAUE7B34KwE5ONuJNKtrdwOUt81b7AW1jHbdeYPh+9XGLWYt+u8AvqD491onE/1AdW0qJkFSK7qcg3lAtR4FgdRAEAMc6OlTBeWanA4cTTasvyuSvVWksSXa62cdLzGPhek=
+	t=1790851852; cv=none; b=guQogw4NRl+wD1cNbn9yVcZcPSjVTZ+TatHSOxVsdCarzRY8slw4oq4jExz7pxXSDI0zjjLUNUAjjUOZCrHTucjh2Dpn3K3b2z09FTNR7UGFdiEyQIQyGRyi7bzavtza1rGQl9zkVuVQUXqLqKiKEuLtljwvdFLvbH4P5xhr1Ik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790848501; c=relaxed/simple;
-	bh=AM93/7wV2C18CHfTJfa9Y5kkw1R/QVBQWawNHw6dQXg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lqoGwVWbE/SKdyoGPY5ZplIu+BDVuV8/2MQqsqcZSzZ9y+zv4f/A1kJlhU5V7z5J7HnXIWdPqzoOHsugpp47sKveKq5JZk/3RtcWCPNbL/xHyJtLTGsKfjxQ+S0PF85vcnoLaDVv9tgDJadIKIWF860tU2BIAuCDDy1DDymgvrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O+gUHYS0; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790851852; c=relaxed/simple;
+	bh=JVrOeTdxXGig0DbeyzW4m4jIDq1ilZ1bvTg/w5OMrsc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gpON6Wjgi+oHXZQo0J2m5wJ/EcLSQCzMPL2/n2H5NVcnVcVw0BTkW2PSRyaSPo4tGBvXHmfEcNAgch2woHlgI3CYkDrOm8PX4CwUd/ZDZJilDqyLoS4UOWXRS2yK04jkscnti0RYB1RAQmai4jGRtA3tJKvpsq+Ynlgllk6uMog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=C/qAfLAZ; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O+gUHYS0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 707A11F000FF;
-	Thu,  1 Oct 2026 09:54:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790848497;
-	bh=11nab1i7FT1WgpzqAXxtbPe+cqEmoMc5MinzBqAyt1E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=O+gUHYS0S7VGSuHHN5huWznb6OYPE1A5aNjJmzaXiRaAvA73LsMwsWjUlFGG8qCR0
-	 3QJlVfMkk6cOvN7eKc7l/2nVA8fFt7yBE2fvnmjujCWMrY89nGAw0P78OL6k08v/XR
-	 Xbpud7U6ZTw7QqDGdr6qRqU1jIrHIUTCuWt7BXOi3Zw2LUCFiwLFIaA9Knv/IaMcJd
-	 n7FUxM9lCXS3KO8/Cz6ehTrIkR4ZZGJtJScqsQK2YVmygI9b9Ss/sk49/O4NjB43De
-	 5g6N7k8vdM9PxEHjp1jSo1MuEGx778nMi2GTiLk6QoMCC8UcNouFPEomh/LSO2IA5d
-	 ye9eNXbORZUYA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xCDV9-0000000FiCq-1ake;
-	Thu, 01 Oct 2026 09:54:55 +0000
-Date: Thu, 01 Oct 2026 10:54:54 +0100
-Message-ID: <86y0ch3fv5.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: oupton@kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	kernel-team@android.com,
-	fuad.tabba@linux.dev,
-	qperret@google.com
-Subject: Re: [PATCH v5 00/18] KVM: arm64: Introduce pKVM hypervisor heap allocator
-In-Reply-To: <86zewx3hd4.wl-maz@kernel.org>
-References: <20260901080941.997769-1-vdonnefort@google.com>
-	<ar0htZydVZdB9zVk@google.com>
-	<86zewx3hd4.wl-maz@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="C/qAfLAZ"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ED7D6497;
+	Thu,  1 Oct 2026 03:50:46 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 05D7B3F85F;
+	Thu,  1 Oct 2026 03:50:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790851850; bh=JVrOeTdxXGig0DbeyzW4m4jIDq1ilZ1bvTg/w5OMrsc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=C/qAfLAZHct4UPoOg6LrBocfrvBKURODMiArS+zGamTfcjlMA/mpEnGC6brYdwr6V
+	 mIrkEpqMXt3kcjIlQrYiQ2m1VUgKTws4JlauIHOfbWmzjCyKm8w/rL1MJ4nve/RR/f
+	 Q2U+pjuMYwFnVqZyx5V87W2K4gSUFNKRc6Y5JRJA=
+Date: Thu, 1 Oct 2026 11:50:44 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+	will@kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+	sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
+Subject: Re: [PATCH v21 2/9] firmware: arm_rmm: Check for RMI support at init
+Message-ID: <ar47BLk-l4-4VyVl@arm.com>
+References: <20261001084555.1456543-1-suzuki.poulose@arm.com>
+ <20261001084555.1456543-3-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vdonnefort@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261001084555.1456543-3-suzuki.poulose@arm.com>
 
-On Thu, 01 Oct 2026 10:22:31 +0100,
-Marc Zyngier <maz@kernel.org> wrote:
-> 
-> On Wed, 30 Sep 2026 15:50:29 +0100,
-> Vincent Donnefort <vdonnefort@google.com> wrote:
-> > 
-> > Gentle ping for this series, 
-> > 
-> > It's been fully reviewed by Fuad and is already based on 7.3-rc1.
-> 
-> I've just tried to take it in, and it conflicts horribly with Fuad's
-> type checking changes [1].
-> 
-> Could you please have a look and propose a resolution? I'll continue
-> to try and resolve it on my end, and we can compare notes.
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> [1] https://lore.kernel.org/all/20260901140326.3812068-1-fuad.tabba@linux.dev/
+On Thu, Oct 01, 2026 at 09:45:48AM +0100, Suzuki K Poulose wrote:
+> +#define RMM_BLOCKED_RETRY_COUNT		2
+> +/*
+> + * rmi_smccc_invoke: Invoke the RMI call and return the results, retrying the
+> + * command when status is RMI_BUSY. If we encounter RMI_BLOCKED, we retry
+> + * it one more time before we give up. The caller is supposed to handle the
+> + * result and reissue if required.
+> + *
+> + * We don't expect to see RMI_BLOCKED on a practical system, except when
+> + * there are parallel requests that results in long standing operation,
+> + * with one blocking the other.
+> + *
+> + * @regs: Input parameters filled in. Updated with the ouptput results
+> + * after the call.
+> + */
+> +static inline void rmi_smccc_invoke(struct arm_smccc_1_2_regs *regs)
+> +{
+> +	struct arm_smccc_1_2_regs args = *regs;
+> +	long status;
+> +	int i = 0;
+> +
+> +	while (i < RMM_BLOCKED_RETRY_COUNT) {
+> +		arm_smccc_1_2_invoke(&args, regs);
+> +
+> +		status = RMI_RESULT_STATUS(regs->a0);
+> +		if (status != RMI_BUSY && status != RMI_BLOCKED)
+> +			break;
+> +		if (status == RMI_BLOCKED)
+> +			i++;
+> +		cpu_relax();
+> +	}
+> +}
 
-It really is a terrible mess. The new and improved type checking makes
-it very hard for stuff like errno_to_smccc(), which seems to be
-designed to avoid any form of C type checking.
+With changes around RMI_BUSY to return early in patch 8, I think this is
+fine for a brief lock-style retry.
 
-Things like __pkvm_init_vm() would need to return a struct by value, I
-expect.
-
-Please rebase on top of Fuad's stuff...
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
