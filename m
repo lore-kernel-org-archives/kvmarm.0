@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48852515983;
-	Thu,  1 Oct 2026 17:28:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092AC5304B0;
+	Thu,  1 Oct 2026 18:14:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790875684; cv=none; b=LrPZF0m0DJnUb+ZvaZUDmdVwCBEMyrg1iHhXDiDbOiGlRYCA0tkTE9AqSqDzSHgjfLd9NkadsUC/Qx2iszhALXcxKcY0R1zS9Jw/tRAbCe2JaEI1Gwvvxfzxn1/tpXhRJqtaWcJ6CaB2sE4VvsVc5mPpzm4+7PsEd7kgAcDPW4M=
+	t=1790878481; cv=none; b=QKm8QaJCxErNbQBqq/5Z1BeRN7WxwqpT1Zn11YTu9INWDTAmoztF0qu42pZhVKt/nt9o/vMDtrFYAjUwNTryDwkoEbIq6VAxd0i2LYxXpewVgJWzDJ8R4GNaMJBFeQtNHQuByQyBcbYoqplVGJ83pzd3BspKDumMEAI1jApsXB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790875684; c=relaxed/simple;
-	bh=2WHrAWI44umCgo5dA1afQgqYa6TJwqxBCWXf73OqFms=;
+	s=arc-20240116; t=1790878481; c=relaxed/simple;
+	bh=8EXPyjCLnT0u6Y3Aw1qgMDaoecca6+CurIO2hSBvPAE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J7DU6J68Vz47BX5lVuHhXQowhVee6LG0e5qEbrnZuwuFpBjzS6cmjqcjFfHrpRsouadzHNN0PAjPNQWGXfnvGeJSiNPTatpf7fxbjqm4eD9DTBGwrLdbUoeoAwmrJ0eJgw9sz49XgeitpI0CdpXBSvDViau9Gou6K56mQcBq71Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cAb0Gw1r; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=XNgN6I7Zxe6FT5tW6b4iFJj9TMHvoah0gjG9pzT/VduF7caGaPVmXSvSKDJN5fmZ4ehAWwxZksdmwISmcVsjfxCJiL5NM6dEa5s99SKMYCkblKLdkervgj06oOutuZVXcjAlgLPqQ0JBNyve/RJ/azXmGB+x753nBesYd7pE+bE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K0YVCfY2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cAb0Gw1r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E73A1F000FF;
-	Thu,  1 Oct 2026 17:27:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K0YVCfY2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFA111F000FF;
+	Thu,  1 Oct 2026 18:14:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790875682;
-	bh=W58m5D1Qq04GgCBROcqOqYr4uS4iCeytTxLxmDkHG/g=;
+	s=k20260515; t=1790878472;
+	bh=8EXPyjCLnT0u6Y3Aw1qgMDaoecca6+CurIO2hSBvPAE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=cAb0Gw1rbEm2vy6R+OXcDxHJqLX/4dmDQcOkQOkVwveQJWdcaZ0N+F15BE8YTm4YT
-	 Glf9iGP+lxwwQvq2jxCl/Xx+TtkSIDjhxy3CWeps7DVPvQnVIkrw1dIX0PZp2jdx9g
-	 RV4fjje8yt90XBnu1P22JXo9aeoHjNVm3vQEcRyCCrsqXztIEXx5icf/ale1T762W9
-	 +xDyp/LZ8MZvXK4IxwhmPwNTpdX8IAeLDRAVm8OMhLHBV382GYG6E9I4QOx1gQPqMd
-	 v/S3bGMoYpHgkjPJH6gb6IjI4bzYgbRaCjS1BqiwFat+FHnNVGtxua0wZzNV7WzK7M
-	 R2RC6kyZdJcvg==
-Date: Thu, 1 Oct 2026 18:27:56 +0100
+	b=K0YVCfY2IDUaC4Vt4tc6UsXJc2uHpFjZ8QQVRtHbwXnLVQqg+u5EW9RW5MrX/HhQt
+	 aBsJd+I6q0vpz1wNylTgBOsPVkpnW2j+cvZENvcBD/lZ77oY3EszViUH6kkOwBetVZ
+	 H9VGfiGECqOwiSeuB2jonVQsYNAMtKKI3/q4s6kzPVf87jTYbNAd4pPl9T4ACPIPek
+	 LtFtHRGA6IIl2pBMyHvMWHQMUeqkiMrPxHmN8sH+OuFoedNzkmC7ZM9/iQztEMXzzH
+	 NmCq/uXXPLYoUpwEva61QltarOEgoeojcabxt2AbJn61YJxlS/VrguUjw6ri9wGNBX
+	 vbDa2ZJ5fJvBQ==
+Date: Thu, 1 Oct 2026 19:14:26 +0100
 From: Mark Brown <broonie@kernel.org>
 To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -42,11 +42,11 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
 	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v21 14/15] tools: Synchronise the kernel esr.h
-Message-ID: <680fe21e-beca-4056-84e3-f501fdfed902@sirena.org.uk>
+Subject: Re: [PATCH v21 12/15] KVM: selftests: arm64: Add GCS to set_id_regs
+Message-ID: <8eb4d0f8-3080-4efa-afaf-bbe2a16eaa37@sirena.org.uk>
 References: <20260930-arm64-gcs-v21-0-3556644cd927@kernel.org>
- <20260930-arm64-gcs-v21-14-3556644cd927@kernel.org>
- <ar6NXWzQ1rMb1aId@gremlin>
+ <20260930-arm64-gcs-v21-12-3556644cd927@kernel.org>
+ <ar6MIFW2vfM893yd@gremlin>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,43 +54,40 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="DprvDADVm2j3tP+g"
+	protocol="application/pgp-signature"; boundary="hLSHdAw0xQgYgBov"
 Content-Disposition: inline
-In-Reply-To: <ar6NXWzQ1rMb1aId@gremlin>
+In-Reply-To: <ar6MIFW2vfM893yd@gremlin>
 X-Cookie: Do not stamp.
 
 
---DprvDADVm2j3tP+g
+--hLSHdAw0xQgYgBov
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 01, 2026 at 05:47:42PM +0100, Lorenzo Stoakes (ARM) wrote:
-> On Wed, Sep 30, 2026 at 10:48:24PM +0100, Mark Brown wrote:
-> > To pick up definitions for GCS.
-> >
-> > Reviewed-by: Leonardo Bras <leo.bras@arm.com>
-> > Signed-off-by: Mark Brown <broonie@kernel.org>
->=20
-> This seems to be out of date, with your series applied to next:
+On Thu, Oct 01, 2026 at 05:38:54PM +0100, Lorenzo Stoakes (ARM) wrote:
+> On Wed, Sep 30, 2026 at 10:48:22PM +0100, Mark Brown wrote:
 
-Yeah, though some of those are changes that are in -next only so
-possibly slightly premature.  I'll resync with mainline, really this
-shouldn't be a manual sync :/
+> > Now that GCS is configurable via the ID registers update set_id_regs to
+> > cover ID_AA64PFR1_EL1.GCS.
 
---DprvDADVm2j3tP+g
+> Should maybe also mention adding the GCS-without-S1PIE test?
+
+I'd have said that was part of the coverage the test now has for
+bitfields TBH.
+
+--hLSHdAw0xQgYgBov
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmq+mBsACgkQJNaLcl1U
-h9AFugf+Psag1H7XxGuG3D4J0/kGv/EHHZDmwkNPNqHh4/wspf175JUlhs6i7NeS
-Y38pNSWL3cKJn0FLw7hI+vi4i92gbgTQSVVa3kaJlydpTYpyotb22WgoU73NchNL
-yTTVA7wbyAC1doxMCSTTuYweTipV+TMrZMlDJ+D7S+0vCYG23NrQgPo6rbB+LCDw
-Fqq9aZEcGFOEDcIR+FNSw+jDD2lGg3xv+fngs/LBmUmIXPFA7wdZPXSyNie2S7QB
-6eTPT6HOtTcY6lxfDAsuqvuW+f/O9v3pC5ITzRFuEqKEODOBbtBADTITjuF6osqd
-pfVyCXWgX4SyvytiMyoI1EYtFdIT6w==
-=lSPU
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmq+owEACgkQJNaLcl1U
+h9AK6Af8CW+PewA41u22GjCm2K4HWJprbzV/mTkY5qCL0xX8i+fFZwjBEGuDg++l
+1WZRIYTi4kqI5ofqkLVG8zllv9dSAW+DXcsH7TJjs5wyZDO9bNqbbBeqFZswxGMh
+ZYdKcZLYTg7gs9EGJ5eEPyIgNYjjJga9ABn6hZTFsDEM+VKDL7GcjpO6WXW+JPZg
+cc2IlLt9eQTZcjwpvtnT9xwnHsbCppAuuVqV8tU+ZuTQ94TMixXsDTTltMvolgvB
+9ZDUkJtJD9k4vuBdXiyh/UmkgMf+b9hoDlJwshmwjziFwY25asoZUM5LNZcJhC8t
+E5Dked3ERLcN6MVu6njP5Qxr0XEW5A==
+=ZnLt
 -----END PGP SIGNATURE-----
 
---DprvDADVm2j3tP+g--
+--hLSHdAw0xQgYgBov--
