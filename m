@@ -1,176 +1,116 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4450192D8A
-	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 14:18:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B2951A73A
+	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 14:19:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790864310; cv=none; b=WlcnS4IuyjW1XrkSfvbfNMe6v0ZNjhK+vcclAHeyxqBW2lW2RptAWLlo6wmOXNtW4OQMxF0mdmov7JDrSfoQ8kWu6kpp5m0EEF0oO7QLtwzCdufAAdVqh9JWsNDpUQquiMGd2fxmutvvXhTc9GGK61SBQ1QmkhbokG9Zg6ehs00=
+	t=1790864370; cv=none; b=NHriP4LHVti+jR9WhDQuyjnDbkVx101FW0MNKIqBYel0ZlK7iC51XZSVq5x0ncjg1ThB0+hCXWcR/YN+o8NSHxmBR8m8+NBfSWKnROsczFL1B+Ct4hEf6FJ46xHbVWzbkm3uAbchLxRv1LQUex1BFNJkCyNDlRrhsmC208+Wr0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790864310; c=relaxed/simple;
-	bh=8p58d17GGNcviII3klkMwUjY4J5XBSmC4HXmivuITLg=;
+	s=arc-20240116; t=1790864370; c=relaxed/simple;
+	bh=+l7TaTAWFQ09+z46qEvj1Q/5Vrhk6KFFrG4SGiptJZ0=;
 	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=RRrrC7CXGCINJpskpbmye0q+aHyNklAus8e3BbKqXSryx9yR1yTgmTjHbBMMRNgakRBtHWUlNEPpRhkIwvRh+cm0PQCM7ru0/T6BJPBKRRRLH/o87XdCRvmg6K8opfk6LPpRPbRggT1Mm68viNfL/RSMDmRgbwg4lhg5w4D+orQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VslM4tZ4; arc=none smtp.client-ip=100.103.45.18
+	 Message-Id; b=jgWlnn5pZv40gJ96VYXrV5htS2xeD2g8zArpspWSjei9CQOc091qrlcATeun+2S41PD10KiY1xr5TkaB/GZDNjH3KEMnE6/2RwddkCyc/6qPtHG8R/Hr8kQzV1peXcqB590U61HRiCdIcBCSx3xQekvbzl1PlrTdsSZQvdGrCUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OfPeXGAp; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VslM4tZ4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B97661F00899;
-	Thu,  1 Oct 2026 14:18:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OfPeXGAp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87F621F000FF;
+	Thu,  1 Oct 2026 14:19:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790864308;
-	bh=V+jGmhE/o7C4pwee+6T89pLvv9OavUzQuLR8KTvtjLo=;
+	s=k20260515; t=1790864368;
+	bh=ZZ5UYkKTm3VB0JgyMS9/7yMBYCsq5BpnI19r/1mJBYE=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=VslM4tZ4Vf9rbTBuT+CC8GwGePLiT5JhTqWytJMHydanjZEVItloY2qV2f3YhIvpk
-	 8d10w0u3lCKwRQxVJuOBpvmRrccqBR0aCHQ3SOZXEfUxbgBgcMgqHB4nms4r9uSPK1
-	 DvUUeVIoFsOrO806kS4NsaTdEU+oQcoHmI3qI2S9neESaaZP929dDWtoEcRkBfmyWJ
-	 Y8sAFc0YMhgQEjCtaaVJtol5IceUsnsjzdGrQ/IRQomfVk0flq+N0disxbr2j9Bl5/
-	 uZY5z+xQnpXFYl+5oBrBjSsdw4K5iOkfchFlPT8pwzIVBXgmt9QDDj/Wlxrlk4rgLv
-	 iqzM3oDFPtXGQ==
+	b=OfPeXGApLDeY2Xshek8JnTJhw62AAHNtwXXpkJfDOvv8JaCJdaAZnIX82btp38E6n
+	 dJewNSx6FaGmn3J2yYTMi0j34VNXsgLLnKsasA3L81mN23mJzSMYs0egwoCCuU4VvN
+	 kyobiVeJTJCIA+EABJ0Q/U2qiuKTHAuW1Jka1qkFI5MMMAyb+cabOkQjuNXXXrRetB
+	 6IxAA5Nd5aLDkl/R1SfFq0h69Jqf6jAXIcjsGeRpudYV06YRC0DZwshVBPG0aJ3ghc
+	 DeYgdIc172SuS5kGvGpBafoc+YgpfI1yMDdOSqi+P/5Ofc40fPkylokP6GfrgSoBi3
+	 fh32SvoNRzweA==
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 16/18] KVM: arm64: Reject host power-on of a vCPU
- that EL2 holds powered off
+Subject: Re: [PATCH v4 06/18] KVM: arm64: Skip fixed-feature state flush for
+ protected vCPUs
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Fuad Tabba" <fuad.tabba@linux.dev>
 Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
  Zyngier" <maz@kernel.org>
-In-Reply-To: <20261001135711.1640520-17-fuad.tabba@linux.dev>
+In-Reply-To: <20261001135711.1640520-7-fuad.tabba@linux.dev>
 References: <20261001135711.1640520-1-fuad.tabba@linux.dev>
- <20261001135711.1640520-17-fuad.tabba@linux.dev>
+ <20261001135711.1640520-7-fuad.tabba@linux.dev>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 01 Oct 2026 14:18:27 +0000
-Message-Id: <20261001141827.B97661F00899@smtp.kernel.org>
+Date: Thu, 01 Oct 2026 14:19:28 +0000
+Message-Id: <20261001141928.87F621F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] arm64: PSCI CPU_ON spuriously fails for protected secondary vCPUs
-- [Medium] arm64: KVM_SET_MP_STATE rejects KVM_MP_STATE_UNINITIALIZED with =
--EINVAL
+- [High] kvm: arm64: host hardware breakpoints leak into protected guests
 --
 
-commit f4c00ca4b159d4b7954978f9de7770cc8b67b029
+commit 678dfb9fd1576272693dba360820510bcb1ec938
 Author: Fuad Tabba <fuad.tabba@linux.dev>
 
-KVM: arm64: Reject host power-on of a vCPU that EL2 holds powered off
+    KVM: arm64: Skip fixed-feature state flush for protected vCPUs
 
-This patch records a protected vCPU held powered off by EL2 as
-KVM_MP_STATE_UNINITIALIZED. It restricts KVM_SET_MP_STATE from overwriting
-this value with RUNNABLE or SUSPENDED, and updates the guest CPU_ON checks
-to gate on this state rather than STOPPED.
+This commit moves the mdcr_el2 and TWI/TWE copies into the non-protected
+branch. It returns early from flush_debug_state() and sync_debug_state() for
+protected vCPUs, as their debug registers are hypervisor-owned, and
+configures HPMN at vCPU load.
 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 14fe4e7275796..a89087c83e27f 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-
-[ ... ]
-
-> @@ -818,12 +829,24 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu=
- *vcpu,
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
+/hyp-main.c
+> index e3f4bbb623492..b7b9f5afb673b 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -200,6 +200,9 @@ static void flush_debug_state(struct pkvm_hyp_vcpu *h=
+yp_vcpu)
+>  {
+>  	struct kvm_vcpu *host_vcpu =3D hyp_vcpu->host_vcpu;
 > =20
->  	switch (mp_state->mp_state) {
->  	case KVM_MP_STATE_RUNNABLE:
-> +		if (kvm_pkvm_vcpu_is_powered_off(vcpu)) {
-> +			ret =3D -EPERM;
-> +			break;
-> +		}
+> +	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu))
+> +		return;
 > +
->  		WRITE_ONCE(vcpu->arch.mp_state, *mp_state);
->  		break;
->  	case KVM_MP_STATE_STOPPED:
-> -		__kvm_arm_vcpu_power_off(vcpu);
-> +		/* Keep EL2's off record: STOPPED over it would let RUNNABLE through. =
-*/
-> +		if (!kvm_pkvm_vcpu_is_powered_off(vcpu))
-> +			__kvm_arm_vcpu_power_off(vcpu, KVM_MP_STATE_STOPPED);
->  		break;
->  	case KVM_MP_STATE_SUSPENDED:
-> +		if (kvm_pkvm_vcpu_is_powered_off(vcpu)) {
-> +			ret =3D -EPERM;
-> +			break;
-> +		}
-> +
->  		kvm_arm_vcpu_suspend(vcpu);
->  		break;
->  	default:
->  		ret =3D -EINVAL;
->  	}
-
-[Severity: Medium]
-Does this break the userspace API for KVM_SET_MP_STATE?
-
-The switch statement lacks a case for KVM_MP_STATE_UNINITIALIZED, defaulting
-to -EINVAL for a state that KVM now actively exposes. If a userspace VMM
-attempts to save and restore the state by reading via KVM_GET_MP_STATE and
-later passing that exact state back via KVM_SET_MP_STATE, it will fail with
--EINVAL. Can we add a case to properly handle the uninitialized state?
-
-[ ... ]
-
-> @@ -1788,7 +1811,7 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm=
-_vcpu *vcpu,
->  	spin_lock(&vcpu->arch.mp_state_lock);
-> =20
->  	if (power_off)
-> -		__kvm_arm_vcpu_power_off(vcpu);
-> +		__kvm_arm_vcpu_power_off(vcpu, KVM_MP_STATE_STOPPED);
 
 [Severity: High]
-Can this cause a spurious PSCI_RET_ALREADY_ON failure when booting secondary
-protected vCPUs?
+Could this early return cause a regression by allowing the host's hardware
+breakpoints to leak into the protected guest?
 
-When the VMM initializes a secondary protected vCPU with
-KVM_ARM_VCPU_POWER_OFF, it explicitly hardcodes its mp_state to
-KVM_MP_STATE_STOPPED here.
+By returning early here, the hyp vCPU's debug_owner remains VCPU_DEBUG_FREE=
+ (0)
+for protected VMs.
 
->  	else
->  		WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_RUNNABLE);
-> =20
+During the world switch, this causes the hypervisor to skip context-switchi=
+ng
+the hardware debug registers because kvm_debug_regs_in_use() evaluates to f=
+alse:
 
-[ ... ]
+arch/arm64/kvm/hyp/include/hyp/debug-sr.h:__debug_switch_to_guest_common() {
+    ...
+	if (!kvm_debug_regs_in_use(vcpu))
+		return;
+    ...
+}
 
-> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> index e3db84400d1f8..b01f8d44033f1 100644
-> --- a/arch/arm64/kvm/psci.c
-> +++ b/arch/arm64/kvm/psci.c
-> @@ -63,7 +63,12 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu =
-*source_vcpu)
->  		return PSCI_RET_INVALID_PARAMS;
-> =20
->  	spin_lock(&vcpu->arch.mp_state_lock);
-> -	if (!kvm_arm_vcpu_stopped(vcpu)) {
-> +	/*
-> +	 * A protected vCPU is off once the host has acted on EL2's CPU_OFF.
-> +	 * STOPPED before that is the VMM's pause.
-> +	 */
-> +	if (!kvm_arm_vcpu_stopped(vcpu) ||
-> +	    (vcpu_is_protected(vcpu) && !kvm_pkvm_vcpu_is_powered_off(vcpu))) {
->  		if (kvm_psci_version(source_vcpu) !=3D KVM_ARM_PSCI_0_1)
->  			ret =3D PSCI_RET_ALREADY_ON;
->  		else
+As a result, the host's physical breakpoints remain active in hardware.
 
-[Severity: High]
-Following up on the KVM_ARM_VCPU_POWER_OFF initialization above, does this
-condition incorrectly reject guest CPU_ON requests?
+If the guest implements DebugVer, MDCR_EL2.TDA is not set:
 
-If the primary vCPU executes a PSCI CPU_ON call before the secondary vCPU
-thread has executed its first KVM_RUN, __pkvm_create_hyp_vcpu() hasn't yet
-upgraded the state to KVM_MP_STATE_UNINITIALIZED.
+arch/arm64/kvm/hyp/nvhe/pkvm.c:pvm_init_traps_mdcr() {
+    ...
+	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, DebugVer, IMP))
+		val |=3D MDCR_EL2_TDRA | MDCR_EL2_TDA;
+    ...
+}
 
-Consequently, when kvm_psci_vcpu_on() evaluates the condition above, it
-sees the vCPU as STOPPED but not UNINITIALIZED. The condition evaluates
-to true, causing it to return PSCI_RET_ALREADY_ON to the guest. This
-deterministically breaks SMP boot for protected VMs on VMMs that block
-secondary vCPU threads prior to wakeup.=20
-
-Should kvm_arch_vcpu_ioctl_vcpu_init() directly set the state to
-KVM_MP_STATE_UNINITIALIZED for protected vCPUs to avoid this race?
+This gives the guest untrapped access to MDSCR_EL1. If the guest sets
+MDSCR_EL1.MDE=3D1, the host's hardware breakpoints could fire inside the gu=
+est
+at EL1, circumventing guest isolation.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261001135711.1640=
-520-1-fuad.tabba@linux.dev?part=3D16
+520-1-fuad.tabba@linux.dev?part=3D6
