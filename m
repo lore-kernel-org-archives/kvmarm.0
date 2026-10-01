@@ -1,82 +1,110 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8665C4734FA;
-	Thu,  1 Oct 2026 16:37:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047CA1A6822;
+	Thu,  1 Oct 2026 16:39:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790872667; cv=none; b=YEHQWrpk74XD3ELWUQA99IGbKvuTvezmQMVi1TCSQ1fRr+i4NlD20agQ4Bz0x9Ag3vSN6BX9QoBQxCUNCmobdLXp/3/zKf5SQm3+1DS/dY11KZX9dlAP0X1Fzvthcil5rs4p+/BESxt+4aQ4tk0tXG8/Tv140Cb1zYvg0rDcjuM=
+	t=1790872743; cv=none; b=hc/anek47WPPrv6TI0vOQTrDnd7N0LMOBHPrPwdeNcQCezU5uvKZY+QqhCv58n5M2hTOep/u5N46SnLfekSkHWcL5KDckY5YxxrPbzQ095BhXGESak02ChJgBUe+Um277/WCnGVcqAR1J6D3gdnopui0cxY9+fkX+o8dWDvPFg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790872667; c=relaxed/simple;
-	bh=K9BrYtciJGkSxMEbrXtvHk2FbFP0IJ/JnLlba9Tczjs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dEJbNnqeo/Jrv9hFQyn9Y912VY1kpr43bp7YU4Oa9RFdPg/9gdpE2VFTHK4jxYF2/uAxK6BlyJaEbG6CsPDDFNmdWq0vCDa8L6//gxXv83J7tKD2KZ3mvQD8rHQuO47C+5NhcJgUTOpLdYJ8dL58NOxgu+E/Qh+EK7FGuRw83O0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=BsV62LOq; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1790872743; c=relaxed/simple;
+	bh=atzKYEkSNf/oEYXZJEAEHrfV7pM0xz0gQsVLLJrHEgQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WzZ194Ra5Gxi1k7/IK++jtQnn1xVR2ecPWhPAU8oF/f1W3w/r5asBHQYIkF9FHpsPv2z2NSPGVV/xOYqRGQnPu6ySM5IeCfV5Q+SRd1SdZUJmrmknFDQs37LxCIx2oUSwWeh7S0uyk6AAvDjvNEYvDeeYa6Jx4JjMKqPP92q75Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ih38u32l; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="BsV62LOq"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6A8D7497;
-	Thu,  1 Oct 2026 09:37:41 -0700 (PDT)
-Received: from [10.57.9.178] (unknown [10.57.9.178])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D8C683F85F;
-	Thu,  1 Oct 2026 09:37:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790872664; bh=K9BrYtciJGkSxMEbrXtvHk2FbFP0IJ/JnLlba9Tczjs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=BsV62LOqI5ja68sCQcFyb5ijD1CAgATdMGzmBFi4PPZQ2Nl1po/USPeOyjARfB1hR
-	 4IW2nKeALWQxil1hxMsJbWCTmjfJWwrfaJRQWTlMxqg8rSgve5w/QmYdvcMHIJ7CR0
-	 apDR+U8DfZ9vBePkOCIe3Wvt8ZYFIpX+pUeF5fiY=
-Message-ID: <c8ea1847-0a92-46b2-a038-37a9d581e8b2@arm.com>
-Date: Thu, 1 Oct 2026 17:37:37 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ih38u32l"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 407411F000FF;
+	Thu,  1 Oct 2026 16:38:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790872741;
+	bh=53qEhBkxOk8Rhw/laCIFBAvn8/m0XtPcvZMYs9C6rlQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=ih38u32lPiJYlaJAURPfglfqwPvJJxhtf5w7W7gSfONpcFZzZDJYU6r4nW3CPdmEU
+	 GqoXWL8her2J6bcMV8UXzEiEVVlsBpoLP5nByHKacD7wwS26XFQKugqsRKZIFEwVmj
+	 JA+xslQaQC1Nbjjt8qzVnPE2bfC9L+z40rHufLphSQVcnGSMrFZtVtthpS5tyd+gFo
+	 eNHHwIYCTZloAMKT8sbG25on4W+Cqebz7aZblobreWAHexQC7WiPCBQrziapwvFRGu
+	 kjQHnrb96C9aAAslyi6KvHaZlrD9RoddsdxJZtn4H/ENIux8KW4XPqPPetdjdy2xW7
+	 KfyM51MqwEu/g==
+Date: Thu, 1 Oct 2026 17:38:54 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <fuad.tabba@linux.dev>, Peter Maydell <peter.maydell@linaro.org>, 
+	Leonardo Bras <leo.bras@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>, 
+	Yao Yuan <yaoyuan@linux.alibaba.com>, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v21 12/15] KVM: selftests: arm64: Add GCS to set_id_regs
+Message-ID: <ar6MIFW2vfM893yd@gremlin>
+References: <20260930-arm64-gcs-v21-0-3556644cd927@kernel.org>
+ <20260930-arm64-gcs-v21-12-3556644cd927@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 22/22] KVM: arm64: CCA: Control user register access
- for Realms
-Content-Language: en-GB
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
- will@kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
- sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com,
- Jean-Philippe Brucker <jean-philippe@linaro.org>
-References: <20260924160504.853911-1-suzuki.poulose@arm.com>
- <20260924160504.853911-23-suzuki.poulose@arm.com> <ar6CEXfo-AIYtq1J@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <ar6CEXfo-AIYtq1J@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260930-arm64-gcs-v21-12-3556644cd927@kernel.org>
 
-On 01/10/2026 16:53, Catalin Marinas wrote:
-> On Thu, Sep 24, 2026 at 05:05:04PM +0100, Suzuki K Poulose wrote:
->> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
->>
->> The RMM restricts the access to the register states that the host can
->> read/modify for a given Realm.
->>
->> e.g., At VCPU creation, can modify GPRS (x0-x30) and PC.
->>        While servicing SMCCC calls via RSI_HOST_CALL or servicing PSCI
->>        requests.
->>        MMIO emulation in the unprotected space.
->>
->> Additionally we use the sysreg configuration to advertise/configure the
->> following Realm parameters, which are required before the Realm Descriptor
->> :w
-> 
-> Should use Emacs ;)
-> 
+On Wed, Sep 30, 2026 at 10:48:22PM +0100, Mark Brown wrote:
+> Now that GCS is configurable via the ID registers update set_id_regs to
+> cover ID_AA64PFR1_EL1.GCS.
 
-Dang it ;-) I have fixed it in v21. Thanks
+Should maybe also mention adding the GCS-without-S1PIE test?
 
-Cheers
-Suzuki
+>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 
+Looks obviously correct (TM) to me too so:
+
+Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+
+> ---
+>  tools/testing/selftests/kvm/arm64/set_id_regs.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+> index cb5e6358c59c..9db8516748cc 100644
+> --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
+> +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+> @@ -154,6 +154,7 @@ static const struct reg_ftr_bits ftr_id_aa64pfr0_el1[] = {
+>
+>  static const struct reg_ftr_bits ftr_id_aa64pfr1_el1[] = {
+>  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, DF2, 0),
+> +	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, GCS, 0),
+>  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, CSV2_frac, 0),
+>  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, SSBS, ID_AA64PFR1_EL1_SSBS_NI),
+>  	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, BT, 0),
+> @@ -818,6 +819,12 @@ struct reg_ftr_val {
+>  	  .mask = r ## _ ## f ## _MASK,				\
+>  	  .val = (r ## _ ## f ## _ ## v  << r ## _ ## f ## _SHIFT) }
+>
+> +static const struct reg_ftr_val gcs_no_s1pie[] = {
+> +	REG_FTR_VAL(ID_AA64PFR1_EL1, GCS, IMP),
+> +	REG_FTR_VAL(ID_AA64MMFR3_EL1, S1PIE, NI),
+> +	{ }
+> +};
+> +
+>  static const struct reg_ftr_val s1pie_no_tcr2[] = {
+>  	REG_FTR_VAL(ID_AA64MMFR3_EL1, TCRX, NI),
+>  	REG_FTR_VAL(ID_AA64MMFR3_EL1, S1PIE, IMP),
+> @@ -836,6 +843,7 @@ struct ftr_config {
+>  };
+>
+>  static const struct ftr_config invalid_configs[] = {
+> +	{ .name = "GCS without S1PIE", .regs = gcs_no_s1pie },
+>  	{ .name = "S1PIE without TCRX", .regs = s1pie_no_tcr2 },
+>  	{ .name = "S1POE without TCRX", .regs = s1poe_no_tcr2 },
+>  };
+>
+> --
+> 2.47.3
+>
+>
+
+--
+Cheers, Lorenzo
