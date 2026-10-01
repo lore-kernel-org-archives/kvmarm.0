@@ -1,56 +1,56 @@
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com [209.85.208.71])
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842AD5208BA
-	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 14:29:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B417851CF78
+	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 14:29:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790864960; cv=none; b=KRCBofcbO///1gQUSn1tForBE8P5BZP0btFG4tgA+/jVXO/hmc0lIZ65qdlyi3v0YZ8Yeth8Q1J8MFt6ezPkbnfJUwgdYk/6c0YpcPloUWwYmHj9OMaIx8J+uXVUKEmBnO//ikWBe9aQT5M2+STxJN33ASerB52skFPgTHxWmhg=
+	t=1790864963; cv=none; b=OHx0s1iEWnPIyTdd6XrNHKfG/fRTsHKrwVEAtbBcpClJPmXq2l6kjRCthTikRGPa4WI3Ac59U9+NnEikvQNq2Gvq35VqIenB8ww+EJc5G1DWpE73q2XxJTwUVhhoqTfwOhqeUIc+CXsf5FSeyeLXVKSyoJh4iLkm90/xLP3FmVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790864960; c=relaxed/simple;
-	bh=6sSlBcH2Xt92ZWa0Q40nxAKJEHr/0+7IsUvl6KfB5QI=;
+	s=arc-20240116; t=1790864963; c=relaxed/simple;
+	bh=2wy4cMYoF8inKyCjdEl4DP8z6/Td8acJjvU/kk2A4to=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SCY2rEkeAQpbeDfAaz843bvAyX7Gvgib022lMMhmtf/+GJX+0p+KD+s4thWTO26R6A4kUdFcrRu2N7t1k82DcniFph1f9E5dcDxKJSUgCvSk8TfGASmpxkcF1p8beVYz9th8UqYdlyJnB8tM9oFBj6HzAOaQkAcrLg+NYiV0vWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pcqS9jr+; arc=none smtp.client-ip=209.85.208.71
+	 To:Cc:Content-Type; b=WrntIMvjCOEAKOhVE9hNLNDrMOCguS4QGlz3iQvtZRxO5djm2PzhPLzjaJcHyttNCkirWLi9IeKyI1UTrW5tZotJSKdo0oRZCfBWi5Y9jywlBRy/L/8n9qvbtbooReCim00q9KPrC7DOjXZ0kYBWl6Yfj/kEAjAxTae5WcvuaoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NHq0Y1GO; arc=none smtp.client-ip=209.85.221.71
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pcqS9jr+"
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-6acb986a43bso3628811a12.3
-        for <kvmarm@lists.linux.dev>; Thu, 01 Oct 2026 07:29:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NHq0Y1GO"
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-48b02d63407so1222080f8f.0
+        for <kvmarm@lists.linux.dev>; Thu, 01 Oct 2026 07:29:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790864949; x=1791469749; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1790864952; x=1791469752; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=AgtErX92+S4B0epnd2wY3xYBTw3NROE9KR9546jjP9s=;
-        b=pcqS9jr+1fZuejDEEUeAlWPELgR1/hM/EcYziWa22rsGHxKmeK6wKzBMTMa1j7qc6l
-         mhfQW78Q8X6nxqBxtxC3aVPTbB7+C3i8oHgCsGn2+/QV6YbJ+nFziEMWh9Prhn5LvnHi
-         o0BNJcsZBdCbK8S7VtPvzyzp3OATfdsVjuSAh4guQx6iitn+lXkPHZ3qnYyL1shOanUl
-         SThbTsYDerSF5Z/dB1F+cA7NficdCYfNutP4Vtl4YFKbOYLnwXsLkwgoVG8Sx/F7JJTk
-         lsPx9skaBlJ/NlyNcZB9S4ubUw9FZfydhMlPlr+VfpMNA8MZHIGv6LpZ2s7OnmoUmAK8
-         9Efw==
+        bh=TuL/trC6ai3Kh0aIJd/3xh1DmywKzy5BGHO8nv2ShpM=;
+        b=NHq0Y1GOfNCiNp/VM/+vJ1duG5XY8prTbKC3Uj+a6zqtqIjucRDRQ1fdlG5sZml2yR
+         Ti9pDWkF2zOEBi/l5n71Zfse/Ncmz11JoWbKhHvGjHOdf3Za/czhzMUrAcpowyt3y/be
+         sAvEg7Z2lr3q50kiH8Ozj1vH9Uk46yTxFhWHA9EQeDca6k0pfKaytm83CPm/SWTtW0mp
+         JW1FIPUCTP8SQJRDnQYhr5kG6OECUbKpU/LdeDWiVyDAgR1cfAz+SnNfuRDD4La5W1wY
+         ISxSdpxrHQUYmlZnpILIFH9E1db+id5/Fah9+gldoXQFxh7AZHVcX49NSW8PR4AX5lpo
+         XZTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790864949; x=1791469749;
+        d=1e100.net; s=20260707; t=1790864952; x=1791469752;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=AgtErX92+S4B0epnd2wY3xYBTw3NROE9KR9546jjP9s=;
-        b=XcDicafEjsPoX537H571+tzMrGeHPVnb/kqUXt1UjfVPTx0rhJhIAy2PVnRKfdvZY8
-         qt+UiJZE2Go07lbDF+Wcb7ljEtbvfHcg0XdHF6XHQMaWijpuJ7Orpef7T6gqZNbAy5Dw
-         6d5kYupVoPMARze/YpxNU2h95JLSYA9tVbeJnr9n7Rzh9HuS1S5mNklfiSGLZOJeVikU
-         ti4BKbARul/uHtJQRuIispmjrOMgDuaafFyu4qPXzRplPyizZjlkrs2c1763YbpLVPWd
-         40oFnZmC767e0L5ilNHBG3QrO6/8FgwS4vnHVKHSzKmpySYtAhRA/QBdHHitYIB9cqy5
-         vQtQ==
-X-Forwarded-Encrypted: i=1; AKwUvBxyPCo8T5qUuoF23b24q7+VfT4VOEDrevWZKc4b3sAI32dOk1KqEYJ1AnfpvBUVDJkuSR+E+ss=@lists.linux.dev
-X-Gm-Message-State: AFq9FYKGe5BFtc1JCgZ0aEzlRTUpppfvpBviM+jttzeGLUxJFwJ6QmSw
-	sw2Yxetji17x07T1woegGLtUNbTMKv1MlT5d5tlL82HhCy6349Te1lQ+imxF4x6ugiSLvMNu/Up
-	DL15L10FWVIja+DzNWIDlug==
-X-Received: from edbch8.prod.google.com ([2002:a05:6402:1bc8:b0:6a5:d898:8471])
+        bh=TuL/trC6ai3Kh0aIJd/3xh1DmywKzy5BGHO8nv2ShpM=;
+        b=A78Igj7aQG86sLnXOoIzChxMlnoV1i7nB75qQQg/zh6I3nAT5j9rH3ghDyeSfa8yNv
+         +PmxoKVEvkOz2qljcw8I2puO9UasOhcxNV5XR+P47rCj9HkdgegUTNdQ0MBKQ2xePSPn
+         bUI0pK8iGcBQYlP/a62jsvc3HBKpvul/y1pkzVv9/avtUe/mmqj956H3ElmJIkId8NML
+         EmOIWlyxSxEOd9T6Hrt0pRsh8/0vs9PLlSt0IBZmBIio+MrOado+x8S/va0imaxGS0/D
+         x75yw1NaFpFbL8Sn/9skZZ0KMp+oviDazOF668XAaDPa3w2w9DPMloEH4Ox0qqeQGa7Z
+         vfeA==
+X-Forwarded-Encrypted: i=1; AKwUvBzgeTO+5MvC0yu4DfWZqWEZ1f9DfjKxv5TH98bKLUEYOAHGJrYi45h33eD5XM7wApfu2QWo5CM=@lists.linux.dev
+X-Gm-Message-State: AFq9FYJDKqq+98dR0RGIS/Hrzi9oA9otrzOHkgAFofQVLJws6XWuvX5k
+	dHxk871yEGnFtAMPeLXGIbh9w3p5alJvmoCCbuh74fjt+/AiSqkN9P/cjuJh7iHZJLhNkPV0CZL
+	gkrmcIx+jBavfA0WPsjvFyA==
+X-Received: from wrbhe34.prod.google.com ([2002:a05:6000:15e2:b0:47f:74c9:84ee])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6402:4024:b0:6aa:734a:a091 with SMTP id 4fb4d7f45d1cf-6ae19929a44mr4327530a12.40.1790864948432;
- Thu, 01 Oct 2026 07:29:08 -0700 (PDT)
-Date: Thu,  1 Oct 2026 15:28:40 +0100
+ 2002:a05:6000:4914:b0:487:1646:8740 with SMTP id ffacd0b85a97d-48b02525c39mr9358682f8f.29.1790864951846;
+ Thu, 01 Oct 2026 07:29:11 -0700 (PDT)
+Date: Thu,  1 Oct 2026 15:28:43 +0100
 In-Reply-To: <20261001142849.3367614-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -60,8 +60,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20261001142849.3367614-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.56.0.rc1.315.gc6ed9934b7-goog
-Message-ID: <20261001142849.3367614-10-vdonnefort@google.com>
-Subject: [PATCH v6 09/18] KVM: arm64: Add selftests for the pKVM heap allocator
+Message-ID: <20261001142849.3367614-13-vdonnefort@google.com>
+Subject: [PATCH v6 12/18] KVM: arm64: Move hyp_vm refcount into the structure
 From: Vincent Donnefort <vdonnefort@google.com>
 To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -71,421 +71,100 @@ Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
 	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Introduce a comprehensive runtime selftest for the pKVM hypervisor heap
-allocator, executed during init when CONFIG_NVHE_EL2_DEBUG is enabled.
-
-The selftest runs entirely at EL2 and exercises allocator's core
-mechanisms:
-
-  * over-sized allocations
-  * basic allocation and alignment
-  * chunk recycling, splitting, merging
-  * memory reclaiming
-  * memory topup
+In preparation for allocating hyp_vm using the pKVM heap allocator
+(hyp_alloc()), move its reference count out of the page metadata
+(vmemmap) and place it into the structure itself. This transition is
+necessary because hyp_alloc() allows multiple small objects to share the
+same physical page.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
 Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/include/asm/kvm_asm.h        |   1 +
- arch/arm64/include/asm/kvm_hcall.h      |   2 +
- arch/arm64/include/asm/kvm_pkvm.h       |   3 +
- arch/arm64/kvm/arm.c                    |   2 +
- arch/arm64/kvm/hyp/include/nvhe/alloc.h |  11 ++
- arch/arm64/kvm/hyp/nvhe/alloc.c         | 186 +++++++++++++++++++++++-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  24 +++
- arch/arm64/kvm/pkvm.c                   |  19 +++
- 8 files changed, 247 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h | 13 +++++++++++++
+ arch/arm64/kvm/hyp/nvhe/pkvm.c         | 10 +++++-----
+ 2 files changed, 18 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index fc3c52b03154..1ac1990bbd68 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -62,6 +62,7 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_hyp_alloc_selftest,
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+index c1171451e1be..b208544141c0 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+@@ -42,6 +42,7 @@ struct pkvm_hyp_vm {
+ 	struct kvm_pgtable pgt;
+ 	struct kvm_pgtable_mm_ops mm_ops;
+ 	struct hyp_pool pool;
++	unsigned short refcount;
+ 	hyp_spinlock_t lock;
  
- 	MARKER(__KVM_HOST_SMCCC_FUNC_MIN_PKVM),
+ 	/* Array of the hyp vCPU structures for this VM. */
+@@ -66,6 +67,18 @@ static inline bool pkvm_hyp_vm_is_protected(struct pkvm_hyp_vm *hyp_vm)
+ 	return kvm_vm_is_protected(&hyp_vm->kvm);
+ }
  
-diff --git a/arch/arm64/include/asm/kvm_hcall.h b/arch/arm64/include/asm/kvm_hcall.h
-index bce6eb8b20e0..8a6c2506fdeb 100644
---- a/arch/arm64/include/asm/kvm_hcall.h
-+++ b/arch/arm64/include/asm/kvm_hcall.h
-@@ -24,6 +24,7 @@ typedef u16 pkvm_handle_t;
- 
- enum pkvm_topup_id {
- 	PKVM_TOPUP_HYP_ALLOC,
-+	PKVM_TOPUP_HYP_ALLOC_SELFTEST,
- };
- 
- struct kvm;
-@@ -153,6 +154,7 @@ DECLARE_KVM_HOST_HCALL(int, __pkvm_cpu_set_vector,
- DECLARE_KVM_HOST_HCALL0(void, __kvm_enable_ssbs)
- DECLARE_KVM_HOST_HCALL0(void, __vgic_v3_init_lrs)
- DECLARE_KVM_HOST_HCALL0(u64, __vgic_v3_get_gic_config)
-+DECLARE_KVM_HOST_HCALL0(int, __pkvm_hyp_alloc_selftest)
- 
- DECLARE_KVM_HOST_HCALL0(int, __pkvm_prot_finalize)
- 
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index c338178d6bb2..ec8060f220f4 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -17,6 +17,7 @@
- 
- #define HYP_MEMBLOCK_REGIONS 128
- 
-+void pkvm_selftests(void);
- int pkvm_init_host_vm(struct kvm *kvm, unsigned long type);
- int pkvm_create_hyp_vm(struct kvm *kvm);
- bool pkvm_hyp_vm_is_created(struct kvm *kvm);
-@@ -208,6 +209,7 @@ struct pkvm_mapping {
- enum pkvm_hyp_req_type {
- 	PKVM_HYP_NO_REQ = 0,
- 	PKVM_HYP_REQ_HYP_ALLOC,
-+	PKVM_HYP_REQ_HYP_ALLOC_SELFTEST,
- 	__PKVM_HYP_REQ_TYPE_MAX,
- };
- 
-@@ -235,6 +237,7 @@ static inline size_t pkvm_hyp_req_arg_size(u8 type)
- 	case PKVM_HYP_NO_REQ:
- 		return 0;
- 	case PKVM_HYP_REQ_HYP_ALLOC:
-+	case PKVM_HYP_REQ_HYP_ALLOC_SELFTEST:
- 		return sizeof(req->mem);
- 	default:
- 		WARN_ON(1);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 8b080804bc90..09ae5431ce58 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2914,6 +2914,8 @@ static int __init init_hyp_mode(void)
- 			kvm_err("Failed to init hyp memory protection\n");
- 			goto out_err;
- 		}
++static inline void pkvm_hyp_vm_ref_inc(struct pkvm_hyp_vm *hyp_vm)
++{
++	BUG_ON(hyp_vm->refcount == USHRT_MAX);
++	hyp_vm->refcount++;
++}
 +
-+		pkvm_selftests();
++static inline void pkvm_hyp_vm_ref_dec(struct pkvm_hyp_vm *hyp_vm)
++{
++	BUG_ON(!hyp_vm->refcount);
++	hyp_vm->refcount--;
++}
++
+ void pkvm_hyp_vm_table_init(void *tbl);
+ 
+ int __pkvm_reserve_vm(void);
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index 5cdb0318fa7b..98db5bd28dde 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -278,7 +278,7 @@ struct pkvm_hyp_vcpu *pkvm_load_hyp_vcpu(pkvm_handle_t handle,
  	}
  
- 	return 0;
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/alloc.h b/arch/arm64/kvm/hyp/include/nvhe/alloc.h
-index 8f87a63f8946..bca0168e0046 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/alloc.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/alloc.h
-@@ -14,4 +14,15 @@ int hyp_alloc_init(size_t size);
- int hyp_alloc_topup(struct kvm_hyp_memcache *host_mc);
- unsigned long hyp_alloc_reclaimable(void);
- void hyp_alloc_reclaim(struct kvm_hyp_memcache *host_mc, unsigned long target);
-+
-+#ifdef CONFIG_NVHE_EL2_DEBUG
-+int hyp_allocator_selftest(void);
-+u32 hyp_alloc_selftest_topup_needed(void);
-+int hyp_alloc_selftest_topup(struct kvm_hyp_memcache *host_mc);
-+void hyp_alloc_selftest_reclaim(struct kvm_hyp_memcache *host_mc, unsigned long target);
-+#else
-+static inline int hyp_alloc_selftest_topup(struct kvm_hyp_memcache *host_mc) { return 0; };
-+static inline void
-+hyp_alloc_selftest_reclaim(struct kvm_hyp_memcache *host_mc, unsigned long target) { };
-+#endif
- #endif
-diff --git a/arch/arm64/kvm/hyp/nvhe/alloc.c b/arch/arm64/kvm/hyp/nvhe/alloc.c
-index e0104d2dd6c0..c1881c0011c9 100644
---- a/arch/arm64/kvm/hyp/nvhe/alloc.c
-+++ b/arch/arm64/kvm/hyp/nvhe/alloc.c
-@@ -1001,9 +1001,17 @@ int hyp_alloc_errno(void)
- 	return hyp_allocator_errno(&hyp_allocator);
+ 	hyp_vcpu->loaded_hyp_vcpu = this_cpu_ptr(&loaded_hyp_vcpu);
+-	hyp_page_ref_inc(hyp_virt_to_page(hyp_vm));
++	pkvm_hyp_vm_ref_inc(hyp_vm);
+ unlock:
+ 	hyp_spin_unlock(&vm_table_lock);
+ 
+@@ -294,7 +294,7 @@ void pkvm_put_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 	hyp_spin_lock(&vm_table_lock);
+ 	hyp_vcpu->loaded_hyp_vcpu = NULL;
+ 	__this_cpu_write(loaded_hyp_vcpu, NULL);
+-	hyp_page_ref_dec(hyp_virt_to_page(hyp_vm));
++	pkvm_hyp_vm_ref_dec(hyp_vm);
+ 	hyp_spin_unlock(&vm_table_lock);
  }
  
-+static int selftest_init(void);
-+
- int hyp_alloc_init(size_t size)
+@@ -311,7 +311,7 @@ struct pkvm_hyp_vm *get_pkvm_hyp_vm(pkvm_handle_t handle)
+ 	hyp_spin_lock(&vm_table_lock);
+ 	hyp_vm = get_vm_by_handle(handle);
+ 	if (hyp_vm)
+-		hyp_page_ref_inc(hyp_virt_to_page(hyp_vm));
++		pkvm_hyp_vm_ref_inc(hyp_vm);
+ 	hyp_spin_unlock(&vm_table_lock);
+ 
+ 	return hyp_vm;
+@@ -320,7 +320,7 @@ struct pkvm_hyp_vm *get_pkvm_hyp_vm(pkvm_handle_t handle)
+ void put_pkvm_hyp_vm(struct pkvm_hyp_vm *hyp_vm)
  {
--	return hyp_allocator_init(&hyp_allocator, size);
-+	int ret;
-+
-+	ret = hyp_allocator_init(&hyp_allocator, size);
-+	if (ret)
-+		return ret;
-+
-+	return selftest_init();
+ 	hyp_spin_lock(&vm_table_lock);
+-	hyp_page_ref_dec(hyp_virt_to_page(hyp_vm));
++	pkvm_hyp_vm_ref_dec(hyp_vm);
+ 	hyp_spin_unlock(&vm_table_lock);
  }
  
- void hyp_alloc_reclaim(struct kvm_hyp_memcache *mc, unsigned long target)
-@@ -1025,3 +1033,179 @@ u32 hyp_alloc_topup_needed(void)
- {
- 	return hyp_allocator_topup_needed(&hyp_allocator);
- }
-+
-+#ifdef CONFIG_NVHE_EL2_DEBUG
-+#define SELFTEST_MAX_PAGES 6
-+#define SELFTEST_MAX_SIZE (PAGE_SIZE * SELFTEST_MAX_PAGES)
-+
-+static DEFINE_PER_CPU(int, __selftest_errno);
-+static DEFINE_PER_CPU(u32, __selftest_topup_needed);
-+
-+static struct hyp_allocator selftest_allocator = {
-+	.errno = &__selftest_errno,
-+	.topup_needed = &__selftest_topup_needed,
-+	.lock = __HYP_SPIN_LOCK_UNLOCKED,
-+};
-+
-+int hyp_alloc_selftest_topup(struct kvm_hyp_memcache *host_mc)
-+{
-+	return hyp_allocator_topup(&selftest_allocator, host_mc);
-+}
-+
-+void hyp_alloc_selftest_reclaim(struct kvm_hyp_memcache *host_mc, unsigned long target)
-+{
-+	hyp_allocator_reclaim(&selftest_allocator, host_mc, target);
-+}
-+
-+u32 hyp_alloc_selftest_topup_needed(void)
-+{
-+	return hyp_allocator_topup_needed(&selftest_allocator);
-+}
-+
-+static int selftest_init(void)
-+{
-+	return hyp_allocator_init(&selftest_allocator, SELFTEST_MAX_SIZE);
-+}
-+
-+static void *selftest_alloc(size_t size)
-+{
-+	return hyp_allocator_alloc(&selftest_allocator, size);
-+}
-+
-+static void selftest_free(void *addr)
-+{
-+	hyp_allocator_free(&selftest_allocator, addr);
-+}
-+
-+static int selftest_errno(void)
-+{
-+	return hyp_allocator_errno(&selftest_allocator);
-+}
-+
-+int hyp_allocator_selftest(void)
-+{
-+	struct hyp_allocator *allocator = &selftest_allocator;
-+	static DEFINE_HYP_SPINLOCK(selftest_lock);
-+	struct kvm_hyp_memcache host_mc = { };
-+	void *addr1, *addr2, *addr3, *addr4;
-+	int ret;
-+
-+	guard(hyp_spinlock)(&selftest_lock);
-+
-+	if (allocator->mc.nr_pages < SELFTEST_MAX_PAGES) {
-+		*this_cpu_ptr(allocator->topup_needed) = SELFTEST_MAX_PAGES -
-+							 allocator->mc.nr_pages;
-+		return -ENOMEM;
-+	}
-+
-+	selftest_alloc(SELFTEST_MAX_SIZE);
-+	if (selftest_errno() != -E2BIG)
-+		return -EINVAL;
-+
-+	selftest_alloc(SIZE_MAX);
-+	if (selftest_errno() != -E2BIG)
-+		return -EINVAL;
-+
-+	/* Test first chunk */
-+	addr1 = selftest_alloc(0);
-+	if (!addr1 || addr1 != (void *)allocator->start + chunk_hdr_size())
-+		return -EINVAL;
-+
-+	/* Test second contiguous chunk with unaligned size */
-+	addr2 = selftest_alloc(MIN_ALLOC_SIZE + 1);
-+	if (!addr2)
-+		return -EINVAL;
-+	addr3 = selftest_alloc(0);
-+	if (!addr3 ||
-+	    addr3 != addr2 + (2 * MIN_ALLOC_SIZE) + chunk_hdr_size())
-+		return -EINVAL;
-+
-+	selftest_free(addr3);
-+
-+	/* Test chunk recycling */
-+	selftest_free(addr1);
-+	if (addr1 != selftest_alloc(0))
-+		return -EINVAL;
-+
-+	/* Test chunk forward merging */
-+	addr3 = selftest_alloc(0);
-+	selftest_free(addr2);
-+	selftest_free(addr1);
-+	if (addr1 != selftest_alloc(MIN_ALLOC_SIZE * 2))
-+		return -EINVAL;
-+
-+	selftest_free(addr1);
-+
-+	/* Test chunk splitting */
-+	if (addr1 != selftest_alloc(0))
-+		return -EINVAL;
-+	if (addr2 != selftest_alloc(0))
-+		return -EINVAL;
-+
-+	/* Test chunk backward merging */
-+	selftest_free(addr1);
-+	selftest_free(addr2);
-+	if (addr1 != selftest_alloc(MIN_ALLOC_SIZE * 2))
-+		return -EINVAL;
-+
-+	selftest_free(addr1);
-+
-+	/* Test chunk 3-way merging */
-+	addr1 = selftest_alloc(0);
-+	addr2 = selftest_alloc(0);
-+	addr4 = selftest_alloc(0);
-+	selftest_free(addr1);
-+	selftest_free(addr3);
-+	selftest_free(addr2);
-+	if (addr1 != selftest_alloc(MIN_ALLOC_SIZE * 3))
-+		return -EINVAL;
-+
-+	selftest_free(addr4);
-+	selftest_free(addr1);
-+
-+	/* Test reclaiming */
-+	if (addr1 != selftest_alloc(0))
-+		return -EINVAL;
-+	if (addr2 != selftest_alloc(PAGE_SIZE * 2))
-+		return -EINVAL;
-+	addr3 = selftest_alloc(0);
-+	addr4 = selftest_alloc(PAGE_SIZE);
-+
-+	/* Test reclaiming the last chunk of the list */
-+	selftest_free(addr4);
-+	hyp_allocator_reclaim(allocator, &host_mc, SELFTEST_MAX_PAGES);
-+	if (host_mc.nr_pages != SELFTEST_MAX_PAGES - 3)
-+		return -EINVAL;
-+
-+	/* Test punching a hole in the middle of a free chunk ... */
-+	selftest_free(addr2);
-+	hyp_allocator_reclaim(allocator, &host_mc, SELFTEST_MAX_PAGES);
-+	if (host_mc.nr_pages != SELFTEST_MAX_PAGES - 2)
-+		return -EINVAL;
-+
-+	if (selftest_alloc(PAGE_SIZE))
-+		return -EINVAL;
-+	if (selftest_errno() != -ENOMEM)
-+		return -EINVAL;
-+
-+	/* ... and to refill this hole */
-+	ret = hyp_allocator_topup(allocator, &host_mc);
-+	if (ret)
-+		return ret;
-+	/* Chunk at addr2 was made smaller by the reclaim */
-+	if (addr2 != selftest_alloc(PAGE_SIZE))
-+		return -EINVAL;
-+
-+	/* Test reclaiming the entire allocator from the host */
-+	selftest_free(addr3);
-+	selftest_free(addr2);
-+	selftest_free(addr1);
-+	if (addr1 != selftest_alloc(SELFTEST_MAX_PAGES * PAGE_SIZE - chunk_hdr_size()))
-+		return -EINVAL;
-+	selftest_free(addr1);
-+
-+	return 0;
-+}
-+#else
-+static int selftest_init(void) { return 0; }
-+#endif
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index fdc39f064718..a6e6c0941428 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -800,6 +800,23 @@ DEFINE_KVM_HOST_HCALL(int, __pkvm_finalize_teardown_vm,
- 	return __pkvm_finalize_teardown_vm(handle);
- }
+@@ -979,7 +979,7 @@ static struct pkvm_hyp_vm *get_pkvm_unref_hyp_vm_locked(pkvm_handle_t handle)
+ 	hyp_assert_lock_held(&vm_table_lock);
  
-+DEFINE_KVM_HOST_HCALL0(int, __pkvm_hyp_alloc_selftest)
-+{
-+	struct pkvm_hyp_req req = { .type = PKVM_HYP_NO_REQ };
-+	int ret = -EPERM;
-+
-+#ifdef CONFIG_NVHE_EL2_DEBUG
-+	ret = hyp_allocator_selftest();
-+	if (ret == -ENOMEM) {
-+		req.type = PKVM_HYP_REQ_HYP_ALLOC_SELFTEST;
-+		req.mem.nr_pages = hyp_alloc_selftest_topup_needed();
-+	}
-+#endif
-+	pkvm_hyp_req_to_smccc(host_data_ptr(host_ctxt), &req);
-+
-+	return ret;
-+}
-+
- DEFINE_KVM_HOST_HCALL(int, __pkvm_hyp_topup,
- 	enum pkvm_topup_id, id, phys_addr_t, head, unsigned long, nr_pages)
- {
-@@ -814,6 +831,9 @@ DEFINE_KVM_HOST_HCALL(int, __pkvm_hyp_topup,
- 	case PKVM_TOPUP_HYP_ALLOC:
- 		ret = hyp_alloc_topup(&host_mc);
- 		break;
-+	case PKVM_TOPUP_HYP_ALLOC_SELFTEST:
-+		ret = hyp_alloc_selftest_topup(&host_mc);
-+		break;
- 	default:
- 		ret = -EINVAL;
- 	}
-@@ -835,6 +855,9 @@ DEFINE_KVM_HOST_HCALL(int, __pkvm_hyp_reclaim,
- 	case PKVM_TOPUP_HYP_ALLOC:
- 		hyp_alloc_reclaim(&host_mc, target);
- 		break;
-+	case PKVM_TOPUP_HYP_ALLOC_SELFTEST:
-+		hyp_alloc_selftest_reclaim(&host_mc, target);
-+		break;
- 	default:
- 		ret = -EINVAL;
- 	}
-@@ -927,6 +950,7 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__kvm_enable_ssbs),
- 	HANDLE_FUNC(__vgic_v3_init_lrs),
- 	HANDLE_FUNC(__vgic_v3_get_gic_config),
-+	HANDLE_FUNC(__pkvm_hyp_alloc_selftest),
- 	HANDLE_FUNC(__pkvm_prot_finalize),
+ 	hyp_vm = get_vm_by_handle(handle);
+-	if (!hyp_vm || hyp_page_count(hyp_vm))
++	if (!hyp_vm || hyp_vm->refcount)
+ 		return NULL;
  
- 	HANDLE_FUNC(__kvm_adjust_pc),
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index fec819a9dc78..7821f2592eba 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -344,6 +344,22 @@ static int __init pkvm_drop_host_privileges(void)
- 	return ret;
- }
- 
-+void __init pkvm_selftests(void)
-+{
-+#ifdef CONFIG_NVHE_EL2_DEBUG
-+	int ret = pkvm_call_hyp_req(__pkvm_hyp_alloc_selftest);
-+	unsigned long reclaimed;
-+
-+	reclaimed = pkvm_hyp_reclaim(PKVM_TOPUP_HYP_ALLOC_SELFTEST, ULONG_MAX);
-+
-+	/* On failure, not all the pages may be reclaimable */
-+	if (!ret)
-+		WARN_ON(reclaimed != 6 /* SELFTEST_MAX_PAGES */);
-+	else
-+		kvm_err("pKVM hyp allocator selftest failed (%d)\n", ret);
-+#endif
-+}
-+
- static int __init finalize_pkvm(void)
- {
- 	int ret;
-@@ -677,6 +693,9 @@ static int pkvm_handle_hyp_req(struct pkvm_hyp_req *req)
- 	case PKVM_HYP_REQ_HYP_ALLOC:
- 		ret = pkvm_hyp_topup(PKVM_TOPUP_HYP_ALLOC, req->mem.nr_pages);
- 		break;
-+	case PKVM_HYP_REQ_HYP_ALLOC_SELFTEST:
-+		ret = pkvm_hyp_topup(PKVM_TOPUP_HYP_ALLOC_SELFTEST, req->mem.nr_pages);
-+		break;
- 	}
- 
- 	trace_kvm_handle_pkvm_hyp_req(req, ret);
+ 	return hyp_vm;
 -- 
 2.56.0.rc1.315.gc6ed9934b7-goog
 
