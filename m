@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D88EA53CA97;
-	Thu,  1 Oct 2026 21:08:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A45B953D0AD;
+	Thu,  1 Oct 2026 21:08:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790888888; cv=none; b=gH3aPmj9YnTE1vFaGrnq3Amibibg2KsGiQXfEDjdcJlpRjuljF/bif+CRTpiFaUTiqOpz3CE1MIogGUfiBVqy+q6aVw/dkMh7uxNgCDprrGPwi2dh3bRhrMULCKoKI2EeQ6dwlsQdPzFHPqeFohfrb02CLqltDlDjJosnQuWI1U=
+	t=1790888891; cv=none; b=rrMotiEP/T94Ez4As96axK8gDFFDEuoB9hYCkiNTddgm79ey+lDfBAxmpY673Ql2Sbxg7uMfzwHB4M01AqwUUbMovn50RBgJmUI2saWI85jpTsJ5mG4gOLMuYaUlOzHXiEvXAfGbamE2e9icoKsHVigs4Z78oLiDK7KQE/9phkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790888888; c=relaxed/simple;
-	bh=n7yz3W9kIeBZupUqbrSWGGV1frVjZNOBUu35dpOGsW4=;
+	s=arc-20240116; t=1790888891; c=relaxed/simple;
+	bh=aUMJm4MmfVPuRwP9cR6se83O2r8UV6BA2hVIN/OMalE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AaSUOLQk+RAVdz2thWKIOPEkeAlpj/HQiY/K5QsCAESxCd6VWYdrZB4SNBsDgIc9kN9uZKAQOCp4JMIg5a9X76cLrEUoIycIa6fNV4SqEXK1LdYBG/kA7D5rz86PUEAqjK/Ilsc9Pg1FU8MyXYAE5RzlDHd7bTWxH1xiZlIBZE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=KRXWwt2G; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=swFdQHUSh/LIZxzsnIXAbauRMdCCw2vJCrESA+UiZElwshTImcEbUgvpL/zta7QM6nTQQCPjU3J18oLDTmGiBwLL7fIMe6gEc87TUJnZdvSnnnpY4si/JkUSJBXets0bMUZBRKvGhJLPDat3FWeRU//PGryijvckbWKbZDLx5Z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hjkHIlzz; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="KRXWwt2G"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hjkHIlzz"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0477016F8;
-	Thu,  1 Oct 2026 14:08:02 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B16A9497;
+	Thu,  1 Oct 2026 14:08:05 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 10E323F86F;
-	Thu,  1 Oct 2026 14:08:01 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B6A3E3F86F;
+	Thu,  1 Oct 2026 14:08:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790888885; bh=n7yz3W9kIeBZupUqbrSWGGV1frVjZNOBUu35dpOGsW4=;
+	t=1790888889; bh=aUMJm4MmfVPuRwP9cR6se83O2r8UV6BA2hVIN/OMalE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KRXWwt2GSHUCdx/NxY2UWuVDHAdnR2gQZsX+wVidNiuUfSuU2ipfTSs87KL4NoWK4
-	 KJ7omlpBm/Z91ME1pwEu51gEEGi3XeCKsgUO7Lt8CA4MZzu2U0TichtC1tWBCtQG+z
-	 33J88/IJ1wvo5kLDU8BacksecXc1sJY08yKI6FKk=
+	b=hjkHIlzzIi8jgVefRLWrLvcg+DhxiA1FPuo8P5j9/UEhQauQa5exAHd8+tCC9jscf
+	 3qqznzN7MnSHuf+Eqbr/wTcsc89UD7N1eN3YsNUw186L0MT8qCXnTjW3OzwS9JUDVQ
+	 Mu3Snx6mZSBw2dOy93Ig25BNJyOiUC3EnNlHxD0g=
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -52,9 +52,9 @@ Cc: maz@kernel.org,
 	sudeep.holla@arm.com,
 	jonathan.cameron@oss.qualcomm.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v21 12/23] KVM: arm64: Abstract out memory abort handling
-Date: Thu,  1 Oct 2026 22:06:52 +0100
-Message-ID: <20261001210703.1597150-13-suzuki.poulose@arm.com>
+Subject: [PATCH v21 13/23] KVM: arm64: Mandate VGIC v3 for pKVM VMs and Realms
+Date: Thu,  1 Oct 2026 22:06:53 +0100
+Message-ID: <20261001210703.1597150-14-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261001210703.1597150-1-suzuki.poulose@arm.com>
 References: <20261001210703.1597150-1-suzuki.poulose@arm.com>
@@ -66,128 +66,73 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Move the memory abort handling under VM specific s2 operation.
+pKVM does not trust the host. Realm VMs follow a similar trust model, with
+the Realm Management Monitor owning the protected state instead of the host.
+Add a helper to identify VMs that run under a host-distrusting hypervisor.
 
+Use this for blocking ioremap of vgic-v2 into stage2 and prevent creation of
+VGIC other than v3.
+
+Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
 Tested-by: Gavin Shan <gshan@redhat.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
-Changes since v19:
- - Drop local variable ret and directly return from if..else for kvm_vm_mem_abort
 Changes since v18:
- - Ensure vm_mem_abort handler is always !NULL
+ - Cover pKVM guests for VGIC v3 mandate.
+ - Merge the VGIC mandate check in here.
 ---
- arch/arm64/include/asm/kvm_host.h |  2 ++
- arch/arm64/kvm/mmu.c              | 35 ++++++++++++++++++-------------
- 2 files changed, 22 insertions(+), 15 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 3 +++
+ arch/arm64/kvm/mmu.c              | 2 +-
+ arch/arm64/kvm/vgic/vgic-init.c   | 2 ++
+ 3 files changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f01df02dabfe1..871f503e9f164 100644
+index 871f503e9f164..4d75b8e6797bb 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -156,6 +156,7 @@ struct kvm_vcpu_ops {
- };
+@@ -328,6 +328,8 @@ enum fgt_group_id {
+ enum kvm_arm_vm_flavor {
+ 	VM_NVHE,
+ 	VM_VHE,
++	/* VMs running on a hyp that doesn't trust */
++	MARKER(__VM_DISTRUSTING_HYP),
+ 	VM_PKVM,		/* Normal guests on pKVM */
+ 	MARKER(__VM_PROTECTED),
+ 	VM_PROTECTED_PKVM,	/* Protected VM */
+@@ -1575,6 +1577,7 @@ struct kvm *kvm_arch_alloc_vm(void);
+ #define kvm_vm_is_unprotected_pkvm(kvm)		\
+ 	(is_protected_kvm_enabled() && ((kvm)->arch.vm_flavor == VM_PKVM))
  
- struct kvm_gfn_range;
-+struct kvm_s2_fault_desc;
++#define kvm_vm_hyp_is_distrusting(kvm)	((kvm)->arch.vm_flavor >= __VM_DISTRUSTING_HYP)
  
- struct kvm_vm_s2_ops {
- 	bool (*vm_age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
-@@ -166,6 +167,7 @@ struct kvm_vm_s2_ops {
- 	void (*vm_stage2_unmap_range)(struct kvm_s2_mmu *mmu,
- 				      phys_addr_t start, u64 size,
- 				      bool may_block);
-+	int (*vm_mem_abort)(const struct kvm_s2_fault_desc *s2fd);
- };
- 
- struct kvm_s2_mmu {
+ int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
+ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 8fe7178c40bec..8e092efdf0825 100644
+index 8e092efdf0825..8f21652d3625c 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1743,7 +1743,7 @@ struct kvm_s2_fault_vma_info {
- 	bool		map_non_cacheable;
- };
+@@ -1252,7 +1252,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 				     KVM_PGTABLE_PROT_R |
+ 				     (writable ? KVM_PGTABLE_PROT_W : 0);
  
--static int pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
-+static int protected_vm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
- {
- 	unsigned int flags = FOLL_HWPOISON | FOLL_LONGTERM | FOLL_WRITE;
- 	struct kvm_vcpu *vcpu = s2fd->vcpu;
-@@ -2181,6 +2181,20 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
- 	return kvm_s2_fault_map(s2fd, &s2vi, prot, memcache);
- }
+-	if (is_protected_kvm_enabled())
++	if (kvm_vm_hyp_is_distrusting(kvm))
+ 		return -EPERM;
  
-+static int kvm_vm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
-+{
-+	struct kvm_vcpu *vcpu = s2fd->vcpu;
-+
-+	VM_WARN_ON_ONCE(kvm_vcpu_trap_is_permission_fault(vcpu) &&
-+			!kvm_is_write_fault(vcpu) &&
-+			!kvm_vcpu_trap_is_exec_fault(vcpu));
-+
-+	if (kvm_slot_has_gmem(s2fd->memslot))
-+		return gmem_abort(s2fd);
-+	else
-+		return user_mem_abort(s2fd);
-+}
-+
- /* Resolve the access fault by making the page young again. */
- static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- {
-@@ -2450,19 +2464,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 		.hva		= hva,
- 	};
+ 	size += offset_in_page(guest_ipa);
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index 4012df6002ea6..874025513afcc 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -84,6 +84,8 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+ 		!kvm_vgic_global_state.can_emulate_gicv2)
+ 		return -ENODEV;
  
--	if (kvm_vm_is_protected(kvm)) {
--		ret = pkvm_mem_abort(&s2fd);
--	} else {
--		VM_WARN_ON_ONCE(kvm_vcpu_trap_is_permission_fault(vcpu) &&
--				!write_fault &&
--				!kvm_vcpu_trap_is_exec_fault(vcpu));
--
--		if (kvm_slot_has_gmem(memslot))
--			ret = gmem_abort(&s2fd);
--		else
--			ret = user_mem_abort(&s2fd);
--	}
--
-+	ret = kvm->arch.vm_s2_ops->vm_mem_abort(&s2fd);
- 	if (ret == 0)
- 		ret = 1;
- out:
-@@ -2857,6 +2859,7 @@ static const struct kvm_vm_s2_ops protected_pkvm_vm_s2_ops = {
- 	 * .vm_test_age_gfn
- 	 * .vm_stage2_unmap_range
- 	 */
-+	.vm_mem_abort			= protected_vm_mem_abort,
- };
- 
- static const struct kvm_vm_s2_ops pkvm_vm_s2_ops = {
-@@ -2865,6 +2868,7 @@ static const struct kvm_vm_s2_ops pkvm_vm_s2_ops = {
- 	.vm_age_gfn			= kvm_vm_age_gfn,
- 	.vm_test_age_gfn		= kvm_vm_test_age_gfn,
- 	.vm_stage2_unmap_range		= kvm_vm_stage2_unmap_range,
-+	.vm_mem_abort			= kvm_vm_mem_abort,
- };
- 
- static const struct kvm_vm_s2_ops kvm_default_vm_s2_ops = {
-@@ -2873,6 +2877,7 @@ static const struct kvm_vm_s2_ops kvm_default_vm_s2_ops = {
- 	.vm_age_gfn			= kvm_vm_age_gfn,
- 	.vm_test_age_gfn		= kvm_vm_test_age_gfn,
- 	.vm_stage2_unmap_range		= kvm_vm_stage2_unmap_range,
-+	.vm_mem_abort			= kvm_vm_mem_abort,
- };
- 
- #define KVM_VM_S2_OPS(flavor, ops)		\
-@@ -2889,7 +2894,7 @@ static int kvm_vm_init_vm_s2_ops(struct kvm *kvm)
- 	BUILD_BUG_ON(ARRAY_SIZE(arm64_vm_s2_ops) != VM_FLAVOR_MAX);
- 
- 	kvm->arch.vm_s2_ops = arm64_vm_s2_ops[kvm->arch.vm_flavor];
--	if (WARN_ON(!kvm->arch.vm_s2_ops))
-+	if (WARN_ON(!kvm->arch.vm_s2_ops || !kvm->arch.vm_s2_ops->vm_mem_abort))
- 		return -EINVAL;
- 	return 0;
- }
++	if (kvm_vm_hyp_is_distrusting(kvm) && type != KVM_DEV_TYPE_ARM_VGIC_V3)
++		return -ENODEV;
+ 	/*
+ 	 * Ensure mutual exclusion with vCPU creation and any vCPU ioctls by:
+ 	 *
 -- 
 2.43.0
 
