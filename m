@@ -1,47 +1,46 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E6FC3FA5FE;
-	Thu,  1 Oct 2026 10:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC89F1F09A5;
+	Thu,  1 Oct 2026 10:50:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790851852; cv=none; b=guQogw4NRl+wD1cNbn9yVcZcPSjVTZ+TatHSOxVsdCarzRY8slw4oq4jExz7pxXSDI0zjjLUNUAjjUOZCrHTucjh2Dpn3K3b2z09FTNR7UGFdiEyQIQyGRyi7bzavtza1rGQl9zkVuVQUXqLqKiKEuLtljwvdFLvbH4P5xhr1Ik=
+	t=1790851860; cv=none; b=ImilzA2k2YunX7HCxf+9e7/k8Ox/ahm0lgntQLuR90QmEa1pwPN4hfD6w85KoW+o97NXwLKCBo2WniEOnEQeciT+TMcY/1u5fiXYWe2hdmJxSvlsVFby5lkZFVlYVYOQ96s5K8J8PNtVRxDF0QCkPLU1n2W/Fivl4BphLkqK1a4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790851852; c=relaxed/simple;
-	bh=JVrOeTdxXGig0DbeyzW4m4jIDq1ilZ1bvTg/w5OMrsc=;
+	s=arc-20240116; t=1790851860; c=relaxed/simple;
+	bh=i1e5atsAyug6xkqquAcMBMvETVmH2j/Jas3w3W4pt+c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gpON6Wjgi+oHXZQo0J2m5wJ/EcLSQCzMPL2/n2H5NVcnVcVw0BTkW2PSRyaSPo4tGBvXHmfEcNAgch2woHlgI3CYkDrOm8PX4CwUd/ZDZJilDqyLoS4UOWXRS2yK04jkscnti0RYB1RAQmai4jGRtA3tJKvpsq+Ynlgllk6uMog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=C/qAfLAZ; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=l5HiBjOjOjsvRIDGdJc9NiT6Y7m6neiellgLleT1t7s23cW2IcG9BfKyTQV7E3/X9ubdqJEwu9gpqBDGq/TSW+pt9HhYxpkVOBHFtySOjyJd/1I+2CImLqq4le2XvpzRn0VAar0cJ1SZnPClCYIUnmeVqxYJ+V2Y7SyaJsGwWlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F/0f4Qi1; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="C/qAfLAZ"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ED7D6497;
-	Thu,  1 Oct 2026 03:50:46 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 05D7B3F85F;
-	Thu,  1 Oct 2026 03:50:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790851850; bh=JVrOeTdxXGig0DbeyzW4m4jIDq1ilZ1bvTg/w5OMrsc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=C/qAfLAZHct4UPoOg6LrBocfrvBKURODMiArS+zGamTfcjlMA/mpEnGC6brYdwr6V
-	 mIrkEpqMXt3kcjIlQrYiQ2m1VUgKTws4JlauIHOfbWmzjCyKm8w/rL1MJ4nve/RR/f
-	 Q2U+pjuMYwFnVqZyx5V87W2K4gSUFNKRc6Y5JRJA=
-Date: Thu, 1 Oct 2026 11:50:44 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
-	will@kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
-	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
-	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
-	sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
-Subject: Re: [PATCH v21 2/9] firmware: arm_rmm: Check for RMI support at init
-Message-ID: <ar47BLk-l4-4VyVl@arm.com>
-References: <20261001084555.1456543-1-suzuki.poulose@arm.com>
- <20261001084555.1456543-3-suzuki.poulose@arm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F/0f4Qi1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A46E1F000FF;
+	Thu,  1 Oct 2026 10:50:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790851858;
+	bh=xHk+A5Sdr78XfGzIL/hT9Sc/BCLMrjVL63nMxl+dTOQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=F/0f4Qi1BcZboIFrJ8gvrQdKLcHA689Xa+ziPcEImnPg59/XyNF0X4WCkbq2x3T5T
+	 iOqpbm4jE/zo8FvcldMI9OWZX/ySs/0+U0x/TM+17FS4Q3HwX/fmvlEH7E4TW6Adl8
+	 CcZ6Di5+gzxs8F3M39gsocZJkxPirxl3ldGTV64YQHZLQoCFGdFmbgNdrr5Sx6OG8B
+	 Rf5xq4yWeXQIozISHrooVwHzlA+LOCPZsU0wVIjGHJEazkeDYSA8aNRwFO8psAkHfZ
+	 9jSBMsd5HLL2ZfQf5Gf6O2qYy6a99kc69zR4PKlN3GehsPwVszioku+gciX+bAcdga
+	 JI9wNQYCcOGQA==
+Date: Thu, 1 Oct 2026 11:50:51 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <fuad.tabba@linux.dev>, Peter Maydell <peter.maydell@linaro.org>, 
+	Leonardo Bras <leo.bras@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>, 
+	Yao Yuan <yaoyuan@linux.alibaba.com>, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v21 02/15] KVM: arm64: Refuse to start a guest with S1PIE
+ or S1POE but not TCR2
+Message-ID: <ar4yT297fh45gwM6@gremlin>
+References: <20260930-arm64-gcs-v21-0-3556644cd927@kernel.org>
+ <20260930-arm64-gcs-v21-2-3556644cd927@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,42 +49,58 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261001084555.1456543-3-suzuki.poulose@arm.com>
+In-Reply-To: <20260930-arm64-gcs-v21-2-3556644cd927@kernel.org>
 
-On Thu, Oct 01, 2026 at 09:45:48AM +0100, Suzuki K Poulose wrote:
-> +#define RMM_BLOCKED_RETRY_COUNT		2
-> +/*
-> + * rmi_smccc_invoke: Invoke the RMI call and return the results, retrying the
-> + * command when status is RMI_BUSY. If we encounter RMI_BLOCKED, we retry
-> + * it one more time before we give up. The caller is supposed to handle the
-> + * result and reissue if required.
-> + *
-> + * We don't expect to see RMI_BLOCKED on a practical system, except when
-> + * there are parallel requests that results in long standing operation,
-> + * with one blocking the other.
-> + *
-> + * @regs: Input parameters filled in. Updated with the ouptput results
-> + * after the call.
-> + */
-> +static inline void rmi_smccc_invoke(struct arm_smccc_1_2_regs *regs)
-> +{
-> +	struct arm_smccc_1_2_regs args = *regs;
-> +	long status;
-> +	int i = 0;
+On Wed, Sep 30, 2026 at 10:48:12PM +0100, Mark Brown wrote:
+
+> Fixes: 663abf04ee4d ("KVM: arm64: Make PIR{,E0}_EL1 save/restore conditional on FEAT_TCRX")
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+
+Great, this looks like the most sensible way of resolving the issue with
+userland being able to trigger a kernel oops due to the save/restore
+registers optimisations.
+
+It's also entirely sensible to disallow completely broken configurations
+like this.
+
+LGTM so:
+
+Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 44aae52c473d..3ae293798b27 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+
+> @@ -5928,6 +5946,9 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
+>  		kvm_vgic_finalize_idregs(kvm);
+>  	}
+>
+> +	if (!kvm_validate_id_regs(vcpu->kvm))
+> +		return -EINVAL;
 > +
-> +	while (i < RMM_BLOCKED_RETRY_COUNT) {
-> +		arm_smccc_1_2_invoke(&args, regs);
-> +
-> +		status = RMI_RESULT_STATUS(regs->a0);
-> +		if (status != RMI_BUSY && status != RMI_BLOCKED)
-> +			break;
-> +		if (status == RMI_BLOCKED)
-> +			i++;
-> +		cpu_relax();
-> +	}
-> +}
 
-With changes around RMI_BUSY to return early in patch 8, I think this is
-fine for a brief lock-style retry.
+Seems like the right place to put it as part of the finalisation process,
+run once per VM and guaranteeing the invariant so it's guaranteed that
+ctx_has_s1pie() -> ctxt_has_tcrx() and ctx_has_s1poe() -> ctxt_has_tcrx().
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+(Just working it through for my own understanding), tracing through it ends
+up at struct kvm_arch->id_regs[]:
+
+kvm_has_tcr2()
+  -> kvm_has_feat()
+    -> __kvm_has_feat()
+      -> kvm_cmp_feat()
+        -> kvm_cmp_feat_unsigned()
+	  -> get_idreg_field_unsigned()
+	    -> kvm_read_vm_id_reg()
+	      -> __vm_id_reg()
+	        -> ka->id_regs[]
+
+Which will all have been populated by here. however failing at this point
+will stop KVM_ARCH_FLAG_HAS_RUN_ONCE from being set (also obviously your
+other series separately fixes the issue with KVM_ARCH_FLAG_FGU_INITIALIZED
+being set with !KVM_ARCH_FLAG_HAS_RUN_ONCE).
+
+--
+Cheers, Lorenzo
