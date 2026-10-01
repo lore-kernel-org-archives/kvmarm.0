@@ -1,220 +1,150 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A925335B4;
-	Thu,  1 Oct 2026 15:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A8C53A5E64
+	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 15:16:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790867563; cv=none; b=D6uWBOJa1e4Kzpii6O4+Az8mPKc/AX9S6/VtjlBXmdgV3GHHr2xrqJpkKdftuMolMX4syEQC1VyZIlqOwylLmjYgiBZtfL4qTC8MalItZNGyIKMcitxmzLWGI2cXjzQKSNjTP/dTTh/CFSrTcQUcEiIKJN68jpgV6EYFw5tc5Qk=
+	t=1790867819; cv=none; b=ss+NfINEKJHisofJwyQsPy/Uzk6k5MDbBuMOmWOQy+TPgj11Qmke0Msrj9Z6OeCyvjOJ1w5+bBBNPGwIVGQLzXH8l7v0v7VoY0MkCr/xjHS4s/f/cIAQp4GQzWpAnk8+3ZmXE6coqB0lC/TSR7PSU4VhRhKuEN9JdY16OHO7scM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790867563; c=relaxed/simple;
-	bh=ozz1C6dVuxbIm7Haps4G3u9mV6Qlp/cJorm0ZFBVOyY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ea+n5XHnswDgCsfXIssBJwfkP2SjzxUH1Kfcq+7jQR5RM7logyb6+oGKMGWW4jGENq6xNNp7EiBED8JDof7Uhx6/KKnbWamqJ6Y4m3jJov6U7+ylod5T/S3rN0bcshhDFLAhZbxnceEt2zUgqblFQWLWR8KT+kdzRZcDrKJJOkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EXjsYr3f; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790867819; c=relaxed/simple;
+	bh=hneQixZug+omiC5d9ZfrRbcSwIyTECL9ua9pAppEj4k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qQMrLYqvjj1AwXwJuKZTwv98o771WCr1E3+dqmdfoa4dJuxuEnhAZ/D2QvguYClWG3P4Sres500XvqKODDWUk0xulojHOtIOJWc0HqZ+YsdFi7Mo/JNb9jvkH1p2QFO4t+SYPJEy4Q2ddaHqxyzIs1UpJHWVoUMh/eHjtvpR+EU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=dIbDIsxf; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EXjsYr3f"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C415D1F000FF;
-	Thu,  1 Oct 2026 15:12:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790867561;
-	bh=U+uboDNmd3c4+oklKhah8Yxki5qXO3q5Peg5zVIsILo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=EXjsYr3f9pk1lSJ048/qqJa1G/jbortu2tHrJtCudQVO2+7tqauxJ+/+f9p0waRi7
-	 1uY4s7FPFIZu0WxNaYxlUICOcD7sKykQwEypzkeI5xMv3IgVVbq8n4KRsajjb3BIq1
-	 b88p5JWvYfF6QWcNjkrIDL3TLUVbFBDa6UcpTX6N9TSKW4Wc8k1L+3iUF7eH6jCaTg
-	 93jFhVkJQQ2BW9oSyPN7Imk5R9GGZXmy0UdDsnC+aS6gHhq9F2njzzXoDFeXX2TR2i
-	 YRzt/RAjNUg7FFQfVJ2LxzO58lCK6hPoNrThjczfiMz/LtxEDSRuEdMQGzf+KV54Hl
-	 vTFevA+w2d6IQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xCISd-0000000Fqe0-1JUm;
-	Thu, 01 Oct 2026 15:12:39 +0000
-Date: Thu, 01 Oct 2026 16:12:38 +0100
-Message-ID: <86wls1315l.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andreas Grapentin <gra@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-	Oliver Upton <oupton@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>
-Subject: Re: (subset) [PATCH v9 00/24] KVM: s390: Introduce arm64 KVM
-In-Reply-To: <20261001132715.108643-A-seiden@linux.ibm.com>
-References: <20260930173441.66762-1-seiden@linux.ibm.com>
-	<179085262878.3865846.5787241839391727949.b4-ty@b4>
-	<20261001132715.108643-A-seiden@linux.ibm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="dIbDIsxf"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D9582497;
+	Thu,  1 Oct 2026 08:16:52 -0700 (PDT)
+Received: from e143914.cambridge.arm.com (e143914.arm.com [10.2.213.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F0B263F86F;
+	Thu,  1 Oct 2026 08:16:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790867816; bh=hneQixZug+omiC5d9ZfrRbcSwIyTECL9ua9pAppEj4k=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dIbDIsxfoe46x4maw4x7xVrxF9pHGaC1gY7zoQBGSF5JqNxjO1HgFslQMCaHwaaSb
+	 EVbbAl6jQ2Oo9COa/3DlynMiG6HJ9vxeLQWK7AQI9SxOC0AcvniUDJR790+h1K0oXq
+	 CADG7BzuFe1Xs1O+EGD9Y7ki09+hbFtlwCJc4BS4=
+From: Joey Gouly <joey.gouly@arm.com>
+To: kvmarm@lists.linux.dev
+Cc: Jing Zhang <jingzhangos@google.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Mark Brown <broonie@kernel.org>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	andrew.jones@linux.dev,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: [PATCH v3 0/8] arm64: Add Stage-2 MMU and Nested Guest Framework
+Date: Thu,  1 Oct 2026 16:16:37 +0100
+Message-ID: <20261001151645.2427065-1-joey.gouly@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, seanjc@google.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Thu, 01 Oct 2026 14:27:15 +0100,
-Steffen Eiden <seiden@linux.ibm.com> wrote:
-> 
-> On Thu, Oct 01, 2026 at 12:04:51PM +0100, Marc Zyngier wrote:
-> > On Wed, 30 Sep 2026 19:34:15 +0200, Steffen Eiden wrote:
-> > > Introduce arm-on-s390. Enable KVM-accelerated ARM CPU virtualisation on s390.
-> > > 
-> > > The new KVM functionally depends on KVM/vfio: Use file-based reference
-> > > counting for KVM [5] The series itself should apply w/o those.
-> > > 
-> > > For the original, now partially outdated, cover letter, have a look at versions
-> > > one to three [1].
-> > > 
-> > > [...]
-> > 
-> > Applied to next, thanks!
-> > 
-> > [05/24] arm64: ptrace: Use constants for compat register numbers
-> >         commit: 295d3df9b1e425099a4eb37954a02c4a08fdb496
-> > [06/24] arm64: sysreg: Convert SPSR_ELx to automatic register generation
-> >         commit: d3d78520068779779e1ed7aa0dd8a3ce63e1ca43
-> > [07/24] KVM: arm64: Access elements of vcpu_gp_regs individually
-> >         commit: 29d92585ab987bb80b1e78d811aaea2a8db86e62
-> > [08/24] KVM: arm64: Use accessor functions for core regs
-> >         commit: 89ed62818f10e38e64fea46d43ee6455a1beb647
-> > [09/24] arm64: Prepare sharing arm64 headers with s390
-> >         commit: df6a70516adec8b7f5fa49e1755d8ee33d980d9c
-> > [10/24] arm64: Share arm64 headers with s390
-> >         commit: c7e18ba462536e870b0ff4deca581babcac9135b
-> > [11/24] KVM: arm64: Share arm64 code with s390
-> >         commit: dcb776bfcccc9662001a75b99dbfbef55f46eb31
-> > 
-> > Note that there were a few conflicts. Please check that I resolved
-> > them correctly.
-> 
-> 
-> After rebasing on those the arm-on-s390 part does not build anymore :( 
+Hi all,
 
-Well, that's sort of expected. The kvmarm tree doesn't have the S390
-stuff yet, and contains tons of new stuff.
+This is v3 of the guest framework for kvm-unit-tests/arm64, I have confirmation
+from Jing that he was ok with me posting v3 on top of his v2 [1].
 
-> We are missing the definition of
-> static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
-> 
-> 
-> quick fix: 
-> 
-> on top of [10/24]  arm64: Share arm64 headers with s390
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index bf35cbe8ddcb..0708f792c631 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -367,10 +367,13 @@ static __always_inline u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
->         return vcpu->arch.fault.esr_el2;
->  }
-> 
-> +#if ARM64_S390_COMMON == 1
->  static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
->  {
->         return esr & ESR_ELx_S1PTW;
->  }
-> +
-> +#endif /* ARM64_S390_COMMON == 1 */
-> 
->  static __always_inline bool esr_abt_is_exec_fault(unsigned long esr)
->  {
-> 
-> 
-> 
-> A cleaner solution it to move this defenition just below  
-> void kvm_vcpu_wfi(struct kvm_vcpu *vcpu) in 
-> [09/24] arm64: Prepare sharing arm64 headers with s390
-> and expand the shared region in the following patch.
+This series introduces lightweight infrastructure for managing arm64 stage-2
+translation tables and running EL1 guests from EL2.
 
-I'm redoing the merge and fixing it as follows (note that the
-ARM64_S390_COMMON guards are already present):
+The stage-2 library provides page-table mapping, unmapping and context loading.
+The initial implementation is deliberately limited to a 4K granule, 48-bit IPA
+space and 8-bit VMIDs.
 
-@@ -336,16 +367,6 @@ static __always_inline u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
- 	return vcpu->arch.fault.esr_el2;
- }
- 
--static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
--{
--	return esr & ESR_ELx_S1PTW;
--}
--
--static __always_inline bool esr_abt_is_exec_fault(unsigned long esr)
--{
--	return esr_trap_is_iabt(esr) && !esr_abt_is_s1ptw(esr);
--}
--
- static inline bool guest_hyp_wfx_traps_enabled(const struct kvm_vcpu *vcpu)
- {
- 	u64 esr = kvm_vcpu_get_esr(vcpu);
-@@ -389,6 +410,12 @@ static inline u64 kvm_vcpu_get_disr(const struct kvm_vcpu *vcpu)
- 	return vcpu->arch.fault.disr_el1;
- }
- 
-+#if ARM64_S390_COMMON == 1
-+static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
-+{
-+	return esr & ESR_ELx_S1PTW;
-+}
-+
- static inline u32 kvm_vcpu_hvc_get_imm(const struct kvm_vcpu *vcpu)
- {
- 	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_xVC_IMM_MASK;
-@@ -456,6 +483,13 @@ static __always_inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
- 	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC;
- }
- 
-+#endif /* ARM64_S390_COMMON == 1 */
-+
-+static __always_inline bool esr_abt_is_exec_fault(unsigned long esr)
-+{
-+	return esr_trap_is_iabt(esr) && !esr_abt_is_s1ptw(esr);
-+}
-+
- static inline
- bool kvm_vcpu_trap_is_permission_fault(const struct kvm_vcpu *vcpu)
- {
+The series also includes a stage-2 demand-paging test which handles a guest
+stage-2 fault by installing the missing mapping and resuming the guest.
+
+The first 2 patches are just preparatory patches and could be merged
+earlier.
+
+Changes since v2:
+- Fixed free_pages(NULL), ran into a hang and debugged it to this
+- Validate the currently supported stage-2 configuration: 4K granules,
+  48-bit IPAs and 8-bit VMIDs.
+- Store the VTCR_EL2 and VTTBR_EL2 values in the stage-2 mmu.
+- Replace s2mmu_enable()/s2mmu_disable() with s2mmu_load(); saving
+  of the previous stage-2 context is now handled by the guest world switch.
+- Make s2mmu_map() return errors, rather than printing.
+- Fix the required barriers for stage-2 TLB invalidation.
+- Split guest creation, so that the policy of mapping is in a separate
+  identity helper.
+- Remove the hardcoded UART mapping from guest creation. This can be added back
+  ad-hoc for debugging.
+- Move system register state into C, using assembly for GPRs and
+  exception vectors.
+- Fix the EL1 exception frame so that x29 and x30 are saved and restored
+  correctly, make the frame 16-byte aligned, and use generated offsets instead
+  of hard-coded values.
+- Use the EL12 system-register aliases when accessing guest EL1 state from a
+  VHE host.
+- Fix the demand-paging test's IPA placement to avoid the identity-mapped guest
+  code region and verify the expected data value explicitly.
+- Added a new test to test the exception handling.
+- Few other small fixes
+
+See the full diff of v3 and v2 at:
+  https://gitlab.arm.com/linux-arm/kvm-unit-tests-jg/-/compare/guest_framework_v2..guest_framework_v3
+
+An LLM was used to review the code, and implement the host-state code
+and the guest-test.c tests (both were also reviewed by me)
+
+Thanks,
+Joey
+
+[1]: https://lore.kernel.org/kvmarm/20260413204630.1149038-1-jingzhangos@google.com/
 
 
-Does this work for you?
+Jing Zhang (6):
+  lib: arm64: Generalize exception vector definitions for EL2 support
+  lib: arm64: Add stage2 page table management library
+  lib: arm64: Add foundational guest execution framework
+  lib: arm64: Add support for guest exit exception handling
+  lib: arm64: Add guest-internal exception handling
+  arm64: Add Stage-2 MMU demand paging test
 
-	M.
+Joey Gouly (2):
+  lib/alloc_page: check for NULL ptr passed to free_pages()
+  arm64: Add basic guest execution tests
+
+ arm/Makefile.arm64         |   5 +
+ arm/debug.c                |   6 +-
+ arm/gic.c                  |   2 +-
+ arm/guest-test.c           | 157 ++++++++++++++
+ arm/micro-bench.c          |   4 +-
+ arm/mte.c                  |   6 +-
+ arm/pl031.c                |   2 +-
+ arm/pmu.c                  |   2 +-
+ arm/psci.c                 |   2 +-
+ arm/selftest.c             |   6 +-
+ arm/stage2-mmu-test.c      | 113 +++++++++++
+ arm/timer.c                |   6 +-
+ lib/alloc_page.c           |   3 +-
+ lib/arm64/asm-offsets.c    |  10 +
+ lib/arm64/asm/esr.h        |   3 +
+ lib/arm64/asm/guest.h      |  99 +++++++++
+ lib/arm64/asm/processor.h  |  32 +--
+ lib/arm64/asm/stage2_mmu.h |  76 +++++++
+ lib/arm64/asm/sysreg.h     |  36 ++++
+ lib/arm64/guest.c          | 264 ++++++++++++++++++++++++
+ lib/arm64/guest_arch.S     | 223 ++++++++++++++++++++
+ lib/arm64/processor.c      |   8 +-
+ lib/arm64/stage2_mmu.c     | 406 +++++++++++++++++++++++++++++++++++++
+ 23 files changed, 1432 insertions(+), 39 deletions(-)
+ create mode 100644 arm/guest-test.c
+ create mode 100644 arm/stage2-mmu-test.c
+ create mode 100644 lib/arm64/asm/guest.h
+ create mode 100644 lib/arm64/asm/stage2_mmu.h
+ create mode 100644 lib/arm64/guest.c
+ create mode 100644 lib/arm64/guest_arch.S
+ create mode 100644 lib/arm64/stage2_mmu.c
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.43.0
+
