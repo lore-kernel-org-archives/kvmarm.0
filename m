@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BFDC2F7EE8
-	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 15:17:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6F415218AC
+	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 15:17:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790867825; cv=none; b=VNFCpH4BPixdUErBqz4GooN3DdoLxNf7H1jHKrkJRhpT20zJP4+sr8OdMZKdxkA+xJ+4gALPbrbo6xrZN+tGOPBp0FJET9KPmZm51M7Z7is+BH/W8hzBsfBBZgVVhesY1QslEUZOrroNW/R02hB4OsJFRrY0ZTuQ8BdcMFTdysc=
+	t=1790867826; cv=none; b=FsDHxglEu3Q0jXRaukRc8uAzg3Oj1yu37Ff2zq8XtJ98u3pzvxEIeWuTg3BCy0P2ZzvK+pztUAEiblOepiJV6qGsrRekoPnD84FHXt/4ghGOkVtOwK7D5XgfeERhSG/+cLUqS/4EnnEHe60Mzpkl/7q75KlRwFIZpeZnYMEHSak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790867825; c=relaxed/simple;
-	bh=ZwqvOf30dvHuoHcl0G2h9uYoD7h3KkHbMLfvtXdIuHw=;
+	s=arc-20240116; t=1790867826; c=relaxed/simple;
+	bh=F146AjrToHixwUsZJqqiVjPe/PxI/aD1NvrVj16tlC0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QMefjrN8HFI8oGjndbBv2pwsoG0dvExi2/KhaQiP3Ge2CEBwNtVRrZ8xEkMeIX3uvNG4B5PxU8BHiYJyRgYalCZM/7sWEdEuxh+hIZMT8HKSnsqTjh1OsGULZLELzyNmMJyjGZOSd80G+ocnZCy3AO1/HQdB2IR47A90F79EI/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=P9+lEU8K; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=Y5KYaG4SX8VqjvqOXYMbZ5nzv2UQQWxCHsqOTCWdKK99QTZcF7QlZHP60HeBDndgsGHvc+fqDkMaG9nuo0JgE+U7XpSDtr4eKxHj6GrLsPugQEUJdbFBengKQnrKWJLq0iCl+EzzdECG9KB2HQfZpWC9JP41cOn62+oQZJgEv2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=FCq6zsSg; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="P9+lEU8K"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="FCq6zsSg"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 85B44497;
-	Thu,  1 Oct 2026 08:16:59 -0700 (PDT)
-Received: from e143914.cambridge.arm.com (e143914.arm.com [10.2.213.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9DAFA3F86F;
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2BF55169E;
 	Thu,  1 Oct 2026 08:17:01 -0700 (PDT)
+Received: from e143914.cambridge.arm.com (e143914.arm.com [10.2.213.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 43DBC3F86F;
+	Thu,  1 Oct 2026 08:17:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790867822; bh=ZwqvOf30dvHuoHcl0G2h9uYoD7h3KkHbMLfvtXdIuHw=;
+	t=1790867824; bh=F146AjrToHixwUsZJqqiVjPe/PxI/aD1NvrVj16tlC0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=P9+lEU8KOdVSI+D5+lb16HE5UIj77xNyupQn1mCMibdH8JhvFZ4SMBBywFydV3CH8
-	 bviPqSu2ICIwH2eQyahPWx0M7i/cPJSIGS0w2rlFpQpIK91LE9yqI9J2ARs/HBDIxV
-	 chrnqf0ScLKyHLZII63S7lnd54MbymxWl4QgravA=
+	b=FCq6zsSg8Ro6y35GMe+AtAauJzlS3IX4XdWDFuQAPaI8RptBKvXjYYKHAVik0C4ya
+	 zRS9Wp5a6vDOlJb0D1Xdjs3RsRVDeIVXjKe05a0yxAde7kHSouFwLdqKZ3MNxhkTEO
+	 C1oYwr3IHQbhaqDN2By7QRoOjLPbWIRacO/xN6AE=
 From: Joey Gouly <joey.gouly@arm.com>
 To: kvmarm@lists.linux.dev
 Cc: Jing Zhang <jingzhangos@google.com>,
@@ -35,9 +35,9 @@ Cc: Jing Zhang <jingzhangos@google.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
 	andrew.jones@linux.dev,
 	Joey Gouly <joey.gouly@arm.com>
-Subject: [PATCH v3 4/8] lib: arm64: Add foundational guest execution framework
-Date: Thu,  1 Oct 2026 16:16:41 +0100
-Message-ID: <20261001151645.2427065-5-joey.gouly@arm.com>
+Subject: [PATCH v3 5/8] lib: arm64: Add support for guest exit exception handling
+Date: Thu,  1 Oct 2026 16:16:42 +0100
+Message-ID: <20261001151645.2427065-6-joey.gouly@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261001151645.2427065-1-joey.gouly@arm.com>
 References: <20261001151645.2427065-1-joey.gouly@arm.com>
@@ -51,323 +51,326 @@ Content-Transfer-Encoding: 8bit
 
 From: Jing Zhang <jingzhangos@google.com>
 
-Introduce the infrastructure to manage and execute guest when running at
-EL2.
+Implement the logic to intercept and handle exceptions from managed
+guests at EL2. This completes the context switch loop by providing a
+mechanism to save guest state, route exceptions to C handlers, and
+either resume the guest or return to the host.
 
-The framework includes:
-- 'struct guest': Encapsulates vCPU state (GPRs, EL1/EL2 sysregs) and
-  Stage-2 MMU context.
-- guest_create() / guest_destroy(): Handle lifecycle management and
-  Stage-2 MMU setup.
-- guest_create_identity(): helper to create a guest and setup some
-  mappings.
-- guest_run(): entry point that saves host callee-saved
-  registers, caches the guest context pointer in TPIDR_EL2, and
-  performs the exception return (ERET) to the guest.
+Key additions:
+- 'hyp_el2_vectors': An EL2 vector table installed during guest
+  execution to trap guest exits (Synchronous, IRQ, etc.).
+- 'guest_c_exception_handler': A C-level dispatcher that updates the
+  guest context with exception info (ESR, FAR, HPFAR) and invokes
+  registered per-vector handlers.
+- Integrated save/restore logic: guest_run() now handles the full
+  cycle of saving host state, loading guest state, trapping exits,
+  and optionally resuming or returning.
+- Handler API: Added guest_install_handler() to allow tests to register
+  custom logic for specific exception types.
 
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 ---
- arm/Makefile.arm64      |   2 +
- lib/arm64/asm-offsets.c |   4 ++
- lib/arm64/asm/guest.h   |  53 +++++++++++++++++
- lib/arm64/asm/sysreg.h  |   6 ++
- lib/arm64/guest.c       | 127 ++++++++++++++++++++++++++++++++++++++++
- lib/arm64/guest_arch.S  |  51 ++++++++++++++++
- 6 files changed, 243 insertions(+)
- create mode 100644 lib/arm64/asm/guest.h
- create mode 100644 lib/arm64/guest.c
- create mode 100644 lib/arm64/guest_arch.S
+ lib/arm64/asm-offsets.c |   1 +
+ lib/arm64/asm/guest.h   |  19 +++++++
+ lib/arm64/guest.c       |  94 +++++++++++++++++++++++++++++++++--
+ lib/arm64/guest_arch.S  | 106 ++++++++++++++++++++++++++++++++++++++--
+ 4 files changed, 212 insertions(+), 8 deletions(-)
 
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index 5e50f5ba..9026fd71 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -41,6 +41,8 @@ cflatobjs += lib/arm64/processor.o
- cflatobjs += lib/arm64/spinlock.o
- cflatobjs += lib/arm64/gic-v3-its.o lib/arm64/gic-v3-its-cmd.o
- cflatobjs += lib/arm64/stage2_mmu.o
-+cflatobjs += lib/arm64/guest.o
-+cflatobjs += lib/arm64/guest_arch.o
- 
- ifeq ($(CONFIG_EFI),y)
- cflatobjs += lib/acpi.o
 diff --git a/lib/arm64/asm-offsets.c b/lib/arm64/asm-offsets.c
-index 80de023c..c55e4bb9 100644
+index c55e4bb9..1fc595ff 100644
 --- a/lib/arm64/asm-offsets.c
 +++ b/lib/arm64/asm-offsets.c
-@@ -8,6 +8,7 @@
- #include <libcflat.h>
- #include <kbuild.h>
- #include <asm/ptrace.h>
-+#include <asm/guest.h>
+@@ -33,6 +33,7 @@ int main(void)
  
- int main(void)
- {
-@@ -30,5 +31,8 @@ int main(void)
- 	DEFINE(S_FP, sizeof(struct pt_regs));
- 	DEFINE(S_FRAME_SIZE, (sizeof(struct pt_regs) + 16));
+ 	OFFSET(GUEST_X_OFFSET, guest, x);
+ 	OFFSET(GUEST_HCR_OFFSET, guest, hcr_el2);
++	OFFSET(GUEST_EXIT_CODE_OFFSET, guest, exit_code);
  
-+	OFFSET(GUEST_X_OFFSET, guest, x);
-+	OFFSET(GUEST_HCR_OFFSET, guest, hcr_el2);
-+
  	return 0;
  }
 diff --git a/lib/arm64/asm/guest.h b/lib/arm64/asm/guest.h
-new file mode 100644
-index 00000000..50fc3338
---- /dev/null
+index 50fc3338..9ad344e1 100644
+--- a/lib/arm64/asm/guest.h
 +++ b/lib/arm64/asm/guest.h
-@@ -0,0 +1,53 @@
+@@ -16,6 +16,19 @@
+ /* Guest stack size */
+ #define GUEST_STACK_SIZE		SZ_64K
+ 
 +/*
-+ * Copyright (C) 2026, Google LLC.
-+ * Author: Jing Zhang <jingzhangos@google.com>
-+ *
-+ * SPDX-License-Identifier: LGPL-2.0-or-later
++ * Result from Handler:
++ * RESUME: Keep guest running (ERET immediately)
++ * EXIT:   Return to Host C caller
 + */
-+#ifndef _ASMARM64_GUEST_H_
-+#define _ASMARM64_GUEST_H_
-+
-+#include <libcflat.h>
-+#include <asm/processor.h>
-+#include <asm/stage2_mmu.h>
-+
-+#define HCR_GUEST_FLAGS (HCR_EL2_VM | HCR_EL2_FMO | HCR_EL2_IMO | \
-+			 HCR_EL2_AMO | HCR_EL2_RW | HCR_EL2_E2H)
-+/* Guest stack size */
-+#define GUEST_STACK_SIZE		SZ_64K
-+
-+struct guest {
-+	/* General Purpose Registers */
-+	unsigned long x[31]; /* x0..x30 */
-+
-+	/* Execution State */
-+	unsigned long elr_el2;
-+	unsigned long spsr_el2;
-+
-+	/* Control Registers */
-+	unsigned long hcr_el2;
-+	unsigned long sctlr_el1;
-+	unsigned long sp_el1;
-+
-+	/* Exit Information */
-+	unsigned long esr_el2;
-+	unsigned long far_el2;
-+	unsigned long hpfar_el2;
-+	unsigned long exit_code;
-+
-+	struct s2_mmu *s2mmu;
-+	void *guest_stack;
++enum guest_handler_result {
++	GUEST_ACTION_RESUME,
++	GUEST_ACTION_EXIT
 +};
 +
-+/*
-+ * Create a guest from a stage-2 context and entry IPA.
-+ */
-+struct guest *guest_create(struct s2_mmu *s2mmu, unsigned long entry_ipa);
++struct guest;
++typedef enum guest_handler_result (*guest_handler_t)(struct guest *guest);
 +
-+/* Helper for tests using identity-mapped host code and a stack. */
-+struct guest *guest_create_identity(int vmid, void (*guest_func)(void),
-+				    enum s2_granule granule);
-+void guest_destroy(struct guest *guest);
-+void guest_run(struct guest *guest);
-+
-+#endif /* _ASMARM64_GUEST_H_ */
-diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-index 72767cf0..b3b7e221 100644
---- a/lib/arm64/asm/sysreg.h
-+++ b/lib/arm64/asm/sysreg.h
-@@ -147,6 +147,10 @@ asm(
- #define VTTBR_EL2_VMID_SHIFT	48
- #define VTTBR_EL2_VMID_MASK	GENMASK_ULL(63, 48)
+ struct guest {
+ 	/* General Purpose Registers */
+ 	unsigned long x[31]; /* x0..x30 */
+@@ -35,6 +48,9 @@ struct guest {
+ 	unsigned long hpfar_el2;
+ 	unsigned long exit_code;
  
-+#define HCR_EL2_VM		_BITULL(0)
-+#define HCR_EL2_FMO		_BITULL(3)
-+#define HCR_EL2_IMO		_BITULL(4)
-+#define HCR_EL2_AMO		_BITULL(5)
- #define HCR_EL2_TGE		_BITULL(27)
- #define HCR_EL2_RW		_BITULL(31)
- #define HCR_EL2_E2H		_BITULL(34)
-@@ -161,6 +165,8 @@ asm(
- #define SYS_HFGWTR2_EL2		sys_reg(3, 4, 3, 1, 3)
- #define SYS_HFGITR2_EL2		sys_reg(3, 4, 3, 1, 7)
- 
-+#define SYS_SCTLR_EL12		sys_reg(3, 5, 1, 0, 0)
++	/* Exception Handlers in EL2 */
++	guest_handler_t handlers[VECTOR_MAX];
 +
- #define INIT_SCTLR_EL1_MMU_OFF	\
- 			(SCTLR_EL1_ITD | SCTLR_EL1_SED | SCTLR_EL1_EOS | \
- 			 SCTLR_EL1_TSCXT | SCTLR_EL1_EIS | SCTLR_EL1_SPAN | \
+ 	struct s2_mmu *s2mmu;
+ 	void *guest_stack;
+ };
+@@ -50,4 +66,7 @@ struct guest *guest_create_identity(int vmid, void (*guest_func)(void),
+ void guest_destroy(struct guest *guest);
+ void guest_run(struct guest *guest);
+ 
++unsigned long guest_c_exception_handler(struct guest *guest);
++void guest_install_handler(struct guest *guest, enum vector v, guest_handler_t handler);
++
+ #endif /* _ASMARM64_GUEST_H_ */
 diff --git a/lib/arm64/guest.c b/lib/arm64/guest.c
-new file mode 100644
-index 00000000..b348e628
---- /dev/null
+index b348e628..afb91559 100644
+--- a/lib/arm64/guest.c
 +++ b/lib/arm64/guest.c
-@@ -0,0 +1,127 @@
-+/*
-+ * Copyright (C) 2026, Google LLC.
-+ * Author: Jing Zhang <jingzhangos@google.com>
-+ *
-+ * SPDX-License-Identifier: LGPL-2.0-or-later
-+ */
-+#include <libcflat.h>
-+#include <asm/guest.h>
-+#include <asm/io.h>
-+#include <asm/sysreg.h>
-+#include <asm/barrier.h>
-+#include <alloc_page.h>
-+#include <alloc.h>
+@@ -12,7 +12,47 @@
+ #include <alloc_page.h>
+ #include <alloc.h>
+ 
+-extern void __guest_switch_regs(struct guest *guest);
++/* Host state owned by a guest_run() invocation, not by the guest. */
++struct guest_host_state {
++	unsigned long hcr_el2;
++	unsigned long vtcr_el2;
++	unsigned long vttbr_el2;
++	unsigned long vbar_el2;
++	unsigned long tpidr_el2;
++	unsigned long daif;
++};
 +
-+extern void __guest_switch_regs(struct guest *guest);
++extern void __guest_switch_regs(struct guest *guest,
++				struct guest_host_state *host_state);
 +
-+static void guest_restore_state(const struct guest *guest)
++static void guest_save_host_state(struct guest_host_state *state)
 +{
-+	write_sysreg(guest->elr_el2, elr_el2);
-+	write_sysreg(guest->spsr_el2, spsr_el2);
-+	write_sysreg_s(guest->sctlr_el1, SYS_SCTLR_EL12);
-+	write_sysreg(guest->sp_el1, sp_el1);
++	state->hcr_el2 = read_sysreg(hcr_el2);
++	state->vtcr_el2 = read_sysreg(vtcr_el2);
++	state->vttbr_el2 = read_sysreg(vttbr_el2);
++	state->vbar_el2 = read_sysreg(vbar_el2);
++	state->tpidr_el2 = read_sysreg(tpidr_el2);
++	state->daif = read_sysreg(daif);
 +}
 +
-+static void guest_arch_enter(struct guest *guest)
++static void guest_restore_host_state(const struct guest_host_state *state)
 +{
-+	s2mmu_load(guest->s2mmu);
-+	guest_restore_state(guest);
-+	__guest_switch_regs(guest);
++	write_sysreg(state->vtcr_el2, vtcr_el2);
++	write_sysreg(state->vttbr_el2, vttbr_el2);
++	write_sysreg(state->vbar_el2, vbar_el2);
++	write_sysreg(state->hcr_el2, hcr_el2);
++	write_sysreg(state->tpidr_el2, tpidr_el2);
++	isb();
++	write_sysreg(state->daif, daif);
 +}
 +
-+void guest_run(struct guest *guest)
++static void guest_save_state(struct guest *guest)
 +{
-+	guest_arch_enter(guest);
-+}
-+
-+struct guest *guest_create(struct s2_mmu *s2_ctx, unsigned long entry_ipa)
-+{
-+	struct guest *guest;
-+
-+	if (!s2_ctx)
-+		return NULL;
-+
-+	guest = calloc(1, sizeof(*guest));
-+	if (!guest)
-+		return NULL;
-+
-+	guest->elr_el2 = entry_ipa;
-+	guest->spsr_el2 = PSR_MODE_EL1h |
-+		PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT;
-+	guest->hcr_el2 = HCR_GUEST_FLAGS;
-+
++	guest->elr_el2 = read_sysreg(elr_el2);
++	guest->spsr_el2 = read_sysreg(spsr_el2);
 +	guest->sctlr_el1 = read_sysreg_s(SYS_SCTLR_EL12);
-+	/* Disable guest stage 1 translation */
-+	guest->sctlr_el1 &= ~(SCTLR_EL1_M | SCTLR_EL1_C);
-+	guest->sctlr_el1 |= SCTLR_EL1_I;
-+
-+	guest->s2mmu = s2_ctx;
-+
-+	return guest;
++	guest->sp_el1 = read_sysreg(sp_el1);
++}
+ 
+ static void guest_restore_state(const struct guest *guest)
+ {
+@@ -22,18 +62,58 @@ static void guest_restore_state(const struct guest *guest)
+ 	write_sysreg(guest->sp_el1, sp_el1);
+ }
+ 
+-static void guest_arch_enter(struct guest *guest)
++static void guest_arch_enter(struct guest *guest,
++			     struct guest_host_state *host_state)
+ {
+ 	s2mmu_load(guest->s2mmu);
+ 	guest_restore_state(guest);
+-	__guest_switch_regs(guest);
++	__guest_switch_regs(guest, host_state);
 +}
 +
-+struct guest *guest_create_identity(int vmid, void (*guest_func)(void),
-+				    enum s2_granule granule)
++void guest_arch_exit(const struct guest_host_state *state)
 +{
-+	unsigned long guest_pa, code_base, stack_pa;
-+	unsigned long *stack_page;
-+	struct guest *guest;
-+	struct s2_mmu *ctx;
-+	int ret;
++	guest_restore_host_state(state);
+ }
+ 
+ void guest_run(struct guest *guest)
+ {
+-	guest_arch_enter(guest);
++	struct guest_host_state host_state;
 +
-+	ctx = s2mmu_init(vmid, granule, true);
-+	if (!ctx)
-+		return NULL;
++	guest_save_host_state(&host_state);
++	guest_arch_enter(guest, &host_state);
+ }
+ 
++/*
++ * C-Entry for Exception Handling
++ * Returns 0 to Resume Guest, 1 to Exit to Host Caller
++ */
++unsigned long guest_c_exception_handler(struct guest *guest)
++{
++	enum vector vector;
 +
-+	/*
-+	 * Map the Host's code segment Identity Mapped (IPA=PA).
-+	 * To be safe, we map a large chunk (e.g., 2MB) around the function
-+	 * to capture any helper functions the compiler might generate calls to.
-+	 */
-+	guest_pa = virt_to_phys((void *)guest_func);
-+	code_base = guest_pa & ~(SZ_2M - 1);
-+	ret = s2mmu_map(ctx, code_base, code_base, SZ_2M, S2_MAP_RW);
-+	if (ret)
-+		goto destroy_s2;
++	/* Save guest system-register state before invoking the exit handler. */
++	guest_save_state(guest);
++	guest->esr_el2 = read_sysreg(esr_el2);
++	guest->far_el2 = read_sysreg(far_el2);
++	guest->hpfar_el2 = read_sysreg(hpfar_el2);
 +
-+	/*
-+	 * Map Stack
-+	 * Allocate 16 pages (64K) in Host, get its PA, and map it for Guest.
-+	 */
-+	stack_page = alloc_pages(get_order(GUEST_STACK_SIZE >> PAGE_SHIFT));
-+	if (!stack_page)
-+		goto destroy_s2;
-+	stack_pa = virt_to_phys(stack_page);
-+	/* Identity Map it (IPA = PA) */
-+	ret = s2mmu_map(ctx, stack_pa, stack_pa, GUEST_STACK_SIZE, S2_MAP_RW);
-+	if (ret)
-+		goto free_stack;
++	if (guest->exit_code >= VECTOR_MAX)
++		return 1;
++	vector = (enum vector)guest->exit_code;
 +
-+	/* Create Guest */
-+	/* Entry point is the PA of the function (Identity Mapped) */
-+	guest = guest_create(ctx, guest_pa);
-+	if (!guest)
-+		goto free_stack;
++	/* Invoke Handler if registered */
++	if (guest->handlers[vector]) {
++		if (guest->handlers[vector](guest) == GUEST_ACTION_RESUME) {
++			guest_restore_state(guest);
++			return 0; /* ASM stub will restore and ERET */
++		}
++	}
 +
-+	/*
-+	 * Setup Guest Stack Pointer
-+	 * Must match where we mapped the stack + Offset
-+	 */
-+	guest->sp_el1 = stack_pa + GUEST_STACK_SIZE;
-+	guest->guest_stack = stack_page;
-+
-+	return guest;
-+
-+free_stack:
-+	free_pages(stack_page);
-+destroy_s2:
-+	s2mmu_destroy(ctx);
-+	return NULL;
++	/* Default: Exit to caller */
++	return 1;
 +}
 +
-+void guest_destroy(struct guest *guest)
++
+ struct guest *guest_create(struct s2_mmu *s2_ctx, unsigned long entry_ipa)
+ {
+ 	struct guest *guest;
+@@ -125,3 +205,9 @@ void guest_destroy(struct guest *guest)
+ 	free_pages(guest->guest_stack);
+ 	free(guest);
+ }
++
++void guest_install_handler(struct guest *guest, enum vector v, guest_handler_t handler)
 +{
-+	s2mmu_destroy(guest->s2mmu);
-+	free_pages(guest->guest_stack);
-+	free(guest);
++	if (v < VECTOR_MAX)
++		guest->handlers[v] = handler;
 +}
 diff --git a/lib/arm64/guest_arch.S b/lib/arm64/guest_arch.S
-new file mode 100644
-index 00000000..16b95835
---- /dev/null
+index 16b95835..33d0dc53 100644
+--- a/lib/arm64/guest_arch.S
 +++ b/lib/arm64/guest_arch.S
-@@ -0,0 +1,51 @@
-+/*
-+ * Copyright (C) 2026, Google LLC.
-+ * Author: Jing Zhang <jingzhangos@google.com>
-+ *
-+ * SPDX-License-Identifier: LGPL-2.0-or-later
-+ */
-+#define __ASSEMBLY__
-+#include <asm/asm-offsets.h>
-+#include <asm/sysreg.h>
-+
-+#define GUEST_XREG_OFFSET(x)	(GUEST_X_OFFSET + 8 * (x))
-+
-+.global __guest_switch_regs
-+__guest_switch_regs:
-+	/* x0 = struct guest pointer */
-+
-+	/* Save Host Callee-Saved Regs */
-+	stp	x29, x30, [sp, #-16]!
-+	stp	x27, x28, [sp, #-16]!
-+	stp	x25, x26, [sp, #-16]!
-+	stp	x23, x24, [sp, #-16]!
-+	stp	x21, x22, [sp, #-16]!
-+	stp	x19, x20, [sp, #-16]!
-+
+@@ -12,7 +12,10 @@
+ 
+ .global __guest_switch_regs
+ __guest_switch_regs:
+-	/* x0 = struct guest pointer */
 +	/*
-+	 * Commit the guest EL2 state only after the world-switch frame is valid.
++	 * x0 = struct guest pointer
++	 * x1 = host system-register state
 +	 */
-+	ldr	x1, [x0, #GUEST_HCR_OFFSET]
-+	msr	tpidr_el2, x0
-+	msr	hcr_el2, x1
-+	isb
+ 
+ 	/* Save Host Callee-Saved Regs */
+ 	stp	x29, x30, [sp, #-16]!
+@@ -21,13 +24,18 @@ __guest_switch_regs:
+ 	stp	x23, x24, [sp, #-16]!
+ 	stp	x21, x22, [sp, #-16]!
+ 	stp	x19, x20, [sp, #-16]!
++	stp	x1, xzr, [sp, #-16]!
+ 
+ 	/*
+-	 * Commit the guest EL2 state only after the world-switch frame is valid.
++	 * Commit the guest EL2 state only after the exit frame is valid. No
++	 * exception may reach the guest vectors without this frame in place.
+ 	 */
+-	ldr	x1, [x0, #GUEST_HCR_OFFSET]
++	ldr	x2, [x0, #GUEST_HCR_OFFSET]
++	adrp	x3, hyp_el2_vectors
++	add	x3, x3, :lo12:hyp_el2_vectors
+ 	msr	tpidr_el2, x0
+-	msr	hcr_el2, x1
++	msr	vbar_el2, x3
++	msr	hcr_el2, x2
+ 	isb
+ 
+ 	/* Load Guest GPRs */
+@@ -49,3 +57,93 @@ __guest_switch_regs:
+ 	ldr	x0, [x0, #GUEST_XREG_OFFSET(0)]
+ 
+ 	eret
 +
-+	/* Load Guest GPRs */
++/* EL2 Hypervisor Vector Table */
++.macro hyp_el2_vector, vector_num
++	.align 7
++	stp	x0, x1, [sp, #-16]!
++	mrs	x0, tpidr_el2
++	mov	x1, \vector_num
++	str	x1, [x0, #GUEST_EXIT_CODE_OFFSET]
++	b	guest_common_exit
++.endm
++
++	.align 11
++.global hyp_el2_vectors
++hyp_el2_vectors:
++	.skip 0x200
++
++	hyp_el2_vector #4	/* ELxH_SYNC */
++	hyp_el2_vector #5	/* ELxH_IRQ */
++	hyp_el2_vector #6	/* ELxH_FIQ */
++	hyp_el2_vector #7	/* ELxH_ERROR */
++
++	hyp_el2_vector #8	/* ELx_LOW_SYNC_64 */
++	hyp_el2_vector #9	/* ELx_LOW_IRQ_64 */
++	hyp_el2_vector #10	/* ELx_LOW_FIQ_64 */
++	hyp_el2_vector #11	/* ELx_LOW_ERROR_64 */
++
++	.align 11
++
++guest_common_exit:
++	stp	x2, x3, [x0, #GUEST_XREG_OFFSET(2)]
++	stp	x4, x5, [x0, #GUEST_XREG_OFFSET(4)]
++	stp	x6, x7, [x0, #GUEST_XREG_OFFSET(6)]
++	stp	x8, x9, [x0, #GUEST_XREG_OFFSET(8)]
++	stp	x10, x11, [x0, #GUEST_XREG_OFFSET(10)]
++	stp	x12, x13, [x0, #GUEST_XREG_OFFSET(12)]
++	stp	x14, x15, [x0, #GUEST_XREG_OFFSET(14)]
++	stp	x16, x17, [x0, #GUEST_XREG_OFFSET(16)]
++	stp	x18, x19, [x0, #GUEST_XREG_OFFSET(18)]
++	stp	x20, x21, [x0, #GUEST_XREG_OFFSET(20)]
++	stp	x22, x23, [x0, #GUEST_XREG_OFFSET(22)]
++	stp	x24, x25, [x0, #GUEST_XREG_OFFSET(24)]
++	stp	x26, x27, [x0, #GUEST_XREG_OFFSET(26)]
++	stp	x28, x29, [x0, #GUEST_XREG_OFFSET(28)]
++	str	x30, [x0, #GUEST_XREG_OFFSET(30)]
++
++	ldp	x2, x3, [sp], #16
++	stp	x2, x3, [x0, #GUEST_XREG_OFFSET(0)]
++
++	bl	guest_c_exception_handler
++	cbz	x0, guest_resume_guest
++
++	/* EXIT */
++	/*
++	 * Restore the host system registers while this world-switch frame and
++	 * the guest exit vector are still valid.
++	 */
++	ldr	x0, [sp]
++	bl	guest_arch_exit
++	add	sp, sp, #16
++
++	/* Restore Host Callee-Saved Regs */
++	ldp	x19, x20, [sp], #16
++	ldp	x21, x22, [sp], #16
++	ldp	x23, x24, [sp], #16
++	ldp	x25, x26, [sp], #16
++	ldp	x27, x28, [sp], #16
++	ldp	x29, x30, [sp], #16
++	ret
++
++	/* RESUME */
++guest_resume_guest:
++	mrs	x0, tpidr_el2
++
 +	ldp	x1, x2, [x0, #GUEST_XREG_OFFSET(1)]
 +	ldp	x3, x4, [x0, #GUEST_XREG_OFFSET(3)]
 +	ldp	x5, x6, [x0, #GUEST_XREG_OFFSET(5)]
@@ -384,7 +387,6 @@ index 00000000..16b95835
 +	ldp	x27, x28, [x0, #GUEST_XREG_OFFSET(27)]
 +	ldp	x29, x30, [x0, #GUEST_XREG_OFFSET(29)]
 +	ldr	x0, [x0, #GUEST_XREG_OFFSET(0)]
-+
 +	eret
 -- 
 2.43.0
