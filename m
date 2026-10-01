@@ -1,76 +1,220 @@
-Received: from mta0.migadu.com (out-14.mta0.migadu.com [91.218.175.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826C1522EED
-	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 15:10:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A925335B4;
+	Thu,  1 Oct 2026 15:12:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790867460; cv=none; b=RBcucBa/qn1IS4c5aX29JU3OVPXukn9wRK9oBx525gaWSB5AMWpo52y+KKfI7d1jLy95kNEbdLkD4sOBpEMwsraiUoK13+4PItUX/EVNnEPSY0/g9lRMsmM/CA8ZlN5PHrXeMSmFRZxZ7k+DCiB6nFvSEHV6pL0zzbFnNq4xVQo=
+	t=1790867563; cv=none; b=D6uWBOJa1e4Kzpii6O4+Az8mPKc/AX9S6/VtjlBXmdgV3GHHr2xrqJpkKdftuMolMX4syEQC1VyZIlqOwylLmjYgiBZtfL4qTC8MalItZNGyIKMcitxmzLWGI2cXjzQKSNjTP/dTTh/CFSrTcQUcEiIKJN68jpgV6EYFw5tc5Qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790867460; c=relaxed/simple;
-	bh=zyQ1FROdiUq3DNEwgy8qntsXEFA0atog2LJ+5V12znY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=G383C71BG/i/mjm4hnrU7xMP0WLxwV85nnA5gS3Cf8kZeDLFj6CsTwWfk3xdYHaIELNWtSK4/CCM1RmjavwL4EDV0XvtrQpvAQ1E/sjB3b5DuOkr5r6Y8DdjeDgZYFnwcUutTicQqY3cvQRB8Yu2iZ+GV4jiwExDfwrvA5CkT1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=daAJ96cf; arc=none smtp.client-ip=91.218.175.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1790867563; c=relaxed/simple;
+	bh=ozz1C6dVuxbIm7Haps4G3u9mV6Qlp/cJorm0ZFBVOyY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ea+n5XHnswDgCsfXIssBJwfkP2SjzxUH1Kfcq+7jQR5RM7logyb6+oGKMGWW4jGENq6xNNp7EiBED8JDof7Uhx6/KKnbWamqJ6Y4m3jJov6U7+ylod5T/S3rN0bcshhDFLAhZbxnceEt2zUgqblFQWLWR8KT+kdzRZcDrKJJOkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EXjsYr3f; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="daAJ96cf"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=zyQ1FROdiUq3DNEwgy8qntsXEFA0atog2LJ+5V12znY=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790867456; v=1; x=1791472256;
- b=daAJ96cfI2zQC4PLz78Qb+jkGg1khg0r3s2cAYpQVXYZOfQmWc4GeMCSEMJZtBNLCjgVjcDY
- 4LIxr68WXWgrJj3ALzsOeCjqMqza3onzjONstnt6mZ13sKrVn1D5j5nd/C0G/dRC7xFYL9L08Xa
- RwCz6AbvldekBcqus2MSoEFE=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id c3f3a13f3479d340;
-	Thu, 01 Oct 2026 15:10:56 +0000
-X-Mizu-Trace-ID: c3f3a13f3479d340
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5ba3d1ea20cso9863e87.0
-        for <kvmarm@lists.linux.dev>; Thu, 01 Oct 2026 08:10:50 -0700 (PDT)
-X-Gm-Message-State: AFq9FYL+ZQDUV2qOHnQXBQoNspDNm26TBT9ZGyqNWm/fENB3pPYhabBp
-	9PNo8KPzk4eazrVzYQoVcBypU9Ko7np5y9zvsMLONYn52l5tUM0O/7kpGqhxIXKekjcAngvhntR
-	C2Th+NQiAS6ktaxfh41ZnACEoN+NjgYf4sShO7PlA
-X-Received: by 2002:a05:6512:3194:b0:5b8:d04b:a1be with SMTP id
- 2adb3069b0e04-5bb7944842dmr65925e87.2.1790867449950; Thu, 01 Oct 2026
- 08:10:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EXjsYr3f"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C415D1F000FF;
+	Thu,  1 Oct 2026 15:12:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790867561;
+	bh=U+uboDNmd3c4+oklKhah8Yxki5qXO3q5Peg5zVIsILo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=EXjsYr3f9pk1lSJ048/qqJa1G/jbortu2tHrJtCudQVO2+7tqauxJ+/+f9p0waRi7
+	 1uY4s7FPFIZu0WxNaYxlUICOcD7sKykQwEypzkeI5xMv3IgVVbq8n4KRsajjb3BIq1
+	 b88p5JWvYfF6QWcNjkrIDL3TLUVbFBDa6UcpTX6N9TSKW4Wc8k1L+3iUF7eH6jCaTg
+	 93jFhVkJQQ2BW9oSyPN7Imk5R9GGZXmy0UdDsnC+aS6gHhq9F2njzzXoDFeXX2TR2i
+	 YRzt/RAjNUg7FFQfVJ2LxzO58lCK6hPoNrThjczfiMz/LtxEDSRuEdMQGzf+KV54Hl
+	 vTFevA+w2d6IQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xCISd-0000000Fqe0-1JUm;
+	Thu, 01 Oct 2026 15:12:39 +0000
+Date: Thu, 01 Oct 2026 16:12:38 +0100
+Message-ID: <86wls1315l.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steffen Eiden <seiden@linux.ibm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Andreas Grapentin <gra@linux.ibm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@kernel.org>,
+	Friedrich Welter <fritz@linux.ibm.com>,
+	Gautam Gala <ggala@linux.ibm.com>,
+	Hariharan Mari <hari55@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Hendrik Brueckner <brueckner@linux.ibm.com>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Nico Boehr <nrb@linux.ibm.com>,
+	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+	Oliver Upton <oupton@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Subject: Re: (subset) [PATCH v9 00/24] KVM: s390: Introduce arm64 KVM
+In-Reply-To: <20261001132715.108643-A-seiden@linux.ibm.com>
+References: <20260930173441.66762-1-seiden@linux.ibm.com>
+	<179085262878.3865846.5787241839391727949.b4-ty@b4>
+	<20261001132715.108643-A-seiden@linux.ibm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20261001135711.1640520-1-fuad.tabba@linux.dev>
- <20261001135711.1640520-17-fuad.tabba@linux.dev> <20261001141827.B97661F00899@smtp.kernel.org>
-In-Reply-To: <20261001141827.B97661F00899@smtp.kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 1 Oct 2026 16:10:13 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxphbwjXvuCiF3gFy+p7OVT=TdQTO0vKkZbOZkvRT9Eng@mail.gmail.com>
-X-Gm-Features: AclHuK_5sMBjcN4lmvUtlFiUWRdtGWfAXLAoeNruxxE9uee1mazlgZ0PLIW_hXA
-Message-ID: <CA+EHjTxphbwjXvuCiF3gFy+p7OVT=TdQTO0vKkZbOZkvRT9Eng@mail.gmail.com>
-Subject: Re: [PATCH v4 16/18] KVM: arm64: Reject host power-on of a vCPU that
- EL2 holds powered off
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, seanjc@google.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 01 Oct 2026 15:18:27 +0100, sashiko-bot@kernel.org wrote:
-[...]
-> Does this break the userspace API for KVM_SET_MP_STATE?
+On Thu, 01 Oct 2026 14:27:15 +0100,
+Steffen Eiden <seiden@linux.ibm.com> wrote:
+> 
+> On Thu, Oct 01, 2026 at 12:04:51PM +0100, Marc Zyngier wrote:
+> > On Wed, 30 Sep 2026 19:34:15 +0200, Steffen Eiden wrote:
+> > > Introduce arm-on-s390. Enable KVM-accelerated ARM CPU virtualisation on s390.
+> > > 
+> > > The new KVM functionally depends on KVM/vfio: Use file-based reference
+> > > counting for KVM [5] The series itself should apply w/o those.
+> > > 
+> > > For the original, now partially outdated, cover letter, have a look at versions
+> > > one to three [1].
+> > > 
+> > > [...]
+> > 
+> > Applied to next, thanks!
+> > 
+> > [05/24] arm64: ptrace: Use constants for compat register numbers
+> >         commit: 295d3df9b1e425099a4eb37954a02c4a08fdb496
+> > [06/24] arm64: sysreg: Convert SPSR_ELx to automatic register generation
+> >         commit: d3d78520068779779e1ed7aa0dd8a3ce63e1ca43
+> > [07/24] KVM: arm64: Access elements of vcpu_gp_regs individually
+> >         commit: 29d92585ab987bb80b1e78d811aaea2a8db86e62
+> > [08/24] KVM: arm64: Use accessor functions for core regs
+> >         commit: 89ed62818f10e38e64fea46d43ee6455a1beb647
+> > [09/24] arm64: Prepare sharing arm64 headers with s390
+> >         commit: df6a70516adec8b7f5fa49e1755d8ee33d980d9c
+> > [10/24] arm64: Share arm64 headers with s390
+> >         commit: c7e18ba462536e870b0ff4deca581babcac9135b
+> > [11/24] KVM: arm64: Share arm64 code with s390
+> >         commit: dcb776bfcccc9662001a75b99dbfbef55f46eb31
+> > 
+> > Note that there were a few conflicts. Please check that I resolved
+> > them correctly.
+> 
+> 
+> After rebasing on those the arm-on-s390 part does not build anymore :( 
 
-No. KVM_SET_MP_STATE has never accepted KVM_MP_STATE_UNINITIALIZED on
-arm64, and the host can't restore a power state that EL2 owns.
+Well, that's sort of expected. The kvmarm tree doesn't have the S390
+stuff yet, and contains tons of new stuff.
 
-[...]
-> Following up on the KVM_ARM_VCPU_POWER_OFF initialization above, does this
-> condition incorrectly reject guest CPU_ON requests?
+> We are missing the definition of
+> static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
+> 
+> 
+> quick fix: 
+> 
+> on top of [10/24]  arm64: Share arm64 headers with s390
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index bf35cbe8ddcb..0708f792c631 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -367,10 +367,13 @@ static __always_inline u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
+>         return vcpu->arch.fault.esr_el2;
+>  }
+> 
+> +#if ARM64_S390_COMMON == 1
+>  static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
+>  {
+>         return esr & ESR_ELx_S1PTW;
+>  }
+> +
+> +#endif /* ARM64_S390_COMMON == 1 */
+> 
+>  static __always_inline bool esr_abt_is_exec_fault(unsigned long esr)
+>  {
+> 
+> 
+> 
+> A cleaner solution it to move this defenition just below  
+> void kvm_vcpu_wfi(struct kvm_vcpu *vcpu) in 
+> [09/24] arm64: Prepare sharing arm64 headers with s390
+> and expand the shared region in the following patch.
 
-No. Before the target's first KVM_RUN it has no hyp vCPU, so
-pvm_psci_vcpu_on() returns INVALID_PARAMETERS at EL2 and the host
-never sees the CPU_ON.
+I'm redoing the merge and fixing it as follows (note that the
+ARM64_S390_COMMON guards are already present):
 
-/fuad
+@@ -336,16 +367,6 @@ static __always_inline u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
+ 	return vcpu->arch.fault.esr_el2;
+ }
+ 
+-static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
+-{
+-	return esr & ESR_ELx_S1PTW;
+-}
+-
+-static __always_inline bool esr_abt_is_exec_fault(unsigned long esr)
+-{
+-	return esr_trap_is_iabt(esr) && !esr_abt_is_s1ptw(esr);
+-}
+-
+ static inline bool guest_hyp_wfx_traps_enabled(const struct kvm_vcpu *vcpu)
+ {
+ 	u64 esr = kvm_vcpu_get_esr(vcpu);
+@@ -389,6 +410,12 @@ static inline u64 kvm_vcpu_get_disr(const struct kvm_vcpu *vcpu)
+ 	return vcpu->arch.fault.disr_el1;
+ }
+ 
++#if ARM64_S390_COMMON == 1
++static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
++{
++	return esr & ESR_ELx_S1PTW;
++}
++
+ static inline u32 kvm_vcpu_hvc_get_imm(const struct kvm_vcpu *vcpu)
+ {
+ 	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_xVC_IMM_MASK;
+@@ -456,6 +483,13 @@ static __always_inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
+ 	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC;
+ }
+ 
++#endif /* ARM64_S390_COMMON == 1 */
++
++static __always_inline bool esr_abt_is_exec_fault(unsigned long esr)
++{
++	return esr_trap_is_iabt(esr) && !esr_abt_is_s1ptw(esr);
++}
++
+ static inline
+ bool kvm_vcpu_trap_is_permission_fault(const struct kvm_vcpu *vcpu)
+ {
+
+
+Does this work for you?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
