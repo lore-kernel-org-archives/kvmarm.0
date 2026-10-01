@@ -1,69 +1,67 @@
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com [209.85.210.71])
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45475349B6
-	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 21:21:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86793491597
+	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 21:33:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790889666; cv=none; b=qnRvd43oTBReg0J7Fcfu5leOklnpeVji2FZAYqsFtv7e4Yhw+MNPg750OP1vcPwEaVkUyJn2+FHwydYQtWGlQ1Md6DPmU1bYyPh1OOtQDuVrXchPYHCf0ouQKyaCtETter4FFL6gxJzTV0M72TsjwwV9KPqiwpvcVoG5HDVZzmY=
+	t=1790890443; cv=none; b=FOknltO6VnACR12IDbmCbQzawINbxBt3sEB6/vLAJkRZwxHS8cUjM4w0HNeeiKPCoQhScMGO568TItOCOA6ls3lbVrDRYNBwOmMcb0q1+Ur8vZyoq12DUsIrPinuRatyUoiqx9zR57YYocNwKdRtQkQeTh+eJznxI6JQVcAdCWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790889666; c=relaxed/simple;
-	bh=SbI9zuwpLoviGTLgjhQIkxJ0mcfP+lQtKKioVT52hTM=;
+	s=arc-20240116; t=1790890443; c=relaxed/simple;
+	bh=aoQY2n7UuHsEBO2b/7mwS2MVg8AzdCvjCqCqmkccQyQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jINciH8WHwn8f+h4zlg0+v1ttOkbs4ALhuaFDN+U79ozUWtWn4GxGJ15zVTMyMi+wpJvKJf+dbBU/LE6HwwhEw0VCvbmnrAYmKFSmbnwlBM1tLiwlImZfifgd1ekIhfkYO9RurDEIUyjTxtP2OgSZ4hJTbDSpnePlyy1AOPnpaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IBQfZJdm; arc=none smtp.client-ip=209.85.210.71
+	 To:Cc:Content-Type; b=hgr1RIwH3kTS4FEj1UnhF9dN3QvuHXpYONDRuTXGdD5wJ77VOm+VkXo7ogk7URr6uhAuivH6AUZu5WU9WHwX6YyNIcLhZF5scLhBUqfOoi5QsUcy3RH+ENQE9hwU8vjIkvDEa5NmkOeEZz4l++YsGptwGcX8jtc0yprOmMJew+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=onEb460r; arc=none smtp.client-ip=209.85.167.200
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IBQfZJdm"
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-806004ec379so6787649a34.1
-        for <kvmarm@lists.linux.dev>; Thu, 01 Oct 2026 14:21:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="onEb460r"
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-4a7de733fa9so2444425b6e.3
+        for <kvmarm@lists.linux.dev>; Thu, 01 Oct 2026 14:33:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790889661; x=1791494461; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1790890438; x=1791495238; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=dIr4K7N8tWlFElP154T0gDhZmtv6PLeTBLURDyjAzjU=;
-        b=IBQfZJdmtupUw9sFfKlvti7qcNLXHHh+nn5XA49As6omiS2ylbKgC3y6Mb4eZ68jHa
-         hlhS9/hbttV19cmwsVvg6seaMM5Iq3HkIm4FfWbUTUichtFQWVZTVptqMt/kuDNLhlZf
-         y1lC4hE217JN2/8W18Q7RtZycXBE8Hg2Axsw9zlY1QuJo3K3dZI2T7cVo7XgHG559jnw
-         jDafoxQ9yEdpf1LaFDwGWiHcUDwbdXkaWS5qsPLTsCgxtl1EfHJ5WO8AT/yEtO5JjqvK
-         U7Pw17O96aC6S93Ov96RTS50C4rS+WXEu8WBLT2ccppyTUu2EgCjBLTRj6kKrAbv+6Gz
-         u2GQ==
+        bh=aoQY2n7UuHsEBO2b/7mwS2MVg8AzdCvjCqCqmkccQyQ=;
+        b=onEb460rm7lkO8NXs6sBkxAfxVH111jiK0KrlpI+q7njzPOGd1TbdqcRhOaxHl6NzV
+         MXFYuFSZSNIEtEMB8ZaVUJTUMnNmKwdJxYlayc8dkS8U0jRzaIr/JtiNQ0572yGMMmer
+         S9g8ulNYObgwyYxoWGEny7RK5kS1r3+fIxPGIcWZRjljvLiSfvzr/LdT/6RDXrt9K3W5
+         BIhlNOoZICS8+kM/0lXmeYIidpi6lcHSqatnQk0jztxgpWABngYs7pFM9aO+QYJjRcXp
+         ByXM05hSg1enzdyf/H6j0y3ZfIy4wqReJYj7TqMx7gamQO9COb6i8fhnlEJOvXaF/Y/8
+         ozsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790889661; x=1791494461;
+        d=1e100.net; s=20260707; t=1790890438; x=1791495238;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=dIr4K7N8tWlFElP154T0gDhZmtv6PLeTBLURDyjAzjU=;
-        b=Mg9MoZfD4eBPPoI2BOwkgA93DjbcW1t57Jxtl9epMCb/iTtnJWuIWdk571qsP67awZ
-         /ZzMViuwW8U802LCHQOzWyJSWD8ZmNx4chaorUCLROEBIlmJHhqZHFW1QbsS3nVfNz47
-         dVyaNldxl6UMfT00PwVBfxwdkZda0A8m949hyDhQSK1Z6dT4ctdFuuOKTjaDlNTURJem
-         VWEGGWQ9apa+9LlCos0QlZnkea+/nVEiaJ5DINSADdj1w/LcD2fC/qvIIA7nIt6oQfZ5
-         VQu/4VUcICaF8R2Tk7qUx6A0LtOtfM9/v0ct9PEcZYYqrzPvhfnWqELLMluV/XXPesnG
-         nOJw==
-X-Forwarded-Encrypted: i=1; AKwUvBx2T97eX7hj7HNTXoOSsX5fxMS2jm2GdN0YTDEjEWLqo7ghytxfByXOlysZ6F+o45tJ9k3uGlQ=@lists.linux.dev
-X-Gm-Message-State: AFuF++m37jcZvZV5eKd8iBHux5a7EBK+qwX7DkhqIMCPdYDC52MdlRfw
-	6ByuRdc4MvanotCl6PncZxqsl8jcdwVx316B5kEa924hUmkK72PxXQE1j3SPy3pWRDRYRfA2U4q
-	RhBamErXgpD/ymqPLFDP/3XTqGA==
-X-Received: from iobir24.prod.google.com ([2002:a05:6602:7158:b0:9c3:8b15:2c82])
+        bh=aoQY2n7UuHsEBO2b/7mwS2MVg8AzdCvjCqCqmkccQyQ=;
+        b=jUeb/Ij6oA9mOmDgirenFmtiV3+onOQ+8UsdW8JNEph6nRkJ3o4FuO0qTpEeDlhX4L
+         Qyn7hTTCBuPnKhHrHeWw+9Pq78msxGL/R5yqO+Le5y2njAM8mj6yo2V5cqYoYwwIjn6+
+         o+zN93w/I4Sg4CczK0s0k4e4Ag6PoM6bSXAr/kvnVMnQiQecRisERYHA1VwY+mThBCBv
+         zMk0GF7aSQUBNMtCjp4F+92lEh1gTUzqEWxAAoqOM/WpPilCiihog1CwXk0A6Ueb2fwf
+         +PhzOFfSwnZBQdeld59mzDdacN6Pj2kZQgXlK2bR/6aMOeH6KXtNfMaVyTJZZJf4kcER
+         4S0A==
+X-Forwarded-Encrypted: i=1; AKwUvBwkLav/v+BVxaTzTgyXPZb/L7z1pcTYlLD9RViebV9sD3mCkPEZaRUjAilb0jcjqnZMDiBvvDs=@lists.linux.dev
+X-Gm-Message-State: AFuF++nlXe/KhanmqX8DcP5yJwLpKwek8amsdRKVttSe2/DVi0tpJNib
+	Nzm6Oi2HWeNiv9eaFGRkERB7VA+kNGqyLZTkDF+P2WdBHLEn1pJ3ECRVaJKXiXAsUxB8r+bBas7
+	ZxITx+sqcfXIc9u1ovwEYGdKvhQ==
+X-Received: from ilbcx6.prod.google.com ([2002:a05:6e02:3c06:b0:50d:b50e:1675])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6808:6905:b0:4c3:a091:52f9 with SMTP id 5614622812f47-4f526747d3fmr385353b6e.2.1790889660625;
- Thu, 01 Oct 2026 14:21:00 -0700 (PDT)
-Date: Thu,  1 Oct 2026 21:21:00 +0000
-In-Reply-To: <56d86280-fcea-4d2d-b6b9-b47449f3408d@linaro.org>
+ 2002:a05:6808:1211:b0:4b9:a829:f015 with SMTP id 5614622812f47-4f529d297bemr430489b6e.33.1790890437780;
+ Thu, 01 Oct 2026 14:33:57 -0700 (PDT)
+Date: Thu,  1 Oct 2026 21:33:55 +0000
+In-Reply-To: <8e47bb89-a894-4fd0-9f96-e11b5dea1972@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20260924172928.2110956-1-coltonlewis@google.com>
- <20260924172928.2110956-21-coltonlewis@google.com> <56d86280-fcea-4d2d-b6b9-b47449f3408d@linaro.org>
+References: <20260924172928.2110956-1-coltonlewis@google.com> <8e47bb89-a894-4fd0-9f96-e11b5dea1972@linaro.org>
 X-Mailer: git-send-email 2.56.0.rc1.315.gc6ed9934b7-goog
-Message-ID: <20261001212100.2035442-1-coltonlewis@google.com>
-Subject: Re: [PATCH v9 20/22] KVM: arm64: Add vCPU device attr to partition
- the PMU
+Message-ID: <20261001213357.2088894-1-coltonlewis@google.com>
+Subject: Re: [PATCH v9 00/22] ARM64 PMU Partitioning
 From: Colton Lewis <coltonlewis@google.com>
 To: James Clark <james.clark@linaro.org>
 Cc: Colton Lewis <coltonlewis@google.com>, Marc Zyngier <maz@kernel.org>, 
@@ -85,25 +83,30 @@ Content-Type: text/plain; charset="UTF-8"
 
 Hi James,
 
-On Wed, Sep 30, 2026 at 04:27:27PM +0100, James Clark wrote:
-> > @@ -77,7 +80,9 @@ Parameters: in:imaan address of a u32 value (N)
-> >   Returns:
-> >   	 =======  ====================================================
-> >   	 -EBUSY   PMUv3 already initialized, or a vCPU has already run
-> > -	 -EINVAL  No PMUv3 explicitly selected, or value of N out of range
-> > +	 -EINVAL  No PMUv3 explicitly selected, or value of N out of
-> > +		  range (>= max_counters when partitioning is
-> > +		  enabled)
+On Wed, Sep 30, 2026 at 04:25:36PM +0100, James Clark wrote:
+> Looks good to me, everything seems to be working now:
 >
-> "No PMUv3 explicitly selected, or value of N > max_counters, or N >
-> max_counters - 1 when partitioning is enabled".
->
-> That might be clearer, otherwise it seems like max_counters being relevant
-> to "out of range" only applies to when partitioning is enabled, not that
-> it's max_counters all the time but one is -1.
+> Tested-by: James Clark <james.clark@linaro.org>
 
-Agreed, that reads much better. I will update it to your phrasing in
-v10.
+Thank you for testing and for all the reviews!
+
+> There are still a few Sashiko comments though, and one critical one about
+> racing with pseudo-NMI PMU interrupts that looked reasonable. I tried to
+> test it and reproduce an actual issue but couldn't, so maybe it's bogus.
+
+The "Critical" Sashiko comment on Patch 19/22 (claiming that clearing
+hardware PMOVSSET_EL0 loses overflow bits because the guest has direct
+untrapped access to PMOVSSET_EL0) is a false positive: Patch 09/22 sets
+HDFGRTR_EL2_PMOVS and HDFGWTR_EL2_PMOVS (and without FGT, MDCR_EL2.TPM
+is set), so guest accesses to PMOVSSET_EL0 and PMOVSCLR_EL0 always trap
+to pmu_reg_read() / pmu_reg_write().
+
+The pseudo-NMI race comments on Patch 11/22 and Patch 19/22 are
+theoretically possible in a narrow 2-instruction RMW window because
+local_irq_save() does not mask GICv3 pseudo-NMIs, which explains why it
+wasn't reproducible in practice. In v10 I will make the PMOVSSET_EL0
+shadow updates and vcpu->arch.mdcr_el2 assignment atomic, and address
+the other valid Sashiko findings.
 
 Thanks,
 Colton
