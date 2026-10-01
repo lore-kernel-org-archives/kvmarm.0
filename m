@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A45B953D0AD;
-	Thu,  1 Oct 2026 21:08:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ADC953D9D2;
+	Thu,  1 Oct 2026 21:08:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790888891; cv=none; b=rrMotiEP/T94Ez4As96axK8gDFFDEuoB9hYCkiNTddgm79ey+lDfBAxmpY673Ql2Sbxg7uMfzwHB4M01AqwUUbMovn50RBgJmUI2saWI85jpTsJ5mG4gOLMuYaUlOzHXiEvXAfGbamE2e9icoKsHVigs4Z78oLiDK7KQE/9phkY=
+	t=1790888895; cv=none; b=ANhqGVb4VKffRBEldF8JhMKMhg1/w9ylNn4+iev5FB9AYEVEHezCMLrVb6voO9x6ELAANDTjwYkrU5M/NNZY6btvBghWGiEn+ktVF8AoKIi9Mh4sb43zLwQsX44OBRxJd7Hbcbsb59Lp9D/dZPLSWqpXL1I1Sv6xoPCoFAPANK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790888891; c=relaxed/simple;
-	bh=aUMJm4MmfVPuRwP9cR6se83O2r8UV6BA2hVIN/OMalE=;
+	s=arc-20240116; t=1790888895; c=relaxed/simple;
+	bh=WsjSAf7iPMA/K8mPP8RhduMdKhLRQFgtRTlAA6Oernw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=swFdQHUSh/LIZxzsnIXAbauRMdCCw2vJCrESA+UiZElwshTImcEbUgvpL/zta7QM6nTQQCPjU3J18oLDTmGiBwLL7fIMe6gEc87TUJnZdvSnnnpY4si/JkUSJBXets0bMUZBRKvGhJLPDat3FWeRU//PGryijvckbWKbZDLx5Z4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=hjkHIlzz; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=PpzSCgyx5TRldfEEt+5w6FWnVUf265XWx3xrSz6bshIcbWr5GWF85sXyFH0vrndwxRLuubq46zTAe74ue92ZZYBxiDnRwvFrdC/rmJkhlC+Ql3GeeuUbiRWK9NR0gb2+SohJsnKaGAY9ROVs/YGTNoFH+RZaVERcv0y1Ys3+utM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=RFd7Lj6p; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="hjkHIlzz"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="RFd7Lj6p"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B16A9497;
-	Thu,  1 Oct 2026 14:08:05 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6039316F8;
+	Thu,  1 Oct 2026 14:08:09 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B6A3E3F86F;
-	Thu,  1 Oct 2026 14:08:05 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 6E0B93F86F;
+	Thu,  1 Oct 2026 14:08:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790888889; bh=aUMJm4MmfVPuRwP9cR6se83O2r8UV6BA2hVIN/OMalE=;
+	t=1790888892; bh=WsjSAf7iPMA/K8mPP8RhduMdKhLRQFgtRTlAA6Oernw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hjkHIlzzIi8jgVefRLWrLvcg+DhxiA1FPuo8P5j9/UEhQauQa5exAHd8+tCC9jscf
-	 3qqznzN7MnSHuf+Eqbr/wTcsc89UD7N1eN3YsNUw186L0MT8qCXnTjW3OzwS9JUDVQ
-	 Mu3Snx6mZSBw2dOy93Ig25BNJyOiUC3EnNlHxD0g=
+	b=RFd7Lj6pc3b5WJuyjN+0CngiS2XcgDjLatO4PjBuQKiDrlojAdaiCSbMVHraV9iZl
+	 vAc1wRY1KqcJ6B9P/EGfibuhWCS01SmILvA2Z3VhTXwiemh/bQFMbvDTAQLOnaRPjj
+	 koSqa0jPyoKTkJ36e9kYDSIhVD/FhY2F2MMRdGM8=
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -52,9 +52,9 @@ Cc: maz@kernel.org,
 	sudeep.holla@arm.com,
 	jonathan.cameron@oss.qualcomm.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v21 13/23] KVM: arm64: Mandate VGIC v3 for pKVM VMs and Realms
-Date: Thu,  1 Oct 2026 22:06:53 +0100
-Message-ID: <20261001210703.1597150-14-suzuki.poulose@arm.com>
+Subject: [PATCH v21 14/23] KVM: arm64: CCA: Add a new mode for supporting Realm guests
+Date: Thu,  1 Oct 2026 22:06:54 +0100
+Message-ID: <20261001210703.1597150-15-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261001210703.1597150-1-suzuki.poulose@arm.com>
 References: <20261001210703.1597150-1-suzuki.poulose@arm.com>
@@ -66,73 +66,58 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-pKVM does not trust the host. Realm VMs follow a similar trust model, with
-the Realm Management Monitor owning the protected state instead of the host.
-Add a helper to identify VMs that run under a host-distrusting hypervisor.
-
-Use this for blocking ioremap of vgic-v2 into stage2 and prevent creation of
-VGIC other than v3.
+Add an explicit mode to support Arm CCA guests.
 
 Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
-Tested-by: Gavin Shan <gshan@redhat.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
-Changes since v18:
- - Cover pKVM guests for VGIC v3 mandate.
- - Merge the VGIC mandate check in here.
----
- arch/arm64/include/asm/kvm_host.h | 3 +++
- arch/arm64/kvm/mmu.c              | 2 +-
- arch/arm64/kvm/vgic/vgic-init.c   | 2 ++
- 3 files changed, 6 insertions(+), 1 deletion(-)
+ Documentation/admin-guide/kernel-parameters.txt | 3 +++
+ arch/arm64/include/asm/kvm_host.h               | 1 +
+ arch/arm64/kvm/arm.c                            | 5 +++++
+ 3 files changed, 9 insertions(+)
 
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index 68647ff4bdd24..1afe3df3b923e 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -3256,6 +3256,9 @@ Kernel parameters
+ 			nested: VHE-based mode with support for nested
+ 				virtualization. Requires at least ARMv8.4
+ 				hardware (with FEAT_NV2).
++			rmm: Support for running confidential guests in Realm
++			     world using RMM, as defined by Arm Confidential
++			     Compute Architecture (CCA)
+ 
+ 			Defaults to VHE/nVHE based on hardware support. Setting
+ 			mode to "protected" will disable kexec and hibernation
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 871f503e9f164..4d75b8e6797bb 100644
+index 4d75b8e6797bb..4516594d90462 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -328,6 +328,8 @@ enum fgt_group_id {
- enum kvm_arm_vm_flavor {
- 	VM_NVHE,
- 	VM_VHE,
-+	/* VMs running on a hyp that doesn't trust */
-+	MARKER(__VM_DISTRUSTING_HYP),
- 	VM_PKVM,		/* Normal guests on pKVM */
- 	MARKER(__VM_PROTECTED),
- 	VM_PROTECTED_PKVM,	/* Protected VM */
-@@ -1575,6 +1577,7 @@ struct kvm *kvm_arch_alloc_vm(void);
- #define kvm_vm_is_unprotected_pkvm(kvm)		\
- 	(is_protected_kvm_enabled() && ((kvm)->arch.vm_flavor == VM_PKVM))
+@@ -69,6 +69,7 @@ enum kvm_mode {
+ 	KVM_MODE_DEFAULT,
+ 	KVM_MODE_PROTECTED,
+ 	KVM_MODE_NV,
++	KVM_MODE_RMM,
+ 	KVM_MODE_NONE,
+ };
+ #ifdef CONFIG_KVM
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index bcb78fc7676c5..3ab722f2af7c8 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -3277,6 +3277,11 @@ static int __init early_kvm_mode_cfg(char *arg)
+ 		return 0;
+ 	}
  
-+#define kvm_vm_hyp_is_distrusting(kvm)	((kvm)->arch.vm_flavor >= __VM_DISTRUSTING_HYP)
- 
- int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
- bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 8e092efdf0825..8f21652d3625c 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1252,7 +1252,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 				     KVM_PGTABLE_PROT_R |
- 				     (writable ? KVM_PGTABLE_PROT_W : 0);
- 
--	if (is_protected_kvm_enabled())
-+	if (kvm_vm_hyp_is_distrusting(kvm))
- 		return -EPERM;
- 
- 	size += offset_in_page(guest_ipa);
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 4012df6002ea6..874025513afcc 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -84,6 +84,8 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 		!kvm_vgic_global_state.can_emulate_gicv2)
- 		return -ENODEV;
- 
-+	if (kvm_vm_hyp_is_distrusting(kvm) && type != KVM_DEV_TYPE_ARM_VGIC_V3)
-+		return -ENODEV;
- 	/*
- 	 * Ensure mutual exclusion with vCPU creation and any vCPU ioctls by:
- 	 *
++	if (strcmp(arg, "rmm") == 0 && !WARN_ON(!is_kernel_in_hyp_mode())) {
++		kvm_mode = KVM_MODE_RMM;
++		return 0;
++	}
++
+ 	return -EINVAL;
+ }
+ early_param("kvm-arm.mode", early_kvm_mode_cfg);
 -- 
 2.43.0
 
