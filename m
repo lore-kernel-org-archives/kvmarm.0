@@ -1,89 +1,176 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55CD5492E4F;
-	Thu,  1 Oct 2026 12:08:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28EFB3BED61
+	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 12:11:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790856489; cv=none; b=Rv+Uj0nfJ0ZpEY7vETcOSdBTBVzZsNNcCRItebS/Bn8ZGAbt9MHyA+vcWnHFvBGZsR7SZHrmG//PAPli2m6E/Pxm2faYgV0FC6RmE+ayncLaELHNHKPWCVTPpzOqzy+PMtV8A3YCEz2gBNI24ZjJn1WBx5SdESipylUA3Qqf39M=
+	t=1790856697; cv=none; b=Cz8Rdm2mOOqCaCOMd9bwznEKp0bw95PL0GmgANR4HQ0BC7apTRjoDCbOBa/IuSzBPc1KOEWZb1WHhewkUZobYHhBy4Ayy54lXhQoO5dmoaMCSv5CsRpWAuVX0I+UVwBgK3/d0TWJRbXi7ZeY1VHbNPeinX+62AgRmTM7eKaRiys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790856489; c=relaxed/simple;
-	bh=IhmtRORkFrvn34IwwPfpohsJrntWTzXRh67fyKrxa+Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lx7hTvmdl5fxy5uAG7ezLfRzMl7Hkkp2Z1d343ngt2yIUMzA4dmB1UBWA2AT77+kGaiNJLzcELkQtSR3L5CgjoE2Ue8rdoGb2trODeFtx27oqEp9f+Y20CQnbLa+AbF87LeWVDOUhVGtLkC2UuGcu1vBbOJTWZ3r/okicU7/qS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kf30x+mW; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790856697; c=relaxed/simple;
+	bh=yCbYjKH+S5QEfiIfZQdjrjC5qwYdJpqahL/rYFDjmls=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=n0QXWw8MVB6Lyc8j6ns1ARp1XPKqHeg7jNGLR6ytktFatvNpheJOi+2sY8gzQvRDyQHMXbKXrnycCGO1Q/UN+rfpnhoCgHFC2eupk/h0OWks2xzenKN3lyvVVRviGIGPJYeXLVt+zKXbeoNdiAz6C9lkeUg2U7OCQmsmFsXKKvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=DdZptR14; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MTMJkvNI; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kf30x+mW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F25671F00898;
-	Thu,  1 Oct 2026 12:07:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790856478;
-	bh=IhmtRORkFrvn34IwwPfpohsJrntWTzXRh67fyKrxa+Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Kf30x+mWYVi6x3ahp7wyZAPGLzt8Kn3UUvAB6NzOZq7cQZt2o74EytRnUM2xT96dG
-	 0lu5VT0/R/CdrWmOf+ewpfDFVmR9w7bDWl/bagPGvzI8R4hvicYmYwjNTkYrN75koL
-	 jThzR5U4M/ziR590a5KJXXtPbrrTqgV54vbb9IJ/cYHB/Ccb1SiOQ4LE0+QQeYkLrc
-	 UMmw5rofd5DmVaNYglHLiiX2CJQ3GOEvRn5UO0JL3lhHLpPoexWq4bDVPvbiRSj2Tz
-	 FVR9ZypYraPUXw+ItjAWqF42MqkeDkahj6Qm01mP+cyIxnV6qzmzaD0CbKGw5loQ/Z
-	 gJoGVpdVlL2sQ==
-Date: Thu, 1 Oct 2026 13:07:54 +0100
-From: Mark Brown <broonie@kernel.org>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: sashiko-reviews@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v21 02/15] KVM: arm64: Refuse to start a guest with S1PIE
- or S1POE but not TCR2
-Message-ID: <4ac3c797-04ec-4873-90c3-f3b015bd9fb7@sirena.org.uk>
-References: <20260930-arm64-gcs-v21-0-3556644cd927@kernel.org>
- <20260930-arm64-gcs-v21-2-3556644cd927@kernel.org>
- <20260930220551.014471F000FF@smtp.kernel.org>
- <ar47ZOMYvcxlbwY8@gremlin>
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="DdZptR14";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MTMJkvNI"
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 8402814000E4
+	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 08:11:28 -0400 (EDT)
+Received: from ams-imap-03 ([10.64.2.23])
+  by ams-compute-02.internal (MEProxy); Thu, 01 Oct 2026 08:11:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1790856674;
+	 x=1790943074; bh=LrP4wnPTH49w5JcU809MXbLlJcIqsc8CmLzg77Y19Yo=; b=
+	DdZptR14wbpanHzm6uKkKZ0c9hXpIWiEzd/rLBR76KL5KksnHcsvaER2Qu/EZLX2
+	iTysz/+vPCwRIZ35fPbIJu8HtFLcQEOTDdrccmt5LhVUFNujINRMaSkpHpo7Hdk4
+	rJk1InvEJnIw813C43vLa5Qr5CwpHE/r0CO1nvF4hPMtCjKDqMuqMgQJ1svVepYk
+	GvV80ITRAyKcVoU8xpiSTLx2ParbRk2TkJDOZNpqE1tWZjqqJywaEbcGw7S2xgiG
+	8KZbkkO4Smu6Qyr87tB8+t5EYiigRa3FeL/96OLJ2poloiH9igIqDbcqKnpglzuB
+	8PjKYewAK3Dg/3nCBXskvQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1790856674; x=
+	1790943074; bh=LrP4wnPTH49w5JcU809MXbLlJcIqsc8CmLzg77Y19Yo=; b=M
+	TMJkvNIJV1H2eTr4uWJq7gIRL4MykfuemTKy3B8qDSQbSo0zIeVIXZKoDMnJ0QeY
+	cRL8+5bXAI54jMaw+DclA5lCIqX8N7DRrMcllnGqJcC5+4aofEPGPXW7wMSUVBkY
+	To8PD1I8mkSFZBr75Np9MWQ8yhQ7NyMQfjuud7GZqLY6i+GBYrKuW8Sika6VR0Mv
+	FM0YqHlrIGa0jUZtikBYE5yZAUqFYZK0dmj7LTgFfh6hRFDVe0w5Q33s6YBmZsM+
+	TsNQrs8hHK8OwprTOFSJwkO/Wf5efJdOkjKdL2qyssfe3qqsNjt8BD/YSfAQcqbx
+	6OOTYNm6IJNHvRgu9BwWA==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-06;
+	repo=github.com/dkim2wg/interop; date=2026-09-30; sw=lmtpprox;
+	action=sign d=arndb.de a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1790856674; d=arndb.de;
+	mf=PGFybmRAYXJuZGIuZGU+; rt=PGt2bWFybUBsaXN0cy5saW51eC5kZXY+;
+	s=fm1:rsa-sha256:ggGB/MIuwSewtQ3D5R3H8k1+g6tXRKSWoMG7TcAPXMQLkBU
+	7cBI4o1cRPjniaWAYw7JRAl1yZKoPTzTdmxKIrxOTUD+E9UyRDzmKnxcD+4RTFO8
+	afEijWdaWFfBF/g0xI40mJb0KDlH4iEPrvg8Kfc6L+nl6AO5kuO3j3ck4YjuLRDb
+	GqGyrGaHvo38hZH9/4slAcI/9HyvaioXOYV0pNC6fOOsjq0MiscOJ+/+s1/XLG+8
+	Cay5MsYbgq/oD5EOoeJUk8SiiWPJrbrbrogTMsrC987pFY4X/0b8b0GArqrICY10
+	6DQ8LABxhQY3RZW4gVvQjC+6JONpbAT/gcd9Mfw==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-06;
+	repo=github.com/dkim2wg/interop; date=2026-09-30; sw=lmtpprox;
+	action=mi-m=1; hc=12;
+	hn=cc,content-transfer-encoding,content-type,date,feedback-id,
+	from,in-reply-to,message-id,mime-version,references,subject,to;
+Message-Instance: m=1; h=sha256:0d3aVtmayZTOzeQ+MpEcEkolJRwy5WF92/2k3IpurhQ=:yCbYjKH+S5QEfiIfZQdjrjC5qwYdJpqahL/rYFDjmls=;
+X-ME-Sender: <xms:2k2-aiTRKWbMc107WhYzHUymmXtYgzuL5oAi-X1o6feSNt-MwREVtg>
+    <xme:2k2-aik4c_KL12gKMLv9VYRj5ZxXpw9mV_peTngbibceQZCIiLTLMk7fQXLhxlE0D
+    l_uDmIrMBPDhtxifqu3dqdCAK4IYCNgAH2fZAvJwGy0MZLgLkxHe-hQ>
+X-ME-Proxy-Cause: dmFkZTGKlnIEsaaPd8MjhsmVKAuQGGCkE6iNhqa5cgmJ0cUZLPa4JCOr3xxfefUsNnq5Qu
+    zIlkZrYxyZZ90IF/NlCb7O0gNqwyI0nsaf77oXEqC6rcMe0AJlx1DbPIELICOaraMNVL92
+    6YD4uYwOQjzFJSe68LWxRWl4gKdGiTNLNgpwEuhc4yqMab+1djzPF1FbsLmn6QlxedBlUz
+    QE3A8cLPSz0AE36Lw+kxBpXqqnwRsojToOFL+h3cipO/SFygy55CoVQWctruTKuv4FhoUW
+    vEWWPlLDvbsfaWv1HNFhJsDx1888K0soTkGt1ki4fl2kkn+ckgLKjRJkrYgYxrcGPfHTqO
+    /U6VHuVF8Gl+WbJM6vfMhtApm5BKKwPu2MYVZh/dd/u7pO3yjAtlHdM1OtMZEYxTrQQVgn
+    DOJE4fvSrQqtqQfKX6KzzPM+I3vemYarjMgstK/GlVj5OSnz7pMRx908MvtCOlH4j9SlbA
+    +B7i6gOX2+QOJ9kzn8mVblz3NJfUfzzjFA/7H1F7crEh4epIST19sEeHee+RBIZM9qhvjs
+    85fruzJ6LWf4fJ8aKLau5nkmelaefTXuDwSKfj3H3VNz43iuHRRvFLPxt9TT9eaxq8hLAw
+    p4LOQzewFyYLMGCm3NDh14uUgZGNpbLZ5/ox80hAW52RxUDHGYuVp+yY7MSQ
+X-ME-Proxy: <xmx:3k2-arboxQ7fgmQSr02igr-P_X0AC1jaCz4CHvCFupNkg6NACoELFw>
+    <xmx:3k2-avz2MRDuBo2q7ocXxhEGE4TMtfUeCjRGvXUl7FsZySNYSepcNg>
+    <xmx:3k2-aqaToNTnuqqH1NTAkNGi7kgMn8cmSG4Qomxq2MZqShqXpauA7g>
+    <xmx:3k2-amyTTgKTSRZ_1u8LkWAANhuCjngI3vrEbXzXCK1vz6dQeLne7w>
+    <xmx:4k2-auNCvzqprV9hX_UxKrvj8cfadVF3_geCgaO3KJdhUG4fMXa8qFc4>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id 3DC4332A008A; Thu,  1 Oct 2026 08:11:06 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="YnWPJcZx56n4iCG9"
-Content-Disposition: inline
-In-Reply-To: <ar47ZOMYvcxlbwY8@gremlin>
-X-Cookie: Do not stamp.
+X-ThreadId: AyQhVaDaKSSk
+Date: Thu, 01 Oct 2026 14:10:06 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Steffen Eiden" <seiden@linux.ibm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+Cc: "Alexander Gordeev" <agordeev@linux.ibm.com>,
+ "Andreas Grapentin" <gra@linux.ibm.com>,
+ "Catalin Marinas" <catalin.marinas@arm.com>,
+ "Christian Borntraeger" <borntraeger@linux.ibm.com>,
+ "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
+ "David Hildenbrand (Red Hat)" <david@kernel.org>,
+ "Friedrich Welter" <fritz@linux.ibm.com>,
+ "Fuad Tabba" <tabba@google.com>, "Gautam Gala" <ggala@linux.ibm.com>,
+ "Hariharan Mari" <hari55@linux.ibm.com>,
+ "Heiko Carstens" <hca@linux.ibm.com>,
+ "Hendrik Brueckner" <brueckner@linux.ibm.com>,
+ "Ilya Leoshkevich" <iii@linux.ibm.com>,
+ "Janosch Frank" <frankja@linux.ibm.com>,
+ "Joey Gouly" <joey.gouly@arm.com>, "Marc Zyngier" <maz@kernel.org>,
+ "Nico Boehr" <nrb@linux.ibm.com>,
+ "Nina Schoetterl-Glausch" <oss@nina.schoetterlglausch.eu>,
+ "Oliver Upton" <oupton@kernel.org>,
+ "Paolo Bonzini" <pbonzini@redhat.com>,
+ "Sean Christopherson" <seanjc@google.com>,
+ "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+ "Sven Schnelle" <svens@linux.ibm.com>,
+ "Ulrich Weigand" <Ulrich.Weigand@de.ibm.com>,
+ "Vasily Gorbik" <gor@linux.ibm.com>, "Will Deacon" <will@kernel.org>,
+ "Zenghui Yu" <yuzenghui@huawei.com>, "Lorenzo Stoakes" <ljs@kernel.org>
+Message-Id: <e2742ccb-6b91-463c-a148-30b7e2f41e9a@app.fastmail.com>
+In-Reply-To: <20260930173441.66762-24-seiden@linux.ibm.com>
+References: <20260930173441.66762-1-seiden@linux.ibm.com>
+ <20260930173441.66762-24-seiden@linux.ibm.com>
+Subject: Re: [PATCH v9 23/24] KVM: s390: arm64: Implement basic page fault handler
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
 
---YnWPJcZx56n4iCG9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> +		/*
+> +		 * Check for a cache maintenance operation. Assume the guest is
+> +		 * cautious and skip instruction
+> +		 */
+> +		if (kvm_is_error_hva(hva) && kvm_vcpu_dabt_is_cm(vcpu)) {
+> +			kvm_incr_pc(vcpu);
+> +			ret = 1;
+> +			goto out_unlock;
 
-On Thu, Oct 01, 2026 at 12:25:08PM +0100, Lorenzo Stoakes (ARM) wrote:
-> On Wed, Sep 30, 2026 at 10:05:50PM +0000, sashiko-bot@kernel.org wrote:
+Hi Steffen,
 
-> > This regression allows KVM to configure traps based on S1PIE, disabling the
-> > trap for PIRE0_EL1, but skipping context-switching the register because TCR2
-> > is disabled. Could this allow the guest to directly overwrite the host's
-> > physical PIRE0_EL1 register?
+[Adding Lorenzo Stoakes to Cc]
 
-> Isn't this just a pre-existing issue and the one addressed by [0]?
+I see this function fails to build on top of linux-next, as the 
+kvm_vcpu_dabt_is_cm() function was removed by commit 18b94675b1fb
+("KVM: arm64: Use ESR helpers in guest abort handling").
 
-> https://lore.kernel.org/kvmarm/20260929-kvm-arm64-idreg-final-v4-0-75296dde994d@kernel.org/
+I used this patch to make it build, but I'm not sure if this is
+the correct fix:
 
-> I don't think it's related to patch 2/15 in any case.
+diff --git a/arch/s390/kvm/arm64/mmu.c b/arch/s390/kvm/arm64/mmu.c
+index 3c1c8a2def73..7ee157c61d70 100644
+--- a/arch/s390/kvm/arm64/mmu.c
++++ b/arch/s390/kvm/arm64/mmu.c
+@@ -119,6 +119,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
+ 	write_fault = kvm_s390_cur_gmap_fault_is_write(vcpu);
+ 	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
++		unsigned long esr = kvm_vcpu_get_esr(vcpu);
+ 		ret = -ENOEXEC;
+ 		/*
+ 		 * The guest has put either its instructions or its page-tables
+@@ -143,7 +144,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 		 * Check for a cache maintenance operation. Assume the guest is
+ 		 * cautious and skip instruction
+ 		 */
+-		if (kvm_is_error_hva(hva) && kvm_vcpu_dabt_is_cm(vcpu)) {
++		if (kvm_is_error_hva(hva) && esr_dabt_is_cm(esr)) {
+ 			kvm_incr_pc(vcpu);
+ 			ret = 1;
+ 			goto out_unlock;
 
-Yes, it should be due to that.
 
---YnWPJcZx56n4iCG9
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmq+TRkACgkQJNaLcl1U
-h9BbSwf/R2HKUzJcHsD/BX7ks/VcA0aNkRKJBZgQD80g2hinHpmZgsu4XEWHLqzF
-B58HdFdOXsXP2oQWrWYhJzrgaBxzChULWSrAJc6/Zo47smvdN6t4vtTtOlpN91CY
-FAbY0jB7ir6VMaKvQl0ALFVP0kLPtf65Kl1wT/HGFmW6xqa6iJhoIQ3FL31pXtVC
-bl6iEtlj+Iksao9tq/XIbkHPP/qQnSEIu2Iw1c2eCVSYlVNTSvX/2t3KBsqtSGN9
-Hz3NcNgP2zY+0xDe681IjEOp+nm0FjaytjQHO2Oft2jTYbDKmkHiu7KEgOiKWybl
-chLP+TwNY4iz7lI5bxRMyawFJbTbJw==
-=ELuq
------END PGP SIGNATURE-----
-
---YnWPJcZx56n4iCG9--
+      Arnd
