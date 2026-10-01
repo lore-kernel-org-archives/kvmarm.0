@@ -1,333 +1,160 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF082541E60;
-	Thu,  1 Oct 2026 21:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4ECC49BD7F;
+	Thu,  1 Oct 2026 21:11:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790888928; cv=none; b=WGaVmaYLY4ZfgoRZ8V7KWx3FT/mfJUXwaEJchcGzAT2ougm52fo+wHN2/rDakOexE7/4pVUTV1hTS1cMlITfycuJ4KiOBIxgISGKlP4tijX0orAvnL09NQq3xggz3hbZX4xajnbVyDGUaFY/SvYipyUWYKUPpBAGMVAvpU522uM=
+	t=1790889117; cv=none; b=h0WGeUGOEqqZiW5ax8iJl1bs8QfQNGY92/1SWlOIL05nnO2LfBns89TbUw/Xd8Gq/3diCFA+VFjxF+ufn1zp3fQ3UlOkiS5ulvrTNNw3oLshybkryFYoHa21T28wTkguwz2z/xAiOb43g7ZOkSiDewWZU7N5HDiVUDCyPCgnzdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790888928; c=relaxed/simple;
-	bh=+hXKXlviQfN2QJXIbC/yz9IDZImjMWTbgpyFT8Aj5q4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=g2XojzqcEoa6E5ZDi3lPJADD8pnH5xVw/JHPRPeDVZgz/Hv9wIp6OGxPiPuaOGpyWYvw7PaCZAxZzf9xkppzmPylCtQLH/6Ng5JW+Q+q03HO3mCvYm8uF166NMR2fsTlXQKKHApQbPdavkKHg4mDT6Y5xk3oe59Cb8XsSlXi1qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=rEzWHT+0; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1790889117; c=relaxed/simple;
+	bh=3Zx7mZTcZxBEPzyMjLgv3nmr1xCwyHk4Zs8Em19mPuw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NcGGEJZ7tsOuqcIvpW60ujdBvPc3UBIJIwkeOVW/CNTxNXRBYAxhxo4U6spV7DH+QzXdZbUI47JMUeInC11DNtuxCGpv4Po72jXm/Pw3jCWBzUfezh/hdeMZsgqZCctTwMUmgwCPwE8NLyJOIp93ziXGVsNgLCGZ006vjyN8GZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VLvG3LAB; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="rEzWHT+0"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C63221476;
-	Thu,  1 Oct 2026 14:08:42 -0700 (PDT)
-Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B44563F86F;
-	Thu,  1 Oct 2026 14:08:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790888926; bh=+hXKXlviQfN2QJXIbC/yz9IDZImjMWTbgpyFT8Aj5q4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rEzWHT+0HPRXN26RMVgQn8MkiEJrN/wHywc0QV8vVGNrp6K8voGDec3ABMgvM53jV
-	 OVobjJSEHlgy41E9uIazN6SA/+yHFbetqsRooX09EhveoGf6PBNERkprJGbj6Hf/fo
-	 Bk+8nL1hIGMGquR46MKiOdNWfO4YOrrnaTPQInn4=
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: maz@kernel.org,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	steven.price@arm.com,
-	aneesh.kumar@kernel.org,
-	oupton@kernel.org,
-	gshan@redhat.com,
-	joey.gouly@arm.com,
-	tabba@google.com,
-	yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev,
-	gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com,
-	alpergun@google.com,
-	fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com,
-	lpieralisi@kernel.org,
-	enju.kohei@fujitsu.com,
-	sudeep.holla@arm.com,
-	jonathan.cameron@oss.qualcomm.com,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v21 23/23] KVM: arm64: CCA: Control user register access for Realms
-Date: Thu,  1 Oct 2026 22:07:03 +0100
-Message-ID: <20261001210703.1597150-24-suzuki.poulose@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261001210703.1597150-1-suzuki.poulose@arm.com>
-References: <20261001210703.1597150-1-suzuki.poulose@arm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VLvG3LAB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92AC51F000FF;
+	Thu,  1 Oct 2026 21:11:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790889116;
+	bh=ZRl45zOulKSzHu0gpa5gJKuaLYcXh2vCa43UARtQmaM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=VLvG3LABMRXOFV0rgrekJzhEHgOaAUj51pCohlr6tbG0Kfz2+O31tpT/VOJmKa2qv
+	 aoqtWaO1OHmw6NEuOwkkzH+ITshRx/cFcvuH30U6Z3Z+1f5M2XRpJW5j0kZQMfBpNm
+	 aDJiV/OkpNSN247u+74LZ2vH1rAJrHOISVEvOLsSU/SkHlDUq8HY1dMdUOolhLzS4O
+	 mNj00cw/HyADcX5F9EhC+DfLOsZJiBgJnAxDjXk7eheCEFsSCfLQQ8G0dWHfPfNsvP
+	 XfEfksywZyaJ74TR0NoPtMy+hlIkUHjIHexpIJSmCzCsK9XTgP8DkePoYwHX0nhJjT
+	 /zuYeQ4/jGOFw==
+Date: Thu, 1 Oct 2026 22:11:49 +0100
+From: Mark Brown <broonie@kernel.org>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Leonardo Bras <leo.bras@arm.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v21 08/15] KVM: arm64: Enforce EXLOCK for SPSR and ELR
+Message-ID: <659cba01-3c53-4eb8-9124-7c62d266a64f@sirena.org.uk>
+References: <20260930-arm64-gcs-v21-0-3556644cd927@kernel.org>
+ <20260930-arm64-gcs-v21-8-3556644cd927@kernel.org>
+ <ar5thpZI5GiCfVRR@gremlin>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="q9J3ZXhLEIPLOZjy"
+Content-Disposition: inline
+In-Reply-To: <ar5thpZI5GiCfVRR@gremlin>
+X-Cookie: Do not stamp.
 
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 
-The RMM restricts the access to the register states that the host can
-read/modify for a given Realm.
+--q9J3ZXhLEIPLOZjy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-e.g., At VCPU creation, can modify GPRS (x0-x30) and PC.
-      While servicing SMCCC calls via RSI_HOST_CALL or servicing PSCI
-      requests.
-      MMIO emulation in the unprotected space.
+On Thu, Oct 01, 2026 at 05:26:41PM +0100, Lorenzo Stoakes (ARM) wrote:
+> On Wed, Sep 30, 2026 at 10:48:18PM +0100, Mark Brown wrote:
+> > As per I_CFFNS and the pseudocode for the SPSR_ELx and ELR_ELx registers
+> > a GCS exception with ExType 1 is generated for attempts to write to
+> > those registers when both GCSCR_ELx.EXLOCKEN and PSTATE.EXLOCK are set.
 
-Additionally we use the sysreg configuration to advertise/configure the
-following Realm parameters, which are required before the Realm Descriptor
-is created:
- - SVE Vector Length
- - Number of HW Breakpoints/Watchpoints
- - PMU Counters.
+> From [4] I see I_CFFNS is defined as:
 
-Thus KVM also additionally allows access to ID_AA64DFR0_EL1 and SVE_VLS for
-the configuration of Realm creation parameters. We don't support PMUs for
-the Realm VMs yet, so PMCR is not exposed.
+> "When an MSR instruction would write to the relevant ELR_ELx or SPSR_ELx
+> for the current Exception level ELy, the Effective value of
+> GCSCR_ELy.EXLOCKEN and PSTATE.EXLOCK may prevent the write."
 
-The RMM makes similar restrictions for reading of the guest's registers
-(this is *confidential* compute after all), however we don't impose the
-restriction here. This allows the VMM to read (stale) values from the
-registers which might be useful to read back the initial values even if
-the RMM doesn't provide the latest version. For migration of a realm VM,
-a new interface will be needed so that the VMM can receive an
-(encrypted) blob of the VM's state.
+> So the lock applies to writes to the current EL's own ELR/SPSR rather than
+> to any ELR_ELx/SPSR_ELx the current EL can write to?
 
-Reflect the above in KVM_GET_REG_LIST, KVM_SET_ONE_REG calls.
+VHE and NV complicate things so "own" isn't just the same ELx, but my
+text above definitely oversimplifies too much and so is wrong.
 
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Co-developed-by: Steven Price <steven.price@arm.com>
-Signed-off-by: Steven Price <steven.price@arm.com>
-Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
-Changes since v18:
- - Don't expose PMCR_EL0 to the userspace now, we could do that when we
-   support PMU
- - Fix check patch warnings
-Changes since v17:
-  - Merge related changes into one single patch for the user set/get registers
-    I have retained the Review tags, as the code hasn't changed, just the patches
-    were merged into a single one with the same tags.
-  - Limit KVM_GET_REG_LIST to the allowed CORE registers.
----
- arch/arm64/kvm/guest.c      | 63 +++++++++++++++++++++++++++++++++++++
- arch/arm64/kvm/hypercalls.c |  4 +--
- arch/arm64/kvm/sys_regs.c   | 28 +++++++++++++----
- 3 files changed, 87 insertions(+), 8 deletions(-)
+For example refering to the pseudocode for ELR_EL1 and SPSR_EL1 we see
+in the MSR handling:
 
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index c3ca369882273..ffe3f5ce4b3cf 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -73,6 +73,25 @@ static u64 core_reg_offset_from_id(u64 id)
- 	return id & ~(KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK | KVM_REG_ARM_CORE);
- }
- 
-+static bool kvm_realm_validate_core_reg(u64 off)
-+{
-+	/*
-+	 * Note that GPRs can only sometimes be controlled by the VMM.
-+	 * For PSCI only X0-X6 are used, higher registers are ignored (restored
-+	 * from the REC).
-+	 * For HOST_CALL all of X0-X30 are copied to the RsiHostCall structure.
-+	 * For emulated MMIO X0 is always used.
-+	 * PC can only be set before the realm is activated.
-+	 */
-+	switch (off) {
-+	case KVM_REG_ARM_CORE_REG(regs.regs[0]) ...
-+	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
-+	case KVM_REG_ARM_CORE_REG(regs.pc):
-+		return true;
-+	}
-+	return false;
-+}
-+
- static int core_reg_size_from_offset(const struct kvm_vcpu *vcpu, u64 off)
- {
- 	int size;
-@@ -553,6 +572,9 @@ static int copy_core_reg_indices(const struct kvm_vcpu *vcpu,
- 		u64 reg = KVM_REG_ARM64 | KVM_REG_ARM_CORE | i;
- 		int size = core_reg_size_from_offset(vcpu, i);
- 
-+		if (vcpu_is_rec(vcpu) && !kvm_realm_validate_core_reg(i))
-+			continue;
-+
- 		if (size < 0)
- 			continue;
- 
-@@ -598,6 +620,9 @@ static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
- 	if (!vcpu_has_sve(vcpu))
- 		return 0;
- 
-+	if (kvm_vm_is_realm(vcpu->kvm))
-+		return 1; /* KVM_REG_ARM64_SVE_VLS */
-+
- 	if (!kvm_arm_vcpu_sve_finalized(vcpu))
- 		return 1; /* KVM_REG_ARM64_SVE_VLS */
- 
-@@ -625,6 +650,10 @@ static int copy_sve_reg_indices(const struct kvm_vcpu *vcpu,
- 		return -EFAULT;
- 	++num_regs;
- 
-+	/* For Realms only support SVE_VLS */
-+	if (kvm_vm_is_realm(vcpu->kvm))
-+		return num_regs;
-+
- 	if (!kvm_arm_vcpu_sve_finalized(vcpu))
- 		return num_regs;
- 
-@@ -705,6 +734,11 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
- 		return -EINVAL;
- 
-+	/*
-+	 * We don't filter out the register reads for Realms, like we do for
-+	 * the user writes. We expose junk data for the VMM instead of
-+	 * denying the requests.
-+	 */
- 	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
- 	case KVM_REG_ARM_CORE:	return get_core_reg(vcpu, reg);
- 	case KVM_REG_ARM_FW:
-@@ -716,12 +750,41 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	return kvm_arm_sys_reg_get_reg(vcpu, reg);
- }
- 
-+#define KVM_REG_ARM_ID_AA64DFR0_EL1	ARM64_SYS_REG(3, 0, 0, 5, 0)
-+/*
-+ * The RMI ABI only enables setting some GPRs and PC. The selection of GPRs
-+ * that are available depends on the Realm state and the reason for the last
-+ * exit.  All other registers are reset to architectural or otherwise defined
-+ * reset values by the RMM, except for a few configuration fields that
-+ * correspond to Realm parameters.
-+ */
-+static bool validate_realm_set_reg(struct kvm_vcpu *vcpu,
-+				   const struct kvm_one_reg *reg)
-+{
-+	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE) {
-+		u64 off = core_reg_offset_from_id(reg->id);
-+
-+		return kvm_realm_validate_core_reg(off);
-+	}
-+
-+	switch (reg->id) {
-+	case KVM_REG_ARM_ID_AA64DFR0_EL1:
-+	case KVM_REG_ARM64_SVE_VLS:
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
- int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- {
- 	/* We currently use nothing arch-specific in upper 32 bits */
- 	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
- 		return -EINVAL;
- 
-+	if (kvm_vm_is_realm(vcpu->kvm) && !validate_realm_set_reg(vcpu, reg))
-+		return -EINVAL;
-+
- 	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
- 	case KVM_REG_ARM_CORE:	return set_core_reg(vcpu, reg);
- 	case KVM_REG_ARM_FW:
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index b11b8821c9fbc..2b1e6fdeb4d5c 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -414,14 +414,14 @@ void kvm_arm_teardown_hypercalls(struct kvm *kvm)
- 
- int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
- {
--	return ARRAY_SIZE(kvm_arm_fw_reg_ids);
-+	return vcpu_is_rec(vcpu) ? 0 : ARRAY_SIZE(kvm_arm_fw_reg_ids);
- }
- 
- int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
- {
- 	int i;
- 
--	for (i = 0; i < ARRAY_SIZE(kvm_arm_fw_reg_ids); i++) {
-+	for (i = 0; i < kvm_arm_get_fw_num_regs(vcpu); i++) {
- 		if (put_user(kvm_arm_fw_reg_ids[i], uindices++))
- 			return -EFAULT;
- 	}
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 44aae52c473d7..47ebde943a09e 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -5638,18 +5638,18 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
- 				    sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
- }
- 
--static unsigned int num_demux_regs(void)
-+static inline unsigned int num_demux_regs(struct kvm_vcpu *vcpu)
- {
--	return CSSELR_MAX;
-+	return vcpu_is_rec(vcpu) ? 0 : CSSELR_MAX;
- }
- 
--static int write_demux_regids(u64 __user *uindices)
-+static int write_demux_regids(struct kvm_vcpu *vcpu, u64 __user *uindices)
- {
- 	u64 val = KVM_REG_ARM64 | KVM_REG_SIZE_U32 | KVM_REG_ARM_DEMUX;
- 	unsigned int i;
- 
- 	val |= KVM_REG_ARM_DEMUX_ID_CCSIDR;
--	for (i = 0; i < CSSELR_MAX; i++) {
-+	for (i = 0; i < num_demux_regs(vcpu); i++) {
- 		if (put_user(val | i, uindices))
- 			return -EFAULT;
- 		uindices++;
-@@ -5693,11 +5693,27 @@ static bool copy_reg_to_user(const struct sys_reg_desc *reg, u64 __user **uind)
- 	return true;
- }
- 
-+static inline bool kvm_realm_sys_reg_hidden_user(const struct kvm_vcpu *vcpu,
-+						 u64 reg)
-+{
-+	if (!vcpu_is_rec(vcpu))
-+		return false;
-+
-+	switch (reg) {
-+	case SYS_ID_AA64DFR0_EL1:
-+		return false;
-+	}
-+	return true;
-+}
-+
- static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
- 			    const struct sys_reg_desc *rd,
- 			    u64 __user **uind,
- 			    unsigned int *total)
- {
-+	if (kvm_realm_sys_reg_hidden_user(vcpu, reg_to_encoding(rd)))
-+		return 0;
-+
- 	/*
- 	 * Ignore registers we trap but don't save,
- 	 * and for which no custom user accessor is provided.
-@@ -5735,7 +5751,7 @@ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
- 
- unsigned long kvm_arm_num_sys_reg_descs(struct kvm_vcpu *vcpu)
- {
--	return num_demux_regs()
-+	return num_demux_regs(vcpu)
- 		+ walk_sys_regs(vcpu, (u64 __user *)NULL);
- }
- 
-@@ -5748,7 +5764,7 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
- 		return err;
- 	uindices += err;
- 
--	return write_demux_regids(uindices);
-+	return write_demux_regids(vcpu, uindices);
- }
- 
- #define KVM_ARM_FEATURE_ID_RANGE_INDEX(r)			\
--- 
-2.43.0
+  elsif PSTATE.EL =3D=3D EL2 then
+      if IsFeatureImplemented(FEAT_GCS) && GetCurrentEXLOCKEN() && !Halted(=
+) && PSTATE.EXLOCK =3D=3D '1' && ELIsInHost(EL2) then
+          EXLOCKException();
 
+and note the use of ELx for ELR/SPSR and ELy for the current exception
+level and GCSCR in I_CFFNS (ie, ELx vs ELy).  My interpretation here is
+that the use of "the relevant" rather than just using ELx throughout is
+an effort to cover the complications resulting from VHE and NV.  With
+the above pseudocode writes to the EL1 register from EL2 are also
+covered when we're in host mode - the fact that we're in host mode makes
+the EL1 access relevant.
+
+I'll reword what I've written in the commit log, like I say it's wrong.
+
+> So... TL;DR is, shouldn't this function look like:
+>=20
+> static inline bool sysregs_exlocked(struct kvm_vcpu *vcpu)
+> {
+> 	if (!kvm_has_gcs(vcpu->kvm))
+> 		return false;
+>=20
+> 	if (!(vcpu->arch.ctxt.regs.pstate & PSR_EXLOCK_BIT))
+> 		return false;
+>=20
+> 	if (is_hyp_ctxt(vcpu))
+> 		return false;
+>=20
+> 	return vcpu_read_sys_reg(vcpu, GCSCR_EL1) & GCSCR_ELx_EXLOCKEN;
+> }
+
+I think so, but I'll check through again.
+
+The confusions you identified in the bit of your mail above this were
+the result of me doing some but on all of the simplifications.  I was
+trying to make things clearer by including some code that couldn't run
+so it was more obvious that things correspond to the pseudocode, but
+really that shouldn't have had any simplifications in it - we should
+either have all the simplifications or none of them.  I'll add more
+comments instead.
+
+> > +	/*
+> > +	 * Note that the EXLOCKEN for the running EL is checked
+> > +	 * regardless of the register written to.
+> > +	 */
+>=20
+> This seems to contradict [4] - the register written to is what decides
+> whether the lock applies?
+
+[4] is section D11.4.1 of DDI0487 M.d, containing rule I_CFFNS discussed
+above.  My intent there is to express that if EXLOCK exceptions might be
+generated we check EXLOCKEN for the running EL, not one influenced by
+the written register.  Some combinations of register, EL and system
+state do not generate exceptions but those that do use the current EL's
+EXLOCKEN rather than an _ELx register using GCSCR_ELx.EXLOCKEN.
+
+--q9J3ZXhLEIPLOZjy
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmq+zJUACgkQJNaLcl1U
+h9BVtAf+PDpVuQacuftSkXtdJrBZMHKg8vNuetDKBvz9KvhrxoYoWQjRmPVuAoX2
+OcGHpNojxajl33f7aKUa28MSH8eOOSZuypPQ1cvORyeyrLK7fTnN7r/MVRpccdQl
+VgMAgLADQyNtyXisrzEFNQorksK5ns7ifIN7qsf6hRMZM11ZMHhxQ0jM4EdhmLX2
+OmHFYM3ynGbTgwltOCO3mXd4DWQOw/QFxzBXc7Y83BNhW7oWphPC0qw098y7WbRo
+pTQnmDtpms4njthjpsM8eSwsTJ+geholf5xtxuI9ssE3JhR1tuN5Su3E3hKjQM5y
+Livc7aiNwu7yvT6t0SYfIcx3omJ/Tg==
+=yzBf
+-----END PGP SIGNATURE-----
+
+--q9J3ZXhLEIPLOZjy--
