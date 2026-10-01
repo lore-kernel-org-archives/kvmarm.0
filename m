@@ -1,88 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB892D322E;
-	Thu,  1 Oct 2026 12:59:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC582499F32
+	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 13:10:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790859574; cv=none; b=WBqKCGziV7rUdpezJOrMmxCnfSBmI0XlPdfOyf4JqFH9IkJzIzkWtPd+82EWBJAQQ2NbsqpWAKuOh+2YPQ/c4QT1e5IFMracnN0HIKNA72PQlj6qRbUhGK9a+sAF6QQAjidjI3Isjc7OzZivb4WOrWDhVSls7jONRH3XpxsW5VI=
+	t=1790860235; cv=none; b=G1PwZrId+Biqm7YP6LeKStpDoi76p6Lizhyp9UjstGg76BQrOBeZpfaGSwtF+NrxIzgSPysFX79TFiVcaSRdlGIS4nbzYZafEEp33/EE4xDcqbAEE1hNge40mwCQZPFy20DsMf/DPsk/GTPHhK9UoW0zYdz8THUW6hVMI2A680M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790859574; c=relaxed/simple;
-	bh=ZxVtC/PKiyDn8e4BnlkdDd+kdXDfx5MN3algV82ScWA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hHhFP764e/Y54yP8F6YJOIbqRa6lGeQTV2VI2JWEbY19pbQ1GpiBQQofMfigTQTDAImaHwfx1wlLarhJmZzinlG6kJkyW1KwOG92ffqtqEm4m7uSiozizHBn4gRYmCNOZ7mxj5M3ntvpwg4GF0zgZQnKto+WDZ5032jXXcLLNXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VPtdhrZL; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790860235; c=relaxed/simple;
+	bh=LTZ6Km6/CpuoVK8bg9yT3WNGLHdPkHSXQmJ98kg34ZU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J0wWEbccSaX2AUTXvuF6jOpGC6zCxrpe7ORBhGPqfrcEJ2cv/RkGideWPVmYYTaEYVz2Olje3iavbrYPkNYw4gtETu9hnDwgYvtIIjSIJJ63uRLQoLxUDohoAVmi5ULaebWL67jxSDxtql7OiMCe3EE/iijKuZV563K7tMYNRl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X7g9fxCm; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VPtdhrZL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E16D1F000FF;
-	Thu,  1 Oct 2026 12:59:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790859573;
-	bh=2+QYNntd07WS7zMODeQXAyVckwYY6XqiZdZf5eCLe8k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=VPtdhrZLZS6IvmpaxQATO4OuteyezqkuAoyWrhPye1VvQ14ST5gu9mgOvbSfuyjDB
-	 UH5zO81vNqRp1IYbp/78IVOmIVhYhGjofsmECs5n3pQswCILJFth7eGwNr2SFudd5M
-	 gjIMBBAVwxo2p/78Jx8e6Bc/NMHv1+T4HbnnepH/4JEYDkRt9zbbgHaX3BEjH9r6UZ
-	 eWd9at+tcDUmTXy6Eab3A3eoxdNB1j8tsBDsDNVNV4bAFFr/NAvPoEKj2wn6e0xD6H
-	 K7XhGzsB6JfvfamVI7Shh7EqDontlUArSPxlI9o7WYa4x+M74v8PZTTX+ASwIhEFty
-	 t8/xTfDToBQ/w==
-Date: Thu, 1 Oct 2026 13:59:27 +0100
-From: Will Deacon <will@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	catalin.marinas@arm.com, joey.gouly@arm.com, seiden@linux.ibm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com,
-	steven.price@arm.com, vdonnefort@google.com, qperret@google.com,
-	tabba@google.com
-Subject: Re: [PATCH v3 10/18] KVM: arm64: Handle PSCI calls for protected VMs
- at EL2
-Message-ID: <ar5ZLxL6-mz98tpN@willie-the-truck>
-References: <20260914113338.159227-1-fuad.tabba@linux.dev>
- <20260914113338.159227-11-fuad.tabba@linux.dev>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X7g9fxCm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1790860232;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DDJyio79knKj0re/byLa1b13NjMEeAfKBhItlxqNUIQ=;
+	b=X7g9fxCmycN9dDwdR5nPCfb7lp+/QBFSFekcTr+XJv4bQDRja2hHMUdMUok6UAQP2TuhEr
+	BcIOKSaHyGGgW+sj8r1E25iIOVNNo1ab3S0VWL0iwxXDEV4tWAIuFJfvfesnsxNyHifJJc
+	enzs25RlCsuLQd9bWNwxj6tfWjc05PU=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-296-ZuB7Tdf8MJWngs7Qdq4AnQ-1; Thu, 01 Oct 2026 09:10:31 -0400
+X-MC-Unique: ZuB7Tdf8MJWngs7Qdq4AnQ-1
+X-Mimecast-MFC-AGG-ID: ZuB7Tdf8MJWngs7Qdq4AnQ_1790860230
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-39d865b11b4so7019222a91.3
+        for <kvmarm@lists.linux.dev>; Thu, 01 Oct 2026 06:10:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790860230; x=1791465030;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=DDJyio79knKj0re/byLa1b13NjMEeAfKBhItlxqNUIQ=;
+        b=gzpMi6S93SGnfBi738/LJqvqsUKnI7F4aEnpZUD1qYxtf7yPbN+bVHKb9d2GOq0iBK
+         VKDEoLi+QwvG5Thrn6FcRbRcdkfOH/Wz7rghF4i8OkP3BkkgXLPSUJCCXCRVK66ypGdS
+         DxpvYLXn0skGXpJ8BFheZQfjHTsvGM5J4KBKBwAgDCqVlU7ync0S/eN9XN1MkGA+Kb5q
+         NFjGpLojRvv7T0dSnJu6WTvncm3LW3NZrfaYO0s89pYlQwrcuB/BGxoMy79HOYjS9Vhi
+         KI3IjOqVXlTJQ7Scwkshehsosg1O+gH8Kfs0/LbZ5mjQ1IPrjb74yCyRRpRC9XDeN0jE
+         xvUQ==
+X-Forwarded-Encrypted: i=1; AKwUvByJAWkXFhMUVIPC5uGkHVjcbiHmHhT8TqeW3NtbrZPlQX82M1lIGcWG6/cwYmtnBxHcPp8TQrg=@lists.linux.dev
+X-Gm-Message-State: AFq9FYLhdQoqCNGurvCjOy6fXslc2FQCtOX44Mro4VCDTVChSnMiroMh
+	07hhYXkp4QmXRnakR/V4uioJFT2vJspGIbtuFginiHTuc2nQ+NwqND3Qm2KRrhCYXhv8bKU/xIs
+	ic70ijZQHWDdEni0mNcsgvfOnJjSTn/t/YQuxFJGzG502tYCd6B1o0/kUpA==
+X-Gm-Gg: AYBFou3NHF/XzWCc1tn5PjoCG3jyXx9Sv5z/ibDVmzVf8dBlfRaG0lwyvyBHYpGx5cT
+	/izyXW5gHn/JxrC6Cx5wLMIBKVwiTuEhmJr5Zqo4+Efpg4MUgGs+IgY2Qaz5S9lu8l5sG6wRTZM
+	YxUU9qNVo6ztLXGGxvXNChoutWqnwxz+Ra3k9bsBQh9fndJ1HjhEB9FGWh1VRJ575cgKNmjS/Jp
+	Kp3gEAM+be6PRLRLcn0agiYkMwfAGJuM2hEbZxt+wSRXiO/B3SPIUtLhr3wT1vVXHOWTVcqv+Na
+	/u5bvciqAdg+L49cc3Q1XGf88LtB+aLDlBC4oxVTE3jX9PHmaxE2ThEIjSlS79DJPy+o4Qv4GPs
+	8VZ6cpIiVd3C5ptBqhz3GxQgO3nvEs7+h3X1PSro3xg==
+X-Received: by 2002:a17:90b:4d09:b0:39e:6c69:f472 with SMTP id 98e67ed59e1d1-3a4d18c0f59mr4364884a91.49.1790860229920;
+        Thu, 01 Oct 2026 06:10:29 -0700 (PDT)
+X-Received: by 2002:a17:90b:4d09:b0:39e:6c69:f472 with SMTP id 98e67ed59e1d1-3a4d18c0f59mr4364841a91.49.1790860229444;
+        Thu, 01 Oct 2026 06:10:29 -0700 (PDT)
+Received: from [192.168.68.52] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a4f6fb6438sm1829850a91.0.2026.10.01.06.10.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Oct 2026 06:10:27 -0700 (PDT)
+Message-ID: <79509ef8-6b7b-4499-b2bf-f400b1c197bf@redhat.com>
+Date: Thu, 1 Oct 2026 23:10:19 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260914113338.159227-11-fuad.tabba@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v21 9/9] firmware: arm_rmm: hotplug: Skip memory added to
+ ZONE_MOVABLE
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+ sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com,
+ David Hildenbrand <david@kernel.org>
+References: <20261001084555.1456543-1-suzuki.poulose@arm.com>
+ <20261001084555.1456543-10-suzuki.poulose@arm.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20261001084555.1456543-10-suzuki.poulose@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: 23M6GBsgTy2q0VEB6EliM-PWt4TBukBcoYbFTntmhq4_1790860230
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Sep 14, 2026 at 12:33:30PM +0100, Fuad Tabba wrote:
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 855cb77c8bba1..d970cba12ca47 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
->  
-> +/*
-> + * Reset the vCPU to its power-on state and commit ON_PENDING -> ON, on the
-> + * target's own CPU. Returns -ECANCELED, with no side effects, if a rollback
-> + * raced the reset.
-> + */
-> +int pkvm_reset_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
-> +{
-> +	struct vcpu_reset_state *reset_state = &hyp_vcpu->vcpu.arch.reset_state;
-> +	int prev;
-> +
-> +	/*
-> +	 * Pairs with smp_store_release(&reset_state->reset, true) in
-> +	 * pvm_psci_vcpu_on(). The acquire must precede the cmpxchg: reversed, a
-> +	 * winning cmpxchg with a false acquire would leave power_state == ON
-> +	 * with the reset skipped.
-> +	 */
-> +	if (!smp_load_acquire(&reset_state->reset))
-> +		return -ECANCELED;
-> +
-> +	prev = cmpxchg_relaxed(&hyp_vcpu->power_state,
-> +			       PSCI_0_2_AFFINITY_LEVEL_ON_PENDING,
-> +			       PSCI_0_2_AFFINITY_LEVEL_ON);
-> +	if (prev != PSCI_0_2_AFFINITY_LEVEL_ON_PENDING) {
-> +		/* The only other writer of ON_PENDING is the rollback. */
-> +		WARN_ON(prev != PSCI_0_2_AFFINITY_LEVEL_OFF);
+On 10/1/26 6:45 PM, Suzuki K Poulose wrote:
+> If the hotadded memory is in ZONE_MOVABLE, we could allow that to proceed
+> without the RMM having fine grained tracking, as we won't allocate pages
+> from there for guest-memfd or kernel allocation
+> 
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: David Hildenbrand (Arm) <david@kernel.org>
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+> Changes since v20:
+>   - Use is_zone_movable_page() and only check the start_pfn
+> ---
+>   drivers/firmware/arm_rmm/rmi.c | 11 +++++++++++
+>   1 file changed, 11 insertions(+)
+> 
+Reviewed-by: Gavin Shan <gshan@redhat.com>
 
-If you go with the idea we're discussing later in the thread, then I think
-you need to drop this WARN_ON() and the comment that goes with it.
-
-Will
