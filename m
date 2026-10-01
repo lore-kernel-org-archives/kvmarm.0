@@ -1,125 +1,205 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632723DAAC2;
-	Thu,  1 Oct 2026 11:04:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECFAE4F5DFE;
+	Thu,  1 Oct 2026 11:06:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790852698; cv=none; b=DMVCebe0pN6Wbw/z72KXmiw6mLYBFFaE80fXRLJVzkodWz+q7+iLqS3hHxrEtzaM0tkRbMTlRpsRiU7n6c8LmcmSWd9dhx3WFg+cMpvPHwFC6C80XxbDmUzLROEm1lpkZIbKosvtVCE2dsiLnT5dYfCa3C5ySbdaL56iuQ82b9g=
+	t=1790852772; cv=none; b=OBGjyICoJyzlRkmhqxAdSoVuw/uAy0dNeu7jiyIxNwiukOnNzcHC2DrfF83+bhdQ+Xf6z7uRxWBJL8Y0goAEy0cXHoWoTwyyBThes9dJkbnbAnE4Vze4ie4TeGoq96/eonaRTWLYrnqaZ4q10KmxjnH6MwJFGZMeoBnhqWv7iRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790852698; c=relaxed/simple;
-	bh=bXv6GlTIZuDVTw0ZfVU3X7Dp2P4hmqJvr+EzSRPktYo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TidlNj9VBQrLcSEsvkWHu6gj11eZCUjgiiAcvYzDx7qE3etZdzNzAuZrcX8ewk3AFDwpIFE2gGQ1W3bK5zlCrGqU1wt5wQwWfq8qTJNr4BOfontpMn0nAxkoTcLJLl3LRRREUz2Tbw4s0kJvSURD3B6CQu2X7H6fQ5wC42Rpk6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vd2ritWN; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790852772; c=relaxed/simple;
+	bh=+V5xRtwSpEjK63wJ+cyKK9U6lr5/HJMU+DNwniXIDPM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kyy46k4S8G/IPiScCNjeJHMNuv6BPRY2Ii0pC5/8gjIgMLZZZKDRDUSNroetxCDJ7PtYY+/s+j79So+WaH7NQ2oWmZxjgith7R8PJbYf2HpjzGC7/Ow6JJ52pgR170tEjnbxDn5MWoSCIEGEbvIkzP/HjQ2RuQRlWXupMsclbCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=QA4Dw1zg; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vd2ritWN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07F191F000FF;
-	Thu,  1 Oct 2026 11:04:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790852697;
-	bh=yDoJGusJjj9fWwjr1asctJ4ruRZGa3Y6b+riH2Zmh94=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Vd2ritWNwMl4w47uWROaY+6SWKRnNZIMVEnU/gxN8f+/MzbMikJBnGlkjNMgnwGB5
-	 9AOaC+VY+jvCPHsb62HkbFUbznVc9uq30qgzOngP1WoVIxjBukLD9cv3V8iieB8Vbm
-	 8AceZrqbklsqPcnOBL2ANcgt3wcHd2gdS9XmKFa2tVSWfZRuwt/uy93xXipSokiBNf
-	 td7JjOuiCgojI9IUAjiRG1JZIFwVsFNudjZhBjkwWTMbgZ2Z196rPWft7pHM5i+p3v
-	 JF/sqBcIUbL8M+W8Vhw34DNs+MwGBonM/r3bUQ0OjATWW/rl5mPOcvyDLg/rNiD9CL
-	 ES7HKJRG1lDaQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xCEas-0000000Fjgd-3Ckb;
-	Thu, 01 Oct 2026 11:04:54 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	Steffen Eiden <seiden@linux.ibm.com>
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andreas Grapentin <gra@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-	Oliver Upton <oupton@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>
-Subject: Re: (subset) [PATCH v9 00/24] KVM: s390: Introduce arm64 KVM
-Date: Thu,  1 Oct 2026 12:04:51 +0100
-Message-ID: <179085262878.3865846.5787241839391727949.b4-ty@b4>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260930173441.66762-1-seiden@linux.ibm.com>
-References: <20260930173441.66762-1-seiden@linux.ibm.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="QA4Dw1zg"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D1A18497;
+	Thu,  1 Oct 2026 04:06:05 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 629933F86F;
+	Thu,  1 Oct 2026 04:06:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790852769; bh=+V5xRtwSpEjK63wJ+cyKK9U6lr5/HJMU+DNwniXIDPM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QA4Dw1zgbThIBjOabcmXcqRHYzROk+Gtzp31ZMqTM1Gizq4hBiCin0fp9CZK59U3Z
+	 lnsZgFVLWM+YD5l+BCQwOtq4F4JiM/pb/+vop0z4oiTIc3E6LJHU7eaxU6vNx7EXKu
+	 x7Lh+csDbTkySVd40j7jwq/nY4waPO8BTz6TOZ1s=
+Date: Thu, 1 Oct 2026 12:05:54 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+	will@kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+	joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+	sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <lenb@kernel.org>, Pavel Machek <pavel@kernel.org>,
+	linux-pm@vger.kernel.org
+Subject: Re: [PATCH v21 7/9] arm64: Block hibernate and kexec while RMM is
+ active
+Message-ID: <ar4-kg8Jq9BTn7Sb@arm.com>
+References: <20261001084555.1456543-1-suzuki.poulose@arm.com>
+ <20261001084555.1456543-8-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, seiden@linux.ibm.com, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, seanjc@google.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261001084555.1456543-8-suzuki.poulose@arm.com>
 
-On Wed, 30 Sep 2026 19:34:15 +0200, Steffen Eiden wrote:
-> Introduce arm-on-s390. Enable KVM-accelerated ARM CPU virtualisation on s390.
+On Thu, Oct 01, 2026 at 09:45:53AM +0100, Suzuki K Poulose wrote:
+> RMM can be deactivated only after all delegated granules have been
+> reclaimed. If a new kernel is entered while any granules remain in the
+> Realm PAS, accesses to that memory can raise a Granule Protection Fault
+> and be fatal to the new kernel.
 > 
-> The new KVM functionally depends on KVM/vfio: Use file-based reference
-> counting for KVM [5] The series itself should apply w/o those.
+> Crash kexec/kdump needs separate handling. It can be supported only once
+> the crash kernel can tolerate delegated memory inherited from the primary
+> kernel. i.e., be able to read the pages safely and fixup the GPF. Until
+> then disable the kexec completely.
 > 
-> For the original, now partially outdated, cover letter, have a look at versions
-> one to three [1].
+> Hibernate has a similar problem. The image cannot be safely saved for
+> delegated pages, as the RMM doesn't support exporting the pages.
 > 
-> [...]
+> Disable both kexec and hiberation while the RMM is active.
 
-Applied to next, thanks!
+I would mention that this adds a new arch_hibernation_available() hook
+called from hibernation_available(), otherwise the hibernation
+maintainers may not realise why they've been cc'ed.
 
-[05/24] arm64: ptrace: Use constants for compat register numbers
-        commit: 295d3df9b1e425099a4eb37954a02c4a08fdb496
-[06/24] arm64: sysreg: Convert SPSR_ELx to automatic register generation
-        commit: d3d78520068779779e1ed7aa0dd8a3ce63e1ca43
-[07/24] KVM: arm64: Access elements of vcpu_gp_regs individually
-        commit: 29d92585ab987bb80b1e78d811aaea2a8db86e62
-[08/24] KVM: arm64: Use accessor functions for core regs
-        commit: 89ed62818f10e38e64fea46d43ee6455a1beb647
-[09/24] arm64: Prepare sharing arm64 headers with s390
-        commit: df6a70516adec8b7f5fa49e1755d8ee33d980d9c
-[10/24] arm64: Share arm64 headers with s390
-        commit: c7e18ba462536e870b0ff4deca581babcac9135b
-[11/24] KVM: arm64: Share arm64 code with s390
-        commit: dcb776bfcccc9662001a75b99dbfbef55f46eb31
+Alternatively, just introduce the hook as a separate patch without any
+arch code.
 
-Note that there were a few conflicts. Please check that I resolved
-them correctly.
+> Cc: "Rafael J. Wysocki" <rafael@kernel.org>
+> Cc: Len Brown <lenb@kernel.org>
+> Cc: Pavel Machek <pavel@kernel.org>
+> Cc: linux-pm@vger.kernel.org
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+> Changes since v20:
+>  - Add arch_hibernation_available() hook for archs to have a say and drop the
+>    other checks.
+> Changes since v19:
+>  - New patch to disable kexec and hibernation with RMM
+> ---
+>  arch/arm64/kernel/hibernate.c     | 14 ++++++++++++++
+>  arch/arm64/kernel/machine_kexec.c | 11 +++++++++++
+>  include/linux/suspend.h           |  1 +
+>  kernel/power/hibernate.c          |  8 +++++++-
+>  4 files changed, 33 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kernel/hibernate.c b/arch/arm64/kernel/hibernate.c
+> index 7bf1174277772..08e03d24b93a8 100644
+> --- a/arch/arm64/kernel/hibernate.c
+> +++ b/arch/arm64/kernel/hibernate.c
+> @@ -10,6 +10,8 @@
+>   * Copyright (C) 2006 Rafael J. Wysocki <rjw@sisk.pl>
+>   */
+>  #define pr_fmt(x) "hibernate: " x
+> +
+> +#include <linux/arm-rmi-cmds.h>
+>  #include <linux/cpu.h>
+>  #include <linux/kvm_host.h>
+>  #include <linux/pm.h>
+> @@ -105,6 +107,18 @@ void notrace restore_processor_state(void)
+>  {
+>  }
+>  
+> +bool arch_hibernation_available(void)
+> +{
+> +	/*
+> +	 * If we have activated the RMM, there could be pages that are
+> +	 * delegated to the RMM. Trying to save them to the image will be fatal.
+> +	 * Also, we donate pages to the RMM at activation and restoring data
+> +	 * to those pages are going to be fatal.
+> +	 * Hence, disable the hibernation when the RMM is active
+> +	 */
+> +	return !cpus_are_stuck_in_kernel() && !is_rmm_active();
+> +}
 
-Cheers,
+For now, I would keep is_rmm_active() only in here as not to change the
+behaviour for pKVM. "disk" would disappear from /sys/power/state with
+this patch. I think it's the correct thing to do for pKVM as well but we
+can discuss this separately once this goes in (I also think pKVM using
+cpus_are_stuck_in_kernel() is a bit of a bodge but it's a handy hook
+called in the right places).
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+> +
+>  int arch_hibernation_header_save(void *addr, unsigned int max_size)
+>  {
+>  	struct arch_hibernate_hdr *hdr = addr;
+> diff --git a/arch/arm64/kernel/machine_kexec.c b/arch/arm64/kernel/machine_kexec.c
+> index 8f9bc2327dc85..48f343704cb54 100644
+> --- a/arch/arm64/kernel/machine_kexec.c
+> +++ b/arch/arm64/kernel/machine_kexec.c
+> @@ -6,6 +6,7 @@
+>   * Copyright (C) Huawei Futurewei Technologies.
+>   */
+>  
+> +#include <linux/arm-rmi-cmds.h>
+>  #include <linux/interrupt.h>
+>  #include <linux/irq.h>
+>  #include <linux/kernel.h>
+> @@ -59,6 +60,16 @@ int machine_kexec_prepare(struct kimage *kimage)
+>  		return -EBUSY;
+>  	}
+>  
+> +	/*
+> +	 * We will be able to allow kdump to proceed, once we have the support
+> +	 * for handling GPF from vmcore accesses to delegated pages. Until then
+> +	 * block kexec completely.
+> +	 */
+> +	if (is_rmm_active()) {
+> +		pr_err("Can't kexec: RMM is active.\n");
+> +		return -EBUSY;
+> +	}
+> +
+>  	return 0;
+>  }
+>  
+> diff --git a/include/linux/suspend.h b/include/linux/suspend.h
+> index b02876f1ae38a..a3815027773c5 100644
+> --- a/include/linux/suspend.h
+> +++ b/include/linux/suspend.h
+> @@ -401,6 +401,7 @@ int hibernate_quiet_exec(int (*func)(void *data), void *data);
+>  int hibernate_resume_nonboot_cpu_disable(void);
+>  int arch_hibernation_header_save(void *addr, unsigned int max_size);
+>  int arch_hibernation_header_restore(void *addr);
+> +bool arch_hibernation_available(void);
+>  
+>  #else /* CONFIG_HIBERNATION */
+>  static inline void register_nosave_region(unsigned long b, unsigned long e) {}
+> diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
+> index d2479c69d71a4..9d9d53828542f 100644
+> --- a/kernel/power/hibernate.c
+> +++ b/kernel/power/hibernate.c
+> @@ -106,11 +106,17 @@ bool hibernation_in_progress(void)
+>  	return !atomic_read(&hibernate_atomic);
+>  }
+>  
+> +__weak bool arch_hibernation_available(void)
+> +{
+> +	return true;
+> +}
+> +
+>  bool hibernation_available(void)
+>  {
+>  	return nohibernate == 0 &&
+>  		!security_locked_down(LOCKDOWN_HIBERNATION) &&
+> -		!secretmem_active() && !cxl_mem_active();
+> +		!secretmem_active() && !cxl_mem_active() &&
+> +		arch_hibernation_available();
+>  }
 
+With the comments above addressed:
 
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
