@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66A8B53FD24;
-	Thu,  1 Oct 2026 21:08:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16AA8541445;
+	Thu,  1 Oct 2026 21:08:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790888916; cv=none; b=lWMEOVL4UGBjJ+sHiAx31DklbdsHvxnLYPW4MSsWksbineDD9WA5IBGy/Ol2BVNOO6E2wG3gnGfjsia/3Jh+kIZG7w5BUHAJgrXR5nO3aCTSbt9HiWRv6cDxFk5eSDW1jmyENpkZL0HXMfoZYUzghuUJvBe62By5HnFHWA0QP9A=
+	t=1790888920; cv=none; b=jIJmd2c/vdZ7DhopPqKpNAtrXaRR7W31eCXSq/7LET8Xlim5g3Z9eUcM0PrCVqnCrXXSm9tU3ddeT8IuveochYtzyk7ve/JIojOR9RSZ1YDFtmg8ETNRLWcvFXjqZcuLvK+Nr5R5EhIDQZ6Yt1Jd1J8bcST3YoiJGmIow+2LiFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790888916; c=relaxed/simple;
-	bh=1DYRIPe8PKoi5a5tSzSos3MNlYuYMYyYfWo3uNo+uDk=;
+	s=arc-20240116; t=1790888920; c=relaxed/simple;
+	bh=AOVF4a7/lSQM973EMT8NHAVecCRsdK6HnC8EakUQ6v8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uepQqqJSlZpDYnf9NEd74YrCruEgUoK91rTyjSyNQvl09Eyiy81URiY5CsF156eaNAUmGrPFjMIHIk5jKrCzsAjbWJE8M4PV+zqn7f2J1WjWospHEzXZDJNCZBvbwyjKCA30RTwywhMx+dNJMzHyEFocRJFzPWuecw8agJK71kQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=UGploU1N; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=WBH4QpxbyAVydB6zmTbvVzdiKmWEWaOysmsqAGCsIylE0+tACocpsCfzxzfnVFzV0HZj4iTAb5oWGgf2ePLgT5QOmRpax/JyyaAHgKfwLYJVgLK2PCr9xpjVrA1D04RQtZVx75Eb6kYWz4yKQl0qMwkobdg3bOue+Fzc1HBAC7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=r/yMYNUR; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="UGploU1N"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="r/yMYNUR"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 855F6175A;
-	Thu,  1 Oct 2026 14:08:31 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 36ABE1476;
+	Thu,  1 Oct 2026 14:08:35 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 841DC3F86F;
-	Thu,  1 Oct 2026 14:08:31 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 40EC93F8C6;
+	Thu,  1 Oct 2026 14:08:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790888914; bh=1DYRIPe8PKoi5a5tSzSos3MNlYuYMYyYfWo3uNo+uDk=;
+	t=1790888918; bh=AOVF4a7/lSQM973EMT8NHAVecCRsdK6HnC8EakUQ6v8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UGploU1NkRWNdzP+rtx197afrvlO68HGFD9R3zmaSv0yoYV5ClFQEF/5wIWV0Kxre
-	 NhqEGyhsacaUI7ObMPKOGk7m4oN9vAUXmxmL8kGRrFJUWglWwoOKSu6SW2cpegBvFV
-	 PFRchRxPB+7joDANRNO+lTC/HRhRiz570XEoFz94=
+	b=r/yMYNURIb/sBvwAlX49VmqbTvsJcj06uk+J7oGM1T1xmddQ9X5YfGddxMDVpy4id
+	 IjRLsfRWFEqLPwttyo6W87jjLv2+OeTfpelbmbxpjMfIyCW/vrs6y7ZAC1c1hV5iS1
+	 vp36gxspinUV3FJTc4GZERNljxm6elvudg8XaEQQ=
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -52,9 +52,9 @@ Cc: maz@kernel.org,
 	sudeep.holla@arm.com,
 	jonathan.cameron@oss.qualcomm.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v21 20/23] KVM: arm64: CCA: WARN on injected undef exceptions
-Date: Thu,  1 Oct 2026 22:07:00 +0100
-Message-ID: <20261001210703.1597150-21-suzuki.poulose@arm.com>
+Subject: [PATCH v21 21/23] KVM: arm64: CCA: Support timers in realm RECs
+Date: Thu,  1 Oct 2026 22:07:01 +0100
+Message-ID: <20261001210703.1597150-22-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261001210703.1597150-1-suzuki.poulose@arm.com>
 References: <20261001210703.1597150-1-suzuki.poulose@arm.com>
@@ -68,33 +68,67 @@ Content-Transfer-Encoding: 8bit
 
 From: Steven Price <steven.price@arm.com>
 
-The RMM doesn't allow injection of a undefined exception into a realm
-guest. Add a WARN to catch if this ever happens.
+The RMM keeps track of the timer while the realm REC is running, but on
+exit to the normal world KVM is responsible for handling the timers.
 
-Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+A later patch adds the support for propagating the timer values from the
+exit data structure and making sure the values are in sync for KVM.
+
+Also, RMM doesn't support injecting virtual interrupts backed by Physical
+interrupts. So, use the existing software resampling mechanims for Realm
+timer interrupts.
+
 Signed-off-by: Steven Price <steven.price@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
-Changes since v15:
- * Switch to KVM_BUG() to mark the VM as bugged as well.
-Changes since v6:
- * if (x) WARN(1, ...) makes no sense, just WARN(x, ...)!
----
- arch/arm64/kvm/inject_fault.c | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/kvm/arch_timer.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index d6c4fc16f8795..d61a3ff04fabb 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -317,6 +317,7 @@ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
-  */
- void kvm_inject_undefined(struct kvm_vcpu *vcpu)
- {
-+	KVM_BUG(vcpu_is_rec(vcpu), vcpu->kvm, "Unexpected undefined exception injection to REC");
- 	if (vcpu_el1_is_32bit(vcpu))
- 		inject_undef32(vcpu);
- 	else
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index a45845f4ae4ea..428709f499205 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -56,11 +56,25 @@ static unsigned long kvm_arch_timer_get_irq_flags(void)
+ 	return kvm_vgic_global_state.no_hw_deactivation ? VGIC_IRQ_SW_RESAMPLE : 0;
+ }
+ 
++static unsigned long kvm_realm_timer_get_irq_flags(void)
++{
++	/*
++	 * RMI_REC_ENTER rejects LRs with the HW bit set, so use the existing
++	 * software resampling mechanism for Realm timer interrupts.
++	 */
++	return VGIC_IRQ_SW_RESAMPLE;
++}
++
+ static const struct irq_ops arch_timer_irq_ops = {
+ 	.get_flags	 = kvm_arch_timer_get_irq_flags,
+ 	.get_input_level = kvm_arch_timer_get_input_level,
+ };
+ 
++static const struct irq_ops realm_timer_irq_ops = {
++	.get_flags	 = kvm_realm_timer_get_irq_flags,
++	.get_input_level = kvm_arch_timer_get_input_level,
++};
++
+ static const struct irq_ops arch_timer_irq_ops_vgic_v5 = {
+ 	.get_input_level = kvm_arch_timer_get_input_level,
+ 	.queue_irq_unlock = vgic_v5_ppi_queue_irq_unlock,
+@@ -1617,8 +1631,12 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 
+ 	get_timer_map(vcpu, &map);
+ 
+-	ops = vgic_is_v5(vcpu->kvm) ? &arch_timer_irq_ops_vgic_v5 :
+-				      &arch_timer_irq_ops;
++	if (vcpu_is_rec(vcpu))
++		ops = &realm_timer_irq_ops;
++	else if (vgic_is_v5(vcpu->kvm))
++		ops = &arch_timer_irq_ops_vgic_v5;
++	else
++		ops = &arch_timer_irq_ops;
+ 
+ 	for (int i = 0; i < nr_timers(vcpu); i++)
+ 		kvm_vgic_set_irq_ops(vcpu, timer_irq(vcpu_get_timer(vcpu, i)), ops);
 -- 
 2.43.0
 
