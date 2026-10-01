@@ -1,149 +1,273 @@
-Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFBE4FE2FE
-	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 13:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9EE636B912
+	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 13:52:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790862007; cv=none; b=mFL8GIILnKJTqvVyNbPsZVKaZdO5PpLXEBRvddD2l4WZJS2LkTaFm+YPggNZz9nmLtRZpnj8SCySgdGbSXDNl0u01y8a7Q7PFwgw2xX53Hvc9GF+0feGdZo9jUuoEg46963SU75Eu8rpihIn/QhXMrlqPoe42jn9wz+6tax3vEE=
+	t=1790862731; cv=none; b=QPvqf6syyPs9F92GyWb18E4H8M/WmUuEavyk4IvWORZXEN+MApTuVcYq6ve62eA2lUa/u1jDfhj49uFrToJiabtuoMUI2PsWXCrojvc4QoNU7/93qjMRfxZb1jgAhWfcN5mvfLlS4HKGNfpZS63Aheabc3K2hVTRjOHSWuBfEXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790862007; c=relaxed/simple;
-	bh=44EZaq4IayZwFnSEKr7sAoYn1kVxome40EQ9XQHbL/E=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=ttUqSFU2eJRlzDGTJNmRG1qsRrwFlNq7qjgpwMiWQ8OAEXDw9juLWdG7fahW1oXqT2G9kAxxCIkc5ijmOltkmJ+daqqiB9U9k2znWtOmQKoHytoTDsuUdyhiVJeeaGnTyD7Lk0O1Ik6ohBV/jLh15OS9qXj3nhlwhXpNHITChEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Vvo60XYF; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=yE0Y3aPz; arc=none smtp.client-ip=103.168.172.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1790862731; c=relaxed/simple;
+	bh=xph1c43Xe1W7p8VbWvnpVws2Aq5YHWyRuoWpTrL40fo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z3XCwdyb7fdn2atNoTrlSzmVSylodgbG9BORHHKHsvGGgPxBKNYSSy6/s4Gw7V1qHEq/5sS1YnSTCNDpcdYTDKy4BumfoFUGjrY1vFHV99vL1xslSNP96IPLWjpfWvoPbT6mq9ixShbyVECh8wr0nGwjoGAnLbz+d4YUcByEUv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hFyi/QQR; arc=none smtp.client-ip=74.125.225.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Vvo60XYF";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="yE0Y3aPz"
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfout.phl.internal (Postfix) with ESMTP id 49357EC01C4
-	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 09:40:05 -0400 (EDT)
-Received: from ams-imap-03 ([10.64.2.23])
-  by ams-compute-02.internal (MEProxy); Thu, 01 Oct 2026 09:40:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1790861991;
-	 x=1790948391; bh=Uwp2ZDOoPY3tI2VNi4uZ1TmL4tpZAymbe2XPjfSWC3g=; b=
-	Vvo60XYFrWy2XPdLwFA9adRkgSN3UVtkoS97ON0g2cGLCnP/r70JvNVCKk02dTpg
-	VDO1wr+/WyiNuQcycIM88DErSPgqbuSU94W8y016zNYI446AuE+uTIftFoiNdWAu
-	FmvLnI1iVuzLIHxP+h5qSkg5dckZO8Nm+09yWalyTUwYhdEIULLSaf49/9ozGQVZ
-	sFcs+noqoxMH57+7ZYpSBQZ0lLPFqII3mpuy1wp6t5FXcrKaQ4PzCYS5EDoFdjVX
-	7PR3k6b2zyNse0qgFebEvb+PQRPXDA8ZQg1bdc1kS+clYqOgRdRJrtxkhy4vxkCH
-	2Hnoq6IBtYmhr2ACmlZdbw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1790861991; x=
-	1790948391; bh=Uwp2ZDOoPY3tI2VNi4uZ1TmL4tpZAymbe2XPjfSWC3g=; b=y
-	E0Y3aPzlONuyx97IbQDkB4tJwxI4yrGQ0Uh6wjPCIopZN/XwMX7BiVptHeT2n7J4
-	JHLSu6Lked9EkPyOzQmskgXlQ39Fa+a8Kc4jWz8ZBDEifiqfcnG3CZBJmc77mUYW
-	MDVjwJPSUCXjCOdtDGmo8d75WwK3FXVmYgcrzgHsLNZ+H2fNdkuRJZLrGoxBu1Xl
-	rbu7lhXbIOcKaH6AJyuu9qb/gRwNp1lCsolXgizZ+Jlq1EVFaG/nM2ZkkAeDGWf+
-	PI55JTlT8JMJjNyz7zWPecjxOzglND4gkkRFqQ2nxceOh7z+53xrU5Bi5v9aQdMi
-	gQm+O2J6WY1RlD8L2adRA==
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-06;
-	repo=github.com/dkim2wg/interop; date=2026-09-30; sw=lmtpprox;
-	action=sign d=arndb.de a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1790861991; d=arndb.de;
-	mf=PGFybmRAYXJuZGIuZGU+; rt=PGt2bWFybUBsaXN0cy5saW51eC5kZXY+;
-	s=fm1:rsa-sha256:abPrqXXX1tBpWAGP4ZaHF27u4UBB8J37oWJ9Q2ZvCLMV0jS
-	CpmSnUl9h1NogyF4f+5NX4kS7/1dNkIe66eXyJ/OoYd+rSLZSiSFZkovcHo3Uu1E
-	RR4DbuNGaE2QCvOjb1n+xzRGQcoT8NSVRGEu8kD96NJWFapC2GaUvOVvBvbzZCnd
-	PvqftU1+sikQ1cxne/0QS6up0oV9CRWb1ZuJfzpHsEMfmrDEvybJtMq5l8dlmNY4
-	UV9VRR2MKSNn0ZlZA3ubZD4J/Uu7DrXODGHQfQAF3LzUYkfUN+QWB45PY91r/IN0
-	9ljAuELXaSd2umPg4EKw2MzY2ML89E+4JK8HamA==;
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-06;
-	repo=github.com/dkim2wg/interop; date=2026-09-30; sw=lmtpprox;
-	action=mi-m=1; hc=12;
-	hn=cc,content-transfer-encoding,content-type,date,feedback-id,
-	from,in-reply-to,message-id,mime-version,references,subject,to;
-Message-Instance: m=1; h=sha256:BGpLFMCduRgTg7y1aJr8Ihh10vNT6FWHgqI8rrxK5fI=:44EZaq4IayZwFnSEKr7sAoYn1kVxome40EQ9XQHbL/E=;
-X-ME-Sender: <xms:oGK-aqKqS5O8pEqGgKCvh__LvsScmCIsvi5uWnyQVKCo8Zk4lQQwIQ>
-    <xme:oGK-as8GbFf_iRvMnim8wlA19YZROZHMvzVXmocivAHkXrM_d6iXEiGBw6qXEAu1S
-    fE61CGw6T95gOkCwEXVs_MLfrviBAyYn5mk8p9PXCqMwpUGceO2MWTO>
-X-ME-Proxy-Cause: dmFkZTEdx5AqovL1MTEo9qQdIf1UspZIhV2/zxzYRmwyd+bfaXPeYA2sFWVvA4rtnWQssz
-    e/2T3RJgnanif0LUm5IZ4ZAoV5grcdZq8G0huQxY29Y8wRoYp009HNfv+KgK5P0w8gmFDz
-    vuFpNcewv5coXrOM/gbTVyOCjoacUGWKLvFYxLZoD9S9vDqeLMeRitS9iJywkISeFaDiOG
-    9HH2239doQyc+FRdEt6Dz45AR1v0pEqiNZCMXnPubcaWeWH/WeBdO1NtWDppw33wUpE9ib
-    hFCl0FzAh+BwPd/iWfy1e3RgasoKugqSILaqPXGOHF4i0TS2V6y7Ghsg/2kzdADRJ67tFk
-    sAomxwNvOZE3Xl4f/XP3A66f9+z9gspYtzZhE4n76yksZa22YcktB2kJwt0AKSyvWKqBnW
-    uThVg1YEV1xUtXdeifE7P+vxCE6CDd5LJ/7+dXXv+Yf4HAaKsl9TzqphOh6uZSnAtXOjHe
-    kjhUwVDtlG2ldd0RYCQAAvdnkapM11UMiRGoBcZgec6rtl/YDvWJHkkF8HXPtm6zq/s32M
-    RM32kc482Ehq7OcsYWXwZvkFARvGyQVFMaMyJSLOcZsQHNLk6CBbaSwOB+baaHKM2a09ih
-    NBkhZ1o7/ENmZlRpShwI8nt1Qe3hGLG5Hb6dsqZU2wuIFvmIxC7QFcNP0u3Q
-X-ME-Proxy: <xmx:pWK-ak-68vXD1ePX4y31qlVBoKs_NqqSxrJHMUKlKasmB4u1PJxesw>
-    <xmx:pWK-agA8IgXnKSdK4QKof0d01XAqAbnMT9DOVIKV8plUbRPRL6zAmQ>
-    <xmx:pWK-auE1s0-gtqaMocgsUVh5dhVkU53_2Of23DTTKtkiFQiexqfdvg>
-    <xmx:pWK-aq1g8e83K9bz6wyRWDXEDrfkLCMGvfwelPYVnOiv_WIGGc2O2w>
-    <xmx:p2K-ar_Hipd_0Tf2XNyz7_3JwgUuiODDRV-TrdSqE9bmmYkIE4Xc8zHN>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 8214032A008A; Thu,  1 Oct 2026 09:39:44 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hFyi/QQR"
+Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49b912d3931so49764055e9.3
+        for <kvmarm@lists.linux.dev>; Thu, 01 Oct 2026 06:52:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790862727; x=1791467527; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=puUp6QetFCd0xmG62nmZajmHZqrboAPDRquIYk2wybY=;
+        b=hFyi/QQRtKuuNiVHMPydLiIezTnE9kotB1ksgDV0ZwHYKAwvybVHM4+HyMzZB2T4h7
+         AniWBaaS2OcTtpThU8mVWwRTntqbVNk2PbDIcEwAMw4woI8QTqXaYGs6uGRhFEqw3vqK
+         zmT7ghou7cJFoW5ATzuVWhjLWL71+WMIrSE3KBw4AfCJlSw6olAiioHFLEQTKcjhnXut
+         3Wfp7TooWw1SakKYwFTdep6ir0HWH0gucMNjh9Of+eiSp3G4feUkGjiNpiIPKo4Awol7
+         px7nfILYakdDYrC/Hqo3PgVc+N3if7lGrkJ2YKLDy0Gpra6yHY7oQjZ6U4Rz8YYmSZXa
+         ndAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790862727; x=1791467527;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=puUp6QetFCd0xmG62nmZajmHZqrboAPDRquIYk2wybY=;
+        b=JSLlmrCJ5H+8Moh5sziJfkkKFBbxMuu6oIG0v166GjrssXisInlafFBAtDsrcnfF1A
+         wZK6WZTHsA+K5VXAOunHHJ+6KTtOU6OPbhGPVg+gUR+PSrbWFGPtqSQloN8LBc4bsnM6
+         fUYru4CVl/QNtp2y56JBzedd8qzClXwKgtARZeZ0myTAD5JUwZozuMUUJJkN4oiuUyE/
+         vUhH0A6dmH6F3v2CV/K+i1UiLRCtYeZDXiyOdgaYI3aCnG9mwJi13nAs6airf+3HPYf5
+         K5QmQiy5yPCNNVuZ8R2H1mlfxKgv/HnMS8ta4Ys2O97uK8wgpL5feODjqDY16aiJKfmX
+         KzMA==
+X-Forwarded-Encrypted: i=1; AKwUvBxqfPcgJ7UhMpFYueRmEZu2DxpOv0NOrfFVr60d1/Ygh1vPE/T8Wwfm9XwhWG+E7VPOqfsKHbg=@lists.linux.dev
+X-Gm-Message-State: AFuF++mi/ROxmFQ3yl3S38r8EJEjr0SV6PuK3Rk1UiDH/niKZQ2CXeAd
+	TXKGblftJsl57oZ1H9f8yHFoa55hXxvnyZ+i363rXioEGl4ld3LMzyr7MTM/ccshww==
+X-Gm-Gg: AYBFou0CBLMB2xKdn174cJxD7gAZXWQE+JYqCGFbhvKMbyBSHNHu4utQ687DBdOE3k6
+	GunCHhnh/nR5kly9kZ7bv1o8dEPuHjpVV4PrwIsnvi2h+oiBTos8CyPGNuTHDxqOagPNGf5d9BS
+	KDQtDJUBDhTWAMNc6NXytB7yfJ6Kqqm5icTe+wxydsq93WBmhfeRY8hCTB9LebrKuuHBkvBJIRW
+	5fYJIZbAb1QQQmfBoHOH3V8ImQgkMcu1lrl/vZZFfiZaQmfb9phfjb/Br3laQ324Tmb1zM0Skj0
+	q65Xrzg3EoaWxoZDDj+0bzqeA/yzbCysTVCZHShv2j0eaix8GmCZsLBkllfXmBuhgFeTUwlvnJ9
+	71tPRn8V/BcHq0mXz1Fp54GmMQCXEKg08/qeUs/ImOf8G+XkubTpZ1EtyPTDe72HS8Xe9oVGJl/
+	gd9D4AWct3DUL9PqaXvnuHdDy2qbK+E0tPVgMlaX0VAhl+y6X7XlxJIvCXXpTQOAJYILSidGolI
+	IpW0zdOVd76dcZS9VGOdP3ghTThMKpDh2VOqv+U9pc=
+X-Received: by 2002:a05:600c:83c3:b0:49c:edd8:ba35 with SMTP id 5b1f17b1804b1-4a01aff3c4emr82048195e9.6.1790862726856;
+        Thu, 01 Oct 2026 06:52:06 -0700 (PDT)
+Received: from google.com (197.183.140.34.bc.googleusercontent.com. [34.140.183.197])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a01f947898sm75262965e9.10.2026.10.01.06.52.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Oct 2026 06:52:05 -0700 (PDT)
+Date: Thu, 1 Oct 2026 14:52:01 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: sashiko-reviews@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	Oliver Upton <oupton@kernel.org>
+Subject: Re: [PATCH v4 4/4] KVM: arm64: Add hyp_printk event to nVHE/pKVM hyp
+Message-ID: <ar5lgYD93976IO6s@google.com>
+References: <20261001084909.2937943-1-vdonnefort@google.com>
+ <20261001084909.2937943-5-vdonnefort@google.com>
+ <20261001090709.C0A971F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-ThreadId: AompHzTHtn-7
-Date: Thu, 01 Oct 2026 15:39:24 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Steffen Eiden" <seiden@linux.ibm.com>, "Marc Zyngier" <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-s390@vger.kernel.org, "Alexander Gordeev" <agordeev@linux.ibm.com>,
- "Andreas Grapentin" <gra@linux.ibm.com>,
- "Catalin Marinas" <catalin.marinas@arm.com>,
- "Christian Borntraeger" <borntraeger@linux.ibm.com>,
- "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
- "David Hildenbrand (Red Hat)" <david@kernel.org>,
- "Friedrich Welter" <fritz@linux.ibm.com>,
- "Gautam Gala" <ggala@linux.ibm.com>,
- "Hariharan Mari" <hari55@linux.ibm.com>,
- "Heiko Carstens" <hca@linux.ibm.com>,
- "Hendrik Brueckner" <brueckner@linux.ibm.com>,
- "Ilya Leoshkevich" <iii@linux.ibm.com>,
- "Janosch Frank" <frankja@linux.ibm.com>,
- "Joey Gouly" <joey.gouly@arm.com>, "Nico Boehr" <nrb@linux.ibm.com>,
- "Nina Schoetterl-Glausch" <oss@nina.schoetterlglausch.eu>,
- "Oliver Upton" <oupton@kernel.org>,
- "Paolo Bonzini" <pbonzini@redhat.com>,
- "Sean Christopherson" <seanjc@google.com>,
- "Suzuki K Poulose" <suzuki.poulose@arm.com>,
- "Sven Schnelle" <svens@linux.ibm.com>,
- "Ulrich Weigand" <Ulrich.Weigand@de.ibm.com>,
- "Vasily Gorbik" <gor@linux.ibm.com>, "Will Deacon" <will@kernel.org>,
- "Zenghui Yu" <yuzenghui@huawei.com>,
- "Fuad Tabba" <fuad.tabba@linux.dev>
-Message-Id: <40dd808c-bddf-4a7a-be81-53c64de2707d@app.fastmail.com>
-In-Reply-To: <20261001132715.108643-A-seiden@linux.ibm.com>
-References: <20260930173441.66762-1-seiden@linux.ibm.com>
- <179085262878.3865846.5787241839391727949.b4-ty@b4>
- <20261001132715.108643-A-seiden@linux.ibm.com>
-Subject: Re: (subset) [PATCH v9 00/24] KVM: s390: Introduce arm64 KVM
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20261001090709.C0A971F000FF@smtp.kernel.org>
 
-On Thu, Oct 1, 2026, at 15:27, Steffen Eiden wrote:
-> On Thu, Oct 01, 2026 at 12:04:51PM +0100, Marc Zyngier wrote:
->
-> quick fix: 
+On Thu, Oct 01, 2026 at 09:07:09AM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 4 potential issue(s) to consider:
+> - [High] kvm: trace_hyp_printk lacks format string validation leading to host panic/leak
+> - [Medium] arm64: unaligned _hyp_string_fmts section start leads to pointer corruption
+> - [Medium] kvm: out-of-bounds read in __hyp_trace_printk when trace sequence is empty
+> - [Medium] kvm: uninitialized padding in remote_event_format_hyp_printk leaks hyp memory
+> --
+> 
+> commit bc7c47888c5fbd307a50212081f15f7498660a9b
+> Author: Vincent Donnefort <vdonnefort@google.com>
+> 
+> KVM: arm64: Add hyp_printk event to nVHE/pKVM hyp
+> 
+> Create an event to allow developers to log pretty much anything into the
+> hypervisor tracing buffer with trace_hyp_printk(), just like the kernel
+> tracing has the function trace_printk().
+> 
+> > diff --git a/arch/arm64/kernel/vmlinux.lds.S b/arch/arm64/kernel/vmlinux.lds.S
+> > index af1d720209764..7f9b6c7dfe70f 100644
+> > --- a/arch/arm64/kernel/vmlinux.lds.S
+> > +++ b/arch/arm64/kernel/vmlinux.lds.S
+> > @@ -324,6 +324,10 @@ SECTIONS
+> >  		__hyp_events_start = .;
+> >  		*(SORT(_hyp_events.*))
+> >  		__hyp_events_end = .;
+> > +
+> > +		__hyp_string_fmts_start = .;
+> > +		*(_hyp_string_fmts)
+> > +		__hyp_string_fmts_end = .;
+> >  	}
+> >  #endif
+> 
+> [Severity: Medium]
+> Could __hyp_string_fmts_start capture an unaligned address before section
+> padding is applied? The compiler might align struct hyp_string_fmt
+> elements, but without an ALIGN() directive, __hyp_string_fmts_start
+> captures the location counter before any alignment padding. When calculating
+> fmt_id in the hypervisor (fmt - __hyp_string_fmts_start), this unaligned
+> offset might yield incorrect values and cause memory access errors.
 
-Ah, I was about to send the same thing.
+arg, that is correct, it depends on the number of events...
 
-> I can send the two fixup patches as a reply here for this tomorrow or 
-> later today if you want. 
+I'll move into its own .rodata.hyp_string_fmts output section.
 
-My build bot is churning away looking for more corner cases.
-I initially had the wrong base, but with this one and the other
-two I sent, things are starting to look good. I'll keep it
-running over night, but if you don't hear from me for any additional
-build regressions in the next hour, it's probably fine.
+And make the hyp_string_fmts struct const at the same time...
 
-      Arnd
+> 
+> > diff --git a/arch/arm64/kvm/hyp/include/nvhe/trace.h b/arch/arm64/kvm/hyp/include/nvhe/trace.h
+> > index 8813ff250f8e0..fa50720e2cffd 100644
+> > --- a/arch/arm64/kvm/hyp/include/nvhe/trace.h
+> > +++ b/arch/arm64/kvm/hyp/include/nvhe/trace.h
+> [ ... ]
+> > @@ -46,6 +46,70 @@ static inline pid_t __tracing_get_vcpu_pid(struct kvm_cpu_context *host_ctxt)
+> >  void *tracing_reserve_entry(unsigned long length);
+> >  void tracing_commit_entry(void);
+> >  
+> > +/*
+> > + * The trace_hyp_printk boilerplate is too fiddly to be declared with
+> > + * HYP_EVENT():
+> > + *
+> > + * The string format is stored into a kernel-accessible ELF section. The
+> > + * hypervisor only writes the format ID.
+> > + *
+> > + * The function has a variadic prototype. We have no easy way to know each
+> > + * argument width so they must all cast to u64.
+> > + */
+> > +#define REMOTE_EVENT_CUSTOM_PRINTK(...)
+> > +
+> > +#define __TO_U64_0()
+> > +#define __TO_U64_1(x)			, (u64)(x)
+> > +#define __TO_U64_2(x, ...)		, (u64)(x) __TO_U64_1(__VA_ARGS__)
+> > +#define __TO_U64_3(x, ...)		, (u64)(x) __TO_U64_2(__VA_ARGS__)
+> > +#define __TO_U64_4(x, ...)		, (u64)(x) __TO_U64_3(__VA_ARGS__)
+> > +#define __TO_U64_5(x, ...)		, (u64)(x) __TO_U64_4(__VA_ARGS__)
+> > +#define __TO_U64_6(x, ...)		, (u64)(x) __TO_U64_5(__VA_ARGS__)
+> > +#define __TO_U64_7(x, ...)		, (u64)(x) __TO_U64_6(__VA_ARGS__)
+> > +#define __TO_U64_8(x, ...)		, (u64)(x) __TO_U64_7(__VA_ARGS__)
+> > +
+> > +#define __TO_U64_X(N, ...)		CONCATENATE(__TO_U64_, N)(__VA_ARGS__)
+> > +#define __TO_U64(...)			__TO_U64_X(COUNT_ARGS(__VA_ARGS__), ##__VA_ARGS__)
+> > +
+> > +REMOTE_EVENT_FORMAT(hyp_printk, HE_STRUCT(he_field(u16, fmt_id) he_field(u64, args[])));
+> 
+> [Severity: Medium]
+> Can this leak hypervisor memory to the host or userspace through uninitialized
+> struct padding? The REMOTE_EVENT_FORMAT definition creates a structure with
+> u16 fmt_id followed by a u64 args[] array, which introduces padding bytes
+> before the array to satisfy the 8-byte alignment requirement of u64. Because
+> tracing_reserve_entry() does not zero the allocated space, these padding bytes
+> are never initialized before tracing_commit_entry() exposes them.
+
+That memory is kernel-shared memory anyway. I do not believe this is an issue.
+
+> 
+> > +extern struct hyp_event_id hyp_event_id_hyp_printk;
+> > +
+> > +static __always_inline void __trace_hyp_printk(struct hyp_string_fmt *fmt, int nr_args, ...)
+> > +{
+> > +	struct remote_event_format_hyp_printk *entry;
+> > +	va_list va;
+> > +	int i;
+> > +
+> > +	if (!atomic_read(&hyp_event_id_hyp_printk.enabled))
+> > +		return;
+> > +
+> > +	entry = tracing_reserve_entry(struct_size(entry, args, nr_args));
+> > +	if (!entry)
+> > +		return;
+> > +
+> > +	entry->hdr.id = hyp_event_id_hyp_printk.id;
+> > +	entry->fmt_id = fmt - __hyp_string_fmts_start;
+> > +
+> > +	va_start(va, nr_args);
+> > +	for (i = 0; i < nr_args; i++)
+> > +		entry->args[i] = va_arg(va, u64);
+> > +	va_end(va);
+> > +
+> > +	tracing_commit_entry();
+> > +}
+> > +
+> > +#define trace_hyp_printk(__fmt, __args...)						\
+> > +do {											\
+> > +	static struct hyp_string_fmt __used __section("_hyp_string_fmts")		\
+> > +	__hyp_str_fmt  = {								\
+> > +		.fmt		= __fmt,						\
+> > +		.nr_args	= COUNT_ARGS(__args),					\
+> > +	};										\
+> > +	BUILD_BUG_ON(sizeof(__fmt) > HYP_STRING_FMT_MAX_SIZE);				\
+> > +	/* __TO_U64 prepends a comma if there are arguments */				\
+> > +	__trace_hyp_printk(&__hyp_str_fmt, COUNT_ARGS(__args) __TO_U64(__args));	\
+> > +} while (0)
+> 
+> [Severity: High]
+> Does this macro validate that the provided format string matches the given
+> arguments? Without checking the format string (e.g. using __printf attributes
+> or if (0) printk(...) type-checking), a mismatch like
+> trace_hyp_printk("val=%d") will set nr_args to 0.
+
+It is impossible to use __printf here due to the u64 cast.
+
+> 
+> The host kernel's __hyp_trace_printk() will then unconditionally call
+> trace_seq_printf(seq, fmt); with no arguments, potentially causing
+> out-of-bounds reads or invalid dereferences when it parses the %d or %s
+> specifiers.
+> 
+> > diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
+> > index 8faaec899f92c..ebb882d0152b6 100644
+> > --- a/arch/arm64/kvm/hyp_trace.c
+> > +++ b/arch/arm64/kvm/hyp_trace.c
+> [ ... ]
+> > @@ -421,6 +424,58 @@ static const char *__hyp_enter_exit_reason_str(u8 reason)
+> >  	return strs[min(reason, HYP_REASON_UNKNOWN)];
+> >  }
+> >  
+> > +static void __hyp_trace_printk(struct remote_event_format_hyp_printk *entry, struct trace_seq *seq)
+> > +{
+> [ ... ]
+> > +	switch (hyp_str_fmt->nr_args) {
+> > +	case 0:
+> > +		trace_seq_printf(seq, fmt);
+> > +		break;
+> > +	case 1:
+> > +		trace_seq_printf(seq, fmt, entry->args[0]);
+> > +		break;
+> [ ... ]
+> > +	}
+> > +
+> > +	if (seq->buffer[trace_seq_used(seq) - 1] != '\n')
+> > +		trace_seq_putc(seq, '\n');
+> 
+> [Severity: Medium]
+> Is it possible for trace_seq_used(seq) to be 0 here? If the sequence buffer
+> was empty or in an overflowed state when passed to this function, subtracting
+> 1 would result in an out-of-bounds array read (accessing seq->buffer[-1]).
+> Would adding a check for trace_seq_used(seq) > 0 prevent this?
+
+I will fix that too.
+
+> 
+> > +}
+> 
+> -- 
+> Sashiko AI review · https://sashiko.dev/#/patchset/20261001084909.2937943-1-vdonnefort@google.com?part=4
+
+I will also change the "\"Unknown\"" even though we do not support yet external
+tooling.
+
+-- 
+Vincent
