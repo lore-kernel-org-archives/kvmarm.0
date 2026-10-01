@@ -1,169 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2779951B188
-	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 14:21:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71C7551DAEA
+	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 14:24:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790864471; cv=none; b=e7W4YFheYjDrc2uYZHoHf3JY9skgoXFIuWQHdflhShwZABGJSZ1jVmHnTTJ6E7hc4sdeTvTw4YgA+32c5KGcVI6woSsz6RwnLpeft7YEmqHADpH7D6wQIsgSbPtlBz0gRxL56IlQN+A8ixqvgJ0uTC0yyk2XKF0Zw3wCfaaeySc=
+	t=1790864650; cv=none; b=GOzvrL5J0ESrrPGuDL2QsX0ykOUXM/v9ftOhMZMpqelowDUMmQmCaBOhJQyBMM8odji7cGwY2HBycUiw1LRXRz2UQXvbp/BJQuhUFDYxQxZYyQpBUdRaYSWnLnKZZQTZZDJTURvOcrutn/01AJPm6wCpxhjjcRflcFDS8hYZCFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790864471; c=relaxed/simple;
-	bh=O5C6NWgeqkFXh7VH41+A0m8eMVNRkAKQcjqUBdUek24=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=jAbbfEZiArp94HR4BaTZCqXyTo0HT78aLQok1+JTDqrgZT2ooGzuJBMiuVRQA+J04g9IX7QHysFJZoYx0yKHoNwZ/kylI3Ni+AAWpzQrYbGpab3PkiImfdnwW2ILKHBgWQAKJwLGI3Lw1YDBTSyr1J22AHeQt28ZSIsmEZga+io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lUmi7jk/; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790864650; c=relaxed/simple;
+	bh=AsFMZI8xdqEy3Q6w8V4G/EplGrKldUILof5pMFeaVNY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QAhKjaqPcCVRYeBomTmYTQ89QmI+6wB7vJhsBTA4WiP83hVBXUIaJHZfMqBJDLyCVTOLdDEEXHjnn6pbgQB8+yq+J2z+tpW63phr8As9aXZsXDQWywOQ9u3ugSFOxueWNmXInxT8/lsOCRfUqxtjMgrVt7/M+4O/0H7pLoFD1a4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F2SeWX0J; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lUmi7jk/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 794CA1F000FF;
-	Thu,  1 Oct 2026 14:21:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F2SeWX0J"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E40291F00898;
+	Thu,  1 Oct 2026 14:24:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790864469;
-	bh=yiZaOxoZQWQLGoR/aa6tOqaFKHqeljJ2axf8kl+MhrU=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=lUmi7jk/De7gHxtoUSXTUURahqTc8Xw9dUl+wSuCn9oymy6m5dweHMwlw2f2+HmSD
-	 1F1XMoloSvMtOtj5/iJulaIyF26iUqtn21zM8Zi8QrTp3CNX/HC1gQCcLxWhjKnxVg
-	 0SYoDSAWqFTi2OmEuV+FGlGnl4MBCVs9DJwJgTxXY2b/XJwVnm245bKDhe7etx/Yko
-	 8nDQl3dmAWDesRUg0SIPZSFo0H3TacCl2CsSo/hzMB5uLV8n0bHQfVU6SylQISCUHq
-	 lUZKmRGiPGQILXyhSsSA/PLS1J7S5Bk/JNppbA7l8tBwauok6mSAcYEcOort04cxLX
-	 c0TyNWOPtkukg==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4 12/18] KVM: arm64: Prevent host PC adjustments for
- protected vCPUs
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20261001135711.1640520-13-fuad.tabba@linux.dev>
-References: <20261001135711.1640520-1-fuad.tabba@linux.dev>
- <20261001135711.1640520-13-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 01 Oct 2026 14:21:08 +0000
-Message-Id: <20261001142109.794CA1F000FF@smtp.kernel.org>
+	s=k20260515; t=1790864648;
+	bh=NyQWHHCSmslcWPV2x1ylZVNMBV/seL+Wm39p7DMyN18=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=F2SeWX0JiXkYZzwbySNjiyQFfYIvhrSpPFrJzcXtkRM0GjyZbzUUM9LE58PzSBWjH
+	 Dy4meAJYjpIJLeg2dNacqW6mqLwv0jmyvooP/5pwWNaTbg6O72ei19KLXCrnMI0zig
+	 XRX2cbJ2O+49ZFIEUfIDAoRsiV0KCvYTPORYmn9rp549fPyZuBvSMKWBlEtohcYrwj
+	 McBzxbuCt0YsSuXENRm6EBzkow3ZXyyt+I6txyQLSH0/EMgtoQ7YI5STizqTZfmvLP
+	 UkzCPtyELEEDkDHXWAlwPWqlX45n1iOrQd/87evGSooeNuvVc41kLjG5340ISqehP5
+	 42XUO5UHnbKZw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xCHhe-0000000FpD6-1kxa;
+	Thu, 01 Oct 2026 14:24:06 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Vincent Donnefort <vdonnefort@google.com>
+Cc: joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	kernel-team@android.com,
+	fuad.tabba@linux.dev,
+	qperret@google.com,
+	weilin.chang@arm.com
+Subject: Re: [PATCH v2 0/4] Fix guest_memfd and protected VMs on systems with pages larger than 4K
+Date: Thu,  1 Oct 2026 15:24:03 +0100
+Message-ID: <179086459527.3904893.12825390067092520410.b4-ty@b4>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260928095454.3255918-1-vdonnefort@google.com>
+References: <20260928095454.3255918-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, vdonnefort@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com, weilin.chang@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [Critical] kvm: host DoS via KVM_SET_VCPU_EVENTS and uncleared INCREMENT_=
-PC
-- [High] kvm: silently dropped exception injections on non-trap exits for p=
-rotected guests
---
+On Mon, 28 Sep 2026 10:54:49 +0100, Vincent Donnefort wrote:
+> This series allows booting protected VMs and guest_memfd-back VMs on
+> systems with a page size larger than 4K.
+> 
+> Currently, the fault handling assumes 4K alignment, as HPFAR_EL2
+> provides the IPA minus the bottom 12 bits regardless of the system page
+> size. This leads to mapping failures on 16K and 64K systems.
+> 
+> [...]
 
-commit 8bf814727f8778e45c8fb25a3c96ee3b58fc462e
-Author: Fuad Tabba <fuad.tabba@linux.dev>
+Applied to next, thanks!
 
-KVM: arm64: Prevent host PC adjustments for protected vCPUs
+[1/4] KVM: arm64: Fix MMFR0 TGRAN advertisement for pVMs
+      commit: 6c29285e78b5e4811145ebda382ac0ba732ce56a
+[2/4] KVM: arm64: Pass kvm_s2_fault_desc to fault_supports_stage2_huge_mapping()
+      commit: 10c5cc50f056a6425305557063ad70c3eb0e686b
+[3/4] KVM: arm64: Use kvm_s2_fault_vma_info in gmem_abort()
+      commit: 80b0b86dc5e4344e62a2fd3ee43d0ef816fe9122
+[4/4] KVM: arm64: Use kvm_s2_fault_vma_info in pkvm_mem_abort()
+      commit: 0cdcc1039200b3c4fbc2ae3f9b5c1be1bc9155e8
 
-This commit modifies __kvm_adjust_pc() to leave PC_UPDATE_REQ (including
-INCREMENT_PC and PENDING_EXCEPTION) on the host copy for protected VMs. It
-introduces kvm_adjust_pc_get() which returns NULL for protected vCPUs,
-bypassing the adjustment and leaving the flag clearing to entry/exit handle=
-rs.
+Again, a large number of conflicts (prefault, rmap). Please review the
+conflict resolution.
 
-> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exceptio=
-n.c
-> index 6e60d890afa4a..93d68b1d38be8 100644
-> --- a/arch/arm64/kvm/hyp/exception.c
-> +++ b/arch/arm64/kvm/hyp/exception.c
-> @@ -353,12 +353,19 @@ static void kvm_inject_exception(struct kvm_vcpu *v=
-cpu)
->   */
->  void __kvm_adjust_pc(struct kvm_vcpu *vcpu)
->  {
-> -	if (vcpu_get_flag(vcpu, PENDING_EXCEPTION)) {
-> -		kvm_inject_exception(vcpu);
-> -		vcpu_clear_flag(vcpu, PENDING_EXCEPTION);
-> -		vcpu_clear_flag(vcpu, EXCEPT_MASK);
-> -	} else if (vcpu_get_flag(vcpu, INCREMENT_PC)) {
-> -		kvm_skip_instr(vcpu);
-> -		vcpu_clear_flag(vcpu, INCREMENT_PC);
-> +	struct kvm_vcpu *target =3D kvm_adjust_pc_get(vcpu);
-> +
-> +	if (!target)
-> +		return;
+Cheers,
 
-[Severity: Critical]
-Can this early return leave INCREMENT_PC uncleared, leading to a host panic?
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
 
-When an unprivileged host userspace VMM manages a protected VM and sets
-SCTLR2_EL1.NMEA=3D1, a guest MMIO exit causes kvm_handle_mmio_return() to s=
-et
-INCREMENT_PC on the host vCPU copy.
 
-If entry is then aborted due to a pending signal, we exit to userspace
-with -EINTR. Because target is NULL for protected VMs, we return early here
-without clearing INCREMENT_PC.
-
-If userspace then calls KVM_SET_VCPU_EVENTS to inject an SError (with
-serror_pending=3D1), serror_is_masked() returns false, which causes
-pend_serror_exception() to call kvm_pend_exception(). This hits the asserti=
-on:
-
-WARN_ON(vcpu_get_flag(v, INCREMENT_PC));
-
-crashing the host if panic_on_warn is set. While Patch 14 attempts to fix t=
-his
-by clearing PC_UPDATE_REQ on exit from EL2, INCREMENT_PC is set at EL1 on M=
-MIO
-return after the EL2 exit.
-
-[ ... ]
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe=
-/hyp-main.c
-> index 00038a162d09b..2fcd3f8cc8fc4 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -644,6 +644,38 @@ static void handle___pkvm_host_mkyoung_guest(struct =
-kvm_cpu_context *host_ctxt)
->  	cpu_reg(host_ctxt, 1) =3D  ret;
->  }
-> =20
-> +/*
-> + * PKVM_HOST_STATE_DIRTY names the authoritative copy, the host's when s=
-et.
-> + * A loaded protected vCPU takes the request at its next entry instead.
-> + */
-> +struct kvm_vcpu *kvm_adjust_pc_get(struct kvm_vcpu *vcpu)
-> +{
-> +	struct pkvm_hyp_vcpu *hyp_vcpu;
-> +
-> +	if (!is_protected_kvm_enabled())
-> +		return vcpu;
-> +
-> +	hyp_vcpu =3D pkvm_get_loaded_hyp_vcpu();
-> +	if (!hyp_vcpu || vcpu =3D=3D &hyp_vcpu->vcpu)
-> +		return vcpu;
-> +
-> +	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu))
-> +		return NULL;
-
-[Severity: High]
-Does deferring exception injection to the entry path cause host-injected
-exceptions to be silently dropped on non-trap exits?
-
-If a protected guest exits due to an IRQ (ARM_EXCEPTION_IRQ) and userspace
-calls KVM_SET_VCPU_EVENTS with serror_pending=3D1, PENDING_EXCEPTION is set=
- on
-the host vCPU.=20
-
-On KVM_RUN, flush_hyp_vcpu() evaluates the exit code and bypasses the
-ec_handler for non-trap exits:
-
-	case ARM_EXCEPTION_IRQ:
-	case ARM_EXCEPTION_EL1_SERROR:
-	case ARM_EXCEPTION_IL:
-		break;
-
-This ignores the PENDING_EXCEPTION flag during entry. When the guest exits
-again, sync_hyp_vcpu() unconditionally clears PC_UPDATE_REQ (which includes
-PENDING_EXCEPTION), permanently losing the injected exception.
-
-[ ... ]
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261001135711.1640=
-520-1-fuad.tabba@linux.dev?part=3D12
