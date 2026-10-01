@@ -1,141 +1,96 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED22489FA5
-	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 17:23:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48852515983;
+	Thu,  1 Oct 2026 17:28:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790875395; cv=none; b=nG6yW+TYAZ0wutwcin73IRuatAhjOBVQ81zKRkxf6CaXs9zagT5YHGe831rlM7CYCCVl5Q/adcTw54vUR7ZxPwA3zvX/tesBKQpSudRs/DBxqbVwoL+vBqlWfrRJfQ56qbF/3lrvzEqZaDLvq6q+3GonLt8IaCZXdPEzxZy1bkI=
+	t=1790875684; cv=none; b=LrPZF0m0DJnUb+ZvaZUDmdVwCBEMyrg1iHhXDiDbOiGlRYCA0tkTE9AqSqDzSHgjfLd9NkadsUC/Qx2iszhALXcxKcY0R1zS9Jw/tRAbCe2JaEI1Gwvvxfzxn1/tpXhRJqtaWcJ6CaB2sE4VvsVc5mPpzm4+7PsEd7kgAcDPW4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790875395; c=relaxed/simple;
-	bh=u5/HMj3CdChqx/OnjqHNwMZ4vGC0r+b7BgrrwRCt8O8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nIIDvio0nSKyaB1/dqT+j3WwbsuBrSvsHnOTZfTijcmZo/oGPzD8t/K3DDhpHFMYwuzDFuddp9CODzVuoduJQSUWFY3/UabQzwAz84JX2ahFIt0vKHL9AfGVX+kinMDPxK/q5Q4yrV/Rd1jEGGOe3kucZ8q2UpPVZ5YoXTvzM48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LsgpwmtM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1790875684; c=relaxed/simple;
+	bh=2WHrAWI44umCgo5dA1afQgqYa6TJwqxBCWXf73OqFms=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J7DU6J68Vz47BX5lVuHhXQowhVee6LG0e5qEbrnZuwuFpBjzS6cmjqcjFfHrpRsouadzHNN0PAjPNQWGXfnvGeJSiNPTatpf7fxbjqm4eD9DTBGwrLdbUoeoAwmrJ0eJgw9sz49XgeitpI0CdpXBSvDViau9Gou6K56mQcBq71Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cAb0Gw1r; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LsgpwmtM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1790875392;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5SoYEmzKElkGom7H29Ym98qwP5JJ7+ldvMW5qXiXXtg=;
-	b=LsgpwmtMI1Lv672MhpWZfopSZhOju/RgD7DWQsdVJvKOXfjgzE4QquoGGBAEokosbPblIP
-	STmDxvxqgHQhNDH8Li6yhhI21bWoHeGWbi62dJA80G889U9trr/NoyOnTrBEZu9tKwhLI0
-	XHBkwLm3SfEW7wXVKTG7CoU+9NAMu38=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-137-FGu9FaXmPTKW1-UaOhS1SQ-1; Thu, 01 Oct 2026 13:23:10 -0400
-X-MC-Unique: FGu9FaXmPTKW1-UaOhS1SQ-1
-X-Mimecast-MFC-AGG-ID: FGu9FaXmPTKW1-UaOhS1SQ_1790875390
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-48af4a0bd0fso1799730f8f.2
-        for <kvmarm@lists.linux.dev>; Thu, 01 Oct 2026 10:23:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790875390; x=1791480190;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=5SoYEmzKElkGom7H29Ym98qwP5JJ7+ldvMW5qXiXXtg=;
-        b=NBeBMnawMP+gXahbvw1XM8NeWTJyTWP4njU3Pfc+iArR4l5BdRY/quvM94753+1c6e
-         9MTJO7UPvB9nHbc5ytSfFo+cClBaUckQN0y4XPMbqWftx7fcOATQlVSMcSk+14H9G2zT
-         9vz++lVbBlOCWwQQXODHQvAwxMA5OPzuPEUqn2D9uef+j8xVZNVgRIQ0zMh9HJ/prGEG
-         pxNQChy5MwQPtGY0rd1Q8f0Wd01gvIJJ/DpeExYg5eRV0peZyyfaet61wMzyOoNN1FJC
-         mepHnktUqHrb/p2cuCdXlACRik0qNExTMl1YnUno7SFxICZvqq2uoQFLxzY0TqW9vGFi
-         GHtQ==
-X-Forwarded-Encrypted: i=1; AKwUvBxyLgmmnCleRHID0GLiUj+HAE7aQNbZpkJaYTOCJ4BLeJUAJDI8xPy8oRFXrQfbQ2c8KF89Pls=@lists.linux.dev
-X-Gm-Message-State: AFq9FYIEYQ6mh7AYbAnqR49gkUL6Q6WAxbY3WTQkaWt+sJMkgoDOlJ18
-	KGTNgrgru7ll9GohBAmjpgZf1KcOdB3XMaTjzriI7yNuwC1PPSiB91pAcUaCGgDnj6yVDC5UZQp
-	UbiHBPhrC7vpaQIj7/D5f0Ezxz4W0ZlMjt9k2QWT/tU9HBdjghs7tmw+ckU6L7+hfvWxK2tPFk8
-	WSaxdEtcyfy7MZ1DjSAwA4TAqCSBd/bHdRvUxjyPSl
-X-Gm-Gg: AYBFou1rhCHloLOKo84g3/JQiIqfv2IaKL6QDpbHSYJy9uGfOhwiUSqbvtxY1+eVQmP
-	Ny+pHMutWDlrw6/LPREe74y7XbQbxinYrGPSPacI/T4ibx5K7rmZBcc/ntpVSvJQlURXx5DX3Py
-	rWNwAzVb6h0Q/oXJSnSszIGQ2mV58b0SdjGlMRz2sf0sciQfdrsK2Sr0Z9du3GyElO5vjvG184G
-	VY6pbpMD+Qo+cGiaz0f30mXDLuG6FyIwH3Z8mio6gpTl1jdiN7t/fBvOu8=
-X-Received: by 2002:adf:f584:0:b0:488:8352:cbfd with SMTP id ffacd0b85a97d-48b1275c0bamr297594f8f.46.1790875389661;
-        Thu, 01 Oct 2026 10:23:09 -0700 (PDT)
-X-Received: by 2002:adf:f584:0:b0:488:8352:cbfd with SMTP id
- ffacd0b85a97d-48b1275c0bamr297572f8f.46.1790875389262; Thu, 01 Oct 2026
- 10:23:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cAb0Gw1r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E73A1F000FF;
+	Thu,  1 Oct 2026 17:27:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790875682;
+	bh=W58m5D1Qq04GgCBROcqOqYr4uS4iCeytTxLxmDkHG/g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=cAb0Gw1rbEm2vy6R+OXcDxHJqLX/4dmDQcOkQOkVwveQJWdcaZ0N+F15BE8YTm4YT
+	 Glf9iGP+lxwwQvq2jxCl/Xx+TtkSIDjhxy3CWeps7DVPvQnVIkrw1dIX0PZp2jdx9g
+	 RV4fjje8yt90XBnu1P22JXo9aeoHjNVm3vQEcRyCCrsqXztIEXx5icf/ale1T762W9
+	 +xDyp/LZ8MZvXK4IxwhmPwNTpdX8IAeLDRAVm8OMhLHBV382GYG6E9I4QOx1gQPqMd
+	 v/S3bGMoYpHgkjPJH6gb6IjI4bzYgbRaCjS1BqiwFat+FHnNVGtxua0wZzNV7WzK7M
+	 R2RC6kyZdJcvg==
+Date: Thu, 1 Oct 2026 18:27:56 +0100
+From: Mark Brown <broonie@kernel.org>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Leonardo Bras <leo.bras@arm.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v21 14/15] tools: Synchronise the kernel esr.h
+Message-ID: <680fe21e-beca-4056-84e3-f501fdfed902@sirena.org.uk>
+References: <20260930-arm64-gcs-v21-0-3556644cd927@kernel.org>
+ <20260930-arm64-gcs-v21-14-3556644cd927@kernel.org>
+ <ar6NXWzQ1rMb1aId@gremlin>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <ar4HJw9zON0mG2_t@kernel.org>
-In-Reply-To: <ar4HJw9zON0mG2_t@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 1 Oct 2026 19:22:55 +0200
-X-Gm-Features: AclHuK-JbEz6Qj_Cdd61kEB-q91RWVXCa2Z9BMHFYGHf6lD5dkvwRUXQ_AoHM8M
-Message-ID: <CABgObfZhmJsjciLG7U2DVmRtzL0nHnqytnRwEoava9-sCT=TUA@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 changes for 7.3, take #3
-To: Oliver Upton <oupton@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: I7O9Y8iXXycHGMVrecmqQasTMT32OGpGbVpFiwR-VOE_1790875390
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="DprvDADVm2j3tP+g"
+Content-Disposition: inline
+In-Reply-To: <ar6NXWzQ1rMb1aId@gremlin>
+X-Cookie: Do not stamp.
+
+
+--DprvDADVm2j3tP+g
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 1, 2026 at 9:09=E2=80=AFAM Oliver Upton <oupton@kernel.org> wro=
-te:
->
-> Hi Paolo,
->
-> As promised, the patches I was waiting on have baked and we have another
-> batch of fixes for 7.3. Continuing with the trend, the VGIC is getting
-> some additional attention, particularly on the handling of a vCPU's AP
-> list.
->
-> Unless there's something truly horrible brewing in the next couple of
-> weeks, I expect this to be the last fixes pull for 7.3 with Marc taking
-> over the tree for 7.4.
+On Thu, Oct 01, 2026 at 05:47:42PM +0100, Lorenzo Stoakes (ARM) wrote:
+> On Wed, Sep 30, 2026 at 10:48:24PM +0100, Mark Brown wrote:
+> > To pick up definitions for GCS.
+> >
+> > Reviewed-by: Leonardo Bras <leo.bras@arm.com>
+> > Signed-off-by: Mark Brown <broonie@kernel.org>
+>=20
+> This seems to be out of date, with your series applied to next:
 
-Thanks, pulled and sent to Linus.
+Yeah, though some of those are changes that are in -next only so
+possibly slightly premature.  I'll resync with mainline, really this
+shouldn't be a manual sync :/
 
-Paolo
+--DprvDADVm2j3tP+g
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> Please pull.
->
-> Thanks,
-> Oliver
->
-> The following changes since commit bc502b86a3cfd89e6740f877c90d06b0263593=
-5d:
->
->   KVM: arm64: Use stage-1 leaf size for VM_PFNMAP (2026-09-30 11:03:16 -0=
-700)
->
-> are available in the Git repository at:
->
->   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags=
-/kvmarm-fixes-7.3-2
->
-> for you to fetch changes up to bc502b86a3cfd89e6740f877c90d06b02635935d:
->
->   KVM: arm64: Use stage-1 leaf size for VM_PFNMAP (2026-09-30 11:03:16 -0=
-700)
->
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 7.3, round #2
->
->  - Take a reference on the last IRQ loaded into an LR to prevent it
->    from being freed while running the guest (Marc Zyngier)
->
->  - Ensure that the ITS MOVALL command only affects LPIs that were
->    previously affined to the source redistributor (Marc Zyngier)
->
->  - Fix + test for honoring the host's trap configuration when running
->    non-protected VMs while KVM is in protected mode (Fuad Tabba)
->
->  - Use the host stage-1 mapping granularity for VM_PFNMAP mappings at
->    stage-2 (Mostafa Saleh)
->
-> ----------------------------------------------------------------
->
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmq+mBsACgkQJNaLcl1U
+h9AFugf+Psag1H7XxGuG3D4J0/kGv/EHHZDmwkNPNqHh4/wspf175JUlhs6i7NeS
+Y38pNSWL3cKJn0FLw7hI+vi4i92gbgTQSVVa3kaJlydpTYpyotb22WgoU73NchNL
+yTTVA7wbyAC1doxMCSTTuYweTipV+TMrZMlDJ+D7S+0vCYG23NrQgPo6rbB+LCDw
+Fqq9aZEcGFOEDcIR+FNSw+jDD2lGg3xv+fngs/LBmUmIXPFA7wdZPXSyNie2S7QB
+6eTPT6HOtTcY6lxfDAsuqvuW+f/O9v3pC5ITzRFuEqKEODOBbtBADTITjuF6osqd
+pfVyCXWgX4SyvytiMyoI1EYtFdIT6w==
+=lSPU
+-----END PGP SIGNATURE-----
+
+--DprvDADVm2j3tP+g--
