@@ -1,193 +1,114 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9398C525A9C
-	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 15:28:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069E852FE27
+	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 15:35:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790868502; cv=none; b=Iirgfk2uCCjNsw/77DnbFURCEJgOeD8X9L8jEH93juVQjTkNh7s/qbK/ymVHgQfeTyd4HmmAF8UtC6X6icoYL4WaMUtyWBlMpB8OsvulfSpwRYvVu4RiFcXwNEvkW9dJIpU8i/8P0uTe7EibXw5PNHysYVzOtGBHhI49+seaYNU=
+	t=1790868914; cv=none; b=eDY3zJJArdtbAM8dYhij1UAsuu7sDXcyiWaTAuKJj1Zaifr+hTo/fjR7fmxSsLLPnVPAzdB69BuA8HJqBY++/0GtPN3MabRpoySLlk0Yk4pQVzoiU9ksujsN6tyD/ZB0erp0NCVtV+asg/Pg3iiTiY0289qWbUwRf5QQUuzML4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790868502; c=relaxed/simple;
-	bh=F7uA/WesQ7CRliLTYJAYWhZReCAT4X085VkubSIQxiw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cGS+F6lhMskS6uHkRgxUoSRe7AUCW9Gi8FNOtsAscOy7JGRbm8r+1JwAx15iLLOI4Oq1vMHMJyBVGGB6knjnSjxilmxjyyW/hRzTXjhcedAWN9o8s8Zq3mySI4G8OEN+Xh7LD8xxXFbOoJbH/Uni3H6/jGDDN287yVrVYub3vCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rrV0xBOg; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1790868914; c=relaxed/simple;
+	bh=J8SPXMxNSOFyJ12yTZ000L4ggUtP99MIWpjJjVBEfvc=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=AP0jPLILeykwviwAKgpQt8JAwFPKPav8PRBSfqqC7ayeh3HWKoDDZo1fO9RgAEaR5YPD0HLDFOxqYmWyEyEgXUvrug8Y9UCiwh/9srTXoTVSC++shQ1ggbW8VL315PgBMFyk1uC9jkRgduMy0OoQzC0i+U7fPezd2IjDA6G9NIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gL9mlzcX; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rrV0xBOg"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 691Daqo31887543;
-	Thu, 1 Oct 2026 15:28:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=vgnG8rVeRbJNCaAy2IBzbkoT7ghCWn
-	R2QVi/WWha3Vs=; b=rrV0xBOgP8q6078R+SrzmauKvifGq4NiympvzFOYe3ewk6
-	HKWGwytDTchEh2YX/B6teyqNutB9496uebTQH5SxabrZaYznb1k1AiulSAEZ9Txp
-	yu52H8+LZdr/lL4PDIdoCHmpjLwh5//EdfaZ/jduDJ11bfT/O3Vg8Y40wiZrJlxP
-	ckDaNIU6wZE60IN6j3UvpfA0Bl/r4dssBrJEQmOge9+kZBcGfkM38+L3iqlbk6S/
-	NpGj3s6Uxd6IkUqlctA5oxpG5g4RwRzLG7CksJVemmweU+sjXvfhLj9Ctl2rnEXU
-	YsjYMTz2IKqdLGzpaGshw2pV1+PXvdThoqwJeXzQ==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gx5s5m1aj-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 01 Oct 2026 15:28:06 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 691DlUMQ1014241;
-	Thu, 1 Oct 2026 15:28:06 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4h0g8e9p97-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Oct 2026 15:28:06 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 691FS2Kg42205502
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 1 Oct 2026 15:28:02 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2E5452004F;
-	Thu,  1 Oct 2026 15:28:02 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C5B302004B;
-	Thu,  1 Oct 2026 15:28:01 +0000 (GMT)
-Received: from osiris (unknown [9.224.76.185])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu,  1 Oct 2026 15:28:01 +0000 (GMT)
-Date: Thu, 1 Oct 2026 17:30:05 +0200
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        "David Hildenbrand (Red Hat)" <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v9 23/24] KVM: s390: arm64: Implement basic page fault
- handler
-Message-ID: <20261001153005.314717-B-seiden@linux.ibm.com>
-References: <20260930173441.66762-1-seiden@linux.ibm.com>
- <20260930173441.66762-24-seiden@linux.ibm.com>
- <e2742ccb-6b91-463c-a148-30b7e2f41e9a@app.fastmail.com>
- <e1569c6e-94df-4609-8d94-d6319b4171cf@app.fastmail.com>
- <ar5udQI9qDAtYrGi@gremlin>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gL9mlzcX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46EFA1F000FF;
+	Thu,  1 Oct 2026 15:35:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790868912;
+	bh=8RtmO2USYkU2p9s8Ji4Zr67f9baaK6FX+xN8ZCaatuw=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=gL9mlzcXhrxlVWCMekcqOQy6swzcWq6+HsM2oTeKDVvUn01Wk0OjmgiVUgMD3clZX
+	 g9BacAG1KkpkNhPlU5J0AgsMSPymPksBWE5JjTdxtJ8bVEDzR50noXWvxP07K91wje
+	 ZetOfb0A43/801brSXmRtMGsR0jNNuJrhEEDEeZec/fZjrTHPIIUNJv6Ven/MwuOfA
+	 7IjWQNpwPKSlPiRU82rM2NHXHMxxTWGB3sw8jEe243T+VRj8TvqNV/tUEoiXoiTKZY
+	 no3z4rsGW7TncZSCd8rlmjYNIJwxE2ICOrUttGlEcQIRbclTHZfgghRl1LeKsKyRO5
+	 +KcnlZj7CJGSg==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v6 11/18] KVM: arm64: Filter out non-kernel addresses in
+ kern_hyp_va
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Vincent Donnefort" <vdonnefort@google.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20261001142849.3367614-12-vdonnefort@google.com>
+References: <20261001142849.3367614-1-vdonnefort@google.com>
+ <20261001142849.3367614-12-vdonnefort@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 01 Oct 2026 15:35:11 +0000
+Message-Id: <20261001153512.46EFA1F000FF@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ar5udQI9qDAtYrGi@gremlin>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDAxMDA2MCBTYWx0ZWRfX2dHxbg9WFAX3
- vCgw9xIT/uH9JuA8kMyp8iH4EM3shTvqHta2glpmTrhKg3ZxR+HYWRuuZ1Tb8SDqndrkHQh6/g+
- HCpaYQIFM66g6y0gOBIIndyYh7p2nCo=
-X-Authority-Analysis: v=2.4 cv=HJ5WhYtv c=1 sm=1 tr=0 ts=6abe7c07 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=kj9zAlcOel0A:10 a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=6ZjwDr74HOGPPcGGw4sA:9
- a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: jiEUxPFN5Hly8OX4mT18-m95iiCMMpxy
-X-Proofpoint-ORIG-GUID: AEF0VvpZZK8TQE1iAmu6GvIL5k8eZq4v
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDAxMDA2MCBTYWx0ZWRfX3RZjgu7EO1TA
- nqQ6f8qZDuj+FPjK69SeLZS8QCIs8YEYUY7Hyu2E4gXHbNesmy4e6o9PQ9/Xd+7/G0R80Z5nWjw
- EQqwPb3JnhC1nqV/a11F5dwG7zSablKI4L/xqnp2Ysw+fqPx6pOP57yhGFqyhQ1GQCZlgGK5n1u
- Qv0T/F/J4FJTuMevh+tDdEQDqvHDwCb9xqjco02PAhkckyMFdw/LL5fJPKPjOHHn+J7e4dBseRK
- PPRUzfVZbuMeQgVcdacTKOowhtTn/sQYW3meePxrGUws0FqjoAD8eWU2/gXiq/w3FHM1cf6XOv9
- uhX09oM//b03nI0dFItJxvZfWkP9CBB4TgEZgiTAOxASgM0FVQr124GqOTWBmPKh82X3428GbWk
- TGFa6lGK5NaWuPk+3yk4zN+LR2H94ETBltPv2d2WNlCpb9/ZUpTdebyl1YaQreR4PtlEkNODDcg
- qBrwGspG411rS5vx1YQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-10-01_04,2026-09-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 suspectscore=0 bulkscore=0 clxscore=1015 lowpriorityscore=0
- spamscore=0 impostorscore=0 phishscore=0 priorityscore=1501 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2610010060
 
-On Thu, Oct 01, 2026 at 03:36:26PM +0100, Lorenzo Stoakes (ARM) wrote:
-> On Thu, Oct 01, 2026 at 03:35:37PM +0200, Arnd Bergmann wrote:
-> > Another ones: after 34cfa9b3af17 ("KVM: arm64: Implement
-> > KVM_PRE_FAULT_MEMORY"), we are now missing a kvm_arch_pre_fault_allowed()
-> > definition in arch/s390/kvm/arm64/mmu.c:
-> >
-> > ERROR: modpost: arch/s390/kvm/arm64/kvm-arm64.ko: symbol 'kvm_arch_pre_fault_allowed' undefined!
-> >
-> > I copied the arm64 version without the pkvm reference to make it
-> > build for me.
-> >
-> >      Arnd
-> >
-> > diff --git a/arch/s390/kvm/arm64/mmu.c b/arch/s390/kvm/arm64/mmu.c
-> > index 7ee157c61d70..be16351acaae 100644
-> > --- a/arch/s390/kvm/arm64/mmu.c
-> > +++ b/arch/s390/kvm/arm64/mmu.c
-> > @@ -179,6 +179,14 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
-> >  	return ret;
-> >  }
-> >
-> > +int kvm_arch_pre_fault_allowed(struct kvm_vcpu *vcpu)
-> > +{
-> > +	if (!kvm_vcpu_initialized(vcpu))
-> > +		return -ENOEXEC;
-> > +
-> > +	return 0;
-> > +}
-> > +
-thanks. This must have slipped through somehow.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Critical] mm: EL2 memory corruption via kern_hyp_va bypass for non-TTBR1=
+ addresses
+--
 
+commit 8768ff7b59b5b3eb8674eb929fc20e711a216dbf
+Author: Vincent Donnefort <vdonnefort@google.com>
 
-> 
-> Ah the s390 <-> kvm emulation stuff.
+KVM: arm64: Filter out non-kernel addresses in kern_hyp_va
 
-no, its not emulation :) 
-We use a hardware based acclearaion approach.
+kern_hyp_va() is idempotent for the hypervisor linear space, which is handy
+for nVHE hypervisor callers. This commit adds a check based on PAGE_OFFSET
+to filter out non-kernel addresses, extending idempotence to the hypervisor
+private range.
 
-
-> 
-> Yep if it's meant to behave like arm64 then that should be correct.
-> 
-> It's odd to me that pre-faulting was not previously implemented for actual-arm64
-> but was added as part of the virtualised s390/arm64 thing automatically :)
-> 
-> Not sure if this implementation requires what s390 does with:
-> 
-> +int kvm_arch_pre_fault_allowed(struct kvm_vcpu *vcpu)
-> +{
-> +       if (kvm_is_ucontrol(vcpu->kvm))
-> +               return -EINVAL;
-no, ucontrol is a feature only for native s390 guests.
-kvm_arm64 on s390 always evaluates kvm_is_ucontrol() to false if it
-appears in shared (between both s390 KVMs) code.
-
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kv=
+m_mmu.h
+> index 57f65257bb56d..04d9f59db976f 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -128,6 +128,9 @@ static __always_inline unsigned long __kern_hyp_va(un=
+signed long v)
+>   * replace the instructions with nops.
+>   */
+>  #ifndef __KVM_VHE_HYPERVISOR__
+> +	if (is_protected_kvm_enabled() && !is_ttbr1_addr(v))
+> +		return v;
 > +
-> +       return 0;
-> +}
-> 
-> Or both conditions? One for the s390 guys.
-> 
-so just the initialized test.
 
-thanks
+[Severity: Critical]
+Does this bypass address translation for untrusted host-provided pointers
+when they are not TTBR1 addresses?
 
-	Steffen
+While this makes kern_hyp_va() idempotent for EL2 private addresses,
+kern_hyp_va_host() also uses __kern_hyp_va() on unvalidated host arguments.
+
+For example, if the host issues a hypercall like __vgic_v5_save_apr and
+passes an EL2 private address:
+
+arch/arm64/kvm/hyp/nvhe/hyp-main.c:handle___vgic_v5_save_apr() {
+    ...
+    __vgic_v5_save_apr(kern_hyp_va_host(cpu_if));
+    ...
+}
+
+Because is_ttbr1_addr(v) is false, __kern_hyp_va() will return the EL2
+private address unmodified. The handler then dereferences it:
+
+arch/arm64/kvm/hyp/vgic-v5-sr.c:__vgic_v5_save_apr() {
+    ...
+    cpu_if->vgic_apr =3D read_sysreg_s(SYS_ICH_APR_EL2);
+    ...
+}
+
+Could this regression allow an untrusted host (EL1) to execute an arbitrary
+write into EL2 private memory and break the pKVM trust boundary?
+
+>  	asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n"         /* mask with va_=
+mask */
+>  				    "ror %0, %0, #1\n"         /* rotate to the first tag bit */
+>  				    "add %0, %0, #0\n"         /* insert the low 12 bits of the tag =
+*/
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261001142849.3367=
+614-1-vdonnefort@google.com?part=3D11
