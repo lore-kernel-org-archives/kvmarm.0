@@ -1,157 +1,125 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944FC466B66
-	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 11:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632723DAAC2;
+	Thu,  1 Oct 2026 11:04:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790852591; cv=none; b=pZkX6UcklBg7x/0wMR5nw0SrwrE6Y5ueQE/tD2wtfe7keLELpx6f58GPdND15kSL5xWqiwbLHng60YBWg5PlKnzylKk4i+h3+fJNG5/+L6ZQHlj9RtqGRLZ8G43Q+0OQWuATQEInyLghByGmOzteXhPHlq4s5KTdSwU/Lza5pVM=
+	t=1790852698; cv=none; b=DMVCebe0pN6Wbw/z72KXmiw6mLYBFFaE80fXRLJVzkodWz+q7+iLqS3hHxrEtzaM0tkRbMTlRpsRiU7n6c8LmcmSWd9dhx3WFg+cMpvPHwFC6C80XxbDmUzLROEm1lpkZIbKosvtVCE2dsiLnT5dYfCa3C5ySbdaL56iuQ82b9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790852591; c=relaxed/simple;
-	bh=LFttZIhAFm+lqGn2jDq4P4s7mkNF9HzAGxFR+72KRrE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fCepO2mtcMF4xcibyfhvTGFseuxGr+RvZrKF+bC2nP10uPmZG3/XNw7fC34FP7/7xpjvzFR7Uswfi3IWmF5PVj+nZh22C7vXeqEIuZPYGPiMTvKwQ2+bixlKy+gHJsWzx+n9nFCLtC1WIqEUNnI4VeQHtFOdOXyiTRxz7yALAlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WtuQgMqM; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1790852698; c=relaxed/simple;
+	bh=bXv6GlTIZuDVTw0ZfVU3X7Dp2P4hmqJvr+EzSRPktYo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TidlNj9VBQrLcSEsvkWHu6gj11eZCUjgiiAcvYzDx7qE3etZdzNzAuZrcX8ewk3AFDwpIFE2gGQ1W3bK5zlCrGqU1wt5wQwWfq8qTJNr4BOfontpMn0nAxkoTcLJLl3LRRREUz2Tbw4s0kJvSURD3B6CQu2X7H6fQ5wC42Rpk6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vd2ritWN; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WtuQgMqM"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69175UUs4040713;
-	Thu, 1 Oct 2026 11:02:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:sender:subject:to; s=pp1; bh=ItK1CfwuIZ04jNSyZCfqu+k
-	V1LoCb64Jr8/HT5gDcpQ=; b=WtuQgMqMiWN4iF/2g4eiK3oT8hFUANWv/rv24dj
-	rLiAcMbw0JctJJ5mYj6/PWBc3BpxY1JX8ZEOPs+aEyQhjnmI5JpX8SKqM2Jk3YyN
-	ogcEGhEwfegcSHReoRUdtpsX4MQh7yqGkvt+xB6/Xo/I4TalqfcgWPVILveq4xY1
-	Qfx8eMDDv06j96koVerE9z6S95FVdfZ3t8EbyXvDJWogzY3+6yt0nGBqxOpstgwE
-	v68AqnrC9N6DP2McpbxYswk2y2ayZIde0qnJxqcs3vamUP5pSFgTbiMv8OxrwiRj
-	GXD5I1IKGNyBfO/dfDr78aLA2z9heQXtxcAfeKnF0M1wqag==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gx4fehk62-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 01 Oct 2026 11:02:35 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 69172Vqm520699;
-	Thu, 1 Oct 2026 11:02:34 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4h0hfpgdgd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Oct 2026 11:02:34 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 691B2UVe50659598
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 1 Oct 2026 11:02:30 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 678F820043;
-	Thu,  1 Oct 2026 11:02:30 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3F29920040;
-	Thu,  1 Oct 2026 11:02:30 +0000 (GMT)
-Received: from vela (unknown [9.87.140.173])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu,  1 Oct 2026 11:02:30 +0000 (GMT)
-Received: from brueckner by vela with local (Exim 4.99.5)
-	(envelope-from <brueckner@linux.ibm.com>)
-	id 1xCDz3-0000000EDXx-1JV6;
-	Thu, 01 Oct 2026 12:25:49 +0200
-Date: Thu, 1 Oct 2026 12:25:49 +0200
-From: Hendrik Brueckner <brueckner@linux.ibm.com>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v9 14/24] s390/tools: Use arm64 headers
-Message-ID: <ar41LayUDhKN26cq@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vd2ritWN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07F191F000FF;
+	Thu,  1 Oct 2026 11:04:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790852697;
+	bh=yDoJGusJjj9fWwjr1asctJ4ruRZGa3Y6b+riH2Zmh94=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=Vd2ritWNwMl4w47uWROaY+6SWKRnNZIMVEnU/gxN8f+/MzbMikJBnGlkjNMgnwGB5
+	 9AOaC+VY+jvCPHsb62HkbFUbznVc9uq30qgzOngP1WoVIxjBukLD9cv3V8iieB8Vbm
+	 8AceZrqbklsqPcnOBL2ANcgt3wcHd2gdS9XmKFa2tVSWfZRuwt/uy93xXipSokiBNf
+	 td7JjOuiCgojI9IUAjiRG1JZIFwVsFNudjZhBjkwWTMbgZ2Z196rPWft7pHM5i+p3v
+	 JF/sqBcIUbL8M+W8Vhw34DNs+MwGBonM/r3bUQ0OjATWW/rl5mPOcvyDLg/rNiD9CL
+	 ES7HKJRG1lDaQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xCEas-0000000Fjgd-3Ckb;
+	Thu, 01 Oct 2026 11:04:54 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	Steffen Eiden <seiden@linux.ibm.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+	Andreas Grapentin <gra@linux.ibm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@kernel.org>,
+	Friedrich Welter <fritz@linux.ibm.com>,
+	Gautam Gala <ggala@linux.ibm.com>,
+	Hariharan Mari <hari55@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Hendrik Brueckner <brueckner@linux.ibm.com>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Nico Boehr <nrb@linux.ibm.com>,
+	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+	Oliver Upton <oupton@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Subject: Re: (subset) [PATCH v9 00/24] KVM: s390: Introduce arm64 KVM
+Date: Thu,  1 Oct 2026 12:04:51 +0100
+Message-ID: <179085262878.3865846.5787241839391727949.b4-ty@b4>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260930173441.66762-1-seiden@linux.ibm.com>
 References: <20260930173441.66762-1-seiden@linux.ibm.com>
- <20260930173441.66762-15-seiden@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260930173441.66762-15-seiden@linux.ibm.com>
-Sender: Hendrik Brueckner <brueckner@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=FYWiV5+6 c=1 sm=1 tr=0 ts=6abe3dcb cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=kj9zAlcOel0A:10 a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=VnNF1IyMAAAA:8
- a=pIDYuyBsNzMzyUpEjcUA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDAxMDA0MiBTYWx0ZWRfXz1Q15mH2sVvj
- RknoqLGudmx52FOgkx1dkcCaCmq9oxf/2E8oKEBr1KtVKDWgTmzeNOOy7tpgHWpTZGfeE32tGTt
- O42Uw3WfNedO+DwVs7j2TZ89fZs1zwM=
-X-Proofpoint-ORIG-GUID: x45Aq5iA47UwqHleMqD5u89nRp6caifF
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDAxMDA0MiBTYWx0ZWRfX0sc7XyEBvHcK
- FuScV3wXgBKFzpJFhAsP3V/w4wX+Wpdeq3PsMD3A0SvUrL8TXWM9bioPCm7jPJ6X+qqdAKAi95L
- eggqevF1i+ArdyWah5iWhFGPvxK8jhXyiXBuRpUlcrXWNEsK8QjXNeQoygNgMJCD4FvHjkh/flG
- 2T8/AUtimtx5CONt3ZIyqzYaGwxueHQEOs0VQOH8CECtSmcb2Jp75Fzz/Pen4HQO8d3j2EUiyja
- /iga8m+lrKCmT3li7tyRcZf6mz3ZdLUJDScZOGYK4SSLJMGeiE0xP57OvwiAbCaH28M9L09w8l+
- RcXCrVvUYHLpbS1GHTTb1odBpXoai6p8viyQ6eV+R/nKb2YBEXOjWDF2BEgAYvVyODg7yRd38a4
- b7pFN1OhQLI8s5R4bOZzTI31GMxmncHXEbNCfK04R/E82RUzAS2bxaOHqRrY54IRTvNJCU8yESC
- 2o+o22kgESxsEMel06A==
-X-Proofpoint-GUID: AkvHnWmuv38b6ddyzKFfJgbkuVZgn30w
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-10-01_03,2026-09-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 clxscore=1015 impostorscore=0 spamscore=0 phishscore=0
- priorityscore=1501 malwarescore=0 bulkscore=0 lowpriorityscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
- definitions=main-2610010042
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, seiden@linux.ibm.com, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, seanjc@google.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Sep 30, 2026 at 07:34:29PM +0200, Steffen Eiden wrote:
-> Introduce a flexible system for sharing ARM64 headers with s390 KVM.
-> Selected arm64 headers or snippet of headers will be reachable by s390
-> code through asm/header.h.
+On Wed, 30 Sep 2026 19:34:15 +0200, Steffen Eiden wrote:
+> Introduce arm-on-s390. Enable KVM-accelerated ARM CPU virtualisation on s390.
 > 
-> Add copy-arm64h.awk that detects ARM64_S390_COMMON markers and extracts
-> marked section into a generated header consumable by s390. Falls back to
-> full file copy when no markers are found.
+> The new KVM functionally depends on KVM/vfio: Use file-based reference
+> counting for KVM [5] The series itself should apply w/o those.
 > 
-> Transform copied includes by replacing '#include <asm/...>' with
-> '#include <arm64/...>' and similar for uapi headers to ensure
-> correct path resolution on s390 and allow for a clear separation of s390
-> asm headers and arm64 asm headers.
+> For the original, now partially outdated, cover letter, have a look at versions
+> one to three [1].
 > 
-> Integrate this extraction into the s390/kapi target, conditional on
-> CONFIG_KVM.
-> 
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> ---
->  arch/s390/include/uapi/Kbuild        |  6 ++
->  arch/s390/tools/Makefile             |  6 +-
->  arch/s390/tools/Makefile.arm64h      | 55 ++++++++++++++++++
->  arch/s390/tools/copy-arm64h-full.awk | 50 +++++++++++++++++
->  arch/s390/tools/copy-arm64h.awk      | 83 ++++++++++++++++++++++++++++
+> [...]
 
-Thanks for the updates.
+Applied to next, thanks!
 
-Reviewed-by: Hendrik Brueckner <brueckner@linux.ibm.com>
+[05/24] arm64: ptrace: Use constants for compat register numbers
+        commit: 295d3df9b1e425099a4eb37954a02c4a08fdb496
+[06/24] arm64: sysreg: Convert SPSR_ELx to automatic register generation
+        commit: d3d78520068779779e1ed7aa0dd8a3ce63e1ca43
+[07/24] KVM: arm64: Access elements of vcpu_gp_regs individually
+        commit: 29d92585ab987bb80b1e78d811aaea2a8db86e62
+[08/24] KVM: arm64: Use accessor functions for core regs
+        commit: 89ed62818f10e38e64fea46d43ee6455a1beb647
+[09/24] arm64: Prepare sharing arm64 headers with s390
+        commit: df6a70516adec8b7f5fa49e1755d8ee33d980d9c
+[10/24] arm64: Share arm64 headers with s390
+        commit: c7e18ba462536e870b0ff4deca581babcac9135b
+[11/24] KVM: arm64: Share arm64 code with s390
+        commit: dcb776bfcccc9662001a75b99dbfbef55f46eb31
+
+Note that there were a few conflicts. Please check that I resolved
+them correctly.
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
