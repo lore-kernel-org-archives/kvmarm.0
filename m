@@ -1,203 +1,113 @@
-Received: from mta0.migadu.com (out-248.mta0.migadu.com [91.218.175.248])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F22AF348C7F
-	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 14:32:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.248
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A067E3B2FDF;
+	Thu,  1 Oct 2026 14:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790865159; cv=none; b=FXTmSFa+vUoqh+9D3NV54OjONSewMjsBbsgWwHuPKhkbgqjeju6mGF9I5r4GtwG8w1NnO4uTPnrXqpk4iMxsZp2mQqObycTr5el/Mb5tKvoXeLI1uvvZEf4kvCX6d591tdJuepIzb7BevFg3nXex2+bfai2iHlrOhEr6UK7S91M=
+	t=1790865402; cv=none; b=Cr/JbnQLYXOnE8N8wAp6grkXw/d5VL0q2Oy6vhvB+oY1KZy7Y6caE88vwC3URZad4IlEr6W1gO8yzax+zxMjyC/7uTJfdB5vRS4uRorgCGYX0/6ZJ2kEXCFG98g2+1N6h0gwy/vtC5fhQG5RLfKDIbdjKWwtZrqej/Xl3d7a/08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790865159; c=relaxed/simple;
-	bh=999ozKnr12qqAVi3LloNIavbUCDjUOpW5yhPr1EvpdY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UTiXsm9fWfSU/FdgYEJssTROOjfyReg/AoI3zq61YK1B0EYvp5jLpZZ29GILU+dRttFEPOErRBzeJJ/kJj+3fPtTwz+hZjgyUAooWbxdIUEd8xRc/EHerZ+oywtocAmFiuruwoOA0VfzuClfyK8gPX8QCF2GiEgmrD2W3Ev2dnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vh45FxGZ; arc=none smtp.client-ip=91.218.175.248
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1790865402; c=relaxed/simple;
+	bh=2kxmO6iReapZ9oKKYWiYUJYQSMUSU1Lhiqom05w8dw0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kGuek9lkqkzz6+4zJ97jR55NAVWwAnBCxKDBOPQVZV30wcFGYCep7lFnUUXZKfCtykLcfrJYr/Ddr8TYc6F0yjNXT9tFaS3cikddjkhns4Y35lratQEZG9dq6lo5ndZaJnXGuOTlSMt5DtDh47FzbYIu46Mpj4fXnk/bf4ELiJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oRA3ndmu; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vh45FxGZ"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=999ozKnr12qqAVi3LloNIavbUCDjUOpW5yhPr1EvpdY=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790865152; v=1; x=1791469952;
- b=vh45FxGZMYL2NJUlXzuF6T2deLvIi8t9sUvqZH/u5CklXNGXoQgiKwWnGyOyLaDz4cazp/Qo
- 9+KiQxZPEDjOFquuLTk7prQ6gR+DE48cRnFUKU1StDsyvk7m2ynexpTWOin2rDJ3NQaYaaqXsVl
- vVgpHg1HMpt5Nbmy+g4yhwsc=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id c9971480cf311f5e;
-	Thu, 01 Oct 2026 14:32:32 +0000
-X-Mizu-Trace-ID: c9971480cf311f5e
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5ba429b64c5so8158e87.1
-        for <kvmarm@lists.linux.dev>; Thu, 01 Oct 2026 07:32:32 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBzGt4tzzM1CE6r2mqlS5ZXQ/F9FIYWHbjbE71s1Cfqx7hKISBPvwLHpuUuQOKfK26NLR8BSBXk=@lists.linux.dev
-X-Gm-Message-State: AFq9FYIVOk8BG28YIzmy+yzexSh3X0V6AqDKlh8Iurpn/0oV/p00J9d3
-	oKcnrqeZ7X77v/m3On57xDIPm5pg1XkHFuoS/x/qUDin1TJ0A5m3gQOEURmL66CGQ9TrE5T9Rhk
-	Stx1mGLvyhfyu6qu/oPNrikCQqfmBr7IsiMPdJc2G
-X-Received: by 2002:a05:6512:3194:b0:5b8:d04b:a1be with SMTP id
- 2adb3069b0e04-5bb7944842dmr58567e87.2.1790865151162; Thu, 01 Oct 2026
- 07:32:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oRA3ndmu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 731E11F000FF;
+	Thu,  1 Oct 2026 14:36:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790865397;
+	bh=KqppwbTyT6zkR1AvrZPfMSRvNskOl/Jz4/VeCTg9S+8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=oRA3ndmuic8x5tRK8Thog7048p9/0q1/4fqTgxaNdxfq2ksuOlOiYGYor6Edw5mFh
+	 gbvysr6lqUVRtSROKKKFcydrUR4RABYSu2qIUBBNEEbKqM1p2z4uKUQHArX06X3jJ6
+	 MFbDk23qOyANQ6TQq68cZYSKJCPBFnzLFV0R9ES5BRxzev1bjVfOz5tZBV3AqnGJ37
+	 AkHkZPtEfhJU+WU+tWgk2Ug6+d9PXdoDBnZtKaMRNnQvgc6gOh6WzgQGIsnMGG8vih
+	 oR/uj2xdHGU8jqPDFk+wEZo3O+KuG2Q9D4/q3JeXQmQSYTJfy5KRO6vlq6A7UTzpMB
+	 O/3vpWAUJQPVQ==
+Date: Thu, 1 Oct 2026 15:36:26 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Steffen Eiden <seiden@linux.ibm.com>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Andreas Grapentin <gra@linux.ibm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, "David Hildenbrand (Red Hat)" <david@kernel.org>, 
+	Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>, Gautam Gala <ggala@linux.ibm.com>, 
+	Hariharan Mari <hari55@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
+	Hendrik Brueckner <brueckner@linux.ibm.com>, Ilya Leoshkevich <iii@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, Marc Zyngier <maz@kernel.org>, 
+	Nico Boehr <nrb@linux.ibm.com>, Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>, 
+	Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, Ulrich Weigand <Ulrich.Weigand@de.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v9 23/24] KVM: s390: arm64: Implement basic page fault
+ handler
+Message-ID: <ar5udQI9qDAtYrGi@gremlin>
+References: <20260930173441.66762-1-seiden@linux.ibm.com>
+ <20260930173441.66762-24-seiden@linux.ibm.com>
+ <e2742ccb-6b91-463c-a148-30b7e2f41e9a@app.fastmail.com>
+ <e1569c6e-94df-4609-8d94-d6319b4171cf@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20261001135711.1640520-1-fuad.tabba@linux.dev>
-In-Reply-To: <20261001135711.1640520-1-fuad.tabba@linux.dev>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 1 Oct 2026 15:31:55 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTyiwG6=VT1kSfyt+A1aMoTG4q6wdYkNmnDuwAbkz3YsMg@mail.gmail.com>
-X-Gm-Features: AclHuK8-UiMlAsIzvUJY49qlEjdh0TC9CmnSfweB2LsKfWfa236H8RRsE5ESvog
-Message-ID: <CA+EHjTyiwG6=VT1kSfyt+A1aMoTG4q6wdYkNmnDuwAbkz3YsMg@mail.gmail.com>
-Subject: Re: [PATCH v4 00/18] KVM: arm64: Confine protected VM vCPU state to EL2
-To: maz@kernel.org
-Cc: catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, 
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	mark.rutland@arm.com, steven.price@arm.com, vdonnefort@google.com, 
-	qperret@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e1569c6e-94df-4609-8d94-d6319b4171cf@app.fastmail.com>
 
-Hi Marc,
+On Thu, Oct 01, 2026 at 03:35:37PM +0200, Arnd Bergmann wrote:
+> Another ones: after 34cfa9b3af17 ("KVM: arm64: Implement
+> KVM_PRE_FAULT_MEMORY"), we are now missing a kvm_arch_pre_fault_allowed()
+> definition in arch/s390/kvm/arm64/mmu.c:
+>
+> ERROR: modpost: arch/s390/kvm/arm64/kvm-arm64.ko: symbol 'kvm_arch_pre_fault_allowed' undefined!
+>
+> I copied the arm64 version without the pkvm reference to make it
+> build for me.
+>
+>      Arnd
+>
+> diff --git a/arch/s390/kvm/arm64/mmu.c b/arch/s390/kvm/arm64/mmu.c
+> index 7ee157c61d70..be16351acaae 100644
+> --- a/arch/s390/kvm/arm64/mmu.c
+> +++ b/arch/s390/kvm/arm64/mmu.c
+> @@ -179,6 +179,14 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  	return ret;
+>  }
+>
+> +int kvm_arch_pre_fault_allowed(struct kvm_vcpu *vcpu)
+> +{
+> +	if (!kvm_vcpu_initialized(vcpu))
+> +		return -ENOEXEC;
+> +
+> +	return 0;
+> +}
+> +
 
-Here's a link to the series based on kvmarm/next, conflicts resolved:
+Ah the s390 <-> kvm emulation stuff.
 
-https://android-kvm.googlesource.com/linux/+/refs/heads/tabba/pkvm-core-b-v4-kvmarm-next
+Yep if it's meant to behave like arm64 then that should be correct.
 
-Cheers,
-/fuad
+It's odd to me that pre-faulting was not previously implemented for actual-arm64
+but was added as part of the virtualised s390/arm64 thing automatically :)
 
-On Thu, 1 Oct 2026 at 14:57, Fuad Tabba <fuad.tabba@linux.dev> wrote:
->
-> Hi folks,
->
-> Changes since v3 [1]:
->   - A protected vCPU that EL2 holds powered off reads as
->     KVM_MP_STATE_UNINITIALIZED, in place of a new bool. (Marc)
->   - The marshalling and PSCI patches access the host copy through the
->     vCPU accessors, with every assignment on one line. (Marc)
->   - The PC adjustment pair is kvm_adjust_pc_get()/put() and tests for
->     the hyp vCPU directly. (Marc)
->   - CPU_OFF clears the reset flag before its release of OFF, CPU_ON's
->     relaxed cmpxchg is ordered by its control dependency, and the
->     CPU_ON rollback stores OFF with a release. pkvm_reset_vcpu()
->     carries the CPU_ON/CPU_OFF sequence as a comment and drops its
->     WARN_ON(). (Vincent, Will)
->   - Collected Reviewed-bys.
->
-> Following the vCPU state-sync series [3], this series completes the
-> job for protected VMs: a protected guest's register state stays at
-> EL2, and the host sees only what handling each exit requires.
->
-> EL2 marshals a protected vCPU's state per exception class instead of
-> copying the whole context both ways. It owns the vCPU's trap
-> configuration, system register reset and HVC handling, and implements
-> PSCI itself: AFFINITY_INFO is left to the host, and CPU_ON and CPU_OFF
-> are resolved at EL2 with the host only scheduling the target or
-> stopping it. A protected guest's TRNG calls, which the host handled
-> until now, return NOT_SUPPORTED until TRNG for protected guests
-> follows. EL2 implements PSCI 1.1, so a protected guest also loses the
-> functions the host supports above that version, SYSTEM_OFF2 included.
-> Host ioctls that would reach the state EL2 owns fail with -EPERM, so a
-> protected VM's state isn't save/restorable. All of this is scoped
-> to KVM_VM_TYPE_ARM_PROTECTED, and pkvm.rst describes the resulting API.
->
-> The kvmtool changes that go with this are posted separately [4].
->
-> Patches 1 to 3 go out separately: the HCR_EL2.VSE fix [5], and the
-> host vCPU VM read and pin fixes, patches 4 and 5 of the host hypercall
-> fixes series [2]. None of the three is part of this series. They're
-> carried so the series applies as is and Sashiko can run on it.
->
-> The KVM_ARM_PREFERRED_TARGET documentation fix [6] went out just ahead
-> of v1. Nothing here depends on it to apply, but patch 18 documents vCPU
-> feature availability as something the capabilities report, while
-> api.rst 4.83 still points userspace at a bitmap that has always been
-> empty.
->
-> The series is structured as follows:
->
->   01:     The HCR_EL2.VSE fix, posted separately.
->   02-03:  The host vCPU VM read and pin fixes, posted separately.
->   04:     Steal time disabled for protected VMs.
->   05-06:  Per-exception-class entry handlers; EL2 owns a protected
->           vCPU's trap configuration.
->   07-09:  Timer state, system register reset and HVC handling at EL2.
->   10-11:  PSCI at EL2, and the KVM_ARM_VCPU_INIT and PSCI version
->           restrictions.
->   12-14:  Host PC adjustments blocked; an UNDEF at EL2 for exit
->           classes the host doesn't emulate; per-class state
->           marshalling.
->   15-16:  Host changes to private state, and host power-on of a vCPU
->           EL2 holds powered off, rejected.
->   17:     Capability allowlist.
->   18:     Documentation.
->
-> Still to come: selftests, TRNG, self-hosted debug and SVE for protected
-> guests, and much more, as separate series.
->
-> Based on v7.3-rc3 (fd73f4a665989).
->
-> Cheers,
-> /fuad
->
-> [1] https://lore.kernel.org/all/20260914113338.159227-1-fuad.tabba@linux.dev/
-> [2] https://lore.kernel.org/all/20260915123846.2317931-1-fuad.tabba@linux.dev/
-> [3] https://lore.kernel.org/all/20260729131823.2021516-1-fuad.tabba@linux.dev/
-> [4] https://lore.kernel.org/all/20260831192406.1341841-1-fuad.tabba@linux.dev/
-> [5] https://lore.kernel.org/all/20260829071120.2522788-1-fuad.tabba@linux.dev/
-> [6] https://lore.kernel.org/all/20260831162815.269851-1-fuad.tabba@linux.dev/
->
-> Fuad Tabba (16):
->   KVM: arm64: Sync HCR_EL2.VSE back to the host vCPU under pKVM
->   KVM: arm64: Validate the host vCPU's VM before reading it under pKVM
->   KVM: arm64: Pin the host vCPU before adjusting its PC under pKVM
->   KVM: arm64: Disable steal time for protected VMs
->   KVM: arm64: Skip fixed-feature state flush for protected vCPUs
->   KVM: arm64: Add system register reset framework for protected VMs
->   KVM: arm64: Implement HVC handling for protected guests at EL2
->   KVM: arm64: Handle PSCI calls for protected VMs at EL2
->   KVM: arm64: Restrict KVM_ARM_VCPU_INIT and PSCI version for protected
->     VMs
->   KVM: arm64: Prevent host PC adjustments for protected vCPUs
->   KVM: arm64: Inject an UNDEF at EL2 for unhandled protected guest exits
->   KVM: arm64: Add per-EC entry/exit state marshalling for protected
->     guests
->   KVM: arm64: Reject host access to protected VM private state
->   KVM: arm64: Reject host power-on of a vCPU that EL2 holds powered off
->   KVM: arm64: Advertise the capabilities that protected VMs support
->   KVM: arm64: Document the protected VM userspace API
->
-> Marc Zyngier (2):
->   KVM: arm64: Introduce per-EC entry handlers for pKVM
->   KVM: arm64: Add {flush,sync}_hyp_timer_state() primitives
->
->  Documentation/virt/kvm/api.rst                |  27 +-
->  .../virt/kvm/arm/fw-pseudo-registers.rst      |   2 +
->  Documentation/virt/kvm/arm/pkvm.rst           | 164 ++++-
->  Documentation/virt/kvm/devices/vcpu.rst       |   3 +-
->  arch/arm64/include/asm/kvm_host.h             |  22 +-
->  arch/arm64/include/asm/kvm_hyp.h              |   4 +
->  arch/arm64/include/asm/kvm_pkvm.h             |  33 +
->  arch/arm64/kvm/arm.c                          |  76 ++-
->  arch/arm64/kvm/guest.c                        |  11 +
->  arch/arm64/kvm/hyp/exception.c                |  26 +-
->  arch/arm64/kvm/hyp/include/hyp/adjust_pc.h    |  48 ++
->  arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |  20 +
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 595 +++++++++++++++++-
->  arch/arm64/kvm/hyp/nvhe/pkvm.c                | 422 ++++++++++++-
->  arch/arm64/kvm/hyp/nvhe/switch.c              |  29 +-
->  arch/arm64/kvm/hyp/nvhe/sys_regs.c            |  60 ++
->  arch/arm64/kvm/hypercalls.c                   |   7 +
->  arch/arm64/kvm/pkvm.c                         |  21 +-
->  arch/arm64/kvm/psci.c                         |  11 +-
->  arch/arm64/kvm/pvtime.c                       |  10 +-
->  20 files changed, 1503 insertions(+), 88 deletions(-)
->
->
-> base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
-> --
-> 2.39.5
->
+Not sure if this implementation requires what s390 does with:
+
++int kvm_arch_pre_fault_allowed(struct kvm_vcpu *vcpu)
++{
++       if (kvm_is_ucontrol(vcpu->kvm))
++               return -EINVAL;
++
++       return 0;
++}
+
+Or both conditions? One for the s390 guys.
+
+--
+Cheers, Lorenzo
