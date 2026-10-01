@@ -1,231 +1,139 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F35E4A4410;
-	Thu,  1 Oct 2026 08:17:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE633164D8;
+	Thu,  1 Oct 2026 08:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790842672; cv=none; b=DY77PL6270ye40xZQCGN16qQ21MKfsXXjm/oKJQStuQNfC4jA4aIV0j3JqnmI52iiDcGNxuNYISC5Li6Hjn8IN1iTQufq3a55epmFsS0rJNhk3JhEIlDUrk+xB4nwvD5iUnw2kFyxdwkYI0twqaTPxHFcRFFU4ah0mMNplq2H9I=
+	t=1790843483; cv=none; b=gsB4SGggStOREZ2JZ8EeLW0KL3XMcuZpxFrBmr9aWLqlRjoZT8oCPDequ4vg/n8R0kz945UUhpHn1j32QXPpxMTIkVzJ6FKiRZXE8IAye1WoLMQdV4pTxUC9iIWtVMZOWgz+Tjd98gDcwLYScPDLLCtv+rjsujJ9wwdgfbm2Bj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790842672; c=relaxed/simple;
-	bh=TJwc5O7ntGMNZfYYJkuk0LGKcByvcIHqyNd0eoZ3S9g=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=YB7ZSPQt7MHPZZNhuprsk8IkWk/ibNjsUs/DTdDeoYJmIgQ/QTLOt6vTrff7ZvIz5CYjktmjodFBHm6ORvcJSvYvhx11IMl7ZIID2HxfVRfKkAiTSR7/1A3A4x5zuGt4/NCMLY3ooOqVLbmIFAjwiv85rVSuUbw8fpwmOibcMfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=CewNhKN7; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1790843483; c=relaxed/simple;
+	bh=9+N+gmAtMgLHYkLcQGdYJLjC+s7rwmcWD9JNQgFqIkQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W/ttNj0YMu4h+LePIJvrBbm6wvZV/8AKUQEZFZjngJxSxie9FqQ8RqwYgyfYNXg5dXWZeeO0fVqBw26Rt1YtjPr3GU/za04WiE2Bempi3mHs2vFYPfVaqugv3QbRcfZprHohBcgyVEQfCyUdrB1VKVimIrntWTqwK23uUl5r7KA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RRPjT6uE; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="CewNhKN7"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BFB6B497;
-	Thu,  1 Oct 2026 01:17:40 -0700 (PDT)
-Received: from [10.57.9.178] (unknown [10.57.9.178])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3FA6C3F85F;
-	Thu,  1 Oct 2026 01:17:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790842664; bh=TJwc5O7ntGMNZfYYJkuk0LGKcByvcIHqyNd0eoZ3S9g=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=CewNhKN7JS2IKfCPqmjxqGA/HGZSmdZau194WtiV0AwU8/0QjE13Noo9pp6XnKP7e
-	 AYh+kAU3AAJEJua+EsH3XguV6rmsCSrnJ8rF0PamnA3sUu+Rurome6qBdPHbVQX2M4
-	 Jb+JZPL47Yj3M4VJhrdptyCuzbosmUTzhGS17YC8=
-Message-ID: <18d2c6d4-55d7-4a9d-992f-fe33fa11c182@arm.com>
-Date: Thu, 1 Oct 2026 09:17:41 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RRPjT6uE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAEE51F000FF;
+	Thu,  1 Oct 2026 08:31:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790843481;
+	bh=qCO7FheBb0QtZY1aP+C/CKmQeFmIqEIk287fXx6Tx9k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=RRPjT6uEl8jvYU2BQEX4mFlM3STmFQT82C+soXKo2LGVahgTGWVUThfHMRvPVLSrw
+	 gkRuPV5J3G7nfnBo7GaTmqSWBg6+Y4y1ozODB8JODDsqJImXcd7a8GXYHlpLvhsrOk
+	 83PD2HcCLoOTKUIfKR9QY8HSixYK5vKwgnAxqfbd9l4BmO/HRsBFl9ZIjZkqfZJwUG
+	 JJvu/nNuLgKWmnpIgL0ccLbwlU7zZ0lsimVw0BV1ZhyuiUGwDmK/FjdBOkmQdbJ9hT
+	 HsRXF+gRngLgSn+VGcCbD1YqxEVgIYxdn+qCimtDaBmJZMJDs8xjtL1xJ8ghZBt3w6
+	 RxAiOAN2Wq9IA==
+Date: Thu, 1 Oct 2026 09:31:15 +0100
+From: Sudeep Holla <sudeep.holla@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+	will@kernel.org, catalin.marinas@arm.com,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
+	gshan@redhat.com, joey.gouly@arm.com, tabba@google.com,
+	yuzenghui@huawei.com, linux-coco@lists.linux.dev,
+	gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com,
+	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com,
+	lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+	jonathan.cameron@oss.qualcomm.com
+Subject: Re: [PATCH v20 6/9] firmware: arm_rmm: Ensure the RMM has GPT
+ entries for memory
+Message-ID: <20261001-military-foxhound-of-conversion-d80e7a@sudeepholla>
+References: <20260929221623.1342076-1-suzuki.poulose@arm.com>
+ <20260929221623.1342076-7-suzuki.poulose@arm.com>
+ <20260930-judicious-loris-of-will-dea0a3@sudeepholla>
+ <210c0b27-c7cb-447a-b6ee-bf6b3fb63acc@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v20 2/9] firmware: arm_rmm: Check for RMI support at init
-Content-Language: en-GB
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oupton@kernel.org>
-References: <20260929221623.1342076-1-suzuki.poulose@arm.com>
- <20260929221623.1342076-3-suzuki.poulose@arm.com>
- <20260929222840.A0E821F000FF@smtp.kernel.org>
- <a2fa2bd1-6888-4ed5-9e2f-233eacb600a5@arm.com> <arzsUdIEVvafG-S5@arm.com>
- <b4af8478-f02c-4c94-afea-7bd0adbe7b79@arm.com>
-In-Reply-To: <b4af8478-f02c-4c94-afea-7bd0adbe7b79@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <210c0b27-c7cb-447a-b6ee-bf6b3fb63acc@arm.com>
 
-On 01/10/2026 07:03, Suzuki K Poulose wrote:
-> On 30/09/2026 12:02, Catalin Marinas wrote:
->> On Wed, Sep 30, 2026 at 09:18:48AM +0100, Suzuki K Poulose wrote:
->>> On 29/09/2026 23:28, sashiko-bot@kernel.org wrote:
->>>>> diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi- 
->>>>> cmds.h
->>>>> new file mode 100644
->>>>> index 0000000000000..911489b636522
->>>>> --- /dev/null
->>>>> +++ b/include/linux/arm-rmi-cmds.h
->>>> [ ... ]
->>>>> +static inline void rmi_smccc_invoke(struct arm_smccc_1_2_regs *regs)
->>>>> +{
->>>>> +    struct arm_smccc_1_2_regs args = *regs;
->>>>> +    long status;
->>>>> +    int i = 0;
->>>>> +
->>>>> +    while (i < RMM_BLOCKED_RETRY_COUNT) {
->>>>> +        arm_smccc_1_2_invoke(&args, regs);
->>>>> +
->>>>> +        status = RMI_RESULT_STATUS(regs->a0);
->>>>> +        if (status != RMI_BUSY && status != RMI_BLOCKED)
->>>>> +            break;
->>>>> +        if (status == RMI_BLOCKED)
->>>>> +            i++;
->>>>> +        cpu_relax();
->>>>> +    }
->>>>
->>>> [Severity: High]
->>>> Does this sequence create an unbounded spin loop if the firmware 
->>>> continuously
->>>> returns RMI_BUSY?
->>>>
->>>> If the status returned by arm_smccc_1_2_invoke() is RMI_BUSY, the loop
->>>> continues without incrementing the exit counter i. It issues 
->>>> cpu_relax()
->>>> but does not yield the CPU (e.g., via cond_resched()) or impose a 
->>>> timeout.
->>>> If the RMM firmware remains busy, this could cause the host kernel 
->>>> to lock
->>>> up indefinitely.
->>>
->>> This is like "spinlock contention". RMM returns EBUSY when a resource is
->>> locked temporarily. We should be able to make progress, unlike the
->>> RMI_BLOCKED, which is blocking due to a long running operation.
->>
->> I dug a bit into the RMI_BUSY description in the spec and it's not
->> always safe to spin forever. For RMI_{PDEV,VDEV}_COMMUNICATE, for
->> example, we need to return to the caller and retry later (for VDEV, the
->> spec suggests informing the realm). That's the TSM series, which doesn't
->> use the new API yet, but something to be aware of when it's updated.
+On Wed, Sep 30, 2026 at 04:55:38PM +0100, Suzuki K Poulose wrote:
+> Hi Sudeep
 > 
-> Agree. There RMI_BUSY indicates the Pdev is busy with an ongoing
-> communication which could take longer.
-> 
->>
->> We may need the spec to bound this spin anyway, or at least give an
->> indication that it's not forever, otherwise it affects latency,
->> especially in an RT kernel.
->>
->> There's a generic RMI command return code table in B4.2 that lists
->> RMI_BUSY for an imp def reason for the command failing to make progress.
->> Does this apply to something like REC_ENTER? In the KVM series we call
->> that with IRQs masked.
-> 
-> REC_ENTER only tries to lock the REC object. The only other code that
-> tries to lock is the PSCI completion processing to update the "rec"
-> state to runnable. Hence we don't expect a the REC_ENTER to be waiting
-> for the REC object lock and encounter an RMI_BUSY. Also, REC_ENTER
-> locks the object to get a refcount on the granule and the lock is
-> released. So even if the host issued REC_ENTER in parallel, the second
-> one will encounter RMI_ERROR_REC due to the bumped refcount.
-> 
-> That said, I am happy to return to the caller on RMI_REC_ENTER in the 
-> worst case and pretend there was an IRQ and that would allow the KVM
-> to re-enter the guest after servicing the interrupts. I have added the 
-> following changes to the patch where we introduce the REC_ENTER:
-> 
-> +/*
-> + * rmi_smccc_invoke_once: Invoke the RMI call and return the results. 
-> Do not
-> + * retry the command. Let the caller deal with RMI_BUSY or RMI_BLOCKED.
-> + */
-> +static inline void rmi_smccc_invoke_once(struct arm_smccc_1_2_regs *regs)
-> +{
-> +       struct arm_smccc_1_2_regs args = *regs;
-> +
-> +       arm_smccc_1_2_invoke(&args, regs);
-> +}
-> +
-> 
+> On 30/09/2026 15:44, Sudeep Holla wrote:
+> > On Tue, Sep 29, 2026 at 11:16:20PM +0100, Suzuki K Poulose wrote:
+> > > From: Steven Price <steven.price@arm.com>
+> > > 
+> > > The RMM maintains the state of all the granules in the system to make
+> > > sure that the host is abiding by the rules. This state can be maintained
+> > > at different granularity, per page (TRACKING_FINE) or per region
+> > > (TRACKING_COARSE or TRACKING_INTERMEDIATE). The region size depends on the
+> > > underlying "RMI_GRANULE_SIZE". For a "coarse"/"intermediate" region,
+> > > all pages in the region must be of the same state, this implies we need to
+> > > have "fine" tracking for DRAM, so that we can delegate individual pages.
+> > > 
+> > > For now we only support a statically carved out memory for tracking
+> > > granules for the "fine" regions. This can be extended in the future to
+> > > allow modifying the tracking granularity and remove the need for a
+> > > static allocation by the firmware.
+> > > 
+> > > Similarly, the firmware may create L0 GPT entries describing the total
+> > > address space. But if we change the "PAS" (Physical Address Space) of a
+> > > granule, then the firmware may need to create L1 tables to track the PAS
+> > > at a finer granularity. Linux therefore checks if the platform firmware
+> > > manages the PAR region. i.e., the firmware is in charge of managing the
+> > > L1 GPTs (creation and the required memory for the GPT tables - via static
+> > > carveouts) without host intervention. Support for dynamic GPT creation by
+> > > the host will be added later.
+> > > 
+> > > If the firmware requires us to manage the tracking or GPT memory,
+> > > deactivate the RMM and reclaim any memory donated at RMM activation.
+> > > 
+> > > Apply the same checks when hotplugged memory is brought online.
+> > > 
 > ...
 > 
+> > > ---
+> > >   drivers/firmware/arm_rmm/rmi.c | 247 ++++++++++++++++++++++++++++++++-
+> > >   include/linux/arm-rmi-cmds.h   |  18 +++
+> > >   2 files changed, 264 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
+> > > index d982cf158f8da..d4d098448e46e 100644
+> > > --- a/drivers/firmware/arm_rmm/rmi.c
+> > > +++ b/drivers/firmware/arm_rmm/rmi.c
+> > 
+> > [...]
+> > 
+> > > +static int rmi_verify_gpt_firmware_managed(phys_addr_t start, phys_addr_t end)
+> > > +{
+> > > +	unsigned long l0gpt_sz;
+> > > +	unsigned long next, par_state;
+> > > +
+> > > +	l0gpt_sz = 1UL << (30 + FIELD_GET(RMI_FEATURE_REGISTER_1_L0GPTSZ,
+> > > +					  rmi_feat_reg(1)));
+> > > +	start = ALIGN_DOWN(start, l0gpt_sz);
+> > > +	end = ALIGN(end, l0gpt_sz);
+> > > +
+> > 
+> > Is it guaranteed that end with not be = PASZ ? The spec says RMI_GPT_INFO
+> > will return RMI_GPT_INFO when top >= pasz. Unlike start, end for good
+> > reason is aligned up(ceil) instead of aligned down, but that also means
+> > end will become PASZ when we reach end of memory, no ?
 > 
-> +/**
-> + * rmi_rec_enter() - Enter a REC
-> + * @rec: PA of the target REC
-> + * @run_ptr: PA of RecRun structure
-> + *
-> + * Starts (or continues) execution within a REC.
-> + *
-> + * Return: RMI return code
-> + */
-> +static inline long rmi_rec_enter(unsigned long rec, unsigned long run_ptr)
-> +{
-> +       struct arm_smccc_1_2_regs regs = {
-> +               SMC_RMI_REC_ENTER, rec, run_ptr,
-> +       };
-> +
-> +       rmi_smccc_invoke_once(&regs);
-> +       return regs.a0;
-> +}
+> Good point. The RMM spec needs to be fixed to make the condition
 > 
+>  top > pasz
+> 
+> as the top, is really the top the region and is not inclusive.
+> 
+> This is already a known issue, tracked by FENIMORE-1807. The proposed
+> fix is :
+> 
+> pre: UInt(top) > rmm.static.pasz
 > 
 
-And for the record, here is the change in the KVM CCA Driver for 
-handling this case :
+Ah OK, all good here then. Thanks for update.
 
-         if (status == RMI_ERROR_REALM) {
-                 vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
-                 return ARM_EXCEPTION_EXIT;
-         }
-
-         /*
-          * If a VCPU has been turned on, but the REC state hasn't been 
-updated
-          * we may experience RMI_ERROR_REC. Exit to the userspace with 
--EAGAIN
-          * for a retry.
-          */
-         if (status == RMI_ERROR_REC)
-                 return -EAGAIN;
-
-+       /*
-+        * If the RMI_REC_ENTER encounters RMI_BUSY, treat it as if it was
-+        * an IRQ and go back to the run-loop. We don't sync the state back
-+        * to the vcpu when status != RMI_SUCCESS.
-+        */
-+       if (status == RMI_BUSY)
-+               return ARM_EXCEPTION_IRQ;
-+
-         if (rec_run_ret)
-                 return rec_exit_fatal(vcpu, "Unexpected REC_ENTER status",
-                                       rec_run_ret);
-
-         switch (rec->run->exit.exit_reason) {
-         case RMI_EXIT_SYNC:
-                 /*
-                  * HPFAR_EL2_NS is hijacked to indicate a valid HPFAR 
-value,
-                  * see __get_fault_info()
-                  */
-                 vcpu->arch.fault.hpfar_el2 = rec->run->exit.hpfar | 
-HPFAR_EL2_NS;
-                 rec_exit_sync(vcpu);
-                 return ARM_EXCEPTION_TRAP;
-         case RMI_EXIT_IRQ:
-         case RMI_EXIT_FIQ:
-                 return ARM_EXCEPTION_IRQ;
-         case RMI_EXIT_SERROR:
-                 return ARM_EXCEPTION_EL1_SERROR;
-         case RMI_EXIT_PSCI:
-                 rec_exit_hvc(vcpu);
-                 /*
-                  * Queue completion before dispatching the exit through the
-                  * generic HVC handling path. The request will be 
-processed after
-                  * HVC handling has updated the vCPU state and before 
-the next REC
-                  * entry.
-                  */
-                 kvm_make_request(KVM_REQ_RMI, vcpu);
-                 return ARM_EXCEPTION_TRAP;
-         case RMI_EXIT_RIPAS_CHANGE:
-                 return rec_exit_ripas_change(vcpu);
-
-Cheers
-Suzuki
+-- 
+Regards,
+Sudeep
