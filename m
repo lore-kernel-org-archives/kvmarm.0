@@ -1,67 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CBFD3E40E4;
-	Thu,  1 Oct 2026 16:36:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8665C4734FA;
+	Thu,  1 Oct 2026 16:37:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790872605; cv=none; b=k+x5EiDJqchzUZ+T0CVV35ryZJPgfEYACT55yp3O6fivo1X4BW5eBx2S3xBn8m6QVBV0G6kGv7rmxwZRzvQqAVdkeiXI4C4BSDbFsiXdR8BVmqnAN2YMJyAs/9Wd8A/lSaZDVP2UVPL/jbkQsNPKNtk4d2FWK2b0JtuSBRjX4Bc=
+	t=1790872667; cv=none; b=YEHQWrpk74XD3ELWUQA99IGbKvuTvezmQMVi1TCSQ1fRr+i4NlD20agQ4Bz0x9Ag3vSN6BX9QoBQxCUNCmobdLXp/3/zKf5SQm3+1DS/dY11KZX9dlAP0X1Fzvthcil5rs4p+/BESxt+4aQ4tk0tXG8/Tv140Cb1zYvg0rDcjuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790872605; c=relaxed/simple;
-	bh=BXLMAg3FlhSPADp+jfcghXHh3xfR672rAp8rAyJvzVo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p5VIwmAZQ6sCFsFheDn/ciBqgtG19jkQJlvznXKX1fLjKh9Le9YyLnBRA/21MinPPTobgH0Mlsm1JDqccRFDu8oZbyIm2/6/uN9jRrPC90pfOGu4+MvTiZYbHe/unH+DuYroEpX3A9nbXliY0sIKLJUQL2WpM0bq7XhWb2XOC7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MI2RWpwa; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790872667; c=relaxed/simple;
+	bh=K9BrYtciJGkSxMEbrXtvHk2FbFP0IJ/JnLlba9Tczjs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dEJbNnqeo/Jrv9hFQyn9Y912VY1kpr43bp7YU4Oa9RFdPg/9gdpE2VFTHK4jxYF2/uAxK6BlyJaEbG6CsPDDFNmdWq0vCDa8L6//gxXv83J7tKD2KZ3mvQD8rHQuO47C+5NhcJgUTOpLdYJ8dL58NOxgu+E/Qh+EK7FGuRw83O0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=BsV62LOq; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MI2RWpwa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CF1E1F000FF;
-	Thu,  1 Oct 2026 16:36:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790872604;
-	bh=BXLMAg3FlhSPADp+jfcghXHh3xfR672rAp8rAyJvzVo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=MI2RWpwaJp/wRl1dRcHeuajsqvY1oGk53fo/PNKRs874vC3Bu+RiWPn45D7au2Wry
-	 6J+WxP1QK/S2chfk9HGMdhF6jToyBoWYT9aKw71o5zKTuuKs1hxgYeKQmFqeMrIjC9
-	 6TjFR1H3Pq9pofIW5XS2U8Pv/7Vw3f+CHJyHek59TUX1nkUrwyg52gD7/AnbifIwKf
-	 s2jpADjhYjtpkgBn8BY5zZy1BpXJPYeysTIR5OU8O7VT2wkHGf6J11GYrBiGTztNwB
-	 bfAGwLW1/Vh3qIAiOZ2r2EajetCqfCxlPYcEypgpm6rzT6VQL/nlk+bnY0lYcF4PPk
-	 1IP/QRrT3Zjwg==
-Date: Thu, 1 Oct 2026 17:36:37 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <fuad.tabba@linux.dev>, Peter Maydell <peter.maydell@linaro.org>, 
-	Leonardo Bras <leo.bras@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>, 
-	Yao Yuan <yaoyuan@linux.alibaba.com>, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-Subject: Re: [PATCH v21 11/15] KVM: selftests: arm64: Add GCS registers to
- get-reg-list
-Message-ID: <ar6L9O-MGe12d95Z@gremlin>
-References: <20260930-arm64-gcs-v21-0-3556644cd927@kernel.org>
- <20260930-arm64-gcs-v21-11-3556644cd927@kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="BsV62LOq"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6A8D7497;
+	Thu,  1 Oct 2026 09:37:41 -0700 (PDT)
+Received: from [10.57.9.178] (unknown [10.57.9.178])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D8C683F85F;
+	Thu,  1 Oct 2026 09:37:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790872664; bh=K9BrYtciJGkSxMEbrXtvHk2FbFP0IJ/JnLlba9Tczjs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=BsV62LOqI5ja68sCQcFyb5ijD1CAgATdMGzmBFi4PPZQ2Nl1po/USPeOyjARfB1hR
+	 4IW2nKeALWQxil1hxMsJbWCTmjfJWwrfaJRQWTlMxqg8rSgve5w/QmYdvcMHIJ7CR0
+	 apDR+U8DfZ9vBePkOCIe3Wvt8ZYFIpX+pUeF5fiY=
+Message-ID: <c8ea1847-0a92-46b2-a038-37a9d581e8b2@arm.com>
+Date: Thu, 1 Oct 2026 17:37:37 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260930-arm64-gcs-v21-11-3556644cd927@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v20 22/22] KVM: arm64: CCA: Control user register access
+ for Realms
+Content-Language: en-GB
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+ will@kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+ sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>
+References: <20260924160504.853911-1-suzuki.poulose@arm.com>
+ <20260924160504.853911-23-suzuki.poulose@arm.com> <ar6CEXfo-AIYtq1J@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <ar6CEXfo-AIYtq1J@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 30, 2026 at 10:48:21PM +0100, Mark Brown wrote:
-> GCS adds new registers GCSCR_ELx, GCSCRE0_EL1 and GCSPR_ELx. Add
-> these to those validated by get-reg-list.
->
-> Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-> Signed-off-by: Mark Brown <broonie@kernel.org>
+On 01/10/2026 16:53, Catalin Marinas wrote:
+> On Thu, Sep 24, 2026 at 05:05:04PM +0100, Suzuki K Poulose wrote:
+>> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+>>
+>> The RMM restricts the access to the register states that the host can
+>> read/modify for a given Realm.
+>>
+>> e.g., At VCPU creation, can modify GPRS (x0-x30) and PC.
+>>        While servicing SMCCC calls via RSI_HOST_CALL or servicing PSCI
+>>        requests.
+>>        MMIO emulation in the unprotected space.
+>>
+>> Additionally we use the sysreg configuration to advertise/configure the
+>> following Realm parameters, which are required before the Realm Descriptor
+>> :w
+> 
+> Should use Emacs ;)
+> 
 
-This looks obviously correct (TM) to me so:
+Dang it ;-) I have fixed it in v21. Thanks
 
-Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+Cheers
+Suzuki
 
---
-Cheers, Lorenzo
