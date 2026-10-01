@@ -1,222 +1,152 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7022330569F;
-	Thu,  1 Oct 2026 11:39:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B76B492E57
+	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 11:56:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790854784; cv=none; b=R9UhgmQnut9KMVqBC0QAdLBhFmcJwrYf25ryxusJBL9eV0h6LYmb+jRiUWGZDRuNaqZNPX016VEJw1NMM+qCeZKlvHgNdmpvu+RO/NbnkaHCDrNF8S9KDP4P9wfx0Nwru505m4/eF2ktkKVaWeY1cWSiuSBgqT/m/nG0pcQmoLw=
+	t=1790855779; cv=none; b=nkAfoEuRsVr9GVKg8/yGSlrm5jT7IERtTZLZBcPRNghjTs5Qn62v3PUsCdO1JpFWZ5vMD4jN2HcfNd1NF/BNh/Mu0gQW1VlSkgdLg1bqak9sp515Mn4IX9IcgSSccnL+0HEcR8UYtp68H4Y4gOJ5L5f/lS/iV6sKNF+986UiSUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790854784; c=relaxed/simple;
-	bh=aIUuO4ENC77y8AatC+unyTYHYRfthaC+8kOZ3gEUHLc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gYpUQJgYs4JRrjYWorKilfMid1lrkp+8aYLXeF8ldEJ6z+Ue0CxPopXgfD2a42DQmS7w7bQxc4aenrisKQFTwl19JfknlwJMGi9QLEzrLzYonhPKL6cApZtZY9pqeNhIzRZtKKXzvoe35YtNvBubOECnTvwimnDg73fsn3ityZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=neqGY7qE; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1790855779; c=relaxed/simple;
+	bh=DlCIAe4lN3Ywg/jZ531L+1dOwy/LVKOYm6dgV2tOXpE=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=VGZyncy6MRPdhmun0s84ZaSSQTqSo9c5LLgEHm/iSmfneGgl9OdZl8ppTb5g2cxSbdUVjuBtYMY6Xh41LwHrDObFhqDCbcMbNzfzTGB/THvMk+xc++kc5lhIZzGj8mcdw6Eiz+1Wf0BMccTD3c7qXKSb4oRy1DbBANRGweHPVGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j6MXDyN1; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="neqGY7qE"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7F9A6497;
-	Thu,  1 Oct 2026 04:39:38 -0700 (PDT)
-Received: from [10.57.9.178] (unknown [10.57.9.178])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 47ED43F86F;
-	Thu,  1 Oct 2026 04:39:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790854781; bh=aIUuO4ENC77y8AatC+unyTYHYRfthaC+8kOZ3gEUHLc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=neqGY7qENHa5C3IakID0foMencI4cFZZHabSuLJ1lNBFE4M0m2FgM7mAvbQNY3BFx
-	 stn/gI/6Xq2wXq7RIjF5XuMlVa57lMplWsGspYC8wxz97g6TqZdZE3Y5XcZczFYbgm
-	 OpqxKgkX2oAxFSQVnqoXEr45ElxUfdqWnQd2sbTw=
-Message-ID: <bf6efab5-ab8e-48e2-8576-2f3fb69a3d6a@arm.com>
-Date: Thu, 1 Oct 2026 12:39:36 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j6MXDyN1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82F9F1F0089A;
+	Thu,  1 Oct 2026 11:56:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790855774;
+	bh=0LMk0kxZg+A1N3k26V4n/1tM78ztN08O9jDun9Ut/QI=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=j6MXDyN1lL6lgjvxqxnEP3GDXn/ysHIECV+RQcck4xX47duZxms+K+cLKFaBqdL4N
+	 VU4O9LBYKbdCK1RnZTdWXXFx/JMx4g1+lzGhlmcM6zlqOxRysAavn0x/Zx5siyf3yf
+	 1q+7cyMMzwPfg9U8zmtqZgh4CKj7Me1rqeNDI6SAkRK92QFdkrE2J+Fd6ZdzQlJqnV
+	 kQY/KC2eaQWFnyYtBAlW7G00hVC6qMVd0DyV67assc5Bt4+GE+Tel99mUlWxifGvGh
+	 SORDzj+MpbvyCie6n/CnhqpuJtXSg7OBaYdrKsSFT5J++zxTMf0CAnxWNLshC5lQfO
+	 hxvMO83aRfh6Q==
+From: sashiko-bot@kernel.org
+Subject: Re: [RFC 05/12] ACPICA: Add TLBI table definition
+Reply-To: sashiko-reviews@lists.linux.dev
+To: =?utf-8?b?S3Jpc3RpbmEgTWFydMWhZW5rbw==?= <kristina.martsenko@arm.com>
+Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
+In-Reply-To: <20261001110655.461473-6-kristina.martsenko@arm.com>
+References: <20261001110655.461473-1-kristina.martsenko@arm.com>
+ <20261001110655.461473-6-kristina.martsenko@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 01 Oct 2026 11:56:14 +0000
+Message-Id: <20261001115614.82F9F1F0089A@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v21 7/9] arm64: Block hibernate and kexec while RMM is
- active
-Content-Language: en-GB
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
- will@kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
- sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com,
- "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>,
- Pavel Machek <pavel@kernel.org>, linux-pm@vger.kernel.org
-References: <20261001084555.1456543-1-suzuki.poulose@arm.com>
- <20261001084555.1456543-8-suzuki.poulose@arm.com> <ar4-kg8Jq9BTn7Sb@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <ar4-kg8Jq9BTn7Sb@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 01/10/2026 12:05, Catalin Marinas wrote:
-> On Thu, Oct 01, 2026 at 09:45:53AM +0100, Suzuki K Poulose wrote:
->> RMM can be deactivated only after all delegated granules have been
->> reclaimed. If a new kernel is entered while any granules remain in the
->> Realm PAS, accesses to that memory can raise a Granule Protection Fault
->> and be fatal to the new kernel.
->>
->> Crash kexec/kdump needs separate handling. It can be supported only once
->> the crash kernel can tolerate delegated memory inherited from the primary
->> kernel. i.e., be able to read the pages safely and fixup the GPF. Until
->> then disable the kexec completely.
->>
->> Hibernate has a similar problem. The image cannot be safely saved for
->> delegated pages, as the RMM doesn't support exporting the pages.
->>
->> Disable both kexec and hiberation while the RMM is active.
-> 
-> I would mention that this adds a new arch_hibernation_available() hook
-> called from hibernation_available(), otherwise the hibernation
-> maintainers may not realise why they've been cc'ed.
-> 
-> Alternatively, just introduce the hook as a separate patch without any
-> arch code.
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
+- [Medium] acpi: direct modification of upstream ACPICA headers with draft =
+specs
+- [Medium] kvm: arm64: HCRX_EL2.FNB bit is not filtered for nested hypervis=
+ors
+--
 
-I will go for this approach, adding the hook in a prep patch and then
-the arm64 version with kexec changes.
+commit 1c073d3327bf45ba56b8ee1d936edd5e15ec68be
+Author: Kristina Mart=C5=A1enko <kristina.martsenko@arm.com>
 
+ACPICA: Add TLBI table definition
 
-> 
->> Cc: "Rafael J. Wysocki" <rafael@kernel.org>
->> Cc: Len Brown <lenb@kernel.org>
->> Cc: Pavel Machek <pavel@kernel.org>
->> Cc: linux-pm@vger.kernel.org
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> ---
->> Changes since v20:
->>   - Add arch_hibernation_available() hook for archs to have a say and drop the
->>     other checks.
->> Changes since v19:
->>   - New patch to disable kexec and hibernation with RMM
->> ---
->>   arch/arm64/kernel/hibernate.c     | 14 ++++++++++++++
->>   arch/arm64/kernel/machine_kexec.c | 11 +++++++++++
->>   include/linux/suspend.h           |  1 +
->>   kernel/power/hibernate.c          |  8 +++++++-
->>   4 files changed, 33 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/kernel/hibernate.c b/arch/arm64/kernel/hibernate.c
->> index 7bf1174277772..08e03d24b93a8 100644
->> --- a/arch/arm64/kernel/hibernate.c
->> +++ b/arch/arm64/kernel/hibernate.c
->> @@ -10,6 +10,8 @@
->>    * Copyright (C) 2006 Rafael J. Wysocki <rjw@sisk.pl>
->>    */
->>   #define pr_fmt(x) "hibernate: " x
->> +
->> +#include <linux/arm-rmi-cmds.h>
->>   #include <linux/cpu.h>
->>   #include <linux/kvm_host.h>
->>   #include <linux/pm.h>
->> @@ -105,6 +107,18 @@ void notrace restore_processor_state(void)
->>   {
->>   }
->>   
->> +bool arch_hibernation_available(void)
->> +{
->> +	/*
->> +	 * If we have activated the RMM, there could be pages that are
->> +	 * delegated to the RMM. Trying to save them to the image will be fatal.
->> +	 * Also, we donate pages to the RMM at activation and restoring data
->> +	 * to those pages are going to be fatal.
->> +	 * Hence, disable the hibernation when the RMM is active
->> +	 */
->> +	return !cpus_are_stuck_in_kernel() && !is_rmm_active();
->> +}
-> 
-> For now, I would keep is_rmm_active() only in here as not to change the
-> behaviour for pKVM. "disk" would disappear from /sys/power/state with
-> this patch. I think it's the correct thing to do for pKVM as well but we
-> can discuss this separately once this goes in (I also think pKVM using
-> cpus_are_stuck_in_kernel() is a bit of a bodge but it's a handy hook
-> called in the right places).
+This commit adds the definition of the new Arm TLBI ACPI table to the global
+acpica headers. The table is noted as an initial proposal that is not yet
+public and may change.
 
-I was in double mind about this. Yes, I agree, makes sense to deal the
-pKVM case separately.
+> diff --git a/include/acpi/actbl2.h b/include/acpi/actbl2.h
+> index baef525367b5c..68849c9f7cf69 100644
+> --- a/include/acpi/actbl2.h
+> +++ b/include/acpi/actbl2.h
+> @@ -61,6 +61,7 @@
+>  #define ACPI_SIG_SVKL           "SVKL"	/* Storage Volume Key Location Ta=
+ble */
+>  #define ACPI_SIG_SWFT           "SWFT"	/* SoundWire File Table */
+>  #define ACPI_SIG_TDEL           "TDEL"	/* TD Event Log Table */
+> +#define ACPI_SIG_TLBI           "TLBI"	/* TLB Invalidate Domain Table */
+                                   ^^^^
 
+[Severity: Medium]
+Is it appropriate to introduce a draft, non-final table signature directly =
+into
+the global upstream-maintained acpica headers?
 
-> 
->> +
->>   int arch_hibernation_header_save(void *addr, unsigned int max_size)
->>   {
->>   	struct arch_hibernate_hdr *hdr = addr;
->> diff --git a/arch/arm64/kernel/machine_kexec.c b/arch/arm64/kernel/machine_kexec.c
->> index 8f9bc2327dc85..48f343704cb54 100644
->> --- a/arch/arm64/kernel/machine_kexec.c
->> +++ b/arch/arm64/kernel/machine_kexec.c
->> @@ -6,6 +6,7 @@
->>    * Copyright (C) Huawei Futurewei Technologies.
->>    */
->>   
->> +#include <linux/arm-rmi-cmds.h>
->>   #include <linux/interrupt.h>
->>   #include <linux/irq.h>
->>   #include <linux/kernel.h>
->> @@ -59,6 +60,16 @@ int machine_kexec_prepare(struct kimage *kimage)
->>   		return -EBUSY;
->>   	}
->>   
->> +	/*
->> +	 * We will be able to allow kdump to proceed, once we have the support
->> +	 * for handling GPF from vmcore accesses to delegated pages. Until then
->> +	 * block kexec completely.
->> +	 */
->> +	if (is_rmm_active()) {
->> +		pr_err("Can't kexec: RMM is active.\n");
->> +		return -EBUSY;
->> +	}
->> +
->>   	return 0;
->>   }
->>   
->> diff --git a/include/linux/suspend.h b/include/linux/suspend.h
->> index b02876f1ae38a..a3815027773c5 100644
->> --- a/include/linux/suspend.h
->> +++ b/include/linux/suspend.h
->> @@ -401,6 +401,7 @@ int hibernate_quiet_exec(int (*func)(void *data), void *data);
->>   int hibernate_resume_nonboot_cpu_disable(void);
->>   int arch_hibernation_header_save(void *addr, unsigned int max_size);
->>   int arch_hibernation_header_restore(void *addr);
->> +bool arch_hibernation_available(void);
->>   
->>   #else /* CONFIG_HIBERNATION */
->>   static inline void register_nosave_region(unsigned long b, unsigned long e) {}
->> diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
->> index d2479c69d71a4..9d9d53828542f 100644
->> --- a/kernel/power/hibernate.c
->> +++ b/kernel/power/hibernate.c
->> @@ -106,11 +106,17 @@ bool hibernation_in_progress(void)
->>   	return !atomic_read(&hibernate_atomic);
->>   }
->>   
->> +__weak bool arch_hibernation_available(void)
->> +{
->> +	return true;
->> +}
->> +
->>   bool hibernation_available(void)
->>   {
->>   	return nohibernate == 0 &&
->>   		!security_locked_down(LOCKDOWN_HIBERNATION) &&
->> -		!secretmem_active() && !cxl_mem_active();
->> +		!secretmem_active() && !cxl_mem_active() &&
->> +		arch_hibernation_available();
->>   }
-> 
-> With the comments above addressed:
-> 
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+The commit message explicitly notes this patch should not be merged as is
+because the TLBI table description is not yet public and may change. Merging
+draft specifications creates a risk of dead uapi and compatibility issues if
+the final specification differs.
 
-Thank you!
+[ ... ]
 
-Suzuki
+> @@ -3701,6 +3702,37 @@ struct acpi_table_tdel {
+>  	u64 log_area_start_address;
+>  };
+> =20
+> +/***********************************************************************=
+********
+> + *
+> + * TLBI - TLBI Domain Table
+> + *
+> + ***********************************************************************=
+*******/
+> +
+> +struct acpi_table_tlbi {
+> +	struct acpi_table_header header;
+> +	u32 domain_count;
+> +	u32 domains_offset;
+> +};
 
+[Severity: Medium]
+Is it acceptable to add a Linux-specific out-of-tree structure definition t=
+o an
+upstream-maintained acpica file?
+
+The acpica headers are maintained upstream, and Linux kernel policy typical=
+ly
+requires changes to first be accepted by the acpica project before being sy=
+nced
+to the Linux tree.
+
+commit cb4c50a2ac546f3127893846943d61a1ea5cc49e
+Author: Kristina Mart=C5=A1enko <kristina.martsenko@arm.com>
+
+KVM: arm64: Hide TLBID from guest sysregs
+
+This commit hides TLBID system registers and fields from the guest to preve=
+nt
+them from discovering domains. It reports the feature as unsupported and
+sanitizes a nested hypervisor's HCRX register bits.
+
+>   * Sanitize a nested hypervisor's HCRX.{VTLBIDEn,VTLBIDOSEn,FNB}.
+
+[Severity: Medium]
+The commit message claims to sanitize the guest's HCRX_EL2.FNB bit, but it
+appears HCRX_EL2_FNB is omitted from NV_HCRX_GUEST_EXCLUDE:
+
+arch/arm64/kvm/hyp/include/hyp/switch.h:
+#define NV_HCRX_GUEST_EXCLUDE	(HCRX_EL2_TMEA	    | HCRX_EL2_PTTWI	| \
+				 HCRX_EL2_EnIDCP128 | HCRX_EL2_VTLBIDEn	| \
+				 HCRX_EL2_VTLBIDOSEn)
+
+Because HCRX_EL2 is a VNCR-backed register, a nested guest hypervisor (L1) =
+can
+write to it directly in memory without trapping. During context switch, KVM
+reads the guest's HCRX_EL2 from the VNCR page and masks it with
+~NV_HCRX_GUEST_EXCLUDE.
+
+Since FNB is not excluded, will KVM apply the guest's FNB bit to the physic=
+al
+HCRX_EL2 register, breaking the virtualization boundary?
+
+The impact appears to be limited to the guest's own TLBI coherence.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261001110655.4614=
+73-1-kristina.martsenko@arm.com?part=3D5
