@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3613A5E64
-	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 15:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE583A5E64
+	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 15:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790867829; cv=none; b=eaQTyvhd/D3okHr/GgRx8I0SMZdcxzMfiKYxyHykvlyorYPsvU/9ek60QkrvqIGTeOXjJQ8NLnoC6xiEOY2vj/7DzsEa60iYeMf955P3urHF2u5peJRzKnnRGLeHXQX4yDHoqicns9IsWUH2B+fc65oYqIS1ZafXILdGNSdaLDU=
+	t=1790867831; cv=none; b=W+aeM4iMLE8idD81O/0vtznjujUanvJubu9z3crI2pfPj1PeHVme28fMvtyqKUFfpa0+vKSCZPL0UVedVLO1d8iVG1t/ncpodCkasvZ+Szp0c+HbglKYISomAeJUHd77jIzrAzaD87utNROVA3j+25mjX5G7SGYE3CXlR8X0L48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790867829; c=relaxed/simple;
-	bh=N+YsEW11ATcjtq3jrkUCY8JpWm0ht3VDeEcGukenrsA=;
+	s=arc-20240116; t=1790867831; c=relaxed/simple;
+	bh=vxfPWEUWaXRC7zvHf1jN9oSEcj82yToOKDaG5szzfI0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PxXTyqORErcjJJ7Li1DINg6iyrR1vkC/2cccz4xnee70efBXQiAs8p7/+WPYEXF56meg429welGcxtBljOXh6quX5YwC50iK35BN9PUBOR00kRRu0YD1ePJ6LYwo59oIUjR9vvlLMUXkWVa8haIvMS+3Osu/6SN9UcxW9VUaLnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Zg/lyyE1; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=btsxeKGAVXbNazyhR4vz6HZ6p3qi8KHxxnC5B0KpMJxIo4l0gfEVFCV0StR825ZieAehyJGBzJltm/ZbfDafsDI+YmwpE5veuZzyzTzXUjtx77BnQpZ+YC6fShjrIpt2t9yAWTT6Hoygmseo+HHFJywtEqp2YyAOIcfEthwmmqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=s+nc6wxZ; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Zg/lyyE1"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="s+nc6wxZ"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6C3761476;
-	Thu,  1 Oct 2026 08:17:04 -0700 (PDT)
-Received: from e143914.cambridge.arm.com (e143914.arm.com [10.2.213.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 842843F86F;
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 10642497;
 	Thu,  1 Oct 2026 08:17:06 -0700 (PDT)
+Received: from e143914.cambridge.arm.com (e143914.arm.com [10.2.213.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2A5FE3F86F;
+	Thu,  1 Oct 2026 08:17:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790867827; bh=N+YsEW11ATcjtq3jrkUCY8JpWm0ht3VDeEcGukenrsA=;
+	t=1790867829; bh=vxfPWEUWaXRC7zvHf1jN9oSEcj82yToOKDaG5szzfI0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Zg/lyyE1CNMCMxv/Ml0k1nE1dvGZ7lQHWkWBGC/xVEYWPuTyx6eriG6Rqb+X2SvyI
-	 HIZo7VstRMUlTgEC4IWlZvu4FTadj1lOtA6Qk/33zLr7n1zxHPiSjzJMbsyP4JIiZM
-	 3WKehhNIZPlBM6Q0G4hTKnKU4ut5zc6kyUQLEeQo=
+	b=s+nc6wxZnlBnq6r7gLOq2KZbTN9zcM3fj0OibekUFehZX8ve8EUBfoNysIbwxqXHa
+	 0ddt1G82giG8FCRyhEyQm6Rs7NqcBlew8oAmfMYJpjSwhzeiiXugw9nl/4p4szk4d3
+	 KqyM4VRbGOahhNKjVa7w6t9qKc1p+C938Y7w55I0=
 From: Joey Gouly <joey.gouly@arm.com>
 To: kvmarm@lists.linux.dev
 Cc: Jing Zhang <jingzhangos@google.com>,
@@ -35,9 +35,9 @@ Cc: Jing Zhang <jingzhangos@google.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
 	andrew.jones@linux.dev,
 	Joey Gouly <joey.gouly@arm.com>
-Subject: [PATCH v3 7/8] arm64: Add Stage-2 MMU demand paging test
-Date: Thu,  1 Oct 2026 16:16:44 +0100
-Message-ID: <20261001151645.2427065-8-joey.gouly@arm.com>
+Subject: [PATCH v3 8/8] arm64: Add basic guest execution tests
+Date: Thu,  1 Oct 2026 16:16:45 +0100
+Message-ID: <20261001151645.2427065-9-joey.gouly@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261001151645.2427065-1-joey.gouly@arm.com>
 References: <20261001151645.2427065-1-joey.gouly@arm.com>
@@ -49,160 +49,205 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jing Zhang <jingzhangos@google.com>
+Add tests that verify that EL2 and EL1 exits can inspect and modify
+guest registers.
 
-Introduce a new test case to validate Stage-2 MMU fault handling. The
-test verifies that the hypervisor correctly identifies and handles
-Stage-2 data aborts triggered by a guest accessing unmapped memory.
-
-The test performs the following:
-- Sets up a guest with Stage-1 disabled, using identity-mapped host
-   code and shared data in the Stage-2 page tables.
-- Triggers a Stage-2 data abort by accessing a specific unmapped IPA.
-- Catches the exception in the host, verifies the fault address,
-   and dynamically maps a new page to resolve the fault.
-- Resumes the guest to confirm the memory access completes successfully
-   and the fault handler functioned as expected.
-
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
+Assisted-by: LLM
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 ---
- arm/Makefile.arm64    |   1 +
- arm/stage2-mmu-test.c | 113 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 114 insertions(+)
- create mode 100644 arm/stage2-mmu-test.c
+ arm/Makefile.arm64  |   1 +
+ arm/guest-test.c    | 157 ++++++++++++++++++++++++++++++++++++++++++++
+ lib/arm64/asm/esr.h |   3 +
+ 3 files changed, 161 insertions(+)
+ create mode 100644 arm/guest-test.c
 
 diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index 9026fd71..e547f92d 100644
+index e547f92d..5c329588 100644
 --- a/arm/Makefile.arm64
 +++ b/arm/Makefile.arm64
-@@ -67,6 +67,7 @@ tests += $(TEST_DIR)/cache.$(exe)
- tests += $(TEST_DIR)/debug.$(exe)
+@@ -68,6 +68,7 @@ tests += $(TEST_DIR)/debug.$(exe)
  tests += $(TEST_DIR)/fpu.$(exe)
  tests += $(TEST_DIR)/mte.$(exe)
-+tests += $(TEST_DIR)/stage2-mmu-test.$(exe)
+ tests += $(TEST_DIR)/stage2-mmu-test.$(exe)
++tests += $(TEST_DIR)/guest-test.$(exe)
  
  include $(SRCDIR)/$(TEST_DIR)/Makefile.common
  
-diff --git a/arm/stage2-mmu-test.c b/arm/stage2-mmu-test.c
+diff --git a/arm/guest-test.c b/arm/guest-test.c
 new file mode 100644
-index 00000000..91d3de7e
+index 00000000..90676bdf
 --- /dev/null
-+++ b/arm/stage2-mmu-test.c
-@@ -0,0 +1,113 @@
++++ b/arm/guest-test.c
+@@ -0,0 +1,157 @@
 +/*
-+ * ARM64 Stage-2 MMU Demand Paging Test
-+ *
-+ * This test validates stage-2 data abort handling by purposefully
-+ * accessing unmapped memory in the guest and verifying that the
-+ * host correctly handles the fault by mapping the page.
-+ *
-+ * Copyright (C) 2026 Google LLC.
-+ * Author: Jing Zhang <jingzhangos@google.com>
-+ *
 + * SPDX-License-Identifier: LGPL-2.0-or-later
++ *
++ * Copyright (C) 2026 Arm Ltd.
 + */
 +#include <libcflat.h>
-+#include <alloc_page.h>
++#include <asm/guest.h>
 +#include <asm/io.h>
 +#include <asm/smp.h>
-+#include <asm/guest.h>
-+#include <asm/stage2_mmu.h>
++#include <asm/sysreg.h>
 +
-+#define TEST_PAGE_IPA		0x50000000UL
-+#define FAULT_ADDR_IPA		0x60000000UL
-+#define TEST_DATA		0xBEEFCAFEUL
++#define HVC_FIRST_EXIT		0x101
++#define HVC_SECOND_EXIT		0x102
++#define HVC_EL1_DONE		0x103
++#define HVC_BAD_EXIT		0x104
++#define EL1_BRK_IMM		0x321
++#define INITIAL_VALUE		0x123
++#define RESUME_VALUE		0x456
++#define EL1_RESUME_VALUE	0x789
++#define TPIDR_EL2_VALUE		0x12345678
 +
-+static volatile bool handled = false;
-+
-+static void guest_code(void)
++static void guest_resume_entry(void)
 +{
-+	volatile unsigned long *test_va = (void *)TEST_PAGE_IPA;
-+	volatile unsigned long *fault_va = (void *)FAULT_ADDR_IPA;
++	unsigned long value;
 +
-+	*fault_va = *test_va;
++	/* Place a specific value in x0, and re-read x0 after the HVC */
++	asm volatile(
++		"mov x0, %1\n"
++		"hvc %2\n"
++		"mov %0, x0"
++		: "=r" (value)
++		: "r" (INITIAL_VALUE), "i" (HVC_FIRST_EXIT)
++		: "x0", "memory");
 +
-+	if (*fault_va == *test_va && *fault_va == TEST_DATA)
-+		handled = true;
-+
-+	asm("hvc #0");
++	if (value == RESUME_VALUE)
++		asm volatile("hvc %0" :: "i" (HVC_SECOND_EXIT));
++	else
++		asm volatile("hvc %0" :: "i" (HVC_BAD_EXIT));
 +}
 +
-+static enum guest_handler_result guest_exception_handler(struct guest *guest)
++static void guest_el1_exception_entry(void)
 +{
-+	unsigned long far, ec;
-+	unsigned long *fixup_page;
++	unsigned long value;
 +
-+	ec = guest->esr_el2 >> ESR_ELx_EC_SHIFT;
++	// BRK, and check that the exception handler modified x0
++	asm volatile(
++		"brk %1\n"
++		"mov %0, x0"
++		: "=r" (value)
++		: "i" (EL1_BRK_IMM)
++		: "x0", "memory");
 +
-+	if (ec == ESR_ELx_EC_HVC64) {
-+		report_info("CPU%d: Guest exited via HVC.", smp_processor_id());
-+		return GUEST_ACTION_EXIT;
-+	}
-+
-+	if (ec == ESR_ELx_EC_DABT_LOW) {
-+		far = guest->far_el2;
-+		if (far == FAULT_ADDR_IPA) {
-+			fixup_page = alloc_page();
-+			s2mmu_map(guest->s2mmu, FAULT_ADDR_IPA,
-+				  virt_to_phys(fixup_page), PAGE_SIZE, S2_MAP_RW);
-+			report(true, "Caught stage-2 fault at 0x%lx", far);
-+		} else {
-+			report(false, "Unexpected fault address: 0x%lx", far);
-+		}
++	if (value == EL1_RESUME_VALUE) {
++		asm volatile(
++			"mov x0, %0\n"
++			"hvc %1"
++			:
++			: "r" (value), "i" (HVC_EL1_DONE)
++			: "x0", "memory");
 +	} else {
-+		report(false, "Unexpected exception class: 0x%lx", ec);
++		asm volatile("hvc %0" :: "i" (HVC_BAD_EXIT));
 +	}
++}
 +
-+	return GUEST_ACTION_RESUME;
++static bool guest_exited_with_hvc(const struct guest *guest,
++				  unsigned long expected_imm)
++{
++	unsigned long ec = guest->esr_el2 >> ESR_ELx_EC_SHIFT;
++	unsigned long imm = guest->esr_el2 & ESR_ELx_ISS_IMM_MASK;
++
++	return ec == ESR_ELx_EC_HVC64 && imm == expected_imm;
++}
++
++static enum guest_handler_result guest_sync_handler(struct guest *guest)
++{
++	if (guest_exited_with_hvc(guest, HVC_FIRST_EXIT) &&
++	    guest->x[0] == INITIAL_VALUE)
++		guest->x[0] = RESUME_VALUE;
++
++	return GUEST_ACTION_EXIT;
++}
++
++static void guest_el1_sync_handler(struct guest_el1_regs *regs,
++				   unsigned int esr)
++{
++	unsigned long ec = esr >> ESR_ELx_EC_SHIFT;
++	unsigned long imm = esr & ESR_ELx_ISS_IMM_MASK;
++
++	if (ec == ESR_ELx_EC_BRK64 && imm == EL1_BRK_IMM)
++		regs->regs[0] = EL1_RESUME_VALUE;
++	else
++		regs->regs[0] = 0;
++
++	regs->elr += 4;
++}
++
++static void test_guest_resume(void)
++{
++	unsigned long old_tpidr_el2 = read_sysreg(tpidr_el2);
++	struct guest *guest;
++	bool tpidr_restored;
++
++	guest = guest_create_identity(smp_processor_id(), guest_resume_entry,
++				      S2_PAGE_4K);
++	assert(guest);
++	guest_install_handler(guest, ELx_LOW_SYNC_64, guest_sync_handler);
++
++	guest_run(guest);
++	report(guest_exited_with_hvc(guest, HVC_FIRST_EXIT) &&
++	       guest->x[0] == RESUME_VALUE,
++	       "exit handler changes guest register state");
++
++	write_sysreg(0, elr_el2);
++	write_sysreg(TPIDR_EL2_VALUE, tpidr_el2);
++	guest_run(guest);
++	tpidr_restored = read_sysreg(tpidr_el2) == TPIDR_EL2_VALUE;
++	write_sysreg(old_tpidr_el2, tpidr_el2);
++
++	report(guest_exited_with_hvc(guest, HVC_SECOND_EXIT),
++	       "guest resumes with its saved PC and register state");
++	report(tpidr_restored, "guest run restores host TPIDR_EL2");
++
++	guest_destroy(guest);
++}
++
++static void test_guest_el1_exception(void)
++{
++	struct guest *guest;
++
++	guest = guest_create_identity(smp_processor_id(),
++				      guest_el1_exception_entry, S2_PAGE_4K);
++	assert(guest);
++	guest_install_handler(guest, ELx_LOW_SYNC_64, guest_sync_handler);
++	guest_install_el1_handler(guest, ELxH_SYNC, guest_el1_sync_handler);
++
++	guest_run(guest);
++	report(guest_exited_with_hvc(guest, HVC_EL1_DONE) &&
++	       guest->x[0] == EL1_RESUME_VALUE,
++	       "guest handles an EL1 synchronous exception");
++
++	guest_destroy(guest);
 +}
 +
 +int main(int argc, char **argv)
 +{
-+	struct guest *guest;
-+	unsigned long *test_page;
-+	unsigned long code_va_base, code_pa_base, data_base;
-+
-+	report_prefix_push("stage2-mmu");
++	report_prefix_push("guest");
 +
 +	if (current_level() != CurrentEL_EL2) {
 +		report_skip("EL2 is required");
 +		return report_summary();
 +	}
 +
-+	guest = guest_create_identity(smp_processor_id(), guest_code,
-+				      S2_PAGE_4K);
-+
-+	/* Map host code: IPA(VA) -> PA */
-+	/* We use the host VA as the Guest IPA because guest stage 1 is disabled. */
-+	code_va_base = (unsigned long)guest_code;
-+	code_pa_base = virt_to_phys((void *)guest_code);
-+
-+	/* Align to 2MB to use block descriptors where possible */
-+	code_va_base = code_va_base & ~(SZ_2M - 1);
-+	code_pa_base = code_pa_base & ~(SZ_2M - 1);
-+	s2mmu_map(guest->s2mmu, code_va_base, code_pa_base, SZ_2M, S2_MAP_RW);
-+
-+	/* Identity map the shared variable */
-+	data_base = virt_to_phys((void *)&handled) & PAGE_MASK;
-+	s2mmu_map(guest->s2mmu, data_base, data_base, PAGE_SIZE, S2_MAP_RW);
-+
-+	/* Map test data page */
-+	test_page = alloc_page();
-+	*test_page = TEST_DATA;
-+	s2mmu_map(guest->s2mmu, TEST_PAGE_IPA, virt_to_phys(test_page), PAGE_SIZE, S2_MAP_RW);
-+
-+	guest_install_handler(guest, ELx_LOW_SYNC_64, guest_exception_handler);
-+
-+	report_info("CPU%d: entering guest...", smp_processor_id());
-+
-+	guest_run(guest);
-+
-+	report(handled, "Stage-2 fault handling test completed");
-+	guest_destroy(guest);
++	test_guest_resume();
++	test_guest_el1_exception();
 +
 +	return report_summary();
 +}
+diff --git a/lib/arm64/asm/esr.h b/lib/arm64/asm/esr.h
+index 3860eb9d..02a27c24 100644
+--- a/lib/arm64/asm/esr.h
++++ b/lib/arm64/asm/esr.h
+@@ -72,4 +72,7 @@
+ #define ESR_ELx_FSC		(0x3F)
+ #define ESR_ELx_FSC_EXTABT	(0x10)
+ 
++/* Immediate field for HVC, SVC, and BRK instructions. */
++#define ESR_ELx_ISS_IMM_MASK	GENMASK(15, 0)
++
+ #endif /* _ASMARM64_ESR_H_ */
 -- 
 2.43.0
 
