@@ -1,88 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-24.mta0.migadu.com [91.218.175.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19E93B95E0;
-	Thu,  1 Oct 2026 07:09:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 137C9426687
+	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 07:11:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790838569; cv=none; b=KNxQNmtgcOGSZRgy8vK/oI6+qkDHo32fB4pBefNDRtaq8iyiYwzX7+9kTq948NfvLEpAJhHIxggkCWls2tvcb3x66pDpRamcT6sZX+8nLFgAgIqeHp/6zrZUE+/j8GngfuQZcxPwg5/SrGaiNjfbrYupePuxIdnXQI+dTb5qHyQ=
+	t=1790838674; cv=none; b=NtZ6Mjj/wmSEjOFBc5NILsjQ44F7t+nZFEmdOE0yYWdjQsj1F6wsNSaYRp+4Uu3yKVTZ4U2386P5Ob8CsGuJcJEMlZN3j7mEKJrdaXId7uNWwhjtmHdBWjT85bvUh/T3TWrBFEfFVQp7DXDc+51EPr/X2GYvpvJ0ZwR9vHBYuCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790838569; c=relaxed/simple;
-	bh=qcUv6L8ARdJT3lK/k0JCm9RvmGbRcHITaNoSi4wbxLA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=p6VXZg6cjV1Hr6OdpUe//ttzAix8EmwlXDopAeq7Eek86NV7xsO/5SaIhK7yVOM1VoiE0uKktGxB64/PMbbNnKnxHcrFkjMicaqC8Wv2TNkx0HzivgQj3wNe544OSDf8vnGPOegPf05l54F0rrE1dJ0p0k+D/DkupleF7tLWivE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AVuGX13l; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790838674; c=relaxed/simple;
+	bh=DhIR0bzDit/54mRZ18aEIOAZmEoER6aoaw9jLPnsPjo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jqg+GUPnEBFf8ed/vdnaGTrN17heTaPFin3NhF9CmoWIXaVdnMQJ5myMt2Go56YQlD3YEr/dVnggFpMd45KTetxZAC4Q0lJ5eDbkcPuH+FTj6NXC5nxa1YD0wAixZFiMD/NvVttEunjlc8+4/Vvhs7DjNQ0QBjIzfOSZOMrg96c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ctqS2PQ5; arc=none smtp.client-ip=91.218.175.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AVuGX13l"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A6001F00898;
-	Thu,  1 Oct 2026 07:09:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790838568;
-	bh=9NU2htvl1DJjae4CiPKNFq06tVKMq97HSV7gij/9Ohc=;
-	h=Date:From:To:Cc:Subject;
-	b=AVuGX13lGxOFnXfsovN9kDWzX1/QIrP1CwOo12N66QAZIz2mPQVi7Emps6B4mQQTU
-	 GEbsC+5MQw4si9+hJ+1uucjHZGD4MpYqgaVhdO8H64X8JrF3nuI3BVZy5Aml419hQd
-	 9YT4q8FpmUHzC24kcCNBC8FwfVmX6qJIFsP9nUj58fI3XVkoc/Q274RAlBsPfTh9Uc
-	 uDGaPNkd99UfPPr1av47dPHHoSbhkD80ZamJL88iPZ3iuIbOx4LDdKeZL7880rAwuM
-	 1q1JWaZpFX+eJd5IJmGY1MGfwNk9oIYV4/GCa9ym96aIOIy7YKNcM/2GldWGVQ7diT
-	 8JY3WZ+PBgZTQ==
-Date: Thu, 1 Oct 2026 00:09:27 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 changes for 7.3, take #3
-Message-ID: <ar4HJw9zON0mG2_t@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ctqS2PQ5"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=DhIR0bzDit/54mRZ18aEIOAZmEoER6aoaw9jLPnsPjo=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1790838665; v=1; x=1791443465;
+ b=ctqS2PQ5TuzqsOkOQZDVPfBJ3GgMmT10ZS0Wse6z0+FYaP0bGZhxZgCbf9RkdH4HBxnbNTRc
+ VKOAG0GOuOJFATGGPXyVr6uRaGEKmNo7YTNeV8f1Re0yWWOLcwARKEHaIgfFcdaTktKs+RAlkO8
+ HlW8Pd6lvgQxBBS6mUCvGaNk=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id b1243c585b78d71b;
+	Thu, 01 Oct 2026 07:11:05 +0000
+X-Mizu-Trace-ID: b1243c585b78d71b
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Yuchao Zhang <ndaugoing@gmail.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH v2 0/3] KVM: arm64: selftests: Cover the ITS MOVALL command
+Date: Thu,  1 Oct 2026 08:10:57 +0100
+Message-Id: <20261001071100.190013-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Hi Paolo,
+Hi folks,
 
-As promised, the patches I was waiting on have baked and we have another
-batch of fixes for 7.3. Continuing with the trend, the VGIC is getting
-some additional attention, particularly on the handling of a vCPU's AP
-list.
+Changes since v1 [1]:
+  - Make the LPIs pending before they're moved, since pending state is
+    what MOVALL moves. (Marc)
+  - Put the test in vgic_lpi_stress, which now builds a VM per test.
+    (Marc)
+  - Test MOVI as well.
+  - Rebased on kvmarm/next.
 
-Unless there's something truly horrible brewing in the next couple of
-weeks, I expect this to be the last fixes pull for 7.3 with Marc taking
-over the tree for 7.4.
+This series tests MOVI and MOVALL on pending LPIs, in vgic_lpi_stress.
+The MOVALL case passes only with "KVM: arm64: vgic-its: Fix MOVALL
+handling of source redistributor", which is in kvmarm/fixes. Under QEMU
+with pKVM, VHE and nVHE hosts, it failed all 21 runs without the fix,
+and the test passed all 21 with it and all 5 on top of Oliver's series
+[2]. MOVI is there because it's what Linux uses to change an LPI's
+affinity.
 
-Please pull.
+The test can also catch the stale LR that Oliver's "KVM: arm64: vgic:
+Move IRQ migrations out of vgic_prune_ap_list()" fixes, since the vCPU
+the LPI is moved from can keep it in its list registers during the
+move. I've only seen that in the MOVALL case without the MOVALL fix,
+where 13 of the 21 runs took the LPI on that vCPU. I couldn't reproduce
+it with MOVI, with the fix, or in 70 runs in a Linux VM on an M4 with
+Ubuntu's 6.8 kernel, which predates the MOVALL bug. Oliver, this may be
+the pending-LPI migration test you mentioned.
 
-Thanks,
-Oliver
+Turns out the test does run on an M4, unlike what I said in v1, since
+KVM emulates the ITS whether or not the host has one.
 
-The following changes since commit bc502b86a3cfd89e6740f877c90d06b02635935d:
+Based on kvmarm/next (8c00199d322b9).
 
-  KVM: arm64: Use stage-1 leaf size for VM_PFNMAP (2026-09-30 11:03:16 -0700)
+Cheers,
+/fuad
 
-are available in the Git repository at:
+[1] https://lore.kernel.org/all/cover.1790708299.git.fuad.tabba@linux.dev/
+[2] https://lore.kernel.org/all/20260929212925.31775-1-oupton@kernel.org/
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags/kvmarm-fixes-7.3-2
+Fuad Tabba (3):
+  KVM: arm64: selftests: Add MOVI and MOVALL commands to the ITS library
+  KVM: arm64: selftests: Build a VM per test in vgic_lpi_stress
+  KVM: arm64: selftests: Test MOVI and MOVALL on a pending LPI
 
-for you to fetch changes up to bc502b86a3cfd89e6740f877c90d06b02635935d:
+ .../selftests/kvm/arm64/vgic_lpi_stress.c     | 258 ++++++++++++++++--
+ .../selftests/kvm/include/arm64/gic_v3_its.h  |   2 +
+ .../selftests/kvm/lib/arm64/gic_v3_its.c      |  28 ++
+ 3 files changed, 265 insertions(+), 23 deletions(-)
 
-  KVM: arm64: Use stage-1 leaf size for VM_PFNMAP (2026-09-30 11:03:16 -0700)
 
-----------------------------------------------------------------
-KVM/arm64 fixes for 7.3, round #2
+base-commit: 8c00199d322b9e5e936bb0ff624ac95b01c740fe
+-- 
+2.39.5
 
- - Take a reference on the last IRQ loaded into an LR to prevent it
-   from being freed while running the guest (Marc Zyngier)
-
- - Ensure that the ITS MOVALL command only affects LPIs that were
-   previously affined to the source redistributor (Marc Zyngier)
-
- - Fix + test for honoring the host's trap configuration when running
-   non-protected VMs while KVM is in protected mode (Fuad Tabba)
-
- - Use the host stage-1 mapping granularity for VM_PFNMAP mappings at
-   stage-2 (Mostafa Saleh)
-
-----------------------------------------------------------------
