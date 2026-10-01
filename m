@@ -1,56 +1,56 @@
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1422F51DE1F
-	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 14:29:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2ED551B169
+	for <kvmarm@lists.linux.dev>; Thu,  1 Oct 2026 14:29:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790864962; cv=none; b=YJ93W2cE2cts25s9Jtn0sw1m2C1oz9TWOTBNgeUCucAMV20FGOzPxRK7sH/y+JUTOSIE500wxdLNjjXBkHuJLKHKY67Y+3URZPZ96Ctq3oFEe2NJk2LO2Q8iVwRI/cId4+xAXK6ZljuFZn457DDODxaHTZ3bQKPA8r7rUEs/V2s=
+	t=1790864962; cv=none; b=INlBhuOc09R/XUjvtNSJTZcY3TjXkg9mfWiNb2XTLaqP7nlfdVPRyLDoRLJ/XrPz+0CfCtfbPDhasS1KSWCnV0WLI7PwaeCnsqw7cFx+du3dQcCz2XKVDodvYj20o4l9puYH9AcDw0pFuoLPowe0PHhGtHbsiJQTz3yzF554xs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1790864962; c=relaxed/simple;
-	bh=VgBYrdgUVqx0LunEhQSQ3NbnQ2pg6rJzAKjLQlb/h44=;
+	bh=HXYv2Nlt9sZI3hswVRRAT339+AHP7HnTpMlsrdZO7Mw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RpSKto26YTpe51fURjmYpYjjlHaPcHLxQ0WC/PcTLBDAXmdznABUhChsikKoU+UkX2fwGI/aPzvb++zkdqvsvmw/eMKiJ41I2p81GqZEK5BevwLR/T2f7U7lf+9efWG0mLTsfrNgjn3+LK+K5cNflMU7VpRIXNwxvB6RdrO/68Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tNk8+88z; arc=none smtp.client-ip=209.85.128.72
+	 To:Cc:Content-Type; b=J3Fx2f+8Dx73jZ9KDOSmgh7jBrRY0JCALQRsGC1ctt5CbCAJwNLx8KVH0tWD0pOuOVc2AU9RvrmU2ppTlxJsPn4aM2Ld2zMr/Z3S4Rp9byBazMmmks0D5fJcLlqVlNkQS5e1gRfASqrqA8HzdYNwmEPNbE7uxL/KJQsIAOhvjmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Il+YunDf; arc=none smtp.client-ip=209.85.221.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tNk8+88z"
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4a024bce773so7180315e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 01 Oct 2026 07:29:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Il+YunDf"
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-4870af30a85so848020f8f.1
+        for <kvmarm@lists.linux.dev>; Thu, 01 Oct 2026 07:29:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790864950; x=1791469750; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1790864951; x=1791469751; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=+ogMG6FWLsaZmD+0hvaGeTXwDkULMhtfZspxWbbrsJg=;
-        b=tNk8+88zPB/KqRYDfNslNalkabXMJxg7MJa7i/PjwPWMoWDm19mE4KySpd5o+Sqe2g
-         j41+sPvTyLYmx1YsG70AlPqWMwUeikhX8BiVTKfzr9wKVuzUMLpzWmP1LQC/W8/sJBco
-         2Knz21alOQlwP/TpHqgBzgxUF+QsRP0ePHPbVJgZkZaCHWXfBXyQjiFZdUI5IeCq0ULY
-         bsJUdhuPpvFXr6jpXW12RsbCB/1UGMLc7XPFICHIXMaGvS3XWPK/ftgxKQOABXb50mUb
-         +RTItmBTwi1hX1skxRtfkGKRsknNAKkflRvZvbYncQAcc1KR4N1kutEkeDdDtUI0jJho
-         l+EA==
+        bh=yEFq2rr5EDnNpZBggFgHhQUVCsgLj0Cjnpte+1iST0Y=;
+        b=Il+YunDfV1JprhQsT/e4bUtB7tcq2y+jM9QJbTdXw23LNvc64+PbSbqZbUdeivkf6W
+         nQfBt8P1qgrLcXezkNSWUlXLkuMFxeO4ID2AMdbkrYaeLFgW79JiNHrsiQBYAKEu5fKQ
+         JOdF53CMKkH1FJbeAjhZfc6zzPBVr7JTECOxaZV+wb537nX4zssYTkNwU8q0efdVv/Kx
+         0/jvOa+ssCx9tI2eRFzoz83vOXnhPYf5HejovpgOflHUZjlX+DMD2F9RsEwr6X/aOJFg
+         OuBfLq9/hMyToS7yBd1ezOXesiha3KgiANyJPskN/9aBIPp7k5AtYxl584OoK74znZGL
+         g8MQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790864950; x=1791469750;
+        d=1e100.net; s=20260707; t=1790864951; x=1791469751;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=+ogMG6FWLsaZmD+0hvaGeTXwDkULMhtfZspxWbbrsJg=;
-        b=1MwXk/EOhi3rzgqsZFPHnO3G+m2uXZfXLdMAw8Vp4+1AHpoFmXKoZx+Vt4jGlg1ef6
-         bm+tOpXcfNX+FCiBSKC7MkXYtI4abDxKVBJLsrh3ddh9VqB4oy+RWh+pXVWvt3wmg7ll
-         EqWvKK3Twlcsvt7RLzWderjc71S+9LEqDUeOrnxpqJRGTRDQgF7dmOrdI0OzealtfCUo
-         wcCIXkqEcD5riP/VCP2r9JGJVC8JqkEzQPtKTEJrMM3xPU2w5T/E0TwsBIgoQSd91AE/
-         sVTvxEO5xJRbA2HKB3PDIhqKf/HlfuiuDtcwtuRVvn6byutaDcZPH8ECV+ttEjL4+ANq
-         u1KQ==
-X-Forwarded-Encrypted: i=1; AKwUvBwQiywbxCuPogSL4eWJUdO9ROuoMURFY2x8TdKNxSgmJn2xLMw2egfD8sfzIREAuyoSm0akh7w=@lists.linux.dev
-X-Gm-Message-State: AFuF++nb7KkNF4FrsoXsTwyVpIl7AQ9m4YnvKnYEzACdWZ3D0DZMZT7U
-	3bBYZZVb7gL70oxH71HcV4Ch2oCGqEL2HHfINv/maaNXw+SiGXIm3KWTTuvQ2sUTq0StW2H9Pae
-	DerleDfv8gAqrkf0OIX9oLg==
-X-Received: from wmmi15.prod.google.com ([2002:a05:600c:400f:b0:4a0:1b62:1284])
+        bh=yEFq2rr5EDnNpZBggFgHhQUVCsgLj0Cjnpte+1iST0Y=;
+        b=Ofr/24E1Sz8awUkHEdHbkSWQ6EI+eo8x/f5KwQv7Lglk3YsdCPzgRFDWzcbsQplPMH
+         /HJbdtqhYeh6RqRMGiB9HGtz8p0dHTa55mMpKvUBBeqWywcS6KB5JQ11k/gr44jd1igP
+         65T7zjRRseu4ta91+dRppY2+8G1PHmxYVneasxmYY2YI8ZWk6UsZFNed81nKu8/kriP+
+         4GTGuNmXzZ9xD7/LW5xmRrS5LKnUhDu8OyZlwa96w3ZRyTqPfQVt0fdUqff1liVcwmcs
+         i6l0YkfQcl0Ql4cRrz1gx1w9nAEc7+PBgwPvs2ckTTb/nRsTNp+kCfahy3Gf2okQP4en
+         EnUA==
+X-Forwarded-Encrypted: i=1; AKwUvByHt+kDzq8W3RFSSSac9xsW+qLUVsNZpECQJ29NHDzs3tqwBV7DQAxyil4fZkBZ7Mz1xtnOHL4=@lists.linux.dev
+X-Gm-Message-State: AFq9FYJuZ6LXu2Vt1et6aB6ZkTHHMaaxi6dfq1P8NGvrP30OUNtYy1ym
+	+7zuhNxe+pfq9TCI7xTqsN8d5hUmgGrMPVZ8KKFhMvVPMmSJUsd1R7Nnbkb8XOeliW3BP1degmx
+	eVkGt/Je+Wr084tcApQLtRg==
+X-Received: from wrck9.prod.google.com ([2002:a5d:5249:0:b0:48a:fb3c:e7c3])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:3b10:b0:4a0:c02:938c with SMTP id 5b1f17b1804b1-4a01b1290f0mr82799725e9.25.1790864949407;
- Thu, 01 Oct 2026 07:29:09 -0700 (PDT)
-Date: Thu,  1 Oct 2026 15:28:41 +0100
+ 2002:a5d:6791:0:b0:485:8ea0:da8c with SMTP id ffacd0b85a97d-48b068c7fd4mr5362558f8f.16.1790864950779;
+ Thu, 01 Oct 2026 07:29:10 -0700 (PDT)
+Date: Thu,  1 Oct 2026 15:28:42 +0100
 In-Reply-To: <20261001142849.3367614-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -60,8 +60,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20261001142849.3367614-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.56.0.rc1.315.gc6ed9934b7-goog
-Message-ID: <20261001142849.3367614-11-vdonnefort@google.com>
-Subject: [PATCH v6 10/18] KVM: arm64: Add a shrinker for pKVM
+Message-ID: <20261001142849.3367614-12-vdonnefort@google.com>
+Subject: [PATCH v6 11/18] KVM: arm64: Filter out non-kernel addresses in kern_hyp_va
 From: Vincent Donnefort <vdonnefort@google.com>
 To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -71,117 +71,41 @@ Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
 	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Integrate the pKVM memory reclaim interface with the host's memory
-management subsystem.
+kern_hyp_va() is idempotent for the hypervisor linear space. This is
+handy for nVHE hypervisor callers handling kvm_vcpu or kvm_arch
+pointers. Those pointers can originate from the hypervisor space (when
+protected mode is enabled, we don't trust the kernel and the hypervisor
+uses its own copy) or from the kernel space (we do trust the kernel in
+"non-protected" nVHE).
 
-This allows the host to automatically recover unused memory fom the
-hypervisor's heap allocator when the host is under memory pressure.
+This idempotence does not hold for addresses within the hypervisor
+private range, like the ones you get from the pKVM heap allocator
+(hyp_alloc()). To resolve this, filter out non-kernel addresses based on
+PAGE_OFFSET.
+
+Leave the assembly version untouched as it has no current users.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
 Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/include/asm/kvm_hcall.h |  1 +
- arch/arm64/kvm/pkvm.c              | 50 +++++++++++++++++++++++++++---
- 2 files changed, 47 insertions(+), 4 deletions(-)
+ arch/arm64/include/asm/kvm_mmu.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_hcall.h b/arch/arm64/include/asm/kvm_hcall.h
-index 8a6c2506fdeb..9f09eb11193f 100644
---- a/arch/arm64/include/asm/kvm_hcall.h
-+++ b/arch/arm64/include/asm/kvm_hcall.h
-@@ -24,6 +24,7 @@ typedef u16 pkvm_handle_t;
- 
- enum pkvm_topup_id {
- 	PKVM_TOPUP_HYP_ALLOC,
-+	NR_PKVM_TOPUP_HYP_IDS,
- 	PKVM_TOPUP_HYP_ALLOC_SELFTEST,
- };
- 
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 7821f2592eba..ea96744f41fb 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -133,7 +133,7 @@ static unsigned long __pkvm_hyp_reclaim(enum pkvm_topup_id id, unsigned long tar
- 	return reclaimed;
- }
- 
--static __maybe_unused unsigned long pkvm_hyp_reclaim(enum pkvm_topup_id id, unsigned long target)
-+static unsigned long pkvm_hyp_reclaim(enum pkvm_topup_id id, unsigned long target)
- {
- 	unsigned long reclaimed = 0;
- 
-@@ -154,7 +154,7 @@ static __maybe_unused unsigned long pkvm_hyp_reclaim(enum pkvm_topup_id id, unsi
- 	return reclaimed;
- }
- 
--static __maybe_unused unsigned long pkvm_hyp_reclaimable(enum pkvm_topup_id id)
-+static unsigned long pkvm_hyp_reclaimable(enum pkvm_topup_id id)
- {
- 	return kvm_call_hyp_nvhe(__pkvm_hyp_reclaimable, id);
- }
-@@ -360,8 +360,39 @@ void __init pkvm_selftests(void)
- #endif
- }
- 
-+static unsigned long pkvm_shrinker_count(struct shrinker *shrink, struct shrink_control *sc)
-+{
-+	unsigned long reclaimable = 0;
-+	int id;
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 57f65257bb56..04d9f59db976 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -128,6 +128,9 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
+  * replace the instructions with `nop`s.
+  */
+ #ifndef __KVM_VHE_HYPERVISOR__
++	if (is_protected_kvm_enabled() && !is_ttbr1_addr(v))
++		return v;
 +
-+	for (id = 0; id < NR_PKVM_TOPUP_HYP_IDS; id++)
-+		reclaimable += pkvm_hyp_reclaimable(id);
-+
-+	return reclaimable ?: SHRINK_EMPTY;
-+}
-+
-+static unsigned long pkvm_shrinker_scan(struct shrinker *shrink, struct shrink_control *sc)
-+{
-+	unsigned long reclaimed = 0;
-+	int id;
-+
-+	sc->nr_scanned = 0;
-+
-+	for (id = 0; id < NR_PKVM_TOPUP_HYP_IDS; id++) {
-+		unsigned long r = pkvm_hyp_reclaim(id, sc->nr_to_scan - sc->nr_scanned);
-+
-+		reclaimed += r;
-+		sc->nr_scanned += r;
-+		if (sc->nr_scanned >= sc->nr_to_scan)
-+			break;
-+	}
-+
-+	return reclaimed ?: SHRINK_STOP;
-+}
-+
- static int __init finalize_pkvm(void)
- {
-+	struct shrinker *pkvm_shrinker;
- 	int ret;
- 
- 	if (!is_protected_kvm_enabled() || !is_kvm_arm_initialised())
-@@ -377,10 +408,21 @@ static int __init finalize_pkvm(void)
- 	kmemleak_free_part_phys(hyp_mem_base, hyp_mem_size);
- 
- 	ret = pkvm_drop_host_privileges();
--	if (ret)
-+	if (ret) {
- 		pr_err("Failed to finalize Hyp protection: %d\n", ret);
-+		return ret;
-+	}
- 
--	return ret;
-+	pkvm_shrinker = shrinker_alloc(0, "pkvm");
-+	if (pkvm_shrinker) {
-+		pkvm_shrinker->count_objects = pkvm_shrinker_count;
-+		pkvm_shrinker->scan_objects = pkvm_shrinker_scan;
-+		shrinker_register(pkvm_shrinker);
-+	} else {
-+		kvm_err("Failed to register shrinker for pKVM\n");
-+	}
-+
-+	return 0;
- }
- device_initcall_sync(finalize_pkvm);
- 
+ 	asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n"         /* mask with va_mask */
+ 				    "ror %0, %0, #1\n"         /* rotate to the first tag bit */
+ 				    "add %0, %0, #0\n"         /* insert the low 12 bits of the tag */
 -- 
 2.56.0.rc1.315.gc6ed9934b7-goog
 
