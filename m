@@ -1,348 +1,117 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00D064611E5
-	for <kvmarm@lists.linux.dev>; Fri,  2 Oct 2026 12:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790945962; cv=none; b=mycT+cl45xPTg6LbgcICnMndbXQz6Vl6+L7lyAulVGd08V6trdgcmceeTY88PtNtOvfqgsg4oOZ+JKCJP69EFIoyWxWe09N3UwJ5PDTrDiK7d5srV+RnHguHf8X3Z+0J1+7UDQJiCFR/TO8gtQtzQf1Drg/nVjp3kJ1Ik/hmHeI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790945962; c=relaxed/simple;
-	bh=y/SyFGeB/VccUzv5MG7L+qQheQ4WqmUPEfC7ar5bOjA=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=AbKg+8pnfacgq4keA7tOIM24+lPvhXGul0pa0a2/9ZEC7nAkQg2xO12/SYxZZeTp6QgpVuoKIAhqlXo2xy5nMputZV+15eGpI9NMOQx2xj4K/N486y0EeEAACiWzmF8MaPqSkWtrIhR92dgi4yjtMnCbVIFl+QQ772j01JzFBiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JvCYjYct; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CD384949F1
+	for <kvmarm@lists.linux.dev>; Fri,  2 Oct 2026 13:05:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790946366; cv=pass; b=XtjjwkdmD2iDVP6ekuAHS9AcEOpBywmAu2pYUdvkA2pvKF2RXgp7pHZgyj3HcqwW4vX5rksMRNongMmpaUdGiXxoOAc5SwB960eSMtU5XdnCyVsjxfs8YbW6yIPAalPdOt2rGqt7d12ksOXJmuHj7qPOYdPOo1EJS2k6FXp6Pho=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790946366; c=relaxed/simple;
+	bh=E3o9mY11vfyNe7daMSPv/Jpy/COQ66uBOFgs4MlwYzE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ebPWu5qb4gzuqvERKvP66kwlY6/4n31wOX2R8gvU/7jN0nDjKHAgOlzC+nKM4wm52YtHj1WmmyPeVuWLeJ+aqVvnsrVVF09D+JNcDtz5Tgd7y9gMcZk1uJ3u+xqtOBgiZ3IiijMVACpkoIwr6hmStI+8yjWAUJQ1OP8gzObApkg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W2Phv1rM; arc=pass smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JvCYjYct"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1790945959;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VFoEE0U1Hp5KQT1ZPGx/a8maOhy1unI7O+5gpZ1vOHI=;
-	b=JvCYjYcttWA40rH35ETUHK2v940k6pVWwT/hfJDs7u9JO4G9KZekIOV8Xfm3UKSYmE9chP
-	TDZBDsuRgiwU5HLNnkEUwQ0ek0P5HPyahRqm3SBzK2sVyoH6ToaE1pvNhnYr448CNFGy34
-	wDNSgs/5BpASt8Ni9KiPl0L2GyTa+4k=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-441-5LmVqVJ2PAWenRnmKjz2aw-1; Fri, 02 Oct 2026 08:59:18 -0400
-X-MC-Unique: 5LmVqVJ2PAWenRnmKjz2aw-1
-X-Mimecast-MFC-AGG-ID: 5LmVqVJ2PAWenRnmKjz2aw_1790945957
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-48af4046a3bso4179256f8f.2
-        for <kvmarm@lists.linux.dev>; Fri, 02 Oct 2026 05:59:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W2Phv1rM"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5ba429b64c5so5729e87.1
+        for <kvmarm@lists.linux.dev>; Fri, 02 Oct 2026 06:05:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790946354; cv=none;
+        d=google.com; s=arc-20260327;
+        b=eqYMOf0k+Pbps9xIg7HRQoyZ4cNkqN06pS9HrI17wgD7jJ9D+y5zkRFNx8KMGvrzNW
+         +MddX9gXAQ5tMTL2v38ZZj8YWN/KAfvXJHDx9+1dKE1yBEvHS10HEcBT32dR7t7NHb8b
+         ZGONhl0Qq2+nhtODZwsEC358MOg86mpfKn13LtDKTzVVNXlUa7Cx/utIIelXILmMTtdt
+         +mhU0JcLIvu9eXArSumxBiN3efhWi5CiFK4vtUNxKi1K5H0GeW88/T8QNwtHXS9ArdBg
+         5q7sxVok0qkoZ2Muff326SDondDw80O9w6PBlj3ikDy74Aui5ptJVVE8vQGyER+H0Yzz
+         CenA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=E3o9mY11vfyNe7daMSPv/Jpy/COQ66uBOFgs4MlwYzE=;
+        fh=dS2kYksMedj7UJCO83IE4KCsFp19fqBHjHkcParxBBI=;
+        b=Mm8+q4czEV0Bnw4bkLvEF/qsOXXtP7ZvfJ30GGxvsRGL73iNs+EiYIeDZWnqTUCtrH
+         e/gpkJR1h1cz6klGie6/pb/7qbvRpRePJVxRwi0bgHHHe1kgEiJFW5vkWZQV8NMXBPkU
+         otop82GNdBc95NIYLuLJiIrYJyWKbM9vXglq8GetsV+kBPthTBvbDvmelLMMqNHIieVq
+         wDyDus+5FCJSfFGa8jBo9G2OyQqRNxw2X0VFbwEjVGBR5YRoGGsxqnx+G5fkdAXWrJ/1
+         fVAfeN8SnmmmLANPnnCUaBm3CEPBEM9KiFtXU3gPXLtWEx3R+aFW3tkbpeVX2CWBNKoH
+         W0Hg==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790946354; x=1791551154; darn=lists.linux.dev;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=E3o9mY11vfyNe7daMSPv/Jpy/COQ66uBOFgs4MlwYzE=;
+        b=W2Phv1rM71oVjbA/8lnLfVri88gI1M30eRNn40Urn258q1MiUGNLN/Jcel+L12i38N
+         YK2aI/VLPf682nbEUaEtM4iCQnSL+ga5QN8MVJauUCOS7bQ4Q6KVKEHRZThuUEEM4Ihq
+         7yLETuOCmKW9xKo5bFk9kqRqBomvjfeBir1qmjVsS3rSnQtkR5t7+3DfSEdukWyIdpfi
+         5E06ZW51I9oN/DQ14ZHg0PRAw6Cm9TJ4IwsIkLFeoy0yb34p5aOC6LxhBg7XAeEfpEgj
+         vuffNPXOFRlB1EF1k4x8REg83cNTpOPZyk7UtQh4J2yfHVXodul6womhF0lrOAGKZLfW
+         2rWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790945957; x=1791550757;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:cc:to:reply-to:subject:from:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=VFoEE0U1Hp5KQT1ZPGx/a8maOhy1unI7O+5gpZ1vOHI=;
-        b=b0DZbfqrf0gjX6RbL1cs1b5iHXI7pyImCd+CxQxo28nnYCfM7yrixkyeZZVsiBQwBv
-         5QSo6E35Ev1856mIfKEdHABp2fPpvKugWpo/2Gsr+Ut8zpeyU3PZgHzkoj6MnuWsOr10
-         8YKuQye2D0+Xw516woq9Z1kIykrGMs4BEdW6q2KCxLZ4Xor73zKtM/g/OANbMKJeOBBO
-         4bEs/cD6um8du+j9HvjLNgF5UWwGI3FW6gNc+8BrKvCBkLHCCzw4jppkj6ZEn1IuoLUC
-         OF1HSuyqyULzuC2T7ukeGQD+567nehy4zYeSriQrOdIGAhZV2IV1uEDzD/aV51adSm9k
-         EOxQ==
-X-Forwarded-Encrypted: i=1; AKwUvByq9u2XyxmTxI6EMeqFEqpvEMTh0YHS5R+nGG7o7UbHAqSYL5AZWmjy7o+FEL0XjdR4hE66clM=@lists.linux.dev
-X-Gm-Message-State: AFq9FYJ8MqhGhWXWJHqX4adW0bFxmuAWRVkGMhgudvDXf0NnckBXkf5l
-	zWKzAemH1MJ3hZC8LrPS88OPK83FJ+aMXb0k70guIH2NQVXyHTrQeAqVnBhYg5lzImcx7V6VBsr
-	XCW4JaxHnQHAR3WizK50NTIiZiqEP7+Vh1DNu9GZdu+sfGwaDF+6LJiWrWw==
-X-Gm-Gg: AYBFou1fiLP++pQ1I8KWAC0s6BKullDn2fFEWKG2bKrsq0Hv5vflyiHQkkuXTljfAX5
-	yC/h+HnVryS0HcMwc59P0Zps5Iz2lXLhq2Y4OkOr00r3aE9ikzm1q8vfpeggK+lp/cvsPBhCMvD
-	6+Rrc9pZR1U1b803rJMCUFl+l3/V1wCMOEpwxevojZiARdRUk5aekculwlr9CvMrzV0GbasDiu0
-	EVmrXiuD+PGp1nYOnfiIj1QLW0VNyi/UHD+oCGyP8Hhp3YILnuSDRSkSSPG2skVsA20NupmP9ZB
-	aCS3M8KKVQogANy8ZfDjMnj1bNoxtq+5zw+l0AKQj6vUBdlDDYkBIPnrqRMKp/6mnc0pKoCqiNF
-	zf7dDkjtr0Pi2/0Dlx9xcJySpUgjuZOVfK1Jrd+Ugr8zDwbBa
-X-Received: by 2002:a05:6000:2c04:b0:487:27f9:841 with SMTP id ffacd0b85a97d-48b12727a3bmr4930953f8f.54.1790945957438;
-        Fri, 02 Oct 2026 05:59:17 -0700 (PDT)
-X-Received: by 2002:a05:6000:2c04:b0:487:27f9:841 with SMTP id ffacd0b85a97d-48b12727a3bmr4930906f8f.54.1790945957040;
-        Fri, 02 Oct 2026 05:59:17 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48b382f98ffsm5713867f8f.38.2026.10.02.05.59.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Oct 2026 05:59:16 -0700 (PDT)
-Message-ID: <14d8af0e-eb1f-43ba-87ce-5f52ac280543@redhat.com>
-Date: Fri, 2 Oct 2026 14:59:14 +0200
+        d=1e100.net; s=20260707; t=1790946354; x=1791551154;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=E3o9mY11vfyNe7daMSPv/Jpy/COQ66uBOFgs4MlwYzE=;
+        b=QOjDNuXRmiewbVqeA42QjoKgtS4BLSSreN6B5g9XfBWF8IKqSdHy2+RGuFI/co0hp4
+         Gj49iyGp0Lru9Ay3K7aQU8oAw32ks3rHz6AsmWel3QxcVFuNTgVL1nDpsV/MMtJZ2QAz
+         t3uV9fSmthuqpti4FOH/l4aOJ580cBUxil7DLHIWlWtbgk1AKxgR1Oq9A1hIoFaiIRtQ
+         MqTGzQf/NOabBAZ9xUjlCaeSEZnWt1eHTnMIuqhjTl+2ZTXKZyvrsae8S2er1rJFfPyU
+         SDBI8dH072afnGo56iobOatn24U0Ne+6eoK6qf92zhqWNQXQogfaMnNdsvWIQgFOhAM4
+         Pztw==
+X-Forwarded-Encrypted: i=1; AKwUvBwLTG68c0TisDVdeZHSYY+l5rlozRWkbjowCNrfVTuQCQwHHcqOtcsd0BKcx1MTAM1WoDd4GsQ=@lists.linux.dev
+X-Gm-Message-State: AFq9FYLcgCVCE8ip+Xgix94iz/GUaUL1lWxl0zWFNreyYf0Z19nzqzvV
+	GDEfpVCFCMOFigjSDuQ4t4yMLFK2WZMYKpBAL49DRzJ+pmHVyUclcugdK4IngeXcqdrGQPLqR8k
+	1i6vD7uNfGgkMy7GJfdW53KG0i1NIs0hx5NIV/FZd
+X-Gm-Gg: AYBFou2/onrLOMGSddLm3dKFK7PDTIT6kcJqnKxmhnXh1RvQV4ZT1UDBnmzUcaMBaML
+	643Wj+/3ymD/71ChTwxlFGnVYFdBF5S7/t8JqFf//9tOqS+FOmThuDHIPqVXufZuNh3YKQogJCq
+	63iTF3lqMmSymdwcxVh/pQ17viB3sJQQurrgCj+Y1dhJe7t7jURXxhU54kFHdbDpvRe22YEU8rJ
+	yn4ogVuQJGNtzRTlrYEuhRKlBl1SIj28qVgTZb3yUEX5AQWKgD9rlJTQDD7QphQ+UuyrHZeyBfj
+	PyXbF1RQL1hmZ+0TQXF8kLxEVAVYAWtPQ5NEvhpIM3M18tiudtD25VizpLuRN56wwCXasboNTMa
+	wFfOo3pKcK61NOQ==
+X-Received: by 2002:ac2:5b41:0:b0:5b1:5141:9156 with SMTP id
+ 2adb3069b0e04-5bbe07ff867mr111076e87.9.1790946353509; Fri, 02 Oct 2026
+ 06:05:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v9 06/26] scripts: Introduce
- scripts/update-aarch64-cpu-sysreg-properties.py
-Reply-To: eric.auger@redhat.com
-To: Khushit Shah <khushit.shah@nutanix.com>
-Cc: "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- Shaju Abraham <shaju.abraham@nutanix.com>,
- "yangjinqian1@huawei.com" <yangjinqian1@huawei.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "sebott@redhat.com" <sebott@redhat.com>,
- "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
- "philmd@oss.qualcomm.com" <philmd@oss.qualcomm.com>,
- "maz@kernel.org" <maz@kernel.org>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "abologna@redhat.com" <abologna@redhat.com>,
- "jdenemar@redhat.com" <jdenemar@redhat.com>
-References: <20260916144721.751810-1-eric.auger@redhat.com>
- <20260916144721.751810-7-eric.auger@redhat.com>
- <DFC38BF2-5E6F-4683-B030-C07656EC19BB@nutanix.com>
-In-Reply-To: <DFC38BF2-5E6F-4683-B030-C07656EC19BB@nutanix.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: HK9d9SedKsI-8xA5NIl2ldmdmjt1cfz1-4b19qBNqww_1790945957
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20261001210703.1597150-1-suzuki.poulose@arm.com>
+ <20261001210703.1597150-6-suzuki.poulose@arm.com> <CA+EHjTxtatPyGcyvEyR129cqUiAYcO_cxRVtwZO0ckZsOnD7TA@mail.gmail.com>
+ <86se2o2rbs.wl-maz@kernel.org>
+In-Reply-To: <86se2o2rbs.wl-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 2 Oct 2026 14:05:17 +0100
+X-Gm-Features: AclHuK-8Kjrfe19sfHmKlc-tMXZBvGMWfs-wEUp4fL4Zc1UtRtbnXSXF_N2l_2s
+Message-ID: <CA+EHjTwHuJ0u_TTP46zNFKFmBP124XHHLUVhkAUSyfhe92=41w@mail.gmail.com>
+Subject: Re: [PATCH v21 05/23] KVM: arm64: Track the type of VM in kvm_arch
+To: Marc Zyngier <maz@kernel.org>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com, 
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, 
+	joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, 
+	gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, 
+	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, 
+	lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com, 
+	jonathan.cameron@oss.qualcomm.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Khushit,
+Hi Marc,
 
-On 9/25/26 11:29 AM, Khushit Shah wrote:
->> On 16 Sep 2026, at 8:15 PM, Eric Auger <eric.auger@redhat.com> wrote:
->>
->> !-------------------------------------------------------------------|
->>  CAUTION: External Email
->>
->> |-------------------------------------------------------------------!
->>
->> Introduce a script that takes as input the Registers.json file
->> delivered in the AARCHMRS Features Model downloadable from the
->> Arm Developer A-Profile Architecture Exploration Tools page:
->> https://urldefense.proofpoint.com/v2/url?u=https-3A__developer.arm.com_Architectures_A-2DProfile-2520Architecture-23Downloads&d=DwIDAg&c=s883GpUCOChKOHiocYtGcg&r=PGWMyignA0NiDmTlyP7vOTHozBws_VN86yrVmSMkBp0&m=2NOLVUk59YPHssYi5AgGX0z_LkZPQXfTkiD33Ti_D8RYfowBwp7XuMOfw-dMDkDE&s=Qs3ro5t6_dDfdQDLUGX7pJ43SvM2axfOShUzqbv90EQ&e= 
->> and automates the generation of system register properties definitions.
->>
->> generates target/arm/cpu-idregs.h.inc containing definitions for
->> feature ID registers.
->>
->> We only care about IDregs with opcodes satisfying:
->> op0 = 3, op1 = {0,1,3}, crn = 0, crm within [0, 7], op2 within [0, 7]
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v5 -> v6
->> - add ident
->> ---
->> .../update-aarch64-cpu-sysreg-properties.py   | 166 ++++++++++++++++++
->> 1 file changed, 166 insertions(+)
->> create mode 100644 scripts/update-aarch64-cpu-sysreg-properties.py
->>
->> diff --git a/scripts/update-aarch64-cpu-sysreg-properties.py b/scripts/update-aarch64-cpu-sysreg-properties.py
->> new file mode 100644
->> index 0000000000..6f5edb88d2
->> --- /dev/null
->> +++ b/scripts/update-aarch64-cpu-sysreg-properties.py
->> @@ -0,0 +1,166 @@
->> +#!/usr/bin/env python3
->> +
->> +# This script takes as input the Registers.json file delivered in
->> +# the AARCHMRS Features Model downloadable from the Arm Developer
->> +# A-Profile Architecture Exploration Tools page:
->> +# https://urldefense.proofpoint.com/v2/url?u=https-3A__developer.arm.com_Architectures_A-2DProfile-2520Architecture-23Downloads&d=DwIDAg&c=s883GpUCOChKOHiocYtGcg&r=PGWMyignA0NiDmTlyP7vOTHozBws_VN86yrVmSMkBp0&m=2NOLVUk59YPHssYi5AgGX0z_LkZPQXfTkiD33Ti_D8RYfowBwp7XuMOfw-dMDkDE&s=Qs3ro5t6_dDfdQDLUGX7pJ43SvM2axfOShUzqbv90EQ&e= 
->> +# and outputs target/arm/cpu-idregs.h.inc content.
->> +# ID regs are defined using this pattern:
->> +#
->> +# IDREG_START(REG)
->> +#    IDREG_FIELD(REG, FIELD, SHIFT, LENGTH)
-> Nit: Add Enum Macro
-This is done later in "target/arm/cpu-idregs.h.inc: Generate enum values"
->> +# ...
->> +# IDREG_END(REG)
->> +#
->> +# Copyright (C) 2026 Red Hat, Inc.
->> +#
->> +# Authors: Eric Auger <eric.auger@redhat.com>
->> +#
->> +# SPDX-License-Identifier: GPL-2.0-or-later
->> +
->> +
->> +import json
->> +import os
->> +import sys
->> +from aarch64_sysreg_helpers import extract_idregs_from_registers_json
->> +
->> +def collect_fields(item, bit_offset=0):
->> +    """
->> +    Recursively finds all field-like objects, handling Fields.Array,
->> +    Fields.ArrayField, and ConditionalField structures.
->> +    Applies bit_offset from containers to child fields.
->> +    """
->> +    fields = []
->> +    if not isinstance(item, dict):
->> +        return fields
->> +
->> +    _type = item.get('_type', '')
->> +
->> +    # Array types (for example CLIDR_EL1 Ctype<n>, Ttype<n>)
->> +    if _type == 'Fields.Array':
->> +        name_template = item.get('name') or item.get('label', '')
->> +        index_info = item.get('indexes', [{}])[0]
->> +        start_idx = index_info.get('start', 0)
->> +        count = index_info.get('width', 0)
->> +
->> +        full_range = item.get('rangeset', [{}])[0]
->> +        bit_start = full_range.get('start', 0) + bit_offset
->> +        elem_width = full_range.get('width', 0) // count if count else 0
->> +
->> +        for i in range(count):
->> +            idx = start_idx + i
->> +            # Correctly handle indexed names like Ctype1, Ctype2
->> +            field_name = name_template.replace('<n>', str(idx))
->> +            fields.append({
->> +                'name': field_name,
->> +                'rangeset': [{
->> +                    'start': bit_start + (i * elem_width),
->> +                    'width': elem_width
->> +                }],
->> +                '_type': 'Fields.Field'
->> +            })
->> +        return fields
->> +
->> +    # ConditionalFields
-> Can you please explain what are conditional fields and should we always include them?
-If we don't you will miss plenty of named fields which depend on a
-specific FEAT implementation.
-Few examples: 
-<     IDREG_FIELD_START(ID_AA64MMFR4_EL1, E2H0, 24, 4)
-<     IDREG_FIELD_START(ID_AA64SMFR0_EL1, SMEver, 56, 4)
-<     IDREG_FIELD_START(ID_AA64ZFR0_EL1, SVEver, 0, 4)
-../..
+On Fri, 02 Oct 2026 13:57:11 +0100, Marc Zyngier <maz@kernel.org> wrote:
+[...]
+> Just to make sure. Is that what you had in mind?
 
-All of those are defined in linux sysreg too
->
->> +    elif _type == 'Fields.ConditionalField':
->> +        inner_offset = bit_offset
->> +        if item.get('rangeset'):
->> +            # Parent container defines the absolute start bit
->> +            inner_offset = item['rangeset'][0].get('start', bit_offset)
->> +
->> +        for entry in item.get('fields', []):
->> +            inner = entry.get('field')
->> +            if inner:
->> +                fields.extend(collect_fields(inner, inner_offset))
->> +        return fields
->> +
->> +    # Normal Field Types
->> +    leaf_types = ['Fields.Field', 'Fields.ConstantField',
->> +                  'Fields.EnumeratedField', 'Fields.Bitfield']
->> +    if _type in leaf_types:
->> +        field_copy = item.copy()
->> +        if field_copy.get('rangeset'):
->> +            new_ranges = []
->> +            for r in field_copy['rangeset']:
->> +                nr = r.copy()
->> +                # Apply the cumulative offset to the field's start bit
->> +                nr['start'] = r.get('start', 0) + bit_offset
->> +                new_ranges.append(nr)
->> +            field_copy['rangeset'] = new_ranges
->> +        fields.append(field_copy)
->> +        return fields
->> +
->> +    # Traverse the hierarchy for other cases
->> +    for key in ['fields', 'values', 'fieldsets']:
->> +        for nested in item.get(key, []):
->> +            fields.extend(collect_fields(nested, bit_offset))
->> +
->> +    return fields
->> +
->> +
->> +def generate_sysreg_properties_from_registers_json(id_reg_names, raw_json_path):
->> +    with open(raw_json_path, 'r') as f:
->> +        register_data = json.load(f)
->> +
->> +    regs = {r.get('name'): r for r in register_data if r.get('_type') == 'Register'}
->> +
->> +    final_output = ""
->> +
->> +    for reg_name in id_reg_names:
->> +        register = regs.get(reg_name)
->> +        if not register:
-> we should error out here.
-agreed
->> +            continue
->> +
->> +        final_output += f"IDREG_START({reg_name})\n"
->> +
->> +        unique_fields = {}
->> +        for fieldset in register.get('fieldsets', []):
->> +            candidates = collect_fields(fieldset)
->> +            for val in candidates:
->> +                name = (val.get('name') or val.get('label', '')).strip()
->> +                if not name or "RESERVED" in name.upper():
->> +                    continue
->> +                for r in val.get('rangeset', []):
->> +                    lsb = int(r.get('start'))
->> +                    width = r.get('width')
->> +                    msb = lsb + int(width) - 1
->> +
->> +                    # Only keep the fields with the highest MSB
->> +                    # needed fir CCSIDR_EL1
-> does not apply now, we ignore CCSIDR_EL1
-yeah but I feel it still makes sense to record the highest msb in case
-different fieldsets exist for the same name (32b versus 64b for instance)
->> +                    if name not in unique_fields or msb > unique_fields[name]['msb']:
->> +                        unique_fields[name] = {'lsb': lsb, 'msb': msb, 'width': width}
->> +
->> +        # Sort decreasing lsbs
->> +        sorted_fields = sorted(unique_fields.items(),
->> +                               key=lambda x: x[1]['lsb'], reverse=True)
->> +
->> +        for name, bits in sorted_fields:
->> +            line = (f"    IDREG_FIELD({reg_name}, "
->> +                    f"{name}, {bits['lsb']}, {bits['width']})\n")
->> +            final_output += line
->> +        final_output += f"IDREG_END({reg_name})\n"
->> +        final_output += "\n"
->> +
->> +    os.makedirs("target/arm", exist_ok=True)
->> +    with open("target/arm/cpu-idregs.h.inc", 'w') as f:
->> +        f.write("/* AUTOMATICALLY GENERATED, DO NOT MODIFY */\n\n")
->> +        f.write("/* SPDX-License-Identifier: GPL-2.0-or-later */\n\n")
->> +        f.write("/* IDREG_START(REG) */\n")
->> +        f.write("/*     IDREG_FIELD(REG, FIELD, SHIFT, LENGTH) */\n”)
-> Same enum macro …
-see above
+A diff is worth a thousand words :) Yes, that's it. With that, every
+remaining hyp user of vcpu_is_protected() only runs with pKVM, so the
+kern_hyp_va() case in the macro can go too.
 
-Thanks!
-
-Eric
->
-> Warm Regards,
-> Khushit
->> +        f.write("/* ... */\n")
->> +        f.write("/* IDREG_END(REG) */\n\n")
->> +        f.write(final_output)
->> +
->> +if __name__ == "__main__":
->> +    if len(sys.argv) < 2:
->> +        print("Usage: python scripts/update-aarch64-cpu-sysreg-properties.py "
->> +              "<path_to_registers_json>")
->> +    else:
->> +        json_path = sys.argv[1]
->> +
->> +        id_regs_dict = extract_idregs_from_registers_json(json_path)
->> +        sorted_names = sorted(id_regs_dict.keys())
->> +
->> +        if sorted_names:
->> +            generate_sysreg_properties_from_registers_json(sorted_names, json_path)
->> +            print("Generated target/arm/cpu-idregs.h.inc")
->> -- 
->> 2.53.0
->>
-
+Cheers,
+/fuad
