@@ -1,254 +1,204 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02D663AAF54;
-	Fri,  2 Oct 2026 14:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E3EE35B634;
+	Fri,  2 Oct 2026 15:15:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790952995; cv=none; b=qfewKNWBllHv4Z5W3o+gaPBimGHrU349i4loD0QnHpuiVuIv/KRyrcVfYvktbgO2TbIhenvq0rP0SbeH0W8tBlr4d3PuzaBoaV5FlY/mdlUH6XFAsFClEXvKnBfkGbNxMCBSPe0L2T6sdLyJn0khb+x5G0SlQKgzLQ8TuiyWBCQ=
+	t=1790954115; cv=none; b=jZtToHQb4dRHn7d+IpYu/xOYWX00IqdRCLOCbCpXypz77bGciVAM34Aqoe0izG3+RJOrHoOPRUnsdjdQEDSnys9gLBoxdFcf4Gr66HXxw0IznnVc4OJtP5+dDXEhdFXeYeOxXt/ZX7EpD4wD6genImgF/gTXM/MI7A3MSclDJtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790952995; c=relaxed/simple;
-	bh=vNF3N3IxUFgjfHwaXFhoUUdmxvTVJaq2s8vGsZwJrtA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tDRRoMZwwKDWQFbkBmzzMF7TsPkbSNJfobuF/S+vlifaw7wbrlV3WadnqzQAOyb51aIXuu/XCcsIroOluRnldBWMDT4bS3ZuQk2lL7RCspcvlfDZ1WaqEpYH9NlMKucJZof1YEOVwmtGfHlMak2n4FEl3J8z1e17T68P9P2dMWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fdVzgh8v; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790954115; c=relaxed/simple;
+	bh=ELvA9eECm9X8xz8cLNWJerW7Zrs56j8/gPBHi6bQfAQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GWUcbwuJkqAournHujBy+X82Zo7gJidT+oH4p4cW7SX/8Ur1Vsd7IVvHGiD1Nu+yWvVCfzJS10UoPRKEQ7WKnqaqnGqBrBQ6ODqJ2/Pr18QlBZKayUHofxL7u5NR0mlkOlZkIAhhoyyCFGtrMxIuAHYHyklEMKTBORBcPXs9I7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=e/z+/n06; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fdVzgh8v"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C88791F00893;
-	Fri,  2 Oct 2026 14:56:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790952993;
-	bh=jQuiTsuvfiP4TjKhygdb17Hd1K9/CkYZDyLUI1EBmwE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=fdVzgh8vzUmdaKUlZe0VUNAIbLSN/FNhbQHH4wzlHFvv+hwCHSicNk7KjrZHYj3Yu
-	 iQlLhsYS9ojqwSku1HQOXWnmdKoCu8CHMkE9A7LZ/DH6hiJQldb++n4ez57oVgBl0V
-	 So8/jwrVJl3CEjbngowiXAkkkl3yvYCSfnXRCFedPo61Fs2XbO15rdcGoISGxqRB8K
-	 jXU4TLmv22BTp6yPLlF2Jpru5HvWTRYFQZfFHeldR1afhWGGXDAezdVopQG8Ave8bR
-	 CZFLT49VpC5WBX0wYA8iUka0IczATo+lcmXmrk2MeXbxiJX2meYd90/doZTa6tYh/0
-	 hugq9t44NIjiw==
-Date: Fri, 2 Oct 2026 15:56:04 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: "David Hildenbrand (Arm)" <david@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	"Liam R. Howlett" <liam@infradead.org>, Vlastimil Babka <vbabka@kernel.org>, 
-	Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
-	Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>, 
-	Michal Hocko <mhocko@suse.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
-	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
-	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
-	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <mkp@kernel.org>, 
-	Jaya Kumar <jayalk@intworks.biz>, Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, 
-	Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
-	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
-	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
-	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
-	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
-	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev
-Subject: Re: [PATCH v3 15/40] mm/vma: add vma[_flags]_is_kernel_owned()
- predicates
-Message-ID: <ar_CYfkR5Pfb7J9b@gremlin>
-References: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org>
- <20260917-b4-mmap-prepare-vma-flag-sanify-v3-15-4583d8a23bca@kernel.org>
- <0623ee06-00e5-421e-a24a-ed605abb559b@kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="e/z+/n06"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 95834143D;
+	Fri,  2 Oct 2026 08:15:09 -0700 (PDT)
+Received: from [10.57.8.170] (unknown [10.57.8.170])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8291F3F85F;
+	Fri,  2 Oct 2026 08:15:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790954113; bh=ELvA9eECm9X8xz8cLNWJerW7Zrs56j8/gPBHi6bQfAQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=e/z+/n06DSw8s8JlOWXlAtjzjYm25fc9jLHgrTo3RhyWsmmAIyy3j08qP4TzIdjSS
+	 i1XDER7EGZI78JBxCEhHmrhsg6HJecq/80SfKLh1Si6/jmxdcksfoV7sMgyWi7U8LA
+	 kq+LppQbltELEHrEHjQrIFbsWBlmpXgBCDEFpcrQ=
+Message-ID: <10563362-5964-4ef7-b5d7-fe1d67ce4adb@arm.com>
+Date: Fri, 2 Oct 2026 16:15:07 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0623ee06-00e5-421e-a24a-ed605abb559b@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v21 05/23] KVM: arm64: Track the type of VM in kvm_arch
+Content-Language: en-GB
+To: Marc Zyngier <maz@kernel.org>, Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org,
+ catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev,
+ gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com,
+ alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com,
+ lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com,
+ jonathan.cameron@oss.qualcomm.com
+References: <20261001210703.1597150-1-suzuki.poulose@arm.com>
+ <20261001210703.1597150-6-suzuki.poulose@arm.com>
+ <CA+EHjTxtatPyGcyvEyR129cqUiAYcO_cxRVtwZO0ckZsOnD7TA@mail.gmail.com>
+ <86se2o2rbs.wl-maz@kernel.org>
+ <CA+EHjTwHuJ0u_TTP46zNFKFmBP124XHHLUVhkAUSyfhe92=41w@mail.gmail.com>
+ <86pkxs2npx.wl-maz@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <86pkxs2npx.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 01, 2026 at 02:36:40PM +0200, David Hildenbrand (Arm) wrote:
-> On 9/17/26 18:22, Lorenzo Stoakes (ARM) wrote:
-> > Rather than referring to VMA flags with uncertain meaning, add a new
-> > predicate that explicitly describes what possession of the VMA_PFNMAP_BIT
-> > or VMA_MIXEDMAP_BIT flags mean, and then refer to that function for
-> > determining VMA mergeability.
-> >
-> > Either flag means the contents of the mapping are owned by the kernel,
-> > usually a driver, rather than by the core mm: the memory may be MMIO,
-> > kernel-allocated pages or even ordinary pages the driver maps itself, but
-> > the core must not populate, reclaim, migrate, copy-on-write or merge the
-> > range on its own initiative.
-> >
-> > We initially also include VMA_IO_BIT here, as by implication, these must be
-> > kernel-owned. (mlock() also sets VMA_IO_BIT transiently on ordinary VMAs
-> > while locking them, which is addressed later in this series.)
-> >
-> > However the intent is to in future remove this, as no mapping should be
-> > marked as an I/O mapping without also being marked with VMA_PFNMAP_BIT.
-> >
-> > This forms the basis of further work intended to improve how we express VMA
-> > properties such as this.
-> >
-> > Also update the VMA userland tests to reflect the change.
-> >
-> > No functional change intended.
->
-> Of course I have to bitch about the naming :)
+On 02/10/2026 15:15, Marc Zyngier wrote:
+> On Fri, 02 Oct 2026 14:05:17 +0100,
+> Fuad Tabba <tabba@google.com> wrote:
+>>
+>> Hi Marc,
+>>
+>> On Fri, 02 Oct 2026 13:57:11 +0100, Marc Zyngier <maz@kernel.org> wrote:
+>> [...]
+>>> Just to make sure. Is that what you had in mind?
+>>
+>> A diff is worth a thousand words :) Yes, that's it. With that, every
+>> remaining hyp user of vcpu_is_protected() only runs with pKVM, so the
+>> kern_hyp_va() case in the macro can go too.
+> 
+> Actually, scratch all of that. The whole thing is written upside down,
+> and makes little sense. I wish I had looked at it more closely...
+> 
+> The *_protected__pkvm() shouldn't exist at all, because nVHE is the
+> only context where it matters, and therefore we can specialise the
+> *normal* accessors for the nVHE context (see below). No *_pkvm(), no
+> kern_hyp_va(), nothing at all.
+> 
+> I'm also dead against the unprotected_pkvm() stuff, as it looks
+> pointlessly specialised. Specifically, this nugget is making my head
+> spin:
+> 
+> +       if (!kvm_vm_is_unprotected_pkvm(vcpu->kvm))
+>                  return;
+> 
+> Honestly, we introduce the flavor stuff to make it easy to match
+> things on a particular VM type in a readable way. So why isn't this
+> reading:
+> 
+> 	if (vcpu->kvm->arch.vm_flavor != VM_PROTECTED_PKVM)
+> 		return;
+> 
+> which makes it pretty explicit. You can gate it with a
+> is_protected_kvm_enabled() if you want, as it was before.
+> 
+> 	M.
+> 
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 9e1fa00d96f7c..6b64f9610f3a3 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1519,41 +1519,22 @@ struct kvm *kvm_arch_alloc_vm(void);
+>   
+>   #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+>   
+> -#define kvm_vm_is_protected(kvm)	((kvm)->arch.vm_flavor >= __VM_PROTECTED)
+> -/*
+> - * Accessing vcpu->kvm from nVHE hyp stub is tricky, as we need to convert the
+> - * pointer to the hyp VA. With pKVM, the nVHE code runs with the hyp_vcpu,
+> - * which is populated correctly.
+> - */
+> -#define vcpu_is_protected(vcpu)						\
+> -	({								\
+> -		struct kvm *__kvm = READ_ONCE((vcpu)->kvm);		\
+> -		bool __protected = false;				\
+> -									\
+> -		if (__kvm) {						\
+> -			if (is_nvhe_hyp_code() &&			\
+> -			    !is_protected_kvm_enabled()) 		\
+> -				__kvm = kern_hyp_va(__kvm); 		\
+> -									\
+> -			__protected = kvm_vm_is_protected(__kvm);	\
+> -		}							\
+> -		__protected;						\
+> -	})
+> -
+> -#define kvm_vm_is_protected_pkvm(kvm)					\
+> +#ifdef __KVM_NVHE_HYPERVISOR__
+> +#define kvm_vm_is_protected(kvm)					\
+>   	(is_protected_kvm_enabled() && ((kvm)->arch.vm_flavor == VM_PROTECTED_PKVM))
+> -
+>   /*
+>    * Rely on is_protected_kvm_enabled() check in kvm_vm_is_protected_pkvm() to
+>    * make sure the vcpu->kvm is always valid VA in the context
+>    */
+> -#define vcpu_is_protected_pkvm(vcpu)					\
+> +#define vcpu_is_protected(vcpu)						\
+>   	({								\
+>   		struct kvm *__kvm = READ_ONCE((vcpu)->kvm);		\
+> -									\
+> -		(__kvm && kvm_vm_is_protected_pkvm(__kvm));		\
+> +		(__kvm && kvm_vm_is_protected(__kvm));			\
+>   	})
+> -
+> +#else
+> +#define kvm_vm_is_protected(kvm)	((kvm)->arch.vm_flavor >= __VM_PROTECTED)
+> +#define vcpu_is_protected(vcpu)		kvm_vm_is_protected((vcpu)->kvm)
+> +#endif
+>   
+>   #define kvm_vm_is_unprotected_pkvm(kvm)		\
+>   	(is_protected_kvm_enabled() && ((kvm)->arch.vm_flavor == VM_PKVM))
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 0f4e8b71fa85d..9ba86450fe4af 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -2624,7 +2624,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>   	hva_t hva, reg_end;
+>   	int ret = 0;
+>   
+> -	if (kvm_vm_is_protected_pkvm(kvm)) {
+> +	if (kvm_vm_is_protected(kvm)) {
 
-Yup :)
+We have slightly different handling for Realms. The final code for this
+looks like :
 
->
-> Intuitively: kernel owned vs ... user owned?
->
-> No, it's kernel owned vs core-mm owned.
+	if (kvm_vm_is_protected(kvm)) {
+		if (new &&
+		    new->flags & (KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY)) {
+			return -EPERM;
+		}
+	}
 
-I would say somebody who does:
-
-	ptr = malloc(4096);
-
-Would think of that memory as 'owned' by them in the sense that they
-control the lifetime, they established its attributes, etc.
-
-So indeed, vs. user-owned.
-
->
-> Which implies core-mm is not part of the kernel?
->
-> Yes, this is confusing. ;)
-
-I think what you're missing here is what _creates_ or _establishes_ the mapping.
-
-Intuitively, if I do:
-
-	ptr = kmalloc(GFP_KERNEL);
-
-I, whether I am in the core kernel, or a driver, or whatever own it in any
-meaningful sense of the word.
-
-I think the issue here is you're confusing this with other things like the
-rmap and refcounting, etc.
+	if (kvm_vm_is_protected_pkvm(kvm)) {
+		/* Cannot modify memslots once a pVM has run. */
+		if (pkvm_hyp_vm_is_created(kvm) &&
+		    (change == KVM_MR_DELETE || change == KVM_MR_MOVE)) {
+			return -EPERM;
+		}
+	} else if (kvm_realm_is_created(kvm)) {
+		/*
+		 * Once the Realm is created, we cannot modify any slots that
+		 * could be providing private memory. i.e., guest_memfd backed
+		 * slots.
+		 * TODO: Handle trusted device private memory slots
+		 */
+		if (kvm_slot_has_gmem(old) || kvm_slot_has_gmem(new))
+			return -EPERM;
+	}
 
 
->
-> I assume you're coming from "map_kernel_pages*", but that's rather "kernel
-> memory" and not "kernel owned".
->
-> Usually we say "driver owned" when not talking about pagecache/anon. Or user vs.
-> kernel memory.
+Of course we could invert the checks to detect vm_is_protected_pkvm()
 
-I think it would only add confusion:
+Suzuki
 
-VDSO/VVAR, perf ring buffers, shmem mapped via PFN map, uprobes, etc. are
-all in this category and I doubt people would consider those driver-owned.
+>   		/* Cannot modify memslots once a pVM has run. */
+>   		if (pkvm_hyp_vm_is_created(kvm) &&
+>   		    (change == KVM_MR_DELETE || change == KVM_MR_MOVE)) {
+> 
 
->
-> So is it really all about "is this (excluding CoW) no ordinary user memory that
-> we would track through the rmap" ?
-
-VMA_MIXEDMAP_BIT mappings can be refcounted and rmapped so that's not a
-correct description.
-
-The distinction is - who put them there and who's allowed to change them
-and who owns the lifecycle.
-
->
-> >
-> > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> > ---
-> >  include/linux/mm.h              | 56 ++++++++++++++++++++++++++++++++++++++++-
-> >  tools/testing/vma/include/dup.h | 29 ++++++++++++++++++++-
-> >  2 files changed, 83 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> > index 2a92193ac6a5..cab29d6e15c1 100644
-> > --- a/include/linux/mm.h
-> > +++ b/include/linux/mm.h
-> > @@ -1612,6 +1612,44 @@ static inline bool vma_is_shared_maywrite(const struct vm_area_struct *vma)
-> >  	return is_shared_maywrite(&vma->flags);
-> >  }
-> >
-> > +/**
-> > + * vma_flags_is_kernel_owned() - Do the specified VMA flags indicate that the
-> > + * contents of the VMA are owned by the kernel rather than the core mm?
-> > + * @flags: The VMA flags to test.
-> > + *
-> > + * A kernel-owned mapping is one whose contents are established and controlled
-> > + * by the kernel, typically a driver, rather than by the core mm's fault and
-> > + * rmap machinery.
-> > + *
-> > + * The mapping may be memory-mapped I/O, kernel-allocated pages or ordinary
-> > + * pages the owner has chosen to map itself (shmem via a PFN map, for instance).
-> > + *
-> > + * In all cases the core mm must not populate, reclaim, migrate, copy-on-write
-> > + * or merge it of its own accord.
-> > + *
-> > + * Pages mapped this way are not necessarily reference counted or map counted.
-> > + *
-> > + * Returns: true if the flags indicate a kernel-owned mapping.
-> > + */
-> > +static inline bool vma_flags_is_kernel_owned(const vma_flags_t *flags)
-> > +{
-> > +	return vma_flags_test_any(flags, VMA_PFNMAP_BIT, VMA_MIXEDMAP_BIT,
-> > +				  VMA_IO_BIT);
->
-> I thought we have cases where we drivers insert pages and neither set
-> VMA_PFNMAP_BIT nor VMA_MIXEDMAP_BIT.
-
-There were 4 - defio, cmt_speech, uprobes and the bpf arena, and I fixed
-all of them :)
-
-Other than the DAX-only case below of course.
-
-It's not correct behaviour and part of the point of this series is to
-structurally _forbid_ illegal behaviour by drivers.
-
->
-> I assume vmf_insert_page_mkwrite() is fine because it is DAX doing it (should we
-> limit this interface to DAX?).
-
-That is a DAX-only thing and DAX is precisely a case that should not be
-kernel-owned (and isn't!)
-
-This series actually fixes the FUSE case too, restricting this interface to
-DAX only seems like a sensible follow up as well.
-
-I could also add a patch to this series to do that too if you wanted?
-
---
-Cheers, Lorenzo
