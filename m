@@ -1,117 +1,100 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD953B05A4;
-	Fri,  2 Oct 2026 09:02:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745D93B47D0;
+	Fri,  2 Oct 2026 09:13:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790931766; cv=none; b=qW17j6Ub4DyrtC/X7EQGKk6lYa4VtJ2ceBYcjpKzVQXDlM+m9/NLWPdKS/2cVZoyMyD5howa8isPfd/hXLmypYluiw3+CweHmVqfVamse0Q76wi9BlAIJV8GY8kWLA3wun8Uf4A8AVtAfjJdbTaT21jasbNfWkwgETyKIUq2wQg=
+	t=1790932429; cv=none; b=N/NiWjJgZ9ic0oEeqeR68Nnu3qQTJvHkFq1vJuPO/wsVYk/UH3sRfIh4w6M0+9hifeE5IrVEZO0vq8HH/YTYekJsInjfZHAa4L5xbERLpFhHZfRUbrlg0TSC7YD9b/3McikiXjadHgBF6HlYzyaeRKOP6o/V3U/9Pcpz9m0279g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790931766; c=relaxed/simple;
-	bh=rWcO8KFxXa2PK7YeSRIvLjsJER8mggXQ7JYXtV7+rXM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RHn24qlK4hDRvem01SorU5DYdsd3x8WgbNEWuGGbPMipRa6UrBWvj+NV42tXiEK1n5A+7W8+paGnyhFQOBviDeuMXHHWykE1WuME2b5/pgVi7xeve7OLcFpdQXODd95gEzT6w1BdeZbKud4FTp5MIoq9Qjk+O7FxrwvnLCXvckg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jOqGjIey; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790932429; c=relaxed/simple;
+	bh=u+6y/sHA9bEwoLN/XVzbQULKtLo/nmjfs/1bU8x07Yg=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=CbGateDb7bh7qwdyNEObaeb1zjO/6UfwvfEPc8ggcxiODhqYsT8KqZbA0YQFF2WEVeLYEIj9o0dlzDc4SLSS23uqdyVpiPU67CNOv0v5MNs8vWcvELnxIZM5I1waY94LoIyi0MFrCL9125ANQcJJzj6yp5VOW2EnRKwLkK8CG6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Phjx1Hkj; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jOqGjIey"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E13F41F000FF;
-	Fri,  2 Oct 2026 09:02:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Phjx1Hkj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1769C1F00899;
+	Fri,  2 Oct 2026 09:13:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790931764;
-	bh=QVMF5xJlxpruAChtkNj1qM1C4rtnjpVNs7oYQB53+ZY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=jOqGjIeyGi1TXTU6JwZrpZ7QTHwotBwuHhTo+6TSuWiQCmCCCK7iX0yUflRxnM7PQ
-	 GCFD78clYw1rLgmWRfdO+fFaFVT4YtV+VYGZ1RaSxrS5dhFAYnRv7MpfgPKalyRAUs
-	 bNoR5zcLKTDOJHHaFbaoHyYn+F6JBysnAFCXlnYkp0ZPOdgxqailH7htMyV7Q6tzp4
-	 b/DVfXRgnxCTBijDILV9YDgNmcQOwSawb6OWvHqnny7HCXnrW5EvmoWF6F+wQaiXlg
-	 1abn+ZtjQKNQ9oQm+i+9ft/OSU+2ITCNqxzvn1FGC/JcJxmLBKB7JUXNSLWM2GBMHL
-	 HlFs0KjFMaYSA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xCZAA-0000000G8Wn-28pp;
-	Fri, 02 Oct 2026 09:02:42 +0000
-Date: Fri, 02 Oct 2026 10:02:41 +0100
-Message-ID: <86v77k326m.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andreas Grapentin <gra@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-	Oliver Upton <oupton@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>
-Subject: Re: (subset) [PATCH v9 00/24] KVM: s390: Introduce arm64 KVM
-In-Reply-To: <20261002080015.22510-A-seiden@linux.ibm.com>
-References: <20260930173441.66762-1-seiden@linux.ibm.com>
-	<179085262878.3865846.5787241839391727949.b4-ty@b4>
-	<20261001132715.108643-A-seiden@linux.ibm.com>
-	<86wls1315l.wl-maz@kernel.org>
-	<20261002080015.22510-A-seiden@linux.ibm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1790932428;
+	bh=Lh9A+TR4VoPNddgYfrzpdItXq1VCAZ0FpSq357jHMJY=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=Phjx1HkjgaXSK6khRltoBmAvuY0TTKFa5ig1tiYEfKettPGs5uZQ1n9DRPUK3RTwQ
+	 c69gfijKhArlaLG3+tyscG7Btz9kY13BBfGaWJ5jhON9VI+OJS2QShOwHuhCdXIbhd
+	 qi3l5eW3/hdkCWFsG33qBByOI9pWqTNBOeC5TvWwc/WGKRMaEZaLW3BtzS6i7Qfd/w
+	 yAmILpOt96qFAh3wp2R4KbXKuETb8qv1vMAqzPO90/qLlv54gRgrxRjyGXnKfPJx/u
+	 KyOcc9dENGVeNlA6p9IyR+LWHWDDDiNuKDC3xdiojtXwRWOVBdX37HxgF1SkTJlzJC
+	 1bINf3lPp8Jew==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v21 18/23] KVM: arm64: CCA: Don't expose unsupported
+ capabilities for realm guests
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Suzuki K Poulose" <suzuki.poulose@arm.com>
+Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20261001210703.1597150-19-suzuki.poulose@arm.com>
+References: <20261001210703.1597150-1-suzuki.poulose@arm.com>
+ <20261001210703.1597150-19-suzuki.poulose@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 02 Oct 2026 09:13:47 +0000
+Message-Id: <20261002091348.1769C1F00899@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, agordeev@linux.ibm.com, gra@linux.ibm.com, arnd@arndb.de, catalin.marinas@arm.com, borntraeger@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, fritz@linux.ibm.com, ggala@linux.ibm.com, hari55@linux.ibm.com, hca@linux.ibm.com, brueckner@linux.ibm.com, iii@linux.ibm.com, frankja@linux.ibm.com, joey.gouly@arm.com, nrb@linux.ibm.com, oss@nina.schoetterlglausch.eu, oupton@kernel.org, pbonzini@redhat.com, seanjc@google.com, suzuki.poulose@arm.com, svens@linux.ibm.com, Ulrich.Weigand@de.ibm.com, gor@linux.ibm.com, will@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 02 Oct 2026 09:00:15 +0100,
-Steffen Eiden <seiden@linux.ibm.com> wrote:
-> 
-> Yes the positioning of the functions look good. It builds on top of
-> kvmarm/next + this (sightly relocated (line numbes are different) patch
-> + arm on s390 stuff.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] arm64: kvm: KVM_CAP_IRQCHIP incorrectly exposed for Realm VMs
+--
 
-Cool. I've now pushed out the rebuilt kvmarm/next branch with this,
-and hopefully it will make it into -next today.
+commit af0bceb4971b2a4c5816fbca6500c4f10a51388d
+Author: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-Let me know if anything else is amiss.
+KVM: arm64: CCA: Don't expose unsupported capabilities for realm guests
 
-> I'll work on a verification tool for you guys to make this process
-> easier.
+This commit limits the capabilities that are allowed for Realm VMs and bloc=
+ks
+the corresponding vm_ioctls. It repurposes kvm_pkvm_ioctl_allowed() to
+support both pKVM and Realm ioctls and adds a generic kvm_vm_ext_allowed()
+helper for filtering.
 
-I guess the ultimate verification tool is to build s390 with the rest
-of the patches, which I've just done. This doesn't lead to any error
-that wasn't already reported.
+> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kv=
+m_rmi.h
+> index 44f5c75a27b5b..ea1450e0c8619 100644
+> --- a/arch/arm64/include/asm/kvm_rmi.h
+> +++ b/arch/arm64/include/asm/kvm_rmi.h
+[ ... ]
+> @@ -58,4 +60,26 @@ struct realm {
+> =20
+>  void kvm_init_rmi(void);
+> =20
+> +static inline bool kvm_realm_ext_allowed(long ext)
+> +{
+> +	switch (ext) {
+> +	case KVM_CAP_IRQCHIP:
 
-Thanks,
+[Severity: Medium]
+The commit message states "Drop KVM_CAP_CREATE_IRQCHIP, as we don't support
+VGIC_V2 for Realms". Did you intend to drop KVM_CAP_IRQCHIP from this
+allowlist?
 
-	M.
+Because KVM_CAP_IRQCHIP is still explicitly allowed here in
+kvm_realm_ext_allowed(), userspace is falsely advertised VGIC_V2 capability
+via KVM_CHECK_EXTENSION.
 
--- 
-Without deviation from the norm, progress is not possible.
+This also allows the KVM_CREATE_IRQCHIP ioctl to bypass the
+kvm_vm_ioctl_allowed() check in kvm_arch_vm_ioctl() and attempt to
+instantiate an unsupported VGIC_V2 before being rejected downstream.
+
+> +	case KVM_CAP_ARM_PSCI:
+> +	case KVM_CAP_ARM_PSCI_0_2:
+> +	case KVM_CAP_DEVICE_CTRL:
+[ ... ]
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261001210703.1597=
+150-1-suzuki.poulose@arm.com?part=3D18
