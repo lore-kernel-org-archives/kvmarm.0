@@ -1,139 +1,110 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 860694BD0FD;
-	Fri,  2 Oct 2026 15:29:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C39E38F93B;
+	Fri,  2 Oct 2026 15:29:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790954954; cv=none; b=GQxYW7uhLKFylPROOgppgGbpepKkHD+eh9q1b9UYOoW8tKQk2b92iJxFCXKqbvjr9GkfNFesoswszBj7ilewO5dazYrzIzWKowKI6QXo6aNWns99N837Z6Q1ik/+olcD5/aid5BxSZbmdUmHy0aaT8DYp6NF4+WZ3ve1Qomg1sU=
+	t=1790954970; cv=none; b=tBKLi6w875xFL5Km+uUt1BaMkT+nNncrgSgxKL3+opvHpjPY68+YA28lGpd8GuY1LLZprFhXKRl6Y/AEyYTmp6m2SubtJy2HsQ3hUHMNLuaIONbEAPIYMIKyM2YYzh0wYRTgFpuhj9AG2esLNrFEg+UR4wv1ULPUF84/rahEvS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790954954; c=relaxed/simple;
-	bh=P4f1hv785d621ll4HEeJjnSeVQYSEnQeNsJSJrh9rSw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M4R8Ju2CwPAypE4PMFjFjRE8haeQ6qM8YAAqR93ZhHxNxUq+1fE/SNX8ubHhUEgb3XsQXvxQplshhgTrNMszqna/dyQnu7QU68MMv7/u3bU49PhM+Tc9hU/sc4+OjhkrBrZkthbAyUrDGWh6yFrcHAXoDak+yJPHE8UaqG1+b7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=p8E8vMpM; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1790954970; c=relaxed/simple;
+	bh=f0O0lGPSDcRSoFDtp6u/8kF+9fEtmWXKHGD/Lq4it9E=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=U7oiggQGfuZEv+WS1XZxDxeHiErseHL4sjZTDdYmhqGR01CkcMAZOqKX/QovNAMHRilPI0Kbq0wTX4WhzPw4d3sBiiXVFe1buix4CVPCCZdkzWPQuJZ+5D0fp9pLqGpC0LcgJ6SRW3PZQU/MrFnSXGivyTghKOi64nCxK4pBpZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MsvbBDri; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="p8E8vMpM"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A4DF0143D;
-	Fri,  2 Oct 2026 08:29:08 -0700 (PDT)
-Received: from [10.57.8.170] (unknown [10.57.8.170])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 279BE3F85F;
-	Fri,  2 Oct 2026 08:29:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790954952; bh=P4f1hv785d621ll4HEeJjnSeVQYSEnQeNsJSJrh9rSw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=p8E8vMpMtKBWVnygtBY4CCJt+MHMHuQj+M7U9zx+9Pgy3DFcV8HBcxW9kxS/N/00J
-	 XhEBuSPy1e7h4vteMl/XfZe//p0e5hbbJ3qzJoOHabnne1Sh49Qvv+nypCIzoo1Ach
-	 9Du30zeEXLKrw1yW4XTxxKDrFWrNKDsec4rnAzbg=
-Message-ID: <38a5b5d5-d39a-4fa2-8de5-ccc1d92aaff1@arm.com>
-Date: Fri, 2 Oct 2026 16:29:05 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MsvbBDri"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE6371F000FF;
+	Fri,  2 Oct 2026 15:29:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790954969;
+	bh=w2qbnlCfWtpMJpTInUhAzDoS27bFsbxCID6JcqdfH9o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=MsvbBDriLGUBuPkGG+TXOygYtreoDOfk5yRbhxaHuznlHbq81x4XHJ0sVS+UcJfp7
+	 WLFCTfvNzAMIvgU5jdnaM1XfSRKf4Bgr320idBQLXxYjErS/nnik2TpwvqQFb5guin
+	 fyKzfDkG9wI7FblnrQzKraetRR4WiINQMf3e7hHZhOIC1uklkIFdPe4IRixnUgyCrH
+	 AFmjieMklHpJ/pLLWLAhBijwJWbPSniaQQzoVIIPHzzX71JbiUgZAcc8q3BkXDPHWn
+	 dZt5G8A4SPW0YIU4YrIcfA1Br27tIbE4k8RkoOj1m+tfFRoMURs5q/c7xESNJbmR/J
+	 uYUezl/z+iNmg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xCfCQ-0000000GHfm-2FHs;
+	Fri, 02 Oct 2026 15:29:26 +0000
+Date: Fri, 02 Oct 2026 16:29:26 +0100
+Message-ID: <86o6dc2ka1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	steven.price@arm.com,
+	aneesh.kumar@kernel.org,
+	oupton@kernel.org,
+	gshan@redhat.com,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev,
+	gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com,
+	alpergun@google.com,
+	fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com,
+	lpieralisi@kernel.org,
+	enju.kohei@fujitsu.com,
+	sudeep.holla@arm.com,
+	jonathan.cameron@oss.qualcomm.com
+Subject: Re: [PATCH v21 05/23] KVM: arm64: Track the type of VM in kvm_arch
+In-Reply-To: <CA+EHjTy4rb+6z0bqh7sPqACES0EDpURdeoyiFGmdw3p0PENcOQ@mail.gmail.com>
+References: <20261001210703.1597150-1-suzuki.poulose@arm.com>
+	<20261001210703.1597150-6-suzuki.poulose@arm.com>
+	<CA+EHjTxtatPyGcyvEyR129cqUiAYcO_cxRVtwZO0ckZsOnD7TA@mail.gmail.com>
+	<86se2o2rbs.wl-maz@kernel.org>
+	<CA+EHjTwHuJ0u_TTP46zNFKFmBP124XHHLUVhkAUSyfhe92=41w@mail.gmail.com>
+	<86pkxs2npx.wl-maz@kernel.org>
+	<CA+EHjTy4rb+6z0bqh7sPqACES0EDpURdeoyiFGmdw3p0PENcOQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v22 07/10] kernel: hibernate: Add an arch hook for
- preventing hiberation
-Content-Language: en-GB
-To: Catalin Marinas <catalin.marinas@arm.com>,
- "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
- will@kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
- sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com,
- Len Brown <lenb@kernel.org>, Pavel Machek <pavel@kernel.org>,
- linux-pm@vger.kernel.org, Sudeep Holla <sudeep.holla@kernel.org>
-References: <20261002061507.1600269-1-suzuki.poulose@arm.com>
- <20261002061507.1600269-8-suzuki.poulose@arm.com> <ar-PiBQGye4_hQa6@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <ar-PiBQGye4_hQa6@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 02/10/2026 12:03, Catalin Marinas wrote:
-> On Fri, Oct 02, 2026 at 07:15:03AM +0100, Suzuki K Poulose wrote:
->> Add a hook to allow arch code disable hibernation. On arm64, with an RMM active,
->> there could be pages that are delegated to the "Realm" security state. Any
->> access to them are fatal (e.g., hibernate save image or restoring an image to
->> a delegated page). pKVM host also has its restrictions on enabling hibernation.
->>
->> Add a weak arch hook to let the architectures have a say.
->>
->> Cc: "Rafael J. Wysocki" <rafael@kernel.org>
->> Cc: Len Brown <lenb@kernel.org>
->> Cc: Pavel Machek <pavel@kernel.org>
->> Cc: linux-pm@vger.kernel.org
->> Cc: Sudeep Holla <sudeep.holla@kernel.org>
->> Suggested-by: Catalin Marinas <catalin.marinas@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+On Fri, 02 Oct 2026 15:37:00 +0100,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> Nit: the subject prefix for kernel/power/ usually is
+> Hi Marc,
 > 
-> 	PM: hibernate: ....
+> On Fri, 02 Oct 2026 15:15:06 +0100, Marc Zyngier <maz@kernel.org> wrote:
+> [...]
+> > Honestly, we introduce the flavor stuff to make it easy to match
+> > things on a particular VM type in a readable way. So why isn't this
+> > reading:
+> >
+> >         if (vcpu->kvm->arch.vm_flavor != VM_PROTECTED_PKVM)
+> >                 return;
 > 
-> I can fix it locally, no need to respin (and probably the wrap the long
-> lines in the commit log, we tend to keep them shorter).
-> 
+> I know this is a sketch, but just in case: that's inverted. The sync
+> only applies to non-protected pKVM VMs (EL2 ignores it for protected
+> ones), so it would be != VM_PKVM.
 
-Ack, I will take care of that in the future.
+See what I meant about this stuff being completely intractable? I
+still have no idea what it means! ;-)
 
+	M.
 
->> ---
->>   include/linux/suspend.h  | 1 +
->>   kernel/power/hibernate.c | 8 +++++++-
->>   2 files changed, 8 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/linux/suspend.h b/include/linux/suspend.h
->> index b02876f1ae38a..a3815027773c5 100644
->> --- a/include/linux/suspend.h
->> +++ b/include/linux/suspend.h
->> @@ -401,6 +401,7 @@ int hibernate_quiet_exec(int (*func)(void *data), void *data);
->>   int hibernate_resume_nonboot_cpu_disable(void);
->>   int arch_hibernation_header_save(void *addr, unsigned int max_size);
->>   int arch_hibernation_header_restore(void *addr);
->> +bool arch_hibernation_available(void);
->>   
->>   #else /* CONFIG_HIBERNATION */
->>   static inline void register_nosave_region(unsigned long b, unsigned long e) {}
->> diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
->> index d2479c69d71a4..9d9d53828542f 100644
->> --- a/kernel/power/hibernate.c
->> +++ b/kernel/power/hibernate.c
->> @@ -106,11 +106,17 @@ bool hibernation_in_progress(void)
->>   	return !atomic_read(&hibernate_atomic);
->>   }
->>   
->> +__weak bool arch_hibernation_available(void)
->> +{
->> +	return true;
->> +}
->> +
->>   bool hibernation_available(void)
->>   {
->>   	return nohibernate == 0 &&
->>   		!security_locked_down(LOCKDOWN_HIBERNATION) &&
->> -		!secretmem_active() && !cxl_mem_active();
->> +		!secretmem_active() && !cxl_mem_active() &&
->> +		arch_hibernation_available();
-> 
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> 
-> Raphael, any objection to this patch going in through the arm64 tree? It
-> matches the style of other __weak functions in this file.
-
-Thanks Catalin
-
-Suzuki
-
-> 
-> Thanks.
-> 
-
+-- 
+Without deviation from the norm, progress is not possible.
