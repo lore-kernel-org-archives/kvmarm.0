@@ -1,112 +1,126 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D7B2F9D82;
-	Fri,  2 Oct 2026 16:11:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136E831E106
+	for <kvmarm@lists.linux.dev>; Fri,  2 Oct 2026 16:39:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790957509; cv=none; b=O/hWpWkp2uelyDL39JcFFn5OnvgZBY3sUWAHbHjz+6TdvSy4zRArUvBs5NLfzWZQpNYzovJ3w4bzMnsoWCOzSF8sByD0n2xQCuBDclXleIsqnmSkPV3kagt7Xcty7ZuWIIS32Oy4Y+AIZrxa/RHtcOOyxhJI+sQgz8gGSOqR8iY=
+	t=1790959171; cv=none; b=ARqAAJHCGqo8pIlKr1vJ7YJUTcJx1FmDNIBjq+g/MmA41DkxYcmqVtctezpWR+np/HeYSeZrMHOgLaBnhuwvOGIw7XAnn5XBN0fqnB7mEcbVRXFUH3j7SojBiYXih13zbnmDk7vq0KWPRWB14ngWW5JGidLaq8M/smcSVpfGDD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790957509; c=relaxed/simple;
-	bh=d/BWqh3I+o1TpqkOrGVewyRNzXZFs+ZGIdSCNuZrwAQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qm1wylZNTeriuWHvsqSax35Sg4/rAczcIkWofNAwmsK808FEkYeeRy1ygMRe5Sfo++2i2I+LgcRSBBSp7irr0UCC6b4/xBdPRX/FNbAGoH+Nnrcrc+y0RTYQ4NQhtlSqG8yMgOkWOWY38hf2lKbyDN0rI3pna+8GO4D4vwUK6O4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KlPBNFEO; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790959171; c=relaxed/simple;
+	bh=CtdOKPzEHl0Qa+wT3t3zkXvKUi0qlkEFrTlHOIDVMQc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FJcSekKuBTY9kIc2jZFqyDaqZJIsh4M6gNZo1jn92/F5pu4qESm6mQJJ7RKZ1vVgKEovjElf/5FWLgFukzFtZ/pU1047I36mCjQ3JGagRPt0XBcFwdv8QTXSAqnNRv0lA0e0KLOPX6M9x8WWqJ93rXotyGnXxeds9AawD6QZMBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uc8dO1B3; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KlPBNFEO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8488D1F000FF;
-	Fri,  2 Oct 2026 16:11:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uc8dO1B3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A417F1F000FF;
+	Fri,  2 Oct 2026 16:39:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790957508;
-	bh=d/BWqh3I+o1TpqkOrGVewyRNzXZFs+ZGIdSCNuZrwAQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=KlPBNFEOE0gGia6RZAPeBTgVB7HNktDmiscBZ7dS/dxuvyJV5qZ4EBnMmKRqBWf+p
-	 NlxsjCUCHTgzOy14NdmetFcItytYbmQN/W1Cz9uNprrziSxnI2AwI/H7kvg7pcE0Th
-	 apHw1PmIMxp0r8Tb82ZsCAY6CdcYuqB/iILLMgb+Hd9L8Z04owEifByqirNGM+qtq7
-	 tnLVDa9jv/B19Ic1romkl3FQeHLFBdffX1K2/Z3MGzjcMTPK1VcbUS2u0EawxZYH+y
-	 GpQjr2jGxvYJz4PqGTUmJEW1o60Sr6vup0HAlwN8d+g/2nFyPIqzdSzcGp8to062lR
-	 qxk5wHC7LEjbQ==
-Date: Fri, 2 Oct 2026 17:11:18 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: "David Hildenbrand (Arm)" <david@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	"Liam R. Howlett" <liam@infradead.org>, Vlastimil Babka <vbabka@kernel.org>, 
-	Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
-	Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>, 
-	Michal Hocko <mhocko@suse.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
-	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
-	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
-	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <mkp@kernel.org>, 
-	Jaya Kumar <jayalk@intworks.biz>, Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, 
-	Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
-	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
-	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
-	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
-	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
-	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev
-Subject: Re: [PATCH v3 40/40] mm/vma: introduce and use vma[_flags]_can_gup()
-Message-ID: <ar_WousLPxpyMozt@gremlin>
-References: <20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org>
- <20260917-b4-mmap-prepare-vma-flag-sanify-v3-40-4583d8a23bca@kernel.org>
- <202033a0-ea65-44de-8119-689e0df0b78e@kernel.org>
+	s=k20260515; t=1790959169;
+	bh=/h7ekfcUzkwWndjKu/7hfrYgYkkTMuuqiAzvSgcH6Sw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=Uc8dO1B3O9glJr+RUsdeAOa/YLv34PmWvMrv0DGAN2HBiDKhpI5AuGOLSaA0iC6A5
+	 WvPWTaYu991MHubFOle+7f6JTk5LZEE8yolD0XE5229cNXr7Ovra7bX/bvd3Y1x62O
+	 mph/WqMZs6RvTOictszgsCnCylgDHGVi/MfvpEFfWIDqOphWz4HHMjwa7m9vZ3APP2
+	 gXMk63k16GtrsZzknJQKuhWEIPIaLQ8euqDhNmHQzGpuFkKFJOu1PmVfYvHksIZ1LU
+	 2bsZHOLMI7y3lbrR9K4YFvzJ9E992vvEBUcXjNCu4tbI7M2IRaHYY3yfGzaCuJuesw
+	 zxLZeqP4CS/QQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xCgIB-0000000GJD9-1nt7;
+	Fri, 02 Oct 2026 16:39:27 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Vincent Donnefort <vdonnefort@google.com>
+Cc: joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	kernel-team@android.com,
+	fuad.tabba@linux.dev
+Subject: Re: [PATCH v6 00/18] KVM: arm64: Introduce pKVM hypervisor heap allocator
+Date: Fri,  2 Oct 2026 17:39:24 +0100
+Message-ID: <179095910311.551935.11321675736723021176.b4-ty@b4>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261001142849.3367614-1-vdonnefort@google.com>
+References: <20261001142849.3367614-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202033a0-ea65-44de-8119-689e0df0b78e@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, vdonnefort@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, fuad.tabba@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Oct 02, 2026 at 09:48:14AM +0200, David Hildenbrand (Arm) wrote:
-> Long story short: I wonder whether vma[_flags]_can_gup() is the right
-> abstraction, especially for users that don't actually *use* gup but just want
-> slightly similar semantics (no VM_IO|VM_PFNMAP).
+On Thu, 01 Oct 2026 15:28:31 +0100, Vincent Donnefort wrote:
+> pKVM historically lacked a dynamic memory allocator: all hypervisor-side
+> VM and VCPU structures had to be sized on the host, allocated as
+> contiguous pages and donated to the hypervisor.
+> 
+> This design tightly coupled the hypervisor's memory footprint to
+> host-side constraints, complicated memory reclaim, and severely
+> restricted VM scalability.
+> 
+> [...]
 
-OK confirmed off-list that you would prefer this be dropped for now.
+Applied to next, thanks!
 
---
-Cheers, Lorenzo
+[01/18] KVM: arm64: Add pkvm_private_va_range_pa
+        commit: 4b66a1941718ef1c945b32ab28e91330e4394de2
+[02/18] KVM: arm64: Add pkvm_remove_mappings
+        commit: 64a89873e0c60fd8a22ebacab6bc723415eeb4b2
+[03/18] KVM: arm64: Add pkvm_map_private_va_range
+        commit: 06b705e789ed1a118331bc77f477a9b46c52dcfe
+[04/18] KVM: arm64: Add a heap allocator for the pKVM hyp
+        commit: c8d7834c9c219a9a0e3969986e90c5c444b9d98d
+[05/18] KVM: arm64: Allow kvm_hyp_memcache usage outside of stage-2
+        commit: 11a59e2959e63546dd75c347d552193c38aeb37e
+[06/18] KVM: arm64: Add pkvm_hyp_req infrastructure
+        commit: e868b8c35268a8cb786091c63f538c960b8807e5
+[07/18] KVM: arm64: Add PKVM_HYP_REQ_HYP_ALLOC request
+        commit: 7bf265fe68af9e1ef3af083d444a72bd3ce3d3e3
+[08/18] KVM: arm64: Add reclaim interface for the pKVM heap alloc
+        commit: 43759e3c9631ffcec55e4b7396864af4a5b98f30
+[09/18] KVM: arm64: Add selftests for the pKVM heap allocator
+        commit: bd93068340e9d770d6282ab425b686bef2042394
+[10/18] KVM: arm64: Add a shrinker for pKVM
+        commit: 909e70fd13567db8247c3850f27b65aaea2c9ad0
+[11/18] KVM: arm64: Filter out non-kernel addresses in kern_hyp_va
+        commit: 0b27ba187dde3170a312904f18595f3ba266bcae
+[12/18] KVM: arm64: Move hyp_vm refcount into the structure
+        commit: 85406921dc81ea7ccfb78c92cf79b0a4bcd2439c
+[13/18] KVM: arm64: Alloc pkvm_hyp_vm using pKVM heap allocator
+        commit: 324397c85d1dde38e5d4805d8b79bfc549af4252
+[14/18] KVM: arm64: Alloc pkvm_hyp_vcpu using pKVM heap allocator
+        commit: e188a901e4bc585a170ee4235c6b55ebcf07b592
+[15/18] KVM: arm64: Rename vCPU pkvm_memcache to stage2_mc
+        commit: 197dac8a9060c17988414086293aa8ed4c82c185
+[16/18] KVM: arm64: Reject hyp trace descriptors with fewer CPUs than hyp_nr_cpus
+        commit: cf9cf059b8f30ffca78c16e6a51c905c95da47a8
+[17/18] KVM: arm64: Reject hyp trace descriptors with fewer than 3 pages
+        commit: 086f86286b5e060904bd372ad96edd04c366885a
+[18/18] KVM: arm64: Alloc simple_buffer_page using pKVM hyp allocator
+        commit: 35dc2dd00334555eb02428cff2302a1cfe60c15f
+
+Std disclaimer: conflict-central even with the rebase, please check
+the result.
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
