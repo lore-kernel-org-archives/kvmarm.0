@@ -1,150 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238EA472545;
-	Fri,  2 Oct 2026 09:13:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790932431; cv=none; b=VTUbo627yX0mMI1dDr+wRUDhgKZOyRyfYEMPaRXon/Xvn69H2XEES0mQtRrDebXStoc+WYNWNSzoBeOBM4TIwD27YKFecxGyWnbsKr5V+R1IWP7I4QDYeHLJMcX/v5X6JKplIi4WITfUNRfhrrSUDefUA/4jVAGw3gPdyQyoWqw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790932431; c=relaxed/simple;
-	bh=ecbCso4L5heKFyHycOrXxSFn2uM/T4PRoMZC8wqsobo=;
-	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
-	 Message-Id; b=dsjqHVn6KAO9MBtCnJqPGvw9Cdi6yFgo7e7untpNtf5Qs9UqDM4COxdEilgGpUyNXechYLUNS4dlY98O6MscSh2G50xslCF1Hb87uyCCthoZwS4d58W7CA+Z6alaGJUX22Rlo9VH9z0flo7RX5YGCOtn3zVBauJJX+OPRCX7zL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O5/NQ9+I; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81B7346FB3
+	for <kvmarm@lists.linux.dev>; Fri,  2 Oct 2026 09:15:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790932531; cv=pass; b=guIQH2xrgvc2OPrCKDAra17kJTyV5OsJxewJOx29IAZGgzHA5HxV62lo7gjbKRzKcEixlAEeZk4tt9JATOdbbr+zeQ8rjTyfDd2LAwgOLbQ6LEBkie9NugL+SCHykDc/es+moewLGXlC+3wetRMmsCwy60+wPxpaElV/qIeuS1c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790932531; c=relaxed/simple;
+	bh=hWB1QcQGFZjdtaZ+WkrO/eQNuOSYDk3BPt9FwXfnsYM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Veelq2mfWIJL85YD8YU8XAJ6fruRVL5t98K4FjJ7VPPvEecjO9z4A8+6LBHtiEZv2rjXHigcrJXqFXib7cUatDL8f2iB3YeA9NijfrpjUkMQxv2H2TBfDw6zW5YuvfgH3fcWCfRuMcaTXdtm7uhDy6xzuT0Enrb/c8vyQzmHOJs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mHYz+cGJ; arc=pass smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O5/NQ9+I"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B90461F0089A;
-	Fri,  2 Oct 2026 09:13:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790932430;
-	bh=4WoBk4y7g4w2Xw2iUNNdQfGRrptu6fnoO4H9WOKx3QQ=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=O5/NQ9+IiLXXuDVb0cPPPWcq5chwKyDyCPHSIYE9vlBnysUHl5+O+lYriuIfWZQQY
-	 Xl8ml2zRSEfgHVOyQYSFHvex/CrCwexxlw6yIpaTsNh3DEYLdWHhBAdEZhQYRx2h4v
-	 gB8zXnItULJKKS41+FGct38Ccglh5Cxhgacv/Z+dJPNFF5/D6U2Fts5djG0L5uJ/n3
-	 U+ddRLSDGVw23yWB7z7QxNxhH6f0yz2jR7ZB9IonIFK73cmckZtGk0IhJmMjHUu47J
-	 NX8/f6kzanp5bSjUtYdeO+3oZ2/BsK6mGQKBcUXss5zTS0jIAiWJrowiFqUq34O7Jk
-	 0XtJwcZfmLqbA==
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v21 22/23] KVM: arm64: CCA: Expose SVE VL register
- before VCPU finalization
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Suzuki K Poulose" <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-In-Reply-To: <20261001210703.1597150-23-suzuki.poulose@arm.com>
-References: <20261001210703.1597150-1-suzuki.poulose@arm.com>
- <20261001210703.1597150-23-suzuki.poulose@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 02 Oct 2026 09:13:49 +0000
-Message-Id: <20261002091349.B90461F0089A@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mHYz+cGJ"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5ba4065fa07so6345e87.0
+        for <kvmarm@lists.linux.dev>; Fri, 02 Oct 2026 02:15:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790932528; cv=none;
+        d=google.com; s=arc-20260327;
+        b=aCOoLwsEHHHNJQHuziE0267GzqAVj6P/Jz4Cf27W4dQpROnYvkJNIXV82VrB7on/k+
+         yIDPrw+pgJtUjHVv6xhwJNHtBR1C4Z7A9bXpsrk9CV0m+o9De0LS5/cHj2aBZZccZDut
+         w/srQ+ohJxuOzGYwHglfdc/4zRaRK6+ykPsFcLLq4NNTo6hXR8M9MYGFUqsIBmyfNRN/
+         xEUwypNEQGgG4F3G/mDC83fJnMdF3phgFJaDQj276WRaBiPT4jHPa9tS6qxoM21kyBME
+         3h/E+p0uIYwh5b+4zdg+3yV/o+V6MrFDFp09RWrQiS0NE2kW9ZBi9PH7cZ8CtZgS9oyn
+         dFwQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=hWB1QcQGFZjdtaZ+WkrO/eQNuOSYDk3BPt9FwXfnsYM=;
+        fh=2QYy1Kzf1qExO4CZS0X5pP1QNtRWKy3sNYJ+DsDUNqA=;
+        b=Kr16vXaeyowfaUxn2S8ZBrtQyTdaFYrRLo/aLZNgM3yD8T+DPU+eEd1P2zV7Yl+S6V
+         TF8T73PwFCyME2/vObxtDC75VTjDul537HsKQBTvaXILoWtExWqrevBsd4UMT0p+kCF7
+         vyHKG/9KlaqzBNfiCwVb6nLZ2nyDobF07HgtOMQN0rpAQ6F4K1BE3hJFVvZ5F06uQTGg
+         DFVjZXajm+w8MO3ksQSkbDSVJFo18SCsiEILUAsMcOSeeHP2H4rAVguIMdY1g89ea5tm
+         7hYcdgiDukZW2Vfs6LRvxIOleVml1fOXBdJqb+KdsToUmgL00SeSTxXXUrgvpRxuxAT0
+         MiYQ==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790932528; x=1791537328; darn=lists.linux.dev;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=hWB1QcQGFZjdtaZ+WkrO/eQNuOSYDk3BPt9FwXfnsYM=;
+        b=mHYz+cGJCEsk8U/bfQOkjXwj5FIUKHvxnI5DJgfOvQbsY4G7X+T92ZoqLNWTLPiDjg
+         +r1LLbRDwXMYFBR2JxOi/WIiot7+YryZnoFjZLWhK9i280bbf0sr13F7dhmvrG+B0shO
+         Ddn6f9nczkgrLdqjVB3lGfizWMT0tGLbH3wSNDaYtEi3XyoiRcAw4FXuL1XRHeiXk5xR
+         s2bIB3xiUVz7nf+ZWtActD7O9d6GSg4lSAvw9GacQldHIEOU1GQvtQ5n8nOgMJN+RSE3
+         w9FkfT3LAVOHl2vYg6LqaXw5CYiluI4MAPbk0FujntvmhAUR43lvGKno1Oo7kG5hYRNi
+         bRDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790932528; x=1791537328;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=hWB1QcQGFZjdtaZ+WkrO/eQNuOSYDk3BPt9FwXfnsYM=;
+        b=rxfzHG3QZ1KDl4t8RT5LsvR84HjjdCW08tDHvCqkUkzyaZ1aH329tSg+SbgjftvjgN
+         iGfnavt1FX8e3ycfoS/DN01BNanKOYuvh7Uf0O6RWGI2lQMBLqNpsiFFIzuAzbLMs+Do
+         s2oxSF3tRbJ3hPHUYaO3RhI7R8LYl7YNrYsNUOiOxAhmcruNYd00uR4Abp3+F0nGculH
+         5EAegtab+Gbk9iqGR2VJomVqz2GpVNzdw8NZT2+/kD4fZo8I1Ui1sJS2GUB/uEbqfpAf
+         DooGZkVejG1Wu1JUEXRfj5vHqItERxIKu3XtV9BqvZWRC5XmDMiSI/aYvgU6kFJvNgnU
+         3S6w==
+X-Forwarded-Encrypted: i=1; AKwUvBzijBr4TElXgUFZw9011PhoRiRoPdzNFbGoUjTSSx8NONFmdxeh3bSGW5ZJ3+7XU+QOATIklO8=@lists.linux.dev
+X-Gm-Message-State: AFq9FYIBrWABji5phHaxpcDhzgJOMn8EBMTXR5pwtoYJZMhhY9ENjHmC
+	Q9roBQgyJNPg5BjCVUiLWK2SD/neeyVA0poOS0QlSvzvGRNFyTEeH+lJauzJwiKOPrgJpG7BGJd
+	b5C/fkAcimxkr2VYSUSzocs40/ltQsb4TUcJA6n5p
+X-Gm-Gg: AYBFou0m/txe6lZrDN0+quWtZLthfaRECNL1x6AKB5QmfX21Ub2QslfL6BMHmy9QLpZ
+	E7GI9RceFXgA0jNxZ+AfLkOta/hvgYN2ecECvt7WkO71+AUHxcEzuV2H4FKRACscdo7P0EiJHfS
+	wGjoeS9hFrihoCyq+H7hdCYaFMOzmCkBnyODAtLnZ5rFojM1WMdsJvKmBBtTokHZN0joSGTJsXy
+	RkkTY4WQHOHOQohaNTqRQbMWFeRbIrqT+hbE074QB9zwI6t5g3iS0nml3x6ST/UJTXlwMYIQHad
+	19Ye7mjFmXvWJF8Ul2zaQUpwHntTCOUcPjv33DyQ95U64dvCAg7Wse1JKfqU2Eb/GErm2lKQHCJ
+	5SPMytK+uGdLiYg==
+X-Received: by 2002:a05:6512:1153:b0:5ba:3797:2359 with SMTP id
+ 2adb3069b0e04-5bb7c8d2f8cmr108813e87.2.1790932527310; Fri, 02 Oct 2026
+ 02:15:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+References: <20261001210703.1597150-1-suzuki.poulose@arm.com> <20261001210703.1597150-12-suzuki.poulose@arm.com>
+In-Reply-To: <20261001210703.1597150-12-suzuki.poulose@arm.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 2 Oct 2026 10:14:51 +0100
+X-Gm-Features: AclHuK81_w9T9KTmUVQvA6ovuNEn5Udf2ErB6CaTomYP4-WPob3E-hZqL0sp0qw
+Message-ID: <CA+EHjTwM=5PXPVByVV75AuNVw5TJRiUqu5TNOcFNPOBmTiL-eg@mail.gmail.com>
+Subject: Re: [PATCH v21 11/23] KVM: arm64: Use a local kvm pointer in kvm_handle_guest_abort()
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org, 
+	will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com, 
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, 
+	joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, 
+	gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, 
+	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, 
+	lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com, 
+	jonathan.cameron@oss.qualcomm.com
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] kvm: arm64: commit message inaccurately describes KVM_GET_REG_LI=
-ST failure behavior
---
+On Thu, 1 Oct 2026 at 22:08, Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+>
+> kvm_handle_guest_abort() repeatedly obtains the VM from vcpu->kvm.
+>
+> Introduce a local kvm pointer and use it throughout the function. While
+> touching the code, fix the missing whitespace in the
+> kvm_is_nested_s2_mmu() call.
+>
+> Suggested-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-commit a8d5a1d267ddf1f3bfd568fee43772989e294b1c
-Author: Jean-Philippe Brucker <jpb@kernel.org>
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
 
-KVM: arm64: CCA: Expose SVE VL register before VCPU finalization
-
-Userspace must configure the SVE vector length before the Realm is created
-(as it is part of the parameter for Realm creation), but the Realm VCPUs
-cannot be finalized until after the Realm Descriptor has been created.
-[ ... ]
-Allow KVM_GET_REG_LIST for unfinalized RECs and make the SVE register
-enumeration handle the unfinalized case explicitly. i.e., only expose
-KVM_REG_ARM64_SVE_VLS before SVE is finalized.
-
-> One adverse side effect of this change is that a KVM_GET_REG_LIST call th=
-at
-> only probes for the array size will now succeed even if SVE is not
-> finalized, but that seems harmless since the following KVM_GET_REG_LIST
-> with the full array will fail.
-
-[Severity: Medium]
-Is this description accurate for the current implementation?
-
-The stated failure behavior does not seem to occur for either VM type.
-
-For normal VMs, kvm_arm_vcpu_reg_list_allowed() returns false if SVE is
-unfinalized, meaning KVM_GET_REG_LIST fails immediately with -EPERM for both
-size probes and full array requests.
-
-For REC VMs, kvm_arm_vcpu_reg_list_allowed() returns true. The array size
-probe succeeds, and the full array query also succeeds because
-copy_sve_reg_indices() explicitly handles the unfinalized case by safely
-copying KVM_REG_ARM64_SVE_VLS and returning 1.
-
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index d43ae985ab1b4..2e153b4fc8f62 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-[ ... ]
-> @@ -2004,6 +2004,19 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu=
- *vcpu,
->  	return __kvm_arm_vcpu_set_events(vcpu, events);
->  }
-> =20
-> +/*
-> + * Realm VCPUs can be finalized only after the Realm descriptor is creat=
-ed.
-> + * But in order to seal the SVE VL, we need to allow the userspace to re=
-ad/write
-> + * to the SVE_VL, before everything is finalized.
-> + * Allow the register list for RECs before the VCPUs are finalized.
-> + */
-> +static bool kvm_arm_vcpu_reg_list_allowed(struct kvm_vcpu *vcpu)
-> +{
-> +	if (kvm_arm_vcpu_is_finalized(vcpu))
-> +		return true;
-> +	return vcpu_is_rec(vcpu);
-> +}
-> +
->  long kvm_arch_vcpu_ioctl(struct file *filp,
->  			 unsigned int ioctl, unsigned long arg)
->  {
-> @@ -2059,7 +2072,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->  			break;
-> =20
->  		r =3D -EPERM;
-> -		if (!kvm_arm_vcpu_is_finalized(vcpu))
-> +		if (!kvm_arm_vcpu_reg_list_allowed(vcpu))
->  			break;
-
-[Severity: Medium]
-Doesn't this check block all KVM_GET_REG_LIST operations on unfinalized nor=
-mal
-VMs? This seems to prevent the array size probe from succeeding as claimed
-in the commit message.
-
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index b01d6622b8720..c3ca369882273 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-[ ... ]
-> @@ -628,6 +625,9 @@ static int copy_sve_reg_indices(const struct kvm_vcpu=
- *vcpu,
->  		return -EFAULT;
->  	++num_regs;
-> =20
-> +	if (!kvm_arm_vcpu_sve_finalized(vcpu))
-> +		return num_regs;
-
-[Severity: Medium]
-For REC VMs, doesn't this explicitly handle the unfinalized case, allowing =
-the
-full KVM_GET_REG_LIST ioctl to successfully complete and return a count of 1
-instead of failing?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261001210703.1597=
-150-1-suzuki.poulose@arm.com?part=3D22
+Cheers,
+/fuad
