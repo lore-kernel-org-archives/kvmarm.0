@@ -1,156 +1,116 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38FB3B101C
-	for <kvmarm@lists.linux.dev>; Fri,  2 Oct 2026 09:17:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14A783B47D0;
+	Fri,  2 Oct 2026 09:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790932670; cv=none; b=LKQUyoKb8onmOuFK71bWVvN4x0nspCgWh77hxEyfYq+q+C3bzADlDQOcwccTFvsX96DRM4rcKvW/xEtiicn2Cnvugw6CbSeladwluzQTwKZxRbSHL7ZARSIyVTXXVvUDcYyG4eAw3GBABC9fRrAtmtsYRtaaoiMWPwYBCFSptIw=
+	t=1790932838; cv=none; b=SenZ1NKGdL5wltCgm9IKUomwMMNbI+MbDzZoWkPw2rA5Ib45Fm+wJ0o91/HF/0Lc9QtBEaf8CV8o0P8soG+OYaR+DARgIrXWaLmz2T0OTpUV1UJtxfqSq9Tarj5c43JBoO5S3Weq+oOjpWPca9wHHztLNg26w076Ea+c7zNWHzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790932670; c=relaxed/simple;
-	bh=G57u2qii/v7VAwt+ktBPH9MfBfnuJ8qot9Hpqxg9VFM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M7gvv+PDNnioZnfsGBZYO6bCBJx6mUVEZMe9pAN6Of867LGoAZmi60II/ozonPS/jb68jRab0qBoqjueHjLnSJXxEcRW7zkLiEW2Xx3O8pc2p86vD39qwDCvb02L1bEGxZzdnLTtwckuGjWJnbdXwIoco1jYh38mVmPkoPFJy+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZjppKu+X; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1790932838; c=relaxed/simple;
+	bh=NiDPwnF91J1fElrQM+XOqR3EbPaFQvf5QeJhyPBAcs0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Tvb8cbXJl6LdbejXbglpVGMckAKLdXPiez72Tlg6g8IHxU8X1nndJj8awQQVeDewceCpiOz6V11svbheBhEci66dv8DtyzInFLXCzABNRhaUlJWRZG+LYuY68gxwgh9NoFnYX2F+ros+ZADYNnKolL9/LUptgfbgAAdeipdhk/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=kVni3wC7; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZjppKu+X"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69265rQL3958830;
-	Fri, 2 Oct 2026 09:17:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=6uqtZCh5sKiBa1aMXAb5BJTAZQc8AK
-	FENrdMiTf5wfM=; b=ZjppKu+Xb/f/KaoBLr2rFJugyrTL723BCaOwEBmWmBnC59
-	k3r8m67jPcYaVd8ORwmboDqQoEByQbOHVKXkiJL13VNFqJhbyjcMUn1XYp/C3b0a
-	U8LFHujV6zFRyMVGOeqqpZ4wy1hhuk+P8I1k6cW1wbzAxTeSphz+BxkDCWilpBXh
-	rDTwYAsf8GpPZ2pM56xlO1fTtSZ8wotN4veMkOfZCBMv0NPP9V3NYCIgVA80Eoro
-	JfCpcyI8gSweqzVDTicBhDn//xmFOYUyKIzv6hGahIOTdnjpF0/ACQwGz+n3RCfo
-	rcVeSbyy1wMJGociV6QGqhvjz3tR7N/czr/pH2ag==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gx5j5rjd0-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 02 Oct 2026 09:17:33 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 69262PFt2076520;
-	Fri, 2 Oct 2026 09:17:32 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4h0xcsj6a3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 02 Oct 2026 09:17:32 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6929HSmC45941162
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 2 Oct 2026 09:17:28 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0BB3B20043;
-	Fri,  2 Oct 2026 09:17:28 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F05972004E;
-	Fri,  2 Oct 2026 09:17:26 +0000 (GMT)
-Received: from osiris (unknown [9.87.132.225])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri,  2 Oct 2026 09:17:26 +0000 (GMT)
-Date: Fri, 2 Oct 2026 11:17:25 +0200
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <fuad.tabba@linux.dev>
-Subject: Re: (subset) [PATCH v9 00/24] KVM: s390: Introduce arm64 KVM
-Message-ID: <20261002091725.22510-B-seiden@linux.ibm.com>
-References: <20260930173441.66762-1-seiden@linux.ibm.com>
- <179085262878.3865846.5787241839391727949.b4-ty@b4>
- <20261001132715.108643-A-seiden@linux.ibm.com>
- <86wls1315l.wl-maz@kernel.org>
- <20261002080015.22510-A-seiden@linux.ibm.com>
- <86v77k326m.wl-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="kVni3wC7"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DE243497;
+	Fri,  2 Oct 2026 02:20:30 -0700 (PDT)
+Received: from [10.57.8.170] (unknown [10.57.8.170])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A6A1A3F86F;
+	Fri,  2 Oct 2026 02:20:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1790932834; bh=NiDPwnF91J1fElrQM+XOqR3EbPaFQvf5QeJhyPBAcs0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kVni3wC7f/qTgA063L/gEbfkL5Vy/kC4H8uyWTCs2um2/CQorXzR1TU+NnjXw1Vjz
+	 kq/KGVFfbFf8VPdv9o6CtFoDJkFSEBblU08m/dpa+CB4Toy9jLMpMhEPJcwp1TF+dD
+	 zemNRWJmmTOG+Wrx//RcIimAAw0a4SLnw+ZVFOxs=
+Message-ID: <73ee7e2e-997b-4b19-9280-2d5a5d5c8deb@arm.com>
+Date: Fri, 2 Oct 2026 10:20:30 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86v77k326m.wl-maz@kernel.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDAyMDAzNiBTYWx0ZWRfXzf+SaVRSYbxi
- wF6O6ItDg/TjjQZsWvIS6iA/pNx+kTGeei2b09mnkYuIYMQvNAu4GfhXOyjUUU0ecdGH3IcCXgs
- 8zzy2BhHZFxJHD9SOSQgWcEEoP35fgc=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDAyMDAzNiBTYWx0ZWRfX6ksXvNaSh//Y
- qLGbrcdum8WnH1erhMEoQABB1l9Je2YAFiwqN0X/a9GeNPNsbLWZkrcInVgphwEXJAfvKF8kzoA
- UIAjEcbcoTC6O+M2TpSUxiugeT+5/TVTNvt2jWqvO83EkDuQTG2CBYApKvu9ZWJ8WMo6+m/eQVZ
- uy3eJXQNOaX+DaYfQ9LeFKbrWhDTIw4gc0RD6NjqlK8itgz3tvrbx+JtuiptfSPSRb+M/VwxF10
- FaMYAZoIfFmS1t2noOk7/HasizlcmVvCPkkChT9+60jc69zF0PNT7/66sbeBXUkjVoZTLuqyFqR
- 0FdGxTkEB4K9x55i0cDA+RhXD1blx10kci9trxb1/sLsHrRVwRkFUPhHRQap8hN3zbRRclFkFdh
- iFISzd2W8M8fXgxjMcGEbO1ZQSotv8F/yjGjvc9BFh9Hv7qdmfJciVbqVxUGbIp77a2oL5NOyTm
- HePgsSgJ7jxJP7IFoGg==
-X-Proofpoint-GUID: 8jsrgeQygRoRTjmexax4kfknhqu-s8hs
-X-Authority-Analysis: v=2.4 cv=RKcmjIi+ c=1 sm=1 tr=0 ts=6abf76ad cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=kj9zAlcOel0A:10 a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
- a=ALOfu2a2d7XKILEI8oUA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-ORIG-GUID: 6Gcx6D6PvRG4WEJpQqeeOPCS1cyvHcMq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-10-02_02,2026-10-01_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 priorityscore=1501 spamscore=0 bulkscore=0 impostorscore=0
- adultscore=0 lowpriorityscore=0 suspectscore=0 malwarescore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2610020036
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v21 18/23] KVM: arm64: CCA: Don't expose unsupported
+ capabilities for realm guests
+Content-Language: en-GB
+To: sashiko-reviews@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Fuad Tabba <tabba@google.com>
+References: <20261001210703.1597150-1-suzuki.poulose@arm.com>
+ <20261001210703.1597150-19-suzuki.poulose@arm.com>
+ <20261002091348.1769C1F00899@smtp.kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20261002091348.1769C1F00899@smtp.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 02, 2026 at 10:02:41AM +0100, Marc Zyngier wrote:
-> On Fri, 02 Oct 2026 09:00:15 +0100,
-> Steffen Eiden <seiden@linux.ibm.com> wrote:
-> > 
-> > Yes the positioning of the functions look good. It builds on top of
-> > kvmarm/next + this (sightly relocated (line numbes are different) patch
-> > + arm on s390 stuff.
+On 02/10/2026 10:13, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [Medium] arm64: kvm: KVM_CAP_IRQCHIP incorrectly exposed for Realm VMs
+> --
 > 
-> Cool. I've now pushed out the rebuilt kvmarm/next branch with this,
-> and hopefully it will make it into -next today.
+> commit af0bceb4971b2a4c5816fbca6500c4f10a51388d
+> Author: Suzuki K Poulose <suzuki.poulose@arm.com>
 > 
-> Let me know if anything else is amiss.
+> KVM: arm64: CCA: Don't expose unsupported capabilities for realm guests
 > 
-> > I'll work on a verification tool for you guys to make this process
-> > easier.
+> This commit limits the capabilities that are allowed for Realm VMs and blocks
+> the corresponding vm_ioctls. It repurposes kvm_pkvm_ioctl_allowed() to
+> support both pKVM and Realm ioctls and adds a generic kvm_vm_ext_allowed()
+> helper for filtering.
 > 
-> I guess the ultimate verification tool is to build s390 with the rest
-> of the patches, which I've just done. This doesn't lead to any error
-> that wasn't already reported.
+>> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+>> index 44f5c75a27b5b..ea1450e0c8619 100644
+>> --- a/arch/arm64/include/asm/kvm_rmi.h
+>> +++ b/arch/arm64/include/asm/kvm_rmi.h
+> [ ... ]
+>> @@ -58,4 +60,26 @@ struct realm {
+>>   
+>>   void kvm_init_rmi(void);
+>>   
+>> +static inline bool kvm_realm_ext_allowed(long ext)
+>> +{
+>> +	switch (ext) {
+>> +	case KVM_CAP_IRQCHIP:
+> 
+> [Severity: Medium]
+> The commit message states "Drop KVM_CAP_CREATE_IRQCHIP, as we don't support
+> VGIC_V2 for Realms". Did you intend to drop KVM_CAP_IRQCHIP from this
+> allowlist?
 
-Yes. Fortuinately this will be availabel soon :) 
+No, this was put back in based on Fuad's comment to advertise that 
+in-kernel IRQ chip is supported.
 
-I wanted to create a simple build target or similar for arm64 that
-mimics the s390 use of arm64 shared code but compiles using an arm64
-toolchain to reduce friction for esp non-maintainers.
+See 
+https://lore.kernel.org/all/CA+EHjTwYqTFzGdNPproWW5L6j5pNqmuWeFuu9HbHa8LBLPvY2A@mail.gmail.com 
 
-I have some ideas. They may work. Let's talk at plumbers about that.
 
-	Steffen
+
+Cheers
+Suzuki
+
+
+> 
+> Because KVM_CAP_IRQCHIP is still explicitly allowed here in
+> kvm_realm_ext_allowed(), userspace is falsely advertised VGIC_V2 capability
+> via KVM_CHECK_EXTENSION.
+> 
+
+> This also allows the KVM_CREATE_IRQCHIP ioctl to bypass the
+> kvm_vm_ioctl_allowed() check in kvm_arch_vm_ioctl() and attempt to
+> instantiate an unsupported VGIC_V2 before being rejected downstream.
+
+
+> 
+>> +	case KVM_CAP_ARM_PSCI:
+>> +	case KVM_CAP_ARM_PSCI_0_2:
+>> +	case KVM_CAP_DEVICE_CTRL:
+> [ ... ]
+> 
+
