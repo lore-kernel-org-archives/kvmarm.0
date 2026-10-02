@@ -1,604 +1,424 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C0233EE1E0;
-	Fri,  2 Oct 2026 06:16:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790921789; cv=none; b=Ye+7JOCPcRxce4RXHHyP6hWDf5LWcPNDnUxeqWCiGLP2EZpZZxiE69qSqE+kD/+7xt7hgZONwV4vXkbRkIQ7+2QZPlL69GTXTbrDhvhnnK+wh21Zo9KcgcFXRbwAzElk8QbU4dOmDJeLLOmR0DQ9bVLcBG29lW3+VddLwyXqtVc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790921789; c=relaxed/simple;
-	bh=6zvnDqrfUszRdTtm0wMRLqNYreAtWP2K+OC/Ib4dxjg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kusfpn84G32GA03a+OOuMeRCJ41smThZ9u5VoDWjYNcIJ090ZQYhHmxpkwRtWHV28OkUGIF5Vf7jRTf6lWOsAogq/VMSzBah48kUixFLylDOTL88mb4u/8cB8fDr43C0ZpwlG0ngjxJZ1N5VEQZcLlb2/JtnbR7JdU0Lsor0T28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=lYKhO/LX; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from mail-lf2-f12.google.com (mail-lf2-f12.google.com [74.125.229.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03CD535E1B8
+	for <kvmarm@lists.linux.dev>; Fri,  2 Oct 2026 06:48:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.229.204
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790923709; cv=pass; b=Cn81aPUyuAUJzbvfoveFUh7uBoKc0r5hP9lKnO5HIg2YbjQWPEzsbRY9qCnpq2qVz1Uhklg/gunJ1RKMZjMM1jbbUcVa/UPlTBMSmFpScFc/9KBLn0wkM6cSYv15A62lDzsbmMNdWJ6K7cEqm3mn9l2XBZtArGaEvz0dsx539LA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790923709; c=relaxed/simple;
+	bh=Gn3DzN67gt8dqk+SVB2qqbya2F4alfWx+9qoC2ReG4M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YdRv1zVbJH0pFLuNFgvn3s97NktYjHmWhYMx9O2/rBsAClv1j4Nqf52Wzg5LgSminEFklpxDSZVxrAjoWytHeYk5BItuF/ZSvScCG92AUfSAyP1ulD0wJoi/Y0FY+OOrVgDC2DojOJFi+PKSUO1l6VYYGdCFsP05b90ZjnPPztM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault.org header.i=@brainfault.org header.b=kBqJ6XuA; arc=pass smtp.client-ip=74.125.229.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="lYKhO/LX"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AB51C16F8;
-	Thu,  1 Oct 2026 23:16:04 -0700 (PDT)
-Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 9D40F3F763;
-	Thu,  1 Oct 2026 23:16:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1790921768; bh=6zvnDqrfUszRdTtm0wMRLqNYreAtWP2K+OC/Ib4dxjg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lYKhO/LXnEpMJeO44LcWkGQSjOrl7OrRDDgamG2JIUlyOTIxz5gZHwBa994iODHFP
-	 +Xa2n66/64OawsTa0vGNPj+frZj4uhBI7kiziyqG2syG3k4aBshcxgxWUFrYqNyPJj
-	 POQs+Edp5rWOTW+44+RjMfip+L8+BlEE9NSEic5Q=
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: maz@kernel.org,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	steven.price@arm.com,
-	aneesh.kumar@kernel.org,
-	oupton@kernel.org,
-	gshan@redhat.com,
-	joey.gouly@arm.com,
-	tabba@google.com,
-	yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev,
-	gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com,
-	alpergun@google.com,
-	fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com,
-	lpieralisi@kernel.org,
-	enju.kohei@fujitsu.com,
-	sudeep.holla@arm.com,
-	jonathan.cameron@oss.qualcomm.com,
-	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v22 09/10] firmware: arm_rmm: Add wrappers for Realm related RMI commands
-Date: Fri,  2 Oct 2026 07:15:05 +0100
-Message-ID: <20261002061507.1600269-10-suzuki.poulose@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261002061507.1600269-1-suzuki.poulose@arm.com>
-References: <20261002061507.1600269-1-suzuki.poulose@arm.com>
+	dkim=pass (2048-bit key) header.d=brainfault.org header.i=@brainfault.org header.b="kBqJ6XuA"
+Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5ba3f77a228so2261182e87.3
+        for <kvmarm@lists.linux.dev>; Thu, 01 Oct 2026 23:48:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790923705; cv=none;
+        d=google.com; s=arc-20260327;
+        b=kGJQDN5enLwKtA+i8Ciw4JePjzS7qNy7rQowHOKbNIMVy+gqUXjMgsRQ4wS7CMddX7
+         kaB1YEiV59JN9kQQ15fW3mUDgYCgq7oNlUMe3Gcl9OUgW9LEbzM9S+Ovn7o5OyzPYEiE
+         dZOKQx8nG9iiwgQqIp0e43HED5ujPxZzyYKBJfwlGKQBDGNefr/hbXBlYlye/G6vA9YR
+         ONKxV1rDRmA8uIgMOK5/6Hc0w8WTF6noJ9LARtY14RnR0uzMN8+WSCONDjXNNnAzvv1u
+         a3bixofFc8FoJMJL+oebWWjj8nblg4CMPMzraEUpoUZKdKzwg5O+5kSenJXz7xhLtuWX
+         KZUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=6lOPOZOlRG1U0jS9b5qGM2HS9CvZmsUPCrds2bv1Jqg=;
+        fh=cjlYWr1kiWQUoQJ6iXnQ2xsFDb61hPmwOpCnFhqxGCE=;
+        b=WgefxINhQ8q8y6X9hs6PbKOA1uw13lcmqPhZpetALThHk+/6NY1dWNGQ4CtPEYsT2T
+         rJDmW2wgqru+Q/G25QDNmY7MYpmeXV7qhKpfGC5swuzOAdLBFCdZ4BVZoJi/KBCAGEKl
+         1MZpukt1Cm9/Sot+YorhRRl0oJEfdoariAZJDr8BFjYsvDP+O/1oSDdLC/TnPH9Uw271
+         pHhSB/JrYKHfFF/4Q7RQWR0Z0V2w0zPT/CGLWr3u05qwnJjtm8g1M4W7gimtHzkhM35r
+         pB71KFLy54IhU8inBy8DGkHN9Qyo5F0V5EU/4KbltpvmqfXvQg5AA56vtjPp2l/kX3c4
+         67bg==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault.org; s=google; t=1790923705; x=1791528505; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=6lOPOZOlRG1U0jS9b5qGM2HS9CvZmsUPCrds2bv1Jqg=;
+        b=kBqJ6XuADhsqLeZFH/l78OB7lKnNt5gzQFXUbkVqy1O9VysSXQC6HRhFltuud/yYjt
+         5viQoko4BBTbUITBu9CpWRkGfKqsW89cFoO2pzh7rqjk4fKdnc+F+IS+l17cK8u7Zil2
+         pBg1SXwD0V2D2YJLeCn4B2ullyc2eW3G0sp33rUIiuiTlqbnQVHp9z/4VganwLTjVku4
+         DvwQLe7Yw+7pFXDBNfp7yu8ltx3D27Qe4khFH8R1KOxZzI1CGAvUQHxV2csGPn15ynFS
+         k6C6yVwO0J+dPHmu2ensG9/UIIZ64wi4cU2tkhIy6PPsVJDwEEMIOTQwsySzBzBS6oXK
+         s6pQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790923705; x=1791528505;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=6lOPOZOlRG1U0jS9b5qGM2HS9CvZmsUPCrds2bv1Jqg=;
+        b=LKNWcKVmFxhRmnH1Q3B/ew0jRiPEeN7b1dNNPeQq9cm5Gd3DxrS93K6epnTlt/J5/F
+         Q6kF2nLYNn9xorbpSTQ8OTLCY6CvCk4TMWdHOzH5DJvF9zLTLKWpPdzq5VYcuOdjQatI
+         /fLqwRzgUxmjGOhjNMy6V1nZL03Li09r3l13om15PXlaxmW9hXfTRgj77wJNsk+4f9ds
+         TkmRVJUnvmJckzqSe3XXrm/rhlkwDF1GQnoyepCcp2E7TBCKSu+1MwMYVCRNW9uoe2mf
+         lCRlewi99ss5SBuqzYcFJIar/TwSOlwGeiULSETx7fjBvTX82mfnlsbwfWfpXdXtv1yE
+         Iugg==
+X-Forwarded-Encrypted: i=1; AKwUvBzGwKlcsEEaGE62CqMLG6FQz93TmLKyf7+G9YkckL4h++lQrYSGn1ykOzdnxH0aZ+vPdaHdUGU=@lists.linux.dev
+X-Gm-Message-State: AFq9FYK0U2aaCcC5LjKHkHEO4sjLoPNa8yYe6FWRkCKn4g9Ql7sJM7QD
+	p4FaM9LMnLUnd+JuS2qkOYcMDpwA9VvrRTEl1CbMTy4dcZF6ndF2OKO364kpa1SOerjhMPz82jC
+	3tZ2UifJhv03bsut4axJonc+McXJdDshtGohdszKUNg==
+X-Gm-Gg: AYBFou3Ap8/jSZ7D3JyJ060OpnuAMQWZ/bl3wB5TF/OlhMEX6cLsbHDr/fAPgs8kunB
+	1HgENmszHIIuglP/Qg8CQ52NwwjlRtf+urRlVNXk89cQBUE4LGVVHptS/0g5elFEhCLNT11ud7s
+	xVGivLcUGZ+0NutVRZWmp6nZhzrh8k/G8JuUTCfN7DXU3XRFg4SgdtjmqVuZu5rZnllYolrLog0
+	twhHSzTpET/nKMVbtUyX2KUsKZwBnak9mFDnNesdqAzlxjzGXmiEHHr007C/8spZTdtbH808e4v
+	UNIkJRiyeVeElyZ9gCQwqTC3J+ZI9Rd+nH/+d1w1vuYXsuaUybDPZxabmcMPIl8+7KTUykyek2i
+	DfR/9QzaJeKEl8JTwFC6rDzIzpBub8c/PbGDZevlMXLyoAmHGVhlHaAcxFOcGhBZd7mz5iP3VK7
+	N5prDVXKWSmQ==
+X-Received: by 2002:a05:6512:401d:b0:5b8:fa05:e49c with SMTP id
+ 2adb3069b0e04-5bb9bb19500mr596734e87.34.1790923704845; Thu, 01 Oct 2026
+ 23:48:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260904175550.430266-1-dongli.zhang@oracle.com> <20260904175550.430266-2-dongli.zhang@oracle.com>
+In-Reply-To: <20260904175550.430266-2-dongli.zhang@oracle.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Fri, 2 Oct 2026 12:18:11 +0530
+X-Gm-Features: AclHuK8jni4c7kFYNY1Z67Q0WeqgvibrlMJVROVFG2iQbTyVsq4GtRVUGzMalTs
+Message-ID: <CAAhSdy2oKW8SDKd5ax8Tw3Wr-i8_x+i2WviK_9r6+HsG-83FYw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] KVM: Move last_steal to common struct kvm_vcpu
+To: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, loongarch@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
+	maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, 
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	zhaotianrui@loongson.cn, maobibo@loongson.cn, chenhuacai@kernel.org, 
+	atish.patra@linux.dev, seanjc@google.com, pbonzini@redhat.com, 
+	shuah@kernel.org, dwmw2@infradead.org, joe.jin@oracle.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Steven Price <steven.price@arm.com>
+On Fri, Sep 4, 2026 at 11:26=E2=80=AFPM Dongli Zhang <dongli.zhang@oracle.c=
+om> wrote:
+>
+> KVM caches per-vCPU host task's run_delay in per-architecture struct
+> kvm_vcpu_arch at last_steal.
+>
+> Move the cache to struct kvm_vcpu and convert x86, arm64, riscv, and
+> loongarch to use the common field.
+>
+> Add HAVE_KVM_PV_STEAL_TIME so last_steal is used only for architectures
+> that implement KVM stealtime.
+>
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
 
-Introduce wrappers for the RMI functions needed for creating and
-managing realm guests. This will be used by the KVM to manage the
-Realms.
+For KVM RISC-V:
+Reviewed-by: Anup Patel <anup@brainfault.org>
+Acked-by: Anup Patel <anup@brainfault.org>
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-Signed-off-by: Steven Price <steven.price@arm.com>
-Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
-Changes since v21:
-  * Add a comment to note that out_* outputs are only valid on RMI_SUCCESS for
-    rmi_rtt_*_{unmap,map} - For the LLM reports
-  * rmi_smccc_invoke_once() -> Always inline and add a comment about result
-  * Always inline for rmi_rec_enter() and rmi_rec_destroy()
-  * Use arm_smccc_1_2_smc() for rmi_smccc_invoke_once()
-Changes since v20:
-  * Add rmi_smccc_invoke_once() and use that for rec_enter
-Changes since v19:
-  * Use rmi_sro_memxfr_command() for rec_create - Catalin
-Changes since v18:
-  * Convert the last man standing nesting if - Gavin
-  * Pass out_top for RMI_ERROR_RTT for rmi_rtt_destroy()
-Changes since v17:
-  * Avoid nesting if conditions for output populating RMI calls
-  * Clean up comments
-  * Always use arm_smccc_1_2_invoke() for RMI calls.
-Changes since v16:
-  * Split into a separate patch and move away from arch/arm64 to
-    include/linux/.
-  * Also moved into the firmware_rmm series from the KVM CCA support.
-    This is done in a hope to reduce the merge conflicts and make
-    the KVM CCA upstreaming in independent parallel chunks
----
- include/linux/arm-rmi-cmds.h | 477 +++++++++++++++++++++++++++++++++++
- 1 file changed, 477 insertions(+)
+Thanks,
+Anup
 
-diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
-index 982e30fdf4dec..4d5d4a89135ce 100644
---- a/include/linux/arm-rmi-cmds.h
-+++ b/include/linux/arm-rmi-cmds.h
-@@ -53,6 +53,20 @@ static inline void rmi_smccc_invoke(struct arm_smccc_1_2_regs *regs)
- 	}
- }
- 
-+/*
-+ * rmi_smccc_invoke_once: Invoke the RMI call and return the results. Do not
-+ * retry the command. Let the caller deal with RMI_BUSY or RMI_BLOCKED.
-+ *
-+ * @regs: Input parameters filled in. Updated with the ouptput results
-+ * after the call.
-+ */
-+static __always_inline void rmi_smccc_invoke_once(struct arm_smccc_1_2_regs *regs)
-+{
-+	struct arm_smccc_1_2_regs args = *regs;
-+
-+	arm_smccc_1_2_smc(&args, regs);
-+}
-+
- unsigned long rmi_feat_reg(unsigned int index);
- 
- int rmi_delegate_range(phys_addr_t phys, unsigned long size,
-@@ -104,4 +118,467 @@ static inline bool is_rmi_available(void)
- }
- #endif	/* CONFIG_ARM_RMM_RMI */
- 
-+
-+/**
-+ * rmi_rtt_data_map_init() - Create a mapping at protected IPA, copying contents
-+ *			     from a given non-secure source granule.
-+ * @rd: PA of the RD
-+ * @data: PA of the target granule mapped in the guest
-+ * @ipa: IPA at which the granule @data will be mapped in the guest
-+ * @src: PA of the source granule with contents
-+ * @flags: RMI_MEASURE_CONTENT if the contents should be measured
-+ *
-+ * Create a mapping from Protected IPA space to conventional memory, copying
-+ * contents from a Non-secure Granule provided by the caller.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_rtt_data_map_init(unsigned long rd, unsigned long data,
-+					 unsigned long ipa, unsigned long src,
-+					 unsigned long flags)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_DATA_MAP_INIT, rd, data, ipa, src, flags
-+	};
-+
-+	return rmi_sro_execute(&regs);
-+}
-+
-+/**
-+ * rmi_rtt_data_map() - Create mappings in protected IPA range with unknown contents
-+ * @rd: PA of the RD
-+ * @base: Base of the target IPA range
-+ * @top: Top of the target IPA range
-+ * @flags: Flags
-+ * @oaddr: Output address set descriptor
-+ * @out_top: Top address of range which was processed.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code.
-+ * NOTE: out_top is only valid with ret == RMI_SUCCESS
-+ */
-+static inline long rmi_rtt_data_map(unsigned long rd,
-+				    unsigned long base,
-+				    unsigned long top,
-+				    unsigned long flags,
-+				    unsigned long oaddr,
-+				    unsigned long *out_top)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_DATA_MAP, rd, base, top, flags, oaddr
-+	};
-+	long ret;
-+
-+	ret = rmi_sro_execute(&regs);
-+
-+	if (ret == RMI_SUCCESS && out_top)
-+		*out_top = regs.a1;
-+
-+	return ret;
-+}
-+
-+/**
-+ * rmi_rtt_data_unmap() - Remove mappings to conventional memory at a protected
-+ *			  IPA range
-+ * @rd: PA of the RD
-+ * @base: Base of the target IPA range
-+ * @top: Top of the target IPA range
-+ * @flags: Flags
-+ * @oaddr: Output address set descriptor
-+ * @out_top: Returns top IPA of range which has been unmapped
-+ * @out_range: Output address range
-+ * @out_count: Number of entries in output address list
-+ *
-+ * Removes mappings to convention memory with a target Protected IPA range.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ * NOTE: out_top is only valid with ret == RMI_SUCCESS
-+ */
-+static inline long rmi_rtt_data_unmap(unsigned long rd,
-+				      unsigned long base,
-+				      unsigned long top,
-+				      unsigned long flags,
-+				      unsigned long oaddr,
-+				      unsigned long *out_top,
-+				      unsigned long *out_range,
-+				      unsigned long *out_count)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_DATA_UNMAP, rd, base, top, flags, oaddr
-+	};
-+	long ret;
-+
-+	ret = rmi_sro_execute(&regs);
-+
-+	if (ret != RMI_SUCCESS)
-+		return ret;
-+
-+	if (out_top)
-+		*out_top = regs.a1;
-+	if (out_range)
-+		*out_range = regs.a2;
-+	if (out_count)
-+		*out_count = regs.a3;
-+
-+	return RMI_SUCCESS;
-+}
-+
-+/**
-+ * rmi_psci_complete() - Complete pending PSCI command
-+ * @calling_rec: PA of the calling REC
-+ * @status: Status of the PSCI request
-+ *
-+ * Completes a pending PSCI command.
-+ *
-+ * Return: RMI return code
-+ */
-+static inline long rmi_psci_complete(unsigned long calling_rec,
-+				     unsigned long status)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_PSCI_COMPLETE, calling_rec, status,
-+	};
-+
-+	rmi_smccc_invoke(&regs);
-+	return regs.a0;
-+}
-+
-+/**
-+ * rmi_realm_activate() - Activate a realm
-+ * @rd: PA of the RD
-+ *
-+ * Mark a realm as Active, signalling that creation is completed, allowing
-+ * execution of the realm.
-+ *
-+ * Return: RMI return code
-+ */
-+static inline long rmi_realm_activate(unsigned long rd)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_REALM_ACTIVATE, rd,
-+	};
-+
-+	rmi_smccc_invoke(&regs);
-+	return regs.a0;
-+}
-+
-+/**
-+ * rmi_realm_create() - Create a realm
-+ * @rd: PA of the RD
-+ * @params: PA of realm parameters
-+ * @sro: Preallocated SRO context
-+ *
-+ * Create a new realm using the given parameters.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_realm_create(unsigned long rd, unsigned long params,
-+				    struct rmi_sro_state *sro)
-+{
-+	return rmi_sro_memxfer_cmd(sro, GFP_KERNEL,
-+				   SMC_RMI_REALM_CREATE, rd, params);
-+}
-+
-+/**
-+ * rmi_realm_terminate() - Terminate a realm
-+ * @rd: PA of the RD
-+ * @sro: Preallocated SRO context
-+ *
-+ * Terminates a realm, moving it into a ZOMBIE state
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_realm_terminate(unsigned long rd,
-+				       struct rmi_sro_state *sro)
-+{
-+	return rmi_sro_memxfer_cmd(sro, GFP_KERNEL,
-+				   SMC_RMI_REALM_TERMINATE, rd);
-+}
-+
-+/**
-+ * rmi_realm_destroy() - Destroy a realm
-+ * @rd: PA of the RD
-+ * @sro: Preallocated SRO context
-+ *
-+ * Destroys a realm, all objects belonging to the realm must be destroyed first.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_realm_destroy(unsigned long rd,
-+				     struct rmi_sro_state *sro)
-+{
-+	return rmi_sro_memxfer_cmd(sro, GFP_KERNEL,
-+				   SMC_RMI_REALM_DESTROY, rd);
-+}
-+
-+/**
-+ * rmi_rec_create() - Create a REC
-+ * @rd: PA of the RD
-+ * @rec: PA of the target REC
-+ * @params: PA of REC parameters
-+ * @sro: Allocated SRO context to be used
-+ *
-+ * Create a REC using the parameters specified in the struct rec_params pointed
-+ * to by @params.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_rec_create(unsigned long rd,
-+				  unsigned long rec,
-+				  unsigned long params,
-+				  struct rmi_sro_state *sro)
-+{
-+	return rmi_sro_memxfer_cmd(sro, GFP_KERNEL,
-+				   SMC_RMI_REC_CREATE, rd, rec, params);
-+}
-+
-+/**
-+ * rmi_rec_destroy() - Destroy a REC
-+ * @rec: PA of the target REC
-+ * @sro: Allocated SRO context to be used
-+ *
-+ * Destroys a REC. The REC must not be running.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static __always_inline long rmi_rec_destroy(unsigned long rec,
-+				   struct rmi_sro_state *sro)
-+{
-+	return rmi_sro_memxfer_cmd(sro, GFP_KERNEL, SMC_RMI_REC_DESTROY, rec);
-+}
-+
-+/**
-+ * rmi_rec_enter() - Enter a REC
-+ * @rec: PA of the target REC
-+ * @run_ptr: PA of RecRun structure
-+ *
-+ * Starts (or continues) execution within a REC.
-+ *
-+ * Return: RMI result
-+ */
-+static __always_inline long rmi_rec_enter(unsigned long rec, unsigned long run_ptr)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_REC_ENTER, rec, run_ptr,
-+	};
-+
-+	rmi_smccc_invoke_once(&regs);
-+	return regs.a0;
-+}
-+
-+/**
-+ * rmi_rtt_create() - Creates an RTT
-+ * @rd: PA of the RD
-+ * @rtt: PA of the target RTT
-+ * @ipa: Base of the IPA range described by the RTT
-+ * @level: Depth of the RTT within the tree
-+ *
-+ * Creates an RTT (Realm Translation Table) at the specified level for the
-+ * translation of the specified address within the realm.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_rtt_create(unsigned long rd, unsigned long rtt,
-+				  unsigned long ipa, long level)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_CREATE, rd, rtt, ipa, level
-+	};
-+
-+	return rmi_sro_execute(&regs);
-+}
-+
-+/**
-+ * rmi_rtt_destroy() - Destroy an RTT
-+ * @rd: PA of the RD
-+ * @ipa: Base of the IPA range described by the RTT
-+ * @level: RTT level
-+ * @out_rtt: Pointer to write the PA of the RTT which was destroyed
-+ * @out_top: Pointer to write the top IPA of non-live RTT entries, from entry
-+ * at which the RTT walk terminated.
-+ *
-+ * Destroys an RTT. The RTT must be non-live, i.e. none of the entries in the
-+ * table are in ASSIGNED or TABLE state.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code.
-+ */
-+static inline long rmi_rtt_destroy(unsigned long rd,
-+				   unsigned long ipa,
-+				   long level,
-+				   unsigned long *out_rtt,
-+				   unsigned long *out_top)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_DESTROY, rd, ipa, level
-+	};
-+	long ret = rmi_sro_execute(&regs);
-+
-+	switch (RMI_RESULT_STATUS(ret)) {
-+	case RMI_SUCCESS:
-+		if (out_rtt)
-+			*out_rtt = regs.a1;
-+		fallthrough;
-+	case RMI_ERROR_RTT:
-+		if (out_top)
-+			*out_top = regs.a2;
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	return ret;
-+}
-+
-+/**
-+ * rmi_rtt_fold() - Fold an RTT
-+ * @rd: PA of the RD
-+ * @ipa: Base of the IPA range described by the RTT
-+ * @level: Depth of the RTT within the tree
-+ * @out_rtt: Pointer to write the PA of the RTT which was destroyed
-+ *
-+ * Folds an RTT. If all entries with the RTT are 'homogeneous' the RTT can be
-+ * folded into the parent and the RTT destroyed.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_rtt_fold(unsigned long rd, unsigned long ipa,
-+				long level, unsigned long *out_rtt)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_FOLD, rd, ipa, level
-+	};
-+	long ret = rmi_sro_execute(&regs);
-+
-+	if (ret == RMI_SUCCESS && out_rtt)
-+		*out_rtt = regs.a1;
-+
-+	return ret;
-+}
-+
-+/**
-+ * rmi_rtt_init_ripas() - Set RIPAS for new realm
-+ * @rd: PA of the RD
-+ * @base: Base of target IPA region
-+ * @top: Top of target IPA region
-+ * @out_top: Top IPA of range whose RIPAS was modified
-+ *
-+ * Sets the RIPAS of a target IPA range to RAM, for a realm in the NEW state.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_rtt_init_ripas(unsigned long rd, unsigned long base,
-+				      unsigned long top, unsigned long *out_top)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_INIT_RIPAS, rd, base, top
-+	};
-+	long ret = rmi_sro_execute(&regs);
-+
-+	if (ret == RMI_SUCCESS && out_top)
-+		*out_top = regs.a1;
-+
-+	return ret;
-+}
-+
-+/**
-+ * rmi_rtt_unprot_map() - Map unprotected granules into a realm
-+ * @rd: PA of the RD
-+ * @base: Base IPA of the mapping
-+ * @top: Top of the target IPA range
-+ * @flags: Flags
-+ * @oaddr: Output address set descriptor
-+ * @out_top: Top IPA of range which has been mapped
-+ *
-+ * Create mappings to memory within a target unprotected IPA range.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_rtt_unprot_map(unsigned long rd,
-+				      unsigned long base,
-+				      unsigned long top,
-+				      unsigned long flags,
-+				      unsigned long oaddr,
-+				      unsigned long *out_top)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_UNPROT_MAP, rd, base, top, flags, oaddr
-+	};
-+	long ret = rmi_sro_execute(&regs);
-+
-+	if (ret == RMI_SUCCESS && out_top)
-+		*out_top = regs.a1;
-+
-+	return ret;
-+}
-+
-+/**
-+ * rmi_rtt_set_ripas() - Set RIPAS for an running realm
-+ * @rd: PA of the RD
-+ * @rec: PA of the REC making the request
-+ * @base: Base of target IPA region
-+ * @top: Top of target IPA region
-+ * @out_top: Pointer to write top IPA of range whose RIPAS was modified
-+ *
-+ * Completes a request made by the realm to change the RIPAS of a target IPA
-+ * range.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ */
-+static inline long rmi_rtt_set_ripas(unsigned long rd, unsigned long rec,
-+				     unsigned long base, unsigned long top,
-+				     unsigned long *out_top)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_SET_RIPAS, rd, rec, base, top
-+	};
-+	long ret = rmi_sro_execute(&regs);
-+
-+	if (ret == RMI_SUCCESS && out_top)
-+		*out_top = regs.a1;
-+
-+	return ret;
-+}
-+
-+/**
-+ * rmi_rtt_unprot_unmap() - Remove mappings within an unprotected IPA range
-+ * @rd: PA of the RD
-+ * @base: Base IPA of the mapping
-+ * @top: Top of the target IPA range
-+ * @flags: Flags
-+ * @oaddr: Output address set descriptor
-+ * @out_top: Top IPA which has been unmapped
-+ * @out_range: Output address range
-+ * @out_count: Number of entries in output address list
-+ *
-+ * Removes mappings to memory within a target unprotected IPA range.
-+ *
-+ * Return: 0 on success, positive RMI result code or negative Linux error code
-+ * NOTE: out_top is only valid with ret == RMI_SUCCESS.
-+ */
-+static inline long rmi_rtt_unprot_unmap(unsigned long rd,
-+					unsigned long base,
-+					unsigned long top,
-+					unsigned long flags,
-+					unsigned long oaddr,
-+					unsigned long *out_top,
-+					unsigned long *out_range,
-+					unsigned long *out_count)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_RTT_UNPROT_UNMAP, rd, base, top, flags, oaddr
-+	};
-+	long ret = rmi_sro_execute(&regs);
-+
-+	if (ret != RMI_SUCCESS)
-+		return ret;
-+
-+	if (out_top)
-+		*out_top = regs.a1;
-+	if (out_range)
-+		*out_range = regs.a2;
-+	if (out_count)
-+		*out_count = regs.a3;
-+
-+	return RMI_SUCCESS;
-+}
-+
- #endif	/* __LINUX_ARM_RMI_CMDS_H_ */
--- 
-2.43.0
 
+> ---
+> Marc suggested reusing CONFIG_HAVE_PV_STEAL_CLOCK_GEN, but I introduced
+> HAVE_KVM_PV_STEAL_TIME instead.
+>
+> As I have access to only x86 and arm64 KVM hosts, I created and validated
+> the selftest on those two architectures only.
+>
+>  arch/arm64/include/asm/kvm_host.h     |  1 -
+>  arch/arm64/kvm/Kconfig                |  1 +
+>  arch/arm64/kvm/pvtime.c               |  8 ++++----
+>  arch/loongarch/include/asm/kvm_host.h |  1 -
+>  arch/loongarch/kvm/Kconfig            |  1 +
+>  arch/loongarch/kvm/exit.c             |  2 +-
+>  arch/loongarch/kvm/vcpu.c             |  6 +++---
+>  arch/riscv/include/asm/kvm_host.h     |  1 -
+>  arch/riscv/kvm/Kconfig                |  1 +
+>  arch/riscv/kvm/vcpu_sbi_sta.c         | 10 +++++-----
+>  arch/x86/include/asm/kvm_host.h       |  1 -
+>  arch/x86/kvm/Kconfig                  |  1 +
+>  arch/x86/kvm/x86.c                    |  5 ++---
+>  include/linux/kvm_host.h              |  4 ++++
+>  virt/kvm/Kconfig                      |  3 +++
+>  15 files changed, 26 insertions(+), 20 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/k=
+vm_host.h
+> index 27fe0cd5b2d7..36cb7dee988c 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -937,7 +937,6 @@ struct kvm_vcpu_arch {
+>
+>         /* Guest PV state */
+>         struct {
+> -               u64 last_steal;
+>                 gpa_t base;
+>         } steal;
+>
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 449154f9a485..f5855bfc681c 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -34,6 +34,7 @@ menuconfig KVM
+>         select HAVE_KVM_IRQ_BYPASS
+>         select HAVE_KVM_READONLY_MEM
+>         select HAVE_KVM_VCPU_RUN_PID_CHANGE
+> +       select HAVE_KVM_PV_STEAL_TIME
+>         select SCHED_INFO
+>         select GUEST_PERF_EVENTS if PERF_EVENTS
+>         select KVM_GUEST_MEMFD
+> diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
+> index 4ceabaa4c30b..a67d93845d79 100644
+> --- a/arch/arm64/kvm/pvtime.c
+> +++ b/arch/arm64/kvm/pvtime.c
+> @@ -14,7 +14,7 @@ void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
+>  {
+>         struct kvm *kvm =3D vcpu->kvm;
+>         u64 base =3D vcpu->arch.steal.base;
+> -       u64 last_steal =3D vcpu->arch.steal.last_steal;
+> +       u64 last_steal =3D vcpu->last_steal;
+>         u64 offset =3D offsetof(struct pvclock_vcpu_stolen_time, stolen_t=
+ime);
+>         u64 steal =3D 0;
+>         int idx;
+> @@ -25,8 +25,8 @@ void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
+>         idx =3D srcu_read_lock(&kvm->srcu);
+>         if (!kvm_get_guest(kvm, base + offset, steal)) {
+>                 steal =3D le64_to_cpu(steal);
+> -               vcpu->arch.steal.last_steal =3D READ_ONCE(current->sched_=
+info.run_delay);
+> -               steal +=3D vcpu->arch.steal.last_steal - last_steal;
+> +               vcpu->last_steal =3D READ_ONCE(current->sched_info.run_de=
+lay);
+> +               steal +=3D vcpu->last_steal - last_steal;
+>                 kvm_put_guest(kvm, base + offset, cpu_to_le64(steal));
+>         }
+>         srcu_read_unlock(&kvm->srcu, idx);
+> @@ -61,7 +61,7 @@ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
+>          * Start counting stolen time from the time the guest requests
+>          * the feature enabled.
+>          */
+> -       vcpu->arch.steal.last_steal =3D current->sched_info.run_delay;
+> +       vcpu->last_steal =3D current->sched_info.run_delay;
+>         kvm_write_guest_lock(kvm, base, &init_values, sizeof(init_values)=
+);
+>
+>         return base;
+> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/inclu=
+de/asm/kvm_host.h
+> index 23cfbecebbd7..14514a25b261 100644
+> --- a/arch/loongarch/include/asm/kvm_host.h
+> +++ b/arch/loongarch/include/asm/kvm_host.h
+> @@ -253,7 +253,6 @@ struct kvm_vcpu_arch {
+>         /* paravirt steal time */
+>         struct {
+>                 u64 guest_addr;
+> -               u64 last_steal;
+>                 struct gfn_to_hva_cache cache;
+>                 u8  preempted;
+>         } st;
+> diff --git a/arch/loongarch/kvm/Kconfig b/arch/loongarch/kvm/Kconfig
+> index 15da2d88c0c1..4996ec9c07f9 100644
+> --- a/arch/loongarch/kvm/Kconfig
+> +++ b/arch/loongarch/kvm/Kconfig
+> @@ -26,6 +26,7 @@ config KVM
+>         select HAVE_KVM_MSI
+>         select HAVE_KVM_READONLY_MEM
+>         select KVM_COMMON
+> +       select HAVE_KVM_PV_STEAL_TIME
+>         select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+>         select KVM_GENERIC_HARDWARE_ENABLING
+>         select KVM_MMIO
+> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
+> index 4f58e6e2cf86..56ae6b18f8c1 100644
+> --- a/arch/loongarch/kvm/exit.c
+> +++ b/arch/loongarch/kvm/exit.c
+> @@ -773,7 +773,7 @@ static long kvm_save_notify(struct kvm_vcpu *vcpu)
+>                 if (!(data & KVM_STEAL_PHYS_VALID))
+>                         return 0;
+>
+> -               vcpu->arch.st.last_steal =3D current->sched_info.run_dela=
+y;
+> +               vcpu->last_steal =3D current->sched_info.run_delay;
+>                 kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
+>                 return 0;
+>         default:
+> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+> index ed9e092c97ba..728d29eba8e0 100644
+> --- a/arch/loongarch/kvm/vcpu.c
+> +++ b/arch/loongarch/kvm/vcpu.c
+> @@ -187,8 +187,8 @@ static void kvm_update_stolen_time(struct kvm_vcpu *v=
+cpu)
+>         smp_wmb();
+>
+>         unsafe_get_user(steal, &st->steal, out);
+> -       steal +=3D current->sched_info.run_delay - vcpu->arch.st.last_ste=
+al;
+> -       vcpu->arch.st.last_steal =3D current->sched_info.run_delay;
+> +       steal +=3D current->sched_info.run_delay - vcpu->last_steal;
+> +       vcpu->last_steal =3D current->sched_info.run_delay;
+>         unsafe_put_user(steal, &st->steal, out);
+>
+>         smp_wmb();
+> @@ -1205,7 +1205,7 @@ static int kvm_loongarch_pvtime_set_attr(struct kvm=
+_vcpu *vcpu,
+>
+>         if (!ret) {
+>                 vcpu->arch.st.guest_addr =3D gpa;
+> -               vcpu->arch.st.last_steal =3D current->sched_info.run_dela=
+y;
+> +               vcpu->last_steal =3D current->sched_info.run_delay;
+>                 kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
+>         }
+>
+> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/k=
+vm_host.h
+> index a30600579231..305875301c04 100644
+> --- a/arch/riscv/include/asm/kvm_host.h
+> +++ b/arch/riscv/include/asm/kvm_host.h
+> @@ -273,7 +273,6 @@ struct kvm_vcpu_arch {
+>         /* SBI steal-time accounting */
+>         struct {
+>                 gpa_t shmem;
+> -               u64 last_steal;
+>         } sta;
+>  };
+>
+> diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
+> index ec2cee0a39e0..1ff07a904a02 100644
+> --- a/arch/riscv/kvm/Kconfig
+> +++ b/arch/riscv/kvm/Kconfig
+> @@ -26,6 +26,7 @@ config KVM
+>         select HAVE_KVM_READONLY_MEM
+>         select HAVE_KVM_DIRTY_RING_ACQ_REL
+>         select KVM_COMMON
+> +       select HAVE_KVM_PV_STEAL_TIME
+>         select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+>         select KVM_GENERIC_HARDWARE_ENABLING
+>         select KVM_MMIO
+> diff --git a/arch/riscv/kvm/vcpu_sbi_sta.c b/arch/riscv/kvm/vcpu_sbi_sta.=
+c
+> index 60e50296a008..9a77d3bde7c7 100644
+> --- a/arch/riscv/kvm/vcpu_sbi_sta.c
+> +++ b/arch/riscv/kvm/vcpu_sbi_sta.c
+> @@ -19,13 +19,13 @@
+>  static void kvm_riscv_vcpu_sbi_sta_reset(struct kvm_vcpu *vcpu)
+>  {
+>         vcpu->arch.sta.shmem =3D INVALID_GPA;
+> -       vcpu->arch.sta.last_steal =3D 0;
+> +       vcpu->last_steal =3D 0;
+>  }
+>
+>  void kvm_riscv_vcpu_record_steal_time(struct kvm_vcpu *vcpu)
+>  {
+>         gpa_t shmem =3D vcpu->arch.sta.shmem;
+> -       u64 last_steal =3D vcpu->arch.sta.last_steal;
+> +       u64 last_steal =3D vcpu->last_steal;
+>         __le32 __user *sequence_ptr;
+>         __le64 __user *steal_ptr;
+>         __le32 sequence_le;
+> @@ -67,8 +67,8 @@ void kvm_riscv_vcpu_record_steal_time(struct kvm_vcpu *=
+vcpu)
+>
+>         if (!WARN_ON(get_user(steal_le, steal_ptr))) {
+>                 steal =3D le64_to_cpu(steal_le);
+> -               vcpu->arch.sta.last_steal =3D READ_ONCE(current->sched_in=
+fo.run_delay);
+> -               steal +=3D vcpu->arch.sta.last_steal - last_steal;
+> +               vcpu->last_steal =3D READ_ONCE(current->sched_info.run_de=
+lay);
+> +               steal +=3D vcpu->last_steal - last_steal;
+>                 WARN_ON(put_user(cpu_to_le64(steal), steal_ptr));
+>         }
+>
+> @@ -115,7 +115,7 @@ static int kvm_sbi_sta_steal_time_set_shmem(struct kv=
+m_vcpu *vcpu)
+>                 return SBI_ERR_INVALID_ADDRESS;
+>
+>         vcpu->arch.sta.shmem =3D shmem;
+> -       vcpu->arch.sta.last_steal =3D current->sched_info.run_delay;
+> +       vcpu->last_steal =3D current->sched_info.run_delay;
+>
+>         return 0;
+>  }
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
+ost.h
+> index 683bb8bf43a9..ebdd8526ae12 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -872,7 +872,6 @@ struct kvm_vcpu_arch {
+>         struct {
+>                 u8 preempted;
+>                 u64 msr_val;
+> -               u64 last_steal;
+>                 struct gfn_to_hva_cache cache;
+>         } st;
+>
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index 538ed1e80332..b2aea8058841 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -40,6 +40,7 @@ config KVM_X86
+>         select HAVE_KVM_MSI
+>         select HAVE_KVM_CPU_RELAX_INTERCEPT
+>         select HAVE_KVM_NO_POLL
+> +       select HAVE_KVM_PV_STEAL_TIME
+>         select VIRT_XFER_TO_GUEST_WORK
+>         select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+>         select KVM_VFIO
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 79468ddfe473..927c8b1ed83d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -2129,9 +2129,8 @@ static void record_steal_time(struct kvm_vcpu *vcpu=
+)
+>         smp_wmb();
+>
+>         unsafe_get_user(steal, &st->steal, out);
+> -       steal +=3D current->sched_info.run_delay -
+> -               vcpu->arch.st.last_steal;
+> -       vcpu->arch.st.last_steal =3D current->sched_info.run_delay;
+> +       steal +=3D current->sched_info.run_delay - vcpu->last_steal;
+> +       vcpu->last_steal =3D current->sched_info.run_delay;
+>         unsafe_put_user(steal, &st->steal, out);
+>
+>         version +=3D 1;
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 03bfc92864b6..ff9d423b6a7c 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -398,6 +398,10 @@ struct kvm_vcpu {
+>          */
+>         struct kvm_memory_slot *last_used_slot;
+>         u64 last_used_slot_gen;
+> +
+> +#ifdef CONFIG_HAVE_KVM_PV_STEAL_TIME
+> +       u64 last_steal;
+> +#endif
+>  };
+>
+>  /*
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index c3c0ee253fc7..f42a3a0fc5ba 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -82,6 +82,9 @@ config HAVE_KVM_IRQ_BYPASS
+>  config HAVE_KVM_VCPU_RUN_PID_CHANGE
+>         bool
+>
+> +config HAVE_KVM_PV_STEAL_TIME
+> +       bool
+> +
+>  config HAVE_KVM_NO_POLL
+>         bool
+>
+> --
+> 2.43.7
+>
