@@ -1,267 +1,171 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B573939C9
-	for <kvmarm@lists.linux.dev>; Fri,  2 Oct 2026 08:00:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474082D8376
+	for <kvmarm@lists.linux.dev>; Fri,  2 Oct 2026 08:47:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790928044; cv=none; b=TU2zDTRt9Zl0sE3PWB9/7hzDJNY7dCdHOmVEu7M6PJwF5anud7bRTaAn9I+TXnZDJnE6agbdfess9nkSROP7ylXDwLJ528xpFyd2GYT23QcjETiHTiZmFUszmw9K3sxZzTVZPOtwtOBhFFLxznSonRIGfTC5/nbVHwsKhPlHaIo=
+	t=1790930840; cv=none; b=JW+AAoBKyYVfKlbze6TnswnEKp4Y0/a+Pg04L3HvshyBdlGl2mAmALuAYjMF4iuZdDUB+lam7VMJQnMLj+hmGL1Xy5U7b7CucytN7pj/Vou/zowSaTDgxd1fIy35zo28GBBELh69xQlmMFO/JwprbpHhTFuV5KgJ0Sht4CPwnWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790928044; c=relaxed/simple;
-	bh=hlfqSJkn81Ycv/Ivxi3j4dobgJe1/751DNUgE4YsUis=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N/qjafjJ8ibEKQzVIA+rO7oIlw5J7pokKQGrygcpgk09rY6relN84LW3tkfvZXQ0Deim60ayeamRbdmyFbC9uZ2K4eTvNkuG9Jca00SwsY8K9OFQsTDvqxVgazKvHtI2+PnNfWZW4IRUzN0pqUJl0tNKgU2kwOzLvDfVdhL7zYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=P+Hr4W2T; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1790930840; c=relaxed/simple;
+	bh=hXFV5+WELtxKEz0g2EtbxcScY/hQNVTx3m+Uv8fbO9U=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=Ss9xHuGyw0Gf2rOz/sZtsFi8anv3L8Tl138NyhRxZjfcXSHFwJau9ZnNZ/icPDcdmdyybYW5J4Tu8EFx+KzfospfJk7FBmRW7MXUpeQ32RsCPdCyeHPeq0PYA4fqwkSXIoeeWNWvmo5VaU4+n+t0MZgCaRAYNtHmLuBZ94eyI98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=RzCOc46S; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=j1WYQgBj; arc=none smtp.client-ip=202.12.124.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="P+Hr4W2T"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69265a5c3917135;
-	Fri, 2 Oct 2026 08:00:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=p0PPkDbty7ErKuoX9vz6zdk4YAkVKe
-	+lc5QseNn0Ko8=; b=P+Hr4W2ToLByzLFfZcGMcJHuclV+C763xAeAnzgFOgxWnp
-	pWLXPmnsw02u1WxXUZxY9zYBoYB8w3DnVM/DtSGIsYNaX8Q2XeohWrjId+giqBvL
-	gefs0jZGoTtAzeHQBbtXJ+/yW1oFcrpvEykpu694ZAxfU2b1niFy6swPuEvW2c7L
-	YDEweDjdfXB13qTDl/GeZ+iO7FU90X4PtW0hpeyTY46HytPxl8SMmzko2Bbozbal
-	VjW08M6NriUlINBEYBRGhGW7xUWtQErRbkkbNOMqr6v0wBl5W/UcHsttnx+VV80m
-	GG52oKRiV5zQfey3aLzCBrzzqQ0gcQn4sF3ETU+A==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gx5s5r2vk-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 02 Oct 2026 08:00:23 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 69262eqd2076646;
-	Fri, 2 Oct 2026 08:00:22 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4h0xcshy6c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 02 Oct 2026 08:00:21 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 69280Hvq30212440
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 2 Oct 2026 08:00:18 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D395D2004E;
-	Fri,  2 Oct 2026 08:00:17 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BC5EF20043;
-	Fri,  2 Oct 2026 08:00:16 +0000 (GMT)
-Received: from osiris (unknown [9.87.132.225])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri,  2 Oct 2026 08:00:16 +0000 (GMT)
-Date: Fri, 2 Oct 2026 10:00:15 +0200
-From: Steffen Eiden <seiden@linux.ibm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
-        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Friedrich Welter <fritz@linux.ibm.com>,
-        Gautam Gala <ggala@linux.ibm.com>,
-        Hariharan Mari <hari55@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Nico Boehr <nrb@linux.ibm.com>,
-        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
-        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <fuad.tabba@linux.dev>
-Subject: Re: (subset) [PATCH v9 00/24] KVM: s390: Introduce arm64 KVM
-Message-ID: <20261002080015.22510-A-seiden@linux.ibm.com>
-References: <20260930173441.66762-1-seiden@linux.ibm.com>
- <179085262878.3865846.5787241839391727949.b4-ty@b4>
- <20261001132715.108643-A-seiden@linux.ibm.com>
- <86wls1315l.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="RzCOc46S";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="j1WYQgBj"
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id D471D7A0164
+	for <kvmarm@lists.linux.dev>; Fri,  2 Oct 2026 04:47:11 -0400 (EDT)
+Received: from ams-imap-03 ([10.64.2.23])
+  by ams-compute-02.internal (MEProxy); Fri, 02 Oct 2026 04:47:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1790930814;
+	 x=1791017214; bh=TMx5zpWKDtSIizVoX7qO1HTvG8b/bpMheHX3q1LsHSA=; b=
+	RzCOc46SyeXngTkCqKEz05ya2MZWY0A48H46yqPYymljdj71RkK86z43qSs2g4qV
+	GhGg4r1agzNGAcrj4J0My9QOG5Z8S9NVuCMgmTQASJJ4CHXTXXxvQp+WVUIgAaYO
+	Gn08kO1TYX1070P39XP64G0k1U8k0EVXk0VwTyPG/GEXOrHDJjLDmMCMkkZ4XHKL
+	spdShfn1J1DmX+60bFaf7YQOCHxBPqX2s29zYyFKB+DOa8PK26Cj0/1VK0GIMUcG
+	b5QAr7pOc0eogHfD2SqLGazj+rUEiYzuhTIupjVcpYyK102VXxJkruevg46IqsWW
+	pfK18SMyj5a8gLLIo+RILw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1790930814; x=
+	1791017214; bh=TMx5zpWKDtSIizVoX7qO1HTvG8b/bpMheHX3q1LsHSA=; b=j
+	1WYQgBjuYBybCLSkou5V1nl/XXjr/3s8sa4Zr3N7Aeru9VblUgtCXnpVoLwvKM/J
+	coV8KAXmAWL2Uc5ric1DJFoPfgSm9YBXgGdW/m/y+3BmzDMZN0T1XiaS09L9Hjdn
+	VtTekv4byWX3YHtSnEtZPNSdjIA2Jp1FsuuhZG+VHD6v2inp/cY9nJt9YKyHaUVq
+	y3uRyB2jLOlp1qIzjp+C/foeop2va2vkXbYZlZisuQxhGTfMmoMfZQzeG5fkp9m8
+	ZfarrG/dPVVSVhPTOnWupOcP3OTyr/aZgSSRvOJJ4btpLuScnFuCSc9eOWCZ8ZXC
+	tmMinmi5v7NQ/qEMDx37A==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-06;
+	repo=github.com/dkim2wg/interop; date=2026-09-30; sw=lmtpprox;
+	action=sign d=arndb.de a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1790930814; d=arndb.de;
+	mf=PGFybmRAYXJuZGIuZGU+; rt=PGt2bWFybUBsaXN0cy5saW51eC5kZXY+;
+	s=fm1:rsa-sha256:NBq7N4cyWT6h3xab/PXoVloKB7Rh91G2Vl7HKMAcMKAR2eb
+	ezDcQgSY4K3JVhA6fuYqiprY0W7A4sJ4Ky170BZ1ea+6nLJ36apjpPCLB/F20Wi4
+	F9EEHnFY61xuQe27qZbLWcQ4oF4F+8Uf9TQVZ22Sre45Se3Y8zHfFYG98PevCZet
+	Ikue9oY8u5wuKwb+s/QBwjODAMKdZNyPlXD6GPR/N91XisGyV4n6ZEsTtpmIyPkD
+	s7WNVraDrSmGYoxhF6Hw/s6KRYIFvTa14flOWz0nU0jA4Hk1FqZ23mufbD9hpzGV
+	jqSEpElUxgduuRWSk5Vo7hHRvSV1gV9VNUOCQMw==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-06;
+	repo=github.com/dkim2wg/interop; date=2026-09-30; sw=lmtpprox;
+	action=mi-m=1; hc=12;
+	hn=cc,content-transfer-encoding,content-type,date,feedback-id,
+	from,in-reply-to,message-id,mime-version,references,subject,to;
+Message-Instance: m=1; h=sha256:zp9p2M12DDOV6tsxuuPUsY4VYzCSp1NgYJfIjQroFvw=:hXFV5+WELtxKEz0g2EtbxcScY/hQNVTx3m+Uv8fbO9U=;
+X-ME-Sender: <xms:dW-_agusuepAi1TSg6P0cZbMq6bONU0mJnV5qYZ_xBByjdDJy3AjVw>
+    <xme:dW-_aoT2UsGTSQ--mCA7YworcmRtciFLMr769nKOwM7O1D2VakXsgtkgOz0bLsul_
+    aJHTFhghTgjvK5XXOp-sycUGfy49izSJa4Gw6ST7CRG4bypF5_-J0sf>
+X-ME-Proxy-Cause: dmFkZTGNYYpzKNIFSp2MsS9/36+tAXSwRx47gvy54pHP33s1WUvxXaS28wpNy7Hm2Ts1Rh
+    zZw7uvnk+hpKrKGxj4+kvsbLNRD6gTKf64CKt757tPDDBL7EwMeIbRDUyRxaM4N7HNR4Vq
+    RkxPWch4Ae+qllTQ6TsIpJR+i5kGdkdIBzlaPi3LrREjLX2n/z2nvAaza2tcMZQ5Uz40u6
+    RGQ1HfZ4nhdiI7bYVJsZQBqvkwNODykZdg2pOw5YGpwcBkuA7wgEXxQH3GueTgYGC1Ahma
+    ar4jdoY03AIr64+L2lM4JbgWU2tTJNw0jG63PnHGUOd0iTqmE5xQJoYe7l9G5iYZgBoXjt
+    p7bHvnU8aaVutTeHIAWm1GjzZBOjm8bXaXQE/5/iyDh9rHSr1Gj1rOGIixZu2j2jGKEU+k
+    xuuH++OKFg53/GgQRn7CxFBWrQZKH80moKzvw7MNJ6QG5h/HQx/X02tXNMDd/wBH+g87Go
+    Gfk+tNXx7MeBWdE+vNE7acLshNIzsK4JhAgoWp41paDoVbB3TfSAeQscrBavbGZNrC4/Mi
+    tw3cBfDJfuuqCRvfqZnKWFBN6z2yFtcsuflZWt93O87+Nnj5J4DYNHFvfGHghY2WAJQd6w
+    N3pMgs97wkWYIlh8uBGvigMSWYqngUpvG9pyIwVxBQwc/2lL+oiHTelCibPA
+X-ME-Proxy: <xmx:em-_ajPxutY8cOb6N7-iQ3nyYZlsJVt_yX2GGJtZbj51JHAdcm6GMQ>
+    <xmx:em-_ahTJKUwpHeLTCyjjynuqtk99OZmHMg4MgOiwWyQyCIoO_ktdoA>
+    <xmx:em-_auGDdKUSvOaYjy03IayCr_EQGyzHoQO165umaUU5FKViSOVhlw>
+    <xmx:em-_aq72u-DUQFc4MPR1IIMDZPnhpeeuK1okwjvZ2CKHFWJ46xKrgg>
+    <xmx:fm-_avkcku59M01ZHSOjUANaFaj7ZR25wo33Y2l7dGtFPFuKsbzwIkFn>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id AEDC232A008A; Fri,  2 Oct 2026 04:46:45 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86wls1315l.wl-maz@kernel.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDAyMDAzMCBTYWx0ZWRfX6TTjafE+zJw/
- 8IOaDmVbWDcj3fnvYRUKSZmSyPSYC1WIM1utUezfe6ZqcnsDGVAfJmIg8txkrBIouGed3/yEyUA
- +/hGiM5q3QeSXuXvavDUJ84pYEoya/s=
-X-Authority-Analysis: v=2.4 cv=HJ5WhYtv c=1 sm=1 tr=0 ts=6abf6497 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=kj9zAlcOel0A:10 a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8
- a=oxOeRRTydUpBoHNR5nMA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: EP_6xC35w4LYshj_KR8G9Ra7L-auzk1s
-X-Proofpoint-ORIG-GUID: ay7HdBwUIxDlv8jnNezyMkEYZ5PrxwQt
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDAyMDAzMCBTYWx0ZWRfX/zOtryu/PAoy
- u7oRYSKzJ6rwE0J3so7nc3C2XtU+bC4IT68zcOhGHfu2LJQua2RonwGZblhNH16odNb7944nUYS
- oyKyBt10wL3kC82+PL1/o+R047CDaivfNu1pJKM2tqYlL16657qBEONEp+v3FwryrwPuTX0S7tb
- EfGEh7FriG3LXB7MNajU7eKyIA9sl2UscPzMOg8/ZHzlpENYSPOvfUvhVD1pGgJ4PoKURz/U98E
- 16MRnYxnnp9yAIqsoV2wGYiru3TWvr6X6KJt0pchKXd42pxzvW41Hh7cYtOoGHzfcc0Gg8B724N
- IWL1x902hHWn64KuE+EEH7FxrusaC1Q9YqGBQjVjRpmMFXURYbCoMhFRawVj1ELvk5HGAKtOiQ7
- c5ueik/J1ir5to+uydKkTkUYiQLWG4scqJCLlQOhm41nFB1WndowEw7r8NIULOhcfZPJvAnOSf9
- gOpDwkD4W1yXh5UaQPA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-10-02_02,2026-10-01_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 suspectscore=0 bulkscore=0 clxscore=1015 lowpriorityscore=0
- spamscore=0 impostorscore=0 phishscore=0 priorityscore=1501 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2610020030
+X-ThreadId: AompHzTHtn-7
+Date: Fri, 02 Oct 2026 10:46:14 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Steffen Eiden" <seiden@linux.ibm.com>, "Marc Zyngier" <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-s390@vger.kernel.org, "Alexander Gordeev" <agordeev@linux.ibm.com>,
+ "Andreas Grapentin" <gra@linux.ibm.com>,
+ "Catalin Marinas" <catalin.marinas@arm.com>,
+ "Christian Borntraeger" <borntraeger@linux.ibm.com>,
+ "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
+ "David Hildenbrand (Red Hat)" <david@kernel.org>,
+ "Friedrich Welter" <fritz@linux.ibm.com>,
+ "Gautam Gala" <ggala@linux.ibm.com>,
+ "Hariharan Mari" <hari55@linux.ibm.com>,
+ "Heiko Carstens" <hca@linux.ibm.com>,
+ "Hendrik Brueckner" <brueckner@linux.ibm.com>,
+ "Ilya Leoshkevich" <iii@linux.ibm.com>,
+ "Janosch Frank" <frankja@linux.ibm.com>,
+ "Joey Gouly" <joey.gouly@arm.com>, "Nico Boehr" <nrb@linux.ibm.com>,
+ "Nina Schoetterl-Glausch" <oss@nina.schoetterlglausch.eu>,
+ "Oliver Upton" <oupton@kernel.org>,
+ "Paolo Bonzini" <pbonzini@redhat.com>,
+ "Sean Christopherson" <seanjc@google.com>,
+ "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+ "Sven Schnelle" <svens@linux.ibm.com>,
+ "Ulrich Weigand" <Ulrich.Weigand@de.ibm.com>,
+ "Vasily Gorbik" <gor@linux.ibm.com>, "Will Deacon" <will@kernel.org>,
+ "Zenghui Yu" <yuzenghui@huawei.com>,
+ "Fuad Tabba" <fuad.tabba@linux.dev>
+Message-Id: <d03bc12e-be69-4c2e-bc5e-f587763e2594@app.fastmail.com>
+In-Reply-To: <40dd808c-bddf-4a7a-be81-53c64de2707d@app.fastmail.com>
+References: <20260930173441.66762-1-seiden@linux.ibm.com>
+ <179085262878.3865846.5787241839391727949.b4-ty@b4>
+ <20261001132715.108643-A-seiden@linux.ibm.com>
+ <40dd808c-bddf-4a7a-be81-53c64de2707d@app.fastmail.com>
+Subject: Re: (subset) [PATCH v9 00/24] KVM: s390: Introduce arm64 KVM
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 01, 2026 at 04:12:38PM +0100, Marc Zyngier wrote:
-> On Thu, 01 Oct 2026 14:27:15 +0100,
-> Steffen Eiden <seiden@linux.ibm.com> wrote:
-> > 
-> > On Thu, Oct 01, 2026 at 12:04:51PM +0100, Marc Zyngier wrote:
-> > > On Wed, 30 Sep 2026 19:34:15 +0200, Steffen Eiden wrote:
-> > > > Introduce arm-on-s390. Enable KVM-accelerated ARM CPU virtualisation on s390.
-> > > > 
-> > > > The new KVM functionally depends on KVM/vfio: Use file-based reference
-> > > > counting for KVM [5] The series itself should apply w/o those.
-> > > > 
-> > > > For the original, now partially outdated, cover letter, have a look at versions
-> > > > one to three [1].
-> > > > 
-> > > > [...]
-> > > 
-> > > Applied to next, thanks!
-> > > 
-> > > [05/24] arm64: ptrace: Use constants for compat register numbers
-> > >         commit: 295d3df9b1e425099a4eb37954a02c4a08fdb496
-> > > [06/24] arm64: sysreg: Convert SPSR_ELx to automatic register generation
-> > >         commit: d3d78520068779779e1ed7aa0dd8a3ce63e1ca43
-> > > [07/24] KVM: arm64: Access elements of vcpu_gp_regs individually
-> > >         commit: 29d92585ab987bb80b1e78d811aaea2a8db86e62
-> > > [08/24] KVM: arm64: Use accessor functions for core regs
-> > >         commit: 89ed62818f10e38e64fea46d43ee6455a1beb647
-> > > [09/24] arm64: Prepare sharing arm64 headers with s390
-> > >         commit: df6a70516adec8b7f5fa49e1755d8ee33d980d9c
-> > > [10/24] arm64: Share arm64 headers with s390
-> > >         commit: c7e18ba462536e870b0ff4deca581babcac9135b
-> > > [11/24] KVM: arm64: Share arm64 code with s390
-> > >         commit: dcb776bfcccc9662001a75b99dbfbef55f46eb31
-> > > 
-> > > Note that there were a few conflicts. Please check that I resolved
-> > > them correctly.
-> > 
-> > 
-> > After rebasing on those the arm-on-s390 part does not build anymore :( 
-> 
-> Well, that's sort of expected. The kvmarm tree doesn't have the S390
-> stuff yet, and contains tons of new stuff.
+On Thu, Oct 1, 2026, at 15:39, Arnd Bergmann wrote:
+> On Thu, Oct 1, 2026, at 15:27, Steffen Eiden wrote:
 >
-
-yes, but sometimes I like to dream 
-
-> > We are missing the definition of
-> > static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
-> > 
-> > 
-> > quick fix: 
-> > 
-> > on top of [10/24]  arm64: Share arm64 headers with s390
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> > index bf35cbe8ddcb..0708f792c631 100644
-> > --- a/arch/arm64/include/asm/kvm_emulate.h
-> > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> > @@ -367,10 +367,13 @@ static __always_inline u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
-> >         return vcpu->arch.fault.esr_el2;
-> >  }
-> > 
-> > +#if ARM64_S390_COMMON == 1
-> >  static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
-> >  {
-> >         return esr & ESR_ELx_S1PTW;
-> >  }
-> > +
-> > +#endif /* ARM64_S390_COMMON == 1 */
-> > 
-> >  static __always_inline bool esr_abt_is_exec_fault(unsigned long esr)
-> >  {
-> > 
-> > 
-> > 
-> > A cleaner solution it to move this defenition just below  
-> > void kvm_vcpu_wfi(struct kvm_vcpu *vcpu) in 
-> > [09/24] arm64: Prepare sharing arm64 headers with s390
-> > and expand the shared region in the following patch.
-> 
-> I'm redoing the merge and fixing it as follows (note that the
-> ARM64_S390_COMMON guards are already present):
-> 
-> @@ -336,16 +367,6 @@ static __always_inline u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
->  	return vcpu->arch.fault.esr_el2;
->  }
->  
-> -static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
-> -{
-> -	return esr & ESR_ELx_S1PTW;
-> -}
-> -
-> -static __always_inline bool esr_abt_is_exec_fault(unsigned long esr)
-> -{
-> -	return esr_trap_is_iabt(esr) && !esr_abt_is_s1ptw(esr);
-> -}
-> -
->  static inline bool guest_hyp_wfx_traps_enabled(const struct kvm_vcpu *vcpu)
->  {
->  	u64 esr = kvm_vcpu_get_esr(vcpu);
-> @@ -389,6 +410,12 @@ static inline u64 kvm_vcpu_get_disr(const struct kvm_vcpu *vcpu)
->  	return vcpu->arch.fault.disr_el1;
->  }
->  
-> +#if ARM64_S390_COMMON == 1
-> +static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
-> +{
-> +	return esr & ESR_ELx_S1PTW;
-> +}
-> +
->  static inline u32 kvm_vcpu_hvc_get_imm(const struct kvm_vcpu *vcpu)
->  {
->  	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_xVC_IMM_MASK;
-> @@ -456,6 +483,13 @@ static __always_inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
->  	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC;
->  }
->  
-> +#endif /* ARM64_S390_COMMON == 1 */
-> +
-> +static __always_inline bool esr_abt_is_exec_fault(unsigned long esr)
-> +{
-> +	return esr_trap_is_iabt(esr) && !esr_abt_is_s1ptw(esr);
-> +}
-> +
->  static inline
->  bool kvm_vcpu_trap_is_permission_fault(const struct kvm_vcpu *vcpu)
->  {
+>> I can send the two fixup patches as a reply here for this tomorrow or 
+>> later today if you want. 
 >
-> 
-> Does this work for you?
->
+> My build bot is churning away looking for more corner cases.
+> I initially had the wrong base, but with this one and the other
+> two I sent, things are starting to look good. I'll keep it
+> running over night, but if you don't hear from me for any additional
+> build regressions in the next hour, it's probably fine.
 
-Yes the positioning of the functions look good. It builds on top of
-kvmarm/next + this (sightly relocated (line numbes are different) patch
-+ arm on s390 stuff.
+No more build failures overnight, but after changing to gcc-10.5.0,
+I get link failures for the namespaced module:
 
-I'll work on a verification tool for you guys to make this process
-easier.
+`__s390_indirect_jump_r1' referenced in section `.text' of arch/s390/kvm/arm64/kvm-namespaced.o: defined in discarded section `.text.__s390_indirect_jump_r1[__s390_indirect_jump_r1]' of arch/s390/kvm/arm64/kvm-namespaced.o
+`__s390_indirect_jump_r4' referenced in section `.text' of arch/s390/kvm/arm64/kvm-namespaced.o: defined in discarded section `.text.__s390_indirect_jump_r4[__s390_indirect_jump_r4]' of arch/s390/kvm/arm64/kvm-namespaced.o
+`__s390_indirect_jump_r14' referenced in section `.text' of arch/s390/kvm/arm64/kvm-namespaced.o: defined in discarded section `.text.__s390_indirect_jump_r14[__s390_indirect_jump_r14]' of arch/s390/kvm/arm64/kvm-namespaced.o
+`__s390_indirect_jump_r1' referenced in section `.text' of arch/s390/kvm/arm64/kvm-namespaced.o: defined in discarded section `.text.__s390_indirect_jump_r1[__s390_indirect_jump_r1]' of arch/s390/kvm/arm64/kvm-namespaced.o
+`__s390_indirect_jump_r4' referenced in section `.text' of arch/s390/kvm/arm64/kvm-namespaced.o: defined in discarded section `.text.__s390_indirect_jump_r4[__s390_indirect_jump_r4]' of arch/s390/kvm/arm64/kvm-namespaced.o
+`__s390_indirect_jump_r14' referenced in section `.text' of arch/s390/kvm/arm64/kvm-namespaced.o: defined in discarded section `.text.__s390_indirect_jump_r14[__s390_indirect_jump_r14]' of arch/s390/kvm/arm64/kvm-namespaced.o
 
-Thank you.
+See https://pastebin.com/raw/pJYu8UAb for the .config that triggered it.
+Later compilers get CONFIG_EXPOLINE_EXTERN=y, which avoids the problem,
+so an easy workaround would be to make the module depend on that symbol:
 
-	Steffen
+--- a/arch/s390/kvm/Kconfig
++++ b/arch/s390/kvm/Kconfig
+@@ -19,6 +19,7 @@ if VIRTUALIZATION
+ config KVM
+        def_tristate y
+        prompt "Kernel-based Virtual Machine (KVM) support"
++       depends on !EXPOLINE || EXPOLINE_EXTERN
+        select HAVE_KVM_CPU_RELAX_INTERCEPT
+        select KVM_ASYNC_PF
+        select KVM_ASYNC_PF_SYNC
 
+      Arnd
