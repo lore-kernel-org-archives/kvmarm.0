@@ -1,126 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr2-f34.google.com (mail-wr2-f34.google.com [74.125.225.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136E831E106
-	for <kvmarm@lists.linux.dev>; Fri,  2 Oct 2026 16:39:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20B74BF921
+	for <kvmarm@lists.linux.dev>; Fri,  2 Oct 2026 17:45:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790959171; cv=none; b=ARqAAJHCGqo8pIlKr1vJ7YJUTcJx1FmDNIBjq+g/MmA41DkxYcmqVtctezpWR+np/HeYSeZrMHOgLaBnhuwvOGIw7XAnn5XBN0fqnB7mEcbVRXFUH3j7SojBiYXih13zbnmDk7vq0KWPRWB14ngWW5JGidLaq8M/smcSVpfGDD8=
+	t=1790963133; cv=none; b=h+Z+ybo/ODORVYxFhHOYfdWN193eR674MXAzA4YHeTGTFW9C0//X6Dwkh6bY0eYIYSDSgUeP0SnpoZ0pS8MbazJnNhzncZQuBst8PBRxTVpGxLHgD4J7kyp5WCDWDGjHtVVM23nPSU39Azas10uW2lKIA8bJ6WE6PwxUKdxo6q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790959171; c=relaxed/simple;
-	bh=CtdOKPzEHl0Qa+wT3t3zkXvKUi0qlkEFrTlHOIDVMQc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FJcSekKuBTY9kIc2jZFqyDaqZJIsh4M6gNZo1jn92/F5pu4qESm6mQJJ7RKZ1vVgKEovjElf/5FWLgFukzFtZ/pU1047I36mCjQ3JGagRPt0XBcFwdv8QTXSAqnNRv0lA0e0KLOPX6M9x8WWqJ93rXotyGnXxeds9AawD6QZMBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uc8dO1B3; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790963133; c=relaxed/simple;
+	bh=tuUKQXYkGnUCxDjJE1nQ+gDpYskdzNay7lbXkALLVfM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H48O7UO9+oBOUgKtUPxp3/AWdCgSbaWFzgEelAvBQBWGa3VBJPSJ6btxKffJYhvZ3nbZocgnMBi1rWbG1YW6wpTaQz0izsptSKmvv1s0waoctq/R9KzCmDa1GwCrEhsP/5ftmNQ7mdHZ3QIBFK6HQhC0TSxNT6+oHbHFfNSqCNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H+FdG8yj; arc=none smtp.client-ip=74.125.225.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uc8dO1B3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A417F1F000FF;
-	Fri,  2 Oct 2026 16:39:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790959169;
-	bh=/h7ekfcUzkwWndjKu/7hfrYgYkkTMuuqiAzvSgcH6Sw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Uc8dO1B3O9glJr+RUsdeAOa/YLv34PmWvMrv0DGAN2HBiDKhpI5AuGOLSaA0iC6A5
-	 WvPWTaYu991MHubFOle+7f6JTk5LZEE8yolD0XE5229cNXr7Ovra7bX/bvd3Y1x62O
-	 mph/WqMZs6RvTOictszgsCnCylgDHGVi/MfvpEFfWIDqOphWz4HHMjwa7m9vZ3APP2
-	 gXMk63k16GtrsZzknJQKuhWEIPIaLQ8euqDhNmHQzGpuFkKFJOu1PmVfYvHksIZ1LU
-	 2bsZHOLMI7y3lbrR9K4YFvzJ9E992vvEBUcXjNCu4tbI7M2IRaHYY3yfGzaCuJuesw
-	 zxLZeqP4CS/QQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xCgIB-0000000GJD9-1nt7;
-	Fri, 02 Oct 2026 16:39:27 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: oupton@kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Vincent Donnefort <vdonnefort@google.com>
-Cc: joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	kernel-team@android.com,
-	fuad.tabba@linux.dev
-Subject: Re: [PATCH v6 00/18] KVM: arm64: Introduce pKVM hypervisor heap allocator
-Date: Fri,  2 Oct 2026 17:39:24 +0100
-Message-ID: <179095910311.551935.11321675736723021176.b4-ty@b4>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261001142849.3367614-1-vdonnefort@google.com>
-References: <20261001142849.3367614-1-vdonnefort@google.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H+FdG8yj"
+Received: by mail-wr2-f34.google.com with SMTP id ffacd0b85a97d-48af0707d41so72089f8f.1
+        for <kvmarm@lists.linux.dev>; Fri, 02 Oct 2026 10:45:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790963125; x=1791567925; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=N1e269Lu4xtW2duTVHt20I/6VEWYe79hxf4w6LtBB3g=;
+        b=H+FdG8yjvfjrfl6Z6f9I1h1KhrPu5OVejehjj7GGgg5xZdhLZ1TnmkKn8HWaAZHfIv
+         DyF/DYp7leV/zFFHKfJQwz3tUwCLBVFRH3LlNaoAf1Ya+PgkH1mZ/RW+5vhABa7TNB5w
+         GKwBs38B3AVJlqOk9zpJWKMiFHYa7S1Aksf8FAhLzLc7rOEHzfrNOYGgBYoYHCXPziai
+         ArOJXYaeVbPfUWGfvdp34h5vxBEokY01dns3ECw47yW8791fnrcpryUc7hpqK5YMHD/s
+         JnMqIrhVvhskhBAjyztMLGM/nu9qAtHrbw9KGDr0k+edCCd7MEnVS5vhveQMBFFtQLVL
+         0pjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790963125; x=1791567925;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=N1e269Lu4xtW2duTVHt20I/6VEWYe79hxf4w6LtBB3g=;
+        b=pPEYFkttbaI6JlpEnppxFylEmr1iOOnfrCHCtBWoKiHqex06L3tViWQq62dz/juxsF
+         173akhAgQXCYjn4HG+Ch28IpBHgFb9T5hI+yan99yaJZPS2J7xf7cWZGhMxbhDTDd4g3
+         xAUuUq19ixPh3fekGrZc8jihOPP4aDSRd/nc08GSQo9m3JLHPcrqjVIuhRQw9Ii77wD6
+         nIOA7dhEtMpEs+6lqRqkapeyyKi5eSDN9tGeH23dv42rcKV4nO01AmRokuNn5q9orkMg
+         Ls01fWgaT7B34iZ7PteYB8gc3tp21vWit5iUaum1dpm/HenU8bIKLqUB3tS8wEYJ+5tG
+         tmJQ==
+X-Forwarded-Encrypted: i=1; AKwUvBzPayItS6QBAPnw+FFhdYqyCeoUuBaSKKMW5G/gK8lhD0yCHvwC7y/3cliN7XORHxUw0I259yw=@lists.linux.dev
+X-Gm-Message-State: AFq9FYInPc2aKYq2V6Z1PYcbmGuNW9XxOpl/OS0bY1SHyx2vNKbGoTWG
+	9sRfU80lN0sQTQ8R6yyE8mybgH7bx9RIlGE7G79a+E+VMUC16DSaVElD
+X-Gm-Gg: AYBFou2Vy34JBfGKu6eXSBR45PPmoXmJBYDUcE+RgNddtavQ3vtwvwxhiCEkFfYcoiz
+	r075etVISvTATumACnydNqZDjZoHf22DESZI3fiJnR4MzlaO/S84z3vHOuD/C5OGVP+yVTVXAdi
+	xFEz5x6BNyYh5AhGgMPfXa50sRjtnJjlOZH8I7E7homCBu2zajk4/HtPE6v/hc4bkoEuyynk9yZ
+	Cxox0FM+tx1yaAkIIYCpwbYvZdu4O7QOwU/5eXCICd/BN9vhnYdYJkOCUyJh8+CDBCvtaixVTNy
+	fmhPnBo03ximBtvexEBg6EXngxUtMKwe33xJw3yZYfKAcsfGOSlv7OFzHAws608hNLDOx8FkDrV
+	o3jDiiF/recrFqgwBJDToJpS15ovwuBDKkq7h2fAtHqjKHO9FuZBdfHx054qO5O5JXpYu+pdXpB
+	YFOycpj01d9srX+wr9XhvKOghHi2zlAKQqkbUJFEXQY8giL36IV2nb96tyfzUMWOqTjV/PMM43c
+	4IIrlYqbtnYMmwMST/h1weS1UsQQzwZKysyOzKvWJ1+781OikpIMHaDohHuVjY+mGtu43Tg8VpW
+	8vnr+Wkq+kbQBX0pwkTv2bgz7jsU7Ed3nfWRHFZmQvHxoskzeElRFJLw7Kh87KA4nclPjdCwzz+
+	iVQT58g==
+X-Received: by 2002:a05:6000:260e:b0:48b:226:839 with SMTP id ffacd0b85a97d-48b1273bfcdmr6851497f8f.14.1790963124443;
+        Fri, 02 Oct 2026 10:45:24 -0700 (PDT)
+Received: from MacBook-Pro-von-Karl (dynamic-2a02-3100-af35-1901-81da-eee8-c2d0-ee3b.310.pool.telefonica.de. [2a02:3100:af35:1901:81da:eee8:c2d0:ee3b])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48b380f0661sm6839400f8f.14.2026.10.02.10.45.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Oct 2026 10:45:23 -0700 (PDT)
+Date: Fri, 2 Oct 2026 19:45:21 +0200
+From: Karl Mehltretter <kmehltretter@gmail.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	kvmarm@lists.linux.dev
+Cc: Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Eric Auger <eric.auger@redhat.com>, 
+	Christoffer Dall <christoffer.dall@arm.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v4 0/4] KVM: arm64: fix VGICv3 redistributor rollback
+Message-ID: <ar_tdaYQO-t1K2F_@gmail.com>
+References: <20260831081005.41346-1-kmehltretter@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, vdonnefort@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, fuad.tabba@linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260831081005.41346-1-kmehltretter@gmail.com>
 
-On Thu, 01 Oct 2026 15:28:31 +0100, Vincent Donnefort wrote:
-> pKVM historically lacked a dynamic memory allocator: all hypervisor-side
-> VM and VCPU structures had to be sized on the host, allocated as
-> contiguous pages and donated to the hypervisor.
+On Mon, Aug 31, 2026 at 10:10:00AM +0100, Karl Mehltretter wrote:
+> Changes since v3:
+> - Dropped the REDIST/REDIST_REGION serialization and VGIC init/destroy
+>   rework, keeping the fix close to v2. (Marc)
+> - Limited rollback to assignments from the new region so an older-region
+>   assignment cannot be missed during concurrent vCPU creation.
+> - Added Fuad's Reviewed-by tags to patches 1, 3 and 4. These are otherwise
+>   unchanged from v3 (formerly patches 1, 4 and 5).
 > 
-> This design tightly coupled the hypervisor's memory footprint to
-> host-side constraints, complicated memory reclaim, and severely
-> restricted VM scalability.
+> Previous version:
+> v3: https://lore.kernel.org/r/20260822095346.53882-1-kmehltretter@gmail.com
 > 
-> [...]
+> Karl Mehltretter (4):
+>   KVM: arm64: vgic-v3: Undo assignment on iodev registration failure
+>   KVM: arm64: vgic-v3: Roll back assignments from the new region
+>   KVM: arm64: selftests: Pass guest code to vm_gic_create_with_vcpus()
+>   KVM: arm64: selftests: Test VGICv3 redistributor region retry
+> 
+>  arch/arm64/kvm/vgic/vgic-mmio-v3.c            |  54 ++++++--
+>  tools/testing/selftests/kvm/arm64/vgic_init.c | 116 ++++++++++++++++--
+>  2 files changed, 151 insertions(+), 19 deletions(-)
 
-Applied to next, thanks!
+A friendly ping on v4. Patches 1, 3, and 4 have Fuad's Reviewed-by;
+patch 2 was revised following Marc's feedback.
 
-[01/18] KVM: arm64: Add pkvm_private_va_range_pa
-        commit: 4b66a1941718ef1c945b32ab28e91330e4394de2
-[02/18] KVM: arm64: Add pkvm_remove_mappings
-        commit: 64a89873e0c60fd8a22ebacab6bc723415eeb4b2
-[03/18] KVM: arm64: Add pkvm_map_private_va_range
-        commit: 06b705e789ed1a118331bc77f477a9b46c52dcfe
-[04/18] KVM: arm64: Add a heap allocator for the pKVM hyp
-        commit: c8d7834c9c219a9a0e3969986e90c5c444b9d98d
-[05/18] KVM: arm64: Allow kvm_hyp_memcache usage outside of stage-2
-        commit: 11a59e2959e63546dd75c347d552193c38aeb37e
-[06/18] KVM: arm64: Add pkvm_hyp_req infrastructure
-        commit: e868b8c35268a8cb786091c63f538c960b8807e5
-[07/18] KVM: arm64: Add PKVM_HYP_REQ_HYP_ALLOC request
-        commit: 7bf265fe68af9e1ef3af083d444a72bd3ce3d3e3
-[08/18] KVM: arm64: Add reclaim interface for the pKVM heap alloc
-        commit: 43759e3c9631ffcec55e4b7396864af4a5b98f30
-[09/18] KVM: arm64: Add selftests for the pKVM heap allocator
-        commit: bd93068340e9d770d6282ab425b686bef2042394
-[10/18] KVM: arm64: Add a shrinker for pKVM
-        commit: 909e70fd13567db8247c3850f27b65aaea2c9ad0
-[11/18] KVM: arm64: Filter out non-kernel addresses in kern_hyp_va
-        commit: 0b27ba187dde3170a312904f18595f3ba266bcae
-[12/18] KVM: arm64: Move hyp_vm refcount into the structure
-        commit: 85406921dc81ea7ccfb78c92cf79b0a4bcd2439c
-[13/18] KVM: arm64: Alloc pkvm_hyp_vm using pKVM heap allocator
-        commit: 324397c85d1dde38e5d4805d8b79bfc549af4252
-[14/18] KVM: arm64: Alloc pkvm_hyp_vcpu using pKVM heap allocator
-        commit: e188a901e4bc585a170ee4235c6b55ebcf07b592
-[15/18] KVM: arm64: Rename vCPU pkvm_memcache to stage2_mc
-        commit: 197dac8a9060c17988414086293aa8ed4c82c185
-[16/18] KVM: arm64: Reject hyp trace descriptors with fewer CPUs than hyp_nr_cpus
-        commit: cf9cf059b8f30ffca78c16e6a51c905c95da47a8
-[17/18] KVM: arm64: Reject hyp trace descriptors with fewer than 3 pages
-        commit: 086f86286b5e060904bd372ad96edd04c366885a
-[18/18] KVM: arm64: Alloc simple_buffer_page using pKVM hyp allocator
-        commit: 35dc2dd00334555eb02428cff2302a1cfe60c15f
-
-Std disclaimer: conflict-central even with the rebase, please check
-the result.
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+Thanks,
+Karl
