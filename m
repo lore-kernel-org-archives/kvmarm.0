@@ -1,120 +1,267 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75639412276;
-	Fri,  2 Oct 2026 07:57:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B573939C9
+	for <kvmarm@lists.linux.dev>; Fri,  2 Oct 2026 08:00:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790927846; cv=none; b=SeFIszSAVVv1Hs12AieZf30TnQvZCW9N8wn/76VnCN1ueTBl75DqOKw+aNiDDvZ3KjHsz4AwIa7c2PqVUPehbCbYHQyuR+hMCc9EHHOgBvrHmPm26SwW8zthGnPzYB4jr68ZDUt4q7jpkIUUGq2dgrUdauwpwJzoiIPXSyGlMZQ=
+	t=1790928044; cv=none; b=TU2zDTRt9Zl0sE3PWB9/7hzDJNY7dCdHOmVEu7M6PJwF5anud7bRTaAn9I+TXnZDJnE6agbdfess9nkSROP7ylXDwLJ528xpFyd2GYT23QcjETiHTiZmFUszmw9K3sxZzTVZPOtwtOBhFFLxznSonRIGfTC5/nbVHwsKhPlHaIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790927846; c=relaxed/simple;
-	bh=dOycbhxLNwAz70FQYBQQeup/L4B8zKEdatOiSSqbVqM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RFW8zjTKgmcnXMi4qmjnutri9zlT1tN2hE3TtIRo2WMMoHBXlhS+J8GXG9tCj2WPlpEjhLO/uQhp24e67Q47MNMTpI8VaLl5IWjk4s+Ix0elRgLUBnjZfYQZWezbqBTOZpfDoz3NxGvq7hGp1o5BDVLaB1FS3cacWhYsvJ0BzQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LcG6iukQ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790928044; c=relaxed/simple;
+	bh=hlfqSJkn81Ycv/Ivxi3j4dobgJe1/751DNUgE4YsUis=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N/qjafjJ8ibEKQzVIA+rO7oIlw5J7pokKQGrygcpgk09rY6relN84LW3tkfvZXQ0Deim60ayeamRbdmyFbC9uZ2K4eTvNkuG9Jca00SwsY8K9OFQsTDvqxVgazKvHtI2+PnNfWZW4IRUzN0pqUJl0tNKgU2kwOzLvDfVdhL7zYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=P+Hr4W2T; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LcG6iukQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF90D1F000FF;
-	Fri,  2 Oct 2026 07:57:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790927844;
-	bh=+w9dQjKSo7vRo1uYWAsgeT21GiD/4TNOm3UiPC1tD/w=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=LcG6iukQDXmqHs5mR32fTh6dsu8rcd3Xa34+5aFRQMEN1EGmX75a29khCv/eYip56
-	 O63Qeb+uFb0pV4n01I9ZEL8aX5w3wHq5ZBojgganh33u9m1azMnuwgl+dLG+PVNc9H
-	 VcBZ0mDFrOZoNqtBUjkT8ALyWc7AK6MF3ML1aRZBn1VIqYJjqA5w7h+umF0IyRqvo5
-	 R9PL4zbViS5wMUoiaqvLbRP/PV6u1XfXTHSF0yf0mokMqv8gUXJo4bX11x0rUrRWXu
-	 s1DaD+FAgWZxUwGQfVzVajWJShvfTkRtenIK4ypW+BAQM1kFdJZlGmN4DUXFgxx9mW
-	 5XCYlmhoYCB6A==
-Message-ID: <bd00d520-06da-404a-b877-01bb5a133317@kernel.org>
-Date: Fri, 2 Oct 2026 09:57:15 +0200
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="P+Hr4W2T"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69265a5c3917135;
+	Fri, 2 Oct 2026 08:00:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=p0PPkDbty7ErKuoX9vz6zdk4YAkVKe
+	+lc5QseNn0Ko8=; b=P+Hr4W2ToLByzLFfZcGMcJHuclV+C763xAeAnzgFOgxWnp
+	pWLXPmnsw02u1WxXUZxY9zYBoYB8w3DnVM/DtSGIsYNaX8Q2XeohWrjId+giqBvL
+	gefs0jZGoTtAzeHQBbtXJ+/yW1oFcrpvEykpu694ZAxfU2b1niFy6swPuEvW2c7L
+	YDEweDjdfXB13qTDl/GeZ+iO7FU90X4PtW0hpeyTY46HytPxl8SMmzko2Bbozbal
+	VjW08M6NriUlINBEYBRGhGW7xUWtQErRbkkbNOMqr6v0wBl5W/UcHsttnx+VV80m
+	GG52oKRiV5zQfey3aLzCBrzzqQ0gcQn4sF3ETU+A==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gx5s5r2vk-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 02 Oct 2026 08:00:23 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 69262eqd2076646;
+	Fri, 2 Oct 2026 08:00:22 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4h0xcshy6c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 02 Oct 2026 08:00:21 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 69280Hvq30212440
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 2 Oct 2026 08:00:18 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D395D2004E;
+	Fri,  2 Oct 2026 08:00:17 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BC5EF20043;
+	Fri,  2 Oct 2026 08:00:16 +0000 (GMT)
+Received: from osiris (unknown [9.87.132.225])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri,  2 Oct 2026 08:00:16 +0000 (GMT)
+Date: Fri, 2 Oct 2026 10:00:15 +0200
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter <fritz@linux.ibm.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <fuad.tabba@linux.dev>
+Subject: Re: (subset) [PATCH v9 00/24] KVM: s390: Introduce arm64 KVM
+Message-ID: <20261002080015.22510-A-seiden@linux.ibm.com>
+References: <20260930173441.66762-1-seiden@linux.ibm.com>
+ <179085262878.3865846.5787241839391727949.b4-ty@b4>
+ <20261001132715.108643-A-seiden@linux.ibm.com>
+ <86wls1315l.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v22 10/10] firmware: arm_rmm: hotplug: Skip memory added
- to ZONE_MOVABLE
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
- gshan@redhat.com, joey.gouly@arm.com, tabba@google.com,
- yuzenghui@huawei.com, linux-coco@lists.linux.dev,
- gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com,
- alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com,
- lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com,
- jonathan.cameron@oss.qualcomm.com
-References: <20261002061507.1600269-1-suzuki.poulose@arm.com>
- <20261002061507.1600269-11-suzuki.poulose@arm.com>
-From: "David Hildenbrand (Arm)" <david@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=david@kernel.org; keydata=
- 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
- qIws/H2t
-In-Reply-To: <20261002061507.1600269-11-suzuki.poulose@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86wls1315l.wl-maz@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDAyMDAzMCBTYWx0ZWRfX6TTjafE+zJw/
+ 8IOaDmVbWDcj3fnvYRUKSZmSyPSYC1WIM1utUezfe6ZqcnsDGVAfJmIg8txkrBIouGed3/yEyUA
+ +/hGiM5q3QeSXuXvavDUJ84pYEoya/s=
+X-Authority-Analysis: v=2.4 cv=HJ5WhYtv c=1 sm=1 tr=0 ts=6abf6497 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=kj9zAlcOel0A:10 a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8
+ a=oxOeRRTydUpBoHNR5nMA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-GUID: EP_6xC35w4LYshj_KR8G9Ra7L-auzk1s
+X-Proofpoint-ORIG-GUID: ay7HdBwUIxDlv8jnNezyMkEYZ5PrxwQt
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDAyMDAzMCBTYWx0ZWRfX/zOtryu/PAoy
+ u7oRYSKzJ6rwE0J3so7nc3C2XtU+bC4IT68zcOhGHfu2LJQua2RonwGZblhNH16odNb7944nUYS
+ oyKyBt10wL3kC82+PL1/o+R047CDaivfNu1pJKM2tqYlL16657qBEONEp+v3FwryrwPuTX0S7tb
+ EfGEh7FriG3LXB7MNajU7eKyIA9sl2UscPzMOg8/ZHzlpENYSPOvfUvhVD1pGgJ4PoKURz/U98E
+ 16MRnYxnnp9yAIqsoV2wGYiru3TWvr6X6KJt0pchKXd42pxzvW41Hh7cYtOoGHzfcc0Gg8B724N
+ IWL1x902hHWn64KuE+EEH7FxrusaC1Q9YqGBQjVjRpmMFXURYbCoMhFRawVj1ELvk5HGAKtOiQ7
+ c5ueik/J1ir5to+uydKkTkUYiQLWG4scqJCLlQOhm41nFB1WndowEw7r8NIULOhcfZPJvAnOSf9
+ gOpDwkD4W1yXh5UaQPA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-10-02_02,2026-10-01_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 suspectscore=0 bulkscore=0 clxscore=1015 lowpriorityscore=0
+ spamscore=0 impostorscore=0 phishscore=0 priorityscore=1501 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2610020030
 
-On 10/2/26 08:15, Suzuki K Poulose wrote:
-> If the hotadded memory is in ZONE_MOVABLE, we could allow that to proceed
-> without the RMM having fine grained tracking, as we won't allocate pages
-> from there for guest-memfd or kernel allocation
+On Thu, Oct 01, 2026 at 04:12:38PM +0100, Marc Zyngier wrote:
+> On Thu, 01 Oct 2026 14:27:15 +0100,
+> Steffen Eiden <seiden@linux.ibm.com> wrote:
+> > 
+> > On Thu, Oct 01, 2026 at 12:04:51PM +0100, Marc Zyngier wrote:
+> > > On Wed, 30 Sep 2026 19:34:15 +0200, Steffen Eiden wrote:
+> > > > Introduce arm-on-s390. Enable KVM-accelerated ARM CPU virtualisation on s390.
+> > > > 
+> > > > The new KVM functionally depends on KVM/vfio: Use file-based reference
+> > > > counting for KVM [5] The series itself should apply w/o those.
+> > > > 
+> > > > For the original, now partially outdated, cover letter, have a look at versions
+> > > > one to three [1].
+> > > > 
+> > > > [...]
+> > > 
+> > > Applied to next, thanks!
+> > > 
+> > > [05/24] arm64: ptrace: Use constants for compat register numbers
+> > >         commit: 295d3df9b1e425099a4eb37954a02c4a08fdb496
+> > > [06/24] arm64: sysreg: Convert SPSR_ELx to automatic register generation
+> > >         commit: d3d78520068779779e1ed7aa0dd8a3ce63e1ca43
+> > > [07/24] KVM: arm64: Access elements of vcpu_gp_regs individually
+> > >         commit: 29d92585ab987bb80b1e78d811aaea2a8db86e62
+> > > [08/24] KVM: arm64: Use accessor functions for core regs
+> > >         commit: 89ed62818f10e38e64fea46d43ee6455a1beb647
+> > > [09/24] arm64: Prepare sharing arm64 headers with s390
+> > >         commit: df6a70516adec8b7f5fa49e1755d8ee33d980d9c
+> > > [10/24] arm64: Share arm64 headers with s390
+> > >         commit: c7e18ba462536e870b0ff4deca581babcac9135b
+> > > [11/24] KVM: arm64: Share arm64 code with s390
+> > >         commit: dcb776bfcccc9662001a75b99dbfbef55f46eb31
+> > > 
+> > > Note that there were a few conflicts. Please check that I resolved
+> > > them correctly.
+> > 
+> > 
+> > After rebasing on those the arm-on-s390 part does not build anymore :( 
 > 
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: David Hildenbrand (Arm) <david@kernel.org>
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
+> Well, that's sort of expected. The kvmarm tree doesn't have the S390
+> stuff yet, and contains tons of new stuff.
+>
 
-Acked-by: David Hildenbrand (Arm) <david@kernel.org>
+yes, but sometimes I like to dream 
 
--- 
-Cheers,
+> > We are missing the definition of
+> > static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
+> > 
+> > 
+> > quick fix: 
+> > 
+> > on top of [10/24]  arm64: Share arm64 headers with s390
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > index bf35cbe8ddcb..0708f792c631 100644
+> > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > @@ -367,10 +367,13 @@ static __always_inline u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
+> >         return vcpu->arch.fault.esr_el2;
+> >  }
+> > 
+> > +#if ARM64_S390_COMMON == 1
+> >  static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
+> >  {
+> >         return esr & ESR_ELx_S1PTW;
+> >  }
+> > +
+> > +#endif /* ARM64_S390_COMMON == 1 */
+> > 
+> >  static __always_inline bool esr_abt_is_exec_fault(unsigned long esr)
+> >  {
+> > 
+> > 
+> > 
+> > A cleaner solution it to move this defenition just below  
+> > void kvm_vcpu_wfi(struct kvm_vcpu *vcpu) in 
+> > [09/24] arm64: Prepare sharing arm64 headers with s390
+> > and expand the shared region in the following patch.
+> 
+> I'm redoing the merge and fixing it as follows (note that the
+> ARM64_S390_COMMON guards are already present):
+> 
+> @@ -336,16 +367,6 @@ static __always_inline u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
+>  	return vcpu->arch.fault.esr_el2;
+>  }
+>  
+> -static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
+> -{
+> -	return esr & ESR_ELx_S1PTW;
+> -}
+> -
+> -static __always_inline bool esr_abt_is_exec_fault(unsigned long esr)
+> -{
+> -	return esr_trap_is_iabt(esr) && !esr_abt_is_s1ptw(esr);
+> -}
+> -
+>  static inline bool guest_hyp_wfx_traps_enabled(const struct kvm_vcpu *vcpu)
+>  {
+>  	u64 esr = kvm_vcpu_get_esr(vcpu);
+> @@ -389,6 +410,12 @@ static inline u64 kvm_vcpu_get_disr(const struct kvm_vcpu *vcpu)
+>  	return vcpu->arch.fault.disr_el1;
+>  }
+>  
+> +#if ARM64_S390_COMMON == 1
+> +static __always_inline bool esr_abt_is_s1ptw(unsigned long esr)
+> +{
+> +	return esr & ESR_ELx_S1PTW;
+> +}
+> +
+>  static inline u32 kvm_vcpu_hvc_get_imm(const struct kvm_vcpu *vcpu)
+>  {
+>  	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_xVC_IMM_MASK;
+> @@ -456,6 +483,13 @@ static __always_inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
+>  	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC;
+>  }
+>  
+> +#endif /* ARM64_S390_COMMON == 1 */
+> +
+> +static __always_inline bool esr_abt_is_exec_fault(unsigned long esr)
+> +{
+> +	return esr_trap_is_iabt(esr) && !esr_abt_is_s1ptw(esr);
+> +}
+> +
+>  static inline
+>  bool kvm_vcpu_trap_is_permission_fault(const struct kvm_vcpu *vcpu)
+>  {
+>
+> 
+> Does this work for you?
+>
 
-David
+Yes the positioning of the functions look good. It builds on top of
+kvmarm/next + this (sightly relocated (line numbes are different) patch
++ arm on s390 stuff.
+
+I'll work on a verification tool for you guys to make this process
+easier.
+
+Thank you.
+
+	Steffen
+
