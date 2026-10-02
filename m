@@ -1,124 +1,163 @@
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5604E1C9A
-	for <kvmarm@lists.linux.dev>; Fri,  2 Oct 2026 15:30:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790955060; cv=pass; b=CrimiGt9GcpzoNmOF0WF8o1VpsTA+Zuohw3Bm+IPrWRljA3rSsBVds/2J2QRSLMryvK+QixoD9IJN0giah4c6kr0GgJXxCmvHum914stQ3+YgGubsSfTA7e3/qDuX0tzPPqln9pSPFxSI9IqMf53JTbPP13j/1ClJvyE9nEnwnY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790955060; c=relaxed/simple;
-	bh=fs5RDQ985eGOdUMkYTIO1AkzMa4f/KMg1mJ+9inMXJI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tdkEbDrlTsICmNaxLzBMUzEARJ19kcQ+E2GmUmp84f8k0vPh+LC5Sr7HkHUvSfjiqi3uWr3/dEEXPBtquEsF/98RWqD3flioH1Yquqm5Vf8q/FADNL+u4Ni6jGc0anq5SCNQtVnbouNJpNUOVvB4jzW+K2SYtBtm0Pjh62xyXmY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kvzh/2XL; arc=pass smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57FB24E06EA;
+	Fri,  2 Oct 2026 15:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790955647; cv=none; b=NU+wSlIbT8CuAedfyI1GH8esxgkY8YWr/DIxwdVsidfOGzqLmaUxF5JrYQgwqKYkVG2UVoCTC4N7Q2d0MVxakGI/ECWIz8Z+lveoZP5mydyc+la7lKQFWk4fCBt5dL/8haQxfNHeOmY20AohMg/n0trL/L60E4YexEndm1PW3hA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790955647; c=relaxed/simple;
+	bh=1r4jf0M0Vfx6ax9wtmkQrz7g96OAwje2NNTrGFOgbhc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=C13K7ZJOPvVQDi6nyr2vynnvZEbmEKNQlur2AVmSIVwqsxRl3EU9m3tLhFEpYWDFhgg7vHjM3gLIQmlGtGbmQp+/Jat1ehewtATnaBvGpvhXREi6OFryBZ/aihcatXuZjVG5Z0QQf2UBzxGxygtPctouV/fV4+Kvb9YYqPArQaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=anbTS0la; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kvzh/2XL"
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5ba429b64c5so7287e87.1
-        for <kvmarm@lists.linux.dev>; Fri, 02 Oct 2026 08:30:57 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790955056; cv=none;
-        d=google.com; s=arc-20260327;
-        b=RsSNgrO7UapC1Uvmkn2e4YxmVjWV0nMsYLlj3FWU8imSw61z4BU3HtAXjjj36dyuaA
-         40ROpmgs9K8g5N4RMpQoursVE1pZ7hik85RukqrYTf2sl/O8f+FjehqD8c0eP/sMI8Yc
-         xLjrcMGbttzw1vcQp2SKfb2HOuw5V7vtz2dXqk73UDntn/Y1fgzlvIaVxxyoE3KXGU31
-         IShzQdmApyZY4MHoLL4HiglLZTTldgYR1K1ZUY/OwcxoAtrevBt1seyrWcxfIZHng64F
-         mDyu2DB9EgFsaHKDRtApSM1PvmFWymFNzSSOIXyUrABd48+2iTIMu73pFTxVLCOq2y0X
-         qIuA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=TyT67JBWmU8a3Diw010Aiq6t7ByqroB1mQnZlP3DzI4=;
-        fh=MaC6lFdo7Ok+xplEUS6aWRUXk4sDf37zGj7NnK90IL0=;
-        b=BjMXfXZljRwqvMSa3DCpRuqwcRvZhW5ipHJCCgwdmbsoGG13ihTU1fNGs9EOP1XVFz
-         qNncUe1xz5Xs+w57ebl2cMgD8hPF6bNzdFIhaK0pYyJwx6t+9PGRfd0IIwg+AJdF/5qR
-         ZB+z9pXvHTtyC0hELG8koTPf+qPhVFQnL0NrDG0F8ohVDPV74az7SqGcdrdfXsol4++k
-         88xrAOGZQ3y6CGIE9ibX0wIuN+a/rVpRUF673S7sCrLAVxL6uMODrl22JWwt8h1S6NDP
-         FNdQbzu4bCGC47zF9YZd+mix4jH1Z3BSSlLKTyLVnhwskCf5JpZX0hfdwb4vn/2GHxGt
-         OHjg==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790955056; x=1791559856; darn=lists.linux.dev;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=TyT67JBWmU8a3Diw010Aiq6t7ByqroB1mQnZlP3DzI4=;
-        b=Kvzh/2XLsmDeY4W9dOk+N1lWPju45l1hE8ZfbBOmFCLDX+oSe1aI5+bMLYjAmSMEp+
-         5m2Sb0QBuehmLKToleeKX2hExWMK48gdg6/EmLfLQHjpWCw1ev7B5C7p0//0VTLcaAit
-         ySaVHepS5sUW4kh4+GiPC1uHnk+8rCuOilX5MUqEsvzZLxPe/sndHFfcCaIu7z57UXZM
-         hTzuE/uC9h656Z0qCKgG1YegxGquXEJajbamwx6UhBvH/pjwCFnL2mLut01O7IoRVET9
-         Yir0zNQk0bPWCDIIY9iF3zUysxEp228QkxKpCL9viUY7To277tdnSlSzJh2OZC5sqsk+
-         TQAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790955056; x=1791559856;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=TyT67JBWmU8a3Diw010Aiq6t7ByqroB1mQnZlP3DzI4=;
-        b=NUJxz/r7vsCLck0wzvTMdwKTtcd6qggHaasc5dlWsIpVSpiOpQjVXLT1Bmr47t5AKT
-         Xgdf2FHMIe3J2Wcsjmf0nMM2K11XbAS1y/1OR/Um0sCAhHdocTgwUbKUy6rRoMYg+cTp
-         KeCVgXCXPizGTP4/8JZJs3Z3McdpbluIB0WPcxiRa+2iFkf+NSSZzBiwjw2JJ5WcPuyK
-         i6X2XORoDH00ViWwTvVt9DR90Tv19iH71bXODp3UqUy92ZW78AxeuIm/qN8dn+BAyNU6
-         YzmEicLao9pm5bVH3nTe331UPlz7qMFXbw130x/fuKDcPNVpS0C8XtwiDgpw0p7W4V2y
-         Y+0A==
-X-Forwarded-Encrypted: i=1; AKwUvBz3MlLf0gvnPg22y+B859n1nZBZi+FtQP2CYdF1Xyt0auMEa2djPGpQSEdTJtWLWvFyOXKMAcw=@lists.linux.dev
-X-Gm-Message-State: AFq9FYKumqUlNZi9liQ+dH/xzJkUTRhOFBfeldyP1iVKmpGBrjRZWSAo
-	RTwm2o9PTNQV+xEjeBbN7rx1ctJvoFW1Te0OQC9ocgYMWPFJTfC0rYIaGpgZQNxsyboO69xlaR0
-	tRlriFHz9wzYlwdZ56HIaOlPXP1pLQP7LG7iIKWqW
-X-Gm-Gg: AYBFou2LXKgJP/sEJWDt88RhByD+c/1WDoO4gLYzOa2cV+MI5QBlRqnhlXska/8HLyq
-	8I2daMAjmscP0y0PYxCETK7tOkL26b1Vp5kwCwGKBDCzewuGM+8rVflilNPITWPOD3kw9fzc5/4
-	wuy1K6Hr3oXHlN+bVRXTG5jtCMi6fPZy6PGPVMsl4igPpVtM6KfAmMPvrfIuCEQl2qUzx/SMzBS
-	L8BcFVCMKYYOnypkKgG40GZJSX4ivdmQvkqAJ2NDs38pK33/IU7yr3F/sy/x2dgoVYmiliDSAYn
-	wFP6vovl4RbjWWWKn7M4LmrEsBushrewGRrvurROLsv6vU4g3X8uTXUO/qpV74Z2VqruSmVK9v7
-	S7yqVji3+jXru2VTA7naUPIkf
-X-Received: by 2002:a05:6512:3b26:b0:5b8:d04b:a1be with SMTP id
- 2adb3069b0e04-5bb7c91a8a0mr183008e87.2.1790955055657; Fri, 02 Oct 2026
- 08:30:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="anbTS0la"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58AD21F000FF;
+	Fri,  2 Oct 2026 15:40:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790955631;
+	bh=KQtBKmV1C9YgjiIXLvcIFbStd7xUmxqWxSJXNgv5TuM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=anbTS0laiuDH50SzRWiL6aysLxMhhzzXx/rR8C8pOoYslb9VfJGkETKebTRUJRMey
+	 ls7sW1OaQEblook8tu19AVAOWbehkhDX3/vi5Ppy2vXwXvCAzJsrFGZ0L0GIk9u31a
+	 RQ42/R7+klv4pJp85W4ahFy5bAzYI7+K1Xm7m8utqNXxrHqJD+oiGqytW2/G6pvflT
+	 FhnI5a9C3sbjM5NFrdA++WnhvpyiXbDVgIF/TqDpKBxiffTh2vi80jMu4N0XrOwYz7
+	 Rlo//OVH1qnjQupD7gTnP+5b4msupwwgKrw5xIAW03va3yEbErSFWV9FM4Oy4CWMCp
+	 8us7eAXO/UkUA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xCfN7-0000000GI1q-0qgJ;
+	Fri, 02 Oct 2026 15:40:29 +0000
+Date: Fri, 02 Oct 2026 16:40:28 +0100
+Message-ID: <86mrsw2jrn.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Fuad Tabba <tabba@google.com>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	steven.price@arm.com,
+	aneesh.kumar@kernel.org,
+	oupton@kernel.org,
+	gshan@redhat.com,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev,
+	gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com,
+	alpergun@google.com,
+	fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com,
+	lpieralisi@kernel.org,
+	enju.kohei@fujitsu.com,
+	sudeep.holla@arm.com,
+	jonathan.cameron@oss.qualcomm.com
+Subject: Re: [PATCH v21 05/23] KVM: arm64: Track the type of VM in kvm_arch
+In-Reply-To: <10563362-5964-4ef7-b5d7-fe1d67ce4adb@arm.com>
+References: <20261001210703.1597150-1-suzuki.poulose@arm.com>
+	<20261001210703.1597150-6-suzuki.poulose@arm.com>
+	<CA+EHjTxtatPyGcyvEyR129cqUiAYcO_cxRVtwZO0ckZsOnD7TA@mail.gmail.com>
+	<86se2o2rbs.wl-maz@kernel.org>
+	<CA+EHjTwHuJ0u_TTP46zNFKFmBP124XHHLUVhkAUSyfhe92=41w@mail.gmail.com>
+	<86pkxs2npx.wl-maz@kernel.org>
+	<10563362-5964-4ef7-b5d7-fe1d67ce4adb@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20261001210703.1597150-1-suzuki.poulose@arm.com>
- <20261001210703.1597150-6-suzuki.poulose@arm.com> <CA+EHjTxtatPyGcyvEyR129cqUiAYcO_cxRVtwZO0ckZsOnD7TA@mail.gmail.com>
- <86se2o2rbs.wl-maz@kernel.org> <CA+EHjTwHuJ0u_TTP46zNFKFmBP124XHHLUVhkAUSyfhe92=41w@mail.gmail.com>
- <86pkxs2npx.wl-maz@kernel.org> <CA+EHjTy4rb+6z0bqh7sPqACES0EDpURdeoyiFGmdw3p0PENcOQ@mail.gmail.com>
- <86o6dc2ka1.wl-maz@kernel.org>
-In-Reply-To: <86o6dc2ka1.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 2 Oct 2026 16:30:19 +0100
-X-Gm-Features: AclHuK-WxuFGXDBt-i8aW4clYrHg0y_cefCod2ajVZ-nmk2Rl2Vmyq6bDATGZwQ
-Message-ID: <CA+EHjTy9wTbjFpgvDOX9Xexw4jpx4uHMHM9ckXYZw8H0_QbAvQ@mail.gmail.com>
-Subject: Re: [PATCH v21 05/23] KVM: arm64: Track the type of VM in kvm_arch
-To: Marc Zyngier <maz@kernel.org>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, steven.price@arm.com, 
-	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, 
-	joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, 
-	gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, 
-	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, 
-	lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com, 
-	jonathan.cameron@oss.qualcomm.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, tabba@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 2 Oct 2026 at 16:29, Marc Zyngier <maz@kernel.org> wrote:
-...
-> > I know this is a sketch, but just in case: that's inverted. The sync
-> > only applies to non-protected pKVM VMs (EL2 ignores it for protected
-> > ones), so it would be != VM_PKVM.
->
-> See what I meant about this stuff being completely intractable? I
-> still have no idea what it means! ;-)
+On Fri, 02 Oct 2026 16:15:07 +0100,
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+> 
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 0f4e8b71fa85d..9ba86450fe4af 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -2624,7 +2624,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+> >   	hva_t hva, reg_end;
+> >   	int ret = 0;
+> >   -	if (kvm_vm_is_protected_pkvm(kvm)) {
+> > +	if (kvm_vm_is_protected(kvm)) {
+> 
+> We have slightly different handling for Realms. The final code for this
+> looks like :
+> 
+> 	if (kvm_vm_is_protected(kvm)) {
+> 		if (new &&
+> 		    new->flags & (KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY)) {
+> 			return -EPERM;
+> 		}
+> 	}
+> 
+> 	if (kvm_vm_is_protected_pkvm(kvm)) {
+> 		/* Cannot modify memslots once a pVM has run. */
+> 		if (pkvm_hyp_vm_is_created(kvm) &&
+> 		    (change == KVM_MR_DELETE || change == KVM_MR_MOVE)) {
+> 			return -EPERM;
+> 		}
+> 	} else if (kvm_realm_is_created(kvm)) {
+> 		/*
+> 		 * Once the Realm is created, we cannot modify any slots that
+> 		 * could be providing private memory. i.e., guest_memfd backed
+> 		 * slots.
+> 		 * TODO: Handle trusted device private memory slots
+> 		 */
+> 		if (kvm_slot_has_gmem(old) || kvm_slot_has_gmem(new))
+> 			return -EPERM;
+> 	}
+> 
+> 
+> Of course we could invert the checks to detect vm_is_protected_pkvm()
 
-Yeah... what is a `!= VM_PKVM` ?!
+This is how I expect this stuff to be written.
 
-:D
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+	if (kvm_vm_is_protected(kvm) && new &&
+	    new->flags & (KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY))
+		return -EPERM;
+
+	switch (kvm->vm_flavor) {
+	case VM_PROTECTED_PKVM:
+		/* Cannot modify memslots once a pVM has run. */
+		if (pkvm_hyp_vm_is_created(kvm) &&
+		    (change == KVM_MR_DELETE || change == KVM_MR_MOVE)) {
+			return -EPERM;
+		break;
+	case VM_CCA:
+		/*
+		 * Once the Realm is created, we cannot modify any slots that
+		 * could be providing private memory. i.e., guest_memfd backed
+		 * slots.
+		 * TODO: Handle trusted device private memory slots
+		 */
+		if (kvm_realm_is_created(kvm) &&
+		    (kvm_slot_has_gmem(old) || kvm_slot_has_gmem(new)))
+			return -EPERM;
+		break;
+	default:
+		break;
+	}
+
+We have an enumeration. Make use of it. And the whole "is_created"
+crap needs to be sorted one way or another.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
