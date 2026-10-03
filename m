@@ -1,134 +1,72 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27EF39023A;
-	Sat,  3 Oct 2026 17:29:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62E33A4F59;
+	Sat,  3 Oct 2026 17:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791048560; cv=none; b=GSMha9ZXQCXaIAX4k1nbm8K8D9UPGpbZb7/LBK4yUsrr46IzYuFWbY4b8GGPGHToTIE0svvGJZBUSsLMCpHENMhgdC3IpnV42w+VFlKXFt89Fk6VzD+DxRGAYh5OoBq9QzbSuYaEZLLPD9Vxy3H8jJFr2+YQyQB1WmbQ7YMGsz0=
+	t=1791050195; cv=none; b=F0bvbYK1DLGfojKI9R2TKkk/M8RcB1GTh2KtiJCH4P4GEbJIR/PATPhM8FKLSsdrI3Hytj3p/UIrttkDqNV4vkum6O0YphP10MbQQn73qaFFWXAGdfS7Kt4Sv8Vxq6gM8aps+v5f/YftmZuBlFYY4IrnlJf31yFc4tjBNlfYVes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791048560; c=relaxed/simple;
-	bh=CqnWtRM63vGOFDy8hHfwMapffw7itr4fH4oD25dDnNI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BUK78teXvVRAA4QDp7IhABtuTOaAbcrnElPK6JlqdvM8SivG5OaGihyqOSh+RcZJgc2JCE/3KKhsvBYMPmGemqwgCOv/HVZr4nxc2OgDternotDEElMej4q6a406Jlw2KB10nAzditXcEA8M4Bx5mxpnFTZc+TiqGRLQfP5xE/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c0KeWhWQ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791050195; c=relaxed/simple;
+	bh=NIhBk/SRDFS0I7lVjccxNBqbONvSO5gx+1RJrKtAPc0=;
+	h=From:Subject:To:Cc:In-Reply-To:References:Content-Type:Date:
+	 Message-Id; b=K7OVTHXMC8mnu+EZ8xREgbLyqYNrvRjnXxhK4BIlIoiRORz3aR7ckh0CZeEejEwgH1VWsZSgb1Ttpfy0Fq0RCzvWXu+JdmedWDMhjf7LRfDRPdi1rY8TRj4E/bxXWBEQ6dRkmCWYPOAxk4tDGGaT5HmkKyv9gMxJ1pyPqXoNpBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j2vsTkrT; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c0KeWhWQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AC821F0089B;
-	Sat,  3 Oct 2026 17:29:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j2vsTkrT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B06591F0089C;
+	Sat,  3 Oct 2026 17:56:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791048558;
-	bh=/By2OE0+/5lBAO79HI0ShVxfSlShXYgYRuhLK9eN7no=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=c0KeWhWQDKHWS7d50/NydMyub1tr1wvxe5M1WAakXEmbrIAlZmehc+TqbIVgm8yEf
-	 Pd10HJC1byIsdZ33IVR2Nn+XeC+XUc9buAf7GZCkyig+/wC04+rf/4607jd8PVvsqb
-	 Ncos1ve2x3vaA6VGCaa9lnlpXbiZMZu5sVMER6EjT9VEMjlSsiwxo6zibnbmHf017B
-	 BAX+fr2PeaBbdwDuLTNqfAUQYGskWTpkohYpUdIE0Yv8dkBGhAmnwU0/lmoEFoE1ha
-	 VyCxfljyoUxqI0iGqUIFCNJVE/I1+DojNkomIYHCfpjaKU920gPdlJD/UpGMpabq2M
-	 oRkJpadK6g/Sg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xD3Xv-0000000GbIs-3dJ5;
-	Sat, 03 Oct 2026 17:29:16 +0000
-Date: Sat, 03 Oct 2026 18:32:23 +0100
-Message-ID: <87ld8e3d20.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	steven.price@arm.com,
-	aneesh.kumar@kernel.org,
-	oupton@kernel.org,
-	gshan@redhat.com,
-	joey.gouly@arm.com,
-	tabba@google.com,
-	yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev,
-	gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com,
-	alpergun@google.com,
-	fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com,
-	lpieralisi@kernel.org,
-	enju.kohei@fujitsu.com,
-	sudeep.holla@arm.com,
-	jonathan.cameron@oss.qualcomm.com
-Subject: Re: [PATCH v21 10/23] KVM: arm64: Add VM specific callback for S2 MMU operations
-In-Reply-To: <ce2e8885-d848-48d3-b82e-49fcd9a6cfcc@arm.com>
-References: <20261001210703.1597150-1-suzuki.poulose@arm.com>
-	<20261001210703.1597150-11-suzuki.poulose@arm.com>
-	<86ik3j2m5v.wl-maz@kernel.org>
-	<9873fb9d-6f32-46f6-bcac-6a52e293d011@arm.com>
-	<ce2e8885-d848-48d3-b82e-49fcd9a6cfcc@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1791050193;
+	bh=NIhBk/SRDFS0I7lVjccxNBqbONvSO5gx+1RJrKtAPc0=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=j2vsTkrT+q7iwpsTHIbznytwjucZ5dNclWGA/WSmmJGNKFc6WqmqUyZbYHG2AK+SO
+	 Kq76PE/BADT6pLr8pFpzlw383x/yF89J6aOj/ocEXhrQXAFpa0snbJ638UYV5EycZH
+	 vQ+Y1JcsLleu5tNKmxOCMyM+WM7yWtvss4VUhbtUjZwzgZO524+OoIIxkcHyAqXWsi
+	 NM5M74uUZGWjjd/qxBRZSQcOYxA4fCVCB+/TUlfaklBjXnzjfz3uW7wKwqH+BpMy6A
+	 K9CXO3FClHR+tAgxQlsM89c1JURjFuHkbaMiw5ftAYTQ/a50cxn4bdvfKQ7kXzCx9/
+	 yURgXC9MZZh9w==
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v4 06/38] mm/vma: tidy up map kernel pages enum values
+Reply-To: sashiko-reviews@lists.linux.dev
+To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
+Cc: linux-s390@vger.kernel.org, "Vasily Gorbik" <gor@linux.ibm.com>, kvmarm@lists.linux.dev, bpf@vger.kernel.org, linux-scsi@vger.kernel.org, kvm@vger.kernel.org, "Alexander
+ Gordeev" <agordeev@linux.ibm.com>, linux-trace-kernel@vger.kernel.org, "Marc
+ Zyngier" <maz@kernel.org>, selinux@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org, "Heiko
+ Carstens" <hca@linux.ibm.com>, "Oliver Upton" <oupton@kernel.org>, linux-perf-users@vger.kernel.org, "Christian
+ Borntraeger" <borntraeger@linux.ibm.com>
+In-Reply-To: <20261003-b4-mmap-prepare-vma-flag-sanify-v4-6-a1f052500fd7@kernel.org>
+References: <20261003-b4-mmap-prepare-vma-flag-sanify-v4-0-a1f052500fd7@kernel.org>
+ <20261003-b4-mmap-prepare-vma-flag-sanify-v4-6-a1f052500fd7@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 03 Oct 2026 17:56:32 +0000
+Message-Id: <20261003175632.B06591F0089C@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, 03 Oct 2026 17:12:28 +0100,
-Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+> MMAP_MAP_KERNEL_PAGES is a mouthful, discard the MAP_ as that's implied by
+> MMAP.
 >=20
-> On 03/10/2026 16:30, Suzuki K Poulose wrote:
-> > On 03/10/2026 10:01, Marc Zyngier wrote:
-> >> On Thu, 01 Oct 2026 22:06:50 +0100,
-> >> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
-> >>>=20
-> >>> Add VM type specific S2 MMU operation backends which can be
-> >>> initialized per
-> >>> VM flavor, to keep the handling cleaner.
-> >>>=20
-> >>> Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
-> >>> Tested-by: Gavin Shan <gshan@redhat.com>
-> >>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> >>> ---
-> >>> Changes since v19:
-> >>> =C2=A0 - Add a blank line in kvm_arch_flush_remote_tlbs()
-> >=20
-> >=20
-> >>> =C2=A0 struct kvm_s2_mmu {
-> >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct kvm_vmid vmid;
-> >>> @@ -332,6 +345,8 @@ struct kvm_arch {
-> >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-> >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u64 fgu[__NR_FGT_GROUP_IDS__];
-> >>> +=C2=A0=C2=A0=C2=A0 const struct kvm_vm_s2_ops *vm_s2_ops;
-> >>> +
-> >>=20
-> >> If you're touching this patch, can you please move this pointer next
-> >> to the vcpu_ops pointer?
-> >=20
-> > Sure, I will do that.
+> Also while we're here delete useless comments for mmap actions whose names
+> clearly indicate what they are for.
 >=20
-> Sorry, this is only stored in kvm_arch, while the vcpu_ops are stored
-> in the vcpu_arch, to avoid pointer chasing vcpu->kvm->arch->.
+> Also update the userland VMA tests to reflect this change.
+>=20
+> No functional change intended.
+>=20
+> Reviewed-by: Suren Baghdasaryan <surenb@google.com>
+> Reviewed-by: Zi Yan <ziy@nvidia.com>
+> Reviewed-by: Gregory Price (Meta) <gourry@gourry.net>
+> Acked-by: David Hildenbrand (Arm) <david@kernel.org>
+> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 
-Ah, my bad,
-
-> I could move it closer to the vm_flavor ?
-
-Maybe. Check whether that introduces a hole or not (I'm trying to keep
-this structure as packed as possible). But we can always change this
-later on.
-
-Thanks,
-
-	M.
+Sashiko has reviewed this patch and found no issues. It looks great!
 
 --=20
-Jazz isn't dead. It just smells funny.
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261003-b4-mmap-pr=
+epare-vma-flag-sanify-v4-0-a1f052500fd7@kernel.org?part=3D6
+
