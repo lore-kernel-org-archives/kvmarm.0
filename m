@@ -1,133 +1,115 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703EE446053;
-	Sat,  3 Oct 2026 15:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 545E74519A5;
+	Sat,  3 Oct 2026 16:09:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791041420; cv=none; b=gE71rCgVq9AuPP1p797gC5v5a7GU9sW1nFurvNwHOJtK7TbP1x9ia4sopwPsLZiztARNFt6frEDj62n3t7HrQ2+3ShM4QGHqdvTpPJ/08iyhfoz0/BBYWQSgl3+Ag+azg8HG58lxRo0hUCqOmZMv9YO+xazD9LSXhY59Bl1Nezs=
+	t=1791043799; cv=none; b=awQo46Nk+vpCLTWrgAB+pnXFVu6dA1c4CFJJ/dDGrdKtaVtEfQH5BHwrsoy3LlbxGZ+LIB+cVW032ZuWzMPTPkBxNq5rnd5NIKHWRwGASFJRXvfPt/X8CLM1egD0Dkw9yMX2LENJCELA5DH1p7EZzgGHBLEQoS711nx9reA/08s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791041420; c=relaxed/simple;
-	bh=DqNzmiLqSRpWo/O9PN56Vgk4zOzq2vzIekil+azxtfs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Uy5Yxc/lwZ/pjCmubg+TUsyIp7deFUJgm+mZR8FulutT/3pHN1LLsoQZn3DPWpn4bFOWKbbIeESfMa5bmbgPo6f6+HDzRSW4weuTMbVJEokd64o3XQEWh5eqU6KEfsdF/PAbXZu/CDljophegGn+6HWMg7ozEl1Nhdre1TG2uoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=VsluF5b6; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1791043799; c=relaxed/simple;
+	bh=q7bSHdUt2NW8NRbyiyELYRSZ5SoLcldxJipAr8d+MIo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CNHX2yv9+EiD3WlslnplugGsHPBHbypI139CZNKQKcsVNCVHIxNiipA7kPJ6cjVHQkFv0GKO3mUUHtBy/+dRvVJQqqFnE3djrPO+xHksKccbdgBraRcXqJNjBJgADovIbd54KNUj+fnKp91zxigoCMYi6w4/2o/FfN1wh3mm2bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oN/nWJYY; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="VsluF5b6"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7B511143D;
-	Sat,  3 Oct 2026 08:30:08 -0700 (PDT)
-Received: from [10.57.8.170] (unknown [10.57.8.170])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 78A283F86F;
-	Sat,  3 Oct 2026 08:30:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1791041411; bh=DqNzmiLqSRpWo/O9PN56Vgk4zOzq2vzIekil+azxtfs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=VsluF5b6kSrZ+AUV4dej8J3hVAA0bso9VTPuE066QFBnPImM3oadyvBD4Og9UtP29
-	 50yVKbbIbWEUm/fpCMSMFhuU/77J7B7JoUuvUqrzDggYJQOP30hz3/M2LO4o+uEVYK
-	 m0MI8bfOukYnTKVm+bkg7o+Z0KqJJtqTlD7KGh4M=
-Message-ID: <9873fb9d-6f32-46f6-bcac-6a52e293d011@arm.com>
-Date: Sat, 3 Oct 2026 16:30:04 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oN/nWJYY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7716D1F0089B;
+	Sat,  3 Oct 2026 16:09:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791043784;
+	bh=8NWGwlQkszgpeDaU/7RVwfUPvUd34G5HRT8qHpyUbDE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=oN/nWJYYAx1Fal5a4qVGc2kJsll2CIviWg+5K5nj+kDGFj0nnoXUNpamtpQP44Bbv
+	 Owc98bzItftGpzLvIC0emFoONYsGsnDdqg6KlrEV/pxG5/9YUvXRsHiHojsyuyuE2n
+	 Zh+HmCUDKwpyu2l9h+464MN4SZ4C4bHD3UYQ7xh6kFk+P0wC4vjtmXL/VnrkGNn18s
+	 1wliJsxW2uhc/ep898c3KimWIJP3fQrrlIFFjJk6VR02piT9P9+HrC5ppZOHgQSgBG
+	 VWYy/MsrFIB+vv3o6NZO76dGBj/N85tPHfMdhXqefBfo9lDaFag1yfTClIv5Gf+E0v
+	 ZoTM+Q7mortCw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xD2Iw-0000000GZHf-1NT7;
+	Sat, 03 Oct 2026 16:09:42 +0000
+Date: Sat, 03 Oct 2026 17:12:50 +0100
+Message-ID: <87mrsu3gql.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kristina =?UTF-8?B?TWFydMWhZW5rbw==?= <kristina.martsenko@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-acpi@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-efi@vger.kernel.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	David Hildenbrand <david@kernel.org>,
+	Lorenzo Stoakes <ljs@kernel.org>,
+	Linu Cherian <linu.cherian@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Hanjun Guo <guohanjun@huawei.com>,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Subject: Re: [RFC 00/12] arm64: Add support for TLBI domains
+In-Reply-To: <20261001110655.461473-1-kristina.martsenko@arm.com>
+References: <20261001110655.461473-1-kristina.martsenko@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v21 10/23] KVM: arm64: Add VM specific callback for S2 MMU
- operations
-Content-Language: en-GB
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org,
- catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
- sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
-References: <20261001210703.1597150-1-suzuki.poulose@arm.com>
- <20261001210703.1597150-11-suzuki.poulose@arm.com>
- <86ik3j2m5v.wl-maz@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <86ik3j2m5v.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kristina.martsenko@arm.com, linux-arm-kernel@lists.infradead.org, linux-acpi@vger.kernel.org, kvmarm@lists.linux.dev, linux-efi@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, ryan.roberts@arm.com, david@kernel.org, ljs@kernel.org, linu.cherian@arm.com, anshuman.khandual@arm.com, lpieralisi@kernel.org, guohanjun@huawei.com, sudeep.holla@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, ardb@kernel.org, ilias.apalodimas@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 03/10/2026 10:01, Marc Zyngier wrote:
-> On Thu, 01 Oct 2026 22:06:50 +0100,
-> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
->>
->> Add VM type specific S2 MMU operation backends which can be initialized per
->> VM flavor, to keep the handling cleaner.
->>
->> Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
->> Tested-by: Gavin Shan <gshan@redhat.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> ---
->> Changes since v19:
->>   - Add a blank line in kvm_arch_flush_remote_tlbs()
+Hi Kristina,
 
+On Thu, 01 Oct 2026 12:06:43 +0100,
+Kristina Mart=C5=A1enko <kristina.martsenko@arm.com> wrote:
 
->>   struct kvm_s2_mmu {
->>   	struct kvm_vmid vmid;
->>   
->> @@ -332,6 +345,8 @@ struct kvm_arch {
->>   	 */
->>   	u64 fgu[__NR_FGT_GROUP_IDS__];
->>   
->> +	const struct kvm_vm_s2_ops *vm_s2_ops;
->> +
-> 
-> If you're touching this patch, can you please move this pointer next
-> to the vcpu_ops pointer?
+[...]
 
-Sure, I will do that.
+>   * It's also possible to use TLBI domains to limit a KVM guest's TLB
+>     invalidations to CPUs where the guest has run. I'll try to include th=
+at in
+>     the next version. This series only disables domains for guests.
 
->> +
->> +static const struct kvm_vm_s2_ops protected_pkvm_vm_s2_ops = {
->> +	.vm_flush_remote_tlbs		= pkvm_flush_remote_tlbs,
->> +	.vm_flush_remote_tlbs_range	= pkvm_flush_remote_tlbs_range,
->> +	/*
->> +	 * Not supported for Protected VMs under pKVM
->> +	 * .vm_age_gfn
->> +	 * .vm_test_age_gfn
->> +	 * .vm_stage2_unmap_range
->> +	 */
-> 
-> I really think we should have *something* here that returns
-> "unsupported", and avoid NULL-checks in the dispatchers.
+My take on this is that just like MPAM, it makes little sense to
+expose this to guests. As long as the L0 hypervisor has the means that
+to scope TLBIs to the relevant domains (subset of CPUs to start with,
+but hopefully SMMUs eventually), we're good.
 
-Ack
+>   * With this series a long-running process may eventually run on all CPU=
+s and
+>     just issue broadcast TLBIs. It may be worth periodically reducing the=
+ set
+>     of CPUs but it's not clear when.
 
-> 
->> +};
->> +
->> +static const struct kvm_vm_s2_ops pkvm_vm_s2_ops = {
->> +	.vm_flush_remote_tlbs		= pkvm_flush_remote_tlbs,
->> +	.vm_flush_remote_tlbs_range	= pkvm_flush_remote_tlbs_range,
->> +	.vm_age_gfn			= kvm_vm_age_gfn,
->> +	.vm_test_age_gfn		= kvm_vm_test_age_gfn,
->> +	.vm_stage2_unmap_range		= kvm_vm_stage2_unmap_range,
-> 
-> and since we have this: can we get rid of the KVM_PGT_FN() hack?
+I had a think about that some time ago, and thought that you were sure
+to be sub-optimal when the number of CPUs you have run on is greater
+than the number of threads in your process.
 
-Ack, I will give it a go.
+But I'm sure there are better heuristics! ;-)
 
+Thanks,
 
->> +#define KVM_VM_S2_OPS(flavor, ops)		\
->> +		[flavor] = ops
->> +static const struct kvm_vm_s2_ops *arm64_vm_s2_ops[] = {
->> +	KVM_VM_S2_OPS(VM_VHE, &kvm_default_vm_s2_ops),
->> +	KVM_VM_S2_OPS(VM_NVHE, &kvm_default_vm_s2_ops),
->> +	KVM_VM_S2_OPS(VM_PKVM, &pkvm_vm_s2_ops),
->> +	KVM_VM_S2_OPS(VM_PROTECTED_PKVM, &protected_pkvm_vm_s2_ops),
-> 
-> nit: move the '&' into the macro.
+	M.
 
-Ack.
-
-Suzuki
-
+--=20
+Jazz isn't dead. It just smells funny.
