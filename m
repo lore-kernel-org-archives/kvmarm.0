@@ -1,43 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A700DEEB3;
-	Sat,  3 Oct 2026 08:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9963ACF14;
+	Sat,  3 Oct 2026 09:01:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791017152; cv=none; b=cWXxv+X1Kt6ls4AaXXedNwTZHlx8bzb9aRxJWhnduLcEuVUzClKX5rDhgEAp24oiFSYHLzxoEt2J3unKq5LUxXUqvAMK3Mt4ZGFxu7dfyeNVnqI303AVEDYb2Sz3/DbE9vItlNnsm1S7OA4LPD1xx8+CDvYObXnKlBaNBmMoY3M=
+	t=1791018065; cv=none; b=jIHQ4/OwaA3lmHq7fsjS8mIC/gZfmHKBCxOZsKr3D3JSuDlxzjNmLc4VOp9xfxsNaw7V1tndldfPQv3QQSUJea1ubYUT2LZR/G3vWjet7GQkqmAsb90hp5fy474A3q1KAnwqvkQeSvJ72GrHkdTR6fwdmiZBoQ4ZBaeYYn8hBgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791017152; c=relaxed/simple;
-	bh=a0nX+tv2G5b7HuoiyPpcU5xklgUpccGz4acc0Y+2SaA=;
+	s=arc-20240116; t=1791018065; c=relaxed/simple;
+	bh=wpq1jWmpUv5+EGh26shmJIK+WW+W70wVExmkUFGSrjk=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F/AI8Endy/D5O3siE6kpeARjyNZD5pgGFQI3IxoSUAZyQV80uRpqt+TWWgbii+mBy3M+5ervYg5IuuSZGTAfh4vb4yxBXS3bOST4JpjGmCHAyQKjRH+2rMV+lhkanmmgfbfFiMx0Vv/TdMd5mIDMWrjhOqrXS1SfFm++ERGrctM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CdvyVKHZ; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=SAESbdFh/eAt1r9EN3WinJI4XK+QIhORnoDp2q0MSLfQbgalPZVOMKlTTd6DO52VtYPmE8SaJ0JtEwcX/2IdU7yWfvWnUalFSiKBGWoaXj4iLfUnKWvb0Os0PdzGS2wanTMadMI3nDxCul9YdkYYO/20EFsjuM2wLqsggMTQyTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aYut5R3d; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CdvyVKHZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37BA01F0089B;
-	Sat,  3 Oct 2026 08:45:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aYut5R3d"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86A601F0089B;
+	Sat,  3 Oct 2026 09:01:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791017151;
-	bh=zxZleFQUEISD064kSfjMjMxf0Adv0+eg+SUInoyeOkM=;
+	s=k20260515; t=1791018063;
+	bh=yoAqEY9vtcmb40M8S9BOEzK/PKedZBtE/JXBMgBsAII=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=CdvyVKHZynq+wKXiwTb2wUbImBUsPXNZ9b5G58qvJbwUraRUEMQLg1XT9zBpaQtHz
-	 O/sZaA5oyo2yoo8B9GvO+5BtRoTLEMHSJ04cG3FJzBxIui+zMCpHs5wSxYRvUwFBPg
-	 mvJVCepy0Nk8CjWXTZZULFrfKzGqsoAQXWQoYLGx7OgBxI09TfXciGLJabnWopj8Kx
-	 Ir6c7ZIBqhhxqfiASq5aVX/zimjZTCZklH/GhBmcHMq1l088jV2lnTsWgytwLGwJ1r
-	 FRfWOPfhhHOs3Awk9IHTDr6kVRfPhWKAq5xq3PbUbmyg53/ZEKZqNh9cv78oWKlkHo
-	 oaPfn7JY5t+4w==
+	b=aYut5R3dleDqge6qyzbSHfNKYeWDbTCx+tfI+HI4XdfYDvB9DzonY2nzMKAfHw64M
+	 NsYBCEGPa2/ItGDTyWcUotvjWKAbNyucnRvEuQAp/4m8P9SOm9ClLU62GtuwFTDHFc
+	 ZUCO10I2mal3jYPWoUsSoQqZm8U7GJL/QqkwDcNbbojTkxKaysBZrm7qmd+qY96c3X
+	 8KCwLM/VVV0Tx6Z/0DXNP6qKL8/TPojc4qdETN2b1UtPYwCpTKeSlRjQ6+GITewlAJ
+	 gdSovnt9yAZasIy4aa75rYmYkch/E17iaB23coW+DlCwOYd0MdgAaLp47et7Fqbtic
+	 Mouc9mTsZCYyQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1xCvNM-0000000GUTq-3GbA;
-	Sat, 03 Oct 2026 08:45:48 +0000
-Date: Sat, 03 Oct 2026 09:45:48 +0100
-Message-ID: <86jynz2mv7.wl-maz@kernel.org>
+	id 1xCvc5-0000000GUbs-1Jyr;
+	Sat, 03 Oct 2026 09:01:01 +0000
+Date: Sat, 03 Oct 2026 10:01:00 +0100
+Message-ID: <86ik3j2m5v.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Fuad Tabba <tabba@google.com>,
-	kvm@vger.kernel.org,
+Cc: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	will@kernel.org,
 	catalin.marinas@arm.com,
@@ -48,6 +47,7 @@ Cc: Fuad Tabba <tabba@google.com>,
 	oupton@kernel.org,
 	gshan@redhat.com,
 	joey.gouly@arm.com,
+	tabba@google.com,
 	yuzenghui@huawei.com,
 	linux-coco@lists.linux.dev,
 	gankulkarni@os.amperecomputing.com,
@@ -59,18 +59,10 @@ Cc: Fuad Tabba <tabba@google.com>,
 	enju.kohei@fujitsu.com,
 	sudeep.holla@arm.com,
 	jonathan.cameron@oss.qualcomm.com
-Subject: Re: [PATCH v21 05/23] KVM: arm64: Track the type of VM in kvm_arch
-In-Reply-To: <d7a398b3-5cbe-4a1c-bdd3-c1c5925dfc33@arm.com>
+Subject: Re: [PATCH v21 10/23] KVM: arm64: Add VM specific callback for S2 MMU operations
+In-Reply-To: <20261001210703.1597150-11-suzuki.poulose@arm.com>
 References: <20261001210703.1597150-1-suzuki.poulose@arm.com>
-	<20261001210703.1597150-6-suzuki.poulose@arm.com>
-	<CA+EHjTxtatPyGcyvEyR129cqUiAYcO_cxRVtwZO0ckZsOnD7TA@mail.gmail.com>
-	<86se2o2rbs.wl-maz@kernel.org>
-	<CA+EHjTwHuJ0u_TTP46zNFKFmBP124XHHLUVhkAUSyfhe92=41w@mail.gmail.com>
-	<86pkxs2npx.wl-maz@kernel.org>
-	<CA+EHjTy4rb+6z0bqh7sPqACES0EDpURdeoyiFGmdw3p0PENcOQ@mail.gmail.com>
-	<86o6dc2ka1.wl-maz@kernel.org>
-	<83e79119-b331-4640-b2c7-cc8135d71c77@arm.com>
-	<d7a398b3-5cbe-4a1c-bdd3-c1c5925dfc33@arm.com>
+	<20261001210703.1597150-11-suzuki.poulose@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -80,62 +72,290 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, tabba@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, 03 Oct 2026 08:07:39 +0100,
+On Thu, 01 Oct 2026 22:06:50 +0100,
 Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
->=20
-> On 03/10/2026 06:53, Suzuki K Poulose wrote:
-> > On 02/10/2026 16:29, Marc Zyngier wrote:
-> >> On Fri, 02 Oct 2026 15:37:00 +0100,
-> >> Fuad Tabba <tabba@google.com> wrote:
-> >>>=20
-> >>> Hi Marc,
-> >>>=20
-> >>> On Fri, 02 Oct 2026 15:15:06 +0100, Marc Zyngier <maz@kernel.org> wro=
-te:
-> >>> [...]
-> >>>> Honestly, we introduce the flavor stuff to make it easy to match
-> >>>> things on a particular VM type in a readable way. So why isn't this
-> >>>> reading:
-> >>>>=20
-> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (vcpu->kvm->arch=
-.vm_flavor !=3D VM_PROTECTED_PKVM)
-> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
-> >>>=20
-> >>> I know this is a sketch, but just in case: that's inverted. The sync
-> >>> only applies to non-protected pKVM VMs (EL2 ignores it for protected
-> >>> ones), so it would be !=3D VM_PKVM.
-> >>=20
-> >> See what I meant about this stuff being completely intractable? I
-> >> still have no idea what it means! ;-)
-> >>=20
-> >=20
-> > Just to be clear: unprotected_pkvm() !=3D (vm_flavor !=3D VM_PROTECED_P=
-KVM).
-> > Rather, unprotected_pkvm =3D> (vm_flavor =3D=3D VM_PKVM).
-> >=20
-> > And the code wanted to bail out early for !unprotected_pkvm(). We can
-> > stick in "is_protected_kvm_enabled()" for unprotected_pkvm predicate
-> >=20
-> > But, I can drop the helper and use the vm_flavor check.
->=20
-> FWIW: Here is the diff for the above change. If you are happy
-> with the following, I could fold this in.
+> 
+> Add VM type specific S2 MMU operation backends which can be initialized per
+> VM flavor, to keep the handling cleaner.
+> 
+> Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+> Tested-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+> Changes since v19:
+>  - Add a blank line in kvm_arch_flush_remote_tlbs()
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  15 ++++
+>  arch/arm64/kvm/mmu.c              | 138 +++++++++++++++++++++++++-----
+>  2 files changed, 132 insertions(+), 21 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 9e1fa00d96f7c..f01df02dabfe1 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -155,6 +155,19 @@ struct kvm_vcpu_ops {
+>  	void (*vcpu_put)(struct kvm_vcpu *vcpu);
+>  };
+>  
+> +struct kvm_gfn_range;
+> +
+> +struct kvm_vm_s2_ops {
+> +	bool (*vm_age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
+> +	bool (*vm_test_age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
+> +	int (*vm_flush_remote_tlbs)(struct kvm *kvm);
+> +	int (*vm_flush_remote_tlbs_range)(struct kvm *kvm, gfn_t gfn,
+> +					  u64 nr_pages);
+> +	void (*vm_stage2_unmap_range)(struct kvm_s2_mmu *mmu,
+> +				      phys_addr_t start, u64 size,
+> +				      bool may_block);
+> +};
+> +
+>  struct kvm_s2_mmu {
+>  	struct kvm_vmid vmid;
+>  
+> @@ -332,6 +345,8 @@ struct kvm_arch {
+>  	 */
+>  	u64 fgu[__NR_FGT_GROUP_IDS__];
+>  
+> +	const struct kvm_vm_s2_ops *vm_s2_ops;
+> +
 
-Yes please. This is far more readable. Once we have the full picture,
-we can maybe look at more synthetic helpers, but let's start without
-any premature abstraction.
+If you're touching this patch, can you please move this pointer next
+to the vcpu_ops pointer?
+
+>  	/*
+>  	 * Stage 2 paging state for VMs with nested S2 using a virtual
+>  	 * VMID.
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 365e2a12c2348..92cdbeb44807e 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -37,6 +37,8 @@ static unsigned long __ro_after_init io_map_base;
+>  
+>  #define KVM_PGT_FN(fn)		(!is_protected_kvm_enabled() ? fn : p ## fn)
+>  
+> +static int kvm_vm_init_vm_s2_ops(struct kvm *kvm);
+> +
+>  static phys_addr_t __stage2_range_addr_end(phys_addr_t addr, phys_addr_t end,
+>  					   phys_addr_t size)
+>  {
+> @@ -166,6 +168,18 @@ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
+>  	return memslot->dirty_bitmap && !(memslot->flags & KVM_MEM_READONLY);
+>  }
+>  
+> +static int pkvm_flush_remote_tlbs(struct kvm *kvm)
+> +{
+> +	kvm_call_hyp_nvhe(__pkvm_tlb_flush_vmid, kvm->arch.pkvm.handle);
+> +	return 0;
+> +}
+> +
+> +static int kvm_vm_flush_remote_tlbs(struct kvm *kvm)
+> +{
+> +	kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
+> +	return 0;
+> +}
+> +
+>  /**
+>   * kvm_arch_flush_remote_tlbs() - flush all VM TLB entries for v7/8
+>   * @kvm:	pointer to kvm structure.
+> @@ -174,26 +188,37 @@ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
+>   */
+>  int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
+>  {
+> -	if (is_protected_kvm_enabled())
+> -		kvm_call_hyp_nvhe(__pkvm_tlb_flush_vmid, kvm->arch.pkvm.handle);
+> -	else
+> -		kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
+> -	return 0;
+> +	if (!kvm->arch.vm_s2_ops->vm_flush_remote_tlbs)
+> +		return 1;
+> +
+> +	return kvm->arch.vm_s2_ops->vm_flush_remote_tlbs(kvm);
+> +}
+> +
+> +static int pkvm_flush_remote_tlbs_range(struct kvm *kvm,
+> +					gfn_t gfn, u64 nr_pages)
+> +{
+> +	return pkvm_flush_remote_tlbs(kvm);
+>  }
+>  
+> -int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
+> -				      gfn_t gfn, u64 nr_pages)
+> +static int kvm_vm_flush_remote_tlbs_range(struct kvm *kvm,
+> +					 gfn_t gfn, u64 nr_pages)
+>  {
+>  	u64 size = nr_pages << PAGE_SHIFT;
+>  	u64 addr = gfn << PAGE_SHIFT;
+>  
+> -	if (is_protected_kvm_enabled())
+> -		kvm_call_hyp_nvhe(__pkvm_tlb_flush_vmid, kvm->arch.pkvm.handle);
+> -	else
+> -		kvm_tlb_flush_vmid_range(&kvm->arch.mmu, addr, size);
+> +	kvm_tlb_flush_vmid_range(&kvm->arch.mmu, addr, size);
+>  	return 0;
+>  }
+>  
+> +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
+> +				     gfn_t gfn, u64 nr_pages)
+> +{
+> +	if (!kvm->arch.vm_s2_ops->vm_flush_remote_tlbs_range)
+> +		return 1;
+> +
+> +	return kvm->arch.vm_s2_ops->vm_flush_remote_tlbs_range(kvm, gfn, nr_pages);
+> +}
+> +
+>  static void *stage2_memcache_zalloc_page(void *arg)
+>  {
+>  	struct kvm_mmu_memory_cache *mc = arg;
+> @@ -337,13 +362,20 @@ static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64
+>  				   may_block));
+>  }
+>  
+> +static void kvm_vm_stage2_unmap_range(struct kvm_s2_mmu *mmu,
+> +				      phys_addr_t start,
+> +				      u64 size, bool may_block)
+> +{
+> +	__unmap_stage2_range(mmu, start, size, may_block);
+> +}
+> +
+>  void kvm_stage2_unmap_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
+>  			    u64 size, bool may_block)
+>  {
+> -	if (kvm_vm_is_protected(kvm_s2_mmu_to_kvm(mmu)))
+> -		return;
+> +	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+>  
+> -	__unmap_stage2_range(mmu, start, size, may_block);
+> +	if (kvm->arch.vm_s2_ops->vm_stage2_unmap_range)
+> +		kvm->arch.vm_s2_ops->vm_stage2_unmap_range(mmu, start, size, may_block);
+>  }
+>  
+>  void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
+> @@ -983,6 +1015,12 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+>  	int cpu, err;
+>  	struct kvm_pgtable *pgt;
+>  
+> +	/* Initialize the VM ops for the VM instance for the first time */
+> +	if (mmu == &kvm->arch.mmu) {
+> +		err = kvm_vm_init_vm_s2_ops(kvm);
+> +		if (err)
+> +			return err;
+> +	}
+>  	/*
+>  	 * If we already have our page tables in place, and that the
+>  	 * MMU context is the canonical one, we have a bug somewhere,
+> @@ -2447,34 +2485,46 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+>  	return false;
+>  }
+>  
+> -bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+> +static bool kvm_vm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>  {
+>  	u64 size = (range->end - range->start) << PAGE_SHIFT;
+>  
+> -	if (!kvm->arch.mmu.pgt || kvm_vm_is_protected(kvm))
+> -		return false;
+> -
+>  	return KVM_PGT_FN(kvm_pgtable_stage2_test_clear_young)(kvm->arch.mmu.pgt,
+>  						   range->start << PAGE_SHIFT,
+>  						   size, true);
+> +}
+> +
+> +bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+> +{
+> +	if (!kvm->arch.mmu.pgt || !kvm->arch.vm_s2_ops->vm_age_gfn)
+> +		return false;
+> +
+> +	return kvm->arch.vm_s2_ops->vm_age_gfn(kvm, range);
+>  	/*
+>  	 * TODO: Handle nested_mmu structures here using the reverse mapping in
+>  	 * a later version of patch series.
+>  	 */
+>  }
+>  
+> -bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+> +static bool kvm_vm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>  {
+>  	u64 size = (range->end - range->start) << PAGE_SHIFT;
+>  
+> -	if (!kvm->arch.mmu.pgt || kvm_vm_is_protected(kvm))
+> -		return false;
+>  
+>  	return KVM_PGT_FN(kvm_pgtable_stage2_test_clear_young)(kvm->arch.mmu.pgt,
+>  						   range->start << PAGE_SHIFT,
+>  						   size, false);
+>  }
+>  
+> +bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+> +{
+> +
+> +	if (!kvm->arch.mmu.pgt || !kvm->arch.vm_s2_ops->vm_test_age_gfn)
+> +		return false;
+> +
+> +	return kvm->arch.vm_s2_ops->vm_test_age_gfn(kvm, range);
+> +}
+> +
+>  phys_addr_t kvm_mmu_get_httbr(void)
+>  {
+>  	return __pa(hyp_pgtable->pgd);
+> @@ -2796,3 +2846,49 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
+>  
+>  	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
+>  }
+> +
+> +static const struct kvm_vm_s2_ops protected_pkvm_vm_s2_ops = {
+> +	.vm_flush_remote_tlbs		= pkvm_flush_remote_tlbs,
+> +	.vm_flush_remote_tlbs_range	= pkvm_flush_remote_tlbs_range,
+> +	/*
+> +	 * Not supported for Protected VMs under pKVM
+> +	 * .vm_age_gfn
+> +	 * .vm_test_age_gfn
+> +	 * .vm_stage2_unmap_range
+> +	 */
+
+I really think we should have *something* here that returns
+"unsupported", and avoid NULL-checks in the dispatchers.
+
+> +};
+> +
+> +static const struct kvm_vm_s2_ops pkvm_vm_s2_ops = {
+> +	.vm_flush_remote_tlbs		= pkvm_flush_remote_tlbs,
+> +	.vm_flush_remote_tlbs_range	= pkvm_flush_remote_tlbs_range,
+> +	.vm_age_gfn			= kvm_vm_age_gfn,
+> +	.vm_test_age_gfn		= kvm_vm_test_age_gfn,
+> +	.vm_stage2_unmap_range		= kvm_vm_stage2_unmap_range,
+
+and since we have this: can we get rid of the KVM_PGT_FN() hack?
+
+> +};
+> +
+> +static const struct kvm_vm_s2_ops kvm_default_vm_s2_ops = {
+> +	.vm_flush_remote_tlbs		= kvm_vm_flush_remote_tlbs,
+> +	.vm_flush_remote_tlbs_range	= kvm_vm_flush_remote_tlbs_range,
+> +	.vm_age_gfn			= kvm_vm_age_gfn,
+> +	.vm_test_age_gfn		= kvm_vm_test_age_gfn,
+> +	.vm_stage2_unmap_range		= kvm_vm_stage2_unmap_range,
+> +};
+> +
+> +#define KVM_VM_S2_OPS(flavor, ops)		\
+> +		[flavor] = ops
+> +static const struct kvm_vm_s2_ops *arm64_vm_s2_ops[] = {
+> +	KVM_VM_S2_OPS(VM_VHE, &kvm_default_vm_s2_ops),
+> +	KVM_VM_S2_OPS(VM_NVHE, &kvm_default_vm_s2_ops),
+> +	KVM_VM_S2_OPS(VM_PKVM, &pkvm_vm_s2_ops),
+> +	KVM_VM_S2_OPS(VM_PROTECTED_PKVM, &protected_pkvm_vm_s2_ops),
+
+nit: move the '&' into the macro.
 
 Thanks,
 
 	M.
 
---=20
+-- 
 Without deviation from the norm, progress is not possible.
