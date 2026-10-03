@@ -1,157 +1,133 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9748F41A76F;
-	Sat,  3 Oct 2026 14:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703EE446053;
+	Sat,  3 Oct 2026 15:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791039216; cv=none; b=OIyv+uBDpdOJztmMWER7hrw572NTNr/73BP7ZtX2KcdQs5piMCmYZprM4nPz0xStEaCb6g+aQFy7OkHsbkB871DweFo/Fz6Q0uAnrNVIK81RM3Q+/6sAOezVcSw7Aj5jOZoN4HcIiq006uPIkN93XSSZY61zr0HzjuRoLYbMpps=
+	t=1791041420; cv=none; b=gE71rCgVq9AuPP1p797gC5v5a7GU9sW1nFurvNwHOJtK7TbP1x9ia4sopwPsLZiztARNFt6frEDj62n3t7HrQ2+3ShM4QGHqdvTpPJ/08iyhfoz0/BBYWQSgl3+Ag+azg8HG58lxRo0hUCqOmZMv9YO+xazD9LSXhY59Bl1Nezs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791039216; c=relaxed/simple;
-	bh=lPPRuJSXZ04HyzQza9o8U1gXfmMmV67weXtXZvd53kg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PMwBzm9OGxBFpXoc1isEKvgvHRZrmSfmDvqKKzqmHcOtybR1BB4mQOhixUDAQpyAxvMAnWSx8zth/E6KSrAEra8pwRfLtJZy1m1lAnQtMSAKRpqNM5XgUubOM7U+viPtClOJDKa5Rh8AloLUHPwsM8F5AK34VcyYAn96vC00q4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cLtAPnfQ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791041420; c=relaxed/simple;
+	bh=DqNzmiLqSRpWo/O9PN56Vgk4zOzq2vzIekil+azxtfs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Uy5Yxc/lwZ/pjCmubg+TUsyIp7deFUJgm+mZR8FulutT/3pHN1LLsoQZn3DPWpn4bFOWKbbIeESfMa5bmbgPo6f6+HDzRSW4weuTMbVJEokd64o3XQEWh5eqU6KEfsdF/PAbXZu/CDljophegGn+6HWMg7ozEl1Nhdre1TG2uoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=VsluF5b6; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cLtAPnfQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 230A01F0089B;
-	Sat,  3 Oct 2026 14:53:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791039214;
-	bh=l6e5SFKNalWkFlh1k64I5ENSGoQuN42StaikJNmYu/8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=cLtAPnfQRzeVvQpcgjqON68hdJlGOOtb+HQOBeqRbacGFSAFTRUITk0/wliohlVT7
-	 c7KIJlOZaonbgsobntYRapJmnt7vDZj8REwnScMH18aDGTJFC+v5mryxXGy0/krzba
-	 2MeIQ0DzDoaZlAFt7rj4rTJY8pZI4SZ/4F5OpsqSSChAziFmJiMMDbqsDPzDeHGsCt
-	 6Pa9/6rKR5n1Wr84E4vJqusAP8YVeGAqSNDr2o4Txhl0Jip5KJDLyLGN7+gRvg+0Am
-	 VXTr/V2jvauKeV+X4+nE2LCKp75mS0+GUWrbdlta3TyjCoSN/ZB6JjWPra7sd+xV1W
-	 PeiT91ayiDD3Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xD17D-0000000GYMi-3OEA;
-	Sat, 03 Oct 2026 14:53:31 +0000
-Date: Sat, 03 Oct 2026 15:53:31 +0100
-Message-ID: <86ece63kes.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Yize Wang <wangyize7@huawei.com>
-Cc: <kvmarm@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>,
-	<catalin.marinas@arm.com>,
-	<will@kernel.org>,
-	<fuad.tabba@linux.dev>,
-	<joey.gouly@arm.com>,
-	<seiden@linux.ibm.com>,
-	<suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>,
-	<mark.rutland@arm.com>,
-	<zhengchuan@huawei.com>,
-	<jiangjiacheng@huawei.com>,
-	<yize_w1110@163.com>
-Subject: Re: [PATCH 0/2] Batch register access for live migration optimization
-In-Reply-To: <f70c6fe3-e3c5-4912-b4bb-8a418fec4346@huawei.com>
-References: <20260918081930.4014735-1-wangyize7@huawei.com>
-	<861paq69te.wl-maz@kernel.org>
-	<f70c6fe3-e3c5-4912-b4bb-8a418fec4346@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="VsluF5b6"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7B511143D;
+	Sat,  3 Oct 2026 08:30:08 -0700 (PDT)
+Received: from [10.57.8.170] (unknown [10.57.8.170])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 78A283F86F;
+	Sat,  3 Oct 2026 08:30:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1791041411; bh=DqNzmiLqSRpWo/O9PN56Vgk4zOzq2vzIekil+azxtfs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=VsluF5b6kSrZ+AUV4dej8J3hVAA0bso9VTPuE066QFBnPImM3oadyvBD4Og9UtP29
+	 50yVKbbIbWEUm/fpCMSMFhuU/77J7B7JoUuvUqrzDggYJQOP30hz3/M2LO4o+uEVYK
+	 m0MI8bfOukYnTKVm+bkg7o+Z0KqJJtqTlD7KGh4M=
+Message-ID: <9873fb9d-6f32-46f6-bcac-6a52e293d011@arm.com>
+Date: Sat, 3 Oct 2026 16:30:04 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: wangyize7@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, zhengchuan@huawei.com, jiangjiacheng@huawei.com, yize_w1110@163.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v21 10/23] KVM: arm64: Add VM specific callback for S2 MMU
+ operations
+Content-Language: en-GB
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org,
+ catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+ sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
+References: <20261001210703.1597150-1-suzuki.poulose@arm.com>
+ <20261001210703.1597150-11-suzuki.poulose@arm.com>
+ <86ik3j2m5v.wl-maz@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <86ik3j2m5v.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, 20 Sep 2026 10:15:25 +0100,
-Yize Wang <wangyize7@huawei.com> wrote:
->=20
-> =E5=9C=A8 2026/9/18 20:08, Marc Zyngier =E5=86=99=E9=81=93:
-> > On Fri, 18 Sep 2026 09:18:13 +0100,
-> > Yize Wang<wangyize7@huawei.com> wrote:
-> >> This series adds batch register access support to KVM/arm64 to reduce
-> >> syscall overhead during VM live migration.
-> >>=20
-> >> Currently, QEMU issues one ioctl per register when saving/restoring VG=
-IC
-> >> state. On large VM configurations this means tens of thousands of sysc=
-alls,
-> >> where lock acquisition and context switch overhead dominates migration
-> >> downtime. Thus, we provide a batch register method to allow userspace
-> >> read/write multiple distributor and redistributor registers in a singl=
-e call.
-> >> In this way, we can significantly reduce syscalls and migration downti=
-me.
-> >>=20
-> >> Test the VM migration time under pressure conditions.
-> >> The VM specifications for migration are as follows:
-> >> - VM use 4-K page;
-> >> - the number of VCPU is 160;
-> >> - the total memory is 320Gigabit;
-> >> - use 'Redis SET-benchmark' to pressurize VM;
-> >>=20
-> >> Performance results (3-run average, ms):
-> >>      | Metric              | Without patch | With patch | Improvement |
-> >>      |---------------------|---------------|------------|-------------|
-> >>      | Migration downtime  |        536    |     321    |     40%     |
-> >>      | Source (total)      |        344    |     230    |     33%     |
-> >>      |   - VGIC put        |        158    |      40    |     75%     |
-> >>      |   - VGIC get        |        120    |      19    |     84%     |
-> >>      | Destination (total) |        192    |      91    |     53%     |
-> >>      |   - VGIC put        |        132    |      27    |     80%     |
-> >>=20
-> >> Yize Wang (2):
-> >>    KVM: arm64: Add batch group constant and data structure to UAPI hea=
-der
-> >>    KVM: arm64: Add VGIC v3 batch register access implementation
-> > Questions:
-> >=20
-> > - Why only the MMIO registers?
-> >=20
-> > - Why not the sysregs?
-> >=20
-> > - Why only the GIC?
-> >=20
-> > - Why not all of the state?
-> >=20
-> > - Where is the corresponding userspace code?
-> >=20
-> > More importantly, since this is about batching system calls:
-> >=20
-> > - Why can't this be done with io_uring instead?
-> >=20
-> > 	M.
->=20
->=20
-> Hi, Marc! Thank you for the review.
->=20
-> =C2=A0 These patches focus on optimizing GICv3 register access during live
-> migration. We found that there are a large number of locks (kvm->lock,
-> vcpus, config_lock) in the GIC, these lock operations wil cost large
-> time waste. The batches of sysreg for vcpu optimization will come in
-> follow as a separate series. And let me address these questions one by
-> one.
+On 03/10/2026 10:01, Marc Zyngier wrote:
+> On Thu, 01 Oct 2026 22:06:50 +0100,
+> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+>>
+>> Add VM type specific S2 MMU operation backends which can be initialized per
+>> VM flavor, to keep the handling cleaner.
+>>
+>> Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+>> Tested-by: Gavin Shan <gshan@redhat.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> ---
+>> Changes since v19:
+>>   - Add a blank line in kvm_arch_flush_remote_tlbs()
 
-All these locks should be non-blocking by the time you save anything
-related to the GIC, because:
 
-- none of the vcpu can be running
+>>   struct kvm_s2_mmu {
+>>   	struct kvm_vmid vmid;
+>>   
+>> @@ -332,6 +345,8 @@ struct kvm_arch {
+>>   	 */
+>>   	u64 fgu[__NR_FGT_GROUP_IDS__];
+>>   
+>> +	const struct kvm_vm_s2_ops *vm_s2_ops;
+>> +
+> 
+> If you're touching this patch, can you please move this pointer next
+> to the vcpu_ops pointer?
 
-- this must be a single threaded operation
+Sure, I will do that.
 
-So if you are seeing anything contended, this is either the sign of a
-bad KVM bug, or an indication that you are violating the above
-requirements.
+>> +
+>> +static const struct kvm_vm_s2_ops protected_pkvm_vm_s2_ops = {
+>> +	.vm_flush_remote_tlbs		= pkvm_flush_remote_tlbs,
+>> +	.vm_flush_remote_tlbs_range	= pkvm_flush_remote_tlbs_range,
+>> +	/*
+>> +	 * Not supported for Protected VMs under pKVM
+>> +	 * .vm_age_gfn
+>> +	 * .vm_test_age_gfn
+>> +	 * .vm_stage2_unmap_range
+>> +	 */
+> 
+> I really think we should have *something* here that returns
+> "unsupported", and avoid NULL-checks in the dispatchers.
 
-	M.
+Ack
 
---=20
-Without deviation from the norm, progress is not possible.
+> 
+>> +};
+>> +
+>> +static const struct kvm_vm_s2_ops pkvm_vm_s2_ops = {
+>> +	.vm_flush_remote_tlbs		= pkvm_flush_remote_tlbs,
+>> +	.vm_flush_remote_tlbs_range	= pkvm_flush_remote_tlbs_range,
+>> +	.vm_age_gfn			= kvm_vm_age_gfn,
+>> +	.vm_test_age_gfn		= kvm_vm_test_age_gfn,
+>> +	.vm_stage2_unmap_range		= kvm_vm_stage2_unmap_range,
+> 
+> and since we have this: can we get rid of the KVM_PGT_FN() hack?
+
+Ack, I will give it a go.
+
+
+>> +#define KVM_VM_S2_OPS(flavor, ops)		\
+>> +		[flavor] = ops
+>> +static const struct kvm_vm_s2_ops *arm64_vm_s2_ops[] = {
+>> +	KVM_VM_S2_OPS(VM_VHE, &kvm_default_vm_s2_ops),
+>> +	KVM_VM_S2_OPS(VM_NVHE, &kvm_default_vm_s2_ops),
+>> +	KVM_VM_S2_OPS(VM_PKVM, &pkvm_vm_s2_ops),
+>> +	KVM_VM_S2_OPS(VM_PROTECTED_PKVM, &protected_pkvm_vm_s2_ops),
+> 
+> nit: move the '&' into the macro.
+
+Ack.
+
+Suzuki
+
