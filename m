@@ -1,62 +1,56 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B762D42640D;
-	Sat,  3 Oct 2026 12:09:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C8242901D;
+	Sat,  3 Oct 2026 12:14:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791029397; cv=none; b=WZJSQRD2x/S4wIDfGimtePTXoIEicIXEe9aG9is9BcnCqmMM88qiGWJRSY6kKkPjfulJLZi9d5cUFBOPhnSevxIcAprYcfDWSvLZiUz4+hZWzWHOIE+iM0CeNNkLNtjpKPBLCTRS8FcM0iXTh66zGKo9Em+cBATlW6AknEM8nTc=
+	t=1791029656; cv=none; b=WtO4+DW+tFJsnCXmWgIVMXIuInKlWpDQwPo+t9yFpubbw3zm3OpDuShFzu01GdN7ePx9YNMmda7D6rt22UvZVp6tuawhIcQjiti0u6fxkpNdrJ3/p6iGQakd+fcnrqPl68z/kZQ32pSZPvlCxlMPadS/RfKDpXtfthTbipHRbcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791029397; c=relaxed/simple;
-	bh=ydLdX1bv8nacsZrCEgcW2BgJb+FqrrvCBTThW2o2HQA=;
+	s=arc-20240116; t=1791029656; c=relaxed/simple;
+	bh=PG8MFk8vZeYRRW5LAiGEFz8vGHLGlDWs4NQzpkjkbYo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aqZsHz/Zn7V950rT6AuluDjsCIzUOMJqZWX42HnJy3/UntkbKeaeDwE0huU0xZSKgR5VCoQ4WRyP+Dnn+aEM2TRA3UvsmtTvzuQTve7pbj7upH8MlX04JnrFZ6J2M0zWIi1i9DjeMsSzmcT5sv0fVlQUxXH5Odxfg1MtO+Q6Mu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZUIHszFB; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=VHv1K/ClssK1+mrjh/6se56JkkPNC25SGH7gz0n4tneZOGBbMpUqMd6ubHVetFljpkBP6XsiB8RGKOFaeShP38JSOsbT5y2fJoX6Jog0CMfQLPmCJXVFYltKs/sK4lWB2eeKK2JsSvyf1nK+6xkrmjPOEuboarQApFpw+qGZgFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VUw/il2b; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZUIHszFB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4497B1F0089B;
-	Sat,  3 Oct 2026 12:09:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VUw/il2b"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E9101F0089B;
+	Sat,  3 Oct 2026 12:14:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791029396;
-	bh=JGL/QMkXhGp4RMJCeorSCQM1mqxZY8KjXd5vjpbYZ8g=;
+	s=k20260515; t=1791029645;
+	bh=rnNuPBOFoJ+E4mnM/5WK9CbF4T41g018LxYJP+6Inbc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ZUIHszFBWdJL7uEiD1n2erTbHkaqEp6cI1LuyHBgc2W0BgH2BkEoEpNdeEBqKaanV
-	 kVGU8UGOH4N1NhNOTGfTSeCioS/qjrgiFWd0+UoL2RdBZtREfaHpCpOhmJXHdwRwqg
-	 h7KiYD5lkRVB+sXhgyb6CgvkZrRUOxtP1qWU+VkYsrwpE7WJBzuAvRb093gRVceCg1
-	 VjhMEH3QifZ5E0sdPbWGPAhg3x3Z/l0QG40rozyy0ZkhkG/naKDYTB6rm4m/djEblT
-	 m4vnXa+mnEdolmX8hrooGIVRXgA3sK+f8Fsb9n5x/oeDHus+yh/LyESjxBVIzzyGr8
-	 5J3wYSYyC8aNg==
+	b=VUw/il2bzsw+6JTG9oiEg2OoLA10RP+J828Xw8zZRzdGe2qVKHTPJqpuyZh7EQrx5
+	 xj4sn+Rav34r2lrW4e3QGdPQiyJNFrS9tR+akU1HYoRP/mtPtEed10LKlherZSXF8N
+	 M73lIBqYJCdY1D8NkuIIdTaaqFvt8djh/tjMzR2JSu35xIt0fEFGris5GwDq89/ya6
+	 Cf02ufpPTM3PiSzGDWT/29u92hfflYrarWRHAy0Ia6FPmsJe0gf5ExWoQoELOSgq5S
+	 Z0Y6aFTZE/PvR20YdyWu8LrZ5kfCDJBx+a+tiW/qXPpdiMjGVC2PX9dFtAZceQG0Pn
+	 zReuy3uGP839A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1xCyYs-0000000GWg2-1VO1;
-	Sat, 03 Oct 2026 12:09:54 +0000
+	id 1xCyct-0000000GWmb-2c21;
+	Sat, 03 Oct 2026 12:14:03 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	Karl Mehltretter <kmehltretter@gmail.com>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Eric Auger <eric.auger@redhat.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
+To: kvmarm@lists.linux.dev,
+	Colton Lewis <coltonlewis@google.com>
+Cc: oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	pbonzini@redhat.com,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v4 0/4] KVM: arm64: fix VGICv3 redistributor rollback
-Date: Sat,  3 Oct 2026 13:09:47 +0100
-Message-ID: <179102937974.606863.14966815402527336266.b4-ty@b4>
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/2] KVM: arm64: Handle hidden FEAT_PMUv3 in ID_AA64DFR0_EL1
+Date: Sat,  3 Oct 2026 13:14:00 +0100
+Message-ID: <179102963296.607377.2477246563507237480.b4-ty@b4>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260831081005.41346-1-kmehltretter@gmail.com>
-References: <20260831081005.41346-1-kmehltretter@gmail.com>
+In-Reply-To: <20260930211834.2773546-1-coltonlewis@google.com>
+References: <20260930211834.2773546-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -66,31 +60,30 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, kmehltretter@gmail.com, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, shuah@kernel.org, eric.auger@redhat.com, christoffer.dall@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, coltonlewis@google.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 31 Aug 2026 10:10:00 +0200, Karl Mehltretter wrote:
-> A failed REDIST_REGION write can unregister redistributor iodevs while
-> leaving their assignments cached. A retry then skips those vCPUs and leaves
-> their iodevs missing.
+On Wed, 30 Sep 2026 21:18:32 +0000, Colton Lewis wrote:
+> When userspace initializes a vCPU with KVM_ARM_VCPU_PMU_V3 and hides
+> FEAT_PMUv3 via ID_AA64DFR0_EL1.PMUVer, KVM hits a WARN_ONCE("Unknown PMU
+> version 0") during reset_pmevtyper() and continues to expose PMU system
+> registers instead of emulating guest accesses as UNDEF.
 > 
-> Patch 1 fixes the accounting when an individual MMIO-bus registration
-> fails. It reserves the selected region slot before registration and undoes
-> that assignment on failure.
+> Patch 1 handles ID_AA64DFR0_EL1_PMUVer_NI in __kvm_pmu_event_mask() and
+> removes the redundant kvm_vcpu_has_pmu() check in reset_pmevtyper().
+> Patch 2 updates pmu_visibility() to check ID_AA64DFR0_EL1.PMUVer via
+> kvm_has_feat() so PMU registers are marked REG_HIDDEN when FEAT_PMUv3 is
+> not advertised.
 > 
 > [...]
 
 Applied to next, thanks!
 
-[1/4] KVM: arm64: vgic-v3: Undo assignment on iodev registration failure
-      commit: 8a88a46b86ca3dbbd24522760d29edfb3f24ac2a
-[2/4] KVM: arm64: vgic-v3: Roll back assignments from the new region
-      commit: 4dbeadeb6ac44819d0f301c1403552695ecd3ca5
-[3/4] KVM: arm64: selftests: Pass guest code to vm_gic_create_with_vcpus()
-      commit: cb5e17e05bfd80a15c36a51a0386f566cb27e73d
-[4/4] KVM: arm64: selftests: Test VGICv3 redistributor region retry
-      commit: 74c8641bf0b5412b064cfcfaa3603e387aae4b21
+[1/2] KVM: arm64: Handle ID_AA64DFR0_EL1.PMUVer == NI in __kvm_pmu_event_mask()
+      commit: aa41a7c3beb59f9dac4e60c9cf1d146f6c9025c4
+[2/2] KVM: arm64: Check ID_AA64DFR0_EL1.PMUVer in pmu_visibility()
+      commit: 517cdec3d4b28ccf5dae2dd03dee2a0a1eef1981
 
 Cheers,
 
