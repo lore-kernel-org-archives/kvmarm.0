@@ -1,273 +1,250 @@
-Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011055.outbound.protection.outlook.com [52.101.57.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC40347988C
-	for <kvmarm@lists.linux.dev>; Sun,  4 Oct 2026 18:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F40C547D471
+	for <kvmarm@lists.linux.dev>; Sun,  4 Oct 2026 18:09:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791137227; cv=fail; b=IrLhKK+BbqNE3ULwZIQNAxGdd1FsFzDBhkzzqZ6PpJM1bIKe/m5AFEDR+31TEN/TN2i7cpMwFw5XqL96cEGDJ5g7qyvmsP/lmZ9RN4Up+9bTOg6Y5M/GEYPy8OJ6y7kRYsN9v3CBBtEIZn32ztw7cSfVyoTf0sNuXYoEDAUbfwY=
+	t=1791137396; cv=pass; b=HUJzbdXLVc5dyBgDDFDONAcOrgauef3Aj5n2vkDu0PECc0jW7ajO46v5looexhudMOtSw1UwqRu+Y96qMdlxjMtrXJZhVezN8ockMbV8h+EIo+OcXmoFRPnYyul8ckh+2FbWdL/w2SWMP0QSY5/wY+CZTfQI99WV1YzJns+D7wY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791137227; c=relaxed/simple;
-	bh=i8KmsE0pQNQm7Bq2SVjfjPanFF6LruXVJiw6x1WN/6Y=;
-	h=Content-Type:Date:Message-Id:From:Subject:Cc:To:References:
-	 In-Reply-To:MIME-Version; b=Mc6LxPNpNnABf9FPW5iUBPIqCH9QODoRHYNQzW/RN/KkrscLEH9S823aB/b6mTcO2kdjW7xccdbEW6Wo9Fgstu5ytB/vod32ZLMf/yiDqOrdYFYEVeyYdHd3tDkHsmd0X9/Dc4+5C0iPbNTqJzokrb4qAwaMkBwirauzssYbv5s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=QOvGeb1x; arc=fail smtp.client-ip=52.101.57.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1791137396; c=relaxed/simple;
+	bh=p8mpZNJ/Ji/VmSUc1fEHKip1nG8b1aj7rE3YFXNPflA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XMAL57gnDIuv0TT8EZL/XYmGfbEXSvpzDoA1XcuvnXR7c3Rh3H/4j5OjRZzfNXUEe7ULUcoYaaak7xkrXZr2AOtZPsZGf5oVAoJYDhxpBHucf6g+OIlVPJjT0IlJkYk4Uo7DLov894Yict+fnioG38stnYfUlXN+67/jYHzAp9c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cZJ9PFVp; arc=pass smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QOvGeb1x"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vgGw5Yt3EPdBosBy1PvIYMGsB0eZN46t/nDmcJwfgdM/BgkaGXCfvlsYVxQ2Ul5Ou826qW51QgbnCkgauYoMQ3LscBsVrpgEs1jh0rbq3vFZnYSuI0anYGal3pSJjWlSs8d3+5hHpeYWlr2WSUOsqxOKROJT2yjLnnF6vdZLGFtYntGHkNucsgCvaKcGL+QwUE0xBbiuB+esCF6V6/2ypG6qnM2A87/BLALZiJ7WX2q46XK8AtvLSQg0dCDAMdLSBG9ePoIkALYw0WMT9sQwEfYmuHjyW64KwhjGqDk8szeiU97yuesNG8/524raVQJXw5b/nZpUGcTJ/6TGIQVNbQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LKl1Pq8id71YkKUpt3N3dSvtHPnSmyqjIoaUcssKSRY=;
- b=qe7XH2VuKGQOXDcybHbQbrCuWsF4D4HO2cA+A5SiCO8q9JKhXSpJhhQpCIIWq6qw8f/j7NSaysBG93Z0O1U+tP5TyLLuGlupOx+/6O+HjjqBBxJezzsbBXVN6xR6NCWyZMKOwp2otj1CVnFYcKvYhzfY2LGNhoJkcVaMkt8S63uMTNbH6vps2EoxRfshDFC3B2SjRKRtV5YUSH5ap/R0hjBf9UwCctwY3MmOQdFTuIFgxkfsN68k4mgP/IjHR+VO6WzZdWMgqD+Sbo8sjirfuOch7tL/D+BnfIQIgjvjiBMTie0h5F8/fymsCcBkS4m8/jxF5ntvuOg8/d4VzNsnyQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LKl1Pq8id71YkKUpt3N3dSvtHPnSmyqjIoaUcssKSRY=;
- b=QOvGeb1xTBbPwugR+Ewlia464ENfu5yQpqUnHDTbAIjIojV07ImleqrhdVj+rqxp8qGcB4AS5XuaRNdRPTCD7++xiYmrTkDkzAhan2dyrbP7zr7XL5qXiFY/nysXRFv4iv/XgHCFX/0pxYgz1geIk9TrSJpf+Z6ESgBuVpfS1D16eYgq+7/wEUXRaa6p5nBQjjmdg6fcR5ZBNKyiA8iKCMoCKPwNjYtE4+Nkf3JOAqHr6omziGYW7qlGSQTZFUC/iAwmBzmta/HC7yNJMCqZSeeYFNn5pWKV4/KS2+g951nYTHjQXEEtGujSzv2uD8Jyl7PTg1ey1ALESpWACdQBwA==
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from IA0PR12MB8374.namprd12.prod.outlook.com (2603:10b6:208:40e::7)
- by DS0PR12MB8479.namprd12.prod.outlook.com (2603:10b6:8:155::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.472.18; Sun, 4 Oct
- 2026 18:06:56 +0000
-Received: from IA0PR12MB8374.namprd12.prod.outlook.com
- ([fe80::d85f:4c87:ae84:3f16]) by IA0PR12MB8374.namprd12.prod.outlook.com
- ([fe80::d85f:4c87:ae84:3f16%6]) with mapi id 15.21.0472.016; Sun, 4 Oct 2026
- 18:06:50 +0000
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Sun, 04 Oct 2026 14:06:48 -0400
-Message-Id: <DLW95E2XWSVT.8W90FW4WG6K8@nvidia.com>
-From: "Zi Yan" <ziy@nvidia.com>
-Subject: Re: [RFC 00/12] arm64: Add support for TLBI domains
-Cc: "Catalin Marinas" <catalin.marinas@arm.com>, "Will Deacon"
- <will@kernel.org>, "Mark Rutland" <mark.rutland@arm.com>, "Ryan Roberts"
- <ryan.roberts@arm.com>, "David Hildenbrand" <david@kernel.org>, "Lorenzo
- Stoakes" <ljs@kernel.org>, "Linu Cherian" <linu.cherian@arm.com>, "Anshuman
- Khandual" <anshuman.khandual@arm.com>, "Lorenzo Pieralisi"
- <lpieralisi@kernel.org>, "Hanjun Guo" <guohanjun@huawei.com>, "Sudeep
- Holla" <sudeep.holla@kernel.org>, "Marc Zyngier" <maz@kernel.org>, "Oliver
- Upton" <oupton@kernel.org>, "Fuad Tabba" <fuad.tabba@linux.dev>, "Joey
- Gouly" <joey.gouly@arm.com>, "Steffen Eiden" <seiden@linux.ibm.com>,
- "Suzuki K Poulose" <suzuki.poulose@arm.com>, "Zenghui Yu"
- <yuzenghui@huawei.com>, "Ard Biesheuvel" <ardb@kernel.org>, "Ilias
- Apalodimas" <ilias.apalodimas@linaro.org>, <linux-mm@kvack.org>
-To: =?utf-8?q?Kristina_Mart=C5=A1enko?= <kristina.martsenko@arm.com>,
- <linux-arm-kernel@lists.infradead.org>, <linux-acpi@vger.kernel.org>,
- <kvmarm@lists.linux.dev>, <linux-efi@vger.kernel.org>
-X-Mailer: aerc 0.22.0
-References: <20261001110655.461473-1-kristina.martsenko@arm.com>
-In-Reply-To: <20261001110655.461473-1-kristina.martsenko@arm.com>
-X-ClientProxiedBy: YQZPR01CA0136.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:c01:87::7) To IA0PR12MB8374.namprd12.prod.outlook.com
- (2603:10b6:208:40e::7)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cZJ9PFVp"
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-5337fa12431so185371cf.1
+        for <kvmarm@lists.linux.dev>; Sun, 04 Oct 2026 11:09:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1791137388; cv=none;
+        d=google.com; s=arc-20260327;
+        b=N5c5CCG61l4vAUp8o50yCqfy7MmIlXHFXcxxiGMcKN0/EEwU1VoqM/TSFotQLMWNdo
+         o2uonRpa2cBjU4EfHFTt/p+P/BEH6Ev4ryIRQZBPA1tp5CqdAYs1r9kztVM5aDLnabWo
+         QwCrO3bxjOwqJasVSEsVAPN8zABXF2UPErTcoU40Vg+dOyW3net5c48aoUZH+B6uJESN
+         qsiro2jGrxfyXtpPXgDenUIibLEakQPojycSBSh5qPVlIOslzIii7x8bP6+ZTqrZuATd
+         DUPVC2Zod2zLFso4nu6Fu1ckrOwDvx1JOKzvEvqzVuaTeGO7XDE4Qv8W4xx9Q+yqUX0t
+         MUig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=XLyJnDD7le8j0fwG4PV8CX7G4WYRHL5RcOgxsV2u/6k=;
+        fh=1JItDBPh0t8pFIrkRatcO1giZdYB0lwLND9j1C6m5ag=;
+        b=B8wDxwgU8BWX0SjEh9hHetmGMYfGruRjCs8PJiF45OXNE15oO/TQkIlPKpE4D3Decf
+         /g7GEJb9g+AOkc9wZ0SjCVcrmM3sseFGJrdaOc3h/MUSkolYR8/AfgpmVs+N9m6v8eNJ
+         TRVLLou3KoojZtkmnUqk+gtZMpUeaJBMmMbSpo7I5RU2DL/6dnEFWbmdo25R2ikdHXVr
+         ENYh2WDlrfcfdW/nW2uUMXTfS2GS4+a5euqXRpaKqVTOqGSXah3oqiFhrAsJOUP120Tc
+         ggX6LiGRhSS9mX1qmqHwB3cCguLhPLkju+jSDdPSwhZ/aIF/5g4/vMm+07E68BmrANvI
+         gZvQ==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1791137388; x=1791742188; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=XLyJnDD7le8j0fwG4PV8CX7G4WYRHL5RcOgxsV2u/6k=;
+        b=cZJ9PFVpP/PtgS0uhYDksQzNVSdbLOAPm74A9eJXsUCWjOxkiMHVN3IrTG/yriSqU/
+         GEzQMMk9XzfqWmcABqwdcHf7g3q6W6U4F/zphd+ijWnTAV3XjhDZHF7jtP0jvj2wBlQ7
+         PWmUHWhZLARafVjKf6GcfcL7rPPXTsEIc8H9GMlrzzENE2BuI3wya7L6D1p8sVEydQ28
+         fiVlfmGS/Ajd/g6xCN6WbA+p7km6GxpLEg+FQon1ihMc4qvbuQAEgMNBgnnMLSm4e8Ep
+         wLaWFnyGi40J5rc8siqZ9BAC084fL8rNqfxDDMY/M+ngNXEqU5HvY3kkduomg77ohUQX
+         8KJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791137388; x=1791742188;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=XLyJnDD7le8j0fwG4PV8CX7G4WYRHL5RcOgxsV2u/6k=;
+        b=J2WUM2fVV/rnGqPQbcWuXcCAyuK13T6k/xyQDGrBN0Da3jT2R8+0P70SoeaCwCvXVJ
+         XZzr2SP+C4T4uPJdcDVF7v4QmaTF9p5uiVDyp5ywN8TDXCBX+m7ogYtvd8OZOhVHLN/b
+         nAgogXNgCm/V2XXvNGSjllwWK1Gl4U59/klVkBpgWrVyzJKvxZm1odV1TMewa15kQKlN
+         DAaMimgi+ViFMOzF55CX0MXf7EoRnd0l9KMKpthQijUT3grHw2LT1KSBDQwov/hItIFx
+         5n+AFBD9FrDCcLcm7FTibopSKtnHySZveKcfiXW1wQd+NpHA5pjO1IsQLZoNHqXG6HeY
+         MSPQ==
+X-Forwarded-Encrypted: i=1; AKwUvBzRRTza0Y6FMhb2D56ZZpQg9nMJ7T31H0ykQoHQFgCaeDHtZfkuXzOULZk7prcfyxfzzFmStTE=@lists.linux.dev
+X-Gm-Message-State: AFuF++mG5OAkBWgdsmDYHGufL8eNpwR6JpF4URkIXGwEnXe6Qf3URO7Y
+	m8U4X6qfbFMNAV9j+iRKSesY++/c2qozfai9DLwN3SRSyJOj/oZ/uffBCnnNMRqanzXEepz5j0N
+	B1hqXV+qf2pm6B+L5cDLn1Qkx2qMUKgtUGXrCmemN
+X-Gm-Gg: AYBFou1UXLdJFYe1HPHv8wQpdSRbN4s5f9IvVdPVA8fjzIK2o90+HLLBAPRUbrtPS6B
+	d4zvKNMzP5VICE+Yfcf0iNsQxmClzXi4ptTSVt5+JlIojP+U6pX4dkGjgpqDGLxi5Pzzssmcd+q
+	UMqoPwLtFfLD6nw4fjwXZaH2ngbv1rpNa5Kn1P85bnuNiaNQUkJLzcWCyq45xIHqRUJ93K6haFV
+	vvRuTiGeg1OC8l9/nIWkP9+MsnmhDYjfyNzFS7ZtTQjftMpETeGpztN3Gp+I8a+UIIK3gzt3svL
+	5sZuiwgpFOTcUbMSYy5u10bgNMKjqKJljXmuVOK1P+yAVVlK035XwrhA
+X-Received: by 2002:a05:622a:e159:10b0:52f:9ed4:8d76 with SMTP id
+ d75a77b69052e-535146449camr14146121cf.14.1791137386702; Sun, 04 Oct 2026
+ 11:09:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA0PR12MB8374:EE_|DS0PR12MB8479:EE_
-X-MS-Office365-Filtering-Correlation-Id: b2303fad-ba7f-4d9a-e50f-08df2242437b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|23010399003|376014|7416014|1800799024|10067099003|56012099006|6133799003|11063799006|3023799007|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	YG8SbDp3221bnK0U74/vL9hMkGDwxNd+ugi8N606yyH2Gtg5WNDraHWqrSNAvD+Z4pDFpT80gddM3AgUGwimLuqUanvgJTY4FDVyQflVLlbnmH9b/DLNFj0oxCf9UChYc9ndSlfOmxTrRy5MlU5RLcRBfJIjGOt6reDI+x6XysEQsyJANOvLTSn8eNj7d6jjBT89TyEuXCgq2OgLq2btlaNG0HYFlj5vYns+0fKKc+ALd8wz4tU6noVvLbi7HI+vnSIDBbOKO3ed9zmWVjwDTXe271uegekqkcHzQdlkPEBmbSsvSTnTt4La5rUKc95frZttQPJOplkvSh99A8f+pN1w6uz1ev2s196IxuXD5raa30qQXN1KsNwy3mw4csE5hbvfGaS6R/9YZyog/x57sg41ZYU2TLazbJhobGR+jr2WA090szU94E+3L9DrsTKkYXk0OXDSo1uPUtCiZHWPObFPBvJiZJb6cHbmfTkFUnQcXsb1YjQiWQ/LqLIVTJfZL2dcush1iJIg1JwSQSj0fR4YCLaDklRc0tOjhRQU++eaTcPvP23evBnbyAI42LnCbBTbIj71AzE+kDW8b6SJN15J2G4cefhnlkGAjyI7XosdbgpH86Sp+VN3YTO2+6wt0NYmaD+eBtSdE82kP7GbbP25Byio1JoJSXz2+2CZ1GQ=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PR12MB8374.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(376014)(7416014)(1800799024)(10067099003)(56012099006)(6133799003)(11063799006)(3023799007)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?U3FsMWw3Mkh3WE1jNlQ1SUNINlg3ZU1pNDlqRnNMTUV3ZW03MjBWY05NZ29X?=
- =?utf-8?B?RVRaVG92ZU5mRURVMUgyNUZrblVZVFM4aHYyTkNVM3lQRFIyN3ppd1JkbnVi?=
- =?utf-8?B?YnRBbVFMN21oQ0pTNEtnSVZXRnF1Y3NCMndYOCs5UGZkK2hrOVlRbWU5Q29Y?=
- =?utf-8?B?WjlERUJjMlhEWWRQY1VvZkFSSjJXMVdTaTdsUUxSTVlXekY1V3QwZ0Rsdlhj?=
- =?utf-8?B?Q2EyR2h6eWcvYlVqNVovK2V4UzRCTm9zS0h0eGJUVEVrUGxxZHFBVTVkNUpO?=
- =?utf-8?B?QUNmYUlod2hQQjBnOENiSDE2bjlkZVVWWWxaNHpSalNLTjQrWXBIT1R2U3R6?=
- =?utf-8?B?eDBmY3BhLzhselY4THJDZ2NhaW1kbGIzTUZhb0VJRGtIa25sbHpCMU9kSnJr?=
- =?utf-8?B?K1BHckFpYno0YWE2TmE2WlZBUWhaSEJIT0M5cSs4NXpZUkppTG9LMHU3WmR5?=
- =?utf-8?B?SVhBWTZMN1hsZXc3TVJlMWR0NjI1U3ptVE9KMjRWN3gxUE82TllzMFhJZXBF?=
- =?utf-8?B?eFRwR2xDVjdWcXdqNDlwM3l4aDFPOHVpMlZWVHdrKys5UDF6ZytuOHNDKytj?=
- =?utf-8?B?ajk2d1R4ckpIUEUrWGwrT2lzb1FoL0RuWmVkRkVCbmVMSEpkSmdrbytMYVND?=
- =?utf-8?B?dXpBYnRWYmErNFYwaHIvek9OZ1IzY00raGx3RmttamFFSU9jN2NsT2FKbU1P?=
- =?utf-8?B?U2orS0I5QS9XS2N4MWRVZlhtVWh1NUhCVS91Y0s1bk1sMzJvOGxUb2s1RTU0?=
- =?utf-8?B?MGZlQVZVQUlMOHo3NkxUYUtDczZzRFpFQVRRWWQ4NXI0TDlIM3o5SkRxWHVa?=
- =?utf-8?B?WkdJUnFrVFBYREF3UHFwU1FNTWd5THJKTzNDdEpzdTM3K0lOb0Q0akVkU0Ja?=
- =?utf-8?B?VXJqM21MeHhRUStOc2hWbjJLWGdVamp5WHpxWTdSWFRCSTRLbnhmRWRsMkpM?=
- =?utf-8?B?dXd3RmVxbDdsTnhGYjFrWjR0bEQ1bkd2bVRORU56RzArNlZHOFordnRCL013?=
- =?utf-8?B?SnkyZCtKRnJlNFlTSDlkMU0yd3VNbUNzV3VCblAzTVBQUzZZQkpzZ29DVFVC?=
- =?utf-8?B?THg1YlRPU292TmdWU0FVelRRd21nbHVyMEZJbzA0WEpUVlJieHNXRzdmTGZs?=
- =?utf-8?B?YVp5Rm0zOXdQV29uc1NPTnRSa29hNzVyTlpCYXZNR0tJQVN4cC9sMlAxQldP?=
- =?utf-8?B?S013VUtzSHIva1lQMVczOXpxNitoL1YzZHlhVUNmZnlnOEtpeHhUZktoRVpK?=
- =?utf-8?B?SjdydjRQM2hPcXJUZXMrKzRNL3JUV1FHN2Y5WGZtbDd5WVoraEtyRlQyc05N?=
- =?utf-8?B?RHJwTkR1aEgySHUwSWV6SDh3eXIzbzd3dEVsSnZQN1FZM1VDb1Z2WkFuZjdp?=
- =?utf-8?B?eklJdU5WMzh6aG1vTW9CajRNTzEzcnFWTVNpWXpEczhmdnZobFdRQS9rN1li?=
- =?utf-8?B?UWk1SE05MmJYYU5TY3pDTk1tK084Q2djQlphZ245NWFMTmhhcTVUV1JoU1pP?=
- =?utf-8?B?d1I3S2QrZXAwTS9wZVJsNXkxUzRmdHZELzlYc0dWN2JUR250MG1hdVYvV0U1?=
- =?utf-8?B?ak1ES3Rra2ljK1NlWFRqYlNBOFRweklDMDhDTFZIZXJCaG1iN2tka0xSbHlp?=
- =?utf-8?B?cTAwei85OFZwNG9rU3Y4eHJiRkF1dlBXbmRKTjJyUnphRHB2R2VSRkgydDA4?=
- =?utf-8?B?b3lRZGNDQlhQSnYyenhadndwM25EaGR0Q1BzWEw2QVJPd1g1aUtNR2d1RUZs?=
- =?utf-8?B?UkZiVnpCSTZMRWdNODVGeGZOTlkwSElkTGIwRWtwM2QyQzZpeTZkQ0dOMG1W?=
- =?utf-8?B?Vzl4VTIyL0w3ZzZMNEZucFZyR0lJVitxRHl4SmxHdmlDVVJBNFkxMGowbThN?=
- =?utf-8?B?VjBMZXlQdjhrdThQZE8zNmVPZzhIQkpzVkNvbGRnc0lkU2ZsUHdLYlNnK2JZ?=
- =?utf-8?B?eHdXN0wwcVdwcWx2RzZLT1V6aXZDblIzQ011K2h4S1piTDQvcWk5UUVTTmx2?=
- =?utf-8?B?cWpXb1VuRStRZThsT1E3Qjk3RVFkTFZhQmI3ZHRTZTVaRm81WGh3ZVUrNllv?=
- =?utf-8?B?YTdKSndNNVoza2FqemxFU1lXcCtDSW5WUzlDWE40N09HRWhlcmgrdWJHR0No?=
- =?utf-8?B?ZkpVRFRnVjU5dTJxN0cveEpCVUVCQmJDN2UyNDFwOWoxeHFJM0FGOVZHcFZL?=
- =?utf-8?B?dktyWnM2WmpYcFVTYWYxOGN3R2ZPSlJWcmpibFd6cVhyaGRhTGpBSnVxWFNN?=
- =?utf-8?B?Q09sVmY5ZnlHZWdOZlNxUW04U0NXNnRKZnBsdWxaMEdiRXhEbVdaNUdnL2hk?=
- =?utf-8?Q?udgJfHDof4oLWJ84Wr?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b2303fad-ba7f-4d9a-e50f-08df2242437b
-X-MS-Exchange-CrossTenant-AuthSource: IA0PR12MB8374.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Oct 2026 18:06:50.6717
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lw3as9qm8Yr60/LalEpHR2zBOc9gmZP9NFUGiyUAYftemw1lSX9sc8Mgw/AcJ+iT
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8479
+References: <20261003-b4-mmap-prepare-vma-flag-sanify-v4-0-a1f052500fd7@kernel.org>
+ <20261003-b4-mmap-prepare-vma-flag-sanify-v4-19-a1f052500fd7@kernel.org>
+In-Reply-To: <20261003-b4-mmap-prepare-vma-flag-sanify-v4-19-a1f052500fd7@kernel.org>
+From: Suren Baghdasaryan <surenb@google.com>
+Date: Sun, 4 Oct 2026 11:09:35 -0700
+X-Gm-Features: AclHuK-kwJ_Uo7kW-aV-ulJRzQPF_vjK2tdCaS-4gRgk6ACv9UztvH0OKE8MWEw
+Message-ID: <CAJuCfpFKJ+31TZOWhwoTQTseOEy0AgAjz5eK9fdXmL40D0OY6Q@mail.gmail.com>
+Subject: Re: [PATCH v4 19/38] HSI: cmt_speech: convert mmap hook to
+ mmap_prepare, refactor
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, "Liam R. Howlett" <liam@infradead.org>, 
+	Vlastimil Babka <vbabka@kernel.org>, Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
+	David Hildenbrand <david@kernel.org>, Mike Rapoport <rppt@kernel.org>, Michal Hocko <mhocko@suse.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Leon Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>, 
+	Stephen Smalley <stephen.smalley.work@gmail.com>, Jaroslav Kysela <perex@perex.cz>, 
+	Takashi Iwai <tiwai@suse.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
+	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
+	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
+	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
+	"Martin K. Petersen" <mkp@kernel.org>, Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, 
+	Sebastian Reichel <sre@kernel.org>, John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, 
+	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Muchun Song <muchun.song@linux.dev>, 
+	Oscar Salvador <osalvador@suse.de>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
+	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
+	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, 
+	Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>, 
+	Ying Huang <ying.huang@linux.alibaba.com>, Alistair Popple <apopple@nvidia.com>, 
+	Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
+	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, 
+	Baoquan He <baoquan.he@linux.dev>, Youngjun Park <youngjun.park@lge.com>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Qi Zheng <qi.zheng@linux.dev>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Axel Rasmussen <axelrasmussen@google.com>, 
+	Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-usb@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	selinux@vger.kernel.org, linux-sound@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, 
+	fuse-devel@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu Oct 1, 2026 at 7:06 AM EDT, Kristina Mart=C5=A1enko wrote:
-> Hi,
+On Sat, Oct 3, 2026 at 6:39=E2=80=AFPM Lorenzo Stoakes (ARM) <ljs@kernel.or=
+g> wrote:
 >
-> This series allows the kernel to use TLBI domains. TLBI domains (FEAT_TLB=
-ID) is
-> an Arm architecture feature that enables a TLB invalidation to target a s=
-ubset
-> of CPUs instead of the whole system. It can improve performance on system=
-s with
-> many CPUs. TLBID is not yet part of the Arm Architecture Reference Manual=
- but
-> some of it is described in the latest XML [1].
+> Use the mmap_prepare in favour of the deprecated mmap hook as part of the
+> work to convert one to another.
 >
-> The goal of this series is to send TLBI commands only to the CPUs where a
-> process has run (i.e. where its page tables have been installed). The las=
-t
+> Since this is simply a refcounted kernel page that has been allocated, it
+> should not be marked VM_IO and should be inserted using the kernel page
+> insertion mechanism, so convert it to do this instead.
+>
+> Use the VMA descriptor's private data field as a scratch buffer to store
+> the page in - this stays valid throughout the kernel page mapping
+> operation.
+>
+> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 
-IIUC, mm_cpumask() is used to store this information on x86 and other
-archs. I see you put this information in tlbid_domains of mm_context_t
-from patch 9, although in the form of tlb id domains. I wonder why not
-make arm64 also update mm_cpumask() like x86 and other archs and derive
-the tlbid domains based on mm_cpumask() and a cpu-to-domain mapping
-(added in patch 7).
-
-Thanks.
-
-> patch explains a bit about how it works. This is an RFC since I'm not fam=
-iliar
-> with the kernel's TLB/mm code and I'd like feedback on whether the genera=
-l
-> approach is correct.
->
-> A few notes and open questions:
->
->   * Domains are described in a new "TLBI" ACPI table. This is not yet par=
-t of
->     the ACPI specification. There was an initial proposal [2] but this se=
-ries
->     uses a newer WIP version of the table that aims to be published by th=
-e end
->     of the year.
->
->   * There is currently no device tree binding since the feature is mainly=
- meant
->     for server-class systems.
->
->   * It's also possible to use TLBI domains to limit a KVM guest's TLB
->     invalidations to CPUs where the guest has run. I'll try to include th=
-at in
->     the next version. This series only disables domains for guests.
->
->   * With this series a long-running process may eventually run on all CPU=
-s and
->     just issue broadcast TLBIs. It may be worth periodically reducing the=
- set
->     of CPUs but it's not clear when.
->
->   * There are currently no performance numbers since there is no hardware=
- with
->     this feature yet.
->
->   * The series has been tested on an Arm FVP which supports the TLBID
->     architecture but does not have any domains (except domain 0).
->
-> Any feedback is welcome.
->
-> Thanks,
-> Kristina
->
-> [1] https://support.arm.com/architectures/a-profile-architecture#Download=
-s
-> [2] https://github.com/tianocore/edk2/issues/11999
->
->
-> Kristina Mart=C5=A1enko (12):
->   arm64: sysreg: Add definitions for FEAT_TLBID
->   arm64: Detect FEAT_TLBID
->   KVM: arm64: Hide TLBID from guest sysregs
->   KVM: arm64: Hide TLBID from guest instructions
->   ACPICA: Add TLBI table definition
->   ACPI: TLBI: Parse domains from table
->   arm64: tlbid: Set up CPU domain bitmaps
->   efi/arm: Check return value of init_new_context()
->   arm64: tlbid: Track the TLBI domain of a task
->   arm64: Support TLBIP instructions
->   arm64: tlbid: Pass domain to TLBI instructions
->   arm64: tlbid: Add documentation
->
->  Documentation/arch/arm64/booting.rst    |  10 ++
->  arch/arm64/Kconfig                      |  12 ++
->  arch/arm64/include/asm/acpi.h           |  10 ++
->  arch/arm64/include/asm/cpu.h            |   1 +
->  arch/arm64/include/asm/cpufeature.h     |  15 ++
->  arch/arm64/include/asm/el2_setup.h      |  76 +++++++-
->  arch/arm64/include/asm/kvm_emulate.h    |   5 +
->  arch/arm64/include/asm/mmu.h            |  13 ++
->  arch/arm64/include/asm/mmu_context.h    |   9 +-
->  arch/arm64/include/asm/tlbflush.h       | 219 +++++++++++++++++-------
->  arch/arm64/kernel/cpufeature.c          |  25 +++
->  arch/arm64/kernel/cpuinfo.c             |   3 +
->  arch/arm64/kvm/config.c                 |   6 +
->  arch/arm64/kvm/emulate-nested.c         |   1 +
->  arch/arm64/kvm/hyp/include/hyp/switch.h |   7 +-
->  arch/arm64/kvm/hyp/nvhe/tlb.c           |   2 +-
->  arch/arm64/kvm/hyp/vhe/tlb.c            |   4 +-
->  arch/arm64/kvm/sys_regs.c               |   3 +
->  arch/arm64/mm/Makefile                  |   1 +
->  arch/arm64/mm/context.c                 |   6 +-
->  arch/arm64/mm/tlbid.c                   | 210 +++++++++++++++++++++++
->  arch/arm64/tools/cpucaps                |   1 +
->  arch/arm64/tools/sysreg                 |  53 +++++-
->  drivers/acpi/arm64/Kconfig              |   3 +
->  drivers/acpi/arm64/Makefile             |   1 +
->  drivers/acpi/arm64/init.c               |   2 +
->  drivers/acpi/arm64/init.h               |   1 +
->  drivers/acpi/arm64/tlbi.c               | 196 +++++++++++++++++++++
->  drivers/firmware/efi/arm-runtime.c      |   3 +-
->  include/acpi/actbl2.h                   |  32 ++++
->  30 files changed, 858 insertions(+), 72 deletions(-)
->  create mode 100644 arch/arm64/mm/tlbid.c
->  create mode 100644 drivers/acpi/arm64/tlbi.c
->
->
-> base-commit: 93f51579e7df248780214094418f205253383cc5
+Reviewed-by: Suren Baghdasaryan <surenb@google.com>
 
 
-
-
---=20
-Best Regards,
-Yan, Zi
-
+> ---
+>  drivers/hsi/clients/cmt_speech.c | 33 +++++++++------------------------
+>  1 file changed, 9 insertions(+), 24 deletions(-)
+>
+> diff --git a/drivers/hsi/clients/cmt_speech.c b/drivers/hsi/clients/cmt_s=
+peech.c
+> index 7226677ebde7..801697b74d4f 100644
+> --- a/drivers/hsi/clients/cmt_speech.c
+> +++ b/drivers/hsi/clients/cmt_speech.c
+> @@ -1084,22 +1084,6 @@ static void cs_hsi_stop(struct cs_hsi_iface *hi)
+>         kfree(hi);
+>  }
+>
+> -static vm_fault_t cs_char_vma_fault(struct vm_fault *vmf)
+> -{
+> -       struct cs_char *csdata =3D vmf->vma->vm_private_data;
+> -       struct page *page;
+> -
+> -       page =3D virt_to_page((void *)csdata->mmap_base);
+> -       get_page(page);
+> -       vmf->page =3D page;
+> -
+> -       return 0;
+> -}
+> -
+> -static const struct vm_operations_struct cs_char_vm_ops =3D {
+> -       .fault  =3D cs_char_vma_fault,
+> -};
+> -
+>  static int cs_char_fasync(int fd, struct file *file, int on)
+>  {
+>         struct cs_char *csdata =3D file->private_data;
+> @@ -1256,18 +1240,19 @@ static long cs_char_ioctl(struct file *file, unsi=
+gned int cmd,
+>         return r;
+>  }
+>
+> -static int cs_char_mmap(struct file *file, struct vm_area_struct *vma)
+> +static int cs_char_mmap_prepare(struct vm_area_desc *desc)
+>  {
+> -       if (vma->vm_end < vma->vm_start)
+> -               return -EINVAL;
+> +       struct file *file =3D desc->file;
+> +       struct cs_char *csdata =3D file->private_data;
+> +       struct page **pages =3D (struct page **)&desc->private_data;
+>
+> -       if (vma_pages(vma) !=3D 1)
+> +       if (vma_desc_pages(desc) !=3D 1)
+>                 return -EINVAL;
+>
+> -       vm_flags_set(vma, VM_IO | VM_DONTDUMP | VM_DONTEXPAND);
+> -       vma->vm_ops =3D &cs_char_vm_ops;
+> -       vma->vm_private_data =3D file->private_data;
+> +       vma_desc_set_flags(desc, VMA_DONTDUMP_BIT, VMA_DONTEXPAND_BIT);
+>
+> +       *pages =3D virt_to_page((void *)csdata->mmap_base);
+> +       mmap_action_map_kernel_pages_full(desc, pages);
+>         return 0;
+>  }
+>
+> @@ -1353,7 +1338,7 @@ static const struct file_operations cs_char_fops =
+=3D {
+>         .write          =3D cs_char_write,
+>         .poll           =3D cs_char_poll,
+>         .unlocked_ioctl =3D cs_char_ioctl,
+> -       .mmap           =3D cs_char_mmap,
+> +       .mmap_prepare   =3D cs_char_mmap_prepare,
+>         .open           =3D cs_char_open,
+>         .release        =3D cs_char_release,
+>         .fasync         =3D cs_char_fasync,
+>
+> --
+> 2.55.0
+>
