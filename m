@@ -1,194 +1,343 @@
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010034.outbound.protection.outlook.com [52.101.85.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1FBE4B1293;
-	Mon,  5 Oct 2026 14:53:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.34
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791212035; cv=fail; b=WkY4wVXv4HHbjMNpXR1AZYJsCt3PQgFQAocLEcfKrkRokXBxd6nX99ekFlfUoHsFIcOgwsxPcEWfmZ7v6dlpzlRovZzzqLvVus0B2daJ6zZNX73C8EC3iXJr6QMpsNAiUydyqd54pqROB0PzHvXssKxxONarPdiVwusuE5Y5Q4o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791212035; c=relaxed/simple;
-	bh=hGdULoe/W2dbSVyhiNd/guNApPkDuDmLF1WFcRKixlw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=P8iaSUhJE3dWPV+Yx++pxdJu5Fpd7IvkgAj/6PQdgW2Jynt/M0EnoAGr/OSefLruMhUHJ2KuCT3G3cCkyE/4v3iLIGzbd4HILeONeNX1X7ep9EA5qBU67W5kxH2a/R30zpOhUJG5udLBrztWYbjzCLFtT3SbzcvUvyMFT02oBrg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=wIGvIAAW; arc=fail smtp.client-ip=52.101.85.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8183C4BB288
+	for <kvmarm@lists.linux.dev>; Mon,  5 Oct 2026 15:02:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791212542; cv=none; b=g3Vrrn9haXMZ7HlX+7P4bZb5OKVql8aWSX54TBQ0ONi42WRUM+AuIzDEjynLiXT4jT2M+tWMwyXuANx70h+2lbmGAse6YFsHTUPAJ2h+1Pm/jCVT9tqsz17y+VhI+1KjDdVR5avf4YhDUj12g5MfL3fciVk4TlrTyXGzHYj0GoU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791212542; c=relaxed/simple;
+	bh=J3uLqr1bwxQ3KPBelR/UqUHMgCgoV6kG7kJMNY3ASQ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dy8KvhSXmB6HiTRr0mwYwijdFftvXLLsN9nzfFaF+WHgUKSSLRzDpDb8jOcaOWzdCeVjHDyzAgU0IL3+1dImehr5EDVZb2fIdNvfxVgO6NzUXC/ff+ezQgJc3THvIyG47pPjtAM7bUv4nUK0p1D5iraMUyoiolixrNlZAYvxm3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kgifhqba; arc=none smtp.client-ip=74.125.225.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="wIGvIAAW"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Pw3lf1bFTBSStJfEdjrCIrBSNkTC6D00dtZfizWfRjPoZMA0eRKpzx2msy2tRNMK+xukBQxSlG7JzIBafsMqmMV3IVurp+FSPKTLbamM/bkPgJr8grYFsHtVJDEiGRly4a7EX2wWcXw812kxm9yNzqtPheFwa3LV+0e3pFdVwvVSf+DnpO/6/E8/HS77jfjBI7WtRyzUD8u0xw/KrcvmUeSWzSHuCskK4Y0oX7KwqMW1b3eZWQJiwcgicvXBbaWWGChJHixNSK57919HYjamRfZpOLIc4ApGaSQbpA9fm6p31E0rsiSKfIfd/IQaEXyC2ECUoGXIhLdgHltWHbOghA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xhYYD7fuqcEAqP8b+0LuUdhivoZIMdrxyhMC5z2p9gw=;
- b=ORZq6mJpMNo8JqZweAKESr2IUbYSuWZQJX6/oC1KXTgmHsuQmF3JzhlPN1kLNI7LBmiRPybhtslCSYJlzb4jc0xVoNfmrfUvJJj/nExXl1/ON+cvwCtciD8AcsEhWg/u47z7I7aEPNB2VVKjuUZyMSnBAAW33+Fmyz/+T+ZS4Fuy5WyISTKxIGnTf2DcDmBJ1yKyoOlpabk9zH0SFJOigEtvl/ljILckBLj6RuIT8jIL0HIaqQfKwWJZcnmT2qyaFz5fX6970HgrNI6Qvs2HToD9s9ERxajS4CVBWhTYBmSKEWdplWK8JsT6/M46URq8zDd0TZ1Mx/l6xl2bJgx8yw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xhYYD7fuqcEAqP8b+0LuUdhivoZIMdrxyhMC5z2p9gw=;
- b=wIGvIAAWRpVTelaHn5Xf4TclnHJYErRu37kJxH+pnH/xAOt0jRFJFktlzFAUi2Fq0pLTUcBifmyk5OtHjOF+OZRqxas9t1uckJhfAgzdOapw3RaaKL3OBoqPUbOYu3dbM0NIvr2S9lmN4PR6M1a5ucw4jNdIOYlXouKDwLGOTEo=
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
- by BL1PR12MB5729.namprd12.prod.outlook.com (2603:10b6:208:384::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.451.26; Mon, 5 Oct
- 2026 14:53:47 +0000
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::ce69:cfae:774d:a65c]) by PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::ce69:cfae:774d:a65c%3]) with mapi id 15.21.0472.016; Mon, 5 Oct 2026
- 14:53:46 +0000
-Message-ID: <f0077cec-10fe-400a-b229-f7434e297364@amd.com>
-Date: Mon, 5 Oct 2026 16:53:34 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 2/6] dma-buf: Add get_phys() to describe a physical
- run
-To: Fred Griffoul <griffoul@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oupton@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>
-Cc: David Woodhouse <dwmw2@infradead.org>,
- Ackerley Tng <ackerleytng@google.com>, Joey Gouly <joey.gouly@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, Steffen Eiden <seiden@linux.ibm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- "H . Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
- Robin Murphy <robin.murphy@arm.com>, Alex Williamson <alex@shazbot.org>,
- Shuah Khan <shuah@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org, linux-kselftest@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, x86@kernel.org
-References: <a04f17cc-f59a-4240-81c8-29776eee3a2e@amd.com>
- <20261005132046.30025-1-griffoul@gmail.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-In-Reply-To: <20261005132046.30025-1-griffoul@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: YT2PR01CA0021.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:38::26) To PH7PR12MB5685.namprd12.prod.outlook.com
- (2603:10b6:510:13c::22)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kgifhqba"
+Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49b912d8239so16285175e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 05 Oct 2026 08:02:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1791212539; x=1791817339; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=lQ07Wpw/41IyXuGwO1TNf2h3w/qx6ENdaCXlHUoPSxo=;
+        b=kgifhqbaNwzRhZsX9BTmY4OtpJzv2k40We5pLBh8neHxO2/KEJfpzqdgZqk2VFb4/j
+         7y/vHU70p5e0XGkyfbC06LXjzZtI8iLsXYXE7bPi/LK5Hzo54Ds5BdFsA1ylt/f6bMt4
+         oFCSF5O0XWlzUjKBSuDi9RJjVfdV1TndXvME+ewFTI3DVNTRY504K1hzPEet05IfpPEf
+         CKUakG0hcCilQmzL4lmSZg3niUth+0SrPvCMsF31mHVi67P8hyWTMBH/iuEzj7awhJl7
+         +76F5dQ3APxu7YaKJK3F6Xxdf/MZ3FJHnYdrMVCpqlMT+VNqKp/WVt1fTMdBvqOzN3fm
+         nAqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791212539; x=1791817339;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=lQ07Wpw/41IyXuGwO1TNf2h3w/qx6ENdaCXlHUoPSxo=;
+        b=2ViPQJT95aVi6wsQHGHFzqe1RdLfqRwa6gR57OlXSNG7E2wyNazCriD4eeteHDD1P7
+         hCy0cWUKbJCiX+I4mR8EyS4bkzYFcXg8ImFctF73e3kNY1lqdwVA79hUVaAdUoxuUdP/
+         Jh6JQYPogfwopgMKSmEeI9pSCU6sIB+HUzLHetTq1EJQfFNs0KDQgN8CQGms3at5gwGz
+         WvvuxeuTKQYLjgW+vY7ltl8ZU+l3o6ehB9ZP9UdxRycDBJ+hNl2MDtnYz+0iHlnaSmsN
+         DAzmlNSbqRhdoyAZC4+VGHsrGhzKWmLIeRPLhivTFItB5EsvWvMs89ZN8gDhmPmnlxC2
+         upUQ==
+X-Forwarded-Encrypted: i=1; AKwUvBx3oDgbHI5ZGgRambK5qv+FYB1VWu5LRmXgDapmnS+qrPks9IbPIspkpOeruS+seewVO//Vinw=@lists.linux.dev
+X-Gm-Message-State: AFuF++kZ3clJiHPGG/YdQXeFkFgTdBz8or453xr3H3lxMUaiYr9fkFmI
+	E1XwAb+aYyQIRDgPc3jsiRBqs1dvTJNLJLqXC/QAP5t6p431z8il8E9AWpS6kONbnw==
+X-Gm-Gg: AYBFou1JEsdvh4vmfpBYMRbM8vopDOicinLPr4NlRlZ8l68N2R9HC6AYWlmxOABRPjI
+	Zv/BuZCSeku5CO+/ebo5oO6ntWlASBeqrB+fF/SLSKYlIesxdHo7OrGuTBLNpVdbWappg+o9Mly
+	yW6oqKsLBXnojSEI4OqTBtMrYVikwQ8eXBV5KDyo4zwnM07PwixvWjAEUYT6aukCNK4wPUzdMD3
+	vditmRpUMvuR4d7SAx7eyLh+uB9Tu2bwSQyawOWnh+M4Bz6A5Tqp4IsHzrrbzo4kusu9U0XOkG8
+	+G53UAXI+npLzuDuuLR8CKU6mdiAdAdVj/i9hfay/9TEyQlX1OsbrCubu5PGmAHCzThPrbL1YDf
+	f3aZN3Iq+7qSXNL1FT5te+eQIMU0pbDya8RYroBzYLnHutiiqxUhcwgn5ToRDmCGrXf0Eo+Hbyt
+	a0l4iAAna6LruAVUIpnBgYAUyrbE5t89k+J/u6LjfZzxbAX04KUIeGqsV4TVeyXlbyFcNQaOdfN
+	MoSFg5vwnMCU3lQ3iTj9TWMsm+X/1H/fxtG/R5FQiE=
+X-Received: by 2002:a05:600c:4e4e:b0:4a0:62d:4424 with SMTP id 5b1f17b1804b1-4a027566f93mr192858015e9.8.1791212537927;
+        Mon, 05 Oct 2026 08:02:17 -0700 (PDT)
+Received: from google.com (197.183.140.34.bc.googleusercontent.com. [34.140.183.197])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1785398b5sm156955e9.2.2026.10.05.08.02.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Oct 2026 08:02:12 -0700 (PDT)
+Date: Mon, 5 Oct 2026 16:02:06 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+	oupton@kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, tabba@google.com,
+	sebastianene@google.com, keirf@google.com, qperret@google.com,
+	linu.cherian@arm.com
+Subject: Re: [PATCH v3 2/2] KVM: arm64: Support BBM level 3
+Message-ID: <asO77kvqqwCsJt8I@google.com>
+References: <20260904132855.638117-1-smostafa@google.com>
+ <20260904132855.638117-3-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|BL1PR12MB5729:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5180c871-a821-4b99-440d-08df22f07562
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|23010399003|10067099003|11063799006|56012099006|6133799003|4143699003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	UMx0b+52OJCYLOf3oRoulDZIGT5QrLnzOPNMCapQVSyRURB5fCSysSsCDls0m/nsgU+Rewv0hwM6sGISOslSxlDf+V1525NPxJ3b6a3KpwPI2G614zfLeZpctlIy7hrtl4VH53G2goXj7KlcD2XMdgVHRRxZ+QF7cH9zYnN5PbCbBXDOLzm6a7KZuOScVS41NpxCR7fijpnvixJNIipadhiZDk4yTqIbuj+Oimh3R/UrIelVMAXFSvaLP34R+oCB7yihEiuv8FBHn1PMGc4AFBe6iGt69gntVEx7Z/f1JN53fQ+8yytRU4X91Ox3DBfYowNwGYcAtLF/40KTzNC7HH9OvoDlF33Cfc1WpX6zYDE8oW5hZ9LJK5qnBG+G1GWbbqqeKBZJmYt8Gujq7MJc1ehEJ3bscl9n8/JRFjEJmWRUaHr4mfgUzX7tBNUVkY/uj6w2DoVeeldjKURa5CE0pox0qOcLBcJRdczt6Nz+yOJsMU8QQXHjqzMwdla9J4G5BYx2QTklmlfQSiCK+hQ/6QudiHQMd+5G+J3jORC5BCXzmyU9jOdJcCYzLcFKA4X+VZCRb5UGKckeTYm6JKBj7sV0kJ5o6wm19Yv+0O1SAqpzwOkZ7Fjx3vuZGdHl8P53
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(23010399003)(10067099003)(11063799006)(56012099006)(6133799003)(4143699003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UUZnZzlQU0J0SkJkUTdIYzlWSEhvRHJ3VlVBbE80Z1A1L0lTU1ZLTll4bmVi?=
- =?utf-8?B?a211M0o0QkVyMWxhM0JKZGNCQnJmTEFzRk9ON0k3eTRadU1zQVZYUTB5bW8z?=
- =?utf-8?B?eDhaQ0FnVDlsRUM2VUJWRTJZa2pBSlJMQWhrbmNWZ1Z6ZTJuNUkxdFNMeU4y?=
- =?utf-8?B?M2hOUHY1bEtUWHNlOSt6cm5XcXNmSjByNHcwd1VvNlEvSVZsamdVdmFxS3Ax?=
- =?utf-8?B?c05sUkQvWjhOVWV0M1ExQkoxT2ZrTzF6RmhPNVVBNWtzMFkwaDhQejllZnc3?=
- =?utf-8?B?OXNSbG41L2hvdSs3OVlUTlo3ZmR6T29XbVNUOEwvU1BxVmNjK1V5dmhpSUEz?=
- =?utf-8?B?OWRwNk1ubWcra3VrVitDRTNwVUtpaVhDY284RFFKc3pjdUtmcWlHQjJUVFRM?=
- =?utf-8?B?Y2xhLzNyT0VRUDlZd3V4ai9ld0pISFl4Mi9Jc0lFcFZ0bk1QZ0d6ZVdOZjRt?=
- =?utf-8?B?a3NBUHUxbTQyRTliZk84TktrMG1WaUFyNEdZNzcrS0trNTZLdUNJQ3hXQnh0?=
- =?utf-8?B?Z2hHQTZNL1BwVUZaTWhXTEc3dm1hbXZ1UFZLWUNSUGRsTjcxV2FWNm9CMnBB?=
- =?utf-8?B?WjBuUEI0VUo2YXVyUVM1UjgyZFNRMGlmUnQ2aVZNNDZsMWFvOHVDU2dYYXlp?=
- =?utf-8?B?VzV0Sm1QRGRNQzBwNHI1aFVyaW1HQjhNRmlPcUpiZHpoWWp0cHpJUWNBYWJ4?=
- =?utf-8?B?RjJXdW9yUmQ5ZWFKazlMSTlHZVpnMTZaV3l3VEs5czNYQitiWGJOZi9admRy?=
- =?utf-8?B?SmpVSkphclViTldydnc3Y0VjNU5tU2l3akVSUG9TQW9qY2h4dG9uOWhBdWh0?=
- =?utf-8?B?WEk0UjhqWHEybUpqNEl5Ly93dGVsYXJwVHU5QVAzU2puVWRxZGUvV3g3b2dp?=
- =?utf-8?B?WkZ4a1kvc3VsSldKWUNEYXFFYkZqaDlqV1l2aDRkc3VxMmg1N2t1dEdMalhV?=
- =?utf-8?B?a3MrRWEzL3JtdmFQYVcvY05PSmtML1VkVnk0OUt2UUJRekJybDdZSDVnS1V5?=
- =?utf-8?B?YXJPWStxbWRyTVhyQWYwbDlkcTA5bXhEbkR2ZWRobXFuV29UVFY1c1FRbDlB?=
- =?utf-8?B?eTg1dThBMzVwNHdldTdCM0ZsR1lQajBleEtPcUtHcW1NZnJXeFRielMwa1c5?=
- =?utf-8?B?MkxMZFJLZ2UxeHJzRHNFL1hSY2RSSEpzMEgwRDFTakR6VGVQOFVaQS94OEhN?=
- =?utf-8?B?WDVLMjhoNG51Uk93YWQwVGVDT1V5cGd2UlEzd0dBRkU0VmRESjRQTERrUXB6?=
- =?utf-8?B?RVBVMDhvMER5M003RzRPVWJWNGU2ejlqZzNDR3lSWUVsVmh1dGRXdlJlWUpz?=
- =?utf-8?B?djJRQ3QwZzNwditmVmRCZ0cvZHVQMHdqd3RvMnZDSzVPT2lMZWVJMEhTSWFz?=
- =?utf-8?B?LzRmcFp4bGFiaXBZTENuV2VnWVJBTWpNcyttR1BCeDUzRElrc0NyL3F3eVFK?=
- =?utf-8?B?N0ttaVJYdFNqbHRoSTVVZnA2OFBibEUwRTduR3BtU0h0NHlMaHVLZ0F3dUQ2?=
- =?utf-8?B?bUlFM3dBakdDbEpxSWh2T1gxeFFnekFyVEZYYUxQSm5DNFhVNmxYcUpXdWxK?=
- =?utf-8?B?dDNpV1Yray8ycXdVaVBqeFk2Qzlpd1NBclVsLzRleVJWV25nQVpkN1cwTVBJ?=
- =?utf-8?B?OEQ4RFFqSGc2bWhuZXVCeVM1eDZWUjVPV0pkcVlmMkNOSHh5T2ZoYjd4c2Y1?=
- =?utf-8?B?U2hxc0xBNWRhTFlrYnVpZW85ZzRGMFFNaTk0Y0V4VjdQQXd4MWNUYWtMdkNK?=
- =?utf-8?B?UFNZMXNIS3RIN25BQWVmWVA3dGZTV3AxQnRjQTRNY3NXM2w1YmJaL1duZTBE?=
- =?utf-8?B?VmN0LzlUVVlHWThyZm5pSFVCMG9GMDFqMWVnRWN0YkZZcmFLOUNLK2MreWtq?=
- =?utf-8?B?RUtQaUt6TTJ5aHllWE84T3J4ZzV0T2dpaEs3a1Y1SnY3MlNxUmdxZjNNc1dP?=
- =?utf-8?B?R0pwc1NFNnRFVzQ0VW1YVDNwVlF2eXBwelpIT3NZK3M0a2pEWUsxL3dLZU9X?=
- =?utf-8?B?YjNpN1lVTGNIQzZMLzVCT1FqTGt1Tm5NVFhoZU1wOUtMYitMaUkzSm9LbWFz?=
- =?utf-8?B?M2lkSzBOTkpiSHViNlR5dHBGVitrMmRBVDIySHl5LzhzQVZzUEt0R1NWbUVM?=
- =?utf-8?B?TDVpeFQwdnZCK3dwS1N6T3RnclF0K2JJcnZUWmhoZDJ0WlVTbWJJMFdhNENZ?=
- =?utf-8?B?L2Q1a082VHk1bGswVXdwYzdsY1VESkFOeUw2ZzlyM0pBTTluT25EcmVKN2hC?=
- =?utf-8?B?RlVMRE9udVFBbDJLUVBkSGVURTNob1RlekNkTmFKRjR0SmRlVzhMdTNhYmF3?=
- =?utf-8?Q?Hc0M7qWAY2qZQ8+ci9?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5180c871-a821-4b99-440d-08df22f07562
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Oct 2026 14:53:46.8740
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AmtdD0x3b82LYedWJRCPE8uRkJn8eUSChFoy8OXHpB8cABCoDWbN6dYWy0C+wQk+
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5729
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260904132855.638117-3-smostafa@google.com>
 
-On 10/5/26 15:20, Fred Griffoul wrote:
-> On 10/5/26 Christian König wrote:
->> Well filling page tables by the importer is an absolutely clear NO-GO
->> for the DMA-buf design, we have gotten down that path already and it
->> took us years to remove this functionality again.
+On Fri, Sep 04, 2026 at 01:28:55PM +0000, Mostafa Saleh wrote:
+> If the system supports hardware Break-Before-Make (BBM) level 3, use it
+> to replace stage-2 PTEs directly. Otherwise, fall back to the software
+> BBM sequence.
 > 
-> Understood, thanks for the quick and clear answers on this patch and on
-> patch 3.
+> For BBML3 the sequence is:
+> 1) Get a reference count on the containing table for the new PTE.
+> 2) Atomically update the PTE with the new valid descriptor.
+> 3) Invalidate the TLB for the old PTE.
+> 4) Drop the reference count holding the old PTE.
 > 
->> The problem you are facing here is that dma_buf_mmap() doesn't work
->> because you don't have a VMA.
+> Add 2 helpers:
+> 1) kvm_pgtable_use_bbml3(): Checks for the architecture requirement
+>    for BBML3.
 > 
-> Right: the memory has no struct page and is deliberately not mapped in
-> the host, so there is no VMA to hand to KVM.
+> 2) stage2_use_bbml3(): Extra checks added by SW design (FWB and DIC)
+>    - As BBML3 will update the PTE atomically, it can only know it
+>      raced with another core at the point of the cmpxchg failing,
+>      unlike the SW implementation which locks the PTE first.
+>      And as we must issue CMOs to the new mapped page before the
+>      update, that means with BBML3 racing cores will issue redundant
+>      CMOs.
 > 
-> I'll post a new version of this series. It drops get_phys(), the ranged
-> invalidation and the guest_memfd dma-buf import (patches 2-5), and it
-> does not touch drivers/dma-buf, as you suggested in the PAL discussion:
+> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> ---
+>  arch/arm64/kvm/hyp/pgtable.c | 111 ++++++++++++++++++++++++++++-------
+>  1 file changed, 90 insertions(+), 21 deletions(-)
 > 
->   https://lore.kernel.org/all/c413710b-4c28-4ed8-88ec-aeb8c4482011@amd.com/
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index d670da8882a5..a9ba761e9a01 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -82,6 +82,27 @@ static bool kvm_pte_table(kvm_pte_t pte, s8 level)
+>  	return FIELD_GET(KVM_PTE_TYPE, pte) == KVM_PTE_TYPE_TABLE;
+>  }
+>  
+> +/*
+> + * Check if BBML3 can be used for this PTE update.
+> + * Fallback to software break-before-make for leaf-to-leaf changes.
+> + */
+> +static bool kvm_pgtable_use_bbml3(const struct kvm_pgtable_visit_ctx *ctx,
+> +				  kvm_pte_t new)
+> +{
+> +	if (!system_supports_bbml3())
+> +		return false;
+> +
+> +	if (!kvm_pte_valid(ctx->old) || !kvm_pte_valid(new))
+> +		return false;
+> +
+> +	/* Block <-> Table is ok. */
+> +	if (kvm_pte_table(new, ctx->level) ||
+> +	    kvm_pte_table(ctx->old, ctx->level))
+> +		return true;
+> +
+> +	return false;
+> +}
+> +
+>  static kvm_pte_t *kvm_pte_follow(kvm_pte_t pte, struct kvm_pgtable_mm_ops *mm_ops)
+>  {
+>  	return mm_ops->phys_to_virt(kvm_pte_to_phys(pte));
+> @@ -835,25 +856,46 @@ static void stage2_clean_old_pte(const struct kvm_pgtable_visit_ctx *ctx,
+>  		mm_ops->put_page(ctx->ptep);
+>  }
+>  
+> +/*
+> + * Don't use bbml3 for stage-2 if FWB or DIC are not supported
+> + * as that means racing cores will issue duplicate CMOs.
+> + */
+> +static bool stage2_use_bbml3(const struct kvm_pgtable_visit_ctx *ctx,
+> +			     kvm_pte_t new)
+> +{
+> +	if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB) ||
+> +	    !cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
+> +		return false;
+> +
+> +	return kvm_pgtable_use_bbml3(ctx, new);
+> +}
+> +
+>  /**
+>   * stage2_try_break_pte() - Invalidates a pte according to the
+>   *			    'break-before-make' requirements of the
+> - *			    architecture.
+> + *			    architecture, if BBML3 is supported it
+> + *			    will be used and this function won't
+> + *			    break the PTE.
+>   *
+>   * @ctx: context of the visited pte.
+>   * @mmu: stage-2 mmu
+> + * @new: New pte installed in make.
+>   *
+> - * Returns: true if the pte was successfully broken.
+> + * Returns: true if the pte was successfully broken or BBML3 is used.
+>   *
+>   * If the removed pte was valid, performs the necessary serialization and TLB
+>   * invalidation for the old value. For counted ptes, drops the reference count
+>   * on the containing table page.
+>   */
+>  static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
+> -				 struct kvm_s2_mmu *mmu)
+> +				 struct kvm_s2_mmu *mmu, kvm_pte_t new)
+>  {
+>  	kvm_pte_t locked_pte;
+>  
+> +	/* All handled in stage2_make_pte() */
+> +	if (stage2_use_bbml3(ctx, new))
+> +		return true;
+> +
+
+Wouldn't it be easier to keep try_break_pte/make_pte to the !bbml3 case and to
+just create a make_pte_bbml3() variant to be called when stage2_use_bbml3()?
+
+  if (!stage2_use_bbml3()) {
+      if (stage2_try_break_pte())
+          return -EAGAIN;
+      stage2_make_pte();
+  } else {
+      if (stage2_make_pte_bbml3())
+          return -EAGAIN;
+  }
+
+I believe also, the error path would look less weird as we catch an error in
+make_pte() but without reverting the break_pte() (even if it is correct right
+now).
+
+And perhaps you could introduce a function that does both break/make
+(stage2_update_pte()?) called by both stage2_split_walker() and
+stage2_map_walk_leaf(). This would avoid repeating the error path.
+
+Otherwise, everything looks functional to me.
+
+-- 
+Vincent
+
+
+>  	if (stage2_pte_is_locked(ctx->old)) {
+>  		/*
+>  		 * Should never occur if this walker has exclusive access to the
+> @@ -873,16 +915,37 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
+>  	return true;
+>  }
+>  
+> -static void stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t new)
+> +static bool stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
+> +			    kvm_pte_t new)
+>  {
+>  	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+>  
+> -	WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
+> -
+>  	if (stage2_pte_is_counted(new))
+>  		mm_ops->get_page(ctx->ptep);
+>  
+> +	if (stage2_use_bbml3(ctx, new)) {
+> +		if (!kvm_pgtable_walk_shared(ctx)) {
+> +			/*
+> +			 * stage2_try_set_pte() uses WRITE_ONCE for non-shared walks,
+> +			 * lacking release semantics used in the software BBM case.
+> +			 */
+> +			smp_wmb();
+> +		}
+> +
+> +		if (!stage2_try_set_pte(ctx, new)) {
+> +			/* Raced with another core. */
+> +			if (stage2_pte_is_counted(new))
+> +				mm_ops->put_page(ctx->ptep);
+> +			return false;
+> +		}
+> +
+> +		stage2_clean_old_pte(ctx, mmu);
+> +		return true;
+> +	}
+> +
+> +	WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
+>  	smp_store_release(ctx->ptep, new);
+> +	return true;
+>  }
+>  
+>  static bool stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt)
+> @@ -1001,7 +1064,7 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>  		return 0;
+>  	}
+>  
+> -	if (!stage2_try_break_pte(ctx, data->mmu))
+> +	if (!stage2_try_break_pte(ctx, data->mmu, new))
+>  		return -EAGAIN;
+>  
+>  	/* Perform CMOs before installation of the guest stage-2 PTE */
+> @@ -1014,7 +1077,8 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>  	    stage2_pte_executable(new))
+>  		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
+>  
+> -	stage2_make_pte(ctx, new);
+> +	if (!stage2_make_pte(ctx, data->mmu, new))
+> +		return -EAGAIN;
+>  
+>  	return 0;
+>  }
+> @@ -1057,19 +1121,21 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>  	childp = mm_ops->zalloc_page(data->memcache);
+>  	if (!childp)
+>  		return -ENOMEM;
+> -
+> -	if (!stage2_try_break_pte(ctx, data->mmu)) {
+> -		mm_ops->put_page(childp);
+> -		return -EAGAIN;
+> -	}
+> -
+>  	/*
+>  	 * If we've run into an existing block mapping then replace it with
+>  	 * a table. Accesses beyond 'end' that fall within the new table
+>  	 * will be mapped lazily.
+>  	 */
+>  	new = kvm_init_table_pte(childp, mm_ops);
+> -	stage2_make_pte(ctx, new);
+> +	if (!stage2_try_break_pte(ctx, data->mmu, new)) {
+> +		mm_ops->put_page(childp);
+> +		return -EAGAIN;
+> +	}
+> +
+> +	if (!stage2_make_pte(ctx, data->mmu, new)) {
+> +		mm_ops->put_page(childp);
+> +		return -EAGAIN;
+> +	}
+>  
+>  	return 0;
+>  }
+> @@ -1549,18 +1615,21 @@ static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
+>  	if (IS_ERR(childp))
+>  		return PTR_ERR(childp);
+>  
+> -	if (!stage2_try_break_pte(ctx, mmu)) {
+> -		kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
+> -		return -EAGAIN;
+> -	}
+> -
+>  	/*
+>  	 * Note, the contents of the page table are guaranteed to be made
+>  	 * visible before the new PTE is assigned because stage2_make_pte()
+>  	 * writes the PTE using smp_store_release().
+>  	 */
+>  	new = kvm_init_table_pte(childp, mm_ops);
+> -	stage2_make_pte(ctx, new);
+> +	if (!stage2_try_break_pte(ctx, mmu, new)) {
+> +		kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
+> +		return -EAGAIN;
+> +	}
+> +
+> +	if (!stage2_make_pte(ctx, mmu, new)) {
+> +		kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
+> +		return -EAGAIN;
+> +	}
+>  	return 0;
+>  }
+>  
+> -- 
+> 2.55.0.979.g7e5102b832-goog
 > 
-> KVM gets its frames through the KVM-private guest_memfd provider
-> interface from David's series. iommufd gets them through a private
-> interface with the exporter, as it already does for vfio-pci. The new
-> version adds a small registry in iommufd for that, which replaces the
-> symbol_get() of the sample in David's series. The dma-buf is then only
-> the handle and the existing revoke.
-
-Yeah that approach sounds totally sane to me.
-
-We have drivers which stuff all kind of resources, not just memory, into a DMA-buf. That ranges from MMIO BARs to trigger FW operations (doorbells) over full HW blocks (ordered appends, global wave sync etc...) where two or more applications need to share which one is used.
-
-That you then have a exporter private interface is for accessing this is perfectly ok.
-
-The problem you are facing here is more that this is not limited to one driver/module but multiple ones and you don't want module inter dependencies because of the symbols.
-
-So symbol_get() is probably the right thing to do as long as we don't have something like weak symbols or similar.
-
-Regards,
-Christian.
-
-> 
-> Thanks,
-> Fred
-
