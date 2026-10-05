@@ -1,65 +1,65 @@
-Received: from mail-ej2-f12.google.com (mail-ej2-f12.google.com [74.125.228.140])
+Received: from mail-ej2-f43.google.com (mail-ej2-f43.google.com [74.125.228.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA17E47255F
-	for <kvmarm@lists.linux.dev>; Mon,  5 Oct 2026 09:56:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D8346C846
+	for <kvmarm@lists.linux.dev>; Mon,  5 Oct 2026 09:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791194164; cv=none; b=DWedTTkh03G/iSeFBZ9isghU/Vxutm2QPSThF3YKDAZnmBMMKbute5V2Qnciehnv1AkbVHc/Xeqc0xCyUWsQGoo9JgcZR52dsJWlgy9KXXxyQ3zVSv9dQI6XvCjq3OSVYMzF8xyLiJrAQNwnTqkv74HEA4EvV/GNulmvzclp3mk=
+	t=1791194165; cv=none; b=UDfufaf7jDsiJR9dmXneQd4ri3SmlUusTCjHOaQG2i9xNrH/vvY5U/wjhTip1lq2+nTsTellB8hJGfyGUJ2nhykczojNnx8LzU6NzLqnnq2VB3WhUIu2JxT7E/dD1nMSveSCXvCIcPzyYadd/tWZZRfWGlVkWPu9VIy2XpN2qCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791194164; c=relaxed/simple;
-	bh=W+faagf9X6giuP7Jvxi6Qt0uOgcW4oIP8+vZrnvBrKc=;
+	s=arc-20240116; t=1791194165; c=relaxed/simple;
+	bh=ARYO8oRzysyDjWqkNeWzqMaVQP/6D2sRYtg4hlwDrxk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Xose+mfqFsxzMfUe6FCc0cmtQjGiWmoSlEqs6implZBAsrPWU/exJQ11u8v3NHvagxCh1CF4CYPN3ZEJDpuD1NUGyS+hJSnHF67Fz4IhC/IVJBlF1LQk5Sb1207ZuXrUxKFS28xUSneM4sajNHioHc9P40ziZ3zKI7TuuttRrgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R4boc6Wm; arc=none smtp.client-ip=74.125.228.140
+	 MIME-Version; b=nqY4G1XNPysO4q7fMCeR+UCsfZMDAkIJl/65/9aaBQZ5WSK6A+6NNOsD3/VVaSaNVmzXoGR2IjXBIAb3C10vkX22q4lofNjrhPpDirv2fMThJeRFh1f/Iwxz2/066Egm2wUjXgfn0ZElwMwR9NdVlif7P6oPsodgDy6cNUZk5qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IC3ERM05; arc=none smtp.client-ip=74.125.228.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R4boc6Wm"
-Received: by mail-ej2-f12.google.com with SMTP id a640c23a62f3a-c29703cb470so266547066b.0
-        for <kvmarm@lists.linux.dev>; Mon, 05 Oct 2026 02:56:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IC3ERM05"
+Received: by mail-ej2-f43.google.com with SMTP id a640c23a62f3a-c2a4fbc5586so273127266b.2
+        for <kvmarm@lists.linux.dev>; Mon, 05 Oct 2026 02:56:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791194158; x=1791798958; darn=lists.linux.dev;
+        d=gmail.com; s=20251104; t=1791194160; x=1791798960; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=lD6pTqRDMSfKXNqb4UUFNdsEKglv/1NbFFOX0KLFSbY=;
-        b=R4boc6WmXoOAcU08VrXFZ0meOdcCTFkRq5SxerArgCeiozC47cY089LLcDzhol20Ch
-         7gL8IHouyBAVV0Kbsu55Df3e5gmT+Pmm/bjjIAmvPB+zF8WG3uQ0EYAavig6Y01QJH/G
-         vTzw3rXEYMZiB3YLI2AbsFo8wzQK5bxUBKMB5tlnGxHvOU5E0cpa138GaHtdJJjIohSc
-         ueGoeg9I9WZI50bldWwelbEE+NQkZpVxlCyPlefmNKUa9YhrhNa4PKFozJg2E5fl8JBG
-         JVijrLKLszaSsXSi0hN1yeXqTi4STr44vdpkmb7eJC2e7fKh8Bl59YlbZKPvsMy+LC34
-         u4pA==
+        bh=JwlAWAAy7BYUoB7+a9T937QVUxmXXORCOGD20YZnv/k=;
+        b=IC3ERM05EbDjOzW+1J0QQsiE8B0RMBt3ne7K09xmsyaOF7V/rCZncJoPUdsnfeFpNn
+         x0SVLCNZTbd+q3sGiSzVrTECqyc//UsyuS3t6a4GxP0Z/lgGRjaFKi1pdjDyz04JBbUQ
+         KqhgPYG55wGPY7Fi3QDJTvkq2Evx7zwBqFk0AdOlyY2aHOrn0NhrzHW6U6iebfPYz0qs
+         xLQJGXxWpBpHVu+8MS05vuydDylqX2LwTRTc9Zjqv1kVeF/CXIPb0wBzO9YnOziVWIpo
+         vLRlBYh35aHwMLMkv1zIGmumXjbsrbClm/opo4+JK2rBA17UmrIQ9RdpqKN/CbzUfc2O
+         YvKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791194158; x=1791798958;
+        d=1e100.net; s=20260707; t=1791194160; x=1791798960;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=lD6pTqRDMSfKXNqb4UUFNdsEKglv/1NbFFOX0KLFSbY=;
-        b=jTI4lMdAGP4pZr/7pySCIvWJIq1/BfaBpEa+6wrLPN1irIxQaaCKIW+do3gijf3iZI
-         FAEwr9iSJSZi2hUEqaJuFUIMPhvBCdIhnEFwptLeH4NpEPUQcGQX83bhXFCCwHTsa3SD
-         yIsASV4pXy1Jnn+XmJV4gAg/o3p63UjatW8Ok9d+2OVRzqlbDePiKm/AMFv0SZGrN2pV
-         3eJt+EXwtNZJP4yCgh3I9fax73BkDDcEq5UzSCJAXUN5PT8E+R4RZr+OzOymflgkQPGs
-         nwUiOkEvF/C6896y0JnZEHs1Ey8F5DZf1s0Kc1KaYUpoQokpAAAKZCIBACVAt3ZgVuA0
-         r9aA==
-X-Forwarded-Encrypted: i=1; AKwUvBzplcVj+QRzRnOS9XDOpQ/Fw3Of1CfFyRKOsBz+xxnYJ0zPMrhWRIjVXByjRlsDBoHTvT6HYvI=@lists.linux.dev
-X-Gm-Message-State: AFq9FYKceaXTSmsLKKexER7l8c2S7e3eWMmRpP47UB7moYg1yeqe1S5c
-	YDXfDUjbPtdfxUr3pp1sGtWyU1kCYe1nF7Mt5XMRmITYJ0AneL/pNWP4
-X-Gm-Gg: AYBFou3kLbLFa57PCO/zkJ4RSwGj/DTgbbCCYiCeo9KpsHeEr4so4WbJ+BRgh/YjjJS
-	5gTodKRD7yu8UfW+GspzCQV7km7EsFpWFY/2ohTLhhg4m7jzKnQkFhPhmcOQWq2LlDI+BwTPrFs
-	naDF9uuKFUauL9m7Itga3wRMYee5O4370YQMCs+mx1zcNZvW3JMo9OAdCV9IBwUsPG8ObRa2bLQ
-	I9GQ3uDgSjVdrwOPv8gznYfnf4kG/OE/zVGRzWvxZCkXaChTLoeaDY5jEBfgzGTmNv3omBlHXAr
-	ZP5VP5iQxSitfvbAfWtBm9hs2t7cnJQVTekVShgro7o7lHVdqjszl49eX+oJhNIDv/70oRg30LB
-	hTJ42W4KIJO4xIAoNPRm8lvozPt0O4fhge9cRU17QVZ8yDs98sp+mMpk24TUtZoLo+600wqqYDx
-	jcpk4pmJnWSZN4lmmToP9QfGx/Gy8WOvWOCkfgnEF+v0UT+g/I5ckmQSeFQiyZ5COOrc6TfZeDc
-	z6z6qLvfrzmk4yioov0Ij7PjIK4Tj/A+liiz29cVf5y5rxalC+IQ9K8jLam/7vjYuxI7RULkqfy
-	8xY4e+aoIIXDF7oRFkUkITtdw8paPaty3j8=
-X-Received: by 2002:a17:907:3da3:b0:c2e:7fe7:288e with SMTP id a640c23a62f3a-c2e7fe736eamr411177566b.32.1791194158114;
-        Mon, 05 Oct 2026 02:55:58 -0700 (PDT)
+        bh=JwlAWAAy7BYUoB7+a9T937QVUxmXXORCOGD20YZnv/k=;
+        b=KprPD63KsKGk5w0tR8AjOLlBw979omxdS4dGLWCFqKHmjEBrWUjBHNkX8DyVwj+xIo
+         S1qHcLmtfbWFrp5/Bytac/pZWXerc0JwU5PmXd+NINebb2hq0I7CyTZ4v++mNuEEz3Fw
+         p2jzL8mkAu5sZKmiWpmhpCX+MosjeUbvNH9F0+vQPcAQhhVnSVxqgbb9M30pxPvdASP1
+         SBLVx2yXFr0/9p7U6lXexuuT/I2F8d9a8M9zlIOvAT2mYcRSE90bFbBBo4/s3hSd8ETa
+         wfPLapzfFgY8MwgEL1CQJLd7yinwnu/cyywwQMZ7Npxlzo+gx5VSttzi77UzBySdJj8L
+         +JOg==
+X-Forwarded-Encrypted: i=1; AKwUvByX/2L0h4FK7KvEfiowAs8qwqVreI43xB1+fN0RlgWPQWki5jcuB2/Vi1PorvNuR+i6OBtpV1c=@lists.linux.dev
+X-Gm-Message-State: AFuF++k+H+ZVW5Inmj1kRNya9jDfWMo8ZFehYEAZn3kPrPFu3nssaRCJ
+	RqjcCwPPaHlPaQJdoM/4FlIObvf9CWAevZCSN3Xastz8Gkbf/rVR2Rqy
+X-Gm-Gg: AYBFou22TPbtqARk7fum+Z/PDn5M4nKx3+VCFgGcD8qGf/FjpMcki5VBScC5ZGmHe1A
+	VWqW1zjKPg+GqqbRMsj05l0wYLlHUrn8c7Ze9pGtX/L/DLxKmUc9lsOhwJTPo4oTFCoagvDAUQ9
+	s2BaUMbdhqMZGEvxjPmfeXvEF2Wyd1ESycpNv0NcubtJYcrRRMBdjRO6HCnc23+nzV8JegO5D0p
+	ArS6H9ALGPe2Fs3f4S4oJaxQ7x4HSUPD+VAATppu1BAEHfvXwPxOhiZRtM2piXkKZKmKfD+2eXL
+	rxkiNMge61q55srmyCX/qqCxiab7IljPmhZGRYMfabugVqrdux6w/aQgNacK91TERRJpjl5dPhg
+	y1ye63WTtbzdwQlTn/P3MSwG/zhqbIO+qmraO4JJSBuAIOiajWqUZq/a1cS8zy42kagx/KN7DoF
+	vpSqvAu52TEfgF5+3qx0W7gNT+FvIyB82ZOk41kgGVnyrZzgQky/GhueuxCOnDFP7J7+A0iFcE4
+	Uxym/bQ7BSAwxr5uIxryT0NhfpjSiW4YCrWu8BsJasGleUt79jgp7NrxSfR+Ql7PsET8nmWdjI7
+	XtWX+pV9vv5Fftv2MEz5uuy6CwBuR9O3p+X34REdPfyXkg==
+X-Received: by 2002:a17:907:6d11:b0:c25:2688:8212 with SMTP id a640c23a62f3a-c2e4a6a273emr858285166b.0.1791194159542;
+        Mon, 05 Oct 2026 02:55:59 -0700 (PDT)
 Received: from dev-dsk-fgriffo-1c-93421965.eu-west-1.amazon.com (54-240-197-234.amazon.com. [54.240.197.234])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c31562aba16sm50753266b.23.2026.10.05.02.55.56
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c31562aba16sm50753266b.23.2026.10.05.02.55.58
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 05 Oct 2026 02:55:57 -0700 (PDT)
+        Mon, 05 Oct 2026 02:55:59 -0700 (PDT)
 From: Fred Griffoul <griffoul@gmail.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
@@ -100,9 +100,9 @@ Cc: David Woodhouse <dwmw2@infradead.org>,
 	linux-kselftest@vger.kernel.org,
 	linux-trace-kernel@vger.kernel.org,
 	x86@kernel.org
-Subject: [RFC PATCH 3/6] dma-buf: Add ranged mapping invalidation
-Date: Mon,  5 Oct 2026 09:55:49 +0000
-Message-ID: <20261005095552.52748-4-griffoul@gmail.com>
+Subject: [RFC PATCH 4/6] dma-buf: Allow dynamic attach without a device
+Date: Mon,  5 Oct 2026 09:55:50 +0000
+Message-ID: <20261005095552.52748-5-griffoul@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261005095552.52748-1-griffoul@gmail.com>
 References: <20260720111259.122911-1-dwmw2@infradead.org>
@@ -117,99 +117,86 @@ Content-Transfer-Encoding: 8bit
 
 From: Fred Griffoul <fgriffo@amazon.co.uk>
 
-dma_buf_invalidate_mappings() tells every importer that the whole
-buffer changed. An exporter that changes one part of its memory cannot
-say which bytes changed, so importers throw away mappings that are
-still valid.
+dma_buf_dynamic_attach() requires a struct device: the device for which
+the buffer is mapped for DMA. Exporters may also check it before they
+accept the attachment. An importer that does not perform DMA has no
+such device. iommufd already attaches with a global placeholder device
+for this reason. KVM would need one too, although it only needs to know
+where the memory is so that it can map it into a guest.
 
-Add an exporter helper that invalidates a byte range, and an importer
-callback that receives it. The callback means that the address, the
-attributes or the backing of the range changed. If part of the range is
-no longer backed, get_phys() returns -ENOENT for it. Importers must stop
-using their old answer before the callback returns. Importers that do
-not implement the callback still receive a whole-buffer invalidation.
+Allow @dev to be NULL for a dynamic importer. Such an importer learns
+where the memory is from get_phys() and builds its own mappings. It
+must not map the attachment for DMA, and dma_buf_map_attachment()
+refuses an attachment without a device. An exporter that needs a device
+to answer can refuse the attachment in its attach op, as it can for any
+other reason.
 
 Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
 ---
- drivers/dma-buf/dma-buf.c | 30 ++++++++++++++++++++++++++++++
- include/linux/dma-buf.h   | 16 ++++++++++++++++
- 2 files changed, 46 insertions(+)
+ drivers/dma-buf/dma-buf.c      | 15 +++++++++++++--
+ include/trace/events/dma_buf.h |  2 +-
+ 2 files changed, 14 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/dma-buf/dma-buf.c b/drivers/dma-buf/dma-buf.c
-index 66b85d53ed22..e7010163eb2f 100644
+index e7010163eb2f..3d43b529a523 100644
 --- a/drivers/dma-buf/dma-buf.c
 +++ b/drivers/dma-buf/dma-buf.c
-@@ -1389,6 +1389,36 @@ void dma_buf_invalidate_mappings(struct dma_buf *dmabuf)
- }
- EXPORT_SYMBOL_NS_GPL(dma_buf_invalidate_mappings, "DMA_BUF");
- 
-+/**
-+ * dma_buf_invalidate_mappings_range - notify attachments that a range changed
-+ * @dmabuf: buffer whose layout changed
-+ * @offset: first changed byte
-+ * @length: number of changed bytes
+@@ -1007,6 +1007,13 @@ dma_buf_pin_on_map(struct dma_buf_attachment *attach)
+  * Note that this can fail if the backing storage of @dmabuf is in a place not
+  * accessible to @dev, and cannot be moved to a more suitable place. This is
+  * indicated with the error code -EBUSY.
 + *
-+ * Importers with a ranged callback stop using their old mappings of the range
-+ * before returning. Other importers receive the existing whole-buffer
-+ * callback, which is correct but coarser. The reservation lock must be held.
-+ */
-+void dma_buf_invalidate_mappings_range(struct dma_buf *dmabuf,
-+				       unsigned long offset,
-+				       unsigned long length)
-+{
-+	struct dma_buf_attachment *attach;
-+
-+	dma_resv_assert_held(dmabuf->resv);
-+	list_for_each_entry(attach, &dmabuf->attachments, node) {
-+		const struct dma_buf_attach_ops *ops = attach->importer_ops;
-+
-+		if (!ops)
-+			continue;
-+		if (ops->invalidate_mappings_range)
-+			ops->invalidate_mappings_range(attach, offset, length);
-+		else if (ops->invalidate_mappings)
-+			ops->invalidate_mappings(attach);
-+	}
-+}
-+EXPORT_SYMBOL_NS_GPL(dma_buf_invalidate_mappings_range, "DMA_BUF");
-+
- /**
-  * dma_buf_get_phys - describe the run that starts at an offset
-  * @attach: attachment to query
-diff --git a/include/linux/dma-buf.h b/include/linux/dma-buf.h
-index b223962e20c2..55c3fe60a0ba 100644
---- a/include/linux/dma-buf.h
-+++ b/include/linux/dma-buf.h
-@@ -485,6 +485,19 @@ struct dma_buf_attach_ops {
- 	 * required behavior.
- 	 */
- 	void (*invalidate_mappings)(struct dma_buf_attachment *attach);
-+
-+	/**
-+	 * @invalidate_mappings_range: [optional] a byte range changed
-+	 *
-+	 * The exporter changed the address, attributes or backing of
-+	 * [@offset, @offset + @length). The importer must stop using its old
-+	 * answer for that range before returning.
-+	 * Importers without this callback receive @invalidate_mappings for
-+	 * the whole buffer instead.
-+	 */
-+	void (*invalidate_mappings_range)(struct dma_buf_attachment *attach,
-+					  unsigned long offset,
-+					  unsigned long length);
- };
++ * @dev may be NULL for a dynamic importer that is not a DMA master: one that
++ * only asks the exporter where the memory is, through &dma_buf_ops.get_phys,
++ * and builds its own mappings from the answer.  Such an importer must never
++ * call dma_buf_map_attachment(), and an exporter that needs a device to
++ * answer (a peer-to-peer check, say) refuses the attachment in its
++ * &dma_buf_ops.attach.
+  */
+ struct dma_buf_attachment *
+ dma_buf_dynamic_attach(struct dma_buf *dmabuf, struct device *dev,
+@@ -1016,7 +1023,7 @@ dma_buf_dynamic_attach(struct dma_buf *dmabuf, struct device *dev,
+ 	struct dma_buf_attachment *attach;
+ 	int ret;
  
- /**
-@@ -600,6 +613,9 @@ struct sg_table *dma_buf_map_attachment(struct dma_buf_attachment *,
- void dma_buf_unmap_attachment(struct dma_buf_attachment *, struct sg_table *,
- 				enum dma_data_direction);
- void dma_buf_invalidate_mappings(struct dma_buf *dma_buf);
-+void dma_buf_invalidate_mappings_range(struct dma_buf *dma_buf,
-+				       unsigned long offset,
-+				       unsigned long length);
- bool dma_buf_attach_revocable(struct dma_buf_attachment *attach);
- /* bits 0-7: memory type (a value, not flags) */
- #define DMA_BUF_PHYS_ATTR_TYPE_MASK	GENMASK(7, 0)
+-	if (WARN_ON(!dmabuf || !dev))
++	if (WARN_ON(!dmabuf || (!dev && !importer_ops)))
+ 		return ERR_PTR(-EINVAL);
+ 
+ 	attach = kzalloc_obj(*attach);
+@@ -1175,6 +1182,9 @@ struct sg_table *dma_buf_map_attachment(struct dma_buf_attachment *attach,
+ 
+ 	if (WARN_ON(!attach || !attach->dmabuf))
+ 		return ERR_PTR(-EINVAL);
++	/* An importer without a device cannot be a DMA master. */
++	if (WARN_ON(!attach->dev))
++		return ERR_PTR(-EINVAL);
+ 
+ 	dma_resv_assert_held(attach->dmabuf->resv);
+ 
+@@ -1847,7 +1857,8 @@ static int dma_buf_debug_show(struct seq_file *s, void *unused)
+ 		attach_count = 0;
+ 
+ 		list_for_each_entry(attach_obj, &buf_obj->attachments, node) {
+-			seq_printf(s, "\t%s\n", dev_name(attach_obj->dev));
++			seq_printf(s, "\t%s\n", attach_obj->dev ?
++				   dev_name(attach_obj->dev) : "none");
+ 			attach_count++;
+ 		}
+ 		dma_resv_unlock(buf_obj->resv);
+diff --git a/include/trace/events/dma_buf.h b/include/trace/events/dma_buf.h
+index 3bb88d05bcc8..7cabca53b798 100644
+--- a/include/trace/events/dma_buf.h
++++ b/include/trace/events/dma_buf.h
+@@ -40,7 +40,7 @@ DECLARE_EVENT_CLASS(dma_buf_attach_dev,
+ 	TP_ARGS(dmabuf, attach, is_dynamic, dev),
+ 
+ 	TP_STRUCT__entry(
+-		__string(	dev_name,			dev_name(dev))
++		__string(dev_name, dev ? dev_name(dev) : "none")
+ 		__string(	exp_name,			dmabuf->exp_name)
+ 		__field(	size_t,				size)
+ 		__field(	ino_t,				ino)
 -- 
 2.47.3
 
