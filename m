@@ -1,130 +1,79 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-201.mta1.migadu.com [95.215.58.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C7938836C;
-	Mon,  5 Oct 2026 08:27:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB2703932D3
+	for <kvmarm@lists.linux.dev>; Mon,  5 Oct 2026 08:28:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791188860; cv=none; b=fw+IRAy2d7/h6NGf3eolwHEpXk2uGA9Kh5g6LKu8tgVe8x4TG0yS9P/B64besWHdpB+fPYc5QZv/SeFFFslS8UlgArxq3Nxp90FDs0rSdwAgL9OSIUw9/MboSQ76X50XeX2OIZ4CHy4j3yFTSbQTasE2UyHIFD6i5thf0iKmljk=
+	t=1791188916; cv=none; b=eNZiZrbb+hxPpInLXIupiG4G8X8Y18n+1wtIH34Nvn01OE1x5KNkwewetrDCVs16K0yHNGvBO0sCXlY6fuBDrJgyOO29qjgH6FlwflHausTbrDui7wN/hRPhwZeERS8ohnwpHaRQ9K9m0MRSp/8SsfCKaW3jAIUx9zTOBXCERS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791188860; c=relaxed/simple;
-	bh=tPVv6cAJ4mS7KxYWT+/8HwELvC3Yq6cmUWBF2ZodqIU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lNSOh023S77KzxjFvyf/oBtFfCCJRGp79QYceQVpLRcu8/UTYjGj7Jk2OTgDfXtKpYEUoSbDV7Noc02eOq2u5dXbXsbOUCyf2/YoLA3LvBt/K8+oCheeut5BW2a7ajomRRnEY+IAfc3QavlhZ79NcYJUHscZ5G6COTABMipTuKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZFgOJSus; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791188916; c=relaxed/simple;
+	bh=azL6RWzxNPLFbjqexUqOSuUWiCvD6BgcwHGYwvXeEQQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M2o/GljEp/cWRT51KQ+KBP6T/1/8Wbzmq15KxyvGMcFjh8f6k6Ykx64va0vRMIlav3LT3Fgbrz3dpX9hPXY6ygzkncdvYBIglZp4G3HSyjx1x3icGnRcvW7tUelxuPCOfCOczIeka2/NCmH7RC6XuJFJLCuZgFC2XjyBJd/lIks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RefDkvbg; arc=none smtp.client-ip=95.215.58.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZFgOJSus"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40A7A1F000FF;
-	Mon,  5 Oct 2026 08:27:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791188854;
-	bh=fsKzr1wwNvOjG1lYsOOgfAPocI7bU4FNx1neeTdXdCU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=ZFgOJSusJIoSOi11shbnQnrlSzUGgYbaD3c8YdF90OeX7PaXk7RuxWk0/vu9lA0Vj
-	 nUqK2foIIZ5QFyit1d67UQBHX7OkLSBMI8/G+6tmHeTUVMzp2th5bIY7SseS8ZL0sT
-	 bgmcxpLAHJOk7axStkf3y9j1GEnI0teRW0fcb1KwO5YX6na+1uLW1bdzCM0vVYT58i
-	 x3wWG+N/q5f9hzKRfeC3fyYhfWDCb8iE7gSxhkZ6QkAl0OmbMlQykWSGf8aZwyMGVH
-	 0o9PO+y9+MkeUQjKL06AY/4euFiG5MNwK/hm9+JQXTpc/dq2fmvOTxIbF/afYdgjwO
-	 DyWJEkRhLxFHQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xDe2l-0000000GzC6-42XU;
-	Mon, 05 Oct 2026 08:27:32 +0000
-Date: Mon, 05 Oct 2026 09:30:39 +0100
-Message-ID: <87ece435xs.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: oupton@kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	vdonnefort@google.com,
-	qperret@google.com,
-	tabba@google.com,
-	mark.rutland@arm.com
-Subject: Re: [PATCH] KVM: arm64: Pend host SErrors for protected vCPUs through HCR_EL2.VSE
-In-Reply-To: <20261005050352.836980-1-fuad.tabba@linux.dev>
-References: <20261005050352.836980-1-fuad.tabba@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RefDkvbg"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=azL6RWzxNPLFbjqexUqOSuUWiCvD6BgcwHGYwvXeEQQ=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1791188906; v=1; x=1791793706;
+ b=RefDkvbgGSmLsOec0nyqeXVejqLTmL2t6WKYsfipdd+7xBNCQjjZ2I8vEjANuKmA46dONAHw
+ 73y1z+TFgJiCIisfbhJNBqPWSMEzvjP3vAXXzz5mrUaTQv3yYzzeUvLU3NdBhfn2JAQtnOGW66Y
+ fxtsdGcFeC4KNCyq8fqLPB/A=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 814c23d57508982f;
+	Mon, 05 Oct 2026 08:28:26 +0000
+X-Mizu-Trace-ID: 814c23d57508982f
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5ba429b64c5so6049e87.1
+        for <kvmarm@lists.linux.dev>; Mon, 05 Oct 2026 01:28:26 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvByx187qfb7/Tz72WphgQBEfnvWVYhvODXHjDNreXinpSAfjHQJd0YwHWh/FTWNHxsZHVNX7JHQ=@lists.linux.dev
+X-Gm-Message-State: AFq9FYLkywqSo4I6zqmtFOP78D9Ee2nWym30AkhfZpAQXqXkIr/BxdOE
+	pInP1Ou6VsUnUmxGBcfgqlWtDh+j0+uGzBhYLLTDXLs/oXMkMl1td1lcKZ9HyHmtmhb4SKk7mZD
+	0GM1W4+Uva8GB/ulvKKP1VxWPwIe6YPujJzu6C+47
+X-Received: by 2002:a05:6512:440e:b0:5bc:b531:51ea with SMTP id
+ 2adb3069b0e04-5bcb62cfb9dmr110049e87.13.1791188905794; Mon, 05 Oct 2026
+ 01:28:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, vdonnefort@google.com, qperret@google.com, tabba@google.com, mark.rutland@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20261005050349.836795-1-fuad.tabba@linux.dev> <asNdAXGkxagm88Su@kernel.org>
+In-Reply-To: <asNdAXGkxagm88Su@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 5 Oct 2026 10:27:49 +0200
+X-Gmail-Original-Message-ID: <CA+EHjTxG=JUc7qERzdkOE4hEMUVSWK2AUtcR1JJ-k6S0m_RxqA@mail.gmail.com>
+X-Gm-Features: AclHuK_skcmiWKYt-g9sV07lqcK6sGjUvRohlQWsrIQerdG0YwJX1vJl3n2KYq4
+Message-ID: <CA+EHjTxG=JUc7qERzdkOE4hEMUVSWK2AUtcR1JJ-k6S0m_RxqA@mail.gmail.com>
+Subject: Re: [PATCH v3] KVM: arm64: selftests: Check SError is not pending
+ after delivery
+To: Oliver Upton <oupton@kernel.org>
+Cc: maz@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, 
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	vdonnefort@google.com, qperret@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 05 Oct 2026 06:03:52 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
-> 
-> kvm_inject_serror_esr() reads PSTATE.A and SCTLR2_EL1.NMEA to decide
-> whether to emulate the SError's exception entry or pend it through
-> HCR_EL2.VSE. For a protected vCPU, the host's copy of those is stale,
-> and when it reads as unmasked KVM emulates the entry on that copy. EL2
-> never delivers it as an SError: its entry handler turns the pending
-> exception into an external abort on the trapped access, and an MMIO
-> completion still pending trips WARN_ON(INCREMENT_PC).
-> 
-> Always pend through HCR_EL2.VSE for a protected vCPU. EL2 forwards it,
-> and the guest's own masking decides when the SError is taken.
-> 
-> Fixes: 872383bd12e11 ("KVM: arm64: Add per-EC entry/exit state marshalling for protected guests")
-> Reported-by: Sashiko <sashiko-bot@kernel.org>
-> Closes: https://lore.kernel.org/all/20261001142109.794CA1F000FF@smtp.kernel.org/
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
-> Applies on kvmarm/next. A follow-up to "KVM: arm64: Confine protected VM
-> vCPU state to EL2" [1], from Sashiko's review of its v4 patch 12.
-> 
-> [1] https://lore.kernel.org/all/20261001135711.1640520-1-fuad.tabba@linux.dev/
-> 
->  arch/arm64/kvm/inject_fault.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> index d6c4fc16f8795..49a342b078365 100644
-> --- a/arch/arm64/kvm/inject_fault.c
-> +++ b/arch/arm64/kvm/inject_fault.c
-> @@ -378,8 +378,11 @@ int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr)
->  	 *
->  	 * As we're emulating the SError injection we need to explicitly populate
->  	 * ESR_ELx.EC because hardware will not do it on our behalf.
-> +	 *
-> +	 * A protected vCPU's PSTATE and SCTLR2_EL1 live at EL2, so pend through
-> +	 * HCR_EL2.VSE and let the guest's own masking apply.
->  	 */
-> -	if (!serror_is_masked(vcpu)) {
-> +	if (!vcpu_is_protected(vcpu) && !serror_is_masked(vcpu)) {
->  		pend_serror_exception(vcpu);
->  		esr |= FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SERROR) | ESR_ELx_IL;
->  		vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
-> 
+Hi Oliver,
 
-I thought we had discussed that one before (or am I making things
-up?). Why can't the host always evaluate serror_is_masked() as true?
-Given that PSTATE is never synced back to the host, it would only be a
-matter of set PSTATE.A==1 at vcpu creation time.
+On Mon, 5 Oct 2026 at 10:17, Oliver Upton <oupton@kernel.org> wrote:
+>
+> Hi Fuad,
+[...]
+>
+> Can you add coverage for the vCPU events state to all the test cases? In
+> addition to the case where the SError is taken, it'd be good to assert
+> that the SError remains pending if the guest masked it.
 
-It'd be more palatable than this sprinkling of vcpu_is_protected(),
-which really do not scale.
+Will do,
+/fuad
 
-Thanks,
-
-	M.
-
--- 
-Jazz isn't dead. It just smells funny.
+> Thanks,
+> Oliver
