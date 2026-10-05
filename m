@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE3AF434996;
-	Mon,  5 Oct 2026 09:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D09643803F;
+	Mon,  5 Oct 2026 09:08:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791191318; cv=none; b=ubioH8eWdwaRpHlDQ60gtpBebDTU0DECikEVU2pH8wE5ViozDkjkKSAvUwPcMYTWvnoekz52j5DDXx0Zv5qA3XlYMezeb1+RPrAAmhP+50BJWZj8w0O6W1NRa+nvQld/bEVr2b9fzpETuNse7J6vmDyAMCW0p02H1jyuwJ5y1vc=
+	t=1791191323; cv=none; b=tg5di1wMREd3jhRONBQSzJrU2a/nmYJ2l0CZ6CPzqF9YDsrJ8MXHJLfKjUa3sBMSIX7yvPfzE5M7a2/3zS9Vdvq6wTkjKf3wMcXS4j50liDd4ZzetqDl4DU1wSUOjEfOwJU1l9mF3uE+7nmz7+Wf33iugiKmcoS/JuieVGRZUWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791191318; c=relaxed/simple;
-	bh=95tX0g47qDlvblS2Z+zxuL6zEuph5wLOWbRzPVg1CJQ=;
+	s=arc-20240116; t=1791191323; c=relaxed/simple;
+	bh=to/o+2+LTNUsw7yP3Ll+qatHWCaw6Nm2Yp7csAeqYaw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NcrsDfhv6AeNyzzrJmUtkrqg7qApTK5qq/W+Y62miA4p9jc8nLDvAwzXvkjfGsFzZVid1LsUXtvUPEAflHH1jbI9fCEuKteffY4VdAVFfd3IsCasuUcMRSFLk/JZMf5zpMIEYyhf4L3XGZ3q55XzgeEYGO5wAA7O+YS0ct1fShw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=d/4IR5qM; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=qfQi3tfQgpPV/mG97hB/YUcPrMwUKwKhWK2eJhcKZZZlXvqxQPvKSCIXyrVJtCEtZL9MjyWkK0xQwFRHQEEKTPCVbLcbr1xhWKEXgOuvqm/4ULgsFLGJ/BXHOyGus/lCdGmoEic/1q3OR6qFYBkjdqc88vnNrOEyRYuvaUFBMJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ZkSWqd+3; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="d/4IR5qM"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ZkSWqd+3"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0F8FC152B;
-	Mon,  5 Oct 2026 02:08:33 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 557C41576;
+	Mon,  5 Oct 2026 02:08:36 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 6EF8F3F66F;
-	Mon,  5 Oct 2026 02:08:33 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B4C493F66F;
+	Mon,  5 Oct 2026 02:08:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1791191316; bh=95tX0g47qDlvblS2Z+zxuL6zEuph5wLOWbRzPVg1CJQ=;
+	t=1791191319; bh=to/o+2+LTNUsw7yP3Ll+qatHWCaw6Nm2Yp7csAeqYaw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=d/4IR5qMtJ2fEgcQloh6yk2kxJLlKqJ+BsLqBrR9teyHzJGN6z7x4t8qDPmEuiJF+
-	 FRvZCkRfJQZpuUQev3fZxDsLna/HHksPsNZEktBza/z3xBBXqGdSln6ubdz4qtFLSy
-	 9AqYiuFbJrJErUnVHXmLZsNkE4R46dTLt6e+bsNw=
+	b=ZkSWqd+3Cdo2ScU1cPdjqhieUQ4DtB1tB0BiA9pTYesABpdQepqape5Ir9Gv8spYa
+	 u9YnVJtpNqNOxgQcw5uvWc2Kzjw3yHKqmfzuoppm0W1i0GiczAp60LOpNGG3Zbf0JT
+	 kVt4FUVYbwbUq5qMKFJro+JOWFYEllaqMPaujWNo=
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -52,9 +52,9 @@ Cc: maz@kernel.org,
 	sudeep.holla@arm.com,
 	jonathan.cameron@oss.qualcomm.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v22 09/23] KVM: arm64: Prevent unsupported vcpu features for VM types
-Date: Mon,  5 Oct 2026 10:07:40 +0100
-Message-ID: <20261005090754.2140522-10-suzuki.poulose@arm.com>
+Subject: [PATCH v22 10/23] KVM: arm64: Consolidate stage2 unmap range into kvm_stage2_unmap_range
+Date: Mon,  5 Oct 2026 10:07:41 +0100
+Message-ID: <20261005090754.2140522-11-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261005090754.2140522-1-suzuki.poulose@arm.com>
 References: <20261005090754.2140522-1-suzuki.poulose@arm.com>
@@ -66,55 +66,99 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Prevent unsupported VCPU features for the protected VCPUs. Realms and pVMs
-not support 32bit EL1 or NV yet. pKVM doesn't rely on the host vcpu
-features and it clears the unsupported features while hyp_vcpu is
-initialised. Block the features early in the vcpu init if we detect
-incompatible features.
+In preparation for adding VM specific backends for stage2 operations,
+nuke __unmap_stage2_range() and fold the logic into
+kvm_stage2_unmap_range(). Also, make kvm_unmap_gfn_range(), the only other
+user of the __unmap_stage2_range() call the kvm_stage2_unmap_range(). Also,
+while at it fix the comment to make it clear that mmu_lock must always be
+held while unmapping. The code already mandates that and the two call paths
+do have the write mmu_lock held.
+
+Later we would replace the logic in kvm_stage2_unmap_range() with VM
+specific backends.
+
+No functional changes intended.
 
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm64/kvm/arm.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Change since v21:
+ - Nuke __unmap_stage2_range and consolidate the stage2_unmap_range logic
+   into kvm_stage2_unmap_range(), in preparation for removing the KVM_PGT_FN()
+   for stage2_unmap
+---
+ arch/arm64/kvm/mmu.c | 38 ++++++++++++++++----------------------
+ 1 file changed, 16 insertions(+), 22 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index f31d31fa27ad9..9c2ef7ca6a961 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1668,11 +1668,12 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
- 	return -EINVAL;
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 0f4e8b71fa85d..4ae3bb6baef1a 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -314,36 +314,30 @@ static void invalidate_icache_guest_page(void *va, size_t size)
+  * does.
+  */
+ /**
+- * __unmap_stage2_range -- Clear stage2 page table entries to unmap a range
++ * kvm_stage2_unmap_range -- Clear stage2 page table entries to unmap a range
+  * @mmu:   The KVM stage-2 MMU pointer
+  * @start: The intermediate physical base address of the range to unmap
+  * @size:  The size of the area to unmap
+  * @may_block: Whether or not we are permitted to block
+  *
+  * Clear a range of stage-2 mappings, lowering the various ref-counts.  Must
+- * be called while holding mmu_lock (unless for freeing the stage2 pgd before
+- * destroying the VM), otherwise another faulting VCPU may come in and mess
+- * with things behind our backs.
++ * be called while holding mmu_lock otherwise another faulting VCPU may
++ * come in and mess with things behind our backs.
+  */
+-static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size,
+-				 bool may_block)
+-{
+-	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+-	phys_addr_t end = start + size;
+-
+-	lockdep_assert_held_write(&kvm->mmu_lock);
+-	WARN_ON(size & ~PAGE_MASK);
+-	WARN_ON(stage2_apply_range(mmu, start, end, KVM_PGT_FN(kvm_pgtable_stage2_unmap),
+-				   may_block));
+-}
+-
+ void kvm_stage2_unmap_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
+ 			    u64 size, bool may_block)
+ {
+-	if (kvm_vm_is_protected(kvm_s2_mmu_to_kvm(mmu)))
++	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
++
++	if (kvm_vm_is_protected(kvm))
+ 		return;
+ 
+-	__unmap_stage2_range(mmu, start, size, may_block);
++	lockdep_assert_held_write(&kvm->mmu_lock);
++	WARN_ON(size & ~PAGE_MASK);
++
++	WARN_ON(stage2_apply_range(mmu, start, start + size,
++				   KVM_PGT_FN(kvm_pgtable_stage2_unmap),
++				   may_block));
  }
  
--static unsigned long system_supported_vcpu_features(void)
-+static unsigned long system_supported_vcpu_features(struct kvm_vcpu *vcpu)
+ void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
+@@ -2436,12 +2430,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 
+ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
  {
- 	unsigned long features = KVM_VCPU_VALID_FEATURES;
+-	if (!kvm->arch.mmu.pgt || kvm_vm_is_protected(kvm))
++	if (!kvm->arch.mmu.pgt)
+ 		return false;
  
--	if (!cpus_have_final_cap(ARM64_HAS_32BIT_EL1))
-+	if (vcpu_is_protected(vcpu) ||
-+	    !cpus_have_final_cap(ARM64_HAS_32BIT_EL1))
- 		clear_bit(KVM_ARM_VCPU_EL1_32BIT, &features);
+-	__unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
+-			     (range->end - range->start) << PAGE_SHIFT,
+-			     range->may_block);
++	kvm_stage2_unmap_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
++			       (range->end - range->start) << PAGE_SHIFT,
++			       range->may_block);
  
- 	if (!kvm_supports_guest_pmuv3()) {
-@@ -1688,7 +1689,8 @@ static unsigned long system_supported_vcpu_features(void)
- 		clear_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, &features);
- 	}
- 
--	if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
-+	if (vcpu_is_protected(vcpu) ||
-+	    !cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
- 		clear_bit(KVM_ARM_VCPU_HAS_EL2, &features);
- 
- 	return features;
-@@ -1708,7 +1710,7 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
- 			return -ENOENT;
- 	}
- 
--	if (features & ~system_supported_vcpu_features())
-+	if (features & ~system_supported_vcpu_features(vcpu))
- 		return -EINVAL;
- 
- 	/*
+ 	kvm_nested_s2_unmap(kvm, range->may_block);
+ 	return false;
 -- 
 2.43.0
 
