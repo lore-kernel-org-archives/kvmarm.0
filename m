@@ -1,101 +1,130 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B51349CC3;
-	Mon,  5 Oct 2026 08:17:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C7938836C;
+	Mon,  5 Oct 2026 08:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791188235; cv=none; b=YWSuoGftr4D8MVOmfaZ4ftckCY9JTib7dMXYGPOo3Zso8MLTYKmpXgkkJ1lFXztgFYWmr/bxfXZ2quclEbX6B3suRIriTrr7lRQ1Al0B97TKyJbsZqvQwA/B797fj9FRDg4ISatGe/DXZAteMhRbL5OBATvtJuVLc1JGGkIrm0k=
+	t=1791188860; cv=none; b=fw+IRAy2d7/h6NGf3eolwHEpXk2uGA9Kh5g6LKu8tgVe8x4TG0yS9P/B64besWHdpB+fPYc5QZv/SeFFFslS8UlgArxq3Nxp90FDs0rSdwAgL9OSIUw9/MboSQ76X50XeX2OIZ4CHy4j3yFTSbQTasE2UyHIFD6i5thf0iKmljk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791188235; c=relaxed/simple;
-	bh=Ll4d/W7+VpfeFiQCo86C1RRPw4tjVGdF3eCnkhyfIlI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YjMvNA9qYwa7GxXt2HuOYsPoCKp0y+OdGhLbseLc0r80RiHzE209aMjna8g11CVNyDiVFpqqqz2qyL9Hi1yfpT8b6A5MH9iawEhdBaTWhKFYsE60peudT0NsJe6e3SYD4z7u2ahzFEB7sM5KbJ7/WlmIqYjr9uK+eb43crVu1nI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gvOMKerV; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791188860; c=relaxed/simple;
+	bh=tPVv6cAJ4mS7KxYWT+/8HwELvC3Yq6cmUWBF2ZodqIU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lNSOh023S77KzxjFvyf/oBtFfCCJRGp79QYceQVpLRcu8/UTYjGj7Jk2OTgDfXtKpYEUoSbDV7Noc02eOq2u5dXbXsbOUCyf2/YoLA3LvBt/K8+oCheeut5BW2a7ajomRRnEY+IAfc3QavlhZ79NcYJUHscZ5G6COTABMipTuKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZFgOJSus; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gvOMKerV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88A371F000FF;
-	Mon,  5 Oct 2026 08:17:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZFgOJSus"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40A7A1F000FF;
+	Mon,  5 Oct 2026 08:27:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791188234;
-	bh=LOUDEDfbIuhsdU9SMlqRtqsOKmFkLusGahJcyhTqJsA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=gvOMKerVLu6ANJO/Dzr1bSj3L6JSMCZ9duOUYPtB4ZW58O+tUaPSe4KMitx4ROu7n
-	 r/orIXgLCdvlt/jk/DGlVcB/6xbezs6hrr0tGmVFn72NEPkKlfX/41U85N51HNE2Cj
-	 80jrS3NP88l4TdQTKj1G7UmIo1rzrbJY13FIBKr1U7e+fUWi9GPhAVpeOZEnT7dRCL
-	 TS5+2M2ZFvbv7G+nRTS8INQjg4ucv8HvlMXK811bc6v4jWh/ebKF6zbKOSMWqM9qO+
-	 EavxJFIIk/Bw1ceQJG2n7P7QqYhvJl9tTHrkAqS1e8Q2ItaFUSpD5RmlzI8k7pRxAa
-	 i+PN9tuh9XW7g==
-Date: Mon, 5 Oct 2026 01:17:05 -0700
-From: Oliver Upton <oupton@kernel.org>
+	s=k20260515; t=1791188854;
+	bh=fsKzr1wwNvOjG1lYsOOgfAPocI7bU4FNx1neeTdXdCU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=ZFgOJSusJIoSOi11shbnQnrlSzUGgYbaD3c8YdF90OeX7PaXk7RuxWk0/vu9lA0Vj
+	 nUqK2foIIZ5QFyit1d67UQBHX7OkLSBMI8/G+6tmHeTUVMzp2th5bIY7SseS8ZL0sT
+	 bgmcxpLAHJOk7axStkf3y9j1GEnI0teRW0fcb1KwO5YX6na+1uLW1bdzCM0vVYT58i
+	 x3wWG+N/q5f9hzKRfeC3fyYhfWDCb8iE7gSxhkZ6QkAl0OmbMlQykWSGf8aZwyMGVH
+	 0o9PO+y9+MkeUQjKL06AY/4euFiG5MNwK/hm9+JQXTpc/dq2fmvOTxIbF/afYdgjwO
+	 DyWJEkRhLxFHQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xDe2l-0000000GzC6-42XU;
+	Mon, 05 Oct 2026 08:27:32 +0000
+Date: Mon, 05 Oct 2026 09:30:39 +0100
+Message-ID: <87ece435xs.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: maz@kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com,
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	vdonnefort@google.com, qperret@google.com, tabba@google.com
-Subject: Re: [PATCH v3] KVM: arm64: selftests: Check SError is not pending
- after delivery
-Message-ID: <asNdAXGkxagm88Su@kernel.org>
-References: <20261005050349.836795-1-fuad.tabba@linux.dev>
+Cc: oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	vdonnefort@google.com,
+	qperret@google.com,
+	tabba@google.com,
+	mark.rutland@arm.com
+Subject: Re: [PATCH] KVM: arm64: Pend host SErrors for protected vCPUs through HCR_EL2.VSE
+In-Reply-To: <20261005050352.836980-1-fuad.tabba@linux.dev>
+References: <20261005050352.836980-1-fuad.tabba@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261005050349.836795-1-fuad.tabba@linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, vdonnefort@google.com, qperret@google.com, tabba@google.com, mark.rutland@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Fuad,
-
-On Mon, Oct 05, 2026 at 06:03:49AM +0100, Fuad Tabba wrote:
-> test_serror() never looks at the vCPU after the SError is delivered, so
-> a stale pending SError goes unnoticed. Read the vCPU events back and
-> check the SError is no longer pending.
+On Mon, 05 Oct 2026 06:03:52 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
+> kvm_inject_serror_esr() reads PSTATE.A and SCTLR2_EL1.NMEA to decide
+> whether to emulate the SError's exception entry or pend it through
+> HCR_EL2.VSE. For a protected vCPU, the host's copy of those is stale,
+> and when it reads as unmasked KVM emulates the entry on that copy. EL2
+> never delivers it as an SError: its entry handler turns the pending
+> exception into an external abort on the trapped access, and an MMIO
+> completion still pending trips WARN_ON(INCREMENT_PC).
+> 
+> Always pend through HCR_EL2.VSE for a protected vCPU. EL2 forwards it,
+> and the guest's own masking decides when the SError is taken.
+> 
+> Fixes: 872383bd12e11 ("KVM: arm64: Add per-EC entry/exit state marshalling for protected guests")
+> Reported-by: Sashiko <sashiko-bot@kernel.org>
+> Closes: https://lore.kernel.org/all/20261001142109.794CA1F000FF@smtp.kernel.org/
 > Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 > ---
-> The fix from v2 was applied [1], but not this test.
+> Applies on kvmarm/next. A follow-up to "KVM: arm64: Confine protected VM
+> vCPU state to EL2" [1], from Sashiko's review of its v4 patch 12.
 > 
-> Changes since v2 [2]:
-> - Dropped the fix, now in kvmarm/next.
-> - Rebased on kvmarm/next.
+> [1] https://lore.kernel.org/all/20261001135711.1640520-1-fuad.tabba@linux.dev/
 > 
-> [1] https://lore.kernel.org/all/20261001135711.1640520-2-fuad.tabba@linux.dev/
-> [2] https://lore.kernel.org/all/20260921101030.1231605-1-fuad.tabba@linux.dev/
+>  arch/arm64/kvm/inject_fault.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
->  tools/testing/selftests/kvm/arm64/external_aborts.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> index d6c4fc16f8795..49a342b078365 100644
+> --- a/arch/arm64/kvm/inject_fault.c
+> +++ b/arch/arm64/kvm/inject_fault.c
+> @@ -378,8 +378,11 @@ int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr)
+>  	 *
+>  	 * As we're emulating the SError injection we need to explicitly populate
+>  	 * ESR_ELx.EC because hardware will not do it on our behalf.
+> +	 *
+> +	 * A protected vCPU's PSTATE and SCTLR2_EL1 live at EL2, so pend through
+> +	 * HCR_EL2.VSE and let the guest's own masking apply.
+>  	 */
+> -	if (!serror_is_masked(vcpu)) {
+> +	if (!vcpu_is_protected(vcpu) && !serror_is_masked(vcpu)) {
+>  		pend_serror_exception(vcpu);
+>  		esr |= FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SERROR) | ESR_ELx_IL;
+>  		vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
 > 
-> diff --git a/tools/testing/selftests/kvm/arm64/external_aborts.c b/tools/testing/selftests/kvm/arm64/external_aborts.c
-> index 7836756a38a6c..c35b0c87250a1 100644
-> --- a/tools/testing/selftests/kvm/arm64/external_aborts.c
-> +++ b/tools/testing/selftests/kvm/arm64/external_aborts.c
-> @@ -239,6 +239,7 @@ static void test_serror_guest(void)
->  
->  static void test_serror(void)
->  {
-> +	struct kvm_vcpu_events events;
->  	struct kvm_vcpu *vcpu;
->  	struct kvm_vm *vm = vm_create_with_dabt_handler(&vcpu, test_serror_guest,
->  							unexpected_dabt_handler);
-> @@ -247,6 +248,11 @@ static void test_serror(void)
->  
->  	vcpu_inject_serror(vcpu);
->  	vcpu_run_expect_done(vcpu);
-> +
-> +	vcpu_events_get(vcpu, &events);
-> +	TEST_ASSERT(!events.exception.serror_pending,
-> +		    "SError still pending after the guest took it");
-> +
->  	kvm_vm_free(vm);
->  }
 
-Can you add coverage for the vCPU events state to all the test cases? In
-addition to the case where the SError is taken, it'd be good to assert
-that the SError remains pending if the guest masked it.
+I thought we had discussed that one before (or am I making things
+up?). Why can't the host always evaluate serror_is_masked() as true?
+Given that PSTATE is never synced back to the host, it would only be a
+matter of set PSTATE.A==1 at vcpu creation time.
+
+It'd be more palatable than this sprinkling of vcpu_is_protected(),
+which really do not scale.
 
 Thanks,
-Oliver
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
