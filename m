@@ -1,93 +1,64 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6880A448BB6
-	for <kvmarm@lists.linux.dev>; Mon,  5 Oct 2026 11:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD2BD46D558
+	for <kvmarm@lists.linux.dev>; Mon,  5 Oct 2026 12:11:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791198474; cv=none; b=QpaQfISYg/T7cfLucW2AcgigRvWFR4jTSoHfSG3yfJjMsb33iLMugSnqlvVPQMzNCXLbr/iWIMPMw3eY0OteQLe/1QTSNBKOGQCNvxkWEk3FbF7WRErsjXAK9AKxh3Fnsbr3eKuap65Jzs8+37NlUL0oKPMxqV+EsOCXzSHM/UM=
+	t=1791202263; cv=none; b=t6PzQxlyiy3Zj1kUP7TFzeh7NDM2WLmX5IFg+Uibti1YAdkFKyujMySKQbqIvXHkN01wAdt4gI8reR2v9hvvDtSh9h32qIaUKGqKrNrl4Mor+xrVydtgchFl/AOjeLCd04kKrYE2SP3y3f756vfy+rrrDl6f3YInqSLJRPIKIuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791198474; c=relaxed/simple;
-	bh=OstHisGp7P6hgz4/0D89NdgTFhwBoAjGYPB++ZUdrsQ=;
+	s=arc-20240116; t=1791202263; c=relaxed/simple;
+	bh=f0uib9eMHl81tzc+EqAfrcIxoFi4MWrxxKPr85f9QCE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qm4USnRHf/q9mykQQSfZ9IvBMfr77RvYidb8lOhc+srxQOMlNrV6K+ZrzvvmCXZab7mEGfWEQEdytchxFv5sbcdjx1EVWdfCWe0TX5XmJ2lxjWs9rhuVbg8Hp58QdfFJby5DU6c+A3YucmhHI2YZKsIgwFYTEpq7zXiTWXEI0pE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=huznAKYd; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=lzi0wukxg2dfNUuVwy5Aims924h7gm0zpRwcbL2hswr80rV9gU9XvRsj8FOEUz4A2NK9r/uVfaL74TBRxlk+U9hR7FczINXqn+D9ZXWES0DgiOg8dIe9ERHw/2+4pb3Svlm4s2tF38Fo6fuIBTq6bZv3MRfDbeiyCaiHDfAQb8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KlY3ULAw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="huznAKYd"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 81EA2152B;
-	Mon,  5 Oct 2026 04:07:49 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9F9B13F86F;
-	Mon,  5 Oct 2026 04:07:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1791198472; bh=OstHisGp7P6hgz4/0D89NdgTFhwBoAjGYPB++ZUdrsQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=huznAKYddU0oZFKAUlCcQ1STeT/7wXvr3I03BhqGvib3xpajTRxhfLH9R4n0xbL3S
-	 kIEIw7UozOwAKAYis3taxahTMvipmp7uuojl2U657r8N7zaBJ5NTsf4aP8uJ8+p+Rb
-	 BYYgwF3ME4VdyiRufVFi72RJCpQxDxT6c94/F8TA=
-Date: Mon, 5 Oct 2026 12:07:46 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Zi Yan <ziy@nvidia.com>
-Cc: Kristina =?utf-8?Q?Mart=C5=A1enko?= <kristina.martsenko@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-acpi@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-efi@vger.kernel.org,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Linu Cherian <linu.cherian@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Hanjun Guo <guohanjun@huawei.com>,
-	Sudeep Holla <sudeep.holla@kernel.org>,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, linux-mm@kvack.org
-Subject: Re: [RFC 00/12] arm64: Add support for TLBI domains
-Message-ID: <asOE8NSHH3Jnv7AJ@arm.com>
-References: <20261001110655.461473-1-kristina.martsenko@arm.com>
- <DLW95E2XWSVT.8W90FW4WG6K8@nvidia.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KlY3ULAw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 059FB1F000FF;
+	Mon,  5 Oct 2026 12:10:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791202262;
+	bh=f0uib9eMHl81tzc+EqAfrcIxoFi4MWrxxKPr85f9QCE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=KlY3ULAwEo0SmWdc+EGl/5eTNPos2ssNKzNs4Vx9kPXwGMCvuYHiXqhTf935U3Siz
+	 mMFPezPH1itjem0CcEus1PEX8iwup2+pTX0tcEqzh4Z1zPKSqFmwBcRjLcBL19EhuC
+	 VjPk87y9hrjRt4uP/fOxm6SdkGXvIqYN09U/B/meU2XCAcXKmn+HDRdWUFaZTbCIeR
+	 HXNisfDkfpQTDNz9pfMCV3ibrgv2oS2832pIh6xBcBjod6NB3UapzexWJiTrU4zzLK
+	 P5VreISqLLUjb+HOm43OrCG2o9JpTqeZJdbO9ySjDB4sWzJn/F1oP3bU9F8m2zCLhf
+	 HSBlWW7NLgDSg==
+Date: Mon, 5 Oct 2026 05:10:55 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Matthias Goergens <matthias.goergens@gmail.com>,
+	Steffen Eiden <seiden@linux.ibm.com>, fuad.tabba@linux.dev,
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [RFC PATCH] Documentation/process: Add a maintainer entry
+ profile for KVM/arm64
+Message-ID: <asOTzzNU7foTo9KA@kernel.org>
+References: <20260924033536.3624334-1-matthias.goergens@gmail.com>
+ <877bkb3zjq.wl-maz@kernel.org>
+ <20260924083036.1744194-1-matthias.goergens@gmail.com>
+ <875wzu4vuv.wl-maz@kernel.org>
+ <20260925085621.562448-1-matthias.goergens@gmail.com>
+ <87tsnb2dtq.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <DLW95E2XWSVT.8W90FW4WG6K8@nvidia.com>
+In-Reply-To: <87tsnb2dtq.wl-maz@kernel.org>
 
-On Sun, Oct 04, 2026 at 02:06:48PM -0400, Zi Yan wrote:
-> On Thu Oct 1, 2026 at 7:06 AM EDT, Kristina Martšenko wrote:
-> > This series allows the kernel to use TLBI domains. TLBI domains (FEAT_TLBID) is
-> > an Arm architecture feature that enables a TLB invalidation to target a subset
-> > of CPUs instead of the whole system. It can improve performance on systems with
-> > many CPUs. TLBID is not yet part of the Arm Architecture Reference Manual but
-> > some of it is described in the latest XML [1].
-> >
-> > The goal of this series is to send TLBI commands only to the CPUs where a
-> > process has run (i.e. where its page tables have been installed). The last
-> 
-> IIUC, mm_cpumask() is used to store this information on x86 and other
-> archs. I see you put this information in tlbid_domains of mm_context_t
-> from patch 9, although in the form of tlb id domains. I wonder why not
-> make arm64 also update mm_cpumask() like x86 and other archs and derive
-> the tlbid domains based on mm_cpumask() and a cpu-to-domain mapping
-> (added in patch 7).
+On Sun, Sep 27, 2026 at 11:22:57AM +0100, Marc Zyngier wrote:
+> This otherwise looks pretty good to me. Let's see what Oliver says,
+> but I'm otherwise inclined to take something like this in 7.4.
 
-One reason is that it's cheaper to compute the tlbi domains at context
-switch time (bitmap-and IIRC) than working from mm_cpumask() every time
-we do a TLBI.
+I haven't had time to review this in detail but I'm not generally
+opposed to better documentation. Post as a patch and I'll make an
+effort to review.
 
-That said, suggestions for a quick algorithm are welcome. Subject to the
-race conditions Will mentioned, we could use the mm_cpumask() for a
-quick check if we ever ran on that CPU and avoid recomputing the tlbi
-domains.
-
--- 
-Catalin
+Thanks,
+Oliver
