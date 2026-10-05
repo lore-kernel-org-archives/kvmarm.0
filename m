@@ -1,84 +1,101 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422E93C10BE;
-	Mon,  5 Oct 2026 08:31:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F9F92FE05C;
+	Mon,  5 Oct 2026 08:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791189070; cv=none; b=PKFwYOSE0BuWsjAgUErlpLXR7HscYuviBNzFJJRpUpdILtHI6qL3SgCOA2mEWPtLdc4xEF0ismnuU8u8nFW5IzcaRXEGdq5OQIaMwZ/txIT7glSHCLuZ2R0/ZBQQXXEcVQY2OiUR2Rt2RXvkeaVuenjFcx3k/oKVG4ECGozVagY=
+	t=1791189629; cv=none; b=QC5+GHL3sjh+yuJD8QU2tBxhU4NZkSqJQpfMSsRsOCJX48t78OsZnr2MVwNIl12/ar6rXfvnsMMnTk2teQJiUB46xxwjjaTIArThksTi5q/HHz5Q5V9p20EdVxI5TD/GS+3PKnSsUXryfugt7Dcf2VRdQv6bT2/ldXpAxK+Jj9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791189070; c=relaxed/simple;
-	bh=p5j1tVtGImF6mr2cxwmxFFMWCEsHi20IPSFC1HEmhaE=;
+	s=arc-20240116; t=1791189629; c=relaxed/simple;
+	bh=7vYwjN3r+v7sr4u0OEkpPtVQ+McQ8rLbBPFktzyUxlc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hz8OcXcpJW13NDtxC6RaBOSYWJJhjqvVQrNKNtJ9h9rr3F/s2nkrGsHfnEBYe71AZSwqhZ0ryggnrOqV044bo045LCKJNDeXr6qLBdT68u7l/gawsAyMgoq3TYmUzc91y6aYPcGjXsd1YFiNsMekasO0iqpebsQuVtVd96rEOvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i7coYvwA; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=oj84WeGItLil/99YLl3lw+Av7Iz+Mci4ahwnJAt50aqkIwaxC3kvvEU4KtKVTId4GgocHHphapT/ju6w8H4L4bOTAPfdhYhmYkf2a/rB9J9TmlPIBE215UnT+XXLuALZPCKK4+qD/dRkHToCY0jYrMDie/2mWBiEDiICs2Pp69I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e6+39s7d; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i7coYvwA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33AC91F000FF;
-	Mon,  5 Oct 2026 08:30:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e6+39s7d"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 424981F000FF;
+	Mon,  5 Oct 2026 08:40:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791189064;
-	bh=+vMssXeFUWuK2+atRP/yY0Yi3PMPF4xdx4cHzEXP+mc=;
+	s=k20260515; t=1791189628;
+	bh=OT4fTCBzl6ea0tdPBPkwmD3TW36PNhwwmU38PY2NoAw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=i7coYvwAbK+cQxKJ9kh7zGq3agGxzKHndRn15xPbhOADf5QKOA/QmN6EBGXpj+xgU
-	 JLmUQ/mtLLln+nMvG1tlxw8rOf7Oh+RJqlXXRR1K8MB1OPpJWYsp3JrKhUHFUlKQ3/
-	 EukvSCTM8MhAcOm1Pk5ul0Vrzj5m8RysAwXRZoArbtFeVx5ZqwfPb2gltLF7rMx1IR
-	 QftH+u8ya46m6O8XLTIPMUf/QVgClpZAuv/roONQKKozDDh1tGXIy5gS2xIFOmeNKy
-	 rHwVL4UqsZRSrzcpPknKZS8rwF1gipw4+GIXwJEHzjuA0rV0kVnNY1S8ids0vyouJt
-	 MU3Vy+k1aSquA==
-Date: Mon, 5 Oct 2026 01:30:56 -0700
+	b=e6+39s7dojdpn57bOln9SdDj77kq3GXuRYOEc4Gm39fJlu+B2J/ZduPGUzr2efObT
+	 ZJCz5CLam8qehPkkIiHWC9jzLo3mbRxMAiB0RJeUV+4ZL9MYllSjQTLYPwROymbka+
+	 /A9UrZ086Z+ROMSV2wwSGb42pHPwLLGNQN42B+Q2AyiweuXbm6yNToUbPIVFDfWnrZ
+	 5pUNCRKMbaMq/gwluzf4zY6NOH6phd+zrdxfjBwHun7aTaj8N3zCnHhNq/l8/qwmkJ
+	 /shnVG5aWIu8LPx3Ht11qTeruxeOAxBd60wsX7qutlSBYYeZohg7Ka92o6+vKGC4QD
+	 d1dHjZyOZkTqw==
+Date: Mon, 5 Oct 2026 01:40:17 -0700
 From: Oliver Upton <oupton@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: maz@kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com,
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	vdonnefort@google.com, qperret@google.com, tabba@google.com,
-	mark.rutland@arm.com
-Subject: Re: [PATCH] KVM: arm64: Pend host SErrors for protected vCPUs
- through HCR_EL2.VSE
-Message-ID: <asNgQDxNQP9Gll-p@kernel.org>
-References: <20261005050352.836980-1-fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Kristina =?utf-8?Q?Mart=C5=A1enko?= <kristina.martsenko@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-acpi@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-efi@vger.kernel.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	David Hildenbrand <david@kernel.org>,
+	Lorenzo Stoakes <ljs@kernel.org>,
+	Linu Cherian <linu.cherian@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Hanjun Guo <guohanjun@huawei.com>,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Subject: Re: [RFC 00/12] arm64: Add support for TLBI domains
+Message-ID: <asNicWUtP4v1ti19@kernel.org>
+References: <20261001110655.461473-1-kristina.martsenko@arm.com>
+ <87mrsu3gql.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20261005050352.836980-1-fuad.tabba@linux.dev>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87mrsu3gql.wl-maz@kernel.org>
 
-Hi Fuad,
+Hey,
 
-On Mon, Oct 05, 2026 at 06:03:52AM +0100, Fuad Tabba wrote:
-> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> index d6c4fc16f8795..49a342b078365 100644
-> --- a/arch/arm64/kvm/inject_fault.c
-> +++ b/arch/arm64/kvm/inject_fault.c
-> @@ -378,8 +378,11 @@ int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr)
->  	 *
->  	 * As we're emulating the SError injection we need to explicitly populate
->  	 * ESR_ELx.EC because hardware will not do it on our behalf.
-> +	 *
-> +	 * A protected vCPU's PSTATE and SCTLR2_EL1 live at EL2, so pend through
-> +	 * HCR_EL2.VSE and let the guest's own masking apply.
->  	 */
-> -	if (!serror_is_masked(vcpu)) {
-> +	if (!vcpu_is_protected(vcpu) && !serror_is_masked(vcpu)) {
->  		pend_serror_exception(vcpu);
->  		esr |= FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_SERROR) | ESR_ELx_IL;
->  		vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
+On Sat, Oct 03, 2026 at 05:12:50PM +0100, Marc Zyngier wrote:
+> Hi Kristina,
+> 
+> On Thu, 01 Oct 2026 12:06:43 +0100,
+> Kristina Martšenko <kristina.martsenko@arm.com> wrote:
+> 
+> [...]
+> 
+> >   * It's also possible to use TLBI domains to limit a KVM guest's TLB
+> >     invalidations to CPUs where the guest has run. I'll try to include that in
+> >     the next version. This series only disables domains for guests.
+> 
+> My take on this is that just like MPAM, it makes little sense to
+> expose this to guests. As long as the L0 hypervisor has the means that
+> to scope TLBIs to the relevant domains (subset of CPUs to start with,
+> but hopefully SMMUs eventually), we're good.
 
-The emulated injection is only necessary when vcpu_has_nv(), it was just
-convenient for the sake of testing that everything short circuits to
-emulation instead of VSE.
+Err... I think TLBID is quite useful in a VM and unlike MPAM should
+actually be virtualizable.
 
-I see Marc suggests letting the stale PSTATE.A value force the desired
-behavior which seems fine to me. If that doesn't work, I'd rather
-emulated injection be predicated on vcpu_has_nv() than
-vcpu_is_protected() with the appropriate rephrasing of the preceding
-comment.
+Think of a case where a VM spans multiple chiplets, the VMM will likely
+affine vCPU threads to a particular chiplet and present a virtual
+topology to the guest. If those underlying chiplets map to TLBI domains
+then it seems beneficial to expose virtual domains to the guest.
+
+Even for VMs that fit within a single domain, you'll still need VMM
+participation to scope the virtual domain correctly and affine the vCPU
+threads appropriately.
+
+I don't think this needs to happen as part of the initial enablement, no
+issues with hiding the feature for now. We can revisit the topic later
+how the feature is expected to work for KVM.
 
 Thanks,
 Oliver
