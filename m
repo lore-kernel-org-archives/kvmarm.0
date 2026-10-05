@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C0A5433051;
-	Mon,  5 Oct 2026 09:09:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CAAC446C18;
+	Mon,  5 Oct 2026 09:09:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791191351; cv=none; b=EiXLfKQKmRbxH/HuQJLmZLJV93oaYS5Wxy7Kdiy+bzDFHJD6u2qxIt9BjxmR+2Cjkh1cr57d9FmWhPo/AtOE8/SFL0QXmz72ztLuSZfBID6DZX9yJkndrjiclmEhPnSkIGJmzuh+X2dy6OGT5ivH0Nd4hXmXy0FpBOH88Fze/Xs=
+	t=1791191354; cv=none; b=MWtAKr6UHBDuFJK18Fb9NG+LYE/l8a5EA9VoOf1PEu261QpCGPpIepBm2JIVuCsAGx6RzM+StHGlk7k1aZM26VLxBXA1Y+ZdBviXKhB1VrJw2Vc0t8f/65BhPuYmGiAAt0nGjthXI1dT28mLrwBMddY7/ZzzHuPpaStYUnMdMRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791191351; c=relaxed/simple;
-	bh=lpi/z5z9I7QN6X4z0f7ezeP7dj+LvQGbCZME+zU+F/k=;
+	s=arc-20240116; t=1791191354; c=relaxed/simple;
+	bh=frlcBi4UAJkigcKVYvolRUhfFy/cS93/gSL/61U+fGM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BlcWgxRGAsdaKpwIcb1rDSEGA5DHA7COn8W8SdiJNkTESvJ17yfE0y5QW/UPQWYRRmiWMTx1QzBBEhTBTvHV9PxlLxySAxa4kwR/L/tgGqnCQE21yGR+pPj+zUU04s3UgTnoNYxpVE55UninOM9jBibZqb5JnRvyT4Fd2oCdUoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=QdwfOA5W; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=QS4TxViSjyxVtfkw17gVGZALYuyKTCtP4hQnZl1RRlcc1dOkRkHe+e6CuVsJVQSg5ZTZJb4tR4KZo4a3Vud0FkJReig8/XXcO9NV6ZyG37TEi/bp+aYiFx9xTHeNzbgNRKKfYfS5/FKWS113Ky7LyduFgS2rOMZmOg5MKWvvKWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=qrQD3DOB; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="QdwfOA5W"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="qrQD3DOB"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 22DD2152B;
-	Mon,  5 Oct 2026 02:09:06 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 73D271576;
+	Mon,  5 Oct 2026 02:09:09 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 852A63F66F;
-	Mon,  5 Oct 2026 02:09:06 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id CAB6F3F66F;
+	Mon,  5 Oct 2026 02:09:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1791191349; bh=lpi/z5z9I7QN6X4z0f7ezeP7dj+LvQGbCZME+zU+F/k=;
+	t=1791191352; bh=frlcBi4UAJkigcKVYvolRUhfFy/cS93/gSL/61U+fGM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QdwfOA5W/C4HUeVUSHag9Yf9OtZWgsmNLUrGcHZqLXhW3JbEgr2dNGANFc9t8NgJo
-	 cWwTQaWW3RTgcULkQGzdubSJHcC5f2nkpfkTrtRVTIHCF35zeejFRue5MqFdNw6VE7
-	 FNb0AslsIYcU1GqLiFjWSV1Q4bmb/xY+iLmqKEaA=
+	b=qrQD3DOBUSM8hClpoJ04HoHHlaWTeJhj5DYEHEczvovU/Z4gxBno/s90OWtykcQpJ
+	 8OKILVi9/lnuwU92XUVE90vh/qmnQaKgX9f5/r06t/V2seR9ZRHJyF4Jv2DeiJRqQR
+	 tRnF88rnQYJW+U0Zfcu0Oq/A8MqcCTfBXwwOsXb0=
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -52,9 +52,9 @@ Cc: maz@kernel.org,
 	sudeep.holla@arm.com,
 	jonathan.cameron@oss.qualcomm.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v22 19/23] KVM: arm64: CCA: Don't expose unsupported capabilities for realm guests
-Date: Mon,  5 Oct 2026 10:07:50 +0100
-Message-ID: <20261005090754.2140522-20-suzuki.poulose@arm.com>
+Subject: [PATCH v22 20/23] KVM: arm64: CCA: WARN on injected undef exceptions
+Date: Mon,  5 Oct 2026 10:07:51 +0100
+Message-ID: <20261005090754.2140522-21-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261005090754.2140522-1-suzuki.poulose@arm.com>
 References: <20261005090754.2140522-1-suzuki.poulose@arm.com>
@@ -66,176 +66,30 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Limit the capabilities that are allowed for Realm VMs. Similarly block
-the vm_ioctls backed by the capabilities.
+From: Steven Price <steven.price@arm.com>
 
-Repurpose the kvm_pkvm_ioctl_allowed() to support both pKVM and Realm
-ioctls. Rename the helper to kvm_vm_ioctl_allowed() and move it
-into arch/arm64/kvm/arm.c. Also add a generic kvm_vm_ext_allowed()
-to handle pKVM and Realm capability filtering and route them accordingly.
+The RMM doesn't allow injection of a undefined exception into a realm
+guest. Add a WARN to catch if this ever happens.
 
+Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+Signed-off-by: Steven Price <steven.price@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
-Changes since v21:
- - Drop WARN_ON_ONCE() from kvm_vm_ioctl_allowed to synchronise with
-   what is in -rc5 and make the conflict resolution easier.
----
- arch/arm64/include/asm/kvm_pkvm.h | 19 ------------
- arch/arm64/include/asm/kvm_rmi.h  | 24 +++++++++++++++
- arch/arm64/kvm/arm.c              | 49 +++++++++++++++++++++++++++++--
- 3 files changed, 70 insertions(+), 22 deletions(-)
+ arch/arm64/kvm/inject_fault.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index 2addc37c500e1..b833abb1be9c7 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -53,25 +53,6 @@ static inline bool kvm_pkvm_ext_allowed(struct kvm *kvm, long ext)
- 	}
- }
- 
--/*
-- * Check whether the KVM VM IOCTL is allowed in pKVM.
-- *
-- * Certain features are allowed only for non-protected VMs in pKVM, which is why
-- * this takes the VM (kvm) as a parameter.
-- */
--static inline bool kvm_pkvm_ioctl_allowed(struct kvm *kvm, unsigned int ioctl)
--{
--	long ext;
--	int r;
--
--	r = kvm_get_cap_for_kvm_ioctl(ioctl, &ext);
--
--	if (WARN_ON_ONCE(r < 0))
--		return false;
--
--	return kvm_pkvm_ext_allowed(kvm, ext);
--}
--
- extern struct memblock_region kvm_nvhe_sym(hyp_memory)[];
- extern unsigned int kvm_nvhe_sym(hyp_memblock_nr);
- 
-diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
-index 44f5c75a27b5b..ea1450e0c8619 100644
---- a/arch/arm64/include/asm/kvm_rmi.h
-+++ b/arch/arm64/include/asm/kvm_rmi.h
-@@ -6,6 +6,8 @@
- #ifndef __ASM_KVM_RMI_H
- #define __ASM_KVM_RMI_H
- 
-+#include <linux/kvm.h>
-+
- /**
-  * enum realm_state - State of a Realm
-  *
-@@ -58,4 +60,26 @@ struct realm {
- 
- void kvm_init_rmi(void);
- 
-+static inline bool kvm_realm_ext_allowed(long ext)
-+{
-+	switch (ext) {
-+	case KVM_CAP_IRQCHIP:
-+	case KVM_CAP_ARM_PSCI:
-+	case KVM_CAP_ARM_PSCI_0_2:
-+	case KVM_CAP_DEVICE_CTRL:
-+	case KVM_CAP_NR_VCPUS:
-+	case KVM_CAP_MAX_VCPUS:
-+	case KVM_CAP_MAX_VCPU_ID:
-+	case KVM_CAP_MSI_DEVID:
-+	case KVM_CAP_ARM_VM_IPA_SIZE:
-+	case KVM_CAP_ARM_SVE:
-+	case KVM_CAP_ONE_REG:
-+	case KVM_CAP_ARM_PTRAUTH_ADDRESS:
-+	case KVM_CAP_ARM_PTRAUTH_GENERIC:
-+	case KVM_CAP_SYNC_MMU:
-+		return true;
-+	}
-+	return false;
-+}
-+
- #endif /* __ASM_KVM_RMI_H */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 37ef2ba4e43e2..fe707a0c47308 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -136,6 +136,49 @@ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
- 	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
- }
- 
-+static inline bool kvm_vm_ext_allowed(struct kvm *kvm, long ext)
-+{
-+	/*
-+	 * We could be called with kvm as NULL, so can't use kvm_vm_* for pKVM
-+	 * flavors
-+	 */
-+	if (is_protected_kvm_enabled())
-+		return kvm_pkvm_ext_allowed(kvm, ext);
-+	else if (kvm && kvm_vm_is_realm(kvm))
-+		return kvm_realm_ext_allowed(ext);
-+	else
-+		return true;
-+}
-+
-+/*
-+ * Check whether the KVM VM IOCTL is allowed. For pKVM and Realm VMs, certain
-+ * ioctls are not allowed. Further, certain features are allowed only for
-+ * non-protected VMs in pKVM.
-+ */
-+static inline bool kvm_vm_ioctl_allowed(struct kvm *kvm, unsigned int ioctl)
-+{
-+	long ext;
-+	int r;
-+
-+	/*
-+	 * We are guaranteed to be called with a valid kvm instance, as the
-+	 * only caller is kvm_arch_vm_ioctl(). Catch any deviations, as we
-+	 * rely on the kvm instance below.
-+	 */
-+	if (WARN_ON_ONCE(!kvm))
-+		return false;
-+
-+	/* Cover both pKVM host and Realm VMs */
-+	if (!kvm_vm_hyp_is_distrusting(kvm))
-+		return true;
-+
-+	r = kvm_get_cap_for_kvm_ioctl(ioctl, &ext);
-+	if (r < 0)
-+		return false;
-+
-+	return kvm_vm_ext_allowed(kvm, ext);
-+}
-+
- int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 			    struct kvm_enable_cap *cap)
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index d6c4fc16f8795..d61a3ff04fabb 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -317,6 +317,7 @@ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
+  */
+ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
  {
-@@ -144,7 +187,7 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 	if (cap->flags)
- 		return -EINVAL;
- 
--	if (is_protected_kvm_enabled() && !kvm_pkvm_ext_allowed(kvm, cap->cap))
-+	if (!kvm_vm_ext_allowed(kvm, cap->cap))
- 		return -EINVAL;
- 
- 	switch (cap->cap) {
-@@ -403,7 +446,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- {
- 	int r;
- 
--	if (is_protected_kvm_enabled() && !kvm_pkvm_ext_allowed(kvm, ext))
-+	if (!kvm_vm_ext_allowed(kvm, ext))
- 		return 0;
- 
- 	switch (ext) {
-@@ -2146,7 +2189,7 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
- 	void __user *argp = (void __user *)arg;
- 	struct kvm_device_attr attr;
- 
--	if (is_protected_kvm_enabled() && !kvm_pkvm_ioctl_allowed(kvm, ioctl))
-+	if (!kvm_vm_ioctl_allowed(kvm, ioctl))
- 		return -EINVAL;
- 
- 	switch (ioctl) {
++	KVM_BUG(vcpu_is_rec(vcpu), vcpu->kvm, "Unexpected undefined exception injection to REC");
+ 	if (vcpu_el1_is_32bit(vcpu))
+ 		inject_undef32(vcpu);
+ 	else
 -- 
 2.43.0
 
