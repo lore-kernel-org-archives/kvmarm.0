@@ -1,84 +1,84 @@
-Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E0F320B80B;
-	Mon,  5 Oct 2026 08:08:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.194.8.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8C13783C8
+	for <kvmarm@lists.linux.dev>; Mon,  5 Oct 2026 08:09:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791187712; cv=none; b=CADeh9gxTKCE3MfbN8oNaYos6ilAajcmn9MtJYMD4CFT8Mh7IH1UGBuuYKBvrnxc+OIfqKEkiZzWuXD5De51pk/nQvKWltOaqQZW78Su0G1jdTTtTFie9pqVV0NGCCVB6OdUfX+incp8lbSkiByNWKHWxUkc9MwzuiNV8RUCbLM=
+	t=1791187772; cv=none; b=h8RG9IEYqZMBKFULOfvRHnmc2Kcv0fXxlragH1GvA0QSnDipNgqr8ocCtzdBFWZMghDEuRkcJOCGoT9O0zI7ePc1dFwWkHNLp+GWGeyRRlu3LtqlUU1hayfeZXSEwgil1KVXo4jspVwmSnaNPNVexnQBQ552ju2l03Yx5WteMUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791187712; c=relaxed/simple;
-	bh=nwOcxLH3Q6mUbHlJpRBPnf70GLs/nZjTxnotzVVRqWg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aUu3dCpch/dJAnORxqo6XCsecLJ2fn1hTGEr8b7PLfni/T8Wo/ElSFFGFZkgHgjP8a0B7b952J6bezgpZR3pNqCOFwMZzV06ehKpfWWtjks1+ZYLhpFZ63Uz5Yy7Yn1cfJBo4yCDimVGHc63eHuv9uiRQN5aCfV2AfBUB9CbE3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=pc46WDqn; arc=none smtp.client-ip=217.194.8.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
+	s=arc-20240116; t=1791187772; c=relaxed/simple;
+	bh=8Ht32jWnPGpXzNOU1Ahi58x+0Gp+IIYwZW6gzDfKv78=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k2WBDQyvVm0r6Rp8caG1vUTcc5RwZdUitHqfbf0jMDzd+FWA93X8rIkaczzcy99NGZ0NYqAOYRzWC4F62q9XgfncU1Tw5mxpGbzV5orlpjGJsglK/k5rYfZJxEFNItgILiropHGFU0HYRQxLa2R0qsOaXAQquFU1v8aNF1ElC2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BDiOIjRQ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b="pc46WDqn"
-Received: from francesco-nb (93-33-55-11.ip43.fastwebnet.it [93.33.55.11])
-	by mail11.truemail.it (Postfix) with ESMTPA id 384511FCC5;
-	Mon,  5 Oct 2026 10:08:27 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
-	s=default; t=1791187709;
-	bh=D+Y6d8UnrGoNFXVY4j5x4i4B2RwDWSIwdnLaT7QqWYA=; h=From:To:Subject;
-	b=pc46WDqn850L7lcIP9Fhgqz50KA3iyT13iys3P83fFFH2WP1JTTiUdlzjxtjMHvVV
-	 HCtW83/A9eD1cpccAu9bCoFi7j0aSvw1PCz7wjrMaLb92gfV/RsN5zPJtscGFMubg9
-	 /ZOsBaI0zujfilGLjnXmUYIQgnSpMRoEd8ewqvtkR2KzSYgmVqFDG/CjdDsBJ2Doeq
-	 O2WWifHY6ZjZMBtZ+WMQLB8d9W7V6g+UOJ/VGVty3Ri5/ppfw9BGBiLUwBJK92vu0a
-	 dRA0n3+jy7CbCP75Dk8d+Cuea+2T9TgZEVE/IxwCusznJrIDAZnnQrCsLH7SrmB55M
-	 S/AfgUIpKsrjg==
-Date: Mon, 5 Oct 2026 10:08:22 +0200
-From: Francesco Dolcini <francesco@dolcini.it>
-To: Peng Fan <peng.fan@oss.nxp.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	"Ivan T. Ivanov" <iivanov@suse.de>,
-	Francesco Dolcini <francesco@dolcini.it>,
-	Frank Li <frank.li@nxp.com>, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, imx@lists.linux.dev,
-	Peng Fan <peng.fan@nxp.com>
-Subject: Re: [PATCH v4] arm64: errata: Add NXP iMX8QM workaround for A53
- cache coherency issue
-Message-ID: <20261005080822.GA13120@francesco-nb>
-References: <20260824-imx8qm-cache-coherency-v4-v4-1-b2e528c7d05e@nxp.com>
- <aqleHm4stDi3Pt//@shlinux89>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BDiOIjRQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D97EC1F000FF;
+	Mon,  5 Oct 2026 08:09:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791187770;
+	bh=DyajoXEiE5OZTyyC4HoS1mecTSELNPfDNIq8DNtLUK4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=BDiOIjRQv1EGmqCsNVvPO3VFpxHPm1p+dL8msuPVOWYylIPSmUBxkBrmoJq8b3/eZ
+	 Q5B9CvoKyaXadPxVRJiLiXD2fXWIk0+85yhB5IdDANPsNr/Q7bjA73Xj9rQd6tEwqQ
+	 QImX85QUrDamFCxTH4qvftrRyFfGdZ7uedb3AMgP+igyN1Nj8EpmQ+P7N53ZA3XsG/
+	 0ub4/sS12G/7vkyCcbRElBOaiHrqFYqS/3FAp4l82Vbz1EqrJdTeFEbkmuQEgqMFaD
+	 5CfUy3wJXzKd5MAT5k6QMIqnpGm+YNtPG11nuPaopCqsL3eHGYg+F6w5ByXvn3ZI1r
+	 Mjv1Juutcwq4A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xDdlI-0000000Gyvk-2GAO;
+	Mon, 05 Oct 2026 08:09:28 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Vincent Donnefort <vdonnefort@google.com>
+Cc: joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	kernel-team@android.com,
+	fuad.tabba@linux.dev
+Subject: Re: [PATCH] KVM: arm64: pkvm: Drop keneldoc markers for the allocator structs
+Date: Mon,  5 Oct 2026 09:09:22 +0100
+Message-ID: <179118775350.630534.9707834125912557281.b4-ty@b4>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261005072046.2246900-1-vdonnefort@google.com>
+References: <20261005072046.2246900-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aqleHm4stDi3Pt//@shlinux89>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, vdonnefort@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, fuad.tabba@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hello,
-
-On Tue, Sep 15, 2026 at 11:02:54PM +0800, Peng Fan wrote:
-> On Mon, Aug 24, 2026 at 12:02:04PM +0800, Peng Fan (OSS) wrote:
-> >From: Peng Fan <peng.fan@nxp.com>
-> >
-> >According to NXP errata document IMX8_1N94W[1], the i.MX8QuadMax SoC
-> >suffers from a cache coherency issue (ERR050104). The upper bits, above
-> >bit 35, of the ARADDR and ACADDR buses within the Arm A53 subsystem
-> >have been incorrectly connected. This causes some TLBI and IC
-> >maintenance operations exchanged between the A53 and A72 core clusters
-> >to be corrupted.
-> >
+On Mon, 05 Oct 2026 08:20:46 +0100, Vincent Donnefort wrote:
+> chunk_hdr and hyp_allocator are private. Their description is not
+> exposed to the API documentation. Drop the kerneldoc markers.
 > 
-> Any comments?
+> While at it add the missing description for chunk_hdr::data.
 
-Any plan to have this merged?
+Applied to next, thanks!
 
-Francesco
+[1/1] KVM: arm64: pkvm: Drop keneldoc markers for the allocator structs
+      commit: 6b1abd43b27a5ecac0672482dc8ca1e48c2c8d15
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
 
