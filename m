@@ -1,89 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A6E3290B1;
-	Mon,  5 Oct 2026 06:30:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EB3534D92C
+	for <kvmarm@lists.linux.dev>; Mon,  5 Oct 2026 07:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791181801; cv=none; b=EJ/9qSyTe5KJyVfH1h/PGe9UTMm2EZhA+7GK2u3QByFztwfKSK/P8Av3a2h+wrhY9xdYaWNollaK/2ovM1Cy1zmL0JLVjiqNuWMbps9QNKM8qlbFmC02V1j1kPqTaClgDuhYwEYqwF0rhnUVSAOZFbf6bEJ3IKGyAxxKmV3fmK8=
+	t=1791184855; cv=none; b=KiI3EDfhXwgWqTwTHWcNURSA+Rkjk5KytXWmqox9+urOi0M/N5HAdRiBqJkPn4tPMuSI5m7UPgnYuv/8E4JX8ngAvG7HOvd8EOHkur0uZcVFMmKaXKQlsoosHXi81PwnxrdXwnTfBHoF3Yiz9D/fsGnA+lOimoRhe+9z6Ht/XE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791181801; c=relaxed/simple;
-	bh=TyO4u2KWK78c9gO8VxFyI8mKQKwpEe8Vs33LhFo7sMQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A4OoGk+gVtpOF0uP1cQAwEV+bAo4wvV1IESpfwBCuSOMjbvzbSmotwYmxb3dwXAuVwneEsE8ZmfQ41FBz7/1lrcBF+cwdfupfotdf/0vjCqk+t72LD3QbSQZCkEUIG6bAcpiNRCNOeMgyRRtRe0O/qWg8CiHMvLlLgY3IjTfSnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gFHs0RI0; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791184855; c=relaxed/simple;
+	bh=UztVvrP3/qoq0z0m9CiC1KLLRGcckeoaS1oc1gDRxDk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=RZt4Ixe0pCuUgDDnPyy4X8dZolh8UAnmZohzlCKxPNaFC3g8u5mF3XdG0GDwtmyYaaaoH4vfqa4qdPWMKDUmn8xVB1UvsyLBvX/Hdn7IcdHstuQ+rVvYRS6mDp130f9BA5RwFlgRXZTU639I5qisJSOdDXy2EPkXCL1tEQ1Mso8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KuTWMVYR; arc=none smtp.client-ip=209.85.128.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gFHs0RI0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E65B1F00893;
-	Mon,  5 Oct 2026 06:29:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791181800;
-	bh=NMXP+3HOcHF428TlVrg2cs9+rmnJKLTevmDSSnYryBQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=gFHs0RI0vQiYN70xLjJK6AIYAhKscdvLrr5shld7PhX2KZychrY1pspfUyGMIyjgR
-	 mbkFt9Cb7WMu6rmV0YK7D6FB1RqQpIwcnjbvH/a8zwzdISBXeDxfcPXSds6DBbys25
-	 UPDLmNmI5IR8DhAvnAxyD7B0lABLUqOm8rN5+XVq/cKEJprw7em17Xe35a7kBMxQnj
-	 2nIkE+qQq91I2LBKt5owi+zYqepp7uqZU1R5dNPMIPeduKfGwHtf9JvyuvaHBtbPLX
-	 oSWkiCiwB41mvjZxskSm+7HDZWrGWb6aVcllIiebe2luvrsOd4VQUN7q9UO4HkfmtL
-	 EZb5je/2vyG6w==
-Date: Mon, 5 Oct 2026 07:29:51 +0100
-From: Will Deacon <will@kernel.org>
-To: Zi Yan <ziy@nvidia.com>
-Cc: Kristina =?utf-8?Q?Mart=C5=A1enko?= <kristina.martsenko@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-acpi@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-efi@vger.kernel.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Linu Cherian <linu.cherian@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Hanjun Guo <guohanjun@huawei.com>,
-	Sudeep Holla <sudeep.holla@kernel.org>,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, linux-mm@kvack.org
-Subject: Re: [RFC 00/12] arm64: Add support for TLBI domains
-Message-ID: <asND3-Wnb2hiDAop@willie-the-truck>
-References: <20261001110655.461473-1-kristina.martsenko@arm.com>
- <DLW95E2XWSVT.8W90FW4WG6K8@nvidia.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KuTWMVYR"
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4a175fdc37aso418145e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 05 Oct 2026 00:20:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1791184851; x=1791789651; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=VJ3aIExDf7Vwm1ZzRemWe9zF2SleuBxqq66clvypQjw=;
+        b=KuTWMVYRLSJrL+J5/RhYkP/hjYArAIbSCU4mGvlzawv3WsoN4MV6Yy/QOyRWg2clof
+         5N+NX3V+VJktmh9DKvgLZJgBaWVAtuGxCujyVmBuEvmHjiG1mBitA8iWZbI+5e1jjisE
+         cTK89CsclNEj+EoprlnVFRAhMekiOBeqC3mIUma0q7oC2OMfof4RV5yjFBJp1Ivx6rF9
+         BeACoLfAOIoFyk+wfEx/v3PCw5Doxtdh66b0dmZGj9a9ac1zuuluPpT5FpitCIE0YphD
+         bYQLI4mowQpVb24NNz2KeWVLEXBP+F7a9IdtyahfZK2cq8caFReeSJEvoYtutILjYe7a
+         zIhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791184851; x=1791789651;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=VJ3aIExDf7Vwm1ZzRemWe9zF2SleuBxqq66clvypQjw=;
+        b=0qDZqPDYsiH9LR+InoTnUz9DisCCy3GGCb+8FgKWR+/AiYxPhil+4dADnfm9yXtFTZ
+         oC2Vhn3ZvQhcG8LweICqiJFAi7xXz9cObdIPTShlp32S3dERoGE5oAZ3BD3tMTC1WeW/
+         +3OlRiD70PuSYKqEvEd9+2snFuRmV9ZwyeepJkwwpkDC+nW04zWmbQDsO5PwxTDqnwdT
+         eiudfhsBxyhTiWM0MWnMkK/GjI69yxdrzv5bipz9fNDhn4Ujll6MGmGzDofgRLVoIeQv
+         zlZbIeZwajf+lYaFz3nyV7Bvm+GzpfIejQfWX+N/NP2yqA94JyiBR+Syx5PBmeMy0n5J
+         ht4g==
+X-Forwarded-Encrypted: i=1; AKwUvBzAAbVe6wBwhZeisCHe39HiYuNI6xTIFEMcjVrkIXTPFNutHcleRsps96tcuY0ykZI4UgFN9KE=@lists.linux.dev
+X-Gm-Message-State: AFuF++lRoi3YNm6tE39rXerRwjjpVPX1Q/TeP1q+iZcUaN6yQDVd2O4L
+	YCRT9OLKUtK9nGGRNqXffiLsnjYlJJwHdJiLsLm2PiWkgXyoI97y56r1cxDsJLyborvB5bCzrws
+	NYi4d8UvmIEGH309A9W3TUw==
+X-Received: from wmbgy25.prod.google.com ([2002:a05:600c:8819:b0:4a1:738b:7acf])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:6287:b0:49d:1df8:156d with SMTP id 5b1f17b1804b1-4a1680f5050mr86675175e9.18.1791184851211;
+ Mon, 05 Oct 2026 00:20:51 -0700 (PDT)
+Date: Mon,  5 Oct 2026 08:20:46 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <DLW95E2XWSVT.8W90FW4WG6K8@nvidia.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.rc1.315.gc6ed9934b7-goog
+Message-ID: <20261005072046.2246900-1-vdonnefort@google.com>
+Subject: [PATCH] KVM: arm64: pkvm: Drop keneldoc markers for the allocator structs
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	kernel-team@android.com, fuad.tabba@linux.dev, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, Oct 04, 2026 at 02:06:48PM -0400, Zi Yan wrote:
-> On Thu Oct 1, 2026 at 7:06 AM EDT, Kristina Martšenko wrote:
-> > This series allows the kernel to use TLBI domains. TLBI domains (FEAT_TLBID) is
-> > an Arm architecture feature that enables a TLB invalidation to target a subset
-> > of CPUs instead of the whole system. It can improve performance on systems with
-> > many CPUs. TLBID is not yet part of the Arm Architecture Reference Manual but
-> > some of it is described in the latest XML [1].
-> >
-> > The goal of this series is to send TLBI commands only to the CPUs where a
-> > process has run (i.e. where its page tables have been installed). The last
-> 
-> IIUC, mm_cpumask() is used to store this information on x86 and other
-> archs. I see you put this information in tlbid_domains of mm_context_t
-> from patch 9, although in the form of tlb id domains. I wonder why not
-> make arm64 also update mm_cpumask() like x86 and other archs and derive
-> the tlbid domains based on mm_cpumask() and a cpu-to-domain mapping
-> (added in patch 7).
+chunk_hdr and hyp_allocator are private. Their description is not
+exposed to the API documentation. Drop the kerneldoc markers.
 
-Historically, maintaining mm_cpumask() was a horrible source of contention
-when we looked at it in the past. Maybe that's no longer true, but it
-would be good to see some numbers if we want to start keeping that thing
-accurate on arm64.
+While at it add the missing description for chunk_hdr::data.
 
-Will
+Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+
+diff --git a/arch/arm64/kvm/hyp/nvhe/alloc.c b/arch/arm64/kvm/hyp/nvhe/alloc.c
+index c1881c0011c9..e1e6dd21cda1 100644
+--- a/arch/arm64/kvm/hyp/nvhe/alloc.c
++++ b/arch/arm64/kvm/hyp/nvhe/alloc.c
+@@ -28,13 +28,14 @@
+  */
+ #define MIN_ALLOC_SIZE 16UL
+ 
+-/**
++/*
+  * struct chunk_hdr - Chunk header
+  * @next:       offset from this chunk header to the next one.
+  * @prev:       offset from this chunk header to the previous one.
+  * @__unmapped: Internal field containing the offset to the unmapped page
+  *              boundary, multiplexed with the allocation state flag.
+  * @hash:       Hash computed over the chunk header.
++ * @data:       Chunk payload.
+  */
+ struct chunk_hdr {
+ 	u32			next;
+@@ -45,7 +46,7 @@ struct chunk_hdr {
+ 	char			data[];
+ } __aligned(MIN_ALLOC_SIZE);
+ 
+-/**
++/*
+  * struct hyp_allocator - Heap allocator
+  * @start:		Start in the allocator's reserved virtual address range.
+  * @end:		End in the allocator's reserved virtual address range.
+
+base-commit: f0406245cb9855e6318335a8a223551354291a46
+-- 
+2.56.0.rc1.315.gc6ed9934b7-goog
+
