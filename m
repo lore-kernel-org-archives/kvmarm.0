@@ -1,80 +1,93 @@
-Received: from mta1.migadu.com (out-55.mta1.migadu.com [95.215.58.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D6F36C5BB
-	for <kvmarm@lists.linux.dev>; Mon,  5 Oct 2026 10:35:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.55
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6880A448BB6
+	for <kvmarm@lists.linux.dev>; Mon,  5 Oct 2026 11:07:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791196510; cv=none; b=EzX2CYap+MAteHZaefYfPJCf6CBCUuH46oDpD6fNyBF4wDCnU6MnAZYjXJWu/wo5SKI8JDODvUWV0F0LIY93A9CgzpIrICi1IO+wncZZZH9kwDnzIcp3RIA3s0alH4vHtM/B50lpYjcOxrJN0vSksW6OAlRij1MRuj6vlRQ2Ap8=
+	t=1791198474; cv=none; b=QpaQfISYg/T7cfLucW2AcgigRvWFR4jTSoHfSG3yfJjMsb33iLMugSnqlvVPQMzNCXLbr/iWIMPMw3eY0OteQLe/1QTSNBKOGQCNvxkWEk3FbF7WRErsjXAK9AKxh3Fnsbr3eKuap65Jzs8+37NlUL0oKPMxqV+EsOCXzSHM/UM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791196510; c=relaxed/simple;
-	bh=sV3EdOxAQTAmg19Y3zgY7THPUvOZZFHhczWUDB6Dz3M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MdqLvMXOgsYp6C5Yoo1RjdvtsxOH5ZiAL8RvOGBryQEgq+DQ22l2609fZFaj7o5kpRIAJ9MtRkWL94YBATyPreG7Lx4pHkQsMY9eDv9BbFLyA6sBYBlL6O80ceBB2JMODa5Gu++MAHg5BUJvK1s+/9DY06JyDglCRM9s0yKYAAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=T5zWd35a; arc=none smtp.client-ip=95.215.58.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1791198474; c=relaxed/simple;
+	bh=OstHisGp7P6hgz4/0D89NdgTFhwBoAjGYPB++ZUdrsQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qm4USnRHf/q9mykQQSfZ9IvBMfr77RvYidb8lOhc+srxQOMlNrV6K+ZrzvvmCXZab7mEGfWEQEdytchxFv5sbcdjx1EVWdfCWe0TX5XmJ2lxjWs9rhuVbg8Hp58QdfFJby5DU6c+A3YucmhHI2YZKsIgwFYTEpq7zXiTWXEI0pE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=huznAKYd; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="T5zWd35a"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=sV3EdOxAQTAmg19Y3zgY7THPUvOZZFHhczWUDB6Dz3M=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1791196505; v=1; x=1791801305;
- b=T5zWd35aZXKsb9nyBEGa8vqsR2Fj7FH48neDFVqfCRr7EGRwJjUcqx72PsxraioFx6vnEwEV
- M+mA2i8vYD2jO6FQcUtz6WhIB912b1JHP5+wOwnuBUeG9VTyN/R1hXy3Ml2AVSeOz62xVrmMyJu
- KcitFd8pI+rCbfLHGA/uYk2E=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id e1986e39d62e7c4e;
-	Mon, 05 Oct 2026 10:35:05 +0000
-X-Mizu-Trace-ID: e1986e39d62e7c4e
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5ba429b64c5so7243e87.1
-        for <kvmarm@lists.linux.dev>; Mon, 05 Oct 2026 03:35:05 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwZ4ZxzrOPN6EEE8eYUj/rUTWbTdGREDpzSmK1FiJJ/5U1T6IZidx6dIpTAcf/9eAbATSlzjIU=@lists.linux.dev
-X-Gm-Message-State: AFq9FYLX/1ggFtSCejYOX1jlWRi5D5wQwQaJR44bd8Dedy9SeNqP6EQj
-	/Goq+WRfKNSSbDUwJUP/7khFPFkt3yDB9X/7pMCbHhWd3AUmWgaoDtOFDkux3wGrN9ITBP7TOo+
-	Wrn+fGZ2+mRJdeAFE8OZ5ekGrEMHiG/btkAe01eHW
-X-Received: by 2002:a05:6512:12cc:b0:5b8:c932:f056 with SMTP id
- 2adb3069b0e04-5bcb62a9caamr173682e87.7.1791196504126; Mon, 05 Oct 2026
- 03:35:04 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="huznAKYd"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 81EA2152B;
+	Mon,  5 Oct 2026 04:07:49 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9F9B13F86F;
+	Mon,  5 Oct 2026 04:07:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1791198472; bh=OstHisGp7P6hgz4/0D89NdgTFhwBoAjGYPB++ZUdrsQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=huznAKYddU0oZFKAUlCcQ1STeT/7wXvr3I03BhqGvib3xpajTRxhfLH9R4n0xbL3S
+	 kIEIw7UozOwAKAYis3taxahTMvipmp7uuojl2U657r8N7zaBJ5NTsf4aP8uJ8+p+Rb
+	 BYYgwF3ME4VdyiRufVFi72RJCpQxDxT6c94/F8TA=
+Date: Mon, 5 Oct 2026 12:07:46 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Zi Yan <ziy@nvidia.com>
+Cc: Kristina =?utf-8?Q?Mart=C5=A1enko?= <kristina.martsenko@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-acpi@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-efi@vger.kernel.org,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	David Hildenbrand <david@kernel.org>,
+	Lorenzo Stoakes <ljs@kernel.org>,
+	Linu Cherian <linu.cherian@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Hanjun Guo <guohanjun@huawei.com>,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, linux-mm@kvack.org
+Subject: Re: [RFC 00/12] arm64: Add support for TLBI domains
+Message-ID: <asOE8NSHH3Jnv7AJ@arm.com>
+References: <20261001110655.461473-1-kristina.martsenko@arm.com>
+ <DLW95E2XWSVT.8W90FW4WG6K8@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20261005050352.836980-1-fuad.tabba@linux.dev> <asNgQDxNQP9Gll-p@kernel.org>
-In-Reply-To: <asNgQDxNQP9Gll-p@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 5 Oct 2026 12:34:28 +0200
-X-Gmail-Original-Message-ID: <CA+EHjTw0qZ5DVNOag-8Y_LY2pny3LR8fys0_aFd93m8aYXdTWw@mail.gmail.com>
-X-Gm-Features: AclHuK8UjgPmg-ubCtS9kjMFnBw5eJYdkkIlGq56U6ct7MdjZtvLfCs824uH56c
-Message-ID: <CA+EHjTw0qZ5DVNOag-8Y_LY2pny3LR8fys0_aFd93m8aYXdTWw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Pend host SErrors for protected vCPUs through HCR_EL2.VSE
-To: Oliver Upton <oupton@kernel.org>
-Cc: maz@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, 
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	vdonnefort@google.com, qperret@google.com, mark.rutland@arm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <DLW95E2XWSVT.8W90FW4WG6K8@nvidia.com>
 
-Hi Marc, Oliver,
+On Sun, Oct 04, 2026 at 02:06:48PM -0400, Zi Yan wrote:
+> On Thu Oct 1, 2026 at 7:06 AM EDT, Kristina Martšenko wrote:
+> > This series allows the kernel to use TLBI domains. TLBI domains (FEAT_TLBID) is
+> > an Arm architecture feature that enables a TLB invalidation to target a subset
+> > of CPUs instead of the whole system. It can improve performance on systems with
+> > many CPUs. TLBID is not yet part of the Arm Architecture Reference Manual but
+> > some of it is described in the latest XML [1].
+> >
+> > The goal of this series is to send TLBI commands only to the CPUs where a
+> > process has run (i.e. where its page tables have been installed). The last
+> 
+> IIUC, mm_cpumask() is used to store this information on x86 and other
+> archs. I see you put this information in tlbid_domains of mm_context_t
+> from patch 9, although in the form of tlb id domains. I wonder why not
+> make arm64 also update mm_cpumask() like x86 and other archs and derive
+> the tlbid domains based on mm_cpumask() and a cpu-to-domain mapping
+> (added in patch 7).
 
-On Mon, 05 Oct 2026 09:30:39 +0100, Marc Zyngier <maz@kernel.org> wrote:
-[...]
-> I thought we had discussed that one before (or am I making things
-> up?). Why can't the host always evaluate serror_is_masked() as true?
-> Given that PSTATE is never synced back to the host, it would only be a
-> matter of set PSTATE.A==1 at vcpu creation time.
->
-> It'd be more palatable than this sprinkling of vcpu_is_protected(),
-> which really do not scale.
+One reason is that it's cheaper to compute the tlbi domains at context
+switch time (bitmap-and IIRC) than working from mm_cpumask() every time
+we do a TLBI.
 
-Yes, it's better for the host to always see SErrors as masked. v2 will
-do that when the hyp vCPU is created, and leave
-kvm_inject_serror_esr() alone.
+That said, suggestions for a quick algorithm are welcome. Subject to the
+race conditions Will mentioned, we could use the mm_cpumask() for a
+quick check if we ever ran on that CPU and avoid recomputing the tlbi
+domains.
 
-Cheers,
-/fuad
+-- 
+Catalin
