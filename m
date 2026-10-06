@@ -1,32 +1,32 @@
-Received: from mta0.migadu.com (out-16.mta0.migadu.com [91.218.175.16])
+Received: from mta1.migadu.com (out-163.mta1.migadu.com [95.215.58.163])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E193A718D
-	for <kvmarm@lists.linux.dev>; Tue,  6 Oct 2026 09:28:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2703A8736
+	for <kvmarm@lists.linux.dev>; Tue,  6 Oct 2026 09:28:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791278914; cv=none; b=SYwSKQLO4dhcuVcL4oDdnSMX8boPBii8f43Q1lmPQPMNSBlY/I0NCcQ82lWvz4If+fUG2UEXLBTt/wp6LSd6iqE6ss4g5mYRrpoa9+hW3ZIfk+Txo63qlr8IajvjISZn1JleuxhhH4SdVvmhiT8ux3lqx/jaNCpau/V9UpWNI44=
+	t=1791278930; cv=none; b=StMqVo6U78xqylSSRrpMfcPuvTm8ZbyZx34n1G/k47UACxtkE5NIH94TGUyVyR7eQOkLuMpfmG9XtuWmsAi/OqRzrXpM5KlYi23US+DgdowlFqRPK96r42YUyNFn+pSTRSOXI7kvKecOKkedIp344Mpz7IotJh5ekxF6WqEu1wY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791278914; c=relaxed/simple;
-	bh=v3T3fBb11/yU7ppCqF5TMod7CuvBDECZxjrjNXI8Y9o=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Q/ucGFHA2wbqg1qtYjJsebxQ1ahAJW9j7eZuBHMR3c6m0ejCwg5ANCzmkl39H8cSLwX5nQg6KmEQEXhUr/eQWE32o/KxE0Umdk5MwfHVpVgl+XUtjJZHLlv1f1sQwgGGpxfIjqKW5nvENwuIws5bijQw/gfX9DokCBVHqVbK1GU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PsL7Jxdf; arc=none smtp.client-ip=91.218.175.16
+	s=arc-20240116; t=1791278930; c=relaxed/simple;
+	bh=I68XOz2+dlHst72wv+RGCM6KpZ5GGkDGvyZu0sm4Syw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HJ6uN6/6tRfJxJf2mfIMYYKOhnN7ONYqLhUEmhPap49Ugp8vm8KROhwUdWBI5km3onudgivKJ6x4O7P1wpcFs+FktjnhuRTYs4I2uf84kChZGiUSxS3JiL/xXzERAib1Wuo8KaxS5nzyv9dBJWF6dnT9eBBEj6vUh1s6tdmRbnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MEkA6Q8q; arc=none smtp.client-ip=95.215.58.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PsL7Jxdf"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MEkA6Q8q"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=v3T3fBb11/yU7ppCqF5TMod7CuvBDECZxjrjNXI8Y9o=;
+DKIM-Signature: a=rsa-sha256; bh=I68XOz2+dlHst72wv+RGCM6KpZ5GGkDGvyZu0sm4Syw=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1791278911; v=1; x=1791883711;
- b=PsL7JxdfWqBr55wQ/rfIOw4yeUv7YZfEcRTuZv6UWuOkukydRyHYSD4gkVKv7DQiedOLNLOz
- z2q2qFK5yPord/fz9SKjajpvJNe5mUsb5ZM5ysIYnWJyCRFF4wL+HfWBbyELn+muClp7s4R6Uza
- OvUfE6wlMvQzBZ5N4MTC+/rc=
+ t=1791278926; v=1; x=1791883726;
+ b=MEkA6Q8qN0UqhysbHM0zMcwF6xt4Y2Tyq6RrdzLp/N9665hbEBYSrm4vkkQvZUt9NsbD2OWJ
+ D+VDYoqYlZMuH8r+uIwKZpP0NmRu6zR1nvBNrIDwHuIY998qpIzH1bHEmxgPDO5NOTc91j8yJLR
+ dY8bOTmn3TTkJsUaD23oCZB8=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 913d3b9294e19705;
-	Tue, 06 Oct 2026 09:28:30 +0000
-X-Mizu-Trace-ID: 913d3b9294e19705
+Received: by smtp.migadu.com with ESMTPS id d166d98b4bdd94e5;
+	Tue, 06 Oct 2026 09:28:46 +0000
+X-Mizu-Trace-ID: d166d98b4bdd94e5
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: maz@kernel.org,
@@ -42,11 +42,10 @@ Cc: catalin.marinas@arm.com,
 	yuzenghui@huawei.com,
 	vdonnefort@google.com,
 	qperret@google.com,
-	mark.rutland@arm.com,
 	tabba@google.com
-Subject: [PATCH v2] KVM: arm64: Mask SErrors in a protected vCPU's host copy at first run
-Date: Tue,  6 Oct 2026 10:28:26 +0100
-Message-Id: <20261006092826.2201763-1-fuad.tabba@linux.dev>
+Subject: [PATCH v4] KVM: arm64: selftests: Check the pending SError state in external_aborts
+Date: Tue,  6 Oct 2026 10:28:41 +0100
+Message-Id: <20261006092841.2202109-1-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -56,62 +55,126 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The host's copy of a protected vCPU has SErrors masked from reset, so a
-host-injected SError is pended through HCR_EL2.VSE and the guest takes
-it when it unmasks SErrors. However, the VMM can unmask SErrors in that
-copy before the first run, through PSTATE.A or SCTLR2_EL1.NMEA. KVM
-then emulates the SError's entry on the host copy, and the guest never
-takes it as an SError. Exits that copy PSTATE out set PSTATE.A again,
-but nothing clears NMEA. With NMEA set, an SError injected after a
-KVM_RUN that completes an MMIO access but returns before entering the
-guest also trips WARN_ON(INCREMENT_PC).
+None of the external abort tests look at the vCPU events once the guest
+is done, so an SError left pending after the guest took it, or dropped
+while the guest had it masked, goes unnoticed.
 
-Mask SErrors in the host copy when the first run creates the hyp vCPU,
-after which KVM_SET_ONE_REG is rejected. An SError injected before then
-is still emulated, but only writes registers the VMM can set itself.
+Read the vCPU events back at the end of every test that runs the guest.
+The SError must still be pending in the masked case, with the injected
+ESR when the vCPU has RAS, and no SError, injected or spurious, may be
+pending in any of the others.
 
-Fixes: 872383bd12e11 ("KVM: arm64: Add per-EC entry/exit state marshalling for protected guests")
-Reported-by: Sashiko <sashiko-bot@kernel.org>
-Closes: https://lore.kernel.org/all/20261001142109.794CA1F000FF@smtp.kernel.org/
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
-v2:
- - Set PSTATE.A and clear SCTLR2_EL1.NMEA in the host copy when the hyp
-   vCPU is created, instead of testing vcpu_is_protected() in
-   kvm_inject_serror_esr() (Marc).
+The check that no SError is left pending after the guest took it is
+what fails without commit 3708f6342f01 ("KVM: arm64: Sync HCR_EL2.VSE
+back to the host vCPU under pKVM"), in kvmarm/next.
 
-Applies on kvmarm/next. A follow-up to "KVM: arm64: Confine protected VM
-vCPU state to EL2" [1], from Sashiko's review of its v4 patch 12.
+Changes since v3 [1]:
+- Check the SError pending state at the end of every test that runs the
+  guest, and assert it is still pending, with the injected ESR, in the
+  masked case (Oliver [2]).
 
-v1: https://lore.kernel.org/r/20261005050352.836980-1-fuad.tabba@linux.dev/
-[1] https://lore.kernel.org/all/20261001135711.1640520-1-fuad.tabba@linux.dev/
+[1] https://lore.kernel.org/all/20261005050349.836795-1-fuad.tabba@linux.dev/
+[2] https://lore.kernel.org/all/asNdAXGkxagm88Su@kernel.org/
 
- arch/arm64/kvm/pkvm.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ .../selftests/kvm/arm64/external_aborts.c     | 20 +++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index d4822d8bb16b8..49973c689789f 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -191,12 +191,18 @@ static int __pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu)
- 	/*
- 	 * Mirror EL2's seeding of power_state from mp_state. The hyp vCPU is
- 	 * published, so take mp_state_lock against kvm_psci_vcpu_on().
-+	 *
-+	 * EL2 never reads the VMM's PSTATE or SCTLR2_EL1: undo any unmasking
-+	 * so that a host SError is pended through HCR_EL2.VSE.
- 	 */
- 	if (vcpu_is_protected(vcpu)) {
- 		spin_lock(&vcpu->arch.mp_state_lock);
- 		if (kvm_arm_vcpu_stopped(vcpu))
- 			WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_UNINITIALIZED);
- 		spin_unlock(&vcpu->arch.mp_state_lock);
-+
-+		*vcpu_cpsr(vcpu) |= PSR_A_BIT;
-+		__vcpu_rmw_sys_reg(vcpu, SCTLR2_EL1, &=, ~SCTLR2_EL1_NMEA);
- 	}
+diff --git a/tools/testing/selftests/kvm/arm64/external_aborts.c b/tools/testing/selftests/kvm/arm64/external_aborts.c
+index 7836756a38a6c..1a858d0d82968 100644
+--- a/tools/testing/selftests/kvm/arm64/external_aborts.c
++++ b/tools/testing/selftests/kvm/arm64/external_aborts.c
+@@ -75,6 +75,17 @@ static void vcpu_inject_serror(struct kvm_vcpu *vcpu)
+ 	vcpu_events_set(vcpu, &events);
+ }
  
- 	vcpu_set_flag(vcpu, VCPU_PKVM_FINALIZED);
++static void vcpu_assert_serror_pending(struct kvm_vcpu *vcpu, bool pending)
++{
++	struct kvm_vcpu_events events;
++
++	vcpu_events_get(vcpu, &events);
++	TEST_ASSERT_EQ(events.exception.serror_pending, pending);
++
++	if (pending && vcpu_has_ras(vcpu))
++		TEST_ASSERT_EQ(events.exception.serror_esr, EXPECTED_SERROR_ISS);
++}
++
+ static void __vcpu_run_expect(struct kvm_vcpu *vcpu, unsigned int cmd)
+ {
+ 	struct ucall uc;
+@@ -134,6 +145,7 @@ static void test_mmio_abort(void)
+ 
+ 	vcpu_inject_sea(vcpu);
+ 	vcpu_run_expect_done(vcpu);
++	vcpu_assert_serror_pending(vcpu, false);
+ 	kvm_vm_free(vm);
+ }
+ 
+@@ -162,6 +174,7 @@ static void test_mmio_nisv(void)
+ 
+ 	TEST_ASSERT(_vcpu_run(vcpu), "Expected nonzero return code from KVM_RUN");
+ 	TEST_ASSERT_EQ(errno, ENOSYS);
++	vcpu_assert_serror_pending(vcpu, false);
+ 
+ 	kvm_vm_free(vm);
+ }
+@@ -185,6 +198,7 @@ static void test_mmio_nisv_abort(void)
+ 
+ 	vcpu_inject_sea(vcpu);
+ 	vcpu_run_expect_done(vcpu);
++	vcpu_assert_serror_pending(vcpu, false);
+ 	kvm_vm_free(vm);
+ }
+ 
+@@ -212,6 +226,7 @@ static void test_serror_masked(void)
+ 
+ 	vcpu_inject_serror(vcpu);
+ 	vcpu_run_expect_done(vcpu);
++	vcpu_assert_serror_pending(vcpu, true);
+ 	kvm_vm_free(vm);
+ }
+ 
+@@ -247,6 +262,7 @@ static void test_serror(void)
+ 
+ 	vcpu_inject_serror(vcpu);
+ 	vcpu_run_expect_done(vcpu);
++	vcpu_assert_serror_pending(vcpu, false);
+ 	kvm_vm_free(vm);
+ }
+ 
+@@ -288,6 +304,7 @@ static void test_s1ptw_abort(void)
+ 	*ptep |= bad_pa;
+ 
+ 	vcpu_run_expect_done(vcpu);
++	vcpu_assert_serror_pending(vcpu, false);
+ 	kvm_vm_free(vm);
+ }
+ 
+@@ -313,6 +330,7 @@ static void test_serror_emulated(void)
+ 	vcpu_run_expect_sync(vcpu);
+ 	vcpu_inject_serror(vcpu);
+ 	vcpu_run_expect_done(vcpu);
++	vcpu_assert_serror_pending(vcpu, false);
+ 	kvm_vm_free(vm);
+ }
+ 
+@@ -356,6 +374,7 @@ static void test_mmio_ease(void)
+ 
+ 	vcpu_inject_sea(vcpu);
+ 	vcpu_run_expect_done(vcpu);
++	vcpu_assert_serror_pending(vcpu, false);
+ done:
+ 	kvm_vm_free(vm);
+ }
+@@ -395,6 +414,7 @@ static void test_serror_amo(void)
+ 	vcpu_run_expect_sync(vcpu);
+ 	vcpu_inject_serror(vcpu);
+ 	vcpu_run_expect_done(vcpu);
++	vcpu_assert_serror_pending(vcpu, false);
+ 	kvm_vm_free(vm);
+ }
+ 
 
 base-commit: fa22cd9947fc245d71bc40482f7f78eb0d5a4af0
 -- 
