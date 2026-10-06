@@ -1,200 +1,244 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4667E39EF1C
-	for <kvmarm@lists.linux.dev>; Tue,  6 Oct 2026 06:23:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E853E123F;
+	Tue,  6 Oct 2026 08:30:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791267841; cv=none; b=K+9eomTUYOyX3wcAC38BlBtQVEOjB0pHu38pstSvCJv96HGsyGf9kXVl1Wh4TyJZ1WVwCkuOM1fB86YKk5SQSWmYsKP4xYxAfpA69ZTtLkQIwDxDcyrTabK/5w4wvXTAtX/MwY7WajZc2okW6Yde4DwaK9Q4R69MN++C7XP0kaU=
+	t=1791275437; cv=none; b=Iz0qH0pHX4gSJajW1WFtGM/QpFMLNZn4yi5kbDz2xMyeNjYDHCJMUNiPYJbNKFDhFt8cjfy7Iq/rEVOjkxckqVMPdwfg2hGoxSyGiogRy3+dMVP9r7v46/uQYfwPWRhDzFmcLtDxSIsfKNV+hh5MKSl4l0l/oukAKaHRLm383Fc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791267841; c=relaxed/simple;
-	bh=SMeDTIX8jSBWXiQnBBwSiyWPRzAqbGBsla0efRqXLEM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=krN2kD1WQoO9tLc538BZpNPLUeceIRqgC9geEYSJDVgAD6tGdN8y27keIXyyqYgMuBFzvT05g/D5AKLpLSyz7RujQReF6+F9C8ZSkRTObpZrKf24MfM4Rpt2PZEWey17q52B0gvun+iig2SQmorn96xwBoG9r70dZXlBjKMqcx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bnO1sjtb; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1791275437; c=relaxed/simple;
+	bh=S104aBvWvcjDpwSAuYRp94+JN5ILa7zOtEE62s70xcQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CIT/BJUCH5YGTK1j7MzJkEsBcSTFAMRA7d1904w9x8gkgp/1AP+3MtaxJ2Hx2jfMnfreOCITWHb11Tt3Tqcro3W5eoQGDhEtJl26seSuXCPf4Xe58aK3wzLIN7+kmYjPqnEUWUAOCimeWh+jirVcCeDPK5+MDPru/POuWhlv24E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LG0K2CBh; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bnO1sjtb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1791267839;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DLLq1R13uyDoTfMnvHZDH/2dbxOMckf2plTOpZS7OhQ=;
-	b=bnO1sjtb3VQ3Vkox7LUS5H9slWPktU7hW2t/ypGs4uiDxpn1yPK3l/pvnDLMYU5bloAnGw
-	1W9ICdGXROFSqNObD7IPM/UJmvY6EYge+LVu36y4ullIwOmZ1OOLH3sk38f+m52387XH4S
-	4Nv2N/kLdkNyRaoJl5O+53gtMEtOnHY=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-443-Oq9wHeg_NdOeNj1w8MtZGw-1; Tue, 06 Oct 2026 02:23:56 -0400
-X-MC-Unique: Oq9wHeg_NdOeNj1w8MtZGw-1
-X-Mimecast-MFC-AGG-ID: Oq9wHeg_NdOeNj1w8MtZGw_1791267835
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-cbedbd182f5so468101a12.1
-        for <kvmarm@lists.linux.dev>; Mon, 05 Oct 2026 23:23:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791267835; x=1791872635;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=DLLq1R13uyDoTfMnvHZDH/2dbxOMckf2plTOpZS7OhQ=;
-        b=weAhQ/fncbIDqI19R/lGzuN84f6axN3bbZWQH4fcCa3mxHPIt1AUvBdbgW1D7Vob3W
-         aHYCWDIiVPAVTasl8Bdkk1mM9CkGbNW0BorB27CquwC09jUSqkW6WIzcDwNtueCogYV1
-         NfBly6YT+95nUB5nkHa5mZII8J3uDrZP0KX9nymy7GUZHClD1Wiiidq878tEoHA1rHpO
-         fuLpDX1aGVlO2v5B9fYUAeNixik6t0Y8uhwdcC26tVIfi7dkZa1DudqYxLPGnYK9EANF
-         gW8gW3x6qfIYh80uoEKn7nsDNo9LyoPkqRPWHM/Llq+9loXmaz6bVePyqmPpbUEZaopW
-         JVlA==
-X-Forwarded-Encrypted: i=1; AKwUvBzEFmZj2Q6X5ckIq6HxoP7BE2l4EMKS0epQwe1HvVfN6tfVTZlmqvOnEOUCVrOWA86XtBTqq9g=@lists.linux.dev
-X-Gm-Message-State: AFq9FYIm1l7ubZ7PUpbSHgkjmKR2fV/SaKzZmrsMGHe52+m63o2ju41T
-	XKzKu8Mxl1MVLqlK4LHUB8eUzhGjVLd2G5+mjcUnrlIAIoj944WBLqvqcx+/XurNCVYmWKLP6mC
-	VYpMSqIhWYY+BcwD4Ns+O0PxiOwimGdEt0yzUBzW7UPA5h/mWj8AI50YJGQ==
-X-Gm-Gg: AYBFou3KY7uY4V0uojd2tHRbSUcGxdACORNrM2uH4vKD92YaEyOxvAEPK3hdkZSjssn
-	TP8Qd2M2XYrP7ITRPm58ASxePUvbtcLAwMUIRLr9Lf3m+Vo9xC2enWyJXS9i3/6o8R11qU7bvCa
-	HAjcA8CDu+8eG39d2k+Lnxt1idHQUE5jnfBY4JIYbOcTgW305WJiL4oAIqEjh8UOlZUEof4JtPw
-	CoPprX1zqFqicq2KgEi4Jk48yivEL4uIszlxESFKl66frW+44WjglugzZUadqSUg/akR1nXulR3
-	bsCBgGah4r5Cvr5jLVkH30LxSAdUDMDMEBR/5qXtBddOgIil0BEbg6yzTLOOiM7BWRhF27k2+Z4
-	LDzE23aMzrYbXzGBuiaDP8xMzsDTE3mxdtUqrClR73w==
-X-Received: by 2002:a17:90b:1f92:b0:3a4:e635:a8c3 with SMTP id 98e67ed59e1d1-3a8545cceb1mr1330588a91.20.1791267834676;
-        Mon, 05 Oct 2026 23:23:54 -0700 (PDT)
-X-Received: by 2002:a17:90b:1f92:b0:3a4:e635:a8c3 with SMTP id 98e67ed59e1d1-3a8545cceb1mr1330556a91.20.1791267834199;
-        Mon, 05 Oct 2026 23:23:54 -0700 (PDT)
-Received: from [192.168.68.52] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a6f734ae3dsm9932948a91.2.2026.10.05.23.23.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Oct 2026 23:23:53 -0700 (PDT)
-Message-ID: <7bbee080-e8b9-4f8e-a4bd-c24f0b3b815f@redhat.com>
-Date: Tue, 6 Oct 2026 16:23:44 +1000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LG0K2CBh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8D111F000FF;
+	Tue,  6 Oct 2026 08:30:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791275435;
+	bh=ezI8UiBBWAdumn89F3u9bJA9IULMvyJf/Nv4niiHgUs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=LG0K2CBhlcbzq74ehpntcnmQwYNzuCCtfG+S7uiSuMlqrCskcf1ruTLjEnZaz4X6S
+	 whbuXKS0axRYVR2GNMEHt2ede3C6LSO1PJ8oajSdnoJtYGOzcHdJHT7CMEghiecNoO
+	 d3ejR3sDbl8CK8v8Bj7LkBM493PrlFJ3BXyN+HvCLsX8RNaVIAzTBylD0JJW1DmXgN
+	 srl5le4e32gBvHR/72yX9/bDldGG/cQVZgKMGpHtbXaZ0oxJK7bjaNlqoMaRbCHuBE
+	 sVQYVu/Qcsbz05wIv7TB/KMWF1ZS2tKWrk2ct+I49euc+5QexvJ7OkpdwnbsT7jrKp
+	 k4vWQ1UZQgDXg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xE0ZE-0000000HLLe-26HQ;
+	Tue, 06 Oct 2026 08:30:33 +0000
+Date: Tue, 06 Oct 2026 09:33:39 +0100
+Message-ID: <87cxtn2pp8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	steven.price@arm.com,
+	aneesh.kumar@kernel.org,
+	oupton@kernel.org,
+	gshan@redhat.com,
+	joey.gouly@arm.com,
+	tabba@google.com,
+	yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev,
+	gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com,
+	alpergun@google.com,
+	fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com,
+	lpieralisi@kernel.org,
+	enju.kohei@fujitsu.com,
+	sudeep.holla@arm.com,
+	jonathan.cameron@oss.qualcomm.com
+Subject: Re: [PATCH v22 05/23] KVM: arm64: Track the type of VM in kvm_arch
+In-Reply-To: <20261005090754.2140522-6-suzuki.poulose@arm.com>
+References: <20261005090754.2140522-1-suzuki.poulose@arm.com>
+	<20261005090754.2140522-6-suzuki.poulose@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v22 23/23] KVM: arm64: CCA: Control user register access
- for Realms
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
- linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
- sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
- WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
- sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com,
- Jean-Philippe Brucker <jean-philippe@linaro.org>
-References: <20261005090754.2140522-1-suzuki.poulose@arm.com>
- <20261005090754.2140522-24-suzuki.poulose@arm.com>
- <52e3e45a-751e-40b2-8dd3-3db589ddebee@redhat.com>
- <7b6ed626-eca4-41f2-ae56-0af59a931b29@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <7b6ed626-eca4-41f2-ae56-0af59a931b29@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: VnrYnTdB9EfnvtOoDyBvmf4rg-_tneZkJ5ra7eiVqog_1791267835
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 10/6/26 4:01 PM, Suzuki K Poulose wrote:
-> On 06/10/2026 06:47, Gavin Shan wrote:
->> On 10/5/26 7:07 PM, Suzuki K Poulose wrote:
->>> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
->>>
->>> The RMM restricts the access to the register states that the host can
->>> read/modify for a given Realm.
->>>
->>> e.g., At VCPU creation, can modify GPRS (x0-x30) and PC.
->>>        While servicing SMCCC calls via RSI_HOST_CALL or servicing PSCI
->>>        requests.
->>>        MMIO emulation in the unprotected space.
->>>
->>> Additionally we use the sysreg configuration to advertise/configure the
->>> following Realm parameters, which are required before the Realm Descriptor
->>> is created:
->>>   - SVE Vector Length
->>>   - Number of HW Breakpoints/Watchpoints
->>>   - PMU Counters.
->>>
->>> Thus KVM also additionally allows access to ID_AA64DFR0_EL1 and SVE_VLS for
->>> the configuration of Realm creation parameters. We don't support PMUs for
->>> the Realm VMs yet, so PMCR is not exposed.
->>>
->>> The RMM makes similar restrictions for reading of the guest's registers
->>> (this is *confidential* compute after all), however we don't impose the
->>> restriction here. This allows the VMM to read (stale) values from the
->>> registers which might be useful to read back the initial values even if
->>> the RMM doesn't provide the latest version. For migration of a realm VM,
->>> a new interface will be needed so that the VMM can receive an
->>> (encrypted) blob of the VM's state.
->>>
->>> Reflect the above in KVM_GET_REG_LIST, KVM_SET_ONE_REG calls.
+On Mon, 05 Oct 2026 10:07:36 +0100,
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 > 
->>>   static int core_reg_size_from_offset(const struct kvm_vcpu *vcpu, u64 off)
->>>   {
->>>       int size;
->>> @@ -553,6 +572,9 @@ static int copy_core_reg_indices(const struct kvm_vcpu *vcpu,
->>>           u64 reg = KVM_REG_ARM64 | KVM_REG_ARM_CORE | i;
->>>           int size = core_reg_size_from_offset(vcpu, i);
->>> +        if (vcpu_is_rec(vcpu) && !kvm_realm_validate_core_reg(i))
->>> +            continue;
->>> +
->>>           if (size < 0)
->>>               continue;
->>> @@ -598,6 +620,9 @@ static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
->>>       if (!vcpu_has_sve(vcpu))
->>>           return 0;
->>> +    if (kvm_vm_is_realm(vcpu->kvm))
->>> +        return 1; /* KVM_REG_ARM64_SVE_VLS */
->>> +
->>>       if (!kvm_arm_vcpu_sve_finalized(vcpu))
->>>           return 1; /* KVM_REG_ARM64_SVE_VLS */
->>>
->>
->> Aren't above two checks conflicting to each other?
+> KVM arm64 has different types of VMs with all the different modes in which
+> the hypervisor code can be run. e.g., VHE, nVHE, pKVM etc. Then there is
+> protected VM and normal VMs with pKVM. We might soon add other types,
+> e.g., Arm CCA Realm. So in an effort to make the handling of these
+> different types of VMs a bit more friendly to the eyes, add a VM flavor to
+> the kvm_arch and we could then add handlers for different operations based
+> on the VM type.
 > 
-> Do they? We allow SVE_VLS only for the Realms and we allow that
-> before the vCPUs are finalized. For normal VMs, depending on
-> whether the vcpus are finalized, we either send 1 or the full list.
+> Keep the flavor initialisation at the beginning to allow for the detection
+> early enough and fail out on any unsupported requests.
 > 
-
-num_sve_regs() can be called for 3 cases: (a) non-finalized realm vCPU; (b) finalized
-realm vCPU; (c) Other finalized vCPUs, correct? The check "if (kvm_vm_is_realm(vcpu->kvm))",
-which would be "if (vcpu_is_rec(vcpu))", covers (a) and (b). The second check
-"if (!kvm_arm_vcpu_sve_finalized(vcpu))" isn't used. The check here would be something
-as below after this series is applied:
-
-	/*
-	 * Only KVM_REG_ARM64_SVE_VLS is visible on realm vCPUs no matter if
-	 * they have been finalized.
-	 */
-	if (vcpu_is_rec(vcpu))
-		return 1;
-
-Besides, this check "if (vcpu_is_rec(vcpu))" belongs to PATCH[22]. Hope I make myself
-clear :-)
-
->>
->>> @@ -625,6 +650,10 @@ static int copy_sve_reg_indices(const struct kvm_vcpu *vcpu,
->>>           return -EFAULT;
->>>       ++num_regs;
->>> +    /* For Realms only support SVE_VLS */
->>> +    if (kvm_vm_is_realm(vcpu->kvm))
->>> +        return num_regs;
->>> +
->>>       if (!kvm_arm_vcpu_sve_finalized(vcpu))
->>>           return num_regs;
->>
->> Same question here.
+> With that, add wrappers for checking the "type" of a VM and replace the
+> existing users with the new wrappers.
 > 
-> As above.
+> Given we already have the construct of "kvm_vm_is_protected" in the core
+> KVM code, use that for all confidential compute guests including Realms
+> that we are about to add. Adds __VM_PROTECTED marker vm flavor to draw the
+> boundary for "protected VMs". In later patches, we would add Realm VMs,
+>  which would also be classified as protected.
 > 
-> Suzuki
+> Add a explicit helper to detect if a given VM is a "protected" VM under pKVM.
+> Change the existing users that precisely want to check the VM type. These
+> include :
+>   - kvm_arch_prepare_memory_region - For preventing memslot changes after
+>     pVM creation.
+> 
+> All the others are retained as a wider check for confidential guest VMs.
+> These are:
+>  - kvm_vm_ioctl_set_counter_offset - For disallowing timer offset
+>    configuration
+>  - io_mem_abort for dabt handling without valid syndrome information
+> 
+> Both of which are true for Realms too.
+> 
+> Realms support is restricted to VHE host and thus "kvm_vm_is_protected()"
+> checks in the pkvm hyp specific code doesn't need to change, as the only
+> protected guests it deals with is "protected pKVM" guests. To tighten this
+> init_pkvm_hyp_vm() restricts the hyp copy of the vm_flavor to the ones it
+> supports.
+> 
+> vcpu_is_protected() usage from nVHE hyp code is tricky, as we need to
+> convert the vcpu->kvm to the HYP VA before checking the flavor. This
+> involves kern_hyp_va() usage in asm/kvm_host.h. To avoid build breaks,
+> include asm/kvm_mmu.h to arm64/kvm/mmio.c.
+> 
+> While at it move the psci_version around to keep the structure packed.
+> 
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Tested-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+> Changes since v21:
+>  - Drop kern_hyp_va() and restrict nvhe code to always use vcpu_is_protected_pkvm()
+>  - Drop kvm_vm_is_unprotected_pkvm() and open code the check
+>  - Move psci_version field in kvm_arch around to keep the structure packed
+> ---
+>  arch/arm64/include/asm/kvm_host.h      | 42 +++++++++++++++++++++++---
+>  arch/arm64/include/asm/kvm_pkvm.h      |  4 +--
+>  arch/arm64/kvm/arm.c                   | 33 ++++++++++++++++----
+>  arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  2 +-
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c         |  6 +++-
+>  arch/arm64/kvm/hyp/nvhe/switch.c       |  4 +--
+>  arch/arm64/kvm/hyp/nvhe/timer-sr.c     |  2 +-
+>  arch/arm64/kvm/mmio.c                  |  1 +
+>  arch/arm64/kvm/mmu.c                   |  2 +-
+>  arch/arm64/kvm/pkvm.c                  |  6 ++--
+>  10 files changed, 79 insertions(+), 23 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 286489a69dff5..dedb5df15a803 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -257,7 +257,6 @@ struct kvm_protected_vm {
+>  	pkvm_handle_t handle;
+>  	struct kvm_hyp_memcache teardown_mc;
+>  	struct kvm_hyp_memcache stage2_teardown_mc;
+> -	bool is_protected;
+>  	bool is_created;
+>  
+>  	/*
+> @@ -306,9 +305,22 @@ enum fgt_group_id {
+>  	__NR_FGT_GROUP_IDS__
+>  };
+>  
+> +enum kvm_arm_vm_flavor {
+> +	VM_NVHE,
+> +	VM_VHE,
+> +	VM_PKVM,		/* Normal guests on pKVM */
+> +	MARKER(__VM_PROTECTED),
+> +	VM_PROTECTED_PKVM,	/* Protected VM */
+> +	VM_FLAVOR_MAX
+> +};
+> +
+>  struct kvm_arch {
+>  	struct kvm_s2_mmu mmu;
+>  
+> +	enum kvm_arm_vm_flavor vm_flavor;
+> +	/* Mandated version of PSCI */
+> +	u32 psci_version;
+> +
+>  	/*
+>  	 * Fine-Grained UNDEF, mimicking the FGT layout defined by the
+>  	 * architecture. We track them globally, as we present the
+> @@ -332,9 +344,6 @@ struct kvm_arch {
+>  	/* Timers */
+>  	struct arch_timer_vm_data timer_data;
+>  
+> -	/* Mandated version of PSCI */
+> -	u32 psci_version;
+> -
+>  	/* Protects VM-scoped configuration data */
+>  	struct mutex config_lock;
+>  
+> @@ -1504,9 +1513,32 @@ struct kvm *kvm_arch_alloc_vm(void);
+>  
+>  #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+>  
+> -#define kvm_vm_is_protected(kvm)	(is_protected_kvm_enabled() && (kvm)->arch.pkvm.is_protected)
+> +#define kvm_vm_is_protected(kvm)	((kvm)->arch.vm_flavor >= __VM_PROTECTED)
+>  
+> +#ifdef __KVM_NVHE_HYPERVISOR__
+> +/*
+> + * Accessing vcpu->kvm from nVHE hyp stub is tricky, as we need to convert the
+> + * pointer to the hyp VA. With pKVM, the nVHE code runs with the hyp_vcpu,
+> + * which is populated correctly. Always vcpu_is_protected_pkvm(), which is
 
-Thanks,
-Gavin
+Always *use*?
 
+> + * gated on is_protected_kvm_enabled().
+> + */
+> +#define vcpu_is_protected(vcpu)		BUILD_BUG_ON(1)
+> +#else
+>  #define vcpu_is_protected(vcpu)		kvm_vm_is_protected((vcpu)->kvm)
+> +#endif
+> +
+> +#define kvm_vm_is_protected_pkvm(kvm)					\
+> +	(is_protected_kvm_enabled() && ((kvm)->arch.vm_flavor == VM_PROTECTED_PKVM))
+> +/*
+> + * Rely on is_protected_kvm_enabled() check in kvm_vm_is_protected_pkvm() to
+> + * make sure the vcpu->kvm is always valid VA in the context
+> + */
+> +#define vcpu_is_protected_pkvm(vcpu)					\
+> +	({								\
+> +		struct kvm *__kvm = READ_ONCE((vcpu)->kvm);		\
+> +									\
+> +		(__kvm && kvm_vm_is_protected_pkvm(__kvm));		\
+> +	})
+
+But why do we have to have this pkvm-specific stuff? I thought we had
+established it is not necessary in [1].
+
+I really want to avoid any backend-specific helper, as it really gets
+in the way of maintainability.
+
+	M.
+
+[1] https://lore.kernel.org/r/86pkxs2npx.wl-maz@kernel.org
+
+
+-- 
+Jazz isn't dead. It just smells funny.
