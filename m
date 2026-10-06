@@ -1,72 +1,72 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB3625B0A4
-	for <kvmarm@lists.linux.dev>; Tue,  6 Oct 2026 02:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46AF52701B6
+	for <kvmarm@lists.linux.dev>; Tue,  6 Oct 2026 02:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791253533; cv=none; b=ixqIhpY8I7IeG2jH/aDnWgRNt5odKW2QJLCp8owK2pWaFnTN1BEsjdZsLF9//zSuTwlJHwMN9Z/ptA2j+UdUbZ9IUuG8ElFqgTKlp1pES6oX8t8fb4kTJ7cAw8n/EKq5C6sdYAAa2QtYyAYjKAilFKyJekvUvDXF6Xhh824+BAA=
+	t=1791254285; cv=none; b=naF3Ovb3LqrOxUDzC50Ydx8olomcvwhCAQ+lVs3X8MS57rdIXMxQqwpUB9KFzpkugb6o8Lm/Qo5kgXA2Pw3E4AGMdzfodIBzf0bHpZYfuZxb50JLhdzFLew0Cjb221FXaIgiCkB+wmzZVnSXpoxrW1yQIcnX+/fRmog21Ij5P7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791253533; c=relaxed/simple;
-	bh=QWAFFhzhcemt4JkAXvKSQU+sijmwJ3F9VG6lkevDJYQ=;
+	s=arc-20240116; t=1791254285; c=relaxed/simple;
+	bh=D0UxWkrGDJEjJknTZwzjCJ31q1+uUyqqvfVL7rYvYbY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A4xy3CAuRGCx6jdiIF9XOVa+zqQmcjEP5YAOJPA57O0MyNx+j8WvOI5Doasl5BWWQ+13ZLaoFimhvR7oxmv/KNtV1UHLUIgwqWoaqWmIO1KwLgeIqipp7nFaUp7wcTqjGbEnVVNJr447GjFuQluP0EHQiihLcZ9BViWy9Z40NMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SFuSqM0k; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=KKwAn5nUM6pZk5YxwJbSm5rXG4EB9me1OL8UizMb9jyaQ9xUimuCbchWCaQRztSFb8XL2ShRB5XfYWB+kTtmLzPEo8pYBg0MJGYLn6utdR4d+Nm0c4VQRZ9a0QZO7bT+Xvr87tAxVngoSiBh6zfsjj4dS98IQiou5vSujmreLvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lnm6l3av; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SFuSqM0k"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lnm6l3av"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1791253531;
+	s=mimecast20190719; t=1791254283;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ugMxefZ1qIEDU/oRAsn8b/LDZMC+9ePrF31NK37FBF8=;
-	b=SFuSqM0kMRocs6bRvUTeS3WzPdsf1Gp5DotSQLJkYsDFmxv8HeU3M21S1hHfdkiI9/IOyl
-	sfEAgEWf7Xei3ojQG/pMjWUaNC7eR4EF1STdJ1AVYF4xyc2qQbF/jGHw6ZqtLfbQ55SuQq
-	VUITBINIeeTA75W6d1yvFkGIwWxcV2A=
+	bh=Di6epxlZpoHDGpBk057UhpR75wL2RoTA8HU7YmJFqJk=;
+	b=Lnm6l3av5+fB7j47sNy48pyMAywTlleTPaCR5L2mUVYTfC2Efj3atyClZ9comRlwCNUzTZ
+	sD2r6fzDyBGHIN5nDs+EqqdfpPQxOQmwdNLDZaXH0IDDzovjylf9woZVV8tBJCqEaztqTw
+	EpavJe/W/UqEUWNRwyVYABFq46K1r4s=
 Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
  [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-678-WdVZlcxgNXq30hSBwmvJpg-1; Mon, 05 Oct 2026 22:25:30 -0400
-X-MC-Unique: WdVZlcxgNXq30hSBwmvJpg-1
-X-Mimecast-MFC-AGG-ID: WdVZlcxgNXq30hSBwmvJpg_1791253529
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-3a47617a0b3so2209295a91.2
-        for <kvmarm@lists.linux.dev>; Mon, 05 Oct 2026 19:25:30 -0700 (PDT)
+ us-mta-6-_QNPAjm-PgeMM_lZrsLW6g-1; Mon, 05 Oct 2026 22:38:01 -0400
+X-MC-Unique: _QNPAjm-PgeMM_lZrsLW6g-1
+X-Mimecast-MFC-AGG-ID: _QNPAjm-PgeMM_lZrsLW6g_1791254280
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-38e54b6556aso2192515a91.2
+        for <kvmarm@lists.linux.dev>; Mon, 05 Oct 2026 19:38:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791253529; x=1791858329;
+        d=1e100.net; s=20260707; t=1791254280; x=1791859080;
         h=content-transfer-encoding:content-type:in-reply-to:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=ugMxefZ1qIEDU/oRAsn8b/LDZMC+9ePrF31NK37FBF8=;
-        b=iT5H0ucRdvSs1n6PYHr26ESocKpNcq2X1GVh4GNhKYsubk30v9eaF4wYPoGvIr4fuY
-         zSKkx/GTRkMV/Pyoap74MrqQYhrkmuEzDqWMzc6t7qrKg2uivTSmW7YRN/2Urj1wrp3B
-         fd829lae1bKmGyY2NYNjeYK4J2X8Aiks5nJBF5Zq4TKpTdx1jHOz327s5imKwPdxQQhM
-         BofgC4jgS4ai4O/tMryYFyZuCj+GnQiHgcHNjKmHKDSWZcvfKP1mJfEQHbPPpwcfDxvh
-         FcBPQCBb2AdcPwkstQaKbPoPO7eEIqYguIHIj/RiP2yE3uiwbFEzNUiyhHXWyyEf+BZJ
-         cYQw==
-X-Forwarded-Encrypted: i=1; AKwUvBzPJ+WfG/NIlEGKJ3IS1ca5EAt84BhsTr8SppaBVzgX0/u45e76f7nH9lzHd3ZBsHic7A6iaso=@lists.linux.dev
-X-Gm-Message-State: AFq9FYLBy2Q5QY8dUimbBguO5Kqp55ciJ1Fea0lj7Z8Scm4ML+qQAPOc
-	3bKWPrdenhPHOedaef8XN1cNKvLHyM9NbAOJnPLkpQtXsdx8SvDgeOpEUyFCUGLtWDNC/TT3kG+
-	a/oYamR2ayiVQkeN2LiKB6XtGS+33QXxtPpwLsc7QNBs9fdfl1nBqeH2XqQ==
-X-Gm-Gg: AYBFou16M4yydqlfD2c9yP8Ihdgs9rHfckkhyUnL6TC1eEGK0olmzJDppPjnpLtExoh
-	N6FSCYBMnZ40F+nEA5xYW9QgjA5SbAukG7j1XVXI6yL1ZPmb04j6D2SQU2EDGmuVsgDN11Jut/8
-	vwjLAaRCvRdJqPzgDg1v9PHzI1Rnr7i84/CJDvY9mKjbL74IiwstIesmKYgl3lyTMbKw0IzPT47
-	h2sM/Ix31302ONaA3dlQXb0RdKIe7F1BYjsQ0Efc7XBLUiXWvIHRrIHkZ+iu7A806H64fAzuPbn
-	Idmsp7bx8N9a8YLIwvZu5rPcOJRWMLP3wU+DmimrqM8NXVPlPKAUITKwMP2LrVf9Cq0QzR/fYCt
-	dIjPsDSi4hqLp1PhQChg5j2ujzwYcVI2nyxEtZkJjng==
-X-Received: by 2002:a17:90b:2812:b0:3a4:cbaf:f152 with SMTP id 98e67ed59e1d1-3a6cec2fb6emr4459077a91.33.1791253529312;
-        Mon, 05 Oct 2026 19:25:29 -0700 (PDT)
-X-Received: by 2002:a17:90b:2812:b0:3a4:cbaf:f152 with SMTP id 98e67ed59e1d1-3a6cec2fb6emr4459071a91.33.1791253528874;
-        Mon, 05 Oct 2026 19:25:28 -0700 (PDT)
+        bh=Di6epxlZpoHDGpBk057UhpR75wL2RoTA8HU7YmJFqJk=;
+        b=BHVjVleI6GJ8vjcWzAHWGvNWxoF5TWiJQ1w/Ii2m5BaMxZAkWYPedfSgw1csP9C2x6
+         37lIssA6lmrXVBwQ0QgjwwgJMnTYLvY48DPhIqPT7TRpZh8zP65k1ZD/mPU7Z888wWqk
+         lObPFn2xdlbN0zIckXdIILPmCJXzlaRL0NZmexIQQ5xjF/DAdAt+I0fJlC+WxZiTicaN
+         6xzRtfUiUEr2MZCPKDQQijvDkw0bhMrPbQN1kr7D+fl+UvvKk4kzUSFzWltGfaTvkKVS
+         eOBtHjylX3ikNwScr/qByhKZgoAk8kO/tSwUjRfvq1weSN/hMKWr0uwhwYxMckf/4jdd
+         DEuQ==
+X-Forwarded-Encrypted: i=1; AKwUvBxBHPNMAFdu+5LtjYGHTSx2zzCOs8Oh1zoDhw58GnF7f9W1Ae6D5jODH4sTq3YvqxPPEk58KpY=@lists.linux.dev
+X-Gm-Message-State: AFq9FYLbnkNZo7F2XD3vru+Cs/P0Rc7Y1hm9+P0D27YVVdbinaylVuxi
+	jvyhO/tTOr89eB13Ns7zzENa2LIvMnilaF1a/s+6XCMUhSaU/8oOZmF8EF+XQfza1DzKsrx5AtJ
+	AQabFnmakpXbFBso2Gwodl+hE12dizpJRe5xTgkKtb4ip2ImxLBlCcJs/mA==
+X-Gm-Gg: AYBFou0mjKCUn+hnFJHd9HL3IfpsOTh4TwEYx3YQL7Bsh67w/6Dpi9Bw8QKHkeCPQDX
+	/NSOhqqBSS0A5/G8+vH9ywLawOBZLkFWfHhvQ2RWmbB/Q960B0LFMBZT3dgxJO4X8sqbv2pMcTc
+	jHMnbapYlkSxW9tEU+jcHrPnd1plsoPs3SrNSgk2FMEkJwJQwGioB8ZKKOHrx7xdHh6cnWaIy4O
+	Y//zo3K1B5jwcC35QbTdJVDJ2ryLbJygPatXqU8uHmr4pfJJx0rpQcS8FoH3QhZH4QYeGDIzItS
+	qDH5RoluTpg41BHMVPX6zBpJzivv0EZfrgDd+4W0+M/jkSOv0F2soDjUk09jisPAgLau0Xucnnl
+	0w/Tn9/SF/bag2H09hKlqmEqzBqi30ViE1O4NOW2vdA==
+X-Received: by 2002:a17:90b:4d09:b0:3a7:9413:cfa3 with SMTP id 98e67ed59e1d1-3a79413ddc3mr6299022a91.55.1791254280371;
+        Mon, 05 Oct 2026 19:38:00 -0700 (PDT)
+X-Received: by 2002:a17:90b:4d09:b0:3a7:9413:cfa3 with SMTP id 98e67ed59e1d1-3a79413ddc3mr6299010a91.55.1791254279897;
+        Mon, 05 Oct 2026 19:37:59 -0700 (PDT)
 Received: from [192.168.68.52] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a85388c664sm2351690a91.4.2026.10.05.19.25.17
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cce6d2406b1sm1679514a12.8.2026.10.05.19.37.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Oct 2026 19:25:25 -0700 (PDT)
-Message-ID: <32c662e1-0de9-44a7-81e5-2b1e6c824114@redhat.com>
-Date: Tue, 6 Oct 2026 12:25:15 +1000
+        Mon, 05 Oct 2026 19:37:58 -0700 (PDT)
+Message-ID: <c8930670-32b1-4f20-af0b-a13d17b45044@redhat.com>
+Date: Tue, 6 Oct 2026 12:37:49 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -74,8 +74,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v22 09/23] KVM: arm64: Prevent unsupported vcpu features
- for VM types
+Subject: Re: [PATCH v22 10/23] KVM: arm64: Consolidate stage2 unmap range into
+ kvm_stage2_unmap_range
 To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
@@ -87,87 +87,40 @@ Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
  WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
  sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
 References: <20261005090754.2140522-1-suzuki.poulose@arm.com>
- <20261005090754.2140522-10-suzuki.poulose@arm.com>
+ <20261005090754.2140522-11-suzuki.poulose@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20261005090754.2140522-10-suzuki.poulose@arm.com>
+In-Reply-To: <20261005090754.2140522-11-suzuki.poulose@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: Frc7-nVWG-FHbs_kjGXIj8hcCttBcaJcbChpAMLUAPE_1791253529
+X-Mimecast-MFC-PROC-ID: rNmsdiqeZjuEkQuJ5h67GXsmRCXobyN3GOnbOj9gTmk_1791254280
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 10/5/26 7:07 PM, Suzuki K Poulose wrote:
-> Prevent unsupported VCPU features for the protected VCPUs. Realms and pVMs
-> not support 32bit EL1 or NV yet. pKVM doesn't rely on the host vcpu
-> features and it clears the unsupported features while hyp_vcpu is
-> initialised. Block the features early in the vcpu init if we detect
-> incompatible features.
+> In preparation for adding VM specific backends for stage2 operations,
+> nuke __unmap_stage2_range() and fold the logic into
+> kvm_stage2_unmap_range(). Also, make kvm_unmap_gfn_range(), the only other
+> user of the __unmap_stage2_range() call the kvm_stage2_unmap_range(). Also,
+> while at it fix the comment to make it clear that mmu_lock must always be
+> held while unmapping. The code already mandates that and the two call paths
+> do have the write mmu_lock held.
+> 
+> Later we would replace the logic in kvm_stage2_unmap_range() with VM
+> specific backends.
+> 
+> No functional changes intended.
 > 
 > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > ---
->   arch/arm64/kvm/arm.c | 10 ++++++----
->   1 file changed, 6 insertions(+), 4 deletions(-)
+> Change since v21:
+>   - Nuke __unmap_stage2_range and consolidate the stage2_unmap_range logic
+>     into kvm_stage2_unmap_range(), in preparation for removing the KVM_PGT_FN()
+>     for stage2_unmap
+> ---
+>   arch/arm64/kvm/mmu.c | 38 ++++++++++++++++----------------------
+>   1 file changed, 16 insertions(+), 22 deletions(-)
 > 
 
-One nitpick below. In either way:
-
 Reviewed-by: Gavin Shan <gshan@redhat.com>
-
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index f31d31fa27ad9..9c2ef7ca6a961 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1668,11 +1668,12 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
->   	return -EINVAL;
->   }
->   
-> -static unsigned long system_supported_vcpu_features(void)
-> +static unsigned long system_supported_vcpu_features(struct kvm_vcpu *vcpu)
->   {
->   	unsigned long features = KVM_VCPU_VALID_FEATURES;
->   
-> -	if (!cpus_have_final_cap(ARM64_HAS_32BIT_EL1))
-> +	if (vcpu_is_protected(vcpu) ||
-> +	    !cpus_have_final_cap(ARM64_HAS_32BIT_EL1))
->   		clear_bit(KVM_ARM_VCPU_EL1_32BIT, &features);
->   
->   	if (!kvm_supports_guest_pmuv3()) {
-> @@ -1688,7 +1689,8 @@ static unsigned long system_supported_vcpu_features(void)
->   		clear_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, &features);
->   	}
->   
-> -	if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
-> +	if (vcpu_is_protected(vcpu) ||
-> +	    !cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
->   		clear_bit(KVM_ARM_VCPU_HAS_EL2, &features);
->   
->   	return features;
-> @@ -1708,7 +1710,7 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
->   			return -ENOENT;
->   	}
->   
-> -	if (features & ~system_supported_vcpu_features())
-> +	if (features & ~system_supported_vcpu_features(vcpu))
->   		return -EINVAL;
->  
-
-The following check at the beginning of kvm_vcpu_init_check_features() is redundant to
-the check here. We can drop that in this patch or a preparatory patch.
-
-static int kvm_vcpu_init_check_features(...)
-{
-        /*
-         * This check can be dropped since the same check has been done
-	* by the followup "if (features & ~system_supported_vcpu_features(vcpu))"
-         */
-        if (features & ~KVM_VCPU_VALID_FEATURES)
-                 return -ENOENT;
-}
-
-  
->   	/*
-
-Thanks,
-Gavin
 
