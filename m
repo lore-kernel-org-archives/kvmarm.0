@@ -1,80 +1,53 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2684A3AAF60
-	for <kvmarm@lists.linux.dev>; Tue,  6 Oct 2026 10:47:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39AB23DD871;
+	Tue,  6 Oct 2026 11:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791283633; cv=none; b=tw6SoYrEQ+8YC4JGYI8R4Qdm2RjRvabAOgfnr1QyxyYgnsvngpjmmEs299GWf2Z+JUDYEcjKtCQBncbbRR1ALK8+cpRronLZgaiHeG1y21OcRojv0Ya8OtuRuuUJKxT7265AKzhj+Mj+rM+h8Hhk8T+pDC/HcZCpg0pdwT+LtbM=
+	t=1791285531; cv=none; b=aD9CjFPrgoomk7NyFeoZ2UsSBOHqqGPzHx/GjOSdzTQyg1RSLKk7HRSzDZTi/2VcZVcF7cWbA7Fya0Gqb2smA80gernItJjq9A3c3bSt74FACHnJyiybomrietviC85j/yEHTg96hJHzAcRVivTQlgqzUZMvfedYDkQ7v9Q5Bmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791283633; c=relaxed/simple;
-	bh=VCi/kjLFAJJGXjgxhIYMwC657u5zE4DOnBkrZHplcNE=;
+	s=arc-20240116; t=1791285531; c=relaxed/simple;
+	bh=J0aYmzl4Bca+kxxzx5CT2dAYF56mfLYy3OaN1LrAIjc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PdzMdF2Vv0BqlihBat36qqPy9CKkZTAi8TR3nAOSbEV671DLSg9QVaIHqEXbKXx62iU8AekkW4rkW3h9r60i5s66KDc9h2ImhnOcdLw0NmbxnZbaK18CSLDtm2BywZMvebgs4jKHtXfjd3Z/Vxay5POMTDyCrerh3KfMaXao6gw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OUHgNs1H; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=BcvN9KB4s2Px3H2TrhvEZywa7U6iQqR96gjmKrTDqEA9IX3OPxPMn/urxz46cE3uxEKRFdrd5FFdxK4hkXvqST1O8S/ncF2F/hXbV0EvE1cGoNLmT1DX0yHJQmSymeD7IwkW3agzyrOSH/MxWnEcEW5NMMHXSKHLT/XBgdRyy+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=RZ5hdLhD; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OUHgNs1H"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4a018493d57so55215e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 06 Oct 2026 03:47:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1791283630; x=1791888430; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=oNhJI/vsDPATwVHCwRxldmCYKg+ihLyBJJx7xKlf2yc=;
-        b=OUHgNs1HJCmsTYjVBafhalr0d0SFpD6Ycvfkbr0rpEUu+1gKcVUTGrWMqf57/69Kb5
-         8d38IiOeepwb6d4kZshA6RWZWu5LgF6YCuAxTAG1J4IUBwpe+MxRCISowAgFPSCVBCNL
-         92f57mX08xQ4whEMGndzjxlyXjR07qwnNuA36zUFe4LceXVNb0GaYgFPXieMJ79tiEcI
-         g1FEqhz0zM7S1AxHprd7nmpnxls8PZTBvfU3fSvKXRo38FZ8YwUTA9vA9N3lK1VhZKJo
-         llxcx0/90Ctat9SaNI9Cc/4gSZ2piLIBnUzSzpDBl3BI+u8KLNhOOp9P61z67FoiULBm
-         LjkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791283630; x=1791888430;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=oNhJI/vsDPATwVHCwRxldmCYKg+ihLyBJJx7xKlf2yc=;
-        b=J308FS3UG4LVv03cl/GCJ7fWzSid5vOKbyMnYY6ktvAOLa3l82BJjXLmO1rJkYqUyE
-         EMcppQneb02mN9fuNJ+8Ty7/CWpSg9CQ61xn2TXTh6N/wBsdNhsWEZqQI4wVS8DncQ1r
-         3IDpfT7daqsz2OSNOOMC7IO1/KU78W/7hLcsiPRMpJ7oOOyR4eaP6TGGeGxDYLs0XcTO
-         wlmrmJ1xpnaUp1Ff6wAyYLkT7M/Y0mVKeP7cyTtJRzCxzFGo6wa+mK4N9SQhT6rVmXe6
-         +2QCp2/KUVzukh9i9BFVtOMlZLN3G3ELCsKGeLYJwhlTzfVFX+J0Zn672q2cm0jUT1/n
-         +HTQ==
-X-Forwarded-Encrypted: i=1; AKwUvBzYivA/ztHENZ18ta7t2JiiQAXhX8HcR3FgzvEC3M6VADXtJf6FJRpI4/BovhIh5HHnbQ7xD1g=@lists.linux.dev
-X-Gm-Message-State: AFuF++lx+lQ7HHy707439BXbRmVlgZiu3oIw6MHDRLPYKrs0iRAmVAli
-	FqdvLMmp9ChBgLFI0tNCdK0CbVgdsWbcEhmqp+OIIAXQuaa/rcwWUX9owYzZYw6Sdw==
-X-Gm-Gg: AYBFou2DZyr08wd9q6z7abG6IXhdne3zE8JaDRTN1nYNaEt/fQAoNWJmRn9Tf/65Mxq
-	dMnJGeT0eAIkenL/EslV764twLxWkPN0eSNyhV/LLhtt1mKguXzGhXYqCeuxDC9tfHBCDTkRoce
-	9Tup/xqFogahh7K7YlIxihdmn/smJrKBUYnkUwhS7LIp4dOsnBllFOxbwK4h5zZ+oCeTh8pUU6a
-	GvRjbvTz6+NHGDpgO2SGbvAqWherJMykOq8inanBeEcjB1ssWTNIj0W2ubdcJWDVzv6FRDh3ym9
-	lfmVUfVr2pVUf23bgroCwy5V/t811Bia26K0qFU17P5W46isjmKcnH1xkNY7xNpLAlYIk4DCu4s
-	ypKP8003skwUmlBUGlcPChT3xj++XTh2+YzMir30rBrl30G2igViW1Wpvo27CcbgGn+Phvn6GQs
-	pP7GbM2nSg0yPnHtrVmeODDe/i6vUJEiXuaqPi8DYaYA0p2ifXmS9QWyX4rwGfg97BKqGnFPK/7
-	hmEnHiWTRHnRqzq34Qq1V00MELRNX7V2UN2nEUd
-X-Received: by 2002:a05:600c:6290:b0:4a1:7af1:5386 with SMTP id 5b1f17b1804b1-4a17b4587a5mr465225e9.1.1791283629775;
-        Tue, 06 Oct 2026 03:47:09 -0700 (PDT)
-Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48c69afe66bsm3896689f8f.30.2026.10.06.03.47.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Oct 2026 03:47:08 -0700 (PDT)
-Date: Tue, 6 Oct 2026 10:47:04 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
-	oupton@kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, tabba@google.com,
-	sebastianene@google.com, keirf@google.com, qperret@google.com,
-	linu.cherian@arm.com
-Subject: Re: [PATCH v3 2/2] KVM: arm64: Support BBM level 3
-Message-ID: <asTRqPfsrnbBWVSF@google.com>
-References: <20260904132855.638117-1-smostafa@google.com>
- <20260904132855.638117-3-smostafa@google.com>
- <asO77kvqqwCsJt8I@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="RZ5hdLhD"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ECE121516;
+	Tue,  6 Oct 2026 04:18:43 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A908D3F763;
+	Tue,  6 Oct 2026 04:18:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1791285527; bh=J0aYmzl4Bca+kxxzx5CT2dAYF56mfLYy3OaN1LrAIjc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RZ5hdLhDyybGfQibMShr19Huoc4OLB+eoXXlg7amCRsxzOgV1zt1dFH/S0dhFJkgc
+	 rIFYwye7wxuuF+SdCgqKHuV8+tHKURuLoG+OFSMqph64rLv2vaGBHlM7+nTnpwaXg0
+	 NO8CPkXvVECFbdhIjvjb8OSJwJynk/APt9d+RyAE=
+Date: Tue, 6 Oct 2026 12:18:42 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: "Peng Fan (OSS)" <peng.fan@oss.nxp.com>
+Cc: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Randy Dunlap <rdunlap@infradead.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	"Ivan T. Ivanov" <iivanov@suse.de>,
+	Francesco Dolcini <francesco@dolcini.it>,
+	Frank Li <frank.li@nxp.com>, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, imx@lists.linux.dev,
+	Peng Fan <peng.fan@nxp.com>
+Subject: Re: [PATCH v4] arm64: errata: Add NXP iMX8QM workaround for A53
+ cache coherency issue
+Message-ID: <asTZEhzMDs869r_n@arm.com>
+References: <20260824-imx8qm-cache-coherency-v4-v4-1-b2e528c7d05e@nxp.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -83,153 +56,239 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <asO77kvqqwCsJt8I@google.com>
+In-Reply-To: <20260824-imx8qm-cache-coherency-v4-v4-1-b2e528c7d05e@nxp.com>
 
-On Mon, Oct 05, 2026 at 04:02:06PM +0100, Vincent Donnefort wrote:
-> On Fri, Sep 04, 2026 at 01:28:55PM +0000, Mostafa Saleh wrote:
-> > If the system supports hardware Break-Before-Make (BBM) level 3, use it
-> > to replace stage-2 PTEs directly. Otherwise, fall back to the software
-> > BBM sequence.
-> > 
-> > For BBML3 the sequence is:
-> > 1) Get a reference count on the containing table for the new PTE.
-> > 2) Atomically update the PTE with the new valid descriptor.
-> > 3) Invalidate the TLB for the old PTE.
-> > 4) Drop the reference count holding the old PTE.
-> > 
-> > Add 2 helpers:
-> > 1) kvm_pgtable_use_bbml3(): Checks for the architecture requirement
-> >    for BBML3.
-> > 
-> > 2) stage2_use_bbml3(): Extra checks added by SW design (FWB and DIC)
-> >    - As BBML3 will update the PTE atomically, it can only know it
-> >      raced with another core at the point of the cmpxchg failing,
-> >      unlike the SW implementation which locks the PTE first.
-> >      And as we must issue CMOs to the new mapped page before the
-> >      update, that means with BBML3 racing cores will issue redundant
-> >      CMOs.
-> > 
-> > Signed-off-by: Mostafa Saleh <smostafa@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/pgtable.c | 111 ++++++++++++++++++++++++++++-------
-> >  1 file changed, 90 insertions(+), 21 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index d670da8882a5..a9ba761e9a01 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -82,6 +82,27 @@ static bool kvm_pte_table(kvm_pte_t pte, s8 level)
-> >  	return FIELD_GET(KVM_PTE_TYPE, pte) == KVM_PTE_TYPE_TABLE;
-> >  }
-> >  
-> > +/*
-> > + * Check if BBML3 can be used for this PTE update.
-> > + * Fallback to software break-before-make for leaf-to-leaf changes.
-> > + */
-> > +static bool kvm_pgtable_use_bbml3(const struct kvm_pgtable_visit_ctx *ctx,
-> > +				  kvm_pte_t new)
-> > +{
-> > +	if (!system_supports_bbml3())
-> > +		return false;
-> > +
-> > +	if (!kvm_pte_valid(ctx->old) || !kvm_pte_valid(new))
-> > +		return false;
-> > +
-> > +	/* Block <-> Table is ok. */
-> > +	if (kvm_pte_table(new, ctx->level) ||
-> > +	    kvm_pte_table(ctx->old, ctx->level))
-> > +		return true;
-> > +
-> > +	return false;
-> > +}
-> > +
-> >  static kvm_pte_t *kvm_pte_follow(kvm_pte_t pte, struct kvm_pgtable_mm_ops *mm_ops)
-> >  {
-> >  	return mm_ops->phys_to_virt(kvm_pte_to_phys(pte));
-> > @@ -835,25 +856,46 @@ static void stage2_clean_old_pte(const struct kvm_pgtable_visit_ctx *ctx,
-> >  		mm_ops->put_page(ctx->ptep);
-> >  }
-> >  
-> > +/*
-> > + * Don't use bbml3 for stage-2 if FWB or DIC are not supported
-> > + * as that means racing cores will issue duplicate CMOs.
-> > + */
-> > +static bool stage2_use_bbml3(const struct kvm_pgtable_visit_ctx *ctx,
-> > +			     kvm_pte_t new)
-> > +{
-> > +	if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB) ||
-> > +	    !cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
-> > +		return false;
-> > +
-> > +	return kvm_pgtable_use_bbml3(ctx, new);
-> > +}
-> > +
-> >  /**
-> >   * stage2_try_break_pte() - Invalidates a pte according to the
-> >   *			    'break-before-make' requirements of the
-> > - *			    architecture.
-> > + *			    architecture, if BBML3 is supported it
-> > + *			    will be used and this function won't
-> > + *			    break the PTE.
-> >   *
-> >   * @ctx: context of the visited pte.
-> >   * @mmu: stage-2 mmu
-> > + * @new: New pte installed in make.
-> >   *
-> > - * Returns: true if the pte was successfully broken.
-> > + * Returns: true if the pte was successfully broken or BBML3 is used.
-> >   *
-> >   * If the removed pte was valid, performs the necessary serialization and TLB
-> >   * invalidation for the old value. For counted ptes, drops the reference count
-> >   * on the containing table page.
-> >   */
-> >  static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
-> > -				 struct kvm_s2_mmu *mmu)
-> > +				 struct kvm_s2_mmu *mmu, kvm_pte_t new)
-> >  {
-> >  	kvm_pte_t locked_pte;
-> >  
-> > +	/* All handled in stage2_make_pte() */
-> > +	if (stage2_use_bbml3(ctx, new))
-> > +		return true;
-> > +
-> 
-> Wouldn't it be easier to keep try_break_pte/make_pte to the !bbml3 case and to
-> just create a make_pte_bbml3() variant to be called when stage2_use_bbml3()?
-> 
->   if (!stage2_use_bbml3()) {
->       if (stage2_try_break_pte())
->           return -EAGAIN;
->       stage2_make_pte();
->   } else {
->       if (stage2_make_pte_bbml3())
->           return -EAGAIN;
->   }
-> 
-> I believe also, the error path would look less weird as we catch an error in
-> make_pte() but without reverting the break_pte() (even if it is correct right
-> now).
-> 
-> And perhaps you could introduce a function that does both break/make
-> (stage2_update_pte()?) called by both stage2_split_walker() and
-> stage2_map_walk_leaf(). This would avoid repeating the error path.
+Hi Peng,
 
-I though about that and was not sure about it at the beginning as
-mentioned in the cover letter:
-    Initially, I encapsulated the full logic of BBM in one function,
-    which was not readable, due to different ordering and dealing with
-    CMO, TLBI.
-
-I think that can be better if we call the new helper for all sites
-except for stage2_map_walker_try_leaf(). Although we would need to
-open code the bbml3 check there now. I can try and see how it looks.
-
-Thanks,
-Mostafa
-
+On Mon, Aug 24, 2026 at 12:02:04PM +0800, Peng Fan (OSS) wrote:
+> From: Peng Fan <peng.fan@nxp.com>
 > 
-> Otherwise, everything looks functional to me.
+> According to NXP errata document IMX8_1N94W[1], the i.MX8QuadMax SoC
+> suffers from a cache coherency issue (ERR050104). The upper bits, above
+> bit 35, of the ARADDR and ACADDR buses within the Arm A53 subsystem
+> have been incorrectly connected. This causes some TLBI and IC
+> maintenance operations exchanged between the A53 and A72 core clusters
+> to be corrupted.
 > 
-> -- 
-> Vincent
+> The workaround requires:
 > 
+>   - Downgrading targeted TLBI operations to broadcast-all variants.
+>     Instead of patching the low-level __TLBI_1 macro (which interferes
+>     with the REPEAT_TLBI workaround and causes excessive over-
+>     invalidation), redirect high-level TLB flush functions
+>     (flush_tlb_mm, __do_flush_tlb_range, flush_tlb_kernel_range,
+>     __flush_tlb_kernel_pgtable) to use VMALLE1IS via static key checks.
+> 
+>   - Upgrading IC IVAU to IC IALLUIS for both kernel (via ALTERNATIVE in
+>     invalidate_icache_by_line) and EL0 userspace (via trap-and-upgrade
+>     in user_cache_maint_handler with SCTLR_EL1.UCI=0).
+> 
+>   - Disabling KVM since correct TLB maintenance cannot be guaranteed
+>     for guests.
+
+Do you need virtualisation on such platform? An alternative would be for
+the guests to be aware of the erratum as well and use the right TLBI/IC
+ops. But you'd also need to upgrade the VMID-aware ops in KVM (unless
+the hardware can't work around stage 2 TLBI at all).
+
+>   - No need to touch SMMU Broadcast TLB Maintenance (BTM) since i.MX8QM
+>     does not support broadcast TLB.
+> 
+> SoC detection uses devicetree compatible string "fsl,imx8qm" or
+> "fsl,imx8qp" since the boot CPU MIDR_EL1 (0x410fd034) and AIDR_EL1 (0)
+> are not unique to this SoC.
+
+That's fine but I wonder whether your hardware implements the SoC ID
+SMCCC. That would come in handy if some future revision fixes the bug.
+The DT string doesn't tell you version/revision.
+
+> @@ -580,23 +584,28 @@ static __always_inline void __do_flush_tlb_range(struct vm_area_struct *vma,
+>  
+>  	asid = ASID(mm);
+>  
+> -	switch (flags & (TLBF_NOWALKCACHE | TLBF_NOBROADCAST)) {
+> -	case TLBF_NONE:
+> -		__flush_s1_tlb_range_op(vae1is, start, pages, stride,
+> -					asid, tlb_level);
+> -		break;
+> -	case TLBF_NOWALKCACHE:
+> -		__flush_s1_tlb_range_op(vale1is, start, pages, stride,
+> -					asid, tlb_level);
+> -		break;
+> -	case TLBF_NOBROADCAST:
+> -		/* Combination unused */
+> -		BUG();
+> -		break;
+> -	case TLBF_NOWALKCACHE | TLBF_NOBROADCAST:
+> -		__flush_s1_tlb_range_op(vale1, start, pages, stride,
+> -					asid, tlb_level);
+> -		break;
+> +	if (alternative_has_cap_unlikely(ARM64_WORKAROUND_NXP_ERR050104) &&
+> +	    !(flags & TLBF_NOBROADCAST)) {
+> +		__tlbi(vmalle1is);
+
+This assumes it doesn't run under any hypervisor with HCR_EL2.FB. I
+guess that's fine if this erratum renders virtualisation unusable
+anyway.
+
+> +	} else {
+> +		switch (flags & (TLBF_NOWALKCACHE | TLBF_NOBROADCAST)) {
+> +		case TLBF_NONE:
+> +			__flush_s1_tlb_range_op(vae1is, start, pages, stride,
+> +						asid, tlb_level);
+> +			break;
+> +		case TLBF_NOWALKCACHE:
+> +			__flush_s1_tlb_range_op(vale1is, start, pages, stride,
+> +						asid, tlb_level);
+> +			break;
+> +		case TLBF_NOBROADCAST:
+> +			/* Combination unused */
+> +			BUG();
+> +			break;
+> +		case TLBF_NOWALKCACHE | TLBF_NOBROADCAST:
+> +			__flush_s1_tlb_range_op(vale1, start, pages, stride,
+> +						asid, tlb_level);
+> +			break;
+> +		}
+>  	}
+>  
+>  	if (!(flags & TLBF_NONOTIFY))
+
+[...]
+
+> @@ -200,6 +202,29 @@ cpu_enable_cache_maint_trap(const struct arm64_cpu_capabilities *__unused)
+>  	sysreg_clear_set(sctlr_el1, SCTLR_EL1_UCI, 0);
+>  }
+>  
+> +#ifdef CONFIG_NXP_IMX8QM_ERRATUM_ERR050104
+> +static bool
+> +is_imx8qm_soc(const struct arm64_cpu_capabilities *entry, int scope)
+> +{
+> +	WARN_ON(preemptible());
+
+Not needed for a DT lookup.
+
+> +
+> +	return of_machine_is_compatible("fsl,imx8qm") ||
+> +		of_machine_is_compatible("fsl,imx8qp");
+> +}
+> +
+> +static void
+> +cpu_enable_imx8qm_err050104(const struct arm64_cpu_capabilities *__unused)
+> +{
+> +	cpu_enable_cache_maint_trap(__unused);
+> +
+> +	/*
+> +	 * TLB maintenance cannot be guaranteed correct for guests, so
+> +	 * disable KVM as if kvm-arm.mode=none was passed on the command line.
+> +	 */
+> +	kvm_force_disabled();
+> +}
+> +#endif
+> +
+>  #define CAP_MIDR_RANGE(model, v_min, r_min, v_max, r_max)	\
+>  	.matches = is_affected_midr_range,			\
+>  	.midr_range = MIDR_RANGE(model, v_min, r_min, v_max, r_max)
+> @@ -1030,6 +1055,15 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
+>  		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+>  		.matches = has_broken_gic_v3_seis,
+>  	},
+> +#ifdef CONFIG_NXP_IMX8QM_ERRATUM_ERR050104
+> +	{
+> +		.desc = "NXP erratum ERR050104",
+> +		.capability = ARM64_WORKAROUND_NXP_ERR050104,
+> +		.type = ARM64_CPUCAP_STRICT_BOOT_CPU_FEATURE,
+> +		.matches = is_imx8qm_soc,
+> +		.cpu_enable = cpu_enable_imx8qm_err050104,
+> +	},
+> +#endif
+
+There's a precedent with 4311569 to wire up a SoC erratum into the CPU
+errata framework. That one is a system wide feature, so only probed once
+for the CPUs coming up at boot (though still probed for each late CPUs).
+For iMX, you need this turned on early, hence the boot probing. But
+calling it a strict boot CPU feature is a bit of a stretch. It also gets
+probed on every CPU, unnecessarily.
+
+I think we could do with something like below (maybe as a preparatory
+patch). We could also add it to 4311569 even if it changes its scope
+from system to boot CPU (the early param is available).
+
+Only compile-tested and haven't tried wiring up your workaround:
+
+-------------------8<-----------------------
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 4f04ad82ea34..669f808e379e 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -266,6 +266,13 @@ extern struct arm64_ftr_reg arm64_ftr_reg_ctrel0;
+ #define SCOPE_BOOT_CPU				ARM64_CPUCAP_SCOPE_BOOT_CPU
+ #define SCOPE_ALL				ARM64_CPUCAP_SCOPE_MASK
+ 
++/*
++ * matches() is called only once, when the capability is detected, and the
++ * result applies to all CPUs. Secondary and late CPUs are not checked for
++ * conflicts but cpu_enable() is still called on each of them. It has no
++ * effect on SCOPE_LOCAL_CPU capabilities.
++ */
++#define ARM64_CPUCAP_PROBE_ONCE			((u16)BIT(3))
+ /*
+  * Is it permitted for a late CPU to have this capability when system
+  * hasn't already enabled it ?
+@@ -293,6 +300,13 @@ extern struct arm64_ftr_reg arm64_ftr_reg_ctrel0;
+  */
+ #define ARM64_CPUCAP_LOCAL_CPU_ERRATUM		\
+ 	(ARM64_CPUCAP_SCOPE_LOCAL_CPU | ARM64_CPUCAP_OPTIONAL_FOR_LATE_CPU)
++/*
++ * SoC (not CPU) errata workarounds. The erratum is probed once on the boot
++ * CPU, before the secondary CPUs are brought up, and no secondary or late CPU
++ * can conflict with it.
++ */
++#define ARM64_CPUCAP_SOC_ERRATUM			\
++	(ARM64_CPUCAP_SCOPE_BOOT_CPU | ARM64_CPUCAP_PROBE_ONCE)
+ /*
+  * CPU feature detected at boot time based on system-wide value of a
+  * feature. It is safe for a late CPU to have this feature even though
+@@ -414,6 +428,12 @@ static inline bool cpucap_match_all_early_cpus(const struct arm64_cpu_capabiliti
+ 	return cap->type & ARM64_CPUCAP_MATCH_ALL_EARLY_CPUS;
+ }
+ 
++static inline bool cpucap_probe_once(const struct arm64_cpu_capabilities *cap)
++{
++	return (cap->type & ARM64_CPUCAP_PROBE_ONCE) &&
++	       !(cap->type & ARM64_CPUCAP_SCOPE_LOCAL_CPU);
++}
++
+ /*
+  * Generic helper for handling capabilities with multiple (match,enable) pairs
+  * of call backs, sharing the same capability bit.
+diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+index e0c09402540c..a418e240ccce 100644
+--- a/arch/arm64/kernel/cpu_errata.c
++++ b/arch/arm64/kernel/cpu_errata.c
+@@ -986,7 +986,7 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
+ #ifdef CONFIG_ARM64_ERRATUM_4311569
+ 	{
+ 		.capability = ARM64_WORKAROUND_4311569,
+-		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.type = ARM64_CPUCAP_SOC_ERRATUM,
+ 		.matches = need_arm_si_l1_workaround_4311569,
+ 	},
+ #endif
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 84053f0a8e01..0e4c3de78c1d 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -3695,8 +3695,11 @@ static void verify_local_cpu_caps(u16 scope_mask)
+ 		if (!caps || !(caps->type & scope_mask))
+ 			continue;
+ 
+-		cpu_has_cap = caps->matches(caps, SCOPE_LOCAL_CPU);
+ 		system_has_cap = cpus_have_cap(caps->capability);
++		if (cpucap_probe_once(caps))
++			cpu_has_cap = system_has_cap;
++		else
++			cpu_has_cap = caps->matches(caps, SCOPE_LOCAL_CPU);
+ 
+ 		if (system_has_cap) {
+ 			/*
