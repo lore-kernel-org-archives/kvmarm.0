@@ -1,95 +1,78 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 972AA3D4135
-	for <kvmarm@lists.linux.dev>; Wed,  7 Oct 2026 09:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FC4048822A;
+	Wed,  7 Oct 2026 10:04:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791364883; cv=none; b=LzH0i+Odumc/VqSKIbKSpk3kcLHAYb4kFBvDf34behfV/H3yCP/5lp+ac3alSOjSGtzsqMvZ0ieDDHfmGHn6FOwxenuWZj3FRTghRKaVT8Y7yyGptQ6c0sMIA1vtDPK1l4Cn/KD8N8uRzNpqLmRdnn+MHkn1gj26IMEai8l8pUE=
+	t=1791367471; cv=none; b=FuTy55W6HJC4SyQiVEeaI4H8DG2ktL7MSZ1dlrXiSMV69KoQRvYYPic7GYyKF66Jsy4IUGTAEX7QE53fa5oCe9NGQnKKsPmuvMxKtlJ7/OBLJwmOJx7L4sSXJ9KztaqnxyTt0xUqdgTcisEJhyDEiZCUZxgzkSBFSEekqw2TWjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791364883; c=relaxed/simple;
-	bh=opmN9wi4Yy8hW+H8AZW92vjJdGqpEOJ3A8Pa6J3rivA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GaNtPft7/9W7MFE9hIG3wVjY9kJxsQ7icxnY+AgFmAU8n/Z6T+2bB0hLwkN8trBNWTFAEqjPeyxdywBbxE0Fh3UrgJQwdPpFvgBxIGXUw4zS1IkS3WqH33kXrFnv/aShsxaanPvtBJ+1AJY++rABTNX0EpykOMPjbRSpcUhpr+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IS1s6fxw; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791367471; c=relaxed/simple;
+	bh=sEIZxq/zxpwKKzSYDQ6XzSaK+HAsstIRb1uGP+YKEtM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KNg9s5T+3rT1P7echUkXQVOL25DzgOEdox8qX4ksZwcao8H81s9uoR04wsPwAh3xlgBcRfOdoIPk/iz8CyjaVKTVndAJhs+kVcaZi3Zz6wLMje69V5PQtJDxWTJAFnuizY4J39VBiaYePfR43eHTTklEfatKTKUnMHskT8Gwl8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e1QmOhj/; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IS1s6fxw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0AD11F0089C;
-	Wed,  7 Oct 2026 09:20:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e1QmOhj/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E00A11F0089B;
+	Wed,  7 Oct 2026 10:04:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791364816;
-	bh=kVmEn3eqUyM2fWrdbC7yW74tAHSLFoixorcTuIO8mFU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=IS1s6fxwB2XUZeF1+COiBBg0zOHFiVepZx0iHbVfDioLhejOmfTBOwF6WRCspZ04Z
-	 J7wJcPTeFfgL8bBeJVgBnnUEW5eaetO5nAme5UMyz+LYazX/p9WSv4Y3Q1eh8FGPOU
-	 999mYKBSfdBmLrvTCzTtuFr5fBjasW2Z4InZcnRdgcVWMimJDtzi4mtZ+Eo/ANhmF3
-	 vd3C+HOWX8XbVOkwa0DUB0ygSW85tf0heGARgbih+vHvbn6nz77/5x66rWt3Yy1mb1
-	 MCAc4WNPciz+GNLovx06hTFHVB0CT+Pvgt2bWcVmyvPOBa3EuHktFwwCEr6gv7tXyx
-	 RITsONJIn3bVw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xENos-00000000CUO-2iSC;
-	Wed, 07 Oct 2026 09:20:14 +0000
-Date: Wed, 07 Oct 2026 10:23:24 +0100
-Message-ID: <877bjt3lv7.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jasmin Mulaosmanovic <jmulaosmanovic@qnx.com>
-Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	Sheridan Ethier
-	<sethier@qnx.com>,
-	Phil Giroux <pgiroux@qnx.com>
-Subject: Re: KVM progress with FEAT_NV2
-In-Reply-To: <YT6PR01MB10847DF9576E4055F3F8F95F3C0952@YT6PR01MB10847.CANPRD01.PROD.OUTLOOK.COM>
-References: <YT6PR01MB10847DF9576E4055F3F8F95F3C0952@YT6PR01MB10847.CANPRD01.PROD.OUTLOOK.COM>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1791367461;
+	bh=OkV7aWutgjFpbY2mI5Akvl/9Cn2GxgJ/KIs/Ot1aoZM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=e1QmOhj/T/jVqQOyBRwu5c6J7dAbbLrI4gMImRCkaGw/DZaPMBfqK8qoww/kbqKuR
+	 iaqYfJJuECPvknLllTY2Jgw1iCsCGMkSeMvLk0jfa4xOTvQNZSD1Q33WleAt1J+Cux
+	 KKuivvuUU6CnxYvwDAZrYGqddAneVKlHjN4klWQNtFSEO2ybCZ3f0U1BV6+jOW7ABf
+	 PYLgJAsXRNJfHoOep3aIgzg82583sBfYgmvjoy6l8Yt8NpvJk7JLDh8YYm2u14YLgq
+	 kDLEo2sRL35t7pOktGGIQx8deqEqMoRM7KCfOehlpPikv2LuORUT2XfocDqxZlXHBA
+	 8MCjc6r3SNsrg==
+Date: Wed, 7 Oct 2026 01:41:43 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v3] KVM: arm64: Only emulate an SError's entry for vCPUs
+ with NV
+Message-ID: <asYFx8g_P9H_bjb7@kernel.org>
+References: <20261007080833.371899-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jmulaosmanovic@qnx.com, kvmarm@lists.linux.dev, sethier@qnx.com, pgiroux@qnx.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261007080833.371899-1-fuad.tabba@linux.dev>
 
-Hi Jasmin,
-
-On Tue, 06 Oct 2026 20:01:22 +0100,
-Jasmin Mulaosmanovic <jmulaosmanovic@qnx.com> wrote:
+On Wed, Oct 07, 2026 at 09:08:33AM +0100, Fuad Tabba wrote:
+> kvm_inject_serror_esr() emulates an SError's exception entry when the
+> host's copy of PSTATE says SErrors are unmasked, although only NV needs
+> this, for a nested context whose guest hypervisor owns the vSError. A
+> protected vCPU's PSTATE lives at EL2, and the VMM can unmask SErrors in
+> the host's copy before the first run, so KVM emulates the entry on that
+> copy and the guest never takes the SError.
 > 
-> Hi Marc,
+> Emulate the entry only for a vCPU with NV, which protected VMs don't
+> support, and otherwise pend the SError through HCR_EL2.VSE, as KVM did
+> before commit ce66109cec867 ("KVM: arm64: nv: Take "masked" aborts to
+> EL2 when HCRX_EL2.TMEA is set").
 > 
-> I'm a product manager at QNX looking at the status of nested
-> virtualization support in KVM. The ARM team pointed me to you as the
-> right person to contact.
->
-> Our automotive customers run QNX-based systems in the cloud. We want
-> to run multiple QNX Hypervisor instances on top of KVM, with each
-> instance hosting its own Android and Linux guests.
-> 
-> We understand there has been ongoing upstream work on FEAT_NV2
-> support. Is there a roadmap or expected timeline for KVM to support
-> this configuration with hardware acceleration?
+> Fixes: 872383bd12e11 ("KVM: arm64: Add per-EC entry/exit state marshalling for protected guests")
+> Reported-by: Sashiko <sashiko-bot@kernel.org>
+> Closes: https://lore.kernel.org/all/20261001142109.794CA1F000FF@smtp.kernel.org/
+> Suggested-by: Oliver Upton <oupton@kernel.org>
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 
-Support for FEAT_NV2 has been merged about a year ago (in 6.17, if I
-remember correctly), as an experimental feature, and is regularly
-improved. There is also some limited support in upstream QEMU and
-kvmtool to drive this.
+Reviewed-by: Oliver Upton <oupton@kernel.org>
 
-As for a roadmap, we don't have one. Architectural features are
-enabled as needed, and as people find the time (and interest) to
-support them. Whether the existing KVM support matches what QNX
-requires, I can't tell.
-
-Hope this helps,
-
-	M.
-
--- 
-Jazz isn't dead. It just smells funny.
+Thanks,
+Oliver
