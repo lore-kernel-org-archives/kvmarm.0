@@ -1,93 +1,57 @@
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+Received: from mta0.migadu.com (out-75.mta0.migadu.com [91.218.175.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B945E4AB1B4
-	for <kvmarm@lists.linux.dev>; Wed,  7 Oct 2026 13:45:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791380756; cv=pass; b=AinKyi/8XpjBw/pJGiOlmvckwrxi7uhbbRSuDxnMMumhmxCY0CNqwpaJ4CCIrc4kpEs5CBAQ/xOOqWjts3ltz7nhrQ4N60HSSaam90rknq7X8/6qNGzCnsElHmQF9cZk7OvgX2wAjX2Z/TS33CLmzuX9RNr1NinACXUVm2SsBWI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791380756; c=relaxed/simple;
-	bh=7R3ym81WdAEtexE6jWnwa4vea2N/jeqsSvQGrEvEZOo=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE79484894
+	for <kvmarm@lists.linux.dev>; Wed,  7 Oct 2026 13:46:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.75
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791380794; cv=none; b=iGsxiL5ky/lkHdYziogtyCP7hQYBZLWTpEqdzVFn10ioBvdiikv1qJ9HodEO3rSOEupXwsl21+4p7i0H50JAvmEGnA7WUeBXSBt0zjBta9o2XLLr5cx4tltmDPGEW/eiwy8+//tgCot5DwcoFSiJlLc19uiCXKjH3K/Bis4b4wM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791380794; c=relaxed/simple;
+	bh=EOLf8afyt5b6SOANC3rqCkf69jr4nV59FAjYhwNBzS4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gtFIArblgbG7FIx5StmU3q3t7Q6uayvJ/wM05X/kQd0UbOjR+KVUqiaA6MMOUIl7H4aEfVxVCOeSgM/6ZjT5eq/17jTKiI6OTpPRXoulj8fX1NDtKQHFdwXCjsueWl72VpcKYOd3Djhf0+h4xtFIPqas7NiSNQ9z29PxZOvISwE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CZuRhzjj; arc=pass smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 To:Cc:Content-Type; b=rmVXV4UmuKAUlvNGUAyCvMT+4J1FF4zLEFEVdiQucyy5voTAJ3QI3UMUZcpS62YmC81N9riMltmIL/it1WmvdMl7m4zKqIK+rXQeIGAoFMdEYYrsyZV4aLlQWjDnBAbj1hTMCNf148+9C8hNTAQrq4O5vBOQWLa2Hmb4jlyTnjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NReHhLKh; arc=none smtp.client-ip=91.218.175.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CZuRhzjj"
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5bcc04c71f5so8738e87.0
-        for <kvmarm@lists.linux.dev>; Wed, 07 Oct 2026 06:45:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1791380746; cv=none;
-        d=google.com; s=arc-20260327;
-        b=m3qPznUuB1GSI6L+8KhoTJR+nJ+Lfb7vvgD+fkpEAVk8vhplwNXmCnFlhrC1XISbPE
-         NH+KlfX145WbIyH4kgjgS4PAvuBBr6bPof3TPFoj7cmcDexObHxu09ZfIOiCB0OCC+D0
-         MjY5352VaRyg21EQq+vkwFHHU0EdsbnocDTyVHEoIpArhJHgTACZ0pEm7on26hyeb2TT
-         Zm0XsUHbH53/MH0WgYtcsxCpl6krj9tDJJQ1IGws1UXkpNPfRR40rYpO0uFS3SV0XodP
-         vvT872z2NSV4rFydXj518P4cns1x6B16E6h4z1CsBLTKIXh8qye2z1tYiCvg1NtG+GIL
-         VwYA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=7R3ym81WdAEtexE6jWnwa4vea2N/jeqsSvQGrEvEZOo=;
-        fh=NuEzMNxe/ChyJqRPygJsYIZPB0fZ4oJ8f4kcJ78/Vcc=;
-        b=joAKMUqP4yU7ankb5NEA2JZnA6M4JT4/FvyNcaclVsrdWYu+Mf5bCEbpXCOpRarInM
-         rXabJsxTkw2+bsm4t8gG3AAxg/Ud5o6SanZ2rCScxCFO+2zSlAmKJdO9pVxZocP8BgP+
-         JbMeDUISQ0pP0CtIQ47hagFPSkOXjN8lc/UYzRebvrFT/urNk2+k8ReHsaGe1WVqoAJS
-         wyZhYs0DxHoeUl3GxPmwr5r/sSJE1OZd3ngDBsgWESziCmKnIPADfWRTCH+Kpcg7pJnj
-         SA00nRNkeKpEyDBUxEQRBPXU+4z2BzYAwNPkFnMMfXVZA6VpLLdkJAyL89H82gasB5dl
-         /9wg==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1791380746; x=1791985546; darn=lists.linux.dev;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=7R3ym81WdAEtexE6jWnwa4vea2N/jeqsSvQGrEvEZOo=;
-        b=CZuRhzjjpY2xIreezXDHBSy+spQKQahBgMhyb4WNIQ9lGuk+DobYluvGKy1OCZnlkJ
-         IYk931P2s8H5uHq9ljCulvz3BGZ13Y3k75DpCXeH9lchbwwECPftdKDNnWG0ThiE/vpP
-         lVT1zBJc5ZWZ2NWZFqwAmXuAQuO6WWVof/iB7E9OdQb678xFfLKPg1EkWDGRiniLe2qt
-         sBDqKEJUjgaLsgFCywXOrPIYuhcsBBZk+aB3dEuFl2EYig6kyM9kI9ZdUVAb5goOPPn5
-         ZUY05YfI1d3eYOQ7nrRviKOrogr3TPoExYHaFOencc5gfGy4OWuw/evUToSMOjzNVczr
-         lOYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791380746; x=1791985546;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=7R3ym81WdAEtexE6jWnwa4vea2N/jeqsSvQGrEvEZOo=;
-        b=GtaaW3F8CPvl0R+9n5JNszj+ARBlpHtdhAwVVSVY2IglG85PNz4FMPnHeU1CvoXA4h
-         SP+1Mp3NxU00mP1phWgNAuJqXhvZ9K6PXfeCkGwxTS6er6mdYW1wFpNC4sB8xMqM9ofz
-         hbClWG7qGoRHFP4Up4Bbk8Q0yeGNU35LC4T5ZrjZLNuFT3b1MXkmJdl6jRIvHgRkvGKY
-         Ra84qJZSUuqXgK/9/6DxLCoYv0MqdvPVYmNjw1qShOif3zlbEmtqSWro2omkPPSSQTqr
-         sc58gcXs6g7+lPEu37atKApVlIW1ohnesCQk44q+8Obljr9df/xSlgkBjlSKTeJp/rQt
-         n2dA==
-X-Forwarded-Encrypted: i=1; AKwUvBy7OreqGWobqP/sUSknecJJDJZR1B61tV6ZrdPuiP7jUVRgiXFevrt22+P91Bd0t7e2KFELaKM=@lists.linux.dev
-X-Gm-Message-State: AFq9FYJBO3Dwbv67RywkN9thwD1RN6VrBA3uOA9QqlNPGgMz6ny6B9TX
-	R59jiB897bzp35OxFv2Odor7yS01wPaOc+LRnUO+ne+W85ipZBfHo1MfgvEbLRHZ5VuoxeMikFq
-	fVxPSYaxTSRP5rB6v3e23Q66a8460bD8onWgmj5au
-X-Gm-Gg: AYBFou3z4u49Ibks1ALx1rb6rkrtFq7A8z9DVa62+9ZsMdjMQQkVDayAY2ecCT5p4g0
-	Tf9HqhFTGY9LAmjXFpegnfwzA4l7oANIfScL966T0IWIvZZLBgoIcRFu+sE/BG8O/bzre1BiXVT
-	YeYAoDdeN5TIjDJ0CDoralR2aGsQj60DKoONUR3l4itTagpXtjlAa5JWqtdZaBgAJ3cbIiuu3vy
-	IAOsFwW3g9dm+gXryNZmaV3Cqw/Z2lkYSpXYTod7SfZ0MoBKYa890+AdyrZvWXN8nVXy6aethdI
-	myERe5tBMAplNDL5kxolbZKldSdJcAninnLTBJag0s3O0n/s4gC+ENS5
-X-Received: by 2002:a05:6512:33d3:b0:5bb:ff6f:b4bd with SMTP id
- 2adb3069b0e04-5bcca66e395mr320554e87.14.1791380744549; Wed, 07 Oct 2026
- 06:45:44 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NReHhLKh"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=EOLf8afyt5b6SOANC3rqCkf69jr4nV59FAjYhwNBzS4=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1791380784; v=1; x=1791985584;
+ b=NReHhLKhFMfzXPAWTxt4xmRvOMajkIT00NLyFutFSAFABdCQoz9sVnjauO6LqIT5PKSnRHNg
+ IoVcU+PDHHINi5Lmh9eD9AUtGlM8KOh0R54G1bNhKIh9BMOh/VO2zZIIHdFg32CZ4rYHPtkBm/5
+ jX+akeErsmPEf/gFediUcFoY=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 37f9a3236aa2cb18;
+	Wed, 07 Oct 2026 13:46:13 +0000
+X-Mizu-Trace-ID: 37f9a3236aa2cb18
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5bcbb378fc9so9230e87.0
+        for <kvmarm@lists.linux.dev>; Wed, 07 Oct 2026 06:46:13 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBysZJjTBM5g8orfCpZku3YXLoaSWuERSqhsQZzl7bo/5jmYz1Ekv1V+J7i5TxRrulSI2/X3AGM=@lists.linux.dev
+X-Gm-Message-State: AFq9FYK7XS/+frvqAmc35NoEO0s3jejRUIA/dH5TCBzcxlw50wL9ZgLo
+	EPwn6ZZHiGNGdawizVX75PomNGE7GH4VIT79ma9E187pbv5IEZ8UOhdgwasT+2lHYqg8v6fbi+/
+	SNxPW7DCXbVvYaQPu7N4TmhPddFLQF7n6AKJsJq2+
+X-Received: by 2002:a05:6512:a83:b0:5bc:b531:51ea with SMTP id
+ 2adb3069b0e04-5bcca86c249mr304368e87.13.1791380772866; Wed, 07 Oct 2026
+ 06:46:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20261007073537.2454351-1-suzuki.poulose@arm.com> <20261007073537.2454351-13-suzuki.poulose@arm.com>
-In-Reply-To: <20261007073537.2454351-13-suzuki.poulose@arm.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 7 Oct 2026 15:45:07 +0200
-X-Gm-Features: AclHuK9NBZeYXTKdDsAbHTEgR4p43Lr3P06clWDgtHoGILzFBEkx0SOT-Ggr9gA
-Message-ID: <CA+EHjTxuAh1zegQGA0-dNAjDBnXUc036WhoGxoUvVmMW1BxdXg@mail.gmail.com>
-Subject: Re: [PATCH v23 12/14] KVM: arm64: Abstract out memory abort handling
+References: <20261007073537.2454351-1-suzuki.poulose@arm.com> <20261007073537.2454351-14-suzuki.poulose@arm.com>
+In-Reply-To: <20261007073537.2454351-14-suzuki.poulose@arm.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Wed, 7 Oct 2026 15:45:36 +0200
+X-Gmail-Original-Message-ID: <CA+EHjTy_1EekD472UH=CDSpC7oksdy3eS8AP0rPxKkhQ_PyXdg@mail.gmail.com>
+X-Gm-Features: AclHuK_J8GmFTVM33wX7R0VP_JP-fZesKaU03j7TLtkYQU0t9fz-B9AOXRmoM04
+Message-ID: <CA+EHjTy_1EekD472UH=CDSpC7oksdy3eS8AP0rPxKkhQ_PyXdg@mail.gmail.com>
+Subject: Re: [PATCH v23 13/14] KVM: arm64: Mandate VGIC v3 for pKVM VMs and Realms
 To: Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org, 
 	will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, 
@@ -100,15 +64,20 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
 	jonathan.cameron@oss.qualcomm.com
 Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 7 Oct 2026 at 09:36, Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
->
-> Move the memory abort handling under VM specific s2 operation.
->
-> Tested-by: Gavin Shan <gshan@redhat.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Hi Suzuki,
 
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+On Wed, 07 Oct 2026 08:35:36 +0100, Suzuki K Poulose
+<suzuki.poulose@arm.com> wrote:
+> pKVM does not trust the host. Realm VMs follow a similar trust model, with
+> the Realm Management Monitor owning the protected state instead of the
+> host. Add a helper to identify VMs that run under a host-distrusting
+> hypervisor.
+
+When I reviewed this in v21, the Realm patches that use this came
+later in the same series. Without them, kvm_vm_hyp_is_distrusting() is
+true exactly when is_protected_kvm_enabled() is, and protected mode
+already doesn't register a GICv2, so this patch doesn't change
+anything on its own. Should it move to the series that adds Realms?
 
 Cheers,
 /fuad
