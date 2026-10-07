@@ -1,91 +1,83 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC72396B70;
-	Wed,  7 Oct 2026 12:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50E3447F793;
+	Wed,  7 Oct 2026 13:11:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791375408; cv=none; b=VUN8omIoX/c5O7HfanSw0hfTxqzjf6Pg3zotPDh7z6BMK3kchgH02vgdLGjCTOqjYYoS07e6OvwYpHHwbxucJm61kOH9vxTxp+e7GMsuwbQMip1sBuTI3X2K1UeUCU7n3Vzr1cnGLJcXNKCcds8Z4CKnZX45GG//E4JmX7nY7Jo=
+	t=1791378681; cv=none; b=f5az2Gcq+oWQjfC0E/HuKK0P6Z//VPxAiWXwf2Utb2x0dj4Ol6TM1PVMrkwi9bOtYx9UOwqtYqTAk8CCgKLU+Rbr/DKFLyjujekei4BpyBRrJOTXUVHXeXDjCicCNmhd8zd7/5CAHVFqLCevgG2uey5LOAyNO8tjkhgqfFQp95g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791375408; c=relaxed/simple;
-	bh=xEBzt1BEf+JnghpXD1opJU8qu5Tzm90T+1FaD62L2Yo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RTfMcHix5Ye8wI0SKWWP3tZm9rhgbXVHbssNYw5yjd40x/RffpoQFLU33VnbTZX+zkpyY0Y21lNi+faAGc7GXFOceoRZe1zSr+Vh8ir30JZ+Xk/I3aeZ73eeUj5bN1RSCMqRZ78xEkBj+i7X4tejpNeVFtP1Fss8u8RfcaSgJz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FDpQx/oQ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791378681; c=relaxed/simple;
+	bh=aQPC+Yw1LXnFEbwa2Z4tr5U+8DNSNTgby5HUOWLpEkQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AR3GDh3QtrOmwOzon8ibKwVzdJeMgtgJ+JsmabZgB81uMnlkgrIubnfpYEH4w34P2/QThDLE/XSoEVfX6KcHWOOSau9lh4w4Z3pXIwdWxjp6vMrFC7fUUI9wcLm7vtR0fxfOQzk/xfSBqZGjHHDE3JPOanDQixhmlQ+q+AAfXQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=U9sRHUeu; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FDpQx/oQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B16731F0089B;
-	Wed,  7 Oct 2026 12:16:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791375400;
-	bh=3/dEtmAwKr7ZR+4MeKQdc3RXVW7UjGf5ICaRVp/tj/E=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=FDpQx/oQpMsMNBcFozRTE9j18Y8+LtZvEx+RvXAloudQWUXoyIC54g4fa6GqrchtA
-	 /NgtwQalk8mSo0f+Zxykozo/txYdFwePH8tErTcMftJvaYP6Blh19Q9yseCT86vpPW
-	 ZHqzmmKhJru5DeLyVg6YPSXYt1Hsrkwnriaqlc8NZAi44H7ssDwftCO1XHfvjAnl37
-	 nLUJ+m1S1WBh4PpOvBnVA73Ef8of1GnR68KgngzIz30ZfzFol6VuWIltzaVJTqdzgc
-	 M6Rym7XMPww2XXzEaNIqrhJPmFafof3iW4w7HHf/EjAW0FloKoLZRKqJjVDiSH04HX
-	 Arv6sT0sIe4Ww==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xEQZa-00000000GHs-2b0w;
-	Wed, 07 Oct 2026 12:16:38 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: oupton@kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Fuad Tabba <fuad.tabba@linux.dev>
-Cc: catalin.marinas@arm.com,
-	will@kernel.org,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	vdonnefort@google.com,
-	qperret@google.com
-Subject: Re: [PATCH v4] KVM: arm64: selftests: Check the pending SError state in external_aborts
-Date: Wed,  7 Oct 2026 13:16:34 +0100
-Message-ID: <179137539018.699295.11516742459649413558.b4-ty@b4>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261006092841.2202109-1-fuad.tabba@linux.dev>
-References: <20261006092841.2202109-1-fuad.tabba@linux.dev>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="U9sRHUeu"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A2031595;
+	Wed,  7 Oct 2026 06:11:01 -0700 (PDT)
+Received: from [10.57.10.153] (unknown [10.57.10.153])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9716E3F66F;
+	Wed,  7 Oct 2026 06:11:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1791378664; bh=aQPC+Yw1LXnFEbwa2Z4tr5U+8DNSNTgby5HUOWLpEkQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=U9sRHUeuLEhsrHnA+pCnGFP1F7eIFMBxSK4cMcQ48GUMGIU9jmj9OMP/kbwdDtvgD
+	 yX/7zMMyJMhwsw5oP8/tPZ4nnTt7cg2CobLtBcpJDqTc9DE6ehnevr3pGfCT/6m1ab
+	 T3SxDxXmEdhUeQFi7n2OIlMVc1ZRyxiihQX95zbI=
+Message-ID: <f88b3cf5-8312-453a-bbf6-c5cc3e5ac119@arm.com>
+Date: Wed, 7 Oct 2026 15:10:58 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, fuad.tabba@linux.dev, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, vdonnefort@google.com, qperret@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v23 02/14] KVM: arm64: Disable Steal time accounting for
+ protected guests
+Content-Language: en-GB
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+ will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev,
+ gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com,
+ alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com,
+ lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com,
+ jonathan.cameron@oss.qualcomm.com
+References: <20261007073537.2454351-1-suzuki.poulose@arm.com>
+ <20261007073537.2454351-3-suzuki.poulose@arm.com>
+ <CA+EHjTyb3-QoLa6P-dGXVdMh9E_vO3p8HceH3TH8h8gPJSd1Kw@mail.gmail.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <CA+EHjTyb3-QoLa6P-dGXVdMh9E_vO3p8HceH3TH8h8gPJSd1Kw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, 06 Oct 2026 10:28:41 +0100, Fuad Tabba wrote:
-> None of the external abort tests look at the vCPU events once the guest
-> is done, so an SError left pending after the guest took it, or dropped
-> while the guest had it masked, goes unnoticed.
+On 07/10/2026 11:51, Fuad Tabba wrote:
+> On Wed, 7 Oct 2026 at 09:35, Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+>>
+>> PVTIME support is advertised by KVM_CAP_STEAL_TIME, which doesn't take into
+>> account the kvm instance. Even with that, a VMM could skip the CAP check
+>> and proceed to configure the PVTIME as we don't do further check on the
+>> DEVICE_CTRL. Tighten this up by passing the KVM instance around wherever
+>> possible and catch things early.
+>>
+>> Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>> Tested-by: Gavin Shan <gshan@redhat.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > 
-> Read the vCPU events back at the end of every test that runs the guest.
-> The SError must still be pending in the masked case, with the injected
-> ESR when the vCPU has RAS, and no SError, injected or spurious, may be
-> pending in any of the others.
+> Someone beat you to it. This is already in kvmarm/next as a5b0f36a045e :)
+
+Thats fine, thanks for the pointer.
+
+Cheers
+Suzuki
+
 > 
-> [...]
-
-Applied to next, thanks!
-
-[1/1] KVM: arm64: selftests: Check the pending SError state in external_aborts
-      commit: 49664cd0b1db434b6bbf9e37c84b3f448a545dc5
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
+> Cheers,
+> /fuad
 
