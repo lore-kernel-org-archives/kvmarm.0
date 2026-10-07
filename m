@@ -1,94 +1,93 @@
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EAC649551D
-	for <kvmarm@lists.linux.dev>; Wed,  7 Oct 2026 11:13:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98CB449E5FA
+	for <kvmarm@lists.linux.dev>; Wed,  7 Oct 2026 11:19:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.53
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791371624; cv=pass; b=XqUw16zmhHc+n0JwDEsQhD0rQlBkLzVN7GruaaKofLJRM5zc1dnAdS9Fd8hUeDILdlcWAzyKsoO/QWUBsaUrOH0bNPgghClJc+ma4ms8W38+ivSI327rR9wQ4B/uAIz8bF4vXvB4H6Uq9KfjsrehdbisMwxO7/kQD1AyI8aYCXo=
+	t=1791371997; cv=pass; b=GO7O0NRFthVKQWZhhJDXi9s4Ifut53Cy4JZBH1EcN5C8QFIqiQAmyTvfMXnE2bFG6c+NGtBWZr/MLKg8rwgvdR2U2hAXiAc3uMoGdnnGdzADjtMyxEeJmN5mynHU1ekoBgOmunkUfEmNLHqBJWgBD/ANuuyHhxClpdEwX9eKzh8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791371624; c=relaxed/simple;
-	bh=f+RisWKCQLZOEfrvNgEfr/uIKD0wCzcM3ghzQdvYe+U=;
+	s=arc-20240116; t=1791371997; c=relaxed/simple;
+	bh=VTU69CrXg+oUNUa21qt+heVePxURpvvJ4P7YR2kHJSA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QMdx0407k1iizdMNWQKF/PwWBMzLyL5c4z72ew5N/rO4j+nobZ0MDWx77V++c57b++DI7se6+sadn4+Wi0kMO8vTFqsBMRZ11ITenYs69gtWcF7Br969UcqMWGEmyqmVQBidsTc2Id1mXLNHNkXWW74+ol9h/Y5HfOu2hORtBfQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q2TPnXkJ; arc=pass smtp.client-ip=209.85.167.51
+	 To:Cc:Content-Type; b=p1jYD+DkbPipJHzGaAMRM8FOo3c+VNfbzXFoWibouMR0C83mw1DB78HW3o70xkzTr4kNJLiNKTsUJ+eeRflbxv/hDvJjKMebxMgv5Pj5RWwTz+ykmQuCqy49jF/C56G6P/S/uOX0iwU+NmzI94fNsX3oa3NXvZGdpumewFgYhMo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fnuNFLE6; arc=pass smtp.client-ip=209.85.167.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q2TPnXkJ"
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5ba40832934so5802e87.1
-        for <kvmarm@lists.linux.dev>; Wed, 07 Oct 2026 04:13:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1791371607; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fnuNFLE6"
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5ba429b64c5so5715e87.1
+        for <kvmarm@lists.linux.dev>; Wed, 07 Oct 2026 04:19:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1791371958; cv=none;
         d=google.com; s=arc-20260327;
-        b=KazY9f5yt+p2LPHoWRPWiKSdrXbYX4PwvI3tM6DMmvjC5nhILmrTQ68Hecy8vEIF1Y
-         l59rsm8JDgfjxGBS4/Wu9aYDgmPgqMJmT4OV3tsJZ6cwsQG7zZttfv5mgwnGWfaxYrmi
-         v92NG9woEZC6kwiE1D/pabdc1x2AKhfDV/xXhjSk7m/bOYGCmNwmIZwBPdMaYmEKIQRF
-         kZQEPUq62BpYTirxapfrij5GSfbcrjKXymUdjzAuS5c7Znge6BUVw5Wi1XTy4/kgJM3z
-         kWNMlV7nHX3TAsOfEf9BQy9hqjsMN7Ez6sgz68os1JgJdipfr06A1gPyyUDdsNIDcNeJ
-         7auQ==
+        b=jhvoYcGC2eDD9iueyCSdXKm4b+ZVw0psdClnHvcleRV30EpgpZLeLYdPIZSuMVm8+y
+         L/nnfvGiyCz5I9ifDn1DfaBXDk3Yiv10onhgkOyunEK61QzopmtD37K2oq9JbEC3Reue
+         3TTc2b8zYQJwL1JPIvc65wv3InEPNJNdAKi1Jf8KvJS5EegXFSikPfXUSzhtGs+oVh/Y
+         fhbGxIL+rv+NSZPcpXv+kdCRZAcodMJ1vgvi7O8ax3Fwj+DmJzh/llPv7RKGfe8iCtUe
+         DW2BCaQ361Yd0Pw1k6eNus+Aoi4+ymIxPMCf6yLNpwdhYZftI1NyM+LLTffuIPAZYTcP
+         uNtA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=f+RisWKCQLZOEfrvNgEfr/uIKD0wCzcM3ghzQdvYe+U=;
-        fh=0N/oADiEfsB0RhxWi+54y453jJ1aCOXPpPLNYw3GsB0=;
-        b=oYp+fcaJroYHhVizsTBP7Zli0Eh8Efrnw1/G5QJCBtbuQMZRFGAs7znraaA0WV3ON7
-         PTpBZ+4s3smivqxcPwMmor2ORTJVJtR2oMGexFOjqNZn/rKvxSFc4f0CROoa0nyTllfw
-         AIKtJATany+i5JagZho/dn6x3FECfEXEEMp51X99rsoMCbGfYETITPTDdp5D3BceHS9M
-         9l6upfF+h34TUhZER9GryBIFrx8FXZp/nTw7q695BsupnjMVWUIzO9r8bHsxCuFLagpH
-         M2R2r4j+Z5JBF9SJ/tDNViuh4v3h1BEi6SiR1AYEer/7MqvnMBcAI2GWVz95pudYopKc
-         6/7w==;
+        bh=VTU69CrXg+oUNUa21qt+heVePxURpvvJ4P7YR2kHJSA=;
+        fh=YsBeUVgbC9P6aARqyO/TpCcH3vPN+FASu51Y/C2r8Dg=;
+        b=LvYQyTXc0/YUQowJEx/XhQJUSUrT+uhM8QL4s4XJPfiwhRpJkq9Ds6/h22e4RhlqS7
+         /Stu7TceSxyFN6kHdvmUiRAgRgnrlNCpqyRsniSUj1cAv+P6mlYnBuOIMKx4vYnYDiJ3
+         bd0JjuxAMpEcinjHbFjP+SGeryeo9KDXvl0Eep50KlBj14MgfGy7Avg/vILsUUBHUn3k
+         sSOJyouACFEMHLNjcBggGpUn/uZ3xAKYY04jmo0VQaVJ2IqFNn7KyfJzfmiLx/AnKXUm
+         7pYDRMvBVrbKqL16a7fgKqye+Rsv+WSuzQ2WinYwD6qWE4TlWg0tF7tEaHx+0+lUizsy
+         gWWw==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1791371607; x=1791976407; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1791371958; x=1791976758; darn=lists.linux.dev;
         h=content-type:cc:to:subject:message-id:date:from:in-reply-to
          :references:mime-version:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=f+RisWKCQLZOEfrvNgEfr/uIKD0wCzcM3ghzQdvYe+U=;
-        b=q2TPnXkJ7KvltQQqtUrFoyPDFMeqYHyEoCube1MRGpFNMbrs/juEJDr64DMHO/y1DD
-         AiNxXUniDKyngxy6xtrx0AlnLxNk2R/7wvscmDGTaxnwtyUQUd8lc4F8T1fh4CgeaT2w
-         XySYHkyixjfqIL9JcXbXyJV9yqGLvB7Ob8oKkfko88MaxExxx4v38TNv5RKb2DpMOP/y
-         xBc2zFDOBGpwS3Hd5NcGxedJFoslidX2TR77yWX5V6skDansBm51dDbch0cg4PiIW9Mk
-         EXNtu+H/J2gZx371VirkOt7dG+7Hod8Hq4DMFzJBdyaHqryVQ6PCyMJAJuinqjr6Y9y1
-         GGAg==
+        bh=VTU69CrXg+oUNUa21qt+heVePxURpvvJ4P7YR2kHJSA=;
+        b=fnuNFLE6EVVEsb2AIl6FIWy6+RnCbiZIX1wgHldkhwUnzUEdnlnS/kJvsqVBrBEMwP
+         jw0+4RhnuSCtqNX663320KGww0g/ZsFBslajCcXVllcn7PUOFDfbH7nGGWgil7Sdgago
+         fSn8mUVovhb8fDVYL8S13XFbN6JWDdS9ofqvFLwQOVdESN4KpB4Qko1yPqwEkOOecEZe
+         PcUDZJdEKmIheQmrml2UlcEcBByPqJse4jgkO4vVlTMMkZeEshqpHM53jWES+lGNFSKv
+         d3QypzrRzCjxJcQnTVPFt17pLeXcx+9dAXtjkSofyEf1VL0WpSWrcC2mhZMlcIpihehD
+         Ngdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791371607; x=1791976407;
+        d=1e100.net; s=20260707; t=1791371958; x=1791976758;
         h=content-type:cc:to:subject:message-id:date:from:in-reply-to
          :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=f+RisWKCQLZOEfrvNgEfr/uIKD0wCzcM3ghzQdvYe+U=;
-        b=cJ9T9SY+UJQ1i5RZE6pjmo/4e1styn8gb07ISm9f3CmFzIAhnLfNDgBFnrswPXY1Nn
-         tA+ddKvUDhDdjY6XGKpPebLAvsZaWTEqiXacsvgDabLPPggIvYjd1qaKhHPawv3LsdAs
-         7ShbxaPFDcE/Co67uerHsnUci+rm8kps+hOaSZL8R4RcHBsNjRFz/w1az3zkFHXNL3PQ
-         h8O/JudWHlt3YdDcvTkLLKGCKwK1BBd1WohN91k1XoISIwxYb5R3ulJz3YtisWMoqfqW
-         VTuPMZJclkS9PKARQ7xDQvEsKzvG3WPv4baIIu84SYxJUdpM3HvOEEVh0tb/XQI01zpw
-         vUQQ==
-X-Forwarded-Encrypted: i=1; AKwUvBxj8i0ucHWGlaHPoTjdRFlB/V/+sORZZwJscWR4dp4xj8iWBoZxlyh1OQ64NYPLht57HB+YK+U=@lists.linux.dev
-X-Gm-Message-State: AFq9FYLPUNUc5qxJfm5oi0Jzj6IwWUwQjOLDgozkq0j/Uch7LG0ZifwX
-	bVGrECtVG3CEDdeDfeP276hfSCfV82jVVscA5YQku48JSQhbkyJOyNfgxY4p48lPrT62oQ5wIcc
-	v4abiLvd1CoCeEAuTj6bTO3/EvGFkM6knkVfYyr5u
-X-Gm-Gg: AYBFou0pkQpJuTo97kyUkmN/U0ijSI5mS8dXevm70SDIdqfBjBtW+dtP5HiPWx5+HVu
-	CgjBm3AiKy4pQTlj7h9bOQintbynk7WXUSAwqoAp73DIY9sqY/bfylSveO903i8YiBzEUBkIOQd
-	41wQhMWRPt9P5+PALEGgyXn540v4q4L1ql4hm8dy6ECnyNw0EiEgPoLwI2Q7v1JPg/GKEZG7Fjg
-	P7xTfyPfiwNPbWAZOZE/acbbGRvXVOF5UMqQ9m/3i8Pehp6mxsly1lnV9eB+Uh5zt9Dl2Hov1gT
-	k2TE07KvRomqbE7hRSoTx61zZCBwN5lCEat+a1l3MfDnfJGlUTV4q/HNx0wC+wjD/A==
-X-Received: by 2002:a05:6512:135b:b0:5b8:f142:cf3 with SMTP id
- 2adb3069b0e04-5bcca65b3acmr273089e87.11.1791371606791; Wed, 07 Oct 2026
- 04:13:26 -0700 (PDT)
+        bh=VTU69CrXg+oUNUa21qt+heVePxURpvvJ4P7YR2kHJSA=;
+        b=HkH9dS0l4HqGP4snCGZbeDzN1JtCoCeRM6i/q0dY7/5FmLz5Tfh5W3E7MGYLmpoO3F
+         k+3vS6NsEn3Y7ObF3FckvQtL6R+2fYsq9jygKU6GOTj9/AWZDN/7FOrE263t9CHujRrU
+         xo58LBYcYbgu07Igw52cFU3gH8sIrBies1f86cyf2j59tiGfrPDP8cDnfowWbjWCV0eh
+         3D8HeJD8kCIlvsC6kM3mNUK+1+k8gXNaZiUV0muFXq4dCexzk+qriI+MfT3NVGZdpaZz
+         9U1b7PWQ3ywy0hZXSfD87uwVGb0+acRZ0TdRVDonAm2f0UvkRnIym1cz7sXl6CvrcF7X
+         LnSA==
+X-Forwarded-Encrypted: i=1; AKwUvBw7dZaMOTZRQaxB6i9HzV/f87Ut3WiZyujLi8/mvXnF8ONXMz4ObnEOrRZN9JceXDVUTlUF5G4=@lists.linux.dev
+X-Gm-Message-State: AFq9FYIdLYEN3El5l21HRRuCDwTeeDqcIakpHWO3fQiXi8zdeJ0eRNDA
+	TkyLQusKVUqnYVhurZZYeKM8QnXEQ4Za30zqm9YV1bstwBCEespYmHgHfSV4HNj+WrUsuMipJzL
+	oP4HPzxA5kcXTR3gvLipIUvh0hS8gDDb31E+C1w/B
+X-Gm-Gg: AYBFou0ZHbtl1JjLlYIRIZazA/9uLzZVDmlCjDOKdEe6Le3QpI+Kv9QAGOBZlKtYHZx
+	hMO5AHwvx1FA3fWqF5Rwn10SOaqXjB3GcssSZBeVryKd893RenUjyLxQexXDp7pbjKO84DcWh14
+	0ya1A4CEPyut2QV0yZDA5nGkRX5y+XAX9X9OMKw/dLgTU7DDBDMgSzAJM82JZkjEeUDyNwjYJPz
+	R9cFgHgb9YHKvYj6Kg2oViHRmyMnGzDPaKWnX7G7eKwatjobLgy6xGTiUDNlQ9i1vVzQRfWuDpo
+	iFhGvH6k0y5ueZQOvMnomg7Sj62W48QHgbgmGNuz0pEAeyYBkrEDpQ==
+X-Received: by 2002:a05:6512:1385:b0:5b8:e262:d32e with SMTP id
+ 2adb3069b0e04-5bcca7ec141mr318055e87.1.1791371957703; Wed, 07 Oct 2026
+ 04:19:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20261007073537.2454351-1-suzuki.poulose@arm.com> <20261007073537.2454351-8-suzuki.poulose@arm.com>
-In-Reply-To: <20261007073537.2454351-8-suzuki.poulose@arm.com>
+References: <20261007073537.2454351-1-suzuki.poulose@arm.com> <20261007073537.2454351-9-suzuki.poulose@arm.com>
+In-Reply-To: <20261007073537.2454351-9-suzuki.poulose@arm.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Wed, 7 Oct 2026 13:12:50 +0200
-X-Gm-Features: AclHuK8WLpu77qQsvdg4MDduFoR68Hrl6zUyd6Su64I0GC1JFRH6-dZAB7pnQNs
-Message-ID: <CA+EHjTy2WuCui_O8sYXviCmgLQfZ-j-jOBQqRY9NOXzMGQ5k+Q@mail.gmail.com>
-Subject: Re: [PATCH v23 07/14] KVM: arm64: Refactor the vcpu_load to allow for
- VM specific callbacks
+Date: Wed, 7 Oct 2026 13:18:40 +0200
+X-Gm-Features: AclHuK9FLvM3LbOukRQncRzEinU8YnpJHc3NQvReH44DvOmDcByJyESZjTaqDmQ
+Message-ID: <CA+EHjTzV29F+MoKAKum1rUS8ZBd2j2w28yQWfHL4ymfJnVzG=A@mail.gmail.com>
+Subject: Re: [PATCH v23 08/14] KVM: arm64: Add vcpu load/put call backs for flavors
 To: Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org, 
 	will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, 
@@ -103,24 +102,13 @@ Content-Type: text/plain; charset="UTF-8"
 
 On Wed, 7 Oct 2026 at 09:36, Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 >
-> To keep the VCPU load/put handling cleaner with the different kinds of VM
-> types, we are about to introduce VM specific callbacks to do just the right
-> thing. In preparation for that, make some refactoring to add the change
-> easier by mainly feature specific configurations to individual wrappers,
-> so that different callbacks could reuse the helpers.
+> Add VM flavor specific handlers for VCPU load/put, in an effort to make it
+> easier to follow the code. pauth traps were removed from VMs running PKVM
+> as it is a no-op for them.
 >
-> Adds vcpu_prepare_mmu()/vcpu_put_mmu() wrappers to load/put MMU related
-> configurations for !pKVM guests. Additionally makes it explicit that
-> kvm_arm_vmid_clear_active() is not required for pKVM host.
+> Based on a patch by Marc Zyngier
 >
-> Add vcpu_load_pvtime(), vcpu_set_wfx_traps() wrappers for handling the
-> corresponding configurations.
->
-> While at it, also make it clear that the timer loading constraints only
-> apply for the VHE.
->
-> No functional changes intended. Based on a work by Marc Zyngier.
->
+> Suggested-by: Marc Zyngier <maz@kernel.org>
 > Reviewed-by: Gavin Shan <gshan@redhat.com>
 > Tested-by: Gavin Shan <gshan@redhat.com>
 > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
