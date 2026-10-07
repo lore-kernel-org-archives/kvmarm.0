@@ -1,32 +1,33 @@
-Received: from mta0.migadu.com (out-72.mta0.migadu.com [91.218.175.72])
+Received: from mta0.migadu.com (out-79.mta0.migadu.com [91.218.175.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41D7941CB4D
-	for <kvmarm@lists.linux.dev>; Wed,  7 Oct 2026 07:43:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B705841D4F1
+	for <kvmarm@lists.linux.dev>; Wed,  7 Oct 2026 07:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791359037; cv=none; b=h/f3NuVTe7sJZ6slEMIHS7CkPh7MawQ96a+jroVy54MikfvLUNgCFFI3sj8JxOH+2rG5YDLVqpIiCLqGqtQpYy+4B62IOMWov5Bnjiabhg2k9PVH0F/yvUpGLvcFbc7oVW8bawQMas5jf/TnFA6UqHCmLqI/cn0DDeTcTiYWwuQ=
+	t=1791359045; cv=none; b=jWo2cmI3TW0lYBymye5EEpyxNhORUJ7veHRqjiq/W+IIgeYm2v799gGoadDaqtFyYBl1Q3ixGtGA1CQHQXlq4Up+6SMt0i2P6zSAJ940QSw0kXv2o1LWFO7vhcTyjzD/vYMnDh4VO4N+AX/jSOdW8M5ZctGBnHW3KD7CivuqR5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791359037; c=relaxed/simple;
-	bh=o5+OZlVLtUCueg4cXgDkgvR3WZIRFrS7EESmuvL0q6I=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gM0THBdHf/L0qABmNqoZ3aCBLxmDKYD3w4ygl47g7RXPPxIaCSi00hsomteQNP/jEN/x6RcnrVSHF2MzlcD/QkE+JJD9Gi6xIDy0OCVKcme1y8Yg54neH7CmeEShSy9g9K3QPttvaLiN5nLPC4c9r1uk3oOsogrjpuRHZEpmGlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jFoRxIDL; arc=none smtp.client-ip=91.218.175.72
+	s=arc-20240116; t=1791359045; c=relaxed/simple;
+	bh=26sJxdBAYmq6lVWEeN66iV6F411lF6shyPsA+r/oRO0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=LoI52re+K8KG0LiCB4jFjkvvRj6641ykixz1LKYIug28JgsYk74R2BvkTZeR0JYaq+QKn2nn41Hn+c2AqpPRi7ssDPi96sJ3FG6D03qrKP/CrhADLugBRQI2buRCOaG0lkgrf9leNblWBG9OYS/cYtotsBqBn/jWhOnqwWjxrvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=d6LWWCHd; arc=none smtp.client-ip=91.218.175.79
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jFoRxIDL"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="d6LWWCHd"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=o5+OZlVLtUCueg4cXgDkgvR3WZIRFrS7EESmuvL0q6I=;
+DKIM-Signature: a=rsa-sha256; bh=26sJxdBAYmq6lVWEeN66iV6F411lF6shyPsA+r/oRO0=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1791359027; v=1; x=1791963827;
- b=jFoRxIDLTBHOp3gb9k4AfT6yEHQOHSMPWbGZgr8nPg6agkQDu5LMdHqTv51cUQii7xIvIs4B
- v/NBvUBll+jKYn1MkrrKq39QIgAEso9afRmjf8xbHUhkjnTKGxAvmrpbRG3Wt4VpWfnhmpd4lLX
- uAbffj2QLLlEKW0fHMUMXc/4=
+ t=1791359032; v=1; x=1791963832;
+ b=d6LWWCHdH4XCAe3Ti3ESKzNmApTWM0X6+XvVE/Vna7u3sNCLECCq8oIZjCxcLuG2SqvWxQGA
+ JTt3HmD8LThjJv0ei2rzUzGowRx6cUToQr8wgBmUDQyPryxnKpCRzjROEYxNwiqDGkMDx5/Voo3
+ TA5mFFbpwBOUM4be/WmT+lU0=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 781d49e7d095f2d5;
-	Wed, 07 Oct 2026 07:43:47 +0000
-X-Mizu-Trace-ID: 781d49e7d095f2d5
+Received: by smtp.migadu.com with ESMTPS id 684038a9acd37d11;
+	Wed, 07 Oct 2026 07:43:52 +0000
+X-Mizu-Trace-ID: 684038a9acd37d11
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -44,10 +45,12 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH v2 0/3] KVM: arm64: timers: Program CVAL from the current count when the hardware won't apply the offset
-Date: Wed,  7 Oct 2026 08:43:40 +0100
-Message-Id: <20261007074343.324269-1-fuad.tabba@linux.dev>
+Subject: [PATCH v2 1/3] KVM: arm64: timers: Compute an offset-applied CVAL from the current count
+Date: Wed,  7 Oct 2026 08:43:41 +0100
+Message-Id: <20261007074343.324269-2-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20261007074343.324269-1-fuad.tabba@linux.dev>
+References: <20261007074343.324269-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,79 +59,161 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi folks,
+When the hardware won't apply a timer's offset, KVM programs CVAL +
+offset and lets it compare that against the raw counter. The compare is
+unsigned (IsTimerConditionMet, DDI0487M_c J1.4.3.29):
 
-Changes since v1 [1]:
-  - Patch 3 programs the new case's CVAL as an absolute value near the
-    wrap instead of a negative TVAL, so a host stall between the
-    counter and timer writes can't make it fire. (Sashiko)
+  condition_met = (UInt(PhysicalCountInt() - offset) -
+                   UInt(compare_value)) >= 0;
 
-A guest timer can fail to fire, or fire early, once the guest's counter
-is far enough from the host's. Where the hardware won't apply the
-offset itself (the physical timer without CNTPOFF_EL2, a CNTPOFF_EL2
-host while TGE is set, the virtual timer on x1e), KVM adds it to CVAL
-and lets the hardware compare the sum against the raw counter. The
-timer condition is an unsigned compare, and adding the offset to both
-sides of it preserves it only while both sums wrap or neither does: a
-guest whose counter is ahead of the host's by more than CVAL has an
-expired timer that never fires, and one behind it can have a far-future
-timer fire at once.
+so adding the offset to both sides holds only while both sums wrap or
+neither does. A guest whose counter is ahead of the host's by more than
+CVAL has an expired timer that never fires, and one behind it can have
+a far-future timer fire at once.
 
-Patch 1 computes the programmed value from the current count instead,
-and returns a guest hypervisor's own physical CVAL from memory where it
-used to subtract the offset from the hardware value. Patch 2 does the
-same for the virtual CVAL read on x1e, which has returned CVAL + offset
-since the workaround landed. Patch 3 adds the second case, a guest
-behind the host with a far-future timer, to arch_timer_edge_cases.
+On a CNTPOFF_EL2 host the first case livelocks: each entry reloads the
+guest's CVAL, the timer fires, and the exit rewrites it as CVAL + offset
+before the host can take the interrupt. Without CNTPOFF_EL2 the timer
+hangs until the vCPU is next loaded, which is what Zenghui reported on
+a Kunpeng920.
 
-So far it has only shown up in the selftest, which moves the guest
-counter half its range away from the host's. On a VHE host without
-CNTPOFF_EL2 arch_timer_edge_cases hangs in its physical cval = 0 cases
-until the vCPU is next loaded, which is what Zenghui saw on a
-Kunpeng920 [2]. On a CNTPOFF_EL2 host (QEMU, here) the same cases
-livelock instead. Both go away with patch 1. The arithmetic is wrong
-for any offset once one sum wraps and the other doesn't, and the fix
-for the selftest's case should be the fix for all of them.
+Program the value from the current count instead: CVAL + offset while
+the deadline is ahead, 0 once the timer has expired for the guest, ~0
+past the counter's wrap. KVM recomputes it at load, at exit and on a
+trapped CVAL write, and an expired timer stays expired in between. The
+value can't be inverted, so with an offset timer_save_state() keeps the
+memory copy, and kvm_hyp_handle_timer() returns that copy for a guest
+hypervisor's read of its physical CVAL rather than subtracting the
+offset back out.
 
-Tested with arch_timer_edge_cases on QEMU with [3], which has since been
-merged, under VHE, nVHE and pKVM, and under VHE with CNTPOFF_EL2 removed
-by id_aa64mmfr0.ecv=1, the host class Zenghui hit. Under VHE with patch
-1 reverted the new case fails. QEMU's TCG had a separate bug with the
-same offsets, which [3] fixes. Without it the test stalls under nVHE and
-pKVM as well, where KVM emulates the physical timer and patch 1 changes
-nothing. Not exercised here: patch 1's x1e paths in timer_save_state()
-and timer_restore_state() and all of patch 2, since nothing here runs on
-an x1e, and patch 1's CNTP_CVAL_EL0 read in kvm_hyp_handle_timer(),
-which only a guest hypervisor with a physical offset on a host without
-CNTPOFF_EL2 reaches.
+Fixes: c605ee245097 ("KVM: arm64: timers: Allow physical offset without CNTPOFF_EL2")
+Fixes: 9404673293b0 ("KVM: arm64: timers: Correctly handle TGE flip with CNTPOFF_EL2")
+Fixes: 0bc9a9e85fcf ("KVM: arm64: Work around x1e's CNTVOFF_EL2 bogosity")
+Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+Closes: https://lore.kernel.org/r/460258be-0102-e922-c342-4e87cd94b9e5@huawei.com
+Cc: stable@vger.kernel.org
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ arch/arm64/kvm/arch_timer.c     | 27 ++++++++++++---------------
+ arch/arm64/kvm/hyp/vhe/switch.c | 11 ++++++-----
+ include/kvm/arm_arch_timer.h    | 15 +++++++++++++++
+ 3 files changed, 33 insertions(+), 20 deletions(-)
 
-Patch 1 carries Cc: stable for the hang and the livelock.
-
-Based on Linux 7.3-rc3 (fd73f4a665989; also applies to kvmarm/next
-f91b534e81f23).
-
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/20260921140427.2211373-1-fuad.tabba@linux.dev/
-[2] https://lore.kernel.org/r/460258be-0102-e922-c342-4e87cd94b9e5@huawei.com
-[3] https://lore.kernel.org/r/20260921074451.3158645-1-fuad.tabba@linux.dev
-
-Fuad Tabba (3):
-  KVM: arm64: timers: Compute an offset-applied CVAL from the current
-    count
-  KVM: arm64: nv: Read a guest hypervisor's CNTV_CVAL_EL0 from memory on
-    x1e
-  KVM: arm64: selftests: Test a timer set past the counter's wrap
-
- arch/arm64/kvm/arch_timer.c                   | 27 +++++++++----------
- arch/arm64/kvm/hyp/vhe/switch.c               | 21 +++++++++------
- include/kvm/arm_arch_timer.h                  | 15 +++++++++++
- .../kvm/arm64/arch_timer_edge_cases.c         | 25 +++++++++++++++++
- 4 files changed, 65 insertions(+), 23 deletions(-)
-
-
-base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 6ac3321f4c575..9278b5383c044 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -528,17 +528,11 @@ static void timer_save_state(struct arch_timer_context *ctx)
+ 		goto out;
+ 
+ 	switch (index) {
+-		u64 cval;
+-
+ 	case TIMER_VTIMER:
+ 	case TIMER_HVTIMER:
+ 		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTV_CTL));
+-		cval = read_sysreg_el0(SYS_CNTV_CVAL);
+-
+-		if (has_broken_cntvoff())
+-			cval -= timer_get_offset(ctx);
+-
+-		timer_set_cval(ctx, cval);
++		if (!has_broken_cntvoff() || !timer_get_offset(ctx))
++			timer_set_cval(ctx, read_sysreg_el0(SYS_CNTV_CVAL));
+ 
+ 		/* Disable the timer */
+ 		write_sysreg_el0(0, SYS_CNTV_CTL);
+@@ -564,11 +558,12 @@ static void timer_save_state(struct arch_timer_context *ctx)
+ 	case TIMER_PTIMER:
+ 	case TIMER_HPTIMER:
+ 		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTP_CTL));
+-		cval = read_sysreg_el0(SYS_CNTP_CVAL);
+-
+-		cval -= timer_get_offset(ctx);
+-
+-		timer_set_cval(ctx, cval);
++		/*
++		 * With an offset, memory already holds the guest's CVAL (the
++		 * trap handler or __deactivate_traps() wrote it).
++		 */
++		if (!timer_get_offset(ctx))
++			timer_set_cval(ctx, read_sysreg_el0(SYS_CNTP_CVAL));
+ 
+ 		/* Disable the timer */
+ 		write_sysreg_el0(0, SYS_CNTP_CTL);
+@@ -647,7 +642,8 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+ 		offset = timer_get_offset(ctx);
+ 		if (has_broken_cntvoff()) {
+ 			set_cntvoff(0);
+-			cval += offset;
++			if (offset)
++				cval = timer_apply_offset(cval, offset, kvm_phys_timer_read());
+ 		} else {
+ 			set_cntvoff(offset);
+ 		}
+@@ -660,7 +656,8 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+ 		cval = timer_get_cval(ctx);
+ 		offset = timer_get_offset(ctx);
+ 		set_cntpoff(offset);
+-		cval += offset;
++		if (offset)
++			cval = timer_apply_offset(cval, offset, kvm_phys_timer_read());
+ 		write_sysreg_el0(cval, SYS_CNTP_CVAL);
+ 		isb();
+ 		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTP_CTL);
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 7875911c05063..14aada311bac4 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -175,7 +175,8 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+ 		offset = read_sysreg_s(SYS_CNTPOFF_EL2);
+ 
+ 		if (map.direct_ptimer && offset) {
+-			write_sysreg_el0(val + offset, SYS_CNTP_CVAL);
++			val = timer_apply_offset(val, offset, arch_timer_read_cntpct_el0());
++			write_sysreg_el0(val, SYS_CNTP_CVAL);
+ 			isb();
+ 		}
+ 	}
+@@ -296,10 +297,10 @@ static bool kvm_hyp_handle_timer(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 		break;
+ 	case SYS_CNTP_CVAL_EL0:
+ 		if (vcpu_el2_e2h_is_set(vcpu)) {
+-			val = read_sysreg_el0(SYS_CNTP_CVAL);
+-
+-			if (!has_cntpoff())
+-				val -= timer_get_offset(vcpu_hptimer(vcpu));
++			if (!has_cntpoff() && timer_get_offset(vcpu_hptimer(vcpu)))
++				val = __vcpu_sys_reg(vcpu, CNTHP_CVAL_EL2);
++			else
++				val = read_sysreg_el0(SYS_CNTP_CVAL);
+ 		} else {
+ 			val = __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0);
+ 		}
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index bc6f2fdd7ad33..80f96ea59f1ae 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -195,4 +195,19 @@ static inline void timer_set_offset(struct arch_timer_context *ctxt, u64 offset)
+ 	WRITE_ONCE(*ctxt->offset.vm_offset, offset);
+ }
+ 
++/*
++ * CVAL to program when the hardware won't apply the timer's offset, so that
++ * its compare against the raw counter matches the guest's at 'now'. An
++ * expired timer stays expired; one past the wrap never fires.
++ */
++static inline u64 timer_apply_offset(u64 cval, u64 offset, u64 now)
++{
++	u64 hw = cval + offset;
++
++	if (now - offset >= cval)
++		return 0;
++
++	return hw > now ? hw : U64_MAX;
++}
++
+ #endif
 -- 
 2.39.5
 
