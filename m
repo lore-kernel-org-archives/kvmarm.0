@@ -1,84 +1,88 @@
-Received: from mta1.migadu.com (out-32.mta1.migadu.com [95.215.58.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2AD03A2551
-	for <kvmarm@lists.linux.dev>; Thu,  8 Oct 2026 19:14:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39AC036B932
+	for <kvmarm@lists.linux.dev>; Thu,  8 Oct 2026 20:28:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791486850; cv=none; b=FkwsZ5EMawmvFH82GFCdLHC/QDxAUdBAbS2SFLgRe0r8AZxpNEh5ugjkUwwdonBXIQYRi6v5aFBxWXZ8uwbsjMbq8n7UPSRkmG9nNp3DwmFz6EvV5alHShmhoHiA2N9Fqae52eAWJQZ0bPfHHcb1lnfCbkIz1KQ+idbgS/t0kQQ=
+	t=1791491317; cv=none; b=hJPhuFuafFR8dkDcg+66I+O4kJ1IcN+XtECjGXZC5Od5W3hPMS8nBCh6nBuR99YvzvDgioz9/l2UPM5fLzBZZ1E5jFdPjcG6tybwaXOw2jNbIb6XvcXk+M9odZt6EUUygli42V0h3eP6WxSltNF+WktnEe+GEfa6RntppM5P4RM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791486850; c=relaxed/simple;
-	bh=AKR83nbVxbLcyLekP2tauXtp08m1xfpMBejB0OmP9ZE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K4wl6ljO+lD1L8CrYJmy9uVnHdcVPBbEeHgxkWXvZEEJDwfSL/MGDy7dOBk5n6HdRhXfYGfHjP3rYBi6pCFfOnZ4tbzqtRS76FlYc4cNVf/BAWW1o537LXph6KRRkx67lOTEt+PdS6bsAUuw+QQqraisXa2NTh2hMInTs/wMhkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GRuT9Pyj; arc=none smtp.client-ip=95.215.58.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1791491317; c=relaxed/simple;
+	bh=mNvOB+KGOLoyZmuXxuqz2CLFBYOvXKUFcOmLZj7MOYo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bdC73PUCODKbuIzVxaaBSi7r8Xby5EwHEejam2h3dX8nBpWXpQfhNXGLzCHLDoLM/NrmRJsdw570Orn063M2cOW7QomtoRQWp6NWI64YrW/vLHwKpKf3vNTVNZBY++J+E3E17tnSX6jl1QULf+qt537ie6EaBo/zinjWCrv4P+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P1WnOMAz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GRuT9Pyj"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=AKR83nbVxbLcyLekP2tauXtp08m1xfpMBejB0OmP9ZE=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1791486846; v=1; x=1792091646;
- b=GRuT9PyjtrKV24zT1m7nKq1byVdCATSTjL+r8gnAdQwNlBYb78zys/K7PHd5x32e/sdefucx
- A/dHh/DV8ctGiZ9kImFkQA/6OFLjcuL7jbpGNDi4D+1no3udWAYAULtg3I311ASVoBFWJlMvksH
- xqvgvaNcZOw6VqMT3HBgUO+A=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 76e91f6e026d46b3;
-	Thu, 08 Oct 2026 19:14:06 +0000
-X-Mizu-Trace-ID: 76e91f6e026d46b3
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5ba40832934so223e87.1
-        for <kvmarm@lists.linux.dev>; Thu, 08 Oct 2026 12:14:06 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwX34fgf6sVA9950A5OtDcwC60fP9e3b2EvjlNXvGIl0CCfzpYT5tkutZ5+DJqQN7EdEs4ky/k=@lists.linux.dev
-X-Gm-Message-State: AFq9FYLC88FI4ZctuG7881pZw5u3mLQ0iQNot+X0nJjGnhv1tKVg2WLl
-	N9lNo0d0hzydz5yOAiUdnBmI0+q3YNWeAWou66l3knpHyoyfO/KKee8E89qxztJKg4UpixJIWmi
-	oFVTNe7rtogqp+OCx7AQiHmZmAxjTQfAUj9o+hxHW
-X-Received: by 2002:a05:6512:10c1:b0:5b8:c230:1241 with SMTP id
- 2adb3069b0e04-5bcdd4f70eemr5332e87.10.1791486845553; Thu, 08 Oct 2026
- 12:14:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P1WnOMAz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3B8D1F000FF;
+	Thu,  8 Oct 2026 20:28:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791491315;
+	bh=AXqdN5NM/wlg2F8eFqzzica7nKQ60DQkM32wCrMgOZM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=P1WnOMAzhX0r0p+dRbQm5BeoFyfpcd3NetZ23g75J+5tUE1LIbd/YHCWDvGgCLu6N
+	 aG9Aa9SVdpmPs6FlZ9wGBTsAb6Zn+ywHdgimkOcCc3CWfTitu7olMeRlHNptNgu3E4
+	 EejlmpRyIMyaQBw8iKqJog0witsYLYjMjhvd0tQKHeEGdxOQO49izGp8nO6XqUNcPi
+	 M/k+AuanHknCantAAJUaqzb0o7OJwMtl1sV8WzsEeljdv0Pz7N2Xw2CJCIouqpI2Pp
+	 wWl2j2Ah6juGjj2KsaObFAt5EA2mBKpED6pwg4qx4tWX+cV/fF9VksSVXl9I+lOJ6M
+	 UdzIbVXDQOZLw==
+Date: Thu, 8 Oct 2026 13:28:30 -0700
+From: Oliver Upton <oupton@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Yuchao Zhang <ndaugoing@gmail.com>
+Subject: Re: [PATCH v2 0/7] KVM: arm64: vgic-v3: Make LPI disabling robust
+ (and more)
+Message-ID: <asf87i2RDh-WksL-@kernel.org>
+References: <20260929093548.3598547-1-maz@kernel.org>
+ <CA+EHjTybnn2jgVKxCO0WXdGXWJ-=2p4k98CHfh3CrhJopvPDFQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20261008104212.3134550-1-vdonnefort@google.com> <20261008104212.3134550-3-vdonnefort@google.com>
-In-Reply-To: <20261008104212.3134550-3-vdonnefort@google.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 8 Oct 2026 20:13:29 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzpKk3hUTriyRF-YWkNQpQ82vuJoqKkW+uo+6n5f2mhmg@mail.gmail.com>
-X-Gm-Features: AclHuK_ThQjFI6b4HwbVAIZDiFDSYYuCsea3IqDte6EDuPAwAowo5mbSypT5SSs
-Message-ID: <CA+EHjTzpKk3hUTriyRF-YWkNQpQ82vuJoqKkW+uo+6n5f2mhmg@mail.gmail.com>
-Subject: Re: [PATCH v1 2/2] KVM: arm64: Fix bpages backing allocation size in hyp_trace
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, 
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, 
-	qperret@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTybnn2jgVKxCO0WXdGXWJ-=2p4k98CHfh3CrhJopvPDFQ@mail.gmail.com>
 
-On Thu, 8 Oct 2026 at 11:42, Vincent Donnefort <vdonnefort@google.com> wrote:
->
-> hyp_trace_buffer_alloc_bpages_backing() computes nr_bpages as
-> (PAGE_ALIGN(size) / PAGE_SIZE) + 1, whereas trace_remote_alloc_buffer()
-> takes into account the buffer page header.
->
-> Align the bpages backing allocation by using
-> __calc_nr_pages_ring_buffer_desc(). There's no need to validate
-> nr_bpages again, it has been before with trace_buffer_desc_size().
->
-> Fixes: 3aed038aac8d ("KVM: arm64: Add trace remote for the nVHE/pKVM hyp")
+Hi Fuad,
 
-Should this have Cc: stable too, like patch 1? The undercount is there
-since 3aed038aac8d for small buffers, and 442ffa742daa6
-("tracing/remotes: Account for ring buffer page header in size
-calculation") makes it reachable at ordinary sizes.
+On Thu, Oct 08, 2026 at 07:15:46PM +0100, Fuad Tabba wrote:
+> Hi Marc,
+> 
+> On Tue, 29 Sep 2026 10:35:41 +0100, Marc Zyngier <maz@kernel.org> wrote:
+> [...]
+> > Address the two issues in one go, by actively taking a refcount on all
+> > IRQs referenced by last_lr_irq, and making sure that disabling LPIs
+> > force all vcpus to be paused, making it safe.
+> 
+> I'm triaging Sashiko's pre-existing bug database, and I ran into
+> something that I think this series doesn't cover.
+> 
+> vgic_its_inject_cached_translation() doesn't check vgic_lpis_enabled()
+> (the slow path, vgic_its_resolve_lpi(), does), and pausing the vCPUs
+> doesn't stop an MSI coming in through irqfd or KVM_SIGNAL_MSI. So an
+> MSI that hits the translation cache between vgic_flush_pending_lpis()
+> and vgic_its_invalidate_all_caches() can still end up on the ap_list
+> of a vCPU whose LPIs are being disabled, after the flush.
+> 
+> Could the cached path check vgic_lpis_enabled() on the target vCPU, or
+> am I missing something?
 
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+Hmm, since there's no parent lock between disabling LPIs and translation
+cache fills I believe there's still a chance for this to race. We could
+have vgic_target_oracle() return NULL if LPIs are disabled at the
+redistributor, then the rest of the AP list machinery will "just work"
+for injections that slip between the cracks.
 
-Cheers,
-/fuad
+If only Arm went a bit further than "strongly recommends" on migrating
+LPIs _before_ flipping the bit...
+
+Thanks,
+Oliver
