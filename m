@@ -1,56 +1,56 @@
 Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC3EE497394
-	for <kvmarm@lists.linux.dev>; Thu,  8 Oct 2026 10:42:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D559E4973A7
+	for <kvmarm@lists.linux.dev>; Thu,  8 Oct 2026 10:42:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791456169; cv=none; b=qvkXWYxiFbmowdotP4XN0UC3SAzMKZePbnt8uJG5HDP2zBRqXElGR2VurRTMH5mBN54V6LFy49y9X1bn6/xdeZqgGqElwHaKdmyMZWM2/8I6qr5Y7pWqQ0F9thRN+tvJ6jrI/yxvkW7C5KgMm7FAt17ZrDYgfZ4bNkPpzscdfd8=
+	t=1791456170; cv=none; b=JZgc1yHC1vNDw39WSGCKFKc9cvg0iCMI61LjdJ7y7QsOXh22YFTQNAT6PKIHMRm1rUd0NUJWXR2gJ/HpFsElnAYQD4uIAXRx5iFyR7bvTZjQi1k6WQTz/Wq+ggBEcX1x3ErkQG2tl1vJq5EMbOMJ8IVFdgTdhE2kxBvXnUFk2rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791456169; c=relaxed/simple;
-	bh=Pc4BNRTJOTAvPAzY24OovCuqd7bgTd/I0IOAu7zieiA=;
+	s=arc-20240116; t=1791456170; c=relaxed/simple;
+	bh=/xcJ2+8lWGMc37QVAznzR6c4fUY/FLvesrfH+DiP29g=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=H+jlhIPUOboFdh2Oj+F/UWpCY0nvmsDi+Us/0p5cw+p/VPzP7EJQptIL8QyiNP67ZuWCLs5uP3ZXjfXyeEskN4oOmftrehY5I2QFRgLIAdv1ioEywoPEBFBKcBh9MVV7oGnJsaBUNNbrCXYuK03O6nszGGKn343B61mNIrCLjIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NF6EbwXR; arc=none smtp.client-ip=209.85.128.70
+	 To:Cc:Content-Type; b=kopqWKXyXON+mtORkMa/TMyT8Nzb/AnV67rZ/8OUmDBulRZnpvT/L0a3qoaLhK2ck/sVv3aTJdv1FuHgMAi2qM7fyxJ57xvJsGtqSlvzMXXPOPy6OYNAixbqSU1h9FUsAdsS/ACtNF3HRxTDVX+LmQmR01HL8FDS2OrZj8BqHZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KcPQ2sEW; arc=none smtp.client-ip=209.85.128.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NF6EbwXR"
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4a17b4c613fso16410395e9.2
-        for <kvmarm@lists.linux.dev>; Thu, 08 Oct 2026 03:42:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KcPQ2sEW"
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4a17e77c5b1so16593255e9.1
+        for <kvmarm@lists.linux.dev>; Thu, 08 Oct 2026 03:42:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1791456166; x=1792060966; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1791456167; x=1792060967; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=7A3TCDs1xynx1LpYwQyPlW/nabg1O3gtjbirRm79U8s=;
-        b=NF6EbwXRXwPysZwsj9Cxk47gbBiSvCIQpMSf7cQioYs9YjIDCwhqQAqzJQY0bwWAS5
-         hQzzYhUJqJXq/Ei7kBhQjuFdi1Lx5Da7NuK2/YzYh0XfQFK3HpChHn5L+ACCiLeYcgMe
-         J58Ix4dLU4Go97ZKaI5ch4CA5HHgoRR13X5bCgHAcO1Ihp4XNQ02uV0FPlKI5AOIEora
-         kHvykMg4FvEJmJFm8ETvTevD4v0ywfNT4US4krv8zmcMKQ9GBtGmt9ndUu4RYCY60hGy
-         ogzgaCcKuvHfUwq9xnZoSuyPD0I6ukPHTA0oNHAEAmo0T+uuc+LjDDvLh/HjgaIHo3jg
-         DsVg==
+        bh=VM97xwYT1dB0ZgvNb7fOqgAZXGtuRGu0qA+yv/6pRZc=;
+        b=KcPQ2sEWB4GXiPgAIr+7cf+NEXo6oQ1YrkiMP8sWOgLiBHhWDra/Zzv4C9laYYOxMV
+         qP0d8DcRHBnSlMCCovlPOTIJeW2ETix93SsWqpyLO3O95IrXiPS5dh7ghzDVmXcN/N2A
+         S00Yf8lqhl3Wre8gyVKDEl0AMCSSieToFd+Vlrw0mNgLtezJXMF6pJzT7Ju+SlNReONt
+         bbqZfX9KZcybk5ZE7lqIcxcOQjdzYOOanD10gNv3HfUG4wUx+q8gLTsFMevk0zqKZEba
+         NNjhDSr6ystcbTJJemJzuPXEu8LS8rxZSx76bEQk8rirgpSDrN7Le5jftppdxZ9jrVMb
+         M3mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791456166; x=1792060966;
+        d=1e100.net; s=20260707; t=1791456167; x=1792060967;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=7A3TCDs1xynx1LpYwQyPlW/nabg1O3gtjbirRm79U8s=;
-        b=zuLsbxUnzT7VwqvA1WXlSr8OUYlpgD/2T+fR/k0Co06m/+L64+LC2mPzR3Mo62ORMn
-         x0Ug3keiffDiVi7BUkyOUk7CBdef6YV9GWSoVyMdgSfKv9ou84rwMLKSwp4//VwbPDvc
-         nGUcHOLQalFQn9D7Ccyqd0rxPc2XVjraJaBO+lOAdFoDf3VC1XxnPIHuK5c9UgZhHdOb
-         q4Ydsf6IspUIv+CJKb0pQya8rHVJQF+01CgP0DhSKbHVuxoaGoKSLfTM3uA2MmRmitQW
-         dY1IfY+f156Wxzo4FtYqpszr9iflrbah12aQFq+00fkRHgl9jO35llpwREmdAAMJWV+U
-         VP7w==
-X-Forwarded-Encrypted: i=1; AKwUvBywU3QDsHDWmV92Bilx7Zjpz9DF3noEvmnXKU3s2ER65CAPPm50hPRmC8s1ehuxobg9LaMvB6w=@lists.linux.dev
-X-Gm-Message-State: AFuF++mOSdoASyBsDHyZJVYsZZAWN8kyeKLg7TbrYD7InaPEh9vP5ygd
-	+i3qCvMDxKf2TiO3QmKXInsZJ50WP8vkH0x4C+AnhNp7w6OXLbQYd81fFV15KVitAvsdqNVa1h+
-	zgqTYQQ77MTuMUxOizC2PaQ==
-X-Received: from wmol7.prod.google.com ([2002:a05:600c:47c7:b0:4a1:708e:7d78])
+        bh=VM97xwYT1dB0ZgvNb7fOqgAZXGtuRGu0qA+yv/6pRZc=;
+        b=SYBg4hLhVh7Bz42HtJK9+nxr8Hwa9Yx3ES7Fkrj8pjO9YCEo+gDtNmhqW16/AFISNh
+         RyVCO5V1yl/MDjT6k/IkRvwKBcwvYo+vAY/d7aMUHG6W6AxQNzyq5cwXR/Ab17bJWls+
+         ftz+5AwgP11YYPJpxzg8AN+9rREzZofEoM6o9T2hv6UADY0srL6VWlt7T5fwjnFAbEVd
+         eROvgpnUQ5P1/+/MGoP2d75kvXiAyAehCBgWNojPLN6fdpi+yn75+GJ2UmU5savYN6LD
+         bvZ3dGhDRtKT4cZEZXahlx8oVcRezW8uVV9ipWfNbzhhdW2X6uXxfekf/jDrW/ZVyK9O
+         kDaw==
+X-Forwarded-Encrypted: i=1; AKwUvBxKFUCbMMn99LO8nh3cVv6YCH/n7Pyz6qEcsRcIJA2/sObu8DXhsjMGo/A/vqCdFkYBl1g4g14=@lists.linux.dev
+X-Gm-Message-State: AFuF++ln0gTbwF2oP1Clg3yrUtlYqOG7a+eDh+wXdEfI7cqtGR57gYcA
+	vYcQLCyWabW3uaDq6o/ejvtItIHNNWjFnYlu4e5wIqEihY79vY864na1hlUQL1HWx3dZpA+WKlj
+	aY26copDIpISBcxRlBryG0w==
+X-Received: from wmpd9.prod.google.com ([2002:a05:600c:4c09:b0:4a0:13a7:83c6])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:1c0d:b0:4a0:1efa:c74c with SMTP id 5b1f17b1804b1-4a18043c6a5mr113186995e9.20.1791456166130;
- Thu, 08 Oct 2026 03:42:46 -0700 (PDT)
-Date: Thu,  8 Oct 2026 11:42:11 +0100
+ 2002:a05:600c:64c6:b0:49f:cbf1:e765 with SMTP id 5b1f17b1804b1-4a18008688cmr90980165e9.0.1791456167102;
+ Thu, 08 Oct 2026 03:42:47 -0700 (PDT)
+Date: Thu,  8 Oct 2026 11:42:12 +0100
 In-Reply-To: <20261008104212.3134550-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -60,62 +60,54 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20261008104212.3134550-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.56.0.360.g66cac248cb-goog
-Message-ID: <20261008104212.3134550-2-vdonnefort@google.com>
-Subject: [PATCH v1 1/2] KVM: arm64: Prevent 64-bit overflow when computing hyp
- clock rate
+Message-ID: <20261008104212.3134550-3-vdonnefort@google.com>
+Subject: [PATCH v1 2/2] KVM: arm64: Fix bpages backing allocation size in hyp_trace
 From: Vincent Donnefort <vdonnefort@google.com>
 To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
 Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
 	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
 	kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com, 
-	Vincent Donnefort <vdonnefort@google.com>, stable@vger.kernel.org
+	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The hypervisor clock rate is delta_cycles * NSEC_PER_SEC / delta_boot.
-It is computed whenever a deviation occurs. If the delta between two
-rate updates is big enough, delta_cycles * NSEC_PER_SEC will overflow.
+hyp_trace_buffer_alloc_bpages_backing() computes nr_bpages as
+(PAGE_ALIGN(size) / PAGE_SIZE) + 1, whereas trace_remote_alloc_buffer()
+takes into account the buffer page header.
 
-Prevent overflow with mul_u64_u64_div_u64(). And as a bonus, simplify
-the clock estimation with mul_u64_u32_shr().
+Align the bpages backing allocation by using
+__calc_nr_pages_ring_buffer_desc(). There's no need to validate
+nr_bpages again, it has been before with trace_buffer_desc_size().
 
-Fixes: b22888917fa4 ("KVM: arm64: Sync boot clock with the nVHE/pKVM hyp")
-Cc: stable@vger.kernel.org
+Fixes: 3aed038aac8d ("KVM: arm64: Add trace remote for the nVHE/pKVM hyp")
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 ---
- arch/arm64/kvm/hyp_trace.c | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/hyp_trace.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
-index 9241d5a325fb..26fc13c16458 100644
+index 26fc13c16458..b9404496f977 100644
 --- a/arch/arm64/kvm/hyp_trace.c
 +++ b/arch/arm64/kvm/hyp_trace.c
-@@ -60,14 +60,8 @@ static void __hyp_clock_work(struct work_struct *work)
- 	if (hyp_clock->mult) {
- 		u64 err, cur = delta_cycles;
+@@ -146,8 +146,8 @@ static void __unshare_page(unsigned long va)
  
--		if (WARN_ON_ONCE(cur >= hyp_clock->cyc_overflow64)) {
--			__uint128_t tmp = (__uint128_t)cur * hyp_clock->mult;
--
--			cur = tmp >> hyp_clock->shift;
--		} else {
--			cur *= hyp_clock->mult;
--			cur >>= hyp_clock->shift;
--		}
-+		WARN_ON_ONCE(cur >= hyp_clock->cyc_overflow64);
-+		cur = mul_u64_u32_shr(cur, hyp_clock->mult, hyp_clock->shift);
- 		cur += hyp_clock->boot;
+ static int hyp_trace_buffer_alloc_bpages_backing(struct hyp_trace_buffer *trace_buffer, size_t size)
+ {
++	unsigned long nr_bpages;
+ 	size_t backing_size;
+-	int nr_bpages;
+ 	void *start;
+ 	int ret;
  
- 		err = abs_diff(cur, boot);
-@@ -85,7 +79,7 @@ static void __hyp_clock_work(struct work_struct *work)
- 					    err / NSEC_PER_USEC);
+@@ -157,7 +157,7 @@ static int hyp_trace_buffer_alloc_bpages_backing(struct hyp_trace_buffer *trace_
+ 		return 0;
  	}
  
--	rate = div64_u64(delta_cycles * NSEC_PER_SEC, delta_boot);
-+	rate = mul_u64_u64_div_u64(delta_cycles, NSEC_PER_SEC, delta_boot);
+-	nr_bpages = (PAGE_ALIGN(size) / PAGE_SIZE) + 1;
++	nr_bpages = __calc_nr_pages_ring_buffer_desc(size);
+ 	backing_size = PAGE_ALIGN(sizeof(struct simple_buffer_page) * nr_bpages *
+ 				  num_possible_cpus());
  
- 	clocks_calc_mult_shift(&hyp_clock->mult, &hyp_clock->shift,
- 			       rate, NSEC_PER_SEC, CLOCK_MAX_CONVERSION_S);
 -- 
 2.56.0.360.g66cac248cb-goog
 
