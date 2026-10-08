@@ -1,117 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-245.mta1.migadu.com [95.215.58.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B8543846B
-	for <kvmarm@lists.linux.dev>; Thu,  8 Oct 2026 10:56:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E093BFAF7
+	for <kvmarm@lists.linux.dev>; Thu,  8 Oct 2026 11:18:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791457007; cv=none; b=MRYBkkthhgXK5hJU6pk96Ipqs7vvDvGARl5Ep6idYRmLHCW49NOtGRKMUhZbnqEA7X0Ka5qnkAILREFEbKtFWjJAE5MH+V2mKsiALjKzJA7RrbSKd10Q0c3FyOUgXlFF0zx6ESM4NuuuHe7hM4B+9CbA7TwXfhNd66etnUOAYkA=
+	t=1791458300; cv=none; b=i+3UWmv9S0yx8YvOGSLVoI/ElHyqQbxxWbUy2m2mbWZnlO58t6ymAgZT4eXvDbIFZUIQhV52poQpoZVXhy/PkKKCkmxxJ2KEhBvEWxumjmq/F154RcAMAbGRS9pGWk1iok/lcco5yxenc1eFPpbMihiJbbAtodLMFXxLXadYQHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791457007; c=relaxed/simple;
-	bh=RhE6pqdKOcQAUT78ZXVDwF4d/KdMjHMfldq+BxdKaEM=;
-	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=eVCwr/KTYx/+snnFc+ToYwzSV68y22jkfusC4BNqB0dH+Taq1ZOaNr7d5r8mR8Uk0HQJ0I9E/iUZ4KfBL9BTDGJVyw7hFYwKYX22CMaUz2ntHIRvS5SPDqZ3mSpr944hkhx6Y6bLWbmamIj6zTkLohmioF4F8ypNPV3kqLMJ61k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Er1OBMiU; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791458300; c=relaxed/simple;
+	bh=RZDQiChJc4BLUjPTC5GATFlDtxZirW0FNEhzwWirWTc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UX9A2Qy7qWTyIHTEqsjQRjSrU+iFezMpqCTQmPBxOlxX8RvmelASJOEEEYghlyM5hMnkOOgk920JxSgeKYTIa1F+fUuIdwEkxmfz5YotGdHLGJOrgl/upsUVY7RHNLk7UikVz4kZ0TBgTkwaND4nuiSaF98NE2Yqdhk/srJKPoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fRazBe5Q; arc=none smtp.client-ip=95.215.58.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Er1OBMiU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB80E1F000FF;
-	Thu,  8 Oct 2026 10:56:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791457006;
-	bh=BjKXW7uFi0WvnfmRNiFxw4trsjsURpA7mnAthL473Lo=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Er1OBMiUY0NInf0l0SRK/Dvn1o366fJeA5dkA9R4ISQTGy43X6SYG/UePJU6QCE5F
-	 6b4ffe7hlbk/eHP4XbRLISeFwjr4kzRh4hTcNcFhIy5bwdbYoTflblmg3Cbd51nT+Y
-	 2w5HBM8N6/N6pVnJmbjTVqn1FhSO7IOVqFt18U2g9bYDSQM8+fq64cOQ/jetpr+Wqp
-	 bYFvrEtnXYmt9ntP6U7mhGt1jtacYj+P/XMb6OXSkHn8rzaeIILzCuLgJ6tSUahMRy
-	 T4WmIiGtvD0hK82YLU4Qjvs4JbxBjlbe9caU01Oqyu7UkBxCG71NInKBSq4kRkbSFY
-	 UJinu8WIPGcBg==
-Message-ID: <sashiko-outbox-164063@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v1 2/2] KVM: arm64: Fix bpages backing allocation size
- in hyp_trace
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Vincent Donnefort" <vdonnefort@google.com>
-Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20261008104212.3134550-3-vdonnefort@google.com>
-References: <20261008104212.3134550-1-vdonnefort@google.com>
- <20261008104212.3134550-3-vdonnefort@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Oct 2026 10:56:45 +0000
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fRazBe5Q"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=RZDQiChJc4BLUjPTC5GATFlDtxZirW0FNEhzwWirWTc=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1791458296; v=1; x=1792063096;
+ b=fRazBe5QaLm2PdugOLlam3NU3qsy5I1whvW77qa99OgeE1xMTCMZoY5CPzq+zw7sx9PDkYu7
+ dO2oQN16vZSUx4gqYwXIBiTIqQFx/PK/wN1V/YRBckxw3bqw3ZgZDdalbPmW43dm1IgZK6/TD84
+ cP/JkXcEnPB3KIG/7Ts1WIZw=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id adb1e4e5936bce1d;
+	Thu, 08 Oct 2026 11:18:16 +0000
+X-Mizu-Trace-ID: adb1e4e5936bce1d
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5bcbb378fc9so7266e87.0
+        for <kvmarm@lists.linux.dev>; Thu, 08 Oct 2026 04:18:12 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBzduk2PpY0iSckMjJijml3ArzhhaiOZRLO3f0G+4DSdEPmOtJFXlTcDeYYT/eKsZ9ZKEZs+Gvk=@lists.linux.dev
+X-Gm-Message-State: AFq9FYJv6ARrXUSNJP28k85ijL7lJupZT6S1wc6I+GoTyr3gn6FwCb/1
+	+qzPYZKjgmJ0TjUx/PRqNw+7DKvCovPuH5iyTrort8duI+hMb56EIqQVByEkWepwCB8So0eMMuN
+	j9Ou3JkIqoWUjta4quxICmodwoeZJapSwaDDczUhL
+X-Received: by 2002:a05:6512:2315:b0:5b8:cc2e:2fe6 with SMTP id
+ 2adb3069b0e04-5bcd41a3c42mr122649e87.5.1791458291477; Thu, 08 Oct 2026
+ 04:18:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+References: <20261007073537.2454351-1-suzuki.poulose@arm.com>
+ <20261007073537.2454351-14-suzuki.poulose@arm.com> <CA+EHjTy_1EekD472UH=CDSpC7oksdy3eS8AP0rPxKkhQ_PyXdg@mail.gmail.com>
+ <4cdd882b-832f-4968-9838-dcc29a899121@arm.com>
+In-Reply-To: <4cdd882b-832f-4968-9838-dcc29a899121@arm.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Thu, 8 Oct 2026 13:17:34 +0200
+X-Gmail-Original-Message-ID: <CA+EHjTyg7QM9+XtbQfAf77zpyNGh0rvEjMBm=mD0694Dtk=rGA@mail.gmail.com>
+X-Gm-Features: AclHuK8P2lsNGbFWtbI77W6PCd57-smcbil7-006btPRzP0RGDfW9UFPgF16p5I
+Message-ID: <CA+EHjTyg7QM9+XtbQfAf77zpyNGh0rvEjMBm=mD0694Dtk=rGA@mail.gmail.com>
+Subject: Re: [PATCH v23 13/14] KVM: arm64: Mandate VGIC v3 for pKVM VMs and Realms
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org, 
+	will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, steven.price@arm.com, 
+	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, 
+	joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, 
+	gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, 
+	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, 
+	lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com, 
+	jonathan.cameron@oss.qualcomm.com
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Low] tracing: Integer overflow in trace buffer size calculation bypasses=
- capacity check
---
+Hi Suzuki,
 
-commit 652836a529b433a8c0e0cb4f4308fa9b9556763d
-Author: Vincent Donnefort <vdonnefort@google.com>
+On Thu, 08 Oct 2026 09:51:56 +0100, Suzuki K Poulose
+<suzuki.poulose@arm.com> wrote:
+[...]
+> But the second part of the changes are required for pKVM today, right ?
+> and you requested that here. The check as such is useful, except that
+> it is using kvm_vm_hyp_is_distrusting() rather than
+> is_protected_kvm_enabled(). I don't see this as a problem as this is
+> not a hotpath anyway.
 
-KVM: arm64: Fix bpages backing allocation size in hyp_trace
+pKVM already gets the -ENODEV at KVM_CREATE_DEVICE: protected mode
+never sets can_emulate_gicv2, so the check just above yours in
+kvm_vgic_create() rejects a GICv2. The new check only changes
+behaviour once a Realm can set the flavor, which is why I think it
+belongs in the Realm series.
 
-This commit updates the trace buffer backing allocation in hyp_trace to
-calculate the required number of pages using
-__calc_nr_pages_ring_buffer_desc(). This appropriately accounts for the
-buffer page header and relies on trace_buffer_desc_size() for validation.
+That said, my tag stands, and I don't have a strong preference.
 
-> diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
-> index 26fc13c164589..b9404496f9775 100644
-> --- a/arch/arm64/kvm/hyp_trace.c
-> +++ b/arch/arm64/kvm/hyp_trace.c
-[ ... ]
-> @@ -157,7 +157,7 @@ static int hyp_trace_buffer_alloc_bpages_backing(stru=
-ct hyp_trace_buffer *trace_
->  		return 0;
->  	}
-> =20
-> -	nr_bpages =3D (PAGE_ALIGN(size) / PAGE_SIZE) + 1;
-> +	nr_bpages =3D __calc_nr_pages_ring_buffer_desc(size);
-
-[Severity: Low]
-Does this calculation overflow if size is near SIZE_MAX?
-
-Looking at __calc_nr_pages_ring_buffer_desc() in include/linux/ring_buffer.=
-h:
-
-static inline unsigned long __calc_nr_pages_ring_buffer_desc(size_t size)
-{
-        /* Takes into account the reader page */
-        return max(DIV_ROUND_UP(size, PAGE_SIZE - BUF_PAGE_HDR_SIZE), 2UL) =
-+ 1;
-}
-
-If size is extremely large, the DIV_ROUND_UP macro wraps around, causing the
-function to erroneously return a very small page count (e.g. 0 wrapping to 3
-pages).
-
-The commit message notes there is no need to validate nr_bpages again becau=
-se
-it was validated by trace_buffer_desc_size(), but could this overflow bypass
-that check?
-
-Looking at trace_buffer_desc_size() in include/linux/ring_buffer.h:
-
-        /* Capped by ring_buffer_desc::nr_page_va */
-        if (nr_pages > UINT_MAX)
-                return SIZE_MAX;
-
-Because the wrapped nr_pages is small, this capacity check would be
-circumvented, bypassing the intended -E2BIG rejection. Downstream consumers
-like hyp_trace_buffer_alloc_bpages_backing(), trace_remote_alloc_buffer(),
-and __tracing_load() would then operate safely on this truncated page count.
-This results in a silent failure where the kernel allocates a tiny function=
-al
-trace buffer instead of returning an error for the impossibly large
-allocation.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261008104212.3134=
-550-1-vdonnefort@google.com?part=3D2
+Cheers,
+/fuad
