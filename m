@@ -1,73 +1,40 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C04CE3E4C88
-	for <kvmarm@lists.linux.dev>; Thu,  8 Oct 2026 07:52:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCBC44746BB
+	for <kvmarm@lists.linux.dev>; Thu,  8 Oct 2026 08:32:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791445962; cv=none; b=FVcFW4sziG+TTwzKEonV4kiV/3llklk+jukQaBHoLBCsay1VbsusXIVlgi4wnyUnvZM9A2XjXeGgpawdw+SKdmxVXkfdq5WmYFr3kIcIZDP13jruQhItaSxIbGOkbrPh1Ibmnob3Gpc6J13xFnlocwMpWgMoleLQ3rwhSqxa75E=
+	t=1791448379; cv=none; b=apKAMnED1Us+2we/GmBQTsWw5dYiQAUl20VhzlfWoPHSeIa1nMu8boqmolFPNljS2NbPJQ1raacHL+7p1DEWf8Cg+KpbTwAU7zS3PFxVblqesEZZWdZUm7JVfqNRNtGdL88vDPlCiqKbq8uuCFO1aDd8iBIfGP3t1Gv1j5MlKm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791445962; c=relaxed/simple;
-	bh=6DTl0uwQ1yLTMh5cjmF/kl6BfX9oVPRW5+fpv8Jw9Tc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ChzSQqWtG1b9V9RZ3F2UfLzv6arj/R0pwhTLlpm05UfNAeQOWr6X1EOliHgDSTo96qqatqMSodL5nX2PcjSJn5YKIWcNhMpsWuDu21hcDZZ0HEoJwLK0uuNsD15qOcilAH6rdGwigPNdJJa7F4irGCas9ReWWWdrH5AFlg/nspY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dWTWRe/d; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1791448379; c=relaxed/simple;
+	bh=8oDcxO6R0pIWzs3iz56qAEG2SacddL4pqmEab/tfmOw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Qtc+6JH/bPcqa01OjgLodMcnIZ+C+3HjrWAul/LHmhuKqXzBfwl1QWVefqN/dn5MQZ4xBRM84Sp/R9//jO5kiYPiA0vKwsUMx4W51cGsx3JvZjywYy06BlMjJs2GNZ4wJAXB6ypmJY65KVBgJktCiLxYaU2x7q39IKy6EHUdIa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=6wBubGHC; arc=none smtp.client-ip=113.46.200.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dWTWRe/d"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1791445957;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Py7x+AATRs+M7CC5CAtcFn0GVg+kSB4pWlgQwH92zJU=;
-	b=dWTWRe/d84JEgoJmXlbtCHjurgPKG4DGMiF6ki6Rb2vm+PdQ3NLXnYcjaoL78D8H3vI+U+
-	tJe8fqKURpoXmlxHPNMLl/vp9l0UkN6v1goqdwzYFusiiPBA8Q0L/phs8HV9WdZN1KcutM
-	0HuVRyr3M4accGuj6R25S5Cmjskb/zo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-553-xS5fkjCmMmqVeQZHHM_kyA-1; Thu, 08 Oct 2026 03:52:36 -0400
-X-MC-Unique: xS5fkjCmMmqVeQZHHM_kyA-1
-X-Mimecast-MFC-AGG-ID: xS5fkjCmMmqVeQZHHM_kyA_1791445955
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-48b00febba3so3360980f8f.1
-        for <kvmarm@lists.linux.dev>; Thu, 08 Oct 2026 00:52:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791445955; x=1792050755;
-        h=content-transfer-encoding:content-type:in-reply-to:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Py7x+AATRs+M7CC5CAtcFn0GVg+kSB4pWlgQwH92zJU=;
-        b=U07haPXnxveWBlyynUg74skFsZ9VXUgxYb34lAYIGenx8h2QZFyghxgBs5MyuVZMOO
-         CiSIU6nPYqevLmqPl0OLQP6bA9LPfRVVwWlh5bmMqCy1bazvH7F5nMWfY5PZykCKbnmg
-         caVGSIDWNhgVAkGTjrx3aCU36vvgl5L0/HKeuTlJgkMe49c+ysY3ef/7F6FQhdPV/a/J
-         CKxOXVKynM06OA4Vm9RFifDoF4WMdmVBUYKB2j0BR34a1Qpw6vrgmB2AdQBlu+rNlXLj
-         /X8BN1OO7e1jXtLd3ww1/V0woevo9NLuVROiJn5eKBVgh6XdP9dsWuc6NHAd1O2midm3
-         G57w==
-X-Forwarded-Encrypted: i=1; AKwUvBxBpqveoo03wvwszhscCKDmVGbd4h+/WEy8PTMGdRSegOBlmSE2Ikryi4M3MLvCmwc72LEpbBo=@lists.linux.dev
-X-Gm-Message-State: AFq9FYJ0/Rwh5Y2nn6zc/FwanxVJh/bG73jAbdG7vrIixTLskr7DlzcN
-	h7zEY7h/81Ci4tBo84TiDgspDwBkQBw2SnLCzJP8ncncnnP3aS8a5jutaDexZMkusA1k85hBdrG
-	iRAJ7vreNOJCia9wKcjU4rOXvpaE7aF4y/Kf8CQ7zvqlnHcyudANmhhR2eQ==
-X-Gm-Gg: AYBFou1jjHdWcdbRy0BmX0mKNYDs4cbboNwL/CRri1KN4hkSWxww8341YwtS8lWd8/b
-	8/iGgM5noy6YlWdu7fkPlb2lIxtsFck4yFN73rYGe+Tk5MplkxrNLHWHqXjF/oDRJ+5Lv+FvjBd
-	xbkuMPExG+2GEip5o7M6u59MTaTF+8pJZetBUtG+nX3xxqI5HWTD+2kP6n1T6rW0nnPFaHIQB+I
-	uvF78G0g53ETs3ko7q0hT1EDsgPy6fcv/jjVQwOlSynTsdz7WKFVC9VKyXIvBEDTb7opl+0svMn
-	56AXVLiPL1gmSRTug+JRSxcwjWEH5S2aj4upQ8Kw3MaS+4ne/nGZLjU03Lob77aCmaEZWLxpet2
-	iQMYyCwxIj0407u+7oKwmm1+JcMyx9dYbeIPQCfB5cCq8AtB6
-X-Received: by 2002:a05:6000:4818:b0:487:27f6:a4d3 with SMTP id ffacd0b85a97d-48c72884e65mr7905397f8f.35.1791445955192;
-        Thu, 08 Oct 2026 00:52:35 -0700 (PDT)
-X-Received: by 2002:a05:6000:4818:b0:487:27f6:a4d3 with SMTP id ffacd0b85a97d-48c72884e65mr7905271f8f.35.1791445952791;
-        Thu, 08 Oct 2026 00:52:32 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48c724b660fsm9300871f8f.18.2026.10.08.00.52.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Oct 2026 00:52:32 -0700 (PDT)
-Message-ID: <df13670e-1502-4947-8a76-600dd045708b@redhat.com>
-Date: Thu, 8 Oct 2026 09:52:30 +0200
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="6wBubGHC"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=JBqNPMfAHd4kXYVw0IlxjFhPFtYWD0YbSv7I3OmUVeE=;
+	b=6wBubGHCcQwyJdjCK4XXhFfiW6bCiv1EvWbTOVKqYilIF9NpyPazN/1+lQA3dKgOAz5we/Xyg
+	+UZguQ6PAi+fvBJ3LSetlii2DGjCbpSFbJCKPF05sZV1AugF3CUxi9WznP9644mmcUblnrKVfsV
+	E8YAutmEp6HiwTi5DKBAVYo=
+Received: from mail.maildlp.com (unknown [172.19.163.15])
+	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4j0jc745ltzmV8H;
+	Thu,  8 Oct 2026 16:20:39 +0800 (CST)
+Received: from dggpemr200003.china.huawei.com (unknown [7.185.36.25])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5EE1E40578;
+	Thu,  8 Oct 2026 16:32:53 +0800 (CST)
+Received: from [10.174.185.234] (10.174.185.234) by
+ dggpemr200003.china.huawei.com (7.185.36.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.46; Thu, 8 Oct 2026 16:32:52 +0800
+Message-ID: <77a9ab65-2997-47f8-8e99-04c4467df7b8@huawei.com>
+Date: Thu, 8 Oct 2026 16:32:51 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -75,196 +42,235 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v9 16/26] target/arm/kvm: Apply SYSREG props to the final
- vcpu
-To: Khushit Shah <khushit.shah@nutanix.com>
-Cc: "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- Shaju Abraham <shaju.abraham@nutanix.com>,
- "yangjinqian1@huawei.com" <yangjinqian1@huawei.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "sebott@redhat.com" <sebott@redhat.com>,
- "skolothumtho@nvidia.com" <skolothumtho@nvidia.com>,
- "philmd@oss.qualcomm.com" <philmd@oss.qualcomm.com>,
- "maz@kernel.org" <maz@kernel.org>,
- "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "abologna@redhat.com" <abologna@redhat.com>,
- "jdenemar@redhat.com" <jdenemar@redhat.com>
-References: <20260916144721.751810-1-eric.auger@redhat.com>
- <20260916144721.751810-17-eric.auger@redhat.com>
- <5AC3258F-1F6E-491E-8B38-633C52199904@nutanix.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <5AC3258F-1F6E-491E-8B38-633C52199904@nutanix.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: u81MQQcuVZaWMa1j_JM2mwucNjM6r5W1ZimfhOCxkJc_1791445955
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH 0/2] Batch register access for live migration optimization
+To: Marc Zyngier <maz@kernel.org>
+CC: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <catalin.marinas@arm.com>, <will@kernel.org>,
+	<fuad.tabba@linux.dev>, <joey.gouly@arm.com>, <seiden@linux.ibm.com>,
+	<suzuki.poulose@arm.com>, <yuzenghui@huawei.com>, <mark.rutland@arm.com>,
+	<zhengchuan@huawei.com>, <jiangjiacheng@huawei.com>, <yize_w1110@163.com>
+References: <20260918081930.4014735-1-wangyize7@huawei.com>
+ <861paq69te.wl-maz@kernel.org>
+ <f70c6fe3-e3c5-4912-b4bb-8a418fec4346@huawei.com>
+ <86ece63kes.wl-maz@kernel.org>
+From: Yize Wang <wangyize7@huawei.com>
+In-Reply-To: <86ece63kes.wl-maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ dggpemr200003.china.huawei.com (7.185.36.25)
 
 
+在 2026/10/3 22:53, Marc Zyngier 写道:
+> On Sun, 20 Sep 2026 10:15:25 +0100,
+> Yize Wang <wangyize7@huawei.com> wrote:
+>> 在 2026/9/18 20:08, Marc Zyngier 写道:
+>>> On Fri, 18 Sep 2026 09:18:13 +0100,
+>>> Yize Wang<wangyize7@huawei.com> wrote:
+>>>> This series adds batch register access support to KVM/arm64 to reduce
+>>>> syscall overhead during VM live migration.
+>>>>
+>>>> Currently, QEMU issues one ioctl per register when saving/restoring VGIC
+>>>> state. On large VM configurations this means tens of thousands of syscalls,
+>>>> where lock acquisition and context switch overhead dominates migration
+>>>> downtime. Thus, we provide a batch register method to allow userspace
+>>>> read/write multiple distributor and redistributor registers in a single call.
+>>>> In this way, we can significantly reduce syscalls and migration downtime.
+>>>>
+>>>> Test the VM migration time under pressure conditions.
+>>>> The VM specifications for migration are as follows:
+>>>> - VM use 4-K page;
+>>>> - the number of VCPU is 160;
+>>>> - the total memory is 320Gigabit;
+>>>> - use 'Redis SET-benchmark' to pressurize VM;
+>>>>
+>>>> Performance results (3-run average, ms):
+>>>>       | Metric              | Without patch | With patch | Improvement |
+>>>>       |---------------------|---------------|------------|-------------|
+>>>>       | Migration downtime  |        536    |     321    |     40%     |
+>>>>       | Source (total)      |        344    |     230    |     33%     |
+>>>>       |   - VGIC put        |        158    |      40    |     75%     |
+>>>>       |   - VGIC get        |        120    |      19    |     84%     |
+>>>>       | Destination (total) |        192    |      91    |     53%     |
+>>>>       |   - VGIC put        |        132    |      27    |     80%     |
+>>>>
+>>>> Yize Wang (2):
+>>>>     KVM: arm64: Add batch group constant and data structure to UAPI header
+>>>>     KVM: arm64: Add VGIC v3 batch register access implementation
+>>> Questions:
+>>>
+>>> - Why only the MMIO registers?
+>>>
+>>> - Why not the sysregs?
+>>>
+>>> - Why only the GIC?
+>>>
+>>> - Why not all of the state?
+>>>
+>>> - Where is the corresponding userspace code?
+>>>
+>>> More importantly, since this is about batching system calls:
+>>>
+>>> - Why can't this be done with io_uring instead?
+>>>
+>>> 	M.
+>>
+>> Hi, Marc! Thank you for the review.
+>>
+>>    These patches focus on optimizing GICv3 register access during live
+>> migration. We found that there are a large number of locks (kvm->lock,
+>> vcpus, config_lock) in the GIC, these lock operations wil cost large
+>> time waste. The batches of sysreg for vcpu optimization will come in
+>> follow as a separate series. And let me address these questions one by
+>> one.
+> All these locks should be non-blocking by the time you save anything
+> related to the GIC, because:
+>
+> - none of the vcpu can be running
+>
+> - this must be a single threaded operation
+>
+> So if you are seeing anything contended, this is either the sign of a
+> bad KVM bug, or an indication that you are violating the above
+> requirements.
+>
+> 	M.
 
-On 9/30/26 9:54 AM, Khushit Shah wrote:
->
->> On 16 Sep 2026, at 8:15 PM, Eric Auger <eric.auger@redhat.com> wrote:
->>
->> !-------------------------------------------------------------------|
->>  CAUTION: External Email
->>
->> |-------------------------------------------------------------------!
->>
->> SYSREG prop settings were recorded in a hashtable but they
->> are not yet injected on guest. Iterate over all set fields and
->> apply the new value through KVM_SET_ONE_REG. The new field
->> value overrides the current observable vcpu register value.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->> target/arm/kvm.c        | 65 +++++++++++++++++++++++++++++++++++++++++
->> target/arm/trace-events |  1 +
->> 2 files changed, 66 insertions(+)
->>
->> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
->> index 3ec2618cc1..ddf320d0e6 100644
->> --- a/target/arm/kvm.c
->> +++ b/target/arm/kvm.c
->> @@ -343,6 +343,9 @@ static ARM64SysRegField *get_field(int i, ARM64SysReg *reg)
->> #define MAKE_IDREG_KEY(reg_idx, field_shift) \
->>     (((uint64_t)(reg_idx) << 8) | ((uint64_t)(field_shift) & 0xFF))
->>
->> +#define KEY_TO_REG_IDX(key)     ((uint32_t)(((uint64_t)(key)) >> 8))
->> +#define KEY_TO_SHIFT(key)       ((uint8_t)(((uint64_t)(key)) & 0xFF))
->> +
->> static void set_sysreg_prop(Object *obj, Visitor *v,
->>                             const char *name, void *opaque,
->>                             Error **errp)
->> @@ -2215,6 +2218,63 @@ int kvm_arch_pre_create_vcpu(CPUState *cpu, Error **errp)
->>     return 0;
->> }
->>
->> +static int kvm_arm_apply_sysreg_props(ARMCPU *cpu, Error **errp)
->> +{
->> +    uint64_t *idregs = cpu->isar.idregs;
->> +    gpointer key_ptr, value_ptr;
->> +    CPUState *cs = CPU(cpu);
->> +    GHashTableIter iter;
->> +
->> +    g_hash_table_iter_init(&iter, cpu->sysreg_props);
->> +
->> +    while (g_hash_table_iter_next(&iter, &key_ptr, &value_ptr)) {
->> +        uint64_t key = (uint64_t)key_ptr;
->> +        uint64_t value = (uint64_t)value_ptr;
->> +        uint32_t reg_idx = KEY_TO_REG_IDX(key);
->> +        uint8_t lower    = KEY_TO_SHIFT(key);
->> +        ARM64SysReg *reg = &arm64_id_regs[reg_idx];
->> +        struct kvm_one_reg kvm_reg;
->> +        uint64_t current, old, mask;
->> +        uint64_t kvm_idx;
->> +        ARM64SysRegField *field = get_field(lower, reg);
->> +        int length = field->length;
->> +        uint64_t oldfv;
->> +        int ret;
->> +
->> +        mask = MAKE_64BIT_MASK(lower, length);
->> +        value = value << lower;
->> +
->> +        old = idregs[reg_idx];
->> +
->> +        kvm_idx = idregs_sysreg_to_kvm_reg(id_register_sysreg[reg_idx]);
->> +        ret = read_sys_reg64(cs->kvm_fd, &current, kvm_idx);
->> +        if (ret) {
->> +            error_setg(errp, "failed to read the current value of %s",
->> +                       reg->name);
->> +            return ret;
->> +        }
->> +        oldfv = (current & mask) >> lower;
->> +
->> +        idregs[reg_idx] = current & ~mask;
->> +        idregs[reg_idx] |= value;
->> +
->> +        kvm_reg.id = kvm_idx;
->> +        kvm_reg.addr = (uintptr_t)&idregs[reg_idx];
->> +
->> +        ret = ioctl(cs->kvm_fd, KVM_SET_ONE_REG, &kvm_reg);
->> +        if (ret) {
->> +            error_setg(errp, "failed to apply new value 0x%"PRIx64" for field %s.%s "
->> +                       "(previous is 0x%"PRIx64"): %m", idregs[reg_idx],
->> +                       reg->name, field->name, oldfv);
->> +            return ret;
->> +        }
-> Hi Eric,
->
-> The above is the only KVM-related code here. Can we split this into
->     1. Apply SYSREG_ props callback which resides in cpu64.c?
->     2. The previous writeback to cpregs function that writes back ID registers to KVM?
 
-the problem is the previous method was copying all the idregs that
-changed back to cpregs. But those idregs were populated from the "max"
-vcpu which in some cases led to inconsistency with the final vcpu
-setting. The setter now registers the new field value in a hash table.
-Maybe we can just rely on an arch callback to apply them on the guest
+Hi, Marc! Thanks for your review.
 
-Thanks
+You are right that when saving the GIC state during live migration 
+process, all vCPUs are not running and it is a single threaded 
+operation. Our patches process the packaged register states from the 
+userspace under the same lock. These operations only aim to reduce the 
+lock opreation downtime and do not involve lock contention.
 
-Eric
->
-> The reason being the SYSREG_ props otherwise do not work with any other accelerator.
-> We are already trying to make the SYSREG_ getter/setter accel-agnostic.
->
-> The above method still has the nicety that -cpu host without any SYSREG_ prop should
-> behave the same as previous :)
->
-> Side note:
-> While we don’t target TCG support currently, I tried your v8 + named models on TCG
-> (quick hack; ~20 LOC), and SYSREG_ props/named models works almost out of the box
-> there (very minimal testing), which was cool.
->
-> Thanks,
-> Khushit
->
->> +
->> +        trace_apply_sysreg_prop(reg->name, field->name, old, current,
->> +                                mask, value, idregs[reg_idx]);
->> +    }
->> +    return 0;
->> +}
->> +
->> int kvm_arch_init_vcpu(CPUState *cs, Error **errp)
->> {
->>     int ret;
->> @@ -2315,6 +2375,11 @@ int kvm_arch_init_vcpu(CPUState *cs, Error **errp)
->>     }
->>     cpu->mp_affinity = mpidr & ARM64_AFFINITY_MASK;
->>
->> +    ret = kvm_arm_apply_sysreg_props(cpu, errp);
->> +    if (ret) {
->> +        return ret;
->> +    }
->> +
->>     return kvm_arm_init_cpreg_list(cpu);
->> }
->>
->> diff --git a/target/arm/trace-events b/target/arm/trace-events
->> index d72ad6b671..b4d2b45a7d 100644
->> --- a/target/arm/trace-events
->> +++ b/target/arm/trace-events
->> @@ -18,6 +18,7 @@ kvm_arm_writable_idregs_to_cpreg_list(const char *name, uint64_t previous, uint6
->> decode_idreg_writemap(const char* name, int lower, int upper, char *prop_name) "%s [%d:%d] is writable (prop %s)"
->> get_sysreg_prop(const char *name, uint64_t value) "%s 0x%"PRIx64
->> set_sysreg_prop(const char *name, uint64_t old, uint64_t mask, uint64_t field_value, uint64_t new) "%s old reg value=0x%"PRIx64" mask=0x%"PRIx64" new field value=0x%"PRIx64" new reg value=0x%"PRIx64
->> +apply_sysreg_prop(const char *reg_name, const char *field_name, uint64_t old, uint64_t current, uint64_t mask, uint64_t field_value, uint64_t new) "%s.%s old=0x%"PRIx64" current=0x%"PRIx64" mask=0x%"PRIx64" new field value=0x%"PRIx64" new=0x%"PRIx64
->> nb_sysreg_props(const char *name, int count) "%s: %d SYSREG properties"
->>
->> # cpu.c
->> -- 
->> 2.53.0
->>
+In addition, these patches focus on reducing the syscalls of ioctl. Now, 
+every register requires an ioctl, resulting in (num_cpu * 
+registers_per_cpu) system calls. This will cost lots of time during the 
+large-scale VM migration. Our patches batch registers by category in 
+qemu and then send them to kernel in batches. This operations 
+significantly reduce the number of ioctl syscalls and save a great 
+amount of downtime.
+
+The comparison is as follow:
+
+BEFORE:
+
+QEMU (Userspace)Kernel (Kernelspace)
+
++--------------------------++------------------------------+
+
+||||
+
+|kvm_arm_gicv3_get()||vgic_v3_attr_regs_access()|
+
+||||
+
+|for ncpu in num_cpu:|||
+
+|+--------------+|||
+
+|| GICR_CTLR|----|--- ioctl ------> |mutex_lock(&kvm->lock)|
+
+|+--------------+ <--|--- val --------- |kvm_trylock_all_vcpus()|
+
+|+--------------+||mutex_lock(&config_lock)|
+
+|| GICR_STATUSR |----|--- ioctl ------> ||
+
+|+--------------+ <--|--- val --------- |read/write single register|
+
+|+--------------+|||
+
+|| GICR_WAKER|----|--- ioctl ------> |mutex_unlock(&config_lock)|
+
+|+--------------+ <--|--- val --------- |kvm_unlock_all_vcpus()|
+
+|...||mutex_unlock(&kvm->lock)|
+
+|+--------------+|||
+
+|| ICC_SRE_EL1|----|--- ioctl ------> |(repeat lock -> read -> unlock
+
+|+--------------+ <--|--- val --------- |for each register)|
+
+|...|||
+
+||||
+
++--------------------------++------------------------------+
+
+
+AFTER:
+
+QEMU (Userspace)Kernel (Kernelspace)
+
++----------------------------++--------------------------------+
+
+||||
+
+|kvm_arm_gicv3_get()||vgic_v3_batch_access()|
+
+|||        |
+
+|+- Collect Phase ----+|||
+
+||| |||
+
+|| batch_add(GICR_CTLR)| |||
+
+|| batch_add(GICR_STATUSR) |||
+
+|| batch_add(GICR_WAKER)||||
+
+|| batch_add(GICR_IGROUPR0)| ||
+
+|| ...||||
+
+|| batch_add(ICC_SRE_EL1)  |||
+
+|| ...||||
+
+|+---------------------+ |||
+
+||1 ioctl|copy_from_user(entries)|
+
+|+- Commit Phase -----+|||
+
+||| --- ioctl(BATCH)---> |mutex_lock(&kvm->lock)|
+
+||batch_commit()| ||kvm_trylock_all_vcpus()|
+
+|||||mutex_lock(&config_lock)|
+
+||||||
+
+|+---------------------+ ||+-- Process Each Entry --+|
+
+||||||
+
+|+- Unpack Phase -----+|||entry[0]: read GICR_CTLR|  |
+
+||| <---batch result ---||entry[1]: read GICR_STATUSR|
+
+||Write back to QEMU | | ||entry[2]: read GICR_WAKER| |
+
+||state||||...||
+
+||(post-process:| | ||entry[N]: read ICC_SRE | |
+
+||unshuffle, split| | ||| |
+
+||bytes, etc.)| |||* FLAG_LOCKED: skip||
+
+||| | ||locking (already held)|  |
+
+|+---------------------+ ||+-------------------------+ |
+
+|||  |
+
++----------------------------++--------------------------------+
+
+
 
