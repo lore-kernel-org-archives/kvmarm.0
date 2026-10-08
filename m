@@ -1,103 +1,218 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C065392C3D
-	for <kvmarm@lists.linux.dev>; Thu,  8 Oct 2026 12:25:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02B3A49F110
+	for <kvmarm@lists.linux.dev>; Thu,  8 Oct 2026 12:51:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791462348; cv=none; b=QgOJNuk3dUZJ3RUfealOP9XxAHmrJXala4OWduwO7VVPhBJUEHTQ2tBlpOKUkXozCwQpPnLoHA31U8INYL24QoclMxGVgvORmXO97FNkSt21+s/aX+ZchFiQwT8SWPL0gqqoCsG6L0SatHeoBeBuIpp9TURCLcpe4aCC/luFtLs=
+	t=1791463869; cv=none; b=CB/riprpUAhnPlkAvt0SEQFapzruCZN8wdQ1jFujp3VUfPj5sibG2eJiur+glSvvcuLnRAEQZpLZKiy2AyWmVkUpE3Gusytzy+xsB/rRCBu8FvJnAm7zLpicKo3GxVeSp2iGr2Rz0dENSSd3TZQiH36d1ifpvVePO0ZCmyDQLIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791462348; c=relaxed/simple;
-	bh=+waYO2mhBJEk4uM73kt1BqIj6YNPmknn03mbEhYqNMI=;
-	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=TEURl2gJNYhXk36KxAjFwv5fZcIGKIdFedqONDUgdEdwWZU/qzq+kNuNeGe0xI6BY2OQO8/hqi+P/cTvLBVBAD9nlaG/vUvPe0+NDR6/9cQuWf8NKNjVxl2rgKHpUimgMW0AbCJdLm4+yw/KexpdvUt/W9j/kYeVcSqv6U1OqH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cbJHq74K; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791463869; c=relaxed/simple;
+	bh=qUzrwIm9Vmn8z34coqmC8IGKY3W0zs8r4C2iagR5PFU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=mptBAHF87/dMt8Idd9KCI9Nj2WFMwVYIAhJSMThAgYmXAFRWjtbBUt6eUyPcznItjZ6S/qUyhE8TeVACgpN1zrywyI+jLAbAQZay3xoxUaNdNhd+v8qdbHd7P85blynhobodkoXZyBYjdR+eUpea0txpk18UTwmHYSWKkN9myU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=cdcy/2dj; arc=none smtp.client-ip=113.46.200.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cbJHq74K"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A49FF1F000FF;
-	Thu,  8 Oct 2026 12:25:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791462346;
-	bh=cSuJVMhd1Ykjobs4DcG6CDbGwbsg6VG/pWu6sFkyFDw=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=cbJHq74KCpuvyYx7Py3MP5TntKnCEfyZtzh8jksq68b1+QD/7YHXP4nmA/XuWoYvm
-	 Ziqxe+cz6kkzzIIyfk8xYDbowVnfhhp/PPIvibgZzeoOJHd+UfLS5CURskPReQgiRh
-	 pq1mqb/TIOLOXOE/MlAxzT4Qs5ytP7/pX4OgNhj6cW/OvS8ngPBLp3D43F6Zzhs082
-	 KsWBYq7bus7pjse2Yy62rp0Z28pxiBxfBwGtd32eNvfjX7iITgujyOHykL2TMF/QEU
-	 X9A3cMGM4aw6xk2fv1GKEkjtba4+egi9veJlSme6iJ+R2Xg/XPW+84+Y//DZ61DAU8
-	 gNbcXpp96Uo0A==
-Message-ID: <sashiko-outbox-164141@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 2/2] arm64: Apply existing Apple CPU workarounds to M3
- and M4
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Michael Reeves" <michael.reeves077@gmail.com>
-Cc: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20261008-apple-m3-m4-kvm-v1-2-7bb4cbf3d63b@gmail.com>
-References: <20261008-apple-m3-m4-kvm-v1-0-7bb4cbf3d63b@gmail.com>
- <20261008-apple-m3-m4-kvm-v1-2-7bb4cbf3d63b@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Oct 2026 12:25:46 +0000
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="cdcy/2dj"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=azu39hy4sP9l9bRMcKId7i+KbDup1QkTOPoJ+2kNYCw=;
+	b=cdcy/2djDSiUkkPO0QEaErPKpvMVBP3ghfWe4K54nsje1g/e2wppO6EK36bXKK/gC6SPjDq4g
+	MZl/77my+iIk6VNg+ZZFh79SQu/VJt3dHA4IRb8SwoYyBKsiP07Lho2A92wcK2rcpEL/skRCsex
+	VlU74hvEOtmS6lwk0qd+HOg=
+Received: from mail.maildlp.com (unknown [172.19.163.104])
+	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4j0qKy1bMLz1T4JM;
+	Thu,  8 Oct 2026 20:38:46 +0800 (CST)
+Received: from dggpemr200003.china.huawei.com (unknown [7.185.36.25])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4B1004057F;
+	Thu,  8 Oct 2026 20:50:59 +0800 (CST)
+Received: from [10.174.185.234] (10.174.185.234) by
+ dggpemr200003.china.huawei.com (7.185.36.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.46; Thu, 8 Oct 2026 20:50:58 +0800
+Message-ID: <6890def8-168d-4951-b6bd-bcbbcbf3595a@huawei.com>
+Date: Thu, 8 Oct 2026 20:50:57 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RESEND][PATCH 0/2] Batch register access for live migration
+ optimization
+To: Marc Zyngier <maz@kernel.org>
+CC: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <catalin.marinas@arm.com>, <will@kernel.org>,
+	<fuad.tabba@linux.dev>, <joey.gouly@arm.com>, <seiden@linux.ibm.com>,
+	<suzuki.poulose@arm.com>, <yuzenghui@huawei.com>, <mark.rutland@arm.com>,
+	<zhengchuan@huawei.com>, <jiangjiacheng@huawei.com>, <yize_w1110@163.com>
+References: <20260918081930.4014735-1-wangyize7@huawei.com>
+ <861paq69te.wl-maz@kernel.org>
+ <f70c6fe3-e3c5-4912-b4bb-8a418fec4346@huawei.com>
+ <86ece63kes.wl-maz@kernel.org>
+From: Yize Wang <wangyize7@huawei.com>
+In-Reply-To: <86ece63kes.wl-maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ dggpemr200003.china.huawei.com (7.185.36.25)
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] arm64: missing M3 and M4 from has_vgic_v3 KVM capability array
---
 
-commit adcc2ca70d0cb38584f5c01ccf8a91f249b43c44
-Author: Michael Reeves <michael.reeves077@gmail.com>
+在 2026/10/3 22:53, Marc Zyngier 写道:
+> On Sun, 20 Sep 2026 10:15:25 +0100,
+> Yize Wang <wangyize7@huawei.com> wrote:
+>> 在 2026/9/18 20:08, Marc Zyngier 写道:
+>>> On Fri, 18 Sep 2026 09:18:13 +0100,
+>>> Yize Wang<wangyize7@huawei.com> wrote:
+>>>> This series adds batch register access support to KVM/arm64 to reduce
+>>>> syscall overhead during VM live migration.
+>>>>
+>>>> Currently, QEMU issues one ioctl per register when saving/restoring VGIC
+>>>> state. On large VM configurations this means tens of thousands of syscalls,
+>>>> where lock acquisition and context switch overhead dominates migration
+>>>> downtime. Thus, we provide a batch register method to allow userspace
+>>>> read/write multiple distributor and redistributor registers in a single call.
+>>>> In this way, we can significantly reduce syscalls and migration downtime.
+>>>>
+>>>> Test the VM migration time under pressure conditions.
+>>>> The VM specifications for migration are as follows:
+>>>> - VM use 4-K page;
+>>>> - the number of VCPU is 160;
+>>>> - the total memory is 320Gigabit;
+>>>> - use 'Redis SET-benchmark' to pressurize VM;
+>>>>
+>>>> Performance results (3-run average, ms):
+>>>>       | Metric              | Without patch | With patch | Improvement |
+>>>>       |---------------------|---------------|------------|-------------|
+>>>>       | Migration downtime  |        536    |     321    |     40%     |
+>>>>       | Source (total)      |        344    |     230    |     33%     |
+>>>>       |   - VGIC put        |        158    |      40    |     75%     |
+>>>>       |   - VGIC get        |        120    |      19    |     84%     |
+>>>>       | Destination (total) |        192    |      91    |     53%     |
+>>>>       |   - VGIC put        |        132    |      27    |     80%     |
+>>>>
+>>>> Yize Wang (2):
+>>>>     KVM: arm64: Add batch group constant and data structure to UAPI header
+>>>>     KVM: arm64: Add VGIC v3 batch register access implementation
+>>> Questions:
+>>>
+>>> - Why only the MMIO registers?
+>>>
+>>> - Why not the sysregs?
+>>>
+>>> - Why only the GIC?
+>>>
+>>> - Why not all of the state?
+>>>
+>>> - Where is the corresponding userspace code?
+>>>
+>>> More importantly, since this is about batching system calls:
+>>>
+>>> - Why can't this be done with io_uring instead?
+>>>
+>>> 	M.
+>>
+>> Hi, Marc! Thank you for the review.
+>>
+>>    These patches focus on optimizing GICv3 register access during live
+>> migration. We found that there are a large number of locks (kvm->lock,
+>> vcpus, config_lock) in the GIC, these lock operations wil cost large
+>> time waste. The batches of sysreg for vcpu optimization will come in
+>> follow as a separate series. And let me address these questions one by
+>> one.
+> All these locks should be non-blocking by the time you save anything
+> related to the GIC, because:
+>
+> - none of the vcpu can be running
+>
+> - this must be a single threaded operation
+>
+> So if you are seeing anything contended, this is either the sign of a
+> bad KVM bug, or an indication that you are violating the above
+> requirements.
+>
+> 	M.
 
-arm64: Apply existing Apple CPU workarounds to M3 and M4
 
-Add M3, M3 Pro, M3 Max and base M4 to apple_cpus so they receive the
-existing PMU trap and broken SEIS workarounds needed by KVM.
+Hi, Marc! Thanks for your review.
 
-> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errat=
-a.c
-> index e0c09402540ce..8a7703b86f3ef 100644
-> --- a/arch/arm64/kernel/cpu_errata.c
-> +++ b/arch/arm64/kernel/cpu_errata.c
-> @@ -288,6 +288,14 @@ static const struct midr_range apple_cpus[] =3D {
->  	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_PRO),
->  	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_MAX),
->  	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_MAX),
-> +	MIDR_ALL_VERSIONS(MIDR_APPLE_M3_SAWTOOTH),
-> +	MIDR_ALL_VERSIONS(MIDR_APPLE_M3_EVEREST),
-> +	MIDR_ALL_VERSIONS(MIDR_APPLE_M3_SAWTOOTH_PRO),
-> +	MIDR_ALL_VERSIONS(MIDR_APPLE_M3_EVEREST_PRO),
-> +	MIDR_ALL_VERSIONS(MIDR_APPLE_M3_SAWTOOTH_MAX),
-> +	MIDR_ALL_VERSIONS(MIDR_APPLE_M3_EVEREST_MAX),
-> +	MIDR_ALL_VERSIONS(MIDR_APPLE_M4_DONAN_ECORE),
-> +	MIDR_ALL_VERSIONS(MIDR_APPLE_M4_DONAN_PCORE),
->  	{},
->  };
+You are right that when saving the GIC state during live migration process, all vCPUs are not running and it is a single threaded operation. Our patches process the packaged register states from the userspace under the same lock. These operations only aim to reduce the lock opreation downtime and do not involve lock contention.
 
-[Severity: High]
-Does this commit also need to update the has_vgic_v3 array in
-can_trap_icv_dir_el1() in arch/arm64/kernel/cpufeature.c with these M3 and =
-M4
-MIDRs?
+In addition, these patches focus on reducing the syscalls of ioctl. Now, every register requires an ioctl, resulting in (num_cpu * registers_per_cpu) system calls. This will cost lots of time during the large-scale VM  migration. Our patches batch registers by category in qemu and then send them to kernel in batches. This operations significantly reduce the number of ioctl syscalls and save a great amount of downtime.
 
-Because Apple SoCs use AIC instead of a standard physical GIC, they lack the
-ARM64_HAS_GICV3_CPUIF CPU capability. To use the hardware vGIC's TDIR (Trap
-DIR) feature on Apple Silicon, KVM relies on the has_vgic_v3 array in
-can_trap_icv_dir_el1().
+The comparison is as follow:
+BEFORE:
 
-Since M3 and M4 are omitted from has_vgic_v3, can_trap_icv_dir_el1() returns
-false on M3 and M4, clearing the ARM64_HAS_ICH_HCR_EL2_TDIR capability.
+        QEMU (Userspace)                  Kernel (Kernelspace)
+   +------------------------+        +----------------------------+
+   |                        |        |                            |
+   |  kvm_arm_gicv3_get()   |        |  vgic_v3_attr_regs_access  |
+   |                        |        |                            |
+   |  for ncpu in num_cpu:  |        |                            |
+   |    for each register:  |        |                            |
+   |                        |        |                            |
+   |  GICR_CTLR             | ioctl->|  mutex_lock(&kvm->lock)    |
+   |                        |        |  kvm_trylock_all_vcpus     |
+   |                        |        |  mutex_lock(&config_lock)  |
+   |                        | <-val  |  read/write register       |
+   |                        |        |  mutex_unlock              |
+   |                        |        |  kvm_unlock_all_vcpus      |
+   |                        |        |  mutex_unlock(&kvm->lock)  |
+   |                        |        |                            |
+   |  GICR_STATUSR          | ioctl->|  (repeat lock/read         |
+   |                        | <-val  |   -> unlock)               |
+   |  ...                   |        |                            |
+   |                        |        |                            |
+   |  GICR_WAKER            | ioctl->|  (repeat lock/read         |
+   |                        | <-val  |   -> unlock)               |
+   |  ...                   |        |                            |
+   |                        |        |                            |
+   |  ICC_SRE_EL1           | ioctl->|  (repeat lock/read         |
+   |                        | <-val  |   -> unlock)               |
+   |  ...                   |        |                            |
+   |                        |        |                            |
+   +------------------------+        +----------------------------+
 
-When this capability is missing, KVM's fallback path in
-kvm_compute_ich_hcr_trap_bits() forces common_trap =3D true (setting the
-ICH_HCR_EL2.TC bit). This traps all guest GICv3 system register accesses to
-EL2 for software emulation, causing a catastrophic performance degradation
-for interrupt-heavy virtualization workloads.
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261008-apple-m3-m=
-4-kvm-v1-0-7bb4cbf3d63b@gmail.com?part=3D2
+AFTER:
+
+        QEMU (Userspace)                  Kernel (Kernelspace)
+   +------------------------+        +----------------------------+
+   |                        |        |                            |
+   |  kvm_arm_gicv3_get()   |        |  vgic_v3_batch_access      |
+   |                        |        |                            |
+   |  Collect Phase:        |        |                            |
+   |    add(GICR_CTLR)      |        |                            |
+   |    add(GICR_STATUSR)   |        |                            |
+   |    add(GICR_WAKER)     |        |                            |
+   |    add(GICR_IGROUPR0)  |        |                            |
+   |    ...                 |        |                            |
+   |    add(ICC_SRE_EL1)    |        |                            |
+   |    ...                 |        |                            |
+   |                        |        |                            |
+   |  Commit Phase:         | BATCH->|  copy_from_user            |
+   |    batch_commit()      |        |  mutex_lock(&kvm->lock)    |
+   |                        |        |  kvm_trylock_all_vcpus     |
+   |                        |        |  mutex_lock(&config_lock)  |
+   |                        |        |                            |
+   |                        |        |  Process Each Entry:       |
+   |                        |        |    entry[0]: GICR_CTLR     |
+   |                        |        |    entry[1]: GICR_STATUSR  |
+   |                        |        |    entry[2]: GICR_WAKER    |
+   |                        |        |    ...                     |
+   |                        |        |    entry[N]: ICC_SRE       |
+   |                        |        |    FLAG_LOCKED: skip       |
+   |                        |        |                            |
+   |  Unpack Phase:         |<-result|  mutex_unlock              |
+   |    Write back          |        |  kvm_unlock_all_vcpus      |
+   |    Post-process:       |        |  mutex_unlock(&kvm->lock)  |
+   |      unshuffle,split   |        |  copy_to_user              |
+   |                        |        |                            |
+   +------------------------+        +----------------------------+
+
+
+
