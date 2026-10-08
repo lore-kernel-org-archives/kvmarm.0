@@ -1,89 +1,107 @@
-Received: from mta1.migadu.com (out-245.mta1.migadu.com [95.215.58.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E093BFAF7
-	for <kvmarm@lists.linux.dev>; Thu,  8 Oct 2026 11:18:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE6B3DD50B;
+	Thu,  8 Oct 2026 12:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791458300; cv=none; b=i+3UWmv9S0yx8YvOGSLVoI/ElHyqQbxxWbUy2m2mbWZnlO58t6ymAgZT4eXvDbIFZUIQhV52poQpoZVXhy/PkKKCkmxxJ2KEhBvEWxumjmq/F154RcAMAbGRS9pGWk1iok/lcco5yxenc1eFPpbMihiJbbAtodLMFXxLXadYQHQ=
+	t=1791461741; cv=none; b=nYmlVNEfClFeGWOOqvmT0xxVhuXU2kWRx73E31UqOAky7hpZLKE3Zu6HCiu51FCtx+JTZpKC+SiohPjYLVvdjOMQKg7EV2Xpmcr+8kCYmiBtlNl2Lb9M7wtnS7NshWYtG/NB7TBOIegq8bbiSqiNLUzLNiVkxoxQcnQz0Vd1/20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791458300; c=relaxed/simple;
-	bh=RZDQiChJc4BLUjPTC5GATFlDtxZirW0FNEhzwWirWTc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UX9A2Qy7qWTyIHTEqsjQRjSrU+iFezMpqCTQmPBxOlxX8RvmelASJOEEEYghlyM5hMnkOOgk920JxSgeKYTIa1F+fUuIdwEkxmfz5YotGdHLGJOrgl/upsUVY7RHNLk7UikVz4kZ0TBgTkwaND4nuiSaF98NE2Yqdhk/srJKPoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fRazBe5Q; arc=none smtp.client-ip=95.215.58.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1791461741; c=relaxed/simple;
+	bh=4ODUPMV03VdBemqJmmhvAVMXz/2NymhIvG+Z8fEazdk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mCCbGTc4aHRu5R6F60ReuxsmOFHmPAi8fT/IdRct+vaXdj0xJVIvufshY/3SBMR3cv8nE+ppxssUHnHuzcwEHhKyppldKWG2EPBBzztEyAKoZ5j2LmYrPGUf6/d6KO3NVRqMZjMf0CQbvuq2gb5/4oydruWV8PqcPoTUjnS+TLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WnIfY0MP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fRazBe5Q"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=RZDQiChJc4BLUjPTC5GATFlDtxZirW0FNEhzwWirWTc=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1791458296; v=1; x=1792063096;
- b=fRazBe5QaLm2PdugOLlam3NU3qsy5I1whvW77qa99OgeE1xMTCMZoY5CPzq+zw7sx9PDkYu7
- dO2oQN16vZSUx4gqYwXIBiTIqQFx/PK/wN1V/YRBckxw3bqw3ZgZDdalbPmW43dm1IgZK6/TD84
- cP/JkXcEnPB3KIG/7Ts1WIZw=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id adb1e4e5936bce1d;
-	Thu, 08 Oct 2026 11:18:16 +0000
-X-Mizu-Trace-ID: adb1e4e5936bce1d
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5bcbb378fc9so7266e87.0
-        for <kvmarm@lists.linux.dev>; Thu, 08 Oct 2026 04:18:12 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBzduk2PpY0iSckMjJijml3ArzhhaiOZRLO3f0G+4DSdEPmOtJFXlTcDeYYT/eKsZ9ZKEZs+Gvk=@lists.linux.dev
-X-Gm-Message-State: AFq9FYJv6ARrXUSNJP28k85ijL7lJupZT6S1wc6I+GoTyr3gn6FwCb/1
-	+qzPYZKjgmJ0TjUx/PRqNw+7DKvCovPuH5iyTrort8duI+hMb56EIqQVByEkWepwCB8So0eMMuN
-	j9Ou3JkIqoWUjta4quxICmodwoeZJapSwaDDczUhL
-X-Received: by 2002:a05:6512:2315:b0:5b8:cc2e:2fe6 with SMTP id
- 2adb3069b0e04-5bcd41a3c42mr122649e87.5.1791458291477; Thu, 08 Oct 2026
- 04:18:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WnIfY0MP"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 35D71C2BCC7;
+	Thu,  8 Oct 2026 12:15:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1791461741;
+	bh=4ODUPMV03VdBemqJmmhvAVMXz/2NymhIvG+Z8fEazdk=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=WnIfY0MP30ldQmC7BEHmqnRO89oB7ldDTfgZZYxclJdeXEJtQHWpCEKPvNgT12cVQ
+	 Cge24dhxgyo+EN2y1WJrzASc5+p0SzcoiMr36C6tp5MixvaybkKe09F8F00ZNxoIRE
+	 GYb6fH+t2DG5tVoNhzWeu6KAnvTmkzsR4OLN0gbJXt3C1KSe5slhlYjR0qLPKaGNyi
+	 b7MFrfef1aNOib7GtEVepNX241/YsJ4s/QIUV7AeMxfQH6c/7d0T9X8QUYF4+sSmtD
+	 fLXJJQg12lHS36F1ZJGdZCeDqV9qSUpQvi4xdbtN4SKYBe1Pi13gYEf11YpCGeFs7x
+	 6M+CfUR6biLOA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F432CA600C;
+	Thu,  8 Oct 2026 12:15:41 +0000 (UTC)
+From: Michael Reeves via B4 Relay <devnull+michael.reeves077.gmail.com@kernel.org>
+Subject: [PATCH 0/2] arm64: Add support for Apple M3 and M4 CPUs in KVM
+Date: Thu, 08 Oct 2026 23:15:39 +1100
+Message-Id: <20261008-apple-m3-m4-kvm-v1-0-7bb4cbf3d63b@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20261007073537.2454351-1-suzuki.poulose@arm.com>
- <20261007073537.2454351-14-suzuki.poulose@arm.com> <CA+EHjTy_1EekD472UH=CDSpC7oksdy3eS8AP0rPxKkhQ_PyXdg@mail.gmail.com>
- <4cdd882b-832f-4968-9838-dcc29a899121@arm.com>
-In-Reply-To: <4cdd882b-832f-4968-9838-dcc29a899121@arm.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 8 Oct 2026 13:17:34 +0200
-X-Gmail-Original-Message-ID: <CA+EHjTyg7QM9+XtbQfAf77zpyNGh0rvEjMBm=mD0694Dtk=rGA@mail.gmail.com>
-X-Gm-Features: AclHuK8P2lsNGbFWtbI77W6PCd57-smcbil7-006btPRzP0RGDfW9UFPgF16p5I
-Message-ID: <CA+EHjTyg7QM9+XtbQfAf77zpyNGh0rvEjMBm=mD0694Dtk=rGA@mail.gmail.com>
-Subject: Re: [PATCH v23 13/14] KVM: arm64: Mandate VGIC v3 for pKVM VMs and Realms
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org, 
-	will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, steven.price@arm.com, 
-	aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, 
-	joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, 
-	gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, 
-	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, 
-	lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com, 
-	jonathan.cameron@oss.qualcomm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGuJx2oC/yWMyw6DIBBFf8XMupMiGvv4laYLBsZKW5CANU2M/
+ y7o8tzHWSBxtJzgXi0QebbJjj5DfapAD8q/GK3JDFLIrhbiiiqEL6Nr0LX4mR3ShW4kuWlJG8i
+ vELm3/934eB6cfvRmPRVNWZBKjBSV10OJTFT9dD60uzDXsK4bk1jkupoAAAA=
+X-Change-ID: 20261008-apple-m3-m4-kvm-b7b9b2e34bcd
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ Mark Rutland <mark.rutland@arm.com>
+Cc: Myria Sarvay <myrialsarvay@gmail.com>, 
+ Yureka Lilian <yureka@cyberchaos.dev>, Fuad Tabba <fuad.tabba@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
+ kvmarm@lists.linux.dev, Sven Peter <sven@kernel.org>, 
+ Janne Grunau <j@jannau.net>, Neal Gompa <neal@gompa.dev>, 
+ asahi@lists.linux.dev, linux-kernel@vger.kernel.org, 
+ Michael Reeves <michael.reeves077@gmail.com>
+X-Mailer: b4 0.16.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1791461739; l=982;
+ i=michael.reeves077@gmail.com; s=20261008-m3-m4-kvm;
+ h=from:subject:message-id;
+ bh=4ODUPMV03VdBemqJmmhvAVMXz/2NymhIvG+Z8fEazdk=;
+ b=k9godCQ6k6IjLO6XtMj7BaWGkvsuz4j44cDDnNlgk3dwYIILYaqrFQ97KPhtRllK9LFE+rJd8
+ 0aEIs/00G9xCt0t6+sdBFeJJ0xjg+9U/gDMEq966ZXDfR7WTihdCdDr
+X-Developer-Key: i=michael.reeves077@gmail.com; a=ed25519;
+ pk=oi7WuppQ1A+qFZp9DdfIwDnpC3WZ+XY6fJK1upV/CSY=
+X-Endpoint-Received: by B4 Relay for
+ michael.reeves077@gmail.com/20261008-m3-m4-kvm with auth_id=1131
+X-Original-From: Michael Reeves <michael.reeves077@gmail.com>
+Reply-To: michael.reeves077@gmail.com
 
-Hi Suzuki,
+Hi,
 
-On Thu, 08 Oct 2026 09:51:56 +0100, Suzuki K Poulose
-<suzuki.poulose@arm.com> wrote:
-[...]
-> But the second part of the changes are required for pKVM today, right ?
-> and you requested that here. The check as such is useful, except that
-> it is using kvm_vm_hyp_is_distrusting() rather than
-> is_protected_kvm_enabled(). I don't see this as a problem as this is
-> not a hotpath anyway.
+This series enables KVM support on Apple Silicon M3 series and base M4
+CPUs.
 
-pKVM already gets the -ENODEV at KVM_CREATE_DEVICE: protected mode
-never sets can_emulate_gicv2, so the check just above yours in
-kvm_vgic_create() rejects a GICv2. The new check only changes
-behaviour once a Realm can set the flavor, which is why I think it
-belongs in the Realm series.
+The first patch adds the part numbers and MIDR definitions for M3
+(base, Pro and Max) and base M4 CPU cores.
 
-That said, my tag stands, and I don't have a strong preference.
+The second patch adds these CPUs to the existing Apple CPU workarounds
+list, which is required for KVM to function correctly.
 
-Cheers,
-/fuad
+This series was developed from testing on:
+- Apple M3 and M3 Pro by Michael Reeves
+- Apple M3 Max by Myria Sarvay and Yureka Lilian
+- Apple M4 by Yureka Lilian
+
+---
+Michael Reeves (1):
+      arm64: Apply existing Apple CPU workarounds to M3 and M4
+
+Myria Sarvay (1):
+      arm64: Add Apple M3 and M4 CPU part numbers
+
+ arch/arm64/include/asm/cputype.h | 16 ++++++++++++++++
+ arch/arm64/kernel/cpu_errata.c   |  8 ++++++++
+ 2 files changed, 24 insertions(+)
+---
+base-commit: a90ee4305c4a5df72c11b31dacfdc76e00fcf78a
+change-id: 20261008-apple-m3-m4-kvm-b7b9b2e34bcd
+
+Best regards,
+--  
+Michael Reeves <michael.reeves077@gmail.com>
+
+
