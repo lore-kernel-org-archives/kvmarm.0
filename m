@@ -1,55 +1,46 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31640472062;
-	Fri,  9 Oct 2026 07:23:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20C53AD51F;
+	Fri,  9 Oct 2026 07:54:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791530583; cv=none; b=g245kac2DQaEApdop2YVVxJ2wwb6QCWkhQCSYShzOrD1zpW1sQQwHtb0lKkNZCkIL+qoIecCj3alPxF1D5oGXyhkadvdrLUnH/ukmd4UBpLav/2dF34q1UbMDCwws30lrgEP4rzjHK5Obl28D4y3JED7jmYf/kqSD65ma8VLor0=
+	t=1791532455; cv=none; b=scPEy/a/JcCbzwP6mzLuyhoee4i6k1Lbt1sRtPQtwe7jmEmnDqt+2UggSwffC1zycGAzZXM3+Ud3H1Oj6RQl7TGhPuyppHLumukAqP8K54LIlXo+MOcFLcqv9GN8fCzpVjyUuAJyi393Nyq7OK1q/J1ZTuN1Y3e1nQTjNE9U6BM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791530583; c=relaxed/simple;
-	bh=WsYk4mwXHGtEeA9/sqqtPLloNXN/PsNfk1fSu7KICtk=;
+	s=arc-20240116; t=1791532455; c=relaxed/simple;
+	bh=tE3GOa1bzQYmLci/uinKcz9hq53UUxXOStqlM98g8ME=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g68uoj909WMdWvczgiSIYLJmNVKEue0e4TLQHjW4nNivy2tYnegGEt6JzblK3/gFf+WIIwB5I/tQ3rqrvEhsmzExSOfNoV8W3L8cUn/4UhO/V1T7s3/Sqkl0Pf0hNPiPYYrFoCNKbheJxEHqSStn8a2N73WrhsSulGS4ENW13kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=t8CehVv4; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=j4GMEh5BaYP9Ds1QxQxn18myhkisVflXhGPwgMV31FMuEEXLUSLmkf9iLo3JihEK8jOf5P7l0su6CnZ8kdmNyoNL5FH85zyzkjeg76xNk8nPvHw9vBJ1Li7/K0rewpWbafqiHfaXBLkHLTPvyTvx2kUe3Tk0r6QxjKw8L8C7Po4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g+h+Soyw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="t8CehVv4"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DE6991692;
-	Fri,  9 Oct 2026 00:22:57 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 29DE03F8C6;
-	Fri,  9 Oct 2026 00:22:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1791530581; bh=WsYk4mwXHGtEeA9/sqqtPLloNXN/PsNfk1fSu7KICtk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=t8CehVv4+Lz8Ugsv96BmQeZ1twjOPHaeTSryLFZ8XK8XZigz5W+IYmOHxXvNgxCos
-	 N7BdEXolPVcgXabranRPAkc3TgIpNDG7vL7on5JnWLSDBD8O+6Xi8OgL/yfdqoaAGW
-	 FrYeFAl55KJTNtuwLj3854pSMLI1wyh9ufDn1hq0=
-Date: Fri, 9 Oct 2026 08:22:55 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Peng Fan <peng.fan@oss.nxp.com>
-Cc: Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g+h+Soyw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD9EC1F000FF;
+	Fri,  9 Oct 2026 07:54:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791532452;
+	bh=tE3GOa1bzQYmLci/uinKcz9hq53UUxXOStqlM98g8ME=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=g+h+Soyw+HgmIxzntY/594uEIbgmuEFV+tmD9csdsQad1z9b+YaY02BZdfcFsD9f+
+	 KMGpoqtSVXb1PWsSLXbQZCmMXVZwDIjjYn1cYV20oP5OPcVTj3PNShJx52ZIJoYtpb
+	 VXzQJtlcNKbztVX9eqP4mZUKpkbUvtc0HdsiOOhGydOAMG6H8YzKvx7klVFpMvxMWW
+	 cqHmWY58o+Leznpc1Nj5REb1fQSL1DmRh0nupH55y+hBOMOZwgYeA9DOp2l507ll0j
+	 GI1Anx3LJiStqxZryfZ4EZqad42vufbRnmuA4vziyjvdi839Cz/vCwUlnABGd6BM82
+	 SRNivJ/yhaiyw==
+Date: Fri, 9 Oct 2026 08:54:07 +0100
+From: Will Deacon <will@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Julien Thierry <julien.thierry.kdev@gmail.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	"Ivan T. Ivanov" <iivanov@suse.de>,
-	Francesco Dolcini <francesco@dolcini.it>,
-	Frank Li <frank.li@nxp.com>, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, imx@lists.linux.dev,
-	Peng Fan <peng.fan@nxp.com>
-Subject: Re: [PATCH v4] arm64: errata: Add NXP iMX8QM workaround for A53
- cache coherency issue
-Message-ID: <asiWTxgGxJ5JIFcl@arm.com>
-References: <20260824-imx8qm-cache-coherency-v4-v4-1-b2e528c7d05e@nxp.com>
- <asTZEhzMDs869r_n@arm.com>
- <aseZUwi0CYTXuE/I@shlinux89>
+	Andre Przywara <andre.przywara@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH kvmtool 0/5] Fix diagnostics and capability probes for
+ protected VMs
+Message-ID: <asidn0tpusz-MZRp@willie-the-truck>
+References: <20260831192406.1341841-1-fuad.tabba@linux.dev>
+ <CA+EHjTwBXEVp_fJp+SvXqrfab2NGdnCXy6L9n=aW2yeTUUOniQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,48 +49,14 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aseZUwi0CYTXuE/I@shlinux89>
+In-Reply-To: <CA+EHjTwBXEVp_fJp+SvXqrfab2NGdnCXy6L9n=aW2yeTUUOniQ@mail.gmail.com>
 
-On Thu, Oct 08, 2026 at 09:23:31PM +0800, Peng Fan wrote:
-> On Tue, Oct 06, 2026 at 12:18:42PM +0100, Catalin Marinas wrote:
-> >On Mon, Aug 24, 2026 at 12:02:04PM +0800, Peng Fan (OSS) wrote:
-> >>   - Disabling KVM since correct TLB maintenance cannot be guaranteed
-> >>     for guests.
-> >
-> >Do you need virtualisation on such platform? An alternative would be for
-> 
-> We not have KVM support in our software release for i.MX8QM.
-> 
-> >the guests to be aware of the erratum as well and use the right TLBI/IC
-> >ops. But you'd also need to upgrade the VMID-aware ops in KVM (unless
-> >the hardware can't work around stage 2 TLBI at all).
-> 
-> We not have test cases for this since KVM is not in our release scope. 
-> Could we take this as a future enablement to avoid uneccessary churn
+On Fri, Oct 09, 2026 at 08:10:55AM +0100, Fuad Tabba wrote:
+> Gentle ping on this series. Marc has merged the pKVM core series into
+> kvmarm/next, including the KVM_GET_ONE_REG -EPERM that patch 1
+> handles, and all five patches have Suzuki's Reviewed-by.
 
-Yes, you can leave it out if you don't care about the KVM use-cases.
+I usually wait for the patches to land in Linus' tree before I update
+kvmtool (although I may be fishing when that happens).
 
-> >There's a precedent with 4311569 to wire up a SoC erratum into the CPU
-> >errata framework. That one is a system wide feature, so only probed once
-> >for the CPUs coming up at boot (though still probed for each late CPUs).
-> >For iMX, you need this turned on early, hence the boot probing. But
-> >calling it a strict boot CPU feature is a bit of a stretch. It also gets
-> >probed on every CPU, unnecessarily.
-> >
-> >I think we could do with something like below (maybe as a preparatory
-> >patch). We could also add it to 4311569 even if it changes its scope
-> >from system to boot CPU (the early param is available).
-> >
-> >Only compile-tested and haven't tried wiring up your workaround:
-> 
-> With type set to ARM64_CPUCAP_SOC_ERRATUM for i.MX8QM and your patch
-> applied, I not see issues in my test.
-> 
-> Would you post it as a formal patch or need me to include your patch
-> with i.MX8QM errata patch in a patchset?
-
-Please post it with your patchset. Feel free to add a co-developed-by or
-suggested-by me on the new cpucap proposal.
-
--- 
-Catalin
+Will
