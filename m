@@ -1,122 +1,177 @@
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BFD83DDDBE
-	for <kvmarm@lists.linux.dev>; Fri,  9 Oct 2026 08:45:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341B44248CE;
+	Fri,  9 Oct 2026 08:55:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791535552; cv=none; b=h/4kDVdbiuvlMM1WjZ+vOIHW2naDCHB8hBC2gMmMhe+hXI9kueZRej796ace2hwi2hjVIGBXPVk62PMlsEjmctYEnOEBYs5XggS0Xf/nh1Vtt8D61lTSQ7piFkkY2MKD+mkWSbXUo4m/TVukhPkeYxIndKrItgnEu/Wq95dgcUw=
+	t=1791536158; cv=none; b=qRgY8H0UbjInggww+9VV2WkpiSQy5lDwMx6nWKLayIvBbFJ4bcRoq0bHJebwGEouqt8FYhpNDjSWBI8ko2kSI1npmsmeu3hkcuAaDDdIkp8vchbIr35ryN/8kMHyvl1iDbuZqsRXRJ3CFiYLsn1TWOPHk/94r3HPwKNgFDjPnTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791535552; c=relaxed/simple;
-	bh=rr/cSP3qAQ6A5c5kAR8YIJQqjcKmys/CxSIO9WFPZ90=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hw3/Fnr7vqbZQp/ZqzWjEHLGmiLgHrTQulDxfm6bd8x6+Iybcrrj4ObMGfy0ULdOYJR2rjpXY+lx8muFPmBg1rGjuR1ENiY5ttYm1qjjXX6zoEtaBROfZSNZHjXG7hISKyBELdr28sYuAZZGLYfmnDzsYzVzYb9OC1sJuMQ2Ce8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UDO5esu5; arc=none smtp.client-ip=209.85.128.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
+	s=arc-20240116; t=1791536158; c=relaxed/simple;
+	bh=k5CsmijKQl/rAcDEA0cbJQKgTfQD/JM0gZZ4pXklOqo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=T+KdtYkAeLI0JDmAbZ93qaPAQuHG/5dbL4VQdNnGvr2tgEAY0QvgOpbntdvYEGs+3+qygBi+KDGbouqdU12C2rLyOY/2VUe1LqYxCk0b+pbB6F5knWl+g32C+s5kr0UQeeLRKGPXgDNkewMkWOUhpSpTsp+A3ZoIh9uYc1dM7iE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eD98WeCo; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UDO5esu5"
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4a009f82bedso35531025e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 09 Oct 2026 01:45:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1791535549; x=1792140349; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=kYQM2I+r8judSPngvWcWEJb9im+ycy9cxj2LUpGCt2I=;
-        b=UDO5esu5L/a7NpNytPIbWTfQf6AxA+ivxDk2BerLaREq1INLqMnaIORfUbkjMMIsrf
-         nwRjc/5dSJfy8n37CsN8h9r1zSGFY6cMYXBVMK7SsQVmwBV9z0ZzjvFIGVCH0StgWmwW
-         Kvk4FiRUFreES/SK7dfrE3lsjr8Ds/VUgDQzUmYsSJe+8lDqYaoVvyhqxCiUoxKMuVge
-         GYJ0Sx1iywEL0aT+hrzpWQMn84LQSK7P/p9wRFQs+CCpNMvPQFSczOt/dabZ0L1U+Fzq
-         XfAjkjIny+FpTf8jeuSJvW7lpEceF5GyRtgrOXEwN1g1Rf1QOZwxswxSNd5DDHalKTYw
-         sYaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791535549; x=1792140349;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=kYQM2I+r8judSPngvWcWEJb9im+ycy9cxj2LUpGCt2I=;
-        b=LJBViLLjPpS9dMqwJ8pKoUKbztZNf6aaV+bh3MA7YUJxViZfcC+iRiNU4ksSbOOPJO
-         rrujwJvxrl903x4jI+24M0dZpvV5I27FdrYi0RYpLWIOfMmWUZLvkYrS0E/ExiIk8RIX
-         7hzZEoCEnaZaPjpDNOQwJvLEEL8wXX+feb8TMsErGHUbt/QoEzdr//GsiZqL27UAm4nc
-         UAJh087sqjOBU8INLQJJDjefVtUI+gOFTv2ij53rQoqM9HL5Cd9h18N/z+P31nEESjjb
-         D4QaarUoLanCs28rad/tGZ+WG+gr43WXokZhq02NfAqcoiLH5zeGo395KRR7yTvsFyPK
-         pYdw==
-X-Forwarded-Encrypted: i=1; AKwUvBzz/CVX5B0EzFtLLz26pgn7MvjinWt9QK/wb747MvR6vFU9jyv0qptQtksuQTju9+QzJxk4fbQ=@lists.linux.dev
-X-Gm-Message-State: AFuF++n22ygqafE6X57agXvGY1RRs/ZvJlj3QxSYdfNyResXtyz2/4/F
-	BO5UMSWsjPY+iWshI+mtKaX9jAiURyHlJqkED4dI2jhAU79ZZHc/n8Jehce/YhsRJq9Hxx5huJC
-	bBh170IT8/OUi9IQIyfeWpg==
-X-Received: from wmdv21.prod.google.com ([2002:a05:600c:12d5:b0:4a1:7101:895d])
- (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:4ecb:b0:49f:f099:6fb1 with SMTP id 5b1f17b1804b1-4a18e4adcd0mr22678935e9.15.1791535549080;
- Fri, 09 Oct 2026 01:45:49 -0700 (PDT)
-Date: Fri,  9 Oct 2026 09:45:29 +0100
-In-Reply-To: <20261009084529.462577-1-vdonnefort@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eD98WeCo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 679B21F000FF;
+	Fri,  9 Oct 2026 08:55:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791536155;
+	bh=RUTuEHoA6y1ZBd7WiFp1nW0Ji2GbuE6iesB+SQXale4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=eD98WeCoGtEZI2OmM43W4l2cL8MMXqic+6xM6OAdSmr7OqFyF6511ri3twgHI2l0Z
+	 +6yeHmG7W+iL3UYmmMN7vWGD7dG74xmv0/FIRrelgITei+s9X0rrAcz2HHn3KY0a7T
+	 1pxMFA5OtxjtotzUOFr289jnBw8wu34sIbsEan3GFLR0rEq0Q8pIWC1IQNhskW/X++
+	 6dyoy3FefGrw8zinzf3Mfns/E2/ZLbxx+hpgiCwr4+pCRAVG/Eb2BQG9mMWIQ8Lkhc
+	 9qWM5Z/ch4NjxDkxsWek6e0lpstgu5oKc/wlBPiH/G97NDWcCS2K0VMlsxQCJ7q6pn
+	 XB7qJaGHMCkFw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xF6OP-00000000v22-0Ezj;
+	Fri, 09 Oct 2026 08:55:53 +0000
+Date: Fri, 09 Oct 2026 09:55:52 +0100
+Message-ID: <86a4on2qxz.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	steven.price@arm.com,
+	aneesh.kumar@kernel.org,
+	oupton@kernel.org,
+	gshan@redhat.com,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev,
+	gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com,
+	alpergun@google.com,
+	fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com,
+	lpieralisi@kernel.org,
+	enju.kohei@fujitsu.com,
+	sudeep.holla@arm.com,
+	jonathan.cameron@oss.qualcomm.com
+Subject: Re: [PATCH v23 14/14] KVM: arm64: Prevent unsupported vcpu features for VM types
+In-Reply-To: <CA+EHjTx-niYPnnRDvAAiY3MXLpSYau_PhiBTCiE9mOYUChASPQ@mail.gmail.com>
+References: <20261007073537.2454351-1-suzuki.poulose@arm.com>
+	<20261007073537.2454351-15-suzuki.poulose@arm.com>
+	<CA+EHjTx-niYPnnRDvAAiY3MXLpSYau_PhiBTCiE9mOYUChASPQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20261009084529.462577-1-vdonnefort@google.com>
-X-Mailer: git-send-email 2.56.0.385.gd3acb90ef8-goog
-Message-ID: <20261009084529.462577-4-vdonnefort@google.com>
-Subject: [PATCH v1 3/3] KVM: arm64: Add host_hvc hyp event
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org
-Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com, 
-	Vincent Donnefort <vdonnefort@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add a host_hvc hypervisor trace event to log host HVC call IDs and
-return values.
+On Wed, 07 Oct 2026 15:19:53 +0100,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> Hi Suzuki,
+> 
+> On Wed, 07 Oct 2026 08:35:37 +0100, Suzuki K Poulose
+> <suzuki.poulose@arm.com> wrote:
+> [...]
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 4d0e6bd2009ac..97089c81d6428 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -42,6 +42,13 @@
+> >  #define KVM_VCPU_MAX_FEATURES 10
+> >  #define KVM_VCPU_VALID_FEATURES        (BIT(KVM_VCPU_MAX_FEATURES) - 1)
+> >
+> > +/* As dictated by kvm_pkvm_ext_allowed() */
+> > +#define KVM_PROTECTED_VCPU_VALID_FEATURES              \
+> > +       (BIT(KVM_ARM_VCPU_POWER_OFF)            |       \
+> > +        BIT(KVM_ARM_VCPU_PSCI_0_2)             |       \
+> > +        BIT(KVM_ARM_VCPU_PTRAUTH_ADDRESS)      |       \
+> > +        BIT(KVM_ARM_VCPU_PTRAUTH_GENERIC))
+> 
+> kvmarm/next already restricts protected VM features through
+> kvm_pkvm_vcpu_allowed_features(), shared with EL2 (0b7d843ef3bf).
+> Could you rebase on that and drop the protected half of this patch,
+> rather than add a second list?
 
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
----
- arch/arm64/include/asm/kvm_hypevents.h | 13 +++++++++++++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c     |  2 ++
- 2 files changed, 15 insertions(+)
+A rebase would be a terrible idea. This thing *must* go on its own
+branch, and not depend on anything else.
 
-diff --git a/arch/arm64/include/asm/kvm_hypevents.h b/arch/arm64/include/asm/kvm_hypevents.h
-index c1239d78c8f9..a37ba9db1cc7 100644
---- a/arch/arm64/include/asm/kvm_hypevents.h
-+++ b/arch/arm64/include/asm/kvm_hypevents.h
-@@ -60,6 +60,19 @@ HYP_EVENT(selftest,
- 	RE_PRINTK("id=%llu", __entry->id)
- );
+I can however fix things at merge time. is something like this what
+you had in mind? It compiles, and is therefore perfect...
+
+	M.
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 300ffc2e31c7d..1c6632216e327 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -45,13 +45,6 @@
+ #define KVM_VCPU_MAX_FEATURES 10
+ #define KVM_VCPU_VALID_FEATURES	(BIT(KVM_VCPU_MAX_FEATURES) - 1)
  
-+HYP_EVENT(host_hvc,
-+	HE_PROTO(u8 id, u64 ret),
-+	HE_STRUCT(
-+		he_field(u8, id)
-+		he_field(u64, ret)
-+	),
-+	HE_ASSIGN(
-+		__entry->id = id;
-+		__entry->ret = ret;
-+	),
-+	HE_PRINTK("id=%u ret=0x%llx", __entry->id, __entry->ret)
-+);
-+
- HYP_EVENT(guest_hvc,
- 	HE_PROTO(u32 id, u64 val, u8 handled),
- 	HE_STRUCT(
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 76d08c503dc0..579615e3b2dd 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -996,6 +996,8 @@ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
- 	cpu_reg(host_ctxt, 0) = SMCCC_RET_SUCCESS;
- 	hfn(host_ctxt);
+-/* As dictated by kvm_pkvm_ext_allowed() */
+-#define KVM_PROTECTED_VCPU_VALID_FEATURES		\
+-	(BIT(KVM_ARM_VCPU_POWER_OFF)		|	\
+-	 BIT(KVM_ARM_VCPU_PSCI_0_2)		|	\
+-	 BIT(KVM_ARM_VCPU_PTRAUTH_ADDRESS)	|	\
+-	 BIT(KVM_ARM_VCPU_PTRAUTH_GENERIC))
+-
+ #define KVM_REQ_SLEEP \
+ 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_IRQ_PENDING		KVM_ARCH_REQ(1)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 3ae8f51ce948a..a0e7f1d2d1575 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1706,12 +1706,10 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
  
-+	trace_host_hvc(id, cpu_reg(host_ctxt, 1));
-+
- 	return;
- inval:
- 	cpu_reg(host_ctxt, 0) = SMCCC_RET_NOT_SUPPORTED;
+ static unsigned long system_supported_vcpu_features(struct kvm_vcpu *vcpu)
+ {
+-	unsigned long features;
++	unsigned long features = KVM_VCPU_VALID_FEATURES;
+ 
+ 	if (vcpu->kvm->arch.vm_flavor == VM_PROTECTED_PKVM)
+-		features = KVM_PROTECTED_VCPU_VALID_FEATURES;
+-	else
+-		features = KVM_VCPU_VALID_FEATURES;
++		kvm_pkvm_vcpu_allowed_features(vcpu->kvm, &features);
+ 
+ 	if (!cpus_have_final_cap(ARM64_HAS_32BIT_EL1))
+ 		clear_bit(KVM_ARM_VCPU_EL1_32BIT, &features);
+@@ -1753,19 +1751,6 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
+ 	if (features & ~system_supported_vcpu_features(vcpu))
+ 		return -EINVAL;
+ 
+-	/* Reject features EL2 would drop when it creates the hyp VM. */
+-	if (vcpu_is_protected(vcpu)) {
+-		DECLARE_BITMAP(allowed, KVM_VCPU_MAX_FEATURES);
+-
+-		kvm_pkvm_vcpu_allowed_features(vcpu->kvm, allowed);
+-		if (!bitmap_subset(&features, allowed, KVM_VCPU_MAX_FEATURES))
+-			return -EINVAL;
+-
+-		/* EL2 implements PSCI 1.1; the host must not dispatch as 0.1. */
+-		if (!test_bit(KVM_ARM_VCPU_PSCI_0_2, &features))
+-			return -EINVAL;
+-	}
+-
+ 	/*
+ 	 * For now make sure that both address/generic pointer authentication
+ 	 * features are requested by the userspace together.
+
 -- 
-2.56.0.385.gd3acb90ef8-goog
-
+Without deviation from the norm, progress is not possible.
