@@ -1,494 +1,410 @@
-Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013069.outbound.protection.outlook.com [52.101.83.69])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40AC93DA7F9;
-	Fri,  9 Oct 2026 17:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.69
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791566620; cv=fail; b=eTLN9krfZkQtkmJboLjAKl8qM7b2dM+S9t5OUSMDNvC8YHeXYVeEUoF4FMkW18bW6vpgtMJ5SzNMyBcnL5sCTS5PEGpsT34YnAAGouudTKlbPqPDTy5NgB4oH4B2BnyNiJm3fjl9iUB3T7BBCI32VqxfQhtCBfgRt4IkclZ/p9c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791566620; c=relaxed/simple;
-	bh=QEyjdtvOC6EtWjXpCq6r1C484W/ioCLS3I90wFIDbYs=;
-	h=From:Date:Subject:Content-Type:Message-Id:References:In-Reply-To:
-	 To:Cc:MIME-Version; b=a3V/T9AT77R/jJ2QpFyqFxxCGi6KW6ZS+lKVNQ5We96ZS92MOv57u7fvRDcrlkrowlwX2/QB0q8itABuqGryxppkxdh/yLnSTRsCPrfTPH6pnrV2zt/qA1ay9Gr1L64rjJ4YNzx3T2V5ULhzihK1klDYbVuPPau+TKDBiP2C0co=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=vgEnwz8Y; arc=fail smtp.client-ip=52.101.83.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1727F2F619D;
+	Fri,  9 Oct 2026 18:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791569078; cv=none; b=BhrQlWHAx6rosmFMynLdAnz/qe6nG3xLpHk7Rk4xfav1ixRdth98gNxjPjmgjfhUGscGjyNGSnGrOsDBK4NkiKLqlszqO14tWEgEjSNOdLe1Ko28/M4MKeXTBU9lXKV8aYlgjC5vIXVTGPsTsMQYsQE6n31kszhO5NN8g0sDpxk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791569078; c=relaxed/simple;
+	bh=n4V9rL2hXS1EHjEQMTlg867FNgqGNKwt46gTB6wkitI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=OJ6S7s1rlPoKMU1qztIzHAZkL/kRCNuZbOciW4xpbQN/Ep2bY1s/7Umaf8o1p8UIEJ9Yn4c7xQ5u56UWJ32bqKJ2tRFj+e05gLFcP+bdDxHiw/2AGUcZJuf6SqWIVR9KyJyPKaBbap/keXnouYDKja6Vc0rVbGbqHvScNp1RH3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qad3KSrd; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="vgEnwz8Y"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sCwcLpqHoGcTpt5s9JCRsm0Bs63b5JhbTH1D+p7LMoEBsMMNta4taSQV80C/JhXhiEjA2uv6L4rfj97SSFr5s0ax0McsxJyYCLgWDo1SJjosBoYFlBXJVNW4wG5Ycud+3wCibeb28fzPEZRrIb3/IN2aXUCdTttPx8vnR/7PbJZSFSZMXk8sDJTKZTrkfSjFevVRRbqFQt7jLnmfLhnWDi008ED6pN8x9+mXDLx3RkCFjz918iCrcjBpG7eHUcJhl9OcUb6OAyxyGfB0rs8NG1E7WY0ZABlwUiXbDsUWLKrSKF6X4Ws67WTg9KjcW2l8p4KPuYKYHX0vRaIIef9NXA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6DRcd+qXewQzAjtWTsp6aqERv5a44CDpzmx4tFC6ft4=;
- b=qkvaI6d9kY9/UzMYL3Prj+K4tAXsV2xrPxRY+ryqo8JSsCe7DWbtOf1yOHEX2P+NkEc8GROkyMFuZGT9zwHVsJMzEkL8aadKaSyA5oRdhvQ6qBr/vhW/JkqsW1CEHY9KXNdUdNGLoL3tVAynKzTSYchbs90Adhoag17JfE8CYinyr+jJyXDJeLWealTX3XSAXDqrRNZ6XRKJ1MzJ0h+EM7ZRZKnA1N6aolvAuLXOVWeSg6Am3DslDwAnbZOujhTDy7beE4o9r60S3/xJH5W+EKj3i5Fvy5MfQlneXShJcJXBlGcy6GXVNiFmJvqWCooVqV78CKBlLnoQ/+aNx3blGg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector1-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6DRcd+qXewQzAjtWTsp6aqERv5a44CDpzmx4tFC6ft4=;
- b=vgEnwz8YEl6KqjYXCYCUwaX0O7KUN4nTqlM9A3W5zoLOhpDD4ja68J4btC8fkNUbgf0uSDkj7BmFptPwmGwZrhdMuCkjwamajiwj+xnQUZLBC61L6o5dzY38lBUmkhqU2thDUxj8zJHuLLeo9bMiOGdTZ3LX9OcX3IkiHUiv1Q75Jqe+lCFbSnYk+mTtW4wpyUxZIy6ac9TrsMae2p0ZtFzpd8ocWwRu4hZr4if+Z/mf9DJCy4sc+G1cdCwAr1AVH13rmjNRwZ3PcVXxNMPbZfM7M2IOPfAZFcC6pUhLsP3jWnxUjT82Rm9I/Cil/6mHKxZyXERjO8eNn1gZ+WWz0w==
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oss.nxp.com;
-Received: from AM8PR04MB7874.eurprd04.prod.outlook.com (2603:10a6:20b:24d::9)
- by AS8PR04MB8343.eurprd04.prod.outlook.com (2603:10a6:20b:3f1::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.496.15; Fri, 9 Oct
- 2026 17:23:33 +0000
-Received: from AM8PR04MB7874.eurprd04.prod.outlook.com
- ([fe80::ac38:1699:6f18:c5d9]) by AM8PR04MB7874.eurprd04.prod.outlook.com
- ([fe80::ac38:1699:6f18:c5d9%6]) with mapi id 15.21.0496.010; Fri, 9 Oct 2026
- 17:23:32 +0000
-From: "Peng Fan (OSS)" <peng.fan@oss.nxp.com>
-Date: Sat, 10 Oct 2026 01:19:46 +0800
-Subject: [PATCH v5 2/2] arm64: errata: Add NXP iMX8QM workaround for A53
- cache coherency issue
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261010-imx8qm-cache-coherency-v5-v5-2-c9d6cd60c0c2@nxp.com>
-References: <20261010-imx8qm-cache-coherency-v5-v5-0-c9d6cd60c0c2@nxp.com>
-In-Reply-To: <20261010-imx8qm-cache-coherency-v5-v5-0-c9d6cd60c0c2@nxp.com>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
- Randy Dunlap <rdunlap@infradead.org>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>, 
- Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Zenghui Yu <yuzenghui@huawei.com>
-Cc: "Ivan T. Ivanov" <iivanov@suse.de>, 
- Francesco Dolcini <francesco@dolcini.it>, 
- Franz Schnyder <franz.schnyder@toradex.com>, Frank Li <frank.li@nxp.com>, 
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, imx@lists.linux.dev, 
- Peng Fan <peng.fan@nxp.com>
-X-Mailer: b4 0.15.2
-X-ClientProxiedBy: MA5P287CA0062.INDP287.PROD.OUTLOOK.COM
- (2603:1096:a01:1d3::15) To AM8PR04MB7874.eurprd04.prod.outlook.com
- (2603:10a6:20b:24d::9)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qad3KSrd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9D731F000FF;
+	Fri,  9 Oct 2026 18:04:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791569076;
+	bh=SHbPL8zAhY1EPDigTnWul0MzUeZXzl8KtpG/s8AqHXY=;
+	h=From:Subject:Date:To:Cc;
+	b=Qad3KSrddBgXnQWBK0Lx2JvuXuUvt6cFnQA7ziRLUO7kybnH5xcjHLqxLIjnOMaae
+	 vIQcFH7oS6EG/qkp0/aK8LoTXMFgmhjy8SLC9NLnfIJA2cfdZuTMiR8PyUCOAQbXT1
+	 SizGfxN5Cy1MC+n11o8cFtpHAJG50xLWg2Tr2mMYCFNV6/fB5HU0wOp/rJnC886Ulz
+	 N9BwAObrLZTs86EmJo66Ak0JXK1F4SkrFaqzUctVqRC6UlARTGESabx4ECJvmNMtDi
+	 o/hVI7HkK3JlHS0y5DTpLbGC5XZp7HJYNWyCNIRpIaQmIjHHWfFRcBBc6/R0RQAT2A
+	 AS2nq+aY71VAg==
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Subject: [PATCH v5 00/38] mm: make VMA flag semantics explicit, eliminate
+ VM_SPECIAL
+Date: Fri, 09 Oct 2026 19:03:54 +0100
+Message-Id: <20261009-b4-mmap-prepare-vma-flag-sanify-v5-0-923b70125b1e@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7874:EE_|AS8PR04MB8343:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4cd921eb-c1c5-44a8-f362-08df262a0a86
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|19092799006|366016|1800799024|7416014|376014|921020|11063799006|10067099003|56012099006|18002099003|6133799003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	x/dtCxVM+UW+j2I6CDSS6C0xGFL47KgBZaBk04Qdts97EwdPWEIqBJeuQ6AVTZpJAf0KDoc4G/S1ptDyCdL43DehQqvtxTl+5eoso76/BnfDQjA3qZTDmIvtw/fLrNHPX+ae8CbxNlRwhEo0dPwyXeUin7T7+eB45gjltyDaWje4FrSzanMNTxcT/0fVA/ZCgVSCWPzwpNBwcF2rziKlP1XCDRLyluqQ20HVbXUcCoFSfz/ahPUzTaH++zRshpcL7W0elBPfd+ZQzPFsIHGf9V7K0IyZMhUb8NzbJh/BrMv0fcs8P+jduUo7WWjTPyWBOQM0j19nbiIhULzShpUWKGhMytTnfbpGbdVfUf2mpXPnjR1ayR1JsPq6ukE8Ux9EAAPUdp0Fr0DhHBakHJw+nMDHVO/LEqBxZNddV1VaR2OLoNR249x9UiM4/KIv/B6D/oPAyrPCAFPIOYnVjdf/o50m7flov/OlufiJy6OY4VaWcCFtcvUza6Oxjx8BwSuVvy8H6MuWIrF6FfhQ/IiYrke53tg1mwdRaP0nAHO5jVyKbstAC6qLvVEh0FV1DTQmRMsXheiyEXlTNh0swluPD1MnsII148VmPC62qgLcTCNXmoOQoQlS+uW+rHA3Q72iPFovpWpP5DbVxynB3NLhe08LUIwk0xm+8tKv9vRzuHhuGKTm5Ksl/iOEbAPxPCIwDwYi4XX4ir4pLMKtBpSFyw==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7874.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(19092799006)(366016)(1800799024)(7416014)(376014)(921020)(11063799006)(10067099003)(56012099006)(18002099003)(6133799003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dnBjNGEvQjJlTzhwUjVHVlpCZGIyTkxMa2taUXprZ21sa3dhRXR1OG9kMVgy?=
- =?utf-8?B?MU9oWWV4YlJqTVBGTDBEK09aS3YrZmVQVnBCZzNsL0ZMelpZRjhldVh2ejR1?=
- =?utf-8?B?c0NWQ3F3emwwWVlIN1FTSWQ5dmNkVXA2M3NBc1dlSVBpcTZLMXFBV0MzS0dw?=
- =?utf-8?B?REIrZ2NYZUhSVTJFMTFnUncwR1ZjdUdpOHpxUDRCQjBwOFdQUnkxL1ZnMDc0?=
- =?utf-8?B?UDZPTWxYU3NRVjErNlVVdGQ2QzBwcDdkOHgxbG5CUkNLVy9xRThHN1UrS2p0?=
- =?utf-8?B?V055TzRBWTNTQ3NWUi9BS1RIUWFQVVhBTTlwSEUwSXovcWUwWmNRTmxJM0h4?=
- =?utf-8?B?b1AvOTZzbllhYzhwc3h6Z1dzNUdLODN0WjNudjdoY0tnMnlhTnUycGFzdTFo?=
- =?utf-8?B?TDFSL0dXU3hGTGI1VWpyRUJEMDVTL09BZ0dlTlBISVI2bnpqWmgwNyt3NXVN?=
- =?utf-8?B?V0FmSmdMVUFVc0UrR1NhaVo0bEpuWkd3VFJlZ0p1YzdmRll4T0g3UVRBZHVk?=
- =?utf-8?B?d0Z4L2RLYW56eU9RK3VKT3JMQk80c3gyUmhKZFZnQ2pRVkV2ZDFjdHkxUU9G?=
- =?utf-8?B?bVoyR0ovb0ZTaVRXQXlLSlNwN3czaWhzd0RTSlhqbG1jZFRHQU5MRnVWdmlV?=
- =?utf-8?B?dUx5bDUwZFFUUzY2WDY4cVdmRDBRUS9rb2xMVDNyRlAzdElKay9XMktaVS9q?=
- =?utf-8?B?NU9FbjBuUGtwa1lKb3JHTWYya1RLL21HUEdDSk1QL2t4a1QyU0twbXZDUFlt?=
- =?utf-8?B?R2dRT0Frc2NWanpQL2pCTkxWT1JIMzJ4TzdQbFpUelF0V3puRmFiWHhEL0Ux?=
- =?utf-8?B?NFFLR09HY1F2Wm9NcDhJN2RqMkJEVGVSWHM3NGdOOVNPQ2tRUUpvME5kblpK?=
- =?utf-8?B?aXo1VDNTdDlMWmZzMlBUMm4vTDRqYTExT0tiaWpWL24xbmJkYmlxN2x6WkFK?=
- =?utf-8?B?WVdaNkxySjdINUtqVUQyM0dIQnNWbEVZdERKTnlqQ2kwMkkyM2wyWkpSNDcy?=
- =?utf-8?B?aXhLbDZxdVhkY0FDeHZiUm5EUW9DRFhWMHpaWU1DWWxtd1owMlZYSFRrUXpo?=
- =?utf-8?B?b0xrU3RURFdhMWRjWm5EVmNBN1BXQ1FBaUZPYTdzdC8zeUpSK1Y0TnJVOGov?=
- =?utf-8?B?OXFkU1RjMXdBSnBjWHNaSkFoVWV2RXhNOEhaemFPSTU2cUtLbktkMVZnNjFm?=
- =?utf-8?B?WlR4cWIvd2hGY2RJbFBqL3ptYXROUFFOQlhwaDZCYVFwblgvekNXdWdtblRW?=
- =?utf-8?B?ZVo3YXNIODlDaEJCNzBod0tXK0NRdWk4VDZFWlgzR2Nvc2VrSkRSTjJ6Um1G?=
- =?utf-8?B?aEthNjN6ZVEvNEttYUxyNGIvS0ZjUnhxc24zRWJSUUljNG9mMVJSRTFHWWgw?=
- =?utf-8?B?dGtTbitIZWR3SXZBYVNuQ3pRZXR2MEhiTUVCZ3VUbTA3cDd0cFp5bmtZMnJl?=
- =?utf-8?B?RVJqRXpHN2E3TGZrM2NoYm0vWTUyNVgwOUsrdEQvbXV2NmJpa1JLbWlTTVVY?=
- =?utf-8?B?MCt5R01VSDg0VVdGdjV4ODFOd0gwL0JCdTQyZmpZNzZ3M21OemxCNkdpSFJ4?=
- =?utf-8?B?OThxa2JGN3lsa0NZTlRDUFRDOWcwbndGN2hwa0REdTRqUzdHVkJMeS9DV3J0?=
- =?utf-8?B?VDJrUVZoZldkeTB5cENGQmlObHpONFJpSXdwRk9nZmEwZDFpaFppeHdVTGJ5?=
- =?utf-8?B?ZTFVUG1PMGhEOTFLRllRVTkvejZiMWxrUnVzanN1UzZKYTd5Z3lTVkNBUkVJ?=
- =?utf-8?B?WTRxcVNIbDJ5M0ttQmNPQm4zalh6blpCMElwR3ZyNEhnV0NLaU5mKy9OT3NW?=
- =?utf-8?B?dVlCZjdvNG1FUFRhRTMrVjBqOFlBdCtYYjZJMy9HbmVJaWRKSDE3eWhMNEFp?=
- =?utf-8?B?R3BXVCtxekpROFcwTjhXc2ZjSUd3NTcyQjVXMkJWejBLdEpVWVlNejZJRGtL?=
- =?utf-8?B?cU5OVjFGVStCTTZ1ajZLbS9tRzJJTzJhdGtNRjZxWDA5aDdzdE1CbjZnNTdS?=
- =?utf-8?B?MjFkbVE1TXM0dkxjRnRvSStRZ0tqejV3OUdJZVVaeDdNdjhhQlBEbVA3YXNW?=
- =?utf-8?B?YUNrV3ZnK2M0elhYcFdnTDhyd3dGUzgxbmltRkRYMzdVcjVCeDRySVNLenZI?=
- =?utf-8?B?NU9WR3QrSGlyZk9MZzM3RXZYQURQMVViMytTeVFGVU9sYjF4U1BPclVraVdk?=
- =?utf-8?B?d2c2MW9wTGFmOTBvSE5pcUh6cmdFOC94YnBuNUoyQy9VOE9BNnYydEErTHEr?=
- =?utf-8?B?UFZDOWtYTW0rREFlYkJBdThubFE4SXE2M2xHZUhreEFnbzZMRGZpMUFLRmlu?=
- =?utf-8?B?a2haMTFVVTNPUXN6Ykh3SzJpMWlsNmM5cVVjNkJiSHNtWDZJT3lIRGZhbnVz?=
- =?utf-8?Q?5Xb63Axa0Pm8O2Eshgl/QcW+R4V62FOMgmiZ4?=
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4cd921eb-c1c5-44a8-f362-08df262a0a86
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7874.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Oct 2026 17:23:31.9893
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EUeVxG9/tSCoa61Q52EGla3ILzWWV/oSNoqxzf1fGJnyxzjKEtTKTX7D8OmmVhQf4AfDHTSVYFuK8VaJZ3UXTR11hb+T9zNBjdCbeN8J6wCB8g7BfTjUZdoMV0JOTuWI
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8343
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/4XQTW7DIBAF4KtErEsFAwQ7q96j6mIMg0Mb/whS1
+ Cjy3YsTqUqVhZdPevreaK4sU4qU2WF3ZYlKzHEaazAvO+aOOPbEo6+ZgYC9sCB5p/kw4MznRDM
+ m4mVAHk7Y84xjDBcOUggNxgeDyKpSeyH+3BbeP+45f3ef5M4ruzaOMZ+ndLmdUOTau6+1otlcK
+ 5IL7tEF2TpHAN3bF6WRTq9T6tk6V+ABlHobhApa39pGkjdqL59A9QjabVBVUJtG+QZBdQ6fQP0
+ H1tepbVBXEGUQBowQwdt/4LIsv+zINubUAQAA
+X-Change-ID: 20260721-b4-mmap-prepare-vma-flag-sanify-2100425df5aa
+To: Andrew Morton <akpm@linux-foundation.org>, 
+ "Liam R. Howlett" <liam@infradead.org>, Vlastimil Babka <vbabka@kernel.org>, 
+ Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
+ David Hildenbrand <david@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
+ Paul Moore <paul@paul-moore.com>, 
+ Stephen Smalley <stephen.smalley.work@gmail.com>, 
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+ Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
+ Baolin Wang <baolin.wang@linux.alibaba.com>, 
+ Nico Pache <nico.pache@linux.dev>, Ryan Roberts <ryan.roberts@arm.com>, 
+ Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
+ Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
+ Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
+ "Martin K. Petersen" <mkp@kernel.org>, Simona Vetter <simona@ffwll.ch>, 
+ Helge Deller <deller@gmx.de>, Sebastian Reichel <sre@kernel.org>, 
+ John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
+ Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
+ Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+ Arnaldo Carvalho de Melo <acme@kernel.org>, 
+ Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+ Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, 
+ Juri Lelli <juri.lelli@redhat.com>, 
+ Vincent Guittot <vincent.guittot@linaro.org>, 
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+ David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
+ "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, 
+ Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+ Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, 
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+ Catalin Marinas <catalin.marinas@arm.com>, 
+ Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, 
+ Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+ Albert Ou <aou@eecs.berkeley.edu>, 
+ Christian Borntraeger <borntraeger@linux.ibm.com>, 
+ Janosch Frank <frankja@linux.ibm.com>, 
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+ Alexander Gordeev <agordeev@linux.ibm.com>, 
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>, 
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Andreas Larsson <andreas@gaisler.com>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Christian Brauner <brauner@kernel.org>, 
+ Matthew Brost <matthew.brost@intel.com>, 
+ Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, 
+ Byungchul Park <byungchul@sk.com>, Gregory Price <gourry@gourry.net>, 
+ Ying Huang <ying.huang@linux.alibaba.com>, 
+ Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, 
+ Kairui Song <kasong@tencent.com>, Kemeng Shi <shikemeng@huaweicloud.com>, 
+ Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
+ Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+ Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
+ Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, 
+ Wei Xu <weixugc@google.com>, Chengming Zhou <chengming.zhou@linux.dev>, 
+ Michal Hocko <mhocko@kernel.org>, Miklos Szeredi <miklos@szeredi.hu>, 
+ Xu Xin <xu.xin@linux.dev>
+Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+ linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
+ linux-rdma@vger.kernel.org, selinux@vger.kernel.org, 
+ linux-sound@vger.kernel.org, bpf@vger.kernel.org, 
+ linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
+ linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, 
+ linux-fsdevel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+ linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, 
+ fuse-devel@lists.linux.dev, Ihor Solodrai <ihor.solodrai@linux.dev>, 
+ Bert Karwatzki <spasswolf@web.de>, "Lorenzo Stoakes (ARM)" <ljs@kernel.org>, 
+ Takashi Iwai <tiwai@suse.de>, Emil Tsalapatis <emil@etsalapatis.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=13909; i=ljs@kernel.org;
+ h=from:subject:message-id; bh=n4V9rL2hXS1EHjEQMTlg867FNgqGNKwt46gTB6wkitI=;
+ b=owGbwMvMwCV2fu7ZrsZH9SKMp9WSGLJO6kydo702/Ib2xh9+HSqmfsVCNscPR/U77Ut0rj9xh
+ SnxoOn3jlIWBjEuBlkxRZbnX8T3B4mEzeu84O8GM4eVCWQIAxenAEzEUJ2R4eZn3ZoPJ+4KpZV/
+ zIlJktF97JTUnWozvY7fWIl3JdsSR0aGw3Ec7V0VV6v3Wah8KNselbo8wS/c8P0f3eQCy6s2bXW
+ cAA==
+X-Developer-Key: i=ljs@kernel.org; a=openpgp;
+ fpr=E7F417BF5214569E89D04F46CF9DCD8A81E27F14
 
-From: Peng Fan <peng.fan@nxp.com>
+The VM_SPECIAL / VMA_SPECIAL_FLAGS mask conflates several unrelated
+properties:
 
-According to NXP errata document IMX8_1N94W[1], the i.MX8QuadMax SoC
-suffers from a cache coherency issue (ERR050104). The upper bits, above
-bit 35, of the ARADDR and ACADDR buses within the Arm A53 subsystem
-have been incorrectly connected. This causes some TLBI and IC
-maintenance operations exchanged between the A53 and A72 core clusters
-to be corrupted.
+* Is this managed by core mm, or by a driver mapping MMIO, kernel-allocated
+  pages, or even ordinary pages itself?
+* Can it be expanded or merged?
+* Is this a 'weird' case like mlock where migration might race and we
+  'have' to set invalid flags to notify?
+* Is it another 'weird' case where we just want to stop GUP from touching
+  it?
 
-The workaround requires:
+Driver writers have often been confused about this, and who can blame them?
 
-  - Downgrading targeted TLBI operations to broadcast-all variants.
-    Instead of patching the low-level __TLBI_1 macro (which interferes
-    with the REPEAT_TLBI workaround and causes excessive over-
-    invalidation), redirect high-level TLB flush functions
-    (flush_tlb_mm, __do_flush_tlb_range, flush_tlb_kernel_range,
-    __flush_tlb_kernel_pgtable) to use VMALLE1IS via static key checks.
+It also interacts badly with the eternal edgecase known as hugetlb - which
+sets VMA_DONTEXPAND_BIT but doesn't also want to be treated like a
+'special' flag.
 
-  - Upgrading IC IVAU to IC IALLUIS for both kernel (via ALTERNATIVE in
-    invalidate_icache_by_line) and EL0 userspace (via trap-and-upgrade
-    in user_cache_maint_handler with SCTLR_EL1.UCI=0).
+Another issue is that we cannot make sensible assumptions about flag
+use. It's not possible to assume VMA_IO_BIT means iommu because drivers
+abuse it and mlock abuses it.
 
-  - Disabling KVM since correct TLB maintenance cannot be guaranteed
-    for guests.
+Special is also an overloaded term in mm. VDSO and VVAR mappings are also
+called 'special' but they're special in a... special way.
 
-  - No need to touch SMMU Broadcast TLB Maintenance (BTM) since i.MX8QM
-    does not support broadcast TLB.
+Sometimes things are called special that are a subset of
+VMA_SPECIAL_FLAGS (VMA_PFNMAP_BIT and VMA_MIXEDMAP_BIT for instance when it
+comes to zapping or vm_normal_folio()).
 
-SoC detection uses devicetree compatible string "fsl,imx8qm" or
-"fsl,imx8qp" since the boot CPU MIDR_EL1 (0x410fd034) and AIDR_EL1 (0)
-are not unique to this SoC.
+There's a specific kind of special for THP too, which considers
+PFN map, mixed map 'special' but DAX not.
 
-[1] https://www.nxp.com/docs/en/errata/IMX8_1N94W.pdf
+It's all rather a mess.
 
-[ Reworked per review feedback from Will Deacon and Mark Rutland:
-  - Move TLBI workaround from __TLBI_1 macro to high-level flush
-    functions to avoid REPEAT_TLBI interaction issues
-  - Add kernel IC IVAU upgrade via ALTERNATIVE in assembler.h
-  - Add cpucap_is_possible() entry for compile-time elimination]
+This series brings some order to things by both limiting what drivers can
+do with VMA flags and switching to using predicates that describe
+behaviour, not arbitrary flags.
 
-Tested-by: Franz Schnyder <franz.schnyder@toradex.com> # Toradex Apalis iMX8QM
-Co-developed-by: Ivan T. Ivanov <iivanov@suse.de>
-Signed-off-by: Ivan T. Ivanov <iivanov@suse.de>
-Signed-off-by: Peng Fan <peng.fan@nxp.com>
+It establishes the invariant that mm-managed mappings may neither set
+VMA_IO_BIT nor clear VMA_MAYWRITE_BIT in an mmap hook, enforcing this by
+validating VMA state after every mmap and mmap_prepare hook.
+
+It updates usbmon and sg to mmap_prepare in order to do so, adding a new
+mmap action for mapping discontiguous kernel pages, and has hfi1 and the
+ALSA PCM status page map their pages eagerly instead.
+
+It also establishes the invariant that VMA_MIXEDMAP_BIT be set when mapping
+kernel memory, something that is usually the case but happens not to be for
+some users - specifically defio, cmt_speech, uprobes and the bpf arena, all
+of which are updated to do the right thing.
+
+It replaces VM_SPECIAL and arbitrary flag tests with predicates that say
+what is actually being tested:
+
+     vma_is_mm_managed()   Are the VMA's contents established and managed
+                           by core mm, rather than a driver or other kernel
+                           component?
+
+      vma_is_mm_backed()   Is the VMA backed by memory core mm itself
+                           faults in and keeps, rather than a driver or
+                           device?
+
+  vma_is_fixed_mapping()   Is the VMA not permitted to be expanded or
+                           merged?
+
+         vma_can_merge()   Can the VMA be merged with a compatible
+                           neighbour?
+
+Remaining raw VMA_IO_BIT, VMA_PFNMAP_BIT and VMA_MIXEDMAP_BIT tests
+scattered across mm are converted to predicates where they express one, and
+left as explicit flag tests where they do not.
+
+And also the opportunity is taken to eliminate THP's vma_is_special_huge()
+which was an existing source of confusion.
+
+Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 ---
- Documentation/arch/arm64/silicon-errata.rst |  2 +
- arch/arm64/Kconfig                          | 16 ++++++++
- arch/arm64/include/asm/assembler.h          |  5 +++
- arch/arm64/include/asm/cpucaps.h            |  2 +
- arch/arm64/include/asm/kvm_host.h           |  2 +
- arch/arm64/include/asm/tlbflush.h           | 62 ++++++++++++++++++-----------
- arch/arm64/kernel/cpu_errata.c              | 32 +++++++++++++++
- arch/arm64/kernel/traps.c                   |  2 +
- arch/arm64/kvm/arm.c                        |  5 +++
- arch/arm64/tools/cpucaps                    |  1 +
- 10 files changed, 105 insertions(+), 24 deletions(-)
+v5:
+* Applied tags (thanks everybody!)
+* Updated 3/38 to fix a bug in __mmap_new_file_vma() by zapping + closing
+  the VMA before setting vma->vm_file NULL to avoid an i_mmap_writable
+  imbalance. A repro was tested before/after and confirmed fixed.
+* Updated 7/38 to make __map_kernel_pages_prepare() use
+  mmap_assert_write_locked() rather than the weird
+  assert-on-mmap_read_trylock() pattern, as per Suren.
+* Also update vm_insert_page(), vm_insert_pages() to fix the same pattern
+  and to use the new VMA API, and converted a BUG_ON to a
+  VM_WARN_ON_ONCE().
 
-diff --git a/Documentation/arch/arm64/silicon-errata.rst b/Documentation/arch/arm64/silicon-errata.rst
-index 6de353e3f338..9ecace8778c1 100644
---- a/Documentation/arch/arm64/silicon-errata.rst
-+++ b/Documentation/arch/arm64/silicon-errata.rst
-@@ -332,6 +332,8 @@ stable kernels.
- +----------------+-----------------+-----------------+-----------------------------+
- | Freescale/NXP  | LS2080A/LS1043A | A-008585        | FSL_ERRATUM_A008585         |
- +----------------+-----------------+-----------------+-----------------------------+
-+| Freescale/NXP  | i.MX 8QuadMax   | ERR050104       | NXP_IMX8QM_ERRATUM_ERR050104|
-++----------------+-----------------+-----------------+-----------------------------+
- +----------------+-----------------+-----------------+-----------------------------+
- | Hisilicon      | Hip0{5,6,7}     | #161010101      | HISILICON_ERRATUM_161010101 |
- +----------------+-----------------+-----------------+-----------------------------+
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 5f2db2cecf97..098d2ae41023 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -1488,6 +1488,22 @@ config ROCKCHIP_ERRATUM_3588001
- 
- 	  If unsure, say Y.
- 
-+config NXP_IMX8QM_ERRATUM_ERR050104
-+	bool "NXP iMX8QM ERR050104: broken cache/TLB invalidation broadcast"
-+	default y
-+	help
-+	  On iMX8QM, address bits above bit 35 in the A53 subsystem ARADDR and
-+	  ACADDR buses are incorrectly connected. This corrupts targeted TLBI
-+	  and IC broadcasts exchanged between the A53 and A72 core clusters.
-+
-+	  Work around this by redirecting targeted TLBI operations to
-+	  broadcast-all variants (VMALLE1IS) in the high-level TLB flush
-+	  functions, upgrading IC IVAU to IC IALLUIS for both kernel and
-+	  user-space, and disabling KVM since correct TLB maintenance
-+	  cannot be guaranteed for guests.
-+
-+	  If unsure, say Y.
-+
- config SOCIONEXT_SYNQUACER_PREITS
- 	bool "Socionext Synquacer: Workaround for GICv3 pre-ITS"
- 	default y
-diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-index 42a167a75486..020670814bda 100644
---- a/arch/arm64/include/asm/assembler.h
-+++ b/arch/arm64/include/asm/assembler.h
-@@ -420,6 +420,10 @@ alternative_else_nop_endif
-  * 	Corrupts:	tmp1, tmp2
-  */
- 	.macro invalidate_icache_by_line start, end, tmp1, tmp2, fixup
-+alternative_if ARM64_WORKAROUND_NXP_ERR050104
-+	ic	ialluis
-+	b	.Licache_done\@
-+alternative_else_nop_endif
- 	icache_line_size \tmp1, \tmp2
- 	sub	\tmp2, \tmp1, #1
- 	bic	\tmp2, \start, \tmp2
-@@ -428,6 +432,7 @@ alternative_else_nop_endif
- 	add	\tmp2, \tmp2, \tmp1
- 	cmp	\tmp2, \end
- 	b.lo	.Licache_op\@
-+.Licache_done\@:
- 	dsb	ish
- 	isb
- 
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index 76350b38f0d7..0c3bfbe99aad 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -66,6 +66,8 @@ cpucap_is_possible(const unsigned int cap)
- 		return IS_ENABLED(CONFIG_ARM64_ERRATUM_3194386);
- 	case ARM64_WORKAROUND_4193714:
- 		return IS_ENABLED(CONFIG_ARM64_ERRATUM_4193714);
-+	case ARM64_WORKAROUND_NXP_ERR050104:
-+		return IS_ENABLED(CONFIG_NXP_IMX8QM_ERRATUM_ERR050104);
- 	case ARM64_MPAM:
- 		/*
- 		 * KVM MPAM support doesn't rely on the host kernel supporting MPAM.
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 14cc632c7671..caa8d105a184 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -121,8 +121,10 @@ enum kvm_mode {
- };
- #ifdef CONFIG_KVM
- enum kvm_mode kvm_get_mode(void);
-+void kvm_force_disabled(void);
- #else
- static inline enum kvm_mode kvm_get_mode(void) { return KVM_MODE_NONE; };
-+static inline void kvm_force_disabled(void) { };
- #endif
- 
- extern unsigned int __ro_after_init kvm_sve_max_vl;
-diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
-index 14a78ac0f800..a05520d3a013 100644
---- a/arch/arm64/include/asm/tlbflush.h
-+++ b/arch/arm64/include/asm/tlbflush.h
-@@ -378,9 +378,13 @@ static inline void flush_tlb_mm(struct mm_struct *mm)
- 	unsigned long asid;
- 
- 	dsb(ishst);
--	asid = __TLBI_VADDR(0, ASID(mm));
--	__tlbi(aside1is, asid);
--	__tlbi_user(aside1is, asid);
-+	if (alternative_has_cap_unlikely(ARM64_WORKAROUND_NXP_ERR050104)) {
-+		__tlbi(vmalle1is);
-+	} else {
-+		asid = __TLBI_VADDR(0, ASID(mm));
-+		__tlbi(aside1is, asid);
-+		__tlbi_user(aside1is, asid);
-+	}
- 	__tlbi_sync_s1ish(mm);
- 	mmu_notifier_arch_invalidate_secondary_tlbs(mm, 0, -1UL);
- }
-@@ -580,23 +584,28 @@ static __always_inline void __do_flush_tlb_range(struct vm_area_struct *vma,
- 
- 	asid = ASID(mm);
- 
--	switch (flags & (TLBF_NOWALKCACHE | TLBF_NOBROADCAST)) {
--	case TLBF_NONE:
--		__flush_s1_tlb_range_op(vae1is, start, pages, stride,
--					asid, tlb_level);
--		break;
--	case TLBF_NOWALKCACHE:
--		__flush_s1_tlb_range_op(vale1is, start, pages, stride,
--					asid, tlb_level);
--		break;
--	case TLBF_NOBROADCAST:
--		/* Combination unused */
--		BUG();
--		break;
--	case TLBF_NOWALKCACHE | TLBF_NOBROADCAST:
--		__flush_s1_tlb_range_op(vale1, start, pages, stride,
--					asid, tlb_level);
--		break;
-+	if (alternative_has_cap_unlikely(ARM64_WORKAROUND_NXP_ERR050104) &&
-+	    !(flags & TLBF_NOBROADCAST)) {
-+		__tlbi(vmalle1is);
-+	} else {
-+		switch (flags & (TLBF_NOWALKCACHE | TLBF_NOBROADCAST)) {
-+		case TLBF_NONE:
-+			__flush_s1_tlb_range_op(vae1is, start, pages, stride,
-+						asid, tlb_level);
-+			break;
-+		case TLBF_NOWALKCACHE:
-+			__flush_s1_tlb_range_op(vale1is, start, pages, stride,
-+						asid, tlb_level);
-+			break;
-+		case TLBF_NOBROADCAST:
-+			/* Combination unused */
-+			BUG();
-+			break;
-+		case TLBF_NOWALKCACHE | TLBF_NOBROADCAST:
-+			__flush_s1_tlb_range_op(vale1, start, pages, stride,
-+						asid, tlb_level);
-+			break;
-+		}
- 	}
- 
- 	if (!(flags & TLBF_NONOTIFY))
-@@ -657,7 +666,8 @@ static inline void flush_tlb_kernel_range(unsigned long start, unsigned long end
- 	end = round_up(end, stride);
- 	pages = (end - start) >> PAGE_SHIFT;
- 
--	if (__flush_tlb_range_limit_excess(pages, stride)) {
-+	if (alternative_has_cap_unlikely(ARM64_WORKAROUND_NXP_ERR050104) ||
-+	    __flush_tlb_range_limit_excess(pages, stride)) {
- 		flush_tlb_all();
- 		return;
- 	}
-@@ -675,10 +685,14 @@ static inline void flush_tlb_kernel_range(unsigned long start, unsigned long end
-  */
- static inline void __flush_tlb_kernel_pgtable(unsigned long kaddr)
- {
--	unsigned long addr = __TLBI_VADDR(kaddr, 0);
--
- 	dsb(ishst);
--	__tlbi(vaae1is, addr);
-+	if (alternative_has_cap_unlikely(ARM64_WORKAROUND_NXP_ERR050104)) {
-+		__tlbi(vmalle1is);
-+	} else {
-+		unsigned long addr = __TLBI_VADDR(kaddr, 0);
-+
-+		__tlbi(vaae1is, addr);
-+	}
- 	__tlbi_sync_s1ish_kernel();
- 	isb();
- }
-diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index a418e240ccce..cb9341c4dbeb 100644
---- a/arch/arm64/kernel/cpu_errata.c
-+++ b/arch/arm64/kernel/cpu_errata.c
-@@ -6,6 +6,7 @@
-  */
- 
- #include <linux/arm-smccc.h>
-+#include <linux/of.h>
- #include <linux/types.h>
- #include <linux/cpu.h>
- #include <asm/cpu.h>
-@@ -13,6 +14,7 @@
- #include <asm/cpufeature.h>
- #include <asm/fpsimd.h>
- #include <asm/kvm_asm.h>
-+#include <asm/kvm_host.h>
- #include <asm/smp_plat.h>
- 
- static u64 target_impl_cpu_num;
-@@ -203,6 +205,27 @@ cpu_enable_cache_maint_trap(const struct arm64_cpu_capabilities *__unused)
- 	sysreg_clear_set(sctlr_el1, SCTLR_EL1_UCI, 0);
- }
- 
-+#ifdef CONFIG_NXP_IMX8QM_ERRATUM_ERR050104
-+static bool
-+is_imx8qm_soc(const struct arm64_cpu_capabilities *entry, int scope)
-+{
-+	return of_machine_is_compatible("fsl,imx8qm") ||
-+		of_machine_is_compatible("fsl,imx8qp");
-+}
-+
-+static void
-+cpu_enable_imx8qm_err050104(const struct arm64_cpu_capabilities *__unused)
-+{
-+	cpu_enable_cache_maint_trap(__unused);
-+
-+	/*
-+	 * TLB maintenance cannot be guaranteed correct for guests, so
-+	 * disable KVM as if kvm-arm.mode=none was passed on the command line.
-+	 */
-+	kvm_force_disabled();
-+}
-+#endif
-+
- #define CAP_MIDR_RANGE(model, v_min, r_min, v_max, r_max)	\
- 	.matches = is_affected_midr_range,			\
- 	.midr_range = MIDR_RANGE(model, v_min, r_min, v_max, r_max)
-@@ -1045,6 +1068,15 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
- 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
- 		.matches = has_broken_gic_v3_seis,
- 	},
-+#ifdef CONFIG_NXP_IMX8QM_ERRATUM_ERR050104
-+	{
-+		.desc = "NXP erratum ERR050104",
-+		.capability = ARM64_WORKAROUND_NXP_ERR050104,
-+		.type = ARM64_CPUCAP_SOC_ERRATUM,
-+		.matches = is_imx8qm_soc,
-+		.cpu_enable = cpu_enable_imx8qm_err050104,
-+	},
-+#endif
- 	{
- 	}
- };
-diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
-index 914282016069..d6391ab20db3 100644
---- a/arch/arm64/kernel/traps.c
-+++ b/arch/arm64/kernel/traps.c
-@@ -586,6 +586,8 @@ static void user_cache_maint_handler(unsigned long esr, struct pt_regs *regs)
- 		break;
- 	case ESR_ELx_SYS64_ISS_CRM_IC_IVAU:	/* IC IVAU */
- 		__user_cache_maint("ic ivau", address, ret);
-+		if (cpus_have_final_cap(ARM64_WORKAROUND_NXP_ERR050104) && !ret)
-+			asm volatile("ic ialluis");
- 		break;
- 	default:
- 		force_signal_inject(SIGILL, ILL_ILLOPC, regs->pc, 0);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index d17c58c3b03e..2f94a1b8862a 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -3239,6 +3239,11 @@ static int __init early_kvm_mode_cfg(char *arg)
- }
- early_param("kvm-arm.mode", early_kvm_mode_cfg);
- 
-+void kvm_force_disabled(void)
-+{
-+	kvm_mode = KVM_MODE_NONE;
-+}
-+
- static int __init early_kvm_wfx_trap_policy_cfg(char *arg, enum kvm_wfx_trap_policy *p)
- {
- 	if (!arg)
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 58b6c084f9f2..20cc185649f9 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -124,6 +124,7 @@ WORKAROUND_DEVICE_LOAD_ACQUIRE
- WORKAROUND_DISABLE_CNP
- WORKAROUND_GICv3_BROKEN_SEIS
- WORKAROUND_NVIDIA_OLYMPUS_1027
-+WORKAROUND_NXP_ERR050104
- WORKAROUND_PMUV3_IMPDEF_TRAPS
- WORKAROUND_QCOM_FALKOR_E1003
- WORKAROUND_QCOM_ORYON_CNTVOFF
+v4:
+* Pulled what was 2/40 out of the series to send as a fix instead, as per
+  Suren.
+* Updated 1/38 to rename put_map() to map_put_vm_file(), as per Suren and
+  Liam.
+* Updated 3/38 (was 4/40) to perform the vma_close() after unmapping the
+  range as per Gregory.
+* Updated 3/38 (was 4/40) to rename prev_* to orig_* in the mmap hook
+  validation code, as per Suren.
+* Updated 4/38 (was 5/40) to clarify that the mergeable-VMA action check
+  runs after mmap_action_prepare(), as per Zi.
+* Updated 7/38 (was 8/40) to have discontig_kernel_map_page_range() map
+  only the pages which fit in the VMA, consistent with
+  discontig_kernel_map_page(), as per Suren and Zi.
+* Updated 7/38 (was 8/40) to unmap and close the VMA when an mmap action
+  fails under the mmap_prepare compatibility layer, so state is correctly
+  released there too, as per Lance.
+* Updated 8/38 (was 9/40) to document this, as per Zi.
+* Updated 14/38 (was 15/40) to replace vma[_flags]_is_kernel_owned() with
+  its inverse, vma[_flags]_is_mm_managed() and reword accordingly
+  throughout, as per David.
+* Updated 22/38 (was 23/40) to add a clarifying comment, as per Zi.
+* Updated 23/38 (was 24/40) to test VMA_LOCKED_MASK before draining the
+  mlock batch in try_to_unmap_one() and try_to_migrate_one(), as per Lance.
+* Updated 30/38 (was 31/40) to rename vma[_flags]_is_persistent() to
+  vma[_flags]_is_mm_backed() and reword its documentation around what backs
+  the mapping rather than persistence, as per David.
+* Updated 31/38 (was 32/40) to make the code more succinct in
+  vma_move_compatible(), as per David.
+* Dropped what was 40/40, vma[_flags]_can_gup(), as per David.
+https://lore.kernel.org/r/20261003-b4-mmap-prepare-vma-flag-sanify-v4-0-a1f052500fd7@kernel.org
 
+v3:
+* Fixed up bug in patch 1 as reported by Mike - have to delay setting
+  map->vma_flags until after action prepare, though map->vm_file needs to
+  be set before for correct reference count management.
+* Updated 4/40 to add a symmetric vm_end check as well as vm_start in case
+  of a dangerously insane driver, as per Sashiko.
+* Updated 8/40 to check if a driver did something REALLY stupid like having
+  a NULL discontig_kernel_page_ops ptr, as per Sashiko.
+* Updated 15/40 to trivially synchronise userland test comments.
+* Updated 17/40 to correctly duplicate code to the userland VMA tests as
+  per Sashiko.
+https://lore.kernel.org/r/20260917-b4-mmap-prepare-vma-flag-sanify-v3-0-4583d8a23bca@kernel.org
+
+v2:
+* Rebased on mm-unstable.
+* Introduced new patch to fix various mmap_prepare and file interactions
+  that weren't quite right as per Sashiko. None impact anything upstream
+  yet so it doesn't need to be a fix.
+* Restore vma->vm_start if an mmap hook has moved it before tearing the
+  VMA down, so we unmap the range we established rather than the one the
+  hook invented, as per Sashiko.
+* Reject a discontiguous kernel page batch of zero pages rather than
+  looping forever, and bound batches by the pages remaining in the VMA,
+  as per Sashiko.
+* Add the missing map_kernel_discontig member to the userland VMA tests'
+  copy of struct mmap_action as per Sashiko.
+* Set VM_DONTEXPAND on hfi1's RCV_HDRQ, RCV_EGRBUF and RTAIL mappings, as
+  dma_mmap_coherent() doesn't on the IOMMU-DMA path, as per Sashiko.
+* Recompute vma->vm_page_prot in snd_pcm_mmap_status() after clearing
+  VM_WRITE, as vm_insert_page() uses it immediately rather than at fault
+  time, as per Sashiko.
+* munlock_vma_folio() now tests VMA_LOCKED_MASK so an unmap racing the
+  mlock walk still munlocks folios the walk has already counted, as per
+  Sashiko.
+https://lore.kernel.org/r/20260914-b4-mmap-prepare-vma-flag-sanify-v2-0-7d9781ed5361@kernel.org
+
+v1:
+https://lore.kernel.org/r/20260908-b4-mmap-prepare-vma-flag-sanify-v1-0-dacf19cce22b@kernel.org
+
+---
+Lorenzo Stoakes (ARM) (38):
+      mm/vma: fix mmap_prepare file handling, remove file_doesnt_need_get
+      mm/vma: introduce and use vma_[flags_]can_merge()
+      mm: consistently validate VMA state after mmap[_prepare] hooks
+      mm/vma: ensure mmap_prepare doesn't set actions on a mergeable vma
+      mm: make map_kernel_pages_[prepare,complete] internal and unexported
+      mm/vma: tidy up map kernel pages enum values
+      mm: add mmap action for discontiguous kernel page mapping
+      docs: filesystems: update mmap_prepare docs for discontig kernel pgs
+      drivers/usb/mon: update to use mmap_prepare + map kernel pages
+      infiniband: update hfi1 to use remap_vmalloc_range()
+      selinux: reject writable opens of policy file, drop mmap shared/write check
+      ALSA: pcm: use vm_insert_page() to map PCM status page
+      bpf: arena: mark arena_map_mmap() mappings VM_MIXEDMAP
+      mm/vma: add vma[_flags]_is_mm_managed() predicates
+      mm/vma: only allow mmap to clear VMA_MAYWRITE_BIT if not mm-managed
+      mm/vma: add and use vma_[flags]_is_fixed_mapping
+      scsi: sg: convert mmap hook to mmap_prepare and rework
+      fbdev: defio: assert FBINFO_VIRTFB, drop VM_IO, add VM_MIXEDMAP
+      HSI: cmt_speech: convert mmap hook to mmap_prepare, refactor
+      mm/gup: error out early on !VMA_MAYREAD_BIT VMAs
+      uprobes: remove VM_IO, set VM_MIXEDMAP for mapped kernel pages
+      mm/mlock: clear VMA_LOCKED_MASK over mmap callback
+      mm/mlock: eliminate weird VMA_IO_BIT abuse and simplify
+      mm/vma: enforce that mm-managed mappings may not set VMA_IO_BIT
+      mm: remove VMA_IO_BIT check in vma[_flags]_is_mm_managed()
+      mm: remove hugetlb_inline.h
+      mm: rename is_vm_hugetlb_page() to vma_is_hugetlb()
+      mm: drop some redundant checks around hugetlb VMAs
+      mm/madvise: update is_valid_guard_vma() to use vma_can_merge()
+      mm/vma: introduce vma[_flags]_is_mm_backed()
+      mm/uffd: use predicates for userfaultfd checks
+      mm/madvise: use predicates for madvise(..., MADV_DOFORK)
+      mm: eliminate VMA_SPECIAL_FLAGS usage when hugetlb explicitly tested
+      mm: eliminate VMA_SPECIAL_FLAGS check in lru_gen_look_around()
+      mm: avoid use of VMA_SPECIAL_FLAGS in migrate_vma_setup()
+      mm: eliminate VM_SPECIAL, VMA_SPECIAL_FLAGS
+      fuse: dax: do not set VM_MIXEDMAP
+      mm/huge_memory: remove vma_is_special_huge()
+
+ Documentation/filesystems/mmap_prepare.rst |  81 ++++++++++
+ arch/arm64/kvm/mmu.c                       |   4 +-
+ arch/powerpc/mm/book3s64/radix_tlb.c       |   6 +-
+ arch/powerpc/mm/nohash/e500_hugetlbpage.c  |   2 +-
+ arch/powerpc/mm/nohash/tlb.c               |   2 +-
+ arch/riscv/kvm/mmu.c                       |   2 +-
+ arch/riscv/mm/tlbflush.c                   |   2 +-
+ arch/s390/mm/gmap_helpers.c                |   6 +-
+ arch/sparc/mm/init_64.c                    |   2 +-
+ arch/x86/kernel/uprobes.c                  |   2 +-
+ drivers/gpu/drm/drm_gpusvm.c               |   5 +-
+ drivers/hsi/clients/cmt_speech.c           |  33 ++--
+ drivers/infiniband/hw/hfi1/file_ops.c      |  83 +++-------
+ drivers/scsi/sg.c                          | 115 ++++++-------
+ drivers/usb/mon/mon_bin.c                  |  82 ++++++----
+ drivers/video/fbdev/core/fb_defio.c        |   6 +-
+ drivers/video/fbdev/ssd1307fb.c            |   2 +
+ fs/coredump.c                              |   2 +-
+ fs/fuse/dax.c                              |   2 +-
+ fs/hugetlbfs/inode.c                       |   2 +-
+ fs/proc/task_mmu.c                         |   8 +-
+ include/asm-generic/tlb.h                  |   4 +-
+ include/linux/hugetlb.h                    |   5 +-
+ include/linux/hugetlb_inline.h             |  28 ----
+ include/linux/mm.h                         | 240 +++++++++++++++++++++++++--
+ include/linux/mm_types.h                   |  50 +++++-
+ include/linux/pagemap.h                    |   1 -
+ include/linux/rmap.h                       |   2 +-
+ include/linux/userfaultfd_k.h              |   1 -
+ kernel/bpf/arena.c                         |   3 +-
+ kernel/events/core.c                       |   2 +-
+ kernel/events/uprobes.c                    |   4 +-
+ kernel/sched/fair.c                        |   3 +-
+ mm/folio.c                                 |   2 +-
+ mm/gup.c                                   |   8 +-
+ mm/huge_memory.c                           |  31 ++--
+ mm/hugetlb.c                               |  14 +-
+ mm/internal.h                              |  80 +++++----
+ mm/ksm.c                                   |   4 +-
+ mm/madvise.c                               |  28 ++--
+ mm/memory.c                                | 147 ++++++++++++++---
+ mm/mempolicy.c                             |   2 +-
+ mm/migrate_device.c                        |  12 +-
+ mm/mlock.c                                 |  51 +++---
+ mm/mmap.c                                  |   2 +-
+ mm/mmu_gather.c                            |   2 +-
+ mm/mprotect.c                              |   5 +-
+ mm/mremap.c                                |  11 +-
+ mm/page_vma_mapped.c                       |   4 +-
+ mm/pagewalk.c                              |   2 +-
+ mm/rmap.c                                  |   8 +-
+ mm/swapfile.c                              |   2 +-
+ mm/userfaultfd.c                           |  43 ++---
+ mm/util.c                                  |  49 ++++--
+ mm/vma.c                                   | 250 ++++++++++++++++++++++-------
+ mm/vma.h                                   |  31 +++-
+ mm/vma_internal.h                          |   1 -
+ mm/vmscan.c                                |   9 +-
+ security/selinux/selinuxfs.c               |  11 +-
+ sound/core/pcm_native.c                    |  38 ++---
+ tools/testing/vma/include/dup.h            |  80 +++++++--
+ tools/testing/vma/include/stubs.h          |   6 +-
+ tools/testing/vma/tests/merge.c            |  10 +-
+ 63 files changed, 1164 insertions(+), 571 deletions(-)
+---
+base-commit: 6b41451631cabf9ea3b384c2a099088e1598f963
+change-id: 20260721-b4-mmap-prepare-vma-flag-sanify-2100425df5aa
+
+Cheers,
 -- 
-2.51.0
+Lorenzo Stoakes (ARM) <ljs@kernel.org>
 
