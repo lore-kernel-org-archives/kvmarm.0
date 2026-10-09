@@ -1,77 +1,69 @@
-Received: from mta0.migadu.com (out-35.mta0.migadu.com [91.218.175.35])
+Received: from mta1.migadu.com (out-117.mta1.migadu.com [95.215.58.117])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1507B469823
-	for <kvmarm@lists.linux.dev>; Fri,  9 Oct 2026 06:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E7113E40E9
+	for <kvmarm@lists.linux.dev>; Fri,  9 Oct 2026 07:11:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.117
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791528382; cv=none; b=rADVUfEoHnK9SuNjZs3b5vBrQ6GDSdo0r3QR5Bc/vHzufq9yK38gNAEB2F3y6xj6x23gQuKNCa7emqNb82T7o7QlUSvLneoOBcp1JZAw8y4PeV8AGsmvQieSFrU40tyLvsdIE/hkAZaONeBtqITqHlsS8YrYjajuVfWV/4g2QUc=
+	t=1791529896; cv=none; b=tW1sAtiyK1LQ3SCop3JiBbFpSv/6Q95ToggvRmD+FgFFISvHzmRiDHhCU4ZyGIazy2j4kWNug+R2Qji6le6wVitOzeG+1oyspBROlVZIlm7UbLO4XPtBsjdSARoNHCiDeo1fgd4hQ1zfI4R96/UdfsIvN8dP01am0J2N6yuOZsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791528382; c=relaxed/simple;
-	bh=qkbJzcmqDeieYoXJhEk/nB3qFlnGDMJI9zS6yIH7Up8=;
+	s=arc-20240116; t=1791529896; c=relaxed/simple;
+	bh=+3BT92sWytCvb3pLA/EXvyVT90nOy1CuxYDMO7Gq48Y=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hEjeTqRYo6kL43mCllyXg/xG4AxVkknMJzxRzjwltFn2QLCaZNG27XJ+4v3IRfCq5crmbdu0LVlBKk0j5nI5XTSYtaM87BPLLBZ+Io6g0OVh0mFCc4SvkyhxawLnuXmZ6Pa+oeQsT6XBFI0Tlp/HBvBQTrCXVVtiBY+iPRlWolU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=V8IEyIS3; arc=none smtp.client-ip=91.218.175.35
+	 To:Cc:Content-Type; b=G/XWYV9tDsk2fgXETbsvhJ0OdC3Ub9OAU3olTgks3xjLQzTFpsp7DYnQUQd1NFxziJfgyPSzU/pr6HEtix/V/iZrveXClwPBRmrmWON9pCFDP0XXenn4VJc+3XY+ViJXDn40Pbk4EuDwoUrFGJeOEZ2EPg+/zVJhRcnbRTc/ysY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sp82+7GS; arc=none smtp.client-ip=95.215.58.117
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="V8IEyIS3"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sp82+7GS"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=qkbJzcmqDeieYoXJhEk/nB3qFlnGDMJI9zS6yIH7Up8=;
+DKIM-Signature: a=rsa-sha256; bh=+3BT92sWytCvb3pLA/EXvyVT90nOy1CuxYDMO7Gq48Y=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1791528379; v=1; x=1792133179;
- b=V8IEyIS3s+YgzOthG5qGJA6R57YE8pq9XYBJuOeb+2UPEL8Tefsb8Q0Lqr/WEdpFbmbEam7y
- vNXDKoc6R1Fpt3UtIy0wG5rTrR1zQuKuHJBKwO+AVEH7AiyZK1/ObTDjTvXeDm/i9yLnVGQU/Av
- V21qhwwi/qFlWgBGWF4iGPKo=
+ t=1791529893; v=1; x=1792134693;
+ b=sp82+7GSHjgJuebi9o/DJLZ313HlD155t9ooWU7R9gmePwhg8tENw15eZg5fC0hVgDn5I5mk
+ YauXmPuUBoTePDBBAisy4m8J3NcUxZsai6ImFIltOHmkOVlbOnHM3GONDlfX0Tt96F3ml+sQnqg
+ XJbHyq5pnG4fcTbVHJPyLQ0c=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 00d2ae1cc462cca1;
-	Fri, 09 Oct 2026 06:46:19 +0000
-X-Mizu-Trace-ID: 00d2ae1cc462cca1
+Received: by smtp.migadu.com with ESMTPS id e352405b78ec7728;
+	Fri, 09 Oct 2026 07:11:32 +0000
+X-Mizu-Trace-ID: e352405b78ec7728
 X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5bcc04c71f5so5097e87.0
-        for <kvmarm@lists.linux.dev>; Thu, 08 Oct 2026 23:46:18 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwGhzBG1SuU7P5doXFwFdUBI+vwGvOFHO9B8FMs2SYDGBRArmvkFoVx4eoNa0RGUvghHoNO7uw=@lists.linux.dev
-X-Gm-Message-State: AFq9FYJqapWekbjlCqgqsvqcCPkg4y0pCuG4p8Kv3AteYTedbSYOIvG1
-	ZzVqFKqbtjuUnAhs6hEEHnJssIB0MtzV7AgVyp/ir80i2Q3ri2A0QMmJnR18r31hQcdBOy4RqYH
-	2OFditYqGt7Y5NGTA99NcVw+8/G1FNU31+nTDHAun
-X-Received: by 2002:a05:6512:6d3:b0:5bc:44d4:ab49 with SMTP id
- 2adb3069b0e04-5bcdf93c5d4mr38548e87.13.1791528378033; Thu, 08 Oct 2026
- 23:46:18 -0700 (PDT)
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5ba429b64c5so4711e87.1
+        for <kvmarm@lists.linux.dev>; Fri, 09 Oct 2026 00:11:32 -0700 (PDT)
+X-Gm-Message-State: AFq9FYJBMsedA2ibp/INi4z1jTr9NKNx7EFo0DN16U0DbEhUDlGyiCzm
+	7VbBOhAPFoxbbA52v09PpWpe72KQhLgpvt6ta8cQCbcKlfk03s+BTQr5FyVSYbEgcEv7rEIHd9v
+	c7lRmKC59X2cXT4kLmxqLZSHR3d1Q+xPcNS902Nt+
+X-Received: by 2002:a05:6512:1194:b0:5b1:5141:9156 with SMTP id
+ 2adb3069b0e04-5bcdf948dc0mr43820e87.9.1791529891928; Fri, 09 Oct 2026
+ 00:11:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260929093548.3598547-1-maz@kernel.org> <CA+EHjTybnn2jgVKxCO0WXdGXWJ-=2p4k98CHfh3CrhJopvPDFQ@mail.gmail.com>
- <asf87i2RDh-WksL-@kernel.org>
-In-Reply-To: <asf87i2RDh-WksL-@kernel.org>
+References: <20260831192406.1341841-1-fuad.tabba@linux.dev>
+In-Reply-To: <20260831192406.1341841-1-fuad.tabba@linux.dev>
 From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Fri, 9 Oct 2026 07:45:41 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTwbhhFipHyi5kL3j6oPxqEO4mVP3BCrtg18iWaFFGiNfw@mail.gmail.com>
-X-Gm-Features: AclHuK_nku16xs9azzExlIZ7VItoqo2nur27jo7qgAEiOQl6n1JVILRZZg7lbSQ
-Message-ID: <CA+EHjTwbhhFipHyi5kL3j6oPxqEO4mVP3BCrtg18iWaFFGiNfw@mail.gmail.com>
-Subject: Re: [PATCH v2 0/7] KVM: arm64: vgic-v3: Make LPI disabling robust
- (and more)
-To: Oliver Upton <oupton@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, Steffen Eiden <seiden@linux.ibm.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Yuchao Zhang <ndaugoing@gmail.com>
+Date: Fri, 9 Oct 2026 08:10:55 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTwBXEVp_fJp+SvXqrfab2NGdnCXy6L9n=aW2yeTUUOniQ@mail.gmail.com>
+X-Gm-Features: AclHuK9OgMQfIJ6sfKoLoA9wmDjNzBE48OI8X_B1wQUZOUjYO1IsWkWO-9TV2hY
+Message-ID: <CA+EHjTwBXEVp_fJp+SvXqrfab2NGdnCXy6L9n=aW2yeTUUOniQ@mail.gmail.com>
+Subject: Re: [PATCH kvmtool 0/5] Fix diagnostics and capability probes for
+ protected VMs
+To: kvm@vger.kernel.org
+Cc: kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>, 
+	Julien Thierry <julien.thierry.kdev@gmail.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Andre Przywara <andre.przywara@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Oliver,
+Hi Will,
 
-[...]
-> We could have vgic_target_oracle() return NULL if LPIs are disabled at the redistributor, then the rest of the AP list machinery will "just work" for injections that slip between the cracks.
-
-That would also cover a related one Sashiko raised:
-vgic_its_resolve_lpi() can cache a translation after
-vgic_its_invalidate_all_caches() has run, since the disable path
-doesn't take its_lock, but any MSI that hits that entry would then be
-dropped by the oracle. I'll write it up and send a patch on top of
-Marc's series.
+Gentle ping on this series. Marc has merged the pKVM core series into
+kvmarm/next, including the KVM_GET_ONE_REG -EPERM that patch 1
+handles, and all five patches have Suzuki's Reviewed-by.
 
 Cheers,
 /fuad
