@@ -1,109 +1,122 @@
-Received: from mta0.migadu.com (out-43.mta0.migadu.com [91.218.175.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF51144B690
-	for <kvmarm@lists.linux.dev>; Fri,  9 Oct 2026 12:06:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4388A42A152;
+	Fri,  9 Oct 2026 12:17:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791547614; cv=none; b=bEjuldIMJYEh0kwetA13yxEW0u9HsfHiiFoPFhPhH/gizGgf7kfx6dRqvRWRBdGPwszEDCqx3gZ+AT98h7JNtGPFJueR6KIhI/dVKdAz1vSXY+L6UajRigI33zMVDCqVP14F3JS6Z5+EGDMhWtf73etJzTtBv62YhO401S8SRIs=
+	t=1791548227; cv=none; b=dDKcTTS2SKPAMOOLfNcRjgpUWx1m8VZCnaSHDMAkSw9rPQmRAZGpVVkUG+3wKcOcq/6sb1/h3c9ophmTEsFkk5W0UfhWScWDwcFal+xF/5/UglhGXxjfW2NlcaJWCSqScn0nMYjX3hI2xCCz/C4P9i1fpAHyETBF5mF7j6gGRio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791547614; c=relaxed/simple;
-	bh=8QpueOoSu8dlWDzU2ovo4g2tq4XyDape3DzAzPS1hLg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WSOehvvo1045qvOkI9UjuUXpdvWGVFKVYY6BB5Ku5y2fZghtjmg/tP6IHZQJjat8cTiTYm+HoJ160v9aE8ucgOtgCEqL/vzndaN7P3ihhtz3J+/DQb6ZE7rakDts2v0pYJXl/OuL/XCct2YwcroWwDxG5IjHLkHqURukDTIXK8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=A1I2APRP; arc=none smtp.client-ip=91.218.175.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1791548227; c=relaxed/simple;
+	bh=kf9dg50ujd8CthO4zIArtdQ1S9/f19tZLRH75JxQSkE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KuvCsbXQKJ1bTlfIMNvzhLV4sPYEPns98JWbZYYCNBNnXTyLHs0q7yyiHbldMJcDLDGvlHVePzf5YeBC/El1mF3RQ7Mui2eO4f6n9GJQHZjv65k0aCkn5Fy4biACWAze6BM3VD3D/WjU3cdcYq38UY5RXX9oafDyKhZfLXxRPVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PL9IPTYq; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="A1I2APRP"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=8QpueOoSu8dlWDzU2ovo4g2tq4XyDape3DzAzPS1hLg=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1791547605; v=1; x=1792152405;
- b=A1I2APRPbUwzYbkokg4/FnN9pHlC1G6PsFDFd/eaEer6+l5TB0luJj3gzBD6PO0RY4cds/LY
- kwuF/1PBJLQ4rQKFXvvshZ9wOm4a8UXXl4jyh0QQyC218ptlUZ1oae3K3QfoQ6QfjQuNy8uoujg
- qEsIXhe2DlJZHWC3IfS1P4rM=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id a6b491e864cbd28e;
-	Fri, 09 Oct 2026 12:06:45 +0000
-X-Mizu-Trace-ID: a6b491e864cbd28e
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5bcc04c71f5so6870e87.0
-        for <kvmarm@lists.linux.dev>; Fri, 09 Oct 2026 05:06:42 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvByJoSYtCQJZLsRToAEf37uy90KGO/sce/KDkmyvOshx0kJvQN/WRIiC3Tdrmaxrdr+4eWEFeq4=@lists.linux.dev
-X-Gm-Message-State: AFq9FYIc1EohzCgnRDxdQhTtWNbsbydjGVU92IJO66rWMZR/jzhUeIp2
-	6ndBpNfLNsHeou3zNHj/8xHAJDCAUN81Vv/XVdROxI8RN3OVsuNaAe+mawkQ1CDpBrPL7+ih1aR
-	9OY5M0LPndyyCLoHGH//DCziURn9R2SXJ8wjFWHJU
-X-Received: by 2002:a05:6512:3dab:b0:5bc:b23c:f7e5 with SMTP id
- 2adb3069b0e04-5bcdf91d57emr82402e87.9.1791547601556; Fri, 09 Oct 2026
- 05:06:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PL9IPTYq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 834B91F000FF;
+	Fri,  9 Oct 2026 12:17:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791548220;
+	bh=6/A+on6QTcsynPBLF2wcK5YT384IqIK0ywry4fp4NAo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=PL9IPTYqlfvHL+IF9BEowQEj+uuzDibLKxsIj7RBMNCrBx/PdQkyBGqsi9P9NWrWf
+	 X68m6skXLFM4qKc18VNrF8rDSSacoinKTCYD15iSoBkKIbT/Q5n9exe2z42IvNKqON
+	 pXUKAtJmt82QV4EfJDDbNdJX+o4OeJrQG2S22PLdP17PyfptkVlWxlL04uanmVqasy
+	 0C9xFCZ4laTK1J6p10pWLJOzgQLQy64Te5n9pFKsg25loGY2K9vcqtY9wrDW6wR53M
+	 TfvExeqSQUPo1jXgoqfo+VOaGLHWtr9n/l31zaHyuncoJW1kQH1VuqyPm7kKHTy4xf
+	 oGwY+qx3CQy3A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xF9X0-00000000zPz-1ZsQ;
+	Fri, 09 Oct 2026 12:16:58 +0000
+Date: Fri, 09 Oct 2026 13:16:57 +0100
+Message-ID: <868q472hmu.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	steven.price@arm.com,
+	aneesh.kumar@kernel.org,
+	oupton@kernel.org,
+	gshan@redhat.com,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev,
+	gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com,
+	alpergun@google.com,
+	fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com,
+	lpieralisi@kernel.org,
+	enju.kohei@fujitsu.com,
+	sudeep.holla@arm.com,
+	jonathan.cameron@oss.qualcomm.com
+Subject: Re: [PATCH v23 14/14] KVM: arm64: Prevent unsupported vcpu features for VM types
+In-Reply-To: <CA+EHjTxZM2kEtsG7+pq7zygA8Mhwzai9PL7+ex1K35BPVSt6hQ@mail.gmail.com>
+References: <20261007073537.2454351-1-suzuki.poulose@arm.com>
+	<20261007073537.2454351-15-suzuki.poulose@arm.com>
+	<CA+EHjTx-niYPnnRDvAAiY3MXLpSYau_PhiBTCiE9mOYUChASPQ@mail.gmail.com>
+	<86a4on2qxz.wl-maz@kernel.org>
+	<CA+EHjTxZM2kEtsG7+pq7zygA8Mhwzai9PL7+ex1K35BPVSt6hQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20261009084529.462577-1-vdonnefort@google.com> <20261009084529.462577-3-vdonnefort@google.com>
-In-Reply-To: <20261009084529.462577-3-vdonnefort@google.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Fri, 9 Oct 2026 13:06:05 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTxzBBDpg3B9Lw47tMWMK+VCjpeEQDgYNKvLUnmUYVJVcA@mail.gmail.com>
-X-Gm-Features: AclHuK-OrizQjQ93TY0UAA_o6daR8H0aSQt1YkpepTx45oni65FNHe6Eup6oIrU
-Message-ID: <CA+EHjTxzBBDpg3B9Lw47tMWMK+VCjpeEQDgYNKvLUnmUYVJVcA@mail.gmail.com>
-Subject: Re: [PATCH v1 2/3] KVM: arm64: Add guest_hvc hyp event
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, 
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, 
-	qperret@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Vincent,
+On Fri, 09 Oct 2026 11:10:55 +0100,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Fri, 09 Oct 2026 09:55:52 +0100, Marc Zyngier <maz@kernel.org> wrote:
+> [...]
+> > A rebase would be a terrible idea. This thing *must* go on its own
+> > branch, and not depend on anything else.
+> >
+> > I can however fix things at merge time. is something like this what
+> > you had in mind? It compiles, and is therefore perfect...
+> 
+> Yes, that's what I had in mind, but please keep the PSCI 0.2 check
+> from kvm_vcpu_init_check_features():
+> 
+>         /* EL2 implements PSCI 1.1; the host must not dispatch as 0.1. */
+>         if (vcpu_is_protected(vcpu) &&
+>             !test_bit(KVM_ARM_VCPU_PSCI_0_2, &features))
+>                 return -EINVAL;
+> 
+> Folding the allowed set into the mask covers the rest of the block you
+> dropped, but a mask can only reject a feature, not require one.
+> Without the check a protected vCPU can init without PSCI_0_2, and the
+> host then dispatches the forwarded calls as PSCI 0.1, while EL2
+> returns 1.1 to the guest.
 
-On Fri, 09 Oct 2026 09:45:28 +0100, Vincent Donnefort
-<vdonnefort@google.com> wrote:
+I think eventually we will have to implement this stuff as a pair of
+masks on a backend basis: one for what is acceptable, one for what is
+mandatory.
 
-> Add a guest_hvc hypervisor trace event to log protected VM HVC call IDs,
-> return values, and whether the call was handled by the hypervisor.
+In the meantime, I'll fold the above hack in.
 
-nit: only the first return value is logged.
+Thanks,
 
-[...]
-> diff --git a/arch/arm64/include/asm/kvm_hypevents.h b/arch/arm64/include/asm/kvm_hypevents.h
+	M.
 
-[...]
-> +HYP_EVENT(guest_hvc,
-> +        HE_PROTO(u32 id, u64 val, u8 handled),
-> +        HE_STRUCT(
-> +                he_field(u8, handled)
-> +                he_field(u32, id)
-> +                he_field(u64, val)
-> +        ),
-
-remote_event_format_show() doesn't align the field offsets, so the
-format file puts id at 3 and val at 7 instead of 4 and 8. hyp_enter's
-vcpu is already off the same way, so should this be a separate fix in
-trace_remote.c, with ALIGN(offset, field->align)?
-
-[...]
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-
-[...]
-> @@ -1183,5 +1185,8 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
->
->          if (handled)
->                  smccc_set_retval(vcpu, val[0], val[1], val[2], val[3]);
-> +
-> +        trace_guest_hvc(fn, val[0], handled);
-> +
->          return handled;
-
-When handled is false, val[0] is the SMCCC_RET_INVALID_PARAMETER
-initialiser, which the guest never gets. For example, a MEM_SHARE
-forwarded to the host logs "id=0xc6000003 val=0xfffffffffffffffd
-handled=0". Could this log 0 in that case?
-
-Cheers,
-/fuad
+-- 
+Without deviation from the norm, progress is not possible.
