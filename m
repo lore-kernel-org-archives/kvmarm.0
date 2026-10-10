@@ -1,118 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA3F33EB10;
-	Sat, 10 Oct 2026 09:19:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C12E843E4BB;
+	Sat, 10 Oct 2026 09:44:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791623952; cv=none; b=ki163UGo6Fw7ihgg/MaaZAb2+2/PM22wocFjBLs6o9lsBAcO5BhUohShF69Sv0KZ/gtPns02CRGT4mnW/337BdUNJ9vyPHks4W2CVoMhOQ7hnr0bPB8XXCyWQSq3cF+SMbY9iXeUCRLs7zMV76bXBN4ehWdXuey9GSD6yppIjY0=
+	t=1791625470; cv=none; b=D3MJePniNmyxnSI2ZjJ2LiZw0W1/t02Fm1Pi78r7EosiZa0gp9BT73O7sEWRzK2eGBNJMgUqvZgE/MY7Sh6cXa89o5klIcTO4sZxNBaLOCME9Eg+w5h7Inu6Og41Jq474YoC2YT3+HyGAv+3nndDv/Liwbhkgy7OtWqA/n3yTN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791623952; c=relaxed/simple;
-	bh=xJWOuAfcQ5pH23EefrBgictiwLlfihQDSTjnoO+K1HM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NOP4nMzTSNqgwOuUEkMcEarJJCqoRzHqpPHeeRM+L1b7/LYqkinqYRe2Uwql64V/X+2P2ICbjoi8pgX57+j51aax5DmNGUIG5zrWSX0diXXS+007x0iOisuPvwzry9AiWB1O+mrWfgtuObCjo6V8ub4kX/EMjUfme4jwuvZO7Yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q9nfPoD3; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791625470; c=relaxed/simple;
+	bh=xSrGiPagtnpCy4QbngWDcah0WpHU1UjhcJFdf8wVURY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DmyS6tv0700ykSvQz9JGOE7cB82FNZowT5cm8Gi6SkpdL/UATSx25rGcB+JyDDRuHL6pzHJa0e4NZBDHoowhNonqB57o4WTpM+kDp2gJLwKbpChJE8WOPXD98kNxofgaIgADMxA2E//s6gmIANmKn6yV9cqMxtGyW+eWbDAWuyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=nMSWOd9Z; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q9nfPoD3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 530151F000FF;
-	Sat, 10 Oct 2026 09:19:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791623950;
-	bh=D4+Af9krnXG1FyhekW6iYE8+UMidk+F4PGKFcs/h4no=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Q9nfPoD3r0DN+zYl9hJGdoxzF+vQaPfP2sWcCXS3tjgtErSXq5ULXDJaNx3eg9SyG
-	 8oCobmGKCekdNmes0FH0zVEuQL1zRiEqLU6d8psZDuppz0ldsQ8dEIhc0bjKYK8RDm
-	 ejcrgaDOim3ulP9XsAy+piqwKQ7fBM8BwAbBwzDQT6YUni84MUec4lgKoY9CBtYot6
-	 sO7yUEuLGYCMsxFekTAveHnDSNLRATspHd6/bo4lHFMBT+kOsSC4KPOXI+6jA/EfM5
-	 OuTHp5rJ/sbc8p0h6NrGxye9ng7NkFAgYGB8l/M+tDAnk35WXrCOqeJ3/JVDOhTwlU
-	 S0hie+wH93mCA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xFTER-00000001JUf-3yLq;
-	Sat, 10 Oct 2026 09:19:08 +0000
-Date: Sat, 10 Oct 2026 10:19:07 +0100
-Message-ID: <865wz93oc4.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	steven.price@arm.com,
-	aneesh.kumar@kernel.org,
-	oupton@kernel.org,
-	gshan@redhat.com,
-	joey.gouly@arm.com,
-	yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev,
-	gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com,
-	alpergun@google.com,
-	fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com,
-	lpieralisi@kernel.org,
-	enju.kohei@fujitsu.com,
-	jonathan.cameron@oss.qualcomm.com,
-	Sudeep Holla <sudeep.holla@kernel.org>
-Subject: Re: [PATCH v23 00/14] KVM: arm64: CCA: Add basic plumbing for Realms
-In-Reply-To: <CA+EHjTymHEqCJco+d_yy33ndqPPsoZARhOQZ5A0Zwc5N3SV4Qg@mail.gmail.com>
-References: <20261007073537.2454351-1-suzuki.poulose@arm.com>
-	<179155224299.829527.1733164520192309991.b4-ty@b4>
-	<CA+EHjTymHEqCJco+d_yy33ndqPPsoZARhOQZ5A0Zwc5N3SV4Qg@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="nMSWOd9Z"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 92F691FC7;
+	Sat, 10 Oct 2026 02:44:23 -0700 (PDT)
+Received: from [10.57.13.91] (unknown [10.57.13.91])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C318F3F882;
+	Sat, 10 Oct 2026 02:44:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1791625466; bh=xSrGiPagtnpCy4QbngWDcah0WpHU1UjhcJFdf8wVURY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=nMSWOd9ZAvrx7KVY2EuJHRjAwqDOMCaH5ffSd5GgWZfentbnhQhih3r/UmBO/kkvx
+	 w1MbhygHPrXdoV6rvl7tZ0zphsO5KlyBvRv5yH+ibtR5InA9haGeBs614DUhRJPyRu
+	 CEtNgeRb8wmw5ws78bwLAlArcsC0aLo/aAHUeKwk=
+Message-ID: <80155c78-1cf2-4060-a874-c487ff9fee38@arm.com>
+Date: Sat, 10 Oct 2026 10:44:22 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, suzuki.poulose@arm.com, will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com, jonathan.cameron@oss.qualcomm.com, sudeep.holla@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v23 00/14] KVM: arm64: CCA: Add basic plumbing for Realms
+Content-Language: en-GB
+To: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev,
+ gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com,
+ alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com,
+ lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+ jonathan.cameron@oss.qualcomm.com, Fuad Tabba <fuad.tabba@linux.dev>,
+ Sudeep Holla <sudeep.holla@kernel.org>
+References: <20261007073537.2454351-1-suzuki.poulose@arm.com>
+ <179155224299.829527.1733164520192309991.b4-ty@b4>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <179155224299.829527.1733164520192309991.b4-ty@b4>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, 09 Oct 2026 15:20:44 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
+On 09/10/2026 14:28, Marc Zyngier wrote:
+> On Wed, 07 Oct 2026 08:35:23 +0100, Suzuki K Poulose wrote:
+>> This is a trimmed down and updated version of the v22 of Arm CCA basic
+>> plumbing series [0]. I have dropped the CCA specific bits for the sake keeping
+>> them separate. This series now only contains the framework for handling
+>> different VM types and lay down the path for adding Realm as one of the
+>> protected VMs. The full support for running Realms under KVM is available as
+>> an integration branch at [1].
+>>
+>> [...]
 > 
-> Hi Marc,
+> Applied to next, thanks!
 > 
-> On Fri, 09 Oct 2026 14:28:03 +0100, Marc Zyngier <maz@kernel.org> wrote:
-> [...]
-> > Of course, mmu.c is where the crap happens, so anyone with any interest
-> > in this stuff being halfway sane, please review the conflict resolution.
+> [01/14] KVM: arm64: protected VM: Handle user writes to CNTVCT_EL0/CNTPCT_EL0
+>          commit: 3d736a339e9cbeec3841da1a821f56fb3230fd68
+> [03/14] KVM: arm64: Include kvm_emulate.h in kvm/arm_psci.h
+>          commit: 22adb9c3543cc702516c18f0a28e3a8dfcdbeecc
+> [04/14] KVM: arm64: Avoid including linux/kvm_host.h in kvm_pgtable.h
+>          commit: 0c4063f89bfdf204112651f45620ef0c5a691e6b
+> [05/14] KVM: arm64: Track the type of VM in kvm_arch
+>          commit: 762ad274c03a13686192d75ef9a354b96114b503
+> [06/14] KVM: arm64: Don't call vcpu_set_pauth_traps for pKVM host
+>          commit: 42a4026b435e49af4d5eaae58afe7103ca740c30
+> [07/14] KVM: arm64: Refactor the vcpu_load to allow for VM specific callbacks
+>          commit: 8252f74f9188b9148ec93438e53b8e1b865ffb7b
+> [08/14] KVM: arm64: Add vcpu load/put call backs for flavors
+>          commit: 0cb16544ccaceba4c5e8beb2e8ae896278dcf018
+> [09/14] KVM: arm64: Consolidate stage2 unmap range into kvm_stage2_unmap_range
+>          commit: fb3926af9d0d5e2e2f58a1f4b2252f529fbe23bf
+> [10/14] KVM: arm64: Add VM specific callback for S2 MMU operations
+>          commit: 68933203edddc092b30dd1039167b3262a40a326
+> [11/14] KVM: arm64: Use a local kvm pointer in kvm_handle_guest_abort()
+>          commit: 4ee1b583589781bfd47b28da3ce216b2fb51dac5
+> [12/14] KVM: arm64: Abstract out memory abort handling
+>          commit: b44a8c32f0116aba0a934c3068628bacda3cd3a3
+> [13/14] KVM: arm64: Mandate VGIC v3 for pKVM VMs and Realms
+>          commit: 37d7ea3f81bbe61f1e895b6c87decadbfe8799eb
+> [14/14] KVM: arm64: Prevent unsupported vcpu features for VM types
+>          commit: a467f39afc2a149f9f5efbb7238fb531ade8a86e
 > 
-> I went through the mmu.c resolution and it looks good to me. Unmap and
-> aging are still no-ops for protected VMs, their abort handler is
-> unchanged, and the default op keeps the tracked unmap for nested MMUs.
-> Two minor things you might want to tidy up.
+> FWIW: I've dropped patch #2, which was a duplicate of an equivalent pKVM
+> change, kept patch #13 (we can simplify things down the line), and hacked
+> the patch #14 merge so that we don't have to describe things twice.
 > 
-> kvm_vm_stage2_unmap_range() repeats the lockdep_assert_held_write()
-> and WARN_ON(size & ~PAGE_MASK) that kvm_stage2_unmap_range() already
-> does before calling the op.
-> 
-> The VM_WARN_ON_ONCE() in kvm_vm_mem_abort() reads the ESR from the
-> vcpu again, where next had moved these checks to s2fd->esr. It's the
-> same result today, since the only caller handles a real abort, but
-> this (and dropping the vcpu local) would keep it in line with the
-> rest:
-> 
->         VM_WARN_ON_ONCE(kvm_s2_fault_is_perm(s2fd) &&
->                         !esr_abt_is_write_fault(s2fd->esr) &&
->                         !kvm_s2_fault_is_exec(s2fd));
+> Of course, mmu.c is where the crap happens, so anyone with any interest
+> in this stuff being halfway sane, please review the conflict resolution.
 
-Thanks for looking. I've now applied this to the merge resolution.
+Thanks Marc ! Apart from what Fuad reported, the plumbing bits look good
+to me.
 
-Cheers,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Cheers
+Suzuki
