@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D36376475
-	for <kvmarm@lists.linux.dev>; Sat, 10 Oct 2026 13:39:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686DB3C0A07
+	for <kvmarm@lists.linux.dev>; Sat, 10 Oct 2026 13:39:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791639592; cv=none; b=BQZH6eENZcxF4abTo3mjQY6MBizjaO/eX1dluNBL/KxUfh/KUPSD4TtGkNwX5MiVzIdVkLATviK6fdse6+Ibat5lQ3rhu+2JGRLXKpT3D1y3fmvvut278ikqEEZtIR2XCb+eXFtoHA8m+CJEqv/F5/UnAgE27bL1/r42TFnh4xQ=
+	t=1791639597; cv=none; b=OIlE3+OF7EbdlUAWBvcNNMn5iAu1eM5T39/hEn0n7Kp9jO+xzlUkIZBud/O64GgTRe511z6gBQHqZQsIwBunke5uebL5INkgbRMR8Xyid/J8dWh64Q5pV0h40ymBnE22ypdANogVtfOjysYTd0ngffYEnAdu+YC4gZpbozMXKF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791639592; c=relaxed/simple;
-	bh=N0AtkHNr09n0/9HSvX07TLditCqNDHCXOldbNhDhkss=;
+	s=arc-20240116; t=1791639597; c=relaxed/simple;
+	bh=9Y6XB8RP9vVk99VeNTKazmAGD2zCYQaoP8zfrFlBws0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:content-type; b=Ic8XN0mlCWpo9wGHYoNFZArcaWzmUw7LFV54zXa8Q5opbrkhGyTFSedRJI4orYunnX5Rs8nrCmGRsLUWdmv9HfaQkp0EoRId1FYqc2cDcY9r+qeThaqJaM5FooRv+9qR5RlR5mQv+gannteLzwsjU9tcjAGfXuoeUHbgLUTt84s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UsoEnPnk; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:content-type; b=mYGtyfclMK8jhWD8vu6nauOqh3reVVCp+hfwaqtlZySSmOKN3dk/bP0ZUoYOqyeaOqbfVKaW7XaQmABMNbneQKK/0YWck6ixwSBqBDdD5DHIEH7GNYcXXDfm08XjLYNNHX+QS4a2tBnL4MdnMaMUnYAzr3M0wPxKZPozsR1YsdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KeGm0v8A; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UsoEnPnk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KeGm0v8A"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1791639590;
+	s=mimecast20190719; t=1791639595;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=EbqisRaIUe/W7PEZdi6C4FJJ74syA8YTjrnLe5iUXKw=;
-	b=UsoEnPnkPATYWB8hLCpLjeaO9WtQhgMEabD6RV20zRgWkY5ptbcicqelTUTzInpgFpOe1w
-	pG+R2yGLlVgLetHnAXykYTWMWWxbMJl1bfYo0sKAF/qgmKm1ULG5AtphFbkbSiDPc1+kul
-	e+O91k2tKAJUYLFNX05snYnxBjqBwJ0=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=eHlmM2OW8vBgTNNqS2W/Lyj0mc71XENMhVWORgeokPc=;
+	b=KeGm0v8Am9Idymk6wT+O/SqFnt1yHVV2AwtkcbJ/W2fqHUKx71J9O5PeYL2sqlTwkTnmsr
+	nDUibBg8m/Fpvp79I7xcfJfBFHmsij2Ujdb8ZWACz/z0ngo9In9zRb2cq+nBBGPGjBF4rd
+	FsbWPhTSU8+MQrA6PgtF3lJy6kZhxxg=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-335-YyMV1p93OGu2Gdk2UjROhw-1; Sat,
- 10 Oct 2026 13:39:45 +0000
-X-MC-Unique: YyMV1p93OGu2Gdk2UjROhw-1
-X-Mimecast-MFC-AGG-ID: YyMV1p93OGu2Gdk2UjROhw_1791639584
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-68-eklHFRvkPgWBpJ2ToJv5QA-1; Sat,
+ 10 Oct 2026 13:39:51 +0000
+X-MC-Unique: eklHFRvkPgWBpJ2ToJv5QA-1
+X-Mimecast-MFC-AGG-ID: eklHFRvkPgWBpJ2ToJv5QA_1791639589
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1D911195DE58;
-	Sat, 10 Oct 2026 13:39:44 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 00B931944B22;
+	Sat, 10 Oct 2026 13:39:49 +0000 (UTC)
 Received: from laptop.redhat.corp (headnet03.pony-001.prod.iad2.dc.redhat.com [10.2.32.114])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 462FE30000E5;
-	Sat, 10 Oct 2026 13:39:35 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7850630000E5;
+	Sat, 10 Oct 2026 13:39:44 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com,
 	eric.auger@redhat.com,
@@ -64,9 +64,9 @@ Cc: maz@kernel.org,
 	berrange@redhat.com,
 	abologna@redhat.com,
 	jdenemar@redhat.com
-Subject: [PATCH v10 25/26] arm-qmp-cmds: introspection for ID register props
-Date: Sat, 10 Oct 2026 15:36:29 +0200
-Message-ID: <20261010133725.642498-26-eric.auger@redhat.com>
+Subject: [PATCH v10 26/26] arm/cpu-features: Document ID reg properties
+Date: Sat, 10 Oct 2026 15:36:30 +0200
+Message-ID: <20261010133725.642498-27-eric.auger@redhat.com>
 In-Reply-To: <20261010133725.642498-1-eric.auger@redhat.com>
 References: <20261010133725.642498-1-eric.auger@redhat.com>
 Precedence: bulk
@@ -76,272 +76,176 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Mimecast-MFC-PROC-ID: ubzZVwkpokCBI1grYs54GxOdzKRyVM6hYmfUrcTHB2U_1791639584
+X-Mimecast-MFC-PROC-ID: p6QyMZlrzoTxceE3qmVzGYJaIJDh1HuWLjF_s-8i2Ns_1791639589
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 content-type: text/plain; charset="US-ASCII"; x-default=true
 
 From: Cornelia Huck <cohuck@redhat.com>
 
-Enhance the current host model query-cpu-model-expansion with the
-capability to return SYSREG_* options and also test possible
-values.
-
-If no SYSREG prop is set, query-cpu-model-expansion returns the
-default host values for all SYSREG properties. They are extracted
-from a scratch vcpu featuring all the KVM advertised capabilities.
-
-Here is a qmp-shell example:
-
-(QEMU) query-cpu-model-expansion type=full model={"name":"host"}
-{"return": {"model": {"name": "host", "props": {"SYSREG_ID_AA64PFR0_EL1_EL3": 1,
-"SYSREG_ID_AA64ISAR2_EL1_CLRBHB": 0, "SYSREG_CTR_EL0_L1Ip": 3,
-"SYSREG_MIDR_EL1_PartNum": 3407, "SYSREG_CTR_EL0_DminLine": 4,
-"SYSREG_ID_AA64MMFR0_EL1_PARange": 5, "SYSREG_ID_AA64MMFR1_EL1_ECBHB": 0
-../..
-
-It becomes also possible to test new SYSREG property values.
-
-With Full expansion of the host model, the SYSREG props are tested
-against a scratch vcpu. With static expansion, no check is performed
-against KVM but only against qemu code (the value does not exceed the
-field size and if the field is associated to enum values, the set
-value belongs to the list of arch enum values.
-
-Examples
-(QEMU) query-cpu-model-expansion type=full model={"name":"host","props":{"SYSREG_ID_AA64ISAR0_EL1_DP":0x13}}
-{"error": {"class": "GenericError", "desc": "idreg SYSREG_ID_AA64ISAR0_EL1_DP set value (0x13) exceeds length of field (4)!"}}
-
-(QEMU) query-cpu-model-expansion type=full model={"name":"host","props":{"SYSREG_ID_AA64ISAR0_EL1_DP":0x2}}
-{"error": {"class": "GenericError", "desc": "idreg SYSREG_ID_AA64ISAR0_EL1_DP set value (0x2) does not match any arch valid enum value!"}}
+Add some documentation for how individual ID registers can be
+configured with the host cpu model.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 
 ---
 
-v9 -> v10:
-- use new proto for kvm_arm_create_init_scratch_vcpu, rework error path
-  and fix visit_type_uint64 call
-
-v8 -> v9:
-- fix the leak reported by Khushit
-- implement static mode for host
-
-v7 -> v8:
-- do not check if the prop exists (this is checked elsewhere with a
-  different error message)
-- clarify that examples given in the commit msg are based on qmp-shell
-
-v5 -> v6:
-- add the write capability
+9 -> 10:
+- document the fact some props may be willingly hidden because they
+  conflict with legacy composite options
+- mention max model too
 ---
- target/arm/arm-qmp-cmds.c | 130 ++++++++++++++++++++++++++++++++++----
- 1 file changed, 118 insertions(+), 12 deletions(-)
+ docs/system/arm/cpu-features.rst | 111 ++++++++++++++++++++++++++++---
+ 1 file changed, 102 insertions(+), 9 deletions(-)
 
-diff --git a/target/arm/arm-qmp-cmds.c b/target/arm/arm-qmp-cmds.c
-index 83ec95c290..2765594c68 100644
---- a/target/arm/arm-qmp-cmds.c
-+++ b/target/arm/arm-qmp-cmds.c
-@@ -21,6 +21,7 @@
-  */
+diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
+index 10b0eff27e..13454783cf 100644
+--- a/docs/system/arm/cpu-features.rst
++++ b/docs/system/arm/cpu-features.rst
+@@ -2,8 +2,11 @@ Arm CPU Features
+ ================
  
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qemu/target-info.h"
- #include "hw/core/boards.h"
- #include "kvm_arm.h"
-@@ -30,6 +31,7 @@
- #include "qapi/qapi-commands-machine.h"
- #include "qapi/qapi-commands-misc-arm.h"
- #include "qobject/qdict.h"
-+#include "qobject/qnum.h"
- #include "qom/qom-qobject.h"
- #include "cpu.h"
+ CPU features are optional features that a CPU of supporting type may
+-choose to implement or not.  In QEMU, optional CPU features have
+-corresponding boolean CPU proprieties that, when enabled, indicate
++choose to implement or not.  QEMU provides two different mechanisms
++to configure those features:
++
++1. For most CPU models, optional CPU features may have
++corresponding boolean CPU properties that, when enabled, indicate
+ that the feature is implemented, and, conversely, when disabled,
+ indicate that it is not implemented. An example of an Arm CPU feature
+ is the Performance Monitoring Unit (PMU).  CPU types such as the
+@@ -31,6 +34,34 @@ running guests in AArch32.
+ CPU features that are inherently specific to KVM are
+ prefixed with "kvm-" and are described in "KVM VCPU Features".
  
-@@ -83,15 +85,24 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
-                                                      CpuModelInfo *model,
-                                                      Error **errp)
- {
-+    bool use_scratch_vcpu = kvm_enabled() && type == CPU_MODEL_EXPANSION_TYPE_FULL;
-     CpuModelExpansionInfo *expansion_info;
-+    ObjectPropertyIterator iter;
-     const QDict *qdict_in;
-+    ObjectProperty *idregprop;
-     QDict *qdict_out;
-     ObjectClass *oc;
-     Object *obj;
-+    Visitor *visitor = NULL;
-+    Error *err = NULL;
-+    bool scratch_created = false;
-     const char *name;
-+    int fdarray[3];
-+    int fd = -1;
-     int i;
++2. Additionally, the ``host`` and ``max`` CPU models on KVM allow
++overwriting a subset of the ID register fields. Not all ID register
++fields are writable: this depends on the host. For those which are
++writable, and for those only, these models expose
++``SYSREG_<IDREG>_<FIELD>`` properties. IDREG and FIELD names are those
++used in the ARM Architecture Reference Manual. QEMU may still omit some
++writable fields that conflict with legacy composite options (for example
++EL3/secure, MTE, SVE, or pauth).
++
++Values set with those properties override the initial values retrieved
++from the vCPU after legacy composite property settings (``sve``,
++``pauth``, ...) have been applied, whether at machine level or at vCPU
++level.
++
++``SYSREG_<IDREG>_<FIELD>`` properties are applied at the end of the chain
++and do not substitute for legacy composite options. In other words, if
++you want to use pauth, you still need to set ``pauth=on``. Indeed legacy
++options do more than exposing a different value for ID registers. They
++may also interact with KVM to prepare the vCPU for this feature (for
++instance at vCPU init time). Whereas ``SYSREG_<IDREG>_<FIELD>`` properties
++only change the final value of the ID register. Inconsistent settings
++between legacy composite options (at machine level or CPU level) which
++impact the vCPU and low-level ``SYSREG_<IDREG>_<FIELD>`` properties are
++rejected. ``SYSREG_<IDREG>_<FIELD>`` properties are essentially used to
++tune the ``host``/``max`` vCPU model so that it allows migration between
++different hardware.
++
++
+ CPU Feature Probing
+ ===================
  
--    if (type != CPU_MODEL_EXPANSION_TYPE_FULL) {
-+    /* we support static expansion for host model only */
-+    if (type != CPU_MODEL_EXPANSION_TYPE_FULL && strcmp(model->name, "host")) {
-         error_setg(errp, "The requested expansion type is not supported");
-         return NULL;
-     }
-@@ -134,9 +145,6 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
-     obj = object_new(object_class_get_name(oc));
+@@ -126,13 +157,21 @@ A note about CPU models and KVM
  
-     if (model->props) {
--        Visitor *visitor;
--        Error *err = NULL;
--
-         visitor = qobject_input_visitor_new(model->props);
-         if (!visit_start_struct(visitor, "model.props", NULL, 0, errp)) {
-             visit_free(visitor);
-@@ -146,6 +154,8 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
+ Named CPU models generally do not work with KVM.  There are a few cases
+ that do work, e.g. using the named CPU model ``cortex-a57`` with KVM on a
+-seattle host, but mostly if KVM is enabled the ``host`` CPU type must be
+-used.  This means the guest is provided all the same CPU features as the
+-host CPU type has.  And, for this reason, the ``host`` CPU type should
+-enable all CPU features that the host has by default.  Indeed it's even
+-a bit strange to allow disabling CPU features that the host has when using
+-the ``host`` CPU type, but in the absence of CPU models it's the best we can
+-do if we want to launch guests without all the host's CPU features enabled.
++seattle host, but mostly if KVM is enabled, the ``host`` CPU model must be
++used.
++
++Using the ``host`` type means the guest is provided all the same CPU
++features as the host CPU type has.  And, for this reason, the ``host``
++CPU type should enable all CPU features that the host has by default.
++
++In case some features need to be tuned for the guest, and the host kernel
++supports it, the ``host`` and ``max`` models can be instructed to change
++individual ID register field values. This is especially useful for
++migration purposes.
++However, this interface will not allow configuring an arbitrary set of
++features; the ID registers must describe a subset of the host's features,
++and all differences to the host's configuration must actually be supported
++by the kernel to be deconfigured.
  
-         qdict_in = qobject_to(QDict, model->props);
-         i = 0;
-+
-+        /* Test legacy composite option settings */
-         while ((name = cpu_model_advertised_features[i++]) != NULL) {
-             if (qdict_get(qdict_in, name)) {
-                 if (!object_property_set(obj, name, visitor, &err)) {
-@@ -154,19 +164,89 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
-             }
-         }
+ Enabling KVM also affects the ``query-cpu-model-expansion`` QMP command.  The
+ affect is not only limited to specific features, as pointed out in example
+@@ -169,6 +208,15 @@ disabling many SVE vector lengths would be quite verbose, the ``sve<N>`` CPU
+ properties have special semantics (see "SVE CPU Property Parsing
+ Semantics").
  
--        if (!err) {
--            visit_check_struct(visitor, &err);
--        }
-         if (!err) {
-             arm_cpu_finalize_features(ARM_CPU(obj), &err);
-         }
-+        if (err) {
-+            goto bail_out;
-+        }
++Additionally, if supported by KVM on the host kernel, the ``host`` and
++``max`` CPU models may be configured via individual ID register field
++properties, for example::
 +
-+        /**
-+         * Test SYSREG option settings
-+         * In full mode, build a scratch vcpu that reflects composite legacy
-+         * options
-+         */
-+        if (use_scratch_vcpu) {
-+            Error *local_err = NULL;
-+            bool has_virt = object_property_get_bool(OBJECT(current_machine),
-+                                                     "virtualization",
-+                                                     &local_err);
++  $ qemu-system-aarch64 -M virt -cpu host,SYSREG_ID_AA64ISAR0_EL1_DP=0x0
 +
-+            if (local_err) {
-+                error_free(local_err); /* the machine property does not exist */
-+            } else {
-+                if (!has_virt && object_property_find(obj, "has_el2")) {
-+                    object_property_set_bool(obj, "has_el2", false, NULL);
-+                }
-+            }
-+            fd = kvm_arm_create_init_scratch_vcpu(ARM_CPU(obj), fdarray, errp);
-+            if (fd < 0) {
-+                goto bail_out;
-+            }
-+            scratch_created = true;
-+        }
++This forces ID_AA64ISAR0_EL1 DP field to 0. The same property syntax works
++with ``-cpu max``.
 +
-+        qdict_in = qobject_to(QDict, model->props);
-+        for (const QDictEntry *entry = qdict_first(qdict_in);
-+                 entry != NULL; entry = qdict_next(qdict_in, entry)) {
-+            const char *key = qdict_entry_key(entry);
-+            QObject *val_obj = qdict_entry_value(entry);
-+            ObjectProperty *prop;
-+            Visitor *v;
-+            uint64_t val;
-+
-+            if (!g_str_has_prefix(key, "SYSREG_")) {
-+                continue;
-+            }
-+
-+            prop = object_property_find(obj, key);
-+
-+            /* consume the prop to avoid unexpected parameter */
-+            if (!visit_type_uint64(visitor, key, &val, errp)) {
-+                goto bail_out;
-+            }
-+
-+            v = qobject_input_visitor_new(val_obj);
-+
-+            if (!object_property_set(obj, key, v, errp)) {
-+                visit_free(v);
-+                goto bail_out;
-+            }
-+
-+            if (use_scratch_vcpu && prop) {
-+                ARM64SysRegField *field = (ARM64SysRegField *)prop->opaque;
-+
-+                if (!kvm_idreg_write_scratch_vcpu(ARM_CPU(obj), fd,
-+                                                  field, val, errp)) {
-+                    visit_free(v);
-+                    goto bail_out;
-+                }
-+            }
-+            visit_free(v);
-+        }
-+
-+        visit_check_struct(visitor, &err);
-+        if (err) {
-+            goto bail_out;
-+        }
-+
-+        if (scratch_created) {
-+            kvm_arm_destroy_scratch_host_vcpu(fdarray);
-+            scratch_created = false;
-+        }
-         visit_end_struct(visitor, NULL);
-         visit_free(visitor);
--        if (err) {
--            object_unref(obj);
--            error_propagate(errp, err);
--            return NULL;
--        }
-+        visitor = NULL;
-     } else {
-         arm_cpu_finalize_features(ARM_CPU(obj), &error_abort);
-     }
-@@ -190,6 +270,18 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
-         }
-     }
+ KVM VCPU Features
+ =================
  
-+    object_property_iter_init(&iter, obj);
-+
-+    while ((idregprop = object_property_iter_next(&iter))) {
-+        QObject *value;
-+
-+        if (!g_str_has_prefix(idregprop->name, "SYSREG_")) {
-+            continue;
-+        }
-+        value = object_property_get_qobject(obj, idregprop->name, &error_abort);
-+        qdict_put_obj(qdict_out, idregprop->name, value);
-+    }
-+
-     if (!qdict_size(qdict_out)) {
-         qobject_unref(qdict_out);
-     } else {
-@@ -199,6 +291,20 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
-     object_unref(obj);
+@@ -495,3 +543,48 @@ Legal values for ``S`` are 30, 34, 36, and 39; the default is 30.
  
-     return expansion_info;
+ As with ``x-rme``, the ``x-l0gptsz`` property may be renamed or
+ removed in some future QEMU release.
 +
-+bail_out:
-+    if (scratch_created) {
-+        kvm_arm_destroy_scratch_host_vcpu(fdarray);
-+    }
-+    if (visitor) {
-+        visit_end_struct(visitor, NULL);
-+        visit_free(visitor);
-+    }
-+    if (err) {
-+        error_propagate(errp, err);
-+    }
-+    object_unref(obj);
-+    return NULL;
- }
- 
- static void arm_cpu_add_definition(gpointer data, gpointer user_data)
++Configuring CPU features via ID register fields
++===============================================
++
++Note that this is currently only supported under KVM, and with the
++``host`` or ``max`` CPU models.
++
++Querying available ID register fields
++-------------------------------------
++
++QEMU will create properties for ID register fields that are reported as
++being writable by the kernel, known to the QEMU instance, and not omitted
++because they conflict with legacy composite options. Therefore, the same
++QEMU binary may expose different properties when run under a different
++kernel.
++
++To find out the available ID register field properties, use the
++``query-cpu-model-expansion`` QMP command::
++
++  (QEMU) query-cpu-model-expansion type=full model={"name":"host"}
++  {"return": {
++   "model": {"name": "host", "props": {
++   "SYSREG_ID_AA64PFR0_EL1_EL2": 1, "SYSREG_ID_AA64ISAR2_EL1_CLRBHB": 0,
++   "SYSREG_CTR_EL0_L1Ip": 3, "SYSREG_CTR_EL0_DminLine": 4,
++   "SYSREG_ID_AA64MMFR0_EL1_BIGEND": 1, "SYSREG_ID_AA64MMFR1_EL1_ECBHB": 0,
++   "SYSREG_ID_AA64MMFR2_EL1_CnP": 1, "SYSREG_ID_DFR0_EL1_PerfMon": 4,
++   "SYSREG_ID_AA64PFR0_EL1_DIT": 0, "SYSREG_ID_AA64MMFR1_EL1_HAFDBS": 2,
++   "SYSREG_ID_AA64ISAR0_EL1_FHM": 0, "SYSREG_ID_AA64ISAR2_EL1_CSSC": 0,
++   "SYSREG_ID_AA64ISAR0_EL1_DP": 1, (...)
++   }}}}
++
++If a certain field in an ID register does not show up in this list, it is
++either not writable with the specific host kernel, unknown to this QEMU
++build, or intentionally not exposed because it overlaps a legacy composite
++option.
++
++A note on compatibility
++-----------------------
++
++A common use case for providing a defined set of ID register values is
++to be able to present a fixed set of features to a guest, often referred
++to as "stable guest ABI". This may take the form of ironing out differences
++between two similar CPUs with the intention of being able to migrate
++between machines with those CPUs, or providing the same CPU across Linux
++kernel updates on the host.
 -- 
 2.53.0
 
