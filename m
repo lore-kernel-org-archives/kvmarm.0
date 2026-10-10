@@ -1,251 +1,269 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686DB3C0A07
-	for <kvmarm@lists.linux.dev>; Sat, 10 Oct 2026 13:39:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DD91A683D;
+	Sat, 10 Oct 2026 22:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791639597; cv=none; b=OIlE3+OF7EbdlUAWBvcNNMn5iAu1eM5T39/hEn0n7Kp9jO+xzlUkIZBud/O64GgTRe511z6gBQHqZQsIwBunke5uebL5INkgbRMR8Xyid/J8dWh64Q5pV0h40ymBnE22ypdANogVtfOjysYTd0ngffYEnAdu+YC4gZpbozMXKF4=
+	t=1791669627; cv=none; b=pvoSx4+58RJt/pZ3LW/aDh8aVfcXnvuIsCVf4SMHeUqU03UIF60qOlHr2fBnANy53S5xaYPwrwCaK9vVXDrbYfWO5AZ3riFu3LwKYe/ymIgpa8AJsQtPAcajJPMkUj30jqmLPhKLkSP4AthoXZGWHZoifKuhq5mOzXwjoAht/Q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791639597; c=relaxed/simple;
-	bh=9Y6XB8RP9vVk99VeNTKazmAGD2zCYQaoP8zfrFlBws0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:content-type; b=mYGtyfclMK8jhWD8vu6nauOqh3reVVCp+hfwaqtlZySSmOKN3dk/bP0ZUoYOqyeaOqbfVKaW7XaQmABMNbneQKK/0YWck6ixwSBqBDdD5DHIEH7GNYcXXDfm08XjLYNNHX+QS4a2tBnL4MdnMaMUnYAzr3M0wPxKZPozsR1YsdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KeGm0v8A; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1791669627; c=relaxed/simple;
+	bh=uTIIgXvNGRKidYtT9y9d/j9O/uWBWM1pGuwQpiO4cmw=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=LxMbN4FMd8LTIFjiPea+nzZKCbl9pWue4MSjHuNEHXw8edbBTn5aa++6NGrRpEtSCEfwX13SoWeZ2wNQ3RrWp5xUIhhJ+2XPHi7ITvpMZa1z5TZgNagyttUk0wpBrTgKFuexBZfsUQWi2ziBmDZ6ZWxse3V+cxAJqVpfdWWVHLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=ffP+TPLt; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KeGm0v8A"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1791639595;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eHlmM2OW8vBgTNNqS2W/Lyj0mc71XENMhVWORgeokPc=;
-	b=KeGm0v8Am9Idymk6wT+O/SqFnt1yHVV2AwtkcbJ/W2fqHUKx71J9O5PeYL2sqlTwkTnmsr
-	nDUibBg8m/Fpvp79I7xcfJfBFHmsij2Ujdb8ZWACz/z0ngo9In9zRb2cq+nBBGPGjBF4rd
-	FsbWPhTSU8+MQrA6PgtF3lJy6kZhxxg=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-68-eklHFRvkPgWBpJ2ToJv5QA-1; Sat,
- 10 Oct 2026 13:39:51 +0000
-X-MC-Unique: eklHFRvkPgWBpJ2ToJv5QA-1
-X-Mimecast-MFC-AGG-ID: eklHFRvkPgWBpJ2ToJv5QA_1791639589
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 00B931944B22;
-	Sat, 10 Oct 2026 13:39:49 +0000 (UTC)
-Received: from laptop.redhat.corp (headnet03.pony-001.prod.iad2.dc.redhat.com [10.2.32.114])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7850630000E5;
-	Sat, 10 Oct 2026 13:39:44 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com,
-	eric.auger@redhat.com,
-	qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org,
-	kvmarm@lists.linux.dev,
-	peter.maydell@linaro.org,
-	shaju.abraham@nutanix.com,
-	khushit.shah@nutanix.com,
-	yangjinqian1@huawei.com,
-	cohuck@redhat.com,
-	richard.henderson@linaro.org,
-	sebott@redhat.com,
-	skolothumtho@nvidia.com,
-	philmd@oss.qualcomm.com
-Cc: maz@kernel.org,
-	oliver.upton@linux.dev,
-	pbonzini@redhat.com,
-	armbru@redhat.com,
-	berrange@redhat.com,
-	abologna@redhat.com,
-	jdenemar@redhat.com
-Subject: [PATCH v10 26/26] arm/cpu-features: Document ID reg properties
-Date: Sat, 10 Oct 2026 15:36:30 +0200
-Message-ID: <20261010133725.642498-27-eric.auger@redhat.com>
-In-Reply-To: <20261010133725.642498-1-eric.auger@redhat.com>
-References: <20261010133725.642498-1-eric.auger@redhat.com>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="ffP+TPLt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AADC1F000FF;
+	Sat, 10 Oct 2026 22:00:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux-foundation.org; s=korg; t=1791669625;
+	bh=N2jYfqmPt2es1xuCkTol8NOahRHgRnTcTOUiwhGzkTU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=ffP+TPLt1hBG2zdntJGpA4a6eo1Kktyl63gUdmTPWoDV5PB8j6QZDH7O5pu6DND18
+	 83jrFOWryJ2h63yrCPBw+Uh9wavAQ633twrY1q8Eu4fcsINr1B1dFygd9ev9/B+B/N
+	 PiED0VbjIV4o5yPrrgsINTWJg6/2ZfXlko4ls4sM=
+Date: Sat, 10 Oct 2026 15:00:20 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: "Liam R. Howlett" <liam@infradead.org>, Vlastimil Babka
+ <vbabka@kernel.org>, Jann Horn <jannh@google.com>, Pedro Falcato
+ <pfalcato@suse.de>, David Hildenbrand <david@kernel.org>, Mike Rapoport
+ <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>, Michal Hocko
+ <mhocko@suse.com>, Jonathan Corbet <corbet@lwn.net>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Dennis Dalessandro
+ <dennis.dalessandro@cornelisnetworks.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Leon Romanovsky <leon@kernel.org>, Paul Moore <paul@paul-moore.com>,
+ Stephen Smalley <stephen.smalley.work@gmail.com>, Jaroslav Kysela
+ <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
+ <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, Kumar Kartikeya
+ Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, Baolin Wang
+ <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, Ryan
+ Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song
+ <baohua@kernel.org>, Lance Yang <lance.yang@linux.dev>, Usama Arif
+ <usama.arif@linux.dev>, Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert
+ <dgilbert@interlog.com>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, "Martin K. Petersen"
+ <mkp@kernel.org>, Simona Vetter <simona@ffwll.ch>, Helge Deller
+ <deller@gmx.de>, Sebastian Reichel <sre@kernel.org>, John Hubbard
+ <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, Peter Zijlstra
+ <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar
+ <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo
+ <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Mark Rutland
+ <mark.rutland@arm.com>, Rik van Riel <riel@surriel.com>, Harry Yoo
+ <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot
+ <vincent.guittot@linaro.org>, Maarten Lankhorst
+ <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>,
+ Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>,
+ Will Deacon <will@kernel.org>, "Aneesh Kumar K.V"
+ <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann
+ <arnd@arndb.de>, Muchun Song <muchun.song@linux.dev>, Oscar Salvador
+ <osalvador@suse.de>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan
+ Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, Oliver Upton
+ <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Madhavan
+ Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul
+ Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
+ <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda
+ <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller"
+ <davem@davemloft.net>, Andreas Larsson <andreas@gaisler.com>, Alexander
+ Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>,
+ Matthew Brost <matthew.brost@intel.com>, Joshua Hahn
+ <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park
+ <byungchul@sk.com>, Gregory Price <gourry@gourry.net>, Ying Huang
+ <ying.huang@linux.alibaba.com>, Alistair Popple <apopple@nvidia.com>, Chris
+ Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, Kemeng Shi
+ <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He
+ <baoquan.he@linux.dev>, Youngjun Park <youngjun.park@lge.com>, Johannes
+ Weiner <hannes@cmpxchg.org>, Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt
+ <shakeel.butt@linux.dev>, Axel Rasmussen <axelrasmussen@google.com>,
+ Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, Chengming
+ Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, Miklos
+ Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-rdma@vger.kernel.org,
+ selinux@vger.kernel.org, linux-sound@vger.kernel.org, bpf@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, sparclinux@vger.kernel.org,
+ fuse-devel@lists.linux.dev, Ihor Solodrai <ihor.solodrai@linux.dev>, Bert
+ Karwatzki <spasswolf@web.de>, Takashi Iwai <tiwai@suse.de>, Emil Tsalapatis
+ <emil@etsalapatis.com>
+Subject: Re: [PATCH v5 00/38] mm: make VMA flag semantics explicit,
+ eliminate VM_SPECIAL
+Message-Id: <20261010150020.cbd6ce3038e3b6d72e2c92c9@linux-foundation.org>
+In-Reply-To: <20261009-b4-mmap-prepare-vma-flag-sanify-v5-0-923b70125b1e@kernel.org>
+References: <20261009-b4-mmap-prepare-vma-flag-sanify-v5-0-923b70125b1e@kernel.org>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Mimecast-MFC-PROC-ID: p6QyMZlrzoTxceE3qmVzGYJaIJDh1HuWLjF_s-8i2Ns_1791639589
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-content-type: text/plain; charset="US-ASCII"; x-default=true
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Cornelia Huck <cohuck@redhat.com>
+On Fri, 09 Oct 2026 19:03:54 +0100 "Lorenzo Stoakes (ARM)" <ljs@kernel.org> wrote:
 
-Add some documentation for how individual ID registers can be
-configured with the host cpu model.
+> The VM_SPECIAL / VMA_SPECIAL_FLAGS mask conflates several unrelated
+> properties:
+> 
+> * Is this managed by core mm, or by a driver mapping MMIO, kernel-allocated
+>   pages, or even ordinary pages itself?
+> * Can it be expanded or merged?
+> * Is this a 'weird' case like mlock where migration might race and we
+>   'have' to set invalid flags to notify?
+> * Is it another 'weird' case where we just want to stop GUP from touching
+>   it?
+> 
+> Driver writers have often been confused about this, and who can blame them?
+> 
+> It also interacts badly with the eternal edgecase known as hugetlb - which
+> sets VMA_DONTEXPAND_BIT but doesn't also want to be treated like a
+> 'special' flag.
+> 
+> Another issue is that we cannot make sensible assumptions about flag
+> use. It's not possible to assume VMA_IO_BIT means iommu because drivers
+> abuse it and mlock abuses it.
+> 
+> Special is also an overloaded term in mm. VDSO and VVAR mappings are also
+> called 'special' but they're special in a... special way.
+> 
+> Sometimes things are called special that are a subset of
+> VMA_SPECIAL_FLAGS (VMA_PFNMAP_BIT and VMA_MIXEDMAP_BIT for instance when it
+> comes to zapping or vm_normal_folio()).
+> 
+> There's a specific kind of special for THP too, which considers
+> PFN map, mixed map 'special' but DAX not.
+> 
+> It's all rather a mess.
+> 
+> This series brings some order to things by both limiting what drivers can
+> do with VMA flags and switching to using predicates that describe
+> behaviour, not arbitrary flags.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Thanks, I've updated mm-unstable to this version.
 
----
+For some reason, new versions of this series aren't applying when I
+drop the new series in place of the old.  I made the same old bunch of
+reject-fixups, so the below interdiff will show if I messed any of them up.
 
-9 -> 10:
-- document the fact some props may be willingly hidden because they
-  conflict with legacy composite options
-- mention max model too
----
- docs/system/arm/cpu-features.rst | 111 ++++++++++++++++++++++++++++---
- 1 file changed, 102 insertions(+), 9 deletions(-)
+> v5:
+> * Applied tags (thanks everybody!)
+> * Updated 3/38 to fix a bug in __mmap_new_file_vma() by zapping + closing
+>   the VMA before setting vma->vm_file NULL to avoid an i_mmap_writable
+>   imbalance. A repro was tested before/after and confirmed fixed.
+> * Updated 7/38 to make __map_kernel_pages_prepare() use
+>   mmap_assert_write_locked() rather than the weird
+>   assert-on-mmap_read_trylock() pattern, as per Suren.
+> * Also update vm_insert_page(), vm_insert_pages() to fix the same pattern
+>   and to use the new VMA API, and converted a BUG_ON to a
+>   VM_WARN_ON_ONCE().
 
-diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
-index 10b0eff27e..13454783cf 100644
---- a/docs/system/arm/cpu-features.rst
-+++ b/docs/system/arm/cpu-features.rst
-@@ -2,8 +2,11 @@ Arm CPU Features
- ================
+Here's how v5 altered mm.git:
+
+ mm/memory.c                       |   20 +++++++++++---------
+ mm/vma.c                          |   16 ++++++++--------
+ tools/testing/vma/include/stubs.h |    4 ++++
+ 3 files changed, 23 insertions(+), 17 deletions(-)
+
+--- a/mm/memory.c~b
++++ a/mm/memory.c
+@@ -2611,10 +2611,11 @@ int vm_insert_pages(struct vm_area_struc
  
- CPU features are optional features that a CPU of supporting type may
--choose to implement or not.  In QEMU, optional CPU features have
--corresponding boolean CPU proprieties that, when enabled, indicate
-+choose to implement or not.  QEMU provides two different mechanisms
-+to configure those features:
-+
-+1. For most CPU models, optional CPU features may have
-+corresponding boolean CPU properties that, when enabled, indicate
- that the feature is implemented, and, conversely, when disabled,
- indicate that it is not implemented. An example of an Arm CPU feature
- is the Performance Monitoring Unit (PMU).  CPU types such as the
-@@ -31,6 +34,34 @@ running guests in AArch32.
- CPU features that are inherently specific to KVM are
- prefixed with "kvm-" and are described in "KVM VCPU Features".
+ 	if (!range_in_vma(vma, addr, end))
+ 		return -EFAULT;
+-	if (!(vma->vm_flags & VM_MIXEDMAP)) {
+-		VM_WARN_ON_ONCE(mmap_read_trylock(vma->vm_mm));
+-		VM_WARN_ON_ONCE(vma->vm_flags & VM_PFNMAP);
+-		vm_flags_set(vma, VM_MIXEDMAP);
++	if (!vma_test(vma, VMA_MIXEDMAP_BIT)) {
++		mmap_assert_write_locked(vma->vm_mm);
++		VM_WARN_ON_ONCE(vma_test(vma, VMA_PFNMAP_BIT));
++		vma_start_write(vma);
++		vma_set_flags(vma, VMA_MIXEDMAP_BIT);
+ 	}
+ 	/* Defer page refcount checking till we're about to map that page. */
+ 	return insert_pages(vma, addr, pages, num, vma->vm_page_prot);
+@@ -2626,7 +2627,7 @@ static void __map_kernel_pages_prepare(s
+ 	if (vma_desc_test(desc, VMA_MIXEDMAP_BIT))
+ 		return;
  
-+2. Additionally, the ``host`` and ``max`` CPU models on KVM allow
-+overwriting a subset of the ID register fields. Not all ID register
-+fields are writable: this depends on the host. For those which are
-+writable, and for those only, these models expose
-+``SYSREG_<IDREG>_<FIELD>`` properties. IDREG and FIELD names are those
-+used in the ARM Architecture Reference Manual. QEMU may still omit some
-+writable fields that conflict with legacy composite options (for example
-+EL3/secure, MTE, SVE, or pauth).
-+
-+Values set with those properties override the initial values retrieved
-+from the vCPU after legacy composite property settings (``sve``,
-+``pauth``, ...) have been applied, whether at machine level or at vCPU
-+level.
-+
-+``SYSREG_<IDREG>_<FIELD>`` properties are applied at the end of the chain
-+and do not substitute for legacy composite options. In other words, if
-+you want to use pauth, you still need to set ``pauth=on``. Indeed legacy
-+options do more than exposing a different value for ID registers. They
-+may also interact with KVM to prepare the vCPU for this feature (for
-+instance at vCPU init time). Whereas ``SYSREG_<IDREG>_<FIELD>`` properties
-+only change the final value of the ID register. Inconsistent settings
-+between legacy composite options (at machine level or CPU level) which
-+impact the vCPU and low-level ``SYSREG_<IDREG>_<FIELD>`` properties are
-+rejected. ``SYSREG_<IDREG>_<FIELD>`` properties are essentially used to
-+tune the ``host``/``max`` vCPU model so that it allows migration between
-+different hardware.
-+
-+
- CPU Feature Probing
- ===================
+-	VM_WARN_ON_ONCE(mmap_read_trylock(desc->mm));
++	mmap_assert_write_locked(desc->mm);
+ 	VM_WARN_ON_ONCE(vma_desc_test(desc, VMA_PFNMAP_BIT));
+ 	vma_desc_set_flags(desc, VMA_MIXEDMAP_BIT);
+ }
+@@ -2785,10 +2786,11 @@ int vm_insert_page(struct vm_area_struct
+ {
+ 	if (addr < vma->vm_start || addr >= vma->vm_end)
+ 		return -EFAULT;
+-	if (!(vma->vm_flags & VM_MIXEDMAP)) {
+-		BUG_ON(mmap_read_trylock(vma->vm_mm));
+-		BUG_ON(vma->vm_flags & VM_PFNMAP);
+-		vm_flags_set(vma, VM_MIXEDMAP);
++	if (!vma_test(vma, VMA_MIXEDMAP_BIT)) {
++		mmap_assert_write_locked(vma->vm_mm);
++		VM_WARN_ON_ONCE(vma_test(vma, VMA_PFNMAP_BIT));
++		vma_start_write(vma);
++		vma_set_flags(vma, VMA_MIXEDMAP_BIT);
+ 	}
+ 	return insert_page(vma, addr, page, vma->vm_page_prot, false);
+ }
+--- a/mm/vma.c~b
++++ a/mm/vma.c
+@@ -2631,21 +2631,21 @@ static int __mmap_new_file_vma(struct mm
+ 	map->vm_file = vma->vm_file;
  
-@@ -126,13 +157,21 @@ A note about CPU models and KVM
+ 	if (error) {
+-		struct file *file = vma->vm_file;
+ 		UNMAP_STATE(unmap, vmi, vma, vma->vm_start, vma->vm_end,
+ 			    map->prev, map->next);
  
- Named CPU models generally do not work with KVM.  There are a few cases
- that do work, e.g. using the named CPU model ``cortex-a57`` with KVM on a
--seattle host, but mostly if KVM is enabled the ``host`` CPU type must be
--used.  This means the guest is provided all the same CPU features as the
--host CPU type has.  And, for this reason, the ``host`` CPU type should
--enable all CPU features that the host has by default.  Indeed it's even
--a bit strange to allow disabling CPU features that the host has when using
--the ``host`` CPU type, but in the absence of CPU models it's the best we can
--do if we want to launch guests without all the host's CPU features enabled.
-+seattle host, but mostly if KVM is enabled, the ``host`` CPU model must be
-+used.
++		if (vma->vm_ops->close) {
++			zap_vma(vma);
++			/* Safe, because VMA zapped. */
++			vma_close(vma);
++		}
++		if (map_same_file(map))
++			fput(map->vm_file);
 +
-+Using the ``host`` type means the guest is provided all the same CPU
-+features as the host CPU type has.  And, for this reason, the ``host``
-+CPU type should enable all CPU features that the host has by default.
-+
-+In case some features need to be tuned for the guest, and the host kernel
-+supports it, the ``host`` and ``max`` models can be instructed to change
-+individual ID register field values. This is especially useful for
-+migration purposes.
-+However, this interface will not allow configuring an arbitrary set of
-+features; the ID registers must describe a subset of the host's features,
-+and all differences to the host's configuration must actually be supported
-+by the kernel to be deconfigured.
+ 		vma->vm_file = NULL;
+ 		vma_iter_set(vmi, vma->vm_end);
+ 		/* Undo any partial mapping done by a device driver. */
+ 		unmap_region(&unmap);
+-		vma->vm_file = file;
+-		/* Only safe once unmapped. */
+-		vma_close(vma);
+-
+-		if (map_same_file(map))
+-			fput(map->vm_file);
+-		vma->vm_file = NULL;
+ 		return error;
+ 	}
  
- Enabling KVM also affects the ``query-cpu-model-expansion`` QMP command.  The
- affect is not only limited to specific features, as pointed out in example
-@@ -169,6 +208,15 @@ disabling many SVE vector lengths would be quite verbose, the ``sve<N>`` CPU
- properties have special semantics (see "SVE CPU Property Parsing
- Semantics").
+--- a/tools/testing/vma/include/stubs.h~b
++++ a/tools/testing/vma/include/stubs.h
+@@ -329,6 +329,10 @@ static inline void vma_close(struct vm_a
+ {
+ }
  
-+Additionally, if supported by KVM on the host kernel, the ``host`` and
-+``max`` CPU models may be configured via individual ID register field
-+properties, for example::
++static inline void zap_vma(struct vm_area_struct *vma)
++{
++}
 +
-+  $ qemu-system-aarch64 -M virt -cpu host,SYSREG_ID_AA64ISAR0_EL1_DP=0x0
-+
-+This forces ID_AA64ISAR0_EL1 DP field to 0. The same property syntax works
-+with ``-cpu max``.
-+
- KVM VCPU Features
- =================
- 
-@@ -495,3 +543,48 @@ Legal values for ``S`` are 30, 34, 36, and 39; the default is 30.
- 
- As with ``x-rme``, the ``x-l0gptsz`` property may be renamed or
- removed in some future QEMU release.
-+
-+Configuring CPU features via ID register fields
-+===============================================
-+
-+Note that this is currently only supported under KVM, and with the
-+``host`` or ``max`` CPU models.
-+
-+Querying available ID register fields
-+-------------------------------------
-+
-+QEMU will create properties for ID register fields that are reported as
-+being writable by the kernel, known to the QEMU instance, and not omitted
-+because they conflict with legacy composite options. Therefore, the same
-+QEMU binary may expose different properties when run under a different
-+kernel.
-+
-+To find out the available ID register field properties, use the
-+``query-cpu-model-expansion`` QMP command::
-+
-+  (QEMU) query-cpu-model-expansion type=full model={"name":"host"}
-+  {"return": {
-+   "model": {"name": "host", "props": {
-+   "SYSREG_ID_AA64PFR0_EL1_EL2": 1, "SYSREG_ID_AA64ISAR2_EL1_CLRBHB": 0,
-+   "SYSREG_CTR_EL0_L1Ip": 3, "SYSREG_CTR_EL0_DminLine": 4,
-+   "SYSREG_ID_AA64MMFR0_EL1_BIGEND": 1, "SYSREG_ID_AA64MMFR1_EL1_ECBHB": 0,
-+   "SYSREG_ID_AA64MMFR2_EL1_CnP": 1, "SYSREG_ID_DFR0_EL1_PerfMon": 4,
-+   "SYSREG_ID_AA64PFR0_EL1_DIT": 0, "SYSREG_ID_AA64MMFR1_EL1_HAFDBS": 2,
-+   "SYSREG_ID_AA64ISAR0_EL1_FHM": 0, "SYSREG_ID_AA64ISAR2_EL1_CSSC": 0,
-+   "SYSREG_ID_AA64ISAR0_EL1_DP": 1, (...)
-+   }}}}
-+
-+If a certain field in an ID register does not show up in this list, it is
-+either not writable with the specific host kernel, unknown to this QEMU
-+build, or intentionally not exposed because it overlaps a legacy composite
-+option.
-+
-+A note on compatibility
-+-----------------------
-+
-+A common use case for providing a defined set of ID register values is
-+to be able to present a fixed set of features to a guest, often referred
-+to as "stable guest ABI". This may take the form of ironing out differences
-+between two similar CPUs with the intention of being able to migrate
-+between machines with those CPUs, or providing the same CPU across Linux
-+kernel updates on the host.
--- 
-2.53.0
+ static inline int mmap_file(struct file *file, struct vm_area_struct *vma)
+ {
+ 	return 0;
+_
 
