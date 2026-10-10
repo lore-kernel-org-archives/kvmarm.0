@@ -1,80 +1,119 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24713371D1F;
-	Fri,  9 Oct 2026 18:56:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4635F379C23;
+	Sat, 10 Oct 2026 07:36:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791572193; cv=none; b=iKxE6e3XwZwOz4lJRC8gpNFd8STSmpxm0ERL2MtxRe+5/ZGFiGZKMSFMiPgh/00UaSnDBlKJUwo7eLGZscf5/z/XraPy+LyDAVOlScqHi0e/5S/CWLbnIdAIjiJE549Gh+eWpTRmDfVPNHMdWEfvmFpIIKBb6VcCM6J0mcaL8kY=
+	t=1791617788; cv=none; b=Yy4pTwyLBz1WoZ24UcJMCMHei6Tbjei4d7Zmgau1zzcBrtdCLXitBw5/iEwGPbfH6xUcn33RDsTReSJBRodZHDJtL/m33zT0C5+cbzHesplY9C5vzMRyUq9KuvSL8QLW3TyDyrRPDycffzXWiQ8PWAjkMSe/BBJVbRBrY/0NzMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791572193; c=relaxed/simple;
-	bh=uvQMXHnxTG4FqAgA5JTVZhUD6rORKeAmVBvuWWpVtA0=;
-	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=tWZ5/f5pn8Sd/mAL2gLZDTZYP1yTAV2qhy6YjzRP0tkmhiVlRoBpq8XGIsUGuKbA83cv1OhJHJh8/PZEttctZfCtwMZv5ReV9DP/dvxfXtGqgg3tDrgIyVTtaJNtp1W/yS0edPvaVdFiBR2ijA8H2m8EGZ3wyA6TnE/srCKPZc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WKZyk5W4; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791617788; c=relaxed/simple;
+	bh=4ko9gSj+vxgBtEJWFjbBisBasVf3lndbjG7WDoYLcn4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=D5I0rc97HVDeTKyClYObvvdQ6vwGbokclXCQLXY4X/y+ZQynOoYSBVqU6LAwFly2sqH0PBKmBuJGMsLFZmXH2Hir91qxZiCaqQ9vAec44RIx7S/O90NByIBF0Hm1UtYmcXwdwKX54bNhP/VHkBFao+SJUwJhUKwXdHLTY+hlUXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O1scjIDh; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WKZyk5W4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B189E1F000FF;
-	Fri,  9 Oct 2026 18:56:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O1scjIDh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10F321F000FF;
+	Sat, 10 Oct 2026 07:36:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791572191;
-	bh=uvQMXHnxTG4FqAgA5JTVZhUD6rORKeAmVBvuWWpVtA0=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=WKZyk5W4pD59iAu6zCeNv37305I8x6p4gQbX+FP/PZ/jZ6MixSoMwKHDVo1vp6B/i
-	 6qv3VXaVJ4/99m6GfjNLjmY/WLt2Q4vRrS658OHa47WI8N6KQtIvNiAYQx3S48PVB3
-	 3ibP5klygvAjp1tHR0m7rNySQR0utfDlb/VGUL0VWjMmAFPu4ohjWAZ+yAW32aqKio
-	 7XR3CPCQg8LZUqLcnUs1uVhMK1Wmz5yupyN3Lx/IJFjjh8lkm9Xqed9oEIm2gOlW4x
-	 M77vORQr0bcYqTrbFtxibgXIY5DnbebAi4O814UfFmQblSKKl05MwA8sY2FvDcX8sJ
-	 agzjiELTSI7cw==
-Message-ID: <sashiko-outbox-165989@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 37/38] fuse: dax: do not set VM_MIXEDMAP
-Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
-Cc: "Vasily Gorbik" <gor@linux.ibm.com>, linux-usb@vger.kernel.org, bpf@vger.kernel.org, linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, "Heiko
- Carstens" <hca@linux.ibm.com>, linux-trace-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, "Alexander
- Gordeev" <agordeev@linux.ibm.com>, "Oliver Upton" <oupton@kernel.org>, "Christian
- Borntraeger" <borntraeger@linux.ibm.com>, "Marc Zyngier" <maz@kernel.org>, selinux@vger.kernel.org, linux-s390@vger.kernel.org, kvmarm@lists.linux.dev
-In-Reply-To: <20261009-b4-mmap-prepare-vma-flag-sanify-v5-37-923b70125b1e@kernel.org>
-References: <20261009-b4-mmap-prepare-vma-flag-sanify-v5-0-923b70125b1e@kernel.org>
- <20261009-b4-mmap-prepare-vma-flag-sanify-v5-37-923b70125b1e@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 09 Oct 2026 18:56:30 +0000
+	s=k20260515; t=1791617786;
+	bh=lvHacGZHOil6n8X8TWo3a/lv5iJ2YDY90NDrBy/yA4U=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=O1scjIDh9Idq26MCPYxo0nalUPgIQV8jPHjj9EAukOJzrIDI+14xcWHlQyw+RQW+z
+	 c7bfG0uCWt+vPb6LQbz83ilcKuAN5wvPqekwmSW/kUbYPHVXoZV+KlJYXQjZTB81Cd
+	 VxJqf2JFBOtbzVjZ6kkqAF7Dde+UtRdu4nMX+IrjnQrHWWwBN0ZbwR7o5StsVqvnKd
+	 ReygXOyiuezuAqNAnHRGyM99QlGFGSNZttQJtO1GHCBElzQxgme2m+vwsQ9rz5XRWx
+	 5hiOXKqAE2c85h3nDndjJe1iif63W9teMNiLmh+O8rOw6WU6umu3Kx2kzmp/rr7N7n
+	 V56r/87rFYK1A==
+X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Fred Griffoul <griffoul@gmail.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	David Hildenbrand <david@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Jan Kara <jack@suse.cz>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>
+Cc: David Woodhouse <dwmw2@infradead.org>,
+	Ackerley Tng <ackerleytng@google.com>,
+	Lorenzo Stoakes <ljs@kernel.org>,
+	"Liam R . Howlett" <liam@infradead.org>,
+	Vlastimil Babka <vbabka@kernel.org>,
+	Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [RFC PATCH 0/9] mm: Memory providers for guest_memfd and iommufd
+In-Reply-To: <20261006183235.16576-1-griffoul@gmail.com>
+References: <20260720111259.122911-1-dwmw2@infradead.org>
+ <20261006183235.16576-1-griffoul@gmail.com>
+Date: Sat, 10 Oct 2026 13:06:09 +0530
+Message-ID: <yq5ald8680t2.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain
 
-> Commit e1fb4a086495 ("dax: remove VM_MIXEDMAP for fsdax and device dax")
-> prevented fsdax and device-dax from setting VM_MIXEDMAP, as DAX no longer
-> relies on it to direct core mm paths.
->=20
-> The fuse DAX implementation, added later, copied the old pattern and still
-> sets it.
->=20
-> Fuse DAX maps pages the same way fsdax does, via dax_iomap_fault() and
-> ultimately vmf_insert_page_mkwrite() and vmf_insert_folio_pmd(), which
-> insert ordinary refcounted pages and so do not require VM_MIXEDMAP.
->=20
-> Setting it only serves to mark the mapping as not mm-managed, making fuse
-> DAX the sole DAX implementation whose mappings are unmergeable, cannot be
-> mlock()'d, eagerly copy page tables on fork and reject MADV_DOFORK and
-> MADV_DODUMP.
->=20
-> It also requires vma_is_special_huge() in mm/huge_memory.c to carve DAX o=
-ut
-> of its check for mappings not managed by core mm explicitly.
->=20
-> There is no reason for fuse DAX to keep on using this flag so drop it.
->=20
-> Acked-by: David Hildenbrand (Arm) <david@kernel.org>
-> Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+Fred Griffoul <griffoul@gmail.com> writes:
 
-Sashiko has reviewed this patch and found no issues. It looks great!
+> From: Fred Griffoul <fgriffo@amazon.co.uk>
+>
+> Some drivers manage RAM outside the page allocator: a carve-out, device
+> memory, or memory that a host component moves between VMs while they
+> run. This memory often has no struct page. The driver wants to lend
+> pages to a VM and to its devices, and to take any of them back later.
+>
+> David Woodhouse's series "KVM: Allow alternative providers of
+> guest_memfd backed by PFNMAP memory" lets such a driver back a
+> guest_memfd through struct kvm_gmem_ops:
+>
+>   https://lore.kernel.org/kvm/20260720111259.122911-1-dwmw2@infradead.org/
+>
+> That covers the guest, but not the VM's devices, which his cover
+> letter left as an open question. This series adds a small interface in
+> mm: the driver that owns the memory becomes a provider, and the code
+> that maps it attaches as a consumer. There are two consumers, a
+> guest_memfd backend and IOMMU_IOAS_MAP_FILE in iommufd.
+>
+> The series is on top of David's v2 (base 0e35b9b6ec0f). Patch 1 was
+> part of the earlier dma-buf RFC. The provider backend depends on it, so
+> this series carries it.
+>
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261009-b4-mmap-pr=
-epare-vma-flag-sanify-v5-0-923b70125b1e@kernel.org?part=3D37
 
+I have been working on something similar for confidential computing use
+cases. There is likely some overlap between this series and what I posted
+at [1].
+
+I have not reviewed this series in detail yet, but I will compare the two
+approaches and identify what can be shared between the use cases. Please
+let me know how you would like to proceed.
+
+[1] https://lore.kernel.org/all/20261010072504.536230-1-aneesh.kumar@kernel.org/
+
+-aneesh
