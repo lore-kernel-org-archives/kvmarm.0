@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A4717DFFA
-	for <kvmarm@lists.linux.dev>; Sat, 10 Oct 2026 13:38:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14FE01B2EF2
+	for <kvmarm@lists.linux.dev>; Sat, 10 Oct 2026 13:38:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791639531; cv=none; b=gc+KBnRxtw0bYtEtORwLIdlMkEtt8bqvhD9EH4uiE79jyvnP1dVgGp3h9o0LWbh83u5pgl0qodVq0DGoXRdFzv/C/Eeuwh+r0KN5h1W2ARnkhPPbIavSMMpnhb34Z23s9cusglcSIt/ggNsF18keRCsa1gJ64nOVDIrutcqNXPs=
+	t=1791639538; cv=none; b=WmaATx4lBu5RRQa3/Hu7IUfAuMIikWXBtYUtuA/1g8AINukIFl0iHS4ZWNfo8RxCagmdCRPC6oY8PVikO5bfAkdcobc3zx2eJRZTEDjqNZUE/nW7XF7ZsVUPvmFNRU9bmsWxLu+JRtm3qGWaKn+wkRZSCpP/QPxLEhK3s1IOXQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791639531; c=relaxed/simple;
-	bh=CQ8B8Bl+HPwF1AN+4jM/AX2/sWnlDraMYFS/4eM94W8=;
+	s=arc-20240116; t=1791639538; c=relaxed/simple;
+	bh=oeORjM3Pzd/sNdj+0S3vYehHPusgILuypBkl7ZL/HFE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:content-type; b=BELZhPXIdU+hn7Exymw6OeSotc+0XWOvlgmks8iSghzTUqLRBsSKxiCINMZBRtQ3UmM523kS7svJ+5Cl1Ft9fh4gxrhjTOyZXoSQbbGNQrXyWOUyxBSq5Gw5iKkUIprNAh8t11UKLcHgmmUQf9m3xyWUwBiZIHVIVrmKEILChWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IL2h7rAg; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:content-type; b=Yvzdqw/M7c8PVqpLFEWGbadrGT3LZOjTR2OfIT3F2RzRko2QFXXb67k1jbsD/4/SvzZWh5bYncNeuEDFoBbK7zpBpPtKS3Otqm8Fv7QBi+pP/IRTdafbFYwN+KPmZ97k2yf3X/eZYM1SuAd4+fUJBwjUenUItOfPSG1+NFBLWS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ayVTewtU; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IL2h7rAg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ayVTewtU"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1791639528;
+	s=mimecast20190719; t=1791639536;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3fgklMGCKXzzfl+Y/I7jaLT7gfuLtYlF+j5mQXWNrTY=;
-	b=IL2h7rAgsQKvC5fh4T/3+1eJSMBE2HlxMn0wxU6KUBNYgS9LCYZ65ejeHdAbBaP249XsEc
-	7eSOjhVjciLuy9f6lVHxupqCVeolSOCzaiY4U9+gJmG87g6m2EtNedxVXg7HXH0yuSQsN6
-	YRFl7+/oCoxYoR3/F5oF3kgKoVOan34=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=rJJ9866SG6H+ss4j/yi5NJRaRLchsKWeX66gkZZoSAY=;
+	b=ayVTewtUdfYSwlpf3UYwwZDPtxm5UfjSY9xE9BFB4DZmArI9VpzYcrvZURjEnYS1CzAamI
+	fdm3PkEF6XV6UwdrnxDyhcb7Q2sxjBv3/QEDW9m0qaxcbLXyTYw3Y4x+2mEZU7OKTKDR30
+	QrNsR8+2JJ4Bzl04slgA2iaYTKM2nfo=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-587-rTx9SFtgPb2e8k1qIShEPQ-1; Sat,
- 10 Oct 2026 13:38:47 +0000
-X-MC-Unique: rTx9SFtgPb2e8k1qIShEPQ-1
-X-Mimecast-MFC-AGG-ID: rTx9SFtgPb2e8k1qIShEPQ_1791639525
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-634-IlDwscnDO6S4RsQQdcxOeA-1; Sat,
+ 10 Oct 2026 13:38:52 +0000
+X-MC-Unique: IlDwscnDO6S4RsQQdcxOeA-1
+X-Mimecast-MFC-AGG-ID: IlDwscnDO6S4RsQQdcxOeA_1791639530
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9BE3F19560B8;
-	Sat, 10 Oct 2026 13:38:45 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BA44A1809C9F;
+	Sat, 10 Oct 2026 13:38:50 +0000 (UTC)
 Received: from laptop.redhat.corp (headnet03.pony-001.prod.iad2.dc.redhat.com [10.2.32.114])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D6BB730000E5;
-	Sat, 10 Oct 2026 13:38:40 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 00FCD30000E5;
+	Sat, 10 Oct 2026 13:38:45 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com,
 	eric.auger@redhat.com,
@@ -64,9 +64,9 @@ Cc: maz@kernel.org,
 	berrange@redhat.com,
 	abologna@redhat.com,
 	jdenemar@redhat.com
-Subject: [PATCH v10 14/26] target/arm/kvm: Implement SYSREG property setter and getter
-Date: Sat, 10 Oct 2026 15:36:18 +0200
-Message-ID: <20261010133725.642498-15-eric.auger@redhat.com>
+Subject: [PATCH v10 15/26] target/arm/kvm: Let kvm_arm_init_cpreg_list propagate an error handle
+Date: Sat, 10 Oct 2026 15:36:19 +0200
+Message-ID: <20261010133725.642498-16-eric.auger@redhat.com>
 In-Reply-To: <20261010133725.642498-1-eric.auger@redhat.com>
 References: <20261010133725.642498-1-eric.auger@redhat.com>
 Precedence: bulk
@@ -76,163 +76,90 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Mimecast-MFC-PROC-ID: i-dAC2jhTjEJ3z2u6TQEC6X9LMpdv7J5RJA277VnGog_1791639525
+X-Mimecast-MFC-PROC-ID: iRALXew__YIscH6cUqvJ9GXChWagkQNaTgDS1GYAWBg_1791639530
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 content-type: text/plain; charset="US-ASCII"; x-default=true
 
-When the setter is called, the final vcpu is not created yet.
+Subsequent patch will add an error handle to kvm_arch_init_vcpu(). So all
+errors must come with an error handle.
 
-Applying the override on vcpu.isar initialized with the max scratch
-vcpu would not be correct because the final vcpu may have some features
-turned off (for instance virtualization) while the scratch vcpu
-features all available ones. So we need to postpone the actual
-override until the final vcpu has been initialized.
-
-Set values are recorded in a hash table and will be applied to the
-guest in a subsequent patch. At this point the only checks that can
-be done on the input value are checking against field length and
-arch enum value if any.
-
-With regards to the getter, if the sysreg prop was set, we return the
-set value, otherwise, we return the value in cpu->isar.idregs[].
+kvm_arm_init_cpreg_list does not propogate any, add this capability.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Khushit Shah <khushit.shah@nutanix.com>
-
 ---
+ target/arm/kvm.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-v9 -> v10:
-- renamed MAKE_IDREG_KEY into IDREG_FIELD_KEY
-- rebase on new implementation in cpu64.c
----
- target/arm/cpu.h   |  2 ++
- target/arm/cpu.c   |  5 ++--
- target/arm/cpu64.c | 65 ++++++++++++++++++++++++++++++++++++++++++++--
- 3 files changed, 68 insertions(+), 4 deletions(-)
-
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 639be0713e..bef100c02c 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -968,6 +968,8 @@ struct ArchCPU {
-     uint64_t *cpreg_vmstate_values;
-     int32_t cpreg_vmstate_array_len;
- 
-+    GHashTable *sysreg_props;
-+
-     DynamicGDBFeatureInfo dyn_sysreg_feature;
-     DynamicGDBFeatureInfo dyn_svereg_feature;
-     DynamicGDBFeatureInfo dyn_smereg_feature;
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index bee74c0f94..d2755d77ca 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1238,8 +1238,8 @@ static void arm_cpu_initfn(Object *obj)
- {
-     ARMCPU *cpu = ARM_CPU(obj);
- 
--    cpu->cp_regs = g_hash_table_new_full(g_direct_hash, g_direct_equal,
--                                         NULL, g_free);
-+    cpu->cp_regs = g_hash_table_new(g_direct_hash, g_direct_equal);
-+    cpu->sysreg_props = g_hash_table_new(g_direct_hash, g_direct_equal);
- 
-     QLIST_INIT(&cpu->pre_el_change_hooks);
-     QLIST_INIT(&cpu->el_change_hooks);
-@@ -1739,6 +1739,7 @@ static void arm_cpu_finalizefn(Object *obj)
-     ARMCPRegMigTolerance *t, *n;
- 
-     g_hash_table_destroy(cpu->cp_regs);
-+    g_hash_table_destroy(cpu->sysreg_props);
- 
-     QLIST_FOREACH_SAFE(hook, &cpu->pre_el_change_hooks, node, next) {
-         QLIST_REMOVE(hook, node);
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index b1738c9be3..9662608675 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -801,18 +801,79 @@ static void kvm_arm_set_cpreg_mig_tolerances(ARMCPU *cpu)
-                                      UINT64_MAX, 0, ToleranceOnlySrcTestValue);
- }
- 
-+#define IDREG_FIELD_KEY(reg_idx, field_shift) \
-+    (((uint64_t)(reg_idx) << 8) | ((uint64_t)(field_shift) & 0xFF))
-+
- static void set_sysreg_prop(Object *obj, Visitor *v,
-                             const char *name, void *opaque,
-                             Error **errp)
- {
--    error_setg(errp, "%s setter not yet implemented", name);
-+    ARM64SysRegField *field = (ARM64SysRegField *)opaque;
-+    ARMCPU *cpu = ARM_CPU(obj);
-+    int index = field->index;
-+    int lower = field->shift;
-+    int length = field->length;
-+    uint64_t key, value;
-+
-+    if (!visit_type_uint64(v, name, &value, errp)) {
-+        return;
-+    }
-+
-+    if (length < 64 && value > ((1ULL << length) - 1)) {
-+        error_setg(errp,
-+                   "idreg %s set value (0x%" PRIx64 ") exceeds length of "
-+                   "field (%d)!", name, value, length);
-+        return;
-+    }
-+
-+    if (field->arch_vals) {
-+        /* this field has some enum values */
-+        for (int i = 0; i < field->arch_vals_count; i++) {
-+            if (value == field->arch_vals[i]) {
-+                goto valid;
-+            }
-+        }
-+        error_setg(errp,
-+                   "idreg %s set value (0x%" PRIx64 ") does not match any "
-+                   "arch valid enum value", name, value);
-+        return;
-+    }
-+
-+valid:
-+
-+    key = IDREG_FIELD_KEY(index, lower);
-+    g_hash_table_insert(cpu->sysreg_props, GUINT_TO_POINTER(key),
-+                       GUINT_TO_POINTER(value));
- }
- 
- static void get_sysreg_prop(Object *obj, Visitor *v,
-                             const char *name, void *opaque,
-                             Error **errp)
- {
--    error_setg(errp, "%s getter not yet implemented", name);
-+    ARM64SysRegField *field = (ARM64SysRegField *)opaque;
-+    ARMCPU *cpu = ARM_CPU(obj);
-+    int index = field->index;
-+    int lower = field->shift;
-+    int length = field->length;
-+    gpointer value_ptr;
-+    uint64_t value;
-+    uint64_t key = IDREG_FIELD_KEY(index, lower);
-+    gboolean exists;
-+
-+    exists = g_hash_table_lookup_extended(cpu->sysreg_props,
-+                                          GUINT_TO_POINTER(key), NULL,
-+                                          &value_ptr);
-+    if (exists) {
-+        value = GPOINTER_TO_UINT(value_ptr);
-+    } else {
-+        uint64_t mask = MAKE_64BIT_MASK(lower, length);
-+        uint64_t *idregs = cpu->isar.idregs;
-+
-+        value = (idregs[index] & mask) >> lower;
-+    }
-+
-+    visit_type_uint64(v, name, &value, errp);
-+    trace_get_sysreg_prop(name, value);
- }
- 
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index ac4f307276..f2b79c0a34 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -962,6 +962,7 @@ static bool kvm_arm_reg_syncs_via_cpreg_list(uint64_t regidx)
  /**
+  * kvm_arm_init_cpreg_list:
+  * @cpu: ARMCPU
++ * @errp: pointer to Error* for error reporting
+  *
+  * Initialize the ARMCPU cpreg list according to the kernel's
+  * definition of what CPU registers it knows about (and throw away
+@@ -969,22 +970,27 @@ static bool kvm_arm_reg_syncs_via_cpreg_list(uint64_t regidx)
+  *
+  * Returns: 0 if success, else < 0 error code
+  */
+-static int kvm_arm_init_cpreg_list(ARMCPU *cpu)
++static int kvm_arm_init_cpreg_list(ARMCPU *cpu, Error **errp)
+ {
+     struct kvm_reg_list rl;
+-    struct kvm_reg_list *rlp;
++    struct kvm_reg_list *rlp = NULL;
+     int i, ret, arraylen;
+     CPUState *cs = CPU(cpu);
+ 
+     rl.n = 0;
+     ret = kvm_vcpu_ioctl(cs, KVM_GET_REG_LIST, &rl);
+     if (ret != -E2BIG) {
++        if (ret < 0) {
++            error_setg_errno(errp, -ret,
++                             "failed to get KVM register list size");
++        }
+         return ret;
+     }
+     rlp = g_malloc(sizeof(struct kvm_reg_list) + rl.n * sizeof(uint64_t));
+     rlp->n = rl.n;
+     ret = kvm_vcpu_ioctl(cs, KVM_GET_REG_LIST, rlp);
+     if (ret) {
++        error_setg_errno(errp, -ret, "failed to get KVM register list");
+         goto out;
+     }
+     /* Sort the list we get back from the kernel, since cpreg_tuples
+@@ -1001,7 +1007,7 @@ static int kvm_arm_init_cpreg_list(ARMCPU *cpu)
+         case KVM_REG_SIZE_U64:
+             break;
+         default:
+-            fprintf(stderr, "Can't handle size of register in kernel list\n");
++            error_setg(errp, "Can't handle size of register in kernel list");
+             ret = -EINVAL;
+             goto out;
+         }
+@@ -1027,7 +1033,7 @@ static int kvm_arm_init_cpreg_list(ARMCPU *cpu)
+         /* Shouldn't happen unless kernel is inconsistent about
+          * what registers exist.
+          */
+-        fprintf(stderr, "Initial read of kernel register state failed\n");
++        error_setg(errp, "Initial read of kernel register state failed");
+         ret = -EINVAL;
+         goto out;
+     }
+@@ -2196,7 +2202,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     SET_IDREG(&cpu->isar, MPIDR, mpidr);
+     cpu->mp_affinity = mpidr & ARM64_AFFINITY_MASK;
+ 
+-    return kvm_arm_init_cpreg_list(cpu);
++    return kvm_arm_init_cpreg_list(cpu, errp);
+ }
+ 
+ int kvm_arch_destroy_vcpu(CPUState *cs)
 -- 
 2.53.0
 
