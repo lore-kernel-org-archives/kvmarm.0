@@ -1,112 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-126.mta1.migadu.com [95.215.58.126])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE256243387;
-	Sun, 11 Oct 2026 15:07:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D83772FE042
+	for <kvmarm@lists.linux.dev>; Sun, 11 Oct 2026 15:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.126
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791731235; cv=none; b=VSmxWBPf+CDyTOzjHIXfyuRASMLQoaM+4Jp/pZRVlUihq8u8GVYVKiENkkN4Lq9gUMObRx4DDWjMnx7MI1AesGpTRJM8ZEI8XBuqX/bhXIMsZrziLEXn3pfvyCyYbZa5jRXss8pv1b4hkbbnI4lSv+4R+XPuBxQciAoZXuZVejM=
+	t=1791732461; cv=none; b=L84/2ldqQ+JiJoDslK4B7n2PBvEmbE+lDUUzr5WKWyYGV60ag/Bqdqbf80uEtqtT2dFvluhtcCwBosU7excbyzs7ohPBsCrDSXcl3sO0L4Lcm/egVYv8CWTFv1j/SL4DpAD+CU89te2hCGJd1s+9b36WY1kIQPRv8r6AeqfsNqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791731235; c=relaxed/simple;
-	bh=dl++89glVDFxTXodHWnqwNoD+60xNeshlXqtD8dpDb8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=joVh4lw39lLozOGwL3tBZT7jtXdOhmOkuc6Pr46yaH+OFBta+Tktee8hMJzyf16Cy3OhXcT3UJyE9HEwXbdQedEXoNvVw5HlTagchhjpmxCAqx2q4cl4kK44qgLLW1J9y7cEbi/e6CEndSHU1K31t8Jh+qqCwZ8Cd73YI9aF6MM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ATRUbMz+; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791732461; c=relaxed/simple;
+	bh=suXI9TweIJ9OgvYGDH8vL0MpTp8HpvwFkmEvYZ5Q21c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cSWKyi3zM4npyQjvzh0jM/gY1J6dMqPuxpjLDzFzfNaxGLpw+/+p/ShhOjCWolpA3TPKOcU+7nyDJk80urtjniQKks4tXkzhUycUy4Dgn+RgFHeaSp74w3dWexeTeQ9kxwXUHDYilLY5mvt72VzeNtn80Y9oDUWHh5N5D8xpoQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JulmlrVR; arc=none smtp.client-ip=95.215.58.126
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ATRUbMz+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E9841F0089B;
-	Sun, 11 Oct 2026 15:07:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791731234;
-	bh=rPssMDMu2wzj+SLVMrrlq/wPuteu356OQ6siN0kIobM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=ATRUbMz+kTJCBgOaTXtgUoZIaRDwWP7rNf33Asa4LbCtGnsHo27BWHK4GzCwfjJPf
-	 ss0ebsvPMB5nBIV/tuYk0AOSzjC/f6Jd9mt8lrUVC2cAEBNQ2pwLix/Xfy7AbPaY6e
-	 MO4yHwoWuYgFtHkG8KdKk1nLBoeTNFcKXh0CISiJXzUAjUQFVH7u4TZ6wJuKJZsTcJ
-	 BB0yVrAKMeo0ZV0XHnjaFv2TgwC3dT8mCJfs9QgZzsXlBSPvWI0tStKmWmqlA3eEHU
-	 3EXJNTCRsMM+X9iTarQAXTpw6FzkZArsxG9xMHUu1jjmMO6jEU5YCLhyrOjiL1nVAI
-	 mDYV1fmqxTBuA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xFv8q-00000001aqI-2Uaa;
-	Sun, 11 Oct 2026 15:07:12 +0000
-Date: Sun, 11 Oct 2026 16:10:19 +0100
-Message-ID: <87zewk8e90.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: oupton@kernel.org,	kvmarm@lists.linux.dev,	linux-arm-kernel@lists.infradead.org,	linux-kernel@vger.kernel.org,	catalin.marinas@arm.com,	will@kernel.org,	joey.gouly@arm.com,	seiden@linux.ibm.com,	suzuki.poulose@arm.com,	yuzenghui@huawei.com,	mark.rutland@arm.com,	vdonnefort@google.com,	qperret@google.com,	Sascha.Bischoff@arm.com,	steven.price@arm.com,	tabba@google.com
-Subject: Re: [PATCH v2 4/5] KVM: arm64: vgic: Do not access the GICv5 CPU interface from EL1
-In-Reply-To: <20261011143648.211337-5-fuad.tabba@linux.dev>
-References: <20261011143648.211337-1-fuad.tabba@linux.dev>
-	<20261011143648.211337-5-fuad.tabba@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JulmlrVR"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=suXI9TweIJ9OgvYGDH8vL0MpTp8HpvwFkmEvYZ5Q21c=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1791732457; v=1; x=1792337257;
+ b=JulmlrVRskf94TsU3SlUtaoD8OycnSbR7hz/wAeujVQGv4IEUmOYMlDYqLJ/fjEaKUM96NXN
+ AMbGgYHdjw7+Qub7JofaKM4mWCsQUcAqzGvuwEfpJXy4kuWiDCD9bMmOUxlGtDCH9jCS4qxjf8V
+ nK5Hsu0XYhxlg61kr/Y5yuio=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id fa0437482b345aaa;
+	Sun, 11 Oct 2026 15:27:37 +0000
+X-Mizu-Trace-ID: fa0437482b345aaa
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5ba40832934so2888e87.1
+        for <kvmarm@lists.linux.dev>; Sun, 11 Oct 2026 08:27:33 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBxvPZFdY2xbWHafhx/oFUAm+mcnoreYN7VlDIXUqhqvBanFThK2iuJ3lUrK7TbLMHoTbFgF95A=@lists.linux.dev
+X-Gm-Message-State: AFq9FYLgjfYkcSVgFlMRQ/rAz0T5vOdmNE5rkKFsHeBVmyBk3AKmldlx
+	OGshFR7laBWKmqlGkb6OBSVkb2hEHMNNMZ4RRM6PSZdRrZZZt5QQEgNyc38fV802bkxpUuk80PK
+	X7ru+iL/RNIvljw15lsu5tnhbVeshVinMUxdZr+qv
+X-Received: by 2002:a05:6512:238d:b0:5b8:ebf3:3370 with SMTP id
+ 2adb3069b0e04-5bce9d8696fmr69006e87.5.1791732452056; Sun, 11 Oct 2026
+ 08:27:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, vdonnefort@google.com, qperret@google.com, Sascha.Bischoff@arm.com, steven.price@arm.com, tabba@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20261011143648.211337-1-fuad.tabba@linux.dev> <20261011143648.211337-5-fuad.tabba@linux.dev>
+ <87zewk8e90.wl-maz@kernel.org>
+In-Reply-To: <87zewk8e90.wl-maz@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Sun, 11 Oct 2026 16:26:55 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTwQzWTQd83ybB7xyhzVZctre0Nn5_Smg8dA7QusNMve3w@mail.gmail.com>
+X-Gm-Features: AclHuK_rIOwStTCG2fxSnbJUVb7MyinGSk7pAOJvFzysPaQbzGjG5f9VtEekiws
+Message-ID: <CA+EHjTwQzWTQd83ybB7xyhzVZctre0Nn5_Smg8dA7QusNMve3w@mail.gmail.com>
+Subject: Re: [PATCH v2 4/5] KVM: arm64: vgic: Do not access the GICv5 CPU
+ interface from EL1
+To: Marc Zyngier <maz@kernel.org>
+Cc: oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, 
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	mark.rutland@arm.com, vdonnefort@google.com, qperret@google.com, 
+	Sascha.Bischoff@arm.com, steven.price@arm.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, 11 Oct 2026 15:36:47 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
-> 
-> can_access_vgic_from_kernel() excludes only the GICv3 system register
-> interface, so on a native GICv5 system without FEAT_GCIE_LEGACY it
-> returns true under nVHE. The kernel then saves and restores the CPU
-> interface from EL1, where ICH_VMCR_EL2 and the ICH_PPI_* registers are
-> UNDEFINED, so running a vCPU oopses the host. The nVHE world switch
-> already does that work at EL2.
-> 
-> Require VHE for GICv5 as for GICv3.
-> 
-> Fixes: 9b8e3d4ca0e73 ("KVM: arm64: gic-v5: Implement GICv5 load/put and save/restore")
-> Reviewed-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->  arch/arm64/kvm/vgic/vgic.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index b25303d9919fd..da72779d3b3ee 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -1045,11 +1045,15 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
->  static inline bool can_access_vgic_from_kernel(void)
->  {
->  	/*
-> -	 * GICv2 can always be accessed from the kernel because it is
-> -	 * memory-mapped, and VHE systems can access GICv3 EL2 system
-> -	 * registers.
-> +	 * GICv3 and GICv5 drive the CPU interface through EL2 system
-> +	 * registers, so only VHE reaches them from the kernel. GICv2 is
-> +	 * memory-mapped and always reachable.
->  	 */
-> -	return !static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif) || has_vhe();
-> +	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif) ||
-> +	    kvm_vgic_global_state.type == VGIC_V5)
-> +		return has_vhe();
-> +
-> +	return true;
+Hi Marc,
 
-This really is perpetuating the wrong model. The rule is simple:
-anything that requires system instructions or system registers cannot
-be accessed from EL1, and therefore GICv2 is the only one that can be
-accessed from EL1. So the whole thing should read:
+On Sun, 11 Oct 2026 16:10:19 +0100, Marc Zyngier <maz@kernel.org> wrote:
+[...]
+> This really is perpetuating the wrong model. The rule is simple:
+> anything that requires system instructions or system registers cannot
+> be accessed from EL1, and therefore GICv2 is the only one that can be
+> accessed from EL1. So the whole thing should read:
+>
+>      return has_vhe() || kvm_vgic_global_state.type == VGIC_V2;
 
-	 return has_vhe() || kvm_vgic_global_state.type == VGIC_V2;
+Ack, I'll respin it that way.
 
-Ultimately, we should static keys for all of the vgic types.
+> Ultimately, we should static keys for all of the vgic types.
 
-	M.
+I'll do that as a follow-up once the merge window is over.
 
--- 
-Jazz isn't dead. It just smells funny.
+Cheers,
+/fuad
