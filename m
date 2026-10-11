@@ -1,86 +1,124 @@
-Received: from mta1.migadu.com (out-33.mta1.migadu.com [95.215.58.33])
+Received: from mta0.migadu.com (out-74.mta0.migadu.com [91.218.175.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABFBF376A16
-	for <kvmarm@lists.linux.dev>; Sun, 11 Oct 2026 07:26:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E41EB448CE6
+	for <kvmarm@lists.linux.dev>; Sun, 11 Oct 2026 14:36:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791703587; cv=none; b=eAeQEtnogMLNyiiYG3m0+AgEsG0nU6fgPiegfyV6+uWgHxGybnCXpOU7efv+c4akmg/riS5BfoXk3lksuyHYHML2dlMKOum/Ihig2+JNF77Itouoz3LruJjboTNupcDtgeNcGZX9hhd6+HXM6fAwRztLlUWj+q4P6OgV6k6poq8=
+	t=1791729415; cv=none; b=X61Ta4dgUEx2BdEaMOnk1XUeQGIWKnz8QVkCN9N2CC+MXUyAhCo/s3Nm2PiGl5dTV59QPuOVEbGGt4c84HuOMDyNoMxuZsHgd3n7EAIqWMTAND4rzmh5V3bYmI1NWHb9SJATeRDNPJEhHWqJCAoi9Wg4+GlAIaFDg1clc4ukrp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791703587; c=relaxed/simple;
-	bh=zeYhOKLAEK6plYt1ei/97MDQNIKutEUyTKAyLEF+q9o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SrDB68VQnCR6ffK5kumYhuaijbWL47/T7YY6laxiKNsDwG/GIVLHtHVkhvvkz7PPDEuX0bw2tSIQ2+hIi5MWim5+wiw/NkXpY58kQFpsaayl8RFooxsjHBBU26WsRk1PJwRDXZmmwhxgH2leAQS/f8e8CUHUTBbpVxStlXbzzZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VO+EyQMf; arc=none smtp.client-ip=95.215.58.33
+	s=arc-20240116; t=1791729415; c=relaxed/simple;
+	bh=OYn21/OL8lrH8NaEq6iDghNkvvHb7mfdPr+Xymc5Uv4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=B0gXjKqqjdwG3OkDLGOzp+aGp3y2aY5Qg1iwWfgznhDRlAY7S46G5PHegk2MViSOXqh6HOPoJAV41BV3olQGRHvt/tLY9rcupyH9atEm1q9fQEbAw5ECVY65lGnnFzRNMzhNGVjPyXFiCTIox7q/N4MjO4a835GP1mH9u6lSnRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pagB3q/F; arc=none smtp.client-ip=91.218.175.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VO+EyQMf"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pagB3q/F"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=zeYhOKLAEK6plYt1ei/97MDQNIKutEUyTKAyLEF+q9o=;
+DKIM-Signature: a=rsa-sha256; bh=OYn21/OL8lrH8NaEq6iDghNkvvHb7mfdPr+Xymc5Uv4=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1791703583; v=1; x=1792308383;
- b=VO+EyQMfkdoCAzZRmZ8Q1gzeNbt2A1w1Qihdx9B6DOJ0ha5zWAz8ayJz5O5gcYCqEFXXoa5o
- 5ulxgtOWHUhYpFPOxVDBF3wyfeRAnt9hbhlCjaweLu+Jvu4vQ321wKPL26A6vRMgYtUsAcIVcbN
- wa0IwO3jWcHI564/cHO74XrM=
+ t=1791729410; v=1; x=1792334210;
+ b=pagB3q/FkgcGgbi/SX8/Y4X6grPtD6gyyVgB3lIw4yE2QjFrRLWAgs8Fpw0XZ3iyJjHH+ChN
+ RawBGI6CSXQFaCT8w0MD6NzJr+7rPFZeKbFdHt8H92kD4P9hgPu/d3ypsU6RiKwOgcsONCRnVCH
+ F45f1cl0XPiD9ISsHct75XaY=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 7dff3651a5d9afb8;
-	Sun, 11 Oct 2026 07:26:23 +0000
-X-Mizu-Trace-ID: 7dff3651a5d9afb8
+Received: by smtp.migadu.com with ESMTPS id c296a38619e6afa6;
+	Sun, 11 Oct 2026 14:36:50 +0000
+X-Mizu-Trace-ID: c296a38619e6afa6
 X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5bcf03d95b8so547e87.0
-        for <kvmarm@lists.linux.dev>; Sun, 11 Oct 2026 00:26:19 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvByMTOqOME6rjKrG0WQqNN0biwuOTLDYHvHJ1gG9WjUxvh85rlLFeCpm/nmBK5qNNmrQ4qFGhh4=@lists.linux.dev
-X-Gm-Message-State: AFq9FYIBPKKEW72tuxcfVK2oYzE6OIMFfra63kWr9sEUoSnWoNauoqUA
-	UTqh5gFYwr72mFUB5o684ApkvyaN5WyiHxNxxx5Zbq06pzQWGGdbftv7B9TOZd2bra+AtkwqYXN
-	4fynGPLklq9cSG4z7FOp41QnEQoWmIghzM/FJqP8f
-X-Received: by 2002:a05:6512:3b11:b0:5bb:ff6f:b4bd with SMTP id
- 2adb3069b0e04-5bcea610359mr46362e87.14.1791703578480; Sun, 11 Oct 2026
- 00:26:18 -0700 (PDT)
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: maz@kernel.org,
+	oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: catalin.marinas@arm.com,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	mark.rutland@arm.com,
+	vdonnefort@google.com,
+	qperret@google.com,
+	Sascha.Bischoff@arm.com,
+	steven.price@arm.com,
+	tabba@google.com
+Subject: [PATCH v2 1/5] KVM: arm64: Reject the GICv5 CPU interface hypercalls under pKVM
+Date: Sun, 11 Oct 2026 15:36:44 +0100
+Message-Id: <20261011143648.211337-2-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20261011143648.211337-1-fuad.tabba@linux.dev>
+References: <20261011143648.211337-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260928152507.2116110-1-fuad.tabba@linux.dev>
- <20260928152507.2116110-4-fuad.tabba@linux.dev> <k6hsxo35ou3b5bcdo5xiew56zo25c4dmxqocnxszjvuqd7ct44@owruwfstprrh>
-In-Reply-To: <k6hsxo35ou3b5bcdo5xiew56zo25c4dmxqocnxszjvuqd7ct44@owruwfstprrh>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Sun, 11 Oct 2026 08:25:42 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTwe73HZ5u3LWgeYjDC2t1n4aLdwF=r-on5hSzCeTg+WPA@mail.gmail.com>
-X-Gm-Features: AclHuK-7n7d2SMrcaEI2aS0U2QLkxfWQsDtE5UfiVO1913-p3Vb7V7WrGlc9y-0
-Message-ID: <CA+EHjTwe73HZ5u3LWgeYjDC2t1n4aLdwF=r-on5hSzCeTg+WPA@mail.gmail.com>
-Subject: Re: [PATCH v1 03/10] KVM: arm64: nv: Don't loop on AT S12E{0,1}{R,W}
- with an invalid VTCR_EL2
-To: Kajetan Puchalski <kajetan.puchalski@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Jing Zhang <jingzhangos@google.com>, Karl Mehltretter <kmehltretter@gmail.com>, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-  Hi Kajetan,
+__vgic_v5_save_apr() and __vgic_v5_restore_vmcr_apr() remain callable
+once pKVM has finalised. pKVM never registers a GICv5 vgic, so neither
+has a valid caller in protected mode, and on a GICv3 machine both reach
+a register that is UNDEFINED at EL2 and panic the hypervisor.
 
-  On Fri, 09 Oct 2026 17:30:59 +0100, Kajetan Puchalski
-<kajetan.puchalski@arm.com> wrote:
-  [...]
-  > Currently we just clear out the upper bits of an address larger
-than the IA size and proceed, but
-  > the architecture requires that to cause a L0 translation fault.
-Not that it's a particularly common case.
-  > That is to say, I'm suggesting something like the following:
-  >
-  > + if (input_size > 48 || input_size < 25 || (ipa >> input_size) ||
-  > +    check_base_s2_limits(vcpu, wi, level, input_size, stride)) {
+Move both into the band the dispatcher rejects once pKVM has finalised.
 
-  Thanks, I'll add this to v2 as its own patch, since it's a missing
-check rather than the loop this patch fixes. I'll add
-  an at.c test for it too.
+Fixes: af325e87af5da ("KVM: arm64: gic-v5: Add vgic-v5 save/restore hyp interface")
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ arch/arm64/include/asm/kvm_asm.h   | 4 ++--
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-  Cheers,
-  /fuad
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index e5b92ac09e69e..ea319c496bb26 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -62,6 +62,8 @@ enum __kvm_host_smccc_func {
+ 	__KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs,
+ 	__KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs,
+ 	__KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config,
++	__KVM_HOST_SMCCC_FUNC___vgic_v5_save_apr,
++	__KVM_HOST_SMCCC_FUNC___vgic_v5_restore_vmcr_apr,
+ 
+ 	MARKER(__KVM_HOST_SMCCC_FUNC_MIN_PKVM),
+ 
+@@ -87,8 +89,6 @@ enum __kvm_host_smccc_func {
+ 	__KVM_HOST_SMCCC_FUNC___tracing_write_event,
+ 	__KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs,
+ 	__KVM_HOST_SMCCC_FUNC___vgic_v3_restore_vmcr_aprs,
+-	__KVM_HOST_SMCCC_FUNC___vgic_v5_save_apr,
+-	__KVM_HOST_SMCCC_FUNC___vgic_v5_restore_vmcr_apr,
+ 
+ 	MARKER(__KVM_HOST_SMCCC_FUNC_PKVM_ONLY),
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 9a3b92e626adb..7c939baf9c1ba 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -911,6 +911,8 @@ static const hcall_t host_hcall[] = {
+ 	HANDLE_FUNC(__kvm_enable_ssbs),
+ 	HANDLE_FUNC(__vgic_v3_init_lrs),
+ 	HANDLE_FUNC(__vgic_v3_get_gic_config),
++	HANDLE_FUNC(__vgic_v5_save_apr),
++	HANDLE_FUNC(__vgic_v5_restore_vmcr_apr),
+ 	HANDLE_FUNC(__pkvm_prot_finalize),
+ 
+ 	HANDLE_FUNC(__kvm_adjust_pc),
+@@ -932,8 +934,6 @@ static const hcall_t host_hcall[] = {
+ 	HANDLE_FUNC(__tracing_write_event),
+ 	HANDLE_FUNC(__vgic_v3_save_aprs),
+ 	HANDLE_FUNC(__vgic_v3_restore_vmcr_aprs),
+-	HANDLE_FUNC(__vgic_v5_save_apr),
+-	HANDLE_FUNC(__vgic_v5_restore_vmcr_apr),
+ 
+ 	HANDLE_FUNC(__pkvm_host_share_hyp),
+ 	HANDLE_FUNC(__pkvm_host_unshare_hyp),
+-- 
+2.39.5
+
