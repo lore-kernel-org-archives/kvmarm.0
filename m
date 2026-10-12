@@ -1,236 +1,205 @@
-Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7698741A921
-	for <kvmarm@lists.linux.dev>; Mon, 12 Oct 2026 11:04:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CF33F1056;
+	Mon, 12 Oct 2026 11:18:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791803096; cv=none; b=T13E7jmjRESzis79OGZ6/S55kUHrU6/5Y49sFNeXC0c/uqYaz3ZB3UmMdvnjPo5diGdS0YWB6mVDURwiu2fvwQmQSGxIQ68QOK/e+BFDNOfVNCIvZw2LVVC6Xmr79KbKBo0F10F8ISWDQO7FOdZfZ1aLlib0TpbB04Bw2bLTOYo=
+	t=1791803936; cv=none; b=YeOcaG+6WPYpGgE5Q+RUWo52EfUv2aO7EIgE9Cf5sJ21sjlU6PWTAFNpagn1/NgPvnWGKWc9tGe8ExTVb5bTANyhDBmVTxajGAdKBqqZGpBQy2r5WKLiEYJZ+cL6vDF8XG4kAp7+ylW2stY4/kpGxmwcUiaiK7Gr1C7OJxDTj/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791803096; c=relaxed/simple;
-	bh=Cntu8oydZe03qON8GryQkxB1KO+5pPFV3rgXmrRfFaQ=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=Rrf93OJ6NBbvRt0OWcZlv46WSku8mhg5mqta/tWYmwJdeL57PrCPZB4l5zYt2g5u/ti2zV0oNzcE91oSa6bdaijIybu9rqDUF/2dWqg4nqMqf1sq2BaJsZLQS10ICl9z+PlvYDzXz6TATV8lx7ABrFYbdZt5GN0iBo0zrMZzisw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=t+B+sJs8; arc=none smtp.client-ip=113.46.200.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1791803936; c=relaxed/simple;
+	bh=jqw+YqbNYpvWQkI81aml8+fiXxR2itbQl6fzKI+QO1M=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=g/dNeFzKhCn0vN9AuqrYbahgifwuJTIEeRV/jjgWqHwQqiQ3y+RJas4hnXLx39ySm56V3jhKF+98SzZRT7rXnrFP5cAnrflizErpWuxx2RJtFIU8JL+DMtb601y2e5OQzf7rG4o/iqYZEXHHumeTGreZBbKHoE4jz9WRn+bszPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GCxHvs/X; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="t+B+sJs8"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=6iGDId3KBgK0IM1Sb2lP0rsPu/sGEUwNU7C75TQ+NnQ=;
-	b=t+B+sJs8gGXBn4HhheHU+yhFK044D8088DXFCuJaCVEvxTSwEbyL/8/+VhF7EUqNa77vrz8G0
-	XlDciYLuXS0XJNLydxU50IPMkQvOFk4mW0Pkv6vhlYlUkyIrD88WnQmhIZxxK77b90aPyCh3UKi
-	h+aUKXjROC+sUvNGR1TfwdM=
-Received: from mail.maildlp.com (unknown [172.19.162.197])
-	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4j3DnD4x1jzpStW;
-	Mon, 12 Oct 2026 18:52:16 +0800 (CST)
-Received: from dggpemr200003.china.huawei.com (unknown [7.185.36.25])
-	by mail.maildlp.com (Postfix) with ESMTPS id 81E8B4057D;
-	Mon, 12 Oct 2026 19:04:48 +0800 (CST)
-Received: from [10.174.185.234] (10.174.185.234) by
- dggpemr200003.china.huawei.com (7.185.36.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.46; Mon, 12 Oct 2026 19:04:47 +0800
-Message-ID: <d4487bbb-ff89-4604-82b4-13a4a92067d8@huawei.com>
-Date: Mon, 12 Oct 2026 19:04:46 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GCxHvs/X"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB2221F0089B;
+	Mon, 12 Oct 2026 11:18:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791803934;
+	bh=lK+qV6ACE+ZIC7/SKRa3Jojmx9oqGAXfttgxOcfCiug=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=GCxHvs/X+x/620NMpUjYsEgKKYPzCd8nvloW+GB/wUHrYBgnzpkeqkqknm4IAy1C9
+	 oZSTQViurCAm2XPhplhdaVVuWflpOeU1vPArVp92GEWGoWdnfihy7FghMtsTnSbFcf
+	 5AkJDD4NaXQtK/efkWAt430AdYv2bSI1AB5OIyq6GVCBbnkaNQcyplMnMvpD7JQI5s
+	 OoaeYKmsqddZCUa3o83Uz/QuGKYKAueN+qLX+JvYz39qkKpgImLnofvwdRhFnOZN5v
+	 reefTqZh70dZwB57nq2q+mS/0ojfJJD+xPMKHZOuz63/Wt1IL6oYjGrlrf3Pv5r13b
+	 SkEze+R0ZC08g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xGE3Q-00000001qdE-21hE;
+	Mon, 12 Oct 2026 11:18:52 +0000
+Date: Mon, 12 Oct 2026 12:18:51 +0100
+Message-ID: <8633ub2mlg.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v1] KVM: arm64: vgic-v4: Don't forward an LPI with no target vCPU
+In-Reply-To: <20261012084743.2228612-1-fuad.tabba@linux.dev>
+References: <20261012084743.2228612-1-fuad.tabba@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RESEND][PATCH 0/2] Batch register access for live migration
- optimization
-From: Yize Wang <wangyize7@huawei.com>
-To: Marc Zyngier <maz@kernel.org>
-CC: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <catalin.marinas@arm.com>, <will@kernel.org>,
-	<fuad.tabba@linux.dev>, <joey.gouly@arm.com>, <seiden@linux.ibm.com>,
-	<suzuki.poulose@arm.com>, <yuzenghui@huawei.com>, <mark.rutland@arm.com>,
-	<zhengchuan@huawei.com>, <jiangjiacheng@huawei.com>, <yize_w1110@163.com>
-References: <20260918081930.4014735-1-wangyize7@huawei.com>
- <861paq69te.wl-maz@kernel.org>
- <f70c6fe3-e3c5-4912-b4bb-8a418fec4346@huawei.com>
- <86ece63kes.wl-maz@kernel.org>
- <6890def8-168d-4951-b6bd-bcbbcbf3595a@huawei.com>
-In-Reply-To: <6890def8-168d-4951-b6bd-bcbbcbf3595a@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- dggpemr200003.china.huawei.com (7.185.36.25)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Kindly Ping
+On Mon, 12 Oct 2026 09:47:43 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> 
+> KVM keeps one vgic_irq per LPI. The MAPTI that creates it sets its
+> target vCPU from that MAPTI's collection, and a later MAPTI of the same
+> LPI leaves the target alone. Mapping one LPI from two events is
+> UNPREDICTABLE (IHI 0069H.b, 5.2.10), but nothing stops a guest doing
+> it. If the first MAPTI names a collection the guest never maps and the
+> second a mapped one, the LPI translates through the second event with
+> a NULL target vCPU.
+> 
+> When the VMM routes an assigned device's MSI to that event on a host
+> with GICv4 enabled, kvm_vgic_v4_set_forwarding() takes the vPE from the
+> NULL target vCPU and the host oopses:
+> 
+>   Unable to handle kernel paging request at virtual address 0000000000001980
+>   [...]
+>   Call trace:
+>    its_build_vmapti_cmd (drivers/irqchip/irq-gic-v3-its.c:943) (P)
+>    its_irq_set_vcpu_affinity (drivers/irqchip/irq-gic-v3-its.c:1380)
+>    irq_set_vcpu_affinity (kernel/irq/manage.c:670)
+>    its_map_vlpi (drivers/irqchip/irq-gic-v4.c:326)
+>    kvm_vgic_v4_set_forwarding (arch/arm64/kvm/vgic/vgic-v4.c:485)
+>    kvm_arch_irq_bypass_add_producer (arch/arm64/kvm/arm.c:2977)
+>    irq_bypass_register_consumer (virt/lib/irqbypass.c:44)
+>    kvm_irqfd (arch/arm64/kvm/../../../virt/kvm/eventfd.c:496)
+>    kvm_vm_ioctl (arch/arm64/kvm/../../../virt/kvm/kvm_main.c:5270)
+> 
+> Leave such an LPI to the software path, which copes with a NULL target,
+> as kvm_vgic_v4_set_forwarding() already does when the MSI doesn't
+> translate.
+> 
+> Fixes: 196b136498b35 ("KVM: arm/arm64: GICv4: Wire mapping/unmapping of VLPIs in VFIO irq bypass")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+> Tested on QEMU, which emulates the GICv4 ITS, with a local reproducer
+> that sets up the two MAPTIs and forwards a vfio-pci MSI to the LPI. It
+> oopses without the fix and passes with it. Not tested on GICv4 hardware.
+> 
+> Based on v7.3-rc3.
+> 
+>  arch/arm64/kvm/vgic/vgic-v4.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+> index ed236f083f0d7..545e55317c863 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v4.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
+> @@ -466,6 +466,13 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+>  	if (irq->hw)
+>  		goto out_unlock_irq;
+>  
+> +	/*
+> +	 * Silently exit if the LPI has no target vCPU, as one mapped by
+> +	 * multiple ITEs (UNPREDICTABLE) can have.
+> +	 */
+> +	if (!irq->target_vcpu)
+> +		goto out_unlock_irq;
+> +
+>  	/*
+>  	 * Emit the mapping request. If it fails, the ITS probably
+>  	 * isn't v4 compatible, so let's silently bail out. Holding
+> 
 
-在 2026/10/8 20:50, Yize Wang 写道:
->
-> 在 2026/10/3 22:53, Marc Zyngier 写道:
->> On Sun, 20 Sep 2026 10:15:25 +0100,
->> Yize Wang <wangyize7@huawei.com> wrote:
->>> 在 2026/9/18 20:08, Marc Zyngier 写道:
->>>> On Fri, 18 Sep 2026 09:18:13 +0100,
->>>> Yize Wang<wangyize7@huawei.com> wrote:
->>>>> This series adds batch register access support to KVM/arm64 to reduce
->>>>> syscall overhead during VM live migration.
->>>>>
->>>>> Currently, QEMU issues one ioctl per register when 
->>>>> saving/restoring VGIC
->>>>> state. On large VM configurations this means tens of thousands of 
->>>>> syscalls,
->>>>> where lock acquisition and context switch overhead dominates 
->>>>> migration
->>>>> downtime. Thus, we provide a batch register method to allow userspace
->>>>> read/write multiple distributor and redistributor registers in a 
->>>>> single call.
->>>>> In this way, we can significantly reduce syscalls and migration 
->>>>> downtime.
->>>>>
->>>>> Test the VM migration time under pressure conditions.
->>>>> The VM specifications for migration are as follows:
->>>>> - VM use 4-K page;
->>>>> - the number of VCPU is 160;
->>>>> - the total memory is 320Gigabit;
->>>>> - use 'Redis SET-benchmark' to pressurize VM;
->>>>>
->>>>> Performance results (3-run average, ms):
->>>>>       | Metric              | Without patch | With patch | 
->>>>> Improvement |
->>>>> |---------------------|---------------|------------|-------------|
->>>>>       | Migration downtime  |        536    |     321 |     40%     |
->>>>>       | Source (total)      |        344    |     230 |     33%     |
->>>>>       |   - VGIC put        |        158    |      40 |     75%     |
->>>>>       |   - VGIC get        |        120    |      19 |     84%     |
->>>>>       | Destination (total) |        192    |      91 |     53%     |
->>>>>       |   - VGIC put        |        132    |      27 |     80%     |
->>>>>
->>>>> Yize Wang (2):
->>>>>     KVM: arm64: Add batch group constant and data structure to 
->>>>> UAPI header
->>>>>     KVM: arm64: Add VGIC v3 batch register access implementation
->>>> Questions:
->>>>
->>>> - Why only the MMIO registers?
->>>>
->>>> - Why not the sysregs?
->>>>
->>>> - Why only the GIC?
->>>>
->>>> - Why not all of the state?
->>>>
->>>> - Where is the corresponding userspace code?
->>>>
->>>> More importantly, since this is about batching system calls:
->>>>
->>>> - Why can't this be done with io_uring instead?
->>>>
->>>>     M.
->>>
->>> Hi, Marc! Thank you for the review.
->>>
->>>    These patches focus on optimizing GICv3 register access during live
->>> migration. We found that there are a large number of locks (kvm->lock,
->>> vcpus, config_lock) in the GIC, these lock operations wil cost large
->>> time waste. The batches of sysreg for vcpu optimization will come in
->>> follow as a separate series. And let me address these questions one by
->>> one.
->> All these locks should be non-blocking by the time you save anything
->> related to the GIC, because:
->>
->> - none of the vcpu can be running
->>
->> - this must be a single threaded operation
->>
->> So if you are seeing anything contended, this is either the sign of a
->> bad KVM bug, or an indication that you are violating the above
->> requirements.
->>
->>     M.
->
->
-> Hi, Marc! Thanks for your review.
->
-> You are right that when saving the GIC state during live migration 
-> process, all vCPUs are not running and it is a single threaded 
-> operation. Our patches process the packaged register states from the 
-> userspace under the same lock. These operations only aim to reduce the 
-> lock opreation downtime and do not involve lock contention.
->
-> In addition, these patches focus on reducing the syscalls of ioctl. 
-> Now, every register requires an ioctl, resulting in (num_cpu * 
-> registers_per_cpu) system calls. This will cost lots of time during 
-> the large-scale VM  migration. Our patches batch registers by category 
-> in qemu and then send them to kernel in batches. This operations 
-> significantly reduce the number of ioctl syscalls and save a great 
-> amount of downtime.
->
-> The comparison is as follow:
-> BEFORE:
->
->        QEMU (Userspace)                  Kernel (Kernelspace)
->   +------------------------+        +----------------------------+
->   |                        |        |                            |
->   |  kvm_arm_gicv3_get()   |        |  vgic_v3_attr_regs_access  |
->   |                        |        |                            |
->   |  for ncpu in num_cpu:  |        |                            |
->   |    for each register:  |        |                            |
->   |                        |        |                            |
->   |  GICR_CTLR             | ioctl->| mutex_lock(&kvm->lock)    |
->   |                        |        |  kvm_trylock_all_vcpus     |
->   |                        |        | mutex_lock(&config_lock)  |
->   |                        | <-val  |  read/write register       |
->   |                        |        |  mutex_unlock              |
->   |                        |        |  kvm_unlock_all_vcpus      |
->   |                        |        | mutex_unlock(&kvm->lock)  |
->   |                        |        |                            |
->   |  GICR_STATUSR          | ioctl->|  (repeat lock/read         |
->   |                        | <-val  |   -> unlock)               |
->   |  ...                   |        |                            |
->   |                        |        |                            |
->   |  GICR_WAKER            | ioctl->|  (repeat lock/read         |
->   |                        | <-val  |   -> unlock)               |
->   |  ...                   |        |                            |
->   |                        |        |                            |
->   |  ICC_SRE_EL1           | ioctl->|  (repeat lock/read         |
->   |                        | <-val  |   -> unlock)               |
->   |  ...                   |        |                            |
->   |                        |        |                            |
->   +------------------------+        +----------------------------+
->
->
-> AFTER:
->
->        QEMU (Userspace)                  Kernel (Kernelspace)
->   +------------------------+        +----------------------------+
->   |                        |        |                            |
->   |  kvm_arm_gicv3_get()   |        |  vgic_v3_batch_access      |
->   |                        |        |                            |
->   |  Collect Phase:        |        |                            |
->   |    add(GICR_CTLR)      |        |                            |
->   |    add(GICR_STATUSR)   |        |                            |
->   |    add(GICR_WAKER)     |        |                            |
->   |    add(GICR_IGROUPR0)  |        |                            |
->   |    ...                 |        |                            |
->   |    add(ICC_SRE_EL1)    |        |                            |
->   |    ...                 |        |                            |
->   |                        |        |                            |
->   |  Commit Phase:         | BATCH->| copy_from_user            |
->   |    batch_commit()      |        | mutex_lock(&kvm->lock)    |
->   |                        |        |  kvm_trylock_all_vcpus     |
->   |                        |        | mutex_lock(&config_lock)  |
->   |                        |        |                            |
->   |                        |        |  Process Each Entry:       |
->   |                        |        |    entry[0]: GICR_CTLR     |
->   |                        |        |    entry[1]: GICR_STATUSR  |
->   |                        |        |    entry[2]: GICR_WAKER    |
->   |                        |        |    ...                     |
->   |                        |        |    entry[N]: ICC_SRE       |
->   |                        |        |    FLAG_LOCKED: skip       |
->   |                        |        |                            |
->   |  Unpack Phase:         |<-result| mutex_unlock              |
->   |    Write back          |        |  kvm_unlock_all_vcpus      |
->   |    Post-process:       |        | mutex_unlock(&kvm->lock)  |
->   |      unshuffle,split   |        |  copy_to_user              |
->   |                        |        |                            |
->   +------------------------+        +----------------------------+
+Isn't the core problem that we don't correctly handle the UNPRED
+double mapping of the same LPI? I'd rather we attack the issue at the
+source instead of papering over the consequences.
+
+I hacked the following, which is obviously untested. Can you give it a
+go?
+
+Thanks,
+
+	M.
+
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index e5657cb603567..f0a1a879d9ac1 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -73,14 +73,16 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+  * If this is a "new" LPI, we allocate and initialize a new struct vgic_irq.
+  * This function returns a pointer to the _unlocked_ structure.
+  */
+-static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+-				     struct kvm_vcpu *vcpu)
++static struct vgic_irq *__vgic_add_lpi(struct kvm *kvm, u32 intid,
++				       struct kvm_vcpu *vcpu, bool *created)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	struct vgic_irq *irq = vgic_get_irq(kvm, intid), *oldirq;
+ 	unsigned long flags;
+ 	int ret;
+ 
++	*created = false;
++
+ 	/* In this case there is no put, since we keep the reference. */
+ 	if (irq)
+ 		return irq;
+@@ -133,6 +135,8 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ 
+ 		if (oldirq && !WARN_ON_ONCE(refcount_read(&oldirq->refcount)))
+ 			kfree_rcu(oldirq, rcu);
++
++		*created = true;
+ 	}
+ 
+ 	xa_unlock_irqrestore(&dist->lpi_xa, flags);
+@@ -160,6 +164,25 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ 	return irq;
+ }
+ 
++static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, int lpi_nr, struct kvm_vcpu *vcpu)
++{
++	struct vgic_irq *irq;
++	bool created;
++
++	irq = __vgic_add_lpi(kvm, lpi_nr, vcpu, &created);
++
++	/*
++	 * Mapping an LPI twice is UNPREDICTIBLE. Drop mapping an
++	 * existing LPI on the floor and convert it into an error.
++	 */
++	if (irq && !IS_ERR(irq) && !created) {
++		vgic_put_irq(kvm, irq);
++		irq = ERR_PTR(-EEXIST);
++	}
++
++	return irq;
++}
++
+ /**
+  * struct vgic_its_abi - ITS abi ops and settings
+  * @cte_esz: collection table entry size
+
+-- 
+Without deviation from the norm, progress is not possible.
