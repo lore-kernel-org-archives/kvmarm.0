@@ -1,104 +1,92 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C7154749F2
-	for <kvmarm@lists.linux.dev>; Mon, 12 Oct 2026 12:15:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mta0.migadu.com (out-100.mta0.migadu.com [91.218.175.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7E030D41B
+	for <kvmarm@lists.linux.dev>; Mon, 12 Oct 2026 14:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791807319; cv=none; b=NZix79PL5eOB2rN0q4Y1OPZr5+vmndDOXFeeB4sJ+EvAv8wzw3nPbWlANkcQT7UP8iuem0DZlYmvoyXupyRHB9fSEWaalyN0icqSzbpQjPqQbjPTgrWDfj9aGMJAgphAmIby1RPDbbKwt4Sg5C+4UFL4cqw+cKeTamwo82477no=
+	t=1791814475; cv=none; b=tralBorXr5FVrSA9WBeP7+aaCdi54ZggXQ1P5o8ZwBJwrVHISNx0LJd+m8KnWzHaT+J9bzyXq3F9ZyV8YW6PN6GI9s+znc8XDrql5vf4CYvgyT2CjFoaT8DNB8j8YtRE2wHB8xJjTy9OSP4FkGHnq5TC0XP1u6B9ZYCnU9u+V5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791807319; c=relaxed/simple;
-	bh=DMfzaODv+X4rVAl4WF+kEEoPKgzLJ8k6qC5EAIV4KlE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sXidyxErAO+lSaiyuafzHQ9Zp1/9RJYBd+EIeg2MmPsYsqyhkDPYvt1GBVi8D+pZ9sbrsMfeBLjWi0c0bIpx7L4pFw1AtmrAGbaGRXfgUf4QNE2OsueL9s3gemM6VmND5FC5yeqNCnhR1QCYiV2LQthZNEEL7NuxywFKo4Hy2Tg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=o1G7tYKA; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1791814475; c=relaxed/simple;
+	bh=BU8FrrYxJtVjuWI+jaNz6hLEtjMMOJYa/QcIW3P8I8U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=F2slcuVth9eT8Fdf4IJwRcr0snPqtFZrDoGqJpbusl07K47d0eF2192Z94uicLAvJxQvRHZDsFx7cl8QVhlVseBlfY0RTeNE0avcrbOQw+6Rt6JQWdV4f010RF1T3HIAwITSfnNuo+KdhD9fVqm9byGp/FmL//Az23U1VoUMxV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=N9T3SVF0; arc=none smtp.client-ip=91.218.175.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="o1G7tYKA"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E417A1655;
-	Mon, 12 Oct 2026 05:15:10 -0700 (PDT)
-Received: from [10.0.128.125] (Suzukis-MBP.cambridge.arm.com [10.0.128.125])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BE4013F66F;
-	Mon, 12 Oct 2026 05:15:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1791807314; bh=DMfzaODv+X4rVAl4WF+kEEoPKgzLJ8k6qC5EAIV4KlE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=o1G7tYKAGZ8ZUOIwIMmHupcl8h8MbxdF5P7ZnXLQuJfQB61fuKwkwK3TZmO6C28+N
-	 SbYuqfBg6rLwPYEE4bDpmIioMu2kDIHPUhQ9ZwHQlrvSnf+FbOofNqaEPjIQNkYSSX
-	 T1ISHippehbYzUvxDUu/A6KZveqt9lew5OOG1nss=
-Message-ID: <9cae3f68-1e6a-41e3-a092-39a662e26e6c@arm.com>
-Date: Mon, 12 Oct 2026 13:15:10 +0100
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="N9T3SVF0"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=BU8FrrYxJtVjuWI+jaNz6hLEtjMMOJYa/QcIW3P8I8U=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1791814469; v=1; x=1792419269;
+ b=N9T3SVF0nUZhqqcpvEwAbb3RrcVW2DMqtRuMp4Gm7LCs6YiICocesBgderiLIFG6zRR9fcM4
+ YaYrdGuXqCjX+GMTt2v4pW4JPVNMYESfbEt1tLuI+tDQ4VqCy/akDJElRvR1mbx2Q1fwEIGGcM6
+ uaNh7AP7r37A49B4wL38hyjU=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id da8de25c92919491;
+	Mon, 12 Oct 2026 14:14:29 +0000
+X-Mizu-Trace-ID: da8de25c92919491
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5ba40832934so7810e87.1
+        for <kvmarm@lists.linux.dev>; Mon, 12 Oct 2026 07:14:28 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBxYGAkCtQI1LqiYvU3sba0SMZAu94J0pYW31eaYLoSmumjKEo3ovbnbYDr7CcAbkRsU16bpcmk=@lists.linux.dev
+X-Gm-Message-State: AFq9FYKYjO7V+OUEJINEh89jwKpAV2lTs8z8yWIP4JfzyYOwR/TNSnCq
+	CqxS8w/JuG79ZnLutCW6ePgL938oXjeSkBlNA8eNgZ1sIodMbHj7Z7TzJkWBZm1UM7zOuGwqRlh
+	BcKahiluh5Hmt3Gt6E3avGZBme5QxMUZWqZJmaZLU
+X-Received: by 2002:a05:6512:3043:b0:5bb:661:7db4 with SMTP id
+ 2adb3069b0e04-5bce97ff24cmr161841e87.0.1791814467633; Mon, 12 Oct 2026
+ 07:14:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/5] KVM: arm64: Validate the host-provided vgic model
- in pKVM
-Content-Language: en-GB
-To: Fuad Tabba <fuad.tabba@linux.dev>, maz@kernel.org, oupton@kernel.org,
- kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
-Cc: catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com,
- seiden@linux.ibm.com, yuzenghui@huawei.com, mark.rutland@arm.com,
- vdonnefort@google.com, qperret@google.com, Sascha.Bischoff@arm.com,
- steven.price@arm.com, tabba@google.com
-References: <20261011143648.211337-1-fuad.tabba@linux.dev>
- <20261011143648.211337-4-fuad.tabba@linux.dev>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20261011143648.211337-4-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20261012084743.2228612-1-fuad.tabba@linux.dev> <8633ub2mlg.wl-maz@kernel.org>
+In-Reply-To: <8633ub2mlg.wl-maz@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 12 Oct 2026 15:13:51 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTwyQPPVG4tGY0i0DRk=kwbdEmjca6+GNjLDXrGxkNbMOw@mail.gmail.com>
+X-Gm-Features: AclHuK8JAr7VKAyNHjXlm8W06MLq8y4tWsehOxWPWjdhocCzuow2M7Ozid4Azug
+Message-ID: <CA+EHjTwyQPPVG4tGY0i0DRk=kwbdEmjca6+GNjLDXrGxkNbMOw@mail.gmail.com>
+Subject: Re: [PATCH v1] KVM: arm64: vgic-v4: Don't forward an LPI with no
+ target vCPU
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/10/2026 15:36, Fuad Tabba wrote:
-> EL2 copies vgic_model from the host's struct kvm unchecked, and the nVHE
-> world switch dispatches on it with no cpucap guard. A host writing
-> KVM_DEV_TYPE_ARM_VGIC_V5 makes EL2 access GICv5 CPU interface registers
-> that are UNDEFINED without FEAT_GCIE, and panics the hypervisor on any
-> GICv3 machine.
-> 
-> Accept only GICv3, the one model pKVM supports, and force anything else
-> to 0, as for a VM with no in-kernel irqchip. EL2 reads the model only to
-> pick the GICv5 world switch and to emulate GICv3 CPU interface accesses,
-> and the host's own copy is left alone.
-> 
-> Fixes: 9b8e3d4ca0e73 ("KVM: arm64: gic-v5: Implement GICv5 load/put and save/restore")
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->   arch/arm64/kvm/hyp/nvhe/pkvm.c | 10 ++++++++--
->   1 file changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 459bd9eb7e4bc..a9d0e94709199 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -340,13 +340,19 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
->   {
->   	struct kvm *kvm = &hyp_vm->kvm;
->   	unsigned long host_arch_flags = READ_ONCE(host_kvm->arch.flags);
-> +	u32 vgic_model = READ_ONCE(host_kvm->arch.vgic.vgic_model);
->   	DECLARE_BITMAP(allowed_features, KVM_VCPU_MAX_FEATURES);
->   
->   	/* CTR_EL0 is always under host control, even for protected VMs. */
->   	hyp_vm->kvm.arch.ctr_el0 = host_kvm->arch.ctr_el0;
->   
-> -	/* Preserve the vgic model so that GICv3 emulation works */
-> -	hyp_vm->kvm.arch.vgic.vgic_model = host_kvm->arch.vgic.vgic_model;
-> +	/*
-> +	 * pKVM runs only GICv3. Anything else becomes 0, the model of a VM
-> +	 * with no in-kernel irqchip, which keeps EL2 off the GICv5 registers.
-> +	 */
-> +	if (vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
-> +		vgic_model = 0;
+Hi Marc,
 
+On Mon, 12 Oct 2026 12:18:51 +0100, Marc Zyngier <maz@kernel.org> wrote:
+[...]
+> Isn't the core problem that we don't correctly handle the UNPRED
+> double mapping of the same LPI? I'd rather we attack the issue at the
+> source instead of papering over the consequences.
+>
+> I hacked the following, which is obviously untested. Can you give it a
+> go?
 
+With your diff on rc3, the second MAPTI is dropped, and forwarding the
+vfio-pci MSI to its event leaves the host up.
 
-> +	hyp_vm->kvm.arch.vgic.vgic_model = vgic_model;
+However, a vgic_irq outlives its ITE while the LPI is pending on a
+vCPU, so the check also drops a legitimate remap: a guest that
+DISCARDs a pending LPI and then maps it again loses the new mapping.
+On QEMU, rc3 (baseline) keeps it and your diff drops it.
+vgic_its_restore_ite() also goes through vgic_add_lpi(), so restoring
+tables that hold a double mapping fails with -EEXIST.
 
-0 is not a valid KVM_DEV_TYPE_*, so this looks good to me.
+v2, which I'm still testing, drops the second mapping at MAPTI too,
+but tracks in the vgic_irq whether an ITE maps it and checks that
+instead. A restore keeps the first ITE and drops the duplicate. I'll
+send it tomorrow.
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-
-
+Cheers,
+/fuad
