@@ -1,177 +1,146 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905904D37B3;
-	Mon, 12 Oct 2026 19:12:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145964CC294
+	for <kvmarm@lists.linux.dev>; Mon, 12 Oct 2026 19:13:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791832324; cv=none; b=SmJ4/klyXVJvnXRNACJv51OPrSHbPxyo7xhvDCPIUcO2n+CJbw/hEWpgAGm2xzkk+UtFFVcEggOh+JfjVW0kxbFFi0ANADDJi4Hvu80Wht6C6fc2wqJD8cFJr4t8pHSJn5GPxZcd0h1jopEa/h7BHOhISv0PYM+vAW34dhFkk0s=
+	t=1791832421; cv=none; b=IElEcY0XyK8Vevqxx3aFkZ/EQNHRMCYZ2X/RBnUYO18XsOrmTPvDl+hMm7VgDyF4lT0Ev5yRJ4VYzYaBapaI9a8Z0qc3jAv3e8qMqoGGp0KED8JfPUR3CAOfsb9UCJq6O2FaYnnAqqWBR38V4aWqYdY3MdlalxyKe2QzPDo4rdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791832324; c=relaxed/simple;
-	bh=FdkP+D43EN+xQd/ndnjr780pUFvJoTrEDYoQqVAKW9Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l0UQiJo/+lDQDa5CJ9dKoqj/m51mCTrh3Sx6jpn1CoJKCwTk1aBgCJTTPutRND9ZIt/o43Oc4InVsPyeofAztQJZD8ih39/qeGtvXFKngLN2FM19E10q0DeZ4N/KuJegboSEoC0SZnFkvlhTGVPQ7ZqQ19zsS8yKEjO5T9yEnv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BEu0ArYB; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791832421; c=relaxed/simple;
+	bh=+qmz+yBeXRlBRx+OdP1RU/IGoFJLfquctyGFdtp+Fp0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nZs6nxrZ2r9iCeUzVT61pW1vvnou+mb/Q5HKhH+rCBk/gcmKzfLQGj9SkO27sifk6aSa13ElosXhpuqvzfoud7PzL+NOYNaqxjHbndl7yN29epa+3Jwd1Jw2Fm1oH2GGxqhkrnHwkl9QnwwELBIX6l3c39Ka2A4xGcl/jPDZERo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vr9MD9aq; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BEu0ArYB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58B361F0089B;
-	Mon, 12 Oct 2026 19:11:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vr9MD9aq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E082B1F008BC
+	for <kvmarm@lists.linux.dev>; Mon, 12 Oct 2026 19:13:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791832322;
-	bh=t5mO4SpyqVviWjSaaEv8n4NUJ8+LaAHDu09XG7kSbFs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=BEu0ArYB5XZKL/22X+idpyNhILy00Ml5Fj2jTZ7Fk/4tKlvNrtbcuHyIbatS1i6+H
-	 EgraXbynE/kQHml4oxd8zg6gA+C0hu9dN4/bgco2QE++oQB5bH8DxThhNACrQfpLo5
-	 XjczelQ46llI8hh5qdyeZlOGyGOojXJ0MYtBFM6yqvzpX+4jdT2meUTVQWDtflbCXM
-	 6iF5pmWBFtkh91Se1FhzLeFVS17tfaVz+ddcjoVeEnKq4qW/b4a4Az4vnWO1vg7GEy
-	 PxJnHj6TKtLcX2c2xZZNIY6SbIQi0/ch6peXKK7YGg1Kjv6Q5wlicS2sXtSXi+SohG
-	 UEkXkdb5KImtQ==
-Date: Mon, 12 Oct 2026 20:11:27 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: "David Hildenbrand (Arm)" <david@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	"Liam R. Howlett" <liam@infradead.org>, Vlastimil Babka <vbabka@kernel.org>, 
-	Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
-	Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>, 
-	Michal Hocko <mhocko@suse.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
-	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
-	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
-	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <mkp@kernel.org>, 
-	Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, Sebastian Reichel <sre@kernel.org>, 
-	John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
-	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
-	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
-	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
-	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
-	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
-	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
-	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev, 
-	Ihor Solodrai <ihor.solodrai@linux.dev>, Bert Karwatzki <spasswolf@web.de>, 
-	Emil Tsalapatis <emil@etsalapatis.com>
-Subject: Re: [PATCH v5 13/38] bpf: arena: mark arena_map_mmap() mappings
- VM_MIXEDMAP
-Message-ID: <as0uGOcxjg74Xw7_@gremlin>
-References: <20261009-b4-mmap-prepare-vma-flag-sanify-v5-0-923b70125b1e@kernel.org>
- <20261009-b4-mmap-prepare-vma-flag-sanify-v5-13-923b70125b1e@kernel.org>
- <5b8ef0ce-7429-4d74-b4da-a0561c59b1e2@kernel.org>
- <as0Buhi_-VCC7xLZ@gremlin>
- <4124106e-c51e-4476-bd67-63e4641bf14a@kernel.org>
+	s=k20260515; t=1791832419;
+	bh=Aps8kHLqi/8jFYidGtO0vryj1o6o4s/CXu0xm5bD3hI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=Vr9MD9aq/0c/K8dttGgHbcaFVyWghRXbaJ6aaaKBVDfEno5glVgugPNXPq3k06LIU
+	 SkfY5+HUu7AUNsjPrjRHtb/ZVvXSHEv6wp5MO3yXaaICa/8Amvv6ic3izHhBfbRoyy
+	 Gs6xiftz0Ep5iYn537eYMMrYpxj5DIoN/YPplNJQkwRDEhgorXpfM0nTTY33HFt9p3
+	 Cso4oUrpq4qCfUfPBsNgwp89s2hB+mjjkU6UTC5rPWUoHDacxWmW7YkKAlrixK5Nr1
+	 ahgRCzp979VYn7+1R9S36QMyLpexKe6JWyc5rL3pa0aueoALBqmuLvV/Qi3iBg3s2E
+	 3ArL9oQFRqGBQ==
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5ba35c0df4fso1754188e87.0
+        for <kvmarm@lists.linux.dev>; Mon, 12 Oct 2026 12:13:39 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBx2B07ONPfKdOKKd6kLq26FIlZ8JqFd9Pz0V8RwFiOxLrXuhhByvDD5GAzFZgG1NvJHFudA0GA=@lists.linux.dev
+X-Gm-Message-State: AFq9FYLRZAJlkrYQHnY7ulPLfFiwN6/Kdq8aPqsYprBCSRN1KZOHU4wn
+	fL4+Uj8xIUOHzJU0k1iFCOBNS9sGhNfwiK1s1zMJiWcGDtxpL5a4cR/lJVbEirVaXvs3heeN1cA
+	j0y54Es21jcAAOXQlTz5Ji50lF+xuhwk=
+X-Received: by 2002:a05:6512:3042:b0:5b8:f125:f48 with SMTP id
+ 2adb3069b0e04-5bcde8e2d0cmr3421626e87.57.1791832418176; Mon, 12 Oct 2026
+ 12:13:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4124106e-c51e-4476-bd67-63e4641bf14a@kernel.org>
+References: <20261002061507.1600269-1-suzuki.poulose@arm.com>
+ <20261002061507.1600269-8-suzuki.poulose@arm.com> <ar-PiBQGye4_hQa6@arm.com>
+In-Reply-To: <ar-PiBQGye4_hQa6@arm.com>
+From: "Rafael J. Wysocki (Intel)" <rafael@kernel.org>
+Date: Mon, 12 Oct 2026 21:11:34 +0200
+X-Gmail-Original-Message-ID: <CAJZ5v0gqSsA=tdKuQB1uExYas8F0BaxUm+eh8xaxxP6YAFB6cg@mail.gmail.com>
+X-Gm-Features: AclHuK92lB5NiS5iBnplzk_ORuBnuUMmcADY6EqE6mt-4e6s6zZBLocPPGyqu5E
+Message-ID: <CAJZ5v0gqSsA=tdKuQB1uExYas8F0BaxUm+eh8xaxxP6YAFB6cg@mail.gmail.com>
+Subject: Re: [PATCH v22 07/10] kernel: hibernate: Add an arch hook for
+ preventing hiberation
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, "Rafael J. Wysocki" <rafael@kernel.org>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, maz@kernel.org, will@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, 
+	gshan@redhat.com, joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com, 
+	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, 
+	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, 
+	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com, 
+	sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com, 
+	Len Brown <lenb@kernel.org>, Pavel Machek <pavel@kernel.org>, linux-pm@vger.kernel.org, 
+	Sudeep Holla <sudeep.holla@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 12, 2026 at 08:56:23PM +0200, David Hildenbrand (Arm) wrote:
-> On 10/12/26 17:55, Lorenzo Stoakes (ARM) wrote:
-> > On Mon, Oct 12, 2026 at 05:08:09PM +0200, David Hildenbrand (Arm) wrote:
-> >> On 10/9/26 20:04, Lorenzo Stoakes (ARM) wrote:
-> >
-> >>> diff --git a/kernel/bpf/arena.c b/kernel/bpf/arena.c
-> >>> index 7b6847200b43..b69fe5e34339 100644
-> >>> --- a/kernel/bpf/arena.c
-> >>> +++ b/kernel/bpf/arena.c
-> >>> @@ -620,8 +620,9 @@ static int arena_map_mmap(struct bpf_map *map, struct vm_area_struct *vma)
-> >>>  	 * clears VM_MAYEXEC. Set VM_DONTEXPAND to avoid potential change
-> >>>  	 * of user_vm_start. Set VM_DONTCOPY to prevent arena VMA from
-> >>>  	 * being copied into the child process on fork.
-> >>> +	 * This is a kernel page so set VM_MIXEDMAP.
-> >>>  	 */
-> >>> -	vm_flags_set(vma, VM_DONTEXPAND | VM_DONTCOPY);
-> >>> +	vm_flags_set(vma, VM_MIXEDMAP | VM_DONTEXPAND | VM_DONTCOPY);
-> >>>  	vma->vm_ops = &arena_vm_ops;
-> >>>  	return 0;
-> >>>  }
-> >>>
-> >>
-> >> Historically, VM_MIXEDMAP really just means: can contain refcounted and
-> >> non-refcounted things. Everything with a struct page is refcounted.
-> >>
-> >> I think we are now changing the semantics to mean "maps kernel pages". I think
-> >
-> > Yes.
-> >
-> > It was sort of implicit before given insert_page() etc. but still really meaning
-> > that it _might_ be both.
+On Fri, Oct 2, 2026 at 1:03=E2=80=AFPM Catalin Marinas <catalin.marinas@arm=
+.com> wrote:
 >
-> Yeah, it's in the name. Mixed: pfn and/or ordinary.
-
-Well the name is confusing as a great many users never mix anything, and it's
-far from obvious you need to set one.
-
-Anyway, one for later. Maybe a mask like VMA_NON_MM_MANAGED_MASK or something
-better than that...
-
->
+> On Fri, Oct 02, 2026 at 07:15:03AM +0100, Suzuki K Poulose wrote:
+> > Add a hook to allow arch code disable hibernation. On arm64, with an RM=
+M active,
+> > there could be pages that are delegated to the "Realm" security state. =
+Any
+> > access to them are fatal (e.g., hibernate save image or restoring an im=
+age to
+> > a delegated page). pKVM host also has its restrictions on enabling hibe=
+rnation.
 > >
-> >> this is fine, but we really have to update the documentation (and possibly
-> >> rename this thing to something more expressive?)
+> > Add a weak arch hook to let the architectures have a say.
 > >
-> > Yeah I completely agree.
+> > Cc: "Rafael J. Wysocki" <rafael@kernel.org>
+> > Cc: Len Brown <lenb@kernel.org>
+> > Cc: Pavel Machek <pavel@kernel.org>
+> > Cc: linux-pm@vger.kernel.org
+> > Cc: Sudeep Holla <sudeep.holla@kernel.org>
+> > Suggested-by: Catalin Marinas <catalin.marinas@arm.com>
+> > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>
+> Nit: the subject prefix for kernel/power/ usually is
+>
+>         PM: hibernate: ....
+>
+> I can fix it locally, no need to respin (and probably the wrap the long
+> lines in the commit log, we tend to keep them shorter).
+>
+> > ---
+> >  include/linux/suspend.h  | 1 +
+> >  kernel/power/hibernate.c | 8 +++++++-
+> >  2 files changed, 8 insertions(+), 1 deletion(-)
 > >
-> > I will rename it, but I think that's best for 7.5 obviously! :)
+> > diff --git a/include/linux/suspend.h b/include/linux/suspend.h
+> > index b02876f1ae38a..a3815027773c5 100644
+> > --- a/include/linux/suspend.h
+> > +++ b/include/linux/suspend.h
+> > @@ -401,6 +401,7 @@ int hibernate_quiet_exec(int (*func)(void *data), v=
+oid *data);
+> >  int hibernate_resume_nonboot_cpu_disable(void);
+> >  int arch_hibernation_header_save(void *addr, unsigned int max_size);
+> >  int arch_hibernation_header_restore(void *addr);
+> > +bool arch_hibernation_available(void);
+> >
+> >  #else /* CONFIG_HIBERNATION */
+> >  static inline void register_nosave_region(unsigned long b, unsigned lo=
+ng e) {}
+> > diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
+> > index d2479c69d71a4..9d9d53828542f 100644
+> > --- a/kernel/power/hibernate.c
+> > +++ b/kernel/power/hibernate.c
+> > @@ -106,11 +106,17 @@ bool hibernation_in_progress(void)
+> >       return !atomic_read(&hibernate_atomic);
+> >  }
+> >
+> > +__weak bool arch_hibernation_available(void)
+> > +{
+> > +     return true;
+> > +}
+> > +
+> >  bool hibernation_available(void)
+> >  {
+> >       return nohibernate =3D=3D 0 &&
+> >               !security_locked_down(LOCKDOWN_HIBERNATION) &&
+> > -             !secretmem_active() && !cxl_mem_active();
+> > +             !secretmem_active() && !cxl_mem_active() &&
+> > +             arch_hibernation_available();
 >
-> Yes.
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 >
-> VM_PFNMAP / VM_MIXEDMAP - These contain kernel-mapped data which cannot be
-> 			  reasonably reconstructed on page fault.
->
-> the description is already pretty clear. just not that kernel-mapped pages
-> *must* use one of these.
+> Raphael, any objection to this patch going in through the arm64 tree? It
+> matches the style of other __weak functions in this file.
 
-I think mixed map could do with a rename because it implies it _is_ mixed rather
-than could be.
+No objection, and feel free to add an ACK from me to this one.
 
-But again one for the future!
-
->
-> (again, the ->fault thing returning allcoated kernel memory is nasty)
-
-Yeah added to my todo to fix that. Hateful.
-
---
-Cheers, Lorenzo
+Thanks!
