@@ -1,139 +1,151 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 070EC433E81;
-	Mon, 12 Oct 2026 11:31:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F3B9345EB1
+	for <kvmarm@lists.linux.dev>; Mon, 12 Oct 2026 12:03:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791804683; cv=none; b=WM0Imnot4Ou7wFVnloYjMvCtxi4Jkj0rX7gcyZOIPRdV6yli729KTbv11q3zX/crqHBTXHcLdZUy4BRCHMhiuUag6bmLHDW6pl5z0hVCAYLTfAMvKUfBt3QGytmYGzpaJb2/b2Ds4b1eE0gqkqdDNk6WzP8FGxIPq2sqifUdTww=
+	t=1791806587; cv=none; b=FD7eo9qZXDadBDs+0D/Pc6GPSo94hoyCcCrxooQ1qxZvdpuQrKp6Vcs1VgifjjZRmrkLfvwiXz7GfwDM9l41aX8W54zWev1hhCaolThfqPwh2CUGYeISGRKGYr4JL6nR6xMT5PAQby8sU71VP5ousUNhxfE+GjYYP+boRT9tQqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791804683; c=relaxed/simple;
-	bh=J2BDvOIa7NGCXDbw/wJHso1NT9BGYY7QZe4OLOYylDE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qvayX9e+8KqQY7rodAPEDBykrtf5dXoX9DBEhikOHBxqf2xDOK0/Xbe4eDvoIgDncoUwHTLWV1SwD3qDcVLLFFaqt0RlxMsYeZezrQaGtEyMrO6ou1EpML16U5AbcT0hCEMq0Dj1YIlykUrq0T8YVfG9mesohaNx5BtEmRne3aQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GG0crorO; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791806587; c=relaxed/simple;
+	bh=87JAwL4Wo/puwTtUIlo0MwTa0OtKrL9jDLQqKX3bxp4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=E5Lo++zpyLvYSQ0RpiIH4CgdcD67hhHQ2AAHmmEOuNHDzd6YzzZfc7N/M8SJ+OaUvpq0ctVjJmeU5TkASbsukXFXC3bpgmwqNqww0bzCkt6ZPGXkYTzfpn1l+4sw5Hf1NWUGQTLLc4FhR5aBVbnunYUVKDCTohsASuUa34DYyG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=TICF56M6; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GG0crorO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0D681F0089B;
-	Mon, 12 Oct 2026 11:31:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791804680;
-	bh=UKbDbkFJt72t2zaBIh+ZUe3E29MXtHewW5fvZXZCj30=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=GG0crorOYWxX9858zOkG7h2+X99LFStJ4Gi8/a5Drk5bO6EswnhtjYKFxLtZt8h4v
-	 FqWT41IP8Ehk2C/+UT4t68wZgWCbVd9ccW7oEqHevvJi6EfSWQxTa1AjZMgk6k3j8u
-	 ugOmsxlfttwzXePsildhyn3jj5iL3LG673ZL4PpuDTVHcsQh4g5PfnjnTRhKZbh6x+
-	 BYJ7LRg0UFaH6olen9aZ42c6+9FhgGQ1mO1hAOAoe2BsAI9MuZ3RqAQ8Q0x8ccp0wC
-	 5vea+Oyry6rwXwBdEIXnlMuev3gMUhP3qJV/Q/iNVMJ5qIqtC6jjHQSn4RWNIAGCqt
-	 BUJZ2KnBFbjsQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xGEFS-00000001qvN-0l8F;
-	Mon, 12 Oct 2026 11:31:18 +0000
-Date: Mon, 12 Oct 2026 12:31:17 +0100
-Message-ID: <861p9v2m0q.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Yize Wang <wangyize7@huawei.com>
-Cc: <kvmarm@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>,
-	<catalin.marinas@arm.com>,
-	<will@kernel.org>,
-	<fuad.tabba@linux.dev>,
-	<joey.gouly@arm.com>,
-	<seiden@linux.ibm.com>,
-	<suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>,
-	<mark.rutland@arm.com>,
-	<zhengchuan@huawei.com>,
-	<jiangjiacheng@huawei.com>,
-	<yize_w1110@163.com>
-Subject: Re: [RESEND][PATCH 0/2] Batch register access for live migration optimization
-In-Reply-To: <6890def8-168d-4951-b6bd-bcbbcbf3595a@huawei.com>
-References: <20260918081930.4014735-1-wangyize7@huawei.com>
-	<861paq69te.wl-maz@kernel.org>
-	<f70c6fe3-e3c5-4912-b4bb-8a418fec4346@huawei.com>
-	<86ece63kes.wl-maz@kernel.org>
-	<6890def8-168d-4951-b6bd-bcbbcbf3595a@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="TICF56M6"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 344871655;
+	Mon, 12 Oct 2026 05:03:01 -0700 (PDT)
+Received: from [10.0.128.125] (Suzukis-MBP.cambridge.arm.com [10.0.128.125])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5B77B3F882;
+	Mon, 12 Oct 2026 05:03:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1791806584; bh=87JAwL4Wo/puwTtUIlo0MwTa0OtKrL9jDLQqKX3bxp4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=TICF56M6nNaNZ0BA/yq8qr6ucOZMhtXGjlDncoubsa5DUKj+9gHLENQWxXlo6Lk+9
+	 OFjfHSt6tCbGetm28hbc4ZnkyisTwvY2JNmfqM3953GySDxovOIbFO2V3xR8grjucT
+	 m9Nmq1OaAXoA507w4TpvDFdwL9+qVjjP2yQ1K1g4=
+Message-ID: <6f5dcdd6-21ca-4392-9d6c-fa262a8cf7de@arm.com>
+Date: Mon, 12 Oct 2026 13:03:00 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: wangyize7@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, zhengchuan@huawei.com, jiangjiacheng@huawei.com, yize_w1110@163.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/5] KVM: arm64: Reject the stage-2 flush hypercalls
+ under pKVM
+Content-Language: en-GB
+To: Fuad Tabba <fuad.tabba@linux.dev>, maz@kernel.org, oupton@kernel.org,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+Cc: catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com,
+ seiden@linux.ibm.com, yuzenghui@huawei.com, mark.rutland@arm.com,
+ vdonnefort@google.com, qperret@google.com, Sascha.Bischoff@arm.com,
+ steven.price@arm.com, tabba@google.com
+References: <20261011143648.211337-1-fuad.tabba@linux.dev>
+ <20261011143648.211337-3-fuad.tabba@linux.dev>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20261011143648.211337-3-fuad.tabba@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, 08 Oct 2026 13:50:57 +0100,
-Yize Wang <wangyize7@huawei.com> wrote:
->=20
->=20
-> =E5=9C=A8 2026/10/3 22:53, Marc Zyngier =E5=86=99=E9=81=93:
-> > On Sun, 20 Sep 2026 10:15:25 +0100,
-> > Yize Wang <wangyize7@huawei.com> wrote:
-> >> =E5=9C=A8 2026/9/18 20:08, Marc Zyngier =E5=86=99=E9=81=93:
-> >>> On Fri, 18 Sep 2026 09:18:13 +0100,
-> >>> Yize Wang<wangyize7@huawei.com> wrote:
-> >>  =C2=A0 These patches focus on optimizing GICv3 register access during=
- live
-> >> migration. We found that there are a large number of locks (kvm->lock,
-> >> vcpus, config_lock) in the GIC, these lock operations wil cost large
-> >> time waste. The batches of sysreg for vcpu optimization will come in
-> >> follow as a separate series. And let me address these questions one by
-> >> one.
-> > All these locks should be non-blocking by the time you save anything
-> > related to the GIC, because:
-> >=20
-> > - none of the vcpu can be running
-> >=20
-> > - this must be a single threaded operation
-> >=20
-> > So if you are seeing anything contended, this is either the sign of a
-> > bad KVM bug, or an indication that you are violating the above
-> > requirements.
-> >=20
-> > 	M.
->=20
->=20
-> Hi, Marc! Thanks for your review.
->=20
-> You are right that when saving the GIC state during live migration
-> process, all vCPUs are not running and it is a single threaded
-> operation. Our patches process the packaged register states from the
-> userspace under the same lock. These operations only aim to reduce
-> the lock opreation downtime and do not involve lock contention.
+On 11/10/2026 15:36, Fuad Tabba wrote:
+> The stage-2 TLB and context flush hypercalls remain callable once pKVM
+> has finalised, and five of the six dereference a host-supplied
+> struct kvm_s2_mmu pointer. Under pKVM none has a valid caller: the host
+> walks no guest stage-2, its TLB flushes go through the handle-based
+> __pkvm_tlb_flush_vmid, and kvm_arch_vcpu_load() skips both the VMID
+> update and the CPU context flush.
+> 
+> Move them into the band the dispatcher rejects once pKVM has finalised.
+> 
+> Reported-by: Sashiko <sashiko-bot@kernel.org>
+> Closes: https://lore.kernel.org/all/20260914130152.F0D5F1F000FF@smtp.kernel.org/
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>   arch/arm64/include/asm/kvm_asm.h   | 12 ++++++------
+>   arch/arm64/kvm/hyp/nvhe/hyp-main.c | 11 ++++++-----
+>   2 files changed, 12 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index ea319c496bb26..b182c908c1a98 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -64,6 +64,12 @@ enum __kvm_host_smccc_func {
+>   	__KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config,
+>   	__KVM_HOST_SMCCC_FUNC___vgic_v5_save_apr,
+>   	__KVM_HOST_SMCCC_FUNC___vgic_v5_restore_vmcr_apr,
+> +	__KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
+> +	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa,
+> +	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa_nsh,
 
-OK, so your argument was actively misleading, since you were claiming
-that locks were the majority of the overhead, and are now
-advocating... something else.
+For a moment (pardon my inexperience with pKVM code base) I thought we
+could get this called via
 
-> In addition, these patches focus on reducing the syscalls of
-> ioctl. Now, every register requires an ioctl, resulting in (num_cpu
-> * registers_per_cpu) system calls. This will cost lots of time
-> during the large-scale VM migration. Our patches batch registers by
-> category in qemu and then send them to kernel in batches. This
-> operations significantly reduce the number of ioctl syscalls and
-> save a great amount of downtime.
+pkvm_stage2_relax_perms() ->... kvm_stage2_relax_perms() for the host, 
+but we are in EL2 already and it is a direct call.
 
-I've suggested you use io_uring, and you completely disregarded my
-suggestion based on... locking contention. How do you expect me to
-take you seriously?
+So, yes makes sense to me.
 
-I've now marked this series as rejected. Please come back once you and
-your AI toy have agreed on what you want to do.
+FWIW:
 
-Thanks,
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-	M.
+> +	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid,
+> +	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_range,
+> +	__KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context,
+>   
+>   	MARKER(__KVM_HOST_SMCCC_FUNC_MIN_PKVM),
+>   
+> @@ -72,12 +78,6 @@ enum __kvm_host_smccc_func {
+>   	/* Hypercalls that are always available and common to [nh]VHE/pKVM. */
+>   	__KVM_HOST_SMCCC_FUNC___kvm_adjust_pc,
+>   	__KVM_HOST_SMCCC_FUNC___kvm_vcpu_run,
+> -	__KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
+> -	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa,
+> -	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa_nsh,
+> -	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid,
+> -	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_range,
+> -	__KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context,
+>   	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
+>   	__KVM_HOST_SMCCC_FUNC___tracing_load,
+>   	__KVM_HOST_SMCCC_FUNC___tracing_unload,
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 7c939baf9c1ba..b2657a3c65b40 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -913,16 +913,16 @@ static const hcall_t host_hcall[] = {
+>   	HANDLE_FUNC(__vgic_v3_get_gic_config),
+>   	HANDLE_FUNC(__vgic_v5_save_apr),
+>   	HANDLE_FUNC(__vgic_v5_restore_vmcr_apr),
+> -	HANDLE_FUNC(__pkvm_prot_finalize),
+> -
+> -	HANDLE_FUNC(__kvm_adjust_pc),
+> -	HANDLE_FUNC(__kvm_vcpu_run),
+>   	HANDLE_FUNC(__kvm_flush_vm_context),
+>   	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
+>   	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa_nsh),
+>   	HANDLE_FUNC(__kvm_tlb_flush_vmid),
+>   	HANDLE_FUNC(__kvm_tlb_flush_vmid_range),
+>   	HANDLE_FUNC(__kvm_flush_cpu_context),
+> +	HANDLE_FUNC(__pkvm_prot_finalize),
+> +
+> +	HANDLE_FUNC(__kvm_adjust_pc),
+> +	HANDLE_FUNC(__kvm_vcpu_run),
+>   	HANDLE_FUNC(__kvm_timer_set_cntvoff),
+>   	HANDLE_FUNC(__tracing_load),
+>   	HANDLE_FUNC(__tracing_unload),
+> @@ -969,7 +969,8 @@ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
+>   
+>   	/*
+>   	 * If pKVM has been initialised then reject any calls to the
+> -	 * early "privileged" hypercalls. Note that we cannot reject
+> +	 * early "privileged" hypercalls, and to the ones the host has no
+> +	 * use for in protected mode. Note that we cannot reject
+>   	 * calls to __pkvm_prot_finalize for two reasons: (1) The static
+>   	 * key used to determine initialisation must be toggled prior to
+>   	 * finalisation and (2) finalisation is performed on a per-CPU
 
---=20
-Without deviation from the norm, progress is not possible.
