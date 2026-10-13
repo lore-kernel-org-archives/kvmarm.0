@@ -1,108 +1,195 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C130501295;
-	Tue, 13 Oct 2026 13:15:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE3B43C4563;
+	Tue, 13 Oct 2026 13:25:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791897313; cv=none; b=aHZm2VJtweZHXkDYP96QDsjK/CfDb8RkNbNpLM6STUYducap7eCQgYx0wnNaqFDMD/ifkGvV8CZwaBMPqa9231pitsEK75h6E4CnKfouQcmffwlqwz1P92UctXMxyWYTUqnJfmCyAKsDwCDWCugO/2hoxLjSC/riv7QNyFUvkrI=
+	t=1791897914; cv=none; b=NAC6B7kUXK9N47GFAGmfk9+Kruui0zefktu3vM92hXFry+QhW7lQAri14k2j+kMHm+se8RzahvX/ZGOQ21G8ZB+aUQBMZJ1C39vqOPSgi/UIbwDORHhwle35nP9zwNaXebYysjY7p0Mllq11XOmRYIOfYss+rbsIQOjv50ONKtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791897313; c=relaxed/simple;
-	bh=Z+vMVIXE9PODI5Wjf5ENx6vbXQiccUCZkPzQaPzj5pI=;
-	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=ecbnpS39vZhmZTnK218KO97Io6VjDxPCoOIyDncbPPkxEMXrkCS9X8Gc0LaD8IgkJAwinCtocAHefGyE7ZW2mlnTb9u/C9CykTjVXJ4hC1ntWfhYzH5BJsAU7DUjYk9JS99zCwieV0EthYS/4vZpCBZXvomfsvKwFbXSe2qiO8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KpzAElXV; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791897914; c=relaxed/simple;
+	bh=D/NigCEw73Ni9kY2I+Qw1DkW9l2u6Bdzz8oTYVY7XnE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aj2t8NVVnx9u1hik9PENG6sLV3Hk1Jw43VhGRj9VxueozP/F+xBo+4o1vgo4BN2RJmMuEg5Wg9xmqTEtBhFB11FgxFaGzZQzikobiXZVKCiSYOK6jWk9OqhhqBY8VfPRBxzUabHAXui/W4JW/xtjg+UwWweW1iJHmTpk5CdQHuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dSbKGPNR; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KpzAElXV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FA311F00893;
-	Tue, 13 Oct 2026 13:15:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dSbKGPNR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2E0E1F00893;
+	Tue, 13 Oct 2026 13:25:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791897311;
-	bh=L2lzIxBqaIeKi35f2v1IsK/Ll38K3FBX56QBG+TlL6c=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=KpzAElXVs/a80GANpGx4NmrwLsXtScp1Lcos1ADoaJsLsie7O7T9OZU2unl3E14TK
-	 vGSnhhypHQtHPXtvBIkd7C0lxLBogySnmjDHsXsFFu653cTXYCj5yZeAZuVRDLJZkR
-	 hZ6PBVWxn3pF/EjMNsYuIzgELNdXz8fLKjsN2WSeE0sIY64CUl/TRSlYfzOaqSRGPG
-	 V0jH7yaKwpt4uHkFfgKt45uAtsBMkh9GZVQppTlnd6ZBnyXPoLgQMOts7Rj/Ja18B8
-	 psjbP2cdoesppZFvRFUoxOIwK76PQwAuQRDYr3Q+MidCo/H0RiKWjTLhQu2M9iMKuO
-	 eILcRRgRiwPtw==
-Message-ID: <sashiko-outbox-169787@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 3/4] arm64: sysreg: Mark fields the architecture dropped
- as RES0
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>
-Cc: kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20261013130247.4135515-4-fuad.tabba@linux.dev>
-References: <20261013130247.4135515-1-fuad.tabba@linux.dev>
- <20261013130247.4135515-4-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 13 Oct 2026 13:15:11 +0000
+	s=k20260515; t=1791897912;
+	bh=PwLxNOFwoQXW7+W+m9Z6B9NLRJR3CBuEEpDCbi6SBic=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=dSbKGPNRxJPPOMFpbge1zMm1SfL13jy9ENTnh7KtZIMFidWfOFhgk2FptTGUif2ao
+	 LRJ5aaaSGLKTbZQ0bLZYyjELXZ4VsJBGm1labQHWOdZdWyWX7TjqKPRaLV5WuF/yU7
+	 MiUQ5TWevmPBZZWkn0bzqsPjo1k+WxmRk/HajK6Uh6skEuC+nTMa01/d7SO7yL1jM8
+	 IMpBXQxLRSR188YW8t7tjCaLzCeQ4mf1cQuj2S3aICIaRmFJoHbnScEz3oPqG8ZyJK
+	 jsKTHbTy7C/wtsHDTkd1fKGX025mpXe571dZF7vMESZLpr8TNdTOhZXMmQQz0U0TvW
+	 yDf01FORPI5eg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xGcVC-00000002NMW-1eHk;
+	Tue, 13 Oct 2026 13:25:10 +0000
+Date: Tue, 13 Oct 2026 14:25:09 +0100
+Message-ID: <86tsmp20ne.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/2] KVM: arm64: vgic-its: Fix LPI double mapping and DISCARD
+In-Reply-To: <CA+EHjTyZA6VL6EjhkB2bf9fDk4fUWpc=iXsu+sR1B+_YbR-nOQ@mail.gmail.com>
+References: <20261013081646.933312-1-fuad.tabba@linux.dev>
+	<as3_NKT20MNdqaJR@kernel.org>
+	<86wlrl2a2f.wl-maz@kernel.org>
+	<CA+EHjTztZpFrmuz9pK+01BsDxHnzpEwUMt6E3nUrgk4NNTsKYQ@mail.gmail.com>
+	<86v77526me.wl-maz@kernel.org>
+	<CA+EHjTyZA6VL6EjhkB2bf9fDk4fUWpc=iXsu+sR1B+_YbR-nOQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] arm64/sysreg: Semantic drift in auto-generated SCTLR_EL1_RES0 ma=
-sk consumed by KVM
---
+On Tue, 13 Oct 2026 13:59:22 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> 
+> Hi Marc,
+> 
+> On Tue, 13 Oct 2026 12:16:09 +0100, Marc Zyngier <maz@kernel.org> wrote:
+> [...]
+> > > A vCPU on its way into the guest does the same: it loads its LRs in
+> > > kvm_vgic_flush_hwstate() while it's still OUTSIDE_GUEST_MODE, so
+> > > kvm_arm_halt_guest() doesn't wait for it. With the delay after the
+> > > flush instead, on v2 plus your 1/7 and 2/7 [2] and both changes from
+> > > your reply to 1/7 [3], the guest takes it in 9 of 20 runs.
+> >
+> > Does this mean we still need OUTSIDE_GUEST_MODE to be a store-release
+> > past the point where we resync the state?
+> 
+> Not for the 9 of 20: that run already had the release. The halt reads
+> the OUTSIDE_GUEST_MODE the vCPU published at its previous exit, so it
+> doesn't wait for the early exit that folds the LPI back.
+> 
+> We do still need it for the window after the exit: with the delay
+> there and the same patches applied, the guest takes it in none of 20
+> runs, against 13 of 20 on v2.
 
-commit 60f264776efd2948b9996828935b2e973ae9b2bd
-Author: Fuad Tabba <fuad.tabba@linux.dev>
+I don't understand what these probabilities represent. Either it works
+or it doesn't. And given that I have no idea what you are testing
+with, I can't really make head or tail of the above.
 
-arm64: sysreg: Mark fields the architecture dropped as RES0
+> 
+> > > Once DISCARD waits for irq->on_lr to clear before clearing
+> > > pending_latch, the guest takes it in none of 20 runs in either case.
+> > > I'll add that to v3, unless the single-vcpu stunning already waits for
+> > > it.
+> >
+> > Polling for on_lr feels very dodgy, and I'd like to avoid this. If the
+> > OUTSIDE_GUEST release addresses it, I'd rather do that.
+> 
+> I'd rather avoid the polling too, but the release alone doesn't close
+> this one. The vCPU would also need to store IN_GUEST_MODE and check
+> its requests before kvm_vgic_flush_hwstate(), so that it never loads
+> its LRs while it's OUTSIDE_GUEST_MODE. The existing check after the
+> flush would still be needed, for the KVM_REQ_GUEST_HYP_IRQ_PENDING
+> request kvm_vgic_flush_hwstate() makes in a nested state. With that
+> and the release, the guest takes it in none of 20 runs with the delay
+> after the flush, and herd7 finds no LKMM execution that leaves it
+> pending.
 
-Commit d65bf6e317e7 turned the TME fields of SCTLR_EL1 into RES0, but left
-their copies in SCTLRMASK_EL1. PMICFILTR_EL0.T and BRBFCR_EL1.LASTFAILED
-have gone from the architecture as well, so mark them all as RES0 to match
-the spec.
+If you have a herd litmus test, how about posting it? It would really
+avoid a lot of that back and forth where the S/N ratio is pretty poor.
 
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 341db8e9b6c37..99af1c39478be 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
+> The IN_GUEST_MODE change would also cover vgic_mmio_change_active(),
+> which depends on the same halt (the comment above
+> vgic_access_active_prepare()). Would you be OK folding it into your
+> series, on top of your OUTSIDE_GUEST_MODE changes? Patch 2 then
+> wouldn't need the on_lr wait.
 
-[ ... ]
+Is the hack below what you are asking for? I can't tell. If it isn't,
+please post your own version.
 
-> @@ -2663,11 +2662,7 @@ Field	57	EPAN
->  Field	56	EnALS
->  Field	55	EnAS0
->  Field	54	EnASR
-> -Field	53	TME
-> -Field	52	TME0
-> -Field	51	TMT
-> -Field	50	TMT0
-> -Res0	49:47
-> +Res0	53:47
+Thanks,
 
-[Severity: Medium]
-This change reclassifies bits 53:50 of SCTLR_EL1 (TME, TME0, TMT, TMT0) from
-Field to Res0. This silently regenerates the aggregate mask SCTLR_EL1_RES0 =
-to
-include these bits.
+	M.
 
-This macro is actively consumed by KVM during C initialization via
-FORCE_RES0(SCTLR_EL1_RES0) in sctlr_el1_feat_map() in arch/arm64/kvm/config=
-.c:
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 0576c2022ef57..f1449b08531eb 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1321,10 +1321,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 
+ 		local_irq_disable();
+ 
+-		kvm_vgic_flush_hwstate(vcpu);
+-
+-		kvm_pmu_update_vcpu_events(vcpu);
+-
+ 		/*
+ 		 * Ensure we set mode to IN_GUEST_MODE after we disable
+ 		 * interrupts and before the final VCPU requests check.
+@@ -1333,14 +1329,18 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		 */
+ 		smp_store_mb(vcpu->mode, IN_GUEST_MODE);
+ 
++		kvm_vgic_flush_hwstate(vcpu);
++
++		kvm_pmu_update_vcpu_events(vcpu);
++
+ 		if (ret <= 0 || kvm_vcpu_exit_request(vcpu, &ret)) {
+-			vcpu->mode = OUTSIDE_GUEST_MODE;
+ 			isb(); /* Ensure work in x_flush_hwstate is committed */
+ 			if (kvm_vcpu_has_pmu(vcpu))
+ 				kvm_pmu_sync_hwstate(vcpu);
+ 			if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
+ 				kvm_timer_sync_user(vcpu);
+ 			kvm_vgic_sync_hwstate(vcpu);
++			smp_store_release(&vcpu->mode, OUTSIDE_GUEST_MODE);
+ 			local_irq_enable();
+ 			preempt_enable();
+ 			continue;
+@@ -1356,7 +1356,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 
+ 		ret = kvm_arm_vcpu_enter_exit(vcpu);
+ 
+-		vcpu->mode = OUTSIDE_GUEST_MODE;
+ 		vcpu->stat.exits++;
+ 		/*
+ 		 * Back from guest
+@@ -1390,6 +1389,12 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 
+ 		kvm_arch_vcpu_ctxsync_fp(vcpu);
+ 
++		/*
++		 * All the state has been synchronised, let advertise
++		 * we're outside of the guest.
++		 */
++		smp_store_release(&vcpu->mode, OUTSIDE_GUEST_MODE);
++
+ 		/*
+ 		 * We must ensure that any pending interrupts are taken before
+ 		 * we exit guest timing so that timer ticks are accounted as
 
-arch/arm64/kvm/config.c:sctlr_el1_feat_map() {
-    ...
-    FORCE_RES0(SCTLR_EL1_RES0),
-    ...
-}
-
-Could this cause a regression in KVM guest feature configuration for SCTLR_=
-EL1
-by forcing the removed TME bits to 0? Is KVM's initialization logic robust =
-to
-SCTLR_EL1_RES0 expanding to cover bits 53:50, and is forcing these bits to 0
-for guests intended?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261013130247.4135=
-515-1-fuad.tabba@linux.dev?part=3D3
+-- 
+Without deviation from the norm, progress is not possible.
