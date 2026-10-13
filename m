@@ -1,46 +1,47 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050C849DB83;
-	Tue, 13 Oct 2026 06:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD80339890A;
+	Tue, 13 Oct 2026 06:46:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791871893; cv=none; b=inQbnw54mIiUpHcS4M7fjyB6c5QuxNffflhsD+oQkbIyYP3LSEyFDOEaiO2GZxGNM0jYFhlYv1xVudSTcTCWWIsYC5urg/v8iZZXYVjhsfjc4rQ7aV3tAS7N3JWZfBOnS9ICcJ2S+5eoWMmaLDjFF30rSpzIc8ocUHANNcjKjUs=
+	t=1791874007; cv=none; b=bbJCcZHMYKrLPT8ud1jplQL3GAx0EIqT4Zy+VvTtm9URrtNqr/QGmaQ6uPxPrd3cl7SXeK+UWfSg4OkXvsQ1cm9Z22sEGdIQfn2Rjpdu352SX8XjBKVLATIt3fLahNVJA0i0wGqpeVbUt5tEREIJpvYKmKH/J/wkGYhR4mlCOpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791871893; c=relaxed/simple;
-	bh=LiJbY3k5up5aLOd7Bcg4qH560hdJKOEuwg8jCmB5OzI=;
+	s=arc-20240116; t=1791874007; c=relaxed/simple;
+	bh=pH93kqBmOwBI52TYN3NXCYhYrkC2g7AYW458mWnIn8c=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=mc6TsvYbk21zFFyd+7HdBb2MaHYbyNPqGE/vNicC9+IyAQnrvGjesZEX8+FLKgaJq3QULBXckgfLRiIczWcmI+fPb1wixexj/swzt7vXwK+I3YSkOXtrKjUDeDCz9aHaFemthg+tGZD/EMk1WM4QjNY6b0Qu4nmDTKK2y+bqtMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YALk6qqK; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=m1OpTVuWz1o/Osm8bOF37Vaa1sNJjm9DOQ8u3q9bvCHyhrxJh03LiN2XKDZRgQHGulMA8gsL+ZLeCD3vpmcMpZVmNJe8jbmPg379la54JgKnS/UImO3Tz7exViZ17nQeoBT1A8JQeSBWtuoetO26hwKjnkNZIEbfDm+zD/PEwXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kJwA7B9U; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YALk6qqK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFB561F000FF;
-	Tue, 13 Oct 2026 06:11:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kJwA7B9U"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D52B91F000FF;
+	Tue, 13 Oct 2026 06:46:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791871890;
-	bh=XNxt7wwex7pUWDMg9V+3M/jTcecLEnREYVs82yyM9aI=;
+	s=k20260515; t=1791874006;
+	bh=2JJcHZm2wlX4VUk8I+EW0Bm36MPCTKsLvSSStPnKLN0=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=YALk6qqKtPdpcsxHCEb6uvpb2E11q490MxJK0iGJMqeSZ3yQudydI0b2f/myBLVIM
-	 C6BF8rcCphjTDwvNOShHrnWejq1NYMLJri+gXA9wNepU0ucFeHZLUf7Bna2ZGGNY8R
-	 h2x+hPM80NwNThLC6pSawUKDuhzNukpeE6VlTzW8siz/raPskdFnhHFTz+ldkR9Qz+
-	 IuEh/gK1V3bV9FlML/ekBHhNT3VyWXZCp1Jxb1+yyVO1Gza/+2hJbY8so2bCazACHz
-	 dLLzWrNKLPyG5KWe20GdJcSSQuRMm64KgoruGc7/kEA1SIDtL+vy2ruCUIzISQlWNu
-	 dURRJrJm5hlpA==
+	b=kJwA7B9UiFHkL/DnvAVg/frvpkp4oL/S9lgGhHVKRZzRt5WsKpMe/3OMvBVw+Fluf
+	 A5YhHmVw1ksQsazXm8wt2EoWcot4gQsM/J+/Ah9xOtXFeGKWFsz0/H8bbJz0UiDZ5a
+	 A6TgRhf/rHEVy54YT+pySEx7GNZbrgBDYwnOSjRbgj/FCtAZV+1zRqRYabFA7/QBSz
+	 A1fKwzqL/jhxJsO3UgLFvvC/q7z1YTi8J05eee5nu2E8hvv2/3llFwjtzP7Yedrm30
+	 KD7tN4ClcHEWon5AWGuTfrEb/SuYs1hEJyxcJnRACCOyDQ6xvE54dI4E4HwHbUZ4M+
+	 4kQGg/V6uNXFA==
 X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
 From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: sashiko-reviews@lists.linux.dev, Jason Gunthorpe <jgg@nvidia.com>,
-	linux-coco@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, dri-devel@lists.freedesktop.org,
-	media-ci@linuxtv.org, kvmarm@lists.linux.dev,
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: [RFC PATCH v8 06/14] dma-pool: Allocate CoCo atomic pools using
- CoCo shared memory allocator
-In-Reply-To: <20260924101945.95D7F1F000FF@smtp.kernel.org>
+To: sashiko-reviews@lists.linux.dev, linux-coco@lists.linux.dev,
+	Jason Gunthorpe <jgg@nvidia.com>
+Cc: media-ci@linuxtv.org, kvmarm@lists.linux.dev,
+	dri-devel@lists.freedesktop.org,
+	Oliver Upton <oupton@kernel.org>,
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [RFC PATCH v8 08/14] swiotlb: Align shared IO TLB pools to the
+ shared granule size
+In-Reply-To: <20260924102254.60C431F00893@smtp.kernel.org>
 References: <20260924100529.1398790-1-aneesh.kumar@kernel.org>
- <20260924100529.1398790-7-aneesh.kumar@kernel.org>
- <20260924101945.95D7F1F000FF@smtp.kernel.org>
-Date: Tue, 13 Oct 2026 11:41:25 +0530
-Message-ID: <yq5aqzhuqgdu.fsf@kernel.org>
+ <20260924100529.1398790-9-aneesh.kumar@kernel.org>
+ <20260924102254.60C431F00893@smtp.kernel.org>
+Date: Tue, 13 Oct 2026 12:16:39 +0530
+Message-ID: <yq5ao6cyqer4.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,83 +53,79 @@ Content-Type: text/plain
 sashiko-bot@kernel.org writes:
 
 > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] dma-pool: atomic_pool_expand() falsely returns success on failure
+> - [Medium] mm: infinite loop in swiotlb_init_late() when remap fails
 > --
 >
-> commit 7de8bc3a8ea9e2bbef83e09d72fa88999ce898b9
+> commit 9e7f1b72520615870ee21508117e4c5c7e0eb684
 > Author: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 >
-> dma-pool: Allocate CoCo atomic pools using CoCo shared memory allocator
+> swiotlb: Align shared IO TLB pools to the shared granule size
+>     
+> This commit aligns and sizes the early memblock pool to the common CoCo
+> shared granule, leaving the slot count unchanged. It replaces the default
+> and dynamic pool set_memory calls with helpers to keep alignment validation
+> and architecture dispatch centralized. Pages are intentionally leaked if
+> their private state cannot be restored safely.
 >
-> This commit modifies atomic DMA pools to use the CoCo shared memory allocator.
-> It prevents allocation fallback below the required shared granule size, and
-> uses the cc_make_shared() helper to transition the backing allocations in a
-> sleepable context.
+>> diff --git a/kernel/dma/swiotlb.c b/kernel/dma/swiotlb.c
+>> index ded7016a46a71..394db93b7eb96 100644
+>> --- a/kernel/dma/swiotlb.c
+>> +++ b/kernel/dma/swiotlb.c
 >
->> diff --git a/kernel/dma/pool.c b/kernel/dma/pool.c
->> index 70b7f64b17ab5..f059312c15aa5 100644
->> --- a/kernel/dma/pool.c
->> +++ b/kernel/dma/pool.c
 > [ ... ]
->> @@ -85,6 +85,9 @@ static bool cma_in_zone(gfp_t gfp)
->>  static int atomic_pool_expand(struct dma_gen_pool *dma_pool, size_t pool_size,
->>  			      gfp_t gfp)
->>  {
->> +	struct cc_shared_layout layout;
->> +	unsigned long attrs = 0;
->> +	unsigned int min_order = 0;
->>  	unsigned int order;
->>  	struct page *page = NULL;
->>  	bool leak_pages = false;
->> @@ -92,6 +95,17 @@ static int atomic_pool_expand(struct dma_gen_pool *dma_pool, size_t pool_size,
->>  	int ret = -ENOMEM;
->>  	pgprot_t prot __maybe_unused;
+>
+>> @@ -578,7 +578,7 @@ int swiotlb_init_late(size_t size, gfp_t gfp_mask,
+>>  		swiotlb_adjust_nareas(num_possible_cpus());
 >>  
->> +	if (dma_pool->cc_shared) {
->> +		ret = cc_shared_calc_layout(pool_size, &layout);
->> +		if (ret)
->> +			goto out;
+>>  retry:
+>> -	order = get_order(nslabs << IO_TLB_SHIFT);
+>> +	order = get_order(ALIGN(nslabs << IO_TLB_SHIFT, cc_shared_granule_size()));
+>>  	nslabs = SLABS_PER_PAGE << order;
 >
-> [Severity: High]
-> If cc_shared_calc_layout() succeeds, it returns 0 and overwrites the initial
-> ret = -ENOMEM. Could this cause the function to falsely return 0 (success) on
-> subsequent failures?
+> [Severity: Medium]
+> If remap() fails later in this function, nslabs is halved and the code jumps
+> back to the retry label to try a smaller allocation:
 >
-> For instance, if page allocation fails below, the function jumps to out and
-> returns the current value of ret:
+> kernel/dma/swiotlb.c:swiotlb_init_late() {
+>     ...
+> 	if (remap)
+> 		rc = remap(vstart, nslabs);
+> 	if (rc) {
+> 		free_pages((unsigned long)vstart, order);
 >
->     if (!page)
->         goto out;
+> 		nslabs = ALIGN(nslabs >> 1, IO_TLB_SEGSIZE);
+> 		if (nslabs < IO_TLB_MIN_SLABS)
+> 			return rc;
+> 		retried = true;
+> 		goto retry;
+> 	}
+>     ...
+> }
 >
-> Similarly, if remapping fails later in the function:
+> Does the new ALIGN macro at the retry label risk inflating the halved size
+> back to its original value if cc_shared_granule_size() is >= 2MB?
 >
->     addr = dma_common_contiguous_remap(...)
->     if (!addr)
->         goto free_page;
->
-> In both cases, ret will be 0 instead of -ENOMEM. Would it be better to reset
-> ret back to -ENOMEM when these failures occur, or use a separate variable
-> for the cc_shared_calc_layout() return value?
+> If so, this would restore nslabs to its original failing value, overriding
+> the shrinking mechanism and creating an infinite loop.
 >
 
-Fixed as
+We don't expect cc_shared_granule_size() > 2MB. But i can also add a
+check. 
 
-modified    kernel/dma/pool.c
-@@ -96,9 +96,11 @@ static int atomic_pool_expand(struct dma_gen_pool *dma_pool, size_t pool_size,
- 	pgprot_t prot __maybe_unused;
+modified    kernel/dma/swiotlb.c
+@@ -719,8 +719,13 @@ int swiotlb_init_late(size_t size, gfp_t gfp_mask,
+ 		free_pages((unsigned long)vstart, order);
  
- 	if (dma_pool->cc_shared) {
--		ret = cc_shared_calc_layout(pool_size, &layout);
--		if (ret)
--			goto out;
-+		int err;
+ 		nslabs = ALIGN(nslabs >> 1, IO_TLB_SEGSIZE);
+-		if (nslabs < IO_TLB_MIN_SLABS)
+-			return rc;
++		if (nslabs <= IO_TLB_MIN_SLABS)
++			return rc;
 +
-+		err = cc_shared_calc_layout(pool_size, &layout);
-+		if (err)
-+			return err;
- 		pool_size = layout.shared_size;
- 		min_order = get_order(layout.alignment);
- 		if (min_order > MAX_PAGE_ORDER)
-
-
--aneesh
++		/* Avoid infinite loop */
++		if (WARN_ON(nslabs < (cc_shared_granule_size() >> IO_TLB_SHIFT)))
++			return rc;
++
+ 		retried = true;
+ 		goto retry;
+ 	}
