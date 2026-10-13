@@ -1,131 +1,177 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD80339890A;
-	Tue, 13 Oct 2026 06:46:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C612737A831
+	for <kvmarm@lists.linux.dev>; Tue, 13 Oct 2026 07:50:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791874007; cv=none; b=bbJCcZHMYKrLPT8ud1jplQL3GAx0EIqT4Zy+VvTtm9URrtNqr/QGmaQ6uPxPrd3cl7SXeK+UWfSg4OkXvsQ1cm9Z22sEGdIQfn2Rjpdu352SX8XjBKVLATIt3fLahNVJA0i0wGqpeVbUt5tEREIJpvYKmKH/J/wkGYhR4mlCOpw=
+	t=1791877851; cv=none; b=g2xJYRFImjKVUq5bc1893fvUCPfPYt5eydEWMA+bro6zVMQerXuE/rL+l/6IFMdn8rT7R4YiTMoJlElhPCdmA+Aye0bfeFIOTaz4Vd6p1ZUyw7E4iYYYJ5kDPfBnNI1xNkeGSZWXN3AZUXxoANXYs9TAP1VY+AXPS5T9RewnkKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791874007; c=relaxed/simple;
-	bh=pH93kqBmOwBI52TYN3NXCYhYrkC2g7AYW458mWnIn8c=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=m1OpTVuWz1o/Osm8bOF37Vaa1sNJjm9DOQ8u3q9bvCHyhrxJh03LiN2XKDZRgQHGulMA8gsL+ZLeCD3vpmcMpZVmNJe8jbmPg379la54JgKnS/UImO3Tz7exViZ17nQeoBT1A8JQeSBWtuoetO26hwKjnkNZIEbfDm+zD/PEwXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kJwA7B9U; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791877851; c=relaxed/simple;
+	bh=24/ZlOx+ZPKk/LHYC6cnoVGf2pxPAraBxhNLYYoSrqE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KPR68qbFdy2GzNHKlpQYoswK6RxoP1pv1LQlnzqjaTyQeyScyUB3TIXDtHIq4K0x26Zbf21nwEuR7BqIrc38wKsmRQPx46/THY0V6JnU6O6O/Kp74z+NdTh5sbxQfVJoWkcZQqT04QgU/WzeZMDHIjrgCWN2YcCTzAZua6rDGXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MTJD1DH3; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kJwA7B9U"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D52B91F000FF;
-	Tue, 13 Oct 2026 06:46:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791874006;
-	bh=2JJcHZm2wlX4VUk8I+EW0Bm36MPCTKsLvSSStPnKLN0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=kJwA7B9UiFHkL/DnvAVg/frvpkp4oL/S9lgGhHVKRZzRt5WsKpMe/3OMvBVw+Fluf
-	 A5YhHmVw1ksQsazXm8wt2EoWcot4gQsM/J+/Ah9xOtXFeGKWFsz0/H8bbJz0UiDZ5a
-	 A6TgRhf/rHEVy54YT+pySEx7GNZbrgBDYwnOSjRbgj/FCtAZV+1zRqRYabFA7/QBSz
-	 A1fKwzqL/jhxJsO3UgLFvvC/q7z1YTi8J05eee5nu2E8hvv2/3llFwjtzP7Yedrm30
-	 KD7tN4ClcHEWon5AWGuTfrEb/SuYs1hEJyxcJnRACCOyDQ6xvE54dI4E4HwHbUZ4M+
-	 4kQGg/V6uNXFA==
-X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: sashiko-reviews@lists.linux.dev, linux-coco@lists.linux.dev,
-	Jason Gunthorpe <jgg@nvidia.com>
-Cc: media-ci@linuxtv.org, kvmarm@lists.linux.dev,
-	dri-devel@lists.freedesktop.org,
-	Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [RFC PATCH v8 08/14] swiotlb: Align shared IO TLB pools to the
- shared granule size
-In-Reply-To: <20260924102254.60C431F00893@smtp.kernel.org>
-References: <20260924100529.1398790-1-aneesh.kumar@kernel.org>
- <20260924100529.1398790-9-aneesh.kumar@kernel.org>
- <20260924102254.60C431F00893@smtp.kernel.org>
-Date: Tue, 13 Oct 2026 12:16:39 +0530
-Message-ID: <yq5ao6cyqer4.fsf@kernel.org>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MTJD1DH3"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69D2F4BD1933761;
+	Tue, 13 Oct 2026 07:50:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=Sjs5mgAwZ0u2tQzKKe+zpfzq8m52Sd
+	rPDCcsqsEdmIg=; b=MTJD1DH3K509Y3CM40iggEGEh1FNGlOnHsHyS6xobIkPUB
+	iWwogBwHl7a6rhTh4GGI1qsr7OdvVL+9SGl38P8RX6vTcPLSrGTajuxn4meC/jI7
+	NqRS7BWskBB2BnN40kEHpoo924Ni9lJbq8+2vmWR/GtzgyDRGgkrbSprGP5QavNc
+	K0YXAA0WKwRt3fp2u9tccOlvzqgOfVVDj3oGNUUH95qgEhS1iYnnOg3NMmyuUyZF
+	z3xziv1e+hNrinpTP2b8bMqaMW8ZJXal2z9Fx5Uff7J2W1/btu+XjXA/rCbFY/9t
+	2LBhpmYPYD8dmQJo8JescP2vRDCGbzY5REbo7oDQ==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4h7e1w4cpe-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 13 Oct 2026 07:50:24 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 69D7UVgH2297907;
+	Tue, 13 Oct 2026 07:50:24 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4h82cygfvx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 13 Oct 2026 07:50:23 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 69D7oJ1A43123064
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 13 Oct 2026 07:50:19 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9BABC2004D;
+	Tue, 13 Oct 2026 07:50:19 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9FAB420040;
+	Tue, 13 Oct 2026 07:50:18 +0000 (GMT)
+Received: from osiris (unknown [9.224.76.185])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 13 Oct 2026 07:50:18 +0000 (GMT)
+Date: Tue, 13 Oct 2026 09:50:17 +0200
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Friedrich Welter <fritz@linux.ibm.com>, Fuad Tabba <tabba@google.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Nico Boehr <nrb@linux.ibm.com>,
+        Nina Schoetterl-Glausch <oss@nina.schoetterlglausch.eu>,
+        Oliver Upton <oupton@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v9 02/24] KVM: Move architecture capability Kconfigs to
+ header defines
+Message-ID: <20261013075017.696560-A-seiden@linux.ibm.com>
+References: <20260930173441.66762-1-seiden@linux.ibm.com>
+ <20260930173441.66762-3-seiden@linux.ibm.com>
+ <26b2c514-de23-4c70-81c8-875f8e8c094a@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <26b2c514-de23-4c70-81c8-875f8e8c094a@redhat.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDEzMDAzMCBTYWx0ZWRfXyw5R7W3K3BrL
+ LZS0Mygj1AmZeZcOQIxEbDCCTSV4YFnb+GKWecnNfkUmq8HHze6IZ3FC6JyEWjkgK/9ULemrzr4
+ h1p8WEQGtHlHPTaqpAYsPkasUz9/rdU=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDEzMDAzMCBTYWx0ZWRfX+r51WcVgennW
+ 1W5+Csfo13ax9IUXhhZDpqG3+qQTSbWxgs0E+z1KGhGCAwQl8QpaQjD5akVGj2QHYo5w9hgan+z
+ 0AKFKcE0yUv12a9dBfnmFMDshMhB38S3L8wWxivkvit2xvOmXqopiNZ/M5OsfZ12Rfn2cvF9Rik
+ blDH9L6pdeQeE+k2gV7uSDaz8J7L5Qs/z/nJ+mp2K8eKDgfljuw0IO3PSWx/8vna76dJvxvl0kl
+ 5m7vjOtfXAI32BhTBhXxYHd0f6CV4L3oM/GK2Uvl9fU/tze9zgu8RRLxlkDYynI/ItlY92oKjml
+ 4L41SFPnBUqqgsnztOzmbL3BGTJKSS14uwZcj9W2gteqQ4DH5XmPc/ARTQxQGvAMNHpSlxtgUTY
+ em45iQ68HXwQKpZB4m/Dusx6odXwsGkVwvBYBZd9fRRVtncyNDwSe7CO2f4UOovxo7YgouQaRHV
+ YhAGaYl09ZrmTulXl5w==
+X-Authority-Analysis: v=2.4 cv=E6pYNqdl c=1 sm=1 tr=0 ts=6acde2c1 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=kj9zAlcOel0A:10 a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=VnNF1IyMAAAA:8
+ a=LolK8cCbLh9hbZZaMMsA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: kRfiUjtPbLtTGxyBHkSxxPdk_XR8hKaj
+X-Proofpoint-GUID: 8usMhobHWWRXOQdsRqavwz8LGCbzNUF6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-10-13_01,2026-10-09_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 phishscore=0 clxscore=1015 bulkscore=0 priorityscore=1501
+ spamscore=0 adultscore=0 suspectscore=0 malwarescore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2610080000 definitions=main-2610130030
 
-sashiko-bot@kernel.org writes:
-
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Medium] mm: infinite loop in swiotlb_init_late() when remap fails
-> --
->
-> commit 9e7f1b72520615870ee21508117e4c5c7e0eb684
-> Author: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
->
-> swiotlb: Align shared IO TLB pools to the shared granule size
->     
-> This commit aligns and sizes the early memblock pool to the common CoCo
-> shared granule, leaving the slot count unchanged. It replaces the default
-> and dynamic pool set_memory calls with helpers to keep alignment validation
-> and architecture dispatch centralized. Pages are intentionally leaked if
-> their private state cannot be restored safely.
->
->> diff --git a/kernel/dma/swiotlb.c b/kernel/dma/swiotlb.c
->> index ded7016a46a71..394db93b7eb96 100644
->> --- a/kernel/dma/swiotlb.c
->> +++ b/kernel/dma/swiotlb.c
->
-> [ ... ]
->
->> @@ -578,7 +578,7 @@ int swiotlb_init_late(size_t size, gfp_t gfp_mask,
->>  		swiotlb_adjust_nareas(num_possible_cpus());
->>  
->>  retry:
->> -	order = get_order(nslabs << IO_TLB_SHIFT);
->> +	order = get_order(ALIGN(nslabs << IO_TLB_SHIFT, cc_shared_granule_size()));
->>  	nslabs = SLABS_PER_PAGE << order;
->
-> [Severity: Medium]
-> If remap() fails later in this function, nslabs is halved and the code jumps
-> back to the retry label to try a smaller allocation:
->
-> kernel/dma/swiotlb.c:swiotlb_init_late() {
->     ...
-> 	if (remap)
-> 		rc = remap(vstart, nslabs);
-> 	if (rc) {
-> 		free_pages((unsigned long)vstart, order);
->
-> 		nslabs = ALIGN(nslabs >> 1, IO_TLB_SEGSIZE);
-> 		if (nslabs < IO_TLB_MIN_SLABS)
-> 			return rc;
-> 		retried = true;
-> 		goto retry;
-> 	}
->     ...
-> }
->
-> Does the new ALIGN macro at the retry label risk inflating the halved size
-> back to its original value if cc_shared_granule_size() is >= 2MB?
->
-> If so, this would restore nslabs to its original failing value, overriding
-> the shrinking mechanism and creating an infinite loop.
+On Mon, Oct 12, 2026 at 07:53:43PM +0200, Paolo Bonzini wrote:
+> On 9/30/26 19:34, Steffen Eiden wrote:
+> > Historically, KVM feature opt-ins and callbacks were configured globally
+> > via Kconfig symbols (CONFIG_HAVE_KVM_* and CONFIG_KVM_*).
+> 
+> Not all of them - there are many __KVM_HAVE_* symbols already.  In
+> particular now there's both KVM_MSI and __KVM_HAVE_MSI/__KVM_HAVE_MSIX (but
+> the latter is dead, so I have sent a patch to remove it).
+> 
+> There are several remaining CONFIG_HAVE_KVM_ARCH_* Kconfig symbols as well.
+> That's okay, but it should be noted in the changelog that not all symbols
+> were fixed.
+> 
+> Can you at least quickly provide a v2, that changes all symbols to
+> __KVM_HAVE_<function-name> (and when not applicable __KVM_*, for example
+> __KVM_HAVE_READONLY_MEM)?  I have already changed KVM_NO_MMIO to
+> __KVM_NO_MMIO in kvm/queue.
 >
 
-We don't expect cc_shared_granule_size() > 2MB. But i can also add a
-check. 
+Yes, no problem.
 
-modified    kernel/dma/swiotlb.c
-@@ -719,8 +719,13 @@ int swiotlb_init_late(size_t size, gfp_t gfp_mask,
- 		free_pages((unsigned long)vstart, order);
- 
- 		nslabs = ALIGN(nslabs >> 1, IO_TLB_SEGSIZE);
--		if (nslabs < IO_TLB_MIN_SLABS)
--			return rc;
-+		if (nslabs <= IO_TLB_MIN_SLABS)
-+			return rc;
-+
-+		/* Avoid infinite loop */
-+		if (WARN_ON(nslabs < (cc_shared_granule_size() >> IO_TLB_SHIFT)))
-+			return rc;
-+
- 		retried = true;
- 		goto retry;
- 	}
+Using this pattern would reintroduce __KVM_HAVE_MSI then, right?
+I would create those symbols:
+
+  - __KVM_HAVE_INVALID_WAKEUPS 		(formerly KVM_INVALID_WAKEUPS)
+  - __KVM_HAVE_MSI			(formerly HAVE_KVM_MSI)
+  - __KVM_HAVE_NO_POLL			(formerly HAVE_KVM_NO_POLL)
+  - __KVM_HAVE_READONLY_MEM		(formerly HAVE_KVM_READONLY_MEM)
+  - __KVM_HAVE_VCPU_RUN_PID_CHANGE	(formerly HAVE_KVM_VCPU_RUN_PID_CHANGE)
+
+OK?
+
+	Steffen
+> Thanks,
+> 
+> Paolo
+> 
+> > Replace these global Kconfig options with architecture-specific opt-in
+> > defines in <asm/kvm_host.h> and standardize their naming by dropping the
+> > HAVE_ prefix:
+> >    - KVM_INVALID_WAKEUPS
+> >    - KVM_MSI			(formerly HAVE_KVM_MSI)
+> >    - KVM_NO_POLL			(formerly HAVE_KVM_NO_POLL)
+> >    - KVM_READONLY_MEM		(formerly HAVE_KVM_READONLY_MEM)
+> >    - KVM_VCPU_RUN_PID_CHANGE	(formerly HAVE_KVM_VCPU_RUN_PID_CHANGE)
+> > 
+> > This allows each architecture and guest implementation to configure its
+> > supported capabilities independently in its kvm_host header and eliminates
+> > unnecessary fallback stubs across different KVM targets.
+> > 
+> > Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+
