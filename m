@@ -1,33 +1,33 @@
-Received: from mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from mta0.migadu.com (out-12.mta0.migadu.com [91.218.175.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A074BD793
-	for <kvmarm@lists.linux.dev>; Tue, 13 Oct 2026 08:16:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D269B4BE457
+	for <kvmarm@lists.linux.dev>; Tue, 13 Oct 2026 08:17:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791879420; cv=none; b=d4izyq9uJNrClxnAb1LF2AmFtGcf3Ts/cyFINd60LYR4pIDB6ssiua+wPFPk4ONp+1IATq9/OlW/h4qs3unt/d/9ZtkulhdycyFO3ufet1HSeswQvXZv8mcXqZftVspz4qWZTr3HLzTQ41DGH+Vru7riurhRjcGHY4JiEw4Xhrw=
+	t=1791879424; cv=none; b=aN8/reh8xs/RIOdAfLTxukmfMnYBLm04vkPkXmRaqNLFvRJSWzwVRhR+tzXIgYcSDOL3rSu80SXq5rb6Lqmyw+qNB2qjL3MOjjSJZEbiWDXNTw3/oKaRZRogcfcf5CNbJy9qoXB73+7dn7LNgK1qM6SdFMZSOIiBzREUbcZLHRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791879420; c=relaxed/simple;
-	bh=bAqn7LCznwrvSaX1s89zfcIUxQs+oEV8QYw2vXO1G6o=;
+	s=arc-20240116; t=1791879424; c=relaxed/simple;
+	bh=QOyVRTmWh+YT7G+cpGvL66+aoL8H82+I49NPk8LYl+U=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WcD4kTqOji0RN4JNf0ujy/nBp6qBSoMT2rdcmfbTYtfNMuHO2FYtkkTe6uxtGu8tu7f/3rtWeLcUSfrr5MuDPfaV4ymhtkrSd4+/QqoMUQdWiU3eZqAfy12OvSumokqKSXUYQFiuwnk2w+LCpQBCDMM9TEabKUAlaIOCcgvRFRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sDw1kJI4; arc=none smtp.client-ip=95.215.58.182
+	 MIME-Version; b=mwOuJApjkYJXVte6+M1mGj3QwLUu1MLQZPzI0S3NnIfXXLKH8jAQG5kHKjtlZXugBCklRUiV9v9DxuuFG9XneftJPc/tYLMI+TEmdOpLPiyLDMpZWNVVnP8sCo3iaHTGGpFddrxDL5ojferF8VWrWASj/q5TH3gtcr3BTkmP1FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Gp2nP+pH; arc=none smtp.client-ip=91.218.175.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sDw1kJI4"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Gp2nP+pH"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=bAqn7LCznwrvSaX1s89zfcIUxQs+oEV8QYw2vXO1G6o=;
+DKIM-Signature: a=rsa-sha256; bh=QOyVRTmWh+YT7G+cpGvL66+aoL8H82+I49NPk8LYl+U=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1791879416; v=1; x=1792484216;
- b=sDw1kJI46lckutGknZRiV9xYq4UwaZQ59hydt44yRZywWuT8GfnsV9UJVZT7rZ2aK5Oux2o/
- TZyxkF+L8GT2ObexUKGkFfNEDM1ge9oW+WM8cLvQ/82v1jjoec7jn+0iBtF2Ets4b+HrMhkHhoS
- ZK7QV/lSmequ4ulbBcl3WbnQ=
+ t=1791879420; v=1; x=1792484220;
+ b=Gp2nP+pHOe5Lp/et1yJeGbgH/+x9cN0DXk8zE3PXvHDZ4kolbcGb/VVt3+a32LtfaNmlG0rC
+ 3yT5yPU+6WVoTvrjgSgvU+sLUh5AUf/9uFh8ANALqX9BbmKu1J1Kq5TEenVeGrqi3Xbf0mQxJb9
+ E9gJ30yAG8X/yBCVyYXjcF7g=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 93af02de8e003406;
-	Tue, 13 Oct 2026 08:16:55 +0000
-X-Mizu-Trace-ID: 93af02de8e003406
+Received: by smtp.migadu.com with ESMTPS id 3790d623399d7862;
+	Tue, 13 Oct 2026 08:17:00 +0000
+X-Mizu-Trace-ID: 3790d623399d7862
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -44,9 +44,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v2 1/2] KVM: arm64: vgic-its: Don't map an LPI from more than one event
-Date: Tue, 13 Oct 2026 09:16:45 +0100
-Message-Id: <20261013081646.933312-2-fuad.tabba@linux.dev>
+Subject: [PATCH v2 2/2] KVM: arm64: vgic-its: Remove the pending state of a discarded LPI
+Date: Tue, 13 Oct 2026 09:16:46 +0100
+Message-Id: <20261013081646.933312-3-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20261013081646.933312-1-fuad.tabba@linux.dev>
 References: <20261013081646.933312-1-fuad.tabba@linux.dev>
@@ -58,124 +58,61 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-KVM keeps one vgic_irq per LPI. A MAPTI of an LPI whose vgic_irq
-already exists reuses it for the new ITE and leaves its target vCPU as
-it was. Mapping one LPI from two events is UNPREDICTABLE (IHI 0069H.b,
-5.2.10), but nothing stops a guest from doing it. If the first MAPTI
-names a collection the guest never maps and the second a mapped one,
-the LPI translates through the second event with a NULL target vCPU.
+DISCARD removes the mapping of an event and instructs the Redistributor
+to remove the pending state of its LPI (IHI 0069H.b, 5.3.4). KVM only
+frees the ITE, so an LPI that is pending when the guest discards it
+stays queued on its target vCPU, and the guest still takes it.
 
-When the VMM routes an assigned device's MSI to that event on a host
-with GICv4 enabled, kvm_vgic_v4_set_forwarding() takes the vPE from the
-NULL target vCPU and the host oopses:
+Clear the pending state before freeing the ITE. A queued LPI can be
+pending in a running vCPU's list register, so halt the guest first when
+the LPI is queued, to fold that state back. A forwarded LPI already
+loses its pending state in its_free_ite(), whose unmap from the vPE
+sends a DISCARD to the host ITS.
 
-  Unable to handle kernel paging request at virtual address 0000000000001980
-  [...]
-  Call trace:
-   its_build_vmapti_cmd (drivers/irqchip/irq-gic-v3-its.c:943) (P)
-   its_irq_set_vcpu_affinity (drivers/irqchip/irq-gic-v3-its.c:1380)
-   irq_set_vcpu_affinity (kernel/irq/manage.c:670)
-   its_map_vlpi (drivers/irqchip/irq-gic-v4.c:326)
-   kvm_vgic_v4_set_forwarding (arch/arm64/kvm/vgic/vgic-v4.c:485)
-   kvm_arch_irq_bypass_add_producer (arch/arm64/kvm/arm.c:2977)
-   irq_bypass_register_consumer (virt/lib/irqbypass.c:44)
-   kvm_irqfd (arch/arm64/kvm/../../../virt/kvm/eventfd.c:496)
-   kvm_vm_ioctl (arch/arm64/kvm/../../../virt/kvm/kvm_main.c:5270)
-
-Track in each vgic_irq whether an ITE maps it. Drop a MAPTI of an LPI
-that is already mapped, as a failed MAPTI already is. Restoring the ITS
-tables keeps the first ITE it reads for each LPI and drops any later
-one, so a guest saved with a double mapping still restores. Key the
-check on the mapping, not on the vgic_irq. A vgic_irq outlives its ITE
-while anything holds a reference to it, such as the vCPU it was last
-queued on. A later MAPTI of such an LPI succeeds as before, and now
-retargets it to its collection.
-
-Fixes: 196b136498b35 ("KVM: arm/arm64: GICv4: Wire mapping/unmapping of VLPIs in VFIO irq bypass")
+Fixes: df9f58fbea9bc ("KVM: arm64: vgic-its: Implement ITS command queue command handlers")
 Suggested-by: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/vgic/vgic-its.c | 26 ++++++++++++++++++++++++--
- include/kvm/arm_vgic.h         |  1 +
- 2 files changed, 25 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/vgic/vgic-its.c | 24 +++++++++++++++++++-----
+ 1 file changed, 19 insertions(+), 5 deletions(-)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 9e782a4fea7e5..44b92c01bc727 100644
+index 44b92c01bc727..3b8e0e5b097e0 100644
 --- a/arch/arm64/kvm/vgic/vgic-its.c
 +++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -772,6 +772,7 @@ static void its_free_ite(struct kvm *kvm, struct its_ite *ite)
- 				its_unmap_vlpi(ite->irq->host_irq);
- 
- 			irq->hw = false;
-+			irq->mapped = false;
- 		}
- 
- 		vgic_put_irq(kvm, ite->irq);
-@@ -780,6 +781,23 @@ static void its_free_ite(struct kvm *kvm, struct its_ite *ite)
- 	kfree(ite);
- }
- 
-+/* Mapping one LPI from two events is UNPREDICTABLE: the first ITE keeps it. */
-+static bool vgic_its_map_lpi(struct kvm *kvm, struct its_ite *ite,
-+			     struct vgic_irq *irq, struct kvm_vcpu *vcpu)
-+{
-+	scoped_guard(raw_spinlock_irqsave, &irq->irq_lock) {
-+		if (!irq->mapped) {
-+			irq->mapped = true;
-+			irq->target_vcpu = vcpu;
-+			ite->irq = irq;
-+			return true;
-+		}
-+	}
+@@ -829,13 +829,27 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
+ 		struct its_device *device = find_its_device(its, device_id);
+ 		int ite_esz = vgic_its_get_abi(its)->ite_esz;
+ 		gpa_t gpa = device->itt_addr + ite->event_id * ite_esz;
+-		/*
+-		 * Though the spec talks about removing the pending state, we
+-		 * don't bother here since we clear the ITTE anyway and the
+-		 * pending state is a property of the ITTE struct.
+-		 */
++		struct vgic_irq *irq = ite->irq;
++		bool queued;
 +
-+	vgic_put_irq(kvm, irq);
-+	return false;
-+}
-+
- static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
- {
- 	return (le64_to_cpu(its_cmd[word]) >> shift) & (BIT_ULL(size) - 1);
-@@ -1089,13 +1107,14 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 		vcpu = collection_to_vcpu(kvm, collection);
+ 		vgic_its_invalidate_cache(its);
  
- 	irq = vgic_add_lpi(kvm, lpi_nr, vcpu);
-+	if (!IS_ERR(irq) && !vgic_its_map_lpi(kvm, ite, irq, vcpu))
-+		irq = ERR_PTR(-EEXIST);
- 	if (IS_ERR(irq)) {
- 		if (new_coll)
- 			vgic_its_free_collection(its, coll_id);
++		/*
++		 * A queued LPI can be pending in a running vCPU's list register,
++		 * which the exit path folds back: halt the guest before clearing.
++		 */
++		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock)
++			queued = irq->vcpu;
++
++		if (queued)
++			kvm_arm_halt_guest(kvm);
++
++		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock)
++			irq->pending_latch = false;
++
++		if (queued)
++			kvm_arm_resume_guest(kvm);
++
  		its_free_ite(kvm, ite);
- 		return PTR_ERR(irq);
- 	}
--	ite->irq = irq;
  
- 	return 0;
- }
-@@ -2195,7 +2214,10 @@ static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
- 		its_free_ite(kvm, ite);
- 		return PTR_ERR(irq);
- 	}
--	ite->irq = irq;
-+
-+	/* Drop an ITE whose LPI another ITE maps, as MAPTI does. */
-+	if (!vgic_its_map_lpi(kvm, ite, irq, vcpu))
-+		its_free_ite(kvm, ite);
- 
- 	return offset;
- }
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 086b7578e5f33..5c3a0154becc4 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -256,6 +256,7 @@ struct vgic_irq {
- 	bool active:1;
- 	bool hw:1;			/* Tied to HW IRQ */
- 	bool on_lr:1;			/* Present in a CPU LR */
-+	bool mapped:1;			/* LPIs: mapped by an ITE */
- 	refcount_t refcount;		/* Used for LPIs */
- 	u32 hwintid;			/* HW INTID number */
- 	unsigned int host_irq;		/* linux irq corresponding to hwintid */
+ 		return vgic_its_write_entry_lock(its, gpa, 0ULL, ite);
 -- 
 2.39.5
 
