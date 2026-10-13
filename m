@@ -1,195 +1,85 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-95.mta1.migadu.com [95.215.58.95])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE3B43C4563;
-	Tue, 13 Oct 2026 13:25:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E746248A8C5
+	for <kvmarm@lists.linux.dev>; Tue, 13 Oct 2026 13:27:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791897914; cv=none; b=NAC6B7kUXK9N47GFAGmfk9+Kruui0zefktu3vM92hXFry+QhW7lQAri14k2j+kMHm+se8RzahvX/ZGOQ21G8ZB+aUQBMZJ1C39vqOPSgi/UIbwDORHhwle35nP9zwNaXebYysjY7p0Mllq11XOmRYIOfYss+rbsIQOjv50ONKtA=
+	t=1791898076; cv=none; b=HFZ92X0qGJRsUIjUldAbs98/Q1IS77P0EwldzjqZvHBL1dfTYUr78BQ4i6AkQDj8y6U6wpkiaaCaJTt2zTGmYx1K3ctmD4UaDeuurr2uKxdGsijEDnCAQPszVKRMbsxlKYTWBhPkY3vdf85E59ryXCNNh/iUrCl4hbmE49i+Ac8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791897914; c=relaxed/simple;
-	bh=D/NigCEw73Ni9kY2I+Qw1DkW9l2u6Bdzz8oTYVY7XnE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aj2t8NVVnx9u1hik9PENG6sLV3Hk1Jw43VhGRj9VxueozP/F+xBo+4o1vgo4BN2RJmMuEg5Wg9xmqTEtBhFB11FgxFaGzZQzikobiXZVKCiSYOK6jWk9OqhhqBY8VfPRBxzUabHAXui/W4JW/xtjg+UwWweW1iJHmTpk5CdQHuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dSbKGPNR; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791898076; c=relaxed/simple;
+	bh=SIHqZxvERkT8Aik9zKj3iOUoBA0r+lCrV7bOfwUXDno=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Fhp9NLg7NQqPHDzn6vj6zZSsS3wu5MQKnQK+4yxHUtOoWoAks7ZyKeiuDC07xVKj7hSWXGs3E220X8pEp46sF5pVJH78xB9Z/m4NesxWWhXSxZP7uj6IDKufgH1VX/Ud3GcM2KmN8z9PlXc0L1Z+AlEBrG2ssLDmUYYUGAZZIM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=R33YSZzf; arc=none smtp.client-ip=95.215.58.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dSbKGPNR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2E0E1F00893;
-	Tue, 13 Oct 2026 13:25:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791897912;
-	bh=PwLxNOFwoQXW7+W+m9Z6B9NLRJR3CBuEEpDCbi6SBic=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=dSbKGPNRxJPPOMFpbge1zMm1SfL13jy9ENTnh7KtZIMFidWfOFhgk2FptTGUif2ao
-	 LRJ5aaaSGLKTbZQ0bLZYyjELXZ4VsJBGm1labQHWOdZdWyWX7TjqKPRaLV5WuF/yU7
-	 MiUQ5TWevmPBZZWkn0bzqsPjo1k+WxmRk/HajK6Uh6skEuC+nTMa01/d7SO7yL1jM8
-	 IMpBXQxLRSR188YW8t7tjCaLzCeQ4mf1cQuj2S3aICIaRmFJoHbnScEz3oPqG8ZyJK
-	 jsKTHbTy7C/wtsHDTkd1fKGX025mpXe571dZF7vMESZLpr8TNdTOhZXMmQQz0U0TvW
-	 yDf01FORPI5eg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xGcVC-00000002NMW-1eHk;
-	Tue, 13 Oct 2026 13:25:10 +0000
-Date: Tue, 13 Oct 2026 14:25:09 +0100
-Message-ID: <86tsmp20ne.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/2] KVM: arm64: vgic-its: Fix LPI double mapping and DISCARD
-In-Reply-To: <CA+EHjTyZA6VL6EjhkB2bf9fDk4fUWpc=iXsu+sR1B+_YbR-nOQ@mail.gmail.com>
-References: <20261013081646.933312-1-fuad.tabba@linux.dev>
-	<as3_NKT20MNdqaJR@kernel.org>
-	<86wlrl2a2f.wl-maz@kernel.org>
-	<CA+EHjTztZpFrmuz9pK+01BsDxHnzpEwUMt6E3nUrgk4NNTsKYQ@mail.gmail.com>
-	<86v77526me.wl-maz@kernel.org>
-	<CA+EHjTyZA6VL6EjhkB2bf9fDk4fUWpc=iXsu+sR1B+_YbR-nOQ@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="R33YSZzf"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=SIHqZxvERkT8Aik9zKj3iOUoBA0r+lCrV7bOfwUXDno=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1791898071; v=1; x=1792502871;
+ b=R33YSZzfU1OZxhf8zv5zmbIGu725gL8wHLAO4L9w+rB9lK3KcDcNmC+xk+pIMMxvgwzJ4ITV
+ QB8PNmJ+mAKjrs6C0PPKmBq668AbXdi5pEHePdH50MJ/IehBkhsh7AfW5qPTCtViF0C5cF00rHO
+ UL457ar2GCpmnXOzdEUqLQxw=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 5b7f91973e48002c;
+	Tue, 13 Oct 2026 13:27:51 +0000
+X-Mizu-Trace-ID: 5b7f91973e48002c
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5ba429b64c5so19854e87.1
+        for <kvmarm@lists.linux.dev>; Tue, 13 Oct 2026 06:27:48 -0700 (PDT)
+X-Gm-Message-State: AFq9FYJgXE6j+jltYuMfXvkS7VkOWhxd2b769UURig3gn2DSmOQLELib
+	4AJYAIBiHTSXidSkAjJb49hPtGT/d+yIywQ+npVVKflb9zO/WjD279MUCA9V6IBbjIcztR4nfMg
+	lhzDRKkP5Ydb9Lb9+rM6mF53cMLgGg4kP0BzjqFDB
+X-Received: by 2002:a05:6512:3ba5:b0:5bc:b2ec:eaee with SMTP id
+ 2adb3069b0e04-5bcea8328a2mr344669e87.11.1791898067868; Tue, 13 Oct 2026
+ 06:27:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20261013130247.4135515-1-fuad.tabba@linux.dev>
+ <20261013130247.4135515-4-fuad.tabba@linux.dev> <sashiko-outbox-169787@kernel.org>
+In-Reply-To: <sashiko-outbox-169787@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 13 Oct 2026 14:27:11 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTyUDgdbuSi1_CJ7uC0TP3uxJoOgA3sCPA4X9arnbq_0ZA@mail.gmail.com>
+X-Gm-Features: AclHuK910JIQF8Z2todu-S70u0aibAhdbvAd4WRKuP3Y0cjiQl0qPf6kSlNkfL8
+Message-ID: <CA+EHjTyUDgdbuSi1_CJ7uC0TP3uxJoOgA3sCPA4X9arnbq_0ZA@mail.gmail.com>
+Subject: Re: [PATCH 3/4] arm64: sysreg: Mark fields the architecture dropped
+ as RES0
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, 
+	Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 13 Oct 2026 13:59:22 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
-> 
-> Hi Marc,
-> 
-> On Tue, 13 Oct 2026 12:16:09 +0100, Marc Zyngier <maz@kernel.org> wrote:
-> [...]
-> > > A vCPU on its way into the guest does the same: it loads its LRs in
-> > > kvm_vgic_flush_hwstate() while it's still OUTSIDE_GUEST_MODE, so
-> > > kvm_arm_halt_guest() doesn't wait for it. With the delay after the
-> > > flush instead, on v2 plus your 1/7 and 2/7 [2] and both changes from
-> > > your reply to 1/7 [3], the guest takes it in 9 of 20 runs.
-> >
-> > Does this mean we still need OUTSIDE_GUEST_MODE to be a store-release
-> > past the point where we resync the state?
-> 
-> Not for the 9 of 20: that run already had the release. The halt reads
-> the OUTSIDE_GUEST_MODE the vCPU published at its previous exit, so it
-> doesn't wait for the early exit that folds the LPI back.
-> 
-> We do still need it for the window after the exit: with the delay
-> there and the same patches applied, the guest takes it in none of 20
-> runs, against 13 of 20 on v2.
+On Tue, 13 Oct 2026 14:15:11 +0100, sashiko-bot@kernel.org wrote:
+[...]
+>> @@ -2663,11 +2662,7 @@ Field        57        EPAN
+>>  Field        56        EnALS
+>>  Field        55        EnAS0
+>>  Field        54        EnASR
+>> -Field        53        TME
+>> -Field        52        TME0
+>> -Field        51        TMT
+>> -Field        50        TMT0
+>> -Res0        49:47
+>> +Res0        53:47
+>
+>[Severity: Medium]
+>This change reclassifies bits 53:50 of SCTLR_EL1 (TME, TME0, TMT, TMT0) from
+>Field to Res0. This silently regenerates the aggregate mask SCTLR_EL1_RES0 to
+>include these bits.
 
-I don't understand what these probabilities represent. Either it works
-or it doesn't. And given that I have no idea what you are testing
-with, I can't really make head or tail of the above.
+This hunk is in SCTLRMASK_EL1, not SCTLR_EL1. SCTLR_EL1 has had Res0
+53:50 since commit d65bf6e317e7 ("KVM: arm64: Remove all traces of
+FEAT_TME"), so SCTLR_EL1_RES0 doesn't change. Nothing uses
+SCTLRMASK_EL1_RES0.
 
-> 
-> > > Once DISCARD waits for irq->on_lr to clear before clearing
-> > > pending_latch, the guest takes it in none of 20 runs in either case.
-> > > I'll add that to v3, unless the single-vcpu stunning already waits for
-> > > it.
-> >
-> > Polling for on_lr feels very dodgy, and I'd like to avoid this. If the
-> > OUTSIDE_GUEST release addresses it, I'd rather do that.
-> 
-> I'd rather avoid the polling too, but the release alone doesn't close
-> this one. The vCPU would also need to store IN_GUEST_MODE and check
-> its requests before kvm_vgic_flush_hwstate(), so that it never loads
-> its LRs while it's OUTSIDE_GUEST_MODE. The existing check after the
-> flush would still be needed, for the KVM_REQ_GUEST_HYP_IRQ_PENDING
-> request kvm_vgic_flush_hwstate() makes in a nested state. With that
-> and the release, the guest takes it in none of 20 runs with the delay
-> after the flush, and herd7 finds no LKMM execution that leaves it
-> pending.
-
-If you have a herd litmus test, how about posting it? It would really
-avoid a lot of that back and forth where the S/N ratio is pretty poor.
-
-> The IN_GUEST_MODE change would also cover vgic_mmio_change_active(),
-> which depends on the same halt (the comment above
-> vgic_access_active_prepare()). Would you be OK folding it into your
-> series, on top of your OUTSIDE_GUEST_MODE changes? Patch 2 then
-> wouldn't need the on_lr wait.
-
-Is the hack below what you are asking for? I can't tell. If it isn't,
-please post your own version.
-
-Thanks,
-
-	M.
-
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 0576c2022ef57..f1449b08531eb 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1321,10 +1321,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 
- 		local_irq_disable();
- 
--		kvm_vgic_flush_hwstate(vcpu);
--
--		kvm_pmu_update_vcpu_events(vcpu);
--
- 		/*
- 		 * Ensure we set mode to IN_GUEST_MODE after we disable
- 		 * interrupts and before the final VCPU requests check.
-@@ -1333,14 +1329,18 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		 */
- 		smp_store_mb(vcpu->mode, IN_GUEST_MODE);
- 
-+		kvm_vgic_flush_hwstate(vcpu);
-+
-+		kvm_pmu_update_vcpu_events(vcpu);
-+
- 		if (ret <= 0 || kvm_vcpu_exit_request(vcpu, &ret)) {
--			vcpu->mode = OUTSIDE_GUEST_MODE;
- 			isb(); /* Ensure work in x_flush_hwstate is committed */
- 			if (kvm_vcpu_has_pmu(vcpu))
- 				kvm_pmu_sync_hwstate(vcpu);
- 			if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
- 				kvm_timer_sync_user(vcpu);
- 			kvm_vgic_sync_hwstate(vcpu);
-+			smp_store_release(&vcpu->mode, OUTSIDE_GUEST_MODE);
- 			local_irq_enable();
- 			preempt_enable();
- 			continue;
-@@ -1356,7 +1356,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 
- 		ret = kvm_arm_vcpu_enter_exit(vcpu);
- 
--		vcpu->mode = OUTSIDE_GUEST_MODE;
- 		vcpu->stat.exits++;
- 		/*
- 		 * Back from guest
-@@ -1390,6 +1389,12 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 
- 		kvm_arch_vcpu_ctxsync_fp(vcpu);
- 
-+		/*
-+		 * All the state has been synchronised, let advertise
-+		 * we're outside of the guest.
-+		 */
-+		smp_store_release(&vcpu->mode, OUTSIDE_GUEST_MODE);
-+
- 		/*
- 		 * We must ensure that any pending interrupts are taken before
- 		 * we exit guest timing so that timer ticks are accounted as
-
--- 
-Without deviation from the norm, progress is not possible.
+Cheers,
+/fuad
