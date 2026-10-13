@@ -1,114 +1,68 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74BE51B167;
-	Tue, 13 Oct 2026 17:04:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96ACA51FCB0
+	for <kvmarm@lists.linux.dev>; Tue, 13 Oct 2026 17:05:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791911088; cv=none; b=Q7/V90y4LM4BlrCeCSwy5/xw4nvHVOO2CVaonduf3HbYSGzisSCgORRlXxbTQLCXPsDChWV6Kvw3ToPSzsp32StG/ObYBJHxLIXFbG3lVWcMgJjUXU4tphTSzsMIg7KyFWxgiBsRT/ozvOsWF6/poLdH5LHQSmHq8pJm2nZMDdU=
+	t=1791911130; cv=none; b=nro7mxLW2o7h1yB9GE/A3pHM+m0JJIqnoa0filGJ9sN3WlSFat5aQnmeXwVi81fZlIKqnHr57DxIzDgrXP8eoxBJnRMAcNcnVYZmZumVwxcD9QgC4t8V1wtuWYYI+TfLnDt9+JmDnru1ADbky8nF3a5yuu4djPXpmfGSIf31Fmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791911088; c=relaxed/simple;
-	bh=9dNcM9X5XKBcssjruktIrFoEkKYg65GWxWsBlvWUxao=;
-	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=iutp1eTAaLxKVFdQtQwCp/MMF1b3oEMQf2MhKV9B0ngHVu/R/tWcVhSkE2TgTE29iAi64miwPQK8FHv70oKNbLIYBcCEy+NW0e1mOnm9KgnGwU6kMtnd7qck3TtztujvqwAtva1h7LDL3AcF+cyGzEzCd/LU2X9FB6WpW6vrGmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MHhpxNma; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791911130; c=relaxed/simple;
+	bh=dg4lya1wOIsNzz5d1Y0U13u79sEKc0xrgX1PBOPZf7A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=canOzTWqQtogL0ouQ/PLTygdxtS2jZNbn/8b7+rXkeDX/cX7k+cm6QEDeKp9FT+r8Z2QSThfmVZWeHqCzVkL4Ky6U/V1vLpkeopXkPgVH/JoG7JCpTT1oX0EyF1ZS3unswDCJ8qo99QVt+WPAIYWKVjOcowaAri0tWTVTONR8Z0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=UPpqgxcs; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MHhpxNma"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1B671F000FF;
-	Tue, 13 Oct 2026 17:04:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791911087;
-	bh=trYYkzD1fUs2CPyc6avA9Aj89H9HqMjaP7lJEkleLw0=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=MHhpxNma2+XUsPMVZHnq8rTIQWBMavytXojW7y5vd4gUuugEqYGxdRuV8qU3XwwYP
-	 AZIcUXMjujc/YsJgY2YU2XxNRApLORzKbQf/yHrrteWGOgGShuuyE6iQIMpclWNS3w
-	 iBu8BkqypB5Qp8HrYKusRxuaM9ENB7F1tMjDaVI9D9tXByX9d20zvGote51RlW3ZIi
-	 puL/us9LlgbOPGp9XUjcvtSCKVw6sfSHlid6LvnpsM8NjjNsDZn5IcPWGiXUKAclZ6
-	 WZeLj0Pe2LX9+pKUcFKBE9SkSrg/kSXHF+dOQAhq42r5Jv3UV3/GL4QA4TIm7aopsI
-	 8Ju3bft2ogs+g==
-Message-ID: <sashiko-outbox-170187@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v6 11/39] infiniband: update hfi1 to use
- remap_vmalloc_range()
-Reply-To: sashiko-reviews@lists.linux.dev
-To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
-Cc: linux-usb@vger.kernel.org, linux-rdma@vger.kernel.org, selinux@vger.kernel.org, bpf@vger.kernel.org, linux-scsi@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-s390@vger.kernel.org, "Oliver
- Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, "Heiko
- Carstens" <hca@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>, "Alexander
- Gordeev" <agordeev@linux.ibm.com>, "Christian Borntraeger" <borntraeger@linux.ibm.com>
-In-Reply-To: <20261013-b4-mmap-prepare-vma-flag-sanify-v6-11-1aa3c9b139f9@kernel.org>
-References: <20261013-b4-mmap-prepare-vma-flag-sanify-v6-0-1aa3c9b139f9@kernel.org>
- <20261013-b4-mmap-prepare-vma-flag-sanify-v6-11-1aa3c9b139f9@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 13 Oct 2026 17:04:45 +0000
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="UPpqgxcs"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 69DFF169E;
+	Tue, 13 Oct 2026 10:05:23 -0700 (PDT)
+Received: from gaia.lan (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3940B3F673;
+	Tue, 13 Oct 2026 10:05:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1791911126; bh=dg4lya1wOIsNzz5d1Y0U13u79sEKc0xrgX1PBOPZf7A=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=UPpqgxcst0jCWD5I79N5/ZWmUnUZu8LqfLsnqqFOuKwnPlLGedZYHw488LxQU3qlv
+	 uKhsgnFTvxXP25VFYW2R8Gg3HpQvubQZpQhLhycMqmTF0DkvmSss3GH/XCYQMkw89b
+	 kUV1mHtu5+vBcOEpyy/dka5f7aVb041RGnjMmZOk=
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Linus Walleij <linusw@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Usama Anjum <usama.anjum@arm.com>
+Subject: Re: [PATCH v2] arm64: clear_page[s] using memset
+Date: Tue, 13 Oct 2026 18:05:20 +0100
+Message-ID: <179191112050.1981689.18384332389486467892.b4-ty@b4>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260916-aarch64-clear-pages-c-v2-1-0393769f7912@kernel.org>
+References: <20260916-aarch64-clear-pages-c-v2-1-0393769f7912@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] mm: VM_WARN_ON_ONCE triggered by vm_flags_reset() in mmap hook
---
+On Wed, 16 Sep 2026 12:03:56 +0200, Linus Walleij wrote:
+> There is no need to try to second-guess the compiler when
+> clearing memory. Just call memset() like everyone else.
+> 
+> Since memset() already has an architecture-local MOPS
+> optimization, we do not need to do anything else to preserve
+> the MOPS optimization.
+> 
+> [...]
 
-commit a356d47e4beede9d3e032c777130976d06dd5dd8
-Author: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+Applied to arm64 (for-next/misc), thanks!
 
-    infiniband: update hfi1 to use remap_vmalloc_range()
-   =20
-    In cases which map chip memory from vmalloc()'d ranges, the hfi1 infini=
-band
-    drivers currently installs a fault handler, and then smuggles the kernel
-    virtual address of this range in vma->vm_pgoff.
-
-> diff --git a/drivers/infiniband/hw/hfi1/file_ops.c b/drivers/infiniband/h=
-w/hfi1/file_ops.c
-> index dc548e6802e24..b02d1f1dbb27b 100644
-> --- a/drivers/infiniband/hw/hfi1/file_ops.c
-> +++ b/drivers/infiniband/hw/hfi1/file_ops.c
-[ ... ]
-> @@ -422,7 +418,7 @@ static int hfi1_file_mmap(struct file *fp, struct vm_=
-area_struct *vma)
->  			ret =3D -EPERM;
->  			goto done;
->  		}
-> -		vm_flags_clear(vma, VM_MAYWRITE);
-> +		vm_flags_mod(vma, VM_DONTEXPAND, VM_MAYWRITE);
->  		/*
->  		 * Mmap multiple separate allocations into a single vma.  From
->  		 * here, dma_mmap_coherent() calls dma_direct_mmap(), which
-[ ... ]
-> @@ -559,12 +546,10 @@ static int hfi1_file_mmap(struct file *fp, struct v=
-m_area_struct *vma)
->  	}
-> =20
->  	vm_flags_reset(vma, flags);
-> -	mmap_cdbg(ctxt, subctxt, type, mapio, vmf, memaddr, memvirt, memdma,=20
-> +	mmap_cdbg(ctxt, subctxt, type, mapio, is_vmalloc, memaddr, memvirt, mem=
-dma,
->  		  memlen, vma);
-> -	if (vmf) {
-> -		vma->vm_pgoff =3D PFN_DOWN(memaddr);
-> -		vma->vm_ops =3D &vm_ops;
-> -		ret =3D 0;
-> +	if (is_vmalloc) {
-> +		ret =3D remap_vmalloc_range(vma, memvirt, 0);
-
-[Severity: Medium]
-Will this trigger a lockdep warning due to the VMA not being write-locked?
-
-In hfi1_file_mmap(), modifying the VMA flags using vm_flags_reset() (and
-the newly introduced vm_flags_mod() earlier in this function) enforces=20
-write-lock assertions via vma_assert_write_locked().=20
-
-Because the VMA is not yet inserted into the tree and is not write-locked=20
-during the mmap callback, its vm_lock_seq is uninitialized (UINT_MAX) and=20
-will not match the mm lock sequence. This triggers a VM_WARN_ON_ONCE_VMA.
-
-Should vm_flags_init() be used instead?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261013-b4-mmap-pr=
-epare-vma-flag-sanify-v6-0-1aa3c9b139f9@kernel.org?part=3D11
+[1/1] arm64: clear_page[s] using memset
+      https://git.kernel.org/arm64/c/7fa0d9b2ec07
