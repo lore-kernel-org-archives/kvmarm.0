@@ -1,45 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE2F4734E6;
-	Tue, 13 Oct 2026 05:46:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FFE9472094;
+	Tue, 13 Oct 2026 06:04:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791870398; cv=none; b=DtgvzYWzYF5ozBicPFCjfIYWAACLS+srbyGwVUrGBzOeMOe7scRHSJIfS7h8jj74ma7uNncnuFQ7zR28PJWe8q+7Z+NILBDtGN/YsCmmlKkOiwgbz+D4x04cDq6r03NRcbiKDH5Ph6vrt2g1BdPG1SPTQWbokE57fwZyA2nrAlY=
+	t=1791871484; cv=none; b=GDXone4c4D+Lk9kfFhEPMblKiee2qxgqchM2IBWH/9N2Nxv+uPHsqMpPiQLqsbk1kV/ciUU1mwoljtvAfc7AVCzOFNEaBqylMctZTgBc6OOnzEYmd1ViCgeP45e0LQN9gmNR4juKDBSPW61lQcOIm1bx61oYgPDQiqp4gD7+w3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791870398; c=relaxed/simple;
-	bh=2sHaGrxsBzmAZihV89YwgCeytCHYJJCpW4O35Qli6mA=;
+	s=arc-20240116; t=1791871484; c=relaxed/simple;
+	bh=wmpzqyHoUg8Ly5Hqe7iYFW/4xNIDEyzAXXrcBX+fh1Q=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=SJQ8MqFmZm5j/DERHyQJElAxttjNMdezWZFBOV6nSuriql2CTjfN7nJHW2N6ffO6EupdWj9l44YVkDYkjIdYwPKPH8bydk7GHyuKm+wcjifB8OPkEyXJDMA2MvdfIe/scaY8Ttplr9ErJmDg9695wEMI0Bp26/OftOyqq5/xMBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ORBFjCti; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=ZMtp5MSMS0zsUushUZOT0ldBtwids8NsWIpfuZ97mVW+uZttypZoBtpbSGisrPLo3kSg5PDY6D+F9+W2WdRpZa3aG09VAT1ZUE9yJCDA6pNRE3zn4f94+W0qpJDMogpsWO6Ce/e5/f8g++DT+z4Z5MWUz5nCaZqfnySzf6CS588=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DHTxXxd2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ORBFjCti"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01F1B1F000FF;
-	Tue, 13 Oct 2026 05:46:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DHTxXxd2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EA301F00893;
+	Tue, 13 Oct 2026 06:04:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791870396;
-	bh=Kn3sevWHfnmO/p6abMJZzG209Y+bg0EY/JmHb1ot1GE=;
+	s=k20260515; t=1791871483;
+	bh=pQTvO774lNq9vEe76fPZMODdaEtbTuDCbo9xPRHunBQ=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=ORBFjCtiLmLFAFdLrfSgNeOhZmd84KKHFG3/Ud7vCkeR4P8xYLLZV9vJFZ9ITLqEe
-	 FMcv3ppgXKgS5hFtzSNr4sAImv5Sdpk0ehtcOYGsTGWDo86WRES/kHNuLfrpJ6fZQ5
-	 UkIXfDT+sNYdhwqiizR0uHiVfZvAl5dSuTWJgDGUIonxzF4PoWnSjEnD/7AV84IV6T
-	 KlOFHLybwTcUxVQVhLAxJmYWXoF9CG+nbk05dPYB79O4JJCPM61Sx65t0yX3jSSURg
-	 t89eP8ob5nP7tBZa9s8UbYDKxfcRjW0OYyoY394hTRMnB4nKntpZASnVO7i6WnpKxZ
-	 ubmnZ6/1aT1RA==
+	b=DHTxXxd2bivztQgc/fn7JR7mKWYpipxkR0I8aM0GmYTkWxzEV+HOUV7IsNqq4vhtM
+	 XuC4h9UiKjZFghTTOCNt6zftiWBJpwNzWQueXDZqp8S6SfwVZYI2BGUBB433A4EVEi
+	 8UkjFzN0Zi2DFLjIb3J0fGpAoM6s3/KsKEdF1cE6j+xm3Eo50Y+XWDES2l72FZEN+7
+	 p2fi3Ey7NfyrN7coO5uLFcK93RkWNfwi38zTflKoRvn5GBrhnuYVFtGfE4LKRhiQUm
+	 Z+N3xTA4EBIWN3u6D46Jyg8okJMwTq0HxjtLMvt+zFkUYCNaP/TXJl41Q/M6itJ39u
+	 yqhWUIappwAiw==
 X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
 From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
 To: sashiko-reviews@lists.linux.dev
-Cc: media-ci@linuxtv.org, kvmarm@lists.linux.dev,
-	Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>, dri-devel@lists.freedesktop.org
-Subject: Re: [RFC PATCH v8 03/14] irqchip/gic-v3-its: Resolve the default
- NUMA node explicitly
-In-Reply-To: <20260924101929.815D81F00893@smtp.kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev, dri-devel@lists.freedesktop.org,
+	media-ci@linuxtv.org
+Subject: Re: [RFC PATCH v8 04/14] irqchip/gic-v3-its: Allocate shared tables
+ using CoCo shared memory allocator
+In-Reply-To: <20260924101928.380661F000FF@smtp.kernel.org>
 References: <20260924100529.1398790-1-aneesh.kumar@kernel.org>
- <20260924100529.1398790-4-aneesh.kumar@kernel.org>
- <20260924101929.815D81F00893@smtp.kernel.org>
-Date: Tue, 13 Oct 2026 11:16:32 +0530
-Message-ID: <yq5awlrmqhjb.fsf@kernel.org>
+ <20260924100529.1398790-5-aneesh.kumar@kernel.org>
+ <20260924101928.380661F000FF@smtp.kernel.org>
+Date: Tue, 13 Oct 2026 11:34:38 +0530
+Message-ID: <yq5atsmqqgp5.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -51,70 +51,117 @@ Content-Type: text/plain
 sashiko-bot@kernel.org writes:
 
 > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Medium] irqchip/gic-v3-its: incomplete NUMA_NO_NODE resolution exposes allocations to task mempolicy
+> - [High] irqchip/gic-v3-its: buddy allocator corruption due to discarded shared_size
 > --
 >
-> commit 6d762ab83972132164ae57c1422f1916decb2fe3
+> commit d897529703a71c914b0334abcb563ffb37979469
 > Author: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 >
->     irqchip/gic-v3-its: Resolve the default NUMA node explicitly
->     
->     alloc_pages_node() resolves NUMA_NO_NODE to numa_mem_id() internally. In
->     preparation for switching ITS allocations to the CoCo shared memory
->     allocator, resolve the default node explicitly in its_alloc_pages().
->     
->     The CoCo shared memory allocator interprets NUMA_NO_NODE as a request to
->     apply the current task's memory policy. Passing numa_mem_id() instead
->     preserves the existing nearest-memory-node placement across the
->     allocator switch. This patch does not change the current allocation
->     behavior.
+> irqchip/gic-v3-its: Allocate shared tables using CoCo shared memory allocator
+>
+> This commit updates the ITS allocator to route page allocations through
+> alloc_cc_shared_pages_node(). It reconstructs common allocation metadata
+> from the original ITS order and the architecture granule size on release.
 >
 >> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+>> index ac5507acb1a0c..4814161df02ed 100644
 >> --- a/drivers/irqchip/irq-gic-v3-its.c
 >> +++ b/drivers/irqchip/irq-gic-v3-its.c
->> @@ -236,7 +237,7 @@ static struct page *its_alloc_pages_node(int node, gfp_t gfp,
->>  
->>  static struct page *its_alloc_pages(gfp_t gfp, unsigned int order)
+>
+> [ ... ]
+>
+>> @@ -214,25 +213,13 @@ static gfp_t gfp_flags_quirk;
+>>  static struct page *its_alloc_pages_node(int node, gfp_t gfp,
+>>  					 unsigned int order)
 >>  {
->> -	return its_alloc_pages_node(NUMA_NO_NODE, gfp, order);
->> +	return its_alloc_pages_node(numa_mem_id(), gfp, order);
+>> -	struct page *page;
+>> -	int ret = 0;
+>> -
+>> -	page = alloc_pages_node(node, gfp | gfp_flags_quirk, order);
+>> -
+>> -	if (!page)
+>> -		return NULL;
+>> +	struct cc_shared_pages mem;
+>>  
+>> -	ret = set_memory_decrypted((unsigned long)page_address(page),
+>> -				   1 << order);
+>> -	/*
+>> -	 * If set_memory_decrypted() fails then we don't know what state the
+>> -	 * page is in, so we can't free it. Instead we leak it.
+>> -	 * set_memory_decrypted() will already have WARNed.
+>> -	 */
+>> -	if (ret)
+>> +	if (alloc_cc_shared_pages_node(node, gfp | gfp_flags_quirk,
+>> +				       PAGE_SIZE << order, &mem))
+>>  		return NULL;
+>>  
+>> -	return page;
+>> +	return mem.page;
 >>  }
 >
-> [Severity: Medium]
-> Will this leave other callers of its_alloc_pages_node() exposed to the
-> task memory policy change?
+> [Severity: High]
+> Is it safe to discard mem.shared_size here? The API contract seems to require
+> callers to retain the true allocated size so it can be passed back when
+> freeing the pages.
 >
-> When a device probe or ITT allocation occurs with its->numa_node ==
-> NUMA_NO_NODE (which is common when firmware lacks NUMA info), callers pass
-> NUMA_NO_NODE directly to its_alloc_pages_node():
+>>  static struct page *its_alloc_pages(gfp_t gfp, unsigned int order)
+>> @@ -242,13 +229,15 @@ static struct page *its_alloc_pages(gfp_t gfp, unsigned int order)
+>>  
+>>  static void its_free_pages(void *addr, unsigned int order)
+>>  {
+>> -	/*
+>> -	 * If the memory cannot be encrypted again then we must leak the pages.
+>> -	 * set_memory_encrypted() will already have WARNed.
+>> -	 */
+>> -	if (set_memory_encrypted((unsigned long)addr, 1 << order))
+>> +	struct cc_shared_layout layout;
+>> +	struct cc_shared_pages mem;
+>> +
+>> +	if (WARN_ON(cc_shared_calc_layout(PAGE_SIZE << order, &layout)))
+>>  		return;
+>> -	free_pages((unsigned long)addr, order);
+>> +
+>> +	mem.page = virt_to_page(addr);
+>> +	mem.shared_size = layout.shared_size;
+>> +	free_cc_shared_pages(&mem);
+>>  }
 >
-> drivers/irqchip/irq-gic-v3-its.c:its_alloc_pages_node() {
-> 	...
-> 	page = alloc_pages_node(node, gfp | gfp_flags_quirk, order);
-> 	...
-> }
+> [Severity: High]
+> Does recalculating the size here cause a mismatch on non-CC platforms?
 >
-> If node is NUMA_NO_NODE, it passes it directly to the underlying allocator.
-> When the underlying allocator interprets NUMA_NO_NODE as a request to apply
-> task mempolicy, these direct callers will be subjected to the current task's
-> memory policy instead of bypassing it and using the local node. 
+> When memory encryption is disabled, alloc_cc_shared_pages_node() does not
+> round up the allocation to the granule size; it simply allocates the
+> requested order.
 >
-> If a user binds the driver via sysfs under a restrictive task mempolicy,
-> the allocations could land on suboptimal distant nodes or fail entirely.
+> However, cc_shared_calc_layout() unconditionally rounds up to the
+> architectural granule size. If the granule size exceeds the requested
+> allocation size, free_cc_shared_pages() will call __free_pages() with a
+> higher order than was actually allocated. Can this corrupt the buddy
+> allocator by freeing unallocated pages?
 >
-> Should the NUMA_NO_NODE resolution logic be moved inside its_alloc_pages_node()
-> to ensure all callers are protected?
+>>  static struct gen_pool *itt_pool;
+>> @@ -273,7 +262,8 @@ static void *itt_alloc_pool(int node, int size)
+>>  		if (!page)
+>>  			break;
+>>  
+>> -		gen_pool_add(itt_pool, (unsigned long)page_address(page), PAGE_SIZE, node);
+>> +		gen_pool_add(itt_pool, (unsigned long)page_address(page),
+>> +			     cc_shared_granule_size(), node);
+>>  	} while (!addr);
+>>  
+>>  	return (void *)addr;
+>
+> [Severity: High]
+> Will adding a hardcoded granule size to the generic pool advertise unallocated
+> out-of-bounds memory to consumers?
+>
+> On non-CC platforms, the underlying allocation size is just a single page,
+> but this adds the full cc_shared_granule_size() bytes to the pool. Could
+> this lead to pool consumers accessing memory beyond what was actually
+> allocated?
+>
 
-Yes, updated the patch to perform the mapping in its_alloc_pages_node(),
-so all callers are handled.
+None of these concerns are valid because cc_shared_granule_size() defaults
+to PAGE_SIZE on non-CC platforms.
 
-@@ -216,6 +217,9 @@ static struct page *its_alloc_pages_node(int node, gfp_t gfp,
- 	struct page *page;
- 	int ret = 0;
- 
-+	if (node == NUMA_NO_NODE)
-+		node = numa_mem_id();
-+
- 	page = alloc_pages_node(node, gfp | gfp_flags_quirk, order);
- 
- 	if (!page)
+-aneesh
