@@ -1,118 +1,174 @@
-Received: from mta0.migadu.com (out-12.mta0.migadu.com [91.218.175.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D269B4BE457
-	for <kvmarm@lists.linux.dev>; Tue, 13 Oct 2026 08:17:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B8503AEF5F
+	for <kvmarm@lists.linux.dev>; Tue, 13 Oct 2026 08:50:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791879424; cv=none; b=aN8/reh8xs/RIOdAfLTxukmfMnYBLm04vkPkXmRaqNLFvRJSWzwVRhR+tzXIgYcSDOL3rSu80SXq5rb6Lqmyw+qNB2qjL3MOjjSJZEbiWDXNTw3/oKaRZRogcfcf5CNbJy9qoXB73+7dn7LNgK1qM6SdFMZSOIiBzREUbcZLHRg=
+	t=1791881453; cv=none; b=d6gqR6uIf2WWIIGq7P8jDoSRph4gUxNWeeuVMrZxeuwFJ9uEJU8KefKf9whAdujWAV+mOAQKBzxYV7CCcE6ySDUj6E9OLd2ldkQ3ylxeHo2JAi0zNW0kSEu/IPe9eI7IqFKSC1eOSDKJUBxpmEYjZeGcEzlgZzNS50JsDT9Y0go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791879424; c=relaxed/simple;
-	bh=QOyVRTmWh+YT7G+cpGvL66+aoL8H82+I49NPk8LYl+U=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mwOuJApjkYJXVte6+M1mGj3QwLUu1MLQZPzI0S3NnIfXXLKH8jAQG5kHKjtlZXugBCklRUiV9v9DxuuFG9XneftJPc/tYLMI+TEmdOpLPiyLDMpZWNVVnP8sCo3iaHTGGpFddrxDL5ojferF8VWrWASj/q5TH3gtcr3BTkmP1FY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Gp2nP+pH; arc=none smtp.client-ip=91.218.175.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1791881453; c=relaxed/simple;
+	bh=mY7wWFwqV/tYUkujAfXj3LzTbT2dXUljdzHarDcCBlA=;
+	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
+	 Date; b=tMWfiq8opwtotmXrOlnNk6PuaQsce/m5vtexHMoVatGqH0ESI+D8Exqk2DjA9iMGnV72+eymlLPs0Uk7nTnVj/EQXQPk5rzugdDGp7nquyKHB5kcdnZm8krQRvsXv7WKzYkHBHREAA7u+XT/Nh/PDJlG1+co6RtRVW2HozC7TOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ma/UYR64; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Gp2nP+pH"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=QOyVRTmWh+YT7G+cpGvL66+aoL8H82+I49NPk8LYl+U=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1791879420; v=1; x=1792484220;
- b=Gp2nP+pHOe5Lp/et1yJeGbgH/+x9cN0DXk8zE3PXvHDZ4kolbcGb/VVt3+a32LtfaNmlG0rC
- 3yT5yPU+6WVoTvrjgSgvU+sLUh5AUf/9uFh8ANALqX9BbmKu1J1Kq5TEenVeGrqi3Xbf0mQxJb9
- E9gJ30yAG8X/yBCVyYXjcF7g=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 3790d623399d7862;
-	Tue, 13 Oct 2026 08:17:00 +0000
-X-Mizu-Trace-ID: 3790d623399d7862
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v2 2/2] KVM: arm64: vgic-its: Remove the pending state of a discarded LPI
-Date: Tue, 13 Oct 2026 09:16:46 +0100
-Message-Id: <20261013081646.933312-3-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20261013081646.933312-1-fuad.tabba@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ma/UYR64"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B35841F00893;
+	Tue, 13 Oct 2026 08:50:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791881452;
+	bh=ljEXd8WFnlqbVQ2QxECKp6gjbMNskbI6S3A2tDXHw7s=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=Ma/UYR64FKRLjjPc53f89XxwTAHtgYXZU6MeMAVpkMQNWJhUz+gXTQQf5EHNWWb45
+	 49bBaz1nkt8L4TOkaoe86G+DNAJApBNbJJiBGADFtpqlJGz5s9/OlVraCFmL/Lan39
+	 CGxVgk9Kl2Zd+Z9SAawRUBE9sDxu3QumnhyANx8Rq7u1Hhl43eKIyYO0tvoqL2bsOS
+	 1jO7HR4ORyobAPvjbNELJRidwtwSXEYQvbJzv6c39H+Ml6cBsTvAiHNSWvcUUpd6BX
+	 7wFyx+NKgj2eI8SoqZ3hEoqUuiveqEPdi9AzA5dMGrxcUQIhQ7fIIOXN2HYiTwEkUD
+	 GVlIJKs5MFo0g==
+Message-ID: <sashiko-outbox-169278@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 2/2] KVM: arm64: vgic-its: Remove the pending state
+ of a discarded LPI
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Fuad Tabba" <fuad.tabba@linux.dev>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20261013081646.933312-3-fuad.tabba@linux.dev>
 References: <20261013081646.933312-1-fuad.tabba@linux.dev>
+ <20261013081646.933312-3-fuad.tabba@linux.dev>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 13 Oct 2026 08:50:51 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-DISCARD removes the mapping of an event and instructs the Redistributor
-to remove the pending state of its LPI (IHI 0069H.b, 5.3.4). KVM only
-frees the ITE, so an LPI that is pending when the guest discards it
-stays queued on its target vCPU, and the guest still takes it.
+Thank you for your contribution! Sashiko AI review found 3 potential issue(=
+s) to consider:
+- [High] kvm: arm64: vgic-its: TOCTOU race resurrects discarded LPI due to =
+IPI skip
+- [High] kvm: arm64: vgic-its: Race on vcpu->arch.pause breaks mutual exclu=
+sion
+- [Medium] kvm: arm64: vgic-its: Global VM halt on DISCARD causes Denial of=
+ Service
+--
 
-Clear the pending state before freeing the ITE. A queued LPI can be
-pending in a running vCPU's list register, so halt the guest first when
-the LPI is queued, to fold that state back. A forwarded LPI already
-loses its pending state in its_free_ite(), whose unmap from the vPE
-sends a DISCARD to the host ITS.
+commit 4bb7971d12d2fa6f1083c9f2ddc383b8d63483fb
+Author: Fuad Tabba <fuad.tabba@linux.dev>
+KVM: arm64: vgic-its: Remove the pending state of a discarded LPI
 
-Fixes: df9f58fbea9bc ("KVM: arm64: vgic-its: Implement ITS command queue command handlers")
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- arch/arm64/kvm/vgic/vgic-its.c | 24 +++++++++++++++++++-----
- 1 file changed, 19 insertions(+), 5 deletions(-)
+This commit ensures the pending state of a queued LPI is cleared when handl=
+ing
+an ITS DISCARD command. It halts the guest before clearing the pending stat=
+e if
+the LPI is queued on a running vCPU.
 
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 44b92c01bc727..3b8e0e5b097e0 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -829,13 +829,27 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
- 		struct its_device *device = find_its_device(its, device_id);
- 		int ite_esz = vgic_its_get_abi(its)->ite_esz;
- 		gpa_t gpa = device->itt_addr + ite->event_id * ite_esz;
--		/*
--		 * Though the spec talks about removing the pending state, we
--		 * don't bother here since we clear the ITTE anyway and the
--		 * pending state is a property of the ITTE struct.
--		 */
-+		struct vgic_irq *irq = ite->irq;
-+		bool queued;
-+
- 		vgic_its_invalidate_cache(its);
- 
-+		/*
-+		 * A queued LPI can be pending in a running vCPU's list register,
-+		 * which the exit path folds back: halt the guest before clearing.
-+		 */
-+		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock)
-+			queued = irq->vcpu;
-+
-+		if (queued)
-+			kvm_arm_halt_guest(kvm);
-+
-+		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock)
-+			irq->pending_latch = false;
-+
-+		if (queued)
-+			kvm_arm_resume_guest(kvm);
-+
- 		its_free_ite(kvm, ite);
- 
- 		return vgic_its_write_entry_lock(its, gpa, 0ULL, ite);
--- 
-2.39.5
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-it=
+s.c
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -829,12 +829,26 @@ static int vgic_its_cmd_handle_discard(struct kvm *=
+kvm, struct vgic_its *its,
+>  		struct its_device *device =3D find_its_device(its, device_id);
+>  		int ite_esz =3D vgic_its_get_abi(its)->ite_esz;
+>  		gpa_t gpa =3D device->itt_addr + ite->event_id * ite_esz;
+> +		struct vgic_irq *irq =3D ite->irq;
+> +		bool queued;
+> +
+> +		vgic_its_invalidate_cache(its);
+> +
+>  		/*
+> -		 * Though the spec talks about removing the pending state, we
+> -		 * don't bother here since we clear the ITTE anyway and the
+> -		 * pending state is a property of the ITTE struct.
+> +		 * A queued LPI can be pending in a running vCPU's list register,
+> +		 * which the exit path folds back: halt the guest before clearing.
+>  		 */
+> -		vgic_its_invalidate_cache(its);
+> +		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock)
+> +			queued =3D irq->vcpu;
+> +
+> +		if (queued)
+> +			kvm_arm_halt_guest(kvm);
 
+[Severity: Medium]
+Does this introduce a denial of service if a guest spams DISCARD commands?
+
+Because kvm_arm_halt_guest() forces all vCPUs in the VM to exit, a guest
+rapidly issuing DISCARD commands for a single vCPU's LPI could repeatedly
+lock up the entire VM and cause host starvation. Could we restrict the
+synchronization strictly to the target irq->vcpu where the LPI is queued?
+
+> +
+> +		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock)
+> +			irq->pending_latch =3D false;
+
+[Severity: High]
+Is there a window here where an exiting vCPU might overwrite the cleared
+latch and resurrect the LPI?
+
+If the target vCPU is just exiting when kvm_arm_halt_guest() broadcasts
+KVM_REQ_SLEEP, the vCPU sets vcpu->mode =3D OUTSIDE_GUEST_MODE before foldi=
+ng
+its hardware state in kvm_arch_vcpu_ioctl_run().
+
+Because kvm_request_needs_ipi() checks:
+
+virt/kvm/kvm_main.c:kvm_request_needs_ipi() {
+    if (req & KVM_REQUEST_WAIT)
+        return mode !=3D OUTSIDE_GUEST_MODE;
+}
+
+The IPI is skipped and kvm_arm_halt_guest() returns immediately without
+waiting for the vCPU to sync. The DISCARD thread then clears
+irq->pending_latch =3D false.
+
+Concurrently, the exiting vCPU executes kvm_vgic_sync_hwstate(), reads the
+still-pending state from the hardware LR, and unconditionally overwrites the
+cleared latch back to true:
+
+arch/arm64/kvm/vgic/vgic-v3.c:vgic_v3_fold_lr() {
+    if (irq->config =3D=3D VGIC_CONFIG_EDGE && (val & ICH_LR_PENDING_BIT))
+        irq->pending_latch =3D true;
+}
+
+Could we coordinate with the vCPU's state folding sequence to ensure the
+discard isn't lost?
+
+> +
+> +		if (queued)
+> +			kvm_arm_resume_guest(kvm);
+
+[Severity: High]
+Can concurrent DISCARD commands on different ITS instances break the mutual
+exclusion of vcpu->arch.pause?
+
+vgic_its_cmd_handle_discard() executes holding the per-ITS its->its_lock.
+If a VM has multiple ITS devices, two DISCARD commands could run concurrent=
+ly
+and both call kvm_arm_halt_guest(), which sets vcpu->arch.pause to true
+across all vCPUs.
+
+The first thread to finish will call kvm_arm_resume_guest(), which does:
+
+arch/arm64/kvm/arm.c:kvm_arm_resume_guest() {
+    kvm_for_each_vcpu(i, vcpu, kvm) {
+        vcpu->arch.pause =3D false;
+        __kvm_vcpu_wake_up(vcpu);
+    }
+}
+
+This unconditionally clears the pause flag and wakes up all vCPUs while the
+second thread is still modifying VGIC state assuming the guest is fully
+halted.
+
+> =20
+>  		its_free_ite(kvm, ite);
+>
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261013081646.9333=
+12-1-fuad.tabba@linux.dev?part=3D2
