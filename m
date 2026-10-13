@@ -1,85 +1,171 @@
-Received: from mta1.migadu.com (out-95.mta1.migadu.com [95.215.58.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E746248A8C5
-	for <kvmarm@lists.linux.dev>; Tue, 13 Oct 2026 13:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9928B3C4574;
+	Tue, 13 Oct 2026 13:47:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791898076; cv=none; b=HFZ92X0qGJRsUIjUldAbs98/Q1IS77P0EwldzjqZvHBL1dfTYUr78BQ4i6AkQDj8y6U6wpkiaaCaJTt2zTGmYx1K3ctmD4UaDeuurr2uKxdGsijEDnCAQPszVKRMbsxlKYTWBhPkY3vdf85E59ryXCNNh/iUrCl4hbmE49i+Ac8=
+	t=1791899247; cv=none; b=eLQrmnodaiCDamP+RDb2QosbjTWb5IXgg//FY9tcFin91G5IrDb4d46LiLiNRXvhA9He5U6IfhCkL1SIQ+AKPN1ofrTJmUR8NVzKddwl2u45biBOevt2qCQQv46Vb0ybfcq+kpKSm7CsqvKgxTn6BROJzY6PVyBanL9mFe4RhsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791898076; c=relaxed/simple;
-	bh=SIHqZxvERkT8Aik9zKj3iOUoBA0r+lCrV7bOfwUXDno=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Fhp9NLg7NQqPHDzn6vj6zZSsS3wu5MQKnQK+4yxHUtOoWoAks7ZyKeiuDC07xVKj7hSWXGs3E220X8pEp46sF5pVJH78xB9Z/m4NesxWWhXSxZP7uj6IDKufgH1VX/Ud3GcM2KmN8z9PlXc0L1Z+AlEBrG2ssLDmUYYUGAZZIM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=R33YSZzf; arc=none smtp.client-ip=95.215.58.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1791899247; c=relaxed/simple;
+	bh=Hd6B3HmdeeY+37Ck7A9VvJD6apYnPKGi0/9MCJajo2w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Sm2FfxW8WTmPC88TzRt16EymArlGAVhac6Atj2vQfArI9k/sw8EXAdVF7TUCAJfE89vgvupE7rVP51E/Pnq9BGyRS7pKXdYZp+gtr26VREXQqx09qmQG6/MgIgwhL/8Ygo1F+QgpAbZ5IukvrAgr/t6mUx9tTw2QXw2dt9ZUIUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S32sFMdJ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="R33YSZzf"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=SIHqZxvERkT8Aik9zKj3iOUoBA0r+lCrV7bOfwUXDno=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1791898071; v=1; x=1792502871;
- b=R33YSZzfU1OZxhf8zv5zmbIGu725gL8wHLAO4L9w+rB9lK3KcDcNmC+xk+pIMMxvgwzJ4ITV
- QB8PNmJ+mAKjrs6C0PPKmBq668AbXdi5pEHePdH50MJ/IehBkhsh7AfW5qPTCtViF0C5cF00rHO
- UL457ar2GCpmnXOzdEUqLQxw=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 5b7f91973e48002c;
-	Tue, 13 Oct 2026 13:27:51 +0000
-X-Mizu-Trace-ID: 5b7f91973e48002c
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5ba429b64c5so19854e87.1
-        for <kvmarm@lists.linux.dev>; Tue, 13 Oct 2026 06:27:48 -0700 (PDT)
-X-Gm-Message-State: AFq9FYJgXE6j+jltYuMfXvkS7VkOWhxd2b769UURig3gn2DSmOQLELib
-	4AJYAIBiHTSXidSkAjJb49hPtGT/d+yIywQ+npVVKflb9zO/WjD279MUCA9V6IBbjIcztR4nfMg
-	lhzDRKkP5Ydb9Lb9+rM6mF53cMLgGg4kP0BzjqFDB
-X-Received: by 2002:a05:6512:3ba5:b0:5bc:b2ec:eaee with SMTP id
- 2adb3069b0e04-5bcea8328a2mr344669e87.11.1791898067868; Tue, 13 Oct 2026
- 06:27:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S32sFMdJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27E541F000FF;
+	Tue, 13 Oct 2026 13:47:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791899246;
+	bh=ufMZp4Qc9d80hvvRB3vNUruXIvuXEMAYVkTpkYEJ0aU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=S32sFMdJ2NY/boJZiq7qHgwrDvnfacP5JNU8mgaJyQiC/aJSf/o6u1yYss44okWo+
+	 Sjga82Sb2QOdchZ1LbH0ux4IvEmSVJYxDuqsW2hn+bGfVieTjBjqpSHEZOrRJigUno
+	 Px/tm8jUDyk1sC2fW1OcOVHLHHQvxIxtYjd1Q9Yv72c3MLoEPN+IRXDvhqPnrpGeFv
+	 wDS7604PLG+GDAQq4ZB6hDi1UaV9y9t8Kh+H+s/ulOnRB0aWSsvTUCvQRS756SbO3C
+	 aRc+OXw5d+p7xFNvkD8MgBaeVjQN7uppe/zdzAtPLcpNJmMMBmFatZswffJxTVZJ3G
+	 jQSn9tSa+g88w==
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfauth.ams.internal (Postfix) with ESMTP id 01726198003A;
+	Tue, 13 Oct 2026 09:47:11 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Tue, 13 Oct 2026 09:47:21 -0400
+X-ME-Sender: <xms:XzbOan8Y8kGba8pRx5mgpWDM4YXW1EMocY6hBF154p4NE_F875UjkA>
+    <xme:XzbOasWum8CcjS-iK132ufVMOimRtEOpWN8JV7dRfEX1h1Dp_3dY_DtQtcao6Ny_a
+    yYaAPEJ0M59QTbNoSdl3ZanKVC4FYisPINrKzr_mvgREULtKWqsDGvx>
+X-ME-Received: <xmr:XzbOap0ub0Qc1GVOIpPOLwa49EH1LI7JGZhO_dy3oWX53Pt7ElSMpyHzD84>
+X-ME-Proxy-Cause: dmFkZTE4j+cS9gh3PxGqMjY7PyaLxMVg3dj8MlDzlM7GN7gdgiVxP0yJ//GkJN0wCahlMx
+    5JdZXyer7uBv1S7r9zKudGJTVsIfvIDNMUthTv4zHTDadaydFl5J3WM5oOjG7bueTu1P/y
+    ErJcoDmdDlf2mbevwhHQ61prG/aGc64Y1+ArTq02T6BN55y6XBoncRB7eE5H2SYOX4r3El
+    YrSBfcjthcbdK9TH5Jj2U1yRZNxzXvJ0LVkfeDISJaGmLMzoC8igk5XBTY+38fhiHSyGiL
+    +cnpmehXA2/flj223aR6gM8IWtENoV0RxoyPyt9udox5uLVBfm0KgCcO5tiVN9eCvh/5JM
+    aTKNqGwu/2rDhCkM1c+ix5JpPW+GGwuxufWlSR9jnyihSU+e9+lhP2kVKcTNhuePk4D7h4
+    2Q/OqvXjwTCM/tEN3XsDlSmc1l8yzmlZPtSQ3+C0mMNsQsEFPswQDCtfmGg67K80Az+PVL
+    LRd83YGI28XR3lRflIQMmdCsHVNKROP4bmpOl8lfPNG/peUSuiL9LZu5QLVVUe3NoZwPGs
+    g7i+lcpjCaoYEqyEbFS/GsC8fY2i0+IyggX935VBX1nvot5c71LozqkHm+PSwQtEOzOylc
+    ws01IE6e2mhHKHvxbwqIw1oJJoQYx5BwXuQtZfTdhwj1Ef1bu0vOINgdPZAw
+X-ME-Proxy: <xmx:XzbOavjAdgGfkkFd30Sl97e4fKs0AXQI0rmS1xtCq9gumhdIOAyBRQ>
+    <xmx:XzbOamTbl7FUwBPXlrXZ5UPMDMEsm-qJQemClGWaBNm7JvXRJNgTWQ>
+    <xmx:XzbOahFtiScMJxuiSy8_Pg59KzrCRLfao8Sx9nm0MSTSvPdPM-8nyw>
+    <xmx:XzbOau_9QagkSr9Gcvi2fyeWTN6rOk-E4VNxPyjkfdaOI5zuhHPpVw>
+    <xmx:XzbOanGVoJjyM8cI1RPfiSHx1bWBKrDdsr6nob_WZdZmjMxe9r7CI-pk>
+Feedback-ID: i10464835:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 13 Oct 2026 09:47:09 -0400 (EDT)
+Date: Tue, 13 Oct 2026 14:47:08 +0100
+From: Kiryl Shutsemau <kas@kernel.org>
+To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
+Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+ 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ iommu@lists.linux.dev, 	Andrew Morton <akpm@linux-foundation.org>,
+ Baoquan He <baoquan.he@linux.dev>, 	Mike Rapoport <rppt@kernel.org>,
+ Pasha Tatashin <pasha.tatashin@soleen.com>,
+ 	Pratyush Yadav <pratyush@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ 	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Joerg Roedel <joro@8bytes.org>,
+ 	Marc Zyngier <maz@kernel.org>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ 	Robin Murphy <robin.murphy@arm.com>,
+ Steven Price <steven.price@arm.com>,
+ 	Sumit Semwal <sumit.semwal@linaro.org>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ 	Thomas Gleixner <tglx@kernel.org>, Will Deacon <will@kernel.org>,
+ 	Russell King <linux@armlinux.org.uk>,
+ Benjamin Gaignard <benjamin.gaignard@collabora.com>,
+ 	Brian Starkey <Brian.Starkey@arm.com>, John Stultz <jstultz@google.com>,
+ 	Mark Rutland <mark.rutland@arm.com>, Radu Rendec <radu@rendec.net>,
+ 	"T.J. Mercier" <tjmercier@google.com>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ 	Michael Ellerman <mpe@ellerman.id.au>,
+ Nicholas Piggin <npiggin@gmail.com>,
+ 	Christophe Leroy <chleroy@kernel.org>,
+ Ritesh Harjani <ritesh.list@gmail.com>,
+ 	Shrikanth Hegde <sshegde@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ 	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, 	Vasily Gorbik <gor@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ 	Sven Schnelle <svens@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>,
+ 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H . Peter Anvin" <hpa@zytor.com>,
+ 	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ "K . Y . Srinivasan" <kys@microsoft.com>,
+ 	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, 	Long Li <longli@microsoft.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ 	Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Andy Lutomirski <luto@kernel.org>,
+ 	Peter Zijlstra <peterz@infradead.org>, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org, 	linux-media@vger.kernel.org,
+ linux-mm@kvack.org
+Subject: Re: [RFC PATCH v8 02/14] mm: Zero memory during shared memory
+ transitions
+Message-ID: <as4q9FlxUy9EFJZK@thinkstation>
+References: <20260924100529.1398790-1-aneesh.kumar@kernel.org>
+ <20260924100529.1398790-3-aneesh.kumar@kernel.org>
+ <arZkEugXwCtKHH64@thinkstation>
+ <yq5azewiqj39.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20261013130247.4135515-1-fuad.tabba@linux.dev>
- <20261013130247.4135515-4-fuad.tabba@linux.dev> <sashiko-outbox-169787@kernel.org>
-In-Reply-To: <sashiko-outbox-169787@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 13 Oct 2026 14:27:11 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTyUDgdbuSi1_CJ7uC0TP3uxJoOgA3sCPA4X9arnbq_0ZA@mail.gmail.com>
-X-Gm-Features: AclHuK910JIQF8Z2todu-S70u0aibAhdbvAd4WRKuP3Y0cjiQl0qPf6kSlNkfL8
-Message-ID: <CA+EHjTyUDgdbuSi1_CJ7uC0TP3uxJoOgA3sCPA4X9arnbq_0ZA@mail.gmail.com>
-Subject: Re: [PATCH 3/4] arm64: sysreg: Mark fields the architecture dropped
- as RES0
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, 
-	Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <yq5azewiqj39.fsf@kernel.org>
 
-On Tue, 13 Oct 2026 14:15:11 +0100, sashiko-bot@kernel.org wrote:
-[...]
->> @@ -2663,11 +2662,7 @@ Field        57        EPAN
->>  Field        56        EnALS
->>  Field        55        EnAS0
->>  Field        54        EnASR
->> -Field        53        TME
->> -Field        52        TME0
->> -Field        51        TMT
->> -Field        50        TMT0
->> -Res0        49:47
->> +Res0        53:47
->
->[Severity: Medium]
->This change reclassifies bits 53:50 of SCTLR_EL1 (TME, TME0, TMT, TMT0) from
->Field to Res0. This silently regenerates the aggregate mask SCTLR_EL1_RES0 to
->include these bits.
+On Tue, Oct 13, 2026 at 10:42:58AM +0530, Aneesh Kumar K.V wrote:
+> Kiryl Shutsemau <kas@kernel.org> writes:
+> 
+> > On Thu, Sep 24, 2026 at 03:35:17PM +0530, Aneesh Kumar K.V (Arm) wrote:
+> >> diff --git a/arch/x86/coco/tdx/tdx.c b/arch/x86/coco/tdx/tdx.c
+> >> index f904a636d449..1f1f39082391 100644
+> >> --- a/arch/x86/coco/tdx/tdx.c
+> >> +++ b/arch/x86/coco/tdx/tdx.c
+> >> @@ -978,6 +978,9 @@ static bool tdx_enc_status_changed(unsigned long vaddr, int numpages, bool enc)
+> >>  static int tdx_enc_status_change_prepare(unsigned long vaddr, int numpages,
+> >>  					 bool enc)
+> >>  {
+> >> +	if (!enc)
+> >> +		memset((void *)vaddr, 0, (size_t)numpages << PAGE_SHIFT);
+> >> +
+> >>  	/*
+> >>  	 * Only handle shared->private conversion here.
+> >>  	 * See the comment in tdx_early_init().
+> >
+> > This doesn't make sense to me.
+> >
+> > On TDX the memset zeroes a page that is about to be dropped.
+> > MapGPA(shared) makes the VMM back the GPA with different memory, and
+> > what the guest reads afterwards through the shared mapping is whatever
+> > the host has there.
+> >
+> 
+> Does TDX require the guest contents to be preserved when pages are
+> converted to shared?
 
-This hunk is in SCTLRMASK_EL1, not SCTLR_EL1. SCTLR_EL1 has had Res0
-53:50 since commit d65bf6e317e7 ("KVM: arm64: Remove all traces of
-FEAT_TME"), so SCTLR_EL1_RES0 doesn't change. Nothing uses
-SCTLRMASK_EL1_RES0.
+No.
 
-Cheers,
-/fuad
+From the host perspective, the private page is withdrawn from the TD.
+Its contents are encrypted with the TD's key and do not carry over. Then
+the host inserts some page (maybe the same one) as shared.
+
+So the memset() in the prepare callback zeroes a page the guest is about
+to lose, and it does nothing to what the caller sees. With the
+post-conversion memset() gone from dma_direct_alloc(),
+dma_alloc_coherent() in a TDX guest returns whatever the host has at
+that GPA.
+
+TDX needs the same ordering as CCA: zero in
+tdx_enc_status_change_finish() after tdx_enc_status_changed(). No flag
+is needed for that.
+
+But, again, shared memory is under host control and you cannot assume it
+will stay zeroed.
+
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
