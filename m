@@ -1,97 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F15C947DF8E;
-	Tue, 13 Oct 2026 05:13:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE2F4734E6;
+	Tue, 13 Oct 2026 05:46:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791868397; cv=none; b=eIyFgs34TYtglL9ejnvy/3CiA6vwnI8Qf912wd89lD4J8K+3G24Uo7xgeF6rWg4jESDAA4cfY7qNXrruFJjlfol0l6nAIWRIJGh7YHe6YvGq/9oYbXct/WhtzZONOLpzZSjw6HLshhhMCvw1+XTe2rrkCNnOj7VEjDchOWxLEA8=
+	t=1791870398; cv=none; b=DtgvzYWzYF5ozBicPFCjfIYWAACLS+srbyGwVUrGBzOeMOe7scRHSJIfS7h8jj74ma7uNncnuFQ7zR28PJWe8q+7Z+NILBDtGN/YsCmmlKkOiwgbz+D4x04cDq6r03NRcbiKDH5Ph6vrt2g1BdPG1SPTQWbokE57fwZyA2nrAlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791868397; c=relaxed/simple;
-	bh=p8Zz7IgMclgStUHo6Bn7GZa81f1lXxrvkXQTVNRaFjQ=;
+	s=arc-20240116; t=1791870398; c=relaxed/simple;
+	bh=2sHaGrxsBzmAZihV89YwgCeytCHYJJCpW4O35Qli6mA=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ewieIm42vfT0BuKw+NZm17VjAUONeMAlF6djAiag15cJg4cTLFpoKGrenlOaZZHIfDh4S5RaD8KCosnllXbnzsn40i+JhMmDKPyWKx5d/r6ejjV3lXek4v3ZUw61HQT9cakuNm4UZDTj+ZC0rHvGkI2+ELSGO6H/syoVdDMkmvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VzCrDEQb; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=SJQ8MqFmZm5j/DERHyQJElAxttjNMdezWZFBOV6nSuriql2CTjfN7nJHW2N6ffO6EupdWj9l44YVkDYkjIdYwPKPH8bydk7GHyuKm+wcjifB8OPkEyXJDMA2MvdfIe/scaY8Ttplr9ErJmDg9695wEMI0Bp26/OftOyqq5/xMBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ORBFjCti; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VzCrDEQb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E989C1F000FF;
-	Tue, 13 Oct 2026 05:13:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ORBFjCti"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01F1B1F000FF;
+	Tue, 13 Oct 2026 05:46:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791868395;
-	bh=GJNXTxAKDlJNxNUfVhfSQZRthKiPsKwpUGRTdAWw5nk=;
+	s=k20260515; t=1791870396;
+	bh=Kn3sevWHfnmO/p6abMJZzG209Y+bg0EY/JmHb1ot1GE=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=VzCrDEQbQkLh3MKfOcrVWwIP8JEXomYf5WXOVtkxPNomqYwc62kenfaWt4EtjgLr1
-	 56jB5oIiN8pzQZeIE3LFciZow2fKaUlTkUhbRzOM+dcbTemWxjNlaDACdigHCayE87
-	 aOYeG7A0j8blwTWF/PhrjdF/yqcwVCBZgEXlTLggA50DrIt7DidbhXOeZDYqd2wlwf
-	 5VM61psLu8x0NOTS6zsnpsRtNRWIIa6D/I6cZXFg4QLjCBQLZUYg8H0fnCR6pdxExb
-	 Rlsmno4/IPgxywaV4sYkjL4r0KtaTtxGQIturB/lLm5ZpL/LuERHtKpU8HslKH1Kgj
-	 Tp4Z6gqmgQAbg==
+	b=ORBFjCtiLmLFAFdLrfSgNeOhZmd84KKHFG3/Ud7vCkeR4P8xYLLZV9vJFZ9ITLqEe
+	 FMcv3ppgXKgS5hFtzSNr4sAImv5Sdpk0ehtcOYGsTGWDo86WRES/kHNuLfrpJ6fZQ5
+	 UkIXfDT+sNYdhwqiizR0uHiVfZvAl5dSuTWJgDGUIonxzF4PoWnSjEnD/7AV84IV6T
+	 KlOFHLybwTcUxVQVhLAxJmYWXoF9CG+nbk05dPYB79O4JJCPM61Sx65t0yX3jSSURg
+	 t89eP8ob5nP7tBZa9s8UbYDKxfcRjW0OYyoY394hTRMnB4nKntpZASnVO7i6WnpKxZ
+	 ubmnZ6/1aT1RA==
 X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
 From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Kiryl Shutsemau <kas@kernel.org>
-Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Baoquan He <baoquan.he@linux.dev>,
-	Mike Rapoport <rppt@kernel.org>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Pratyush Yadav <pratyush@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian =?utf-8?Q?K=C3=B6nig?= <christian.koenig@amd.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Joerg Roedel <joro@8bytes.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Benjamin Gaignard <benjamin.gaignard@collabora.com>,
-	Brian Starkey <Brian.Starkey@arm.com>,
-	John Stultz <jstultz@google.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Radu Rendec <radu@rendec.net>,
-	"T.J. Mercier" <tjmercier@google.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <chleroy@kernel.org>,
-	Ritesh Harjani <ritesh.list@gmail.com>,
-	Shrikanth Hegde <sshegde@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	"K . Y . Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [RFC PATCH v8 02/14] mm: Zero memory during shared memory
- transitions
-In-Reply-To: <arZkEugXwCtKHH64@thinkstation>
+To: sashiko-reviews@lists.linux.dev
+Cc: media-ci@linuxtv.org, kvmarm@lists.linux.dev,
+	Oliver Upton <oupton@kernel.org>,
+	Marc Zyngier <maz@kernel.org>, dri-devel@lists.freedesktop.org
+Subject: Re: [RFC PATCH v8 03/14] irqchip/gic-v3-its: Resolve the default
+ NUMA node explicitly
+In-Reply-To: <20260924101929.815D81F00893@smtp.kernel.org>
 References: <20260924100529.1398790-1-aneesh.kumar@kernel.org>
- <20260924100529.1398790-3-aneesh.kumar@kernel.org>
- <arZkEugXwCtKHH64@thinkstation>
-Date: Tue, 13 Oct 2026 10:42:58 +0530
-Message-ID: <yq5azewiqj39.fsf@kernel.org>
+ <20260924100529.1398790-4-aneesh.kumar@kernel.org>
+ <20260924101929.815D81F00893@smtp.kernel.org>
+Date: Tue, 13 Oct 2026 11:16:32 +0530
+Message-ID: <yq5awlrmqhjb.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -100,57 +48,73 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-Kiryl Shutsemau <kas@kernel.org> writes:
+sashiko-bot@kernel.org writes:
 
-> On Thu, Sep 24, 2026 at 03:35:17PM +0530, Aneesh Kumar K.V (Arm) wrote:
->> diff --git a/arch/x86/coco/tdx/tdx.c b/arch/x86/coco/tdx/tdx.c
->> index f904a636d449..1f1f39082391 100644
->> --- a/arch/x86/coco/tdx/tdx.c
->> +++ b/arch/x86/coco/tdx/tdx.c
->> @@ -978,6 +978,9 @@ static bool tdx_enc_status_changed(unsigned long vaddr, int numpages, bool enc)
->>  static int tdx_enc_status_change_prepare(unsigned long vaddr, int numpages,
->>  					 bool enc)
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [Medium] irqchip/gic-v3-its: incomplete NUMA_NO_NODE resolution exposes allocations to task mempolicy
+> --
+>
+> commit 6d762ab83972132164ae57c1422f1916decb2fe3
+> Author: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+>
+>     irqchip/gic-v3-its: Resolve the default NUMA node explicitly
+>     
+>     alloc_pages_node() resolves NUMA_NO_NODE to numa_mem_id() internally. In
+>     preparation for switching ITS allocations to the CoCo shared memory
+>     allocator, resolve the default node explicitly in its_alloc_pages().
+>     
+>     The CoCo shared memory allocator interprets NUMA_NO_NODE as a request to
+>     apply the current task's memory policy. Passing numa_mem_id() instead
+>     preserves the existing nearest-memory-node placement across the
+>     allocator switch. This patch does not change the current allocation
+>     behavior.
+>
+>> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+>> --- a/drivers/irqchip/irq-gic-v3-its.c
+>> +++ b/drivers/irqchip/irq-gic-v3-its.c
+>> @@ -236,7 +237,7 @@ static struct page *its_alloc_pages_node(int node, gfp_t gfp,
+>>  
+>>  static struct page *its_alloc_pages(gfp_t gfp, unsigned int order)
 >>  {
->> +	if (!enc)
->> +		memset((void *)vaddr, 0, (size_t)numpages << PAGE_SHIFT);
->> +
->>  	/*
->>  	 * Only handle shared->private conversion here.
->>  	 * See the comment in tdx_early_init().
+>> -	return its_alloc_pages_node(NUMA_NO_NODE, gfp, order);
+>> +	return its_alloc_pages_node(numa_mem_id(), gfp, order);
+>>  }
 >
-> This doesn't make sense to me.
+> [Severity: Medium]
+> Will this leave other callers of its_alloc_pages_node() exposed to the
+> task memory policy change?
 >
-> On TDX the memset zeroes a page that is about to be dropped.
-> MapGPA(shared) makes the VMM back the GPA with different memory, and
-> what the guest reads afterwards through the shared mapping is whatever
-> the host has there.
+> When a device probe or ITT allocation occurs with its->numa_node ==
+> NUMA_NO_NODE (which is common when firmware lacks NUMA info), callers pass
+> NUMA_NO_NODE directly to its_alloc_pages_node():
 >
+> drivers/irqchip/irq-gic-v3-its.c:its_alloc_pages_node() {
+> 	...
+> 	page = alloc_pages_node(node, gfp | gfp_flags_quirk, order);
+> 	...
+> }
+>
+> If node is NUMA_NO_NODE, it passes it directly to the underlying allocator.
+> When the underlying allocator interprets NUMA_NO_NODE as a request to apply
+> task mempolicy, these direct callers will be subjected to the current task's
+> memory policy instead of bypassing it and using the local node. 
+>
+> If a user binds the driver via sysfs under a restrictive task mempolicy,
+> the allocations could land on suboptimal distant nodes or fail entirely.
+>
+> Should the NUMA_NO_NODE resolution logic be moved inside its_alloc_pages_node()
+> to ensure all callers are protected?
 
-Does TDX require the guest contents to be preserved when pages are
-converted to shared?
+Yes, updated the patch to perform the mapping in its_alloc_pages_node(),
+so all callers are handled.
 
-The memset() is done here because CoCo shared-memory allocations now
-ignore __GFP_ZERO and instead always zero the memory explicitly. For
-CoCo architectures such as CCA, this must be done after the memory is
-converted to shared because shared memory uses a different encryption
-context.
-
-The full patch avoids zeroing the memory twice. If __GFP_ZERO is used
-for a CoCo shared-page allocation, the page is first zeroed during
-allocation, then converted to shared, and must be zeroed again. I only
-changed Arm CCA  in this series because I was unsure whether the other
-architectures required similar changes. Therefore, every CoCo
-architecture other than CCA currently performs the memset() before
-conversion, while CCA performs it afterward.
-
-If the host expects to see the guest contents from before the conversion
-to shared, we will have to pass the allocation flags down to these
-helpers and perform the memset() only when __GFP_ZERO was requested,
-along the lines of:
-
-https://lore.kernel.org/all/yq5aa4p82sqt.fsf@kernel.org
-
-To keep the changes minimal, the current approach always performs the
-memset() rather than passing down a flag.
-
--aneesh
+@@ -216,6 +217,9 @@ static struct page *its_alloc_pages_node(int node, gfp_t gfp,
+ 	struct page *page;
+ 	int ret = 0;
+ 
++	if (node == NUMA_NO_NODE)
++		node = numa_mem_id();
++
+ 	page = alloc_pages_node(node, gfp | gfp_flags_quirk, order);
+ 
+ 	if (!page)
