@@ -1,92 +1,196 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44A93E5EF8;
-	Tue, 13 Oct 2026 09:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF06F4CC600;
+	Tue, 13 Oct 2026 09:58:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791885116; cv=none; b=kyspcAyPVBqVhw8Nilp4omF0V73E+uAtGM4vDUJdzltaj5q/RfkaQPA3VaMJgvH9PuRIZ+48qzQQ3HLYXFquRJMqXlIMMRdjgJeHnJJy8fqs4QothIl05cSWrkyBBetdob2Ok9yEoAG/y7l2ojW+KLGLiYWEvxJI20CY85MN85U=
+	t=1791885517; cv=none; b=ItC1zbe0G9HD0oF5sw9gS242O7VCVUfUAX+dJSMr3izrSIYwXDHGBkWVEe3ungCWBES5WIPSjsp2LuRae8K8kmqkqT+vQFM1/qvJj4ZbVUbN4oPxq+DE6wbjb68E4mWDAGlBwrBXYrDq0MXznaH94cAZa0t1nd9tVnfvovIkl98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791885116; c=relaxed/simple;
-	bh=2L7HIEuwrKsGQPkUmHA8GltpZbVB3LGSooIReo/UXGU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FMPtkFkA2rOKyciVCuGOIN6Q4k44XGcDbUgjiP3f1Nu6uNoDaHt34cHRhHbO8CJaUu3NxRRhGCPxz6KwBT4saFJuvRxvVokG12YxGwMk5KxV/4/J8toiNJe1dfG/rkuz+3mMqaxtx6V0OWmYhOTuxbXvPausP/gPMXawxwtmPa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D+RdwBM9; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791885517; c=relaxed/simple;
+	bh=YXnRSTWAU7IyxFtbn+qxY3qd2/8gPBY2gi/t/qkHSRE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ii88/49rBzQrl54Wk4OPQr/kEf+grMPwwvdLGwyPTFVkgTq4B5uEGv1yL5eRwWhcSvfVMkWPyQvcRvkdF3JbjSAjpSB/XHiYfoP+dyaWkdKs18hzQbVK6nhrwJQE3T4hdvhRPM1X4rEONkvkz/JhIE6Spnrrkn/l8ria2Y99/Eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=gyrI4p+h; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D+RdwBM9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E8D11F000FF;
-	Tue, 13 Oct 2026 09:51:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791885115;
-	bh=PyCzwXp6skk6xuTNd5K7xv+NS33CqBs/aqCiNCjofPU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=D+RdwBM9UNxHRLePRTKBR9LdQwEtGhFzrPCerxIXBjRJcRKecovsPLJDZf1Wo/A0e
-	 DVAOJcbY54iNO3N24ta5Mb34ynrLmDJllTvriiN+45+xPf+B08wwGD3iHsQc5a8ZfI
-	 C5GXwXL2/Qc9MLL4FJ8DRWz8MgAw2ZYcIQ9z713vjPsS2LMNak6J04CbMVRIlMKg/9
-	 mEnhAZB3z+TjgEeOuok2njcVeiisvuoFNo7zM2CfSar7SCrLAeUNxR4e7M+eOzQB9L
-	 dhe5J7ep9XjoNsnZnXrc/As1NDC6dL25BMfsEr7L4tYfvcDpLenhuJQ1wcNzr4vqtV
-	 2p4w25BGmaHHw==
-Date: Tue, 13 Oct 2026 02:51:48 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v2 0/2] KVM: arm64: vgic-its: Fix LPI double mapping and
- DISCARD
-Message-ID: <as3_NKT20MNdqaJR@kernel.org>
-References: <20261013081646.933312-1-fuad.tabba@linux.dev>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="gyrI4p+h"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E5801169C;
+	Tue, 13 Oct 2026 02:58:30 -0700 (PDT)
+Received: from [10.0.128.125] (Suzukis-MBP.cambridge.arm.com [10.0.128.125])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 587BB3F7B4;
+	Tue, 13 Oct 2026 02:58:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1791885514; bh=YXnRSTWAU7IyxFtbn+qxY3qd2/8gPBY2gi/t/qkHSRE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=gyrI4p+h+rg7F7KzN+FY9x9PiD8fijVdOLYuXXJRTseA4OxfHLYYokao4JrlWWDYc
+	 b7TYUZxc1LcIIzSY473gSneYG1BQKVdJSIpkJWp2/mAll6ueBdVaaSiIzgjq0dfLc6
+	 n/vn/bnmlNaqC9t2P2EbLNHqMRTHnuTppuDBHw80=
+Message-ID: <8be050e3-8af1-4f04-902f-9bc01b209dd0@arm.com>
+Date: Tue, 13 Oct 2026 10:58:29 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261013081646.933312-1-fuad.tabba@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v22 02/10] firmware: arm_rmm: Check for RMI support at
+ init
+Content-Language: en-GB
+To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+ sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
+References: <20261002061507.1600269-1-suzuki.poulose@arm.com>
+ <20261002061507.1600269-3-suzuki.poulose@arm.com>
+ <2586e689-c27d-4e4c-8c69-03e24259cb96@redhat.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <2586e689-c27d-4e4c-8c69-03e24259cb96@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 13, 2026 at 09:16:44AM +0100, Fuad Tabba wrote:
-> Hi folks,
+On 13/10/2026 04:53, Gavin Shan wrote:
+> Hi Suzuki,
 > 
-> Changes since v1 [1]:
->   - Dropped the second mapping of an LPI at MAPTI, instead of keeping a
->     doubly mapped LPI out of GICv4 forwarding. (Marc)
->   - Keyed that check on whether an ITE maps the LPI, not on whether its
->     vgic_irq exists.
->   - Added a patch that makes DISCARD remove the pending state. (Marc)
+> On 10/2/26 4:14 PM, Suzuki K Poulose wrote:
+>> From: Steven Price <steven.price@arm.com>
+>>
+>> Query the RMI version number and check if it is a compatible version.
+>> All RMM feature registers are read and exposed for future code to
+>> use. Also restrict the support to SMC conduit.
+>>
+>> We only support this for Little Endian kernels, the Big Endian kernel
+>> support is anyway marked BROKEN and is being removed.
+>>
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Cc: Oliver Upton <oupton@kernel.org>
+>> Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+>> Tested-by: Gavin Shan <gshan@redhat.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> ---
 > 
-> Two fixes to the ITS emulation. The first stops a guest from mapping
-> one LPI from two events, which can oops a GICv4 host when the VMM then
-> routes an assigned device's MSI to the second event. The second makes
-> DISCARD remove the LPI's pending state, as the spec requires.
+> [...]
 > 
-> Tested on QEMU, which emulates a GICv4 ITS. A local reproducer with two
-> vCPUs DISCARDs an LPI that's pending in the other vCPU's list register.
-> On rc3, and with patch 2 but without its halt, the guest still takes
-> the LPI. With the series applied, it doesn't.
+>> ---
+>>   MAINTAINERS                       |   2 +
+>>   arch/arm64/Kconfig                |   1 +
+>>   arch/arm64/kernel/cpufeature.c    |   1 +
+>>   arch/arm64/kvm/sys_regs.c         |   2 +
+>>   drivers/firmware/Kconfig          |   1 +
+>>   drivers/firmware/Makefile         |   1 +
+>>   drivers/firmware/arm_rmm/Kconfig  |  25 +++++++
+>>   drivers/firmware/arm_rmm/Makefile |   1 +
+>>   drivers/firmware/arm_rmm/rmi.c    | 112 ++++++++++++++++++++++++++++++
+>>   include/linux/arm-rmi-cmds.h      |  48 +++++++++++++
+>>   10 files changed, 194 insertions(+)
+>>   create mode 100644 drivers/firmware/arm_rmm/Kconfig
+>>   create mode 100644 drivers/firmware/arm_rmm/Makefile
+>>   create mode 100644 drivers/firmware/arm_rmm/rmi.c
+>>   create mode 100644 include/linux/arm-rmi-cmds.h
+>>
 > 
-> Based on Linux 7.3-rc3 (fd73f4a665989).
+> [...]
 > 
-> Cheers,
-> /fuad
+>> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/ 
+>> arm_rmm/rmi.c
+>> new file mode 100644
+>> index 0000000000000..06f5392c982d2
+>> --- /dev/null
+>> +++ b/drivers/firmware/arm_rmm/rmi.c
+>> @@ -0,0 +1,112 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * Copyright (C) 2023-2026 ARM Ltd.
+>> + */
+>> +
+>> +#include <linux/arm-rmi-cmds.h>
+>> +#include <linux/cpufeature.h>
+>> +#include <linux/memblock.h>
+>> +#include <linux/slab.h>
+>> +
+>> +#include <asm/memory.h>
+>> +#include <asm/pgtable-hwdef.h>
+>> +
+>> +/* RMM v2.0 defines RmiFeatureRegister0 to RmiFeatureRegister4. */
+>> +static unsigned long rmi_feat_reg_cache[5] __ro_after_init;
+>> +
+>> +static int rmi_check_version(void)
+>> +{
+>> +    unsigned short version_major, version_minor;
+>> +    unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
+>> +                             RMI_ABI_MINOR_VERSION);
+>> +    unsigned long aa64pfr0 = 
+>> read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+>> +    struct arm_smccc_1_2_regs res = {
+>> +        SMC_RMI_VERSION, host_version,
+>> +    };
+>> +
+>> +    /* If RME isn't supported, then RMI can't be */
+>> +    if (cpuid_feature_extract_unsigned_field(aa64pfr0, 
+>> ID_AA64PFR0_EL1_RME_SHIFT) == 0)
+>> +        return -ENXIO;
+>> +
+>> +    if (arm_smccc_1_1_get_conduit() != SMCCC_CONDUIT_SMC)
+>> +        return -ENXIO;
 > 
-> [1] https://lore.kernel.org/all/20261012084743.2228612-1-fuad.tabba@linux.dev/
+> I think we need to ensure SMCCC version is v1.2 or a newer one here? 
+> arm_smccc_1_2_smc()
+> is immediately called by rmi_smccc_invoke() after this check.
 > 
-> Fuad Tabba (2):
->   KVM: arm64: vgic-its: Don't map an LPI from more than one event
->   KVM: arm64: vgic-its: Remove the pending state of a discarded LPI
+>      if (arm_smccc_1_1_get_conduit() != SMCCC_CONDUIT_SMC ||
+>              arm_smccc_get_version() < ARM_SMCCC_VERSION_1_2)
 
-Looks good. As all of these VGIC fixes depend on reliably synchronizing
-hwstate I'll assume Marc will apply this patchset after his own series.
+We could. But I am wondering if that adds any value ? If the RMM
+exists and responds to the RMI_ABI_VERSION, it must be so on a
+platform with v1.2 or greater ? The extra check doesn't hurt.
 
-Reviewed-by: Oliver Upton <oupton@kernel.org>
+Suzuki
 
-Thanks,
-Oliver
+>          return -ENXIO;
+> 
+> Thanks,
+> Gavin
+> 
+>> +
+>> +    rmi_smccc_invoke(&res);
+>> +    if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
+>> +        return -ENXIO;
+>> +
+>> +    version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
+>> +    version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
+>> +
+>> +    if (res.a0 != RMI_SUCCESS) {
+>> +        unsigned short high_version_major, high_version_minor;
+>> +
+>> +        high_version_major = RMI_ABI_VERSION_GET_MAJOR(res.a2);
+>> +        high_version_minor = RMI_ABI_VERSION_GET_MINOR(res.a2);
+>> +
+>> +        pr_err("Unsupported RMI ABI (v%d.%d - v%d.%d) we want v%d.%d\n",
+>> +               version_major, version_minor,
+>> +               high_version_major, high_version_minor,
+>> +               RMI_ABI_MAJOR_VERSION,
+>> +               RMI_ABI_MINOR_VERSION);
+>> +        return -ENXIO;
+>> +    }
+>> +
+>> +    pr_info("RMI ABI version %d.%d\n", version_major, version_minor);
+>> +
+>> +    return 0;
+>> +}
+>> +
+> 
+> [...]
+> 
+> 
+> 
+
