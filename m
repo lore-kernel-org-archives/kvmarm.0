@@ -1,104 +1,212 @@
-Received: from mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF4E47ECC7
-	for <kvmarm@lists.linux.dev>; Tue, 13 Oct 2026 10:50:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3337B4DD3B4;
+	Tue, 13 Oct 2026 10:58:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791888651; cv=none; b=uJlF+rZuH15jx5ftGzra9urNFc6Ar3Tv+yAyi1QGKa784SHFM2CqWubzNVTaqvQAoX7yE0g4pW7aHRmGjENOlAka/PEZXBUS6m+5YOuvRf5xV2lsihkGwoIpR/TkApcimnPaDGCJZKzVv0saR9w46YUf9o4lRdZ2qV3xN1Gat90=
+	t=1791889097; cv=none; b=PrNOwEauo6T8WvN1yUTMrs+ZMZOu3aZb8/eP9Hfwx9tm9vhKGWfDJ00e8h98EHLSNOuOW1BHa6zqGyhR2f525UKaQW+ZIbAmFszu1kNInF2xe+AUZxeh0KBsjiEidNKFxIgRR3DXVuXMqinHQag6bsQ87Ht2xoqM7jEZkZVaonU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791888651; c=relaxed/simple;
-	bh=KVAzhVgNrvfGhJXuSFvrFDmK336xmECT5jayATxTm8M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PkJDOhm3LCQWFj33/aVIHIfx/5iE57ZvWdFOlMfeXWl+ACx7uWAo8foekyMVy5/IzzZyHkkgB4oNEZCBlgDulqMMGIf57SMgj0nxHyOlkehJGWD4y9/hmU9ZHR3wUJ5wWVfzraYFETzqBCnlt5Y/H1jinkijFoHTeNOM4QbpjHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=b1FoPo48; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1791889097; c=relaxed/simple;
+	bh=6SnVVVmPYxF1OFQX0l7U7uiorQk9/Vabbq3+fH3CB0o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iYZQvO3Qy81AhbOuGo/bupz+ZlMuOZkFuF380myyZCWnZ1maRrvwR2M1hoA/RV0Gp25nBklTyKFTNFCRxyr/SJeKEA2kN2xnbejJ6ZmvD/clfCHY5b+/25ranfNULQjkZMNE7jaRftfRNM/tk40Ho2Y9RYHLo6ph4rPgBJSlYQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aR/hDTCH; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="b1FoPo48"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=KVAzhVgNrvfGhJXuSFvrFDmK336xmECT5jayATxTm8M=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1791888647; v=1; x=1792493447;
- b=b1FoPo484jsbUcknLORxshs+NjUtGDlWFA0+BsB/lqir7EsKSbWvjb/tzPPS+KeIshCYthM5
- vAa7QxmsKETVmB+9c7FGwPMzlOyL6B508C/gQOYfaCCqy7L6s+Kdgqo5IItMXFsKCP7NYXMNCFj
- CN8OWGeiw/yBKZ9JEsHiNAqc=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 83f9fc653666faac;
-	Tue, 13 Oct 2026 10:50:47 +0000
-X-Mizu-Trace-ID: 83f9fc653666faac
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5ba40832934so16925e87.1
-        for <kvmarm@lists.linux.dev>; Tue, 13 Oct 2026 03:50:47 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwT5ZWOOI00MUcv1F0AYxeDpnt3ZYe4xWwvj7Jw+vVgSX3id+Nw6EqIB1ltdRvjtVH78JCN95I=@lists.linux.dev
-X-Gm-Message-State: AFq9FYLcyxZ80eE8PXC7WS03a+WH8eARfX0LZom3zc3uUzDpUkORqXoo
-	p2H7Wf35IEzHtTGHQucXL1upyLuaDNYSGC4vYeTZ2rm1lcquRVpTH+xX4/qvsummJgMF67EmJFY
-	FU9PTXbpE1PmsZqLEj0QoFMRLvg7N582x5g2Iw9Ne
-X-Received: by 2002:a05:6512:1284:b0:5b8:c230:1241 with SMTP id
- 2adb3069b0e04-5bcea5f77eamr307791e87.10.1791888646329; Tue, 13 Oct 2026
- 03:50:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aR/hDTCH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E60871F00893;
+	Tue, 13 Oct 2026 10:57:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791889087;
+	bh=XqYELHn1Fs10YGv478nR1wyW/4N+kLzgnDGLYZUvs88=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=aR/hDTCHkpRrD2Q85x6nhy7UfQ/CtL/ivKHNoP/7YmaOf2YtsXzMbVTewABYl+lH2
+	 E1ANeprkW0sDIPEXVwMMv8R0Alz/PxPWx9Tls6fHrc59XjGM4kE7oQbFPXbmtT1b26
+	 CgYaGJe2w4vRzH4o2iObzguPPcIgDQyWEM+zvsH5mKunbvoiuZazXqSsrrlF7EEQb1
+	 hxo4AG70naM9Mdv5S3OChc7VTcBA6PvNoZfqGhd1XdBHFqyWNU172VtIq4TfMG4wVp
+	 n2po+hi0bZLT+0+nGnJXrnkRwfPTxiBa+7wNgPjNRVRt5ql/bfPHJ7ItjHN+V6LamS
+	 WiV/sW1lCSqeQ==
+Date: Tue, 13 Oct 2026 11:57:34 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: "David Hildenbrand (Arm)" <david@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	"Liam R. Howlett" <liam@infradead.org>, Vlastimil Babka <vbabka@kernel.org>, 
+	Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, 
+	Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>, 
+	Michal Hocko <mhocko@suse.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
+	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Zi Yan <ziy@nvidia.com>, 
+	Baolin Wang <baolin.wang@linux.alibaba.com>, Nico Pache <nico.pache@linux.dev>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>, 
+	Lance Yang <lance.yang@linux.dev>, Usama Arif <usama.arif@linux.dev>, 
+	Kiryl Shutsemau <kas@kernel.org>, Doug Gilbert <dgilbert@interlog.com>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <mkp@kernel.org>, 
+	Simona Vetter <simona@ffwll.ch>, Helge Deller <deller@gmx.de>, Sebastian Reichel <sre@kernel.org>, 
+	John Hubbard <jhubbard@nvidia.com>, Peter Xu <peterx@redhat.com>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Oleg Nesterov <oleg@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	David Airlie <airlied@gmail.com>, Will Deacon <will@kernel.org>, 
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Jan Kara <jack@suse.cz>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
+	Andreas Larsson <andreas@gaisler.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Matthew Brost <matthew.brost@intel.com>, 
+	Joshua Hahn <joshua.hahnjy@gmail.com>, Rakie Kim <rakie.kim@sk.com>, Byungchul Park <byungchul@sk.com>, 
+	Gregory Price <gourry@gourry.net>, Ying Huang <ying.huang@linux.alibaba.com>, 
+	Alistair Popple <apopple@nvidia.com>, Chris Li <chrisl@kernel.org>, Kairui Song <kasong@tencent.com>, 
+	Kemeng Shi <shikemeng@huaweicloud.com>, Nhat Pham <nphamcs@gmail.com>, Baoquan He <baoquan.he@linux.dev>, 
+	Youngjun Park <youngjun.park@lge.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Qi Zheng <qi.zheng@linux.dev>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Yuanchu Xie <yuanchu@google.com>, Wei Xu <weixugc@google.com>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Michal Hocko <mhocko@kernel.org>, 
+	Miklos Szeredi <miklos@szeredi.hu>, Xu Xin <xu.xin@linux.dev>, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, selinux@vger.kernel.org, linux-sound@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev, 
+	Ihor Solodrai <ihor.solodrai@linux.dev>, Bert Karwatzki <spasswolf@web.de>
+Subject: Re: [PATCH v5 30/38] mm/vma: introduce vma[_flags]_is_mm_backed()
+Message-ID: <as4NZeHKJJ822E0L@gremlin>
+References: <20261009-b4-mmap-prepare-vma-flag-sanify-v5-0-923b70125b1e@kernel.org>
+ <20261009-b4-mmap-prepare-vma-flag-sanify-v5-30-923b70125b1e@kernel.org>
+ <c79d2d40-0f1c-43ec-bc25-b75ce975f27e@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20261013081646.933312-1-fuad.tabba@linux.dev> <as3_NKT20MNdqaJR@kernel.org>
- <86wlrl2a2f.wl-maz@kernel.org>
-In-Reply-To: <86wlrl2a2f.wl-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 13 Oct 2026 11:50:09 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTztZpFrmuz9pK+01BsDxHnzpEwUMt6E3nUrgk4NNTsKYQ@mail.gmail.com>
-X-Gm-Features: AclHuK_kCCq3-9Q2tIHYoGWtf99ZLB81HNWPaAdr5x53TtL1SwcCZkCDuzzJ-Oc
-Message-ID: <CA+EHjTztZpFrmuz9pK+01BsDxHnzpEwUMt6E3nUrgk4NNTsKYQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] KVM: arm64: vgic-its: Fix LPI double mapping and DISCARD
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c79d2d40-0f1c-43ec-bc25-b75ce975f27e@kernel.org>
 
-Hi Marc,
+On Mon, Oct 12, 2026 at 08:45:17PM +0200, David Hildenbrand (Arm) wrote:
+> On 10/9/26 20:04, Lorenzo Stoakes (ARM) wrote:
+> > Introduce vma[_flags]_is_mm_backed() for the purposes of identifying
+> > mappings which are mm-managed and whose contents were placed there by core
+> > mm's own fault path - rather than a custom ->fault handler - and which core
+> > mm has not reserved the right to discard.
+> >
+> > Mappings not managed by core mm do not fall into this category, as they are
+> > populated by their owner, and nor of course does memory-mapped I/O.
+> >
+> > We exclude fixed mappings as these have a layout core mm cannot assume
+> > ordinary fault semantics over.
+> >
+> > hugetlb mappings are fixed mappings, but core mm owns them entirely, so
+> > they are explicitly carved out as mm-backed, as the MADV_DODUMP check
+> > already does.
+> >
+> > Droppable mappings are excluded as core mm has promised it may discard them
+> > at any time.
+> >
+> > Use this functionality to update the madvise MADV_DODUMP check to test for
+> > this rather than open-coding it.
+> >
+> > This replaces the VM_SPECIAL check which means it no longer checks for
+> > VMA_IO_BIT, however this is safe as we have established the invariant that
+> > mm-managed mappings may not set VMA_IO_BIT, so we implicitly include
+> > these.
+> >
+> > No functional change intended.
+> >
+> > Acked-by: Zi Yan <ziy@nvidia.com>
+> > Signed-off-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+> > ---
+> >  include/linux/mm.h | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  mm/madvise.c       |  4 ++--
+> >  2 files changed, 52 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/include/linux/mm.h b/include/linux/mm.h
+> > index 2ce68713e4c3..55320cf2c525 100644
+> > --- a/include/linux/mm.h
+> > +++ b/include/linux/mm.h
+> > @@ -1738,6 +1738,56 @@ static inline bool vma_can_merge(const struct vm_area_struct *vma)
+> >  	return vma_flags_can_merge(&vma->flags);
+> >  }
+> >
+> > +/**
+> > + * vma_flags_is_mm_backed() - Do the specified VMA flags imply the mapping is
+> > + * backed by core mm?
+> > + * @flags: The VMA flags to test.
+> > + *
+> > + * An mm-backed mapping is one managed by core mm (see
+> > + * vma_flags_is_mm_managed()) for which two further things are true:
+> > + *
+> > + * 1. Everything mapped was placed there by core mm's fault path (no custom
+> > + *    ->fault).
+> > + * 2. What is mapped stays there until it is zapped or unmapped by the user.
+>
+> I still dislike squeezing the VMA_DROPPABLE check in here.
+>
+> It's just weird semantics to squeeze pages that are *managed* by core MM (#1)
+> but are simply always lazyfree into this check.
+>
+> In fact, core-mm manages (zaps) these pages, they are really just just
+> permanently lazyfree.
+>
+> Open-coding "this (DUMP, UFFD, MLOCK) does not make sense for droppable
+> mappings" is IMHO the right decision, because there you could say
+>
+> "dumping something that can get zapped every second does not make any sense"
+>
+> "placing pages through uffd does not make any sense if it can get zapped any second"
+>
+> "mlock'ing (and thereby allocating!) droppable mapping does not make any sense
+> and could actually break droppable semantics"
 
-On Tue, 13 Oct 2026 11:01:44 +0100, Marc Zyngier <maz@kernel.org> wrote:
-[...]
-> Yeah, I now have a series that has the counting pause, your single
-> vcpu pause (fixed to DTRT), and the LPI disabling fix. Patch #2 of
-> this series can probably make use of the single-vcpu stunning.
+Yeah, I am starting to come over to your point of view on this.
 
-I'll rebase the series on that once it's out, with patch 2 using the
-single-vcpu stunning.
+It sucks that we have to manually do the droppable check, and I still worry
+callers will miss this as a result, but at least the flag has a specific,
+non-vague purpose.
 
-> As for the OUTSIDE_GUEST discussion, I've had a long discussion with
-> Will where we reversed engineered the synchronisation requirements,
-> and concluded that there was nothing to fix on that front (the logic
-> is incredibly subtle and counter-intuitive, but overall sound). This
-> patch is therefore dropped.
+Rather than keep on trying to fit droppable into the definition, which should be
+as clear as possible, it does seem better to just drop the droppable check.
 
-The first [High] issue Sashiko found on patch 2 [1] holds for DISCARD,
-because the fold writes back the pending_latch that DISCARD clears.
-With a 2ms delay after the exit to widen the window, and the DISCARD
-sent at a varying time, the guest in my DISCARD reproducer takes the
-discarded LPI in 13 of 20 runs on v2.
+It's nearly equivalent to the mergeable check, except that it allows hugetlb
+(the eternal exception), but that means we can now define mergeability in terms
+of mm-backing which is really nice.
 
-A vCPU on its way into the guest does the same: it loads its LRs in
-kvm_vgic_flush_hwstate() while it's still OUTSIDE_GUEST_MODE, so
-kvm_arm_halt_guest() doesn't wait for it. With the delay after the
-flush instead, on v2 plus your 1/7 and 2/7 [2] and both changes from
-your reply to 1/7 [3], the guest takes it in 9 of 20 runs.
+It also lets me avoid a case where I check mergeability in a non-merge situation
+(can just drop anything like that). As well as the cases you mention.
 
-Once DISCARD waits for irq->on_lr to clear before clearing
-pending_latch, the guest takes it in none of 20 runs in either case.
-I'll add that to v3, unless the single-vcpu stunning already waits for
-it.
+>
+> Not a hill I will die on, but I much rather have the droppable mapping be
+> outside or  have it called something nasty like
+>
+> vma[_flags]_is_mm_backed_or_droppable()
 
-Cheers,
-/fuad
+Yeah I think best not, the flag is clearly defined, so we can live with
+checking it manually.
 
-[1] https://lore.kernel.org/r/sashiko-outbox-169278@kernel.org
-[2] https://lore.kernel.org/r/20260929093548.3598547-1-maz@kernel.org
-[3] https://lore.kernel.org/r/86a4p0403b.wl-maz@kernel.org
+My concern was people forgetting to account for it, but I guess we just
+have to live with that in general (ugh).
+
+Maybe later we can think of a bright idea as to how to define some
+semantics that include it, but that's one for the future anyway.
+
+--
+Cheers, Lorenzo
