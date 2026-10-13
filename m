@@ -1,146 +1,225 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145964CC294
-	for <kvmarm@lists.linux.dev>; Mon, 12 Oct 2026 19:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB6C46D0A5
+	for <kvmarm@lists.linux.dev>; Tue, 13 Oct 2026 03:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791832421; cv=none; b=IElEcY0XyK8Vevqxx3aFkZ/EQNHRMCYZ2X/RBnUYO18XsOrmTPvDl+hMm7VgDyF4lT0Ev5yRJ4VYzYaBapaI9a8Z0qc3jAv3e8qMqoGGp0KED8JfPUR3CAOfsb9UCJq6O2FaYnnAqqWBR38V4aWqYdY3MdlalxyKe2QzPDo4rdE=
+	t=1791863627; cv=none; b=QVycAupbOyqUf+AH6GPLTC1dO/Q/7aO1kJ4JWSWEwGvsPw+7lLLNif4iZU/U0nIwKuc9+xZgun9ozr87N/SQa3fiGJTfpsTUUtmQkMZ4XC0DgKD/6zZZ5bMEHtCcOXj/1+emXzj1OneEP90KA2jbUYTnm2D/eg43NWW2QIFFl7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791832421; c=relaxed/simple;
-	bh=+qmz+yBeXRlBRx+OdP1RU/IGoFJLfquctyGFdtp+Fp0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nZs6nxrZ2r9iCeUzVT61pW1vvnou+mb/Q5HKhH+rCBk/gcmKzfLQGj9SkO27sifk6aSa13ElosXhpuqvzfoud7PzL+NOYNaqxjHbndl7yN29epa+3Jwd1Jw2Fm1oH2GGxqhkrnHwkl9QnwwELBIX6l3c39Ka2A4xGcl/jPDZERo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vr9MD9aq; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791863627; c=relaxed/simple;
+	bh=OrGS45tssdwz0Wu7L2zQYru/yP7pd41ssjIeJd+6cHc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ChpJWl8PKCMZmQnSc3riBNo84LB317TzUqnfm2MKdFnclLDG9vZNFa/LBWtLSKaLzIqlbTTk4H8tLf8D2CeatuZ057p49fGVVz1P0bE3v888YRWEuyNHJjMyqguGjKCZY+Vrl/T1O7bhnqPTVh7aiXJ1w9vsYXyb6SWB3zOpNiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ofx0d1yQ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vr9MD9aq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E082B1F008BC
-	for <kvmarm@lists.linux.dev>; Mon, 12 Oct 2026 19:13:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791832419;
-	bh=Aps8kHLqi/8jFYidGtO0vryj1o6o4s/CXu0xm5bD3hI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=Vr9MD9aq/0c/K8dttGgHbcaFVyWghRXbaJ6aaaKBVDfEno5glVgugPNXPq3k06LIU
-	 SkfY5+HUu7AUNsjPrjRHtb/ZVvXSHEv6wp5MO3yXaaICa/8Amvv6ic3izHhBfbRoyy
-	 Gs6xiftz0Ep5iYn537eYMMrYpxj5DIoN/YPplNJQkwRDEhgorXpfM0nTTY33HFt9p3
-	 Cso4oUrpq4qCfUfPBsNgwp89s2hB+mjjkU6UTC5rPWUoHDacxWmW7YkKAlrixK5Nr1
-	 ahgRCzp979VYn7+1R9S36QMyLpexKe6JWyc5rL3pa0aueoALBqmuLvV/Qi3iBg3s2E
-	 3ArL9oQFRqGBQ==
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5ba35c0df4fso1754188e87.0
-        for <kvmarm@lists.linux.dev>; Mon, 12 Oct 2026 12:13:39 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBx2B07ONPfKdOKKd6kLq26FIlZ8JqFd9Pz0V8RwFiOxLrXuhhByvDD5GAzFZgG1NvJHFudA0GA=@lists.linux.dev
-X-Gm-Message-State: AFq9FYLRZAJlkrYQHnY7ulPLfFiwN6/Kdq8aPqsYprBCSRN1KZOHU4wn
-	fL4+Uj8xIUOHzJU0k1iFCOBNS9sGhNfwiK1s1zMJiWcGDtxpL5a4cR/lJVbEirVaXvs3heeN1cA
-	j0y54Es21jcAAOXQlTz5Ji50lF+xuhwk=
-X-Received: by 2002:a05:6512:3042:b0:5b8:f125:f48 with SMTP id
- 2adb3069b0e04-5bcde8e2d0cmr3421626e87.57.1791832418176; Mon, 12 Oct 2026
- 12:13:38 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ofx0d1yQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1791863625;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mUqyt0vezPpSgZq+1/oWOilSNokxX7sjQOB+0OZMeo0=;
+	b=Ofx0d1yQsd7xEI7PLtKGdEaNbtbNaAbgzvu/NiIGc4onWhFiLA9xQ/mJpYLjfGUkKyCEXs
+	J01vgatRREykVqYc1x7AAocW/e5pmB6c6TznIm7+1LRA84RMN5JOpxTmTqNy9IhxuuPsyt
+	L8GcRyGtBroNSZ9aN+hasP2axfQqSJE=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-642-RgfpTIUtNzChNF9ISZK_3Q-1; Tue, 13 Oct 2026 03:53:36 +0000
+X-MC-Unique: RgfpTIUtNzChNF9ISZK_3Q-1
+X-Mimecast-MFC-AGG-ID: RgfpTIUtNzChNF9ISZK_3Q_1791863615
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-3ab2cb8d5dbso3133284a91.1
+        for <kvmarm@lists.linux.dev>; Mon, 12 Oct 2026 20:53:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791863615; x=1792468415;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=mUqyt0vezPpSgZq+1/oWOilSNokxX7sjQOB+0OZMeo0=;
+        b=lF/mSb7Wcqn9zIQervGeIxRNHO6iMFs5W5FUgDzEhlv/cmz9hHnxCZIiK9uDnzNBbh
+         dyDsDBwEpMwN7ufM2MPz3y2XZiHml76rOQQo8gpbOKqsQAhc5iQiadjXvCML52WGXuRF
+         Khuq1fpnKXK4KAXcVSIPlQ+Zuh5nQUsiDtFr6xhf8rgdbfTSJQk9hBdSQYRUVJGYUpYI
+         jAYM/dEsFn1JYY6s78ldMIPHyC59dfwR4OhNs8Ea+Hl5c5ceH0SrLM55IiXD0tZ0pCDS
+         g0hkR9KBCpiV0wufFbF0bxpnIetvOhUWR62rhUipSlwoVeWF7sfKOvhJ7zMJMW01q8aC
+         ijUA==
+X-Forwarded-Encrypted: i=1; AKwUvBx+HlhwgBxNqgNeSxKSiyV3inaTFD4u2bqiQSvjtH49YNdFAYNuVcn+5fcuTyujiFOmZL75Mkc=@lists.linux.dev
+X-Gm-Message-State: AFq9FYLr1KDoAImBoZSQ8qGx+SWk+7ISa2+NBk8xqPMwOoBOyn4fTNQR
+	UwB3/T2cTLrHTVTFoMZWjqgvarHSCnECoSxj71Hb/wtP2V0ihD59y5rXcvtUkeXR0ZF4DGWGhzz
+	6aTagIpfTT0FHsXn2LHkXPdvmnzogRzYRiRoh2gMm5L2L9iBOmytjLDbSSA==
+X-Gm-Gg: AYBFou3FLUQmxq5/HQQrNP+++N44pE0VFm/3OxrSk+banUAuCYUZAn2NZNG5Itfr3IT
+	nZTS426MGDxdpB2uUL8xoTMIWV7nS0BcFAnr4yc4lBQtg47VNLKfFVBsKZqexRm8qPtM/TgjnYa
+	VRQJwaCQlvsFcjpcroEmfaIM1T9MW9n163RQGNKLYUO+Qy/FtIwpbPTtz4P+uie/Zenmdf4y15m
+	UOr417kV6FMuXDxNeWnBY0FFCjyoK3ulhdQamOIp41mhACqXNM+I5kmtdGVmYInSpJVYlbpRhNq
+	smCgQe76VZHbvLA8Apf7bVR5lN15OVTS5LFCuE1JDsk9s97CsNLj9s6jJdO11QI2WXhfYZj+QGv
+	/XjAFTXEXVPZ1ZcwBAPKLBdhviPQN3Puch6gr5pgZew==
+X-Received: by 2002:a17:90b:6c5:b0:3ac:450a:f9ac with SMTP id 98e67ed59e1d1-3ac450b4782mr286948a91.64.1791863615054;
+        Mon, 12 Oct 2026 20:53:35 -0700 (PDT)
+X-Received: by 2002:a17:90b:6c5:b0:3ac:450a:f9ac with SMTP id 98e67ed59e1d1-3ac450b4782mr286938a91.64.1791863614431;
+        Mon, 12 Oct 2026 20:53:34 -0700 (PDT)
+Received: from [192.168.68.52] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ab38dd5864sm18786368a91.8.2026.10.12.20.53.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Oct 2026 20:53:33 -0700 (PDT)
+Message-ID: <2586e689-c27d-4e4c-8c69-03e24259cb96@redhat.com>
+Date: Tue, 13 Oct 2026 13:53:24 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v22 02/10] firmware: arm_rmm: Check for RMI support at
+ init
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com,
+ sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
 References: <20261002061507.1600269-1-suzuki.poulose@arm.com>
- <20261002061507.1600269-8-suzuki.poulose@arm.com> <ar-PiBQGye4_hQa6@arm.com>
-In-Reply-To: <ar-PiBQGye4_hQa6@arm.com>
-From: "Rafael J. Wysocki (Intel)" <rafael@kernel.org>
-Date: Mon, 12 Oct 2026 21:11:34 +0200
-X-Gmail-Original-Message-ID: <CAJZ5v0gqSsA=tdKuQB1uExYas8F0BaxUm+eh8xaxxP6YAFB6cg@mail.gmail.com>
-X-Gm-Features: AclHuK92lB5NiS5iBnplzk_ORuBnuUMmcADY6EqE6mt-4e6s6zZBLocPPGyqu5E
-Message-ID: <CAJZ5v0gqSsA=tdKuQB1uExYas8F0BaxUm+eh8xaxxP6YAFB6cg@mail.gmail.com>
-Subject: Re: [PATCH v22 07/10] kernel: hibernate: Add an arch hook for
- preventing hiberation
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, "Rafael J. Wysocki" <rafael@kernel.org>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, maz@kernel.org, will@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, 
-	gshan@redhat.com, joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com, 
-	linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, 
-	sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, 
-	WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com, 
-	sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com, 
-	Len Brown <lenb@kernel.org>, Pavel Machek <pavel@kernel.org>, linux-pm@vger.kernel.org, 
-	Sudeep Holla <sudeep.holla@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+ <20261002061507.1600269-3-suzuki.poulose@arm.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20261002061507.1600269-3-suzuki.poulose@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: bShROAcHo2sT-RXNlz5Ye6_OKUH5v4phEWRvdwp0l8g_1791863615
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 2, 2026 at 1:03=E2=80=AFPM Catalin Marinas <catalin.marinas@arm=
-.com> wrote:
->
-> On Fri, Oct 02, 2026 at 07:15:03AM +0100, Suzuki K Poulose wrote:
-> > Add a hook to allow arch code disable hibernation. On arm64, with an RM=
-M active,
-> > there could be pages that are delegated to the "Realm" security state. =
-Any
-> > access to them are fatal (e.g., hibernate save image or restoring an im=
-age to
-> > a delegated page). pKVM host also has its restrictions on enabling hibe=
-rnation.
-> >
-> > Add a weak arch hook to let the architectures have a say.
-> >
-> > Cc: "Rafael J. Wysocki" <rafael@kernel.org>
-> > Cc: Len Brown <lenb@kernel.org>
-> > Cc: Pavel Machek <pavel@kernel.org>
-> > Cc: linux-pm@vger.kernel.org
-> > Cc: Sudeep Holla <sudeep.holla@kernel.org>
-> > Suggested-by: Catalin Marinas <catalin.marinas@arm.com>
-> > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->
-> Nit: the subject prefix for kernel/power/ usually is
->
->         PM: hibernate: ....
->
-> I can fix it locally, no need to respin (and probably the wrap the long
-> lines in the commit log, we tend to keep them shorter).
->
-> > ---
-> >  include/linux/suspend.h  | 1 +
-> >  kernel/power/hibernate.c | 8 +++++++-
-> >  2 files changed, 8 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/linux/suspend.h b/include/linux/suspend.h
-> > index b02876f1ae38a..a3815027773c5 100644
-> > --- a/include/linux/suspend.h
-> > +++ b/include/linux/suspend.h
-> > @@ -401,6 +401,7 @@ int hibernate_quiet_exec(int (*func)(void *data), v=
-oid *data);
-> >  int hibernate_resume_nonboot_cpu_disable(void);
-> >  int arch_hibernation_header_save(void *addr, unsigned int max_size);
-> >  int arch_hibernation_header_restore(void *addr);
-> > +bool arch_hibernation_available(void);
-> >
-> >  #else /* CONFIG_HIBERNATION */
-> >  static inline void register_nosave_region(unsigned long b, unsigned lo=
-ng e) {}
-> > diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
-> > index d2479c69d71a4..9d9d53828542f 100644
-> > --- a/kernel/power/hibernate.c
-> > +++ b/kernel/power/hibernate.c
-> > @@ -106,11 +106,17 @@ bool hibernation_in_progress(void)
-> >       return !atomic_read(&hibernate_atomic);
-> >  }
-> >
-> > +__weak bool arch_hibernation_available(void)
-> > +{
-> > +     return true;
-> > +}
-> > +
-> >  bool hibernation_available(void)
-> >  {
-> >       return nohibernate =3D=3D 0 &&
-> >               !security_locked_down(LOCKDOWN_HIBERNATION) &&
-> > -             !secretmem_active() && !cxl_mem_active();
-> > +             !secretmem_active() && !cxl_mem_active() &&
-> > +             arch_hibernation_available();
->
+Hi Suzuki,
+
+On 10/2/26 4:14 PM, Suzuki K Poulose wrote:
+> From: Steven Price <steven.price@arm.com>
+> 
+> Query the RMI version number and check if it is a compatible version.
+> All RMM feature registers are read and exposed for future code to
+> use. Also restrict the support to SMC conduit.
+> 
+> We only support this for Little Endian kernels, the Big Endian kernel
+> support is anyway marked BROKEN and is being removed.
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oupton@kernel.org>
+> Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
 > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
->
-> Raphael, any objection to this patch going in through the arm64 tree? It
-> matches the style of other __weak functions in this file.
+> Tested-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
 
-No objection, and feel free to add an ACK from me to this one.
+[...]
 
-Thanks!
+> ---
+>   MAINTAINERS                       |   2 +
+>   arch/arm64/Kconfig                |   1 +
+>   arch/arm64/kernel/cpufeature.c    |   1 +
+>   arch/arm64/kvm/sys_regs.c         |   2 +
+>   drivers/firmware/Kconfig          |   1 +
+>   drivers/firmware/Makefile         |   1 +
+>   drivers/firmware/arm_rmm/Kconfig  |  25 +++++++
+>   drivers/firmware/arm_rmm/Makefile |   1 +
+>   drivers/firmware/arm_rmm/rmi.c    | 112 ++++++++++++++++++++++++++++++
+>   include/linux/arm-rmi-cmds.h      |  48 +++++++++++++
+>   10 files changed, 194 insertions(+)
+>   create mode 100644 drivers/firmware/arm_rmm/Kconfig
+>   create mode 100644 drivers/firmware/arm_rmm/Makefile
+>   create mode 100644 drivers/firmware/arm_rmm/rmi.c
+>   create mode 100644 include/linux/arm-rmi-cmds.h
+> 
+
+[...]
+
+> diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
+> new file mode 100644
+> index 0000000000000..06f5392c982d2
+> --- /dev/null
+> +++ b/drivers/firmware/arm_rmm/rmi.c
+> @@ -0,0 +1,112 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2023-2026 ARM Ltd.
+> + */
+> +
+> +#include <linux/arm-rmi-cmds.h>
+> +#include <linux/cpufeature.h>
+> +#include <linux/memblock.h>
+> +#include <linux/slab.h>
+> +
+> +#include <asm/memory.h>
+> +#include <asm/pgtable-hwdef.h>
+> +
+> +/* RMM v2.0 defines RmiFeatureRegister0 to RmiFeatureRegister4. */
+> +static unsigned long rmi_feat_reg_cache[5] __ro_after_init;
+> +
+> +static int rmi_check_version(void)
+> +{
+> +	unsigned short version_major, version_minor;
+> +	unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
+> +						     RMI_ABI_MINOR_VERSION);
+> +	unsigned long aa64pfr0 = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+> +	struct arm_smccc_1_2_regs res = {
+> +		SMC_RMI_VERSION, host_version,
+> +	};
+> +
+> +	/* If RME isn't supported, then RMI can't be */
+> +	if (cpuid_feature_extract_unsigned_field(aa64pfr0, ID_AA64PFR0_EL1_RME_SHIFT) == 0)
+> +		return -ENXIO;
+> +
+> +	if (arm_smccc_1_1_get_conduit() != SMCCC_CONDUIT_SMC)
+> +		return -ENXIO;
+
+I think we need to ensure SMCCC version is v1.2 or a newer one here? arm_smccc_1_2_smc()
+is immediately called by rmi_smccc_invoke() after this check.
+
+	if (arm_smccc_1_1_get_conduit() != SMCCC_CONDUIT_SMC ||
+             arm_smccc_get_version() < ARM_SMCCC_VERSION_1_2)
+		return -ENXIO;
+
+Thanks,
+Gavin
+
+> +
+> +	rmi_smccc_invoke(&res);
+> +	if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
+> +		return -ENXIO;
+> +
+> +	version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
+> +	version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
+> +
+> +	if (res.a0 != RMI_SUCCESS) {
+> +		unsigned short high_version_major, high_version_minor;
+> +
+> +		high_version_major = RMI_ABI_VERSION_GET_MAJOR(res.a2);
+> +		high_version_minor = RMI_ABI_VERSION_GET_MINOR(res.a2);
+> +
+> +		pr_err("Unsupported RMI ABI (v%d.%d - v%d.%d) we want v%d.%d\n",
+> +		       version_major, version_minor,
+> +		       high_version_major, high_version_minor,
+> +		       RMI_ABI_MAJOR_VERSION,
+> +		       RMI_ABI_MINOR_VERSION);
+> +		return -ENXIO;
+> +	}
+> +
+> +	pr_info("RMI ABI version %d.%d\n", version_major, version_minor);
+> +
+> +	return 0;
+> +}
+> +
+
+[...]
+
+
+
