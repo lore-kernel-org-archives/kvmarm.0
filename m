@@ -1,172 +1,108 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92E48217F27
-	for <kvmarm@lists.linux.dev>; Tue, 13 Oct 2026 13:04:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C130501295;
+	Tue, 13 Oct 2026 13:15:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791896683; cv=none; b=LHekt6x3gX1fomeYHQAF6zEu6VNHxvTWYV7zkTjhP1xi+mtliaTkiFFSaaFn2Kd8GACMvNV5CCJ8wvMSkSO9/JfQULgTtIotZEN+cpo5ZxGe2qPPHfAzUQhJ77TVZjSuWVJqAbY68MHThO7gWpixRiqLBAAJp2A6fWttzBMJwV0=
+	t=1791897313; cv=none; b=aHZm2VJtweZHXkDYP96QDsjK/CfDb8RkNbNpLM6STUYducap7eCQgYx0wnNaqFDMD/ifkGvV8CZwaBMPqa9231pitsEK75h6E4CnKfouQcmffwlqwz1P92UctXMxyWYTUqnJfmCyAKsDwCDWCugO/2hoxLjSC/riv7QNyFUvkrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791896683; c=relaxed/simple;
-	bh=YWFi8pNw4Nk/CWDYcXcgcJeWhFMoeYs4kTjK55wIpDk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iEgUFbS01lVdL+Qrb+KgAH7+FMAFvM+45QO03P+79PaHxHMiMU69FgGGNL64N2vI82yFTk/iTU5U1k+S+79d4ksF2N8VLgJO2ZxV27ATXKN+YonQd3GlmN+yzso8Dzhk2lMRTxNrJWIN0J/CNTnDPcByyDqilF9SdPz4dcYOtCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=HOhAS3wi; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1791897313; c=relaxed/simple;
+	bh=Z+vMVIXE9PODI5Wjf5ENx6vbXQiccUCZkPzQaPzj5pI=;
+	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
+	 Date; b=ecbnpS39vZhmZTnK218KO97Io6VjDxPCoOIyDncbPPkxEMXrkCS9X8Gc0LaD8IgkJAwinCtocAHefGyE7ZW2mlnTb9u/C9CykTjVXJ4hC1ntWfhYzH5BJsAU7DUjYk9JS99zCwieV0EthYS/4vZpCBZXvomfsvKwFbXSe2qiO8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KpzAElXV; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="HOhAS3wi"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1B483169C;
-	Tue, 13 Oct 2026 06:04:37 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BBB333F66F;
-	Tue, 13 Oct 2026 06:04:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1791896680; bh=YWFi8pNw4Nk/CWDYcXcgcJeWhFMoeYs4kTjK55wIpDk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HOhAS3wiU5y+6aEiONJoWcDCn4oDRByZB2qAH6ljvfPPsPCfqHec8sUcVw8adxsn/
-	 cq3wP/gR563Tn8osdAUixj9C5c9QSh5oAPjmNl5S8sksmcuFbkmqOSdTLTmp/6INb0
-	 6657orV2X/TJTY/B14QNQGovG4n26ksGxDmlcGZM=
-Date: Tue, 13 Oct 2026 14:04:35 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Muhammad Usama Anjum <usama.anjum@arm.com>
-Cc: Leonardo Bras <leo.bras@arm.com>, Linus Walleij <linusw@kernel.org>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2] arm64: clear_page[s] using memset
-Message-ID: <as4sY3Eq-B_59lW9@arm.com>
-References: <20260916-aarch64-clear-pages-c-v2-1-0393769f7912@kernel.org>
- <aqq1sxdQNZ93oV9A@LeoBrasDK>
- <aqq7oZzutLP82WYB@LeoBrasDK>
- <arP619hd9Rx8Vlrx@arm.com>
- <ec298ee5-5080-494d-b735-7ba7bd20cdf0@arm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KpzAElXV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FA311F00893;
+	Tue, 13 Oct 2026 13:15:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791897311;
+	bh=L2lzIxBqaIeKi35f2v1IsK/Ll38K3FBX56QBG+TlL6c=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=KpzAElXVs/a80GANpGx4NmrwLsXtScp1Lcos1ADoaJsLsie7O7T9OZU2unl3E14TK
+	 vGSnhhypHQtHPXtvBIkd7C0lxLBogySnmjDHsXsFFu653cTXYCj5yZeAZuVRDLJZkR
+	 hZ6PBVWxn3pF/EjMNsYuIzgELNdXz8fLKjsN2WSeE0sIY64CUl/TRSlYfzOaqSRGPG
+	 V0jH7yaKwpt4uHkFfgKt45uAtsBMkh9GZVQppTlnd6ZBnyXPoLgQMOts7Rj/Ja18B8
+	 psjbP2cdoesppZFvRFUoxOIwK76PQwAuQRDYr3Q+MidCo/H0RiKWjTLhQu2M9iMKuO
+	 eILcRRgRiwPtw==
+Message-ID: <sashiko-outbox-169787@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 3/4] arm64: sysreg: Mark fields the architecture dropped
+ as RES0
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Fuad Tabba" <fuad.tabba@linux.dev>
+Cc: kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20261013130247.4135515-4-fuad.tabba@linux.dev>
+References: <20261013130247.4135515-1-fuad.tabba@linux.dev>
+ <20261013130247.4135515-4-fuad.tabba@linux.dev>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 13 Oct 2026 13:15:11 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ec298ee5-5080-494d-b735-7ba7bd20cdf0@arm.com>
 
-On Thu, Oct 08, 2026 at 02:30:20PM +0100, Muhammad Usama Anjum wrote:
-> On 23/09/2026 5:14 pm, Catalin Marinas wrote:
-> > On Wed, Sep 16, 2026 at 04:54:09PM +0100, Leonardo Bras wrote:
-> >> On Wed, Sep 16, 2026 at 04:28:51PM +0100, Leonardo Bras wrote:
-> >>> On Wed, Sep 16, 2026 at 12:03:56PM +0200, Linus Walleij wrote:
-> >>>> There is no need to try to second-guess the compiler when
-> >>>> clearing memory. Just call memset() like everyone else.
-> >>>>
-> >>>> Since memset() already has an architecture-local MOPS
-> >>>> optimization, we do not need to do anything else to preserve
-> >>>> the MOPS optimization.
-> >>>>
-> >>>> While at it, implement the shorthand for directly calling
-> >>>> the new prototype clear_pages() for larger page chunks.
-> >>>>
-> >>>> No performance regressions can be seen, the fastpath
-> >>>> benchmarks differences are in the noise.
-> >>>>
-> >>>> Usama Anjum tested next-20260821 with one warm-up and three repeats
-> >>>> in four sessions, for a total of 12 measured runs. The commands were:
-> >>>>
-> >>>>   perf bench mem memset -k 1GB -f default -s 16GB
-> >>>>   perf bench mem mmap -p 1GB -f demand -s 32GB -l 5
-> >>>>   perf bench mem mmap -p 4KB -f demand -s 32GB -l 5
-> >>>>
-> >>>> The results were:
-> >>>>
-> >>>> aws-m7g.metal:
-> >>>>   Benchmark    Base bytes/sec   Change with patch
-> >>>>   memset 1GB   63932542232.12                1.92%
-> >>>>   mmap 1GB     63272579168.03               -0.57%
-> >>>>   mmap 4KB     49692830849.48               -1.11%
-> >>>>
-> >>>> cesw-aarch64-ampereone-1s-a192-32x:
-> >>>>   Benchmark    Base bytes/sec   Change with patch
-> >>>>   memset 1GB   33895562998.71                0.25%
-> >>>>   mmap 1GB     34338454210.17                1.16%
-> >>>>   mmap 4KB     25687107580.90               -0.85%
-> > [...]
-> >>> Looking on that, I see that the memset() implementation uses setp, setm, 
-> >>> sete, while the clear_page()'s uses setpn, setmn, setn for the case with 
-> >>> MOPS. But then, reading into the docs, the instructions seem pretty much 
-> >>> the same thing. 
-> > [...]
-> >> Oh, I browsed a bit here, and IIUC none of the tested machines have 
-> >> FEAT_MOPS, is that right?
-> >>
-> >> If that's the case, the tests are exactly to what is different between 
-> >> patched and current versions. There should be no impact on MOPS version as 
-> >> the instructions are basically the same.
-> > 
-> > Logically, yes, they are the same. From a performance perspective, there
-> > may be a difference between the temporal and non-temporal variants,
-> > depending on the usage.
-> > 
-> > I think it would be good to run the benchmarks with the current
-> > implementation without DC ZVA. I don't think we have an easy way to do
-> > this on the command line, so we can simply hard-code the DZP=1 check and
-> > fall back to the STP or STNP in both cases.
-> > 
-> > Otherwise I'm fine with the patch as well, good clean-up.
-> 
-> 
-> With DC ZVA bypassed, clear_page() STNP and patched memset() STP showed only
-> 2 statistically significant regressions on AmpereOne machine.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] arm64/sysreg: Semantic drift in auto-generated SCTLR_EL1_RES0 ma=
+sk consumed by KVM
+--
 
-This is confusing as I don't think Linus's patch regresses anything on
-the platforms tested.
+commit 60f264776efd2948b9996828935b2e973ae9b2bd
+Author: Fuad Tabba <fuad.tabba@linux.dev>
 
-> Results for SUT Class aws-m7g.metal:
-> 
-> +-----------+------------------------------------------------+-----------------------+---------------------+--------------------+-------------------------+
-> | Benchmark | Result Class                                   | next-20260922-vanilla | next-20260922-patch | next-20260922-stnp | next-20260922-patch_stp |
-> +===========+================================================+=======================+=====================+====================+=========================+
-> | perf/mem  | memset -k 1GB -f default -s 16GB (bytes/sec)   |        65367617364.09 |              -0.32% |              0.70% |                  -0.80% |
-> |           | mmap -p 1GB -f demand -s 32GB -l 5 (bytes/sec) |        63750796288.65 |               0.59% |             -1.56% |                  -1.15% |
-> |           | mmap -p 4KB -f demand -s 32GB -l 5 (bytes/sec) |        49588573632.22 |              -0.39% |             -0.40% |                  -0.93% |
-> +-----------+------------------------------------------------+-----------------------+---------------------+--------------------+-------------------------+
-> 
-> Results for SUT Class cesw-aarch64-ampereone-1s-a192-32x:
-> 
-> +-----------+------------------------------------------------+-----------------------+---------------------+--------------------+-------------------------+
-> | Benchmark | Result Class                                   | next-20260922-vanilla | next-20260922-patch | next-20260922-stnp | next-20260922-patch_stp |
-> +===========+================================================+=======================+=====================+====================+=========================+
-> | perf/mem  | memset -k 1GB -f default -s 16GB (bytes/sec)   |        35882584735.80 |              -0.36% |              0.43% |                  -0.00% |
-> |           | mmap -p 1GB -f demand -s 32GB -l 5 (bytes/sec) |        36204572635.77 |              -1.17% |         (R) -2.07% |                   0.14% |
-> |           | mmap -p 4KB -f demand -s 32GB -l 5 (bytes/sec) |        27149223683.79 |               0.54% |         (R) -2.48% |                  -0.13% |
-> +-----------+------------------------------------------------+-----------------------+---------------------+--------------------+-------------------------+
+arm64: sysreg: Mark fields the architecture dropped as RES0
 
-Trying to make sense of the above. So based on -next of 22nd of
-September, the table means:
+Commit d65bf6e317e7 turned the TME fields of SCTLR_EL1 into RES0, but left
+their copies in SCTLRMASK_EL1. PMICFILTR_EL0.T and BRBFCR_EL1.LASTFAILED
+have gone from the architecture as well, so mark them all as RES0 to match
+the spec.
 
-vanilla		- next/master on that day (current clear_page())
-patch		- memset()-based clear_page() patch (Linus's patch)
-stnp		- vanilla clear_page() without DC ZVA
-patch_stp	- memset()-based clear_page() patch without DC ZVA
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index 341db8e9b6c37..99af1c39478be 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
 
-I assume the vanilla vs patch columns are just noise. Well, there's a
--1.17% regression (not flagged) on Ampere but what's the standard
-deviation for this column? Similarly for the -1.15% on the AWS patch_stp
-test (vs stnp in the same test, it's no worse).
+[ ... ]
 
-Vanilla vs stnp shows a regression on Ampere, however that's expected as
-we no longer do the DC ZVA. Interestingly, the patch_stp result doesn't have
-this regression, so I reckon DC ZVA behaves mostly in line with STP on
-this hardware.
+> @@ -2663,11 +2662,7 @@ Field	57	EPAN
+>  Field	56	EnALS
+>  Field	55	EnAS0
+>  Field	54	EnASR
+> -Field	53	TME
+> -Field	52	TME0
+> -Field	51	TMT
+> -Field	50	TMT0
+> -Res0	49:47
+> +Res0	53:47
 
-Basically I was looking for the stnp vs patch_stp results. If I read it
-correctly, there's no significant change going from non-temporal to
-temporal stores (and a small improvement for Ampere). Assuming future
-FEAT_MOPS will have similar behaviour, moving clear_page() to memset()
-shouldn't cause any regressions. Before FEAT_MOPS, we'll use DC ZVA here
-anyway.
+[Severity: Medium]
+This change reclassifies bits 53:50 of SCTLR_EL1 (TME, TME0, TMT, TMT0) from
+Field to Res0. This silently regenerates the aggregate mask SCTLR_EL1_RES0 =
+to
+include these bits.
 
-Thanks for running the tests.
+This macro is actively consumed by KVM during C initialization via
+FORCE_RES0(SCTLR_EL1_RES0) in sctlr_el1_feat_map() in arch/arm64/kvm/config=
+.c:
 
--- 
-Catalin
+arch/arm64/kvm/config.c:sctlr_el1_feat_map() {
+    ...
+    FORCE_RES0(SCTLR_EL1_RES0),
+    ...
+}
+
+Could this cause a regression in KVM guest feature configuration for SCTLR_=
+EL1
+by forcing the removed TME bits to 0? Is KVM's initialization logic robust =
+to
+SCTLR_EL1_RES0 expanding to cover bits 53:50, and is forcing these bits to 0
+for guests intended?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261013130247.4135=
+515-1-fuad.tabba@linux.dev?part=3D3
