@@ -1,95 +1,112 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08BDD47A895
-	for <kvmarm@lists.linux.dev>; Tue, 13 Oct 2026 16:29:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3EB502795;
+	Tue, 13 Oct 2026 16:29:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791908949; cv=none; b=BSzEhVrSq0FXk/so4cCCs/b5PPt1vPN0uZrElLTmrnSePiRFYwa1BtJjm2f4jHs5pgyO2T20wc1ubu2+AIbYzgTwGUbj5/yL4Gl2dYju+v1UfXKckxua/PaqrvnWDXnkOJb5KoAhuLeBh10frTP/qlnekQzXo5yxBJ7DXvad+AI=
+	t=1791908964; cv=none; b=SYRhPt1U73TT4NfWmVaNppknIpQkAroEmTPC9fiE0Mf7wYtB1vcrzBR5pTsOadCp1tcLKUah+wCP7ogZ40TrrmA2cdNDT/Dfn1mblwJo1NSGT60mH7STZmhzqPQlwlF9kTDPJODj9qL1ZGMowNZJrv977eltrkXAG4R3OANG6O4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791908949; c=relaxed/simple;
-	bh=hT10YEh8gpLga8eETCQsbuAQGVBcyFRVjqQif1cywmM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UzfoGxK6H8wF24DhhNi8gysxx1I3V9AWup0ADU5a5GhtPS5aXJCe+D01A2QPvvF9E/7LAk1dkCah+pBnSxvZW+mfTxvznFB6ruH0eBmPtqiMh5AhB4h9KY5x4Ovnry1X6weLqze24Wq4tKqF1enaOJRwpOW5cQxWbV+hOzHp81U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VIZODnQv; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791908964; c=relaxed/simple;
+	bh=vM85zR2fOVurYBxjn8fT5iW4OxrI/h14uZrugbUdlkY=;
+	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
+	 Date; b=YaBD6puDEn9YMwQFSxgXyJxRF0GcRlydr7ODi2/Pn4eHVHUQUUoNXcTmWmpwB2d0FF0ePhUhuFh/3rO2XF3GoO3up2sAahRYbZqxGCC34a/UWDeWNm0NBkP/31C0SgxQX3B7JMyHNbX4y6UnFKGI+g7IIoLulbwC/5E1AY4xIP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nh5lZUsI; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VIZODnQv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E33031F00893
-	for <kvmarm@lists.linux.dev>; Tue, 13 Oct 2026 16:29:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nh5lZUsI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFEF01F000FF;
+	Tue, 13 Oct 2026 16:29:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791908947;
-	bh=2U9zEpn0AXs6lLEm2UZzitB8Wqsn/VzGaFG21nyW/jM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=VIZODnQvYcE9Tkf4OS2kP6zEmJ4q9/eSeEMzSvW1BAPseLlozADSIkP8cizT90Fuy
-	 /YPq1OIGa19EHNHc60Rlp05boMetMPeRYrw8/+Js2Z3GoMXzvJgy+OYlX3BXnZwtoS
-	 HDnDrEhJHgknR4wHMA9vNuABJHyhLRDbM4cstx+nPk/fdWOZX2Oq5fkX3IwU5v4js9
-	 cboYLjyQJd8f41AFk+DWmUoB2HLOHBgEYaey7MQ9oK0+BbkVsnT77yNQpNx1Abr3ZI
-	 6VEuHPF8BbD05ndJbfrhY+25J8Qbic+7IZ0T5sIpjdG8+OFic5lt5jBszam3d4aluF
-	 XtetxPXmpxXsA==
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5bccc73eea4so123240e87.1
-        for <kvmarm@lists.linux.dev>; Tue, 13 Oct 2026 09:29:07 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBySIDD2HTdtgQnl9iEYPhFBopEPEpAb8yqp/mw39Y/V6PKRWb2srRQfnexy04T7nz9DL+PtxXw=@lists.linux.dev
-X-Gm-Message-State: AFq9FYLLnvmb2pcA+AYvxk0J4f3RqGo5/eHoTpmjG/64jnHjofXLt8w5
-	/nGBQ38tjloGReXecrZa/dXgj1ENI29PEwEqM8xfnDZmAJvi6dvph88zLxyZrPbDlh1qYZ20mTe
-	jPv6rqopJ2uNyXDYRK5RTeq23EdGEeI8=
-X-Received: by 2002:a05:6512:3d94:b0:5b4:af24:3612 with SMTP id
- 2adb3069b0e04-5bcdd509e2bmr4521635e87.20.1791908946678; Tue, 13 Oct 2026
- 09:29:06 -0700 (PDT)
+	s=k20260515; t=1791908962;
+	bh=2MSKGWi5sSTXPxshy0khHGQFOGEaARrsUzF69RTi9us=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=Nh5lZUsI00aE3cPEz2OT/FZEYPg4h6SI/G9fLd8I8GbBxvGn7Uy+G0t/Y5HnPvih5
+	 SD5sDhB85Itm65IyDanL2L6ix/6sThqZYZim+pOR7Tf8IZbsbKOQazjDnDHzZiZUu0
+	 Pb0JRbMPuunzrsBVAtuztHOBCcafuATGlv8iUze9mWAfF82adDnhQElQDj5FWrf59v
+	 Quwnc1vGch6JEZ3OSp2xEg7STFPr5ZsdAvcTM8aZ3OofM5bseGmWVBrqSgDxNbt1cD
+	 AjK4u117W1bn2hBBK9uXbKgxDektLa785Jnaywiz/gekeuhP4MAtvxX9YBQkbjoh30
+	 z1XaVUdGNVjSg==
+Message-ID: <sashiko-outbox-170114@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v6 08/39] mm: add mmap action for discontiguous kernel
+ page mapping
+Reply-To: sashiko-reviews@lists.linux.dev
+To: =?utf-8?b?TG9yZW56byBTdG9ha2VzIChBUk0p?= <ljs@kernel.org>
+Cc: linux-usb@vger.kernel.org, linux-rdma@vger.kernel.org, selinux@vger.kernel.org, bpf@vger.kernel.org, linux-scsi@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-trace-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-s390@vger.kernel.org, "Oliver
+ Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, "Heiko
+ Carstens" <hca@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>, "Alexander
+ Gordeev" <agordeev@linux.ibm.com>, "Christian Borntraeger" <borntraeger@linux.ibm.com>
+In-Reply-To: <20261013-b4-mmap-prepare-vma-flag-sanify-v6-8-1aa3c9b139f9@kernel.org>
+References: <20261013-b4-mmap-prepare-vma-flag-sanify-v6-0-1aa3c9b139f9@kernel.org>
+ <20261013-b4-mmap-prepare-vma-flag-sanify-v6-8-1aa3c9b139f9@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 13 Oct 2026 16:29:21 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260916-aarch64-clear-pages-c-v2-1-0393769f7912@kernel.org>
- <aqq1sxdQNZ93oV9A@LeoBrasDK> <aqq7oZzutLP82WYB@LeoBrasDK> <arP619hd9Rx8Vlrx@arm.com>
- <ec298ee5-5080-494d-b735-7ba7bd20cdf0@arm.com> <as4sY3Eq-B_59lW9@arm.com>
-In-Reply-To: <as4sY3Eq-B_59lW9@arm.com>
-From: Linus Walleij <linusw@kernel.org>
-Date: Tue, 13 Oct 2026 18:28:54 +0200
-X-Gmail-Original-Message-ID: <CAD++jLmMoD_FPno2Q47WyWicpRaf8x46YREt0eyUzAXkOU5cFA@mail.gmail.com>
-X-Gm-Features: AclHuK_FYdXBkzOaQUWuxycJBffBsmxf6yQ-hSZTX0gPejiYwMWk2Xc7z3lDJUY
-Message-ID: <CAD++jLmMoD_FPno2Q47WyWicpRaf8x46YREt0eyUzAXkOU5cFA@mail.gmail.com>
-Subject: Re: [PATCH v2] arm64: clear_page[s] using memset
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Muhammad Usama Anjum <usama.anjum@arm.com>, Leonardo Bras <leo.bras@arm.com>, Will Deacon <will@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 13, 2026 at 3:04=E2=80=AFPM Catalin Marinas <catalin.marinas@ar=
-m.com> wrote:
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] mm: mmap_action_finish bypasses error_override for compat tasks
+--
 
-> Trying to make sense of the above. So based on -next of 22nd of
-> September, the table means:
->
-> vanilla         - next/master on that day (current clear_page())
-> patch           - memset()-based clear_page() patch (Linus's patch)
-> stnp            - vanilla clear_page() without DC ZVA
-> patch_stp       - memset()-based clear_page() patch without DC ZVA
->
-> I assume the vanilla vs patch columns are just noise. Well, there's a
-> -1.17% regression (not flagged) on Ampere but what's the standard
-> deviation for this column? Similarly for the -1.15% on the AWS patch_stp
-> test (vs stnp in the same test, it's no worse).
->
-> Vanilla vs stnp shows a regression on Ampere, however that's expected as
-> we no longer do the DC ZVA. Interestingly, the patch_stp result doesn't h=
-ave
-> this regression, so I reckon DC ZVA behaves mostly in line with STP on
-> this hardware.
->
-> Basically I was looking for the stnp vs patch_stp results. If I read it
-> correctly, there's no significant change going from non-temporal to
-> temporal stores (and a small improvement for Ampere). Assuming future
-> FEAT_MOPS will have similar behaviour, moving clear_page() to memset()
-> shouldn't cause any regressions. Before FEAT_MOPS, we'll use DC ZVA here
-> anyway.
+commit 21d3d0c977ac349611c733fc3c288ae67e5f71a1
+Author: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 
-That almost sounds like an Acked-by if Usama can confirm your
-assumptions above!
+mm: add mmap action for discontiguous kernel page mapping
 
-Yours,
-Linus Walleij
+This commit introduces discontig_kernel_page_ops and a new mmap action type
+to allow drivers to map discontiguous arrays of kernel pages into a VMA.
+It updates the compatibility layer via compat_mmap_action_abort() to proper=
+ly
+handle VMA teardown on mmap action failures.
+
+> diff --git a/mm/util.c b/mm/util.c
+> --- a/mm/util.c
+> +++ b/mm/util.c
+
+[ ... ]
+
+> @@ -1412,12 +1421,13 @@ static int mmap_action_finish(struct vm_area_stru=
+ct *vma,
+> =20
+>  	/* do_munmap() might take rmap lock, so release if held. */
+>  	maybe_rmap_unlock_action(vma, action);
+> -	/*
+> -	 * If this is invoked from the compatibility layer, post-mmap() hook
+> -	 * logic will handle cleanup for us.
+> -	 */
+> -	if (!err || is_compat)
+> +	if (!err)
+> +		return 0;
+> +
+> +	if (is_compat) {
+> +		compat_mmap_action_abort(vma);
+>  		return err;
+
+[Severity: Medium]
+Does this bypass the error_override logic for compat tasks?
+
+When an mmap action fails, the mmap_action struct provides an error_override
+field to allow drivers to replace the internal error code with a user-facing
+one. Later in this function, non-compat tasks return=20
+action->error_override ?: err.
+
+By returning err directly here when is_compat is true, it seems 32-bit comp=
+at
+tasks might receive different error codes than 64-bit tasks, potentially
+breaking ABI consistency.
+
+> +	}
+> =20
+>  	/*
+>  	 * If an error occurs, unmap the VMA altogether and return an error. We
+
+[ ... ]
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261013-b4-mmap-pr=
+epare-vma-flag-sanify-v6-0-1aa3c9b139f9@kernel.org?part=3D8
