@@ -1,65 +1,65 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8874D0CDA
-	for <kvmarm@lists.linux.dev>; Wed, 14 Oct 2026 09:37:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE774E13F4
+	for <kvmarm@lists.linux.dev>; Wed, 14 Oct 2026 09:37:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791970667; cv=none; b=nMSl3r+NrmHc6DGBJWzXprRtClK0LCTbjUru3UeOdKRKiSf7klyauKzSPHnje8QaX0Mt1gFqJr8ewRb8nhqBx1r670HE2B5qxVI6e513A6IXVkZdO85nSwW+YMw/GqYWOGdovLW9QpmzTyFGWcGtSeJEMwwNO2+5CdSP7o463/c=
+	t=1791970670; cv=none; b=S6Y5Q+ptiTmOizWp7lRfrTz4DrhsrPl17wYvXdiu4s6dytmCylP2kPuYeZAfGwRlCMa+gbCxv14gVxyYNbO+9hqhjmQjcZhtOBtPjEu2jvI3OsBNcvLbwW/GODEDegGhN2Khc7FGAEjp5gXmT9YLdYpRncSMgqJQdCPAaxgKz0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791970667; c=relaxed/simple;
-	bh=kw1mlsHDTmK1p7DnWlrdqDmJgkQXAZnMpH411GflSVE=;
+	s=arc-20240116; t=1791970670; c=relaxed/simple;
+	bh=2O/iMNJqoH7UyElUt7ICv1K7dgb27nZuWpr+bMknwbw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mRvkRK3hyTROaMk3oxiwvvEDwt4tuiAjdunACXsfrepSlXqUBSWSASkUbtndSniUa5Lpo87bGJXRLZ57JUF3dF2Lt6yYCN69ubp0lOwHOW7GrRylJs/JZcY+whbqBjC/tS+7lW1j2PLwsLhOWhFnNuzNdYB8bcVK7/5+sAPf5CI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X588CAVb; arc=none smtp.client-ip=209.85.221.47
+	 MIME-Version; b=M3bo3zx7IxtxYM9HGAUfmch+TJIJ7XJre3vWAbGLBNjZ0BI4Krz5FyHk49QizyVARRcxPrrvt/Xjnnr9gQ/xOl5K7krGtRhoM94uylNfChmKtBHhVxo3Y+NpO10icuTUaVNuLMgC3AQL+j08BCgOBZbDupm+D2V/UNOHIoW0Yng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S3B/rRrK; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X588CAVb"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-48deeadb3fdso249409f8f.0
-        for <kvmarm@lists.linux.dev>; Wed, 14 Oct 2026 02:37:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S3B/rRrK"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4a19cba5c14so32540485e9.3
+        for <kvmarm@lists.linux.dev>; Wed, 14 Oct 2026 02:37:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791970660; x=1792575460; darn=lists.linux.dev;
+        d=gmail.com; s=20251104; t=1791970662; x=1792575462; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=JQDTRvso52jUuczv7UdtVuHK1eN+NxLIMYZKCEfei9E=;
-        b=X588CAVbxaMAVMk2KnucJ1R6zpFuLaozHSH2ZHJOgeneeM2BnpdEPMzZ0XIAjN4D9r
-         4WjK4C8tqV+/fJiLUXNGS+WViWk9ZkVB3kWTV2nn3WWqFLmsJiu8jb8QhQFUO4AMikEB
-         voirwtiRaePWOaJkDeFPGjzn0a8QqRjeyT9DPJ3F7FEgHZ/AqtK4w2BBSR10/jgMdQqa
-         Di97cTy+4yznyInfJXqnob6Iz8a21tA2bcNJ1+i3KjIeRvemaPQ4Z0q4ra3WF5WgjyEu
-         TFl1VdHo+ndtuFT2CE41kvN39FUMo28aqitJzEf818vCQCsfaXw45TyfIGCIFonDuxR8
-         diDg==
+        bh=2bE4GOYNuN0L2A43+aeT8XcVziQfGC7lOtj0K7aqEDA=;
+        b=S3B/rRrKBht9RlfKTVVbl97Tb2iJP1YE8nhXC41B8u0ng24XbHXsORpyLer8tncZ90
+         yNEhIYJkb6G1FUK6Eex/y5cUA6z8cixqvmnoC2XJvCW39tqM8Lv0dXDqwjGFhDCRe8xM
+         x1wwpPhemi9bVPblamYWeBOohu6akz+fC0n7rU289kApoi/dp0omRE+GV4iZOYKO+fR0
+         fq70GlnnhxK4tMiYxba9RI81/IAZ6tig32H5Y/DM4bBwpBRMcvCPO7V7HIv+WVVhMggc
+         cCD+KkRmRcrvnjXpGFoPhoesV6oy6Bv+nICHwuCL+SSiMSepGSVTcwhe6IHzDaq9txUj
+         fLuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791970660; x=1792575460;
+        d=1e100.net; s=20260707; t=1791970662; x=1792575462;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=JQDTRvso52jUuczv7UdtVuHK1eN+NxLIMYZKCEfei9E=;
-        b=xlrYp0fsT7isCotVL9AKLedgNEcg7EXhp+ywoHeq9wFWFsfp6oFbgcmJ9AI/oxVlIY
-         DCF6GnXq9qOIWqqfm2j8unjAcrixdLCHZHuBaBm6B36yICT2q29wYQoA99ZKyDKjcUJ4
-         PW0s2OvXkKK3q77+sKNHWLXIV60RMF/FtMyQGhVSsIMUtbxG6BF2xMkjI89Nrxol3ENI
-         k8h5rn8sxktBEy+BCRvcMlH42NYF7cO+UV6z8h5XgEOWzFHpXrp2/ZgOjU14RwP+3T2m
-         up1MUZKt0vEclo+d4nfFzs3DCHUuIRtnwL7diLjHXARhl15WaWL/RoVpKbBewp4MGaUe
-         g+aQ==
-X-Forwarded-Encrypted: i=1; AKwUvBz8l+VX675RmWba79Ub7ywQl5cBSet04/KGj+sXsGEWUS3YEFPaPMmcbAef9AkxP/HQEWqWmLU=@lists.linux.dev
-X-Gm-Message-State: AFq9FYKiOW7IOIQXzbb4LitbFWJsxJR6cuzmirlUxp01N4s2BIcko3QB
-	a/5YfJWeCDIYZLgM4wY7g3UH9Zcs9WdoT1GuwnpPRm30FcL+sF2kvpN1
-X-Gm-Gg: AYBFou3YeYrwyZdLXRF+VrxdxYORZyhKbDEOPbCrmN80rtKlBPL2/G4WGUUyljDtwdE
-	NSO/fa0f1qAUL+xJ0YmYVPOFbyid0z6698DGnsdQL/+u52fGnakGC1neSjQ+PPA9Eoj2LOWROKj
-	dtJJ98XvCln6eV3pbxErec88hhebGV1oNVYBNj01G462OpV57QrW5iiv44gwn4f5vzknTlAsjRG
-	mAOzeZ/r3t0sqISksSBnSy9Xi9NwwpyYtqZ5aT47UUonnu5FJBJ8KRwqmOJrQfT0hK09CWVJ+9m
-	eyw63cxStcZM0G/6/oFvypRNmHlYzrdYjIWDaJHSij09ARevlIqbr5rSgk5IDwqLNMmCDSE5jgt
-	BsuJBgY6nqKrhqO6cMe6B67gp3dWhQ6KqImQWw8HE0dKhi6jnIh2aZGPOw5kn8Nu306MkHNdpK+
-	sIczZB57HqLI67heBAzsOVbWPGziSXand2zhUPSeotAbtvvpwcJMw7b82BLCwULPjtgsP8vIHsD
-	uoiTkj8dStJK9Oh5XvmzR7LlOKi/ma+f/cJALumBgObuJKxGRsbK3bhtLW6EgEDb8+7zG3o7IJm
-	KOCCSIAy4M9zhSostbXPSeCw7FyYQUrV0xM=
-X-Received: by 2002:a5d:5d89:0:b0:48d:ed0e:6bb4 with SMTP id ffacd0b85a97d-48ded0e6cc9mr2179330f8f.4.1791970659557;
-        Wed, 14 Oct 2026 02:37:39 -0700 (PDT)
+        bh=2bE4GOYNuN0L2A43+aeT8XcVziQfGC7lOtj0K7aqEDA=;
+        b=cDrDChuvT+ZV/lO2mHezwb4Psw9D2gJvAJ61BPl9iPVKHSZIiplQYB6hTQ/ut9YBcf
+         A7ObmYJAoFXM1ydWPNC93PejHOR/oYClTtvOuDwarEKZsQDDgHSCJm3y5VASyXx5Eyrg
+         UPMQ0/XqbLxhyROQpcWtdhDsI1LakfEo32/dTXdB+Ua/+wL+O+V3hSNqlQyjYgWc2ypX
+         PGaRaJFpttUfni+aFjFpjQzVEZkY1PRwIcFybo2T8xPy5S6GqSeNXOhoZeB63RfQsKkq
+         d+09BxaPzzBozClwfmVml7r/yTGIGztKmEX+YfYI22MuB0466PWKssXU3+UbbJRdjm4/
+         wuAw==
+X-Forwarded-Encrypted: i=1; AKwUvBzLjBxeWwmMkNMxpnRe74BWhRmXe6YL7ndvOPs2p+udEsFtt8vtuKjfB63GviECyeLlGksz0zA=@lists.linux.dev
+X-Gm-Message-State: AFq9FYLL8ChreowFbQFzFk524gi+iWScyJ443/gDbspG00xFbBGfK6A8
+	IETIIQ9+Yn6WRcF6YJZjm7QnRgV9og77+pmOmkgnuU1wCc20grZIjfJk
+X-Gm-Gg: AYBFou09gXBPlvVu5YYwlvBiNrbrrQuI+kRXxsoDkCSIj5R1EiNCcXUjgIjm3Vde6a0
+	rxfZ87YgLYSrEEQlqJtegk7jGhLGRsnxLmTjR7Bz9n67EA3Xhz6fWQO2AQL7IQ31cTkYRl3muFB
+	tCCv2F9Jsd+Tqa3sISj6lAZ51OAkmE/KxgHy1XhiW+PXslKT/a0HSqsu0AN2YJioX4kd+QDhiYy
+	V040OZKuh+HnrKtOFHGBq9A3cq5N8Mu3fQnNPGEfYhARdV/5YuyHGRVmvBViQyyBZLtU3pzORKM
+	Y8l0ObDmGkLSh00OXJ/bWgfZT6jaqmAKlWJpzg0LLXGhDSgrDwDjvJ0M4X1cAWfmsRNmue7P33N
+	yOZXIsnw/uBf+q1la5YtFB3QqfbvCA6VJNWa0sCGT1g1iavZKTnxTe4q9jbLiPVfGHh1e2FuNPv
+	JStXh1mIvfVeSYHx0/XfQS/q0fWglT0BpE5bEVTpQDfmEPJW2PfylyeLoFLfEohauttsmTnEDmu
+	AJ25Sc5Dq/KjSMMEfYUcTImJk66GDexBDXPI7Kt10cdb0qzLckO0zBlGDp20FYujzw/8xYZDgAL
+	TwMcoafRlecThUWP0M1fo5CEvbmYDamB41I=
+X-Received: by 2002:a05:600c:5493:b0:4a1:78da:d271 with SMTP id 5b1f17b1804b1-4a18e4ee976mr332971435e9.30.1791970662375;
+        Wed, 14 Oct 2026 02:37:42 -0700 (PDT)
 Received: from dev-dsk-fgriffo-1c-93421965.eu-west-1.amazon.com (54-240-197-234.amazon.com. [54.240.197.234])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48de3f7f8b8sm9365477f8f.35.2026.10.14.02.37.38
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48de3f7f8b8sm9365477f8f.35.2026.10.14.02.37.41
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 14 Oct 2026 02:37:39 -0700 (PDT)
+        Wed, 14 Oct 2026 02:37:41 -0700 (PDT)
 From: Fred Griffoul <griffoul@gmail.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
@@ -107,9 +107,9 @@ Cc: David Woodhouse <dwmw2@infradead.org>,
 	linux-mm@kvack.org,
 	linux-kselftest@vger.kernel.org,
 	linux-doc@vger.kernel.org
-Subject: [RFC PATCH v2 03/11] mm: Add memory providers
-Date: Wed, 14 Oct 2026 09:37:25 +0000
-Message-ID: <20261014093733.90312-4-griffoul@gmail.com>
+Subject: [RFC PATCH v2 05/11] iommufd: Track the domains of pages that are not pinned
+Date: Wed, 14 Oct 2026 09:37:27 +0000
+Message-ID: <20261014093733.90312-6-griffoul@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261014093733.90312-1-griffoul@gmail.com>
 References: <20261014093733.90312-1-griffoul@gmail.com>
@@ -123,507 +123,359 @@ Content-Transfer-Encoding: 8bit
 
 From: Fred Griffoul <fgriffo@amazon.co.uk>
 
-A driver that owns memory outside the page allocator, often without
-struct page, has no common way to lend it to the code that maps it.
-guest_memfd and iommufd each need their own hooks, and the owner must
-keep them consistent when it takes memory back.
+Memory provider pages, added in the next patch, are not pinned and can
+change under the domains that map them, as a dma-buf can. They need the
+same list of (area, domain) pairs that the dma-buf revoke uses.
 
-Add an interface between such an owner, the provider, and its
-consumers. A consumer attaches to a provider file, asks for the frame
-and attributes behind each page, and makes every mapping itself. When
-the provider changes a range, it revokes it, and every consumer of the
-file removes its mappings before the revoke returns.
+Move that list from struct iopt_pages_dmabuf to struct iopt_pages.
 
-A frame is therefore valid until its revoke returns, and consumers hold
-no references. A revoke reaches every consumer of the file, so a
-provider cannot take a frame from one consumer while another still maps
-it.
+No functional change.
 
-A provider is found from its file: its file_operations sit in a struct
-mem_provider_fops with the provider's operations, and FOP_MEM_PROVIDER
-is set. Each provider file embeds a struct mem_provider_file that holds
-its consumers, and the provider revokes through it. The core has no
-registry and no global state, and struct file_operations does not grow.
-
-The provider also owns the host memory type of its frames. Memory that
-is not System RAM must have its type reserved, or PAT makes it uncached
-on x86.
-
-Suggested-by: David Woodhouse <dwmw@amazon.co.uk>
 Assisted-by: Claude:claude-opus-5-5
 Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
 ---
- MAINTAINERS                  |   7 ++
- include/linux/fs.h           |   2 +
- include/linux/mem_provider.h | 211 +++++++++++++++++++++++++++++++++++
- mm/Kconfig                   |   7 ++
- mm/Makefile                  |   1 +
- mm/mem_provider.c            | 177 +++++++++++++++++++++++++++++
- 6 files changed, 405 insertions(+)
- create mode 100644 include/linux/mem_provider.h
- create mode 100644 mm/mem_provider.c
+ drivers/iommu/iommufd/io_pagetable.c | 24 +++++-----
+ drivers/iommu/iommufd/io_pagetable.h | 33 +++++++++-----
+ drivers/iommu/iommufd/pages.c        | 67 ++++++++++++++--------------
+ 3 files changed, 67 insertions(+), 57 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f37a81950e25..6cab075a3ff7 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17360,6 +17360,13 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm
- F:	include/uapi/asm-generic/mman-common.h
- F:	mm/madvise.c
+diff --git a/drivers/iommu/iommufd/io_pagetable.c b/drivers/iommu/iommufd/io_pagetable.c
+index 24d4917105d9..bcd531acc9dd 100644
+--- a/drivers/iommu/iommufd/io_pagetable.c
++++ b/drivers/iommu/iommufd/io_pagetable.c
+@@ -1008,14 +1008,14 @@ static void iopt_unfill_domain(struct io_pagetable *iopt,
+ 				WARN_ON(!area->storage_domain);
+ 			if (area->storage_domain == domain)
+ 				area->storage_domain = storage_domain;
+-			if (iopt_is_dmabuf(pages)) {
++			if (iopt_pages_tracked(pages)) {
+ 				if (!iopt_dmabuf_revoked(pages))
+ 					iopt_area_unmap_domain(area, domain);
+-				iopt_dmabuf_untrack_domain(pages, area, domain);
++				iopt_pages_untrack_domain(pages, area, domain);
+ 			}
+ 			mutex_unlock(&pages->mutex);
  
-+MEMORY PROVIDERS
-+M:	Fred Griffoul <fgriffo@amazon.co.uk>
-+L:	linux-mm@kvack.org
-+S:	Maintained
-+F:	include/linux/mem_provider.h
-+F:	mm/mem_provider.c
-+
- MEMORY TECHNOLOGY DEVICES (MTD)
- M:	Miquel Raynal <miquel.raynal@bootlin.com>
- M:	Richard Weinberger <richard@nod.at>
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 50ce731a2b78..f459f0e34ca5 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1980,6 +1980,8 @@ struct file_operations {
- #define FOP_ASYNC_LOCK		((__force fop_flags_t)(1 << 6))
- /* File system supports uncached read/write buffered IO */
- #define FOP_DONTCACHE		((__force fop_flags_t)(1 << 7))
-+/* Lends memory to consumers: embedded in a struct mem_provider_fops */
-+#define FOP_MEM_PROVIDER	((__force fop_flags_t)(1 << 8))
+-			if (!iopt_is_dmabuf(pages))
++			if (!iopt_pages_tracked(pages))
+ 				iopt_area_unmap_domain(area, domain);
+ 		}
+ 		return;
+@@ -1033,8 +1033,8 @@ static void iopt_unfill_domain(struct io_pagetable *iopt,
+ 		WARN_ON(area->storage_domain != domain);
+ 		area->storage_domain = NULL;
+ 		iopt_area_unfill_domain(area, pages, domain);
+-		if (iopt_is_dmabuf(pages))
+-			iopt_dmabuf_untrack_domain(pages, area, domain);
++		if (iopt_pages_tracked(pages))
++			iopt_pages_untrack_domain(pages, area, domain);
+ 		mutex_unlock(&pages->mutex);
+ 	}
+ }
+@@ -1065,15 +1065,15 @@ static int iopt_fill_domain(struct io_pagetable *iopt,
+ 			continue;
  
- /* Wrap a directory iterator that needs exclusive inode access */
- int wrap_directory_iterator(struct file *, struct dir_context *,
-diff --git a/include/linux/mem_provider.h b/include/linux/mem_provider.h
-new file mode 100644
-index 000000000000..94e9352ebeb0
---- /dev/null
-+++ b/include/linux/mem_provider.h
-@@ -0,0 +1,211 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _LINUX_MEM_PROVIDER_H
-+#define _LINUX_MEM_PROVIDER_H
-+
-+#include <linux/bits.h>
-+#include <linux/fs.h>
-+#include <linux/list.h>
-+#include <linux/rwsem.h>
-+#include <linux/types.h>
-+
-+/*
-+ * Memory providers
-+ *
-+ * A provider owns physical memory that the page allocator does not manage,
-+ * and lends it to consumers through files that it hands to userspace.  A
-+ * consumer is given such a file, attaches to it, and asks the provider for
-+ * the frame behind each page.  The consumer makes every mapping of the
-+ * frames itself, including the mappings into userspace; the provider makes
-+ * none of them.
-+ *
-+ * When the frames or attributes behind a range change, the provider revokes
-+ * the range.  The core calls every consumer attached to the file, and each
-+ * one removes all its mappings of the range before the revoke returns.  A
-+ * frame therefore stays valid for a consumer until the revoke that removes
-+ * it has returned, and consumers hold no references.
-+ *
-+ * A consumer must not install a mapping of a frame after the revoke that
-+ * removes it has returned.  It either holds a lock across get_page() and
-+ * the map that its revoke callback also takes, or detects a revoke that ran
-+ * in between and retries, as KVM does with its invalidation sequence.
-+ *
-+ * A revoke may also change the contents behind the range, for example when
-+ * the provider moves a frame from one file to another.  A consumer that
-+ * reports the pages written through its mappings, for live migration, must
-+ * therefore treat the whole revoked range as written.
-+ *
-+ * A provider cannot take a frame back from one consumer only: a revoke
-+ * reaches every consumer of the file.
-+ *
-+ * A provider gives its files a struct mem_provider_fops, which holds their
-+ * file_operations, with FOP_MEM_PROVIDER and an owner set, and the provider's
-+ * operations.  It embeds a struct mem_provider_file in the state of each
-+ * file, returns it from attach(), and passes it to mem_provider_revoke().
-+ * An attachment holds a reference to the file, so neither the file's state
-+ * nor the module can go away while a consumer is attached.  MEM_PROVIDER
-+ * has no prompt: a provider selects it, or depends on a consumer that does.
-+ */
-+
-+/*
-+ * Memory type of a frame, in the low bits of the attributes.  The provider
-+ * makes the host's memory type for its frames match what it reports: for
-+ * memory that is not System RAM, it reserves the type of the range, for
-+ * example with memremap() or ioremap_wc(), before it hands frames out.  The
-+ * architecture otherwise chooses the type of an unknown range, uncached on
-+ * x86, and the VMM's mapping of a guest_memfd would differ from the guest's.
-+ * On x86 the guest's type also depends on the host: KVM maps a frame uncached
-+ * for the guest unless it is RAM in the firmware's E820 map, or a struct-page
-+ * frame (DAX, ZONE_DEVICE) that PAT does not force uncached.  So the
-+ * reservation matters for the guest too, not only for the VMM's mapping.
-+ */
-+#define MEM_PROVIDER_ATTR_TYPE		GENMASK(3, 0)
-+#define MEM_PROVIDER_TYPE_RAM		0	/* cacheable system memory */
-+#define MEM_PROVIDER_TYPE_MMIO		1	/* uncached device memory */
-+#define MEM_PROVIDER_TYPE_MMIO_WC	2	/* write-combining device memory */
-+						/* 3 to 15 are reserved */
-+
-+/*
-+ * No consumer may map the frame writable: not for a guest, a device or
-+ * userspace.
-+ */
-+#define MEM_PROVIDER_ATTR_READONLY	BIT(4)
-+
-+/*
-+ * No consumer may map the frame into userspace.  Guest and device mappings
-+ * are not affected.  The provider decides this for each page.
-+ */
-+#define MEM_PROVIDER_ATTR_NO_USER_MAP	BIT(5)
-+
-+#define MEM_PROVIDER_ATTR_VALID		(MEM_PROVIDER_ATTR_TYPE | \
-+					 MEM_PROVIDER_ATTR_READONLY | \
-+					 MEM_PROVIDER_ATTR_NO_USER_MAP)
-+
-+static inline unsigned int mem_provider_type(u32 attrs)
-+{
-+	return attrs & MEM_PROVIDER_ATTR_TYPE;
-+}
-+
-+/*
-+ * The provider side of one provider file, embedded in the provider's state
-+ * for the file and set up with mem_provider_file_init().  It must stay until
-+ * the file is released.  Its fields are private to the core.
-+ */
-+struct mem_provider_file {
-+	struct rw_semaphore lock;
-+	struct list_head consumers;
-+};
-+
-+/**
-+ * struct mem_provider_ops - What a provider implements.
-+ */
-+struct mem_provider_ops {
-+	/**
-+	 * @attach: A consumer starts to use @file.
-+	 *
-+	 * Called once for each consumer, and possibly for several at once.
-+	 *
-+	 * @size is the end of the range of the file that the consumer will
-+	 * use, from offset 0, as the consumer's user asked for it: the size
-+	 * of a guest_memfd, or the end of an iommufd mapping.  Return the
-+	 * file's struct mem_provider_file, which is passed to the other
-+	 * operations, or an ERR_PTR().  Return ERR_PTR(-EINVAL) if the file
-+	 * is smaller than @size, so that the consumer fails the request at
-+	 * once.  May sleep.
-+	 */
-+	struct mem_provider_file *(*attach)(struct file *file, loff_t size);
-+
-+	/**
-+	 * @detach: A consumer is gone.
-+	 *
-+	 * Called once for each successful attach().  The consumer has removed
-+	 * every mapping of the frames, and the core no longer calls its
-+	 * revoke callback.  May sleep.
-+	 */
-+	void (*detach)(struct mem_provider_file *mpf);
-+
-+	/**
-+	 * @get_page: Return the frame behind page @index.
-+	 *
-+	 * @pfn:       [out] The frame.
-+	 * @max_order: [in, out] On entry, the largest order the consumer
-+	 *             can use.  On return, the largest order for which the
-+	 *             aligned block that contains @index is physically
-+	 *             contiguous and has the same attributes.  It must not
-+	 *             be larger than on entry.
-+	 * @attrs:     [out] MEM_PROVIDER_ATTR_* for the block.
-+	 *
-+	 * Return 0, -EFAULT if the provider does not back the page now, or
-+	 * another negative errno.
-+	 *
-+	 * May sleep, and may run at the same time as the provider changes
-+	 * its state.  A result that is out of date is harmless, because the
-+	 * provider revokes the range after the change.  Must not call into
-+	 * the consumer, must not call mem_provider_revoke(), and must not take
-+	 * a lock that the provider holds across mem_provider_revoke().
-+	 */
-+	int (*get_page)(struct mem_provider_file *mpf, pgoff_t index,
-+			unsigned long *pfn, int *max_order, u32 *attrs);
-+};
-+
-+/*
-+ * The file_operations of a provider's files, with FOP_MEM_PROVIDER set in
-+ * fops.fop_flags, and the provider's operations.
-+ */
-+struct mem_provider_fops {
-+	struct file_operations fops;
-+	const struct mem_provider_ops *ops;
-+};
-+
-+/**
-+ * struct mem_provider_attachment - One consumer's attachment to a provider
-+ * file.  Embedded in the consumer's object, set by mem_provider_attach() and
-+ * owned by the consumer until mem_provider_detach().  @ops must be NULL before
-+ * the first mem_provider_attach(), for example by zeroing the attachment, so
-+ * that mem_provider_detach() on an attachment that was never made does
-+ * nothing.
-+ * @ops: The provider's operations.  Read-only to the consumer.
-+ * @mpf: The provider's per-file state.  Read-only to the consumer.
-+ * @file: The provider file.  Read-only to the consumer.
-+ * @size: The end of the range the consumer uses.  Read-only to the consumer.
-+ * @revoke: Called when the frames behind a range change; see below.
-+ * @node: Private to the core.
-+ */
-+struct mem_provider_attachment {
-+	const struct mem_provider_ops *ops;
-+	struct mem_provider_file *mpf;
-+	struct file *file;
-+	loff_t size;
-+
+ 		guard(mutex)(&pages->mutex);
+-		if (iopt_is_dmabuf(pages)) {
+-			rc = iopt_dmabuf_track_domain(pages, area, domain);
++		if (iopt_pages_tracked(pages)) {
++			rc = iopt_pages_track_domain(pages, area, domain);
+ 			if (rc)
+ 				goto out_unfill;
+ 		}
+ 		rc = iopt_area_fill_domain(area, domain);
+ 		if (rc) {
+-			if (iopt_is_dmabuf(pages))
+-				iopt_dmabuf_untrack_domain(pages, area, domain);
++			if (iopt_pages_tracked(pages))
++				iopt_pages_untrack_domain(pages, area, domain);
+ 			goto out_unfill;
+ 		}
+ 		if (!area->storage_domain) {
+@@ -1102,8 +1102,8 @@ static int iopt_fill_domain(struct io_pagetable *iopt,
+ 			area->storage_domain = NULL;
+ 		}
+ 		iopt_area_unfill_domain(area, pages, domain);
+-		if (iopt_is_dmabuf(pages))
+-			iopt_dmabuf_untrack_domain(pages, area, domain);
++		if (iopt_pages_tracked(pages))
++			iopt_pages_untrack_domain(pages, area, domain);
+ 		mutex_unlock(&pages->mutex);
+ 	}
+ 	return rc;
+@@ -1315,7 +1315,7 @@ static int iopt_area_split(struct iopt_area *area, unsigned long iova)
+ 		return -EBUSY;
+ 
+ 	/* Maintaining the domains_itree below is a bit complicated */
+-	if (iopt_is_dmabuf(pages))
++	if (iopt_pages_tracked(pages))
+ 		return -EOPNOTSUPP;
+ 
+ 	if (new_start & (alignment - 1) ||
+diff --git a/drivers/iommu/iommufd/io_pagetable.h b/drivers/iommu/iommufd/io_pagetable.h
+index 27e3e311d395..ba539bfaac31 100644
+--- a/drivers/iommu/iommufd/io_pagetable.h
++++ b/drivers/iommu/iommufd/io_pagetable.h
+@@ -70,15 +70,14 @@ void iopt_area_unfill_domain(struct iopt_area *area, struct iopt_pages *pages,
+ void iopt_area_unmap_domain(struct iopt_area *area,
+ 			    struct iommu_domain *domain);
+ 
+-int iopt_dmabuf_track_domain(struct iopt_pages *pages, struct iopt_area *area,
+-			     struct iommu_domain *domain);
+-void iopt_dmabuf_untrack_domain(struct iopt_pages *pages,
+-				struct iopt_area *area,
+-				struct iommu_domain *domain);
+-int iopt_dmabuf_track_all_domains(struct iopt_area *area,
+-				  struct iopt_pages *pages);
+-void iopt_dmabuf_untrack_all_domains(struct iopt_area *area,
+-				     struct iopt_pages *pages);
++int iopt_pages_track_domain(struct iopt_pages *pages, struct iopt_area *area,
++			    struct iommu_domain *domain);
++void iopt_pages_untrack_domain(struct iopt_pages *pages, struct iopt_area *area,
++			       struct iommu_domain *domain);
++int iopt_pages_track_all_domains(struct iopt_area *area,
++				 struct iopt_pages *pages);
++void iopt_pages_untrack_all_domains(struct iopt_area *area,
++				    struct iopt_pages *pages);
+ 
+ static inline unsigned long iopt_area_index(struct iopt_area *area)
+ {
+@@ -194,7 +193,8 @@ enum iopt_address_type {
+ 	IOPT_ADDRESS_DMABUF,
+ };
+ 
+-struct iopt_pages_dmabuf_track {
++/* An area of the pages mapped into a domain, for pages that are not pinned. */
++struct iopt_pages_track {
+ 	struct iommu_domain *domain;
+ 	struct iopt_area *area;
+ 	struct list_head elm;
+@@ -205,7 +205,6 @@ struct iopt_pages_dmabuf {
+ 	struct phys_vec phys;
+ 	/* Always PAGE_SIZE aligned */
+ 	unsigned long start;
+-	struct list_head tracker;
+ };
+ 
+ /*
+@@ -246,6 +245,12 @@ struct iopt_pages {
+ 	struct rb_root_cached access_itree;
+ 	/* Of iopt_area::pages_node */
+ 	struct rb_root_cached domains_itree;
 +	/*
-+	 * @revoke: The frames behind [@offset, @offset + @len) changed.
-+	 *
-+	 * The consumer removes every mapping it made of the range and asks
-+	 * get_page() again when it next needs a page.  It must not return
-+	 * while a mapping of the old frames remains, including one being
-+	 * installed from an earlier get_page(): it excludes such a mapping or
-+	 * makes it retry.  Revokes of the same file may call this at the same
-+	 * time, and may call it before mem_provider_attach() returns.  May
-+	 * sleep, and may call get_page().  Must not call
-+	 * mem_provider_revoke(), and must not attach or detach any provider.
++	 * Of iopt_pages_track::elm.  Pages that are not pinned can change
++	 * under the domains that map them, so every (area, domain) that maps
++	 * them is listed here.  See iopt_pages_tracked().
 +	 */
-+	void (*revoke)(struct mem_provider_attachment *att, loff_t offset,
-+		       loff_t len);
-+
-+	struct list_head node;
-+};
-+
-+/* Provider side. */
-+void mem_provider_file_init(struct mem_provider_file *mpf);
-+void mem_provider_revoke(struct mem_provider_file *mpf, loff_t offset,
-+			 loff_t len);
-+
-+/* Consumer side. */
-+int mem_provider_attach(struct mem_provider_attachment *att, struct file *file,
-+			loff_t size,
-+			void (*revoke)(struct mem_provider_attachment *att,
-+				       loff_t offset, loff_t len));
-+void mem_provider_detach(struct mem_provider_attachment *att);
-+int mem_provider_get_page(struct mem_provider_attachment *att, pgoff_t index,
-+			  unsigned long *pfn, int *max_order, u32 *attrs);
-+
-+#endif /* _LINUX_MEM_PROVIDER_H */
-diff --git a/mm/Kconfig b/mm/Kconfig
-index 9e0ca4824905..7085bf6666e5 100644
---- a/mm/Kconfig
-+++ b/mm/Kconfig
-@@ -774,6 +774,13 @@ config DEFAULT_MMAP_MIN_ADDR
- config ARCH_SUPPORTS_MEMORY_FAILURE
- 	bool
++	struct list_head tracker;
+ };
  
-+config MEM_PROVIDER
-+	bool
-+	help
-+	  An interface that lets a driver lend memory that the page allocator
-+	  does not manage to consumers such as guest_memfd and iommufd, and
-+	  take it back.  See include/linux/mem_provider.h.
-+
- config MEMORY_FAILURE
- 	depends on MMU
- 	depends on ARCH_SUPPORTS_MEMORY_FAILURE
-diff --git a/mm/Makefile b/mm/Makefile
-index eff9f9e7e061..35420b587f89 100644
---- a/mm/Makefile
-+++ b/mm/Makefile
-@@ -110,6 +110,7 @@ obj-$(CONFIG_CGROUP_HUGETLB) += hugetlb_cgroup.o
- obj-$(CONFIG_GUP_TEST) += gup_test.o
- obj-$(CONFIG_DMAPOOL_TEST) += dmapool_test.o
- obj-$(CONFIG_MEMORY_FAILURE) += memory-failure.o
-+obj-$(CONFIG_MEM_PROVIDER) += mem_provider.o
- obj-$(CONFIG_HWPOISON_INJECT) += hwpoison-inject.o
- obj-$(CONFIG_DEBUG_KMEMLEAK) += kmemleak.o
- obj-$(CONFIG_DEBUG_RODATA_TEST) += rodata_test.o
-diff --git a/mm/mem_provider.c b/mm/mem_provider.c
-new file mode 100644
-index 000000000000..5a2984afde10
---- /dev/null
-+++ b/mm/mem_provider.c
-@@ -0,0 +1,177 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Memory providers: lend memory that the page allocator does not manage to
-+ * consumers that map it.  See include/linux/mem_provider.h.
-+ *
-+ * Locking: the @lock of a struct mem_provider_file protects its list of
-+ * consumers.  mem_provider_revoke() holds it for reading while it calls the
-+ * consumers, so a consumer cannot detach until every revoke of its file has
-+ * returned.  It follows that a revoke callback must not attach, detach or
-+ * revoke, and that a consumer must not detach while it holds a lock that its
-+ * revoke callback takes.  A revoke callback may call get_page(), which takes
-+ * no lock of the core.
-+ */
-+#include <linux/export.h>
-+#include <linux/file.h>
-+#include <linux/fs.h>
-+#include <linux/mem_provider.h>
-+#include <linux/mm.h>
-+#include <linux/rwsem.h>
-+
-+/**
-+ * mem_provider_file_init() - Set up the provider side of a provider file.
-+ * @mpf: Embedded in the provider's state for the file.
-+ */
-+void mem_provider_file_init(struct mem_provider_file *mpf)
+ static inline bool iopt_is_dmabuf(struct iopt_pages *pages)
+@@ -255,6 +260,12 @@ static inline bool iopt_is_dmabuf(struct iopt_pages *pages)
+ 	return pages->type == IOPT_ADDRESS_DMABUF;
+ }
+ 
++/* The pages are not pinned, so their domains are tracked in pages->tracker. */
++static inline bool iopt_pages_tracked(struct iopt_pages *pages)
 +{
-+	init_rwsem(&mpf->lock);
-+	INIT_LIST_HEAD(&mpf->consumers);
++	return iopt_is_dmabuf(pages);
 +}
-+EXPORT_SYMBOL_GPL(mem_provider_file_init);
 +
-+/**
-+ * mem_provider_attach() - Attach a consumer to a provider file.
-+ * @att: The consumer's attachment, filled in on success.
-+ * @file: A file handed out by a provider.
-+ * @size: The end of the range of @file that the consumer will use, in bytes
-+ *        from offset 0.  The provider refuses a file that is smaller.
-+ * @revoke: Called when the frames behind a range of @file change.
-+ *
-+ * Holds a reference to @file, and so to the provider's module, until
-+ * mem_provider_detach().
-+ *
-+ * Return: 0, -EINVAL if @size or @revoke is invalid or the provider lacks an
-+ * operation, -ENODEV if @file is not a provider file, or the error returned
-+ * by the provider.
-+ */
-+int mem_provider_attach(struct mem_provider_attachment *att, struct file *file,
-+			loff_t size,
-+			void (*revoke)(struct mem_provider_attachment *att,
-+				       loff_t offset, loff_t len))
-+{
-+	const struct mem_provider_ops *ops;
-+	struct mem_provider_file *mpf;
-+
-+	if (size <= 0 || !revoke)
-+		return -EINVAL;
-+
-+	if (!(file->f_op->fop_flags & FOP_MEM_PROVIDER))
-+		return -ENODEV;
-+	ops = container_of(file->f_op, struct mem_provider_fops, fops)->ops;
-+	if (WARN_ON_ONCE(!ops->attach || !ops->detach || !ops->get_page))
-+		return -EINVAL;
-+
-+	mpf = ops->attach(file, size);
-+	if (IS_ERR(mpf))
-+		return PTR_ERR(mpf);
-+
-+	att->ops = ops;
-+	att->mpf = mpf;
-+	att->file = get_file(file);
-+	att->size = size;
-+	att->revoke = revoke;
-+
-+	down_write(&mpf->lock);
-+	list_add_tail(&att->node, &mpf->consumers);
-+	up_write(&mpf->lock);
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(mem_provider_attach);
-+
-+/**
-+ * mem_provider_detach() - Detach a consumer from a provider file.
-+ * @att: An attachment from mem_provider_attach().
-+ *
-+ * The consumer must have removed every mapping of the provider's frames.
-+ * Waits for revokes of the file that are in progress.  Does nothing if @att
-+ * is not attached.
-+ */
-+void mem_provider_detach(struct mem_provider_attachment *att)
-+{
-+	struct mem_provider_file *mpf = att->mpf;
-+
-+	if (!att->ops)
-+		return;
-+
-+	down_write(&mpf->lock);
-+	list_del(&att->node);
-+	up_write(&mpf->lock);
-+
-+	att->ops->detach(mpf);
-+	fput(att->file);
-+
-+	att->ops = NULL;
-+	att->mpf = NULL;
-+	att->file = NULL;
-+}
-+EXPORT_SYMBOL_GPL(mem_provider_detach);
-+
-+/**
-+ * mem_provider_get_page() - Get the frame behind a page of an attachment.
-+ * @att: The attachment.
-+ * @index: The page, in units of PAGE_SIZE from offset 0.
-+ * @pfn: [out] The frame.
-+ * @max_order: [in, out] See &mem_provider_ops.get_page.
-+ * @attrs: [out] MEM_PROVIDER_ATTR_* for the frame.
-+ *
-+ * On return, @max_order is also limited so that the block is aligned in
-+ * physical memory.  The frame stays valid until the consumer's revoke
-+ * callback for the page has returned.
-+ *
-+ * Return: 0, -EFAULT if the provider does not back the page now, -EINVAL if
-+ * @index is beyond the attachment, -EIO if the provider returned an invalid
-+ * result, or another negative errno from the provider.
-+ */
-+int mem_provider_get_page(struct mem_provider_attachment *att, pgoff_t index,
-+			  unsigned long *pfn, int *max_order, u32 *attrs)
-+{
-+	int order = *max_order;
-+	int ret;
-+
-+	if (index >= DIV_ROUND_UP(att->size, PAGE_SIZE))
-+		return -EINVAL;
-+
-+	*attrs = 0;
-+	ret = att->ops->get_page(att->mpf, index, pfn, max_order, attrs);
-+	if (ret)
-+		return ret;
-+
-+	if (WARN_ON_ONCE(*max_order < 0 || *max_order > order ||
-+			 (*attrs & ~MEM_PROVIDER_ATTR_VALID) ||
-+			 mem_provider_type(*attrs) > MEM_PROVIDER_TYPE_MMIO_WC))
-+		return -EIO;
-+
-+	/* A large mapping also needs the first frame of the block aligned. */
-+	if (*max_order && ((*pfn ^ index) & ((1UL << *max_order) - 1)))
-+		*max_order = __ffs(*pfn ^ index);
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(mem_provider_get_page);
-+
-+/**
-+ * mem_provider_revoke() - Tell the consumers that frames changed.
-+ * @mpf: The provider side of the file.
-+ * @offset: The start of the range, in bytes.
-+ * @len: The length of the range, in bytes.
-+ *
-+ * Call this after the provider has changed the frames or attributes behind
-+ * the range.  Returns when every consumer of the file has removed its
-+ * mappings of the range.  The provider must not hold a lock that its
-+ * get_page() takes, because a consumer may call get_page() before it
-+ * returns.  May sleep.
-+ */
-+void mem_provider_revoke(struct mem_provider_file *mpf, loff_t offset,
-+			 loff_t len)
-+{
-+	struct mem_provider_attachment *att;
-+
-+	might_sleep();
-+	if (len <= 0)
-+		return;
-+
-+	down_read(&mpf->lock);
-+	list_for_each_entry(att, &mpf->consumers, node)
-+		att->revoke(att, offset, len);
-+	up_read(&mpf->lock);
-+}
-+EXPORT_SYMBOL_GPL(mem_provider_revoke);
+ static inline bool iopt_dmabuf_revoked(struct iopt_pages *pages)
+ {
+ 	lockdep_assert_held(&pages->mutex);
+diff --git a/drivers/iommu/iommufd/pages.c b/drivers/iommu/iommufd/pages.c
+index 03c8379bbc34..660af3d46f5e 100644
+--- a/drivers/iommu/iommufd/pages.c
++++ b/drivers/iommu/iommufd/pages.c
+@@ -1384,6 +1384,7 @@ static struct iopt_pages *iopt_alloc_pages(unsigned long start_byte,
+ 	pages->npages = DIV_ROUND_UP(length + start_byte, PAGE_SIZE);
+ 	pages->access_itree = RB_ROOT_CACHED;
+ 	pages->domains_itree = RB_ROOT_CACHED;
++	INIT_LIST_HEAD(&pages->tracker);
+ 	pages->writable = writable;
+ 	if (capable(CAP_IPC_LOCK))
+ 		pages->account_mode = IOPT_PAGES_ACCOUNT_NONE;
+@@ -1434,13 +1435,13 @@ struct iopt_pages *iopt_alloc_file_pages(struct file *file,
+ static void iopt_revoke_notify(struct dma_buf_attachment *attach)
+ {
+ 	struct iopt_pages *pages = attach->importer_priv;
+-	struct iopt_pages_dmabuf_track *track;
++	struct iopt_pages_track *track;
+ 
+ 	guard(mutex)(&pages->mutex);
+ 	if (iopt_dmabuf_revoked(pages))
+ 		return;
+ 
+-	list_for_each_entry(track, &pages->dmabuf.tracker, elm) {
++	list_for_each_entry(track, &pages->tracker, elm) {
+ 		struct iopt_area *area = track->area;
+ 
+ 		iopt_area_unmap_domain_range(area, track->domain,
+@@ -1557,7 +1558,6 @@ struct iopt_pages *iopt_alloc_dmabuf_pages(struct iommufd_ctx *ictx,
+ 	pages->account_mode = IOPT_PAGES_ACCOUNT_NONE;
+ 	pages->type = IOPT_ADDRESS_DMABUF;
+ 	pages->dmabuf.start = start - start_byte;
+-	INIT_LIST_HEAD(&pages->dmabuf.tracker);
+ 
+ 	rc = iopt_map_dmabuf(ictx, pages, dmabuf);
+ 	if (rc) {
+@@ -1568,16 +1568,16 @@ struct iopt_pages *iopt_alloc_dmabuf_pages(struct iommufd_ctx *ictx,
+ 	return pages;
+ }
+ 
+-int iopt_dmabuf_track_domain(struct iopt_pages *pages, struct iopt_area *area,
+-			     struct iommu_domain *domain)
++int iopt_pages_track_domain(struct iopt_pages *pages, struct iopt_area *area,
++			    struct iommu_domain *domain)
+ {
+-	struct iopt_pages_dmabuf_track *track;
++	struct iopt_pages_track *track;
+ 
+ 	lockdep_assert_held(&pages->mutex);
+-	if (WARN_ON(!iopt_is_dmabuf(pages)))
++	if (WARN_ON(!iopt_pages_tracked(pages)))
+ 		return -EINVAL;
+ 
+-	list_for_each_entry(track, &pages->dmabuf.tracker, elm)
++	list_for_each_entry(track, &pages->tracker, elm)
+ 		if (WARN_ON(track->domain == domain && track->area == area))
+ 			return -EINVAL;
+ 
+@@ -1586,21 +1586,20 @@ int iopt_dmabuf_track_domain(struct iopt_pages *pages, struct iopt_area *area,
+ 		return -ENOMEM;
+ 	track->domain = domain;
+ 	track->area = area;
+-	list_add_tail(&track->elm, &pages->dmabuf.tracker);
++	list_add_tail(&track->elm, &pages->tracker);
+ 
+ 	return 0;
+ }
+ 
+-void iopt_dmabuf_untrack_domain(struct iopt_pages *pages,
+-				struct iopt_area *area,
+-				struct iommu_domain *domain)
++void iopt_pages_untrack_domain(struct iopt_pages *pages, struct iopt_area *area,
++			       struct iommu_domain *domain)
+ {
+-	struct iopt_pages_dmabuf_track *track;
++	struct iopt_pages_track *track;
+ 
+ 	lockdep_assert_held(&pages->mutex);
+-	WARN_ON(!iopt_is_dmabuf(pages));
++	WARN_ON(!iopt_pages_tracked(pages));
+ 
+-	list_for_each_entry(track, &pages->dmabuf.tracker, elm) {
++	list_for_each_entry(track, &pages->tracker, elm) {
+ 		if (track->domain == domain && track->area == area) {
+ 			list_del(&track->elm);
+ 			kfree(track);
+@@ -1610,36 +1609,36 @@ void iopt_dmabuf_untrack_domain(struct iopt_pages *pages,
+ 	WARN_ON(true);
+ }
+ 
+-int iopt_dmabuf_track_all_domains(struct iopt_area *area,
+-				  struct iopt_pages *pages)
++int iopt_pages_track_all_domains(struct iopt_area *area,
++				 struct iopt_pages *pages)
+ {
+-	struct iopt_pages_dmabuf_track *track;
++	struct iopt_pages_track *track;
+ 	struct iommu_domain *domain;
+ 	unsigned long index;
+ 	int rc;
+ 
+-	list_for_each_entry(track, &pages->dmabuf.tracker, elm)
++	list_for_each_entry(track, &pages->tracker, elm)
+ 		if (WARN_ON(track->area == area))
+ 			return -EINVAL;
+ 
+ 	xa_for_each(&area->iopt->domains, index, domain) {
+-		rc = iopt_dmabuf_track_domain(pages, area, domain);
++		rc = iopt_pages_track_domain(pages, area, domain);
+ 		if (rc)
+ 			goto err_untrack;
+ 	}
+ 	return 0;
+ err_untrack:
+-	iopt_dmabuf_untrack_all_domains(area, pages);
++	iopt_pages_untrack_all_domains(area, pages);
+ 	return rc;
+ }
+ 
+-void iopt_dmabuf_untrack_all_domains(struct iopt_area *area,
+-				     struct iopt_pages *pages)
++void iopt_pages_untrack_all_domains(struct iopt_area *area,
++				    struct iopt_pages *pages)
+ {
+-	struct iopt_pages_dmabuf_track *track;
+-	struct iopt_pages_dmabuf_track *tmp;
++	struct iopt_pages_track *track;
++	struct iopt_pages_track *tmp;
+ 
+-	list_for_each_entry_safe(track, tmp, &pages->dmabuf.tracker,
++	list_for_each_entry_safe(track, tmp, &pages->tracker,
+ 				 elm) {
+ 		if (track->area == area) {
+ 			list_del(&track->elm);
+@@ -1656,6 +1655,7 @@ void iopt_release_pages(struct kref *kref)
+ 	WARN_ON(!RB_EMPTY_ROOT(&pages->domains_itree.rb_root));
+ 	WARN_ON(pages->npinned);
+ 	WARN_ON(!xa_empty(&pages->pinned_pfns));
++	WARN_ON(!list_empty(&pages->tracker));
+ 	if (iopt_is_dmabuf(pages) && pages->dmabuf.attach) {
+ 		struct dma_buf *dmabuf = pages->dmabuf.attach->dmabuf;
+ 
+@@ -1664,7 +1664,6 @@ void iopt_release_pages(struct kref *kref)
+ 		dma_resv_unlock(dmabuf->resv);
+ 		dma_buf_detach(dmabuf, pages->dmabuf.attach);
+ 		dma_buf_put(dmabuf);
+-		WARN_ON(!list_empty(&pages->dmabuf.tracker));
+ 	} else if (pages->type == IOPT_ADDRESS_FILE) {
+ 		fput(pages->file);
+ 	}
+@@ -1749,7 +1748,7 @@ static void __iopt_area_unfill_domain(struct iopt_area *area,
+ 
+ 	lockdep_assert_held(&pages->mutex);
+ 
+-	if (iopt_is_dmabuf(pages)) {
++	if (iopt_pages_tracked(pages)) {
+ 		if (WARN_ON(iopt_dmabuf_revoked(pages)))
+ 			return;
+ 		iopt_area_unmap_domain_range(area, domain, start_index,
+@@ -1917,8 +1916,8 @@ int iopt_area_fill_domains(struct iopt_area *area, struct iopt_pages *pages)
+ 		return 0;
+ 
+ 	mutex_lock(&pages->mutex);
+-	if (iopt_is_dmabuf(pages)) {
+-		rc = iopt_dmabuf_track_all_domains(area, pages);
++	if (iopt_pages_tracked(pages)) {
++		rc = iopt_pages_track_all_domains(area, pages);
+ 		if (rc)
+ 			goto out_unlock;
+ 	}
+@@ -1983,8 +1982,8 @@ int iopt_area_fill_domains(struct iopt_area *area, struct iopt_pages *pages)
+ 	}
+ 	pfn_reader_destroy(&pfns);
+ out_untrack:
+-	if (iopt_is_dmabuf(pages))
+-		iopt_dmabuf_untrack_all_domains(area, pages);
++	if (iopt_pages_tracked(pages))
++		iopt_pages_untrack_all_domains(area, pages);
+ out_unlock:
+ 	mutex_unlock(&pages->mutex);
+ 	return rc;
+@@ -2024,8 +2023,8 @@ void iopt_area_unfill_domains(struct iopt_area *area, struct iopt_pages *pages)
+ 		WARN_ON(RB_EMPTY_NODE(&area->pages_node.rb));
+ 	interval_tree_remove(&area->pages_node, &pages->domains_itree);
+ 	iopt_area_unfill_domain(area, pages, area->storage_domain);
+-	if (iopt_is_dmabuf(pages))
+-		iopt_dmabuf_untrack_all_domains(area, pages);
++	if (iopt_pages_tracked(pages))
++		iopt_pages_untrack_all_domains(area, pages);
+ 	area->storage_domain = NULL;
+ out_unlock:
+ 	mutex_unlock(&pages->mutex);
 -- 
 2.47.3
 
