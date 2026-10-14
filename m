@@ -1,32 +1,33 @@
-Received: from mta0.migadu.com (out-31.mta0.migadu.com [91.218.175.31])
+Received: from mta1.migadu.com (out-2.mta1.migadu.com [95.215.58.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4F94AA1F2
-	for <kvmarm@lists.linux.dev>; Wed, 14 Oct 2026 12:55:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B385038ED
+	for <kvmarm@lists.linux.dev>; Wed, 14 Oct 2026 12:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791982525; cv=none; b=UMOM9/OKdTa05AFBhDMRQLxKTK+YfsWDEOORtP6EiyMDXnTzRuuhLqmXMneJ8z+p4nZ2HmSM+YiG22wf6ZQrtp1fs7hDXFfDG0isDXuSB84ODNXCIilIh2Osw5z0A7qlgQisALZN70SaVb+/Oh9mxdm5F81XCG83TEBoDOGJP+k=
+	t=1791982529; cv=none; b=nH1B0khxa9fxtbFTEqcvnMTBhAcesYyM0Rv4qZtajrsXt315vZnS/LNovtcEOqfcGQ7v1Nj0mZ4rwWtmGRlNfMlmQmgykkeIVoIoc9yVH1ZKzBqt5YfextQOV+DPMLiOlEUzxq5iAw5IpJF+xCybknDAe/6LMalpmwZFDF5OwLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791982525; c=relaxed/simple;
-	bh=pJBToGHsJMC6/kg5jWs+Mtib+z5TjGaiaQJZnJjpmkk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Dtnv5IxVt9ru7ykLZ8WKsk6v7BzJTfqL2Tg+k7PHcEVsK4xeiezMAsGbomAFlFtQUVo+PEYvElfC12C7EVlzMvIJGVFeM5eVN5LVTm4cF14ztBxH4nZJMHcaOHYGyeq7mnsryKBWbO2GK4/FhToZO0yb8MaecYN5+gzSI64vxow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WPaBA/Hw; arc=none smtp.client-ip=91.218.175.31
+	s=arc-20240116; t=1791982529; c=relaxed/simple;
+	bh=1W+NOG2Vc3f+T8d2kTd9wvETY+8H8YtcVIfzWtcM8hs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Pfy3b6rlDVjdrYMOJ1kxoM/O4Gx6N19O6hKh+nA09pVDL/VUwzoGgnBGkEUf0117eGbxpjP0viO1vNPmXmgFPtjsFM9TslcWd+pSpvW3ldHJjgLdGKl7xwCzk0TVOD0nOysBwxKAe/Cd9c5bH7f+GVljxF/5zZvXQDJhqFJy1XE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dntljhIZ; arc=none smtp.client-ip=95.215.58.2
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WPaBA/Hw"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dntljhIZ"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=pJBToGHsJMC6/kg5jWs+Mtib+z5TjGaiaQJZnJjpmkk=;
+DKIM-Signature: a=rsa-sha256; bh=1W+NOG2Vc3f+T8d2kTd9wvETY+8H8YtcVIfzWtcM8hs=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1791982513; v=1; x=1792587313;
- b=WPaBA/HwgY+tZeMAg6kf+GOwzWUpq9ktnmYc9UmzX87qeVgLYJgJ4j8HMnDwqh5iRAqLuOXN
- WUPG9uFRz2OdgMsZ5MiKFu7xaTGj/GmqAsZMXOS9Ixv2sKKXjwqrSz7PeKfCu4qS2t3Kd6sRChp
- s6RoZ+duXicG38/1/q5bU1gY=
+ t=1791982518; v=1; x=1792587318;
+ b=dntljhIZwyLxEF7g2/rFr503mVZCDevPVkqarcveV3KUbbF3t54IaiBuVSEnJVAq0hCTtnC1
+ WVmHEIHjDi+rnHey4KyHZWziXvPYZQSSZlQuCAf2veCeJy8vMj1cvXjo5rd5C4PCkWEDA4hRJpy
+ rBIMnazP2f87SCL//w4+b4rQ=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 8a582e26eeccef1c;
-	Wed, 14 Oct 2026 12:55:10 +0000
-X-Mizu-Trace-ID: 8a582e26eeccef1c
+Received: by smtp.migadu.com with ESMTPS id 439495e9f5d2f512;
+	Wed, 14 Oct 2026 12:55:14 +0000
+X-Mizu-Trace-ID: 439495e9f5d2f512
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -44,10 +45,12 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 0/2] KVM: arm64: Per-vCPU TLB and I-cache flush in pKVM
-Date: Wed, 14 Oct 2026 13:55:08 +0100
-Message-Id: <20261014125510.2928306-1-fuad.tabba@linux.dev>
+Subject: [PATCH 1/2] KVM: arm64: Track physical CPU number at EL2
+Date: Wed, 14 Oct 2026 13:55:09 +0100
+Message-Id: <20261014125510.2928306-2-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20261014125510.2928306-1-fuad.tabba@linux.dev>
+References: <20261014125510.2928306-1-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,41 +59,69 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi folks,
+The nVHE hypervisor has no equivalent of smp_processor_id(), so EL2 code
+has no index for the CPU it runs on.
 
-Since 6.14, protected and non-protected pKVM guests run on the
-hypervisor's VMID. The host no longer flushes a CPU's TLBs and I-cache
-when a different vCPU of the same VM is loaded there, so vCPUs of one
-guest can hit each other's entries. This series adds the flush at EL2.
+Add a hyp per-CPU hyp_cpu_number, which the host writes in
+cpu_prepare_hyp_mode() before it's deprivileged, and a
+hyp_smp_processor_id() accessor to read it. The next patch uses it to
+index per-CPU state in a hyp VM.
 
-An earlier version of these patches was in Will's pKVM base series in
-2022 [1], but didn't make it into its later versions.
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ arch/arm64/include/asm/kvm_hyp.h  | 3 +++
+ arch/arm64/kvm/arm.c              | 3 +++
+ arch/arm64/kvm/hyp/nvhe/hyp-smp.c | 2 ++
+ 3 files changed, 8 insertions(+)
 
-This series is based on kvmarm/next because the hyp VM is allocated with
-hyp_alloc() there, and the per-CPU array it adds is allocated the same
-way.
-
-Based on kvmarm/next (dd0bc00e3e920).
-
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/20220519134204.5379-1-will@kernel.org/
-
-Fuad Tabba (2):
-  KVM: arm64: Track physical CPU number at EL2
-  KVM: arm64: Ensure TLBs and I-cache are private to each vCPU in pKVM
-
- arch/arm64/include/asm/kvm_hyp.h       |  3 +++
- arch/arm64/kvm/arm.c                   |  3 +++
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  3 +++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c     |  8 ++++++++
- arch/arm64/kvm/hyp/nvhe/hyp-smp.c      |  2 ++
- arch/arm64/kvm/hyp/nvhe/pkvm.c         | 21 ++++++++++++++++++---
- 6 files changed, 37 insertions(+), 3 deletions(-)
-
-
-base-commit: dd0bc00e3e9201fd49b62ff9cc07890c89003afe
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index b0e42be3d9eef..6c4169a14b73e 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -16,6 +16,9 @@
+ DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+ DECLARE_PER_CPU(unsigned long, kvm_hyp_vector);
+ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
++DECLARE_PER_CPU(int, hyp_cpu_number);
++
++#define hyp_smp_processor_id() (__this_cpu_read(hyp_cpu_number))
+ 
+ /*
+  * Unified accessors for registers that have a different encoding
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index d593ba9280933..0dd6667f1beea 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -116,6 +116,7 @@ DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+ 
+ DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_base);
+ DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
++DECLARE_KVM_NVHE_PER_CPU(int, hyp_cpu_number);
+ 
+ DECLARE_KVM_NVHE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+ 
+@@ -2351,6 +2352,8 @@ static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
+ 	struct kvm_nvhe_init_params *params = per_cpu_ptr_nvhe_sym(kvm_init_params, cpu);
+ 	unsigned long tcr;
+ 
++	*per_cpu_ptr_nvhe_sym(hyp_cpu_number, cpu) = cpu;
++
+ 	/*
+ 	 * Calculate the raw per-cpu offset without a translation from the
+ 	 * kernel's mapping to the linear mapping, and store it in tpidr_el2
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
+index 04d194583f1e4..9fcb92abd0b57 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
+@@ -8,6 +8,8 @@
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
+ 
++DEFINE_PER_CPU(int, hyp_cpu_number);
++
+ /*
+  * nVHE copy of data structures tracking available CPU cores.
+  * Only entries for CPUs that were online at KVM init are populated.
 -- 
 2.39.5
 
