@@ -1,163 +1,218 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 368813F484D;
-	Wed, 14 Oct 2026 17:48:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792000125; cv=none; b=SUcR47Ix9ofa6jLMfooCv4JV89CrCG4cDT67/4N5zKmJ1wPy2/4xiysIwNKrXhhh28zdlpzTDV6YqBUUqWT4fHBD0Ob1C0t6Cg27Gc+QWeFGBXJr1uTg2aE4OErqWMDRzEKj36z8gaB7nWB/WH0IafkQkzeYuQPBw2KUYY4AK9E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792000125; c=relaxed/simple;
-	bh=71a9bS9KOD7KGqIJAy7haSe7B0cJeULJ9tVA1djapEI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HM+1kuENpVtf6B///zFLkImZc96yhfl/e+BrAS0sDcb+hPAW/pkgkf5fOYpyLKs/4IzRkFguIgTtd41OR1NZkwnnVBdQCIWU5kUVAyRkyLP8v+I5U5roCTrC3FMJYtUedcznx0gTskmxloF/jyWyg/DGWDqqe+WgCSVPcQU8FVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f/feUoZ9; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909B0483BE1
+	for <kvmarm@lists.linux.dev>; Wed, 14 Oct 2026 21:47:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792014430; cv=pass; b=bgsmzo1TJpUypyyfqP/OAvoVx+KVWA4/LfC+Rcb5mqWUdmyO1xls2uR9J0JERy6oPQOHBr+ipnJE4zAo59AhSUk2ZHv3fZiY5mV6LMwdKtq1/qfG1c+W8nm6fUVPpEProcDN1ny3E4c5KukV4WiBBpP+YMjfA4y5NrGwy3XhnHI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792014430; c=relaxed/simple;
+	bh=MCaOs6wYNSB4LFrsDrFCk/QlJZrshEPv8X72I3y+9V4=;
+	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HsdIJblZOGuIpuJTbv1ltsJw7utuEkHRSO5TKalN0cO5DL7YyaHLpZr1MlKAuxHaXdqFqqMtyZKiEqIero/Pt6LRHJcNFYPaIxr+8xqAJqlrXfTktMyHd3b7XSCik4NOpZDWdXsa/K92iBf/uNp+E+vM5w/HLEKhfcI+nV2k7sA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mqHFli7r; arc=pass smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f/feUoZ9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46D221F000C4;
-	Wed, 14 Oct 2026 17:48:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792000123;
-	bh=ztWJU2EjfoLTEJPuQ+2lII5i140c6mxubxZEL3aTvdI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=f/feUoZ9pYIyFM/8FFZmrN+WLzqLFlPKmlCZq5JI/mWB99rlDr7gLp5u57SkWD5Tf
-	 xhuAeuHnSy+e/2o9NRja9m64WfLg0oywRgfF0h+vXEyilYMpt13sWKOF3rawAS/30t
-	 uKvpuaWGoSHOuiWxr9X7mUEXphHsY8P+uG+3FXAGPDME28HXs+Ldh2jF/r3peGCgUP
-	 K/Hw4GWmjliah8rPLLjGSSV5EkmwhlPVVSX3k4p1gCQSnNItMSv3ZCcc66OXq+n2aB
-	 nWKF56v5iQkT5jqXRoONduYqkAJZInCgvBCFe2qudpnKLm7J5IuWIScrhaWYMttitc
-	 gIspDF4iL+i/Q==
-Date: Wed, 14 Oct 2026 18:48:37 +0100
-From: Mark Brown <broonie@kernel.org>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Leonardo Bras <leo.bras@arm.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v21 02/15] KVM: arm64: Refuse to start a guest with S1PIE
- or S1POE but not TCR2
-Message-ID: <ae24e80c-1b34-4827-9c93-e80b987e9cd7@sirena.org.uk>
-References: <20260930-arm64-gcs-v21-0-3556644cd927@kernel.org>
- <20260930-arm64-gcs-v21-2-3556644cd927@kernel.org>
- <86fqyn2che.wl-maz@kernel.org>
- <as-f1JfUy38Xt9QA@gremlin>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mqHFli7r"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-917bab38b14so9558696d6.3
+        for <kvmarm@lists.linux.dev>; Wed, 14 Oct 2026 14:47:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792014428; cv=none;
+        d=google.com; s=arc-20260327;
+        b=VWwIqxV5qDDBUSqu+Rz7GkamAgiI+BPKcXlfHWOI5BTtBAE8Lk/PgveWc/IaTYLFza
+         jFuVkrUp4qZ8ofMxa+j0CbCBrGIqWPOrprS9ommJYuikdxa4hqaDrlRkQGoUMOy8uWT7
+         tTcpkzWkdCPkwffXV43i0PfS3j3hAOAbdMV6zarz1zyPlskxI+CudSQEKg3cit6BvFLM
+         /0/2Ri/kpXyE4GY5hp6DjgtQX4y/ZFn7icz7jEtG9n5YgvQPwPXG919ZNJmUTKhiNny3
+         HbVbzO1V1d044eUIHfOUqht2FDTD10Pl2+dv1BpvAmlwviKVuwB4DJfJ5UVdKRrWPnGx
+         owjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:dkim-signature;
+        bh=OmdjCtO0BT/G+HosYDOiIQ+MFbY+P6PHIY8xmD++EWw=;
+        fh=BonsMnJ3Kijep3pfj/42JV3miqAuKWgMjBE/BMGeGkw=;
+        b=Kc/h4dhPZLd0sHjRW9HTHcDytslWGVEXEeA5qgFtjqa2j7pF8cZhe6M5IY3V/LCs1L
+         wI/HUG3aIlG49hpYljh5EzRPEmQYiO2aaxH7lkjjgoxsnGIy3tqV2fUVTZjDdw58aMX7
+         oUyYYBqJj8sREgCVJDXJnNJyj29p78hnp0S7hzJB2iz6k3MHgGQj4IowH7CwzEQbGYjJ
+         H/M+jVTW/n4ZgsfwIa88tVh86kznETXzY7bdNCDq2seIe7UaxgOfGEwLI/xTSgconVU0
+         Ag+c5MKt7iMlLfVExYsp4HT1gWl0oHLGfkbpX11yRJRb+Qz6icYlA8kkae2mWzbIP9Eb
+         rBag==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1792014428; x=1792619228; darn=lists.linux.dev;
+        h=content-type:cc:to:subject:message-id:date:mime-version:references
+         :in-reply-to:from:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=OmdjCtO0BT/G+HosYDOiIQ+MFbY+P6PHIY8xmD++EWw=;
+        b=mqHFli7rwFgQHmtkcvvFTPDATz4ZKtKaSWnrO4QJPUuO2kPpFrwH2PZGBKV+7qe32I
+         vdhhxNAaKFHqZpgzfxDNV8+OimgNO0VhP6HG0gW/08nQuqCTU1FS9S0ao7wVaakeA+x+
+         tRaZLGSyHmNa+j4t5+x62Jy28DZoQmvYMCldvU2naTWTacFauJJ1qOkG0vyI45WdSXHy
+         u+sWEfwF2IznfkpTH00fzmsssoPP5yv3AROacARelaDU/kjTm1ZDahWy0N52GGy/ys0q
+         O44tMPk6lnHG1GO88lOQMfkFDaiIX+FwRq/OEY8UgX1Tp4u6AlRDzZ/MMId/eyGhmzjY
+         xUNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792014428; x=1792619228;
+        h=content-type:cc:to:subject:message-id:date:mime-version:references
+         :in-reply-to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=OmdjCtO0BT/G+HosYDOiIQ+MFbY+P6PHIY8xmD++EWw=;
+        b=ct17dpDcIp6+RYPA4KspryMyTvWKYtYVLd9FK0ZGhK6p6JHAqIIZ/R8UHdsXZXuVNf
+         g2yZqsJXg0AcvKHJj587wQrgWs2OLZTOA39whomcNabzTne78mELBY1jppUnUUvbmtY0
+         b8TatWCObSnt0IltbaCflZDbJ2nu/bE1H0Gx1lvAu/6br4e68GsKqy7W+TbvBqLTp4sC
+         S6BjlOLTV0TbHPPcPbPlfzEUfkTttZWLzI/qH956dJtj2dUkLUXk7jQTCnA6ERx8Os6q
+         PCJckhmWLwhh1lFVkx4mnjK3SRdrOUmLI31APAMBPoKFtgEpIGh1bMgIjlwn+rBLgtdl
+         mUoQ==
+X-Forwarded-Encrypted: i=1; AKwUvBya2jnaJA1i9nwD0p2Q1uqJhjNAIDt+GkA4CNmNzMX8etVSATFXIg8ILCP25qlEuallJLJ0mUk=@lists.linux.dev
+X-Gm-Message-State: AFq9FYJwAljEiurbbDKziHKU+Kgg/K25jciyK5QFDfFYdCBsIw9LajTP
+	m2+fbRkZAwwHiHTlQ1NV1/eY88u0vh80xHLAj1Gf6Qa0mSOh7tmhqy5MS0vnrXdQhdAv8M0sDXG
+	GCv7vl6UXp3j7PTjbQJIEapD2RGAgdj3ZlWG7QhNl
+X-Gm-Gg: AYBFou0qFeZ+ikr0VmAbdRy57OPEzGmNqpnH+eeQLNBcbyw99SAobTVr3m2pV8QYJK7
+	si5GKyJStRAbu7AurR/2Vv2nc9rkQsyeSepdCYe6zDECEv8AF29FUi7dVxQUMJNcobyfAa7UlVC
+	tzyFbxKPsWZmjVQGZgVYva3k+Bo9CQOtxtsvnb6wVOEkPOSjSbdobQ/LL6Sb7p0L8jptOCw2MoE
+	3yOijBKjepgmGQE7wuXDJjWyDehuDbI56eOWwyPu3y5QfI2zBpL8DiFzezhWSgK29ONaV2USc4f
+	GXYl5Ldqzx36wR0CydsCPehLYdZ81XfIpcrukszuVJ9He0OPid8DdRelN6/qmVd25y8xNvp6JjL
+	J4PZFNyXph7kqceiBTe9OVXGFETYJByWfQhLEA/VMTmS9zi571xsD
+X-Received: by 2002:a05:6214:43c1:b0:91b:8e06:73f5 with SMTP id
+ 6a1803df08f44-91b8e0680ffmr139578016d6.15.1792014427625; Wed, 14 Oct 2026
+ 14:47:07 -0700 (PDT)
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 14 Oct 2026 14:47:06 -0700
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 14 Oct 2026 14:47:06 -0700
+From: Ackerley Tng <ackerleytng@google.com>
+In-Reply-To: <20261014095702.39676-1-griffoul@gmail.com>
+References: <20260720111259.122911-1-dwmw2@infradead.org> <20261006183235.16576-1-griffoul@gmail.com>
+ <CAEvNRgEseLO+LbkwXrEit0H2LH5Wx-srSvHEMpt0=upPL3tF=g@mail.gmail.com> <20261014095702.39676-1-griffoul@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="gBzASHaWQ8wEZzsB"
-Content-Disposition: inline
-In-Reply-To: <as-f1JfUy38Xt9QA@gremlin>
-X-Cookie: Live free or die.
+Date: Wed, 14 Oct 2026 14:47:06 -0700
+X-Gm-Features: AclHuK_bDoENPFsEJnePb9piUrHFuROo5b9vCnTZ7F3PMjuUH-N1Jl6pvQGbDQg
+Message-ID: <CAEvNRgHtB8j6=9r=txjsKvQM0F85nRN4KW5sdnuv_-Og=cWEfg@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/9] mm: Memory providers for guest_memfd and iommufd
+To: Fred Griffoul <griffoul@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	David Hildenbrand <david@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
+	Robin Murphy <robin.murphy@arm.com>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H . Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>, 
+	Shuah Khan <skhan@linuxfoundation.org>
+Cc: David Woodhouse <dwmw2@infradead.org>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, 
+	Lorenzo Stoakes <ljs@kernel.org>, "Liam R . Howlett" <liam@infradead.org>, Vlastimil Babka <vbabka@kernel.org>, 
+	Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
+Fred Griffoul <griffoul@gmail.com> writes:
 
---gBzASHaWQ8wEZzsB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Ackerley Tng <ackerleytng@google.com> writes:
+>
+>> When the provider wants to revoke the page, the notifications/function
+>> calls flow this way, the last [ENTITY] in the chain actually does the
+>> zapping.
+>>
+>> + [PROVIDER] -> [KVM]
+>> + [PROVIDER] -> [DMABUF] -> [IOMMU]
+>> + [PROVIDER] -> [GUEST_MEMFD] -> [USERSPACE] (AFAICT this was not
+>>   implemented in the RFC.)
+>
+> Thanks for going through it. I have just posted v2:
+>
+>   https://lore.kernel.org/all/20261014093733.90312-1-griffoul@gmail.com/
+>
+> It changes two of these chains. dma-buf is gone: iommufd attaches to
+> the provider file itself, through a small interface in mm. And
+> guest_memfd now maps the file into userspace from the provider's
+> frames, so a revoke also zaps the VMM's mapping:
+>
+>   [PROVIDER] -> [GUEST_MEMFD] -> [KVM], [USERSPACE]
+>   [PROVIDER] -> [IOMMU]
+>
 
-On Wed, Oct 14, 2026 at 04:47:22PM +0100, Lorenzo Stoakes (ARM) wrote:
-> On Sat, Oct 03, 2026 at 01:30:05PM +0100, Marc Zyngier wrote:
+Thanks :)
 
-> > This *absolutely* needs to be data driven, and we're not going back to
-> > over two years ago. We already have most of what is needed in
-> > config.c, and it is only a matter of making sure that S1PxE is only
-> > enabled for the guest if TCR2 and ATS1A are also present. If that
-> > means additional sanitisation of the idregs when finalised, so be it.
+>> IIUC guest_memfd conversions was not illustrated in the RFC: what
+>> happens on a shared -> private conversion?
+>
+> There are none yet. Only VMs of type KVM_X86_DEFAULT_VM can use a
+> provider, so all their memory is shared.
+>
 
-I do agree that's what we should have, I started down that route but as
-I noted in the commit log it felt like I was pulling in disproportionate=20
-refactoring given the existing gap.
+To borrow David's words, the part about this that makes me itch is
+conversion. We have to support conversions. Even if it doesn't merge in
+the first patch series, we have to have line of sight to how conversions
+would work.
 
-> > If userspace decides to expose crap in the ID registers, that's its
-> > own problem, and we're not in the business of enforcing idiotic
-> > configurations. The only thing that matters is that the state that KVM
-> > deals with is consistent.
+Conversion requests originate from the guest and then the host handles
+the guest request by making calling an ioctl on guest_memfd. Hopefully
+this part doesn't change with alternative provider support.
 
-> As I understand it: don't return an error for a configuration that doesn't
-> make sense, enforce RES0 instead.
+Suppose guest_memfd still gets the conversion request first, in RFCv2,
+to reach all the mappings in various page tables, it would have to be
 
-I went with erroring out there to make sure that we didn't make any
-mistakes with the ordering of our checks - I didn't want to accidentally
-end up with a situation where we look at the dependencies for feature A,
-decide that it's OK, then later check feature B which it depends on and
-turn it off due to it missing it's own prerequisite.
++ [GUEST_MEMFD] -> [KVM], [USERSPACE]
++ [GUEST_MEMFD] -> [PROVIDER] -> [IOMMU]
 
-We can resolve that like you've done here by having the full dependency
-stack in every check but I worried that this would be error prone due to
-all the duplication, however looking at your code I think we can resolve
-that anyway, see blow.
+since guest_memfd must ensure no IOMMU mappings to guest private pages?
+There's that extra step through the [PROVIDER]...
 
-Userspace really shouldn't be setting up guests where we need to make
-adjustments in the first place, and setting up guests isn't that hot a
-path so like Marc says so long as KVM protects itself we're fine.
+>> Does your provider need to know if some memory was transitioned between
+>> shared/private states? The provider can be notified too, if
+>> necessary. If not, then isn't guest_memfd doing all the coordination
+>> better than going via the provider?
+>
+> Our provider does not need to know, and I agree: once there is private
+> memory, guest_memfd converts the pages, so it should tell the others
+> what to zap.
+>
+> I think the two models meet there, and the v2 cover letter now says so.
+> The iommufd side of v2 does not pin and keeps no references: it asks for
+> the frame behind each page, treats a page with no frame as a hole, and
+> maps again on a revoke. guest_memfd can offer that for its own file:
+> shared pages return their frames, private pages are holes, and
+> guest_memfd revokes a range whenever it converts it, in either
+> direction. That is your [GUEST_MEMFD] -> [IOMMU], and it should work for
+> folio-backed guest_memfd without memfd_pin_folios() or refcounts, as
+> long as guest_memfd also revokes a range before it frees its folios.
+>
 
->  #define kvm_has_s1pie(k)				\
-> -	(kvm_has_feat((k), ID_AA64MMFR3_EL1, S1PIE, IMP))
-> +	(kvm_has_tcr2(k) &&				\
-> +	 kvm_has_feat((k), ID_AA64ISAR2_EL1, ATS1A, IMP) &&	\
-> +	 kvm_has_feat((k), ID_AA64MMFR3_EL1, S1PIE, IMP))
+This part makes sense, if I'm understanding you correctly.
 
-This will mean that every time we check for an individual feature
-throughout KVM we check for all the dependencies as well.  A lot of the
-time that's not really going to matter but we have these checks in hot
-paths like context switches.
+> The one difference is that v2 also lets iommufd map a provider file
+> directly. Going through guest_memfd would add nothing without private
+> memory: it would only pass each revoke on. And memory that only devices
+> use, such as MMIO, does not go through guest_memfd at all. Both paths
+> would use the same iommufd code.
+>
+>> Does the revocation model work for you? If it helps, I can rebuild the
+>> sample provider to illustrate how the revocation can be done.
+>
+> Yes, the revocation model works for us. v2 replaces David's sample
+> with one that moves, donates and makes pages read-only, and a selftest
+> that checks the guest, the device and the VMM's mapping after each
+> change. It may be a good base if you want to try guest_memfd as the
+> provider for iommufd on top of it.
+>
 
-> +static bool feat_s1pie(struct kvm *kvm)
-> +{
-> +	return kvm_has_s1pie(kvm);
-> +}
+Thanks, I will prototype what I have in mind too to make sure things
+work as I think they will :)
 
-We should put the dependencies in here where they're only checked during
-initialisation instead, that way the hot paths only need to look at the
-leaf features.  We could also deal with the duplication concern by
-having the functions call each other rather than duplicating their
-contents:
-
-	static bool feat_gcs(struct kvm *kvm)
-	{
-		if (!feat_s1pie(kvm))
-			return false;
-
-		return kvm_has_gcs(kvm);
-	}
-
-(or whatever stylistic variation of that.) =20
-
-This approach also needs the code for updating the ID registers since
-config.c doesn't do that at the moment.  Some of the existing visibility
-limiting stuff (like for 32 bit ID registers without AArch32 or
-ID_AA64ZFR0_EL1 without SVE) could be moved over too.
-
-TBH when I said in the commit log I was thinking of something more data
-driven I was thinking more of having the dependencies expressed as pure
-data, more like the way the test in set_id_regs is written.  This also
-seems fine to me, the checks are similar.  It's just much more invasive.
-
---gBzASHaWQ8wEZzsB
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmrPwHQACgkQJNaLcl1U
-h9CR5wf/Wuk4OnY8jsShSYGyT/jXaUVL1JmMxLFVq7VJR3Q9U18Q7X7aNQxEBmTB
-MblTigPUrxmBmSJnBZO19fUPGo/8rz2WOg6vruuGvjhlPlIy8DtfK5zMFE6wj2LK
-tRckwodxThZkNIMri/YbJmkkmJoth7PeE8/uvsWOrfuHqRyyeTgEoeCfAyeBR2HZ
-8M43Q/l6H+UUimfx0mmFoN8Ts0jzAQXQy5zlaypa+riXdDQCWJ2/T2DNlqLyIIHS
-waGqLdgDNILbAaTUastiy4kw3QT5D/YnZ2iT4CsJP9nfXW9O9GGlVqS8IgXfkMrq
-JF/M0vzZDnAfQL9LwvrjqiLcDIK2aA==
-=ae8X
------END PGP SIGNATURE-----
-
---gBzASHaWQ8wEZzsB--
+>> 4. [DIRECTMAP] Kernel direct map.
+>
+> Agreed, that is separate. The memory we have in mind is a range hidden
+> from the host with memmap=, so it is not in the direct map.
+>
+> Thanks,
+> Fred
