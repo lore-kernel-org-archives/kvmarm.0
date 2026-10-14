@@ -1,103 +1,100 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 156DA515962
-	for <kvmarm@lists.linux.dev>; Wed, 14 Oct 2026 13:46:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7E95326AA;
+	Wed, 14 Oct 2026 13:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791985571; cv=none; b=tBqj1SI4/tPgkkjjj/iH6KkXrwKbbBepaPiGE1IGKetGrbOyDRZ8qEMlpnNCY4PUQ4MS1/inMOoAXlZAxKBT7G8eGEWo6kcDQp73G3msMVHoV795K/E7vfLlx5AFTQ9T80/hgU/Rq5/4ICK3cM5d4CRLdxv1A9ZyWak7FV1e16Q=
+	t=1791985697; cv=none; b=OUDj685/5jouGLui3lx9hbWO51dm8QfAUdMpWttikQCsTQSyEjpQzQJOw47EzamIXusu9uTV0qTKzRJnlwsvz7g704hdTk+mHjikMRiZ1PvFHKTA9adeVxXXdOOMI3szxLVpFGngTQZxpihQTAf6qz1zabnp4hdHhKK4gPsh8bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791985571; c=relaxed/simple;
-	bh=0inB59qaRugPpia4kgYwImiOX1wdChUgdWVEES4jPh4=;
+	s=arc-20240116; t=1791985697; c=relaxed/simple;
+	bh=TmOHkYRuvrUgagwVcOvIbXXfLOe4v1DZSdUWKMO7u28=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S7a5kA/YlWw0YFLh1ZxmNYtgmxW2oMWYU1VQ1mlIciGNorxq6rqgZOtn0w3LKWdMzzYJukuB8ezs1c63ql3jUt1cyIWsx/956dmrDaIufd6lk/RyBOe9VprP/MbqVul9Fi1NMQUbb/gTZPoyjxPKgKbCF/F87b7mZzFLoflvVDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=XLyTA9y0; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=lIUBbrC2aBhu8rcVxRZHIELZllICfuSFbD6BkTA+i7uLiJ1IAdcbjl1wqxn3GigtZ5OKGBgXSZMzbQqCGs/aGrujW5f2UXgCAh0NdUW96hHPzl4PKD7LmmZEY7LPxnsBj/ReOguXUY2dok8gE7pG79gsiTKtYq+DWqpAyFZjMQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V+Wp8E3K; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="XLyTA9y0"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EF5521570;
-	Wed, 14 Oct 2026 06:45:59 -0700 (PDT)
-Received: from e142392.arm.com (e142392.arm.com [10.2.213.23])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CD86F3F7B4;
-	Wed, 14 Oct 2026 06:45:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1791985563; bh=0inB59qaRugPpia4kgYwImiOX1wdChUgdWVEES4jPh4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XLyTA9y0OrLaz8C3GXcl3JnMAXQ66bYK5O8u/HZ7Qq+K8glC8UI7jP2OtzZpk0CP1
-	 u7MZF0KLvTL8GIu40bmnzu+cMMY5jFKe+rp5d5i1Hdtd1L1CrPM3DKr2YhtJ+og4Hg
-	 UakRwqZPw+lMfKHNXkonF6t9U8YDl3l/FfVySdbQ=
-Date: Wed, 14 Oct 2026 14:45:52 +0100
-From: Kristina =?utf-8?Q?Mart=C5=A1enko?= <kristina.martsenko@arm.com>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-acpi@vger.kernel.org, 
-	kvmarm@lists.linux.dev, linux-efi@vger.kernel.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	David Hildenbrand <david@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, 
-	Linu Cherian <linu.cherian@arm.com>, Anshuman Khandual <anshuman.khandual@arm.com>, 
-	Lorenzo Pieralisi <lpieralisi@kernel.org>, Hanjun Guo <guohanjun@huawei.com>, 
-	Sudeep Holla <sudeep.holla@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V+Wp8E3K"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 025671F00A2F;
+	Wed, 14 Oct 2026 13:48:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791985694;
+	bh=1qQSURO19kIhXzArX2xPf4oTamNn87j/Xtfb5YjYQeg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=V+Wp8E3KHj5HfarmjhHe8oPbVzrZV+mSoVlO20FAUrZAtZZUSAvDZDvEdIUnMOfWs
+	 PdNFGYrmWub+NN20ADFsWODAqJ3aIsrh+e0rqf6NEtKzTnDVGbFIftvtvYw9KUmM8v
+	 iGP4otTdzMyc8eRi+SNMBLMAdH4SVyy9ZPMTN8W3SsuNA2PnirUtJbaab3cG+2c8ym
+	 dWi6Wa9WJU73sMqDniudv0FvXOFPy9nXKJHHb2eTUks3yFfMZcFaeA1bARgEjo5TrC
+	 r+DoskInDcsRaq/0vcO9ButTC3Nw8nmVHd613gX+AutImHQNrGT4cq/NfYOUWyHI/m
+	 oXmBkDNyfnpXg==
+Date: Wed, 14 Oct 2026 14:48:02 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Ard Biesheuvel <ardb@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Subject: Re: [RFC 03/12] KVM: arm64: Hide TLBID from guest sysregs
-Message-ID: <t7f3l6ewiyenrvsvh3olhwszis4i4zifue6dvlrpgcry5n5b2q@3z7eminzykqr>
-References: <20261001110655.461473-1-kristina.martsenko@arm.com>
- <20261001110655.461473-4-kristina.martsenko@arm.com>
- <20261012081254.483793-A-seiden@linux.ibm.com>
+	Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Mark Rutland <mark.rutland@arm.com>, Randy Dunlap <rdunlap@infradead.org>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	David Hildenbrand <david@kernel.org>, Heiko Carstens <hca@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Shuah Khan <shuah@kernel.org>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Jack Thomson <jackabt@amazon.com>, Jack Thomson <jackabt.amazon@gmail.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Vincent Donnefort <vdonnefort@google.com>, 
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Sean Christopherson <seanjc@google.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Leo Soares Passos <Leo.Bras@arm.com>, 
+	Wei-Lin Chang <weilin.chang@arm.com>, linux-s390@vger.kernel.org
+Subject: Re: [PATCH v4 01/14] KVM: Allow architectures to disallow pre-fault
+Message-ID: <as-H1zaslO-Bwf5q@gremlin>
+References: <20260923-kvm-arm-prefault-v4-0-d4b0b4dfa8c3@kernel.org>
+ <20260923-kvm-arm-prefault-v4-1-d4b0b4dfa8c3@kernel.org>
+ <CA+EHjTzDYSuBVEc+SMdDa41sq-ET=m_oWW0gL9dYf+AumPYPUg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20261012081254.483793-A-seiden@linux.ibm.com>
+In-Reply-To: <CA+EHjTzDYSuBVEc+SMdDa41sq-ET=m_oWW0gL9dYf+AumPYPUg@mail.gmail.com>
 
-On Mon, Oct 12, 2026 at 10:12:54AM +0200, Steffen Eiden wrote:
-> On Thu, Oct 01, 2026 at 12:06:46PM +0100, Kristina Martšenko wrote:
-> > Don't expose FEAT_TLBID to guests. It wouldn't be useful in the general
-> > case since a guest doesn't know which domains exist and its vCPUs can be
-> > moved between any physical CPUs.
-> > 
-> > Try to hide TLBID sysregs and sysreg fields from the guest:
-> > 
-> >   * Report the feature as not supported in the ID register
-> >     ID_AA64MMFR4_EL1.TLBID.
-> > 
-> >   * Configure the TLBIDIDR_EL1 sysreg to UNDEF via the FGU mechanism.
-> >     Sanitize a nested hypervisor's HFGRTR2.nTLBIDIDR.
-> > 
-> >   * Sanitize a nested hypervisor's HCRX.{VTLBIDEn,VTLBIDOSEn,FNB}.
-> > 
-> >   * VTLBID{OS}<n>_EL2 registers are VNCR-backed and not exposed to
-> >     guests (apart from being able to read/write into the VNCR page) so
-> >     no need to handle them in sys_reg_descs or elsewhere.
-> > 
-> >   * The guest is free to set SCTLR2_EL{1,2}.TLBOSNIS, which shouldn't
-> >     matter to KVM.
-> >
-> 
-> What confuse me where a bit that you wrote 'try to hide'.
-> For me this indicates that the hiding process may not be successful.
-> For me the code looks like it will always succeddin hiding the feature
-> from the guest, no? Did I miss anything?
+On Wed, Sep 23, 2026 at 07:52:27PM +0100, Fuad Tabba wrote:
+> Hi Lorenzo,
+>
+> On Wed, 23 Sep 2026 16:15:44 +0100, "Lorenzo Stoakes (ARM)"
+> <ljs@kernel.org> wrote:
+> [...]
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> [...]
+> > +int kvm_arch_pre_fault_allowed(struct kvm_vcpu *vcpu)
+> > +{
+> > +        if (!vcpu->kvm->arch.pre_fault_allowed)
+> > +                return -EOPNOTSUPP;
+> > +
+> > +        return 0;
+> > +}
+>
+> nit: the comment above the smp_rmb() in tdx_sept_map_leaf_spte() still
+> says pre_fault_allowed is read by kvm_arch_vcpu_pre_fault_memory(),
+> but after this patch it's read here.
 
-Sorry for the vague wording. You’re right that we always succeed in
-hiding the feature. What I meant was that there are some parts of the
-feature that we can’t fully hide, because the architecture doesn’t
-provide a way to do it.
+Ack, will chase that up!
 
-Accessing a VTLBID register should ideally cause an UNDEF exception
-(like on a CPU without TLBID), but guest accesses will go to the VNCR
-page instead (which won’t have any effect).
+>
+> Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
 
-> Same for the next patch.
+Thanks!
 
-Executing a TLBIP instruction should also UNDEF, but will succeed. There
-is no way to trap it without also trapping TLBI instructions.
+>
+> Cheers,
+> /fuad
+>
 
-Thanks,
-Kristina
+--
+Cheers, Lorenzo
