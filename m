@@ -1,128 +1,255 @@
-Received: from mta0.migadu.com (out-135.mta0.migadu.com [91.218.175.135])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B59D5448A1
-	for <kvmarm@lists.linux.dev>; Wed, 14 Oct 2026 15:21:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.135
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C26B51D539;
+	Wed, 14 Oct 2026 15:47:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791991296; cv=none; b=qy4TBARsRxsJ+A3jAEG4WJv1MxsKuRhMZNjd33XskFIxSCVF3R9tFRnjXtODCqsxFoH9wduqdiBnQNR7GNclIzTqS6vhD0NKDwL809Nuy233h/+d938knR9yGSAQLdL9Vdsjftf2XkCqpMBySiiaKdEHaycsiVfNQY9p0yh20OU=
+	t=1791992851; cv=none; b=KM5tgNoZfIRKoK/XgScK4KrvAhNefsQsHwZWlA/ED2Eoer3qv/2oUyoGsVHbxUm/FflfSROILA17B1oovp/aZdvEueL5RY9UzbPr0eb80bKzve1VtLVoW1wyAZupCiQt8J7BnwM3hXoNkMdaUf3QOoOEPlZUoe7VqsLEQ0WRzoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791991296; c=relaxed/simple;
-	bh=quvfgFJ++znBLejNnQxBzynex0w2Jk0eO461131buU4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Qc6VyJ3gjyp5vinzn/0nVWNr2mPbAalfEQy0IKaWJ4wzNcigdLvyBKGGYMro9LonCUplpLCUO+3EyLbYjsLAVrLsQfTzoOqdcWbro010u1f1EhvRxzsS+Dxywh5gvlLiWCKQYqyCRkJBr7H/MJ1LDQ5mbcPoQhhsebzQw7b6V3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=e8CQk9tf; arc=none smtp.client-ip=91.218.175.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1791992851; c=relaxed/simple;
+	bh=6otGIeKfClWjbQUXS/YyaNpFrgvGvcQY03U9FnQykwg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EkQN5ZVIAJqX6UQeJTMsB9OERin1dWYAAJZT50OAxavW3NNth14GBIz4H9XN2TClFd+D1/5toE5xb2vs7henP0Z8bFkheXolyPEtlj6oUYtw6ISKFO4YhOeCvxLZmDrkgCvLywDHo9ip3TFQr7PseYPi1TVDpF0dtO/n1RIMFlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dqfG4WfF; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="e8CQk9tf"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=quvfgFJ++znBLejNnQxBzynex0w2Jk0eO461131buU4=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1791991290; v=1; x=1792596090;
- b=e8CQk9tfNeROBWVJjPWdSPlzDmKTaOPsj8JId2r0gB/IMoOjYdXijoQKZyj3lDFRvEI9JKk1
- pBGK1RsEKMWUOXK2GA7JIJZrvsMzE7fUqGHyw5WNiq8hJ8q9Azw+TZIW0Ejl5SJgLBsQ6kChgEn
- LUoOJhJdkWOVJrtnzNAQjo2E=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id ee8959a424782db2;
-	Wed, 14 Oct 2026 15:21:30 +0000
-X-Mizu-Trace-ID: ee8959a424782db2
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5bcbb378fc9so32157e87.0
-        for <kvmarm@lists.linux.dev>; Wed, 14 Oct 2026 08:21:30 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxGdWMOBAou6JEdQumcspf4UVsQQb7Z8u6DyoKWb91p1Xrdb1MARVsZ5lhxUFj8e/Xg4uCaFWc=@lists.linux.dev
-X-Gm-Message-State: AFq9FYKNDtmSD2Zv7KUvTNDtJFWPW3VFWB4elDHkFPpKZyuq8gg0ePgc
-	6d/gzKSpgGYBXjQDw3tue87ONAl9fgaZNgBDmGqb1GLFr/HsBb5F7pB7PMFpu4W80fTjSGy4rQQ
-	J1JvylZdVtU59ZBjpITGqZV1Qhp+GpeRjQSFoIaw3
-X-Received: by 2002:ac2:568c:0:b0:5bc:b2ec:eaee with SMTP id
- 2adb3069b0e04-5be35cac1c5mr118716e87.11.1791991289793; Wed, 14 Oct 2026
- 08:21:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dqfG4WfF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 164EA1F000C4;
+	Wed, 14 Oct 2026 15:47:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791992849;
+	bh=rbTaxtGNsGO6dgPReDaWD0CM9kndZbKd1uV53a/NSu8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=dqfG4WfFMKJxZ9jShdl7o7hbScb8EXezBJoZoHAJjMY2QTexCj+pstW54eXAMefef
+	 BSVJN+lUooUHBK45XcGSqxC8+gBs3YCZQ92pDIzpDYCor00KsGZ+4IvBNV4Z3WGLt7
+	 IHcxFy9I+aWxO4XI8VFjoxlM89KAywkvlNJIl98I5ruCdg1QAskpAgdvTGjmxhN4nI
+	 ObTi0HuPUkkmLi3dAB8FWD3vYG7MRvb9xCkjz+UUI7J1B+eXAwPZN7/UALyAKl38wB
+	 XQuFsrlqIy5YaU9BOo7SHmJrNCQYxpsSLRpk0YsWZ1G7sl5keIuMcC+RZfF61CN+/2
+	 Ieqc9taOqzpFw==
+Date: Wed, 14 Oct 2026 16:47:22 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Mark Brown <broonie@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <fuad.tabba@linux.dev>, Peter Maydell <peter.maydell@linaro.org>, 
+	Leonardo Bras <leo.bras@arm.com>, Wei-Lin Chang <weilin.chang@arm.com>, 
+	Yao Yuan <yaoyuan@linux.alibaba.com>, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v21 02/15] KVM: arm64: Refuse to start a guest with S1PIE
+ or S1POE but not TCR2
+Message-ID: <as-f1JfUy38Xt9QA@gremlin>
+References: <20260930-arm64-gcs-v21-0-3556644cd927@kernel.org>
+ <20260930-arm64-gcs-v21-2-3556644cd927@kernel.org>
+ <86fqyn2che.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <86tsmp20ne.wl-maz@kernel.org> <20261013143338.815377-1-fuad.tabba@linux.dev>
- <86se281k4u.wl-maz@kernel.org>
-In-Reply-To: <86se281k4u.wl-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 14 Oct 2026 16:20:53 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTwnO-G8jx+1RvSUcFyKtGB2vbASzHDjTLeZCPY90dhzJg@mail.gmail.com>
-X-Gm-Features: AclHuK-B5G1xDGXPQoX5Vm0txWNpcPBVZK84TOsBPDslRqCcUXPB_JGF6FjQ5oU
-Message-ID: <CA+EHjTwnO-G8jx+1RvSUcFyKtGB2vbASzHDjTLeZCPY90dhzJg@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] KVM: arm64: vgic-its: Fix LPI double mapping and DISCARD
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86fqyn2che.wl-maz@kernel.org>
 
-Hi Marc,
-
-On Wed, 14 Oct 2026 14:34:09 +0100, Marc Zyngier <maz@kernel.org> wrote:
-[...]
-> I don't think this is right. Yes, it probably does enough request
-> checks that we end-up with not getting it completely wrong, but the
-> issues are that:
+On Sat, Oct 03, 2026 at 01:30:05PM +0100, Marc Zyngier wrote:
+> This *absolutely* needs to be data driven, and we're not going back to
+> over two years ago. We already have most of what is needed in
+> config.c, and it is only a matter of making sure that S1PxE is only
+> enabled for the guest if TCR2 and ATS1A are also present. If that
+> means additional sanitisation of the idregs when finalised, so be it.
 >
-> - we have state change before we evaluate the requests
->
-> - we mix request generation and state change in a single helper
->
-> and we should be able to fix that so that there is only a single
-> request checking point in the whole entry sequence.
+> If userspace decides to expose crap in the ID registers, that's its
+> own problem, and we're not in the business of enforcing idiotic
+> configurations. The only thing that matters is that the state that KVM
+> deals with is consistent.
 
-Agreed, this is cleaner. With the flush after the single request
-check, your run loop is what the second litmus test in my last email
-[1] models (discard+halt+check), which comes out Never under the LKMM.
-On QEMU, with your diff on top of v2, the guest doesn't take the
-discarded LPI in any of 20 runs with the debug hooks forcing the race.
-With NV, vgic_lpi_stress and my DISCARD test pass with the guest at
-vEL2, but I don't have any tests that run an L2 guest.
+As I understand it: don't return an error for a configuration that doesn't
+make sense, enforce RES0 instead.
 
-[...]
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-[...]
-> @@ -1334,18 +1330,19 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->                  smp_store_mb(vcpu->mode, IN_GUEST_MODE);
->
->                  if (ret <= 0 || kvm_vcpu_exit_request(vcpu, &ret)) {
-> -                        vcpu->mode = OUTSIDE_GUEST_MODE;
->                          isb(); /* Ensure work in x_flush_hwstate is committed */
+So I'm guessing something like the below against the series (+ obviously
+adjusting tests to reflect that)?
 
-I think you can drop this isb() too. It was added so that the early
-exit's vgic sync would read back consistent GIC state after the flush
-had written it (771621b0e2f8).
+Cheers, Lorenzo
 
-[...]
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-[...]
-> @@ -2054,6 +2057,11 @@ void kvm_nested_flush_hwstate(struct kvm_vcpu *vcpu)
->
->          if (unlikely(vcpu_test_and_clear_flag(vcpu, NESTED_SERROR_PENDING)))
->                  kvm_inject_serror_esr(vcpu, vcpu_get_vsesr(vcpu));
-> +
-> +        vgic_v3_nested_update_mi(vcpu);
-> +
-> +        if (vgic_state_is_nested(vcpu) && kvm_vgic_vcpu_pending_irq(vcpu))
-> +                kvm_make_request(KVM_REQ_GUEST_HYP_IRQ_PENDING, vcpu);
+----8<----
+From b10625d0147f74504141da1f0c837b3b2bdd3d37 Mon Sep 17 00:00:00 2001
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Date: Wed, 14 Oct 2026 16:31:13 +0100
+Subject: [PATCH] tmp
 
-This now runs before kvm_pmu_flush_hwstate(), so a PMU overflow raised
-there isn't queued yet when the pending check runs, and the vCPU goes
-round the loop once more (the injection's KVM_REQ_IRQ_PENDING still
-stops the entry). Would it make sense to call
-kvm_nested_flush_hwstate() after kvm_pmu_flush_hwstate() instead?
+---
+ arch/arm64/include/asm/kvm_host.h |  7 ++++++-
+ arch/arm64/kvm/config.c           | 35 ++++++++++++++++++++++---------
+ arch/arm64/kvm/sys_regs.c         | 24 ---------------------
+ 3 files changed, 31 insertions(+), 35 deletions(-)
 
-Patch 2 depends on your run-loop change, so I'll wait for it and for
-your series with the pauses and the LPI-disabling fix, and rebase both
-patches on top for v3.
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 0eee9845324b..d5ba9867927f 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1626,10 +1626,14 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
+ 	(kvm_has_feat((k), ID_AA64MMFR3_EL1, TCRX, IMP))
 
-Cheers,
-/fuad
+ #define kvm_has_s1pie(k)				\
+-	(kvm_has_feat((k), ID_AA64MMFR3_EL1, S1PIE, IMP))
++	(kvm_has_tcr2(k) &&				\
++	 kvm_has_feat((k), ID_AA64ISAR2_EL1, ATS1A, IMP) &&	\
++	 kvm_has_feat((k), ID_AA64MMFR3_EL1, S1PIE, IMP))
 
-[1] https://lore.kernel.org/all/20261013143338.815377-1-fuad.tabba@linux.dev/
+ #define kvm_has_s1poe(k)				\
+ 	(system_supports_poe() &&			\
++	 kvm_has_tcr2(k) &&				\
++	 kvm_has_feat((k), ID_AA64ISAR2_EL1, ATS1A, IMP) &&	\
+ 	 kvm_has_feat((k), ID_AA64MMFR3_EL1, S1POE, IMP))
+
+ #define kvm_has_ras(k)					\
+@@ -1640,6 +1644,7 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
+
+ #define kvm_has_gcs(k)					\
+ 	(system_supports_gcs() &&			\
++	 kvm_has_s1pie(k) &&				\
+ 	 kvm_has_feat((k), ID_AA64PFR1_EL1, GCS, IMP))
+
+ static inline bool kvm_arch_has_irq_bypass(void)
+diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+index 1053676551af..58dab9cb2c04 100644
+--- a/arch/arm64/kvm/config.c
++++ b/arch/arm64/kvm/config.c
+@@ -232,6 +232,21 @@ static bool not_feat_aa64el3(struct kvm *kvm)
+ 	return !kvm_has_feat(kvm, FEAT_AA64EL3);
+ }
+
++static bool feat_s1pie(struct kvm *kvm)
++{
++	return kvm_has_s1pie(kvm);
++}
++
++static bool feat_s1poe(struct kvm *kvm)
++{
++	return kvm_has_s1poe(kvm);
++}
++
++static bool feat_gcs(struct kvm *kvm)
++{
++	return kvm_has_gcs(kvm);
++}
++
+ static bool feat_nv2(struct kvm *kvm)
+ {
+ 	return ((kvm_has_feat(kvm, ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY) &&
+@@ -393,17 +408,17 @@ static const struct reg_bits_to_feat_map hfgrtr_feat_map[] = {
+ 	NEEDS_FEAT(HFGRTR_EL2_nS2POR_EL1, FEAT_S2POE),
+ 	NEEDS_FEAT(HFGRTR_EL2_nPOR_EL1		|
+ 		   HFGRTR_EL2_nPOR_EL0,
+-		   FEAT_S1POE),
++		   feat_s1poe),
+ 	NEEDS_FEAT(HFGRTR_EL2_nPIR_EL1		|
+ 		   HFGRTR_EL2_nPIRE0_EL1,
+-		   FEAT_S1PIE),
++		   feat_s1pie),
+ 	NEEDS_FEAT(HFGRTR_EL2_nRCWMASK_EL1, FEAT_THE),
+ 	NEEDS_FEAT(HFGRTR_EL2_nTPIDR2_EL0	|
+ 		   HFGRTR_EL2_nSMPRI_EL1,
+ 		   FEAT_SME),
+ 	NEEDS_FEAT(HFGRTR_EL2_nGCS_EL1		|
+ 		   HFGRTR_EL2_nGCS_EL0,
+-		   FEAT_GCS),
++		   feat_gcs),
+ 	NEEDS_FEAT(HFGRTR_EL2_nACCDATA_EL1, FEAT_LS64_ACCDATA),
+ 	NEEDS_FEAT(HFGRTR_EL2_ERXADDR_EL1	|
+ 		   HFGRTR_EL2_ERXMISCn_EL1	|
+@@ -474,17 +489,17 @@ static const struct reg_bits_to_feat_map hfgwtr_feat_map[] = {
+ 	NEEDS_FEAT(HFGWTR_EL2_nS2POR_EL1, FEAT_S2POE),
+ 	NEEDS_FEAT(HFGWTR_EL2_nPOR_EL1		|
+ 		   HFGWTR_EL2_nPOR_EL0,
+-		   FEAT_S1POE),
++		   feat_s1poe),
+ 	NEEDS_FEAT(HFGWTR_EL2_nPIR_EL1		|
+ 		   HFGWTR_EL2_nPIRE0_EL1,
+-		   FEAT_S1PIE),
++		   feat_s1pie),
+ 	NEEDS_FEAT(HFGWTR_EL2_nRCWMASK_EL1, FEAT_THE),
+ 	NEEDS_FEAT(HFGWTR_EL2_nTPIDR2_EL0	|
+ 		   HFGWTR_EL2_nSMPRI_EL1,
+ 		   FEAT_SME),
+ 	NEEDS_FEAT(HFGWTR_EL2_nGCS_EL1		|
+ 		   HFGWTR_EL2_nGCS_EL0,
+-		   FEAT_GCS),
++		   feat_gcs),
+ 	NEEDS_FEAT(HFGWTR_EL2_nACCDATA_EL1, FEAT_LS64_ACCDATA),
+ 	NEEDS_FEAT(HFGWTR_EL2_ERXADDR_EL1	|
+ 		   HFGWTR_EL2_ERXMISCn_EL1	|
+@@ -674,7 +689,7 @@ static const struct reg_bits_to_feat_map hfgitr_feat_map[] = {
+ 	NEEDS_FEAT(HFGITR_EL2_nGCSEPP		|
+ 		   HFGITR_EL2_nGCSSTR_EL1	|
+ 		   HFGITR_EL2_nGCSPUSHM_EL1,
+-		   FEAT_GCS),
++		   feat_gcs),
+ 	NEEDS_FEAT(HFGITR_EL2_nBRBIALL		|
+ 		   HFGITR_EL2_nBRBINJ,
+ 		   FEAT_BRBE),
+@@ -913,7 +928,7 @@ static const struct reg_bits_to_feat_map hcrx_feat_map[] = {
+ 	NEEDS_FEAT(HCRX_EL2_SRMASKEn, FEAT_SRMASK),
+ 	NEEDS_FEAT(HCRX_EL2_PACMEn, feat_pauth_lr),
+ 	NEEDS_FEAT(HCRX_EL2_EnFPM, FEAT_FPMR),
+-	NEEDS_FEAT(HCRX_EL2_GCSEn, FEAT_GCS),
++	NEEDS_FEAT(HCRX_EL2_GCSEn, feat_gcs),
+ 	NEEDS_FEAT(HCRX_EL2_EnIDCP128, FEAT_SYSREG128),
+ 	NEEDS_FEAT(HCRX_EL2_EnSDERR, feat_aderr),
+ 	NEEDS_FEAT(HCRX_EL2_TMEA, FEAT_DoubleFault2),
+@@ -1062,8 +1077,8 @@ static const struct reg_bits_to_feat_map tcr2_el2_feat_map[] = {
+ 	NEEDS_FEAT(TCR2_EL2_AIE, FEAT_AIE),
+ 	NEEDS_FEAT(TCR2_EL2_POE		|
+ 		   TCR2_EL2_E0POE,
+-		   FEAT_S1POE),
+-	NEEDS_FEAT(TCR2_EL2_PIE, FEAT_S1PIE),
++		   feat_s1poe),
++	NEEDS_FEAT(TCR2_EL2_PIE, feat_s1pie),
+ 	FORCE_RES0(TCR2_EL2_RES0),
+ 	FORCE_RES1(TCR2_EL2_RES1),
+ };
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 3e016ac40427..de48d2d1d761 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -5938,27 +5938,6 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
+ 	mutex_unlock(&kvm->arch.config_lock);
+ }
+
+-/*
+- * Some optimisations in fast paths would be broken by architecturally
+- * invalid feature combinations, reject those.
+- *
+- * This should share code with the host kernel cpufeature code, and
+- * make use of the MRS to generate dependencies.
+- */
+-static bool kvm_validate_id_regs(struct kvm *kvm)
+-{
+-	if (kvm_has_s1pie(kvm) && !kvm_has_tcr2(kvm))
+-		return false;
+-
+-	if (kvm_has_s1poe(kvm) && !kvm_has_tcr2(kvm))
+-		return false;
+-
+-	if (kvm_has_gcs(kvm) && !kvm_has_s1pie(kvm))
+-		return false;
+-
+-	return true;
+-}
+-
+ /*
+  * Perform last adjustments to the ID registers that are implied by the
+  * configuration outside of the ID regs themselves, as well as any
+@@ -6027,9 +6006,6 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
+ 		kvm_vgic_finalize_idregs(kvm);
+ 	}
+
+-	if (!kvm_validate_id_regs(vcpu->kvm))
+-		return -EINVAL;
+-
+ 	return 0;
+ }
+
+--
+2.56.0
