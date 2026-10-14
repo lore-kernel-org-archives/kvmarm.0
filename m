@@ -1,33 +1,33 @@
-Received: from mta1.migadu.com (out-2.mta1.migadu.com [95.215.58.2])
+Received: from mta0.migadu.com (out-49.mta0.migadu.com [91.218.175.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B385038ED
-	for <kvmarm@lists.linux.dev>; Wed, 14 Oct 2026 12:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9494F052E
+	for <kvmarm@lists.linux.dev>; Wed, 14 Oct 2026 12:55:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791982529; cv=none; b=nH1B0khxa9fxtbFTEqcvnMTBhAcesYyM0Rv4qZtajrsXt315vZnS/LNovtcEOqfcGQ7v1Nj0mZ4rwWtmGRlNfMlmQmgykkeIVoIoc9yVH1ZKzBqt5YfextQOV+DPMLiOlEUzxq5iAw5IpJF+xCybknDAe/6LMalpmwZFDF5OwLw=
+	t=1791982538; cv=none; b=N5lWDER347Ztx9qbOddSAEGJcVFW1QsV1I0ReCfcucG6c/PqkHAgiZd4C+suHrSOMDg6JBZdvSAOhvDSz0tOzKBXo5cT2vcEN2JwVRLaOqMXzZEsGWM83oF2pp/4QjiLIUIftbS4BxqFSynTmeGObmI5+qB1tybqiYMrowRm7FM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791982529; c=relaxed/simple;
-	bh=1W+NOG2Vc3f+T8d2kTd9wvETY+8H8YtcVIfzWtcM8hs=;
+	s=arc-20240116; t=1791982538; c=relaxed/simple;
+	bh=e+MP2KA6xny3o+tRYZFFnshoyISqoWQeWDPwKAXnGkA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Pfy3b6rlDVjdrYMOJ1kxoM/O4Gx6N19O6hKh+nA09pVDL/VUwzoGgnBGkEUf0117eGbxpjP0viO1vNPmXmgFPtjsFM9TslcWd+pSpvW3ldHJjgLdGKl7xwCzk0TVOD0nOysBwxKAe/Cd9c5bH7f+GVljxF/5zZvXQDJhqFJy1XE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dntljhIZ; arc=none smtp.client-ip=95.215.58.2
+	 MIME-Version; b=pKudbS8qYwjg8O0hU3UsID1Ar1iBMCI3AU/GK19ehpQCAZPfTkoC3N+VOnfQVAA/KHO/cd2cxtacHxja72asAfTohg+/3aYuosDXrASNXw/MtAuQmkd6ZWSi0XYUJ0Dm/X1rFdlSvz2GQThN6nuqesocaJRJcYgufT3x/0LpaOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FcRRnnjT; arc=none smtp.client-ip=91.218.175.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dntljhIZ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FcRRnnjT"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=1W+NOG2Vc3f+T8d2kTd9wvETY+8H8YtcVIfzWtcM8hs=;
+DKIM-Signature: a=rsa-sha256; bh=e+MP2KA6xny3o+tRYZFFnshoyISqoWQeWDPwKAXnGkA=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1791982518; v=1; x=1792587318;
- b=dntljhIZwyLxEF7g2/rFr503mVZCDevPVkqarcveV3KUbbF3t54IaiBuVSEnJVAq0hCTtnC1
- WVmHEIHjDi+rnHey4KyHZWziXvPYZQSSZlQuCAf2veCeJy8vMj1cvXjo5rd5C4PCkWEDA4hRJpy
- rBIMnazP2f87SCL//w4+b4rQ=
+ t=1791982526; v=1; x=1792587326;
+ b=FcRRnnjTXNZGdlK9P+Foh7cLqKvOm10EoSCY5ob9GFEFiEp5XHZD8C9tQJJuzTsEf40U7qBI
+ 3f91clEuroUsaIq8DzhJ2NpzuoIVh/sEFijyPO/Df/m8VHYmAfFciEwWa906wBnyFd4RmrvDQEI
+ QpXBHViuhax3piLjWFV5DSHk=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 439495e9f5d2f512;
-	Wed, 14 Oct 2026 12:55:14 +0000
-X-Mizu-Trace-ID: 439495e9f5d2f512
+Received: by smtp.migadu.com with ESMTPS id 2f84a68d7f29c388;
+	Wed, 14 Oct 2026 12:55:22 +0000
+X-Mizu-Trace-ID: 2f84a68d7f29c388
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -45,9 +45,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] KVM: arm64: Track physical CPU number at EL2
-Date: Wed, 14 Oct 2026 13:55:09 +0100
-Message-Id: <20261014125510.2928306-2-fuad.tabba@linux.dev>
+Subject: [PATCH 2/2] KVM: arm64: Ensure TLBs and I-cache are private to each vCPU in pKVM
+Date: Wed, 14 Oct 2026 13:55:10 +0100
+Message-Id: <20261014125510.2928306-3-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20261014125510.2928306-1-fuad.tabba@linux.dev>
 References: <20261014125510.2928306-1-fuad.tabba@linux.dev>
@@ -59,69 +59,138 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The nVHE hypervisor has no equivalent of smp_processor_id(), so EL2 code
-has no index for the CPU it runs on.
+All vCPUs of a VM share its VMID, so KVM flushes a physical CPU's TLBs
+and I-cache for the VM whenever a different vCPU of that VM is loaded
+there (vcpu_prepare_mmu()). Commit fce886a602073 ("KVM: arm64: Plumb the
+pKVM MMU in KVM") moved pKVM guests, protected or not, onto the
+hypervisor's stage-2 and VMID, and the host stopped flushing for them.
+Nothing at EL2 flushes instead, so a vCPU can hit TLB and I-cache
+entries that another vCPU of the same VM left on that CPU.
 
-Add a hyp per-CPU hyp_cpu_number, which the host writes in
-cpu_prepare_hyp_mode() before it's deprivileged, and a
-hyp_smp_processor_id() accessor to read it. The next patch uses it to
-index per-CPU state in a hyp VM.
+Track the last vCPU loaded on each physical CPU in the hyp VM, and flush
+at EL2 in __pkvm_vcpu_load() when it changes.
 
+Fixes: fce886a602073 ("KVM: arm64: Plumb the pKVM MMU in KVM")
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/include/asm/kvm_hyp.h  | 3 +++
- arch/arm64/kvm/arm.c              | 3 +++
- arch/arm64/kvm/hyp/nvhe/hyp-smp.c | 2 ++
- 3 files changed, 8 insertions(+)
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  3 +++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c     |  8 ++++++++
+ arch/arm64/kvm/hyp/nvhe/pkvm.c         | 21 ++++++++++++++++++---
+ 3 files changed, 29 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index b0e42be3d9eef..6c4169a14b73e 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -16,6 +16,9 @@
- DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
- DECLARE_PER_CPU(unsigned long, kvm_hyp_vector);
- DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
-+DECLARE_PER_CPU(int, hyp_cpu_number);
-+
-+#define hyp_smp_processor_id() (__this_cpu_read(hyp_cpu_number))
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+index 9abfe6b7e942b..02c8fc7a10904 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+@@ -54,6 +54,9 @@ struct pkvm_hyp_vm {
+ 	unsigned short refcount;
+ 	hyp_spinlock_t lock;
  
- /*
-  * Unified accessors for registers that have a different encoding
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index d593ba9280933..0dd6667f1beea 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -116,6 +116,7 @@ DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
- 
- DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_base);
- DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
-+DECLARE_KVM_NVHE_PER_CPU(int, hyp_cpu_number);
- 
- DECLARE_KVM_NVHE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
- 
-@@ -2351,6 +2352,8 @@ static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
- 	struct kvm_nvhe_init_params *params = per_cpu_ptr_nvhe_sym(kvm_init_params, cpu);
- 	unsigned long tcr;
- 
-+	*per_cpu_ptr_nvhe_sym(hyp_cpu_number, cpu) = cpu;
++	/* Per physical CPU, the vcpu_idx of the last vCPU of this VM loaded there. */
++	int *last_vcpu_ran;
 +
  	/*
- 	 * Calculate the raw per-cpu offset without a translation from the
- 	 * kernel's mapping to the linear mapping, and store it in tpidr_el2
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-index 04d194583f1e4..9fcb92abd0b57 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-@@ -8,6 +8,8 @@
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
+ 	 * The vCPU initialised RUNNABLE: claimed under vm_table_lock,
+ 	 * released only if its own init fails.
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index d715aa942577e..f0b77236c871e 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -827,11 +827,19 @@ DEFINE_KVM_HOST_HCALL(void, __pkvm_vcpu_load,
+ 	pkvm_handle_t, handle, unsigned int, vcpu_idx, u64, hcr_el2)
+ {
+ 	struct pkvm_hyp_vcpu *hyp_vcpu;
++	int *last_ran;
  
-+DEFINE_PER_CPU(int, hyp_cpu_number);
+ 	hyp_vcpu = pkvm_load_hyp_vcpu(handle, vcpu_idx);
+ 	if (!hyp_vcpu)
+ 		return;
+ 
++	/* TLBs and I-cache are private to each vCPU, see vcpu_prepare_mmu(). */
++	last_ran = &pkvm_hyp_vcpu_to_hyp_vm(hyp_vcpu)->last_vcpu_ran[hyp_smp_processor_id()];
++	if (*last_ran != vcpu_idx) {
++		__kvm_flush_cpu_context(hyp_vcpu->vcpu.arch.hw_mmu);
++		*last_ran = vcpu_idx;
++	}
 +
- /*
-  * nVHE copy of data structures tracking available CPU cores.
-  * Only entries for CPUs that were online at KVM init are populated.
+ 	if (pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
+ 		u64 dfr0 = read_sysreg(id_aa64dfr0_el1);
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index ac020d0501d2e..f18fa762746c9 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -489,10 +489,11 @@ static void unpin_host_vcpus(struct pkvm_hyp_vcpu *hyp_vcpus[],
+ }
+ 
+ static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
+-			     unsigned int nr_vcpus, pkvm_handle_t handle)
++			     int *last_vcpu_ran, unsigned int nr_vcpus, pkvm_handle_t handle)
+ {
+ 	struct kvm_s2_mmu *mmu = &hyp_vm->kvm.arch.mmu;
+ 	int idx = vm_handle_to_idx(handle);
++	unsigned long cpu;
+ 
+ 	hyp_vm->kvm.arch.pkvm.handle = handle;
+ 
+@@ -512,6 +513,10 @@ static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
+ 	mmu->vtcr = host_mmu.arch.mmu.vtcr;
+ 	mmu->arch = &hyp_vm->kvm.arch;
+ 	mmu->pgt = &hyp_vm->pgt;
++
++	for (cpu = 0; cpu < hyp_nr_cpus; cpu++)
++		last_vcpu_ran[cpu] = -1;
++	hyp_vm->last_vcpu_ran = last_vcpu_ran;
+ }
+ 
+ static int pkvm_vcpu_init_sve(struct pkvm_hyp_vcpu *hyp_vcpu, struct kvm_vcpu *host_vcpu)
+@@ -887,6 +892,7 @@ int __pkvm_init_vm(struct kvm *host_kvm, void __kern *pgd_hva)
+ 	size_t vm_size, pgd_size;
+ 	unsigned int nr_vcpus;
+ 	pkvm_handle_t handle;
++	int *last_vcpu_ran;
+ 	void *pgd = NULL;
+ 	int ret;
+ 
+@@ -915,13 +921,19 @@ int __pkvm_init_vm(struct kvm *host_kvm, void __kern *pgd_hva)
+ 		goto err_unpin_kvm;
+ 	}
+ 
++	last_vcpu_ran = hyp_alloc(array_size(hyp_nr_cpus, sizeof(*last_vcpu_ran)));
++	if (!last_vcpu_ran) {
++		ret = hyp_alloc_errno();
++		goto err_free_hyp_vm;
++	}
++
+ 	ret = -ENOMEM;
+ 
+ 	pgd = map_donated_memory_noclear(pgd_hva, pgd_size);
+ 	if (!pgd)
+-		goto err_free_hyp_vm;
++		goto err_free_last_ran;
+ 
+-	init_pkvm_hyp_vm(host_kvm, hyp_vm, nr_vcpus, handle);
++	init_pkvm_hyp_vm(host_kvm, hyp_vm, last_vcpu_ran, nr_vcpus, handle);
+ 
+ 	ret = kvm_guest_prepare_stage2(hyp_vm, pgd);
+ 	if (ret)
+@@ -938,6 +950,8 @@ int __pkvm_init_vm(struct kvm *host_kvm, void __kern *pgd_hva)
+ 	kvm_guest_destroy_stage2(hyp_vm);
+ err_remove_mappings:
+ 	unmap_donated_memory(pgd, pgd_size);
++err_free_last_ran:
++	hyp_free(last_vcpu_ran);
+ err_free_hyp_vm:
+ 	hyp_free(hyp_vm);
+ err_unpin_kvm:
+@@ -1112,6 +1126,7 @@ int __pkvm_finalize_teardown_vm(pkvm_handle_t handle)
+ 		hyp_free(hyp_vcpu);
+ 	}
+ 
++	hyp_free(hyp_vm->last_vcpu_ran);
+ 	hyp_free(hyp_vm);
+ 	hyp_unpin_shared_mem(host_kvm, host_kvm + 1);
+ 	return 0;
 -- 
 2.39.5
 
