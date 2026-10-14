@@ -1,95 +1,96 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A421A4BD36E;
-	Wed, 14 Oct 2026 12:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mta0.migadu.com (out-31.mta0.migadu.com [91.218.175.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4F94AA1F2
+	for <kvmarm@lists.linux.dev>; Wed, 14 Oct 2026 12:55:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791981666; cv=none; b=qxC0kEP+0QkKzQVYA8AYex+jfoh1dgNcFng4X40NBHjGBMog/DPDypVQE4+89/95uXfIPkTsQg1XWlMvWStw2k7VCANpTMdrGDmeMaGZqx9yErCnFmfah8QcZKjYjmhBGBBQe6F+4QTeaIatEAluiMkWdossiiph6Zy+cTTiyUY=
+	t=1791982525; cv=none; b=UMOM9/OKdTa05AFBhDMRQLxKTK+YfsWDEOORtP6EiyMDXnTzRuuhLqmXMneJ8z+p4nZ2HmSM+YiG22wf6ZQrtp1fs7hDXFfDG0isDXuSB84ODNXCIilIh2Osw5z0A7qlgQisALZN70SaVb+/Oh9mxdm5F81XCG83TEBoDOGJP+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791981666; c=relaxed/simple;
-	bh=DsC4q+4yg6eLHkPxNVJf1vPqliSRaUMAYV//mcmB3hs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mepoXH8cWoPbQNH4P2te78b1XqAJ7wTKkrID4hUS9J5eagESjRuqGGyoMY71TLbfQeyPgjlabC4JVD/HubxEqUyShx7BzuKB5wRpTejbdzTI0l7Kva3Jfx3aB+fAVA1AeHXVGiI0hV+UNkPgzqBxB3Fl/oz2VxAj5h2/DF8VSdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ROgEgrXY; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1791982525; c=relaxed/simple;
+	bh=pJBToGHsJMC6/kg5jWs+Mtib+z5TjGaiaQJZnJjpmkk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Dtnv5IxVt9ru7ykLZ8WKsk6v7BzJTfqL2Tg+k7PHcEVsK4xeiezMAsGbomAFlFtQUVo+PEYvElfC12C7EVlzMvIJGVFeM5eVN5LVTm4cF14ztBxH4nZJMHcaOHYGyeq7mnsryKBWbO2GK4/FhToZO0yb8MaecYN5+gzSI64vxow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WPaBA/Hw; arc=none smtp.client-ip=91.218.175.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ROgEgrXY"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 55DFF153B;
-	Wed, 14 Oct 2026 05:41:00 -0700 (PDT)
-Received: from [10.57.9.28] (unknown [10.57.9.28])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6BA443FA32;
-	Wed, 14 Oct 2026 05:41:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1791981663; bh=DsC4q+4yg6eLHkPxNVJf1vPqliSRaUMAYV//mcmB3hs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ROgEgrXYixPVhlypL/B3nQZg0NGcVidZSj5LI1vGmvHnBWnkZBR3nmYvDZqFGSXoa
-	 rdsP3QHD0SE3MVRl57iZU0wCiBlAPMEVTuQ9oaL6PFoH/0DWlnAFhwODlogUaspq8p
-	 27yz/Hkuy71iI+sCFzo3yKRvT8q61TcwFRVNFsX8=
-Message-ID: <d943b66a-c779-4b85-a7c6-d73ef9941dd9@arm.com>
-Date: Wed, 14 Oct 2026 13:40:58 +0100
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WPaBA/Hw"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=pJBToGHsJMC6/kg5jWs+Mtib+z5TjGaiaQJZnJjpmkk=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1791982513; v=1; x=1792587313;
+ b=WPaBA/HwgY+tZeMAg6kf+GOwzWUpq9ktnmYc9UmzX87qeVgLYJgJ4j8HMnDwqh5iRAqLuOXN
+ WUPG9uFRz2OdgMsZ5MiKFu7xaTGj/GmqAsZMXOS9Ixv2sKKXjwqrSz7PeKfCu4qS2t3Kd6sRChp
+ s6RoZ+duXicG38/1/q5bU1gY=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 8a582e26eeccef1c;
+	Wed, 14 Oct 2026 12:55:10 +0000
+X-Mizu-Trace-ID: 8a582e26eeccef1c
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Fuad Tabba <tabba@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] KVM: arm64: Per-vCPU TLB and I-cache flush in pKVM
+Date: Wed, 14 Oct 2026 13:55:08 +0100
+Message-Id: <20261014125510.2928306-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v22 02/10] firmware: arm_rmm: Check for RMI support at
- init
-Content-Language: en-GB
-To: Sudeep Holla <sudeep.holla@kernel.org>, Gavin Shan <gshan@redhat.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
- will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
- aneesh.kumar@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
- tabba@google.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev,
- gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com,
- alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com,
- lpieralisi@kernel.org, enju.kohei@fujitsu.com,
- jonathan.cameron@oss.qualcomm.com
-References: <20261002061507.1600269-1-suzuki.poulose@arm.com>
- <20261002061507.1600269-3-suzuki.poulose@arm.com>
- <2586e689-c27d-4e4c-8c69-03e24259cb96@redhat.com>
- <8be050e3-8af1-4f04-902f-9bc01b209dd0@arm.com>
- <3fbd4739-a4eb-4428-95ae-ead22e7cf9f2@redhat.com>
- <799fb810-c33e-4d0e-9a70-7092c0a681ff@arm.com>
- <0ceda99f-0352-474b-a30a-c5e79b817c2d@redhat.com>
- <ade8dd16-4f09-47d0-a821-636ca4c62565@arm.com>
- <20261014-victorious-prompt-kelpie-cf3a87@sudeepholla>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20261014-victorious-prompt-kelpie-cf3a87@sudeepholla>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 14/10/2026 13:05, Sudeep Holla wrote:
-> On Wed, Oct 14, 2026 at 12:06:54PM +0100, Suzuki K Poulose wrote:
-> 
-> [...]
-> 
->>
->> Then it is RMM's problem if it doesn't check that the right level of
->> SMCCC version is not implemented by the EL3. Also, where do we stop
->> the checks ? e.g., We need SMCCC >= v1.3, when SVE is supported.
->> And >= v1.4 if SME is supported. Shouldn't we leave this to the RMM
->> to verify on init and fail the init ? I can raise this with the
->> tf-RMM team.
-> 
-> Fair enough for v1.3+/SME/SVE checks, but RMI interface relying on more
-> that 8 input registers for one or more of it's interfaces (e.g.
-> RSI_ATTESTATION_TOKEN_INIT, RSI_MEASUREMENT_EXTEND, ...etc) indicate
-> it can't work with SMCCC v1.1 or below
+Hi folks,
 
-Fyi, those are RSI interfaces (Realm Guest facing) and we could add the
-checks there. This series is the Host facing interface. That said I
-will send a fixup to add the check for v1.2 for RMI too.
+Since 6.14, protected and non-protected pKVM guests run on the
+hypervisor's VMID. The host no longer flushes a CPU's TLBs and I-cache
+when a different vCPU of the same VM is loaded there, so vCPUs of one
+guest can hit each other's entries. This series adds the flush at EL2.
 
-Thanks for the feedback, both!
+An earlier version of these patches was in Will's pKVM base series in
+2022 [1], but didn't make it into its later versions.
 
-Cheers
-Suzuki
+This series is based on kvmarm/next because the hyp VM is allocated with
+hyp_alloc() there, and the per-CPU array it adds is allocated the same
+way.
 
-> .
-> So IMO check for v1.2+ is completely justified here.
-> 
+Based on kvmarm/next (dd0bc00e3e920).
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20220519134204.5379-1-will@kernel.org/
+
+Fuad Tabba (2):
+  KVM: arm64: Track physical CPU number at EL2
+  KVM: arm64: Ensure TLBs and I-cache are private to each vCPU in pKVM
+
+ arch/arm64/include/asm/kvm_hyp.h       |  3 +++
+ arch/arm64/kvm/arm.c                   |  3 +++
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  3 +++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c     |  8 ++++++++
+ arch/arm64/kvm/hyp/nvhe/hyp-smp.c      |  2 ++
+ arch/arm64/kvm/hyp/nvhe/pkvm.c         | 21 ++++++++++++++++++---
+ 6 files changed, 37 insertions(+), 3 deletions(-)
+
+
+base-commit: dd0bc00e3e9201fd49b62ff9cc07890c89003afe
+-- 
+2.39.5
 
