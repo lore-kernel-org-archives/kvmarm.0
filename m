@@ -1,81 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-135.mta0.migadu.com [91.218.175.135])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED92853445B;
-	Wed, 14 Oct 2026 13:53:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B59D5448A1
+	for <kvmarm@lists.linux.dev>; Wed, 14 Oct 2026 15:21:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.135
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791985987; cv=none; b=agqJ+2UrPO29QBE6h4UtFqL7U+2RKrVjrM2QByNdfl5oMpBU/vZ3h5A5/Nl56kvYtAl6QbY74EwAsDOkVfX9hwtsiu1XO0D17sXyUi09mVlF9aowI8o+Sxirx8OrH89UtahGeRGUspO/zH+1o3NisrPDRPd04hXk1pzPgqwSvOo=
+	t=1791991296; cv=none; b=qy4TBARsRxsJ+A3jAEG4WJv1MxsKuRhMZNjd33XskFIxSCVF3R9tFRnjXtODCqsxFoH9wduqdiBnQNR7GNclIzTqS6vhD0NKDwL809Nuy233h/+d938knR9yGSAQLdL9Vdsjftf2XkCqpMBySiiaKdEHaycsiVfNQY9p0yh20OU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791985987; c=relaxed/simple;
-	bh=YX3oKQFid4+2wlIQM4M+cUy+JgcjW23uXS4Jv7bE5d4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=des4qQDYdwjJk5DM3Nv/lgjqtXvi/lbdpCLRLvkBBVJJTmyLeXMecTmbD8+yaMerr5KnM/eQj9pGqP8vwUCwEdJ0jqbcS7gOj/+eDERjGDudsCVIIHtAF76CBzxU6wnLclr8qxybRdeNmDVBbKDb23vlym9Ot7Q89jOwcIA2snc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m6UV0s6N; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791991296; c=relaxed/simple;
+	bh=quvfgFJ++znBLejNnQxBzynex0w2Jk0eO461131buU4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Qc6VyJ3gjyp5vinzn/0nVWNr2mPbAalfEQy0IKaWJ4wzNcigdLvyBKGGYMro9LonCUplpLCUO+3EyLbYjsLAVrLsQfTzoOqdcWbro010u1f1EhvRxzsS+Dxywh5gvlLiWCKQYqyCRkJBr7H/MJ1LDQ5mbcPoQhhsebzQw7b6V3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=e8CQk9tf; arc=none smtp.client-ip=91.218.175.135
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m6UV0s6N"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96ED41F00A2F;
-	Wed, 14 Oct 2026 13:52:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791985984;
-	bh=YX3oKQFid4+2wlIQM4M+cUy+JgcjW23uXS4Jv7bE5d4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=m6UV0s6NCYtNAyc6gKXbw6p9xcuxFVBgz5sETFnNcoD0b1VSadNMRLxMSDoEp2R0Z
-	 ayMNY2TEmre09azqpKckR2WqLRK6xI1sh0wse7E66Lbl1T1BIVN3UHs+zoSnMvZn+G
-	 smIZ7v01RFqJzpD0xouqoSw1WA6HZSMOfXW3qZHSVx+nmeONzvToNNiwdGZBMT1AJ+
-	 VPtgfE1NfwAl2DfNA93srycj8qJkEmFXS02M+zWFA5otycQ3r2ZEz3EXXi9PaCLWzm
-	 bVlKEGMeias/1TNIwPaTh9Cnu9Hlkolp95ua3rzDNdpFsKtBOqkz/3/XiiiV2Slwv8
-	 SehyAc2HzLzSg==
-Date: Wed, 14 Oct 2026 14:52:51 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Mark Rutland <mark.rutland@arm.com>, Randy Dunlap <rdunlap@infradead.org>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	David Hildenbrand <david@kernel.org>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Shuah Khan <shuah@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Jack Thomson <jackabt@amazon.com>, Jack Thomson <jackabt.amazon@gmail.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Vincent Donnefort <vdonnefort@google.com>, 
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Sean Christopherson <seanjc@google.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Leo Soares Passos <Leo.Bras@arm.com>, 
-	Wei-Lin Chang <weilin.chang@arm.com>, linux-s390@vger.kernel.org
-Subject: Re: [PATCH v4 01/14] KVM: Allow architectures to disallow pre-fault
-Message-ID: <as-I8TN27Kz6HS1Q@gremlin>
-References: <20260923-kvm-arm-prefault-v4-0-d4b0b4dfa8c3@kernel.org>
- <20260923-kvm-arm-prefault-v4-1-d4b0b4dfa8c3@kernel.org>
- <CA+EHjTzDYSuBVEc+SMdDa41sq-ET=m_oWW0gL9dYf+AumPYPUg@mail.gmail.com>
- <as-H1zaslO-Bwf5q@gremlin>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="e8CQk9tf"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=quvfgFJ++znBLejNnQxBzynex0w2Jk0eO461131buU4=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1791991290; v=1; x=1792596090;
+ b=e8CQk9tfNeROBWVJjPWdSPlzDmKTaOPsj8JId2r0gB/IMoOjYdXijoQKZyj3lDFRvEI9JKk1
+ pBGK1RsEKMWUOXK2GA7JIJZrvsMzE7fUqGHyw5WNiq8hJ8q9Azw+TZIW0Ejl5SJgLBsQ6kChgEn
+ LUoOJhJdkWOVJrtnzNAQjo2E=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id ee8959a424782db2;
+	Wed, 14 Oct 2026 15:21:30 +0000
+X-Mizu-Trace-ID: ee8959a424782db2
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5bcbb378fc9so32157e87.0
+        for <kvmarm@lists.linux.dev>; Wed, 14 Oct 2026 08:21:30 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBxGdWMOBAou6JEdQumcspf4UVsQQb7Z8u6DyoKWb91p1Xrdb1MARVsZ5lhxUFj8e/Xg4uCaFWc=@lists.linux.dev
+X-Gm-Message-State: AFq9FYKNDtmSD2Zv7KUvTNDtJFWPW3VFWB4elDHkFPpKZyuq8gg0ePgc
+	6d/gzKSpgGYBXjQDw3tue87ONAl9fgaZNgBDmGqb1GLFr/HsBb5F7pB7PMFpu4W80fTjSGy4rQQ
+	J1JvylZdVtU59ZBjpITGqZV1Qhp+GpeRjQSFoIaw3
+X-Received: by 2002:ac2:568c:0:b0:5bc:b2ec:eaee with SMTP id
+ 2adb3069b0e04-5be35cac1c5mr118716e87.11.1791991289793; Wed, 14 Oct 2026
+ 08:21:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <as-H1zaslO-Bwf5q@gremlin>
+References: <86tsmp20ne.wl-maz@kernel.org> <20261013143338.815377-1-fuad.tabba@linux.dev>
+ <86se281k4u.wl-maz@kernel.org>
+In-Reply-To: <86se281k4u.wl-maz@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Wed, 14 Oct 2026 16:20:53 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTwnO-G8jx+1RvSUcFyKtGB2vbASzHDjTLeZCPY90dhzJg@mail.gmail.com>
+X-Gm-Features: AclHuK-B5G1xDGXPQoX5Vm0txWNpcPBVZK84TOsBPDslRqCcUXPB_JGF6FjQ5oU
+Message-ID: <CA+EHjTwnO-G8jx+1RvSUcFyKtGB2vbASzHDjTLeZCPY90dhzJg@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] KVM: arm64: vgic-its: Fix LPI double mapping and DISCARD
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Oct 14, 2026 at 02:48:02PM +0100, Lorenzo Stoakes (ARM) wrote:
-> On Wed, Sep 23, 2026 at 07:52:27PM +0100, Fuad Tabba wrote:
-> > nit: the comment above the smp_rmb() in tdx_sept_map_leaf_spte() still
-> > says pre_fault_allowed is read by kvm_arch_vcpu_pre_fault_memory(),
-> > but after this patch it's read here.
+Hi Marc,
+
+On Wed, 14 Oct 2026 14:34:09 +0100, Marc Zyngier <maz@kernel.org> wrote:
+[...]
+> I don't think this is right. Yes, it probably does enough request
+> checks that we end-up with not getting it completely wrong, but the
+> issues are that:
 >
-> Ack, will chase that up!
+> - we have state change before we evaluate the requests
+>
+> - we mix request generation and state change in a single helper
+>
+> and we should be able to fix that so that there is only a single
+> request checking point in the whole entry sequence.
 
-Oops disregard!
+Agreed, this is cleaner. With the flush after the single request
+check, your run loop is what the second litmus test in my last email
+[1] models (discard+halt+check), which comes out Never under the LKMM.
+On QEMU, with your diff on top of v2, the guest doesn't take the
+discarded LPI in any of 20 runs with the debug hooks forcing the race.
+With NV, vgic_lpi_stress and my DISCARD test pass with the guest at
+vEL2, but I don't have any tests that run an L2 guest.
 
-My mail client managed to confuse me :P I see that Marc already fixed this up.
+[...]
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+[...]
+> @@ -1334,18 +1330,19 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>                  smp_store_mb(vcpu->mode, IN_GUEST_MODE);
+>
+>                  if (ret <= 0 || kvm_vcpu_exit_request(vcpu, &ret)) {
+> -                        vcpu->mode = OUTSIDE_GUEST_MODE;
+>                          isb(); /* Ensure work in x_flush_hwstate is committed */
 
---
-Cheers, Lorenzo
+I think you can drop this isb() too. It was added so that the early
+exit's vgic sync would read back consistent GIC state after the flush
+had written it (771621b0e2f8).
+
+[...]
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+[...]
+> @@ -2054,6 +2057,11 @@ void kvm_nested_flush_hwstate(struct kvm_vcpu *vcpu)
+>
+>          if (unlikely(vcpu_test_and_clear_flag(vcpu, NESTED_SERROR_PENDING)))
+>                  kvm_inject_serror_esr(vcpu, vcpu_get_vsesr(vcpu));
+> +
+> +        vgic_v3_nested_update_mi(vcpu);
+> +
+> +        if (vgic_state_is_nested(vcpu) && kvm_vgic_vcpu_pending_irq(vcpu))
+> +                kvm_make_request(KVM_REQ_GUEST_HYP_IRQ_PENDING, vcpu);
+
+This now runs before kvm_pmu_flush_hwstate(), so a PMU overflow raised
+there isn't queued yet when the pending check runs, and the vCPU goes
+round the loop once more (the injection's KVM_REQ_IRQ_PENDING still
+stops the entry). Would it make sense to call
+kvm_nested_flush_hwstate() after kvm_pmu_flush_hwstate() instead?
+
+Patch 2 depends on your run-loop change, so I'll wait for it and for
+your series with the pauses and the LPI-disabling fix, and rebase both
+patches on top for v3.
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20261013143338.815377-1-fuad.tabba@linux.dev/
