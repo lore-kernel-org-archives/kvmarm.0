@@ -1,281 +1,117 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7422248EC72
-	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 10:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492E051AEDD
+	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 11:33:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792059932; cv=none; b=E3TuvGvIX3azfWWR4XoYDWJdNOqEqvRGwM1Uafjy/ERBw9BchmlqTzfII9GpUi1QH0rCbikWUxvfho14uQe1lEocJbrFWSY2vxZqJlqAmemFVhmJcGjYYhtVrZPFVwHg/wyCZOEg3Xr8K0I1SuOBljYjZMeriYLaYzkhEy4rBD0=
+	t=1792064007; cv=none; b=GO2MYUNF00KryVSOH3HRKhY8mDgy/p0siJeldH43uk3OT9Xfq2BiclDAlplNSTFbd728bZhE9iboyVfJ4e6aNT1BCELtOmTAc9w0MRPNRGx3FBOvUhspo3HNxSUpnkLCM64w7hb0DPrG9cIkHIDI/a9aTUfguX/QB2jPrgIyNng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792059932; c=relaxed/simple;
-	bh=sGbHk5FDbz32VFe9pXscVJPbQ6k08fJgWHw3LqabAHc=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ohUKhdKJgIX0vo2MYTXnClr8VASIKh0W5c9DPnngI2kzddrJhsxgA2hR92rDLMvDnQ3z0KXzqQKGv6gx/xxZC/VZ8hTDjL+qmj38x3IXUtC/xe3owI9WGpe3EGdGHptRfETn4pg1nqBocN+ogVCvgb/rTKW/BTqsRV569xOt/IE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=vKSGvAjX; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1792064007; c=relaxed/simple;
+	bh=fgA/DOzOgyFrie7kteFJYTL3C5kdV1edAhl0ExNfxMo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=cj2qzBmMXOnpuvkHnp3YiHrJ/IAw0h8t81i0SKqLhsFmqF/c/JWXCBI0vUQGbXnhMPUBaKpSAj9arZsu3VlgSTupNpbL/sXBOdDufREjYlWyBgwFIaMVKgHUqZoT4BtntgN1gmVcH1SQFa/qT0xTrgkSsmDI0SwR9BAjGvOHLeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XmaifPs8; arc=none smtp.client-ip=209.85.128.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="vKSGvAjX"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 74A8D143D;
-	Thu, 15 Oct 2026 03:25:26 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E37763F871;
-	Thu, 15 Oct 2026 03:25:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792059929; bh=sGbHk5FDbz32VFe9pXscVJPbQ6k08fJgWHw3LqabAHc=;
-	h=Date:From:To:Subject:References:In-Reply-To:From;
-	b=vKSGvAjXtSB+OFC5IiRfz05LDiq0TLIbJkeg6ZXjto/Zcxk8gPcWLTHI7cGgpUH/p
-	 J/SYN6MJmQ7Kkvg1lRYsVds5mULFbMOnylpVrD1Y5ZAjWRsGcsCoPxJ77NzHFsz0Sw
-	 WyokOTq42LoQUpu5CzUHlhQ3ReAKIvhq7K7nXGvM=
-Date: Thu, 15 Oct 2026 11:25:25 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev,
-	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, will@kernel.org, mark.rutland@arm.com,
-	linux-perf-users@vger.kernel.org, catalin.marinas@arm.com,
-	james.clark@linaro.org
-Subject: Re: [RFC PATCH v7 00/28] KVM: arm64: Add Statistical Profiling
- Extension (SPE) support
-Message-ID: <atCqFRdGzFq5dOdT@raptor>
-References: <20260903160623.315525-1-alexandru.elisei@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XmaifPs8"
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-49febef74e3so56122345e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 04:33:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1792063998; x=1792668798; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=34I5YMYZwWqkMn99f1ZPfTg1ZL3IhEhk5unHI1E/+wY=;
+        b=XmaifPs8aTu/kx0hkJRkWM3yUXFvFxyRNlyY+n7JFyz1c10ZkI7jexWN8YYHcEhr/A
+         bJ6dk/zYQ9+Imbcn6+Jh/DVYP85L3CNOSanFrEs9TZ3F2MVFsLJ57BRpTaDSuQU4ottv
+         JOXom0iUoTcS1kJTzSvb0/6VDyfGFiYh3hJoZCJ6Gz41Y9hYxi8/6Yo9mhahJgiDlX6m
+         DBegkLj5m6ydBDtovYWukELpGpV4bfwZpeFPRyXissl0bbfJMwd3Ok98FZw6nALWb+1A
+         YvLyZXr0vZh5G+kSZmn44xUVmSJtI5tJ78WmJ4PpCeTN9fhrR180slG4npj4n192l5JU
+         ZtZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792063998; x=1792668798;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=34I5YMYZwWqkMn99f1ZPfTg1ZL3IhEhk5unHI1E/+wY=;
+        b=gn2QR2KSfCqyjO56arOuzQdgkfztQyb9N3IMzjEXSYGnnRlbvNz3JVoDgqg6LLcoVz
+         tUHEvhDAmebjsTizdHM/cYT6OYXkv1BBpNG8CO7P3Un43zb44GGYN+yGnJ/GpkIgw8jO
+         zOK2gN5MlkqdqBuhlo3ClokZ5h+unfZfQ7hYIRWtD1L+lnzVciqfaF/KlRi3sKRk3NTQ
+         5CiuZHaxebELkvVdmlh1g0es2NiFlLZ3zWH49PmQhpJtXLrqUx4M7//ockpbObWx0sXY
+         yqXShgOuej2pEkf/BeOCeq5Re7/EAZbjIzR3AKOk2BVU17cHV5EzQF9WwcAJi0mwUVkE
+         K42Q==
+X-Forwarded-Encrypted: i=1; AKwUvBx8AQZp4I6NDumIqNFUbY6EhccfjtVF7C4d5e7YQe8E8TtdQbOX9FFFTGnA2PWNLLpnzQCDXYc=@lists.linux.dev
+X-Gm-Message-State: AFq9FYLOjkhiwGS3ceDnASjUmmpIypUa5AhviuoAouGg6C+Hr4acv/cp
+	giapf8JlZVb0uN8ayFj+5zRfw7LYJy7RQApzYKcGEtpET+zk10nmnrLy71AX/BxmjfHXaEvJ8Ln
+	CcgDLvqcoGO1aCd4U0NH9qg==
+X-Received: from wmbjq7.prod.google.com ([2002:a05:600c:55c7:b0:4a1:939b:a0c5])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:83cf:b0:4a1:ac66:604b with SMTP id 5b1f17b1804b1-4a1ac666a65mr165997135e9.1.1792063998106;
+ Thu, 15 Oct 2026 04:33:18 -0700 (PDT)
+Date: Thu, 15 Oct 2026 12:28:14 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260903160623.315525-1-alexandru.elisei@arm.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.385.gd3acb90ef8-goog
+Message-ID: <20261015112814.332084-1-vdonnefort@google.com>
+Subject: [PATCH v1] tracing/remotes: Fix TRACE_REMOTE build when TRACING=n
+From: Vincent Donnefort <vdonnefort@google.com>
+To: rostedt@goodmis.org, mhiramat@kernel.org, 
+	linux-trace-kernel@vger.kernel.org
+Cc: mathieu.desnoyers@efficios.com, kernel-team@android.com, 
+	linux-kernel@vger.kernel.org, maz@kernel.org, oupton@kernel.org, 
+	kvmarm@lists.linux.dev, Vincent Donnefort <vdonnefort@google.com>, stable@vger.kernel.org, 
+	kernel test robot <lkp@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Oliver, Marc,
+TRACE_REMOTE relies on tracefs, eventfs and ring-buffer which are only
+built and declared when TRACING is enabled. It is however possible for a
+config to have FTRACE=y TRACING=n and TRACE_REMOTE=y.
 
-Gentle ping regarding this series. Is there something you want me to do to make
-reviewing easier? Do you want me to rebase it on top of v7.4-rc1 when it comes
-out? Something else?
+To fix this configuration, have TRACE_REMOTE select TRACING directly,
+just like other FTRACE options do and drop the TRACING dependency from
+NVHE_EL2_TRACING to avoid a circular Kconfig dependency.
 
-Thanks,
-Alex
+Cc: stable@vger.kernel.org
+Fixes: ea908a2b79c8 ("tracing: Add a trace remote module for testing")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202610142301.GBepPVmS-lkp@intel.com/
+Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+---
+ arch/arm64/kvm/Kconfig | 2 +-
+ kernel/trace/Kconfig   | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-On Thu, Sep 03, 2026 at 05:05:55PM +0100, Alexandru Elisei wrote:
-> For a description of the problem, and why using gup doesn't work, see the
-> previous iteration of the series, version v6 [1].
-> 
-> This series is based on v7.3-rc1.
-> 
-> I've completely changed the approach yet again, but I've kept Reviewed-by tags
-> for the some of the prerequisite patches. The highlights are:
-> 
-> * The entire memory is effectively pinned at stage 2 before the first VCPU is
-> run by having userspace use guest_memfd to back VM memory and then doing
-> KVM_PRE_FAULT_MEMORY on that memory.
-> 
-> This change alone simplifies the code immensly.
-> 
-> * The maximum buffer size does not need to be virtualized since the entire VM
-> memory is pinned, which means that PMBIDR_EL1 doesn't need to be trapped.
-> SPE features cannot be completely hidden from the guest, as some of them (most
-> of them?) add new fields to the records. The end result: PMBIDR_EL1 and
-> PMSIDR_EL1 don't need to be trapped, so the dependency on FEAT_FGT is dropped.
-> 
-> * It works with the SPE host driver built as a module; KVM requires that the
-> module is loaded for SPE to be virtualized.
-> 
-> The end result is that KVM support is mostly reduced to the userspace ABI to
-> configure the feature and context switching the SPE state.
-> 
-> 
-> Prerequisites
-> =============
-> 
-> There are several prerequisites:
-> 
-> * The series depends on KVM_PRE_FAULT_MEMORY being implemented for arm64.
-> There are two different implementations of that on the mailing list: [2], [3]. I
-> have chosen to use the series from Jack Thomson [2] (rebased on top of v7.3-rc1
-> + the SPE patches) for the simple reason that it doesn't change the way KVM
-> handles stage 2 faults, and can be cherry-picked *after* the KVM SPE patches, to
-> allow sashiko to review the SPE patches.
-> 
-> * A patch to explicitely ignore MMU notifiers for guest_memfd-only memslots. The
-> patch is on Sean's radar to be merged once he finishes fixing a bug in a related
-> area [4].
-> 
-> I believe that it is possible to have memory unmapped from stage 2 (it involves
-> automatic NUMA balancing and userspace explicitly setting a mempolicy), but
-> haven't tested that; the patch codifies that guest_memfd memory should never be
-> unmapped without userspace requesting it (userspace can unmap the memory from
-> stage 2 by closing the guest_memfd file descriptor or punching a hole in the
-> descriptor).
-> 
-> * Patches to add dirty page logging support to guest_memfd-only memslots
-> (rebased on top of v7.3-rc1 + the SPE patches), as it's impossible today to
-> change the flags for a guest_memfd-backed memslot. These patches were sent to
-> the mailing list [5], and as far as I can tell the conclusion was that allowing
-> dirty page logging is a goal to be pursued for guest_memfd memslots. If we do
-> decide that dirty page logging for a VM with SPE is useful, I'm planning to
-> revisit dirty page logging for guest_memfd.
-> 
-> A branch with the prerequisites **after** the SPE series can be found at [6].
-> The prequisites come after the SPE patches so I can send this series with an
-> upstream base commit, which allows sashiko to review them.
-> 
-> kvmtool patches are at [7], and kvm-unit-tests are at [8].
-> 
-> 
-> How it works
-> ============
-> 
-> 1. Userspace sets the KVM_ARM_VCPU_SPE VCPU feature for all VCPUs, configures
-> the SPE interrupt number (required), assigns a SPE PMU instance to the VM
-> (required) and then calls KVM_ARM_VCPU_SPE_INIT to finalise configuration. All
-> of this is done via KVM_SET_DEVICE_ATTR on each VCPU.
-> 
-> Once the VCPU feature is set, KVM_ARM_VCPU_SPE_INIT must be executed before a
-> VCPU can be run.
-> 
-> 2. Userspace uses guest_memfd-backed memslots to represent guest memory, and
-> pre-maps that memory at stage 2 using KVM_PRE_FAULT_MEMORY.
-> 
-> The order between steps 1 and 2 does not matter.
-> 
-> 3. Userspace runs the VCPU(s).
-> 
-> For a VM with SPE, KVM will not check if memslots are backed by guest_memfd,
-> because KVM cannot know which memslots the guest will use as RAM and which have
-> a different use, even if they are not read-only. For example, pvtime.
-> 
-> To create a VM with SPE enabled with kvmtool:
-> 
-> # modprobe arm_spe_pmu # If not already loaded or built-in
-> $ lkvm run --kernel <image> --spe --guest-memfd --name spe-test --params "kpti=off <other_params>"
-> 
-> To test dirty page logging with kvmtool, use the debug interface:
-> 
-> # Create a VM with the name spe-test, as above, then:
-> $ lkvm debug --name spe-test --enable-dirty-track # to enable dirty page logging
-> or
-> $ lkvm debug --name spe-test --disable-dirty-track # to disable dirty page logging
-> 
-> To run the tests from kvm-unit-tests:
-> 
-> $ configure --arch=arm64 --cross-prefix=<cross_compile> --target=kvmtool
-> $ make clean && make
-> $ KVMTOOL=<path/to/kvmtool/binary> ./run_tests.sh -g spe
-> 
-> 
-> Migration
-> =========
-> 
-> This is tricky (read: hacky). Relying on KVM fixing up stage 2 faults triggered
-> SPE attempting to write to memory that is read-only doesn't really work, because
-> a partial record might be written to the buffer (PMBSR_EL1.DL set). To recover
-> from this, KVM, or better yet, the VMM, would need to learn to parse the buffer
-> and rewind PMBPTR_EL1 to the first by after the last complete record.
-> 
-> So what I did instead was to introduce a new hardware exit reason, and have
-> VCPUs which have the buffer enabled exit to userspace when dirty page logging is
-> enabled. A VCPU also exits to userspace if the buffer was disabled when dirty
-> page logging was enabled, and the buffer later becomes enabled, before dirty page
-> logging is disabled.
-> 
-> When dirty page logging is disabled, the stage 2 permissions are relaxed to
-> allow writes. The gory details are in patch #27 ("KVM: arm64: Handle dirty page
-> logging when SPE feature is set").
-> 
-> [1] https://lore.kernel.org/kvmarm/20251114160717.163230-1-alexandru.elisei@arm.com/
-> [2] https://lore.kernel.org/kvmarm/20260612162354.73378-3-jackabt.amazon@gmail.com/
-> [3] https://lore.kernel.org/kvmarm/20260825-kvm-arm-prefault-v1-0-befe8947702e@kernel.org/
-> [4] https://lore.kernel.org/kvmarm/amPCdAswlk24Xilf@google.com/
-> [5] https://lore.kernel.org/kvmarm/20260702142912.6395-1-alexandru.elisei@arm.com/
-> [6] https://gitlab.arm.com/linux-arm/linux-ae/-/tree/kvm-spe-v7
-> [7] https://gitlab.arm.com/linux-arm/kvmtool-ae/-/tree/kvm-spe-v7
-> [8] https://gitlab.arm.com/linux-arm/kvm-unit-tests-ae/-/tree/kvm-spe-v7
-> 
-> Alexandru Elisei (26):
->   arm64/sysreg: Add the nVM field to PMBLIMITR_EL1
->   arm64/sysreg: Define MDCR_EL2.E2PB values
->   KVM: arm64: Add CONFIG_KVM_ARM_SPE Kconfig option
->   perf: arm_spe_pmu: Move struct arm_spe_pmu to a separate header file
->   perf: arm_spe_pmu: Add PMBIDR_EL1 and PMSIDR_EL1 to struct arm_spe_pmu
->   KVM: arm64: Add KVM_CAP_ARM_SPE capability
->   KVM: arm64: Add KVM_ARM_VCPU_SPE VCPU feature
->   HACK! KVM: arm64: Disable SPE virtualization if protected KVM is
->     enabled
->   HACK! KVM: arm64: Enable SPE virtualization only in VHE mode
->   HACK! KVM: arm64: Disable SPE virtualization if nested virt is enabled
->   KVM: arm64: Add SPE VCPU device attribute to set the SPE device
->   KVM: arm64: Add SPE VCPU device attribute to initialize SPE
->   KVM: arm64: Use PMSVer from the assigned SPE instance
->   KVM: arm64: Add SPE system registers to VCPU context
->   KVM: arm64: Apply a RES0 mask to PMBLIMITR_EL1 writes
->   KVM: arm64: config: Use functions from spe.c to test
->     FEAT_SPE_{FnE,FDS}
->   KVM: arm64: VHE: Context switch SPE state
->   KVM: arm64: Allow guest SPE physical timestamps only if kernel allows
->     it
->   KVM: arm64: Handle SPE maintenance interrupts
->   arm64: errata: Disable SPE in KVM
->   KVM: arm64: Add kvm-arm.ignore_spe_errata kernel parameter
->   arm64: errata: Don't enable guest buffer if misprogrammed
->   KVM: arm64: at: Use callback for reading descriptor
->   KVM: arm64: Map memory on a SPE stage 2 fault
->   KVM: arm64: Handle dirty page logging when SPE feature is set
->   KVM: arm64: Allow the creation of a SPE enabled VM
-> 
-> Sudeep Holla (2):
->   KVM: arm64: Add a new VCPU device control group for SPE
->   KVM: arm64: Add SPE VCPU device attribute to set the interrupt number
-> 
->  .../admin-guide/kernel-parameters.txt         |   3 +
->  Documentation/arch/arm64/silicon-errata.rst   |  37 +
->  Documentation/virt/kvm/api.rst                |  19 +-
->  Documentation/virt/kvm/devices/vcpu.rst       |  84 +++
->  arch/arm64/Kconfig                            |  55 ++
->  arch/arm64/include/asm/kvm_asm.h              |   1 +
->  arch/arm64/include/asm/kvm_host.h             |  48 +-
->  arch/arm64/include/asm/kvm_hyp.h              |  26 +-
->  arch/arm64/include/asm/kvm_mmu.h              |   1 +
->  arch/arm64/include/asm/kvm_nested.h           |   7 +
->  arch/arm64/include/asm/kvm_pgtable.h          |  19 +
->  arch/arm64/include/asm/kvm_pkvm.h             |   1 +
->  arch/arm64/include/asm/kvm_spe.h              | 150 ++++
->  arch/arm64/include/uapi/asm/kvm.h             |   6 +
->  arch/arm64/kernel/cpu_errata.c                |  51 ++
->  arch/arm64/kvm/Kconfig                        |  10 +
->  arch/arm64/kvm/Makefile                       |   1 +
->  arch/arm64/kvm/arm.c                          |  98 ++-
->  arch/arm64/kvm/at.c                           |  22 +-
->  arch/arm64/kvm/config.c                       |  30 +-
->  arch/arm64/kvm/guest.c                        |  12 +
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   2 +-
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  34 +-
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         |   7 +-
->  arch/arm64/kvm/hyp/pgtable.c                  |   8 +
->  arch/arm64/kvm/hyp/vhe/Makefile               |   1 +
->  arch/arm64/kvm/hyp/vhe/debug-sr.c             |  18 +
->  arch/arm64/kvm/hyp/vhe/spe-sr.c               | 212 ++++++
->  arch/arm64/kvm/hyp/vhe/switch.c               |   9 +
->  arch/arm64/kvm/mmu.c                          |  72 ++
->  arch/arm64/kvm/nested.c                       |   7 +-
->  arch/arm64/kvm/pkvm.c                         |  27 +
->  arch/arm64/kvm/pmu-emul.c                     |  11 +-
->  arch/arm64/kvm/spe.c                          | 647 ++++++++++++++++++
->  arch/arm64/kvm/sys_regs.c                     | 103 ++-
->  arch/arm64/tools/cpucaps                      |   2 +
->  arch/arm64/tools/sysreg                       |  11 +-
->  drivers/perf/arm_spe_pmu.c                    |  46 +-
->  include/linux/perf/arm_spe_pmu.h              |  66 ++
->  include/uapi/linux/kvm.h                      |   1 +
->  40 files changed, 1849 insertions(+), 116 deletions(-)
->  create mode 100644 arch/arm64/include/asm/kvm_spe.h
->  create mode 100644 arch/arm64/kvm/hyp/vhe/spe-sr.c
->  create mode 100644 arch/arm64/kvm/spe.c
->  create mode 100644 include/linux/perf/arm_spe_pmu.h
-> 
-> 
-> base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
-> -- 
-> 2.43.0
-> 
-> 
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 449154f9a485..e179b8ad79e8 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -74,7 +74,7 @@ if NVHE_EL2_DEBUG
+ 
+ config NVHE_EL2_TRACING
+ 	bool
+-	depends on TRACING && FTRACE
++	depends on FTRACE
+ 	select TRACE_REMOTE
+ 	default y
+ 
+diff --git a/kernel/trace/Kconfig b/kernel/trace/Kconfig
+index 0ab5916575a9..6587450cfcd1 100644
+--- a/kernel/trace/Kconfig
++++ b/kernel/trace/Kconfig
+@@ -1329,6 +1329,7 @@ source "kernel/trace/rv/Kconfig"
+ 
+ config TRACE_REMOTE
+ 	bool
++	select TRACING
+ 
+ config SIMPLE_RING_BUFFER
+ 	bool
+
+base-commit: 24a19b953e2a3d0ea5a8c4951a0ab8f32720c907
+-- 
+2.56.0.385.gd3acb90ef8-goog
+
