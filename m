@@ -1,118 +1,117 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29AF52E079;
-	Thu, 15 Oct 2026 14:43:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E1C3AA518;
+	Thu, 15 Oct 2026 14:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792075438; cv=none; b=nV9aIR4SQEFp4xuVSQjVXGbXGOjo97MSi4aMOQexrjWdoFgFUASPOq3/lKJuYv/Jiwg54P0iKt0vVLDNNut1VubSi1HBvHQT5aL1NuueHGgu5cRSfQxHOsrESOe3UU05Ip8NlE+1a/9aKVjgSqUH7sHSNPVUarok8v4saecUgRM=
+	t=1792075453; cv=none; b=D7u9SCwbxUnQ2+I/t2GV4nUgAFSupDuCCkzHSq7ECU3sR6LsVkKGKdVNvjj2jOZfRcIUli5sJvfxVP+0sYtW1lg0nDPtBbn4DhM47dSF0u3p/phGu9FXYfu1tgNh7PWFm28VnH18ys2hcjC+khZ8sGMDicrHTHAm8PCGlE472rA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792075438; c=relaxed/simple;
-	bh=cwBBsbZKOmL49togvkugJG4Goqkmfe3BPDPL0rdtV4Q=;
+	s=arc-20240116; t=1792075453; c=relaxed/simple;
+	bh=6HZ2EJeaBRzMwQJee5p1grA8MrvE8bTCMFJm5GIB5c8=;
 	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=Lw1uyVW1mBo4Gv3yTDKyQjJGL9ytu/bQro2yO/aDy83SyhaxFJxx7NkTqix/H3u6DZB2ObbQpU3sV4tB36WEDDUHDoONM6YvWYpCQTw8912zidDw4T8UY2qoKVI28OJy3Rb2Xy9TkbTQBw/qtLRMZl9n3vnH6KUHD4nC457xSoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ti4tLAbK; arc=none smtp.client-ip=100.103.45.18
+	 Date; b=R0uFx/oHwiG184Y2jSo0r7aM7QT3h24i0ebCFpwVz2iQ7DbToCJZ7yTlkwdPx+1luV0J+AaB9wWqwLO96qLxVVnL7p+AikmrEmeb0UQrdqgyesePxA+/zRP4tAraxNkwM818FlBNIrlu7ghABcqmOLPSZg0K8t+QAKtLKDai+Pw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TOo1oVXD; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ti4tLAbK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB4B91F000C6;
-	Thu, 15 Oct 2026 14:43:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TOo1oVXD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2A971F000C4;
+	Thu, 15 Oct 2026 14:44:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792075436;
-	bh=bCgCeShaQBxK36aaYtu1vNQnmk+/QwKKcoQ12igVn6c=;
+	s=k20260515; t=1792075452;
+	bh=z+CDkoCSZLN1MOVhIw3dKh4lpkaRSWDSWyNkXPNjypY=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Ti4tLAbKEi3c9h+C09FYpavN1JYeUZpPzg5l+0XWfKEVJgktQbuA2CWWFZtBRSfDP
-	 /aT84B7TQ/nBIUhsUUYMv+i0tS2HxJ4L610Xz/aOyJL0h/z/0CCTne16TrfJBX6z6C
-	 ltk9pigL4zVD6rK0J5YmDGsuAkdpNBqTikdCyDCMfX9smNtruGDqFx5b109AAd1jh0
-	 XxTP0Srr0JQ6mhbqVbw6HcorYy8Z9NsasATCbDIrP2BRZ9QS857B0uV/txqhVygFeI
-	 hrGErcicjdyAhC1NL6jTHdE0dZkHRMYB0po6LCmxJJ57h9tEuKs1uscALYAMbaB/5q
-	 wJVVj526CPj1g==
-Message-ID: <sashiko-outbox-172975@kernel.org>
+	b=TOo1oVXD7ZPUEkiTcvuKJC1vohQVa/ydz1nmAWXc4OJW4tHY3VWHAUz+CZeSzCREe
+	 6Ck9P3JeYcoM6wwv4Q7Y/Tw/U3yhLEOrfcmmndHN12CV93d5e0JHLBvdCJXzG1139w
+	 SZXYHTWOp/gSJKeChOAcsjq8KN9B+iJofNlNWs9gk15gmnWvPsMsPvmYnzsnr8wVrA
+	 L8fjC3GsWr5uQVN+DxNV+jyF1tc+rp0g/oYA0Ab0J2fhaXj87+lStrIeEo+Fb3ZFqT
+	 YmY0Wtho8uknR/7qKJqqIEN4wf/D0ppuIbRGi+Vk5XMk9vCkcT8C+BwzISOeH5lOWT
+	 oXMHleAfbBHig==
+Message-ID: <sashiko-outbox-172976@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH v2 11/15] KVM: arm64: Export stage-2 MMU config
+Subject: Re: [RFC PATCH v2 12/15] vfio: Support VFIO devices that access the
+ CPU MMU
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Ryan Roberts" <ryan.roberts@arm.com>
 Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, robh@kernel.org, conor+dt@kernel.org, "Oliver
  Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261015142552.4128028-12-ryan.roberts@arm.com>
+In-Reply-To: <20261015142552.4128028-13-ryan.roberts@arm.com>
 References: <20261015142552.4128028-1-ryan.roberts@arm.com>
- <20261015142552.4128028-12-ryan.roberts@arm.com>
+ <20261015142552.4128028-13-ryan.roberts@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Oct 2026 14:43:55 +0000
+Date: Thu, 15 Oct 2026 14:44:11 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [Low] cleanup: mixing goto-based cleanup and guard() in kvm_arch_get_gues=
-t_mmu()
+- [High] vfio: NULL pointer dereference in vfio_df_iommufd_bind() via cdev =
+ioctl
+- [High] vfio: NULL pointer deref when binding IOMMUFD to CPU_MMU cdev
 --
 
-commit 857dcf037db9acd0dfd4486a2d4b54b73644b090
+commit 147c0e7516a85b91b63d3c3d8f78088a9ca5c65f
 Author: Jean-Philippe Brucker <jpb@kernel.org>
 
-KVM: arm64: Export stage-2 MMU config
+vfio: Support VFIO devices that access the CPU MMU
 
-This commit provides an API to drivers that want to share the stage 2
-configuration of a VM with their device. It introduces the
-kvm_arch_get_guest_mmu and kvm_arch_put_guest_mmu functions to expose the
-stage 2 MMU config of an EL1 VM.
+Support devices that are attached to a CPU and perform DMA through a
+MMU without an IOMMU or VFIO container. The VMM uses device-specific
+knowledge to handle virtual device creation.
 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 9ba86450fe4af..56490226f973b 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-[ ... ]
-> +struct kvm_arch_guest_mmu *kvm_arch_get_guest_mmu(struct kvm *kvm)
-> +{
-> +	int ret;
-> +	struct kvm_arch_guest_mmu *mmu;
-> +
-> +	guard(mutex)(&kvm->arch.config_lock);
-> +
-> +	if (is_protected_kvm_enabled())
-> +		return ERR_PTR(-EOPNOTSUPP);
-[ ... ]
-> +	ret =3D kvm_arm_pinned_vmid_get(kvm);
-> +	if (ret < 0)
-> +		return ERR_PTR(ret);
-> +
-> +	ret =3D -ENOMEM;
-> +	mmu =3D kzalloc_obj(*mmu, GFP_KERNEL_ACCOUNT);
-> +	if (!mmu)
-> +		goto err_unpin_vmid;
-> +
-> +	mmu->vtcr =3D kvm->arch.mmu.vtcr;
-> +	mmu->vttbr =3D kvm_get_vttbr(&kvm->arch.mmu);
-> +	mmu->hcr =3D kvm_mmu_get_hcr(kvm, 0);
-> +
-> +	return mmu;
-> +
-> +err_unpin_vmid:
-> +	kvm_arm_pinned_vmid_put(kvm);
-> +	return ERR_PTR(ret);
-> +}
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 423ead48aafe3..41fee81a14cbb 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -344,7 +344,8 @@ static int __vfio_register_dev(struct vfio_device *de=
+vice,
+>  {
+>  	int ret;
+> =20
+> -	if (WARN_ON(IS_ENABLED(CONFIG_IOMMUFD) &&
+> +	if (type !=3D VFIO_CPU_MMU &&
+> +	    WARN_ON(IS_ENABLED(CONFIG_IOMMUFD) &&
+>  		    (!device->ops->bind_iommufd ||
+>  		     !device->ops->unbind_iommufd ||
+>  		     !device->ops->attach_ioas ||
+>  		     !device->ops->detach_ioas)))
+>  		return -EINVAL;
 
-[Severity: Low]
-Is it intentional to mix goto-based cleanup and guard macros in this functi=
-on?
+[Severity: High]
+Could this bypass lead to a NULL pointer dereference for users of the
+character device interface?
 
-The function uses guard(mutex)(&kvm->arch.config_lock) for scope-based
-locking, but also relies on the goto err_unpin_vmid label to clean up the
-VMID when kzalloc_obj fails.=20
+When CONFIG_VFIO_DEVICE_CDEV is enabled, vfio_device_add() automatically
+creates a character device node (e.g., /dev/vfio/devices/vfioX) for the
+registered device. If an untrusted user opens this cdev file and invokes
+the VFIO_DEVICE_BIND_IOMMUFD ioctl, the request routes through the
+following path:
 
-According to the cleanup helpers guidelines, mixing goto-based error handli=
-ng
-with scope-based cleanup helpers in the same function creates confusing
-ownership semantics and increases the risk of double-free or resource leak
-bugs during future code edits.
+vfio_df_ioctl_bind_iommufd()
+  vfio_df_open()
+    vfio_df_device_first_open()
+      vfio_df_iommufd_bind()
 
-Would it be better to convert this entirely to scope-based cleanup, or
-alternatively, use manual unlocks without the guard macro?
+Inside vfio_df_iommufd_bind() in drivers/vfio/iommufd.c, the code=20
+unconditionally executes:
+
+return vdev->ops->bind_iommufd(vdev, ictx, &df->devid);
+
+Since the updated check permits VFIO_CPU_MMU devices to be registered=20
+without providing a bind_iommufd callback, this would result in an
+immediate NULL pointer dereference.=20
+
+Similarly, calling the VFIO_DEVICE_ATTACH_IOMMUFD_PT ioctl on the cdev=20
+unconditionally dereferences the attach_ioas pointer in=20
+vfio_df_ioctl_attach_pt(), which would also crash the kernel.
+
+Should there be explicit checks in the cdev ioctl handlers to return
+-EOPNOTSUPP for devices lacking these callbacks, or should VFIO_CPU_MMU=20
+devices perhaps be excluded from cdev creation entirely?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261015142552.4128=
-028-1-ryan.roberts@arm.com?part=3D11
+028-1-ryan.roberts@arm.com?part=3D12
