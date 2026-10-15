@@ -1,145 +1,160 @@
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010006.outbound.protection.outlook.com [52.101.56.6])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2B4529417
-	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 16:41:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.6
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792082477; cv=fail; b=sXoXBfKjnVTnuiMmSbgS0Zqjj5OmwWSWs99ZCiCcDWRJVzQrWzkVKhOjP5P4DkO5SmL010Y4atKKaCdmU6jS2WH2mNrpkGc/N11VhAiPtfBny0ox8sMn2XTV2oOqXbN/wXYUruGngNNx4nnGmYFhEd7BMgyfH99fLbGMfV2PkKc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792082477; c=relaxed/simple;
-	bh=yYbkvKAkcPT3QO0klderBKwF5REn+HXMet4898bf/0I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=OzwQDOv6+X8oX5F6U/P2zbht3ricERV2kUJrrNlRiPgMRByFu/IYWSiqMsax7Ifeww6GsZbRMjIMJzF7lDPKAiH+K/qm7FKwz9/6Wccq0uC0OSGWmHfjWrY2PCRkCl4efa8MmpV86U+IQ3WAJVTaoEkbROX0zDOOlronSg+XZQI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=nKgb9m9V; arc=fail smtp.client-ip=52.101.56.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8713EC833;
+	Thu, 15 Oct 2026 16:41:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792082490; cv=none; b=fFXocG/bpKMvGRkw2xfPhv6Gh+ume355jJhxnZTu7ssh1pRoEeSdMuSjG3GCjoagKjo31Wg3BWGmL5iHAOEfVMkRzrKsvMHsgGWRJOaVntMRmfNil5wnEYMcP5hMSrDt/j8nN/4G26VgLn3YMVy41MQc82p4IIyUG3iZw0yJ9cc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792082490; c=relaxed/simple;
+	bh=Rcj7dhPr9rDDor7byhGnm5H0KVxtVvI8oKtdcWRBovI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V7mL/mA+l09HeetevJ1OSwUUh/KZeb04t2bkur+0sZanlkWVXtrwVKkPquXRPC5tA6Bh/g2rYDgwP8lultJP0JzO/4YWmRXznYP+9nU+6+tziZME/J5z9kvo1eIXZAACKKWPCLHtvIytJWP911T5mhyn5diIoVzySdcAyQhf9iE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NJHxIYDa; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="nKgb9m9V"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OPBpsuYveSsqsYsleKafdHPCJL/48wgkEojo51MCrGPF4iHdvfOu5XLTA1wkze4kXnEo398ZA858yCl5QXgmF16pAlurT1L5Md2DxTgZmd0nyN0AIFsEKZYWLrVSz+FUpFbfCdE/rfKV/vrSwbirsZeL1eNpqhMJddv9fw6EJIHdIwgNnTFEe2dGWN5Lgdl6Z7PjWJMED+Ob+Fu9rnDAbeNuErFds1MwgSj1rhpP2od1qXb8ld/OE8uOlWKDv3eV5eUgcazCDVuwtar+kSJt3wWWeKaeJNF2Jzdev15Hk8duv0M4Pe4R1rhmIddJTEz3yNBpJ+wFkZb4VeQIQVKZ+A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KRV2XZ0zeUiK0Ptz2klazF3pOPLvqvRSfdq3BsKctwU=;
- b=nH8qVnapwJJCpVRMYOLzpmHveCTxP4fOZyIXyb+3kUwr2CPOSwa2KUyWA2ogZzlEizyq9t+vXDZkdN5/w5EpPKEBbDoOrCgyjn4XGSyPn4fM4SpQ0YSm6KlmtA+OcUYPxJyWWAI7da1tVBMXxF9rizhS8PXLLM69X1iwZqc8X5QWQiGXUqOIisK8Pg/5bKSl0Hf4SF+OD6OX06D+N3qG15VQtzS50J9JNKbUmtlyzE7y2tNJ0zHui/nnR9BTih+Aw7j7PRTYOsAcQCVkKpQ7rvM2z9F2gThUey1pfMrsjrCKVJwC2l6Rn2dOAtwS1u4t9pRbSArkR/tvNqR/qY5KyA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KRV2XZ0zeUiK0Ptz2klazF3pOPLvqvRSfdq3BsKctwU=;
- b=nKgb9m9V6/v0cCwr66N9jdhKLZqM813HtmNlrQghBmEYbYmxh0/p0sE+7kTG92B+4PJzhFedGqq7kjYYOLEovQqhDr4VAOYJhKWKcOvZEBjjnLoUJwUJbMFnP0vUibpjehYMfid6+TXr8TFcaYFhQZMJFYKAqvqEOpHOudB+mGHrc1aZzn4G9LVPTWweUJqLEdqCw8aMamWOTRTKYd9xXTXM8AF5ZY8bjGPxsmJPV/cbncYEgWfiwQKO3eI9zaDMz3Ys3pfqJ3FtLyVQYyJdZ56WVNpZmcDNTankc9gBzNDQ9GKe/0D5c9G27JA3L+/gjm2nmGuhuBi92sN9b0eEQA==
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CHBPR12MB731189.namprd12.prod.outlook.com
- (2603:10b6:610:33d::12) by MW6PR12MB8867.namprd12.prod.outlook.com
- (2603:10b6:303:249::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.472.25; Thu, 15 Oct
- 2026 16:41:04 +0000
-Received: from CHBPR12MB731189.namprd12.prod.outlook.com
- ([fe80::b0e5:123d:fe06:e10d]) by CHBPR12MB731189.namprd12.prod.outlook.com
- ([fe80::b0e5:123d:fe06:e10d%6]) with mapi id 15.21.0522.013; Thu, 15 Oct 2026
- 16:41:03 +0000
-Date: Thu, 15 Oct 2026 13:41:02 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Arnd Bergmann <arnd@arndb.de>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NJHxIYDa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25A601F000C4;
+	Thu, 15 Oct 2026 16:41:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792082479;
+	bh=henc3B1x6U66Cc4wCHQGaVrAN5txXPadaIqIa3phigg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=NJHxIYDaSvcn1zskfakCyzzkc4KWk3YVFRCCFczSgr9+0yFWlKhBdpJBkyXq9TYCm
+	 UpnV/NdQv/Uai4CJwhme57ZoMqNE+fi6g2DBo1JuZ+tKOI2rlzyrappiw537FK2L/M
+	 +cxsHhaQTaDhaqT48R/MhPUHuIP3m2djDD55Pe4CvQFroaLfCf7ZmNc1mfSah1HBh6
+	 TGVgaDxGN65O5ma+wW77JN8Eojz79vvI4xLTEcgznOKA1DrNqgYuCxpdp8QvEwq1h2
+	 97xsMCBod6WJ+hYnrGuGLMrVJNPQ3PMwcuusePSij0E6VG5N/y+xCbs5rYOKrR4Es6
+	 Z44/hp0IG1asg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xHOW4-00000003OzH-2KmN;
+	Thu, 15 Oct 2026 16:41:16 +0000
+Date: Thu, 15 Oct 2026 17:41:16 +0100
+Message-ID: <86h5im29xv.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Alex Williamson <alex@shazbot.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Jean-Philippe Brucker <jpb@kernel.org>,
-	Oded Gabbay <ogabbay@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [RFC PATCH v2 15/15] misc/arm-cla: Add vfio-mdev user interface
-Message-ID: <20261015164102.GC13920@nvidia.com>
-References: <20261015142552.4128028-1-ryan.roberts@arm.com>
- <20261015142552.4128028-16-ryan.roberts@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261015142552.4128028-16-ryan.roberts@arm.com>
-X-ClientProxiedBy: BN0PR04CA0037.namprd04.prod.outlook.com
- (2603:10b6:408:e8::12) To CHBPR12MB731189.namprd12.prod.outlook.com
- (2603:10b6:610:33d::12)
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	Lorenzo Stoakes <ljs@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Only enable S1PIE and S1POE for a guest with TCR2 and ATS1A
+In-Reply-To: <20261015153041.3770032-1-fuad.tabba@linux.dev>
+References: <20261015153041.3770032-1-fuad.tabba@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CHBPR12MB731189:EE_|MW6PR12MB8867:EE_
-X-MS-Office365-Filtering-Correlation-Id: bf152b00-ddce-426f-2a70-08df2adb1a59
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|366016|7416014|1800799024|23010399003|5023799004|11063799006|56012099006|261009223027099003|4143699003|10067099003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	dbBXbg8yiRbOM50q6Hvprr/No+BSkPImmIqcKt+lfl2bS6TBCvPPkZ6fWlC6KszRX7GHVgfC0MZjsBxiaCOsSjgDideM4NPL9SzJ1KBCgbkM1hbzYb9FzOEalS5sRluV2IFugb/QK5tAQCu9AKXZykPN9Wqd7SA0DQrHCGxTm6HtFktBSkI2DYIvL23Dut+ykAq84FPB1PJrSCDMzsBXXRY1Id22M9jLBNTEnvaB1eQLL1AVKEbhXgWJB50jUuFT8HhlhaS/vEwljplOb8uemZElktR8LZu+k83P2oYhNiReWPYyEc3kz13xQI45HBpiksYSAQL3uyVzHClRp2ZSXmypStbd063NAQ+xdBTUxuC0OMSg2gZUnf0Di8ZrlndPiY4eusjFygr/Hi+b+k0LpXv/O6Z6TaITfpq1rnggjBXDSZVDlUrhS8Eug01j97Jygdawejcpc27PhU3aAYImc4xC70cD3yoPcQHAr3BmIhJk/zRpma+D6AgGrVaSByAWDVdVHzk6kpvwDqT9vddkqTNi0H7xXA10uB3PmwCleYPSu//SAXQptnEbxhKRTZcf2RTPdNrPHbXLiBxp7yCoRC0HLVWbpR4jC1IxJxSPMnXWrwJvgkN7OpzOPTDfvfc4NLNppSOBwcUT6HvA//r8qgBe8DDsGSLPSZF5ugWeAYs=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CHBPR12MB731189.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024)(23010399003)(5023799004)(11063799006)(56012099006)(261009223027099003)(4143699003)(10067099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?eWwB/aoT/QA2v/3IvivKz3e89hRyvU5HFwCYE7B5Ck4zfiX91z97q6jYAMtD?=
- =?us-ascii?Q?D9RuhUEJ4PMrVeXJl0de0hQFuObVwRkaE/7bAlkYFmh0z+9vMsagDfr/RmM4?=
- =?us-ascii?Q?UqRF9tmeLofbDz9AcTYSuzUx7NzV7jnXewNePC7IT7+H0Oqbks72HnGzbhsV?=
- =?us-ascii?Q?58pXeKnBdXXHZa4mpwTjJc1E9piT96PUlApLWHJb6McDUom5J9/K0eNU+wAK?=
- =?us-ascii?Q?RLOuEthCz6s6PqjcBaFrNOFGr4HmfLwfKmvEOtdUrWIq3sYezrMg16CfeXPP?=
- =?us-ascii?Q?6FKb4LcQU4PGYyql+MN3SYJdtYmc6LS+OQbT6r3qRPmUcK29l23/q2NpRIWS?=
- =?us-ascii?Q?8DP4sargMp1vyJX6ZG7CNvk+Eb8ym2y2iEi2VmlH4fMP44l2V8l//JmpwTo1?=
- =?us-ascii?Q?0C/KeWt2BVWpvhlL5md3mgfYdtQm2zgOxqXoz3qLjm6G9PKkOMSYoIXmBFak?=
- =?us-ascii?Q?wmuIuw+5JvcaLqXuELVVxD+1JHxKH2G4Qh80YJP271nSQQr825wOXr4kOeif?=
- =?us-ascii?Q?95Wb1G02BNPxToVfvelmr5qXHWNK6aVEGyrNGnw1iOfJu6FUNK4jufETQyk1?=
- =?us-ascii?Q?O9TdJ1/KsYiubRNDah6D3LdvfZVE7RiT8rQLVCvwy27793Vk3ClfhTery2pv?=
- =?us-ascii?Q?OK6Ar22a1VGnX2j9YYdGdP2taScad4kTLiQp6vFa4k6AxTL0jleOvxPpKlE0?=
- =?us-ascii?Q?jhxFRAghZwS1+J6Xrdbwo5aRBMv14LPtvwjK9C4TsfgasH33yi7g2LzTN/N3?=
- =?us-ascii?Q?maJByX4bS6VmcLyvXe/MjtonyOALHD5pPAD9DxDio1qEnO2ezV/TGM7bNvvS?=
- =?us-ascii?Q?wKzDiK+hXHFhxCvq386EuFJPLBmLIcyioMLBab9TZD61FbH0Vk51OfXz4z0z?=
- =?us-ascii?Q?pK4SIirzj6GjY/dIWpj5YVqra/rQdJ1GC5Zjiu4+XSsz95Tc22FtRfxMpx7k?=
- =?us-ascii?Q?aZRe/kfXgFYf+V7e3X6zk77E0w/ZSwyHlgNLZIqxFoTq7HiC/9WK9asagDui?=
- =?us-ascii?Q?5AzrsqrI0O3EcIDthPg+xaOcOh6uSD9Rq8najmu79D7pc8fTNNKIHfRykVwM?=
- =?us-ascii?Q?WAoonmOJ7BGPC9JUAI2sr4pKcbJM6W/CIgihAhAysc52MuEOgtFyk+L9UkFV?=
- =?us-ascii?Q?80sqmQVqIyS5flzOk3Fu57oesF5blqd2AqAQLrO8qzP6kXdaj7wEW2NpHHZa?=
- =?us-ascii?Q?tTzw9ySo0tXX2BTx09Zn70AcyvEJdKPpKRJkSUltARVBlrthNlzWhFE5UIzX?=
- =?us-ascii?Q?EKB8CZS0SY5xQjcpHI9Riw57sU0v6mA++AygALa6TV0TTixP9SoKXcqlNvy5?=
- =?us-ascii?Q?msOe8Kc/4c+8dCMlXKiAftLN2LYUUk1VsQMiG1Dzs8v29Q8BkVIyVGMyW8XG?=
- =?us-ascii?Q?U30f4lPOuW4gET5vQZNGnnWyIz4lRIwSdG6Svtx6UoL1UqkOEWEZaikIDMtg?=
- =?us-ascii?Q?zQHjaqaBToc6yWoJRlYJb+fxh9jk3uZ/ikJYYDJ5wgZtQwQJYA+erhzKhM52?=
- =?us-ascii?Q?waUsije968ccwIx8+cg7i+edqk9xPTCMZ6rObfxcPHJbwPNuzFYcWxOwYKeB?=
- =?us-ascii?Q?f9C4gNxriEfSHirK4IBGf++ajHqjg/US9pxIY9MrCFh9jodaSiXO/be3EwDC?=
- =?us-ascii?Q?yrOgtK2lll2JPHLjU6R4rchkmPDa29rsKtAOXPByWCehWTHrkO29kslmtYHT?=
- =?us-ascii?Q?SrXHen9PA17kPrAnxpErnUqL+rrFiLkOwkrvcG5U9Ng9/k2n?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bf152b00-ddce-426f-2a70-08df2adb1a59
-X-MS-Exchange-CrossTenant-AuthSource: CHBPR12MB731189.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2026 16:41:03.9101
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: juBIA7kho5I2VsC8QPCwyEDGS1BNrASyfRfAlCBop3UWSKvnq1Q7KbKeT949sG5n
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8867
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, broonie@kernel.org, ljs@kernel.org, tabba@google.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Oct 15, 2026 at 03:25:49PM +0100, Ryan Roberts wrote:
-> From: Jean-Philippe Brucker <jpb@kernel.org>
+On Thu, 15 Oct 2026 16:30:41 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> Implement an interface to assign CLA devices to KVM guests. To creates a
-> CLA instance:
+> The world switch skips PIR_EL1, PIRE0_EL1 and POR_EL1 for a guest
+> without TCR2, but KVM doesn't trap them for a guest with S1PIE or
+> S1POE. Userspace can hide TCR2 while leaving either visible, and such a
+> guest then accesses registers that are neither trapped nor switched.
 > 
->     uuid=$(uuidgen)
->     echo $uuid > /sys/class/mdev_bus/<pdev>/mdev_supported_types/arm-cla-pl1/create
->     cla_cpu=$(< /sys/bus/mdev/devices/$uuid/cpu)
+> Under VHE, that leaks values between guests. POR_EL1, which the host
+> kernel doesn't use, leaks between guests in every mode. On nVHE and
+> hVHE, pKVM included, the host's own EL1 registers are saved and restored
+> according to the running guest's features, so the host kernel resumes
+> with its stage-1 permissions taken from the guest's PIR_EL1 and
+> PIRE0_EL1.
+> 
+> As per the architecture, S1PIE and S1POE imply TCR2 and ATS1A. Only
+> enable them for a guest that has both. A guest that has S1PIE or S1POE
+> without TCR2 or ATS1A still sees the feature in its ID registers, but
+> its accesses to that feature's registers UNDEF.
+> 
+> Fixes: 70ed7238297fb ("KVM: arm64: Sanitise ID_AA64MMFR3_EL1")
+> Fixes: d4a89e5aee23e ("KVM: arm64: Expose S1PIE to guests")
+> Reported-by: Mark Brown <broonie@kernel.org>
+> Link: https://lore.kernel.org/r/20260930-arm64-gcs-v21-2-3556644cd927@kernel.org
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/86fqyn2che.wl-maz@kernel.org
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+> I'm sending this on its own because it affects the host on nVHE and in
+> pKVM, so that it can go to kvmarm/fixes and stable rather than land
+> with the GCS series. It's the data-driven fix Marc asked for on Mark's
+> v21 02/15 [1].
+> 
+> Following Mark's point on Lorenzo's draft [2], only feat_s1pie() and
+> feat_s1poe() test TCR2 and ATS1A, so kvm_has_s1pie() and the world
+> switch are unchanged. I've left the guest's ID registers alone, since
+> updating them is the larger rework Mark described.
+> 
+> I've got a reproducer showing the host's PIR_EL1 overwritten on nVHE
+> and in pKVM, and can share it privately.
+> 
+> Based on Linux 7.3-rc3 (fd73f4a665989; also applies to kvmarm/fixes
+> 71cc2c67fb8f8).
+> 
+> [1] https://lore.kernel.org/r/86fqyn2che.wl-maz@kernel.org
+> [2] https://lore.kernel.org/r/ae24e80c-1b34-4827-9c93-e80b987e9cd7@sirena.org.uk
+> 
+>  arch/arm64/kvm/config.c | 23 +++++++++++++++++++----
+>  1 file changed, 19 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> index 1053676551aff..5e5277c721d52 100644
+> --- a/arch/arm64/kvm/config.c
+> +++ b/arch/arm64/kvm/config.c
+> @@ -280,6 +280,21 @@ static bool feat_anerr(struct kvm *kvm)
+>  		kvm_has_feat(kvm, ID_AA64MMFR3_EL1, SNERR, FEAT_ANERR));
+>  }
+>  
+> +/* S1PIE and S1POE imply TCR2 and ATS1A, but userspace can set them independently */
+> +static bool feat_s1pie(struct kvm *kvm)
+> +{
+> +	return (kvm_has_feat(kvm, FEAT_S1PIE) &&
+> +		kvm_has_feat(kvm, FEAT_TCR2) &&
+> +		kvm_has_feat(kvm, FEAT_ATS1A));
+> +}
+> +
+> +static bool feat_s1poe(struct kvm *kvm)
+> +{
+> +	return (kvm_has_feat(kvm, FEAT_S1POE) &&
+> +		kvm_has_feat(kvm, FEAT_TCR2) &&
+> +		kvm_has_feat(kvm, FEAT_ATS1A));
 
-I think I said this last time, please don't use vfio mdev for
-anything. There is nothing mediated about this.
+Where's what the relevant bits of the JSON say:
 
-Jason
+(FEAT_S1POE ==> FEAT_TCR2)
+(FEAT_S1POE ==> FEAT_ATS1A)
+(FEAT_S1POE ==> FEAT_HPDS)
+
+So this is missing an additional check on FEAT_HPDS, which is advertised
+as:
+
+(FEAT_AA64EL1 ==> (FEAT_HPDS <=> (UInt(ID_AA64MMFR1_EL1.HPDS) >= 1)))
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
