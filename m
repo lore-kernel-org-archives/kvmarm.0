@@ -1,136 +1,144 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5453BF68F;
-	Thu, 15 Oct 2026 14:38:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006491922FD;
+	Thu, 15 Oct 2026 14:38:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792075106; cv=none; b=k8jBpiuHwsFZQ2fAuRkAZknqSGy3v7/Ybolv9U2ORhFRejIF2FhmHLZStvBX93sZdFX/b/AD3lrXlI3V5CVgUtKhqGJ7FxzuTfbF5e5DY8qfY5RkA7KalO0MVZomKCVD5hcPNDRz8T7ixdqJlkhzu61h7J/dwp1PeqyqS2kc+zY=
+	t=1792075116; cv=none; b=ssbCHNAJym7C7zfiZd1TZJgElisYIowQ+dqSruqfv/O6U29HhoTrz/UQAgBQTiIdb59IK54QXTgz0Mj5LhbW7nVpI7pRobp3SSSbomTSrvmyUF0qiFu11weSEKFs8x08JYr8FnUtVloVu5uSExVJkXHvVAkaEhmU66/qDDx/GLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792075106; c=relaxed/simple;
-	bh=3eicMzqvoduiS5w7ckxuXHXZgiiL8L5Gnx9fi08KClM=;
+	s=arc-20240116; t=1792075116; c=relaxed/simple;
+	bh=SVPzRaRgJyX37fsvtpuh0YDIEde/xx3/S/fX1wJyyH8=;
 	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=buFqoNPuJFHX7aLwis/+1NN0JuHYKCQxVH1B+0Qbhc8l6LCSURM5Plct5apVgLBv3S0MFOkBU5tyMS2bBMLPFbzJ0USvi4XXc/iSdepNdYnJ/slknQIbjrk6NgVZZbQvgw0C2BhAzF9YVef/v9cvDHMSdqRxkvq8DMrEkeHmK3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YpboLlr5; arc=none smtp.client-ip=100.103.45.18
+	 Date; b=L1vlmHxkTst3cFNGX+dl9EuWLTFHYCfZv69IiDMkOzZgHJkWPBQQAMmsIIndiiXeAGRs8i6wmbLQ/3vN4HnmjzB++3z5zfmtJ1a0rFaxJ3qR1oqvegptMu+fezZwa3NGXX9vBLxp/LrV3MCLHpwIlb1hg2uwHSBOiYb33f6Vlaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YkjWbEI3; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YpboLlr5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80F1B1F000C4;
-	Thu, 15 Oct 2026 14:38:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YkjWbEI3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 052C21F000C4;
+	Thu, 15 Oct 2026 14:38:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792075105;
-	bh=ue7wn5onuaDHQRN4z9B/8WHxbQ0QXbio4cv6N1Y06JA=;
+	s=k20260515; t=1792075114;
+	bh=ZPllHFkd2/41T9i7XIV50qq2n8bSLRO3ec7naV8MZSg=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=YpboLlr5ABJRFMa/EeCSwk6XNAKW7bZgoOHDkEzOLnphexPS2bi/XZqY2q553Co+s
-	 sxX4ibPADtl8YDPgKBveApiuniGcno2j82Q7laQ3zYzGTxGyzs3Ep39mpwmTob/3EO
-	 dcdzuQiz6kWoNIb1F595zNTDaoDtbYK2gJn09Pd+U/HKBEwSly+aYkn/IXpr5h4MJM
-	 mPlgMV/NUDxf2H9UQGPCZgvGnjKWCKw1KkbOa/0/ol9FfLcSN0R1K1VpOSshXbFEoB
-	 ozAQkjr0E+pJTBASuVO+n8uO4CBJMmMkE8U/HBjtQUMcdmBv/8syv5FXk2DZALt4L/
-	 b0byKjjBhnFgw==
-Message-ID: <sashiko-outbox-172967@kernel.org>
+	b=YkjWbEI3yJ5kawSgkClleLWVOI00vwHYbHg0TFw6M49By5ig/+aDRXjos9a7U4pOR
+	 WhScltQCno5viPoSiHWuZSbzTRUxwrLHkjTb9P/0WpHZDfzcXMhGboxeoBequwL+Er
+	 yeaw9bEPElYK8nrMJktjFLqdwk6w+FkXvGOMrYZUC2I281FWtWWUxFE2N7C6R8McRP
+	 VOOhdswDFuGr56JdoHCTUq5Ou4PjKEloHR9uwSzJElvunjwzLaUydX5lV87ULf4q29
+	 LG6nhscvtys12LaLykDj7MXf9z7dY2S/fKIPZPdoWjT+RxFstEF2E2Ww+pdHiTSSaF
+	 uxoHX8erElVKQ==
+Message-ID: <sashiko-outbox-172968@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH v2 08/15] misc/arm-cla: Manage domain contexts
+Subject: Re: [RFC PATCH v2 10/15] KVM: arm64: Introduce support to pin VMIDs
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Ryan Roberts" <ryan.roberts@arm.com>
 Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, robh@kernel.org, conor+dt@kernel.org, "Oliver
  Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261015142552.4128028-9-ryan.roberts@arm.com>
+In-Reply-To: <20261015142552.4128028-11-ryan.roberts@arm.com>
 References: <20261015142552.4128028-1-ryan.roberts@arm.com>
- <20261015142552.4128028-9-ryan.roberts@arm.com>
+ <20261015142552.4128028-11-ryan.roberts@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Oct 2026 14:38:22 +0000
+Date: Thu, 15 Oct 2026 14:38:30 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Medium] kthread: missing format argument in kthread_run_worker_on_cpu
-- [Medium] sched: timeslice starvation via kthread_mod_delayed_work
+- [Critical] kvm: arm64: integer underflow in max_pinned_vmids allows slab =
+OOB write
 --
 
-commit 9e218cd8677c5cff035aa302edfc44906aa6b821
-Author: Ryan Roberts <ryan.roberts@arm.com>
-misc/arm-cla: Manage domain contexts
+commit 5166cc2f774d24bbef4a1dfb451334ee93c6273a
+Author: Shameer Kolothum <skolothumtho@nvidia.com>
+KVM: arm64: Introduce support to pin VMIDs
 
-This commit introduces a domain scheduler for the CLA driver that queues
-contexts for assignment with a fixed time slice. It runs hardware operations
-through CPU-bound kthread workers to coordinate per-device and domain
-switching. Failures on any device mark the entire domain as broken and
-wake all waiters.
+Introduce kvm_arm_pinned_vmid_get() and kvm_arm_pinned_vmid_put(), to pin
+a VMID associated with a KVM instance. This will guarantee that VMID
+remains the same after a rollover.
 
-> diff --git a/drivers/misc/arm-cla/cla-init.c b/drivers/misc/arm-cla/cla-i=
-nit.c
-> index 58f37787a59c1..e1694f84e05d0 100644
-> --- a/drivers/misc/arm-cla/cla-init.c
-> +++ b/drivers/misc/arm-cla/cla-init.c
+> diff --git a/arch/arm64/kvm/vmid.c b/arch/arm64/kvm/vmid.c
+> index 7fe8ba1a2851c..322279f59e881 100644
+> --- a/arch/arm64/kvm/vmid.c
+> +++ b/arch/arm64/kvm/vmid.c
 [ ... ]
-> @@ -198,6 +201,37 @@ static void cla_dev_reinit(struct cla_dev *dev)
->  	cla_reg_write(dev, CLA_REG_LRESP, 0);
+> @@ -169,6 +175,49 @@ void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
+>  	raw_spin_unlock_irqrestore(&cpu_vmid_lock, flags);
 >  }
 > =20
-> +static int cla_dev_worker_init(struct cla_dev *dev, int cpu)
+> +int kvm_arm_pinned_vmid_get(struct kvm *kvm)
 > +{
-> +	struct kthread_worker *worker;
+> +	struct kvm_vmid *kvm_vmid;
+> +	u64 vmid;
 > +
-> +	worker =3D kthread_run_worker_on_cpu(cpu, 0, "cla-dev-worker/%u");
-
-[Severity: Medium]
-Is this missing a format argument for the %u specifier?
-
-It looks like kthread_run_worker_on_cpu() is being called with the format
-string "cla-dev-worker/%u", but without a corresponding unsigned int
-argument. Will vsnprintf read uninitialized memory from the stack or a
-register to satisfy the %u specifier, resulting in a garbage thread name?
-
-> +	if (IS_ERR(worker))
-> +		return PTR_ERR(worker);
+> +	kvm_vmid =3D &kvm->arch.mmu.vmid;
 > +
-> +	WARN_ON(dev->worker);
+> +	guard(raw_spinlock_irqsave)(&cpu_vmid_lock);
+> +	vmid =3D atomic64_read(&kvm_vmid->id);
+> +
+> +	if (refcount_inc_not_zero(&kvm_vmid->pinned))
+> +		return (vmid & ~VMID_MASK);
+> +
+> +	if (nr_pinned_vmids >=3D max_pinned_vmids)
+> +		return -EINVAL;
+
+[Severity: Critical]
+Does this capacity check protect against pinning exhaustion if max_pinned_v=
+mids
+underflows?
+
+On ARM64 systems with 8-bit VMIDs (NUM_USER_VMIDS=3D256) and 255 or more CP=
+Us,
+the subtraction used to set max_pinned_vmids in kvm_arm_vmid_alloc_init() w=
+ill
+wrap around to a huge unsigned value.
+
+This allows userspace to bypass this check and exhaust all VMIDs by pinning
+them. Once fully exhausted, new_vmid()'s fallback find_next_zero_bit() retu=
+rns
+256, and then falls through to the set_vmid label:
+
+arch/arm64/kvm/vmid.c:new_vmid() {
+	...
+set_vmid:
+	__set_bit(vmid, vmid_map);
+	...
+}
+
+Can this write past the end of the 256-bit bitmap and corrupt adjacent slab
+memory?
 
 [ ... ]
-
-> diff --git a/drivers/misc/arm-cla/cla-sched.c b/drivers/misc/arm-cla/cla-=
-sched.c
-> new file mode 100644
-> index 0000000000000..6b5b782ac33e9
-> --- /dev/null
-> +++ b/drivers/misc/arm-cla/cla-sched.c
-[ ... ]
-> +void cla_domain_schedule_reassignment(struct cla_domain *domain)
-> +{
-> +	struct cla_ctx *ctx =3D domain->assigned_ctx;
-> +	unsigned long delay_jfs =3D 0;
+> @@ -186,10 +235,24 @@ int __init kvm_arm_vmid_alloc_init(void)
+>  	if (!vmid_map)
+>  		return -ENOMEM;
+> =20
+> +	pinned_vmid_map =3D bitmap_zalloc(NUM_USER_VMIDS, GFP_KERNEL);
+> +	if (!pinned_vmid_map) {
+> +		bitmap_free(vmid_map);
+> +		return -ENOMEM;
+> +	}
+> +	nr_pinned_vmids =3D 0;
 > +
-> +	lockdep_assert_held(&domain->lock);
-> +
-> +	if (domain->broken || ctx =3D=3D &invalid_ctx)
-> +		return;
-> +
-> +	if (ctx && !cla_ctx_is_dying(ctx))
-> +		delay_jfs =3D msecs_to_jiffies(CLA_SLICE_MS);
-> +
-> +	kthread_mod_delayed_work(domain->worker, &domain->reassign, delay_jfs);
+> +	/*
+> +	 * Ensure we have at least one empty slot available after rollover when
+> +	 * the maximum number of VMIDs are pinned. VMID#0 is reserved.
+> +	 */
+> +	max_pinned_vmids =3D NUM_USER_VMIDS - num_possible_cpus() - 2;
 
-[Severity: Medium]
-Could this lead to timeslice starvation?
+[Severity: Critical]
+Is it possible for this subtraction to underflow?
 
-By using kthread_mod_delayed_work(), the timer is reset to delay_jfs (100ms)
-from the current time. If new contexts fault and are added to the queue,
-this function will be called again.
+If a system has 8-bit VMIDs (NUM_USER_VMIDS =3D 256) and 255 or more CPUs,
+this will result in a negative value that wraps around to ULONG_MAX.
 
-Does each call push the timer back, effectively giving the currently
-assigned context an infinite timeslice as long as new faults or wakeups
-keep arriving, starving all other contexts in the queue?
-
-Would kthread_queue_delayed_work() be more appropriate here for normal
-timeslice tracking, since it does not push the timer back if it is already
-pending?
-
-> +}
+While there is a WARN_ON(NUM_USER_VMIDS - 1 <=3D num_possible_cpus()) earli=
+er
+in kvm_arm_vmid_alloc_init(), it only emits a warning and does not prevent
+the initialization from proceeding and setting this underflowed value.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261015142552.4128=
-028-1-ryan.roberts@arm.com?part=3D8
+028-1-ryan.roberts@arm.com?part=3D10
