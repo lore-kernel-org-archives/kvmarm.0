@@ -1,158 +1,349 @@
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010034.outbound.protection.outlook.com [52.101.193.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA293E1CE4
-	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 16:44:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.34
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792082678; cv=fail; b=PMkLn95IqhdRoXtRsWBYHhxdpY1hifMNR4BvWVo3f4JJBaxFJt2T369xyXWn6bXXL4WkozgZQ5wm9722R7pDPQ92jf8p1gzBxCYdUElfS8GZrqn5bDJqCCqKUy8vJ17R0IS7fd99eudrj8jo5x4J/Dcpkxj5qUyfXlFtZmXTI0c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792082678; c=relaxed/simple;
-	bh=sVa9WgN9tkedcC16CiqvBHB9ML479SSzymVdlCj1EXA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=CakzWJljIcOfaVufRMTHmt3TuIUY+BHntks9750bycE9qdvDYVYlIHxOlnud7lCEq/gUKaTAeBvYS3yJ9oYTR84Nuw4EkjN7yMpK2EOO/fY9j4c26lZmHzb3kAmzMSjBY26+GouN0wXiMOio3aql7ADtpK4wA4d8RK7il2onqis=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=XRMgTzqI; arc=fail smtp.client-ip=52.101.193.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C61B541E69;
+	Thu, 15 Oct 2026 16:51:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792083091; cv=none; b=XEykL1y0eDKIZOIjt1MDo596qHaDu9MFPyCuQxWc9EzHicIZXVIyqg84/tUy8cpAOjOcMfAYAHCrSTV+HNbAYfhj3wMDZFXCDH8yqTSQVUlJbzo+Y3RkRK8PWEe8NPU9zUIUEMed2SMhXc6/b1WOFdgKqrD72+yGpZCh4RP6AVE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792083091; c=relaxed/simple;
+	bh=HqHAKSUflfJEuWDf3yfMWcVi+U+gd9V1CDIxtFqq64g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NWgWBqqF6wnPrbUSGiRbopTtjddqjJLgN/sWVffUsftdOIHu1f4bt5GkxmO5ytkDzPQMjNrV+PSxAf1bLD2Y8x7xd/jFvrF27WAvG3fnIMiQn/nmzwM9/10WJAS/BXIHUBYM93vVqeJvosT7TnH6a+4vr8vOgGBdFvlFP0JuyAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=al6Y5sUt; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="XRMgTzqI"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FX4AYPYssWSwvpBBbpC+5mjlT3xcNZktyzrI4ueb1QTDAE0qkZlqW8/LdrXh524zTxW0i/C+Rooy5VvFCWVaGmPgvwUFoMQMoCDasBAlK2CNJjxF/E/98CP3HvgNLavSoYWquNH/BtgX958PeITMdFBQ/GfT2zgnyEnqt6qLi2BW0b6btekjRz8GTBk7hkVDe48eyBx0OX17mfNNZ7sLeI1ek5wuB5EYIDe2oH8SwYvXmxtRg3ScKQEyNaMCVGhWmBtwT4QYls/EtmxqxEDB2TOoKSu3hLzrX3zm+ln2Mo2KD/0gf2D2Qj3v/VsE+FHzBhadwoiwgEI0ufjAlV2cIQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hr1d07j0iHjsZ1/mYswjWcTbQf3Ve7B6C6K1TyQLL4A=;
- b=S+zbOtJiFVPAVnMF+nMJt3BqO3gwEl7FHWpmvAv9nn9X1zP1nZHdoklbd2NgI685JnFJXOoj5xHQ/kmbXFcUTMhe2KYpMiVtnRXXfkDJfB6Z+72B2SwJ5L4HmD2TF8ijMu696pI+e0BScMQ0EWGeVdnZ6BFmchxncFHfssZQr3o2X2TiD1tCKAf1/n8cP6P1BfISCwIOJv3yauuoW/wA1IAw+Om9ZeCCbfaMbrkTeGqowlu5rr3duFsCUlK7Po0u6my9pfjWnSGHY9vgAGZ+yYPwVsYnVzo4oRf+tErtAw+w0d/iC950z+N8Lo8UhjY91bC+mAu/cwphUwSEhsGeng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hr1d07j0iHjsZ1/mYswjWcTbQf3Ve7B6C6K1TyQLL4A=;
- b=XRMgTzqI6ZPJ87NNs3PiayKyZZshJgwx3S36xI7oSqMLFD9dDWZxmbtGm/KlB8DL6MQVn6BslnbLErbF/seM8hnvKDDoRQQoc1H4ccpkRsPIdTnb4JcGs0qDJlHYZx/PnRN767jISG5ZiDvqhpwkPVZQmeCtu2h3qDFUTsW0F271JaGKsxTqSC4ikOd3Y+1an+hqkYBWLmEzmE8lyCpKJ2JyvGzvVkhuUhDN7m3ff+GyZaqBN0PT08HpGFmhTCEFH0g+EQ6erWVaJX8cvRfVhicZlQa3ilkqNo0TYhYXCqUwLvmGb/D1Y/6ImRw5Y2p4LACRH1Vb+7H0CFEM1cEhmQ==
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CHBPR12MB731189.namprd12.prod.outlook.com
- (2603:10b6:610:33d::12) by SJ5PPFEB07C8E34.namprd12.prod.outlook.com
- (2603:10b6:a0f:fc02::9a8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.496.23; Thu, 15 Oct
- 2026 16:44:22 +0000
-Received: from CHBPR12MB731189.namprd12.prod.outlook.com
- ([fe80::b0e5:123d:fe06:e10d]) by CHBPR12MB731189.namprd12.prod.outlook.com
- ([fe80::b0e5:123d:fe06:e10d%6]) with mapi id 15.21.0522.013; Thu, 15 Oct 2026
- 16:44:22 +0000
-Date: Thu, 15 Oct 2026 13:44:21 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Alex Williamson <alex@shazbot.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Jean-Philippe Brucker <jpb@kernel.org>,
-	Oded Gabbay <ogabbay@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [RFC PATCH v2 12/15] vfio: Support VFIO devices that access the
- CPU MMU
-Message-ID: <20261015164421.GD13920@nvidia.com>
-References: <20261015142552.4128028-1-ryan.roberts@arm.com>
- <20261015142552.4128028-13-ryan.roberts@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261015142552.4128028-13-ryan.roberts@arm.com>
-X-ClientProxiedBy: YT4PR01CA0076.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:ff::20) To CHBPR12MB731189.namprd12.prod.outlook.com
- (2603:10b6:610:33d::12)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="al6Y5sUt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFB301F000C4;
+	Thu, 15 Oct 2026 16:51:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792083069;
+	bh=Lxxs/l5FI+u++wAMNQ2C0hH42rvX2oaiszt8AMAtoAs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=al6Y5sUteWg7nKjtYumnCaEp7yxwUz08QBxSgIqmF2qdXLDHBbz6iRZzEpZqNedey
+	 XLeaPRJj4fvAsbm2AgFeu9oJM6AytbwGYXyG92aczhT/YHwpRwaguUdP9EwB7fW016
+	 x3G0QnGd0Zv9cUra5EgykP8fDO3PWz046AUPfWdSTG+ihOcSx2qfkMmF4SUozc+Xmk
+	 WOYi8+cS9pMc35j/I3xtbwtehDK2S7rBk0u1FPfilTXrxYzgEJDYTQuEmX/U9abkIx
+	 kk2//vMNApRWuEvlq4YlAMtRmNR4SlPIIPoKIl9qF5wXQs4wK8b0Kg61tLkZcd4bjr
+	 iFdz374dNvEWA==
+Date: Thu, 15 Oct 2026 17:51:03 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, 
+	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	will@kernel.org, mark.rutland@arm.com, linux-perf-users@vger.kernel.org, 
+	catalin.marinas@arm.com, james.clark@linaro.org
+Subject: Re: [RFC PATCH v7 06/28] KVM: arm64: Add KVM_CAP_ARM_SPE capability
+Message-ID: <atDtheEuNRs7v3Gx@gremlin>
+References: <20260903160623.315525-1-alexandru.elisei@arm.com>
+ <20260903160623.315525-7-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CHBPR12MB731189:EE_|SJ5PPFEB07C8E34:EE_
-X-MS-Office365-Filtering-Correlation-Id: 911a89db-7b2a-446a-3745-08df2adb9089
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|7416014|23010399003|1800799024|11063799006|4143699003|22082099003|18002099003|56012099006|10067099003;
-X-Microsoft-Antispam-Message-Info:
-	adb8kNHofnTpQOTVIABfTIoQVRxGUSJxWgCJvVm2mngpyYF5I2W9OyJ1YSlMwHLHyN3VQPWh+fXHzG7brOnSqMN78VYQBly/EtKXt9q0n1kOYkENSlPjBgZKLf0pE4Zh3YSuvrnztmk9hZ876IcZgAv3RnwCsJy6hYi8tBlm7VYhAyzuslRMi08aneWLrjqLmJk67VfHFggBjhW92IUpMY/CY/i+R6/wec6QN+E5zNXGrTBknAgpHGPWUTa1hXf3pwEClyGePyd0i4VBOn3cB3rOnEhgGsuxRI6jm6NeWHa2P6eQFD9KzJlH4oFrxkFmwRwcfNSF+s8hebt6HzUADsHsnGs9ztZCmQtJBHEU4hQf6H/mbJkwed8D6qUmp8sDzdzLakmApOWK0qdnz1ALPRCYpqOa+6SuY4udW3CRV5iHTjibm0OmJ1gy+qYJX/lFpUijiDVaiYCFtqVX5po62aDtjadAN0EypFR50RO0wV+JSfq/7oobn/9RQ+iHzSv7jf+G1APXzWsJk2cKyMmFZHeC8N4s27fxjkgh6og5xY8XoFwLLsGKG78rHO3z3oZ3ZVucvVle1goDaibXV+jE9xgOaJJnRd9YplIWBkCFLhpx9kVUp4uQ67IFan5DSnxX07m5bKN6//Wg92tuc010gMAE9TPjK8n1/UvsSUouOTE=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CHBPR12MB731189.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(23010399003)(1800799024)(11063799006)(4143699003)(22082099003)(18002099003)(56012099006)(10067099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?IZkB/TqDr0yRuEhMxY3jMM5/QMbln1bqa2b0xBRo9939+L5AS6hihOWzW+yB?=
- =?us-ascii?Q?rNUnVyjEaqxREy6DPdY5vow+3VFBavNBY7E5AjBCpsODd/qCcNdIgxMT66uZ?=
- =?us-ascii?Q?GlqtCe/HshTkB9cBD24wB+OCQYQiC5UKaI7e7vuJMkefUs0o2UKip9dhLIEb?=
- =?us-ascii?Q?W5BXB2LQIvlPsctQ1zVsem6ABao8dCy3CAyDbT9L9KSwGsYCiCbxTKMyP1uG?=
- =?us-ascii?Q?XJR5CwxuqmaEKJVyLp5mlda5M2sFF4uNIYaU1FNJ/QlchbivH8ykoQE9c/5f?=
- =?us-ascii?Q?FzZkTgBOVMArjSLyWHmL9UcD0ENk0mS8yLQFj0DPL3mpI6wKF7UK5Oo8Znf+?=
- =?us-ascii?Q?scmq0DLM0JEq1hfbLp7iAY6jJpERalPHWXjP9VAXTvvqIJrBYpKAJMzeHS+9?=
- =?us-ascii?Q?2seWOKJ2xSZwwXFCIrju0P1MIWGWauOmyyufsvVpIpCklOMrEBWOUihtQX/a?=
- =?us-ascii?Q?tdd+6eqLlJ2/j/h2mdcdbpOuNmUqLFLxCE2SXRSoZeD9rMyUzOleCgaNqttk?=
- =?us-ascii?Q?W8No0RVDtu7LK/PD+45GDoZDfK9Cuy/SzmRAKLDixYspJlbF11guDhgXLhIH?=
- =?us-ascii?Q?qwFRVZnH5GQQNUUHTAdPrQNA7OYYFCzNkgWLOMxgXb+tsLog9lhG0wE7wfID?=
- =?us-ascii?Q?yW3QHcotOskBPVyEIwvMN6SLw0n1OWnVyQ4AHcthdszp+UOncof2jFtswWfM?=
- =?us-ascii?Q?joXcKB/ARLQi5IXN1XpCFLds/SY8JCONLV+u4kG3+Dv3mT03BOPzeuRkKGan?=
- =?us-ascii?Q?3GW8N/ZtCS3JJh8olRQW0ttqy41DX2Q4HlzP3PFVVI3rXo1C5Fg6ysOfkn0+?=
- =?us-ascii?Q?kFPwEf1sTic60F8n/0fDQyqdPn3Gn/0ssSqdQWsMUG/nMvLkHaZlps2VSCcm?=
- =?us-ascii?Q?VflU51Q4ePTEyfBl4OGPBn+hBLyREqwreCPQfIa9OKPE22o2IogvpCRJS87Z?=
- =?us-ascii?Q?MROjh+U/0oBclJxgppfwQFhVzDUtTpQDNoyNft0/hilyTaY0WpogpKE4+HlR?=
- =?us-ascii?Q?8axIugJ6qnTIeRx8ggJwJt99B94xq7kCd4RAik8lX8cGBFByEL44Pn2VtWi+?=
- =?us-ascii?Q?sxTR8ElwnvfYnJKqnyenVcECqKoqlR0wVdZuDy2l1Y3XP3KvhNmkrh7TDCnf?=
- =?us-ascii?Q?HyXGy8mZYMXd7S4ltKENKfoYWfgzc8PkquXwuT6+CX46nR1CeEvbpNNp1h07?=
- =?us-ascii?Q?RsTvR2nI3o/FE3Qnw1onNY8ADdyWUaqGOG6gNUW8tsSZH/PQOpQpQS86r6Dm?=
- =?us-ascii?Q?qw0v+dJ4nLYTvk0ylX+ClFljF4VrDt3aaCut37gXSZLLjUEA0XSCC2SC681d?=
- =?us-ascii?Q?v4zhVjeWEXesuEC5zO5MhBU8ns0JBfwF25LvI35bQPSFPpsiz6bovuEXXAk4?=
- =?us-ascii?Q?LxnIK4n3I/AXviOU4P0UiRPxaCnVXHQj1m79GHM5us3qc5gtcyPu3WcRIHSq?=
- =?us-ascii?Q?ReDKQ4GIEwWOPUav240/JQlwOhqSdqV5fdc8yc2ETYBPmAoWIn4+9+mG5fpA?=
- =?us-ascii?Q?fZViklSJ4RixbYfEmlwECOG+5tnFCgHICfNghErHrXGX5GrYJMUrTi9miOjT?=
- =?us-ascii?Q?VZzHjW+5kqM3M9rnj9fXX7Pz3TjrqAMIlxvUZDUSbh2couUGkdirFVx2G/J+?=
- =?us-ascii?Q?ntfpHQYtjJomgnLGNS7MOfqj8vrUoR3mwWHskb24CvdKBfAXR+h3leWBLoD9?=
- =?us-ascii?Q?yI1SbNLbWSkDK9Ia1ecELLua+UDKKJS1vkZ0jyhG+mlEp+XR?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 911a89db-7b2a-446a-3745-08df2adb9089
-X-MS-Exchange-CrossTenant-AuthSource: CHBPR12MB731189.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2026 16:44:22.1850
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tYYwcHGqQ11GDAyTvG793otN8JBc9yNV3zsVCc1HJFdriSCMIHYBjwNXDOKzE65A
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPFEB07C8E34
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260903160623.315525-7-alexandru.elisei@arm.com>
 
-On Thu, Oct 15, 2026 at 03:25:46PM +0100, Ryan Roberts wrote:
-> From: Jean-Philippe Brucker <jpb@kernel.org>
-> 
-> Support devices that are attached to a CPU and perform DMA through a
-> MMU. They do not have an IOMMU and do not use a VFIO container.
-> The VMM needs device-specific knowledge in order to create a virtual
-> device (device tree, ACPI tables), so it also knows not to allocate a
-> container.
+On Thu, Sep 03, 2026 at 05:06:01PM +0100, Alexandru Elisei wrote:
+> Add the SPE capability that will be used by userspace to test if KVM
+> supports SPE virtualization.
 
-I'm not so excited to see new things built on top of the group
-interface.
+You are also adding spe.c too right? Which is adding functionality for the
+perf driver to call into? Probably worth mentioning that you're adding the
+foundations of this stuff in the commit message also.
 
-Maybe in this case you just don't have to do a bind operation on the
-cdev to an iommufd? That feels kind of natural if you don't use a
-iommufd
+>
+> The SPE driver supports heterogenous systems. Keep track of all the
+> available Statistical Profiling Units (SPUs) in the system, because KVM
+> will require the user to associate a VM with exactly one SPU.
 
-However.. you still have to affirm which single mm is the mm that the
-device is going to be doing DMA against. The process the opens the fd
-should not be forced to be the mm that it gets linked to.
+I guess questions more for my understanding here :)
 
-From that perspective maybe you should create an iommufd and a special
-"SVA" IOAS that it can attach to. This is more complicated but it
-makes the mm linkage and blocking beahvior explicit and controlled by
-userspace.
+Is it one SPU per core, or is it some property of heterogenous systems,
+i.e. 1 per big/LITTLE etc.?
 
-Jason
+How can a user decide which? Do you actually expose the ability to select a
+named SPU, or is it automatically determined based upon which CPUs are used
+by the VM?
+
+What if a VM spans both 'big' and 'LITTLE' cores?
+
+>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  Documentation/virt/kvm/api.rst   | 10 ++++++
+>  arch/arm64/include/asm/kvm_spe.h | 18 ++++++++++
+>  arch/arm64/kvm/Makefile          |  1 +
+>  arch/arm64/kvm/arm.c             |  4 +++
+>  arch/arm64/kvm/spe.c             | 56 ++++++++++++++++++++++++++++++++
+>  drivers/perf/arm_spe_pmu.c       |  4 +++
+>  include/linux/perf/arm_spe_pmu.h | 12 +++++++
+
+The KVM arm MAINTAINERS entry has:
+
+F:	arch/arm64/kvm/
+F:	include/kvm/arm_*
+
+So arch/arm64/kvm/spe.c and include/linux/perf/arm_spe_pmu.h don't need any
+updates there.
+
+>  include/uapi/linux/kvm.h         |  1 +
+>  8 files changed, 106 insertions(+)
+>  create mode 100644 arch/arm64/include/asm/kvm_spe.h
+>  create mode 100644 arch/arm64/kvm/spe.c
+>
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index e0430cc750c9..1ed5c389c7a4 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -9600,6 +9600,16 @@ take care to differentiate between these cases.
+>  The presence of this capability indicates that the nested KVM guest can
+>  start in ESA mode.
+>
+> +8.48 KVM_CAP_ARM_SPE
+> +--------------------
+> +
+> +:Capability: KVM_CAP_ARM_SPE
+> +:Architectures: arm64
+> +:Type: vm
+> +
+> +This capability indicates that Statistical Profiling Extension (SPE)
+> +virtualization is available in KVM.
+
+Is it worth adding something here about the perf driver? As this seems key
+to the thing. Or is that too much of an implementation detail?
+
+> +
+>  9. Known KVM API problems
+>  =========================
+>
+> diff --git a/arch/arm64/include/asm/kvm_spe.h b/arch/arm64/include/asm/kvm_spe.h
+> new file mode 100644
+> index 000000000000..f05e6d3f5705
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/kvm_spe.h
+> @@ -0,0 +1,18 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2021 - ARM Ltd
+> + */
+> +
+> +#ifndef __ARM64_KVM_SPE_H__
+> +#define __ARM64_KVM_SPE_H__
+> +
+> +#ifdef CONFIG_KVM_ARM_SPE
+> +bool kvm_supports_spe(void);
+> +#else
+> +static __always_inline bool kvm_supports_spe(void)
+
+Very nitty, but not sure if __always_inline is strictly necessary, you'd hope
+that the compiler would naturally inline a false on optimisation :)
+
+> +{
+> +	return false;
+> +}
+> +#endif /* CONFIG_KVM_ARM_SPE */
+> +
+> +#endif /* __ARM64_KVM_SPE_H__ */
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 59612d2f277c..9ee271f713cd 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -29,6 +29,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+>  kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
+>  kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
+>  kvm-$(CONFIG_PTDUMP_STAGE2_DEBUGFS) += ptdump.o
+> +kvm-$(CONFIG_KVM_ARM_SPE)     += spe.o
+>
+>  kvm-$(CONFIG_NVHE_EL2_TRACING) += hyp_trace.o
+>
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 8b080804bc90..eca1184ef9dd 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -42,6 +42,7 @@
+>  #include <asm/kvm_nested.h>
+>  #include <asm/kvm_pkvm.h>
+>  #include <asm/kvm_ptrauth.h>
+> +#include <asm/kvm_spe.h>
+>  #include <asm/sections.h>
+>  #include <asm/stacktrace/nvhe.h>
+>
+> @@ -468,6 +469,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_ARM_PMU_V3_STRICT:
+>  		r = kvm_supports_guest_pmuv3();
+>  		break;
+> +	case KVM_CAP_ARM_SPE:
+> +		r = kvm_supports_spe();
+> +		break;
+>  	case KVM_CAP_ARM_INJECT_SERROR_ESR:
+>  		r = cpus_have_final_cap(ARM64_HAS_RAS_EXTN);
+>  		break;
+> diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
+> new file mode 100644
+> index 000000000000..646806a60d66
+> --- /dev/null
+> +++ b/arch/arm64/kvm/spe.c
+> @@ -0,0 +1,56 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2021 - ARM Ltd
+> + */
+> +
+> +#include <linux/cpumask.h>
+> +#include <linux/kvm_host.h>
+> +#include <linux/perf/arm_spe_pmu.h>
+> +
+> +#include <asm/kvm_spe.h>
+> +#include <asm/sysreg.h>
+
+NIT: include <linux/cleanup.h> for guard(mutex)() etc.?
+
+> +
+> +static LIST_HEAD(spe_pmus);
+> +static DEFINE_MUTEX(spe_pmus_lock);
+> +
+> +struct spe_pmu_entry {
+> +	struct list_head link;
+> +	struct arm_spe_pmu *spe_pmu;
+> +};
+
+This seems like an odd way of making this into a list, can't you just embed
+list_head in arm_spe_pmu?
+
+Then adding becomes:
+
+list_add_tail(&spe_pmu->link, &spu_pmus);
+
+And removing:
+
+list_del(&spe_pmu->link);
+
+And you can avoid the alloc below too.
+
+
+> +
+> +void kvm_spe_add_instance(struct arm_spe_pmu *spe_pmu)
+
+Hmm I'm guessing this is per-SPU but no mention of SPU in the function
+name? Is an 'SPE instance' equivalent?
+
+If so, maybe worth referencing SPE instances rather than SPUs in the commit
+message, or at least say something like 'otherwise known as SPE instances'.
+
+> +{
+> +	struct spe_pmu_entry *entry;
+> +
+> +	guard(mutex)(&spe_pmus_lock);
+> +
+> +	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
+
+The convention is kmalloc_obj() now. Which also lets you elide GFP_KERNEL
+so this can be:
+
+	entry = kmalloc_obj(*entry);
+
+> +	if (!entry)
+> +		return;
+
+Hmm, shouldn't failing to allocate here be an error, or at least a warning?
+
+> +
+> +	entry->spe_pmu = spe_pmu;
+> +	list_add_tail(&entry->link, &spe_pmus);
+> +}
+> +EXPORT_SYMBOL_FOR_MODULES(kvm_spe_add_instance, "arm_spe_pmu");
+> +
+> +void kvm_spe_remove_instance(struct arm_spe_pmu *spe_pmu)
+> +{
+> +	struct spe_pmu_entry *entry, *tmp;
+> +
+> +	guard(mutex)(&spe_pmus_lock);
+> +
+> +	list_for_each_entry_safe(entry, tmp, &spe_pmus, link) {
+
+You break once you find the entry, so doesn't have to be the _safe variant.
+
+But can avoid all the complexity with an embedded list_head in the spe_pmu
+type if it's possible to put it there!
+
+> +		if (entry->spe_pmu == spe_pmu) {
+> +			list_del(&entry->link);
+> +			kfree(entry);
+> +			break;
+> +		}
+> +	}
+> +}
+> +EXPORT_SYMBOL_FOR_MODULES(kvm_spe_remove_instance, "arm_spe_pmu");
+> +
+> +bool kvm_supports_spe(void)
+> +{
+> +	guard(mutex)(&spe_pmus_lock);
+> +	return !list_empty(&spe_pmus);
+> +}
+> diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
+> index 42ba0924bd02..f24b122a087c 100644
+> --- a/drivers/perf/arm_spe_pmu.c
+> +++ b/drivers/perf/arm_spe_pmu.c
+> @@ -1370,6 +1370,8 @@ static int arm_spe_pmu_device_probe(struct platform_device *pdev)
+>  	if (ret)
+>  		goto out_teardown_dev;
+>
+> +	kvm_spe_add_instance(spe_pmu);
+> +
+>  	return 0;
+>
+>  out_teardown_dev:
+> @@ -1383,6 +1385,8 @@ static void arm_spe_pmu_device_remove(struct platform_device *pdev)
+>  {
+>  	struct arm_spe_pmu *spe_pmu = platform_get_drvdata(pdev);
+>
+> +	kvm_spe_remove_instance(spe_pmu);
+> +
+>  	arm_spe_pmu_perf_destroy(spe_pmu);
+>  	arm_spe_pmu_dev_teardown(spe_pmu);
+>  	free_percpu(spe_pmu->handle);
+> diff --git a/include/linux/perf/arm_spe_pmu.h b/include/linux/perf/arm_spe_pmu.h
+> index 97b14e236fcd..bdb703558a87 100644
+> --- a/include/linux/perf/arm_spe_pmu.h
+> +++ b/include/linux/perf/arm_spe_pmu.h
+> @@ -49,4 +49,16 @@ struct arm_spe_pmu {
+>
+>  #define to_spe_pmu(p) (container_of(p, struct arm_spe_pmu, pmu))
+>
+> +#ifdef CONFIG_KVM_ARM_SPE
+> +void kvm_spe_add_instance(struct arm_spe_pmu *spe_pmu);
+> +void kvm_spe_remove_instance(struct arm_spe_pmu *spe_pmu);
+> +#else
+> +static inline void kvm_spe_add_instance(struct arm_spe_pmu *spe_pmu)
+> +{
+> +}
+> +static inline void kvm_spe_remove_instance(struct arm_spe_pmu *spe_pmu)
+> +{
+> +}
+> +#endif /* CONFIG_KVM_ARM_SPE */
+> +
+>  #endif /* __PERF_ARM_SPE_PMU_H__ */
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index ac2d77d14963..1565a609890b 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -999,6 +999,7 @@ struct kvm_enable_cap {
+>  #define KVM_CAP_S390_HPAGE_2G 249
+>  #define KVM_CAP_PPC_COMPAT_CAPS 250
+>  #define KVM_CAP_ARM_PMU_V3_STRICT 251
+> +#define KVM_CAP_ARM_SPE 252
+>
+>  struct kvm_irq_routing_irqchip {
+>  	__u32 irqchip;
+> --
+> 2.43.0
+>
+>
+
+--
+Cheers, Lorenzo
