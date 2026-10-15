@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB2E3530DE2
-	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 14:26:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6A0531B0F
+	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 14:26:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792074375; cv=none; b=ftzDTbTEBBG5wWGsHi6NNp6rxy3fkDh52HWQVbrAemzfaNiKP3fjSe+EK6V54DvqW1fj551K1n0TxeuT24McXTv6vAP3E7xVR747dx2M4xppl5TpfeS99B39RjipPy3zd0vNiuZLhwcCvQf+BBT+m0j5z9Hy3sxir2N1C9eHO3M=
+	t=1792074383; cv=none; b=SDppLx0gsu9BmM2C9uA9QKpZX9XXtqTkAkzz29SEwAyVDpGnWfEAdzMU0uf34JSTdflfxBL7cDvKQRyVe+8ATSkEzghQZRWWJVMpObKBJDFWVH3jS+Qveu6iw/gpj+OLaeTWxE75aZkLTX1ZZuiYiOQxq34jP5u0EHR69vbGfBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792074375; c=relaxed/simple;
-	bh=+sWSx7q4/Kw4lwtWKeviDU8sZZvwTr4UZ7T0bQPZcT4=;
+	s=arc-20240116; t=1792074383; c=relaxed/simple;
+	bh=G36qdmTqm2rO4jOwRCiQ4XYdFKdwxjAn5cYS9ovRP7s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Wwum9NwnyZBSeC6MW99yDzgQaQYRnWQ/qL81s3x8aaRTtYAIRPAorBKlZAVvCIOK1atKv6m9aTiF3/rvCMOkOJ821MELyEmWz0DtExAtfHSlymuQw6QZNt2oBmey4qoNa3fyDMnIi92vkp0IEAfw9OoVd80LkLww8U2hL6MaMu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=DY769hD2; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=UWj0w+ty3adITOUFnJbi9QthgEqzQgeeGLa3h4cR+U3X1qN7mSwJksjzXvpcjuBCJ5BSOj84rqD0L1LF3tpQlJY/KxOuwshwkmq15unKKnlgbnRjkMktPrjSf0zsFbDbQzq9qZiyHSh9tCdFU6ZTLfZtk4W8z+kUibW6aFFTroo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=qgIDJeAA; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="DY769hD2"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="qgIDJeAA"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D13AD1576;
-	Thu, 15 Oct 2026 07:26:07 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 338861477;
+	Thu, 15 Oct 2026 07:26:11 -0700 (PDT)
 Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.2.198.107])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9DBEA3F871;
-	Thu, 15 Oct 2026 07:26:07 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 768E33F871;
+	Thu, 15 Oct 2026 07:26:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792074371; bh=+sWSx7q4/Kw4lwtWKeviDU8sZZvwTr4UZ7T0bQPZcT4=;
+	t=1792074374; bh=G36qdmTqm2rO4jOwRCiQ4XYdFKdwxjAn5cYS9ovRP7s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DY769hD2aZ1vtvDesRp5NMChqCCV5ltsWck8QekzDyKNA0DuRSEd6vBFWyH1QeS54
-	 D3A2S6P99KAJdEs0fWxHm2zMMUJIEv+q7Pf3PUgOMmlsGGz9aeoE2CCx8yJKLAp2mv
-	 j74pglqhMvx/4mY3LDtwHKNK6hkAwZLwE1cdx1QE=
+	b=qgIDJeAA47kbre4VMzYXSsz/jRNOmr+Uidx7bY/PipDt4zyVp+pZA20LZyfXfcJkx
+	 F94C+169GFWu5+v0tJ09/nbM5ONBNiUi9S89P6lLbYHJjxwTT4u2XVBNDaies8/3//
+	 WJ9pQiFVVXSGlz8owk+LSRbBu9aNNelQ4Y2oomY0=
 From: Ryan Roberts <ryan.roberts@arm.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Arnd Bergmann <arnd@arndb.de>,
@@ -50,9 +50,9 @@ Cc: Ryan Roberts <ryan.roberts@arm.com>,
 	devicetree@vger.kernel.org,
 	dri-devel@lists.freedesktop.org,
 	linux-doc@vger.kernel.org
-Subject: [RFC PATCH v2 02/15] misc/arm-cla: Add launch operation helpers
-Date: Thu, 15 Oct 2026 15:25:36 +0100
-Message-ID: <20261015142552.4128028-3-ryan.roberts@arm.com>
+Subject: [RFC PATCH v2 03/15] dt-bindings: misc: Add Arm Core Local Accelerator
+Date: Thu, 15 Oct 2026 15:25:37 +0100
+Message-ID: <20261015142552.4128028-4-ryan.roberts@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261015142552.4128028-1-ryan.roberts@arm.com>
 References: <20261015142552.4128028-1-ryan.roberts@arm.com>
@@ -64,411 +64,118 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jean-Philippe Brucker <jpb@kernel.org>
+Arm Core Local Accelerator (CLA) provides a CPU-local interface to
+accelerators that access memory through the local CPU's MMU. CLAs whose
+accelerators cannot be isolated from each other form an isolation
+domain.
 
-CLA commands are issued by writing optional payload registers,
-programming the LAUNCH register and polling LRESP until the hardware
-accepts or rejects the operation.
+Add a binding for arm,cla describing the register range, CPU
+association, DMA coherency and isolation domain. Document the
+privilege-level register frames, including reduced ranges exposed to
+virtual machines, and provide an example of two CLAs sharing a domain.
 
-Add a common launch helper that performs this sequence on the CLA's
-local CPU, waits for LRESP completion and translates launch response
-codes into Linux errors.
-
-Build accelerator reset and register read and write support on top of
-it. The register read and write helpers split larger accesses into
-multiple launch operations when an access crosses an eight-register
-window.
-
-Signed-off-by: Jean-Philippe Brucker <jpb@kernel.org>
+Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
 ---
- drivers/misc/arm-cla/Makefile   |   6 +
- drivers/misc/arm-cla/arm-cla.h  |  24 +++
- drivers/misc/arm-cla/cla-init.c |  12 ++
- drivers/misc/arm-cla/cla-ops.c  | 293 ++++++++++++++++++++++++++++++++
- 4 files changed, 335 insertions(+)
- create mode 100644 drivers/misc/arm-cla/cla-init.c
- create mode 100644 drivers/misc/arm-cla/cla-ops.c
+ .../devicetree/bindings/misc/arm,cla.yaml     | 77 +++++++++++++++++++
+ MAINTAINERS                                   |  1 +
+ 2 files changed, 78 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/misc/arm,cla.yaml
 
-diff --git a/drivers/misc/arm-cla/Makefile b/drivers/misc/arm-cla/Makefile
-index a4e40e534e6a..3fa8567c8b3e 100644
---- a/drivers/misc/arm-cla/Makefile
-+++ b/drivers/misc/arm-cla/Makefile
-@@ -1 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
-+
-+arm-cla-y := \
-+	cla-init.o \
-+	cla-ops.o
-+
-+obj-$(CONFIG_ARM_CLA) += arm-cla.o
-diff --git a/drivers/misc/arm-cla/arm-cla.h b/drivers/misc/arm-cla/arm-cla.h
-index 1e8ffca28bc6..4884e4804ab3 100644
---- a/drivers/misc/arm-cla/arm-cla.h
-+++ b/drivers/misc/arm-cla/arm-cla.h
-@@ -7,6 +7,9 @@
- #ifndef _ARM_CLA_H_
- #define _ARM_CLA_H_
- 
-+#include <linux/device.h>
-+#include <linux/io.h>
-+
- #include "arm-cla-regs.h"
- 
- /* Number of accelerators per CLA */
-@@ -19,10 +22,12 @@
-  *
-  * Immutable state:
-  * @cpu:		The CPU this CLA is attached to.
-+ * @regs:		Registers accessed by the kernel.
-  * @dev:		The platform device.
-  */
- struct cla_dev {
- 	unsigned int cpu;
-+	void __iomem *regs;
- 	struct device *dev;
- };
- 
-@@ -33,4 +38,23 @@ struct cla_dev {
- #define cla_err(_dev, fmt, ...) \
- 	dev_err((_dev)->dev, "[%u] " fmt, (_dev)->cpu, ##__VA_ARGS__)
- 
-+static inline u64 cla_reg_read(struct cla_dev *dev, off_t reg)
-+{
-+	/* MMIO reads are all relaxed, since the driver doesn't use DMA. */
-+	return readq_relaxed(dev->regs + reg);
-+}
-+
-+static inline void cla_reg_write(struct cla_dev *dev, off_t reg, u64 val)
-+{
-+	/* MMIO writes are all relaxed, since the driver doesn't use DMA. */
-+	return writeq_relaxed(val, dev->regs + reg);
-+}
-+
-+int cla_op_wait_lresp(struct cla_dev *dev, u64 *lresp);
-+int cla_op_reset(struct cla_dev *dev, unsigned int accid);
-+int cla_op_regread(struct cla_dev *dev, unsigned int accid, unsigned int regidx,
-+		   size_t nregs, u64 *regs);
-+int cla_op_regwrite(struct cla_dev *dev, unsigned int accid,
-+		    unsigned int regidx, size_t nregs, u64 *regs);
-+
- #endif /* _ARM_CLA_H_ */
-diff --git a/drivers/misc/arm-cla/cla-init.c b/drivers/misc/arm-cla/cla-init.c
+diff --git a/Documentation/devicetree/bindings/misc/arm,cla.yaml b/Documentation/devicetree/bindings/misc/arm,cla.yaml
 new file mode 100644
-index 000000000000..3d1f47592842
+index 000000000000..b86a2befd09a
 --- /dev/null
-+++ b/drivers/misc/arm-cla/cla-init.c
-@@ -0,0 +1,12 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Arm CLA driver - probing and initialization
-+ *
-+ * Copyright 2026 Arm Limited.
-+ */
++++ b/Documentation/devicetree/bindings/misc/arm,cla.yaml
+@@ -0,0 +1,77 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/misc/arm,cla.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+#include <linux/module.h>
++title: Arm Core Local Accelerator (CLA)
 +
-+MODULE_DESCRIPTION("Arm Core Local Accelerator");
-+MODULE_AUTHOR("Arm Limited");
-+MODULE_LICENSE("GPL");
-diff --git a/drivers/misc/arm-cla/cla-ops.c b/drivers/misc/arm-cla/cla-ops.c
-new file mode 100644
-index 000000000000..46026304a057
---- /dev/null
-+++ b/drivers/misc/arm-cla/cla-ops.c
-@@ -0,0 +1,293 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Arm CLA driver - Launch operations
-+ *
-+ * Copyright 2026 Arm Limited.
-+ */
++maintainers:
++  - Ryan Roberts <ryan.roberts@arm.com>
 +
-+#include <linux/iopoll.h>
++description:
++  A Core Local Accelerator (CLA) provides a CPU-local interface to up to eight
++  accelerators. The accelerators access memory through the local CPU's MMU. Each
++  CLA has its own register range, which can only be accessed by its local CPU.
++  Completion is polled through the registers; CLA does not generate interrupts.
 +
-+#include "arm-cla.h"
++properties:
++  compatible:
++    const: arm,cla
 +
-+/* Time to wait between two LRESP reads */
-+#define CLA_LRESP_DELAY_US	1
++  reg:
++    maxItems: 1
++    description:
++      A single contiguous register range starting at the PL0 frame, aligned to
++      256 KiB. Each privilege-level frame occupies 64 KiB, with PL0, PL1, PL2
++      and PL3 at offsets 0, 0x10000, 0x20000 and 0x30000 respectively. The
++      complete range is 256 KiB. Higher-privilege frames may be omitted when
++      unavailable, for example in a virtual machine. The range must include at
++      least PL0 and PL1 when running at EL1 and additionally PL2 when running at
++      EL2.
 +
-+/*
-+ * Time to wait for LRESP_PENDING to clear. Commands like REGREAD should
-+ * complete in a few cycles, but ENTERSR and RESET may need to clean up
-+ * some very large states depending on the work interrupted, and may need
-+ * 1us or more. Some software models need a lot more time.
-+ */
-+#define CLA_LRESP_TIMEOUT_US	1000000 /* 1s! */
++  cpu:
++    $ref: /schemas/types.yaml#/definitions/phandle
++    description:
++      Phandle to the CPU for which this CLA is local. Only that CPU can access
++      the CLA's registers.
 +
-+/* Time to wait between two STATUS reads when polling for DMB */
-+#define CLA_STATUS_DMB_DELAY_US	10
++  dma-coherent: true
 +
-+/* Time to wait for STATUS_DMB to be set after a successful RESET or ENTERSR. */
-+#define CLA_STATUS_DMB_TIMEOUT_US 1000000 /* 1s! */
++  arm,domain:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    description:
++      Identifier of the CLA isolation domain. CLAs whose attached accelerators
++      cannot be isolated from each other, for example because they share an
++      inter-accelerator communication bus, must have the same domain ID.
++      Different isolation domains must have different IDs. IDs need not be
++      consecutive. A CLA that can be isolated from all other CLAs has its own
++      domain ID.
 +
-+enum cla_launch_data_mode {
-+	CLA_DATA_NONE,
-+	CLA_DATA_IN,
-+	CLA_DATA_OUT,
-+};
++required:
++  - compatible
++  - reg
++  - cpu
++  - dma-coherent
++  - arm,domain
 +
-+struct cla_launch {
-+	u8	op;		/* opcode */
-+	u8	ndata_m1;	/* Data size minus 1 */
-+	u8	accid;		/* Accelerator ID */
-+	bool	seq;		/* part of compound cmd */
-+	u32	regidx;		/* Register index */
++additionalProperties: false
 +
-+	enum cla_launch_data_mode data_mode;
-+	u64	*data;		/* In/out data */
++examples:
++  - |
++    /* Two CPU-local CLAs in the same isolation domain. */
++    cla@10000000 {
++        compatible = "arm,cla";
++        reg = <0x10000000 0x40000>;
++        cpu = <&cpu0>;
++        dma-coherent;
++        arm,domain = <0>;
++    };
 +
-+	u8	errcode;	/* Output error code */
-+};
-+
-+/**
-+ * cla_op_launch - Launch operation.
-+ * @dev: CLA device.
-+ * @launch: LAUNCH settings.
-+ *
-+ * 1. Check that no previous operation is pending.
-+ * 2. If data_mode is %CLA_DATA_IN, write DATA registers.
-+ * 3. Launch the operation, and wait for the response.
-+ * 4. If data_mode is %CLA_DATA_OUT, read DATA registers into @launch->data.
-+ *
-+ * Return:
-+ * * %0			- Success.
-+ * * %-EAGAIN		- A previous operation is still pending. Nothing was
-+ *			  written to DATA or LAUNCH.
-+ * * %-ETIMEDOUT	- LAUNCH timed out (possibly no CLA at this address).
-+ *			  Unless LRESP_PENDING eventually clears, this is
-+ *			  unrecoverable.
-+ * * %-ENODEV		- Accelerator not available.
-+ * * %-EBUSY		- Accelerator is busy.
-+ * * %-EIO		- LAUNCH error. @launch->errcode contains the LRESP
-+ *			  error code.
-+ */
-+static int cla_op_launch(struct cla_dev *dev, struct cla_launch *launch)
-+{
-+	int i;
-+	int ret;
-+	u64 lresp;
-+
-+	if (WARN_ON(smp_processor_id() != dev->cpu))
-+		return -EINVAL;
-+
-+	lresp = cla_reg_read(dev, CLA_REG_LRESP);
-+	if (FIELD_GET(CLA_LRESP_PENDING, lresp))
-+		return -EAGAIN;
-+
-+	if (launch->data_mode == CLA_DATA_IN)
-+		for (i = 0; i < launch->ndata_m1 + 1; i++)
-+			cla_reg_write(dev, CLA_REG_DATA(i), launch->data[i]);
-+
-+	/*
-+	 * For operations that return a response, LAUNCH sets LRESP_PENDING or
-+	 * provides an immediate response. So a previously completed error
-+	 * response does not block a new LAUNCH and does not need to be
-+	 * explicitly cleared.
-+	 */
-+	cla_reg_write(dev, CLA_REG_LAUNCH,
-+		      FIELD_PREP(CLA_LAUNCH_OP, launch->op) |
-+		      FIELD_PREP(CLA_LAUNCH_NDATA_M1, launch->ndata_m1) |
-+		      FIELD_PREP(CLA_LAUNCH_ACCID, launch->accid) |
-+		      FIELD_PREP(CLA_LAUNCH_SEQ, launch->seq) |
-+		      FIELD_PREP(CLA_LAUNCH_REGIDX, launch->regidx));
-+
-+	ret = cla_op_wait_lresp(dev, &lresp);
-+	if (ret) {
-+		cla_err(dev, "launch failed with %d\n", ret);
-+		return ret;
-+	}
-+
-+	switch (FIELD_GET(CLA_LRESP_CODE, lresp)) {
-+	case CLA_LRESP_OK:
-+		break;
-+	case CLA_LRESP_UNAVAIL:
-+		return -ENODEV;
-+	case CLA_LRESP_BUSY:
-+		return -EBUSY;
-+	case CLA_LRESP_ERROR:
-+		launch->errcode = FIELD_GET(CLA_LRESP_ERRCODE, lresp);
-+		return -EIO;
-+	}
-+
-+	if (launch->data_mode == CLA_DATA_OUT)
-+		for (i = 0; i < launch->ndata_m1 + 1; i++)
-+			launch->data[i] = cla_reg_read(dev, CLA_REG_DATA(i));
-+
-+	return 0;
-+}
-+
-+/**
-+ * cla_op_wait_lresp - Wait for any LAUNCH op to complete.
-+ * @dev: CLA device.
-+ * @lresp: last LRESP value read.
-+ *
-+ * Return: 0 on success, -ETIMEDOUT in case of timeout.
-+ */
-+int cla_op_wait_lresp(struct cla_dev *dev, u64 *lresp)
-+{
-+	return readq_relaxed_poll_timeout_atomic(dev->regs + CLA_REG_LRESP,
-+			*lresp, FIELD_GET(CLA_LRESP_PENDING, *lresp) == 0,
-+			CLA_LRESP_DELAY_US, CLA_LRESP_TIMEOUT_US);
-+}
-+
-+/*
-+ * Wait for STATUS_DMB to be 1. Although RESET and ENTERSR both wait for
-+ * accelerators to return to STATUS_IDLE, some writes may still be pending. When
-+ * all accesses reach the PoC, STATUS_DMB is 1.
-+ *
-+ * This is needed for a few reasons:
-+ *
-+ * - Propagation of STATUS_EABORT. Until all writes are flushed and STATUS_DMB
-+ *   is 1, external aborts may still happen. The next context must not see this
-+ *   external abort reported in its status.
-+ *
-+ *   Note that EABORT cannot be injected into the previous context, it is not
-+ *   part of the saved and restored STATUS bits.
-+ *
-+ * - Turning CLA power off.
-+ *
-+ * - Migrating an accelerator owner across CPUs, although the driver does not
-+ *   support it.
-+ *
-+ * Return: -ETIMEDOUT on timeout. On success, return 0 and set *status to the
-+ * last status read.
-+ */
-+static int cla_wait_status_dmb(struct cla_dev *dev, unsigned int accid, u64 *status)
-+{
-+	return poll_timeout_us(*status = cla_reg_read(dev, CLA_REG_STATUS(accid)),
-+			       *status & CLA_STATUS_DMB,
-+			       CLA_STATUS_DMB_DELAY_US,
-+			       CLA_STATUS_DMB_TIMEOUT_US,
-+			       /* sleep_before_read */ false);
-+}
-+
-+/**
-+ * cla_op_reset - Launch RESET operation for this accelerator.
-+ * @dev: CLA device.
-+ * @accid: accelerator ID.
-+ *
-+ * Return: 0 on success, 1 if there is no accelerator with this ID, or an error.
-+ */
-+int cla_op_reset(struct cla_dev *dev, unsigned int accid)
-+{
-+	int ret;
-+	u64 status;
-+	struct cla_launch launch = {
-+		.op	= CLA_LAUNCH_OP_RESET,
-+		.accid	= accid,
-+	};
-+
-+	ret = cla_op_launch(dev, &launch);
-+	if (ret) {
-+		if (ret == -EIO && launch.errcode == CLA_ERRCODE_NOACC)
-+			return 1;
-+		return ret;
-+	}
-+
-+	/* Wait for outstanding writes */
-+	ret = cla_wait_status_dmb(dev, accid, &status);
-+	if (ret)
-+		return ret;
-+
-+	/*
-+	 * If STATUS.EABORT is set, a RAS error report is available. Launch a
-+	 * second reset to clear the bit. No need to wait for STATUS.DMB again
-+	 * since all accelerators are idle from the first reset, so no more
-+	 * memory writes could have been generated.
-+	 */
-+	if (status & CLA_STATUS_EABORT)
-+		return cla_op_launch(dev, &launch);
-+
-+	return 0;
-+}
-+
-+/* regidx is unsigned long here to avoid overflow during calculations */
-+static int cla_op_access_reg(struct cla_dev *dev, u8 op,
-+			     enum cla_launch_data_mode data_mode,
-+			     unsigned int accid, unsigned long regidx,
-+			     size_t nregs, u64 *regs)
-+{
-+	int ret = -EINVAL;
-+	unsigned long max_regidx;
-+	struct cla_launch launch = {
-+		.op = op,
-+		.accid = accid,
-+		.data_mode = data_mode,
-+	};
-+
-+	switch (op) {
-+	case CLA_LAUNCH_OP_REGREAD:
-+	case CLA_LAUNCH_OP_REGWRITE:
-+		max_regidx = 0x100000000;
-+		break;
-+	default:
-+		WARN_ON(1);
-+		return -EINVAL;
-+	}
-+
-+	if (WARN_ON(regidx + nregs > max_regidx))
-+		return -EINVAL;
-+
-+	/* 1 to 8 registers accessed at a time, within the same 8-reg group */
-+	while (nregs > 0) {
-+		u64 reg_group = ALIGN_DOWN(regidx, 8);
-+		u64 max_reg = min(regidx + nregs, reg_group + 8);
-+		u8 ndata = max_reg - regidx;
-+
-+		launch.ndata_m1 = ndata - 1;
-+		launch.regidx = regidx;
-+		launch.data = regs;
-+
-+		ret = cla_op_launch(dev, &launch);
-+		if (ret)
-+			break;
-+
-+		regidx += ndata;
-+		regs += ndata;
-+		nregs -= ndata;
-+	}
-+
-+	return ret;
-+}
-+
-+/**
-+ * cla_op_regread - Launch REGREAD operations.
-+ * @dev: CLA device.
-+ * @accid: accelerator ID.
-+ * @regidx: first register index.
-+ * @nregs: number of registers. Can be greater than 8 (accessed with multiple
-+ *         REGREAD operations).
-+ * @regs: array of length @nregs.
-+ *
-+ * Return: 0 on success, or an error.
-+ */
-+int cla_op_regread(struct cla_dev *dev, unsigned int accid,
-+			  unsigned int regidx, size_t nregs, u64 *regs)
-+{
-+	return cla_op_access_reg(dev, CLA_LAUNCH_OP_REGREAD, CLA_DATA_OUT,
-+				 accid, regidx, nregs, regs);
-+}
-+
-+/**
-+ * cla_op_regwrite - Launch REGWRITE operations.
-+ * @dev: CLA device.
-+ * @accid: accelerator ID.
-+ * @regidx: first register index.
-+ * @nregs: number of registers. Can be greater than 8 (accessed with multiple
-+ *         REGWRITE operations).
-+ * @regs: array of length @nregs.
-+ *
-+ * Return: 0 on success, or an error.
-+ */
-+int cla_op_regwrite(struct cla_dev *dev, unsigned int accid,
-+			   unsigned int regidx, size_t nregs, u64 *regs)
-+{
-+	return cla_op_access_reg(dev, CLA_LAUNCH_OP_REGWRITE, CLA_DATA_IN,
-+				 accid, regidx, nregs, regs);
-+}
++    cla@10040000 {
++        compatible = "arm,cla";
++        reg = <0x10040000 0x40000>;
++        cpu = <&cpu1>;
++        dma-coherent;
++        arm,domain = <0>;
++    };
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 735f6527f920..98a25b3de9b4 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2213,6 +2213,7 @@ ARM CORE LOCAL ACCELERATOR (CLA) DRIVER
+ M:	Ryan Roberts <ryan.roberts@arm.com>
+ L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+ S:	Supported
++F:	Documentation/devicetree/bindings/misc/arm,cla.yaml
+ F:	Documentation/misc-devices/arm-cla.rst
+ F:	drivers/misc/arm-cla/
+ 
 -- 
 2.43.0
 
