@@ -1,1279 +1,297 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21E453E317F;
-	Thu, 15 Oct 2026 17:36:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A06EA4746BF
+	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 20:09:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792085789; cv=none; b=ghK7FtRcmiEWZ/X3H2UI/LnqqyP5CNBOlEuc50qVlhft2g8pyFNBjQOGt13aTQRJ8Boet7zd/KMLZrdoFXuSEGHVTAMUUI5+C+MhH6A4KZflyCI4ky6a7v5iKwMKTgB9xP5HfQhg+PUoTuW3v6XFkcpstjcPA4+e859zuv6gMFM=
+	t=1792094954; cv=none; b=hwgcjKQ/yv1Okd2T18J4yr5LzFOGSDCNCR00rGdrZb/RNADeyPU5GLujs7xlsY6SRC6R/phrRgKrIXoTaX0INPsQt/GcZ7Z3UFcT6XZgUC1pothqF/sdC6ZiaOKrOQ2muU3hxpLJrzRDVYk//aLeBqLl1y4zXr8hxo3D1CdSR8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792085789; c=relaxed/simple;
-	bh=y+hvgaoylT4VqpcSBiEJxC5rqMUwG4GyH9p7+juGRlM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UFQ6h/omDTR9sQkRDZL68ANBMd9PbhrOECuf/8RobI7UdNpP7wetw98Ij+VAhirGvogroNZ6wGOespk2uy1Ibd1iTH1Yr8EhJT4DJ9yWHeUDsLmKVXq8ojD1TSJ4/6rQRH/zKaioC3yTxf9N+0tEYmhhUW+W8M9YaT7iq8tIIhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GKpXlynY; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792094954; c=relaxed/simple;
+	bh=4QSv9dYhOaR2HBZJNVF+hTPQZ6eZXN2FTJBON2Gx2y8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=i2NLydW/eOO+9PFUfBo8jUhmIcM6WlRQ8kAE5/KlwH2CgKmr93VSvSMfbcQYUMPgBwuycfvC6Ekz9jPpr73vBtZR0v3nHLoC24Mf+aLH4u6MW6eVqUzQk6LHWhu37PBlTFVpyWiJMyygaPzeJ8TuPzms6WId3MLA22nbem//dtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VKbCnOLx; arc=none smtp.client-ip=209.85.221.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GKpXlynY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45A8E1F000C5;
-	Thu, 15 Oct 2026 17:36:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792085770;
-	bh=whEa9FJDnR/9DqSZaeRu65T7kbdkvOiROhSsB9dvyF0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=GKpXlynY7cwwfpXqS3zFYADQcsOBuooqcXQy2Ycc9E9IlQc24XMy/+MHlgnQaMYX5
-	 7O/wc7wtc7I1TlH2BzSpsLBMXk3OVbF/3PnV1iYI50uI/kUhM9YyYDwS6bnDuestfx
-	 eaHTVqcudiZEbs9KmAM0qkaswZVmg7lcpDNDtxpdJeH8vbv9LF4cNGrXnPe1dF2e6I
-	 p5Mm/CrPnjHnmV50BgRNAkG6of74bxvwAKHlRVzYT91jqtbfyUoiNJkzFZoaZ7p+q4
-	 IswyUwg3LTYVgXVTPxC4mOsj6d63v8hpAGlgTPyEAGvi8XSfdwBH5Sm/KFCuIiMQGr
-	 PxYJhoeVfZMFQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xHPNA-00000003Q3a-1B7M;
-	Thu, 15 Oct 2026 17:36:08 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Steffen Eiden <seiden@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>
-Subject: [PATCH 1/2] KVM: arm64: Convert HCR_xyz to HCR_EL2_xyz
-Date: Thu, 15 Oct 2026 18:36:04 +0100
-Message-ID: <20261015173605.1072963-2-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261015173605.1072963-1-maz@kernel.org>
-References: <20261015173605.1072963-1-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VKbCnOLx"
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-48c7fe9736eso4577197f8f.0
+        for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 13:09:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1792094951; x=1792699751; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:from:subject
+         :message-id:mime-version:date:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=JU1lV9tx/T7M1GFAZKdqrqY3WCxWSZr50Vo+l73Jmns=;
+        b=VKbCnOLx0mvQwSqII5KzIUWd1BQAshu6zMhJccM3MLr063CB18doxfF+aWOSbaTdW5
+         6xqDx6lQU7J0cxp4FkYjao/0zWC5JdNT1WpCa/TdTEowDT6vRSt5bVbFNfXqIOWK5zCY
+         G2CgYr2NHpqkrlNLeWoSxo/IW5NBpsKk7nCFwsamtL9/5S8uqqGd2H1Jap8qGzBjdf2x
+         tl0mP0oF1Gc73reicY/wiCpnDljC1yn97mxbCMfbc35GEvKxzXmf5hTpzSNixeMkM9jv
+         xMfzaAea/R+eKIzKITVntUGpYXLt/WlQVs1MZsfpeQwnuxGrQLl27mV8KIGarMwh2avn
+         Fy1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792094951; x=1792699751;
+        h=content-transfer-encoding:content-type:cc:to:from:subject
+         :message-id:mime-version:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=JU1lV9tx/T7M1GFAZKdqrqY3WCxWSZr50Vo+l73Jmns=;
+        b=OH3nwtBu8KoPmWnptsAujOY94kN9Ax4TSQcL4CvnIbldIYJCtEZLlYojFhmeMFPenf
+         Fwlay1QQ9aItxPYS8FauuI/YtOggQ5r+I3Fi35Xs2x/bgo0gMzLjKVGdDD3jFffmYa2H
+         BVTYqgXuI11wAhzowrRBY/zspirOuJonn7l4gGKVybVR2FHoy+hX+/g/wPysGBs+ePd0
+         TSheMdsqleEmi43peTYU7ininpF2zliwCSHZ0RV6SXxzBC9hG/bJ758vRRZnLAM5U+se
+         pQwqefCGcj5y0oI9wLSMZ2lvN+IHAWXaY87kuVtQrb3BnOxcTuDzUj/3fZd76UKvOp2K
+         lR9w==
+X-Forwarded-Encrypted: i=1; AKwUvBwnMwJkhAqxEqTErqlmGmnYRtybn35GGuM2aevicxvkfNW2l1gTkJeMAN5eRq6zTdWX89iVYoY=@lists.linux.dev
+X-Gm-Message-State: AFq9FYL6lZSeuAK/IHE7HbvcVgJRxwY7ScqkWp6uL6QdYdPvV+tXjfAO
+	eAWA3dXI97fC1EgaSKH2+HsNCZNxJLMdD92tRtf6rxjrDE5TSnoiFrI5qJ/yrIFrbPmbht+k1Rz
+	JD7gUh/y+NLmm8g==
+X-Received: from wrpu14.prod.google.com ([2002:adf:f88e:0:b0:489:a3f7:af2d])
+ (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6000:29c3:b0:488:79a2:3232 with SMTP id ffacd0b85a97d-48dbaae446bmr25544669f8f.31.1792094950620;
+ Thu, 15 Oct 2026 13:09:10 -0700 (PDT)
+Date: Thu, 15 Oct 2026 20:08:31 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.176.g3575e65682-goog
+Message-ID: <20261015200903.2735565-1-smostafa@google.com>
+Subject: [PATCH v9 00/25] KVM: arm64: SMMUv3 driver for pKVM (trap and emulate)
+From: Mostafa Saleh <smostafa@google.com>
+To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev
+Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, joro@8bytes.org, jgg@ziepe.ca, mark.rutland@arm.com, 
+	qperret@google.com, tabba@google.com, vdonnefort@google.com, 
+	nicolinc@nvidia.com, Mostafa Saleh <smostafa@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Bulk convert all usages of HCR_xyz to HCR_EL2_xyz (the autogenerated
-version) using the following proof that I can't write shell scripts:
+Changes from v8:
+v8: https://lore.kernel.org/all/20260922131259.2975334-1-smostafa@google.co=
+m/
+- Rebase on iommu/next with the new TLB invalidation rework
+- Rename files (Nicolin, Jason)
+- Move more IDR parsing logic to common code (Nicolin)
+- Move Kconfig and depend on OF (Nicolin)
+- IDR0.COHACC must agree with firmware (Nicolin)
+- Fix waiting with SEV (Sashiko)
+- Drop extra heuristics about carveout size (Nicolin)
+- Minor reworks and cleanups
 
-awk 'match($3, /__HCR.*/) { print $2}' arch/arm64/include/asm/kvm_arm.h |
-  while read i; do
-    j=$(echo $i | sed -e "s/HCR_\(.*\)/\1/");
-    git grep -lw $i arch/arm64/ | xargs sed -i -e "s/\b$i\b/HCR_EL2_$j/g";
-  done
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+I ran Sashiko locally and it was helpful in discovering problems in
+the series. However, it still shows large number of critical and high
+severity issues, I went through them and I believe they are false
+positives, mainly because (in the order of frequently reported):
+- It doesn't understand WARNs are fatal in the hypervisor.
+- It doesn't understand that a malicious host can DoS the system and
+  pKVM doesn't guarantee availability
+- It doesn't understand the SMMUv3 spec and makes stuff up (eg. about
+  CMD_SYC CS field it makes up an non-existent encoding or wrong
+  semantics for the gbpa register)
+- It seems to look at one patch at a time and not the whole series, and
+  as the series is written in a way to be bisectable that confuses it.
 
-... and fixup the result.
+Design:
+=3D=3D=3D=3D=3D=3D=3D
+Assumptions:
+------------
+One of the important points, is that this doesn=E2=80=99t emulate the full
+SMMUv3 architecture, but only the parts used by Linux kernel.
+That=E2=80=99s why enablement of this (ARM_SMMU_V3_PKVM) depends on
+(ARM_SMMU_V3=3Dy) so we are sure of the driver behaviour.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/el2_setup.h      |   4 +-
- arch/arm64/include/asm/hardirq.h        |   6 +-
- arch/arm64/include/asm/kvm_arm.h        |  14 +--
- arch/arm64/include/asm/kvm_emulate.h    |  18 ++--
- arch/arm64/include/asm/kvm_mte.h        |   4 +-
- arch/arm64/include/asm/kvm_ptrauth.h    |   4 +-
- arch/arm64/kernel/head.S                |   4 +-
- arch/arm64/kvm/arm.c                    |  28 +++---
- arch/arm64/kvm/at.c                     |  18 ++--
- arch/arm64/kvm/emulate-nested.c         | 116 ++++++++++++------------
- arch/arm64/kvm/guest.c                  |   2 +-
- arch/arm64/kvm/handle_exit.c            |   2 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h |  14 +--
- arch/arm64/kvm/hyp/nvhe/host.S          |   2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-init.S      |   2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  20 ++--
- arch/arm64/kvm/hyp/nvhe/mem_protect.c   |   6 +-
- arch/arm64/kvm/hyp/nvhe/pkvm.c          |  32 +++----
- arch/arm64/kvm/hyp/vgic-v3-sr.c         |   4 +-
- arch/arm64/kvm/hyp/vhe/switch.c         |  12 +--
- arch/arm64/kvm/hyp/vhe/tlb.c            |   2 +-
- arch/arm64/kvm/inject_fault.c           |   6 +-
- arch/arm64/kvm/mmu.c                    |   8 +-
- arch/arm64/kvm/nested.c                 |   8 +-
- arch/arm64/kvm/sys_regs.c               |  24 ++---
- arch/arm64/kvm/vgic/vgic-v3-nested.c    |   4 +-
- 26 files changed, 182 insertions(+), 182 deletions(-)
+Any new change in the driver will likely trigger a WARN_ON ending up
+in panic, that will require to support also in the hypervisor.
 
-diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-index aa8ec9df80243..b15db1b1d5617 100644
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -61,7 +61,7 @@
- 	b.ne	.LnVHE_\@	// Otherwise, we know that nVHE works.
- 
- .LnE2H0_\@:
--	orr	x0, x0, #HCR_E2H
-+	orr	x0, x0, #HCR_EL2_E2H
- 	msr_hcr_el2 x0
- .LnVHE_\@:
- .endm
-@@ -102,7 +102,7 @@
- /* Check if running in host at EL2 mode, i.e., (h)VHE. Jump to fail if not. */
- .macro __check_hvhe fail, tmp
- 	mrs	\tmp, hcr_el2
--	and	\tmp, \tmp, #HCR_E2H
-+	and	\tmp, \tmp, #HCR_EL2_E2H
- 	cbz	\tmp, \fail
- .endm
- 
-diff --git a/arch/arm64/include/asm/hardirq.h b/arch/arm64/include/asm/hardirq.h
-index 77d6b8c63d4e6..024e5a24973e8 100644
---- a/arch/arm64/include/asm/hardirq.h
-+++ b/arch/arm64/include/asm/hardirq.h
-@@ -40,8 +40,8 @@ do {									\
- 	}								\
- 									\
- 	___hcr = read_sysreg(hcr_el2);					\
--	if (!(___hcr & HCR_TGE)) {					\
--		write_sysreg_hcr(___hcr | HCR_TGE);			\
-+	if (!(___hcr & HCR_EL2_TGE)) {					\
-+		write_sysreg_hcr(___hcr | HCR_EL2_TGE);			\
- 		isb();							\
- 	}								\
- 	/*								\
-@@ -81,7 +81,7 @@ do {									\
- 	 * we secured things for it.					\
- 	 */								\
- 	barrier();							\
--	if (!___ctx->cnt && !(___hcr & HCR_TGE))			\
-+	if (!___ctx->cnt && !(___hcr & HCR_EL2_TGE))			\
- 		write_sysreg_hcr(___hcr);				\
- } while (0)
- 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 678f0daed4459..b78e5ce08905b 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -99,13 +99,13 @@
-  * TID3:	Trap EL1 reads of group 3 ID registers
-  * TID1:	Trap REVIDR_EL1, AIDR_EL1, and SMIDR_EL1
-  */
--#define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
--			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
--			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
--			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 | HCR_TID1)
--#define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK)
--#define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
--#define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H | HCR_AMO | HCR_IMO | HCR_FMO)
-+#define HCR_GUEST_FLAGS (HCR_EL2_TSC | HCR_EL2_TSW | HCR_EL2_TWE | HCR_EL2_TWI | HCR_EL2_VM | \
-+			 HCR_EL2_BSU_IS | HCR_EL2_FB | HCR_EL2_TACR | \
-+			 HCR_EL2_AMO | HCR_EL2_SWIO | HCR_EL2_TIDCP | HCR_EL2_RW | HCR_EL2_TLOR | \
-+			 HCR_EL2_FMO | HCR_EL2_IMO | HCR_EL2_PTW | HCR_EL2_TID3 | HCR_EL2_TID1)
-+#define HCR_HOST_NVHE_FLAGS (HCR_EL2_RW | HCR_EL2_API | HCR_EL2_APK)
-+#define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_EL2_TSC)
-+#define HCR_HOST_VHE_FLAGS (HCR_EL2_RW | HCR_EL2_TGE | HCR_EL2_E2H | HCR_EL2_AMO | HCR_EL2_IMO | HCR_EL2_FMO)
- 
- #define MPAMHCR_HOST_FLAGS	0
- 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 85289a4b8d526..334211b8b2ee4 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -95,7 +95,7 @@ static inline void kvm_inject_nested_sve_trap(struct kvm_vcpu *vcpu)
- #if defined(__KVM_VHE_HYPERVISOR__) || defined(__KVM_NVHE_HYPERVISOR__)
- static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
- {
--	return !(vcpu->arch.hcr_el2 & HCR_RW);
-+	return !(vcpu->arch.hcr_el2 & HCR_EL2_RW);
- }
- #else
- static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
-@@ -116,7 +116,7 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 	 * then.
- 	 */
- 	if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
--		vcpu->arch.hcr_el2 |= HCR_TVM;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_TVM;
- }
- 
- static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
-@@ -227,12 +227,12 @@ static inline bool vcpu_is_el2(const struct kvm_vcpu *vcpu)
- static inline bool vcpu_el2_e2h_is_set(const struct kvm_vcpu *vcpu)
- {
- 	return (!cpus_have_final_cap(ARM64_HAS_HCR_NV1) ||
--		(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_E2H));
-+		(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_EL2_E2H));
- }
- 
- static inline bool vcpu_el2_tge_is_set(const struct kvm_vcpu *vcpu)
- {
--	return ctxt_sys_reg(&vcpu->arch.ctxt, HCR_EL2) & HCR_TGE;
-+	return ctxt_sys_reg(&vcpu->arch.ctxt, HCR_EL2) & HCR_EL2_TGE;
- }
- 
- static inline bool vcpu_el2_amo_is_set(const struct kvm_vcpu *vcpu)
-@@ -251,7 +251,7 @@ static inline bool vcpu_el2_amo_is_set(const struct kvm_vcpu *vcpu)
- 	if (vcpu_is_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu) && !vcpu_el2_tge_is_set(vcpu))
- 		return true;
- 
--	return ctxt_sys_reg(&vcpu->arch.ctxt, HCR_EL2) & HCR_AMO;
-+	return ctxt_sys_reg(&vcpu->arch.ctxt, HCR_EL2) & HCR_EL2_AMO;
- }
- 
- static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
-@@ -264,8 +264,8 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
- 
- 	hcr = __vcpu_sys_reg(vcpu, HCR_EL2);
- 
--	e2h = (hcr & HCR_E2H);
--	tge = (hcr & HCR_TGE);
-+	e2h = (hcr & HCR_EL2_E2H);
-+	tge = (hcr & HCR_EL2_TGE);
- 
- 	/*
- 	 * We are in a hypervisor context if the vcpu mode is EL2 or
-@@ -376,8 +376,8 @@ static inline bool guest_hyp_wfx_traps_enabled(const struct kvm_vcpu *vcpu)
- 	if (!vcpu_has_nv(vcpu) || vcpu_is_el2(vcpu))
- 		return false;
- 
--	return ((is_wfe && (hcr_el2 & HCR_TWE)) ||
--		(!is_wfe && (hcr_el2 & HCR_TWI)));
-+	return ((is_wfe && (hcr_el2 & HCR_EL2_TWE)) ||
-+		(!is_wfe && (hcr_el2 & HCR_EL2_TWI)));
- }
- 
- static __always_inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/include/asm/kvm_mte.h b/arch/arm64/include/asm/kvm_mte.h
-index 3171963ad25ce..502d6df916911 100644
---- a/arch/arm64/include/asm/kvm_mte.h
-+++ b/arch/arm64/include/asm/kvm_mte.h
-@@ -16,7 +16,7 @@ alternative_if_not ARM64_MTE
- 	b	.L__skip_switch\@
- alternative_else_nop_endif
- 	mrs	\reg1, hcr_el2
--	tbz	\reg1, #(HCR_ATA_SHIFT), .L__skip_switch\@
-+	tbz	\reg1, #(HCR_EL2_ATA_SHIFT), .L__skip_switch\@
- 
- 	mrs_s	\reg1, SYS_RGSR_EL1
- 	str	\reg1, [\h_ctxt, #CPU_RGSR_EL1]
-@@ -36,7 +36,7 @@ alternative_if_not ARM64_MTE
- 	b	.L__skip_switch\@
- alternative_else_nop_endif
- 	mrs	\reg1, hcr_el2
--	tbz	\reg1, #(HCR_ATA_SHIFT), .L__skip_switch\@
-+	tbz	\reg1, #(HCR_EL2_ATA_SHIFT), .L__skip_switch\@
- 
- 	mrs_s	\reg1, SYS_RGSR_EL1
- 	str	\reg1, [\g_ctxt, #CPU_RGSR_EL1]
-diff --git a/arch/arm64/include/asm/kvm_ptrauth.h b/arch/arm64/include/asm/kvm_ptrauth.h
-index e50987b32483b..24f75457a7121 100644
---- a/arch/arm64/include/asm/kvm_ptrauth.h
-+++ b/arch/arm64/include/asm/kvm_ptrauth.h
-@@ -71,7 +71,7 @@ alternative_if_not ARM64_HAS_ADDRESS_AUTH
- 	b	.L__skip_switch\@
- alternative_else_nop_endif
- 	mrs	\reg1, hcr_el2
--	and	\reg1, \reg1, #(HCR_API | HCR_APK)
-+	and	\reg1, \reg1, #(HCR_EL2_API | HCR_EL2_APK)
- 	cbz	\reg1, .L__skip_switch\@
- 	add	\reg1, \g_ctxt, #CPU_APIAKEYLO_EL1
- 	ptrauth_restore_state	\reg1, \reg2, \reg3
-@@ -83,7 +83,7 @@ alternative_if_not ARM64_HAS_ADDRESS_AUTH
- 	b	.L__skip_switch\@
- alternative_else_nop_endif
- 	mrs	\reg1, hcr_el2
--	and	\reg1, \reg1, #(HCR_API | HCR_APK)
-+	and	\reg1, \reg1, #(HCR_EL2_API | HCR_EL2_APK)
- 	cbz	\reg1, .L__skip_switch\@
- 	add	\reg1, \g_ctxt, #CPU_APIAKEYLO_EL1
- 	ptrauth_save_state	\reg1, \reg2, \reg3
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index 87a822e5c4ca8..cb684f40beac8 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -299,7 +299,7 @@ SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
- 	isb
- 0:
- 
--	init_el2_hcr	HCR_HOST_NVHE_FLAGS | HCR_ATA
-+	init_el2_hcr	HCR_HOST_NVHE_FLAGS | HCR_EL2_ATA
- 	init_el2_state
- 
- 	/* Hypervisor stub */
-@@ -310,7 +310,7 @@ SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
- 	mov_q	x1, INIT_SCTLR_EL1_MMU_OFF
- 
- 	mrs	x0, hcr_el2
--	and	x0, x0, #HCR_E2H
-+	and	x0, x0, #HCR_EL2_E2H
- 	cbz	x0, 2f
- 
- 	/* Set a sane SCTLR_EL1, the VHE way */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index d593ba9280933..456f51f2b89a5 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -650,11 +650,11 @@ static void vcpu_set_pauth_traps(struct kvm_vcpu *vcpu)
- 		u64 val;
- 
- 		val = __vcpu_sys_reg(vcpu, HCR_EL2);
--		val &= (HCR_API | HCR_APK);
--		vcpu->arch.hcr_el2 &= ~(HCR_API | HCR_APK);
-+		val &= (HCR_EL2_API | HCR_EL2_APK);
-+		vcpu->arch.hcr_el2 &= ~(HCR_EL2_API | HCR_EL2_APK);
- 		vcpu->arch.hcr_el2 |= val;
- 	} else {
--		vcpu->arch.hcr_el2 |= (HCR_API | HCR_APK);
-+		vcpu->arch.hcr_el2 |= (HCR_EL2_API | HCR_EL2_APK);
- 	}
- 
- 	/*
-@@ -662,7 +662,7 @@ static void vcpu_set_pauth_traps(struct kvm_vcpu *vcpu)
- 	 * to use pauth, as the entry code will reload the guest
- 	 * keys in that case.
- 	 */
--	if (vcpu->arch.hcr_el2 & (HCR_API | HCR_APK)) {
-+	if (vcpu->arch.hcr_el2 & (HCR_EL2_API | HCR_EL2_APK)) {
- 		struct kvm_cpu_context *ctxt;
- 
- 		ctxt = this_cpu_ptr_hyp_sym(kvm_hyp_ctxt);
-@@ -736,14 +736,14 @@ static void vcpu_put_mmu(struct kvm_vcpu *vcpu)
- static void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
- {
- 	if (kvm_vcpu_should_clear_twe(vcpu))
--		vcpu->arch.hcr_el2 &= ~HCR_TWE;
-+		vcpu->arch.hcr_el2 &= ~HCR_EL2_TWE;
- 	else
--		vcpu->arch.hcr_el2 |= HCR_TWE;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_TWE;
- 
- 	if (kvm_vcpu_should_clear_twi(vcpu))
--		vcpu->arch.hcr_el2 &= ~HCR_TWI;
-+		vcpu->arch.hcr_el2 &= ~HCR_EL2_TWI;
- 	else
--		vcpu->arch.hcr_el2 |= HCR_TWI;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_TWI;
- }
- 
- static void vcpu_load_pvtime(struct kvm_vcpu *vcpu)
-@@ -963,7 +963,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
-  */
- int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
- {
--	bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF | HCR_VSE);
-+	bool irq_lines = *vcpu_hcr(v) & (HCR_EL2_VI | HCR_EL2_VF | HCR_EL2_VSE);
- 
- 	irq_lines |= (!irqchip_in_kernel(v->kvm) &&
- 		      (kvm_timer_should_notify_user(v) ||
-@@ -1592,9 +1592,9 @@ static int vcpu_interrupt_line(struct kvm_vcpu *vcpu, int number, bool level)
- 	unsigned long *hcr;
- 
- 	if (number == KVM_ARM_IRQ_CPU_IRQ)
--		bit_index = __ffs(HCR_VI);
-+		bit_index = __ffs(HCR_EL2_VI);
- 	else /* KVM_ARM_IRQ_CPU_FIQ */
--		bit_index = __ffs(HCR_VF);
-+		bit_index = __ffs(HCR_EL2_VF);
- 
- 	hcr = vcpu_hcr(vcpu);
- 	if (level)
-@@ -2384,12 +2384,12 @@ static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
- 		params->hcr_el2 = HCR_HOST_NVHE_FLAGS;
- 
- 	if (system_supports_mte())
--		params->hcr_el2 |= HCR_ATA;
-+		params->hcr_el2 |= HCR_EL2_ATA;
- 	else
--		params->hcr_el2 |= HCR_TID5;
-+		params->hcr_el2 |= HCR_EL2_TID5;
- 
- 	if (cpus_have_final_cap(ARM64_KVM_HVHE))
--		params->hcr_el2 |= HCR_E2H;
-+		params->hcr_el2 |= HCR_EL2_E2H;
- 	params->vttbr = params->vtcr = 0;
- 
- 	/*
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 0926426b87989..30d8f062b2c29 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -229,7 +229,7 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 
- 	if (vcpu_has_nv(vcpu)) {
- 		hcr = __vcpu_sys_reg(vcpu, HCR_EL2);
--		wi->s2 = wi->regime == TR_EL10 && (hcr & (HCR_VM | HCR_DC));
-+		wi->s2 = wi->regime == TR_EL10 && (hcr & (HCR_EL2_VM | HCR_EL2_DC));
- 	} else {
- 		WARN_ON_ONCE(wi->regime != TR_EL10);
- 		wi->s2 = false;
-@@ -305,7 +305,7 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 		 * is EL1&0, then it means that either {E2H,TGE} == {1,0} or
- 		 * {0,x}, and we only need to test for TGE == 1.
- 		 */
--		if (hcr & (HCR_DC | HCR_TGE)) {
-+		if (hcr & (HCR_EL2_DC | HCR_EL2_TGE)) {
- 			wr->level = S1_MMU_DISABLED;
- 			break;
- 		}
-@@ -870,7 +870,7 @@ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
- 	s1_parattr = FIELD_GET(SYS_PAR_EL1_ATTR, s1_par);
- 	s2_memattr = FIELD_GET(GENMASK(5, 2), tr->desc);
- 
--	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_FWB) {
-+	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_EL2_FWB) {
- 		if (!kvm_has_feat(vcpu->kvm, ID_AA64PFR2_EL1, MTEPERM, IMP))
- 			s2_memattr &= ~BIT(3);
- 
-@@ -924,7 +924,7 @@ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
- 		}
- 	}
- 
--	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_CD) &&
-+	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_EL2_CD) &&
- 	    !MEMATTR_IS_DEVICE(final_attr))
- 		final_attr = MEMATTR(NC, NC);
- 
-@@ -956,7 +956,7 @@ static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 		par |= wr->pa & SYS_PAR_EL1_PA;
- 
- 		if (wi->regime == TR_EL10 && vcpu_has_nv(vcpu) &&
--		    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
-+		    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_EL2_DC)) {
- 			par |= FIELD_PREP(SYS_PAR_EL1_ATTR,
- 					  MEMATTR(WbRaWa, WbRaWa));
- 			par |= FIELD_PREP(SYS_PAR_EL1_SH, ATTR_NSH);
-@@ -1548,11 +1548,11 @@ int __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 		bool fail;
- 
- 		val = hcr = read_sysreg(hcr_el2);
--		val &= ~HCR_TGE;
--		val |= HCR_VM;
-+		val &= ~HCR_EL2_TGE;
-+		val |= HCR_EL2_VM;
- 
- 		if (!vcpu_el2_e2h_is_set(vcpu))
--			val |= HCR_NV | HCR_NV1;
-+			val |= HCR_EL2_NV | HCR_EL2_NV1;
- 
- 		write_sysreg_hcr(val);
- 		isb();
-@@ -1635,7 +1635,7 @@ int __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 	 * early. Same thing if {VM,DC}=={0,0}.
- 	 */
- 	if (compute_translation_regime(vcpu, op) == TR_EL20 ||
--	    !(vcpu_read_sys_reg(vcpu, HCR_EL2) & (HCR_VM | HCR_DC)))
-+	    !(vcpu_read_sys_reg(vcpu, HCR_EL2) & (HCR_EL2_VM | HCR_EL2_DC)))
- 		return 0;
- 
- 	/* Do the stage-2 translation */
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 3806ff0920fe7..65686ddb3b7da 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -145,176 +145,176 @@ enum cgt_group_id {
- static const struct trap_bits coarse_trap_bits[] = {
- 	[CGT_HCR_TID1] = {
- 		.index		= HCR_EL2,
--		.value 		= HCR_TID1,
--		.mask		= HCR_TID1,
-+		.value 		= HCR_EL2_TID1,
-+		.mask		= HCR_EL2_TID1,
- 		.behaviour	= BEHAVE_FORWARD_READ,
- 	},
- 	[CGT_HCR_TID2] = {
- 		.index		= HCR_EL2,
--		.value 		= HCR_TID2,
--		.mask		= HCR_TID2,
-+		.value 		= HCR_EL2_TID2,
-+		.mask		= HCR_EL2_TID2,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_TID3] = {
- 		.index		= HCR_EL2,
--		.value 		= HCR_TID3,
--		.mask		= HCR_TID3,
-+		.value 		= HCR_EL2_TID3,
-+		.mask		= HCR_EL2_TID3,
- 		.behaviour	= BEHAVE_FORWARD_READ,
- 	},
- 	[CGT_HCR_IMO] = {
- 		.index		= HCR_EL2,
--		.value 		= HCR_IMO,
--		.mask		= HCR_IMO,
-+		.value 		= HCR_EL2_IMO,
-+		.mask		= HCR_EL2_IMO,
- 		.behaviour	= BEHAVE_FORWARD_WRITE,
- 	},
- 	[CGT_HCR_FMO] = {
- 		.index		= HCR_EL2,
--		.value 		= HCR_FMO,
--		.mask		= HCR_FMO,
-+		.value 		= HCR_EL2_FMO,
-+		.mask		= HCR_EL2_FMO,
- 		.behaviour	= BEHAVE_FORWARD_WRITE,
- 	},
- 	[CGT_HCR_TIDCP] = {
- 		.index		= HCR_EL2,
--		.value		= HCR_TIDCP,
--		.mask		= HCR_TIDCP,
-+		.value		= HCR_EL2_TIDCP,
-+		.mask		= HCR_EL2_TIDCP,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_TACR] = {
- 		.index		= HCR_EL2,
--		.value		= HCR_TACR,
--		.mask		= HCR_TACR,
-+		.value		= HCR_EL2_TACR,
-+		.mask		= HCR_EL2_TACR,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_TSW] = {
- 		.index		= HCR_EL2,
--		.value		= HCR_TSW,
--		.mask		= HCR_TSW,
-+		.value		= HCR_EL2_TSW,
-+		.mask		= HCR_EL2_TSW,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_TPC] = { /* Also called TCPC when FEAT_DPB is implemented */
- 		.index		= HCR_EL2,
--		.value		= HCR_TPC,
--		.mask		= HCR_TPC,
-+		.value		= HCR_EL2_TPCP,
-+		.mask		= HCR_EL2_TPCP,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_TPU] = {
- 		.index		= HCR_EL2,
--		.value		= HCR_TPU,
--		.mask		= HCR_TPU,
-+		.value		= HCR_EL2_TPU,
-+		.mask		= HCR_EL2_TPU,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_TTLB] = {
- 		.index		= HCR_EL2,
--		.value		= HCR_TTLB,
--		.mask		= HCR_TTLB,
-+		.value		= HCR_EL2_TTLB,
-+		.mask		= HCR_EL2_TTLB,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_TVM] = {
- 		.index		= HCR_EL2,
--		.value		= HCR_TVM,
--		.mask		= HCR_TVM,
-+		.value		= HCR_EL2_TVM,
-+		.mask		= HCR_EL2_TVM,
- 		.behaviour	= BEHAVE_FORWARD_WRITE,
- 	},
- 	[CGT_HCR_TDZ] = {
- 		.index		= HCR_EL2,
--		.value		= HCR_TDZ,
--		.mask		= HCR_TDZ,
-+		.value		= HCR_EL2_TDZ,
-+		.mask		= HCR_EL2_TDZ,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_TRVM] = {
- 		.index		= HCR_EL2,
--		.value		= HCR_TRVM,
--		.mask		= HCR_TRVM,
-+		.value		= HCR_EL2_TRVM,
-+		.mask		= HCR_EL2_TRVM,
- 		.behaviour	= BEHAVE_FORWARD_READ,
- 	},
- 	[CGT_HCR_TLOR] = {
- 		.index		= HCR_EL2,
--		.value		= HCR_TLOR,
--		.mask		= HCR_TLOR,
-+		.value		= HCR_EL2_TLOR,
-+		.mask		= HCR_EL2_TLOR,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_TERR] = {
- 		.index		= HCR_EL2,
--		.value		= HCR_TERR,
--		.mask		= HCR_TERR,
-+		.value		= HCR_EL2_TERR,
-+		.mask		= HCR_EL2_TERR,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_APK] = {
- 		.index		= HCR_EL2,
- 		.value		= 0,
--		.mask		= HCR_APK,
-+		.mask		= HCR_EL2_APK,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_NV] = {
- 		.index		= HCR_EL2,
--		.value		= HCR_NV,
--		.mask		= HCR_NV,
-+		.value		= HCR_EL2_NV,
-+		.mask		= HCR_EL2_NV,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_NV_nNV2] = {
- 		.index		= HCR_EL2,
--		.value		= HCR_NV,
--		.mask		= HCR_NV | HCR_NV2,
-+		.value		= HCR_EL2_NV,
-+		.mask		= HCR_EL2_NV | HCR_EL2_NV2,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_NV1_nNV2] = {
- 		.index		= HCR_EL2,
--		.value		= HCR_NV | HCR_NV1,
--		.mask		= HCR_NV | HCR_NV1 | HCR_NV2,
-+		.value		= HCR_EL2_NV | HCR_EL2_NV1,
-+		.mask		= HCR_EL2_NV | HCR_EL2_NV1 | HCR_EL2_NV2,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_AT] = {
- 		.index		= HCR_EL2,
--		.value		= HCR_AT,
--		.mask		= HCR_AT,
-+		.value		= HCR_EL2_AT,
-+		.mask		= HCR_EL2_AT,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_nFIEN] = {
- 		.index		= HCR_EL2,
- 		.value		= 0,
--		.mask		= HCR_FIEN,
-+		.mask		= HCR_EL2_FIEN,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_TID4] = {
- 		.index		= HCR_EL2,
--		.value 		= HCR_TID4,
--		.mask		= HCR_TID4,
-+		.value 		= HCR_EL2_TID4,
-+		.mask		= HCR_EL2_TID4,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_TICAB] = {
- 		.index		= HCR_EL2,
--		.value 		= HCR_TICAB,
--		.mask		= HCR_TICAB,
-+		.value 		= HCR_EL2_TICAB,
-+		.mask		= HCR_EL2_TICAB,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_TOCU] = {
- 		.index		= HCR_EL2,
--		.value 		= HCR_TOCU,
--		.mask		= HCR_TOCU,
-+		.value 		= HCR_EL2_TOCU,
-+		.mask		= HCR_EL2_TOCU,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_ENSCXT] = {
- 		.index		= HCR_EL2,
- 		.value 		= 0,
--		.mask		= HCR_ENSCXT,
-+		.mask		= HCR_EL2_EnSCXT,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_TTLBIS] = {
- 		.index		= HCR_EL2,
--		.value		= HCR_TTLBIS,
--		.mask		= HCR_TTLBIS,
-+		.value		= HCR_EL2_TTLBIS,
-+		.mask		= HCR_EL2_TTLBIS,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_TTLBOS] = {
- 		.index		= HCR_EL2,
--		.value		= HCR_TTLBOS,
--		.mask		= HCR_TTLBOS,
-+		.value		= HCR_EL2_TTLBOS,
-+		.mask		= HCR_EL2_TTLBOS,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_HCR_TID5] = {
- 		.index		= HCR_EL2,
--		.value		= HCR_TID5,
--		.mask		= HCR_TID5,
-+		.value		= HCR_EL2_TID5,
-+		.mask		= HCR_EL2_TID5,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
- 	[CGT_MDCR_TPMCR] = {
-@@ -528,7 +528,7 @@ static bool is_nested_nv2_guest(struct kvm_vcpu *vcpu)
- 	u64 val;
- 
- 	val = __vcpu_sys_reg(vcpu, HCR_EL2);
--	return ((val & (HCR_E2H | HCR_TGE | HCR_NV2 | HCR_NV1 | HCR_NV)) == (HCR_E2H | HCR_NV2 | HCR_NV));
-+	return ((val & (HCR_EL2_E2H | HCR_EL2_TGE | HCR_EL2_NV2 | HCR_EL2_NV1 | HCR_EL2_NV)) == (HCR_EL2_E2H | HCR_EL2_NV2 | HCR_EL2_NV));
- }
- 
- static enum trap_behaviour check_cnthctl_el1nvpct(struct kvm_vcpu *vcpu)
-@@ -2725,7 +2725,7 @@ static bool forward_hcr_traps(struct kvm_vcpu *vcpu, u64 control_bit)
- 
- bool forward_smc_trap(struct kvm_vcpu *vcpu)
- {
--	return forward_hcr_traps(vcpu, HCR_TSC);
-+	return forward_hcr_traps(vcpu, HCR_EL2_TSC);
- }
- 
- static bool forward_mdcr_traps(struct kvm_vcpu *vcpu, u64 control_bit)
-@@ -2947,7 +2947,7 @@ int kvm_inject_nested_irq(struct kvm_vcpu *vcpu)
- 	 */
- 
- 	if (vcpu_is_el2(vcpu) && !vcpu_el2_tge_is_set(vcpu) &&
--	    !(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_IMO))
-+	    !(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_EL2_IMO))
- 		return 1;
- 
- 	/* esr_el2 value doesn't matter for exits due to irqs. */
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 1079136d5cd74..878ea4500c5c5 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -755,7 +755,7 @@ int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
- 			      struct kvm_vcpu_events *events)
- {
- 	events->exception.serror_has_esr = cpus_have_final_cap(ARM64_HAS_RAS_EXTN);
--	events->exception.serror_pending = (vcpu->arch.hcr_el2 & HCR_VSE) ||
-+	events->exception.serror_pending = (vcpu->arch.hcr_el2 & HCR_EL2_VSE) ||
- 					   vcpu_get_flag(vcpu, NESTED_SERROR_PENDING);
- 
- 	if (events->exception.serror_pending && events->exception.serror_has_esr)
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index db37678dcb05c..9931192735d46 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -43,7 +43,7 @@ static int handle_hvc(struct kvm_vcpu *vcpu)
- 
- 	/* Forward hvc instructions to the virtual EL2 if the guest has EL2. */
- 	if (vcpu_has_nv(vcpu)) {
--		if (vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_HCD)
-+		if (vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_EL2_HCD)
- 			kvm_inject_undefined(vcpu);
- 		else
- 			kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index a2a054fec2e2f..e0c55644224cb 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -403,11 +403,11 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
- static inline void ___activate_traps(struct kvm_vcpu *vcpu, u64 hcr)
- {
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM))
--		hcr |= HCR_TVM;
-+		hcr |= HCR_EL2_TVM;
- 
- 	write_sysreg_hcr(hcr);
- 
--	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE)) {
-+	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_EL2_VSE)) {
- 		u64 vsesr;
- 
- 		/*
-@@ -454,9 +454,9 @@ static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
- 	 * Additionally, when in a nested context we need to propagate the
- 	 * updated state to the guest hypervisor's HCR_EL2.
- 	 */
--	if (*hcr & HCR_VSE) {
--		*hcr &= ~HCR_VSE;
--		*hcr |= read_sysreg(hcr_el2) & HCR_VSE;
-+	if (*hcr & HCR_EL2_VSE) {
-+		*hcr &= ~HCR_EL2_VSE;
-+		*hcr |= read_sysreg(hcr_el2) & HCR_EL2_VSE;
- 	}
- }
- 
-@@ -655,7 +655,7 @@ static inline bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
- 		write_sysreg_s(__vcpu_sys_reg(vcpu, FPMR), SYS_FPMR);
- 
- 	/* Skip restoring fpexc32 for AArch64 guests */
--	if (!(read_sysreg(hcr_el2) & HCR_RW))
-+	if (!(read_sysreg(hcr_el2) & HCR_EL2_RW))
- 		write_sysreg(__vcpu_sys_reg(vcpu, FPEXC32_EL2), fpexc32_el2);
- 
- 	*host_data_ptr(fp_owner) = FP_STATE_GUEST_OWNED;
-@@ -680,7 +680,7 @@ static inline bool handle_tx2_tvm(struct kvm_vcpu *vcpu)
- 	 * The normal sysreg handling code expects to see the traps,
- 	 * let's not do anything here.
- 	 */
--	if (vcpu->arch.hcr_el2 & HCR_TVM)
-+	if (vcpu->arch.hcr_el2 & HCR_EL2_TVM)
- 		return false;
- 
- 	switch (sysreg) {
-diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-index 9393fe3ea6a18..50581822ec742 100644
---- a/arch/arm64/kvm/hyp/nvhe/host.S
-+++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -123,7 +123,7 @@ SYM_FUNC_START(__hyp_do_panic)
- #ifdef CONFIG_PKVM_DISABLE_STAGE2_ON_PANIC
- 	/* Ensure host stage-2 is disabled */
- 	mrs	x0, hcr_el2
--	bic	x0, x0, #HCR_VM
-+	bic	x0, x0, #HCR_EL2_VM
- 	msr_hcr_el2 x0
- 	tlbi	vmalls12e1
- 	dsb	nsh
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-index 0b3e0b28dfc7f..49127e03cf93e 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-@@ -102,7 +102,7 @@ SYM_CODE_START_LOCAL(___kvm_hyp_init)
- 	ldr	x1, [x0, #NVHE_INIT_HCR_EL2]
- 	msr_hcr_el2 x1
- 
--	mov	x2, #HCR_E2H
-+	mov	x2, #HCR_EL2_E2H
- 	and	x2, x1, x2
- 	cbz	x2, 1f
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index d715aa942577e..f5f77e62d1ba5 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -708,9 +708,9 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- 		if (vcpu_get_flag(host_vcpu, PKVM_HOST_STATE_DIRTY))
- 			flush_hyp_vcpu_state(hyp_vcpu);
- 
--		hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_TWI | HCR_TWE);
-+		hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_EL2_TWI | HCR_EL2_TWE);
- 		hyp_vcpu->vcpu.arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2) &
--							 (HCR_TWI | HCR_TWE);
-+							 (HCR_EL2_TWI | HCR_EL2_TWE);
- 
- 		hyp_vcpu->vcpu.arch.mdcr_el2 = host_vcpu->arch.mdcr_el2;
- 		hyp_vcpu->vcpu.arch.iflags = host_vcpu->arch.iflags;
-@@ -723,8 +723,8 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- 	 * A host-injected vSError is masked by the guest's own PSTATE.A, so it
- 	 * applies to protected guests too.
- 	 */
--	hyp_vcpu->vcpu.arch.hcr_el2 &= ~HCR_VSE;
--	hyp_vcpu->vcpu.arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2) & HCR_VSE;
-+	hyp_vcpu->vcpu.arch.hcr_el2 &= ~HCR_EL2_VSE;
-+	hyp_vcpu->vcpu.arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2) & HCR_EL2_VSE;
- 	hyp_vcpu->vcpu.arch.vsesr_el2 = host_vcpu->arch.vsesr_el2;
- 
- 	flush_hyp_vgic_state(hyp_vcpu);
-@@ -811,8 +811,8 @@ static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu, u32 exit_reason)
- 	}
- 
- 	/* Cleared by hardware once the guest takes the vSError. */
--	host_vcpu->arch.hcr_el2 &= ~HCR_VSE;
--	host_vcpu->arch.hcr_el2 |= hyp_vcpu->vcpu.arch.hcr_el2 & HCR_VSE;
-+	host_vcpu->arch.hcr_el2 &= ~HCR_EL2_VSE;
-+	host_vcpu->arch.hcr_el2 |= hyp_vcpu->vcpu.arch.hcr_el2 & HCR_EL2_VSE;
- 
- 	sync_hyp_vgic_state(hyp_vcpu);
- 	sync_hyp_timer_state(hyp_vcpu);
-@@ -836,8 +836,8 @@ DEFINE_KVM_HOST_HCALL(void, __pkvm_vcpu_load,
- 		u64 dfr0 = read_sysreg(id_aa64dfr0_el1);
- 
- 		/* Propagate WFx trapping flags */
--		hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_TWE | HCR_TWI);
--		hyp_vcpu->vcpu.arch.hcr_el2 |= hcr_el2 & (HCR_TWE | HCR_TWI);
-+		hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_EL2_TWE | HCR_EL2_TWI);
-+		hyp_vcpu->vcpu.arch.hcr_el2 |= hcr_el2 & (HCR_EL2_TWE | HCR_EL2_TWI);
- 
- 		/* HPMN == 0 is reserved without FEAT_HPMN0. */
- 		if (pmuv3_implemented(SYS_FIELD_GET(ID_AA64DFR0_EL1, PMUVer, dfr0)))
-@@ -1739,12 +1739,12 @@ static bool handle_host_mte(u64 esr)
- 	case SYS_TFSR_EL1:
- 	case SYS_TFSRE0_EL1:
- 		/* If we're here for any reason other than MTE, it's a bug. */
--		if (read_sysreg(HCR_EL2) & HCR_ATA)
-+		if (read_sysreg(HCR_EL2) & HCR_EL2_ATA)
- 			return false;
- 		break;
- 	case SYS_GMID_EL1:
- 		/* If we're here for any reason other than MTE, it's a bug. */
--		if (!(read_sysreg(HCR_EL2) & HCR_TID5))
-+		if (!(read_sysreg(HCR_EL2) & HCR_EL2_TID5))
- 			return false;
- 		break;
- 	default:
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index c3035aa5a4707..d4c332a918035 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -344,14 +344,14 @@ int __pkvm_prot_finalize(void)
- 	struct kvm_s2_mmu *mmu = &host_mmu.arch.mmu;
- 	struct kvm_nvhe_init_params *params = this_cpu_ptr(&kvm_init_params);
- 
--	if (params->hcr_el2 & HCR_VM)
-+	if (params->hcr_el2 & HCR_EL2_VM)
- 		return -EPERM;
- 
- 	params->vttbr = kvm_get_vttbr(mmu);
- 	params->vtcr = mmu->vtcr;
--	params->hcr_el2 |= HCR_VM;
-+	params->hcr_el2 |= HCR_EL2_VM;
- 	if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
--		params->hcr_el2 |= HCR_FWB;
-+		params->hcr_el2 |= HCR_EL2_FWB;
- 
- 	/*
- 	 * The CMO below not only cleans the updated params to the
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index ac020d0501d2e..01fe8d085ee21 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -43,30 +43,30 @@ static void pkvm_vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
- 
- 	if (has_hvhe())
--		vcpu->arch.hcr_el2 |= HCR_E2H;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_E2H;
- 
- 	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN)) {
- 		/* route synchronous external abort exceptions to EL2 */
--		vcpu->arch.hcr_el2 |= HCR_TEA;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_TEA;
- 		/* trap error record accesses */
--		vcpu->arch.hcr_el2 |= HCR_TERR;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_TERR;
- 	}
- 
- 	if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
--		vcpu->arch.hcr_el2 |= HCR_FWB;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_FWB;
- 
- 	if (cpus_have_final_cap(ARM64_HAS_EVT) &&
- 	    !cpus_have_final_cap(ARM64_MISMATCHED_CACHE_TYPE) &&
- 	    kvm_read_vm_id_reg(vcpu->kvm, SYS_CTR_EL0) == read_cpuid(CTR_EL0))
--		vcpu->arch.hcr_el2 |= HCR_TID4;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_TID4;
- 	else
--		vcpu->arch.hcr_el2 |= HCR_TID2;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_TID2;
- 
- 	if (vcpu_has_ptrauth(vcpu))
--		vcpu->arch.hcr_el2 |= (HCR_API | HCR_APK);
-+		vcpu->arch.hcr_el2 |= (HCR_EL2_API | HCR_EL2_APK);
- 
- 	if (kvm_has_mte(vcpu->kvm))
--		vcpu->arch.hcr_el2 |= HCR_ATA;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_ATA;
- }
- 
- static void pvm_init_traps_hcr(struct kvm_vcpu *vcpu)
-@@ -75,30 +75,30 @@ static void pvm_init_traps_hcr(struct kvm_vcpu *vcpu)
- 	u64 val = vcpu->arch.hcr_el2;
- 
- 	/* No support for AArch32. */
--	val |= HCR_RW;
-+	val |= HCR_EL2_RW;
- 
- 	/*
- 	 * Always trap:
- 	 * - Feature id registers: to control features exposed to guests
- 	 * - Implementation-defined features
- 	 */
--	val |= HCR_TACR | HCR_TIDCP | HCR_TID3 | HCR_TID1;
-+	val |= HCR_EL2_TACR | HCR_EL2_TIDCP | HCR_EL2_TID3 | HCR_EL2_TID1;
- 
- 	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP)) {
--		val |= HCR_TERR | HCR_TEA;
--		val &= ~(HCR_FIEN);
-+		val |= HCR_EL2_TERR | HCR_EL2_TEA;
-+		val &= ~(HCR_EL2_FIEN);
- 	}
- 
- 	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, AMU, IMP))
--		val &= ~(HCR_AMVOFFEN);
-+		val &= ~(HCR_EL2_AMVOFFEN);
- 
- 	if (!kvm_has_mte(kvm)) {
--		val |= HCR_TID5;
--		val &= ~(HCR_DCT | HCR_ATA);
-+		val |= HCR_EL2_TID5;
-+		val &= ~(HCR_EL2_DCT | HCR_EL2_ATA);
- 	}
- 
- 	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, LO, IMP))
--		val |= HCR_TLOR;
-+		val |= HCR_EL2_TLOR;
- 
- 	vcpu->arch.hcr_el2 = val;
- }
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 74d4a509f1dec..2dfb5ff9db575 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -464,7 +464,7 @@ bool __vgic_v3_get_gic_config(void)
- 	if (has_vhe()) {
- 		flags = local_daif_save();
- 	} else {
--		sysreg_clear_set_hcr(0, HCR_AMO | HCR_FMO | HCR_IMO);
-+		sysreg_clear_set_hcr(0, HCR_EL2_AMO | HCR_EL2_FMO | HCR_EL2_IMO);
- 		isb();
- 	}
- 
-@@ -479,7 +479,7 @@ bool __vgic_v3_get_gic_config(void)
- 	if (has_vhe()) {
- 		local_daif_restore(flags);
- 	} else {
--		sysreg_clear_set_hcr(HCR_AMO | HCR_FMO | HCR_IMO, 0);
-+		sysreg_clear_set_hcr(HCR_EL2_AMO | HCR_EL2_FMO | HCR_EL2_IMO, 0);
- 		isb();
- 	}
- 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 4c965f9b1e1de..3f2390a13173b 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -47,7 +47,7 @@ DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
-  * - FIEN: no way we let a guest have access to the RAS "Common Fault
-  *   Injection" thing, whatever that does
-  */
--#define NV_HCR_GUEST_EXCLUDE	(HCR_TGE | HCR_API | HCR_APK | HCR_FIEN)
-+#define NV_HCR_GUEST_EXCLUDE	(HCR_EL2_TGE | HCR_EL2_API | HCR_EL2_APK | HCR_EL2_FIEN)
- 
- static u64 __compute_hcr(struct kvm_vcpu *vcpu)
- {
-@@ -65,10 +65,10 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
- 	if (is_hyp_ctxt(vcpu)) {
- 		host_data_set_flag(VCPU_IN_HYP_CONTEXT);
- 
--		hcr |= HCR_NV | HCR_NV2 | HCR_AT | HCR_TTLB;
-+		hcr |= HCR_EL2_NV | HCR_EL2_NV2 | HCR_EL2_AT | HCR_EL2_TTLB;
- 
- 		if (!vcpu_el2_e2h_is_set(vcpu))
--			hcr |= HCR_NV1;
-+			hcr |= HCR_EL2_NV1;
- 
- 		/* Publish the guest's view of HCR_EL2 to the HW */
- 		if (cpus_have_final_cap(ARM64_HAS_NV3) && vcpu_el2_e2h_is_set(vcpu))
-@@ -91,7 +91,7 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
- 		host_data_clear_flag(VCPU_IN_HYP_CONTEXT);
- 
- 		guest_hcr = __vcpu_sys_reg(vcpu, HCR_EL2);
--		if (guest_hcr & HCR_NV) {
-+		if (guest_hcr & HCR_EL2_NV) {
- 			u64 va = __fix_to_virt(vncr_fixmap(smp_processor_id()));
- 
- 			/* Inherit the low bits from the actual register */
-@@ -99,14 +99,14 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
- 			write_sysreg_s(va, SYS_VNCR_EL2);
- 
- 			/* Force NV2 in case the guest is forgetful... */
--			guest_hcr |= HCR_NV2;
-+			guest_hcr |= HCR_EL2_NV2;
- 		}
- 
- 		/*
- 		 * Exclude the guest's TWED configuration if it hasn't set TWE
- 		 * to avoid potentially delaying traps for the host.
- 		 */
--		if (!(guest_hcr & HCR_TWE))
-+		if (!(guest_hcr & HCR_EL2_TWE))
- 			guest_hcr &= ~(HCR_EL2_TWEDEn | HCR_EL2_TWEDEL);
- 	}
- 
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index c386d9f1c1016..33ac9a8c954e9 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -62,7 +62,7 @@ static void enter_vmid_context(struct kvm_s2_mmu *mmu,
- 	 */
- 	__load_stage2(mmu);
- 	val = read_sysreg(hcr_el2);
--	val &= ~HCR_TGE;
-+	val &= ~HCR_EL2_TGE;
- 	write_sysreg_hcr(val);
- 	isb();
- }
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index 96bf926ca520e..aa2011cc0d5a0 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -228,7 +228,7 @@ static void __kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
- 
- static bool kvm_sea_target_is_el2(struct kvm_vcpu *vcpu)
- {
--	if (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_TGE | HCR_TEA))
-+	if (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_EL2_TGE | HCR_EL2_TEA))
- 		return true;
- 
- 	if (!vcpu_mode_priv(vcpu))
-@@ -272,7 +272,7 @@ int kvm_inject_dabt_excl_atomic(struct kvm_vcpu *vcpu, u64 addr)
- {
- 	u64 esr;
- 
--	if (is_nested_ctxt(vcpu) && (vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_VM))
-+	if (is_nested_ctxt(vcpu) && (vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_EL2_VM))
- 		return kvm_inject_nested_excl_atomic(vcpu, addr);
- 
- 	__kvm_inject_sea(vcpu, false, addr);
-@@ -387,6 +387,6 @@ int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr)
- 	}
- 
- 	vcpu_set_vsesr(vcpu, esr & ESR_ELx_ISS_MASK);
--	*vcpu_hcr(vcpu) |= HCR_VSE;
-+	*vcpu_hcr(vcpu) |= HCR_EL2_VSE;
- 	return 1;
- }
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index a48f3f531e827..a3eb084a2cf86 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -2988,18 +2988,18 @@ void kvm_set_way_flush(struct kvm_vcpu *vcpu)
- 
- 	/*
- 	 * If this is the first time we do a S/W operation
--	 * (i.e. HCR_TVM not set) flush the whole memory, and set the
-+	 * (i.e. HCR_EL2_TVM not set) flush the whole memory, and set the
- 	 * VM trapping.
- 	 *
- 	 * Otherwise, rely on the VM trapping to wait for the MMU +
- 	 * Caches to be turned off. At that point, we'll be able to
- 	 * clean the caches again.
- 	 */
--	if (!(hcr & HCR_TVM)) {
-+	if (!(hcr & HCR_EL2_TVM)) {
- 		trace_kvm_set_way_flush(*vcpu_pc(vcpu),
- 					vcpu_has_cache_enabled(vcpu));
- 		stage2_flush_vm(vcpu->kvm);
--		*vcpu_hcr(vcpu) = hcr | HCR_TVM;
-+		*vcpu_hcr(vcpu) = hcr | HCR_EL2_TVM;
- 	}
- }
- 
-@@ -3017,7 +3017,7 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
- 
- 	/* Caches are now on, stop trapping VM ops (until a S/W op) */
- 	if (now_enabled)
--		*vcpu_hcr(vcpu) &= ~HCR_TVM;
-+		*vcpu_hcr(vcpu) &= ~HCR_EL2_TVM;
- 
- 	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
- }
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index f0f473978d98f..8dbde3428e803 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -777,7 +777,7 @@ struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu)
- 	vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
- 	hcr = vcpu_read_sys_reg(vcpu, HCR_EL2);
- 
--	nested_stage2_enabled = hcr & HCR_VM;
-+	nested_stage2_enabled = hcr & HCR_EL2_VM;
- 
- 	/* Don't consider the CnP bit for the vttbr match */
- 	vttbr &= ~VTTBR_CNP_BIT;
-@@ -858,7 +858,7 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
- 	 */
- 	s2_mmu->tlb_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2) & ~VTTBR_CNP_BIT;
- 	s2_mmu->tlb_vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
--	s2_mmu->nested_stage2_enabled = vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_VM;
-+	s2_mmu->nested_stage2_enabled = vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_EL2_VM;
- 
- out:
- 	atomic_inc(&s2_mmu->refcnt);
-@@ -979,7 +979,7 @@ void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
- 				vcpu->arch.hw_mmu = get_s2_mmu_nested(vcpu);
- 		}
- 
--		if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
-+		if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_EL2_NV)
- 			kvm_make_request(KVM_REQ_MAP_L1_VNCR_EL2, vcpu);
- 	}
- }
-@@ -2202,7 +2202,7 @@ void kvm_nested_sync_hwstate(struct kvm_vcpu *vcpu)
- 	 * We previously decided that an SError was deliverable to the guest.
- 	 * Reap the pending state from HCR_EL2 and...
- 	 */
--	if (unlikely(__test_and_clear_bit(__ffs(HCR_VSE), hcr)))
-+	if (unlikely(__test_and_clear_bit(__ffs(HCR_EL2_VSE), hcr)))
- 		vcpu_set_flag(vcpu, NESTED_SERROR_PENDING);
- 
- 	/*
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index e9cf6cc340349..4f18ed2793c33 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -586,7 +586,7 @@ static void get_access_mask(const struct sys_reg_desc *r, u64 *mask, u64 *shift)
- }
- 
- /*
-- * Generic accessor for VM registers. Only called as long as HCR_TVM
-+ * Generic accessor for VM registers. Only called as long as HCR_EL2_TVM
-  * is set. If the guest enables the MMU, we stop trapping the VM
-  * sys_regs and leave it in complete control of the caches.
-  */
-@@ -2891,7 +2891,7 @@ static u64 reset_hcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	u64 val = r->val;
- 
- 	if (!cpus_have_final_cap(ARM64_HAS_HCR_NV1))
--		val |= HCR_E2H;
-+		val |= HCR_EL2_E2H;
- 
- 	__vcpu_assign_sys_reg(vcpu, r->reg, val);
- 
-@@ -5796,31 +5796,31 @@ static void vcpu_set_hcr(struct kvm_vcpu *vcpu)
- 	struct kvm *kvm = vcpu->kvm;
- 
- 	if (has_vhe() || has_hvhe())
--		vcpu->arch.hcr_el2 |= HCR_E2H;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_E2H;
- 	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN)) {
- 		/* route synchronous external abort exceptions to EL2 */
--		vcpu->arch.hcr_el2 |= HCR_TEA;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_TEA;
- 		/* trap error record accesses */
--		vcpu->arch.hcr_el2 |= HCR_TERR;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_TERR;
- 	}
- 
- 	if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
--		vcpu->arch.hcr_el2 |= HCR_FWB;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_FWB;
- 
- 	if (cpus_have_final_cap(ARM64_HAS_EVT) &&
- 	    !cpus_have_final_cap(ARM64_MISMATCHED_CACHE_TYPE) &&
- 	    kvm_read_vm_id_reg(kvm, SYS_CTR_EL0) == read_sanitised_ftr_reg(SYS_CTR_EL0))
--		vcpu->arch.hcr_el2 |= HCR_TID4;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_TID4;
- 	else
--		vcpu->arch.hcr_el2 |= HCR_TID2;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_TID2;
- 
- 	if (vcpu_el1_is_32bit(vcpu))
--		vcpu->arch.hcr_el2 &= ~HCR_RW;
-+		vcpu->arch.hcr_el2 &= ~HCR_EL2_RW;
- 
- 	if (kvm_has_mte(vcpu->kvm))
--		vcpu->arch.hcr_el2 |= HCR_ATA;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_ATA;
- 	else
--		vcpu->arch.hcr_el2 |= HCR_TID5;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_TID5;
- 
- 	/*
- 	 * In the absence of FGT, we cannot independently trap TLBI
-@@ -5828,7 +5828,7 @@ static void vcpu_set_hcr(struct kvm_vcpu *vcpu)
- 	 * TLBIs would be far worse. Live with it...
- 	 */
- 	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
--		vcpu->arch.hcr_el2 |= HCR_TTLBOS;
-+		vcpu->arch.hcr_el2 |= HCR_EL2_TTLBOS;
- }
- 
- void kvm_calculate_traps(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-index e3e84d7f5ad51..82bfc4d4f122f 100644
---- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -120,8 +120,8 @@ bool vgic_state_is_nested(struct kvm_vcpu *vcpu)
- 	u64 xmo;
- 
- 	if (is_nested_ctxt(vcpu)) {
--		xmo = __vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_IMO | HCR_FMO);
--		WARN_ONCE(xmo && xmo != (HCR_IMO | HCR_FMO),
-+		xmo = __vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_EL2_IMO | HCR_EL2_FMO);
-+		WARN_ONCE(xmo && xmo != (HCR_EL2_IMO | HCR_EL2_FMO),
- 			  "Separate virtual IRQ/FIQ settings not supported\n");
- 
- 		return !!xmo;
--- 
-2.47.3
+Most notable assumptions:
+- Changing of stream table format/size or l2 pointers is not allowed
+  after initialization.
+- leaf=3D0 CFGI is not allowed.
+- CFGI_ALL with any value but 31 is not allowed.
+- Some commands which are not used are not allowed.
+- Values set in ARM_SMMU_CR1 are hardcoded and don't change.
+
+Emulation logic mainly targets:
+
+1) Command Queue
+----------------
+At boot time, the hypervisor will allocate a shadow command queue
+(doesn't need to match the host size) which then sets up in HW, then
+it will trap access to
+
+i) ARM_SMMU_CMDQ_BASE
+That can only be written when the cmdq is disabled. Then on enable,
+the hypervisor will put the host command queue in a shared state to
+avoid transition into the hypervisor or VMs. It will be unshared with
+the cmdq is disabled
+
+ii) ARM_SMMU_CMDQ_PROD
+Trigger emulation code, where the hypervisor will copy the commands
+between cons and prod, of the host queue and sanitise them (mostly
+WARNs if the host is malicious and issuing commands it shouldn't)
+then eagerly consume them, updating the host cons.
+
+iii) ARM_SMMU_CMDQ_CONS
+No much logic, just return the emulated cons + error bits.
+
+2) Stream table
+---------------
+Similar to the command queue, the first level is allocated at boot
+with max possible size, then the hypervisor  will trap access to:
+i) ARM_SMMU_STRTAB_BASE/ARM_SMMU_STRTAB_BASE_CFG: Keep track of
+   the stream table to put it in a shared state.
+
+On CFGI_STE, the hypervisor will read the STE in scope from the host
+copy, shadow L2 pointers if needed and attach stage-2.
+
+3) GBPA
+-------
+The hypervisor will set GBPA to abort at boot, then any read from the
+host will return ABORT and writes are ignored.
+If the host tries to clear GBPA, it will look like GBPA is refusing
+to update and time out.
+
+4) EVTQ and PRIDQ
+No shadowing needed for those queues, but the hypervisor needs to keep
+track of them to put them in a shared state so they can=E2=80=99t be used b=
+y
+the host or the hypervisor.
+
+Bisectibility:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+I wrote the patches where most of them are bisectable at run time (so
+we can run with a prefix of the series till MMIO emulation, cmdq
+emulation, STE or full nested) that was very helpful in debugging,
+and I kept it like this to make debugging easier.
+
+Constraints:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+1) Discovery:
+-------------
+Only device trees are supported at the moment.
+
+2) Shadow page table
+--------------------
+Uses page granularity (leaf) for memory, that's because of the lack
+of split_block_unmap() logic.
+
+Boot and Probe ordering:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+The main SMMUv3 MUST be only bound/probed after KVM fully initialises
+so it can set up the MMIO emulation.
+
+The KVM SMMUv3 driver is loaded early before KVM init so it can
+register itself, during that point it will probe all the SMMUs from the
+platform bus and bind them to the driver.
+
+Then at a later init call it will create an auxiliary device per SMMU,
+that the main driver will probe. The main driver still relies on this
+device(parent) for all driver activity.
+
+Future work
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+1) Sharing page tables will be an interesting optimization, which was
+   discussed at LPC [1]
+
+2) There is currently ongoing work to enable RPM, that will possibly
+   enable/disable the SMMU frequently, we might need some optimizations
+   to avoid re-shadowing the CMDQ/STE unnecessarily.
+
+3) Add support for non-coherent SMMUs.
+
+4) Optimizations (as using block mappings for memory).
+
+Patches overview
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+The patches are split as follows:
+
+Patches 01: Core hypervisor: Dealing with MMIO and timers.
+Patches 02-05: Refactoring of io-pgtable-arm and SMMUv3 driver.
+Patches 06-09: Hypervisor IOMMU core: pagetable management, dabts.
+Patches 10-25: KVM SMMUv3 code.
+
+Tested on Lenovo IdeaCentre mini X and Qemu.
+
+A development branch can be found at [2]
+
+[1] https://lpc.events/event/20/contributions/2555/
+[2] https://android-kvm.googlesource.com/linux/+/refs/heads/kvm-smmu-v9
+
+Jean-Philippe Brucker (1):
+  iommu/arm-smmu-v3-kvm: Add SMMUv3 driver
+
+Mostafa Saleh (24):
+  KVM: arm64: Donate MMIO to the hypervisor
+  iommu/arm-smmu-v3: Move Queue and STE functions to header
+  iommu/arm-smmu-v3: Move IDR parsing to common functions
+  iommu/arm-smmu-v3: Move hitless machinery to common code
+  iommu/arm-smmu-v3: Move RangeInval to common code
+  KVM: arm64: iommu: Introduce IOMMU driver infrastructure
+  KVM: arm64: iommu: Shadow host stage-2 page table
+  KVM: arm64: iommu: Add memory pool
+  KVM: arm64: iommu: Support DABT for IOMMU
+  iommu/arm-smmu-v3-kvm: Add the kernel driver
+  iommu/arm-smmu-v3-kvm: Probe SMMU HW
+  iommu/arm-smmu-v3-kvm: Add MMIO emulation
+  iommu/arm-smmu-v3-kvm: Shadow the command queue
+  iommu/arm-smmu-v3-kvm: Add CMDQ functions
+  iommu/arm-smmu-v3-kvm: Emulate CMDQ for host
+  iommu/arm-smmu-v3-kvm: Shadow stream table
+  iommu/arm-smmu-v3-kvm: Shadow STEs
+  iommu/arm-smmu-v3-kvm: Share other queues
+  iommu/arm-smmu-v3-kvm: Emulate GBPA
+  iommu/io-pgtable-arm: Support io-pgtable-arm in the hypervisor
+  iommu/arm-smmu-v3-kvm: Shadow the CPU stage-2 page table
+  iommu/arm-smmu-v3-kvm: Invalidate the SMMU TLBs
+  iommu/arm-smmu-v3-kvm: Enable nesting
+  KVM: arm64: Add documentation for pKVM DMA isolation
+
+ .../admin-guide/kernel-parameters.txt         |    7 +
+ Documentation/virt/kvm/arm/pkvm.rst           |   23 +-
+ arch/arm64/include/asm/kvm_host.h             |    8 +
+ arch/arm64/include/asm/kvm_pgtable.h          |    2 +
+ arch/arm64/include/asm/kvm_pkvm.h             |   10 +
+ arch/arm64/kvm/Makefile                       |    2 +-
+ arch/arm64/kvm/hyp/include/nvhe/iommu.h       |   37 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   10 +
+ arch/arm64/kvm/hyp/nvhe/Makefile              |    9 +-
+ arch/arm64/kvm/hyp/nvhe/iommu.c               |  157 ++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  143 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c               |   19 +
+ arch/arm64/kvm/hyp/pgtable.c                  |    8 +-
+ arch/arm64/kvm/iommu.c                        |   68 +
+ arch/arm64/kvm/pkvm.c                         |    1 +
+ drivers/iommu/arm/Kconfig                     |   12 +
+ drivers/iommu/arm/arm-smmu-v3/Makefile        |    3 +-
+ .../arm/arm-smmu-v3/arm-smmu-v3-common-lib.c  |  646 ++++++++
+ .../arm/arm-smmu-v3/arm-smmu-v3-common-lib.h  |   54 +
+ .../arm/arm-smmu-v3/arm-smmu-v3-pkvm-init.c   |  227 +++
+ .../iommu/arm/arm-smmu-v3/arm-smmu-v3-test.c  |    2 +-
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   |  756 +--------
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |   77 +-
+ .../arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.c    | 1425 +++++++++++++++++
+ .../arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.h    |   89 +
+ .../arm/arm-smmu-v3/pkvm/io-pgtable-arm-hyp.h |   88 +
+ drivers/iommu/io-pgtable-arm.c                |   14 +-
+ drivers/iommu/io-pgtable-arm.h                |    9 +
+ 28 files changed, 3190 insertions(+), 716 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/iommu.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/iommu.c
+ create mode 100644 arch/arm64/kvm/iommu.c
+ create mode 100644 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c
+ create mode 100644 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.h
+ create mode 100644 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-pkvm-init.c
+ create mode 100644 drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.c
+ create mode 100644 drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.h
+ create mode 100644 drivers/iommu/arm/arm-smmu-v3/pkvm/io-pgtable-arm-hyp.h
+
+
+base-commit: c233d59828627bfaab750ec5546e81970475f951
+--=20
+2.56.0.176.g3575e65682-goog
 
