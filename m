@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C79C31716E;
-	Thu, 15 Oct 2026 13:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3E9446BE0;
+	Thu, 15 Oct 2026 13:52:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792071058; cv=none; b=nEEz9Qv7PSd1Xm6CvrYWSwoBPRMvbBkq4G+ywPJsg+J4NyDs3+vP5pRuDfmY1d1BasiJO/+eY8CFCTVqOC/splxUehSZcLt+j4smFhYxzJxSRxGdZ/Z3gBtbfRznTw3lKmk0rZozRub36BSDrkKGc4cmxYdKs0sUl1yVTZX/fHo=
+	t=1792072329; cv=none; b=FHJZFDXaak0rRNW4XpxXPIJxI01Cqi/1/5EF5psAn0ePL5nDqw7tf3Wq2PrCfeBwF8TXvMxJN2f02FLOrzitvyMUg8kh5o2l/uMguWJDIA818slCEVGwsEtW/klzZp2uWZrsQf2TcwYBcnojX26iHSsO2flJ/VWE+3RoYWsr9ZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792071058; c=relaxed/simple;
-	bh=L9aIgzSjYho00ggV/zjV4jYYwOi6um4AdVfO21ejWEA=;
+	s=arc-20240116; t=1792072329; c=relaxed/simple;
+	bh=XtVkBcKpKVWyMPnHp4mv+xE86MVAO5YiognkJI+iRw4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I3//rAsk1pG5TpiCiPTl1QfxeHLEK/mI1lbt1d0DcwhcV+0/sLpxKq/ruazwYVV8KuspoNhXKpvLULul8/4XBodNwF9DSG9FJwn5Ou0aAw8UeGlBTpZVGw77neKFYa8aScGgD2RY0tTisVi9xLv1PANnZeKSeQxvEsvQrfRg/5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ol5vRMnH; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=GoEj4uCCxoyAQnaJxhxeNNWeYJXnm4/Vsv4LHhN/Ibsm3Q7d2z3haMQMQX+oju6jztfLL352rVLIY0nAExJR76HcUbcAtbAMQqZxc3z4k07GV8JX+dYiHcXYbEpjpHtu00uH4S/Ys0stZA6HtWbgkc0noALeceXsr8vbKy+g2LQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mxo+pNTH; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ol5vRMnH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 564521F000C4;
-	Thu, 15 Oct 2026 13:30:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mxo+pNTH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A33DD1F000C4;
+	Thu, 15 Oct 2026 13:52:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792071055;
-	bh=aieewkiVnVuP9Gv4tnFbYL65Nv/XO1TXk9gy+wXJC4Y=;
+	s=k20260515; t=1792072327;
+	bh=jffrM+FBQqUwiZ21cymkCC4MhlAofj7fyNSPSMCMd8A=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Ol5vRMnHMUpLDISLVFg5BEdpUSxJjrLkJkYSiePoPb7ofgNa1DtfJqxDHMcnFUtpm
-	 UU4ZmN8IsflTOkK46Jy8692973WILwjvmZBJFB1pR5c8MqFWMqhcT52IKh4pvXX3b9
-	 /WVebvEpJTHzlw2C6AJYFDdVzvqGbSGX04uDOP34W87QDvB41W8vlAGTBd8Gurn676
-	 I+xWw287r7fQSTI5Rz5CIdZ2NiDMuCXLncbzQVuB2vqeR3wuK0XU3SaSIntO5RyGFa
-	 7D2uEjaH6QE5CKptkGLHub7GuaMMDsvf/yhxXvaGXL+bbNVtqQhUFUgACUQeTPQWIO
-	 p2oP2JHAVwuaQ==
+	b=mxo+pNTHLo6MUL8x9zySsXumotxTHNpP1g/C2J2kydv5SBdfm8hVSK6pAx0CDehZ/
+	 BlmUF6hyq4rCRB4S4U1+VQeQEXdQF7n90+sI4+Bx3DD0p//ayxdaPOKsjcRhFGGp28
+	 rO/6lAg8hkCpkecU4mwU0jOl0SfCUJD5RnIEFysjW9IweXALp5d7XqE8i9euCk0PTH
+	 3oxLYmA2wxc2wl4dl/Oh43rQbmn+KFpnNH4w9yZ7wtlyIjY5x2gD9zk71ZbZQobBhG
+	 w9/0f5++QHH70EQcbAvtgthUGRbIEkGrFXBmEKxbBBBJ0ge1YKiE4FBcT3phDElOK3
+	 TiZ0GnCRiSu6g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1xHLXp-00000003K9v-18ma;
-	Thu, 15 Oct 2026 13:30:53 +0000
-Date: Thu, 15 Oct 2026 14:30:52 +0100
-Message-ID: <86jynj146r.wl-maz@kernel.org>
+	id 1xHLsL-00000003KaI-2QOu;
+	Thu, 15 Oct 2026 13:52:05 +0000
+Date: Thu, 15 Oct 2026 14:52:05 +0100
+Message-ID: <86ik33137e.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <fuad.tabba@linux.dev>
 Cc: Oliver Upton <oupton@kernel.org>,
@@ -45,10 +45,10 @@ Cc: Oliver Upton <oupton@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	kvm@vger.kernel.org,
 	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH 0/7] KVM: arm64: Fix cross-CPU vcpu pausing
-In-Reply-To: <20261015125712.2650518-1-fuad.tabba@linux.dev>
-References: <20261015100539.1011760-1-maz@kernel.org>
-	<20261015125712.2650518-1-fuad.tabba@linux.dev>
+Subject: Re: [PATCH 2/7] KVM: arm64: Move OUTSIDE_GUEST_MODE publication past context being saved
+In-Reply-To: <20261015125713.2650696-1-fuad.tabba@linux.dev>
+References: <20261015100539.1011760-3-maz@kernel.org>
+	<20261015125713.2650696-1-fuad.tabba@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -64,53 +64,58 @@ X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, joey.gouly@arm.com, 
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 15 Oct 2026 13:57:12 +0100,
+On Thu, 15 Oct 2026 13:57:13 +0100,
 Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
 > Hi Marc,
 > 
-> On Thu, 15 Oct 2026 11:05:32 +0100, Marc Zyngier <maz@kernel.org> wrote:
+> On Thu, 15 Oct 2026 11:05:34 +0100, Marc Zyngier <maz@kernel.org> wrote:
 > [...]
-> > This series addresses these defects, and builds on top of it to:
+> > However, code that uses OUTSIDE_GUEST_MODE as a synchronisation point
+> > relies on the vcpu state to have been written back to the in-memory
+> > structures. Clearly, this is not what is happening
+> 
+> nit: missing full stop.
+> 
+> [...]
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> [...]
+> > @@ -1390,6 +1389,12 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 > >
-> > - add pausing to a single vcpu in addition to the full VM pausing
+> >  		kvm_arch_vcpu_ctxsync_fp(vcpu);
 > >
-> > - convert LPI disabling and the MOVALL command to vcpu pausing
-> >
-> > Patches on top of -rc6, most of them being Cc stable without any
-> > qualification (this has been broken for as long as I can remember).
+> > +		/*
+> > +		 * All the state has been synchronised, let advertise
+> > +		 * we're outside of the guest.
+> > +		 */
+> > +		smp_store_release(&vcpu->mode, OUTSIDE_GUEST_MODE);
 > 
-> I'll send a couple of nits on patches 2 and 5 as replies to those
-> patches.
+> nit: could this say the vgic state rather than all the state? In pKVM,
+> a non-protected guest's context comes back later, in
+> handle_exit_pkvm_state() or on demand, and with VHE the EL1 sysregs
+> stay on the CPU until vcpu_put(). Also "let's advertise".
 
-Thanks, I'll tidy that up as I apply them.
+I don't really want to make this vgic specific, as there could be
+more. But I can more precisely describe what state were talking about:
 
-> 
-> For the series:
-> Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-> 
-> Tested on QEMU on top of -rc6: npVM and pVM boots in pKVM, npVM boots
-> with nVHE and VHE hosts, and vgic_irq and vgic_lpi_stress in all three
-> and with kvm-arm.mode=nested. My reproducer has vcpu 0 clear vcpu 1's
-> EnableLPIs while the LPI is in vcpu 1's LR: on -rc6 the LPI is still
-> pending on vcpu 1 afterwards, and with the series it isn't. With my
-> vgic-its v2 [1] on top, my MOVALL selftest and my shared LPI and DISCARD
-> reproducers pass, including with PROVE_LOCKING and with debug hooks
-> that force the DISCARD race.
-> 
-> Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 8b46fafdd3494..7ce9f3bfa7fff 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1390,8 +1390,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		kvm_arch_vcpu_ctxsync_fp(vcpu);
+ 
+ 		/*
+-		 * All the state has been synchronised, let advertise
+-		 * we're outside of the guest.
++		 * The state that was pushed into the CPU on entering
++		 * the guest has been synchronised back, let's
++		 * advertise we're outside of the guest.
+ 		 */
+ 		smp_store_release(&vcpu->mode, OUTSIDE_GUEST_MODE);
+ 
 
-Great, thanks again.
-
-> 
-> v2 of "Fix LPI double mapping and DISCARD" [1] applies on top of this
-> series as it is. Would you take it as it is, or would you like me to
-> respin it?
-
-I can stash it on top as is. Looks like the first set of 7.4 fixes is
-going to be pretty vgic-heavy anyway.
-
-Cheers,
+Thanks,
 
 	M.
 
