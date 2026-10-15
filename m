@@ -1,129 +1,130 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D2CC58E2D1
-	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 20:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 610A4599A40
+	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 20:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792096208; cv=none; b=tEEs7z958PHWCyB3yrusJdJtRLxQ6/CJrtuXH8FWX1v1CjR4VJEHu0JDUQ7P23RB8ps7gqWHCe+dUyTBccS/Tj4VLvcOqBtVOxpyONr0FPPkaCGxohwTxyx6Yr8xZxVbPrH7OULsTsajplZqavRgabexcgKOkOgzA0h6oremHMs=
+	t=1792096231; cv=none; b=aFO1iIuTcLSn4rVPrSxdmelZwGlsoeCcckknOc46sEXLs6BCUFskeSBpFrfvcp7nc7lKx4DKT6NlkekA/Ge/82VG/ckAGyZsoTuW+mAKQfVnscSZX5Cetc8MDmpFOZGpAE8E5NdZRz1uyIk6pkqMChRbWpoAYaHtsmNs+rTOEpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792096208; c=relaxed/simple;
-	bh=BzZTErzXU9o7kNXZPrTCPUrQYSSdBJ7MnUO4FRsVC0E=;
+	s=arc-20240116; t=1792096231; c=relaxed/simple;
+	bh=xo8PqO+k9i0lhrvr96leeaVhyTy+FayXS8kjlLnU/PA=;
 	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=hP1GWticGEMmtQDfg6VUNnDnW2h5wBO66g7+NNCmCiM44QKrkV0J6nWRjQ2axBWoqHQD0sxm7qj/XBIlt5caaRsMm/XATOY/IO7xXoYhR1pIR3pHWoxqp/tAXOHTGJ+W+yaaZtVJxgEhyICT0ovjkxNJS7Ra7LiSlMo9ydBxA4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mWAtBiy7; arc=none smtp.client-ip=100.103.45.18
+	 Date; b=OenPOeQmGJ862fU1VlXHO5dF8ZE/0AZQif1wGs0xCA+wBpMcIapwhyhaHRRuvuAV9p0XF6cA7HnLP559VOK70Mujim9V/ppETTFfeWgiVORy/of+SnbpGkR3soxQgXizWO5Iyk7LCy9inFTHO7HigiGbrPh0mF8heJn3Q5W7EPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BCUsAO0c; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mWAtBiy7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F7061F000C5;
-	Thu, 15 Oct 2026 20:30:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BCUsAO0c"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 301B11F000C4;
+	Thu, 15 Oct 2026 20:30:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792096206;
-	bh=toQFWyhAvzScvmsiFAEQShMDE+4eOOidEBNyPILdQ8A=;
+	s=k20260515; t=1792096227;
+	bh=gOlaLhecEJHOpuDdUJ9KMkHrZOIUco05CXt4eHAjDXs=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=mWAtBiy7OIJWyvPhO8MuxsvzadVbM4mPu0Aez5ZeyMR/kRzDNJ2ljmjK3BV8ovTmd
-	 l50kevCLHGz/YBdJ4XdWTA2xRYBAlNBYjE2A38fufI8C6tjYA0RykPy4R68uH0Ld6/
-	 B6ivTi1dt+q1dOe6aDgfzy6iHc7BYv5y173oCyO1cOSQTZStMKa7Dg0+T/AgOpjXr/
-	 erTh+RGeeYiKyIoCGWofMuL/SEsxrdBoC8U0GhwAdmSsifmmjOIUgMxO1PIpivTFiY
-	 J4q2xBh2nZAG9rjOo5FRd6EyX8Bf2ghX2xm3iWdR3k6WK37pBKMofpwoQKVARNBCEO
-	 7vhHB67BrNx+Q==
-Message-ID: <sashiko-outbox-173394@kernel.org>
+	b=BCUsAO0ckSB4TeEe6UkA4SXWIegcuJAVP3sNGksinNuNL2CT3afoxjINEzJaCVYQj
+	 DFC63ErTn1Sdht+LStLxhsIKcXXfoAkzeNLb9Wqv0p6Dn/ymfMVcNEn4yuoI07z3xt
+	 U24xgLTsFmYSXM0oa5dT9dHutf6PwE1loHS/M5s6Kq9d2m+X1kH8EjB3WEAkQMwPIb
+	 53UtDSQw6Q8Z3Gh2QN7MxRsari/cFqyC52ORVVS5/9IxEnScNkPyyaIrqfQTEmkBRR
+	 R1xMuvAjmfTH6GByqR6wh+QZGdaLN44kHlFqzW/uKY73xWKqXK1GpB7AwugiBV1738
+	 UxejzWn2k9lwg==
+Message-ID: <sashiko-outbox-173395@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v9 15/25] iommu/arm-smmu-v3-kvm: Add CMDQ functions
+Subject: Re: [PATCH v9 18/25] iommu/arm-smmu-v3-kvm: Shadow STEs
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Mostafa Saleh" <smostafa@google.com>, kvmarm@lists.linux.dev
 Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261015200903.2735565-16-smostafa@google.com>
+In-Reply-To: <20261015200903.2735565-19-smostafa@google.com>
 References: <20261015200903.2735565-1-smostafa@google.com>
- <20261015200903.2735565-16-smostafa@google.com>
+ <20261015200903.2735565-19-smostafa@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Oct 2026 20:30:05 +0000
+Date: Thu, 15 Oct 2026 20:30:26 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [High] iommu/arm-smmu-v3-kvm: swapped WFE logic causes queue polling dela=
-ys
+- [High] hyp-arm64: fatal WARN_ON(skip) on normal pkvm_iommu_alloc_pages() =
+-ENOMEM failure
+- [High] iommu/arm-smmu-v3: torn STE write sets Valid bit before configurat=
+ion
 --
 
-commit 533e5a914cd22f171b26c2c5c0e2acfb11756ea5
+commit bc7189831be67d30110e4ed04545c980d138dc99
 Author: Mostafa Saleh <smostafa@google.com>
 
-iommu/arm-smmu-v3-kvm: Add CMDQ functions
-
-This commit adds command queue accessors for the ARM SMMUv3 in the
-hypervisor. It includes command queuing and synchronization functions,
-with a 1 ms polling timeout that sleeps in WFE when SEV is supported.
+    iommu/arm-smmu-v3-kvm: Shadow STEs
+   =20
+    Shadow the STE when the host sends CFGI_STE: copy the host entry as is
+    into the hypervisor-owned stream table, which is the one the hardware
+    uses. For 2-level tables the host L2 table is shared and pinned while
+    the entry is read, and the hypervisor L2 table is allocated from the
+    IOMMU pool the first time its L1 slot is used.
 
 > diff --git a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.c b/drive=
 rs/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.c
-> index 02e7c61758329..c9fc21e405e79 100644
+> index 0fa98915e00d4..132f3a9ba3084 100644
 > --- a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.c
 > +++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.c
 [ ... ]
-> @@ -77,6 +113,85 @@ static int smmu_unshare_pages(phys_addr_t addr, size_=
-t size)
+> @@ -290,6 +293,91 @@ static int smmu_init_cmdq(struct hyp_arm_smmu_v3_dev=
+ice *smmu)
 [ ... ]
-> +static int smmu_add_cmd(struct hyp_arm_smmu_v3_device *smmu,
-> +			struct arm_smmu_cmd *cmd)
+> +static int smmu_reshadow_ste(struct hyp_arm_smmu_v3_device *smmu, u32 si=
+d, bool leaf)
 > +{
-> +	int ret;
+[ ... ]
+> +		/* No hypervisor entry, first time the L2 is populated. */
+> +		if (!l1tab[l1_idx].l2ptr) {
+> +			struct arm_smmu_strtab_l2 *l2table;
 > +
-> +	hyp_assert_lock_held(&smmu->hw_lock);
-> +	ret =3D smmu_wait(smmu->features & ARM_SMMU_FEAT_SEV,
-> +			!smmu_cmdq_full(&smmu->cmdq));
+> +			l2table =3D pkvm_iommu_alloc_pages(get_order(sizeof(*l2table)));
+> +			if (!l2table)
+> +				return -ENOMEM;
 
 [Severity: High]
-Does this cause the CPU to stall until a timer event?
+If this allocation fails, smmu_reshadow_ste() returns -ENOMEM, which causes
+smmu_filter_command() to return true. In smmu_emulate_cmdq_insert(), this
+triggers a preexisting WARN_ON(skip):
 
-When the hypervisor inserts a batch of commands that exceeds the command
-queue size, smmu_add_cmd() waits for queue space and passes
-smmu->features & ARM_SMMU_FEAT_SEV as the __use_wfe argument to
-smmu_wait(), executing wfe().
+static int smmu_emulate_cmdq_insert(struct hyp_arm_smmu_v3_device *smmu)
+{
+        ...
+        skip =3D smmu_filter_command(smmu, cmd);
+        if (WARN_ON(skip))
+                continue;
+        ...
+}
 
-However, the SMMU only generates an SEV on a CMD_SYNC with CS_SEV. Since
-hw_lock prevents concurrent insertions and the hypervisor only inserts
-CMD_SYNC at the end of the batch, no SEVs are generated while the queue
-drains. The CPU sleeps in wfe() and relies solely on the timer event
-stream to wake up, introducing massive artificial delays. Stalling EL2
-with interrupts masked for milliseconds degrades system stability and
-risks triggering timeouts.
+Since WARN_ON() expands to a fatal BRK at EL2, does this allow a normal
+out-of-memory condition to panic the hypervisor?
 
-> +	if (ret)
-> +		return ret;
+> +			/* Ensure L2 is observed before writing the ptr. */
+> +			dma_wmb();
+> +			arm_smmu_write_strtab_l1_desc(&l1tab[l1_idx], hyp_virt_to_phys(l2tabl=
+e));
+> +		}
+> +		l2ptr =3D hyp_phys_to_virt(le64_to_cpu(l1tab[l1_idx].l2ptr) &
+> +				STRTAB_L1_DESC_L2PTR_MASK);
+> +		hyp_ste_ptr =3D &l2ptr->stes[arm_smmu_strtab_l2_idx(sid)];
+> +	}
 > +
-> +	smmu_add_cmd_raw(smmu, cmd->data);
-> +	writel(smmu->cmdq.llq.prod, smmu->cmdq.prod_reg);
+> +	for (i =3D 0; i < STRTAB_STE_DWORDS; ++i)
+> +		WRITE_ONCE(hyp_ste_ptr->data[i], host_ste_ptr->data[i]);
+
+[Severity: High]
+Does this copy sequence write the Valid bit (bit 0 of DWord 0) before the
+rest of the stream table entry is fully populated?
+
+Because the loop starts at i =3D 0, hyp_ste_ptr->data[0] is written first.
+If the hardware concurrently fetches this entry, could it read a Valid STE
+while DWords 1 through 7 still contain uninitialized data?
+
 > +	return 0;
-> +}
-> +
-> +static int smmu_sync_cmd(struct hyp_arm_smmu_v3_device *smmu)
-> +{
-> +	int ret;
-> +	struct arm_smmu_cmd cmd;
-> +
-> +	hyp_assert_lock_held(&smmu->hw_lock);
-> +	cmd =3D arm_smmu_make_cmd_sync(CMDQ_SYNC_0_CS_SEV, 0);
-> +	ret =3D smmu_add_cmd(smmu, &cmd);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return smmu_wait(false, smmu_cmdq_empty(&smmu->cmdq));
-
-[Severity: High]
-Is the WFE logic swapped between smmu_add_cmd() and smmu_sync_cmd()?
-
-Here, smmu_sync_cmd() inserts a CMD_SYNC with CS_SEV, which will
-explicitly generate an SEV upon completion. Yet it passes false for
-__use_wfe to smmu_wait(), forcing a busy-wait (cpu_relax()) and ignoring
-the precise hardware SEV wakeup it requested.
-
 > +}
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261015200903.2735=
-565-1-smostafa@google.com?part=3D15
+565-1-smostafa@google.com?part=3D18
