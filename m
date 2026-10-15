@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3D31542ED8
-	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 14:26:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD65F531AEB
+	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 14:26:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792074412; cv=none; b=RazfS4XYEtuW7WLuYCNaCeAaRJ7o5M/1GcygXkFay8qJ3BBjAYYIATES72hJqHMhw6TvURu0gzssdxosLvrh6B/C1Hpk+0KKfeMIHXL1mde6q8Xuug9e31jaViyQcBRO67Vn1zLtmzubVyBc0iekyS6CNJCHt92Siv2aQXVmAWQ=
+	t=1792074417; cv=none; b=XZWz5RK3fEmHKzINey3g6mIdBvK0z+h1U8yJcWboHsmJ7PkFC63TiA3JASY4xYoq4ud7cgbPEN82VTfIfuW2n75OVrPXQzS+uSflVbJ6SKQIHAtVmuuB0TPdQXpFK7geXXu7e3w5KYKj7ViGflhZaKxwKgWrslI6jzdw2VIi7wU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792074412; c=relaxed/simple;
-	bh=PvdO6ybjWfdECdB34WQM6YyFeyokVUC8uljKKclPvzc=;
+	s=arc-20240116; t=1792074417; c=relaxed/simple;
+	bh=PXqy5CTIvVyabhSobcDo5UynTRm8mgLyLlhfsHWhUkg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q03Ic6vHdDH9xcaeHx7lhsqAfJwnEAOsze9Oah/CXbjj8IxmcDCCK2VCzGw5QEesg+PxBpQW4qmDq7obJgzrL7Jgk3uD2ggrt1nHvH02d5qgk/EVXhovF6Jt7fHP+bF8V1w1qQFX+5Xhqak6S/yWiPbmJYHsUGpappfR0rm4/C0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=MMui53xc; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=EltEB3McGX1Q/FEsWFd+PMfxSxDM7iUMFy0tggfefpmbUsr2wm0YryKPTvOpI4oz2AqjJlh88XEJpgP4FNqsj0/lHLUGjYg9oMQxqhpDGj2/PNxcmxjopa4IEeeSeaX60hK2+V0Cne+SQrKjzTjkpT/3m3368Skk2xpg0G17AVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=S5ZNRTzf; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="MMui53xc"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="S5ZNRTzf"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E6CE71477;
-	Thu, 15 Oct 2026 07:26:38 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 70C36175A;
+	Thu, 15 Oct 2026 07:26:42 -0700 (PDT)
 Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.2.198.107])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6BEC33F871;
-	Thu, 15 Oct 2026 07:26:39 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 823663F871;
+	Thu, 15 Oct 2026 07:26:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792074402; bh=PvdO6ybjWfdECdB34WQM6YyFeyokVUC8uljKKclPvzc=;
+	t=1792074405; bh=PXqy5CTIvVyabhSobcDo5UynTRm8mgLyLlhfsHWhUkg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MMui53xcVFnSV+nAov7EKqY4GmNDQjZBjcOtMKkczFyBE7FizLCxhMyDpBVHI3hQB
-	 5p3+9x9yMpP8yIHDmW5UaTF8ZM75R2xKXhPHGOga83IOYGvBvXqckPxeaKvtqY6YaV
-	 Fe+NbtfLYSwESRx52t8Ydqi1Ifixe7NnHan7pK6A=
+	b=S5ZNRTzfTolZ+Gox3+EeghnFvOjOfvisyiJqfkcRnXbzdW9A9ndtPBMqlauFmqpdz
+	 rg6I6zNLJIjuTgVkZBSLh1Xffq/q77Q/SDEhlFVQ98mbDoAgIy3LrXdki0Pdf9LDui
+	 f246UeemzOG1S0I1I8k1XtVaOzqh6IFG3XaYQNCg=
 From: Ryan Roberts <ryan.roberts@arm.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Arnd Bergmann <arnd@arndb.de>,
@@ -50,9 +50,9 @@ Cc: Ryan Roberts <ryan.roberts@arm.com>,
 	devicetree@vger.kernel.org,
 	dri-devel@lists.freedesktop.org,
 	linux-doc@vger.kernel.org
-Subject: [RFC PATCH v2 11/15] KVM: arm64: Export stage-2 MMU config
-Date: Thu, 15 Oct 2026 15:25:45 +0100
-Message-ID: <20261015142552.4128028-12-ryan.roberts@arm.com>
+Subject: [RFC PATCH v2 12/15] vfio: Support VFIO devices that access the CPU MMU
+Date: Thu, 15 Oct 2026 15:25:46 +0100
+Message-ID: <20261015142552.4128028-13-ryan.roberts@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261015142552.4128028-1-ryan.roberts@arm.com>
 References: <20261015142552.4128028-1-ryan.roberts@arm.com>
@@ -66,218 +66,177 @@ Content-Transfer-Encoding: 8bit
 
 From: Jean-Philippe Brucker <jpb@kernel.org>
 
-Provide an API to drivers that want to share the stage 2 configuration
-of a VM with their device. At the moment it is rather limited:
-
-* No invalidation notifiers. The TLBs on the device side, if any,
-  receive CPU TLB invalidations.
-
-* No remote page fault support. All paging still takes the normal data
-  abort route on the CPU. Options are pinning all guest memory or
-  device-specific mechanism for reporting pending faults to the guest.
-
-* No nested VMs. Although we could perhaps support assigning devices to
-  the hyp context of a nested VM, it seems performative.
-
-So for the moment this API works for devices that share the CPU MMU, but
-the SMMU driver could use it with DVM.
+Support devices that are attached to a CPU and perform DMA through a
+MMU. They do not have an IOMMU and do not use a VFIO container.
+The VMM needs device-specific knowledge in order to create a virtual
+device (device tree, ACPI tables), so it also knows not to allocate a
+container.
 
 Signed-off-by: Jean-Philippe Brucker <jpb@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  11 ++++
- arch/arm64/include/asm/kvm_mmu.h  |   1 +
- arch/arm64/kvm/mmu.c              | 102 ++++++++++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c         |  14 +---
- 4 files changed, 117 insertions(+), 11 deletions(-)
+ drivers/vfio/group.c     | 37 +++++++++++++++++++++++++++++--------
+ drivers/vfio/vfio.h      |  5 +++++
+ drivers/vfio/vfio_main.c | 16 +++++++++++++++-
+ include/linux/vfio.h     |  1 +
+ 4 files changed, 50 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 30d0082b15ec..c0932b43f959 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -235,6 +235,14 @@ struct kvm_s2_mmu {
- 	atomic_t refcnt;
- };
+diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+index b2299e5bc6df..99d85880a41c 100644
+--- a/drivers/vfio/group.c
++++ b/drivers/vfio/group.c
+@@ -120,7 +120,7 @@ static int vfio_group_ioctl_set_container(struct vfio_group *group,
+ 		return -EBADF;
  
-+/* stage 2 MMU configuration, for drivers that speak VMSA */
-+struct kvm_arch_guest_mmu {
-+	u64 hcr;
-+	u64 hcrx;
-+	u64 vtcr;
-+	u64 vttbr;
-+};
-+
- struct kvm_arch_memory_slot {
- };
- 
-@@ -1720,4 +1728,7 @@ static __always_inline enum fgt_group_id __fgt_reg_to_group_id(enum vcpu_sysreg
- 
- long kvm_get_cap_for_kvm_ioctl(unsigned int ioctl, long *ext);
- 
-+struct kvm_arch_guest_mmu *kvm_arch_get_guest_mmu(struct kvm *kvm);
-+void kvm_arch_put_guest_mmu(struct kvm *kvm, struct kvm_arch_guest_mmu *mmu);
-+
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 6eae7e7e2a68..8a9d385fe14d 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -185,6 +185,7 @@ int kvm_handle_guest_sea(struct kvm_vcpu *vcpu);
- int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
- 
- phys_addr_t kvm_mmu_get_httbr(void);
-+u64 kvm_mmu_get_hcr(struct kvm *kvm, u64 hcr);
- phys_addr_t kvm_get_idmap_vector(void);
- int __init kvm_mmu_init(u32 hyp_va_bits);
- 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 2d44cd6a5aed..0bf1dff2a41f 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -2805,3 +2805,105 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
- 
- 	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
- }
-+
-+#define HCR_MMU_BITS (HCR_VM | HCR_PTW | HCR_DC | HCR_TGE | HCR_RW |	\
-+		      HCR_CD | HCR_ID | HCR_E2H | HCR_NV | HCR_NV1 |	\
-+		      HCR_FWB | HCR_ATA | HCR_DCT)
-+
-+/* Update MMU-specific host bits of HCR_EL2 */
-+u64 kvm_mmu_get_hcr(struct kvm *kvm, u64 hcr)
-+{
-+	lockdep_assert_held(&kvm->arch.config_lock);
-+
-+	WARN_ON(!test_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED,
-+			  &kvm->arch.flags));
-+
-+	hcr &= ~HCR_MMU_BITS;
-+	hcr |= HCR_VM | HCR_PTW;
-+
-+	if (has_vhe() || has_hvhe())
-+		hcr |= HCR_E2H;
-+
-+	if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
-+		hcr |= HCR_FWB;
-+
-+	if (kvm_has_mte(kvm))
-+		hcr |= HCR_ATA;
-+
-+	if (!test_bit(KVM_ARM_VCPU_EL1_32BIT, kvm->arch.vcpu_features))
-+		hcr |= HCR_RW;
-+
-+	return hcr;
-+}
-+
-+/**
-+ * kvm_arch_get_guest_mmu - Get a reference to the guest MMU config
-+ * @kvm: KVM instance. Caller must hold a reference.
-+ *
-+ * Get the stage 2 MMU config of an EL1 VM. The returned object contains
-+ * settings that do not change until the object is released with
-+ * kvm_arch_put_guest_mmu(). This function does not support nested VMs.
-+ *
-+ * HCR has lots of settings, some of which differ between vCPUs, but most of
-+ * them control traps. For EL1 VMs, the bits relevant to MMU translation are
-+ * common to all vCPUs:
-+ * - VM, PTW, DC, TGE, CD, ID, NV, NV1, DCT have fixed values.
-+ * - E2H, FWB, ATA depend on host CPU features (respectively VHE, FWB and MTE2).
-+ * - RW depends on vCPU features. This function does not support 32-bit VMs.
-+ *
-+ * HCRX: EnSDERR, EnSNERR set to 0. TODO: is GCSEn relevant?
-+ *
-+ * VTCR is set once for the VM, depends on the VM's IPA size.
-+ *
-+ * VTTBR:
-+ * - VMID is pinned, until kvm_arch_put_guest_mmu() is called.
-+ * - PGD is allocated and freed with the vm (the caller must hold their
-+ *   reference to @kvm). KVM may create and remove page table mappings at any
-+ *   moment, and uses normal TLB maintenance operations to synchronize with
-+ *   page table walkers. KVM does not notify the caller about mapping changes.
-+ * - CNP is a property of the host system.
-+ *
-+ * Return: a new kvm_arch_guest_mmu instance, or an error pointer on failure.
-+ */
-+struct kvm_arch_guest_mmu *kvm_arch_get_guest_mmu(struct kvm *kvm)
-+{
-+	int ret;
-+	struct kvm_arch_guest_mmu *mmu;
-+
-+	guard(mutex)(&kvm->arch.config_lock);
-+
-+	if (is_protected_kvm_enabled())
-+		return ERR_PTR(-EOPNOTSUPP);
-+
-+	if (!test_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags) ||
-+	    test_bit(KVM_ARM_VCPU_EL1_32BIT, kvm->arch.vcpu_features) ||
-+	    test_bit(KVM_ARM_VCPU_HAS_EL2, kvm->arch.vcpu_features))
-+		return ERR_PTR(-EINVAL);
-+
-+	ret = kvm_arm_pinned_vmid_get(kvm);
-+	if (ret < 0)
-+		return ERR_PTR(ret);
-+
-+	ret = -ENOMEM;
-+	mmu = kzalloc_obj(*mmu, GFP_KERNEL_ACCOUNT);
-+	if (!mmu)
-+		goto err_unpin_vmid;
-+
-+	mmu->vtcr = kvm->arch.mmu.vtcr;
-+	mmu->vttbr = kvm_get_vttbr(&kvm->arch.mmu);
-+	mmu->hcr = kvm_mmu_get_hcr(kvm, 0);
-+
-+	return mmu;
-+
-+err_unpin_vmid:
-+	kvm_arm_pinned_vmid_put(kvm);
-+	return ERR_PTR(ret);
-+}
-+EXPORT_SYMBOL_GPL(kvm_arch_get_guest_mmu);
-+
-+void kvm_arch_put_guest_mmu(struct kvm *kvm, struct kvm_arch_guest_mmu *mmu)
-+{
-+	kvm_arm_pinned_vmid_put(kvm);
-+	kfree(mmu);
-+}
-+EXPORT_SYMBOL_GPL(kvm_arch_put_guest_mmu);
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index a2f4e769a428..20277f888380 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -5798,8 +5798,8 @@ static void vcpu_set_hcr(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = vcpu->kvm;
- 
--	if (has_vhe() || has_hvhe())
--		vcpu->arch.hcr_el2 |= HCR_E2H;
-+	vcpu->arch.hcr_el2 = kvm_mmu_get_hcr(kvm, vcpu->arch.hcr_el2);
-+
- 	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN)) {
- 		/* route synchronous external abort exceptions to EL2 */
- 		vcpu->arch.hcr_el2 |= HCR_TEA;
-@@ -5807,9 +5807,6 @@ static void vcpu_set_hcr(struct kvm_vcpu *vcpu)
- 		vcpu->arch.hcr_el2 |= HCR_TERR;
+ 	mutex_lock(&group->group_lock);
+-	if (vfio_group_has_iommu(group)) {
++	if (vfio_group_has_iommu(group) || group->type == VFIO_CPU_MMU) {
+ 		ret = -EINVAL;
+ 		goto out_unlock;
  	}
+@@ -173,7 +173,8 @@ static int vfio_df_group_open(struct vfio_device_file *df)
+ 	int ret;
  
--	if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
--		vcpu->arch.hcr_el2 |= HCR_FWB;
--
- 	if (cpus_have_final_cap(ARM64_HAS_EVT) &&
- 	    !cpus_have_final_cap(ARM64_MISMATCHED_CACHE_TYPE) &&
- 	    kvm_read_vm_id_reg(kvm, SYS_CTR_EL0) == read_sanitised_ftr_reg(SYS_CTR_EL0))
-@@ -5817,12 +5814,7 @@ static void vcpu_set_hcr(struct kvm_vcpu *vcpu)
- 	else
- 		vcpu->arch.hcr_el2 |= HCR_TID2;
+ 	mutex_lock(&device->group->group_lock);
+-	if (!vfio_group_has_iommu(device->group)) {
++	if (!vfio_group_has_iommu(device->group) &&
++	    device->group->type != VFIO_CPU_MMU) {
+ 		ret = -EINVAL;
+ 		goto out_unlock;
+ 	}
+@@ -635,7 +636,8 @@ static bool vfio_group_has_device(struct vfio_group *group, struct device *dev)
+ 	return false;
+ }
  
--	if (vcpu_el1_is_32bit(vcpu))
--		vcpu->arch.hcr_el2 &= ~HCR_RW;
--
--	if (kvm_has_mte(vcpu->kvm))
--		vcpu->arch.hcr_el2 |= HCR_ATA;
+-static struct vfio_group *vfio_group_find_or_alloc(struct device *dev)
++static struct vfio_group *vfio_group_find_or_alloc(struct device *dev,
++						   enum vfio_group_type type)
+ {
+ 	struct iommu_group *iommu_group;
+ 	struct vfio_group *group;
+@@ -662,12 +664,13 @@ static struct vfio_group *vfio_group_find_or_alloc(struct device *dev)
+ 	mutex_lock(&vfio.group_lock);
+ 	group = vfio_group_find_from_iommu(iommu_group);
+ 	if (group) {
+-		if (WARN_ON(vfio_group_has_device(group, dev)))
++		if (WARN_ON(vfio_group_has_device(group, dev)) ||
++		    WARN_ON(group->type != type))
+ 			group = ERR_PTR(-EINVAL);
+ 		else
+ 			refcount_inc(&group->drivers);
+ 	} else {
+-		group = vfio_create_group(iommu_group, VFIO_IOMMU);
++		group = vfio_create_group(iommu_group, type);
+ 	}
+ 	mutex_unlock(&vfio.group_lock);
+ 
+@@ -681,10 +684,18 @@ int vfio_device_set_group(struct vfio_device *device,
+ {
+ 	struct vfio_group *group;
+ 
+-	if (type == VFIO_IOMMU)
+-		group = vfio_group_find_or_alloc(device->dev);
 -	else
-+	if (!kvm_has_mte(vcpu->kvm))
- 		vcpu->arch.hcr_el2 |= HCR_TID5;
++	switch (type) {
++	case VFIO_IOMMU:
++	case VFIO_CPU_MMU:
++		group = vfio_group_find_or_alloc(device->dev, type);
++		break;
++	case VFIO_EMULATED_IOMMU:
++	case VFIO_NO_IOMMU:
+ 		group = vfio_noiommu_group_alloc(device->dev, type);
++		break;
++	default:
++		group = ERR_PTR(-EINVAL);
++	}
  
- 	/*
+ 	if (IS_ERR(group))
+ 		return PTR_ERR(group);
+@@ -761,6 +772,11 @@ int vfio_device_group_use_iommu(struct vfio_device *device)
+ 
+ 	lockdep_assert_held(&group->group_lock);
+ 
++	if (group->type == VFIO_CPU_MMU) {
++		get_file(group->opened_file);
++		return 0;
++	}
++
+ 	if (WARN_ON(!group->container))
+ 		return -EINVAL;
+ 
+@@ -777,6 +793,11 @@ void vfio_device_group_unuse_iommu(struct vfio_device *device)
+ 
+ 	lockdep_assert_held(&group->group_lock);
+ 
++	if (group->type == VFIO_CPU_MMU) {
++		fput(group->opened_file);
++		return;
++	}
++
+ 	if (WARN_ON(!group->container))
+ 		return;
+ 
+diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+index 7728bc99b63d..07c5223612d3 100644
+--- a/drivers/vfio/vfio.h
++++ b/drivers/vfio/vfio.h
+@@ -64,6 +64,11 @@ enum vfio_group_type {
+ 	 * taint the kernel.
+ 	 */
+ 	VFIO_NO_IOMMU,
++
++	/*
++	 * Physical devices using the CPU MMU
++	 */
++	VFIO_CPU_MMU,
+ };
+ 
+ #if IS_ENABLED(CONFIG_VFIO_GROUP)
+diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+index 423ead48aafe..41fee81a14cb 100644
+--- a/drivers/vfio/vfio_main.c
++++ b/drivers/vfio/vfio_main.c
+@@ -344,7 +344,8 @@ static int __vfio_register_dev(struct vfio_device *device,
+ {
+ 	int ret;
+ 
+-	if (WARN_ON(IS_ENABLED(CONFIG_IOMMUFD) &&
++	if (type != VFIO_CPU_MMU &&
++	    WARN_ON(IS_ENABLED(CONFIG_IOMMUFD) &&
+ 		    (!device->ops->bind_iommufd ||
+ 		     !device->ops->unbind_iommufd ||
+ 		     !device->ops->attach_ioas ||
+@@ -415,6 +416,19 @@ int vfio_register_emulated_iommu_dev(struct vfio_device *device)
+ }
+ EXPORT_SYMBOL_GPL(vfio_register_emulated_iommu_dev);
+ 
++/*
++ * Register a devices that accesses memory through the CPU MMU. Although it
++ * doesn't use an IOMMU, the device must have an IOMMU group.
++ */
++int vfio_register_cpu_mmu_dev(struct vfio_device *device)
++{
++	if (!IS_ENABLED(CONFIG_VFIO_GROUP))
++		return -EOPNOTSUPP;
++
++	return __vfio_register_dev(device, VFIO_CPU_MMU);
++}
++EXPORT_SYMBOL_GPL(vfio_register_cpu_mmu_dev);
++
+ /*
+  * Decrement the device reference count and wait for the device to be
+  * removed.  Open file descriptors for the device... */
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index 45f08986359e..7d3a5ff1ad00 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -337,6 +337,7 @@ static inline void vfio_put_device(struct vfio_device *device)
+ 	put_device(&device->device);
+ }
+ 
++int vfio_register_cpu_mmu_dev(struct vfio_device *device);
+ int vfio_register_group_dev(struct vfio_device *device);
+ int vfio_register_emulated_iommu_dev(struct vfio_device *device);
+ void vfio_unregister_group_dev(struct vfio_device *device);
 -- 
 2.43.0
 
