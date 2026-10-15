@@ -1,56 +1,56 @@
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com [209.85.218.71])
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A48348C3FB
-	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 20:09:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F7B3481FD1
+	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 20:09:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792094962; cv=none; b=br4Ct4Vu9gSW4GxZxGHrAWL+TmXK8OhNIMDMDrZ2zY8/sRwYOnJoOPLgNhlvld+ghG6wP0mb5LIx+F46BH0/+Jl+jPVckEy9pY+m8ePqi3aT69Ahe6GtQMOdHno6HphV4mljzLOKjEdWMpQwMt3mTDBdQ4JsQ8iXLiv5JofR1/Y=
+	t=1792094962; cv=none; b=nXqFPXeX/HmUnHyyjNvoMKVRVgbTtDeXsXXQn/CY6RFOh+Nkyh6nzhzu1JIc90E8nhe0FGUkW3bhSfJRLoeWYK9cNOOb/ulvLCfwmxr0v+SryBiYOJjknDo89IcaL4PkAjfOqlfIoi800dqDzKRrQ7D0wPw0wYYzgpMRQyTpIOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1792094962; c=relaxed/simple;
-	bh=fUgza7SLLFb5anuHt2xluUBMUoBTWGDhr1TBJyyaCbk=;
+	bh=r63L3owY7mfJ3h4aniiVL9LvB+bNIP+0KJVZO/Aww5U=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GrFsPFBorg42f4gYheNLe4jjC1GCDtiYHVCiua8RK/eyPfJfYK05I7Ya1bKBm2yHl4QF9S07sdqzVM0EERvRnMmMaOr1wJgPFk1AbtTJ+WaC2Fk/MdsSTgQsQZCo/LURleou2wOrO8rvjIAoa7KBZhuxg4Ni6X+Mdb5ScOuCwEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E6kzhojT; arc=none smtp.client-ip=209.85.218.71
+	 To:Cc:Content-Type; b=usjY2ZinHum/w7OS/Uz48QziRhpTp5J8rcUOpDyNYLusqSaxMZrcCmUEVZQe8dv6PtkG3fyHjyIqXIZg67u8jfXTC179+yXRdyhd4qFaZ9c8giSXn8ZPvbDjq1x2BhQYqeUzfmnDJ8Yv3wd8FGuc4R3uVcuOqQfn6Vj1ySntang=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MlvmTFrx; arc=none smtp.client-ip=209.85.128.71
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E6kzhojT"
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-c3f8e149ccfso110090066b.3
-        for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 13:09:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MlvmTFrx"
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4a17574b5easo17700735e9.2
+        for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 13:09:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1792094956; x=1792699756; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1792094954; x=1792699754; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=wic91XhpkzCA7vTTouSB42jSaYhrjWojUPYtPDmPpuk=;
-        b=E6kzhojTKBqvZszZSE6mQwPnMpDqcAwavHF1Ccrs+k4lnSZRJoKV/pqv/lh3X7FUJo
-         vg9hwTaB77fhdxjKa8zxl6Y3YEtcNK1pd5PZLHNIY24aRnQW5f3gH6ssr5B/ZfkIq3ZI
-         GSp2JqaZXZk8u/gaRHpFS4fzKY1jOZl7rnYhpt5Vy4/RjUuhZ8VataqRZzslswIwtyq9
-         pwberGQFLkyQTlR35V+BLqdBPANwSgPIVJlmz1l20U4lzp3eWUs+G6px2gGZreKg8ic6
-         uuR7SithFx5mAMb2cGglydZG9o3wy4j7QBshP1/rI/4URK8GCthmtgMmHg/0BuhC0Zzx
-         RJaA==
+        bh=fvOl/hxvEkk8z+uVJIZLKJKVTrO3KToYAMaC4rC2vNA=;
+        b=MlvmTFrxCVm6eQli2NViUCoBu6bMRt7g6tHgCx6W6BfHgt8xSZWbSkOslzMOR4l8+E
+         IDRgxyNNXWngoQm1jUg+ViCn5i53pDNSoMXrYUgr4cJbpGEAm8pJxV9UswaRfm2PKD8L
+         tq7M6FG3iqBEBo7VqTWzrBKyh2g/FXc0YtwWlfgTWuYJF9ti8yvwNcwJx/LU+6QzOJ9K
+         8fZ/qpjRvJierlmr9k0TGMrtmz5g506CUjf+WnTZHHt+JPqL3zKq6fIctIjPUKuvZp64
+         eIhDRidWCjLxEd30S5WLYxgTTxiWO8cgDT8EKhtVLAokpBbsCCvx6Y5ScwvqCRb2ymGW
+         KfQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792094956; x=1792699756;
+        d=1e100.net; s=20260707; t=1792094954; x=1792699754;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=wic91XhpkzCA7vTTouSB42jSaYhrjWojUPYtPDmPpuk=;
-        b=sdZVG+Ys0c0alcSNbtwZB+Acw1TKkW5H0zTbxz4og1jt03eVxdhedB5VgifR0IaMFF
-         /qPRCfLEFn3FN4y/r4voJuhtoN9qQzGZPFgRRKEEcYGgf0gVPr8cKjusfY3+XnKXIRBK
-         tnF//sQAdlbSk1nMF268bzHHNxUqQil69yPXlk8xKGIvd7UxX7xiqmBAjp0WQYkpwFbd
-         rcFy5nDf5GkQukpw7szaWkZmlwh5XaAOOkOBuhyYBbTiV5YOa9tCh0BlxNORVfGScXaH
-         ybBUCr7msjlT8hQKjcSHJeD6bdy8BQ2Ml+jIA7Jb2pQGK7l/P5QcbIcseERwWAqal6f2
-         f4qA==
-X-Forwarded-Encrypted: i=1; AKwUvBzTlVkUB2D06E1j4Qf/wji7424PPJoRrsMYRKG/4I1T3blu6jFsMLiTWObsgveVi3cxxASaaUA=@lists.linux.dev
-X-Gm-Message-State: AFq9FYLitiQt0bunwNRg9Y1z5apIO3sblyeJiFoclRMN2rCbSEzJOH9x
-	qL074Vj/aoEz0s0Mp5kdPZpmpu+ECTC78lO1kKyX35Zemg0fmV3OFrS6/ySCVir4DL16rPuKuaC
-	b49nRklZCl/Ah0w==
-X-Received: from ejcb24.prod.google.com ([2002:a17:906:36d8:b0:c3f:7f5a:30f9])
+        bh=fvOl/hxvEkk8z+uVJIZLKJKVTrO3KToYAMaC4rC2vNA=;
+        b=Pm3CjbpDhbsKmIbdxAgXRDLupyGQD0Nzneifd5/AJJ7r3Q3rxTxNcstiCMt1a50bAz
+         RVgdtt2vZ2ll9HfQwkCBOuvi4uRTHTFu7eHpQdIckjdbKie2Hn3JpboPtgkBrdoa3Sb9
+         4t+ZBEoN+F8cwsN4Xtv1xJyc9J1m3kqczulSEEraBzru5SyfIJmV5LDzml2h9jsLkQz7
+         ItKL3OdoVLZCfA0ZJvPFkkHydqm01srwuiv2ElTyFeeoLh82g9Urble9njIigAlNNskv
+         VKO5H/ljkz/ZmxMB1xOsrKYi78l/kTvzKJdVJrHRkC5XYAWb7hQMEnk080lH3+G5kIt1
+         lo8A==
+X-Forwarded-Encrypted: i=1; AKwUvBziqcFPAXT7x+27t01AO7isRMhKZY8SPmSzD0yoZmgPGAq+L1kTjJDZidAipNSefA8/O7pNfVY=@lists.linux.dev
+X-Gm-Message-State: AFq9FYICK0cvkMRG93pVAW9O7l0lrlMnWX6L7PrfGj/WKjiOCaFDGC9G
+	t/s56Aedi7oA3xFIhK/hAv5hnX1WNFtrAFY8IqHmULWL7KXaQvJxtXxQXv3lckK+3+cJQCaF+MA
+	2VaWKJlwa8IypBw==
+X-Received: from wmbg12.prod.google.com ([2002:a05:600c:a40c:b0:49f:fd3d:3bd3])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:906:c106:b0:c2d:bf61:24d1 with SMTP id a640c23a62f3a-c31a9a2919bmr1774150966b.1.1792094955429;
- Thu, 15 Oct 2026 13:09:15 -0700 (PDT)
-Date: Thu, 15 Oct 2026 20:08:35 +0000
+ 2002:a05:600c:4e89:b0:4a0:12d7:4c88 with SMTP id 5b1f17b1804b1-4a18e4ac77amr453376685e9.30.1792094954389;
+ Thu, 15 Oct 2026 13:09:14 -0700 (PDT)
+Date: Thu, 15 Oct 2026 20:08:34 +0000
 In-Reply-To: <20261015200903.2735565-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -60,8 +60,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20261015200903.2735565-1-smostafa@google.com>
 X-Mailer: git-send-email 2.56.0.176.g3575e65682-goog
-Message-ID: <20261015200903.2735565-5-smostafa@google.com>
-Subject: [PATCH v9 04/25] iommu/arm-smmu-v3: Move hitless machinery to common code
+Message-ID: <20261015200903.2735565-4-smostafa@google.com>
+Subject: [PATCH v9 03/25] iommu/arm-smmu-v3: Move IDR parsing to common functions
 From: Mostafa Saleh <smostafa@google.com>
 To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
 	kvmarm@lists.linux.dev, iommu@lists.linux.dev
@@ -69,611 +69,642 @@ Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
 	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, 
 	yuzenghui@huawei.com, joro@8bytes.org, jgg@ziepe.ca, mark.rutland@arm.com, 
 	qperret@google.com, tabba@google.com, vdonnefort@google.com, 
-	nicolinc@nvidia.com, Mostafa Saleh <smostafa@google.com>
+	nicolinc@nvidia.com, Mostafa Saleh <smostafa@google.com>, Jason Gunthorpe <jgg@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Move the hitless STE functions to the common file so they can be
-reused by the hypervisor.
+The hypervisor SMMUv3 driver needs the same IDR0, IDR3, IDR5 and IIDR
+parsing as the kernel driver, plus the IDR1 checks it depends on
+(embedded implementation, ATTR_TYPES_OVR, StreamID size). Move them to
+arm-smmu-v3-common-lib.c, which will be built for both, and the IIDR
+implementer and product IDs to arm-smmu-v3.h.
 
-No functional change.
+The two drivers use different device structs, so the shared code is
+written against ARM_SMMU_OBJ, which each compilation unit defines. The
+kernel maps it to struct arm_smmu_device. Static asserts check that the
+fields the shared code uses exist with the expected types.
 
+The validity checks stay with the parsing. dev_err() and dev_info()
+become arm_smmu_err() and arm_smmu_info(), defined per world next to
+ARM_SMMU_OBJ, as the hypervisor cannot print to the console. The
+disable_msipolling module parameter is passed as an argument so the
+hypervisor can opt out, and cpus_have_cap() becomes
+cpus_have_final_cap(), which the hypervisor can use.
+
+No functional change intended.
+
+Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Mostafa Saleh <smostafa@google.com>
-Reviewed-by: Nicolin Chen <nicolinc@nvidia.com>
 ---
- .../arm/arm-smmu-v3/arm-smmu-v3-common-lib.c  | 246 +++++++++++++++++
- .../arm/arm-smmu-v3/arm-smmu-v3-common-lib.h  |   6 +
- .../iommu/arm/arm-smmu-v3/arm-smmu-v3-test.c  |   2 +-
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 249 ------------------
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |   6 +-
- 5 files changed, 254 insertions(+), 255 deletions(-)
+ drivers/iommu/arm/arm-smmu-v3/Makefile        |   2 +-
+ .../arm/arm-smmu-v3/arm-smmu-v3-common-lib.c  | 240 ++++++++++++++++++
+ .../arm/arm-smmu-v3/arm-smmu-v3-common-lib.h  |  39 +++
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 220 +---------------
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |   6 +
+ 5 files changed, 297 insertions(+), 210 deletions(-)
+ create mode 100644 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c
+ create mode 100644 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.h
 
+diff --git a/drivers/iommu/arm/arm-smmu-v3/Makefile b/drivers/iommu/arm/arm-smmu-v3/Makefile
+index 493a659cc66b..c9ce392e6d31 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/Makefile
++++ b/drivers/iommu/arm/arm-smmu-v3/Makefile
+@@ -1,6 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+ obj-$(CONFIG_ARM_SMMU_V3) += arm_smmu_v3.o
+-arm_smmu_v3-y := arm-smmu-v3.o
++arm_smmu_v3-y := arm-smmu-v3.o arm-smmu-v3-common-lib.o
+ arm_smmu_v3-$(CONFIG_ARM_SMMU_V3_IOMMUFD) += arm-smmu-v3-iommufd.o
+ arm_smmu_v3-$(CONFIG_ARM_SMMU_V3_SVA) += arm-smmu-v3-sva.o
+ arm_smmu_v3-$(CONFIG_TEGRA241_CMDQV) += tegra241-cmdqv.o
 diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c
-index 22467aaca191..cf9287cdbd19 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c
+new file mode 100644
+index 000000000000..22467aaca191
+--- /dev/null
 +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.c
-@@ -5,6 +5,7 @@
-  */
- 
- #include <asm/cpufeature.h>
-+#include <kunit/visibility.h>
- 
- #include "arm-smmu-v3.h"
- #include "arm-smmu-v3-common-lib.h"
-@@ -238,3 +239,248 @@ u32 arm_smmu_device_idr5_probe(ARM_SMMU_OBJ *smmu)
- 
- 	return reg;
- }
-+
+@@ -0,0 +1,240 @@
++// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * Based on the value of ent report which bits of the STE the HW will access. It
-+ * would be nice if this was complete according to the spec, but minimally it
-+ * has to capture the bits this driver uses.
++ * Copyright (C) 2015 ARM Limited
++ * Arm SMMUv3 driver functions shared with hypervisor.
 + */
-+void arm_smmu_get_ste_used(const __le64 *ent, __le64 *used_bits)
++
++#include <asm/cpufeature.h>
++
++#include "arm-smmu-v3.h"
++#include "arm-smmu-v3-common-lib.h"
++
++void arm_smmu_device_iidr_probe(ARM_SMMU_OBJ *smmu)
 +{
-+	unsigned int cfg = FIELD_GET(STRTAB_STE_0_CFG, le64_to_cpu(ent[0]));
++	u32 reg;
++	unsigned int implementer, productid, variant, revision;
 +
-+	used_bits[0] = cpu_to_le64(STRTAB_STE_0_V);
-+	if (!(ent[0] & cpu_to_le64(STRTAB_STE_0_V)))
-+		return;
++	reg = readl_relaxed(smmu->base + ARM_SMMU_IIDR);
++	implementer = FIELD_GET(IIDR_IMPLEMENTER, reg);
++	productid = FIELD_GET(IIDR_PRODUCTID, reg);
++	variant = FIELD_GET(IIDR_VARIANT, reg);
++	revision = FIELD_GET(IIDR_REVISION, reg);
 +
-+	used_bits[0] |= cpu_to_le64(STRTAB_STE_0_CFG);
-+
-+	/* S1 translates */
-+	if (cfg & BIT(0)) {
-+		used_bits[0] |= cpu_to_le64(STRTAB_STE_0_S1FMT |
-+					    STRTAB_STE_0_S1CTXPTR_MASK |
-+					    STRTAB_STE_0_S1CDMAX);
-+		used_bits[1] |=
-+			cpu_to_le64(STRTAB_STE_1_S1DSS | STRTAB_STE_1_S1CIR |
-+				    STRTAB_STE_1_S1COR | STRTAB_STE_1_S1CSH |
-+				    STRTAB_STE_1_S1STALLD | STRTAB_STE_1_STRW |
-+				    STRTAB_STE_1_EATS | STRTAB_STE_1_MEV |
-+				    STRTAB_STE_1_INSTCFG);
-+		used_bits[2] |= cpu_to_le64(STRTAB_STE_2_S2VMID);
-+
-+		/*
-+		 * See 13.5 Summary of attribute/permission configuration fields
-+		 * for the SHCFG behavior.
-+		 */
-+		if (FIELD_GET(STRTAB_STE_1_S1DSS, le64_to_cpu(ent[1])) ==
-+		    STRTAB_STE_1_S1DSS_BYPASS)
-+			used_bits[1] |= cpu_to_le64(STRTAB_STE_1_SHCFG);
-+	}
-+
-+	/* S2 translates */
-+	if (cfg & BIT(1)) {
-+		used_bits[1] |=
-+			cpu_to_le64(STRTAB_STE_1_S2FWB | STRTAB_STE_1_EATS |
-+				    STRTAB_STE_1_SHCFG | STRTAB_STE_1_MEV |
-+				    STRTAB_STE_1_INSTCFG);
-+		used_bits[2] |=
-+			cpu_to_le64(STRTAB_STE_2_S2VMID | STRTAB_STE_2_VTCR |
-+				    STRTAB_STE_2_S2AA64 | STRTAB_STE_2_S2ENDI |
-+				    STRTAB_STE_2_S2PTW | STRTAB_STE_2_S2S |
-+				    STRTAB_STE_2_S2R);
-+		used_bits[3] |= cpu_to_le64(STRTAB_STE_3_S2TTB_MASK);
-+	}
-+
-+	if (cfg == STRTAB_STE_0_CFG_BYPASS)
-+		used_bits[1] |= cpu_to_le64(STRTAB_STE_1_SHCFG);
-+}
-+EXPORT_SYMBOL_IF_KUNIT(arm_smmu_get_ste_used);
-+
-+void arm_smmu_get_ste_update_safe(const __le64 *cur, const __le64 *target,
-+				  __le64 *safe_bits)
-+{
-+	const u64 eats_s1chk =
-+		FIELD_PREP(STRTAB_STE_1_EATS, STRTAB_STE_1_EATS_S1CHK);
-+	const u64 eats_trans =
-+		FIELD_PREP(STRTAB_STE_1_EATS, STRTAB_STE_1_EATS_TRANS);
-+
-+	/*
-+	 * When an STE changes EATS_TRANS, the sequencing code in the attach
-+	 * logic already will have the PCI cap for ATS disabled. Thus at this
-+	 * moment we can expect that the device will not generate ATS queries
-+	 * and so we don't care about the sequencing of EATS. The purpose of
-+	 * EATS_TRANS is to protect the system from hostile untrusted devices
-+	 * that issue ATS when the PCI config space is disabled. However, if
-+	 * EATS_TRANS is being changed, then we must have already trusted the
-+	 * device as the EATS_TRANS security block is being disabled.
-+	 *
-+	 *  Note: now the EATS_TRANS update is moved to the first entry_set().
-+	 *  Changing S2S and EATS might transiently result in S2S=1 and EATS=1
-+	 *  which is a bad STE (see "5.2 Stream Table Entry"). In such a case,
-+	 *  we can't do a hitless update. Also, it should not be added to the
-+	 *  safe bits with STRTAB_STE_1_EATS_S1CHK, because EATS=0b11 would be
-+	 *  effectively an errant 0b00 configuration.
-+	 */
-+	if (!((cur[1] | target[1]) & cpu_to_le64(eats_s1chk)) &&
-+	    !((cur[2] | target[2]) & cpu_to_le64(STRTAB_STE_2_S2S)))
-+		safe_bits[1] |= cpu_to_le64(eats_trans);
-+
-+	/*
-+	 * MEV does not meaningfully impact the operation of the HW, it only
-+	 * changes how many fault events are generated, thus we can relax it
-+	 * when computing the ordering. The spec notes the device can act like
-+	 * MEV=1 anyhow:
-+	 *
-+	 *  Note: Software must expect, and be able to deal with, coalesced
-+	 *  fault records even when MEV == 0.
-+	 */
-+	safe_bits[1] |= cpu_to_le64(STRTAB_STE_1_MEV);
-+}
-+EXPORT_SYMBOL_IF_KUNIT(arm_smmu_get_ste_update_safe);
-+
-+/*
-+ * Figure out if we can do a hitless update of entry to become target. Returns a
-+ * bit mask where 1 indicates that qword needs to be set disruptively.
-+ * unused_update is an intermediate value of entry that has unused bits set to
-+ * their new values.
-+ */
-+static u8 arm_smmu_entry_qword_diff(struct arm_smmu_entry_writer *writer,
-+				    const __le64 *entry, const __le64 *target,
-+				    __le64 *unused_update)
-+{
-+	__le64 target_used[NUM_ENTRY_QWORDS] = {};
-+	__le64 cur_used[NUM_ENTRY_QWORDS] = {};
-+	__le64 safe[NUM_ENTRY_QWORDS] = {};
-+	u8 used_qword_diff = 0;
-+	unsigned int i;
-+
-+	writer->ops->get_used(entry, cur_used);
-+	writer->ops->get_used(target, target_used);
-+	if (writer->ops->get_update_safe)
-+		writer->ops->get_update_safe(entry, target, safe);
-+
-+	for (i = 0; i != NUM_ENTRY_QWORDS; i++) {
-+		/*
-+		 * Safe is only used for bits that are used by both entries,
-+		 * otherwise it is sequenced according to the unused entry.
-+		 */
-+		safe[i] &= target_used[i] & cur_used[i];
-+
-+		/*
-+		 * Check that masks are up to date, the make functions are not
-+		 * allowed to set a bit to 1 if the used function doesn't say it
-+		 * is used.
-+		 */
-+		WARN_ON_ONCE(target[i] & ~target_used[i]);
-+
-+		/* Bits can change because they are not currently being used */
-+		cur_used[i] &= ~safe[i];
-+		unused_update[i] = (entry[i] & cur_used[i]) |
-+				   (target[i] & ~cur_used[i]);
-+		/*
-+		 * Each bit indicates that a used bit in a qword needs to be
-+		 * changed after unused_update is applied.
-+		 */
-+		if ((unused_update[i] & target_used[i]) != target[i])
-+			used_qword_diff |= 1 << i;
-+	}
-+	return used_qword_diff;
-+}
-+
-+static void entry_set(struct arm_smmu_entry_writer *writer, __le64 *entry,
-+		      const __le64 *target, unsigned int start,
-+		      unsigned int len)
-+{
-+	bool changed = false;
-+	unsigned int i;
-+
-+	for (i = start; len != 0; len--, i++) {
-+		if (entry[i] != target[i]) {
-+			WRITE_ONCE(entry[i], target[i]);
-+			changed = true;
++	switch (implementer) {
++	case IIDR_IMPLEMENTER_ARM:
++		switch (productid) {
++		case IIDR_PRODUCTID_ARM_MMU_600:
++			/* Arm erratum 1076982 */
++			if (variant == 0 && revision <= 2)
++				smmu->features &= ~ARM_SMMU_FEAT_SEV;
++			/* Arm erratum 1209401 */
++			if (variant < 2)
++				smmu->features &= ~ARM_SMMU_FEAT_NESTING;
++			break;
++		case IIDR_PRODUCTID_ARM_MMU_700:
++			/* Many errata... */
++			smmu->features &= ~ARM_SMMU_FEAT_BTM;
++			if (variant < 1 || revision < 1) {
++				/* Arm erratum 2812531 */
++				smmu->options |= ARM_SMMU_OPT_CMDQ_FORCE_SYNC;
++				/* Arm errata 2268618, 2812531 */
++				smmu->features &= ~ARM_SMMU_FEAT_NESTING;
++			}
++			/* Arm errata 3777127 */
++			smmu->options |= ARM_SMMU_OPT_FULL_CONT_RANGE_INV;
++			break;
++		case IIDR_PRODUCTID_ARM_MMU_L1:
++			/* Arm errata 3878312 */
++			smmu->features &= ~ARM_SMMU_FEAT_BTM;
++			break;
++		case IIDR_PRODUCTID_ARM_MMU_S3:
++			/* Arm errata 3995052 */
++			smmu->features &= ~ARM_SMMU_FEAT_BTM;
++			/* Arm errata 3673557 */
++			if (variant < 1 || (variant == 1 && revision < 1))
++				smmu->options |=
++					ARM_SMMU_OPT_FULL_CONT_RANGE_INV;
++			break;
 +		}
++		break;
 +	}
-+
-+	if (changed)
-+		writer->ops->sync(writer);
 +}
 +
-+/*
-+ * Update the STE/CD to the target configuration. The transition from the
-+ * current entry to the target entry takes place over multiple steps that
-+ * attempts to make the transition hitless if possible. This function takes care
-+ * not to create a situation where the HW can perceive a corrupted entry. HW is
-+ * only required to have a 64 bit atomicity with stores from the CPU, while
-+ * entries are many 64 bit values big.
-+ *
-+ * The difference between the current value and the target value is analyzed to
-+ * determine which of three updates are required - disruptive, hitless or no
-+ * change.
-+ *
-+ * In the most general disruptive case we can make any update in three steps:
-+ *  - Disrupting the entry (V=0)
-+ *  - Fill now unused qwords, execpt qword 0 which contains V
-+ *  - Make qword 0 have the final value and valid (V=1) with a single 64
-+ *    bit store
-+ *
-+ * However this disrupts the HW while it is happening. There are several
-+ * interesting cases where a STE/CD can be updated without disturbing the HW
-+ * because only a small number of bits are changing (S1DSS, CONFIG, etc) or
-+ * because the used bits don't intersect. We can detect this by calculating how
-+ * many 64 bit values need update after adjusting the unused bits and skip the
-+ * V=0 process. This relies on the IGNORED behavior described in the
-+ * specification.
-+ */
-+void arm_smmu_write_entry(struct arm_smmu_entry_writer *writer, __le64 *entry,
-+			  const __le64 *target)
++int arm_smmu_device_idr0_probe(ARM_SMMU_OBJ *smmu, bool disable_msipolling,
++			       u32 *idr0)
 +{
-+	__le64 unused_update[NUM_ENTRY_QWORDS];
-+	u8 used_qword_diff;
++	bool coherent = smmu->features & ARM_SMMU_FEAT_COHERENCY;
++	u32 reg = readl_relaxed(smmu->base + ARM_SMMU_IDR0);
++
++	/* 2-level structures */
++	if (FIELD_GET(IDR0_ST_LVL, reg) == IDR0_ST_LVL_2LVL)
++		smmu->features |= ARM_SMMU_FEAT_2_LVL_STRTAB;
++
++	if (reg & IDR0_CD2L)
++		smmu->features |= ARM_SMMU_FEAT_2_LVL_CDTAB;
 +
 +	/*
-+	 * Many of the entry structures have pointers to other structures that
-+	 * need to have their updates be visible before any writes of the entry
-+	 * happen.
++	 * Translation table endianness.
++	 * We currently require the same endianness as the CPU, but this
++	 * could be changed later by adding a new IO_PGTABLE_QUIRK.
 +	 */
-+	dma_wmb();
-+
-+	used_qword_diff =
-+		arm_smmu_entry_qword_diff(writer, entry, target, unused_update);
-+	if (hweight8(used_qword_diff) == 1) {
-+		/*
-+		 * Only one qword needs its used bits to be changed. This is a
-+		 * hitless update, update all bits the current STE/CD is
-+		 * ignoring to their new values, then update a single "critical
-+		 * qword" to change the STE/CD and finally 0 out any bits that
-+		 * are now unused in the target configuration.
-+		 */
-+		unsigned int critical_qword_index = ffs(used_qword_diff) - 1;
-+
-+		/*
-+		 * Skip writing unused bits in the critical qword since we'll be
-+		 * writing it in the next step anyways. This can save a sync
-+		 * when the only change is in that qword.
-+		 */
-+		unused_update[critical_qword_index] =
-+			entry[critical_qword_index];
-+		entry_set(writer, entry, unused_update, 0, NUM_ENTRY_QWORDS);
-+		entry_set(writer, entry, target, critical_qword_index, 1);
-+		entry_set(writer, entry, target, 0, NUM_ENTRY_QWORDS);
-+	} else if (used_qword_diff) {
-+		/*
-+		 * At least two qwords need their inuse bits to be changed. This
-+		 * requires a breaking update, zero the V bit, write all qwords
-+		 * but 0, then set qword 0
-+		 */
-+		unused_update[0] = 0;
-+		entry_set(writer, entry, unused_update, 0, 1);
-+		entry_set(writer, entry, target, 1, NUM_ENTRY_QWORDS - 1);
-+		entry_set(writer, entry, target, 0, 1);
-+	} else {
-+		/*
-+		 * No inuse bit changed, though safe bits may have changed.
-+		 */
-+		entry_set(writer, entry, target, 0, NUM_ENTRY_QWORDS);
++	switch (FIELD_GET(IDR0_TTENDIAN, reg)) {
++	case IDR0_TTENDIAN_MIXED:
++		smmu->features |= ARM_SMMU_FEAT_TT_LE | ARM_SMMU_FEAT_TT_BE;
++		break;
++#ifdef __BIG_ENDIAN
++	case IDR0_TTENDIAN_BE:
++		smmu->features |= ARM_SMMU_FEAT_TT_BE;
++		break;
++#else
++	case IDR0_TTENDIAN_LE:
++		smmu->features |= ARM_SMMU_FEAT_TT_LE;
++		break;
++#endif
++	default:
++		arm_smmu_err(smmu, "unknown/unsupported TT endianness!\n");
++		return -ENXIO;
 +	}
-+}
-+EXPORT_SYMBOL_IF_KUNIT(arm_smmu_write_entry);
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.h
-index 926a84b11a82..55ffa880b093 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.h
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.h
-@@ -36,4 +36,10 @@ int arm_smmu_device_idr1_probe(ARM_SMMU_OBJ *smmu, u32 *idr1);
- void arm_smmu_device_idr3_probe(ARM_SMMU_OBJ *smmu);
- u32 arm_smmu_device_idr5_probe(ARM_SMMU_OBJ *smmu);
- 
-+void arm_smmu_get_ste_used(const __le64 *ent, __le64 *used_bits);
-+void arm_smmu_get_ste_update_safe(const __le64 *cur, const __le64 *target,
-+				  __le64 *safe_bits);
-+void arm_smmu_write_entry(struct arm_smmu_entry_writer *writer, __le64 *cur,
-+			  const __le64 *target);
 +
- #endif /* __ARM_SMMU_V3_COMMON_LIB_H */
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-test.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-test.c
-index 5a4e45e15125..d9df9adc14ea 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-test.c
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-test.c
-@@ -6,6 +6,7 @@
- #include <linux/io-pgtable.h>
++	/* Boolean feature flags */
++	if (IS_ENABLED(CONFIG_PCI_PRI) && reg & IDR0_PRI)
++		smmu->features |= ARM_SMMU_FEAT_PRI;
++
++	if (IS_ENABLED(CONFIG_PCI_ATS) && reg & IDR0_ATS)
++		smmu->features |= ARM_SMMU_FEAT_ATS;
++
++	if (reg & IDR0_SEV)
++		smmu->features |= ARM_SMMU_FEAT_SEV;
++
++	if (reg & IDR0_MSI) {
++		smmu->features |= ARM_SMMU_FEAT_MSI;
++		if (coherent && !disable_msipolling)
++			smmu->options |= ARM_SMMU_OPT_MSIPOLL;
++	}
++
++	if (reg & IDR0_HYP) {
++		smmu->features |= ARM_SMMU_FEAT_HYP;
++		if (cpus_have_final_cap(ARM64_HAS_VIRT_HOST_EXTN))
++			smmu->features |= ARM_SMMU_FEAT_E2H;
++	}
++
++	switch (FIELD_GET(IDR0_STALL_MODEL, reg)) {
++	case IDR0_STALL_MODEL_FORCE:
++		smmu->features |= ARM_SMMU_FEAT_STALL_FORCE;
++		fallthrough;
++	case IDR0_STALL_MODEL_STALL:
++		smmu->features |= ARM_SMMU_FEAT_STALLS;
++	}
++
++	if (reg & IDR0_S1P)
++		smmu->features |= ARM_SMMU_FEAT_TRANS_S1;
++
++	if (reg & IDR0_S2P)
++		smmu->features |= ARM_SMMU_FEAT_TRANS_S2;
++
++	if (!(reg & (IDR0_S1P | IDR0_S2P))) {
++		arm_smmu_err(smmu, "no translation support!\n");
++		return -ENXIO;
++	}
++
++	/* We only support the AArch64 table format at present */
++	if (!(FIELD_GET(IDR0_TTF, reg) & IDR0_TTF_AARCH64)) {
++		arm_smmu_err(smmu, "AArch64 table format not supported!\n");
++		return -ENXIO;
++	}
++
++	if ((smmu->features & ARM_SMMU_FEAT_TRANS_S1) &&
++	    (smmu->features & ARM_SMMU_FEAT_TRANS_S2))
++		smmu->features |= ARM_SMMU_FEAT_NESTING;
++
++	*idr0 = reg;
++	return 0;
++}
++
++int arm_smmu_device_idr1_probe(ARM_SMMU_OBJ *smmu, u32 *idr1)
++{
++	u32 reg = readl_relaxed(smmu->base + ARM_SMMU_IDR1);
++
++	if (reg & (IDR1_TABLES_PRESET | IDR1_QUEUES_PRESET | IDR1_REL)) {
++		arm_smmu_err(smmu, "embedded implementation not supported\n");
++		return -ENXIO;
++	}
++
++	if (reg & IDR1_ATTR_TYPES_OVR)
++		smmu->features |= ARM_SMMU_FEAT_ATTR_TYPES_OVR;
++
++	smmu->sid_bits = FIELD_GET(IDR1_SIDSIZE, reg);
++
++	/*
++	 * If the SMMU supports fewer bits than would fill a single L2 stream
++	 * table, use a linear table instead.
++	 */
++	if (smmu->sid_bits <= STRTAB_SPLIT)
++		smmu->features &= ~ARM_SMMU_FEAT_2_LVL_STRTAB;
++
++	*idr1 = reg;
++	return 0;
++}
++
++void arm_smmu_device_idr3_probe(ARM_SMMU_OBJ *smmu)
++{
++	u32 reg = readl_relaxed(smmu->base + ARM_SMMU_IDR3);
++
++	if (FIELD_GET(IDR3_RIL, reg))
++		smmu->features |= ARM_SMMU_FEAT_RANGE_INV;
++	if (FIELD_GET(IDR3_FWB, reg))
++		smmu->features |= ARM_SMMU_FEAT_S2FWB;
++	if (FIELD_GET(IDR3_BBM, reg) == 2)
++		smmu->features |= ARM_SMMU_FEAT_BBML2;
++}
++
++u32 arm_smmu_device_idr5_probe(ARM_SMMU_OBJ *smmu)
++{
++	u32 reg = readl_relaxed(smmu->base + ARM_SMMU_IDR5);
++
++	if (reg & IDR5_DS)
++		smmu->features |= ARM_SMMU_FEAT_DS;
++
++	/* Page sizes */
++	if (reg & IDR5_GRAN64K)
++		smmu->pgsize_bitmap |= SZ_64K | SZ_512M;
++	if (reg & IDR5_GRAN16K)
++		smmu->pgsize_bitmap |= SZ_16K | SZ_32M;
++	if (reg & IDR5_GRAN4K)
++		smmu->pgsize_bitmap |= SZ_4K | SZ_2M | SZ_1G;
++
++	/* Input address size */
++	if (FIELD_GET(IDR5_VAX, reg) == IDR5_VAX_52_BIT)
++		smmu->features |= ARM_SMMU_FEAT_VAX;
++
++	/* Output address size */
++	switch (FIELD_GET(IDR5_OAS, reg)) {
++	case IDR5_OAS_32_BIT:
++		smmu->oas = 32;
++		break;
++	case IDR5_OAS_36_BIT:
++		smmu->oas = 36;
++		break;
++	case IDR5_OAS_40_BIT:
++		smmu->oas = 40;
++		break;
++	case IDR5_OAS_42_BIT:
++		smmu->oas = 42;
++		break;
++	case IDR5_OAS_44_BIT:
++		smmu->oas = 44;
++		break;
++	case IDR5_OAS_52_BIT:
++		smmu->oas = 52;
++		smmu->pgsize_bitmap |= 1ULL << 42; /* 4TB */
++		break;
++	default:
++		arm_smmu_info(smmu,
++			      "unknown output address size. Truncating to 48-bit\n");
++		fallthrough;
++	case IDR5_OAS_48_BIT:
++		smmu->oas = 48;
++	}
++
++	return reg;
++}
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.h
+new file mode 100644
+index 000000000000..926a84b11a82
+--- /dev/null
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common-lib.h
+@@ -0,0 +1,39 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef __ARM_SMMU_V3_COMMON_LIB_H
++#define __ARM_SMMU_V3_COMMON_LIB_H
++
++#include <linux/build_bug.h>
++#include <linux/compiler_types.h>
++#include <linux/kernel.h>
++
++/*
++ * The IDR probe functions are shared by the kernel and the hypervisor drivers,
++ * which define ARM_SMMU_OBJ, arm_smmu_err() and arm_smmu_info() differently.
++ * Ensure the fields used by them are defined and have the correct types.
++ */
++#ifndef __KVM_NVHE_HYPERVISOR__
++#include <linux/device.h>
++
++#include "arm-smmu-v3.h"
++
++typedef struct arm_smmu_device ARM_SMMU_OBJ;
++
++#define arm_smmu_err(smmu, fmt, ...)	dev_err((smmu)->dev, fmt, ##__VA_ARGS__)
++#define arm_smmu_info(smmu, fmt, ...)	dev_info((smmu)->dev, fmt, ##__VA_ARGS__)
++#endif
++
++static_assert(__same_type(typeof_member(ARM_SMMU_OBJ, features), u32));
++static_assert(__same_type(typeof_member(ARM_SMMU_OBJ, options), u32));
++static_assert(__same_type(typeof_member(ARM_SMMU_OBJ, oas), unsigned long));
++static_assert(__same_type(typeof_member(ARM_SMMU_OBJ, pgsize_bitmap), unsigned long));
++static_assert(__same_type(typeof_member(ARM_SMMU_OBJ, base), void __iomem *));
++static_assert(__same_type(typeof_member(ARM_SMMU_OBJ, sid_bits), unsigned int));
++
++void arm_smmu_device_iidr_probe(ARM_SMMU_OBJ *smmu);
++int arm_smmu_device_idr0_probe(ARM_SMMU_OBJ *smmu, bool disable_msipolling,
++			       u32 *idr0);
++int arm_smmu_device_idr1_probe(ARM_SMMU_OBJ *smmu, u32 *idr1);
++void arm_smmu_device_idr3_probe(ARM_SMMU_OBJ *smmu);
++u32 arm_smmu_device_idr5_probe(ARM_SMMU_OBJ *smmu);
++
++#endif /* __ARM_SMMU_V3_COMMON_LIB_H */
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+index 101ece0e38d3..8cbf1e7354e2 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+@@ -33,6 +33,7 @@
+ #include <uapi/linux/iommufd.h>
  
  #include "arm-smmu-v3.h"
 +#include "arm-smmu-v3-common-lib.h"
+ #include "../../dma-iommu.h"
  
- struct arm_smmu_test_writer {
- 	struct arm_smmu_entry_writer writer;
-@@ -18,7 +19,6 @@ struct arm_smmu_test_writer {
- 	unsigned int num_syncs;
- };
+ static bool disable_msipolling;
+@@ -5168,63 +5169,6 @@ static int arm_smmu_device_reset(struct arm_smmu_device *smmu)
+ 	return 0;
+ }
  
--#define NUM_ENTRY_QWORDS 8
- #define NUM_EXPECTED_SYNCS(x) x
- 
- static struct arm_smmu_ste bypass_ste;
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index 8cbf1e7354e2..5d7de893865e 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -64,7 +64,6 @@ enum arm_smmu_msi_index {
- 	ARM_SMMU_MAX_MSIS,
- };
- 
--#define NUM_ENTRY_QWORDS 8
- static_assert(sizeof(struct arm_smmu_ste) == NUM_ENTRY_QWORDS * sizeof(u64));
- static_assert(sizeof(struct arm_smmu_cd) == NUM_ENTRY_QWORDS * sizeof(u64));
- 
-@@ -1216,254 +1215,6 @@ EXPORT_SYMBOL_IF_KUNIT(arm_smmu_invs_purge);
- 
- /* Context descriptor manipulation functions */
- 
--/*
-- * Based on the value of ent report which bits of the STE the HW will access. It
-- * would be nice if this was complete according to the spec, but minimally it
-- * has to capture the bits this driver uses.
-- */
--VISIBLE_IF_KUNIT
--void arm_smmu_get_ste_used(const __le64 *ent, __le64 *used_bits)
+-#define IIDR_IMPLEMENTER_ARM		0x43b
+-#define IIDR_PRODUCTID_ARM_MMU_600	0x483
+-#define IIDR_PRODUCTID_ARM_MMU_700	0x487
+-#define IIDR_PRODUCTID_ARM_MMU_L1	0x48a
+-#define IIDR_PRODUCTID_ARM_MMU_S3	0x498
+-
+-static void arm_smmu_device_iidr_probe(struct arm_smmu_device *smmu)
 -{
--	unsigned int cfg = FIELD_GET(STRTAB_STE_0_CFG, le64_to_cpu(ent[0]));
+-	u32 reg;
+-	unsigned int implementer, productid, variant, revision;
 -
--	used_bits[0] = cpu_to_le64(STRTAB_STE_0_V);
--	if (!(ent[0] & cpu_to_le64(STRTAB_STE_0_V)))
--		return;
+-	reg = readl_relaxed(smmu->base + ARM_SMMU_IIDR);
+-	implementer = FIELD_GET(IIDR_IMPLEMENTER, reg);
+-	productid = FIELD_GET(IIDR_PRODUCTID, reg);
+-	variant = FIELD_GET(IIDR_VARIANT, reg);
+-	revision = FIELD_GET(IIDR_REVISION, reg);
 -
--	used_bits[0] |= cpu_to_le64(STRTAB_STE_0_CFG);
--
--	/* S1 translates */
--	if (cfg & BIT(0)) {
--		used_bits[0] |= cpu_to_le64(STRTAB_STE_0_S1FMT |
--					    STRTAB_STE_0_S1CTXPTR_MASK |
--					    STRTAB_STE_0_S1CDMAX);
--		used_bits[1] |=
--			cpu_to_le64(STRTAB_STE_1_S1DSS | STRTAB_STE_1_S1CIR |
--				    STRTAB_STE_1_S1COR | STRTAB_STE_1_S1CSH |
--				    STRTAB_STE_1_S1STALLD | STRTAB_STE_1_STRW |
--				    STRTAB_STE_1_EATS | STRTAB_STE_1_MEV |
--				    STRTAB_STE_1_INSTCFG);
--		used_bits[2] |= cpu_to_le64(STRTAB_STE_2_S2VMID);
--
--		/*
--		 * See 13.5 Summary of attribute/permission configuration fields
--		 * for the SHCFG behavior.
--		 */
--		if (FIELD_GET(STRTAB_STE_1_S1DSS, le64_to_cpu(ent[1])) ==
--		    STRTAB_STE_1_S1DSS_BYPASS)
--			used_bits[1] |= cpu_to_le64(STRTAB_STE_1_SHCFG);
--	}
--
--	/* S2 translates */
--	if (cfg & BIT(1)) {
--		used_bits[1] |=
--			cpu_to_le64(STRTAB_STE_1_S2FWB | STRTAB_STE_1_EATS |
--				    STRTAB_STE_1_SHCFG | STRTAB_STE_1_MEV |
--				    STRTAB_STE_1_INSTCFG);
--		used_bits[2] |=
--			cpu_to_le64(STRTAB_STE_2_S2VMID | STRTAB_STE_2_VTCR |
--				    STRTAB_STE_2_S2AA64 | STRTAB_STE_2_S2ENDI |
--				    STRTAB_STE_2_S2PTW | STRTAB_STE_2_S2S |
--				    STRTAB_STE_2_S2R);
--		used_bits[3] |= cpu_to_le64(STRTAB_STE_3_S2TTB_MASK);
--	}
--
--	if (cfg == STRTAB_STE_0_CFG_BYPASS)
--		used_bits[1] |= cpu_to_le64(STRTAB_STE_1_SHCFG);
--}
--EXPORT_SYMBOL_IF_KUNIT(arm_smmu_get_ste_used);
--
--VISIBLE_IF_KUNIT
--void arm_smmu_get_ste_update_safe(const __le64 *cur, const __le64 *target,
--				  __le64 *safe_bits)
--{
--	const u64 eats_s1chk =
--		FIELD_PREP(STRTAB_STE_1_EATS, STRTAB_STE_1_EATS_S1CHK);
--	const u64 eats_trans =
--		FIELD_PREP(STRTAB_STE_1_EATS, STRTAB_STE_1_EATS_TRANS);
--
--	/*
--	 * When an STE changes EATS_TRANS, the sequencing code in the attach
--	 * logic already will have the PCI cap for ATS disabled. Thus at this
--	 * moment we can expect that the device will not generate ATS queries
--	 * and so we don't care about the sequencing of EATS. The purpose of
--	 * EATS_TRANS is to protect the system from hostile untrusted devices
--	 * that issue ATS when the PCI config space is disabled. However, if
--	 * EATS_TRANS is being changed, then we must have already trusted the
--	 * device as the EATS_TRANS security block is being disabled.
--	 *
--	 *  Note: now the EATS_TRANS update is moved to the first entry_set().
--	 *  Changing S2S and EATS might transiently result in S2S=1 and EATS=1
--	 *  which is a bad STE (see "5.2 Stream Table Entry"). In such a case,
--	 *  we can't do a hitless update. Also, it should not be added to the
--	 *  safe bits with STRTAB_STE_1_EATS_S1CHK, because EATS=0b11 would be
--	 *  effectively an errant 0b00 configuration.
--	 */
--	if (!((cur[1] | target[1]) & cpu_to_le64(eats_s1chk)) &&
--	    !((cur[2] | target[2]) & cpu_to_le64(STRTAB_STE_2_S2S)))
--		safe_bits[1] |= cpu_to_le64(eats_trans);
--
--	/*
--	 * MEV does not meaningfully impact the operation of the HW, it only
--	 * changes how many fault events are generated, thus we can relax it
--	 * when computing the ordering. The spec notes the device can act like
--	 * MEV=1 anyhow:
--	 *
--	 *  Note: Software must expect, and be able to deal with, coalesced
--	 *  fault records even when MEV == 0.
--	 */
--	safe_bits[1] |= cpu_to_le64(STRTAB_STE_1_MEV);
--}
--EXPORT_SYMBOL_IF_KUNIT(arm_smmu_get_ste_update_safe);
--
--/*
-- * Figure out if we can do a hitless update of entry to become target. Returns a
-- * bit mask where 1 indicates that qword needs to be set disruptively.
-- * unused_update is an intermediate value of entry that has unused bits set to
-- * their new values.
-- */
--static u8 arm_smmu_entry_qword_diff(struct arm_smmu_entry_writer *writer,
--				    const __le64 *entry, const __le64 *target,
--				    __le64 *unused_update)
--{
--	__le64 target_used[NUM_ENTRY_QWORDS] = {};
--	__le64 cur_used[NUM_ENTRY_QWORDS] = {};
--	__le64 safe[NUM_ENTRY_QWORDS] = {};
--	u8 used_qword_diff = 0;
--	unsigned int i;
--
--	writer->ops->get_used(entry, cur_used);
--	writer->ops->get_used(target, target_used);
--	if (writer->ops->get_update_safe)
--		writer->ops->get_update_safe(entry, target, safe);
--
--	for (i = 0; i != NUM_ENTRY_QWORDS; i++) {
--		/*
--		 * Safe is only used for bits that are used by both entries,
--		 * otherwise it is sequenced according to the unused entry.
--		 */
--		safe[i] &= target_used[i] & cur_used[i];
--
--		/*
--		 * Check that masks are up to date, the make functions are not
--		 * allowed to set a bit to 1 if the used function doesn't say it
--		 * is used.
--		 */
--		WARN_ON_ONCE(target[i] & ~target_used[i]);
--
--		/* Bits can change because they are not currently being used */
--		cur_used[i] &= ~safe[i];
--		unused_update[i] = (entry[i] & cur_used[i]) |
--				   (target[i] & ~cur_used[i]);
--		/*
--		 * Each bit indicates that a used bit in a qword needs to be
--		 * changed after unused_update is applied.
--		 */
--		if ((unused_update[i] & target_used[i]) != target[i])
--			used_qword_diff |= 1 << i;
--	}
--	return used_qword_diff;
--}
--
--static void entry_set(struct arm_smmu_entry_writer *writer, __le64 *entry,
--		      const __le64 *target, unsigned int start,
--		      unsigned int len)
--{
--	bool changed = false;
--	unsigned int i;
--
--	for (i = start; len != 0; len--, i++) {
--		if (entry[i] != target[i]) {
--			WRITE_ONCE(entry[i], target[i]);
--			changed = true;
+-	switch (implementer) {
+-	case IIDR_IMPLEMENTER_ARM:
+-		switch (productid) {
+-		case IIDR_PRODUCTID_ARM_MMU_600:
+-			/* Arm erratum 1076982 */
+-			if (variant == 0 && revision <= 2)
+-				smmu->features &= ~ARM_SMMU_FEAT_SEV;
+-			/* Arm erratum 1209401 */
+-			if (variant < 2)
+-				smmu->features &= ~ARM_SMMU_FEAT_NESTING;
+-			break;
+-		case IIDR_PRODUCTID_ARM_MMU_700:
+-			/* Many errata... */
+-			smmu->features &= ~ARM_SMMU_FEAT_BTM;
+-			if (variant < 1 || revision < 1) {
+-				/* Arm erratum 2812531 */
+-				smmu->options |= ARM_SMMU_OPT_CMDQ_FORCE_SYNC;
+-				/* Arm errata 2268618, 2812531 */
+-				smmu->features &= ~ARM_SMMU_FEAT_NESTING;
+-			}
+-			/* Arm errata 3777127 */
+-			smmu->options |= ARM_SMMU_OPT_FULL_CONT_RANGE_INV;
+-			break;
+-		case IIDR_PRODUCTID_ARM_MMU_L1:
+-			/* Arm errata 3878312 */
+-			smmu->features &= ~ARM_SMMU_FEAT_BTM;
+-			break;
+-		case IIDR_PRODUCTID_ARM_MMU_S3:
+-			/* Arm errata 3995052 */
+-			smmu->features &= ~ARM_SMMU_FEAT_BTM;
+-			/* Arm errata 3673557 */
+-			if (variant < 1 || (variant == 1 && revision < 1))
+-				smmu->options |=
+-					ARM_SMMU_OPT_FULL_CONT_RANGE_INV;
+-			break;
 -		}
+-		break;
 -	}
--
--	if (changed)
--		writer->ops->sync(writer);
 -}
 -
--/*
-- * Update the STE/CD to the target configuration. The transition from the
-- * current entry to the target entry takes place over multiple steps that
-- * attempts to make the transition hitless if possible. This function takes care
-- * not to create a situation where the HW can perceive a corrupted entry. HW is
-- * only required to have a 64 bit atomicity with stores from the CPU, while
-- * entries are many 64 bit values big.
-- *
-- * The difference between the current value and the target value is analyzed to
-- * determine which of three updates are required - disruptive, hitless or no
-- * change.
-- *
-- * In the most general disruptive case we can make any update in three steps:
-- *  - Disrupting the entry (V=0)
-- *  - Fill now unused qwords, execpt qword 0 which contains V
-- *  - Make qword 0 have the final value and valid (V=1) with a single 64
-- *    bit store
-- *
-- * However this disrupts the HW while it is happening. There are several
-- * interesting cases where a STE/CD can be updated without disturbing the HW
-- * because only a small number of bits are changing (S1DSS, CONFIG, etc) or
-- * because the used bits don't intersect. We can detect this by calculating how
-- * many 64 bit values need update after adjusting the unused bits and skip the
-- * V=0 process. This relies on the IGNORED behavior described in the
-- * specification.
-- */
--VISIBLE_IF_KUNIT
--void arm_smmu_write_entry(struct arm_smmu_entry_writer *writer, __le64 *entry,
--			  const __le64 *target)
--{
--	__le64 unused_update[NUM_ENTRY_QWORDS];
--	u8 used_qword_diff;
+ static void arm_smmu_get_httu(struct arm_smmu_device *smmu, u32 reg)
+ {
+ 	u32 fw_features = smmu->features & (ARM_SMMU_FEAT_HA | ARM_SMMU_FEAT_HD |
+@@ -5255,61 +5199,12 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
+ {
+ 	u32 reg;
+ 	bool coherent = smmu->features & ARM_SMMU_FEAT_COHERENCY;
++	int ret;
+ 
+ 	/* IDR0 */
+-	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR0);
+-
+-	/* 2-level structures */
+-	if (FIELD_GET(IDR0_ST_LVL, reg) == IDR0_ST_LVL_2LVL)
+-		smmu->features |= ARM_SMMU_FEAT_2_LVL_STRTAB;
+-
+-	if (reg & IDR0_CD2L)
+-		smmu->features |= ARM_SMMU_FEAT_2_LVL_CDTAB;
 -
 -	/*
--	 * Many of the entry structures have pointers to other structures that
--	 * need to have their updates be visible before any writes of the entry
--	 * happen.
+-	 * Translation table endianness.
+-	 * We currently require the same endianness as the CPU, but this
+-	 * could be changed later by adding a new IO_PGTABLE_QUIRK.
 -	 */
--	dma_wmb();
--
--	used_qword_diff =
--		arm_smmu_entry_qword_diff(writer, entry, target, unused_update);
--	if (hweight8(used_qword_diff) == 1) {
--		/*
--		 * Only one qword needs its used bits to be changed. This is a
--		 * hitless update, update all bits the current STE/CD is
--		 * ignoring to their new values, then update a single "critical
--		 * qword" to change the STE/CD and finally 0 out any bits that
--		 * are now unused in the target configuration.
--		 */
--		unsigned int critical_qword_index = ffs(used_qword_diff) - 1;
--
--		/*
--		 * Skip writing unused bits in the critical qword since we'll be
--		 * writing it in the next step anyways. This can save a sync
--		 * when the only change is in that qword.
--		 */
--		unused_update[critical_qword_index] =
--			entry[critical_qword_index];
--		entry_set(writer, entry, unused_update, 0, NUM_ENTRY_QWORDS);
--		entry_set(writer, entry, target, critical_qword_index, 1);
--		entry_set(writer, entry, target, 0, NUM_ENTRY_QWORDS);
--	} else if (used_qword_diff) {
--		/*
--		 * At least two qwords need their inuse bits to be changed. This
--		 * requires a breaking update, zero the V bit, write all qwords
--		 * but 0, then set qword 0
--		 */
--		unused_update[0] = 0;
--		entry_set(writer, entry, unused_update, 0, 1);
--		entry_set(writer, entry, target, 1, NUM_ENTRY_QWORDS - 1);
--		entry_set(writer, entry, target, 0, 1);
--	} else {
--		/*
--		 * No inuse bit changed, though safe bits may have changed.
--		 */
--		entry_set(writer, entry, target, 0, NUM_ENTRY_QWORDS);
+-	switch (FIELD_GET(IDR0_TTENDIAN, reg)) {
+-	case IDR0_TTENDIAN_MIXED:
+-		smmu->features |= ARM_SMMU_FEAT_TT_LE | ARM_SMMU_FEAT_TT_BE;
+-		break;
+-#ifdef __BIG_ENDIAN
+-	case IDR0_TTENDIAN_BE:
+-		smmu->features |= ARM_SMMU_FEAT_TT_BE;
+-		break;
+-#else
+-	case IDR0_TTENDIAN_LE:
+-		smmu->features |= ARM_SMMU_FEAT_TT_LE;
+-		break;
+-#endif
+-	default:
+-		dev_err(smmu->dev, "unknown/unsupported TT endianness!\n");
+-		return -ENXIO;
 -	}
--}
--EXPORT_SYMBOL_IF_KUNIT(arm_smmu_write_entry);
 -
- static void arm_smmu_sync_cd(struct arm_smmu_master *master,
- 			     int ssid, bool leaf)
- {
+-	/* Boolean feature flags */
+-	if (IS_ENABLED(CONFIG_PCI_PRI) && reg & IDR0_PRI)
+-		smmu->features |= ARM_SMMU_FEAT_PRI;
+-
+-	if (IS_ENABLED(CONFIG_PCI_ATS) && reg & IDR0_ATS)
+-		smmu->features |= ARM_SMMU_FEAT_ATS;
+-
+-	if (reg & IDR0_SEV)
+-		smmu->features |= ARM_SMMU_FEAT_SEV;
+-
+-	if (reg & IDR0_MSI) {
+-		smmu->features |= ARM_SMMU_FEAT_MSI;
+-		if (coherent && !disable_msipolling)
+-			smmu->options |= ARM_SMMU_OPT_MSIPOLL;
+-	}
+-
+-	if (reg & IDR0_HYP) {
+-		smmu->features |= ARM_SMMU_FEAT_HYP;
+-		if (cpus_have_cap(ARM64_HAS_VIRT_HOST_EXTN))
+-			smmu->features |= ARM_SMMU_FEAT_E2H;
+-	}
++	ret = arm_smmu_device_idr0_probe(smmu, disable_msipolling, &reg);
++	if (ret)
++		return ret;
+ 
+ 	arm_smmu_get_httu(smmu, reg);
+ 
+@@ -5321,44 +5216,14 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
+ 		dev_warn(smmu->dev, "IDR0.COHACC overridden by FW configuration (%s)\n",
+ 			 str_true_false(coherent));
+ 
+-	switch (FIELD_GET(IDR0_STALL_MODEL, reg)) {
+-	case IDR0_STALL_MODEL_FORCE:
+-		smmu->features |= ARM_SMMU_FEAT_STALL_FORCE;
+-		fallthrough;
+-	case IDR0_STALL_MODEL_STALL:
+-		smmu->features |= ARM_SMMU_FEAT_STALLS;
+-	}
+-
+-	if (reg & IDR0_S1P)
+-		smmu->features |= ARM_SMMU_FEAT_TRANS_S1;
+-
+-	if (reg & IDR0_S2P)
+-		smmu->features |= ARM_SMMU_FEAT_TRANS_S2;
+-
+-	if (!(reg & (IDR0_S1P | IDR0_S2P))) {
+-		dev_err(smmu->dev, "no translation support!\n");
+-		return -ENXIO;
+-	}
+-
+-	/* We only support the AArch64 table format at present */
+-	if (!(FIELD_GET(IDR0_TTF, reg) & IDR0_TTF_AARCH64)) {
+-		dev_err(smmu->dev, "AArch64 table format not supported!\n");
+-		return -ENXIO;
+-	}
+-
+ 	/* ASID/VMID sizes */
+ 	smmu->asid_bits = reg & IDR0_ASID16 ? 16 : 8;
+ 	smmu->vmid_bits = reg & IDR0_VMID16 ? 16 : 8;
+ 
+ 	/* IDR1 */
+-	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR1);
+-	if (reg & (IDR1_TABLES_PRESET | IDR1_QUEUES_PRESET | IDR1_REL)) {
+-		dev_err(smmu->dev, "embedded implementation not supported\n");
+-		return -ENXIO;
+-	}
+-
+-	if (reg & IDR1_ATTR_TYPES_OVR)
+-		smmu->features |= ARM_SMMU_FEAT_ATTR_TYPES_OVR;
++	ret = arm_smmu_device_idr1_probe(smmu, &reg);
++	if (ret)
++		return ret;
+ 
+ 	if ((smmu->options & ARM_SMMU_OPT_OVR_INSTCFG_DATA) &&
+ 	    !(reg & IDR1_ATTR_PERMS_OVR)) {
+@@ -5385,87 +5250,24 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
+ 	smmu->priq.q.llq.max_n_shift =
+ 		arm_smmu_priq_max_n_shift(FIELD_GET(IDR1_PRIQS, reg));
+ 
+-	/* SID/SSID sizes */
++	/* SSID size */
+ 	smmu->ssid_bits = FIELD_GET(IDR1_SSIDSIZE, reg);
+-	smmu->sid_bits = FIELD_GET(IDR1_SIDSIZE, reg);
+ 	smmu->iommu.max_pasids = 1UL << smmu->ssid_bits;
+ 
+-	/*
+-	 * If the SMMU supports fewer bits than would fill a single L2 stream
+-	 * table, use a linear table instead.
+-	 */
+-	if (smmu->sid_bits <= STRTAB_SPLIT)
+-		smmu->features &= ~ARM_SMMU_FEAT_2_LVL_STRTAB;
+-
+ 	/* IDR3 */
+-	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR3);
+-	if (FIELD_GET(IDR3_RIL, reg))
+-		smmu->features |= ARM_SMMU_FEAT_RANGE_INV;
+-	if (FIELD_GET(IDR3_FWB, reg))
+-		smmu->features |= ARM_SMMU_FEAT_S2FWB;
+-
+-	if (FIELD_GET(IDR3_BBM, reg) == 2)
+-		smmu->features |= ARM_SMMU_FEAT_BBML2;
++	arm_smmu_device_idr3_probe(smmu);
+ 
+ 	/* IDR5 */
+-	reg = readl_relaxed(smmu->base + ARM_SMMU_IDR5);
++	reg = arm_smmu_device_idr5_probe(smmu);
+ 
+ 	/* Maximum number of outstanding stalls */
+ 	smmu->evtq.max_stalls = FIELD_GET(IDR5_STALL_MAX, reg);
+ 
+-	if (reg & IDR5_DS)
+-		smmu->features |= ARM_SMMU_FEAT_DS;
+-
+-	/* Page sizes */
+-	if (reg & IDR5_GRAN64K)
+-		smmu->pgsize_bitmap |= SZ_64K | SZ_512M;
+-	if (reg & IDR5_GRAN16K)
+-		smmu->pgsize_bitmap |= SZ_16K | SZ_32M;
+-	if (reg & IDR5_GRAN4K)
+-		smmu->pgsize_bitmap |= SZ_4K | SZ_2M | SZ_1G;
+-
+-	/* Input address size */
+-	if (FIELD_GET(IDR5_VAX, reg) == IDR5_VAX_52_BIT)
+-		smmu->features |= ARM_SMMU_FEAT_VAX;
+-
+-	/* Output address size */
+-	switch (FIELD_GET(IDR5_OAS, reg)) {
+-	case IDR5_OAS_32_BIT:
+-		smmu->oas = 32;
+-		break;
+-	case IDR5_OAS_36_BIT:
+-		smmu->oas = 36;
+-		break;
+-	case IDR5_OAS_40_BIT:
+-		smmu->oas = 40;
+-		break;
+-	case IDR5_OAS_42_BIT:
+-		smmu->oas = 42;
+-		break;
+-	case IDR5_OAS_44_BIT:
+-		smmu->oas = 44;
+-		break;
+-	case IDR5_OAS_52_BIT:
+-		smmu->oas = 52;
+-		smmu->pgsize_bitmap |= 1ULL << 42; /* 4TB */
+-		break;
+-	default:
+-		dev_info(smmu->dev,
+-			"unknown output address size. Truncating to 48-bit\n");
+-		fallthrough;
+-	case IDR5_OAS_48_BIT:
+-		smmu->oas = 48;
+-	}
+-
+ 	/* Set the DMA mask for our table walker */
+ 	if (dma_set_mask_and_coherent(smmu->dev, DMA_BIT_MASK(smmu->oas)))
+ 		dev_warn(smmu->dev,
+ 			 "failed to set DMA mask for table walker\n");
+ 
+-	if ((smmu->features & ARM_SMMU_FEAT_TRANS_S1) &&
+-	    (smmu->features & ARM_SMMU_FEAT_TRANS_S2))
+-		smmu->features |= ARM_SMMU_FEAT_NESTING;
+-
+ 	arm_smmu_device_iidr_probe(smmu);
+ 
+ 	if (arm_smmu_sva_supported(smmu))
 diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-index bc4c25421835..d07fca3d1cf5 100644
+index 8c8957831286..bc4c25421835 100644
 --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
 +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-@@ -226,6 +226,7 @@ struct arm_vsmmu;
- #define STRTAB_L1_DESC_L2PTR_MASK	GENMASK_ULL(51, 6)
+@@ -87,6 +87,12 @@ struct arm_vsmmu;
+ #define IIDR_REVISION			GENMASK(15, 12)
+ #define IIDR_IMPLEMENTER		GENMASK(11, 0)
  
- #define STRTAB_STE_DWORDS		8
-+#define NUM_ENTRY_QWORDS		8
++#define IIDR_IMPLEMENTER_ARM		0x43b
++#define IIDR_PRODUCTID_ARM_MMU_600	0x483
++#define IIDR_PRODUCTID_ARM_MMU_700	0x487
++#define IIDR_PRODUCTID_ARM_MMU_L1	0x48a
++#define IIDR_PRODUCTID_ARM_MMU_S3	0x498
++
+ #define ARM_SMMU_AIDR			0x1C
  
- struct arm_smmu_ste {
- 	__le64 data[STRTAB_STE_DWORDS];
-@@ -1140,11 +1141,6 @@ void arm_smmu_make_s2_domain_ste(struct arm_smmu_ste *target,
- 				 bool ats_enabled);
- 
- #if IS_ENABLED(CONFIG_KUNIT)
--void arm_smmu_get_ste_used(const __le64 *ent, __le64 *used_bits);
--void arm_smmu_get_ste_update_safe(const __le64 *cur, const __le64 *target,
--				  __le64 *safe_bits);
--void arm_smmu_write_entry(struct arm_smmu_entry_writer *writer, __le64 *cur,
--			  const __le64 *target);
- void arm_smmu_get_cd_used(const __le64 *ent, __le64 *used_bits);
- void arm_smmu_make_bypass_ste(struct arm_smmu_device *smmu,
- 			      struct arm_smmu_ste *target);
+ #define ARM_SMMU_CR0			0x20
 -- 
 2.56.0.176.g3575e65682-goog
 
