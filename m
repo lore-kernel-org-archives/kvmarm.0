@@ -1,134 +1,141 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBDE159B67E
-	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 20:30:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F307B599A46
+	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 20:30:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792096242; cv=none; b=Pvi53vOnV2G1ycLInwHBgc9p0jue3nPu2DiorrplvH398dLRF8wBt/iV4QyJ5UrjDtHO4TQFj5oh4tffAbNfX0PFkwqElsQPxHpd5TKodd2rV+bK0cTrHk5N4NIMl6zMKElvp6aRYyB6tddtEHrGzRGke3extLsIQ+m71N8Hlek=
+	t=1792096256; cv=none; b=V7Fcs1R+jLx8alwxbfYmpL7QvnCRKiTpnm7x+8iiG/wwb6IuYG+YfJfmBle+PLI98ivjktLqOa/cI/ycF7pzlD3oVNKd6y9E+gQklVGPkbt+IdV23kjHJzGtCVIHLW1hl3bvq5BUCEXX7qKxvb/S2u/okbCLrIhM2hOApY3c06U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792096242; c=relaxed/simple;
-	bh=3+ueikak59nVd4tIX5aGiIMucPElrOJhmJuJF+N2iWE=;
+	s=arc-20240116; t=1792096256; c=relaxed/simple;
+	bh=LRDZ2+tqApiVbcjEjis4hz0cCJX00O1r2nVuMSuNL24=;
 	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=bJTOpTExfZFgNdMT+n9OD68CShZyMrIczrnoYgJ71rQSI+huVG4Wc9ld1atgK6MWNPiLpwd8AiZgM2ucet763gM9pteg6WBbbQ5bLepPtfTnGJ//1BLgYdx0NLafiN7XXtQW2ibDTfNAkkHXF2Yiv2kjkBcz9HMdlpPKH/aEBVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nDGJa7q5; arc=none smtp.client-ip=100.103.45.18
+	 Date; b=Y4G1ec/R5o9QlCa3LBdO7YDPc3uhXT+8pDZtPXhcUCap1Br+JGR1B3WwWX1lh1XAbgfyQzqjOcowrKadOP40N7oYlbnCzgzT+GaBrPo7JwULBBL7HRbgQ7rUXr7IZuKmYXym1mYzQIkC4lkWXga+zVZvQ3bGWgq25qSjwkmNI+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i6Gs1MfG; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nDGJa7q5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC4CF1F000C5;
-	Thu, 15 Oct 2026 20:30:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i6Gs1MfG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 981501F000C5;
+	Thu, 15 Oct 2026 20:30:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792096239;
-	bh=e3LCDIB87fNCLNMT7oVaYMrjUX8pt+PBn/9+C7mbmyQ=;
+	s=k20260515; t=1792096254;
+	bh=7U7LjZGwt8Da4vo9SOPbEhZXiovgwldPWIF4S2+ie5s=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=nDGJa7q5Sp8vTrgXSjLNeDGu8HWsZpLYT2z2N4S8HO2MZkpWYTETp9PP46E7F5F6m
-	 HQboOeRoTYf6NhMkEmjKm1SejZZjuhU6PAVZ23YAQdmrJlt3IDBTLWtTjavpqQiNdU
-	 pE6b1gKEeu2CntJ7F8Qn2PqiqA2hTGYriZ6wjJha1UUw4G/qPxOboAFFV9iomgUWvz
-	 qIzWcZB2hb1KpU3D69URBelG0BthZNHTa/cDAnSNZscYOQqIfztyv0WIJqRUO+k1Ic
-	 lDOmOPoAhYWa5rmZSgVmZTvYpG+m0TPMcQBMUiIo9jqZIv695fKEXz9tfBoWHPhGrf
-	 aZgZ3U3NI5tWA==
-Message-ID: <sashiko-outbox-173397@kernel.org>
+	b=i6Gs1MfG0p4U9yFA52k3VHPAX3er4VVy2s7KTw/wbuWwMicL75WUsGzj7cV9bk/rk
+	 GPhqLE3TDbfHUI4ppMrpmYZZeoM8Av2pexkLk8103AzDzzdOmJR4Ttkjb2+spy2sB0
+	 KP+5RCuDn6A94TNp4N9Gd+HaWl+kENa1ul/xqgT8nE2MR9bMN7wYLEnn0uasuBh8o6
+	 EA/Xt8/RupgI2qPRFoot+rMp8PQC9oGbtCS2KO7PeVpJ6wlDUnq293aXc1udD3ZMAw
+	 pR025F+1sG4RWi4KTdTNr5SLQc1j3ZTnJkv1InRGIdXOm/ZwmisujevP9Y5NlSqogb
+	 sTVH6q2gvEviw==
+Message-ID: <sashiko-outbox-173398@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v9 13/25] iommu/arm-smmu-v3-kvm: Add MMIO emulation
+Subject: Re: [PATCH v9 17/25] iommu/arm-smmu-v3-kvm: Shadow stream table
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Mostafa Saleh" <smostafa@google.com>, kvmarm@lists.linux.dev
 Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261015200903.2735565-14-smostafa@google.com>
+In-Reply-To: <20261015200903.2735565-18-smostafa@google.com>
 References: <20261015200903.2735565-1-smostafa@google.com>
- <20261015200903.2735565-14-smostafa@google.com>
+ <20261015200903.2735565-18-smostafa@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Oct 2026 20:30:38 +0000
+Date: Thu, 15 Oct 2026 20:30:54 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [High] iommu: mmio emulation bitwise logic corrupted on big-endian hosts
+- [High] iommu/arm-smmu: missing length check for STRTAB_BASE corrupts hyp =
+state
+- [Low] iommu/arm-smmu-v3-kvm: Incorrect WARN_ON usage panics hypervisor on=
+ invalid host config
 --
 
-commit 5a437530a55c608782e029a478141ad9b342c024
+commit 9c237aa634fe8fc969bb3e8a3f07ec53bd303b77
 Author: Mostafa Saleh <smostafa@google.com>
 
-iommu/arm-smmu-v3-kvm: Add MMIO emulation
+iommu/arm-smmu-v3-kvm: Shadow stream table
 
-This commit adds a data abort handler for the SMMUs to handle MMIO emulatio=
-n.
-Currently, most registers act as a passthrough, and upcoming patches will
-add CMDQ/STE emulation with logic for specific register access.
+This commit allocates the shadow stream table per SMMU, sized up to 1MB
+for the 2-level host table case. Host writes remain passthrough for now,
+and the stream table is shared/unshared on SMMU enable/disable.
 
 > diff --git a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.c b/drive=
 rs/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.c
 > --- a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.c
 > +++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.c
 [ ... ]
-> @@ -128,6 +132,170 @@ static int smmu_init(void)
-> +static bool smmu_dabt_device(struct hyp_arm_smmu_v3_device *smmu,
-> +			     struct user_pt_regs *regs,
-> +			     u64 esr, u32 off)
+> @@ -441,6 +502,46 @@ static int smmu_emulate_cmdq_insert(struct hyp_arm_s=
+mmu_v3_device *smmu)
+[ ... ]
+> +static void smmu_emulate_enable(struct hyp_arm_smmu_v3_device *smmu)
 > +{
-[ ... ]
-> +	bool is_xzr =3D (rd =3D=3D 31);
-> +	u64 val =3D is_xzr ? 0 : regs->regs[rd];
-
-[Severity: High]
-Does extracting the register value directly from the CPU context here bypass
-endianness conversion on big-endian hosts?
-
-When the host (EL1) uses writel_relaxed() on a big-endian machine, it
-byte-swaps the native value to little-endian representation before issuing
-the store. The MMIO trap then retrieves this raw, byte-swapped value
-directly into val.
-
+> +	/* Enabling SMMU without CMDQ, means TLB invalidation won't work. */
+> +	if (WARN_ON(!is_cmdq_enabled(smmu)))
+> +		return;
 > +
-> +	switch (off) {
-> +	case ARM_SMMU_IDR0:
+> +	WARN_ON(smmu_update_ste_shadow(smmu, true));
+> +}
+
+[Severity: Low]
+Does this panic the hypervisor on invalid host configuration?  These
+assertions evaluate host-supplied states and configurations, which causes a
+fatal EL2 BUG() when the host makes an invalid transition.
+
+According to the pKVM Threat Model, host availability against itself is not
+guaranteed, making this a hardening improvement rather than a security bug.
+However, per the pKVM WARN_ON semantics guide, WARN_ON must only be used
+for EL2 internal invariant violations.  Validating host-supplied inputs with
+WARN_ON is a correctness violation, as the hypervisor should gracefully
+handle or ignore invalid state transitions rather than panicking.
+
 [ ... ]
-> +	case ARM_SMMU_CR0:
-> +		if (len !=3D sizeof(u32))
-> +			break;
-> +
+> @@ -528,7 +629,23 @@ static bool smmu_dabt_device(struct hyp_arm_smmu_v3_=
+device *smmu,
+>  		}
+>  	/* Passthrough the register access for bisectability, handled later */
+>  	case ARM_SMMU_STRTAB_BASE:
 > +		if (is_write) {
-> +			/* Enforce ATS checks. */
-> +			if (smmu->features & ARM_SMMU_FEAT_ATS)
-> +				val |=3D CR0_ATSCHK;
-
-[Severity: High]
-Can this bitwise operation corrupt the configuration on big-endian hosts?
-
-Because val contains a byte-swapped value, applying a native bitmask like
-CR0_ATSCHK modifies bits at the wrong offset.
-
-> +			mask =3D read_write;
-> +		} else {
-> +			mask =3D read_write & ~CR0_ATSCHK;
+> +			/* Must only be written when SMMU_CR0.SMMUEN =3D=3D 0. */
+> +			if (is_smmu_enabled(smmu))
+> +				break;
+> +			smmu->host_ste_base =3D val;
 > +		}
+> +		mask =3D read_write;
 > +		break;
-[ ... ]
-> +	if (is_write) {
-> +		if (len =3D=3D sizeof(u64))
-> +			writeq_relaxed(val & mask, smmu->base + off);
-> +		else
-> +			writel_relaxed(val & mask, smmu->base + off);
 
 [Severity: High]
-Will this double-swap the corrupted value?
+Is a length check missing here?  The missing len =3D=3D sizeof(u64) check
+allows a 32-bit access to capture the full 64-bit CPU register, corrupting
+host_ste_base.
 
-Since val was already byte-swapped by the host's write, writing it back
-using EL2's writel_relaxed() applies a second byte-swap, propagating the
-incorrect state to the SMMU hardware.
+A 32-bit write to STRTAB_BASE will assign the entire 64-bit
+regs->regs[rd] (including uninitialized upper 32 bits) to
+smmu->host_ste_base.  Unlike the ARM_SMMU_CMDQ_BASE trap handler which
+explicitly ensures the access is the correct width (if (len !=3D
+sizeof(u64)) break;), this handler omits the validation.
 
-Read paths face a similar issue where the readl_relaxed() output is passed
-directly to the guest without being swapped back into the format expected by
-the guest's own le32_to_cpu() calls.
+>  	case ARM_SMMU_STRTAB_BASE_CFG:
+> +		if (is_write) {
+> +			/* Must only be written when SMMU_CR0.SMMUEN =3D=3D 0. */
+> +			if (is_smmu_enabled(smmu))
+> +				break;
+> +			smmu->host_ste_cfg =3D val;
+> +		}
+> +		mask =3D read_write;
+> +		break;
 
-> +
-> +		hyp_spin_unlock(&smmu->hw_lock);
-> +		return true;
-> +	}
+[Severity: High]
+Similarly, is a length check missing for this 32-bit register?  The missing
+len =3D=3D sizeof(u32) check allows 64-bit writes to pass through to a 32-b=
+it
+register offset.
+
+A 64-bit write to STRTAB_BASE_CFG will invoke writeq_relaxed() on a
+32-bit register offset (0x88), causing an unaligned or oversized write to
+Device memory which triggers a fatal EL2 alignment fault.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261015200903.2735=
-565-1-smostafa@google.com?part=3D13
+565-1-smostafa@google.com?part=3D17
