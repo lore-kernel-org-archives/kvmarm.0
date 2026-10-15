@@ -1,119 +1,100 @@
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89CF7595757
-	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 20:09:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B739E4A5EC6
+	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 20:18:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792094989; cv=none; b=O6mgJXqKjSeRY+l5lIN205/dDW5kaZQBin0x+zeFECS74PfbYAjja1dw9evD5L2vTrg7kiapDloKtUNxX8fUusepNNGWL5e70nAd7+cjf7/RKQ//8NLkw81mxOl1kCdJZWni0SY919h7pkg6ZgUhP+nKScR9o/E3Hmnek2BpVTI=
+	t=1792095499; cv=none; b=saMUmA3a/dUdHYh6EKv+0xZpR/mNoDEzgyXfh2dMNQx5J3DUoQuKYavM1dEN8KLUXJ2wihf4wYMP8R0Ohfz1sAmT0H7mtx8DJ4XE/zvbtOWpd5sJviwowWClN9ujooGW2xcF14mz4aWQ9E1MWzAY1YoVjuSixzIpmJXTXDeS1MM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792094989; c=relaxed/simple;
-	bh=vuQ82iuTyv6dFRtcM5SHwsBOiusydyoSCEgHa3W9AvQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TKoHqBAaS+pl64LtewKAbS6wyVgFyPs1qhgEPSOYc4biGhZ676oPG+xkRERWqqt72g10OTMDlxYRZ+ELdJZAyRaYeN8cLykLKH45FGuyUDB/Yy+ZldxY94vgcp4l3mDrzItVPNSf1VsVexLthJN0e+lRysfHVAMAZniFkgoweWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PVhypNpY; arc=none smtp.client-ip=209.85.128.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
+	s=arc-20240116; t=1792095499; c=relaxed/simple;
+	bh=23DhRl7o6KMSa1dy0jWxpoL3ZSV84cSUPv9QDJHPs/g=;
+	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
+	 Date; b=pjGH615oggzvZ2+zDJtrTxIvLu3OQf1Tq2jUIKlSMMJdpLXTx+iVhkTLiZOJkndjZBRSUBkAwl6wy6FSdRCEXLosZoVP3mgYFXSGmuvkGbyAxlyHVrrM4OjAIOiPXbwPtvtg2TJp/3CJ90WPEnukZwoNA60CnWLq/JsIgwl+a58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D9G7aG+n; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PVhypNpY"
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4a16fefb7acso44094245e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 13:09:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1792094981; x=1792699781; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=LIrVQ92JIOcBfxb2Vgbbd+S0vgGCTt9XwUnEmjZAhJs=;
-        b=PVhypNpYeP2yS6e2oSYJKI9+ZPC32fQrli5cv2TUPAWI1DbJ5fmYerHY2qPaTzKMcx
-         CMcohfWq809gWVxyUVoB2BB756q+zdkJJQzG28vmH+7EbD1Qx8N4l+uDGFoXn7W1dCp3
-         dFeYszX7WUiEuSg073dplsk5TgB+8ABOGAdjrOmGFnM49hdezKYREiF+5b7i1UvOOYEO
-         Akb9GR34OTpiqyTgoJSXqSnvDjzf2S7RwbKwKInOBFgElcs33P8MvjJgi4XuqLWZ/JP1
-         iBflCQNz7FkLy4gf9h/KO5oy1wmxgLBNE3+9WtT0pOzLNOMBtPjCGzETPYMGII3qSBGr
-         is4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792094981; x=1792699781;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=LIrVQ92JIOcBfxb2Vgbbd+S0vgGCTt9XwUnEmjZAhJs=;
-        b=GbNiQms54K5WLIfDAmK0Jm+UvpofZHZa2w03mXAA1pHOeCN3i6UDcFjB6QNAnqD36m
-         MjW5hdQYUA1k+SOrqsrRm5uKkZYWyZHZTdJfDHAt0Nlv5ZSKqTlgDOoHSxhoSkEZMjVv
-         Pou6nFagyhSFAGXO0E7Pz3uI7x6MEv8tVX+QO6mbhoumA4bpUVqQcN58kEAfg/grcyki
-         5tQbwtGQ8qZlY+iZ1ZrjKfJhr7T5Fl8AFSPOTituNsMLS0rZHa2IfxKD2hc5iZYD7QM+
-         yUI40gU5CeB5jfXwoR3GkJUmsFgsxhuGpM/D+0RqEBnvDQkbRUQk0Imk9Nkp9g6oyHoI
-         l5/g==
-X-Forwarded-Encrypted: i=1; AKwUvBwdchdou4wZP01kiJKtg1tZ7hs4x+kY6b70Xh5Yap3ZuDYZjcktyT8j4qZeaxMjUL+vFAO9Ft8=@lists.linux.dev
-X-Gm-Message-State: AFq9FYKL+q9qqxWy3ZgTdPttGI9dS4gOGp/oR66Av99KHXZUBMC14Xoa
-	nsB61puCBwiuG3Vz8M34rzg3o2Hv4J5elWl2xCojgCFzSF9LM85b5FOn5+Ra7LRR22UVxg3NvaR
-	wnr0oOjP4Eniiug==
-X-Received: from wmoo13.prod.google.com ([2002:a05:600d:10d:b0:4a0:4b7:a33f])
- (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:1c07:b0:4a1:b044:9ccd with SMTP id 5b1f17b1804b1-4a1b0449d00mr214328195e9.28.1792094981436;
- Thu, 15 Oct 2026 13:09:41 -0700 (PDT)
-Date: Thu, 15 Oct 2026 20:08:56 +0000
-In-Reply-To: <20261015200903.2735565-1-smostafa@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D9G7aG+n"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26F011F000C4;
+	Thu, 15 Oct 2026 20:18:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792095498;
+	bh=mSDS/xcKbaVgsUHkpjH8YeMebF3B0/5QZ8OnqmUneJM=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=D9G7aG+nO28ZbWXFdPXyaYcjxqNDpZ8v1U0G6p/iz56KRMec/wIgWp96SPUHM3PJP
+	 xM2apVSdPGB0p/CQVt/0BA13oGnngZ+MT5zIdMlzS6bXdWTvTY/MjBhYZ9cw+wvJnH
+	 Mmpcd4QZSlsjZUOhKIc3h+9w4VFIyLgvR2hiss1J31vcz4Xn4Q3HhA9vyYSaqG9zyc
+	 OEOnYRPcukOCfJGcoGlJJ7IfOrracgGMPBQjMktJgNHNBkLZ/ftMDlff8awfCmAh0T
+	 iT+TjCQIlF3AWMIIKehvuKSXPD5TAHRbGxox+e1uiwD738+aF4fcRWy/tOJ8gLghAr
+	 T7Pz+agfvmFOA==
+Message-ID: <sashiko-outbox-173376@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v9 08/25] KVM: arm64: iommu: Add memory pool
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Mostafa Saleh" <smostafa@google.com>, kvmarm@lists.linux.dev
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
+In-Reply-To: <20261015200903.2735565-9-smostafa@google.com>
+References: <20261015200903.2735565-1-smostafa@google.com>
+ <20261015200903.2735565-9-smostafa@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 15 Oct 2026 20:18:17 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20261015200903.2735565-1-smostafa@google.com>
-X-Mailer: git-send-email 2.56.0.176.g3575e65682-goog
-Message-ID: <20261015200903.2735565-26-smostafa@google.com>
-Subject: [PATCH v9 25/25] KVM: arm64: Add documentation for pKVM DMA isolation
-From: Mostafa Saleh <smostafa@google.com>
-To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev
-Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, joro@8bytes.org, jgg@ziepe.ca, mark.rutland@arm.com, 
-	qperret@google.com, tabba@google.com, vdonnefort@google.com, 
-	nicolinc@nvidia.com, Mostafa Saleh <smostafa@google.com>
-Content-Type: text/plain; charset="UTF-8"
 
-Populate the section for DMA isolation in pKVM with the newly
-added KVM IOMMU and pKVM SMMUv3 driver details.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [High] kvm: fatal EL2 panic on IOMMU pool exhaustion
+--
 
-Signed-off-by: Mostafa Saleh <smostafa@google.com>
----
- Documentation/virt/kvm/arm/pkvm.rst | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+commit 4301acf34cc06e2a4b1fab6b934f06ba07d48a9d
+Author: Mostafa Saleh <smostafa@google.com>
+Subject: KVM: arm64: iommu: Add memory pool
 
-diff --git a/Documentation/virt/kvm/arm/pkvm.rst b/Documentation/virt/kvm/arm/pkvm.rst
-index 514992a79a83..ce67e2ae1f9a 100644
---- a/Documentation/virt/kvm/arm/pkvm.rst
-+++ b/Documentation/virt/kvm/arm/pkvm.rst
-@@ -77,7 +77,28 @@ Status: **Unimplemented.**
- DMA isolation using an IOMMU
- ----------------------------
- 
--Status: **Unimplemented.**
-+Status: Supported for devices behind SMMUv3 supporting dual stages
-+of translation.
-+
-+With ``CONFIG_ARM_SMMU_V3_PKVM``, the hypervisor will take over the SMMUs
-+on the system and provide an architectural emulation to the kernel SMMUv3
-+driver.
-+
-+If some devices are not behind an IOMMU or behind another IOMMU architecture,
-+DMA isolation is not supported, as a driver must be provided for that.
-+
-+DMA isolation is enforced by dual stages of translation; similar to the CPU
-+where a driver can register their ops through ``kvm_iommu_register_driver``
-+and implement ``host_stage2_idmap`` to shadow the CPU page table.
-+
-+The page tables for the stage-2 SMMUv3 will be allocated from a pool created
-+at boot with size configured from the command line "kvm-arm.iommu_pgt_mem"
-+The size must cover the worst case scenario for leaf mappings of system memory.
-+
-+This implementation trusts the system firmware not to allow the untrusted
-+host kernel to bypass the SMMUv3.
-+For example, by resetting the power. In that case, it is the firmware's
-+responsibility to save/restore the SMMUv3 state.
- 
- Proxying of Trustzone services
- ------------------------------
--- 
-2.56.0.176.g3575e65682-goog
+This patch reserves a memory pool for the IOMMU driver's shadow page tables
+early during boot based on the kvm-arm.iommu_pgt_mem command line parameter.
+The driver later allocates from and frees to this pool at runtime in
+protected KVM mode.
 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/iommu.c b/arch/arm64/kvm/hyp/nvhe/io=
+mmu.c
+> --- a/arch/arm64/kvm/hyp/nvhe/iommu.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/iommu.c
+> @@ -115,6 +117,11 @@ int pkvm_iommu_init(void)
+>  	    !pkvm_iommu_ops->host_stage2_idmap)
+>  		return 0;
+> =20
+> +	ret =3D hyp_pool_init(&iommu_pages_pool, hyp_virt_to_pfn(pool_base),
+> +			    nr_pages, 0);
+> +	if (ret)
+> +		return ret;
+> +
+>  	ret =3D pkvm_iommu_ops->init();
+>  	if (ret)
+>  		return ret;
+
+[Severity: High]
+Will this trigger a fatal hypervisor panic if the host specifies an undersi=
+zed
+pool?
+
+The size of the newly introduced iommu_pages_pool is directly controlled by
+the host via the kvm-arm.iommu_pgt_mem command line parameter. If the
+host-provided pool size is too small, pkvm_iommu_snapshot_host_stage2()
+called immediately after this will exhaust the allocator and return -ENOMEM.
+
+Because pkvm_iommu_init() wraps that call in a WARN_ON():
+
+	return WARN_ON(pkvm_iommu_snapshot_host_stage2());
+
+and WARN_ON() at EL2 in nVHE/pKVM expands to a fatal BRK instruction, this
+exhaustion will crash the entire machine.
+
+Could this be updated to propagate the error back to the host, instead of
+treating hyp_alloc_pages() failure as a fatal invariant violation?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261015200903.2735=
+565-1-smostafa@google.com?part=3D8
