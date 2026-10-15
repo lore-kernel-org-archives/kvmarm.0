@@ -1,75 +1,75 @@
 Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE42527057D
-	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 21:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53EA4A5EC6
+	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 21:33:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792099494; cv=none; b=iam4G6IhJIRcf5S7zirVHI0EdcHXEEHxYHDWfw3M5gF+xlAu8f2gMI1hInV2kB5Pa8JY0/e3+beObGfvNHSKcalS4GTsNBKFON40Anh2U0OU9lvxweq7OyLlc2VfjRUNIiP4zz7e38pLcKP8s7lqJxHmhGOok8Fz0vvgBk+VhAc=
+	t=1792099988; cv=none; b=XixTzk5xzl1gq7e0zieFBk8bmqQIZdnh7+PQb3VYClS3DKrFr80bGIInbxMf412Ps7eU+L5PfjSvEXuEYJrTNjg+jXkig/nEUay6FwsimBeAkt9/ezWgU8CZa/PSxlVXHOCdrb152KLbuUi6zuaL2V+r0zmfBCGgBV7z9Ogr+Gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792099494; c=relaxed/simple;
-	bh=TkXwC6R+EndTetkst/D63lP4L+OGrSsZEzFiPRMyMRA=;
+	s=arc-20240116; t=1792099988; c=relaxed/simple;
+	bh=+9zg8vzXT1f7G0XkyVztNjSyeeGX4DYy/1FPhinu/wQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eJ0yAanclhtwfxAYoDuKAtxfJX29sRDC/QKhsh6/fdwH0eBW0wt24AQkdKw0AcrHu9iEoAI6uV7GuS49TGRGxKi3xkRaNyrmlNgeEVYePHwSI5hC+S3bq3qA5lUvkzIlbKv+ucxmk/dcFnR6d+3tF+GEQrzHi8G9V36+pjVW4sY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HBU9/f+v; arc=none smtp.client-ip=209.85.128.41
+	 Content-Type:Content-Disposition:In-Reply-To; b=JBCQr6JY+zndJzkNhLCdCQ0UvuAknj68LNpBYdvguqa5EBXkBCk6386sMaBn6fx/FhFDPuthasakOIqJbCJAnO2pZgkpySuTZz4/HxIckUFtVPp0uj9ZllmKZ3etdh65oxm8mvYdVrfdNz9tPmrB/rtP8rqD6rFpHztGWoldlAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aiX2SpZM; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HBU9/f+v"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4a18617ae90so22955e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 14:24:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aiX2SpZM"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4a18617ae90so23455e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 14:33:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1792099491; x=1792704291; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1792099984; x=1792704784; darn=lists.linux.dev;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :content-type:mime-version:references:message-id:subject:cc:to:from
          :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Bq4PgBio1E8gV2wDn/JrOT5yHUjnH8pSBRTBpqMY8oM=;
-        b=HBU9/f+v6gpiQNfRv+VLzw7/LOs+GGM6ZW+TSAKkWkfYI8zCU2BIuxV4DzhKVUeatt
-         6Yec8LgXYi6XI+yIc1l3RxBny1ck5oWIEvTWHuo30rPXeuk9ZBs0VGevqfpSfK8v3ALp
-         1JXb8VzilEvsJ8MrFrobDDP/6Ps/JJ+du13lUFUHdxM8ThiHhn9fFsD/HOrGhVLYgNp/
-         kt9i8wqy5aqVFNnvX8GPjcSDIpe8dNoyasd5pwEDbnHx7jgVtJYDDW1gOTkFy/Ni2uiD
-         lmLrn8bt6bX/0PjI64JZzmgtYtcxshaStoD0WcxcNAGOSO5xhlbVtn99Mofh/kOVEPHy
-         RshA==
+        bh=cg42GAQPU7NwQLaVw5oHOROSWv7kA9t3moSVYV4GJIg=;
+        b=aiX2SpZMRpY6t1eK6uRR5zmFJWCkfBBOHI2YkwfVeRpKDNEMaqqLT+pV6k08i75ybE
+         4P8saXx4jU786gl2A5hboHy167hxl8ky/F6ZBPW7mkQviCgMXIW/zT38j9Vkj9LlQmSk
+         p3Nys79eiK9Xv8Gg4ypud1sJWmxz2vFSyyscLZITDEVsTv5lqYrI3jPulkdeE9PkNCqr
+         CsSIhZxxnGuEGI0mTyEgRC5dWoDNGBoESRu50H+dXR8HCILukoUKSOdlZj7UMQLhdb15
+         yThvSuqhaVpueM4Vuu7IATujC94vZQe6cb4T9xDh6gl5NKYkkERdWQM6oxp2iFNqzOQB
+         oJUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792099491; x=1792704291;
+        d=1e100.net; s=20260707; t=1792099984; x=1792704784;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :content-type:mime-version:references:message-id:subject:cc:to:from
          :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=Bq4PgBio1E8gV2wDn/JrOT5yHUjnH8pSBRTBpqMY8oM=;
-        b=EMzNKNxJkd059K213lQVojdE5nqzRfMcEy7mHhAtBGMl2UunwFGhPTlg9FLWjN69GL
-         /a9y4mPodSAlLmfhXhmhVgo43mvQsETIGkDc824PMs/wgWPSxRlPSLpxmdSEo48gqjyK
-         WzAaEkpzPpD05VTb2hjZUQKYZfikHwGOGKgaAOtcLaVXCqQr/o0hCyZBn0icTQVci0br
-         wt1uunELMqnfUOPLPPwzrFHiQqY4uUC5ELr3ax2lpIi1gi9rhKBDkgbUOElIECo7wo0G
-         I0mdKFOY8O7GocXwxXJaXs5bXhK/S/608hvSIzXkqAZIEbux9r2xRt/s1kd84UBVfnol
-         LbeA==
-X-Gm-Message-State: AFq9FYJbbRXpgtmekKSRV8xXkzgYowkNUniLC4em8LqXpbWzJ6rCLcyO
-	MIF6uS4X5xi9Xawqgvx8cMd/8u+9rhEgYoEnuyVk46otwOEA4lFybDpJ8xv3ba1Wrw==
-X-Gm-Gg: AYBFou1ZrvBMIEZfyvkT0gHJy99LR1xJ4vvaiwB9nismVPCUmuWMlzAmgVrHSIqijpo
-	Wk22oagtrUIFxYGpxhl1KNR8ERP2I+fKf75GSf+Zq9Iym51M0aOBePUJ+5eCgTYVQ6Rag9x0csV
-	JKxQuIpEJCq7FbBbXb2pfAy8DwInyRNmaN7GbX+wdV6QDWTYu0gk8V0xHx3i7w1xXpc30CGRGFS
-	IG7M/5+7kAT8yJzLNLHIQpcI8xUunUuyPHESlDpHGqNvnV8JW9GlObE0Ir7+3ZclXpmxmFxfvLb
-	hxs54KLiGg+f0y2dh0B09oxv5kQo6iPTEpPPmmxcZt2jG9DrNz0Qq2J/h0Ywo2o3f5XP/XDlM4W
-	mTRQBWGqWuy5SlD6leXe+nL8MG1kLEaOA/CIXQlAdc9UntTgibm3Avd1KQ4kjIU9JpgnP0T1u4Z
-	e6wfXdZDodY5ZLjHTyVOgu1if+46vJzXB0Rf+y3E00zz9FeaHWKM1hjheJrflfdPd7mW6kO2QAy
-	xOLd+Gh5z4LruJ3y+fCu1oKI2eWs7xq3x2w2VGw
-X-Received: by 2002:a05:600c:a40a:b0:4a1:98b1:1de9 with SMTP id 5b1f17b1804b1-4a1c8adda89mr155615e9.13.1792099490706;
-        Thu, 15 Oct 2026 14:24:50 -0700 (PDT)
+        bh=cg42GAQPU7NwQLaVw5oHOROSWv7kA9t3moSVYV4GJIg=;
+        b=k2U46pqOlqW+fwvFfFr/2tnZtQX/++GYomtMMOxUDv5BASQ0HNFUtSK88ufc16VuZE
+         hJQ/Ot4iVDW1yBUIzA7LuUU6Z3RpWc4Ho2tVsx7VAQs5uIhZ8PaOu62sutlf/mW+Q169
+         2ZIaXgVFJHq0A+uTwFvBo3wBUG+wyTRkqsCWYyK+1RRNS6SP1NjdHUdxv7getpOZpeT6
+         uzPtbffuKHij7KlTCUB3cF5rEx6xwLzwSaUVsFLLDzw2dW7Nbgdd8x4R6hw0xko4LJdD
+         L7eKwEXgdiB2CRfNorlLpgkjAWcmNfRE+JrFnzwsJDiRZV/YiwOwan29cth4dxVYCzK0
+         Fbvg==
+X-Gm-Message-State: AFq9FYL0F+rccvbr/6Zd4BaE3mNSubrfkNO4cMIf12OJ1QRAxCbl0IDg
+	8twjtbKsKV//e6r/kEXl1cZXiTLixNexD3CR2qltmvTF2rUh2anFUOIdpa3x1cRCcQ==
+X-Gm-Gg: AYBFou0fO6PUCrEtxXSQjvuneVUHz/3tvup+OzkhzOu6cbKS0rlRBDnp9wRu/xefFy2
+	FRUy74u8XsXD+vvrBQFassDtPG4hoP8wbDKYhW4MTjGwiHRGcErZdwVB63fL49c/whUx3KPmVnZ
+	ltTvxFXen7HQ5Vj5opJ8SwgdkOV+omkHiwFwqqYWScgmFWqsCd6kiOObDurgk4+oH/j5wzbGjno
+	G4HkQJOGVrg5uOFkWe9szf57ia78ds6d0l38kpKMURzcrlQtLIDzqkMUxgzNeYW3e6WsWevKi7l
+	ufRsFFXSW3Qetylb4IJEYnKZghCIToIpKqab2hX6nQBiCdP6xuOMS2CLNGdtEjg5b8W6nOx3F1J
+	6s/pg/YekSIyD3wqB8/9Z99FbXqkxQc4F+oyvGkiRr7gD9Qey4/9q9kOgCCJz/X37FyYkD1YOPX
+	59rLXgvWWV/lyxlqSfAwo5UYwKpPveFugIDTRAyfekVb9bWj+VESNdyPBuChbDUwGk482FGkzMh
+	qd6VIjPSUGNgFY4vMOf8TOEk83dSxa2FAhWEqjp
+X-Received: by 2002:a05:600c:787:b0:4a1:945f:a6ba with SMTP id 5b1f17b1804b1-4a1c7f9b0a9mr233345e9.0.1792099983445;
+        Thu, 15 Oct 2026 14:33:03 -0700 (PDT)
 Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48dfd4f8bb6sm566051f8f.34.2026.10.15.14.24.49
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48dfd4fe9d9sm558041f8f.40.2026.10.15.14.33.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Oct 2026 14:24:49 -0700 (PDT)
-Date: Thu, 15 Oct 2026 21:24:46 +0000
+        Thu, 15 Oct 2026 14:33:02 -0700 (PDT)
+Date: Thu, 15 Oct 2026 21:32:59 +0000
 From: Mostafa Saleh <smostafa@google.com>
 To: sashiko-reviews@lists.linux.dev
 Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
 	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v9 21/25] iommu/io-pgtable-arm: Support io-pgtable-arm in
- the hypervisor
-Message-ID: <atFEnvRG2-AyPuTe@google.com>
+Subject: Re: [PATCH v9 22/25] iommu/arm-smmu-v3-kvm: Shadow the CPU stage-2
+ page table
+Message-ID: <atFGi3RkmdQpKWRd@google.com>
 References: <20261015200903.2735565-1-smostafa@google.com>
- <20261015200903.2735565-22-smostafa@google.com>
- <sashiko-outbox-173386@kernel.org>
+ <20261015200903.2735565-23-smostafa@google.com>
+ <sashiko-outbox-173400@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -79,62 +79,105 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <sashiko-outbox-173386@kernel.org>
+In-Reply-To: <sashiko-outbox-173400@kernel.org>
 
-On Thu, Oct 15, 2026 at 08:26:45PM +0000, sashiko-bot@kernel.org wrote:
+On Thu, Oct 15, 2026 at 08:32:05PM +0000, sashiko-bot@kernel.org wrote:
 > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Low] arch: layering violation by including SMMUv3 header in generic io-pgtable-arm.h
+> - [High] iommu/arm-smmu-v3: incorrect recovery from -EEXIST in smmu_host_stage2_idmap leaves holes in memory
 > --
 > 
-> commit 251567dd4618edfaa4984ef7282b71a0da331297
+> commit d265b84d43b0a3e480c297258952f561f0f39998
 > Author: Mostafa Saleh <smostafa@google.com>
 > 
-> iommu/io-pgtable-arm: Support io-pgtable-arm in the hypervisor
+> iommu/arm-smmu-v3-kvm: Shadow the CPU stage-2 page table
 > 
-> To be able to populate the shadow stage-2 in the hypervisor, compile
-> io-pgtable-arm object for the hypervisor. This requires the hypervisor
-> to provide the iommu-pages allocator, redefine the address conversion
-> helpers, and stub out the DMA API.
+> This commit mirrors changes to the host stage-2 page table into an identity
+> mapped stage-2 for the SMMUv3. It handles memory mapped with PAGE_SIZE and
+> MMIO mapped with the largest block that fits.
 > 
+> > diff --git a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.c b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.c
+> > index 943ffef0bb4aa..75b2b1477a4fa 100644
+> > --- a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.c
+> > +++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.c
 > [ ... ]
-> 
-> > diff --git a/drivers/iommu/io-pgtable-arm.h b/drivers/iommu/io-pgtable-arm.h
-> > index ba7cfdf7afa03..4278da41e406d 100644
-> > --- a/drivers/iommu/io-pgtable-arm.h
-> > +++ b/drivers/iommu/io-pgtable-arm.h
-> > @@ -27,4 +27,13 @@
-> >  #define ARM_LPAE_TCR_PS_48_BIT		0x5ULL
-> >  #define ARM_LPAE_TCR_PS_52_BIT		0x6ULL
-> >  
-> > +#ifndef __KVM_NVHE_HYPERVISOR__
-> > +#include "iommu-pages.h"
-> > +#define arm_lpae_alloc_data(obj)	kmalloc_obj(obj)
-> > +#define arm_lpae_free_data(p)		kfree(p)
+> > @@ -1011,8 +1070,100 @@ static bool smmu_dabt_handler(struct user_pt_regs *regs, u64 esr, u64 addr)
+> [ ... ]
+> > +static int smmu_host_stage2_idmap(phys_addr_t start, phys_addr_t end, int prot)
+> > +{
+> > +	size_t pgsize = PAGE_SIZE, pgcount, size;
+> > +	struct io_pgtable *pgtable = idmap_pgtable;
+> > +	int ret = 0;
 > > +
-> > +#else
-> > +#include "arm/arm-smmu-v3/pkvm/io-pgtable-arm-hyp.h"
+> > +	end = min(end, BIT(pgtable->cfg.oas));
+> > +	if (start >= end)
+> > +		return 0;
+> > +
+> > +	size = end - start;
+> > +	if (prot) {
+> > +		size_t mapped;
+> > +
+> > +		if (!(prot & IOMMU_MMIO))
+> > +			prot |= IOMMU_CACHE;
+> > +
+> > +		while (size) {
+> > +			mapped = 0;
+> [ ... ]
+> > +			if (prot & IOMMU_MMIO)
+> > +				pgsize = smmu_pgsize_idmap(size, start, pgtable->cfg.pgsize_bitmap);
+> > +
+> > +			pgcount = size / pgsize;
+> > +			ret = pgtable->ops.map_pages(&pgtable->ops, start, start,
+> > +						     pgsize, pgcount, prot, 0, &mapped);
+> > +			size -= mapped;
+> > +			start += mapped;
+> > +
+> > +			if (ret == -EEXIST) {
+> > +				/*
+> > +				 * It is possible to get EEXIST when a VM dies with pages
+> > +				 * in a shared state.
+> > +				 */
+> > +				ret = 0;
+> > +				size -= pgsize;
+> > +				start += pgsize;
+> > +				continue;
+> > +			}
 > 
-> [Severity: Low]
-> Is this an intended architecture layering violation? The generic ARM LPAE page
-> table header drivers/iommu/io-pgtable-arm.h explicitly includes the
-> driver-specific header arm/arm-smmu-v3/pkvm/io-pgtable-arm-hyp.h when
-> compiled for the hypervisor. This tightly couples generic IOMMU framework code
-> directly to the SMMUv3 driver path.
+> [Severity: High]
+> Does this error handling skip valid pages when a collision occurs later in
+> the batch?
 > 
-> Should the hypervisor stubs be placed in a generic NVHE include directory
-> (e.g., arch/arm64/kvm/hyp/include/nvhe/) to maintain subsystem independence,
-> even if SMMUv3 is currently the only user?
+> The io-pgtable-arm backend implementation of map_pages validates all entries
+> in the batch before writing any PTEs:
+> 
+> drivers/iommu/io-pgtable-arm.c:arm_lpae_init_pte() {
+> 	for (i = 0; i < num_entries; i++)
+> 		if (iopte_leaf(ptep[i], lvl, data->iop.fmt)) {
+> 			/* We require an unmap first */
+> 			WARN_ON(!(data->iop.cfg.quirks & IO_PGTABLE_QUIRK_NO_WARN));
+> 			return -EEXIST;
+> 		}
+> }
+> 
+> If a collision is found at any index (for example, the 5th page of the batch),
+> map_pages returns -EEXIST immediately without mapping anything, leaving mapped
+> at 0.
+> 
+> Because mapped is 0, this code assumes the very first page of the batch caused
+> the collision, skips it by doing start += pgsize, and retries the loop. This
+> process repeatedly skips earlier non-colliding pages without mapping them,
+> leaving holes in the SMMU stage 2 identity map and causing translation faults
+> during host DMA.
 > 
 
-No strong opinion, I think keeping it anywhere under drivers/iommu is
-fine.
+mmm, yes, this only works now because idmap is called with a single
+leaf. That logic needs some cleanup just in case that changes.
 
 Thanks,
 Mostafa
 
-> > +#endif
-> > +
-> >  #endif /* IO_PGTABLE_ARM_H_ */
+> > +			if (!mapped || ret)
+> > +				break;
+> > +		}
 > 
 > -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20261015200903.2735565-1-smostafa@google.com?part=21
+> Sashiko AI review · https://sashiko.dev/#/patchset/20261015200903.2735565-1-smostafa@google.com?part=22
