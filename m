@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1B0E545DAD
-	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 14:26:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C027B55408F
+	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 14:26:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792074422; cv=none; b=UWZHUh+RWFR2I1ZWiInBZawVKndWSefrMcj+OBSCjl47CfWElisHXiovt3ouIDtirKIYj9cAaP9aG8W2IpbI3pMO/WQcDMuvJKChumeE0WEPcbAAGnJicfAr34eka2wIQMe8MKdTvu/vn7+mHQSEpsIxuapvx0lLTUaXnLbQ28E=
+	t=1792074422; cv=none; b=AVsEWqG0tz5VIf090WiLGqkDC3FMGzth00GQCterIboX6MJbl7dQEQc5k58eEVjShdxYxenQrOmdmzTs0JY8XEZ9twyJxjHy4aC7SxZ9IVc6XO4nbCK8oJneT7gFTvJ7MyoYjC2RPX39T55YxVudVM/INqAJMrAni/yI499e3qI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1792074422; c=relaxed/simple;
-	bh=jyAlkcz7Hoy/h8rp4Ip9aKsq+EFAowP7eD9yk4nKG2k=;
+	bh=6zJkdln/lwFAx0j11y2Tqo0Fge5mRgoV7t4ssd1rzXg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kzlwMpW00brC5S5arZqIgmBFnPAVjGhtDr+KivHXme00Qibh6InvSD1EuOVBjk+rYCukyVlh9srvoLThSEHh6FIadZgqUgv9y/WXd9vpfbkd8esMdnoldRyBk4tX2yiSlI+Yvk6elTO1JZnIHB+RuZcCDyU10CAmT6Ntw8zC4rM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Zvj/A6se; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=hfhQOhqwBv1+Aq5kXwYmc+/NlMP9lu7Z9H/M4h28Byyrc7t1VMwS0fjyOquSuR5+TldVr4lIj+uXb+iTuAVbE/wpknEuM8K83hFGyp4XtOcPOgD7HM5e2J34bf99HvYqPo2rwF+zn8E6tZfTjPP57BA05LfUP9cIGrzmvXK000g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=cfBWzX7Y; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Zvj/A6se"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="cfBWzX7Y"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C097715A1;
-	Thu, 15 Oct 2026 07:26:45 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0C81816F8;
+	Thu, 15 Oct 2026 07:26:52 -0700 (PDT)
 Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.2.198.107])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2279D3F871;
-	Thu, 15 Oct 2026 07:26:45 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7FB6E3F871;
+	Thu, 15 Oct 2026 07:26:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792074409; bh=jyAlkcz7Hoy/h8rp4Ip9aKsq+EFAowP7eD9yk4nKG2k=;
+	t=1792074415; bh=6zJkdln/lwFAx0j11y2Tqo0Fge5mRgoV7t4ssd1rzXg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Zvj/A6sepRFkrCBF8+4yVWabSavnINC5Ma5PBsa1FxdMgI6IuFCwFwWy8JnNw36qP
-	 OSbxlg+xOmdx3OZ8srnzRg9L32tNPecyffqpKmykRPQU7swibDLPnx0fgiqJFagkCV
-	 amf11KGTTHE1xcWBqKxFGpMEFkxVA5iwvhfdKOBY=
+	b=cfBWzX7YPsIAlT14io4tMDz1ApqxSWGQAponpdxy92FR0NicTQ6CvbEAXL0Snq6VR
+	 npc9Am0ZYDfuvMJaqXoltnafkNQU4MUvyeECZEJdiKCeICKnEZAcfC+WBY+3gGeECa
+	 YLoJCi0InAcmjyCJ5ixTEw7KaLM2Owbk2D/l14UM=
 From: Ryan Roberts <ryan.roberts@arm.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Arnd Bergmann <arnd@arndb.de>,
@@ -50,9 +50,9 @@ Cc: Ryan Roberts <ryan.roberts@arm.com>,
 	devicetree@vger.kernel.org,
 	dri-devel@lists.freedesktop.org,
 	linux-doc@vger.kernel.org
-Subject: [RFC PATCH v2 13/15] misc/arm-cla: Add stage-2 MTC and VM context switch
-Date: Thu, 15 Oct 2026 15:25:47 +0100
-Message-ID: <20261015142552.4128028-14-ryan.roberts@arm.com>
+Subject: [RFC PATCH v2 15/15] misc/arm-cla: Add vfio-mdev user interface
+Date: Thu, 15 Oct 2026 15:25:49 +0100
+Message-ID: <20261015142552.4128028-16-ryan.roberts@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261015142552.4128028-1-ryan.roberts@arm.com>
 References: <20261015142552.4128028-1-ryan.roberts@arm.com>
@@ -66,598 +66,741 @@ Content-Transfer-Encoding: 8bit
 
 From: Jean-Philippe Brucker <jpb@kernel.org>
 
-Add functions to switch the guest MTC. Reset the accelerators and CLA
-registers on switch. No save/restore of accelerators at the moment, we
-only restore the kernel's PL0CTL.
+Implement an interface to assign CLA devices to KVM guests. To creates a
+CLA instance:
+
+    uuid=$(uuidgen)
+    echo $uuid > /sys/class/mdev_bus/<pdev>/mdev_supported_types/arm-cla-pl1/create
+    cla_cpu=$(< /sys/bus/mdev/devices/$uuid/cpu)
+
+This creates a user interface in /dev/vfio: a VFIO group in
+/dev/vfio/<n>, discoverable by reading the symlink
+/sys/bus/mdev/devices/$uuid/iommu_group. Although CLA does not use an
+IOMMU, VFIO relies on IOMMU groups as an assignable unit. Here they
+correspond to CLA domains, whose devices communicate through a private
+bus.
+
+The CLA device gets assigned exclusively to the first VMM that opens the
+VFIO group and device. To launch a VM with a CLA attached to vCPU #4,
+with kvmtool:
+
+    lkvm run -k Image --console virtio -c 8
+	--vfio-platform $uuid,type=arm-cla,vcpu=4
+	--vcpu-affinity 4=$cla_cpu	# Bind vCPU 4 to the CLA's CPU
+
+Opens the group, gets the device fd, mmaps the frame, and launches the
+guest. The given vCPU thread is pinned to the CLA's CPU.
+
+Pinning vCPUs is not guaranteed. If the host decides to power off the
+CPUs with assigned CLAs, the guest application can't access the assigned
+device anymore. It would now access a RAZ/WI memory region.
+
+For DMA, because the TLB entries tagged with VMID+ASID are shared
+between CPU and accelerator, we pin the VMID. The stage 2 page tables
+are shared between CPU and CLA. CLA reports DMA page faults directly to
+the user, who performs the access from the CPU to handle both stage 1
+and stage 2 faults.
 
 Signed-off-by: Jean-Philippe Brucker <jpb@kernel.org>
 ---
- drivers/misc/arm-cla/arm-cla-regs.h |  12 ++
- drivers/misc/arm-cla/arm-cla.h      |  41 ++++++-
- drivers/misc/arm-cla/cla-ctx.c      |  55 +++++++++-
- drivers/misc/arm-cla/cla-mtc.c      | 163 +++++++++++++++++++++++++---
- drivers/misc/arm-cla/cla-regs.c     |  63 ++++++++++-
- drivers/misc/arm-cla/cla-sched.c    |   5 +-
- 6 files changed, 308 insertions(+), 31 deletions(-)
+ drivers/misc/arm-cla/Kconfig        |  16 +
+ drivers/misc/arm-cla/Makefile       |   2 +
+ drivers/misc/arm-cla/arm-cla.h      |  48 +++
+ drivers/misc/arm-cla/cla-init.c     |  11 +-
+ drivers/misc/arm-cla/cla-mdev.c     | 469 ++++++++++++++++++++++++++++
+ drivers/misc/arm-cla/cla-topology.c |   9 +-
+ 6 files changed, 553 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/misc/arm-cla/cla-mdev.c
 
-diff --git a/drivers/misc/arm-cla/arm-cla-regs.h b/drivers/misc/arm-cla/arm-cla-regs.h
-index 167e9ab64051..a7fc19f67893 100644
---- a/drivers/misc/arm-cla/arm-cla-regs.h
-+++ b/drivers/misc/arm-cla/arm-cla-regs.h
-@@ -37,6 +37,18 @@
- #define CLA_PLxCTRL_DBGPERM		GENMASK(3, 1)
- #define CLA_PLxCTRL_PREP(accid, v)	((u64)(v) << (8 * (accid)))
+diff --git a/drivers/misc/arm-cla/Kconfig b/drivers/misc/arm-cla/Kconfig
+index f8436a12c1e6..5def727b7a34 100644
+--- a/drivers/misc/arm-cla/Kconfig
++++ b/drivers/misc/arm-cla/Kconfig
+@@ -8,3 +8,19 @@ config ARM_CLA
+ 	  accelerators. It is only accessible from its associated CPU.
  
-+/* Valid bits of PLxCTRL. Other bits are RAZ/WI */
-+#define _CLA_PLxCTRL_MASK (CLA_PLxCTRL_AVAIL | CLA_PLxCTRL_DBGPERM)
-+#define CLA_PLxCTRL_MASK  \
-+	(CLA_PLxCTRL_PREP(0, _CLA_PLxCTRL_MASK) | \
-+	 CLA_PLxCTRL_PREP(1, _CLA_PLxCTRL_MASK) | \
-+	 CLA_PLxCTRL_PREP(2, _CLA_PLxCTRL_MASK) | \
-+	 CLA_PLxCTRL_PREP(3, _CLA_PLxCTRL_MASK) | \
-+	 CLA_PLxCTRL_PREP(4, _CLA_PLxCTRL_MASK) | \
-+	 CLA_PLxCTRL_PREP(5, _CLA_PLxCTRL_MASK) | \
-+	 CLA_PLxCTRL_PREP(6, _CLA_PLxCTRL_MASK) | \
-+	 CLA_PLxCTRL_PREP(7, _CLA_PLxCTRL_MASK))
+ 	  If unsure, say N.
 +
- #define CLA_STATUS_AVAIL		BIT(0)
- #define CLA_STATUS_DMB			BIT(1)
- #define CLA_STATUS_EABORT		BIT(2)
++config ARM_CLA_MDEV
++	bool "Mediated device for Arm CLA"
++	default y
++	depends on KVM
++	depends on VFIO
++	depends on ARM_CLA
++	depends on VFIO_GROUP
++	select VFIO_MDEV
++	help
++	  Enable the VFIO mediated device interface for assigning Arm Core Local
++	  Accelerators (CLAs) to KVM guests. Guests can access the CLA PL0 and
++	  PL1 registers, while the host controls stage 2 address translation.
++	  Devices in the same CLA domain can only be assigned to the same guest.
++
++	  If unsure, say N.
+diff --git a/drivers/misc/arm-cla/Makefile b/drivers/misc/arm-cla/Makefile
+index f848c608e8f1..973390d0b428 100644
+--- a/drivers/misc/arm-cla/Makefile
++++ b/drivers/misc/arm-cla/Makefile
+@@ -11,3 +11,5 @@ arm-cla-y := \
+ 	cla-user.o
+ 
+ obj-$(CONFIG_ARM_CLA) += arm-cla.o
++
++arm-cla-$(CONFIG_ARM_CLA_MDEV) += cla-mdev.o
 diff --git a/drivers/misc/arm-cla/arm-cla.h b/drivers/misc/arm-cla/arm-cla.h
-index e047094dd49c..c9ecab5ab6bf 100644
+index 43a58a329525..93365f525abb 100644
 --- a/drivers/misc/arm-cla/arm-cla.h
 +++ b/drivers/misc/arm-cla/arm-cla.h
-@@ -31,6 +31,9 @@
- /* Quantum of CLA assignment */
- #define CLA_SLICE_MS		100
- 
-+struct kvm;
-+struct kvm_arch_guest_mmu;
-+
- struct cla_domain;
- 
- struct cla_call_on_cpu {
-@@ -141,18 +144,43 @@ struct cla_regs_pl0 {
- 	u64 regstate[];
+@@ -14,6 +14,7 @@
+ #include <linux/kref.h>
+ #include <linux/kthread.h>
+ #include <linux/list.h>
++#include <linux/mdev.h>
+ #include <linux/mm.h>
+ #include <linux/mm_types.h>
+ #include <linux/mutex.h>
+@@ -51,6 +52,11 @@ struct cla_accel_desc {
+ 	u64 revidr;
  };
  
-+/**
-+ * struct cla_regs_pl1 - Saved CLA register state (PL1)
-+ * @pl0ctrl: Host PL0 control register
-+ *
-+ * Most registers are simply reset when transitionning to and from VMs, since we
-+ * don't support shared assignment.
-+ */
-+struct cla_regs_pl1 {
-+	u64 pl0ctrl;
-+};
-+
-+enum cla_ctx_type {
-+	CLA_CTX_PL0,
-+	CLA_CTX_PL1,
++enum cla_mdev_type {
++	CLA_MDEV_TYPE_PL1,
++	CLA_MDEV_NUM_TYPES,
 +};
 +
  /**
-  * struct cla_ctx_key - Unique context identifier
-+ * @type: Context type, PL0 or PL1
-  * @mm: For PL0 contexts, the mm.
-  * @file: for PL0 contexts, the file.
-+ * @kvm: For PL1 contexts, the virtual machine.
+  * struct cla_dev - CLA device
+  *
+@@ -71,6 +77,11 @@ struct cla_accel_desc {
+  * @broken:		Hardware failure.
+  * @worker:		CPU-bound worker to communicate with CLA.
+  * @call:		Scheduling work.
++ *
++ * Other mutable state:
++ * @mdev_parent:	Mdev structure for the VFIO interface.
++ * @mdev_types:		Mdev types that can be created from this device.
++ * @mdev_types_ptr:	Pointers to @mdev_type.
   */
- struct cla_ctx_key {
--	struct mm_struct *mm;
--	struct file *file;
-+	enum cla_ctx_type type;
-+	union {
-+		struct {
-+			struct mm_struct *mm;
-+			struct file *file;
-+		};
-+		struct kvm *kvm;
-+	};
+ struct cla_dev {
+ 	unsigned int cpu;
+@@ -88,6 +99,12 @@ struct cla_dev {
+ 	bool broken;
+ 	struct kthread_worker *worker;
+ 	struct cla_call_on_cpu call;
++
++#if IS_ENABLED(CONFIG_ARM_CLA_MDEV)
++	struct mdev_parent mdev_parent;
++	struct mdev_type mdev_types[CLA_MDEV_NUM_TYPES];
++	struct mdev_type *mdev_types_ptr[CLA_MDEV_NUM_TYPES];
++#endif
  };
  
- #define CLA_CTX_KEY_PL0(_mm, _file)		\
- 	{					\
-+		.type = CLA_CTX_PL0,		\
- 		.mm = (_mm),			\
+ /**
+@@ -100,6 +117,7 @@ struct cla_dev {
+  * @pg_offset:		Mmap offset of the first device.
+  * @nr_devs:		Number of devices in the domain.
+  * @devs:		Devices.
++ * @iommu_group:	Handle for VFIO group.
+  *
+  * Mutable, only accessed under @lock:
+  * @lock:		Protects the following members.
+@@ -127,6 +145,10 @@ struct cla_domain {
+ 	struct cla_ctx *assigned_ctx;
+ 	struct kthread_worker *worker;
+ 	struct kthread_delayed_work reassign;
++
++#if IS_ENABLED(CONFIG_ARM_CLA_MDEV)
++	struct iommu_group *iommu_group;
++#endif
+ };
+ 
+ /**
+@@ -187,6 +209,12 @@ struct cla_ctx_key {
  		.file = (_file),		\
  	}
-@@ -180,6 +208,7 @@ struct cla_ctx_key {
-  * Mutable, written by domain reassignment, device work, and CPU hotplug:
-  * @regs:		State for each device in domain.
-  * @asid:		Pinned ASID of live context.
-+ * @guest_mmu:		Stage 2 translation configuration.
-  */
- struct cla_ctx {
- 	struct kref refcnt;
-@@ -191,7 +220,10 @@ struct cla_ctx {
- 	refcount_t users;
- 	struct list_head queue_node;
- 	void **regs;
--	unsigned int asid;
-+	union {
-+		unsigned int asid;
-+		struct kvm_arch_guest_mmu *guest_mmu;
-+	};
- 	wait_queue_head_t waitq;
- };
  
-@@ -268,6 +300,9 @@ static inline bool cla_ctx_is_dying(struct cla_ctx *ctx)
- 	return refcount_read(&ctx->users) == 0;
- }
- 
-+#define cla_ctx_is_pl0(ctx) ((ctx)->key.type == CLA_CTX_PL0)
-+#define cla_ctx_is_pl1(ctx) ((ctx)->key.type == CLA_CTX_PL1)
-+
- void cla_dev_switch_ctx_work(struct kthread_work *work);
- int cla_dev_switch_ctx(struct cla_dev *dev, struct cla_ctx *prev_ctx,
- 		       struct cla_ctx *next_ctx);
-diff --git a/drivers/misc/arm-cla/cla-ctx.c b/drivers/misc/arm-cla/cla-ctx.c
-index 6a9c95769724..0489bf7a103f 100644
---- a/drivers/misc/arm-cla/cla-ctx.c
-+++ b/drivers/misc/arm-cla/cla-ctx.c
-@@ -3,11 +3,42 @@
- #include <linux/err.h>
- #include <linux/file.h>
- #include <linux/gfp.h>
-+#include <linux/kvm_host.h>
- #include <linux/sched/mm.h>
- #include <linux/slab.h>
- 
- #include "arm-cla.h"
- 
-+#if IS_ENABLED(CONFIG_KVM)
-+/*
-+ * We must hold a reference to KVM at least as long as the PL1 context is
-+ * assigned. We hold it until the ctx is freed.
-+ */
-+static inline bool cla_ctx_get_pl1(struct cla_ctx *ctx)
-+{
-+	return kvm_get_kvm_safe((ctx)->key.kvm);
-+}
-+
-+static inline void cla_ctx_put_pl1(struct cla_ctx *ctx)
-+{
-+	kvm_put_kvm((ctx)->key.kvm);
-+}
-+#else
-+/*
-+ * If KVM isn't enabled, the driver doesn't provide a user interface to create a
-+ * PL1 context, so these are never called.
-+ */
-+static inline bool cla_ctx_get_pl1(struct cla_ctx *ctx)
-+{
-+	return false;
-+}
-+
-+static inline void cla_ctx_put_pl1(struct cla_ctx *ctx)
-+{
-+	WARN_ON(1);
-+}
-+#endif
++#define CLA_CTX_KEY_PL1(_kvm)			\
++	{					\
++		.type = CLA_CTX_PL1,		\
++		.kvm = (_kvm),			\
++	}
 +
  /**
-  * cla_ctx_create - Create a context or increase its user count
-  * @domain: CLA domain
-@@ -48,8 +79,12 @@ struct cla_ctx *cla_ctx_create(struct cla_domain *domain,
- 	INIT_LIST_HEAD(&ctx->queue_node);
- 	init_waitqueue_head(&ctx->waitq);
+  * struct cla_ctx - Domain context
+  *
+@@ -342,4 +370,24 @@ int cla_user_init(void);
+ void cla_user_exit(void);
+ u8 cla_user_accels(struct cla_dev *dev, struct file *file);
  
--	mmgrab(key->mm);
--	get_file(key->file);
-+	if (cla_ctx_is_pl0(ctx)) {
-+		mmgrab(key->mm);
-+		get_file(key->file);
-+	} else {
-+		WARN_ON(!cla_ctx_get_pl1(ctx));
-+	}
++#if IS_ENABLED(CONFIG_ARM_CLA_MDEV)
++int cla_mdev_init(void);
++void cla_mdev_exit(void);
++void cla_mdev_enable(void);
++int cla_domain_mdev_init(struct cla_domain *domain);
++void cla_domain_mdev_exit(struct cla_domain *domain);
++#else
++static inline int cla_mdev_init(void)
++{
++	return 0;
++}
++static inline void cla_mdev_exit(void) {}
++static inline void cla_mdev_enable(void) {}
++static inline int cla_domain_mdev_init(struct cla_domain *domain)
++{
++	return 0;
++}
++static inline void cla_domain_mdev_exit(struct cla_domain *domain) {}
++#endif
++
+ #endif /* _ARM_CLA_H_ */
+diff --git a/drivers/misc/arm-cla/cla-init.c b/drivers/misc/arm-cla/cla-init.c
+index 1afe20aa877f..a0067240809a 100644
+--- a/drivers/misc/arm-cla/cla-init.c
++++ b/drivers/misc/arm-cla/cla-init.c
+@@ -393,6 +393,7 @@ static struct cla_dev *cla_dev_alloc(struct device *parent, int cpu,
+ 	dev->regs = cla_get_regs(regs, cla_kernel_pl);
+ 	dev->cpu = cpu;
+ 	dev->dev = parent;
++	dev_set_drvdata(parent, dev);
  
- 	/*
- 	 * Test if the mm or kvm is compatible. If cla_mtc_get_ctx() fails
-@@ -74,8 +109,12 @@ struct cla_ctx *cla_ctx_create(struct cla_domain *domain,
- err_free_regs:
- 	cla_ctx_free_regs(domain, ctx);
- err_free:
--	mmdrop(key->mm);
--	fput(key->file);
-+	if (cla_ctx_is_pl0(ctx)) {
-+		mmdrop(key->mm);
-+		fput(key->file);
-+	} else {
-+		cla_ctx_put_pl1(ctx);
-+	}
- 	kfree(ctx);
- err_unlock:
- 	mutex_unlock(&domain->lock);
-@@ -139,8 +178,12 @@ void cla_ctx_free(struct kref *ref)
- 	struct cla_ctx *ctx = container_of(ref, struct cla_ctx, refcnt);
+ 	kthread_init_work(&dev->call.switch_ctx, cla_dev_switch_ctx_work);
  
- 	WARN_ON(!cla_ctx_is_dying(ctx));
--	mmdrop(ctx->key.mm);
--	fput(ctx->key.file);
-+	if (cla_ctx_is_pl0(ctx)) {
-+		mmdrop(ctx->key.mm);
-+		fput(ctx->key.file);
-+	} else {
-+		cla_ctx_put_pl1(ctx);
-+	}
- 	cla_ctx_free_regs(ctx->domain, ctx);
- 	kfree(ctx);
- }
-diff --git a/drivers/misc/arm-cla/cla-mtc.c b/drivers/misc/arm-cla/cla-mtc.c
-index 9ab25085dfdf..fc2cacb09c4a 100644
---- a/drivers/misc/arm-cla/cla-mtc.c
-+++ b/drivers/misc/arm-cla/cla-mtc.c
-@@ -7,12 +7,64 @@
+@@ -519,13 +520,20 @@ static int __init cla_module_init(void)
+ 		cla_cpuhp_state = ret;
+ 	}
  
- #include <asm/kvm_arm.h>
- #include <linux/mmu_context.h>
-+#include <linux/kvm_host.h>
++	ret = cla_mdev_init();
++	if (ret)
++		goto err_hardware;
++
+ 	/* Must be last fallible step; see cla_user_init(). */
+ 	ret = cla_user_init();
+ 	if (ret)
+-		goto err_hardware;
++		goto err_mdev_exit;
  
- #include "arm-cla.h"
++	cla_mdev_enable();
+ 	return 0;
  
- #define cla_kernel_mtc \
- 	(cla_kernel_pl == 2 ? CLA_MTC_REGIDX_PL2 : CLA_MTC_REGIDX_PL1)
- 
-+/**
-+ * struct cla_mtc_s2 - Stage 2 MTC configuration for the host or a VM.
-+ * @hcr: HCR_EL2 register value.
-+ * @vttbr: VTTBR_EL2 register value.
-+ * @vtcr: VTCR_EL2 register value.
++err_mdev_exit:
++	cla_mdev_exit();
+ err_hardware:
+ 	cla_domains_sched_exit();
+ 	if (cla_cpuhp_state >= 0)
+@@ -539,6 +547,7 @@ static int __init cla_module_init(void)
+ static void __exit cla_module_exit(void)
+ {
+ 	cla_user_exit();
++	cla_mdev_exit();
+ 	cla_domains_sched_exit();
+ 	cpuhp_remove_state(cla_cpuhp_state);
+ 	cla_domains_free();
+diff --git a/drivers/misc/arm-cla/cla-mdev.c b/drivers/misc/arm-cla/cla-mdev.c
+new file mode 100644
+index 000000000000..66c5dd197542
+--- /dev/null
++++ b/drivers/misc/arm-cla/cla-mdev.c
+@@ -0,0 +1,469 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Arm CLA driver - vfio-mdev interface
++ *
++ * Copyright 2026 Arm Limited.
 + */
-+struct cla_mtc_s2 {
-+	u64 hcr;
-+	u64 vttbr;
-+	u64 vtcr;
++
++#include <linux/cpuhplock.h>
++#include <linux/vfio.h>
++#include <linux/mdev.h>
++
++#include "arm-cla.h"
++
++struct cla_mdev {
++	struct vfio_device vdev;
++	struct cla_dev *dev;
++	enum cla_mdev_type type;
 +};
 +
-+#if IS_ENABLED(CONFIG_KVM)
-+static void cla_mtc_prep_s2(struct cla_mtc_s2 *s2, struct cla_ctx *ctx)
-+{
-+	/* See comment in cla_mtc_setup() about MTC register definitions. */
-+	s2->hcr = ctx->guest_mmu->hcr;
-+	s2->vtcr = ctx->guest_mmu->vtcr;
-+	s2->vttbr = ctx->guest_mmu->vttbr;
-+}
++static bool cla_mdev_ready;
 +
-+static int cla_mtc_get_s2_ctx(struct cla_ctx *ctx)
-+{
-+	struct kvm_arch_guest_mmu *mmu = kvm_arch_get_guest_mmu(ctx->key.kvm);
-+
-+	if (IS_ERR(mmu))
-+		return PTR_ERR(mmu);
-+	ctx->guest_mmu = mmu;
-+
-+	return 0;
-+}
-+
-+static void cla_mtc_put_s2_ctx(struct cla_ctx *ctx)
-+{
-+	kvm_arch_put_guest_mmu(ctx->key.kvm, ctx->guest_mmu);
-+}
-+
-+static void cla_mtc_leak_s2_ctx(struct cla_ctx *ctx)
-+{
-+	kvm_get_kvm(ctx->key.kvm);
-+}
-+#else
-+static void cla_mtc_prep_s2(struct cla_mtc_s2 *s2, struct cla_ctx *ctx) {}
-+static int cla_mtc_get_s2_ctx(struct cla_ctx *ctx)
-+{
-+	return -EOPNOTSUPP;
-+}
-+static void cla_mtc_put_s2_ctx(struct cla_ctx *ctx) {}
-+static void cla_mtc_leak_s2_ctx(struct cla_ctx *ctx) {}
-+#endif
-+
- /**
-  * cla_mtc_setup - initialize the memory translation context
-  * @dev: CLA device
-@@ -85,22 +137,21 @@ int cla_mtc_setup(struct cla_dev *dev)
- 	return 0;
- }
- 
--/**
-- * cla_mtc_clear - clear the memory translation context
-- * @dev: CLA device
-- *
-- * Return: 0 on success, or a negative error code.
-- */
--int cla_mtc_clear(struct cla_dev *dev)
-+static int __cla_mtc_clear(struct cla_dev *dev, bool include_s2)
- {
- 	/* Don't set the RES1 bit in VTCR_EL2 because in MTC they are RAZ/WI. */
- 	u64 regs[2 * CLA_MTC_PL_SIZE] = {};
--	size_t regs_size = cla_kernel_pl * CLA_MTC_PL_SIZE;
-+	size_t regs_size;
- 
- 	/* SETCTX fails if there is no ACCID */
- 	if (!dev->accelerators)
- 		return 0;
- 
-+	if (include_s2)
-+		regs_size = cla_kernel_pl * CLA_MTC_PL_SIZE;
-+	else
-+		regs_size = CLA_MTC_PL_SIZE;
-+
- 	/*
- 	 * All accelerators are idle, meaning there can't be any memory
- 	 * transactions happening. So it is safe to clear the MTC in any order.
-@@ -109,6 +160,23 @@ int cla_mtc_clear(struct cla_dev *dev)
- 	return cla_op_setctx(dev, CLA_MTC_REGIDX_PL1, regs_size, regs);
- }
- 
-+/**
-+ * cla_mtc_clear - clear the whole memory translation context
-+ * @dev: CLA device
++/*
++ * Logical CPU number. After mdev creation, this attribute appears in
++ * /sys/bus/mdev/devices/$uuid/cpu
 + *
-+ * Return: 0 on success, or a negative error code.
++ * This information is crucial to the user, because the device is only
++ * accessible from this CPU.
 + */
-+int cla_mtc_clear(struct cla_dev *dev)
++static ssize_t cpu_show(struct device *dev, struct device_attribute *attr,
++			char *buf)
 +{
-+	return __cla_mtc_clear(dev, true);
++	struct cla_mdev *mdev = dev_get_drvdata(dev);
++
++	return sysfs_emit(buf, "%u\n", mdev->dev->cpu);
 +}
++DEVICE_ATTR_RO(cpu);
 +
-+/* Clear the EL1&0 stage 1 MTC config */
-+static int cla_mtc_clear_s1(struct cla_dev *dev)
++static const struct attribute *const cla_mdev_sysfs_attrs[] = {
++	&dev_attr_cpu.attr, /* CPU ID */
++	NULL,
++};
++ATTRIBUTE_GROUPS(cla_mdev_sysfs);
++
++static const struct mdev_type cla_mdev_types[CLA_MDEV_NUM_TYPES] = {
++	/*
++	 * Assign the PL0 and PL1 registers, with PL2 controlled by the
++	 * kernel (or hypervisor)
++	 */
++	[CLA_MDEV_TYPE_PL1] = {
++		.sysfs_name = "pl1",
++		.pretty_name = "CLA PL1 and PL0 registers exclusively owned",
++	},
++};
++
++static int cla_mdev_switch_ctx(struct cla_dev *dev, struct cla_ctx *prev,
++			       struct cla_ctx *next)
 +{
-+	return __cla_mtc_clear(dev, false);
-+}
++	struct cla_call_on_cpu *call = &dev->call;
 +
- static int cla_mtc_install_s1(struct cla_dev *dev, struct cla_ctx *ctx)
- {
- 	u64 ttbr0;
-@@ -137,6 +205,49 @@ static int cla_mtc_uninstall_s1(struct cla_dev *dev)
- 	return cla_op_setctx(dev, cla_kernel_mtc + CLA_MTC_TTBR0, 1, &ttbr0);
- }
- 
-+static int cla_mtc_install_s2(struct cla_dev *dev, struct cla_ctx *ctx)
-+{
-+	struct cla_mtc_s2 s2 = {};
-+	const size_t num_regs = sizeof(s2) / sizeof(u64);
-+
-+	if (WARN_ON(cla_kernel_pl != 2))
-+		return -EINVAL;
-+
-+	/* GETCTX/SETCTX fail if there is no ACCID */
-+	if (!dev->accelerators)
-+		return 0;
-+
-+	cla_mtc_prep_s2(&s2, ctx);
-+
-+	return cla_op_setctx(dev, CLA_MTC_HCR_EL2, num_regs, (u64 *)&s2);
-+}
-+
-+static int cla_mtc_uninstall_s2(struct cla_dev *dev)
-+{
-+	struct cla_mtc_s2 s2 = {
-+		.hcr = HCR_HOST_VHE_FLAGS,
-+	};
-+	const size_t num_regs = sizeof(s2) / sizeof(u64);
-+	int ret;
-+
-+	if (WARN_ON(cla_kernel_pl != 2))
-+		return -EINVAL;
-+
-+	/* GETCTX/SETCTX fail if there is no ACCID */
-+	if (!dev->accelerators)
-+		return 0;
++	lockdep_assert_cpus_held();
 +
 +	/*
-+	 * The accelerators are idle and there is no pending memory transaction,
-+	 * so we can change the MTC config in any order.
++	 * No race with reassignment work because we're holding the domain lock
++	 * and we're domain->assigned_ctx.
 +	 */
-+	ret = cla_mtc_clear_s1(dev);
-+	if (ret)
-+		return ret;
++	call->sched.prev_ctx = prev;
++	call->sched.next_ctx = next;
++	call->ret = 0;
++	if (dev->worker && !dev->broken)
++		kthread_queue_work(dev->worker, &call->switch_ctx);
 +
-+	return cla_op_setctx(dev, CLA_MTC_HCR_EL2, num_regs, (u64 *)&s2);
++	kthread_flush_work(&call->switch_ctx);
++
++	return call->ret;
 +}
 +
- /**
-  * cla_mtc_install - enable a translation context
-  * @dev: CLA device
-@@ -146,7 +257,8 @@ static int cla_mtc_uninstall_s1(struct cla_dev *dev)
-  */
- int cla_mtc_install(struct cla_dev *dev, struct cla_ctx *ctx)
- {
--	return cla_mtc_install_s1(dev, ctx);
-+	return cla_ctx_is_pl0(ctx) ?
-+		cla_mtc_install_s1(dev, ctx) : cla_mtc_install_s2(dev, ctx);
- }
- 
- /**
-@@ -158,7 +270,8 @@ int cla_mtc_install(struct cla_dev *dev, struct cla_ctx *ctx)
-  */
- int cla_mtc_uninstall(struct cla_dev *dev, struct cla_ctx *ctx)
- {
--	return cla_mtc_uninstall_s1(dev);
-+	return cla_ctx_is_pl0(ctx) ?
-+		cla_mtc_uninstall_s1(dev) : cla_mtc_uninstall_s2(dev);
- }
- 
- /**
-@@ -166,15 +279,23 @@ int cla_mtc_uninstall(struct cla_dev *dev, struct cla_ctx *ctx)
-  * @ctx: context to get
-  *
-  * Grab the information needed for installing this context.
-- * For stage 1 MTC, pin the ASID.
-+ * For stage 1 MTC, pin the ASID. For stage 2 MTC, pin the VMID and get the
-+ * translation configuration registers.
-  *
-  * Return: 0 on success, or a negative error code.
-  */
- int cla_mtc_get_ctx(struct cla_ctx *ctx)
- {
--	ctx->asid = arm64_mm_context_get(ctx->key.mm);
--	if (ctx->asid == 0)
--		return -ENOSPC;
-+	if (cla_ctx_is_pl0(ctx)) {
-+		ctx->asid = arm64_mm_context_get(ctx->key.mm);
-+		if (ctx->asid == 0)
-+			return -ENOSPC;
-+	} else {
-+		int ret = cla_mtc_get_s2_ctx(ctx);
-+
-+		if (ret)
-+			return ret;
-+	}
- 
- 	return 0;
- }
-@@ -187,7 +308,10 @@ int cla_mtc_get_ctx(struct cla_ctx *ctx)
-  */
- void cla_mtc_put_ctx(struct cla_ctx *ctx)
- {
--	arm64_mm_context_put(ctx->key.mm);
-+	if (cla_ctx_is_pl0(ctx))
-+		arm64_mm_context_put(ctx->key.mm);
-+	else
-+		cla_mtc_put_s2_ctx(ctx);
- }
- 
- /**
-@@ -201,6 +325,11 @@ void cla_mtc_put_ctx(struct cla_ctx *ctx)
-  */
- void cla_mtc_leak_ctx(struct cla_ctx *ctx)
- {
--	WARN(1, "leaking PL0 context\n");
--	mmgrab(ctx->key.mm);
-+	if (cla_ctx_is_pl0(ctx)) {
-+		WARN(1, "leaking PL0 context\n");
-+		mmgrab(ctx->key.mm);
-+	} else {
-+		WARN(1, "leaking PL1 context\n");
-+		cla_mtc_leak_s2_ctx(ctx);
-+	}
- }
-diff --git a/drivers/misc/arm-cla/cla-regs.c b/drivers/misc/arm-cla/cla-regs.c
-index d48311d0ef92..5be5d1d4f4e4 100644
---- a/drivers/misc/arm-cla/cla-regs.c
-+++ b/drivers/misc/arm-cla/cla-regs.c
-@@ -205,6 +205,55 @@ static int cla_regs_install_pl0(struct cla_dev *dev, struct cla_ctx *ctx,
- 	return 0;
- }
- 
-+static int cla_regs_uninstall_pl1(struct cla_dev *dev, struct cla_ctx *ctx,
-+				  unsigned int ctx_id)
++/*
++ * Perform a RESET on all accelerators for this dev and clear the CLA
++ * regs. The VMM calls this when rebooting a VM. It doesn't need to be
++ * efficient. Other devices in the domain are not reset.
++ */
++static int cla_mdev_reset(struct cla_mdev *mdev)
 +{
-+	int ret;
-+	u64 lresp;
-+	struct cla_regs_pl1 *regs = ctx->regs[ctx_id];
++	int ret = 0;
++	struct cla_ctx *ctx;
++	struct cla_dev *dev = mdev->dev;
++	struct cla_domain *domain = dev->domain;
 +
-+	/* VM may have been killed while it was launching ops */
-+	ret = cla_op_wait_lresp(dev, &lresp);
-+	if (ret)
-+		return ret;
++	/* Hotplug callbacks may take domain->lock, so acquire this first. */
++	cpus_read_lock();
++	mutex_lock(&domain->lock);
++	if (domain->broken) {
++		ret = -EIO;
++		goto out_unlock;
++	}
++
++	ctx = domain->assigned_ctx;
++	/*
++	 * This function is only reachable when a valid PL1 ctx corresponding to
++	 * the VM is assigned to the domain: cla_mdev_open_device() waits for
++	 * the ctx to be assigned, and the ctx only gets deassigned when the
++	 * file has no reference anymore (no ioctl possible). So the following
++	 * are all bugs.
++	 */
++	if (WARN_ON(!ctx) ||
++	    WARN_ON(!cla_ctx_is_pl1(ctx)) ||
++	    WARN_ON(ctx->key.kvm != mdev->vdev.kvm)) {
++		ret = -EINVAL;
++		goto out_unlock;
++	}
 +
 +	/*
-+	 * TODO: PL1 context save/restore is not supported. Reset the VM state
-+	 * even when the context remains live across CPU hotplug or a VFIO
-+	 * reset.
++	 * This provides a clean config. The stage 1 MTC is clear. The
++	 * accelerators and CLA regs are reset.
 +	 */
-+	ret = cla_op_reset_all(dev);
++	ret = cla_mdev_switch_ctx(dev, ctx, NULL);
 +	if (ret)
-+		return ret;
++		goto out_unlock;
 +
-+	/* Restore kernel PL0CTRL */
-+	cla_reg_write(dev, CLA_REG_PL0CTRL, regs->pl0ctrl);
++	ret = cla_mdev_switch_ctx(dev, NULL, ctx);
++out_unlock:
++	if (ret)
++		cla_domain_set_broken(domain);
++	mutex_unlock(&domain->lock);
++	cpus_read_unlock();
++	return ret;
++}
 +
++static int cla_mdev_open_device(struct vfio_device *vdev)
++{
++	struct cla_mdev *mdev =
++		container_of(vdev, struct cla_mdev, vdev);
++	struct cla_domain *domain = mdev->dev->domain;
++	struct cla_ctx_key key = CLA_CTX_KEY_PL1(vdev->kvm);
++	struct cla_ctx *ctx;
++	int ret;
++
++	/*
++	 * The user registers a KVM instance with this VFIO group. We use it to
++	 * program the stage-2 MTC. stage-1 MTC is managed by the user/guest.
++	 * KVM, if present, is valid for the lifetime of the vfio device file.
++	 */
++	if (!vdev->kvm)
++		return -EINVAL;
++
++	/*
++	 * Obtain a context for exclusive assignment. If other contexts exist
++	 * for this domain, this returns an error. Other devices assigned to the
++	 * same VM within the same domain get the same context.
++	 */
++	ctx = cla_ctx_create(domain, &key);
++	if (IS_ERR(ctx))
++		return PTR_ERR(ctx);
++
++	mutex_lock(&domain->lock);
++	if (domain->broken) {
++		ret = -EIO;
++		goto err_destroy;
++	}
++
++	/* Not assigned and not queued, assign it. */
++	if (domain->assigned_ctx != ctx && list_empty(&ctx->queue_node)) {
++		list_add_tail(&ctx->queue_node, &domain->queued_ctxs);
++		cla_domain_schedule_reassignment(domain);
++	}
++	mutex_unlock(&domain->lock);
++
++	ret = wait_event_interruptible(ctx->waitq,
++				       READ_ONCE(domain->assigned_ctx) == ctx ||
++				       READ_ONCE(domain->broken));
++
++	mutex_lock(&domain->lock);
++	/*
++	 * At this point the context is either assigned or still in the queue
++	 * (if we were interrupted). In case of error, cla_ctx_destroy() kills the
++	 * context and deassigns it.
++	 */
++	if (ret)
++		goto err_destroy;
++
++	if (domain->broken) {
++		ret = -EIO;
++		goto err_destroy;
++	}
++	mutex_unlock(&domain->lock);
++	return 0;
++
++err_destroy:
++	mutex_unlock(&domain->lock);
++	cla_ctx_destroy(domain, &key);
++	return ret;
++}
++
++static void cla_mdev_close_device(struct vfio_device *vdev)
++{
++	struct cla_mdev *mdev =
++		container_of(vdev, struct cla_mdev, vdev);
++	struct cla_ctx_key key = CLA_CTX_KEY_PL1(vdev->kvm);
++
++	cla_ctx_destroy(mdev->dev->domain, &key);
++}
++
++static long cla_mdev_ioctl(struct vfio_device *vdev, unsigned int cmd,
++			       unsigned long arg)
++{
++	struct cla_mdev *mdev =
++		container_of(vdev, struct cla_mdev, vdev);
++	unsigned long minsz;
++
++	switch (cmd) {
++	case VFIO_DEVICE_GET_INFO:
++	{
++		struct vfio_device_info info;
++
++		minsz = offsetofend(struct vfio_device_info, num_irqs);
++
++		if (copy_from_user(&info, (void __user *)arg, minsz))
++			return -EFAULT;
++
++		if (info.argsz < minsz)
++			return -EINVAL;
++
++		info.flags = VFIO_DEVICE_FLAGS_PLATFORM |
++			     VFIO_DEVICE_FLAGS_RESET;
++		info.num_regions = 1;
++		info.num_irqs = 0;
++
++		if (copy_to_user((void __user *)arg, &info, minsz))
++			return -EFAULT;
++
++		return 0;
++	}
++	case VFIO_DEVICE_RESET:
++		return cla_mdev_reset(mdev);
++	case VFIO_DEVICE_GET_IRQ_INFO:
++	case VFIO_DEVICE_SET_IRQS:
++	default:
++		return -EINVAL;
++	}
++	return -ENOTTY;
++}
++
++static int cla_mdev_get_region_info_caps(struct vfio_device *vdev,
++					  struct vfio_region_info *region_info,
++					  struct vfio_info_cap *caps)
++{
++	if (region_info->index != 0)
++		return -EINVAL;
++
++	region_info->offset = 0;
++	region_info->size = 2 * CLA_REG_SIZE;
++	region_info->flags = VFIO_REGION_INFO_FLAG_MMAP |
++			     VFIO_REGION_INFO_FLAG_READ |
++			     VFIO_REGION_INFO_FLAG_WRITE;
 +	return 0;
 +}
 +
-+static int cla_regs_install_pl1(struct cla_dev *dev, struct cla_ctx *ctx,
-+				unsigned int ctx_id)
++/* Mmap PL0 + PL1 frames. */
++static int cla_mdev_mmap(struct vfio_device *vdev, struct vm_area_struct *vma)
++{
++	struct cla_mdev *mdev =
++		container_of(vdev, struct cla_mdev, vdev);
++	unsigned long vm_flags_required = VM_SHARED | VM_READ | VM_WRITE;
++	size_t map_size = vma->vm_end - vma->vm_start;
++	size_t region_size = 2 * CLA_REG_SIZE;
++
++	if (vma->vm_pgoff != 0)
++		return -EINVAL;
++
++	if (vma->vm_end < vma->vm_start)
++		return -EINVAL;
++	if (map_size != region_size)
++		return -EINVAL;
++	if ((vma->vm_flags & vm_flags_required) != vm_flags_required)
++		return -EINVAL;
++	if (vma->vm_flags & VM_EXEC)
++		return -EINVAL;
++
++	vm_flags_mod(vma, VM_DONTCOPY | VM_DONTDUMP | VM_DONTEXPAND |
++			  VM_IO | VM_PFNMAP, VM_MAYEXEC);
++	vma->vm_page_prot = pgprot_device(vma->vm_page_prot);
++
++	return remap_pfn_range(vma, vma->vm_start, mdev->dev->pfn, map_size,
++			       vma->vm_page_prot);
++}
++
++static const struct vfio_device_ops cla_mdev_pl1_ops = {
++	.name = "vfio-arm-cla-pl1",
++	.open_device = cla_mdev_open_device,
++	.close_device = cla_mdev_close_device,
++	.ioctl = cla_mdev_ioctl,
++	.get_region_info_caps = cla_mdev_get_region_info_caps,
++	.mmap = cla_mdev_mmap,
++};
++
++/*
++ * Admin creates an mdev device
++ *
++ *	uuid=$(uuidgen)
++ *	echo $uuid > /sys/class/mdev_bus/<pdev>/mdev_supported_types/arm-cla-pl1/create
++ */
++static int cla_mdev_probe(struct mdev_device *mdev)
++{
++	int ret = -ENODEV;
++	struct cla_dev *dev;
++	enum cla_mdev_type type;
++	struct cla_mdev *cla_mdev;
++
++	/* Ensure the module isn't being removed */
++	if (!try_module_get(THIS_MODULE))
++		return -ENODEV;
++
++	/* Ensure the module has finished initializing */
++	if (!smp_load_acquire(&cla_mdev_ready))
++		goto err_put_module;
++
++	dev = dev_get_drvdata(mdev->dev.parent);
++	type = mdev->type - dev->mdev_types;
++
++	ret = -EINVAL;
++	if (WARN_ON(type < 0 || type >= CLA_MDEV_NUM_TYPES))
++		goto err_put_module;
++
++	cla_mdev = vfio_alloc_device(cla_mdev, vdev, &mdev->dev,
++				     &cla_mdev_pl1_ops);
++	if (IS_ERR(cla_mdev)) {
++		ret = PTR_ERR(cla_mdev);
++		goto err_put_module;
++	}
++
++	cla_mdev->dev = dev;
++	cla_mdev->type = type;
++
++	dev_set_drvdata(&mdev->dev, cla_mdev);
++
++	ret = iommu_group_add_device(dev->domain->iommu_group, &mdev->dev);
++	if (ret)
++		goto err_put_vdev;
++
++	ret = vfio_register_cpu_mmu_dev(&cla_mdev->vdev);
++	if (ret)
++		goto err_put_group;
++
++	return 0;
++
++err_put_group:
++	iommu_group_remove_device(&mdev->dev);
++err_put_vdev:
++	dev_set_drvdata(&mdev->dev, NULL);
++	vfio_put_device(&cla_mdev->vdev);
++err_put_module:
++	module_put(THIS_MODULE);
++	return ret;
++}
++
++/*
++ * Admin removes an mdev device
++ *
++ *	echo 1 > /sys/bus/mdev/devices/$uuid/remove
++ */
++static void cla_mdev_remove(struct mdev_device *mdev)
++{
++	struct cla_mdev *cla_mdev = dev_get_drvdata(&mdev->dev);
++
++	vfio_unregister_group_dev(&cla_mdev->vdev);
++	iommu_group_remove_device(&mdev->dev);
++	dev_set_drvdata(&mdev->dev, NULL);
++	vfio_put_device(&cla_mdev->vdev);
++	module_put(THIS_MODULE);
++}
++
++static struct mdev_driver cla_mdev_driver = {
++	.device_api = VFIO_DEVICE_API_PLATFORM_STRING,
++	.max_instances = 1,
++	.driver = {
++		.name = "arm-cla-mdev",
++		.owner = THIS_MODULE,
++		.mod_name = KBUILD_MODNAME,
++		.dev_groups = cla_mdev_sysfs_groups,
++	},
++	.probe = cla_mdev_probe,
++	.remove	= cla_mdev_remove,
++};
++
++/* Allocate IOMMU groups so VFIO can create its groups based on CLA domains */
++int cla_domain_mdev_init(struct cla_domain *domain)
++{
++	struct iommu_group *iommu_group;
++
++	if (cla_kernel_pl < 2)
++		return 0;
++
++	iommu_group = iommu_group_alloc();
++	if (IS_ERR(iommu_group))
++		return PTR_ERR(iommu_group);
++
++	domain->iommu_group = iommu_group;
++	return 0;
++}
++
++void cla_domain_mdev_exit(struct cla_domain *domain)
++{
++	iommu_group_put(domain->iommu_group);
++}
++
++int __init cla_mdev_init(void)
++{
++	int i, j;
++	int ret;
++	struct cla_dev *dev;
++
++	if (cla_kernel_pl < 2)
++		return 0;
++
++	ret = mdev_register_driver(&cla_mdev_driver);
++	if (ret)
++		return ret;
++
++	for (i = 0; i < cla_nr_devs; i++) {
++		dev = cla_lut_pg[i];
++
++		/*
++		 * mdev_type is a kobj in sysfs, so it cannot be shared between
++		 * CLAs. Each CLA needs its own instance.
++		 */
++		BUILD_BUG_ON(sizeof(cla_mdev_types) != sizeof(dev->mdev_types));
++		memcpy(dev->mdev_types, cla_mdev_types, sizeof(cla_mdev_types));
++		for (j = 0; j < CLA_MDEV_NUM_TYPES; j++)
++			dev->mdev_types_ptr[j] = &dev->mdev_types[j];
++
++		ret = mdev_register_parent(&dev->mdev_parent, dev->dev,
++					   &cla_mdev_driver, dev->mdev_types_ptr,
++					   CLA_MDEV_NUM_TYPES);
++		if (ret)
++			goto err_unregister;
++	}
++
++	return 0;
++
++err_unregister:
++	for (i--; i >= 0; i--) {
++		dev = cla_lut_pg[i];
++		mdev_unregister_parent(&dev->mdev_parent);
++	}
++	mdev_unregister_driver(&cla_mdev_driver);
++	return ret;
++}
++
++/* Enable the interface, once the module initialization is complete */
++void __init cla_mdev_enable(void)
++{
++	/* Synchronize with cla_mdev_probe() */
++	smp_store_release(&cla_mdev_ready, true);
++}
++
++void cla_mdev_exit(void)
 +{
 +	int i;
-+	unsigned int accid;
-+	struct cla_regs_pl1 *regs = ctx->regs[ctx_id];
 +
-+	/* Save PL0CTRL and initialize it as all-enabled */
-+	regs->pl0ctrl = cla_reg_read(dev, CLA_REG_PL0CTRL);
-+	cla_reg_write(dev, CLA_REG_PL0CTRL, CLA_PLxCTRL_MASK);
++	if (cla_kernel_pl < 2)
++		return;
 +
-+	/* Clear EVENT by reading STATUS, to provide a pristine context */
-+	cla_for_each_accid(dev, accid)
-+		cla_reg_read(dev, CLA_REG_STATUS(accid));
++	for (i = 0; i < cla_nr_devs; i++) {
++		struct cla_dev *dev = cla_lut_pg[i];
 +
-+	for (i = 0; i < CLA_NUM_DATA_REGS; i++)
-+		cla_reg_write(dev, CLA_REG_DATA(i), 0);
-+	cla_reg_write(dev, CLA_REG_LRESP, 0);
-+
-+	return 0;
++		mdev_unregister_parent(&dev->mdev_parent);
++	}
++	mdev_unregister_driver(&cla_mdev_driver);
 +}
+diff --git a/drivers/misc/arm-cla/cla-topology.c b/drivers/misc/arm-cla/cla-topology.c
+index ed7acec70019..ead6c25c6391 100644
+--- a/drivers/misc/arm-cla/cla-topology.c
++++ b/drivers/misc/arm-cla/cla-topology.c
+@@ -51,12 +51,18 @@ static struct cla_domain *cla_domain_alloc(struct cla_dev *dev, unsigned int fwi
+ 	}
+ 	domain->devs[0] = dev;
+ 
+-	ret = cla_domain_sched_init(domain);
++	ret = cla_domain_mdev_init(domain);
+ 	if (ret)
+ 		goto err_free_devs;
+ 
++	ret = cla_domain_sched_init(domain);
++	if (ret)
++		goto err_exit_mdev;
 +
- /**
-  * cla_regs_install - Install and/or restore CLA context
-  * @dev: CLA device
-@@ -215,6 +264,7 @@ static int cla_regs_install_pl0(struct cla_dev *dev, struct cla_ctx *ctx,
-  *
-  * PL0 context: Restore the DATA and LRESP registers, and accelerator state if
-  * one has been saved.
-+ * PL1 context: Save host kernel registers. Reset all PL1 and PL0 state.
-  *
-  * This function is called with all accelerators idle and no trace of previous
-  * work.
-@@ -224,7 +274,9 @@ static int cla_regs_install_pl0(struct cla_dev *dev, struct cla_ctx *ctx,
- int cla_regs_install(struct cla_dev *dev, struct cla_ctx *ctx,
- 		     unsigned int ctx_id)
- {
--	return cla_regs_install_pl0(dev, ctx, ctx_id);
-+	return cla_ctx_is_pl0(ctx) ?
-+		cla_regs_install_pl0(dev, ctx, ctx_id) :
-+		cla_regs_install_pl1(dev, ctx, ctx_id);
- }
+ 	return domain;
  
- /**
-@@ -237,6 +289,7 @@ int cla_regs_install(struct cla_dev *dev, struct cla_ctx *ctx,
-  *
-  * PL0 context: Save the DATA registers and accelerator state unless
-  * cla_ctx_is_dying() is true, since a dying context will not be restored.
-+ * PL1 context: Restore host kernel registers.
-  *
-  * When this completes, all accelerators are idle. If this fails, some
-  * accelerators may still be running.
-@@ -246,7 +299,9 @@ int cla_regs_install(struct cla_dev *dev, struct cla_ctx *ctx,
- int cla_regs_uninstall(struct cla_dev *dev, struct cla_ctx *ctx,
- 		       unsigned int ctx_id)
- {
--	return cla_regs_uninstall_pl0(dev, ctx, ctx_id);
-+	return cla_ctx_is_pl0(ctx) ?
-+		cla_regs_uninstall_pl0(dev, ctx, ctx_id) :
-+		cla_regs_uninstall_pl1(dev, ctx, ctx_id);
- }
- 
- /**
-@@ -279,7 +334,9 @@ int cla_ctx_alloc_regs(struct cla_domain *domain, struct cla_ctx *ctx)
- 		 * The regs structures are only ever accessed from the CLA
- 		 * device's CPU, so try to allocate them on the right NUMA node
- 		 */
--		size = struct_size_t(struct cla_regs_pl0, regstate, nr_regstate);
-+		size = cla_ctx_is_pl0(ctx) ?
-+			struct_size_t(struct cla_regs_pl0, regstate, nr_regstate) :
-+			sizeof(struct cla_regs_pl1);
- 		regs = kvzalloc_node(size, GFP_KERNEL_ACCOUNT,
- 				     cpu_to_node(dev->cpu));
- 		if (!regs)
-diff --git a/drivers/misc/arm-cla/cla-sched.c b/drivers/misc/arm-cla/cla-sched.c
-index 6b5b782ac33e..dc0584d681af 100644
---- a/drivers/misc/arm-cla/cla-sched.c
-+++ b/drivers/misc/arm-cla/cla-sched.c
-@@ -196,9 +196,10 @@ static void cla_domain_zap(struct cla_domain *domain, struct cla_ctx *ctx)
- 
- 	/*
- 	 * If the context is dying it has already been unmapped, no need to zap
--	 * it here.
-+	 * it here. PL1 contexts are not bound to a specific mm, but since
-+	 * deassigning them requires unmapping them first, they must be dying.
- 	 */
--	if (!ctx || cla_ctx_is_dying(ctx))
-+	if (!ctx || cla_ctx_is_dying(ctx) || WARN_ON(!cla_ctx_is_pl0(ctx)))
- 		return;
- 
- 	if (!mmget_not_zero(ctx->key.mm))
++err_exit_mdev:
++	cla_domain_mdev_exit(domain);
+ err_free_devs:
+ 	kfree(domain->devs);
+ err_free_id:
+@@ -187,6 +193,7 @@ void cla_domains_free(void)
+ 	cla_lut_cpu = NULL;
+ 	cla_lut_pg = NULL;
+ 	xa_for_each(&cla_domains, fwid, domain) {
++		cla_domain_mdev_exit(domain);
+ 		xa_erase(&cla_domains, fwid);
+ 		kfree(domain->devs);
+ 		kfree(domain);
 -- 
 2.43.0
 
