@@ -1,127 +1,228 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A85858B6D1
-	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 20:34:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EFC1483819
+	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 20:35:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792096485; cv=none; b=lWLw1GnTEFKoDBROMcM6+RhF6oBt1CYRM9aHV/YAlzwF1Ql+8Mf0lid7njbpOUByOeLuEALtyN71qSds8o52cxGXVzmWn2PtMxvUC440hewLuSbOeaQP4fOVQok+Mj+siIRTTm7HcUoObtl4fxNjqk5kx+gaDvPL9+ac9UfleJ8=
+	t=1792096506; cv=none; b=hkgPVG8RKERvA4Qht9yjklQ2kguKR0U9prDHNFgARDVR7ttgWDI52csoJjyYSJ1FpS1X5rCX83KA/SlqcvK62u4Wc2kd98xfajfnGGdVlC1XdT4JsFwv+oV00oPZoWUA6iki2oYEXqmoXpN7IsC9OIe6BPfUIgT1czMol0idHNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792096485; c=relaxed/simple;
-	bh=9aJHioqT4i3GB/VQ8aHNPGBdx54g3uYD7EBwQ6eJQww=;
+	s=arc-20240116; t=1792096506; c=relaxed/simple;
+	bh=TVChWadpAOPtY0rkOvHJCnqFfP512M404lz0L8QlT1o=;
 	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=Ux6oBgQH8pXRbrmEkSL5/1Mp+V/eK+0KGLZyIQzTX0DRQApH68Dj1oZdZNmgAvMs5VDU5NCJpc0jF+oztz5xus6aDiTS+xCPn6KhaCUX8O6UyzwbUwOBmZf43he0jFzbxT3EHZzdVcHOagngFdk6dgDtd2wfR5sSccnn1m8/WLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bDbPILx4; arc=none smtp.client-ip=100.103.45.18
+	 Date; b=QrH7qLfxBB9f+pbMXAdLpLCqpRC7Gi2NzNpD9KHkSk+h6e17UmclndPKr3rOCag0hZMBuiOt6iU8m6rrFB3uqj7DMBPByoHAUfVRelymeUnJ1vQR94lBY2i8PX1WkxZC+uPdJH+6edfVeqGQpwr/G4HKyyHeNZ4E3p1q9su2yhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KCHjq5sl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bDbPILx4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC5FF1F000C4;
-	Thu, 15 Oct 2026 20:34:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KCHjq5sl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CC401F000C4;
+	Thu, 15 Oct 2026 20:35:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792096483;
-	bh=lkUm6iimckqWNjID3uSWjuW/6+xGvgu4O9qQAlTo53g=;
+	s=k20260515; t=1792096503;
+	bh=9urv0JaO4o70dxT7ythyknY9Gm825zCp5Kq/DSq23gk=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=bDbPILx4ZdQXYQqU8pK8aj/rtLZu+BbAT6vRbsGWffJVNc7+pO/hqgsxD96fFJYtG
-	 RIjQwT7A5vE5fUTPJcJxo8lKBzWgyyvZAeVUCGqBa9yBuG1ec5elKKeK+P/1cybwK5
-	 dfMQFopWhrItPidU22n0GINav9f5YpJSF2KI14SWwKt7BrO6UMj6eMuEBhCvMuGLVo
-	 98K/b3khoAX6jzEBTIJKcHxtbimV6BFT+1sroC2C3wyJIir8TUQzCGb/zUnExRxP0f
-	 U+ShOGKyH3Pj8OMfB96w69KwD0CT9EuIxfkOJBJTPKARe6fz4yoeaGf0NxEOgUQnkY
-	 uMuhVrXrnAWLA==
-Message-ID: <sashiko-outbox-173401@kernel.org>
+	b=KCHjq5slaKDwfciZQXhu3etE82hZSKuKxy6npx+nMsqMPMTPI/nt34rbS7nCHSw3a
+	 tX9U3tdJIKZmjLHKaUXzgGViRTtsKx4bX9KONYa5RciDg4pFNpc4goy3O88SEs9p+G
+	 2A7Rt1245FML2Vw7EXb59GGgtdjKJT3tp3wBaqk11vJ37N6VlWJueh5QpXWd9C97Wd
+	 LvXQ9GJCvCfPqRqz1Zhcf/Gea4VXH44sTAth37KWmLxJGUp0XSLJax5Cfo1BL8PAx6
+	 oEWV91w3/RrLnKGTUnf55/B3TnnJp5e3ovkaey3+NkxPmXzNKqOYXr2Rl1Zgvs2Ie6
+	 hfCq4jCwzMejA==
+Message-ID: <sashiko-outbox-173402@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v9 24/25] iommu/arm-smmu-v3-kvm: Enable nesting
+Subject: Re: [PATCH v9 11/25] iommu/arm-smmu-v3-kvm: Add the kernel driver
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Mostafa Saleh" <smostafa@google.com>, kvmarm@lists.linux.dev
 Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261015200903.2735565-25-smostafa@google.com>
+In-Reply-To: <20261015200903.2735565-12-smostafa@google.com>
 References: <20261015200903.2735565-1-smostafa@google.com>
- <20261015200903.2735565-25-smostafa@google.com>
+ <20261015200903.2735565-12-smostafa@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Oct 2026 20:34:42 +0000
+Date: Thu, 15 Oct 2026 20:35:03 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 3 potential issue(=
 s) to consider:
-- [Critical] iommu/arm-smmu-v3: fatal EL2 panic on host-supplied invalid ST=
-E or ENOMEM
-- [Medium] arm-smmu-v3-kvm: Incorrect EL2 WARN_ON usage for hardware timeout
+- [Critical] iommu/arm-smmu-v3: native driver fallback bypasses pKVM DMA is=
+olation
+- [High] mm: UAF of smmu due to devres LIFO inversion on deferred probe
+- [Medium] iommu/arm-smmu-v3: aux device creation failure aborts initializa=
+tion for remaining SMMUs
 --
 
-commit 5625f7b65b03ea88554c9ce7668b1dabbbb068b1
+commit 989c8869198ba4ebe30e4fc7554bb66910985d0b
 Author: Mostafa Saleh <smostafa@google.com>
 
-iommu/arm-smmu-v3-kvm: Enable nesting
+iommu/arm-smmu-v3-kvm: Add the kernel driver
+   =20
+When KVM runs in protected mode with CONFIG_ARM_SMMU_V3_PKVM, the
+hypervisor owns the SMMUv3 hardware and presents emulated SMMUs to the
+host through trap and emulate. This patch adds the host side of the driver,
+using an auxiliary device approach for the emulated SMMUs.
 
-This commit enables stage-2 translation for the ARM SMMUv3 under pKVM
-by allowing the hypervisor to sanitize and control the stage-2 portion
-of the Stream Table Entry (STE).
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-pkvm-init.c b/driv=
+ers/iommu/arm/arm-smmu-v3/arm-smmu-v3-pkvm-init.c
+> new file mode 100644
+> index 0000000000000..5c5f0ff455e3b
+> --- /dev/null
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-pkvm-init.c
 
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.c b/drive=
-rs/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.c
-> index 01f23fce6be50..3562bb222f53e 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.c
 [ ... ]
-> @@ -443,6 +443,60 @@ static int smmu_init_cmdq(struct hyp_arm_smmu_v3_dev=
-ice *smmu)
-> +static int smmu_attach_stage_2(struct hyp_arm_smmu_v3_device *smmu,
-> +			       struct arm_smmu_ste *ste)
+
+> +static int __init kvm_arm_smmu_v3_register(void)
 > +{
-[ ... ]
-> +	/* S2 is not advertised, that should never be attempted. */
-> +	if ((cfg =3D=3D STRTAB_STE_0_CFG_S2_TRANS) ||
-> +	    (cfg =3D=3D STRTAB_STE_0_CFG_NESTED))
-> +		return -EINVAL;
+> +	size_t nr_pages =3D smmu_hyp_pgt_pages();
+> +	int ret;
+> +
+> +	if (!is_protected_kvm_enabled() || !nr_pages)
+> +		return 0;
+> +
+> +	ret =3D kvm_arm_smmu_array_alloc();
+> +	if (ret)
+> +		goto out_err;
+> +
+> +	ret =3D platform_driver_probe(&smmuv3_nesting_driver, smmuv3_nesting_pr=
+obe);
+> +	if (ret)
+> +		goto out_free;
+> +
+> +	ret =3D pkvm_iommu_register_driver(&kvm_nvhe_sym(smmu_ops), nr_pages);
+> +	if (ret)
+> +		goto out_unregister;
+> +
+> +	/*
+> +	 * These variables are stored in the nVHE image, and won't be accessible
+> +	 * after KVM initialization. Ownership of kvm_arm_smmu_array will be
+> +	 * transferred to the hypervisor as well.
+> +	 */
+> +	kvm_hyp_arm_smmu_v3_smmus =3D kvm_arm_smmu_array;
+> +	kvm_hyp_arm_smmu_v3_count =3D kvm_arm_smmu_cur;
+> +	return ret;
+> +
+> +out_unregister:
+> +	platform_driver_unregister(&smmuv3_nesting_driver);
 
 [Severity: Critical]
-Can this error return lead to a hypervisor panic?
+Does this fail-open behavior bypass pKVM DMA isolation?
 
-When smmu_attach_stage_2() returns -EINVAL, the error propagates to
-smmu_filter_command(), which evaluates it and returns true to indicate
-the command should be skipped.
+If an SMMU is rejected by smmuv3_nesting_probe() (e.g. due to Cavium errata
+or unaligned MMIO), or if pkvm_iommu_register_driver() fails, the affected
+SMMU devices are left unbound or the nesting driver is unregistered.
 
-The preexisting caller smmu_emulate_cmdq_insert() then processes this
-skip condition using WARN_ON:
+Later, the native arm_smmu_driver is registered unconditionally in
+arm-smmu-v3.c and will successfully bind to these unbound SMMU devices.
+Since the hypervisor wasn't given the MMIO regions for the skipped SMMUs,
+it does not enforce stage-2 trapping on them. The host EL1 could then
+program these native SMMUs to perform unrestricted DMA into pKVM-protected
+guest or hypervisor memory, compromising protected VMs.
 
-smmu_emulate_cmdq_insert() {
-    ...
-    skip =3D smmu_filter_command(smmu, cmd);
-    if (WARN_ON(skip))
-        continue;
-}
-
-At EL2 under pKVM, WARN_ON expands to a fatal breakpoint. Since the host
-can supply an invalid STE configuration that triggers this -EINVAL, could
-this allow the host to maliciously crash the hypervisor?
-
-Similarly, allocating the L2 table in smmu_reshadow_ste() can fail and
-return -ENOMEM, which also propagates into this same fatal WARN_ON path
-during an out-of-memory event.
-
-[ ... ]
-> +static void smmu_ste_writer_sync_entry(struct arm_smmu_entry_writer *wri=
-ter)
-> +{
-> +	struct smmu_ste_writer *ste_writer =3D
-> +		container_of(writer, struct smmu_ste_writer, writer);
-> +	struct arm_smmu_cmd cfgi_cmd =3D arm_smmu_make_cmd_cfgi_ste(ste_writer-=
->sid, true);
-> +
-> +	WARN_ON(smmu_send_cmd(ste_writer->smmu, &cfgi_cmd));
+> +out_free:
+> +	kvm_arm_smmu_array_free();
+> +out_err:
+> +	kvm_arm_smmu_count =3D 0;
+> +	kvm_arm_smmu_array =3D NULL;
+> +	return ret;
 > +}
+> +
+> +static int __init smmu_create_aux_device(struct device *dev, void *data)
+> +{
+> +	static int dev_id;
+> +	struct auxiliary_device *auxdev;
+> +
+> +	auxdev =3D __devm_auxiliary_device_create(dev, "protected_kvm",
+> +						"smmu_v3_emu", NULL, dev_id++);
+> +	if (!auxdev)
+> +		return -ENODEV;
+> +	return 0;
+> +}
+> +
+> +static int __init kvm_arm_smmu_v3_post_init(void)
+> +{
+> +	if (!kvm_arm_smmu_count)
+> +		return 0;
+> +
+> +	/*
+> +	 * If KVM failed to initialise, the host stage-2 is never enabled and
+> +	 * the SMMUs are driven natively through the same path.
+> +	 */
+> +	WARN_ON(driver_for_each_device(&smmuv3_nesting_driver.driver, NULL,
+> +				       NULL, smmu_create_aux_device));
 
 [Severity: Medium]
-Is it safe to use WARN_ON for hardware interactions that might time out?
+Does this halt initialization for all remaining SMMUs if one fails?
 
-If the SMMU command queue is full and smmu_send_cmd() times out waiting
-for it to drain, it will return -ETIMEDOUT. Because WARN_ON is fatal at
-EL2 under pKVM, this transforms a transient hardware latency or a heavy
-command load into a hypervisor panic.
+In kvm_arm_smmu_v3_post_init(), driver_for_each_device() iterates over all
+bound SMMUs. If smmu_create_aux_device() fails (e.g. due to an ID collision
+or memory allocation failure in __devm_auxiliary_device_create()), it
+returns -ENODEV.
+
+The core driver_for_each_device() function halts iteration and returns
+immediately upon receiving a non-zero value. Consequently, if a single SMMU
+fails aux device creation, all subsequent SMMUs are silently skipped. These
+skipped SMMUs won't be probed by the host's arm_smmu_driver_emu, breaking
+DMA translation for any peripherals behind them.
+
+Should the callback log the error and return 0 to allow the remaining
+devices to initialize?
+
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/=
+arm/arm-smmu-v3/arm-smmu-v3.c
+> index c2ec33c763a0f..66f38c54742b8 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+
+[ ... ]
+
+> +static int arm_smmu_device_probe_emu(struct auxiliary_device *auxdev,
+> +				     const struct auxiliary_device_id *id)
+> +{
+> +	struct device *parent =3D auxdev->dev.parent;
+> +	void *group;
+> +	int ret;
+> +
+> +	dev_info(&auxdev->dev, "Probing from %s\n", dev_name(parent));
+> +	group =3D devres_open_group(parent, NULL, GFP_KERNEL);
+> +	if (!group)
+> +		return -ENOMEM;
+> +
+> +	ret =3D arm_smmu_device_probe(to_platform_device(parent));
+> +	if (ret)
+> +		devres_release_group(parent, group);
+> +	else
+> +		devres_close_group(parent, group);
+> +	return ret;
+> +}
+> +
+> +static void arm_smmu_device_remove_emu(struct auxiliary_device *auxdev)
+> +{
+> +	arm_smmu_device_remove(to_platform_device(auxdev->dev.parent));
+> +}
+
+[Severity: High]
+Can this lead to a use-after-free of the smmu struct due to devres LIFO
+inversion during a deferred probe retry?
+
+If arm_smmu_device_probe() returns -EPROBE_DEFER (e.g. from
+iommu_device_register() -> bus_iommu_probe() -> probe_iommu_group()),
+arm_smmu_device_probe_emu() correctly cleans up and returns the error,
+causing the auxiliary bus to defer the probe.
+
+However, __devm_auxiliary_device_create() has already proceeded to register
+the auxiliary_device_destroy action on the parent's devres list. Later,
+when the deferred probe retries and succeeds, arm_smmu_device_probe()
+allocates the smmu struct via devm_kzalloc() and attaches it to the parent's
+devres list *after* the destroy action.
+
+On parent platform device removal (e.g. via device tree overlay removal or
+system teardown), devres_release_all(parent) destroys devres actions in LIFO
+order. It first frees the smmu struct, and subsequently executes
+auxiliary_device_destroy. This unregisters the aux device and triggers
+arm_smmu_device_remove_emu(), which then dereferences the freed smmu pointe=
+r.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261015200903.2735=
-565-1-smostafa@google.com?part=3D24
+565-1-smostafa@google.com?part=3D11
