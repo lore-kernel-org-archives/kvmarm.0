@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60574322B8F;
-	Thu, 15 Oct 2026 10:05:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD944CDA36;
+	Thu, 15 Oct 2026 10:05:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792058747; cv=none; b=XSueKnDTO+dwjyK60CpNDVbUlQztvsJ+ujNw4bLO8A7l220V1uj3muGwlWC+dLDqM8rYImJCZReODQOlWIqZBqrlRoziYA3DHmKeEnc80IdOsPvwB6MavhZbQlFGcmGjs6UaIC8JzR2ECz/UK3Fs8H20UHmQm1AMTosGs7dPS2o=
+	t=1792058747; cv=none; b=TrKMoo7UyLln1EHE6z6E/cJToYR8vO0ZQdHiXmqz2FcVWfsDBQiBiuZpmyAx+VFLm7d6/3J/Nrj+TUEG3vSAi4s66GuCfWMRwTfw9uWGAy//0uAdPSKMtMftjno5rFx+TBkrPWGuZitCZvngAMhc3dXyUJ8O/IwmizgPAmxZLDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1792058747; c=relaxed/simple;
-	bh=LRyXDXTk18yqvndTX+/Cf5vGdy+ecsAsartgfGzJMj0=;
+	bh=XemyTu1guX1fO0MNgohfpd9YNpsa60jN6nTSeQ4pGMc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Idb4CelVnEIpb1/GcjzAudAW0R3EPM682crwVNzpjR8FX5E4qhJbYnERW2nZsN2mrZfdjTeXKE9pJt2ETvi5bAIoytKAEVUkm4vJ1LwmurC7A8NtHWjKvL/FJYz2y6on1IUwDH0pr9OdVdFobucQCa1oNnE2sjrfp+8t4F/JAcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lqAEQlof; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=u353Q2I52KAzJ2j5YwDXf9RwikSRumXoky44ozW3Qtvd4GLZWBohcP2nPdmCkRaA56AWzjkqROMzU78eouZM+tVf6dobyGtLTF9nHXsJTqHmlYAdEOpNOmFXItbGal5+QfXnrlNir633W//x4KP7534nAHhX4GETBAr3UQsvRJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O4J8jMkN; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lqAEQlof"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 390331F000C9;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O4J8jMkN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6233E1F000CA;
 	Thu, 15 Oct 2026 10:05:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1792058745;
-	bh=fiYCoGfxF/sEN4RR6BPaqmGuVUMacc4v1BdUKp8vTiI=;
+	bh=KhijomrVgpU5nlp7P5LehWDg9luMd/07B0ez7SrB20I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=lqAEQlof0BlnIbCwBXdDiGvgJK/h/7d9tQ8vyOgn1hTrTa68063yah9loYvJG0OEG
-	 Q3S95gDgMn4vboFGzWtKXE0ltC6yV+OqygSwD2BuCfx8OYz8div3badrgqXBPofjcx
-	 xdUYhKFUxs3Z0yMVkobio4kfsmjE8I/zz/McORYhqIv8h7wXDiZrz+jUrmFmqYsiNM
-	 kT1qHuc706i05nCqyZ0Hsq+v6r1Ij9xGj6PLCt9+Gb5Xqinov+bKTsnrs0JEnW7JMh
-	 rUtamnClZJJv/K7Zu6w4Byn4j00YvAuR3ifrsvEY+YfY28I95ygHO6bF8pjO+CGXAm
-	 0qHIXpltLAtCw==
+	b=O4J8jMkN/oVXCbOwp54mOsV0gq8TVDrbE8CyHnpbT1373tcbyhO0qdtgSNSttkErz
+	 +AsUgx1ZbS6SZvjqt0GnqnmeoqgoFEhq2KfQfxA09/aZpsuRB+N2hRKlJy2qQR9MdN
+	 HBXlpDL9TjVzQ1PNycuaUJLM6L56v4gQWY7D7cJ8NBlC18oQxnd8o4obpPaQQPSGHF
+	 op9xPXefuVtdDs+Hno4f0NvY8ra3O2HxENN7YQTrZa82l0BQEX011sThQTNAbE/ivc
+	 dpYRE0c4L2WXE29sR1hIPASkdSBD2X8N0CnlWZu/eMJB2W58yv3hRtalh1aQs8hkQ7
+	 QNpAbXttgncEg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1xHILH-00000003EfK-1ntm;
+	id 1xHILH-00000003EfK-2jnd;
 	Thu, 15 Oct 2026 10:05:43 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -41,11 +41,10 @@ Cc: Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	stable@vger.kernel.org
-Subject: [PATCH 4/7] KVM: arm64: Turn vcpu->arch.pause into a counter
-Date: Thu, 15 Oct 2026 11:05:36 +0100
-Message-ID: <20261015100539.1011760-5-maz@kernel.org>
+	Fuad Tabba <fuad.tabba@linux.dev>
+Subject: [PATCH 5/7] KVM: arm64: Add helpers to halt a vCPU
+Date: Thu, 15 Oct 2026 11:05:37 +0100
+Message-ID: <20261015100539.1011760-6-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261015100539.1011760-1-maz@kernel.org>
 References: <20261015100539.1011760-1-maz@kernel.org>
@@ -57,116 +56,82 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We have situations where we can call kvm_arm_halt_guest() without
-holding config_lock, which means that halt and resume can overlap in
-funny ways when called from separate contexts, and result in situations
-where a vcpu is resumed while other parts of KVM assume it is halted.
-Consequences are left to the imagination of the reader.
+From: Oliver Upton <oupton@kernel.org>
 
-Fix this sorry situation by turning kvm_vcpu_arch::pause into an
-atomic counter, which makes the races described above harmless.
+Currently we pause the entire VM when modifying VGIC state that requires
+state to be synchronized back from hardware. This is perfectly fine for
+heavyweight operations but not ideal for 'simple' things like migrating
+an active/pending IRQ.
 
-Fixes: 3b92830ad41b2 ("KVM: arm/arm64: implement kvm_arm_[halt,resume]_guest")
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-Tested-by: Fuad Tabba < fuad.tabba@linux.dev>
+Add helpers for halting a single vCPU such that they can be used to
+manipulate the AP list remotely.
+
+Signed-off-by: Oliver Upton <oupton@kernel.org>
+Link: https://patch.msgid.link/20260929212925.31775-2-oupton@kernel.org
+[maz: fixed to use kvm_make_vcpus_request_mask(), guaranteeing that the
+      caller waits for the target vcpu to handle the IPI]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org
 ---
- arch/arm64/include/asm/kvm_host.h |  7 +++----
- arch/arm64/kvm/arm.c              | 21 ++++++++++++---------
- 2 files changed, 15 insertions(+), 13 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ arch/arm64/kvm/arm.c              | 21 +++++++++++++++++----
+ 2 files changed, 19 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index cd9b9d2462f96..9c068f27f9b8a 100644
+index 9c068f27f9b8a..7b4f7b6d94b8d 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -889,11 +889,10 @@ struct kvm_vcpu_arch {
- 	/*
- 	 * Don't run the guest (internal implementation need).
- 	 *
--	 * Contrary to the flags above, this is set/cleared outside of
--	 * a vcpu context, and thus cannot be mixed with the flags
--	 * themselves (or the flag accesses need to be made atomic).
-+	 * Contrary to the flags above, this is updated outside of
-+	 * a vcpu context, and thus cannot be mixed with the flags.
- 	 */
--	bool pause;
-+	atomic_t pause;
+@@ -1254,6 +1254,8 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
  
- 	/*
- 	 * We maintain more than a single set of debug registers to support
+ void kvm_arm_halt_guest(struct kvm *kvm);
+ void kvm_arm_resume_guest(struct kvm *kvm);
++void kvm_pause_vcpu(struct kvm_vcpu *vcpu);
++void kvm_resume_vcpu(struct kvm_vcpu *vcpu);
+ 
+ #define vcpu_has_run_once(vcpu)	(!!READ_ONCE((vcpu)->pid))
+ 
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 9956049e592ab..07bf8b2e683d5 100644
+index 07bf8b2e683d5..a2f1606822614 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -565,6 +565,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	kvm_arm_pvtime_vcpu_init(&vcpu->arch);
- 
- 	vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
-+	atomic_set(&vcpu->arch.pause, 0);
- 
- 	/*
- 	 * This vCPU may have been created after mpidr_data was initialized.
-@@ -839,6 +840,11 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
- 	return ret;
+@@ -1017,6 +1017,21 @@ bool kvm_arch_intc_initialized(struct kvm *kvm)
+ 	return vgic_initialized(kvm);
  }
  
-+static bool vcpu_can_run(struct kvm_vcpu *vcpu)
++void kvm_pause_vcpu(struct kvm_vcpu *vcpu)
 +{
-+	return !kvm_arm_vcpu_stopped(vcpu) && !atomic_read(&vcpu->arch.pause);
++	DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS) = { };
++
++	atomic_inc(&vcpu->arch.pause);
++	__set_bit(vcpu->vcpu_idx, vcpu_bitmap);
++	kvm_make_vcpus_request_mask(vcpu->kvm, KVM_REQ_SLEEP, vcpu_bitmap);
 +}
 +
- /**
-  * kvm_arch_vcpu_runnable - determine if the vcpu can be scheduled
-  * @v:		The VCPU pointer
-@@ -854,8 +860,7 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
- 		      (kvm_timer_should_notify_user(v) ||
- 		       kvm_pmu_should_notify_user(v)));
- 
--	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
--		&& !kvm_arm_vcpu_stopped(v) && !v->arch.pause);
-+	return ((irq_lines || kvm_vgic_vcpu_pending_irq(v)) && vcpu_can_run(v));
- }
- 
- bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
-@@ -1018,7 +1023,7 @@ void kvm_arm_halt_guest(struct kvm *kvm)
- 	struct kvm_vcpu *vcpu;
- 
- 	kvm_for_each_vcpu(i, vcpu, kvm)
--		vcpu->arch.pause = true;
-+		atomic_inc(&vcpu->arch.pause);
- 	kvm_make_all_cpus_request(kvm, KVM_REQ_SLEEP);
- }
- 
-@@ -1028,8 +1033,8 @@ void kvm_arm_resume_guest(struct kvm *kvm)
- 	struct kvm_vcpu *vcpu;
- 
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
--		vcpu->arch.pause = false;
--		__kvm_vcpu_wake_up(vcpu);
-+		if (atomic_dec_and_test(&vcpu->arch.pause))
-+			__kvm_vcpu_wake_up(vcpu);
- 	}
- }
- 
-@@ -1037,11 +1042,9 @@ static void kvm_vcpu_sleep(struct kvm_vcpu *vcpu)
++void kvm_resume_vcpu(struct kvm_vcpu *vcpu)
++{
++	if (atomic_dec_and_test(&vcpu->arch.pause))
++		__kvm_vcpu_wake_up(vcpu);
++}
++
+ void kvm_arm_halt_guest(struct kvm *kvm)
  {
- 	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
+ 	unsigned long i;
+@@ -1032,10 +1047,8 @@ void kvm_arm_resume_guest(struct kvm *kvm)
+ 	unsigned long i;
+ 	struct kvm_vcpu *vcpu;
  
--	rcuwait_wait_event(wait,
--			   (!kvm_arm_vcpu_stopped(vcpu)) && (!vcpu->arch.pause),
--			   TASK_INTERRUPTIBLE);
-+	rcuwait_wait_event(wait, vcpu_can_run(vcpu), TASK_INTERRUPTIBLE);
+-	kvm_for_each_vcpu(i, vcpu, kvm) {
+-		if (atomic_dec_and_test(&vcpu->arch.pause))
+-			__kvm_vcpu_wake_up(vcpu);
+-	}
++	kvm_for_each_vcpu(i, vcpu, kvm)
++		kvm_resume_vcpu(vcpu);
+ }
  
--	if (kvm_arm_vcpu_stopped(vcpu) || vcpu->arch.pause) {
-+	if (!vcpu_can_run(vcpu)) {
- 		/* Awaken to handle a signal, request we sleep again later. */
- 		kvm_make_request(KVM_REQ_SLEEP, vcpu);
- 	}
+ static void kvm_vcpu_sleep(struct kvm_vcpu *vcpu)
 -- 
 2.47.3
 
