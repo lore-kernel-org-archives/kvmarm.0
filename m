@@ -1,87 +1,109 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC27E4F799E;
-	Thu, 15 Oct 2026 10:16:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6612D503BD8;
+	Thu, 15 Oct 2026 10:18:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792059385; cv=none; b=EokkxL5ImtbVPn7HSWthmMy+3hTCVMViILyhqg24i7yLDHAPxpCatvRHbUXfiC2yagnKFbNo0ms9aSK0bKXgBhwmtHZ0fv13uwF9wG4UTUEH/F0re/HjeIPs/4WYyLg3Xy2PPjNUFlQDpBGD/NItuzQhmZoBJeVc86yFrhmqA4A=
+	t=1792059540; cv=none; b=u1BsyKK2kyWBe2+RQu4jgqNTErCQe2O+Xqa4FQO5Tfs+K1t2f14cum7y+3EuLpigMzd93HsuZDOtzVpO3bmhPmv1gZkGJCL8rqw2gOwWu3DQqptAJc3FNp2tTeeGni1DOou4/3YZLzBhxRZwQs/P93mzgujmHYU1jIMPUsjWlsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792059385; c=relaxed/simple;
-	bh=4ceMpPHG/axm7Sg/O1PX8NmO2dqKW+WVLDUlpY56jf8=;
-	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=p4mDmsSsA89iQwt8s46cJXE3V63TwnIn42qLv6BFVJLovDCi//nZJ/y4fZHAUpL7PFXP1c/d8hYJFr4gbMOeqyhebPfPwkj+4mQoH3l53bQb4JPyrCFmt0Et0BJOHPIgRuPbjvuiE0QSNOknP/duFswZnc3pXsVWOYc8awS2Dmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XiDZc059; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792059540; c=relaxed/simple;
+	bh=x6Sjd/6VE5z2YcZm0ZBJj+zhxJGkWseChFlyjuH13jw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ExJuM18hafvc1Dn/nNsIgp/MfQMaHZNinW4/QlrERodsvvcmf7IKrkBMUnqyQNH1HLDqZLs9Y5YKgykdKz6OvplGxHumRp/PiqU2xa0hU72jUrz3UzDUNPYkmL79FRMUVbZIXhht39q63QlouucX+k5FwvrXe+5k51GN6AC4ALw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MpnGkmxH; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XiDZc059"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3ADDF1F000C6;
-	Thu, 15 Oct 2026 10:16:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MpnGkmxH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF0C41F000C4;
+	Thu, 15 Oct 2026 10:18:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792059384;
-	bh=qYkTEoKAJ0Rc6lX1Wr/y466XfQVk2zZsukTT702hnfY=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=XiDZc059Nik5E+eH+24irr0rDp6BD4cPOhHOaQE/o3ABMWicLeO9KZbafHLi2IXWm
-	 Es4umXqP51PiKmGRv82zNXb0z/kvYFdMxI4s5eolI3vgvn8VE1Uo/hgUJAMLosZHzj
-	 SZm/C/vSzrtAAW0SNdKvSF8MXvYIogcCdehkJ3T6QGVMWs9vFmBUWd7AgnfMh1rtmm
-	 AcN77lBxKZRULfmqUfTFnAbIhIcSInFWh44gkWsnjuhAH6LStndh40fH1etnZQ38Pp
-	 TroVZMdMIEjiSz4HskYEqO9PCmgMtOmTC0Tl2wnRRRsi3xUgs4Acys0L42sDJF+gqg
-	 nqvVky2vBIX5w==
-Message-ID: <sashiko-outbox-172647@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 1/7] KVM: arm64: nv: Move L2->L1 switch on interrupt
- early
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Marc Zyngier" <maz@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Cc: "Oliver Upton" <oupton@kernel.org>
-In-Reply-To: <20261015100539.1011760-2-maz@kernel.org>
-References: <20261015100539.1011760-1-maz@kernel.org>
- <20261015100539.1011760-2-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Oct 2026 10:16:23 +0000
+	s=k20260515; t=1792059538;
+	bh=wXfvrGncNECkYTGee+Xy6oBurWJxQFEpKp2Ltg0dPzk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=MpnGkmxHZkPrQydu5m9eU/fvlFcJoj/Jewcl0WmzJ9zb4P4/nrWI8ftsb2Cnmtg2L
+	 oY872VoK2af/mtlxfuaFymeLbGnykBKUpDb5ul0midByw5M5BroAvJySGaWBDlp+e4
+	 u616cXq2LOgO9V5Tld5Ynf0k/AhrBrzOLpjRl7NI0irXcFeivbZlia0d/mqEwyx08o
+	 RGN3ZIqBbue6WppNW/ax7LkTs5FsVGKSovb9QRW+4UIPyOl4TK+sR5MwtZ6R9Y0xyk
+	 26jpXrK5Ny92JIiXWj7CCe4YIuYaCY7yR4xgPOFvOaci8F+b5LQXXF1dt4LX5VLgKX
+	 9c/qkcaXfFNrg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xHIY4-00000003F8l-2vNR;
+	Thu, 15 Oct 2026 10:18:56 +0000
+Date: Thu, 15 Oct 2026 11:18:56 +0100
+Message-ID: <86o6cv1d2n.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Thomas Gleixner <tglx@kernel.org>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>,
+	Oliver
+ Upton <oupton@kernel.org>,
+	Eric Auger <eauger@redhat.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen
+ Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Sascha
+ Bischoff <Sascha.Bischoff@arm.com>,
+	Sebastian Ene
+ <sebastianene@google.com>,
+	Yuan Yao <yaoyuan@linux.alibaba.com>,
+	Fuad
+ Tabba <tabba@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 0/4] irqchip/gic-v4, KVM: arm64: Fix the vgic init error paths
+In-Reply-To: <87wlrje2cx.ffs@fw13>
+References: <20260921072958.2918477-1-fuad.tabba@linux.dev>
+	<87wlrje2cx.ffs@fw13>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tglx@kernel.org, fuad.tabba@linux.dev, oupton@kernel.org, eauger@redhat.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, Sascha.Bischoff@arm.com, sebastianene@google.com, yaoyuan@linux.alibaba.com, tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Low] kvm: Outdated comment block in kvm_vgic_flush_hwstate()
---
+On Thu, 15 Oct 2026 10:31:58 +0100,
+Thomas Gleixner <tglx@kernel.org> wrote:
+> 
+> On Mon, Sep 21 2026 at 08:29, Fuad Tabba wrote:
+> > Hi folks,
+> >
+> > Changes since v2 [1]:
+> >   - Patch 3: a vgic_v4_init() failure now frees only the SPI array,
+> >     since that function unwinds its own state; the teardown label is
+> >     for the routing failure. (Yuan Yao)
+> >   - Rebased on kvmarm/next, where the routing failure already tears
+> >     down the GICv5 state. Patch 3 moves that into the shared label, so
+> >     the SPI array is freed on that path too.
+> >   - Collected Reviewed-by from Yuan Yao on patches 1 and 2. (thanks!)
+> >
+> > Four fixes on the paths that run when vgic init fails partway. Each one
+> > needs an allocation failure to reach.
+> 
+> Marc?
 
-commit 8603da24ffa95dd560817192077ee16c16570bf2
-Author: Marc Zyngier <maz@kernel.org>
+I was about to say that I had already queued that, except that it
+appears it only happened in my head, and nowhere else... :-(
 
-KVM: arm64: nv: Move L2->L1 switch on interrupt early
+If that's OK with you, I'll queue (for real!) the whole thing via the
+kvmarm tree, targeting 7.4-rc1.
 
-This commit moves the nested request generation for L2->L1 switch on
-interrupt and the maintenance interrupt (MI) generation to earlier in
-the vCPU entry sequence.
+Thanks,
 
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index b25303d9919fd..1748e7758681b 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -1141,7 +1141,7 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
-[ ... ]
->  	 * - Otherwise, do exactly *NOTHING* apart from enabling the virtual
->  	 *   CPU interface. The guest state is already loaded, and we can
->  	 *   carry on with running it.
->  	 *
->  	 * If we have NV, but are not in a nested state, compute the
->  	 * maintenance interrupt state, as it may fire.
->  	 */
->  	if (vgic_state_is_nested(vcpu)) {
+	M.
 
-[Severity: Low]
-This isn't a bug, but should this comment block in kvm_vgic_flush_hwstate()
-be updated?
-
-The patch moves the execution of vgic_v3_nested_update_mi() to
-kvm_nested_flush_hwstate(), so the note about computing the maintenance
-interrupt state here appears to be outdated now.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261015100539.1011=
-760-1-maz@kernel.org?part=3D1
+-- 
+Without deviation from the norm, progress is not possible.
