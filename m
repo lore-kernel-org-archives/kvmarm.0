@@ -1,139 +1,173 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557F4525A94
-	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 14:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F184849CF54;
+	Thu, 15 Oct 2026 14:09:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792073154; cv=none; b=cmbNF5M+4q2uvFKTF3AlY2ltPv+9N1vxqmOcZepjRUCDy3Ib+SvyGSkKww1ValFL/WA/fC6kTP11C/mskXW9KGnJda8N7B7AzuJuiL7+hHYSVophXsEy9RIWvhbmnM8/rt0H4rKFY0iJEQ1r4NNrsXl+vXCWNSYZYHShcM0e8is=
+	t=1792073375; cv=none; b=EW1LrqjgYkAbCb6MtT8lm/H5CuZwFDLF+CcLjfRi6e5/F7UZxVfD2SPPTVuNs/sUgQ4GPIkKTT4bBR8XtTqjeuc9YDOy3qsjWnukCI1+tkcfKiVt8ZSYfRbzgU4M6wi+uuGrgbfUfMVf+V6qVlTi3jJBTjA+kNu3RIsFR8QhzEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792073154; c=relaxed/simple;
-	bh=iRB8iNw/SDzXnV4puovDYxc4Klg6ae2JqBfiV4+yGyM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z67BwrdA2YssXTC/ykuECgV/mhoXDbK9EK4I38bCIbqzOZOs78EIOe1u5z8NNE/4o5WYWbKLdkboN4tP3KbfCdL7Jbt2xjHfrheAR8/0W2QEHo0+IpCqOwvywGPdn3qA5+kRR1JM8jrlBw0U4mmyb2lgGE9nQaG+ti+Cz6JaajI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c0A7q4Iw; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1792073375; c=relaxed/simple;
+	bh=F43T2h7luc9hlO61Z8r3rxY3D2qU9IwwZ5rfSOveO9M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y6D+CFCsp3LezDYczg7EK5wtMTL7BMrl4SGmPDUhsys2kTU5grJ698f3u4gpq+DiXXR0bgoUwb+DPqbGhKGmbgGggQ+rK1wJ4UJzwJeECFISIjDBpMgiVIqDHbpjLAuHcpdqJjHuV2UokgayHGGt8FOpaK04o29UdxL/onXbDlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=thZIntwS; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c0A7q4Iw"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1792073152;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ro4VReCJbMXDDulID/D345/NuyZnyk0gEdYTf6PdAuE=;
-	b=c0A7q4Iwnd5g8WK4cXCehaUphka/QnRnsdawUGG1gXcBmLG9PkOb8w/v2qNsVIbpQCFL9G
-	qiK2iP7cc/HxpJSdj12yb8U8p/C+G7cLrsbnjil8RS5GlRra80Ku2e3We4iBWP2XUaPfZ6
-	cm+dK6cjis1QFgMbMyI1Dm7RD5JGHSk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-330-CC_MBDVDN2mgZb9z98Zchg-1; Thu, 15 Oct 2026 14:05:51 +0000
-X-MC-Unique: CC_MBDVDN2mgZb9z98Zchg-1
-X-Mimecast-MFC-AGG-ID: CC_MBDVDN2mgZb9z98Zchg_1792073150
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-49cdc4080ddso41483075e9.1
-        for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 07:05:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792073150; x=1792677950;
-        h=content-transfer-encoding:content-type:in-reply-to:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Ro4VReCJbMXDDulID/D345/NuyZnyk0gEdYTf6PdAuE=;
-        b=A3M3FDk1OZeFnD5eHy7w4cOLXLCc0Vc9gUNlpZ/qhEHfZlYzjLDwg53oiy08FNEKOk
-         kiEjGDlbilOl0Bdu0P4rPmTKynVMyy1UElNGI4RzTJBwwtsJnHFpRWxv1naziqmG3QmH
-         pnQ5w6ryPSy8avEKdVbsedITMSjH5jkIebDVK9DztI2VxCyDyUd2z/WZ8vwkW5CCKkyv
-         iLV3NSAR4dCjn4DtYoC9jS7jRinLhfc/jYhZDgYRR9pGupnVCkW2mdSwuOShHyWce2Yg
-         U6TqGhp153dybadHrPPn6M5WUVOC8jzSqFCOBSY3es6/uoFYXtfoyGxcSNEVPvA7Mion
-         H/9Q==
-X-Forwarded-Encrypted: i=1; AKwUvBwGKqJ/NEqKw4k94w9B0dfJ36i+QC/ycsaSI5QduFOHgSEzrRV8cjWacov0y3A70xYdraeeTNQ=@lists.linux.dev
-X-Gm-Message-State: AFq9FYKKZGRTBYBq7OY7sWBRQcPiQFKrEvLGA/0GMWIo6+ciKJbWenzZ
-	nvsgs/EyEhMq8PtjMkzmjGB8dE8KPecx7fWv1ktmsKhgKH9PDnP18Li6UVCpCJUzRhSm3LNPWfv
-	ydIdvRcuLy9ejHhfCFb6UZv+wML/RcllhB/MADiDkZLrG1ilwZxvmoQ0Ulw==
-X-Gm-Gg: AYBFou132e9kURLYve+pfRuL/Hnsu4OOjYz8bySNMNA+rbeMKEAsYiw2i8zyTELuim/
-	fuLfXzmsLiShax2b1QKeNf7rF4GukeIjuL1NHzDRq4glBr7VKLRGDWIhdg9W3F1jwJtrhr+vJIa
-	sUt54uJg/G7djHKsMYZworheb/oAjFlF0mg1FGQ+lxwuqQAL4eSlZ5yUXASlahJ58UQgOVUYOFZ
-	tZ4oGCpt4X3WhktOkMsyiHyWKMDnmSck03sTLcbDRBdnjo01vMeSeNPKz727OBeRNT2Vqi0cr/h
-	85+oOjenLFgHTEz/nUuDc905K4j8Q1hvLibZ8X0+c4xxV4b4F/pgNUaIA/qKxwlrUD4B15uQsgN
-	s3Mj+qO0Ruyxj84OfzEIhZV/H79SfiH1aTyjqw2U1k7Yidros
-X-Received: by 2002:a05:600c:2154:b0:4a1:ac66:604b with SMTP id 5b1f17b1804b1-4a1c6635d20mr2234375e9.1.1792073148398;
-        Thu, 15 Oct 2026 07:05:48 -0700 (PDT)
-X-Received: by 2002:a05:600c:2154:b0:4a1:ac66:604b with SMTP id 5b1f17b1804b1-4a1c6635d20mr2233835e9.1.1792073147927;
-        Thu, 15 Oct 2026 07:05:47 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1bd6428b3sm67859615e9.1.2026.10.15.07.05.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Oct 2026 07:05:47 -0700 (PDT)
-Message-ID: <a1245318-1843-45c8-9822-bea483a3e660@redhat.com>
-Date: Thu, 15 Oct 2026 16:05:45 +0200
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="thZIntwS"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69F9kJvr668033;
+	Thu, 15 Oct 2026 14:09:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=zfy9vemsVssNeNXQlK9X7cjZ8WVP1J
+	7iteS8xAupKCQ=; b=thZIntwSLRTriE0bVuDEjL/vTOOn2Q266mk/QKhBKGDNda
+	+1VbGbkC3byvYJcCVSuVQqOvxtoHXinHLAT8zceMdv8lg/RmtXa5ZwDlvew7D6Nj
+	AAThSy6kvu/sJzb9aXj3s4QRziWZpZroAYaV7lyX8awcVmlzyTV7gqcRjNZDHCOo
+	CXyT3vD8KOfxXVF1eK04RpiuVpXVDSAbbUqIJ/1aYbuIvC5VMnI+9H5t/dxf6Tvu
+	quQSb66pSzNI0qTpVpfRMVpRe8N3+w/vKQUV4Zf2EtBD53GK1+89UFF5WftIx3/b
+	ePN862znLkgY1vctlpyj/kGHeIdN4/ZVj6J65maA==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4h7dugtcgj-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 15 Oct 2026 14:09:13 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 69FE1CJC1929675;
+	Thu, 15 Oct 2026 14:09:12 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4h9pb3t30u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 15 Oct 2026 14:09:12 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 69FE9Axf39453026
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 15 Oct 2026 14:09:10 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9C4282004B;
+	Thu, 15 Oct 2026 14:09:10 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6863320043;
+	Thu, 15 Oct 2026 14:09:10 +0000 (GMT)
+Received: from osiris (unknown [9.224.76.185])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu, 15 Oct 2026 14:09:10 +0000 (GMT)
+Date: Thu, 15 Oct 2026 16:09:09 +0200
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, Mark Brown <broonie@kernel.org>,
+        Fuad Tabba <tabba@google.com>, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/4] arm64: sysreg: Mark fields the architecture dropped
+ as RES0
+Message-ID: <20261015140909.1310928-B-seiden@linux.ibm.com>
+References: <20261013130247.4135515-4-fuad.tabba@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [RFC PATCH v4 14/25] target/arm: add neoverse-v2-v2 named CPU
- model
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Khushit Shah <khushit.shah@nutanix.com>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, kvmarm@lists.linux.dev, cohuck@redhat.com,
- richard.henderson@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
- berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
- gshan@redhat.com, skolothumtho@nvidia.com, sebott@redhat.com,
- armbru@redhat.com, philmd@linaro.org, yangjinqian1@huawei.com,
- shaju.abraham@nutanix.com, mark.caveayland@nutanix.com,
- ping@khushitshah.com, sandesh.patel@nutanix.com
-References: <20260921123249.1708067-1-khushit.shah@nutanix.com>
- <20260921123249.1708067-15-khushit.shah@nutanix.com>
- <395b66c9-4173-401b-b469-8972b710aae2@redhat.com>
- <CAFEAcA8DcLLYJeE_NUKrFTKfYvHp+6YYAmCdZnBfz2AjRNDnzw@mail.gmail.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <CAFEAcA8DcLLYJeE_NUKrFTKfYvHp+6YYAmCdZnBfz2AjRNDnzw@mail.gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: aRi29qkPb-kpeDNg0LyartsFwtsBx72wqezxTtljTcI_1792073150
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261013130247.4135515-4-fuad.tabba@linux.dev>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=Cr0q4X4D c=1 sm=1 tr=0 ts=6ad0de89 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=kj9zAlcOel0A:10 a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
+ a=w5e04ufaKOuyffdHz6kA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-GUID: WOB7SUQw6dbnOqShCuje0_HJogeFUsiG
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDE1MDA1NCBTYWx0ZWRfX/slBZRzzKrCc
+ qkWsuFFdcn3K3qG4AY/SLBJ2yKzghsQ8Nvcvfv5XgLLbI3DwOrac5I6jAysw+w6oY92VgNsFvYT
+ KzCTLymCaJMYUAmXRfJ5HUcXkO0+5KB3B4N9B/LWt+Uv0DW6LOB8zvm0Kx95qajntk0PYyDwp6+
+ iiwXwGUQ4Vg98obDt/ZusYE86ZiQ7AJuyAR1lsf/uHFNztF6ktfzz8/MsUnS9090NXLPQJMgfi2
+ AB1Nc57qGgtswwbX5FUpsuR8srOj3qB7ElW3/DEbY6GWugkNMDJ1OPRut6CxQVQfSPsMseQKpPP
+ UwndLFhhBvTc/KMSsjjpORuYwwYpZHbt6H+GK37CgLVjCU8voewYx3uSX6BYbidymQAmY6o3fCL
+ iMMYxUs+42KHgSxRe3fsvqsx28uGFl/pjoflxGR/I5qFTBNyQVnM7v5b0dK0s/9vNfJX9WwH6bv
+ U6AtSif3KkjrvMnzQiQ==
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDE1MDA1NCBTYWx0ZWRfX6dv9X+DNYoAP
+ tnIwkFTQgKEUG1Vt50i4zyh1MlmE1652CEyQtEvQ8aPoMdDOIXoM7yXNiq6JiYXKz+YTbFeMQpr
+ ZqpHzjXheO40ysrgZ2j4MyNytLOKiuc=
+X-Proofpoint-ORIG-GUID: wpWH6tnocVE3X2SwIAMSgGqzHAI2880y
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-10-14_01,2026-10-14_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 spamscore=0 adultscore=0 priorityscore=1501 suspectscore=0
+ malwarescore=0 clxscore=1011 impostorscore=0 lowpriorityscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2610080000 definitions=main-2610150054
 
+On Tue, Oct 13, 2026 at 02:02:46PM +0100, Fuad Tabba wrote:
+> Commit d65bf6e317e7 ("KVM: arm64: Remove all traces of FEAT_TME")
+> turned the TME fields of SCTLR_EL1 into RES0, but left their copies in
+> SCTLRMASK_EL1. PMICFILTR_EL0.T and BRBFCR_EL1.LASTFAILED have gone from
+> the architecture as well. All six fields are RES0 in DDI0601 2026-09.
+> 
+> Mark them RES0 to match the spec. Nothing in the tree refers to them.
+> 
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 
+Verified values with DDI0601 2026-09.
 
-On 10/15/26 2:22 PM, Peter Maydell wrote:
-> On Thu, 15 Oct 2026 at 13:13, Eric Auger <eric.auger@redhat.com> wrote:
->> Hi Khushit,
->>
->> On 9/21/26 2:32 PM, Khushit Shah wrote:
->>> Add a KVM-only named CPU model for Neoverse V2 r0p1 (TRM 102375),
->>> inheriting from neoverse-v2-v1 (r0p0).
->>>
->>> r0p1 only changes MIDR_EL1.Revision and adds FEAT_ECBHB
->>> (ID_AA64MMFR1_EL1.ECBHB).
->>>  static const ArmNamedCpuModel arm_cpu_models[] = {
->>>      {"arm-v9.0-a-v1", NULL, arm_v9_0_a_v1_props},
->>>      {"neoverse-v2-v1", "arm-v9.0-a-v1", neoverse_v2_v1_props},
->>> +    {"neoverse-v2-v2", "neoverse-v2-v1", neoverse_v2_v2_props},
->> nit I would call it directly neoverse-v2-r0p1 and leave the -v<n> suffix
->> for potential fixes. Same for r0p0 obviously.
-> I'm not very enthusiastic about accumulating different CPU models
-> for all the different rXpY variations that appear. We used to have
-> a ton of basically identical pxa720 variants and I was glad to be
-> able to drop those when we deprecated-and-dropped the pxa support.
->
-> Is any user actually going to care about the difference between
-> r0p0 and r0p1 ? In particular pX changes are just hardware
-> bugfixes that QEMU was unlikely to be modelling in the first place.
-I do agree. In terms of ID reg, there is very little difference between
-both. Modeling a single one may be sufficient
+While checking I noticed that Bit 58 of PMICFILTR_EL0 is also defined as
+RES0 in DDI0601 2026-09 but is defined as SYNC in tools/sysreg. Not sure
+if this demands a separate patch or can be folded into this one as you
+already are touching this reg. This field is unused as well.
 
-Thanks
+Anyways, 
 
-Eric
->
-> thanks
-> -- PMM
->
+Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
 
+Steffen
+
+> ---
+>  arch/arm64/tools/sysreg | 11 +++--------
+>  1 file changed, 3 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index 341db8e9b6c37..99af1c39478be 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -1420,8 +1420,7 @@ Field	17	DIRECT
+>  Field	16	EnI
+>  Res0	15:8
+>  Field	7	PAUSED
+> -Field	6	LASTFAILED
+> -Res0	5:0
+> +Res0	6:0
+>  EndSysreg
+>  
+>  Sysreg	BRBTS_EL1	2	1	9	0	2
+> @@ -2663,11 +2662,7 @@ Field	57	EPAN
+>  Field	56	EnALS
+>  Field	55	EnAS0
+>  Field	54	EnASR
+> -Field	53	TME
+> -Field	52	TME0
+> -Field	51	TMT
+> -Field	50	TMT0
+> -Res0	49:47
+> +Res0	53:47
+>  Field	46	TWEDEL
+>  Field	45	TWEDEn
+>  Field	44	DSSBS
+> @@ -2985,7 +2980,7 @@ Field	27	NSH
+>  Field	26	M
+>  Res0	25
+>  Field	24	SH
+> -Field	23	T
+> +Res0	23
+>  Field	22	RLK
+>  Field	21	RLU
+>  Field	20	RLH
+> -- 
+> 2.39.5
+> 
