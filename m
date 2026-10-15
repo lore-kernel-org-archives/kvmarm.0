@@ -1,221 +1,309 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8878B26D4CA
-	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 12:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64084525A90;
+	Thu, 15 Oct 2026 12:21:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792066396; cv=none; b=BVKI6P5q2Uv6LImZTMks24e50Il6RRp+8lGcnXoXNUhC/PHw9rfygqYU90cDQF2r1TOp0jpZvUWim/7HUJeGZy9LzaTFMwI1Uwq9gymVQONg9OEkptffNiUOavRhlc3gDPvwjw/Cnt96czyQcRacvTrIzZdax6nn5adEj6Y3rAo=
+	t=1792066868; cv=none; b=oDmuakDJusKgu3rv+lswdumk0EYOYKG1xN1kCslwZ4vopc5SyRi5TI+k0ITgOKx+G7gbaHNT7VJ+yOvXIu9ghqz4DpqdNWDO7Hrsn9B5WPznRPQYKO+ElYKnLiWORggVIDklveWO6wlTSOeO09TBljNfVqcn/gYFO+w7T3B5g8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792066396; c=relaxed/simple;
-	bh=l8HFTJFDQdhif4/Tf4TtgZJsFwrHmvWlajdrX975XZ0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=maR7G7W105PMkt+HltGQvJpwnTaCJ4BSa0mjyOlCZA8VaT+hAoFrI5/OMq/n07lX4kGZc7ipIzuMCNHVwygxrjuCGR9u/RsXw4tQqKJY2mNibu6zPYrqTycgW8izYxb6p9+NUVdbHhmtt6ZKiD2CbYy9HPpsuZV1ltgO+btsRrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TBK8eZB0; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1792066868; c=relaxed/simple;
+	bh=Ox1xbZLOZJW2NqByxDANPKArn+SfLQtTDB3WiJswZoc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Dh53V65ei3wbDl3LJfpScaB3uneRZzx2JPi1dzAAF5DkccVTa8NLEmQPg2cq7txqC2207Jtqt3cXUt/pnmiZmjg9kJ20XVz1+hot/M98MqTE8NxiMZDIrTW9gk+Wpx7JiHJnqftPn85dIAiRi32euvaVc1LaeN8O/4wiehAuGWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h/IWRFaq; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TBK8eZB0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1792066394;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6ZS8O6pAKs14B2vAv0EVl9bnzCeWoqf8Dh1MzJORQ00=;
-	b=TBK8eZB0bw+dyDKRLYIoHX5JkCU+H07tjwOSJpH9QtRTyx5p3cnpQZ9JFRe1LDIsOID63T
-	9e33wjM05SOc+brSOD5yogwZ67BpG9x86ocoAdTcFSfjg0iV2YRhihTF8juecmEPbghaYW
-	XcsI01k86Kd41618NswFyrLJR1/DYwk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-460-LTE2vwOCMfa4UyBbrAGVrg-1; Thu, 15 Oct 2026 12:13:12 +0000
-X-MC-Unique: LTE2vwOCMfa4UyBbrAGVrg-1
-X-Mimecast-MFC-AGG-ID: LTE2vwOCMfa4UyBbrAGVrg_1792066391
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4a0761224e1so18116765e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 05:13:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792066391; x=1792671191;
-        h=content-transfer-encoding:content-type:in-reply-to:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=6ZS8O6pAKs14B2vAv0EVl9bnzCeWoqf8Dh1MzJORQ00=;
-        b=MpdR3D3AWtKvVVQCVJX8U3/T2/6cxAcigkABHmAQiV4lF3miVlBxM5rizmNPjxsLv1
-         xA7/gvqH3051dwmEsE1Xd/S2NfWGWOhY2nBhvVMggFSgo75Zfp2SlOEiCAMJnkdPlG89
-         M0B7GZ9Mt6GhptVfsS/Qu6akslhPA7XBxHMOR+8wo6g4pU84AndS9pQwSf3FyE6ulHEz
-         MXXEdM2Zv3NNcBvZqRmRe/4KIE5ynpMUigcGFBaxFC1yM4aSlcN3xI6+4wzXtaOLVoJU
-         K/WZBNOJ1g8Y6fLthmj+J+D/uzygA28h+TRunGp9sdM9IufvEih40Q2A7Hd9k31d15cp
-         xtuQ==
-X-Forwarded-Encrypted: i=1; AKwUvByHd8mn/lJPPW8jkjPYCCCj6K2GSjuIHWq+bE1SWCLn1WQR6drxi8WbqlYukOAvsyqlRnyFrHI=@lists.linux.dev
-X-Gm-Message-State: AFq9FYIqEayolFYaajrL3np2Rgxv0fMhuPt+1LrlcSuYEs5yBWvFsGwE
-	GsushIE8Lr3MaHVr80pAblxmsudm5AjsXZ3g3GAY6wREv7bQbKlAIJ/SS4Yhuf98yXOPaN5lx2X
-	Sg1eFCZkC7IoMb1idAxQh9WRzSN2k0fuMqHsq/cblaiMzAATALSNkGwYIRT/4bEYpWw==
-X-Gm-Gg: AYBFou2i7yJdkLeSiD+gXRKlMPwMrVjh5l+VsE9T7GEg8vaJ0uiGkrwqMxH1sz8+Xbk
-	cSi2zaxSKwRZlwtwOjUv7+kY9rbTY4EOByROzIv6mcTKEF3vXHD1M8kyrpOizVqOE2o8gaoqLsy
-	xbX0jEsxCpl13On7IQx9n/R52QFO02fggsvVHs602CtguyvimJeJGWbxn8h9kYD1aessdtb/SHv
-	Wbb8W07ovj0EO9fzCFiZGDMSpvALcPgiI2a6FuSV+OlnU4+kITwNhN6RIlP2AXMJxvmzEQzv9kY
-	GvZTMGnYJsZsKGC1e0Cv0JFNMnqAii5or3o5LK444ykBoiddaLicNicX6nQTr6A0SUJTmd+eY+Y
-	vtlnmdU4KByqiLDveMhQp1YuXJy/SjND4YRbnAmm3ImjnfGJT
-X-Received: by 2002:a05:600c:3b98:b0:499:79b9:e220 with SMTP id 5b1f17b1804b1-4a18e49886amr424420935e9.10.1792066390213;
-        Thu, 15 Oct 2026 05:13:10 -0700 (PDT)
-X-Received: by 2002:a05:600c:3b98:b0:499:79b9:e220 with SMTP id 5b1f17b1804b1-4a18e49886amr424420585e9.10.1792066389771;
-        Thu, 15 Oct 2026 05:13:09 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1bd99faf3sm66449875e9.14.2026.10.15.05.13.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Oct 2026 05:13:09 -0700 (PDT)
-Message-ID: <395b66c9-4173-401b-b469-8972b710aae2@redhat.com>
-Date: Thu, 15 Oct 2026 14:13:07 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h/IWRFaq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0EC01F000C4;
+	Thu, 15 Oct 2026 12:21:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792066867;
+	bh=NT2XbSQZp+cU7Cn4WzI+ruP1eafbyQ8K/6l27WXBHEs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=h/IWRFaq4vA9PtvjP61helCdett9RPb6ElPn1qf8Rmx5VpDLIOMyGhWQAl4AqqKq+
+	 pB9w4hUWwxUkgv7/VeC0aZVKq9gdMDTq1n2jzH73aVJymY1ba6j+HH3nC2w+JnRWfP
+	 J/XrSzZfsKbPodI48N6DSA9Yb0XQdOJMGHYmJVkayrGuaOz3JooD3sWwdBBHavaILA
+	 bKBaModR4Pm4+rMEHP/D90IGF8JbG20dewHhOZ57o9qZV+YyTHpkK9Gfbgra4+3wY7
+	 2SVGgT++KvPbARS5XSpKpJnpe4RgDExOgFfx1DDZs7YOPRzn4E8/oMgNCptt+DygU9
+	 3UDbtQYkvuaew==
+From: Pratyush Yadav <pratyush@kernel.org>
+To: Logan Odell <loganodell@google.com>
+Cc: arnd@arndb.de,  pasha.tatashin@soleen.com,  rppt@kernel.org,
+  pratyush@kernel.org,  graf@amazon.com,  akpm@linux-foundation.org,
+  pbonzini@redhat.com,  maz@kernel.org,  oupton@kernel.org,
+  seanjc@google.com,  bhelgaas@google.com,  alex@shazbot.org,
+  jgg@nvidia.com,  kevin.tian@intel.com,  dwmw2@infradead.org,
+  baolu.lu@linux.intel.com,  joro@8bytes.org,  will@kernel.org,
+  robin.murphy@arm.com,  linux-arch@vger.kernel.org,
+  linux-kernel@vger.kernel.org,  kexec@lists.infradead.org,
+  linux-mm@kvack.org,  kvm@vger.kernel.org,
+  linux-arm-kernel@lists.infradead.org,  kvmarm@lists.linux.dev,
+  linux-pci@vger.kernel.org,  iommu@lists.linux.dev
+Subject: Re: [RFC PATCH 1/3] luo: Move to feature flags instead of
+ compatibility strings
+In-Reply-To: <20260903023452.721732-2-loganodell@google.com> (Logan Odell's
+	message of "Wed, 2 Sep 2026 19:34:50 -0700")
+References: <20260903023452.721732-1-loganodell@google.com>
+	<20260903023452.721732-2-loganodell@google.com>
+Date: Thu, 15 Oct 2026 14:21:01 +0200
+Message-ID: <2vxzzewfgno2.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [RFC PATCH v4 14/25] target/arm: add neoverse-v2-v2 named CPU
- model
-To: Khushit Shah <khushit.shah@nutanix.com>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, kvmarm@lists.linux.dev
-Cc: cohuck@redhat.com, peter.maydell@linaro.org,
- richard.henderson@linaro.org, maz@kernel.org, oliver.upton@linux.dev,
- berrange@redhat.com, abologna@redhat.com, jdenemar@redhat.com,
- gshan@redhat.com, skolothumtho@nvidia.com, sebott@redhat.com,
- armbru@redhat.com, philmd@linaro.org, yangjinqian1@huawei.com,
- shaju.abraham@nutanix.com, mark.caveayland@nutanix.com,
- ping@khushitshah.com, sandesh.patel@nutanix.com
-References: <20260921123249.1708067-1-khushit.shah@nutanix.com>
- <20260921123249.1708067-15-khushit.shah@nutanix.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20260921123249.1708067-15-khushit.shah@nutanix.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: -fw5DxOvLaDYuS57IK3owkT0lLuD9UUq9TAzJRWlMMA_1792066391
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Hi Khushit,
+Hi Logan,
 
-On 9/21/26 2:32 PM, Khushit Shah wrote:
-> Add a KVM-only named CPU model for Neoverse V2 r0p1 (TRM 102375),
-> inheriting from neoverse-v2-v1 (r0p0).
+On Wed, Sep 02 2026, Logan Odell wrote:
+
+> Define a 128 byte header that can be used by all live update serialized
+> structures. In this header, we reserve room for 64 features with
+> supported, active, and required bits. Update the top level luo struct to
+> use this instead of compatibility strings. Previous versions of the
+> struct had smaller sizes, so add a minimum size check to avoid
+> collisions with older kernels.
 >
-> r0p1 only changes MIDR_EL1.Revision and adds FEAT_ECBHB
-> (ID_AA64MMFR1_EL1.ECBHB).
->
-> Final ID register state requested from KVM for "neoverse-v2-v2":
-> [  0] AIDR_EL1                 = 0x0000000000000000
-> [  1] CLIDR_EL1                = 0x0000000000000000
-> [  2] CTR_EL0                  = 0x000000009444c004
-> [  3] DCZID_EL0                = 0x0000000000000004
-> [  4] GMID_EL1                 = 0x0000000000000000
-> [  5] ID_AA64AFR0_EL1          = 0x0000000000000000
-> [  6] ID_AA64AFR1_EL1          = 0x0000000000000000
-> [  7] ID_AA64DFR0_EL1          = 0x000000f010305009
-> [  8] ID_AA64DFR1_EL1          = 0x0000000000000000
-> [  9] ID_AA64DFR2_EL1          = 0x0000000000000000
-> [ 10] ID_AA64FPFR0_EL1         = 0x0000000000000000
-> [ 11] ID_AA64ISAR0_EL1         = 0x0221100010210000
-> [ 12] ID_AA64ISAR1_EL1         = 0x0011111101211052
-> [ 13] ID_AA64ISAR2_EL1         = 0x0000000000000000
-> [ 14] ID_AA64ISAR3_EL1         = 0x0000000000000000
-> [ 15] ID_AA64MMFR0_EL1         = 0x0000011100101125
-> [ 16] ID_AA64MMFR1_EL1         = 0x1000000010312122
-> [ 17] ID_AA64MMFR2_EL1         = 0x1221011110001011
-> [ 18] ID_AA64MMFR3_EL1         = 0x0000000000000000
-> [ 19] ID_AA64MMFR4_EL1         = 0x0000000000000000
-> [ 20] ID_AA64PFR0_EL1          = 0x1101000120110011
-> [ 21] ID_AA64PFR1_EL1          = 0x0000000000000021
-> [ 22] ID_AA64PFR2_EL1          = 0x0000000000000000
-> [ 23] ID_AA64SMFR0_EL1         = 0x0000000000000000
-> [ 24] ID_AA64ZFR0_EL1          = 0x0000100000110001
-> [ 25] ID_AFR0_EL1              = 0x0000000000000000
-> [ 26] ID_DFR0_EL1              = 0x0000000000000000
-> [ 27] ID_DFR1_EL1              = 0x0000000000000000
-> [ 28] ID_ISAR0_EL1             = 0x0000000000000000
-> [ 29] ID_ISAR1_EL1             = 0x0000000000000000
-> [ 30] ID_ISAR2_EL1             = 0x0000000000000000
-> [ 31] ID_ISAR3_EL1             = 0x0000000000000000
-> [ 32] ID_ISAR4_EL1             = 0x0000000000000000
-> [ 33] ID_ISAR5_EL1             = 0x0000000000000000
-> [ 34] ID_ISAR6_EL1             = 0x0000000000000000
-> [ 35] ID_MMFR0_EL1             = 0x0000000000000000
-> [ 36] ID_MMFR1_EL1             = 0x0000000000000000
-> [ 37] ID_MMFR2_EL1             = 0x0000000000000000
-> [ 38] ID_MMFR3_EL1             = 0x0000000000000000
-> [ 39] ID_MMFR4_EL1             = 0x0000000000000000
-> [ 40] ID_MMFR5_EL1             = 0x0000000000000000
-> [ 41] ID_PFR0_EL1              = 0x0000000000000000
-> [ 42] ID_PFR1_EL1              = 0x0000000000000000
-> [ 43] ID_PFR2_EL1              = 0x0000000000000000
-> [ 44] MIDR_EL1                 = 0x00000000410fd4f1
-> [ 45] MPIDR_EL1                = 0x0000000080000000
-> [ 46] MVFR0_EL1                = 0x0000000000000000
-> [ 47] MVFR1_EL1                = 0x0000000000000000
-> [ 48] MVFR2_EL1                = 0x0000000000000000
-> [ 49] REVIDR_EL1               = 0x0000000000000000
-> [ 50] SMIDR_EL1                = 0x0000000000000000
->
-> Signed-off-by: Khushit Shah <khushit.shah@nutanix.com>
+> Signed-off-by: Logan Odell <loganodell@google.com>
 > ---
->  hw/arm/virt.c           |  1 +
->  target/arm/cpu-models.c | 13 +++++++++++++
->  2 files changed, 14 insertions(+)
+>  include/linux/kho/abi/luo.h  | 74 +++++++++++++++++++++++++++++-------
+>  kernel/liveupdate/luo_core.c | 44 +++++++++++++--------
+>  2 files changed, 90 insertions(+), 28 deletions(-)
 >
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index f5a8ea1145..90e818690c 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -4147,6 +4147,7 @@ static GPtrArray *virt_get_valid_cpu_types(const MachineState *ms)
->      if (kvm_enabled() && target_aarch64()) {
->          g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("arm-v9.0-a-v1")));
->          g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("neoverse-v2-v1")));
-> +        g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("neoverse-v2-v2")));
->      }
->      if (target_aarch64()) {
->          g_ptr_array_add(vct, g_strdup(ARM_CPU_TYPE_NAME("cortex-a53")));
-> diff --git a/target/arm/cpu-models.c b/target/arm/cpu-models.c
-> index 2de67f353b..af60924953 100644
-> --- a/target/arm/cpu-models.c
-> +++ b/target/arm/cpu-models.c
-> @@ -16,6 +16,7 @@
->   * Current Hierarchy:
->   * arm-v9.0-a-v1
->   *   neoverse-v2-v1 (r0p0)
-> + *     neoverse-v2-v2 (r0p1)
->   * SPDX-License-Identifier: GPL-2.0-or-later
+> diff --git a/include/linux/kho/abi/luo.h b/include/linux/kho/abi/luo.h
+> index 288076de6d4a..0a7662a0cf9a 100644
+> --- a/include/linux/kho/abi/luo.h
+> +++ b/include/linux/kho/abi/luo.h
+> @@ -13,15 +13,17 @@
+>   * kernel. The ABI is built upon the Kexec HandOver framework and registers
+>   * the central `struct luo_ser` via the KHO raw subtree API.
+>   *
+> - * This interface is a contract. Any modification to the structure fields,
+> - * compatible strings, or the layout of the `__packed` serialization
+> - * structures defined here constitutes a breaking change. Such changes require
+> - * incrementing the version number in the relevant `_COMPATIBLE` string to
+> - * prevent a new kernel from misinterpreting data from an old kernel.
+> + * This interface is a contract. To ensure the stability of moving between
+> + * kernel versions, any changes to the structures should only be additive
+> + * and should utilize the feature flags to denote the supported, active, and
+> + * required status of the feature.
+> + *
+> + * Features that are entirely optional can be added with the supported and
+> + * active flags both asserted, and the required flag cleared. Features that
+> + * require that the next kernel supports the feature should only be added as
+> + * supported to allow compatible transition kernels. At a later time, the
+> + * active and required flag should be asserted.
+>   *
+> - * Changes are allowed provided the compatibility version is incremented;
+> - * however, backward/forward compatibility is only guaranteed for kernels
+> - * supporting the same ABI version.
+>   *
+>   * KHO Structure Overview:
+>   *   The entire LUO state is encapsulated within a single KHO entry named "LUO".
+> @@ -30,7 +32,7 @@
+>   * Serialization Structures:
+>   *   - struct luo_ser:
+>   *     The central ABI structure that contains the overall state of the LUO.
+> - *     It includes the compatibility string, the liveupdate-number, and pointers
+> + *     It includes the feature flags, the liveupdate-number, and pointers
+>   *     to sessions and FLBs.
+>   *
+>   *   - struct luo_session_ser:
+> @@ -58,19 +60,65 @@
+>  #define _LINUX_KHO_ABI_LUO_H
+>  
+>  #include <linux/align.h>
+> +#include <linux/bits.h>
+>  #include <linux/kho/abi/block.h>
+>  #include <uapi/linux/liveupdate.h>
+>  
+> +/**
+> + * struct luo_feature_hdr - Feature negotiation and versioning header.
+> + * @supp:     Bitmask of features supported by the producing subsystem.
+> + * @req:      Bitmask of features required for safe deserialization by the
+> + *            receiving subsystem.
+
+I think you are mixing two things here: description of the payload and
+description of the file handler capability.
+
+The payload that is handed over via KHO should have the active and
+required bitmasks only. It doesn't need the supported bitmask, because
+it doesn't matter what the handler that produced the payload supports.
+It only matters what fields it populated and which ones are mandatory to
+understand.
+
+Similarly, the description of the file handler can't really describe
+"active". Because the capabilities are static and the active bits will
+depend on a specific file.
+
+So I reckon we should separate these two. These should be the same bits
+of course, but expressed in two ways in two different places.
+
+> + * @active:   Bitmask of features actually active/used in the serialized payload.
+> + * @reserved: Reserved for future use.
+> + *
+> + * This header can be embedded at the beginning of any serialized structure to
+> + * provide forward and backward compatibility via feature negotiation across
+> + * live update.
+> + */
+> +struct luo_feature_hdr {
+> +	u64 supp;
+> +	u64 req;
+> +	u64 active;
+> +	u64 reserved[13];
+
+How do you plan to ever use this? Say I want to extend my bitmaps so I do:
+
+    struct luo_feature_hdr {
+    	u64 supp;
+    	u64 req;
+    	u64 active;
+    	u64 supp2;
+    	u64 req2;
+    	u64 active2;
+    	u64 reserved[10];
+
+But when I go back to a kernel that doesn't know about supp2, req2,
+etc., how does it know how to interpret these? How does it know what the
+values mean?
+
+Is your goal only to be able to extend the three types of flags we have?
+If so, perhaps something like "if bit 63 is set, the flags continue to
+the next u64"? It is certainly harder for the parser, but seems to at
+least be extensible. What do you think?
+
+> +} __packed;
+> +
+> +#define LUO_FEATURE_ACTIVE(s, f)		\
+> +	do {					\
+> +		(s)->features.supp |= (u64)(f);	\
+> +		(s)->features.active |= (u64)(f);	\
+> +	} while (0)
+> +#define LUO_FEATURE_SUPPORTED(s, f)	((s)->features.supp |= (u64)(f))
+> +#define LUO_FEATURE_REQUIRED(s, f)	((s)->features.req |= (u64)(f))
+> +#define LUO_FEATURE_IS_ACTIVE(s, f)	(!!((s)->features.active & (u64)(f)))
+> +#define LUO_FEATURE_IS_SUPPORTED(s, f)	(!!((s)->features.supp & (u64)(f)))
+> +#define LUO_FEATURE_IS_REQUIRED(s, f)	(!!((s)->features.req & (u64)(f)))
+> +
+>  /*
+>   * The LUO state is registered under this KHO entry name.
 >   */
->  
-> @@ -212,9 +213,21 @@ static const ArmModelPropValue neoverse_v2_v1_props[] = {
->      MODEL_PROP_END
->  };
->  
-> +/* Neoverse V2 CPU model (TRM 102375, r0p1), inherits from neoverse-v2-v1. */
-> +static const ArmModelPropValue neoverse_v2_v2_props[] = {
-> +    /* MIDR_EL1 */
-> +    MODEL_PROP("SYSREG_MIDR_EL1_Revision", NUM, 0x1), /* r0p1 */
+>  #define LUO_KHO_ENTRY_NAME	"LUO"
+> -#define LUO_ABI_COMPATIBLE	"luo-v5"
+> -#define LUO_ABI_COMPAT_LEN	ALIGN(sizeof(LUO_ABI_COMPATIBLE), 8)
 > +
-> +    /* ID_AA64MMFR1_EL1 */
-> +    MODEL_PROP("SYSREG_ID_AA64MMFR1_EL1_ECBHB", NUM, 1), /* FEAT_ECBHB */
-> +
-> +    MODEL_PROP_END,
-> +};
-> +
->  static const ArmNamedCpuModel arm_cpu_models[] = {
->      {"arm-v9.0-a-v1", NULL, arm_v9_0_a_v1_props},
->      {"neoverse-v2-v1", "arm-v9.0-a-v1", neoverse_v2_v1_props},
-> +    {"neoverse-v2-v2", "neoverse-v2-v1", neoverse_v2_v2_props},
-nit I would call it directly neoverse-v2-r0p1 and leave the -v<n> suffix
-for potential fixes. Same for r0p0 obviously.
+> +/*
+> + * Bits associated with the luo_feature_hdr values.
+> + */
+> +#define LUO_FEATURE_NUMBER    BIT_ULL(0)
+> +#define LUO_FEATURE_SESSIONS  BIT_ULL(1)
+> +#define LUO_FEATURE_FLBS      BIT_ULL(2)
 
-Thanks
+Nit: please give the flags full documentation on their semantics.
 
-Eric
->      {NULL, NULL, NULL}
->  };
+> +
+> +#define LUO_CORE_FEATURES_SUPP		(LUO_FEATURE_NUMBER | \
+> +					 LUO_FEATURE_SESSIONS | \
+> +					 LUO_FEATURE_FLBS)
+> +#define LUO_CORE_FEATURES_REQ		(LUO_FEATURE_NUMBER | \
+> +					 LUO_FEATURE_SESSIONS | \
+> +					 LUO_FEATURE_FLBS)
+> +#define LUO_CORE_FEATURES_ACTIVE	(LUO_FEATURE_NUMBER | \
+> +					 LUO_FEATURE_SESSIONS | \
+> +					 LUO_FEATURE_FLBS)
 >  
+>  /**
+>   * struct luo_ser - Centralized LUO ABI header.
+> - * @compatible:     Compatibility string identifying the LUO ABI version.
+> + * @features:       Bit mask of supported and active features.
+>   * @liveupdate_num: A counter tracking the number of successful live updates.
+>   * @sessions_pa:    Physical address of the first session block header.
+>   * @flbs_pa:        Physical address of the FLB header.
+> @@ -78,7 +126,7 @@
+>   * This structure is the root of all preserved LUO state.
+>   */
+>  struct luo_ser {
+> -	char compatible[LUO_ABI_COMPAT_LEN];
+> +	struct luo_feature_hdr features;
 
+Do we still need compatible here? How will we ever do breaking changes
+if we really need to?
+
+>  	u64 liveupdate_num;
+>  	u64 sessions_pa;
+>  	u64 flbs_pa;
+> diff --git a/kernel/liveupdate/luo_core.c b/kernel/liveupdate/luo_core.c
+> index 1b2bda22902d..6add1ecc463f 100644
+> --- a/kernel/liveupdate/luo_core.c
+> +++ b/kernel/liveupdate/luo_core.c
+> @@ -107,26 +107,37 @@ static int __init luo_early_startup(void)
+>  		return 0;
+>  	}
+>  
+> -	if (len < sizeof(*luo_ser)) {
+> -		pr_err("LUO state is too small (%zu < %zu)\n", len, sizeof(*luo_ser));
+> -		return -EINVAL;
+> +	luo_ser = phys_to_virt(luo_ser_phys);
+> +
+> +	if (len < sizeof(struct luo_feature_hdr)) {
+> +		pr_err("LUO state is too small (%zu < %zu)\n",
+> +		       len, sizeof(struct luo_feature_hdr));
+> +		err = -EINVAL;
+> +		goto out_free_ser;
+>  	}
+>  
+> -	luo_ser = phys_to_virt(luo_ser_phys);
+> -	if (strncmp(luo_ser->compatible, LUO_ABI_COMPATIBLE, LUO_ABI_COMPAT_LEN)) {
+> -		pr_err("LUO state is incompatible with '%s'\n", LUO_ABI_COMPATIBLE);
+> -		return -EINVAL;
+> +	if (luo_ser->features.req & ~LUO_CORE_FEATURES_SUPP) {
+> +		pr_err("Unsupported required LUO feature (req: 0x%llx, supp: 0x%llx)\n",
+> +		       luo_ser->features.req, (u64)LUO_CORE_FEATURES_SUPP);
+> +		err = -EOPNOTSUPP;
+> +		goto out_free_ser;
+>  	}
+>  
+> -	luo_global.liveupdate_num = luo_ser->liveupdate_num;
+> -	pr_info("Retrieved live update data, liveupdate number: %lld\n",
+> -		luo_global.liveupdate_num);
+> +	if (LUO_FEATURE_IS_ACTIVE(luo_ser, LUO_FEATURE_NUMBER)) {
+> +		luo_global.liveupdate_num = luo_ser->liveupdate_num;
+> +		pr_info("Retrieved live update data, liveupdate number: %lld\n",
+> +			luo_global.liveupdate_num);
+> +	}
+>  
+> -	err = luo_session_setup_incoming(luo_ser->sessions_pa);
+> -	if (err)
+> -		goto out_free_ser;
+>  
+> -	luo_flb_setup_incoming(luo_ser->flbs_pa);
+> +	if (LUO_FEATURE_IS_ACTIVE(luo_ser, LUO_FEATURE_SESSIONS)) {
+> +		err = luo_session_setup_incoming(luo_ser->sessions_pa);
+> +		if (err)
+> +			goto out_free_ser;
+> +	}
+> +
+> +	if (LUO_FEATURE_IS_ACTIVE(luo_ser, LUO_FEATURE_FLBS))
+> +		luo_flb_setup_incoming(luo_ser->flbs_pa);
+>  
+>  	err = 0;
+>  
+> @@ -162,7 +173,10 @@ static int __init luo_state_setup(void)
+>  		return PTR_ERR(luo_ser);
+>  	}
+>  
+> -	strscpy(luo_ser->compatible, LUO_ABI_COMPATIBLE, sizeof(luo_ser->compatible));
+> +	luo_ser->features.supp = LUO_CORE_FEATURES_SUPP;
+> +	luo_ser->features.req = LUO_CORE_FEATURES_REQ;
+> +	luo_ser->features.active = LUO_CORE_FEATURES_ACTIVE;
+> +
+>  	luo_ser->liveupdate_num = luo_global.liveupdate_num + 1;
+>  
+>  	luo_session_setup_outgoing(&luo_ser->sessions_pa);
+
+-- 
+Regards,
+Pratyush Yadav
