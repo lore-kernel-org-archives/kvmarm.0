@@ -1,349 +1,203 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C61B541E69;
-	Thu, 15 Oct 2026 16:51:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07BE94E73A9
+	for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 17:17:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792083091; cv=none; b=XEykL1y0eDKIZOIjt1MDo596qHaDu9MFPyCuQxWc9EzHicIZXVIyqg84/tUy8cpAOjOcMfAYAHCrSTV+HNbAYfhj3wMDZFXCDH8yqTSQVUlJbzo+Y3RkRK8PWEe8NPU9zUIUEMed2SMhXc6/b1WOFdgKqrD72+yGpZCh4RP6AVE=
+	t=1792084679; cv=none; b=lo22Y66+ljagsVEyvJd/5IpsLucMk2y3cVmwm2ZMxtgK3+iGnThpMaEx3Jmtj4wntuUVPeqL6U2qiQAwBBJRNA41MbORUJ4RV/YfDNC+zG6NPdKouiSmh4+rWcA6UQxGPNa9fdL+BR8Rk1JWvPbfA9CEiDclDMxVSIJLI9T/dfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792083091; c=relaxed/simple;
-	bh=HqHAKSUflfJEuWDf3yfMWcVi+U+gd9V1CDIxtFqq64g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NWgWBqqF6wnPrbUSGiRbopTtjddqjJLgN/sWVffUsftdOIHu1f4bt5GkxmO5ytkDzPQMjNrV+PSxAf1bLD2Y8x7xd/jFvrF27WAvG3fnIMiQn/nmzwM9/10WJAS/BXIHUBYM93vVqeJvosT7TnH6a+4vr8vOgGBdFvlFP0JuyAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=al6Y5sUt; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792084679; c=relaxed/simple;
+	bh=97nz3x4cCT7jJVkf7khGZ92jWq9O4MzPPIoGZFfCE3Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KZYvphNm1bXHkLI54FxTM3W1gZddzch5U1Jm8LDoi+a4Fg+V0eeP4V2oKzjetpUjkaOGEU5F+yMjghFHqFe+Kn8xvpFyqscxf4Yc9u2iFFFwehUzOwX5M9fDFfTpNBr/sS7gpZ5zgXAqf59ZqexvWazrNzpOybKtACtwNUG4Hoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BpXyloR5; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="al6Y5sUt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFB301F000C4;
-	Thu, 15 Oct 2026 16:51:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792083069;
-	bh=Lxxs/l5FI+u++wAMNQ2C0hH42rvX2oaiszt8AMAtoAs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=al6Y5sUteWg7nKjtYumnCaEp7yxwUz08QBxSgIqmF2qdXLDHBbz6iRZzEpZqNedey
-	 XLeaPRJj4fvAsbm2AgFeu9oJM6AytbwGYXyG92aczhT/YHwpRwaguUdP9EwB7fW016
-	 x3G0QnGd0Zv9cUra5EgykP8fDO3PWz046AUPfWdSTG+ihOcSx2qfkMmF4SUozc+Xmk
-	 WOYi8+cS9pMc35j/I3xtbwtehDK2S7rBk0u1FPfilTXrxYzgEJDYTQuEmX/U9abkIx
-	 kk2//vMNApRWuEvlq4YlAMtRmNR4SlPIIPoKIl9qF5wXQs4wK8b0Kg61tLkZcd4bjr
-	 iFdz374dNvEWA==
-Date: Thu, 15 Oct 2026 17:51:03 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, 
-	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	will@kernel.org, mark.rutland@arm.com, linux-perf-users@vger.kernel.org, 
-	catalin.marinas@arm.com, james.clark@linaro.org
-Subject: Re: [RFC PATCH v7 06/28] KVM: arm64: Add KVM_CAP_ARM_SPE capability
-Message-ID: <atDtheEuNRs7v3Gx@gremlin>
-References: <20260903160623.315525-1-alexandru.elisei@arm.com>
- <20260903160623.315525-7-alexandru.elisei@arm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BpXyloR5"
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-486e70f2457so889166f8f.2
+        for <kvmarm@lists.linux.dev>; Thu, 15 Oct 2026 10:17:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792084669; x=1792689469; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=nUb4cagls44kE5et9qrliHAU76p7w/thb7bKXpN7Lxs=;
+        b=BpXyloR5zsnCOAOreYmL88y4UaQoHORCNIp19MgNMDKgC+Qmch8Idk9dC9J/tHXgLY
+         XhEx0Djoi73/0I+d68ZUNwPMthn/arGJsRgziQp5HZpbT7hVaM5PpCYaZaiKVdX1yqQp
+         uI39xNIZZ2h2OkRMZ8olC6iaccFMvA0a38UH0TfFhWK9cX0emoPSj0jQzop/tNd25P6b
+         z3KRxhY0pfUWJQZFa+WMvQmGVqAiDB1IdEeI0767Nfme/LzUWGtLGl/j9HXR0ppBtqwl
+         EpYheuEi2oLvVmTysd3O5+F/7jx7SUTocJ67uzxIF4dzlT0LB2WsC51k8PzXgiHlgMoH
+         PR2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792084669; x=1792689469;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=nUb4cagls44kE5et9qrliHAU76p7w/thb7bKXpN7Lxs=;
+        b=fqHlwLxfhwO96cEmpxNfVNjG3fVeK4NwOgjq1NRyYq9MH2vNbTgSYNvIVKRruXchtC
+         yHQARY8BpKrtb+CWV7NvdruFv1eG5hXxmGZ51gxhDDu4OKvlFFSRiavfuOi3WrjSfZRW
+         oJegUH3Ty7LsmpTIfJfx9igfXgR+E1ANKGaVFdepoN4JeZKLYPI8ft3o022Q6hd9z1cD
+         n9L/nVu2wJoFQbXLS3DhARFRE4jQ5bcIJCslMLYjpEqdZ9lsr6vlR5sYEtJrN/XYCSfA
+         aTNspBjv4mZkqAIJFr37paylKEPTdSgd3aHMkoWOWL0FN4NFhwqdsuhq6B1sv9av+h/8
+         s1fg==
+X-Forwarded-Encrypted: i=1; AKwUvBx5MBQziYHZDsLUBb/kj3HD8cA/NA2ih8787wjDF2bL+hz44Uow4TSXJG2U1BZ4WFvUV//6AHU=@lists.linux.dev
+X-Gm-Message-State: AFq9FYIkPjJoNdGWxUIgIEIxmx1AgKT/spv9yWhPupYC+P5gqdQPZvEI
+	YGl2PZetRayhJ3kJNQBnaV74ALpS0lfPFzBCKWI2LmpB359f7x3s5xOT
+X-Gm-Gg: AYBFou2R4HeMipq85Fm2U2L/Jt9ctDL89w+0hhtOlQknUcK5tcV2k/r0TpVRQDzsE8B
+	B5LLPWxPWc4RzQq5NVTBDF//9lOm3x3PuX67qtzNHvYYXlDKAdRT06gj2iTMmnzPqc+8lqH23RQ
+	VQanaP5Wi5k0aX8mSv1BWvlK3sMZqwebr4+03FwprD7DPxDzdipT5yTDI0PP8bJX/Ylh0ADVSnp
+	X1Rb4VAHs5pRSL3eQNnn+IvyeCoQ8qXI52w4/heL02TwKZQMQ/IGU1CNLaYiBXHKect4Dn8KwF1
+	ZguqoYjaedw5Y0tE5QIuUjycsMNqTa6SHWeomsMVsBdJObrBGq1DGUlIU7wr/2DI5jfRRc8QNBD
+	kHFa26WDDZrKU9f9Xls9hwIJ4569YzFueQGJ09KWVaVoS9eY2paBD4TvslIvL+FHz7/zoe7Qs6D
+	TxVmpo54Ab4YPfgcymEXvrzcU7ycA9RyqDs4WasrnwZDeyuDrzVa5WXsPyVUUbQzps8L/fs5Uf/
+	VKN0yXd0nfdAq1LekbnIWFbkXwsErw+E2MIIwsnc8N7MPfnT2k/7IPbwbb8qAzH+JdYMpox4/NB
+	ecrk7FIikoW8M+F6LCIpkaMt1MIIoQscW/I=
+X-Received: by 2002:a5d:44cd:0:b0:488:89e4:c3af with SMTP id ffacd0b85a97d-48dbaae4869mr30499724f8f.45.1792084668569;
+        Thu, 15 Oct 2026 10:17:48 -0700 (PDT)
+Received: from dev-dsk-fgriffo-1c-93421965.eu-west-1.amazon.com (54-240-197-234.amazon.com. [54.240.197.234])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48dfaf1acd7sm1180327f8f.1.2026.10.15.10.17.46
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 15 Oct 2026 10:17:48 -0700 (PDT)
+From: Fred Griffoul <griffoul@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	David Hildenbrand <david@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Ackerley Tng <ackerleytng@google.com>
+Cc: David Woodhouse <dwmw2@infradead.org>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Lorenzo Stoakes <ljs@kernel.org>,
+	"Liam R . Howlett" <liam@infradead.org>,
+	Vlastimil Babka <vbabka@kernel.org>,
+	Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	iommu@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [RFC PATCH 0/9] mm: Memory providers for guest_memfd and iommufd
+Date: Thu, 15 Oct 2026 17:17:46 +0000
+Message-ID: <20261015171746.51538-1-griffoul@gmail.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <CAEvNRgHtB8j6=9r=txjsKvQM0F85nRN4KW5sdnuv_-Og=cWEfg@mail.gmail.com>
+References: <20260720111259.122911-1-dwmw2@infradead.org> <20261006183235.16576-1-griffoul@gmail.com> <CAEvNRgEseLO+LbkwXrEit0H2LH5Wx-srSvHEMpt0=upPL3tF=g@mail.gmail.com> <20261014095702.39676-1-griffoul@gmail.com> <CAEvNRgHtB8j6=9r=txjsKvQM0F85nRN4KW5sdnuv_-Og=cWEfg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260903160623.315525-7-alexandru.elisei@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 03, 2026 at 05:06:01PM +0100, Alexandru Elisei wrote:
-> Add the SPE capability that will be used by userspace to test if KVM
-> supports SPE virtualization.
+Ackerley Tng <ackerleytng@google.com> writes:
 
-You are also adding spe.c too right? Which is adding functionality for the
-perf driver to call into? Probably worth mentioning that you're adding the
-foundations of this stuff in the commit message also.
-
+> To borrow David's words, the part about this that makes me itch is
+> conversion. We have to support conversions. Even if it doesn't merge in
+> the first patch series, we have to have line of sight to how conversions
+> would work.
 >
-> The SPE driver supports heterogenous systems. Keep track of all the
-> available Statistical Profiling Units (SPUs) in the system, because KVM
-> will require the user to associate a VM with exactly one SPU.
+> Conversion requests originate from the guest and then the host handles
+> the guest request by making calling an ioctl on guest_memfd. Hopefully
+> this part doesn't change with alternative provider support.
 
-I guess questions more for my understanding here :)
+Agreed, and it doesn't change. Conversions still go through
+guest_memfd. It is the only one that knows which pages are private.
 
-Is it one SPU per core, or is it some property of heterogenous systems,
-i.e. 1 per big/LITTLE etc.?
-
-How can a user decide which? Do you actually expose the ability to select a
-named SPU, or is it automatically determined based upon which CPUs are used
-by the VM?
-
-What if a VM spans both 'big' and 'LITTLE' cores?
-
+> Suppose guest_memfd still gets the conversion request first, in RFCv2,
+> to reach all the mappings in various page tables, it would have to be
 >
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  Documentation/virt/kvm/api.rst   | 10 ++++++
->  arch/arm64/include/asm/kvm_spe.h | 18 ++++++++++
->  arch/arm64/kvm/Makefile          |  1 +
->  arch/arm64/kvm/arm.c             |  4 +++
->  arch/arm64/kvm/spe.c             | 56 ++++++++++++++++++++++++++++++++
->  drivers/perf/arm_spe_pmu.c       |  4 +++
->  include/linux/perf/arm_spe_pmu.h | 12 +++++++
-
-The KVM arm MAINTAINERS entry has:
-
-F:	arch/arm64/kvm/
-F:	include/kvm/arm_*
-
-So arch/arm64/kvm/spe.c and include/linux/perf/arm_spe_pmu.h don't need any
-updates there.
-
->  include/uapi/linux/kvm.h         |  1 +
->  8 files changed, 106 insertions(+)
->  create mode 100644 arch/arm64/include/asm/kvm_spe.h
->  create mode 100644 arch/arm64/kvm/spe.c
+> + [GUEST_MEMFD] -> [KVM], [USERSPACE]
+> + [GUEST_MEMFD] -> [PROVIDER] -> [IOMMU]
 >
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index e0430cc750c9..1ed5c389c7a4 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -9600,6 +9600,16 @@ take care to differentiate between these cases.
->  The presence of this capability indicates that the nested KVM guest can
->  start in ESA mode.
->
-> +8.48 KVM_CAP_ARM_SPE
-> +--------------------
-> +
-> +:Capability: KVM_CAP_ARM_SPE
-> +:Architectures: arm64
-> +:Type: vm
-> +
-> +This capability indicates that Statistical Profiling Extension (SPE)
-> +virtualization is available in KVM.
+> since guest_memfd must ensure no IOMMU mappings to guest private pages?
+> There's that extra step through the [PROVIDER]...
 
-Is it worth adding something here about the perf driver? As this seems key
-to the thing. Or is that too much of an implementation detail?
+Right, there is a step through [PROVIDER]. But it can be a step through
+the mem_provider code in mm, which every provider shares, rather than
+through each provider driver. Then guest_memfd doesn't need to know who
+else maps the frames, and providers don't have to get it right one by
+one.
 
-> +
->  9. Known KVM API problems
->  =========================
->
-> diff --git a/arch/arm64/include/asm/kvm_spe.h b/arch/arm64/include/asm/kvm_spe.h
-> new file mode 100644
-> index 000000000000..f05e6d3f5705
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/kvm_spe.h
-> @@ -0,0 +1,18 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2021 - ARM Ltd
-> + */
-> +
-> +#ifndef __ARM64_KVM_SPE_H__
-> +#define __ARM64_KVM_SPE_H__
-> +
-> +#ifdef CONFIG_KVM_ARM_SPE
-> +bool kvm_supports_spe(void);
-> +#else
-> +static __always_inline bool kvm_supports_spe(void)
+Here is the idea, on top of your in-place conversion. The VMM gives the
+same provider file to guest_memfd and to iommufd, as in v2. When
+guest_memfd converts a range to private, it claims the range:
 
-Very nitty, but not sure if __always_inline is strictly necessary, you'd hope
-that the compiler would naturally inline a false on optimisation :)
+  int mem_provider_claim(struct mem_provider_attachment *att,
+                         loff_t offset, loff_t len);
+  void mem_provider_unclaim(struct mem_provider_attachment *att,
+                            loff_t offset, loff_t len);
 
-> +{
-> +	return false;
-> +}
-> +#endif /* CONFIG_KVM_ARM_SPE */
-> +
-> +#endif /* __ARM64_KVM_SPE_H__ */
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index 59612d2f277c..9ee271f713cd 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -29,6 +29,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->  kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
->  kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
->  kvm-$(CONFIG_PTDUMP_STAGE2_DEBUGFS) += ptdump.o
-> +kvm-$(CONFIG_KVM_ARM_SPE)     += spe.o
->
->  kvm-$(CONFIG_NVHE_EL2_TRACING) += hyp_trace.o
->
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 8b080804bc90..eca1184ef9dd 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -42,6 +42,7 @@
->  #include <asm/kvm_nested.h>
->  #include <asm/kvm_pkvm.h>
->  #include <asm/kvm_ptrauth.h>
-> +#include <asm/kvm_spe.h>
->  #include <asm/sections.h>
->  #include <asm/stacktrace/nvhe.h>
->
-> @@ -468,6 +469,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_ARM_PMU_V3_STRICT:
->  		r = kvm_supports_guest_pmuv3();
->  		break;
-> +	case KVM_CAP_ARM_SPE:
-> +		r = kvm_supports_spe();
-> +		break;
->  	case KVM_CAP_ARM_INJECT_SERROR_ESR:
->  		r = cpus_have_final_cap(ARM64_HAS_RAS_EXTN);
->  		break;
-> diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
-> new file mode 100644
-> index 000000000000..646806a60d66
-> --- /dev/null
-> +++ b/arch/arm64/kvm/spe.c
-> @@ -0,0 +1,56 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2021 - ARM Ltd
-> + */
-> +
-> +#include <linux/cpumask.h>
-> +#include <linux/kvm_host.h>
-> +#include <linux/perf/arm_spe_pmu.h>
-> +
-> +#include <asm/kvm_spe.h>
-> +#include <asm/sysreg.h>
+The claim revokes the range for every other consumer of the file. After
+that, get_page() returns a hole to them. So iommufd unmaps the pages
+and can't map them again, and nothing changes on the iommufd side.
+guest_memfd zaps its own mappings, as it does today.
 
-NIT: include <linux/cleanup.h> for guard(mutex)() etc.?
+Going back to shared is the reverse. guest_memfd returns the frames to
+the host first, then unclaims the range. The other consumers then map
+the frames again. So a conversion looks like:
 
-> +
-> +static LIST_HEAD(spe_pmus);
-> +static DEFINE_MUTEX(spe_pmus_lock);
-> +
-> +struct spe_pmu_entry {
-> +	struct list_head link;
-> +	struct arm_spe_pmu *spe_pmu;
-> +};
+  [GUEST_MEMFD] -> [KVM], [USERSPACE]
+  [GUEST_MEMFD] -> [PROVIDER] -> [IOMMU]
 
-This seems like an odd way of making this into a list, can't you just embed
-list_head in arm_spe_pmu?
+That is your second chain, but the [PROVIDER] step is the common code
+in mm/mem_provider.c. It does the revokes and hands out the holes. The
+provider driver itself only gets one callback, and it can refuse a
+claim. For example, it would refuse if it also lends those frames
+through another file. Conversions can already fail, so this fits. If a
+later step fails, guest_memfd just unclaims the range.
 
-Then adding becomes:
+This also answers your earlier question. The provider doesn't need to
+know what is shared or private. It only needs to know which ranges are
+claimed, so that it doesn't move or share them, and only takes them
+back once the guest has given them up.
 
-list_add_tail(&spe_pmu->link, &spu_pmus);
+I haven't implemented this yet. My plan is to rebase on kvm-x86 next,
+which has your conversion code. Then I'd demo it with a
+KVM_X86_SW_PROTECTED_VM and the sample provider. A device sees a shared
+page, loses it when the page becomes private, and sees the same frame
+again when it goes back to shared.
 
-And removing:
+Does that match what you have in mind?
 
-list_del(&spe_pmu->link);
+> Thanks, I will prototype what I have in mind too to make sure things
+> work as I think they will :)
 
-And you can avoid the alloc below too.
+Thanks, that would really help. The sample provider and the KVM
+selftest in the series could be a starting point.
 
-
-> +
-> +void kvm_spe_add_instance(struct arm_spe_pmu *spe_pmu)
-
-Hmm I'm guessing this is per-SPU but no mention of SPU in the function
-name? Is an 'SPE instance' equivalent?
-
-If so, maybe worth referencing SPE instances rather than SPUs in the commit
-message, or at least say something like 'otherwise known as SPE instances'.
-
-> +{
-> +	struct spe_pmu_entry *entry;
-> +
-> +	guard(mutex)(&spe_pmus_lock);
-> +
-> +	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
-
-The convention is kmalloc_obj() now. Which also lets you elide GFP_KERNEL
-so this can be:
-
-	entry = kmalloc_obj(*entry);
-
-> +	if (!entry)
-> +		return;
-
-Hmm, shouldn't failing to allocate here be an error, or at least a warning?
-
-> +
-> +	entry->spe_pmu = spe_pmu;
-> +	list_add_tail(&entry->link, &spe_pmus);
-> +}
-> +EXPORT_SYMBOL_FOR_MODULES(kvm_spe_add_instance, "arm_spe_pmu");
-> +
-> +void kvm_spe_remove_instance(struct arm_spe_pmu *spe_pmu)
-> +{
-> +	struct spe_pmu_entry *entry, *tmp;
-> +
-> +	guard(mutex)(&spe_pmus_lock);
-> +
-> +	list_for_each_entry_safe(entry, tmp, &spe_pmus, link) {
-
-You break once you find the entry, so doesn't have to be the _safe variant.
-
-But can avoid all the complexity with an embedded list_head in the spe_pmu
-type if it's possible to put it there!
-
-> +		if (entry->spe_pmu == spe_pmu) {
-> +			list_del(&entry->link);
-> +			kfree(entry);
-> +			break;
-> +		}
-> +	}
-> +}
-> +EXPORT_SYMBOL_FOR_MODULES(kvm_spe_remove_instance, "arm_spe_pmu");
-> +
-> +bool kvm_supports_spe(void)
-> +{
-> +	guard(mutex)(&spe_pmus_lock);
-> +	return !list_empty(&spe_pmus);
-> +}
-> diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
-> index 42ba0924bd02..f24b122a087c 100644
-> --- a/drivers/perf/arm_spe_pmu.c
-> +++ b/drivers/perf/arm_spe_pmu.c
-> @@ -1370,6 +1370,8 @@ static int arm_spe_pmu_device_probe(struct platform_device *pdev)
->  	if (ret)
->  		goto out_teardown_dev;
->
-> +	kvm_spe_add_instance(spe_pmu);
-> +
->  	return 0;
->
->  out_teardown_dev:
-> @@ -1383,6 +1385,8 @@ static void arm_spe_pmu_device_remove(struct platform_device *pdev)
->  {
->  	struct arm_spe_pmu *spe_pmu = platform_get_drvdata(pdev);
->
-> +	kvm_spe_remove_instance(spe_pmu);
-> +
->  	arm_spe_pmu_perf_destroy(spe_pmu);
->  	arm_spe_pmu_dev_teardown(spe_pmu);
->  	free_percpu(spe_pmu->handle);
-> diff --git a/include/linux/perf/arm_spe_pmu.h b/include/linux/perf/arm_spe_pmu.h
-> index 97b14e236fcd..bdb703558a87 100644
-> --- a/include/linux/perf/arm_spe_pmu.h
-> +++ b/include/linux/perf/arm_spe_pmu.h
-> @@ -49,4 +49,16 @@ struct arm_spe_pmu {
->
->  #define to_spe_pmu(p) (container_of(p, struct arm_spe_pmu, pmu))
->
-> +#ifdef CONFIG_KVM_ARM_SPE
-> +void kvm_spe_add_instance(struct arm_spe_pmu *spe_pmu);
-> +void kvm_spe_remove_instance(struct arm_spe_pmu *spe_pmu);
-> +#else
-> +static inline void kvm_spe_add_instance(struct arm_spe_pmu *spe_pmu)
-> +{
-> +}
-> +static inline void kvm_spe_remove_instance(struct arm_spe_pmu *spe_pmu)
-> +{
-> +}
-> +#endif /* CONFIG_KVM_ARM_SPE */
-> +
->  #endif /* __PERF_ARM_SPE_PMU_H__ */
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index ac2d77d14963..1565a609890b 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -999,6 +999,7 @@ struct kvm_enable_cap {
->  #define KVM_CAP_S390_HPAGE_2G 249
->  #define KVM_CAP_PPC_COMPAT_CAPS 250
->  #define KVM_CAP_ARM_PMU_V3_STRICT 251
-> +#define KVM_CAP_ARM_SPE 252
->
->  struct kvm_irq_routing_irqchip {
->  	__u32 irqchip;
-> --
-> 2.43.0
->
->
-
---
-Cheers, Lorenzo
+Thanks,
+Fred
