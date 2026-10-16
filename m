@@ -1,31 +1,31 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C1A04772BF
-	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 15:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1104DD6F5
+	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 15:58:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792166309; cv=none; b=SQXuImyFBzdqNtxaAbAsootG+9BVxTLFLgqmhRLmUeUSDvGBdzqPgzXbIlqsjFLsmIH9tuM/ipZPZeb4BkUTEVICoxVJxNwb+gGQegdKw5rD5ztexXyqAE/OAc6eSuWLe7T98uYIzMhUh2aG9rm/SZibfw/L+oWiQqH9x7Fzxv4=
+	t=1792166318; cv=none; b=Q954izRFx1v7+5Md8AIE9pAMQtgIei6UuQAzIWpbP1OuueEWt0Zn3mGBM3cumm3YTj6lRuQ5lRzGZA3Oya0c+roDdu2SLpjYgra2vGgbiQDHL/EbFnrsZCnIYBMV+IWFjEKhBWIe1A0lzpNoTATb3TbattJ1xl+IoZQaQcLTPiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792166309; c=relaxed/simple;
-	bh=zlp77XtcOpCoZwKyRQ9G7ktiBIGzseumsEE1qryiWyw=;
+	s=arc-20240116; t=1792166318; c=relaxed/simple;
+	bh=pq2+wWRhfYB/qAuo/UjADcYRpR88rqDHy/3xv7EDzq0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aFFzVif/yUnMEU1vpAAZArQQr83PIII0RayKnnlfXXDdl7Pp177j3MzHk9vY8blzl/xfTU23B3LuONQv1gAz2QE4aaHroOGUD3aJVOPMTgBJtNTsFcQWoeDIw0I+QX2Hm10Mwm624VYaOSKlRhNWcAOSLuD6/bPNVQAAHQtEaDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=WeN7FDmg; arc=none smtp.client-ip=217.140.110.172
+	 MIME-Version; b=dV6NY1A/5QGmaFsZ1oq2Taf9dGGwjd3Wdgn41rFtlZSWoWyY6tvzCRbUmMQgOOoA2/MdoYj7y1kvWxG/rtCbotCzJGl7NvBPl6xirHTKiT5SM2IUFtuJqnpU5y3SdyxvVbhOHBmbKvsZabQGQ2fWBufUghHuXKq99HwgBBMjkHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=JhwKnf3k; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="WeN7FDmg"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="JhwKnf3k"
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C3E96143D;
-	Fri, 16 Oct 2026 08:58:24 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 88D8E143D;
+	Fri, 16 Oct 2026 08:58:33 -0700 (PDT)
 Received: from e133894.cambridge.arm.com (e133894.arm.com [10.2.80.62])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 31D933F673;
-	Fri, 16 Oct 2026 08:58:26 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EF27B3F673;
+	Fri, 16 Oct 2026 08:58:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792166308; bh=zlp77XtcOpCoZwKyRQ9G7ktiBIGzseumsEE1qryiWyw=;
+	t=1792166316; bh=pq2+wWRhfYB/qAuo/UjADcYRpR88rqDHy/3xv7EDzq0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WeN7FDmgfZ8dt5LaUAdcp0uPejbqXo+CQQcMJ2UZ84tQc/pnvNTcRtVaw9qMhlZSk
-	 0tN+XSlSpzseY+UdGzJ7m9cwamL2nv6OqmrzWGc9EXshGtlrfYPXEeuat3szV5e8H2
-	 NkJxcqdE54QOTPqEhRndu9Yz/Abg69BfhM9pkRFI=
+	b=JhwKnf3kkTqtWSIkHfurlJhQMGoDHsdffNQkZNaaSQLAqaRdqBIt3gbE/P6jJwt79
+	 XJ4UdV/LJ5g8UKgWMHEb+4YqJgqJbBIGWbN95Ryh1VCBBO0mGuemP4nxFyYHz1DWZo
+	 7nKdcVqS8+sPVQ7KPx4+8S7t+LQj+8cURSeAL8No=
 From: Sascha Bischoff <sascha.bischoff@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
@@ -39,9 +39,9 @@ Cc: maz@kernel.org,
 	lpieralisi@kernel.org,
 	timothy.hayes@arm.com,
 	fuad.tabba@linux.dev
-Subject: [PATCH 03/16] KVM: arm64: gic-v5: Share CoreSight ID register emulation
-Date: Fri, 16 Oct 2026 16:57:28 +0100
-Message-Id: <20261016155741.979985-4-sascha.bischoff@arm.com>
+Subject: [PATCH 04/16] irqchip/gic-v5: Add ITS MMIO register definitions
+Date: Fri, 16 Oct 2026 16:57:29 +0100
+Message-Id: <20261016155741.979985-5-sascha.bischoff@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261016155741.979985-1-sascha.bischoff@arm.com>
 References: <20261016155741.979985-1-sascha.bischoff@arm.com>
@@ -53,179 +53,179 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The GICv5 IRS and ITS expose the same CoreSight identification register
-block. Move the register-value switch into a shared helper and describe
-the contiguous ID register range with one register-region descriptor.
+Introduce the GICv5 ITS MMIO register offsets and bit definitions in
+one place before the virtual ITS starts consuming them.
 
-This keeps the IRS behaviour unchanged while giving the ITS MMIO
-emulation a helper it can reuse when it is added in the following commit.
+Keeping the ITS register frame definitions together avoids spreading
+register-definition churn across the subsequent KVM ITS emulation
+patches.
 
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- arch/arm64/kvm/vgic/vgic-irs-v5.c  | 72 ++----------------------------
- arch/arm64/kvm/vgic/vgic-v5.c      | 34 ++++++++++++++
- arch/arm64/kvm/vgic/vgic.h         |  1 +
- include/linux/irqchip/arm-gic-v5.h |  2 +
- 4 files changed, 41 insertions(+), 68 deletions(-)
+ include/linux/irqchip/arm-gic-v5.h | 126 +++++++++++++++++++++--------
+ 1 file changed, 92 insertions(+), 34 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-irs-v5.c b/arch/arm64/kvm/vgic/vgic-irs-v5.c
-index 1874c3c289a6e..63571dc58546c 100644
---- a/arch/arm64/kvm/vgic/vgic-irs-v5.c
-+++ b/arch/arm64/kvm/vgic/vgic-irs-v5.c
-@@ -520,38 +520,9 @@ static void vgic_v5_mmio_write_irs_ist(struct kvm_vcpu *vcpu, gpa_t addr,
- static unsigned long vgic_v5_coresight_read(struct kvm_vcpu *vcpu,
- 					    gpa_t addr, unsigned int len)
- {
--	const size_t offset = addr & (SZ_64K - 1);
-+	u32 offset = addr & (SZ_64K - 1);
- 
--	switch (offset) {
--	case GICV5_CORESIGHT_DEVARCH:
--		return GICV5_CORESIGHT_DEVARCH_VAL;
--	case GICV5_CORESIGHT_PIDR4:
--		return GICV5_CORESIGHT_PIDR4_JEP106_CONT;
--	case GICV5_CORESIGHT_PIDR5:
--		return GICV5_CORESIGHT_PIDR5_RES0;
--	case GICV5_CORESIGHT_PIDR6:
--		return GICV5_CORESIGHT_PIDR6_RES0;
--	case GICV5_CORESIGHT_PIDR7:
--		return GICV5_CORESIGHT_PIDR7_RES0;
--	case GICV5_CORESIGHT_PIDR0:
--		return GICV5_CORESIGHT_PIDR0_PART_0;
--	case GICV5_CORESIGHT_PIDR1:
--		return GICV5_CORESIGHT_PIDR1_DES_0_PART_1;
--	case GICV5_CORESIGHT_PIDR2:
--		return GICV5_CORESIGHT_PIDR2_DES_1;
--	case GICV5_CORESIGHT_PIDR3:
--		return GICV5_CORESIGHT_PIDR3_REVAND_CMOD;
--	case GICV5_CORESIGHT_CIDR0:
--		return GICV5_CORESIGHT_CIDR0_VAL;
--	case GICV5_CORESIGHT_CIDR1:
--		return GICV5_CORESIGHT_CIDR1_VAL;
--	case GICV5_CORESIGHT_CIDR2:
--		return GICV5_CORESIGHT_CIDR2_VAL;
--	case GICV5_CORESIGHT_CIDR3:
--		return GICV5_CORESIGHT_CIDR3_VAL;
--	default:
--		return 0;
--	}
-+	return vgic_v5_handle_guest_coresight_idreg_read(offset);
- }
- 
- static unsigned long vgic_v5_mmio_uaccess_read_irs_status(struct kvm_vcpu *vcpu,
-@@ -905,43 +876,8 @@ static const struct vgic_register_region vgic_v5_irs_registers[] = {
- 
- 	/* CoreSight identification registers */
- 	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_DEVARCH,
--				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
--				  VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_PIDR4,
--				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
--				  VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_PIDR5,
--				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
--				  VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_PIDR6,
--				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
--				  VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_PIDR7,
--				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
--				  VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_PIDR0,
--				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
--				  VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_PIDR1,
--				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
--				  VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_PIDR2,
--				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
--				  VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_PIDR3,
--				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
--				  VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_CIDR0,
--				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
--				  VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_CIDR1,
--				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
--				  VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_CIDR2,
--				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
--				  VGIC_ACCESS_32bit),
--	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_CIDR3,
--				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
-+				  vgic_v5_coresight_read, vgic_mmio_write_wi,
-+				  GICV5_CORESIGHT_IDREGS_SIZE,
- 				  VGIC_ACCESS_32bit),
- };
- 
-diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-index 91810fbd99afa..18184020e188b 100644
---- a/arch/arm64/kvm/vgic/vgic-v5.c
-+++ b/arch/arm64/kvm/vgic/vgic-v5.c
-@@ -1601,3 +1601,37 @@ int vgic_v5_irs_restore_ists(struct kvm *kvm, struct kvm_device_attr *attr)
- 
- 	return ret;
- }
-+
-+unsigned long vgic_v5_handle_guest_coresight_idreg_read(u32 offset)
-+{
-+	switch (offset) {
-+	case GICV5_CORESIGHT_DEVARCH:
-+		return GICV5_CORESIGHT_DEVARCH_VAL;
-+	case GICV5_CORESIGHT_PIDR4:
-+		return GICV5_CORESIGHT_PIDR4_JEP106_CONT;
-+	case GICV5_CORESIGHT_PIDR5:
-+		return GICV5_CORESIGHT_PIDR5_RES0;
-+	case GICV5_CORESIGHT_PIDR6:
-+		return GICV5_CORESIGHT_PIDR6_RES0;
-+	case GICV5_CORESIGHT_PIDR7:
-+		return GICV5_CORESIGHT_PIDR7_RES0;
-+	case GICV5_CORESIGHT_PIDR0:
-+		return GICV5_CORESIGHT_PIDR0_PART_0;
-+	case GICV5_CORESIGHT_PIDR1:
-+		return GICV5_CORESIGHT_PIDR1_DES_0_PART_1;
-+	case GICV5_CORESIGHT_PIDR2:
-+		return GICV5_CORESIGHT_PIDR2_DES_1;
-+	case GICV5_CORESIGHT_PIDR3:
-+		return GICV5_CORESIGHT_PIDR3_REVAND_CMOD;
-+	case GICV5_CORESIGHT_CIDR0:
-+		return GICV5_CORESIGHT_CIDR0_VAL;
-+	case GICV5_CORESIGHT_CIDR1:
-+		return GICV5_CORESIGHT_CIDR1_VAL;
-+	case GICV5_CORESIGHT_CIDR2:
-+		return GICV5_CORESIGHT_CIDR2_VAL;
-+	case GICV5_CORESIGHT_CIDR3:
-+		return GICV5_CORESIGHT_CIDR3_VAL;
-+	default:
-+		return 0;
-+	}
-+}
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index c33cdd7098df5..66044232ae025 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -388,6 +388,7 @@ int vgic_v5_probe(const struct gic_kvm_info *info);
- void vgic_v5_reset(struct kvm_vcpu *vcpu);
- int vgic_v5_init(struct kvm *kvm);
- int kvm_vgic_v5_irs_init(struct kvm *kvm, unsigned int nr_spis);
-+unsigned long vgic_v5_handle_guest_coresight_idreg_read(u32 offset);
- void vgic_v5_teardown(struct kvm *kvm);
- int vgic_v5_map_resources(struct kvm *kvm);
- void vgic_v5_set_ppi_ops(struct kvm_vcpu *vcpu, u32 vintid);
 diff --git a/include/linux/irqchip/arm-gic-v5.h b/include/linux/irqchip/arm-gic-v5.h
-index 299e75bc95255..a4879774124f8 100644
+index a4879774124f8..7e64eb0436394 100644
 --- a/include/linux/irqchip/arm-gic-v5.h
 +++ b/include/linux/irqchip/arm-gic-v5.h
-@@ -498,6 +498,8 @@
- #define GICV5_CORESIGHT_CIDR1		0xfff4
- #define GICV5_CORESIGHT_CIDR2		0xfff8
- #define GICV5_CORESIGHT_CIDR3		0xfffc
-+#define GICV5_CORESIGHT_IDREGS_SIZE	\
-+	(GICV5_CORESIGHT_CIDR3 + 4 - GICV5_CORESIGHT_DEVARCH)
+@@ -364,50 +364,88 @@
+ /*
+  * ITS registers and tables structures
+  */
+-#define GICV5_ITS_IDR1		0x0004
+-#define GICV5_ITS_IDR2		0x0008
+-#define GICV5_ITS_CR0		0x0080
+-#define GICV5_ITS_CR1		0x0084
+-#define GICV5_ITS_DT_BASER	0x00c0
+-#define GICV5_ITS_DT_CFGR	0x00d0
+-#define GICV5_ITS_DIDR		0x0100
+-#define GICV5_ITS_EIDR		0x0108
+-#define GICV5_ITS_INV_EVENTR	0x010c
+-#define GICV5_ITS_INV_DEVICER	0x0110
+-#define GICV5_ITS_STATUSR	0x0120
+-#define GICV5_ITS_SYNCR		0x0140
+-#define GICV5_ITS_SYNC_STATUSR	0x0148
+-
+-#define GICV5_ITS_IDR1_L2SZ			GENMASK(10, 8)
+-#define GICV5_ITS_IDR1_ITT_LEVELS		BIT(7)
+-#define GICV5_ITS_IDR1_DT_LEVELS		BIT(6)
+-#define GICV5_ITS_IDR1_DEVICEID_BITS		GENMASK(5, 0)
++#define GICV5_ITS_IDR0			0x0000
++#define GICV5_ITS_IDR1			0x0004
++#define GICV5_ITS_IDR2			0x0008
++#define GICV5_ITS_IIDR			0x0040
++#define GICV5_ITS_AIDR			0x0044
++#define GICV5_ITS_CR0			0x0080
++#define GICV5_ITS_CR1			0x0084
++#define GICV5_ITS_DT_BASER		0x00c0
++#define GICV5_ITS_DT_CFGR		0x00d0
++#define GICV5_ITS_DIDR			0x0100
++#define GICV5_ITS_EIDR			0x0108
++#define GICV5_ITS_INV_EVENTR		0x010c
++#define GICV5_ITS_INV_DEVICER		0x0110
++#define GICV5_ITS_READ_EVENTR		0x0114
++#define GICV5_ITS_READ_EVENT_DATAR	0x0118
++#define GICV5_ITS_STATUSR		0x0120
++#define GICV5_ITS_SYNCR			0x0140
++#define GICV5_ITS_SYNC_STATUSR		0x0148
++#define GICV5_ITS_GEN_EVENT_DIDR	0x0180
++#define GICV5_ITS_GEN_EVENT_EIDR	0x0188
++#define GICV5_ITS_GEN_EVENTR		0x018c
++#define GICV5_ITS_GEN_EVENT_STATUSR	0x0190
++#define GICV5_ITS_MEC_IDR		0x01c0
++#define GICV5_ITS_MEC_MECID_R		0x01c4
++#define GICV5_ITS_MPAM_IDR		0x0200
++#define GICV5_ITS_MPAM_PARTID_R		0x0204
++#define GICV5_ITS_SWERR_STATUSR		0x0240
++#define GICV5_ITS_SWERR_SYNDROMER0	0x0248
++#define GICV5_ITS_SWERR_SYNDROMER1	0x0250
++#define GICV5_ITS_MPAM_PMGR		0x0258
++
++#define GICV5_ITS_TRANSLATER		0x0000
++#define GICV5_ITS_RL_TRANSLATER		0x0008
++
++#define GICV5_ITS_IDR0_ITSID		GENMASK(31, 16)
++#define GICV5_ITS_IDR0_SWE		BIT(8)
++#define GICV5_ITS_IDR0_MPAM		BIT(7)
++#define GICV5_ITS_IDR0_MEC		BIT(6)
++#define GICV5_ITS_IDR0_PA_RANGE		GENMASK(5, 2)
++#define GICV5_ITS_IDR0_DOM		GENMASK(1, 0)
++
++#define GICV5_ITS_IDR0_DOMAIN_SECURE		0b00
++#define GICV5_ITS_IDR0_DOMAIN_NON_SECURE	0b01
++#define GICV5_ITS_IDR0_DOMAIN_EL3		0b10
++#define GICV5_ITS_IDR0_DOMAIN_REALM		0b11
++
++#define GICV5_ITS_IDR1_L2SZ		GENMASK(10, 8)
++#define GICV5_ITS_IDR1_ITT_LEVELS	BIT(7)
++#define GICV5_ITS_IDR1_DT_LEVELS	BIT(6)
++#define GICV5_ITS_IDR1_DEVICEID_BITS	GENMASK(5, 0)
  
- #define GICV5_CORESIGHT_DEVARCH_VAL			\
- 	(FIELD_PREP(GENMASK(31, 21), 0x23b) |		\
+ #define GICV5_ITS_IDR1_L2SZ_SUPPORT_4KB(r)	FIELD_GET(BIT(8), (r))
+ #define GICV5_ITS_IDR1_L2SZ_SUPPORT_16KB(r)	FIELD_GET(BIT(9), (r))
+ #define GICV5_ITS_IDR1_L2SZ_SUPPORT_64KB(r)	FIELD_GET(BIT(10), (r))
+ 
+-#define GICV5_ITS_IDR2_XDMN_EVENTs		GENMASK(6, 5)
+-#define GICV5_ITS_IDR2_EVENTID_BITS		GENMASK(4, 0)
++#define GICV5_ITS_IDR2_XDMN_EVENTS	GENMASK(6, 5)
++#define GICV5_ITS_IDR2_EVENTID_BITS	GENMASK(4, 0)
+ 
+-#define GICV5_ITS_CR0_IDLE			BIT(1)
+-#define GICV5_ITS_CR0_ITSEN			BIT(0)
++#define GICV5_ITS_IIDR_PRODUCT_ID	GENMASK(31, 20)
++#define GICV5_ITS_IIDR_VARIANT		GENMASK(19, 16)
++#define GICV5_ITS_IIDR_REVISION		GENMASK(15, 12)
++#define GICV5_ITS_IIDR_IMPLEMENTER	GENMASK(11, 0)
+ 
+-#define GICV5_ITS_CR1_ITT_RA			BIT(7)
+-#define GICV5_ITS_CR1_DT_RA			BIT(6)
+-#define GICV5_ITS_CR1_IC			GENMASK(5, 4)
+-#define GICV5_ITS_CR1_OC			GENMASK(3, 2)
+-#define GICV5_ITS_CR1_SH			GENMASK(1, 0)
++#define GICV5_ITS_AIDR_COMPONENT	GENMASK(11, 8)
++#define GICV5_ITS_AIDR_ARCHMAJORREV	GENMASK(7, 4)
++#define GICV5_ITS_AIDR_ARCHMINORREV	GENMASK(3, 0)
+ 
+-#define GICV5_ITS_DT_CFGR_STRUCTURE		BIT(16)
+-#define GICV5_ITS_DT_CFGR_L2SZ			GENMASK(7, 6)
+-#define GICV5_ITS_DT_CFGR_DEVICEID_BITS		GENMASK(5, 0)
++#define GICV5_ITS_CR0_IDLE		BIT(1)
++#define GICV5_ITS_CR0_ITSEN		BIT(0)
+ 
+-#define GICV5_ITS_DT_BASER_ADDR_MASK		GENMASK_ULL(55, 3)
++#define GICV5_ITS_CR1_ITT_RA		BIT(7)
++#define GICV5_ITS_CR1_DT_RA		BIT(6)
++#define GICV5_ITS_CR1_IC		GENMASK(5, 4)
++#define GICV5_ITS_CR1_OC		GENMASK(3, 2)
++#define GICV5_ITS_CR1_SH		GENMASK(1, 0)
+ 
+-#define GICV5_ITS_INV_DEVICER_I			BIT(31)
+-#define GICV5_ITS_INV_DEVICER_EVENTID_BITS	GENMASK(5, 1)
+-#define GICV5_ITS_INV_DEVICER_L1		BIT(0)
++#define GICV5_ITS_DT_BASER_ADDR_MASK	GENMASK_ULL(55, 3)
++#define GICV5_ITS_DT_BASER_ADDR_SHIFT	3ULL
++
++#define GICV5_ITS_DT_CFGR_STRUCTURE	BIT(16)
++#define GICV5_ITS_DT_CFGR_L2SZ		GENMASK(7, 6)
++#define GICV5_ITS_DT_CFGR_DEVICEID_BITS	GENMASK(5, 0)
+ 
+ #define GICV5_ITS_DIDR_DEVICEID			GENMASK_ULL(31, 0)
+ 
+@@ -417,6 +455,17 @@
+ #define GICV5_ITS_INV_EVENTR_ITT_L2SZ		GENMASK(2, 1)
+ #define GICV5_ITS_INV_EVENTR_L1			BIT(0)
+ 
++#define GICV5_ITS_INV_DEVICER_I			BIT(31)
++#define GICV5_ITS_INV_DEVICER_EVENTID_BITS	GENMASK(5, 1)
++#define GICV5_ITS_INV_DEVICER_L1		BIT(0)
++
++#define GICV5_ITS_READ_EVENTR_R			BIT(31)
++
++#define GICV5_ITS_READ_EVENT_DATAR_VIRT		BIT_ULL(63)
++#define GICV5_ITS_READ_EVENT_DATAR_VM_ID	GENMASK_ULL(47, 32)
++#define GICV5_ITS_READ_EVENT_DATAR_VALID	BIT_ULL(31)
++#define GICV5_ITS_READ_EVENT_DATAR_LPI_ID	GENMASK_ULL(23, 0)
++
+ #define GICV5_ITS_STATUSR_IDLE			BIT(0)
+ 
+ #define GICV5_ITS_SYNCR_SYNC			BIT_ULL(63)
+@@ -425,6 +474,15 @@
+ 
+ #define GICV5_ITS_SYNC_STATUSR_IDLE		BIT(0)
+ 
++#define GICV5_ITS_GEN_EVENT_DIDR_DEVICEID	GENMASK_ULL(31, 0)
++
++#define GICV5_ITS_GEN_EVENT_EIDR_EVENTID	GENMASK(15, 0)
++
++#define GICV5_ITS_GEN_EVENTR_R			BIT(31)
++#define GICV5_ITS_GEN_EVENTR_TARGET_DOMAIN	GENMASK(1, 0)
++
++#define GICV5_ITS_GEN_EVENT_STATUSR_IDLE	BIT(0)
++
+ #define GICV5_DTL1E_VALID			BIT_ULL(0)
+ /* Note that there is no shift for the address by design */
+ #define GICV5_DTL1E_L2_ADDR_MASK		GENMASK_ULL(55, 3)
 -- 
 2.34.1
 
