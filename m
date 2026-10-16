@@ -1,184 +1,218 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C98DC4ED199;
-	Fri, 16 Oct 2026 16:22:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 853315326BB;
+	Fri, 16 Oct 2026 16:23:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792167758; cv=none; b=EAwuR5m8ybn4PGSSV+i+RkTrNWRzUbaa+isy2KmHCzAE3x4mCZu72gnOZ80jE/qn4LhfGb3lXFSyhSPB9yeJrb2DFHzX+w5l5pt+reJsWrTbuXtyg4i8W9eWFDi+ASfDgS1yZoYUuhI9w+2/fOhc32mmUVyjUFeOGx+xg+sT/+I=
+	t=1792167837; cv=none; b=jV5fruIb3e8Oexxw3uMlQzUdR9cU7aQheYBTqtSRXIwxz6L85UL3EHMA7Lgr2/OeDeBmiipIQDCrR5mgTXyK946HRybNnSwpV3UZuAjuxOBdGyCLHdx071VAyUsbUxOeP0/RR7ecgrPYAUd3F49/7sa6uu2ePC9jbNA0sHiIdnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792167758; c=relaxed/simple;
-	bh=4A5pDB6ZEeWv4rh8gzEo33CPoxq5UeBNJnutcQ6EPYE=;
+	s=arc-20240116; t=1792167837; c=relaxed/simple;
+	bh=HbyTB9YG3IEFvULFpxbg7zJ3FR2lmghbhWYQBeuso18=;
 	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=D1NZeMbNB8N4IhsWdvoXHiQ1iOPpZwsRzQFY1MRBVPCQSq7tb++g5h9ZIw+Oe1wL6vLg1u12rI2qfaFFqNwXdjBvgyoRyFM7UKT79Nk/sPLubxaG8Uu+VZGLDpDuhI1lnMFSs5j7qut/h/diugndRwpYHjlZe/G7xhXfBM8ADWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LEy8ryUF; arc=none smtp.client-ip=100.103.45.18
+	 Date; b=aJKlYqJyJ0g0PuSf27WjAvSIdDdPCK6p+vHfUHws90Kv9IVmcnTUCHe/+ZoaXVWiJdG45rr4vXT/SRPUd8B4GGEJglIPN2SDDJWO0FReYvGHEE6LJOTjGbby1pt2SN289YowwniGvUTOQJaEYseu3cqF778QL8MVQ0uYlN2Z4Xo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=am7s3oiB; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LEy8ryUF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C26201F000C6;
-	Fri, 16 Oct 2026 16:22:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="am7s3oiB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD4A41F000C4;
+	Fri, 16 Oct 2026 16:23:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792167754;
-	bh=IM7cd1g397rwGeO1v/7urCs0eQ4C+vEw38RjF2hK70s=;
+	s=k20260515; t=1792167835;
+	bh=MTGG3sE8c3g2AGiRuxoGfoVJjt2RErDfmEmcb286QKI=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=LEy8ryUFIuUlFCZOWlEV2UumgAftd+tbiNbNHxKkWVvXVuR2yWupa0e4uKRJKaegY
-	 8MQqW3Ie+UDZZn5fJ3ztuC0rC/y8DjftTP24ur/vmHfpmFwpNv6PGYkPlxhZKQb3y1
-	 AXizvgfcx5r8EgicbbauE2BdrTuFy3tMrv2TbOiSy7CANCgtVUnPPZguL6YiSHSogw
-	 Oyu+kAAe+mfxrjWR7hvvmGNXi7+umLGmmGB+nfDACzQthPjiS4bzfOfSBWIaT2LbsC
-	 1ufa+QI9wKYJCoNZOy+eYktq8gB/aQsfr3znYGZXyctcLyUcGR+OHtW0B+i5RqQQ30
-	 yIRaoMcxttV0w==
-Message-ID: <sashiko-outbox-174630@kernel.org>
+	b=am7s3oiBpL3DW65qGetBS/FQFYEFBJl0JVvSqybQgaOYMEVyJI02GmGpUaZMlJx77
+	 SEIXt2GUQxjM8VXRmBUpm+ynpDeM7j0SvnxtDg3D3i+nC9AE947unMp8qwe6uYxmZQ
+	 K9m/gpAeVXEOBmn7GnkqKgAI50tP29dNW8ZZZrg9sFdj5PBkoZTjmU/+0LFcT8QQxH
+	 qL1Pyx3mTeRa8CLvaJ5tzDS7H1zvHUPvrdnDdmB6ViKTEUVsYMXtcRDNHwN4HJ2rmQ
+	 sc/YckdTIcoQYmw49E/kt8e9L0iP/9FhcLuAv3vjT6T4l6eJpotadHaDy9zUY7xcaT
+	 d6vHyrJYAPatA==
+Message-ID: <sashiko-outbox-174632@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 15/16] KVM: selftests: Add VGICv5 ITS translation cache
- tests
+Subject: Re: [PATCH 09/16] KVM: arm64: gic-v5: Add ITS MSI injection
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <sascha.bischoff@arm.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
 Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261016155741.979985-16-sascha.bischoff@arm.com>
+In-Reply-To: <20261016155741.979985-10-sascha.bischoff@arm.com>
 References: <20261016155741.979985-1-sascha.bischoff@arm.com>
- <20261016155741.979985-16-sascha.bischoff@arm.com>
+ <20261016155741.979985-10-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 16 Oct 2026 16:22:33 +0000
+Date: Fri, 16 Oct 2026 16:23:54 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 6 potential issue(=
 s) to consider:
-- [High] vgic_v5: missing ITS_STATUSR/ITS_GEN_EVENT_STATUSR completion poll
-- [High] vgic_v5: priority drop coupled with deactivation in ITS IRQ handler
+- [High] kvm/vgic: raw_spinlock deadlock due to missing IRQ disable in its_=
+cache_add_translation
+- [High] kvm/vgic: userspace-triggerable WARN_ON_ONCE causes host DoS in vg=
+ic_v5_its_inject_msi
+- [High] arm64: vgic-v5: User-triggerable WARN_ON_ONCE in MSI injection
+- [High] kvm: arm64: ABI violation on guest-driven MSI mapping errors
+- [Medium] kvm: arm64: gic-v5: MSI injection aborted on translation cache a=
+llocation failure
+- [Medium] arm64: vgic-v5: MSI injection fails if ITS cache insertion fails
 --
 
-commit fe8f40c11d68589dddb7ff395093f6a131cf59d8
+commit 65afd53542f7c52bea1da09f7e70c85b22c50b33
 Author: Sascha Bischoff <sascha.bischoff@arm.com>
 
-KVM: selftests: Add VGICv5 ITS translation cache tests
+    KVM: arm64: gic-v5: Add ITS MSI injection
+   =20
+    Now that KVM can resolve GICv5 ITS translations from guest memory,
+    allow userspace and irqfd MSI injection to target a virtual GICv5 ITS.
 
-This commit adds end-to-end coverage for VGICv5 ITS translation and cache
-invalidation. It verifies that KVM can parse guest-provided linear DT and
-ITT state and use it to deliver LPIs through guest GEN_EVENTR and
-KVM_SIGNAL_MSI. The test builds a two-VPE VM with IRS, ITS, and an LPI IST.
-
-> diff --git a/tools/testing/selftests/kvm/arm64/vgic_v5.c b/tools/testing/=
-selftests/kvm/arm64/vgic_v5.c
-> index b7fb002a64f6c..6ea6aef4f0f46 100644
-> --- a/tools/testing/selftests/kvm/arm64/vgic_v5.c
-> +++ b/tools/testing/selftests/kvm/arm64/vgic_v5.c
+> diff --git a/arch/arm64/kvm/vgic/vgic-its-v5.c b/arch/arm64/kvm/vgic/vgic=
+-its-v5.c
+> index e4c0415137605..5920fa1bcb2cf 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its-v5.c
 
 [ ... ]
 
-> +/* Inject a manually triggered translation via the ITS_GEN_EVENTR */
-> +static void gicv5_send_its_gen_event(u32 device_id, u32 event_id)
-> +{
-> +	u64 val;
-> +
-> +	val =3D FIELD_PREP(GICV5_ITS_GEN_EVENT_DIDR_DEVICEID, device_id);
-> +	writeq(val, GICV5_ITS_BASE_GVA + GICV5_ITS_GEN_EVENT_DIDR);
-> +
-> +	val =3D FIELD_PREP(GICV5_ITS_GEN_EVENT_EIDR_EVENTID, event_id);
-> +	writel(val, GICV5_ITS_BASE_GVA + GICV5_ITS_GEN_EVENT_EIDR);
-> +
-> +	writel(GICV5_ITS_GEN_EVENTR_R |
-> +	       FIELD_PREP(GICV5_ITS_GEN_EVENTR_TARGET_DOMAIN, 0),
-> +	       GICV5_ITS_BASE_GVA + GICV5_ITS_GEN_EVENTR);
+>  static int its_cache_add_translation(struct kvm *kvm, struct vgic_v5_its=
+ *its,
+>  				     u32 device_id, u16 event_id,
+>  				     struct vgic_irq *irq)
+>  {
+>  	u64 key =3D ((u64)device_id << 16) | (u64)event_id;
+>  	struct its_cache_translation_entry *entry;
+>  	struct its_cache_translation_entry *old;
+>  	struct hlist_node *tmp;
+>  	HLIST_HEAD(removed);
+> =20
+>  	entry =3D kzalloc_obj(*entry, GFP_KERNEL);
+>  	if (!entry)
+>  		return -ENOMEM;
+> =20
+>  	entry->key =3D key;
+>  	entry->irq =3D irq;
+> =20
+>  	scoped_guard(raw_spinlock, &its->translation_cache_lock) {
 
 [Severity: High]
-Does this operation require polling for completion? In gicv5_send_its_gen_e=
-vent,
-the event generation command is issued asynchronously by writing to
-GICV5_ITS_GEN_EVENTR without a subsequent poll of the ITS_GEN_EVENT_STATUSR
-IDLE bit.
+Could this lock acquisition deadlock?
 
-Since the test subsequently yields to the host via GUEST_SYNC and expects t=
-he
-event to be delivered, failing to wait for the virtual hardware to complete
-introduces a race condition. The host might act before the virtual ITS fini=
-shes
-processing, leading to flaky test execution.
+The translation_cache_lock is a raw_spinlock_t that is also acquired in
+hardirq context by its_cache_look_up_translation(). Since
+scoped_guard(raw_spinlock) does not disable local interrupts, a hardirq cou=
+ld
+preempt this process-context section and attempt to acquire the same lock,
+spinning forever.
 
-> +}
-> +
-> +static void gicv5_invalidate_its_event(u32 device_id, u32 event_id)
-> +{
-> +	u64 val;
-> +
-> +	val =3D FIELD_PREP(GICV5_ITS_DIDR_DEVICEID, device_id);
-> +	writeq(val, GICV5_ITS_BASE_GVA + GICV5_ITS_DIDR);
-> +
-> +	val =3D FIELD_PREP(GICV5_ITS_EIDR_EVENTID, event_id);
-> +	writel(val, GICV5_ITS_BASE_GVA + GICV5_ITS_EIDR);
-> +
-> +	writel(GICV5_ITS_INV_EVENTR_I,
-> +	       GICV5_ITS_BASE_GVA + GICV5_ITS_INV_EVENTR);
-
-[Severity: High]
-Should this function poll ITS_STATUSR IDLE after invalidating the event?
-
-In gicv5_invalidate_its_event, the event invalidation command is issued
-without a subsequent completion poll. The GICv5 guidelines state that an
-ITS table entry invalidated without polling ITS_STATUSR IDLE is a bug, as
-the host might act before the virtual ITS finishes processing the
-invalidation.
-
-> +}
-> +
-> +static void gicv5_invalidate_its_device(u32 device_id, u32 event_id_bits)
-> +{
-> +	u64 val;
-> +
-> +	val =3D FIELD_PREP(GICV5_ITS_DIDR_DEVICEID, device_id);
-> +	writeq(val, GICV5_ITS_BASE_GVA + GICV5_ITS_DIDR);
-> +
-> +	val =3D GICV5_ITS_INV_DEVICER_I |
-> +	      FIELD_PREP(GICV5_ITS_INV_DEVICER_EVENTID_BITS, event_id_bits);
-> +	writel(val, GICV5_ITS_BASE_GVA + GICV5_ITS_INV_DEVICER);
-
-[Severity: High]
-Similar to the event invalidation above, should gicv5_invalidate_its_device
-wait for the device invalidation to complete by polling ITS_STATUSR IDLE
-before returning? Failing to do so can race with the host side.
-
-> +}
+Should this use the raw_spinlock_irqsave variant?
 
 [ ... ]
 
-> +static void guest_its_irq_handler(struct ex_regs *regs)
-> +{
-> +	u64 expected_hwirq =3D gicv5_lpi_hwirq(READ_ONCE(its_expected_lpi));
-> +	u32 hwirq;
-> +	u64 ia;
-> +
-> +	ia =3D gicr_insn(CDIA);
-> +	if (!GICV5_GICR_CDIA_VALID(ia))
-> +		return;
-> +
-> +	gsb_ack();
-> +	isb();
-> +
-> +	hwirq =3D FIELD_GET(GICV5_GICR_CDIA_INTID, ia);
-> +	GUEST_ASSERT_EQ(hwirq, expected_hwirq);
-> +
-> +	gic_insn(hwirq, CDDI);
-> +	gic_insn(0, CDEOI);
+>  static int its_cache_look_up_translation(struct vgic_v5_its *its,
+>  					 u32 device_id, u16 event_id,
+>  					 struct vgic_irq **irq)
+>  {
+>  	u64 key =3D ((u64)device_id << 16) | (u64)event_id;
+>  	struct its_cache_translation_entry *entry;
+> =20
+>  	guard(raw_spinlock)(&its->translation_cache_lock);
 
 [Severity: High]
-Can we separate the priority drop from the deactivation in this handler?
+Does this also need to disable interrupts?
 
-In guest_its_irq_handler, the priority drop instruction (CDEOI) is
-executed back-to-back with deactivation (CDDI) at the end of the handler.
-The GICv5 architecture strictly enforces a split-EOI model where the
-priority drop must be performed immediately after the acknowledge and
-synchronization barriers, before dispatching to the main handler logic.
+Since this is called from the fast path (kvm_arch_set_irq_inatomic) which c=
+an
+run in hardirq context, and the same lock is taken in process context, shou=
+ld
+both sides use the irqsave/irqrestore variants to prevent deadlocks?
 
-Deferring the priority drop until the end blocks all interrupts of equal
-or lower priority for the handler's duration.
+[ ... ]
+
+> @@ -531,7 +572,8 @@ static int __vgic_v5_its_resolve_lpi(struct kvm *kvm,=
+ struct vgic_v5_its *its,
+>  		return PTR_ERR(*irq);
+> =20
+>  	vgic_get_irq_ref(*irq);
+> -	ret =3D its_cache_add_translation(kvm, its, device_id, event_id, *irq);
+> +	ret =3D its_cache_add_translation(kvm, its, device_id, (u16)event_id,
+> +					 *irq);
+>  	if (ret) {
+>  		vgic_put_irq(kvm, *irq);
+>  		vgic_put_irq(kvm, *irq);
+>  		*irq =3D NULL;
+>  	}
+> =20
+>  	return ret;
+>  }
+
+[Severity: Medium]
+Is it correct to abort the injection if the translation cache insertion fai=
+ls?
+
+The translation cache is intended to be a best-effort optimization. If
+its_cache_add_translation() fails (e.g., due to -ENOMEM), propagating the
+error and dropping the successfully resolved LPI will silently lose the
+interrupt, which could hang guest drivers under host memory pressure.
+
+Should the error be swallowed here instead so that injection proceeds?
+
+[ ... ]
+
+> +int vgic_v5_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
+> +{
+> +	struct vgic_v5_its *its;
+> +	struct vgic_irq *irq;
+> +	bool borrowed_mm =3D false;
+> +	int ret;
+> +
+> +	ret =3D vgic_v5_check_msi(kvm, msi);
+> +	if (ret)
+> +		return ret;
+> +
+> +	its =3D vgic_v5_msi_to_its(kvm, msi);
+> +	if (IS_ERR(its))
+> +		return PTR_ERR(its);
+> +
+> +	/* An irqfd cache miss is resolved by a worker outside the VM's mm. */
+> +	if (current->mm !=3D kvm->mm) {
+> +		if (WARN_ON_ONCE(current->mm || !(current->flags & PF_KTHREAD)))
+> +			return -EWOULDBLOCK;
+
+[Severity: High]
+Could this WARN_ON_ONCE be triggered by unprivileged userspace?=20
+
+If a normal user process (other than the VM creator) calls the KVM_SIGNAL_M=
+SI
+ioctl, current->mm will not equal kvm->mm, and since it is a user thread,
+current->mm is non-NULL and it lacks PF_KTHREAD. Triggering a kernel warning
+can crash the host if panic_on_warn is enabled, leading to a Denial of Serv=
+ice.
 
 > +
-> +	GUEST_SYNC(GUEST_CMD_ITS_LPI_DELIVERED);
-> +}
+> +		if (!mmget_not_zero(kvm->mm))
+> +			return -EFAULT;
+> +
+> +		kthread_use_mm(kvm->mm);
+> +		borrowed_mm =3D true;
+> +	}
+> +
+> +	ret =3D vgic_v5_its_resolve_lpi(kvm, its, msi->devid, msi->data, &irq);
+> +	if (borrowed_mm) {
+> +		kthread_unuse_mm(kvm->mm);
+> +		mmput(kvm->mm);
+> +	}
+> +
+> +	if (ret)
+> +		return ret;
+
+[Severity: High]
+Does this violate the KVM_SIGNAL_MSI ABI by returning negative error codes?
+
+When the guest provides an invalid mapping (like an out-of-bounds Event ID),
+vgic_v5_its_resolve_lpi() returns errors like -E2BIG or -EINVAL. Propagating
+these directly to the ioctl caller instead of returning 0 (to indicate the
+guest blocked or unmapped the MSI) can cause the VMM to abort, creating a
+guest-to-host Denial of Service.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261016155741.9799=
-85-1-sascha.bischoff@arm.com?part=3D15
+85-1-sascha.bischoff@arm.com?part=3D9
