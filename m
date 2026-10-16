@@ -1,242 +1,166 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A137944AB68
-	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 12:08:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792152537; cv=none; b=iajm+6e+iEp4iKvA9fWbxQjDMgrM4i+C7sxifMxspNyPHyPC3OJ68whpbbJ1MRv4xzyNV8WC5FGy4Ls+pH2G2AbIPnFTwq2ArOVDUnxIuXn0QZAGewNIcMYrh993Tl0L9/CChHBf2wmmqNozEIQ1lj9lyl1JR5GXyiSH+z394bg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792152537; c=relaxed/simple;
-	bh=VFMH9dN/WQRl6EcUgR05d3+nY7m15apBlHJFVXqVwaM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PGuOKtXJgYI9wVP1/J6+EeHk9G+qqZ/OERlRYOJMZ7luWiJh6rI5jYpV3xsWtcyQLNZYn6JfYkd8YsviDyRB2VGc3tsttrs/WzxzXH9DMZIc/7Nz8Uh1C0az95MG0JG3f1SNYdpBR86ZKPuuXqUwmEMANUUvX0wxtvl+YhesmLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=YZueOI6w; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E3A391E7C
+	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 12:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792153506; cv=pass; b=UPOBmdDZqSh6vqGoZ2qV6Fjc/8T2BVfeNRcQITV8LOym00w99QfbYabnvtBpOawL/U9YEm1tpr8kwRM1SAbN3r8E9rMN41hyKSA8BFDn7lSAXN+5KJFtJxfEjkbxurnhH9OIXyxiiHvhuKB427ek2s9HB8rlyklhQTTCXtrEd8w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792153506; c=relaxed/simple;
+	bh=HZbf0gFTkk4XHHbd0+91ej0u1COCP7IOH2nDV2cudv8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GVDRBTrKsKBL1iB3wGM7iquxSPcxQM1l7qO83cCNItSr7WHSb2qUhi1hz3TK/YIaccvAsQncA9Igy3eiB3tEL0wXE2Ix+eeMmyvCGEGD73ksRVLKkmp671U9xWlvbPGyA070R8sFb3R2W6HNQ8vbNr55E1w9+rUloRYGB8jX630=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=H/Z1lp0/; arc=pass smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="YZueOI6w"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B073914BF;
-	Fri, 16 Oct 2026 05:08:51 -0700 (PDT)
-Received: from J2N7QTR9R3.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EE35C3F871;
-	Fri, 16 Oct 2026 05:08:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792152535; bh=VFMH9dN/WQRl6EcUgR05d3+nY7m15apBlHJFVXqVwaM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YZueOI6wp4sAix2W59PLrWZY2Wfb/pUbddS5jR0dFXrqo1hImpFPo9X4bSWf82m0K
-	 5E7Erv9pXv7+Ivxz3n/gRoQ4PjKJyFnCiN4LJed73EILzQytL4TH9BC1tzgYcUrDTx
-	 ZBmd5Lb0iKIE0sdJQzdz7/sYpspWNAZPw5oSfKPA=
-Date: Fri, 16 Oct 2026 13:08:49 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Tomohiro Misono <misono.tomohiro@fujitsu.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>, Marc Zyngier <maz@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, Radu Rendec <radu@rendec.net>,
-	Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Kohei Enju <enju.kohei@fujitsu.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-perf-users@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 3/4] perf: arm_pmu: Add workaround for FUJITSU-MONAKA
- Erratum E#030002
-Message-ID: <atIT0dmeqAXLoThW@J2N7QTR9R3.cambridge.arm.com>
-References: <20261016-monaka-fix-for-upstream-v2-0-fc7ede7f9f48@fujitsu.com>
- <20261016-monaka-fix-for-upstream-v2-3-fc7ede7f9f48@fujitsu.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H/Z1lp0/"
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-888cbacf70eso69780347b3.1
+        for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 05:25:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792153504; cv=none;
+        d=google.com; s=arc-20260327;
+        b=G76QPpzB76UDkUyZgL10vSPnA1q20X33prhD3RjBC5JW75FDDaMnB4xgth5ZoCXa5E
+         O4Bfd57TB43s3NuGvySHAqS2GLQYDJ5JjYFjyZ+aqKQ9s3KC+jGhNXU74P06R6gO8Zch
+         /rkPtuCSosTksLz6YHTRvUTGckfylUpyrUlqTVlH5Y8O8ofC837yVYRYaZS4Rg3K3u3v
+         7loIR9p0/VIwH730mNyVUemdrAfbfg+6D3LXuxp7xKieElouXSPw7LYTgzadTRg/kOix
+         /KWQdtlMo3tEV+ewmVi8VUhhPem3a0bL7cSmqUopdRQ6kxiK8/SkoDe9mEBB/uBYONgX
+         SEvw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=zQ7v723Xwm8CKvdncmpgIg6KtAXzOUldqD/wPY6Bdsk=;
+        fh=ti/kWWZyQWhtPP4K3xaX7y1xwpZsJ+x5xC/lyXraxyU=;
+        b=Sdfpy/17TyXOest59v+AHDgZoDLKEm+epCY3NWV7w24iapgDrWyGFoslRK4aqbkp1h
+         jWQ6g6qV/qoCzaRuEgeUFi7XYV3huaIkfq0Il1N2FKEOiS2iLOKuZeJznSQMBk6mDyJa
+         vpNl8rjDJlFmPzX5ovY1ctIwnD6esHZx1gP75t161cDOPqEAsuO5laK7S8rkPqCIeYW/
+         9v1kAAVk+TybvwPz+uMQEIX3NfXxrjI0JcAa01a7QneN5++v80sjeanx1VQ09wIgPbPh
+         UnpPuLpl96Z39Kz/5SB/hJ9yUnpf6hgtjv4GninXbPiUlmRbbfUgMWXehJW+sSjETrK/
+         kngg==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1792153504; x=1792758304; darn=lists.linux.dev;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=zQ7v723Xwm8CKvdncmpgIg6KtAXzOUldqD/wPY6Bdsk=;
+        b=H/Z1lp0/uBouuaZi4cbiNRuaIKZe7NdCeIxHCx2O5wY8c6b1yOnptO1a0R1pQrVoQP
+         3ZFwJRx5c4YPp/KQBA9XL3zs5bV0rdteFBnA1DuXZi15cBsWPJMDkl3o7IMkdAijtQJB
+         3ki0uBJbLKTcPV+zxmYQrVwLfYwFUEIkB4YIYgwM+jAbDSegh6EgtUPugrqA2gjCP097
+         XIh/PHQlH+6imX85HXzPM9qjG4spqn9+UEhEIZiljsG2kwjeSVoN7YepDAhPIWk2MbFo
+         VWVr8ZrMpHUYr+KyF89Ro9OJ2zmzmZQeFA7bp3sWc1OBfvMFE6ewx+tyD2/itS6fHhq1
+         WqgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792153504; x=1792758304;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=zQ7v723Xwm8CKvdncmpgIg6KtAXzOUldqD/wPY6Bdsk=;
+        b=aoe4cKakXb6+OKEG+6SQ5kuZkyjWd01VOz3MRrvSAvr7Wu3rrbJMTIfJ2yTHPz7Dp3
+         R6Y1ZLEMJhIjcKJZmhOglYjTK8gIT4vfkiSAwto4cGDcCX6a6p0wkYp90SoYwyyWTRym
+         A/hn9Es/QgSeKbKEinO8PkVCR6jEkJVjMNagUyX1qLR+cSdp6LJTUA1uV7klMOYBJvnq
+         ckHMgMBo2OcolWn144OldmZlRsXDynsV0KbKZyEcbMGR/AcI81feEiBOMPTo1t+QjRo0
+         cd02jdl2T6i7l3MLiXMjbedE0KlfLb4aGF7JXs2fmQLWEQ52IymS8XUCHpnljOjRtrBH
+         1IZw==
+X-Forwarded-Encrypted: i=1; AKwUvByTD+6gt9nxfmCOl9vTIYESY+xMSNxIeb7oHH9A6reRoQF0q0rWLm7TDQcBw0N5nCHz14RA7WI=@lists.linux.dev
+X-Gm-Message-State: AFq9FYLXRVDQwRR1H8nQ0c8PxZ1OTQfxtq8nGjQn6eucvlaOyjpJnsdC
+	II3cwt0YcgFurXC6IbLKf2FtHq2xVzRF2rG3nYV8hRSBhBz2BIOnTmwr2ZquR2gvzKMnRzYVypT
+	JUwSArkcChLNBT88oms4AoSKc+3tOfUuCZt96pe2rMQ==
+X-Gm-Gg: AYBFou0egx5UFzEE4K6QkoH68oxs2u4dXVmo7VIZxstkXAq8lBxONLBN3GRLm3gpZUW
+	po9qqqIW42cVa8OV6Bp8fZ4pbePYHuovh+GIouwRvAGktFJj6tGHHPAqL071Bd5zX2+Byo/3Htd
+	xB43hzd4dfZTFpzgOvOL8oxie4eA+bey/6IXekblw6HYZZimWA3gTPJCcj9ROogn0IVo9Tmdf53
+	/K23LBpseHpE96VqG/35tzyk8If0RiBwYLkdD9mIV0XFqXoL2ZzcEbScCpK1nSuDZ6U+ndJ677P
+	3i5fjvxP7NAhcp5PkaO5eam/vCYq/eM5L0xrFjmUizl1z4oonK99m9J3HRUn6CuEWhe6UcbfoCT
+	vR8UIy5sMNFQPQlVml2lgDYji4bRpldpWLnJkejI=
+X-Received: by 2002:a05:690c:38a:b0:8ab:f06b:4167 with SMTP id
+ 00721157ae682-8b07ed94faemr70880547b3.13.1792153503619; Fri, 16 Oct 2026
+ 05:25:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261016-monaka-fix-for-upstream-v2-3-fc7ede7f9f48@fujitsu.com>
+References: <20260921123249.1708067-1-khushit.shah@nutanix.com>
+ <20260921123249.1708067-13-khushit.shah@nutanix.com> <45c37754-2244-4336-9aa8-12d0b89840d4@redhat.com>
+In-Reply-To: <45c37754-2244-4336-9aa8-12d0b89840d4@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 16 Oct 2026 13:24:52 +0100
+X-Gm-Features: AclHuK8QUVErp647tqWp5ytpV4Of4NOKFC85jRCyp3SMOobKD0YHSCkB-sEVa48
+Message-ID: <CAFEAcA_VksKhAoAFhV-F-DTdFTp02ZHs8cUrpX5qaOCAJTMOng@mail.gmail.com>
+Subject: Re: [RFC PATCH v4 12/25] target/arm: add arm-v9.0-a-v1 named CPU model
+To: eric.auger@redhat.com
+Cc: Khushit Shah <khushit.shah@nutanix.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, 
+	kvmarm@lists.linux.dev, cohuck@redhat.com, richard.henderson@linaro.org, 
+	maz@kernel.org, oliver.upton@linux.dev, berrange@redhat.com, 
+	abologna@redhat.com, jdenemar@redhat.com, gshan@redhat.com, 
+	skolothumtho@nvidia.com, sebott@redhat.com, armbru@redhat.com, 
+	philmd@linaro.org, yangjinqian1@huawei.com, shaju.abraham@nutanix.com, 
+	mark.caveayland@nutanix.com, ping@khushitshah.com, sandesh.patel@nutanix.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Oct 16, 2026 at 07:00:47PM +0900, Tomohiro Misono wrote:
-> FUJITSU-MONAKA Erratum E#030002 affects FUJITSU-MONAKA CPU.
-> 
-> On affected FUJITSU-MONAKA CPUs, after a PMU event counter is
-> stopped at a value just before overflow, an overflow might still
-> be incorrectly detected, resulting interrupt storm in some case.
-> 
-> For example, if the following conditions are met:
->   1) Running perf to count an event in user space only
->   2) The event can also occur in kernel space
->   3) The counter value is set just before the overflow
->      (when using the -F option, initial counter value is -1)
-> 
-> when the kernel is about to return to user space after enabling
-> the count, an overflow interrupt is incorrectly triggered by an
-> event that occurred in kernel space. Since the counter value is
-> not updated (correctly), the interrupt handler does nothing and
-> returns with the same condition. This leads to another wrong interrupt
-> and results in an interrupt storm and eventually a softlockup.
+On Fri, 16 Oct 2026 at 13:07, Eric Auger <eric.auger@redhat.com> wrote:
+>
+> Hi Khushit,
+>
+> On 9/21/26 2:32 PM, Khushit Shah wrote:
+> > Add a KVM-only named CPU model for the Armv9.0-A baseline, following
+> > DDI0487 revision M.c. The property list is the architecture-mandated
+> > ID-register field view.
 
-I don't fully understand this.
+> > +static const ArmModelPropValue arm_v9_0_a_v1_props[] = {
+> > +    /* ID_AA64PFR0_EL1 */
+> > +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_EL0", NUM, 1), /* only FEAT_AA64EL0 (Armv9.0) */
+> > +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_EL1", NUM, 1), /* only FEAT_AA64EL1 (Armv9.0) */
+> > +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_RAS", NUM, 1), /* FEAT_RAS (Armv8.2) */
+> > +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_DIT", NUM, 1), /* FEAT_DIT (Armv8.4) */
+> > +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_CSV2", NUM, 1), /* FEAT_CSV2 (Armv8.5) */
+> > +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_CSV3", NUM, 1), /* FEAT_CSV3 (Armv8.5) */
+> > +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_FP", NUM, 1), /* FEAT_FP16 */
+> > +    MODEL_PROP("SYSREG_ID_AA64PFR0_EL1_AdvSIMD", NUM, 1), /* FEAT_FP16 */
+> I have not found that FP+AdvSIMD (ie FEAT_FP16) were mandated by v9.0
+> amybe you want this model to implement FP16 but it does not seems
+> strictly mandated in v9.0
+> so it might be distinguished from other settings that are truly mandated.
 
-Surely the relevant PMOVS{CLR,SET}[n] bit set as if the counter n
-overflowed?
+FP/AdvSIMD is one of those things that's technically optional (because
+you might have some extremely-embedded special purpose device that
+doesn't want FP) but in practice is mandatory. (The Arm ARM says
+"This option [no FP] is licensed only for implementations targeting
+specialized markets". Anything that might be running Linux and KVM
+is not that.
 
-If that bit is set, the handler will certainly do *something*.
+> > +
+> > +    /* ID_AA64PFR1_EL1 */
+> > +    /* KVM zeroes out these field when MTE is not enabled. */
+> > +    MODEL_PROP("SYSREG_ID_AA64PFR1_EL1_MTE_frac", NUM, 0),
+> useless as default is 0, no?
+> > +    MODEL_PROP("SYSREG_ID_AA64PFR1_EL1_BT", NUM, 1), /* FEAT_BTI (Armv8.5) */
+>
+>
+> > +
+> > +    /* ID_AA64MMFR0_EL1 */
+> > +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran64", NUM, 0xF), /* not mandatory */
+> > +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran4", NUM, 0), /* 4K granular support */
+> > +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran16_2", NUM, 1), /* not mandatory */
+> > +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran64_2", NUM, 1), /* not mandatory */
+> > +    MODEL_PROP("SYSREG_ID_AA64MMFR0_EL1_TGran4_2", NUM, 1), /* not mandatory */
+> so the top comment, ie.
+>
+> +/* Arm-v9.0-a mandatory features. */
+>
+> should really be updated accordingly. None of that is mandated by v9.0
+> spec, right?
 
-If that bit is not set, the interrupt shouldn't be asserted at all. When
-does it get de-asserted?
+The comments here are confusing, because what we really want to point
+out here is that for these fields the "not implemented" value is not
+always "0" (in some cases it's 0b1111 and in some 0b0001). Where we
+set some non-0 value that is the "not implemented" value we should
+say that.
 
-> Work around the erratum by avoiding programming PMU event counters
-> with values within five counts of overflow.
+Also, no particular granule size is mandatory; you just need to support
+at least one, and 4K is most popular, but you can have just 16K or
+just 64K if you want. So this is making an actual choice.
 
-Without more detail, I don't think that can be sufficient, because you
-can end up in a scenario where:
-
-1. The kernel confugures the counter to -5.
-
-2. The kernel returns to userspace.
-
-3. In userspace, 4 events occur, and are counted, leaving the counter at
-   -1.
-
-4. Some unrelated interrupt is taken, entering the kernel.
-
-5. Upon return to userspace, a kernel event occurs, triggering this
-   issue.
-
-6. The PMU interupt handler runs, does nothing, leading right back to
-   the original issue.
-
-What am I missing?
-
-Mark.
-
-> Signed-off-by: Tomohiro Misono <misono.tomohiro@fujitsu.com>
-> 
-> ---
-> Changes in v2:
-> - Add user impact explanation in the commit message
-> ---
-> ---
->  Documentation/arch/arm64/silicon-errata.rst |  2 ++
->  arch/arm64/Kconfig                          | 17 +++++++++++++++++
->  arch/arm64/include/asm/cpucaps.h            |  2 ++
->  arch/arm64/kernel/cpu_errata.c              | 10 ++++++++++
->  arch/arm64/tools/cpucaps                    |  1 +
->  drivers/perf/arm_pmu.c                      | 13 +++++++++++++
->  6 files changed, 45 insertions(+)
-> 
-> diff --git a/Documentation/arch/arm64/silicon-errata.rst b/Documentation/arch/arm64/silicon-errata.rst
-> index 527af20b26468..0efb24ec01b4c 100644
-> --- a/Documentation/arch/arm64/silicon-errata.rst
-> +++ b/Documentation/arch/arm64/silicon-errata.rst
-> @@ -377,6 +377,8 @@ stable kernels.
->  +----------------+-----------------+-----------------+-----------------------------+
->  | Fujitsu        | MONAKA          | E#030001        | FUJITSU_ERRATUM_030001      |
->  +----------------+-----------------+-----------------+-----------------------------+
-> +| Fujitsu        | MONAKA          | E#030002        | FUJITSU_ERRATUM_030002      |
-> ++----------------+-----------------+-----------------+-----------------------------+
->  +----------------+-----------------+-----------------+-----------------------------+
->  | ASR            | ASR8601         | #8601001        | N/A                         |
->  +----------------+-----------------+-----------------+-----------------------------+
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index 5d1a17ab0f593..43fd265156e46 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -1361,6 +1361,23 @@ config FUJITSU_ERRATUM_030001
->  
->  	  If unsure, say Y.
->  
-> +config FUJITSU_ERRATUM_030002
-> +	bool "FUJITSU-MONAKA erratum E#030002: PMU overflow may be incorrectly detected"
-> +	depends on ARM_PMUV3
-> +	default y
-> +	help
-> +	  This option adds a workaround for FUJITSU-MONAKA erratum E#030002.
-> +	  On affected FUJITSU-MONAKA CPUs, after a PMU event counter is
-> +	  stopped at a value just before overflow, an overflow might still
-> +	  be incorrectly detected.
-> +
-> +	  Work around the erratum by avoiding programming PMU event counters
-> +	  with values within five counts of overflow.
-> +
-> +	  The workaround only affects the FUJITSU-MONAKA.
-> +
-> +	  If unsure, say Y.
-> +
->  config HISILICON_ERRATUM_161600802
->  	bool "Hip07 161600802: Erroneous redistributor VLPI base"
->  	default y
-> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-> index 9220b917ec207..c0a0452daf949 100644
-> --- a/arch/arm64/include/asm/cpucaps.h
-> +++ b/arch/arm64/include/asm/cpucaps.h
-> @@ -68,6 +68,8 @@ cpucap_is_possible(const unsigned int cap)
->  		return IS_ENABLED(CONFIG_ARM64_ERRATUM_4193714);
->  	case ARM64_WORKAROUND_FUJITSU_030001:
->  		return IS_ENABLED(CONFIG_FUJITSU_ERRATUM_030001);
-> +	case ARM64_WORKAROUND_FUJITSU_030002:
-> +		return IS_ENABLED(CONFIG_FUJITSU_ERRATUM_030002);
->  	case ARM64_MPAM:
->  		/*
->  		 * KVM MPAM support doesn't rely on the host kernel supporting MPAM.
-> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-> index a11135f83e858..6363b694b4478 100644
-> --- a/arch/arm64/kernel/cpu_errata.c
-> +++ b/arch/arm64/kernel/cpu_errata.c
-> @@ -1048,6 +1048,16 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
->  					{}
->  				})),
->  	},
-> +#endif
-> +#ifdef CONFIG_FUJITSU_ERRATUM_030002
-> +	{
-> +		.desc = "FUJITSU-MONAKA Erratum E#030002",
-> +		.capability = ARM64_WORKAROUND_FUJITSU_030002,
-> +		ERRATA_MIDR_RANGE_LIST(((const struct midr_range[]) {
-> +					MIDR_ALL_VERSIONS(MIDR_FUJITSU_MONAKA),
-> +					{}
-> +				})),
-> +	},
->  #endif
->  	{
->  		.desc = "Known broken GICv3 SEIS implementation",
-> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-> index 1e57a0105395b..ef8ce70ab7121 100644
-> --- a/arch/arm64/tools/cpucaps
-> +++ b/arch/arm64/tools/cpucaps
-> @@ -133,3 +133,4 @@ WORKAROUND_SPECULATIVE_SSBS
->  WORKAROUND_SPECULATIVE_UNPRIV_LOAD
->  WORKAROUND_BROKEN_AMU_CONSTCNT
->  WORKAROUND_FUJITSU_030001
-> +WORKAROUND_FUJITSU_030002
-> diff --git a/drivers/perf/arm_pmu.c b/drivers/perf/arm_pmu.c
-> index 1150695653892..c0b8580d80bae 100644
-> --- a/drivers/perf/arm_pmu.c
-> +++ b/drivers/perf/arm_pmu.c
-> @@ -234,6 +234,19 @@ int armpmu_event_set_period(struct perf_event *event)
->  	if (left > (max_period >> 1))
->  		left = (max_period >> 1);
->  
-> +#if IS_ENABLED(CONFIG_ARM64)
-> +	if (alternative_has_cap_unlikely(ARM64_WORKAROUND_FUJITSU_030002)) {
-> +		/*
-> +		 * Due to the errata, overflow might be incorrectly detected in the handler
-> +		 * when the counter is about to overflow in a single increment, resulting
-> +		 * interrupt storm in some case. As the counter can increase by up to
-> +		 * 5 at a time, set 6 here to prevent the condition.
-> +		 */
-> +		if (left > 0 && left < 6)
-> +			left = 6;
-> +	}
-> +#endif
-> +
->  	local64_set(&hwc->prev_count, (u64)-left);
->  
->  	armpmu->write_counter(event, (u64)(-left) & max_period);
-> 
-> -- 
-> 2.43.0
-> 
+-- PMM
