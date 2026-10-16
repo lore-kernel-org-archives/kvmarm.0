@@ -1,212 +1,211 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 796F93E717A;
-	Fri, 16 Oct 2026 10:16:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19823474267
+	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 10:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792145802; cv=none; b=G1BKPBIF8F9e7cgqvyDHyMHphN6OnXpTEqlwBwmRKAzIwyfImRHN2srwqEtyaJXFmkDz2wDlX0wXCWceLRkr7Wr0tF1pl83qV/tj+2172baaOO7DEUfdSDlnvBLhxo9s2ogprzrR2g1KqveTStMCUGt2NG3GMDS/IApin1xEARg=
+	t=1792148288; cv=none; b=eOUyX7X00bvRi0h6e4/tsxsJu6ky4/pWX17HCgGue4CaSGJ8LCcanDAncdkS5/OiipW2oSy3Dcb6aY9E+A9trGA7UbqUZV3Ai6Oo4k3M7UAqIG7pJLiegBzSCD4DVf1rIE320zXBrAmFr7PbvdLiyuHJno+J/4l8pqQGeBjPYY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792145802; c=relaxed/simple;
-	bh=bukFjyUDAS8w3bfcUuEoOPmGSr7vtKSdlr/2yLqWGl4=;
-	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=LLCtry/M2OBU7nq14V0UapGqp5hsO8t8WWCV7PmcNDdIvg62gMO/uRPR8O5s4LO0zds5xUtigsq+/n6tclVFLW6SDlalZOjbUu4tBffqxwqYZHV0XUZAId8NxldTi5S9ID3zk6SPdeVxJLf0MHNbHgrGscMmG//zxXfZ61v5O4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BqNqg7Kk; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792148288; c=relaxed/simple;
+	bh=Fg04sF4wbeMFqUdM8zmoRfU3uiwkIyCVmr/Efwdeo90=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nodXIjlkWrz57rmlZC8JgY17HkJeqKhbzKWL7rMvyMvyH6JU2rlDGfegbaicfkTGAjKLTiJreyjDI1tB0cRymOX1A/27rTeG4AYAeQv+t/kX3Ig/MDPY4nF89eVv7FEzDJEOAWPEKRniNzXEyyBAnstxxrR6m7m/SoMjVGpJc+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rdKU3Ex0; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BqNqg7Kk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C27881F000C4;
-	Fri, 16 Oct 2026 10:16:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792145801;
-	bh=wiprSAgtO9o/sDEd18PczQdNBJ6iix2zGRXQtEeQuDo=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=BqNqg7Kk4Vh6X5oUvg0DXsJr+epgTZPZpYX/Vq0VVymb+If1TIHuYOg38dRTiC6ig
-	 Oef8F19O0esEJFWdnPuay1TQyDirZKJzelKW1ZNUWZ+Mfsyd9y9XTZbuMuIskhvFMq
-	 aLiW9BvFcx9vQlIV1++bGK5F+HyH6Z0kGAAW2cVMFHb/CSBOWxuNCZtmjWOchesItu
-	 CCbH5gTrYlYuMKpJ0VotWj5QnHaVOjrVrLLMMD+AwP7Vx5TN/k0OzHB3rRBXDAucqC
-	 2tEbjwmq3tfWlt6u0VPJtxuXpOdwpbNDAh80ydeyF/YxNKdRxC8Mhn/V0UG6cxyQyT
-	 DDAyzB06RCPfA==
-Message-ID: <sashiko-outbox-174139@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 2/4] arm64: tlb: Add tlbi workaround for
- FUJITSU-MONAKA Erratum E#030001
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Tomohiro Misono" <misono.tomohiro@fujitsu.com>
-Cc: linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20261016-monaka-fix-for-upstream-v2-2-fc7ede7f9f48@fujitsu.com>
-References: <20261016-monaka-fix-for-upstream-v2-0-fc7ede7f9f48@fujitsu.com>
- <20261016-monaka-fix-for-upstream-v2-2-fc7ede7f9f48@fujitsu.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 16 Oct 2026 10:16:40 +0000
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rdKU3Ex0"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4a17baef589so27224035e9.0
+        for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 03:57:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792148275; x=1792753075; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=JjoY/Y//bNqM95eGJvwXGt/YGARtJeL2jF1lkb5NGWs=;
+        b=rdKU3Ex0BJB3RKleH37Jpa5Od03LCfCIAFW/iQcsXbyqjMJ5EVpVB9LKCjDKRn5+aq
+         bYaVIp3Xsn4bVi0WeriwZG8eZYNYX68UXwJsA0NvCnn9losA/n4bBTqNV3WgeWaWw2uC
+         oXe52PRlQxx/urS5KIM3wY6XLwBw7caVov62Kt2fEdiYnrZAMXFXilIbl/Z8mGZNvVTJ
+         +m2t7Q8UzeR5guqhXMN3qOMiehCxunmYrN+YINobbbZGidoWJ/VH6ImzFW65Yz13Qt5L
+         xNLAaM5hkneSN8YBmfrPVWtooDjyuBdGU0BwHDyUvWhrEcczyWH5tWInrmeLMIhjD2vF
+         6etA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792148275; x=1792753075;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=JjoY/Y//bNqM95eGJvwXGt/YGARtJeL2jF1lkb5NGWs=;
+        b=lFtBZaKdXWZEdIWzOXg8KphcjKzNUNv6VvHgZxeeIiBGFEFhwYu5AUH1xKra1Tyv2U
+         m22OK/QaToLvYgPs36RjjIEfRQ0bmMBVpOHM2tAQ9uyE29k8rm/Lm+pq/XbKrX7j0Tbi
+         aN5EKlSEOnwrzkCnAx+yorsqKedzu/aXibnLZ7lBwwx7dq65rPQjMMWrCcHXitQfKwfb
+         0inZ69eihdDTmpDcoGhqJjKG7pFxdEgtG/pEOiQXrx0ZymD0Hkhz5GTquW5L1ZTmtSSq
+         pV3/nE6PGE5xOLfvjVD+AtJfFElu8Fm1OY0bg1pPVyKQ2doDWE30Pv4pc9eVMCtgIjiD
+         dDIg==
+X-Forwarded-Encrypted: i=1; AKwUvBxEvwYc5MbjOTZQChvo1R+KgV5l7eQvrenFiU+M2VLBuvPhGML7Qyvm8ku3XB1Xs3XqQ0iiwoI=@lists.linux.dev
+X-Gm-Message-State: AFq9FYLouCDW/AEgA10l6YZ4miWPliIMMzyGAnVu8J6yc4izhAX0WeQW
+	Qz5K/ULHl1brUE2rehqEk16gdmH+b9VC2xev4AWMRPtnDe2Yud5OP9Z0
+X-Gm-Gg: AYBFou1pWQ6iq1seFwBVguf8grlCGesUt6YyAQ+NqPkElB50cpWugexa8diQcS0EMGi
+	N8l5iGXQXFttn0pSJyCAcWC63Yewa3WM8Ljy71prU9IgC4ptdax5PJ6TjpTmnZ4u3yS8H/udoz+
+	vZV0/9iSSgKivpPkZddDQtXF2fyV18Ntf+qL1MBE68QJ+0CuUiWjvC/cxjGPf1TxpW0B5ZDZ7up
+	o0zRi6pMmNUPKVuqRbvfOYfQcvAt/KKUrdhMfmGQbfPkjYXZeCGZBqtnmz2WJOi3An0qwtfDl8E
+	zpnntkmuUYvr/0I+a01qlgd/OpPB/DWFViEnf/BPwYkc+PmciUjAaAxxdi+B+NZrpRIvrIT6nJ2
+	DbOaEsLin37VLUpF7CPTNABNwjEy72pDgh734/E3lkkvYmFwcBKX/CaegpaseebfQGJb9EWceLG
+	qpm/r1MBp2y2wpFVx91YbaCMbMGtTRQ2BThpy9WM8UQbemINtI6i4ZTvsO+1vRA9Mt7oyp1eMJ6
+	r3zlh0UIkY+XHyEc7goCpevYx8F035gaAIBmi+mV1UWydDBUhCwBgXE91mktxQuLTZ7q1ZhOLyw
+	ja/ytGnBq9BTPJDdGS+Tlga7U69AmwBBu+s=
+X-Received: by 2002:a05:600d:82c8:b0:4a1:cedc:ab51 with SMTP id 5b1f17b1804b1-4a1cedcac09mr30065765e9.35.1792148274917;
+        Fri, 16 Oct 2026 03:57:54 -0700 (PDT)
+Received: from dev-dsk-fgriffo-1c-93421965.eu-west-1.amazon.com (54-240-197-234.amazon.com. [54.240.197.234])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1c8ae6d2esm50003685e9.6.2026.10.16.03.57.53
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 16 Oct 2026 03:57:54 -0700 (PDT)
+From: Fred Griffoul <griffoul@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	David Hildenbrand <david@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Cc: David Woodhouse <dwmw2@infradead.org>,
+	Ackerley Tng <ackerleytng@google.com>,
+	Lorenzo Stoakes <ljs@kernel.org>,
+	"Liam R . Howlett" <liam@infradead.org>,
+	Vlastimil Babka <vbabka@kernel.org>,
+	Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	iommu@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [RFC PATCH v2 00/11] mm: Memory providers for guest_memfd and iommufd
+Date: Fri, 16 Oct 2026 10:57:52 +0000
+Message-ID: <20261016105752.68015-1-griffoul@gmail.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <yq5a4iem57qv.fsf@kernel.org>
+References: <20261014093733.90312-1-griffoul@gmail.com> <yq5a4iem57qv.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [High] kvm: arm64: erratum workaround injects host translation granule in=
-to guest TLBI
-- [Medium] kvm: arm64: erratum workaround loop bypassed on address space wr=
-ap-around
---
+Aneesh Kumar K.V <aneesh.kumar@kernel.org> writes:
 
-commit bd446dc250f0ed99bcd777fad354a7212578bba8
-Author: Tomohiro Misono <misono.tomohiro@fujitsu.com>
+> What confused me was the introduction of memory providers as a subsystem
+> in their own. What we really need is the ability to map PFNs from
+> other subsystems into KVM stage-2 and into subsystems such as iommufd?.
+>
+> Restricting the scope to the above, at least initially, would make this
+> much easier to reason about.
 
-arm64: tlb: Add tlbi workaround for FUJITSU-MONAKA Erratum E#030001
+Thanks for looking at it. I should have explained this better in the
+cover letter.
 
-This commit adds a workaround for FUJITSU-MONAKA Erratum E#030001, where
-range-based TLBI operations targeting a VA or IPA may fail to invalidate
-TLB entries for 512MB mappings. It works around the erratum by issuing
-additional non-range TLBI instructions corresponding to the affected VA or
-IPA range-based TLBI operations.
+A memory provider is the driver that owns some memory, like a carve-out
+or a device BAR. It lends pages to whoever maps them, and it can take
+any of them back later. guest_memfd is one user of that memory, and
+iommufd is another, but neither depends on the other.
 
-> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/t=
-lbflush.h
-> index 14a78ac0f8009..2636c273b8111 100644
-> --- a/arch/arm64/include/asm/tlbflush.h
-> +++ b/arch/arm64/include/asm/tlbflush.h
+With this series, iommufd can map a provider file without any VM. Today
+it cannot map such memory, because memory without struct page cannot be
+pinned. For example, a host service that recycles provider memory
+between VMs could clear it with a DMA engine driven through VFIO and
+iommufd, instead of the CPU. And since such memory can outlive the
+process, or a kexec of the host, a network or storage dataplane could
+restart or be updated without losing its DMA buffers.
 
-[ ... ]
+> For my use case, the VFIO fd becomes the backing provider (referred to
+> as backend below). We can create a guest_memfd using that
+> resource_fd, allowing MMIO BAR ranges to be mapped into KVM stage-2.
 
-> @@ -487,6 +487,39 @@ static __always_inline void __tlbi_range(tlbi_op op,=
- u64 addr,
->  	op(arg);
->  }
-> =20
-> +#ifdef CONFIG_FUJITSU_ERRATUM_030001
-> +static __always_inline void fujitsu_erratum_wa(tlbi_op lop, u64 start, u=
-64 end, u16 asid)
-> +{
-> +	u64 addr;
-> +
-> +	if (!alternative_has_cap_unlikely(ARM64_WORKAROUND_FUJITSU_030001))
-> +		return;
-> +
-> +	/*
-> +	 * The erratum fails to invalidate TLBI entries in the range when
-> +	 * addr[34:29] =3D=3D all 1 && addr[28:0] =3D=3D all 0 for 512M hugepag=
-e.
-> +	 * This affects both on S1 and S2 tables and 4k guest may be affected
-> +	 * if host uses 64k page size. Therefore it cannot be determined
-> +	 * reliably if the target entry is affected or not here. So, always
-> +	 * assume hugepage is used.
-> +	 * The workaround is to issue extra non-range TLBI ops corresponding
-> +	 * to the affected VA or IPA range-based ops in the range.
-> +	 */
-> +	addr =3D (start & GENMASK_ULL(63, 35)) | GENMASK_ULL(34, 29);
-> +	while (addr < end) {
-> +		__tlbi_level_asid(lop, addr, TLBI_TTL_UNKNOWN, asid);
+That fits well. VFIO could be a provider for its BARs: get_page()
+reports the BAR frames with the MMIO type. guest_memfd takes the VFIO fd
+as resource_fd, and iommufd can map the same fd. That could also replace
+the dma-buf plus symbol_get() path that iommufd uses for vfio-pci today.
 
-[Severity: High]
-Can this inject the host's translation granule into a guest TLBI?
+> Another feature provided by this series is the ability to map the same
+> range into iommufd. We probably want to restrict this to shared ranges.
+> It may be simpler for guest_memfd to drive this.
 
-When KVM handles a nested guest's range TLB invalidation, it calls
-__fujitsu_erratum_wa(), which invokes this fujitsu_erratum_wa() helper. The
-loop here calls __tlbi_level_asid(lop, addr, TLBI_TTL_UNKNOWN, asid).
+Agreed that guest_memfd must drive shared and private. I replied to
+Ackerley on how that could work with the provider interface:
 
-Looking at __tlbi_level_asid():
+  https://lore.kernel.org/all/20261015171746.51538-1-griffoul@gmail.com/
 
-static __always_inline void __tlbi_level_asid(tlbi_op op, u64 addr, u32 lev=
-el,
-                                              u16 asid)
-{
-        ...
-        if (alternative_has_cap_unlikely(ARM64_HAS_ARMv8_4_TTL) && level <=
-=3D 3) {
-                u64 ttl =3D level | (get_trans_granule() << 2);
-                FIELD_MODIFY(TLBI_TTL_MASK, &arg, ttl);
-        }
-        op(arg);
-}
+In short, on a conversion to private, guest_memfd claims the range on
+the provider file. The provider code in mm then revokes it for every
+other consumer, iommufd included, and hands them holes until guest_memfd
+unclaims it. So guest_memfd stays in charge of conversions, and
+iommufd only ever maps shared pages, without going through guest_memfd.
 
-Since TLBI_TTL_UNKNOWN is 0 and 0 <=3D 3, __tlbi_level_asid() unconditional=
-ly
-sets the TTL field using get_trans_granule(). However, get_trans_granule()
-returns the host kernel's compile-time page size. If the guest is operating
-with a different translation granule (e.g., 4K pages in the guest while the
-host is configured for 64K), the invalidation is issued with a mismatched TG
-hint.
+> Currently, a private-to-shared conversion causes a VM exit, followed by
+> an IOAS_MAP for the newly shared range. Could using guest_memfd with
+> IOAS_MAP_FILE avoid this?
 
-According to the ARM Architecture Reference Manual, a TLBI with a TTL field
-that does not match the actual translation regime's granule may fail to
-invalidate any entries. Does this leave stale TLB entries in the guest
-context?
+Yes, the IOAS_MAP goes away. The conversion itself still comes through
+the VMM, but once guest_memfd unclaims the range, iommufd maps the
+pages again on its own.
 
-> +		if (addr + BIT_ULL(35) < addr)
-> +			/* overflow */
-> +			break;
-> +		addr +=3D BIT_ULL(35);
-> +	}
-> +}
+> Perhaps the series could be rearranged as follows:
+>
+> - Allow a guest_memfd fd to be used with IOAS_MAP_FILE.
+> - Add a VFIO or other backend for guest_memfd, without calling it a provider.
+> - Add support for guest_memfd to provide guest PFNs to other subsystems
+>   through its file descriptor.
 
-[ ... ]
+I'd rather not make guest_memfd the only way in. With kvm_gmem_ops,
+each backend implements a guest_memfd: it binds memslots, invalidates
+KVM's mappings, handles the host mapping, and for confidential VMs
+prepares the frames and gives them back to the host. That puts KVM
+internals in every driver. With a provider, the driver only reports its
+frames and revokes them, and guest_memfd does the KVM side once, for
+every provider.
 
-> diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-> index c386d9f1c1016..2f1a7fab5eb97 100644
-> --- a/arch/arm64/kvm/hyp/vhe/tlb.c
-> +++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+Your diagram already uses mem_provider_ops between guest_memfd and
+iommufd. It is the same interface: get the frame behind a page, and
+revoke a range. So I'd define it once and let drivers use it too. That
+also covers the cases above, where there is no VM and no guest_memfd to
+go through.
 
-[ ... ]
+guest_memfd can still provide its own file to iommufd where there is no
+provider behind it, for a guest_memfd that allocates folios. That would
+use the same interface, and the same iommufd code.
 
-> @@ -218,6 +219,45 @@ void __kvm_flush_vm_context(void)
->  	__tlbi_sync_s1ish_hyp();
->  }
-> =20
-> +#ifdef CONFIG_FUJITSU_ERRATUM_030001
-> +static __always_inline void __vae1is(u64 arg)
-> +{
-> +	__tlbi(vae1is, arg);
-> +}
-> +static __always_inline void __vale1is(u64 arg)
-> +{
-> +	__tlbi(vale1is, arg);
-> +}
-> +static __always_inline void __vaae1is(u64 arg)
-> +{
-> +	__tlbi(vaae1is, arg);
-> +}
-> +static __always_inline void __fujitsu_erratum_wa(tlbi_op op, u64 va)
-> +{
-> +	u64 start, size;
-> +	u16 asid;
-> +
-> +	if (!alternative_has_cap_unlikely(ARM64_WORKAROUND_FUJITSU_030001))
-> +		return;
-> +
-> +	start =3D decode_range_tlbi(va, &size, &asid);
-> +	fujitsu_erratum_wa(op, start, start + size, asid);
+Would that work for your VFIO case?
 
-[Severity: Medium]
-Does this bypass the erratum workaround if the address space wraps around?
-
-When KVM emulates a guest range TLBI instruction, it decodes the range via
-decode_range_tlbi(). If the guest specifies a range that spans to the very =
-end
-of the 64-bit address space, decode_range_tlbi() caps size such that
-start + size exactly overflows to 0.
-
-Passing start + size as the end argument makes end =3D 0. Inside
-fujitsu_erratum_wa(), the workaround loop uses the condition:
-
-while (addr < end) {
-        ...
-}
-
-Because addr is an unsigned 64-bit integer pointing to the upper half of the
-address space, addr < 0 immediately evaluates to false, skipping the
-workaround entirely.
-
-> +}
-> +#else
-> +static __always_inline void __vae1is(u64 arg)
-> +{
-> +}
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261016-monaka-fix=
--for-upstream-v2-0-fc7ede7f9f48@fujitsu.com?part=3D2
+Thanks,
+Fred
