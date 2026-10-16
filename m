@@ -1,98 +1,153 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 369A7525A8F
-	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 15:42:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A46D25C818;
+	Fri, 16 Oct 2026 15:51:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792165361; cv=none; b=TFoxn7cTekQcEA566mOvuDMcfWpcoRcFNyhEgrPRtLjMYwo8z48e6Jk1tz6Z2yvgMdugVbtMDZ13v3tEF2RjBbQuBG1n9oSB96XQdpkQjoP+BuJALFYp40xfzhAsUtNgifUERELPdXYPHvsYh3BJ7nqnaObaich22y19fB6pMZg=
+	t=1792165901; cv=none; b=oWwU7sR9pehpFnt9XlPVJBiSY++jfmg+P2YWXIG2mYDOZXeVcmbaitydkVgN+z5f1TX/p5pgPwZt2jby3/PWlyBkK4v8pUpqXzetxzVwH9CH8w/i6Kx3IbjzO25eTQZU3pXe1kp7YA/krTqO8DmcLqGH0Ns+hBmz+ZVoLZYh734=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792165361; c=relaxed/simple;
-	bh=61NE6Z3E+Vd1fg+GN6HJY+IvknmlM1Zq3jUcdJrEEVc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Y4PaBAOmdjYlc8uFPCgxLRqK7DCufpryEKdnpgWt5zGtMs3dJGi+e6yPWhDQXSCV7Zs9aP+nVizcG3CUSr1KxssPQxyeTIMl3iD/IkULZvlUF0Df/QNH8+6OYz8ETEz5VFUC1ESKhJ9iMQUH/B81yg8mN31AHi0g9wUBy71dosc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=inX3kMZY; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1792165901; c=relaxed/simple;
+	bh=h9HQrxCmYp/y4IbvQr60/f//087jbiIAIBQLLinUJ+c=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Zpg8lnaFmq/ORJeWrM6XGWy64JiPejpz5YcDcUP4B/hBypBqU+1pPE4wdol5Zm/pXJk2OjpXvmOt0cMMUu/EyUnedylI1OVPM5Qf6Y2B8HWWgB/HVtHVp8Z/ILg804FpWbc7GyCOQKnwHGcx2rHl5etgOwya0jwYwh/t+RjHpAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cyEsOz5W; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="inX3kMZY"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5E751143D;
-	Fri, 16 Oct 2026 08:42:32 -0700 (PDT)
-Received: from e133894.cambridge.arm.com (e133894.arm.com [10.2.80.62])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A02823F673;
-	Fri, 16 Oct 2026 08:42:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792165355; bh=61NE6Z3E+Vd1fg+GN6HJY+IvknmlM1Zq3jUcdJrEEVc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=inX3kMZYclPBzJANFWIS5mw9sMC/iZAc3icq4KJSuqNhykSOKcJlXh6Q91S0SyTDe
-	 aPuEZrF97ld8TOgDoZVNCG9//ExGylujRVxHycH/W21v7qVSP5YugbRbV9JppDTg0z
-	 zm94vkqoRBgmbBi29n900zHku73OiBPDL41YG/p0=
-From: Sascha Bischoff <sascha.bischoff@arm.com>
-To: will@kernel.org,
-	julien.thierry.kdev@gmail.com
-Cc: maz@kernel.org,
-	kvm@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cyEsOz5W"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3F611F000C5;
+	Fri, 16 Oct 2026 15:51:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792165899;
+	bh=qYrA4alYLnpWk7LMWSg9VZG/4/dspGuqfh+8t9FeWkA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=cyEsOz5WDZ/fh13BKcjsRgcbrrf4NSXU1ME4JbcFbsqs+wjT7fkOrgP+GG2Fb9RfR
+	 UAtvcBPB2E0oKx8GP82e/y+x9oADQNLJWp9g0HEpG60A5rTUP5CudT3SjiSd9GOGEN
+	 as1oj+01MgD40tHhRKDjunaUKyZ7TVsFt+pqp+aYnmz05AgMyQY/z+r4cB+kb0z9HS
+	 gLgd2jZvGGsWDpZe8MyK9vwEZHjyu+Esk9yG/AAT86Y3QWYbXVMhn+Z6JL6Zh3aKcf
+	 77c2KEru32TS1XGRR9DWf4HKfG5XsW7ws3O1bHUMdnqzDDh7hNaSZQTMkJD8XbTns9
+	 NSinEzCKwOuRg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xHkDZ-00000003pee-298p;
+	Fri, 16 Oct 2026 15:51:37 +0000
+Date: Fri, 16 Oct 2026 16:51:37 +0100
+Message-ID: <867bjh1w52.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	timothy.hayes@arm.com,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH kvmtool v3 21/21] arm64: Expose the GICv5 ITS irqchip option
-Date: Fri, 16 Oct 2026 16:39:39 +0100
-Message-Id: <20261016153939.913764-22-sascha.bischoff@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20261016153939.913764-1-sascha.bischoff@arm.com>
-References: <20261016153939.913764-1-sascha.bischoff@arm.com>
+	linux-kernel@vger.kernel.org,
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v2 2/2] KVM: arm64: vgic-its: Remove the pending state of a discarded LPI
+In-Reply-To: <20261013081646.933312-3-fuad.tabba@linux.dev>
+References: <20261013081646.933312-1-fuad.tabba@linux.dev>
+	<20261013081646.933312-3-fuad.tabba@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Allow --irqchip=gicv5-its now that the ITS DT nodes and PCI MSI
-requester mapping are in place. Start automatic irqchip selection at
-GICv5 ITS so it is preferred ahead of base GICv5 and older models.
+On Tue, 13 Oct 2026 09:16:46 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> 
+> DISCARD removes the mapping of an event and instructs the Redistributor
+> to remove the pending state of its LPI (IHI 0069H.b, 5.3.4). KVM only
+> frees the ITE, so an LPI that is pending when the guest discards it
+> stays queued on its target vCPU, and the guest still takes it.
+> 
+> Clear the pending state before freeing the ITE. A queued LPI can be
+> pending in a running vCPU's list register, so halt the guest first when
+> the LPI is queued, to fold that state back. A forwarded LPI already
+> loses its pending state in its_free_ite(), whose unmap from the vPE
+> sends a DISCARD to the host ITS.
+> 
+> Fixes: df9f58fbea9bc ("KVM: arm64: vgic-its: Implement ITS command queue command handlers")
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>  arch/arm64/kvm/vgic/vgic-its.c | 24 +++++++++++++++++++-----
+>  1 file changed, 19 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 44b92c01bc727..3b8e0e5b097e0 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -829,13 +829,27 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
+>  		struct its_device *device = find_its_device(its, device_id);
+>  		int ite_esz = vgic_its_get_abi(its)->ite_esz;
+>  		gpa_t gpa = device->itt_addr + ite->event_id * ite_esz;
+> -		/*
+> -		 * Though the spec talks about removing the pending state, we
+> -		 * don't bother here since we clear the ITTE anyway and the
+> -		 * pending state is a property of the ITTE struct.
+> -		 */
+> +		struct vgic_irq *irq = ite->irq;
+> +		bool queued;
+> +
+>  		vgic_its_invalidate_cache(its);
+>  
+> +		/*
+> +		 * A queued LPI can be pending in a running vCPU's list register,
+> +		 * which the exit path folds back: halt the guest before clearing.
+> +		 */
+> +		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock)
+> +			queued = irq->vcpu;
 
-Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
----
- arm64/gic.c                         | 4 +++-
- arm64/include/kvm/kvm-config-arch.h | 2 +-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+Is this comment correct? This is only checking that the LPI is on the
+AP list of a vcpu, not that it is in the LRs.
 
-diff --git a/arm64/gic.c b/arm64/gic.c
-index 4ba626bf..34622850 100644
---- a/arm64/gic.c
-+++ b/arm64/gic.c
-@@ -52,6 +52,8 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset)
- 		*type = IRQCHIP_GICV3_ITS;
- 	} else if (!strcmp(arg, "gicv5")) {
- 		*type = IRQCHIP_GICV5;
-+	} else if (!strcmp(arg, "gicv5-its")) {
-+		*type = IRQCHIP_GICV5_ITS;
- 	} else {
- 		pr_err("irqchip: unknown type \"%s\"\n", arg);
- 		return -1;
-@@ -300,7 +302,7 @@ int gic__create(struct kvm *kvm, enum irqchip_type type)
- 
- 	switch (type) {
- 	case IRQCHIP_AUTO:
--		for (try = IRQCHIP_GICV5; try >= IRQCHIP_GICV2; try--) {
-+		for (try = IRQCHIP_GICV5_ITS; try >= IRQCHIP_GICV2; try--) {
- 			err = gic__create(kvm, try);
- 			if (!err)
- 				break;
-diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-index 46130663..936b142d 100644
---- a/arm64/include/kvm/kvm-config-arch.h
-+++ b/arm64/include/kvm/kvm-config-arch.h
-@@ -59,7 +59,7 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
- 			   "transport (Deprecated: Use --virtio-transport "	\
- 			   "option instead)", virtio_transport_parser, kvm),	\
- 	OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
--		     "[gicv2|gicv2m|gicv3|gicv3-its|gicv5]",			\
-+		     "[gicv2|gicv2m|gicv3|gicv3-its|gicv5|gicv5-its]",		\
- 		     "Type of interrupt controller to emulate in the guest",	\
- 		     irqchip_parser, NULL),					\
- 	OPT_U64('\0', "firmware-address", &(cfg)->fw_addr,			\
+> +
+> +		if (queued)
+> +			kvm_arm_halt_guest(kvm);
+
+And should we move this to kvm_pause_vcpu() instead of the big hammer,
+this still works because
+
+- we hold the ITS lock, so no MOVI can be issued on the same ITS
+
+- mapping of the same LPI is already prevented by the previous patch,
+  so no sneaky MOVI generated somewhere else can impact this LPI
+
+Do you agree?
+
+> +
+> +		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock)
+> +			irq->pending_latch = false;
+> +
+> +		if (queued)
+> +			kvm_arm_resume_guest(kvm);
+> +
+>  		its_free_ite(kvm, ite);
+>  
+>  		return vgic_its_write_entry_lock(its, gpa, 0ULL, ite);
+
+If you're OK with the above, I'll make the corresponding changes as I
+apply the patches.
+
+Thanks,
+
+	M.
+
 -- 
-2.34.1
-
+Without deviation from the norm, progress is not possible.
