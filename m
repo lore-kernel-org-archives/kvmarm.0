@@ -1,116 +1,122 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0813FFF9D;
-	Fri, 16 Oct 2026 10:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBBE392811;
+	Fri, 16 Oct 2026 10:12:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792145433; cv=none; b=nPMh+r4CuWsvSWTARBPtfBah/unfaDJxaVnHUvFJTBK1X8BYqCsZqCVe5ytwTgrrpseUyVgxase5fz6isISTdngstPnNPYxQ/AKpXJJl+buoHvUPk83sOtOh/gLQC1OauUJBEiIlFda4AiEuP06Tg+bUVmmnaOh+LQqzUNczVRY=
+	t=1792145549; cv=none; b=fCtm1vJqix19cONzD58VDiq+LgxZ5QXsjhYWEubT0pzSsuC023zjRGwrVLgPvDu0pCuIo0P8wqMNpeXGY1F7l7zQ0m+MHCm3wAzQxRMw364yUc3rtOvR0/MScaaBIAv5z9sXT51NF9E6RnX43fOVR/JCQ5/2vuzUJkw9MXG0MhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792145433; c=relaxed/simple;
-	bh=aZUN3Ejaq62Bdo0IPChTj5v5o1bSTJ7szt3m8E/Y9qI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c3JLpMZEpVWUKS/uutR0JvqT7DIcsHW2rDc6JwqynQ5qWKjjiXmog8Uu/XgkDO9ZBIyO7JFSFCU/37IwV4NhwxbeD5uBLK1Kl+LMCWuhUs3KY/gWMLTq+gZ7siwOfpBhziPNJgUmqw5ntyjwI50qAYZ1JAVuwKr/jv0MdP7lLYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PCkV+VjP; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792145549; c=relaxed/simple;
+	bh=t1louuqsRdcHdBR+jzhfii8trXrcGgQ1nit0V9wK+Nw=;
+	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
+	 Date; b=iQDpR9pdK3omQTOEwdxKxvG04H8A6zbwhxL0rhgPZ+bgpqtYsXi2Eh2Efb6JVQExRBi+W52/EsO3B0jupUeUSi3IfCjblWWMTCmPDZVTg1/FS1Wa8QByxytffEN+1KQ4imsBIduDepL157ZOENA5FARsGTcWq0349bNIsOQIfOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l2hMQFkw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PCkV+VjP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A9831F000C4;
-	Fri, 16 Oct 2026 10:10:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l2hMQFkw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F0751F000C4;
+	Fri, 16 Oct 2026 10:12:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792145431;
-	bh=8lC+3QuyhSeSDfWPg49wFSQP1WWmXzv+SO1bTfVf9QQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=PCkV+VjPEAbPVnwsmhUyCGHvwkW9is05IsSldUUc0jyYvVlhvfueTj7fa8oB2keil
-	 xAzKBOW7NtS/qJyh1VEZSe8eHpzwBlo/GTt2WfF0TI49xl37eMTM3sxJ2sPOSxP6vv
-	 +ONFn+3vDxPlE2dqlmwmp7VWkFeIfLCtQ9DpvFpaqoZRoNhDzb8gyS4N5zLQJsiiqj
-	 d547wc0OYXsILmkfaG/RbPg2RxHCBNXk5hRLogXTDMuRAweLjS16vt1Sev4BDT69bT
-	 rtZNhWB80fByfnfn6bW8o9bk1db6ubyJ6kcDL9vynE3Bz9LIzMNqDhCQZsxAfm3OPZ
-	 KSJMQ0FE9lQjw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xHetQ-00000003hIw-3TGV;
-	Fri, 16 Oct 2026 10:10:28 +0000
-Date: Fri, 16 Oct 2026 11:10:28 +0100
-Message-ID: <86cxta0xd7.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Set HCR_EL2.BSU to Inner Shareable for guests
-In-Reply-To: <20261016081558.805411-1-fuad.tabba@linux.dev>
-References: <20261016081558.805411-1-fuad.tabba@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1792145547;
+	bh=6XWGSGz8Vg6vuz0nSsziqkCdd0FRq8W5K11qLvpM3Aw=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=l2hMQFkwXufdhGUpmmvOXoh+3SnBzv+3i/Ji1IFIXrg2/SMiPo3MBJ9oYZaN2j4Km
+	 8CaGVMumsq2s4+8YlgT/RwrblryjEvRu5b5azdVOUnz5aIdYXk/K4GNUTg+4gE1WcM
+	 QOlv6JlKF990ZiVWCCbtnivx5tMu+T3Eya81CM4QE2ajN5GSE3JEeubqQkZ8l1NZ5a
+	 OdcDXeld/TLJS41WE+m+oWfd6qHjh+uAps16nQ0IV+2pIZnMOeVdEzGieX2HOcIIlf
+	 s9RwXI3fJitif69bjgRQn1d06n8FYdc5ZnQsoXo9h+yfRD3QrGR1pEhh9tsnwlQjAt
+	 wFzDKLsb3SJtA==
+Message-ID: <sashiko-outbox-174127@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 4/4] irqchip/gicv3: Add workaround for FUJITSU-MONAKA
+ erratum E#030003
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Tomohiro Misono" <misono.tomohiro@fujitsu.com>
+Cc: linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20261016-monaka-fix-for-upstream-v2-4-fc7ede7f9f48@fujitsu.com>
+References: <20261016-monaka-fix-for-upstream-v2-0-fc7ede7f9f48@fujitsu.com>
+ <20261016-monaka-fix-for-upstream-v2-4-fc7ede7f9f48@fujitsu.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 16 Oct 2026 10:12:26 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seiden@linux.ibm.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 16 Oct 2026 09:15:58 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
-> 
-> KVM sets HCR_EL2.BSU to Inner Shareable for guests, so that a guest's
-> barriers cover the TLB and I-cache invalidations that HCR_EL2.FB
-> broadcasts. However, since HCR_BSU_IS became an alias of the generated
-> HCR_EL2_BSU_IS, it is the unshifted field value 0b01, which sets bit
-> 0 (VM, already set) and leaves BSU at 0b00. A guest's DSB NSH is then
-> not required to wait for a broadcast TLBI to complete on other CPUs.
-> 
-> Build the field with SYS_FIELD_PREP_ENUM().
-> 
-> Fixes: d0f39259eff4 ("arm64: sysreg: Add layout for HCR_EL2")
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
-> Found while testing Marc's HCR cleanup [1]. Its patch 1 carries this
-> line over as HCR_EL2_BSU_IS, so on top of this fix that hunk would
-> keep SYS_FIELD_PREP_ENUM() instead. I can also rebase this on top of
-> the series if that's easier.
-> 
-> [1] https://lore.kernel.org/r/20261015173605.1072963-1-maz@kernel.org
-> 
->  arch/arm64/include/asm/kvm_arm.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 4bfbd827c5aa7..b3e9dd302730e 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -98,7 +98,7 @@
->   * TID1:	Trap REVIDR_EL1, AIDR_EL1, and SMIDR_EL1
->   */
->  #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
-> -			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
-> +			 SYS_FIELD_PREP_ENUM(HCR_EL2, BSU, IS) | HCR_EL2_FB | HCR_EL2_TACR | \
->  			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
->  			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 | HCR_TID1)
->  #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK)
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
+- [High] irqchip/gic-v3: IPI via GICR_ISPENDR0 targets sleeping redistribut=
+or
+- [High] irqchip/gicv3: missing NULL check on rd_base causes IPI sender cra=
+sh
+--
 
-Huh. That's a bad one. I've added a Cc: stable to that, and queued it
-as a prefix of the cleanup series.
+commit 98989a1fb6fe6471377f9b9c4a24e0097c1639a3
+Author: Kohei Enju <enju.kohei@fujitsu.com>
 
-Thanks,
+irqchip/gicv3: Add workaround for FUJITSU-MONAKA erratum E#030003
 
-	M.
+This patch works around a FUJITSU-MONAKA erratum where SGIs are lost if an
+SGI generation races with CPU interface processing. It addresses the issue
+by bypassing the affected system registers and directly writing to the targ=
+et
+CPU's GICR_ISPENDR0 over MMIO.
 
--- 
-Without deviation from the norm, progress is not possible.
+> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+> --- a/drivers/irqchip/irq-gic-v3.c
+> +++ b/drivers/irqchip/irq-gic-v3.c
+[ ... ]
+> @@ -1386,6 +1391,17 @@ static void gic_ipi_send_mask(struct irq_data *d, =
+const struct cpumask *mask)
+>  	 */
+>  	dsb(ishst);
+> =20
+> +	if (static_branch_unlikely(&gic_fujitsu_030003_erratum)) {
+> +		for_each_cpu(cpu, mask) {
+> +			void __iomem *base =3D gic_data_rdist_sgi_base_cpu(cpu);
+
+[Severity: High]
+Could this cause a fatal page fault on the CPU sending the IPI if the target
+CPU failed to initialize its redistributor?
+
+If a secondary CPU fails to initialize its GIC redistributor due to a buggy
+ACPI MADT or missing DT entry, rd_base remains NULL. However, the CPU can
+still come online because gic_starting_cpu() returns 0 on failure.
+
+When another CPU later broadcasts an IPI, this workaround will derive base
+from a NULL rd_base, resulting in an unmapped address (0x10000). The sender
+CPU will then crash when attempting the writel_relaxed().
+
+Should we validate that the target CPU actually has an initialized
+redistributor base before bypassing the architected SGI system registers?
+
+> +
+> +			writel_relaxed(BIT(d->hwirq), base + GICR_ISPENDR0);
+
+[Severity: High]
+Is it safe to write to a target CPU's GICR_ISPENDR0 directly over MMIO when
+that CPU might be in deep idle?
+
+During deep idle, such as via PSCI, the target CPU's redistributor is put
+to sleep (ProcessorSleep=3D1 either via gic_cpu_pm_notifier or firmware).
+According to the GICv3 architecture, writing to a redistributor register
+(other than GICR_WAKER or GICR_TYPER) when ProcessorSleep=3D1 is constrained
+unpredictable.
+
+Normal kernel operations, like the scheduler sending smp_send_reschedule()
+to an idle CPU, will hit this path. If the hardware ignores the write, the
+IPI is dropped, which can lead to deadlocks in smp_call_function() or lost
+wakeups.
+
+> +		}
+> +
+> +		dsb(st);
+> +		return;
+> +	}
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261016-monaka-fix=
+-for-upstream-v2-0-fc7ede7f9f48@fujitsu.com?part=3D4
