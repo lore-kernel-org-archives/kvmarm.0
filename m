@@ -1,63 +1,67 @@
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E2239EF12
-	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 08:23:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 012841A682C
+	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 08:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792139027; cv=none; b=V3DssSwQ+g8oeJgILpF3uPMtCeCUeBUhmg3/5FPJCXUQTnaJtBGSrKChkMwhDXrlVlJ1ouYrAt2f+pZY9DGfTEUq5p+SVBA4O27+Dn1PBdCakYrtv00nHi3wXPGjU7ad4RQil9cgAVu9dXnQfCBSShd2x/GLT/9x0lMepbjQdzU=
+	t=1792139027; cv=none; b=VS/4AH4N8zIWnG614wcdP+nEUasGUc7/lWT/0kh+3LPeX/3F4if6jgIy0ocvGNTU8qEof17KzwxjikJgTh2GrInQXsrvALubUTumQZJLCl+uFe2/ZBpPTnBFhSpMtYAMPf2kETeZtsu18FqGDyr34eS10a39rputYjeFaTq5VeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1792139027; c=relaxed/simple;
-	bh=TAKHJ1wRNmc6FRr+r/vyusvSCvH1hGFEGvqJ9J2tBRk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qvwku2SeG26H97KUjjMFiyoA0Fm/q3zTJfFR7oeFgPLhZh8dPS8Z2AYRefVU2+Omkam6zg4DaeZxwtFVN0QEhaSe2B8d/alNco0YwZJ24sA+tfQkP3LPLctrjlflrx8hnWZUD5q0LFiMiVSwDJA8i78C+7SVTQYbOdk77HPvU88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--snehalreddy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z27qZeaX; arc=none smtp.client-ip=209.85.128.69
+	bh=DPuJiQDIaf5SF8ZF6lSYjBVWmbCcO7IipEOzcZxX1/Y=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=iFHcrE8jNG95e+A1fT6Ci93YygU2zO3BfYphJkoDvxMWdDxYatinloUMYBQqeSArd53zOUbyr4IEv4EzcXJ3Z+fEcxGS9Jcyp+r3LGuVQxbwXOehxPopMwuhKM3U5YDDByOk7zqT0KMu9oXZsTsuv2zb3XOjScxrVlHMPr1HyGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--snehalreddy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R/4qhWgs; arc=none smtp.client-ip=209.85.128.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--snehalreddy.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z27qZeaX"
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4a01c621dc2so47027945e9.2
-        for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 01:23:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R/4qhWgs"
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4a1ac6663e1so35139855e9.0
+        for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 01:23:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1792139023; x=1792743823; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=jTA/E6KagxCsXAcjrRnC+iKPqmNPE9H/PtvqQ3MoRHU=;
-        b=Z27qZeaX9dzL5jD7uCElRHndA95VE9L/X0dFD3cYzZH1NYnMIzOV/4ikXHqF7dfdK+
-         oMLf38/I4gVRU7Rw48orFavLGwXyErOjTmiE8zqfmfc8kxvDxXPRSsVSuZP1MXwQOYaK
-         gj0ztj7QgxfJYkQonZj9q6qCk8wyK1YjpO7s+hRWGhl20PBMu17fJmzQtbZmWKmTLLv5
-         49QKXMy7k6VxdFz47xv7Y8UByGc3JDSRcPw7VzAvh/ZgS0jZ6wU2rLAS71N2ZX7Jw/IR
-         VI2F2IgfBAEJwY3blEYgWM48sxMLzsgaIjQ/tgkl6Py6e3RJe49BVAmfFEio6/jvonKd
-         XC2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792139023; x=1792743823;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=google.com; s=20251104; t=1792139024; x=1792743824; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=jTA/E6KagxCsXAcjrRnC+iKPqmNPE9H/PtvqQ3MoRHU=;
-        b=i1l9of1/JjtMc8hX2fogPKoNFyiqcIk4wGiR3ZJbZipfrHEloo+cXJA4YI0a3S1tak
-         HfGamAfNW+catXUEXxef6d/w3CPGRS8pUg+xJAUpvHreRhit6WrVDAObjW5zL/LsOyc/
-         ++1+r9F8Zi47P/0CDxmfuw+qgFyC7t1pGrR76TYba9GLr+6kKCu6o2Yd1Fw9SWFpvhvK
-         fy3x6xzctGL6vkpEWItJU9N4MWkELHoCaNpogjbJRuXkPz25IMwmWcrdrq4WAo1Zl5Bs
-         815xbbeNee2FyH6GXYRW/Qy1WThcfVAckakjFzVLD4KMwrFi3YpGimx2AXHUh/RpF+qq
-         YRtQ==
-X-Forwarded-Encrypted: i=1; AKwUvByJRW7m0gHXU+pY2qLunsjsWU5fyVdvn+rzlJWH/V0LLxKJJgqwrzyIayTnWdfDBb/FTFCnjms=@lists.linux.dev
-X-Gm-Message-State: AFq9FYIKcAqhjdL89/z9/9GdEPX++ki23u5THygGnbbHx34pMRC2KnT6
-	SlFVVcUrAqD8Xm2dPSwf5IB8aC4OmlD2m9N/qF9arcgRJJjqJ66lwwj+GTK6Do6osxZYcgDG0E4
-	PN0nfbv9wQPyksXoVId24ai+ezQ==
-X-Received: from wmsz15.prod.google.com ([2002:a05:600c:c16f:b0:4a0:2a5:ce1a])
+        bh=707YQ5WOW5OhLWsgc1Mn0RWZVRHccpuv4G8HLhK/9eU=;
+        b=R/4qhWgscI+ZHYhie/DT4SFfwK23fGD5jkYRIgECSHYJYOfxVwGd0hzsTHf5CyRwjf
+         jqCqW4cnrjJhlsqPN5ID9ZyZR8QBPDZgezMzZEazf7g7z8OsFPKdgBS96+a1CsQ2gLzo
+         Wa2XZxZQA0Kp2+5m1NNP/4oGcZMwVdNMdOSrTKJMYatf2QOgR11p7JwrY+glZIZMB4xn
+         PN5txiJScCFgSZ4piIrBixJ/P9p8xtj1uIP1BJ58uUqpXEcTNIN6tR8tXLRldFNS7SAe
+         EyLb2BxpMM3yU8JzFDl+oHq6D5N4ZsKgx8HfFnfI5ZzqJ9oNYe8jquEDcBovenEPOL/T
+         VDLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792139024; x=1792743824;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=707YQ5WOW5OhLWsgc1Mn0RWZVRHccpuv4G8HLhK/9eU=;
+        b=uDonZV1l3uOGMHvpFkSWP5TNgf6MeEGsm0D/Z/nGtrEO9hn3WFA9b1AvsvKjhPjvb7
+         /315upZROq7/k+h4n6/lqsO2qRjpkZBSHMcP83VqoU2kTe9GKxoWNtUB7QeoJK7XRPOA
+         G0kOQg6d1Aua2sob6zMDdT6FFPprS0mfM7f/XsN7hizUAX+YHx2o6Xh8TLPTqjxtS2b/
+         fNA9NfcUqWmAjFWM7XNV2YVX2d2AsxXYWNdefrdI8kldax0e9Fq1HYv3ZT0kggwYyNnp
+         OmZ5oImlYJI9IxHgN1dmx8WK7DK66K9CWuPRH1Cxxik23BRGwowFZcrOAGAVM0oOM9Af
+         DQsg==
+X-Forwarded-Encrypted: i=1; AKwUvBxSN+LGTuaqwzlpxN4JaJJ4gaaNMRnKplJwe6iYrBxvCzAPpmG3jvZvellCuKcnMRRUswfezRw=@lists.linux.dev
+X-Gm-Message-State: AFq9FYK6qjlagtbi7B34Ykpg9fvJY1PpRsAWOT3CpC+GepZmAPe2QrdC
+	L9E0HmJ9Xs2pKiCmvFmXqAmveAi/NJIThc/j/UwRsGLE1DndjVHhBvX2mvtkr2xzaDWXxfNIccL
+	3SHBoh/MTh5OIJ6jKueD0O/7+Rg==
+X-Received: from wmbhc20.prod.google.com ([2002:a05:600c:8714:b0:4a1:93c0:d3c2])
  (user=snehalreddy job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:310b:b0:4a1:813f:2a5b with SMTP id 5b1f17b1804b1-4a18e4a9da8mr407450355e9.14.1792139022921;
- Fri, 16 Oct 2026 01:23:42 -0700 (PDT)
-Date: Fri, 16 Oct 2026 08:23:39 +0000
+ 2002:a05:600c:4e86:b0:4a1:ad49:7b3 with SMTP id 5b1f17b1804b1-4a1ad4909c6mr230452255e9.22.1792139023899;
+ Fri, 16 Oct 2026 01:23:43 -0700 (PDT)
+Date: Fri, 16 Oct 2026 08:23:40 +0000
+In-Reply-To: <20261016082341.4030770-1-snehalreddy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20261016082341.4030770-1-snehalreddy@google.com>
 X-Mailer: git-send-email 2.56.0.176.g3575e65682-goog
-Message-ID: <20261016082341.4030770-1-snehalreddy@google.com>
-Subject: [RFC PATCH v2 0/2] KVM: arm64: Support FFA_MEM_RECLAIM2 in host handler
+Message-ID: <20261016082341.4030770-2-snehalreddy@google.com>
+Subject: [RFC PATCH v2 1/2] firmware: arm_ffa: Add FFA_MEM_RECLAIM2 function ID
 From: Snehal Koukuntla <snehalreddy@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
 	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
@@ -71,52 +75,35 @@ Cc: Vincent Donnefort <vdonnefort@google.com>, Fuad Tabba <fuad.tabba@linux.dev>
 	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-The Arm Firmware Framework for Arm A-profile (FF-A) v1.3 ALP5
-specification (DEN0140 rev J) [1] introduces the optional
-FFA_MEM_RECLAIM2 (0xC4000091) ABI.
+FF-A v1.3 ALP5 (DEN0140 rev J) introduces the optional FFA_MEM_RECLAIM2
+(0xC4000091) ABI, which enables an Owner to reclaim exclusive access to
+a subset of pages of a memory region without requiring the Relayer to
+maintain intermediate transaction state.
 
-Reclaiming large memory regions with the existing FFA_MEM_RECLAIM ABI
-can take significant time, or relies on a stateful time-slicing
-mechanism in the Relayer. FFA_MEM_RECLAIM2 allows an Owner to reclaim
-exclusive access to a subset of pages from a shared or lent memory
-region by passing an array of constituent memory region descriptors in
-its TX buffer along with a starting descriptor byte offset and initial
-page index. The Relayer returns the number of 4K pages reclaimed in
-that invocation without maintaining intermediate transaction state.
+Add the FFA_MEM_RECLAIM2 function ID definition to arm_ffa.h.
 
-This series adds the FFA_MEM_RECLAIM2 function ID definition and
-implements host proxy support in the pKVM nVHE FF-A handler, unsharing
-the reclaimed pages in the host stage-2 page tables upon a successful
-reclaim response from EL3/SPMD.
-
-As the FF-A v1.3 specification is still at ALPHA, this series is
-posted as an RFC and is not intended for merging until the
-specification reaches BETA.
-
-This series is based on kvmarm/next, as Patch 2 uses
-ffa_check_unused_args_sbz() introduced in commit 3e9df0b0ebd5
-("KVM: arm64: Enforce strict SBZ checks in the FF-A proxy").
-
+Link: https://support.arm.com/documentation/den0140/j
+Signed-off-by: Snehal Koukuntla <snehalreddy@google.com>
+---
 Changes in v2:
-- Mark as RFC until the FF-A v1.3 specification reaches BETA (Sudeep)
-- Rename FFA_FN64_MEM_RECLAIM2 to FFA_MEM_RECLAIM2 (sashiko)
-- Check total_pages against the sum of constituent pg_cnt (Vincent)
-- Simplify the flags and offset alignment checks (Vincent)
-- Rebase on latest kvmarm/next
-- Link to v1: https://lore.kernel.org/r/20260921164748.2958578-1-snehalreddy@google.com
+- Rename FFA_FN64_MEM_RECLAIM2 to FFA_MEM_RECLAIM2, following the
+  existing convention for 64-bit-only ABIs (sashiko)
 
-[1] https://support.arm.com/documentation/den0140/j
+ include/linux/arm_ffa.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-Snehal Koukuntla (2):
-  firmware: arm_ffa: Add FFA_MEM_RECLAIM2 function ID
-  KVM: arm64: Support FFA_MEM_RECLAIM2 in host handler
-
- arch/arm64/kvm/hyp/nvhe/ffa.c | 126 ++++++++++++++++++++++++++++++++++
- include/linux/arm_ffa.h       |   1 +
- 2 files changed, 127 insertions(+)
-
-
-base-commit: dd0bc00e3e9201fd49b62ff9cc07890c89003afe
+diff --git a/include/linux/arm_ffa.h b/include/linux/arm_ffa.h
+index e71d83ee0aef..85c2e490a387 100644
+--- a/include/linux/arm_ffa.h
++++ b/include/linux/arm_ffa.h
+@@ -78,6 +78,7 @@
+ #define FFA_EL3_INTR_HANDLE		FFA_SMC_32(0x8C)
+ #define FFA_MSG_SEND_DIRECT_REQ2	FFA_SMC_64(0x8D)
+ #define FFA_MSG_SEND_DIRECT_RESP2	FFA_SMC_64(0x8E)
++#define FFA_MEM_RECLAIM2		FFA_SMC_64(0x91)
+ 
+ /*
+  * For some calls it is necessary to use SMC64 to pass or return 64-bit values.
 -- 
 2.56.0.176.g3575e65682-goog
 
