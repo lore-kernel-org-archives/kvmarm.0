@@ -1,94 +1,122 @@
-Received: from mta1.migadu.com (out-144.mta1.migadu.com [95.215.58.144])
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE4E2284B37
-	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 08:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E2239EF12
+	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 08:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792138567; cv=none; b=YcZzyJ29F9rBm7tQYOlBPF3eDOcx0Vsit5Ax+uvODAkNaFSjZZxFOHYo2A6SbuyjciabuA4I/fxCeSITJZHC06/xzw5MSkltnX4Yc82J9csAWxfNBP0TxEa1CJkboRE3AV07wvoDRS4mE70kFJ+bQqilh1tuBtLWBWoe4jmF4TE=
+	t=1792139027; cv=none; b=V3DssSwQ+g8oeJgILpF3uPMtCeCUeBUhmg3/5FPJCXUQTnaJtBGSrKChkMwhDXrlVlJ1ouYrAt2f+pZY9DGfTEUq5p+SVBA4O27+Dn1PBdCakYrtv00nHi3wXPGjU7ad4RQil9cgAVu9dXnQfCBSShd2x/GLT/9x0lMepbjQdzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792138567; c=relaxed/simple;
-	bh=TZE6sUf/S8FoDtbPPweh9nK7pgeHraoLy/S4W8tvQQk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jbCtVfCRgvap90F+3+mrvOYA0M6tOvz8T+7DZOenBJs+xM4fCEX5Vd1iagsDJe2pzXgdrgtdt8OmMGyTBQJAR+5F9p9c9CpAuc0wzUWX6mZWNMOoQ/QqY7GCCqAXrfWsuUYGSqXwUjUmd807aJYrL8DOQtNCJMeoKwwWatysFYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sNwThq5T; arc=none smtp.client-ip=95.215.58.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1792139027; c=relaxed/simple;
+	bh=TAKHJ1wRNmc6FRr+r/vyusvSCvH1hGFEGvqJ9J2tBRk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qvwku2SeG26H97KUjjMFiyoA0Fm/q3zTJfFR7oeFgPLhZh8dPS8Z2AYRefVU2+Omkam6zg4DaeZxwtFVN0QEhaSe2B8d/alNco0YwZJ24sA+tfQkP3LPLctrjlflrx8hnWZUD5q0LFiMiVSwDJA8i78C+7SVTQYbOdk77HPvU88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--snehalreddy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z27qZeaX; arc=none smtp.client-ip=209.85.128.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--snehalreddy.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sNwThq5T"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=TZE6sUf/S8FoDtbPPweh9nK7pgeHraoLy/S4W8tvQQk=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792138562; v=1; x=1792743362;
- b=sNwThq5T7I2TpNa1qI2/dNmu6gKPuMKQRqw6+wN2DQuRobDHWFQTRVQNIRkOSGzyzhqlRtt4
- 7heu+1Yif/cKa1MQQbfyeM1vCtrkXOhFlQxsS2TyWGbUEXtY0iUnXBg9xtj6Da7y3h2iA1CwlZd
- bvL3ELzPHIinfe/9bVY1a3Ok=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id a7304d26f9b833f3;
-	Fri, 16 Oct 2026 08:16:02 +0000
-X-Mizu-Trace-ID: a7304d26f9b833f3
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: arm64: Set HCR_EL2.BSU to Inner Shareable for guests
-Date: Fri, 16 Oct 2026 09:15:58 +0100
-Message-Id: <20261016081558.805411-1-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.39.5
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z27qZeaX"
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4a01c621dc2so47027945e9.2
+        for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 01:23:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1792139023; x=1792743823; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=jTA/E6KagxCsXAcjrRnC+iKPqmNPE9H/PtvqQ3MoRHU=;
+        b=Z27qZeaX9dzL5jD7uCElRHndA95VE9L/X0dFD3cYzZH1NYnMIzOV/4ikXHqF7dfdK+
+         oMLf38/I4gVRU7Rw48orFavLGwXyErOjTmiE8zqfmfc8kxvDxXPRSsVSuZP1MXwQOYaK
+         gj0ztj7QgxfJYkQonZj9q6qCk8wyK1YjpO7s+hRWGhl20PBMu17fJmzQtbZmWKmTLLv5
+         49QKXMy7k6VxdFz47xv7Y8UByGc3JDSRcPw7VzAvh/ZgS0jZ6wU2rLAS71N2ZX7Jw/IR
+         VI2F2IgfBAEJwY3blEYgWM48sxMLzsgaIjQ/tgkl6Py6e3RJe49BVAmfFEio6/jvonKd
+         XC2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792139023; x=1792743823;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=jTA/E6KagxCsXAcjrRnC+iKPqmNPE9H/PtvqQ3MoRHU=;
+        b=i1l9of1/JjtMc8hX2fogPKoNFyiqcIk4wGiR3ZJbZipfrHEloo+cXJA4YI0a3S1tak
+         HfGamAfNW+catXUEXxef6d/w3CPGRS8pUg+xJAUpvHreRhit6WrVDAObjW5zL/LsOyc/
+         ++1+r9F8Zi47P/0CDxmfuw+qgFyC7t1pGrR76TYba9GLr+6kKCu6o2Yd1Fw9SWFpvhvK
+         fy3x6xzctGL6vkpEWItJU9N4MWkELHoCaNpogjbJRuXkPz25IMwmWcrdrq4WAo1Zl5Bs
+         815xbbeNee2FyH6GXYRW/Qy1WThcfVAckakjFzVLD4KMwrFi3YpGimx2AXHUh/RpF+qq
+         YRtQ==
+X-Forwarded-Encrypted: i=1; AKwUvByJRW7m0gHXU+pY2qLunsjsWU5fyVdvn+rzlJWH/V0LLxKJJgqwrzyIayTnWdfDBb/FTFCnjms=@lists.linux.dev
+X-Gm-Message-State: AFq9FYIKcAqhjdL89/z9/9GdEPX++ki23u5THygGnbbHx34pMRC2KnT6
+	SlFVVcUrAqD8Xm2dPSwf5IB8aC4OmlD2m9N/qF9arcgRJJjqJ66lwwj+GTK6Do6osxZYcgDG0E4
+	PN0nfbv9wQPyksXoVId24ai+ezQ==
+X-Received: from wmsz15.prod.google.com ([2002:a05:600c:c16f:b0:4a0:2a5:ce1a])
+ (user=snehalreddy job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:310b:b0:4a1:813f:2a5b with SMTP id 5b1f17b1804b1-4a18e4a9da8mr407450355e9.14.1792139022921;
+ Fri, 16 Oct 2026 01:23:42 -0700 (PDT)
+Date: Fri, 16 Oct 2026 08:23:39 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.176.g3575e65682-goog
+Message-ID: <20261016082341.4030770-1-snehalreddy@google.com>
+Subject: [RFC PATCH v2 0/2] KVM: arm64: Support FFA_MEM_RECLAIM2 in host handler
+From: Snehal Koukuntla <snehalreddy@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Sudeep Holla <sudeep.holla@kernel.org>
+Cc: Vincent Donnefort <vdonnefort@google.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Sebastian Ene <sebastianene@google.com>, 
+	Mostafa Saleh <smostafa@google.com>, Snehal Koukuntla <snehalreddy@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-KVM sets HCR_EL2.BSU to Inner Shareable for guests, so that a guest's
-barriers cover the TLB and I-cache invalidations that HCR_EL2.FB
-broadcasts. However, since HCR_BSU_IS became an alias of the generated
-HCR_EL2_BSU_IS, it is the unshifted field value 0b01, which sets bit
-0 (VM, already set) and leaves BSU at 0b00. A guest's DSB NSH is then
-not required to wait for a broadcast TLBI to complete on other CPUs.
+The Arm Firmware Framework for Arm A-profile (FF-A) v1.3 ALP5
+specification (DEN0140 rev J) [1] introduces the optional
+FFA_MEM_RECLAIM2 (0xC4000091) ABI.
 
-Build the field with SYS_FIELD_PREP_ENUM().
+Reclaiming large memory regions with the existing FFA_MEM_RECLAIM ABI
+can take significant time, or relies on a stateful time-slicing
+mechanism in the Relayer. FFA_MEM_RECLAIM2 allows an Owner to reclaim
+exclusive access to a subset of pages from a shared or lent memory
+region by passing an array of constituent memory region descriptors in
+its TX buffer along with a starting descriptor byte offset and initial
+page index. The Relayer returns the number of 4K pages reclaimed in
+that invocation without maintaining intermediate transaction state.
 
-Fixes: d0f39259eff4 ("arm64: sysreg: Add layout for HCR_EL2")
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
-Found while testing Marc's HCR cleanup [1]. Its patch 1 carries this
-line over as HCR_EL2_BSU_IS, so on top of this fix that hunk would
-keep SYS_FIELD_PREP_ENUM() instead. I can also rebase this on top of
-the series if that's easier.
+This series adds the FFA_MEM_RECLAIM2 function ID definition and
+implements host proxy support in the pKVM nVHE FF-A handler, unsharing
+the reclaimed pages in the host stage-2 page tables upon a successful
+reclaim response from EL3/SPMD.
 
-[1] https://lore.kernel.org/r/20261015173605.1072963-1-maz@kernel.org
+As the FF-A v1.3 specification is still at ALPHA, this series is
+posted as an RFC and is not intended for merging until the
+specification reaches BETA.
 
- arch/arm64/include/asm/kvm_arm.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This series is based on kvmarm/next, as Patch 2 uses
+ffa_check_unused_args_sbz() introduced in commit 3e9df0b0ebd5
+("KVM: arm64: Enforce strict SBZ checks in the FF-A proxy").
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 4bfbd827c5aa7..b3e9dd302730e 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -98,7 +98,7 @@
-  * TID1:	Trap REVIDR_EL1, AIDR_EL1, and SMIDR_EL1
-  */
- #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
--			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
-+			 SYS_FIELD_PREP_ENUM(HCR_EL2, BSU, IS) | HCR_EL2_FB | HCR_EL2_TACR | \
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
- 			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 | HCR_TID1)
- #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK)
+Changes in v2:
+- Mark as RFC until the FF-A v1.3 specification reaches BETA (Sudeep)
+- Rename FFA_FN64_MEM_RECLAIM2 to FFA_MEM_RECLAIM2 (sashiko)
+- Check total_pages against the sum of constituent pg_cnt (Vincent)
+- Simplify the flags and offset alignment checks (Vincent)
+- Rebase on latest kvmarm/next
+- Link to v1: https://lore.kernel.org/r/20260921164748.2958578-1-snehalreddy@google.com
+
+[1] https://support.arm.com/documentation/den0140/j
+
+Snehal Koukuntla (2):
+  firmware: arm_ffa: Add FFA_MEM_RECLAIM2 function ID
+  KVM: arm64: Support FFA_MEM_RECLAIM2 in host handler
+
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 126 ++++++++++++++++++++++++++++++++++
+ include/linux/arm_ffa.h       |   1 +
+ 2 files changed, 127 insertions(+)
+
+
+base-commit: dd0bc00e3e9201fd49b62ff9cc07890c89003afe
 -- 
-2.39.5
+2.56.0.176.g3575e65682-goog
 
