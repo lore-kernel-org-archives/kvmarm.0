@@ -1,133 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from relay.hostedemail.com (smtprelay0015.hostedemail.com [216.40.44.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EDDF49550F;
-	Fri, 16 Oct 2026 12:35:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164E74A4851
+	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 12:50:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792154146; cv=none; b=i5bxzYj/Slt4JeLvHqedzxT4y/8q+4lPH4cHVhHkXGK0LgYeR850DSkYEO0H96pmEo4h8nS8P/brXuf5y0X7GrCsScpeZzpyTpmnY8INYPkw2nQvNyxqz8JPmKnugyBJBJ3TklPGWilnRMJhhF/D0es/8xU12EhWMd0M3CV1hoM=
+	t=1792155018; cv=none; b=kngHzKBJiodAIjHQcInV8Fxd+coAGYh9NaU1WSeSJBPYJAgsnx8cObi4knVTj5CbUYEB4Ux/N89DDlWf0LN5vFE0xLiqfHu5mDQLDSKyrVUUNN8txHS30BcPpfPjh6l3clerIUV5KBrU3ePpD8dP4EhfX05z338A6f8n+R/mqZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792154146; c=relaxed/simple;
-	bh=qo57Y8sVuKDQtzxvYWzxBNYYknPPaoFolB5m+yVIP+Y=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JCJZGrA2H9I3eIDCMdKyPmZ4B05K6FlQ+FpQEzjG81ahBjMgHc2D99TQFHya58iGMEFVKSgQaRuPcXHcaEtVL/WrR04kGw5uP1U/r1MyLwwuKq2i6lQFBNeEQWsussoWElPfcrAbomkRx1ekZ3DBhuLPtcKldoWlR0qIQtFzRqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TYgalTsr; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792155018; c=relaxed/simple;
+	bh=qKqkBlzuhzGDRUMe/fpdt9YqLvt+//yIo/tc4unfU9s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Dhhswz0EfcS6DXBEmjrjrG92PrYIbsQyyEuqZVDmfmtEbbKTCKkS4maEjmedyq5qEjcuZa2KZxmMigb0sPzSaXwhgabT5Ia8AXE5dVGMVY1OldDR8U90/N3EXYaKvxiPqgUxKETVED4iV6E88e6pWOTlgcYe7LJZYjt+8AC3yFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; dkim=pass (1024-bit key) header.d=goodmis.org header.i=@goodmis.org header.b=2/NjAVX9; arc=none smtp.client-ip=216.40.44.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TYgalTsr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 646BA1F000C5;
-	Fri, 16 Oct 2026 12:35:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792154143;
-	bh=yod+OUSk06H1G1niXjYGWKR93BqD83B+Eqbab+MOY7o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=TYgalTsrhorxXtmw0FD8z8F+VsI/95+mO9H0VY2k2LQXkrTQtYHbheRUAHwl2oa+Y
-	 /8T1sVCa2H97Z6c4QFWw97rdZ0JSVGOFKUUrFqQKNcLtU3WuxJWp18K6h0JPDMfHny
-	 EEtdACS+W7TDB64pqsqs0z0BQ0UddxDtodFZ8rSMYGGeuY48so6N7q7ATNxgD+9u/F
-	 bqt2uvQDex+KXq2wVRUQXQZwOQ6G3oVcAu5pFZOSjggS1rIJg8wN/ss+H+B7zFdxo5
-	 NcLekinMgISAi9NdfLR2cyS4o1QoKmW+c5iGUTGC56IYxd6w4Z0UO+mHNOq6d92aAY
-	 el6CmbKqrZGXQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xHh9w-00000003kPF-3rh9;
-	Fri, 16 Oct 2026 12:35:41 +0000
-Date: Fri, 16 Oct 2026 13:35:40 +0100
-Message-ID: <86bj8t257n.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Tomohiro Misono <misono.tomohiro@fujitsu.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Radu Rendec <radu@rendec.net>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Kohei Enju <enju.kohei@fujitsu.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-perf-users@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 2/4] arm64: tlb: Add tlbi workaround for FUJITSU-MONAKA Erratum E#030001
-In-Reply-To: <atIPeT7SLSLjQIcl@J2N7QTR9R3.cambridge.arm.com>
-References: <20261016-monaka-fix-for-upstream-v2-0-fc7ede7f9f48@fujitsu.com>
-	<20261016-monaka-fix-for-upstream-v2-2-fc7ede7f9f48@fujitsu.com>
-	<atIPeT7SLSLjQIcl@J2N7QTR9R3.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=goodmis.org header.i=@goodmis.org header.b="2/NjAVX9"
+Received: from omf03.hostedemail.com (lb01a-stub [10.200.18.249])
+	by unirelay04.hostedemail.com (Postfix) with ESMTP id 71DFC1A03F1;
+	Fri, 16 Oct 2026 12:50:08 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf03.hostedemail.com (Postfix) with ESMTPA id 456626000C;
+	Fri, 16 Oct 2026 12:50:06 +0000 (UTC)
+Date: Fri, 16 Oct 2026 08:50:04 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: mhiramat@kernel.org, linux-trace-kernel@vger.kernel.org,
+ mathieu.desnoyers@efficios.com, kernel-team@android.com,
+ linux-kernel@vger.kernel.org, maz@kernel.org, oupton@kernel.org,
+ kvmarm@lists.linux.dev, stable@vger.kernel.org, kernel test robot
+ <lkp@intel.com>
+Subject: Re: [PATCH v1] tracing/remotes: Fix TRACE_REMOTE build when
+ TRACING=n
+Message-ID: <20261015180004.2f7da6b9@gandalf.local.home>
+In-Reply-To: <20261015112814.332084-1-vdonnefort@google.com>
+References: <20261015112814.332084-1-vdonnefort@google.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: mark.rutland@arm.com, misono.tomohiro@fujitsu.com, catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, skhan@linuxfoundation.org, rdunlap@infradead.org, tglx@kernel.org, radu@rendec.net, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, enju.kohei@fujitsu.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 456626000C
+X-Stat-Signature: e5qr4q1ej99h7j4dzuw63ahkdrw36wzt
+X-Rspamd-Server: rspamout01
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX19G+JyMcFu5/yHZATxzznAdFi8WUYXiNOk=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=goodmis.org; h=date:from:to:cc:subject:message-id:in-reply-to:references:mime-version:content-type:content-transfer-encoding; s=dkim1; bh=9nmW7sQ0t25U+FgT2eKiTRK8REkWMAfVAFLVtrkPv/E=; b=2/NjAVX9tWfUGk67YzdKFIz5v94pyPF8ZICYhiJV1zcK1C3RGf1fLXacFTrRUuOfevXv6a0svEecxfLE7khhxrLAeNl4XuqjLG+lSGeaiGNBLeZHjUFSStr/oUveyl2qxDbWcu1un+GJ2Hd7xIaym1UI9yXKg/xIY7ian2TZpSI=
+X-HE-Tag: 1792155006-3091
+X-HE-Meta: U2FsdGVkX18mly2Uv4cUx2B1eIyDr9rJ+2Lxe5r4CR0HcwTwPmv3pvIqGd+mqRSbO7hMWuHUKINtnv1sfU+62+3uM6BgA1/I4prCMwSIr4DUrAniDktwTBNDQ7FYmTwcq4olH21Z9LRmRRgN1abxl/krqEqWIFCzVWYOk3W9PHROXuTPB3dEEA3ALC2Dg17PzTqqnjBSCveQZILiuTAXwyy7qSKXUn6422PPBYoPBpNiFelgNLzAnhNYin51BT5ut6bVzgvoBNYlTpdxUeGOXnWzeV8Rwru9o4GOpSSMZSx1uGM2Oo1x+8QO3dWhGey41hdskym1Rp0kiOUQXpaqAeORqLYih502qfSSiStK+WGvBMiuwCPCiym1fFsGZhkhqUkAu84Auob/HEKxG3KSVzElgMF/ISzK2yrRtv7k44od721KDEx1dtNI4GeMNChWxdt3YYGoo1I=
 
-On Fri, 16 Oct 2026 12:50:17 +0100,
-Mark Rutland <mark.rutland@arm.com> wrote:
+On Thu, 15 Oct 2026 12:28:14 +0100
+Vincent Donnefort <vdonnefort@google.com> wrote:
+
+> TRACE_REMOTE relies on tracefs, eventfs and ring-buffer which are only
+> built and declared when TRACING is enabled. It is however possible for a
+> config to have FTRACE=y TRACING=n and TRACE_REMOTE=y.
 > 
-> On Fri, Oct 16, 2026 at 07:00:46PM +0900, Tomohiro Misono wrote:
-> > FUJITSU-MONAKA Erratum E#030001 affects FUJITSU-MONAKA CPU
-> > when using TLBI range operations.
-> > 
-> > On affected FUJITSU-MONAKA CPUs, range-based TLBI operations
-> > targeting a VA or IPA may fail to invalidate TLB entries when
-> > addr[34:29] == all 1 && addr[28:0] == 0 for 512MB mappings.
-> > The affected instructions are:
-> >   RVA[L]E{1,2,3}*, RVAA[L]E1*, and RIPAS2[L]E1*.
-> > 
-> > Work around the erratum by issuing additional non-range
-> > TLBI instructions corresponding to the affected VA or IPA
-> > range-based TLBI operations.
-> > 
-> > Signed-off-by: Tomohiro Misono <misono.tomohiro@fujitsu.com>
+> To fix this configuration, have TRACE_REMOTE select TRACING directly,
+> just like other FTRACE options do and drop the TRACING dependency from
+> NVHE_EL2_TRACING to avoid a circular Kconfig dependency.
 > 
-> As Will and I suggested last time, we'd prefer to disable range
-> operations on these parts (and ensure that the relevant ID field is
-> hidden from KVM guests).
+> Cc: stable@vger.kernel.org
+> Fixes: ea908a2b79c8 ("tracing: Add a trace remote module for testing")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202610142301.GBepPVmS-lkp@intel.com/
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+
+Acked-by: Steven Rostedt <rostedt@goodmis.org>
+
+This can go through the arm64 tree.
+
+-- Steve
+
+> ---
+>  arch/arm64/kvm/Kconfig | 2 +-
+>  kernel/trace/Kconfig   | 1 +
+>  2 files changed, 2 insertions(+), 1 deletion(-)
 > 
-> Regardless of whether eventually accept the approach you propose here,
-> we first need something simple to backport to stable trees (as I assume
-> you'll want to run standard Linux distributions on this hardware). The
-> TLB invalidation code has changed a lot over time, and I don't think
-> it's practical or sensible to backport this patch.
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 449154f9a485..e179b8ad79e8 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -74,7 +74,7 @@ if NVHE_EL2_DEBUG
+>  
+>  config NVHE_EL2_TRACING
+>  	bool
+> -	depends on TRACING && FTRACE
+> +	depends on FTRACE
+>  	select TRACE_REMOTE
+>  	default y
+>  
+> diff --git a/kernel/trace/Kconfig b/kernel/trace/Kconfig
+> index 0ab5916575a9..6587450cfcd1 100644
+> --- a/kernel/trace/Kconfig
+> +++ b/kernel/trace/Kconfig
+> @@ -1329,6 +1329,7 @@ source "kernel/trace/rv/Kconfig"
+>  
+>  config TRACE_REMOTE
+>  	bool
+> +	select TRACING
+>  
+>  config SIMPLE_RING_BUFFER
+>  	bool
 > 
-> As a first step, I think we should simply disable the use of range
-> operations on these parts, and ensure that KVM hides the relevant ID
-> field. After that, we can consider optimizing the workaround, as you
-> propose here.
-> 
-> Marc, does that align with your expectations?
+> base-commit: 24a19b953e2a3d0ea5a8c4951a0ab8f32720c907
 
-Yes. I'd rather we start with a clean slate so that an unsuspecting
-guest cannot get things wrong because it doesn't know about the
-erratum. Anything else is icing on the cake that is not desirable at
-this stage.
-
-> Is there an existing pattern to follow for hiding the ID field?
-
-Ideally, TLBI_RANGE would be removed from the ID_AA64ISAR0_EL1 copy
-that the kernel has, and KVM would simply inherit this. I'm not sure
-we have a good way to do that other than doing horrible things with
-the override masks.
-
-Otherwise, something as simple as forcing the ID_AA64ISAR0_EL1 reset
-value in sys_regs.c would work.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
