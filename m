@@ -1,73 +1,73 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02FC44A4F0C
-	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 13:21:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8627F4756DF
+	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 13:23:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792156915; cv=none; b=sekx5HPf2LgJRTxytbUOvCk/iAKzND/qKDXZt0Jx0PNWAEopnq3vcLgQ8ExVDV6KtAAkKdtK9TVN5e2ks2VPKzhrmk8pzKH84T8AK3JxnVXHtrx/vzvt6ZxGpGCjKl/+7gmLS4ShKRvLegxEY4FDynuzzXPln896mIoLfUcbvP8=
+	t=1792157036; cv=none; b=duVHPWonsFEk0O0bHMl5XHpHnd7A4ojpHpUxDP2o4qgi/nS1fJRl2wKV2UjueQKl8S94fwqAFcSIrv6M9o/H6jSt5+E34gpkpmxDXILYnfpQTZrSCLA7X92778FtKta4jJv3CPJZizoXJNzKshzmCvwb+2sIeC2V/y5gvmGdpuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792156915; c=relaxed/simple;
-	bh=y93t19qTUov1y2sLa1Hy0fBLm5DgTEafXbawc95i7fA=;
+	s=arc-20240116; t=1792157036; c=relaxed/simple;
+	bh=/kLJGs3U7wop6dIZt6JxkYvhTC1yyWSgyMy4FWp7OwE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WxgykEN2MtcoASU1T6KIOOEXSkT+1m5dmNUz0WF75w1CdS5LYot9v2Rxgm2h2fy+7PCBNtsS7YW1Ti4D+Z8/zs6Qy2u84kwpvgk8BKdyBVMzLaasPSEkguw1yLJQEz1nR4VOznXlUmoMzOiuGx9lpBsNcjognf6U9AwSM8YtkdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C+aEn36N; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=DMwXiPL0yvjmz5mkbeIxEpvtwHO+vZnFg8hstDAu/CN6Fu7xFru6REKVoHTip75xPDfQUCYYHOc5jkvWN1Gg0XEDP3wlx34aDu6y0R1/LA8sZ/PpETJzshxQCyqfMjj28IsO4R08HCkfZY2dAQy2fpQzYTWl1OOdXR9XJg/iRQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PkVDstdO; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C+aEn36N"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PkVDstdO"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1792156912;
+	s=mimecast20190719; t=1792157034;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nvNMJKy5hEsNmX3h2yw6AJYeXfgIvjlosnD74UtrqYM=;
-	b=C+aEn36NzuycGolqcoagJv/YT/bqAqBadu2IG4a21g0g3zPLGOj3SfJAhfzZ55u791OOp9
-	AdnWTiPRUQv1YYj+F4SFOKGVGnCZQK/2nfO0rP7t1Nss1Fe2n3AcwjZIsXhb/UDzPfQh0R
-	lFGs5SdUOAlWVK035kz1yUpjtd7ldeQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=SE9V4G/G/hYgWtus+HDIk8cYxijfE4z5gZCyCIy9Vw4=;
+	b=PkVDstdOS301iYWVEYiaK60QDnr3IYgxRLrTxZgAnpX4DCJIaxLUn37A9Ay9HJ9lpoqCbW
+	27opKFhFs0rxd1mkCmnDSE/7PfFEClzsMXr+74NIinBsW4LHOTd30jtvdBxcRCieagl34Z
+	rBDoR7wPi1qDP79CcwTNEhuKUi1Cd48=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-297-acRXHovOM7KexuZYvbgJ5g-1; Fri, 16 Oct 2026 13:21:50 +0000
-X-MC-Unique: acRXHovOM7KexuZYvbgJ5g-1
-X-Mimecast-MFC-AGG-ID: acRXHovOM7KexuZYvbgJ5g_1792156909
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-487038bc9b8so5147398f8f.2
-        for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 06:21:50 -0700 (PDT)
+ us-mta-241-eOmAnfLWMNyJKgR89wOPRw-1; Fri, 16 Oct 2026 13:23:53 +0000
+X-MC-Unique: eOmAnfLWMNyJKgR89wOPRw-1
+X-Mimecast-MFC-AGG-ID: eOmAnfLWMNyJKgR89wOPRw_1792157032
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4a1cf5e7012so4710745e9.2
+        for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 06:23:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792156909; x=1792761709;
+        d=1e100.net; s=20260707; t=1792157032; x=1792761832;
         h=content-transfer-encoding:content-type:in-reply-to:from:references
          :cc:to:content-language:subject:reply-to:user-agent:mime-version
          :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=nvNMJKy5hEsNmX3h2yw6AJYeXfgIvjlosnD74UtrqYM=;
-        b=EpUX39uUIHjCqZGEn4LivNSw7eKV3FCsVGmzgj2PSdMNoLYKl53LsOuns3AZuA6xc5
-         7yKc6VLvV8ATuKrYhgKDtW1kxlKKALki4kuD61pJDz7YtUzspnbsDBzNk656b+0n2635
-         oTnFV8Yjhmxnx746vYMB3mcJhL9xfSbdS2HJSNA+apJDJnB5RjsZJL8xcGDvtukVzfOD
-         N9sQrnSlq668+KHiEMIng4wRL4HACbc6/Z2DXMy1dbodLXejI2f5H+qcitNOhPRNbLJw
-         u6nxgrrL6lvSaUPP105EtrQZIZJCMw0U2HsxfPBAPlUXAuunsQHWa/IHOXk0fHGzeTzv
-         Resg==
-X-Forwarded-Encrypted: i=1; AKwUvByfi3B02pMjoFfDk2ZHDZUCoFh4t8QcNozCanX+GCQk1idict1rD/AMydJ9tITgOn1RBCsAfpM=@lists.linux.dev
-X-Gm-Message-State: AFq9FYIZjUa16m4x44b0bxMYKR7i0KpwFCMiySkqERJfNs6/jFfbRDm1
-	wjPKBDK+dRrwqRAc/X1Re+BamI2NIpLmFrKbMRsOsyNIg8j3urmAlH35ZlXq56fisquzMrktxcZ
-	fS3dFRl/MF7hd/7iLALAoXS8c7z+7i2je6pVRyoiOfSYKA88i27VonSRHRg==
-X-Gm-Gg: AYBFou3tqPyN9WawprNjMlHlR3cgnWVCyQWbFAcLrf2eOnPMUHFVAd8ygoapUnK/bKa
-	gQ4/cecWbbMFLKi8s1xwNmpMkJpB9MiC8fsSfj1PR2KPib2G2JUe+G/F6JdCT7zhb+2tnAWMdFd
-	8ypCAAhFygH7H2SQsfvi8ejonilFVXkJbuCH6PKW6FPfv+X3a8RndANfUY07ckUBwcFfC2zpata
-	cQPecK7QhGWh5aiVdPo/Fns7Jguv/Dqy1jc2cQLQ9hWwV2K693ZuVTg2DRhJNwABWu637DPoTpc
-	YRXIDuSMwEaRnhn5m4yVyOaw9VXm3dnVtBcswpQNopI5PblFwQtry3qXhSeaZcNjCPE6+dgVrmE
-	Zklp+xlmZ8JdWu939L2GKhTh7ki2H3in4cRNTCuy6X11RhG4I
-X-Received: by 2002:a05:6000:4b15:b0:48d:fbee:3dec with SMTP id ffacd0b85a97d-48dfbee3fa9mr5402185f8f.29.1792156909340;
-        Fri, 16 Oct 2026 06:21:49 -0700 (PDT)
-X-Received: by 2002:a05:6000:4b15:b0:48d:fbee:3dec with SMTP id ffacd0b85a97d-48dfbee3fa9mr5401985f8f.29.1792156907098;
-        Fri, 16 Oct 2026 06:21:47 -0700 (PDT)
+        bh=SE9V4G/G/hYgWtus+HDIk8cYxijfE4z5gZCyCIy9Vw4=;
+        b=mOxZI5Xw8e+jnqitaa71PCazsrNAkcCjJDNaaD50s3OvDH6Nv6wJqBsSZGy3699ARb
+         huNjoOmvYaSKsgVw326XjeMBFNJUSySBjrMygsf/RTVLer0CH5FsJ0RBEPls4JN+VgtT
+         ySU9OlSXfn+0eqjMi6D5QzhVz0AQWJMrsUYWUeuplI+vCHi4pEBVPcdrJERx/AMN73sB
+         1yJxpytfcD+ECcX9UMkRyo82hUZFyKnbke0bwvFJ/y+hLW9mnE3sbBng821H1UNEdI6F
+         o6TOgkqyF8M+kUGIHgz2X2LJe9CFTaVkc/0nY5MhvzepD62yPFm3v8m09IQ+0Uqa5sh7
+         1+Lw==
+X-Forwarded-Encrypted: i=1; AKwUvBw2Qbtmy0hBiJtiUJFnCsZWg4pZu44PPngeQbkziNx0WmruFaP9+U1JlO4C4CtbHmEyxL7uT0A=@lists.linux.dev
+X-Gm-Message-State: AFq9FYJnxUVuF+GZapZX25y0QNuX8xS5Fo67NFswa+Xw8Nn8qCijod9E
+	V/pie2aCf5FjWUorRs9rxvXj/A8uu9WQe98SfsjrKQwcU9VcvYBKmuUo71iNXDjwL6AC4sFrgwv
+	zSmiprnf8JJHacYBdvbIfDQp3+LUo69I+nRT8TXpsQ8XNmaBUc84d27XhWw==
+X-Gm-Gg: AYBFou3zKM6CLUrJL3qDrBbChZxI8ExGOYVj2p9/wnpsnpGzieLkRDkCWIewHxuzwer
+	9+CeJXFnOfm7a4PlPZ3sCLIlYPZ+Hd0yDJRWf0WCUJenrwP1XASxNkspXWdBAoA2RD6RWpIS8Sn
+	oJn+wjMKxl3sANXvS0Ckz1MN9IlhqnQ/SURXTb3eDdS1WYQ8zHhEyCrJGcUYteczvJ+10vUuquQ
+	ryJBrNzZdUu11v+gQkX1sH13S8zijGKGybCbvLhAaqj8zUvP9S2Jz8i2cYHDxzIOmAJlaCN+ju/
+	q21CwCpzXfx0YUDiaNHgdGiW/Jdboyt4SaiAbrZUZU8lKOoG0dD7ro+524DghVp1imqlimCRDsl
+	K8Mo82D+NwkBPx4DswbZ9J0ovxU3tVDHydxe1xdmSSIbJ7k5S
+X-Received: by 2002:a05:600c:c113:b0:4a1:985b:83a9 with SMTP id 5b1f17b1804b1-4a1985b87f5mr280530415e9.4.1792157031832;
+        Fri, 16 Oct 2026 06:23:51 -0700 (PDT)
+X-Received: by 2002:a05:600c:c113:b0:4a1:985b:83a9 with SMTP id 5b1f17b1804b1-4a1985b87f5mr280529705e9.4.1792157031375;
+        Fri, 16 Oct 2026 06:23:51 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48dfe4d2321sm5067555f8f.19.2026.10.16.06.21.45
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1bd9b8b5fsm164077725e9.9.2026.10.16.06.23.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Oct 2026 06:21:46 -0700 (PDT)
-Message-ID: <4c9d85b0-4dac-40f8-8541-d79bb3670f12@redhat.com>
-Date: Fri, 16 Oct 2026 15:21:44 +0200
+        Fri, 16 Oct 2026 06:23:50 -0700 (PDT)
+Message-ID: <1dcb8628-2b99-4af1-92f4-08dcae197e82@redhat.com>
+Date: Fri, 16 Oct 2026 15:23:49 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -92,30 +92,25 @@ References: <20260921123249.1708067-1-khushit.shah@nutanix.com>
 From: Eric Auger <eric.auger@redhat.com>
 In-Reply-To: <20260921123249.1708067-25-khushit.shah@nutanix.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: GXUUlJpy9QigS_5ACw9qINMwy0oMoNs2fvHvzKepy8U_1792156909
+X-Mimecast-MFC-PROC-ID: YZDi3WIXDXfZzXNMM0jlYkoPC3TpBiMLECPaHsduB9w_1792157032
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Khushit,
+
 
 On 9/21/26 2:32 PM, Khushit Shah wrote:
 > Implement query-cpu-props-info for ARM64/KVM by creating and finalizing
 > a temporary "host" CPU object and then walking its QOM properties.
+side note: the new qmp command shall be documented in
+docs/system/arm/cpu-features.rst
+
+Eric
 >
 > For numeric SYSREG_ properties, report the host-supported value ranges
 > computed by kvm_arm_field_get_supported_values(). For boolean
 > properties, report false as always supported and true as supported when
-I am not sure false shall be always permitted. for instance iirc
-aarch64=off requires a special KVM capability which is not tested here.
-
-it is worth to emphasize those are the theoretical values that can be
-easily guessed, this does not check cross feature consistency which can
-only be tested when applying the values at KVM level I guess. So let's
-do not pretend that this is fully reliable. I think the only way to
-double check the chosen values is to do a full expansion for this models
-featuring the new values
 > the QOM property value is true.
 >
 > Signed-off-by: Khushit Shah <khushit.shah@nutanix.com>
@@ -218,7 +213,4 @@ featuring the new values
 >  CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
 >                                                       CpuModelInfo *model,
 >                                                       Error **errp)
-Thanks
-
-Eric
 
