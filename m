@@ -1,144 +1,134 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 446D24DC551;
-	Fri, 16 Oct 2026 16:11:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8CA2E719B;
+	Fri, 16 Oct 2026 16:14:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792167120; cv=none; b=eYK1N6Zm/qr2cGaDrmIwFdgybLn/x+A1t1+S3dd6E5h5wwS6Km03Coqk1kv2HAs9iEMNMK7SBF9AYBkos6zmUgjbBuRySDL62OekFgjX2XkTcaNmT+vKG1EZLmE4ChEAyUAw2Bs7I9QZS8YC0K/sS5Bz+0FSSGQ0PddkHZDMJXE=
+	t=1792167275; cv=none; b=DNdaSF8KxisrO3BdHfjJkQcQMH/bDVekRGHAmFAlD4BjqA9Q6jJ8y3QIYeLXEodimLbt5sBAaFgKSoVm/yO0rTy5qA3PzR3v4dypeNmsQldyAKQNS1z2DM69airEo6WvihtRlbMNAohWPeL8YPGMNjsHRFBNGrCRTqczObgXW0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792167120; c=relaxed/simple;
-	bh=8udg7/Y0vtPLb+YaEi+XK54yOn96d5LjgawTcIHB74o=;
+	s=arc-20240116; t=1792167275; c=relaxed/simple;
+	bh=JhkCgFscqO3e6fUnU47gcbiEWlBj3ckG+hjHSdWnDp8=;
 	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=Rozk73IUYI/Kwmr6CT6y485r43MDE6J9wCnT83pSVGGEIh1ch1wJXVxl5SPDpCGdB/ynUVz735KQAI1Y6bOyqc0SiCOUjAySB2Lxb3nPDHtHIh1X/nClUqCKRZ5Zv+aN6o2WkISr9UPZcOvJYGr5DYdzFDC985P4fQVx9oz8suQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g1h0r5Pb; arc=none smtp.client-ip=100.103.45.18
+	 Date; b=V28thF2CvwQOGZsrYFrDvhqeRpxx9pnjSjjKjRc9o9+IRAg2P7gGi1bym+QD2slHQrb0cF5HvytIcP8WJGpwqVdvLTOdHHxLpDPLqW1Qioz/gBaV9G69Mfq5z9SiMOGuLDeEinLJpIevn739/90t+UvSrxjNgCAe9Cc2WlU7x+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dVqBEtDh; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g1h0r5Pb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 911BF1F000C4;
-	Fri, 16 Oct 2026 16:11:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dVqBEtDh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B03941F000C4;
+	Fri, 16 Oct 2026 16:14:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792167117;
-	bh=31YHdC5GLg308gpID/McJsemnIVZ+YQAgJBEq+aKVXw=;
+	s=k20260515; t=1792167271;
+	bh=Hp9KSkBZtWOuV1uhBzzxFWf14kBrI4Ky2VPKDSawEn4=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=g1h0r5PbyCG2q71h7CY8qBrNr8VG2Mf/iot359vHdOMDcD8+x9T9kYaBBL76tONsU
-	 GHCWjbgeOdWGpQc3g3jz7cUElwBTd3cAiCQOkzOIlvJsIbO4xbWNxD3YmZ21sCqObM
-	 vyYHX1WS/l74fjemjaVS1nf4wiuy1xs3HTWqluSUI5UYGvNY0Zmy4vI5S0T85ptnyP
-	 +58qe8vM4JcfALPAqQ1A9RheRCqfZc5OqreDR76nNbX1rbs/XaUFG2I31rWvEzJHMR
-	 Mg547eKyvP1+gzl0TgiER43Yy1W4ziVx86TkEo+GzcabagO6xVbvryad9bfQT9y8XQ
-	 blh1J6bS+XCEA==
-Message-ID: <sashiko-outbox-174609@kernel.org>
+	b=dVqBEtDhIe7nRA+KoL5fvzNeWNTZnijVMyWaklxPJkmr853Vx8/WfQPOj3xcg/oh1
+	 AXrGyToQULab+eACQXVflGgvMTIqmZEuKh9w98jey+Dl7U+79q+XP+6gla7UVNG0os
+	 zCMWzfhUrCeRYiI1SMrJu4tqRX3cuoKj2w7NUwMbG2cQtlnCS+9rJyCI0aPRdcK3gw
+	 90IPaJiufEl4mvo8SfO9Q9p9RYM0HMhTCQK7VTFwQxpSyyEdadRUjMCUVUe1ElsfMj
+	 CC7NbMP32AeKXNm8JPeyjS4PwqN/tLeRO0ABx3YiYNyaRuLQDn1NAlu2s378k6W7qy
+	 v1QoDcgIx7CZg==
+Message-ID: <sashiko-outbox-174615@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 06/16] KVM: arm64: gic-v5: Add ITS MMIO state emulation
+Subject: Re: [PATCH 01/16] KVM: arm64: vgic: Split out common LPI allocation
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <sascha.bischoff@arm.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
 Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261016155741.979985-7-sascha.bischoff@arm.com>
+In-Reply-To: <20261016155741.979985-2-sascha.bischoff@arm.com>
 References: <20261016155741.979985-1-sascha.bischoff@arm.com>
- <20261016155741.979985-7-sascha.bischoff@arm.com>
+ <20261016155741.979985-2-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 16 Oct 2026 16:11:57 +0000
+Date: Fri, 16 Oct 2026 16:14:30 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [High] kvm: arm64: Data race and TOCTOU due to missing its_lock in MMIO h=
-andlers
-- [High] kvm: arm64: gic-v5: Userspace writes to ITS READ_EVENT_DATAR and I=
-D registers are silently dropped
+- [High] kvm: data race on irq->group due to unlocked assignment after publ=
+ication
 --
 
-commit cda638a2b9c74f59afeb5648c53ce1083d96d5c3
+commit 0cabb3a5e012e80ff468a8654506c83304b15486
 Author: Sascha Bischoff <sascha.bischoff@arm.com>
 
-KVM: arm64: gic-v5: Add ITS MMIO state emulation
+KVM: arm64: vgic: Split out common LPI allocation
 
-In order to expose a virtual GICv5 ITS to the guest, KVM needs to
-emulate the ITS CONFIG_FRAME and its translation-control registers.
-Replace the placeholder ITS IODEV region with the GICv5 ITS register
-layout and handlers for the architected MMIO state.
+The GICv3 ITS code currently owns vgic_add_lpi(), even though the
+first half of the helper is not ITS specific. It allocates or finds
+the VM-wide vgic_irq object in lpi_xa and initializes the common LPI
+state before the GICv3 ITS code reads the property table and pending
+state.
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-its-v5.c b/arch/arm64/kvm/vgic/vgic=
--its-v5.c
-> index f8184b4ae0ccd..fda75314229a5 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its-v5.c
-
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-it=
+s.c
+> index e5657cb603567..8e7bee1bae95d 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -66,77 +66,22 @@ static int update_lpi_config(struct kvm *kvm, struct =
+vgic_irq *irq,
 [ ... ]
+> -	irq =3D kzalloc_obj(struct vgic_irq, GFP_KERNEL_ACCOUNT);
+> -	if (!irq)
+> -		return ERR_PTR(-ENOMEM);
+[ ... ]
+> +	irq =3D vgic_add_lpi(kvm, intid, vcpu);
+> +	if (IS_ERR(irq))
+> +		return irq;
+> =20
+> -	irq->config =3D VGIC_CONFIG_EDGE;
+> -	refcount_set(&irq->refcount, 1);
+> -	irq->intid =3D intid;
+> -	irq->target_vcpu =3D vcpu;
+>  	irq->group =3D 1;
 
-> +static void vgic_v5_mmio_write_its_misc(struct kvm *kvm, void *dev, gpa_=
-t addr,
-> +					unsigned int len, unsigned long val)
+[Severity: High]
+Does this code introduce a data race on irq->group in vgic_its_add_lpi()?
+
+Since vgic_add_lpi() now publishes the object to the globally visible
+lpi_xa xarray and drops the locks, a concurrent thread (e.g., another vCPU
+writing to GICR_INVLPIR or mapping the same LPI on another ITS) can
+retrieve the LPI and access irq->group under irq_lock before we set it here.
+
+This can misroute or drop the LPI if it is evaluated by vgic_irq_cmp()
+as Group 0 instead of Group 1. Should we set the group before publishing,
+or hold irq->irq_lock when assigning it?
+
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index c2726d4c06e6e..bc0171c479a95 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -79,6 +79,78 @@ static struct vgic_irq *vgic_get_lpi(struct kvm *kvm, =
+u32 intid)
+[ ... ]
+> +/*
+> + * Creates a new (reference to a) struct vgic_irq for a given LPI.
+> + * If this LPI already exists, we increase its refcount and return it.
+> + * If this is a "new" LPI, we allocate and initialize a new struct vgic_=
+irq.
+> + * This function returns a pointer to the _unlocked_ structure.
+> + */
+> +struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+> +			      struct kvm_vcpu *vcpu)
 > +{
-> +	struct vgic_v5_its *its =3D dev;
-> +	size_t offset =3D addr & (SZ_64K - 1);
-> +
-> +	switch (offset) {
-> +	case GICV5_ITS_CR0:
-> +		its->enabled =3D FIELD_GET(GICV5_ITS_CR0_ITSEN, val);
-> +		return;
-> +	case GICV5_ITS_CR1:
-> +		its->cr1.sh =3D FIELD_GET(GICV5_ITS_CR1_SH, val);
-> +		its->cr1.oc =3D FIELD_GET(GICV5_ITS_CR1_OC, val);
-> +		its->cr1.ic =3D FIELD_GET(GICV5_ITS_CR1_IC, val);
-> +		its->cr1.dt_ra =3D FIELD_GET(GICV5_ITS_CR1_DT_RA, val);
-> +		its->cr1.itt_ra =3D FIELD_GET(GICV5_ITS_CR1_ITT_RA, val);
-> +		return;
-> +	default:
-> +		return;
-> +	}
-> +}
+[ ... ]
+> +		/*
+> +		 * The entry is either empty or contains a dead LPI (refcount=3D0)
+> +		 * from the deferred release path, pending cleanup by
+> +		 * vgic_release_deleted_lpis(). Evict and free it if present.
+> +		 */
+> +		oldirq =3D __xa_store(&dist->lpi_xa, intid, irq,
+> +				    GFP_NOWAIT | __GFP_ACCOUNT);
 
 [Severity: High]
-Does this code introduce a data race or TOCTOU vulnerability?
+Is it safe to publish the new LPI here while its group field is still
+uninitialized (0)?
 
-The vgic_v5_mmio_write_its_misc() function modifies the its->enabled flag
-and its->cr1 fields without acquiring its->its_lock. Concurrently,
-vgic_v5_mmio_write_its_dt_itt() uses guard(mutex)(&its->its_lock) to safely
-evaluate !its->enabled and modify table bases.
-
-Allowing lockless modification of its->enabled could bypass the check
-if another vCPU is simultaneously writing to translation base registers.
-Additionally, this permits torn reads of the multi-field cr1 struct. Should
-this function acquire its->its_lock?
-
-[ ... ]
-
->  static const struct vgic_register_region vgic_v5_its_registers[] =3D {
-> -	REGISTER_ITS_V5_DESC(0, vgic_v5_mmio_read_its_raz,
-> -			     vgic_v5_mmio_write_its_wi, KVM_VGIC_V5_ITS_SIZE,
-> +	REGISTER_ITS_V5_DESC(GICV5_ITS_IDR0, vgic_v5_mmio_read_its_misc,
-> +			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
-> +	REGISTER_ITS_V5_DESC(GICV5_ITS_IDR1, vgic_v5_mmio_read_its_misc,
-> +			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
-> +	REGISTER_ITS_V5_DESC(GICV5_ITS_IDR2, vgic_v5_mmio_read_its_misc,
-> +			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
-
-[ ... ]
-
-> +	REGISTER_ITS_V5_DESC(GICV5_ITS_READ_EVENT_DATAR,
-> +			     vgic_v5_mmio_read_its_dt_itt,
-> +			     vgic_v5_mmio_write_its_wi, 8,
-> +			     VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
-
-[Severity: High]
-Are userspace writes to restore migration state being silently dropped?
-
-Both the ID registers (e.g. IDR0) and READ_EVENT_DATAR are configured
-with the vgic_v5_mmio_write_its_wi write-ignore handler. Since there is no
-explicit userspace override provided for these registers, a userspace write
-will fall back to the guest MMIO write handler, accepting the write and
-returning success (0) but discarding the value.
-
-For ID registers, ignoring the write prevents the VMM from detecting
-incompatibility across migration. For READ_EVENT_DATAR, the result of an
-inflight READ_EVENTR command is lost. Does this violate the ABI contract
-that userspace writes must either take effect or return an error?
+As mentioned above, doing this in vgic_add_lpi() makes the LPI accessible to
+concurrent lookups in vgic_get_irq() before vgic_its_add_lpi() has finished
+setting up the group field.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261016155741.9799=
-85-1-sascha.bischoff@arm.com?part=3D6
+85-1-sascha.bischoff@arm.com?part=3D1
