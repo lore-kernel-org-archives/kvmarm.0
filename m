@@ -1,172 +1,141 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D57466B75;
-	Fri, 16 Oct 2026 09:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA24244AB68
+	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 09:37:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792141980; cv=none; b=GII0as2LoigkeiFIYS8wvVNyoWXiucGWMlOO4YFQnqNE1X9S5p/qDVEEGD68qx4fn1OOw1OBx876MAnjPiqLqqw/lqv36NII3ngAccO8I9R6GgUreivn9O964KhKJrJR4N/pW/CuqxjNvm27WuapxcLBMl+OzeDiPHKGLzDed2g=
+	t=1792143470; cv=none; b=M8aVBKrKoNifWY47uJxcCQLgUoD9omlaASJU29JgTLL1tSJiPNcarnZLOipQxooNU1o+sS4q4v2DtHgL9i1hAk4HLE3UWW0g2aiVuABgzQRr1BeDeDgrC8J4HM9t+Iky8wiQKjSBH55zqXrkJBLrxgTJph0OKP3Y2ZNUCT9n/lE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792141980; c=relaxed/simple;
-	bh=tIkUz86ONiXurGzEfoccU/KpLb0S8j0MPoniAWV3O6g=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=GnVkQeEEB/p/+LvubBv9QBasF5gmHpD6H4ahByto5LJV85+G+Irj+LIyeij3Rct5dyB6CUKQhezQf+oNloLPO/wHY/nSiwQlFHEK/msudYr0iCU8aJPY+xttO4Ri4qzO+R68O/C0fpAUbZiwYWtwh23dEwduv+MaRuIOY4yJK6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LYZgl/L4; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792143470; c=relaxed/simple;
+	bh=Smhg9yNlnAPYwdPrTRseMbcSPuVDe05yzo3Alil1EIs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Y3daQ9DW9OFvj28QQ1ST9zkcmfmc7Ja/wJKLa/hrQVHt63R55FKvjkf/5bGiD9sxAaMyzC5UTWcAzL45PWM+uF+Il4wJ/CLEouKmiMBOnrcMs3lixDbw9MiK+eXN6zSED8GViKmwMumxqj7MKL0tY3fNLyczNsTVl7qonxwva+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D2OChEEu; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LYZgl/L4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 521BE1F000C4;
-	Fri, 16 Oct 2026 09:12:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D2OChEEu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 709311F000C4;
+	Fri, 16 Oct 2026 09:37:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792141979;
-	bh=mQH+kXpKSTymGia/uumXbgT78aV2agpPTvM0izIRqhE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=LYZgl/L47fPO8Aq+OVvp5UAIfE6hgsH5zIh9oJrQPyGOyzlbTMZ+sEC6Ba2iivygG
-	 TkPuULqc5Ixpat8F42Z/hB853dD7BfPLHituatCT9QtBtX37bYoB2UITBUScGPZJTv
-	 /usSd5kkvMwdNHq8GlE8NVjVR68AUrk8rBGTbLTczFneKEc+Vlra2BuBzIxoldvSJD
-	 5k/PrxNtsyWoMGyB7jwmq/3ALOfJ2jyscwflYFHeck2tVFD/wKAmWKx5Sd0GuFkzRm
-	 5Nais/Vmmp4nMWPIYN3Q5NTbSyK91tqJb4EB8JS7BrO04489Jub9pYLLW9dhx6IUPi
-	 ELIJk5iqbinsA==
-X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Fred Griffoul <griffoul@gmail.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	David Hildenbrand <david@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Jan Kara <jack@suse.cz>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <shuah@kernel.org>,
-	Shuah Khan <skhan@linuxfoundation.org>
-Cc: David Woodhouse <dwmw2@infradead.org>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	"Liam R . Howlett" <liam@infradead.org>,
-	Vlastimil Babka <vbabka@kernel.org>,
-	Mike Rapoport <rppt@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	iommu@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [RFC PATCH v2 00/11] mm: Memory providers for guest_memfd and
- iommufd
-In-Reply-To: <20261014093733.90312-1-griffoul@gmail.com>
-References: <20261014093733.90312-1-griffoul@gmail.com>
-Date: Fri, 16 Oct 2026 14:42:40 +0530
-Message-ID: <yq5a4iem57qv.fsf@kernel.org>
+	s=k20260515; t=1792143469;
+	bh=W3NO0pJ/XcFPdXScblby7SDbvNRveDq8sYiOuPvPASU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=D2OChEEuB/8XOJNsUGNssDuFwg00B7kZOWyhI4ZY7rh9X0unK5dAMTuFZHImX/hch
+	 /4Yp5Z2euhk7BXffr1Ka/MUVv45aC9P6nR9pSDZX7T7nYk+g/o0ZYpolkPir4YReu1
+	 miMeJN4ZUpdd+bm8hh97+A/Pp3v25GVdhXMIer7PkQY4HST+Jl1sT8FgNiExmzSNvE
+	 r3gdvyi3YGIHSjkzrJ8hdyIiK2iJDi9KDpdCGoO5tKXGs/zi+aCHse57LOx/2FLsKu
+	 jtxf1zjAHF13/zmTWHYVVtUcSdENBznzhEjB66uGPda1KpbfGzCJiat5ALkpN2+UAl
+	 z7hfjvL8EYMKA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xHeNn-00000003gIc-03gC;
+	Fri, 16 Oct 2026 09:37:47 +0000
+Date: Fri, 16 Oct 2026 10:37:46 +0100
+Message-ID: <86fqy60yvp.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Khushit Shah <khushit.shah@nutanix.com>
+Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"oupton@kernel.org"
+	<oupton@kernel.org>,
+	"eric.auger@redhat.com" <eric.auger@redhat.com>,
+	"cohuck@redhat.com" <cohuck@redhat.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+	Mark
+ Cave-Ayland <mark.caveayland@nutanix.com>,
+	Shaju Abraham
+	<shaju.abraham@nutanix.com>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	Sandesh Patel <sandesh.patel@nutanix.com>
+Subject: Re: [RFC] Exposing arm64 ID-register safe_rules semantics to userspace?
+In-Reply-To: <27B87634-9720-438E-8153-1918E6515230@nutanix.com>
+References: <B5C9AE36-8181-4A76-905F-3E89B7200215@nutanix.com>
+	<86se6xthih.wl-maz@kernel.org>
+	<E58B3007-0BB1-460F-9225-707FCF811B04@nutanix.com>
+	<86pl21t99k.wl-maz@kernel.org>
+	<27B87634-9720-438E-8153-1918E6515230@nutanix.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: khushit.shah@nutanix.com, kvmarm@lists.linux.dev, oupton@kernel.org, eric.auger@redhat.com, cohuck@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, mark.caveayland@nutanix.com, shaju.abraham@nutanix.com, skolothumtho@nvidia.com, sandesh.patel@nutanix.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Fred Griffoul <griffoul@gmail.com> writes:
+On Fri, 16 Oct 2026 10:07:37 +0100,
+Khushit Shah <khushit.shah@nutanix.com> wrote:
+> 
+> I take your point that a named model cannot be a faithful Neoverse V2
+> (or any other) TRM view: even on V2 hardware, a KVM guest only gets
+> the subset that the architecture and KVM can actually virtualise. We
+> are not trying to present a TRM-accurate Neoverse V2 to the guest.
+> 
+> What we are after is a migration ABI: a fixed guest-visible ID register
+> contract that stays identical across all hosts capable of running it.
 
-> From: Fred Griffoul <fgriffo@amazon.co.uk>
->
+That ABI exists. It is probably buggy as hell, but it is there at
+least in principles.
 
- [ ... 24 lines skipped ... ] 
+> In my research so far, I have identified the following pitfalls with
+> this approach:
+> 
+> - Guest errata: errata handling in the guest is driven by MIDR/REVIDR,
+>   so if those do not match the real host, the guest can pick the wrong
+>   workarounds or skip needed ones.
+> 
+>   Shameer's errata-management work, where the VMM gives the guest the
+>   list of target implementations could address this.
+> 
+> - PMU: events and counters are core-specific, so they cannot be
+>   supported reliably across heterogeneous hosts.
+> 
+>   We currently leave PMU out of named models for that reason.
 
->
-> Why a new interface
-> ===================
->
-> kvm_gmem_ops gives KVM a way in. For devices, the only option today is
-> a dma-buf plus a private call that iommufd looks up with symbol_get(),
-> which is how vfio-pci works. Each new owner would need another such
-> lookup, and iommufd would end up knowing each owner by name. With a
-> common interface, a provider module only calls into mm, and nothing
-> needs symbol_get().
->
-> It also means the provider revokes a range once. The VMM hands the
-> same file to KVM and to iommufd; on a revoke the core forwards it to
-> every consumer, so KVM clears the range from stage-2, iommufd from the
-> IOMMU page tables, and guest_memfd from the VMM's own mapping, all
-> before the revoke returns.
->
+This is a deal breaker IMO. Most interesting events are *architected*,
+and SW that relies on non-architectural events has bigger problems
+anyway (i.e. it is never able to migrate correctly). Removing PMU
+support from named models on these grounds is yet another nail on that
+coffin.
 
-What confused me was the introduction of memory providers as a subsystem
-in their own. What we really need is the ability to map PFNs from
-other subsystems into KVM stage-2 and into subsystems such as iommufd?.
+The "better" thing to do is to list the events you want to support and
+use the event filter to reject anything else.
 
-Restricting the scope to the above, at least initially, would make this
-much easier to reason about.
+> - IMP-DEF registers: ACTLR_EL1, AMAIR_EL1 and AFSR0/1_EL1 are the
+>   trickiest in principle. A named model should only be allowed to boot
+>   on hosts where these registers have the same semantics as on the
+>   implementation the model's MIDR describes.
+> 
+>   Would it make sense for KVM to make them RAZ/WI instead? AFAIU, they
+>   are rarely used by guests; mainline Linux does not touch them at all.
 
-For my use case, the VFIO fd becomes the backing provider (referred to
-as backend below). We can create a guest_memfd using that
-resource_fd, allowing MMIO BAR ranges to be mapped into KVM stage-2.
+ACTLR_EL1 is treated as WI already, but will report the value the
+physical CPU has. We don't know if it is safe to have anything else.
+It may have been yet another early misdesign to do so, but we can't
+change this behaviour now.
 
-Another feature provided by this series is the ability to map the same
-range into iommufd. We probably want to restrict this to shared ranges.
-It may be simpler for guest_memfd to drive this. The resulting
-relationship would be:
+Trapping the other registers to make them RAZ/WI requires trapping all
+VM related registers on CPUs that do not have FEAT_FGT (see the
+registers trapped by HCR_EL2.TVM to get an idea). The cost of that is
+simply not acceptable.
 
-+-----------------------+
-| VFIO PCI BAR backing  |
-+-----------------------+
-            |
-            | guest_memfd_backing_ops
-            | Supplies BAR PFNs
-            v
-+------------------------------------------+
-| guest_memfd                              |
-|                                          |
-| Controls shared/private state            |
-| Exports shared, accessible PFNs          |
-| Revokes consumer mappings when needed    |
-+------------------------------------------+
-            |
-            | mem_provider_ops
-            | IOAS_MAP_FILE(fd = guest_memfd)
-            v
-+-----------------------+
-| IOMMUFD               |
-|                       |
-| Creates and refreshes |
-| IOMMU DMA mappings    |
-+-----------------------+
-            |
-            v
-      Device DMA access
+And to be clear: an implementation that associates non-architectural
+behaviours to these registers is not virtualisable, and will break
+under migration. There is nothing that SW can do about it, because the
+hardware is fundamentally misdesigned when it comes to virtualisation.
 
+But we're pretty far from named models anyway.
 
-Another capability the memory-provider interface could provide is
-kernel-initiated IOAS mapping, for example by allowing a guest_memfd fd
-to be used with IOAS_MAP_FILE.
+	M.
 
-Currently, a private-to-shared conversion causes a VM exit, followed by
-an IOAS_MAP for the newly shared range. Could using guest_memfd with
-IOAS_MAP_FILE avoid this?
-
-Perhaps the series could be rearranged as follows:
-
-- Allow a guest_memfd fd to be used with IOAS_MAP_FILE.
-- Add a VFIO or other backend for guest_memfd, without calling it a provider.
-- Add support for guest_memfd to provide guest PFNs to other subsystems
-  through its file descriptor.
-
-Would this work?
-
--aneesh
+-- 
+Without deviation from the norm, progress is not possible.
