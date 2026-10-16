@@ -1,81 +1,94 @@
-Received: from mta1.migadu.com (out-143.mta1.migadu.com [95.215.58.143])
+Received: from mta1.migadu.com (out-144.mta1.migadu.com [95.215.58.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64DC336F8EB
-	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 07:49:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.143
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE4E2284B37
+	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 08:16:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792136976; cv=none; b=IMN3gXP6Naas4nvlN/o3Ybmdb0DMwTVqqiIfliFK6vJRZzjwmmlon1zGrF7V/itytof6f3LQOzEuCOWaQgevhRzWPOG3aXSq7n7KmUueQKoMk/6nT7bPcZ/5sgg+vRD688D7xCi8oNKPjN4cNXq1i9BSq5qV2uWIaZv/IQIFvyY=
+	t=1792138567; cv=none; b=YcZzyJ29F9rBm7tQYOlBPF3eDOcx0Vsit5Ax+uvODAkNaFSjZZxFOHYo2A6SbuyjciabuA4I/fxCeSITJZHC06/xzw5MSkltnX4Yc82J9csAWxfNBP0TxEa1CJkboRE3AV07wvoDRS4mE70kFJ+bQqilh1tuBtLWBWoe4jmF4TE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792136976; c=relaxed/simple;
-	bh=WZU0ITcIU0RDlLux+WU+QTQ4pBSZPCHTEfxzBG0C718=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jHSA1R7PvFfZrbWmO0qEMTmeAsb2afWqHtPbbuWr9fvybQeJVnL48cvi2Ib4VasLGGJwqYGwGMEjafdMj/hGvXXeMyUJ8mUhX3relMOtB/Z4sYULdqgZIZVAmAt5oLj0y7Vx1Y9EcDJDKlOb+TtIns7q2Z9asFf1PBlQXEM0tqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Eh8/ivjq; arc=none smtp.client-ip=95.215.58.143
+	s=arc-20240116; t=1792138567; c=relaxed/simple;
+	bh=TZE6sUf/S8FoDtbPPweh9nK7pgeHraoLy/S4W8tvQQk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jbCtVfCRgvap90F+3+mrvOYA0M6tOvz8T+7DZOenBJs+xM4fCEX5Vd1iagsDJe2pzXgdrgtdt8OmMGyTBQJAR+5F9p9c9CpAuc0wzUWX6mZWNMOoQ/QqY7GCCqAXrfWsuUYGSqXwUjUmd807aJYrL8DOQtNCJMeoKwwWatysFYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sNwThq5T; arc=none smtp.client-ip=95.215.58.144
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Eh8/ivjq"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sNwThq5T"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=WZU0ITcIU0RDlLux+WU+QTQ4pBSZPCHTEfxzBG0C718=;
+DKIM-Signature: a=rsa-sha256; bh=TZE6sUf/S8FoDtbPPweh9nK7pgeHraoLy/S4W8tvQQk=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792136972; v=1; x=1792741772;
- b=Eh8/ivjq8kb8BMwi1vj3K8S0nIwgXnO449Oum+tqLRTztwME2ILUhxI8/s1TGXjIm2arz7Aa
- pAaNSYbQkZzb7/maJXH8TWl+YequgiyD6UR+1f3+ZencgQdVJzeBvGOCLoJLjtQORMbPzAKT1CP
- BYe8zFADwj2/rRf/h/eJxLb8=
+ t=1792138562; v=1; x=1792743362;
+ b=sNwThq5T7I2TpNa1qI2/dNmu6gKPuMKQRqw6+wN2DQuRobDHWFQTRVQNIRkOSGzyzhqlRtt4
+ 7heu+1Yif/cKa1MQQbfyeM1vCtrkXOhFlQxsS2TyWGbUEXtY0iUnXBg9xtj6Da7y3h2iA1CwlZd
+ bvL3ELzPHIinfe/9bVY1a3Ok=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 7e2a2fcf4185b171;
-	Fri, 16 Oct 2026 07:49:32 +0000
-X-Mizu-Trace-ID: 7e2a2fcf4185b171
+Received: by smtp.migadu.com with ESMTPS id a7304d26f9b833f3;
+	Fri, 16 Oct 2026 08:16:02 +0000
+X-Mizu-Trace-ID: a7304d26f9b833f3
 X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5be4a7b9e6fso3310e87.1
-        for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 00:49:30 -0700 (PDT)
-X-Gm-Message-State: AFq9FYKX/jyJDRZGVj8psl4c7bEj6EEaENLeXgPbbS9wrHqP4DN5+hmx
-	SzT/mZMkIf3AaJFJICmlyeMrj1dBWlqxf+bq4RCIX+RagiJLUecsaCo1f9ji1NdBMTIfKDcIpuy
-	EXFLkrQP01EAwUCSgAgkwIhOhxjqtJw1Tal6nOAoQ
-X-Received: by 2002:a05:6512:b95:b0:5bc:b2ec:eaee with SMTP id
- 2adb3069b0e04-5be493c4cb3mr93309e87.11.1792136969950; Fri, 16 Oct 2026
- 00:49:29 -0700 (PDT)
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: arm64: Set HCR_EL2.BSU to Inner Shareable for guests
+Date: Fri, 16 Oct 2026 09:15:58 +0100
+Message-Id: <20261016081558.805411-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20261015173605.1072963-1-maz@kernel.org>
-In-Reply-To: <20261015173605.1072963-1-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Fri, 16 Oct 2026 08:48:53 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzdN53MvWmvk+KcD2XEthjpgSivGkYAsc7r8JpEb=02LQ@mail.gmail.com>
-X-Gm-Features: AclHuK8kpSMVjBqTkfq4Ie2CF_wEvKZrjX3oALmxM5tl73nYKwHuhkhXFGvtnPw
-Message-ID: <CA+EHjTzdN53MvWmvk+KcD2XEthjpgSivGkYAsc7r8JpEb=02LQ@mail.gmail.com>
-Subject: Re: [PATCH 0/2] KVM: arm64: Cleanup the HCR_xyz macros
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Marc,
+KVM sets HCR_EL2.BSU to Inner Shareable for guests, so that a guest's
+barriers cover the TLB and I-cache invalidations that HCR_EL2.FB
+broadcasts. However, since HCR_BSU_IS became an alias of the generated
+HCR_EL2_BSU_IS, it is the unshifted field value 0b01, which sets bit
+0 (VM, already set) and leaves BSU at 0b00. A guest's DSB NSH is then
+not required to wait for a broadcast TLBI to complete on other CPUs.
 
-On Thu, 15 Oct 2026 18:36:03 +0100, Marc Zyngier <maz@kernel.org> wrote:
-[...]
-> Patches on top of kvmarm-7.4.
+Build the field with SYS_FIELD_PREP_ENUM().
 
-On kvmarm-7.4, every object under arch/arm64/kvm and arch/arm64/kernel
-builds to the same code and data with and without the series (debug
-info aside). Protected and non-protected guests boot in pKVM.
+Fixes: d0f39259eff4 ("arm64: sysreg: Add layout for HCR_EL2")
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+Found while testing Marc's HCR cleanup [1]. Its patch 1 carries this
+line over as HCR_EL2_BSU_IS, so on top of this fix that hunk would
+keep SYS_FIELD_PREP_ENUM() instead. I can also rebase this on top of
+the series if that's easier.
 
-While testing it I found an older bug on a line patch 1 converts:
-HCR_BSU_IS has been the unshifted enum value since the HCR_EL2 sysreg
-layout went in, so guests run with BSU at 0b00. I'll send a fix
-separately.
+[1] https://lore.kernel.org/r/20261015173605.1072963-1-maz@kernel.org
 
-For the series:
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+ arch/arm64/include/asm/kvm_arm.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Cheers,
-/fuad
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 4bfbd827c5aa7..b3e9dd302730e 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -98,7 +98,7 @@
+  * TID1:	Trap REVIDR_EL1, AIDR_EL1, and SMIDR_EL1
+  */
+ #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
+-			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
++			 SYS_FIELD_PREP_ENUM(HCR_EL2, BSU, IS) | HCR_EL2_FB | HCR_EL2_TACR | \
+ 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
+ 			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 | HCR_TID1)
+ #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK)
+-- 
+2.39.5
+
