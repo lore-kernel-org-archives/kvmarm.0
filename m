@@ -1,60 +1,60 @@
-Received: from esa8.hc1455-7.c3s2.iphmx.com (esa8.hc1455-7.c3s2.iphmx.com [139.138.61.253])
+Received: from esa1.hc1455-7.c3s2.iphmx.com (esa1.hc1455-7.c3s2.iphmx.com [207.54.90.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 275C24334B9
-	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 10:01:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.61.253
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D23C946D096
+	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 10:01:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.54.90.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792144901; cv=none; b=KWzooDNId32GDMUfgyKPw7qQaJwoAlQIhri0tRjONZCIukRJQr2mPJgK5xeYBCHE4wIgfbobZNbbt32oBf/QfRZvmU9D+q3Dkcd7jPy0Rg/mh+TxzHR+QLtXEfgmplwr4D+YJpp8/FfdHaCJqLszr98JJoWygDr7LDm5CdCnbKw=
+	t=1792144910; cv=none; b=djCTNVmJ//jXcWaR3Lv6SJIkX2fVeSXRTJZ4Hx9W+Llz/fII779M+0aiPvbMGO5HzFi6bn0bi+giRm8yNZpmmRDuDBxx0P2NAPLeisTUR9J5bIj1U2Pnlinc9cZPyJcCV9sJut6d2f8pMdrZgcm46ld2PdA0lJ8cmWxROS9GuFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792144901; c=relaxed/simple;
-	bh=Yi6urKJkWyGCNstODXrwXoGfLB4RyuU7Y4hjLELW/wM=;
+	s=arc-20240116; t=1792144910; c=relaxed/simple;
+	bh=COlFLRoBfVMLjQUEyASCKsIINgA9dPGyboyYG0+99IM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=lYz3vKFfhxk1ygLv7Uj+t+bGlKvA3KlUbGNb720610TP5I7YHOEf9vUk2w7XXnO8M9AH9vIGes1lEwPQ1I8NsTBLuZcWGu+d5kOpJX2NOaNFBgsztw5GSTP6OJHhLOssPh5L0vCCuFaTrJmy8n0gIP5ci5KX7Vj3e4501cnjh1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=lRp9C28B; arc=none smtp.client-ip=139.138.61.253
+	 In-Reply-To:To:Cc; b=J2BW42eWZWCQOHd61mnrGSwqQM2jbn9MQ6/bZjF4EVkPLtKDFgHkl9sEuyIqCIL+X14YUXWtQwu3oSWlTnppeM9yW4oyXr/iPFkw1tOjsnp4CXHI07rvQPd6hsRS1gpR7AyXV9XIqmydDTQjNX83wfo0T3tXKVXmSO/NAZ1oCn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=NMpiRBvU; arc=none smtp.client-ip=207.54.90.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="lRp9C28B"
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="NMpiRBvU"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1792144905; x=1823680905;
+  t=1792144906; x=1823680906;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=Yi6urKJkWyGCNstODXrwXoGfLB4RyuU7Y4hjLELW/wM=;
-  b=lRp9C28B0Aid+epTXH702Ftiu7vkCy35hVy/Ljd8Kzgg07+8WQQNIMz7
-   y5KcywArSrrS/z+W5xn+TvOGPc8ez9crAXqUpKeysdQ6mosX3rNmEl1fp
-   OzsfbSybL0wim7CdCwhfFddKCuZPdC9P+1sFEiGTR2zB/cFqyxOyktygf
-   ES/n0G73FKkFM0zdmmWRgm+KQsOhzGB7QzblJyjEmscLZUvnfBkeDVG85
-   YFaOmzj6nl2v1GIikEc/ciQ9UzTBYla+X4xVLgi3pm7lCectZ2GZEIOE+
-   XWDtUbtB2gewhOfffuGHE4HFf9o0LDTSXkveY/55/EIp1wM8O5+HEhgux
-   w==;
-X-CSE-ConnectionGUID: YBJ5jl0vRaCqs+0sS6VZsw==
-X-CSE-MsgGUID: NjZ7GNvOSCG+0JoOI1Ns3Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11936"; a="246405452"
+  bh=COlFLRoBfVMLjQUEyASCKsIINgA9dPGyboyYG0+99IM=;
+  b=NMpiRBvU18cLCBNjoZw/u+nJZG3OdLGdBzr6Uy+E+YUzrzErtUAPW86Y
+   OqR1TMIxnBCUGKkE0z0tmUsT+DkyBwer0CDPHgd+B0nbCcZ96XlvCODNt
+   U5bpoB7+XSsdmPVjUa5e7euJEPhiU4ImVZRVk+fiBgWeJ2JhDqXRgJZi3
+   K50lOZkw3UGAhCC0RIGpQ1+ur8ZZyzBgLsHrZIXEJUHd3CKbl6+d1NnLQ
+   5H/4qEwvzyyIaQ3d0gd2U2uXHEKY00ubtpJ+7xeN5wb59X1mHlTWMaLu+
+   QjZesyAsfplnVy/bjYRmkAAlVTspJzbBwP/Jna8Q8uA4euzY+F2oAH5xd
+   Q==;
+X-CSE-ConnectionGUID: rYwCbIOCRx6ocuINFzhtWg==
+X-CSE-MsgGUID: F/Gj75eBQaOkinQWOr6Lxg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11936"; a="258434359"
 X-IronPort-AV: E=Sophos;i="6.27,161,1786978800"; 
-   d="scan'208";a="246405452"
-Received: from gmgwnl01.global.fujitsu.com ([52.143.17.124])
-  by esa8.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2026 19:01:43 +0900
-Received: from az2nlsmgm3.fujitsu.com (unknown [10.150.26.205])
+   d="scan'208";a="258434359"
+Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
+  by esa1.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2026 19:01:44 +0900
+Received: from az2uksmgm1.o.css.fujitsu.com (unknown [10.151.22.198])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by gmgwnl01.global.fujitsu.com (Postfix) with ESMTPS id 2F68D40613B
-	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 10:01:37 +0000 (UTC)
+	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id 1599F82110D
+	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 10:01:44 +0000 (UTC)
 Received: from az2nlsmom3.fujitsu.com (unknown [10.150.26.199])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by az2nlsmgm3.fujitsu.com (Postfix) with ESMTPS id D24D21802AEB
-	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 10:01:36 +0000 (UTC)
+	by az2uksmgm1.o.css.fujitsu.com (Postfix) with ESMTPS id BC289926775
+	for <kvmarm@lists.linux.dev>; Fri, 16 Oct 2026 10:01:43 +0000 (UTC)
 Received: from [127.0.1.1] (unknown [10.124.178.20])
-	by az2nlsmom3.fujitsu.com (Postfix) with ESMTP id B4CA0101BB55;
-	Fri, 16 Oct 2026 10:01:29 +0000 (UTC)
+	by az2nlsmom3.fujitsu.com (Postfix) with ESMTP id 84854100150B;
+	Fri, 16 Oct 2026 10:01:36 +0000 (UTC)
 From: Tomohiro Misono <misono.tomohiro@fujitsu.com>
-Date: Fri, 16 Oct 2026 19:00:46 +0900
-Subject: [PATCH v2 2/4] arm64: tlb: Add tlbi workaround for FUJITSU-MONAKA
- Erratum E#030001
+Date: Fri, 16 Oct 2026 19:00:47 +0900
+Subject: [PATCH v2 3/4] perf: arm_pmu: Add workaround for FUJITSU-MONAKA
+ Erratum E#030002
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261016-monaka-fix-for-upstream-v2-2-fc7ede7f9f48@fujitsu.com>
+Message-Id: <20261016-monaka-fix-for-upstream-v2-3-fc7ede7f9f48@fujitsu.com>
 References: <20261016-monaka-fix-for-upstream-v2-0-fc7ede7f9f48@fujitsu.com>
 In-Reply-To: <20261016-monaka-fix-for-upstream-v2-0-fc7ede7f9f48@fujitsu.com>
 To: Tomohiro Misono <misono.tomohiro@fujitsu.com>, 
@@ -81,83 +81,86 @@ Cc: Kohei Enju <enju.kohei@fujitsu.com>,
  linux-doc@vger.kernel.org, linux-perf-users@vger.kernel.org, 
  kvmarm@lists.linux.dev
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1792144875; l=9554;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1792144875; l=6036;
  i=misono.tomohiro@fujitsu.com; s=20261002; h=from:subject:message-id;
- bh=Yi6urKJkWyGCNstODXrwXoGfLB4RyuU7Y4hjLELW/wM=;
- b=qp1UVSOaM3F9bn8D0Bx+xQZIVImT8ji3Eod68CZr1PHSJIVMWHZU5hzwZ+C4jgOarcQTdAl/H
- D99ggrAZYjgBnH29g0AZcb8509NY2ebvDSe4EIpG4kEVb66hT/mX3bo
+ bh=COlFLRoBfVMLjQUEyASCKsIINgA9dPGyboyYG0+99IM=;
+ b=UGQzN9ynuh/n6haciNhTj+xEq3pai5qyEWFAOpE3tJtjrqMsfeVdp6CFr8kNwybZtu3LALqkO
+ e4JYNQEpZGxAy8GnvS1lTJEp++DWy9oK+bk1DYukSrjoo1dHIF6Gbja
 X-Developer-Key: i=misono.tomohiro@fujitsu.com; a=ed25519;
  pk=VLRxj5y4GJrHLmj3e2NBg30fX2U//ydi7c2G2qiNo10=
 
-FUJITSU-MONAKA Erratum E#030001 affects FUJITSU-MONAKA CPU
-when using TLBI range operations.
+FUJITSU-MONAKA Erratum E#030002 affects FUJITSU-MONAKA CPU.
 
-On affected FUJITSU-MONAKA CPUs, range-based TLBI operations
-targeting a VA or IPA may fail to invalidate TLB entries when
-addr[34:29] == all 1 && addr[28:0] == 0 for 512MB mappings.
-The affected instructions are:
-  RVA[L]E{1,2,3}*, RVAA[L]E1*, and RIPAS2[L]E1*.
+On affected FUJITSU-MONAKA CPUs, after a PMU event counter is
+stopped at a value just before overflow, an overflow might still
+be incorrectly detected, resulting interrupt storm in some case.
 
-Work around the erratum by issuing additional non-range
-TLBI instructions corresponding to the affected VA or IPA
-range-based TLBI operations.
+For example, if the following conditions are met:
+  1) Running perf to count an event in user space only
+  2) The event can also occur in kernel space
+  3) The counter value is set just before the overflow
+     (when using the -F option, initial counter value is -1)
+
+when the kernel is about to return to user space after enabling
+the count, an overflow interrupt is incorrectly triggered by an
+event that occurred in kernel space. Since the counter value is
+not updated (correctly), the interrupt handler does nothing and
+returns with the same condition. This leads to another wrong interrupt
+and results in an interrupt storm and eventually a softlockup.
+
+Work around the erratum by avoiding programming PMU event counters
+with values within five counts of overflow.
 
 Signed-off-by: Tomohiro Misono <misono.tomohiro@fujitsu.com>
 
 ---
 Changes in v2:
- - remove page size restrictions as this errata affects both S1 and S2 tables
- - use __always_inline instead of inline
- - call workaround from NV TLBI operations too (comment by sashiko)
-  - TODO: test using NV
+- Add user impact explanation in the commit message
 ---
 ---
  Documentation/arch/arm64/silicon-errata.rst |  2 ++
- arch/arm64/Kconfig                          | 19 +++++++++++++
+ arch/arm64/Kconfig                          | 17 +++++++++++++++++
  arch/arm64/include/asm/cpucaps.h            |  2 ++
- arch/arm64/include/asm/tlbflush.h           | 35 +++++++++++++++++++++++
- arch/arm64/kernel/cpu_errata.c              | 10 +++++++
- arch/arm64/kvm/hyp/vhe/tlb.c                | 44 +++++++++++++++++++++++++++++
+ arch/arm64/kernel/cpu_errata.c              | 10 ++++++++++
  arch/arm64/tools/cpucaps                    |  1 +
- 7 files changed, 113 insertions(+)
+ drivers/perf/arm_pmu.c                      | 13 +++++++++++++
+ 6 files changed, 45 insertions(+)
 
 diff --git a/Documentation/arch/arm64/silicon-errata.rst b/Documentation/arch/arm64/silicon-errata.rst
-index 99a1eb4b833dd..527af20b26468 100644
+index 527af20b26468..0efb24ec01b4c 100644
 --- a/Documentation/arch/arm64/silicon-errata.rst
 +++ b/Documentation/arch/arm64/silicon-errata.rst
-@@ -375,6 +375,8 @@ stable kernels.
+@@ -377,6 +377,8 @@ stable kernels.
  +----------------+-----------------+-----------------+-----------------------------+
- | Fujitsu        | A64FX           | E#010001        | FUJITSU_ERRATUM_010001      |
+ | Fujitsu        | MONAKA          | E#030001        | FUJITSU_ERRATUM_030001      |
  +----------------+-----------------+-----------------+-----------------------------+
-+| Fujitsu        | MONAKA          | E#030001        | FUJITSU_ERRATUM_030001      |
++| Fujitsu        | MONAKA          | E#030002        | FUJITSU_ERRATUM_030002      |
 ++----------------+-----------------+-----------------+-----------------------------+
  +----------------+-----------------+-----------------+-----------------------------+
  | ASR            | ASR8601         | #8601001        | N/A                         |
  +----------------+-----------------+-----------------+-----------------------------+
 diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index cab741a695f52..5d1a17ab0f593 100644
+index 5d1a17ab0f593..43fd265156e46 100644
 --- a/arch/arm64/Kconfig
 +++ b/arch/arm64/Kconfig
-@@ -1342,6 +1342,25 @@ config FUJITSU_ERRATUM_010001
+@@ -1361,6 +1361,23 @@ config FUJITSU_ERRATUM_030001
  
  	  If unsure, say Y.
  
-+config FUJITSU_ERRATUM_030001
-+	bool "FUJITSU-MONAKA erratum E#030001: Range TLBI may fail to invalidate some entries"
++config FUJITSU_ERRATUM_030002
++	bool "FUJITSU-MONAKA erratum E#030002: PMU overflow may be incorrectly detected"
++	depends on ARM_PMUV3
 +	default y
 +	help
-+	  This option adds a workaround for FUJITSU-MONAKA erratum E#030001.
-+	  On affected FUJITSU-MONAKA CPUs, range-based TLBI operation
-+	  targeting a VA or IPA may fail to invalidate some TLB entries
-+	  when hugepage is used in a certain condition. The affected
-+	  instructions are RVA[L]E{1,2,3}*, RVAA[L]E1*, and RIPAS2[L]E1*
-+	  and this affects on both S1 and S2 tables.
++	  This option adds a workaround for FUJITSU-MONAKA erratum E#030002.
++	  On affected FUJITSU-MONAKA CPUs, after a PMU event counter is
++	  stopped at a value just before overflow, an overflow might still
++	  be incorrectly detected.
 +
-+	  Work around the erratum by issuing additional non-range TLBI
-+	  instructions corresponding to the affected VA or IPA range-based
-+	  TLBI operations.
++	  Work around the erratum by avoiding programming PMU event counters
++	  with values within five counts of overflow.
 +
-+	  The erratum only affects the FUJITSU-MONAKA.
++	  The workaround only affects the FUJITSU-MONAKA.
 +
 +	  If unsure, say Y.
 +
@@ -165,191 +168,72 @@ index cab741a695f52..5d1a17ab0f593 100644
  	bool "Hip07 161600802: Erroneous redistributor VLPI base"
  	default y
 diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index 76350b38f0d7a..9220b917ec207 100644
+index 9220b917ec207..c0a0452daf949 100644
 --- a/arch/arm64/include/asm/cpucaps.h
 +++ b/arch/arm64/include/asm/cpucaps.h
-@@ -66,6 +66,8 @@ cpucap_is_possible(const unsigned int cap)
- 		return IS_ENABLED(CONFIG_ARM64_ERRATUM_3194386);
- 	case ARM64_WORKAROUND_4193714:
+@@ -68,6 +68,8 @@ cpucap_is_possible(const unsigned int cap)
  		return IS_ENABLED(CONFIG_ARM64_ERRATUM_4193714);
-+	case ARM64_WORKAROUND_FUJITSU_030001:
-+		return IS_ENABLED(CONFIG_FUJITSU_ERRATUM_030001);
+ 	case ARM64_WORKAROUND_FUJITSU_030001:
+ 		return IS_ENABLED(CONFIG_FUJITSU_ERRATUM_030001);
++	case ARM64_WORKAROUND_FUJITSU_030002:
++		return IS_ENABLED(CONFIG_FUJITSU_ERRATUM_030002);
  	case ARM64_MPAM:
  		/*
  		 * KVM MPAM support doesn't rely on the host kernel supporting MPAM.
-diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
-index 14a78ac0f8009..2636c273b8111 100644
---- a/arch/arm64/include/asm/tlbflush.h
-+++ b/arch/arm64/include/asm/tlbflush.h
-@@ -487,6 +487,39 @@ static __always_inline void __tlbi_range(tlbi_op op, u64 addr,
- 	op(arg);
- }
- 
-+#ifdef CONFIG_FUJITSU_ERRATUM_030001
-+static __always_inline void fujitsu_erratum_wa(tlbi_op lop, u64 start, u64 end, u16 asid)
-+{
-+	u64 addr;
-+
-+	if (!alternative_has_cap_unlikely(ARM64_WORKAROUND_FUJITSU_030001))
-+		return;
-+
-+	/*
-+	 * The erratum fails to invalidate TLBI entries in the range when
-+	 * addr[34:29] == all 1 && addr[28:0] == all 0 for 512M hugepage.
-+	 * This affects both on S1 and S2 tables and 4k guest may be affected
-+	 * if host uses 64k page size. Therefore it cannot be determined
-+	 * reliably if the target entry is affected or not here. So, always
-+	 * assume hugepage is used.
-+	 * The workaround is to issue extra non-range TLBI ops corresponding
-+	 * to the affected VA or IPA range-based ops in the range.
-+	 */
-+	addr = (start & GENMASK_ULL(63, 35)) | GENMASK_ULL(34, 29);
-+	while (addr < end) {
-+		__tlbi_level_asid(lop, addr, TLBI_TTL_UNKNOWN, asid);
-+		if (addr + BIT_ULL(35) < addr)
-+			/* overflow */
-+			break;
-+		addr += BIT_ULL(35);
-+	}
-+}
-+#else
-+static __always_inline void fujitsu_erratum_wa(tlbi_op lop, u64 start, u64 end, u16 asid)
-+{
-+}
-+#endif /* CONFIG_FUJITSU_ERRATUM_030001 */
-+
- static __always_inline void __flush_tlb_range_op(tlbi_op lop, tlbi_op rop,
- 						 u64 start, size_t pages,
- 						 u64 stride, u16 asid,
-@@ -518,6 +551,8 @@ static __always_inline void __flush_tlb_range_op(tlbi_op lop, tlbi_op rop,
- 		__tlbi_level_asid(lop, addr, level, asid);
- 		addr += stride;
- 	}
-+
-+	fujitsu_erratum_wa(lop, start, end, asid);
- }
- 
- #define __flush_s1_tlb_range_op(op, start, pages, stride, asid, tlb_level) \
 diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
-index e0c09402540ce..a11135f83e858 100644
+index a11135f83e858..6363b694b4478 100644
 --- a/arch/arm64/kernel/cpu_errata.c
 +++ b/arch/arm64/kernel/cpu_errata.c
-@@ -1039,6 +1039,16 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
- 		.matches = has_impdef_pmuv3,
- 		.cpu_enable = cpu_enable_impdef_pmuv3_traps,
+@@ -1048,6 +1048,16 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
+ 					{}
+ 				})),
  	},
-+#ifdef CONFIG_FUJITSU_ERRATUM_030001
++#endif
++#ifdef CONFIG_FUJITSU_ERRATUM_030002
 +	{
-+		.desc = "FUJITSU-MONAKA Erratum E#030001",
-+		.capability = ARM64_WORKAROUND_FUJITSU_030001,
++		.desc = "FUJITSU-MONAKA Erratum E#030002",
++		.capability = ARM64_WORKAROUND_FUJITSU_030002,
 +		ERRATA_MIDR_RANGE_LIST(((const struct midr_range[]) {
 +					MIDR_ALL_VERSIONS(MIDR_FUJITSU_MONAKA),
 +					{}
 +				})),
 +	},
-+#endif
+ #endif
  	{
  		.desc = "Known broken GICv3 SEIS implementation",
- 		.capability = ARM64_WORKAROUND_GICv3_BROKEN_SEIS,
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index c386d9f1c1016..2f1a7fab5eb97 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -8,6 +8,7 @@
- 
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_nested.h>
- #include <asm/tlbflush.h>
- 
- struct tlb_inv_context {
-@@ -218,6 +219,45 @@ void __kvm_flush_vm_context(void)
- 	__tlbi_sync_s1ish_hyp();
- }
- 
-+#ifdef CONFIG_FUJITSU_ERRATUM_030001
-+static __always_inline void __vae1is(u64 arg)
-+{
-+	__tlbi(vae1is, arg);
-+}
-+static __always_inline void __vale1is(u64 arg)
-+{
-+	__tlbi(vale1is, arg);
-+}
-+static __always_inline void __vaae1is(u64 arg)
-+{
-+	__tlbi(vaae1is, arg);
-+}
-+static __always_inline void __fujitsu_erratum_wa(tlbi_op op, u64 va)
-+{
-+	u64 start, size;
-+	u16 asid;
-+
-+	if (!alternative_has_cap_unlikely(ARM64_WORKAROUND_FUJITSU_030001))
-+		return;
-+
-+	start = decode_range_tlbi(va, &size, &asid);
-+	fujitsu_erratum_wa(op, start, start + size, asid);
-+}
-+#else
-+static __always_inline void __vae1is(u64 arg)
-+{
-+}
-+static __always_inline void __vale1is(u64 arg)
-+{
-+}
-+static __always_inline void __vaae1is(u64 arg)
-+{
-+}
-+static __always_inline void __fujitsu_erratum_wa(tlbi_op op, u64 va)
-+{
-+}
-+#endif
-+
- /*
-  * TLB invalidation emulation for NV. For any given instruction, we
-  * perform the following transformtions:
-@@ -322,6 +362,7 @@ int __kvm_tlbi_s1e2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding)
- 	case OP_TLBI_RVAE1ISNXS:
- 	case OP_TLBI_RVAE1OSNXS:
- 		__tlbi(rvae1is, va);
-+		__fujitsu_erratum_wa(__vae1is, va);
- 		break;
- 	case OP_TLBI_RVALE2:
- 	case OP_TLBI_RVALE2IS:
-@@ -336,6 +377,7 @@ int __kvm_tlbi_s1e2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding)
- 	case OP_TLBI_RVALE1ISNXS:
- 	case OP_TLBI_RVALE1OSNXS:
- 		__tlbi(rvale1is, va);
-+		__fujitsu_erratum_wa(__vale1is, va);
- 		break;
- 	case OP_TLBI_RVAAE1:
- 	case OP_TLBI_RVAAE1IS:
-@@ -344,6 +386,7 @@ int __kvm_tlbi_s1e2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding)
- 	case OP_TLBI_RVAAE1ISNXS:
- 	case OP_TLBI_RVAAE1OSNXS:
- 		__tlbi(rvaae1is, va);
-+		__fujitsu_erratum_wa(__vaae1is, va);
- 		break;
- 	case OP_TLBI_RVAALE1:
- 	case OP_TLBI_RVAALE1IS:
-@@ -352,6 +395,7 @@ int __kvm_tlbi_s1e2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding)
- 	case OP_TLBI_RVAALE1ISNXS:
- 	case OP_TLBI_RVAALE1OSNXS:
- 		__tlbi(rvaale1is, va);
-+		__fujitsu_erratum_wa(vaale1is, va);
- 		break;
- 	default:
- 		ret = -EINVAL;
 diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 58b6c084f9f25..1e57a0105395b 100644
+index 1e57a0105395b..ef8ce70ab7121 100644
 --- a/arch/arm64/tools/cpucaps
 +++ b/arch/arm64/tools/cpucaps
-@@ -132,3 +132,4 @@ WORKAROUND_SPECULATIVE_AT
- WORKAROUND_SPECULATIVE_SSBS
+@@ -133,3 +133,4 @@ WORKAROUND_SPECULATIVE_SSBS
  WORKAROUND_SPECULATIVE_UNPRIV_LOAD
  WORKAROUND_BROKEN_AMU_CONSTCNT
-+WORKAROUND_FUJITSU_030001
+ WORKAROUND_FUJITSU_030001
++WORKAROUND_FUJITSU_030002
+diff --git a/drivers/perf/arm_pmu.c b/drivers/perf/arm_pmu.c
+index 1150695653892..c0b8580d80bae 100644
+--- a/drivers/perf/arm_pmu.c
++++ b/drivers/perf/arm_pmu.c
+@@ -234,6 +234,19 @@ int armpmu_event_set_period(struct perf_event *event)
+ 	if (left > (max_period >> 1))
+ 		left = (max_period >> 1);
+ 
++#if IS_ENABLED(CONFIG_ARM64)
++	if (alternative_has_cap_unlikely(ARM64_WORKAROUND_FUJITSU_030002)) {
++		/*
++		 * Due to the errata, overflow might be incorrectly detected in the handler
++		 * when the counter is about to overflow in a single increment, resulting
++		 * interrupt storm in some case. As the counter can increase by up to
++		 * 5 at a time, set 6 here to prevent the condition.
++		 */
++		if (left > 0 && left < 6)
++			left = 6;
++	}
++#endif
++
+ 	local64_set(&hwc->prev_count, (u64)-left);
+ 
+ 	armpmu->write_counter(event, (u64)(-left) & max_period);
 
 -- 
 2.43.0
