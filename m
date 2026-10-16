@@ -1,134 +1,175 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8CA2E719B;
-	Fri, 16 Oct 2026 16:14:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7B437F006;
+	Fri, 16 Oct 2026 16:17:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792167275; cv=none; b=DNdaSF8KxisrO3BdHfjJkQcQMH/bDVekRGHAmFAlD4BjqA9Q6jJ8y3QIYeLXEodimLbt5sBAaFgKSoVm/yO0rTy5qA3PzR3v4dypeNmsQldyAKQNS1z2DM69airEo6WvihtRlbMNAohWPeL8YPGMNjsHRFBNGrCRTqczObgXW0U=
+	t=1792167443; cv=none; b=GTy//L/2ecW4QZ6QhLwnOLGJiABzN06fiY7ZDRxbxSiCSUCFsSww1XNYUqZSinw6HzdrJEW8TC8Dq6hKxLjQ98ts2vWjl5zX6RXCYY/E8OG58rxzWZxtDlq52nyQq0ZyHDJV+08wAQh1TOarq5QWW5BleEYeaZpcQxRjOvljZsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792167275; c=relaxed/simple;
-	bh=JhkCgFscqO3e6fUnU47gcbiEWlBj3ckG+hjHSdWnDp8=;
+	s=arc-20240116; t=1792167443; c=relaxed/simple;
+	bh=3//BKI1A7au1gT4lihfgvCeE1R3WDxaBeIDvT2fzqpw=;
 	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=V28thF2CvwQOGZsrYFrDvhqeRpxx9pnjSjjKjRc9o9+IRAg2P7gGi1bym+QD2slHQrb0cF5HvytIcP8WJGpwqVdvLTOdHHxLpDPLqW1Qioz/gBaV9G69Mfq5z9SiMOGuLDeEinLJpIevn739/90t+UvSrxjNgCAe9Cc2WlU7x+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dVqBEtDh; arc=none smtp.client-ip=100.103.45.18
+	 Date; b=D8hbyoMKQWOR6PN3asnWsEiXsZw5C/oqc+dsAd3QTlVzszyq1p/WNQ5S8YmwnFfjBlnwkqh0OnUhlvcqohEvK/tiZRYYeY46/1lLOQuTnU6BmEFiEu7WQMcP8irM7K6kyvvKMBHVZKJ/dAKSiQ6VFbKfRetlG7nRUslUIjiv/r0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=obQ5Fi29; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dVqBEtDh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B03941F000C4;
-	Fri, 16 Oct 2026 16:14:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="obQ5Fi29"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D7BD1F000C4;
+	Fri, 16 Oct 2026 16:17:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792167271;
-	bh=Hp9KSkBZtWOuV1uhBzzxFWf14kBrI4Ky2VPKDSawEn4=;
+	s=k20260515; t=1792167438;
+	bh=TRr2Z9TQ3bSko9O1jV9gr4++etiR+lopscD5B/GhQgE=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=dVqBEtDhIe7nRA+KoL5fvzNeWNTZnijVMyWaklxPJkmr853Vx8/WfQPOj3xcg/oh1
-	 AXrGyToQULab+eACQXVflGgvMTIqmZEuKh9w98jey+Dl7U+79q+XP+6gla7UVNG0os
-	 zCMWzfhUrCeRYiI1SMrJu4tqRX3cuoKj2w7NUwMbG2cQtlnCS+9rJyCI0aPRdcK3gw
-	 90IPaJiufEl4mvo8SfO9Q9p9RYM0HMhTCQK7VTFwQxpSyyEdadRUjMCUVUe1ElsfMj
-	 CC7NbMP32AeKXNm8JPeyjS4PwqN/tLeRO0ABx3YiYNyaRuLQDn1NAlu2s378k6W7qy
-	 v1QoDcgIx7CZg==
-Message-ID: <sashiko-outbox-174615@kernel.org>
+	b=obQ5Fi295B51jEM17PcmdaONBQpLJJ9Cc6YS4pUPPlHz0hIi1YgDdiGSY9rPOnhL8
+	 vqlbE+ndLm6FOWinksEArKqIqGcD7U1y0qTl94nOE3zOEopISceHBE+VwR6Yoldph1
+	 5we7yduszPN3UkvFmGtH+Ig+/dFSTpKTdWRw9kMN8QCDl6aw9M59cBW+JnUOtq/H8m
+	 gDNz5+fcx8D36ntma+b/PDu6nCAyKWQ62ZsfDLlM80UjEMUPUstAujWjHve19SX8P1
+	 lpYKsAXZr7dLI66rlmxI8txJ6IgBvFlplT25LNatjHXV+r09WU0iIlBwqlrtz3m5kz
+	 vMloeSnuqqvlw==
+Message-ID: <sashiko-outbox-174621@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 01/16] KVM: arm64: vgic: Split out common LPI allocation
+Subject: Re: [PATCH 07/16] KVM: arm64: gic-v5: Add ITS guest table
+ translation emulation
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Sascha Bischoff" <sascha.bischoff@arm.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
 Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261016155741.979985-2-sascha.bischoff@arm.com>
+In-Reply-To: <20261016155741.979985-8-sascha.bischoff@arm.com>
 References: <20261016155741.979985-1-sascha.bischoff@arm.com>
- <20261016155741.979985-2-sascha.bischoff@arm.com>
+ <20261016155741.979985-8-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 16 Oct 2026 16:14:30 +0000
+Date: Fri, 16 Oct 2026 16:17:17 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 3 potential issue(=
 s) to consider:
-- [High] kvm: data race on irq->group due to unlocked assignment after publ=
-ication
+- [High] kvm: typed INTID used directly as XArray index in vgic_add_lpi()
+- [Medium] kvm: arm64: gic-v5: Guest can bypass VITS_V5_DEVICE_ID_BITS poli=
+cy cap
+- [Low] kvm: compilation failure due to mismatched types in min() macro
 --
 
-commit 0cabb3a5e012e80ff468a8654506c83304b15486
+commit c4304c740198b40a23d386e3b547cd38e75a6238
 Author: Sascha Bischoff <sascha.bischoff@arm.com>
 
-KVM: arm64: vgic: Split out common LPI allocation
+KVM: arm64: gic-v5: Add ITS guest table translation emulation
 
-The GICv3 ITS code currently owns vgic_add_lpi(), even though the
-first half of the helper is not ITS specific. It allocates or finds
-the VM-wide vgic_irq object in lpi_xa and initializes the common LPI
-state before the GICv3 ITS code reads the property table and pending
-state.
+The GICv5 ITS consumes guest-owned translation tables. Unlike the
+GICv3 ITS, KVM does not maintain a separate software device/table
+model for GICv5 translations; the guest's DT and ITTs are the
+authoritative source of DeviceID/EventID to LPI mappings.
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-it=
-s.c
-> index e5657cb603567..8e7bee1bae95d 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -66,77 +66,22 @@ static int update_lpi_config(struct kvm *kvm, struct =
-vgic_irq *irq,
+> diff --git a/arch/arm64/kvm/vgic/vgic-its-v5.c b/arch/arm64/kvm/vgic/vgic=
+-its-v5.c
+> --- a/arch/arm64/kvm/vgic/vgic-its-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its-v5.c
 [ ... ]
-> -	irq =3D kzalloc_obj(struct vgic_irq, GFP_KERNEL_ACCOUNT);
-> -	if (!irq)
-> -		return ERR_PTR(-ENOMEM);
+> +static int get_itt(struct kvm *kvm, struct vgic_v5_its *its, u32 device_=
+id,
+> +		   gpa_t *itt_base, bool *two_level_itt,
+> +		   unsigned int *event_id_bits, unsigned int *itt_l2sz)
+> +{
+> +	unsigned int dt_l2sz, device_id_bits;
+> +	bool two_level_dt;
+> +	gpa_t dt_base;
+> +
+> +	dt_base =3D its->dt_baser.addr;
+> +	two_level_dt =3D its->dt_cfgr.structure;
+> +	dt_l2sz =3D its->dt_cfgr.l2sz;
+> +	device_id_bits =3D its->dt_cfgr.device_id_bits;
+> +
+> +	if (device_id >=3D 1UL << device_id_bits) {
+
+[Severity: Medium]
+Does this check allow the guest to bypass the VITS_V5_DEVICE_ID_BITS policy
+cap?
+
+KVM advertises a maximum of 16 device ID bits (VITS_V5_DEVICE_ID_BITS) and a
+single-level DT in IDR1. However, when the guest writes to GICV5_ITS_DT_CFG=
+R,
+the fields are stored directly in its->dt_cfgr without being clamped to
+these policy limits.
+
+Since this out-of-bounds check compares against the un-clamped guest value
+instead of the VITS_V5_DEVICE_ID_BITS cap, the guest could configure a
+2-level DT and process Device IDs up to 31 bits, bypassing the advertised
+policy cap.
+
+> +		kvm_debug("Device ID out of range\n");
+> +		return -E2BIG;
+> +	}
 [ ... ]
-> +	irq =3D vgic_add_lpi(kvm, intid, vcpu);
-> +	if (IS_ERR(irq))
-> +		return irq;
-> =20
-> -	irq->config =3D VGIC_CONFIG_EDGE;
-> -	refcount_set(&irq->refcount, 1);
-> -	irq->intid =3D intid;
-> -	irq->target_vcpu =3D vcpu;
->  	irq->group =3D 1;
-
-[Severity: High]
-Does this code introduce a data race on irq->group in vgic_its_add_lpi()?
-
-Since vgic_add_lpi() now publishes the object to the globally visible
-lpi_xa xarray and drops the locks, a concurrent thread (e.g., another vCPU
-writing to GICR_INVLPIR or mapping the same LPI on another ITS) can
-retrieve the LPI and access irq->group under irq_lock before we set it here.
-
-This can misroute or drop the LPI if it is evaluated by vgic_irq_cmp()
-as Group 0 instead of Group 1. Should we set the group before publishing,
-or hold irq->irq_lock when assigning it?
-
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index c2726d4c06e6e..bc0171c479a95 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -79,6 +79,78 @@ static struct vgic_irq *vgic_get_lpi(struct kvm *kvm, =
-u32 intid)
-[ ... ]
-> +/*
-> + * Creates a new (reference to a) struct vgic_irq for a given LPI.
-> + * If this LPI already exists, we increase its refcount and return it.
-> + * If this is a "new" LPI, we allocate and initialize a new struct vgic_=
-irq.
-> + * This function returns a pointer to the _unlocked_ structure.
-> + */
-> +struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
-> +			      struct kvm_vcpu *vcpu)
+> +static int parse_two_level_itt(struct kvm *kvm, u32 event_id, gpa_t itt_=
+base,
+> +			       unsigned int itt_l2sz, __le64 *itt_l2_entry)
 > +{
 [ ... ]
-> +		/*
-> +		 * The entry is either empty or contains a dead LPI (refcount=3D0)
-> +		 * from the deferred release path, pending cleanup by
-> +		 * vgic_release_deleted_lpis(). Evict and free it if present.
-> +		 */
-> +		oldirq =3D __xa_store(&dist->lpi_xa, intid, irq,
-> +				    GFP_NOWAIT | __GFP_ACCOUNT);
+> +	itt_l2_base =3D FIELD_GET(GICV5_ITTL1E_L2_ADDR_MASK, val) << 3;
+> +	l2_event_id_bits =3D
+> +		min(FIELD_GET(GICV5_ITTL1E_SPAN, val), itt_split_bits);
+
+[Severity: Low]
+Will this min() macro invocation cause a compilation failure due to mismatc=
+hed
+types?
+
+The arguments to min() are FIELD_GET(GICV5_ITTL1E_SPAN, val) and
+itt_split_bits. val is a 64-bit u64, making the FIELD_GET evaluation an
+unsigned long long, while itt_split_bits is a 32-bit unsigned int.=20
+
+The Linux kernel's min() macro enforces strict type equality and will cause
+a build failure when comparing a 64-bit and 32-bit type. Could we use min_t=
+()
+here instead to resolve the mismatch?
+
+> +	l2_event_id =3D event_id % (1UL << l2_event_id_bits);
+[ ... ]
+> +static int __vgic_v5_its_resolve_lpi(struct kvm *kvm, struct vgic_v5_its=
+ *its,
+> +				     u32 device_id, u16 event_id,
+> +				     struct vgic_irq **irq)
+> +{
+[ ... ]
+> +	val =3D le64_to_cpu(itt_l2_entry);
+> +	if (!FIELD_GET(GICV5_ITTL2E_VALID, val)) {
+> +		kvm_debug("ITTE is not valid\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	lpi =3D FIELD_GET(GICV5_ITTL2E_LPI_ID, val);
+> +
+> +	*irq =3D vgic_add_lpi(kvm, vgic_v5_make_lpi(lpi), NULL);
 
 [Severity: High]
-Is it safe to publish the new LPI here while its group field is still
-uninitialized (0)?
+Does this pass a fully typed INTID directly to vgic_add_lpi()?
 
-As mentioned above, doing this in vgic_add_lpi() makes the LPI accessible to
-concurrent lookups in vgic_get_irq() before vgic_its_add_lpi() has finished
-setting up the group field.
+Here, the hardware LPI ID is extracted and converted to a full typed INTID
+using vgic_v5_make_lpi(), which sets the GICv5 type bits in the upper nibbl=
+e.
+This typed INTID is passed to vgic_add_lpi(), which then uses it directly
+as the array index for the lpi_xa XArray:
+
+arch/arm64/kvm/vgic/vgic.c:vgic_add_lpi() {
+    ...
+	ret =3D xa_reserve_irq(&dist->lpi_xa, intid, GFP_KERNEL_ACCOUNT);
+    ...
+}
+
+Using a typed INTID as an array index violates the GICv5 architectural rule
+to strip type bits before indexing. It forces the XArray to allocate
+unnecessary depth to reach indices over 1 billion, leading to memory waste
+and incorrect type dispatch separation.
+
+> +	if (IS_ERR(*irq))
+> +		return PTR_ERR(*irq);
+> +
+> +	return 0;
+> +}
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261016155741.9799=
-85-1-sascha.bischoff@arm.com?part=3D1
+85-1-sascha.bischoff@arm.com?part=3D7
