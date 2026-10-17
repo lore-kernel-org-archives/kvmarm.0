@@ -1,129 +1,167 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E62A3D954A;
-	Sat, 17 Oct 2026 11:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB673E3141;
+	Sat, 17 Oct 2026 12:24:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792237796; cv=none; b=c69CGN1qIgIHsMkU+B5r8yZXtrzpL6R1D8s9GkptN8G+lgjb0fRYzWQ1wje5dpttkNQviWWFKbtDGn366mYiQecHbLTSrHQF/jEBO90q+2i5FaQwNTHhO+K1D0JI6VNZlJSvw7srqYJlIM9+f1Q2zpB7HZeKolfr4LBnV/FhG9Q=
+	t=1792239851; cv=none; b=E9xp7PoPz3vcMxIWUE4g34PDzyoIRhWqYerFQkThH24lEt2A157noFw+C2qv8Jt6351ZJArgO9AlQ+u4dqJP52JpqBGs+m8wShQJKXtTefFT6gUVFKYOJULrfUjPGse7x664WO0IKr29lC01psDMAnEtJ8lDLqlr7ilIbAx1pww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792237796; c=relaxed/simple;
-	bh=I9rUXOsPvPb1Pr+yDalZ+a5oJd95FTQW828LowTVdXA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oiyknvB9OTwFE7qtx/PM5UfGG9l1cfGzunzmVM0MZVEgJQwUs2//YDmy/1ep8YshcPnBw6FaA5IlE3pX4a1T6VFjN3D0S7teyUhCUM2rC0vKrSUeh+S0axUWS9R4ZFwzNb2x3+H/Nz2lSkgdn2aKFEft9p9V7veWF4O4fkPGOrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VyfByGnW; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1792239851; c=relaxed/simple;
+	bh=D66bgpF4xq6Jkx1pgVOG5+ZFloPVrVvVUIa0+62spJk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Kc4ZN9uTebNBAJhq7/hYC2o/a0yNH1EATtNA8Fzc8tVeP6hXNAlK53OeyKY9esXe69SXcHPFNmi40hXxmzniK0AtEnuSlObpe/qJZrHUVYHmWQ7ABO+M+QQkjITd6BP7zgPSZxWONWAC2dBkURRS94SFfrwQXdZ5trx51ddCCPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mq40XWY4; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VyfByGnW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1792237795; x=1823773795;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=I9rUXOsPvPb1Pr+yDalZ+a5oJd95FTQW828LowTVdXA=;
-  b=VyfByGnWNKbn2kfyVg0MSWDUPSd5gMLacSgiGpVThbxumWonxg2S+Fh/
-   yopAomT7444DhiWJlXp+N315x66TT6ffaEhyGkNksLfRBlrKba1pFf2Uj
-   W6HJhTwuYn/NWhlCkmJlGmxhgl4e9iFFASPGaBuYosI0nvkB19hIUyiEm
-   lXZ0jKTl1VRc5IS42x8xlAAjlqjKymY62JycSn/wGUCYATa7QPNWAECjl
-   GiDO4/lwoJpTKHnn0KW7zQRhB6/vAMxfLlGPA1W9rQ43i77UfdVAlG/IU
-   WqqTrd9R6pUCwcYQOKC5I/8aptLs2faKQlxQejNuAkxeoq7TSopsSWX4t
-   A==;
-X-CSE-ConnectionGUID: 0IpToEM7R7eWz8pb7aEOKw==
-X-CSE-MsgGUID: ZHmIHB8LTEC4A1puyhDNHQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11937"; a="890581"
-X-IronPort-AV: E=Sophos;i="6.27,163,1787036400"; 
-   d="scan'208";a="890581"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2026 04:49:54 -0700
-X-CSE-ConnectionGUID: DYy1T7yHTp+E+xZibSr/fQ==
-X-CSE-MsgGUID: jNHTC4sES8KGI2xa8NxPhw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,163,1787036400"; 
-   d="scan'208";a="2248423"
-Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 17 Oct 2026 04:49:45 -0700
-Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1xI2v0-00000000JL4-2aZn;
-	Sat, 17 Oct 2026 11:49:42 +0000
-Date: Sat, 17 Oct 2026 19:48:51 +0800
-From: kernel test robot <lkp@intel.com>
-To: Tomohiro Misono <misono.tomohiro@fujitsu.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mq40XWY4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95EEE1F000C4;
+	Sat, 17 Oct 2026 12:24:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792239849;
+	bh=wi8JAuyO0hOC6x1GjHB6+POlI9OZtGzMwfqaNCzV4YM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Mq40XWY43s/jjXrpkL4Of1aCM+O3gjKOwh8nrilRguUM2IRLv66qI1pszUbqMyiuw
+	 eLmkxIe/o2XuutqLoQAj1DGTNHeaSxwvK6fkj1JPV4WQR7V2pEEm2PCPmAAHr06pz9
+	 pA9P94R3QpIs7V5GWiRn3ZzGLW1DLB3WIeCweoc+dWeyffBiF4xUIq66YOnDECLmG9
+	 6N3OfN3cQ4n5sYEnk9sihRQOfYGiyFb0M3fVGsgiE0PKeK/rq4t86HQmn+sM91RbfW
+	 K/x45dhBztHhBPkKvUQ7itJpbEmJFC78qHl5A6zOuVGWl9s8fBOJFfkinVQFl38Zsn
+	 Q4veWv+9RwWLg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xI3SJ-000000045T1-02z6;
+	Sat, 17 Oct 2026 12:24:07 +0000
+Date: Sat, 17 Oct 2026 13:27:20 +0100
+Message-ID: <87wlrg8qc7.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Tomohiro Misono <misono.tomohiro@fujitsu.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
 	Jonathan Corbet <corbet@lwn.net>,
 	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>, Marc Zyngier <maz@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, Radu Rendec <radu@rendec.net>,
-	Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Radu Rendec <radu@rendec.net>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	Kohei Enju <enju.kohei@fujitsu.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-perf-users@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 4/4] irqchip/gicv3: Add workaround for FUJITSU-MONAKA
- erratum E#030003
-Message-ID: <202610171939.VWCcPPra-lkp@intel.com>
-References: <20261016-monaka-fix-for-upstream-v2-4-fc7ede7f9f48@fujitsu.com>
+Subject: Re: [PATCH v2 4/4] irqchip/gicv3: Add workaround for FUJITSU-MONAKA erratum E#030003
+In-Reply-To: <20261016-monaka-fix-for-upstream-v2-4-fc7ede7f9f48@fujitsu.com>
+References: <20261016-monaka-fix-for-upstream-v2-0-fc7ede7f9f48@fujitsu.com>
+	<20261016-monaka-fix-for-upstream-v2-4-fc7ede7f9f48@fujitsu.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261016-monaka-fix-for-upstream-v2-4-fc7ede7f9f48@fujitsu.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: misono.tomohiro@fujitsu.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, corbet@lwn.net, skhan@linuxfoundation.org, rdunlap@infradead.org, tglx@kernel.org, radu@rendec.net, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, enju.kohei@fujitsu.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Tomohiro,
+On Fri, 16 Oct 2026 11:00:48 +0100,
+Tomohiro Misono <misono.tomohiro@fujitsu.com> wrote:
+> 
+> From: Kohei Enju <enju.kohei@fujitsu.com>
+> 
+> On affected FUJITSU-MONAKA CPUs, the erratum may occur when an SGI is
+> generated by writing to ICC_SGI0R_EL1, ICC_SGI1R_EL1, or ICC_ASGI1R_EL1,
+> if the operation races with CPU interface processing triggered by the
+> arrival of a higher-priority interrupt, an update to a pending
+> interrupt, or a transition of the PE to the Sleep state. When the
+> erratum occurs, the SGI is lost and the system register write does not
+> complete, causing the issuing core to hang.
+> 
+> Guest accesses to these registers are not affected by this erratum, as
+> they are trapped to EL2 and handled without issuing the affected system
+> register write.
+> 
+> Work around the erratum by writing 1 to the bit corresponding to the
+> target SGI INTID in GICR_ISPENDR0 of each target PE's GIC Redistributor,
+> instead of writing to the affected system registers.
+> 
+> Accessing a target PE's GICR_ISPENDR0 requires its Redistributor base to
+> have been discovered. Affected platforms conform to SBBR, which requires
+> PSCI for secondary CPU boot. They therefore do not use the ACPI Parking
+> protocol, which sends an IPI before the secondary CPU has initialized
+> its Redistributor. With PSCI, a secondary CPU discovers its
+> Redistributor before becoming an IPI target.
+> 
+> Signed-off-by: Kohei Enju <enju.kohei@fujitsu.com>
 
-kernel test robot noticed the following build errors:
+You are posting a patch on behalf of someone else, you need to add
+your own SoB:
 
-[auto build test ERROR on 24a19b953e2a3d0ea5a8c4951a0ab8f32720c907]
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?h=v7.3-rc7#n448
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Tomohiro-Misono/arm64-cputype-Add-FUJITSU-MONAKA-definition/20261016-190045
-base:   24a19b953e2a3d0ea5a8c4951a0ab8f32720c907
-patch link:    https://lore.kernel.org/r/20261016-monaka-fix-for-upstream-v2-4-fc7ede7f9f48%40fujitsu.com
-patch subject: [PATCH v2 4/4] irqchip/gicv3: Add workaround for FUJITSU-MONAKA erratum E#030003
-config: arm-defconfig (https://download.01.org/0day-ci/archive/20261017/202610171939.VWCcPPra-lkp@intel.com/config)
-compiler: clang version 24.0.0git (https://github.com/llvm/llvm-project 6719b9e31d6a93099612c474eec76d9f41d0275a)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261017/202610171939.VWCcPPra-lkp@intel.com/reproduce)
+> ---
+> Changes in v2:
+> - Clarify the erratum description and document that virtual accesses are
+>   unaffected.
+> - Remove the gic_send_sgi_via_rdist() helper.
+> - Remove the write-count rationale.
+> - Use the CPU MIDR instead of the SoC ID for filtering.
+> 
+> Note that I have left the dsb(st) after the GICR_ISPENDR0 writes
+> unchanged, pending clarification of the required completion point. If
+> the writes must be observed by a specific component before
+> gic_ipi_send_mask() returns, I will use the appropriate mechanism to
+> provide that guarantee.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202610171939.VWCcPPra-lkp@intel.com/
+See below.
 
-All errors (new ones prefixed by >>):
+[...]
 
->> drivers/irqchip/irq-gic-v3.c:1892:34: error: use of undeclared identifier 'ARM_CPU_IMP_FUJITSU'
-    1892 |         if (read_cpuid_implementor() != ARM_CPU_IMP_FUJITSU ||
-         |                                         ^~~~~~~~~~~~~~~~~~~
->> drivers/irqchip/irq-gic-v3.c:1893:34: error: use of undeclared identifier 'FUJITSU_CPU_PART_MONAKA'
-    1893 |             read_cpuid_part_number() != FUJITSU_CPU_PART_MONAKA)
-         |                                         ^~~~~~~~~~~~~~~~~~~~~~~
-   2 errors generated.
+> @@ -1386,6 +1391,17 @@ static void gic_ipi_send_mask(struct irq_data *d, const struct cpumask *mask)
+>  	 */
+>  	dsb(ishst);
+>  
+> +	if (static_branch_unlikely(&gic_fujitsu_030003_erratum)) {
+> +		for_each_cpu(cpu, mask) {
+> +			void __iomem *base = gic_data_rdist_sgi_base_cpu(cpu);
+> +
+> +			writel_relaxed(BIT(d->hwirq), base + GICR_ISPENDR0);
+> +		}
+> +
+> +		dsb(st);
 
+What is this DSB achieving? As far as I can tell, not much. The memory
+type is nGnRE, so DSB doesn't force writes to reach the end-point, and
+only guarantee ordering that system register SGI generation doesn't
+provide.
 
-vim +/ARM_CPU_IMP_FUJITSU +1892 drivers/irqchip/irq-gic-v3.c
+So either
 
-  1889	
-  1890	static bool gic_enable_quirk_fujitsu_030003(void *data)
-  1891	{
-> 1892		if (read_cpuid_implementor() != ARM_CPU_IMP_FUJITSU ||
-> 1893		    read_cpuid_part_number() != FUJITSU_CPU_PART_MONAKA)
-  1894			return false;
-  1895	
-  1896		static_branch_enable(&gic_fujitsu_030003_erratum);
-  1897		return true;
-  1898	}
-  1899	
+(a) there is a functional requirement on this HW to have a DSB, and
+    needs to be documented,
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+(b) or there is a need for end-point synchronisation, which needs to
+    be enforced by a read back (knowing that the sysreg doesn't
+    provide this guarantee), and this needs to be documented,
+
+(c) or this is completely superfluous and can be dropped
+
+Which case are we in?
+
+Thanks,
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
