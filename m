@@ -1,233 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4FC9302146;
-	Sat, 17 Oct 2026 11:48:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E62A3D954A;
+	Sat, 17 Oct 2026 11:49:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792237710; cv=none; b=qrftaoGBGcTrBpohJ1Q8lwXzYX1zTwltnYc17lnzW0y9AIDCCnWd8iWnUc8TW5aQLx9FlffmqvdmxgxfXuUydkvaaL7DqjRgPUTWAciECe/B+8badbgx9qgtoxUVeYWy97vRBW/1EL0Hc7FWsqZj5b3PUolfNCw0iRNsK+eRFvo=
+	t=1792237796; cv=none; b=c69CGN1qIgIHsMkU+B5r8yZXtrzpL6R1D8s9GkptN8G+lgjb0fRYzWQ1wje5dpttkNQviWWFKbtDGn366mYiQecHbLTSrHQF/jEBO90q+2i5FaQwNTHhO+K1D0JI6VNZlJSvw7srqYJlIM9+f1Q2zpB7HZeKolfr4LBnV/FhG9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792237710; c=relaxed/simple;
-	bh=y1FPo3GMWlifTTHe8FuDPc02/dkHtva0dU1ppoaU2bc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HPLkwe3JLTt8Y+lzdaQg0zK0zDMQcsIz6d24bfZz31TEHUIPuA6akfvYUX03ExwCPwrIkFhVSBnxMFgQGszUM7r3jNsFnQurqvF12b2XSZgKtSUOgsX4b5f9weT2eJAYIDKNY2jgzK8OrBE1vXdG+QqbZVi09IjdQp29eC9vsLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T6XsGeLv; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792237796; c=relaxed/simple;
+	bh=I9rUXOsPvPb1Pr+yDalZ+a5oJd95FTQW828LowTVdXA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oiyknvB9OTwFE7qtx/PM5UfGG9l1cfGzunzmVM0MZVEgJQwUs2//YDmy/1ep8YshcPnBw6FaA5IlE3pX4a1T6VFjN3D0S7teyUhCUM2rC0vKrSUeh+S0axUWS9R4ZFwzNb2x3+H/Nz2lSkgdn2aKFEft9p9V7veWF4O4fkPGOrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VyfByGnW; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T6XsGeLv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E4251F000C4;
-	Sat, 17 Oct 2026 11:48:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792237709;
-	bh=jJmc5s72fxnzrSisazlCiSA9/N+0IuorH4FcHqR8R3Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=T6XsGeLv6DMHkSP68KPe1EP4tk+yLjiPAPERFWjp/cc64HhPR9M/EY5g4KzGqPhsq
-	 s9ZyCRe/Wte5Br0+77Xt/SJ59TP13Z5thDfc1ow5ctTsb09aF1aUA7Ev9UuUz1qUpJ
-	 ANXbRY3WzL6cdisADF0z+2IsINIYz4hwohQzHNGNTD9czKTtejHj4R3LfhP17TM/x0
-	 jwrIaKz3earIeawjC36RR5TNjyjy7IbAWn2lpYVkAXgeGzWdCqpgIyjI1LvcQz4vAm
-	 0iApAkw+VRn0SW96Vp1J3vzN4kN3lZukFsyqY0kIu2kTFL0WAX0XlSPWjAvtLDBD1m
-	 AQBhgOLqPYTIg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xI2tn-0000000459f-0Czq;
-	Sat, 17 Oct 2026 11:48:27 +0000
-Date: Sat, 17 Oct 2026 12:51:41 +0100
-Message-ID: <87y0bw8rzm.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <sascha.bischoff@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	oupton@kernel.org,
-	fuad.tabba@linux.dev,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com
-Subject: Re: [PATCH 1/2] KVM: arm64: vgic: Require matching VGIC model for GICv3 ITS
-In-Reply-To: <20261016152225.898761-2-sascha.bischoff@arm.com>
-References: <20261016152225.898761-1-sascha.bischoff@arm.com>
-	<20261016152225.898761-2-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VyfByGnW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1792237795; x=1823773795;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=I9rUXOsPvPb1Pr+yDalZ+a5oJd95FTQW828LowTVdXA=;
+  b=VyfByGnWNKbn2kfyVg0MSWDUPSd5gMLacSgiGpVThbxumWonxg2S+Fh/
+   yopAomT7444DhiWJlXp+N315x66TT6ffaEhyGkNksLfRBlrKba1pFf2Uj
+   W6HJhTwuYn/NWhlCkmJlGmxhgl4e9iFFASPGaBuYosI0nvkB19hIUyiEm
+   lXZ0jKTl1VRc5IS42x8xlAAjlqjKymY62JycSn/wGUCYATa7QPNWAECjl
+   GiDO4/lwoJpTKHnn0KW7zQRhB6/vAMxfLlGPA1W9rQ43i77UfdVAlG/IU
+   WqqTrd9R6pUCwcYQOKC5I/8aptLs2faKQlxQejNuAkxeoq7TSopsSWX4t
+   A==;
+X-CSE-ConnectionGUID: 0IpToEM7R7eWz8pb7aEOKw==
+X-CSE-MsgGUID: ZHmIHB8LTEC4A1puyhDNHQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11937"; a="890581"
+X-IronPort-AV: E=Sophos;i="6.27,163,1787036400"; 
+   d="scan'208";a="890581"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2026 04:49:54 -0700
+X-CSE-ConnectionGUID: DYy1T7yHTp+E+xZibSr/fQ==
+X-CSE-MsgGUID: jNHTC4sES8KGI2xa8NxPhw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,163,1787036400"; 
+   d="scan'208";a="2248423"
+Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 17 Oct 2026 04:49:45 -0700
+Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1xI2v0-00000000JL4-2aZn;
+	Sat, 17 Oct 2026 11:49:42 +0000
+Date: Sat, 17 Oct 2026 19:48:51 +0800
+From: kernel test robot <lkp@intel.com>
+To: Tomohiro Misono <misono.tomohiro@fujitsu.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Randy Dunlap <rdunlap@infradead.org>, Marc Zyngier <maz@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>, Radu Rendec <radu@rendec.net>,
+	Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Kohei Enju <enju.kohei@fujitsu.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-perf-users@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 4/4] irqchip/gicv3: Add workaround for FUJITSU-MONAKA
+ erratum E#030003
+Message-ID: <202610171939.VWCcPPra-lkp@intel.com>
+References: <20261016-monaka-fix-for-upstream-v2-4-fc7ede7f9f48@fujitsu.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sascha.bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261016-monaka-fix-for-upstream-v2-4-fc7ede7f9f48@fujitsu.com>
 
-On Fri, 16 Oct 2026 16:22:23 +0100,
-Sascha Bischoff <sascha.bischoff@arm.com> wrote:
-> 
-> On a GICv5 host with legacy support, KVM registers both VGICv3 and
-> VGICv5 devices. A VM can create a GICv3 ITS with another VGIC model,
-> setting has_its even though that model cannot use the GICv3 ITS.
-> 
-> Reject GICv3 ITS creation when the VM already has an incompatible VGIC.
-> KVM also permits creating an ITS before its VGIC, so record the model
-> required by the ITS and reject a later incompatible VGIC. Preserve
-> either creation order when the models match.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-init.c | 5 +++++
->  arch/arm64/kvm/vgic/vgic-its.c  | 9 +++++++++
->  include/kvm/arm_vgic.h          | 2 ++
->  3 files changed, 16 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> index b5ea1e39c6862..48a92555fa6ab 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> @@ -125,6 +125,11 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
->  		goto out_unlock;
->  	}
->  
-> +	if (kvm->arch.vgic.its_model && kvm->arch.vgic.its_model != type) {
-> +		ret = -ENODEV;
-> +		goto out_unlock;
-> +	}
-> +
->  	if (kvm_id_regs_final(kvm))
->  		goto out_unlock;
->  	ret = 0;
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index e5657cb603567..bf901626ea6df 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -1875,6 +1875,14 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
->  
->  	mutex_lock(&dev->kvm->arch.config_lock);
->  
-> +	if ((irqchip_in_kernel(dev->kvm) && !vgic_is_v3(dev->kvm)) ||
-> +	    (dev->kvm->arch.vgic.its_model &&
-> +	     dev->kvm->arch.vgic.its_model != KVM_DEV_TYPE_ARM_VGIC_V3)) {
-> +		mutex_unlock(&dev->kvm->arch.config_lock);
-> +		kfree(its);
-> +		return -ENODEV;
-> +	}
-> +
+Hi Tomohiro,
 
-A comment would go a long way to make it clear what this is checking
-for:
+kernel test robot noticed the following build errors:
 
-	- if a GIC already exists and is not v3, fail
-	- if an ITS already exists and is not v3, fail
+[auto build test ERROR on 24a19b953e2a3d0ea5a8c4951a0ab8f32720c907]
 
->  	if (vgic_initialized(dev->kvm)) {
->  		ret = vgic_v4_init(dev->kvm);
->  		if (ret < 0) {
-> @@ -1903,6 +1911,7 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
->  
->  	dev->kvm->arch.vgic.msis_require_devid = true;
->  	dev->kvm->arch.vgic.has_its = true;
-> +	dev->kvm->arch.vgic.its_model = KVM_DEV_TYPE_ARM_VGIC_V3;
->  	its->enabled = false;
->  	its->dev = dev;
->  
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 7be81b936bf10..a2b6b328808ba 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -548,6 +548,8 @@ struct vgic_dist {
->  	struct vgic_io_device	cpuif_iodev;
->  
->  	bool			has_its;
-> +	/* VGIC model required by the VM's ITS devices. */
-> +	u32			its_model;
+url:    https://github.com/intel-lab-lkp/linux/commits/Tomohiro-Misono/arm64-cputype-Add-FUJITSU-MONAKA-definition/20261016-190045
+base:   24a19b953e2a3d0ea5a8c4951a0ab8f32720c907
+patch link:    https://lore.kernel.org/r/20261016-monaka-fix-for-upstream-v2-4-fc7ede7f9f48%40fujitsu.com
+patch subject: [PATCH v2 4/4] irqchip/gicv3: Add workaround for FUJITSU-MONAKA erratum E#030003
+config: arm-defconfig (https://download.01.org/0day-ci/archive/20261017/202610171939.VWCcPPra-lkp@intel.com/config)
+compiler: clang version 24.0.0git (https://github.com/llvm/llvm-project 6719b9e31d6a93099612c474eec76d9f41d0275a)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261017/202610171939.VWCcPPra-lkp@intel.com/reproduce)
 
-I reckon that has_its and its_model can be made the same thing, since
-its_model == 0 indicates the lack of ITS, and it is otherwise the same
-as vgic_model.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202610171939.VWCcPPra-lkp@intel.com/
 
-I ended up with this (untested). Thoughts?
+All errors (new ones prefixed by >>):
 
-	M.
+>> drivers/irqchip/irq-gic-v3.c:1892:34: error: use of undeclared identifier 'ARM_CPU_IMP_FUJITSU'
+    1892 |         if (read_cpuid_implementor() != ARM_CPU_IMP_FUJITSU ||
+         |                                         ^~~~~~~~~~~~~~~~~~~
+>> drivers/irqchip/irq-gic-v3.c:1893:34: error: use of undeclared identifier 'FUJITSU_CPU_PART_MONAKA'
+    1893 |             read_cpuid_part_number() != FUJITSU_CPU_PART_MONAKA)
+         |                                         ^~~~~~~~~~~~~~~~~~~~~~~
+   2 errors generated.
 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 2d915769cdc7c..c70390b7fcab6 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -456,6 +456,9 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
- 		 */
- 		if (vcpu->vcpu_id >= kvm_vgic_global_state.max_gicv5_vcpus)
- 			return -EINVAL;
-+		break;
-+	default:
-+		unreachable();
- 	}
- 
- 	return ret;
-@@ -572,6 +575,8 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
- 		kfree(dist->vgic_v5_irs_data);
- 		dist->vgic_v5_irs_data = NULL;
- 		break;
-+	default:
-+		unreachable();
- 	}
- 
- 	xa_destroy(&dist->lpi_xa);
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 0ec461df74cd9..171e5e345c220 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -1963,7 +1963,6 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
- 	xa_init(&its->translation_cache);
- 
- 	dev->kvm->arch.vgic.msis_require_devid = true;
--	dev->kvm->arch.vgic.has_its = true;
- 	dev->kvm->arch.vgic.its_model = KVM_DEV_TYPE_ARM_VGIC_V3;
- 	its->enabled = false;
- 	its->dev = dev;
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index 636c576b2b99e..282fac37b6642 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -42,10 +42,7 @@ bool vgic_has_its(struct kvm *kvm)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
- 
--	if (dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
--		return false;
--
--	return dist->has_its;
-+	return (dist->its_model == dist->vgic_model);
- }
- 
- bool vgic_supports_direct_msis(struct kvm *kvm)
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index c4135815884b6..4b2c41917b77c 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -503,7 +503,9 @@ struct vgic_dist {
- 	bool			initialized;
- 
- 	/* vGIC model the kernel emulates for the guest (GICv2 or GICv3) */
--	u32			vgic_model;
-+	enum kvm_device_type	vgic_model;
-+	/* VGIC model required by the VM's ITS devices. */
-+	enum kvm_device_type	its_model;
- 
- 	/* Implementation revision as reported in the GICD_IIDR */
- 	u32			implementation_rev;
-@@ -548,9 +550,6 @@ struct vgic_dist {
- 	struct vgic_io_device	dist_iodev;
- 	struct vgic_io_device	cpuif_iodev;
- 
--	bool			has_its;
--	/* VGIC model required by the VM's ITS devices. */
--	u32			its_model;
- 	bool			table_write_in_progress;
- 
- 	/*
 
--- 
-Jazz isn't dead. It just smells funny.
+vim +/ARM_CPU_IMP_FUJITSU +1892 drivers/irqchip/irq-gic-v3.c
+
+  1889	
+  1890	static bool gic_enable_quirk_fujitsu_030003(void *data)
+  1891	{
+> 1892		if (read_cpuid_implementor() != ARM_CPU_IMP_FUJITSU ||
+> 1893		    read_cpuid_part_number() != FUJITSU_CPU_PART_MONAKA)
+  1894			return false;
+  1895	
+  1896		static_branch_enable(&gic_fujitsu_030003_erratum);
+  1897		return true;
+  1898	}
+  1899	
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
