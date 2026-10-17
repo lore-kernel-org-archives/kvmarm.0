@@ -1,148 +1,233 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11EC5272E56;
-	Sat, 17 Oct 2026 11:19:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4FC9302146;
+	Sat, 17 Oct 2026 11:48:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792235942; cv=none; b=AHI7P5WTAvnOVDWDPbZ8wujR2wzLWwlbE3S85hjzk0g0nxHKFEDqgIQ6rkszwh3dBkxqc4gxSf6KkMyNHZcR52zAFniR/Pf7b5N8S6CRxcSvhX+5hVpY3oXO7o0N1RHU9/qv+eB2Xk5YcxC9nTn70/XZsEYHmXHdHQRsF+XTRTs=
+	t=1792237710; cv=none; b=qrftaoGBGcTrBpohJ1Q8lwXzYX1zTwltnYc17lnzW0y9AIDCCnWd8iWnUc8TW5aQLx9FlffmqvdmxgxfXuUydkvaaL7DqjRgPUTWAciECe/B+8badbgx9qgtoxUVeYWy97vRBW/1EL0Hc7FWsqZj5b3PUolfNCw0iRNsK+eRFvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792235942; c=relaxed/simple;
-	bh=OCTw8+vz7sEYBl55cbeccEMXfXi6zkLyAGf9HBSYQDM=;
-	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=d9+lol+4KM9g/z/g0+KfpotG2eBGVUeVlhvysyIwxTrtITbw3Q8jziUC43BclcGl+ouHR1qVH8yNaBCnw1VWy+28bqm6OhMenndrBQ7ilhc1tu8SQdv8r33T1KU6+uSdXKMpeipYPXG0itVb7b+xtIxgofbBVdi7DJyx21f5wmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HQHdggwN; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792237710; c=relaxed/simple;
+	bh=y1FPo3GMWlifTTHe8FuDPc02/dkHtva0dU1ppoaU2bc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HPLkwe3JLTt8Y+lzdaQg0zK0zDMQcsIz6d24bfZz31TEHUIPuA6akfvYUX03ExwCPwrIkFhVSBnxMFgQGszUM7r3jNsFnQurqvF12b2XSZgKtSUOgsX4b5f9weT2eJAYIDKNY2jgzK8OrBE1vXdG+QqbZVi09IjdQp29eC9vsLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T6XsGeLv; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HQHdggwN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81CAB1F000C4;
-	Sat, 17 Oct 2026 11:19:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T6XsGeLv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E4251F000C4;
+	Sat, 17 Oct 2026 11:48:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792235940;
-	bh=Z9RR8Y+9CiX/8bUs+isxOWhJ+pNGhscRtRzD48EgSvA=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=HQHdggwNANyKrCYQJ/GOPYT39W9E9YsKDLJJXXUPOtVZXFolZT02DzAEw5Sp62inM
-	 waDc3lkoSBBTBCUSveEPGc7PZFom2Ju8ijBiSt43LZX8bjgwpnRIgp+wR9uRZd+pVp
-	 /DtDWMBZCsGTt/wiZ03SX2indl8s8ZmTid5wT28gqcipqJHznsWyNavdvpYmYMBfpy
-	 7OGKHgZtn8a0TELL7MOoWa+Qbn7QgRpM7/n2o3+9YJ+xf4H6eMaXBwCeoak5JQh0aW
-	 9NHorAdSaZNLS6yUGXsq0ZGl9V7eYgOJtXVCL+Eu2wtEcskMmSfoMYPdakvqD0+9f9
-	 gD7vO+4WuLJyw==
-Message-ID: <sashiko-outbox-175488@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 4/5] KVM: selftests: Reserve memslot 1 for the ucall
- MMIO address
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Tharit Tangkijwanichakul" <tharitt97@gmail.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20261017110213.46199-5-tharitt97@gmail.com>
-References: <20261017110213.46199-1-tharitt97@gmail.com>
- <20261017110213.46199-5-tharitt97@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 17 Oct 2026 11:19:00 +0000
+	s=k20260515; t=1792237709;
+	bh=jJmc5s72fxnzrSisazlCiSA9/N+0IuorH4FcHqR8R3Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=T6XsGeLv6DMHkSP68KPe1EP4tk+yLjiPAPERFWjp/cc64HhPR9M/EY5g4KzGqPhsq
+	 s9ZyCRe/Wte5Br0+77Xt/SJ59TP13Z5thDfc1ow5ctTsb09aF1aUA7Ev9UuUz1qUpJ
+	 ANXbRY3WzL6cdisADF0z+2IsINIYz4hwohQzHNGNTD9czKTtejHj4R3LfhP17TM/x0
+	 jwrIaKz3earIeawjC36RR5TNjyjy7IbAWn2lpYVkAXgeGzWdCqpgIyjI1LvcQz4vAm
+	 0iApAkw+VRn0SW96Vp1J3vzN4kN3lZukFsyqY0kIu2kTFL0WAX0XlSPWjAvtLDBD1m
+	 AQBhgOLqPYTIg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xI2tn-0000000459f-0Czq;
+	Sat, 17 Oct 2026 11:48:27 +0000
+Date: Sat, 17 Oct 2026 12:51:41 +0100
+Message-ID: <87y0bw8rzm.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <sascha.bischoff@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	oupton@kernel.org,
+	fuad.tabba@linux.dev,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH 1/2] KVM: arm64: vgic: Require matching VGIC model for GICv3 ITS
+In-Reply-To: <20261016152225.898761-2-sascha.bischoff@arm.com>
+References: <20261016152225.898761-1-sascha.bischoff@arm.com>
+	<20261016152225.898761-2-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sascha.bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] KVM: selftests: memslot 1 collision in vgic_v5_lpi_ist_vm_create=
-()
---
-
-commit 9df9f60479f8451e3b508d09149c3249f3de5c98
-Author: Tharit Tangkijwanichakul <tharitt97@gmail.com>
-
-KVM: selftests: Reserve memslot 1 for the ucall MMIO address
-
-This commit reserves memslot 1 for a read-only ucall MMIO region in
-__vm_create() when KVM_CAP_READONLY_MEM is supported, and bumps
-TEST_MEM_SLOT_BASE from 1 to 2.
-
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/s=
-elftests/kvm/lib/kvm_util.c
-> index 9ddc047d5c275..f387100b1a19a 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -20,6 +20,7 @@
->  #include <linux/kernel.h>
-> =20
->  #define KVM_UTIL_MIN_PFN	2
-> +#define KVM_UCALL_MEMSLOT	1
-> =20
->  u32 kvm_random_seed;
->  struct kvm_random_state kvm_rng;
-> @@ -492,6 +493,7 @@ struct kvm_vm *__vm_create(struct vm_shape shape, u32=
- nr_runnable_vcpus,
->  	struct userspace_mem_region *slot0;
->  	struct kvm_vm *vm;
->  	int i, flags;
-> +	gpa_t mmio_gpa;
-> =20
->  	kvm_set_files_rlimit(nr_runnable_vcpus);
-> =20
-> @@ -514,14 +516,19 @@ struct kvm_vm *__vm_create(struct vm_shape shape, u=
-32 nr_runnable_vcpus,
-> =20
->  	kvm_vm_elf_load(vm, program_invocation_name);
-> =20
-> -	/*
-> -	 * TODO: Add proper defines to protect the library's memslots, and then
-> -	 * carve out memslot1 for the ucall MMIO address.  KVM treats writes to
-> -	 * read-only memslots as MMIO, and creating a read-only memslot for the
-> -	 * MMIO region would prevent silently clobbering the MMIO region.
-> +	/* KVM treats writes to read-only memslots as MMIO, and creating
-> +	 * a read-only memslot for the MMIO region would prevent silently
-> +	 * clobbering the MMIO region.
->  	 */
->  	slot0 =3D memslot2region(vm, 0);
-> -	ucall_init(vm, slot0->region.guest_phys_addr + slot0->region.memory_siz=
-e);
-> +	mmio_gpa =3D slot0->region.guest_phys_addr + slot0->region.memory_size;
-> +	ucall_init(vm, mmio_gpa);
+On Fri, 16 Oct 2026 16:22:23 +0100,
+Sascha Bischoff <sascha.bischoff@arm.com> wrote:
+> 
+> On a GICv5 host with legacy support, KVM registers both VGICv3 and
+> VGICv5 devices. A VM can create a GICv3 ITS with another VGIC model,
+> setting has_its even though that model cannot use the GICv3 ITS.
+> 
+> Reject GICv3 ITS creation when the VM already has an incompatible VGIC.
+> KVM also permits creating an ITS before its VGIC, so record the model
+> required by the ITS and reject a later incompatible VGIC. Preserve
+> either creation order when the models match.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-init.c | 5 +++++
+>  arch/arm64/kvm/vgic/vgic-its.c  | 9 +++++++++
+>  include/kvm/arm_vgic.h          | 2 ++
+>  3 files changed, 16 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index b5ea1e39c6862..48a92555fa6ab 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -125,6 +125,11 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>  		goto out_unlock;
+>  	}
+>  
+> +	if (kvm->arch.vgic.its_model && kvm->arch.vgic.its_model != type) {
+> +		ret = -ENODEV;
+> +		goto out_unlock;
+> +	}
 > +
-> +	if (vm_check_cap(vm, KVM_CAP_READONLY_MEM))
-> +		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-> +					    mmio_gpa, KVM_UCALL_MEMSLOT,
-> +					    vm_adjust_num_guest_pages(vm->mode, 1),
-> +					    KVM_MEM_READONLY);
+>  	if (kvm_id_regs_final(kvm))
+>  		goto out_unlock;
+>  	ret = 0;
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index e5657cb603567..bf901626ea6df 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -1875,6 +1875,14 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+>  
+>  	mutex_lock(&dev->kvm->arch.config_lock);
+>  
+> +	if ((irqchip_in_kernel(dev->kvm) && !vgic_is_v3(dev->kvm)) ||
+> +	    (dev->kvm->arch.vgic.its_model &&
+> +	     dev->kvm->arch.vgic.its_model != KVM_DEV_TYPE_ARM_VGIC_V3)) {
+> +		mutex_unlock(&dev->kvm->arch.config_lock);
+> +		kfree(its);
+> +		return -ENODEV;
+> +	}
+> +
 
-[Severity: Medium]
-Does reserving KVM_UCALL_MEMSLOT (slot 1) in __vm_create() collide with
-VGIC_V5_LPI_MEMSLOT in tools/testing/selftests/kvm/arm64/vgic_v5.c?
+A comment would go a long way to make it clear what this is checking
+for:
 
-In tools/testing/selftests/kvm/arm64/vgic_v5.c, VGIC_V5_LPI_MEMSLOT is
-hardcoded to 1 instead of using TEST_MEM_SLOT_BASE:
+	- if a GIC already exists and is not v3, fail
+	- if an ITS already exists and is not v3, fail
 
-    #define VGIC_V5_LPI_MEMSLOT	1
+>  	if (vgic_initialized(dev->kvm)) {
+>  		ret = vgic_v4_init(dev->kvm);
+>  		if (ret < 0) {
+> @@ -1903,6 +1911,7 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+>  
+>  	dev->kvm->arch.vgic.msis_require_devid = true;
+>  	dev->kvm->arch.vgic.has_its = true;
+> +	dev->kvm->arch.vgic.its_model = KVM_DEV_TYPE_ARM_VGIC_V3;
+>  	its->enabled = false;
+>  	its->dev = dev;
+>  
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 7be81b936bf10..a2b6b328808ba 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -548,6 +548,8 @@ struct vgic_dist {
+>  	struct vgic_io_device	cpuif_iodev;
+>  
+>  	bool			has_its;
+> +	/* VGIC model required by the VM's ITS devices. */
+> +	u32			its_model;
 
-When test_vgic_v5_lpis() or test_vgic_v5_ist_save_restore() runs,
-vgic_v5_lpi_ist_vm_create() creates the VM via __vm_create() (which
-populates slot 1 because arm64 unconditionally supports
-KVM_CAP_READONLY_MEM) and then attempts to add a memslot at
-VGIC_V5_LPI_MEMSLOT:
+I reckon that has_its and its_model can be made the same thing, since
+its_model == 0 indicates the lack of ITS, and it is otherwise the same
+as vgic_model.
 
-    v->vm =3D __vm_create(VM_SHAPE_DEFAULT, VGIC_V5_LPI_NR_VCPUS, 0);
-    ...
-    vm_userspace_mem_region_add(v->vm, VM_MEM_SRC_ANONYMOUS,
-                                VGIC_V5_LPI_IST_BASE_GPA,
-                                VGIC_V5_LPI_MEMSLOT,
-                                nr_lpi_ist_pages, 0);
+I ended up with this (untested). Thoughts?
 
-Inside vm_userspace_mem_region_add() -> vm_mem_add(), the duplicate slot
-check in vm->regions.slot_hash finds KVM_UCALL_MEMSLOT in slot 1 and
-aborts the test with TEST_FAIL("A mem region with the requested slot
-already exists...").
+	M.
 
-Should VGIC_V5_LPI_MEMSLOT be defined in terms of TEST_MEM_SLOT_BASE as
-well?
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index 2d915769cdc7c..c70390b7fcab6 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -456,6 +456,9 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+ 		 */
+ 		if (vcpu->vcpu_id >= kvm_vgic_global_state.max_gicv5_vcpus)
+ 			return -EINVAL;
++		break;
++	default:
++		unreachable();
+ 	}
+ 
+ 	return ret;
+@@ -572,6 +575,8 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
+ 		kfree(dist->vgic_v5_irs_data);
+ 		dist->vgic_v5_irs_data = NULL;
+ 		break;
++	default:
++		unreachable();
+ 	}
+ 
+ 	xa_destroy(&dist->lpi_xa);
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 0ec461df74cd9..171e5e345c220 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -1963,7 +1963,6 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+ 	xa_init(&its->translation_cache);
+ 
+ 	dev->kvm->arch.vgic.msis_require_devid = true;
+-	dev->kvm->arch.vgic.has_its = true;
+ 	dev->kvm->arch.vgic.its_model = KVM_DEV_TYPE_ARM_VGIC_V3;
+ 	its->enabled = false;
+ 	its->dev = dev;
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index 636c576b2b99e..282fac37b6642 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -42,10 +42,7 @@ bool vgic_has_its(struct kvm *kvm)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 
+-	if (dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
+-		return false;
+-
+-	return dist->has_its;
++	return (dist->its_model == dist->vgic_model);
+ }
+ 
+ bool vgic_supports_direct_msis(struct kvm *kvm)
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index c4135815884b6..4b2c41917b77c 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -503,7 +503,9 @@ struct vgic_dist {
+ 	bool			initialized;
+ 
+ 	/* vGIC model the kernel emulates for the guest (GICv2 or GICv3) */
+-	u32			vgic_model;
++	enum kvm_device_type	vgic_model;
++	/* VGIC model required by the VM's ITS devices. */
++	enum kvm_device_type	its_model;
+ 
+ 	/* Implementation revision as reported in the GICD_IIDR */
+ 	u32			implementation_rev;
+@@ -548,9 +550,6 @@ struct vgic_dist {
+ 	struct vgic_io_device	dist_iodev;
+ 	struct vgic_io_device	cpuif_iodev;
+ 
+-	bool			has_its;
+-	/* VGIC model required by the VM's ITS devices. */
+-	u32			its_model;
+ 	bool			table_write_in_progress;
+ 
+ 	/*
 
-> =20
->  	if (kvm_random_seed !=3D last_kvm_seed)
->  		kvm_seed_rng(kvm_random_seed);
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261017110213.4619=
-9-1-tharitt97@gmail.com?part=3D4
+-- 
+Jazz isn't dead. It just smells funny.
