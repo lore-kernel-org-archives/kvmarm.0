@@ -1,123 +1,146 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8646E359A9B
-	for <kvmarm@lists.linux.dev>; Sat, 17 Oct 2026 15:25:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792250718; cv=pass; b=GjZW/wr0YloO0sm6eWIdhI/RYz/BI3VWZQOzGZ7isuW02qe9uX0/pM8Mg0sqCG4Ls3j7Vy2FpblR9XzwUfCoYiEpm/EvejHrmmZWdzPSNjMgDhqeYUSae8wVS6TMCEsmMrlYJy2pkPTgR93D/rhRep6k/OESzgqCSzKAKUQcICg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792250718; c=relaxed/simple;
-	bh=Jm8AzdPrPR6BhXQyJz2nZ42hfc8fkKPUPVq/AoDXHaw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b4rGHywkStUcv5v/gAGDSjjzAU8DtvOZQc5bCdMJ9FNCqX85zo5dJZYhi9CXa0ZioeDPeW34BEmouSrHyDNhHbQBVIRlL67k02KQc0+Zte9sTly5VGy3K3tlAA+UG1SsOXG7vSAVJlGAKez7HATjvtkw5APnLznX/Qo9vRgOjjk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TNvTNfQg; arc=pass smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2172A3905EB;
+	Sat, 17 Oct 2026 16:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792254256; cv=none; b=CL4rUxLLDU54nTlY8VetbFKhiMHDRx4Ft6/c7+CFfXwYa8MSsTLDsCZaj4+K8oV7yN67Wr3nKdo64S8ng4WckAt4LEtCq/9Grte4bUF0XHuSrXBoZXU78G2hcfwQmTxGUa4NKwtCtfu+Swynp/yWh5sMEbhu5BtGSlb8uLMMz6c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792254256; c=relaxed/simple;
+	bh=UA8pGmqMp8j+mGS3obBFuKVd1iXAUsGud+vT1KbKpDA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RFEA9sT71XXTq6gOgC+m5i645iqrDypnqPRUzwcldm/UkVmAmvY34g4GATNSQ6OY+o1s3IaFRlDkmFEFGCyAg0gOjkrd9usQ4Yrv1F+DzeEWKSLMgxCpjB6USddAq6M8/6LGAw3w6IUyXbt+++JbeJzd1b1qT08+c2LaIGc9JOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jJUye3F7; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TNvTNfQg"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-53381e53b80so10275781cf.1
-        for <kvmarm@lists.linux.dev>; Sat, 17 Oct 2026 08:25:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792250716; cv=none;
-        d=google.com; s=arc-20260327;
-        b=gMj+Z0ks0rOTVvlkovZ9DvB045SnuXKZ4iRQCfV2XtFglkb+es/ZXtxPljXPwOaBbQ
-         EY/ashZm5ABJrMHi+4HUkGJmSMmX2hzZT96Z6kRveV/L5Jc/tIxwT+EcGMQa4poCYV51
-         tbmGuuJTQtF/C0bAskwzW1vA6pM7H6A6UxpUjrhFEjAFL0OQOYRt4FD9vDfRvGSQitUO
-         jCTCFbTH83PSlv8lCiqMv0/nV4RyMYdPot3Yf74UN2fjerGSGN2qS+I+2XQSX/m5S/CB
-         Z5am/0zg31cHAmzP4HWgs5NvlSW0cSjS6faR0tO+2OzoEXP723svGJGUzDm4jkJmnBUO
-         a6dw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=cBiNZFwCvoEsAVFQ+85lVVDF8nZW55yFDyjuRN5OJEE=;
-        fh=Agrz8sg+acyaGKC1iM9y7czNziKEeF0UYSLnabEYrdA=;
-        b=DtGFq6oFTE6w9oOodE1MkSKkvuITanQ4sERqdKP4hrTuwrpfSNeykNcZMrll6BRIYp
-         RsrayX4LeiovAYKtAjsmZvNpotXxQ2Lnsih8CpT8y3d08ZKGYtuZ5duYXEDpiE8zSPvL
-         8CuxhQc7gBmW9GNk4EGfhHNISdiBToPB/zpsfRFwfh/83c+AQHHtiMJfD9maTNr5hlEQ
-         ed7hKWlup+ph4n5SSDXB0ucBXqsNzjMX+4vgZDj8F7L6i2wojhH6N1NKkK1Vbs46CeKc
-         GT10IjuSBlYG5hB/0gO4L3AuODVF8NQ14o0xDGEpQvtqo5h2PMEvBLjVTqC/heTprCrj
-         RYdw==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792250716; x=1792855516; darn=lists.linux.dev;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=cBiNZFwCvoEsAVFQ+85lVVDF8nZW55yFDyjuRN5OJEE=;
-        b=TNvTNfQgrVqftZU52z50fM+CX2Qr3JNttkGI9hLMW0XqQHXpYDIZ5viZcw6AsLbufE
-         V0r97ytQwEGtSK35YnGlYGY3M2aDtLPwT5OCkLYE8nNYj/4lsoHVKK+dufbFa4W6nlE9
-         vV7ptqsFz7oFzBrKc5K0GHoFAJ2Wljo5JkoXheZ6kOqPlmFm8sD34kbm0WftnNNeR32J
-         SxiPqcEcHDPJYQ0MB2N51cHmUASaR9F32iud5faLjZc/gWjaH9TrwoLlIQR/GtKW0N5e
-         js3+0zH4HtI2GZmOOT7eMOztfOoZ+hmrrbVH8e3PC2bkZtXwyOoW01iXXvBU8o8DmM4c
-         zIxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792250716; x=1792855516;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=cBiNZFwCvoEsAVFQ+85lVVDF8nZW55yFDyjuRN5OJEE=;
-        b=YhtTyaUc5NbhAUg8UQ7iXlPbs3382JVxwhS+Kk8V8ZAUglBjLEYvf3iosO6CUy9t/0
-         g6o6ICdFrW9iNN3eH9ptirr2z+I3gdjdiJkq7Ed6cvnDvrCkDiefIuF1R63+J+fWqrY7
-         1/Hm2eJag4cGdCzS/bs4ysjh+h2t046O5X06yLEXUJAi6k1cjyicRUfxo69k9uRuy3Ua
-         W6lmY4G+UfI94yJPZv0JsUm677984FH44mxpAu5hjHZ4euv5FTIhbCmVUBl6fCGFXxtM
-         dFCG0ds5GsGRyAKjMcVA4cLmbGcmULzNpkawwRGdk9EISsq5kPG1YWZtxT8Bj+aA6gYy
-         QEFg==
-X-Forwarded-Encrypted: i=1; AKwUvBzTB21uYawx4HIsxCNKlYgK9n7dA+qPMz1gsOnri9t10GU+QN5useXP7vhaPMRmLJSi0Au77G8=@lists.linux.dev
-X-Gm-Message-State: AFq9FYIXqA2zX4gM53mOGp18Y0E0yFnWlqQwaw6R0BsFmgeJghFBgekg
-	krCXH0UXwh/TYpWSh6bX+Xxnjo+yQjuv2446SS1tcBXrNi5kYtW10RXy0LZm4yvFltywRAtjmJt
-	K+3+tYAv86wxpsc3Xm+0jZQkOMqn8+NM=
-X-Gm-Gg: AYBFou3bueXy+DbbHsApb8H2eSZy2q9L4VwG1fI9R33uNNVuQgN0BjXd/paluzSEopB
-	frtCnEOhwnoPTM27mwTlxs5SfJ4ckXcbHZtXm0n2g3XSaWBECSqcvHZwVLDvTe1gYyDsiHOmTn2
-	4mVzvKor6+hIEHUFte/T50a7PaZQO0wLe8AG9XWB3XEsaiG++tV+afiN+LXCtGN+KOBTd498BQ3
-	FBBM3Rf5sIP+398JWfnhN9GZjEztZx+apKcuOnLEDQkhuQYGnPbZOck8gWhs8/s8K5LH343kFmL
-	c81MyscMZD0B2NPYhNZWMhKPb/bQV93vwqwvX3rFL2p/V1k/MvLhPmL5SmVth8p6wl3EznEYiNn
-	VnSwLqwtA6UHDB1L9RTMPNWH9y3Cl938nnPehRcRWi9koVw==
-X-Received: by 2002:a05:620a:2783:b0:93e:d051:8f19 with SMTP id
- af79cd13be357-93f29ced575mr485953085a.40.1792250716444; Sat, 17 Oct 2026
- 08:25:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jJUye3F7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0A011F000C4;
+	Sat, 17 Oct 2026 16:24:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792254254;
+	bh=Sn6oltEz1l2gbSTEtMRaMGw2g3dSBbPeiQre/ajrvSI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=jJUye3F71L6g7gXBMb4EwJv4URAOh3FVM+EV/DoYqFRNTmSIzHAmrX2JvlEtbC/AL
+	 b6OxHpY2Jl+E1DJ2WHt+UlRnG5FbiY9wqOyLfndPwyUSKgmGctEEn97wtmfsbnxs2c
+	 iLEUjbrOBbr2m8ydOX9WoGmSG1/5PACeLRGORO7OFdsuPi+H3oTRgecNjjV0F33tW1
+	 Bbn+qlfJipAP0sw3igJyGh585gBx1ej6PG9ojGvGN2NKQ9B75MeEaaNQDjW4yd2T8j
+	 wJ3S6WU0//4Q8jesK1KWtD8i1mRcbBqAGmkc8W805ONV0knOEazkamnVevvuIi6tZS
+	 BuSg5FTjWvSTw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xI7Ce-0000000487K-0c5q;
+	Sat, 17 Oct 2026 16:24:12 +0000
+Date: Sat, 17 Oct 2026 17:24:11 +0100
+Message-ID: <865wz01ej8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	mark.rutland@arm.com,
+	vdonnefort@google.com,
+	qperret@google.com,
+	Sascha.Bischoff@arm.com,
+	steven.price@arm.com,
+	tabba@google.com
+Subject: Re: [PATCH v3 1/5] KVM: arm64: Reject the GICv5 CPU interface hypercalls under pKVM
+In-Reply-To: <20261012161524.4016464-2-fuad.tabba@linux.dev>
+References: <20261012161524.4016464-1-fuad.tabba@linux.dev>
+	<20261012161524.4016464-2-fuad.tabba@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20261017110213.46199-1-tharitt97@gmail.com> <20261017110213.46199-6-tharitt97@gmail.com>
-In-Reply-To: <20261017110213.46199-6-tharitt97@gmail.com>
-From: Tharit Tangkijwanichakul <tharitt97@gmail.com>
-Date: Sat, 17 Oct 2026 22:25:04 +0700
-X-Gm-Features: AclHuK8Bu8EDo40zZmiyUcWdeJAzBkx4-shpMZtTbASYDmEugT246DxrXg3J2Ik
-Message-ID: <CACak8wNa-dbNMGO=4U=JpTqSYWdk9MC+DWZS3WxRwuRRvC1T7g@mail.gmail.com>
-Subject: Re: [PATCH 5/5] KVM: selftests: Test protection of the ucall MMIO region
-To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Cc: Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atish.patra@linux.dev>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alex@ghiti.fr>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel-mentees@lists.linux.dev, 
-	skhan@linuxfoundation.org, me@brighamcampbell.com, jkoolstra@xs4all.nl
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, vdonnefort@google.com, qperret@google.com, Sascha.Bischoff@arm.com, steven.price@arm.com, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-> +#define CLOBBERED_SLOT         TEST_MEM_SLOT_BASE
-Upon self-review, this should have been hardcoded to 1 (to clobber the
-reserved ucal mmio).
+On Mon, 12 Oct 2026 17:15:20 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> 
+> __vgic_v5_save_apr() and __vgic_v5_restore_vmcr_apr() remain callable
+> once pKVM has finalised. pKVM never registers a GICv5 vgic, so neither
+> has a valid caller in protected mode, and on a GICv3 machine both reach
+> a register that is UNDEFINED at EL2 and panic the hypervisor.
+> 
+> Move both into the band the dispatcher rejects once pKVM has finalised.
+> 
+> Fixes: af325e87af5da ("KVM: arm64: gic-v5: Add vgic-v5 save/restore hyp interface")
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_asm.h   | 4 ++--
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 4 ++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index e5b92ac09e69e..ea319c496bb26 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -62,6 +62,8 @@ enum __kvm_host_smccc_func {
+>  	__KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs,
+>  	__KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs,
+>  	__KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config,
+> +	__KVM_HOST_SMCCC_FUNC___vgic_v5_save_apr,
+> +	__KVM_HOST_SMCCC_FUNC___vgic_v5_restore_vmcr_apr,
+>  
+>  	MARKER(__KVM_HOST_SMCCC_FUNC_MIN_PKVM),
+>  
+> @@ -87,8 +89,6 @@ enum __kvm_host_smccc_func {
+>  	__KVM_HOST_SMCCC_FUNC___tracing_write_event,
+>  	__KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs,
+>  	__KVM_HOST_SMCCC_FUNC___vgic_v3_restore_vmcr_aprs,
+> -	__KVM_HOST_SMCCC_FUNC___vgic_v5_save_apr,
+> -	__KVM_HOST_SMCCC_FUNC___vgic_v5_restore_vmcr_apr,
+>  
+>  	MARKER(__KVM_HOST_SMCCC_FUNC_PKVM_ONLY),
+>  
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 9a3b92e626adb..7c939baf9c1ba 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -911,6 +911,8 @@ static const hcall_t host_hcall[] = {
+>  	HANDLE_FUNC(__kvm_enable_ssbs),
+>  	HANDLE_FUNC(__vgic_v3_init_lrs),
+>  	HANDLE_FUNC(__vgic_v3_get_gic_config),
+> +	HANDLE_FUNC(__vgic_v5_save_apr),
+> +	HANDLE_FUNC(__vgic_v5_restore_vmcr_apr),
+>  	HANDLE_FUNC(__pkvm_prot_finalize),
+>  
+>  	HANDLE_FUNC(__kvm_adjust_pc),
+> @@ -932,8 +934,6 @@ static const hcall_t host_hcall[] = {
+>  	HANDLE_FUNC(__tracing_write_event),
+>  	HANDLE_FUNC(__vgic_v3_save_aprs),
+>  	HANDLE_FUNC(__vgic_v3_restore_vmcr_aprs),
+> -	HANDLE_FUNC(__vgic_v5_save_apr),
+> -	HANDLE_FUNC(__vgic_v5_restore_vmcr_apr),
+>  
+>  	HANDLE_FUNC(__pkvm_host_share_hyp),
+>  	HANDLE_FUNC(__pkvm_host_unshare_hyp),
 
-> +       ret = __vm_set_user_memory_region2(vm, CLOBBERED_SLOT, 0,
-> +                                          vm->ucall_mmio_addr, slot_size, slot_mem, 0, 0);
-> +       TEST_ASSERT(ret == -1 && errno == EEXIST,
-> +                   "Expected the ucall GPA overlap to be rejected: ret=%d errno=%d",
-> +                   ret, errno);
-This should have been errno == EINVAL check to catch writing to the
-exiting read-only slot.
+In order to minimise the number of conflicts while merging this, I've
+dropped the last two hunks that only serve a cosmetic purpose. Same
+thing for the following patch.
 
-The earlier test accidentally passed because it used a different slot
-ID (=2, not reserved) and received EEXIST for overlapping the reserved
-ucall GPA. It therefore tested GPA overlap rejection, not the intended
-rejection of overwriting slot 1.
+Thanks,
 
-I will fix it in v2
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
