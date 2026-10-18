@@ -1,54 +1,53 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-18.mta1.migadu.com [95.215.58.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C009391E51;
-	Sat, 17 Oct 2026 16:52:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7B73CAE9B
+	for <kvmarm@lists.linux.dev>; Sun, 18 Oct 2026 08:09:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792255932; cv=none; b=qmAs4SXjfu+EKfgmWj9JFVNxM9UL+NDvljLtFpFrRKMO4r9Vx1xeh5ypzYgFVtNIuQMhliSG3O0lFV6Iau0mklPLKTLRjC/I8QSHt7mO0S7mRuCFcns2ZGvnH7uHUu14RPy0lkkXESZnHe4vMHtQoxSuFE1j0/msbNcGkDgnZzc=
+	t=1792310965; cv=none; b=p7+X8BRJkmc8Ov3RWo60aGRVkHCfXvcVjJa+fQ202O8Q+I4Bv+uFVrIQQFOrQQ9uMlN6b8oVF2mkcGfOSSZ/PWewfmnax73xdRgb+CeM7cQeI7mTmjKWS8SFuZBsJgvdImiwbZSIlHWmM8XB+oTyqDmygfN2tBUskRXQHCB3m0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792255932; c=relaxed/simple;
-	bh=pkkOISFZ8rjUmNCwDryve8EJC/gwnA2Zit4q34YKJ5Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZEQVfzPzypyXMxHVOrU/Cho4XIULKa0MXEEyMReq8ma4mXEccHYFfNt0Mo9vAIrT+qQz1aSZfbnNWheeYKfQrDHWDXsBJ2lyuyWPLsvAcE3J6n5cBgDqCvy6DZPOVwb76s9CaJSs853NrnNPwfWe2AuA4PGiuS56zGubqL772S8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XNhL7+Oj; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792310965; c=relaxed/simple;
+	bh=qNYqHsAHI3D2aPJmGx4BXdS7p6PSMN3a0jhnzLNwxsI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Shi/GY8oESjZJBXyCAHXd4H6A/FcRnvw2eSsKQs24VKPW4QbguolrYYnAQwrkTylYVSljd4LbvL25g4kUaXY/XjYQJn6xoQbDu9umjPVTeLEh7cVx5gX/FmEXkRFQM/38pS22LeMBWrLpr2g0Af/TpYn4FyrBvZZWXh3igP0L8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Wz7v8pKp; arc=none smtp.client-ip=95.215.58.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XNhL7+Oj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 527551F000C4;
-	Sat, 17 Oct 2026 16:52:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792255926;
-	bh=3vbcLPl9Ae1u6zg9Rk4ugkwF/dOBqR4NA2hwmpe9z3s=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=XNhL7+OjP7duuKUengT2ZtHzLbuqJA4edwW1Wsuw0Huot//DZVqbUeBbdA/sCGeEc
-	 Un3m8//Kel2+St8rtwJjI6X10WmS+tbiYYYjJ+3HTcoMVGDGcjlzhBvHP7IbL/S1Gx
-	 9VW320qUeI+Q/sgmrRBHeDRNYvQqYqNge4M1I9/C4vfD2bdCZjhPpqskoY6DDTSThW
-	 Il5+pAi3zJFblIW9RfwvlKgGvnowQtVRvFbdKW9chJzwv72i9cc6l3IpGo1jS1j3D7
-	 PnQsQFG7CsQvDlgi4Eub+8HC1db2HPgqnH3SfTEJkxHjYAvP+D/nYmM1taUEuS2wwm
-	 Nov3t9BtPRonA==
-From: Sasha Levin <sashal@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Wz7v8pKp"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=qNYqHsAHI3D2aPJmGx4BXdS7p6PSMN3a0jhnzLNwxsI=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1792310961; v=1; x=1792915761;
+ b=Wz7v8pKpEBk8280l784bBkmCcmwNp0OS1yhecXnhfm6LfojnpQux+qxHezKBt0P2uLG+QCJ9
+ XdfVPc327mUhnajsz+VOcWHHFolAQPVMkTSQa2s/bGNGdXYI2QH5R83iB3fBvMKyLXPIn3qB+qg
+ xaUJO7cUskQFjk9gfTjFgfR4=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 82dde8ee2cd03a9b;
+	Sun, 18 Oct 2026 08:09:21 +0000
+X-Mizu-Trace-ID: 82dde8ee2cd03a9b
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Joey Gouly <joey.gouly@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Mark Rutland <mark.rutland@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH] KVM: arm64: Take a protected vCPU's TWI and TWE only at vCPU load
-Date: Sat, 17 Oct 2026 12:52:04 -0400
-Message-ID: <20261017165204.3343275-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261014162126.964330-1-maz@kernel.org>
-References: <20261014162126.964330-1-maz@kernel.org>
+	Mark Brown <broonie@kernel.org>,
+	Lorenzo Stoakes <ljs@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] KVM: arm64: Only enable S1PIE and S1POE with the features they imply
+Date: Sun, 18 Oct 2026 09:09:20 +0100
+Message-Id: <20261018080921.3942517-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,99 +56,106 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit 06499de8f998 ("KVM: arm64: Skip fixed-feature state flush for
-protected vCPUs") moved the copy of the host's TWI and TWE in
-flush_hyp_vcpu() into the non-protected branch: a protected vCPU takes
-them in __pkvm_vcpu_load() instead, and only VSE comes from the host on
-each entry.
+The world switch skips PIR_EL1, PIRE0_EL1 and POR_EL1 for a guest
+without TCR2, but KVM doesn't trap them for a guest with S1PIE or
+S1POE. Userspace can hide TCR2 while leaving either visible, and such a
+guest then accesses registers that are neither trapped nor switched.
 
-Commit 04447b95c62b ("KVM: arm64: Use the host's HCR_EL2 for
-non-protected VMs in pKVM") was written against the old code, where
-both VM types took TWI, TWE and VSE on each entry, and kept that for a
-protected VM as PKVM_HCR_EL2_HOST_PVM. The merge of the two applies
-PKVM_HCR_EL2_HOST_PVM in the common path, so a protected vCPU takes TWI
-and TWE from the host's vCPU on every entry again.
+Under VHE, that leaks values between guests. POR_EL1, which the host
+kernel doesn't use, leaks between guests in every mode. On nVHE and
+hVHE, pKVM included, the host's own EL1 registers are saved and restored
+according to the running guest's features, so the host kernel resumes
+with its stage-1 permissions taken from the guest's PIR_EL1 and
+PIRE0_EL1.
 
-That doesn't change what a protected guest runs with today: once the
-vCPU is initialised, the host only changes TWI and TWE in
-vcpu_set_wfx_traps(), which pkvm_vcpu_load() calls right before
-__pkvm_vcpu_load(). But it undoes part of 06499de8f998, and has EL2
-read a protected vCPU's trap configuration from host memory on every
-entry, which nothing needs.
+As per the architecture, S1PIE and S1POE imply TCR2 and ATS1A, and
+S1POE also implies HPDS. Only enable each for a guest that has the
+features it implies. A guest that has S1PIE or S1POE without them still
+sees the feature in its ID registers, but its accesses to that
+feature's registers UNDEF.
 
-Make PKVM_HCR_EL2_HOST_PVM VSE alone and add TWI and TWE to
-PKVM_HCR_EL2_HOST_NPVM, so that each mask again lists what EL2 takes
-from the host on each entry for its VM type. A non-protected VM takes
-the same bits as before. Say in the comments that a protected vCPU's
-TWI and TWE come at vCPU load.
-
-llminus, an LLM-assisted merge conflict resolution tool, found the
-difference while resolving the same conflict in an integration tree.
-
-Fixes: 439d8f9cb01c ("Merge tag 'kvmarm-7.4' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD")
-Assisted-by: LLM
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Fixes: 70ed7238297fb ("KVM: arm64: Sanitise ID_AA64MMFR3_EL1")
+Fixes: d4a89e5aee23e ("KVM: arm64: Expose S1PIE to guests")
+Reported-by: Mark Brown <broonie@kernel.org>
+Link: https://lore.kernel.org/r/20260930-arm64-gcs-v21-2-3556644cd927@kernel.org
+Suggested-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/86fqyn2che.wl-maz@kernel.org
+Cc: stable@vger.kernel.org
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
-With KVM's own host code this changes nothing a guest can observe: the
-per-entry copy writes back the TWI/TWE value __pkvm_vcpu_load() already
-set. It restores the split 06499de8f998 made.
+Changes in v2:
+- Also require FEAT_HPDS for S1POE (Marc)
+- Link to v1: https://lore.kernel.org/r/20261015153041.3770032-1-fuad.tabba@linux.dev
 
-Marc's resolution in kvmarm/fixes, aca73c1d23f1 ("Merge branch
-kvmarm-7.4 into kvmarm-master/fixes"), is the same as the one in
-kvm/next, so this applies to both.
+Based on Linux 7.3-rc3 (fd73f4a665989).
 
-Build-tested only: arm64 defconfig with gcc and clang, W=1, no new
-warnings. The only code generation change is the protected vCPU's
-per-entry mask, 0x6100 to 0x100. Not runtime-tested, as the in-tree
-selftests can't create protected VMs.
+ arch/arm64/kvm/config.c | 28 ++++++++++++++++++++++++----
+ 1 file changed, 24 insertions(+), 4 deletions(-)
 
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h | 13 +++++++------
- arch/arm64/kvm/hyp/nvhe/pkvm.c         |  5 ++++-
- 2 files changed, 11 insertions(+), 7 deletions(-)
-
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index 4373e9b63e87f..0261b2bc681f7 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -14,13 +14,14 @@
- #include <nvhe/spinlock.h>
+diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+index 1053676551aff..6d2650427c5fc 100644
+--- a/arch/arm64/kvm/config.c
++++ b/arch/arm64/kvm/config.c
+@@ -205,6 +205,7 @@ struct reg_feat_map_desc {
+ #define FEAT_MEC		ID_AA64MMFR3_EL1, MEC, IMP
+ #define FEAT_HAFT		ID_AA64MMFR1_EL1, HAFDBS, HAFT
+ #define FEAT_HDBSS		ID_AA64MMFR1_EL1, HAFDBS, HDBSS
++#define FEAT_HPDS		ID_AA64MMFR1_EL1, HPDS, IMP
+ #define FEAT_HPDS2		ID_AA64MMFR1_EL1, HPDS, HPDS2
+ #define FEAT_BTI		ID_AA64PFR1_EL1, BT, IMP
+ #define FEAT_ExS		ID_AA64MMFR0_EL1, EXS, IMP
+@@ -280,6 +281,25 @@ static bool feat_anerr(struct kvm *kvm)
+ 		kvm_has_feat(kvm, ID_AA64MMFR3_EL1, SNERR, FEAT_ANERR));
+ }
  
- /*
-- * HCR_EL2 bits EL2 takes from the host on each entry, per VM type. The rest
-- * are EL2's own and nothing the host sets there reaches the guest.
-+ * HCR_EL2 bits EL2 takes from the host on each entry, per VM type. A protected
-+ * VM also takes TWI and TWE, at vCPU load. The rest are EL2's own and nothing
-+ * the host sets there reaches the guest.
-  */
--#define PKVM_HCR_EL2_HOST_PVM	(HCR_EL2_TWI | HCR_EL2_TWE | HCR_EL2_VSE)
--#define PKVM_HCR_EL2_HOST_NPVM	(PKVM_HCR_EL2_HOST_PVM | HCR_EL2_VI | HCR_EL2_VF |	\
--				 HCR_EL2_TVM | HCR_EL2_TID2 | HCR_EL2_TID4 |		\
--				 HCR_EL2_TID5 | HCR_EL2_TTLBOS)
-+#define PKVM_HCR_EL2_HOST_PVM	HCR_EL2_VSE
-+#define PKVM_HCR_EL2_HOST_NPVM	(PKVM_HCR_EL2_HOST_PVM | HCR_EL2_TWI | HCR_EL2_TWE |	\
-+				 HCR_EL2_VI | HCR_EL2_VF | HCR_EL2_TVM | HCR_EL2_TID2 |	\
-+				 HCR_EL2_TID4 | HCR_EL2_TID5 | HCR_EL2_TTLBOS)
- 
- /*
-  * Holds the relevant data for maintaining the vcpu state completely at hyp.
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 237483d2442a5..fc0475f0877d1 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -38,7 +38,10 @@ unsigned int kvm_host_sve_max_vl;
-  */
- static DEFINE_PER_CPU(struct pkvm_hyp_vcpu *, loaded_hyp_vcpu);
- 
--/* The PKVM_HCR_EL2_HOST_{PVM,NPVM} bits of this value come from the host on each entry. */
 +/*
-+ * The PKVM_HCR_EL2_HOST_{PVM,NPVM} bits of this value come from the host on
-+ * each entry, and a protected vCPU's TWI and TWE at vCPU load.
++ * S1PIE and S1POE imply TCR2 and ATS1A, and S1POE also implies HPDS, but
++ * userspace can set them independently.
 + */
- static void pkvm_vcpu_reset_hcr(struct kvm_vcpu *vcpu)
++static bool feat_s1pie(struct kvm *kvm)
++{
++	return (kvm_has_feat(kvm, FEAT_S1PIE) &&
++		kvm_has_feat(kvm, FEAT_TCR2) &&
++		kvm_has_feat(kvm, FEAT_ATS1A));
++}
++
++static bool feat_s1poe(struct kvm *kvm)
++{
++	return (kvm_has_feat(kvm, FEAT_S1POE) &&
++		kvm_has_feat(kvm, FEAT_TCR2) &&
++		kvm_has_feat(kvm, FEAT_ATS1A) &&
++		kvm_has_feat(kvm, FEAT_HPDS));
++}
++
+ static bool feat_sme_smps(struct kvm *kvm)
  {
- 	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
-
-base-commit: 2ea3a929fe01ec5ae7313a94badaf9b70a8c69b1
+ 	/*
+@@ -393,10 +413,10 @@ static const struct reg_bits_to_feat_map hfgrtr_feat_map[] = {
+ 	NEEDS_FEAT(HFGRTR_EL2_nS2POR_EL1, FEAT_S2POE),
+ 	NEEDS_FEAT(HFGRTR_EL2_nPOR_EL1		|
+ 		   HFGRTR_EL2_nPOR_EL0,
+-		   FEAT_S1POE),
++		   feat_s1poe),
+ 	NEEDS_FEAT(HFGRTR_EL2_nPIR_EL1		|
+ 		   HFGRTR_EL2_nPIRE0_EL1,
+-		   FEAT_S1PIE),
++		   feat_s1pie),
+ 	NEEDS_FEAT(HFGRTR_EL2_nRCWMASK_EL1, FEAT_THE),
+ 	NEEDS_FEAT(HFGRTR_EL2_nTPIDR2_EL0	|
+ 		   HFGRTR_EL2_nSMPRI_EL1,
+@@ -474,10 +494,10 @@ static const struct reg_bits_to_feat_map hfgwtr_feat_map[] = {
+ 	NEEDS_FEAT(HFGWTR_EL2_nS2POR_EL1, FEAT_S2POE),
+ 	NEEDS_FEAT(HFGWTR_EL2_nPOR_EL1		|
+ 		   HFGWTR_EL2_nPOR_EL0,
+-		   FEAT_S1POE),
++		   feat_s1poe),
+ 	NEEDS_FEAT(HFGWTR_EL2_nPIR_EL1		|
+ 		   HFGWTR_EL2_nPIRE0_EL1,
+-		   FEAT_S1PIE),
++		   feat_s1pie),
+ 	NEEDS_FEAT(HFGWTR_EL2_nRCWMASK_EL1, FEAT_THE),
+ 	NEEDS_FEAT(HFGWTR_EL2_nTPIDR2_EL0	|
+ 		   HFGWTR_EL2_nSMPRI_EL1,
 -- 
-2.53.0
+2.39.5
 
