@@ -1,161 +1,210 @@
-Received: from mta1.migadu.com (out-18.mta1.migadu.com [95.215.58.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7B73CAE9B
-	for <kvmarm@lists.linux.dev>; Sun, 18 Oct 2026 08:09:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1987633E345
+	for <kvmarm@lists.linux.dev>; Sun, 18 Oct 2026 08:29:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792310965; cv=none; b=p7+X8BRJkmc8Ov3RWo60aGRVkHCfXvcVjJa+fQ202O8Q+I4Bv+uFVrIQQFOrQQ9uMlN6b8oVF2mkcGfOSSZ/PWewfmnax73xdRgb+CeM7cQeI7mTmjKWS8SFuZBsJgvdImiwbZSIlHWmM8XB+oTyqDmygfN2tBUskRXQHCB3m0w=
+	t=1792312164; cv=none; b=ERJElsdxrCRWlYFLcWKiplmqLcP734oDq0jeyNRqETLp1ZVlzRx1YvWhQpDf6Gxrr4tf3z4pV4+8ofJp9p+r6P/BGk131ZYRTmAAkZgvWXIuXxw8+ox2EuZP5DoW3+yIxZA68EJrbjEccEN/0MYfUW5diW2HldHE5HaRdkDd4GY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792310965; c=relaxed/simple;
-	bh=qNYqHsAHI3D2aPJmGx4BXdS7p6PSMN3a0jhnzLNwxsI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Shi/GY8oESjZJBXyCAHXd4H6A/FcRnvw2eSsKQs24VKPW4QbguolrYYnAQwrkTylYVSljd4LbvL25g4kUaXY/XjYQJn6xoQbDu9umjPVTeLEh7cVx5gX/FmEXkRFQM/38pS22LeMBWrLpr2g0Af/TpYn4FyrBvZZWXh3igP0L8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Wz7v8pKp; arc=none smtp.client-ip=95.215.58.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1792312164; c=relaxed/simple;
+	bh=6UvPHw9tynirR1x0a57YAlFhbsjhXTROvoGJiSxDXTI=;
+	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
+	 Date; b=cYipWydghobz6fKTu3Pmw3ZaK1sUXkRG3wmDEudFNiJdw4jP/zAEWzb44Zj97njSBmhTTVO8DzG3l+wMwWWfIxo+Qro84uGI+NpWYuMI2jBDD4f8YZMYPVdKj46rI/RyAL4RapqfstXVfS5Fc1pDPD8mYHV3czgGbnjfVmwxQ+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EDRieEvJ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Wz7v8pKp"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=qNYqHsAHI3D2aPJmGx4BXdS7p6PSMN3a0jhnzLNwxsI=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792310961; v=1; x=1792915761;
- b=Wz7v8pKpEBk8280l784bBkmCcmwNp0OS1yhecXnhfm6LfojnpQux+qxHezKBt0P2uLG+QCJ9
- XdfVPc327mUhnajsz+VOcWHHFolAQPVMkTSQa2s/bGNGdXYI2QH5R83iB3fBvMKyLXPIn3qB+qg
- xaUJO7cUskQFjk9gfTjFgfR4=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 82dde8ee2cd03a9b;
-	Sun, 18 Oct 2026 08:09:21 +0000
-X-Mizu-Trace-ID: 82dde8ee2cd03a9b
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] KVM: arm64: Only enable S1PIE and S1POE with the features they imply
-Date: Sun, 18 Oct 2026 09:09:20 +0100
-Message-Id: <20261018080921.3942517-1-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.39.5
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EDRieEvJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A09BB1F000C4;
+	Sun, 18 Oct 2026 08:29:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792312162;
+	bh=xt4ZUfOHNAt7AHDXqlWb+Bg3PDSf+xhzRzMS04jzzcA=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=EDRieEvJhiXkt9mcAZNgFjkK7qP5o/NPwp04jFq1aKDUf3D3aEdSbzPafj6+jQfo/
+	 k6zYXb9f6EWJKE0NdfjoG5fASfMs9nO+bwXbuTueSS62CUBCqPLx3y0vWDpQLeAmMS
+	 TYbkhPJ/Zg61qQyFhV28l4GQ7sX+Tm3fWr56aWDEIO9wmEBNW1WOen2aX+6HHeLfui
+	 fG1CURTCIfxwkRu4on7+kfh+r2pzCRAunKGB/ru4oesyK8YlYsFsr3t6/GM0Ed+SGs
+	 ja6+e7Rt9WYm6n0KT0QVndjJnvzX6qEP8QjUjSSzpPBKyDORX7A1n/+Fuw+5PHkilQ
+	 /mQCl9tgILS/w==
+Message-ID: <sashiko-outbox-176009@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2] KVM: arm64: Only enable S1PIE and S1POE with the
+ features they imply
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Fuad Tabba" <fuad.tabba@linux.dev>, kvmarm@lists.linux.dev
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
+In-Reply-To: <20261018080921.3942517-1-fuad.tabba@linux.dev>
+References: <20261018080921.3942517-1-fuad.tabba@linux.dev>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 18 Oct 2026 08:29:22 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-The world switch skips PIR_EL1, PIRE0_EL1 and POR_EL1 for a guest
-without TCR2, but KVM doesn't trap them for a guest with S1PIE or
-S1POE. Userspace can hide TCR2 while leaving either visible, and such a
-guest then accesses registers that are neither trapped nor switched.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [High] KVM: arm64: incomplete S1PIE/S1POE implied-feature checks in kvm_h=
+as_s1p*()
+--
 
-Under VHE, that leaks values between guests. POR_EL1, which the host
-kernel doesn't use, leaks between guests in every mode. On nVHE and
-hVHE, pKVM included, the host's own EL1 registers are saved and restored
-according to the running guest's features, so the host kernel resumes
-with its stage-1 permissions taken from the guest's PIR_EL1 and
-PIRE0_EL1.
+commit 1d4d0fe97a6aa6ec7a4e6a93ff7c048e9f3bf806
+Author: Fuad Tabba <fuad.tabba@linux.dev>
 
-As per the architecture, S1PIE and S1POE imply TCR2 and ATS1A, and
-S1POE also implies HPDS. Only enable each for a guest that has the
-features it implies. A guest that has S1PIE or S1POE without them still
-sees the feature in its ID registers, but its accesses to that
-feature's registers UNDEF.
+KVM: arm64: Only enable S1PIE and S1POE with the features they imply
 
-Fixes: 70ed7238297fb ("KVM: arm64: Sanitise ID_AA64MMFR3_EL1")
-Fixes: d4a89e5aee23e ("KVM: arm64: Expose S1PIE to guests")
-Reported-by: Mark Brown <broonie@kernel.org>
-Link: https://lore.kernel.org/r/20260930-arm64-gcs-v21-2-3556644cd927@kernel.org
-Suggested-by: Marc Zyngier <maz@kernel.org>
+This commit restricts the fine-grained trap enablement of S1PIE and S1POE
+registers in hfgrtr_feat_map and hfgwtr_feat_map to guests that also have
+the architecturally implied features (TCR2 and ATS1A, plus HPDS for S1POE).
+
+Link: https://lore.kernel.org/r/20260930-arm64-gcs-v21-2-3556644cd927@kerne=
+l.org
 Link: https://lore.kernel.org/r/86fqyn2che.wl-maz@kernel.org
-Cc: stable@vger.kernel.org
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
-Changes in v2:
-- Also require FEAT_HPDS for S1POE (Marc)
-- Link to v1: https://lore.kernel.org/r/20261015153041.3770032-1-fuad.tabba@linux.dev
 
-Based on Linux 7.3-rc3 (fd73f4a665989).
+> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> index e93919cadf860..5cb2b759b68d6 100644
+> --- a/arch/arm64/kvm/config.c
+> +++ b/arch/arm64/kvm/config.c
+> @@ -205,6 +205,7 @@ struct reg_feat_map_desc {
+>  #define FEAT_MEC		ID_AA64MMFR3_EL1, MEC, IMP
+>  #define FEAT_HAFT		ID_AA64MMFR1_EL1, HAFDBS, HAFT
+>  #define FEAT_HDBSS		ID_AA64MMFR1_EL1, HAFDBS, HDBSS
+> +#define FEAT_HPDS		ID_AA64MMFR1_EL1, HPDS, IMP
+>  #define FEAT_HPDS2		ID_AA64MMFR1_EL1, HPDS, HPDS2
+>  #define FEAT_BTI		ID_AA64PFR1_EL1, BT, IMP
+>  #define FEAT_ExS		ID_AA64MMFR0_EL1, EXS, IMP
+> @@ -280,6 +281,25 @@ static bool feat_anerr(struct kvm *kvm)
+>  		kvm_has_feat(kvm, ID_AA64MMFR3_EL1, SNERR, FEAT_ANERR));
+>  }
+> =20
+> +/*
+> + * S1PIE and S1POE imply TCR2 and ATS1A, and S1POE also implies HPDS, but
+> + * userspace can set them independently.
+> + */
+> +static bool feat_s1pie(struct kvm *kvm)
+> +{
+> +	return (kvm_has_feat(kvm, FEAT_S1PIE) &&
+> +		kvm_has_feat(kvm, FEAT_TCR2) &&
+> +		kvm_has_feat(kvm, FEAT_ATS1A));
+> +}
+> +
+> +static bool feat_s1poe(struct kvm *kvm)
+> +{
+> +	return (kvm_has_feat(kvm, FEAT_S1POE) &&
+> +		kvm_has_feat(kvm, FEAT_TCR2) &&
+> +		kvm_has_feat(kvm, FEAT_ATS1A) &&
+> +		kvm_has_feat(kvm, FEAT_HPDS));
+> +}
+> +
 
- arch/arm64/kvm/config.c | 28 ++++++++++++++++++++++++----
- 1 file changed, 24 insertions(+), 4 deletions(-)
+[Severity: High]
+Should these implied-feature checks also be folded into kvm_has_s1pie() and
+kvm_has_s1poe() in arch/arm64/include/asm/kvm_host.h, as well as the other
+S1PIE and S1POE checks in KVM?
 
-diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index 1053676551aff..6d2650427c5fc 100644
---- a/arch/arm64/kvm/config.c
-+++ b/arch/arm64/kvm/config.c
-@@ -205,6 +205,7 @@ struct reg_feat_map_desc {
- #define FEAT_MEC		ID_AA64MMFR3_EL1, MEC, IMP
- #define FEAT_HAFT		ID_AA64MMFR1_EL1, HAFDBS, HAFT
- #define FEAT_HDBSS		ID_AA64MMFR1_EL1, HAFDBS, HDBSS
-+#define FEAT_HPDS		ID_AA64MMFR1_EL1, HPDS, IMP
- #define FEAT_HPDS2		ID_AA64MMFR1_EL1, HPDS, HPDS2
- #define FEAT_BTI		ID_AA64PFR1_EL1, BT, IMP
- #define FEAT_ExS		ID_AA64MMFR0_EL1, EXS, IMP
-@@ -280,6 +281,25 @@ static bool feat_anerr(struct kvm *kvm)
- 		kvm_has_feat(kvm, ID_AA64MMFR3_EL1, SNERR, FEAT_ANERR));
- }
- 
-+/*
-+ * S1PIE and S1POE imply TCR2 and ATS1A, and S1POE also implies HPDS, but
-+ * userspace can set them independently.
-+ */
-+static bool feat_s1pie(struct kvm *kvm)
-+{
-+	return (kvm_has_feat(kvm, FEAT_S1PIE) &&
-+		kvm_has_feat(kvm, FEAT_TCR2) &&
-+		kvm_has_feat(kvm, FEAT_ATS1A));
-+}
-+
-+static bool feat_s1poe(struct kvm *kvm)
-+{
-+	return (kvm_has_feat(kvm, FEAT_S1POE) &&
-+		kvm_has_feat(kvm, FEAT_TCR2) &&
-+		kvm_has_feat(kvm, FEAT_ATS1A) &&
-+		kvm_has_feat(kvm, FEAT_HPDS));
-+}
-+
- static bool feat_sme_smps(struct kvm *kvm)
- {
- 	/*
-@@ -393,10 +413,10 @@ static const struct reg_bits_to_feat_map hfgrtr_feat_map[] = {
- 	NEEDS_FEAT(HFGRTR_EL2_nS2POR_EL1, FEAT_S2POE),
- 	NEEDS_FEAT(HFGRTR_EL2_nPOR_EL1		|
- 		   HFGRTR_EL2_nPOR_EL0,
--		   FEAT_S1POE),
-+		   feat_s1poe),
- 	NEEDS_FEAT(HFGRTR_EL2_nPIR_EL1		|
- 		   HFGRTR_EL2_nPIRE0_EL1,
--		   FEAT_S1PIE),
-+		   feat_s1pie),
- 	NEEDS_FEAT(HFGRTR_EL2_nRCWMASK_EL1, FEAT_THE),
- 	NEEDS_FEAT(HFGRTR_EL2_nTPIDR2_EL0	|
- 		   HFGRTR_EL2_nSMPRI_EL1,
-@@ -474,10 +494,10 @@ static const struct reg_bits_to_feat_map hfgwtr_feat_map[] = {
- 	NEEDS_FEAT(HFGWTR_EL2_nS2POR_EL1, FEAT_S2POE),
- 	NEEDS_FEAT(HFGWTR_EL2_nPOR_EL1		|
- 		   HFGWTR_EL2_nPOR_EL0,
--		   FEAT_S1POE),
-+		   feat_s1poe),
- 	NEEDS_FEAT(HFGWTR_EL2_nPIR_EL1		|
- 		   HFGWTR_EL2_nPIRE0_EL1,
--		   FEAT_S1PIE),
-+		   feat_s1pie),
- 	NEEDS_FEAT(HFGWTR_EL2_nRCWMASK_EL1, FEAT_THE),
- 	NEEDS_FEAT(HFGWTR_EL2_nTPIDR2_EL0	|
- 		   HFGWTR_EL2_nSMPRI_EL1,
--- 
-2.39.5
+Right now, feat_s1pie() and feat_s1poe() are only wired into
+hfgrtr_feat_map[] and hfgwtr_feat_map[], which populate
+kvm->arch.fgu[HFGRTR_GROUP] for the EL1/EL0 registers, while
+kvm_has_s1pie() and kvm_has_s1poe() still only check ID_AA64MMFR3_EL1:
 
+arch/arm64/include/asm/kvm_host.h:
+    #define kvm_has_s1pie(k)				\
+    	(kvm_has_feat((k), ID_AA64MMFR3_EL1, S1PIE, IMP))
+
+    #define kvm_has_s1poe(k)				\
+    	(system_supports_poe() &&			\
+    	 kvm_has_feat((k), ID_AA64MMFR3_EL1, S1POE, IMP))
+
+In a nested virtualization guest running at vEL2 when TCR2 is hidden,
+accesses to PIR_EL2, PIRE0_EL2, and POR_EL2 trap via HCR_EL2.NV rather than
+fine-grained traps. Because encoding_to_fgt[] in triage_sysreg_trap() only
+maps the EL1/EL0 encodings, kvm_handle_sys_reg() -> perform_access() falls
+back to sysreg_hidden() -> s1pie_el2_visibility() / s1poe_el2_visibility():
+
+arch/arm64/kvm/sys_regs.c:
+    static unsigned int s1poe_visibility(const struct kvm_vcpu *vcpu,
+    				     const struct sys_reg_desc *rd)
+    {
+    	if (kvm_has_s1poe(vcpu->kvm))
+    		return 0;
+
+    	return REG_HIDDEN;
+    }
+
+Because kvm_has_s1pie() and kvm_has_s1poe() return true even when TCR2 is
+hidden, perform_access() does not inject an UNDEF. Instead, on VHE,
+access_rw() -> vcpu_read_sys_reg() / vcpu_write_sys_reg() ->
+locate_register() maps PIR_EL2, PIRE0_EL2, and POR_EL2 to the hardware
+SYS_PIR_EL12, SYS_PIRE0_EL12, and SYS_POR_EL12 registers. However,
+__sysreg_save_vel2_state() and __sysreg_restore_vel2_state() in
+arch/arm64/kvm/hyp/vhe/sysreg-sr.c skip saving and restoring them when
+!ctxt_has_tcrx():
+
+    if (ctxt_has_tcrx(&vcpu->arch.ctxt)) {
+    	__vcpu_assign_sys_reg(vcpu, TCR2_EL2, read_sysreg_el1(SYS_TCR2));
+
+    	if (ctxt_has_s1pie(&vcpu->arch.ctxt)) {
+    		__vcpu_assign_sys_reg(vcpu, PIRE0_EL2, read_sysreg_el1(SYS_PIRE0));
+    		__vcpu_assign_sys_reg(vcpu, PIR_EL2, read_sysreg_el1(SYS_PIR));
+    	}
+
+    	if (ctxt_has_s1poe(&vcpu->arch.ctxt))
+    		__vcpu_assign_sys_reg(vcpu, POR_EL2, read_sysreg_el1(SYS_POR));
+    }
+
+Won't a nested guest with S1PIE or S1POE and without TCR2 still leak and
+corrupt the physical PIR_EL1, PIRE0_EL1, and POR_EL1 registers across
+guests on VHE via PIR_EL2, PIRE0_EL2, and POR_EL2?
+
+Similarly, if userspace enables TCR2 alongside S1PIE or S1POE while hiding
+ATS1A or HPDS, leaving kvm_has_s1pie() and kvm_has_s1poe() unchanged means:
+
+- s1pie_visibility() and s1poe_visibility() keep the registers visible to
+  userspace and vEL2, and ctxt_has_s1pie() / ctxt_has_s1poe() still context
+  switch them.
+- s1pie_enabled() and compute_s1poe() in arch/arm64/kvm/at.c still treat
+  S1PIE and S1POE as enabled during software AT walks.
+- tcr2_el2_feat_map[] in arch/arm64/kvm/config.c still uses FEAT_S1POE and
+  FEAT_S1PIE for TCR2_EL2_POE | TCR2_EL2_E0POE and TCR2_EL2_PIE instead of
+  feat_s1poe and feat_s1pie.
+- __activate_cptr_traps_vhe() in arch/arm64/kvm/hyp/include/hyp/switch.h
+  still checks raw kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1POE, IMP)
+  when propagating CPACR_EL1_E0POE.
+
+>  static bool feat_sme_smps(struct kvm *kvm)
+>  {
+>  	/*
+> @@ -393,10 +413,10 @@ static const struct reg_bits_to_feat_map hfgrtr_fea=
+t_map[] =3D {
+>  	NEEDS_FEAT(HFGRTR_EL2_nS2POR_EL1, FEAT_S2POE),
+>  	NEEDS_FEAT(HFGRTR_EL2_nPOR_EL1		|
+>  		   HFGRTR_EL2_nPOR_EL0,
+> -		   FEAT_S1POE),
+> +		   feat_s1poe),
+>  	NEEDS_FEAT(HFGRTR_EL2_nPIR_EL1		|
+>  		   HFGRTR_EL2_nPIRE0_EL1,
+> -		   FEAT_S1PIE),
+> +		   feat_s1pie),
+>  	NEEDS_FEAT(HFGRTR_EL2_nRCWMASK_EL1, FEAT_THE),
+>  	NEEDS_FEAT(HFGRTR_EL2_nTPIDR2_EL0	|
+>  		   HFGRTR_EL2_nSMPRI_EL1,
+> @@ -474,10 +494,10 @@ static const struct reg_bits_to_feat_map hfgwtr_fea=
+t_map[] =3D {
+>  	NEEDS_FEAT(HFGWTR_EL2_nS2POR_EL1, FEAT_S2POE),
+>  	NEEDS_FEAT(HFGWTR_EL2_nPOR_EL1		|
+>  		   HFGWTR_EL2_nPOR_EL0,
+> -		   FEAT_S1POE),
+> +		   feat_s1poe),
+>  	NEEDS_FEAT(HFGWTR_EL2_nPIR_EL1		|
+>  		   HFGWTR_EL2_nPIRE0_EL1,
+> -		   FEAT_S1PIE),
+> +		   feat_s1pie),
+>  	NEEDS_FEAT(HFGWTR_EL2_nRCWMASK_EL1, FEAT_THE),
+>  	NEEDS_FEAT(HFGWTR_EL2_nTPIDR2_EL0	|
+>  		   HFGWTR_EL2_nSMPRI_EL1,
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261018080921.3942=
+517-1-fuad.tabba@linux.dev?part=3D1
