@@ -1,84 +1,263 @@
-Received: from mta1.migadu.com (out-197.mta1.migadu.com [95.215.58.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA18363C6F
-	for <kvmarm@lists.linux.dev>; Sun, 18 Oct 2026 15:30:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1DA93D88F2;
+	Sun, 18 Oct 2026 17:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792337446; cv=none; b=Iiek+s1CUZ3OdmvIZmtNeGBFeXX2yc9UAR5Dkf6DQp9IZ1QOsd/YxzWHK3fkkGJO48a3SBb7BokgKhK3vtAXCVDO1I+BlsUEtJojqHBBv30EEs4z3XoRg/gvXW6QLWyIHAo7z4ymA3CUbpjD6/OC9ITEdiu7oaxpJwQ38VqEOOc=
+	t=1792345062; cv=none; b=ApamvD/Gfx4fmv6sWO8d6w4S29EUreK2xjxtC0doj06yzdr+OnWDAvitGmjf7r7AWGGZhVMLyPxJa2ymrUY8x0dwwMRfqIaToCNcgpLG2GefMuNIGtjXWCb0LMD44jaUkTqXJYvy4Ze8hVtaRdUJY7uGFyZbDZquti7Ta1WmoKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792337446; c=relaxed/simple;
-	bh=/JipYdo2bB1OfUJDoroTZjZ485KsuI12cRAd7OrDUZ0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Hyappgi705OGcsMKAy3FUdx2EvozgdmjURZSEEZN6L4tEi89Qj40uJW6zBUdjb1ioztHfvz3+cOUys2jEKtM4GNGT5uwiYV6rUxxIsypMx+7T4Vkejvyyfazoz1eS6wZwrew2XeRXBsLOUjm6ie5dUjabBpkR0vDHKv/eINOgn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U8eM9eGh; arc=none smtp.client-ip=95.215.58.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1792345062; c=relaxed/simple;
+	bh=W6/xJUXiJRjxHLldaoyS1k8sSLJ4eH6UuMP3wvFGgME=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=M7j8dYY2pQHStjhHFuEtH+C2FCz1MOJ/OmRPDqiFWL6vLSGRkxfjFMCWSSqedG79F60H+5CXshZ4WnfECBohRF35TUqjFDrtC+cSnsxCCYLOvDb9rEnN8ZYNi6PEYC0MN/7ZosasKUZ+1/hsyDx/zrijJPtYBvcm5A7op9KlOEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KQbQQkNg; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U8eM9eGh"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=/JipYdo2bB1OfUJDoroTZjZ485KsuI12cRAd7OrDUZ0=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792337441; v=1; x=1792942241;
- b=U8eM9eGhc2RfnOjNhpnMbs4gg2+nDzQG8clNYNBVE5sFmmxA/1Pmhl0rqcuoK9aKHzmVwkwO
- EhRfRm+8WojJcaZKV2urh9GjVpApNahgU4swYLOP7qRMIFE8EYS9lWgIswNjs0+dOXn5HFIkW86
- fPY3UYSbRLvtpPT86JbVThIc=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id d18b9db8650f1ce6;
-	Sun, 18 Oct 2026 15:30:41 +0000
-X-Mizu-Trace-ID: d18b9db8650f1ce6
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5be4a7b9e6fso4825e87.1
-        for <kvmarm@lists.linux.dev>; Sun, 18 Oct 2026 08:30:40 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvByYZnN0uuubIuXFz0lqvxPnCjxfqxAB1sLfElN583LwORQOE447jbtYKJe8Z3Y++D8gCC6XCKA=@lists.linux.dev
-X-Gm-Message-State: AFq9FYKH/0vL1rmYIW2BP/Odjj/4udB1h3HhBPhZEOj8WHon7IpGshQ8
-	LlZernLZrl0p9p+pTWC7iil8U/B25c471VxwoznZde/T5oJ4tZTF5DiqUAFrnSpCCNWlJ57H/LW
-	4BfcgNB5JW9X8xTEROSCgHDal3MZgorgPGoNR5Mr6
-X-Received: by 2002:a05:6512:4026:b0:5be:5605:3606 with SMTP id
- 2adb3069b0e04-5be560540ecmr42233e87.8.1792337439769; Sun, 18 Oct 2026
- 08:30:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KQbQQkNg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B4C51F000C5;
+	Sun, 18 Oct 2026 17:37:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792345060;
+	bh=MXN0uxdpPF8mfxNUdX5WRrP0OYPFZhAl37bZ+oP5xko=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=KQbQQkNgV907agrD+gqyyskJfcCpa/zjXM9SgGFpIqVzrXhqV241AUsRGQkY3n1z+
+	 Qh/zz8x8j3U9oa6cIx5xtCXd1g+8Cz3qyWj/ztvHAD0pQ114+KspAghpwX20wWFYGm
+	 W9jzAFQW1g9UHCAgCbiaUVBt06NqZZkbZAGHvNrL5TlPcUZLuahyONyZxLJc4Ez8Rx
+	 knoHuXsDEXMKqkUjr1h71OT9gVy1h4DJv6cu9axfiG/YguadLCOwMYQzJ8H5KX5Qy2
+	 o8VChqcPEC38NWH/H64Lym0ef9qQTzRMr6/FaXdehLSApWQAWbLpTn6jrqtOtLJEJ3
+	 g1wAk7t2mc7kQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xIUpG-00000004Npl-1655;
+	Sun, 18 Oct 2026 17:37:38 +0000
+Date: Sun, 18 Oct 2026 18:37:37 +0100
+Message-ID: <8633u229lq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	Lorenzo Stoakes <ljs@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: arm64: Only enable S1PIE and S1POE with the features they imply
+In-Reply-To: <20261018080921.3942517-1-fuad.tabba@linux.dev>
+References: <20261018080921.3942517-1-fuad.tabba@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20261014162126.964330-1-maz@kernel.org> <20261017165204.3343275-1-sashal@kernel.org>
-In-Reply-To: <20261017165204.3343275-1-sashal@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Sun, 18 Oct 2026 16:30:03 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTzNJ_Cmzthn04bzHdu2+1cDmwqRsnK1uWQ1XBmxJdt04g@mail.gmail.com>
-X-Gm-Features: AclHuK-MBUMuIZ1CdPDTxZws0S-OBMvb5spNuDbDe5Ykb1uD70nnFSK1DYZMkr0
-Message-ID: <CA+EHjTzNJ_Cmzthn04bzHdu2+1cDmwqRsnK1uWQ1XBmxJdt04g@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Take a protected vCPU's TWI and TWE only at
- vCPU load
-To: Sasha Levin <sashal@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Vincent Donnefort <vdonnefort@google.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, broonie@kernel.org, ljs@kernel.org, tabba@google.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thanks for fixing this Sasha.
+On Sun, 18 Oct 2026 09:09:20 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
+>=20
+> The world switch skips PIR_EL1, PIRE0_EL1 and POR_EL1 for a guest
+> without TCR2, but KVM doesn't trap them for a guest with S1PIE or
+> S1POE. Userspace can hide TCR2 while leaving either visible, and such a
+> guest then accesses registers that are neither trapped nor switched.
+>=20
+> Under VHE, that leaks values between guests. POR_EL1, which the host
+> kernel doesn't use, leaks between guests in every mode. On nVHE and
+> hVHE, pKVM included, the host's own EL1 registers are saved and restored
+> according to the running guest's features, so the host kernel resumes
+> with its stage-1 permissions taken from the guest's PIR_EL1 and
+> PIRE0_EL1.
+>=20
+> As per the architecture, S1PIE and S1POE imply TCR2 and ATS1A, and
+> S1POE also implies HPDS. Only enable each for a guest that has the
+> features it implies. A guest that has S1PIE or S1POE without them still
+> sees the feature in its ID registers, but its accesses to that
+> feature's registers UNDEF.
+>=20
+> Fixes: 70ed7238297fb ("KVM: arm64: Sanitise ID_AA64MMFR3_EL1")
+> Fixes: d4a89e5aee23e ("KVM: arm64: Expose S1PIE to guests")
+> Reported-by: Mark Brown <broonie@kernel.org>
+> Link: https://lore.kernel.org/r/20260930-arm64-gcs-v21-2-3556644cd927@ker=
+nel.org
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/86fqyn2che.wl-maz@kernel.org
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+> Changes in v2:
+> - Also require FEAT_HPDS for S1POE (Marc)
+> - Link to v1: https://lore.kernel.org/r/20261015153041.3770032-1-fuad.tab=
+ba@linux.dev
+>=20
+> Based on Linux 7.3-rc3 (fd73f4a665989).
+>=20
+>  arch/arm64/kvm/config.c | 28 ++++++++++++++++++++++++----
+>  1 file changed, 24 insertions(+), 4 deletions(-)
 
-On Sat, 17 Oct 2026 17:52:04 +0100, Sasha Levin <sashal@kernel.org> wrote:
-[...]
-> Build-tested only: arm64 defconfig with gcc and clang, W=1, no new
-> warnings. The only code generation change is the protected vCPU's
-> per-entry mask, 0x6100 to 0x100. Not runtime-tested, as the in-tree
-> selftests can't create protected VMs.
+I'm afraid that this only addresses part of the problem. Ultimately,
+the idregs themselves require some sanitisation because KVM uses this
+as the source of truth. I was pointing this in my reply to Broonie,
+and this is (probably) what sashiko is blabbing on about.
 
-I tested it on QEMU, with the host booted with
-kvm-arm.wfi_trap_policy=notrap and a protected VM using kvmtool. The
-protected VM doesn't take any WFI exits (4415 with the default
-policy), so TWI still reaches it at vCPU load.
+I hacked something that could be used as the bases for such
+sanitisation, although it is quite crude and doesn't cover all of the
+possible requirements, see below. I've only boot-tested it in a nested
+guest, and I'm not even sure it actually works (my test box doesn't
+have these features).
 
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+	M.
 
-Cheers,
-/fuad
+=46rom 6632cbcebbf4b384f209e988deab0924f03dfff8 Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Sun, 18 Oct 2026 12:07:09 +0100
+Subject: [PATCH] KVM: arm64: Sanitise ID_AA64MMFR3_EL1.S1P[IO]E
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_host.h |  1 +
+ arch/arm64/kvm/config.c           | 59 +++++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c         |  2 ++
+ 3 files changed, 62 insertions(+)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm=
+_host.h
+index 6be90f8e19813..ab68ddca234c4 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1742,6 +1742,7 @@ static inline bool kvm_arch_has_irq_bypass(void)
+ 	return true;
+ }
+=20
++void kvm_idregs_enforce_dependencies(struct kvm *kvm);
+ void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt);
+ struct resx get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg);
+ void check_feature_map(void);
+diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+index 6d2650427c5fc..f037a288c9d46 100644
+--- a/arch/arm64/kvm/config.c
++++ b/arch/arm64/kvm/config.c
+@@ -59,6 +59,7 @@ struct reg_feat_map_desc {
+ 	const struct reg_bits_to_feat_map feat_map;
+ 	const struct reg_bits_to_feat_map *bit_feat_map;
+ 	const unsigned int		  bit_feat_map_sz;
++	const unsigned int		  idreg_idx;
+ };
+=20
+ #define __NEEDS_FEAT_3(m, f, w, id, fld, lim)		\
+@@ -130,6 +131,21 @@ struct reg_feat_map_desc {
+ 		.bit_feat_map_sz	=3D ARRAY_SIZE(m),		\
+ 	}
+=20
++/*
++ * Declare the dependency between the features advertised in an id
++ * register, and the set of other features they depend on. This
++ * generates a struct reg_feat_map_desc.
++ */
++#define DECLARE_IDREG_FEAT_MAP(n, r, m, f)				\
++	struct reg_feat_map_desc n =3D {					\
++		.name			=3D #r,				\
++		.feat_map		=3D NEEDS_FEAT(~(r##_RES0 |	\
++						       r##_RES1), f),	\
++		.bit_feat_map		=3D m,				\
++		.bit_feat_map_sz	=3D ARRAY_SIZE(m),		\
++		.idreg_idx		=3D IDREG_IDX(SYS_##r),		\
++	}
++
+ #define FEAT_SPE		ID_AA64DFR0_EL1, PMSVer, IMP
+ #define FEAT_BRBE		ID_AA64DFR0_EL1, BRBE, IMP
+ #define FEAT_TRC_SR		ID_AA64DFR0_EL1, TraceVer, IMP
+@@ -1319,6 +1335,14 @@ static const struct reg_bits_to_feat_map vtcr_el2_fe=
+at_map[] =3D {
+ static const DECLARE_FEAT_MAP(vtcr_el2_desc, VTCR_EL2,
+ 			      vtcr_el2_feat_map, FEAT_AA64EL2);
+=20
++static const struct reg_bits_to_feat_map id_aa64mmfr3_el1_feat_map[] =3D {
++	NEEDS_FEAT(ID_AA64MMFR3_EL1_S1PIE, feat_s1pie),
++	NEEDS_FEAT(ID_AA64MMFR3_EL1_S1POE, feat_s1poe),
++};
++
++static const DECLARE_IDREG_FEAT_MAP(id_aa64mmfr3_el1_desc, ID_AA64MMFR3_EL=
+1,
++				    id_aa64mmfr3_el1_feat_map, FEAT_AA64EL1);
++
+ static const struct reg_bits_to_feat_map ich_hfgrtr_feat_map[] =3D {
+ 	NEEDS_FEAT(ICH_HFGRTR_EL2_ICC_APR_EL1 |
+ 		   ICH_HFGRTR_EL2_ICC_IDRn_EL1 |
+@@ -1428,6 +1452,41 @@ void __init check_feature_map(void)
+ 	check_reg_desc(&ich_hfgitr_desc);
+ }
+=20
++static const struct reg_feat_map_desc *idreg_feat_maps[] =3D {
++	&id_aa64mmfr3_el1_desc,
++};
++
++static bool idreg_deps(struct kvm *kvm,
++		       const struct reg_feat_map_desc *r)
++{
++	struct resx resx =3D {};
++	u64 val;
++
++	for (int i =3D 0; i < r->bit_feat_map_sz; i++) {
++		if ((r->bit_feat_map[i].flags & CALL_FUNC) &&
++		    !r->bit_feat_map[i].match(kvm))
++			resx.res0 |=3D reg_feat_map_bits(&r->bit_feat_map[i]);
++	}
++
++	val =3D kvm->arch.id_regs[r->idreg_idx];
++	kvm->arch.id_regs[r->idreg_idx] &=3D ~resx.res0;
++	kvm->arch.id_regs[r->idreg_idx] |=3D resx.res1;
++
++	return val !=3D kvm->arch.id_regs[r->idreg_idx];
++}
++
++void kvm_idregs_enforce_dependencies(struct kvm *kvm)
++{
++	bool again;
++
++	do {
++		again =3D false;
++
++		for (int i =3D 0; i < ARRAY_SIZE(idreg_feat_maps); i++)
++			again |=3D idreg_deps(kvm, idreg_feat_maps[i]);
++	} while (again);
++}
++
+ static bool idreg_feat_match(struct kvm *kvm, const struct reg_bits_to_fea=
+t_map *map)
+ {
+ 	u64 regval =3D kvm->arch.id_regs[map->regidx];
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 4f18ed2793c33..0687b78cd7c2b 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -5872,6 +5872,8 @@ static int kvm_vm_finalize_sys_regs(struct kvm *kvm)
+ 	if (kvm_id_regs_final(kvm))
+ 		return 0;
+=20
++	kvm_idregs_enforce_dependencies(kvm);
++
+ 	/*
+ 	 * This hacks into the ID registers, so only perform it when the
+ 	 * first vcpu runs, or the kvm_set_vm_id_reg() helper will scream.
+--=20
+2.47.3
+
+
+--=20
+Without deviation from the norm, progress is not possible.
