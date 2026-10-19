@@ -1,166 +1,158 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.72
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792421997;
+	b=sTanikHvY3SFu51KvyG4G5hefEErKn31RuLL43K+Iiw5p2TbP1qTbnpyGAn9LrJgkgMV
+	 k1Eulu/sWlham1TBrld7o0uBUHOigUFnH+Mx+B/DOiwn1aVRNteN6sYI0vJpIN6dQgTmT
+	 WwrefqnuB+CGjrIi/xhFUmZcWsTgdtzlVbBG3+nPj9zvfducEcYzOr3oGPB5z3knnCwIL
+	 DSmEwtGuVMpfUBdIcf/RDNuPSlNfgjPAVMWsfR8gaozEw4bxzSokakC05gVM6JRK22K+X
+	 nBYmuo96xNbksR7qzouwncDD0jMM/8ap766n6Ojtt8Aorvzzg6iY3xV0+pV2N4ed8IQ==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792421997;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
+	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=Meq30BGUrGHp6xcOF0w5JprFYd5g2Y2UtUcpUpaVjGQ=;
+	b=2UaOtoEK2AO3h/1N5Ob31AbaI1Sh/xp/JF0TC9KKnkDvfYBroZg+WgUXWxNhWH5rAnNX
+	 rYP+JBcEMEpxdzPXXg2LEc2dIVR1CslIcCqBPgR/rEwQ0EV1kd0XTM2JGup/PDiupafIH
+	 /SDnSkOSvpJlca+Hh+D/DoakQdlok+gF6XW2ynzb0vrUHGwYrr1lFWCpnFVxBqhbovWpR
+	 X0Qu/t+1wa7mTy2Gwd0REk7DCzziFeycq8dmdNfvssnawB7Oerqw+jDzsOZTZKhI9ipNY
+	 UIglMT40v4R+hmDFvn3DAxy1n8EJehEs8HaA2/CO+7QqOWBeZ9XDP1JNkA+AkfroPow==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=sLDfJbe0;
+	arc=none smtp.remote-ip=209.85.221.72
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB965CFA33;
-	Mon, 19 Oct 2026 14:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792418483; cv=none; b=bnrtv7bp/hsNQWKXqbkGKz0juz5FJbVKnUzOU41seco5Z4dk1AlXV+FLzaf2U9rvo/Q7Mlgv0p10bNqQZH3fyTMhCZYYVdfnoqqLAGz4ALceX81GB8ct1b/yPgK2JBZfSe0SliX0D/4R39/k+Z9sCuhMuYWF6sPtlJUbG7s5toY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792418483; c=relaxed/simple;
-	bh=QN1JVvvcU8tCJIUBuHRPCvDcAoldkEB3YpGvN0zpHLc=;
-	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
-	 Date; b=oh/9B0qYDe1JpnxvpgO5w0fckDAZLCa+62zBjrA0SGfBQRzSleTpkyHfsRYEFxY712Yo9iGr7SAMPBVfhR69ijGTPAzcpcDzAAEq9mTG6Ff8XgmgaTvdt2qBWV+OayNHENJ2AvtWTTSMOJrCveRhrQbXdBvu5UomxP0wQ5YUcT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=asW3LIOC; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D0F7607886B
+	for <kvmarm@lists.linux.dev>; Mon, 19 Oct 2026 14:59:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1D0F7607886B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="asW3LIOC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2137F1F000C8;
-	Mon, 19 Oct 2026 14:01:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792418481;
-	bh=vOzMu9yXDXjpNHsxshh5zV/Cvva5ZmdoG5eGo37cSQ4=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=asW3LIOC5kxu1ONl9gDGJsqDbV3phdOB3QBWQw+miqk1Lm+mG6lbLDqivJ4F0Sv8C
-	 hhpH/jI0ypdJv5xjM45JQAC3R2pvFCplcGlOwo2u88OCVJ8EBeTu9OMKNRfjkskUN5
-	 /tcaiQPmN6AMx9vXjcUlb8pKnBkn10Z+KRKfLMOmfO/BHDsfZUp5GnGAi8UEZbCVMJ
-	 aDZF8ogKe/0qZUiNT3QZ72sOTJ4IsQAnrH/WG0atrAuYZVBfQrx0JUuCSIxzXE/uJd
-	 uPavnxc8yD637x+pV9LkOrX/984DwexMYNSF5uXEq3zbwU+W2yEC1z5HnDfuWHSM7C
-	 Fl3oERhbWJwjg==
-Message-ID: <sashiko-outbox-177254@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 1/2] KVM: arm64: vgic: Require matching VGIC model
- for GICv3 ITS
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sascha Bischoff" <sascha.bischoff@arm.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261019134242.1289002-2-sascha.bischoff@arm.com>
-References: <20261019134242.1289002-1-sascha.bischoff@arm.com>
- <20261019134242.1289002-2-sascha.bischoff@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 19 Oct 2026 14:01:20 +0000
-Precedence: bulk
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=sLDfJbe0
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-48b01a74792so1629502f8f.0
+        for <kvmarm@lists.linux.dev>; Mon, 19 Oct 2026 07:59:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1792421995; x=1793026795; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Meq30BGUrGHp6xcOF0w5JprFYd5g2Y2UtUcpUpaVjGQ=;
+        b=sLDfJbe0oQgOaX0K7WJvqrSsd0R6dTUD8XeVNEUFmpcHwMJw/+ngznxpfVtvFeJYc3
+         jwHU0d0S2KjvpiTJwHpnm9Y59Pgjqwekl+tYN9b4gfILg1w3GXfoWThDlQ5ggvYOWD/G
+         4biKWrJGfRBPGlSz40HnFTjU7WS1NVkpaeNC85e5wX2TdKFto6fCDJHXqUpZpylhFWHg
+         y0OVfHF/7zXYtb+/ItAvZRjpNwgqWVABaeZwl56m4i2ZtQaXqvkRxY9DrKRiHRGa8eUV
+         ZHRcL+80Iq33pRDnJs2q4sJIZgVuGoVBBNRFSA5OoF7ydpWExR/ranLhd8uo/NkzAUyX
+         hdvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792421995; x=1793026795;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Meq30BGUrGHp6xcOF0w5JprFYd5g2Y2UtUcpUpaVjGQ=;
+        b=tyCxeLS7gWc1WmCg2Aj7zztj6mXJpK1x5otb/TPaPtrAiJAPIbBG/lgagWuZs1UNGp
+         KWK0suHBUy5+SIEy+tycW0OTEbGbt9DuO8OsBD556evPI2oIZ5IL3utYVSGb9NB+beWx
+         Gq0RuEKYF/dqJWgqkrkKwFfrIMF0mWK7Bt/Ls+t/Kgipa0RYV/SFjEdP46mE63UTtvLG
+         RVQiT3AjKnM1WdSng2yECjrkoXtMdJLXo5y3lMoPUaZbiyHB0pluklE4ZzndN8hIvdfH
+         8LrH0747M0tUMbCSrVgrJSQqa2iqR7de+g+3LdgdvDouM0PgBKqtDhkYZNAHVKeIP85Q
+         m+rg==
+X-Forwarded-Encrypted: i=1; AKwUvBwVpMjJ2ASrD2Fx2m+zGZTvDdRuDjdDztXIwISaNuSmfuB5KJa81zd8UCpA37oSlJtxgQPgn7o=@lists.linux.dev
+X-Gm-Message-State: AFq9FYIiWO5ciOLAgfAVyx9iRYjZiBvW16uPPTj8ZWGjGSCgVUQLz5l1
+	cC/I/Ftvm6Qd2JA8x0OLmwW8ezDm6gnIH5jxZexOmBzk9fWVJLQbZr7QnawOrvER9bc8xVJMMcK
+	HlnFMTz2e5tVD+resiPztsA==
+X-Received: from wrus7.prod.google.com ([2002:a5d:6a87:0:b0:48e:1449:1f6c])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a5d:60cc:0:b0:48d:f14a:9177 with SMTP id ffacd0b85a97d-48e07fb9180mr11409788f8f.56.1792421995213;
+ Mon, 19 Oct 2026 07:59:55 -0700 (PDT)
+Date: Mon, 19 Oct 2026 15:59:49 +0100
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
+List-Post: <mailto:kvmarm@lists.linux.dev>
+List-Help: <mailto:kvmarm+help@lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
+Precedence: list
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.176.g3575e65682-goog
+Message-ID: <20261019145949.1922019-1-vdonnefort@google.com>
+Subject: [PATCH kvmtool] arm64: THPs for systems with pages bigger than 4K
+From: Vincent Donnefort <vdonnefort@google.com>
+To: will@kernel.org, julien.thierry.kdev@gmail.com
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org, oliver.upton@linux.dev, 
+	suzuki.poulose@arm.com, alexandru.elisei@arm.com, andre.przywara@arm.com, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] KVM: arm64: vgic: vgic_has_its() returns true without an in-kern=
-el VGIC
---
+The THP support imposes an alignment of the memslot userspace address to
+the size of a THP (PMD_SIZE). To do so, kvmtool overallocates the RAM
+size and aligns it. However it assumes PMD_SIZE is 2MiB, which is only
+true on 4KiB page systems.
 
-commit 06339a92609918e3caedb4339d3324ff581b8fee
-Author: Sascha Bischoff <sascha.bischoff@arm.com>
+Use a huge-page size, based on the system page size. This value can be
+massive for a 64KiB page system, so skip the alignment if we couldn't
+even install one THP.
 
-KVM: arm64: vgic: Require matching VGIC model for GICv3 ITS
+Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-This commit records the VGIC model required by an ITS device in
-struct vgic_dist and checks model compatibility during both VGIC and ITS
-creation so that incompatible devices are rejected regardless of creation
-order. It also replaces dist->has_its with a check on dist->its_model in
-vgic_has_its() and changes dist->vgic_model to enum kvm_device_type.
+diff --git a/arm64/kvm.c b/arm64/kvm.c
+index 36b3284e4a92..2c01dc32fa9a 100644
+--- a/arm64/kvm.c
++++ b/arm64/kvm.c
+@@ -18,6 +18,8 @@
+ 
+ #include <asm/image.h>
+ 
++#define HUGEPAGE_SIZE (PAGE_SIZE * (PAGE_SIZE / 8UL))
++
+ static struct arm64_image_header *kernel_header;
+ 
+ struct kvm_ext kvm_req_ext[] = {
+@@ -35,20 +37,23 @@ bool kvm__arch_cpu_supports_vm(void)
+ 
+ void kvm__init_ram(struct kvm *kvm)
+ {
+-	u64 phys_start, phys_size;
++	u64 phys_start, phys_size, ram_alloc_align = SZ_64K;
+ 	void *host_mem;
+ 	int err;
+ 
+ 	/*
+-	 * Allocate guest memory. We must align our buffer to 64K to
+-	 * correlate with the maximum guest page size for virtio-mmio.
+-	 * If using THP, then our minimal alignment becomes 2M.
+-	 * 2M trumps 64K, so let's go with that.
++	 * Allocate guest memory. We must align our buffer to 64K to correlate
++	 * with the maximum guest page size for virtio-mmio. If using THP, then
++	 * our minimal alignment trumps 64K, so let's go with that.
+ 	 */
+ 	kvm->ram_size = kvm->cfg.ram_size;
+ 	kvm->arch.ram_alloc_size = kvm->ram_size;
+-	if (!kvm->cfg.hugetlbfs_path)
+-		kvm->arch.ram_alloc_size += SZ_2M;
++	if (!kvm->cfg.hugetlbfs_path) {
++		if (kvm->ram_size >= HUGEPAGE_SIZE)
++			ram_alloc_align = HUGEPAGE_SIZE;
++
++		kvm->arch.ram_alloc_size += ram_alloc_align;
++	}
+ 
+ 	if (kvm->cfg.arch.guest_memfd)
+ 		kvm->arch.ram_alloc_start = mmap_guest_memfd(kvm,
+@@ -63,7 +68,7 @@ void kvm__init_ram(struct kvm *kvm)
+ 		    kvm->arch.ram_alloc_size, errno);
+ 
+ 	kvm->ram_start = (void *)ALIGN((unsigned long)kvm->arch.ram_alloc_start,
+-					SZ_2M);
++					ram_alloc_align);
+ 
+ 	if (!kvm->cfg.arch.guest_memfd) {
+ 		madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-it=
-s.c
-> index e5657cb603567..7df5869cff990 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -1875,6 +1875,19 @@ static int vgic_its_create(struct kvm_device *dev,=
- u32 type)
-> =20
->  	mutex_lock(&dev->kvm->arch.config_lock);
-> =20
-> +	/*
-> +	 * Reject creation of a GICv3 ITS if:
-> +	 * - The VM already has a VGIC other than GICv3.
-> +	 * - An existing ITS requires a VGIC model other than GICv3.
-> +	 */
-> +	if ((irqchip_in_kernel(dev->kvm) && !vgic_is_v3(dev->kvm)) ||
-> +	    (dev->kvm->arch.vgic.its_model &&
-> +	     dev->kvm->arch.vgic.its_model !=3D KVM_DEV_TYPE_ARM_VGIC_V3)) {
-> +		mutex_unlock(&dev->kvm->arch.config_lock);
-> +		kfree(its);
-> +		return -ENODEV;
-> +	}
-> +
->  	if (vgic_initialized(dev->kvm)) {
->  		ret =3D vgic_v4_init(dev->kvm);
->  		if (ret < 0) {
-> @@ -1902,7 +1915,7 @@ static int vgic_its_create(struct kvm_device *dev, =
-u32 type)
->  	xa_init(&its->translation_cache);
-> =20
->  	dev->kvm->arch.vgic.msis_require_devid =3D true;
-> -	dev->kvm->arch.vgic.has_its =3D true;
-> +	dev->kvm->arch.vgic.its_model =3D KVM_DEV_TYPE_ARM_VGIC_V3;
->  	its->enabled =3D false;
->  	its->dev =3D dev;
-> =20
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgi=
-c-mmio-v3.c
-> index 5ab789accc9d4..5f0a5b12e338f 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> @@ -42,10 +42,7 @@ bool vgic_has_its(struct kvm *kvm)
->  {
->  	struct vgic_dist *dist =3D &kvm->arch.vgic;
-> =20
-> -	if (dist->vgic_model !=3D KVM_DEV_TYPE_ARM_VGIC_V3)
-> -		return false;
-> -
-> -	return dist->has_its;
-> +	return !!dist->its_model;
->  }
-> =20
->  bool vgic_supports_direct_msis(struct kvm *kvm)
+base-commit: f67bc0bdae9433a9cfd05e65ea2c1bb6102566d9
+-- 
+2.56.0.176.g3575e65682-goog
 
-[Severity: Medium]
-Can vgic_has_its() now return true when a VM has created an ITS device
-without creating an in-kernel VGIC (dist->vgic_model =3D=3D 0)?
-
-Previously, vgic_has_its() returned false when dist->vgic_model was 0.
-With this change, vgic_its_create() sets dist->its_model even when
-!irqchip_in_kernel(dev->kvm), while skipping vgic_v4_init() because
-vgic_initialized(dev->kvm) is false.
-
-If userspace creates a KVM_DEV_TYPE_ARM_VGIC_ITS device and runs a vCPU
-without creating an in-kernel VGIC (which kvm_vgic_map_resources() permits
-when !irqchip_in_kernel(kvm)), vgic_supports_direct_msis() evaluates to
-true on GICv4.0 hosts:
-
-arch/arm64/kvm/vgic/vgic-mmio-v3.c:vgic_supports_direct_msis() {
-	if (system_supports_direct_sgis() && !vgic_supports_direct_sgis(kvm))
-		return false;
-
-	return kvm_vgic_global_state.has_gicv4 && vgic_has_its(kvm);
-}
-
-In the vCPU run loop, kvm_arch_vcpu_ioctl_run() calls
-kvm_vgic_flush_hwstate() unconditionally:
-
-arch/arm64/kvm/vgic/vgic.c:kvm_vgic_flush_hwstate() {
-	if (vgic_supports_direct_irqs(vcpu->kvm) && kvm_vgic_global_state.has_gicv=
-4)
-		vgic_v4_commit(vcpu);
-
-	if (!kvm_vgic_vcpu_pending_irq(vcpu))
-		return;
-}
-
-Wouldn't this call vgic_v4_commit() -> its_commit_vpe() ->
-irq_set_vcpu_affinity(0, &info) on an uninitialized its_vpe where
-vpe->irq =3D=3D 0, as well as allowing MSI entry points such as kvm_set_msi=
-(),
-kvm_arch_set_irq_inatomic(), vgic_msi_to_its(), and
-kvm_vgic_v4_set_forwarding() to proceed without an in-kernel VGIC?
-
-Should vgic_has_its() still check irqchip_in_kernel(kvm) (or
-dist->vgic_model =3D=3D dist->its_model)?
-
-[ ... ]
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261019134242.1289=
-002-1-sascha.bischoff@arm.com?part=3D1
