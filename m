@@ -1,33 +1,33 @@
-Received: from mta1.migadu.com (out-167.mta1.migadu.com [95.215.58.167])
+Received: from mta0.migadu.com (out-31.mta0.migadu.com [91.218.175.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFAB24E80BD
-	for <kvmarm@lists.linux.dev>; Mon, 19 Oct 2026 13:21:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.167
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87C134E1C89
+	for <kvmarm@lists.linux.dev>; Mon, 19 Oct 2026 13:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792416075; cv=none; b=RWNorEOJiNBhlrn7bOyKhbUIK8WaGCVDowx/2OR1+WmGAFoEKwPWv+HDfu+B1CApWRpk3J4gezNAX0CTJjOtPnG7JOvIMFs4sQP9GAMy87Sy3SPtxrAANyTBh2DiziXP5US+FvWrlk3Dj7aQJMnjtpuTvHOeyF6jnn3Xky40C/E=
+	t=1792416079; cv=none; b=e2QMR2pwrxkM3+6SHzoq/yDmw45FyAp/rM9tAIzJEovmyDXNHKNbG+najRmzjLx4uXyxdZJsfCW8Ek3c7qtKz2ANFMvTWcU/GvX7mdE9+KtJzZQbMTGFMa9/Q5OPgtHmJRAipzS/mlkrV49YG9rxOOLrwa7Qj2ZFADfKqhFJ+Qw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792416075; c=relaxed/simple;
-	bh=5fJGL4C4mMNi8vcFoFABt8pOi03qIUjPdJtacS8L23s=;
+	s=arc-20240116; t=1792416079; c=relaxed/simple;
+	bh=Ww+r+o4/7dyPQTMz8pAy9hMNzw+4oyPYtc7UMkTUyD8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LqZUeWVtn+DE40/09NkVdasGCXu14Bb1Z+dzJBh/uKOXhSlwf/1mr+QE32zXE3xhV/0eI/QZanTfCRY/ohfMwd0O5ciH+VuKPbA3aoiDO0Ab2TvbOMSzizAF4CgCp0sBaHtmbrAmQ78fXAcZjUuUjD/im4f/dfLPYKVb/sq/8r0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=C6MXiTZ2; arc=none smtp.client-ip=95.215.58.167
+	 MIME-Version; b=epJ4iSmTXqohS9p24L9N+D9gHpuGSoKZHEUxfosGsJF8w2hZ649gJ56d6M9BO0XNZL93ZUrmZg+ljEHixLHbnd483A/XdMt6i+VdbUz610OObQ7JnM0lgt7VhXsQVq8IBTGh360torXNNMbVrHsoHGmnt373tm6isCir0xodwjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TK3YWf0j; arc=none smtp.client-ip=91.218.175.31
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="C6MXiTZ2"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TK3YWf0j"
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=5fJGL4C4mMNi8vcFoFABt8pOi03qIUjPdJtacS8L23s=;
+DKIM-Signature: a=rsa-sha256; bh=Ww+r+o4/7dyPQTMz8pAy9hMNzw+4oyPYtc7UMkTUyD8=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792416071; v=1; x=1793020871;
- b=C6MXiTZ2RIKcR4M0KOxR0qb5p/hnqWSTNcd7WWQwqdEt6paMSjAL32qaZu4665ERJD9e0zWU
- 7ltWn81gDKFRu9ovoQrHrFtTEqi+F5XcQTACOgEZDgphPNXkPRLEI8gKG6bfutCoWj1xeXvuITM
- GpfMHmDbCpnnpBnEfCcaeig4=
+ t=1792416076; v=1; x=1793020876;
+ b=TK3YWf0jkioYFAtNlIsw71RiN7/dj33Vpy5fc28k21OiXX8ihe1nBZ2WqIS59xzWdw0uoGyX
+ Nu/vSD1iF+t6Mh3JnYsgDpleATOasp0uYcgmeU/cjgnAt6DkHNEdQIIm/KzvuBqnb7RYYFvLdw7
+ Bt87F3oOn1BjQOMtxvBmTv4w=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id e803656b720e69e6;
-	Mon, 19 Oct 2026 13:21:11 +0000
-X-Mizu-Trace-ID: e803656b720e69e6
+Received: by smtp.migadu.com with ESMTPS id 409a3763f14ff9d2;
+	Mon, 19 Oct 2026 13:21:16 +0000
+X-Mizu-Trace-ID: 409a3763f14ff9d2
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -46,9 +46,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	David Hildenbrand <david@kernel.org>,
 	Fuad Tabba <tabba@google.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] KVM: arm64: Clear the whole hugetlb folio when sanitising MTE tags
-Date: Mon, 19 Oct 2026 14:21:01 +0100
-Message-ID: <20261019132103.3836646-2-fuad.tabba@linux.dev>
+Subject: [PATCH 2/3] KVM: arm64: Clear the whole hugetlb folio when storing MTE tags
+Date: Mon, 19 Oct 2026 14:21:02 +0100
+Message-ID: <20261019132103.3836646-3-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261019132103.3836646-1-fuad.tabba@linux.dev>
 References: <20261019132103.3836646-1-fuad.tabba@linux.dev>
@@ -60,37 +60,54 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-sanitise_mte_tags() clears the tags of the pages about to be mapped at
-stage-2 before marking them tagged. For a hugetlb folio the flag covers
-every page in the folio, but the loop only covers the mapping being
-installed. Stage-2 maps a folio in pieces for the contiguous hugetlb
-sizes, and for any size under dirty logging. The first fault then marks
-the whole folio after clearing only its own piece, and the rest keeps
-its previous owner's tags for the guest to read.
+When KVM_ARM_MTE_COPY_TAGS copies tags into a page, it marks the page as
+tagged. For a hugetlb folio the flag covers every page in the folio. If
+the folio wasn't tagged yet, its other pages are marked as tagged with
+their previous owner's tags still in place. The stage-2 fault path then
+maps them into the guest without clearing them. The ioctl's read side
+also copies them out to the VMM.
 
-Clear the whole folio, as mte_sync_tags() does.
+Clear the whole folio on its first tagging, before copying in this
+page's tags.
 
 Fixes: 25c17c4b55def ("hugetlb: arm64: add mte support")
 Cc: stable@vger.kernel.org
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/mmu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/guest.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 9ba86450fe4af..48a08b608ea72 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1514,7 +1514,8 @@ static void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
- 	if (folio_test_hugetlb(folio)) {
- 		/* Hugetlb has MTE flags set on head page only */
- 		if (folio_try_hugetlb_mte_tagging(folio)) {
--			for (i = 0; i < nr_pages; i++, page++)
-+			page = folio_page(folio, 0);
-+			for (i = 0; i < folio_nr_pages(folio); i++, page++)
- 				mte_clear_page_tags(page_address(page));
- 			folio_set_hugetlb_mte_tagged(folio);
- 		}
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index b01d6622b8720..cda655fbff657 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -1012,6 +1012,7 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 		void *maddr;
+ 		unsigned long num_tags;
+ 		struct folio *folio;
++		unsigned long i;
+ 
+ 		if (!page) {
+ 			ret = -EFAULT;
+@@ -1042,12 +1043,14 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 			/*
+ 			 * Only locking to serialise with a concurrent
+ 			 * __set_ptes() in the VMM but still overriding the
+-			 * tags, hence ignoring the return value.
++			 * tags. A hugetlb folio is marked tagged as a whole,
++			 * so its first tagging clears every page.
+ 			 */
+-			if (folio_test_hugetlb(folio))
+-				folio_try_hugetlb_mte_tagging(folio);
+-			else
++			if (!folio_test_hugetlb(folio))
+ 				try_page_mte_tagging(page);
++			else if (folio_try_hugetlb_mte_tagging(folio))
++				for (i = 0; i < folio_nr_pages(folio); i++)
++					mte_clear_page_tags(page_address(folio_page(folio, i)));
+ 			num_tags = mte_copy_tags_from_user(maddr, tags,
+ 							MTE_GRANULES_PER_PAGE);
+ 
 -- 
 2.47.3
 
