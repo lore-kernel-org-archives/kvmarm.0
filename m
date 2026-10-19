@@ -1,98 +1,99 @@
-Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041E148F837
-	for <kvmarm@lists.linux.dev>; Mon, 19 Oct 2026 07:50:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6774549BB72
+	for <kvmarm@lists.linux.dev>; Mon, 19 Oct 2026 08:50:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792396224; cv=none; b=jz1tbZ/HfN2beGFJyKFC5zdc2s86EpVDC9EWXx5PuJFARTWgZAnXSR8db1q0dvPYtJeRj7dcFKTknEtZzuB0wAiWcWAtUG8h9D//M8lfs9+6WiHsfQCT1KE2JWzqJ54VEgOBtEWAKRBILHYG9bzxh6yTIghBXNApEDjzYv2jJqY=
+	t=1792399840; cv=none; b=HtlpeKEfbstSqhzCbrklHz5bE6AAoCi5UaLfFWLYDq5ncz98UEXuAcKAj/POXZmB0sGpUhEAMFTZfDad/+iCnO+e2PkvXvfN3a+WIQyvfZyzSgNVTnZ/HyHCGzse0rPG248kBzQ+Y8Hi5Fm7H88LQIDrZfWx37Qj88H9uU35t0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792396224; c=relaxed/simple;
-	bh=q6nzKWe/Qe1MwaN18sAYpKN7gyI/txGOIUnkyLgTQvw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=n1nsTz30TY9/05YcFMb0y7sPK5O8j2OUq0v7+Kye2O4jyTuQvLOIjIg0rjGrZoxMXFq6KbtAxSzI+qsD+zCelV/fVQaQP5j/JTv3TJ8xCs3y1EXNfwEG0DvL2dMH5ZVHNzBeWbtMQHgTkLZ3KHNmJDcuQX12Oxhnimwc2nvL8pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=YNnmNWHz; arc=none smtp.client-ip=113.46.200.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1792399840; c=relaxed/simple;
+	bh=smuPfukUTEhnLlad9GsBi0MdMFhYsr8EsSBrkOpeT54=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Jb85p0WFU1JbmIqRBAKd+6fY9PsatJlyRwhKY+Kz+ey4wwQqUU/rgiRVpH05AHTCa9XAwhVgL6ZOjoXDbUOgJGBOBVcvq4Y+L1DvhDp/UGnXxjWg2RKzIxtt3LSPKII02ji5TTEwEnh0jEPpdzuVVU5UGbzs8TStqL0gvDotsic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CnVNoI7W; arc=none smtp.client-ip=95.215.58.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="YNnmNWHz"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=TfWxx76uGZPAx8muZb+AM8rdjUCDSsgdX5aqqxf1ygs=;
-	b=YNnmNWHzcUWkPqEB70mQCx/3LrJHVntKBiorFx2yuGzGuXBMZGsS5m3s7i+MVMPpNingdYxcJ
-	dSbPfSOOUuGelLhPxFklSehjTiMP5AdXzNPG+Hp4MHTlEUgBwjYePfzuEIXikra/ulYGXw+c2vS
-	vv3T+GOGL/E/c4JyJugKQ2g=
-Received: from mail.maildlp.com (unknown [172.19.163.104])
-	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4j7SPl1wLvzcb4D;
-	Mon, 19 Oct 2026 15:50:03 +0800 (CST)
-Received: from kwepemk300013.china.huawei.com (unknown [7.202.194.231])
-	by mail.maildlp.com (Postfix) with ESMTPS id 66CFB4057F;
-	Mon, 19 Oct 2026 15:50:09 +0800 (CST)
-Received: from [10.67.121.183] (10.67.121.183) by
- kwepemk300013.china.huawei.com (7.202.194.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Mon, 19 Oct 2026 15:50:08 +0800
-Message-ID: <2c90472e-b178-4d11-9e55-5faf4fc579c8@huawei.com>
-Date: Mon, 19 Oct 2026 15:50:06 +0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CnVNoI7W"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=smuPfukUTEhnLlad9GsBi0MdMFhYsr8EsSBrkOpeT54=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1792399836; v=1; x=1793004636;
+ b=CnVNoI7WKYqX4ZhlD7DL/KlSqj6WOfzOfBqX0ZJbLEfD82y0q/siPiANqTTgnkRWCMj5yKn9
+ fGpgXDlLAauSv5gCB+8S+NQizRl5VX/6f7+XMc12kiOUaSlK8e0b8W8iQ8zhmiZaQG6CH83Rh9p
+ Bu3dqT9n87cJv/lkSMGAwH9c=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id b6915b6c1e99e6bb;
+	Mon, 19 Oct 2026 08:50:34 +0000
+X-Mizu-Trace-ID: b6915b6c1e99e6bb
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5be3b2f17c1so6734e87.1
+        for <kvmarm@lists.linux.dev>; Mon, 19 Oct 2026 01:50:30 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvByhxZCFLgCrYY0Pz80sL0GCdjnGpdRxN9IlObMvb+0ro8RqYivTYpHJjD/MY3KiFXR2DjLAq7U=@lists.linux.dev
+X-Gm-Message-State: AFq9FYL7r7nI34N2euvt6+41EvSpvnwsbJN3WET996n25UQ+hBtGvS5r
+	+zCxH5KeYI4eBn8wTL5fPmfi3EloKcqxUayS0dy6M/DxUU9iz5VOUToTfZA/feHCNCaNSpDI+Xf
+	GrYV56O3vlqt6CFkguzVXDSu65SXh5euq04QYwjyd
+X-Received: by 2002:a05:6512:ace:b0:5ba:3602:4343 with SMTP id
+ 2adb3069b0e04-5be51d51c40mr121150e87.16.1792399829578; Mon, 19 Oct 2026
+ 01:50:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 07/12] arm64: tlbid: Set up CPU domain bitmaps
-To: =?UTF-8?Q?Kristina_Mart=C5=A1enko?= <kristina.martsenko@arm.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-acpi@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>, <linux-efi@vger.kernel.org>
-CC: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>, Ryan Roberts <ryan.roberts@arm.com>,
-	David Hildenbrand <david@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, Linu
- Cherian <linu.cherian@arm.com>, Anshuman Khandual
-	<anshuman.khandual@arm.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Hanjun Guo <guohanjun@huawei.com>, Sudeep Holla <sudeep.holla@kernel.org>,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Fuad Tabba
-	<fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Steffen Eiden
-	<seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
-	<yuzenghui@huawei.com>, Ard Biesheuvel <ardb@kernel.org>, Ilias Apalodimas
-	<ilias.apalodimas@linaro.org>
-References: <20261001110655.461473-1-kristina.martsenko@arm.com>
- <20261001110655.461473-8-kristina.martsenko@arm.com>
-From: Jinqian Yang <yangjinqian1@huawei.com>
-In-Reply-To: <20261001110655.461473-8-kristina.martsenko@arm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemk300013.china.huawei.com (7.202.194.231)
+References: <20261018080921.3942517-1-fuad.tabba@linux.dev>
+ <8633u229lq.wl-maz@kernel.org> <CA+EHjTwHP7h_=e1s-iCDekMNvHGAQA3K1zv5v_4=PXQw9ueiFg@mail.gmail.com>
+ <861p9m1709.wl-maz@kernel.org>
+In-Reply-To: <861p9m1709.wl-maz@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 19 Oct 2026 09:49:53 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTyDJ87A3e7tr6Q2UEvi9BRuuu5HQ90A_3VWaOFKnRmZkw@mail.gmail.com>
+X-Gm-Features: AclHuK_GC1ojwYomVv0QIMlxdcqQYksqozcLWRejxdRqCJ0NJlVWgmqtZaSv6zY
+Message-ID: <CA+EHjTyDJ87A3e7tr6Q2UEvi9BRuuu5HQ90A_3VWaOFKnRmZkw@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: arm64: Only enable S1PIE and S1POE with the
+ features they imply
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Mark Brown <broonie@kernel.org>, 
+	Lorenzo Stoakes <ljs@kernel.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+Hi Marc,
 
-On 2026/10/1 19:06, Kristina Martšenko wrote:
-> +static int __init init_cpu_domain_bitmaps(struct tlbi_domain *domains)
-> +{
-> +	int cpu;
-> +
-> +	cpu_domains = kcalloc(nr_cpu_ids, sizeof(*cpu_domains), GFP_KERNEL);
-> +	if (!cpu_domains)
-> +		return -ENOMEM;
-> +
-> +	for_each_possible_cpu(cpu) {
-> +		cpu_domains[cpu] = bitmap_zalloc(domain_count, GFP_KERNEL);
-> +		if (!cpu_domains[cpu])
-> +			return -ENOMEM;
-> +
-> +		for (int i = 0; i < domain_count; i++) {
-> +			if (cpumask_test_cpu(cpu, domains[i].cpus))
-> +				set_bit(i, cpu_domains[cpu]);
-> +		}
-> +	}
-> +
-> +	return 0;
-> +}
-The same minor issue: init_cpu_domain_bitmaps has a memory leak per CPU
-if bitmap_zalloc() fails during execution, the allocated bitmap will be
-leaked.
+On Mon, 19 Oct 2026 08:31:18 +0100, Marc Zyngier <maz@kernel.org> wrote:
+[...]
+> > I'll send your patch as v3, rebased on -rc3 with you as the author,
+>
+> Please at least add yourself as a co-author.
 
-Thanks,
-Jinqian
+Will do, thanks.
+
+> > once I've tested it. I'm dropping v2's trap table changes, since
+> > they're redundant once the ID registers are sanitised. I made two
+> > changes to your patch. The sanitisation now runs before
+> > kvm_init_nv_sysregs(), so the nested RESx masks are computed from the
+> > sanitised values.
+>
+> Isn't that already the case? At least with kvmarm-7.4,
+> kvm_vm_finalize_sys_regs() is called before kvm_init_nv_sysregs().
+
+It is. -rc3 doesn't have Mark's split of kvm_finalize_sys_regs(), so
+kvm_init_nv_sysregs() still runs there first. I'll rebase v3 on
+kvmarm-7.4 and keep the call where you had it.
+
+> > I dropped the res1 half, which isn't set by anything.
+>
+> I'd like to keep this, as it will eventually get used, just like the
+> recompute loop is a bit useless for now, but will become useful in the
+> future as dependencies get recomputed.
+
+Ack.
+
+Cheers,
+/fuad
