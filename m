@@ -1,43 +1,38 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-210.mta1.migadu.com [95.215.58.210])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6754D9556;
-	Mon, 19 Oct 2026 10:34:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B57E4E50DC
+	for <kvmarm@lists.linux.dev>; Mon, 19 Oct 2026 11:44:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792406067; cv=none; b=u0FZIOPKXoPdatHw3SGnrixkMoI54HIY1LBopBrVI/yGdXrrp5RIHcewpLXxUoYkLyidgDCU1hU0M419PLr/vlY3r6ulhgi/oQmlJbb3cWKV8szy+9BuPGgskXNfH7kVC0NXQxJhA8tUG8C0laUIxXoJSyKHXvfqCVOXvXRyqrc=
+	t=1792410244; cv=none; b=AyKhWN+1xXwMz70m0jW9KimX0LqAMZEg07spwYiFgQMGKq74J9q1xa/Sin8ZoYv41xw7Ec8qgYRO1aEugDCn2uvnl4yrNwLCS3n3vyrr66o330VOQmSSkvv9YpHZnh8jNiAHrJaTcMOLM5SOUC01JZA0UVnIUXiQyEapVSYTt5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792406067; c=relaxed/simple;
-	bh=+es2PVFAr2HBpq03g18cK+D30skWRI4pAmlTdB0e2vw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IVh4KyOFT5lTuWAfZ6WSK9VVxykXuDLwdN/CUjPW1niZTOUp1ZU3h8qzZNQoTINVCTp55ZKHvzfoNW1dJAQvU+6D6wiVuBUUvHpRljzsYvacuSwih+Kwt16waQDmHvn599PesOKlsNrrYLFfj03Dw0LVmHapI42th+SYZnx0OaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M68/nfyb; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792410244; c=relaxed/simple;
+	bh=QkdzoORvtgg7KQohGDt3TNHW0PH2R3Zz6T0ndc+56Wc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=SldLjNFep1AXRhUS4U7GyNAspv2mMS5FPeoaCVHj4U+iV/h4fEPq87lGeorXN+dEPawtFPgEQhVbUM9ZxWptVvR9O/APgVR10GNxPw1CcUDkyAxzhcND+/o6vOPgMqAGggWI8LMFKaLc3TRntvqlISKlB25i0QmM9vsw1Jqm8Qk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LKmpTjE6; arc=none smtp.client-ip=95.215.58.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M68/nfyb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5885A1F000C4;
-	Mon, 19 Oct 2026 10:34:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792406066;
-	bh=NMtvbHH/I1g/sQXpRj+No1jY0sXXAfdKFZfF15Bu6bE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=M68/nfybPNjbZPiQO8pigg38b3hBoKXHKg+Pa91kYA3owPZ3ebobdyeWdkPPUTvrg
-	 adywnocygiCIF3N3KK5qw/goS4vmRDBa/QbV4eXUEFMw6bEOKevvyBQySVbfPBO1aO
-	 CNZxhEP5+5oSUbMH7O5qdSOKC6JRY4/XOkFdQRllS3E12XxPcIz/LTzoMBVXazd6kb
-	 yLr+2I3FUzSYYEYioLDUz/YXU+Joym1IQjs40U+AAZaMuuqTs1TOqoU9NxkBP9MCAX
-	 O+J0ylb4hWFjwAeGD3AoWN+y+ds7I5j72dwntCXEfZTj3Cmhgl3fHS3XtazwvK50zF
-	 EZhqoGbpc5SNQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xIkhE-00000004b2A-0Ezl;
-	Mon, 19 Oct 2026 10:34:24 +0000
-Date: Mon, 19 Oct 2026 11:34:23 +0100
-Message-ID: <86y0buyo5s.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LKmpTjE6"
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=QkdzoORvtgg7KQohGDt3TNHW0PH2R3Zz6T0ndc+56Wc=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1792410237; v=1; x=1793015037;
+ b=LKmpTjE6NlXhvyA0a2/Rfs0iI2As3QBkMkf9I12fIV9QfValtcDar0Xq4y6w7Sg0Ao9TA8sv
+ 6qtEYQ8anC2SlLILaDhX1b5CrUrDk7gYRmqxu3M9W2nonynBOSU0nFz0r9QuURiZfG4wR1lZuSv
+ ycsa4wAELOeJOwPiT1pY7h+s=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id e578383164884499;
+	Mon, 19 Oct 2026 11:43:57 +0000
+X-Mizu-Trace-ID: e578383164884499
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
@@ -50,62 +45,43 @@ Cc: Oliver Upton <oupton@kernel.org>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: arm64: Track physical CPU number at EL2
-In-Reply-To: <20261014125510.2928306-2-fuad.tabba@linux.dev>
-References: <20261014125510.2928306-1-fuad.tabba@linux.dev>
-	<20261014125510.2928306-2-fuad.tabba@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Subject: Re: [PATCH 2/2] KVM: arm64: Ensure TLBs and I-cache are private to each vCPU in pKVM
+Date: Mon, 19 Oct 2026 12:43:56 +0100
+Message-ID: <20261019114356.3528479-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <as-lgxiD5wFBWEOc@e143914.arm.com>
+References: <20261014125510.2928306-1-fuad.tabba@linux.dev> <20261014125510.2928306-3-fuad.tabba@linux.dev> <as-lgxiD5wFBWEOc@e143914.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, vdonnefort@google.com, qperret@google.com, tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Wed, 14 Oct 2026 13:55:09 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
-> 
-> The nVHE hypervisor has no equivalent of smp_processor_id(), so EL2 code
-> has no index for the CPU it runs on.
-> 
-> Add a hyp per-CPU hyp_cpu_number, which the host writes in
-> cpu_prepare_hyp_mode() before it's deprivileged, and a
-> hyp_smp_processor_id() accessor to read it. The next patch uses it to
-> index per-CPU state in a hyp VM.
-> 
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->  arch/arm64/include/asm/kvm_hyp.h  | 3 +++
->  arch/arm64/kvm/arm.c              | 3 +++
->  arch/arm64/kvm/hyp/nvhe/hyp-smp.c | 2 ++
->  3 files changed, 8 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index b0e42be3d9eef..6c4169a14b73e 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -16,6 +16,9 @@
->  DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
->  DECLARE_PER_CPU(unsigned long, kvm_hyp_vector);
->  DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
-> +DECLARE_PER_CPU(int, hyp_cpu_number);
-> +
-> +#define hyp_smp_processor_id() (__this_cpu_read(hyp_cpu_number))
->
+Hi Joey,
 
-Do we really need this? I was hoping that TPIDR_EL2 would give us a
-way to compute the CPU number more or less directly, without having to
-maintain per-CPU variable (which is pretty backward, when you think
-about it...).
+On Wed, 14 Oct 2026 16:53:39 +0100, Joey Gouly <joey.gouly@arm.com> wrote:
+[...]
+> > diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+[...]
+> > @@ -54,6 +54,9 @@ struct pkvm_hyp_vm {
+> >          unsigned short refcount;
+> >          hyp_spinlock_t lock;
+> >  
+> > +        /* Per physical CPU, the vcpu_idx of the last vCPU of this VM loaded there. */
+> > +        int *last_vcpu_ran;
+> 
+> Trying to think of a better way to reword this, it's an array indexed by
+> pCPU, not per cpu in the normal linux way. Unlike `mmu->last_vcpu_ran`
+> which really is per_cpu. Maybe I'm just being nitpicky, and it's fine as
+> is!
 
-	M.
+Agreed, "Per physical CPU" reads as a per_cpu variable, which it
+wasn't. After Marc's comment on patch 1 [1], it's a real per-CPU
+variable in v2, indexed by the VM's table entry.
 
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+/fuad
+
+[1] https://lore.kernel.org/all/86y0buyo5s.wl-maz@kernel.org/
