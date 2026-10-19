@@ -1,104 +1,162 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A14F14D9F8A;
-	Mon, 19 Oct 2026 13:33:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from esa1.hc1455-7.c3s2.iphmx.com (esa1.hc1455-7.c3s2.iphmx.com [207.54.90.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C2F74F68BA;
+	Mon, 19 Oct 2026 13:36:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.54.90.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792416834; cv=none; b=LcHOCRfOEQAJ+SWfZsoPhRFX2Go6arQA3cfpeWssW3nxOEF/4ba3Ak7bHKS5hgDDab4q4BhoV22Ukf2SyZkg+TLpdUklcwo8rFQuSat11zxLh56U/DtQcvP+tJHRWRczL7+qB4DJEoQo9K4V/EL5IJD2xQzQg2YgrEkZ3L4+07k=
+	t=1792416982; cv=none; b=CiPFfRPukIwbMrHAua072gk+nv756debEy15qieBVH/cLD4WFwCjQqF/FvfxrCjGRsmDWoo0NwYUoE1g5IzLIn0Kqp48nCYpoEAYq/hY0zZhT++WcvTwmtsYdRAMPfaoV+WWh9JXXEG/4lRR5MpvGL9j5/Il0WHxgqcDVd4xBio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792416834; c=relaxed/simple;
-	bh=ujXmLORlFdUC8dYzrwRUCwif5YWfOXSF11Rs+nig8sY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KMvbXlfpN/9Smpv0FXpCe30Nnj61fsRJpCbVzDCdUy5eaHdzHQYggBej7ySuXcv1p/jXG4uV+uSxw96aLxctvTN+LmRLsw2OwNDxBP8tF2hBboSqVmvzml8s+GpFtZZkir1l1xX7bsZrOOBw7SwYZyw7GFRJ/IKkPEahLB51/Gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=UjV4c1SF; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1792416982; c=relaxed/simple;
+	bh=KE+do/TBjY7vm9rIgC20yyacq0P4rxEoP1N4rypshpY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZeIPjGwEAohrOBrp4Us9m5HAXLdZVCRyhvPLYWD58tSWtS4xH4uQ562GY7cRWTp7m7OOapc1oqBGqeQfRrvBi8mJyjdherBQPJDIEL06pfkocfc9QWd638+pFZ0eDBD4K2O7n1JUqfwvO2gZBzBvBp9tp9589jd2u19TNPqHfRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=I8jfGeNZ; arc=none smtp.client-ip=207.54.90.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="UjV4c1SF"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D03741682;
-	Mon, 19 Oct 2026 06:33:47 -0700 (PDT)
-Received: from [10.0.136.108] (M0PRX50XMG.cambridge.arm.com [10.0.136.108])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3C0213F7D8;
-	Mon, 19 Oct 2026 06:33:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792416831; bh=ujXmLORlFdUC8dYzrwRUCwif5YWfOXSF11Rs+nig8sY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=UjV4c1SF9xNCAoOXioBz7tSAyYZ/mAfTbiTR7C8qe7c6KAyzoehoYaX2xl7mswvjb
-	 2XW5PNkyPw/kkzhazF6kZHxdR/xiPIvVnH6KCJLkhBEAJSa0uqiVIoGcunx6qm2DgW
-	 Emdx8z9A21+BvHbW/JWeXE/6xi+YQ0+t8ODrrST0=
-Message-ID: <6e7f76e9-3e62-4733-9d4a-acf944e005cb@arm.com>
-Date: Mon, 19 Oct 2026 14:33:48 +0100
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="I8jfGeNZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1792416981; x=1823952981;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=KE+do/TBjY7vm9rIgC20yyacq0P4rxEoP1N4rypshpY=;
+  b=I8jfGeNZr6bv9FW2U+UDPEGucczkGkjL3H7R2VyfXDmKBJyvW/2KRHQf
+   kEeLmI9jAvnyMeXFmUla8279RvooGuTRH/9ejqDCDV6EJy6AqwkOfl6JU
+   gmm5uM0FWGzBMlziFQQfs5XceJ0Mr5dRyhI/piyCj+om7suOiF+gyAGvl
+   tvAptftgW4xc4HMWwrolPbVKJK81j01N7yBh7sqEdaNZElFCFHBymg5my
+   /O1176c/bCRxrwKhxeQfD72h/O+1dwutYXGsy/Vk8EbCuoPUIEiYOrTU6
+   prfewJrMWkZJKMDKcI6J8GR7tsKqBmlxIDgkT3PLqq/WQVPWcVDGQkDhP
+   Q==;
+X-CSE-ConnectionGUID: MF4IYJroSrumKtJ4ApyMkg==
+X-CSE-MsgGUID: w6uQv8HsQriqawROnPT9wA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11940"; a="258693774"
+X-IronPort-AV: E=Sophos;i="6.27,167,1786978800"; 
+   d="scan'208";a="258693774"
+Received: from gmgwnl01.global.fujitsu.com ([52.143.17.124])
+  by esa1.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2026 22:36:14 +0900
+Received: from az2nlsmgm4.fujitsu.com (unknown [10.150.26.204])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by gmgwnl01.global.fujitsu.com (Postfix) with ESMTPS id 50E2C42A327;
+	Mon, 19 Oct 2026 13:36:13 +0000 (UTC)
+Received: from az2nlsmom3.fujitsu.com (unknown [10.150.26.199])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2nlsmgm4.fujitsu.com (Postfix) with ESMTPS id 029171000863;
+	Mon, 19 Oct 2026 13:36:13 +0000 (UTC)
+Received: from FCCLS0092175.localdomain (unknown [10.8.51.148])
+	by az2nlsmom3.fujitsu.com (Postfix) with SMTP id E63AB101A437;
+	Mon, 19 Oct 2026 13:36:09 +0000 (UTC)
+Date: Mon, 19 Oct 2026 22:36:08 +0900
+From: Kohei Enju <enju.kohei@fujitsu.com>
+To: sashiko-reviews@lists.linux.dev
+Cc: Tomohiro Misono <misono.tomohiro@fujitsu.com>, 
+	linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v2 4/4] irqchip/gicv3: Add workaround for FUJITSU-MONAKA
+ erratum E#030003
+Message-ID: <atYTTBlzr5J4G_iR@FCCLS0092175.localdomain>
+References: <20261016-monaka-fix-for-upstream-v2-0-fc7ede7f9f48@fujitsu.com>
+ <20261016-monaka-fix-for-upstream-v2-4-fc7ede7f9f48@fujitsu.com>
+ <sashiko-outbox-174127@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] KVM: selftests: Reject GICv3 ITS with a GICv5 VGIC
-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org
-Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
-References: <20261016152225.898761-1-sascha.bischoff@arm.com>
- <20261016152225.898761-3-sascha.bischoff@arm.com>
- <sashiko-outbox-174571@kernel.org>
-Content-Language: en-GB
-From: Sascha Bischoff <sascha.bischoff@arm.com>
-In-Reply-To: <sashiko-outbox-174571@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <sashiko-outbox-174127@kernel.org>
 
-On 16/10/2026 16:36, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Medium] selftests: vgic_v5.c uses ad hoc skip messages and direct exit() instead of TAP
+On 10/16 10:12, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
+> - [High] irqchip/gic-v3: IPI via GICR_ISPENDR0 targets sleeping redistributor
+> - [High] irqchip/gicv3: missing NULL check on rd_base causes IPI sender crash
 > --
 > 
-> commit 1b97dfda1bac7a30c8395c0645ac8efb945b4639
-> Author: Sascha Bischoff <sascha.bischoff@arm.com>
+> commit 98989a1fb6fe6471377f9b9c4a24e0097c1639a3
+> Author: Kohei Enju <enju.kohei@fujitsu.com>
 > 
-> KVM: selftests: Reject GICv3 ITS with a GICv5 VGIC
+> irqchip/gicv3: Add workaround for FUJITSU-MONAKA erratum E#030003
 > 
-> Check that a GICv3 ITS and a GICv5 VGIC cannot be paired, regardless
-> of which device is created first. Skip the check when the host does not
-> expose a GICv3 ITS.
+> This patch works around a FUJITSU-MONAKA erratum where SGIs are lost if an
+> SGI generation races with CPU interface processing. It addresses the issue
+> by bypassing the affected system registers and directly writing to the target
+> CPU's GICR_ISPENDR0 over MMIO.
 > 
->> diff --git a/tools/testing/selftests/kvm/arm64/vgic_v5.c b/tools/testing/selftests/kvm/arm64/vgic_v5.c
->> index d5df742b23001..5bf7d99d29147 100644
->> --- a/tools/testing/selftests/kvm/arm64/vgic_v5.c
->> +++ b/tools/testing/selftests/kvm/arm64/vgic_v5.c
+> > diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+> > --- a/drivers/irqchip/irq-gic-v3.c
+> > +++ b/drivers/irqchip/irq-gic-v3.c
 > [ ... ]
->> @@ -2003,8 +2003,40 @@ int test_kvm_device(u32 gic_dev_type)
->>   	return 0;
->>   }
->>   
->> +static void test_vgic_v3_its_with_vgic_v5(void)
->> +{
->> +	struct kvm_vm *vm = vm_create_barebones();
->> +	int gic_fd, its_fd, ret;
->> +
->> +	if (__kvm_test_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_ITS)) {
->> +		pr_info("No GICv3 ITS support; skipping mixed-model test.\n");
->> +		kvm_vm_free(vm);
->> +		return;
->> +	}
+> > @@ -1386,6 +1391,17 @@ static void gic_ipi_send_mask(struct irq_data *d, const struct cpumask *mask)
+> >  	 */
+> >  	dsb(ishst);
+> >  
+> > +	if (static_branch_unlikely(&gic_fujitsu_030003_erratum)) {
+> > +		for_each_cpu(cpu, mask) {
+> > +			void __iomem *base = gic_data_rdist_sgi_base_cpu(cpu);
 > 
-> [Severity: Medium]
-> When running test_vgic_v3_its_with_vgic_v5() on a host without GICv3 ITS
-> support, this prints an unstructured skip message and returns directly.
-> 
-> Could this be converted to use a TAP reporting macro like
-> ksft_test_result_skip() instead of an ad-hoc pr_info() and return?
-> 
-> Additionally, running the test suite on a host without GICv5 support calls
-> exit(KSFT_SKIP) directly in main() instead of using ksft_exit_skip().
-> Are there plans to update the main() exit path as well?
-> 
+> [Severity: High]
+> Could this cause a fatal page fault on the CPU sending the IPI if the target
+> CPU failed to initialize its redistributor?
 
-As it stands, this matches the rest of the GICv5 selftests. I think that 
-it makes some sense to adjust these going forward, but this change is 
-not the time to start doing that IMO.
+I believe the described path is unreachable.
 
-I'll look into doing this going forward, but won't fix this for now.
+> 
+> If a secondary CPU fails to initialize its GIC redistributor due to a buggy
+> ACPI MADT or missing DT entry, rd_base remains NULL. 
 
-Thanks,
-Sascha
+Yes, rd_base can remain NULL if the firmware description is broken.
+
+
+> However, the CPU can
+> still come online because gic_starting_cpu() returns 0 on failure.
+
+Actually, the CPU cannot come online. Although gic_starting_cpu()
+returns zero, arm64 calls ipi_setup() before set_cpu_online().
+ipi_setup() enables the per-CPU SGIs, which reaches:
+
+secondary_start_kernel()
+  notify_cpu_starting()
+    gic_starting_cpu()
+  ipi_setup()
+    enable_percpu_irq()
+      irq_percpu_enable()
+        gic_unmask_irq()
+          gic_poke_irq()
+  set_cpu_online()
+
+Since rd_base is NULL, gic_poke_irq() attempts to access GICR_ISENABLER0
+through an invalid redistributor base (NULL + 0x10100), causing a fault
+on the secondary CPU before it is marked online.
+
+> 
+> When another CPU later broadcasts an IPI, this workaround will derive base
+> from a NULL rd_base, resulting in an unmapped address (0x10000). The sender
+> CPU will then crash when attempting the writel_relaxed().
+> 
+> Should we validate that the target CPU actually has an initialized
+> redistributor base before bypassing the architected SGI system registers?
+
+I don't think an additional check is necessary here. Existing GICv3 code
+already relies on rd_base being valid for every online CPU. 
+
+Moreover, there is no safe fallback for this workaround: using the
+normal system register write can trigger the erratum, while dropping the
+IPI would leave the target CPU unable to make forward progress.
+
+> 
+> > +
+> > +			writel_relaxed(BIT(d->hwirq), base + GICR_ISPENDR0);
+> 
+> [Severity: High]
+> Is it safe to write to a target CPU's GICR_ISPENDR0 directly over MMIO when
+> that CPU might be in deep idle?
+
+This seems false-positive to me, same as v1:
+  https://lore.kernel.org/all/asYsHLoeNtc-sESV@FCCLS0092175.localdomain/
