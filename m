@@ -1,99 +1,104 @@
-Received: from mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6774549BB72
-	for <kvmarm@lists.linux.dev>; Mon, 19 Oct 2026 08:50:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53997488201
+	for <kvmarm@lists.linux.dev>; Mon, 19 Oct 2026 08:52:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792399840; cv=none; b=HtlpeKEfbstSqhzCbrklHz5bE6AAoCi5UaLfFWLYDq5ncz98UEXuAcKAj/POXZmB0sGpUhEAMFTZfDad/+iCnO+e2PkvXvfN3a+WIQyvfZyzSgNVTnZ/HyHCGzse0rPG248kBzQ+Y8Hi5Fm7H88LQIDrZfWx37Qj88H9uU35t0Y=
+	t=1792399935; cv=none; b=nvFrYrxe64NiGQS67N/EAUAnLuq3WAkWwSZzTz+xZd+BD3hTjoJt2JtEiuD2iiTgo0rl9k7SmMhk+n7I2cTMW5PfMvL1MYam3PL223lhFjKKrHe4LyBgj8ixgGSOge7bfSailw/at2A2NJaQSyvEUWotdZAZAjHM5e4hVG2EZR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792399840; c=relaxed/simple;
-	bh=smuPfukUTEhnLlad9GsBi0MdMFhYsr8EsSBrkOpeT54=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Jb85p0WFU1JbmIqRBAKd+6fY9PsatJlyRwhKY+Kz+ey4wwQqUU/rgiRVpH05AHTCa9XAwhVgL6ZOjoXDbUOgJGBOBVcvq4Y+L1DvhDp/UGnXxjWg2RKzIxtt3LSPKII02ji5TTEwEnh0jEPpdzuVVU5UGbzs8TStqL0gvDotsic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CnVNoI7W; arc=none smtp.client-ip=95.215.58.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1792399935; c=relaxed/simple;
+	bh=MUCbYR8v18SbB6OH/HVYNU3LttmfdwnVvjpPi4IMhV0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=P3ZTGbRmsWE/URLWHAiL+Vh9CLk3hxAadxeiJQuB/zzyZpSbefOurNGCEFVXAmTe40I0bmjzvKliurPX7YEsJmXMR8gO2kPPSJNi4pgSBIVd/0DrDkg7GEJT3wEP0z2cVQT9fXz2jXnR3pTWO8tQjxwz6t2w9kIuAIsLFz+NF48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=GT1bZLoW; arc=none smtp.client-ip=113.46.200.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CnVNoI7W"
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=smuPfukUTEhnLlad9GsBi0MdMFhYsr8EsSBrkOpeT54=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792399836; v=1; x=1793004636;
- b=CnVNoI7WKYqX4ZhlD7DL/KlSqj6WOfzOfBqX0ZJbLEfD82y0q/siPiANqTTgnkRWCMj5yKn9
- fGpgXDlLAauSv5gCB+8S+NQizRl5VX/6f7+XMc12kiOUaSlK8e0b8W8iQ8zhmiZaQG6CH83Rh9p
- Bu3dqT9n87cJv/lkSMGAwH9c=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id b6915b6c1e99e6bb;
-	Mon, 19 Oct 2026 08:50:34 +0000
-X-Mizu-Trace-ID: b6915b6c1e99e6bb
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5be3b2f17c1so6734e87.1
-        for <kvmarm@lists.linux.dev>; Mon, 19 Oct 2026 01:50:30 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvByhxZCFLgCrYY0Pz80sL0GCdjnGpdRxN9IlObMvb+0ro8RqYivTYpHJjD/MY3KiFXR2DjLAq7U=@lists.linux.dev
-X-Gm-Message-State: AFq9FYL7r7nI34N2euvt6+41EvSpvnwsbJN3WET996n25UQ+hBtGvS5r
-	+zCxH5KeYI4eBn8wTL5fPmfi3EloKcqxUayS0dy6M/DxUU9iz5VOUToTfZA/feHCNCaNSpDI+Xf
-	GrYV56O3vlqt6CFkguzVXDSu65SXh5euq04QYwjyd
-X-Received: by 2002:a05:6512:ace:b0:5ba:3602:4343 with SMTP id
- 2adb3069b0e04-5be51d51c40mr121150e87.16.1792399829578; Mon, 19 Oct 2026
- 01:50:29 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="GT1bZLoW"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=9RA/hcHJY3Xat3tCcIdPXsEW1mdR/MAvb3pTyuaKtH8=;
+	b=GT1bZLoWEeUhVI9pHxVGG5Ih5t07PJ7PhNfPRlbaE6gxZFAUryRnYskkR/n2v4K6+kzhR3gNZ
+	GFY97Pdf5N+UsxDTpm2dJa7f5PXuLu/jkhwrISX8RblokF3/07EYt7DotxFJMl8Kpy6VH79B1q0
+	qJGqGHYJkgZmEVNFdymwEF4=
+Received: from mail.maildlp.com (unknown [172.19.162.223])
+	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4j7TnJ4Sr4z1prlN;
+	Mon, 19 Oct 2026 16:52:04 +0800 (CST)
+Received: from kwepemk300013.china.huawei.com (unknown [7.202.194.231])
+	by mail.maildlp.com (Postfix) with ESMTPS id 47EFD40575;
+	Mon, 19 Oct 2026 16:52:07 +0800 (CST)
+Received: from [10.67.121.183] (10.67.121.183) by
+ kwepemk300013.china.huawei.com (7.202.194.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.45; Mon, 19 Oct 2026 16:52:05 +0800
+Message-ID: <9eb6e0fe-5d8a-499c-b19b-ce73fe982451@huawei.com>
+Date: Mon, 19 Oct 2026 16:52:04 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20261018080921.3942517-1-fuad.tabba@linux.dev>
- <8633u229lq.wl-maz@kernel.org> <CA+EHjTwHP7h_=e1s-iCDekMNvHGAQA3K1zv5v_4=PXQw9ueiFg@mail.gmail.com>
- <861p9m1709.wl-maz@kernel.org>
-In-Reply-To: <861p9m1709.wl-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 19 Oct 2026 09:49:53 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTyDJ87A3e7tr6Q2UEvi9BRuuu5HQ90A_3VWaOFKnRmZkw@mail.gmail.com>
-X-Gm-Features: AclHuK_GC1ojwYomVv0QIMlxdcqQYksqozcLWRejxdRqCJ0NJlVWgmqtZaSv6zY
-Message-ID: <CA+EHjTyDJ87A3e7tr6Q2UEvi9BRuuu5HQ90A_3VWaOFKnRmZkw@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: arm64: Only enable S1PIE and S1POE with the
- features they imply
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Mark Brown <broonie@kernel.org>, 
-	Lorenzo Stoakes <ljs@kernel.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 00/12] arm64: Add support for TLBI domains
+To: =?UTF-8?Q?Kristina_Mart=C5=A1enko?= <kristina.martsenko@arm.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-acpi@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>, <linux-efi@vger.kernel.org>
+CC: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>, Ryan Roberts <ryan.roberts@arm.com>,
+	David Hildenbrand <david@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, Linu
+ Cherian <linu.cherian@arm.com>, Anshuman Khandual
+	<anshuman.khandual@arm.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Hanjun Guo <guohanjun@huawei.com>, Sudeep Holla <sudeep.holla@kernel.org>,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Fuad Tabba
+	<fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Steffen Eiden
+	<seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+	<yuzenghui@huawei.com>, Ard Biesheuvel <ardb@kernel.org>, Ilias Apalodimas
+	<ilias.apalodimas@linaro.org>
+References: <20261001110655.461473-1-kristina.martsenko@arm.com>
+From: Jinqian Yang <yangjinqian1@huawei.com>
+In-Reply-To: <20261001110655.461473-1-kristina.martsenko@arm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemk300013.china.huawei.com (7.202.194.231)
 
-Hi Marc,
+Hi,
 
-On Mon, 19 Oct 2026 08:31:18 +0100, Marc Zyngier <maz@kernel.org> wrote:
-[...]
-> > I'll send your patch as v3, rebased on -rc3 with you as the author,
->
-> Please at least add yourself as a co-author.
+On 2026/10/1 19:06, Kristina Martšenko wrote:
+> Hi,
+> 
+> This series allows the kernel to use TLBI domains. TLBI domains (FEAT_TLBID) is
+> an Arm architecture feature that enables a TLB invalidation to target a subset
+> of CPUs instead of the whole system. It can improve performance on systems with
+> many CPUs. TLBID is not yet part of the Arm Architecture Reference Manual but
+> some of it is described in the latest XML [1].
+> 
+> The goal of this series is to send TLBI commands only to the CPUs where a
+> process has run (i.e. where its page tables have been installed). The last
+> patch explains a bit about how it works. This is an RFC since I'm not familiar
+> with the kernel's TLB/mm code and I'd like feedback on whether the general
+> approach is correct.
+> 
 
-Will do, thanks.
+Thanks for posting this series.
 
-> > once I've tested it. I'm dropping v2's trap table changes, since
-> > they're redundant once the ID registers are sanitised. I made two
-> > changes to your patch. The sanitisation now runs before
-> > kvm_init_nv_sysregs(), so the nested RESx masks are computed from the
-> > sanitised values.
->
-> Isn't that already the case? At least with kvmarm-7.4,
-> kvm_vm_finalize_sys_regs() is called before kvm_init_nv_sysregs().
+I'm working on the KVM side of TLBID, and have a series that
+virtualizes TLBI domains for guests. It includes:
 
-It is. -rc3 doesn't have Mark's split of kvm_finalize_sys_regs(), so
-kvm_init_nv_sysregs() still runs there first. I'll rebase v3 on
-kvmarm-7.4 and keep the call where you had it.
+  - per-vCPU vDomain configuration via a new capability and
+    two ioctls
+  - VTLBID_EL2 programming at vCPU load/put, mapping vDomains
+    to physical domains
+  - a guest visible TLBIDIDR_EL1 with virtual domain counts,
+    and conditional exposure of ID_AA64MMFR4_EL1.TLBID
 
-> > I dropped the res1 half, which isn't set by anything.
->
-> I'd like to keep this, as it will eventually get used, just like the
-> recompute loop is a bit useless for now, but will become useful in the
-> future as dependencies get recomputed.
+You mentioned you planned to look at KVM support in your next
+version. Would it be OK for us to post this as an RFC on top
+of your series? :)
 
-Ack.
+Thanks,
+Jinqian
 
-Cheers,
-/fuad
