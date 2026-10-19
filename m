@@ -1,110 +1,166 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F7EB4F96AC
-	for <kvmarm@lists.linux.dev>; Mon, 19 Oct 2026 13:42:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB965CFA33;
+	Mon, 19 Oct 2026 14:01:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792417380; cv=none; b=T8V9PLiC1ZSKVU2/5S20AvzuqcPgO1pGUnrlOXXXHxUDaJif2pqrbtl6yo0QQNmEkOq0hLVgvs5Yvp9DH7TSfgadZwvy8rfwGs5+isoiNqWtA2Mi0U1/VqdFiC3VNIYgEppRysdgA7W32rHKlIWkwQ4fhk03rJz3RrpJQQgIAD0=
+	t=1792418483; cv=none; b=bnrtv7bp/hsNQWKXqbkGKz0juz5FJbVKnUzOU41seco5Z4dk1AlXV+FLzaf2U9rvo/Q7Mlgv0p10bNqQZH3fyTMhCZYYVdfnoqqLAGz4ALceX81GB8ct1b/yPgK2JBZfSe0SliX0D/4R39/k+Z9sCuhMuYWF6sPtlJUbG7s5toY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792417380; c=relaxed/simple;
-	bh=uF3gHfbdma2orZBXGO3W33CSKmBuY31e2U0A16wUtI4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rtcu8kO3H2s5i6TxOXSkh0pTN+0nsSg0M04vu1Y8ttPtTI7UpMpdNzHhkVaMr5jim1gO7SUsCb4zT6leMMrtijiREgQ2HEndbbQAQxQgRa4dcSJhiPKG6tHHpUpsIJVQjWumGCsuNr/uZejDIq98XwxGp1gCR2sfv+prUyqg8P4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=XYs0c9v6; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1792418483; c=relaxed/simple;
+	bh=QN1JVvvcU8tCJIUBuHRPCvDcAoldkEB3YpGvN0zpHLc=;
+	h=Message-ID:From:Subject:To:Cc:In-Reply-To:References:Content-Type:
+	 Date; b=oh/9B0qYDe1JpnxvpgO5w0fckDAZLCa+62zBjrA0SGfBQRzSleTpkyHfsRYEFxY712Yo9iGr7SAMPBVfhR69ijGTPAzcpcDzAAEq9mTG6Ff8XgmgaTvdt2qBWV+OayNHENJ2AvtWTTSMOJrCveRhrQbXdBvu5UomxP0wQ5YUcT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=asW3LIOC; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="XYs0c9v6"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7FB7E1CE0;
-	Mon, 19 Oct 2026 06:42:55 -0700 (PDT)
-Received: from e133894.cambridge.arm.com (e133894.arm.com [10.2.80.62])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 699593F7D8;
-	Mon, 19 Oct 2026 06:42:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792417378; bh=uF3gHfbdma2orZBXGO3W33CSKmBuY31e2U0A16wUtI4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XYs0c9v6eCUP6TFLr/38qxMAAJ02GuUE+cvJoII+EneHNNCLsTlQhoRZ3moyfbt03
-	 z0Y8veezIvYax7sZoSx0q1Mcmj3Ss6p+myC0Kr5Cz67a4GHwYKy+QZjh0ibUW9jCIb
-	 Ttl0+1+2beS1NEXO5GaELPODbAICnc8ilCF5fQww=
-From: Sascha Bischoff <sascha.bischoff@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Cc: maz@kernel.org,
-	oupton@kernel.org,
-	fuad.tabba@linux.dev,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com
-Subject: [PATCH v2 2/2] KVM: selftests: Reject GICv3 ITS with a GICv5 VGIC
-Date: Mon, 19 Oct 2026 14:42:42 +0100
-Message-Id: <20261019134242.1289002-3-sascha.bischoff@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20261019134242.1289002-1-sascha.bischoff@arm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="asW3LIOC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2137F1F000C8;
+	Mon, 19 Oct 2026 14:01:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792418481;
+	bh=vOzMu9yXDXjpNHsxshh5zV/Cvva5ZmdoG5eGo37cSQ4=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=asW3LIOC5kxu1ONl9gDGJsqDbV3phdOB3QBWQw+miqk1Lm+mG6lbLDqivJ4F0Sv8C
+	 hhpH/jI0ypdJv5xjM45JQAC3R2pvFCplcGlOwo2u88OCVJ8EBeTu9OMKNRfjkskUN5
+	 /tcaiQPmN6AMx9vXjcUlb8pKnBkn10Z+KRKfLMOmfO/BHDsfZUp5GnGAi8UEZbCVMJ
+	 aDZF8ogKe/0qZUiNT3QZ72sOTJ4IsQAnrH/WG0atrAuYZVBfQrx0JUuCSIxzXE/uJd
+	 uPavnxc8yD637x+pV9LkOrX/984DwexMYNSF5uXEq3zbwU+W2yEC1z5HnDfuWHSM7C
+	 Fl3oERhbWJwjg==
+Message-ID: <sashiko-outbox-177254@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 1/2] KVM: arm64: vgic: Require matching VGIC model
+ for GICv3 ITS
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Sascha Bischoff" <sascha.bischoff@arm.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
+In-Reply-To: <20261019134242.1289002-2-sascha.bischoff@arm.com>
 References: <20261019134242.1289002-1-sascha.bischoff@arm.com>
+ <20261019134242.1289002-2-sascha.bischoff@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 19 Oct 2026 14:01:20 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Check that a GICv3 ITS and a GICv5 VGIC cannot be paired, regardless
-of which device is created first. Skip the check when the host does not
-expose a GICv3 ITS.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] KVM: arm64: vgic: vgic_has_its() returns true without an in-kern=
+el VGIC
+--
 
-Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
----
- tools/testing/selftests/kvm/arm64/vgic_v5.c | 32 +++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+commit 06339a92609918e3caedb4339d3324ff581b8fee
+Author: Sascha Bischoff <sascha.bischoff@arm.com>
 
-diff --git a/tools/testing/selftests/kvm/arm64/vgic_v5.c b/tools/testing/selftests/kvm/arm64/vgic_v5.c
-index d5df742b23001..5bf7d99d29147 100644
---- a/tools/testing/selftests/kvm/arm64/vgic_v5.c
-+++ b/tools/testing/selftests/kvm/arm64/vgic_v5.c
-@@ -2003,8 +2003,40 @@ int test_kvm_device(u32 gic_dev_type)
- 	return 0;
- }
- 
-+static void test_vgic_v3_its_with_vgic_v5(void)
-+{
-+	struct kvm_vm *vm = vm_create_barebones();
-+	int gic_fd, its_fd, ret;
-+
-+	if (__kvm_test_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_ITS)) {
-+		pr_info("No GICv3 ITS support; skipping mixed-model test.\n");
-+		kvm_vm_free(vm);
-+		return;
-+	}
-+
-+	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V5);
-+	ret = __kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_ITS);
-+	TEST_ASSERT(ret < 0 && errno == ENODEV,
-+		    "GICv3 ITS created after GICv5 VGIC: ret=%d errno=%d",
-+		    ret, errno);
-+	close(gic_fd);
-+	kvm_vm_free(vm);
-+
-+	vm = vm_create_barebones();
-+	its_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_ITS);
-+	ret = __kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V5);
-+	TEST_ASSERT(ret < 0 && errno == ENODEV,
-+		    "GICv5 VGIC created after GICv3 ITS: ret=%d errno=%d",
-+		    ret, errno);
-+	close(its_fd);
-+	kvm_vm_free(vm);
-+}
-+
- void run_tests(u32 gic_dev_type)
- {
-+	pr_info("Test VGICv5 and GICv3 ITS model mismatch\n");
-+	test_vgic_v3_its_with_vgic_v5();
-+
- 	pr_info("Test VGICv5 address attrs\n");
- 	test_vgic_v5_addr_attrs();
- 
--- 
-2.34.1
+KVM: arm64: vgic: Require matching VGIC model for GICv3 ITS
 
+This commit records the VGIC model required by an ITS device in
+struct vgic_dist and checks model compatibility during both VGIC and ITS
+creation so that incompatible devices are rejected regardless of creation
+order. It also replaces dist->has_its with a check on dist->its_model in
+vgic_has_its() and changes dist->vgic_model to enum kvm_device_type.
+
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-it=
+s.c
+> index e5657cb603567..7df5869cff990 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -1875,6 +1875,19 @@ static int vgic_its_create(struct kvm_device *dev,=
+ u32 type)
+> =20
+>  	mutex_lock(&dev->kvm->arch.config_lock);
+> =20
+> +	/*
+> +	 * Reject creation of a GICv3 ITS if:
+> +	 * - The VM already has a VGIC other than GICv3.
+> +	 * - An existing ITS requires a VGIC model other than GICv3.
+> +	 */
+> +	if ((irqchip_in_kernel(dev->kvm) && !vgic_is_v3(dev->kvm)) ||
+> +	    (dev->kvm->arch.vgic.its_model &&
+> +	     dev->kvm->arch.vgic.its_model !=3D KVM_DEV_TYPE_ARM_VGIC_V3)) {
+> +		mutex_unlock(&dev->kvm->arch.config_lock);
+> +		kfree(its);
+> +		return -ENODEV;
+> +	}
+> +
+>  	if (vgic_initialized(dev->kvm)) {
+>  		ret =3D vgic_v4_init(dev->kvm);
+>  		if (ret < 0) {
+> @@ -1902,7 +1915,7 @@ static int vgic_its_create(struct kvm_device *dev, =
+u32 type)
+>  	xa_init(&its->translation_cache);
+> =20
+>  	dev->kvm->arch.vgic.msis_require_devid =3D true;
+> -	dev->kvm->arch.vgic.has_its =3D true;
+> +	dev->kvm->arch.vgic.its_model =3D KVM_DEV_TYPE_ARM_VGIC_V3;
+>  	its->enabled =3D false;
+>  	its->dev =3D dev;
+> =20
+> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgi=
+c-mmio-v3.c
+> index 5ab789accc9d4..5f0a5b12e338f 100644
+> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> @@ -42,10 +42,7 @@ bool vgic_has_its(struct kvm *kvm)
+>  {
+>  	struct vgic_dist *dist =3D &kvm->arch.vgic;
+> =20
+> -	if (dist->vgic_model !=3D KVM_DEV_TYPE_ARM_VGIC_V3)
+> -		return false;
+> -
+> -	return dist->has_its;
+> +	return !!dist->its_model;
+>  }
+> =20
+>  bool vgic_supports_direct_msis(struct kvm *kvm)
+
+[Severity: Medium]
+Can vgic_has_its() now return true when a VM has created an ITS device
+without creating an in-kernel VGIC (dist->vgic_model =3D=3D 0)?
+
+Previously, vgic_has_its() returned false when dist->vgic_model was 0.
+With this change, vgic_its_create() sets dist->its_model even when
+!irqchip_in_kernel(dev->kvm), while skipping vgic_v4_init() because
+vgic_initialized(dev->kvm) is false.
+
+If userspace creates a KVM_DEV_TYPE_ARM_VGIC_ITS device and runs a vCPU
+without creating an in-kernel VGIC (which kvm_vgic_map_resources() permits
+when !irqchip_in_kernel(kvm)), vgic_supports_direct_msis() evaluates to
+true on GICv4.0 hosts:
+
+arch/arm64/kvm/vgic/vgic-mmio-v3.c:vgic_supports_direct_msis() {
+	if (system_supports_direct_sgis() && !vgic_supports_direct_sgis(kvm))
+		return false;
+
+	return kvm_vgic_global_state.has_gicv4 && vgic_has_its(kvm);
+}
+
+In the vCPU run loop, kvm_arch_vcpu_ioctl_run() calls
+kvm_vgic_flush_hwstate() unconditionally:
+
+arch/arm64/kvm/vgic/vgic.c:kvm_vgic_flush_hwstate() {
+	if (vgic_supports_direct_irqs(vcpu->kvm) && kvm_vgic_global_state.has_gicv=
+4)
+		vgic_v4_commit(vcpu);
+
+	if (!kvm_vgic_vcpu_pending_irq(vcpu))
+		return;
+}
+
+Wouldn't this call vgic_v4_commit() -> its_commit_vpe() ->
+irq_set_vcpu_affinity(0, &info) on an uninitialized its_vpe where
+vpe->irq =3D=3D 0, as well as allowing MSI entry points such as kvm_set_msi=
+(),
+kvm_arch_set_irq_inatomic(), vgic_msi_to_its(), and
+kvm_vgic_v4_set_forwarding() to proceed without an in-kernel VGIC?
+
+Should vgic_has_its() still check irqchip_in_kernel(kvm) (or
+dist->vgic_model =3D=3D dist->its_model)?
+
+[ ... ]
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261019134242.1289=
+002-1-sascha.bischoff@arm.com?part=3D1
