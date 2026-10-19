@@ -1,125 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B61A93ECBDA;
-	Mon, 19 Oct 2026 07:31:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52CF1485957
+	for <kvmarm@lists.linux.dev>; Mon, 19 Oct 2026 07:38:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792395082; cv=none; b=W1wNYnH8CaSbY1bLiyvU5pzSlSGr2z9bFAcfiAbpYBL7B/SuSACTkLJ7Lu9CZMk2aR3Mp3ycs/Q1v8CQz7Ni6eghMvtPV/oPk9HLIVA2CWUWVeFDuNI3qjr2bMVtA+/4mNlWA7iUqDuGCCBdmpH0t+A3+6d//FGDqN8HxgT8Gec=
+	t=1792395489; cv=none; b=g8/JZH1YOjuq1vyRSzvMWZvqh50Xcvhtugg6Yn78nhS0TlWqBPcQPzdI+6sgnCGnJ85MdJk/xON3M8QtKOeKmcvsexb6H9l33xWFN4ociQtZZabYUJtapLw/hWW8pcw3DwDSj0zvSoIHRM8+WAV7e/5jNReQ+Bju9lRfVGGmwYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792395082; c=relaxed/simple;
-	bh=udJeHtKFc+AI2kfdvBt/OjQRSFLlHhk/kt6ygA/+jxc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bbZxKnTJL4fNtAPW2Cvm/n2aqEUkbDS8CVp03BhDn+tAcAVlsPZR3nuL0jhqHsuJEJr/1pqB+dARMVQcAq8t6uJ9BVN+n4rilDzOVs0mXeb5E/mVdSqx3suWY2AC9oUiLt+yKVycSrpLh/AhpjWAnVfVXupDm4tq3jGpFEymdfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KvfNtmig; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792395489; c=relaxed/simple;
+	bh=EALUpi89F8vG8tau0PZutc7ETFh24LQ10NG5a1YgYP0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=lqKE3mhCdRRLeM5Hr5mS8ECwFJ22OWufk5vZXCXFUv3sBazMoxjMe+c/5tMalcvZ3IfWaIpuZFxEwopeU951FcIUSIWDBpowIkBybe2le27ww+x/6q6TuqbQVT2WOyMZkzB4IMVFsqmGHKUmjqJAoSTInejCFnKUAiaG0gQG5eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=oUtFqMPX; arc=none smtp.client-ip=113.46.200.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KvfNtmig"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 443D51F000C4;
-	Mon, 19 Oct 2026 07:31:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792395081;
-	bh=uCGtUkkqng5DDwzVzyRNOsFv9259MjO3krkZaoJj3eQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=KvfNtmig5fCNWGhuipioroXwY0AvPKlNdMITkMj9ZkKqe7C+O5kX2SnBY121fAqA/
-	 Bph8ibNC+RGUQIxQc40JM1NBRntlrTSsHQ08UiNNdu7FaOkfdNsr3XFHpe9W7M8shZ
-	 MdZiO7MztaOU9iLTjdIflb2diiBr8YsPXMp3Amwkg5n0LuC3n0G+PnimtjpJTlekiB
-	 ov4POiOwi5eDWKlc410o5uP/Yo+o+tm2brI7GAezQEldB7PJ4wlANZ19MMT4eZgulO
-	 VOHzNiTE8Cm7hNtluUfx55gTho5ftjfSesYOy5jOkebVjzstvQseNmqxJXxFF8hNYV
-	 WidbvNl3v9nKw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xIhq3-00000004WLX-0LYn;
-	Mon, 19 Oct 2026 07:31:19 +0000
-Date: Mon, 19 Oct 2026 08:31:18 +0100
-Message-ID: <861p9m1709.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: arm64: Only enable S1PIE and S1POE with the features they imply
-In-Reply-To: <CA+EHjTwHP7h_=e1s-iCDekMNvHGAQA3K1zv5v_4=PXQw9ueiFg@mail.gmail.com>
-References: <20261018080921.3942517-1-fuad.tabba@linux.dev>
-	<8633u229lq.wl-maz@kernel.org>
-	<CA+EHjTwHP7h_=e1s-iCDekMNvHGAQA3K1zv5v_4=PXQw9ueiFg@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="oUtFqMPX"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=dl5RLVgDUnKMmfwkyYpV+I64OLaYgtn2GgeN1aSXzxk=;
+	b=oUtFqMPX256inh7nC7a+6PjRlRe1sqcp+mWOt6JQZCRkpGSMf5H8qLiMbX8sCSKJoI+nPSTnr
+	fPGZUtnBPFPu/404GHMvOpJF0YS9cvIRkEaXNv/uKSuyEpoWhXRD+/9jcT1PqkfkYXW7vduDrv4
+	rtVICoS3BdIIXxZ0JSxO/D0=
+Received: from mail.maildlp.com (unknown [172.19.162.223])
+	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4j7S7s1VHnz1prRJ;
+	Mon, 19 Oct 2026 15:38:01 +0800 (CST)
+Received: from kwepemk300013.china.huawei.com (unknown [7.202.194.231])
+	by mail.maildlp.com (Postfix) with ESMTPS id D70DB40575;
+	Mon, 19 Oct 2026 15:38:03 +0800 (CST)
+Received: from [10.67.121.183] (10.67.121.183) by
+ kwepemk300013.china.huawei.com (7.202.194.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.45; Mon, 19 Oct 2026 15:38:02 +0800
+Message-ID: <49e48aac-8d84-4786-9e3e-04e1c2fef020@huawei.com>
+Date: Mon, 19 Oct 2026 15:38:01 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, broonie@kernel.org, ljs@kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 06/12] ACPI: TLBI: Parse domains from table
+To: =?UTF-8?Q?Kristina_Mart=C5=A1enko?= <kristina.martsenko@arm.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-acpi@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>, <linux-efi@vger.kernel.org>
+CC: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>, Ryan Roberts <ryan.roberts@arm.com>,
+	David Hildenbrand <david@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, Linu
+ Cherian <linu.cherian@arm.com>, Anshuman Khandual
+	<anshuman.khandual@arm.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Hanjun Guo <guohanjun@huawei.com>, Sudeep Holla <sudeep.holla@kernel.org>,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Fuad Tabba
+	<fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Steffen Eiden
+	<seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+	<yuzenghui@huawei.com>, Ard Biesheuvel <ardb@kernel.org>, Ilias Apalodimas
+	<ilias.apalodimas@linaro.org>
+References: <20261001110655.461473-1-kristina.martsenko@arm.com>
+ <20261001110655.461473-7-kristina.martsenko@arm.com>
+From: Jinqian Yang <yangjinqian1@huawei.com>
+In-Reply-To: <20261001110655.461473-7-kristina.martsenko@arm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemk300013.china.huawei.com (7.202.194.231)
 
-On Sun, 18 Oct 2026 19:52:35 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
-> 
-> Hi Marc,
-> 
-> On Sun, 18 Oct 2026 18:37:37 +0100, Marc Zyngier <maz@kernel.org> wrote:
-> [...]
-> > I'm afraid that this only addresses part of the problem. Ultimately,
-> > the idregs themselves require some sanitisation because KVM uses this
-> > as the source of truth. I was pointing this in my reply to Broonie,
-> > and this is (probably) what sashiko is blabbing on about.
-> 
-> It seems so. The trap tables were only one of the places that read
-> S1PIE and S1POE. Sashiko found another: PIR_EL2, PIRE0_EL2 and POR_EL2
-> accessed from vEL2 have no FGT bit, so accesses to them reached the
-> hardware registers.
-> 
-> > I hacked something that could be used as the bases for such
-> > sanitisation, although it is quite crude and doesn't cover all of the
-> > possible requirements, see below. I've only boot-tested it in a nested
-> > guest, and I'm not even sure it actually works (my test box doesn't
-> > have these features).
-> 
-> I'll send your patch as v3, rebased on -rc3 with you as the author,
+Hi,
 
-Please at least add yourself as a co-author.
+On 2026/10/1 19:06, Kristina Martšenko wrote:
+> +static int __init parse_tlbi_table(void)
+> +{
+> +	struct acpi_table_header *table __free(acpi_put_table) =
+> +		acpi_get_table_pointer(ACPI_SIG_TLBI, 0);
+> +	u32 offset;
+> +	int ret;
+> +
+> +	if (IS_ERR(table))
+> +		return PTR_ERR(table);
+> +
+> +	tlbi = (struct acpi_table_tlbi *)table;
+> +	if (tlbi->header.length < sizeof(*tlbi) ||
+> +	    tlbi->domain_count > MAX_TLBI_DOMAINS)
+> +		return -EINVAL;
+> +	if (!tlbi->domain_count)
+> +		return -ENOENT;
+> +
+> +	domain_count = tlbi->domain_count;
+> +	domains = kcalloc(domain_count, sizeof(*domains), GFP_KERNEL);
+> +	if (!domains)
+> +		return -ENOMEM;
+> +
+> +	offset = tlbi->domains_offset;
+> +
+> +	for (int i = 0; i < domain_count; i++) {
+> +		struct acpi_tlbi_domain *domain = tlbi_get_domain(offset);
+> +
+> +		if (!domain || domain->id > U16_MAX)
+> +			return -EINVAL;
+> +
+> +		domains[i].id = domain->id;
+> +		if (!zalloc_cpumask_var(&domains[i].cpus, GFP_KERNEL))
+> +			return -ENOMEM;
+> +
+> +		ret = parse_tlbi_domain(domain, domains[i].cpus, 0);
+> +		if (ret)
+> +			return ret;
+> +
+> +		offset += domain->length;
+> +	}
+> +
+> +	ret = validate_tlbi_domains();
+> +	if (ret)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+> +
+> +void __init acpi_tlbi_init(void)
+> +{
+> +	int ret;
+> +
+> +	if (!cpus_have_final_cap(ARM64_HAS_TLBID))
+> +		return;
+> +
+> +	ret = parse_tlbi_table();
+> +	if (ret) {
+> +		if (ret != -ENOENT)
+> +			pr_err("Failed to parse ACPI table\n");
+> +		return;
+> +	}
+> +}
 
-> once I've tested it. I'm dropping v2's trap table changes, since
-> they're redundant once the ID registers are sanitised. I made two
-> changes to your patch. The sanitisation now runs before
-> kvm_init_nv_sysregs(), so the nested RESx masks are computed from the
-> sanitised values.
-
-Isn't that already the case? At least with kvmarm-7.4,
-kvm_vm_finalize_sys_regs() is called before kvm_init_nv_sysregs().
-
-> I dropped the res1 half, which isn't set by anything.
-
-I'd like to keep this, as it will eventually get used, just like the
-recompute loop is a bit useless for now, but will become useful in the
-future as dependencies get recomputed.
-
-The way I imagine this to work is that each sanitised field entry will
-point to a subtable containing the encoding of the field and the a
-function that checks for the dependency. That's not required for now,
-as S1P[IO]E is only a boolean, but I expect some features to
-eventually need something more fine-grained.
+The error paths in parse_tlbi_table() return without freeing
+"domains" or the cpumask already allocated.
 
 Thanks,
+Jinqian
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
