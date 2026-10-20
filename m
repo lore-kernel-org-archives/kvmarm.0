@@ -1,49 +1,61 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792511761;
-	b=DjrjMZRgWINFEXAA9H3tGzsqIB0heyK9vOfAE7YwLjQcEJwh4h5DZeTZmCZTDvMR4C1O
-	 9qM5yNraQ7RMxu5iqmaKhpiMSyBUvmDEhlFVwxN2Qf/FpeZrHYDJbO8N3FfoXbaiCdwyo
-	 gLGOAPyB4xw6br4r0pAKbnOckT6v77MxdHAUB0EOkqAlKanNErSrzTc3arG3p8Qm23dz0
-	 nBO7JI9+wyBchOs3vzXR0f7CswrmPy6IB2D7lWBgKlOgGj2IGdDl9Wr2B7RQVKCEkw8Y9
-	 iNE4CteU+MREIfF09WT+Kfam8iaCknPbGAza7i8qM56LM0stsA3rcH8AEkRmAcwMD6g==
+	t=1792514373;
+	b=psqE5Jiso/ijUXDWjVzq5c6sRERi3d4Gw3q/fCT+/DgzwGjs85J+5kdJ5vm426p3MgKd
+	 6co3x+gV9+AyCXCw80eUXuxjLlSHtQOoq5W5pr+7b2SxnYt0btN1N9E5uHD5+cJt7uyaJ
+	 JrwPFPYkQUh/y9R702GjqTrFXq1ydIKTokwA0aoScCVmr68sKnTRFV9hhnD+lmTrbW6CW
+	 Pfq4bmrvEFODunVa82Hd4hgtjqzX8ho1GRzrvaCVzXQdwN5uboUh+2lWQGOIKmla5KQYk
+	 +TUSvrsuYE116/M9/3/TaAYq3Ugk4+NMZ8k4tclNUWcze7m0+yCtpxa25ddN1KNrVDA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792511761;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
-	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=Sm8fHDamcBdzMl5gH1h8FKaHDH8UrW+Ey8qPWPBjzGw=;
-	b=FRNvqilZ1Igguxs2PeZgjXgw8qagHB+apiaF/qWfRxigmuBBeMpsK1fsGJJhoePAxHvA
-	 okz5UoQFFsl3H/Pnx+6eP4xBwuD+ZrxTrrTQ3VDUOFZT+aJ5yUc0rZCsDpD1sBMedwSxG
-	 xRKorFk8ecRNLrnCdYk6yJTQan3UA5U0/gftlNpZWsNHsBQpKTN/aBY2yzNYPJuROXK24
-	 V353mKeAFBq9KILMwBR+dUPAUDKfN0x0IUKNfWBhwBDzlFGnEY/CYGgvvlxUxi7Ci6abV
-	 y/pb3V7m4gSPUzCC18HbAY45YGCOJpHYyl6bv6C/zMI2xBY+tGfELOODmeAWMrk0XRQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792514373;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-Id:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=830H2YTMFkD9IORfLXHCHq/I9Z/gK3pKXYSwz8rUqk4=;
+	b=wI/KoBOp9qDvd/rvrLVnHvKJFGsdFS7EbxuInRJ1sSzGcHK++zJHYetBJwHker8oySVy
+	 FF2BKZLQrXJ7NfCcAVZFDX+sOdBL6kUXLaCQiMyJUrLpcNsUgCowfRGO64rgSnP3ehwIh
+	 g8YsFFag1I4iL23UArQ1xwjwUDCB95OxkwNBiygQrkvITsjYKNVwq5A7A6AWNt05B9b7N
+	 OvbuC/e7XlUl0N3h/LUgdbf4LwAgP7G+wmZVRGFYt9KgxNDtfG0ONPZ0bTqkh6Ls4zKLy
+	 U4VS4tup1cFb9LEfSXmUTsFvsY47OzNNS2j5ilUigq0/IXX6bv7sV/4U/ShtEk9WsBA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=X4lGo9CE;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=b7Day1CE;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1B7606A327
-	for <kvmarm@lists.linux.dev>; Tue, 20 Oct 2026 15:55:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1A1B7606A327
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A79606A32D
+	for <kvmarm@lists.linux.dev>; Tue, 20 Oct 2026 16:39:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A8A79606A32D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=X4lGo9CE
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=b7Day1CE
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EB36916F8;
-	Tue, 20 Oct 2026 08:55:50 -0700 (PDT)
-Received: from [10.0.137.15] (XHFQ2J9959-5.cambridge.arm.com [10.0.137.15])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 16E3D3F7B4;
-	Tue, 20 Oct 2026 08:55:50 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A83B11596;
+	Tue, 20 Oct 2026 09:39:28 -0700 (PDT)
+Received: from e133894.cambridge.arm.com (e133894.arm.com [10.2.80.62])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4DF2F3F7D8;
+	Tue, 20 Oct 2026 09:39:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792511754; bh=RA7wOkYKzBDqak619Rsj+v/XerrUB1e1xwduoqIgrN8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=X4lGo9CEziSLBpzJ/wESFC5gv5b77FuUDrR0qNwD8V1L1mSKpYmzGUiAukpnL80d8
-	 P11iPoiXfYQuXADVOOxE6uyuYgs13RlDvy1BObGmrYbA1li5ZIbGLrEXmg2JIdJMIw
-	 rykl0k838v9Jemvp9bv+0a2Q8qDWplu00g6B3roE=
-Message-ID: <3f49b39e-139f-45da-b646-dbb240b31776@arm.com>
-Date: Tue, 20 Oct 2026 16:55:49 +0100
+	t=1792514371; bh=5rR7Cm0/WLTiRNhzJ0pe4uv+L2juToro2br9wZ5Wk7o=;
+	h=From:To:Cc:Subject:Date:From;
+	b=b7Day1CEKJw+adAz90dZ+i2OF/o9tpbIQwSTwJ4ylGS+KplNNCbhZCKNN++pf9BBr
+	 qFE6tFRuSCdkcl8+sYER64nWZigWMmAu2baN6JcHltYCx56t4ksOu99o1v7bLXndR4
+	 bsYa/3TIyQWq7L81Ox3D77JOKo6n5XCDV1rjQhEM=
+From: Sascha Bischoff <sascha.bischoff@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org
+Cc: maz@kernel.org,
+	oupton@kernel.org,
+	fuad.tabba@linux.dev,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com
+Subject: [PATCH v3 0/2] KVM: arm64: Reject mismatched VGIC/ITS models
+Date: Tue, 20 Oct 2026 17:39:21 +0100
+Message-Id: <20261020163923.1407856-1-sascha.bischoff@arm.com>
+X-Mailer: git-send-email 2.34.1
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,70 +65,62 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 12/15] vfio: Support VFIO devices that access the
- CPU MMU
-To: Alex Williamson <alex@shazbot.org>
-Cc: Jason Gunthorpe <jgg@nvidia.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Jean-Philippe Brucker <jpb@kernel.org>,
- Oded Gabbay <ogabbay@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, kvm@vger.kernel.org, devicetree@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-doc@vger.kernel.org
-References: <20261015142552.4128028-1-ryan.roberts@arm.com>
- <20261015142552.4128028-13-ryan.roberts@arm.com>
- <20261015164421.GD13920@nvidia.com>
- <95e0f9bd-0203-4c7a-9d09-622593bb3d4c@arm.com>
- <20261020140944.GA3008132@nvidia.com>
- <c367caf3-d462-42ea-b482-bf9c51c47a63@arm.com>
- <20261020091323.3c51258e@shazbot.org>
-From: Ryan Roberts <ryan.roberts@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20261020091323.3c51258e@shazbot.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 20/10/2026 16:13, Alex Williamson wrote:
-> On Tue, 20 Oct 2026 16:06:37 +0100
-> Ryan Roberts <ryan.roberts@arm.com> wrote:
-> 
->> On 20/10/2026 15:09, Jason Gunthorpe wrote:
->>> On Tue, Oct 20, 2026 at 12:51:26PM +0100, Ryan Roberts wrote:  
->>>>> However.. you still have to affirm which single mm is the mm that the
->>>>> device is going to be doing DMA against. The process the opens the fd
->>>>> should not be forced to be the mm that it gets linked to.  
->>>>
->>>> What is the mm representing here? Ultimately we want to install the KVM
->>>> instance's stage2 pgtables and (pinned) VMID. We currently get that via the
->>>> bound KVM instance (which looks like it still works using the cdev interface?)
->>>>
->>>> The guest will then install the stage1 pgtables and (pinned) ASID associated
->>>> with the relevant (guest) mm_struct.
->>>>
->>>> Do we _need_ an mm association in the host?  
->>>
->>> Ah.. I see, I didn't quite follow that. OK.. Ah everyone else doing
->>> this is using iommufd with a viommu to establish their connection
->>> between device an KVM. eg Jacob Pan's series. That's a probably a
->>> better idea to stay aligned with the common path. Though your reasons
->>> are a little different..  
->>
->> Just to check, you're referring to [1]?
->>
->> I was under the impression that I could open the VFIO device through the cdev
->> interface, then bind it to the KVM instance via KVM_DEV_VFIO_FILE_ADD... Why do
->> I need an iommufd at all?
-> 
-> The cdev is not unlocked to actually access the device until it's bound
-> to iommufd.  Thanks,
+On a GICv5 host with legacy GICv3 support, KVM exposes both VGIC
+models to userspace. A VM can create a GICv3 ITS alongside a GICv5
+VGIC, because neither creation path checks the model of the other
+device. The ITS sets has_its, but a GICv5 VM cannot use a GICv3 ITS
+for MSI translation. Creating the ITS before the VGIC also lets
+userspace select an incompatible VGIC model later.
 
-Ahh - got it! Thanks!
+The same issue affects GICv2 on hosts with GICv3 ITS support. KVM
+previously accepted a GICv2 VGIC and a GICv3 ITS in either order, then
+ignored the ITS. The new checks reject this pairing with -ENODEV.
 
-> 
-> Alex
+Record the VGIC model required by a GICv3 ITS and reject incompatible
+device creation in either order. Drop has_its in favour of checking
+that its_model matches vgic_model, so an ITS created without an
+in-kernel VGIC is not reported as available. The second patch tests
+both orderings of the GICv5 mismatch, skipping the test if the host
+does not offer a GICv3 ITS.
+
+This series is based on kvmarm/next-7.4+fixes-7.3-2.
+
+Changes since V2:
+
+* Check vgic_model in vgic_has_its(), as pointed out by Sashiko [1]
+  and Fuad [2], so an ITS without an in-kernel VGIC is not reported as
+  present.
+* Document the GICv2 behaviour and make the first patch subject
+  independent of the GIC version.
+
+Changes since V1:
+
+* Worked in Marc's suggestion to drop has_its.
+* Check for its_model being non-zero in vgic_has_its(), allowing us to
+  drop has_its.
+* Added a comment to explain what we are actually doing. Again, Marc's
+  suggestion.
+* Changed the type of vgic_model from u32 to enum kvm_device_type.
+
+Thanks,
+Sascha
+
+[1] https://lore.kernel.org/all/sashiko-outbox-177254@kernel.org
+[2] https://lore.kernel.org/all/CA+EHjTzqKiWr2tnV0rUiA4VVCs5a0E2XQQTdwvH0bTKZ5dxe5A@mail.gmail.com/
+
+Sascha Bischoff (2):
+  KVM: arm64: vgic: Require matching VGIC and ITS models
+  KVM: selftests: Reject GICv3 ITS with a GICv5 VGIC
+
+ arch/arm64/kvm/vgic/vgic-init.c             | 17 +++++++++++
+ arch/arm64/kvm/vgic/vgic-its.c              | 15 +++++++++-
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c          |  5 +---
+ include/kvm/arm_vgic.h                      |  5 ++--
+ tools/testing/selftests/kvm/arm64/vgic_v5.c | 32 +++++++++++++++++++++
+ 5 files changed, 67 insertions(+), 7 deletions(-)
+
+-- 
+2.34.1
 
