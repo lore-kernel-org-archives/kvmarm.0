@@ -1,62 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.205
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792501913;
-	b=thH4WhafO4F9V60Geyg1cvfiF3UiHN3YA/QLQc6GJ5bVl0r1b0l3lIJIaU/g6UVs4qFQ
-	 vP5GFXTdgTRuH5527vJ9hEmKk62al2bVUEdRHvGlBLRIymGc33oitkozwCJ1lUGspa6pa
-	 MVYYWKD/CNulhtbxJoK9ynqIlOGtM+KVXMWP8r4brooiOkqbNm6FPQvOEjAopqkB9xV0g
-	 cm+UVQUdZBLfs4meMHgg9JndWatNLofksWjmnqOgr88eI14Sv8T3C9unN2NQ50NSyjIeD
-	 X5CXGSe45pkSq1kJiF09rj3KvRTib8DpB3gqLz88tBB6nuVsuo26OZ4pLVBnO9ouzPg==
+	t=1792502211;
+	b=3zj/2peB5dGSuvLBc6SZgY5gXvNnvkV/91GYyX+AU4VttFKMk2fjouqgv4TnZWvmzaVD
+	 6rvxtxINgmPuYVyG53Gx7x5xuWRDWlyKzmfAlaCCgW56F+t43Rq03GqBlMaqduizTCi0z
+	 iGL18unwNoqgk/sJgtu++S/3Q5glC9gAYkjiznuCEHXAYSqVoMwzP8vhI3TxsJLoAAwCn
+	 tEbADc+PoQBZBJJE85CiNrskCD5q3ukqdVI26QuyrR2JDGmCRPvbzZHqUW8tsYUCn2Wvr
+	 KHWcrq0P0WHeN0eCcMbp0vtziaM0OUnWF6O2mua7/TRqt17lLvDMhVTuAirJ0j0PrSw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792501913;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=/SUtRRL7fFOVx3xS2Q3jVLLMRlhIGOOjpBbDS0FruaY=;
-	b=VhJcGil8juYR9xqMGuwVFcjocMdhXLegxVhWoK+nNdOQtQ5JlLnMydfb7X7U+XJwKIaD
-	 LSTO4mm2V3VptUtKcANt0oMlxGv8wt+RD7fuUx7FRqWRT6/MvUVYvn1zHlp9pf5BjKeEV
-	 /ehqizBJPoIACFoZgxE9hPHwpLC4KXK6XBqsfPhehg3HrS3uhGn7qRQJlgIQ8WuKuvoG3
-	 8kttr8cwWLRD2LdgrO9uHrEr8k/g9LeyAvt8DKQleZSsua+cXQBtq1e1voB3ZIbOm//TR
-	 k/txsOa8B1Jy2XBu29oxD0Vqzhp9w0sAX7gGGkGg9cHRkfUzQr6QpSUa4doqfNL+t0w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792502211;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=I/lKKMbBLG1C3ERfK2T/2BuXrkJjvJM7GnohfMS18Rk=;
+	b=e38ObY/YbHQ0tDrB0/V7zHMgbmn49ZSG9EjdQblYchXNe92xj64gLm3TjN7TVSX/jSHB
+	 KolnviCYFOLdWOtK0M22Hsdt/Us4u+FdNT7rmgSbzkGVPS/jZos/wGyMg7YhRCR98koe+
+	 WgwMU1RDyAFChxq4d6ILv3bY+uoMcucIWoqFZORZZQWxC3GovWmngZnlGwp80B4uv4FU+
+	 24TXw5QvzTpQxWZ3X+pJdlCKjpfPaj9ZAsjiBMgsU16CLiMfg7gfgD+SmZ2thrXaDp65K
+	 KW4mPgU4BUqrJYz9R8Urw3Sqz+kuwQaMIbjBlbaHSR6KSrmFWLcMXysG30qvV2SYc3g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=s4IzQ5+F;
-	arc=none smtp.remote-ip=91.218.175.205
-Received: from mta0.migadu.com (out-205.mta0.migadu.com [91.218.175.205])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BLVK4c85;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68096606A31B
-	for <kvmarm@lists.linux.dev>; Tue, 20 Oct 2026 13:11:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 68096606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B20D606A31B;
+	Tue, 20 Oct 2026 13:16:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=s4IzQ5+F
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=8VOtYkZ2466K3qFYYyJvUToJ0S8DZXQ+CH6HzzvGHMU=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792501910; v=1; x=1793106710;
- b=s4IzQ5+FHeWTxBnPPXhvEE4gRPZTofORfrTlg6jchQNKsLjRUmqRMnfVOn88RjmHVvB7FQpB
- theM0rga7WyPyQyTbD2WXTyEEfYBEA81Rwrx1/2jTMFTE4UuRq1Q6ERZT9X3uq9PlwSNZRNzx7p
- aYTRSk+HETALW/h4bW3+tf+E=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 716be10f2f395814;
-	Tue, 20 Oct 2026 13:11:50 +0000
-X-Mizu-Trace-ID: 716be10f2f395814
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5be58ad9600so8523e87.0
-        for <kvmarm@lists.linux.dev>; Tue, 20 Oct 2026 06:11:49 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBw/5IjkKBnO+G5zYGVtUBCQNjOqXMoVkt8b1XR8v1cHC85gd52S4IsdGCfhINEtVUd6VnQpzqA=@lists.linux.dev
-X-Gm-Message-State: AFq9FYLbXyFnfRoPae58MmWSprXmjMcrJyeaM2yKb46ATCj8GfJmcnmx
-	mA9RzQiLAQqatR+JSVkYvSDqVJTMYXE+3yWLEHxCnH0UJhM+Glicn2h8VurRtgvYlMllRJKv5ax
-	OVD5lKyQ67Z4Q5QfhR0cHD6jnEZRiwjx9JZt+EuEg
-X-Received: by 2002:a05:6512:32d5:b0:5bf:6c49:434c with SMTP id
- 2adb3069b0e04-5bf6c4946d8mr42776e87.10.1792501908190; Tue, 20 Oct 2026
- 06:11:48 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BLVK4c85
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F16301F000C4;
+	Tue, 20 Oct 2026 13:16:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792502211;
+	bh=I/lKKMbBLG1C3ERfK2T/2BuXrkJjvJM7GnohfMS18Rk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=BLVK4c85jEpKcBasUz9BxREf/MNa9QY55Ld7dqoCHZl6DnHhQhhQYw0KIrGl5qVL5
+	 /TSml8VG2zattBjDFMfQ7wZ/zQP5ycJjLH/5LIlK7vJcmg9FkRNRNNN+O9knSI877l
+	 YeJ0rEr7MWFVBpVsy3PBM4whHdUAf9nMUgr3EYiEEzkjMtRy3jHyp1v7wsGZrlJkWZ
+	 tGE+oASF13ed3kA7O1bJsmNe0sMvoFmpyFxj9M7l/fR2STdGQB00eVz6qAAEqVjI5J
+	 6rXhZM7+PwMlQ2/e6LQgWVhUxqymtohoEeeXgrv8YYtN/jjVFIWV4L6T9E63s5wnxL
+	 DBMNhMz1mEutw==
+Date: Tue, 20 Oct 2026 14:16:43 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Steven Price <steven.price@arm.com>, 
+	Yang Shi <yang@os.amperecomputing.com>, David Hildenbrand <david@kernel.org>, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: arm64: Clear the whole hugetlb folio when
+ sanitising MTE tags
+Message-ID: <atdoknSMviv1xdqd@gremlin>
+References: <20261019132103.3836646-1-fuad.tabba@linux.dev>
+ <20261019132103.3836646-2-fuad.tabba@linux.dev>
+ <atdUzfOA1Obd7Mir@gremlin>
+ <CA+EHjTykGoHmDt82Cz=eEeBoqpjDRnhKEVGnOhTprn4dLxLZKQ@mail.gmail.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,58 +66,78 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261019132103.3836646-1-fuad.tabba@linux.dev>
- <20261019132103.3836646-3-fuad.tabba@linux.dev> <atdWIpk9Qh8ngs-Y@gremlin>
-In-Reply-To: <atdWIpk9Qh8ngs-Y@gremlin>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 20 Oct 2026 14:11:11 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTwb9V+12siUswmUX0-jr=sidKdAJ+vht+HyqS0KgA6v6g@mail.gmail.com>
-X-Gm-Features: AclHuK_VB8b2JJ7L3ieaAtlIC-DnIJuANGGUM1BoyrOPOd60UgfcMApklQSkE2I
-Message-ID: <CA+EHjTwb9V+12siUswmUX0-jr=sidKdAJ+vht+HyqS0KgA6v6g@mail.gmail.com>
-Subject: Re: [PATCH 2/3] KVM: arm64: Clear the whole hugetlb folio when
- storing MTE tags
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Steven Price <steven.price@arm.com>, Yang Shi <yang@os.amperecomputing.com>, 
-	David Hildenbrand <david@kernel.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTykGoHmDt82Cz=eEeBoqpjDRnhKEVGnOhTprn4dLxLZKQ@mail.gmail.com>
 
-Hi Lorenzo,
-
-On Tue, 20 Oct 2026 12:58:13 +0100, Lorenzo Stoakes (ARM)
-<ljs@kernel.org> wrote:
-[...]
-> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-[...]
-> > @@ -1042,12 +1043,14 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-[...]
-> > -                        if (folio_test_hugetlb(folio))
-> > -                                folio_try_hugetlb_mte_tagging(folio);
-> > -                        else
-> > +                        if (!folio_test_hugetlb(folio))
-> >                                  try_page_mte_tagging(page);
-> > +                        else if (folio_try_hugetlb_mte_tagging(folio))
+On Tue, Oct 20, 2026 at 02:09:45PM +0100, Fuad Tabba wrote:
+> Hi Lorenzo,
 >
-> Slightly awkward logic, testing a negative then the negative of the negative
-> (i.e. else) plus folio_try_hugetlb_mte_tagging(), makes it a little harder to
-> understand.
+> On Tue, 20 Oct 2026 12:52:54 +0100, Lorenzo Stoakes (ARM)
+> <ljs@kernel.org> wrote:
+> [...]
+> > On Mon, Oct 19, 2026 at 02:21:01PM +0100, Fuad Tabba wrote:
+> > > sanitise_mte_tags() clears the tags of the pages about to be mapped at
+> > > stage-2 before marking them tagged. For a hugetlb folio the flag covers
+> > > every page in the folio, but the loop only covers the mapping being
+> > > installed. Stage-2 maps a folio in pieces for the contiguous hugetlb
+> > > sizes, and for any size under dirty logging. The first fault then marks
+> > > the whole folio after clearing only its own piece, and the rest keeps
+> > > its previous owner's tags for the guest to read.
+> >
+> > I'm guessing the folio size is always >= size here?
 >
-> With mte_clear_folio_tags() you can make life simpler:
+> Yes, the stage-2 mapping of a hugetlb VMA is never larger than its
+> hugetlb page size, so it always sits within one folio.
+
+OK good! :)
+
 >
->         if (folio_test_hugetlb(folio)) {
->                 if (folio_try_hugetlb_mte_tagging(folio))
->                         mte_clear_folio_tags(folio);
->         } else {
->                 try_page_mte_tagging(page);
->         }
+> [...]
+> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> [...]
+> > > @@ -1514,7 +1514,8 @@ static void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
+> > >          if (folio_test_hugetlb(folio)) {
+> > >                  /* Hugetlb has MTE flags set on head page only */
+> >
+> > Is this comment redundant now?
+>
+> I'd keep it: it's why the whole folio has to be cleared, as the flags
+> on the head page cover every page in it.
 
-Without the helper, the extra level of nesting takes the loop body
-past 100 columns, so I'll switch to your version in the separate patch
-that adds mte_clear_folio_tags() (see 1/3).
+OK, but there's an inconsistency between the comments in 1/3 and 2/3 (you update
+one in 2/3 to reflect what's happening), so maybe worth having the comment from
+2/3 on both, rather than this one?
 
-Thanks,
-/fuad
+(the PG_arch1,2,3 flags are folio flags unless there's something weird so it's
+sort of redundant I think?)
+
+>
+> > >                  if (folio_try_hugetlb_mte_tagging(folio)) {
+> > > -                        for (i = 0; i < nr_pages; i++, page++)
+> > > +                        page = folio_page(folio, 0);
+> > > +                        for (i = 0; i < folio_nr_pages(folio); i++, page++)
+> >
+> > I know it's a stable fix, but the fact that this pattern exists in multiple
+> > places really argues for a mte_clear_folio_tags(), which would make this
+> > trivially:
+> >
+> >         mte_clear_folio_tags(folio);
+> >
+> > And avoid the re-use of page etc.
+> >
+> > It's not a huge change and makes the next patch in the series simpler too so
+> > arguably could be part of the series?
+>
+> I think you're right about the helper, but I'd rather keep the fixes
+> as small as possible for the backports. I'll send
+> mte_clear_folio_tags() as a separate patch on top of these, using it
+> in mte_sync_tags() too. In v2 the loop uses folio_page(folio, i)
+> rather than reusing page.
+
+Sure makes sense, though honestly I think the duplication there means delta of
+lines of code is small. But then again, adding a helper in a Fixes: is iffy
+itself so fair enough :)
+
+--
+Cheers, Lorenzo
