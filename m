@@ -1,79 +1,79 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
 	t=1792540403;
-	b=FEagwnet+xSuNfKi6ytVlZMG3Z5VZwFc9D4aQu6iuBGGQD2SMONnVgK0r+mVuJcl9SUY
-	 /n0HngnyO0gGosNU/80LiKPo5IZ3h4IMyVCYRJXnkBbXhDbsFSGDa+Wu4C5LZGlk+3fw7
-	 dEwQvCF8lthKKK6FURb4JtD0myrLojmnfDnJZun69iT2j3VnMNulCJakhgCdKEy4eJWPP
-	 lIMpQRv9CewQRkqA6vrIn7IvVAlYHFivp4a5rYNChqB+yLDGMGiXg+l4/C5u1FpLUt5l1
-	 TTZf4aP8fNqLRl+JCWAa6Z4mBpcsYRVTOJzE5gU+aFTB35p/AoM/mzDeE/QFy7kiXeg==
+	b=z5km9pBemzL1cCmv3a6U9PrART5Hwa7RK7RPFyeu1RVCyoG/YI74S/xUq0NXpQt4N5cq
+	 8ULJ2B1Y4Z0XcMYrKVH2NPQ2yQ8Ocqn0F/bM06BRPi5Z3Z8D1qXkOiOnvbSgz30RHF+h6
+	 z7LxOUYLnmfDGHMLDweF2rWruE/k8bKWNjC4W5mfnpCi0za9+L+7bjkoy7W6bFWM8Gz52
+	 eYkoDxPvR4NTEm8ods/88id9ucwueZz1+6QZhSD11Hole1/Uc/SxAzJwSouM57lO6KZNW
+	 TH5qw0M/SDvYpKr2cAPvbcAQkKt+aHdAPvIrS/Kcl7zXG1V0j3dyPin5CNFP0xQ/gvg==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1792540403;
-	h=Received:DKIM-Signature:Received:From:Subject:Date:Message-Id:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
-	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
-	 X-Endpoint-Received:X-Original-From:Reply-To;
-	bh=Kel4RSYESjXcs8Dg40JwYXjmWcDIJY09nOoIQY6d2LQ=;
-	b=4PE3JicsOI75dxb+0ssw8QiyXq4VDBSWgsm6lGKHp2bnH74qb2nHFqW9nSfvlFAx0rw3
-	 4Sz7kvcLpflDIECPsxFq4icPiN59DKbVmOzkcg1uy0yF3/k3WAakIsvcmTX7TV+DVxSIM
-	 aXb0QitmXAt8WzP6lmsI+AolagOKGMdX5S9ptjgjfic81IpBOqYfpRvyagdvzCzkm0MRz
-	 npkaqNQruwa9aTjNO+HRtEgf6/YjeHl1CunEyj5qAPBgdZ7n2u7ZZtEuweEAThV1H3Bpl
-	 j7A+MHkGzLV+pgTzQL4OXVyMVqMIUeCTbqtBeQxnLmCDMv5TXAtib/BD8Hye7n5NlDg==
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=8uxk441ISQMCr6ffs1OiNE54QJj6KTHjiAkmGI9m0+8=;
+	b=r2XYTrW74/feiBgoWg0bM+YG1UyXDFKIfEkHBm6rKc+D00e8rb/UCa8fs+JDsYMlAX3j
+	 BePv57Vc/GvPfwmua4768uElfAPniMOfFg7u2HTpyxXcQO3E02zGt39DKa4JhTnUuRmu6
+	 7YgTSyuK8P3hsnU+51iz8Z5PQSjse1EVV+XqH9XnJs2J6RidIMqtkYjqtBznSOaPGCL0l
+	 R27Rr6PurSHK4JQdzNANGXggVb7BEQ500TXJ11ixXT4rOFkOhtRGHkA6AFDP/DC8t/Mmd
+	 2s156T6tQp05Zfx844yxfRxAgRlh8rySMBtckkULmKyo2nb+ANdU2d8Ec9PFspYn5GA==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NL00w4KL;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AnYzOoRA;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A518606A31E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5AF606A31F;
 	Tue, 20 Oct 2026 23:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NL00w4KL
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AnYzOoRA
 Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
 ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
 	t=1792540403;
-	b=YrbyLersiFbL+bsZNjvQXg/p3/jq0iYO8cn5Xql/g84tRs91sGvTNKJYsEU3jZX2mMn/
-	 WqFLzI2VMVAgHE/pnFI/1yNrs7bXvSbJBvYor3pvxVnb7sMwINytwQEsRxK0moUCsqg7X
-	 enXWbnsXQ1hPdyhikXf29fIbBP9Jp68RD4etcYt6636ggbozafKe82Sc96jr2DttCC8aW
-	 aJSbplXdpVHh26D7aXqALQ60qh6sxCPcxdQ9OgzA1Xu3sPqZufpgeUlvuhYgiWNXvPCuX
-	 tiTGNjCuOOAunCN7Mbp7a+3TSa/l3eIwRkftcqvsYilAVyu9QFdThZJbQacdoqFzQjw==
+	b=vGtGllpzHJmtTtoDXCg/wNdQpRXjzeagkkaUhC3kYSrjoAieobwOfjcNRGqwEagu29v2
+	 DZXyMIifnQAme7k/RnKFngawG4x32GnlrSXbyvVnqqnFHMyVhlPZp/r3R2bFKWxYWk7Gy
+	 CjP/qCzYaXmXZzuGktnMEe/C7Owv8Kioj1U9da1N0YbDcYFEd4FHYfe7GDl4gObI3rk72
+	 skCH/Z9g1oBTBTtluGgfaEmBI2O4j9V47Ch2utlsiFFcsW6NPv/LrqxqHMOGjnh/QL+Po
+	 uIntX9QulJdGvObW1GIT77B2MITl+l5Lo5wsrtG04bv6gvogOF3NP5pgdb64hjNlNOw==
 ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
 	c=relaxed/relaxed; t=1792540403;
-	h=DKIM-Signature:Received:From:Subject:Date:Message-Id:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
-	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To;
-	bh=Kel4RSYESjXcs8Dg40JwYXjmWcDIJY09nOoIQY6d2LQ=;
-	b=Yv2mv6uX3fyY2grTI0SlymEzU2bvzI/KXD9Abf0zyeZEdvGtXYyhqlyNmuGkQ/4MZKOL
-	 h+Hy0DEHZHOCVwJ08mrgsgCxRw3xcUquqVuNiMAal7p7Pr6ipvQ8jW6bdiIJurseS1v/n
-	 KtKh4fE1UKuxonz3m7ojtuKp4aZNiK3mOOYH0vNN7huLt1DjX0s/Ej2eI1NyE7YBLOKrH
-	 wAS7VHHLwsU2SaiN9GT2t24fZRVqJlNGLVYaVuzbevijQLuM65YzCE84RGFL10SuITAoE
-	 TA0doHrGOCtTJoqjd1ahp36wlwDkcHSwAYjYtwgDoojIOxO+L7lHu/4s4V9tiT+QnDg==
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=8uxk441ISQMCr6ffs1OiNE54QJj6KTHjiAkmGI9m0+8=;
+	b=3dBVmFlcpKRT4qxnYtLyF8fPXafZ0YSqKi92slRHj7qIzoo9rHxhWEYF5c9DZ87RXVl1
+	 FW/zT+seH/RfyA1byFPttSi/y79qWyrbEfjQiC1IeZ0GhpFJfgAh+pbjNZ4PCf8cbDsab
+	 09K+qKBYIBNuugIbSjL/cNDmZwuK0/qjwJsAbzXiaAkAJfhlDlKRmS6YTOm0Ia0yEcJYL
+	 Gu3UgLkUxYj2r/umXtFIwE8aLcZ+Eyzgw/O+NThOu7lwL0agUDy+dy4A49/HJg7ZIQcUm
+	 dXgZ6oLbsPYuid6fqklMZs4CJUaT9nmjMnzzzGYrNTfp7SAkHH7lOKrYpPd4aiU//7w==
 ARC-Authentication-Results: i=1; smtp.kernel.org; 
 	arc=none smtp.remote-ip=100.80.115.77
 Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id 2AA161F000CB;
+	by smtp.kernel.org (Postfix) with ESMTPS id 2A9121F000CA;
 	Tue, 20 Oct 2026 23:53:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1792540403;
-	bh=Kel4RSYESjXcs8Dg40JwYXjmWcDIJY09nOoIQY6d2LQ=;
-	h=From:Subject:Date:To:Cc:Reply-To;
-	b=NL00w4KLJBC3iawsBoUNIOGnDmsbentUZwRLGedSaHsGa9t4RVY2KjUFffgp27rPQ
-	 Z40ynxLvfdl3x/j66cgPICq3uWnf8WuCulSKp0FUofWyQOLCtgQWpKf3JIbckTiJLg
-	 l8hJ8AUXxIZhVUuy3n//6G8hriAZdCmDv3SJ/PEvXctWP5HbPFau+S3CR7EfCD38/S
-	 uC8TBOm8vPUZfqugmaUDVfsD7iPeYHkr8QD6kw6Wyamm0KOstP1GnK42B8XRrFHbWn
-	 6aAbwTc0w94fv3xyrBds9AcvF6pcyzFRU685VL3lTGWteL6B/7WT7Yj051nQrbGFsV
-	 Yn8/elM8VaQww==
+	bh=8uxk441ISQMCr6ffs1OiNE54QJj6KTHjiAkmGI9m0+8=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
+	b=AnYzOoRAI98rD6gX9bom8k7NKqrMiXMN8Iper7cSb6a3qGGkCzUL1Y8tU6xFgvcZ1
+	 qrs3MphwSNQmt5Uim4Z3xqmG5mW6058AhgnFfT5a0EuVm9T8+MtBoCFQ04p+nz49p8
+	 4eM6JORqX1/4J1wSqVZwnfiMNHH7tDfWocuXX7IXV7e/e1tXTVHXy+yaLXZXa6rPIM
+	 cgZKS5mXoYVAnU0JUSdyyouURFr78EXAnFKHO8l4J1j2S7svNAJSKaaG/t/QVSNa3Q
+	 ztORLw6d0Ok9MCjzm2d7HU7JrNTzeer3DFhT5fmgdLqayEvlo5S3GgAZlJR9hxL7B7
+	 EviZIwlXSMLqA==
 Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 7EC4543263;
+	by lkml.kernel.org (Postfix) with ESMTP id 9015B43267;
 	Tue, 20 Oct 2026 23:53:21 +0000 (UTC)
 From: Michael Reeves via B4 Relay <devnull+michael.reeves077.gmail.com@kernel.org>
-Subject: [PATCH v2 0/2] arm64: Add KVM support for newer Apple Silicon CPUs
-Date: Wed, 21 Oct 2026 10:53:19 +1100
-Message-Id: <20261021-apple-m3-m4-kvm-v2-0-04905152cc2a@gmail.com>
+Date: Wed, 21 Oct 2026 10:53:21 +1100
+Subject: [PATCH v2 2/2] arm64: Apply existing Apple Silicon CPU workarounds
+ to newer CPUs
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -84,12 +84,9 @@ List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAO/+12oC/3WOQQ6CMBBFr2K6drQUAurKexgWnXaAKgXSYqMh3
- N0W1i7fzP8vf2GenCHPboeFOQrGm3GIII4Hpjo5tARGR2aCizLj/AJymnoCm4Mt4BUsYIVXFJQ
- XqDSLrclRYz6b8VHv7N/4JDUnTUqg9ATo5KC6dNJONvN5127C+E6xzvh5dN9tWciS7v+IkAGHC
- rFQ2OS6zPHeWmn6kxotq9d1/QE4rRLf5wAAAA==
-X-Change-ID: 20261008-apple-m3-m4-kvm-b7b9b2e34bcd
+Message-Id: <20261021-apple-m3-m4-kvm-v2-2-04905152cc2a@gmail.com>
+References: <20261021-apple-m3-m4-kvm-v2-0-04905152cc2a@gmail.com>
+In-Reply-To: <20261021-apple-m3-m4-kvm-v2-0-04905152cc2a@gmail.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
  Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
  Mark Rutland <mark.rutland@arm.com>
@@ -103,62 +100,86 @@ Cc: Myria Sarvay <myrialsarvay@gmail.com>,
  asahi@lists.linux.dev, linux-kernel@vger.kernel.org, 
  Michael Reeves <michael.reeves077@gmail.com>
 X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1792540400; l=1504;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1792540400; l=2838;
  i=michael.reeves077@gmail.com; s=20261008-m3-m4-kvm;
  h=from:subject:message-id;
- bh=G8igJOGmolem0kocmF21BJtoXeYx1AMIyTFUWr2XhNg=;
- b=3/imRnUx82pjDBOxQMAxCwDKByTwQ/pGjZVTqRy7jTjfXcIpKtcapYnyJgcn0m0DpETbDD76T
- CByrM5Dp/QaBW1o/MLetC4O2gExoXOB0vaJrXCtXkvMWIPOsb/Elnyr
+ bh=PFEvneEC+/aHCyp+lZlYQ70fLEswRlQt4crDxkng4ZM=;
+ b=tdzSqkZ6HaKIHAWImFyWY66JwbtNxJmwuTwJTnGZZiLnX6q5CW+eemkITphNFG4ER38EIwCOr
+ 6m8dQm1oFgJBeqMtTnFaL2l0m6ROA2s5BnrD3vmK7nq+4wKb+MQO9vF
 X-Developer-Key: i=michael.reeves077@gmail.com; a=ed25519;
  pk=oi7WuppQ1A+qFZp9DdfIwDnpC3WZ+XY6fJK1upV/CSY=
 X-Endpoint-Received: by B4 Relay for
  michael.reeves077@gmail.com/20261008-m3-m4-kvm with auth_id=1131
 X-Original-From: Michael Reeves <michael.reeves077@gmail.com>
 Reply-To: michael.reeves077@gmail.com
+Content-Transfer-Encoding: 7bit
 
-Hi,
+From: Michael Reeves <michael.reeves077@gmail.com>
 
-This series enables KVM support on Apple Silicon M3 (base, Pro and Max),
-base M4, A18 Pro and M5 Pro CPUs.
+Add M3, M3 Pro, M3 Max, base M4, A18 Pro and M5 Pro to apple_cpus
+so they receive the existing PMU trap and broken SEIS workarounds.
 
-The first patch adds the CPU part numbers and MIDR definitions.
+Add these CPUs to has_vgic_v3 so KVM detects TDIR support and can
+trap guest DIR accesses without trapping all common registers.
 
-The second patch adds these CPUs to the existing Apple Silicon PMU and
-broken SEIS workarounds. It also enables TDIR detection so KVM can trap
-guest DIR accesses without trapping all common registers.
-
-This series was developed from testing on:
-- Apple M3 and M3 Pro by Michael Reeves
-- Apple M3 Max by Myria Sarvay and Yureka Lilian
-- Apple M4, A18 Pro and M5 Pro by Yureka Lilian
-
-These tests also confirmed that the SEIS workaround is still needed.
-
+Co-developed-by: Yureka Lilian <yureka@cyberchaos.dev>
+Signed-off-by: Yureka Lilian <yureka@cyberchaos.dev>
+Tested-by: Yureka Lilian <yureka@cyberchaos.dev>
+Tested-by: Myria Sarvay <myrialsarvay@gmail.com>
+Signed-off-by: Michael Reeves <michael.reeves077@gmail.com>
 ---
-Changes in v2:
-- Add A18 Pro and M5 CPU IDs and workaround coverage.
-- Add all to has_vgic_v3 for TDIR detection
-- Document testing confirming SEIS workaround still needed
-- Link to v1:
-  https://patch.msgid.link/20261008-apple-m3-m4-kvm-v1-0-7bb4cbf3d63b@gmail.com
+ arch/arm64/kernel/cpu_errata.c | 12 ++++++++++++
+ arch/arm64/kernel/cpufeature.c | 12 ++++++++++++
+ 2 files changed, 24 insertions(+)
 
----
-Michael Reeves (1):
-      arm64: Apply existing Apple Silicon CPU workarounds to newer CPUs
+diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+index e0c094025..bc91bc13b 100644
+--- a/arch/arm64/kernel/cpu_errata.c
++++ b/arch/arm64/kernel/cpu_errata.c
+@@ -288,6 +288,18 @@ static const struct midr_range apple_cpus[] = {
+ 	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_PRO),
+ 	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_MAX),
+ 	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_MAX),
++	MIDR_ALL_VERSIONS(MIDR_APPLE_M3_SAWTOOTH),
++	MIDR_ALL_VERSIONS(MIDR_APPLE_M3_EVEREST),
++	MIDR_ALL_VERSIONS(MIDR_APPLE_M3_SAWTOOTH_PRO),
++	MIDR_ALL_VERSIONS(MIDR_APPLE_M3_EVEREST_PRO),
++	MIDR_ALL_VERSIONS(MIDR_APPLE_M3_SAWTOOTH_MAX),
++	MIDR_ALL_VERSIONS(MIDR_APPLE_M3_EVEREST_MAX),
++	MIDR_ALL_VERSIONS(MIDR_APPLE_M4_DONAN_ECORE),
++	MIDR_ALL_VERSIONS(MIDR_APPLE_M4_DONAN_PCORE),
++	MIDR_ALL_VERSIONS(MIDR_APPLE_A18_PRO_TAHITI_ECORE),
++	MIDR_ALL_VERSIONS(MIDR_APPLE_A18_PRO_TAHITI_PCORE),
++	MIDR_ALL_VERSIONS(MIDR_APPLE_M5_PRO_SOTRA_MCORE),
++	MIDR_ALL_VERSIONS(MIDR_APPLE_M5_PRO_SOTRA_PCORE),
+ 	{},
+ };
+ 
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 3ae3ad1a1..bb82b80b3 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2357,6 +2357,18 @@ static bool can_trap_icv_dir_el1(const struct arm64_cpu_capabilities *entry,
+ 		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_PRO),
+ 		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_MAX),
+ 		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_MAX),
++		MIDR_ALL_VERSIONS(MIDR_APPLE_M3_SAWTOOTH),
++		MIDR_ALL_VERSIONS(MIDR_APPLE_M3_EVEREST),
++		MIDR_ALL_VERSIONS(MIDR_APPLE_M3_SAWTOOTH_PRO),
++		MIDR_ALL_VERSIONS(MIDR_APPLE_M3_EVEREST_PRO),
++		MIDR_ALL_VERSIONS(MIDR_APPLE_M3_SAWTOOTH_MAX),
++		MIDR_ALL_VERSIONS(MIDR_APPLE_M3_EVEREST_MAX),
++		MIDR_ALL_VERSIONS(MIDR_APPLE_M4_DONAN_ECORE),
++		MIDR_ALL_VERSIONS(MIDR_APPLE_M4_DONAN_PCORE),
++		MIDR_ALL_VERSIONS(MIDR_APPLE_A18_PRO_TAHITI_ECORE),
++		MIDR_ALL_VERSIONS(MIDR_APPLE_A18_PRO_TAHITI_PCORE),
++		MIDR_ALL_VERSIONS(MIDR_APPLE_M5_PRO_SOTRA_MCORE),
++		MIDR_ALL_VERSIONS(MIDR_APPLE_M5_PRO_SOTRA_PCORE),
+ 		{},
+ 	};
+ 	struct arm_smccc_res res = {};
 
-Myria Sarvay (1):
-      arm64: Add CPU part numbers for newer Apple Silicon CPUs
-
- arch/arm64/include/asm/cputype.h | 28 ++++++++++++++++++++++++++++
- arch/arm64/kernel/cpu_errata.c   | 12 ++++++++++++
- arch/arm64/kernel/cpufeature.c   | 12 ++++++++++++
- 3 files changed, 52 insertions(+)
----
-base-commit: a90ee4305c4a5df72c11b31dacfdc76e00fcf78a
-change-id: 20261008-apple-m3-m4-kvm-b7b9b2e34bcd
-
-Best regards,
---  
-Michael Reeves <michael.reeves077@gmail.com>
+-- 
+2.56.0
 
 
