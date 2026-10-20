@@ -1,49 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792497092;
-	b=fpmEOwcfLwTzFqtJmY2AjTOIPsoXEejvovtScvrbrdcySWm+JbAFec4SA8Qtv39PGgeJ
-	 II7SBfNPMszpBbnh0DWopDP0Q2pOzY9cjDm+l99leBERMsa1ZZSuVvrn4e7+eDLGTx17U
-	 osx4mQ45mnY+71Z3XSejMOqkrgzITRyfK6dWww7AfPxHG8kvawLSr7bKLwvXvB/NC5AOZ
-	 FcnhRysGkmqcj2BqVj5Mnlw+jKN/K6GZD3rdMiVdPki/Hjx1SvFGhATK7YR6zHQUeX5YU
-	 H8zXk4e9gBj9KVQWhVfsEPeJgmpQ9tjZj/ZIlbuNen/2xsoP3Y5L9qFiDotA/RfWjvA==
+	t=1792497182;
+	b=w4lS/iplSZ4fY+bqFeFJ8xHbQNen6KDlQq261uZgUg7tLp7RKoHz33Nm6bFRgROha62C
+	 kNwdI8HI0/xKY/xcAp2zFEUptzEz6tPWbXKWiPpSR5Qy635VsKtFn++gALUKQkPFPh/se
+	 wdrdEIocsg4pohn3nvGUBIV3nIXIGt1Sv7EPVtb5sSuIWJIBKKvn0kBNbspWXr19ZrAxb
+	 hvoqZr9RIbyKd4S5vrwk7AmQfLWF90yJT2silMqWDqYnHRmEtHl5ovviWuwH15ba+FfGp
+	 wanU4OEi+3Gror7gaIpLeutamFB06Xf4Dhk6tTJWNnGNzJ12pruMxhMtve/vNMaSVAA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792497092;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
-	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=nNoA3+6wTNExlUkYZCt9HTAT9xEHjkyLUdvHdZCEN4Y=;
-	b=btpcrTjvIIQ9JxjCAyCcCU0e65Avy4OvkXcAMmi0/rIF/3aAFJdZGh8mxa/jkd4SyTBO
-	 hJB1vHbVMVkef8Z8eSmQuBpro7L+0hntXSkMU5n9aqIB5IZbQkZ1T+jGdT6YMdoxXGxye
-	 JpOFc3dWZonIOWu+YI7mqNlCMkPF6cRb3sCPkkPzkkXmKZADtRSlCF1xtVAodVn/TK4yl
-	 kCYK+7SyFsQxje/Slh8jH+FhkjVkbWv0fe5aX4axJxFX1rPastsrVjtOUCKOoFRuB83Tq
-	 YRjp30hT8bb+IpHTmSG6KAFZMXgHwz3ydHWjKj0YLaF8jjCJ8REVLK+2iuJtGuw7Z3w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792497182;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=RUALFoCPuP4ag/Wm4Tjk9NReNJDOBGhLi2LnL7PxTOU=;
+	b=xQulQl+7tJtARLua0pY5+XSMtt6FLMlBpPnoA01YYE7Y69bOXMxzkVsR300AxMpQau5D
+	 FBpNdeuxADChGfrp4qBINDwmw9iXi8TSPlHy22f6+Gqo7h9g/aP+Dg606maNZ7GlZ84be
+	 aq6iPGHadqTRxQloHFvFtKHinFn6BknKGGNs41PXCga+z6JIuhj0x3qNotdcaLY6goh2j
+	 wvBOvLpyyV2pR6jLaPMcvmGHzCQyXEkRPYxVhQwjy/XMESSm7V7rM1mzOSdwUiC3U9l87
+	 /Q6s4rilnOwgbG4WrAHNTST3yCmNoiqOTM7CIW09s5idsyN4xk0hz1ibIzklzinVzhw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=k1oeeqEy;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4106606A31D
-	for <kvmarm@lists.linux.dev>; Tue, 20 Oct 2026 11:51:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C4106606A31D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Zd+Vs3ar;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FEAE606A31F;
+	Tue, 20 Oct 2026 11:53:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=k1oeeqEy
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AE6E21596;
-	Tue, 20 Oct 2026 04:51:27 -0700 (PDT)
-Received: from [10.0.137.15] (XHFQ2J9959-5.cambridge.arm.com [10.0.137.15])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E1F9A3F7B4;
-	Tue, 20 Oct 2026 04:51:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792497090; bh=UFdHRBoQNmzK3J1KulBJN2N/STdJqV3Qy+2zaWTevg8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=k1oeeqEyXO6BAXWERGM3PoBR163hq6VQuZgUfNyIwbgfcGU+dMXRc6ZiMZ8nIPUHE
-	 hepPI5uQuoBLhfyK2T0O/Del6FpxrnjimRZS57vdorb4f0y7hQi1/BYwO9CNcBOF4p
-	 xtMeabKTRqXJsmvVN6HMxF9dAnQOgKizG9dfxlgQ=
-Message-ID: <95e0f9bd-0203-4c7a-9d09-622593bb3d4c@arm.com>
-Date: Tue, 20 Oct 2026 12:51:26 +0100
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Zd+Vs3ar
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6B9F1F000C5;
+	Tue, 20 Oct 2026 11:52:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792497182;
+	bh=RUALFoCPuP4ag/Wm4Tjk9NReNJDOBGhLi2LnL7PxTOU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Zd+Vs3arajwy5+WYD3opiB8R/t/y46x74me9H0tC1BGifbOJmn88NfzmfaqKDZUd4
+	 j26wSB6R1aWrD3VYYBKd5/jmlYe7tCEDsTxnmkzRnq8QRw31nuxmU/4SFX912KrfId
+	 9ih5O9VeW7igCxlpsg6/Ll4WWo2hzVj4FonYaRvAQODRnyPJHCp3+xrq83sllTOWXI
+	 IDzmDheO2Yyve6GD2lwlMOaAWdQ8UF3fbkNnCqccUvfnT47+T7CCsys3P79oCwyhJw
+	 JsaJ3GsV1i3NXaSOLRH6Z7hSsHNWKgJNKtJgbGXNtLf5bdYhlWJPrCcVzyKFD7xjmI
+	 OeKsHNeVVcB+A==
+Date: Tue, 20 Oct 2026 12:52:54 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Steven Price <steven.price@arm.com>, 
+	Yang Shi <yang@os.amperecomputing.com>, David Hildenbrand <david@kernel.org>, 
+	Fuad Tabba <tabba@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: arm64: Clear the whole hugetlb folio when
+ sanitising MTE tags
+Message-ID: <atdUzfOA1Obd7Mir@gremlin>
+References: <20261019132103.3836646-1-fuad.tabba@linux.dev>
+ <20261019132103.3836646-2-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,75 +64,71 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 12/15] vfio: Support VFIO devices that access the
- CPU MMU
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
- Alex Williamson <alex@shazbot.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Jean-Philippe Brucker <jpb@kernel.org>,
- Oded Gabbay <ogabbay@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, kvm@vger.kernel.org, devicetree@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-doc@vger.kernel.org
-References: <20261015142552.4128028-1-ryan.roberts@arm.com>
- <20261015142552.4128028-13-ryan.roberts@arm.com>
- <20261015164421.GD13920@nvidia.com>
-From: Ryan Roberts <ryan.roberts@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20261015164421.GD13920@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261019132103.3836646-2-fuad.tabba@linux.dev>
 
-Hi Jason,
+hugetlb strikes again... :) the mm part of me apologises ;)
 
+On Mon, Oct 19, 2026 at 02:21:01PM +0100, Fuad Tabba wrote:
+> sanitise_mte_tags() clears the tags of the pages about to be mapped at
+> stage-2 before marking them tagged. For a hugetlb folio the flag covers
+> every page in the folio, but the loop only covers the mapping being
+> installed. Stage-2 maps a folio in pieces for the contiguous hugetlb
+> sizes, and for any size under dirty logging. The first fault then marks
+> the whole folio after clearing only its own piece, and the rest keeps
+> its previous owner's tags for the guest to read.
 
-On 15/10/2026 17:44, Jason Gunthorpe wrote:
-> On Thu, Oct 15, 2026 at 03:25:46PM +0100, Ryan Roberts wrote:
->> From: Jean-Philippe Brucker <jpb@kernel.org>
->>
->> Support devices that are attached to a CPU and perform DMA through a
->> MMU. They do not have an IOMMU and do not use a VFIO container.
->> The VMM needs device-specific knowledge in order to create a virtual
->> device (device tree, ACPI tables), so it also knows not to allocate a
->> container.
-> 
-> I'm not so excited to see new things built on top of the group
-> interface.
-> 
-> Maybe in this case you just don't have to do a bind operation on the
-> cdev to an iommufd? That feels kind of natural if you don't use a
-> iommufd
+I'm guessing the folio size is always >= size here?
 
-Yes, that makes sense. I don't know enough to know what actually needs to change
-to make this work, but will look in this direction.
+>
+> Clear the whole folio, as mte_sync_tags() does.
+>
+> Fixes: 25c17c4b55def ("hugetlb: arm64: add mte support")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 
-> 
-> However.. you still have to affirm which single mm is the mm that the
-> device is going to be doing DMA against. The process the opens the fd
-> should not be forced to be the mm that it gets linked to.
+Some nits below but generally looks sensible to me so:
 
-What is the mm representing here? Ultimately we want to install the KVM
-instance's stage2 pgtables and (pinned) VMID. We currently get that via the
-bound KVM instance (which looks like it still works using the cdev interface?)
+Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 
-The guest will then install the stage1 pgtables and (pinned) ASID associated
-with the relevant (guest) mm_struct.
+> ---
+>  arch/arm64/kvm/mmu.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 9ba86450fe4af..48a08b608ea72 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1514,7 +1514,8 @@ static void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
+>  	if (folio_test_hugetlb(folio)) {
+>  		/* Hugetlb has MTE flags set on head page only */
 
-Do we _need_ an mm association in the host?
+Is this comment redundant now?
 
-Thanks,
-Ryan
+>  		if (folio_try_hugetlb_mte_tagging(folio)) {
+> -			for (i = 0; i < nr_pages; i++, page++)
+> +			page = folio_page(folio, 0);
+> +			for (i = 0; i < folio_nr_pages(folio); i++, page++)
 
-> 
-> From that perspective maybe you should create an iommufd and a special
-> "SVA" IOAS that it can attach to. This is more complicated but it
-> makes the mm linkage and blocking beahvior explicit and controlled by
-> userspace.
-> 
-> Jason
+I know it's a stable fix, but the fact that this pattern exists in multiple
+places really argues for a mte_clear_folio_tags(), which would make this
+trivially:
 
+	mte_clear_folio_tags(folio);
+
+And avoid the re-use of page etc.
+
+It's not a huge change and makes the next patch in the series simpler too so
+arguably could be part of the series?
+
+>  				mte_clear_page_tags(page_address(page));
+>  			folio_set_hugetlb_mte_tagged(folio);
+>  		}
+> --
+> 2.47.3
+>
+>
+
+--
+Cheers, Lorenzo
