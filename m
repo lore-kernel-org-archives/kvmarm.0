@@ -1,50 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.39.247.168
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792507028;
-	b=qJWX2IxCehBF612J/iyVVdDzrLE8oA/fNFTjD3I9XMOLLFin9nvvQXNvHsoT/mjqk/0J
-	 zDmRi+l2ZWFkrZnJso89+yp+UQ88sDdejfdS+90Q6FxrexLmYvmi2NoKlx/Im05/7lcz2
-	 V3Uz79/7OkMM6AoL478HTjL+ei14g1YeqjQfQs+fF4ovmOSLyJQUFi4syOHff/4VTPO7s
-	 z3XfuzdRoKkgktsPJkKHJ1v/rSm6WuuQ4NnjIXyW3g+Hq0/pj+0bMqXBXvixXuKFf0BHM
-	 7N8d69WrOQwsXRLdPjCFN/MKiQNUKFG+tICcg2K/DdOdVALSdFj/IlKM99ocHQ929xg==
+	t=1792507394;
+	b=atXwRPQmIp+zxxiay2MQFPTk/yDJvdv5zPde6QWWkeaGZ9IeK22VMxn6CiXyu3M7l0Bi
+	 Zhzk5teRknenvN5t/FQ+pzYZNT6SssWsICOWkQ7T8GfOLWewPJOIIc/8zKdMTa8ifPbra
+	 bPBRda+gkOGHqFvHKAKjCLSYcfm5i4XfzDIJ1srzKPe651IGY4dDZClvxH1JQjjWerqWF
+	 9Ob6RmxT2BuZkQ4s1j8otesyBI9wv/6cRCkf6HXa4atvKwPX8n7HLboNIl2Ulc9kdFSub
+	 paYsfmTgH2v/nTvsufONbY4G1ltYME7AYNFHJ/1zbbUtkaqwVUFhPl7asxacrdH1enw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792507028;
-	h=DMARC-Filter:Message-ID:DKIM-Signature:Date:MIME-Version:Subject:To:
-	 Cc:References:Content-Language:From:Autocrypt:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=/KQ70MsaDZXGGg9xwr15iwDR73QEsKB18yX4p0CKZSM=;
-	b=2RJHdACkiGcoM9SlmAP4wblYlsSm8idcx0FCVMvwdbvc5hNGuiiB1B1rOpw7/mEH2+Wm
-	 Y1HAGSJb8XtKFpz2I2h8HoC/lUllKVgKbC+qShWGu8XYLahH+4kEs5b0jGpXokcAmQpGN
-	 tvpsv904O6xFVfJbkapfqo+GdQRwd8qt67PTQ0G3dDgPtkox9X78Q7J0PAK7nB8tpd6BR
-	 5IlXaAMTT6N8vQGgwwpNvq/7YIo66iQwbeIP9k+luL/CYVco0I4/+ktXGHOmusvP37uf3
-	 21FzdvTOZVV6Jaht05V02EV7z4zg9+Ng1R1sRwM2NmdWHoSWKETCUXady8QVWTyHt9w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792507394;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=jQyDvfX7kGhNcVt2WJOUsbR6Xr7YV1OMvJOHBnTjnZQ=;
+	b=sGEr4VG6yGqdQXQXn7hJhWXljcjG14Jp7mCKeflhRnPfmi40oaBldMFKc8utorMW2FLY
+	 +dcguLERg6GrOLJ57f1wvOccwIiZa2szfh6WKudUA5XdaqeaCXfmjlhY3EbAu9wqdNol7
+	 2TRJGVwlm9hzFpVvoBlCcRyoi5p1vzz6kVi2t405VbgkzrYhC6PKZrmxENQ539Po7/Kg6
+	 74wKo47UMkYc5bjuqNtC7NtoCx+lPLuWCDU16S/ORLZgcP6Ym1wT/IOeBikQ1uhqgbsAA
+	 /TcAzkMPIclGNsprGzen3F2EyuI6pFnNbQJCGlOIbMQzBTgXclFozDp+ppFz+8H/xXQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=cyberchaos.dev;
-	spf=pass smtp.mailfrom=cyberchaos.dev;
-	dkim=pass header.d=cyberchaos.dev header.i=@cyberchaos.dev header.a=rsa-sha256 header.s=mail header.b=YggroFkc;
-	arc=none smtp.remote-ip=195.39.247.168
-Received: from mail.cyberchaos.dev (mail.cyberchaos.dev [195.39.247.168])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC73606A31B;
-	Tue, 20 Oct 2026 14:37:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CBC73606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cyberchaos.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cyberchaos.dev
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=hl0e9+IB;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EBF1606A31B
+	for <kvmarm@lists.linux.dev>; Tue, 20 Oct 2026 14:43:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6EBF1606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=cyberchaos.dev header.i=@cyberchaos.dev header.a=rsa-sha256 header.s=mail header.b=YggroFkc
-Message-ID: <7e59d984-1c00-4414-aa45-3092491ac39b@cyberchaos.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cyberchaos.dev;
-	s=mail; t=1792507019;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=/KQ70MsaDZXGGg9xwr15iwDR73QEsKB18yX4p0CKZSM=;
-	b=YggroFkcCadfQfVG8niIpNsyieORHWjFzYJGR4w/M8tD1eH9iDKWbMHv5Jgf+IwlrHxLJB
-	usD4/MSGgmm58e7uu+YwBIbmwpP1nLJ/M2O1xRpIi05kCSpf/p72CvGX11rD3GHaQbT2Eq
-	oetmXAEU064lrnsbFA+yaG0sVJJyMwU=
-Date: Tue, 20 Oct 2026 16:36:55 +0200
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=hl0e9+IB
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 55CB716F8;
+	Tue, 20 Oct 2026 07:43:08 -0700 (PDT)
+Received: from [10.57.15.218] (unknown [10.57.15.218])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2899E3F7D8;
+	Tue, 20 Oct 2026 07:43:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1792507391; bh=W/Yikr956noee/xLRWy1f51hzGlzHc+4smIokQpB9Lg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=hl0e9+IBBWp9E+x72oIanT99AIWv1ndjtvX6GN8kI19JG/d+AuHI3PqRQ6e/X8css
+	 q2rfFAxHAiCe+WVgV0zQ7cavUxeKYacxdjD4wKMQCTYTDjc7z9R2PIBTMT/nPPcGNM
+	 cjqHRZXreBywaD0rBmQJWQJQ4FvcTFVYuTnS+1mI=
+Message-ID: <16679dd3-c168-4dee-bb9d-da9b0e3416cf@arm.com>
+Date: Tue, 20 Oct 2026 15:43:08 +0100
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -54,76 +53,98 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Subject: Re: [PATCH 2/2] arm64: Apply existing Apple CPU workarounds to M3 and
- M4
-To: Marc Zyngier <maz@kernel.org>,
- Michael Reeves <michael.reeves077@gmail.com>
-Cc: Oliver Upton <oupton@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Myria Sarvay <myrialsarvay@gmail.com>,
- Yureka Lilian <yureka@cyberchaos.dev>, Fuad Tabba <fuad.tabba@linux.dev>,
- Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, Sven Peter <sven@kernel.org>,
- Janne Grunau <j@jannau.net>, Neal Gompa <neal@gompa.dev>,
- asahi@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20261008-apple-m3-m4-kvm-v1-0-7bb4cbf3d63b@gmail.com>
- <20261008-apple-m3-m4-kvm-v1-2-7bb4cbf3d63b@gmail.com>
- <86cxtk2utm.wl-maz@kernel.org>
- <CANpmGNv4uYRLALMLKZn-HJwTiqJO90Fx23DOO7K7d-PfSWn=2w@mail.gmail.com>
- <86bj932ssc.wl-maz@kernel.org>
-Content-Language: en-US
-From: Yureka Lilian <yureka@cyberchaos.dev>
-Autocrypt: addr=yuka@yuka.dev; keydata=
- xjMEZ3vnnhYJKwYBBAHaRw8BAQdAn6RVMnaxLzmDDx+J3jSUGY7BqjyDhsWhdwKBSI6QpXfN
- Fll1cmVrYSA8eXVrYUB5dWthLmRldj7CjgQTFgoANhYhBPGINbLQ3ypM7JNhigKbtnC7kwpH
- BQJne+eeAhsDBAsJCAcEFQoJCAUWAgMBAAIeBQIXgAAKCRACm7Zwu5MKRx1qAP9ToLaOMd73
- VVf1JdwoMc5G44OZfKNk/+ezt9Dl2oqZdQD/Xvgd0lytU3BZ4WnYeMNzo2xHeRxXmX+MfXhA
- D33tzQ/OOARne+eeEgorBgEEAZdVAQUBAQdAIs9uImfvgSCnJOcfvzshLuaSRJ/a0Vp/9rUA
- eBGZq10DAQgHwngEGBYKACAWIQTxiDWy0N8qTOyTYYoCm7Zwu5MKRwUCZ3vnngIbDAAKCRAC
- m7Zwu5MKRyW9AP0dBOuwgWso+QjBZUsbuEmGGUz2OWtszs2Yb7087RMerwEA3al6E7vqq0HC
- 7LiB3nisU+xqQojJ4n/fWCu70iEkjQw=
-In-Reply-To: <86bj932ssc.wl-maz@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH kvmtool] arm64: THPs for systems with pages bigger than 4K
+To: Vincent Donnefort <vdonnefort@google.com>, will@kernel.org,
+ julien.thierry.kdev@gmail.com
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+ oliver.upton@linux.dev, alexandru.elisei@arm.com, andre.przywara@arm.com
+References: <20261019145949.1922019-1-vdonnefort@google.com>
+Content-Language: en-GB
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20261019145949.1922019-1-vdonnefort@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/9/26 10:16, Marc Zyngier wrote:
-> On Fri, 09 Oct 2026 01:03:57 +0100,
-> Michael Reeves <michael.reeves077@gmail.com> wrote:
->>> I can provide the binary (and a few scripts) to test this easily.
->>> Should they have been fixed, we can always create a second
->>> implementation list to cover the PMU.
->> Can you please send that so we can try? That would be much
->> appreciated, thank you.
-> I've sent you (and Yureka) details over IRC. If you need help with
-> setting things up, let me know directly.
->
-> Thanks,
->
-> 	M.
+On 19/10/2026 15:59, Vincent Donnefort wrote:
+> The THP support imposes an alignment of the memslot userspace address to
+> the size of a THP (PMD_SIZE). To do so, kvmtool overallocates the RAM
+> size and aligns it. However it assumes PMD_SIZE is 2MiB, which is only
+> true on 4KiB page systems.
+> 
+> Use a huge-page size, based on the system page size. This value can be
+> massive for a 64KiB page system, so skip the alignment if we couldn't
+> even install one THP.
+> 
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> 
+> diff --git a/arm64/kvm.c b/arm64/kvm.c
+> index 36b3284e4a92..2c01dc32fa9a 100644
+> --- a/arm64/kvm.c
+> +++ b/arm64/kvm.c
+> @@ -18,6 +18,8 @@
+>   
+>   #include <asm/image.h>
+>   
+> +#define HUGEPAGE_SIZE (PAGE_SIZE * (PAGE_SIZE / 8UL))
+> +
+>   static struct arm64_image_header *kernel_header;
+>   
+>   struct kvm_ext kvm_req_ext[] = {
+> @@ -35,20 +37,23 @@ bool kvm__arch_cpu_supports_vm(void)
+>   
+>   void kvm__init_ram(struct kvm *kvm)
+>   {
+> -	u64 phys_start, phys_size;
+> +	u64 phys_start, phys_size, ram_alloc_align = SZ_64K;
+>   	void *host_mem;
+>   	int err;
+>   
+>   	/*
+> -	 * Allocate guest memory. We must align our buffer to 64K to
+> -	 * correlate with the maximum guest page size for virtio-mmio.
+> -	 * If using THP, then our minimal alignment becomes 2M.
+> -	 * 2M trumps 64K, so let's go with that.
+> +	 * Allocate guest memory. We must align our buffer to 64K to correlate
+> +	 * with the maximum guest page size for virtio-mmio. If using THP, then
+> +	 * our minimal alignment trumps 64K, so let's go with that.
+>   	 */
+>   	kvm->ram_size = kvm->cfg.ram_size;
+>   	kvm->arch.ram_alloc_size = kvm->ram_size;
+> -	if (!kvm->cfg.hugetlbfs_path)
+> -		kvm->arch.ram_alloc_size += SZ_2M;
+> +	if (!kvm->cfg.hugetlbfs_path) {
+> +		if (kvm->ram_size >= HUGEPAGE_SIZE)
+> +			ram_alloc_align = HUGEPAGE_SIZE;
+
+There is logic in builtin-run.c to detect the host_ram_size(), could we
+use that instead to decide if we should apply this alignment ? Or retry
+the RAM allocation without the alignment on failure ?
+
+It doesn't look like a good idea to hard code this based just on the
+requested RAM size.
+
+Cheers
+Suzuki
 
 
-Hi all,
 
-
-sorry for the long delay on this. I needed to get my testing setup in 
-shape to be able to run the tests with the limited amount of I/O I have 
-working on these devices.
-But I can now confirm, that the following SoCs reproduce the SEIS 
-erratum (produce a host SError using the binary sent by Marc) unless the 
-MIDR part numbers are added to the has_broken_gic_v3_seis list.
-
-The affected SoCs are:
-- T8132 (M4)
-- T8140 (A18 Pro)
-- T6050 (M5 Pro)
-
-So please add those to the list for v2 of this series, and probably also 
-add T604x (M4 Pro/Max) and T8142 (M5) since I doubt they will be different).
-
-
-Thanks,
-
-Yureka
+> +
+> +		kvm->arch.ram_alloc_size += ram_alloc_align;
+> +	}
+>   
+>   	if (kvm->cfg.arch.guest_memfd)
+>   		kvm->arch.ram_alloc_start = mmap_guest_memfd(kvm,
+> @@ -63,7 +68,7 @@ void kvm__init_ram(struct kvm *kvm)
+>   		    kvm->arch.ram_alloc_size, errno);
+>   
+>   	kvm->ram_start = (void *)ALIGN((unsigned long)kvm->arch.ram_alloc_start,
+> -					SZ_2M);
+> +					ram_alloc_align);
+>   
+>   	if (!kvm->cfg.arch.guest_memfd) {
+>   		madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
+> 
+> base-commit: f67bc0bdae9433a9cfd05e65ea2c1bb6102566d9
 
