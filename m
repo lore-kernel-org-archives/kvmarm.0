@@ -1,98 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792499612;
-	b=451IA60yQN5dSJQUNYahQ5V4TMxcFw34Om/u7UlDYdMblPls4OCFNuV1U9c/oiizoavc
-	 bpOEQcn95v6WNxTNHMDtplM7WoeOR9KpP67znxU5EKww6khOGLfdxE7slcmRu58215K71
-	 +/FK4aIlzrPghqxD3zcfcSovYN/WbsL50ravdYIgDW9jx4PTkkY7o3A2mgo5QU4qqqcta
-	 CtumQDUMjizfrjQALDp1MhnX/REO0cbAwGzrF/ZsIXGVUpMPZ5CxMq5622mQ/x3vo+u1N
-	 GblqBn80xbblVe6+a0azQft4LpOwVmGOYZkU0TQ95HgeA7cGMgb2o+qDZYQ32URM+rg==
+	t=1792500348;
+	b=z83I3ZYofUyQ6Q/G3tLQcfNOgElJYuQ59bFDBbkx6Sk/ZQDrAvTu4GHwS9uw1+sOLsKv
+	 DoqxpX5oRptW1KqB+KcptQOfTwzsRd+uxs2FI2cjghuoxWkZoUYNiCrzuVjbDkbZOXhZq
+	 CnhfjRbDgCdnx/YMQLtgjixi+hbzABqSoq9uRqkLLBvH8CgBZ9CbAXlMgLkHwQi2pLMh3
+	 NehBNY20ir98F0ab+ROrQfvE+kGjGOvkUQX3jTqyf3f0EEUVluqdiClnDEoeXn0ffXAar
+	 pRvGFO3FKkFB4nn9V3ahlhF9R0z4j9d9W99J9FBs6qszvLleQe8PYpE2jG83ZD9wzVA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792499612;
-	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
-	 X-Mimecast-MFC-AGG-ID:Received:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:Date:From:
-	 To:Cc:Subject:Message-ID:References:MIME-Version:In-Reply-To:
-	 X-Mimecast-Spam-Score:X-Mimecast-MFC-PROC-ID:X-Mimecast-Originator:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
-	bh=GPLC8o5SopY2/JwIMyGwlvxapT2M/nYAW+f6CZhs/0U=;
-	b=AtwmD4vYiMAzm0+X37Rtp9i4+FmnMUBs19HtAEmmeYnto8ktSh6sz6mOHMXvrvWoZlsF
-	 n5RnFRd9iwPsECLJ/h9A8RJS47VT8J+G12GKIRh5q1f/tvB5hfe8h1GYoLZiQXVcfMRKR
-	 GgpDQ4MD4gLaDDiuottYtmMCx1QkoPwhZkbpM/iYWoD2/yuwjqyuV1neRYflMj8/ZHs9/
-	 82CdKVrL3GHdW0lw69kWwICZ2PDMi1XHYEX7xfbr07r7QDb5+VorL6dzjDi1Bk6ryIesP
-	 n5Bl4CiGBZsvPUo+HKGtVHbHrGi2rGdcTvok9HzCfAYUkv8NepkEwVQzTZ8j0A+L4UQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792500348;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=xuei+CRi+YTC+w1w98cKTUkZqf74pwWNLSk3Y5bwTTw=;
+	b=lfSPPRkxdpT0f01V+ka9mjZ/pYMIeUbbwQtl3u6RIXN8qCScMtoCAvP/+wYZsGS/4rb+
+	 abFl7JyqjSF8oZL3vHVm9rP4nPc/9eHmvjybrH1LTGHKQY2i7ckzJWr2oZZ5S/FzeZDSj
+	 wEAoqmtiqjf7fC2Bei/EJJG0tMHofgnA86LTHWMTtJC8G6q7v/ohXaEcW+efIRQCdQopw
+	 7UjwfBEBcBZyAzMQzTVkreu/PBEG8W8GE75SmzyU1j5iC44nTsNvZuwgsxDbHeZxwII2k
+	 bVUtTLVLc2cTEa5XSkUpQi8GdPAdbdBbODJBW/Gy3MDBWtD2AmazQrZ++IZcSzEvFow==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=redhat.com;
-	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=AoSe0bwA;
-	arc=none smtp.remote-ip=170.10.133.124
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA73606A319
-	for <kvmarm@lists.linux.dev>; Tue, 20 Oct 2026 12:33:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DAA73606A319
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="XK0/Ckz1";
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DE6B606A31A
+	for <kvmarm@lists.linux.dev>; Tue, 20 Oct 2026 12:45:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7DE6B606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=AoSe0bwA
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1792499610;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GPLC8o5SopY2/JwIMyGwlvxapT2M/nYAW+f6CZhs/0U=;
-	b=AoSe0bwA+Qi9g3ulJedO3GG3dW9MHVFj4k4/qgaU89VYkPmFSv2TonOoqg1CdDB3Kj2+ee
-	ArR9xMopRAyG4TFsRwKoKw0ckvUgdrerVGHqxdYpCU/QV/xeyGNr42gh2QsTIHuRsotHr+
-	ZZjJI5cbbEqDUNxiJbc7rt6p2hvwATg=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-142-kpmyxj4FPrKzeJL54lOmpA-1; Tue, 20 Oct 2026 08:33:29 -0400
-X-MC-Unique: kpmyxj4FPrKzeJL54lOmpA-1
-X-Mimecast-MFC-AGG-ID: kpmyxj4FPrKzeJL54lOmpA_1792499608
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-48e1ad3cb66so898903f8f.3
-        for <kvmarm@lists.linux.dev>; Tue, 20 Oct 2026 05:33:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792499608; x=1793104408;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=GPLC8o5SopY2/JwIMyGwlvxapT2M/nYAW+f6CZhs/0U=;
-        b=sbeyT2ln0kdQj7MH1Fu8w2aGZmtbUABROSB7Ix03pDZ3T4bDn3sVV3/d5Pgn/Tiv2c
-         B34+B7LNUEoF+QzdhkJmfDBV9oL6+aFCgcMjZmMN2hkQ5hXIj7JeVmfSvOYHNoxHqE5M
-         7a8FGfb7Am+FuXOOTIFqmCMZsUbWPX+KYKpIDzNOcDdc4uPyWddTXLImIl8RhhKwxlu7
-         3PNVpaBIqdAqvljSJXNDtU+OLK3+r7xQ+RBx1M4DTQJtCMsN6ILUvVS4zcYEvf+AK7dZ
-         avjXpFcDrRYTldpFpx6Oufqq/s32KeTtTKLiXx8BFSxXOLBTJCw4mOOxCMcTIA/fca1L
-         z+qQ==
-X-Gm-Message-State: AFq9FYJytVaHDPDZZ/SUbIz8O0fIzJ6nus9FDt0DinFn7pgmJWZMHYBC
-	8pJotWxwcm6zJrOuw/jBssPBIPP5X0E/pXFvR4P65BjTEwbMUnQYWonyqoQ3zntSmEoGeANzt4+
-	86JxHOrS+dSaefir2v+p4NAH8Ua+E4XqntwGsC4/tPHVA4KuEqACqJwZSB2TGotBigA==
-X-Gm-Gg: AYBFou3W0vG1cOs8HFYSHpVTv5AAxprIicBsL009sunyKC8+yzWhfa1Y2/J9+crDlA/
-	+rg/KXiwXHdliCXiZIkF8GKAXRIfy43aVo6TpAutZbcm17SxpMG0WYVjznQ5OXzL2MY6aqWj5KA
-	mr4cl/HblQCSHHxOKIBUjFcX4tBgeF5f22uKnKM9J7srM2DaS5Ahu80WUk1irc/KnBJYwr8wEVx
-	ZiWiQ9ZsiE9zu/1O42TrKX4/2oQ+a/ixYc0ZxRkWHDkNYVKsOHzJUG67nn//C+mi/P0yMvOwZHo
-	9Py4AoCvgauow6Hn3+z8fHvLdNR0b6j3caYZbyIqhCUov3YnXweZ2w1nfnUI
-X-Received: by 2002:a05:6000:2990:10b0:486:f4ae:72a2 with SMTP id ffacd0b85a97d-48e07b9201emr16604619f8f.1.1792499607771;
-        Tue, 20 Oct 2026 05:33:27 -0700 (PDT)
-X-Received: by 2002:a05:6000:2990:10b0:486:f4ae:72a2 with SMTP id ffacd0b85a97d-48e07b9201emr16604579f8f.1.1792499607364;
-        Tue, 20 Oct 2026 05:33:27 -0700 (PDT)
-Received: from x1 ([151.41.153.165])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48e1d818d61sm5728198f8f.31.2026.10.20.05.33.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Oct 2026 05:33:26 -0700 (PDT)
-Date: Tue, 20 Oct 2026 14:33:24 +0200
-From: Gustavo Romero <gromero@redhat.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Decouple computation of the GICv5 trap
- registers from FEAT_FGT
-Message-ID: <txi37sltlqtxakyxpk2aim2hrazoa57n3sses6wlc2g3cpwi7k@dm5lre2smxrh>
-References: <20261020104138.2641586-1-gromero@redhat.com>
- <sashiko-outbox-178860@kernel.org>
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=XK0/Ckz1
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 544C31596;
+	Tue, 20 Oct 2026 05:45:43 -0700 (PDT)
+Received: from [10.0.136.108] (M0PRX50XMG.cambridge.arm.com [10.0.136.108])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 739FB3F7D8;
+	Tue, 20 Oct 2026 05:45:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1792500346; bh=k/J+BLE6vPdQdmPvLoLHbEAnQDYiSHhsZ1irxSZ1S0c=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=XK0/Ckz10HfdOrQ2gW5EXmYrluTZNl1MEA6/Znp4ylSv0NXe7N7cfX7V6MYHngkzp
+	 2K6qBeew0yi5eud1JcnMy7Wu+FNWywvpohQ70Fdg75XLJJCf88uq06G9vGkSbrYnp9
+	 Co20daI7xoU1EBK2ytn+oVqt4ixIQUr++Hh7Kngg=
+Message-ID: <36a94626-f760-4eb6-acf2-13c1ad128391@arm.com>
+Date: Tue, 20 Oct 2026 13:45:43 +0100
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -102,139 +53,106 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-In-Reply-To: <sashiko-outbox-178860@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: zQxnsCjGMyzMEuYEh7exM6J1NZjPI0o3i6xJWzygJ90_1792499608
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: arm64: Decouple computation of the GICv5 trap
+ registers from FEAT_FGT
+To: Gustavo Romero <gromero@redhat.com>, kvmarm@lists.linux.dev,
+ fuad.tabba@linux.dev
+Cc: maz@kernel.org, oupton@kernel.org, eric.auger@redhat.com, seott@redhat.com
+References: <20261020104138.2641586-1-gromero@redhat.com>
+Content-Language: en-GB
+From: Sascha Bischoff <sascha.bischoff@arm.com>
+In-Reply-To: <20261020104138.2641586-1-gromero@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi robot,
+Hi Gustavo,
 
-On Tue, Oct 20, 2026 at 10:53:22AM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] KVM: arm64: populate_nv_trap_config() skips GICv5 FGTs when FEAT_FGT is absent
-> --
-> 
-> commit 78d2daa299df3d77e7dfa794f19cd0a1eee7919c
-> Author: Gustavo Romero <gromero@redhat.com>
-> 
-> KVM: arm64: Decouple computation of the GICv5 trap registers from FEAT_FGT
-> 
-> This commit moves the computation of ICH_HFGRTR_EL2, ICH_HFGWTR_EL2, and
-> ICH_HFGITR_EL2 in kvm_vcpu_load_fgt() ahead of the ARM64_HAS_FGT check so
-> that GICv5 trap register values are computed whenever ARM64_HAS_GICV5_CPUIF
-> is present, even if the CPU lacks FEAT_FGT.
-> 
-> > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> > index e93919cadf860..0833453efe4bb 100644
-> > --- a/arch/arm64/kvm/config.c
-> > +++ b/arch/arm64/kvm/config.c
-> > @@ -1744,6 +1744,12 @@ static void __compute_ich_hfgwtr(struct kvm_vcpu *vcpu)
-> >  
-> >  void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
-> >  {
-> > +	if (cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF)) {
-> > +		__compute_ich_hfgrtr(vcpu);
-> > +		__compute_ich_hfgwtr(vcpu);
-> > +		__compute_fgt(vcpu, ICH_HFGITR_EL2);
-> > +	}
-> > +
-> >  	if (!cpus_have_final_cap(ARM64_HAS_FGT))
-> >  		return;
-> 
-> [Severity: High]
-> Does populate_nv_trap_config() in arch/arm64/kvm/emulate-nested.c also need
-> to be updated to store the ICH_HFGRTR_GROUP and ICH_HFGITR_GROUP entries into
-> sr_forward_xa when ARM64_HAS_GICV5_CPUIF is present but ARM64_HAS_FGT is
-> absent?
+On 20/10/2026 11:41, Gustavo Romero wrote:
+> Currently, kvm_vcpu_load_fgt() returns early when the CPU lacks FEAT_FGT,
+> so the per-vCPU ICH_HFGRTR_EL2, ICH_HFGWTR_EL2 and ICH_HFGITR_EL2 values
+> are never computed and stay 0, meaning any access to several GICv5
+> registers will trap, like an access to ICC_PPI_PRIORITYR0_EL1.
 
-I guess you're right but it was already addressed by Fuad's patch:
+This is never a valid configuration for GICv5 on a system that has EL2, 
+i.e., one that supports KVM.
 
-https://lore.kernel.org/all/20260929090031.3829185-2-fuad.tabba@linux.dev/
+* FEAT_GCIE (GICv5) is optional from v9.3.
+* FEAT_FGT is mandatory from v8.6, if an implementation has EL2 or EL3.
+* v9.1 must be v8.6 compliant.
+* If we are running KVM, we must have EL2.
 
-that is already in the mainline:
+There's no way to legally have GICv5 without also having support for 
+FEAT_FGT.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4bdd2b3a708c1feb701cb8b62feb8ad2fd77bb07
+FWIW, Marc caught me making the same mistake:
 
-Maybe you're looking at some branch that doesn't have this fix?
+https://lore.kernel.org/all/86o6o3oehl.wl-maz@kernel.org/
 
+> 
+> On the other hand, __activate_traps_ich_hfgxtr() is gated only on the
+> GICv5 CPU interface and writes them on every guest entry, which is
+> correct.
+> 
+> Returning early when the CPU lacks FEAT_FGT and leaving the GICv5 traps
+> enabled can lead to a KVM "Unsupported guest access at" error when a
+> GICv5 register access by the guest traps to KVM, because the register
+> has no emulation handler.
+> 
+> A real machine with no FEAT_FGT and with GICv5 support enabled is
+> unlikely to exist
 
-Cheers,
-Gustavo
- 
-> Currently, populate_nv_trap_config() skips storing any entry into
-> sr_forward_xa when ARM64_HAS_FGT is not supported:
-> 
-> arch/arm64/kvm/emulate-nested.c:populate_nv_trap_config() {
-> 	...
-> 		for_each_encoding_in(enc, fgt->encoding, fgt->end) {
-> 			...
-> 			if (!cpus_have_final_cap(ARM64_HAS_FGT))
-> 				continue;
-> 
-> 			prev = xa_store(&sr_forward_xa, enc,
-> 					xa_mk_value(tc.val), GFP_KERNEL);
-> 			...
-> 		}
-> }
-> 
-> Because of that, on a system with ARM64_HAS_GICV5_CPUIF and !ARM64_HAS_FGT,
-> the GICv5 entries in sr_forward_xa are left with tc.fgt == __NO_FGT_GROUP__
-> (populated only with tc.sri by populate_sysreg_config() for registers in
-> sys_reg_descs[], or left at 0 for all other GICv5 registers and instructions).
-> 
-> When a guest running without FEAT_GCIE (for example, a GICv3 guest in
-> compatibility mode, or a VM where ID_AA64PFR2_EL1.GCIE was cleared) executes
-> a GICv5 system register or instruction access, kvm_vcpu_load_fgt() has
-> cleared the trap bits in ICH_HFGRTR_EL2, ICH_HFGWTR_EL2, and ICH_HFGITR_EL2
-> from kvm->arch.fgu[], so the access traps to kvm_handle_sys_reg() ->
-> triage_sysreg_trap():
-> 
-> arch/arm64/kvm/emulate-nested.c:triage_sysreg_trap() {
-> 	...
-> 	if (tc.fgt != __NO_FGT_GROUP__ &&
-> 	    (vcpu->kvm->arch.fgu[tc.fgt] & BIT(tc.bit))) {
-> 		kvm_inject_undefined(vcpu);
-> 		return true;
-> 	}
-> 	...
-> }
-> 
-> With tc.fgt == __NO_FGT_GROUP__, this FGU check is bypassed instead of
-> injecting an UNDEF:
-> 
-> - A guest read of SYS_ICC_PPI_ENABLER0_EL1 or SYS_ICC_PPI_ENABLER1_EL1
->   dispatches to access_gicv5_ppi_enabler() in arch/arm64/kvm/sys_regs.c with
->   !p->is_write, triggering WARN_ON_ONCE(!p->is_write).
-> 
-> - A guest write to SYS_ICC_PPI_ENABLER0_EL1 dispatches to
->   access_gicv5_ppi_enabler() and writes to
->   vcpu->arch.vgic_cpu.vgic_v5.vgic_ppi_enabler, which shares a union with
->   vgic_v3 in struct vgic_cpu.
-> 
-> - Guest reads of SYS_ICC_IDR0_EL1 or SYS_ICC_IAFFIDR_EL1 execute
->   access_gicv5_idr0() or access_gicv5_iaffid() instead of injecting UNDEF.
-> 
-> - Guest accesses to other GICv5 registers or instructions fall through to the
->   local label with !tc.sri and log "Unsupported guest access at:" on the host
->   before injecting UNDEF.
-> 
-> >  
-> > @@ -1761,10 +1767,4 @@ void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
-> >  		__compute_fgt(vcpu, HDFGRTR2_EL2);
-> >  		__compute_fgt(vcpu, HDFGWTR2_EL2);
-> >  	}
-> > -
-> > -	if (cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF)) {
-> > -		__compute_ich_hfgrtr(vcpu);
-> > -		__compute_ich_hfgwtr(vcpu);
-> > -		__compute_fgt(vcpu, ICH_HFGITR_EL2);
-> > -	}
-> >  }
-> 
-> -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20261020104138.2641586-1-gromero@redhat.com?part=1
-> 
+Given the above, very unlikely. I hope... :)
 
+> , but such a setup can happen on some simulators, like
+> FVP with the following flags:
+> 
+> -C cluster0.has_arm_v8-5=1
+> -C bp.is_gicv5_used=1
+
+Even if the simulator allows it, it isn't a valid configuration. You 
+want v9.3 or greater here. Moreover, we shouldn't be writing code to 
+support architecturally invalid configurations.
+
+Thanks,
+Sascha
+
+> 
+> Hence, because the ICH trap registers are part of FEAT_GCIE, not part of
+> FEAT_FGT, compute them before the FGT check, making this computation
+> independent of FEAT_FGT.
+> 
+> Fixes: 9d6d9514c08f ("KVM: arm64: gic-v5: Support GICv5 FGTs & FGUs")
+> Signed-off-by: Gustavo Romero <gromero@redhat.com>
+> ---
+>   arch/arm64/kvm/config.c | 12 ++++++------
+>   1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> index 1053676551af..8a526704af59 100644
+> --- a/arch/arm64/kvm/config.c
+> +++ b/arch/arm64/kvm/config.c
+> @@ -1744,6 +1744,12 @@ static void __compute_ich_hfgwtr(struct kvm_vcpu *vcpu)
+>   
+>   void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
+>   {
+> +	if (cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF)) {
+> +		__compute_ich_hfgrtr(vcpu);
+> +		__compute_ich_hfgwtr(vcpu);
+> +		__compute_fgt(vcpu, ICH_HFGITR_EL2);
+> +	}
+> +
+>   	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+>   		return;
+>   
+> @@ -1761,10 +1767,4 @@ void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
+>   		__compute_fgt(vcpu, HDFGRTR2_EL2);
+>   		__compute_fgt(vcpu, HDFGWTR2_EL2);
+>   	}
+> -
+> -	if (cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF)) {
+> -		__compute_ich_hfgrtr(vcpu);
+> -		__compute_ich_hfgwtr(vcpu);
+> -		__compute_fgt(vcpu, ICH_HFGITR_EL2);
+> -	}
+>   }
