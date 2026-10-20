@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792507394;
-	b=atXwRPQmIp+zxxiay2MQFPTk/yDJvdv5zPde6QWWkeaGZ9IeK22VMxn6CiXyu3M7l0Bi
-	 Zhzk5teRknenvN5t/FQ+pzYZNT6SssWsICOWkQ7T8GfOLWewPJOIIc/8zKdMTa8ifPbra
-	 bPBRda+gkOGHqFvHKAKjCLSYcfm5i4XfzDIJ1srzKPe651IGY4dDZClvxH1JQjjWerqWF
-	 9Ob6RmxT2BuZkQ4s1j8otesyBI9wv/6cRCkf6HXa4atvKwPX8n7HLboNIl2Ulc9kdFSub
-	 paYsfmTgH2v/nTvsufONbY4G1ltYME7AYNFHJ/1zbbUtkaqwVUFhPl7asxacrdH1enw==
+	t=1792508803;
+	b=HdSRggNeonJb0qXCsLwf1k6oc32B61dIrnHFYpdc5CiAu6erA5AfW4Hv4TP61EvHh/Lf
+	 bi0AOzyAYSl0vSoW/mJYLG0rma3qwritJx+IKwJtWzCR9GLIprPoO9KdMThYSD0630dM6
+	 xF++n7iZzrpYdpJg8tdmP0/duulCffaEZiKWn1wVWmynOBEP2fTLtw57mkfhPRQlcUGt6
+	 fv2oqybv0p/fd41MoHJu/S82aI5hVyU6rANBOENy58i6bOs4HWkljm/K14pmxH7w5aKut
+	 OmjX/0el17543qtoUonPEdy+3+APp1YKVwIdrPYCOIjFH2GtN6mXU1eF7WKszaFypbQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792507394;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792508803;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=jQyDvfX7kGhNcVt2WJOUsbR6Xr7YV1OMvJOHBnTjnZQ=;
-	b=sGEr4VG6yGqdQXQXn7hJhWXljcjG14Jp7mCKeflhRnPfmi40oaBldMFKc8utorMW2FLY
-	 +dcguLERg6GrOLJ57f1wvOccwIiZa2szfh6WKudUA5XdaqeaCXfmjlhY3EbAu9wqdNol7
-	 2TRJGVwlm9hzFpVvoBlCcRyoi5p1vzz6kVi2t405VbgkzrYhC6PKZrmxENQ539Po7/Kg6
-	 74wKo47UMkYc5bjuqNtC7NtoCx+lPLuWCDU16S/ORLZgcP6Ym1wT/IOeBikQ1uhqgbsAA
-	 /TcAzkMPIclGNsprGzen3F2EyuI6pFnNbQJCGlOIbMQzBTgXclFozDp+ppFz+8H/xXQ==
+	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
+	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=0c2WAJ+A3fmtE5JIgmM33C+5uxJtcuzd3UjlEAxXX4c=;
+	b=I1PEnOZKrq5MN19LIFnCm7q1fe8PBZjsHJ80PyOV0uToi28pMPtcwTsKpgxNdnnPc+xL
+	 Tp6dqXQDO4MPF1rTcuES2dTH5guBSh1AH8cZUiSu9inor50bUIwUT29lpjv25FP9tccU6
+	 Q+sfr07XworeK+jZoqn68VDPLEOvcIoAzKvY/LbDUfltDq21tXf2HpgXKVIqWiIsdQdWZ
+	 MRz7NTB4XXCVO8MSFjqyZq8hm0+HReIAKq2Q4iUvBNflfDcxTpeDhtTOszJRYfOQiKYSe
+	 fDBCClVuY4yde9cqOuQYHMFlf+W5bGLCB8Q+eLCMJU65KuCNPoGF2Kb0V0AIsWZD0oA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=hl0e9+IB;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=qbsEPwkD;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EBF1606A31B
-	for <kvmarm@lists.linux.dev>; Tue, 20 Oct 2026 14:43:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6EBF1606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B91A5606A31B
+	for <kvmarm@lists.linux.dev>; Tue, 20 Oct 2026 15:06:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B91A5606A31B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=hl0e9+IB
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=qbsEPwkD
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 55CB716F8;
-	Tue, 20 Oct 2026 07:43:08 -0700 (PDT)
-Received: from [10.57.15.218] (unknown [10.57.15.218])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2899E3F7D8;
-	Tue, 20 Oct 2026 07:43:10 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BACB516F8;
+	Tue, 20 Oct 2026 08:06:38 -0700 (PDT)
+Received: from [10.0.137.15] (XHFQ2J9959-5.cambridge.arm.com [10.0.137.15])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 023503F7B4;
+	Tue, 20 Oct 2026 08:06:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792507391; bh=W/Yikr956noee/xLRWy1f51hzGlzHc+4smIokQpB9Lg=;
+	t=1792508801; bh=B2p95+bauGKjmtB2lfd2lV6Dt4OS4tWv6hQlDp4Cj+Y=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hl0e9+IBBWp9E+x72oIanT99AIWv1ndjtvX6GN8kI19JG/d+AuHI3PqRQ6e/X8css
-	 q2rfFAxHAiCe+WVgV0zQ7cavUxeKYacxdjD4wKMQCTYTDjc7z9R2PIBTMT/nPPcGNM
-	 cjqHRZXreBywaD0rBmQJWQJQ4FvcTFVYuTnS+1mI=
-Message-ID: <16679dd3-c168-4dee-bb9d-da9b0e3416cf@arm.com>
-Date: Tue, 20 Oct 2026 15:43:08 +0100
+	b=qbsEPwkDD7Lc4yU5KuGZCTmflk83ca1uakWmyzyB5V+G5xona4bnVrrf8HUO7SfBD
+	 hWcREG5/ibmRlF3zEEC0SajKDIYlVtmTByzKmcih5lFG3FO5cxnsZcCqcNRrejVtTV
+	 ofgzQDwH+CmP1BeWW8uCRXFv9mqJ7hmrpsqrKaQ8=
+Message-ID: <c367caf3-d462-42ea-b482-bf9c51c47a63@arm.com>
+Date: Tue, 20 Oct 2026 16:06:37 +0100
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -54,97 +54,67 @@ List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kvmtool] arm64: THPs for systems with pages bigger than 4K
-To: Vincent Donnefort <vdonnefort@google.com>, will@kernel.org,
- julien.thierry.kdev@gmail.com
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, maz@kernel.org,
- oliver.upton@linux.dev, alexandru.elisei@arm.com, andre.przywara@arm.com
-References: <20261019145949.1922019-1-vdonnefort@google.com>
+Subject: Re: [RFC PATCH v2 12/15] vfio: Support VFIO devices that access the
+ CPU MMU
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+ Alex Williamson <alex@shazbot.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Jean-Philippe Brucker <jpb@kernel.org>,
+ Oded Gabbay <ogabbay@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, devicetree@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-doc@vger.kernel.org
+References: <20261015142552.4128028-1-ryan.roberts@arm.com>
+ <20261015142552.4128028-13-ryan.roberts@arm.com>
+ <20261015164421.GD13920@nvidia.com>
+ <95e0f9bd-0203-4c7a-9d09-622593bb3d4c@arm.com>
+ <20261020140944.GA3008132@nvidia.com>
+From: Ryan Roberts <ryan.roberts@arm.com>
 Content-Language: en-GB
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20261019145949.1922019-1-vdonnefort@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20261020140944.GA3008132@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 19/10/2026 15:59, Vincent Donnefort wrote:
-> The THP support imposes an alignment of the memslot userspace address to
-> the size of a THP (PMD_SIZE). To do so, kvmtool overallocates the RAM
-> size and aligns it. However it assumes PMD_SIZE is 2MiB, which is only
-> true on 4KiB page systems.
+On 20/10/2026 15:09, Jason Gunthorpe wrote:
+> On Tue, Oct 20, 2026 at 12:51:26PM +0100, Ryan Roberts wrote:
+>>> However.. you still have to affirm which single mm is the mm that the
+>>> device is going to be doing DMA against. The process the opens the fd
+>>> should not be forced to be the mm that it gets linked to.
+>>
+>> What is the mm representing here? Ultimately we want to install the KVM
+>> instance's stage2 pgtables and (pinned) VMID. We currently get that via the
+>> bound KVM instance (which looks like it still works using the cdev interface?)
+>>
+>> The guest will then install the stage1 pgtables and (pinned) ASID associated
+>> with the relevant (guest) mm_struct.
+>>
+>> Do we _need_ an mm association in the host?
 > 
-> Use a huge-page size, based on the system page size. This value can be
-> massive for a 64KiB page system, so skip the alignment if we couldn't
-> even install one THP.
+> Ah.. I see, I didn't quite follow that. OK.. Ah everyone else doing
+> this is using iommufd with a viommu to establish their connection
+> between device an KVM. eg Jacob Pan's series. That's a probably a
+> better idea to stay aligned with the common path. Though your reasons
+> are a little different..
+
+Just to check, you're referring to [1]?
+
+I was under the impression that I could open the VFIO device through the cdev
+interface, then bind it to the KVM instance via KVM_DEV_VFIO_FILE_ADD... Why do
+I need an iommufd at all?
+
+[1]
+https://lore.kernel.org/all/20260925190742.1575380-1-jacob.pan@linux.microsoft.com/#t
+
+Thanks,
+Ryan
+
 > 
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> If you manage to get pinned VMID out of KVM then we can implement SMMU
+> BTM as well!
 > 
-> diff --git a/arm64/kvm.c b/arm64/kvm.c
-> index 36b3284e4a92..2c01dc32fa9a 100644
-> --- a/arm64/kvm.c
-> +++ b/arm64/kvm.c
-> @@ -18,6 +18,8 @@
->   
->   #include <asm/image.h>
->   
-> +#define HUGEPAGE_SIZE (PAGE_SIZE * (PAGE_SIZE / 8UL))
-> +
->   static struct arm64_image_header *kernel_header;
->   
->   struct kvm_ext kvm_req_ext[] = {
-> @@ -35,20 +37,23 @@ bool kvm__arch_cpu_supports_vm(void)
->   
->   void kvm__init_ram(struct kvm *kvm)
->   {
-> -	u64 phys_start, phys_size;
-> +	u64 phys_start, phys_size, ram_alloc_align = SZ_64K;
->   	void *host_mem;
->   	int err;
->   
->   	/*
-> -	 * Allocate guest memory. We must align our buffer to 64K to
-> -	 * correlate with the maximum guest page size for virtio-mmio.
-> -	 * If using THP, then our minimal alignment becomes 2M.
-> -	 * 2M trumps 64K, so let's go with that.
-> +	 * Allocate guest memory. We must align our buffer to 64K to correlate
-> +	 * with the maximum guest page size for virtio-mmio. If using THP, then
-> +	 * our minimal alignment trumps 64K, so let's go with that.
->   	 */
->   	kvm->ram_size = kvm->cfg.ram_size;
->   	kvm->arch.ram_alloc_size = kvm->ram_size;
-> -	if (!kvm->cfg.hugetlbfs_path)
-> -		kvm->arch.ram_alloc_size += SZ_2M;
-> +	if (!kvm->cfg.hugetlbfs_path) {
-> +		if (kvm->ram_size >= HUGEPAGE_SIZE)
-> +			ram_alloc_align = HUGEPAGE_SIZE;
-
-There is logic in builtin-run.c to detect the host_ram_size(), could we
-use that instead to decide if we should apply this alignment ? Or retry
-the RAM allocation without the alignment on failure ?
-
-It doesn't look like a good idea to hard code this based just on the
-requested RAM size.
-
-Cheers
-Suzuki
-
-
-
-> +
-> +		kvm->arch.ram_alloc_size += ram_alloc_align;
-> +	}
->   
->   	if (kvm->cfg.arch.guest_memfd)
->   		kvm->arch.ram_alloc_start = mmap_guest_memfd(kvm,
-> @@ -63,7 +68,7 @@ void kvm__init_ram(struct kvm *kvm)
->   		    kvm->arch.ram_alloc_size, errno);
->   
->   	kvm->ram_start = (void *)ALIGN((unsigned long)kvm->arch.ram_alloc_start,
-> -					SZ_2M);
-> +					ram_alloc_align);
->   
->   	if (!kvm->cfg.arch.guest_memfd) {
->   		madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
-> 
-> base-commit: f67bc0bdae9433a9cfd05e65ea2c1bb6102566d9
+> Jason
 
