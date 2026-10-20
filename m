@@ -1,49 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.133.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792492924;
-	b=hjJ377phD7deGlJD+kwc6JB3Q0O9My41RAfjyHIYGlWunWTQG2Gc4BRAGNwjk9Jq7ONp
-	 /sClpVULhmqye/S6MJTuo6GuP4OJy9uRuA2cjsocF1oF+uoDPpal6UPXL2tmk5DRDNlcK
-	 2U6ay/l52ccdUO2Xfh+ZC/Dz6np60I1XeMq5SN6UGHt13yXJKRgJsgbcnr3t7iKwrv/WJ
-	 cigibEef5FiOOXRj3dJpfBG9XSRGsf6dOE2Ea8qv43PDmhzmfEmYpw223EHIGiq17nudh
-	 yIUdCYynt4uM6IYO71S/ycD+qrlqcksCr/wcWNbEGLhGwvKYwAXMMMdYRYAvg1dmtCw==
+	t=1792492936;
+	b=S11Fiip7tE3JYI0riNjhZHsrffEYv1xDQfQfEZ0+BykV15R6FvwlWYfetzui9iWr9HvH
+	 /RmNp7m/VJ+FykBw590DzKgiNJyy7Gjtfp1lzFzaVTGfdUVc3f+8LNVpU+eRRsRxLvGH8
+	 PjpCtGHjfGpG06p871dhLT35kQdvgNlLSbR6DVAXq/7+E4bJsQ/PWbkr7lxRbovcCqMcP
+	 YYERCaG6J+ZCpzTIGsvr7x+lCKZx7dCQwPmRK4DlsUU29knI4rL4dR8Z0WILOMQTT6kCo
+	 J1N4MFWBLpTHfoKGQesWx1ekSKfq6DLgSqt46QLgus1w1dZSFgaTXACf7Ea4/noldIw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792492924;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
-	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=HOfrP9Gwhe+jGo5BWEDgZkkf4alGpvk7OGOLWLYgIaA=;
-	b=yzc7uEmoMHmqOJEU466ng71RXPNwznpIUG8h9DL3d4Fp7xd4sc6UmFBeiIkhDMsBrVMy
-	 CfE88/UribrM6B11J/N2d5Amaeg2ia4Y4FvSZTRA+aQoqJ4UYj1UpnYAYVHvYizOwTmSl
-	 ottapH0vtw8h12g+gxdS6TtIcMH8wKMYvNN1KpLY8gpUMekMl6b+Kvo2pPL0tpHasK9yu
-	 hUU5kntgH5W9wTZJTw66p9kJOdFB5zczLBpd+xTKEvjPgLozOXllcqdWmklxo88F8Zy/f
-	 plTHG/1Uwvok/YKjQ80xIHBcmta6TUIHkuj6duYlzSomWzmpTOYGWNpfQzLm+xDdMUw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792492936;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 X-Received:Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:X-Mimecast-Spam-Score:X-Mimecast-MFC-PROC-ID:
+	 X-Mimecast-Originator:Content-Transfer-Encoding:content-type;
+	bh=EHQMj0nDjE1NM5DAqsI61LFSXR1PvG5+yphDQ1lnzpc=;
+	b=nz84ho0FAF53vJEFLUMRI9wzr8ZSnJq7aEs8VbiRlczbD1+1P6Wg7DA4NDlx7iN4R6de
+	 BSdkbMhAY5cy7CBeplWrM+K+i5T/AZoaKvq7Ccy+BT0erOyFwPZ+AVyhQqZJ/Ui6rUmod
+	 wnI5fEuH1+uBBcxTsR48y+77tdyn5jQo/t0hatmySMHpHzG1Ta3kiXX+senUfpw/zrCht
+	 mLh2YOY/C66Qrjz23Rpj+x9wgIQI77MaZZDFehZEWdS1v0Hgp42TukXEENDeUyys2ZMVQ
+	 96aDKraie3tDnRg0Rrxk38dHZJx9rffb43+cHjtE6Ou4guMw7yT/zKO4gL1rOmfNUnA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=R0X9Nmpp;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40A38606A31D
-	for <kvmarm@lists.linux.dev>; Tue, 20 Oct 2026 10:42:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 40A38606A31D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=DFyvOL+A;
+	arc=none smtp.remote-ip=170.10.133.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF5B5606A320
+	for <kvmarm@lists.linux.dev>; Tue, 20 Oct 2026 10:42:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BF5B5606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=R0X9Nmpp
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0EA711596;
-	Tue, 20 Oct 2026 03:41:59 -0700 (PDT)
-Received: from [10.0.137.15] (XHFQ2J9959-5.cambridge.arm.com [10.0.137.15])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2958D3F7D8;
-	Tue, 20 Oct 2026 03:41:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792492922; bh=OaSet948UMPKW/bEq7Gy7KB2ZNmZwB2hGOuIicxjXI8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=R0X9NmppaPctZe25oyvdRyxTPp7TrT33QgSmgyWht1QNwxUfP4JqEzNxdmziK123R
-	 XueQS3xiz/bfL8vBZ1yVww8k6Q6T25wedDXhj06BS3d1+I/XnwCjNfnm9GNFLMWDfn
-	 vC7cxViW1dKg0DcKnWi5Bhdwq1g6zBBbBiqLMygQ=
-Message-ID: <375868af-d0bd-4278-83e6-f8429df130e9@arm.com>
-Date: Tue, 20 Oct 2026 11:41:57 +0100
+	dkim=pass (1024-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=DFyvOL+A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1792492934;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=EHQMj0nDjE1NM5DAqsI61LFSXR1PvG5+yphDQ1lnzpc=;
+	b=DFyvOL+A8ad+Cy5UaenWeD5ORfGR+ad/NRY6fwY3XW4EH67scv1xTBEEUZpc2N1ptmzyPS
+	h1N03ZjJ4uagfDAqxtxiETFG/iW/LC+olY78AQJZadJIP+kKl/dzsPDUs4sQs61yGNl0Wo
+	NBOcAEamlCk1lvPvcQs8Y8zrhmZwvZ4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-664-G2mey3YVMnuAPkqKWkr4Rw-1; Tue, 20 Oct 2026 10:42:13 +0000
+X-MC-Unique: G2mey3YVMnuAPkqKWkr4Rw-1
+X-Mimecast-MFC-AGG-ID: G2mey3YVMnuAPkqKWkr4Rw_1792492932
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4a1d7663a4dso29182315e9.2
+        for <kvmarm@lists.linux.dev>; Tue, 20 Oct 2026 03:42:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792492932; x=1793097732;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=EHQMj0nDjE1NM5DAqsI61LFSXR1PvG5+yphDQ1lnzpc=;
+        b=HDCijHceB/V+oHXTw3HI5OsiLS0zbtR+DlobzNu7554gxk2ShJTdzSyfNhyjEXk0ox
+         DDXbFUKKS9hJv/pUee4Ndb0Aemi1xCT30y0KGcFOnuHUsbkKU+aCWVtxCqLVNvcSHUoj
+         CnkEnVFXBfHsnuoJx4qWwUnQ3r/kxWP7SqM4EyCY85PyV4sbN6WjCKUU55hcffa3Af0t
+         2wx5+KzdlmzFOGKw2/L3YZcdR9rS2ssETXEiZEQY81Q0+CEWKQu+W5B8QH5KEkvSWxTe
+         +85q/xm34wp1/Tle8FsEyf0oY4hk/eZzjaRsBRGkL8BDNr6L9hEJ3HWKuQ7bvUR3MVdX
+         EF4g==
+X-Forwarded-Encrypted: i=1; AKwUvBySbPla3FO6CNGDxrymOcxPMC1d2EtzzndEFpB/I0w5IIjr9+JAt14NPn8+TYpaCk6e07eUqTs=@lists.linux.dev
+X-Gm-Message-State: AFq9FYKgxbwDumTM1MGNERfwN69arbxJc4IrDTUZjmD5J4D5FDjN2MtR
+	pqh+MWRvbRIrx4ndJ5Ut9k5zd3ODcoGe1fCUoPa+7LXR18kDAFFHjX8+XsL1Lp+/FPjLbZIupgq
+	+fWV9GzpVST9g84ec9+oPqQA2VzULx8a1PiUYZrr23p3uETDy+VRV318CMQ==
+X-Gm-Gg: AYBFou2b+EJNTK9Tw+V+tVvdZFzivY8VzFZRBsRQ2ivmrzabmAUAMLLFnk3dsjrrTpr
+	CUU/oZDv3tEPtaC+Br4otPt/lyjLuK2fDKXetFz/23WWLjFoHJPVJXw/X2YuXTP8CXYpG4g9Uqn
+	tgaZnLnPj6gGII5Pf9OrOhn0u97gkD49cQ5soir8y16Hz2De2b+QcJcS245K0q2dvLAZN4TadbX
+	kX2pVXqsZ4VM9n+8cq45ivSbU2Lef1CTGAnkQ3dl9wKbMn5UmvlI5AxAj4oM7YfdqEVjyzL7fIE
+	cvVG1swYYiiqY9wVYo+m/hRpW2KeDomgO7Ke2/bKJqSd9mYg2SdelHHw0pQzcLRuzSj3dVdNRPg
+	=
+X-Received: by 2002:a7b:ce19:0:b0:4a1:f91a:732e with SMTP id 5b1f17b1804b1-4a1f91a73d8mr10947975e9.12.1792492932085;
+        Tue, 20 Oct 2026 03:42:12 -0700 (PDT)
+X-Received: by 2002:a7b:ce19:0:b0:4a1:f91a:732e with SMTP id 5b1f17b1804b1-4a1f91a73d8mr10947595e9.12.1792492931578;
+        Tue, 20 Oct 2026 03:42:11 -0700 (PDT)
+Received: from x1.redhat.com ([151.41.153.165])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1f2d699dasm66908685e9.12.2026.10.20.03.42.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Oct 2026 03:42:11 -0700 (PDT)
+From: Gustavo Romero <gromero@redhat.com>
+To: gromero@redhat.com,
+	kvmarm@lists.linux.dev,
+	fuad.tabba@linux.dev,
+	Sascha.Bischoff@arm.com
+Cc: maz@kernel.org,
+	oupton@kernel.org,
+	eric.auger@redhat.com,
+	seott@redhat.com
+Subject: [PATCH] KVM: arm64: Decouple computation of the GICv5 trap registers from FEAT_FGT
+Date: Tue, 20 Oct 2026 12:41:38 +0200
+Message-ID: <20261020104138.2641586-1-gromero@redhat.com>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,81 +105,71 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 15/15] misc/arm-cla: Add vfio-mdev user interface
-To: Jason Gunthorpe <jgg@nvidia.com>, Jean-Philippe Brucker <jpb@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
- Alex Williamson <alex@shazbot.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Oded Gabbay <ogabbay@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, devicetree@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-doc@vger.kernel.org
-References: <20261015142552.4128028-1-ryan.roberts@arm.com>
- <20261015142552.4128028-16-ryan.roberts@arm.com>
- <20261015164102.GC13920@nvidia.com>
- <CABCqBse_aZL-EH0us2uA5X10q6E4WP02MoHTYf+M9ezRZr26WQ@mail.gmail.com>
- <20261016144202.GG13920@nvidia.com>
-From: Ryan Roberts <ryan.roberts@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20261016144202.GG13920@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: v5t00vpG4eGzzBr9-1mdr2_LAM9524M2iUepJ82jNLo_1792492932
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+content-type: text/plain; charset="US-ASCII"; x-default=true
 
-On 16/10/2026 15:42, Jason Gunthorpe wrote:
-> On Fri, Oct 16, 2026 at 03:22:00PM +0100, Jean-Philippe Brucker wrote:
->> On Thu, 15 Oct 2026 at 17:41, Jason Gunthorpe <jgg@nvidia.com> wrote:
->>> I think I said this last time, please don't use vfio mdev for
->>> anything. There is nothing mediated about this.
->>
->> We don't multiplex a device between guests, but the host driver must
->> control part of the device registers while the remainder is assigned to
->> a guest. The host configures accelerator access, stage-2 translation,
->> handles CPUHP and context save/restore. So we can't bind the device to
->> vfio-platform.
-> 
-> That's fine, you can make a proper vfio-cla driver.
+Currently, kvm_vcpu_load_fgt() returns early when the CPU lacks FEAT_FGT,
+so the per-vCPU ICH_HFGRTR_EL2, ICH_HFGWTR_EL2 and ICH_HFGITR_EL2 values
+are never computed and stay 0, meaning any access to several GICv5
+registers will trap, like an access to ICC_PPI_PRIORITYR0_EL1.
 
-Hi Jason,
+On the other hand, __activate_traps_ich_hfgxtr() is gated only on the
+GICv5 CPU interface and writes them on every guest entry, which is
+correct.
 
-Thanks for taking a look at this! I've been chewing on this comment and trying
-to educate myself deeper on the subject. I have a proposal...
+Returning early when the CPU lacks FEAT_FGT and leaving the GICv5 traps
+enabled can lead to a KVM "Unsupported guest access at" error when a
+GICv5 register access by the guest traps to KVM, because the register
+has no emulation handler.
 
-Currently we create a struct device per CLA device instance. But multiple CLA
-device instances cooperate within a domain and the domain is the "unit of
-isolation"; we can't have some CLAs from a domain assigned to a VM, while others
-from the same domain are used by the host. Therefore it didn't feel like the
-correct model to unbind one of these devices from the native driver and rebind
-it to a cla-vfio driver. mdev seemed to solve this problem nicely for us.
+A real machine with no FEAT_FGT and with GICv5 support enabled is
+unlikely to exist, but such a setup can happen on some simulators, like
+FVP with the following flags:
 
-But looking into it in more detail, I guess something like this might be a bit
-more standard:
+-C cluster0.has_arm_v8-5=1
+-C bp.is_gicv5_used=1
 
- - Split the existing CLA driver into three components:
-    - cla-core: Hardware discovery, domain configuration, struct device
-      registration and CPU hotplug
-    - cla-native driver: Provides the user space accelerator interfaces
-    - cla-vfio driver: Enables domains to be assigned to virtual machines
- - Each domain has a struct device (created by the core)
-    - An individual CLA is not represented by a struct device
- - Either cla-native or cla-vfio can then bind to a domain device
-    - cla-native exposes a char device per domain, per accelerator class
-    - cla-vfio
+Hence, because the ICH trap registers are part of FEAT_GCIE, not part of
+FEAT_FGT, compute them before the FGT check, making this computation
+independent of FEAT_FGT.
 
-For VFIO, I guess we could use one VFIO region per CLA, which would allow the
-VMM to construct a device tree. But it would need to additionally determine
-which CPU each CLA is bound to; perhaps that's a sysfs interface that cla-core
-could expose?
+Fixes: 9d6d9514c08f ("KVM: arm64: gic-v5: Support GICv5 FGTs & FGUs")
+Signed-off-by: Gustavo Romero <gromero@redhat.com>
+---
+ arch/arm64/kvm/config.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-Does this feel like it's going in the right direction?
-
-Thanks,
-Ryan
-
-> 
-> Jason
+diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+index 1053676551af..8a526704af59 100644
+--- a/arch/arm64/kvm/config.c
++++ b/arch/arm64/kvm/config.c
+@@ -1744,6 +1744,12 @@ static void __compute_ich_hfgwtr(struct kvm_vcpu *vcpu)
+ 
+ void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
+ {
++	if (cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF)) {
++		__compute_ich_hfgrtr(vcpu);
++		__compute_ich_hfgwtr(vcpu);
++		__compute_fgt(vcpu, ICH_HFGITR_EL2);
++	}
++
+ 	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+ 		return;
+ 
+@@ -1761,10 +1767,4 @@ void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
+ 		__compute_fgt(vcpu, HDFGRTR2_EL2);
+ 		__compute_fgt(vcpu, HDFGWTR2_EL2);
+ 	}
+-
+-	if (cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF)) {
+-		__compute_ich_hfgrtr(vcpu);
+-		__compute_ich_hfgwtr(vcpu);
+-		__compute_fgt(vcpu, ICH_HFGITR_EL2);
+-	}
+ }
+-- 
+2.47.3
 
