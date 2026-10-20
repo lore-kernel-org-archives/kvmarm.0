@@ -1,64 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792514382;
-	b=25zXsoXg1GR3Pp4hgJXubzoghdYZh1DlmLz03DMXKnkqTfidJIbILd1pwwphszF73b86
-	 UyzW2oJqDAOh7YH8Ce/hCvLELa9F4+l0pk61zNg13/IShMWYYlU6Q7qX72egrouuGyFiY
-	 0jAQHqUWrzmetG6dwOB37n9O7Z4SdourlqNam7bmra0bXU6axcYp3sBvqYahKuE1B5/0D
-	 np7uGFs3EgRtNxKi+j55EeOE+T9uAvaFDcrQflovSmVWwxlKwmh7srxUwdKg35i+xt3A+
-	 UZdlWA0y7n9ym5UqDnD8CjWIHy+TFSPjDpXaQsAKfMgN7nXPqr2VoOzpr27OiVyW6Kw==
+	t=1792516844;
+	b=iJgE02ByF3NjRTtT0YMWs+GKLh6HipPbCZzXkTSxCLtLWrAfntImFwKfjhWCLnCBzmh0
+	 t8FFq14bwEMQt3RZVXqVXzIXyVKciXiaSD8DfLehWeGzIegNbqZT3Kuhn5TUcB8jPNis5
+	 HNDmVFQBPmRkmdzsKA4GygMBDGOEAPKMVfzaHkrpknUG/L2PoKt64LONZqLHKxjAgZ4/O
+	 +Qc+nBUuoe61bY/L6fdKEy68fqHDGNk96jA0+RvZFuL6H+5U4MoEB50D+MLZIhJj3aRqb
+	 sjVvNOHwFybRvqfJLdyJC96uNKmxSPaOBv82ex5wPVjjRvTNVSvM9mO44SnRb3+qAOQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792514382;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=Me8xE9/+Q42HSlzVQJcqG9CFCufmL51mc1y5dA1P6VI=;
-	b=1U/pD5ek+PObGYyRb+zq4iOHIjk95V+dli3efklFwmpbkHIz6njGc6rfFgyS067WOsuh
-	 IfmTbozQNEGB8+/gYfLpL8tqi9lbPOdI8dbR7VdUoBffQy6DCCl1/Z5M6gnLjiIGiMTFV
-	 r15XeOVoWWm4ziUuIpCmtVwQEkzcYuE2B8KRDzXYEnkbf9CoSAJp5OlyhSDkpx1WtP1Sc
-	 u2xAoS5cwG0Jig5ECyQeVEFXsG3sLAj3oHSVjoWIoGd7YWlZHcuzjeiXwNnwWoY+29a8/
-	 bZ3SBOi40gmgWK5CpqpNi7dGlbJqKovBhGVPse2qT+6A0Iekm+RbsPm8UUGZ8tvTvOA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792516844;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=6WWk7zExmFICqSLgFYRdnOfnAX1UA+1LzUHxktArr0A=;
+	b=J4kIxOv+RlXLLAs39rYOsI58kawPscGXp+TM7xe3CXIjm55LZDXBrxaIOuDwbQgDfbSs
+	 l03j8fJCHy8/5dVys4KZqUbemJtwTUkYhhRQH/Cm+0R+UbJn/dY8F/mZzNStLsBnHxmpl
+	 86QwBuwcrOvyY+cb542xd320D+2kjE5RXd0GxX5eQHHupJBUPPg4s2MsyP9FGBpRIu1y0
+	 fzHVt7ye7uvA7x5Pwi3/4v6mwMOkMAXpiJIy0Q0cU7ybDD6oBPWR1xEbnRsfyT6B/4LcS
+	 gl3SifcWYmy82WxOwEeTD0kyzCvR5vjmWYaiyw/WeshOQ3qyZydY3pPoISzrVeDEXHA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=T70CvmUT;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A49B606D51C
-	for <kvmarm@lists.linux.dev>; Tue, 20 Oct 2026 16:39:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6A49B606D51C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=KAny9+RY;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAA9606A31A;
+	Tue, 20 Oct 2026 17:20:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=T70CvmUT
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9838525DD;
-	Tue, 20 Oct 2026 09:39:37 -0700 (PDT)
-Received: from e133894.cambridge.arm.com (e133894.arm.com [10.2.80.62])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3FB173F7D8;
-	Tue, 20 Oct 2026 09:39:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792514380; bh=uF3gHfbdma2orZBXGO3W33CSKmBuY31e2U0A16wUtI4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=T70CvmUTYgev5Tmb2X5hI2lrtGLa/fHVn7smRE79Yua3opx1vbQmGa9uCgJQ8o2uk
-	 4VL222g2R4Lf5NZoSmSeHzwkVPfHec6aElCY6SYHnQkziTtAh0/atEJGKT50ABcPX4
-	 iYkn3TI3zbfrsoWjqvlCtAWC+I69tJKgyKqf9xiA=
-From: Sascha Bischoff <sascha.bischoff@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Cc: maz@kernel.org,
-	oupton@kernel.org,
-	fuad.tabba@linux.dev,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com
-Subject: [PATCH v3 2/2] KVM: selftests: Reject GICv3 ITS with a GICv5 VGIC
-Date: Tue, 20 Oct 2026 17:39:23 +0100
-Message-Id: <20261020163923.1407856-3-sascha.bischoff@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20261020163923.1407856-1-sascha.bischoff@arm.com>
-References: <20261020163923.1407856-1-sascha.bischoff@arm.com>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=KAny9+RY
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B2D51F000C9;
+	Tue, 20 Oct 2026 17:20:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792516844;
+	bh=6WWk7zExmFICqSLgFYRdnOfnAX1UA+1LzUHxktArr0A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=KAny9+RYL3Bjeb2mO44a1DmHjw5+oGJtZavst+KtM/yvA1XeMdgFf3bk6UL5KVh+P
+	 1I8S6GaqWuXL8Un8uzuTijsxfTPN2YhPmtDXJNFntGZsRaXLO6wtVyd41QOtYOGfE3
+	 DPTZSKa9l5SlKTfbLLVmDokn5amCYcHczoUjzfGt2L3Uyy37nkRW3J/FhkwA3HpxpG
+	 aGmdXDp18uRFtMDOMDDhO12qmoLrthj/KgtRm3RlSyU6VmZBQP9KXQYj2NKwGS1cL5
+	 p11g45R+3sO/Aeb4+glyJU+LCXXl9ZLUNj23hri92cY95iFyeu7QdrrZJpBX2srtW+
+	 +6cYTtWtGJAOA==
+Date: Tue, 20 Oct 2026 18:20:29 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, 
+	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	will@kernel.org, mark.rutland@arm.com, linux-perf-users@vger.kernel.org, 
+	catalin.marinas@arm.com, james.clark@linaro.org, Sudeep Holla <sudeep.holla@arm.com>
+Subject: Re: [RFC PATCH v7 12/28] KVM: arm64: Add SPE VCPU device attribute
+ to set the interrupt number
+Message-ID: <ateEKZC3pjL6Sjrq@gremlin>
+References: <20260903160623.315525-1-alexandru.elisei@arm.com>
+ <20260903160623.315525-13-alexandru.elisei@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -68,62 +61,296 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260903160623.315525-13-alexandru.elisei@arm.com>
 
-Check that a GICv3 ITS and a GICv5 VGIC cannot be paired, regardless
-of which device is created first. Skip the check when the host does not
-expose a GICv3 ITS.
+On Thu, Sep 03, 2026 at 05:06:07PM +0100, Alexandru Elisei wrote:
+> From: Sudeep Holla <sudeep.holla@arm.com>
+>
+> Add KVM_ARM_VCPU_SPE_CTRL(KVM_ARM_VCPU_SPE_IRQ) to allow the user to set
+> the interrupt number for the buffer management interrupt.
 
-Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
----
- tools/testing/selftests/kvm/arm64/vgic_v5.c | 32 +++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+I know this is a bit of a theme of the review :P but feels a little short.
 
-diff --git a/tools/testing/selftests/kvm/arm64/vgic_v5.c b/tools/testing/selftests/kvm/arm64/vgic_v5.c
-index d5df742b23001..5bf7d99d29147 100644
---- a/tools/testing/selftests/kvm/arm64/vgic_v5.c
-+++ b/tools/testing/selftests/kvm/arm64/vgic_v5.c
-@@ -2003,8 +2003,40 @@ int test_kvm_device(u32 gic_dev_type)
- 	return 0;
- }
- 
-+static void test_vgic_v3_its_with_vgic_v5(void)
-+{
-+	struct kvm_vm *vm = vm_create_barebones();
-+	int gic_fd, its_fd, ret;
-+
-+	if (__kvm_test_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_ITS)) {
-+		pr_info("No GICv3 ITS support; skipping mixed-model test.\n");
-+		kvm_vm_free(vm);
-+		return;
-+	}
-+
-+	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V5);
-+	ret = __kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_ITS);
-+	TEST_ASSERT(ret < 0 && errno == ENODEV,
-+		    "GICv3 ITS created after GICv5 VGIC: ret=%d errno=%d",
-+		    ret, errno);
-+	close(gic_fd);
-+	kvm_vm_free(vm);
-+
-+	vm = vm_create_barebones();
-+	its_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_ITS);
-+	ret = __kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V5);
-+	TEST_ASSERT(ret < 0 && errno == ENODEV,
-+		    "GICv5 VGIC created after GICv3 ITS: ret=%d errno=%d",
-+		    ret, errno);
-+	close(its_fd);
-+	kvm_vm_free(vm);
-+}
-+
- void run_tests(u32 gic_dev_type)
- {
-+	pr_info("Test VGICv5 and GICv3 ITS model mismatch\n");
-+	test_vgic_v3_its_with_vgic_v5();
-+
- 	pr_info("Test VGICv5 address attrs\n");
- 	test_vgic_v5_addr_attrs();
- 
--- 
-2.34.1
+Be good to see why you want to do this, broadly what you are changing
+(shouldn't duplicate stuff you can see from the diff but something like '
 
+>
+> [ Alexandru E: Split from "KVM: arm64: Add a new VCPU device control group
+>                for SPE" ]
+>
+> Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+I guess similar comment to before - is this a significant change? If so
+then probably best to go Co-developed-by route, otherwise not a big deal.
+
+> ---
+>  Documentation/virt/kvm/devices/vcpu.rst | 22 +++++++
+>  arch/arm64/include/asm/kvm_host.h       |  2 +
+>  arch/arm64/include/asm/kvm_spe.h        | 11 ++++
+>  arch/arm64/include/uapi/asm/kvm.h       |  1 +
+>  arch/arm64/kvm/guest.c                  |  2 +
+>  arch/arm64/kvm/spe.c                    | 82 +++++++++++++++++++++++++
+>  6 files changed, 120 insertions(+)
+>
+> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+> index e0a7fa35dfd2..d30b2f7fec9a 100644
+> --- a/Documentation/virt/kvm/devices/vcpu.rst
+> +++ b/Documentation/virt/kvm/devices/vcpu.rst
+> @@ -307,3 +307,25 @@ From the destination VMM process:
+>  ===============================
+>
+>  :Architectures: ARM64
+> +
+> +5.1 ATTRIBUTE: KVM_ARM_VCPU_SPE_IRQ
+> +-----------------------------------
+> +
+> +:Parameters: in kvm_device_attr.addr the address for the Profiling Buffer
+> +             management interrupt number as a pointer to an int
+> +
+> +Returns:
+
+Was going to say maybe it should be ':Returns:' but actually the doc seems
+super inconsistent on this... :P so it doesn't really matter.
+
+> +
+> +	 =======  ==========================================================
+> +	 -EFAULT  Error accessing the buffer management interrupt number
+> +	 -EINVAL  Invalid interrupt number or not using an in-kernel irqchip
+> +	 -ENODEV  KVM_ARM_VCPU_HAS_SPE VCPU feature not set
+
+Seems like a typo, should be KVM_ARM_VCPU_SPE_IRQ right?
+
+> +	 -ENXIO   SPE not supported or not properly configured
+> +	 =======  ==========================================================
+> +
+> +Required.
+> +
+> +Specifies the Profiling Buffer management interrupt number. The interrupt number
+> +must be a PPI and the interrupt number must be the same for each VCPU. Arm
+> +recommends 21 as the interrupt number. SPE virtualization requires an in-kernel
+> +vGIC implementation.
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 27fe0cd5b2d7..e7332bd82bf3 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -27,6 +27,7 @@
+>  #include <asm/fpsimd.h>
+>  #include <asm/kvm.h>
+>  #include <asm/kvm_asm.h>
+> +#include <asm/kvm_spe.h>
+>  #include <asm/vncr_mapping.h>
+>
+>  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+> @@ -918,6 +919,7 @@ struct kvm_vcpu_arch {
+>  	struct vgic_cpu vgic_cpu;
+>  	struct arch_timer_cpu timer_cpu;
+>  	struct kvm_pmu pmu;
+> +	struct kvm_vcpu_spe vcpu_spe;
+>
+>  	/* vcpu power state */
+>  	struct kvm_mp_state mp_state;
+> diff --git a/arch/arm64/include/asm/kvm_spe.h b/arch/arm64/include/asm/kvm_spe.h
+> index 1327064d0984..8ded2d821bff 100644
+> --- a/arch/arm64/include/asm/kvm_spe.h
+> +++ b/arch/arm64/include/asm/kvm_spe.h
+> @@ -6,7 +6,15 @@
+>  #ifndef __ARM64_KVM_SPE_H__
+>  #define __ARM64_KVM_SPE_H__
+>
+> +struct kvm;
+> +struct kvm_vcpu;
+> +struct kvm_device_attr;
+> +
+>  #ifdef CONFIG_KVM_ARM_SPE
+> +struct kvm_vcpu_spe {
+> +	int irq_num;		/* Buffer management interrupt number */
+> +};
+
+I guess this struct will be expanded over time?
+
+> +
+>  bool kvm_supports_spe(void);
+>
+>  #define vcpu_has_spe(vcpu)					\
+> @@ -16,6 +24,9 @@ int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+>  int kvm_spe_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+>  int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+>  #else
+
+NIT, and probably applicable to a previous patch, but useful to put /*
+CONFIG_KVM_ARM_SPE */ there, certainly useful as things grow.
+
+> +struct kvm_vcpu_spe {
+> +};
+> +
+
+OK good this covers off the !CONFIG_KVM_ARM_SPE case.
+
+>  static __always_inline bool kvm_supports_spe(void)
+>  {
+>  	return false;
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index e8a68e34be63..b9e5019181eb 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -447,6 +447,7 @@ enum {
+>  #define KVM_ARM_VCPU_PVTIME_CTRL	2
+>  #define   KVM_ARM_VCPU_PVTIME_IPA	0
+>  #define KVM_ARM_VCPU_SPE_CTRL		3
+> +#define   KVM_ARM_VCPU_SPE_IRQ		0
+>
+>  /* KVM_IRQ_LINE irq field index values */
+>  #define KVM_ARM_IRQ_VCPU2_SHIFT		28
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 56c5f937fcdb..f953b235b458 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -920,7 +920,9 @@ int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+>  		ret = kvm_arm_pvtime_set_attr(vcpu, attr);
+>  		break;
+>  	case KVM_ARM_VCPU_SPE_CTRL:
+> +		mutex_lock(&vcpu->kvm->arch.config_lock);
+>  		ret = kvm_spe_set_attr(vcpu, attr);
+> +		mutex_unlock(&vcpu->kvm->arch.config_lock);
+>  		break;
+>  	default:
+>  		ret = -ENXIO;
+> diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
+> index fe45ad4c703a..dd5f80318ba4 100644
+> --- a/arch/arm64/kvm/spe.c
+> +++ b/arch/arm64/kvm/spe.c
+> @@ -59,17 +59,99 @@ bool kvm_supports_spe(void)
+>  	return !list_empty(&spe_pmus);
+>  }
+>
+> +static bool kvm_spe_irq_is_valid(struct kvm *kvm, int irq)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_vcpu_spe *vcpu_spe;
+> +	unsigned long i;
+> +
+
+Maybe worth a small comment:
+
+	/* Every vCPU must have either the same or no IRQ set. */
+
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		vcpu_spe = &vcpu->arch.vcpu_spe;
+> +
+> +		if (!vcpu_spe->irq_num)
+> +			continue;
+> +
+> +		if (vcpu_spe->irq_num != irq)
+> +			return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+
+>  int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  {
+> +	struct kvm_vcpu_spe *vcpu_spe = &vcpu->arch.vcpu_spe;
+> +	struct kvm *kvm = vcpu->kvm;
+> +
+> +	lockdep_assert_held(&kvm->arch.config_lock);
+> +
+> +	if (!vcpu_has_spe(vcpu))
+> +		return -ENODEV;
+> +
+> +	switch (attr->attr) {
+> +	case KVM_ARM_VCPU_SPE_IRQ: {
+> +		int __user *uaddr = (int __user *)(long)attr->addr;
+> +		int irq;
+> +
+> +		if (!irqchip_in_kernel(kvm))
+> +			return -EINVAL;
+> +
+> +		if (get_user(irq, uaddr))
+> +			return -EFAULT;
+> +
+> +		if (!irq_is_ppi(kvm, irq))
+> +			return -EINVAL;
+> +
+> +		if (!kvm_spe_irq_is_valid(kvm, irq))
+> +			return -EINVAL;
+
+What about changing the IRQ for vcpu? kvm_spe_irq_is_valid() will abort
+even if only the current vCPU has an IRQ set.
+
+Also what about the case of setting the current vCPU's IRQ to the same
+value? Should that be -EBUSY?
+
+PMU seems to do something like that, so maybe worth doing that for
+consistency? Not exactly a huge thing, that though!
+
+Also looking at PMU there's:
+
+	/* On GICv5, the PMUIRQ is architecturally mandated to be PPI 23 */
+	if (vgic_is_v5(kvm) && irq != KVM_ARMV8_PMU_GICV5_IRQ)
+		return false;
+
+Is that something you have to worry about for SPE?
+
+
+> +
+> +		vcpu_spe->irq_num = irq;
+> +		return 0;
+> +	}
+> +	}
+> +
+>  	return -ENXIO;
+>  }
+>
+>  int kvm_spe_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  {
+> +	struct kvm_vcpu_spe *vcpu_spe = &vcpu->arch.vcpu_spe;
+> +	struct kvm *kvm = vcpu->kvm;
+> +
+> +	if (!vcpu_has_spe(vcpu))
+> +		return -ENODEV;
+> +
+> +	switch (attr->attr) {
+> +	case KVM_ARM_VCPU_SPE_IRQ: {
+> +		int __user *uaddr = (int __user *)(long)attr->addr;
+> +		int irq;
+> +
+> +		if (!irqchip_in_kernel(kvm))
+> +			return -EINVAL;
+> +
+> +		if (!vcpu_spe->irq_num)
+> +			return -ENXIO;
+> +
+> +		irq = vcpu_spe->irq_num;
+> +		if (put_user(irq, uaddr))
+> +			return -EFAULT;
+> +
+> +		return 0;
+> +	}
+> +	}
+> +
+>  	return -ENXIO;
+>  }
+>
+>  int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  {
+> +	if (!vcpu_has_spe(vcpu))
+> +		return -ENODEV;
+> +
+> +	switch(attr->attr) {
+> +	case KVM_ARM_VCPU_SPE_IRQ:
+> +		return 0;
+> +	}
+> +
+>  	return -ENXIO;
+>  }
+> --
+> 2.43.0
+>
+>
+
+--
+Cheers, Lorenzo
