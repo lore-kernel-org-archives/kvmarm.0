@@ -1,79 +1,79 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
 	t=1792540403;
-	b=d98PGgW1BRWDSKYiK0LqNEtUhSeXlAc17+h6knq1Rnpobg1Q9jCkuNO69KgQPF32tb+3
-	 gAh/V+4J+szXPlnbp3dFZKzyQW1IaKgQZA+Eu/dO+UhF0f7PdExlzQOjISxgFDuCqqjef
-	 R7tNTw6KFulm30xLw8aiE3M+PgpBkxFcAiS9mWJLwLLJEYrTrLdHJ9v/SIfUhnvoD2S4l
-	 VQdRUP8Ic6eObVG9yndCOeJqEBjAuqMazAg0VLGdNx3tjXWT400DCp3iRNRCP6YcXgBCs
-	 rnAPLqkUZB6LN+N/typoSStAEeMKBUxhazFxN8YaHg8Tftn4Rw1GRcHJEhnMAB7x2hg==
+	b=FEagwnet+xSuNfKi6ytVlZMG3Z5VZwFc9D4aQu6iuBGGQD2SMONnVgK0r+mVuJcl9SUY
+	 /n0HngnyO0gGosNU/80LiKPo5IZ3h4IMyVCYRJXnkBbXhDbsFSGDa+Wu4C5LZGlk+3fw7
+	 dEwQvCF8lthKKK6FURb4JtD0myrLojmnfDnJZun69iT2j3VnMNulCJakhgCdKEy4eJWPP
+	 lIMpQRv9CewQRkqA6vrIn7IvVAlYHFivp4a5rYNChqB+yLDGMGiXg+l4/C5u1FpLUt5l1
+	 TTZf4aP8fNqLRl+JCWAa6Z4mBpcsYRVTOJzE5gU+aFTB35p/AoM/mzDeE/QFy7kiXeg==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1792540403;
-	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:Message-Id:References:
-	 In-Reply-To:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
+	h=Received:DKIM-Signature:Received:From:Subject:Date:Message-Id:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
+	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
 	 X-Endpoint-Received:X-Original-From:Reply-To;
-	bh=gN0ju8lD81Sz1gc8sNBSSmRi9TErZR5ipKv96L1LgaY=;
-	b=Zj9SV/yYH8TkWtKWK3MWH3+bTWXVVYL/Y0HNBDfr/3j/d19sgiNtsGztaiXQsZSrrQhp
-	 yj43VK+Ns22zQVdAhBIgrQZIQVB1fuiVVlMuNW7Ubtw+8OkeVmh947AZfuCWrF6wXAPIL
-	 ycLhblD9wYLed38jeWJ9jvjtEusYmjkvsCgTZuNAsKPpMp+7Z+aWVERqTDFbkowWsDAnf
-	 lb6CFV/81g/m1ddMJyhc6vw+GrJHQuJr/9wfHr9u5VGCSLMi30vurkRVMPZiFCHOfIo/p
-	 P03leUIbaTB4phbd/2q2lYy4A1uRfWlfPrsZsk6GiBtgouSZbpjJj3FXvbIdeZ/GWsQ==
+	bh=Kel4RSYESjXcs8Dg40JwYXjmWcDIJY09nOoIQY6d2LQ=;
+	b=4PE3JicsOI75dxb+0ssw8QiyXq4VDBSWgsm6lGKHp2bnH74qb2nHFqW9nSfvlFAx0rw3
+	 4Sz7kvcLpflDIECPsxFq4icPiN59DKbVmOzkcg1uy0yF3/k3WAakIsvcmTX7TV+DVxSIM
+	 aXb0QitmXAt8WzP6lmsI+AolagOKGMdX5S9ptjgjfic81IpBOqYfpRvyagdvzCzkm0MRz
+	 npkaqNQruwa9aTjNO+HRtEgf6/YjeHl1CunEyj5qAPBgdZ7n2u7ZZtEuweEAThV1H3Bpl
+	 j7A+MHkGzLV+pgTzQL4OXVyMVqMIUeCTbqtBeQxnLmCDMv5TXAtib/BD8Hye7n5NlDg==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aGkCXRtp;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NL00w4KL;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9FF2606A319;
-	Tue, 20 Oct 2026 23:53:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A518606A31E;
+	Tue, 20 Oct 2026 23:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aGkCXRtp
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NL00w4KL
 Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
 ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1792540402;
-	b=u2U1bHzfkEY6I7lLCJ/SFHjBdyF/GaCxkT5TUxNB4ACAhGouKcmmPqqiVEYB0sk2pZHq
-	 ISzQNcPJnwDBUpewZQIYvO6rfv6bYDL04Cb2ZfN+Et+1HFuNoSs4lPDGzkz3qVqCZnecs
-	 DG8wenyHn16CIRZ+pKQrsjTIP2ooUNcaZ/6I9UdphRR0lUKinW/4WvkEOxnHKU2kYSs9/
-	 rcMgUsM6V/XrzOtWR/GdUXCNMNwyq97Vh8XbtRqz1a6TN9tjdBf8m0u9QWyOrj10juwzZ
-	 4T2ivFTanKGXaqHYG74iKfc9aMYfxyGaxkY9++AbKM5hakX8b8OXTriYB2v0Wgd7XSQ==
+	t=1792540403;
+	b=YrbyLersiFbL+bsZNjvQXg/p3/jq0iYO8cn5Xql/g84tRs91sGvTNKJYsEU3jZX2mMn/
+	 WqFLzI2VMVAgHE/pnFI/1yNrs7bXvSbJBvYor3pvxVnb7sMwINytwQEsRxK0moUCsqg7X
+	 enXWbnsXQ1hPdyhikXf29fIbBP9Jp68RD4etcYt6636ggbozafKe82Sc96jr2DttCC8aW
+	 aJSbplXdpVHh26D7aXqALQ60qh6sxCPcxdQ9OgzA1Xu3sPqZufpgeUlvuhYgiWNXvPCuX
+	 tiTGNjCuOOAunCN7Mbp7a+3TSa/l3eIwRkftcqvsYilAVyu9QFdThZJbQacdoqFzQjw==
 ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1792540402;
-	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
-	 X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	c=relaxed/relaxed; t=1792540403;
+	h=DKIM-Signature:Received:From:Subject:Date:Message-Id:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
+	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
 	 X-Original-From:Reply-To;
-	bh=gN0ju8lD81Sz1gc8sNBSSmRi9TErZR5ipKv96L1LgaY=;
-	b=Sv1Qt/e4gRae3oGx14VIXcG0jDEJROu+8CXR8NqXEBOgnlY1s1wTS1Fh4bc0vBn3MiJb
-	 aasfZ/iQsha5jbSxudUULoV1IEfN9DfkvUTvT+OscknNPfpEtewSOSF5HVDl3KNnTfoQV
-	 5+2ymDaZjLKLqnFqNIqsI2XBsUihBwAC6a10n339uTNU+c0La2gjs/Zvkjh5rYToxt9El
-	 Vw5Ui1JwQPyp//WlXhCbrJVx3Q2uW1akWv52Cue5/7BiAuO5Mdc0KJvM5vDRosaqJwIRT
-	 y3FUyfJ7F10V13A+avCTRJLUNIDtVuXN+8b8nJht+6M8e7g1cudyYYtbq3B5NujzVhA==
+	bh=Kel4RSYESjXcs8Dg40JwYXjmWcDIJY09nOoIQY6d2LQ=;
+	b=Yv2mv6uX3fyY2grTI0SlymEzU2bvzI/KXD9Abf0zyeZEdvGtXYyhqlyNmuGkQ/4MZKOL
+	 h+Hy0DEHZHOCVwJ08mrgsgCxRw3xcUquqVuNiMAal7p7Pr6ipvQ8jW6bdiIJurseS1v/n
+	 KtKh4fE1UKuxonz3m7ojtuKp4aZNiK3mOOYH0vNN7huLt1DjX0s/Ej2eI1NyE7YBLOKrH
+	 wAS7VHHLwsU2SaiN9GT2t24fZRVqJlNGLVYaVuzbevijQLuM65YzCE84RGFL10SuITAoE
+	 TA0doHrGOCtTJoqjd1ahp36wlwDkcHSwAYjYtwgDoojIOxO+L7lHu/4s4V9tiT+QnDg==
 ARC-Authentication-Results: i=1; smtp.kernel.org; 
 	arc=none smtp.remote-ip=100.80.115.77
 Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id 2A7751F000C9;
+	by smtp.kernel.org (Postfix) with ESMTPS id 2AA161F000CB;
 	Tue, 20 Oct 2026 23:53:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792540402;
-	bh=gN0ju8lD81Sz1gc8sNBSSmRi9TErZR5ipKv96L1LgaY=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
-	b=aGkCXRtpC0or3gEmzbjpEJic9B2qM3E5Kg4IjQncI7M3S7657e2FivPIiEMEZw+r3
-	 jJVubdBG1R38ftg2434RGaN8tCXxdi+3xBkhYJdss5n84ZzhFYH4eGopPJp5JmM7gu
-	 0AYcI+XsS1UPIhjY1ObLV4fiyjZpzNZJfpA85swasNt+OZSyTKqCfNDtbnq8qbRrDv
-	 eNPMUPnPDpnUJGqPp5Jz2ZpSvz8riwnKi7M95Ky/dO7t8SYEbY3Iwjq24j5GYK2CHY
-	 U5e5yOCgdPI/fssr6cNoGFbt5NDkYonAMaapF386eVpivYXRVCn3v5NLEtvK6B8PnU
-	 Vydixk8nuC9EA==
+	s=k20260515; t=1792540403;
+	bh=Kel4RSYESjXcs8Dg40JwYXjmWcDIJY09nOoIQY6d2LQ=;
+	h=From:Subject:Date:To:Cc:Reply-To;
+	b=NL00w4KLJBC3iawsBoUNIOGnDmsbentUZwRLGedSaHsGa9t4RVY2KjUFffgp27rPQ
+	 Z40ynxLvfdl3x/j66cgPICq3uWnf8WuCulSKp0FUofWyQOLCtgQWpKf3JIbckTiJLg
+	 l8hJ8AUXxIZhVUuy3n//6G8hriAZdCmDv3SJ/PEvXctWP5HbPFau+S3CR7EfCD38/S
+	 uC8TBOm8vPUZfqugmaUDVfsD7iPeYHkr8QD6kw6Wyamm0KOstP1GnK42B8XRrFHbWn
+	 6aAbwTc0w94fv3xyrBds9AcvF6pcyzFRU685VL3lTGWteL6B/7WT7Yj051nQrbGFsV
+	 Yn8/elM8VaQww==
 Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 88B034325C;
+	by lkml.kernel.org (Postfix) with ESMTP id 7EC4543263;
 	Tue, 20 Oct 2026 23:53:21 +0000 (UTC)
 From: Michael Reeves via B4 Relay <devnull+michael.reeves077.gmail.com@kernel.org>
-Date: Wed, 21 Oct 2026 10:53:20 +1100
-Subject: [PATCH v2 1/2] arm64: Add CPU part numbers for newer Apple Silicon
- CPUs
+Subject: [PATCH v2 0/2] arm64: Add KVM support for newer Apple Silicon CPUs
+Date: Wed, 21 Oct 2026 10:53:19 +1100
+Message-Id: <20261021-apple-m3-m4-kvm-v2-0-04905152cc2a@gmail.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -85,9 +85,11 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261021-apple-m3-m4-kvm-v2-1-04905152cc2a@gmail.com>
-References: <20261021-apple-m3-m4-kvm-v2-0-04905152cc2a@gmail.com>
-In-Reply-To: <20261021-apple-m3-m4-kvm-v2-0-04905152cc2a@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAO/+12oC/3WOQQ6CMBBFr2K6drQUAurKexgWnXaAKgXSYqMh3
+ N0W1i7fzP8vf2GenCHPboeFOQrGm3GIII4Hpjo5tARGR2aCizLj/AJymnoCm4Mt4BUsYIVXFJQ
+ XqDSLrclRYz6b8VHv7N/4JDUnTUqg9ATo5KC6dNJONvN5127C+E6xzvh5dN9tWciS7v+IkAGHC
+ rFQ2OS6zPHeWmn6kxotq9d1/QE4rRLf5wAAAA==
+X-Change-ID: 20261008-apple-m3-m4-kvm-b7b9b2e34bcd
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
  Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
  Mark Rutland <mark.rutland@arm.com>
@@ -101,12 +103,12 @@ Cc: Myria Sarvay <myrialsarvay@gmail.com>,
  asahi@lists.linux.dev, linux-kernel@vger.kernel.org, 
  Michael Reeves <michael.reeves077@gmail.com>
 X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1792540400; l=3412;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1792540400; l=1504;
  i=michael.reeves077@gmail.com; s=20261008-m3-m4-kvm;
  h=from:subject:message-id;
- bh=juCh5R4p12iRnVQ+5ShiPPNpDD7QYQmROKo57ewmfzo=;
- b=xd1M2Vm/pX07aguQJcvtqE1esHZjP8TTsj2WXuu/Kgl1MA1T8FOezXwcpxMsXOpvoEXMhu6Pe
- LZ08uLRwMngDkSFJAG1IA5yzYxFGrG7GYwxpZ+W0pn3NU42VQ0jyU5o
+ bh=G8igJOGmolem0kocmF21BJtoXeYx1AMIyTFUWr2XhNg=;
+ b=3/imRnUx82pjDBOxQMAxCwDKByTwQ/pGjZVTqRy7jTjfXcIpKtcapYnyJgcn0m0DpETbDD76T
+ CByrM5Dp/QaBW1o/MLetC4O2gExoXOB0vaJrXCtXkvMWIPOsb/Elnyr
 X-Developer-Key: i=michael.reeves077@gmail.com; a=ed25519;
  pk=oi7WuppQ1A+qFZp9DdfIwDnpC3WZ+XY6fJK1upV/CSY=
 X-Endpoint-Received: by B4 Relay for
@@ -114,68 +116,49 @@ X-Endpoint-Received: by B4 Relay for
 X-Original-From: Michael Reeves <michael.reeves077@gmail.com>
 Reply-To: michael.reeves077@gmail.com
 
-From: Myria Sarvay <myrialsarvay@gmail.com>
+Hi,
 
-Add CPU part numbers and MIDR definitions for M3, M3 Pro, M3 Max,
-base M4, A18 Pro and M5 Pro so CPU workarounds can identify these cores.
+This series enables KVM support on Apple Silicon M3 (base, Pro and Max),
+base M4, A18 Pro and M5 Pro CPUs.
 
-Use the SoC codenames for M4, A18 Pro and M5 Pro, with suffixes for
-their core types, as separate core codenames are not known.
+The first patch adds the CPU part numbers and MIDR definitions.
 
-Signed-off-by: Myria Sarvay <myrialsarvay@gmail.com>
-Signed-off-by: Michael Reeves <michael.reeves077@gmail.com>
+The second patch adds these CPUs to the existing Apple Silicon PMU and
+broken SEIS workarounds. It also enables TDIR detection so KVM can trap
+guest DIR accesses without trapping all common registers.
+
+This series was developed from testing on:
+- Apple M3 and M3 Pro by Michael Reeves
+- Apple M3 Max by Myria Sarvay and Yureka Lilian
+- Apple M4, A18 Pro and M5 Pro by Yureka Lilian
+
+These tests also confirmed that the SEIS workaround is still needed.
+
 ---
+Changes in v2:
+- Add A18 Pro and M5 CPU IDs and workaround coverage.
+- Add all to has_vgic_v3 for TDIR detection
+- Document testing confirming SEIS workaround still needed
+- Link to v1:
+  https://patch.msgid.link/20261008-apple-m3-m4-kvm-v1-0-7bb4cbf3d63b@gmail.com
+
+---
+Michael Reeves (1):
+      arm64: Apply existing Apple Silicon CPU workarounds to newer CPUs
+
+Myria Sarvay (1):
+      arm64: Add CPU part numbers for newer Apple Silicon CPUs
+
  arch/arm64/include/asm/cputype.h | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ arch/arm64/kernel/cpu_errata.c   | 12 ++++++++++++
+ arch/arm64/kernel/cpufeature.c   | 12 ++++++++++++
+ 3 files changed, 52 insertions(+)
+---
+base-commit: a90ee4305c4a5df72c11b31dacfdc76e00fcf78a
+change-id: 20261008-apple-m3-m4-kvm-b7b9b2e34bcd
 
-diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
-index 1fa29616e..86adfebcb 100644
---- a/arch/arm64/include/asm/cputype.h
-+++ b/arch/arm64/include/asm/cputype.h
-@@ -155,6 +155,18 @@
- #define APPLE_CPU_PART_M2_AVALANCHE_PRO	0x035
- #define APPLE_CPU_PART_M2_BLIZZARD_MAX	0x038
- #define APPLE_CPU_PART_M2_AVALANCHE_MAX	0x039
-+#define APPLE_CPU_PART_M3_SAWTOOTH	0x042
-+#define APPLE_CPU_PART_M3_EVEREST	0x043
-+#define APPLE_CPU_PART_M3_SAWTOOTH_PRO	0x044
-+#define APPLE_CPU_PART_M3_EVEREST_PRO	0x045
-+#define APPLE_CPU_PART_M3_SAWTOOTH_MAX	0x048
-+#define APPLE_CPU_PART_M3_EVEREST_MAX	0x049
-+#define APPLE_CPU_PART_M4_DONAN_ECORE	0x052
-+#define APPLE_CPU_PART_M4_DONAN_PCORE	0x053
-+#define APPLE_CPU_PART_A18_PRO_TAHITI_ECORE	0x060
-+#define APPLE_CPU_PART_A18_PRO_TAHITI_PCORE	0x061
-+#define APPLE_CPU_PART_M5_PRO_SOTRA_MCORE	0x064
-+#define APPLE_CPU_PART_M5_PRO_SOTRA_PCORE	0x065
- 
- #define AMPERE_CPU_PART_AMPERE1		0xAC3
- #define AMPERE_CPU_PART_AMPERE1A	0xAC4
-@@ -250,6 +262,22 @@
- #define MIDR_APPLE_M2_AVALANCHE_PRO MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_AVALANCHE_PRO)
- #define MIDR_APPLE_M2_BLIZZARD_MAX MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_BLIZZARD_MAX)
- #define MIDR_APPLE_M2_AVALANCHE_MAX MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_AVALANCHE_MAX)
-+#define MIDR_APPLE_M3_SAWTOOTH MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M3_SAWTOOTH)
-+#define MIDR_APPLE_M3_EVEREST MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M3_EVEREST)
-+#define MIDR_APPLE_M3_SAWTOOTH_PRO MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M3_SAWTOOTH_PRO)
-+#define MIDR_APPLE_M3_EVEREST_PRO MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M3_EVEREST_PRO)
-+#define MIDR_APPLE_M3_SAWTOOTH_MAX MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M3_SAWTOOTH_MAX)
-+#define MIDR_APPLE_M3_EVEREST_MAX MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M3_EVEREST_MAX)
-+#define MIDR_APPLE_M4_DONAN_ECORE MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M4_DONAN_ECORE)
-+#define MIDR_APPLE_M4_DONAN_PCORE MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M4_DONAN_PCORE)
-+#define MIDR_APPLE_A18_PRO_TAHITI_ECORE \
-+	MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_A18_PRO_TAHITI_ECORE)
-+#define MIDR_APPLE_A18_PRO_TAHITI_PCORE \
-+	MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_A18_PRO_TAHITI_PCORE)
-+#define MIDR_APPLE_M5_PRO_SOTRA_MCORE \
-+	MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M5_PRO_SOTRA_MCORE)
-+#define MIDR_APPLE_M5_PRO_SOTRA_PCORE \
-+	MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M5_PRO_SOTRA_PCORE)
- #define MIDR_AMPERE1 MIDR_CPU_MODEL(ARM_CPU_IMP_AMPERE, AMPERE_CPU_PART_AMPERE1)
- #define MIDR_AMPERE1A MIDR_CPU_MODEL(ARM_CPU_IMP_AMPERE, AMPERE_CPU_PART_AMPERE1A)
- #define MIDR_MICROSOFT_AZURE_COBALT_100 MIDR_CPU_MODEL(ARM_CPU_IMP_MICROSOFT, MICROSOFT_CPU_PART_AZURE_COBALT_100)
-
--- 
-2.56.0
+Best regards,
+--  
+Michael Reeves <michael.reeves077@gmail.com>
 
 
