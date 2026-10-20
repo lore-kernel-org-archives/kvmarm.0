@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792497501;
-	b=rNkqCLBLgtfWbB3FCGIoMfusJwc97V5E3xMQPxHqg5knJgdJNLmk5oGiiKQIyesj8862
-	 GXec96Ny4pIZWyJKpE0G2ZtUHiA1TtWaqVKcRtcL7r58LpMqdBHztkD+ylbmlwbarcrn3
-	 dulj1J1EpCX/N2yaerzumPx/sNCyeSiRHyHeMOZcHviyo+3pQJOlAR6S0UbJPJLN4Nn2V
-	 A7jchAObQz6hXpTMhUwB7eLJSaG/IGj0dpS8H1u14yAQ/1A8iZnRP+H1xxS1ScaIEMpIX
-	 lkSDYlHkrwKWyP3tUR0jRw4NIxMPXHqK3rMqVrHUkHvsyAF65zCap5v4s34nXRrKbow==
+	t=1792498449;
+	b=J0/qN1ul3UndnYS6NgIlsHZRS7qMwDmF6ikl6OtNKjfRFiDxYOOp6WWHSfTawZgZwJR2
+	 YZY8GgtBdUm/BSCq65B8vkKOcAQVM9DmGqvKd8ofI7bBV7ic5xep6dmEkpzyx0Z72M3bR
+	 BJEcFa0hnBRcsTRWraGJYsg0DMynwdl3fvWl6JBs3Ri0Hm0pa6EptvWTrBmDcxWE4rq68
+	 2SEKNiI+f4bif6GhfgEL33M2qvklRGqboz36gSa34cSAvjJ8QXc3QltoR8oKuPHqFSv+8
+	 h3xaMttAHIi1H4hJz5fnH/8pyxblt9GT+7AhRIAMSH5zSAcDzrzNNZlaos5i0cBFi5A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792497501;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792498449;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=wUDDCCeo/xzsRa4qQI+rhPZ7oVj1XJXfhtbwBRYdfes=;
-	b=EcO1eGkNchMOoQ8uFZiOkkqGa1eGvGmXnCb6Ow/Q93OHdvSWDrBuHO32XS6Fz1VZslTT
-	 LaisBiKLUZThm5vhgLb7xnU1+yrolCbG3lbNIV9OCjDd/dmRO3P2e7mCpFxQ2Rn792yZz
-	 /1YCHUFBp2098BCLQ0sNxFEUrjXsHnhTFnayGw/OJAg8mKrDP8YT3p3xd+uND2LxmqRFK
-	 2WUIcsNUevV3zy8L+z3l75GRUbqLxXP6neyE7bNxgz1xuaXEIV1FxVMMw1Xn69W5aleIY
-	 Xu2FrlCFmp8Y66USw2EdDz00L7h5OBFTKR3asxdhs45VbyJ1/DiB1QUjconbeDd2XoQ==
+	bh=dKWmJgLEWxzvGFYBH7caDkZqJJLLMNe4m0yrs2VTkfw=;
+	b=zB0gJQzv+zdHeqgUDLnGVqP1/niZGqg3SovgJv6hwHpYGlIOyxP7FgOH+Ga9qvJfV9MP
+	 oSWwaBvoFzxk0aOwSoQ6cSzEPwAh1j38LtcCL6iqxhyvejSAejBVP/SQzH4WRkNrhjTpW
+	 /zvetCKNVAvgOSAyVRjyz2CBfyvbx/GlGZY4HJo4JSJ6P5UU3UMumslUZjjrGjXbmkWJq
+	 wNICVrsQzhF4Ce5/dEWy18a2qO7v6Uf3ybNmTINgX7E8lTR9UXI7XXbo3v8odqp2W0JeY
+	 1IF+9HI52tuHBYh+vv8LgA/bkJmj20P5xocJ5tw1WsBHD/4rGdC9AgVcWgQSn6PUJxw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=muxb5d4o;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EVOMiTJs;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A51DF606A329;
-	Tue, 20 Oct 2026 11:58:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2AAA606A319;
+	Tue, 20 Oct 2026 12:14:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=muxb5d4o
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA76E1F000C6;
-	Tue, 20 Oct 2026 11:58:15 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EVOMiTJs
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E46CD1F000C9;
+	Tue, 20 Oct 2026 12:14:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792497500;
-	bh=wUDDCCeo/xzsRa4qQI+rhPZ7oVj1XJXfhtbwBRYdfes=;
+	s=k20260515; t=1792498448;
+	bh=dKWmJgLEWxzvGFYBH7caDkZqJJLLMNe4m0yrs2VTkfw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=muxb5d4o2qlr8O9BcDWx2nvGEWrRVgRounbDRnVYUFFXnBbWIu0Zy7ynHugFphuVm
-	 yqzEEN5rGnb95iZxl5u0HHDmktwC89C/65jsjdSb52v0EKM2qFi+7rfvF8VSmixm7m
-	 gi6pqYU2wLrZkIZTqpa8flBZdL8niOugsTzf0981BAbrWy370EE42BXQ9kOdN3BOxu
-	 Wqm86rZBgDQ97v0cXOApZyKN3VSfXikRPc7orwxUbx2GtjDS98ayOWkHciHhz045gt
-	 iK9RU9kpusVv/lWplJtJBwxFrK6CuOdZ5tv237FMsknk+qYaCHOpdLNJtL3ngR0Idb
-	 xgu8N5g7I052Q==
-Date: Tue, 20 Oct 2026 12:58:13 +0100
+	b=EVOMiTJsZ+bQ2IrY4bPM+M+hVd2hhFQQ9aVfFMY0JgfnRA2l29X+k+VIf+MGSOuKu
+	 27oIPN65A5V42ZMY+dH6zH0ezrpezSTg/l37aPFH9ChezKOmfSnhaFSKj1156XdpbY
+	 TyXC8/cYJqvdoYVP/+/QQNWOegZMbPzj/SOIU8fQG5bsNZMMwVQB/0xkPVUno3ZGrT
+	 gDUEwXNAZFfmwbq3W+RP3x2b36GOO/2cwJkbwis7WsA9ToGDsIVXfGGxZPVCDjFbEi
+	 NlyV+/Ipn9tQLVj/6zT5HUfdC3716FdDdKNvZsQtBjAiWn8z6HiaJ8/aOtoMVxIrnx
+	 3xOyC5lQnZmOQ==
+Date: Tue, 20 Oct 2026 13:14:01 +0100
 From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
 To: Fuad Tabba <fuad.tabba@linux.dev>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
@@ -50,11 +50,11 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
 	Mark Rutland <mark.rutland@arm.com>, Steven Price <steven.price@arm.com>, 
 	Yang Shi <yang@os.amperecomputing.com>, David Hildenbrand <david@kernel.org>, 
 	Fuad Tabba <tabba@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] KVM: arm64: Clear the whole hugetlb folio when
- storing MTE tags
-Message-ID: <atdWIpk9Qh8ngs-Y@gremlin>
+Subject: Re: [PATCH 3/3] KVM: arm64: Sanitise MTE tags when a permission
+ fault installs a mapping
+Message-ID: <atdXdtXXTH-6DWVt@gremlin>
 References: <20261019132103.3836646-1-fuad.tabba@linux.dev>
- <20261019132103.3836646-3-fuad.tabba@linux.dev>
+ <20261019132103.3836646-4-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,79 +66,99 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261019132103.3836646-3-fuad.tabba@linux.dev>
+In-Reply-To: <20261019132103.3836646-4-fuad.tabba@linux.dev>
 
-On Mon, Oct 19, 2026 at 02:21:02PM +0100, Fuad Tabba wrote:
-> When KVM_ARM_MTE_COPY_TAGS copies tags into a page, it marks the page as
-> tagged. For a hugetlb folio the flag covers every page in the folio. If
-> the folio wasn't tagged yet, its other pages are marked as tagged with
-> their previous owner's tags still in place. The stage-2 fault path then
-> maps them into the guest without clearing them. The ioctl's read side
-> also copies them out to the VMM.
+On Mon, Oct 19, 2026 at 02:21:03PM +0100, Fuad Tabba wrote:
+> The stage-2 fault path sanitises MTE tags only on translation faults, as
+> a permission fault normally just relaxes an existing leaf. However, when
+> the page is backed by a THP, a permission fault at page granule installs
+> a block whose other pages may never have been mapped or sanitised. Once
+> dirty logging is off, a guest write to a page mapped read-only during
+> logging installs the block, and the guest can read the tags those pages'
+> previous owners left.
 >
-> Clear the whole folio on its first tagging, before copying in this
-> page's tags.
+> Sanitise whenever the fault path calls kvm_pgtable_stage2_map() rather
+> than relaxing permissions. If the VMM replaces the VMA after the guest
+> takes a permission fault but before vma_lookup(), that path would map
+> and sanitise memory from the new VMA without checking it. Run the
+> VM_MTE_ALLOWED check in kvm_s2_fault_compute_prot() on permission
+> faults too.
 >
-> Fixes: 25c17c4b55def ("hugetlb: arm64: add mte support")
+> Fixes: ea7fc1bb1cd1b ("KVM: arm64: Introduce MTE VM feature")
+
+Yikes! It goes quite far back :)
+
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 
-Logic LGTM, with some nits below:
+Nits below, but with those addressed LGTM and:
 
 Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 
 > ---
->  arch/arm64/kvm/guest.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
+>  arch/arm64/kvm/mmu.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index b01d6622b8720..cda655fbff657 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -1012,6 +1012,7 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->  		void *maddr;
->  		unsigned long num_tags;
->  		struct folio *folio;
-> +		unsigned long i;
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 48a08b608ea72..208fcae80f67f 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -2005,7 +2005,7 @@ static int kvm_s2_fault_compute_prot(const struct kvm_s2_fault_desc *s2fd,
+>  	if (s2fd->nested)
+>  		*prot = adjust_nested_exec_perms(kvm, s2fd->nested, *prot);
 >
->  		if (!page) {
->  			ret = -EFAULT;
-> @@ -1042,12 +1043,14 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->  			/*
->  			 * Only locking to serialise with a concurrent
->  			 * __set_ptes() in the VMM but still overriding the
-> -			 * tags, hence ignoring the return value.
-> +			 * tags. A hugetlb folio is marked tagged as a whole,
-> +			 * so its first tagging clears every page.
->  			 */
-> -			if (folio_test_hugetlb(folio))
-> -				folio_try_hugetlb_mte_tagging(folio);
-> -			else
-> +			if (!folio_test_hugetlb(folio))
->  				try_page_mte_tagging(page);
-> +			else if (folio_try_hugetlb_mte_tagging(folio))
+> -	if (!kvm_s2_fault_is_perm(s2fd) && !s2vi->map_non_cacheable && kvm_has_mte(kvm)) {
+> +	if (!s2vi->map_non_cacheable && kvm_has_mte(kvm)) {
 
-Slightly awkward logic, testing a negative then the negative of the negative
-(i.e. else) plus folio_try_hugetlb_mte_tagging(), makes it a little harder to
-understand.
+OK so doing this check on permission faults too.
 
-With mte_clear_folio_tags() you can make life simpler:
+>  		/* Check the VMM hasn't introduced a new disallowed VMA */
+>  		if (!s2vi->mte_allowed)
+>  			return -EFAULT;
+> @@ -2060,7 +2060,7 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+>  		}
+>  	}
+>
+> -	if (!perm_fault_granule && !s2vi->map_non_cacheable && kvm_has_mte(kvm))
+> +	if (mapping_size != perm_fault_granule && !s2vi->map_non_cacheable && kvm_has_mte(kvm))
 
-	if (folio_test_hugetlb(folio)) {
-		if (folio_try_hugetlb_mte_tagging(folio))
-			mte_clear_folio_tags(folio);
+So 'translation fault or permission fault if this will install a mapping' rather
+than 'translation fault' alone right?
+
+Just after this code you have:
+
+	if (mapping_size == perm_fault_granule) {
+		...
 	} else {
-		try_page_mte_tagging(page);
+		...
 	}
 
-> +				for (i = 0; i < folio_nr_pages(folio); i++)
-> +					mte_clear_page_tags(page_address(folio_page(folio, i)));
+So you could put
 
-As above, similar comment to 1/3 re: mte_clear_folio_tags(). Would be less churn also.
+		if (!s2vi->map_non_cacheable && kvm_has_mte(kvm))
+			sanitise_mte_tags(kvm, pfn, mapping_size);
 
->  			num_tags = mte_copy_tags_from_user(maddr, tags,
->  							MTE_GRANULES_PER_PAGE);
+In the else branch? Seems neater and clearer.
+
+Also I wonder if the !s2vi->map_non_cacheable && kvm_has_mte(kvm) check could be
+abstracted?
+
+E.g.:
+
+static bool is_mte_fault(const struct kvm *kvm,
+		         const struct kvm_s2_fault_vma_info *s2vi)
+{
+	return !s2vi->map_non_cacheable && kvm_has_mte(kvm);
+}
+
+Then could be:
+
+	if (is_mte_fault(kvm, s2vi))
+		sanitise_mte_tags(kvm, pfn, mapping_size);
+
+>  		sanitise_mte_tags(kvm, pfn, mapping_size);
 >
+>  	/*
 > --
 > 2.47.3
 >
