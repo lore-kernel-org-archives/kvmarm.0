@@ -1,57 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792591387;
-	b=ZWzlyiUktVJL7q6ry9kWNAvH2UK2XYJOae1DfCyksSu5whzfMGuL4DbWj5tDyAE0qixk
-	 eTBNbNkkWakTIwV95QjRY4+T6jxifF9E8XlKkIGJUxAidGY+m9K1o69aMl9mQ3doaX7r8
-	 cCvqL1RrQzSySba4nz4ougoHx/gyiV4dqTtOKbAVDOUx5oUO8sKx7r33S27h/caWJnebr
-	 Hx84i2Gom6PxeFAxGi2QAYb+jnRi4TLvgs4+gfvEac1cfAX5BdrrhiNTtsIGLW1qKgcpm
-	 ybw7WVrYkW9Yg7OxzXxutl6oc5LUNnaZ3R3UG9yi/juQFmLb8WQwsxNVibZ5//+a4zQ==
+	t=1792591494;
+	b=NXNJwlwyUdVTymemT5RTCdhEIqOBZhkM+ZQDPy2ZPr5Hhmc/PctIvBG5VCU/dJN8Ll0W
+	 kLlw1FSc5PmyVLl3G9ikvjnkVjlDyCBtaH030w0t8YLGYiFTo1ZsBJsWWreEZJ8F/oq73
+	 WxG5yTEn1JV1IBlEp8JIS216zCzur7tCwG4BUUaiWE0slRTufRAfAi3Z9eOkpyScSQRWa
+	 7mZpBdyGojwIlgOyMI4WYFCXDY0eJAiEXFpvZpCx8glqyBHAka24vuOkhhyXjzv0TCsOz
+	 IPUSNEhEAYth3jPCJFkG+kjpD3KSNHFg+iWBoQWr7yNLTVrJQhX/tDKuYQHz/nz1WJw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792591387;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792591494;
 	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
 	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
 	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
 	 X-SA-Exim-Scanned;
-	bh=HG5WwI0uva9+q35bmaikDJW5M7QGxWPn9cqDARaboVE=;
-	b=dAYjGu+KZ8FreqoPloGVmfaMeohVu+MwZE+WE18YFV89CfjRxL7Tug+KTPEd/0B8V1yd
-	 PE4heyCgRMBKZ4lIMFZTkn9dvKzTanc5Uwrh1YV3HLF3B3UHpjQV8bKvb99k8FPoD9i0F
-	 34GstQ+W5rdUdGErN8km2zjJWYJBen6OcGWnPfJhCok2Pge2S2PDc32+WVR593yYRSV7F
-	 OnSnrG3T7elmxWmtSlkkfVh/Z0zBIEJ1yOuY0n0DHy33NmVDnAA5R5T01bHMKkTTnOJh2
-	 ycM2JTUP/z19DKZeL3afcM/2APxPkQQFcD7m1I434pMiIr91rrEwNZSbbrRJm6l3zpA==
+	bh=yA/d7xHCvimeiSgT5X9qinEfD4f+i9hf+y7HDZY8TE0=;
+	b=4srHYibEpUGb37QoOiHF3T2nAXrwr/PLQzj7yAroGvZXv5B2wyvyfgZ1cywwhuw5rfOy
+	 RUqudQIzRNvdl7rNbZu7OY5S0eYuGa6J9J9he80LNLTLIfrTGjHHxt85wC188Z9WaYhFW
+	 Em9Z0K1d5hx91nrp/DttatE2ospgz5J6m8BaZm17QhRtVJvt+wtbu01MRJzKaSLiuBGiB
+	 SC489Z0AiH1yFNqhUPUqh9j8DKL0GVmnQgoAquHEuXOWqKKKuBq9x/8G9I3Q6nP5mGVnX
+	 QCRHmpYMps3lrIg1VaWleA3PFvyooIuJe1C4SLF9u1EigAD4givsA2E/0NVX3m9dGyQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fGjvyCzl;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UZT563FZ;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F51606A32E;
-	Wed, 21 Oct 2026 14:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841E9606A31D;
+	Wed, 21 Oct 2026 14:04:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fGjvyCzl
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EF621F000C8;
-	Wed, 21 Oct 2026 14:03:07 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UZT563FZ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 585A91F000C4;
+	Wed, 21 Oct 2026 14:04:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792591387;
-	bh=HG5WwI0uva9+q35bmaikDJW5M7QGxWPn9cqDARaboVE=;
+	s=k20260515; t=1792591494;
+	bh=yA/d7xHCvimeiSgT5X9qinEfD4f+i9hf+y7HDZY8TE0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=fGjvyCzl/fJR+Od4lSDF8SJ6aZKPrlsrQz4NQHh6aQRKTNbxA8w5bvEkcPmIm1xpD
-	 0UbBGkvMb2PXPQyZplNPm75s5OZMCs/of/Q32mdtF/smWQKFNP+WRVkOVM1g/pgF7M
-	 k6Gilcq91OuB8lxZWSo00NOqkLLNDe4YfheInStdqfZqXqgjkEexCgjzhpWK7jNZnu
-	 n9w/rjbYE9+Ogl2+2nUyjwlTtBNyRUgQR6xwpeDtOajbZKWpMIFENdUf57CPUfbI+p
-	 XxgSiHkBRrGucN9Hhu/l1ep5E8AAg+JpBLP1qT7YhJ+SATLQ2wcWoaAydcqYox4Jd8
-	 hWBtCNuaWDKkQ==
+	b=UZT563FZdUGP4XEOxzleadiPXVItt+IukRA8Q0pvDTxGiRM352eYfiFV3ZpR+mAVS
+	 TOQjs7SZu0k5T4qA1b3jK/KenlsAX5Z/ktvQeei+NBo+GiJYMU1Zjl7ApteFHRINEI
+	 hSq9E9Ev9QMZzgUGPeHOlyrcDVwA8fX+4LWiRb554HkCtBIupo0D0UlBbWpJXsszA8
+	 fqCSms+YgllcSe8692GwRRjbTBNRea9tv5t7GhH9rz0zx+k55jhqDusib5AfuhpXlz
+	 uJSq+QtrtEsYVgA4KaAFAP6JAc1qfAqd9zwfAXk21T1y+5S8qY4UOCdilEeKp0VqcD
+	 I1xsQEQ7V0lVQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1xJWuG-00000005dP4-3zaA;
-	Wed, 21 Oct 2026 14:03:05 +0000
-Date: Wed, 21 Oct 2026 15:03:04 +0100
-Message-ID: <86o6cnywvb.wl-maz@kernel.org>
+	id 1xJWw0-00000005dRI-1xo7;
+	Wed, 21 Oct 2026 14:04:52 +0000
+Date: Wed, 21 Oct 2026 15:04:51 +0100
+Message-ID: <86mrs7ywsc.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>,
+To: Mark Brown <broonie@kernel.org>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>,
 	Oliver Upton <oupton@kernel.org>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -62,13 +62,13 @@ Cc: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Mark Rutland <mark.rutland@arm.com>,
-	Mark Brown <broonie@kernel.org>,
+	Lorenzo Stoakes <ljs@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH v3] KVM: arm64: Sanitise ID_AA64MMFR3_EL1.S1P[IO]E
-In-Reply-To: <CA+EHjTxMGFuZHPp8ULkpUiGhXos8f1B8kZ1FDigFE7afR=X6AQ@mail.gmail.com>
+In-Reply-To: <ati3_lymW0zaBsSU@sirena.co.uk>
 References: <20261020064306.1542865-1-fuad.tabba@linux.dev>
-	<atc2Y4gHwtGlffns@gremlin>
-	<CA+EHjTxMGFuZHPp8ULkpUiGhXos8f1B8kZ1FDigFE7afR=X6AQ@mail.gmail.com>
+	<ati3_lymW0zaBsSU@sirena.co.uk>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -83,66 +83,22 @@ Precedence: list
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, ljs@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, broonie@kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: broonie@kernel.org, fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, ljs@kernel.org, tabba@google.com, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 20 Oct 2026 20:30:56 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
+On Wed, 21 Oct 2026 14:02:54 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> >> @@ -59,6 +59,7 @@ struct reg_feat_map_desc {
-> >>         const struct reg_bits_to_feat_map feat_map;
-> >>         const struct reg_bits_to_feat_map *bit_feat_map;
-> >>         const unsigned int                bit_feat_map_sz;
-> >> +       const unsigned int                idreg_idx;
-> >
-> > This field feels a bit hazardous - 0 is a valid index and now things that
-> > don't declare it are setting a valid value.
-> 
-> idreg_idx is only read for the descriptors in idreg_feat_maps[], which
-> all come from DECLARE_IDREG_FEAT_MAP(), so the 0 in the others is
-> never used. Storing the encoding would work as well, I'll leave that
-> one to Marc.
+> It would be nice to have it be more obvious to the VMM and/or it's users
+> that it messed up, as things stand features it thought it had set will
+> just silently vanish from the guest - they'd need to know that this is
+> something that might happen and check after finalization or similar.
+> That's probably more a documentation/education thing than anything for
+> the patch.
 
-I don't think we should baby-sit people who hack this code. If you put
-something that is not the output of IDREG_IDX(), you get to keep the
-pieces. If you use this out of context, it will blow up in your face.
-
-> 
-> [...]
-> >> +static bool idreg_deps(struct kvm *kvm, const struct reg_feat_map_desc *r)
-> >
-> > To me this reads confusingly - idreg_apply_deps() would be clearer I think.
-> 
-> Agreed.
-> 
-> [...]
-> >> +       for (int i = 0; i < r->bit_feat_map_sz; i++) {
-> >> +               if ((r->bit_feat_map[i].flags & CALL_FUNC) &&
-> >
-> > What if it isn't a CALL_FUNC feature?
-> >
-> > Could this loop just be replaced with compute_resx_bits()?
-> 
-> It's skipped, so a dependency written as a plain field match would be
-> silently ignored. Both entries today are CALL_FUNC, but
-> compute_resx_bits() handles every kind of entry and would also give
-> the res1 line something to set. It'd mean moving idreg_deps() below
-> it.
-
-I really do not want to drag compute_resx_bits() into this. None of
-that stuff is RESx. It is bad enough that we use the same structures
-to represent different type of dependencies. I also want to add new
-ways to affect ID registers that really do not fit the RESx handling.
-
-> Marc, compute_resx_bits(), the rename and the loop rework are all fine
-> by me. If you agree, I can respin with them, or you can fold them in
-> when applying, whichever is easier for you.
-
-I don't care about the name, but I don't want the rest of the proposed
-changes.
-
-Thanks,
+The VMM is an integral part of implementing the architecture. If the
+VMM doesn't cooperate, that's its problem.
 
 	M.
 
