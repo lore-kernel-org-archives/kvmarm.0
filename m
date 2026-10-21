@@ -1,78 +1,72 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792597056;
-	b=XSl6/IAEgFXbBGLSpiciH+r1Yps92unSOZ64Y0wS275aBI80AT/R00PGNlhdPhIgCVWv
-	 ikM4jFF2wYieh4hAxHtxI+JnYmvXom+2GVJkG+o93B58kabqWgr86q1qPBvlHJIK8uTFF
-	 Ct7rVuQew1JdlkESyhsflk4YKXonfnpmEtSoazGSSR6fzhnDyvsJHIT0nd5++lXkxJ7rq
-	 AntqaW679xlJkFVrM34UMN+WkHFSUa6h2b9dHsmRCI3kHB6uOOFmgLxevrwW5HF7nTE/O
-	 30mVTaW+SgWGK14mz6cFoTsAl33SJTGXtWR9dCRcjVqNhYPTJUGfbeDBKkHu+mpMMgw==
+	t=1792597469;
+	b=sr/AFjr9BwcdmNqfNM4vzaFLeRlmgrFolJaHteyrCVVxXeqIh1+KLeOqjfCsh+fVcCAY
+	 jzSLUgFtr+hU3MtXc9fY2cjW1hXoPxvbs1IgvMya+i4yxuJO3hkM2fC+8pp/32TxmZN9V
+	 A5XHWGQMwYb/CEoeoamZBpwm6Eqds78c7pEvt/gF+Mbm2B9dAdM4R7y7jg9Jc7Ib00k5U
+	 DLtxMkwGUDhWv8Sw2FQi9ld03VntyqB2znTfwuvxe2dnsKgbMP25CkMzHbHTvjqkpOUBf
+	 uGbSEbUhNsnxeXGpL0RQy/pfynld7XxaBFgxfjZ4nXpzOWHccikMns9/zNuxVvVJIGA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792597056;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=151osnyqTqNRy9yGvwwtrRpNABKKk4npuM+xHhPMEdc=;
-	b=b8dzw9jtgIxCED1TaP22ihIm4G5T0CvStACCPOBrfouFV/OCnOm8ruCOvYS6s7aE+S85
-	 wAPnivdyhUzExug80lcTCyQRRHTXX7EmmI5vnzEPTeVaTbwdzHhvsrZZ7x8qEZg3WIuYh
-	 /4qUUKF51gEWn2pksvZV8xxp5HcDj5xybeaQYTKHzBPD72nC84kI652KvHerVGUnJUnEG
-	 8QqeEot2YIPo94rif0vGDoMn3cQ0QcorrfhNRra6ACjV1qx6Jbga39g12Sv28ViGnTX92
-	 oXRmLg0Xb71UrFUajIrdUd0WnpHtrd0W5rVX44AXPow0JQYYvm1WECcdJdOhrprfpWg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792597469;
+	h=Received:DKIM-Signature:Received:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
+	 X-Cookie;
+	bh=4kcXDJhEfENFHuyA+lYroTo7cmLFPG8UX1ID8jIbjAE=;
+	b=DZV+r++Gr3GyZTXlMphzsmOOfs5PRiTCV6Da7i7ZS2k4JaXGagE/KLqv7dQ7Tkc4zgBY
+	 JvT27SgziQHKYcOLG9Yp3ptjEcPjG3ocEMN/rL/EqnfYhoxFMKbSXKwMeOjIY9xA2S7zR
+	 grua6Ye5lyld59/gPxemsIrTm/XcfQLGZipP0jClPzKp4dvDTbNUV+Ctcj8PapdgiPGKp
+	 IJPOCJx7xBs3NfEYMDXB52ebnDkLEgNAjkOGeCvH/pHm7qD1C+UMDJXy2B76+K4EB7jgn
+	 PbndO/IE5bPmIOQMA0drpLSRYvtOpshq4JVFb/8s4gv2tq5pGJuCOFvPac4rTaPXqwA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LZlUa8sk;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Mo7xzRhE;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1382606A319;
-	Wed, 21 Oct 2026 15:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548DE606A334;
+	Wed, 21 Oct 2026 15:44:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LZlUa8sk
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 490D41F000C1;
-	Wed, 21 Oct 2026 15:37:35 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Mo7xzRhE
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B49D11F000C1;
+	Wed, 21 Oct 2026 15:44:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792597055;
-	bh=151osnyqTqNRy9yGvwwtrRpNABKKk4npuM+xHhPMEdc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=LZlUa8skphlwi4uXJ9gjrUnssf7gpReG91Bk/DKT+IMLa5CjHH4Sen2zDoYK7qxdi
-	 CGXBT+8RggG/CIIyN7YEHpJWjZiwZvmeAuvi0zv3QU8n+XAG2QjZEa0an89uKrEDNU
-	 Zh6vtp3lAx2xhPIwDGcYy/QNHWf0OVPAQft7yr9HtV/R5aYIhbHhTF7d3eeVV6+bSM
-	 oIFVo1tRZ+jQHFE6BVFfJvs1teBdUPEir8wBOnfjF0ffX0XX5tRgn/zai/656vWnun
-	 DVh7q6ismi/NsXhv0cJBFcPSt3VP2xqqMI2kns1H3uN6evQ35LB9/02YLHvf49f9JH
-	 69HXyicRfywFw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xJYNh-00000005jCk-1CgX;
-	Wed, 21 Oct 2026 15:37:33 +0000
-Date: Wed, 21 Oct 2026 16:37:32 +0100
-Message-ID: <86jynbyshv.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: oupton@kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	kernel-team@android.com,
-	fuad.tabba@linux.dev,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v1] KVM: arm64: pkvm: Clear GICv3 LRs in the hypervisor
-In-Reply-To: <atjWzRABsApbZ8CC@google.com>
-References: <20261021110000.508827-1-vdonnefort@google.com>
-	<86qzhjz1iz.wl-maz@kernel.org>
-	<ati1DrtmMd-63bIN@google.com>
-	<86pkx3yylb.wl-maz@kernel.org>
-	<atjWzRABsApbZ8CC@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1792597468;
+	bh=4kcXDJhEfENFHuyA+lYroTo7cmLFPG8UX1ID8jIbjAE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Mo7xzRhEgPIbjPjOPjzFXzBcvgAiCuOyW6f2SHflaCGJu6mCMwAKU1OlP3dYvjw5y
+	 HH69cHHF8gH1/Te1jqAcddWOpBFIhC0TNcN8ByBSDaZ1M76BZqur9sVejIM15JW5H5
+	 EsAgq/Gp7juChmcyxYcJPj4YICO1or8l2c7j5d4k/o3TlBMBrBJcRSMgfxAgKGiAAl
+	 gvBmzj6q6cMHVMAEJNfU/g2r8/SCu3ZxrjWzcxk/nY1J2J206ZSwf76cQgw90/1ujH
+	 mFlax4+tAZ4/o79FkDQmci6XRBJpivOn3e0ooAbvvP/STS/ReSLqmG+EOujh4qrtfk
+	 mYIpGhIScBaSQ==
+Received: by traversing.sirena.org.uk (Postfix, from userid 1000)
+	id B7F9C1CEA6B9; Wed, 21 Oct 2026 16:44:26 +0100 (BST)
+Date: Wed, 21 Oct 2026 16:44:26 +0100
+From: Mark Brown <broonie@kernel.org>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Leonardo Bras <leo.bras@arm.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v21 02/15] KVM: arm64: Refuse to start a guest with S1PIE
+ or S1POE but not TCR2
+Message-ID: <atjd2g25X3YUtOPY@sirena.org.uk>
+References: <20260930-arm64-gcs-v21-0-3556644cd927@kernel.org>
+ <20260930-arm64-gcs-v21-2-3556644cd927@kernel.org>
+ <86fqyn2che.wl-maz@kernel.org>
+ <as-f1JfUy38Xt9QA@gremlin>
+ <ae24e80c-1b34-4827-9c93-e80b987e9cd7@sirena.org.uk>
+ <atdebC62zPS1sQeR@gremlin>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -81,71 +75,41 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vdonnefort@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, fuad.tabba@linux.dev, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="XlGPDImXBOHBZN3B"
+Content-Disposition: inline
+In-Reply-To: <atdebC62zPS1sQeR@gremlin>
+X-Cookie: Whoever dies with the most toys wins.
 
-On Wed, 21 Oct 2026 16:14:21 +0100,
-Vincent Donnefort <vdonnefort@google.com> wrote:
-> 
-> On Wed, Oct 21, 2026 at 02:25:52PM +0100, Marc Zyngier wrote:
-> > On Wed, 21 Oct 2026 13:50:22 +0100,
-> > Vincent Donnefort <vdonnefort@google.com> wrote:
-> > > 
-> > > On Wed, Oct 21, 2026 at 01:22:28PM +0100, Marc Zyngier wrote:
-> > > > On Wed, 21 Oct 2026 12:00:00 +0100,
-> > > > Vincent Donnefort <vdonnefort@google.com> wrote:
-> > > > > 
-> > > > > The LR registers are architecturally UNKNOWN when the CPU boots or
-> > > > > resumes. However, in protected mode, only the used ones are reset.
-> > > > > During boot the HVC __vgic_v3_init_lrs() is never called because
-> > > > > vgic_present is only set in init_subsystems(), after cpu_hyp_init() was
-> > > > > called.
-> > > > 
-> > > > Why don't you fix this rather than making the init even more
-> > > > different?
-> > > 
-> > > Ack, I'll make a patch to fix that first.
-> > > 
-> > > > 
-> > > > > Also, the PM notifier isn't registered for pKVM and the HVC
-> > > > > becomes unavailable after the host is deprivileged.
-> > > > 
-> > > > Sanitising the LRs on PSCI_ON is probably the right thing to do, but I
-> > > > don't understand why resetting the LRs is out of reach from the host,
-> > > > given that the host is fully in charge of the interrupt injection, and
-> > > > therefore controls the LRs.
-> > > 
-> > > I suppose I could reinstantiate the pm callbacks for pkvm to at least reset the
-> > > LRs?
-> > 
-> > I think there are two different things:
-> > 
-> > - pKVM must not rely on the host resetting the LRs once it is
-> >   deprivileged (that's the PSCI_ON case)
-> 
-> Definitely not a hot path, but if we keep this one ^, isn't a shame of making
-> the host issue HVCs on CPU resume to reset the LRs if we know the hypervisor did
-> it anyway?
 
-The really annoying thing is that we have divergence between
-hypervisor backends that make the code fragile and harder to
-maintain. Specially as we add CCA to the mix.
+--XlGPDImXBOHBZN3B
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-So my approach to this is to stop messing with the host code. It
-should do what it is notionally supposed to do, and the hypervisor
-code can do its own stuff. You can always optimise away the reset on
-PSCI_ON if you add some tracking.
+On Tue, Oct 20, 2026 at 02:16:50PM +0100, Lorenzo Stoakes (ARM) wrote:
+> On Wed, Oct 14, 2026 at 06:48:37PM +0100, Mark Brown wrote:
 
-Is it worth it? Absolutely not. But that's where the complexity should
-go.
+> > TBH when I said in the commit log I was thinking of something more data
+> > driven I was thinking more of having the dependencies expressed as pure
+> > data, more like the way the test in set_id_regs is written.  This also
+> > seems fine to me, the checks are similar.  It's just much more invasive.
 
-Thanks,
+> Indeed. Perhaps the config.c approach will make it easier to convert JSON
+> -> code also?
 
-	M.
+I'm not sure how much of a difference it makes given that there's still
+code for the actual dependency set.
 
--- 
-Without deviation from the norm, progress is not possible.
+--XlGPDImXBOHBZN3B
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQReagvpf3TrrA7BoYYv73Ows9A4iQUCatjd2gAKCRAv73Ows9A4
+iZlOAP4sLpPvccqJReB8Mwy526cPBNWAF6ETiDO4ErTN2k8z1AEAsIpkS9DcFELc
+uBP7TL5YvgkbZg81LWuZNJGnIL2vMQU=
+=g8kZ
+-----END PGP SIGNATURE-----
+
+--XlGPDImXBOHBZN3B--
