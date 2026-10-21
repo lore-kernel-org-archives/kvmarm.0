@@ -1,65 +1,96 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792592384;
-	b=baeTqWLD/iKIKD8na/ev4Pde8tp9ixRy2ZPEE/e8WHUOv4PWZGKI15Pb1DpZfzZcgMTz
-	 EdCxv4GP8m40sd5jJs2oabvgmySC+K1GkiWolK35Unh1d/kx7XY80Fp9Cj9RFqJ+/qweZ
-	 6SNOPHG4B3Lda899NIdT6yQy7ICTN+5Sz15LNL/UKaixnFNG2F88J6IKGx70Woct2GQHV
-	 hq5do2nmoLFko1VbV37eU6WXnrzyHQSqCULVXY7lilNwX1kcuvdmc9GClzjpL+pf4DNfO
-	 QlJueTw59956JJAZWLzpbaZorF8ScsNSckEHP+w4poMt5upQj+mw8eXRFDYB+KNiHAg==
+	t=1792593011;
+	b=TvXlQQuWj9ejMt3XOSEABF0UpVgA2OAcKY++qaNzneEqwBfytAlohFDD2qOWJrV0UVFp
+	 MUzS4OVpUopFoDkb/2qFyDiorqBTEJPlYjj6DcCr9JTH6RgqxvRqpUtphZTKnrwKtaJtN
+	 gzkcGMLJCjeHNrv7kfVnDnkhgeEe4H6QC1M8TEqxmDXzKMUvh6QuUfesdlFIFhipNsy+z
+	 /SgHpenNNy7bjwIeiZ5ixgrw53QgEvnGyOSL91PysFUomPn+QJ8mEJdiH5kLwyK4/C2qq
+	 ThgwIDp0XNXg9NE1JHzqWZPCdzBuX7okSaGe0OqWQb9fvJj6xo97kERJT896FlRsDsg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792592384;
-	h=Received:DKIM-Signature:Received:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
-	 X-Cookie;
-	bh=UEVidBOtJkGIF4/dj6UUdp9Wd3YXp7nSAWdH8eAbb7E=;
-	b=Ly2p/rTsL+1lMwRWovJw4mjRdai5fAll+Qgl1Y/LRXvJLFDqoORw5UR80nktEhftC2Rm
-	 58V5vHVHyaBaWw32YS6vv2/0P8dIvVORZWtgLw0VDLdDvXS+kIFJPhoAOYEkckePWGf+u
-	 9E+k+ZhbkcM9eaR9Ysj0FtfXju559oOW7uwR7I2VrSlChWb7dmkxg5AdWu/Wq9qFlhjQo
-	 cToVjXWcf0qEuhZAsUtaPLghwxqBnq4TMhWSekqUZi/Zp5da+ENKBrMhi2emTVwjZcOFD
-	 Wb1nsmv+mtYOl70Fa8//MlJrkZtImTjL6ARmdCzOoo+7waiM0EIhW6ReimRtWJxKYBg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792593011;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=957G2mErVd6A0+xGGgP3Dv2Yz/cVZ3gHz/1oWxMzJUI=;
+	b=cIAJMEDBkvwSQh/GoiWlPMSwsWx/tvlZhQQBlB2/lkGmXMIO0nVPa7bgHHpWedFBgnm5
+	 IydnESJFc4uobFlT9eF0ZUBoDAuAAiDaTHxl35GoEXFZPVIIDcPtyCoiC/Cwc17h5uVQ/
+	 GpPc8LewZ0jHU546JoijUFwaBzZyGIgroMsG+3Q0+YE/01V/N/Gm8cSuKJVsgqFYmeGL4
+	 BoYqbl7wDJZqXKHU7ag34wB0IvuGxz7E3lIfOiU5znEekmRil1Ob9SDmtFXhvIcniP0u4
+	 PLtl9sR5ng70pjutAfdr65uC+52K/GPW7Cmz9tBDt6caImFdVcZAigUTc1CjNVK2h7w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=J3YF5IEx;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Jaf2r3ld;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8956E606A31A;
-	Wed, 21 Oct 2026 14:19:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98D5606A31A;
+	Wed, 21 Oct 2026 14:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=J3YF5IEx
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 091A11F000C4;
-	Wed, 21 Oct 2026 14:19:44 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Jaf2r3ld
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 837CF1F000C4;
+	Wed, 21 Oct 2026 14:30:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792592384;
-	bh=UEVidBOtJkGIF4/dj6UUdp9Wd3YXp7nSAWdH8eAbb7E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=J3YF5IEx+f0xM3L6lGSedpqw1xZILeSBg9+qBCG3fPIh0Im2Qi3dVV9QwWk54g/Ow
-	 f/fUNUXG/IWtyORuoTDz/YC8zut+S8kBe6l1nKAWd7K/7O2DnxERSzSwOIDxd2Ky3G
-	 OUulGror7/GFlnXow42JXkVC36VdSWTiDalLfNb5CUi7HyDHauAuKmy49J+FBWi9g6
-	 y4SJUN4A6JfdAQJTet1Qwm7VwdtzEGpW3oYwNZFsIzB7LhhUrderhVq4JJdV+kozwK
-	 csXe7/1qYnBwKEZUDeAzIzzLb+VQ+mOYFntgFWrhkFs+ohgXlcTtqYfQ61laSvDyeI
-	 36QCVCxA9FeNw==
-Received: by traversing.sirena.org.uk (Postfix, from userid 1000)
-	id D42661CB526D; Wed, 21 Oct 2026 15:19:41 +0100 (BST)
-Date: Wed, 21 Oct 2026 15:19:41 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>, Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Lorenzo Stoakes <ljs@kernel.org>, Fuad Tabba <tabba@google.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] KVM: arm64: Sanitise ID_AA64MMFR3_EL1.S1P[IO]E
-Message-ID: <atjJ_WuM_6GuLkmI@sirena.org.uk>
-References: <20261020064306.1542865-1-fuad.tabba@linux.dev>
- <ati3_lymW0zaBsSU@sirena.co.uk>
- <86mrs7ywsc.wl-maz@kernel.org>
+	s=k20260515; t=1792593010;
+	bh=957G2mErVd6A0+xGGgP3Dv2Yz/cVZ3gHz/1oWxMzJUI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Jaf2r3ld/vpyAqfuxLoNTCUrwseVzC/QmW175rdNMmKgtM9t36o4o481+8Cxj7rZW
+	 rp1S0XUsvlovMMNmIwoCvOy2J6+zIQiLquI3PLygoNGmacXnuZq7io5y/rPeO8mvJH
+	 XbQ07nEJJYqVMOosLQwWZV2a0B2IdhH9AWezII3rZeszrMa5UZ2y9S7yOpqPzHNGHu
+	 eRH8TOIBo4QM+vwg9utUNMlMIFtbd5krXKuO7GVRc2babNJANBA7E1HLU7tgiJVW3A
+	 HOCxhHQKoWIkmK6GUq64ZMuekeyfFEBocBwVCHDAfXhQnPrdyaH5a0B6af6pOHdt3I
+	 3jTEDoPa3OrDQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xJXKS-00000005hTS-0Cu0;
+	Wed, 21 Oct 2026 14:30:08 +0000
+Date: Wed, 21 Oct 2026 15:30:07 +0100
+Message-ID: <86ld7ryvm8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	will@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	steven.price@arm.com,
+	aneesh.kumar@kernel.org,
+	oupton@kernel.org,
+	gshan@redhat.com,
+	joey.gouly@arm.com,
+	tabba@google.com,
+	yuzenghui@huawei.com,
+	linux-coco@lists.linux.dev,
+	gankulkarni@os.amperecomputing.com,
+	sdonthineni@nvidia.com,
+	alpergun@google.com,
+	fj0570is@fujitsu.com,
+	WeiLin.Chang@arm.com,
+	lpieralisi@kernel.org,
+	enju.kohei@fujitsu.com,
+	sudeep.holla@arm.com,
+	jonathan.cameron@oss.qualcomm.com
+Subject: Re: [PATCH v19 5/7] firmware: arm_rmm: Activate the RMM
+In-Reply-To: <5d487949-9195-442f-97af-acb9e3fdfb0d@arm.com>
+References: <20260924135201.850038-1-suzuki.poulose@arm.com>
+	<20260924135201.850038-6-suzuki.poulose@arm.com>
+	<arZmXFw5Jw2IbAmA@arm.com>
+	<a11aba04-eaaa-43fd-988b-a2581b1b2fdb@arm.com>
+	<araketG70TIKeNuf@arm.com>
+	<12e83d88-de4c-4230-aac2-1796123320ad@arm.com>
+	<70d47475-e26e-40e1-b409-b0c16aecb8c0@arm.com>
+	<195cdfe4-a55a-453f-9c34-620738eca244@arm.com>
+	<arqrZ_Auk9BYOopa@arm.com>
+	<0f68dcff-1dfe-4515-9912-515ca6457674@arm.com>
+	<arudWVBPXcnUvYNh@arm.com>
+	<5d487949-9195-442f-97af-acb9e3fdfb0d@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -68,45 +99,67 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="myDSwi2Ph81d1HS6"
-Content-Disposition: inline
-In-Reply-To: <86mrs7ywsc.wl-maz@kernel.org>
-X-Cookie: Whoever dies with the most toys wins.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, catalin.marinas@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Wed, 21 Oct 2026 10:58:13 +0100,
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+> 
+> On 29/09/2026 12:15, Catalin Marinas wrote:
+> > On Mon, Sep 28, 2026 at 07:28:20PM +0100, Suzuki K Poulose wrote:
+> >> On 28/09/2026 19:01, Catalin Marinas wrote:
+> >>> possible, to defer the RMM activation until the first user (still do the
+> >>> RMI probing as an initcall). If we run on RME-capable hardware and
+> >>> firmware but don't care about realms or TSM, we still get the normal OS
+> >>> functionality.
+> >> 
+> >> Would you prefer this in the first drop of the RMM ? Or is this
+> >> something we could add as a separate series ?
+> > 
+> > I think we could add the deferring as a separate patch, maybe together
+> > with the KVM bits. An advantage of keeping it here if we merge this
+> > first is that we still exercise the activation path without full realm
+> > support or TSM. Otherwise a lot of this would be dead code until the
+> > other series arrive. Either way, do it as as separate patch on top of
+> > this series.
+> > 
+> 
+> I have been looking at the "on-demand" activation support and came
+> across the following design decision.
+> 
+> * We have KVM_CAP_ARM_RME which advertises that KVM can create Realm VMs
+>   to the userspace. A VMM could check this before it creates a Realm VM
+>   using KVM_CREATE_VM with type=RealmVM.
+> 
+> 
+> Now, we could delay the RMM activation as late as the KVM_CREATE_VM and
+> kick it off while we initialise the kvm as part of kvm_arch_init_vm().
+> But if that fails, we would fail the KVM_CREATE_VM.
+> 
+> The question is, what should KVM_CAP_ARM_RME indicate ?  We could
+> initially enable the cap based on the presence of RMM (but not
+> activated). However, should we turn the KVM_CAP_ARM_RME=off when we
+> fail to activate the RMM ? Is that senisble ? (i.e., runtime
+> disabling a cap).
 
---myDSwi2Ph81d1HS6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+I think this sets a bad precedent. If activation can fail, KVM end-up
+not delivering on the promise that it makes, and that's not great.
 
-On Wed, Oct 21, 2026 at 03:04:51PM +0100, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
+My take is that the least surprising behaviour is best. If you have
+bought into the CCA kool-aid by enabling it on the kernel command
+line, that's not by accident. You expect your VMs to reliably be
+created when KVM tells you that CCA is available.
 
-> > It would be nice to have it be more obvious to the VMM and/or it's users
-> > that it messed up, as things stand features it thought it had set will
-> > just silently vanish from the guest - they'd need to know that this is
-> > something that might happen and check after finalization or similar.
-> > That's probably more a documentation/education thing than anything for
-> > the patch.
+So KVM_CAP_ARM_RME should indicate whether the RMM has been
+successfully activated, and nothing else.
 
-> The VMM is an integral part of implementing the architecture. If the
-> VMM doesn't cooperate, that's its problem.
+Thanks,
 
-Absolutely, it's a bug if the VMM is doing this.  What I'm saying is
-that it could be helpful if the bug was made visible, with the silent
-fixup VMM bugs could easily lurk around for longer before someone
-notices the problem than they might otherwise.
+	M.
 
---myDSwi2Ph81d1HS6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQReagvpf3TrrA7BoYYv73Ows9A4iQUCatjJ+AAKCRAv73Ows9A4
-iZeYAQDZSaktjduuIlbdaY9J9HfNbTXXohL5Mg9RtMggk2fZTwD/RWuP/83tS3ju
-xCr8sa/Wa91fFPcj6epcub0Aat5XBAo=
-=KMvg
------END PGP SIGNATURE-----
-
---myDSwi2Ph81d1HS6--
+-- 
+Without deviation from the norm, progress is not possible.
