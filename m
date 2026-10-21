@@ -1,72 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792604940;
-	b=5MYeDBnr66VhNvUJebn7cagtAhnUBozqAzWkXJOmSFFh7pPTe0Z4uGFUd15rFZiy1E57
-	 hsa6nM2FI3Rfu2cFjxEZ2NQ98P8xVekIIDS6kVp+X2d6yQQWVemOcQuZ7hT43CldJyq0k
-	 tI2vpVgFGTopHpCc2uPjR76FCHM88PNFx57gi3A5UVZFQfOQJ0ff8zZKanRAjWgFNCNgs
-	 ul4V95Cq8UOCuRDvPu0ZAaA2ZSeMYD0bKMA38kPm+DONwVQ1EalaTe010rd6GtrlJB1Tt
-	 6bW1S1jQfvS2/bcyRof5nyjidk+IA0fDeGmzG7W+I0IhJ5HGxifprkc72pP7U3E7y6g==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792604940;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=u21UTFmux6GWpsHxQyjMm4C7qQp2KgUxiXBHFByAtzM=;
-	b=buiLR5NFlnkXA80POdFBajmioG4FgHSQpAHANt/MRd9QUkb79G8lFFBoF1FgtV7rzvZ+
-	 mkdP1HP9gJeBMEVmWwI+N6l7kBO4K69HxxZjcAVi4Dc6MVIHXKKlWX4oX8ie/5S9G5X/7
-	 a1e06abncBUzmv5dGFjfdoErj1Npnn6rchwlj0skiGBhuiUuUVXCz7dW6CddM/oQ/lKlb
-	 IEoV2uck299amg2X/16oqAoT5JRyAhFeGPgJibtYKryN82AzHzurKDg4GPf5jBxGmk5S5
-	 +iCJUrtUwLPXx3uiMbXpczV+/Wx5g8nrIq4hvWbSGEMhsHB/BliAgTitEyz90XCYPeQ==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=jLO2LuVO;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDF94606A31A;
-	Wed, 21 Oct 2026 17:48:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DDF94606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.48
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1792605391;
+	b=O8iuc9G8f8PFJ0Vh77Aik56elwqVdJbHCVOxjrEZuLX7R4IInW1dmHPQjSRMooP4TsNd
+	 dXk+lf0VeZZMjeCQunsv1NLe2expG92gUzuBRKraejTIVd9LtjRyAxr4rVDEEjow+ACGN
+	 JlApFDhzm6hhm5CquDJGbBoiZjbx5iS6MeG90JxdzraV1ONbZK9HofWRhD32vLATTIPhc
+	 ahHrGwD2GvJF+tzLDcXXXiPGNFalFUQOdVP76akx8gPN6J4+SOJ+Z4wsmePgcUJFn3qrj
+	 JIee4v6ugp4HzwlcXzvo5AltrNqpoZxFrIx2CE0th+VQhGQ/SEnrzAitRZBMQAnJYLA==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792605391;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=l/9Q6vwSpHzLOuQcu+iZE9ek6ulZ0fAfcC9lHWm1vuA=;
+	b=Gfv/olTN1BQjyQMHXXMLtvH2+LpbNq3XXJ2DMyG3lHeiAmpgU6xEQzllzzh9KuRskdyp
+	 ZYi7SF8ulTp/Ch+RNKXSKmFrweoDu60suBRyR9BNh5oZK1bqqyrJrsxLFvKM5hz27bLMK
+	 nDWB8XishstOl1P6KyfgKfQfH9SO+9CMYlK0dys9nC7WsHw88b6EsSGuz7PBmenHpjua9
+	 QxR2h5V3eOtlPmfgXiyjggsuzWq0hWsHngcrn3nRdWFVRHSuhc8pVmteltekBI773kEWu
+	 LYaXNGJMLWH+PZifeWn7F5xfDOg055kJVdscpaaPW4WLsyDINeEV2mM6foIOcRHjZ+A==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=soleen.com;
+	spf=pass smtp.mailfrom=soleen.com;
+	dkim=pass header.d=soleen.com header.i=@soleen.com header.a=rsa-sha256 header.s=google header.b=EoYq0cHw;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.48
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E044606A326
+	for <kvmarm@lists.linux.dev>; Wed, 21 Oct 2026 17:56:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2E044606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soleen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=jLO2LuVO
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 55CF516F8;
-	Wed, 21 Oct 2026 10:48:54 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 356E33F7B4;
-	Wed, 21 Oct 2026 10:48:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792604937; bh=bEa9giIeZfDBMDwMUgTW8YTFn1UnEm9XoYsTu1CX0h8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jLO2LuVONwtdmLRHFnELMpS1lxH3gZTntDBxAbGW9KjLlWgiBvkDKAp5Nw1YJcZxO
-	 lipPGRVxkc03dKFZUrIiHwM2M4wUyIatvCJAj5t3jkuQCxVl/GRwS4d4Pc/G49ZX0C
-	 argPPnBs8MRvzm4HMuckndnnPQaxYrK4eORDIYaI=
-Date: Wed, 21 Oct 2026 18:48:51 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, will@kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
-	gshan@redhat.com, joey.gouly@arm.com, tabba@google.com,
-	yuzenghui@huawei.com, linux-coco@lists.linux.dev,
-	gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com,
-	alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com,
-	lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com,
-	jonathan.cameron@oss.qualcomm.com
-Subject: Re: [PATCH v19 5/7] firmware: arm_rmm: Activate the RMM
-Message-ID: <atj7A1CV4paW3htS@arm.com>
-References: <a11aba04-eaaa-43fd-988b-a2581b1b2fdb@arm.com>
- <araketG70TIKeNuf@arm.com>
- <12e83d88-de4c-4230-aac2-1796123320ad@arm.com>
- <70d47475-e26e-40e1-b409-b0c16aecb8c0@arm.com>
- <195cdfe4-a55a-453f-9c34-620738eca244@arm.com>
- <arqrZ_Auk9BYOopa@arm.com>
- <0f68dcff-1dfe-4515-9912-515ca6457674@arm.com>
- <arudWVBPXcnUvYNh@arm.com>
- <5d487949-9195-442f-97af-acb9e3fdfb0d@arm.com>
- <86ld7ryvm8.wl-maz@kernel.org>
+	dkim=pass (2048-bit key, unprotected) header.d=soleen.com header.i=@soleen.com header.a=rsa-sha256 header.s=google header.b=EoYq0cHw
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-6b3dd83e779so1702762a12.1
+        for <kvmarm@lists.linux.dev>; Wed, 21 Oct 2026 10:56:30 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792605389; cv=none;
+        d=google.com; s=arc-20260327;
+        b=GDNQs+amjusRjFgvkp9uUBZC+VIWDFOzHU3aSmGfwpP9wndnmaDExqAzkKOTzeNCuW
+         PIWeg2TlodJCNaacTuXfsgSdy2+eiLq8WVibVneFAd6OLTEYekt2PuYTFRSyZFydihWq
+         H15q7EQZVargOQy7JmDzFsks5BDPfaSnvjPiJtJOml7ypEdBWuYNIPu+TVgYxzyR8Hxu
+         UP2TgTOSqk2Fexoa+x5GHkERaInOqYmBXpTx+a4Z+dTQG3C18zpYIS/GAuCaMjEVVWYg
+         xSDfLC24wypGG/qmIstf2lajwEHVhUXC+GjFJ8jswB1DW0z1me0q5tr6cVx2YUoh9uOy
+         Qc2Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=l/9Q6vwSpHzLOuQcu+iZE9ek6ulZ0fAfcC9lHWm1vuA=;
+        fh=6MmyJx/Y6BKsjrMTOJcyCNscWkL7b5RRENX0612psbE=;
+        b=ZV/1AHmULSxO0nTIzAwaKpg+5x8aYl/O/AtDO2hGhw2u+43ciTDJp7VPvTVqdWY8mC
+         eUrtJbFdklCsm2XfyUV2yci2Okq5GPh9XZqmz0tHKZtAQ6YL7Nt2YesSQU66wshvyq8F
+         GtSIo/rYj/yj0tG2XvKcUJTRrVi8GvBP26XJN51MpWO90ehuOtNPYD8RFh+M0aH5DNzy
+         XAExLABLffqtnCqy9adqNC6/A9PkVNAYcW5MY3lcbSu8F1RoXJCP5bB29ba6VBI6IOrH
+         L88rYAJ/pf4Qeovm0bfrEnT0uwFPJIwF9FSX66i3IIyG45snbvq4L2HWXUL9xGUFaywA
+         S/oA==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=soleen.com; s=google; t=1792605389; x=1793210189; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=l/9Q6vwSpHzLOuQcu+iZE9ek6ulZ0fAfcC9lHWm1vuA=;
+        b=EoYq0cHwrrywoSQhFH/3j1jMjJk7Uk14uTMReh+5LLX9X55/TA+FZctHD3EjrHFy4o
+         +HS56mdn1VUiJIEEgNPIxpFYZpz3CZiPKlPyhe3/M2PE8SmhI65EMoee5nNXBme6Uc1H
+         0skAmL1piBWcirj/MMj9TzVMSAf1BlH+GTfLg3qYAJh+MpQyvXtTUgH6E3wnk1tMode2
+         BPcYUQsmsrFv8njxXSWJoyvfukZ69Xbw1262fBTnmfpy2+cWSMc8ekcE2X2Xb2k/Jzrm
+         /CkwlIL30EAuZCNOXD8B41hialtGS1V5eoNZVjSuXDdSh4FrZYkYGWGR1314sLu0vV9K
+         i5Bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792605389; x=1793210189;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=l/9Q6vwSpHzLOuQcu+iZE9ek6ulZ0fAfcC9lHWm1vuA=;
+        b=cfq5S74VewlygIw6a9W3zCHyk9uB/vpJWYw0pppOtCN+KmPC7x91PvdE0EYwPpjQYZ
+         5f/Xzc0qAlEJ8XkC1Vu7tPgDdX16Y1cry+HFSy2qDGOhElZskejyEp4QQ9C0VMQ1R61d
+         xFwBiB5izMDAqP6cH9rmtvZBmkCA72BlvDi6/SpDA6EaWfhWgJMB9nNvvYeb18S9G20r
+         WpWi8oaVWCW8U/Y1uhFByefMZHOMMTfKzPTIuI+s8KyAlaF4DvCShYZPAuGKcFAK5Be9
+         WPghhKJPu0N9GeV/PPFOYZGOFhZZXodgVMFzZNJWYa8gLWYyeHaNUiVPsmLkqI8i7GdV
+         SG6A==
+X-Forwarded-Encrypted: i=1; AKwUvBw+TpspPWBJHqIU+R59BXh0SK/q2hfkJ/eWKfuSPCdXcOToI/uyxDyJzj/T/vZIWLCmxNFkGjw=@lists.linux.dev
+X-Gm-Message-State: AFq9FYIftX1KmEZ9/l1ofyfhx70P3TktmHPI+oJOpTtHyaSHaCqvRcHg
+	RZDmrL1AxNfrLK1pLB3bzsLfAi6dnKxDeaGM+dDJPFDLIh8awTx9Zsw3kn2KANeb6lhyy9/vrGo
+	2aRC6Xb9LN82a/GacDPYAoT9LFZC9SLXukNm8qM2K9Q==
+X-Gm-Gg: AYBFou29wa+VmQOi2RrimKMmh0JmnmPNDN1ot9Ahf0dT++UDtG1RwcMLAc6g0Ax20EE
+	Jk55qirvTOtk0WgOHPjQhizGQSAhCppNOsSyZ7KSmm6UmMtYqAudZQNU6etKjPIE58oObyYEFo6
+	4cInvmVwP7IsxH7dcF79Jg8x/iWMHabrbQGfAhsKW9pOWlQ9d+RYW1klFgAI6uJMBrFru/4+QsA
+	4Kp6hFjWTbC/M+hkgRPZqn5y+wAznfSKWOH5sSdtlKLXMSGKyLo5ei6ngKaTTUJoXlWQCLAqO05
+	aD/BJzJz6cgfhYMWqjQeLNvAhIK3cooaCFxsikIZ8npNxCNBIw6VqcWVDnzghdm9YJ3230W31Mm
+	pdycyiu3V6AV3cIZTfSs/BSg1KU4hICtzBTb5PhIR4MqHzcqxV+85/jKWtDLHEPT/7FU=
+X-Received: by 2002:a05:6402:458e:b0:6ac:686f:91db with SMTP id
+ 4fb4d7f45d1cf-6b408e9f045mr1964734a12.11.1792605389455; Wed, 21 Oct 2026
+ 10:56:29 -0700 (PDT)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -76,73 +104,61 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86ld7ryvm8.wl-maz@kernel.org>
+References: <20261021152527.375070-1-tarunsahu@google.com> <20261021152527.375070-4-tarunsahu@google.com>
+ <CA+CK2bAQbmq3ArP3XMErF_8RC2CUwvgpLY0H83D0nCJTaVKYyA@mail.gmail.com> <20261021174006.GU3008132@nvidia.com>
+In-Reply-To: <20261021174006.GU3008132@nvidia.com>
+From: Pasha Tatashin <pasha.tatashin@soleen.com>
+Date: Wed, 21 Oct 2026 13:55:52 -0400
+X-Gm-Features: AclHuK-Q6MQhxMIMUURzzci_OOwzGik9EFivN3YqqlGA_5OHu0xT6GsF67-BzDw
+Message-ID: <CA+CK2bDJzo44K0X-+5F77E9g2dmqKdwZvrUf-1SkC7ewrgEgzA@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 3/4] liveupdate: Replace compatibility string with
+ a 2-bit pair feature header
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Tarun Sahu <tarunsahu@google.com>, Andrew Morton <akpm@linux-foundation.org>, joro@8bytes.org, 
+	Mike Rapoport <rppt@kernel.org>, Pratyush Yadav <pratyush@kernel.org>, maz@kernel.org, arnd@arndb.de, 
+	David Matlack <dmatlack@google.com>, robin.murphy@arm.com, loganodell@google.com, 
+	oupton@kernel.org, kevin.tian@intel.com, alex@shazbot.org, 
+	dwmw2@infradead.org, pbonzini@redhat.com, seanjc@google.com, will@kernel.org, 
+	Alexander Graf <graf@amazon.com>, Bjorn Helgaas <bhelgaas@google.com>, baolu.lu@linux.intel.com, 
+	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, 
+	sagis@google.com, linux-mm@kvack.org, kvmarm@lists.linux.dev, 
+	iommu@lists.linux.dev, linux-pci@vger.kernel.org, kexec@lists.infradead.org, 
+	skhawaja@google.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 21, 2026 at 03:30:07PM +0100, Marc Zyngier wrote:
-> On Wed, 21 Oct 2026 10:58:13 +0100,
-> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
-> > 
-> > On 29/09/2026 12:15, Catalin Marinas wrote:
-> > > On Mon, Sep 28, 2026 at 07:28:20PM +0100, Suzuki K Poulose wrote:
-> > >> On 28/09/2026 19:01, Catalin Marinas wrote:
-> > >>> possible, to defer the RMM activation until the first user (still do the
-> > >>> RMI probing as an initcall). If we run on RME-capable hardware and
-> > >>> firmware but don't care about realms or TSM, we still get the normal OS
-> > >>> functionality.
-> > >> 
-> > >> Would you prefer this in the first drop of the RMM ? Or is this
-> > >> something we could add as a separate series ?
-> > > 
-> > > I think we could add the deferring as a separate patch, maybe together
-> > > with the KVM bits. An advantage of keeping it here if we merge this
-> > > first is that we still exercise the activation path without full realm
-> > > support or TSM. Otherwise a lot of this would be dead code until the
-> > > other series arrive. Either way, do it as as separate patch on top of
-> > > this series.
-> > > 
-> > 
-> > I have been looking at the "on-demand" activation support and came
-> > across the following design decision.
-> > 
-> > * We have KVM_CAP_ARM_RME which advertises that KVM can create Realm VMs
-> >   to the userspace. A VMM could check this before it creates a Realm VM
-> >   using KVM_CREATE_VM with type=RealmVM.
-> > 
-> > 
-> > Now, we could delay the RMM activation as late as the KVM_CREATE_VM and
-> > kick it off while we initialise the kvm as part of kvm_arch_init_vm().
-> > But if that fails, we would fail the KVM_CREATE_VM.
-> > 
-> > The question is, what should KVM_CAP_ARM_RME indicate ?  We could
-> > initially enable the cap based on the presence of RMM (but not
-> > activated). However, should we turn the KVM_CAP_ARM_RME=off when we
-> > fail to activate the RMM ? Is that senisble ? (i.e., runtime
-> > disabling a cap).
-> 
-> I think this sets a bad precedent. If activation can fail, KVM end-up
-> not delivering on the promise that it makes, and that's not great.
-> 
-> My take is that the least surprising behaviour is best. If you have
-> bought into the CCA kool-aid by enabling it on the kernel command
-> line, that's not by accident. You expect your VMs to reliably be
-> created when KVM tells you that CCA is available.
-> 
-> So KVM_CAP_ARM_RME should indicate whether the RMM has been
-> successfully activated, and nothing else.
+On Wed, Oct 21, 2026 at 1:40=E2=80=AFPM Jason Gunthorpe <jgg@nvidia.com> wr=
+ote:
+>
+> On Wed, Oct 21, 2026 at 01:27:22PM -0400, Pasha Tatashin wrote:
+> > On Wed, Oct 21, 2026 at 11:25=E2=80=AFAM Tarun Sahu <tarunsahu@google.c=
+om> wrote:
+> > >
+> > > LUO and its file handlers validate handed-over state with monolithic
+> > > compatibility strings ("luo-v5", "memfd-v2"). Any change to a seriali=
+zed
+> > > structure, even an optional additive one, must bump the string, which
+> > > breaks live update between adjacent kernels. Replace the string in
+> > > struct luo_ser with a feature header, so that the target kernel can
+> > > accept or reject the source kernel state per feature.
+> > >
+> > > struct luo_feature_hdr is a fixed 128-byte header: the serialized
+> >
+> > This patch is all wrong; 128 bytes is far too large. For every _ser
+> > struct, we only need 8 bytes instead.
+> >
+> > The first 4 bytes are the size, and the next 4 bytes are flags (i.e.,
+> > 30 feature flags + 2 reserved bits for flags extension). The last two
+> > bits of the flags indicate whether an extended flags field is present.
+> > Each extended flags field is 8 bytes, and its last two bits indicate
+> > that yet another extended flags field follows.
+>
+> I thought we agreed not to loose the string too, it was a tree
+>  string -> feature flags -> individual values
+>
+> The string is the emergency if we really badly mess it up.
 
-Tying activation to kvm-arm.mode=rmm works for me, roughly similar to
-kvm-arm.mode=protected. It's still an eager activation (just
-conditional) and KVM_CAP_ARM_RME then only reports whether activation
-succeeded. We lose kexec/hibernation but that's fine, it was explicitly
-requested on the command line.
+Yes, we'll still have the file-handlers/flbs compatibility strings.
 
-There's also the case of a host-only PCIe TSM (without realms). IIUC
-(grep'ing FIRME spec) on an RME system IDE key programming goes via the
-RMM, so this would need the RMM activated even without KVM. Not sure it
-makes sense without realms, so I think we can ignore it until there's a
-concrete use case (and add one more hook to activate the RMM).
-
--- 
-Catalin
+>
+> Jason
