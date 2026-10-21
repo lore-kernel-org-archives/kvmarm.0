@@ -1,59 +1,96 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.51
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792585730;
-	b=gQNLlRNAzrz62Y82HH1TblVqb8efdGnBbKsVhfOM2vLLjZKmfw09viWjMKmP68wDYGPy
-	 PXmNGKNd46Oo8jgss8hsvdXFNQN1XSG8WQA5Mc7c2EkcpkahANCjyppqHJjiKalDR1P89
-	 5Q9uBUbV9qV3YmTDATDhhcGvchsJv2R6v64goYswApTWn+qwSkEeq/BjgSP8WfOoJv/Sa
-	 DxbXq7Y3qj+JLk3wsVvo5MPZh5F9e6avwvMltKWgxJ9BDKAvPqHvCjPy11y+9x7IT+p47
-	 TsbqIhFMsMjlT39MCzMDnQzeNtoV9/VcEXa6FvzqW6qPAAMBJRhC7LIiwhGcw0qHxDw==
+	t=1792587030;
+	b=vDrgO5R/lq87MPCX7nS/VoTex0Aj52OIFxVqdMkHFIqMYlz4wTdJSiWl6tuyGjcp7ns/
+	 YZAC5AIPYjiqOfXcUzpDgswe4Bc2YKpth+qcO1qp9UAk6yQda7KND6sCM4z+C6FYEXYgs
+	 xqbRjsVgXnWXbYIi5oOucx1A0RoQj4/qFfvdZlP6IIhWHQfxdAsyMSh/tUSPQTwSbvkuR
+	 Vx37va/thVdbnJbBHYfu+KYFKISNQL1X3qcuJTXRI2FGC3Zsu6GrlBzwSXoI3v7VmDKkp
+	 LB1BK7pUq2sLkTZBnTVRo+OO+O8OrcqlYV96oq8eFD+i+RlIplkyZCByRETrf65CkGA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792585730;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=x7YCZmHpFRCHFyGPTyhGucE8A4eYFXcryDMfwgdgRZc=;
-	b=leRExGcUaLLi677z9WFYZyUvuKUJGI8/NrkjRTu/ENd2zBQlLreJFflgUz+w2vkOfY9j
-	 0tsCjOeauDkZo7LNy9k+NDX07yHK/uTfdUkoZ+Bd13PFKhRlZYGnh4elUCMEHWWvXvpDQ
-	 0QK4hlyUd9VPS6RbIGviLgDlacpSgadLYNOM9ZWDbIKUZHf3Kufw7F0KrKyNTfoF2sOa7
-	 +hIfVupasqikOacikuLHScX8QHU0B+77sBi6aaIw1VI9CM4gxp1+SgL9OiSK4vfK1y4F3
-	 JE0MoxrboAGJoTBrvpwdQtyEcFkYWvCTFQTYJITgpIYQ0yx878VzxkE8xZq2FmUnvZw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792587030;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=Sh9adS1hWGFrVRHbKh++Je7qyXxMfA8cN2D8AczDFWM=;
+	b=seKgBp7I8iso8laRgLa76mb+P7DrMzcXZVFnZqcUYxvgRVtSoBYDsA/v8URFEBF/1G1Y
+	 GnTVwi4CI2JprvajApl/4VPdRlzxBjc/8na8+y/cYww+RXuH5qwkHcVDo1K6bOi8dV5JX
+	 +B3CRVfTqedTPkQZ5xgTWRgXSGrHWrr/ZDsdKcnNeUERIbVCPYiTPSBhYNRw5f1odjLqh
+	 WrfatfKZV47wxjHJ974Vw2i/nGjBLm235Wj6bqxmR6sd7EbHDA7Rh2Pzwkre9PbPFqh+4
+	 7c+N1mTDc8La4u+ZRL73maDSADCBoAKYLbuqi03KT+4fclwVJi/eAhTIwtTKl4qzKKA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Hm22FjB9;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=q0ybyEol;
+	arc=none smtp.remote-ip=209.85.208.51
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC37B606A319;
-	Wed, 21 Oct 2026 12:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 552BF606A31E
+	for <kvmarm@lists.linux.dev>; Wed, 21 Oct 2026 12:50:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 552BF606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Hm22FjB9
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0DE21F000C4;
-	Wed, 21 Oct 2026 12:28:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792585729;
-	bh=x7YCZmHpFRCHFyGPTyhGucE8A4eYFXcryDMfwgdgRZc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Hm22FjB98pQQqDEUKzhBwrhVIvZRBkT9Uo5aEGJEM9c1lNfcoEvpHGBEGnblB5GQv
-	 NHiub28gA6QMTNzNCefGTjrfOoccMxUQ4R79JsznGZvZ/V2BDI7CA2iT+hq+Zn2FaE
-	 waw4hVMX3VITTXm5347EF70HjF9l+WNqRfQfLI5FIKUb59SlugRL98f8qWFCdsJaNr
-	 r72i0ZV7YAX4/DKecqUMhHfOscT8fKpLFi0oFHBubU1JmDVzmPK60bCKmCdftc9NSm
-	 wLRBqzORgHDGCTp/FgTETDkGK7HcIQDVpNx6SLEGgpcx1ikViAvR8WPWGjovOV07pB
-	 5cPW0d+FrRvFQ==
-Date: Wed, 21 Oct 2026 13:28:42 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Steven Price <steven.price@arm.com>, 
-	Yang Shi <yang@os.amperecomputing.com>, David Hildenbrand <david@kernel.org>, 
-	Fuad Tabba <tabba@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 4/4] arm64: mte: Add mte_clear_folio_tags()
-Message-ID: <ativTPb95ZxK2_ho@gremlin>
-References: <20261021110700.493315-1-fuad.tabba@linux.dev>
- <20261021110700.493315-5-fuad.tabba@linux.dev>
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=q0ybyEol
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6b1f31c63ebso2756666a12.0
+        for <kvmarm@lists.linux.dev>; Wed, 21 Oct 2026 05:50:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1792587029; x=1793191829; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=Sh9adS1hWGFrVRHbKh++Je7qyXxMfA8cN2D8AczDFWM=;
+        b=q0ybyEolXqbuN10nSE5blDS1+sAk/SpkgqqvyyMk730iAGhSVXbQGh5RkNsidKzO9e
+         xGEwtq34LEnSE/xfqikVXXbbZPtMbr6TCGPWgqB7lrUWiNcY2ifQQ4PjHDU1IKXYpJ0i
+         2IJoAnmuHS2j5o/tLtCn2bSuBiEapO5K00zzXqubPUQQa62PDXAerExV1UvKi5qL2kWD
+         AZnnHC4cUWbsVLtAmHNj6MGkbEzTfFQro8cZmZB3vOFhaazlqo0sj1gZUKnj+CmtCVLp
+         0HrmxwYiSmfNqVf/l6bOOiD3JJLhVfm9Mn0tlF7Z6w2cvuYBrTHB7HSDmkUPSEYJLTcf
+         Pbaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792587029; x=1793191829;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Sh9adS1hWGFrVRHbKh++Je7qyXxMfA8cN2D8AczDFWM=;
+        b=QnkE3gFrbSmK9T+KvJttvLP7JRu5mtgx4Rcsp8hP209U8HV82+eToJ5GZiy960m7WQ
+         cgTHKcz/EdXOmVvoxFtZddP2JuxtWo1bSWOohqv+GLH7jsIXC0oISdpEaF51Cyr2AASU
+         g/bgDFmZ8szfdQMdL3DJeAu+AkYrKY4lNjbO6pFF1NhLSt41+GOqO/uPFvUYHTWl5suo
+         veSThJ6NgknUyD0YhzTMp5zsJg7RSMRtnmGG6C6j4efg4vy1Lj4FGIAzjJTMqxxWnLsJ
+         4X/wjx3lRIrw4L8WJmlFMdcekq2Vjl3B26hBKVsscqKUBXZVEaYJAKhebgg6VmrJjX/E
+         gHBQ==
+X-Forwarded-Encrypted: i=1; AKwUvBz1iyVy0m7eW+CWz9CIqIx+l0p2ciUSnweIavWxvHvBQBCTi22My4oeVgDK1rezgJQC1pDRXO0=@lists.linux.dev
+X-Gm-Message-State: AFq9FYKsrE39IAj5gyfcgkdzfj9yLIEMi5R7RGXGo+H+AfS2WMXCv5Bj
+	uTgAretnHvwZU0BI49wHBEcTPsxIbYicl2Xa+6qabixfJPyxSQKUZCa+NzvDRpuEtw==
+X-Gm-Gg: AYBFou0SC1Ol5mRXctdJlefFrnssXNYh3ZrDVet5o9cVq+CG8tGh3M0Mwz8ye4gBg9y
+	RcX1iovKM7VeqseqmOt+xLmNP9DLOGC9OAA3Ltb/2D46XVXCKwZD032MyCkNsXbUEsJQ03RK6hZ
+	J60zoLpUvT/ovCGj4ZfqwRNG56kpnk9HUaxu6H41yBPOTALofE+c8X4Jr71y1aulMNcRgtmKVbi
+	Lwqa4dQGxcDr7p6az7YS2I5kjtxAmjtC0RpICtaasSlX9JMNkZjlTPd63S7yjiDlxLfctGhi2eP
+	MG+3F5qIvC96s/Sg3/22wPVWN8re2Bf/nJfUQz1W0IbNpesrp/m8hOx3nEUpDBq1n4yrbs9f+S6
+	XkjU4U5sJs60yWbZ2WITWQPcnIBYHpx217H920qRyowIaNEdBvSCXoig9gb1E+Hp1U4tDOt3JlU
+	QWPX0YKiZon9+3ZvEIxUUntJYcsQ8hGVHoVTx2R4d5DXLO4xfNPOfZ8OaTFZ/QhUYOJ+AePGxKc
+	EOjsd3paaF57EEmhTnXhD6XlQSlDxD/49SjSNq+a0kq8y3eUprNhFAl7ZzqMLSUHMk3GNGPE597
+	ULkUA9MBMg8f4UIccV9YWMI5
+X-Received: by 2002:a17:906:c114:b0:c2e:22f7:59c5 with SMTP id a640c23a62f3a-c460370aeafmr447928866b.7.1792587027947;
+        Wed, 21 Oct 2026 05:50:27 -0700 (PDT)
+Received: from google.com (197.183.140.34.bc.googleusercontent.com. [34.140.183.197])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c4678e5acc9sm74841366b.9.2026.10.21.05.50.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Oct 2026 05:50:27 -0700 (PDT)
+Date: Wed, 21 Oct 2026 13:50:22 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: oupton@kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com,
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com,
+	fuad.tabba@linux.dev, stable@vger.kernel.org
+Subject: Re: [PATCH v1] KVM: arm64: pkvm: Clear GICv3 LRs in the hypervisor
+Message-ID: <ati1DrtmMd-63bIN@google.com>
+References: <20261021110000.508827-1-vdonnefort@google.com>
+ <86qzhjz1iz.wl-maz@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -65,133 +102,42 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261021110700.493315-5-fuad.tabba@linux.dev>
+In-Reply-To: <86qzhjz1iz.wl-maz@kernel.org>
 
-On Wed, Oct 21, 2026 at 12:07:00PM +0100, Fuad Tabba wrote:
-> mte_sync_tags(), sanitise_mte_tags() and kvm_vm_ioctl_mte_copy_tags()
-> each open-code the loop that clears the tags of every page in a hugetlb
-> folio. Add mte_clear_folio_tags() and use it in all three.
-> kvm_vm_ioctl_mte_copy_tags() then tests for hugetlb first, as it does
-> where it sets the tagged flag below.
->
-> No functional change intended.
->
-> Suggested-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+On Wed, Oct 21, 2026 at 01:22:28PM +0100, Marc Zyngier wrote:
+> On Wed, 21 Oct 2026 12:00:00 +0100,
+> Vincent Donnefort <vdonnefort@google.com> wrote:
+> > 
+> > The LR registers are architecturally UNKNOWN when the CPU boots or
+> > resumes. However, in protected mode, only the used ones are reset.
+> > During boot the HVC __vgic_v3_init_lrs() is never called because
+> > vgic_present is only set in init_subsystems(), after cpu_hyp_init() was
+> > called.
+> 
+> Why don't you fix this rather than making the init even more
+> different?
 
-Great LGTM so:
+Ack, I'll make a patch to fix that first.
 
-Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+> 
+> > Also, the PM notifier isn't registered for pKVM and the HVC
+> > becomes unavailable after the host is deprivileged.
+> 
+> Sanitising the LRs on PSCI_ON is probably the right thing to do, but I
+> don't understand why resetting the LRs is out of reach from the host,
+> given that the host is fully in charge of the interrupt injection, and
+> therefore controls the LRs.
 
-> ---
->  arch/arm64/include/asm/mte.h |  4 ++++
->  arch/arm64/kernel/mte.c      | 15 ++++++++++-----
->  arch/arm64/kvm/guest.c       | 10 +++++-----
->  arch/arm64/kvm/mmu.c         |  3 +--
->  4 files changed, 20 insertions(+), 12 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/mte.h b/arch/arm64/include/asm/mte.h
-> index 7f7b97e099968..5a2d2814c0416 100644
-> --- a/arch/arm64/include/asm/mte.h
-> +++ b/arch/arm64/include/asm/mte.h
-> @@ -96,6 +96,7 @@ static inline bool try_page_mte_tagging(struct page *page)
->  }
->
->  void mte_zero_clear_page_tags(void *addr);
-> +void mte_clear_folio_tags(struct folio *folio);
->  void mte_sync_tags(pte_t pte, unsigned int nr_pages);
->  void mte_copy_page_tags(void *kto, const void *kfrom);
->  void mte_thread_init_user(void);
-> @@ -128,6 +129,9 @@ static inline bool try_page_mte_tagging(struct page *page)
->  static inline void mte_zero_clear_page_tags(void *addr)
->  {
->  }
-> +static inline void mte_clear_folio_tags(struct folio *folio)
-> +{
-> +}
->  static inline void mte_sync_tags(pte_t pte, unsigned int nr_pages)
->  {
->  }
-> diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
-> index 1a9aad6ef22a0..fb2598f8c0ccd 100644
-> --- a/arch/arm64/kernel/mte.c
-> +++ b/arch/arm64/kernel/mte.c
-> @@ -36,6 +36,14 @@ DEFINE_STATIC_KEY_FALSE(mte_async_or_asymm_mode);
->  EXPORT_SYMBOL_GPL(mte_async_or_asymm_mode);
->  #endif
->
-> +void mte_clear_folio_tags(struct folio *folio)
-> +{
-> +	unsigned long i;
-> +
-> +	for (i = 0; i < folio_nr_pages(folio); i++)
-> +		mte_clear_page_tags(page_address(folio_page(folio, i)));
-> +}
-> +
->  void mte_sync_tags(pte_t pte, unsigned int nr_pages)
->  {
->  	struct page *page = pte_page(pte);
-> @@ -43,12 +51,9 @@ void mte_sync_tags(pte_t pte, unsigned int nr_pages)
->  	unsigned long i;
->
->  	if (folio_test_hugetlb(folio)) {
-> -		unsigned long nr = folio_nr_pages(folio);
-> -
-> -		/* Hugetlb MTE flags are set for head page only */
-> +		/* A hugetlb folio is marked tagged as a whole, so clear every page */
->  		if (folio_try_hugetlb_mte_tagging(folio)) {
-> -			for (i = 0; i < nr; i++, page++)
-> -				mte_clear_page_tags(page_address(page));
-> +			mte_clear_folio_tags(folio);
->  			folio_set_hugetlb_mte_tagged(folio);
->  		}
->
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index cda655fbff657..c75466384f8ac 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -1012,7 +1012,6 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->  		void *maddr;
->  		unsigned long num_tags;
->  		struct folio *folio;
-> -		unsigned long i;
->
->  		if (!page) {
->  			ret = -EFAULT;
-> @@ -1046,11 +1045,12 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->  			 * tags. A hugetlb folio is marked tagged as a whole,
->  			 * so its first tagging clears every page.
->  			 */
-> -			if (!folio_test_hugetlb(folio))
-> +			if (folio_test_hugetlb(folio)) {
-> +				if (folio_try_hugetlb_mte_tagging(folio))
-> +					mte_clear_folio_tags(folio);
-> +			} else {
->  				try_page_mte_tagging(page);
-> -			else if (folio_try_hugetlb_mte_tagging(folio))
-> -				for (i = 0; i < folio_nr_pages(folio); i++)
-> -					mte_clear_page_tags(page_address(folio_page(folio, i)));
-> +			}
->  			num_tags = mte_copy_tags_from_user(maddr, tags,
->  							MTE_GRANULES_PER_PAGE);
->
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 6e10aa9913d71..f8139c0a54deb 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1514,8 +1514,7 @@ static void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
->  	if (folio_test_hugetlb(folio)) {
->  		/* A hugetlb folio is marked tagged as a whole, so clear every page */
->  		if (folio_try_hugetlb_mte_tagging(folio)) {
-> -			for (i = 0; i < folio_nr_pages(folio); i++)
-> -				mte_clear_page_tags(page_address(folio_page(folio, i)));
-> +			mte_clear_folio_tags(folio);
->  			folio_set_hugetlb_mte_tagged(folio);
->  		}
->  		return;
-> --
-> 2.47.3
->
+I suppose I could reinstantiate the pm callbacks for pkvm to at least reset the
+LRs?
 
---
-Cheers, Lorenzo
+-- 
+Vincent
+
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
