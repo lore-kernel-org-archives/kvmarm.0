@@ -1,100 +1,108 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.176
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792604337;
-	b=h7gHU6QtR++XzRDcJtXYaJ79pTAi//vMDb/KQBnR+2G5qt5zEoropBELJ2JTJjfr3PcD
-	 npHqS9Pp7AYT6ZAk4HjEGgrCdHgCA3fzkciA/nhZzR0QBhwadY5uVnj6cNQ/Jk/lLBea+
-	 yR6Gis2uDfvoxlpIXJPucsDvzuVrImtouPOmYokm6le8s61EVDiodbZ/XSLHS4aP5uiow
-	 6aAnLv6Xk5hyH+jlDfTnWP5F/xOwnTL0vwsLiLWitx0OJ06/Byefp46nVzLryqdtrW2Qr
-	 GM1I7p+mlYH4d/1nQ03lM4vEYmiDkqPqzMY8g5obg0rKg6afQp2ct7v+igRpTQTmqSQ==
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.remote-ip=40.107.200.50
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=fail;
+	t=1792604414;
+	b=ZRhSIrdFO3CdLQ2+fRqZvGiU0v9QhyMyTuMxlx0rCN0wpQYPh2NjcKixH1/kmflIcaf1
+	 2iMIm01z8vV/s7E44GXj4nUVmRvgGNmVwrE2gCaZ8TdW62SyvwHN/wQkm8mZNqUMcWICs
+	 sLMZQAaI2Aw5PHFBy8NAbYgffNKJ37B9I3aw21R3hrROKqmQoQAaD1hOXUxb9FaQI6LNK
+	 1HIEF9DuGodPo/o+JoX45xqA3/SxdJRgXxitQxW6C4B+WdGKFKdnABAZx1xER9SP7IRjK
+	 xeEPa02G2d2yBwCJHnjg17MWqgIIdtdrZ+kBvhHlMz3nB/o0jL/S+v/H1ouPD7T+nDA==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792604337;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=csULT7PmXNkTg9HaShgHK/UOyRj2pqW39WBnWQcueFE=;
-	b=WuBgZjmaYzua00Or8Yp3g5GRvKa6zOwUcHBDUCeqAbiFAAgVI8P+rtDoHL9hg6Az1e6H
-	 RrwILB9es750n9CDjhyW6dG+U3QsGkx6s1pZaDM9SadXaO/ZpGAO9jxaVxbqUA7XbqsVU
-	 DMUu0GxkQ/fZ2kU+A9ECQpG0QViG/oCq4qGiFKgwJ14CV0rNk+6gsvquVv/EN7kzdOk9d
-	 GmhyZwJVAfVMRzH4xElAMVI8yiLms1nOa38paS+/vgWKrtsF3JBHpxHsjFYG6CjzSzk/l
-	 n7BTms/+2nm2F2A8u0dwXDv6kIf+0SqMOpl2cIivFBBUNSs2TKzKOQV7QaQ0IE6lzoA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792604414;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:Content-Type:Content-Disposition:
+	 Content-Transfer-Encoding:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+	 X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
+	 X-MS-Office365-Filtering-Correlation-Id:X-MS-Exchange-SenderADCheck:
+	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
+	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
+	 X-MS-Exchange-CrossTenant-UserPrincipalName:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
+	bh=Sh+BLdyawyu3x2WuC9w4sgPwmZXii/nWDIS0NOhyN2k=;
+	b=L9kObu2Qs7qwUJnh+GXjAw00t3akWJBkQnM9qFEpgKN85uM3xHXyhjgOazop+V4f4Uoj
+	 mlnAPSPu5fqas7r/tCmOPgARuHIkdp8EJS3eBlc5qfP2F5jsy2tULMPsaD7g+8+mcs09N
+	 b/bNJ+hejoSPb4bOoqlRoqfkMXFknIEudfikBJWRjdbUIusruj59ZIEDcj0HJaDGuJG2O
+	 gENU9lj56C5+t8+LkMO2N/WFDYfK1HEItjizKvj0AeK8D4JrYV6ygIzlq46sJHcAU2Mue
+	 pSGGJDE3wmdQGjhnoPxfjPRf+ZqYWlD1AsNovlp7D9krKtyD6bGzIBoOZiAM8HoJJTg==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=soleen.com;
-	spf=pass smtp.mailfrom=soleen.com;
-	dkim=pass header.d=soleen.com header.i=@soleen.com header.a=rsa-sha256 header.s=google header.b="R/wfDvdV";
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.176
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=nvidia.com;
+	spf=fail smtp.mailfrom=nvidia.com;
+	dkim=pass header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=gBUv3QkW;
+	arc=fail smtp.remote-ip=40.107.200.50
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012050.outbound.protection.outlook.com [40.107.200.50])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8D5606A31F
-	for <kvmarm@lists.linux.dev>; Wed, 21 Oct 2026 17:38:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1F8D5606A31F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soleen.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36898606A31D;
+	Wed, 21 Oct 2026 17:40:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 36898606A31D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=soleen.com header.i=@soleen.com header.a=rsa-sha256 header.s=google header.b=R/wfDvdV
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-3ab4891fc73so9079801fa.0
-        for <kvmarm@lists.linux.dev>; Wed, 21 Oct 2026 10:38:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792604334; cv=none;
-        d=google.com; s=arc-20260327;
-        b=PxobZbF4nVRn84a1Y02mB8czM5jIjaYvWWZr85yAqa/tRyWigHlKEF8kEC3EiyJftI
-         6CZLeJzCswMRyFrukaZPWNovWG9MrOqhsa1cs4ovZib3IBdYVcTwuZg3L3mF/1CUHCz7
-         5IdpL9qnJAmfZ5AIOxc/pHYXIyqzneIJ02JYcXXXGAijyB7faPKlqBc0vavh8ablTU9/
-         +480IAVkhpEyY9TKMl3ym2dPu2Di76yus02hXlykdEyGvMS77TZ5jPbteER9AQhFuqFf
-         67KzbFa1R8A6mUxIo5tobCQAXdrF8ommAUo2TAYJOkXzNzHLXHlVO79b7sD19syfrNI4
-         LZ5A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=csULT7PmXNkTg9HaShgHK/UOyRj2pqW39WBnWQcueFE=;
-        fh=54thBwpvQ1BmRXHT3CJcELiBZSakDZ7K30fXvzIKgkQ=;
-        b=dSZzaULScpLHycP7Uc2EsOQj1XEeGt2jSrTB4WeSSYD9McAdbeolckAQggJh71dStm
-         sf5ENa3K2RYLJWqYm/6xnjfjAFYj2DxEhcIILR62I4LIAAqp0u5HIyuMBHS7ealxvKAS
-         xI/hkqmVyel3I+y97pNR7nwJIKwXJJh18jqcrQ8LU5HagmFN7CXOmQNGTSZGnXoRjh+0
-         MtVEsVGlPvj21apbMnqVWAwSmT/kKjSHpEotdvEJtBjcy+r0iXVNYuOGipmJM/5bki4e
-         TRWPR/4yqsbY8yhLUVwtWZC0/lH0msdwBEiWgxLZcVYld8UAHZMBi2FT9s0HqVcR/KFH
-         avqA==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=soleen.com; s=google; t=1792604334; x=1793209134; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=csULT7PmXNkTg9HaShgHK/UOyRj2pqW39WBnWQcueFE=;
-        b=R/wfDvdVrvYoxRq/P0hL7dIWM53cGYo2XM5VWIuNyxBHA/4uki1P3pUaRl76FNNfod
-         2mIEWmjmu8wC0gnNoI885fYYFsjJiefti/EROuTof03fdrWI89gdxH7RfcwVOVqCzxmd
-         YVNG5rErKF6ruwuGHNxS1f+12rXnmyR7VQ8lzVaexft4ELXULUVIRSqVWD03Kw+ZlLQX
-         hPDWiFUlu49jzUHOPMTRh+6dvnVMnGt2z7T9foSOQPTxTWoxv/GvInZl7uMYyW7Jkok5
-         NKgehHsNocX33z/s6dqGORYEZbVrGRSc8lhB+mC1kEAtGnpfg+aG+beE3xhjcj83s6xK
-         cohQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792604334; x=1793209134;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=csULT7PmXNkTg9HaShgHK/UOyRj2pqW39WBnWQcueFE=;
-        b=zMEC+oLF5h/lrWV1F8iBy6T9v56+W7cyM9inmyaJwH8zfhVWhBgTiBit+Y41snroZt
-         t8UsDkdH2glR+jFUwsjgIFPS7460txvdNbhEaBm9/R04RB6Dp9i5Imv2/1KAXYBfT/Gj
-         pu7RHQJq7RcTfvTXhmFMUISon45IRtXBiakWqY7pw6QgVeVXn4GRiSU8ZkzPKhCllTZA
-         tAjTuH3jRcCeGeGxzegT7RiWDNZzrDPGvw442fyEPTxTItkI9HsXmF1zV23Mx7ydLOFh
-         QmMfWfQTkt+6dM1JwWv44WhovXdARqkMyeYHfzcSNfGmQCDFKvRuF2giYLaVQsjMYV1s
-         KbMA==
-X-Forwarded-Encrypted: i=1; AKwUvBziNB1dFVUria/nrSgoAes/L20EddQqpWZ/vDxzgDtgYFofCi78QMyO5yS5o4WgK2OdsZfm9L0=@lists.linux.dev
-X-Gm-Message-State: AFq9FYIMtYFp4O9wkMReaZaqfl5FUHofS3dgIrNJTxXp1PJtUKKvLWml
-	Ryhoh0xagdXHOpg0b0g3Qe3o55VrwLi//1M/iFtK2EwLIkcVHD5qAvGHlKkc97L0V1U8hwC8t2r
-	Ap2Ep/YEl0h1wOOqbTL2X3DysZRv+WzDMLhG6xzN5ng==
-X-Gm-Gg: AYBFou3PAZL6fPOJu3ibHlTVsaNrEEcfCI8g36TvfhmImeXQw1zAgYVGa1mpZ21BgP7
-	WdWsiofpbU4jca1fkwbdNm3qEpCHOGxdcyySD4cR1EXCbSU8zRMc+we4N6mtrdzfiJm6qlcTYie
-	iA2NWj/y5xNRKw8pS7YCU7+RpJZLQOj0PZ9BrthuwcnGFy9Jb7cZi3exz4OKz+QtAZN0b6NoETY
-	owhbc28T+ExdmMlcaVgLUdbI93/NFY2e8lil3tEc/X8ro7PlkdL/NBFF5Tlz2JG+iFsP9ZX3RFS
-	+FCrT0z1G8n3Q8gR0vyoPu9OowK6Wh4JE1riLb3JKgrgLgzxBB6Si+svyImDYQn/O/p0R4qJ2fq
-	xT7U13FrHVOIDjEIEUKuqkvPHJuWqhvczgfZLPX24N/mkvdbOlYriCUmUBXKS6jpP/zc=
-X-Received: by 2002:a05:651c:4210:b0:3ab:473f:4340 with SMTP id
- 38308e7fff4ca-3ac44229527mr7899791fa.25.1792604334224; Wed, 21 Oct 2026
- 10:38:54 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=gBUv3QkW
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=k9HHKtENJG4+K2Rtawv6hGS2wcmr3NLX3/PslEZ62cpUbv+bGBj3/c92WBpYFRXWIO2qdt/ET2KujvOOwnrdBP/KqXA/ZYUaJxcNi8OEysWSDo+YE9cnmjXotbRkZuK+o8gy/E4s6/TwmGJDmTpGkSVzkGAnuDABgkpFevV4/0r6ju5Wk7E72Z3qA+fF/egWdQqb8A5I1Vrjr81F9eB5fL565+BttFWwP/I4M0Ldqh6i54Z9nqxcNDStHRu8PPj6Z9bKblLpUtpIc7jbvPGi5nh2VjCHzFfr3dhSSHGmU/ZM1aqrv8twI7SkxpqUqDgUrjAyqAeIf1DNJKAqKa+Rjw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Sh+BLdyawyu3x2WuC9w4sgPwmZXii/nWDIS0NOhyN2k=;
+ b=wt248RjEHiIkbQhssKKM5/K7Vfe1tUo5iDO5YAKRtGUBV34YebQo+7iIqaAmYQvrabayQbGLTzNTEPu8WJSGPjZJzGAdBDvDiURPbwMFEaBxikHiDeA83zp+HJC4RnP0AkPNVrIyASrCWqlTaivr4dVLd42/zetcV8leD+rh95vJm1+GAC12RkR3S7z3J9jo+5HV7DNRfIpLLmO1Z9bwaBG5t2OWnR/2T2awVvfpfsfrxKxJPPkvnQzcbPs0fc0bJDZXGrE/AovCuGT0W7jUEgcH06n+iQeBeEYIOQYgQDDeBXSRyQd1toFI458eQgl+iE9SvUKrLvtGWzDpfT927g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Sh+BLdyawyu3x2WuC9w4sgPwmZXii/nWDIS0NOhyN2k=;
+ b=gBUv3QkWQY0wBPHaMuiCTJfpTge3T5nYTtyCosjuaD63aaMZAOeKWK+lE7wlKNsuw+Ks+Sp/HNrQkLRJbH3yirIO8FX1bNNmcsaDGFh8cy3d2fWS4CQmFjM6vir67JGEfrBp+34FSgexMniCcoySSmhU/D3GraABO8F8uPQDfiC5SsXsDiPmCG0WEdYYUBAqEdODDECrLRpifMkPcxqVx4fZbaOt+ooiWywwbMpX6papLdnzxi2HXIEsPpPjob8OOfJnv68H1pp+S/ZhZP7ploJvf0wZNtabZHVOKgeGCjRQa8ga8dOeIHyhIeQ9FgJ4HhrYRllRNaoSozgDUOkk7A==
+Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CHBPR12MB731189.namprd12.prod.outlook.com
+ (2603:10b6:610:33d::12) by PH8PR12MB7375.namprd12.prod.outlook.com
+ (2603:10b6:510:215::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.546.15; Wed, 21 Oct
+ 2026 17:40:07 +0000
+Received: from CHBPR12MB731189.namprd12.prod.outlook.com
+ ([fe80::b0e5:123d:fe06:e10d]) by CHBPR12MB731189.namprd12.prod.outlook.com
+ ([fe80::b0e5:123d:fe06:e10d%6]) with mapi id 15.21.0546.012; Wed, 21 Oct 2026
+ 17:40:07 +0000
+Date: Wed, 21 Oct 2026 14:40:06 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Pasha Tatashin <pasha.tatashin@soleen.com>
+Cc: Tarun Sahu <tarunsahu@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>, joro@8bytes.org,
+	Mike Rapoport <rppt@kernel.org>,
+	Pratyush Yadav <pratyush@kernel.org>, maz@kernel.org, arnd@arndb.de,
+	David Matlack <dmatlack@google.com>, robin.murphy@arm.com,
+	loganodell@google.com, oupton@kernel.org, kevin.tian@intel.com,
+	alex@shazbot.org, dwmw2@infradead.org, pbonzini@redhat.com,
+	seanjc@google.com, will@kernel.org,
+	Alexander Graf <graf@amazon.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, baolu.lu@linux.intel.com,
+	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
+	sagis@google.com, linux-mm@kvack.org, kvmarm@lists.linux.dev,
+	iommu@lists.linux.dev, linux-pci@vger.kernel.org,
+	kexec@lists.infradead.org, skhawaja@google.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v2 3/4] liveupdate: Replace compatibility string with
+ a 2-bit pair feature header
+Message-ID: <20261021174006.GU3008132@nvidia.com>
+References: <20261021152527.375070-1-tarunsahu@google.com>
+ <20261021152527.375070-4-tarunsahu@google.com>
+ <CA+CK2bAQbmq3ArP3XMErF_8RC2CUwvgpLY0H83D0nCJTaVKYyA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+CK2bAQbmq3ArP3XMErF_8RC2CUwvgpLY0H83D0nCJTaVKYyA@mail.gmail.com>
+X-ClientProxiedBy: BN0PR02CA0051.namprd02.prod.outlook.com
+ (2603:10b6:408:e5::26) To CHBPR12MB731189.namprd12.prod.outlook.com
+ (2603:10b6:610:33d::12)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -104,231 +112,94 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261021152527.375070-1-tarunsahu@google.com> <20261021152527.375070-5-tarunsahu@google.com>
-In-Reply-To: <20261021152527.375070-5-tarunsahu@google.com>
-From: Pasha Tatashin <pasha.tatashin@soleen.com>
-Date: Wed, 21 Oct 2026 13:38:17 -0400
-X-Gm-Features: AclHuK9EmTvcDrSPqjt_gHIG_UhFcRBGzP6kEtdhbGsx9XevNkAWoOmg1utImw8
-Message-ID: <CA+CK2bCWo7ixrNLKPvqETn3JSFwSNaB2UsPgy9RHVAhWroJURQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 4/4] mm: memfd_luo: Add the 2-bit pair feature header
-To: Tarun Sahu <tarunsahu@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, joro@8bytes.org, 
-	Mike Rapoport <rppt@kernel.org>, Pratyush Yadav <pratyush@kernel.org>, maz@kernel.org, arnd@arndb.de, 
-	David Matlack <dmatlack@google.com>, jgg@nvidia.com, robin.murphy@arm.com, 
-	loganodell@google.com, oupton@kernel.org, kevin.tian@intel.com, 
-	alex@shazbot.org, dwmw2@infradead.org, pbonzini@redhat.com, seanjc@google.com, 
-	will@kernel.org, Alexander Graf <graf@amazon.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	baolu.lu@linux.intel.com, linux-arm-kernel@lists.infradead.org, 
-	linux-arch@vger.kernel.org, sagis@google.com, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev, linux-pci@vger.kernel.org, 
-	kexec@lists.infradead.org, skhawaja@google.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CHBPR12MB731189:EE_|PH8PR12MB7375:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0da19133-30cd-4aec-e6eb-08df2f9a58dc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|23010399003|7416014|376014|1800799024|18002099003|10067099003|22082099003|4143699003|11063799006|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	//Zveg7enEZjDC1odBo483/ecevc1uWMM/arC+UNUM1pW8mwHaLeIHpSa/T6IaFdUOWbx4pcfBk81LSSXOfcLo8V6vLWB8r44QQgSD67qmFdgoHI7aUwTkzjMGb/e9SGoNLYWHEw0NOcQIVp08zf3UtxUDsb/FGzFp4z299SSPu0iAa5tnU/1CAq+MqtHU/Iw0V4i1NvqNunASMq4PR8SEhaP6JK6hENH7P8jYt5tDfv2OxyhRTaRWPDy2By+Pv6IRBAt4IeQQnTq92i28hV0jctpJ7HEvrYYaKBp30y+LXmWBYjzM6Te5Cz4kSro4EOBnYxipKeWsP+YtNEAsJI8vhp4zsCb0Jz4H6KOHCz9QqCgOdK0zLHBf6wmFv6CYmzWKpwnx9Sgd4fLekcXTc1zfWGTebdRbZyDAO+rfoTeckn4UdUpXbDFyHKwlj/agfunYrMaYvkMX2RPxsynIAkSdR9qDryJiahCmINAiHYA6ErrkVr0oonCa7llCRl8wGpnwlJmIzSunCryePNFzGbuIvBdmLDht3CqdAomJwYguCKUV0yxjvNgqinvZfSVvYEX5SfEkRlKMnBCFKh2MFuiaVVhdfvQ199WCSFDkZVLqkKheEcbyb4HVzk/hclM8W8IqbGisJILv5z83ylzdhL7LsLYJ4uwRgVeCoaSxyr/fo=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CHBPR12MB731189.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(7416014)(376014)(1800799024)(18002099003)(10067099003)(22082099003)(4143699003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?S3QwM0xIQ1g0cEtSay9pZWEwSnlZd1M2Z2d2RUhYZzlubTc5dmovVnF5cldl?=
+ =?utf-8?B?cGNwWjg1ZkJtSEViQXlQbHFzY29VNC8wSTlTSU9ObHRYY1ltUFZ3ZlVkc2dG?=
+ =?utf-8?B?NGxjdEx0K1pDSVV0UWwzV2dvNUtYWHlzTEZXd3Y3WlFGUGlHb3Q3SkFVaWNx?=
+ =?utf-8?B?WEEzcTFPSlVKd0JlcUJoYjc5eHVBa2xFWHU1ZStCd2ZqTzN0STdYOGlFNHM4?=
+ =?utf-8?B?K2FMQnlRdk5YUFhzL1EwUWEwNUVwZ1IzQXhROGs1K2ZLT3ZxT2szai92VVdV?=
+ =?utf-8?B?MytLcm96bENxL2U1TUtEM2hSdmE4NWh0M0NoK3NYclFVbm1xeWgrMXZ6STJK?=
+ =?utf-8?B?TzVGTTc0bjJ6Y2loZ2Q0Tms2RytWamt5Z2NweUNWbDdtOHExUi8xclphaldG?=
+ =?utf-8?B?VXhmWEs1RE5ESkxzM3doRWw4V29MZWJ5bnZOV2lBZFA4OU5YUjRwcGdjOVcv?=
+ =?utf-8?B?dWNJOXIyaTMzWXpyY2JzSCtDUDU0a3NrRDFaMHVWclV3aEtoeHl3TGJDNXlV?=
+ =?utf-8?B?aUIwWWlCWThKci90OEp3NWZFRWZvU0d2QTN3YStvc0NaK2JrY2xwRlpzcGc5?=
+ =?utf-8?B?SWtaSTVuRDZ4cFRLZldaTklRRnNxYmxjZnpubXI5aXZ4cGhLK1RMQUhnZ0pV?=
+ =?utf-8?B?b0hNL1VGUm9CcVRGUS9iUGNsaUpoaWVvK0lzZlZsNzZmaGN3cEJzb1RXVjdH?=
+ =?utf-8?B?YUlkcHlzWGk2REg2MnJxOFBsT1NkWDFlSTh4a2NSMnk3OVgrUWVuczlEbUtV?=
+ =?utf-8?B?MGpYcjg2ZEl1SFY2b0lkMFNmekJBTE9vRFJwMXJYK2swK1R0dXluOGdpLzJz?=
+ =?utf-8?B?a09Cc0FwN3F0NkZKb1paWjZ0bFlaOXVmNnU3eDFNRHQyYkhjOTNSN2l6TUxo?=
+ =?utf-8?B?cGdacjdWVGRsZ3p2YXlFMSt3dGpqQmtmSXBHQzR4czVCZnJRRkp3dFp3dDZt?=
+ =?utf-8?B?bFQ5Mnc4bGE0WXBxZHV4TFNycTZIM1RKQzQvVUtpU1ZrSmlTRmc5Z1pzeCtT?=
+ =?utf-8?B?Y3Z6bXc3MUt1cEZoYVd2Y0hTdmwwVCtDQ3k2VS9CdFEzTXV4M0p6WlVObzB1?=
+ =?utf-8?B?aUVMdjhtL2l0ME5xbHgzMnkzeWVZRlovekxQK0k3ZXVKTGNOYTJXTUg0WnNt?=
+ =?utf-8?B?Vml4ZWxUOUMrQWVtS3JoYXpGSk5KM0hxOG1RNkEzQmt5bS9ZUFN0akxZS1JZ?=
+ =?utf-8?B?d2o0ZGcwYzQ0eEhFbkczSjg4S0MzVXB0SEVGczh5dkJRL2FiSlU0WTVZblJK?=
+ =?utf-8?B?bzByLzA5Yy9kNVkwYjJoQVF4bXMvV0ZhVE5IVWxnd0dabFlaUy82cEVPS2pu?=
+ =?utf-8?B?WGpLTDU5K01uM1p5Q05lcEFrRVovSHpqNDdaYTloeTNJSHhxKzdZaEZvMitJ?=
+ =?utf-8?B?Tjg2M0dVYyt4SWZYcGN5a3IraDlxR3pTQTgvdG16RlAvSU5WSFVGWWxVVnJx?=
+ =?utf-8?B?NGpDL0dmZkU3MVFVYUVjbEZGKzk1WXlPdzFxNFZSMGkrZVhxVlBOQ3B6OHRI?=
+ =?utf-8?B?cmVPbFk3ZlNUdll1a3g0ZW9OdjNPdXRLaEQvUTBFNWtvVVVQSWpiS2ozUXRo?=
+ =?utf-8?B?a1RhNGZXU2NKSHh1Yk53UnZsQlVOYnl3bDhSMmVaSG5rRDU0S2xVY2JqNk1E?=
+ =?utf-8?B?ODNEYVRXTnFWWC9OdU5talFpOURJVm1SMTZxU0VZRytUc0dnd0M4VWdoSTB3?=
+ =?utf-8?B?SUFvMmZSUWgrOExKd05SeDh4UGl2V0dqWFF4N1M5T1ltWk44U1U0YkdhVmhj?=
+ =?utf-8?B?bVd1NmF1ZENqQkZMWWZxcTBncnI4RVNSaXd3K2V3WFA1Z0paak5JNEpvaWhp?=
+ =?utf-8?B?RlR2cXQ1VjZhaFNIUy9WSEJlSTJrNWZqdUhvbDlKTFZ6c0tCSnN2N1NNdXhn?=
+ =?utf-8?B?a1JCb3U1WDN2VTlHOC9qK05uUkVhc3ZUNHVhVzdLcHRRQ0NzMm1KbjNkYlR0?=
+ =?utf-8?B?d0Z3NlJ4TGRSalRwMnQ1S3pMN2NQazIzQ2N3V3ZlRmRndXNRNXhkeTRYWFRB?=
+ =?utf-8?B?TlRQdGpJVGpDdzQvcXhnSjd1QjlkRS81VTBiSmY2d3UvMjhjUzN4VDFjeTdn?=
+ =?utf-8?B?dkx3eFVka2xUWCtYMGVreUdmek1lV05XalpNMDQ0NWorTDhDRzhuUit4TFhU?=
+ =?utf-8?B?V1VKTVZLZnZ3eFpFbHcvYTNpYkc1QmVXbVhZZnQwbUVGRGdLYmJmYjhINUpi?=
+ =?utf-8?B?d2JCcURlWksrazlRdHVJSllnSWY4SzNuRE1Qekp5bGRQS0w2ZmlQd1R3ZWhW?=
+ =?utf-8?B?d213OWZ0SWpDQTc2RFZZdUdPT0I4VG9NNnBXVUJiMkwvck5hVlkyL3I3NEVN?=
+ =?utf-8?Q?p/X4sLqUr2pBiB1mfb?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0da19133-30cd-4aec-e6eb-08df2f9a58dc
+X-MS-Exchange-CrossTenant-AuthSource: CHBPR12MB731189.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2026 17:40:07.3422
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 794ZxyqdEjLv0iivdjt47az1uT9Z2XsAePZvyGVDFO6Lfz9QPB0c7U1IZHywYA9q
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7375
 
-On Wed, Oct 21, 2026 at 11:25=E2=80=AFAM Tarun Sahu <tarunsahu@google.com> =
-wrote:
->
-> Embed the fixed-size 128-byte struct luo_feature_hdr at the start of
-> struct memfd_luo_ser and define enum memfd_luo_feature
-> (MEMFD_LUO_FEAT_CORE and MEMFD_LUO_FEAT_MAX) for memfd preservation.
->
-> All current struct memfd_luo_ser fields (pos, size, seals, flags,
-> nr_folios, folios) and MEMFD_LUO_ALL_SEALS belong to
-> MEMFD_LUO_FEAT_CORE (LUO_FEAT_REQUIRED in memfd_luo_features). Future
-> changes add new entries to enum memfd_luo_feature before
-> MEMFD_LUO_FEAT_MAX and append any new fields to the end of struct
-> memfd_luo_ser so existing field offsets never shift.
->
-> Signed-off-by: Logan Odell <loganodell@google.com>
-> Signed-off-by: Tarun Sahu <tarunsahu@google.com>
-> ---
->  include/linux/kho/abi/memfd.h | 35 ++++++++++++++++++++++++++++++-----
->  mm/memfd_luo.c                | 14 ++++++++++++++
->  2 files changed, 44 insertions(+), 5 deletions(-)
->
-> diff --git a/include/linux/kho/abi/memfd.h b/include/linux/kho/abi/memfd.=
-h
-> index 371ffd108a79..f0b5235a408d 100644
-> --- a/include/linux/kho/abi/memfd.h
-> +++ b/include/linux/kho/abi/memfd.h
-> @@ -13,6 +13,7 @@
->
->  #include <linux/types.h>
->  #include <linux/kho/abi/kexec_handover.h>
-> +#include <linux/kho/abi/luo.h>
->
->  /**
->   * DOC: memfd Live Update ABI
-> @@ -21,11 +22,20 @@
->   * reboot using the LUO.
->   *
->   * The state is serialized into a packed structure `struct memfd_luo_ser=
-`
-> - * which is handed over to the next kernel via the KHO mechanism.
-> + * which is handed over to the target kernel via the KHO mechanism.
->   *
-> - * This interface is a contract. Any modification to the structure layou=
-t
-> - * constitutes a breaking change. Such changes require incrementing the
-> - * version number in the MEMFD_LUO_FH_COMPATIBLE string.
-> + * This interface is a contract. `struct memfd_luo_ser` starts with a fi=
-xed
-> + * 128-byte `struct luo_feature_hdr`. The relative order and offsets of
-> + * fields must remain unchanged as features are added or retired: new fi=
-elds
-> + * are appended at the end of `struct memfd_luo_ser` under a new feature
-> + * flag in `enum memfd_luo_feature` (before `MEMFD_LUO_FEAT_MAX`), and
-> + * retired fields are kept in place so subsequent offsets never shift. I=
-n
-> + * the target kernel, fields of a `LUO_FEAT_REQUIRED` feature are guaran=
-teed
-> + * present once `luo_feature_hdr_validate()` succeeds, whereas fields of=
- a
-> + * `LUO_FEAT_OPTIONAL` feature should be accessed only after checking
-> + * `luo_feature_is_active()`. All current fields (`pos`, `size`, `seals`=
-,
-> + * `flags`, `nr_folios`, `folios`) and `MEMFD_LUO_ALL_SEALS` belong to
-> + * `MEMFD_LUO_FEAT_CORE` (`LUO_FEAT_REQUIRED` in `memfd_luo_features`).
->   */
->
->  /**
-> @@ -58,7 +68,7 @@ struct memfd_luo_folio_ser {
->
->  /*
->   * The set of seals this version supports preserving. If support for any=
- new
-> - * seals is needed, add it here and bump version.
-> + * seals is needed, gate them behind a new feature flag.
->   */
->  #define MEMFD_LUO_ALL_SEALS (F_SEAL_SEAL | \
->                              F_SEAL_SHRINK | \
-> @@ -67,8 +77,22 @@ struct memfd_luo_folio_ser {
->                              F_SEAL_FUTURE_WRITE | \
->                              F_SEAL_EXEC)
->
-> +/**
-> + * enum memfd_luo_feature - Feature indices for &struct memfd_luo_ser.
-> + * @MEMFD_LUO_FEAT_CORE: Core feature covering `pos`, `size`, `seals`, `=
-flags`,
-> + *                       `nr_folios`, `folios`, and %MEMFD_LUO_ALL_SEALS=
-.
-> + * @MEMFD_LUO_FEAT_MAX:  Number of defined &enum memfd_luo_feature featu=
-res.
-> + */
-> +enum memfd_luo_feature {
-> +       MEMFD_LUO_FEAT_CORE =3D 0,
-> +       MEMFD_LUO_FEAT_MAX,
-> +};
-> +
-> +static_assert((int)MEMFD_LUO_FEAT_MAX <=3D LUO_FEAT_MAX);
-> +
->  /**
->   * struct memfd_luo_ser - Main serialization structure for a memfd.
-> + * @features:  ABI feature and size header for memfd_luo_ser.
->   * @pos:       The file's current position (f_pos).
->   * @size:      The total size of the file in bytes (i_size).
->   * @seals:     The seals present on the memfd. The seals are uABI so it =
-is safe
-> @@ -79,6 +103,7 @@ struct memfd_luo_folio_ser {
->   *             struct memfd_luo_folio_ser.
->   */
->  struct memfd_luo_ser {
-> +       struct luo_feature_hdr features;
+On Wed, Oct 21, 2026 at 01:27:22PM -0400, Pasha Tatashin wrote:
+> On Wed, Oct 21, 2026 at 11:25 AM Tarun Sahu <tarunsahu@google.com> wrote:
+> >
+> > LUO and its file handlers validate handed-over state with monolithic
+> > compatibility strings ("luo-v5", "memfd-v2"). Any change to a serialized
+> > structure, even an optional additive one, must bump the string, which
+> > breaks live update between adjacent kernels. Replace the string in
+> > struct luo_ser with a feature header, so that the target kernel can
+> > accept or reject the source kernel state per feature.
+> >
+> > struct luo_feature_hdr is a fixed 128-byte header: the serialized
+> 
+> This patch is all wrong; 128 bytes is far too large. For every _ser
+> struct, we only need 8 bytes instead.
+> 
+> The first 4 bytes are the size, and the next 4 bytes are flags (i.e.,
+> 30 feature flags + 2 reserved bits for flags extension). The last two
+> bits of the flags indicate whether an extended flags field is present.
+> Each extended flags field is 8 bytes, and its last two bits indicate
+> that yet another extended flags field follows.
 
-I have not looked into this yet, but I would prefer to use some kind
-of macro constructor for serialized structs. That way, they will
-automatically include the header, making it easier to search the code
-for what is actually preserved versus what exists only in this kernel.
+I thought we agreed not to loose the string too, it was a tree
+ string -> feature flags -> individual values
 
-So, I think something like this:
-/* Base serialization header: 4 bytes total size, 4 bytes flags */
-struct luo_ser_hdr {
-    __u32 total_size;
-    __u32 flags;
-};
+The string is the emergency if we really badly mess it up.
 
-#define LUO_SER_INIT_HDR(obj, _flags) do {           \
-    (obj)->hdr.total_size =3D sizeof(*(obj));          \
-    (obj)->hdr.flags =3D (_flags);                     \
-} while (0)
-
-#define DECLARE_LUO_SER(name, expected_size, members)       \
-    struct name {                                           \
-        struct luo_ser_hdr hdr;                             \
-        members                                             \
-    };                                                      \
-    static_assert(sizeof(struct name) =3D=3D (expected_size),   \
-                  "LUO struct " #name " size mismatch!")
-
-Usage:
-/*
- * Header:  8 bytes (hdr: 4 bytes total_size + 4 bytes flags)
- * Payload: 8 (pos) + 8 (size) + 4 (seals) + 4 (_pad) =3D 24 bytes
- * Total:   32 bytes
- */
-DECLARE_LUO_SER(memfd_luo_ser, 32,
-    __u64 pos;
-    __u64 size;
-    __u32 seals;
-    __u32 _pad;
-);
-
-struct memfd_luo_ser *ser;
-...
-LUO_SER_INIT_HDR(ser, 0);
-
-Thanks,
-Pasha
-
->         u64 pos;
->         u64 size;
->         u32 seals;
-> diff --git a/mm/memfd_luo.c b/mm/memfd_luo.c
-> index 64f8b8cb75bd..ea1f4c8cd259 100644
-> --- a/mm/memfd_luo.c
-> +++ b/mm/memfd_luo.c
-> @@ -84,6 +84,10 @@
->
->  #include "internal.h"
->
-> +static const u8 memfd_luo_features[MEMFD_LUO_FEAT_MAX] =3D {
-> +       [MEMFD_LUO_FEAT_CORE] =3D LUO_FEAT_REQUIRED,
-> +};
-> +
->  static int memfd_luo_preserve_folios(struct file *file,
->                                      struct kho_vmalloc *kho_vmalloc,
->                                      struct memfd_luo_folio_ser **out_fol=
-ios_ser,
-> @@ -284,6 +288,8 @@ static int memfd_luo_preserve(struct liveupdate_file_=
-op_args *args)
->                 goto err_free_ser;
->         }
->
-> +       luo_feature_hdr_init(&ser->features, sizeof(*ser),
-> +                            memfd_luo_features);
->         ser->pos =3D args->file->f_pos;
->         inode_size =3D i_size_read(inode);
->
-> @@ -525,6 +531,14 @@ static int memfd_luo_retrieve(struct liveupdate_file=
-_op_args *args)
->         if (!ser)
->                 return -EINVAL;
->
-> +       err =3D luo_feature_hdr_validate(&ser->features, memfd_luo_featur=
-es);
-> +       if (err) {
-> +               pr_err("memfd_luo_ser feature header validation failed (s=
-ize=3D%llu, flags[0]=3D%#llx): %pe\n",
-> +                      ser->features.size, ser->features.flags[0],
-> +                      ERR_PTR(err));
-> +               goto free_ser;
-> +       }
-> +
->         /* Make sure the file only has seals supported by this version. *=
-/
->         if (ser->seals & ~MEMFD_LUO_ALL_SEALS) {
->                 err =3D -EOPNOTSUPP;
-> --
-> 2.56.0.212.g129ede20d9-goog
->
+Jason
