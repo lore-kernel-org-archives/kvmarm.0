@@ -1,96 +1,59 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792593011;
-	b=TvXlQQuWj9ejMt3XOSEABF0UpVgA2OAcKY++qaNzneEqwBfytAlohFDD2qOWJrV0UVFp
-	 MUzS4OVpUopFoDkb/2qFyDiorqBTEJPlYjj6DcCr9JTH6RgqxvRqpUtphZTKnrwKtaJtN
-	 gzkcGMLJCjeHNrv7kfVnDnkhgeEe4H6QC1M8TEqxmDXzKMUvh6QuUfesdlFIFhipNsy+z
-	 /SgHpenNNy7bjwIeiZ5ixgrw53QgEvnGyOSL91PysFUomPn+QJ8mEJdiH5kLwyK4/C2qq
-	 ThgwIDp0XNXg9NE1JHzqWZPCdzBuX7okSaGe0OqWQb9fvJj6xo97kERJT896FlRsDsg==
+	t=1792594893;
+	b=4djRa0W2nUsP0/O+hA1QZ1ZK9+ZugWSpI7T7ITM0YkBL2WUuW4gSvx0GveRbRJs0FU9J
+	 QIKnvCeL+Ri39m2W7QWQpnmL7f1tQjQSlYfoKVWTEiaNa76dHmZecTFCr6QQ/jtSnq5rK
+	 Glz4mzbPbL/PfdicjldDiLzPNUy320WQYypEDoBk6i4Z35+4y/aGEPnRbeP8LUNCPsMIi
+	 gpuf5jSRqSvvkFxxLKV02hnyUHd/tFOJJVRKvxrsNd/1Ya6XGX1LSLekFkwvCJ/yrSzM8
+	 s6nmK+FaZlfsBWie1CP89tb9jzYPwTxnZx3yyL/rswE7ZQJthYLxPWyVwMNf2BS3D2g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792593011;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=957G2mErVd6A0+xGGgP3Dv2Yz/cVZ3gHz/1oWxMzJUI=;
-	b=cIAJMEDBkvwSQh/GoiWlPMSwsWx/tvlZhQQBlB2/lkGmXMIO0nVPa7bgHHpWedFBgnm5
-	 IydnESJFc4uobFlT9eF0ZUBoDAuAAiDaTHxl35GoEXFZPVIIDcPtyCoiC/Cwc17h5uVQ/
-	 GpPc8LewZ0jHU546JoijUFwaBzZyGIgroMsG+3Q0+YE/01V/N/Gm8cSuKJVsgqFYmeGL4
-	 BoYqbl7wDJZqXKHU7ag34wB0IvuGxz7E3lIfOiU5znEekmRil1Ob9SDmtFXhvIcniP0u4
-	 PLtl9sR5ng70pjutAfdr65uC+52K/GPW7Cmz9tBDt6caImFdVcZAigUTc1CjNVK2h7w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792594893;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=A4guUMc9i9ehpF1G8jQSt60WOuL8gly2/KcblJXhFIY=;
+	b=14jUndmvLiJ9nbv0C6j7Q7s+jLr5XV01Gk+YYpeKgCUC6oyxlqeQS77mqUP3A273AaSq
+	 +EET/QFhqO7BbQ8oTHUshIlDhfrlUQM4b0XHNxyF5oOyF0HIcfE4lM6glzHezPrtk96kj
+	 aTfDtu0Jm/NGfCkX15Bo+QN8uAtCSfV1CQ4iQqdcY2Vssg/HzlBa3QBWxQqbxc9AjslZv
+	 gC95FekYagLnfIqF22HSYOmmnqdokq3heeoMEVXtV2tF5vubt6V7a+wwRA+PRTkvZJj+K
+	 a/yX1Pzm2NwaXvTAtpaEL7CW12+Y/yvHf/mat5GjS9gkm6PlI3IABG/Dw+2oxY7p2wA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Jaf2r3ld;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Xba3Sfr2;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98D5606A31A;
-	Wed, 21 Oct 2026 14:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA86606A319;
+	Wed, 21 Oct 2026 15:01:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Jaf2r3ld
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 837CF1F000C4;
-	Wed, 21 Oct 2026 14:30:10 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Xba3Sfr2
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EC2F1F000C1;
+	Wed, 21 Oct 2026 15:01:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792593010;
-	bh=957G2mErVd6A0+xGGgP3Dv2Yz/cVZ3gHz/1oWxMzJUI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Jaf2r3ld/vpyAqfuxLoNTCUrwseVzC/QmW175rdNMmKgtM9t36o4o481+8Cxj7rZW
-	 rp1S0XUsvlovMMNmIwoCvOy2J6+zIQiLquI3PLygoNGmacXnuZq7io5y/rPeO8mvJH
-	 XbQ07nEJJYqVMOosLQwWZV2a0B2IdhH9AWezII3rZeszrMa5UZ2y9S7yOpqPzHNGHu
-	 eRH8TOIBo4QM+vwg9utUNMlMIFtbd5krXKuO7GVRc2babNJANBA7E1HLU7tgiJVW3A
-	 HOCxhHQKoWIkmK6GUq64ZMuekeyfFEBocBwVCHDAfXhQnPrdyaH5a0B6af6pOHdt3I
-	 3jTEDoPa3OrDQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xJXKS-00000005hTS-0Cu0;
-	Wed, 21 Oct 2026 14:30:08 +0000
-Date: Wed, 21 Oct 2026 15:30:07 +0100
-Message-ID: <86ld7ryvm8.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	will@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	steven.price@arm.com,
-	aneesh.kumar@kernel.org,
-	oupton@kernel.org,
-	gshan@redhat.com,
-	joey.gouly@arm.com,
-	tabba@google.com,
-	yuzenghui@huawei.com,
-	linux-coco@lists.linux.dev,
-	gankulkarni@os.amperecomputing.com,
-	sdonthineni@nvidia.com,
-	alpergun@google.com,
-	fj0570is@fujitsu.com,
-	WeiLin.Chang@arm.com,
-	lpieralisi@kernel.org,
-	enju.kohei@fujitsu.com,
-	sudeep.holla@arm.com,
-	jonathan.cameron@oss.qualcomm.com
-Subject: Re: [PATCH v19 5/7] firmware: arm_rmm: Activate the RMM
-In-Reply-To: <5d487949-9195-442f-97af-acb9e3fdfb0d@arm.com>
-References: <20260924135201.850038-1-suzuki.poulose@arm.com>
-	<20260924135201.850038-6-suzuki.poulose@arm.com>
-	<arZmXFw5Jw2IbAmA@arm.com>
-	<a11aba04-eaaa-43fd-988b-a2581b1b2fdb@arm.com>
-	<araketG70TIKeNuf@arm.com>
-	<12e83d88-de4c-4230-aac2-1796123320ad@arm.com>
-	<70d47475-e26e-40e1-b409-b0c16aecb8c0@arm.com>
-	<195cdfe4-a55a-453f-9c34-620738eca244@arm.com>
-	<arqrZ_Auk9BYOopa@arm.com>
-	<0f68dcff-1dfe-4515-9912-515ca6457674@arm.com>
-	<arudWVBPXcnUvYNh@arm.com>
-	<5d487949-9195-442f-97af-acb9e3fdfb0d@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1792594892;
+	bh=A4guUMc9i9ehpF1G8jQSt60WOuL8gly2/KcblJXhFIY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Xba3Sfr20Kz5gusDKlhGPB3CawV7BST+aPzpn6mJzugFRMC+iYEF0//1hJzhbhn5B
+	 FpgprOld7c3FBThNJEx6YKXfgUWaXn73oa7/WoC6aQu97ASe6/crpYX+EXseyo/tfj
+	 nh9yvk54UUA9/Jqpzbb1Y2OvJkbnXn6oqsu8W9B93EawaCC3uz5o9Ns19Bs8dcq66r
+	 W5QSNhK3dUxYpMMFtCIdBs6EIFBx8gtGp7sEp5WlZWLmY3fWTPtCxZ1lLjIHPYGeNH
+	 rfMdw2Cxm6lDO2ECHr+MtIu10ADMmsFvc0tAIuubT+nmA8XSiOMjp6vT2qvi9uXRN5
+	 +H7iCZ4kynszw==
+Date: Wed, 21 Oct 2026 16:01:26 +0100
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>, Oliver Upton <oupton@kernel.org>, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Mark Brown <broonie@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] KVM: arm64: Sanitise ID_AA64MMFR3_EL1.S1P[IO]E
+Message-ID: <atjSmLQbm7-_oRPv@gremlin>
+References: <20261020064306.1542865-1-fuad.tabba@linux.dev>
+ <atc2Y4gHwtGlffns@gremlin>
+ <CA+EHjTxMGFuZHPp8ULkpUiGhXos8f1B8kZ1FDigFE7afR=X6AQ@mail.gmail.com>
+ <86o6cnywvb.wl-maz@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -99,67 +62,71 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, catalin.marinas@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com, joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com, lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com, jonathan.cameron@oss.qualcomm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86o6cnywvb.wl-maz@kernel.org>
 
-On Wed, 21 Oct 2026 10:58:13 +0100,
-Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
-> 
-> On 29/09/2026 12:15, Catalin Marinas wrote:
-> > On Mon, Sep 28, 2026 at 07:28:20PM +0100, Suzuki K Poulose wrote:
-> >> On 28/09/2026 19:01, Catalin Marinas wrote:
-> >>> possible, to defer the RMM activation until the first user (still do the
-> >>> RMI probing as an initcall). If we run on RME-capable hardware and
-> >>> firmware but don't care about realms or TSM, we still get the normal OS
-> >>> functionality.
-> >> 
-> >> Would you prefer this in the first drop of the RMM ? Or is this
-> >> something we could add as a separate series ?
-> > 
-> > I think we could add the deferring as a separate patch, maybe together
-> > with the KVM bits. An advantage of keeping it here if we merge this
-> > first is that we still exercise the activation path without full realm
-> > support or TSM. Otherwise a lot of this would be dead code until the
-> > other series arrive. Either way, do it as as separate patch on top of
-> > this series.
-> > 
-> 
-> I have been looking at the "on-demand" activation support and came
-> across the following design decision.
-> 
-> * We have KVM_CAP_ARM_RME which advertises that KVM can create Realm VMs
->   to the userspace. A VMM could check this before it creates a Realm VM
->   using KVM_CREATE_VM with type=RealmVM.
-> 
-> 
-> Now, we could delay the RMM activation as late as the KVM_CREATE_VM and
-> kick it off while we initialise the kvm as part of kvm_arch_init_vm().
-> But if that fails, we would fail the KVM_CREATE_VM.
-> 
-> The question is, what should KVM_CAP_ARM_RME indicate ?  We could
-> initially enable the cap based on the presence of RMM (but not
-> activated). However, should we turn the KVM_CAP_ARM_RME=off when we
-> fail to activate the RMM ? Is that senisble ? (i.e., runtime
-> disabling a cap).
+On Wed, Oct 21, 2026 at 03:03:04PM +0100, Marc Zyngier wrote:
+> On Tue, 20 Oct 2026 20:30:56 +0100,
+> Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> >
+> > >> @@ -59,6 +59,7 @@ struct reg_feat_map_desc {
+> > >>         const struct reg_bits_to_feat_map feat_map;
+> > >>         const struct reg_bits_to_feat_map *bit_feat_map;
+> > >>         const unsigned int                bit_feat_map_sz;
+> > >> +       const unsigned int                idreg_idx;
+> > >
+> > > This field feels a bit hazardous - 0 is a valid index and now things that
+> > > don't declare it are setting a valid value.
+> >
+> > idreg_idx is only read for the descriptors in idreg_feat_maps[], which
+> > all come from DECLARE_IDREG_FEAT_MAP(), so the 0 in the others is
+> > never used. Storing the encoding would work as well, I'll leave that
+> > one to Marc.
+>
+> I don't think we should baby-sit people who hack this code. If you put
+> something that is not the output of IDREG_IDX(), you get to keep the
+> pieces. If you use this out of context, it will blow up in your face.
 
-I think this sets a bad precedent. If activation can fail, KVM end-up
-not delivering on the promise that it makes, and that's not great.
+That's fair enough, I did worry a bit about identifying the idreg variant
+vs. not from a reg_feat_map_desc instance though?
 
-My take is that the least surprising behaviour is best. If you have
-bought into the CCA kool-aid by enabling it on the kernel command
-line, that's not by accident. You expect your VMs to reliably be
-created when KVM tells you that CCA is available.
+> > >> +static bool idreg_deps(struct kvm *kvm, const struct reg_feat_map_desc *r)
+> > >> +       for (int i = 0; i < r->bit_feat_map_sz; i++) {
+> > >> +               if ((r->bit_feat_map[i].flags & CALL_FUNC) &&
+> > >
+> > > What if it isn't a CALL_FUNC feature?
+> > >
+> > > Could this loop just be replaced with compute_resx_bits()?
+> >
+> > It's skipped, so a dependency written as a plain field match would be
+> > silently ignored. Both entries today are CALL_FUNC, but
+> > compute_resx_bits() handles every kind of entry and would also give
+> > the res1 line something to set. It'd mean moving idreg_deps() below
+> > it.
+>
+> I really do not want to drag compute_resx_bits() into this. None of
+> that stuff is RESx. It is bad enough that we use the same structures
+> to represent different type of dependencies. I also want to add new
+> ways to affect ID registers that really do not fit the RESx handling.
 
-So KVM_CAP_ARM_RME should indicate whether the RMM has been
-successfully activated, and nothing else.
+I wonder if it's worth breaking out the resx stuff into something separate
+that both call? As a follow-up obviously.
 
-Thanks,
+>
+> > Marc, compute_resx_bits(), the rename and the loop rework are all fine
+> > by me. If you agree, I can respin with them, or you can fold them in
+> > when applying, whichever is easier for you.
+>
+> I don't care about the name, but I don't want the rest of the proposed
+> changes.
 
-	M.
+Fine with me ;) the logic all looks fine so these were nits.
 
--- 
-Without deviation from the norm, progress is not possible.
+As you are indifferent on name, do you mind having the two functions one
+calling another? That is a lot clearer to my eyes. But also not a
+showstopper, obviously!
+
+--
+Cheers, Lorenzo
