@@ -1,58 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792589316;
-	b=2SRocfJztZA0VjXo/ETCYPQwRQXMFHCaW8QUuJrIY/zETi9v2ix62kjNsSS/2bdn8Ifj
-	 HHgdO1qxLHwIY7F7RSc3E9fw1fTvXppnqc3+yftdWRTtAfE6eJCJfe9HRESO+swjmigkQ
-	 HC2Jpcuyzsl/8eZrs7lJh/WOOKDG6d5vB+RyUS1GQkbHYXCjE2wDELZW2YQhKutbbUADt
-	 /Icv/O0HkCdDmxgzxPsHOSXvi/nRd8YHNmNmtdSbxu5PM6+Xyq9UVadvvSYWNlU/NoJb2
-	 lEnuDzBBsGC0EpuqEvnb0k1RNu1Pp4BHkck18GpB6510S6XvFUyuHIuzq65X11JXn7Q==
+	t=1792589754;
+	b=NFAC7Y2YaRfeQDaeoEqnz9Q9+4LfDO9POC7lcKdGgK8FVv8LSgbGgbpIrjDHQLasWeAL
+	 aTW5LX64cizxDm63t+ERqMW9WTDCAkaDb9Ru2uPTvVUiyuPsECMBeuHAf5t4vc+c4ibN7
+	 3xxOU5UrkmqgAp4bJYuh3YGMf5I/rrl+LGdEeYxYRP70ZN7Ju+ay3tO/utcivoQahWUMc
+	 w95OOVOAzKO3e5YasriJB0i7xCaGmntSdM1fn0p1IWYf4xUFvBsX7KA1BaEDjgwlHLNYP
+	 hfXG7wnl+no4TVjbx1ReeXKbSdIQdLLi4nyqS7hYUcsmqEP+LgehjBKkvUrthFX5ivA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792589316;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=oMGqCUBvkzKyHx9AT+4QUIhrDabLOK6bK0GYypE8T3U=;
-	b=C4lNW/lwvvblzxJBJkyK0K9XBDEa54hzRh/IRMghhjf8yg/pTeo1as8htp5xuryEgcZj
-	 8r8iNN1hJVZZ+9UyYvbhO16ayx/HvLYZY4r3W5jP6DTwCtnkROB0rifP9X6CET5+OEUoI
-	 hkaJ1fVy1JZSEadrVfGnSGJj7v97qxpn96EJYmKmwfvuxskyVDATQxdSr3qjEOCJi5Juk
-	 Zyjovd4Cz4Ki8S346dusPTfX33qTAJeWiN9NejRa4fhnwIiFDbgDsNZGJEZSjG4JQURHa
-	 F30Qff+ofF9Lr3e7EpBU389ejcEDWRHoCXBlk2NF5jKZf0Od9NgXWq+ZkLiaz/c112Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792589754;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:Content-Language:To:Cc:References:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=TWEer91pURJKpMqcGr1P37YbC2QaRDdu+H8+zHCyteo=;
+	b=5sg4U3JLY0g2JC/ymkPHX9AG0X2ElpiHhu2OBChbJobwduOj2HlKWJKxwl7U4eumyqiX
+	 LPCX0ZA+MK6kZQ+4dqj6cizCTIp847vmjXEkCNmlwU+V3YsczZAsXjDFaadkTNfWFStyZ
+	 rQEnPYf8BwRBUWjJ49p/Mns8O9tNY2tin0aLV6u/WYp1x0l5lT2KCmb5Fxv8a2KNYg1LI
+	 aybhNkqt+C+EyD6VpLIljHsa7aSlXQpezhWT4+oK6GCzm7urM+FZhFNPC5RF7TrdzISnM
+	 iW/mQHWyEXh2kqbsHfVMjjHmV2vQcRuxHhErx2Na7AJRIiQKXJzmAKx3ADh3oTItPZg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jWbuEhCR;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3519E606A319;
-	Wed, 21 Oct 2026 13:28:35 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=nYXLNQ+m;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B518606A31A;
+	Wed, 21 Oct 2026 13:35:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4B518606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jWbuEhCR
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EADF61F000C4;
-	Wed, 21 Oct 2026 13:28:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792589315;
-	bh=oMGqCUBvkzKyHx9AT+4QUIhrDabLOK6bK0GYypE8T3U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=jWbuEhCRUfg7HSS5kAjkc0CEflHpYNfFhGnBYKQbboed1IQQferHvn1sOSJslAVBI
-	 WV1ui3+W3v98X+CCX6+wMnWqabDWCrOx1BcjIyG7RAnnhjYWGO3wqO/BWGXiRPn3/G
-	 GNR/2zc2tRZWZlCqNyP6C/8CnCNB+cyuhNFDQfUvSbtJkSRf4Y8HG5Wi1N0wzb8mKg
-	 QKD5tjhp0cUzYqsPvhaguchFdk+M6Hq9NMV1lRsEUEd0m5KnudPqgxbbIlLXFlZ9BF
-	 6PP+Woil9GKEwXKoKSzKo+juFtkhgZQdNhR0yuOCrNVUdR/ykYExRDhGffExZFhgkJ
-	 S6VA+EB4G1KEg==
-Date: Wed, 21 Oct 2026 14:28:29 +0100
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Mark Brown <broonie@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] KVM: arm64: Sanitise ID_AA64MMFR3_EL1.S1P[IO]E
-Message-ID: <ati9chI3v4jOuAiT@gremlin>
-References: <20261020064306.1542865-1-fuad.tabba@linux.dev>
- <atc2Y4gHwtGlffns@gremlin>
- <CA+EHjTxMGFuZHPp8ULkpUiGhXos8f1B8kZ1FDigFE7afR=X6AQ@mail.gmail.com>
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=nYXLNQ+m
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E59A616F8;
+	Wed, 21 Oct 2026 06:35:48 -0700 (PDT)
+Received: from [10.0.129.145] (Suzukis-MBP.cambridge.arm.com [10.0.129.145])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 15B443F7B4;
+	Wed, 21 Oct 2026 06:35:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1792589752; bh=K1+XouPflyX+8G49/HiO730D52/jF3umhs279EWrgBY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=nYXLNQ+m65v1I4y0obonQ9lqui4JgOt4+DqhX03+NXDRwPJhBR+5eXzu3HFypdarB
+	 260uJDalXUV9HrTgNpR7ZPbYtjl9wbcutcQcYsbMycxZAFFN23wSwQesecaDaWSXY8
+	 V9wUjjfnHaCB1HCL+OPrGx+2p/vshWxKbHaQoRJo=
+Message-ID: <34bf0c98-35b1-4402-842f-a100245cb9a7@arm.com>
+Date: Wed, 21 Oct 2026 14:35:47 +0100
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -62,100 +53,173 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTxMGFuZHPp8ULkpUiGhXos8f1B8kZ1FDigFE7afR=X6AQ@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v22 06/10] firmware: arm_rmm: Ensure the RMM has GPT
+ entries for memory
+Content-Language: en-GB
+To: Kohei Enju <enju.kohei@fujitsu.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+ will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, sudeep.holla@arm.com,
+ jonathan.cameron@oss.qualcomm.com, Soby Mathew <Soby.Mathew@arm.com>
+References: <20261002061507.1600269-1-suzuki.poulose@arm.com>
+ <20261002061507.1600269-7-suzuki.poulose@arm.com>
+ <atiyZ7_S7aBxowIQ@FCCLS0092175.localdomain>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <atiyZ7_S7aBxowIQ@FCCLS0092175.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 20, 2026 at 08:30:56PM +0100, Fuad Tabba wrote:
-> Hi Lorenzo,
->
-> On Tue, 20 Oct 2026 12:35:14 +0100, "Lorenzo Stoakes (ARM)"
-> <ljs@kernel.org> wrote:
+Hi
+
+On 21/10/2026 14:07, Kohei Enju wrote:
+> Hi Suzuki,
+> 
+> I've tested this series and found a possible TF-RMM issue.
+> Please  below.
+> 
+> On 10/02 07:15, Suzuki K Poulose wrote:
+>> From: Steven Price <steven.price@arm.com>
+>>
+>> The RMM maintains the state of all the granules in the system to make
+>> sure that the host is abiding by the rules. This state can be maintained
+>> at different granularity, per page (TRACKING_FINE) or per region
+>> (TRACKING_COARSE or TRACKING_INTERMEDIATE). The region size depends on the
+>> underlying "RMI_GRANULE_SIZE". For a "coarse"/"intermediate" region,
+>> all pages in the region must be of the same state, this implies we need to
+>> have "fine" tracking for DRAM, so that we can delegate individual pages.
+>>
+>> For now we only support a statically carved out memory for tracking
+>> granules for the "fine" regions. This can be extended in the future to
+>> allow modifying the tracking granularity and remove the need for a
+>> static allocation by the firmware.
+>>
+>> Similarly, the firmware may create L0 GPT entries describing the total
+>> address space. But if we change the "PAS" (Physical Address Space) of a
+>> granule, then the firmware may need to create L1 tables to track the PAS
+>> at a finer granularity. Linux therefore checks if the platform firmware
+>> manages the PAR region. i.e., the firmware is in charge of managing the
+>> L1 GPTs (creation and the required memory for the GPT tables - via static
+>> carveouts) without host intervention. Support for dynamic GPT creation by
+>> the host will be added later.
+>>
+>> If the firmware requires us to manage the tracking or GPT memory,
+>> deactivate the RMM and reclaim any memory donated at RMM activation.
+>>
+>> Apply the same checks when hotplugged memory is brought online.
+>>
+>> Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+>> Tested-by: Gavin Shan <gshan@redhat.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> ---
 > [...]
-> >> Fixes: 70ed7238297fb ("KVM: arm64: Sanitise ID_AA64MMFR3_EL1")
-> >> Fixes: d4a89e5aee23e ("KVM: arm64: Expose S1PIE to guests")
-> >
-> > I guess kernels that are missing 19868b67e3e7 and 2ce80f624032 will need
-> > that stuff ported too?
->
-> I think 2ce80f624032 would have to go back too, since without it a VMM
-> can still write the ID registers after they've been sanitised.
-> 19868b67e3e7 mostly provides the call site: the version I tested on
-> 7.3-rc3 called kvm_idregs_enforce_dependencies() at the top of
-> kvm_finalize_sys_regs() instead. Kernels before 6.16 don't have
-> config.c, so the backport there would be a different patch. I'd leave
-> the stable side to Marc though.
+>> +/*
+>> + * We do not support creating L1 GPTs yet. So, make sure that all the regions
+>> + * are managed by the firmware.
+>> + */
+>> +static int rmi_verify_gpt_firmware_managed(phys_addr_t start, phys_addr_t end)
+>> +{
+>> +	unsigned long l0gpt_sz;
+>> +	unsigned long next, par_state;
+>> +
+>> +	l0gpt_sz = 1UL << (30 + FIELD_GET(RMI_FEATURE_REGISTER_1_L0GPTSZ,
+>> +					  rmi_feat_reg(1)));
+>> +	start = ALIGN_DOWN(start, l0gpt_sz);
+>> +	end = ALIGN(end, l0gpt_sz);
+>> +
+>> +	while (start < end) {
+>> +		long ret = rmi_gpt_info(start, end, &next, &par_state);
+>> +
+>> +		if (ret != RMI_SUCCESS) {
+>> +			pr_err("RMI_GPT_INFO failed for %llx-%llx: (%ld)\n",
+>> +				start, end, ret);
+>> +			return -ENXIO;
+>> +		}
+>> +
+>> +		if (WARN_ON(next <= start))
+>> +			return -ENXIO;
+>> +
+>> +		if (par_state != RMI_GPT_PAR_PLAT) {
+>> +			pr_err("GPT for the region is not managed by firmware %llx-%lx\n",
+>> +				start, next);
+>> +			return -ENODEV;
+> 
+> When system RAM starts at a non-L0GPTSZ-aligned address, the alignment
+> in rmi_verify_gpt_firmware_managed() may cause the queried L0GPT range
+> to include a memory hole.
 
-Ack :) I guess this is mostly 'stable looks painful' :)
+> 
+> On out platform, the relevant memory layout is:
+> 
+>      800c0000000-800dc3fffff : memory hole
+>      800dc400000-82fffffffff : System RAM
+> 
 
->
-> [...]
-> > static const struct reg_feat_map_desc *idreg_feat_maps[] = {
-> >         &id_aa64mmfr3_el1_desc,
-> > +       &id_aa64pfr1_el1_desc,
-> > };
-> >
-> > Right?
->
-> That's how I'd expect it to look. Since
-> kvm_idregs_enforce_dependencies() repeats until nothing changes,
-> feat_gcs() could also test FEAT_S1PIE directly: by then, S1PIE has
-> been cleared if its own dependencies are missing.
+Thanks for the report.
 
-Great, so that clears I think the really main outstanding question for that
-series. Really nice! :)
+> Consequently, Linux queries the following L0GPT range:
+> 
+>      800c0000000-80100000000
+> 
+> The query fails with RMI_GPT_PAR_RESERVED:
+> 
+>      [    8.551855] GPT for the region is not managed by firmware 800c0000000-80100000000
+> 
+> and arm64_init_rmi() subsequently fails.
+> 
+> As I understand it, smc_gpt_info() in TF-RMM checks only the beginning
+> of the aligned L0GPT range. Since that address is in the hole, the whole
+> range is reported as RMI_GPT_PAR_RESERVED, even though it contains
+> platform-managed System RAM.
+> 
+> I believe this should be addressed in TF-RMM. Do you have any thoughts
+> on the expected RMI_GPT_INFO behavior in this case?
 
->
-> [...]
-> >> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> [...]
-> >> @@ -59,6 +59,7 @@ struct reg_feat_map_desc {
-> >>         const struct reg_bits_to_feat_map feat_map;
-> >>         const struct reg_bits_to_feat_map *bit_feat_map;
-> >>         const unsigned int                bit_feat_map_sz;
-> >> +       const unsigned int                idreg_idx;
-> >
-> > This field feels a bit hazardous - 0 is a valid index and now things that
-> > don't declare it are setting a valid value.
->
-> idreg_idx is only read for the descriptors in idreg_feat_maps[], which
-> all come from DECLARE_IDREG_FEAT_MAP(), so the 0 in the others is
-> never used. Storing the encoding would work as well, I'll leave that
-> one to Marc.
+I believe the RMM should report a value that represents the situation
+better. In this case, there is a hole, and some conventional memory
+areas. For the conventional memory, the RMM has to manage the GPTs.
+(This applies to the tf-RMM implementation of TRACKING Granule state
+too. It only looks at the first granule and reports the type of memory.)
 
-Yeah not used, but you're defaulting to a valid value, so it's got real
-footgun potential.
+RMI_GPT_PAR_RESERVED is not accurate as the memory region is not
+reserved, unless it is reserved for firmware (in which case the
+memory description is wrong).
 
->
-> [...]
-> >> +static bool idreg_deps(struct kvm *kvm, const struct reg_feat_map_desc *r)
-> >
-> > To me this reads confusingly - idreg_apply_deps() would be clearer I think.
->
-> Agreed.
->
-> [...]
-> >> +       for (int i = 0; i < r->bit_feat_map_sz; i++) {
-> >> +               if ((r->bit_feat_map[i].flags & CALL_FUNC) &&
-> >
-> > What if it isn't a CALL_FUNC feature?
-> >
-> > Could this loop just be replaced with compute_resx_bits()?
->
-> It's skipped, so a dependency written as a plain field match would be
-> silently ignored. Both entries today are CALL_FUNC, but
-> compute_resx_bits() handles every kind of entry and would also give
-> the res1 line something to set. It'd mean moving idreg_deps() below
-> it.
->
-> Marc, compute_resx_bits(), the rename and the loop rework are all fine
-> by me. If you agree, I can respin with them, or you can fold them in
-> when applying, whichever is easier for you.
->
+I would say RMI_GPT_PAR_PLAT  is accurate if the L1GPT exists, as the
+  region covered by the L0GPT has some memory that are delegable.
+
+Otherwise it must be reported as RMI_GPT_HOST_NOT_CREATED.
+
+The information that a given memory region is not "memory" (i.e. hole)
+is basically TRACKING_STATE returned as RMI_MEM_CATEGORY_NONE
+
+
+> 
+> As a side note, we tested this series and the v23 integration branch
+> with a Linux-side workaround to avoid the problem above, and we have not
+> observed any other major issues. Sorry for the delay in testing this
+> series.
+
+Thanks for the testing !
+
+Suzuki
+> 
 > Thanks,
-> /fuad
+> Kohei
+> 
+>> +		}
+>> +		start = next;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
 
-Thanks! :)
-
---
-Cheers, Lorenzo
