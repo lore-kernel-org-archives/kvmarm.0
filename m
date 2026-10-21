@@ -1,111 +1,108 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792613837;
-	b=qLR0EySsSqyEg2zhWM+dSpFcVzxJEIKnPTt17U2ztCQ8Qyk77djfK82PayFuQM+gK7O3
-	 Pgv3UzQPA9ryGOUJoO7ZINTWtuM+naqvRAellDfw0N11XYi/cA1ZSuFu9cZzw9uUrBg9m
-	 bwFDBz1Cx5QayggRK19g5xq5ZsKhqJFwMR3V97SJwS6hagmG0Ih4HBgWBnVH5rB2Mgp5y
-	 OQb9C/d5RH8vhsL33rZkhcYQebWR/WGz66MoCVNIp+j6eTyyv5jneCnImJgZexwvSqSnt
-	 hr0BAvXyNaFBJC/48eu/IVFr1ABSZgUYxuef1nt6rJIFFUHAIOkOStdXZ6Qeav2wvog==
+	t=1792623741;
+	b=BXRNPPxXKMlnbGPt/1d42E5dfTO10jgQDatV491emZnGtqp++Vvhqo0LbfZ3Jz9kuq3y
+	 RfaBOk7tSQjN7xOFbtCxVeaa9r5zyd1Evd/fylgE+cDBlME0j2GZOfBLZB5n5qttOIuY+
+	 Iar1LdZf8jrjgrpnsC7eJvS2i7tpX7wt+Ceutju9mX66oU1Ct/91SFs1nXJ8KWaykbvgD
+	 mDFz0qVacus4Axo2XC4BZEielccG9t+eNak+al3laUG94l9ynqZeGZsS1wP3UCP+R+v1h
+	 P48N4GNFmMlv6sL7M8Ps09ESL+1DFqL8+LRpq5VVIgVjgV006xrVlSnnqBaWP+nBjJA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792613837;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792623741;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=At2A/wrqaAUfI4SKCwlEtMqC27pXN2/myITaZPv60nw=;
-	b=O0nFBODoBtiEfSV9jNgH/sJJRFKSq1n6Q6XJjtsNcnOdrNnBaJ57TEeLT17hzajki3CY
-	 3ri6DbbRcRdSBf/gE801xGn+dJICXzMZFkTNKUzB9TdIa/RF8toBHCXodar5Vk9vjMpsB
-	 ukNPqvUjwIpRPEnIm9VwQ9F8700UNNNIQCUQ7d00zxD9gmEjV6h7LeeNm6UnIj9nfFMqn
-	 p09+GIkxH+jBmRFxdSpUrNr44N5JTnD780TfROOWfGrxoQEyY2kjhDdtZYy++uyVk4KWA
-	 5TXfMcQii5nf8fyHpe9uh8RB0AdbIm2pn54lcWDqXrTR0fngTjzZiR0ysN385knY1Sw==
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding:
+	 In-Reply-To;
+	bh=Rh1ct0ynFCJmpIeBgUsQvZu9SOoIsv6E2A9BdvVwioc=;
+	b=l6s7vgc+bbFh7jw9hcf+cO2xynpXi0bXbGtK7HzjS8Az0OrP05Vl0L2ujMAsDnzsD3jK
+	 VIAOwfBESmpPdbnjRXHqFZvFP4rCPVH10sSyU2iDmuo8nb+Wt+j6b5FlIdajx6zTFOTLY
+	 zxO/DBaKRb1GwN4qCRoHYowTiA9Uv1olhWCMOMqu3uXwhSvC6KzwjU75y3O0a5vCDcOyz
+	 J1vDImfNQ/i1jEZ0WDeoG3YzQuwDy6UTbDVDBm0/ezSetqtYrT5g5CfzM7EmDlyWnF5r5
+	 k51sKOkdB8FUNdEAQ+IRhMT5uC+/EGdgmx+u2vBOkgEP2U5mzMYK8h9o7V2qNYuGC0w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=rbnzvMFc;
-	arc=none smtp.remote-ip=209.85.214.179
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b="LooLg07/";
+	arc=none smtp.remote-ip=209.85.216.48
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2CC1606A325
-	for <kvmarm@lists.linux.dev>; Wed, 21 Oct 2026 20:17:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E2CC1606A325
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C470606A320
+	for <kvmarm@lists.linux.dev>; Wed, 21 Oct 2026 23:02:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4C470606A320
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=rbnzvMFc
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2db33db4de9so16845ad.0
-        for <kvmarm@lists.linux.dev>; Wed, 21 Oct 2026 13:17:11 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=LooLg07/
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-38ec1402b05so766464a91.2
+        for <kvmarm@lists.linux.dev>; Wed, 21 Oct 2026 16:02:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1792613831; x=1793218631; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=At2A/wrqaAUfI4SKCwlEtMqC27pXN2/myITaZPv60nw=;
-        b=rbnzvMFcBZSYOpf8m2uIE0UViInwHCUjTQ3QYlo6W8eWeUlaM/7IYkZjMc3UDAKKc1
-         bOxfO3PNXU2gBYYEM52mUZ6CRmsWLAFoqLZfdkYr0H8uMu0H71HGe+YKkKXud4tkNi/J
-         ME4cy+4Eh9iPjki/t2KF4MhkbjPvsB5x/SvP2kNYxPMS1bxgz4Kzc563J42MALXC0oZS
-         5vlbQHREHgV2UwHwGZbECHYIacAvvEYnGEZMkroAR5dmB7tG92XZYepDtHvcru1PZ2qS
-         X7xOLbwqQhkwSwC6dL4R/dMhFDMGtGUUzA3dUS6qbQWza9QE8+dbEYaSwq5qIKAi+0XQ
-         vVYg==
+        d=google.com; s=20251104; t=1792623741; x=1793228541; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Rh1ct0ynFCJmpIeBgUsQvZu9SOoIsv6E2A9BdvVwioc=;
+        b=LooLg07/jIq4fTj8/WSkVhmX7O5R4KqvIleS+BBMd3cr9breEy84WXW9DxX4PIJS3j
+         u0JPuvRGopkj6yy1iX5RUv2dAm4BMvOW/wDq3CP17WPMAl7SxxuVQ5B86mIGjg6Yrqlh
+         lzzI+NMXOAiXTiBjSAv184EsT+Eb3jgF4iqLPkfNXqxEabYILyVI7+LesTK0R9KNNHSN
+         Fjj0Ld1c1Ihq2sDvaF4MzAOKj93GDXG05IpP458s35Al+IwVqqdjf4IYEmYY4bOsMUlO
+         QMPcjQeQbeDXqxN9MS/YCcvzGWMdVYOK7F6zMCXjSzlsONa1Oh0Y0yfhB/pQE0/LFSFs
+         jmbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792613831; x=1793218631;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=At2A/wrqaAUfI4SKCwlEtMqC27pXN2/myITaZPv60nw=;
-        b=BLv3TfFKwyavA6ryD4YGCbMSEIDMebmDQEu0/SOUYPnhvEMJ4XLJgZXxCvKiGO7Nm7
-         XST0DsVGLESaH7rlF6UDu7HRr9ihoOmZrM6pApDN/dAvaw3itm1gcxHnVpfkoiS/qFhP
-         wuaM6nk80tKM+2vNwnt4o96dU6exB0zvXWg6Fvf2GAqdbN7lLde84jSQ5t4OdFfoavsF
-         +gw+9RWA/pr7CRI0KNHeBFkJVFBsSdtBvshN/Ba8VKqISSRTUEAFx+sGhbMTI16kzxzM
-         EtbBtfPrg4xHmrc1Y1kG1PtnEvsUO8C9JmGKMyv0K8hCx8FxUPSeZdKyFHhX5YJwvwb3
-         J6kg==
-X-Forwarded-Encrypted: i=1; AKwUvBxICCYIjS3k0PVXVHGCmKSWqtKrIKFjzHK14fmFe1UCrJqYEmvjsVoE6MmGGKF/gQYoFLebCms=@lists.linux.dev
-X-Gm-Message-State: AFq9FYKCQLL/YtjEty1VY7mbygMpEf17kaLV6xjWRevAR9ge6rKx47tw
-	6XMHcD76fsFisuzPvUqDK7e7BXmuUrHJIyjXq24tvqoIEthIxmzrDgZifS+VOpu4uQ==
-X-Gm-Gg: AYBFou3mx/qa4lgw93TL+q3w3edeRR0jhhWdYeUtbSuIyZEAJCqT1vo5GIVK5183A0j
-	VYjq8H+IMpfDqZ8ypEkNDyGzKn8OrZI6+sUIEAY9zHECYOrct7mrr4YP4nb+zJmeZuQPjYd1+5l
-	hBpy+0MSvOJX24K+Nw4qTDzqjLIuNLUvNeZWiEsBvXVAejzV7Ow1meF5gfLMan+Zk9+LBlLGFAC
-	jyb/hl3I39d8jNWq3KUw6LUZIbbzo7f15K8Jk8vcdIC0evWLgqX70iLjNU2MXRjD7APG9byFWkU
-	xY9AtucQm+2HU2F3kS4YqlRDngxrcLixupM7+cndyi2sq4IdnWmeRJbhDfbcjVMtDCBfwX+L2r9
-	sw0ite5giI73U235yDhuEtY8S7tvE8fvdMhzXvaV7ooezqE5pksskhWr13JZES52wgT/yAb/PXK
-	4C+3cV+WdDlOS++dsPuO+LOjqK9tRbdpME9M8xwOxIcqNGppgrRoivmMUBu8SLJ6Z2/syjbOZs0
-	io1/GD4IynY/aZJnnwjr/0FcDOTaxw3BtTfZ6P6ZbeSKBZnvY5VEkCaNwRqbpFsMCxHRAQ4hvTd
-	5w3XgCm3bemUQ7eaEvMO2hjRkul1+9purh5oJZvkGhuOTgmQ
-X-Received: by 2002:a17:903:24b:b0:2e6:d25:d874 with SMTP id d9443c01a7336-2ea6313172cmr689965ad.10.1792613830593;
-        Wed, 21 Oct 2026 13:17:10 -0700 (PDT)
-Received: from google.com (163.1.145.34.bc.googleusercontent.com. [34.145.1.163])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ada4896c71sm927197a91.6.2026.10.21.13.17.09
+        d=1e100.net; s=20260707; t=1792623741; x=1793228541;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=Rh1ct0ynFCJmpIeBgUsQvZu9SOoIsv6E2A9BdvVwioc=;
+        b=yEuNqX+KiWeXPRfp/Rj15tnmfsgMFKbSP2q23Egod/dec+CNqGYt5V2zjAoapa3qv8
+         /8CEQye+y+hWacXFUXnpD75EjgQHow8CfaT/0DNTOp2+1uEctw/3xxIO8ILqpYshIodm
+         P8TIn/ox8/7toSYMi5Ra5kLT82m2UZK7e/F+CnKQ43y0WOBpph1C1AFwUDf8tw1o04iI
+         i5r366tK5r32/9nYY0so30PQPWiCCM0KnJukpE8qVfSPM1r+EBo7MYlMLNxlMZUrhPmF
+         b5h2TS4Cd82xbY5ftgY/OQEERfB5AsO6TMFWjtHhjR2arlQqjWxwcXpAcrnvXrZn8F6v
+         cz3g==
+X-Forwarded-Encrypted: i=1; AKwUvBzEE1O2N2a7XSzyeYwRpQn2WrYXcLZ19jZjvbIJXu1AXCoc3lP1PSpzkIJM/fVtHjRCJwWngjU=@lists.linux.dev
+X-Gm-Message-State: AFq9FYITIDko9rmL1Yigx+J9BaLiz5TdEjGtZOet6Qem3Z3bScQuq909
+	YCrDlBGo/tlMANCjUujjwrBjqAU48nSDlJh4sKjcgnxf/611ahFxneJ9PacifzK9jQ==
+X-Gm-Gg: AYBFou3vSAmWq2bePp1C5GUdH1E6/KpHfzQghQXubVxce3HO8eUceanZNxRbBeElFU+
+	zAuWnC2KWAX2NB7B026NahMVIUjrYCYJTPOZAzO5j82/h9SuPzJ755rOp35OcMPdvcHVx1I/xO2
+	jBQELX3tqnYUwfjz0g0u4lQfzrsXHiCge8UD6fcbybPNcOWapEm0mGCD0B8H5DbZhzd/s9fLndg
+	GZzx8qzRVWMuNMklc1ymWS+vvzCMmzeesG/wpMBvso3pyC4MGHFgD53ox3aaC9KDj8KeWU23QuB
+	oAY4tLxyayAao6O33xilnbcc8IPguBmWjLhvYE/umpO5YbbKGKI31QLL/m+SEqdCtZsGLPULyz5
+	sUiAe2PX1rxnGyBbM+o4jPxBOpvE2r/9wuT6bLuIJUfzwXFIZ+Q7PnYVrSIJMgDZzHzv4OT3pQd
+	e/MtfXC40tayty1vRWbnJW0cKv9+0rD91d7ZhHaj5mDpwL74GmklchTCtlnAFDigWihCXOO9zMQ
+	qWZo7NlyPGuupG1bA+hiAjOITfWmu6Cy25xzqQLv+noJjJ4fYeSR2GBk32T1RQZAjDGAsRXC3nE
+	CirheWr8h+NBCEOSwrLzx74hZGy25xqbyNgD7w==
+X-Received: by 2002:a17:90b:2f85:b0:3ac:7c4d:8be6 with SMTP id 98e67ed59e1d1-3ad86d9e088mr2829501a91.40.1792623739843;
+        Wed, 21 Oct 2026 16:02:19 -0700 (PDT)
+Received: from google.com (64.75.127.34.bc.googleusercontent.com. [34.127.75.64])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ada4896c4dsm1314919a91.7.2026.10.21.16.02.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Oct 2026 13:17:09 -0700 (PDT)
-Date: Wed, 21 Oct 2026 20:17:05 +0000
-From: Samiullah Khawaja <skhawaja@google.com>
-To: Fred Griffoul <griffoul@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	David Hildenbrand <david@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
-	Robin Murphy <robin.murphy@arm.com>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>, 
-	Shuah Khan <skhan@linuxfoundation.org>, David Woodhouse <dwmw2@infradead.org>, 
-	Ackerley Tng <ackerleytng@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, 
-	Lorenzo Stoakes <ljs@kernel.org>, "Liam R . Howlett" <liam@infradead.org>, 
-	Vlastimil Babka <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-kselftest@vger.kernel.org, 
-	linux-doc@vger.kernel.org
-Subject: Re: [RFC PATCH v2 06/11] iommufd: Map memory provider files
-Message-ID: <atkO08eCJzLX6R58@google.com>
-References: <20261014093733.90312-1-griffoul@gmail.com>
- <20261014093733.90312-7-griffoul@gmail.com>
+        Wed, 21 Oct 2026 16:02:18 -0700 (PDT)
+Date: Wed, 21 Oct 2026 23:02:14 +0000
+From: David Matlack <dmatlack@google.com>
+To: Pasha Tatashin <pasha.tatashin@soleen.com>
+Cc: Tarun Sahu <tarunsahu@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>, joro@8bytes.org,
+	Mike Rapoport <rppt@kernel.org>,
+	Pratyush Yadav <pratyush@kernel.org>, maz@kernel.org, arnd@arndb.de,
+	jgg@nvidia.com, robin.murphy@arm.com, loganodell@google.com,
+	oupton@kernel.org, kevin.tian@intel.com, alex@shazbot.org,
+	dwmw2@infradead.org, pbonzini@redhat.com, seanjc@google.com,
+	will@kernel.org, Alexander Graf <graf@amazon.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, baolu.lu@linux.intel.com,
+	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
+	sagis@google.com, linux-mm@kvack.org, kvmarm@lists.linux.dev,
+	iommu@lists.linux.dev, linux-pci@vger.kernel.org,
+	kexec@lists.infradead.org, skhawaja@google.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v2 2/4] liveupdate: Select file handler by name in
+ the preserve ioctl
+Message-ID: <atlEdhPjlyTPDWmG@google.com>
+References: <20261021152527.375070-1-tarunsahu@google.com>
+ <20261021152527.375070-3-tarunsahu@google.com>
+ <CA+CK2bCnS8wcVDbOymBGeJB6pDUkknOpF22EynbwSV=D5=J4ow@mail.gmail.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -115,218 +112,69 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20261014093733.90312-7-griffoul@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+CK2bCnS8wcVDbOymBGeJB6pDUkknOpF22EynbwSV=D5=J4ow@mail.gmail.com>
 
-On Wed, Oct 14, 2026 at 09:37:28AM +0000, Fred Griffoul wrote:
->From: Fred Griffoul <fgriffo@amazon.co.uk>
->
->IOMMU_IOAS_MAP_FILE pins the pages it maps, which cannot work for a
->memory provider file: the frames may have no struct page, and the
->provider can take any of them back at any time.
->
->Accept a provider file. iommufd neither pins nor accounts its pages.
->It asks the provider for each frame when it fills a domain, and on a
->revoke it unmaps the range in every domain and maps what the provider
->backs now. A device that accesses the range in between faults. A
->revoke charges the page tables it allocates to the memory cgroup that
->mapped the file, not to the task that revoked.
->
->Each frame gets a PAGE_SIZE entry, so a partial revoke never splits a
->large IOMMU page. The next patch maps larger blocks. Holes stay
->unmapped, read-only pages are mapped without IOMMU_WRITE, and MMIO
->pages with IOMMU_MMIO. Frame 0 is refused with -EINVAL: iova_to_phys()
->returns 0 for an IOVA that is not mapped, so a revoke would take that
->page for a hole and leave it mapped.
->
->A revoke would race a dirty bitmap read and lose the dirty bits of the
->range, so provider pages and a dirty tracking domain cannot share an
->IOAS: whichever comes second fails with -EOPNOTSUPP. A provider
->mapping cannot be split by a partial unmap, and in-kernel accesses to
->it are refused.
->
->Assisted-by: Claude:claude-opus-5-5
->Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
->---
-> drivers/iommu/iommufd/Kconfig        |   1 +
-> drivers/iommu/iommufd/io_pagetable.c |  13 +-
-> drivers/iommu/iommufd/io_pagetable.h |  27 ++-
-> drivers/iommu/iommufd/pages.c        | 288 ++++++++++++++++++++++++++-
-> include/uapi/linux/iommufd.h         |  11 +-
-> 5 files changed, 334 insertions(+), 6 deletions(-)
->
+On 2026-10-21 01:17 PM, Pasha Tatashin wrote:
+> On Wed, Oct 21, 2026 at 11:25 AM Tarun Sahu <tarunsahu@google.com> wrote:
+> >
+> > Currently luo_preserve_file() iterates over luo_file_handler_list and
+> > picks the first registered handler whose .can_preserve() callback
+> > returns true. When a subsystem introduces a new, backwards-incompatible
+> > file handler alongside an existing one for the same file type, userspace
+> > has no way to choose which handler preserves a file descriptor, nor can
+> > the kernel keep the existing rollback-safe handler as the default while
+> > allowing callers to opt into the new handler.
+> 
+> That is not how it will work. If we are in the .can_preserve() call,
+> it means the user has already decided which file handlers to use. We
+> need to do that before any preservation happens; otherwise, we could
+> run into conflicts on FLBs i.e. FH of different version require
+> different FLBs.
+> 
+> Therefore, there should be a luoctl call (i.e via a new ioctl to set
+> compatability) that provides the kernel with the specs file of the
+> target kernel we are updating to, allowing the kernel to select the
+> compatible file handlers. Since .can_preserve() is called when the
+> user is already preserving files, the specification must have already
+> been supplied, or the kernel should fall back to using the default
+> (i.e., latest) file handlers.
 
-[snip]
+I don't think that is the right direction. IMO the kernel should not be
+choosing which file handler to use, userspace should be. If userspace
+gets it wrong and chooses a file handler the next kernel does not
+support, that's on them.
 
->+
-> /* The pages are not pinned, so their domains are tracked in pages->tracker. */
-> static inline bool iopt_pages_tracked(struct iopt_pages *pages)
-> {
->-	return iopt_is_dmabuf(pages);
->+	return iopt_is_dmabuf(pages) || iopt_is_provider(pages);
-> }
->
-> static inline bool iopt_dmabuf_revoked(struct iopt_pages *pages)
->@@ -285,6 +306,10 @@ struct iopt_pages *iopt_alloc_dmabuf_pages(struct iommufd_ctx *ictx,
-> 					   unsigned long start_byte,
-> 					   unsigned long start,
-> 					   unsigned long length, bool writable);
->+struct iopt_pages *iopt_alloc_provider_pages(struct file *file,
->+					     unsigned long start,
->+					     unsigned long length,
->+					     bool writable);
-> void iopt_release_pages(struct kref *kref);
-> static inline void iopt_put_pages(struct iopt_pages *pages)
-> {
->diff --git a/drivers/iommu/iommufd/pages.c b/drivers/iommu/iommufd/pages.c
->index 660af3d46f5e..aa7740326ad6 100644
->--- a/drivers/iommu/iommufd/pages.c
->+++ b/drivers/iommu/iommufd/pages.c
->@@ -52,6 +52,8 @@
-> #include <linux/iommu.h>
-> #include <linux/iommufd.h>
-> #include <linux/kthread.h>
->+#include <linux/mem_provider.h>
->+#include <linux/memcontrol.h>
-> #include <linux/overflow.h>
-> #include <linux/slab.h>
-> #include <linux/sched/mm.h>
->@@ -238,6 +240,35 @@ static void iommu_unmap_nofail(struct iommu_domain *domain, unsigned long iova,
-> 	WARN_ON(ret != size);
-> }
->
->+/*
->+ * Provider pages are mapped with PAGE_SIZE entries, and may have holes.  Some
->+ * IOMMU drivers warn when asked to unmap an IOVA that is not mapped, so find
->+ * the runs that are mapped and unmap each one, without touching the holes.
->+ * iopt_provider_map() refuses frame 0, which iova_to_phys() reports for
->+ * an IOVA that is not mapped.
->+ */
->+static void iopt_provider_unmap(struct iopt_area *area,
->+				struct iommu_domain *domain,
->+				unsigned long start_index,
->+				unsigned long last_index)
->+{
->+	unsigned long iova = iopt_area_index_to_iova(area, start_index);
->+	size_t left = (last_index - start_index + 1) * PAGE_SIZE;
->+
->+	while (left) {
->+		size_t len = 0;
->+
->+		while (len < left && iommu_iova_to_phys(domain, iova + len))
->+			len += PAGE_SIZE;
->+		if (len)
->+			iommu_unmap_nofail(domain, iova, len);
->+		/* Step over the run and the hole page that ended it. */
->+		len = min(len + PAGE_SIZE, left);
->+		iova += len;
->+		left -= len;
->+	}
->+}
->+
-> static void iopt_area_unmap_domain_range(struct iopt_area *area,
-> 					 struct iommu_domain *domain,
-> 					 unsigned long start_index,
->@@ -245,6 +276,11 @@ static void iopt_area_unmap_domain_range(struct iopt_area *area,
-> {
-> 	unsigned long start_iova = iopt_area_index_to_iova(area, start_index);
->
->+	if (area->provider) {
->+		iopt_provider_unmap(area, domain, start_index, last_index);
->+		return;
->+	}
->+
-> 	iommu_unmap_nofail(domain, start_iova,
-> 			   iopt_area_index_to_iova_last(area, last_index) -
-> 				   start_iova + 1);
->@@ -1349,6 +1385,10 @@ static int pfn_reader_first(struct pfn_reader *pfns, struct iopt_pages *pages,
-> 	    WARN_ON(last_index < start_index))
-> 		return -EINVAL;
->
->+	/* Provider pages are read from the provider, see iopt_provider_map() */
->+	if (WARN_ON(iopt_is_provider(pages)))
->+		return -EINVAL;
->+
-> 	rc = pfn_reader_init(pfns, pages, start_index, last_index);
-> 	if (rc)
-> 		return rc;
->@@ -1647,6 +1687,228 @@ void iopt_pages_untrack_all_domains(struct iopt_area *area,
-> 	}
-> }
->
->+static int iopt_provider_prot(struct iopt_area *area, u32 attrs)
->+{
->+	int prot = area->iommu_prot;
->+
->+	if (attrs & MEM_PROVIDER_ATTR_READONLY)
->+		prot &= ~IOMMU_WRITE;
->+	if (mem_provider_type(attrs) != MEM_PROVIDER_TYPE_RAM) {
->+		prot &= ~IOMMU_CACHE;
->+		prot |= IOMMU_MMIO;
->+	}
->+	return prot;
->+}
->+
->+/*
->+ * Map what the provider backs in [start_index, last_index] of the area into
->+ * @domain, and leave the holes unmapped.  Each frame is mapped with a
->+ * PAGE_SIZE entry, so that a revoke of part of a large block never has to
->+ * split a larger IOMMU page.  On failure nothing in the range is mapped.
->+ */
->+static int iopt_provider_map(struct iopt_area *area, struct iopt_pages *pages,
->+			     struct iommu_domain *domain,
->+			     unsigned long start_index,
->+			     unsigned long last_index)
->+{
->+	unsigned long base = pages->provider.start >> PAGE_SHIFT;
->+	unsigned long index = start_index;
->+	int rc;
->+
->+	lockdep_assert_held(&pages->mutex);
->+
->+	if ((1UL << __ffs(domain->pgsize_bitmap)) > PAGE_SIZE)
->+		return -EOPNOTSUPP;
->+
->+	/*
->+	 * A revoke unmaps under pages->mutex only, so it would race with a
->+	 * dirty bitmap read, and lose the dirty bits of what it unmaps.
->+	 * Provider pages are not mapped in a domain with dirty tracking.
->+	 */
->+	if (domain->dirty_ops)
->+		return -EOPNOTSUPP;
->+
->+	while (index <= last_index) {
->+		unsigned long pfn, iova, block_end, nr, i;
->+		int order = PUD_ORDER;
->+		u32 attrs;
->+		int prot;
->+
->+		rc = mem_provider_get_page(&pages->provider.att, base + index,
->+					   &pfn, &order, &attrs);
->+		if (rc == -EFAULT) {
->+			index++;
->+			continue;
+The problem with the kernel making a decision about file handlers is
+then userspace does not know what arguments to pass in. We are adding
+custom per-file handler arguments to PRESERVE_FD and RETRIEVE_FD. If the
+kernel is picking which file handler to use, say for a memfd, then
+userspace doesn't know which arguments to pass in.
 
-Hi Fred,
+Sure you could add some method where userspace could query which file
+handlers are active and decide arguments based on that. But it feels
+backwards.
 
-Thanks for this.
+I think a much cleaner solution is that userspace chooses file handler
+during PRESERVE_FD. I would even require it for RETRIEVE_FD so that we
+are guaranteed that the args the user is passing in are being sent to
+the right file handler. Passing to RETRIEVE_FD also opens the door to
+transforming across Live Update (similar to how AWS did LU from Xen to
+KVM as discussed at LPC).
 
-With this approach, silently skipping holes during IOAS_MAP_FILE means
-iommufd has no tracking of which IOVA ranges in the area are actually
-mapped, which complicates unmap and could also hide a bug if a hole in
-the range was not expected?
+Regarding FLB conflicts, today we don't support multiple FLBs for the
+same global state, so there is nothing to conflict. Selecting a file
+handler during PRESERVE_FD doesn't change that.
 
-I am wondering whether the areas can track the holes, or whether we
-should have areas for the mapped/unmapped ranges? This should allow
-proper sanity checks when doing revoke. I am also thinking about this
-from the live update point of view, where we might need to sanity check
-that the backing memory of mapped regions is preserved.
+If we ever need to support multiple FLBs for the same global state
+(e.g. an incompatible change to the PCI FLB), we can add an ioctl that
+lets userspace select which FLB to use before preserving any files.
+After that, only file handlers registered with the selected FLB can be
+used to preserve files. PRESERVE_FD with any other file handler fails.
 
-Could you please CC me on v3? I'd like to follow this from the live
-update IOMMU and iommufd preservation side.
-
-https://lore.kernel.org/all/20260921004834.2601285-1-skhawaja@google.com/
-
-Thanks,
-Sami
+That keeps the FLB decision up front and global, like you want, while
+still letting userspace pick the file handler for each fd. I'd also
+expect this to be rare, since FLB serialized state can use the same
+feature flags as everything else in this series.
