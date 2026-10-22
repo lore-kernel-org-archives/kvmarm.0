@@ -1,72 +1,81 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.69
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=34.218.115.239
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792690695;
-	b=t66XYyRfDymNfscBy1/ykoWXbD0IwoduJF2tY1M3IXmZBKzK35QmMp0G5NjjGgRzevmy
-	 YoMfw/gP6O81JoiscVe7FqJcTUw9/BJAzvDXRxuV4xn6wyHIVI+KvvIuRweslMlc5Lwb9
-	 nohhN7vIRbPf7WA30GpY3oWCAeAqLIHuOgfqJh+6MvNH2p3Kn60+I2dxOsRioxS0BZjpY
-	 nLe1x8Vay6+RIeRAuleRYfLpq5HX2eCjlb/qRKjbN3o+AkVTuhbmHXCGk001nFLbmKgNt
-	 HTLlBCY4Mje+ojVaC0m3HwjmMHMQ9ONSbOrVMrKhr8OnRcU6/bWarKVp3TGarOcodDg==
+	t=1792691312;
+	b=lStSQ3XSflBzPTNjzOoRlfYcEwYWySh6S0XufJ4xNPSF0TIBe4FDrN70uKjq4qFRuZkx
+	 tucyWJjCYZiM5h3QgqHm76kIgear9+80MvG8FblowbMYRlZpZ26DjQWi281Sfi7advV7I
+	 /Kl4fFks6OkVNUjUAXoYF6tPMd/WPsBhAP/7RnYeFEO86QjSpIaTKEx/OojzDHEKEDIrg
+	 jugaLFrtvjHpatt6EZebR0T9DCY98y7XMb8Eavlb1StswgIMnB3y+am+rqBLVg2m4l8rY
+	 eN1whfcn8pSeKbreX89Q4s6DKZKvf8/T/leiJgijJ4bCD41a+J7nZ5mx/9a5JVhemWQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792690695;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=qp9j90rvNjQEHYpNnURle2G+so6ZY/ayC5ckMBJ47tw=;
-	b=QlR2UGOGoy7GhlJ2zLO6QAPt5t2vTcThBz2UP5RVhoWIhE50CYILwx28N9yEJ1Bhe8y/
-	 Ce9RrwixWA7/yzVqHorrejno1JRNE1zTSiBYP7nZ6e9RRbKFeN3k+H27oQjIpH6DU302o
-	 yuP/eDbOMv4I2h2aTzXMgod0peVXnH6zZJaaAZbo/AOKZSJjbxjSa0QbmiJqy8GcX+s/7
-	 +Xpl3wG9lsIWnKJhKHbnxoFixgGFka7FJD2g30fPOf0ZY0czr7mOXt739omGc0ksyjr56
-	 3QvwooUVE6o0hmyeI180G2y8taWmnpXpVtf0F+lrJLr/LGgTkatO3K7IIqNjfzvQXpQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792691312;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:Received:Received:X-Farcaster-Flow-ID:Received:Received:
+	 From:To:CC:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
+	 X-ClientProxiedBy;
+	bh=SpslVbUahu1lzhSFFj8q6rCig7MM9wSX+fuc0eipTGc=;
+	b=nNF0oQiQP8IkaKxMhA/cGM3xHDMMpEKn+babyCalgssmz0skII+PjWCrOrhEoY7eHfC6
+	 gyAWyFuVNzyJ73B+0j+dx9WOhz9jBljyvk1LVoPUQWeB5e+JXy8Mg9Lx7HThgFkOX2+8e
+	 xGpEgwUw7Nu9+nOzNmBJCxgEvaLevGI0CrBGQ2gQSh65MvjUBNuQ2A0eL9udQgLUv3E58
+	 9E2EHZVU8M61ZT5BrgAKL5kbcsrQicgJCd0hHxie519ekvP6/zNFDgukIxAcFJROT0o0j
+	 w8L+KReyzU3FD2YgR6yMM//uBLXm0ktzIA0lrMWoTk9RqVU5r8gBCFmVpBuXkfJgRrg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=C2WdeDsy;
-	arc=none smtp.remote-ip=91.218.175.69
-Received: from mta0.migadu.com (out-69.mta0.migadu.com [91.218.175.69])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=amazon.com;
+	spf=pass smtp.mailfrom=amazon.com;
+	dkim=pass header.d=amazon.com header.i=@amazon.com header.a=rsa-sha256 header.s=amazoncorp2 header.b="T7UZ/xC6";
+	arc=none smtp.remote-ip=34.218.115.239
+Received: from pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com [34.218.115.239])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A682606A31B
-	for <kvmarm@lists.linux.dev>; Thu, 22 Oct 2026 17:38:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7A682606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B690F606A31A
+	for <kvmarm@lists.linux.dev>; Thu, 22 Oct 2026 17:48:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B690F606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=C2WdeDsy
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=qp9j90rvNjQEHYpNnURle2G+so6ZY/ayC5ckMBJ47tw=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792690691; v=1; x=1793295491;
- b=C2WdeDsy/Q6QBr9Xyku5LDGL9KE4sGVWTRGNEc9gDyAjsYyZ4YUmhkHS88MsjykoVJX8Djca
- Gqa15OEkXcTAbl1j3yCpfYDKA+SMukdL022UmNe2NVngXAcx5trsyFP8HuV4HdiPygEIw71tv99
- p6BTAHIKPpfzJTsDz8/+5+2w=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id b2080240adfd05ac;
-	Thu, 22 Oct 2026 17:38:11 +0000
-X-Mizu-Trace-ID: b2080240adfd05ac
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org,
-	oupton@kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	kernel-team@android.com,
-	tabba@google.com
-Subject: Re: [PATCH v2 4/4] KVM: arm64: pkvm: Avoid trapping on HVC_RESET_VECTORS
-Date: Thu, 22 Oct 2026 18:38:06 +0100
-Message-ID: <20261022173806.3752938-1-fuad.tabba@linux.dev>
+	dkim=pass (2048-bit key, unprotected) header.d=amazon.com header.i=@amazon.com header.a=rsa-sha256 header.s=amazoncorp2 header.b=T7UZ/xC6
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1792691311; x=1824227311;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=SpslVbUahu1lzhSFFj8q6rCig7MM9wSX+fuc0eipTGc=;
+  b=T7UZ/xC6BezNuiL+3Wdnm2IPgpNrcke8tP3zj/jRsjKllA7/0EFuxw1F
+   khtCIz85VrOONWTTkCBuhckHsDodgNsudIsHhIH3Wg4Z67FF6Wf6EUwAv
+   MQ40zrLKCkvdpxn2qsGKZ81bunMYR4Dg8yxEKlf4OM33hdS2fRqvdeSAo
+   Vyh8G/sv3ZrrOInFxn7IKEiBLJ672Cs0ezqq9dlhXt23cToS4OmLzVGEx
+   mKllSEfpS5DQEaD+ip+IMt/kt/GbQAw52fmPzQcTxyIGUXLdcZ2dx1YN4
+   7N3CZlMONw4DwOW2KzRxm0a77qYAz862aw63rU1DQlr1/68fRA+VNV6bo
+   g==;
+X-CSE-ConnectionGUID: L+EihjG2S0W5i2YMzsl0Uw==
+X-CSE-MsgGUID: xBeVkGZtR9OnaJ0HESE8mw==
+X-IronPort-AV: E=Sophos;i="6.27,172,1787011200"; 
+   d="scan'208";a="31772390"
+Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
+  by internal-pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2026 17:48:31 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.48:11227]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.97:2525] with esmtp (Farcaster)
+ id dd35c2c1-3ca3-49e5-a666-293da7c32e6d; Thu, 22 Oct 2026 17:48:31 +0000 (UTC)
+X-Farcaster-Flow-ID: dd35c2c1-3ca3-49e5-a666-293da7c32e6d
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.49;
+ Thu, 22 Oct 2026 17:48:30 +0000
+Received: from dev-dsk-aarnahmd-2a-95203392.us-west-2.amazon.com
+ (172.19.38.251) by EX19D001UWA001.ant.amazon.com (10.13.138.214) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.53; Thu, 22 Oct 2026
+ 17:48:30 +0000
+From: Aaron Ahmed <aarnahmd@amazon.com>
+To: <stable@vger.kernel.org>
+CC: <maz@kernel.org>, <oupton@kernel.org>, <joey.gouly@arm.com>,
+	<seiden@linux.ibm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
+	<fuad.tabba@linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH 5.10.y] KVM: arm64: vgic-its: Don't dereference a NULL collection on ITT save
+Date: Thu, 22 Oct 2026 17:45:36 +0000
+Message-ID: <20261022174537.2767-1-aarnahmd@amazon.com>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261022140048.2522787-5-vdonnefort@google.com>
-References: <20261022140048.2522787-1-vdonnefort@google.com> <20261022140048.2522787-5-vdonnefort@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -76,21 +85,60 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWC003.ant.amazon.com (10.13.139.252) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Hi Vincent,
+From: Fuad Tabba <fuad.tabba@linux.dev>
 
-On Thu, 22 Oct 2026 15:00:48 +0100, Vincent Donnefort <vdonnefort@google.com> wrote:
-> pKVM prevents the reset of the hypervisor vector and as a consequence,
-> kvm_hyp_initialized can never be reset. Add a fast-path for this case to
-> skip unnecessary HVCs on the CPU hotplug and PM path.
+[ Upstream commit c6c156d931c33b92362383cf76f6d6e1291dcbfe ]
 
-Could you drop this patch? It brings back a pKVM check in the host code,
-which Marc asked to avoid on v1 [1], to save one HVC that pKVM already
-rejects.
+MAPC with V=0 drops ite->collection but leaves the ITE on the device's
+ITT list, and vgic_its_save_ite() dereferences it unconditionally. A
+guest that issues MAPD, MAPTI and then MAPC(V=0) therefore oopses the
+host when the VMM issues KVM_DEV_ARM_ITS_SAVE_TABLES to migrate it.
+That sequence is UNPREDICTABLE per the architecture, but KVM already
+handles the resulting state in the translate, MOVI and DISCARD paths.
 
-Cheers,
-/fuad
+Save a zeroed entry, which vgic_its_restore_ite() reads back as
+invalid. Skipping the ITE instead would leave the ITT slot holding
+whatever is in guest memory, and restore rejects an entry naming a
+collection the restored collection table does not have.
 
-[1] https://lore.kernel.org/all/86jynbyshv.wl-maz@kernel.org/
+Fixes: eff484e0298da ("KVM: arm64: vgic-its: ITT save and restore")
+Cc: stable@vger.kernel.org
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+Link: https://patch.msgid.link/20260807104102.2410744-2-fuad.tabba@linux.dev
+Signed-off-by: Oliver Upton <oupton@kernel.org>
+[aarnahmd: Upstream vgic_its_write_entry_lock() takes in the kind of table
+ entry (ite) and looks up its size, while 5.10 takes in the size of an ite
+ directly via ite_esz, because commit 3b2c81d5feb2 ("KVM: arm64: vgic-its:
+ Add stronger type-checking to the ITS entry sizes") is not in 5.10.]
+Signed-off-by: Aaron Ahmed <aarnahmd@amazon.com>
+---
+ arch/arm64/kvm/vgic/vgic-its.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index e6ec0701f5616..07b8ca72111f3 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -2151,6 +2151,14 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
+ 	u32 next_offset;
+ 	u64 val;
+ 
++	/*
++	 * MAPC with V=0 keeps the ITEs mapped but drops their collection,
++	 * and with it the ICID. Save a zeroed entry, which the restore path
++	 * reads back as invalid.
++	 */
++	if (!ite->collection)
++		return vgic_its_write_entry_lock(its, gpa, 0ULL, ite_esz);
++
+ 	next_offset = compute_next_eventid_offset(&dev->itt_head, ite);
+ 	val = ((u64)next_offset << KVM_ITS_ITE_NEXT_SHIFT) |
+ 	       ((u64)ite->irq->intid << KVM_ITS_ITE_PINTID_SHIFT) |
+-- 
+2.47.3
+
