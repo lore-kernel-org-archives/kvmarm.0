@@ -1,61 +1,84 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792682782;
-	b=mB1gbR8jmGUOPDRIyLFUKly99Zh4WGCBE5U8Km/6KwaeWFvfPD/DppthSrUWF/fqUg6b
-	 Ht2uBcAvn49MyjX5P3/vNXwFFYMw20RjcLaRWzY5chk6bMQuomzwqT0vrL/f9be9Uta9o
-	 G34EAfS6mC+ngd08bX3Co8y3d7Yxt5IQgu4VKmcKPLhv24Nt8MTcobaOgnacPxlV6Hhns
-	 ZNZ3So9E0J1/g72PU60jyDuyNFGS+DkPrNxFbHoMksmR2/FjxNgVtz8OLuqJSXhHn5dol
-	 WioblGpHXiWlciyo4kevlHyjcacZ7yb5T1isbISGkzv3QIVrxpLzeTSNkEt2Qa5eZ5w==
+	t=1792683811;
+	b=VTlKyjbr598Z2MoPkkWgj4YmBicoLAw7qla2P/SjrxtOR+OxuAbmji0fhihFwc3IS39z
+	 7RUI7mzn364/D5Y8g6M8GlnSlZ+RG6PHiWzB+veuddVjiqUke+mzp2iHctALZfipBT8M/
+	 pG0FwfHVJU7qmY5CkVeSuU7JiKCDLZwVMrI1HDC0p4GaIkDVgFLfdL8rRN+9NJefFaJfJ
+	 8LKuf5gParJZyTmIHNlWOvvP/Koi/Y7tvYNmjErFQbPm30bEAkT/tFiwpWzbWk78EWMqY
+	 38JyfOZQebPAHd+4ai433lfZ5uYk53KANN9AM3csrmFWwew+GFgHrozoxWiXPlw1/dw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792682782;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=ShNiCMk8Kuf8pc2qB+tQRe+Fq75YJp+jO77Paj5vAT8=;
-	b=uaGdScoQCIS40UGofSSVftoKir8TFH2C73m0Xeo6xOiZ2sQH3/8+WUSX50Kf55ncJg5R
-	 /w0Mtnl/+YcwzmodQOS8ilQhKpuNZ005TFMYrTbfA/6pIN2RyA/kkSZdsBb1AQvV0s/dS
-	 4mu2b/lN6QYVzYs9XJk+WPS1jZAYcGiYi3mFg57i8htvWVZLKB3UXmlEahCFt3IZBRz7D
-	 qwDEGJru3tguWD90IuQSa8KJAgvz/43nMSaRr974DWruhQFtgW7M94uETYO4KLfVHxq76
-	 /pfljd+g4l+j12DLKxaY88E8ygZHBhchxal9TXN7sFB2hzgT3tKi17EuA6cEkSeSucA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792683811;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=H/ZQDZbJUUwaDWq/U/yZ4cIarmdBAnG5+fgMRyphtSo=;
+	b=HwIKfp6hhWKxqRjizQRKXRY+LfmJy5OxZJoidpYkRWcWLC1lPfxPZTeQxH+kdb9sOnVA
+	 +8/zztcVYwih6Zhod3yxYbhXlfqIqz6DAfAteI2LCMIl4HsC7fXH8kRZ5moixhrSr/jUb
+	 wJ6RUrFzfYsEicukauAHfglpqOnTkU6OXOsJRiyNkPqRXSVkFKi1Bv+9ePOuvfF7Q9Jgz
+	 e5OKE+QjK/U+yJHxWYjDEpTKiwOUFkfKpyKWyIZhv6uLR5tpmKWHiGB/W5l+iVtbStlji
+	 wTVzy3APKKgeSg85dFzGNr5eH9V9v17p8fM8yAxHxcfcsaAdycHo/9A8try6BbD5gdQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="KG/ahhDT";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HkIm1xBS;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865A1606A319;
-	Thu, 22 Oct 2026 15:26:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67CE606A319;
+	Thu, 22 Oct 2026 15:43:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=KG/ahhDT
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AB2E1F01828;
-	Thu, 22 Oct 2026 15:26:21 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HkIm1xBS
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BFAC1F01825;
+	Thu, 22 Oct 2026 15:43:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792682782;
-	bh=ShNiCMk8Kuf8pc2qB+tQRe+Fq75YJp+jO77Paj5vAT8=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=KG/ahhDTlLfdPHHLRIXec/17R576tWHUPWqYwwZtqRAkH9gmk96VkUbys9bFRitIz
-	 hb+W/lY6cQNa2FAKkCQTHppIq0ErCF6chSi8acEObQHS8drrpFbsvrr0T8tmBToh6l
-	 +6faJfTY035e2rxW5JZGK+e0/5k1yYr3wObGkLqjPPQPcWqcinYVLyGsnLA624OYnr
-	 xvnoPipWUv+m2tGCZEG/J6jzXmcUwmnfL6sTfoRDtoQZvnvXtOHUdTDK9qviFpTFRs
-	 FHsqYRElnShhy52IA7WsxqAWEsy/e4NP2E7YRUuUloiPNvuaeXIbrk5q1G8UZOXbbi
-	 lyuq0A5swftPg==
-Message-ID: <sashiko-outbox-181698@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH v2 4/4] mm: memfd_luo: Add the 2-bit pair feature
- header
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Tarun Sahu" <tarunsahu@google.com>, "Andrew Morton" <akpm@linux-foundation.org>, joro@8bytes.org, "Mike
- Rapoport" <rppt@kernel.org>, "Pratyush Yadav" <pratyush@kernel.org>, maz@kernel.org, arnd@arndb.de, "David
- Matlack" <dmatlack@google.com>, jgg@nvidia.com, robin.murphy@arm.com, loganodell@google.com, oupton@kernel.org, kevin.tian@intel.com, alex@shazbot.org, dwmw2@infradead.org, pbonzini@redhat.com, seanjc@google.com, will@kernel.org, "Pasha
- Tatashin" <pasha.tatashin@soleen.com>, "Alexander Graf" <graf@amazon.com>, "Bjorn
- Helgaas" <bhelgaas@google.com>, baolu.lu@linux.intel.com
-Cc: sagis@google.com, linux-mm@kvack.org, kvmarm@lists.linux.dev, linux-pci@vger.kernel.org, kexec@lists.infradead.org, skhawaja@google.com, kvm@vger.kernel.org
-In-Reply-To: <20261021152527.375070-5-tarunsahu@google.com>
-References: <20261021152527.375070-1-tarunsahu@google.com>
- <20261021152527.375070-5-tarunsahu@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 22 Oct 2026 15:26:21 +0000
+	s=k20260515; t=1792683810;
+	bh=H/ZQDZbJUUwaDWq/U/yZ4cIarmdBAnG5+fgMRyphtSo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=HkIm1xBS2oaBequM1IPluWU8b+N//ZtGRp17ZRz9uHD5bKy2xYcEdA4HU0rNyrgDg
+	 YBJuHEJRMeL+tUCGYtbZjpENSBmdmPC0uQqPh2SUb6uSsREXyD0lUSYkOkV1P70koK
+	 OpBxQh+BqzrF3MFP5RXmvSeTtHZO3/bxhr4B2iDcNcLx6Gpmah9lHKIk8JbDsl0h+w
+	 16pnLvPlrRDp3BcIAmQGfyE+57bIfZzWGhQES485JDv6J/MtvdsOxkexEJGoFqAI9n
+	 lbeEZcJoLlj4jO4oACEpTZEstHuP263QEUjvW+OTTqmS/WKngm8TZDxFNEC0gQ78/P
+	 +b4+D2p5AvpGA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xJuwx-000000067Lk-3k9q;
+	Thu, 22 Oct 2026 15:43:27 +0000
+Date: Thu, 22 Oct 2026 16:43:27 +0100
+Message-ID: <86h5idzqow.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Alex Williamson <alex@shazbot.org>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jean-Philippe Brucker <jpb@kernel.org>,
+	Oded Gabbay <ogabbay@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [RFC PATCH v2 11/15] KVM: arm64: Export stage-2 MMU config
+In-Reply-To: <20261015142552.4128028-12-ryan.roberts@arm.com>
+References: <20261015142552.4128028-1-ryan.roberts@arm.com>
+	<20261015142552.4128028-12-ryan.roberts@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -64,89 +87,205 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, gregkh@linuxfoundation.org, arnd@arndb.de, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, oupton@kernel.org, alex@shazbot.org, jgg@nvidia.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, jpb@kernel.org, ogabbay@kernel.org, corbet@lwn.net, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-doc@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] mm: memfd_luo: missing feature header validation in memfd_luo_fi=
-nish()
---
-
-commit b960724786ac11078fdfa9ded6bcd2355170cf0b
-Author: Tarun Sahu <tarunsahu@google.com>
-
-mm: memfd_luo: Add the 2-bit pair feature header
-
-This commit embeds a 128-byte struct luo_feature_hdr at the start of struct
-memfd_luo_ser and defines enum memfd_luo_feature with MEMFD_LUO_FEAT_CORE as
-a required feature. It initializes the feature header during
-memfd_luo_preserve() and validates it during memfd_luo_retrieve().
-
-> diff --git a/mm/memfd_luo.c b/mm/memfd_luo.c
-> index 64f8b8cb75bdb..ea1f4c8cd2591 100644
-> --- a/mm/memfd_luo.c
-> +++ b/mm/memfd_luo.c
-
-[ ... ]
-
-> @@ -525,6 +531,14 @@ static int memfd_luo_retrieve(struct liveupdate_file=
-_op_args *args)
->  	if (!ser)
->  		return -EINVAL;
-> =20
-> +	err =3D luo_feature_hdr_validate(&ser->features, memfd_luo_features);
-> +	if (err) {
-> +		pr_err("memfd_luo_ser feature header validation failed (size=3D%llu, f=
-lags[0]=3D%#llx): %pe\n",
-> +		       ser->features.size, ser->features.flags[0],
-> +		       ERR_PTR(err));
-> +		goto free_ser;
-> +	}
+On Thu, 15 Oct 2026 15:25:45 +0100,
+Ryan Roberts <ryan.roberts@arm.com> wrote:
+> 
+> From: Jean-Philippe Brucker <jpb@kernel.org>
+> 
+> Provide an API to drivers that want to share the stage 2 configuration
+> of a VM with their device. At the moment it is rather limited:
+> 
+> * No invalidation notifiers. The TLBs on the device side, if any,
+>   receive CPU TLB invalidations.
+> 
+> * No remote page fault support. All paging still takes the normal data
+>   abort route on the CPU. Options are pinning all guest memory or
+>   device-specific mechanism for reporting pending faults to the guest.
+> 
+> * No nested VMs. Although we could perhaps support assigning devices to
+>   the hyp context of a nested VM, it seems performative.
+> 
+> So for the moment this API works for devices that share the CPU MMU, but
+> the SMMU driver could use it with DVM.
+> 
+> Signed-off-by: Jean-Philippe Brucker <jpb@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  11 ++++
+>  arch/arm64/include/asm/kvm_mmu.h  |   1 +
+>  arch/arm64/kvm/mmu.c              | 102 ++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/sys_regs.c         |  14 +---
+>  4 files changed, 117 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 30d0082b15ec..c0932b43f959 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -235,6 +235,14 @@ struct kvm_s2_mmu {
+>  	atomic_t refcnt;
+>  };
+>  
+> +/* stage 2 MMU configuration, for drivers that speak VMSA */
+> +struct kvm_arch_guest_mmu {
+> +	u64 hcr;
+> +	u64 hcrx;
+> +	u64 vtcr;
+> +	u64 vttbr;
+> +};
 > +
->  	/* Make sure the file only has seals supported by this version. */
->  	if (ser->seals & ~MEMFD_LUO_ALL_SEALS) {
->  		err =3D -EOPNOTSUPP;
+>  struct kvm_arch_memory_slot {
+>  };
+>  
+> @@ -1720,4 +1728,7 @@ static __always_inline enum fgt_group_id __fgt_reg_to_group_id(enum vcpu_sysreg
+>  
+>  long kvm_get_cap_for_kvm_ioctl(unsigned int ioctl, long *ext);
+>  
+> +struct kvm_arch_guest_mmu *kvm_arch_get_guest_mmu(struct kvm *kvm);
+> +void kvm_arch_put_guest_mmu(struct kvm *kvm, struct kvm_arch_guest_mmu *mmu);
+> +
+>  #endif /* __ARM64_KVM_HOST_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 6eae7e7e2a68..8a9d385fe14d 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -185,6 +185,7 @@ int kvm_handle_guest_sea(struct kvm_vcpu *vcpu);
+>  int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
+>  
+>  phys_addr_t kvm_mmu_get_httbr(void);
+> +u64 kvm_mmu_get_hcr(struct kvm *kvm, u64 hcr);
+>  phys_addr_t kvm_get_idmap_vector(void);
+>  int __init kvm_mmu_init(u32 hyp_va_bits);
+>  
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 2d44cd6a5aed..0bf1dff2a41f 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -2805,3 +2805,105 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
+>  
+>  	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
+>  }
+> +
+> +#define HCR_MMU_BITS (HCR_VM | HCR_PTW | HCR_DC | HCR_TGE | HCR_RW |	\
+> +		      HCR_CD | HCR_ID | HCR_E2H | HCR_NV | HCR_NV1 |	\
+> +		      HCR_FWB | HCR_ATA | HCR_DCT)
+> +
+> +/* Update MMU-specific host bits of HCR_EL2 */
+> +u64 kvm_mmu_get_hcr(struct kvm *kvm, u64 hcr)
+> +{
+> +	lockdep_assert_held(&kvm->arch.config_lock);
+> +
+> +	WARN_ON(!test_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED,
+> +			  &kvm->arch.flags));
+> +
+> +	hcr &= ~HCR_MMU_BITS;
+> +	hcr |= HCR_VM | HCR_PTW;
+> +
+> +	if (has_vhe() || has_hvhe())
+> +		hcr |= HCR_E2H;
+> +
+> +	if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
+> +		hcr |= HCR_FWB;
+> +
+> +	if (kvm_has_mte(kvm))
+> +		hcr |= HCR_ATA;
+> +
+> +	if (!test_bit(KVM_ARM_VCPU_EL1_32BIT, kvm->arch.vcpu_features))
+> +		hcr |= HCR_RW;
+> +
+> +	return hcr;
+> +}
+> +
+> +/**
+> + * kvm_arch_get_guest_mmu - Get a reference to the guest MMU config
+> + * @kvm: KVM instance. Caller must hold a reference.
+> + *
+> + * Get the stage 2 MMU config of an EL1 VM. The returned object contains
+> + * settings that do not change until the object is released with
+> + * kvm_arch_put_guest_mmu(). This function does not support nested VMs.
+> + *
+> + * HCR has lots of settings, some of which differ between vCPUs, but most of
+> + * them control traps. For EL1 VMs, the bits relevant to MMU translation are
+> + * common to all vCPUs:
+> + * - VM, PTW, DC, TGE, CD, ID, NV, NV1, DCT have fixed values.
+> + * - E2H, FWB, ATA depend on host CPU features (respectively VHE, FWB and MTE2).
+> + * - RW depends on vCPU features. This function does not support 32-bit VMs.
+> + *
+> + * HCRX: EnSDERR, EnSNERR set to 0. TODO: is GCSEn relevant?
+> + *
+> + * VTCR is set once for the VM, depends on the VM's IPA size.
+> + *
+> + * VTTBR:
+> + * - VMID is pinned, until kvm_arch_put_guest_mmu() is called.
+> + * - PGD is allocated and freed with the vm (the caller must hold their
+> + *   reference to @kvm). KVM may create and remove page table mappings at any
+> + *   moment, and uses normal TLB maintenance operations to synchronize with
+> + *   page table walkers. KVM does not notify the caller about mapping changes.
+> + * - CNP is a property of the host system.
+> + *
+> + * Return: a new kvm_arch_guest_mmu instance, or an error pointer on failure.
+> + */
+> +struct kvm_arch_guest_mmu *kvm_arch_get_guest_mmu(struct kvm *kvm)
+> +{
+> +	int ret;
+> +	struct kvm_arch_guest_mmu *mmu;
+> +
+> +	guard(mutex)(&kvm->arch.config_lock);
+> +
+> +	if (is_protected_kvm_enabled())
+> +		return ERR_PTR(-EOPNOTSUPP);
 
-[Severity: Medium]
-Here in memfd_luo_retrieve(), ser->features is validated via
-luo_feature_hdr_validate() before accessing any MEMFD_LUO_FEAT_CORE fields,
-jumping directly to kho_restore_free(ser) on failure.
+How does this compose with CCA? Can it be restricted to exclusively
+running VHE rather than also dealing with the lesser configurations?
 
-However, when a preserved memfd is not retrieved in the target kernel before
-the session is finished or closed (for example via luo_session_release() ->
-luo_session_finish_one() -> luo_file_finish() -> luo_file_finish_one() ->
-memfd_luo_finish() with args->retrieve_status =3D=3D 0), memfd_luo_finish()
-reads ser->nr_folios and ser->folios without validating ser->features first:
+> +
+> +	if (!test_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags) ||
+> +	    test_bit(KVM_ARM_VCPU_EL1_32BIT, kvm->arch.vcpu_features) ||
+> +	    test_bit(KVM_ARM_VCPU_HAS_EL2, kvm->arch.vcpu_features))
+> +		return ERR_PTR(-EINVAL);
+> +
+> +	ret = kvm_arm_pinned_vmid_get(kvm);
+> +	if (ret < 0)
+> +		return ERR_PTR(ret);
+> +
+> +	ret = -ENOMEM;
+> +	mmu = kzalloc_obj(*mmu, GFP_KERNEL_ACCOUNT);
+> +	if (!mmu)
+> +		goto err_unpin_vmid;
+> +
+> +	mmu->vtcr = kvm->arch.mmu.vtcr;
+> +	mmu->vttbr = kvm_get_vttbr(&kvm->arch.mmu);
+> +	mmu->hcr = kvm_mmu_get_hcr(kvm, 0);
 
-mm/memfd_luo.c:memfd_luo_finish() {
-	if (args->retrieve_status)
-		return;
+How about the hcrx field in the structure?
 
-	ser =3D phys_to_virt(args->serialized_data);
-	if (!ser)
-		return;
+> +
+> +	return mmu;
+> +
+> +err_unpin_vmid:
+> +	kvm_arm_pinned_vmid_put(kvm);
+> +	return ERR_PTR(ret);
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_arch_get_guest_mmu);
 
-	if (ser->nr_folios) {
-		folios_ser =3D kho_restore_vmalloc(&ser->folios);
-		if (!folios_ser)
-			goto out;
+It really feels like this is a bit upside down. Since you are actively
+pinning the S2 MMU context, it should only be a matter of taking a
+reference on the kvm struct (just like KVM devices do), and handing
+off the kvm_s2_mmu structure, rather than copying things. When you're
+done with it, drop the reference.
 
-		memfd_luo_discard_folios(folios_ser, ser->nr_folios);
-		vfree(folios_ser);
-	}
+If there is a need to deal with a different value for HCR_EL2 (or
+anything else), it can be done in the code that makes use of it,
+rather than being in the KVM code.
 
-out:
-	kho_restore_free(ser);
-}
+Thanks,
 
-According to the ABI contract in include/linux/kho/abi/memfd.h, fields of a
-LUO_FEAT_REQUIRED feature such as nr_folios and folios are only guaranteed
-present once luo_feature_hdr_validate() succeeds.
+	M.
 
-Should memfd_luo_finish() also call luo_feature_hdr_validate(&ser->features,
-memfd_luo_features) and skip to kho_restore_free(ser) if validation fails,
-so it does not pass unvalidated MEMFD_LUO_FEAT_CORE fields to
-kho_restore_vmalloc() and memfd_luo_discard_folios()?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261021152527.3750=
-70-1-tarunsahu@google.com?part=3D4
+-- 
+Without deviation from the norm, progress is not possible.
