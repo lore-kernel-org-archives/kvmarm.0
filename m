@@ -1,49 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.69
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792690649;
-	b=iP5wIyPVO9AeJdXmZxPG/E6IkMT5WfMnF563xcD5GZj1j0hhpN6NvP6PlkWsczSjTITy
-	 NIIg3FQV1Flc3Y4w0S+3g7T0JOv5tEqyE8GpYJffAphEfx1+fIxFhCD2WSREc5B1oNIVL
-	 gsYU3NBhmxKs4BBGtrCudJJfkWYZtSiRPARIgkOW8YucfK7FWaHeUed95ceLSOufB/8N0
-	 /Ebr+7U9BQjvFV27masetL41cQThIfxbZVPSxGsDh7N1yndmlvX3nfgKUVeq5cjs0EjT9
-	 EPOe1gabqGWr4maN73JDP7FqdhWO2Gt1MNyR92HPOdRP09fW84X+FQj2cjn9+3WLKkA==
+	t=1792690695;
+	b=t66XYyRfDymNfscBy1/ykoWXbD0IwoduJF2tY1M3IXmZBKzK35QmMp0G5NjjGgRzevmy
+	 YoMfw/gP6O81JoiscVe7FqJcTUw9/BJAzvDXRxuV4xn6wyHIVI+KvvIuRweslMlc5Lwb9
+	 nohhN7vIRbPf7WA30GpY3oWCAeAqLIHuOgfqJh+6MvNH2p3Kn60+I2dxOsRioxS0BZjpY
+	 nLe1x8Vay6+RIeRAuleRYfLpq5HX2eCjlb/qRKjbN3o+AkVTuhbmHXCGk001nFLbmKgNt
+	 HTLlBCY4Mje+ojVaC0m3HwjmMHMQ9ONSbOrVMrKhr8OnRcU6/bWarKVp3TGarOcodDg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792690649;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=K9W5RCdzIyUx2UGPGNpmosuNQ05dcpdn632UhvrEm/U=;
-	b=IbsSHO2amh7nw9jBaHDLGKPd5v47gQGAI/lDIrJMkO2B8GVT97jP9ub0+6VkYIF5ajZK
-	 gx3c/ST0tz+xBflZ69UvajwzenYsle+Y7UYvg1QHEbM8FH4uumHz1OXraV7ImgrW29vHK
-	 zDtEz9gvBjCiPXruBcCxpQpbg2871tNKOeO3rcc059vHPkAkvO32UzDGIcH+vkPoHLLRE
-	 twez17KRpmPl2YD/V0qJEybO/o9mZBSHNBcdqwov73CYj8a6AzDa8Ghnhj3VDFeDlRwSP
-	 2/rWJrWqO4cuFx3SN7yWtkQWzCJ6SrvXf7eiOGVIVAdyeWOonV2n11RzdMBvaV1OMbA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792690695;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=qp9j90rvNjQEHYpNnURle2G+so6ZY/ayC5ckMBJ47tw=;
+	b=QlR2UGOGoy7GhlJ2zLO6QAPt5t2vTcThBz2UP5RVhoWIhE50CYILwx28N9yEJ1Bhe8y/
+	 Ce9RrwixWA7/yzVqHorrejno1JRNE1zTSiBYP7nZ6e9RRbKFeN3k+H27oQjIpH6DU302o
+	 yuP/eDbOMv4I2h2aTzXMgod0peVXnH6zZJaaAZbo/AOKZSJjbxjSa0QbmiJqy8GcX+s/7
+	 +Xpl3wG9lsIWnKJhKHbnxoFixgGFka7FJD2g30fPOf0ZY0czr7mOXt739omGc0ksyjr56
+	 3QvwooUVE6o0hmyeI180G2y8taWmnpXpVtf0F+lrJLr/LGgTkatO3K7IIqNjfzvQXpQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=NjFUqFWk;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45E25606A328
-	for <kvmarm@lists.linux.dev>; Thu, 22 Oct 2026 17:37:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 45E25606A328
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=C2WdeDsy;
+	arc=none smtp.remote-ip=91.218.175.69
+Received: from mta0.migadu.com (out-69.mta0.migadu.com [91.218.175.69])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A682606A31B
+	for <kvmarm@lists.linux.dev>; Thu, 22 Oct 2026 17:38:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7A682606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=NjFUqFWk
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 80DC91691;
-	Thu, 22 Oct 2026 10:37:24 -0700 (PDT)
-Received: from [10.57.76.220] (unknown [10.57.76.220])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0AB7B3F673;
-	Thu, 22 Oct 2026 10:37:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792690647; bh=wEmXCKLi8hNQIEvYmhYaLegYxs9QSULRFwJW/xWDQTs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=NjFUqFWkZX85dGb/IWTgRXjZ67lw+gzzoNjeaEOF8FmgZ+8Z4wLj4+GPeTrvmwWPO
-	 eOY3P2lpdM9O/xoFCfZJ9W2Z4Li9dW811Z1b4EFC4ZL+/Qup3NWOlT1P7Yt+4/ZMZ6
-	 epa2BgewZnpOwa5SnQ0ES4xgM9TeCbfYuTwNhtcQ=
-Message-ID: <c3df7c89-1376-4fc9-88c0-083029c836bb@arm.com>
-Date: Thu, 22 Oct 2026 18:37:24 +0100
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=C2WdeDsy
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=qp9j90rvNjQEHYpNnURle2G+so6ZY/ayC5ckMBJ47tw=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1792690691; v=1; x=1793295491;
+ b=C2WdeDsy/Q6QBr9Xyku5LDGL9KE4sGVWTRGNEc9gDyAjsYyZ4YUmhkHS88MsjykoVJX8Djca
+ Gqa15OEkXcTAbl1j3yCpfYDKA+SMukdL022UmNe2NVngXAcx5trsyFP8HuV4HdiPygEIw71tv99
+ p6BTAHIKPpfzJTsDz8/+5+2w=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id b2080240adfd05ac;
+	Thu, 22 Oct 2026 17:38:11 +0000
+X-Mizu-Trace-ID: b2080240adfd05ac
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org,
+	oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	kernel-team@android.com,
+	tabba@google.com
+Subject: Re: [PATCH v2 4/4] KVM: arm64: pkvm: Avoid trapping on HVC_RESET_VECTORS
+Date: Thu, 22 Oct 2026 18:38:06 +0100
+Message-ID: <20261022173806.3752938-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261022140048.2522787-5-vdonnefort@google.com>
+References: <20261022140048.2522787-1-vdonnefort@google.com> <20261022140048.2522787-5-vdonnefort@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,69 +76,21 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kvmtool v3 03/21] arm64: Sync KVM UAPI headers for GICv5
- IRS
-To: Sascha Bischoff <sascha.bischoff@arm.com>, will@kernel.org,
- julien.thierry.kdev@gmail.com
-Cc: maz@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- timothy.hayes@arm.com, Peter Maydell <peter.maydell@linaro.org>
-References: <20261016153939.913764-1-sascha.bischoff@arm.com>
- <20261016153939.913764-4-sascha.bischoff@arm.com>
-Content-Language: en-GB
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-In-Reply-To: <20261016153939.913764-4-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 10/16/26 16:39, Sascha Bischoff wrote:
-> Copy the GICv5 IRS address type and size, the IRS register attribute
-> group, and the IST attribute and descriptor from the Linux headers.
-> 
-> Keep the ITS UAPI out of this sync so the base GICv5 support uses
-> only the IRS definitions already present in Linux.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> ---
->  arm64/include/asm/kvm.h | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
-> 
-> diff --git a/arm64/include/asm/kvm.h b/arm64/include/asm/kvm.h
-> index 1c13bfa2..9998252e 100644
-> --- a/arm64/include/asm/kvm.h
-> +++ b/arm64/include/asm/kvm.h
-> @@ -97,6 +97,11 @@ struct kvm_regs {
->  #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
->  #define KVM_VGIC_V3_ITS_SIZE		(2 * SZ_64K)
->  
-> +/* Supported VGICv5 address types  */
-> +#define KVM_VGIC_V5_ADDR_TYPE_IRS	6
-> +
-> +#define KVM_VGIC_V5_IRS_SIZE		(2 * SZ_64K)
-> +
->  #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
->  #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
->  #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
-> @@ -417,6 +422,16 @@ enum {
->  #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
->  #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS 8
->  #define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ  9
-> +#define KVM_DEV_ARM_VGIC_GRP_IRS_REGS	10
-> +#define KVM_DEV_ARM_VGIC_GRP_IST	11
-> +
-> +struct kvm_vgic_v5_ist {
-> +	__u64	spi_ist_addr;
-> +	__u64	spi_ist_size;
-> +	__u64	lpi_ist_addr;
-> +	__u64	lpi_ist_size;
-> +};
-> +
->  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
->  #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
->  			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
-> -- 2.34.1
-> 
+Hi Vincent,
 
-That matches to what we expect in 7.4-rc1, so FWIW
+On Thu, 22 Oct 2026 15:00:48 +0100, Vincent Donnefort <vdonnefort@google.com> wrote:
+> pKVM prevents the reset of the hypervisor vector and as a consequence,
+> kvm_hyp_initialized can never be reset. Add a fast-path for this case to
+> skip unnecessary HVCs on the CPU hotplug and PM path.
 
-Reviewed-by: Vladimir Murzin <vladimir.murzin@arm.com>
+Could you drop this patch? It brings back a pKVM check in the host code,
+which Marc asked to avoid on v1 [1], to save one HVC that pKVM already
+rejects.
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/86jynbyshv.wl-maz@kernel.org/
