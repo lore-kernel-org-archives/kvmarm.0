@@ -1,74 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792670171;
-	b=3eMThVmDNmSdparXy/qhvhdbRCogk6OYNv1xD8SlQ8+wAvgLoeN7KzrOIQG82JiOXM/b
-	 vkyU3LIUy5n42twIUV99Srvs8huSYBv9f8ZesnbP6rrQp0v7gypx2QHmi0tw0iJ9/8x/V
-	 N44qaNq/ZQseYYu53h7akp079qM27p2ldIyHh6D6bJDnULGxOqjGmNW3n9tgl8SDTkgex
-	 XOA2Enr40FUv+b7nG+3baTNmBFieWyYJtuMrLw2/x3Kht50RYlRx8M5t9U0LdHFu99wmE
-	 bEpdkNpZpJpjd8RhMzHDAS4Vpq55dmnxdAVSYD4FYs1XgGJs27v75O2eVEm8iCoFzyA==
+	t=1792670868;
+	b=zWMuZTAGosoJTvQ5jV1WoeH38sque7tIKY1RWKQg3yJVrnWm+TCRgdYIQ2Ek5vIxxxfc
+	 FRa+0mKBuRzcaRzCEbTx3hXYNWqVFv8pVc0vtAdTquYKJ4n1OWoJ3fjqtM/vd4VIo7jDP
+	 KKsDME1yhg38n0+0m8iShjeER49PgKJVta9OPSbubzDhOFc19YP2laA9vNLlgB9RB3RsB
+	 wOT1B2qiFOcwxUe2cA4qkWDkdr45DZRqO/lrx1DL59Knb2AxujLnmr7v2cGzc4hZkFMHF
+	 2tN9+u3+tXr0OQ8Ychv3SmNWE8VQR6kpTCJcZeZAJ3wFnWF4LUsH6Ztkx9zRW/q6EJw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792670171;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=uSw0hqva5lv8jHz3IgGXQeMNYL3kw4sZIYA08yZ1Xng=;
-	b=nmoGbEQnhd5ZaSY76Bu2moGSVJUoyC14ljD3qWyVos5+eIEp+xtGOYi4bVraYkqqM72r
-	 VywV9rNFn/hCoUzfkTG+QJMpRxkqrQdKmdNWGBdCDJOzM3187zQuurWnAkvr14debxcA2
-	 wM2hdCaj2i38y+TiBZudfUpdamDyAKzOcw/kzUCdmbRaFBMXHrFXA3alPmA09yJxM5zr2
-	 ASD+sKUBCk1UnPAL76sxF/yVjV/xmW/OqyF7IbCzHnhC/prFf6R8AE+ble+Nq+A2Y6yx0
-	 ng0fTGR/s8+KCwTWZq9m5TeXadGKNBkZba1vqrZNcSx3r0uDvUdLQKwJ6O8RhUyldNA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792670868;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:Content-Language:To:Cc:References:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=U+E2goX+603MK4R3YbLe0NZDVKTFLoXN52JzT924H9k=;
+	b=LlYeiEFRDVgJ+3GZ9KImA+6bSOOvJBocs1CnIZfGtMkDqwRYNOhHRkxrMON9Y73wqd4u
+	 UNZwdkedS34HVNbgo2f3R+EPGHyg6yBefHoaqc/HLQk9L71kaYTGYAZtnrx1DoV4tZbAG
+	 1jd6azfYqQDiy02ksh4iHewpFdnfj9xNPxGkFy44X2x/B+jrn2VdtWpbGP+dC5LUocK0i
+	 JO5grt8P6E0pXkdbzy7s+ICeA9eeC3hIb8ixyGWpjw9hHax3gvo/KfKQlwmiOSTrb+GOa
+	 QfX5su/aFRy8jyQZuMCQbjzOC5pXeUT+HSWcFqpDaEaaDy5LvxTEfnfJw+XkzYIvboQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XiygvKaQ;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30014606A319;
-	Thu, 22 Oct 2026 11:56:10 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=F9rzmpQ0;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63322606A31A;
+	Thu, 22 Oct 2026 12:07:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 63322606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XiygvKaQ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B76E91F000C1;
-	Thu, 22 Oct 2026 11:56:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792670170;
-	bh=uSw0hqva5lv8jHz3IgGXQeMNYL3kw4sZIYA08yZ1Xng=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=XiygvKaQqHrN8jioM3jUCOKES/mevdTuY04wOyxjToclbQdxBqa+8RX/wIr/Qe1hq
-	 4rXbx4/0RuDJ5d4RwUpAFlAJer8xwN0XBEEJ5ZL9ZqePAPy3ZqJjiXvCXKe/A2BXSK
-	 rE+9Z9jL8Crnb65H0ssCKLvGDt00XNHcRYUjW/SybkujFPoL1Zg1yH/jo8qZIVr61r
-	 BJ8rN7A7ifsSGUD6zpKIZhbH0d0k+ry2cCMdagCrFFPg3fFExu1eELX054H/CtpoM/
-	 0e7NkfvITU5Ubhyj6OVQy5FflcB9Q8uw1cdrDq26AX47rQ8VrUA/PnBpUK8pJBeCV/
-	 KdtdxPqDFo51w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xJrOy-000000062XC-1ir3;
-	Thu, 22 Oct 2026 11:56:08 +0000
-Date: Thu, 22 Oct 2026 12:56:07 +0100
-Message-ID: <86ik2uymnc.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: nv: Don't WARN when L1 sets IMO and FMO differently
-In-Reply-To: <20261022100319.3046476-1-fuad.tabba@linux.dev>
-References: <20261022100319.3046476-1-fuad.tabba@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=F9rzmpQ0
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 405C92C41;
+	Thu, 22 Oct 2026 05:07:43 -0700 (PDT)
+Received: from [10.0.129.145] (Suzukis-MBP.cambridge.arm.com [10.0.129.145])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DDB643F7B4;
+	Thu, 22 Oct 2026 05:07:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1792670866; bh=YaugAaOmXpQMbGlR3yQjGJIUa/UWqthL0o7dDmiSzso=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=F9rzmpQ0ewydjOM5Qv2BdnCe/OuDpwBhtCFdR50SESHcFJQn+h++HvTUD+D4WLr/k
+	 xknS5QY+Wgn8HOgpNw40KmbQhMVVOHGQw3OcgSl7If9mgbz6AA7Lavl4a7hIeoBXK6
+	 xRiC9nve68kc1VzLusRjYJgPqEkbyCJGZX+vwlwg=
+Message-ID: <0ab0d3a1-a225-4a88-91bf-04f8f0e42eb7@arm.com>
+Date: Thu, 22 Oct 2026 13:07:41 +0100
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -77,65 +52,203 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seiden@linux.ibm.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, tabba@google.com, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v22 06/10] firmware: arm_rmm: Ensure the RMM has GPT
+ entries for memory
+Content-Language: en-GB
+To: Kohei Enju <enju.kohei@fujitsu.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
+ will@kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, steven.price@arm.com,
+ aneesh.kumar@kernel.org, oupton@kernel.org, gshan@redhat.com,
+ joey.gouly@arm.com, tabba@google.com, yuzenghui@huawei.com,
+ linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com,
+ sdonthineni@nvidia.com, alpergun@google.com, fj0570is@fujitsu.com,
+ WeiLin.Chang@arm.com, lpieralisi@kernel.org, sudeep.holla@arm.com,
+ jonathan.cameron@oss.qualcomm.com, Soby Mathew <Soby.Mathew@arm.com>
+References: <20261002061507.1600269-1-suzuki.poulose@arm.com>
+ <20261002061507.1600269-7-suzuki.poulose@arm.com>
+ <atiyZ7_S7aBxowIQ@FCCLS0092175.localdomain>
+ <34bf0c98-35b1-4402-842f-a100245cb9a7@arm.com>
+ <atjEkyLimpQSL4d4@FCCLS0092175.localdomain>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <atjEkyLimpQSL4d4@FCCLS0092175.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, 22 Oct 2026 11:03:19 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
+On 21/10/2026 15:00, Kohei Enju wrote:
+> On 10/21 14:35, Suzuki K Poulose wrote:
+>> Hi
+>>
+>> On 21/10/2026 14:07, Kohei Enju wrote:
+>>> Hi Suzuki,
+>>>
+>>> I've tested this series and found a possible TF-RMM issue.
+>>> Please  below.
+>>>
+>>> On 10/02 07:15, Suzuki K Poulose wrote:
+>>>> From: Steven Price <steven.price@arm.com>
+>>>>
+>>>> The RMM maintains the state of all the granules in the system to make
+>>>> sure that the host is abiding by the rules. This state can be maintained
+>>>> at different granularity, per page (TRACKING_FINE) or per region
+>>>> (TRACKING_COARSE or TRACKING_INTERMEDIATE). The region size depends on the
+>>>> underlying "RMI_GRANULE_SIZE". For a "coarse"/"intermediate" region,
+>>>> all pages in the region must be of the same state, this implies we need to
+>>>> have "fine" tracking for DRAM, so that we can delegate individual pages.
+>>>>
+>>>> For now we only support a statically carved out memory for tracking
+>>>> granules for the "fine" regions. This can be extended in the future to
+>>>> allow modifying the tracking granularity and remove the need for a
+>>>> static allocation by the firmware.
+>>>>
+>>>> Similarly, the firmware may create L0 GPT entries describing the total
+>>>> address space. But if we change the "PAS" (Physical Address Space) of a
+>>>> granule, then the firmware may need to create L1 tables to track the PAS
+>>>> at a finer granularity. Linux therefore checks if the platform firmware
+>>>> manages the PAR region. i.e., the firmware is in charge of managing the
+>>>> L1 GPTs (creation and the required memory for the GPT tables - via static
+>>>> carveouts) without host intervention. Support for dynamic GPT creation by
+>>>> the host will be added later.
+>>>>
+>>>> If the firmware requires us to manage the tracking or GPT memory,
+>>>> deactivate the RMM and reclaim any memory donated at RMM activation.
+>>>>
+>>>> Apply the same checks when hotplugged memory is brought online.
+>>>>
+>>>> Reviewed-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+>>>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>>>> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+>>>> Tested-by: Gavin Shan <gshan@redhat.com>
+>>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>>> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>> ---
+>>> [...]
+>>>> +/*
+>>>> + * We do not support creating L1 GPTs yet. So, make sure that all the regions
+>>>> + * are managed by the firmware.
+>>>> + */
+>>>> +static int rmi_verify_gpt_firmware_managed(phys_addr_t start, phys_addr_t end)
+>>>> +{
+>>>> +	unsigned long l0gpt_sz;
+>>>> +	unsigned long next, par_state;
+>>>> +
+>>>> +	l0gpt_sz = 1UL << (30 + FIELD_GET(RMI_FEATURE_REGISTER_1_L0GPTSZ,
+>>>> +					  rmi_feat_reg(1)));
+>>>> +	start = ALIGN_DOWN(start, l0gpt_sz);
+>>>> +	end = ALIGN(end, l0gpt_sz);
+>>>> +
+>>>> +	while (start < end) {
+>>>> +		long ret = rmi_gpt_info(start, end, &next, &par_state);
+>>>> +
+>>>> +		if (ret != RMI_SUCCESS) {
+>>>> +			pr_err("RMI_GPT_INFO failed for %llx-%llx: (%ld)\n",
+>>>> +				start, end, ret);
+>>>> +			return -ENXIO;
+>>>> +		}
+>>>> +
+>>>> +		if (WARN_ON(next <= start))
+>>>> +			return -ENXIO;
+>>>> +
+>>>> +		if (par_state != RMI_GPT_PAR_PLAT) {
+>>>> +			pr_err("GPT for the region is not managed by firmware %llx-%lx\n",
+>>>> +				start, next);
+>>>> +			return -ENODEV;
+>>>
+>>> When system RAM starts at a non-L0GPTSZ-aligned address, the alignment
+>>> in rmi_verify_gpt_firmware_managed() may cause the queried L0GPT range
+>>> to include a memory hole.
+>>
+>>>
+>>> On out platform, the relevant memory layout is:
+>>>
+>>>       800c0000000-800dc3fffff : memory hole
+>>>       800dc400000-82fffffffff : System RAM
+>>>
+>>
+>> Thanks for the report.
+>>
+>>> Consequently, Linux queries the following L0GPT range:
+>>>
+>>>       800c0000000-80100000000
+>>>
+>>> The query fails with RMI_GPT_PAR_RESERVED:
+>>>
+>>>       [    8.551855] GPT for the region is not managed by firmware 800c0000000-80100000000
+>>>
+>>> and arm64_init_rmi() subsequently fails.
+>>>
+>>> As I understand it, smc_gpt_info() in TF-RMM checks only the beginning
+>>> of the aligned L0GPT range. Since that address is in the hole, the whole
+>>> range is reported as RMI_GPT_PAR_RESERVED, even though it contains
+>>> platform-managed System RAM.
+>>>
+>>> I believe this should be addressed in TF-RMM. Do you have any thoughts
+>>> on the expected RMI_GPT_INFO behavior in this case?
+>>
+>> I believe the RMM should report a value that represents the situation
+>> better. In this case, there is a hole, and some conventional memory
+>> areas. For the conventional memory, the RMM has to manage the GPTs.
+>> (This applies to the tf-RMM implementation of TRACKING Granule state
+>> too. It only looks at the first granule and reports the type of memory.)
+>>
+>> RMI_GPT_PAR_RESERVED is not accurate as the memory region is not
+>> reserved, unless it is reserved for firmware (in which case the
+>> memory description is wrong).
+>>
+>> I would say RMI_GPT_PAR_PLAT  is accurate if the L1GPT exists, as the
+>>   region covered by the L0GPT has some memory that are delegable.
+>>
+>> Otherwise it must be reported as RMI_GPT_HOST_NOT_CREATED.
+>>
+>> The information that a given memory region is not "memory" (i.e. hole)
+>> is basically TRACKING_STATE returned as RMI_MEM_CATEGORY_NONE
 > 
-> When L1 runs L2 with only one of IMO and FMO set in its HCR_EL2,
-> vgic_state_is_nested() WARNs that this isn't supported. KVM then runs
-> L2 as if both bits were set.
-> 
-> However, IMO and FMO are independent bits, so any L1 can trigger the
-> WARN, which panics a host running with panic_on_warn.
-> 
-> Drop the WARN.
-> 
-> Fixes: 146a050f2d8c4 ("KVM: arm64: nv: Nested GICv3 emulation")
-> Reported-by: Sashiko <sashiko-bot@kernel.org>
-> Closes: https://lore.kernel.org/all/20260714235020.2F4151F000E9@smtp.kernel.org/
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
-> I dropped the WARN rather than demoting it to a print, the same way
-> e6e3e0022ef8f ("KVM: arm64: timer: Drop warning on failed interrupt
-> signalling") dropped one that was loud and easy to trigger from
-> userspace.
-> 
-> Tested on QEMU with kvm-arm.mode=nested. A reproducer of mine sets
-> L1's HCR_EL2 to IMO=1, FMO=0, TGE=0 through KVM_SET_ONE_REG and starts
-> the vCPU at EL1. The host WARNs on the first KVM_RUN without this
-> patch, and not with it.
-> 
-> Based on kvmarm/fixes (c5b7894f1a26b), which has the HCR_EL2_* rename.
-> 
->  arch/arm64/kvm/vgic/vgic-v3-nested.c | 3 ---
->  1 file changed, 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> index 82bfc4d4f122f..c70e06c46a7a5 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-> @@ -121,9 +121,6 @@ bool vgic_state_is_nested(struct kvm_vcpu *vcpu)
->  
->  	if (is_nested_ctxt(vcpu)) {
->  		xmo = __vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_EL2_IMO | HCR_EL2_FMO);
-> -		WARN_ONCE(xmo && xmo != (HCR_EL2_IMO | HCR_EL2_FMO),
-> -			  "Separate virtual IRQ/FIQ settings not supported\n");
-> -
->  		return !!xmo;
->  	}
->  
+> Thanks for the clarification. Could you please raise this with the TF-RMM
+> team? Please let me know if I can help with testing or provide any
+> additional information.
 
-No. Either we fix the bug, or the WARN_ON() stays. There is no
-alternative.
+[Duplicating Soby's response, which may have been filtered due to the 
+HTML email]
 
-	M.
+--->8---
 
--- 
-Without deviation from the norm, progress is not possible.
+Thanks Kohei for reporting this issue. I have pushed a fix for this in 
+TF-RMM which we hope to get merged soon.
+
+https://review.trustedfirmware.org/c/TF-RMM/tf-rmm/+/55689/1
+
+Best Regards
+Soby Mathew
+
+---8<---
+
+> 
+> Thanks,
+> Kohei
+> 
+>>
+>>
+>>>
+>>> As a side note, we tested this series and the v23 integration branch
+>>> with a Linux-side workaround to avoid the problem above, and we have not
+>>> observed any other major issues. Sorry for the delay in testing this
+>>> series.
+>>
+>> Thanks for the testing !
+>>
+>> Suzuki
+>>>
+>>> Thanks,
+>>> Kohei
+>>>
+>>>> +		}
+>>>> +		start = next;
+>>>> +	}
+>>>> +
+>>>> +	return 0;
+>>>> +}
+>>
+
