@@ -1,49 +1,110 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.180
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792691782;
-	b=ZsjK8aEOsFHYO2gvApoxrYq4vx+3ovIbq+HjcWGxQ+sS70sF1TUpsVHlPK49zu/+XR6U
-	 1l0hQ0n/C+bjbUYr1GrRllRBHmxZlZKDFU0VUGYo8wScOANDUmvwvDjKy+SLTJHEuWH/I
-	 j1qdAy8ZtlSMBnyNCNAZ5FdkFX0EDk6fopJ1Ajb+/Qbyfc7sxUUAgd6sQWeZT5fZPOWrm
-	 cB9WSDh01E8VV/c9rZRwAUDAfjmQvktCgOr3W1KU0325MePPo1gTh5i+P0GLcp2rj8eT/
-	 wEcGZUbq61izcd8sRNQWNysV6DK1B8s3RI7sdeIbnX/7dBqyAsUdvh+PnLR2Z+0NIDg==
+	t=1792691845;
+	b=Ky5iOUHov33dsT+pGYR3ECl6+EjJ7AF0NNY3f0KIyC+qDvgO7PmYRt1FJyXF3U0QLB24
+	 NqvJlC0JTpPo9yExCL2ieGGihrxzehmH9tOtyNyj44AXWqJ0VL1c4dZluZqUxaraWfD7k
+	 AV7JTNaYK0ix58mbW1SGqk+l8zWxQBhqaxPvkrcoRb5jNT1NwKFpY795YDPdWKf5cFh6F
+	 4C8xX7RFeXoAluA5qqkWv4+GDpux5VyE1y7TcU+UJxzSHKjuvnLabC0gSFW49AdNEWyZ/
+	 z9+8Vboxe9NPQjnkrVB91jG7SwV03rCQYUDnAiYtM2AH/kbbZYouPNsjnSbyOaCIOgQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792691782;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=/DrQ3iekP1XcE52khQzn+9lpo/N0t7Cvh1IYh3OUbJ4=;
-	b=OlI4dv1fPr5jihR4ycapCMFvqrvV97q21uH/MOTGD4qmoHkr7+82ktZfGxQAZTFiWC/N
-	 ckk1ImTUNUfVBKthx4ogbCTT9QZSHIBwiIZWPkHks/UUFG3AGfMED/gjoBfzhmvQmjxwn
-	 3Ads0pEoEgFBUQop01HV8w9MfdHQMpsOmrNkBOHNF5DZnbBR3CQNkhR01Ii4e0ctIsklR
-	 s/sNTE984qhLVylZv6h3L3ZpTad0+Hzaiu8tv73urnyEGXaPCX5PFJCNS2w6W/2DvgMXn
-	 mKJkMpttqiO5uvdIrpwQt9K1WAeQ/rZr7RD1IXsZLZkb30ps0G/soxCQIhF3nLSfRvg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792691845;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding:
+	 In-Reply-To;
+	bh=8EgRcbuDfKORZQpY0utOTTMffHlpWo5to8q3utLizKM=;
+	b=P+S4DeDfNpZ9cOegVT2KlzoKFz7MRHOaQawsxwB8iBAMO6mWfw1vTU4IXSpz63KjlwgX
+	 v8f0G2uLtHbYBHrGjIjXrJYYFpMTZTgwMaoXR92qgjrzCTGFNQyi7RyH8ak6hk6b1jZLq
+	 I5IhwJfU25uJqPeEypPtcPDXv9DHWXz+TtMgCyU8oy5YVVmfdCB2W2Ywryi9LQ9JGCVPn
+	 O1fi4Njhbd+hiro1OTtdx3Nra831jeWUm7NB0Z7m8pkU1rVMTHWo8YnO2pkzL5UgdOGUd
+	 TIcS7AjhzxbUY2n1p75d4LEFOSciMdw+W+B+IsyG8kyUzsGFU8a2ZhwakLRrVLc7ntw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=cta1OVwu;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A78606A319
-	for <kvmarm@lists.linux.dev>; Thu, 22 Oct 2026 17:56:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D0A78606A319
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b="UUZGv/9a";
+	arc=none smtp.remote-ip=209.85.214.180
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A48606A31E
+	for <kvmarm@lists.linux.dev>; Thu, 22 Oct 2026 17:57:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 69A48606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=cta1OVwu
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E47471691;
-	Thu, 22 Oct 2026 10:56:17 -0700 (PDT)
-Received: from [10.57.76.220] (unknown [10.57.76.220])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 614303F673;
-	Thu, 22 Oct 2026 10:56:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792691781; bh=NET5R7K22HicShqh6xqK88Y7xW34rhsaS4821eJfymU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cta1OVwuTk+dz4DR5UUAnm5tSkPwKd0VomVHLF8g3nO00Y2VzYCTegr0RjyQvDyoM
-	 BlnbZtbfz85gKKUMSAWpQZXYlAN1lXOl/TiOm+Zyht80O+vADUjoJDRV0zqGCTEgvz
-	 rpkWyuJOG5De1FiwaSSAbswqhr2GxMC4xVJiTYmk=
-Message-ID: <c28aad8e-c361-4e25-9fee-ea29a018c785@arm.com>
-Date: Thu, 22 Oct 2026 18:56:17 +0100
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=UUZGv/9a
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2e98798cbddso132585ad.0
+        for <kvmarm@lists.linux.dev>; Thu, 22 Oct 2026 10:57:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1792691840; x=1793296640; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=8EgRcbuDfKORZQpY0utOTTMffHlpWo5to8q3utLizKM=;
+        b=UUZGv/9ajUqdLGXLn0MF+j0DIrUdv8Q7Li+z69ilh3CAiUHlVGTVT0ngNGq3ZqcG5n
+         KbKwfFscFEPP1eESah+78UrMNWU449iGN5iXXu1QzMVHcI0FMUJPfGgJDzkicuVcBctE
+         JKXJ+/hDpVOPlh0VIEG7ONZGxBv/oojEuYwytCX7tdvy/S3gjKacyLZ7QSF5eYpl18dG
+         mrRQ0ne7/h206gEbOwockKJIKgRmw6WITfKJz6LDJZSOkINYqX9SnEKplKB2u6AZUZKh
+         XUuTton8GpiT28VvCzAkYmXhTneuqBS4GKsGNqt6IFYQ4A8mkWJ0MK6lIwahASv0PRv4
+         GMzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792691840; x=1793296640;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=8EgRcbuDfKORZQpY0utOTTMffHlpWo5to8q3utLizKM=;
+        b=FbjbTm9Q8VgJE3W2XdvNMDMlHSab6QfM3JXnuxXhcshvcV/VVuLNkmLoydur64oyGz
+         G6R8DE2JMRTCnx5+LoH9MBfLNxJc8ms2wgrXOCD7kA3mq74/V8VH6J1EcCze1fgSFzxo
+         zucY0EEymIU5Gx9Vi17ZXnfzwfoE3sySwjTVt3InPFf+Ujdd3lhADEK554ebQVYGqpjf
+         qYkLnVt1VHmUFUPFBoqA9VVAl7dvzg75B0ky+DymnSZKEkdVP60LpapOopdOvPHLMnyl
+         yO76I+iwtIJeon14vU5neY5LiOnhW2PxnTOLjFBo/Z1iAbBrgTBL7Fwdsyb88E80VgYt
+         DVtQ==
+X-Forwarded-Encrypted: i=1; AKwUvBzvY1twvmZx6tNrR7Ka092GipQU5bwrJ2pw9iYbYzfZ7ZsyZaXxTX7ShU0O6jmE+LyYhusLxOE=@lists.linux.dev
+X-Gm-Message-State: AFq9FYLsBqGAEqKh+DgynX6eafgzOrbKl6kmfsRBLfJsmWbhpWnckDiA
+	nu1ZF3BACx23o3qrax5pshwsXbRO/3y2i0fCTKEUB95GvOiAeMcdQfiNVUCQYH6gNQ==
+X-Gm-Gg: AYBFou1MfmCEsaLyvTlkpt/tFMyLBq2O64KHkz9UkVhgBfwaSbvfoz5u9IQW506smel
+	15ZT4Yox+4IwqDTo/9oUKNSPYIIhVM6rx52voGjV6rbHVOSGrDycaY30D1GjRoD8r+ueI2A1AYt
+	hPZ8FUsGL4bp4waj3Xks8C2p/eiQHwJ2e7zYmvD1G1ShSFA+r6yccA6gj3SeWA5beV8HjpOUM1E
+	41hFgNOA386wXsM6PjxxReGlTx0mGtRlfwCv7uqLgg3nS/26HwT7VjCYHU6N+AI59d03Nseczjz
+	2eO91CpfZgjIL6clo9gWU1bS+mGfOfgVSGG/WdNxJJjXAAZNkQnRtMyiByfQce3l9VbraBbI8Uy
+	CZqTEPtzJdlfhucfwlpZLENhoGIkBaow0ji/NOCPsgj+LQwG8Exovple/fsJFKVgdT4HfmbajIo
+	HsbaSjNBJxTSY4GTkZ4zBGUTCgQUwZ1w663sZpU/AW2XQ6XNxMZnjPP19QgutWBbBCgA3qR4EOy
+	IUz23b0JWuvhbCwSGXVJDKklw+KqA88oRBsgZZF5Y1zuwCGazMww5iJpGX/1j7IZQ6DWjL0iKWZ
+	N5slVLROICakNMtCieM/WQ==
+X-Received: by 2002:a17:903:19ef:b0:2e9:61bf:6591 with SMTP id d9443c01a7336-2ea7c33be70mr1491705ad.45.1792691839016;
+        Thu, 22 Oct 2026 10:57:19 -0700 (PDT)
+Received: from google.com (192.150.203.35.bc.googleusercontent.com. [35.203.150.192])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ea7b34dadbsm1687675ad.26.2026.10.22.10.57.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Oct 2026 10:57:18 -0700 (PDT)
+Date: Thu, 22 Oct 2026 17:57:15 +0000
+From: David Matlack <dmatlack@google.com>
+To: Pasha Tatashin <pasha.tatashin@soleen.com>
+Cc: Tarun Sahu <tarunsahu@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>, joro@8bytes.org,
+	Mike Rapoport <rppt@kernel.org>,
+	Pratyush Yadav <pratyush@kernel.org>, maz@kernel.org, arnd@arndb.de,
+	jgg@nvidia.com, robin.murphy@arm.com, loganodell@google.com,
+	oupton@kernel.org, kevin.tian@intel.com, alex@shazbot.org,
+	dwmw2@infradead.org, pbonzini@redhat.com, seanjc@google.com,
+	will@kernel.org, Alexander Graf <graf@amazon.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, baolu.lu@linux.intel.com,
+	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
+	sagis@google.com, linux-mm@kvack.org, kvmarm@lists.linux.dev,
+	iommu@lists.linux.dev, linux-pci@vger.kernel.org,
+	kexec@lists.infradead.org, skhawaja@google.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v2 2/4] liveupdate: Select file handler by name in
+ the preserve ioctl
+Message-ID: <atpOe-blcgW-uDd4@google.com>
+References: <20261021152527.375070-1-tarunsahu@google.com>
+ <20261021152527.375070-3-tarunsahu@google.com>
+ <CA+CK2bCnS8wcVDbOymBGeJB6pDUkknOpF22EynbwSV=D5=J4ow@mail.gmail.com>
+ <atlEdhPjlyTPDWmG@google.com>
+ <CA+CK2bAxgtx2gZ-UE2HqwAU8=h9K5RE3xozBs1njgLo1-CaPvA@mail.gmail.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,201 +114,76 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kvmtool v3 04/21] arm64: Add GICv5 irqchip device support
-To: Sascha Bischoff <sascha.bischoff@arm.com>, will@kernel.org,
- julien.thierry.kdev@gmail.com
-Cc: maz@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- timothy.hayes@arm.com, Peter Maydell <peter.maydell@linaro.org>
-References: <20261016153939.913764-1-sascha.bischoff@arm.com>
- <20261016153939.913764-5-sascha.bischoff@arm.com>
-Content-Language: en-GB
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-In-Reply-To: <20261016153939.913764-5-sascha.bischoff@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+CK2bAxgtx2gZ-UE2HqwAU8=h9K5RE3xozBs1njgLo1-CaPvA@mail.gmail.com>
 
-On 10/16/26 16:39, Sascha Bischoff wrote:
-> Add IRQCHIP_GICV5 and create KVM_DEV_TYPE_ARM_VGIC_V5 for it. GICv5
-> has no distributor or redistributor MMIO frame, so omit those address
-> attributes. Also omit the GICv2 PPI CPU mask from GICv5 interrupt
-> specifiers.
+On 2026-10-21 09:14 PM, Pasha Tatashin wrote:
+> On Wed, Oct 21, 2026 at 7:02 PM David Matlack <dmatlack@google.com> wrote:
+> >
+> > On 2026-10-21 01:17 PM, Pasha Tatashin wrote:
+> > > On Wed, Oct 21, 2026 at 11:25 AM Tarun Sahu <tarunsahu@google.com> wrote:
+> > > >
+> > > > Currently luo_preserve_file() iterates over luo_file_handler_list and
+> > > > picks the first registered handler whose .can_preserve() callback
+> > > > returns true. When a subsystem introduces a new, backwards-incompatible
+> > > > file handler alongside an existing one for the same file type, userspace
+> > > > has no way to choose which handler preserves a file descriptor, nor can
+> > > > the kernel keep the existing rollback-safe handler as the default while
+> > > > allowing callers to opt into the new handler.
+> > >
+> > > That is not how it will work. If we are in the .can_preserve() call,
+> > > it means the user has already decided which file handlers to use. We
+> > > need to do that before any preservation happens; otherwise, we could
+> > > run into conflicts on FLBs i.e. FH of different version require
+> > > different FLBs.
+> > >
+> > > Therefore, there should be a luoctl call (i.e via a new ioctl to set
+> > > compatability) that provides the kernel with the specs file of the
+> > > target kernel we are updating to, allowing the kernel to select the
+> > > compatible file handlers. Since .can_preserve() is called when the
+> > > user is already preserving files, the specification must have already
+> > > been supplied, or the kernel should fall back to using the default
+> > > (i.e., latest) file handlers.
+> >
+> > I don't think that is the right direction. IMO the kernel should not be
+> > choosing which file handler to use, userspace should be. If userspace
+> > gets it wrong and chooses a file handler the next kernel does not
+> > support, that's on them.
+> >
+> > The problem with the kernel making a decision about file handlers is
+> > then userspace does not know what arguments to pass in. We are adding
+> > custom per-file handler arguments to PRESERVE_FD and RETRIEVE_FD. If the
+> > kernel is picking which file handler to use, say for a memfd, then
+> > userspace doesn't know which arguments to pass in.
 > 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> ---
->  arm64/gic.c             | 19 +++++++++++++++----
->  arm64/include/kvm/gic.h |  1 +
->  2 files changed, 16 insertions(+), 4 deletions(-)
+> It is not the kernel deciding on its own which handler to use; it is
+> the system admin (or host orchestrator) that configures LUO before the
+> LU process starts, because the sysadmin knows what kernel we are
+> rebooting into and the LUO specs of that target kernel. Meanwhile, the
+> process calling PRESERVE_FD (e.g., a VMM) only knows about its own FDs
+> and should not have to track target kernel serialization versions.
 > 
-> diff --git a/arm64/gic.c b/arm64/gic.c
-> index f8371f50..5c8a33b5 100644
-> --- a/arm64/gic.c
-> +++ b/arm64/gic.c
-> @@ -189,6 +189,9 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
->  		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V3;
->  		dist_attr.attr  = KVM_VGIC_V3_ADDR_TYPE_DIST;
->  		break;
-> +	case IRQCHIP_GICV5:
-> +		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V5;
-> +		break;
->  	case IRQCHIP_AUTO:
->  		return -ENODEV;
->  	}
-> @@ -208,15 +211,20 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
->  	case IRQCHIP_GICV3:
->  		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &redist_attr);
->  		break;
-> +	case IRQCHIP_GICV5:
-> +		break;
->  	case IRQCHIP_AUTO:
->  		return -ENODEV;
->  	}
->  	if (err)
->  		goto out_err;
->  
-> -	err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &dist_attr);
-> -	if (err)
-> -		goto out_err;
-> +	/* Only set the dist_attr for non-GICv5 */
-> +	if (type != IRQCHIP_GICV5) {
-> +		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &dist_attr);
-> +		if (err)
-> +			goto out_err;
-> +	}
+> Also, the PRESERVE_FD and RETRIEVE_FD arguments are uABI tied to the
+> FD type, not to a specific internal handler version. They are stable,
+> and we can expand them the same way any ioctl argument is expanded
+> (via size and flags), without ever shrinking or breaking them. We
+> should not play the game of providing completely different uABI
+> argument structs for different versions of a file handler. If a caller
+> passes a new feature in the uABI args that the currently configured
+> file handler version does not support, PRESERVE_FD simply returns
+> -EOPNOTSUPP, just like any other extensible ioctl.
 
-Given that we had two switch statement for irq type above, this if condition
-look like complete surprise to my eye :D. Asking for third switch statement is
-no go - gic__create_device() is already crowded. OTOH, I like approach of
-gic__create_msi_frame(), so what do you think about some refactoring (perhaps
-in separate patch), like
+If we require that PRESERVE_FD and RETRIEVE_FD uAPI is stable across
+different file handlers for the same file type, then my concern is
+resolved.
 
-static int gic__set_cpu_if(enum irqchip_type type)
-{
-        u64 cpu_if_addr = ARM_GIC_CPUI_BASE;
-        struct kvm_device_attr cpu_if_attr = {
-                .group  = KVM_DEV_ARM_VGIC_GRP_ADDR,
-                .attr   = KVM_VGIC_V2_ADDR_TYPE_CPU,
-                .addr   = (u64)(unsigned long)&cpu_if_addr,
-        };
+> More generally, we are rebooting the host into a single target kernel,
+> so compatibility is a session-level property, not a per-FD property.
+> If we need an upfront global ioctl anyway, configuring the target
+> compatibility upfront in one place is much cleaner than exposing FLBs
+> to userspace and splitting version selection between a global ioctl
+> and per-FD PRESERVE_FD calls.
 
-        switch (type) {
-        case IRQCHIP_GICV2M:
-        case IRQCHIP_GICV2:
-                return ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &cpu_if_attr);
-        default:        /* No CPUIF needed */
-                return 0;
-        }
-}
-
-static int gic__set_redist(enum irqchip_type type)
-{
-        struct kvm_device_attr redist_attr = {
-                .group  = KVM_DEV_ARM_VGIC_GRP_ADDR,
-                .attr   = KVM_VGIC_V3_ADDR_TYPE_REDIST,
-                .addr   = (u64)(unsigned long)&gic_redists_base,
-        };
-
-        switch (type) {
-        case IRQCHIP_GICV3_ITS:
-        case IRQCHIP_GICV3:
-                return ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &redist_attr);
-        default:        /* No redist needed */
-                return 0;
-        }
-}
-
-static int gic__set_dist(enum irqchip_type type)
-{
-        u64 dist_addr = ARM_GIC_DIST_BASE;
-        struct kvm_device_attr dist_attr = {
-                .group  = KVM_DEV_ARM_VGIC_GRP_ADDR,
-                .addr   = (u64)(unsigned long)&dist_addr,
-        };
-
-        switch (type) {
-        case IRQCHIP_GICV2M:
-        case IRQCHIP_GICV2:
-                dist_attr.attr  = KVM_VGIC_V2_ADDR_TYPE_DIST;
-                return ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &dist_attr);
-        case IRQCHIP_GICV3_ITS:
-        case IRQCHIP_GICV3:
-                dist_attr.attr  = KVM_VGIC_V3_ADDR_TYPE_DIST;
-                return ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &dist_attr);
-        default:        /* No dist needed */
-                return 0;
-        }
-}
-
-static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
-{
-...
-        gic_fd = gic_device.fd;
-
-        err = gic__set_cpu_if(type);
-        if (err)
-                goto out_err;
-
-        err = gic__set_redist(type);
-        if (err)
-                goto out_err;
-
-        err = gic__set_dist(type);
-        if (err)
-                goto out_err;
-
-        err = gic__create_msi_frame(kvm, type, gic_msi_base);
-        if (err)
-                goto out_err;
-...
-}
-
-You might also notice that gic_msi_base is global, so maybe there
-is no point keep it as function argument ;) 
-
->  
->  	err = gic__create_msi_frame(kvm, type, gic_msi_base);
->  	if (err)
-> @@ -290,6 +298,8 @@ int gic__create(struct kvm *kvm, enum irqchip_type type)
->  		gic_redists_base = ARM_GIC_DIST_BASE - gic_redists_size;
->  		gic_msi_base = gic_redists_base - gic_msi_size;
->  		break;
-> +	case IRQCHIP_GICV5:
-> +		break;
->  	default:
->  		return -ENODEV;
->  	}
-> @@ -440,7 +450,8 @@ u32 gic__get_fdt_irq_cpumask(struct kvm *kvm)
->  {
->  	/* Only for GICv2 */
->  	if (kvm->cfg.arch.irqchip == IRQCHIP_GICV3 ||
-> -	    kvm->cfg.arch.irqchip == IRQCHIP_GICV3_ITS)
-> +	    kvm->cfg.arch.irqchip == IRQCHIP_GICV3_ITS ||
-> +	    kvm->cfg.arch.irqchip == IRQCHIP_GICV5)
->  		return 0;
-
-Nitpick: maybe we can take advantage of order of irqchip_type and do
-
-	/* Only for GICv2 */
-	if (kvm->cfg.arch.irqchip >= IRQCHIP_GICV3)
-		return 0;
-
-Thanks
-Vladimir
-
->  
->  	if (kvm->nrcpus > 8)
-> diff --git a/arm64/include/kvm/gic.h b/arm64/include/kvm/gic.h
-> index 8490cca6..630f0bbd 100644
-> --- a/arm64/include/kvm/gic.h
-> +++ b/arm64/include/kvm/gic.h
-> @@ -29,6 +29,7 @@ enum irqchip_type {
->  	IRQCHIP_GICV2M,
->  	IRQCHIP_GICV3,
->  	IRQCHIP_GICV3_ITS,
-> +	IRQCHIP_GICV5,
->  };
->  
->  struct kvm;
-> -- 2.34.1
-> 
-
+That's a good point. Ok let's not do per-FD FH selection.
