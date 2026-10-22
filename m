@@ -1,49 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.151
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792690499;
-	b=JYPiOPjSQqsKenX5ZUeTNdOIATtneLXhTGq3YYF6CfbaW0WNArXDjRLvQlM0Cj3PHRmk
-	 TYPmEp3AY4nl9WC+nWr56kd4mcUNeEB9976J/swqHq/ijyHXXzAB3V4nQOaxS13RbpwOP
-	 XAuVAkmLewSPq4QjQ4jY66EtQfopwmblCCmmgo5YYmWIPy9ElgWvFVatPJM7HNlTxkM92
-	 S0p19sv9B5pGAkJ8PE4dIv6ETK6fSizUdYEc8+oKihxXsMEreqQDsqLwy5C/byxWfovYD
-	 n2FmJEfGzQsMuRLvZGExE86Hu/LYh01FzewitklC075+e/jcoMLML+ny2MrI16/HE6g==
+	t=1792690508;
+	b=ph1ANwTy/XjYBm+V38eXxCGnFeVrghQ1UlvYMeup6KH3pDvET/4Zg7+x07The+H5Vd5Z
+	 d4RgV2zEYBib/yFhO0HUilwcrrrnnZBBx6XPJLDoZukkeS2OrMYkOIbLLxJ7bIEpefqin
+	 g7lTmnz0zLbkfajpgqHTMsIktMEfMYSEYNiKu60EBuOkKXuQo3WXbWRqjgICO7vo4gdas
+	 8vItnNnlF9weeAHew05pWocJaKj0tiGLtsgnYcm1+Y1OvvF9kC0e+QXvKUtXsORna+Efm
+	 Dxh1dzHK8w5aGlXlCRw/i9CkuUsrsVI7d+qJwyAEGnfP9NX6hz7mCHYB1MOgOlpeVcA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792690499;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=8J1zzDxtlEA13ky6xYJ/w+ZJ3LY5rj/np53fpaLDum8=;
-	b=oFWvX2Fi6Ji7U5NmDKrDm1gp2E77s1jabc/oM+O8BfBtKXVS/dKps9Gtu1oEGqqWnSh5
-	 tFjdKI4XbF69VGu2NxAfLeE4FxB7LWa57eTL2aAWQ9t9GRdlR61EmNvVIz0+hm/Ves21t
-	 36vYkts1WjwjCu4LGoLe28CQt8p0mkjO7hgu9URiXPpi8UvRNDz6zBX7fiobC88mNpL01
-	 T4lhWKl+UmszSvNSLL0Xg4w7M/WQPvpdf3D7wzKdfTNiRBwRZZ1/+5AB6GZPXmE6gq5Wf
-	 P/eO30ewDGkOab4ct1dKBEmYe5PmUmhv6pAlGr2loNElOF208gPamgRJSiLYzLBOJdA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792690508;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=UhyAbw4qoriwhozaXu+XfZddUYSkASyU0+JOd2C+mS0=;
+	b=FUcoI3CBMVfsCA2MzcjNpYAXad98rwooTEnaqR9DUpnuLnffMXrHLU4rL12Jhwt5ZI/k
+	 y2erwupSuweVbXCf+cL1OxWWNu0lfzOSkhTrOHWtinYSINwMe5Y2uX5iv7rvkKFvL/BkQ
+	 d+MH47nfh822HGpG10s+L1bPhHosxN4Z7xPwC6X+dYDoOG9mNQas341I6rOCf7MfHhcIC
+	 G1CtGKaGR5B9ijYGqDrd/T7iaN6NA3A0eR9WieztfYUBC2/CibATppzvTgHJzSQYhUgg/
+	 WXQxNb/GEl8UrIv4a37ZWKggb1MtgorgxQmESwNw1Og0edUp8PIPkJnsKq8DTv28+tg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=cr+LiqX6;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7EB7606AB63
-	for <kvmarm@lists.linux.dev>; Thu, 22 Oct 2026 17:34:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A7EB7606AB63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="lebqlN/r";
+	arc=none smtp.remote-ip=95.215.58.151
+Received: from mta1.migadu.com (out-151.mta1.migadu.com [95.215.58.151])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6443D606B78A
+	for <kvmarm@lists.linux.dev>; Thu, 22 Oct 2026 17:35:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6443D606B78A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=cr+LiqX6
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8364E1691;
-	Thu, 22 Oct 2026 10:34:48 -0700 (PDT)
-Received: from [10.57.76.220] (unknown [10.57.76.220])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1CB493F673;
-	Thu, 22 Oct 2026 10:34:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792690491; bh=wULjyGcKG4QcdOpXfpsEHSuPmredAn2/K/5P6lqhDNw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cr+LiqX6dxnXyLCw6xcG/iiQ6lcbH2bua/6JIR9Sdx6NiJ7Zxwgdi5SE9qksYSe+b
-	 ktoOVvsAeu4AJfhU0NNcOhHnAIuqI5pXCJdoySjpJTN9pJXqo6xGAOR9TzidsE9XnW
-	 EI2YkVhAW7DbynslCf0yp9btO9PFWcp7CkDg3Gd8=
-Message-ID: <84e2b43b-5c4e-4e15-813d-856ce21d25d7@arm.com>
-Date: Thu, 22 Oct 2026 18:34:47 +0100
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=lebqlN/r
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=UhyAbw4qoriwhozaXu+XfZddUYSkASyU0+JOd2C+mS0=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1792690504; v=1; x=1793295304;
+ b=lebqlN/rZSsxlA9jgeH5wG+Q4iXisCDTIskkPc699DogTycxxjFuIW4eB1IprKxqe1mzVFaw
+ 4vuY4gCnQkLD1W7tCzdujt8PVzEe9sArx+9qTa2PAOtNO0KFgcDN1oRaya6pHqRb4hxCzpmE+uF
+ YQUyy4ForQ57xq9RUe0MO/P8=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 3b6a465357a79fe8;
+	Thu, 22 Oct 2026 17:35:03 +0000
+X-Mizu-Trace-ID: 3b6a465357a79fe8
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org,
+	oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	kernel-team@android.com,
+	tabba@google.com
+Subject: Re: [PATCH v2 1/4] KVM: arm64: Make __vgic_v3_init_lrs HVC always available
+Date: Thu, 22 Oct 2026 18:34:59 +0100
+Message-ID: <20261022173459.3692613-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261022140048.2522787-2-vdonnefort@google.com>
+References: <20261022140048.2522787-1-vdonnefort@google.com> <20261022140048.2522787-2-vdonnefort@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,51 +76,19 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kvmtool v3 01/21] arm64: Propagate IRQ routing
- initialisation errors
-To: Sascha Bischoff <sascha.bischoff@arm.com>, will@kernel.org,
- julien.thierry.kdev@gmail.com
-Cc: maz@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- timothy.hayes@arm.com, Peter Maydell <peter.maydell@linaro.org>
-References: <20261016153939.913764-1-sascha.bischoff@arm.com>
- <20261016153939.913764-2-sascha.bischoff@arm.com>
-Content-Language: en-GB
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-In-Reply-To: <20261016153939.913764-2-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 10/16/26 16:39, Sascha Bischoff wrote:
-> irq__routing_init() can fail while allocating entries for the default
-> routing table. gic__init_gic() currently ignores that error and
-> continues with a partially populated table. Return the error before
-> the VGIC is marked as initialised.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> ---
->  arm64/gic.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arm64/gic.c b/arm64/gic.c
-> index 1e400962..debb0381 100644
-> --- a/arm64/gic.c
-> +++ b/arm64/gic.c
-> @@ -344,7 +344,9 @@ static int gic__init_gic(struct kvm *kvm)
->  		}
->  	}
->  
-> -	irq__routing_init(kvm);
-> +	ret = irq__routing_init(kvm);
-> +	if (ret)
-> +		return ret;
->  
->  	if (!ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &vgic_init_attr)) {
->  		ret = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &vgic_init_attr);
-> -- 2.34.1
-> 
+Hi Vincent,
 
-FWIW,
+On Thu, 22 Oct 2026 15:00:45 +0100, Vincent Donnefort <vdonnefort@google.com> wrote:
+> The __vgic_v3_init_lrs hypercall only resets the vGIC LRs. Those
+> registers are expected to be 0 when the host is running. As a
+> consequence, it is completely safe to make it available at all times,
+> even when pKVM is enabled and the host was deprivileged.
 
-Reviewed-by: Vladimir Murzin <vladimir.murzin@arm.com>
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
 
+Cheers,
+/fuad
