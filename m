@@ -1,49 +1,69 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.230
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792658372;
-	b=jGqj7v8HfjSQeGnZka1QQl2wG9b+4b0Lpj72R8dtDt86SD3a3EKQquA4IyTtovkYI/EX
-	 fVs7UhhEJqZXFyBYv8OpJx6U2E9lT9FEwYbCYsM3mG8UsfX9P2XNp+debvxedDsBgDvhe
-	 xOh5VynH/LOrWljAhhLrhry+44h3DN9hATT4cKHPYdVc9KhTadAM2um0/99s1H2CGzxke
-	 oDp7DkMCwwGnTYQlMfGghY64W981hlntzsJ3e4EPgMAAlN4iyVXmNby9YYpBdKUZVOhQO
-	 08gR3iNPyXRsakGCWY2FXuho1AkfmU8rACAb5tzC3Vj9YD4dK7DPSoKC8zchHrSNEUw==
+	t=1792663408;
+	b=BhaoAOQ9xthptg/StvJa/v9T8FLanZliCqcDc2dDWIMNJBM1D7uS54DpCP/5Z1Kv3P1f
+	 NfJFtzthP1KXdiNDs1dauEiI8mk5zkGlbyKpN8D2AbapSFmmJBRzZB0NvZM8lJ3qU1PlR
+	 3+YZWt0+WtlS2RUCmW1w7qirZBs3McY7G2IXeK/Ai/q9TJgwJn6Jr3ajhwHzQfo3zuOq+
+	 Bxt2lnTmj4YduULf6HiYzUoSTCXX4jxLjTLbHTZqpF8ogj72BjbZ/lSPQf3w6/+33JFHV
+	 9q/kmsR633KlVkzQ2UXHOOLCWavOr9flYq5OsciCuFqdsni3E9WQf5ky67n6Ut8B/VQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792658372;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=CvCWEqXaZH/iIUkBgP+o8Ay2lvbiOFHenVSVWHTDnio=;
-	b=tgc9/W4jQxOomtxja9etFVOZznrMIlZRzE3rzCRm/c9LIr1C9vdZWejy0/E5Su6YtABp
-	 vNL/RBkhk3G+Fqg0F0ZV3uj8loez8A28P3HeJraDT9Lpq0YrDXqmtTFEP+9FW2xLYl8Y3
-	 Y56wj5qdSMPdnuHh2UIYnXphTzmplBV/FIxoCGzyPIJqRJIpYaRpoQO06iQvarbH7pgnG
-	 S4KxRfjAxlPCkHrwtpj0W3joMYha4eo+r4x90vfy4XZ1w8Ixc1HmUClOLy6vXao5nJMlb
-	 mQ2KkfnClPgs99SL7OzhOsBrk2sT1ajoBVZZkvny3pVUN0I+yZKk3qV73tmBO1Htj2A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792663408;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=tytNRA2x/cdXQgb+WGb9wUkqID3jyg9++uqej4viFWA=;
+	b=LhMqzk+6ksuMLAlZUGtYl5N78ftw2q+kgaDN5RepQqr6HEF6dCXZ8Irc8smBPLDHvVeZ
+	 QWJk3ozv71F7qMD+4c62XFhL0T5H3m8xVScIRGLnv6j/d49DSckpuETO3rhzx9u9Qta0k
+	 6TPzuReoD7Gd4CcNkHqS7/Wo5lWP+DXPWUGwL9QF5xw3A7gtsiqrw79TKRa18aM5Ooa2H
+	 JyxyOun2RlBqHj+4LrJB+2IdNIuaLz3jVdSu5bwzcy0lg/m25G5gxMM3EOs90aiDgf5ca
+	 EDrh5N2Zl4ueiRjjKIFtJSFhBzPEn+kPa5TVGKbCTpA3ottaLrBtneuso95W6mOZqJQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=hEObLniC;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10514606A31A;
-	Thu, 22 Oct 2026 08:39:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 10514606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=wtk2tfok;
+	arc=none smtp.remote-ip=95.215.58.230
+Received: from mta1.migadu.com (out-230.mta1.migadu.com [95.215.58.230])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B10606A330
+	for <kvmarm@lists.linux.dev>; Thu, 22 Oct 2026 10:03:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 36B10606A330
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=hEObLniC
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DD9062C46;
-	Thu, 22 Oct 2026 01:39:21 -0700 (PDT)
-Received: from [10.2.197.99] (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EE8D93F673;
-	Thu, 22 Oct 2026 01:39:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792658365; bh=uD8Z+VnaxokujgVMBewvc6O/2Oc94t5bbNpab8XT2Mo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hEObLniCfO8tvUEME++blEmza9btcaiRUMVFVtYl9TdDINt/Jh+KSuOXaWp/rKmlo
-	 WUhI/MoxamaYnryozypEz5akzYCHQwBT1DP41jmVMtmfcNM9rOY0pgG75S1zir53qf
-	 PQfmGihfe1dbVdN8Zrb0zomrdSqiyDwI9lvPy+WU=
-Message-ID: <4a086f49-14a3-43a9-ba9b-ab387f5e7f91@arm.com>
-Date: Thu, 22 Oct 2026 09:39:20 +0100
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=wtk2tfok
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=bdwUyWR/ogB0uruaLKskLrPi9QHrdsAZ7cDFPYUW9pg=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1792663405; v=1; x=1793268205;
+ b=wtk2tfok5DtBnkyhCxjarl+rdNrbWxaw0zgeTVXX5yy8E2cuEb/99lvOMktpGjXG8J7EZTTy
+ bg1c+GRjmsR49oOige7EXjMJX5sPG1WvlEBZE3G99e7u2PSI/+nOqZwamt61pyDbnTEOIurVOqb
+ tLoHOQjWAxXblrJLzQ5B+KD0=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id f968876e0cbfdf44;
+	Thu, 22 Oct 2026 10:03:25 +0000
+X-Mizu-Trace-ID: f968876e0cbfdf44
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: arm64: nv: Don't WARN when L1 sets IMO and FMO differently
+Date: Thu, 22 Oct 2026 11:03:19 +0100
+Message-ID: <20261022100319.3046476-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,110 +73,54 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 5/7] firmware: arm_rmm: Activate the RMM
-To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, will@kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- steven.price@arm.com, aneesh.kumar@kernel.org, oupton@kernel.org,
- gshan@redhat.com, joey.gouly@arm.com, tabba@google.com,
- yuzenghui@huawei.com, linux-coco@lists.linux.dev,
- gankulkarni@os.amperecomputing.com, sdonthineni@nvidia.com,
- alpergun@google.com, fj0570is@fujitsu.com, WeiLin.Chang@arm.com,
- lpieralisi@kernel.org, enju.kohei@fujitsu.com, sudeep.holla@arm.com,
- jonathan.cameron@oss.qualcomm.com
-References: <a11aba04-eaaa-43fd-988b-a2581b1b2fdb@arm.com>
- <araketG70TIKeNuf@arm.com> <12e83d88-de4c-4230-aac2-1796123320ad@arm.com>
- <70d47475-e26e-40e1-b409-b0c16aecb8c0@arm.com>
- <195cdfe4-a55a-453f-9c34-620738eca244@arm.com> <arqrZ_Auk9BYOopa@arm.com>
- <0f68dcff-1dfe-4515-9912-515ca6457674@arm.com> <arudWVBPXcnUvYNh@arm.com>
- <5d487949-9195-442f-97af-acb9e3fdfb0d@arm.com> <86ld7ryvm8.wl-maz@kernel.org>
- <atj7A1CV4paW3htS@arm.com>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <atj7A1CV4paW3htS@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 21/10/2026 18:48, Catalin Marinas wrote:
-> On Wed, Oct 21, 2026 at 03:30:07PM +0100, Marc Zyngier wrote:
->> On Wed, 21 Oct 2026 10:58:13 +0100,
->> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
->>>
->>> On 29/09/2026 12:15, Catalin Marinas wrote:
->>>> On Mon, Sep 28, 2026 at 07:28:20PM +0100, Suzuki K Poulose wrote:
->>>>> On 28/09/2026 19:01, Catalin Marinas wrote:
->>>>>> possible, to defer the RMM activation until the first user (still do the
->>>>>> RMI probing as an initcall). If we run on RME-capable hardware and
->>>>>> firmware but don't care about realms or TSM, we still get the normal OS
->>>>>> functionality.
->>>>>
->>>>> Would you prefer this in the first drop of the RMM ? Or is this
->>>>> something we could add as a separate series ?
->>>>
->>>> I think we could add the deferring as a separate patch, maybe together
->>>> with the KVM bits. An advantage of keeping it here if we merge this
->>>> first is that we still exercise the activation path without full realm
->>>> support or TSM. Otherwise a lot of this would be dead code until the
->>>> other series arrive. Either way, do it as as separate patch on top of
->>>> this series.
->>>>
->>>
->>> I have been looking at the "on-demand" activation support and came
->>> across the following design decision.
->>>
->>> * We have KVM_CAP_ARM_RME which advertises that KVM can create Realm VMs
->>>    to the userspace. A VMM could check this before it creates a Realm VM
->>>    using KVM_CREATE_VM with type=RealmVM.
->>>
->>>
->>> Now, we could delay the RMM activation as late as the KVM_CREATE_VM and
->>> kick it off while we initialise the kvm as part of kvm_arch_init_vm().
->>> But if that fails, we would fail the KVM_CREATE_VM.
->>>
->>> The question is, what should KVM_CAP_ARM_RME indicate ?  We could
->>> initially enable the cap based on the presence of RMM (but not
->>> activated). However, should we turn the KVM_CAP_ARM_RME=off when we
->>> fail to activate the RMM ? Is that senisble ? (i.e., runtime
->>> disabling a cap).
->>
->> I think this sets a bad precedent. If activation can fail, KVM end-up
->> not delivering on the promise that it makes, and that's not great.
->>
->> My take is that the least surprising behaviour is best. If you have
->> bought into the CCA kool-aid by enabling it on the kernel command
->> line, that's not by accident. You expect your VMs to reliably be
->> created when KVM tells you that CCA is available.
->>
->> So KVM_CAP_ARM_RME should indicate whether the RMM has been
->> successfully activated, and nothing else.
-> 
-> Tying activation to kvm-arm.mode=rmm works for me, roughly similar to
-> kvm-arm.mode=protected. It's still an eager activation (just
-> conditional) and KVM_CAP_ARM_RME then only reports whether activation
-> succeeded. We lose kexec/hibernation but that's fine, it was explicitly
-> requested on the command line.
+When L1 runs L2 with only one of IMO and FMO set in its HCR_EL2,
+vgic_state_is_nested() WARNs that this isn't supported. KVM then runs
+L2 as if both bits were set.
 
-Thank you both, I will tie the activation to kvm init, gated on the
-kvm-arm.mode.
+However, IMO and FMO are independent bits, so any L1 can trigger the
+WARN, which panics a host running with panic_on_warn.
 
-> 
-> There's also the case of a host-only PCIe TSM (without realms). IIUC
-> (grep'ing FIRME spec) on an RME system IDE key programming goes via the
-> RMM, so this would need the RMM activated even without KVM. Not sure it
-> makes sense without realms, so I think we can ignore it until there's a
-> concrete use case (and add one more hook to activate the RMM).
+Drop the WARN.
 
-We could, again gate this on kvm-arm.mode. RMM is not useful without
-the capability to run realms. The dependency is the other way around.
-If an RMM exists and would be used for any other device TSM, then it
-should act as the TSM for all devices, to make sure we have a single
-TSM managing the IDEs (and the SPDM connections).
+Fixes: 146a050f2d8c4 ("KVM: arm64: nv: Nested GICv3 emulation")
+Reported-by: Sashiko <sashiko-bot@kernel.org>
+Closes: https://lore.kernel.org/all/20260714235020.2F4151F000E9@smtp.kernel.org/
+Cc: stable@vger.kernel.org
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+I dropped the WARN rather than demoting it to a print, the same way
+e6e3e0022ef8f ("KVM: arm64: timer: Drop warning on failed interrupt
+signalling") dropped one that was loud and easy to trigger from
+userspace.
 
-So, tying this again to the kvm-arm.mode=rmm, i.e., the capability
-to run Realms makes sense to me. Thoughts ?
+Tested on QEMU with kvm-arm.mode=nested. A reproducer of mine sets
+L1's HCR_EL2 to IMO=1, FMO=0, TGE=0 through KVM_SET_ONE_REG and starts
+the vCPU at EL1. The host WARNs on the first KVM_RUN without this
+patch, and not with it.
 
-Suzuki
-> 
+Based on kvmarm/fixes (c5b7894f1a26b), which has the HCR_EL2_* rename.
+
+ arch/arm64/kvm/vgic/vgic-v3-nested.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index 82bfc4d4f122f..c70e06c46a7a5 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -121,9 +121,6 @@ bool vgic_state_is_nested(struct kvm_vcpu *vcpu)
+ 
+ 	if (is_nested_ctxt(vcpu)) {
+ 		xmo = __vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_EL2_IMO | HCR_EL2_FMO);
+-		WARN_ONCE(xmo && xmo != (HCR_EL2_IMO | HCR_EL2_FMO),
+-			  "Separate virtual IRQ/FIQ settings not supported\n");
+-
+ 		return !!xmo;
+ 	}
+ 
+
+base-commit: c5b7894f1a26b5cc942be1cd11b15c3876c837a1
+-- 
+2.47.3
 
