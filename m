@@ -1,101 +1,77 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.41
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792642342;
-	b=myQ2qS1zuRjDg4y9oDllMjUeF6H0Is/NcEdpyQvz9IsMlEW3ZrKxQl46gnESxH5LK5SK
-	 rSKSGG9vqrO7P1/Ka451sY48fEkhBJj0dbAF+h2easzzJMI6bDAeegNgWY2CtvVWscPS/
-	 JM1X0/HdvK0TQhvubVHSpexyU3iyN870INw+9ArtETnPISYsmYjJiY7Nlh4paEviJwSHO
-	 7DqnM1+yxSQ7fGVWiPQ794hFo8qUDdzS6Ag/s533uhhq5i9DdauEa+suF2QfNwEcK2NVi
-	 c/7ZxCoE9RvPgP94EfhXI9TGVnoQvd5T/FT2r2UA28kJPHKT4bxB6t0idMmm5MIaKfA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792642342;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=vprUskQTUd+SPbnT8TFojrEtK+oeOiPvhjewwpNbp/8=;
-	b=KvDpBhlJ2VdTqca7+wJCjxig7ib1F/vwARYrP4eMsHFwlwpyVEcOkilBmHipexhtTwZV
-	 rUp2CJmod7YMzEzPXFGFmxd8Beo8encXywNyToapzYlfCj/JAk0TCqd3gTdoGT1ZKP5iY
-	 ZeQXVUuQ+CsFayBBf3yRSnxSlH6K3zhSNp+MT2mcuX4dCs2F9QiZUjdz/P4XpB7PE/52g
-	 HhYEdBCTqk2xOT+GkLbkfDvIvl1++3yH90KBjy+ylUgxG/u5MabmeCvN58DzzdJOb3SHG
-	 I0pgT2fTlL8XKNBOBLg2LtjagYdbxBcEd1r08Yc3Bc6qI0oJmfWsKp49gZrR3I7qqAw==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=soleen.com;
-	spf=pass smtp.mailfrom=soleen.com;
-	dkim=pass header.d=soleen.com header.i=@soleen.com header.a=rsa-sha256 header.s=google header.b=URELnTGD;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.41
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=207.54.90.47
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792650013;
+	b=lJISQ0HKMOYRwOKxL0wcc4nnFP5C09IkwvsQiga6x6Wo3SywSwV7d1D7ZN2cUWUQuogO
+	 mi77aXd1itpRAH4sYutroqtQYW7t5Oa2+b+bi6GnfjvHV3wdMZYNBfar9s9B3Du+/u+yI
+	 HPIsGJnk8nDRMrUIk18ljfOAI4K+zthD6i+Lyi2xX/WRoypKXRH+83NnQHG7jHPj4bSdZ
+	 TDRMXMS3TvpIlZ1H0yh6hjczQmgowzPxTJEDKoPpMLaEyKksTQ3kRTbUmqFgtDKvfQkS9
+	 HD+e/vDdcZCd32x2d/VNStEs0eqxjkhpgD8gtp/9ZhAPpRYrKfkSl9mzh92t3JWn9bw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792650013;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:Received:Received:Received:From:
+	 Date:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key;
+	bh=nfOEQXWDlmV/Zo8XCMuxaKqjh8ws7hBvTby8XB3KbrE=;
+	b=0Ka11TNGDeJUexFjyRYW0+jtlNWFVlD/3SHYlBmKmK3H/FwF+OJ7nMy7B8CXX7EFoBw+
+	 +ioAsv/b3+D/h321IDUtYe2Fah6wFdSGdkghtrSYuWV7nL+EQAotSljEVeiDeiabXgbye
+	 GLZ6KCCLZbGQ8gyZstxe3+4y8Oi3PtpmPMsy1o84wudcIW38/Xc9jxPI/0NvQZPJq7dxu
+	 x364G1bp0v0FccMax6RMLtl8BbzylquGhPzA9crNm7fVBk0vEskboW3faxMzxKsD60ncp
+	 7mrSgeCTcNhkJAEsTWJgLEzAWH/c2e2XJ9dTlE+wl6zOg/nA6yKk+7ci44tzDTfrdgQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=fujitsu.com;
+	spf=pass smtp.mailfrom=fujitsu.com;
+	dkim=pass header.d=fujitsu.com header.i=@fujitsu.com header.a=rsa-sha256 header.s=fj2 header.b="Z/i8MaXU";
+	arc=none smtp.remote-ip=207.54.90.47
+Received: from esa1.hc1455-7.c3s2.iphmx.com (esa1.hc1455-7.c3s2.iphmx.com [207.54.90.47])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88428606A31D
-	for <kvmarm@lists.linux.dev>; Thu, 22 Oct 2026 04:12:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 88428606A31D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soleen.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34FC4606A32D
+	for <kvmarm@lists.linux.dev>; Thu, 22 Oct 2026 06:20:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 34FC4606A32D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=soleen.com header.i=@soleen.com header.a=rsa-sha256 header.s=google header.b=URELnTGD
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6b1a86c0316so1781213a12.0
-        for <kvmarm@lists.linux.dev>; Wed, 21 Oct 2026 21:12:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792642336; cv=none;
-        d=google.com; s=arc-20260327;
-        b=YxCWYCDjg71cDlW0AjUHklQgkS2rnRmWCCGh1We5fowq2mRTP5SV56WSRT2aQIWz6o
-         sfCnmMnQwbiZuc0ODLSMN+41qFrK8tvYaWT4oWU/5F2QerUtNZpbZWMlQ45/nXtarBI4
-         uuOqWevPZhZagB1o9HnJEQOtZdkFkOkcGZesDe4DNn56iPqtzx7FATX0THdf70RzAqLh
-         J3Vx+Rl8R6bvRiMJeUzgKFGFipGRvbAbFKG9KtTPv8LbaELRblwntXUOw9NsDYXJHcEW
-         EnyyXm11KtXoF3JFy+9V9rPohHIImS28dNGkuiJQX1ODejBG2ifZbkpnbqogfvQUeyEK
-         saWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=vprUskQTUd+SPbnT8TFojrEtK+oeOiPvhjewwpNbp/8=;
-        fh=6zkAdzK4o42gqIdL4uwCoNUvMi7B4InuZ+ol5h8V/7E=;
-        b=o5zke5tL6hgR04pviZOfqkekJUjdQ3NFjzL4+HKGeH8DuPMUWS1cH1u3RHU0dNhqJk
-         MvozXEkP1Gn2OGhgl5pO0CA0mCbGX2ljg7DqKjBwPFwwsVXr9QgeiU1M17B7h4KtD5Hn
-         gsH/m/k8+aKduL+I2qi08VQvNQu4jrAqkzbNtNdWBNrI5qia8n389Pwp0sZrzyVv4+5t
-         ul4xgKPn0tadlHJJpjucueXbbxA8A0QFPo9MQZ7s1KsP5ec3N9oppb/fx5VXlTO7udOq
-         ExeF714eNRK/Px8+1dz5qsG1nRZWktOMJG27gnpSXWEdafBNZrxsjJ584tcyjNU0Ldnh
-         CumA==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=soleen.com; s=google; t=1792642336; x=1793247136; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=vprUskQTUd+SPbnT8TFojrEtK+oeOiPvhjewwpNbp/8=;
-        b=URELnTGDTEFT3a59Exg9C44vVdmWLcMYEeJZW40MPXNL8jgW6rEXI4tjEehy8+wT3p
-         Uq3LA2VIDHYpCkXF3kj+5Rvu+fGpxyekTmQTGZip9gs/NBCDR3aSXn97NdO8vMkc5/j2
-         5iekOlHajKUZ6ncXC9EZeude7kX0+3jXvExKhlHe/sFwE6i8c6B4YlPGqDvvYxTYFmi6
-         KyeNxE+Bb+zk6Rekv7zKceYKfB+TF0aBJebxEQHXpEnm7vqZoMZwn8Yxh1IJXyQDJlSy
-         WrybG35BPzdrNEWXdkxcgHcGzCtcF5OpxB6TIguhPBLfEmE24kPfPch4/+DnBhRO/1eB
-         RmIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792642336; x=1793247136;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=vprUskQTUd+SPbnT8TFojrEtK+oeOiPvhjewwpNbp/8=;
-        b=M96E4FYld176lRne2WSAbKXj5lJwkGSbCBpgM4gPu1/sKO2UvDJW7LxwG7kjzDjG8b
-         2ydDGupSOlvQW0jXbm/rkPPSwYxeuxfGTOWm9CT2i9HyADsX2Dux385kyHYV+PsEDuGQ
-         NDXI7XfDN7bCxL4iyUzfZy09yw5en9PpigyAu1uB8xU12lEVvj8rmn0zR1DIdAgL27sJ
-         43Po0AiNME3CBSN7s68/F0v+e6gOnjRcN0fKVdCJhprcqchdEewtxIjiI7BgmG9XM89b
-         9uTlZmYn67v9fa8a6OImdAKCvvOKUoa3RUewUg/oGF7JvVdeB0JembNz4xXYh6w+XuQW
-         G1pA==
-X-Forwarded-Encrypted: i=1; AKwUvBwqXga5b6Y62E3PhZpoLOi1hJiczQMOVL6YygTpOuZSkrXzsLLrt0qmQ8hb9202fq//jcCxoUk=@lists.linux.dev
-X-Gm-Message-State: AFq9FYJBzbvp1/zM7aKigkpJCCjd792Wp4ax6VgHzg/g3dGsKFGIhMA6
-	IXgk/YdrePEkA1BApv/kJxa0t1osUSPoVC6+Lu4fDevd+1ji96Fmatpnl32aVjF/KMVKn0W75sh
-	g+IgCDSQM6u9zDg6SeXshMacjYTy4NxTlgq35xjVUWg==
-X-Gm-Gg: AYBFou3Mj6Y1IRt+mwHePuJD72Whx+jsnikWvkYcA8Wd7CDsDNJ3Q5nU1jQF/ueNk06
-	D8PRqxGnj/Ttndw+xKTIpmxfuGc2cK/VIa/hLWRkJdZBnVaFI87RPWpz5vOKUkOhueo5BeYJDXB
-	0U0f8YexHTbwsYXaGhN8mcH7b2u3PbVhMYaQczEfGo+lwbwbkjs8C1QjBsdhbgFq8CgJnXKQxqd
-	bwgeEK2qytjsbdWfQu777amKA9P2bB6F+8QSxHSm+djmX/37sLmnkd9kkRwTK4tcgwx0jvas/3p
-	K+pXiBESIx8BJBteHcJPSg47Lh6QV714dHQvnTgiC64IWqqjeuzn0LBb2jRQ4vjeCI57vVmyWka
-	l3d8ymi0OqKG4hywBmmTbG0+DKn5UXTi4Vp0dqaSRP6TtMBiWfLKIFD/GcNB5DE86HowasYmGvf
-	z8vGu8pgOpuncpqCkCzAnBdIsRKxU=
-X-Received: by 2002:a05:6402:5d4:b0:6ab:e30:c9a7 with SMTP id
- 4fb4d7f45d1cf-6b408e80bddmr3221542a12.10.1792642335878; Wed, 21 Oct 2026
- 21:12:15 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=fujitsu.com header.i=@fujitsu.com header.a=rsa-sha256 header.s=fj2 header.b=Z/i8MaXU
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1792650013; x=1824186013;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:to:cc;
+  bh=ylBrsxn7jFn3FfUWPO0HCWyrC/kn6sqQ1CWMj626tQs=;
+  b=Z/i8MaXUj7a/Rzs90j75US3rjRt0rPNOAvn+aKlg9NYlGVJpDHqOADwN
+   FQJiZjyE4vyx/PELdkm5nAukC6FAPZ9BD4teYYE0LpqTyepDlr9tFF9bS
+   nFvKQSj0UZSgmj6/k1Gmmw5H/JyGupSAuG0GqzEgJ8JGTth6+MNoCaZcD
+   ptKXSFdzz+HVrAJ5cHQ2itZ9MuBBr75mbmSlEKNW6VWxOKk3LoT+rkwnN
+   2eP+/AKoINff16AuRiFdK78/GOXyupTGnPrrq4s1bESPXechLcQqb/D5G
+   ACbWer+qtfOt8DRwx+u7Ja9sxyBpDNQ03CUN0Df7mp/7yXnpPwxT9z9qh
+   Q==;
+X-CSE-ConnectionGUID: +5Mvgsr/RZK4sAOPu6M85A==
+X-CSE-MsgGUID: j5nuoBq+RD+aRVMPw0Yuqg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11942"; a="259058196"
+X-IronPort-AV: E=Sophos;i="6.27,171,1786978800"; 
+   d="scan'208";a="259058196"
+Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
+  by esa1.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Oct 2026 15:20:06 +0900
+Received: from az2uksmgm4.o.css.fujitsu.com (unknown [10.151.22.201])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id 6CF041002B8B
+	for <kvmarm@lists.linux.dev>; Thu, 22 Oct 2026 06:20:05 +0000 (UTC)
+Received: from az2nlsmom1.o.css.fujitsu.com (unknown [10.150.26.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2uksmgm4.o.css.fujitsu.com (Postfix) with ESMTPS id 1D2891401271
+	for <kvmarm@lists.linux.dev>; Thu, 22 Oct 2026 06:20:05 +0000 (UTC)
+Received: from [127.0.1.1] (unknown [10.124.178.20])
+	by az2nlsmom1.o.css.fujitsu.com (Postfix) with ESMTP id E4BB582037B;
+	Thu, 22 Oct 2026 06:19:59 +0000 (UTC)
+From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Date: Thu, 22 Oct 2026 15:19:52 +0900
+Subject: [PATCH] KVM: arm64: selftests: Test VNCR translation invalidation
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -105,271 +81,375 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261021152527.375070-1-tarunsahu@google.com> <20261021152527.375070-4-tarunsahu@google.com>
- <CA+CK2bAQbmq3ArP3XMErF_8RC2CUwvgpLY0H83D0nCJTaVKYyA@mail.gmail.com>
- <9huzecdi6go0.fsf@tarunix.c.googlers.com> <CALzav=dLdJoVy=B1pv0FAurD9OhAzLSTjJNbtjTdJRmSqaB0yw@mail.gmail.com>
- <CA+CK2bAQRMAEXZyHTEuUN0_Fo59Sn0hBmYbme_J9ewjx6gPyJQ@mail.gmail.com>
- <atlKsD-aJB3mJr2j@google.com> <CA+CK2bABt4OZO31TenVF2+uBUWVwViWbvfE00=0xbAw=f7K9SA@mail.gmail.com>
- <atl7peoVHdP5hz7z@google.com> <CA+CK2bBFXnJA1kddbLKGq0DAHDgjYhsTSQQay-xeX7jJC1V_UQ@mail.gmail.com>
- <CALzav=e=ho2gVrn+7KpZ3ZyasvH2u15-pC-RSRSS7KcMfKqUJQ@mail.gmail.com>
-In-Reply-To: <CALzav=e=ho2gVrn+7KpZ3ZyasvH2u15-pC-RSRSS7KcMfKqUJQ@mail.gmail.com>
-From: Pasha Tatashin <pasha.tatashin@soleen.com>
-Date: Thu, 22 Oct 2026 00:11:39 -0400
-X-Gm-Features: AclHuK_pCDHndbxcQ4IiuuWok4wCO_ZxudIta9yn_V-W6vImOs3uvaPF1BC9RHM
-Message-ID: <CA+CK2bAJo8dnTOyKMgnnMnk-SCXbTsv+JCLEOWkjyj-wqtEkHg@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 3/4] liveupdate: Replace compatibility string with
- a 2-bit pair feature header
-To: David Matlack <dmatlack@google.com>
-Cc: tarunsahu@google.com, Andrew Morton <akpm@linux-foundation.org>, joro@8bytes.org, 
-	Mike Rapoport <rppt@kernel.org>, Pratyush Yadav <pratyush@kernel.org>, maz@kernel.org, arnd@arndb.de, 
-	jgg@nvidia.com, robin.murphy@arm.com, loganodell@google.com, 
-	oupton@kernel.org, kevin.tian@intel.com, alex@shazbot.org, 
-	dwmw2@infradead.org, pbonzini@redhat.com, seanjc@google.com, will@kernel.org, 
-	Alexander Graf <graf@amazon.com>, Bjorn Helgaas <bhelgaas@google.com>, baolu.lu@linux.intel.com, 
-	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, 
-	sagis@google.com, linux-mm@kvack.org, kvmarm@lists.linux.dev, 
-	iommu@lists.linux.dev, linux-pci@vger.kernel.org, kexec@lists.infradead.org, 
-	skhawaja@google.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261022-b4-vncr-mapping-test-v1-1-e9ad54d506be@fujitsu.com>
+X-B4-Tracking: v=1; b=H4sIAAer2WoC/yXMQQqDMBBA0avIrDtgplK0VyldJHGqIzQNmRgE8
+ e5N7fIt/t9BOQkr3JsdEhdR+YQKc2nAzzZMjDJWA7V0My0Rug5L8AnfNkYJE2bWjFdreu+6wRI
+ T1DQmfsl2bh/Pv3V1C/v8e8FxfAHQILsFeAAAAA==
+X-Change-ID: 20261022-b4-vncr-mapping-test-3a18cb49a2e2
+To: Paolo Bonzini <pbonzini@redhat.com>, 
+ Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, 
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+ Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+ Steffen Eiden <seiden@linux.ibm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ kvmarm@lists.linux.dev, Itaru Kitayama <itaru.kitayama@fujitsu.com>
+X-Mailer: b4 0.16.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1792649999; l=10003;
+ i=itaru.kitayama@fujitsu.com; s=20260825; h=from:subject:message-id;
+ bh=ylBrsxn7jFn3FfUWPO0HCWyrC/kn6sqQ1CWMj626tQs=;
+ b=JH3T49hvs6NtSTICq6ESaTafpdONTM/XvAVPpMvDnicYxUphQL8ILu+kYIj+gP0hx88geJfQC
+ Zo68819EAS1DyUjgPPT0Rw8p351CN296mBAdWjV/0DrwE+q+f+202pV
+X-Developer-Key: i=itaru.kitayama@fujitsu.com; a=ed25519;
+ pk=g9bTnr9giRP7JwNSZHy+OMLQZBEUtSE9tUnXso0hH1Y=
 
-On Wed, Oct 21, 2026 at 11:53=E2=80=AFPM David Matlack <dmatlack@google.com=
-> wrote:
->
-> On Wed, Oct 21, 2026 at 8:32=E2=80=AFPM Pasha Tatashin
-> <pasha.tatashin@soleen.com> wrote:
-> >
-> > On Wed, Oct 21, 2026 at 10:57=E2=80=AFPM David Matlack <dmatlack@google=
-.com> wrote:
-> > >
-> > > On 2026-10-21 09:26 PM, Pasha Tatashin wrote:
-> > > > On Wed, Oct 21, 2026 at 7:28=E2=80=AFPM David Matlack <dmatlack@goo=
-gle.com> wrote:
-> > > > >
-> > > > > On 2026-10-21 02:50 PM, Pasha Tatashin wrote:
-> > > > > > On Wed, Oct 21, 2026 at 2:47=E2=80=AFPM David Matlack <dmatlack=
-@google.com> wrote:
-> > > > > > >
-> > > > > > > On Wed, Oct 21, 2026 at 11:40=E2=80=AFAM <tarunsahu@google.co=
-m> wrote:
-> > > > > > > >
-> > > > > > > > Pasha Tatashin <pasha.tatashin@soleen.com> writes:
-> > > > > > > >
-> > > > > > > > > On Wed, Oct 21, 2026 at 11:25=E2=80=AFAM Tarun Sahu <taru=
-nsahu@google.com> wrote:
-> > > > > > > > >>
-> > > > > > > > >> LUO and its file handlers validate handed-over state wit=
-h monolithic
-> > > > > > > > >> compatibility strings ("luo-v5", "memfd-v2"). Any change=
- to a serialized
-> > > > > > > > >> structure, even an optional additive one, must bump the =
-string, which
-> > > > > > > > >> breaks live update between adjacent kernels. Replace the=
- string in
-> > > > > > > > >> struct luo_ser with a feature header, so that the target=
- kernel can
-> > > > > > > > >> accept or reject the source kernel state per feature.
-> > > > > > > > >>
-> > > > > > > > >> struct luo_feature_hdr is a fixed 128-byte header: the s=
-erialized
-> > > > > > > > >
-> > > > > > > > > This patch is all wrong; 128 bytes is far too large. For =
-every _ser
-> > > > > > > > > struct, we only need 8 bytes instead.
-> > > > > > > >
-> > > > > > > > NOO, It is not. It is intended to avoid complex mess with u=
-nnecessary
-> > > > > > > > over-engineering.
-> > > > > >
-> > > > > > 128-byte per serialized struct is not starter.
-> > > > > >
-> > > > > > > >
-> > > > > > > > >
-> > > > > > > > > The first 4 bytes are the size, and the next 4 bytes are =
-flags (i.e.,
-> > > > > > > > > 30 feature flags + 2 reserved bits for flags extension). =
-The last two
-> > > > > > > > > bits of the flags indicate whether an extended flags fiel=
-d is present.
-> > > > > > > > > Each extended flags field is 8 bytes, and its last two bi=
-ts indicate
-> > > > > > > > > that yet another extended flags field follows.
-> > > > > > > >
-> > > > > > > > If we will have dynamic extension of flags, Think about thi=
-s.
-> > > > > > >
-> > > > > > > To support dynamic extensions in a backward compatible way yo=
-u want
-> > > > > > > something like this:
-> > > > > > >
-> > > > > > > struct luo_feature_hdr {
-> > > > > > >    size
-> > > > > > >    flags
-> > > > > >
-> > > > > > __u32 size
-> > > > > > __u32 flags
-> > > > > >
-> > > > > > >    extensions  // offset of first luo_feature_extensions (or =
-0)
-> > > > > >
-> > > > > > __u64 extensions[0]  --> but the size should be specificed in
-> > > > > > declaration macro that I showed in the next patch.
-> > > > >
-> > > > > I think you may have misunderstood what I meant. In my proposal,
-> > > > > extensions is an offset to the first extension, not an array of
-> > > > > extensions that immediately follow the header.
-> > > > >
-> > > > > If the extensions immediately follow the header, then the number =
-of
-> > > > > extensions is baked into the struct layout. Every field after the=
-m sits
-> > > > > at an offset that depends on how many extensions there are. If we=
- ever
-> > > > > need one more extension, all the fields shift and old and new ker=
-nels
-> > > > > can no longer read each other's struct. That is the problem Tarun
-> > > >
-> > > > We can structure it cleanly by nesting the payload: something like
-> > > > struct { struct header {...}h; struct serialize_data { ... }p; };
-> > > > That way, the header can expand dynamically at the front, while all
-> > > > fields inside `serialize_data` stay at fixed offsets relative to th=
-e
-> > > > start
-> > > > of the payload.
-> > > >
-> > > > Since the header size is self-describing via continuation bits (e.g=
-.,
-> > > > the last two bits indicating whether another flag word follows), LU=
-O
-> > > > can
-> > > > easily compute where the payload begins in the incoming blob. This
-> > > > keeps the implementation simple, avoids linked lists of offsets.
-> > >
-> > > Oh interesting. I agree a dynamically sized header at the front can w=
-ork
-> > > and is simpler than a linked list.
-> > >
-> > > So the header and the payload need to be separate, and the payload is
-> > > located with pointer arithmetic on the header. For example:
-> > >
-> > > struct luo_ser_hdr {
-> > >     u32 size;    /* Size of the payload in bytes */
-> > >     u32 flags;    /* Bits [31:30] indicate an extension word follows =
-*/
-> > >     /* u64 extension words follow while the continuation bits are set=
- */
-> > > };
-> > >
-> > > /* Size of the header, including any extension words. */
-> > > size_t luo_ser_hdr_size(const struct luo_ser_hdr *hdr);
-> > >
-> > > static inline void *luo_ser_payload(const struct luo_ser_hdr *hdr)
-> > > {
-> > >     return (void *)hdr + luo_ser_hdr_size(hdr);
-> > > }
-> > >
-> > > On preserve:
-> > >
-> > >     hdr =3D kho_alloc_preserve(luo_ser_hdr_size_for(nr_ext) + sizeof(=
-*ser));
-> > >     luo_ser_hdr_init(hdr, sizeof(*ser), ...);
-> > >     ser =3D luo_ser_payload(hdr);
-> > >     ...
-> > >     args->serialized_data =3D virt_to_phys(hdr);
-> > >
-> > > On retrieve:
-> > >
-> > >     hdr =3D phys_to_virt(args->serialized_data);
-> > >     err =3D luo_ser_hdr_validate(hdr, ...);
-> > >     if (err)
-> > >         return err;
-> > >
-> > >     ser =3D luo_ser_payload(hdr);
-> > >
-> > > What would size mean in luo_ser_hdr? The size of the payload or the s=
-ize
-> > > of the combined luo_ser_hdr + payload. luo_ser_hdr is self describing=
- so
-> > > maybe it's just the size of the payload?
-> >
-> > > What would size mean in luo_ser_hdr? The size of the payload or the s=
-ize
-> > > of the combined luo_ser_hdr + payload. luo_ser_hdr is self describing=
- so
-> > > maybe it's just the size of the payload?
-> >
-> > Either works, but having size cover the combined hdr + payload
-> > provides a few extra guarantees:
-> >
-> > 1. A single static_assert validates the entire serialized struct at
-> > compile time, including the header and the number of ext_flags
-> > elements.
-> > 2. Bounds checking while traversing the header continuation bits on
-> > retrieve: we can sanity-check that luo_ser_hdr_size(hdr) <=3D hdr->size
-> > so we never walk past the end of the serialized blob if there is
-> > memory corruption.
-> >
-> > If we declare the payload struct separately and pass it into the
-> > macro, handlers also get a clean type for luo_ser_payload(hdr):
-> >
-> > #define DECLARE_LUO_SER(name, expected_size, ext_flags_count, payload_t=
-ype) \
-> >     struct name {                                                      =
-     \
-> >         __u32 size;                                                    =
-     \
-> >         __u32 flags;                                                   =
-     \
-> >         __u64 ext_flags[ext_flags_count];                              =
-     \
-> >         payload_type payload;                                          =
-     \
-> >     };                                                                 =
-     \
-> >     static_assert(sizeof(struct name) =3D=3D (expected_size),          =
-         \
-> >                   "LUO struct " #name " size mismatch!")
-> >
-> > For example:
-> >
-> > struct luo_memfd_payload {
-> >     __u64 pos;
-> >     __u64 size;
-> > };
-> >
-> > DECLARE_LUO_SER(luo_memfd_ser, 24, 0, struct luo_memfd_payload);
->
-> This looks pretty reasonable but I would name the payload
-> luo_memfd_ser. The combined struct that DECLARE_LUO_SER() creates
-> should never be used directly since the offset of the payload in that
-> struct is only valid in the current kernel. So I would give that
-> struct a special name that makes it obvious you shouldn't be using it.
+Add a standalone KVM selftest that checks VNCR accesses after L1
+updates its stage-1 mapping and issues a TLBI.
 
-Lets drop the fourth macro argument and generate the combined struct name:
+Keep VNCR_EL2 unchanged while remapping its backing page A to B then
+again to A. At each step, L2 reads and writes TPIDR_EL2, and L1
+verifies that the accesses reach the selected page while leaving the
+other page unchanged.
 
-#define DECLARE_LUO_SER(name, expected_size, ext_flags_count)              =
-\
-    struct name##_hdr {                                                    =
-\
-        __u32 size;                                                        =
-\
-        __u32 flags;                                                       =
-\
-        __u64 ext_flags[ext_flags_count];                                  =
-\
-        struct name payload;                                               =
-\
-    };                                                                     =
-\
-    static_assert(sizeof(struct name##_hdr) =3D=3D (expected_size),        =
-    \
-                  "LUO struct " #name " size mismatch!")
+The test runs with L1-managed stage-2 translation disabled.
 
-For example:
+Signed-off-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+---
+ tools/testing/selftests/kvm/Makefile.kvm           |   1 +
+ .../selftests/kvm/arm64/nv_vncr_tlbi_test.c        | 303 +++++++++++++++++++++
+ 2 files changed, 304 insertions(+)
 
-struct luo_memfd_ser {
-    __u64 pos;
-    __u64 size;
-};
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index f43549a56f0b..9f0af6ef54ba 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -181,6 +181,7 @@ TEST_GEN_PROGS_arm64 += arm64/host_sve
+ TEST_GEN_PROGS_arm64 += arm64/hypercalls
+ TEST_GEN_PROGS_arm64 += arm64/external_aborts
+ TEST_GEN_PROGS_arm64 += arm64/mmio_sign_ext
++TEST_GEN_PROGS_arm64 += arm64/nv_vncr_tlbi_test
+ TEST_GEN_PROGS_arm64 += arm64/page_fault_test
+ TEST_GEN_PROGS_arm64 += arm64/psci_test
+ TEST_GEN_PROGS_arm64 += arm64/sea_to_user
+diff --git a/tools/testing/selftests/kvm/arm64/nv_vncr_tlbi_test.c b/tools/testing/selftests/kvm/arm64/nv_vncr_tlbi_test.c
+new file mode 100644
+index 000000000000..93219d036de6
+--- /dev/null
++++ b/tools/testing/selftests/kvm/arm64/nv_vncr_tlbi_test.c
+@@ -0,0 +1,303 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Check VNCR translation invalidation through observable memory effects.
++ *
++ * L1 keeps VNCR_EL2 unchanged while remapping its virtual address:
++ *
++ *     VNCR VA -> page A -> page B -> page A
++ *
++ * L2 reads and writes TPIDR_EL2 with HCR_EL2.{NV2,NV} == {1,1}.
++ * These accesses use the TPIDR_EL2 slot at VNCR offset 0x090.
++ *
++ * After each L2 HVC, L1 checks:
++ *   - the value returned by the redirected register read;
++ *   - the value written to the selected backing page;
++ *   - that the other backing page remains unchanged.
++ *
++ * No L3 and no L1-managed stage-2 translation are needed.
++ */
++
++#include "kvm_util.h"
++#include "processor.h"
++#include "test_util.h"
++#include "ucall_common.h"
++
++#define VNCR_TPIDR_OFFSET	0x090
++
++#define SEED_A			0x1111222233334444ULL
++#define SEED_B			0x5555666677778888ULL
++#define WRITE_A			0xaaaabbbbccccddddULL
++#define WRITE_B			0x123456789abcdef0ULL
++#define WRITE_A_AGAIN		0xfedcba9876543210ULL
++
++#define L1_HCR			(HCR_EL2_RW | HCR_EL2_E2H | \
++				 HCR_EL2_NV | HCR_EL2_NV2)
++#define L2_PSTATE		(PSR_MODE_EL1h | PSR_D_BIT | PSR_A_BIT | \
++				 PSR_I_BIT | PSR_F_BIT)
++
++static struct test_config {
++	u64 vncr_va;
++	u64 *vncr_ptep;
++	u64 pte_a;
++	u64 pte_b;
++	u64 *slot_a;
++	u64 *slot_b;
++	u64 l2_sp;
++} cfg;
++
++static unsigned int round_nr;
++
++extern void l2_probe(void);
++extern char l2_after_hvc[];
++
++/*
++ * x1: value to write.
++ * x0: value read, observed by L1's HVC handler.
++ *
++ * No stack accesses or C calls in L2.
++ * Use the SMCCC convention of a zero HVC immediate.
++ */
++asm(
++".pushsection .text,\"ax\"\n"
++".balign 4\n"
++".global l2_probe\n"
++".type l2_probe, %function\n"
++"l2_probe:\n"
++"	mrs	x0, tpidr_el2\n"
++"	msr	tpidr_el2, x1\n"
++"	dsb	ish\n"
++"	hvc	#0\n"
++".global l2_after_hvc\n"
++"l2_after_hvc:\n"
++"	brk	#0\n"
++".size l2_probe, . - l2_probe\n"
++".popsection\n"
++);
++
++static void remap_vncr(u64 new_pte)
++{
++	u64 hcr = read_sysreg(hcr_el2);
++	u64 operand = cfg.vncr_va >> 12;
++
++	/*
++	 * Use the VHE host translation regime for the EL1 TLBI
++	 * instruction: HCR_EL2.{E2H,TGE} == {1,1}.
++	 */
++	write_sysreg(hcr | HCR_EL2_TGE, hcr_el2);
++	isb();
++
++	/* Break before make. VNCR_EL2 itself is never rewritten. */
++	WRITE_ONCE(*cfg.vncr_ptep, 0);
++	dsb(ishst);
++
++	asm volatile("tlbi vaae1is, %0" : : "r" (operand) : "memory");
++	dsb(ish);
++	isb();
++
++	WRITE_ONCE(*cfg.vncr_ptep, new_pte);
++	dsb(ishst);
++	isb();
++
++	/* Permit return to L2 at EL1. */
++	write_sysreg(hcr, hcr_el2);
++	isb();
++}
++
++static void handle_l2_hvc(struct ex_regs *regs)
++{
++	u64 esr = read_sysreg(esr_el1);
++
++	GUEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_HVC64);
++	GUEST_ASSERT_EQ(esr & 0xffff, 0x0);
++	GUEST_ASSERT_EQ(regs->pc, (u64)l2_after_hvc);
++	GUEST_ASSERT_EQ(read_sysreg_s(SYS_VNCR_EL2), cfg.vncr_va);
++
++	dsb(ish);
++
++	switch (round_nr) {
++	case 0:
++		/* Warmed translation: VNCR VA -> A. */
++		GUEST_ASSERT_EQ(regs->regs[0], SEED_A);
++		GUEST_ASSERT_EQ(READ_ONCE(*cfg.slot_a), WRITE_A);
++		GUEST_ASSERT_EQ(READ_ONCE(*cfg.slot_b), SEED_B);
++
++		remap_vncr(cfg.pte_b);
++		regs->regs[1] = WRITE_B;
++		break;
++
++	case 1:
++		/* Following TLBI, reads and writes must now use B. */
++		GUEST_ASSERT_EQ(regs->regs[0], SEED_B);
++		GUEST_ASSERT_EQ(READ_ONCE(*cfg.slot_b), WRITE_B);
++		GUEST_ASSERT_EQ(READ_ONCE(*cfg.slot_a), WRITE_A);
++
++		remap_vncr(cfg.pte_a);
++		regs->regs[1] = WRITE_A_AGAIN;
++		break;
++
++	case 2:
++		/* Check invalidation again, with the mapping reversed. */
++		GUEST_ASSERT_EQ(regs->regs[0], WRITE_A);
++		GUEST_ASSERT_EQ(READ_ONCE(*cfg.slot_a), WRITE_A_AGAIN);
++		GUEST_ASSERT_EQ(READ_ONCE(*cfg.slot_b), WRITE_B);
++
++		GUEST_DONE();
++	default:
++		GUEST_FAIL("Unexpected round %u", round_nr);
++		return;
++	}
++
++	round_nr++;
++	regs->pc = (u64)l2_probe;
++	regs->pstate = L2_PSTATE;
++}
++
++static void guest_code(void)
++{
++	GUEST_ASSERT_EQ(get_current_el(), 2);
++	GUEST_ASSERT(read_sysreg(hcr_el2) & HCR_EL2_E2H);
++
++	/*
++	 * With E2H=1, these EL1 accessors read L1's own configuration.
++	 * EL12 accessors configure the EL1 context used to execute L2.
++	 */
++	write_sysreg_s(read_sysreg(tcr_el1), SYS_TCR_EL12);
++	write_sysreg_s(read_sysreg(ttbr0_el1), SYS_TTBR0_EL12);
++	write_sysreg_s(read_sysreg(mair_el1), SYS_MAIR_EL12);
++	write_sysreg_s(read_sysreg(cpacr_el1), SYS_CPACR_EL12);
++	write_sysreg_s(read_sysreg(vbar_el1), SYS_VBAR_EL12);
++	write_sysreg_s(read_sysreg(sctlr_el1), SYS_SCTLR_EL12);
++	write_sysreg(cfg.l2_sp, sp_el1);
++	isb();
++
++	/*
++	 * These aliases remain mapped throughout the test. They allow
++	 * inspection of both backing pages independently of VNCR VA.
++	 */
++	WRITE_ONCE(*cfg.slot_a, SEED_A);
++	WRITE_ONCE(*cfg.slot_b, SEED_B);
++	dsb(ish);
++
++	/* Program the VNCR address exactly once. */
++	write_sysreg_s(cfg.vncr_va, SYS_VNCR_EL2);
++
++	/* VM=0, TGE=0; enable nested register redirection for L2. */
++	write_sysreg(L1_HCR, hcr_el2);
++	isb();
++
++	GUEST_ASSERT_EQ(read_sysreg(hcr_el2) &
++			(HCR_EL2_NV | HCR_EL2_NV2),
++			HCR_EL2_NV | HCR_EL2_NV2);
++	GUEST_ASSERT(!(read_sysreg(hcr_el2) & HCR_EL2_VM));
++
++	write_sysreg((u64)l2_probe, elr_el2);
++	write_sysreg(L2_PSTATE, spsr_el2);
++	isb();
++
++	asm volatile(
++		"mov x1, %0\n"
++		"eret\n"
++		:
++		: "r" (WRITE_A)
++		: "x1", "memory");
++
++	__builtin_unreachable();
++}
++
++/* Add a guest virtual alias for an existing guest physical page. */
++static u64 map_alias(struct kvm_vm *vm, u64 gpa)
++{
++	u64 va = vm_unused_gva_gap(vm, vm->page_size,
++				  KVM_UTIL_MIN_VADDR);
++
++	virt_map(vm, va, gpa, 1);
++	return va;
++}
++
++static void prepare_memory(struct kvm_vm *vm)
++{
++	u64 a = vm_alloc_page(vm);
++	u64 b = vm_alloc_page(vm);
++	u64 page_mask = ~((u64)vm->page_size - 1);
++	u64 stack = vm_alloc_pages(vm, DEFAULT_STACK_PGS);
++	u64 ptep_gpa, ptep_alias;
++	u64 *ptep;
++
++	cfg.slot_a = (u64 *)(a + VNCR_TPIDR_OFFSET);
++	cfg.slot_b = (u64 *)(b + VNCR_TPIDR_OFFSET);
++	cfg.l2_sp = stack + DEFAULT_STACK_PGS * vm->page_size;
++
++	/* Initially, the separate VNCR virtual address maps page A. */
++	cfg.vncr_va = map_alias(vm, addr_gva2gpa(vm, a));
++
++	ptep = virt_get_pte_hva(vm, cfg.vncr_va);
++	cfg.pte_a = *ptep;
++	cfg.pte_b = *virt_get_pte_hva(vm, b);
++
++	TEST_ASSERT(cfg.pte_a != cfg.pte_b,
++		    "Backing pages must have different descriptors");
++	TEST_ASSERT((cfg.pte_a & (PTE_VALID | PTE_TYPE_PAGE)) ==
++		    (PTE_VALID | PTE_TYPE_PAGE),
++		    "VNCR mapping must use a leaf page descriptor");
++
++	/*
++	 * Map the page containing the descriptor into L1, so L1 can
++	 * perform its own page-table update and architectural TLBI.
++	 */
++	ptep_gpa = addr_hva2gpa(vm, ptep);
++	ptep_alias = map_alias(vm, ptep_gpa & ~page_mask);
++	cfg.vncr_ptep = (u64 *)(ptep_alias + (ptep_gpa & page_mask));
++
++	sync_global_to_guest(vm, cfg);
++}
++
++int main(void)
++{
++	struct kvm_vm *vm;
++	struct kvm_vcpu *vcpu;
++	struct ucall uc;
++	u64 mmfr4, cmd;
++
++	TEST_REQUIRE(test_supports_el2());
++
++	vm = __vm_create_with_one_vcpu(&vcpu, 32, guest_code);
++	TEST_REQUIRE(vcpu_has_el2(vcpu));
++
++	/*
++	 * Target KVM's exposed NV2-only-or-later nested capability.
++	 * Merely having a virtual EL2 is insufficient for this test.
++	 */
++	mmfr4 = vcpu_get_reg(vcpu,
++			    KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR4_EL1));
++	TEST_REQUIRE(FIELD_GET(ID_AA64MMFR4_EL1_NV_frac, mmfr4) >=
++		     ID_AA64MMFR4_EL1_NV_frac_NV2_ONLY);
++
++	vm_init_descriptor_tables(vm);
++	vcpu_init_descriptor_tables(vcpu);
++	vm_install_sync_handler(vm, VECTOR_SYNC_LOWER_64,
++				ESR_ELx_EC_HVC64, handle_l2_hvc);
++
++	prepare_memory(vm);
++
++	for (;;) {
++		vcpu_run(vcpu);
++		cmd = get_ucall(vcpu, &uc);
++
++		switch (cmd) {
++		case UCALL_PRINTF:
++			REPORT_GUEST_PRINTF(uc);
++			break;
++		case UCALL_ABORT:
++			REPORT_GUEST_ASSERT(uc);
++			break;
++		case UCALL_DONE:
++			pr_info("PASS: VNCR accesses followed A -> B -> A mappings; "
++		"inactive backing slots remained unchanged\n");
++			kvm_vm_free(vm);
++			return 0;
++		default:
++			TEST_FAIL("Unexpected ucall %lu, KVM exit reason %u",
++				  cmd, vcpu->run->exit_reason);
++		}
++	}
++}
 
-DECLARE_LUO_SER_HDR(luo_memfd_ser, 24, 0);
+---
+base-commit: c03c1a14507dfaf8b856c2608f9ac216021fc222
+change-id: 20261022-b4-vncr-mapping-test-3a18cb49a2e2
+
+Best regards,
+--  
+Itaru Kitayama <itaru.kitayama@fujitsu.com>
+
