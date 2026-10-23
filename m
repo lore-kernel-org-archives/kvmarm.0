@@ -1,114 +1,110 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.155
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792763419;
-	b=mdE44CBvPTXXmPuAp85WHzafIcu6OLxZ9AC5J20/sBABaiDjYLAkuQ0moE+5HwgZEdfq
-	 4wTVfCnf8Xo8oHrESstDXMp/7f0q/lpNwNt071B/O9iEv8tO+zAmy1aAQ4SVAMjj2wZ6a
-	 NLw2zIkpnQMPJro4His+8KNxMh6BMm17O5sx9hl7c8Qpp9N8RDreeHICHGhZh1ywn2Zqh
-	 Ri+HobcXvi7Zl5Udkt2DxNG85TZIiSe0PqQWC5STScXef23EMS7D0fFGiZSXs9hANtE9E
-	 fihXzDgH95+Ngnh1TSm/pKPVYS68FlRQQ1cbPjO7cI0cFxCoG2Ic6m88KSwqVadYRhw==
+	t=1792764677;
+	b=lX6pBgoPzC7UL2ZJbjX8Ns4cE2ckcjw/IrMieWrcNtMrTwiLXtr/BLZNHmk+MZ/qf6LW
+	 +8+mtOgEG7+z241g7tCiDf0ubrmzLLGEAeXtz79HaMBrxzj/pSjXmj382ZtKJyrB0YXfk
+	 xS6J2DyvVOfyQERcZnDA59Vio6ftcqGiG8dOv3/UqxyLuPsB5zXxxsVGcUvTm/fnvPwKH
+	 Z0q7KWYYbf2yE0Tb5FiwLeGOyNy5YWXtUxCBddaawXbl9RgGrgcjf7bi0AVkZzrhrDRDr
+	 YerdOYb+8D2vh8UZPSWkoLBlfiVusvM3XBaRCfcWSzegLHehDBUzUmJNaGp7UxyY3ew==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792763419;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding:
-	 In-Reply-To;
-	bh=8FyuJnnll3uJwbR+wT99CVBO9fzREsmjzeqnUECMRTY=;
-	b=ajn+PRFRRVrcBKTZQjwzlmshF1D14YyrNiH7+9g+oUNELKWIodtPGeotdGKBtg2c4UBt
-	 PRt/RNbbHjjW1ITh/ywhKALHC6iGuY4EYcuo43ePJ696o7LtFB+Rf2R+6GZJedThVks9R
-	 bSAlmCggM/hTeCQInBh8wKyhlHEOBQAYehD3PfmO4BAvb2ONvdxN6kNWC+An5pi5n9tTz
-	 ixSpt0y7zEQ0OjYNT5M4Ls1tUvawPEAUIrhaPAL8gzvZr9DHrf0/yDOi2kDNtZr3s4rZv
-	 Vs4Lj9TU/u/jS1o6Iv3XAZW7BTzEe48NHrTJnrXT6c9tZkXJkkaoq5I+YntdLxu3rpA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792764677;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
+	 MIME-Version:X-ThreadId:Date:From:To:Cc:Message-Id:In-Reply-To:
+	 References:Subject:Content-Type:Content-Transfer-Encoding;
+	bh=VHsYbMWajiPGkaPnQFmHr/q3XA6XDqqarKFTwdVqZaA=;
+	b=n2Td1G9SsZCX5JRlvrXhKluzCvROCselVi2nQwn7nHLCsq6j9G722THAFPjMVQspiyoW
+	 DVcIOixI9HvQ5keU9U67nEoAfzEthYar9G0vXjQ/kd5D36twsfJ2n/TgaNzdbnUyNOB2E
+	 cf/qUS3Z8pfjbR0jj7b3DiYHAkxBbz8eqGSDdl/K5SK9GGo5YqlI9tJ3tC9Qy2Cik8OyW
+	 TUumDc9IrRNCAH1Gkll5A+htxjR38eAd3owOUnm6srttNxx700kYhD54smFElAl2r/PO+
+	 2TepoBQfdVyFmrLPxe9gdyp3BnwkKxRZKh6tdqY+9IrgcPgtLooBHTQwCjT0pcZhUaQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b="KPwT/HJ6";
-	arc=none smtp.remote-ip=209.85.215.175
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=arndb.de;
+	spf=pass smtp.mailfrom=arndb.de;
+	dkim=pass header.d=arndb.de header.i=@arndb.de header.a=rsa-sha256 header.s=fm1 header.b=dpSgweoN;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=fEtKMigR;
+	arc=none smtp.remote-ip=202.12.124.155
+Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11EBF606A321
-	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 13:50:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 11EBF606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACF2606A31A
+	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 14:11:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8ACF2606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=KPwT/HJ6
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-cd633ef819bso405835a12.2
-        for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 06:50:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1792763418; x=1793368218; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=8FyuJnnll3uJwbR+wT99CVBO9fzREsmjzeqnUECMRTY=;
-        b=KPwT/HJ6horIKi23Rq8ERXOA7CxMMCLFhxpXAn0iJcR+i6JW2S/JPevtTssiy1/B/D
-         QkDqb/Vo84n98i1mJwuyEIEck2vbUhTvdx477HUj6Kpr7ky+2/o/MmcHzySoFLUq8tQ/
-         lJQ9dKL4RdkxIC9yBsZP9pRRXIoW7HguLJ2V9BqaTN0vDBeCXuCe2Bz9heiebY2k887m
-         U1HN8G8/yNCH9Nf2xSe//99kC2jdcf+Shb3q+jBowGeQMuhF3C+G5l/l7690crC7yfvd
-         ExJDD4WLTeuf9asQZ6uWobI3JRl2ujAw6wHpbcU1XV49lVYwEm7jOwFxxzXAvpF+zrPe
-         IW7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792763418; x=1793368218;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=8FyuJnnll3uJwbR+wT99CVBO9fzREsmjzeqnUECMRTY=;
-        b=exJJwzEdLosn8/FN6mhqrJqJIeDgiceMKtQvc9Yy7/4A/yCZBk4XSufxl68HyltTHQ
-         4nGgxAY9OHKIpWlc92D9jMY7Qp+WccYi5+4R++bF2Jm7W2kAFOEZwBJkMpoNf3F6/mOY
-         AsugKUmOrEcYk27qMVyPNjZC/7q4B6DInSVLtSmnJ7/89jXOJV4Iu6/fKDmEHu0Mu227
-         PGoqARigTh7Xs2MheX4BgE4SMFGhK0IZGwNisl8cVlhSqO60/6AyKfObeiRHPTYFxXfB
-         jSNHGN0QVxDA185qJeMPkbnHFbBNRuE+ypMW5gYgNtfPeXjtGq+ntwKsqxUEYfafleTC
-         Utag==
-X-Forwarded-Encrypted: i=1; AKwUvBwb9u0BqSWO12ssGmtWfv6IEESRBSmLBcNQDKjsyzJh4Tuwl5YlfBL3cUjYurJLS9z7NzWeBOU=@lists.linux.dev
-X-Gm-Message-State: AFq9FYKl89T4xlB3PRN1CRikEuyuTyTvIapo6mbU+yJ+t7ff3lhR34vQ
-	0Y7/IMVv1aLgDkJ9CM33n5wgww73g7xdG893JIfIk3GGfzqXoCtuZv4iFJLkSV1zVg==
-X-Gm-Gg: AYBFou2nQVmT7QblEZHY8tn/YTZsl1fp444nzkgks3evyhm+mGE6qyWl0N3fOBgVVPm
-	SzM5Z1g+hTgQj4wWJKEf6cgOivrOax2+3dCPim0ssPvUnqrQV2BPujjBk04fZSb2ccBZekYA/4V
-	BH8+cVwLMleNn8WvNtSvpputXCElROOTY0YzHZJ26ly+5+7rQipB1hvRWqMfpamvgc+JIdtF+3K
-	0OZkmU2/jWGcTiu/VRrbZpcHFomWHEXCAmanXQeZWPzjHoW3p2puzCkMl2992wCvAbTImj4YAeC
-	J7if+n4k4Or8k6jHVLoIAfIHhmJRWczV+Q/mqCR9oCpIfKAXXqERydaoEzYU/X6O0LTyYMN8AJf
-	OMIg6Hb9noXIRlHCISMdF3t0Y1E6D0kZzLa4pV/48i+Iae3DxgOoxgrhb4KQamDOd7jC760c+cE
-	Ic04xZLHNEube82QCEEzajsL32X2jbR+WXNgPuwCkKtMyRztMZYXqNLsJ67yza3hLI/PIJ1jRzD
-	SfMIf4Nf38zl1j0KN7WQdZW6f/QMFODeKMsHVEqoVkJ4ovdudHDMZB4E8y4WGPJIgOOUOm+Miwl
-	mfPvOFoGBh1Ua6UfdSarPNdtBsuMSm8AOhGTYg==
-X-Received: by 2002:a17:90b:5906:b0:3ab:3437:554f with SMTP id 98e67ed59e1d1-3adce0073a2mr1983207a91.29.1792763417701;
-        Fri, 23 Oct 2026 06:50:17 -0700 (PDT)
-Received: from google.com (64.75.127.34.bc.googleusercontent.com. [34.127.75.64])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ea94677c91sm545015ad.4.2026.10.23.06.50.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Oct 2026 06:50:16 -0700 (PDT)
-Date: Fri, 23 Oct 2026 13:50:13 +0000
-From: David Matlack <dmatlack@google.com>
-To: Pasha Tatashin <pasha.tatashin@soleen.com>
-Cc: tarunsahu@google.com, Andrew Morton <akpm@linux-foundation.org>,
-	joro@8bytes.org, Mike Rapoport <rppt@kernel.org>,
-	Pratyush Yadav <pratyush@kernel.org>, maz@kernel.org, arnd@arndb.de,
-	jgg@nvidia.com, robin.murphy@arm.com, loganodell@google.com,
-	oupton@kernel.org, kevin.tian@intel.com, alex@shazbot.org,
-	dwmw2@infradead.org, pbonzini@redhat.com, seanjc@google.com,
-	will@kernel.org, Alexander Graf <graf@amazon.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, baolu.lu@linux.intel.com,
-	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
-	sagis@google.com, linux-mm@kvack.org, kvmarm@lists.linux.dev,
-	iommu@lists.linux.dev, linux-pci@vger.kernel.org,
-	kexec@lists.infradead.org, skhawaja@google.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v2 3/4] liveupdate: Replace compatibility string with
- a 2-bit pair feature header
-Message-ID: <attmFVIFU_mS0Y7p@google.com>
-References: <CALzav=dLdJoVy=B1pv0FAurD9OhAzLSTjJNbtjTdJRmSqaB0yw@mail.gmail.com>
- <CA+CK2bAQRMAEXZyHTEuUN0_Fo59Sn0hBmYbme_J9ewjx6gPyJQ@mail.gmail.com>
- <atlKsD-aJB3mJr2j@google.com>
- <CA+CK2bABt4OZO31TenVF2+uBUWVwViWbvfE00=0xbAw=f7K9SA@mail.gmail.com>
- <atl7peoVHdP5hz7z@google.com>
- <CA+CK2bBFXnJA1kddbLKGq0DAHDgjYhsTSQQay-xeX7jJC1V_UQ@mail.gmail.com>
- <CALzav=e=ho2gVrn+7KpZ3ZyasvH2u15-pC-RSRSS7KcMfKqUJQ@mail.gmail.com>
- <CA+CK2bAJo8dnTOyKMgnnMnk-SCXbTsv+JCLEOWkjyj-wqtEkHg@mail.gmail.com>
- <atpNFEFIlqAoYIwH@google.com>
- <CA+CK2bB2C3Am5ssRuzYpfiU7_vB81vxMGc19HQLq7N=_7YrbTg@mail.gmail.com>
+	dkim=pass (2048-bit key, unprotected) header.d=arndb.de header.i=@arndb.de header.a=rsa-sha256 header.s=fm1 header.b=dpSgweoN;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=fEtKMigR
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 958F07A0281
+	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 10:11:15 -0400 (EDT)
+Received: from ams-imap-03 ([10.64.2.23])
+  by ams-compute-02.internal (MEProxy); Fri, 23 Oct 2026 10:11:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1792764666;
+	 x=1792851066; bh=VHsYbMWajiPGkaPnQFmHr/q3XA6XDqqarKFTwdVqZaA=; b=
+	dpSgweoNo091s7m8gEE03TEoLCYOXysEbhnCXk/AIsmM5kxGSm2dUuKlVfvGECHK
+	+K/ddLXrwrWLj/Ew6QOZuwuVr+lElBRHoiExO3wwgNkI7riU60tKTWhaFjhPlyYi
+	i57RD4GnTk65ehTHhv/UIW9nBV/q/rsPPwanqDQT1m1eaGWrRwTiyLO/PARv23Z3
+	EG2EVyf7fFb2reTmq8PlpHnEgg50MjJ14ykR/SecNcvP3VQTEv9ncLE/2IWvtEyX
+	FKm7ni4MQlrQ69DAATruiytl0Cm6TXwi63HDPpfROl5xPqzHWHWZbQBw4U6FshzD
+	MUUDX3pjPv9xl3zEWJhUGA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1792764666; x=
+	1792851066; bh=VHsYbMWajiPGkaPnQFmHr/q3XA6XDqqarKFTwdVqZaA=; b=f
+	EtKMigR3n+7M8yQnILxn9DnRqg3symMwVA2w8qqJwkMEtu2I6l1ZFs+Qm308SpSt
+	Qk+XpWgz9xsZryG96EvSVTnnRHyYHbn9IJefbrr/tWae+abt5K+WagPrTAHtcDeb
+	dwfXoOWOCZRbDczMkGooxdhGIcD5KXwED9f/54SoctF3NgvCKmyK4SOQzr/mts08
+	SWj2GAzJOhPJEAuS8uEpqjZ1hsPahdGXbmOcUwf1LImEmTh2AvZsCihUiyR8kQXL
+	VP4IQhVE1OkQNBhpyFR+BzDemrhLR9FY+4Yt+PEDVyawUwrIBa8zpGCz0HRqRikm
+	7SJx4TLb3xr684352XI4Q==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-07;
+	repo=github.com/dkim2wg/interop; date=2026-10-18; sw=lmtpprox;
+	action=sign d=arndb.de a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1792764666; d=arndb.de;
+	mf=PGFybmRAYXJuZGIuZGU+; rt=PGt2bWFybUBsaXN0cy5saW51eC5kZXY+;
+	s=fm1:rsa-sha256:bdZEvG926szG08mFYNrwrxfVISvCrXe/JhKfOBFZiBQz2UL
+	EaPQri5S8wzIx8r6Ebr7PbJL18Dj/QI+FodFA1t6mL+Wru2bZgUksTeIxx8lS+yU
+	BWrUDPWRzyDvFp3iqlhzBNnYY/9Kc8/E0asCz87LfRP3ZHXyAaRK6dMTu+bLfvhn
+	ZJpkfd7T3nFEmhsdfBSq5A0qNOJ4Ir8WoVS4mW0Mb4ej0vX+M5v9UyvAkNjoxXZ3
+	m5wA77cCIrbIWPBzh/5eoOj5IKerTUdh1RfL25wSqWtBOlikJ2lpTsgNrVa6AJpN
+	0tLjfmFPNJ+qL94JxjWfnlu0NjJW9qRdU0upP2w==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-07;
+	repo=github.com/dkim2wg/interop; date=2026-10-18; sw=lmtpprox;
+	action=mi-m=1; hc=12;
+	hn=cc,content-transfer-encoding,content-type,date,feedback-id,
+	from,in-reply-to,message-id,mime-version,references,subject,to;
+Message-Instance: m=1; h=sha256:gLdcu4wlVTeOqtG+F1nxk9aFgt/lv+jaAPp2yGbIQCA=:sNAftTAns3R115dm8xVuq12ndv8JtTHMJC021bb9264=;
+X-ME-Sender: <xms:82rbagk6Dq3FqIIZNwQeZvb8UrzoSTfx2XbQVZ0GIx0gWK-vZHFIEA>
+    <xme:82rbaqqfDaHFTgbQCrRmODZqUJZAvgzdPa3Fex-d-IQXFCNveUcaYoBeHYejUNOwu
+    D28_ZhxN-shpJl6RjlkdY-qf3Yx0lkGIFWf6UN1Y1MzBO3tPuUDvvdFhw>
+X-ME-Proxy-Cause: dmFkZTF+XKMUw2hOuK6Q78JhubtZyyLXH043ZxI8uxm2Aug6BXA6W4PTfA0AquoOYCC6F8
+    +oMyCseuDN6IBluJBj0IwaLeH3SqeCuU20fhuONXou8mT14m9M5y77ASHsOEApCpYu8L12
+    Pu/qh/PTXW/nxsXtG5o+7GlUxJw8mg45mvXwW+eN7oGJuudUYU7gupqr7aEyGWP91sKUTZ
+    EymCikImgjItHKrkU8TMXGgEkh9ZGZPPeYDB83uWc8vNUSqdrV9rdA76GhTF3HW2rhJtmH
+    fJwGR2G9l4fhsSO4IqIEvqX4RtlRImBdMzqak5k6Fy36+Tdv5vTtuj4kcSqJAx/EXajBIZ
+    JoreQFcjxeFbx5U7XTo9leDLmnzdh/5qv9vdbgjwAVa6S4BHEAdM+McnsdlhTrWD4b6WJN
+    BAQxcGfhczEBah4yEZ8VAKU9ChzjyZriavARcfwFTYLaTcOulXV8wEp/TahuJgts4Wqi/o
+    XZaZhJgFdX/H9sqw8ctmYjf3/SCuaG1/klo7AEin36mC37fUPKFrMa0YPdP2lQn6BRCK0O
+    PVNYM5qUU+Vp93vy+IIpLHbLOb2WTwonDPBJc824V8lrj/JaPs/TAOuZ7kAD1pZdeZJMc8
+    M8W3+yLp61dXxCfwKsCnUMUC0l8bUijYOIUCj7vIEVqUqVFLgXcC7+ML/7og
+X-ME-Proxy: <xmx:9mrbapsRwNp7ht9Ikq6wixfPE8ymJ-VYAOvX9Y47eN-NMI4Oat1s0g>
+    <xmx:9mrbajY_tZQK14hboBgnxNgMvTpwyOjC4kA2BiHSjY-4Iu0RD2ztSA>
+    <xmx:9mrbatFzayDMZSrfbRE8sfRwSRoxu0IViKt52HEB9I3a-i77So2SOg>
+    <xmx:9mrbaurf-wdnHzYyU6nuOuObs-JYf3fFL2Qjd9jq_K-bPvbrVFeynQ>
+    <xmx:-mrbanNI2vuXFG-cC9EUW3LXr-6UVbc5hfQT-UnN6Y7rKCuwnQ2JtJlf>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id 88E4C32A0097; Fri, 23 Oct 2026 10:10:59 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -118,154 +114,246 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+CK2bB2C3Am5ssRuzYpfiU7_vB81vxMGc19HQLq7N=_7YrbTg@mail.gmail.com>
+X-ThreadId: AmcrnnMArev7
+Date: Fri, 23 Oct 2026 16:10:23 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Fuad Tabba" <fuad.tabba@linux.dev>, "Marc Zyngier" <maz@kernel.org>
+Cc: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, "Joey Gouly" <joey.gouly@arm.com>,
+ "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+ "Zenghui Yu" <yuzenghui@huawei.com>, "Steffen Eiden" <seiden@linux.ibm.com>,
+ "Catalin Marinas" <catalin.marinas@arm.com>, "Will Deacon" <will@kernel.org>,
+ "Mark Rutland" <mark.rutland@arm.com>,
+ "Yicong Yang" <yangyicong@hisilicon.com>,
+ "Zhou Wang" <wangzhou1@hisilicon.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Message-Id: <ad724195-3452-495a-a50a-5e5c8093a483@app.fastmail.com>
+In-Reply-To: 
+ <CA+EHjTy0jpY3sdVCENJRj_kfRDwbZ6TpkCAHQ2xUO-7ZuErpcA@mail.gmail.com>
+References: <20261023070110.1833446-1-fuad.tabba@linux.dev>
+ <20261023070110.1833446-2-fuad.tabba@linux.dev>
+ <86fqxwzul7.wl-maz@kernel.org>
+ <CA+EHjTw08SZC_3Uodt6ew6vXVH-doW-8G41fVCF-rmaKsv+0fQ@mail.gmail.com>
+ <86ecdgzp6m.wl-maz@kernel.org>
+ <CA+EHjTy0jpY3sdVCENJRj_kfRDwbZ6TpkCAHQ2xUO-7ZuErpcA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Hide FEAT_LS64_ACCDATA from guests
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On 2026-10-22 04:53 PM, Pasha Tatashin wrote:
-> On Thu, Oct 22, 2026 at 1:51 PM David Matlack <dmatlack@google.com> wrote:
-> > On 2026-10-22 12:11 AM, Pasha Tatashin wrote:
+On Fri, Oct 23, 2026, at 12:37, Fuad Tabba wrote:
+> On Fri, 23 Oct 2026 11:28:17 +0100, Marc Zyngier <maz@kernel.org> wrote:
+> [...]
+>> No, I want this fixed by enabling ACCDATA support by default, which is
+>> what we have *already* promised to userspace, and see the fireworks.
+>> You can add an arm64.nols64 kernel option if you want, which is
+>> consistent with what we do for CNTPOFF, NV3, and other extensions that
+>> depend on FW enabling them.
+>
+> Will do. v2 will have your patches 3 and 4 from [1] rebased, EnAS0 set
+> when the guest has LS64_ACCDATA, and an arm64.nols64 option.
 
-> > > Lets drop the fourth macro argument and generate the combined struct name:
-> > >
-> > > #define DECLARE_LUO_SER(name, expected_size, ext_flags_count)              \
-> > >     struct name##_hdr {                                                    \
-> > >         __u32 size;                                                        \
-> > >         __u32 flags;                                                       \
-> > >         __u64 ext_flags[ext_flags_count];                                  \
-> > >         struct name payload;                                               \
-> > >     };                                                                     \
-> > >     static_assert(sizeof(struct name##_hdr) == (expected_size),            \
-> > >                   "LUO struct " #name " size mismatch!")
-> > >
-> > > For example:
-> > >
-> > > struct luo_memfd_ser {
-> > >     __u64 pos;
-> > >     __u64 size;
-> > > };
-> > >
-> > > DECLARE_LUO_SER_HDR(luo_memfd_ser, 24, 0);
-> >
-> > I think we are getting close, bu I have two remaining concerns:
-> >
-> >  * Reserving bits in each flags word for continuation leaves gaps
-> >    in the flag space that users have to know to skip.
-> 
-> Yes, but callers should never manipulate the raw flag words directly,
-> and we can provide simple accessor macros or inlines that take a
-> contiguous feature ID (0, 1, 2, ...)
-> 
-> enum luo_memfd_feats {
->     LUO_MEMFD_FEAT_HUGETLB = 0,
->     LUO_MEMFD_FEAT_SEALS   = 1,
->     /* ... */
->     LUO_MEMFD_FEAT_FOO     = 15, /* Automatically lands in
-> ext_flags[0] bits 0:1 */
->     LUO_MEMFD_NR_FEATS
-> };
-> 
-> if (luo_ser_get_feat(hdr, LUO_MEMFD_FEAT_HUGETLB)) {
->     /* handle hugetlb */
-> }
+That sounds good. For reference, I have prototyped support for
+LS64_ACCDATA in Linux drivers based on the corresponding x86 code.
+The code is not yet tested on hardware, but it may help understand
+how this may be used in the future.
 
-Sure but why deal with all the complexity just to save 8 bytes? All of
-these structs are allocated on folios and there are kilobytes of unused
-space to fit this header. And even if we optimize that we are talking
-about 8 bytes per FH/FLB... or 16 bytes for structs with arch-specific
-sub-structs like the KVM ones.
+       Arnd
 
-> >  * struct name##_hdr only matches structs written by the current kernel
-> >    (in terms of length of array and offset of payload).
-> 
-> This is not an issue on the incoming path, we never cast incoming data
-> to struct name##_hdr or access ->payload directly. Instead, we parse
-> the incoming buffer, dynamically compute the header size from the
-> continuation bits, and cast the payload offset to "struct name *"
-> based on the negotiated feature flags.
+----
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] arm64: dynamically enable st64bv0 for SVA
 
-How?
+I/O devices that understand the st64bv0 instruction for doing shared
+virtual access from userspace need to set the pasid value in the
+accdata_el1 register, but in general we want this to be disabled unless
+a driver actually hands an MMIO area to userspace that accepts these
+commands and installs a pasid using iommu_sva_bind_device().
 
-This is the only data structure that describes the header. Are you
-saying the incoming path will parse the header purely with a void *? Or
-use this header but just be careful not to access payload?
+Rather than trying to find all threads that use an mm_struct by the
+time the pasid created, iommu_sva_bind_device() only stores the pasid in
+'struct iommu_mm_data' and sets up the iommu domain in the device. The
+first attempt to use SVA from userspace traps into do_el0_other(),
+which checks that this is indeed valid and then sets the configured
+pasid before enabling SCTLR_EL1_EnAS0.
 
-We should have one header structure that can be used on the incoming and
-outgoing path. We should not have one header data structure that can be
-used on the outgoing path and one that can be used on the incoming
-path.
+This is pretty much a lifted from the x86 try_fixup_enqcmd_gp()
+function.
 
-Also we need a standard header that can be shared across all structs,
-not a per struct header. Otherwise you will need to do weird casting and
-overlays to implement the shared helper routines that parse it.
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-> > How about this instead:
-> >
-> > struct luo_ser_hdr {
-> >     __u32 size;        /* Size of header + payload in bytes */
-> >     __u32 nr_flags;    /* Number of features encoded in flags[] */
-> >     __u64 flags[];
-> > };
-> >
-> > Each feature occupies 2 bits of flags[], so feature N is always bits
-> > [2N+1:2N] of flags[N / 32], with no gaps:
-> >
-> >   00: Feature not present
-> >   01: Feature present, safe to ignore if not supported
-> >   11: Feature present, must be supported by the next kernel
-> >   10: Invalid
-> >
-> > The length of flags[] and the header size are computed directly rather
-> > than by walking continuation bits:
-> >
-> > static inline u32 luo_ser_nr_flag_words(const struct luo_ser_hdr *hdr)
-> > {
-> >     return DIV_ROUND_UP(hdr->nr_flags, 32);
-> > }
-> >
-> > static inline size_t luo_ser_hdr_size(const struct luo_ser_hdr *hdr)
-> > {
-> >     return struct_size(hdr, flags, luo_ser_nr_flag_words(hdr));
-> > }
-> >
-> > static inline void *luo_ser_payload(const struct luo_ser_hdr *hdr)
-> > {
-> >     return (void *)hdr + luo_ser_hdr_size(hdr);
-> > }
-> >
-> > and bounds checking is just luo_ser_hdr_size(hdr) <= hdr->size. The
-> > payload is always 8-byte aligned.
-> >
-> > Payload structs are then declared on their own, with no header:
-> >
-> > struct luo_memfd_ser {
-> >     __u64 pos;
-> >     __u64 size;
-> > };
-> > LUO_SER_ASSERT_SIZE(luo_memfd_ser, 16);
-> >
-> > The static_assert covers the payload to catch embedded structs changing
-> > size.  Asserting the header doesn't add anything since its size varies
-> > by kernel. And because flags[] is a flexible array, the header can't be
-> > embedded in front of a payload in a combined struct; it can only be
-> > reached through luo_ser_payload().
-> >
-> > I think the only downside is that the header increases to 16-bytes when
-> > there is at least 1 flag. But I don't think we need to be so concerned
-> > about an 8 byte difference...
-> 
-> I would prefer to keep the default header at 8 bytes. With 15 features
-> fitting directly inside the base __u32 flags word, adding the first 15
-> features to a struct keeps the header at 8 bytes and does not shift
-> the payload.
-> 
-> Computation-wise it is also very similar: for the 99% of structs that
-> have <= 15 features, LUO_FLAGS_CONT is 0, so computing the header size
-> is just a single bit test with no loop. Even if a struct ever needs
-> ext_flags, the loop will walk at most one or two extra words.
+diff --git a/arch/arm64/include/asm/exception.h b/arch/arm64/include/asm/exception.h
+index a2da3cb21c24..7c61b50718d6 100644
+--- a/arch/arm64/include/asm/exception.h
++++ b/arch/arm64/include/asm/exception.h
+@@ -81,6 +81,7 @@ void do_el0_sys(unsigned long esr, struct pt_regs *regs);
+ void do_sp_pc_abort(unsigned long addr, unsigned long esr, struct pt_regs *regs);
+ void bad_el0_sync(struct pt_regs *regs, int reason, unsigned long esr);
+ void do_el0_cp15(unsigned long esr, struct pt_regs *regs);
++void do_el0_other(struct pt_regs *regs, unsigned long esr);
+ int do_compat_alignment_fixup(unsigned long addr, struct pt_regs *regs);
+ void do_el0_svc(struct pt_regs *regs);
+ void do_el0_svc_compat(struct pt_regs *regs);
+diff --git a/arch/arm64/include/asm/mmu_context.h b/arch/arm64/include/asm/mmu_context.h
+index 803b68758152..55965d752ad5 100644
+--- a/arch/arm64/include/asm/mmu_context.h
++++ b/arch/arm64/include/asm/mmu_context.h
+@@ -16,6 +16,7 @@
+ #include <linux/mm_types.h>
+ #include <linux/pgtable.h>
+ #include <linux/pkeys.h>
++#include <linux/iommu.h>
+ 
+ #include <asm/cacheflush.h>
+ #include <asm/cpufeature.h>
+@@ -247,6 +248,20 @@ static inline void __switch_mm(struct mm_struct *next)
+ 	check_and_switch_context(next);
+ }
+ 
++/* switch to PASID if new task has enabled st64bv0 */
++static inline void switch_iommu_mm(struct mm_struct *mm, struct task_struct *tsk)
++{
++	u32 pasid;
++
++	if (!IS_ENABLED(CONFIG_IOMMU_SVA) ||
++	    !(tsk->thread.sctlr_user & SCTLR_EL1_EnAS0))
++		return;
++
++	pasid = mm_get_enqcmd_pasid(mm);
++	if (pasid != IOMMU_PASID_INVALID)
++		write_sysreg(pasid, accdata_el1);
++}
++
+ static inline void
+ switch_mm(struct mm_struct *prev, struct mm_struct *next,
+ 	  struct task_struct *tsk)
+@@ -254,6 +269,8 @@ switch_mm(struct mm_struct *prev, struct mm_struct *next,
+ 	if (prev != next)
+ 		__switch_mm(next);
+ 
++	switch_iommu_mm(next, tsk); /* FIXME: is there a better place to do this? */
++
+ 	/*
+ 	 * Update the saved TTBR0_EL1 of the scheduled-in task as the previous
+ 	 * value may have not been initialised yet (activate_mm caller) or the
+diff --git a/arch/arm64/kernel/entry-common.c b/arch/arm64/kernel/entry-common.c
+index 11d3f888fcd8..abeffb7f1fb2 100644
+--- a/arch/arm64/kernel/entry-common.c
++++ b/arch/arm64/kernel/entry-common.c
+@@ -806,6 +806,14 @@ static void noinstr el0_fpac(struct pt_regs *regs, unsigned long esr)
+ 	arm64_exit_to_user_mode(regs);
+ }
+ 
++static void noinstr el0_other(struct pt_regs *regs, unsigned long esr)
++{
++	arm64_enter_from_user_mode(regs);
++	local_daif_restore(DAIF_PROCCTX);
++	do_el0_other(regs, esr);
++	arm64_exit_to_user_mode(regs);
++}
++
+ asmlinkage void noinstr el0t_64_sync_handler(struct pt_regs *regs)
+ {
+ 	unsigned long esr = read_sysreg(esr_el1);
+@@ -869,6 +877,9 @@ asmlinkage void noinstr el0t_64_sync_handler(struct pt_regs *regs)
+ 	case ESR_ELx_EC_FPAC:
+ 		el0_fpac(regs, esr);
+ 		break;
++	case ESR_ELx_EC_OTHER:
++		el0_other(regs, esr);
++		break;
+ 	default:
+ 		el0_inv(regs, esr);
+ 	}
+diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
+index d6391ab20db3..ce968cce11e7 100644
+--- a/arch/arm64/kernel/traps.c
++++ b/arch/arm64/kernel/traps.c
+@@ -13,6 +13,7 @@
+ #include <linux/kprobes.h>
+ #include <linux/spinlock.h>
+ #include <linux/uaccess.h>
++#include <linux/iommu.h>
+ #include <linux/hardirq.h>
+ #include <linux/kdebug.h>
+ #include <linux/module.h>
+@@ -543,6 +544,55 @@ void do_el1_mops(struct pt_regs *regs, unsigned long esr)
+ 	kernel_fastforward_single_step(regs);
+ }
+ 
++/*
++ * PASID/ACCDATA is shared by the entire mm, while sctlr_el1
++ * is maintained per thread. Keep things simple and enable
++ * ACCDATA dynamically on first access if available.
++ *
++ * After exiting back to userspace, the st64bv0 instruction
++ * should no longer trap.
++ */
++static bool try_enable_st64bv0(struct pt_regs *regs, unsigned long esr)
++{
++	u32 pasid;
++	u64 isar1;
++	u64 sctlr;
++
++	pasid = mm_get_enqcmd_pasid(current->mm);
++	if (pasid == IOMMU_PASID_INVALID)
++		return false;
++
++	isar1 = read_sanitised_ftr_reg(SYS_ID_AA64ISAR1_EL1);
++	if (!(isar1 & ID_AA64ISAR1_EL1_LS64_LS64_ACCDATA))
++		return false;
++
++	sysreg_clear_set(accdata_el1, ACCDATA_EL1_ACCDATA, pasid);
++	sctlr = current->thread.sctlr_user;
++	sctlr |= SCTLR_EL1_EnAS0;
++	current->thread.sctlr_user = sctlr;
++	update_sctlr_el1(sctlr);
++
++	return true;
++}
++
++void do_el0_other(struct pt_regs *regs, unsigned long esr)
++{
++	switch (ESR_ELx_ISS(esr)) {
++	case ESR_ELx_ISS_OTHER_ST64BV0:
++		if (try_enable_st64bv0(regs, esr))
++			return;
++		break;
++
++	case ESR_ELx_ISS_OTHER_ST64BV:
++	case ESR_ELx_ISS_OTHER_LDST64B:
++	default:
++		break;
++	}
++
++	/* Treat all other "other" trapping instructions as illegal opcode */
++	force_signal_inject(SIGILL, ILL_ILLOPC, regs->pc, 0);
++}
++
+ #define __user_cache_maint(insn, address, res)			\
+ 	if (address >= TASK_SIZE_MAX) {				\
+ 		res = -EFAULT;					\
+@@ -842,6 +892,7 @@ static const char *esr_class_str[] = {
+ 	[ESR_ELx_EC_FP_ASIMD]		= "ASIMD",
+ 	[ESR_ELx_EC_CP10_ID]		= "CP10 MRC/VMRS",
+ 	[ESR_ELx_EC_PAC]		= "PAC",
++	[ESR_ELx_EC_OTHER]		= "OTHER",
+ 	[ESR_ELx_EC_CP14_64]		= "CP14 MCRR/MRRC",
+ 	[ESR_ELx_EC_BTI]		= "BTI",
+ 	[ESR_ELx_EC_ILL]		= "PSTATE.IL",
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index b15a59b9e95d..e358d9ad229b 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -3656,6 +3656,11 @@ Sysreg	TPIDR_EL1	3	0	13	0	4
+ Field	63:0	ThreadID
+ EndSysreg
+ 
++Sysreg	ACCDATA_EL1	3	0	13	0	5
++Res0	63:32
++Field	31:0	ACCDATA
++EndSysreg
++
+ Sysreg	RCWMASK_EL1	3	0	13	0	6
+ Field	63:0	RCWMASK
+ EndSysreg
 
-Please explain why it is so important to keep the header 8 bytes that we
-have to jump through all these hoops to map a contiguous flag space
-onto a u32 + u64[] array structure where certain bits are reserved and
-have to be skipped.
