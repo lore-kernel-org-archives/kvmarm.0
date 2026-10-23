@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1792789042;
-	b=kkVYXY7Z1Ehf33gZOGNma5VKdIs2QYu5X5lhj4DgI1YAG/1dkJ0a8p2p2GsQRPgVi1AW
-	 YHqJ27ZwXczRPR2XyqkxjdBeCIM232hmpvHqUUUncDRVH3sC8YJiOMA12djNDddyWTVoK
-	 rxwZbsF97Ho4dBOogfQ4/oRqktg/OAilFtyO6X+azkbb0UwgQgAy9djfvaoh8uhnhvfqP
-	 UltU9FObiKk+cRY0D6LSGEaP3K9iBIBz9QkmtdoxkUF9f/5GecZRlH9u0oSzLazBfFlMw
-	 rdOPJ+6jvnbyLeWyiTIRfv3z3epEoBdVsGGjfJS5C8djrDSAQrpSG3G9pyGJYQyGpFQ==
+	b=bprj/wJh+h/hy0v2EjEIHZa9wNhUf2Xd5ozUKWVD5eLK6r6xK39XCsBe0h96xDfWO53O
+	 xeCsMESzb2kycLWaCRE6R774Z30hR3sABCEkS2o3RLy3n7TtMI+rth4rS9zRBYalUtGWW
+	 2lkCQQ+BMstr3cXUv1KaeLolpj8g1dhUTfrDC/Jx6SATmDiH/dz0xFQIEsAyHf34Pd2nZ
+	 NYPxCny6V9tgP7ZG/+Ap3gb/Nv5UkqcpoOaPwV2SqfV9LsBbi+faF+eIOINpvyxhKCGlW
+	 yfFQc6pSz+EkBDPrdORL1pe+nYJQVoR+rPL7hKWgS0nEGYAQtkP2TDrxLCPydBVhTVA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1792789042;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=hmH0ZH2wNvDIdAKdXV/THoRuWtSJQnHWL34seNIkoRM=;
-	b=SwnkXZwnGB8EwYjk+xJxkLr3VI2/U3/SQLhUv31fCjZMro5Km+BtGO4j/zpH+NXKyo81
-	 9XbtGD9AKl15syNIiovASiH8kI9vRNKSXx3TnuZRBIXRGR5gkDsl1X/HmsbcLNLVlaTMb
-	 yJF9aOgHeNcNuNHaBjylbJolmwiZHe1o+EKrCYq+Vm0APvthqtdXSdGP+ktqIEACWxK+F
-	 MpqsRlohdCjN3fP8gbBKlLF/DCViZP/nn1S562Dawgj3vM2mR8n1I01y7kv+W1FyaBWDV
-	 L+PGiQBzKRbG7ipI0wO5I15Q9EWeA9YD0Z8Xy1+Mz6E9rWYJTZvwNC3dJG2yCglyshA==
+	bh=g/QP0M32Fp7JIq8p7pO19iKh514so/hjbeFUaOaUHjM=;
+	b=awSl73mozVtYTrpEHuAEm3kkVXEZdnTctDllb00lhvYXZBz72kuhmbXMdoQ9ufsahqDX
+	 JoAh1+8Tj5EUjD4bMh1FAXt+yi4B2DWfWdgEQeA+K4AsCXDX/baVgk9qGiT+Rr0QW7eNK
+	 +NZGrwYJijIVkFpwoVEF/dpfgwh9tfm4OaIMg/fJPWaQghtm9talHhPFyHobIVKdFQZCE
+	 OpvTz+Y4fET9jRg+lYaQPHM6o8T+ek8V0Lhvjrs1Y22uDA0RNBR/CcElwcP/6Tv+poCih
+	 wJqz88vppxpjASpjpWHcsH3p/3S2lahKVDATwvunhbyVWDTmy3PAYx/RiJDTdyLo/Hw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MqzfLbwf;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=feTlWc3j;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F242D606A31A
-	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 20:57:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB19606A31E
+	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 20:57:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MqzfLbwf
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADB821F01825;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=feTlWc3j
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECC171F031E5;
 	Fri, 23 Oct 2026 20:57:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792789041;
-	bh=hmH0ZH2wNvDIdAKdXV/THoRuWtSJQnHWL34seNIkoRM=;
+	s=k20260515; t=1792789042;
+	bh=g/QP0M32Fp7JIq8p7pO19iKh514so/hjbeFUaOaUHjM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=MqzfLbwf7kPKabxH/BZCBRuBAbjpAM5bThtem8WqMYCRzIGPuqhH5X7gEIDQ0X4OK
-	 5o/goq655fGzNZoVsUVcA0Cz0tU3EaUBU7OuH5vI9Uik/eDOtr7WlzHob5YMeQSVx2
-	 0OZFNLgPf9YFuIu5LytIZd25pauAZYos8e/4O4LPWg1y2aKHrDtp+RMOV3UDEvtulQ
-	 ZUVw6L3myeQ75a6M7cc3LxwJFOWQI+P7eIVOzFDTYnwkTFO1vtOmQbFN3VOl4QNCXM
-	 RsUk+Xiy+cBKQKHIcmrO5j/MgNuOG9tbbLMFHQRPG5wXnhrcyUcScnOVHaleAZ1yUv
-	 4dAPNKUxjOuAw==
+	b=feTlWc3jJ9uhx6+I4krYi+LPMivBl9v/Rjx+8/7+RL0ehWULmiSqFxpFbaFVVD5yD
+	 fKKmeuNmvaWquYhBeTAXmPB/6pi0lA4SBDHftLEVt8wZgs6IfXURMjV866rNstWoYU
+	 yvuu564LbI9etVq6FsXNKK3IePvYthpMieK75Fn5XE4tiWQQr2UMPymQPPo+BPjNCd
+	 qiQXIqWQofu0VoYBlMNbo3UP2lKYjlwNqql4Z+c1QxlJZDsBh5imOUL9oKTAOqf822
+	 BEtzBsNpyZKqaq/QvufNVfxS/9CaFJoCkrSor+4ISPQMpR5STJUlRp5u9S/SAZYfXc
+	 c7iYWpnYEWijw==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -50,9 +50,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Fuad Tabba <fuad.tabba@linux.dev>,
 	Leonardo Bras <leo.bras@arm.com>,
 	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH v2 23/28] KVM: arm64: nv: Set access flag on table descriptors at stage-2
-Date: Fri, 23 Oct 2026 13:56:05 -0700
-Message-ID: <20261023205610.1044532-24-oupton@kernel.org>
+Subject: [PATCH v2 24/28] KVM: arm64: nv: Expose FEAT_HAFT
+Date: Fri, 23 Oct 2026 13:56:06 -0700
+Message-ID: <20261023205610.1044532-25-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261023205610.1044532-1-oupton@kernel.org>
 References: <20261023205610.1044532-1-oupton@kernel.org>
@@ -67,63 +67,28 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement access flag updates on table descriptors as required by
-FEAT_HAFT.
+Both stages of translation now support the access flag on table
+descriptors, advertise the feature.
 
 Reviewed-by: Leonardo Bras <leo.bras@arm.com>
 Signed-off-by: Oliver Upton <oupton@kernel.org>
 ---
- arch/arm64/kvm/nested.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/nested.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index eb20409a14b1..5ae818a70ae2 100644
+index 5ae818a70ae2..0c468235f123 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -152,6 +152,7 @@ struct s2_walk_info {
- 	bool		be;
- 	bool		ha;
- 	bool		hd;
-+	bool		haft;
- };
- 
- struct s2_walk_step {
-@@ -253,12 +254,15 @@ static bool should_set_access_flag(struct s2_walk_info *wi, struct s2_walk_step
- 	if (access->type == WALK_ACCESS_NONARCH)
- 		return false;
- 
--	return wi->ha;
-+	return kvm_pte_table(ws->desc, ws->level) ? wi->haft : wi->ha;
- }
- 
- static bool should_set_dirty_state(struct s2_walk_info *wi, struct s2_walk_step *ws,
- 				   struct kvm_s2_trans *out, struct kvm_walk_access *access)
- {
-+	if (kvm_pte_table(ws->desc, ws->level))
-+		return false;
-+
- 	switch (access->type) {
- 	/* R_ZYGHJ */
- 	case WALK_ACCESS_CMO:
-@@ -447,6 +451,10 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, struct kvm_walk_access *acc
- 			return 1;
- 		}
- 
-+		ret = handle_desc_update(vcpu, wi, &ws, out, access);
-+		if (ret)
-+			return ret;
-+
- 		base_addr = ws.desc & GENMASK_ULL(47, wi->pgshift);
- 
- 		ws.level += 1;
-@@ -585,6 +593,7 @@ static void setup_s2_walk(struct kvm_vcpu *vcpu, struct s2_walk_info *wi)
- 	wi->ha = vtcr & VTCR_EL2_HA;
- 	wi->be = vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_ELx_EE;
- 	wi->hd = wi->ha && (vtcr & VTCR_EL2_HD);
-+	wi->haft = wi->ha && (vtcr & VTCR_EL2_HAFT);
- }
- 
- int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, struct kvm_walk_access *access,
+@@ -2052,7 +2052,7 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
+ 		/* FEAT_S2FWB implies IDC */
+ 		if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB) &&
+ 		    cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
+-			val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR1_EL1, HAFDBS, DBM);
++			val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR1_EL1, HAFDBS, HAFT);
+ 		else
+ 			val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR1_EL1, HAFDBS, AF);
+ 		break;
 -- 
 2.47.3
 
