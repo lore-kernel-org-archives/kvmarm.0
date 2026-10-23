@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1792788977;
-	b=tJKFJRR5nbuChrnzEe/0O/49hnJHBsjsNadwBcdn6M8O24ex2YHUnWLupKjWOzXBr0AB
-	 a4ODv86vrKF1Dr64G8IzFhO5uRVS7sQXDQjMUkxoPZguCOG/YYy+5HTtBbxwThzcwPZ+B
-	 DVyzk7spml/2NkbuIZfktfFfWSLNQR2h1Zj7TrMPwfYejjaxe5WOA9l6Zz7yPppyJmxLm
-	 qHf8c5BQHUEx5RnLV0L8Rr51+or/yW82K/jH4W2LWEgwkIYS64w7KGouuCwMV/8ZXrhio
-	 yDMSe7/PnBB8n5K1nv7raR7ndwjcoOVdDeUUBbjlIOjA3mH4FBKvG9KYRfS81fOxAvA==
+	b=tvCMr87D0RAqKbdVSPlFbOyM5mZnGnWIQA2Y++hZxD5ePA1SiFYkaXqlTh84Uw20vuTN
+	 U9xuSEsP0v+e/tL28Uo+rjR92jtNWBg3d7rUpWxRbrxbfZHjvPMU7msIeeuGD7s5bDUFv
+	 XXA+fRWMZdImkIHNKPRbbs5Bak43Pl6588Q/gbSZ7DCja+6n2bIuERDMypQ3V5ucjNQsC
+	 kgGbLn3GCnb6bvS2bz6WFp9VGY0W184nLyV3IbHb87Rdcy7r1fvzk7M62ayqfPpmMTVyr
+	 rfESgsbBazIulaxaxsBt981KfHbnn1SqYFwcj+r5KEr1GDmJTwxKjcvRO/rSi0wRn7Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1792788977;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=9HCWtLQ40Y4aEgYkZ+glLBgmoxAgo2915MhNv1fAqhI=;
-	b=Twl2n7NEXshjtJ/V9DmCdNsAcBKWDGQkY2a9Exo5XwhVwjZqXlKYKCVrPHHwpZDEgY95
-	 wak0p1GRQKU4WvJEw7mMVJJ8Zg4h6ga+3tSec/i3vpp79JhqWub8XBdQTitmq1zYfKuL5
-	 9ggkejYH6476YmgxkITHkoZdrLjKDL+pWP8aukRBjIPKkI5GOYLEgCgN1lKFIH1aeKV58
-	 Z0Hxvg5fDPjUzWawfjVHQIj8tbRRgs3FLWqvRjZZ3yzpE9mzdVfJhiqgmXI6oe+BcoBLA
-	 nUyC4yD8rZ/B6RoPvJiNO1vLWsM7gOzvO8KRozoGuczs7MJRX2qtCltZ3BBJVUY4NXA==
+	bh=m7QFKdFEwomwpXn1vlKr0DWJa49AevbNDo3W/iY6ERc=;
+	b=uSPc/ZBkkpjgg7Wt5Rh3mGMl0xUFCQCOl58/VhzD6EJvpft16K1laZ9XQUZb6VjJXt9I
+	 FfFH+bd9FvTaBjfN2X/74aS/WT+6hifrPv8oUPhE9H6AtX9PN+0BqBOteuSFQVjuZViPy
+	 IDbBw9EznSCU5M3xHluwIRh/jji+EnCj52f5cartJhbaSklzZ1NtMD58SY/ZPilhWdYSU
+	 UNxAdEnTWrlg5KqsYavhJsQEs91tK0isIce8CajXuvCM7y45jxE5TUTOweYDnQVD0CKkD
+	 NkCIieltT1mAntFpfi4fhmpzpT0aPSqbGMkIIuYUsezTlB83l6MEClCktqMovYHP05g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jLSoN1ZW;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EvSwp0dx;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31630606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68EC8606A321
 	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 20:56:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jLSoN1ZW
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F286E1F031E8;
-	Fri, 23 Oct 2026 20:56:16 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EvSwp0dx
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36BEA1F031E6;
+	Fri, 23 Oct 2026 20:56:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1792788977;
-	bh=9HCWtLQ40Y4aEgYkZ+glLBgmoxAgo2915MhNv1fAqhI=;
+	bh=m7QFKdFEwomwpXn1vlKr0DWJa49AevbNDo3W/iY6ERc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=jLSoN1ZWgPEEOm0PSEDrop7AvYRYs/231F5cmRXlPTASLBCeHpCzAUBqhNuAGywAh
-	 pXtw5pGpR1VX0WgbtqeUkGPbUOfEAtnt0+XnmiBcUw/GW84JoNJpvu4jyZAJC68HjL
-	 2abHsrL7zKzBAbC6gRtQkl+lp5sbxuJjI3b4VLYFR7h77+uBVJAIXi/7pSzHhHwo0/
-	 HmvSY2KkX/z0TleVcmM0zYsbcY8YIu62ckeW9khaOJeUf9ey3CdBe/xI/FQCyLRzTj
-	 uEFRO/Aa/IlE6WNvXn0kn6ZxMgMHzz17k14F3q9mx16cSTK5cpNkFryjdCJNCt6D8o
-	 rIcKAXHTD1PHQ==
+	b=EvSwp0dxFd1KcBV4JhLPJ7RiR1Q/lzF1QxX0GY869L8cwirE61MF1V+Wh5/ogli4f
+	 3kiy0BGAoxmqJ/hBk54YjkwgDskjkr1cQM4dSoZIqUg/M6oZ/GAAKrMmNqbbPZ43ep
+	 uUWWwhz1kmBBLtGKi81pIA7CGsP7pG4ATjE+VXPIxr9UnymiUnpb0RDM3KDB7yZ009
+	 cDGQFucl55UKDy+bFvCjZu4jb6jtJy8sKeTYPK/vU3oHYOY6rHwTLi3dZ+wE8rEhjp
+	 AuraHxLezXlLMDKCFBNx44IxWhKpsLxU9MK4+vuY0dUDrilopumomiUp8bjoBQ5Bn2
+	 QbT6A6i3cVVVw==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -50,9 +50,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Fuad Tabba <fuad.tabba@linux.dev>,
 	Leonardo Bras <leo.bras@arm.com>,
 	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH v2 06/28] KVM: arm64: nv: Use a helper for stage-2 descriptor updates
-Date: Fri, 23 Oct 2026 13:55:48 -0700
-Message-ID: <20261023205610.1044532-7-oupton@kernel.org>
+Subject: [PATCH v2 07/28] KVM: arm64: nv: Set dirty state at stage-2
+Date: Fri, 23 Oct 2026 13:55:49 -0700
+Message-ID: <20261023205610.1044532-8-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261023205610.1044532-1-oupton@kernel.org>
 References: <20261023205610.1044532-1-oupton@kernel.org>
@@ -67,101 +67,121 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Use a helper for handling stage-2 descriptor updates so the
-implementation can be shared with updates to table descriptors.
+Set the dirty state on descriptors at stage-2 for write accesses when
+DBM is set.
 
 Signed-off-by: Oliver Upton <oupton@kernel.org>
 ---
- arch/arm64/kvm/nested.c | 47 +++++++++++++++++++++++------------------
- 1 file changed, 26 insertions(+), 21 deletions(-)
+ arch/arm64/kvm/nested.c | 51 +++++++++++++++++++++++++++++++----------
+ 1 file changed, 39 insertions(+), 12 deletions(-)
 
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index a3cbf37dddc9..dea5c31f10df 100644
+index dea5c31f10df..1d581d3bd557 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -246,9 +246,23 @@ static int read_guest_s2_desc(struct kvm_vcpu *vcpu, struct s2_walk_step *ws,
+@@ -151,6 +151,7 @@ struct s2_walk_info {
+ 	unsigned int	t0sz;
+ 	bool		be;
+ 	bool		ha;
++	bool		hd;
+ };
+ 
+ struct s2_walk_step {
+@@ -246,6 +247,20 @@ static int read_guest_s2_desc(struct kvm_vcpu *vcpu, struct s2_walk_step *ws,
  	return 0;
  }
  
--static int swap_guest_s2_desc(struct kvm_vcpu *vcpu, phys_addr_t pa, u64 old, u64 new,
--			      struct s2_walk_info *wi)
-+static int handle_desc_update(struct kvm_vcpu *vcpu, struct s2_walk_info *wi,
-+			      struct s2_walk_step *ws, struct kvm_s2_trans *out,
-+			      struct kvm_walk_access *access)
- {
-+	u64 old, new;
-+	int ret;
++static bool should_set_dirty_state(struct s2_walk_info *wi, struct s2_walk_step *ws,
++				   struct kvm_s2_trans *out, struct kvm_walk_access *access)
++{
++	switch (access->type) {
++	/* R_ZYGHJ */
++	case WALK_ACCESS_CMO:
++	case WALK_ACCESS_AT:
++		return false;
++	default:
++		/* R_NSXRD */
++		return access->write && wi->hd && out->writable;
++	}
++}
 +
-+	old = new = ws->desc;
+ static int handle_desc_update(struct kvm_vcpu *vcpu, struct s2_walk_info *wi,
+ 			      struct s2_walk_step *ws, struct kvm_s2_trans *out,
+ 			      struct kvm_walk_access *access)
+@@ -258,6 +273,9 @@ static int handle_desc_update(struct kvm_vcpu *vcpu, struct s2_walk_info *wi,
+ 	if (wi->ha)
+ 		new |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
+ 
++	if (should_set_dirty_state(wi, ws, out, access))
++		new |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
 +
-+	if (wi->ha)
-+		new |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
-+
-+	if (old == new)
-+		return 0;
-+
-+	ws->desc = new;
-+
- 	if (wi->be) {
- 		old = (__force u64)cpu_to_be64(old);
- 		new = (__force u64)cpu_to_be64(new);
-@@ -257,7 +271,13 @@ static int swap_guest_s2_desc(struct kvm_vcpu *vcpu, phys_addr_t pa, u64 old, u6
- 		new = (__force u64)cpu_to_le64(new);
+ 	if (old == new)
+ 		return 0;
+ 
+@@ -272,11 +290,15 @@ static int handle_desc_update(struct kvm_vcpu *vcpu, struct s2_walk_info *wi,
  	}
  
--	return __kvm_at_swap_desc(vcpu->kvm, pa, old, new);
-+	ret = __kvm_at_swap_desc(vcpu->kvm, ws->desc_pa, old, new);
-+	if (!ret || ret == -EAGAIN)
-+		return ret;
-+
-+	out->esr = ESR_ELx_FSC_SEA_TTW(ws->level);
-+	out->desc = ws->desc;
-+	return 1;
+ 	ret = __kvm_at_swap_desc(vcpu->kvm, ws->desc_pa, old, new);
+-	if (!ret || ret == -EAGAIN)
++	if (ret == -EAGAIN)
+ 		return ret;
++	if (!ret) {
++		out->desc = ws->desc;
++		out->dirty = out->desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
++		return 0;
++	}
+ 
+ 	out->esr = ESR_ELx_FSC_SEA_TTW(ws->level);
+-	out->desc = ws->desc;
+ 	return 1;
  }
  
- static void compute_s2_permissions(struct kvm_vcpu *vcpu, struct s2_walk_info *wi,
-@@ -306,7 +326,6 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, struct kvm_walk_access *acc
- 	struct s2_walk_step ws = {};
- 	phys_addr_t base_addr;
- 	unsigned int addr_top, addr_bottom;
--	u64 new_desc;  /* page table entry */
- 	int ret;
- 
- 	switch (BIT(wi->pgshift)) {
-@@ -359,8 +378,6 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, struct kvm_walk_access *acc
- 			return ret;
- 		}
- 
--		new_desc = ws.desc;
--
- 		/* Check for valid descriptor at this point */
- 		if (!(ws.desc & KVM_PTE_VALID)) {
- 			out->esr = compute_fsc(ws.level, ESR_ELx_FSC_FAULT);
-@@ -405,21 +422,9 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, struct kvm_walk_access *acc
+@@ -422,16 +444,6 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, struct kvm_walk_access *acc
  		return 1;
  	}
  
--	if (wi->ha)
--		new_desc |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
+-	ret = handle_desc_update(vcpu, wi, &ws, out, access);
+-	if (ret)
+-		return ret;
 -
--	if (new_desc != ws.desc) {
--		ret = swap_guest_s2_desc(vcpu, ws.desc_pa, ws.desc, new_desc, wi);
--		if (ret == -EAGAIN)
--			return ret;
--		if (ret) {
--			out->esr = ESR_ELx_FSC_SEA_TTW(ws.level);
--			out->desc = ws.desc;
--			return 1;
--		}
--
--		ws.desc = new_desc;
+-	if (!(ws.desc & KVM_PTE_LEAF_ATTR_LO_S2_AF)) {
+-		out->esr = compute_fsc(ws.level, ESR_ELx_FSC_ACCESS);
+-		out->desc = ws.desc;
+-		return 1;
 -	}
+-
+ 	addr_bottom += contiguous_bit_shift(ws.desc, wi, ws.level);
+ 
+ 	/* Calculate and return the result */
+@@ -441,6 +453,20 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, struct kvm_walk_access *acc
+ 	compute_s2_permissions(vcpu, wi, &ws, out);
+ 	out->level = ws.level;
+ 	out->desc = ws.desc;
++
 +	ret = handle_desc_update(vcpu, wi, &ws, out, access);
 +	if (ret)
 +		return ret;
++
++	if (!(ws.desc & KVM_PTE_LEAF_ATTR_LO_S2_AF)) {
++		*out = (struct kvm_s2_trans) {
++			.esr	= compute_fsc(ws.level, ESR_ELx_FSC_ACCESS),
++			.desc	= ws.desc,
++		};
++
++		return 1;
++	}
++
+ 	return 0;
+ }
  
- 	if (!(ws.desc & KVM_PTE_LEAF_ATTR_LO_S2_AF)) {
- 		out->esr = compute_fsc(ws.level, ESR_ELx_FSC_ACCESS);
+@@ -537,6 +563,7 @@ static void setup_s2_walk(struct kvm_vcpu *vcpu, struct s2_walk_info *wi)
+ 			      ps_to_output_size(FIELD_GET(VTCR_EL2_PS_MASK, vtcr), false));
+ 	wi->ha = vtcr & VTCR_EL2_HA;
+ 	wi->be = vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_ELx_EE;
++	wi->hd = wi->ha && (vtcr & VTCR_EL2_HD);
+ }
+ 
+ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, struct kvm_walk_access *access,
 -- 
 2.47.3
 
