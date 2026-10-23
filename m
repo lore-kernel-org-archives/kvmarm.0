@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792785788;
-	b=T+Fy7m3x0GjED7uQoqP2irHksMfL0gzzIItzDPzYqwdU1HcZDkXYMd0Nrg8FwHxpPxPt
-	 DcRi+PRRHob0Eei+Rsg2njqlaUyoKgf55ZkdKbqNUgt1NxUjLquaX9u5FMVbY+M6jXAMI
-	 brAwBIXvt5YhokrhGyCEQ9x7xuqwGJFnooXgy1+y04pf7+ouCx9RxbuR5Ij7WG/xheC3B
-	 UIyaFZdAWkXs4T9X+EVuXgiJshU5PfsrbPGXv0RwRECbcRKpLc1KUhR1AMNuhTw7PvNF2
-	 8pCCVQ3Jpa4ripBF3n4yKD17s9CHSte9KKRUed+zO/mc/FpPTpwHVePGLqCNE46sFFw==
+	t=1792785790;
+	b=g3MvV9e0VfGGERD1fAt/Edd/oypUQO3vLd6GaU3NiBySpw4nYhUxCMfOyBPFGPiXEcOb
+	 5IikReZgbtKEsMu8lV7cVDWJFX4LrB+XtyGc6e/lnp/TEHXIlqgsx4usIWJSzXcbNkD+P
+	 TTn2BCBVQ9y3g7C6hYhTXmCdhfSiD5viDihO5W+sP9UWxGLsP6Q9DFb3IV9xm7nyGcq6O
+	 4bOPlwIKehdaiTAsiRAgb/pcialiikdWoIZmHULACvFKpCiUIt8f9nDfE55j8tHfuVeht
+	 tSCARNB0ZJM4759Mnx+Enle5thLTZTrcwWtFie/VoSZ4WSt7j+mj70E+fodcvgjhAsw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792785788;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792785790;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=VwsTNUIWgPGNrUvwHU2JTnkVF1TKtK53W++DxYs7jXE=;
-	b=QJ6dOMg5Nu9hd6zZnlrw+aCoVOMjIopZygYeiHYw04Iuad0X15MF65fUEUrlcRM/vQp1
-	 /Jtuk9fuNv/N5UIjCOde4xPtqRd9iZSeNz0xiPbBifgrAV7/j4FrFb1hnxQcsnSh4LJ1u
-	 DEriEhR8m3D38Illiegkga6uLI/IuLvANdkxdx6z0TnVPKpSDW3aq06aRwo1JF4wdtZBe
-	 WJsOZVPiFUJRE9Rb7uRvUGhHSROfr+J0LMBUnaAbifCByu4ST3tNfyM/sGU08mzqMTPzq
-	 qCkOQas4n/SmfU/aYQNjPpPep0dmtpGi7SRusg3og2MC+rK+yiYUKp9MywTKx2jQhYg==
+	bh=73AIKSbXnm7iEYTouzViIQzL+RlppRhBp/kP6VeGFkw=;
+	b=U304RHjfRXQwabaJyfKV3Ve6t4QabLCqi/tk6YFOsnF53cEkES+Mhk6UEiNz3ewu+CaF
+	 DDQhMDWOo6mprzla85o7pwfM/Fn5/YuRvt9/61j9wzlTXQsnRy3azRXNzHYNgauprYr4/
+	 8p/Pvd/82QqMNMtUjSRTzxrA9ZGYAFfJeqlMCXC6cb9AMMnYJHwbE+2XI+V4oBOmwiXRW
+	 /FG6MBl3RyCIJj/Zgwsp6IxkogliNKodx4KeVFvsD161rA3WeZfH0pS+UXLaiutQ4azl1
+	 5jncrb5r7vlprZdKKblSMllsiTHkOJfo63bXFom1nuaEhCXnp6Occc/We5UQzkEIn6g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Blr3eB+j;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oESDUsak;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A35606A330;
-	Fri, 23 Oct 2026 20:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C82C1606A326;
+	Fri, 23 Oct 2026 20:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Blr3eB+j
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 416311F01825;
-	Fri, 23 Oct 2026 20:03:06 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oESDUsak
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0381D1F01828;
+	Fri, 23 Oct 2026 20:03:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792785787;
-	bh=VwsTNUIWgPGNrUvwHU2JTnkVF1TKtK53W++DxYs7jXE=;
+	s=k20260515; t=1792785789;
+	bh=73AIKSbXnm7iEYTouzViIQzL+RlppRhBp/kP6VeGFkw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Blr3eB+jadRq8XnnDJI5LiUGJYjybneYXqIdZ10tcNU5k09Uus1d2wZWZgI9Qm+io
-	 lk1LGvRT9AouoNEAHgaMcgOjZxEgBYhTXNmKosueDRi8QiL4Wbhlj+5oe9JnPBeCcN
-	 PTTzQGOpkHzUXbfG9uV79Fcbfc70Ktpu24KXjX7t7+mNM4dK5M/gzyo1yCb0PqXSns
-	 p0KgBluNj2HqiDwwcQ5XTqDHvW/i6KHKm54yJ4NM0iTNvsZAjK1p3C9QVbTTIEtqC+
-	 XICQv/+OUFBTZcj8A0JC2Zxqv5dm5U31HLsDy93W8uDcGhN1gvPBKAZVuMb2bTBRRp
-	 u+e364Q3fQLcw==
+	b=oESDUsakss0mrofMZOFxZbw4ICto+6WAZh/A4KTfqvWKeeo6GoIH35y8OSWaaQfAo
+	 9fcNdhd4+WC0Dh32yR0DvXGtZdN6vChjrCvfqSFEQ6l1bI6BiG4SjErB24/0qj79+5
+	 n38ovGqG0ItDpQelkDYtZJWKq50kiKD+8CHi48DXr8iun8w69Y3c2dQrRjh/xU4Z9I
+	 RVhFjtLrjvkU4fmurcrvhoWexkyxiblZXBu54XeH/IQSQkYY71mgeR7fQJIAVgY2MW
+	 uo2RQjdKEk1zWKshNXghg3HDgd9kRE3lBWnDC5Ogxxg21FD2w+I7eLCovGO1KyvB6u
+	 ridSoZJrOrmPQ==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org
 Cc: Sasha Levin <sashal@kernel.org>,
@@ -53,12 +53,12 @@ Cc: Sasha Levin <sashal@kernel.org>,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	Aaron Ahmed <aarnahmd@amazon.com>
-Subject: Re: [PATCH 5.10.y] KVM: arm64: vgic-its: Don't dereference a NULL collection on ITT save
-Date: Fri, 23 Oct 2026 16:02:47 -0400
-Message-ID: <2026-10-23-1-daily-reply-0011-vgic-its-null-collection-5-10@kernel.org>
+Subject: Re: [PATCH 5.15.y] KVM: arm64: vgic-its: Don't dereference a NULL collection on ITT save
+Date: Fri, 23 Oct 2026 16:02:48 -0400
+Message-ID: <2026-10-23-1-daily-reply-0012-vgic-its-null-collection-5-15@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261022174537.2767-1-aarnahmd@amazon.com>
-References: <20261022174537.2767-1-aarnahmd@amazon.com>
+In-Reply-To: <20261022174537.2767-2-aarnahmd@amazon.com>
+References: <20261022174537.2767-2-aarnahmd@amazon.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -75,7 +75,7 @@ Content-Transfer-Encoding: 8bit
 > guest that issues MAPD, MAPTI and then MAPC(V=0) therefore oopses the
 > host when the VMM issues KVM_DEV_ARM_ITS_SAVE_TABLES to migrate it.
 
-Queued for 5.10, thanks.
+Queued for 5.15, thanks.
 
 -- 
 Thanks,
