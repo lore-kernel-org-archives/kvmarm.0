@@ -1,100 +1,73 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.178
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792759066;
-	b=YzPcs9hA7IOleGoRgF0k2WYfx/mgxrs+UkjTuBqAuO8ahZNoPH6MnEHLBPn2XKC8eFrV
-	 NBb3qa3s0yXa6putBYJnUtPeW68q/TsyMhdlxvQAe1WB4GH593VrLHkVDrIGBGSFeTS5A
-	 UjDOIIyHGEOKjDJsDkPrOdVDqp7DFgw3f/59XzLi8wLPszfLF22eWFGO39rBOzo2e6HCu
-	 qDaZtYNuUbxx6xnjahdeRqQy0af8xRhD1vNfOXKSq1nUsJwPB2IW7zrmDK0c4E7ztiPP3
-	 +oaazKFJCuQyyG/CuBMV6zGQLo+qoEWYns9TXT9ODgE46QAH8XTdN1wMvV5vb6q46ew==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792759066;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type;
-	bh=SUkoX/3bwjFpT0dyc8UcMdZ4lcBpeSlTtzlkyvLE7Jo=;
-	b=W5ZdZkWC0O0gUSRynEd3Y2ED/AvzfpjmqhEK7GjUvpUbq1+siLaD4lp3680LS7/bLtIp
-	 JyFmrydcSKcwpvODfdxxmaf5UMhD6daNTdStMxpDsu8ZGawdmvViKiv/X32YqTonYYVx9
-	 xZYXmVvtYw0hnMbJdFa71L5m0A+luWj5VENkW8QuLc9QGG7iqO3hYvV3jJbJrGdYquEcN
-	 nfyCyRCiY4W12tH0//q1RAvYeQt5S1CyJV3Q6ftzy+5oqAwW0AeXlxPudx6iJeUDoye7s
-	 Wil7g8q2+Wjo3lQyRJtCTiP9ZLWii9YKEJRk+TuiJ+HBWyASvgdtOqRsprBXappRV9A==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linaro.org;
-	spf=pass smtp.mailfrom=linaro.org;
-	dkim=pass header.d=linaro.org header.i=@linaro.org header.a=rsa-sha256 header.s=google header.b=UdpCV5Nw;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.178
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792759068;
+	b=Lz8DAhYBffWZpHSRr8yO8bzWGWYVPYDxTu2qZKHaob4NzSYPm+2hONSf87Zphs6VN8Rx
+	 ULnT8XAFVhWF48zYfORohBhGu6Sdo7mSCN05POTHBHLYNPVSIfM/484CYUJwpQnJM7+k8
+	 PhlMhPCpyIa+1DsfkGd8M16lmEBZPlOZGCPrAVjOFLF0GKLrXOQE8G2rolrNy9DqSeQ4a
+	 9tCH1tXvPE+BqG4eYq28kMIPEgh3CXOL0+gnIsaCqaDsasCeHn8MiBTT7XQ8wDy6B/5V4
+	 fTLxUoboVEh98E6vnNQ40KTWvqQenmXZYgHxQu8Gwq6MrGRlABv+lz2/7EcNgLvZvtA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792759068;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=lklnJv3m9wn+sUjSz23qr/7on9I1vjJJc+u4N9JuGRI=;
+	b=0v511WlZPljwzsBUZqMYKnfRRdDvRuGUMOtGv05swn0X/RMZ/piQfgiRbxhJoDYAXU48
+	 5oQyCE1uOiVqaNnzF5DxMkK84WBqVvvRXVIMgmhNF8L2YnRD/A38sb5NkoHHyHI/JzDj7
+	 gEKDB5O2p+gFzT8ohwqIl7lI6bum3zu7Q03N17KjPV8x0Bf2DLdvG7e/QaAPDACGozbmS
+	 Iu1wAuBIRakYxnOXzzAXVW17EFO4luLRAL+t5u0y88TQi1YPF/SXubZSbCZvkyRc62Z6D
+	 x+EAxM3la7+pEH7xvfeiAP68fmz/6W3nJuhHwEBkRhzow2Z/wcqT4rLSjcWY+Jo1FYQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PysySQZP;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55A1606A321
-	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 12:37:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D55A1606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4B1606A320
+	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 12:37:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=linaro.org header.i=@linaro.org header.a=rsa-sha256 header.s=google header.b=UdpCV5Nw
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-8b09e07e149so7518147b3.1
-        for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 05:37:45 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792759065; cv=none;
-        d=google.com; s=arc-20260327;
-        b=bsrtsSokqac0/EknjmWbFZ+IWLAS8MpJ2cMlAe56PdV650V9nHuBjVYgKLigAOwN89
-         PvS+bpD8XxGkh8o4w85WsWWzDjAnKHARmtaCHqHKefPqPmgPIAc5Y3HFJB5cEIlibCLM
-         6A71mk4D39CuIE+/yQuR2sJPWX/JmSe5m+14ixODf/BjRlxytl71kWeqmQqgTDMVcbwt
-         hY1Nuq2Va8blxHqcaWNrtfVdO1RDvqHPc4auYLls0DMND0/00NvntCHEzp1gYWma9WKZ
-         VUsW8OY/CeU+54xkS3VaFW/MQUlQmSTP/M/VQgr7TO3X0TeN/dJc5vZ7xLuxllLq5yFp
-         9CkQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=SUkoX/3bwjFpT0dyc8UcMdZ4lcBpeSlTtzlkyvLE7Jo=;
-        fh=6Xyjg6xSWLSps4LsfIP9DNrqwqBvw5iw+KW+vfBhALM=;
-        b=AQ47gp5DhwjMYLhaw6akOt8oKAu0j8Y+TSx//tNQfRL/70XwGtUe8iItrbgExSzOwT
-         LoUajRA23aiy1vRgr1YqRarTH9BEA6rFpRL22d2C0KBd0HkYmRQyvsFA0kvOd3Syagc/
-         OK/VSx4wZYgDjJG2J3Q9tueNpc4jgtS4lZbQVmTjGPUUIQMjwFO+2aeBqV9o51onaWV3
-         lwxhDIwfQoSvRQhbgvHlFKB/v2+mEYNfqGFmlSrsuZd8LAA3sn6v81EWRlR0uccXyGx9
-         JA/OwZl+9UBpECrjVXppCTmef9uoaO8iQ96xRN9WPhyUGiGpyLWMsp4wdc19UOdB1CGx
-         jZiw==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1792759065; x=1793363865; darn=lists.linux.dev;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=SUkoX/3bwjFpT0dyc8UcMdZ4lcBpeSlTtzlkyvLE7Jo=;
-        b=UdpCV5Nw7KaIlCuloAFJLGQxlhA4stw57V0NBAMkgH+w1NCrj5SygmTDRxvAK/dSwo
-         Pk+kBuxAf1+JxCy2aCr+UtbYN0qDePJhLxIwBmM9kN/878A98ERvOdF6zEbT6ctnK0ak
-         0kKSP/e8E6OEcjIEmnlyoLx6A0eYsMgSzb3wW3JhxKSLpAZq6txgQ0l/QDyk4uqejpzW
-         j9lqYSKrksU6+mMmN47DsVYDLHkB6+Xagd/36OTDM585N7OAccjaSfcKPZA1st1B8gPg
-         9xIFX4SqdyYW4wSyaDPZ0DTKFpx28Ho+7z+Wnp+PJ0Vyd+4obCvZHkoVd5skhCJNjSyW
-         KsKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792759065; x=1793363865;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=SUkoX/3bwjFpT0dyc8UcMdZ4lcBpeSlTtzlkyvLE7Jo=;
-        b=iPMgOEpkXVrUcOSUk1IG+JdG4MxPOWmMZMEvXLWWgC7s6ODsYGW7C7k0vwVcdXYsov
-         yIK4649HSIRLVcp+Bgjfd6FVCwqhxBGtcsbF87+GBPGCxE4p6mexfQQTXnbjx4cxJyqW
-         dhiSVo9bVEH3+EZxEc7pq5xVX6/5LTukY2jhdezj6/XZkeCU67LisSXBj4Du50tbQ1E9
-         p+VIq60JXc+6KUmLqih5QHu0FY6afSd+JEby2wlWNZeEoBbJk3IR7jh/S8TJZg7/UQRU
-         VAZ/qxbcdp9UMAPZf272ad2WX3Art79YFVpOpo0xh3+xItQ+YNhNSkuB+vBH9CfVSHE8
-         Qf/w==
-X-Forwarded-Encrypted: i=1; AKwUvBxYV2upBzo+z04923hsuLvlSy1K1QKO95rXLWst2utPR9BpsyBNd3z0IovrRrNliKJI0J4WkwY=@lists.linux.dev
-X-Gm-Message-State: AFq9FYLNg+G/9KvO7Q+AMLLNuQXSIXnv7kKbRwneD09/C48m33LNNkcL
-	liHlkoccJyuAWbv3YM0OnS3JOfVsn0paKzSWNImuefiS6mgSuNxk7AjiXMBIP1EuCZgcKyAmhV2
-	MGWgPQ9rxLreThqSeyUYgPQYYOAAtjMXYBflcrGu7TA==
-X-Gm-Gg: AYBFou2ZWo5rpLBA1ozuRTxpEe2G/fwtRL0wIGp7m33RcOxSOdTMEBISv88DcQMG9nq
-	Aniu15x7ZB3WaZQppKLeRUVXbfXdbKSqO/GQ24zODt0rINI8quwF5C/ts/7ZWuwUKU8cveQVxj6
-	+/CGUKlWPLqnE5bKtzUXJfpIUFgfXsWegnsht2hZXO750vWrBGn6d9Jc5MzOSYhAKw5IDTqLYaW
-	PEGnWSF6lPukvKc6zuCmfaNvk67zEv5HkwN+qP9dIqVOmHEjWtvONWmJk53clA77lEeGv/0RL0F
-	nxUp+JBosbLE1H23lCV4nd9QpVOuJ8zfyw+krOdSblvyMi9PbbQw8YKScM9YJwWKqrNVOQbB0SN
-	FZyug90GT/VTTDylUBBnUpnH1GBk59keXC/65GhL0DTzyBLdxqGHCK2DzKzNF6Wh6KvXISaHoad
-	GZ/Rvb1Rqqh2TJdQN/cXeuXg==
-X-Received: by 2002:a05:690c:550c:10b0:8b1:3606:65f6 with SMTP id
- 00721157ae682-8b157d96b4cmr11350167b3.64.1792759064577; Fri, 23 Oct 2026
- 05:37:44 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PysySQZP
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD98F1F031E2;
+	Fri, 23 Oct 2026 12:37:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792759067;
+	bh=lklnJv3m9wn+sUjSz23qr/7on9I1vjJJc+u4N9JuGRI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=PysySQZPwCVNFDM2IcfoYZwVzRdSOwHFlrDmK+bSa/LMAUCkzMyYw0Gz9WOmiUTQ0
+	 IOVy9Nmhim/H4DCjm5y2RPYdkAhH4yMG8DESjVZmX3XF5DfgdhNYcIJiTVw7coos8+
+	 SqLEuw8h9v4uwLTb0N6Sze0t3B/BK8ARG3TgLlWuckOP2NteVuyg5f3VVdPpmqQO3Y
+	 BOKSkRXDMv7DUsC3FyPW+yfkHFL2CmuTteF8RnmxNna3snr82zUBzN8EMmuKECWcHh
+	 IYkWZzqWfpUNYGkfQO+aiizlD8clAWlgQWJCyLGhmT04qJ8UYeBG31iMAbnBZ3hUrw
+	 A8ap4Vora6qJg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xKEWn-00000006SOz-30jJ;
+	Fri, 23 Oct 2026 12:37:45 +0000
+Date: Fri, 23 Oct 2026 13:37:45 +0100
+Message-ID: <86cxt0zj6u.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	kernel-team@android.com,
+	fuad.tabba@linux.dev
+Subject: Re: [PATCH v1] KVM: arm64: Use the host kvm_host_data for nr_event_counters
+In-Reply-To: <20261023092007.3918848-1-vdonnefort@google.com>
+References: <20261023092007.3918848-1-vdonnefort@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -103,33 +76,70 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-References: <cover.1792728982.git.deepagupta@nvidia.com> <529fc7538b61d0d2ea9a984087ff1d616dd65624.1792728982.git.deepagupta@nvidia.com>
-In-Reply-To: <529fc7538b61d0d2ea9a984087ff1d616dd65624.1792728982.git.deepagupta@nvidia.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Oct 2026 13:37:32 +0100
-X-Gm-Features: AclHuK9ojQv69OAZTrmG7kBHeUcigZauSSNPGVhBPnbTfN_tKVHRQ_dcXo19pmw
-Message-ID: <CAFEAcA8tV-Qc_GHxyCwaU-c0h5n5hcTCU07k0bvGiT8ePFu4FA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/1] target/arm/kvm: handle KVM_EXIT_ARM_SEA and report BUS_MCEERR_AO
-To: Deepak Gupta <deepagupta@nvidia.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, mchehab+huawei@kernel.org, 
-	jiaqiyan@google.com, oliver.upton@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: vdonnefort@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, fuad.tabba@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 23 Oct 2026 at 06:22, Deepak Gupta <deepagupta@nvidia.com> wrote:
->
-> Linux 6.19 added KVM_CAP_ARM_SEA_TO_USER: a guest synchronous external
-> abort (SEA) that the host cannot attribute to a firmware-first (APEI)
-> error record is returned to userspace as KVM_EXIT_ARM_SEA instead of
-> being injected as a virtual SError. Linux guests treat that SError as
-> fatal, so on a host whose HEST has no SEA-notified GHES source every
-> guest-consumed memory error currently panics the guest.
+On Fri, 23 Oct 2026 10:20:07 +0100,
+Vincent Donnefort <vdonnefort@google.com> wrote:
+> 
+> nr_event_counters is only used by the host to populate mdcr_el2.
+> However, host_data_ptr() for pKVM switches between the hypervisor copy
+> of kvm_host_data before it is deprivileged to the host copy after.
+> 
+> So kvm_init_host_debug_data() initialises nr_event_counters in the
+> hypervisor's kvm_host_data, while kvm_arm_setup_mdcr_el2() reads the
+> host copy which is 0. With a HPMN of 0, this stops programmable event
+> counters from counting a non-protected guest.
+> 
+> Always use the host copy for nr_event_counters.
+> 
+> Fixes: 2417218f2f23 ("KVM: arm64: Get rid of __kvm_get_mdcr_el2() and related warts")
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> ---
+>  arch/arm64/kvm/debug.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index f4d7b12045e8..a00771339c62 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -44,7 +44,7 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
+>  	 * to disable guest access to the profiling and trace buffers
+>  	 */
+>  	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN,
+> -					 *host_data_ptr(nr_event_counters));
+> +					 __this_cpu_read(kvm_host_data.nr_event_counters));
+>  	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
+>  				MDCR_EL2_TPMS |
+>  				MDCR_EL2_TTRF |
+> @@ -80,8 +80,8 @@ void kvm_init_host_debug_data(void)
+>  								   ID_AA64DFR0_EL1_PMUVer_SHIFT);
+>  
+>  	if (pmuv3_implemented(pmuver))
+> -		*host_data_ptr(nr_event_counters) = FIELD_GET(ARMV8_PMU_PMCR_N,
+> -							      read_sysreg(pmcr_el0));
+> +		__this_cpu_write(kvm_host_data.nr_event_counters,
+> +				 FIELD_GET(ARMV8_PMU_PMCR_N, read_sysreg(pmcr_el0)));
+>  
+>  	*host_data_ptr(debug_brps) = SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, dfr0);
+>  	*host_data_ptr(debug_wrps) = SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, dfr0);
+> 
 
-So we already have a mechanism for the kernel to tell us about
-memory errors -- the BUS_MCEERR_AR SIGBUS code path. Why do
-we need to have a second mechanism that needs more code in QEMU
-to wire up to have the same effect? Can't the kernel tell us
-about memory errors in just one way?
+This really looks like the wrong approach.
 
--- PMM
+host_data_ptr() should be reliable, and always point at the correct
+data, irrespective of the backend. If host_data_ptr() returns a
+pointer to stale data on pKVM, then it is purely a pKVM bug, and
+that's what needs fixing by synchronising the two copies by whatever
+means necessary.
+
+Randomly picking a different accessor is not an acceptable outcome.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
