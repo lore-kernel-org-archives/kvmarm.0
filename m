@@ -1,100 +1,70 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.181
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792755901;
-	b=F7L6Vo0td1FoVt2uyu9t6QSB6FKzWWBHdGLqPrgFN0s90WzxWR0QVIi+rtLcY71KXQum
-	 LU03baKvm1Vtr33UCMmfBMJ5rT4hq17M/o6M8fvr7z0Cvie6xxvJAE8dtabGgyZ0/b1rQ
-	 myMF7G+uBbDaOeztBeDoHbttHwYMjB8K9EC6tNWztmK4/2uw5EfJtNsrv4ME94GCkiL94
-	 iGJFSqAiLdtyhnbEeBxvSdluLaTvwEqGRUcY+79C0PTqZxg3OHr95VaxN/ROJAzlEdqWN
-	 O7khopDD17KrXYj4QGkFUKfWV4fAltydncLvKWO4LM1f205ldcki0jsO84aZQOolMpA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792755901;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type;
-	bh=LJ3/gGSXFuZez0qoiMtJBNrT34Y0qC3xMuJpLq2A+6A=;
-	b=49kDQV9vS/UWjxP73/4Q2eOFmdOkT02mCEqeSchiwUVpMQCmIR3otD13b4Mn/5+pYVMf
-	 ecrpJj2lHqOI4tIVvqjPoVWeOn+PWnzWAdELndq2okhsS0O1AR4oaLNnAGV06p0dBbETY
-	 CHEMoR5V2phsekgHe1nlykCScgrURQIpnCLABAonCxrdFrF2G8a09QFQqvWo09sTyofZt
-	 DcML4gppy8tpy3/hoVZWDVF9CmtZoW+2r9YrDhF0g9KCdTfolwhg+cvCCzs2BCzjs7eIG
-	 XqiwSxNYEKZnVueo0OAvMy41kJP0L/XOpSLqqu5bWFca4KPziPlM0+gMLsPsh20rWmw==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linaro.org;
-	spf=pass smtp.mailfrom=linaro.org;
-	dkim=pass header.d=linaro.org header.i=@linaro.org header.a=rsa-sha256 header.s=google header.b=DIqO52yT;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.181
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69780606A322
-	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 11:45:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 69780606A322
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792756926;
+	b=I8ptjhSMg/ILgs/lRrqq/V+oMXV3nrGozpZnjEMrALTVfk64fyO2DKvgzzjQIObk6Wyl
+	 XtFthJDOMqyLMmW0Iw0tb2rUqw5ucX1Gwok7wKT6OBiS4y3qmK1yU/uhvxpcnJ7yiePT9
+	 +cjSrotZdfcb2Ppu8zf9F2a2D+iHbuIicxZswwbqQIHwAxCnkiwzFhlcmFNKhuQEuG7hB
+	 /u60uX2BKuDSnS7JDgw2VnG4vg3fkiDzRzGt3gBwi62vFNCCDqY9c+5acGITemMxvPNR6
+	 ngfg/2+KHRNqN/hdTiCb0iUgccXfVncKl/14n0NdTF7RTYWpatbSKh55alk9K7mfImA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792756926;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
+	bh=jctLZMa3CFFn1fL9CJJAY0fHDymjjHzSukwmoA365k8=;
+	b=N+vDkRznBKsFqEhTkZbGiB3+1EnFtyTVGSDQ3z/0/MHYhmoKmcJf7Jn/tJRkaRBp47d4
+	 FwLm4py4js1u/XDdnFklITx9jpzZZSXxVmG6JgcNGaTQFh8SuxWLTMpF6Li6jhXLZ74eq
+	 ow1CKDwI2+fc8P7iUPwTMtZesmOGP6hpkNq0dzFfwZ+BBunzFJFAmBx33j2vSErMBs+m4
+	 UXbsR1d3wbx9p/Lk+CpMoxQH80UN5sQekakHRof5mNg2xqD64FHkMzaj7OkM8Ge+df5Z0
+	 5Px22fUiSzCBUq6Fjjmi29fr9of6QeeMZ6kuPjSd+W4FTg9BKEvFT+1y27G3lOlCmPA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=bxRS2WXI;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4354606A31A
+	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 12:02:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B4354606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=linaro.org header.i=@linaro.org header.a=rsa-sha256 header.s=google header.b=DIqO52yT
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-8ac525c1f05so7172647b3.1
-        for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 04:45:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792755900; cv=none;
-        d=google.com; s=arc-20260327;
-        b=qLg5GEfu4k33LoK/eN9FBjG3OGcX7vqHB3WBh21K+q4elB4oGyFVmzdqB+OKxpbHpp
-         HFnVkODxs8MU+Bsu/oaVIBmF4u4Otcy6s3oqtpXfJd+dmU4O6ZDCbYvL/Dx6N3Sf44Dh
-         XKsd4MFWSppjhSmFisoJI8fQLN7k3WJ8vXzHhEDfq3b3iMxKMShtXsd8eOrU6HC9wIr+
-         SQUw+KFhn//cKiIuhV2704F8+zrE9w6L4pL0BR31gnaWV/lNlaKkPmXHGtRYd7w3V8fN
-         krAJYqPKjsG0qfQlpjgHe2MwLd8Kk224/yRi4PEwoUyAgboZKYeXhBOzJzt8cg5aluUk
-         PxNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=LJ3/gGSXFuZez0qoiMtJBNrT34Y0qC3xMuJpLq2A+6A=;
-        fh=ugLDIyxvR+GaMss9gPYazRRdCsGvl92/OwXy5dI6KWg=;
-        b=nw/sfey1t2YMydcqb76PsIH7IFBXdm+y/+s+OGjG0sY1k5d7G7htUkSNaoWHNLFOxP
-         AVp9fM2XKKa/YlTW56Z6DKn827PHilsQua8Ykzqaet52Dpjl9HEpDzGC+O4wYykH+O7V
-         QdMFDE6kNp1VZE1jw9GcmgWRWHoWpkxYC3IdUDhqrpY3rJJjKfAvsdmeR0jr3SqAKnI9
-         ysol1DpSglsF4z8CTKfT7OvhkvSCUVpos6PHakmjHMEFNL07wKPqTCByxApi8Z5y4Mxi
-         l70HYvjkkzMu6jxxlZ1DH06qHKReeEo6W33x7xvWLnk/58NbVAY0GnT/mIKgXtLlmQ2I
-         ToXg==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1792755900; x=1793360700; darn=lists.linux.dev;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=LJ3/gGSXFuZez0qoiMtJBNrT34Y0qC3xMuJpLq2A+6A=;
-        b=DIqO52yTGkZ7izWyttf2uDhRTbxAs8VC0XRz+VEkdH+hUmhKGxwbwTtwnpeRjc7qj6
-         9vykD8LnURo0NHyfHj8nHHETPQI2k0SZo5V+LWLALd7w2BvQ+vYzKyFhqtg8vn9raGHA
-         44BOET6z6Kjijxu1TIXyNoYbjApTZWGFTSRxwVA2q75rl/nipWcYgZBNkPIlPrBFdSMJ
-         L7BbpbeCz8wc+Rtc+D1e2srg9OdC4dj6tnUOZzVLJoG6RAyhNxetdARW8w2NvjO6sQNL
-         /o9EG2lGJ2dSPVWVVCFKkGr7PEcCZDlHqW4wPKmkIuihrAqQ0vJZG6cV3cu4nxO0LtBG
-         s0Tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792755900; x=1793360700;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=LJ3/gGSXFuZez0qoiMtJBNrT34Y0qC3xMuJpLq2A+6A=;
-        b=FY5g+GzBPHyY7WRIwiQJY7RMkCjcbZfaX3w7Y9TCMwXvNE8aWZSe3kqnzDQpYarwA9
-         XJD/OCyhuzM4co2wygBkW46mSJDSp7NsOAXC//h+TUqrhSvyIB1JT8WLNb8ECVOaPb9q
-         8FjgyFX78YoLr99M7oUTPVVdGVMLRBQUMFqzfz9S26TfbSJzOigHmTm1Ah3whBJ2+4wT
-         9XoZg5CAWbsQGauTVlBKu39p1dvAyrDiG3Epml4zhrMjtek9e3WZ8lHtjl0J+dZpCd+J
-         5RfVP6Lg2oLqIZSXZu8aGzxopW4xu8ZN8+NJ5H+b9D87OUb0WtfEpUWLbkUcfgmThW7Y
-         EehA==
-X-Forwarded-Encrypted: i=1; AKwUvBz5qNNTo9UCPxXCzfK+axomxm5K11vqMmlgBsvACy1AzMnZA90Qk7qHHia3YJf+KEDI0ZqaSOk=@lists.linux.dev
-X-Gm-Message-State: AFq9FYLvrUHgFvRMn1GP4qk/Bsz+2xEWsbJzL5roE3BF0PWdQEjVtILt
-	WMn+NGRfcn53WQbdbIhUwvdnPrvTyhD7p/5nsQU1ngDGW+jS9gnfvVDwgkMnItNsho/Yl7yd6HP
-	b0iB3+vcPxdllHawSpGCaizerpr/j3NeeHeR2O9/DIg==
-X-Gm-Gg: AYBFou2NwgQTwxzJL7446U7vkKPUiJxCuX+FY3JrEwtdfgsyXefvfiNgdd9OChj6JtW
-	8oMGVHcnVI9aE7wUlMpcFobdEQjJNaO0E8F7IivPU/H4Ac5HRqkaBnrRM48XXu5yfuhiCpUGoNe
-	Z5KVJfQrxwmtSBonej8aozYKCwK+9vZRBmp260Eh+qA+tc6hniBxlHkNhgBR7DwrBuc6dFiXBUG
-	qBECUDek41RICFxfUvSYTjCcditaZa237/eq3LzelpERSR/5zGE3bUpgZsM7eRv01Yik9cDBvRo
-	DUAmNEqqPtHhneHK/hl/L5jmSBajJkzega87AcBKGMQTeKswZ9q8H8pojaNTHKdtwhVy5boXPU0
-	nGQQhZToxal3SuixpqWaLsG4YIA+Wn9TTf/YfFW2Bo+OI7EiItx4MBjtSS/FKnonpfScEY0B2+K
-	AuGj2OMgEf/ruIuuXGwjfA
-X-Received: by 2002:a05:690c:7108:b0:847:d0cd:11eb with SMTP id
- 00721157ae682-8b157ba2d78mr17589257b3.9.1792755900069; Fri, 23 Oct 2026
- 04:45:00 -0700 (PDT)
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=bxRS2WXI
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DF2001691;
+	Fri, 23 Oct 2026 05:02:00 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 18F3F3F7B4;
+	Fri, 23 Oct 2026 05:02:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1792756924; bh=WhP+2ZARQeBOK940ZZV2hQ7dkuiCr9Al+UuwIs63AhY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=bxRS2WXIeECIQ2k5nigxQE0z5PLaNETAUfEr+noV/i/NkRlOpHb0Vp+CcZr7aNDlk
+	 PqIv9v832Zymbd8retio17UCU2P2YlX8mZzjXQeJaNBtTGU9zSmCVpzGDPyKopTwlw
+	 hMK699uINLjrdnaCD2KwH1mEgasSdWo23WeKGCek=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 5/5] KVM: arm64: Enable HAFDBS for guests not on migration
+Date: Fri, 23 Oct 2026 13:01:57 +0100
+Message-ID: <attMtUqxNsuPooix@LeoBrasDK>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <3e464bef-8dfe-44a3-afea-3c276ae87cd8@huawei.com>
+References: <20260901171558.2674031-1-leo.bras@arm.com> <20260901171558.2674031-6-leo.bras@arm.com> <aqneWnlsdpocLIl6@kernel.org> <aqqhDs3NyjtkZzXK@LeoBrasDK> <aqsl1_IqnV2r8kUL@kernel.org> <aqvt2gnlBZeNsaf4@LeoBrasDK> <as-mH36YSMxAosND@LeoBrasDK> <3e464bef-8dfe-44a3-afea-3c276ae87cd8@huawei.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -104,42 +74,112 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261010133725.642498-1-eric.auger@redhat.com>
-In-Reply-To: <20261010133725.642498-1-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Oct 2026 12:44:48 +0100
-X-Gm-Features: AclHuK-SOddt72tpNNxsXJ62VuaXNgbTq3dc6W6MUQby4pa5991PP5qOVGNvpWA
-Message-ID: <CAFEAcA9XE0TLxp+DNzFSbkxbj7f0M78N+tf1a01cJ5rNkM7NBA@mail.gmail.com>
-Subject: Re: [PATCH v10 00/26] kvm/arm: Introduce a customizable aarch64 KVM
- host model
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, 
-	kvmarm@lists.linux.dev, shaju.abraham@nutanix.com, khushit.shah@nutanix.com, 
-	yangjinqian1@huawei.com, cohuck@redhat.com, richard.henderson@linaro.org, 
-	sebott@redhat.com, skolothumtho@nvidia.com, philmd@oss.qualcomm.com, 
-	maz@kernel.org, oliver.upton@linux.dev, pbonzini@redhat.com, 
-	armbru@redhat.com, berrange@redhat.com, abologna@redhat.com, 
-	jdenemar@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On Sat, 10 Oct 2026 at 14:37, Eric Auger <eric.auger@redhat.com> wrote:
->
-> This series enhances the current host KVM model with capability to
-> set writable ID reg fields.
->
-> Since v6.7 kernel, KVM/arm allows the userspace to overwrite the values
-> of a subset of ID regs. The list of writable fields continues to grow.
-> The feature ID range is defined as the AArch64 System register space
-> with op0==3, op1=={0, 1, 3}, CRn==0, CRm=={0-7}, op2=={0-7}.
->
-> The end goal is to get more flexibility when migrating guests
-> between different host hardware. This series is a prerequisite for
-> aarch64 named vcpu models.
+On Fri, Oct 23, 2026 at 03:23:04PM +0800, Tian Zheng wrote:
+> 
+> 
+> On 10/14/2026 11:56 PM, Leonardo Bras wrote:
+> > On Thu, Sep 17, 2026 at 02:40:42PM +0100, Leonardo Bras wrote:
+> > > On Wed, Sep 16, 2026 at 04:27:19PM -0700, Oliver Upton wrote:
+> > > > On Wed, Sep 16, 2026 at 03:00:46PM +0100, Leonardo Bras wrote:
+> > > > > On Tue, Sep 15, 2026 at 05:10:02PM -0700, Oliver Upton wrote:
+> > > > > > Hi,
+> > > > > > 
+> > > > > > On Tue, Sep 01, 2026 at 06:15:56PM +0100, Leonardo Bras wrote:
+> > > > > > > When dirty-logging is disabled, even non-write faults make a page dirty,
+> > > > > > > which avoids a second fault when the page is actually written to.
+> > > > > > > 
+> > > > > > > On dirty-logging enable, this approach causes all (writable) pages on the
+> > > > > > > memslot to be marked clean, even if they were not written to, which can
+> > > > > > > take a lot of time, while holding the MMU lock, doing atomic writes to
+> > > > > > > PTEs.
+> > > > > > 
+> > > > > > Do you have any performance numbers for this? Enabling HAFDBS seems a
+> > > > > > bit involved to avoid some stores on the first pass.
+> > > > > 
+> > > > > Not yet, but if the idea does not look too crazy I can find hardware and
+> > > > > collect some data :)
+> > > > 
+> > > > TBH this looks like a micro-optimization so I'm not expecting the
+> > > > performance gains to justify the behavior change.
+> > > > 
+> > > 
+> > > Okay then, I will get a machine to figure the performance gains :)
+> > 
+> > Got the performance numbers here.
+> > I tested both the case where all PTEs are dirty, and the case that 50% of
+> > the PTEs are dirty.
+> > 
+> > For that test, actually patch #5 could make kvm_pgtable_stage2_wrprotect()
+> > slower, which is counter-intuitive, in all platforms tested:
+> > 
+> > When we walk the S2 pagetable to wrprotect, using the new walker, the
+> > write to the PTE itself is so cheap* that the cost of the branch
+> > misprediction (write PTE or not) for the 50/50 case is significantly higher
+> > than the cost of the 50% extra writes, which makes the 50/50 up to 60%
+> > slower than the 100% dirty case. It is still slower in the '25% dirty' as
+> > well, and starts to get even at '10% dirty'.
+> > 
+> > * (non-atomic, everything is in order, walker is small, cpu will probably
+> > bundle it all in a single cacheline write)
+> > 
+> > Since the idea of patch #5 was to reduce PTE writes in the first wrprotect
+> > walk, it becomes faster only if only a small portion (<10%) of the VM was
+> > write-faulted while the remaining was read-faulted, which seems to be a
+> > really reduced audience.
+> > 
+> > Since this comes with increased complexity, and also carry costs of
+> > having HAFDBS itself enabled outside dirty-tracking, I don't think it's a
+> > good idea to further pursue patch #5. It's only value is that it served as
+> > a base for HDBSS implementation.
+> > 
+> > Thanks for reading!
+> > Leo
+> > 
+> Hi Leo,
+> 
+> Thanks for running this, the numbers are really useful.
+> 
+> It means the hardware dirty mode (HD=1) should only be enabled while
+> dirty logging is active with HDBSS support, and stays off otherwise.
 
-To help me with review prioritization -- are you hoping this will
-land for 11.2, or are you expecting it to be 12.0 material? (Given
-the softfreeze date is rapidly approaching, it feels to me like
-12.0 is where it's going to be.)
+Hi Tian,
 
-thanks
--- PMM
+Correct, it's actually counter-productive for it to stay on without HDBSS 
+before dirty-logging.
+
+> 
+> With HD only enabled during dirty logging, we also keep the DBM-based
+> encoding for the HD=0 case. On systems that support FEAT_HAFDBS, DBM
+> remains the write bit and S2AP[1] the dirty bit even with HD=0. This
+> works because kvm_s2_fault_compute_prot() maps any writable page of a
+> non-tracked memslot writable-dirty (WD), including on read faults:
+> 
+> ```c
+> if (s2vi->map_writable) {
+>         *prot |= KVM_PGTABLE_PROT_W;
+> 
+>         if (s2vi->device ||
+>             !memslot_is_logging(s2fd->memslot) ||
+>             kvm_is_write_fault(s2fd->vcpu))
+>                 *prot |= KVM_PGTABLE_PROT_DIRTY;
+> }
+> ```
+> 
+> So there is no WC entry for hardware to promote, and HD is simply not
+> needed outside dirty logging.
+> 
+> In the next HDBSS version, we'll only turn on HD=1 when dirty logging
+> is active.
+> 
+
+Right! 
+I will also send a new version of the pre-patch (4 patches) for us to 
+discuss. The first 2 patches will change meaning a bit, but should still 
+work as they do today.
+
+Thanks!
+Leo
