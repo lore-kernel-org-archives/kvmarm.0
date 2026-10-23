@@ -1,62 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.195
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.140
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792743345;
-	b=RtdYBL+g1mzvUvuZPmPbCj/mgpzW6iobUG/u621FAZ0Gqph4gY52/Fa6Vk19bmofgFZ4
-	 MQ2b+Ffwe2pOD4JXgokWh2GYYToxFDvtcdDpPV4IzINeMnc+Gyk2uMFp+c2F18rAsIk13
-	 dIdUhhVF3NX9T7GRjFu31YdnRCyaSYyRsjVqBPRv55HCTt6OGXQEeM7Z+Al7W9IpT4gSZ
-	 uUV3Ab9ZyTtyBrUD4Nobk8aAZE5/PWVBmGtG3Aim67lPHeCO2yfErdqx/tg8PYwr0ye8f
-	 dTqrI/ToQmO2qltmGR710fF0u9MKC7Ekk0zYH1rJQPieRdKanqjgwYwqn9CrJsx++Cg==
+	t=1792743462;
+	b=OHsANJ9ky+kca9wmtChk8O0X39xW1g5xChYeT6i6ycwwaNb0aB5jvvQGCkj/3f5Un8D6
+	 Rqbz4VmH0FDSQNoAwBC+rIJjEQHMuA4QoGkjkCFRrW3vcOuP3tPkiyt+IaaLA3E+YNT3H
+	 YcOkzbsriRXRteDQ9u/yD64eUzkEGnil94TMi+A5ftEtHLwzREm9rlYScFokIEX8GdzWY
+	 KjdpdgpzsLjQe8P9Plt5QQENv+3WQbwLjBH33khL5r5euFxiE93ywXGYG8JpdvaBP5Tox
+	 jnrtjhkerOfO7l/T4gFXNMwGvcmfHaP2p7Zy+ADXKh2cB0BWwuGYTWR46/8jPRHx31A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792743345;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792743462;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
 	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
 	 Subject:To:Cc:Content-Type;
-	bh=3Y1UNnJLUfF4IHPLVKAOakcJbI9y7VNgBZgpQW6I5jQ=;
-	b=Dcdfng9JZSQg3u3MKd48Rsn1AW5SJIHuUayYGFy4+BfJwRlcKmCNkb6p3kk9iXYt07p4
-	 pqJLI9nX32xUSfp6QR0vWBuBCV/9QlcBJytt3D0BvSnpkpY5ZjHVPRndsWii7Iysht+Qj
-	 jsJLnF8Z39KWeD/W2OwtP8F61sQQAxNZFLAxM/QhjewdzDvcOH/xpngHhxI0a6ueR+U2Y
-	 EbnjStSMg+VxgINMGNWOP63pHDh6Y/+lCkeQ0HcFbMlauOoXDH9cb+o2pbNhiE5ZvRV92
-	 EUU2I74f9uif7rIc2xqLVGSandHa6Fxn/WDjrT/O2xVMstrLb6gFu1MPL/DY7ij1AUw==
+	bh=qNsB+WdeCj5VypVcxsMZSCwyt6cdxmOolUo5Fs1wHvU=;
+	b=F9j3xmlU8H3Iq0h4MFqpbkkD7PIqdiA9N1IxwhidsxAe6LVPAy3niqCIp5YwkucbQ7U7
+	 GoCxTlMRw0RkNTG3LruA/dKY5BL8eaJ5CYdbr9jcSYPvmA354/dW8nxW2qgmJOatVq0Uv
+	 /dYbzbTeYfe6V9rfuJAJdQmjQApdEmBKPuAlPX8eWFYqkHEKgBbf4LvfrcHG7/goNssh8
+	 rZCpVPlyyIibWDUVDssY8ZNKM42zwFYDz73ksJECrfR9tPurQLld61tx9b0tmwvIMgY73
+	 SqHr4MyrKO90bhiD3W6GfDkHa7f1FM6VWjsd65CeUx970/HcxTqEBU7RVeAOQCkzCrg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Ob6ZXa6z;
-	arc=none smtp.remote-ip=95.215.58.195
-Received: from mta1.migadu.com (out-195.mta1.migadu.com [95.215.58.195])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=HewK4t4R;
+	arc=none smtp.remote-ip=91.218.175.140
+Received: from mta0.migadu.com (out-140.mta0.migadu.com [91.218.175.140])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E4E8606A31F
-	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 08:15:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3E4E8606A31F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599A6606A31B
+	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 08:17:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 599A6606A31B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Ob6ZXa6z
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=HewK4t4R
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=3Y1UNnJLUfF4IHPLVKAOakcJbI9y7VNgBZgpQW6I5jQ=;
+DKIM-Signature: a=rsa-sha256; bh=3q8FYPFV6/mr5bsm1f2R+ib1owIqgidysonIiS2gMzA=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792743342; v=1; x=1793348142;
- b=Ob6ZXa6z+Shtn/o70ofJ6MLMuWppAPOomeGXjXF27pEoFqMjHap/51bHj1q4cS1joihbD+XR
- 7a19LR11RLuSK/6kKQnQReu9i18iIe24D9R8Spg2UxLC27iKTbcwtx1arADdxUZ3q0y5f1CTeV/
- VWmjmz6DVbYC3mCRtEvQo4Y4=
+ t=1792743459; v=1; x=1793348259;
+ b=HewK4t4R2Bj/oFfl4TKhbcPUYvmqj8Ic166L1IxkSl5nADKqqR/ADLTkroCr/srWV6N2Fy0d
+ bTIfhBgM0PDlrwYZWGGMYUO7wWiTC6Ig12VPWGhAKWZIRGZRLTpgnWSCQdarvsdaYLduDMY0hI7
+ 3yMIyMQn1gbysvSyt5N256rQ=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 62f1d22193d5e5ca;
-	Fri, 23 Oct 2026 08:15:26 +0000
-X-Mizu-Trace-ID: 62f1d22193d5e5ca
+Received: by smtp.migadu.com with ESMTPS id e45c14a784e98ea7;
+	Fri, 23 Oct 2026 08:17:38 +0000
+X-Mizu-Trace-ID: e45c14a784e98ea7
 X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5be58ad9600so6020e87.0
-        for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 01:15:22 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBy5FwNV+Sz8PDOFePydDdw1+GVAQaE/ZDP9645kBr2ejazb4/0aMeWujeQaTJ1lBuvh/WmOw1c=@lists.linux.dev
-X-Gm-Message-State: AFq9FYJQfSbVekjUvPCenjBceTxVpyVvY0a5uT9AqpptxrOYBlTEKgHR
-	dloBfVGDdu1EolCMpwLV2IwJr9kwUhBvh63qnlvZmcOOZcaA75tJwlzuqhTVwnISJsvK9gLXXN9
-	btaagvYt5C0bUq9Rp46Uj1RhgRngKYW+VgwQWgwsA
-X-Received: by 2002:a05:6512:2399:b0:5b4:74e2:4171 with SMTP id
- 2adb3069b0e04-5bfb00b65e4mr104760e87.4.1792743320286; Fri, 23 Oct 2026
- 01:15:20 -0700 (PDT)
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5be4a7b9e6fso4102e87.1
+        for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 01:17:38 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBzRqdbslmMfQkM4BrjomgRGL3i94tGzzUrcr8O8O4XzG6ZMU6eW5H6DhPwQFdGZcYU84yxRDOw=@lists.linux.dev
+X-Gm-Message-State: AFq9FYLuLBaxWCSewk4P6bl5tjH4jo8qnnkh1+zc+Nzp9zPjVxee4bE8
+	gPfE3oiDw9eEZdvHIspHmN8JtV9LEWwXZviHf2xZ4JsrxfDdSnO981ziEyTGsprMzG4h2aBwcJe
+	qePg8CYDfWq4jIZ0HqQ2buhw4TZLFrlYxwI8WeZ0h
+X-Received: by 2002:a05:6512:1111:b0:5bf:aeea:6e42 with SMTP id
+ 2adb3069b0e04-5bfb06d38f2mr78643e87.8.1792743457929; Fri, 23 Oct 2026
+ 01:17:37 -0700 (PDT)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,40 +66,69 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261022140048.2522787-1-vdonnefort@google.com>
- <20261022140048.2522787-3-vdonnefort@google.com> <20261022173604.3710390-1-fuad.tabba@linux.dev>
- <atsT4c-JLRSxSreo@google.com>
-In-Reply-To: <atsT4c-JLRSxSreo@google.com>
+References: <20261022-b4-vncr-mapping-test-v2-1-033e63ee055d@fujitsu.com>
+In-Reply-To: <20261022-b4-vncr-mapping-test-v2-1-033e63ee055d@fujitsu.com>
 From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Fri, 23 Oct 2026 09:14:44 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTw6yONFTYBbbwBbV=YvYC2Wcio-yCOf9WCcvTUKWeav=g@mail.gmail.com>
-X-Gm-Features: AclHuK8QRPswQkmU_NO-o8BNrXH8cgfaj9wb0MoWlEnDaWgVTOs_RkNMpHxX_IE
-Message-ID: <CA+EHjTw6yONFTYBbbwBbV=YvYC2Wcio-yCOf9WCcvTUKWeav=g@mail.gmail.com>
-Subject: Re: [PATCH v2 2/4] KVM: arm64: pkvm: Fix missing reset of GICv3 LRs
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, 
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com
+Date: Fri, 23 Oct 2026 09:17:01 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTwoY0e6oaJoQg3-1Ns=RVPfdACAaVuJE-_DgLUHhMqg9A@mail.gmail.com>
+X-Gm-Features: AclHuK_ZP2kPcYLceD_8xYePQ21UVh1ALRPCnQDdUQxEW_qnQ2BndoyxjgDJICM
+Message-ID: <CA+EHjTwoY0e6oaJoQg3-1Ns=RVPfdACAaVuJE-_DgLUHhMqg9A@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: arm64: selftests: Test VNCR translation invalidation
+To: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 23 Oct 2026 at 08:59, Vincent Donnefort <vdonnefort@google.com> wrote:
-[..]
-> > Could you say here what happens to a guest when an LR isn't reset, as I
-> > asked on v1? Without this series, on QEMU changed to leave a pending
-> > vINTID 100 in the top LR at CPU reset, the guest warns "Unexpected
-> > interrupt (irqnr 100)". With only the EOI bit set there, the npVM
-> > doesn't print anything in 150 seconds, since the maintenance interrupt
-> > is asserted on every entry. With that in the message, could you also
-> > bring back the Cc: stable you had on v1?
->
-> Sorry I missed that.
->
-> Actually I don't know if this should be backported. I believe it was working
-> until now because all SoCs do reset their LRs even though they don't have to do
-> it.
+Hi Itaru,
 
-Fair enough, I'm fine with leaving the Cc: stable off.
+On Thu, 22 Oct 2026 09:11:18 +0100, Itaru Kitayama
+<itaru.kitayama@fujitsu.com> wrote:
+> Add a standalone KVM selftest that checks VNCR accesses after L1
+> updates its stage-1 mapping and issues a TLBI.
+
+Could you add a sentence on what this guards? KVM caches L1's
+translation of VNCR_EL2 and has to drop it when L1 invalidates that
+mapping, in kvm_handle_s1e2_tlbi().
+
+[...]
+> diff --git a/tools/testing/selftests/kvm/arm64/nv_vncr_tlbi_test.c b/tools/testing/selftests/kvm/arm64/nv_vncr_tlbi_test.c
+[...]
+> +static void handle_l2_hvc(struct ex_regs *regs)
+[...]
+> +       case 2:
+> +               /* Check invalidation again, with the mapping reversed. */
+> +               GUEST_ASSERT_EQ(regs->regs[0], WRITE_A);
+> +               GUEST_ASSERT_EQ(READ_ONCE(*cfg.slot_a), WRITE_A_AGAIN);
+> +               GUEST_ASSERT_EQ(READ_ONCE(*cfg.slot_b), WRITE_B);
+> +
+> +               GUEST_DONE();
+> +       default:
+
+Could you add a break here? GUEST_DONE() isn't noreturn, so this falls
+through into default:.
+
+[...]
+> +int main(void)
+[...]
+> +               case UCALL_DONE:
+> +                       pr_info("PASS: VNCR accesses followed A -> B -> A mappings; "
+> +               "inactive backing slots remained unchanged\n");
+
+Could you align the second line of the string under the first?
+
+I ran it on QEMU with kvm-arm.mode=nested and it passes. With the VNCR
+invalidation in kvm_handle_s1e2_tlbi() disabled, it fails at the round
+1 check, so it catches the bug it's meant to.
+
+Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+
+With the issues above fixed:
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
 
 Cheers,
 /fuad
