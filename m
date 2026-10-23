@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1792789010;
-	b=okshNW/w+1/N5imDvBTU+saqOKoDgXX7WdePMfMZNgmGZYtVkOsxjT0QmWlueEM7VCoT
-	 58lRaKe4xw8aV07YGVzWf2O6vKMQpSkepPDKocFGByHUUP6eT+rAS1PFiURqIiEI4Ujwy
-	 Ctx/Gf2B2f/vPuiPEo+MGBwaMdg1l6xlN8gv4GVXyIPPweTaYKoKWlXRPmcBJu9I5mOvc
-	 KtuHx/ob3E/S0O8aljXDOOE/prPR3qorGiqp/MBPuLTdnzh25KDHLPd0afbeXEkHRGNCP
-	 j8KA/m5YBavyUOvtAKV2Np37jeLrylRIrRqco5GzV5BfSlAyY5DlW/28k7czYoO3jaQ==
+	b=QU0aZy17thUvc0fT3JKcOp0CI65YC7zKlNzASjw9d6+lo+5B45WD0Pnk36nnLem7Bi6g
+	 f5mQl2CAm3e6O6UwYNzudThd9xRdWPbMMwAMTWiYU1vzZx00YD8d/ejbnmStLXLoBMSez
+	 mgPW9czCAdj2KGAqLcgQjCi1m8boI9Jb4rqxtf1ScA8b0UxirvBmcnBGE9qrasy9cx2NY
+	 kc2FwvCteTuNdZPLMlMpAPt5h0OWZhwpT8vqXUaTv3TG/hy1DJe2ie0hbqnKXnyab8mRh
+	 MCX1LvtVb4EDRkwnCCLVFhfokRpsVeKczcwhs1L7Zy/7YUxSM3ZlNiAUlQwoEPI3WTA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1792789010;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=pIU5d6j9Ys00lAMXVHCBFg580+GrlC7IugJoG1GKGeU=;
-	b=vRdJ4D0PRbMJbT4nprVw8U4XGHAbaodMQrz+NUnvIzUtnpqeH2GEsWCR4owS8tKK3GYw
-	 JyTmBGY1iHQvWQM4hdQknTcXY3r9DtlPHoZF18m1senFkRisZyB+dVmwdcswMXEnDi4+Y
-	 0S0gCKRl+lDZBPQvpJtBE2QHaZY1nocJ9wKkRBej6wr8Nd5hl/B2ZwVLC29HDdQ3T8Kit
-	 3iMFOJx28jD5oT55Xahne/SKDnNkuSxwIBJMvfV9/IQyTaJTD6y+ErHH33bD6TfTCdYH3
-	 ijBlXKeNylFdQFcorh63nEPMuwYtFFHp3B7oDIPfWBbjMM6equiTE+ZLzIJUUeRk25w==
+	bh=wdoDgkpqvfrRPadKgSQzPh0ji1X/m/kQoQfnBmOEsTI=;
+	b=hm8v0mqKG/bZ+6hX1mRvjcouQlwDMn0QyplR0NAoD+48Cn2XOln8xfviEBKHr1ADfu5X
+	 JhphicR9Y3HSaIO2+MBd5appyyC3BOvMsblGXzgByWPoxWpBOF0+/AgzuJlILS658kCiI
+	 Kvn+Yw3/PCHBUc2TeAdF2uYomDDHaLMaLyZXgwDdAKZabfHqmiY551HpBjEOyZ6mH2ipA
+	 SMxctNVleBM3uesy26d/fkWvAfRDWCa6xPyJ+lP+j1fBfZKpYX4DwVO34syqb5zAL65Pe
+	 W5qZaSj8t8tmD7AtaoqiuDSYVojUOjzyrdDy0Wju9sJ9EJAi3uih/nAX9IRPmdINlWQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AGgfsGLa;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WWrPqLa4;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 279B8606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65CC1606A328
 	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 20:56:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AGgfsGLa
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4CCB1F031E4;
-	Fri, 23 Oct 2026 20:56:49 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WWrPqLa4
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FA3F1F031E2;
+	Fri, 23 Oct 2026 20:56:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1792789010;
-	bh=pIU5d6j9Ys00lAMXVHCBFg580+GrlC7IugJoG1GKGeU=;
+	bh=wdoDgkpqvfrRPadKgSQzPh0ji1X/m/kQoQfnBmOEsTI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=AGgfsGLaViXRwov8tZpb2xrtZwMaNSm9SPUk+laowJhr9GuzIfwVOH/Zu8f2w6feA
-	 uZfeUszIpQZX+N4NUUcaXedOjWl6N3Mlb/KcHkytbGBkp46wQU0OF3r9Tx9/f06/0M
-	 89ghJa20322Pib3vMz9/6rlFBuEHEzVzzSFZMPBDxWhW6HGOt1NjSXrmR2VrRyezBC
-	 s8RicU6uhfHF2Zu1votHm2PVOemdz9nO6lmo59V+wfIQ0oQuWtmQdMlWWJwWl5E0Zm
-	 u1lbRivyTg/X0cS7DKro4RMhMuDo/Ova3LYNj6n6MtPB4kmn8MnAy+M2by2WT6QQ3F
-	 6ajh0xfvNePPQ==
+	b=WWrPqLa4Sr9VGiu2N3BIEihFbBB3o2sgo/tN7cANfg59OJRZAMwewH+5G02dQlHJx
+	 405q+VQMzimpmsWyGqqTI9dDQaE3qQ3uxjnrS7Mh4enzJb3uHSl8Qgc3Aj7Jo05Ckd
+	 gU+Yr2RRv+qN0LQ9ACUQJX6wdOxiw0enlBovBP3OtpCGVGO9i6mF91QgVZD6EHBpBt
+	 yoFucJ0BSMeLcieOY5DH4JYE/xWgT5IHGuw3hAijZwbhW2zRMLY3IKEKOwEQn6qVKG
+	 QMNB+KncB2mx7ZlBrozMHkymslsyLi25r9Ovp/c5HvMgnVQX6UvMV2+wk8+iP+rwpq
+	 qB3f+NfdruUqQ==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -50,9 +50,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Fuad Tabba <fuad.tabba@linux.dev>,
 	Leonardo Bras <leo.bras@arm.com>,
 	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH v2 17/28] KVM: arm64: Don't update descriptors for "non-arch" access
-Date: Fri, 23 Oct 2026 13:55:59 -0700
-Message-ID: <20261023205610.1044532-18-oupton@kernel.org>
+Subject: [PATCH v2 18/28] KVM: arm64: nv: Emulate CMOs via writable-clean translations as NOPs
+Date: Fri, 23 Oct 2026 13:56:00 -0700
+Message-ID: <20261023205610.1044532-19-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261023205610.1044532-1-oupton@kernel.org>
 References: <20261023205610.1044532-1-oupton@kernel.org>
@@ -67,106 +67,74 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-WALK_ACCESS_NONARCH is a special indicator that the page table walk
-request is not due to an architectural behavior and instead used
-internally for KVM. Currently, the only user of this is SEA injection to
-identify the correct translation level that generated the abort.
+Virtualizing FEAT_HAFDBS for an L1 hypervisor has a pretty large
+architectural deficiency by way of cache maintenance instructions.
+CMOs (e.g. DC IVAC) require write permission but do not set the dirty
+state on the descriptor.
 
-Ensure "non-arch" table walks are not made visible to the guest and
-explicitly avoid descriptor updates. These accesses are not expected to
-be used for pseudo-TLB fills, nor are they used to dirty any memory.
+There's no way to shadow a writable-clean translation in such a way that
+these CMOs pass the permission check and subsequent writes generate a
+permission fault. Worse yet, data aborts taken on CMOs do not have
+sufficient syndrome information to perform instruction emulation and
+trapping all CMOs is unpalatable.
 
-Reviewed-by: Leonardo Bras <leo.bras@arm.com>
+So what do we do? Absolutely nothing. Treat CMOs to writable-clean
+translations as NOPs in anticipation of KVM only exposing FEAT_HAFDBS
+when the VM is fully coherent (FEAT_S2FWB, CTR_EL0.{DIC,IDC}={1,1}, no
+noncoherent DMA).
+
 Signed-off-by: Oliver Upton <oupton@kernel.org>
 ---
- arch/arm64/kvm/at.c     | 15 ++++++++++++++-
- arch/arm64/kvm/nested.c | 12 +++++++++++-
- 2 files changed, 25 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/mmu.c    |  4 ++++
+ arch/arm64/kvm/nested.c | 20 ++++++++++++++++++++
+ 2 files changed, 24 insertions(+)
 
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 20cc50c0f694..2ce34af3b9f2 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -457,6 +457,15 @@ static int kvm_read_s1_desc(struct kvm_vcpu *vcpu, u64 pa, u64 *desc,
- 	return 0;
- }
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 7b29be33a1ea..a21b674a1981 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -2548,6 +2548,10 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 		}
  
-+static bool should_set_access_flag(struct s1_walk_info *wi, struct s1_walk_step *ws,
-+				   struct kvm_walk_access *access)
-+{
-+	if (access->type == WALK_ACCESS_NONARCH)
-+		return false;
-+
-+	return wi->ha;
-+}
-+
- static bool should_set_dirty_state(struct s1_walk_info *wi, struct s1_walk_step *ws,
- 				   struct s1_walk_result *wr, struct kvm_walk_access *access)
- {
-@@ -466,6 +475,7 @@ static bool should_set_dirty_state(struct s1_walk_info *wi, struct s1_walk_step
- 	/* R_RKMHW */
- 	case WALK_ACCESS_CMO:
- 	case WALK_ACCESS_AT:
-+	case WALK_ACCESS_NONARCH:
- 		return false;
- 	default:
- 		/* R_NSXRD */
-@@ -482,7 +492,7 @@ static int handle_desc_update(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 
- 	old = new = ws->desc;
- 
--	if (wi->ha)
-+	if (should_set_access_flag(wi, ws, access))
- 		new |= PTE_AF;
- 
- 	if (should_set_dirty_state(wi, ws, wr, access))
-@@ -558,6 +568,9 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 				.write	= wi->ha,
- 			};
- 
-+			if (access->type == WALK_ACCESS_NONARCH)
-+				s2_access.type = WALK_ACCESS_NONARCH;
-+
- 			ret = kvm_walk_nested_s2(vcpu, &s2_access, &ws.s2_trans);
- 			if (ret == -EAGAIN)
- 				return ret;
+ 		ret = kvm_s2_handle_perm_fault(vcpu, &nested_trans);
++		if (ret == -EAGAIN) {
++			ret = 1;
++			goto out_unlock;
++		}
+ 		if (ret) {
+ 			esr = nested_trans.esr;
+ 			kvm_inject_s2_fault(vcpu, esr);
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 964331dbf475..7dda95d37925 100644
+index 7dda95d37925..46fcc75f4c20 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -247,6 +247,15 @@ static int read_guest_s2_desc(struct kvm_vcpu *vcpu, struct s2_walk_step *ws,
- 	return 0;
- }
+@@ -1150,6 +1150,26 @@ int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, struct kvm_s2_trans *trans)
+ 	} else {
+ 		bool write_fault = kvm_is_write_fault(vcpu);
  
-+static bool should_set_access_flag(struct s2_walk_info *wi, struct s2_walk_step *ws,
-+				   struct kvm_walk_access *access)
-+{
-+	if (access->type == WALK_ACCESS_NONARCH)
-+		return false;
++		/*
++		 * Plug your nose for a moment.
++		 *
++		 * Writable-clean translations are shadowed using a read-only
++		 * mapping so KVM can set the dirty state on the L1 descriptor
++		 * before installing a writable mapping.
++		 *
++		 * Certain cache maintenance instructions require a write
++		 * permission check but leave the translation in a writable-clean
++		 * state, meaning KVM is on the hook to emulate CMOs that use a
++		 * writable-clean translation.
++		 *
++		 * "Emulate" the CMO as a NOP, as KVM only exposes FEAT_HAFDBS
++		 * when FEAT_S2FWB is present and the I-cache is coherent.
++		 */
++		if (kvm_vcpu_dabt_is_cm(vcpu) && trans->writable && !trans->dirty) {
++			kvm_incr_pc(vcpu);
++			return -EAGAIN;
++		}
 +
-+	return wi->ha;
-+}
-+
- static bool should_set_dirty_state(struct s2_walk_info *wi, struct s2_walk_step *ws,
- 				   struct kvm_s2_trans *out, struct kvm_walk_access *access)
- {
-@@ -254,6 +263,7 @@ static bool should_set_dirty_state(struct s2_walk_info *wi, struct s2_walk_step
- 	/* R_ZYGHJ */
- 	case WALK_ACCESS_CMO:
- 	case WALK_ACCESS_AT:
-+	case WALK_ACCESS_NONARCH:
- 		return false;
- 	default:
- 		/* R_NSXRD */
-@@ -270,7 +280,7 @@ static int handle_desc_update(struct kvm_vcpu *vcpu, struct s2_walk_info *wi,
- 
- 	old = new = ws->desc;
- 
--	if (wi->ha)
-+	if (should_set_access_flag(wi, ws, access))
- 		new |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
- 
- 	if (should_set_dirty_state(wi, ws, out, access))
+ 		forward_fault = ((write_fault && !trans->writable) ||
+ 				 (!write_fault && !trans->readable));
+ 	}
 -- 
 2.47.3
 
