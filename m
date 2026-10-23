@@ -1,70 +1,97 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792741455;
-	b=FZm+50GKq2Snzk3EKKvj6hWl2FL4XyralciMaqGP4yVMSPbLc94KdXTxYskAih+L4PxD
-	 WDDkCYD7r2u0Xk6SVIAb558Nz0nTBwZMv8B0F+sxEXZItfKcFLO8NjkYqyvJx4gSP7k3l
-	 6RofpFqBQRTN95SZdeGvmqJU0sKe7JgiMnwxsje3XqFlVEn1K5IBhnQf7P7TCwh1X1rZw
-	 sfhxvnvSn2127b+IDOwOYjA15vDHAH7iHtkOOJeGfiVN8c0CZ9nGVb69T+UJYUpbPJLvp
-	 VVA9pyYNvs0+abtFFnrRhalxQiOTvkGVZAA/ASLBZx3+9oB7mWAnqjAA77R8Eid/Lyg==
+	t=1792742376;
+	b=gqHN7jgd5GvGy0Hl3Rl2EgujjQWqu/GwqaW+dA05vnJq7QBGh9z1fR0A5usxOnw9m2I9
+	 9Y0qsyna8HglQl7NGV8KhvgO0TcQT+QF9J6Yex9lo604QF1eShMP+XBFDxGziWZdmekPN
+	 s0JXaAt1zDQlAw5ptQ7bwmgO0lJQ3eAsbLdG/d/XbcwtdoIUXDeVlvFjDQ2G/fmIlOKjO
+	 o1JJZ6tmw6eepNIw0g4oIvp+zKpGqkJiOeArL3g9iOv4h6PLPzfbK1Lb+8IIAZJ8Qxzh1
+	 EF6822pIrdii6PETyGbnqV98cmx+6RZjWeUOmSbclgFb7I398IEyAmA4+TZNaj4yBwA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792741455;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To;
-	bh=wy/cnaPswmms/QpZfcVOeHijhXMXPHn20ADaK91xPcA=;
-	b=dTsoxeNIRIxZI1vaI3Lp6J5Wu0xUaKAOvp7jDDOt+XF8ElN/o/XvgD7DCZagn8ZyRF1r
-	 NthybCoaYGGKUJViF/YxRto8cyGYJDBsqCY+1RfwQ7FYFQ5ZJLsKRAe/xxOrsIkzSEwl7
-	 XyP7GyoZMAPhgPNA+coXjyMnQq1oJJcniXP3OW9yCEZC66/eAxx/1dB++6iP4jR0jUexH
-	 YuCg7CIP5+FU4Aam3pZUmDkSwJv4u109N6iM1Vz7Y+a2SimmVzbn5DX6bK3pD6XnBvjDq
-	 UOwo8tx5UeiBShwdpNFTsGciMwsfvgkLC20G6PqBOkG0VEmA5bryqmS1+qUOCa+OClw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792742376;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=5jkvtV8P/+s5qJ2kbqgOKMQCk58hvpuAEYMAliw2L+E=;
+	b=gQz4Xf4mZRnX6GH2rKdJWL2Fz0/rCV5xx8brXRR3Y5vIt8VwUwWU2huBl14wYJS8QqQQ
+	 AnwS+mNbraW5dnaeQ/Kh8xd1jgPFeiNgeKWg9eVgN6gugUwAnTctXIFflbvFPn/7122kA
+	 /uGabqr3gxrLCy1fVOxYT/+Rhv1/1WAjUiDkL2YpNP6/KWKjoaDXZbtSwwgV7MI5fRqsM
+	 duOS3g+XuR0JRfgNORdFnhSY3Uw+lOaeyIYH1ZiK6vC1XFgivqjs/iEgGhKuySmKztY26
+	 SEAL2nHrM9p6EMvPq2872OKuV//9clZ2277irb6nHJqpnjBR9KFMnqzikAJWfpgwpjQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EaM7GVz8;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=u5BV6j4A;
+	arc=none smtp.remote-ip=209.85.128.43
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E82E606A31A;
-	Fri, 23 Oct 2026 07:44:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08D3606A31A
+	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 07:59:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A08D3606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EaM7GVz8
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9170D1F01825;
-	Fri, 23 Oct 2026 07:44:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792741455;
-	bh=wy/cnaPswmms/QpZfcVOeHijhXMXPHn20ADaK91xPcA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=EaM7GVz8N1F1WL1rJOnrhPXJUtKGkqsv14MRU42ie3CqopgX3LNFxUDnl1OPNUi/e
-	 2iQPCPAmrugokeUqdjjGnxoE/8npZif6jkFURSIYhrlahltUYFVTdLrUtWmi4bJDt4
-	 uJpg0nOqXHeMjeyusKILIH3Cl4Mf3vGvpiVoTnLCyKCJvnhkOfk8IhqWDgFcrVZDsw
-	 RQJc+E3xcDPh7iuKo7qjMm+aQPiRzX97cIhkWDsUcyao4CJSpPFEH+7iNFyZcmmnZH
-	 r3znD2zes+BCcnM/Q+slSfn7Uk5g9JQYqOi58zhfrrPLbNKPn/9s/EmGcuM+9Ol3+7
-	 YAzLqgDZtmCpA==
-Date: Fri, 23 Oct 2026 10:44:01 +0300
-From: Mike Rapoport <rppt@kernel.org>
-To: tarunsahu@google.com
-Cc: Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Andrew Morton <akpm@linux-foundation.org>, joro@8bytes.org,
-	Pratyush Yadav <pratyush@kernel.org>, maz@kernel.org, arnd@arndb.de,
-	David Matlack <dmatlack@google.com>, jgg@nvidia.com,
-	robin.murphy@arm.com, loganodell@google.com, oupton@kernel.org,
-	kevin.tian@intel.com, alex@shazbot.org, dwmw2@infradead.org,
-	pbonzini@redhat.com, seanjc@google.com, will@kernel.org,
-	Alexander Graf <graf@amazon.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, baolu.lu@linux.intel.com,
-	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
-	sagis@google.com, linux-mm@kvack.org, kvmarm@lists.linux.dev,
-	iommu@lists.linux.dev, linux-pci@vger.kernel.org,
-	kexec@lists.infradead.org, skhawaja@google.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v2 1/4] liveupdate: Rename handler compatible to name
-Message-ID: <atsQQcUiVhb9KXWZ@kernel.org>
-References: <20261021152527.375070-1-tarunsahu@google.com>
- <20261021152527.375070-2-tarunsahu@google.com>
- <CA+CK2bC_wc4LxvHe0TREbBP7esYW3pcMNtkGK-kqvf6MyvOh2g@mail.gmail.com>
- <9huzik2u6hs5.fsf@tarunix.c.googlers.com>
- <CA+CK2bDyk=F7W3J=q3pKCjsr2wy_PLdgqgu+ywp0F5HL=VoMpA@mail.gmail.com>
- <9huzld7q4zjz.fsf@tarunix.c.googlers.com>
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=u5BV6j4A
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4a218c463d1so193685e9.0
+        for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 00:59:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1792742374; x=1793347174; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=5jkvtV8P/+s5qJ2kbqgOKMQCk58hvpuAEYMAliw2L+E=;
+        b=u5BV6j4A12HiHIbg6gQlUBL5X0t6O1C3ddixjrZop6JI+2TKTFJmOXd9weEDZpktFm
+         GSfpnEY18rSUyBHXuvtvidSe2wjY1SQ0ugvkdCeKpgbxQ5WuV4/rW0LjBALuJGzgo6I/
+         wChGjifTcPjMVXvJQtVi5jp7G9naGiO10finMycewx9eV4hox1OYNzolG6NXj6qzSVCI
+         1MXUVyM0NAPnjq30Oo7GCnkNLoqyeVoj0GFcBT30w7jt/HQNfzJSbwhVDS/NqJhj/O73
+         90vGz83YHXe3owWT1y1JMfExqI4zKc0p3Ifoz/rWlLFcRflHlRweU+7oEMyd7yWrKwSR
+         VCvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792742374; x=1793347174;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=5jkvtV8P/+s5qJ2kbqgOKMQCk58hvpuAEYMAliw2L+E=;
+        b=D0G8FtFSTeG1PKjmTWvxgo6xly+juDa+k6H8+qSwVeKOBZBqFlv8EAxoIYaACrXNDa
+         SakIIyUXJ7fM3hm9Cjf8skXJ07Ov251icns182AAXCV+0mcguFaUivHB37XIcVE2Tj+R
+         Pr31t32423I4uqnTCC/h7d3ES2NPaS3GlRNJZ0Oeq5eETcCuiV3nKaOq2R5ThaSjcqo/
+         TLwx+FKJgCMAgbWeR+GSWkc+lmu0Tr0s4WXexGqppe1QPLnawllfM6hN2urjQjhSqvmV
+         +EpES1Tiexg1Gwms8Qt4Y6LJ/E58w2/ltgCC7bjwRe4eFCq3QfRU/SGeW7kR6sn9/sy5
+         BKwA==
+X-Forwarded-Encrypted: i=1; AKwUvBzM4k+K67clY2TcVv51UeBTqM6NGKwm4JP7/ffb2RpmSS47hivqPVitQ2nq3mIu7LMB2Uiarp0=@lists.linux.dev
+X-Gm-Message-State: AFq9FYJmMyzVQp3N+6tHmWLm5AxwdIG+x5BL37CTOJntcuaOYflAaI/L
+	2ULaD4bITl4f43DwOfbKKxKH/GmxtnQv8QdCqDTe9UFvn39swc4BeiLekQHNj56XFw==
+X-Gm-Gg: AYBFou0h7l7gNTuZ8ci7wdGQ9UweCnZ8L93z324FadeSxkhoaXN1NUOVyo2d916PK3I
+	D+z7UgQDP1wlOG5hoDweK4YIg9/Me1KFUT3Jz2X8zmWyHj0Eu/ktcdgxTVI/CyghF+EqcPPGNPm
+	yySugZU9P0r8I1ZJo0otQ3YxzeT1K19qlGQkd5g4Y36ltnuW9qCZUSkLKgDvPX2HXsASDzWIGTt
+	fBrAJLAWYonuLAdHqXvgq9g01ALhNxYn2XukwIy7U5FFkl6p7LaT0kkjg6e7JpOK3QjXm1Cl7Cq
+	9YiY3JtSzbL8yyzlxBYTNsxAQU2VbDEbMTeSTd/yQtIUSB4a3qvv1CCk9aVLTU1rHUXrjyZp26P
+	di86NuiH/3avd9+GwP474FxJmIu4KCgZ+zJdnkim/UO0B4naPcZj0pLRAdmAUUxIxdxF7swRl1+
+	BaxPd7gWBKOpg3ISU/Cn5CuvfRCih13V3v80ewxDOjoGJLWVceAXpqAya2lYE2xySlvTIaMa6bd
+	UIVcMVL8XcB050LBTO/JaTYiaIqDel3jqDqt3lHVmpdEywJ+KKFmzgsGDzLPHcy2PSvWiO3Y4xa
+	1WchI8GVD+L7Inl/KVru7smU
+X-Received: by 2002:a05:600c:a04:b0:4a1:e7ce:107b with SMTP id 5b1f17b1804b1-4a211c7facemr22799255e9.2.1792742373535;
+        Fri, 23 Oct 2026 00:59:33 -0700 (PDT)
+Received: from google.com (197.183.140.34.bc.googleusercontent.com. [34.140.183.197])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a210473567sm56280825e9.12.2026.10.23.00.59.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Oct 2026 00:59:32 -0700 (PDT)
+Date: Fri, 23 Oct 2026 08:59:29 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com,
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com,
+	tabba@google.com
+Subject: Re: [PATCH v2 2/4] KVM: arm64: pkvm: Fix missing reset of GICv3 LRs
+Message-ID: <atsT4c-JLRSxSreo@google.com>
+References: <20261022140048.2522787-1-vdonnefort@google.com>
+ <20261022140048.2522787-3-vdonnefort@google.com>
+ <20261022173604.3710390-1-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -74,165 +101,78 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9huzld7q4zjz.fsf@tarunix.c.googlers.com>
+In-Reply-To: <20261022173604.3710390-1-fuad.tabba@linux.dev>
 
-On Wed, Oct 21, 2026 at 07:35:28PM +0000, tarunsahu@google.com wrote:
-> Pasha Tatashin <pasha.tatashin@soleen.com> writes:
-> > On Wed, Oct 21, 2026 at 2:16 PM <tarunsahu@google.com> wrote:
-> >> Pasha Tatashin <pasha.tatashin@soleen.com> writes:
-> >>
-> >> > On Wed, Oct 21, 2026 at 11:25 AM Tarun Sahu <tarunsahu@google.com> wrote:
-> >> >>
-> >> >> File handler and File-Lifecycle-Bound (FLB) identifiers name the
-> >> >
-> >> > Please use FLB directly, no need to spell it out.
-> >> >
-> >> >> registered handler or FLB rather than a monolithic compatibility version.
-> >> >> Rename compatible to name across LUO headers, structures, and consumers:
-> >> >> - struct liveupdate_file_handler and struct luo_file_ser name field
-> >> >> - LIVEUPDATE_HNDL_NAME_LENGTH (in include/uapi/linux/liveupdate.h) and
-> >> >>   MEMFD_LUO_FH_NAME
-> >> >> - struct liveupdate_flb name field, LIVEUPDATE_FLB_NAME_LENGTH,
-> >> >>   PCI_LUO_FLB_NAME, and LIVEUPDATE_TEST_FLB_NAME
-> >> >>
-> >> >> Signed-off-by: Tarun Sahu <tarunsahu@google.com>
-> >> >> ---
-> >> >>  drivers/pci/liveupdate.c        | 10 ++++----
-> >> >>  include/linux/kho/abi/luo.h     | 26 +++++++++----------
-> >> >>  include/linux/kho/abi/memfd.h   |  4 +--
-> >> >>  include/linux/kho/abi/pci.h     |  2 +-
-> >> >>  include/linux/liveupdate.h      | 18 +++++--------
-> >> >>  include/uapi/linux/liveupdate.h |  3 +++
-> >> >>  kernel/liveupdate/luo_file.c    | 45 +++++++++++++++++----------------
-> >> >>  kernel/liveupdate/luo_flb.c     | 16 ++++++------
-> >> >>  lib/tests/liveupdate.c          | 22 ++++++++--------
-> >> >>  mm/memfd_luo.c                  |  2 +-
-> >> >>  10 files changed, 73 insertions(+), 75 deletions(-)
-> >> >>
-> >> >> diff --git a/drivers/pci/liveupdate.c b/drivers/pci/liveupdate.c
-> >> >> index 51695782ed42..3cf01d7d615c 100644
-> >> >> --- a/drivers/pci/liveupdate.c
-> >> >> +++ b/drivers/pci/liveupdate.c
-> >> >> @@ -424,7 +424,7 @@ static struct liveupdate_flb_ops pci_liveupdate_flb_ops = {
-> >> >>
-> >> >>  static struct liveupdate_flb pci_liveupdate_flb = {
-> >> >>         .ops = &pci_liveupdate_flb_ops,
-> >> >> -       .compatible = PCI_LUO_FLB_COMPATIBLE,
-> >> >> +       .name = PCI_LUO_FLB_NAME,
-> >> >>  };
-> >> >>
-> >> >>  static void pci_liveupdate_flb_put_outgoing(void)
-> >> >> @@ -667,13 +667,13 @@ static struct pci_flb_incoming *pci_liveupdate_flb_get_incoming(void)
-> >> >>
-> >> >>         /*
-> >> >>          * Live Update is enabled and there is incoming FLB data, but none of it
-> >> >> -        * matches pci_liveupdate_flb.compatible.
-> >> >> +        * matches pci_liveupdate_flb.name.
-> >> >>          */
-> >> >>         if (ret == -ENOENT)
-> >> >>                 return NULL;
-> >> >>
-> >> >>         /*
-> >> >> -        * There is incoming FLB data that matches pci_liveupdate_flb.compatible
-> >> >> +        * There is incoming FLB data that matches pci_liveupdate_flb.name
-> >> >>          * but retrieve failed (pci_flb_retrieve() returned an error or LUO
-> >> >>          * failed to acquire a reference to pci_liveupdate_flb_ops.owner).
-> >> >>          */
-> >> >> @@ -998,7 +998,7 @@ EXPORT_SYMBOL_GPL(pci_liveupdate_is_incoming);
-> >> >>   */
-> >> >>  int pci_liveupdate_register_flb(struct liveupdate_file_handler *fh)
-> >> >>  {
-> >> >> -       pr_debug("Registering file handler \"%s\"\n", fh->compatible);
-> >> >> +       pr_debug("Registering file handler \"%s\"\n", fh->name);
-> >> >>         return liveupdate_register_flb(fh, &pci_liveupdate_flb);
-> >> >>  }
-> >> >>  EXPORT_SYMBOL_GPL(pci_liveupdate_register_flb);
-> >> >> @@ -1009,7 +1009,7 @@ EXPORT_SYMBOL_GPL(pci_liveupdate_register_flb);
-> >> >>   */
-> >> >>  void pci_liveupdate_unregister_flb(struct liveupdate_file_handler *fh)
-> >> >>  {
-> >> >> -       pr_debug("Unregistering file handler \"%s\"\n", fh->compatible);
-> >> >> +       pr_debug("Unregistering file handler \"%s\"\n", fh->name);
-> >> >>         liveupdate_unregister_flb(fh, &pci_liveupdate_flb);
-> >> >>  }
-> >> >>  EXPORT_SYMBOL_GPL(pci_liveupdate_unregister_flb);
-> >> >> diff --git a/include/linux/kho/abi/luo.h b/include/linux/kho/abi/luo.h
-> >> >> index 288076de6d4a..5fb2f46425d7 100644
-> >> >> --- a/include/linux/kho/abi/luo.h
-> >> >> +++ b/include/linux/kho/abi/luo.h
-> >> >> @@ -39,9 +39,9 @@
-> >> >>   *     Multiple blocks are linked via the `next` field in the header.
-> >> >>   *
-> >> >>   *   - struct luo_file_ser:
-> >> >> - *     Metadata for a single preserved file. Contains the `compatible` string to
-> >> >> - *     find the correct handler in the new kernel, a user-provided `token` for
-> >> >> - *     identification, and an opaque `data` handle for the handler to use.
-> >> >> + *     Metadata for a single preserved file. Contains the handler `name` string
-> >> >> + *     to find the correct handler in the new kernel, a user-provided `token`
-> >> >> + *     for identification, and an opaque `data` handle for the handler to use.
-> >> >>   *
-> >> >>   *   - struct luo_flb_header_ser:
-> >> >>   *     Header for the FLB array. Contains the total page count of the
-> >> >> @@ -49,9 +49,9 @@
-> >> >>   *     that follow.
-> >> >>   *
-> >> >>   *   - struct luo_flb_ser:
-> >> >> - *     Metadata for a single preserved global object. Contains its `name`
-> >> >> - *     (compatible string), an opaque `data` handle, and the `count`
-> >> >> - *     number of files depending on it.
-> >> >> + *     Metadata for a single preserved global object. Contains its FLB `name`
-> >> >> + *     string, an opaque `data` handle, and the `count` number of files
-> >> >> + *     depending on it.
-> >> >>   */
-> >> >>
-> >> >>  #ifndef _LINUX_KHO_ABI_LUO_H
-> >> >> @@ -84,18 +84,16 @@ struct luo_ser {
-> >> >>         u64 flbs_pa;
-> >> >>  } __packed;
-> >> >>
-> >> >> -#define LIVEUPDATE_HNDL_COMPAT_LENGTH  48
-> >> >> -
-> >> >>  /**
-> >> >>   * struct luo_file_ser - Represents the serialized preserves files.
-> >> >> - * @compatible:  File handler compatible string.
-> >> >> + * @name:        File handler name string.
-> >> >
-> >> > We are renaming from cpmaptible to name; I am not sure that is
-> >> > necessary. We can still use compatible for the same purpose as name.
-> >> > Unless it really bothers people, but for me 'compatible' works just
-> >> > the same.
-> >>
-> >> Yes it is necessary, For example if we have two handler for a single
-> >> subsystem. We should refer it by handle this or handler that, not like
-> >> handler with compatible string this and handler with compatible string
-> >> that.
-> >
-> > I still feel like compatability makes more sense to me. Take an example:
-> >
-> > We have two file handlers for memfd (i.e., FH_OLD and FH_NEW): one has
-> > compatibility = "memfd", and the other has compatibility =
-> > "memfd_next_generation". The user chooses one of them to preserve the
-> > memfd data, and the compatibility string is saved alongside the FD.
-> > When the next kernel scans through the registered file handlers, it
-> > must find exactly one that is compatible with the preserved data.
+On Thu, Oct 22, 2026 at 06:36:04PM +0100, Fuad Tabba wrote:
+> Hi Vincent,
 > 
-> I will open this for vote.
+> On Thu, 22 Oct 2026 15:00:46 +0100, Vincent Donnefort <vdonnefort@google.com> wrote:
+> > The vGIC LRs are architecturally UNKNOWN when the CPU boots or resumes.
+> > However, in protected mode, only the used ones are reset, because the
+> > HVC __vgic_v3_init_lrs() is never called:
+> 
+> Could you say here what happens to a guest when an LR isn't reset, as I
+> asked on v1? Without this series, on QEMU changed to leave a pending
+> vINTID 100 in the top LR at CPU reset, the guest warns "Unexpected
+> interrupt (irqnr 100)". With only the EOI bit set there, the npVM
+> doesn't print anything in 150 seconds, since the maintenance interrupt
+> is asserted on every entry. With that in the message, could you also
+> bring back the Cc: stable you had on v1?
 
-I'd rather won't ;-)
+Sorry I missed that.
 
-"compatible" does not contradict more fine grained bitfields, and still has meaning.
-Just like in FDT world from where we inherited it, it means "these ops are
-somewhat compatible with that serialized format, will check the details and
-will know for sure".
-
-And IMO we should keep it.
- 
-And please, trim your responses. I had to scroll 463 lines to see there's
-nothing there.
+Actually I don't know if this should be backported. I believe it was working
+until now because all SoCs do reset their LRs even though they don't have to do
+it.
 
 -- 
-Sincerely yours,
-Mike.
+Vincent
+
+> 
+> [...]
+> > Then, cpu_hyp_init() is only called from init_subsystems and
+> > kvm_arch_enable_virtualization_cpu(). Remove the kvm_hyp_initialized
+> > gate: when pKVM is enabled, the cpu_hyp_reset() will just return an
+> > error while for other modes, we already know kvm_hyp_initialized is
+> > false at this point.
+> 
+> In init_subsystems(), only the CPU that ran do_pkvm_init() returns an
+> error here. The others are still on the hyp stub, which returns 0 for
+> HVC_RESET_VECTORS, so they go through the full init. Could you reword
+> this part?
+> 
+> [...]
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> [...]
+> >  static void cpu_hyp_reinit(void)
+> >  {
+> > -        cpu_hyp_reset();
+> > -        cpu_hyp_init_context();
+> > -        cpu_hyp_init_features();
+> > +        if (!cpu_hyp_reset()) {
+> > +                cpu_hyp_init_context();
+> > +                cpu_hyp_init_features();
+> > +        } else {
+> > +                if (WARN_ON(!__this_cpu_read(kvm_hyp_initialized)))
+> > +                        return;
+> > +        }
+> 
+> Could you make this "} else if (WARN_ON(...)) {", as elsewhere in
+> arm.c?
+> 
+> > +
+> > +        /*
+> > +         * Even if the hypervisor didn't allow resetting the vectors we can
+> > +         * reset what we have access to.
+> > +         */
+> 
+> nit: "what we have access to" is the LRs, so I'd name them.
+> 
+> With the above addressed:
+> Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+> Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+> 
+> Cheers,
+> /fuad
