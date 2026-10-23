@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792789008;
-	b=4ohZifJPFgRrk6Gkig/IFyD3SyFyqVL5vGrFsF6Sk/SfXXapiTvUI6QjDTIgTGL0UfV0
-	 TgrGpVC5oaiTuEL6DmmT4tSGZ5gId3mQJdhv6Ux1MeB6u4KB4MS6+wDeG/pbInbaigxNv
-	 rFK6u5tcQfuE5PbmBNHuPMHzyh6hLV5G2HtgQKpAwvzrZv5prkkn4mi0/UGevma1hlzlA
-	 +BZwt80wpDsV6Wv5CgPvnMOyyIBr3Vf1SvBrdD//shPA6PNisnWjJvFQlJ7WZVZMrsZfS
-	 6I/Zs7DNW913KXAICZXAvx/uQkLqrXQiOk711+2gb7mBX8HI0F2Hh5fFbELb1giFzyg==
+	t=1792789009;
+	b=NkXHctg4soqL2uleghZLicHNP/hyoyhNJgQQXhv9R2QYrKiwpjLFYjLjSyYZTxiH+77P
+	 leyQnI2+3zh3CI6/5fmSrMmSau4FmuAMhr3sHJOAPYRDc8vhIf+lfZb2PKudurwvET9Zj
+	 QjVESXIcbhzKrx2nNPA1oFzDdLa0NtFAh6dkg1251q78vayqi7E2F1MCFGJQ8vELpOTdp
+	 3XXxtfAgn08iXo9pl29W+Eg/wpw42DofSeYTLB0lnQApRPTCauuQFDQ7ZDAfp5Jjeoqjs
+	 O+Pwvon6kITnwPb6Q2GWFiNFbzCTp+xGjxeToVIUOOrob7YU1TV7agx8SoH678n6hEQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792789008;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792789009;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=CnRX1d72fSAMR51ATKMjI11B+ejkm7mR/T1sfQzC4T8=;
-	b=RyIuXcT62qN3MfxmYnQ4jHdgRT2wAjaH2eNqkoUTDwzByvwP11wBpzNP3g5rsGPKVhmm
-	 05mEQJudFibfe2TOkJZZraQCPD7YHFSDzJ6dhiSlbKYEOj83flL6SJnxBQLkThdgCMftE
-	 aBfH+AujWw7w853hjEwIZATyoLpsLtVVgzA5/OFnKCTcBcgysv1JOj+wgEJZpusOcHHdz
-	 NKYd5ydxrmbGgBOO49gCgpl7Aa+iisSthZLJvUX8EXK/2LJAyKL0dH0Hz2QKVZYgU+3gP
-	 ymfkfAzhnfFzfle0UhPXXSXnMignf67yEo77nY2T4CZ+PeGJsg0ps6ijhxl2CT3JOrA==
+	bh=t/gf+svSt3zX5Xbq29BV5Ho3II+tfnzv6kCOt2JTM5M=;
+	b=iqaTM6hEkUHmemMj6vAv5urQz0OMjpR9Ty66qzxRfayIF9zbqe5nt+SK887JcFx2TZvl
+	 d4XDxnZRXGgbZUDNFHV1oswjjVonqXHPT5Iw6rvLnZvfYbNHt3X809OmsUyZJUTJqsWYQ
+	 wdssPNEt0HLMJKEpjLd+DWUPtv2TcCGyVEw5cJBXK+HGUzq2dtl2GwmTh/QEAfvwu0zdH
+	 uamQw6/yWnvXPCKtB/w4REeC9LtNWi+JI9DOzdwQqWfeB9Z3wA2P66hbzJiCoD03VAhUw
+	 lMWYMrZrwiUKSoTAzYwKiXR1ICh2Zr9zA0ZDogA3pDVyf+1qEkmJj83wr1laTBF108A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Cvw6UqHg;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cDRYEBw2;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15E9606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDAB4606A31D
 	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 20:56:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Cvw6UqHg
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EE2D1F01828;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cDRYEBw2
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 603E61F031E1;
 	Fri, 23 Oct 2026 20:56:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1792789008;
-	bh=CnRX1d72fSAMR51ATKMjI11B+ejkm7mR/T1sfQzC4T8=;
+	bh=t/gf+svSt3zX5Xbq29BV5Ho3II+tfnzv6kCOt2JTM5M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Cvw6UqHgba57RU8ADae4chkJnU2ROA+UngclbC0Am9qQxt2MTwHI8wjFowHyPvhLo
-	 Mr2s4oGNZCNPHdzxZHeamTGrFLAwODpxHvJH647lM0RNvbDAP18WYJM8F6f3MENaXC
-	 wF/RfvNJAlx87e3FdB2oEFqEA5BUPTnWCcf3vywiH8TGxjSevZCuTsw7GRFbqn9+xz
-	 izJfEVgkqUVYUlZbcF4NiGDC4zSOwv0djzwgXri9NTUIoMLWFEgkQs0LDaBriT/XLI
-	 j/MvFgUdkbsVAv8d5792hghDs38vCzZiU1v6FSuBMxM9rmZKSdfPsA1NNlsPTf+HbW
-	 bCSu3OSc3ZSGw==
+	b=cDRYEBw21NGJMsFpCFZYasoFRYM9VKv09pJDdpTstIly3uxsklKcr2gHEAsxOWbKU
+	 qLxu0c+AGXtAQXxlbhc8kYpc4P+1zDFuqZZ214OvjWCDTy//mUI2fhZDEmLBa3qaKK
+	 HYbz8O5SChx2W4PBRnqveTVnShZVGhzWV+NofeIHA8I0z/We+bQrFqrH7Iv8yLlyBH
+	 BkAOGHTZ1vkwoLp0bh80kUaTQL3/sxqIy+mCLlCY1GVb7BJHVFItUsevei8fBwI3A/
+	 8p5orgXasUmna4ETJgwrDSQoOFwF6RPNgtUr46uM99KlKWno+CVa9Sf4zOHVj0gq4h
+	 aigR1CG+qzxaA==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -50,9 +50,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Fuad Tabba <fuad.tabba@linux.dev>,
 	Leonardo Bras <leo.bras@arm.com>,
 	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH v2 10/28] KVM: arm64: Plumb through access descriptor for stage-1
-Date: Fri, 23 Oct 2026 13:55:52 -0700
-Message-ID: <20261023205610.1044532-11-oupton@kernel.org>
+Subject: [PATCH v2 11/28] KVM: arm64: Use a struct for stage-1 walk context
+Date: Fri, 23 Oct 2026 13:55:53 -0700
+Message-ID: <20261023205610.1044532-12-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261023205610.1044532-1-oupton@kernel.org>
 References: <20261023205610.1044532-1-oupton@kernel.org>
@@ -67,173 +67,253 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Pass sufficient context to the stage-1 walk such that access-dependent
-features like FEAT_HAFDBS can implement the correct behavior.
+Consolidate the current walk step in a struct such that helpers can be
+spun off from the core implementation.
 
+Reviewed-by: Leonardo Bras <leo.bras@arm.com>
 Signed-off-by: Oliver Upton <oupton@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h |  4 +++-
- arch/arm64/kvm/at.c                 | 32 ++++++++++++++++++++++-------
- arch/arm64/kvm/nested.c             | 10 ++++++---
- 3 files changed, 35 insertions(+), 11 deletions(-)
+ arch/arm64/kvm/at.c | 94 ++++++++++++++++++++++++---------------------
+ 1 file changed, 51 insertions(+), 43 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 89a860b92826..d7c1fa66f029 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -118,6 +118,8 @@ struct kvm_walk_access {
- 		WALK_ACCESS_CMO,
- 		WALK_ACCESS_AT,
- 		WALK_ACCESS_S1PTW,
-+		WALK_ACCESS_NV2,
-+		WALK_ACCESS_NONARCH,
- 	} type;
- 
- 	u64	ia;
-@@ -385,7 +387,7 @@ static inline bool s1_walk_translated(struct s1_walk_result *wr)
- }
- 
- int __kvm_translate_va(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
--		       struct s1_walk_result *wr, u64 va);
-+		       struct s1_walk_result *wr, struct kvm_walk_access *access);
- int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa,
- 			     int *level);
- 
 diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 3031f5855316..fe1d8a674d64 100644
+index fe1d8a674d64..dcbe5563baa2 100644
 --- a/arch/arm64/kvm/at.c
 +++ b/arch/arm64/kvm/at.c
-@@ -464,12 +464,13 @@ static void compute_s1_permissions(struct kvm_vcpu *vcpu,
- 				   struct s1_walk_result *wr);
- 
- static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
--		   struct s1_walk_result *wr, u64 va)
-+		   struct s1_walk_result *wr, struct kvm_walk_access *access)
- {
--	u64 va_top, va_bottom, baddr, desc, new_desc, ipa;
-+	u64 va_top, va_bottom, baddr, desc, new_desc, ipa, va;
- 	struct kvm_s2_trans s2_trans = {};
- 	int level, stride, ret;
- 
-+	va = access->ia;
- 	level = wi->sl;
- 	stride = wi->pgshift - 3;
- 	baddr = wi->baddr;
-@@ -1338,6 +1339,7 @@ static void compute_s1_permissions(struct kvm_vcpu *vcpu,
- 
- static int handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr, u64 *par)
- {
-+	struct kvm_walk_access access = {};
- 	struct s1_walk_result wr = {};
- 	struct s1_walk_info wi = {};
- 	bool perm_fail = false;
-@@ -1355,9 +1357,21 @@ static int handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr, u64 *par)
- 	if (wr.level == S1_MMU_DISABLED)
- 		goto compute_par;
- 
-+	access.type = WALK_ACCESS_AT;
-+	access.ia = vaddr;
-+	switch (op) {
-+	case OP_AT_S1E1WP:
-+	case OP_AT_S1E1W:
-+	case OP_AT_S1E2W:
-+	case OP_AT_S1E0W:
-+		access.write = true;
-+		break;
-+	default:
-+	}
-+
- 	idx = srcu_read_lock(&vcpu->kvm->srcu);
- 
--	ret = walk_s1(vcpu, &wi, &wr, vaddr);
-+	ret = walk_s1(vcpu, &wi, &wr, &access);
- 
- 	srcu_read_unlock(&vcpu->kvm->srcu, idx);
- 
-@@ -1681,11 +1695,11 @@ int __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
-  * set. The rest of the wi and wr should be 0-initialised.
-  */
- int __kvm_translate_va(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
--		       struct s1_walk_result *wr, u64 va)
-+		       struct s1_walk_result *wr, struct kvm_walk_access *access)
- {
- 	int ret;
- 
--	ret = setup_s1_walk(vcpu, wi, wr, va);
-+	ret = setup_s1_walk(vcpu, wi, wr, access->ia);
- 	if (ret)
- 		return ret;
- 
-@@ -1696,7 +1710,7 @@ int __kvm_translate_va(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 		return 0;
- 	}
- 
--	return walk_s1(vcpu, wi, wr, va);
-+	return walk_s1(vcpu, wi, wr, access);
+@@ -427,6 +427,14 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 	return -EFAULT;
  }
  
- struct desc_match {
-@@ -1734,6 +1748,10 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
- 		.as_el0	= false,
- 		.pan	= false,
- 	};
-+	struct kvm_walk_access access = {
-+		.type	= WALK_ACCESS_NONARCH,
-+		.ia	= va,
-+	};
- 	struct s1_walk_result wr = {};
- 	int ret;
- 
-@@ -1754,7 +1772,7 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
- 
- 	/* Walk the guest's PT, looking for a match along the way */
- 	scoped_guard(srcu, &vcpu->kvm->srcu)
--		ret = walk_s1(vcpu, &wi, &wr, va);
-+		ret = walk_s1(vcpu, &wi, &wr, &access);
- 	switch (ret) {
- 	case -EINTR:
- 		/* We interrupted the walk on a match, return the level */
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index e388cefad9e5..964331dbf475 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1639,6 +1639,7 @@ static bool vncr_can_map_writable(struct vncr_tlb *vt)
- 
- static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
- {
-+	struct kvm_walk_access access = {};
- 	struct kvm_memory_slot *memslot;
- 	bool write_fault, writable;
- 	unsigned long mmu_seq;
-@@ -1648,6 +1649,7 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
- 	int ret;
- 
- 	vt = vcpu->arch.vncr_tlb;
-+	write_fault = kvm_is_write_fault(vcpu);
- 
- 	/*
- 	 * If we're about to walk the EL2 S1 PTs, we must invalidate the
-@@ -1674,15 +1676,17 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
- 
- 	va =  read_vncr_el2(vcpu);
- 
-+	access.type = WALK_ACCESS_NV2;
-+	access.ia = va;
-+	access.write = write_fault;
++struct s1_walk_step {
++	u64			desc;
++	u64			desc_ipa;
++	u64			desc_pa;
++	struct kvm_s2_trans	s2_trans;
++	int			level;
++};
 +
- 	mmu_seq = vcpu->kvm->mmu_invalidate_seq;
- 	smp_rmb();
+ static int kvm_read_s1_desc(struct kvm_vcpu *vcpu, u64 pa, u64 *desc,
+ 			    struct s1_walk_info *wi)
+ {
+@@ -466,12 +474,12 @@ static void compute_s1_permissions(struct kvm_vcpu *vcpu,
+ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 		   struct s1_walk_result *wr, struct kvm_walk_access *access)
+ {
+-	u64 va_top, va_bottom, baddr, desc, new_desc, ipa, va;
+-	struct kvm_s2_trans s2_trans = {};
+-	int level, stride, ret;
++	u64 va_top, va_bottom, baddr, new_desc, va;
++	struct s1_walk_step ws = {};
++	int stride, ret;
  
--	ret = __kvm_translate_va(vcpu, &vt->wi, &vt->wr, va);
-+	ret = __kvm_translate_va(vcpu, &vt->wi, &vt->wr, &access);
- 	if (ret)
- 		return ret;
+ 	va = access->ia;
+-	level = wi->sl;
++	ws.level = wi->sl;
+ 	stride = wi->pgshift - 3;
+ 	baddr = wi->baddr;
  
--	write_fault = kvm_is_write_fault(vcpu);
--
- 	gfn = vt->wr.pa >> PAGE_SHIFT;
- 	memslot = gfn_to_memslot(vcpu->kvm, gfn);
- 	if (!memslot) {
+@@ -480,15 +488,15 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 	while (1) {
+ 		u64 index;
+ 
+-		va_bottom = (3 - level) * stride + wi->pgshift;
++		va_bottom = (3 - ws.level) * stride + wi->pgshift;
+ 		index = (va & GENMASK_ULL(va_top, va_bottom)) >> (va_bottom - 3);
+ 
+-		ipa = baddr | index;
++		ws.desc_ipa = ws.desc_pa = baddr | index;
+ 
+ 		if (wi->s2) {
+ 			struct kvm_walk_access s2_access = {
+ 				.type	= WALK_ACCESS_S1PTW,
+-				.ia	= ipa,
++				.ia	= ws.desc_ipa,
+ 
+ 				/*
+ 				 * R_JCXVS, stage-2 dirty state can be updated
+@@ -498,25 +506,25 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 				.write	= wi->ha,
+ 			};
+ 
+-			ret = kvm_walk_nested_s2(vcpu, &s2_access, &s2_trans);
++			ret = kvm_walk_nested_s2(vcpu, &s2_access, &ws.s2_trans);
+ 			if (ret == -EAGAIN)
+ 				return ret;
+ 
+ 			if (ret) {
+ 				fail_s1_walk(wr,
+-					     (s2_trans.esr & ~ESR_ELx_FSC_LEVEL) | level,
++					     (ws.s2_trans.esr & ~ESR_ELx_FSC_LEVEL) | ws.level,
+ 					     true);
+ 				return ret;
+ 			}
+ 
+-			if (!s2_trans.readable) {
+-				fail_s1_walk(wr, ESR_ELx_FSC_PERM_L(level),
++			if (!ws.s2_trans.readable) {
++				fail_s1_walk(wr, ESR_ELx_FSC_PERM_L(ws.level),
+ 					     true);
+ 
+ 				return -EPERM;
+ 			}
+ 
+-			ipa = s2_trans.output;
++			ws.desc_pa = ws.s2_trans.output;
+ 		}
+ 
+ 		if (wi->filter) {
+@@ -524,40 +532,40 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 					     {
+ 						     .wi	= wi,
+ 						     .table_ipa	= baddr,
+-						     .level	= level,
++						     .level	= ws.level,
+ 					     }, wi->filter->priv);
+ 			if (ret)
+ 				return ret;
+ 		}
+ 
+-		ret = kvm_read_s1_desc(vcpu, ipa, &desc, wi);
++		ret = kvm_read_s1_desc(vcpu, ws.desc_pa, &ws.desc, wi);
+ 		if (ret) {
+-			fail_s1_walk(wr, ESR_ELx_FSC_SEA_TTW(level), false);
++			fail_s1_walk(wr, ESR_ELx_FSC_SEA_TTW(ws.level), false);
+ 			return ret;
+ 		}
+ 
+-		new_desc = desc;
++		new_desc = ws.desc;
+ 
+ 		/* Invalid descriptor */
+-		if (!(desc & BIT(0)))
++		if (!(ws.desc & BIT(0)))
+ 			goto transfault;
+ 
+ 		/* Block mapping, check validity down the line */
+-		if (!(desc & BIT(1)))
++		if (!(ws.desc & BIT(1)))
+ 			break;
+ 
+ 		/* Page mapping */
+-		if (level == 3)
++		if (ws.level == 3)
+ 			break;
+ 
+ 		/* Table handling */
+ 		if (!wi->hpd) {
+-			wr->APTable  |= FIELD_GET(S1_TABLE_AP, desc);
+-			wr->UXNTable |= FIELD_GET(PMD_TABLE_UXN, desc);
+-			wr->PXNTable |= FIELD_GET(PMD_TABLE_PXN, desc);
++			wr->APTable  |= FIELD_GET(S1_TABLE_AP, ws.desc);
++			wr->UXNTable |= FIELD_GET(PMD_TABLE_UXN, ws.desc);
++			wr->PXNTable |= FIELD_GET(PMD_TABLE_PXN, ws.desc);
+ 		}
+ 
+-		baddr = desc_to_oa(wi, desc);
++		baddr = desc_to_oa(wi, ws.desc);
+ 
+ 		/* Check for out-of-range OA */
+ 		if (check_output_size(baddr, wi))
+@@ -565,23 +573,23 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 
+ 		/* Prepare for next round */
+ 		va_top = va_bottom - 1;
+-		level++;
++		ws.level++;
+ 	}
+ 
+ 	/* Block mapping, check the validity of the level */
+-	if (!(desc & BIT(1))) {
++	if (!(ws.desc & BIT(1))) {
+ 		bool valid_block = false;
+ 		bool lpa = kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR0_EL1, PARANGE, 52);
+ 
+ 		switch (BIT(wi->pgshift)) {
+ 		case SZ_4K:
+-			valid_block = level == 1 || level == 2 || (wi->pa52bit && level == 0);
++			valid_block = ws.level == 1 || ws.level == 2 || (wi->pa52bit && ws.level == 0);
+ 			break;
+ 		case SZ_16K:
+-			valid_block = level == 2 || (wi->pa52bit && level == 1);
++			valid_block = ws.level == 2 || (wi->pa52bit && ws.level == 1);
+ 			break;
+ 		case SZ_64K:
+-			valid_block = level == 2 || (lpa && level == 1);
++			valid_block = ws.level == 2 || (lpa && ws.level == 1);
+ 			break;
+ 		}
+ 
+@@ -589,19 +597,19 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 			goto transfault;
+ 	}
+ 
+-	baddr = desc_to_oa(wi, desc);
++	baddr = desc_to_oa(wi, ws.desc);
+ 	if (check_output_size(baddr & GENMASK(52, va_bottom), wi))
+ 		goto addrsz;
+ 
+-	va_bottom += contiguous_bit_shift(desc, wi, level);
++	va_bottom += contiguous_bit_shift(ws.desc, wi, ws.level);
+ 
+ 	wr->failed = false;
+-	wr->level = level;
+-	wr->desc = desc;
++	wr->level = ws.level;
++	wr->desc = ws.desc;
+ 	wr->pa = baddr & GENMASK(52, va_bottom);
+ 	wr->pa |= va & GENMASK_ULL(va_bottom - 1, 0);
+ 
+-	wr->nG = (wi->regime != TR_EL2) && (desc & PTE_NG);
++	wr->nG = (wi->regime != TR_EL2) && (ws.desc & PTE_NG);
+ 	if (wr->nG)
+ 		wr->asid = get_asid_by_regime(vcpu, wi->regime);
+ 
+@@ -610,35 +618,35 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 	if (wi->ha)
+ 		new_desc |= PTE_AF;
+ 
+-	if (new_desc != desc) {
+-		if (wi->s2 && !s2_trans.writable) {
+-			fail_s1_walk(wr, ESR_ELx_FSC_PERM_L(level), true);
++	if (new_desc != ws.desc) {
++		if (wi->s2 && !ws.s2_trans.writable) {
++			fail_s1_walk(wr, ESR_ELx_FSC_PERM_L(ws.level), true);
+ 			return -EPERM;
+ 		}
+ 
+-		ret = kvm_swap_s1_desc(vcpu, ipa, desc, new_desc, wi);
++		ret = kvm_swap_s1_desc(vcpu, ws.desc_pa, ws.desc, new_desc, wi);
+ 		if (ret == -EAGAIN)
+ 			return ret;
+ 		if (ret) {
+-			fail_s1_walk(wr, ESR_ELx_FSC_SEA_TTW(level), false);
++			fail_s1_walk(wr, ESR_ELx_FSC_SEA_TTW(ws.level), false);
+ 			return ret;
+ 		}
+ 
+-		desc = new_desc;
++		ws.desc = new_desc;
+ 	}
+ 
+-	if (!(desc & PTE_AF)) {
+-		fail_s1_walk(wr, ESR_ELx_FSC_ACCESS_L(level), false);
++	if (!(ws.desc & PTE_AF)) {
++		fail_s1_walk(wr, ESR_ELx_FSC_ACCESS_L(ws.level), false);
+ 		return -EACCES;
+ 	}
+ 
+ 	return 0;
+ 
+ addrsz:
+-	fail_s1_walk(wr, ESR_ELx_FSC_ADDRSZ_L(level), false);
++	fail_s1_walk(wr, ESR_ELx_FSC_ADDRSZ_L(ws.level), false);
+ 	return -EINVAL;
+ transfault:
+-	fail_s1_walk(wr, ESR_ELx_FSC_FAULT_L(level), false);
++	fail_s1_walk(wr, ESR_ELx_FSC_FAULT_L(ws.level), false);
+ 	return -ENOENT;
+ }
+ 
 -- 
 2.47.3
 
