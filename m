@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.143
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.150
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792738879;
-	b=Iw+jqj6BBOSspF29qHrDYAAZ24cREcryhASXSv5SYcCdNYHCudqGdlfaSSMyKK/a0yqo
-	 sTOUOJjwnFAlUL6sCea/MlX5eL/Aj3lBT563gZIWAyq5iubp3+/CaRAKmct5YL2GVxyuV
-	 DisUUG44U5/Yjgg7xdyEpWPXWrmzwYxwo0niwW4v/I+Er+BdcGirQvd9UOdWDFN2cryaX
-	 spPY1B/GZIGnBRHLqp5SOVN3Ln2AUskxKJINwdMkhtmBcE9Twqt5aVsDcD/U56n3zCxMu
-	 wyky5k6JHN+4Xu51zjXcX3Rb+zvqW4oF4YlexVoOA5dPRVu6ocz9Na2mmn/+u4euT2Q==
+	t=1792738883;
+	b=By/lNTb6lTDsiH4eJq+WLHqEwHbPMYQGr3d5CYvIjVkuF0V1QrNxNYjixGUSyyZz0lLd
+	 q0JzANOaIGFA/yUCeJrXDfi1rsZfVmBA7tUdgxVMY39z0AS9yk5YC8N9ZTYP3IiTsxBX+
+	 8ldFHmtuNzKY2gE4jDcn0FM+EzuFBt6tbB6dM6rF4sejqWTJbw9tgtTIOjqK81ZkBt7E9
+	 UXdCwWCuTBcQEaqxNsM8TbUkQPXUcZwzdc0LSoBqr0lNZdP+oB2tw7CoGXM7SnIi7+MVz
+	 1jBBcH3Sf5uCH1ta13YJk1/q0mKAzcAoj5WAvUUCoRud9DRDcvd/4N7rC3wGnmVmu2g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792738879;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792738883;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=IthMuZ/X3+pBoLoIufpj4zbJGn8A/2aYhe0XUm0DWMM=;
-	b=J2OHK1v+v733iINHqVOBBdj16nR9LPTGrrqoX0BxpI1WfMLVD9E8CFa8M6VEiHj5uSl0
-	 k4BbUy65l0DEbnDHE+uxvQQm+dt3/iVu2WQrKuazCqoLGHdJelAHcHkPn7upvIg9ywKiN
-	 UYqs54ojRNgpe/H99aS5yjSYKWsYeFoHMwbLh9OwkPwznST4wvk1cTew4AQw07KLNBzYC
-	 9VsAGlqHNHZrS729mvgszrWd+ruEfoxPdNUDy2KbIbfkAlv9rYZpZzQHqvDucoLS+IgBi
-	 nzU4L/KbRAOGcXbX1k1X5151aVPqguDaVyV0WpQO3Fno8/jV90wiqJrdoToWvN8QyUw==
+	bh=rUCmr5KNsTqdAFtykuTtOHLJ0k3Z9x+lHOLfB29fVwI=;
+	b=eJQ0kp+TMcuJvQEWU7OH7gTBKSV/4O6i3vG37FI4skUrhhvt/qavQj4a9mQBkvMwRAWU
+	 cWe/9ALKm4sl/OOgF1LejtDbf1VZViAq79+qndiof8htMbbGvD1CLSXe2jOAc/am6sPFk
+	 OMvr4f/s5SS1FtVOQUa8xTkhFrr2iWJkZbLlbng5RTCw/PZR0ocP0psnTZgdsSuL4SpXR
+	 JkNOQVfpmrnVAtbUs7/PweaOWYeX2vHdV3Zy4IoFDOtjjYFITQcBqcjn+z2rUTyutAhnJ
+	 nUndXtDvK0D7USkM/ZdGdT3TA3uwFC26kdP+ERvQDlfcXVJaD+aME41mGhdI48F/xNA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=VIIyaJ0S;
-	arc=none smtp.remote-ip=91.218.175.143
-Received: from mta0.migadu.com (out-143.mta0.migadu.com [91.218.175.143])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=PoDPze0g;
+	arc=none smtp.remote-ip=91.218.175.150
+Received: from mta0.migadu.com (out-150.mta0.migadu.com [91.218.175.150])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0577B606A31B
-	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 07:01:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0577B606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C56606A329
+	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 07:01:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 82C56606A329
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=VIIyaJ0S
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=PoDPze0g
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=bc/l25RHGTThA1qU58knnGQTtBxP0XgtC5Ldu46NdMg=;
+DKIM-Signature: a=rsa-sha256; bh=eS/K4doPXluNCr1/hI+pokpdsQChHXvBQQzirTFG9AU=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792738877; v=1; x=1793343677;
- b=VIIyaJ0Sw52+V97m1HKFMIqSa8yNktq8sfhmwLCLfRwHTvhwV0dPleik4OXIPg2DcDAfVuTs
- yVRIUsm/0QDbsndkPZ8u3CEHzlCuhbWSoLIFMxsl3QiNzNSTJBfnt8tWlqqrFHZzL9tRocntdjZ
- bLk6ry6z00cJbZ/RFAUTs7Mo=
+ t=1792738880; v=1; x=1793343680;
+ b=PoDPze0g8zldcDV/HwCZOP7leQ1N5HWH/s4sa6iVzVsq4qFzdk2aPNQUhUxkM9T2jSP/0sqF
+ DFp0VlHtBj4Dmf6VS4BdkTlwGHc311NBy3LTU8q6fIhdEiPptBUulsjv6Rph9wgj1DItDStsN4Z
+ 1brxc9aLY/X/yxiwXDmAsyTY=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id c1557c2947e98bd9;
-	Fri, 23 Oct 2026 07:01:16 +0000
-X-Mizu-Trace-ID: c1557c2947e98bd9
+Received: by smtp.migadu.com with ESMTPS id 2ac626447dabcc43;
+	Fri, 23 Oct 2026 07:01:20 +0000
+X-Mizu-Trace-ID: 2ac626447dabcc43
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -65,9 +65,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] KVM: arm64: Hide FEAT_LS64_ACCDATA from guests
-Date: Fri, 23 Oct 2026 08:01:09 +0100
-Message-ID: <20261023070110.1833446-2-fuad.tabba@linux.dev>
+Subject: [PATCH 2/2] KVM: arm64: selftests: Test ID_AA64ISAR1_EL1.LS64 on its own
+Date: Fri, 23 Oct 2026 08:01:10 +0100
+Message-ID: <20261023070110.1833446-3-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261023070110.1833446-1-fuad.tabba@linux.dev>
 References: <20261023070110.1833446-1-fuad.tabba@linux.dev>
@@ -82,82 +82,103 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since commit 58ce78667a641 ("arm64: Add support for FEAT_{LS64,
-LS64_V}"), a guest sees the host's ID_AA64ISAR1_EL1.LS64, but KVM only
-enables the FEAT_LS64 and FEAT_LS64_V instructions in HCRX_EL2. On a
-host with FEAT_LS64_ACCDATA, a guest's ST64BV0 therefore traps and hits
-the WARN_ON_ONCE() in handle_other(). ACCDATA_EL1 isn't trapped or
-context-switched either, so every guest on that CPU shares it.
+KVM caps ID_AA64ISAR1_EL1.LS64 at LS64_V, but accepts a write of any
+level up to the host's and caps it. On a host at LS64_ACCDATA or above,
+the generic test writes the level above KVM's value and expects it to
+be rejected, but KVM accepts it.
 
-Rather than support FEAT_LS64_ACCDATA, which requires ACCDATA_EL1 to be
-context-switched, cap the field at LS64_V. The guest's ACCDATA_EL1
-accesses then UNDEF. This hides FEAT_LS64WB too, as it implies
-FEAT_LS64_ACCDATA.
+Move LS64 out of the generic table into its own test. It checks that the
+field reads as the host's level capped at LS64_V, that a write of 0 is
+kept and one of the host's level is capped, and that a level above the
+host's is rejected.
 
-A VM saved on an older kernel can carry any level up to the host's, so
-keep accepting those from the VMM, capped the same way. One saved at
-LS64_ACCDATA or above restores at LS64_V.
-
-Fixes: 58ce78667a641 ("arm64: Add support for FEAT_{LS64, LS64_V}")
 Cc: stable@vger.kernel.org
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/sys_regs.c | 28 ++++++++++++++++++++++++----
- 1 file changed, 24 insertions(+), 4 deletions(-)
+ .../testing/selftests/kvm/arm64/set_id_regs.c | 49 ++++++++++++++++++-
+ 1 file changed, 47 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 44aae52c473d7..7801166991b12 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1958,6 +1958,9 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
- 				 ID_AA64ISAR1_EL1_API |
- 				 ID_AA64ISAR1_EL1_GPA |
- 				 ID_AA64ISAR1_EL1_GPI);
-+
-+		/* ACCDATA_EL1 isn't context-switched, so no FEAT_LS64_ACCDATA */
-+		val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64ISAR1_EL1, LS64, LS64_V);
- 		break;
- 	case SYS_ID_AA64ISAR2_EL1:
- 		if (!vcpu_has_ptrauth(vcpu))
-@@ -2403,6 +2406,22 @@ static int set_id_aa64pfr2_el1(struct kvm_vcpu *vcpu,
- 	return set_id_reg(vcpu, rd, user_val);
+diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+index 7429a1055df56..60b96f7608dc3 100644
+--- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
++++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+@@ -108,7 +108,6 @@ static const struct reg_ftr_bits ftr_id_aa64isar0_el1[] = {
+ };
+ 
+ static const struct reg_ftr_bits ftr_id_aa64isar1_el1[] = {
+-	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR1_EL1, LS64, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR1_EL1, XS, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR1_EL1, I8MM, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR1_EL1, DGH, 0),
+@@ -644,6 +643,51 @@ static void test_user_set_mte_reg(struct kvm_vcpu *vcpu)
+ 		ksft_test_result_pass("ID_AA64PFR1_EL1.MTE_frac no longer 0xF\n");
  }
  
-+static int set_id_aa64isar1_el1(struct kvm_vcpu *vcpu,
-+				const struct sys_reg_desc *rd, u64 user_val)
++#define LS64_IDREG_TEST 4
++static void test_user_set_ls64_reg(struct kvm_vcpu *vcpu)
 +{
-+	u64 hw_val = read_sanitised_ftr_reg(SYS_ID_AA64ISAR1_EL1);
-+	u64 ls64_mask = ID_AA64ISAR1_EL1_LS64_MASK;
++	u64 reg = KVM_ARM64_SYS_REG(SYS_ID_AA64ISAR1_EL1);
++	u64 val, ls64, host, limit;
++	int err;
++
++	/* LS64 is visible to EL0, so this reads the host's sanitised level */
++	host = FIELD_GET(ID_AA64ISAR1_EL1_LS64, read_sysreg(id_aa64isar1_el1));
++	limit = min(host, ID_AA64ISAR1_EL1_LS64_LS64_V);
++
++	val = vcpu_get_reg(vcpu, reg);
++	ls64 = FIELD_GET(ID_AA64ISAR1_EL1_LS64, val);
++	if (ls64 == limit)
++		ksft_test_result_pass("ID_AA64ISAR1_EL1.LS64=%lu, host at %lu\n", ls64, host);
++	else
++		ksft_test_result_fail("ID_AA64ISAR1_EL1.LS64=%lu, host at %lu\n", ls64, host);
++
++	val &= ~ID_AA64ISAR1_EL1_LS64_MASK;
++	err = __vcpu_set_reg(vcpu, reg, val);
++	ls64 = FIELD_GET(ID_AA64ISAR1_EL1_LS64, vcpu_get_reg(vcpu, reg));
++	if (!err && !ls64)
++		ksft_test_result_pass("ID_AA64ISAR1_EL1.LS64=0 accepted\n");
++	else
++		ksft_test_result_fail("ID_AA64ISAR1_EL1.LS64=0: err %d, reads %lu\n", err, ls64);
 +
 +	/*
-+	 * Older kernels let userspace set LS64 up to the host's level, so
-+	 * keep accepting those values, capped at LS64_V.
++	 * A VM saved on an older kernel carries the host's level, which KVM
++	 * must accept from the VMM but keep at the limit.
 +	 */
-+	if ((user_val & ls64_mask) <= (hw_val & ls64_mask))
-+		user_val = ID_REG_LIMIT_FIELD_ENUM(user_val, ID_AA64ISAR1_EL1, LS64, LS64_V);
++	err = __vcpu_set_reg(vcpu, reg, val | FIELD_PREP(ID_AA64ISAR1_EL1_LS64_MASK, host));
++	ls64 = FIELD_GET(ID_AA64ISAR1_EL1_LS64, vcpu_get_reg(vcpu, reg));
++	if (!err && ls64 == limit)
++		ksft_test_result_pass("ID_AA64ISAR1_EL1.LS64=%lu accepted as %lu\n", host, ls64);
++	else
++		ksft_test_result_fail("ID_AA64ISAR1_EL1.LS64=%lu: err %d, reads %lu\n",
++				      host, err, ls64);
 +
-+	return set_id_reg(vcpu, rd, user_val);
++	err = __vcpu_set_reg(vcpu, reg, val | FIELD_PREP(ID_AA64ISAR1_EL1_LS64_MASK, host + 1));
++	if (err && errno == EINVAL)
++		ksft_test_result_pass("ID_AA64ISAR1_EL1.LS64=%lu rejected\n", host + 1);
++	else
++		ksft_test_result_fail("ID_AA64ISAR1_EL1.LS64=%lu not rejected\n", host + 1);
 +}
 +
- /*
-  * Allow userspace to de-feature a stage-2 translation granule but prevent it
-  * from claiming the impossible.
-@@ -3428,10 +3447,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ static u64 reset_mutable_bits(u32 id, u64 val)
+ {
+ 	struct test_feature_reg *reg = NULL;
+@@ -828,7 +872,7 @@ int main(void)
  
- 	/* CRm=6 */
- 	ID_WRITABLE(ID_AA64ISAR0_EL1, ~ID_AA64ISAR0_EL1_RES0),
--	ID_WRITABLE(ID_AA64ISAR1_EL1, ~(ID_AA64ISAR1_EL1_GPI |
--					ID_AA64ISAR1_EL1_GPA |
--					ID_AA64ISAR1_EL1_API |
--					ID_AA64ISAR1_EL1_APA)),
-+	ID_FILTERED(ID_AA64ISAR1_EL1, id_aa64isar1_el1,
-+		    ~(ID_AA64ISAR1_EL1_GPI |
-+		      ID_AA64ISAR1_EL1_GPA |
-+		      ID_AA64ISAR1_EL1_API |
-+		      ID_AA64ISAR1_EL1_APA)),
- 	ID_WRITABLE(ID_AA64ISAR2_EL1, ~(ID_AA64ISAR2_EL1_RES0 |
- 					ID_AA64ISAR2_EL1_APA3 |
- 					ID_AA64ISAR2_EL1_GPA3)),
+ 	ksft_print_header();
+ 
+-	test_cnt = 3 + MPAM_IDREG_TEST + MTE_IDREG_TEST;
++	test_cnt = 3 + MPAM_IDREG_TEST + MTE_IDREG_TEST + LS64_IDREG_TEST;
+ 	for (i = 0; i < ARRAY_SIZE(test_regs); i++)
+ 		for (j = 0; test_regs[i].ftr_bits[j].type != FTR_END; j++)
+ 			test_cnt++;
+@@ -840,6 +884,7 @@ int main(void)
+ 	test_vcpu_non_ftr_id_regs(vcpu);
+ 	test_user_set_mpam_reg(vcpu);
+ 	test_user_set_mte_reg(vcpu);
++	test_user_set_ls64_reg(vcpu);
+ 
+ 	test_guest_reg_read(vcpu);
+ 
 -- 
 2.47.3
 
