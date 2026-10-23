@@ -1,85 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792742376;
-	b=gqHN7jgd5GvGy0Hl3Rl2EgujjQWqu/GwqaW+dA05vnJq7QBGh9z1fR0A5usxOnw9m2I9
-	 9Y0qsyna8HglQl7NGV8KhvgO0TcQT+QF9J6Yex9lo604QF1eShMP+XBFDxGziWZdmekPN
-	 s0JXaAt1zDQlAw5ptQ7bwmgO0lJQ3eAsbLdG/d/XbcwtdoIUXDeVlvFjDQ2G/fmIlOKjO
-	 o1JJZ6tmw6eepNIw0g4oIvp+zKpGqkJiOeArL3g9iOv4h6PLPzfbK1Lb+8IIAZJ8Qxzh1
-	 EF6822pIrdii6PETyGbnqV98cmx+6RZjWeUOmSbclgFb7I398IEyAmA4+TZNaj4yBwA==
+	t=1792742515;
+	b=5MvEDORbGvnpO1YG5CpRRmd9RAwYkgwnV84DR0QcexsXhEUb+8s9Eh1gBkfkLpZYC14o
+	 ARf26IMafpgeqvI97txRzBRWp8687Et14SAkd5dgR2Xv8DY6plZzcXQw2GzLrhbV8Gno9
+	 fi9FDD9mAnGExwmledELAWuYuDmivatfvkqoItnfdr3ogaDt7AJrA7w8N9UnaMl14M27z
+	 v2jSz8uoexlHUvEPp/sXDP5FWMxvf+c96BAB4z1eiz6ZNRGDvTxDD5PcU1YREVO3YbXUv
+	 yY219as9knLcxHHqbv1q+2Yfph6GQYCnUYps656c9vqdiE31R8sXUYnay29FhTSVDzg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792742376;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792742515;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
 	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=5jkvtV8P/+s5qJ2kbqgOKMQCk58hvpuAEYMAliw2L+E=;
-	b=gQz4Xf4mZRnX6GH2rKdJWL2Fz0/rCV5xx8brXRR3Y5vIt8VwUwWU2huBl14wYJS8QqQQ
-	 AnwS+mNbraW5dnaeQ/Kh8xd1jgPFeiNgeKWg9eVgN6gugUwAnTctXIFflbvFPn/7122kA
-	 /uGabqr3gxrLCy1fVOxYT/+Rhv1/1WAjUiDkL2YpNP6/KWKjoaDXZbtSwwgV7MI5fRqsM
-	 duOS3g+XuR0JRfgNORdFnhSY3Uw+lOaeyIYH1ZiK6vC1XFgivqjs/iEgGhKuySmKztY26
-	 SEAL2nHrM9p6EMvPq2872OKuV//9clZ2277irb6nHJqpnjBR9KFMnqzikAJWfpgwpjQ==
+	bh=h/NfMB+35she+i0TxY4peuXbshaf1B5IwLQii+ni3vw=;
+	b=so3RLkXQUG6n1uQxb7uT7dkknqISfxkXxlhijI2HSijnEs2/qepFKcdcSGQXLUzTfIYN
+	 ia9vZtu/NDW294Dd2vD/TM8tDniDpQkVq8RmLbDqQbvVIC0YReBjqcElYo8CIcmHclIF9
+	 3CTOfzDjftDFBaaVqQDPrGIB3nab59yRz5TdKjxIVHYHSOv9vJ+XCzR71MMPZ3GZ1a0Rj
+	 3pRSa/QWHDVIcQ23KTnBVUkKA1xUuTvwEwxWmsBWzitv6ZqnPmGZhBG2eZvEiYv/ldAMz
+	 w9MNRAxrDWk8kXMr5ksPf9lJWgK4av5TGgDoln1GSRtS2B3I6d8RRYFfQiXdeRoDr8g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=u5BV6j4A;
-	arc=none smtp.remote-ip=209.85.128.43
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=G0VEavm1;
+	arc=none smtp.remote-ip=209.85.128.46
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08D3606A31A
-	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 07:59:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A08D3606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB33606A31A
+	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 08:01:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BCB33606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=u5BV6j4A
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4a218c463d1so193685e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 00:59:35 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=G0VEavm1
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4a1e34ecb02so3444225e9.2
+        for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 01:01:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1792742374; x=1793347174; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1792742513; x=1793347313; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=5jkvtV8P/+s5qJ2kbqgOKMQCk58hvpuAEYMAliw2L+E=;
-        b=u5BV6j4A12HiHIbg6gQlUBL5X0t6O1C3ddixjrZop6JI+2TKTFJmOXd9weEDZpktFm
-         GSfpnEY18rSUyBHXuvtvidSe2wjY1SQ0ugvkdCeKpgbxQ5WuV4/rW0LjBALuJGzgo6I/
-         wChGjifTcPjMVXvJQtVi5jp7G9naGiO10finMycewx9eV4hox1OYNzolG6NXj6qzSVCI
-         1MXUVyM0NAPnjq30Oo7GCnkNLoqyeVoj0GFcBT30w7jt/HQNfzJSbwhVDS/NqJhj/O73
-         90vGz83YHXe3owWT1y1JMfExqI4zKc0p3Ifoz/rWlLFcRflHlRweU+7oEMyd7yWrKwSR
-         VCvg==
+        bh=h/NfMB+35she+i0TxY4peuXbshaf1B5IwLQii+ni3vw=;
+        b=G0VEavm1EDcGXTzHQCgLOT+Y5TwE8b2BPAovtnnkBRQZGXrnwd6CETd/Hy/ak8IJRr
+         Vy1466LGig2+xyMy1eZRbkYhlD4JYUhD2e/Vv1NetsTa64z5kXltNxqolcX/mjcbGmca
+         7Mf1azXCTUHq4iKbki7sIFqhus1wcpKMkbHoO5P5ISitvjgWbYSkOlm50qTuGXRCioH4
+         SOJy13cqaWMrIrMqXA+qN/40h2eVOG6Oc3GhIxBIZcZHqx8kO92aR2nc+GzUEpPFNpxj
+         /pe73X8F6p+F+u4oGzzvOoM/eSP+PNRKBFSwmyfY2juOk+lTVRNwhOjYZmSp6vrgdoOt
+         TawQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792742374; x=1793347174;
+        d=1e100.net; s=20260707; t=1792742513; x=1793347313;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=5jkvtV8P/+s5qJ2kbqgOKMQCk58hvpuAEYMAliw2L+E=;
-        b=D0G8FtFSTeG1PKjmTWvxgo6xly+juDa+k6H8+qSwVeKOBZBqFlv8EAxoIYaACrXNDa
-         SakIIyUXJ7fM3hm9Cjf8skXJ07Ov251icns182AAXCV+0mcguFaUivHB37XIcVE2Tj+R
-         Pr31t32423I4uqnTCC/h7d3ES2NPaS3GlRNJZ0Oeq5eETcCuiV3nKaOq2R5ThaSjcqo/
-         TLwx+FKJgCMAgbWeR+GSWkc+lmu0Tr0s4WXexGqppe1QPLnawllfM6hN2urjQjhSqvmV
-         +EpES1Tiexg1Gwms8Qt4Y6LJ/E58w2/ltgCC7bjwRe4eFCq3QfRU/SGeW7kR6sn9/sy5
-         BKwA==
-X-Forwarded-Encrypted: i=1; AKwUvBzM4k+K67clY2TcVv51UeBTqM6NGKwm4JP7/ffb2RpmSS47hivqPVitQ2nq3mIu7LMB2Uiarp0=@lists.linux.dev
-X-Gm-Message-State: AFq9FYJmMyzVQp3N+6tHmWLm5AxwdIG+x5BL37CTOJntcuaOYflAaI/L
-	2ULaD4bITl4f43DwOfbKKxKH/GmxtnQv8QdCqDTe9UFvn39swc4BeiLekQHNj56XFw==
-X-Gm-Gg: AYBFou0h7l7gNTuZ8ci7wdGQ9UweCnZ8L93z324FadeSxkhoaXN1NUOVyo2d916PK3I
-	D+z7UgQDP1wlOG5hoDweK4YIg9/Me1KFUT3Jz2X8zmWyHj0Eu/ktcdgxTVI/CyghF+EqcPPGNPm
-	yySugZU9P0r8I1ZJo0otQ3YxzeT1K19qlGQkd5g4Y36ltnuW9qCZUSkLKgDvPX2HXsASDzWIGTt
-	fBrAJLAWYonuLAdHqXvgq9g01ALhNxYn2XukwIy7U5FFkl6p7LaT0kkjg6e7JpOK3QjXm1Cl7Cq
-	9YiY3JtSzbL8yyzlxBYTNsxAQU2VbDEbMTeSTd/yQtIUSB4a3qvv1CCk9aVLTU1rHUXrjyZp26P
-	di86NuiH/3avd9+GwP474FxJmIu4KCgZ+zJdnkim/UO0B4naPcZj0pLRAdmAUUxIxdxF7swRl1+
-	BaxPd7gWBKOpg3ISU/Cn5CuvfRCih13V3v80ewxDOjoGJLWVceAXpqAya2lYE2xySlvTIaMa6bd
-	UIVcMVL8XcB050LBTO/JaTYiaIqDel3jqDqt3lHVmpdEywJ+KKFmzgsGDzLPHcy2PSvWiO3Y4xa
-	1WchI8GVD+L7Inl/KVru7smU
-X-Received: by 2002:a05:600c:a04:b0:4a1:e7ce:107b with SMTP id 5b1f17b1804b1-4a211c7facemr22799255e9.2.1792742373535;
-        Fri, 23 Oct 2026 00:59:33 -0700 (PDT)
+        bh=h/NfMB+35she+i0TxY4peuXbshaf1B5IwLQii+ni3vw=;
+        b=cg10iqYVSi6ktX3MCDGz3JnYDbgRWjy7xvmnuGm7MAHCQnATQXc+aPOW9/THMv+gjT
+         4vTl96wawuoMG28yJFFFilWACKDv0EWr7Z8fO2qRRCJa5nEBtGTshvvY84pjuF1pgfw7
+         KqOFBSmRf2BNnFPZt3dsAg2SV49YLg4Qs+SWjiZ+EefIsUeP1m6jsDHBRfK/+Xj1ag8j
+         IaOrZ4kYTW2TRTe1HFmfIvT9Agdij6YvHIlFZ+eNdLP0zgFeGOmgba/A8WCCqeVgjMiY
+         zefe4Na4iVvyWt4cdfNpTPq3Xqyua4oCBrUkdHCcMKQ+LVqNF9m+YlG2ow59pO8wX+gv
+         Nqgg==
+X-Forwarded-Encrypted: i=1; AKwUvBxnWe3llsBGa00rTeJREFWscKPvYD765UzlMYFFD2GCH5HZdtJ2dMHeC5sa2J86JAuErnXfIkE=@lists.linux.dev
+X-Gm-Message-State: AFq9FYIOgE0qM8qJpRQUHlDBzYhoWukrnkw26j3vepPI9hRO99hnp77y
+	avLTmymUBfl3FTSshEJXJdcNXEKX0etStXmCaVBcVx3BhTpTIHVyupeWyjqf3z75nQ==
+X-Gm-Gg: AYBFou1MK0VJ/ZrNr5TYcXUnYDMAy2eOuymGYhdep+8kgOSCQEa6Cb01Vc2/ssSLLIi
+	S3WHpUyJ8+OabEtfhvvYb6oAPIpVnGbklcCpROl/V0rL1ST9glvYQIRJDGt6AKhI63cRQ7+KwQA
+	s+XERFooJYHB89NY/jc0upbXQkwOU4PGXourOYbWc5SPuEdDIR4oXPZ7ZPAotjoAgVPxsjF0qXW
+	NO+2x6C8PcNwKwkAS9mHJCWpJEujEUcdat9ni03htJAIulBNPCTt6IMK1UAVypV+Who4jIgXQLA
+	F04ECFpZDoBA7uGUH+Upo2vNLszuJG/Qw4UBbjzoxL1DsLrrmF/2SdY82hGzJ63SMk3Tr8cQqk9
+	IhmT4HOXhZi8QZJs7G3FXgmNcbzmRuSZ3Y4NtkvQXsZc0XkA0eVUV5x9PB92WGgjsSKtKf7Z5Qt
+	IbHcCX2NgcWqPnf9EIM56BdanyDq6lYXCD9WTBNA/rCQ2BMH8pJe8AL0TXzhUWDZrMMVJkFldsm
+	3LttYMH8CSuqksc+8nA61HDplQWsXIfoOlLANJMEtkvxq8noQ4M0k4Ar6MworlAaaVxqvdnXt/k
+	stXmerJ/T59jR+hhO+v+pJ1n
+X-Received: by 2002:a05:600c:4e8a:b0:49f:fe39:5bc8 with SMTP id 5b1f17b1804b1-4a211ee9b8amr23155815e9.12.1792742512330;
+        Fri, 23 Oct 2026 01:01:52 -0700 (PDT)
 Received: from google.com (197.183.140.34.bc.googleusercontent.com. [34.140.183.197])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a210473567sm56280825e9.12.2026.10.23.00.59.32
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a21555f9e1sm10347795e9.4.2026.10.23.01.01.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Oct 2026 00:59:32 -0700 (PDT)
-Date: Fri, 23 Oct 2026 08:59:29 +0100
+        Fri, 23 Oct 2026 01:01:51 -0700 (PDT)
+Date: Fri, 23 Oct 2026 09:01:42 +0100
 From: Vincent Donnefort <vdonnefort@google.com>
 To: Fuad Tabba <fuad.tabba@linux.dev>
 Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
@@ -87,11 +87,12 @@ Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
 	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
 	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com,
 	tabba@google.com
-Subject: Re: [PATCH v2 2/4] KVM: arm64: pkvm: Fix missing reset of GICv3 LRs
-Message-ID: <atsT4c-JLRSxSreo@google.com>
+Subject: Re: [PATCH v2 4/4] KVM: arm64: pkvm: Avoid trapping on
+ HVC_RESET_VECTORS
+Message-ID: <atsUZv8-9is_i5r-@google.com>
 References: <20261022140048.2522787-1-vdonnefort@google.com>
- <20261022140048.2522787-3-vdonnefort@google.com>
- <20261022173604.3710390-1-fuad.tabba@linux.dev>
+ <20261022140048.2522787-5-vdonnefort@google.com>
+ <20261022173806.3752938-1-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -103,76 +104,31 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261022173604.3710390-1-fuad.tabba@linux.dev>
+In-Reply-To: <20261022173806.3752938-1-fuad.tabba@linux.dev>
 
-On Thu, Oct 22, 2026 at 06:36:04PM +0100, Fuad Tabba wrote:
+On Thu, Oct 22, 2026 at 06:38:06PM +0100, Fuad Tabba wrote:
 > Hi Vincent,
 > 
-> On Thu, 22 Oct 2026 15:00:46 +0100, Vincent Donnefort <vdonnefort@google.com> wrote:
-> > The vGIC LRs are architecturally UNKNOWN when the CPU boots or resumes.
-> > However, in protected mode, only the used ones are reset, because the
-> > HVC __vgic_v3_init_lrs() is never called:
+> On Thu, 22 Oct 2026 15:00:48 +0100, Vincent Donnefort <vdonnefort@google.com> wrote:
+> > pKVM prevents the reset of the hypervisor vector and as a consequence,
+> > kvm_hyp_initialized can never be reset. Add a fast-path for this case to
+> > skip unnecessary HVCs on the CPU hotplug and PM path.
 > 
-> Could you say here what happens to a guest when an LR isn't reset, as I
-> asked on v1? Without this series, on QEMU changed to leave a pending
-> vINTID 100 in the top LR at CPU reset, the guest warns "Unexpected
-> interrupt (irqnr 100)". With only the EOI bit set there, the npVM
-> doesn't print anything in 150 seconds, since the maintenance interrupt
-> is asserted on every entry. With that in the message, could you also
-> bring back the Cc: stable you had on v1?
-
-Sorry I missed that.
-
-Actually I don't know if this should be backported. I believe it was working
-until now because all SoCs do reset their LRs even though they don't have to do
-it.
-
--- 
-Vincent
-
-> 
-> [...]
-> > Then, cpu_hyp_init() is only called from init_subsystems and
-> > kvm_arch_enable_virtualization_cpu(). Remove the kvm_hyp_initialized
-> > gate: when pKVM is enabled, the cpu_hyp_reset() will just return an
-> > error while for other modes, we already know kvm_hyp_initialized is
-> > false at this point.
-> 
-> In init_subsystems(), only the CPU that ran do_pkvm_init() returns an
-> error here. The others are still on the hyp stub, which returns 0 for
-> HVC_RESET_VECTORS, so they go through the full init. Could you reword
-> this part?
-> 
-> [...]
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> [...]
-> >  static void cpu_hyp_reinit(void)
-> >  {
-> > -        cpu_hyp_reset();
-> > -        cpu_hyp_init_context();
-> > -        cpu_hyp_init_features();
-> > +        if (!cpu_hyp_reset()) {
-> > +                cpu_hyp_init_context();
-> > +                cpu_hyp_init_features();
-> > +        } else {
-> > +                if (WARN_ON(!__this_cpu_read(kvm_hyp_initialized)))
-> > +                        return;
-> > +        }
-> 
-> Could you make this "} else if (WARN_ON(...)) {", as elsewhere in
-> arm.c?
-> 
-> > +
-> > +        /*
-> > +         * Even if the hypervisor didn't allow resetting the vectors we can
-> > +         * reset what we have access to.
-> > +         */
-> 
-> nit: "what we have access to" is the LRs, so I'd name them.
-> 
-> With the above addressed:
-> Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-> Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+> Could you drop this patch? It brings back a pKVM check in the host code,
+> which Marc asked to avoid on v1 [1], to save one HVC that pKVM already
+> rejects.
 > 
 > Cheers,
 > /fuad
+> 
+> [1] https://lore.kernel.org/all/86jynbyshv.wl-maz@kernel.org/
+
+Exactly why I kept this patch separated :) 
+
+It is a single documented fast-path while the series removed 5. 
+
+But I agree this is only for the CPU resume or going out of idle path so not
+really a hot path.
+
+-- 
+Vincent
