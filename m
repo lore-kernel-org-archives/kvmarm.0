@@ -1,79 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.174
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792744295;
-	b=dw/0/KDJt4fAnSN6dcZsQZ32ZPeoxDlPJEPrsi/BgqWMxRY3pqCCTx2qAQLXpNJ9zv4O
-	 tWGzYPtAc0HQ++haihTKt1QYH4TVbYfaCQqZQ863o2fXe/DEobw+Ci6my10zy4+7rQLpI
-	 DiDAxdA3LyAJtPa+MxjTjrFdVY3uXie1UgUKFPNkOiC01fddwVQ/SmVIHJTLa/cJ3i9tO
-	 E/Ajs884xPlZGSxVHGpHOUokZn8PhuFapSP5U4IIicr0VEFaIdvnwBSSgFRDUn6V1He1m
-	 SVUnLHFY1YJnWKsWHIULYHM9Gwql2P6i6jQXZveS0Y2uJkNda3Ky7b0VSVPHayYfSZQ==
+	t=1792746535;
+	b=VRnvMFjI2BE+rxDoEh16H/WuYLT4vya17VbpyfbTlHjW/lBIIiSRDHL9AHborFfu26fT
+	 a/15uHnTGPHuwNwXdE96PxDr5hrh4oVOtzcJ0AB6bFUZ1hmedbESutY2HilurULJymd10
+	 hJMefd3BjswfaAGcmWEuOgPjiaDMFrwmYLC1wiRtzsw2jBgOoCJ+epPgsW2xYs/ll3kc9
+	 64HPT4m8yK1vdgd86v47Q5nizUDboBRrUr4auKpsJIiycC8ERHArCt6q5drmC/LdSx9Xn
+	 XAbsoB2gtdlYU82sBTJ74bb3WPOyK3wNOLQPNAAo0aDwFW3v1DBRqlscAKKkmYVOA/w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792744295;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=NShwj3uySdZgYCjF4f6Gih+68kU6l/C0njQVpdn1AzA=;
-	b=RHUIrnFxs0L4Kk+Y8OtfqXXX+pXISHWM8bbjSwJiLf4U61lGIs3KBAjJGX7JHkBvh2sl
-	 qDx9UqArz3wj1q6l52QDd/DcXVtXLaMtz0d2BonBVGF9yx1V81Ladts1h7/YngtSOy0Wz
-	 qXywMB6PRbddTDIqBQF1PExUja/furfHZWRae8Pnk4JdHfn8iTHyT70O5jUQts4tfwYi9
-	 z6JRloft71EVv0WeqdlDk643MAtAJzys2D2eq0PLD8WdWJxjPzvArfOfvKCUIDT2zo0vv
-	 g7redBD4gg6M/dGP/da8BtRNF83B2Xv6pG2ZLnClh1kCFIOYarXDuSdXGN6iuAms34A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792746535;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=aHdZ+oKwe6OINwv5V856+JzJxIwxr2tU0lqEBlQhC6Y=;
+	b=NSzGBCc6yMyLjhFL6TBGIQoULq1CqOZymmWnLkt3KL2FtflqwO4nZrd6KZ7E59s4CRJP
+	 fRgbp+CqpcYtnBo3EI6wjwK9D2TNEvjUlgQ5myYYSIY6NNadwvti4S0qE5TlCgfKreiWa
+	 pHWdQLS1p73p/T5+RIAHaB+U6bmbyGYlM89Yd15azIIxQc1BF3afAwA5iS7gtriWS3E3B
+	 +PTIdqljGTgj4ReN8pVrax3waZeyk/fpgXnY9kYpV83Q5o24gwNGbvct5Cu70kAPmv4CP
+	 OiqmidPBvCp2iAnt9o4zwouT0ZT8ngd8v9YB16zhHTU/qGq2c6oGBRYISYflYP3rc8g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SVHaoBAL;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=q+CtonFs;
+	arc=none smtp.remote-ip=95.215.58.174
+Received: from mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D737606A31A;
-	Fri, 23 Oct 2026 08:31:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347F5606A321
+	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 09:08:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 347F5606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SVHaoBAL
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECECF1F01825;
-	Fri, 23 Oct 2026 08:31:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792744295;
-	bh=NShwj3uySdZgYCjF4f6Gih+68kU6l/C0njQVpdn1AzA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=SVHaoBALR7WJ71D1liXzObFE+vCHKRrdo3c5LpI+6iVskBn02BK/NlEMU4dxHSTbT
-	 eUvJnwQnFMYfOQJ9CXtpGs7sScqi38Dj4CBHZc6Cr11rf/x9uks0Pu6VteITazLQEX
-	 Pqa3bcJ2nweoJarZTzWpyrLy4uhH9MdZIQEX26nN6be9wuMtTtICUzToiY2qDin5dR
-	 bu52nrKzoUMNX7stcph1UIvAmwda1E7V2E5hPkydNkGAv1hlbTZW4jPQh3rHmJle9d
-	 SdOlY3O7f6dmcnueb2RxBBmQBlxwANA4rT/WMl733fj//RUC8l8sTYbWYYrTuGpo9U
-	 4eDXUFodChlNQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xKAgW-00000006NxD-3HaW;
-	Fri, 23 Oct 2026 08:31:32 +0000
-Date: Fri, 23 Oct 2026 09:31:32 +0100
-Message-ID: <86fqxwzul7.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Yicong Yang <yangyicong@hisilicon.com>,
-	Zhou Wang <wangzhou1@hisilicon.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Fuad Tabba <tabba@google.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: arm64: Hide FEAT_LS64_ACCDATA from guests
-In-Reply-To: <20261023070110.1833446-2-fuad.tabba@linux.dev>
-References: <20261023070110.1833446-1-fuad.tabba@linux.dev>
-	<20261023070110.1833446-2-fuad.tabba@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=q+CtonFs
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=aHdZ+oKwe6OINwv5V856+JzJxIwxr2tU0lqEBlQhC6Y=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1792746533; v=1; x=1793351333;
+ b=q+CtonFsq/yIiM0skPBshBA4a0cnJyCmZl0ywNg+6KYtPzv9uEvbqzU/Ll8t936D8nT9edL0
+ 1WjdK2yc4ipdY2VCsy/llbY+ulHP/0tpzk7p3YimKgkK2fxaLD9OHjo04LWNeQ2ctN35L7VooYx
+ ovGJ3X95vLsmNWIrn1K3+jTw=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id eab9fa1100caf4eb;
+	Fri, 23 Oct 2026 09:08:53 +0000
+X-Mizu-Trace-ID: eab9fa1100caf4eb
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5be58ad9600so6450e87.0
+        for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 02:08:49 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvByvKIQKgjCDrbmKDBrmW/R7gGMxbVs1uLEz01f9weaueyyD2KXAVSiSD4QCbq4W8UW7E5Aj89U=@lists.linux.dev
+X-Gm-Message-State: AFq9FYKUor+DoQszU29nawAukDxRbaU9KJfwaiuG397C10Tp9e7xG5t1
+	yexsWUVS7wPHN1b0W2X/n229CrDraThv1oJi1mT5zdZibaKlQx8xo1B4wEmtcqciktunysA5/ic
+	XJOEOQC3w1c3ZxA8knNkTMJckb/s7zY5g4zXa8vBv
+X-Received: by 2002:a05:6512:3f03:b0:5bf:a49c:ddde with SMTP id
+ 2adb3069b0e04-5bfb06b5140mr90492e87.10.1792746528071; Fri, 23 Oct 2026
+ 02:08:48 -0700 (PDT)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -82,35 +65,50 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seiden@linux.ibm.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, yangyicong@hisilicon.com, wangzhou1@hisilicon.com, arnd@arndb.de, tabba@google.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20261023070110.1833446-1-fuad.tabba@linux.dev>
+ <20261023070110.1833446-2-fuad.tabba@linux.dev> <86fqxwzul7.wl-maz@kernel.org>
+In-Reply-To: <86fqxwzul7.wl-maz@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Fri, 23 Oct 2026 10:08:11 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTw08SZC_3Uodt6ew6vXVH-doW-8G41fVCF-rmaKsv+0fQ@mail.gmail.com>
+X-Gm-Features: AclHuK8By_xwbQyrvckEGFfA4cAUoxoiGOv41Z9xRvku379045c1KVkkaVcFF80
+Message-ID: <CA+EHjTw08SZC_3Uodt6ew6vXVH-doW-8G41fVCF-rmaKsv+0fQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Hide FEAT_LS64_ACCDATA from guests
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Yicong Yang <yangyicong@hisilicon.com>, Zhou Wang <wangzhou1@hisilicon.com>, 
+	Arnd Bergmann <arnd@arndb.de>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 23 Oct 2026 08:01:09 +0100,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
-> 
-> Since commit 58ce78667a641 ("arm64: Add support for FEAT_{LS64,
-> LS64_V}"), a guest sees the host's ID_AA64ISAR1_EL1.LS64, but KVM only
-> enables the FEAT_LS64 and FEAT_LS64_V instructions in HCRX_EL2. On a
-> host with FEAT_LS64_ACCDATA, a guest's ST64BV0 therefore traps and hits
-> the WARN_ON_ONCE() in handle_other(). ACCDATA_EL1 isn't trapped or
-> context-switched either, so every guest on that CPU shares it.
-> 
-> Rather than support FEAT_LS64_ACCDATA, which requires ACCDATA_EL1 to be
-> context-switched, cap the field at LS64_V. The guest's ACCDATA_EL1
-> accesses then UNDEF. This hides FEAT_LS64WB too, as it implies
-> FEAT_LS64_ACCDATA.
+Hi Marc,
 
-Why settle for the least capable option? Context switching ACCDATA_EL1
-is easy enough, can be gated on guest features, and avoid the
-userspace horror story.
+On Fri, 23 Oct 2026 09:31:32 +0100, Marc Zyngier <maz@kernel.org> wrote:
+[...]
+> Why settle for the least capable option? Context switching ACCDATA_EL1
+> is easy enough, can be gated on guest features, and avoid the
+> userspace horror story.
+>
+> I'd rather see that.
 
-I'd rather see that.
+Context switching it means accessing ACCDATA_EL1 at EL2, which traps
+to EL3 unless SCR_EL3.ADEn is set. booting.rst doesn't require ADEn
+today, and TF-A only sets it when built with ENABLE_FEAT_LS64_ACCDATA,
+which defaults to off. On such a host, KVM traps to EL3 the first time
+it switches ACCDATA_EL1 for a VM, and every VM has LS64_ACCDATA by
+default. The cap leaves the register alone, and the fine-grained trap
+takes priority over ADEn, so it works whatever ADEn is set to.
 
-	M.
+Should we keep the cap as the fix for stable, and post ACCDATA support
+on top? If you agree, I'd rebase your patches 3, 4 and 8 from [1], add
+a booting.rst requirement for ADEn and EnAS0, and lift the cap and the
+compat.
 
--- 
-Without deviation from the norm, progress is not possible.
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20240815125959.2097734-1-maz@kernel.org/
