@@ -1,70 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.76
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792756926;
-	b=I8ptjhSMg/ILgs/lRrqq/V+oMXV3nrGozpZnjEMrALTVfk64fyO2DKvgzzjQIObk6Wyl
-	 XtFthJDOMqyLMmW0Iw0tb2rUqw5ucX1Gwok7wKT6OBiS4y3qmK1yU/uhvxpcnJ7yiePT9
-	 +cjSrotZdfcb2Ppu8zf9F2a2D+iHbuIicxZswwbqQIHwAxCnkiwzFhlcmFNKhuQEuG7hB
-	 /u60uX2BKuDSnS7JDgw2VnG4vg3fkiDzRzGt3gBwi62vFNCCDqY9c+5acGITemMxvPNR6
-	 ngfg/2+KHRNqN/hdTiCb0iUgccXfVncKl/14n0NdTF7RTYWpatbSKh55alk9K7mfImA==
+	t=1792758590;
+	b=f2kYu+6bZAyFYgdo3xLeGNzKu0Z7H8YEQNBkLMdx9lIufxRfrDP6/vkQaPUvyRZqI972
+	 bogEGR2uG3OcJyrJ2YzHnoH85K6Hjl1m2O9azvH9fsu7SflyG/3Ryn/pomKYA6O3BBr0P
+	 i2t12TJrC63oz/gwi7x4FhvoDrhB0rC511rtHB6gTm6DzFKL9Ub+BH2+BDiSAUnJbD0g1
+	 TPk99HHNlJlEAewkRrfLjFqGtj1NwKQeeuihQxMSf/m3AMY1CcDJPDKIFuZ1DbNV33mlQ
+	 MffQwokOqHvgg3K7CTZO8H4Qye4JX/KIAMbwITHNz85pJaMNmc3/rcMsT9s1gXcZldA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792756926;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
-	bh=jctLZMa3CFFn1fL9CJJAY0fHDymjjHzSukwmoA365k8=;
-	b=N+vDkRznBKsFqEhTkZbGiB3+1EnFtyTVGSDQ3z/0/MHYhmoKmcJf7Jn/tJRkaRBp47d4
-	 FwLm4py4js1u/XDdnFklITx9jpzZZSXxVmG6JgcNGaTQFh8SuxWLTMpF6Li6jhXLZ74eq
-	 ow1CKDwI2+fc8P7iUPwTMtZesmOGP6hpkNq0dzFfwZ+BBunzFJFAmBx33j2vSErMBs+m4
-	 UXbsR1d3wbx9p/Lk+CpMoxQH80UN5sQekakHRof5mNg2xqD64FHkMzaj7OkM8Ge+df5Z0
-	 5Px22fUiSzCBUq6Fjjmi29fr9of6QeeMZ6kuPjSd+W4FTg9BKEvFT+1y27G3lOlCmPA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792758590;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=YpJoqFudutFLGEsXKoFfWlOWQ18XnvPfGoZCVowy++8=;
+	b=m2PnJ2zWRv2S6jjCyNSEkghEstBHFmMaRZjdjJ0X5kJk+fDP5ZAA9LPiCrvEfTS63N49
+	 vd1A04CHeBdw7IqAk9hQMlErzF6CvWQUY6VCSNyb9WwiPxYAVEHAc+4HtmWg4q2qu/8Ec
+	 lSYIXiC4jvsXxr5HmadezzhVcgFsvCjg2LYDvgdrFOum0dqYwliYOHte3IrsBZo0KQOuN
+	 RDCOIChGw+byt9EsRx5swECVBpt5m+O25xh87B8SqC1H6g5nvvLLoPD7oToZP4YH4W6xG
+	 /vvRlO2SSqKPktvfTdBuVeT9i9SVfRkZORPw+j4y9mvqCcIGqQnipYZm0xvJ1LqT3sg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=bxRS2WXI;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4354606A31A
-	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 12:02:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B4354606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=bjyvkKfa;
+	arc=none smtp.remote-ip=95.215.58.76
+Received: from mta1.migadu.com (out-76.mta1.migadu.com [95.215.58.76])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C25F7606A322
+	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 12:29:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C25F7606A322
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=bxRS2WXI
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DF2001691;
-	Fri, 23 Oct 2026 05:02:00 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 18F3F3F7B4;
-	Fri, 23 Oct 2026 05:02:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1792756924; bh=WhP+2ZARQeBOK940ZZV2hQ7dkuiCr9Al+UuwIs63AhY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bxRS2WXIeECIQ2k5nigxQE0z5PLaNETAUfEr+noV/i/NkRlOpHb0Vp+CcZr7aNDlk
-	 PqIv9v832Zymbd8retio17UCU2P2YlX8mZzjXQeJaNBtTGU9zSmCVpzGDPyKopTwlw
-	 hMK699uINLjrdnaCD2KwH1mEgasSdWo23WeKGCek=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 5/5] KVM: arm64: Enable HAFDBS for guests not on migration
-Date: Fri, 23 Oct 2026 13:01:57 +0100
-Message-ID: <attMtUqxNsuPooix@LeoBrasDK>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <3e464bef-8dfe-44a3-afea-3c276ae87cd8@huawei.com>
-References: <20260901171558.2674031-1-leo.bras@arm.com> <20260901171558.2674031-6-leo.bras@arm.com> <aqneWnlsdpocLIl6@kernel.org> <aqqhDs3NyjtkZzXK@LeoBrasDK> <aqsl1_IqnV2r8kUL@kernel.org> <aqvt2gnlBZeNsaf4@LeoBrasDK> <as-mH36YSMxAosND@LeoBrasDK> <3e464bef-8dfe-44a3-afea-3c276ae87cd8@huawei.com>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=bjyvkKfa
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=YpJoqFudutFLGEsXKoFfWlOWQ18XnvPfGoZCVowy++8=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1792758581; v=1; x=1793363381;
+ b=bjyvkKfaNQmmaR7VbdPgJGbH4tyFQzLtGd0gCfAMvLu8phf5zLp1iP3t/ZR4R0mb/u6mOPgy
+ zDiUxCyyGmabEvkmV/Tf98c50h4ol9C3A1wtVJaa40C7p85riBAN+Yhe6Nwgv49WAFZmc0kM6Mc
+ 5vWvdmcMiy61xEFLRZ260R88=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 08d346243c6856ea;
+	Fri, 23 Oct 2026 12:29:41 +0000
+X-Mizu-Trace-ID: 08d346243c6856ea
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5be58ad9600so7887e87.0
+        for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 05:29:41 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBycWzlt/QsF6fecVyNiwEiFHkye3NpXiOJm2ig2DdX/C1Gs4YlFipRmIogFKWpico0Xj1MqdYk=@lists.linux.dev
+X-Gm-Message-State: AFq9FYIjmW64berdyRmIqLkdA1HuCDRaIDILwBSxvAcrgKY3ph68qHGJ
+	7PraG5tVaOSJkBKGhudrjohb6dLgEX+wGnim500+0pOG+A+XJNRutBHLHmgQiRccUH/12ossUfs
+	MtsMOVpGtFMqWtg3ixm8DJZ/ShxEYKCJCyVO+Uhq/
+X-Received: by 2002:a05:6512:124d:b0:5be:b32e:c309 with SMTP id
+ 2adb3069b0e04-5bfb06c344amr122219e87.13.1792758580452; Fri, 23 Oct 2026
+ 05:29:40 -0700 (PDT)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -74,112 +66,43 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+References: <20261023092007.3918848-1-vdonnefort@google.com>
+In-Reply-To: <20261023092007.3918848-1-vdonnefort@google.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Fri, 23 Oct 2026 13:29:04 +0100
+X-Gmail-Original-Message-ID: <CA+EHjTwNOJCphq8YNxK4nUZFj0Xrw31Okx1fiFAS=sHY1Z3cnA@mail.gmail.com>
+X-Gm-Features: AclHuK-K2YjKCXeXFgvD-ClRx7h0B7uTh_qx33F7Uf1HBgI4b2DbgsZxKFDYIow
+Message-ID: <CA+EHjTwNOJCphq8YNxK4nUZFj0Xrw31Okx1fiFAS=sHY1Z3cnA@mail.gmail.com>
+Subject: Re: [PATCH v1] KVM: arm64: Use the host kvm_host_data for nr_event_counters
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, 
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Oct 23, 2026 at 03:23:04PM +0800, Tian Zheng wrote:
-> 
-> 
-> On 10/14/2026 11:56 PM, Leonardo Bras wrote:
-> > On Thu, Sep 17, 2026 at 02:40:42PM +0100, Leonardo Bras wrote:
-> > > On Wed, Sep 16, 2026 at 04:27:19PM -0700, Oliver Upton wrote:
-> > > > On Wed, Sep 16, 2026 at 03:00:46PM +0100, Leonardo Bras wrote:
-> > > > > On Tue, Sep 15, 2026 at 05:10:02PM -0700, Oliver Upton wrote:
-> > > > > > Hi,
-> > > > > > 
-> > > > > > On Tue, Sep 01, 2026 at 06:15:56PM +0100, Leonardo Bras wrote:
-> > > > > > > When dirty-logging is disabled, even non-write faults make a page dirty,
-> > > > > > > which avoids a second fault when the page is actually written to.
-> > > > > > > 
-> > > > > > > On dirty-logging enable, this approach causes all (writable) pages on the
-> > > > > > > memslot to be marked clean, even if they were not written to, which can
-> > > > > > > take a lot of time, while holding the MMU lock, doing atomic writes to
-> > > > > > > PTEs.
-> > > > > > 
-> > > > > > Do you have any performance numbers for this? Enabling HAFDBS seems a
-> > > > > > bit involved to avoid some stores on the first pass.
-> > > > > 
-> > > > > Not yet, but if the idea does not look too crazy I can find hardware and
-> > > > > collect some data :)
-> > > > 
-> > > > TBH this looks like a micro-optimization so I'm not expecting the
-> > > > performance gains to justify the behavior change.
-> > > > 
-> > > 
-> > > Okay then, I will get a machine to figure the performance gains :)
-> > 
-> > Got the performance numbers here.
-> > I tested both the case where all PTEs are dirty, and the case that 50% of
-> > the PTEs are dirty.
-> > 
-> > For that test, actually patch #5 could make kvm_pgtable_stage2_wrprotect()
-> > slower, which is counter-intuitive, in all platforms tested:
-> > 
-> > When we walk the S2 pagetable to wrprotect, using the new walker, the
-> > write to the PTE itself is so cheap* that the cost of the branch
-> > misprediction (write PTE or not) for the 50/50 case is significantly higher
-> > than the cost of the 50% extra writes, which makes the 50/50 up to 60%
-> > slower than the 100% dirty case. It is still slower in the '25% dirty' as
-> > well, and starts to get even at '10% dirty'.
-> > 
-> > * (non-atomic, everything is in order, walker is small, cpu will probably
-> > bundle it all in a single cacheline write)
-> > 
-> > Since the idea of patch #5 was to reduce PTE writes in the first wrprotect
-> > walk, it becomes faster only if only a small portion (<10%) of the VM was
-> > write-faulted while the remaining was read-faulted, which seems to be a
-> > really reduced audience.
-> > 
-> > Since this comes with increased complexity, and also carry costs of
-> > having HAFDBS itself enabled outside dirty-tracking, I don't think it's a
-> > good idea to further pursue patch #5. It's only value is that it served as
-> > a base for HDBSS implementation.
-> > 
-> > Thanks for reading!
-> > Leo
-> > 
-> Hi Leo,
-> 
-> Thanks for running this, the numbers are really useful.
-> 
-> It means the hardware dirty mode (HD=1) should only be enabled while
-> dirty logging is active with HDBSS support, and stays off otherwise.
+Hi Vincent,
 
-Hi Tian,
+On Fri, 23 Oct 2026 10:20:07 +0100, Vincent Donnefort
+<vdonnefort@google.com> wrote:
+[...]
+> So kvm_init_host_debug_data() initialises nr_event_counters in the
+> hypervisor's kvm_host_data, while kvm_arm_setup_mdcr_el2() reads the
+> host copy which is 0. With a HPMN of 0, this stops programmable event
+> counters from counting a non-protected guest.
 
-Correct, it's actually counter-productive for it to stay on without HDBSS 
-before dirty-logging.
+I tested this in pKVM with a non-protected guest counting with
+perf_event_open(). On its own the patch doesn't change what the guest
+sees: every counter, the cycle counter included, still reads 0. That's
+a separate bug: flush_hyp_vcpu() never copies vcpu->arch.pmu.events to
+the hyp vCPU, so the guest's events are never enabled on entry. I'll
+send a fix for that shortly.
 
-> 
-> With HD only enabled during dirty logging, we also keep the DBM-based
-> encoding for the HD=0 case. On systems that support FEAT_HAFDBS, DBM
-> remains the write bit and S2AP[1] the dirty bit even with HD=0. This
-> works because kvm_s2_fault_compute_prot() maps any writable page of a
-> non-tracked memslot writable-dirty (WD), including on read faults:
-> 
-> ```c
-> if (s2vi->map_writable) {
->         *prot |= KVM_PGTABLE_PROT_W;
-> 
->         if (s2vi->device ||
->             !memslot_is_logging(s2fd->memslot) ||
->             kvm_is_write_fault(s2fd->vcpu))
->                 *prot |= KVM_PGTABLE_PROT_DIRTY;
-> }
-> ```
-> 
-> So there is no WC entry for hardware to promote, and HD is simply not
-> needed outside dirty logging.
-> 
-> In the next HDBSS version, we'll only turn on HD=1 when dirty logging
-> is active.
-> 
+With that fix applied, the cycle counter counts without your patch but
+a programmable counter still reads 0, and with your patch both count.
 
-Right! 
-I will also send a new version of the pre-patch (4 patches) for us to 
-discuss. The first 2 patches will change meaning a bit, but should still 
-work as they do today.
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
 
-Thanks!
-Leo
+Cheers,
+/fuad
