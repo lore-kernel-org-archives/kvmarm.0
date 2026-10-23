@@ -1,57 +1,58 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792759068;
-	b=Lz8DAhYBffWZpHSRr8yO8bzWGWYVPYDxTu2qZKHaob4NzSYPm+2hONSf87Zphs6VN8Rx
-	 ULnT8XAFVhWF48zYfORohBhGu6Sdo7mSCN05POTHBHLYNPVSIfM/484CYUJwpQnJM7+k8
-	 PhlMhPCpyIa+1DsfkGd8M16lmEBZPlOZGCPrAVjOFLF0GKLrXOQE8G2rolrNy9DqSeQ4a
-	 9tCH1tXvPE+BqG4eYq28kMIPEgh3CXOL0+gnIsaCqaDsasCeHn8MiBTT7XQ8wDy6B/5V4
-	 fTLxUoboVEh98E6vnNQ40KTWvqQenmXZYgHxQu8Gwq6MrGRlABv+lz2/7EcNgLvZvtA==
+	t=1792759418;
+	b=np86mtdA5H1nOrDI6Hpw3b4gdHdMni9p33qE7I7QujSAQhgPzwZcmLfNo2mUOGbXRPBA
+	 OOqz4pNDL/ZA3l72u2HE/hAiV2NdcpETotdge7uCEWCqmJ9UP2pTXr//pvINuVOPD88Va
+	 0DDoglTHZ/7mBNZ2BcIJpI7RqQz9z7WIduywx8li7GfSnsWMLmwCezqyXEvBeLFrT7wLZ
+	 foUUzDymGYE2VoIC1tnp8tkVX0zYV8etnUZczbNEpaWq/4Q+VHYTju2s1O5BUmOc79e/2
+	 hA6ZFEx3VRam56buT48tN8CxVMSpgC9nkwLse/34TO8zWM51igj9Ob9lRlRLlfi/p2w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792759068;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792759418;
 	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
 	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
 	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
 	 X-SA-Exim-Scanned;
-	bh=lklnJv3m9wn+sUjSz23qr/7on9I1vjJJc+u4N9JuGRI=;
-	b=0v511WlZPljwzsBUZqMYKnfRRdDvRuGUMOtGv05swn0X/RMZ/piQfgiRbxhJoDYAXU48
-	 5oQyCE1uOiVqaNnzF5DxMkK84WBqVvvRXVIMgmhNF8L2YnRD/A38sb5NkoHHyHI/JzDj7
-	 gEKDB5O2p+gFzT8ohwqIl7lI6bum3zu7Q03N17KjPV8x0Bf2DLdvG7e/QaAPDACGozbmS
-	 Iu1wAuBIRakYxnOXzzAXVW17EFO4luLRAL+t5u0y88TQi1YPF/SXubZSbCZvkyRc62Z6D
-	 x+EAxM3la7+pEH7xvfeiAP68fmz/6W3nJuhHwEBkRhzow2Z/wcqT4rLSjcWY+Jo1FYQ==
+	bh=IiTpUVrPsntr4c3s5eLquFzntS/9A4Vem272aEb4epg=;
+	b=tEb+OIrEOQHpNn/+w3I1F4V+zwz+rc048RpHcjfxUNmXEHHnNwQUb97mKLbw3s/S0pIR
+	 BlY0xuCDPxsDCzIC4ZBXsyesFz6aAkRXpwNpjLL5LDiY1HzSJXr/lfVzSMQTOtwyKYO7A
+	 xiM1O/Z4nOw9D/Voq8XP5nLQquy6GFFlvSZFyggMK7BisEkLNeXu5YC7oU696AJfzA9Jc
+	 u53ghazST/tJk0csdMRItBO3rnMd++QBTjqd2vh3ApxPvkgrRdX5Mqt3hfSyJjhz6e+TA
+	 viuzAf0bJwf/rHwYDuso8SjZ6fex2hYJ+AY+ZIImweOCxOrqaXsb98S0ctrPXDdft3Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PysySQZP;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IIY7U003;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4B1606A320
-	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 12:37:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 956E0606A31A
+	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 12:43:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PysySQZP
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD98F1F031E2;
-	Fri, 23 Oct 2026 12:37:47 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IIY7U003
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C1A41F01825;
+	Fri, 23 Oct 2026 12:43:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792759067;
-	bh=lklnJv3m9wn+sUjSz23qr/7on9I1vjJJc+u4N9JuGRI=;
+	s=k20260515; t=1792759418;
+	bh=IiTpUVrPsntr4c3s5eLquFzntS/9A4Vem272aEb4epg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=PysySQZPwCVNFDM2IcfoYZwVzRdSOwHFlrDmK+bSa/LMAUCkzMyYw0Gz9WOmiUTQ0
-	 IOVy9Nmhim/H4DCjm5y2RPYdkAhH4yMG8DESjVZmX3XF5DfgdhNYcIJiTVw7coos8+
-	 SqLEuw8h9v4uwLTb0N6Sze0t3B/BK8ARG3TgLlWuckOP2NteVuyg5f3VVdPpmqQO3Y
-	 BOKSkRXDMv7DUsC3FyPW+yfkHFL2CmuTteF8RnmxNna3snr82zUBzN8EMmuKECWcHh
-	 IYkWZzqWfpUNYGkfQO+aiizlD8clAWlgQWJCyLGhmT04qJ8UYeBG31iMAbnBZ3hUrw
-	 A8ap4Vora6qJg==
+	b=IIY7U0035cGKpwVJ+pBrPs2u6Tw6wEVwqyum5wukse9tTNz3LN4YkwZS+5Ggc7v+q
+	 rMeae4XbHcm4NT6xeu4pli4//Qcs4LisdYWIxlS/Lp0SGEf0CJczXvWV9Hz8eYn9u5
+	 op8n1WwXJay1BWQ3h3WmUjaGjpgd8/9sR4wNtEnFrrcD9HdF5BJ32uH17mp4bXFLWT
+	 kcOCNdEY9wYWIfF5j7pwv8Ug5mG4+sq3+YFTPMCMc2PJKqriWVUNzLT+5qPYkhrq5P
+	 wYzgcVCS+Gb7jJwTmxNDLVnbyS+4tYvWlWuSJ83QiP0BxEFIEoavXeJwdwgMScZaiE
+	 G4u7yEfP4z4pQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1xKEWn-00000006SOz-30jJ;
-	Fri, 23 Oct 2026 12:37:45 +0000
-Date: Fri, 23 Oct 2026 13:37:45 +0100
-Message-ID: <86cxt0zj6u.wl-maz@kernel.org>
+	id 1xKEcR-00000006SWT-47JU;
+	Fri, 23 Oct 2026 12:43:36 +0000
+Date: Fri, 23 Oct 2026 13:43:35 +0100
+Message-ID: <86bj8kzix4.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: oupton@kernel.org,
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Vincent Donnefort <vdonnefort@google.com>,
+	oupton@kernel.org,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	joey.gouly@arm.com,
@@ -60,11 +61,11 @@ Cc: oupton@kernel.org,
 	yuzenghui@huawei.com,
 	catalin.marinas@arm.com,
 	will@kernel.org,
-	kernel-team@android.com,
-	fuad.tabba@linux.dev
+	kernel-team@android.com
 Subject: Re: [PATCH v1] KVM: arm64: Use the host kvm_host_data for nr_event_counters
-In-Reply-To: <20261023092007.3918848-1-vdonnefort@google.com>
+In-Reply-To: <CA+EHjTwNOJCphq8YNxK4nUZFj0Xrw31Okx1fiFAS=sHY1Z3cnA@mail.gmail.com>
 References: <20261023092007.3918848-1-vdonnefort@google.com>
+	<CA+EHjTwNOJCphq8YNxK4nUZFj0Xrw31Okx1fiFAS=sHY1Z3cnA@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -79,65 +80,37 @@ Precedence: list
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vdonnefort@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, fuad.tabba@linux.dev
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, vdonnefort@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 23 Oct 2026 10:20:07 +0100,
-Vincent Donnefort <vdonnefort@google.com> wrote:
+On Fri, 23 Oct 2026 13:29:04 +0100,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> nr_event_counters is only used by the host to populate mdcr_el2.
-> However, host_data_ptr() for pKVM switches between the hypervisor copy
-> of kvm_host_data before it is deprivileged to the host copy after.
+> Hi Vincent,
 > 
-> So kvm_init_host_debug_data() initialises nr_event_counters in the
-> hypervisor's kvm_host_data, while kvm_arm_setup_mdcr_el2() reads the
-> host copy which is 0. With a HPMN of 0, this stops programmable event
-> counters from counting a non-protected guest.
+> On Fri, 23 Oct 2026 10:20:07 +0100, Vincent Donnefort
+> <vdonnefort@google.com> wrote:
+> [...]
+> > So kvm_init_host_debug_data() initialises nr_event_counters in the
+> > hypervisor's kvm_host_data, while kvm_arm_setup_mdcr_el2() reads the
+> > host copy which is 0. With a HPMN of 0, this stops programmable event
+> > counters from counting a non-protected guest.
 > 
-> Always use the host copy for nr_event_counters.
-> 
-> Fixes: 2417218f2f23 ("KVM: arm64: Get rid of __kvm_get_mdcr_el2() and related warts")
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> ---
->  arch/arm64/kvm/debug.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index f4d7b12045e8..a00771339c62 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
-> @@ -44,7 +44,7 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
->  	 * to disable guest access to the profiling and trace buffers
->  	 */
->  	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN,
-> -					 *host_data_ptr(nr_event_counters));
-> +					 __this_cpu_read(kvm_host_data.nr_event_counters));
->  	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
->  				MDCR_EL2_TPMS |
->  				MDCR_EL2_TTRF |
-> @@ -80,8 +80,8 @@ void kvm_init_host_debug_data(void)
->  								   ID_AA64DFR0_EL1_PMUVer_SHIFT);
->  
->  	if (pmuv3_implemented(pmuver))
-> -		*host_data_ptr(nr_event_counters) = FIELD_GET(ARMV8_PMU_PMCR_N,
-> -							      read_sysreg(pmcr_el0));
-> +		__this_cpu_write(kvm_host_data.nr_event_counters,
-> +				 FIELD_GET(ARMV8_PMU_PMCR_N, read_sysreg(pmcr_el0)));
->  
->  	*host_data_ptr(debug_brps) = SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, dfr0);
->  	*host_data_ptr(debug_wrps) = SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, dfr0);
-> 
+> I tested this in pKVM with a non-protected guest counting with
+> perf_event_open(). On its own the patch doesn't change what the guest
+> sees: every counter, the cycle counter included, still reads 0. That's
+> a separate bug: flush_hyp_vcpu() never copies vcpu->arch.pmu.events to
+> the hyp vCPU, so the guest's events are never enabled on entry. I'll
+> send a fix for that shortly.
 
-This really looks like the wrong approach.
+Please synchronise with Vincent and sent this as a series fixing PMU
+handling on pKVM, not as discrete patches.
 
-host_data_ptr() should be reliable, and always point at the correct
-data, irrespective of the backend. If host_data_ptr() returns a
-pointer to stale data on pKVM, then it is purely a pKVM bug, and
-that's what needs fixing by synchronising the two copies by whatever
-means necessary.
+The approach taken for this patch is wrong anyway, so you have plenty
+of opportunity to work together.
 
-Randomly picking a different accessor is not an acceptable outcome.
+Thanks,
 
 	M.
 
