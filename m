@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1792789041;
-	b=RtIvJokeb/1tlGxmWnDlBWO2mCCTsa00WuUZVMaXCck7/C3Wc44o9K9uCJKxKEMCxYEL
-	 +AKM3VZ5geJlOBr+AxQGMeIize7FpBnrTXGl4FIvrvwA41mwDDT/sm/y/0XFC9L4xkGhU
-	 KqJKAP4CyK5U2n/vXCZMD7YGG/yoK9PFnKSXn9jbhdPZwt7W/BYr/X+CQzTCmVGuBLzHO
-	 bVBJ4NBmx0Dz76v7cHiEQuPVxDmHknjqttayQd9b+WoiuB/oiSfo7c5OaatSPzXl3dIOI
-	 9dy7Mo9YrOX5J/PYKjKgjLa0SkX2UBfawJa46zJNjqRi8j+RMc5hcSuO5SSNTfLjkOQ==
+	b=NZjYOYrkauiHnjo/rVmwLEN8YNh9uBl+pmem9fgzyqtqpaoh2DGtPvpa0EvHm8J6ojRY
+	 rV8do+rDpq4VBIGZ719XlCPeZ+dQH+TAl9Cam02It3UW3mbZLUUPt2+VX42sne6sql7lK
+	 eDIZurxZCkNt3D4VoYaRxNN2ZNbiWgaV2nWQFy5FV4Yw55a1JcfTp1Nz85/tY4AvThSQJ
+	 aOuAsPzhHh5S9Vhq/IkeLGvzRynmydAntSJwYyrac0v/3DXUCmw/+oYEHS26VgdrwDyvC
+	 y54RJKuiNuZ5EKGDArbkGppSWv18dkeoEmeCOH6WhSsZz1SzqYyS/W56ZenPGJvV7RQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1792789041;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=0IdhmF99LDl77/hLE03LlaYclWDXFfvPTPVFK1qF/Ls=;
-	b=EywnuwyDxfjycN+DAsDOwdU8nBi3blHm1YARyVKN3E4H5lqsYhBSuzLWHoPu4DGqrIqR
-	 fx3h7We411dxPb2m0NnVntn0AP6RShQDEa2yjs5uEbPWGolJpSwiJbzCOkqE1Z48zJUcw
-	 +u9JxevoIAAKuAR3kVUMAFnEI/C98ct/+EtZ9oXdUbGrxKwiA1KEXWxwrmIwmAHYplk21
-	 z3Cz+RjQd3KChAfj5ScNPOodsvboHXMlejB841U/2Nli+EXu9TNFD8Kw7kefCLv52uoLv
-	 2/KUcKUfPKkfYlvikoD3i7HAQn+1lHbYkA5W5j/Obc1I8Gv2E/Vq1zDahk10O9nCOWw==
+	bh=xhgZHoVfKBPNRATxJ5oMiRmhlFrIVbhzGnpHflUS5EA=;
+	b=5PuECY/ZF2RNaMZyzJNZkZ4CkuxQ7hOm4bvQJ5kw8vHkGFDoM9Lm1apcBYcdwHxVlwfh
+	 o02hznJYZermSrOyu2Bum3Apj/fivl6tZTGIY9gDkr82/pGVbSl6jqfzqiq4xippRuimP
+	 zzz6VcdGucBZm//QuQkxYoATczHAG8Lst1NFqWs+IwI2xN/dVshrWx5bJrUYr1DmOritz
+	 GQ/2YA3DURGq6RAVWXXQEzBQrr1LDt5/EfPU1/9SZ6FADHgUHNVz+Si556ZOcok/aw8wd
+	 PzfvVTn7QMZoF76pA9DOyWtyB0sZ0UQ4rnb6OUHRfkRUNZne15O3OQl3p15JeqKyyAg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EXQohEER;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eAeCzVAh;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D9FB606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA58606A31B
 	for <kvmarm@lists.linux.dev>; Fri, 23 Oct 2026 20:57:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EXQohEER
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEE641F01825;
-	Fri, 23 Oct 2026 20:57:20 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eAeCzVAh
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DB7D1F031E0;
+	Fri, 23 Oct 2026 20:57:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1792789041;
-	bh=0IdhmF99LDl77/hLE03LlaYclWDXFfvPTPVFK1qF/Ls=;
+	bh=xhgZHoVfKBPNRATxJ5oMiRmhlFrIVbhzGnpHflUS5EA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=EXQohEER0xpnibfQUn8O1Dh6PT9A11oJdnPncaQ8+1bq22NYRJ4qthgxT0sb4dAIQ
-	 ybl3LDbFGQpg+aU+5ZJAsXP2kE4h2dwhutFtRRjN16AbwS5in4M8xjyiE9+wbeZzOr
-	 aoyFqo8gpBDJ0S0OlrJ/xzW7BLcGEusmP07lSfocvh4RFlgXY+oCHrk53Icxbjlmcb
-	 g8tvUXsAFP6/IfmHs1z3h6e3SVEJjXEkMFIMKpLMDTtFb5Qc81knXEhcKQwpFK9GVG
-	 +VhVy8Oa41h0KtuW2UKZ9wgG0+waNKcu+PXB/AKHlK46QejJHekXCaVabxsk62PJqj
-	 8+d4svOQ9WdKA==
+	b=eAeCzVAh6njwHlmPUlgy+qNwGNf8Z2riHicE8pzIyP6kobMJajwQ5kluLE+xluM7g
+	 rAtxe2V7emuat2iml9rq/TWZh81m+4a7d3g4WC2BlSLKWeI5SkFPF/xFx1fu/oTIrT
+	 qAB6/Xp2yFkBi+gxoCUAXrhtzIMDMe97uzG9ghcsbBlwWojVW18zkTVy1Z8wUN1GJo
+	 DlTx6+6WeeOULdoZveaK5qMODpmmuyI5qfe6eqwcGuilulqBK1IDB7FnLX1TOTZ2RI
+	 NABGDMi1Yn3IzY/0Ad2BkjELD8/A0PoC9l1s366t68Dr6JvyvEwIvWMVzBsNPTK0Gu
+	 MmH5EmF0UOdpQ==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -50,9 +50,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Fuad Tabba <fuad.tabba@linux.dev>,
 	Leonardo Bras <leo.bras@arm.com>,
 	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH v2 20/28] KVM: arm64: Reject non-coherent DMA when using forced writeback
-Date: Fri, 23 Oct 2026 13:56:02 -0700
-Message-ID: <20261023205610.1044532-21-oupton@kernel.org>
+Subject: [PATCH v2 21/28] KVM: arm64: nv: Expose FEAT_HAFDBS
+Date: Fri, 23 Oct 2026 13:56:03 -0700
+Message-ID: <20261023205610.1044532-22-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261023205610.1044532-1-oupton@kernel.org>
 References: <20261023205610.1044532-1-oupton@kernel.org>
@@ -67,60 +67,33 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Assigning non-coherent devices to a KVM guest subject to forced
-writeback is broken. DMA through cacheable aliases and CMOs work, but
-using non-cacheable aliases for buffers on the CPU does not due to the
-implicit promotion to Normal writeback.
+Everything is in place now to support hardware dirty state management.
+Flip the corresponding bit and advertise the feature to the guest.
 
-Non-coherent DMA is fundamentally incompatible with the direction of
-travel on KVM/arm64. Draw the line in the sand and bug the VM if FWB is
-in use. Users can use the newly-added kernel commandline to fall back to
-a non-FWB configuration that *actually works*.
-
+Reviewed-by: Leonardo Bras <leo.bras@arm.com>
 Signed-off-by: Oliver Upton <oupton@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  2 ++
- arch/arm64/kvm/arm.c              | 14 ++++++++++++++
- 2 files changed, 16 insertions(+)
+ arch/arm64/kvm/nested.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 1c6632216e32..5672721416a4 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1565,6 +1565,8 @@ struct kvm *kvm_arch_alloc_vm(void);
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 46fcc75f4c20..eb20409a14b1 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -2040,7 +2040,12 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
+ 		if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features))
+ 			val &= ~ID_AA64MMFR1_EL1_VH;
  
- #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+-		val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR1_EL1, HAFDBS, AF);
++		/* FEAT_S2FWB implies IDC */
++		if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB) &&
++		    cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
++			val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR1_EL1, HAFDBS, DBM);
++		else
++			val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR1_EL1, HAFDBS, AF);
+ 		break;
  
-+#define __KVM_HAVE_ARCH_NONCOHERENT_DMA
-+
- #ifdef __KVM_NVHE_HYPERVISOR__
- 
- #define kvm_vm_is_protected(kvm)			\
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index d593ba928093..f08a450184d9 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -133,6 +133,20 @@ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
- 	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
- }
- 
-+void kvm_arch_register_noncoherent_dma(struct kvm *kvm)
-+{
-+	if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
-+		return;
-+
-+	pr_err_once("kvm: noncoherent DMA unsupported with FWB, see kvm_arm.nofwb\n");
-+	kvm_vm_bugged(kvm);
-+}
-+
-+void kvm_arch_unregister_noncoherent_dma(struct kvm *kvm)
-+{
-+
-+}
-+
- int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 			    struct kvm_enable_cap *cap)
- {
+ 	case SYS_ID_AA64MMFR2_EL1:
 -- 
 2.47.3
 
