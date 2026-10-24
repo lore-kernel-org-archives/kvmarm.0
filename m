@@ -1,79 +1,67 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792844266;
-	b=cbhPT2alpcgetaKOzGL7Vrzx5lgtCLePlGnNO5zNgPILlqv6Uv6Hi+EmabdpcyF3fDZy
-	 d8oVBguAxkTxQAUrQb2AyRtnQb6OdIcaZ1tBmWFMphxt3/Kep8MJN1RiuYnxMXiEgtSWK
-	 /uG516/BBoudimZpzhcLY1NdALYpuNcUQ8SS2Fd9dBKNk1hRCMI2tzuzyP4ygxG9/j0g7
-	 TLQYwOQI5QVFM8Ql6Lj3AKf74MyGQUfv6jRrwerWzy4jvncPXHkwHpw4CEQ4QaiqW3IN2
-	 NUitFCPANe9u6XPD5ieBAY8J89aOZ3WLHRqnxuh6utboq9iQJHhEC/seUJa03fKI5RA==
+	t=1792858282;
+	b=h6yKQKnhZsf7GoQ69RPeOcksErL4oMDgcvQE6DXmcrwxGHf8Bl0H8JqzuM2BvHJ3y+YW
+	 ukqk+6HsRaqvl3hUvSk40qT+3BiV+kOVFuYl/x5aAsCsuRuH8xGC5X7lzQKt+Ft4KftTc
+	 eDWq47E7BqaJ0qfIcWzntloVcHi4lql0Ul+C85HlsxluHgNi2kqsdmKYhuhjQh+YdrZTO
+	 q5i/8eE6RozJ2JKDKIid4/GEj9c7/iEWjZONGqenWH8PiuCE5RdptAyKrIGWBxg1VmXSl
+	 1m/4qmFc69m7AxSJtYcfj53UwaEVWIba1+gWRltS7+dJqvd331z9RmFz+w7vCbE8o/A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792844266;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=R+Kivv+zlEGPU+9SEUXQD6rceDKEZP4lAk4GmwDpTwk=;
-	b=M/SDOipRVANESD/wWmifyi/KfzwitLoRBJGDGI3+p457tdBNr08jJVy+fYDZMqrmfCfF
-	 c8Dzx1h0wjdRgiZHoOhTG79I57N/gg4I9W8OAPuWhUI1DQPIDwdZSRc1Smhq0kYDJhJCy
-	 YagPZLMyb9RJ3WN3yJ8BZs4ggIvaFXv4VG17UbAVrRCYuzxOsct2ph5t6JaQZuP21B9/z
-	 LZ+DdMeX4bsDtH3MP1wvhK44TXWCq8wunK/i7JwYloBPCB9AFDnN8Kj/wyQvUoEaD91qn
-	 4vi4YPWzbgLxksS2iP3P1rRixVAd1ilMd/X26jNVBexJE3cC5eeXVPnrD1znvc6wXfA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792858282;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=W27aSalgzv2Xbhoow/lwveUu1WS93+h0c2znFzv+Gb4=;
+	b=lDm7yuAScq3tLVpfChm4mpjomuw6iqnFee0toXXsEfIYEv1y/0AUhCZPuyil4AFeBbYF
+	 9esSrNo+aFP5gdZSmo96xSaZBqzM55dmMkmg3cDZjvH8PHFBFH9NYzvr3ssppJcdOIyVC
+	 a2bcaSREkXLMO0Lv2Yu977lf5Zvj4BOpW5yloXygz1O2noUxaOY655ns1bmez7CAoP++k
+	 gDcfNI5LZClgleFd6r+1WxU3k0yhsm1xTuxd7xvCIsmexjqdeihDUy35KSf1XZonUfvNx
+	 BSswecJ5HUpq2iMsBvId2wCC/k9UrutUrWcNf3ywD9vgUXmwAJvQlktwNr4LNGw+ouw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cuzqdhn0;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X2Q+YVI4;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56FE9606A31A;
-	Sat, 24 Oct 2026 12:17:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC7D606A31E;
+	Sat, 24 Oct 2026 16:11:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cuzqdhn0
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE12D1F01825;
-	Sat, 24 Oct 2026 12:17:45 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X2Q+YVI4
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA6BC1F01825;
+	Sat, 24 Oct 2026 16:11:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792844265;
-	bh=R+Kivv+zlEGPU+9SEUXQD6rceDKEZP4lAk4GmwDpTwk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=cuzqdhn04FqsErQkVJnYS7+La9ms9fOlIoOQr1y5n1F7G0rsuKDu/jFUgPLRTtMGN
-	 fouh6gEYOFgOqVQIHuT95nfLObp9mfDkaxxhZCVmO1q7iyOcnwWsSMba2XgmUzIRLw
-	 YsDuYVNuwTMTe41snOBfkhsD7io6gSIW/DU5yyNQFUy6enSUq0fMtsW8gQRlnNX22h
-	 1fQdo/RMFb4NlJ0NJxJFLhkf+51lUh8nng7d1WZq6MnvUwIejUdcBBYoKfu8vedVY7
-	 UpR0Z0D0EKn3Q993vDnoUOWHYEYzYQBJqcmcRvGUeIXrtz0ITCbQDCCwbnMUrH09wO
-	 cd3hPQbNtKazw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xKagx-00000006kav-2zdA;
-	Sat, 24 Oct 2026 12:17:43 +0000
-Date: Sat, 24 Oct 2026 13:21:00 +0100
-Message-ID: <87se1v8f2r.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Amir Noohi <amirmnoohi@gmail.com>
-Cc: Thomas Gleixner <tglx@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Radu Rendec <radu@rendec.net>,
-	Igor Velkov <iav@iav.lv>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
+	s=k20260515; t=1792858281;
+	bh=W27aSalgzv2Xbhoow/lwveUu1WS93+h0c2znFzv+Gb4=;
+	h=From:To:Cc:Subject:Date;
+	b=X2Q+YVI4JJRsEhbQrDjwlDFBW1bkYeTfu/NVkgbhJQosNuEypKZGkOILmN4DthdpU
+	 a3kSC4CnRyy5nN+5jfVJz41vPvG+dT6kP8mgSUPKgwb8cbE7xy2KKYj08Vm5/VC74W
+	 wA0ChyCgi01R2pmgS1rKMS7h2P8QISkKN503K3nNbXBSXrQspvLjVPEsSwMR/y6lhM
+	 XOrpsP2NLCJZfh4X7yGbhr13dUhSA0bfC2izzxeFrFfcvmvJ+JdlGhBkGpxRPpwQ4s
+	 rnOnK451RgnTRfzf06YzPhkq5uQrEcBKD5B844ux7BDfWjWdJaDz9LGbIX8wZMX/Sn
+	 Lj7xBvatHsN1Q==
+From: Sasha Levin <sashal@kernel.org>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>,
+	Mark Brown <broonie@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Christoffer Dall <cdall@linaro.org>,
-	kvmarm@lists.linux.dev,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Lorenzo Stoakes (ARM)" <ljs@kernel.org>,
+	Itaru Kitayama <itaru.kitayama@fujitsu.com>,
 	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] genirq/manage: Provide irq_set_percpu_irqchip_state()
-In-Reply-To: <20261024022450.629980-2-amirmnoohi@gmail.com>
-References: <20261024022450.629980-1-amirmnoohi@gmail.com>
-	<20261024022450.629980-2-amirmnoohi@gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Subject: [PATCH] KVM: arm64: selftests: Skip ignored AArch32 ID regs in the failed-run test
+Date: Sat, 24 Oct 2026 12:11:18 -0400
+Message-ID: <20261024161118.1007472-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -82,124 +70,93 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: amirmnoohi@gmail.com, tglx@kernel.org, oupton@kernel.org, radu@rendec.net, iav@iav.lv, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, cdall@linaro.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Sat, 24 Oct 2026 03:24:49 +0100,
-Amir Noohi <amirmnoohi@gmail.com> wrote:
-> 
-> irq_set_irqchip_state() acquires the bus lock and the descriptor lock of
-> the interrupt. A per CPU devid interrupt has a single descriptor for all
-> CPUs, while its irqchip state is per CPU, e.g. each GICv3 redistributor
-> holds the active and pending state of the PPIs of its own CPU and GICv5
-> keeps that state in per CPU system registers. Callers which modify that
-> state have to be pinned to the CPU anyway, so the descriptor lock only
-> serializes CPUs which update their own private state.
-> 
-> KVM on arm64 sets the active state of the host timer interrupts on every
-> vCPU load, i.e. on every KVM_RUN ioctl and every time a vCPU thread is
-> scheduled in. When many CPUs load vCPUs at the same time, they all spin
-> on the descriptor lock of the same interrupt, even when every vCPU has
-> a physical CPU of its own. A global serialization point on the same path
-> was removed before in commit 64b6d1d7a845 ("genirq: Get rid of global
-> lock in irq_do_set_affinity()").
-> 
-> Provide irq_set_percpu_irqchip_state(), which sets the irqchip state of
-> a per CPU devid interrupt on the calling CPU without acquiring the
-> descriptor lock. The irqchip callback is still invoked with interrupts
-> disabled. The caller has to have preemption disabled and has to ensure
-> that the interrupt is neither freed nor reconfigured concurrently, which
-> is the case for an interrupt it has requested. Interrupt chips which
-> require a bus lock are rejected, as the bus lock may sleep and cannot be
-> taken with preemption disabled.
-> 
-> The function is not exported as its only user, KVM on arm64, cannot be
-> built as a module.
-> 
-> Signed-off-by: Amir Noohi <amirmnoohi@gmail.com>
-> ---
->  include/linux/interrupt.h |  2 ++
->  kernel/irq/manage.c       | 36 ++++++++++++++++++++++++++++++++++++
->  2 files changed, 38 insertions(+)
-> 
-> diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
-> index 3bf969ad8fe0..ab20129615d4 100644
-> --- a/include/linux/interrupt.h
-> +++ b/include/linux/interrupt.h
-> @@ -507,6 +507,8 @@ extern int irq_get_irqchip_state(unsigned int irq, enum irqchip_irq_state which,
->  				 bool *state);
->  extern int irq_set_irqchip_state(unsigned int irq, enum irqchip_irq_state which,
->  				 bool state);
-> +int irq_set_percpu_irqchip_state(unsigned int irq, enum irqchip_irq_state which,
-> +				 bool state);
->  
->  #ifdef CONFIG_IRQ_FORCED_THREADING
->  # ifdef CONFIG_PREEMPT_RT
-> diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
-> index bdb47837c66f..e76fe1cec9fb 100644
-> --- a/kernel/irq/manage.c
-> +++ b/kernel/irq/manage.c
-> @@ -2777,6 +2777,42 @@ int irq_set_irqchip_state(unsigned int irq, enum irqchip_irq_state which, bool v
->  }
->  EXPORT_SYMBOL_GPL(irq_set_irqchip_state);
->  
-> +/**
-> + * irq_set_percpu_irqchip_state - Set the irqchip state of a per CPU interrupt
-> + * @irq:	Linux interrupt number of a per CPU devid interrupt
-> + * @which:	State to be set (one of IRQCHIP_STATE_*)
-> + * @val:	Value corresponding to @which
-> + *
-> + * Variant of irq_set_irqchip_state() which sets the state of the calling
-> + * CPU's instance of a per CPU devid interrupt without acquiring the
-> + * interrupt descriptor lock. The descriptor and its lock are shared by all
-> + * CPUs while the state is not, so acquiring the lock only serializes CPUs
-> + * which modify their own state.
-> + *
-> + * Must be called with preemption disabled on an interrupt which has been
-> + * requested, so that the interrupt chip hierarchy cannot change
-> + * concurrently. Interrupt chips which require a bus lock are not supported.
-> + *
-> + * Return: 0 on success, a negative error code otherwise.
-> + */
-> +int irq_set_percpu_irqchip_state(unsigned int irq, enum irqchip_irq_state which, bool val)
-> +{
-> +	struct irq_desc *desc = irq_to_desc(irq);
-> +	struct irq_chip *chip;
-> +
-> +	lockdep_assert_preemption_disabled();
-> +
-> +	if (WARN_ON_ONCE(!desc || !irq_settings_is_per_cpu_devid(desc)))
-> +		return -EINVAL;
-> +
-> +	chip = irq_desc_get_chip(desc);
-> +	if (WARN_ON_ONCE(chip->irq_bus_lock || chip->irq_bus_sync_unlock))
-> +		return -EINVAL;
-> +
-> +	guard(irqsave)();
-> +	return __irq_set_irqchip_state(desc, which, val);
-> +}
-> +
->  /**
->   * irq_has_action - Check whether an interrupt is requested
->   * @irq:	The linux irq number
+test_idreg_frozen_after_failed_run() checks that changing a feature ID
+register after a failed first KVM_RUN is rejected with -EBUSY, and does
+so for every register in test_regs.
 
-It really feels like a leap of faith.
+On a host without AArch32 support at EL0, KVM treats the AArch32 ID
+registers as RAZ/WI: aa32_id_visibility() returns REG_RAZ | REG_USER_WI,
+and kvm_sys_reg_set_user() ignores the write and returns 0 before
+set_id_reg() checks whether the ID registers are final. The test then
+fails on the first such register:
 
-There is nothing that says that it is safe to call this without
-holding the global lock. For all we know, drivers have been relying on
-it for a good decade, and I don't feel confident letting things rip
-just because it (mostly) works with the GIC.
+  arm64/set_id_regs.c:870: r < 0 && errno == EBUSY
+  ID_DFR0_EL1_PerfMon write after failed first run: r=0 errno=16
 
-At the very least, something exposed by the irqchip (a per-IRQ flag?)
-should tell you whether it is safe to elide the lock.
+KernelCI hits this on every run on an AArch64 only GB300 host.
 
-Thanks,
+An ignored write leaves the register unchanged, so the ID registers are
+still immutable and only the test's expectation is wrong. Skip the
+AArch32 ID registers that KVM_ARM_GET_REG_WRITABLE_MASKS reports as not
+writable for this VM, which is decided by the same
+kvm_supports_32bit_el0() check as the write path. The aarch64_only flag
+that test_vm_ftr_id_regs() uses is not a good fit here, as it comes from
+the EL0 field of another VM's vCPU, which reads as AArch64 only whenever
+that vCPU has EL2 enabled, even on hosts that support AArch32.
 
-	M.
+Fixes: 00e309933879 ("KVM: arm64: selftests: Check ID regs are immutable after a failed run")
+Link: https://d.kernelci.org/test/maestro:6adcad0c55fda50760800a00
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
 
+Tested on an AArch64 only GB300 (Neoverse V2) running KernelCI's arm64
+build of mainline 5b0764a53235: set_id_regs fails as above without this
+change and passes with it (104 pass, 4 skip, 0 fail) in three runs.
+
+This does not change the AArch32 ID register readback issue under nested
+virtualization that Itaru reported:
+https://lore.kernel.org/all/as8x38o9taXgKZym@sm-arm-grace07/
+
+ .../testing/selftests/kvm/arm64/set_id_regs.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+index 10849d21c0dd2..c8c9aaf9d7e86 100644
+--- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
++++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+@@ -815,6 +815,10 @@ static void test_idreg_frozen_after_failed_run(void)
+ 		SYS_REVIDR_EL1,
+ 		SYS_AIDR_EL1,
+ 	};
++	u64 masks[KVM_ARM_FEATURE_ID_RANGE_SIZE];
++	struct reg_mask_range range = {
++		.addr = (__u64)masks,
++	};
+ 	struct kvm_vcpu_init init;
+ 	struct kvm_vcpu *vcpu;
+ 	struct kvm_vm *vm;
+@@ -831,6 +835,7 @@ static void test_idreg_frozen_after_failed_run(void)
+ 
+ 	vm = vm_create(1);
+ 	vm_enable_cap(vm, KVM_CAP_ARM_WRITABLE_IMP_ID_REGS, 0);
++	vm_ioctl(vm, KVM_ARM_GET_REG_WRITABLE_MASKS, &range);
+ 	kvm_get_default_vcpu_target(vm, &init);
+ 	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
+ 	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
+@@ -852,8 +857,18 @@ static void test_idreg_frozen_after_failed_run(void)
+ 	 */
+ 	for (int i = 0; i < ARRAY_SIZE(test_regs); i++) {
+ 		const struct reg_ftr_bits *ftr_bits = test_regs[i].ftr_bits;
+-		u64 reg = KVM_ARM64_SYS_REG(test_regs[i].reg);
+-		u64 val = vcpu_get_reg(vcpu, reg);
++		u32 reg_id = test_regs[i].reg;
++		u64 reg = KVM_ARM64_SYS_REG(reg_id);
++		u64 val;
++
++		/*
++		 * KVM ignores writes to the AArch32 ID registers when it can't
++		 * expose AArch32 EL0, and reports them as not writable.
++		 */
++		if (sys_reg_CRm(reg_id) < 4 && !masks[encoding_to_range_idx(reg_id)])
++			continue;
++
++		val = vcpu_get_reg(vcpu, reg);
+ 
+ 		for (int j = 0; ftr_bits[j].type != FTR_END; j++) {
+ 			u64 ftr = (val & ftr_bits[j].mask) >> ftr_bits[j].shift;
 -- 
-Jazz isn't dead. It just smells funny.
+2.53.0
+
