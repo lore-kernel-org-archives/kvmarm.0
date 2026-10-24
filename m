@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792823066;
-	b=JXkWb2uInOUmw+a7QRcqluOI66TfLuAjlGql0QbV948f52/Lpf1dK1RvwUA1M3izZ0xF
-	 9IhGE/pIU5AuLgwzdo7F47NH9ujK0LOjSevXVoOWA4KFlkdbrmJOj725luGDeevki4htR
-	 pyNM0jfYRDf1ksiVjyL+RJlfmIlvygCiaJJEv7XwPC9Bo5/Hg07EDsKnpJtTsnOwdjZfw
-	 zFt+FJJklpiD/y053utw9m2bGJ4fbDvXRk+cjQ6JEwvumXjVBmR3KS+AK1qynfJh2B4zH
-	 HFmvOpHAE4wsXO0Z2JdC/idTXSC0qLSBFoeaTXZQT0vdrQzgJoOP6MSqk5MGQzExHjA==
+	t=1792823221;
+	b=s9vmkyiWeTK3r6LgrvPjyiLuD/rrA5tgpnF5XSsqIcrj0ozAdvjHPAqXRajsGJoaEzuQ
+	 Qda4WtHaz3JN6sIM9oWSnG/+XW4krBFV49WNfEnTL+bNZMqtAnYG692Awqm3fMLjGBkY7
+	 3IlXfA947qFQtda70pT+RH+AakOWfoODmpbMzh4buL61Ql+ErFTbd7qmtVxg57wld7ebg
+	 bdcq7996MmNBIOqFHsKojdPR2i4o4tHtCbleqTlQqO1Z6iDH/r6JAqycjy4wYY4sNgWEL
+	 H0E+mK2Usi83XGgdS83OTEI9xvjo3YRpVIHECkDdGtiuqXDGFcY+lrrDgsf6dRFaFTg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792823066;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792823221;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:
 	 Content-Transfer-Encoding:In-Reply-To;
-	bh=rD0Dk82caeis6DFmJoJytphHVMK7ucfmFXYpBFrDjC8=;
-	b=Q3KoZGdHkpEzbbqR4qfACk9Xs1f8lRMx/6E7+vuofn7zPMshxJ1jrMeyW2RU3GNIyb+b
-	 +iV+5nOXbbiZPGk6ShXsImOXaFAP3Yl7Qxe2zBSMZ3bpikocQViHX84qu2VEE1nOw2Zun
-	 DCrZbRoxLvPNz1DybreVasIdb+KIHMXjSs0reYAHiBOz8xfPTXxvDkkBmtEQyclugAszo
-	 xdDj5qAhS6ITtFe32+OV4mGXhSAJccCjVVYOF8rTQmQ5usKxnCIM6o6BCT+GLGgKGcZD2
-	 v5mIEZm/ZZx4VOQ6keO5IfYZxlG3CUUcXsBP6mDBTY0i5v9lIg/aT3AbmaH3LEIopyw==
+	bh=+S9En87nOHBKDP9xDITQCXqiAG2G9mU536/WXxAEKjM=;
+	b=viaMKG5iWp7Pw1N1qIdi3UzBWO/O6Xw1NJOk8LTm6sKj5PX7SphBgd9VaiuonXcsU+Xg
+	 bCvk4Rv7TyIXQXSmE3CPz/FYafnBpW9K2d96zB9z/SOQwB9PKJWu162zXGFa3xPLkm1j/
+	 cTIWe698TdvMalIYVkf9mOsyM5UsZd6OXV/eRDIvUgPodBQ6KX4EIN5VSZs1J0TjSbf6H
+	 tm+thZwdUebaQhs2wbVOg8qvmMfQUD443ynnVj8XNIp/3Xfwi9FE74GujnfSIyH+CCVHH
+	 2hvnOA3hfolXPjI31TLOlKHPejp5ipd+/VdBKE4BLcP3cUlW41G/kehgJv3JqTrlSjA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=c4mKMkUv;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=g8RtePCQ;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 497AF606A31A;
-	Sat, 24 Oct 2026 06:24:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE7BB606A31E;
+	Sat, 24 Oct 2026 06:27:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=c4mKMkUv
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C768B1F01825;
-	Sat, 24 Oct 2026 06:24:25 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=g8RtePCQ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62BF81F01825;
+	Sat, 24 Oct 2026 06:27:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792823065;
-	bh=rD0Dk82caeis6DFmJoJytphHVMK7ucfmFXYpBFrDjC8=;
+	s=k20260515; t=1792823220;
+	bh=+S9En87nOHBKDP9xDITQCXqiAG2G9mU536/WXxAEKjM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=c4mKMkUvGcf/gF9xr43dWTVDZSUoEtfU7QswHU89/TQlDALjOcmHEpOIoRrXH/Nvm
-	 s0ba4l2PiNzgg+Vy9MGALhbF1GhTVHD76qJgUSBeghfQvpweNvZ9BVsXger2Dp4Vea
-	 ovPGq2ZDegarmk4GWtmD/0Itph4goRO+IljqJCSJzSmzLjlUTeZeifFVAZSycs4zQT
-	 Fn5S23UtpqQ0GqHzm+ctolams8sRpOhPLI1ufip15RgrDnN1uV81/UipPtqdxN5AAp
-	 R3yBXYo6ZMpopyxP4WSE7lCxUBIQy574RnnevQUTVOqzwMMXykMGAhpZKwAF/kNVyO
-	 ixytUshPVf8UA==
-Date: Fri, 23 Oct 2026 23:24:24 -0700
+	b=g8RtePCQu/twlD4PMNOBNLI9WPlik31a5cUdbrvT+ViOqWXKBTjEUjre7qA8f2mPo
+	 cSTEmQ0f65hGHL4Oe02XVxZ3ORUVRBHEDTBFB6KFRGYzl9oSqdfk4ewTU4incgqfPa
+	 QV1k9gq8zjJ23EfiZp/U4qAUX5D0xKN1W+NYScXCht+PQsdgM87chs5dNf6bE+GMLZ
+	 J1f6ddCLyVu2SIGLOUCHMD5KqQXp1/V+AufETHL1GOY9ca2WevP9SMWW+lJw75Z7tP
+	 zcT1mzL+dJxd40IXBP0+LuuqEpOtL/jQYMnyo/vn7//VRT51P1Q4cc3xNUtFsuSgft
+	 1s+bLqqcjOecw==
+Date: Fri, 23 Oct 2026 23:26:59 -0700
 From: Oliver Upton <oupton@kernel.org>
 To: sashiko-reviews@lists.linux.dev
 Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 22/28] KVM: arm64: Set Access flag on table
- descriptors at stage-1
-Message-ID: <atxPGA1ZQEdnV5Dj@kernel.org>
+Subject: Re: [PATCH v2 04/28] KVM: arm64: nv: Only shadow writable-dirty
+ guest descs as writable
+Message-ID: <atxPs59WnhOM1cJ9@kernel.org>
 References: <20261023205610.1044532-1-oupton@kernel.org>
- <20261023205610.1044532-23-oupton@kernel.org>
- <sashiko-outbox-183250@kernel.org>
+ <20261023205610.1044532-5-oupton@kernel.org>
+ <sashiko-outbox-183253@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -62,100 +62,58 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <sashiko-outbox-183250@kernel.org>
+In-Reply-To: <sashiko-outbox-183253@kernel.org>
 
-On Fri, Oct 23, 2026 at 09:22:33PM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Medium] KVM: arm64: missing kvm_has_tcr2() check in effective_tcr2()
-> --
-> 
-> commit bcde4120f508adf06668822f4f97b91e98f978ff
-> Author: Oliver Upton <oupton@kernel.org>
-> 
-> KVM: arm64: Set Access flag on table descriptors at stage-1
-> 
-> This commit implements FEAT_HAFT stage-1 access flag updates on table
-> descriptors during software page table walks.
-> 
-> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> > index 2ce34af3b9f20..8f1be3af64e88 100644
-> > --- a/arch/arm64/kvm/at.c
-> > +++ b/arch/arm64/kvm/at.c
-> > @@ -414,6 +414,8 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
-> >  	wi->hd &= (wi->regime == TR_EL2 ?
-> >  		  FIELD_GET(TCR_EL2_HD, tcr) :
-> >  		  FIELD_GET(TCR_HD, tcr));
-> > +	wi->haft  = kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, HAFDBS, HAFT) && wi->ha &&
-> > +		    FIELD_GET(TCR2_EL1_HAFT, effective_tcr2(vcpu, wi->regime));
+On Fri, Oct 23, 2026 at 09:25:39PM +0000, sashiko-bot@kernel.org wrote:
+> > @@ -1781,7 +1788,7 @@ int kvm_handle_vncr_abort(struct kvm_vcpu *vcpu)
+> >  		kvm_inject_nested_sync(vcpu, esr);
+> >  		break;
+> >  	case 0:
+> > -		perm = kvm_is_write_fault(vcpu) ? vt->wr.pw && vt->hpa_writable : vt->wr.pr;
+> > +		perm = kvm_is_write_fault(vcpu) ? vncr_can_map_writable(vt) : vt->wr.pr;
+> >  		if (!perm)
+> >  			handle_vncr_perm(vcpu);
+> >  		break;
 > 
 > [Severity: Medium]
-> Can this read a stale physical SYS_TCR2_EL12 register value if userspace
-> disables FEAT_TCR2 (ID_AA64MMFR3_EL1.TCRX = 0) while leaving
-> ID_AA64MMFR1_EL1.HAFDBS set to HAFT?
-> 
-> ID_AA64MMFR1_EL1 and ID_AA64MMFR3_EL1 are independently writable from
-> userspace via KVM_SET_ONE_REG and are not cross-sanitized in
-> kvm_vm_finalize_sys_regs(). When kvm_has_tcr2(vcpu->kvm) is false,
-> ctxt_has_tcrx() returns false in arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h:
+> Does handle_vncr_perm() in arch/arm64/kvm/nested.c also need to check
+> vt->wr.dirty when deciding whether to promote a write fault to an external
+> abort?
 
-Hrm, having effective_tcr2() return 0 in the case that FEAT_TCRX isn't
-implemented seems to be the best way out here.
+Yep, what we have 'works' for the direct permission model but S1PIE
+style software dirty state makes a mess of it.
 
-Unlike the enforcement we need to do for context save/restore
-dependencies, KVM emulation assumes that system registers take an
-effective value that's consistent with the feature being NI.
+> With FEAT_S1PIE enabled at guest EL2, compute_s1_indirect_permissions()
+> computes vt->wr.pw = true from PIR_EL2 and the descriptor's permission index
+> independently of BIT(7), while compute_s1_permissions() sets vt->wr.dirty =
+> false when BIT(7) is set on a writable-clean stage-1 descriptor.
+
+Hey, look at that! You got the architecture right this time.
 
 Thanks,
 Oliver
 
-> static inline bool ctxt_has_tcrx(struct kvm_cpu_context *ctxt)
-> {
-> 	struct kvm_vcpu *vcpu;
+> When a nested guest takes a VNCR write fault on such a writable-clean
+> descriptor backed by a read-only memslot or HPA (!vt->hpa_writable),
+> kvm_handle_vncr_abort() sees !vncr_can_map_writable(vt) and calls
+> handle_vncr_perm():
 > 
-> 	if (!cpus_have_final_cap(ARM64_HAS_TCR2))
-> 		return false;
-> 
-> 	vcpu = ctxt_to_vcpu(ctxt);
-> 	return kvm_has_tcr2(kern_hyp_va(vcpu->kvm));
+> arch/arm64/kvm/nested.c:handle_vncr_perm() {
+> 	...
+> 	if (kvm_is_write_fault(vcpu) && vt->wr.pw && !vt->hpa_writable)
+> 		fsc = ESR_ELx_FSC_EXTABT;
+> 	/*
+> 	 * Otherwise, inject a permission fault using the guest's translation
+> 	 * level rather than the host's.
+> 	 */
+> 	else
+> 		fsc = ESR_ELx_FSC_PERM_L(vt->wr.level);
+> 	...
 > }
 > 
-> As a result, __sysreg_restore_el1_state() and __sysreg_restore_vel2_state()
-> do not context-switch the physical SYS_TCR2_EL12 register when loading the
-> vCPU.
-> 
-> However, effective_tcr2() in arch/arm64/kvm/at.c does not check
-> kvm_has_tcr2(vcpu->kvm):
-> 
-> static u64 effective_tcr2(struct kvm_vcpu *vcpu, enum trans_regime regime)
-> {
-> 	if (regime == TR_EL10) {
-> 		if (vcpu_has_nv(vcpu) &&
-> 		    !(__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En))
-> 			return 0;
-> 
-> 		return vcpu_read_sys_reg(vcpu, TCR2_EL1);
-> 	}
-> 
-> 	return vcpu_read_sys_reg(vcpu, TCR2_EL2);
-> }
-> 
-> When setup_s1_walk() runs while SYSREGS_ON_CPU is set (for example, in
-> TR_EL2/TR_EL20 via handle_at_s1e2() -> __kvm_at_s1e2() -> handle_at_slow() ->
-> setup_s1_walk() or kvm_s2_handle_perm_fault() -> __kvm_translate_va() ->
-> setup_s1_walk(), or for a non-NV guest in TR_EL10 via kvm_inject_sea() ->
-> inject_abt64() -> __kvm_find_s1_desc_level() -> setup_s1_walk()),
-> vcpu_read_sys_reg() resolves to read_sr_from_cpu() in
-> arch/arm64/kvm/sys_regs.c:
-> 
-> 	case TCR2_EL1:		val = read_sysreg_s(SYS_TCR2_EL12);	break;
-> 
-> This reads whatever SYS_TCR2_EL12 value was left on the physical CPU by a
-> previous vCPU, which could set wi->haft and cause walk_s1() ->
-> handle_desc_update() to set PTE_AF on guest stage-1 table descriptors.
-> 
-> Should effective_tcr2() check kvm_has_tcr2(vcpu->kvm) first (similar to
-> __kvm_at_s1e01_fast() and __effective_sctlr2_bit()), or should setup_s1_walk()
-> gate wi->haft on kvm_has_tcr2(vcpu->kvm)?
+> Because handle_vncr_perm() only checks vt->wr.pw && !vt->hpa_writable
+> without checking vt->wr.dirty, won't it inject ESR_ELx_FSC_EXTABT instead of
+> the architectural stage-1 permission fault ESR_ELx_FSC_PERM_L(vt->wr.level)?
 > 
 > -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20261023205610.1044532-1-oupton@kernel.org?part=22
+> Sashiko AI review · https://sashiko.dev/#/patchset/20261023205610.1044532-1-oupton@kernel.org?part=4
