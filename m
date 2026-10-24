@@ -1,67 +1,106 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.44
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792858282;
-	b=h6yKQKnhZsf7GoQ69RPeOcksErL4oMDgcvQE6DXmcrwxGHf8Bl0H8JqzuM2BvHJ3y+YW
-	 ukqk+6HsRaqvl3hUvSk40qT+3BiV+kOVFuYl/x5aAsCsuRuH8xGC5X7lzQKt+Ft4KftTc
-	 eDWq47E7BqaJ0qfIcWzntloVcHi4lql0Ul+C85HlsxluHgNi2kqsdmKYhuhjQh+YdrZTO
-	 q5i/8eE6RozJ2JKDKIid4/GEj9c7/iEWjZONGqenWH8PiuCE5RdptAyKrIGWBxg1VmXSl
-	 1m/4qmFc69m7AxSJtYcfj53UwaEVWIba1+gWRltS7+dJqvd331z9RmFz+w7vCbE8o/A==
+	t=1792876995;
+	b=1TcRppJajXjLnAn0NGer88HIiaPq3Ua7MEHkUvOQdLOJw9bfdGNJXbJ/2dMdf8kyNqW/
+	 4iat5UZ61JW2b/mX/ZSZuSLlaCGodmjxJIqA5f4jKnU1xNtcoqMlEgEVbBr4Ras+Ig0iz
+	 OYkgj2C+sXjZgXKnHeDfzSX840fXj7bw9Q0xCJbiHucW2dcWhsNY0OnWoEbQWAH1I1L7T
+	 CORkqEH6fin+FGLXf5hppL19EGVi8bDkNJkt0DHYceS7ZhQd2o/74+VDYQaufrVRSh95D
+	 ppjjeL49JZsUhhvuQ+GO/50aYETy8s0H7xKbKqouqG8U9dQaPpz6Qrb7Muc/q18n8sA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792858282;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	a=rsa-sha256; c=relaxed/relaxed; t=1792876995;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=W27aSalgzv2Xbhoow/lwveUu1WS93+h0c2znFzv+Gb4=;
-	b=lDm7yuAScq3tLVpfChm4mpjomuw6iqnFee0toXXsEfIYEv1y/0AUhCZPuyil4AFeBbYF
-	 9esSrNo+aFP5gdZSmo96xSaZBqzM55dmMkmg3cDZjvH8PHFBFH9NYzvr3ssppJcdOIyVC
-	 a2bcaSREkXLMO0Lv2Yu977lf5Zvj4BOpW5yloXygz1O2noUxaOY655ns1bmez7CAoP++k
-	 gDcfNI5LZClgleFd6r+1WxU3k0yhsm1xTuxd7xvCIsmexjqdeihDUy35KSf1XZonUfvNx
-	 BSswecJ5HUpq2iMsBvId2wCC/k9UrutUrWcNf3ywD9vgUXmwAJvQlktwNr4LNGw+ouw==
+	bh=/uDSBSON0zRSqoCF+kBzR4qoVmokC3Xn3ipHg55DqZs=;
+	b=dpel35uWefC9mTTBMWqDSud3FN4R0OgPnP8hghe0ZN+oCgBtCzWFCn/potN1sTotoHSd
+	 YKtY/WtXopUQDpCecXTk6LGmErTspvOcsiLZALZ139QUfp19W9v8AFsoZn/4Lz94LiRa8
+	 G3ZffXIXLzdMdNrtQa/fm9oRxhQiG4wxuoC2Xw9UqNtgS4ofymQ8iQ4PDdCLTbGqFHGb5
+	 x0pMTubd4i1gz+Lp98oZH7IdYII4TPrpZ40+mtoUnmi+wDnG7SBFHqCS+R7nKrNS5q8HF
+	 v/gpkrRe1k5dmkzvr1LM1ASJrVODffX9NYImbvgl8TjLjgQjwtn5tuRQTZBgsHtaRbA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X2Q+YVI4;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=CRf2l+FD;
+	arc=none smtp.remote-ip=209.85.128.44
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC7D606A31E;
-	Sat, 24 Oct 2026 16:11:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6DBF606A31A
+	for <kvmarm@lists.linux.dev>; Sat, 24 Oct 2026 21:23:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C6DBF606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X2Q+YVI4
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA6BC1F01825;
-	Sat, 24 Oct 2026 16:11:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792858281;
-	bh=W27aSalgzv2Xbhoow/lwveUu1WS93+h0c2znFzv+Gb4=;
-	h=From:To:Cc:Subject:Date;
-	b=X2Q+YVI4JJRsEhbQrDjwlDFBW1bkYeTfu/NVkgbhJQosNuEypKZGkOILmN4DthdpU
-	 a3kSC4CnRyy5nN+5jfVJz41vPvG+dT6kP8mgSUPKgwb8cbE7xy2KKYj08Vm5/VC74W
-	 wA0ChyCgi01R2pmgS1rKMS7h2P8QISkKN503K3nNbXBSXrQspvLjVPEsSwMR/y6lhM
-	 XOrpsP2NLCJZfh4X7yGbhr13dUhSA0bfC2izzxeFrFfcvmvJ+JdlGhBkGpxRPpwQ4s
-	 rnOnK451RgnTRfzf06YzPhkq5uQrEcBKD5B844ux7BDfWjWdJaDz9LGbIX8wZMX/Sn
-	 Lj7xBvatHsN1Q==
-From: Sasha Levin <sashal@kernel.org>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>,
-	Mark Brown <broonie@kernel.org>,
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=CRf2l+FD
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4a3517554f7so8665745e9.2
+        for <kvmarm@lists.linux.dev>; Sat, 24 Oct 2026 14:23:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792876993; x=1793481793; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=/uDSBSON0zRSqoCF+kBzR4qoVmokC3Xn3ipHg55DqZs=;
+        b=CRf2l+FDeWRsEQqLqqjAyAu8Yp6cK0Xz1iRb7vDndipdWj7EbOu9o+pwpNLC26CC0r
+         4ZQrzJVcV4Wyb2/PEe1U45Xvn6OF1telCWHQq7NHHN1qxcGO4eteDTppC41P7FXcyX/E
+         KLsF70A2RW6OP/bpBg1brlDKLJ635DcF41IrsLUU21/x6tdBCftnIOKR9048Oz8t8oKE
+         1sF24DUNBaL7SMQHHXX+uhGVXYsgO5eudibqZscSCUEUUtemApRI35qprapdLJgePtRX
+         FMv4h6+ZSkwYa/du+6IPRKEaKKKZWOSdWHCSmZXSwP0ksfj7ElBxN4vcPP0UTFJv9wfp
+         TRWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792876993; x=1793481793;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=/uDSBSON0zRSqoCF+kBzR4qoVmokC3Xn3ipHg55DqZs=;
+        b=yICBmWpfzbIQUxWDlISKJo4/74TxprbeiFORiTOKR1kz+/76J3xrn92VY05jSbJKD1
+         9s6C6mtwjdxsFFyNkEfP0aR9ISzBWQgPeSjRtbGlA3NmmFSZwLwtkuV0hSpQHuEnqrpB
+         KHGJZMzm2phaula1qJQarqsW4iaMG/dkaf2GgpVgyWoyUDlNeHH/5OJ1tOyMDsS8FZ8q
+         C0M3faqvRnAs+XU2WCoCrYhlxeyIDPGef8xa6bNsw9/igv831Xo6R7eRxeMKHHUAG9PU
+         Fynka6Gsbny1loK1y2CeFDW1Getet4tCCMELki+8cbDOCZQ+HPq5AulUYv8mTNHtolbk
+         v3bw==
+X-Forwarded-Encrypted: i=1; AKwUvBxTRdXOfzM7BZyQLYmr096nKvnGCGCZdp8wI5xqltNx3vdGXmP2NOjGTQWjCVlz8QCuNuSDRLA=@lists.linux.dev
+X-Gm-Message-State: AFq9FYImln/zrV45A144MeCNTCtSJH3CJH9zS1LkJyGC+DmDACPQjMQh
+	RXS+TJXQxdCHHipeaWtCFbWh4tuVjfDQ7LV9XPVk7Y77Y5MUCaxqp1Nd
+X-Gm-Gg: AYBFou3eGgNXWN94+B3iAd9Hs2xAp3bHdkKKKN75U9/y5skprcfW3O8dFCfdt/LJmBy
+	w3hG0HSQtcOaO1XoqXACo6Mnzeil/az3v3un/Zlp32WqJW3RZfCJZOu0l1TyfYOQ/RObbTdmF0S
+	fWcBeziR9gOTZ6m7zfFpZAufSini1RP4Wa1eCKWsw67rviHPYoEmr0VlDjOCrlm2PG/11kAy4M8
+	5zHbk4vIkx9sjhrz2xtPRQbEuuGRadcIgQsQVb1XljC9o7RvzjwKKelui47AIez+IahN24OH2lX
+	NR3bIGM6/FOCHIC9Eq6l6jdBY5XChKuF7uxLzUb5cbsoe5HfJ+DmzqUvrpTQksu7kV2kF3uL8EW
+	MZitkjvffoIPknxJR38kgEJwX7Z0KSPLCxifuTYi/WdSUgbuya+JAJE+IEA9AiCteJLxuKRD9v0
+	HwRxdJNJt7DYRCl8yGM7m4wzAv10WWz+CpLGnLkyaLJagzNKJN7OBlDGPyYJzoG5Ro0vPGNtm4r
+	q8xXj9EacOoOqCGPkkNtdY5BRKo6ow80DVD3L32xP9zvZYxte2TnZmT4aAIMcGg6Z8pwiXu4uGY
+	CnG57A==
+X-Received: by 2002:a05:600c:6095:b0:4a1:f7f4:7cf1 with SMTP id 5b1f17b1804b1-4a35ac8bf3amr39663215e9.11.1792876992941;
+        Sat, 24 Oct 2026 14:23:12 -0700 (PDT)
+Received: from ASHA ([2001:630:3c1:164:1a66:daff:fe85:4026])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a359f3e00asm147825395e9.0.2026.10.24.14.23.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 24 Oct 2026 14:23:11 -0700 (PDT)
+From: Amir Noohi <amirmnoohi@gmail.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Thomas Gleixner <tglx@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Radu Rendec <radu@rendec.net>,
+	Igor Velkov <iav@iav.lv>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"Lorenzo Stoakes (ARM)" <ljs@kernel.org>,
-	Itaru Kitayama <itaru.kitayama@fujitsu.com>,
-	linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
 	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: arm64: selftests: Skip ignored AArch32 ID regs in the failed-run test
-Date: Sat, 24 Oct 2026 12:11:18 -0400
-Message-ID: <20261024161118.1007472-1-sashal@kernel.org>
+Subject: Re: [PATCH 0/2] genirq, KVM: arm64: Avoid the irq descriptor lock on vCPU load
+Date: Sat, 24 Oct 2026 21:23:04 +0000
+Message-ID: <20261024212304.2620845-1-amirmnoohi@gmail.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <87tsmb8gdv.wl-maz@kernel.org>
+References: <20261024022450.629980-1-amirmnoohi@gmail.com> <87tsmb8gdv.wl-maz@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -73,90 +112,31 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-test_idreg_frozen_after_failed_run() checks that changing a feature ID
-register after a failed first KVM_RUN is rejected with -EBUSY, and does
-so for every register in test_regs.
+Hi Marc,
 
-On a host without AArch32 support at EL0, KVM treats the AArch32 ID
-registers as RAZ/WI: aa32_id_visibility() returns REG_RAZ | REG_USER_WI,
-and kvm_sys_reg_set_user() ignores the write and returns 0 before
-set_id_reg() checks whether the ID registers are final. The test then
-fails on the first such register:
+On Sat, 24 Oct 2026 12:52:44 +0100, Marc Zyngier <maz@kernel.org> wrote:
+> Looking at the test case, this really isn't a representative or
+> realistic workload.  This is a contrived setup that has trapping to
+> userspace as its only purpose.
+>
+> I'm not saying that this is useless observation. But it is not
+> something that represents something exacerbated by "real" VMs.
 
-  arm64/set_id_regs.c:870: r < 0 && errno == EBUSY
-  ID_DFR0_EL1_PerfMon write after failed first run: r=0 errno=16
+Fair enough. I checked with real Linux guests running hackbench on the
+same Altra (kvmtool, in-kernel GICv3). With one vCPU per CPU, and in
+lighter hackbench runs, it makes no measurable difference, but it does
+once busy vCPUs share CPUs.
 
-KernelCI hits this on every run on an AArch64 only GB300 host.
+With four 31-vCPU VMs on 31 CPUs (124 vCPUs), all running
+"hackbench -g 31 -f 20 -l 2000", each VM takes 76.5s on mainline and
+60.4s with the series, so 21% less time (8 runs per kernel, no
+overlap). In a profiled run irq_set_irqchip_state() was called ~2.4M
+times/s and 47% of those calls hit contention. With the series the
+contention on that path drops to ~7 per second.
 
-An ignored write leaves the register unchanged, so the ID registers are
-still immutable and only the test's expectation is wrong. Skip the
-AArch32 ID registers that KVM_ARM_GET_REG_WRITABLE_MASKS reports as not
-writable for this VM, which is decided by the same
-kvm_supports_32bit_el0() check as the write path. The aarch64_only flag
-that test_vm_ftr_id_regs() uses is not a good fit here, as it comes from
-the EL0 field of another VM's vCPU, which reads as AArch64 only whenever
-that vCPU has EL2 enabled, even on hosts that support AArch32.
+So the case that matters is overcommitted hosts with busy vCPUs. I'll
+make that the main justification in v2 instead of the exit-to-userspace
+test.
 
-Fixes: 00e309933879 ("KVM: arm64: selftests: Check ID regs are immutable after a failed run")
-Link: https://d.kernelci.org/test/maestro:6adcad0c55fda50760800a00
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
-
-Tested on an AArch64 only GB300 (Neoverse V2) running KernelCI's arm64
-build of mainline 5b0764a53235: set_id_regs fails as above without this
-change and passes with it (104 pass, 4 skip, 0 fail) in three runs.
-
-This does not change the AArch32 ID register readback issue under nested
-virtualization that Itaru reported:
-https://lore.kernel.org/all/as8x38o9taXgKZym@sm-arm-grace07/
-
- .../testing/selftests/kvm/arm64/set_id_regs.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index 10849d21c0dd2..c8c9aaf9d7e86 100644
---- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -815,6 +815,10 @@ static void test_idreg_frozen_after_failed_run(void)
- 		SYS_REVIDR_EL1,
- 		SYS_AIDR_EL1,
- 	};
-+	u64 masks[KVM_ARM_FEATURE_ID_RANGE_SIZE];
-+	struct reg_mask_range range = {
-+		.addr = (__u64)masks,
-+	};
- 	struct kvm_vcpu_init init;
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_vm *vm;
-@@ -831,6 +835,7 @@ static void test_idreg_frozen_after_failed_run(void)
- 
- 	vm = vm_create(1);
- 	vm_enable_cap(vm, KVM_CAP_ARM_WRITABLE_IMP_ID_REGS, 0);
-+	vm_ioctl(vm, KVM_ARM_GET_REG_WRITABLE_MASKS, &range);
- 	kvm_get_default_vcpu_target(vm, &init);
- 	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
- 	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-@@ -852,8 +857,18 @@ static void test_idreg_frozen_after_failed_run(void)
- 	 */
- 	for (int i = 0; i < ARRAY_SIZE(test_regs); i++) {
- 		const struct reg_ftr_bits *ftr_bits = test_regs[i].ftr_bits;
--		u64 reg = KVM_ARM64_SYS_REG(test_regs[i].reg);
--		u64 val = vcpu_get_reg(vcpu, reg);
-+		u32 reg_id = test_regs[i].reg;
-+		u64 reg = KVM_ARM64_SYS_REG(reg_id);
-+		u64 val;
-+
-+		/*
-+		 * KVM ignores writes to the AArch32 ID registers when it can't
-+		 * expose AArch32 EL0, and reports them as not writable.
-+		 */
-+		if (sys_reg_CRm(reg_id) < 4 && !masks[encoding_to_range_idx(reg_id)])
-+			continue;
-+
-+		val = vcpu_get_reg(vcpu, reg);
- 
- 		for (int j = 0; ftr_bits[j].type != FTR_END; j++) {
- 			u64 ftr = (val & ftr_bits[j].mask) >> ftr_bits[j].shift;
--- 
-2.53.0
-
+Thanks,
+Amir
