@@ -1,62 +1,77 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.248
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792826144;
-	b=2aYySYPEa/QN61JRgCntEHzQdb6P2va+Bdhgbjm7dQGr1EK5w4w2GXb2SgcQoZ6bIidL
-	 BZQoayLlscoXSIfj3IQuleN9foVb81LA17RIgMq0G3ndH1MHaEXjVkr5zH9tULbEzGk9r
-	 /7Imn5rrYKo/unzOeO/h93I+7r/vFKw7OiDYHxESf7QjtaFzNrtSLWmIcLT+K+O/YRvLI
-	 W29fCtfT6xOkzlM9Qv0YQ/S/bmmdq4rAaund5YUlQA8vxRLxg+hFfPo0eUlCuzpnMAWcu
-	 sAx/tbhob6ysEUBdFbEcixg7P2Gl5EuuDyGXOqF+QfUBFKphhe388lLHhj8p3GbxhwQ==
+	t=1792842570;
+	b=E4IV/qeenYQ3g8USheF1RNBNpOdJ/2u7D03gaRPFZ54jI0197bhZG1Ci+pakCB+0YvWa
+	 DcPPEwhMvYYKSzceHk59mIkGLCstpqMyb3O9Q2gyMeeOUYLYqAFAjbsQiyQ02daL7U4EK
+	 ZXPi4o+uJ2rsc78+kJ+/AWd56ezKLKXEfBpUEcT1M7GjSDURSeYbctwM7nT8By70Ef2fF
+	 Rg2ozjjY+5xijSRuaSFkcj6hTtnJbLOb97csOE1Yl6Gs2oczwZUtYidlAbW5adniSiVDo
+	 hv/kb5SDAcB+gTMcQCQHCtKUhdd3FZo7echjJBJpzy8Cx4di4JqHheMmWpqWkWb+DnQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792826144;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=xgVmkxubDRg1cJuzFYDYMiEdO1rVdRyOgY/ruAhYY2s=;
-	b=TeL36547fTYzgTioP+NeWtpPft411FFSzgVe526otGSwZblhCmTTkQOx5y0yOip+fjAJ
-	 4Nuc6uJOU3CMrLaeqxndEK48Byv/i90/kWYuOPb+tjxSgkReo5O9/I3gnyPhGpH57qE3J
-	 0UALGB+JKP+6M7fjKg2iRxkvuhtDqse4IZ4CQ0U33ksxDAb3qg1fTe9Ai7muKbgFesmYn
-	 i/pydlDsX8H+nLgb7Mlq03tpgyypxX/FcAgD4hKPneXLuYBWxL4fiMHEwyD/X6Bjcb0+i
-	 yh4ofn7HiIShyRh7tBpztLY0/BNebPWbfQMcNugAXvUKVaBpM7vodwAaSa1P9bmCS0w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792842570;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=FuqXf7oFIzUBEcQbKPY0llvBnP0Pu2NRXKoSWtEKfn0=;
+	b=tWu90DjtMUGIoNeCdMdBdiU4nncw0db0TUBXr+huXA8Oc8VGwefx7YFAr65b17EhBexl
+	 /pYWdyUJFoW3wQsN8JpB8+bvZ7HP4/KNuvRO6u4mvOBYkSocISgdDNLWS6diLO4NapkJp
+	 6HjSRei73kpCuOeMJSBBUBuKLHjhXQ0RAzXGoXGidgRQ0LhRabaIDqRKjTCvJ5K8N6zUW
+	 zSOF7PT2s69GM2Yn1psRM+DI35KHE8BwabgD2N6nkHBVJCB8Pc+m+4KwuYFvC7P5JqfOx
+	 GABRI7ivhypBxn1L5mKW8U6TyBnH7D9Q4gfiC5skrL1QRY9DTzzU5nkxdxxAPQVg1hw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Aq0BzqOU;
-	arc=none smtp.remote-ip=95.215.58.248
-Received: from mta1.migadu.com (out-248.mta1.migadu.com [95.215.58.248])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WEjZ1CRI;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F483606A329
-	for <kvmarm@lists.linux.dev>; Sat, 24 Oct 2026 07:15:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4F483606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0EE606A31A;
+	Sat, 24 Oct 2026 11:49:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Aq0BzqOU
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=fS8yvEoIwEhEI1jeJexTVj+BAmw6eQpccC70A0wbAfc=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792826141; v=1; x=1793430941;
- b=Aq0BzqOUljMMR5tzh7Kyv5yeWxOAyaaYbi+YtLE2cbYreaefc5j4CG0NjIHVwo0ho3SqZvw2
- B3ItMWMKFEtqQK42Qs8JMJc5DwFX2OlfzfBZHUfNke7xZiq14Prb87oEQSVJi159DCwwACOL33r
- vimuLFtJZeiPgdofygAY/Xws=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id d4f0141a09b42773;
-	Sat, 24 Oct 2026 07:15:40 +0000
-X-Mizu-Trace-ID: d4f0141a09b42773
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5be4a7b9e6fso2055e87.1
-        for <kvmarm@lists.linux.dev>; Sat, 24 Oct 2026 00:15:36 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwZWBZvDBaAaMbFFu9hwAIlREP/lodnuCpoF91Bvz6s2MO90QaV0ndC9v4WCl22xAwy2oTsR+c=@lists.linux.dev
-X-Gm-Message-State: AFq9FYK/uNyOQQa1U4nnKtfLv4e3ecNa79NkYUvBdcrFs5pjzkIM2/pD
-	TMeox9ZJv89+aAlB1Z0PCgLONKaLvBKyokv5NQwLg+rM/gPn54JbElUNuj0GdcNdC+KNLsWrqGB
-	5uEfthXYOt1WJEkLXetXDxHo0Xtk8EIDDIBDEBtor
-X-Received: by 2002:a05:6512:3e1a:b0:5bf:b27b:6371 with SMTP id
- 2adb3069b0e04-5bfb79f9850mr46341e87.10.1792826135785; Sat, 24 Oct 2026
- 00:15:35 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WEjZ1CRI
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE9461F01825;
+	Sat, 24 Oct 2026 11:49:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792842569;
+	bh=FuqXf7oFIzUBEcQbKPY0llvBnP0Pu2NRXKoSWtEKfn0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=WEjZ1CRIcbCJAp/JIdnJ/lHTbaGXMf7MCXDF9mrTgwfRVdgWDLQeZZ3+EelpxSQX5
+	 SKoLSEERZcVQTB9OD1Vh5eDSMwhPUsrhQPtlWsGhBJ8KDUc9XvShjbHdFA8AC5AZ8N
+	 V5SWdX6Gi4m49WsO7Lpey8V4+pLGfNAK7mQNzV/8MCnNUm8YN0W7ze63PhY4AcUCKi
+	 7IrRuKbkGXgShhOliQe5X2QbCNrQ3SCjhjKtAAPNQSnwRdTLx5PpfjgxeBoJ69aXyB
+	 UJ/ZCC2KhCQVSKL/Tu/v9MmzMGbv3wnsDmUaLm8qHRfarR72rZxxao2RglWbwtoyJ9
+	 AHufBBq1UK93g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xKaFb-00000006kGD-2If9;
+	Sat, 24 Oct 2026 11:49:27 +0000
+Date: Sat, 24 Oct 2026 12:52:44 +0100
+Message-ID: <87tsmb8gdv.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Amir Noohi <amirmnoohi@gmail.com>
+Cc: Thomas Gleixner <tglx@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Radu Rendec <radu@rendec.net>,
+	Igor Velkov <iav@iav.lv>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] genirq, KVM: arm64: Avoid the irq descriptor lock on vCPU load
+In-Reply-To: <20261024022450.629980-1-amirmnoohi@gmail.com>
+References: <20261024022450.629980-1-amirmnoohi@gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -65,83 +80,46 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-References: <20261023070110.1833446-1-fuad.tabba@linux.dev>
- <20261023070110.1833446-2-fuad.tabba@linux.dev> <86fqxwzul7.wl-maz@kernel.org>
- <CA+EHjTw08SZC_3Uodt6ew6vXVH-doW-8G41fVCF-rmaKsv+0fQ@mail.gmail.com>
- <86ecdgzp6m.wl-maz@kernel.org> <CA+EHjTy0jpY3sdVCENJRj_kfRDwbZ6TpkCAHQ2xUO-7ZuErpcA@mail.gmail.com>
- <ad724195-3452-495a-a50a-5e5c8093a483@app.fastmail.com>
-In-Reply-To: <ad724195-3452-495a-a50a-5e5c8093a483@app.fastmail.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Sat, 24 Oct 2026 08:14:59 +0100
-X-Gmail-Original-Message-ID: <CA+EHjTyLnAXanf9R7SuoL3gFZUNewX7QOnW=mc3qzwvaxg7jJg@mail.gmail.com>
-X-Gm-Features: AclHuK9QvFT6f4TAsNTrh2PdecgAYJ19yM-sYm9uDvK9gvirJINXHV46-ipXL60
-Message-ID: <CA+EHjTyLnAXanf9R7SuoL3gFZUNewX7QOnW=mc3qzwvaxg7jJg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: Hide FEAT_LS64_ACCDATA from guests
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Yicong Yang <yangyicong@hisilicon.com>, Zhou Wang <wangzhou1@hisilicon.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: amirmnoohi@gmail.com, tglx@kernel.org, oupton@kernel.org, radu@rendec.net, iav@iav.lv, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Arnd,
+On Sat, 24 Oct 2026 03:24:48 +0100,
+Amir Noohi <amirmnoohi@gmail.com> wrote:
+> 
+> KVM/arm64 vCPUs slow each other down even when every vCPU has a physical
+> CPU to itself. On a 32 CPU Ampere Altra (GICv3, VHE) running mainline,
+> with an in-kernel GICv3 and each vCPU thread pinned to its own otherwise
+> idle CPU, a vCPU which exits to userspace in a loop manages 320k exits/s
+> on its own, 120k when 16 vCPUs do the same and 59k with 31. The aggregate
+> rate stops growing at 8 vCPUs. No two vCPUs share a CPU and nothing is
+> over-subscribed.
+> 
+> The cause is the interrupt descriptor lock of the host timer interrupts.
+> Every vCPU load sets their active state with irq_set_irqchip_state()
+> (twice on VHE: virtual and physical timer). The timer interrupts are per
+> CPU interrupts, so all CPUs share one descriptor and its lock, while the
+> state being written is per CPU (a redistributor register on GICv3, a
+> system register on GICv5). The lock serializes nothing but CPUs updating
+> their own state. At 8 vCPUs, 99.9% of all lock contention events during
+> the test have __irq_get_desc_lock() or irq_set_irqchip_state() on the
+> stack.
 
-On Fri, 23 Oct 2026 15:10:23 +0100, "Arnd Bergmann" <arnd@arndb.de> wrote:
-[...]
-> That sounds good. For reference, I have prototyped support for
-> LS64_ACCDATA in Linux drivers based on the corresponding x86 code.
-> The code is not yet tested on hardware, but it may help understand
-> how this may be used in the future.
+Looking at the test case, this really isn't a representative or
+realistic workload.  This is a contrived setup that has trapping to
+userspace as its only purpose.
 
-Thanks, that's useful to see.
+I'm not saying that this is useless observation. But it is not
+something that represents something exacerbated by "real" VMs.
 
-[...]
-> diff --git a/arch/arm64/include/asm/mmu_context.h b/arch/arm64/include/asm/mmu_context.h
-[...]
-> @@ -254,6 +269,8 @@ switch_mm(struct mm_struct *prev, struct mm_struct *next,
->          if (prev != next)
->                  __switch_mm(next);
->
-> +        switch_iommu_mm(next, tsk); /* FIXME: is there a better place to do this? */
+I'll look at the patches shortly.
 
-switch_mm() isn't enough when the same thread also runs a vCPU. In v2,
-which I'll post soon, KVM will save and restore ACCDATA_EL1 only for
-the guest, since nothing in the host uses it today. So after KVM_RUN
-returns from a guest that has LS64_ACCDATA, the VMM thread's next
-ST64BV0 would use the guest's value, unless KVM also saves and
-restores the host's.
+Thanks,
 
-[...]
-> diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
-[...]
-> +static bool try_enable_st64bv0(struct pt_regs *regs, unsigned long esr)
-[...]
-> +        isar1 = read_sanitised_ftr_reg(SYS_ID_AA64ISAR1_EL1);
-> +        if (!(isar1 & ID_AA64ISAR1_EL1_LS64_LS64_ACCDATA))
-> +                return false;
+	M.
 
-v2 will add an ARM64_HAS_LS64_ACCDATA cpucap, so this could test that
-instead. As written it tests bits [1:0] of the register, not the LS64
-field, since ID_AA64ISAR1_EL1_LS64_LS64_ACCDATA is the unshifted field
-value.
-
-> +
-> +        sysreg_clear_set(accdata_el1, ACCDATA_EL1_ACCDATA, pasid);
-> +        sctlr = current->thread.sctlr_user;
-> +        sctlr |= SCTLR_EL1_EnAS0;
-> +        current->thread.sctlr_user = sctlr;
-> +        update_sctlr_el1(sctlr);
-
-On a host that runs at EL1 (nVHE or hVHE), this also requires
-__init_el2_fgt to set nACCDATA_EL1 in HFGRTR_EL2 and HFGWTR_EL2, and
-__init_el2_hcrx to set HCRX_EL2.EnAS0. Without them, the ACCDATA_EL1
-access traps to EL2 and the hypervisor panics, and so does ST64BV0
-once SCTLR_EL1.EnAS0 is set. Happy to write those and the KVM change
-once you're ready to post this.
-
-Cheers,
-/fuad
+-- 
+Jazz isn't dead. It just smells funny.
