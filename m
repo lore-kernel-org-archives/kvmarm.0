@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.113
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.6
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792914726;
-	b=Is4IPpFdylJKcFn/VnWRx2/Cupws/nBZCc6BZjqiF+gVEgt2AhFrpCAl/s3CaZKpYkDS
-	 xdK/1+tQ7PZV6p3/MkFMQT1vgsE4IFK539UfGyBozdFnn0PhrpaKnWbzp6b6vH98FjoSY
-	 6YtsaEbMZoyM4+Fk/s4NJrFeYwYS9i1g7PyGQmibX1NwM3vGNuCg5iVykFuOK/KzRwWcA
-	 0p9z+4zEARg/h9D69dl5TS7CVMPRBMIAUq8UpG5ZmPm+5Ld8bQBcTsKY+jHlsYce+vLot
-	 Uu3i2gwbXBvWpOifWOI2VIVrkdSEmOdm1UupwLog1MvVtbcnRfKBB0OU1T1TyVpACAA==
+	t=1792914746;
+	b=AeNTLdiO0bPmUtfiIaEfqasoSRKFcvUNEk4ABATMkC6g0jyFZ+z7MOFUrYI9CjWeE59B
+	 FUD8snYJLy5RzzToHG9LPb9IPg9HZC5jr4xTDcBhkykumnkp7wgAAVrkc/sY+C5fYcA7a
+	 U8Udx1WzmVG6VQbkGEjOts2OUsf2ObSGOb9zXm01OXQP7D7FCda9pDeS5iH9hSw78N5wV
+	 2OElPnIk8sQCvTVM15s32IOeUDkxdWxUl3qkly20BJlYtOqI0nMhnvOEdr7/E+ZForGV7
+	 uXEav5L9+9gkL1Cg3DET5W7C3228gNFqIlizP3A8o8d99FnKYNnLoc8pPk1QbQCR3eg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792914726;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792914746;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=mhsArRboNOG7MEYGvuVxZAVzLd8DQVPPiwRvsOHZhfo=;
-	b=4bl8G5d0+is88PUsMjowbJhCuARwgMQc8B91pLO7XXICbOLffXo5Hgt1/ZOApwOTAn/q
-	 R6os9M5qGG6hyagbL8aRIMJ8qzmWesZeeKDWUO2YMwIGBFDoWeINKtNtvT2rd43dL81Li
-	 iEq3EWUKdElfvnCy2X6HOhoriD3H9lNbUEFRbZie3XQuTAmsDjdAc1GLe7DZ3J4wTj0/f
-	 EC/9dNYoHkNhV1MdOpYlmaDq6ofS79NS2fk78K3J+gSob0MLjmSbOjxNeaLhKrKJYeNTK
-	 rRvds+CQgPXz4E9fKW/Kgw2ymTtTq7kFUb0qEumFlxIby8PH+HZGoHFDXyVyZbunvYQ==
+	bh=P3hdhOQZUT2FZ6Hh3e1FpgfLP6uVmzP7OGnEQtYKL48=;
+	b=q9+nwex7S+4VF/iYm11xigZlV459SSgjpaS3/N5Zal/B7cpGmDR1aOvljrzHk7uiFErD
+	 KcDX1i3QK4gHN5Sf+TExGLb1vWoM3SucO+x2wneJKHRJe0Wm1nzSbmxTJ9/60LsJF2525
+	 xk5+cE3A616gbsunHJTDbjnJgIes94bhAduigA75BC7zP6jEZIg/Ok0CWka09uG1yEfR7
+	 0LIW8WsJ0WEaHnuJxjCbYclGCZDH7hF2AlAVQU2BJqpt0gj+cq1NeaN5+aicmJYe15BDH
+	 l/PqxC/yH+GK81GOzmZtq1fABzi4CnFJNIwlw2HrPXUlvbJ4xoGpDhFwrCQvEmGMIzg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="b5c/+U/o";
-	arc=none smtp.remote-ip=95.215.58.113
-Received: from mta1.migadu.com (out-113.mta1.migadu.com [95.215.58.113])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=ipervbUn;
+	arc=none smtp.remote-ip=91.218.175.6
+Received: from mta0.migadu.com (out-6.mta0.migadu.com [91.218.175.6])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC0EC606A31A
-	for <kvmarm@lists.linux.dev>; Sun, 25 Oct 2026 07:52:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AC0EC606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A573E606A31A
+	for <kvmarm@lists.linux.dev>; Sun, 25 Oct 2026 07:52:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A573E606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=b5c/+U/o
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=ipervbUn
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=LcQIPG/aqOFsoIK9+iuAeL5MlGsV4fSp77IzdGl2HiA=;
+DKIM-Signature: a=rsa-sha256; bh=9tdQc3XLASUSgtohD1Zmp8zbuiOyq7kuHVLMF2vvkJs=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792914723; v=1; x=1793519523;
- b=b5c/+U/oukInby2nkiUQoMYepyq4030cqKpS9GEafPT+pwQ6eoNmi40N0/capxxiBri4BsMB
- q9bTxQDb0tGspFSpCCIBDh59QJ2rw2VVzVsoGhVSH33kqYCI71pI1XfVZGqPNf8xQCQHDuD6bk8
- 6Eo+gD1bW7db4QBjSseU2L4A=
+ t=1792914743; v=1; x=1793519543;
+ b=ipervbUnrzjwf6Sk2LT0ZYsSAmZCf4nZQ/SMcmVXK73Sw8GgcCvmFAbC3tJMzAtkNTfnvbpW
+ 5BRRKM6vl34yLhmvxfR+r5dvGvBHDHxvd6YIhjEBSLi4gBo9V2xQinRNMtjrTNbe/IvTHzq2x1W
+ gEWJmxqhabe7axdoTqdsV8hs=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 176e5694bb0be5f6;
-	Sun, 25 Oct 2026 07:52:03 +0000
-X-Mizu-Trace-ID: 176e5694bb0be5f6
+Received: by smtp.migadu.com with ESMTPS id c302dc059e47d3f9;
+	Sun, 25 Oct 2026 07:52:23 +0000
+X-Mizu-Trace-ID: c302dc059e47d3f9
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -65,9 +65,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 4/5] KVM: arm64: Enable ST64BV0 for guests with FEAT_LS64_ACCDATA
-Date: Sun, 25 Oct 2026 07:51:37 +0000
-Message-ID: <20261025075138.2919734-5-fuad.tabba@linux.dev>
+Subject: [PATCH v2 5/5] KVM: arm64: selftests: Add ACCDATA_EL1 to get-reg-list
+Date: Sun, 25 Oct 2026 07:51:38 +0000
+Message-ID: <20261025075138.2919734-6-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261025075138.2919734-1-fuad.tabba@linux.dev>
 References: <20261025075138.2919734-1-fuad.tabba@linux.dev>
@@ -82,36 +82,37 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since commit 58ce78667a641 ("arm64: Add support for FEAT_{LS64,
-LS64_V}"), a guest sees the host's ID_AA64ISAR1_EL1.LS64, but KVM only
-enables the FEAT_LS64 and FEAT_LS64_V instructions in HCRX_EL2. On a
-host with FEAT_LS64_ACCDATA, a guest's ST64BV0 therefore traps and hits
-the WARN_ON_ONCE() in handle_other().
+KVM exposes ACCDATA_EL1 to userspace when the guest has
+FEAT_LS64_ACCDATA. Add it to get-reg-list, conditioned on
+ID_AA64ISAR1_EL1.LS64, so that the test still passes on hosts that
+implement the feature.
 
-Set HCRX_EL2.EnAS0 when the guest has FEAT_LS64_ACCDATA, now that
-ACCDATA_EL1 is context-switched.
-
-Fixes: 58ce78667a641 ("arm64: Add support for FEAT_{LS64, LS64_V}")
 Cc: stable@vger.kernel.org
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 3 +++
- 1 file changed, 3 insertions(+)
+ tools/testing/selftests/kvm/arm64/get-reg-list.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index a3c1928bdf743..d07f72082531c 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -712,6 +712,9 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
- 		if (kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V))
- 			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnASR;
- 
-+		if (kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA))
-+			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnAS0;
-+
- 		/*
- 		 * NV3 is a host-specific extension, and we always use
- 		 * it when present and that the guest uses NV. It may
+diff --git a/tools/testing/selftests/kvm/arm64/get-reg-list.c b/tools/testing/selftests/kvm/arm64/get-reg-list.c
+index 533994687b5d8..912590f9b0c2b 100644
+--- a/tools/testing/selftests/kvm/arm64/get-reg-list.c
++++ b/tools/testing/selftests/kvm/arm64/get-reg-list.c
+@@ -49,6 +49,7 @@ static struct feature_id_reg feat_id_regs[] = {
+ 	REG_FEAT(POR_EL1,	ID_AA64MMFR3_EL1, S1POE, IMP),
+ 	REG_FEAT(POR_EL0,	ID_AA64MMFR3_EL1, S1POE, IMP),
+ 	REG_FEAT(POR_EL2,	ID_AA64MMFR3_EL1, S1POE, IMP),
++	REG_FEAT(ACCDATA_EL1,	ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA),
+ 	REG_FEAT(HCRX_EL2,	ID_AA64MMFR1_EL1, HCX, IMP),
+ 	REG_FEAT(HFGRTR_EL2,	ID_AA64MMFR0_EL1, FGT, IMP),
+ 	REG_FEAT(HFGWTR_EL2,	ID_AA64MMFR0_EL1, FGT, IMP),
+@@ -517,6 +518,7 @@ static __u64 base_regs[] = {
+ 	ARM64_SYS_REG(3, 0, 12, 1, 1),	/* DISR_EL1 */
+ 	ARM64_SYS_REG(3, 0, 13, 0, 1),	/* CONTEXTIDR_EL1 */
+ 	ARM64_SYS_REG(3, 0, 13, 0, 4),	/* TPIDR_EL1 */
++	ARM64_SYS_REG(3, 0, 13, 0, 5),	/* ACCDATA_EL1 */
+ 	ARM64_SYS_REG(3, 0, 14, 1, 0),	/* CNTKCTL_EL1 */
+ 	ARM64_SYS_REG(3, 2, 0, 0, 0),	/* CSSELR_EL1 */
+ 	ARM64_SYS_REG(3, 3, 10, 2, 4),	/* POR_EL0 */
 -- 
 2.47.3
 
