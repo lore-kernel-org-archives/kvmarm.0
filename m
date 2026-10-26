@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793037953;
-	b=TCaY10JSIXj+TkP9RLReen9eZ8TXvnQg07GCxQLLKt91lgbo3R1oPTLs5pYL4V9AJrRS
-	 V3onIfIJQON5uurlyw8WSvDHDDwy8Ut460jgE4AHImDunb217y9Wl4mAZJDoASb0WlKcS
-	 ME1A52TGz6p5dV6YtbgIsq1stym3ngzbk1xXLSebf50sUwAzXtDcnBB/N9b9HXGzkUS4i
-	 Sj9uaEBfq0jnw6ljI4glaTw3aFZH8CgIfEIo9SD8sfDTmyl6PSIU5TDjf/c7JluwWFawp
-	 CwKs1IeRlVNcjgUx7u7ULguJmLu0+Mr8SAv+HfCmQt8hPzFJlPToykiqGK6Anr3X+2w==
+	t=1793038343;
+	b=e5DHJt4j+ahlBFsVFwZC3AFNSuPPM5unqr7xl4Tb1LemlgFBWJvaY+vZRYbTmz4wlfm5
+	 RmqswnaKUNO8DecyEUrUQwifyLGynTEB00cP8YgXPrBIs0axXL/EyoO408ntCkO6WMi3m
+	 pcBiDwJzoq5zwddJrXZJFn7jNIkl496RNmj6jXYH2f0AAB9LZsKr6ju9EczMaIsuEvH5E
+	 9Q0YNbT8Ndhk6tsaeTo4FMZiJVAwlMHswVvhmSYLphYixko0nydRLsLny80A0QCY0RifK
+	 J20vG0iRrXARYOBIl82aPxj2z0ahjGCR2aNSQY6Q3IqBMBhuokpplhTDwCpWTaCl8Jw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793037953;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793038343;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
-	bh=Dazdfuswvplzd+nZxkdJ2Trb6gBuPhP20O43N/pReRw=;
-	b=kIKPCc/FzllkiqxDIXbQHdDH+3Rw3l+RgByxEzIgymtq3yPWhxfbcWqqOoKOvQRxZxKv
-	 98j12b2E1vJ5nd833LYBiKG4+4mI38MlN18rKCyM2lLLtaSf+tlLlREp7RQtMOF7xvJrF
-	 V5YFde43b1191XBOlnRa8XSs//zrG+2+mOWyxi4MqJPLOpj3Xqj19tjf9R4xWBe2bIPzD
-	 ZrxDf1jkQw3lQNcQnUB6JhmBB5P9yoOUrcn+u+87O1iCVx/go+Ow8ESGbb7rXZRDLnlfP
-	 sTgwcVxOqX01Ek9ay9zmDuxbsAzfgY0Xz/iTK/g/lz0BZ0CqOR5+9uX95DbnDMoBkFw==
+	bh=sS8eK21wcStxD43pokzl5l+eKhxWDBCgOyN2a4eiOW0=;
+	b=ZR6m6kuRuQh8rJkECqIzVRpiQi+WEtRpw+zhuE6F6a2+q5tdg9Z45G1W6ezicahCd5h6
+	 rKROEL26nlIUEourJ1t05sePFNDUfqcu/KZZvRE3vE7j1Wn48vrvAT27iQF/+s3idefQE
+	 V+uqQy9dLW3yB46DfDRSBRr/7aL4Bj4algMwlsmG+6Gqat2AGMqLgpq2Sh+sU4bdKBA5D
+	 GIqCvRp9Vt7Hzu9ucWRe/XxMQf6WIOjjzUoa5E3gtJJpdYAEC1H/EDHQIs+4AJEDGYR8F
+	 +ngEcoTLQ58PJTi/LKLNMeXU8v2AA2qQ6IsKlNCKhn9OcId2KePCezMmWpyd/c7mwSw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=oiB7p4FK;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=HaGbgBhG;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3CE9606A31A
-	for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 18:05:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A3CE9606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE417606A31D
+	for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 18:12:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AE417606A31D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=oiB7p4FK
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=HaGbgBhG
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7783D19F6;
-	Mon, 26 Oct 2026 11:05:47 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D935819F6;
+	Mon, 26 Oct 2026 11:12:17 -0700 (PDT)
 Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E9D403F7B4;
-	Mon, 26 Oct 2026 11:05:46 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5730A3F7B4;
+	Mon, 26 Oct 2026 11:12:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793037950; bh=0Fm//jObvS8Sn73p6wEdeeyE1A5W+WdjYk5R853HCAU=;
+	t=1793038341; bh=wWJzTR3+Htr+1KB+CeXE1r7KMO3Eq6qQO8tranbjgEk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oiB7p4FKmQfYPhak2KyREhmAxzj21VR9bO/7IkVcr4vAhuyPU4BxeGZVArbjZCBEd
-	 7nzK9K8tzkV9r//ANLZIfuLWdMzOrAyY3poD5DzLJ8uSGtE5kCj10S9IqZQr1/eDt6
-	 WhdNQVWRU4yJS35XoSMSRo4NhGpvYUfZQjEkElRo=
+	b=HaGbgBhGvHNrCSoZMQZwE2Rf+O7xkvPrz8EmYBL5er1/HwqECfBXYRDWtWQR5/akt
+	 H29jkInDU8TVzJ/EY6x/NrfrEC5SJpx/2ZTHZlIRabLVwtJe6gjhw1nE4dvJijMwCw
+	 1BY5t2eXAWy1WXZLn4ljoJUkMWmP5t/p13GzHy9Y=
 From: Leonardo Bras <leo.bras@arm.com>
 To: Tian Zheng <zhengtian10@huawei.com>
 Cc: Leonardo Bras <leo.bras@arm.com>,
@@ -74,12 +74,12 @@ Cc: Leonardo Bras <leo.bras@arm.com>,
 	linux-doc@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	skhan@linuxfoundation.org
-Subject: Re: [PATCH v5 05/15] KVM: arm64: Harvest stage-2 dirty state into the host folio account
-Date: Mon, 26 Oct 2026 18:05:38 +0000
-Message-ID: <at-WceRKAVM2kEnI@LeoBrasDK>
+Subject: Re: [PATCH v5 06/15] KVM: arm64: Add support for FEAT_HDBSS
+Date: Mon, 26 Oct 2026 18:12:15 +0000
+Message-ID: <at-X_hFbsBU_Dsgr@LeoBrasDK>
 X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20260929103655.85107-6-zhengtian10@huawei.com>
-References: <20260929103655.85107-1-zhengtian10@huawei.com> <20260929103655.85107-6-zhengtian10@huawei.com>
+In-Reply-To: <20260929103655.85107-7-zhengtian10@huawei.com>
+References: <20260929103655.85107-1-zhengtian10@huawei.com> <20260929103655.85107-7-zhengtian10@huawei.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -93,38 +93,30 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-Hi Tian,
-Sorry for the delay in reviewing...
+On Tue, Sep 29, 2026 at 06:36:46PM +0800, Tian Zheng wrote:
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 32102c3912fa..12fa37328dd2 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -2158,6 +2158,11 @@ static bool hvhe_possible(const struct arm64_cpu_capabilities *entry,
+>  	return arm64_test_sw_feature_override(ARM64_SW_FEATURE_OVERRIDE_HVHE);
+>  }
+> 
+> +static bool has_vhe_hdbss(const struct arm64_cpu_capabilities *entry, int scope)
+> +{
+> +	return is_kernel_in_hyp_mode() && has_cpuid_feature(entry, scope);
+> +}
+> +
 
-On Tue, Sep 29, 2026 at 06:36:45PM +0800, Tian Zheng wrote:
-> With VTCR_EL2.HD set, hardware promotes writable-clean descriptors to
-> writable-dirty without any VM exit, and the only record of the write
-> is the S2AP[1] bit in the stage-2 PTE. The write never passed through
-> the host stage-1, and no unmap path reads the bit, so the record dies
-> with the PTE and reclaim may discard written guest data (silent
-> corruption).
+IIUC you run this on every cpu in the system, to make sure it's matching 
+the feature. Is there any chance the kernel is in EL2 only on some of the 
+cpus here?
 
-Sorry, I didn't get what you are trying to achieve here.
+If not, maybe we can run it on system_supports_hdbss() instead, which would 
+be easier for the user to understand it only runs in EL2, on top of not 
+needing the above.
 
-On your patch, I see you marking backing pages dirty at wrprotect and unmap 
-walkers, and it's very confusing to me on why you are doing this.
-
-IIUC, what you are trying to do is make sure a page does not lose it's 
-contents in case it is reclaimed by the OS.
-
-IIUC, when a page is reclaimed, it will unmap the S2 PTE, and save it's 
-contents to swap, so when the guest read or write to that page will cause 
-it to fault. 
-
-The page can never be just unmaped, as if there was a single write to it, 
-the backing pages should be writable, and the contents need to be saved 
-somewhere. 
-
-So, if I was able to understand your suggestion, we don't need to worry 
-about this, and this patch wouldn't be necessary. 
-
-Did you hit this issue? 
-Can you please expand on your issue, if I could not describe it above?
+Other than that, seems ok to me.
 
 Thanks!
 Leo
