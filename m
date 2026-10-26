@@ -1,72 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.115
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793028415;
-	b=xNyiePUCtAK22kVp9DBzaT20KjEJM1dhADIZSuM3EJZnoXufhx2zi71+pb9bql1zsCXj
-	 l+oD9Q5oCLXPwjxNLnsiJ/7AAHFn6Fbk15TrngiNF4MNmwB1Wf3MLaMaPTal+SYh3MVYk
-	 KRd2cy79H/ZPS+CCt/rLybHpl3aJ+LMwtLSugPn240tJeIorQOuLBTyGR6r9WwsHDjgdo
-	 uh0XtYNZIr2EUZ1LIr1nGYwCyBkt1wkdDuLfJeZZN+FlFG/LXKH7O6AI9w69+Cwk8tWiy
-	 gGtvsUkJoFvWKGQtVa1IxXMtKxnj6YejijfL8zbybzLLIATCZVRggyKih8N2M1hxTVw==
+	t=1793029307;
+	b=3atkLGN+bQJPF7js/KIqdJBT/t/WJu2BEGj6vJP/qp0smbOGdjrXkCxIz9Yq5AavSabK
+	 QLtUhWeLx109/icjZCiLuY0HHnvoUl7pwZG7Uplq1RkQbpjO/nvUWqlGOxWN9TC0kCeTA
+	 gOKdv032eZus2cHy0XTrgtep5mZBVoA0g+kBHR8gFYBmAEARCgp4Js7wMv8RsIDJpWCDx
+	 aNzanlRP0a22Vw/v1puUwetSifRz3VnDAqVa96rLkJzxA+FzCd3Hc3DFWHkpUGhxFSgkl
+	 BTrFz+oMjyvl9Nk1VvsgQ/lmVgX1/q5Ae8QgyZNbEwnC9Ciwb0HhkN2EmRamOXWMcYQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793028415;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=R+uyHs9ywIaM0i/9cYv3M9HNaFEltPzXJeKYyT3HeLQ=;
-	b=IdQqoFLj2UlUuT3BdSfvPmONkx817V2O8fXNbIPs9L8SUcLYZ+EhYU6x2QmTHR6+NZW4
-	 6TD6DamMns3bvoabeF9gXY3C9TtYYWtxFCGhgGM4PUnVkjcfQvy+IVUVvnbuTQ6fbfkM4
-	 5lIsyNBahJq5bGumpeyh8ZGPJuBWf2Ffg8Bsx9dVCdgOlGtv7uWBu/Wx7kPSTjZji3Iy1
-	 C4W5ojbr7/7SwJ3HJq0iTzpxMm0aJoxmdjTFBFUnyTQIeSNDwynCO2jaTsr2BJf3Rizil
-	 jmoyvpRa4++rS6ZKpDKnIY/U8YlHEUejrMJI0jeBkhI9i/m8TJQCofmQAbp5jPJ4XJA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793029307;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:Content-Language:To:Cc:References:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=GKj9JFfk8I4IU3vVzFmwmNrdflyxwhRRx6GsvWvD46w=;
+	b=X2PBn2GUy5b5iaOaoOSZIA+8IGUTLvHhpVB1i6QOpKGBgqgZWr4nDa6va7svZpfCWm2o
+	 3tTBgm8sBODFWUshHFXgnYpwUDvCJX3EpTBGwN4IUJrsvzRKba7uKJkbNZ8vTguuuv9eA
+	 JCo9frDn9+qHHcvdSo0g7jS87imcR2n/gpsZOjQFGmJzo0oWlI8kIaFKMM6XPSz19hiKX
+	 pYgts0Ho5vq/cQaastrgKEE8bDjcjO6VKwjTBDHk4n4wfE18d7JNPP9kymVyzRyWsVLVx
+	 uWSl2gCGjXALhEivGaM63m2UHHCx4W8Rc4Ou1ciBIXk7j8RV40F/0M/e6i8pnhZk84g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=GGcSxjh1;
-	arc=none smtp.remote-ip=95.215.58.115
-Received: from mta1.migadu.com (out-115.mta1.migadu.com [95.215.58.115])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19048606A32C
-	for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 15:26:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 19048606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="kUwXwSd/";
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D3A9606A31B
+	for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 15:41:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6D3A9606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=GGcSxjh1
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=HeX2/geBxz2dlu9U8tei1sYnbTS6/PpznfxzSmtORYY=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793028413; v=1; x=1793633213;
- b=GGcSxjh1UC0cDCLlNJtR4af/Jfdu7XvwZolqns7vXAfIesqqt7TVSd7HO4oPf/+limgiRxdw
- DV0LNNzoxOi0BKQIM5w8+YSY284Gd3P5rFgj1nJFGGaXexmKRrjsNgRg/j8w9T9DVJeSk8kT8XY
- BkuAX/k18vmb9DWM3QRsX2pY=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 069beff3eddbe141;
-	Mon, 26 Oct 2026 15:26:53 +0000
-X-Mizu-Trace-ID: 069beff3eddbe141
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] KVM: arm64: vgic-v4: Don't allocate vPEs when userspace clears nASSGIcap
-Date: Mon, 26 Oct 2026 15:26:39 +0000
-Message-ID: <20261026152639.3926498-3-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261026152639.3926498-1-fuad.tabba@linux.dev>
-References: <20261026152639.3926498-1-fuad.tabba@linux.dev>
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=kUwXwSd/
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 38E9819F6;
+	Mon, 26 Oct 2026 08:41:42 -0700 (PDT)
+Received: from [10.57.10.231] (unknown [10.57.10.231])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 199523F59E;
+	Mon, 26 Oct 2026 08:41:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793029305; bh=cmexXTKLOSAI+heYuz0JDdMhnzANsLX6gihKP09ScZw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kUwXwSd/nn5jBPQbUkRuYeXNe3OVLuPy3WXmLnpGX+CIDo6d3qTUCjK+OljzDFHAY
+	 hHak9JAT251sASlhwcYogAAeQ/6wJIWTHJItJTmkwOuL6KIbI8P7oyuE95FgDmbwB5
+	 ar8e8neaJQw3JFISwK7KgFX43wTDM7oEPFDEOhCg=
+Message-ID: <a86348e5-a55a-4a99-a3c6-24b3213ed3d1@arm.com>
+Date: Mon, 26 Oct 2026 15:41:41 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -76,44 +53,143 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/5] KVM: arm64: Add context-switch of ACCDATA_EL1
+Content-Language: en-GB
+To: Fuad Tabba <fuad.tabba@linux.dev>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Steffen Eiden <seiden@linux.ibm.com>, Mark Rutland <mark.rutland@arm.com>,
+ Yicong Yang <yangyicong@hisilicon.com>, Zhou Wang <wangzhou1@hisilicon.com>,
+ Arnd Bergmann <arnd@arndb.de>, Fuad Tabba <tabba@google.com>,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20261025075138.2919734-1-fuad.tabba@linux.dev>
+ <20261025075138.2919734-4-fuad.tabba@linux.dev>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20261025075138.2919734-4-fuad.tabba@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Since commit c652887a92887 ("KVM: arm64: vgic-v3: Allow userspace to
-write GICD_TYPER2.nASSGIcap"), userspace can disable vPE allocation for
-a VM on a GICv4.1 host with vSGIs by clearing nASSGIcap before the vgic
-is initialised. vgic_init() then skips vgic_v4_init(), and
-kvm_vgic_dist_destroy() skips vgic_v4_teardown(). vgic_its_create()
-still calls vgic_v4_init() for an ITS created after the vgic is
-initialised, though, and vgic_v4_init() allocates the vPEs and requests
-a doorbell IRQ for each vCPU. Destroying the VM leaks them, and leaves
-each doorbell handler registered with a vCPU that's about to be freed.
+Hi Fuad
 
-Rather than gate on vgic_supports_direct_irqs(), which reads has_its
-before vgic_its_create() sets it, check for a cleared nASSGIcap in
-vgic_v4_init().
+On 25/10/2026 07:51, Fuad Tabba wrote:
+> From: Marc Zyngier <maz@kernel.org>
+> 
+> Add ACCDATA_EL1 save/restore as part of the EL0 context. This is
+> conditioned on the guest's view of ID_AA64ISAR1_EL1.LS64 reporting
+> that this register is supported.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Fixes: 58ce78667a641 ("arm64: Add support for FEAT_{LS64, LS64_V}")
+> Link: https://lore.kernel.org/r/20240815125959.2097734-5-maz@kernel.org
+> Cc: stable@vger.kernel.org
+> [Fuad: rebased; switch ACCDATA_EL1 for guests only, as the host never
+>   uses it; gate it on a new ARM64_HAS_LS64_ACCDATA capability, since
+>   in pKVM the host controls a non-protected guest's ID registers, and
+>   an EL2 access to ACCDATA_EL1 on a CPU without the feature is UNDEFINED]
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>   arch/arm64/kernel/cpufeature.c             |  7 +++++++
+>   arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 23 ++++++++++++++++++++++
+>   arch/arm64/tools/cpucaps                   |  1 +
+>   3 files changed, 31 insertions(+)
+> 
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 32102c3912fa7..b5720c56eebc9 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -3225,6 +3225,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+>   		.cpu_enable = cpu_enable_ls64_v,
+>   		ARM64_CPUID_FIELDS(ID_AA64ISAR1_EL1, LS64, LS64_V)
+>   	},
+> +	{
+> +		.desc = "LS64_ACCDATA",
+> +		.capability = ARM64_HAS_LS64_ACCDATA,
+> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+> +		.matches = has_cpuid_feature,
+> +		ARM64_CPUID_FIELDS(ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA)
+> +	},
+>   #ifdef CONFIG_ARM64_LSUI
+>   	{
+>   		.desc = "Unprivileged Load Store Instructions (LSUI)",
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> index c382848d31947..4a008c8a696ba 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> @@ -17,6 +17,7 @@
+>   #include <asm/kvm_mmu.h>
+>   
+>   static inline bool ctxt_has_s1poe(struct kvm_cpu_context *ctxt);
+> +static inline bool ctxt_has_accdata(struct kvm_cpu_context *ctxt);
+>   
+>   static inline struct kvm_vcpu *ctxt_to_vcpu(struct kvm_cpu_context *ctxt)
+>   {
+> @@ -67,6 +68,13 @@ static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
+>   {
+>   	ctxt_sys_reg(ctxt, TPIDR_EL0)	= read_sysreg(tpidr_el0);
+>   	ctxt_sys_reg(ctxt, TPIDRRO_EL0)	= read_sysreg(tpidrro_el0);
+> +
+> +	/*
+> +	 * Despite the appearances, ACCDATA_EL1 is part of the EL0
+> +	 * context, as it can only be used using ST64BV0.
+> +	 */
+> +	if (ctxt_has_accdata(ctxt))
+> +		ctxt_sys_reg(ctxt, ACCDATA_EL1)	= read_sysreg_s(SYS_ACCDATA_EL1);
+>   }
+>   
+>   static inline bool ctxt_has_mte(struct kvm_cpu_context *ctxt)
+> @@ -131,6 +139,18 @@ static inline bool ctxt_has_sctlr2(struct kvm_cpu_context *ctxt)
+>   	return kvm_has_sctlr2(kern_hyp_va(vcpu->kvm));
+>   }
+>   
+> +static inline bool ctxt_has_accdata(struct kvm_cpu_context *ctxt)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	/* The host never uses ACCDATA_EL1 */
+> +	if (!cpus_have_final_cap(ARM64_HAS_LS64_ACCDATA) || !ctxt_is_guest(ctxt))
+> +		return false;
+> +
+> +	vcpu = ctxt_to_vcpu(ctxt);
+> +	return kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA);
 
-Fixes: c652887a92887 ("KVM: arm64: vgic-v3: Allow userspace to write GICD_TYPER2.nASSGIcap")
-Cc: stable@vger.kernel.org
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- arch/arm64/kvm/vgic/vgic-v4.c | 4 ++++
- 1 file changed, 4 insertions(+)
+minor nit: Aligning with the other kvm_has_feat() usecsaes, should we 
+wrap this under kvm_has_accdata() (with moving the cpus_have_final_cap()
+to the wrapper ?)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index a01de4de608a6..12a57921f6af3 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -251,6 +251,10 @@ int vgic_v4_init(struct kvm *kvm)
- 	if (!kvm_vgic_global_state.has_gicv4 || dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
- 		return 0; /* Nothing to see here... move along. */
- 
-+	/* Userspace disabled vPE allocation by clearing nASSGIcap */
-+	if (system_supports_direct_sgis() && !vgic_supports_direct_sgis(kvm))
-+		return 0;
-+
- 	if (dist->its_vm.vpes)
- 		return 0;
- 
--- 
-2.47.3
+Otherwise looks good to me.
+
+Suzuki
+
+
+
+> +}
+> +
+>   static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+>   {
+>   	ctxt_sys_reg(ctxt, SCTLR_EL1)	= read_sysreg_el1(SYS_SCTLR);
+> @@ -210,6 +230,9 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
+>   {
+>   	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL0),	tpidr_el0);
+>   	write_sysreg(ctxt_sys_reg(ctxt, TPIDRRO_EL0),	tpidrro_el0);
+> +
+> +	if (ctxt_has_accdata(ctxt))
+> +		write_sysreg_s(ctxt_sys_reg(ctxt, ACCDATA_EL1), SYS_ACCDATA_EL1);
+>   }
+>   
+>   static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
+> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+> index 2775ba3359cfe..f01719bbd6037 100644
+> --- a/arch/arm64/tools/cpucaps
+> +++ b/arch/arm64/tools/cpucaps
+> @@ -49,6 +49,7 @@ HAS_LPA2
+>   HAS_LSE_ATOMICS
+>   HAS_LS64
+>   HAS_LS64_V
+> +HAS_LS64_ACCDATA
+>   HAS_LSUI
+>   HAS_MOPS
+>   HAS_NESTED_VIRT
 
