@@ -1,85 +1,69 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.102
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793026929;
-	b=rgXyPUqxqUiK0yZT/PGfKXonRSMwNW2BwPgkR+rOvMEdnfCHdJENMe7FbWaUEYilMA0t
-	 gKYKq5WTXW1jIZrFXGAF0LzKCHnlDIax1TDZJgIeZgiARzVXKM6eRAhGCgCBV3WJUspNN
-	 NQmvgNbUWV+7l9nTADJ4PiMoWAGfpW0DhOQX4ZEiyR8G0SlqTLCO7Cr077Apys7IiQMmp
-	 asewLjY+DFnTNiZt+KzYqcteaeVxTGTh9PkgVNdEthbaCSD7+q66m25ZpUIfQL9Tsv24m
-	 PKGA9u2ZIgSYJK4nZb19oSGPhD/E7VSCGWP4GYexVJ/whb4BBa7PHhOT7yvl4L0gFtw==
+	t=1793028404;
+	b=SBXEI0+EgEDdk39d0SThElKlF7BmFe6sCLmHGNbbhKUHcWJf0E6qqQrA/sK+4qwc960/
+	 T5JbO/VcwUmFRi/Z2zb0hU8JyZXymv15/cRtIS6VSN5fzTvg0rzTSBLWuFVGzZMBzLoVH
+	 xqPYVA70ym6pFdWl2cF7NDdp/hN8Wbe/96CbMXPdMdKtQFm748NnRTB9WeEYrgCvg74Rm
+	 Z7xP3E3eRyRBkusDiKYd4p4hPRBvQnX3pBezE9h8BQWd0PrG/Pjqa4cDp10I+6D2eyxLN
+	 Ka8j2kdR4tSDuYR5JoAF91VCM3QjWbk8b45f4eepP4VQPUXN7r24ZpiEciQGF+SZrjg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793026929;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
-	bh=m9xXitEiI+hi1F9clvRlUMjS8JnuPFDTdYXDE0kyjzc=;
-	b=DckbaP+2s9/KKk8PVYY4VH+9/Xm0PPlvhV3BH04b3Gwb7KsC+Cysxz1FQWNw9O3iU7Js
-	 XMVEx3Msv/9uyXGmMHDov2ccoFT4UjpyQkd/d9ayRGbjN+CohV659Yp5sMA55UiA3CBBj
-	 +gn7vd6T3X/e2Sdu5D7u828RgquTpaWpGaFqBXLQQqca8moBwl9KhrhEGizKJiAyicGNa
-	 nolQmn+Hi11jfJFDgVlMWJ33ROC7M80go0Qxi7J1s6yy6e2qWLvL+eWUyBL25C13+UCJj
-	 ExxqAqD3QLzYHCyh3PIT5zNYxhwhWoXTcD/9rTVXPX0HcbKkXo1Kd/eo/oDWolBFvxA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793028404;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=6sX1ckCkCo0C9crGPLuXV3itI4WluLyfMysqHfXOIc8=;
+	b=b27kE85ML8nm2dmZSYpb0tPrDfb4AUbDwdkbv3Jc2iKuSARZ4SShFIPQTP92A53yQDS5
+	 QpskpsRGqg5gbTLDgKzhgBhUhtW0tzvTNY8niHTlindJrbshUW5o2wq0kU3RxssjLxD/L
+	 UF4jDor9VPD+dAB9a5eU3njvQWKDGg9o3ZC7isgr1DhFPyoi31eZfcb80jvfqBXXhN8A2
+	 rCUVy292lfR9Cq4j5uvDqF6IfKG3YtG8JMC2Iy1aVZ5jGjr0OUTPnoYTJQ+hVQ9YZT8Qp
+	 5RnBxyyaOt8LB5nD4C+cNo/NIoHYGA9OT27fZmUjfYxXSCxArEDHf4JDocDmclOlsDg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Fq8fBUGG;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7691A606A31E
-	for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 15:02:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7691A606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Yug95bfy;
+	arc=none smtp.remote-ip=95.215.58.102
+Received: from mta1.migadu.com (out-102.mta1.migadu.com [95.215.58.102])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02F5E606A31A
+	for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 15:26:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 02F5E606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Fq8fBUGG
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AEA1B1655;
-	Mon, 26 Oct 2026 08:02:03 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2EA793F7B4;
-	Mon, 26 Oct 2026 08:02:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793026926; bh=v+zgyK0QwsGg1V453RC6kjK16TjZSW8MMUUh5EUtImA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Fq8fBUGGhyKB1XXODIVt6BLwqv4o1xkXZa7X2pGzhE3cWxE1Dx6V2Agz2JruU6v8B
-	 e6+kt1FW/KX9OCoA7zQKe+M/qRq4dDfLlyRJhVUpUX6qmLxdWvCOV5AohG8CCGKOyh
-	 lOSGCTkE5jrlgqOKG5he5sUj7qM29vi1N67m9FTc=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	maz@kernel.org,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	corbet@lwn.net,
-	pbonzini@redhat.com,
-	yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com,
-	yangjinqian1@huawei.com,
-	caijian11@h-partners.com,
-	liuyonglong@huawei.com,
-	tangchengchang@huawei.com,
-	yezhenyu2@huawei.com,
-	yubihong@huawei.com,
-	linuxarm@huawei.com,
-	joey.gouly@arm.com,
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Yug95bfy
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=s46YFljZH4peYcKfdSw0ukYEvKh0IVavDFv9NTBlyqg=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793028402; v=1; x=1793633202;
+ b=Yug95bfyhInIBBLxd8u3eOeUaRUZqKDFTlAV245v9MCfpVidsG9MXF15Tx24oWy50Mg1BJkh
+ V0TMFYqROCTeGQCVJ3V0OBA0bbduJ0VkrglxqpiOGhozxi1/5kfGZmon83H6SE8PJdBGObF1qqY
+ 1cJJ1un2J85n79Im7RnTVi8s=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id c79fc02862921bcd;
+	Mon, 26 Oct 2026 15:26:42 +0000
+X-Mizu-Trace-ID: c79fc02862921bcd
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Will Deacon <will@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
 	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	fuad.tabba@linux.dev,
-	mark.rutland@arm.com,
-	seanjc@google.com,
-	rdunlap@infradead.org,
-	linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	skhan@linuxfoundation.org
-Subject: Re: [PATCH v5 01/15] KVM: arm64: pgtables: Change write bit from S2AP_W to DBM
-Date: Mon, 26 Oct 2026 15:02:00 +0000
-Message-ID: <at9raEVrsbb7rj6n@LeoBrasDK>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <8ca88576-651a-4b7f-91ff-2cb2359aa79e@huawei.com>
-References: <20260929103655.85107-1-zhengtian10@huawei.com> <20260929103655.85107-2-zhengtian10@huawei.com> <arxW4PUY3qqRkogl@kernel.org> <8ca88576-651a-4b7f-91ff-2cb2359aa79e@huawei.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] KVM: arm64: vgic-v4: Don't allocate vPEs that a VM can't use
+Date: Mon, 26 Oct 2026 15:26:37 +0000
+Message-ID: <20261026152639.3926498-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -89,56 +73,43 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 30, 2026 at 10:44:26AM +0800, Tian Zheng wrote:
-> On 9/30/2026 8:25 AM, Oliver Upton wrote:
-> > Hmm... I'd actually like to see this structured where the "write" bit
-> > could either be S2AP_W or DBM depending on if the system supports
-> > FEAT_HAFDBS. Look at how HVHE is handled for selecting the right AP
-> > encoding for the hyp stage-1 page tables.
-> > 
-> 
-> Hi Oliver,
-> 
-> Thanks for the suggestion. I missed the case where FEAT_HAFDBS is not
-> supported. Systems without the feature should keep the original
-> encoding, with S2AP[1] as the write permission bit. I'll follow the HVHE
-> pattern to select between the two encodings in the next version.
-> 
-> Thanks!
-> Tian
-> 
+Hi folks,
 
-Hi Oliver, Tian,
+Two fixes for vgic_its_create() allocating vPEs for a VM that never
+uses them. Nothing frees them when the VM is destroyed, and each
+doorbell handler stays registered with a freed vCPU.
 
-After some digging, I think it would be better if we kept using S2AP[1] as 
-a writable bit, while DBM can be treated as "Can promote a non-writable 
-page to writable if HAFDBS=on". 
+The first is for a GICv2 VM, which KVM can run on a GICv4.0 host whose
+CPU interface supports legacy operation. The second is for a GICv3 VM
+whose VMM cleared nASSGIcap on a GICv4.1 host with vSGIs.
 
-I know it's not that intuitive, as the Arm ARM even introduced the concept 
-of Writable-clean an Writable-dirty, but I think it will be the best way of 
-referring to what was intended of the bit.
+Tested on AEM FVP, with has-gicv4.1=0 for the GICv2 case and =1 for the
+other. With my reproducer (clear nASSGIcap for the second case,
+initialise the vgic, create an ITS, destroy the VM), the kernel without
+the fix leaves four "vcpu" doorbells in /proc/interrupts in each case,
+and the fixed one doesn't leave any.
 
-I wrote down what I mean by that:
-https://lore.kernel.org/all/20261026144413.441566-1-leo.bras@arm.com/
+It doesn't conflict with my vgic init error-path series [1].
 
-tl;dr: 
-- DBM + S2AP[1] is set on writable entries (KVM_PGTABLE_PROT_W)
-- Writable detection is made only on S2AP[1], so no changes
-- Wrprotect sets S2AP[1]=0 from the PTE, and also DBM=0 if it's a block
+Based on Linux 7.3-rc3 (fd73f4a665989; also applies to kvmarm-7.4).
 
-On dirty-tracking:
-- If HAFDBS=0 : no functional change, DBM bit there but unused
-- If HDBSS=1
-  - Pages: writable-clean promoted to writable-dirty on write, HDBSS does 
-    the tracking
-  - Blocks: faults on write, splits in pages, pages get DBM=1. 
-  	(argh, I think we need a PROT_DBM for that) 
+Cheers,
+/fuad
 
-Does that make sense?
+[1] https://lore.kernel.org/all/20260921072958.2918477-1-fuad.tabba@linux.dev/
 
-Thanks!
-Leo
+Fuad Tabba (2):
+  KVM: arm64: vgic-v4: Don't allocate vPEs for a GICv2 VM
+  KVM: arm64: vgic-v4: Don't allocate vPEs when userspace clears
+    nASSGIcap
+
+ arch/arm64/kvm/vgic/vgic-v4.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+
+base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
+-- 
+2.47.3
+
