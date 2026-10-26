@@ -1,69 +1,74 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793016079;
-	b=pA4Eeqk5XTbp9k4H81rklrJKx3TW++pgC20ytxrJ/ZjNuOg7NK84TTbKOJdmAW8zdMXn
-	 vcDaoWQaX68yzTTY6n659gJSawySH/iEaSLMc7Z6f4mA968ATTwZZmiv7QSekzNtfcZGY
-	 s9PHWGuWRV5jPOL04NjOUYWfVjfik7Yxr/au4UTzeZR3AoD6AO3+aINjvqBdWncMVCQOp
-	 DPsiwW+lXDT0Nj6xp0jipfvqU9v/o4wcsFnzymXoQchYcg8o20L7dy2y8VE4l56TJumyS
-	 ePEy319tGi2j5lk0FIweIO8AfDFkTxag19gUj9tQJ33pcTOFqs0iPGLg99bQ5Ihp07Q==
+	t=1793016080;
+	b=T3Fx8hAAd6VY37TGjhAtUS263s1NhM46ssa4yOZmZ8d/udHEY1T1/Rp0+K4ja79FC6+A
+	 tg84YEfZprNSF52HbOsgr2RpRFYlYx23X0UU5JqGQpJFjou5i3tlrNr3+yNnd3gIU1uF3
+	 iVp3bkZTUdo3B5n2+s5Z3sNx13I5nm9MHQBj4nKfWaFWR2SIHrbwbOX3Kdd22ygiEu5Hu
+	 zwGv+NZp8M5Y2gV+LMf+dPuOaI/AJHNE+dmdYg8q2Qn21TTBIFGUNWifC4vyBv+pYlhwe
+	 aJo0ODCpX8CFPJ4S3uSJAGOlIhbyFW/2T0un778J2LVsU6nefjMEKHkaSm0d9ZCobBQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793016079;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793016080;
 	h=Received:DKIM-Signature:Received:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding:X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:
 	 X-SA-Exim-Mail-From:X-SA-Exim-Scanned;
-	bh=00z8Y8GW8ca1Wv3c+CFIBQZrxnGa28sKK7la2T75TrI=;
-	b=cukk6Mjl/b0Qpelbb6UP0vx01P8x0u52Wg+K6ldNruzSYPf+YHKsCKZV/VoxrKfC+/Ab
-	 UoE18TH5XUhhLeKLWX2ZDxefrftTiwm96jgmP/qnjMe6pbHvVQCLekgaOGVVD2YTLKSMa
-	 jEaKLJ9sSE6UXJpf0dbM/wZtFoa4gfPFroXkgUP3/PZBFL7xgo1JPCv2nhCdcvk4mgkMh
-	 xWyuUJv0ow5ctnOigu/MVO2Rqn7xiWBHJEvQZkKXJfzw0DpIYnljsdgZ1LiC4amzghk8g
-	 MK66WrPRNCRVGb6lrwTRNcMMCVGNmwr7M5ZSMrAyxSC9Xgw8bpSsuKeB2Nxuz17ycJg==
+	bh=wlK4J5+u27LNMsvRQXEEEMIC66E4N0DC/9wfhCw0BeY=;
+	b=lF4vBdwH7cgMyyihdToMbMf70aMEovpK8fsVg9yYA20iBHDBBEgUXDTb66jSk+BGdt/n
+	 wMRFLcqBVNjGYcj2ESO9QEKZjGxOtaXsqw6mWjkFLiPmvdP2PshOWO0mygVrI4NTfdCT6
+	 fW6m0Wyk9YVB20cfw9MpQGPQCNsiDkJcZJhA1agmMAeN4lZvNXFxWLxzm5YXzkv7T29F3
+	 F/4pjDpCMQ2kqsvz105x9dZd1fOJbzRj73hqg1i5wbxEpZJF5KlnwzJvpYSVa3ev/GGcd
+	 9bh0zI8xVgQ82UeMG4rRRbwaxOMJ5jCcsV7kNVigd1EcTsC9mJvgDclBpnacpLc72gg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fbOeMxVz;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jbyzkPZe;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7ACA60A2604;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2453606A33B;
 	Mon, 26 Oct 2026 12:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fbOeMxVz
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D79F1F031E1;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jbyzkPZe
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C70501F01828;
 	Mon, 26 Oct 2026 12:01:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1793016079;
-	bh=00z8Y8GW8ca1Wv3c+CFIBQZrxnGa28sKK7la2T75TrI=;
+	bh=wlK4J5+u27LNMsvRQXEEEMIC66E4N0DC/9wfhCw0BeY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=fbOeMxVzZ2wwyoueUYpOU4eoNV33v/2vwwS64f+6CntR9IYN15e8WRqPxMIQVCO6C
-	 xt3u2xemlqPYoFa3/MSnMFB4XGIWwoyJ8MkaB06zBLgpUeLN/e2ISwrsmLfM/OF1Rb
-	 x0JNVnwP/NiaEM19QM4eSB8FVG3lpdAipT6ixfTmDE8b87pxFOwR/5qbdNPJBlDVI4
-	 id/CAFWkSslNMNI5z9jmK12XlLFdlW4j3gXfmO/wHxWOThV7CeDxoFJu5D5OdGUYBm
-	 QDn9SUBkGYUmjTziAj6mFkWvyEb29xfrJx13q+64lfJb32w3cGXIt9VQyAZKycV16H
-	 IhHYLJ3mcXtUg==
+	b=jbyzkPZe6foy50XtTP9CpXx4hvabTiJl7PmzZzs0+hz/Vw0IYK/3YaR4jznmU4gE6
+	 owoMZot7uL5NWe8yELeqdFDQjlxc0uUAm0TvfYszXhYnYCUpeXba8jiRRIwLb9yWiJ
+	 s1TasvE9jh1C6EmxBzBlX3swxc+3anPAy3marb64KvJOm4UhvlRb1zHyR+oJsVjiUe
+	 r7ecFk678xweiS/cW0IqMNtwxIcpV/jBszlAEZjT78prDnnhg4rebyVRH1C0GXDORm
+	 CJumswHuuCm1ozrecgRDPAt4WpDRF+aTyL9St/PaBKOI1Uu7qmNlYJyYTbrp/eGlq9
+	 zX6Ba+OQNZerg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1xLJO9-00000007Fr6-3Xwv;
-	Mon, 26 Oct 2026 12:01:17 +0000
+	id 1xLJOA-00000007Fr6-0Y6d;
+	Mon, 26 Oct 2026 12:01:18 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
+To: Oliver Upton <oupton@kernel.org>,
+	Sasha Levin <sashal@kernel.org>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
 	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	Sascha Bischoff <sascha.bischoff@arm.com>
-Cc: oupton@kernel.org,
-	fuad.tabba@linux.dev,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com
-Subject: Re: [PATCH v3 0/2] KVM: arm64: Reject mismatched VGIC/ITS models
-Date: Mon, 26 Oct 2026 12:01:06 +0000
-Message-ID: <179301587210.2527370.18024850620938589623.b4-ty@b4>
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Take a protected vCPU's TWI and TWE only at vCPU load
+Date: Mon, 26 Oct 2026 12:01:07 +0000
+Message-ID: <179301587188.2527370.14948250574472478110.b4-ty@b4>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261020163923.1407856-1-sascha.bischoff@arm.com>
-References: <20261020163923.1407856-1-sascha.bischoff@arm.com>
+In-Reply-To: <20261017165204.3343275-1-sashal@kernel.org>
+References: <20261017165204.3343275-1-sashal@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -76,26 +81,30 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, sascha.bischoff@arm.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: oupton@kernel.org, sashal@kernel.org, fuad.tabba@linux.dev, pbonzini@redhat.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, vdonnefort@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 20 Oct 2026 17:39:21 +0100, Sascha Bischoff wrote:
-> On a GICv5 host with legacy GICv3 support, KVM exposes both VGIC
-> models to userspace. A VM can create a GICv3 ITS alongside a GICv5
-> VGIC, because neither creation path checks the model of the other
-> device. The ITS sets has_its, but a GICv5 VM cannot use a GICv3 ITS
-> for MSI translation. Creating the ITS before the VGIC also lets
-> userspace select an incompatible VGIC model later.
+On Sat, 17 Oct 2026 12:52:04 -0400, Sasha Levin wrote:
+> Commit 06499de8f998 ("KVM: arm64: Skip fixed-feature state flush for
+> protected vCPUs") moved the copy of the host's TWI and TWE in
+> flush_hyp_vcpu() into the non-protected branch: a protected vCPU takes
+> them in __pkvm_vcpu_load() instead, and only VSE comes from the host on
+> each entry.
+> 
+> Commit 04447b95c62b ("KVM: arm64: Use the host's HCR_EL2 for
+> non-protected VMs in pKVM") was written against the old code, where
+> both VM types took TWI, TWE and VSE on each entry, and kept that for a
+> protected VM as PKVM_HCR_EL2_HOST_PVM. The merge of the two applies
+> PKVM_HCR_EL2_HOST_PVM in the common path, so a protected vCPU takes TWI
+> and TWE from the host's vCPU on every entry again.
 > 
 > [...]
 
 Applied to fixes, thanks!
 
-[1/2] KVM: arm64: vgic: Require matching VGIC and ITS models
-      commit: 05620a31421935f737d16a060d2dfe731f7b2f74
-[2/2] KVM: selftests: Reject GICv3 ITS with a GICv5 VGIC
-      commit: b17eea28dc815f63aa3279a66fd1e4de47a8a446
+[1/1] KVM: arm64: Take a protected vCPU's TWI and TWE only at vCPU load
+      commit: 5b34f0b4adbf983174e53721f68b617113376f2f
 
 Cheers,
 
