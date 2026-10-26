@@ -1,61 +1,68 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793023650;
-	b=xjQ/N7s0Ae3KB7E6/2WSzb7FESWCdcXP7/6kzAIeCIOHpO5E30jJG1IZ5NbZzNGCHjQ9
-	 wmq2Ewx+tuSdRMU+E/6fFKMpJEmhL2OkG2kdFLYIrRx828WuLEdGp7bB5UHWXWl2RxrKU
-	 vNwEY0YZ6UjV72/jndNijOhETRGN7/bcrjsNXnex61eKJf+gfCpVZoPP4Eb6ORcBCsOBm
-	 V48C0BlLmbMgJ1gjzHqY0MqATYNPvkuRe4sOtxtiNffsLg0jdJs4MMe9KwZjIDFE3klh0
-	 QqDSbkD24ZH8eNK8kNVvZTEmGf1NX+VaM7O+u4pZBbcJMdVmWs5iijHUQScPTUvosmw==
+	t=1793025883;
+	b=02EGUmMGD4EW2Nz2uqChIXvzYroZP7WN458WtBTTQPrZKVxZX2Xb3k1YrBBqNOKIiLAS
+	 EbNzvzhSrJV629IdG8/IFALmbVXXuPJqfFHX+S/w3gOXbhamgS8ANLFWgEmipFV1q9/vr
+	 x3kQLFGVXAS85oHsvNVIqGA2mu8tVEnC0jhd468BBhW/SwomKDU3b6rFZpk6oGwtWgTQc
+	 r9l12xyi1IUoakOernKpjLp7+4y+33KrTrXUy6ER80/JmDj1ffwELeIfemdAzUz4B2JCV
+	 pmXWoMnMZ02lwkepLbBYoAuD7HaVcBgcATfvMD9DIrESupHaojsObf3hyQ3tAKxG/TQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793023650;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Gm-Message-State:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:
-	 X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:Subject:To:Cc:
-	 Content-Type;
-	bh=o2NPZbWA6+uMRn4xr5m7DWDGwtChXRj3f2KhhtG1Hlk=;
-	b=bKG4txDPejh5V7YIhHn3/uoGmdqzuGWhFL0ELLWD092Uf+E5Y8lzWHP9iItu9Dtm8Ta8
-	 ToxZDUcXVIbiyK8t7gcUVedCs6MsR5hmjjPmWuYoij9Fq2Dg+HuOHltKnRXwFcQSiBS8S
-	 GcEffO6ZP+ttZOs6Xg1BT99OFMNtvmhpQvjXsS+sGHZ9sT701iqHUxAemF+QbaTJsK94u
-	 bzLULHwGb69ZIZ5bk1i7DIt8v/KkDSVPkdVyeIK/goDZ208waeeU+rxBhgC8GpeoZNlDC
-	 mpBzI0f203PuwG8A+FmsbLQGJdelgVZMTbQun6aBo64I87ojXLt3PE2a+HRySBaT7lg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793025883;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:X-Developer-Signature:
+	 X-Developer-Key:Content-Transfer-Encoding;
+	bh=2bC/tKvsMyQSFyWd/4grWajRGenpXtC7/e5rOkNlwlE=;
+	b=5RQXTAg5sh+HFFbPUbhQ5uq9/DOFowMQpjbw5aWgKzr3UHvr3ISI35rF5Xh0tEkBTrVr
+	 aydfErw4k9GXs6CaxAtjSbujynQDOFAM3YKaVRngT14WZJcmVSOTMJuAfQ+JDUyUIFhmh
+	 pclITs4m+l675bZhiGk0AdZ5k9U2WL6iW0AXHGB6j6umYGYt2GzpRSMJ3BeP3xKk+Me8t
+	 xt10oHqzqElPaFYz6kjLVpxFujr5t2eOr4y2BC1Vk9aB61vU3FUN7ijDhizn7/Gsnubb9
+	 Em4Wof7/Rc1gVMrex8oIp+9dRXPM7lWqN7UrJ8/lf3XNU2sYMOmoHLWiSifhvXMob0g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=BOaLcSNb;
-	arc=none smtp.remote-ip=91.218.175.189
-Received: from mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B90606A31B
-	for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 14:07:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 66B90606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=cc641w2U;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A7B2606A31B
+	for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 14:44:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4A7B2606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=BOaLcSNb
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=o2NPZbWA6+uMRn4xr5m7DWDGwtChXRj3f2KhhtG1Hlk=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793023646; v=1; x=1793628446;
- b=BOaLcSNb52fcoWRAcVgWmTObLdGfm77N3xG/4XFYJkJSlpclvOVWQEYEH6gEVdDgOKvfJiB2
- +GDD3F70CDowqqrC3Q6TNASH+zHAMTNvs+G6Oh6i/X+MhSZeVJQ1Kl74FXP5sJ+HxvQA9zJM3en
- eQ/TgBCXXOaytcx17V/c25rw=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id a5c90954689e6792;
-	Mon, 26 Oct 2026 14:07:26 +0000
-X-Mizu-Trace-ID: a5c90954689e6792
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5be58ad9600so11655e87.0
-        for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 07:07:25 -0700 (PDT)
-X-Gm-Message-State: AFq9FYLofEyueLfmtiQeKHpH5GNHFVVFYFdLEIN63k31Y6NWBj148kvZ
-	++jwTKxU4awXtJd1Cec47n9Ec63RcT7uaLlbcGDXk3NmVD+e4rnuaQ0esix5ASJedAH0zYqMRPK
-	9CxHPLm7LCLufedHAIpKsO31wPDW1ne6ybZijwWpn
-X-Received: by 2002:a05:6512:a94:b0:5b8:f20b:350c with SMTP id
- 2adb3069b0e04-5bfb79aed47mr175268e87.3.1793023644976; Mon, 26 Oct 2026
- 07:07:24 -0700 (PDT)
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=cc641w2U
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6D1F415A1;
+	Mon, 26 Oct 2026 07:44:38 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 932E83F7B4;
+	Mon, 26 Oct 2026 07:44:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793025881; bh=cXwGQ1sgxxKZyhdDrXpdQtNttNvD0RVFexoJ9R9VXl8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=cc641w2UwlCKZjaZ6pVm4urYV48alptH2J9aWv5cKo5Wo1XqBvDykrSj2aRAF1H9i
+	 5sGR5B/F9mKusRhXjgKIwz+SfGLvQJp9Dzctg82Pwl7Yp9JDNQ3UD0zpTgP0sbOIKI
+	 y/kJZBx0ZBNZF5QpiXnZvHAD6GEi0iCyS14f6D4k=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Oliver Upton <oupton@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Leonardo Bras <leo.bras@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Tian Zheng <zhengtian10@huawei.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH v2 0/3] Set DBM bit on writable pages
+Date: Mon, 26 Oct 2026 14:44:06 +0000
+Message-ID: <20261026144413.441566-1-leo.bras@arm.com>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -65,37 +72,57 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261026082305.2515705-1-maz@kernel.org>
-In-Reply-To: <20261026082305.2515705-1-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 26 Oct 2026 14:06:48 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTwB63+RL=5=kb1jMbbjLa7-r9+L-4xXt28pP8jYjx456w@mail.gmail.com>
-X-Gm-Features: AclHuK_Ciqa1-nHCIpB_KeKWlov_S50T8qZTQ8KyurQOAUPRFkCKEJz_GNIaL0Y
-Message-ID: <CA+EHjTwB63+RL=5=kb1jMbbjLa7-r9+L-4xXt28pP8jYjx456w@mail.gmail.com>
-Subject: Re: [PATCH 0/2] KVM: arm64: Reenable MTE on VHE guest exit
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	Steffen Eiden <seiden@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2136; i=leo.bras@arm.com; h=from:subject; bh=cXwGQ1sgxxKZyhdDrXpdQtNttNvD0RVFexoJ9R9VXl8=; b=owGbwMvMwCX2pizjszvTwvWMp9WSGLLupxsaJqiuV//2b+8U5p99kl2hzS61uzMNn29+8EIr9 PfZwLlhHaUsDGJcDLJiiiyyj+av4vk+JePIlR8LYOawMoEMYeDiFICJ/F7IyDDpjlbE/mvLLW3a F9sVzTFn1cmZdlVw/gepVAshs0UTFu5jZFjdof9mzTn9Loub/25bWaR+uPTkvOrnlX+bt+6J8NG de4MLAA==
+X-Developer-Key: i=leo.bras@arm.com; a=openpgp; fpr=36E6C95AE0F111CC5B6F4D2E688C33F8A0C5B0C5
+Content-Transfer-Encoding: 8bit
 
-Hi Marc,
+When HAFDBS is enabled (VTCR_EL2.{HA,HD}={1,1}), having a DBM bit allows 
+hardware to promote a non-writable page to writable by setting (S2AP[1]=1),
+without having to take a fault.
 
-On Mon, 26 Oct 2026 08:23:03 +0000, Marc Zyngier <maz@kernel.org> wrote:
-[...]
+The reason for this patchset is to add the DBM bit when setting-up writable 
+pages, so the code is prepared for future patches that make use of 
+HDBSS/HACDBS to accelerate dirty-tracking. Write-bit detection still 
+happens based only in S2AP[1], so no change in that aspect.
 
-Tested on QEMU with MTE, on a VHE host with KASAN_HW_TAGS: a debug
-print right after the guest run returns shows TCO set without the
-series and clear with it. Guests also boot on nVHE and pKVM hosts (as
-normal).
+Having DBM set on block entries is undesired, as we benefit from the first 
+fault for splitting it in PAGE_SIZE entries, which is the granularity used 
+to track the dirty pages in KVM. So introduce a new walker that, on top of 
+clearing S2AP[1] for every entry, also clear DBM for block entries.
 
-For the series:
+Also introduce a new VCPU request to reload Stage2, as it will be needed on 
+future HDBSS/HAFDBS patchsets. 
 
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+Please let me know of what do you think!
+
+Changes since RFCv1:
+- Dropped patch #5 on enabling HAFDBS on non-dirty-tracking guests, as it 
+  proved to be counter-productive on wrprotect, contrary to expectations
+- No more moving writable-bit to DBM. That does not seem to be the intended 
+  use. It makes sense and it's easier to convert code to new DBM approach.
+- No new PROT_DIRTY, so drop patch #2
+- Tried adding a PROT_DBM, but does not seem necessary to fault a page as 
+  writable-clean. 
+- KVM_REQ_RELOAD_STAGE2 now depends on VHE, as it already reloads Stage2 on 
+  guest entry otherwise. 
+Link: https://lore.kernel.org/all/20260901171558.2674031-1-leo.bras@arm.com/
+
+Thanks!
+Leo
+
+Leonardo Bras (3):
+  KVM: arm64: pgtables: Set DBM attribute on writable Stage-2 PTEs
+  KVM: arm64: Introduce a dedicated walker for stage2 write-protect
+  KVM: arm64: Add KVM_REQ_RELOAD_STAGE2
+
+ arch/arm64/include/asm/kvm_host.h    |  2 ++
+ arch/arm64/include/asm/kvm_pgtable.h |  3 +++
+ arch/arm64/kvm/arm.c                 | 10 ++++++++++
+ arch/arm64/kvm/hyp/pgtable.c         | 30 ++++++++++++++++++++++------
+ 4 files changed, 39 insertions(+), 6 deletions(-)
 
 
-Cheers,
-/fuad
+base-commit: c03c1a14507dfaf8b856c2608f9ac216021fc222
+-- 
+2.56.0
+
