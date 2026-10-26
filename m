@@ -1,49 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.71
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793029307;
-	b=3atkLGN+bQJPF7js/KIqdJBT/t/WJu2BEGj6vJP/qp0smbOGdjrXkCxIz9Yq5AavSabK
-	 QLtUhWeLx109/icjZCiLuY0HHnvoUl7pwZG7Uplq1RkQbpjO/nvUWqlGOxWN9TC0kCeTA
-	 gOKdv032eZus2cHy0XTrgtep5mZBVoA0g+kBHR8gFYBmAEARCgp4Js7wMv8RsIDJpWCDx
-	 aNzanlRP0a22Vw/v1puUwetSifRz3VnDAqVa96rLkJzxA+FzCd3Hc3DFWHkpUGhxFSgkl
-	 BTrFz+oMjyvl9Nk1VvsgQ/lmVgX1/q5Ae8QgyZNbEwnC9Ciwb0HhkN2EmRamOXWMcYQ==
+	t=1793032791;
+	b=atmQhIQ7AXhehLbuqh6WgOHx7rAkgaGW7Kkv5pi7iIBZO2rwwjJ1L8HsqH50hS1qW/Qh
+	 06uI3y67Ck7l39R/5z5jk39cKqhK2JO5i1phJod0z+fMPpcqPLFmYn6WQmWnTXzCLFvZV
+	 xQAx++epkXoW+2a/Dt6UwOThQS257gRHXeZYZuV3jrrMLerM3FH35Y65XFDmipXR8j5hj
+	 uEKTGhAGbaXS9EBASPzGkUW1jWLZhhfeDfKOXPVL9ZwuP4c1qxi2kieGpuByr5EBgZILW
+	 Qlt5raCDgkPwBvYNIghgmglbUlvduerdsDaJUjk3qH0jJnZsuW+1e4Kdt3UbqisOi2w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793029307;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:Content-Language:To:Cc:References:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=GKj9JFfk8I4IU3vVzFmwmNrdflyxwhRRx6GsvWvD46w=;
-	b=X2PBn2GUy5b5iaOaoOSZIA+8IGUTLvHhpVB1i6QOpKGBgqgZWr4nDa6va7svZpfCWm2o
-	 3tTBgm8sBODFWUshHFXgnYpwUDvCJX3EpTBGwN4IUJrsvzRKba7uKJkbNZ8vTguuuv9eA
-	 JCo9frDn9+qHHcvdSo0g7jS87imcR2n/gpsZOjQFGmJzo0oWlI8kIaFKMM6XPSz19hiKX
-	 pYgts0Ho5vq/cQaastrgKEE8bDjcjO6VKwjTBDHk4n4wfE18d7JNPP9kymVyzRyWsVLVx
-	 uWSl2gCGjXALhEivGaM63m2UHHCx4W8Rc4Ou1ciBIXk7j8RV40F/0M/e6i8pnhZk84g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793032791;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
+	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=ucD/WoA7wxIoPFGYELZoInIDrJz1mWtO2kaqtrfylpQ=;
+	b=ga4LUeFQ0tA5KcFJbZcoLVgI9wKqoySdIcS+36ic9pVw+36+03oJ3QV+BjI1Inh+sZmO
+	 oH8yItNtUmLuAS9WX5kz4hpOhdBMAxlPeoi+UJmVekmsK7mgSHaWuVk1skO5Pj4t+OwTa
+	 D37/t/B1AYy4NHF0pYljGzEyr0sx12KRYfal0L+DsmgLeujcjjEL80MkHWP5ds8fqy5yM
+	 RP62m6i388VKCh0uAo7ZMf/QkInCyZbBcXR4ZFiZ3BuI23ZWkL94JU85iZD8N746CBC2N
+	 /cnKksZCal7cNZASKuMS1kfD/NieEOBYuUkti98PqdgCb+eGs6DKgZG1XPWPLq7v9Rw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="kUwXwSd/";
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D3A9606A31B
-	for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 15:41:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6D3A9606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=AD9vUmoi;
+	arc=none smtp.remote-ip=209.85.128.71
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F826606A320
+	for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 16:39:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8F826606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=kUwXwSd/
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 38E9819F6;
-	Mon, 26 Oct 2026 08:41:42 -0700 (PDT)
-Received: from [10.57.10.231] (unknown [10.57.10.231])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 199523F59E;
-	Mon, 26 Oct 2026 08:41:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793029305; bh=cmexXTKLOSAI+heYuz0JDdMhnzANsLX6gihKP09ScZw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=kUwXwSd/nn5jBPQbUkRuYeXNe3OVLuPy3WXmLnpGX+CIDo6d3qTUCjK+OljzDFHAY
-	 hHak9JAT251sASlhwcYogAAeQ/6wJIWTHJItJTmkwOuL6KIbI8P7oyuE95FgDmbwB5
-	 ar8e8neaJQw3JFISwK7KgFX43wTDM7oEPFDEOhCg=
-Message-ID: <a86348e5-a55a-4a99-a3c6-24b3213ed3d1@arm.com>
-Date: Mon, 26 Oct 2026 15:41:41 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=AD9vUmoi
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4a1f03f2e8aso25488915e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 09:39:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1793032789; x=1793637589; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ucD/WoA7wxIoPFGYELZoInIDrJz1mWtO2kaqtrfylpQ=;
+        b=AD9vUmoiVrsS4xnkcTQYVy2V+oVeV0WTyQA52JF316Id+aIt3uRAma1Z8fH5OkLU67
+         pMdkY1p1/j0Sdeu4n3rmeT4gKQiiXIU4jvOsiFBwiAq45mIRQXzLDr76aFiqL91FDbCb
+         uvwysjRmnbGGyf2EoNnoABEI91UBpxBAjw0fPb3zr+wzxsEgkTJoSifixLq3Z6gBnhcY
+         Wd8/ScoGuTkYD34OMEOZh9X2Ejhyneo2eKSS67d9DHI2eG+zlm7i2GH+I+mI8zL+R9mF
+         wAD0ppHD91Wjb0lvT5rD5caBnz65+/K4mS/fQyFpNyFZT1hu9UDCEPQ76N8AHD4fim9K
+         u50Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793032789; x=1793637589;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ucD/WoA7wxIoPFGYELZoInIDrJz1mWtO2kaqtrfylpQ=;
+        b=0K1eGggd/06AKc6vy45799CrTEL3cxSQRchcUs5onFmP7cuf/fvr7a91wFraEPw1bZ
+         +o9+qG0d7DNY2yjGBaxVn9wt7JHTvai1d/IQ1lGywO7KU4z66F9iDuAkZ5U2tC6ftQQJ
+         x2P5nkWeCc7EAYs2hruZq7Ls9PDwuKzY+0/UY4DB8DNekb9TsIJJS0WvI9suctSpcr1L
+         y0MbDuUeJHI6HC4dY5sRvnBTwDbb+HCQY3sN1RfGN1mg9UWgAYjvvWH1nNakURd4H6FR
+         PFaTc+4QPe/la3VDJPw1RsVef9vtkqJfAbevWqrD8/m8EX4HCnpH8M3UXu49VhSyep2o
+         Gdhg==
+X-Forwarded-Encrypted: i=1; AKwUvBxQRPK7igHjmCeSx8NHP2tvONG7tNWWJTetToESH2VXDIly4Z5OC0N3ptQXZC5tPvkks902okY=@lists.linux.dev
+X-Gm-Message-State: AFq9FYJR0uuyhrjvPUMrjKvHF/VWp/iT0y/sGSKzpsD0hmHesUoxOJhD
+	wLE/eIDBTIEBsAVEP5qySv7HZNibl0JWZ+BlWqfnwE0sGWnFr95oIcGqTnnTbuORFhDsCNcaDwU
+	GzVVNDNMM/ifjOwphhZjOCA==
+X-Received: from wmfr7.prod.google.com ([2002:a05:600c:1587:b0:4a2:15e9:5ef1])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:a318:b0:4a3:5aee:2c25 with SMTP id 5b1f17b1804b1-4a35aee2cfdmr103061435e9.31.1793032788588;
+ Mon, 26 Oct 2026 09:39:48 -0700 (PDT)
+Date: Mon, 26 Oct 2026 16:39:34 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -52,144 +75,62 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/5] KVM: arm64: Add context-switch of ACCDATA_EL1
-Content-Language: en-GB
-To: Fuad Tabba <fuad.tabba@linux.dev>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Steffen Eiden <seiden@linux.ibm.com>, Mark Rutland <mark.rutland@arm.com>,
- Yicong Yang <yangyicong@hisilicon.com>, Zhou Wang <wangzhou1@hisilicon.com>,
- Arnd Bergmann <arnd@arndb.de>, Fuad Tabba <tabba@google.com>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20261025075138.2919734-1-fuad.tabba@linux.dev>
- <20261025075138.2919734-4-fuad.tabba@linux.dev>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20261025075138.2919734-4-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.257.gf7497c7d27-goog
+Message-ID: <20261026163937.963087-1-vdonnefort@google.com>
+Subject: [PATCH v3 0/3] KVM: arm64: pkvm: Fix missing reset of GICv3 LRs
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	kernel-team@android.com, fuad.tabba@linux.dev, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Fuad
+The GICv3 List Registers (LRs) are architecturally UNKNOWN when a CPU
+boots or wakes up from a low-power state. When pKVM is enabled,
+__vgic_v3_init_lrs() is currently never called on boot, CPU hotplug, or
+CPU PM resume.
 
-On 25/10/2026 07:51, Fuad Tabba wrote:
-> From: Marc Zyngier <maz@kernel.org>
-> 
-> Add ACCDATA_EL1 save/restore as part of the EL0 context. This is
-> conditioned on the guest's view of ID_AA64ISAR1_EL1.LS64 reporting
-> that this register is supported.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Fixes: 58ce78667a641 ("arm64: Add support for FEAT_{LS64, LS64_V}")
-> Link: https://lore.kernel.org/r/20240815125959.2097734-5-maz@kernel.org
-> Cc: stable@vger.kernel.org
-> [Fuad: rebased; switch ACCDATA_EL1 for guests only, as the host never
->   uses it; gate it on a new ARM64_HAS_LS64_ACCDATA capability, since
->   in pKVM the host controls a non-protected guest's ID registers, and
->   an EL2 access to ACCDATA_EL1 on a CPU without the feature is UNDEFINED]
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->   arch/arm64/kernel/cpufeature.c             |  7 +++++++
->   arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 23 ++++++++++++++++++++++
->   arch/arm64/tools/cpucaps                   |  1 +
->   3 files changed, 31 insertions(+)
-> 
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 32102c3912fa7..b5720c56eebc9 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -3225,6 +3225,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->   		.cpu_enable = cpu_enable_ls64_v,
->   		ARM64_CPUID_FIELDS(ID_AA64ISAR1_EL1, LS64, LS64_V)
->   	},
-> +	{
-> +		.desc = "LS64_ACCDATA",
-> +		.capability = ARM64_HAS_LS64_ACCDATA,
-> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> +		.matches = has_cpuid_feature,
-> +		ARM64_CPUID_FIELDS(ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA)
-> +	},
->   #ifdef CONFIG_ARM64_LSUI
->   	{
->   		.desc = "Unprivileged Load Store Instructions (LSUI)",
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> index c382848d31947..4a008c8a696ba 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> @@ -17,6 +17,7 @@
->   #include <asm/kvm_mmu.h>
->   
->   static inline bool ctxt_has_s1poe(struct kvm_cpu_context *ctxt);
-> +static inline bool ctxt_has_accdata(struct kvm_cpu_context *ctxt);
->   
->   static inline struct kvm_vcpu *ctxt_to_vcpu(struct kvm_cpu_context *ctxt)
->   {
-> @@ -67,6 +68,13 @@ static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
->   {
->   	ctxt_sys_reg(ctxt, TPIDR_EL0)	= read_sysreg(tpidr_el0);
->   	ctxt_sys_reg(ctxt, TPIDRRO_EL0)	= read_sysreg(tpidrro_el0);
-> +
-> +	/*
-> +	 * Despite the appearances, ACCDATA_EL1 is part of the EL0
-> +	 * context, as it can only be used using ST64BV0.
-> +	 */
-> +	if (ctxt_has_accdata(ctxt))
-> +		ctxt_sys_reg(ctxt, ACCDATA_EL1)	= read_sysreg_s(SYS_ACCDATA_EL1);
->   }
->   
->   static inline bool ctxt_has_mte(struct kvm_cpu_context *ctxt)
-> @@ -131,6 +139,18 @@ static inline bool ctxt_has_sctlr2(struct kvm_cpu_context *ctxt)
->   	return kvm_has_sctlr2(kern_hyp_va(vcpu->kvm));
->   }
->   
-> +static inline bool ctxt_has_accdata(struct kvm_cpu_context *ctxt)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +
-> +	/* The host never uses ACCDATA_EL1 */
-> +	if (!cpus_have_final_cap(ARM64_HAS_LS64_ACCDATA) || !ctxt_is_guest(ctxt))
-> +		return false;
-> +
-> +	vcpu = ctxt_to_vcpu(ctxt);
-> +	return kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA);
+Following Marc's comments on v1, instead of handling the LR reset inside
+the pKVM hypervisor, this series fixes the host CPU init, hotplug, and
+PM paths to properly reset the vGIC LRs even when pKVM is enabled. This
+removes a few calls to is_protected_kvm_enabled(), making the whole
+hypervisor init machinery more generic.
 
-minor nit: Aligning with the other kvm_has_feat() usecsaes, should we 
-wrap this under kvm_has_accdata() (with moving the cpus_have_final_cap()
-to the wrapper ?)
+Since pKVM can't trust the deprivileged host, keep the reset in the
+CPU_ON/CPU_SUSPEND path.
 
-Otherwise looks good to me.
+Changelog:
 
-Suzuki
+v3:
+  * Drop "KVM: arm64: pkvm: Avoid trapping on HVC_RESET_VECTORS". (Fuad)
+  * Collect Fuad's tags.
+  * Apply the few nits (Fuad)
+
+v2 (https://lore.kernel.org/all/20261022140048.2522787-1-vdonnefort@google.com/):
+  * Make the __vgic_v3_init_lrs HVC always available. (Marc)
+  * Propagate __hyp_reset_vectors() error and remove
+    is_protected_kvm_enabled() special-casing in the host CPU init/PM
+    paths so the host resets the vGIC LRs. (Marc)
+
+v1 (https://lore.kernel.org/all/20261021110000.508827-1-vdonnefort@google.com/)
+
+Vincent Donnefort (3):
+  KVM: arm64: Make __vgic_v3_init_lrs HVC always available
+  KVM: arm64: pkvm: Fix missing reset of GICv3 LRs
+  KVM: arm64: pkvm: Reset GICv3 LRs in the hypervisor
+
+ arch/arm64/include/asm/kvm_asm.h     |  2 +-
+ arch/arm64/include/asm/virt.h        |  2 +-
+ arch/arm64/kvm/arm.c                 | 50 +++++++++++++++-------------
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c   |  5 +--
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c |  4 +++
+ 5 files changed, 36 insertions(+), 27 deletions(-)
 
 
-
-> +}
-> +
->   static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
->   {
->   	ctxt_sys_reg(ctxt, SCTLR_EL1)	= read_sysreg_el1(SYS_SCTLR);
-> @@ -210,6 +230,9 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
->   {
->   	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL0),	tpidr_el0);
->   	write_sysreg(ctxt_sys_reg(ctxt, TPIDRRO_EL0),	tpidrro_el0);
-> +
-> +	if (ctxt_has_accdata(ctxt))
-> +		write_sysreg_s(ctxt_sys_reg(ctxt, ACCDATA_EL1), SYS_ACCDATA_EL1);
->   }
->   
->   static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
-> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-> index 2775ba3359cfe..f01719bbd6037 100644
-> --- a/arch/arm64/tools/cpucaps
-> +++ b/arch/arm64/tools/cpucaps
-> @@ -49,6 +49,7 @@ HAS_LPA2
->   HAS_LSE_ATOMICS
->   HAS_LS64
->   HAS_LS64_V
-> +HAS_LS64_ACCDATA
->   HAS_LSUI
->   HAS_MOPS
->   HAS_NESTED_VIRT
+base-commit: c03c1a14507dfaf8b856c2608f9ac216021fc222
+-- 
+2.56.0.257.gf7497c7d27-goog
 
