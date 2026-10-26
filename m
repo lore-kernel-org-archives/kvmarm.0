@@ -1,73 +1,67 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793016083;
-	b=wq57bMwNzJ139XlrcghUTrUoWrQay2DOFABi+JEfAuZJvnS/VjBIsSqZtMV/GXEQ6e1F
-	 2DHAaeu+GFucFkFy35Ojq2YMGfJwPB4UJwpEcx2P9qf/7/d/J9KaBx9XSj67Kx7JVP5Di
-	 3vppo3yNG7S9XOgUbs4Q5QHmt5Xvw+UPf49TL2PR19zZx6IHMaEO+XwuG+6OV1KWbJ16M
-	 ug9qb2/6s6SGdYDaNnlBuBYQkcJHNVZeHY9q45uyTROszgoCLOf7esmlk8l3fKUhFAZaT
-	 jkRtSqpLVD0+5rSc1KrSF4IXbJcRzb2PpCdA7dIEwnVlB3FExsGoAgXIVDXpBTSoCfw==
+	t=1793016312;
+	b=hE2rlYYqaxbcHn4CY0NnFlbQDjSppriCgYQF6WcAr/nqTuglZ+1WDqrdB/KZSS53sjKy
+	 VJz8T42BuqTz4X+wUXtHpgQIZzt/l9qTHiF9phgYK7pMnDXNAWb8n1dysaxSb15K1OcP2
+	 XhqPI/10VLQSgRLF2y8eHV4pEP5O0tWkU7EjFRG/JBwxU2Q6oHLRiJAIQ00TStUXB09V5
+	 qLEpnntQaoKXGnn3P0ByK4RSu1bydPTQQVBn1v5+1XK4J/aLcflLL06HkJmDEvOq4L9C8
+	 PSAeHDUB6QIL7E7KHZiuIQ5SbQXQ1YbtK7/IANilB+ZtywEP+jJjSPseIxNV/keSYFw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793016083;
-	h=Received:DKIM-Signature:Received:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:
-	 X-SA-Exim-Mail-From:X-SA-Exim-Scanned;
-	bh=OSKQ5HiKHS7VyDFvKfOVWU7kBHEXK2Qv2Aln+gNIB+Q=;
-	b=nTQYwkivfVNTZdQVf2i6w3f+eTeXH89b+huQ2jmxcNj2bhOEUCQ4yfjojm82IYIRfdc2
-	 NKsebNFEK+n4aedMZwSSB9R/IZiGjJWmOLki1tVja/P7pqm79H5Up/t4MlbYpp3/puiF4
-	 MhiOizOirYnhqX2kcBDYBMKCsRbQM9dILH0xGQBb4Rsrvx73j/ecQ1NXSULAwNluDPtM2
-	 C96G+fqEgrsy6Ue699Wv84lV5iisfg3xSeT6ardu5EMY4FgJ83ANsIuSyfqaj27gYst2e
-	 2NTuxUuJRX2P1hYuD+OFxxFFxZAMiFgz6w4d/BuwEXEgUEyXfLJuPjyAG/fnfAGW86w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793016312;
+	h=Received:DKIM-Signature:Received:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
+	 X-Cookie;
+	bh=XrszyOJWwJTV90LIZM95zHwP5tXDmJojQtjJsIJz+qU=;
+	b=JDozdlGV91pq6S6c63PhpSTQ5r6T9XT0KHuW3LQLjNjY56y2fw+k4hzLs9jp6ytoQfAj
+	 U8pk983tNoAk8s2YuFFTBJ56wlWXlt0JHmOLee8I5lMjDtLlKqWfCrcfKRNcladNAoA2m
+	 cNLHhWM8aXi3RY/2sBda0ubfUE6bU3UkTzrWOKKD+vH9uRzY4Wut15UOQo9ZqA+EFOX3l
+	 IHiFwgSiRfBG78NsZw1OfH5EM9EZFjDc2zQHa6894P3bvW6XgA/4voNDnC7lZ2Dg6qoqY
+	 wYD5D+DAahlgqoJN+hhU5yhFf3leuk7T+2GPekWUfC7oqn01rDMySsSDgNMuIErS1aA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=f+4rBuIb;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="oj6JZE/k";
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A395606A325;
-	Mon, 26 Oct 2026 12:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 165EF606A31F;
+	Mon, 26 Oct 2026 12:05:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=f+4rBuIb
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E35691F031E0;
-	Mon, 26 Oct 2026 12:01:17 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oj6JZE/k
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E6741F01825;
+	Mon, 26 Oct 2026 12:05:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793016077;
-	bh=OSKQ5HiKHS7VyDFvKfOVWU7kBHEXK2Qv2Aln+gNIB+Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=f+4rBuIbYdiek7nz9qLpx2TV0UJDpibSMTPc+lKhFwQetxbrU+ekIL7IWrnxAJhi8
-	 s3jZVG2JXsE3vg4AIfv7Ia6dF4s6/7XpxN7x6S9Tw/CT17yHc8MV9z0yI8t9MudY1m
-	 /V4j/0iIRsmTMmEOuRwlTstybh8UYMJTSvysBn4IXbxE0gGhTL8PIu1VEuLVAn7974
-	 thK/XLj4Ci6AWmSIxOhPSvQWVBbdlDB+vqYQNlQrKpdUAoT8KhGscqn2mE2u/ioK+x
-	 zqKR7U4dC2LfyS1Hbn1phXatqnD5ZE86II1Mo7UnALfB1y18LrPJmdsl6pX8jKfN0p
-	 lNtCiqoAsCcoA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xLJO7-00000007Fr6-30mh;
-	Mon, 26 Oct 2026 12:01:15 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
+	s=k20260515; t=1793016311;
+	bh=XrszyOJWwJTV90LIZM95zHwP5tXDmJojQtjJsIJz+qU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=oj6JZE/kG+hhqZxoQ+yODE7mTOSfVM9r0neDNfQu+XgJYnH9BMCJLbAczYPub7N+L
+	 smVfNhxDG3ihVKIfBKNdKfYMtETvU9dG6NVfyExtT9Y4M8mDJrLb8CkdXz51LPA2GR
+	 L4ibCVaR977YPgdL9njvzFJO6gLBo9LVJUjOhbpcOgCy062lZv5b0nKTnvlwS5zGI2
+	 dFe/RbFRsinmNpkiYdkIi8BYqNUu93ZeaFCMNDrvU8xOzoGtToulgIdCczYKBX5qwa
+	 +hnLr9BA9QYs/0c+oLEu88TJgQk2n0Xg7juHz4wT83M1laZqakSTxkWxbVahW+8fRB
+	 +r6GQhzwBMiVQ==
+Received: by finisterre.sirena.org.uk (Postfix, from userid 1000)
+	id 3CA051AC5994; Mon, 26 Oct 2026 12:05:08 +0000 (GMT)
+Date: Mon, 26 Oct 2026 12:05:08 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Sasha Levin <sashal@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Return on kvm_gmem_get_pfn() failure in gmem_abort()
-Date: Mon, 26 Oct 2026 12:00:57 +0000
-Message-ID: <179301587191.2527370.3684405184573124806.b4-ty@b4>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261022123054.31729-1-fuad.tabba@linux.dev>
-References: <20261022123054.31729-1-fuad.tabba@linux.dev>
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"Lorenzo Stoakes (ARM)" <ljs@kernel.org>,
+	Itaru Kitayama <itaru.kitayama@fujitsu.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: arm64: selftests: Skip unwritable ID fields in
+ the failed-run test
+Message-ID: <at9B9N-90QwLPv5i@sirena.co.uk>
+References: <20261026012128.2270251-1-sashal@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -77,33 +71,44 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, fuad.tabba@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seiden@linux.ibm.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, vdonnefort@google.com, weilin.chang@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-
-On Thu, 22 Oct 2026 13:30:54 +0100, Fuad Tabba wrote:
-> The kvm-arm64/mmu-fixes-7.4 merge dropped the return from the
-> kvm_gmem_get_pfn() error path in gmem_abort(). Both parents of the
-> merge keep that return. On a failed kvm_gmem_get_pfn(), gmem_abort()
-> then carries on with a zero pfn, and on a nested stage-2 it uses the
-> mapping it has just freed.
-> 
-> Restore the return.
-> 
-> [...]
-
-Applied to fixes, thanks!
-
-[1/1] KVM: arm64: Return on kvm_gmem_get_pfn() failure in gmem_abort()
-      commit: c4c362949dcaaaabaa5db34acaa6e91b9912094c
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="lOlYcF5yfFB7kmfM"
+Content-Disposition: inline
+In-Reply-To: <20261026012128.2270251-1-sashal@kernel.org>
+X-Cookie: Victory or defeat!
 
 
+--lOlYcF5yfFB7kmfM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Sun, Oct 25, 2026 at 09:21:28PM -0400, Sasha Levin wrote:
+
+> Only a field that userspace can change can be frozen, and KVM reports
+> these registers as not writable in KVM_ARM_GET_REG_WRITABLE_MASKS. Skip
+> the fields that the writable mask does not cover. test_vm_ftr_id_regs()
+> already requires the mask to cover every other field in test_regs, so
+> this only drops the fields KVM never lets userspace change. Whether KVM
+> accepts writes to fields it reports as not writable is a separate
+> question from finalization.
+
+It would be nice to apply the same thing to the NV instances as well but
+in any case:
+
+Reviewed-by: Mark Brown <broonie@kernel.org>
+
+I didn't redo the testing that Fuad already did since it'd just be the
+same thing.
+
+--lOlYcF5yfFB7kmfM
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQReagvpf3TrrA7BoYYv73Ows9A4iQUCat9B9AAKCRAv73Ows9A4
+iUn/AP977I6nqPZmrTudLmqcb4MROLcy9GYgz1jVFIocLXDrrwEAnUi0j81aTjSo
+ef9JvnGQ0OBh4UI9WY6xdmk4v/IezgY=
+=G2In
+-----END PGP SIGNATURE-----
+
+--lOlYcF5yfFB7kmfM--
