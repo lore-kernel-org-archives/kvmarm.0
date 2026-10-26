@@ -1,97 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.133.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793020130;
-	b=Uc/zrlEQ9TTC6xq7MsjTFMx8Qe7dPyiL1Ax5A4BsDTX3gZ65ZwD1bZtt/w+19DxFGD4+
-	 riPiP/mKpvSvyKL+eQ68N0hlANzcP+ax1T6xyyttJfgy66xGXzDhqvygIvYXqOPWLO3AA
-	 ILmMzTEPBHDA89MF4Tlg2/tjAASQ4XN6cUhrwfuN9XU5H1X0RUlUo5RaxR5PtZuazaXqx
-	 FV0glFseiSiVkHj/sKW7AK7QJ2cNsXuX4rwTmDp83bqRdEobEcLDanPwbAUuLNTVFeZae
-	 yhUETqjD1ZPgxJyBxUtOE6DrzJIDfGkWN+03Rv95RmX6dduRxOZFkyp7gdrpXIkl8vw==
+	t=1793022911;
+	b=ISzrC65Fh1c3Zc77jwPuwj0ZkVpsfxl9z5qzbqsbuWoFXv9zRB5lYSFM36xtq8nU1Nak
+	 pOVWigtKkqDDKRfqKWqCysRBGMlgq7a+tQwKI5c5Gv+edpE3Jt+P9wrKca6d0IQN509It
+	 cz+ErFiihk2y1kEjCG5zYKqhIuO9ZZL7D+LXzqVay16X5cdvNGT46cjDjSm/AWFy0mR73
+	 ntqQgLhblI+N6gkZ3RWoYI1Uqf9O2AISVg/XcjuWSRFZCqHOAdV5uldEGoNrKxUU2zcy5
+	 nK8b4/lI+QZK8+YB0UfUF4iFPzmq7XATumpSk6/8KcmP9OvfmY7RHe2ZaRewYC0hE2A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793020130;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=QFUFENIciwLZFoUCVayw48AKayBa+G1hl0ibvcGBtzQ=;
-	b=Ec031qSWob2HmlpjIUclKluBPSjwwVxAbNsyHe4Wq9OQ5Ht/lWyu1WWChECUI6nOfO5Z
-	 hBBrF2upUXGwMTW/C6gbfBykr19eZOSAp/uBc5Y70QbPVIIV9CsjrjyVTU7Xk9IfVgoEi
-	 mYpS7QQObYIedCKYEh+FJV1jzfe5ZojaAyLtVI1JxZ/Uj1URfkMQhB/1/hZs1lGNEgPJ4
-	 hpT1rGnVVhEWZLCXEgq2dqqBDAOnl0XeNkfRfnjvAKHZnEygT+IXtm9Z/qZqko9p/Zo68
-	 Jl0IZGT6zMncYPkhgZb0c6cjcgCB7Jzi9qXHMq+sV4vQMPVK/bxjcaKcRJIdXxApyDg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793022911;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 X-Received:Received:Message-ID:Date:MIME-Version:User-Agent:Reply-To:
+	 Subject:To:Cc:References:From:In-Reply-To:X-Mimecast-Spam-Score:
+	 X-Mimecast-MFC-PROC-ID:X-Mimecast-Originator:Content-Language:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=AYIyUjcnnUXti+/sgQo976EJjdmpRoD/s64kOynFb+I=;
+	b=ZuvrlFDeLChF4kVieYOLolnzp3gGiSxaTWENGe9k8Vh4PZjp5I50T5Paa0hh/sCc+d82
+	 U6xxh9hINFwzLO5xgzMRg8zDnEdz4BzxyYoxXTDPsSGzW2xyXe0yucm8pwXcSwXsh1dlA
+	 Fb3plNntXPteVKDU4o++riLeKiV7qf2TkiMaOQpNYa+Zh9FW96GLmGTQEXH0kxJBgrrSI
+	 aU8hYFdsB3Q2f2FJMgmIis+gGj1kw3TefvK+ZO69H49U4Be6NqeRHWRaYsXshjWr+va6Y
+	 Rwdlms7sXJ19DvM0Ah9X6Bmllt6t86v6VqiHXtpjts9zPjoeAkbVHMQ2jrT1Ch28d9A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=rXv6cfjV;
-	arc=none smtp.remote-ip=209.85.218.52
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=chC8QJe7;
+	arc=none smtp.remote-ip=170.10.133.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC68606A31A
-	for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 13:08:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CFC68606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D153606A31A
+	for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 13:55:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6D153606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=rXv6cfjV
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-c247f6687dcso446461266b.2
-        for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 06:08:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1793020128; x=1793624928; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=QFUFENIciwLZFoUCVayw48AKayBa+G1hl0ibvcGBtzQ=;
-        b=rXv6cfjV7YJbhHuotVMcPsx05uWCKJd495bAusdli/pCBOn5hDfkPUt3SIO7CHUxBI
-         beC0fyMJ7KFqSuOnr1I8DVpWrHFlefPIrc5ikqNPjtxS9G4QvQjfidTHpDDRo5t/AEUd
-         LKU5Pd9LFAvqHLz+qJeA2twG0NmPJBda+5jmy/CKIBXW9wi3tmdgjJEEy/7ZvwtiBttu
-         ymTJMP6+1BWMKhWfWy8MiZGqFJN1NmJ1ezTfUGLkxJH+a3tUH2SJN2DbcsJrc1LZkzX8
-         8gmr9bZIYhfC6bPddyFB81DDnHMX0SgMKRneLjPwOLw82j9iLdzO5M9ncN4/UO+IR593
-         KJvg==
+	dkim=pass (1024-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=chC8QJe7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1793022910;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AYIyUjcnnUXti+/sgQo976EJjdmpRoD/s64kOynFb+I=;
+	b=chC8QJe7wtJlrW7GA5u1hAPphGmzgdWz800N96GIGoXpR88i6gD91cB9Xb9cZiNEs0Sd26
+	17cirS7L7ZBuyxW7UEkkmiPZvlbXy3AgT6srPifnMVUhppQFkTSAKD6glr6/SlfDYxoXUX
+	xS1vSA3Up3mtNcgNr/wK6oOJCVhIyqY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-88-bTkpP5GyMXCn4wgTMhzd8g-1; Mon, 26 Oct 2026 09:55:09 -0400
+X-MC-Unique: bTkpP5GyMXCn4wgTMhzd8g-1
+X-Mimecast-MFC-AGG-ID: bTkpP5GyMXCn4wgTMhzd8g_1793022908
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-49febef74e3so27683825e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 06:55:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793020128; x=1793624928;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=QFUFENIciwLZFoUCVayw48AKayBa+G1hl0ibvcGBtzQ=;
-        b=cJERn6n/sLMgEjVzxZlS8uFlpFOmsKEIGqc3MgkJBGxD6pI/c3MP+ipmWAM26b463N
-         Mq+Yw9CAabX9msG+y6JjDjhiryjaEZrBMWBSdCz0/cdNVAXF29bqyCF42BsttflKZQcB
-         yZ5brpTEXIG0HQ5To2nkeaeDctYqszubWcIGv5Lky8FTuzBB1/aAQxZQ58pQDjSD6u/Q
-         iIltOTNZaUiganVU9gH0ONrG0aTpoEa+rxIg5ghHYsvrWlqiZVAvRf9tZ2lyKyRqtTfs
-         b3+Zv5WWS8ilUcgkBf7Ak+ZaifkFdLD+LTGPtPB/VqCkzdfseL5A5+gis9tY7ivzMtKr
-         9rKg==
-X-Forwarded-Encrypted: i=1; AKwUvBwql4GJNnA767iQFXliBZcsvysS4oTvEVG/2fh15+2DaHRQHCr96Lny/7lqocjxrs6GxJxjT9k=@lists.linux.dev
-X-Gm-Message-State: AFq9FYKzYakARQBs1bMt6gh+IizV2i9PBxkK3OvwZHvelanVzD5MCqxy
-	Wjp7cGUe+nLLSQpeoqzfcL+bqM1EZ9SwtA2mZC4vQgBpYiSEyXNNkFAfpeScSc4uXQ==
-X-Gm-Gg: AYBFou0AKoNxaQjRZ8eYR/jkijA0kHKg2ryMGESxf2pXnJS4HaBMkgqT8+C7XJuBtpw
-	PLNL7SsUngYhji8yqRO7cAgtnsMtSHzTCe7ZApqYH+CkoqEqCpkF9Q5ot9vm/UAOQMR6LryctxU
-	z/JyK9RGHyUEIiMboHPSFCHHEqneBwgGqeKLPvV7yR986JjnHiHrumcxpB42Cbk7W4iftiIMPAS
-	t/DUQCjufBP+FE/h1v/GhCHKZaPxHnFW4IIBFcPIa2/O3JR6GoZU/RX0IrckubQ7on93II2GD1N
-	MYOAQTVmT4don6OnWANUx+3H7JS0gpGPlbZ4W2lPBSgHcMUBnwB1lU2/7rcy0AG4nWRM3WYDe0S
-	QClkGp1zJY1SOgInCMp0eIrVX3nyQGT40npxerzVZAcMGSbXhBB/MuS/BNbKMkn4hl8cMfJwpoI
-	NM3TIT1LHAKwf1NWb9uUalDwmmwwanl4wULouxrbxv2oXeo3JkVBSPYgEp9Yk3u1wZHSceHjdA4
-	JBkB9lmcoZNRFF2onf7YodaVy4Or+vJCFWJ7MgVE5ZpcKcWujwcsEFe4IYW4qpB9UPM4Xkogr5R
-	ke+8YoQ0u5/S6dISe1b0j7Ft
-X-Received: by 2002:a17:907:3ccc:b0:c40:6ed9:b962 with SMTP id a640c23a62f3a-c46bdc2a4b5mr786978166b.26.1793020127574;
-        Mon, 26 Oct 2026 06:08:47 -0700 (PDT)
-Received: from google.com (197.183.140.34.bc.googleusercontent.com. [34.140.183.197])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c46bd4e99a2sm323829166b.24.2026.10.26.06.08.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Oct 2026 06:08:43 -0700 (PDT)
-Date: Mon, 26 Oct 2026 13:08:39 +0000
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: oupton@kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com,
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com,
-	fuad.tabba@linux.dev
-Subject: Re: [PATCH v1] KVM: arm64: Use the host kvm_host_data for
- nr_event_counters
-Message-ID: <at9Q1-tbXDcRbeyq@google.com>
-References: <20261023092007.3918848-1-vdonnefort@google.com>
- <86cxt0zj6u.wl-maz@kernel.org>
+        d=1e100.net; s=20260707; t=1793022908; x=1793627708;
+        h=content-transfer-encoding:content-type:in-reply-to:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=AYIyUjcnnUXti+/sgQo976EJjdmpRoD/s64kOynFb+I=;
+        b=nRW62shKiSH+EkvIrvbh+lPU5xd3QxIewRkJw//5yNCv65sQR55nYIs6l2cvBhIKFV
+         rWVP7RioE4Ed65EQj04mSlwFJjsZL//bxTFvXXkE8Oz8vi2OfJCFx/ym5b7tVXpkE0lN
+         qRvHitU3+xjrK3cZKGl67ChWe/UPA7CTedkeLEJjRcGuFzAhXWBake5kGAFIfUffMG/d
+         9RPdPxILemCJD1NjtQJGnUnzFYdsDAwgTh576OZKNY8VC3ENOWi/ayQtdPq/G1YxBdp8
+         2XzqwiR5h2sdSVxAoG/8WctQeX/xuzdSQIc4FQRYf44dj4zXrrRkruvXDymwH9vINABp
+         ESlw==
+X-Forwarded-Encrypted: i=1; AKwUvBw35aqZM2pryC6bweTuDYUeiYzn6ByyKnMYXjWoUzlYCp9gpAMCnB1ZOiJwFeTdnruYJY6f0TM=@lists.linux.dev
+X-Gm-Message-State: AFq9FYLwH7XnuE4ufDN/PS0o/B/OaAMd1YzUj4Rd2g2ZZdWAXmyeGHWU
+	stCJU48opotZjfTwuGx9+9aPUWuIEfNylJAHjW+Z5KIebTHy2gwOG4fwKeizxFFvmzYcPKtHKvN
+	SE4ZHaNPd+xJcNE2C9FptH5tcKx+MLryyt4VVGaiWwDFrMlWqSAl69mn+lA==
+X-Gm-Gg: AYBFou01KXYTF0vRWR/xYCsgzTqVTHA6RF/OKSAzthiqZ6XuAHrJXpltvJLAmoI8Ady
+	cnE07OnFmmN59G7HlKHuLqQ0qUGH5b8lHbx04rYo4XapSRTYi33Blr193xhEHtHW+EL+K/q/4YO
+	KcbTFkurb9jXFoiyfSjroHicqmBuvP4mCQjO3tsudhSD7G5C0KIuiBafUFAwYwGp5TrZq3z3fWa
+	HRSr/oPSn/r2fMuYUqsYLkk1NyNHT/ULMyV2ZLaXQJs/SXsTLYdGgRl8+DHD5JeKvhA+/mX1DvD
+	fMYtW5tK3WMq8I0Qsf1BXuutgfIwAy1gtw4ax99HjbU3xZ6kQlXEP4DUquPk5XOSPKX/mhmINyF
+	RqhlurU/zjUYt7tM/xi8ADK3JA1yqHBcYupBkg4c9J1SsacRs
+X-Received: by 2002:a05:600c:4f05:b0:49e:65f2:db64 with SMTP id 5b1f17b1804b1-4a35ae71b30mr145150315e9.5.1793022907666;
+        Mon, 26 Oct 2026 06:55:07 -0700 (PDT)
+X-Received: by 2002:a05:600c:4f05:b0:49e:65f2:db64 with SMTP id 5b1f17b1804b1-4a35ae71b30mr145149665e9.5.1793022907163;
+        Mon, 26 Oct 2026 06:55:07 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a35a56992dsm186668015e9.6.2026.10.26.06.55.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Oct 2026 06:55:06 -0700 (PDT)
+Message-ID: <71a7a633-b0d1-496b-a4a8-fc887aaad685@redhat.com>
+Date: Mon, 26 Oct 2026 14:55:04 +0100
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -101,77 +98,60 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86cxt0zj6u.wl-maz@kernel.org>
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v10 00/26] kvm/arm: Introduce a customizable aarch64 KVM
+ host model
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ kvmarm@lists.linux.dev, shaju.abraham@nutanix.com, khushit.shah@nutanix.com,
+ yangjinqian1@huawei.com, cohuck@redhat.com, richard.henderson@linaro.org,
+ sebott@redhat.com, skolothumtho@nvidia.com, philmd@oss.qualcomm.com,
+ maz@kernel.org, oliver.upton@linux.dev, pbonzini@redhat.com,
+ armbru@redhat.com, berrange@redhat.com, abologna@redhat.com,
+ jdenemar@redhat.com
+References: <20261010133725.642498-1-eric.auger@redhat.com>
+ <CAFEAcA9XE0TLxp+DNzFSbkxbj7f0M78N+tf1a01cJ5rNkM7NBA@mail.gmail.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <CAFEAcA9XE0TLxp+DNzFSbkxbj7f0M78N+tf1a01cJ5rNkM7NBA@mail.gmail.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: lrZ3TrMI--9pe3HIP3kaF9aP-ulaR5cRXNFweLBDeGs_1793022908
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 23, 2026 at 01:37:45PM +0100, Marc Zyngier wrote:
-> On Fri, 23 Oct 2026 10:20:07 +0100,
-> Vincent Donnefort <vdonnefort@google.com> wrote:
-> > 
-> > nr_event_counters is only used by the host to populate mdcr_el2.
-> > However, host_data_ptr() for pKVM switches between the hypervisor copy
-> > of kvm_host_data before it is deprivileged to the host copy after.
-> > 
-> > So kvm_init_host_debug_data() initialises nr_event_counters in the
-> > hypervisor's kvm_host_data, while kvm_arm_setup_mdcr_el2() reads the
-> > host copy which is 0. With a HPMN of 0, this stops programmable event
-> > counters from counting a non-protected guest.
-> > 
-> > Always use the host copy for nr_event_counters.
-> > 
-> > Fixes: 2417218f2f23 ("KVM: arm64: Get rid of __kvm_get_mdcr_el2() and related warts")
-> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> > ---
-> >  arch/arm64/kvm/debug.c | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> > index f4d7b12045e8..a00771339c62 100644
-> > --- a/arch/arm64/kvm/debug.c
-> > +++ b/arch/arm64/kvm/debug.c
-> > @@ -44,7 +44,7 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
-> >  	 * to disable guest access to the profiling and trace buffers
-> >  	 */
-> >  	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN,
-> > -					 *host_data_ptr(nr_event_counters));
-> > +					 __this_cpu_read(kvm_host_data.nr_event_counters));
-> >  	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
-> >  				MDCR_EL2_TPMS |
-> >  				MDCR_EL2_TTRF |
-> > @@ -80,8 +80,8 @@ void kvm_init_host_debug_data(void)
-> >  								   ID_AA64DFR0_EL1_PMUVer_SHIFT);
-> >  
-> >  	if (pmuv3_implemented(pmuver))
-> > -		*host_data_ptr(nr_event_counters) = FIELD_GET(ARMV8_PMU_PMCR_N,
-> > -							      read_sysreg(pmcr_el0));
-> > +		__this_cpu_write(kvm_host_data.nr_event_counters,
-> > +				 FIELD_GET(ARMV8_PMU_PMCR_N, read_sysreg(pmcr_el0)));
-> >  
-> >  	*host_data_ptr(debug_brps) = SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, dfr0);
-> >  	*host_data_ptr(debug_wrps) = SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, dfr0);
-> > 
-> 
-> This really looks like the wrong approach.
-> 
-> host_data_ptr() should be reliable, and always point at the correct
-> data, irrespective of the backend. If host_data_ptr() returns a
-> pointer to stale data on pKVM, then it is purely a pKVM bug, and
-> that's what needs fixing by synchronising the two copies by whatever
-> means necessary.
+Hi Peter,
 
-I'll update both copies and make a common series Fuad.
+On 10/23/26 1:44 PM, Peter Maydell wrote:
+> On Sat, 10 Oct 2026 at 14:37, Eric Auger <eric.auger@redhat.com> wrote:
+>> This series enhances the current host KVM model with capability to
+>> set writable ID reg fields.
+>>
+>> Since v6.7 kernel, KVM/arm allows the userspace to overwrite the values
+>> of a subset of ID regs. The list of writable fields continues to grow.
+>> The feature ID range is defined as the AArch64 System register space
+>> with op0==3, op1=={0, 1, 3}, CRn==0, CRm=={0-7}, op2=={0-7}.
+>>
+>> The end goal is to get more flexibility when migrating guests
+>> between different host hardware. This series is a prerequisite for
+>> aarch64 named vcpu models.
+> To help me with review prioritization -- are you hoping this will
+> land for 11.2, or are you expecting it to be 12.0 material? (Given
+> the softfreeze date is rapidly approaching, it feels to me like
+> 12.0 is where it's going to be.)
+for the whole series I think this is too late for 11.2. What would be
+nice to get in 10.2 is some prerequisite patches like those you reviewed
+plus [PATCH v10 16/26] target/arm/kvm: Pass an Error handle to
+kvm_arch_init_vcpu which are rather independent. I will prepare a
+separate reduced series containing those + fixing the oversight of one
+midr conversion.
 
 Thanks
 
--- 
-Vincent
+Eric
+>
+> thanks
+> -- PMM
+>
 
-
-> 
-> Randomly picking a different accessor is not an acceptable outcome.
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
