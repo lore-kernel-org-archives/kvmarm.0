@@ -1,64 +1,76 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793003198;
-	b=A3eIex9UBAqnBX3Jgf1tanw2o/WfQ3umHKX15cnrDC+DjUQwtWSuAmSsTPfCnw3Z2LG5
-	 ZHtcQc6E1HwwIU9xpPyPODSzCOA/8bTOGC1Lz1QpRdnYKonPtfGUyna/eNSzspdzz/PAl
-	 2F1qemhUxNrC9JPJT8Wvk8sdiyQt03otJwk/xN4grlI/4HoII/TfTCY5ORkwu/cMAnoqs
-	 F4GqqKmDmtntCSN4wQRxTMB7SYh4YihEItko+lpjmWZ/EoH7kePTDSnGvCirMYoMAML+r
-	 M+R5ZmjK+ftDGM1+kOfF+L0iLG73p1FnRnIrxIIPBto5BmIvRdG5pAdqpHGFvdjcmGg==
+	t=1793003410;
+	b=1/g//3nLN4OPXj9L4q4rfBwWrAkgwdWeQlqTIlgHsy3IvS5XmljfgJfxtCF6g/s28z0G
+	 nnpbNNcfh+1FUo1mPhOXGFgOdZyIF+wXNzJqMwgFEkPl3ixxDletcgQ9pNq9/W0ALJQJq
+	 YeZhI9u0+hFLV0oLagL0D2Fqx5f0eqN4KnObPZBlkLZscxSB6miwU0Ckt2UBoCifXzISJ
+	 8LMlJOirA+4wBPNJTaN8Yt7RYQG9PwD96XPaydY/ukz97Qm0hFAd0I4Ax5uuJhlSIHYTB
+	 oqIbXpNyrMk0ucSlpb+h6LAAvN0Uug4TFXPxghn48+HJbV4J81rBM0/X5be6Wge44ng==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793003198;
-	h=Received:DKIM-Signature:Received:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding:X-SA-Exim-Connect-IP:
-	 X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:X-SA-Exim-Scanned;
-	bh=lX8LvqZgD73olitS+s6RbnRC+ddhlxGmqCP4X38QoRU=;
-	b=0ZmB88OyBU09mxzoxc7qJue3J7xBiHVbTeMLvNQdr/te2YfFAmHqUsk2JDng6mWceOYA
-	 q3I/c+wAUHCalGoxsvyQiliXKHNuwIe8z8IAhPc/+lq2ZdcIgzkfkM2J9Wh+1d8MCA0K/
-	 YQYtK4Jv6t7+FIqq/NYOqs6ESpluRDsvITzQQv1BzoWBCeU7kSnvZhb2xHVU+rS2RLT7S
-	 xJo4ukY6QBqXdBPX2tyYoVPuIlghth7gJgr7M/81vLrccEz3vNAMU6hHxeqDyPtfq/s1u
-	 Whv6FRk9IV7YJIPgEmpJ4xw33/iiBmmk+0euWPSDwUqkoGYW0QhP+zOE89v2FiN/W0w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793003410;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=G63bq4wpgZslgc8Jrbf5zqBVwNjBpTm05EKH4grfb9g=;
+	b=NFmlvwjOy7lmBgJG9AS9vbdK72ginn+ultA0bf/GnF7Pj3AxgQIDbeBMJEUA7NgWkCzv
+	 zD0dtPWVPijOdbHkgJYERUpjDcd4bWBr96IJp0zK1b5V4zOD7wDeM8uyGwGWQ+P6gZkea
+	 1T/CDLJc0YOX04JqlJQrkzpCTUqgKDtHudg/Htpw/yeIRX/vBeAZ4c2qT3bwOz5d9yMNm
+	 QThQo67onFEqwAEyhh15lA7GMlwWnBIcRNpAwi3NIdzp/ikXIXV8W7EqYyvC0xy662msm
+	 8iLiBvs2XHR0J2vULelbuliq726WhRNfiaomnaEJORaWl6Tnm1VqrqDMjMUzOfBIkfw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Ah8C2fVP;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eNjS8GtB;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85FAF606A31A
-	for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 08:26:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453E2606A32C;
+	Mon, 26 Oct 2026 08:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Ah8C2fVP
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 173A51F01825;
-	Mon, 26 Oct 2026 08:26:38 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eNjS8GtB
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFF321F01825;
+	Mon, 26 Oct 2026 08:30:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793003198;
-	bh=lX8LvqZgD73olitS+s6RbnRC+ddhlxGmqCP4X38QoRU=;
-	h=From:To:Cc:Subject:Date;
-	b=Ah8C2fVPtUkaf6CPei2OZEo9J/LtAUIo8X85qe2mUFO1LTNqYbZP7DpeATekOtnXR
-	 0i5MrNAEDMgbpm7aUutgTeSMVficL1pVmyjRlFlCuGC4oVwNlWlTkC0elwFh/Fyyuq
-	 hI31dZ2A68oKZFEe4BWVzkSOyqaNWVhz5RjywWgKEln0OvCpCUD6NTswky3xVEV+K0
-	 u5ozPjpYvOShe6Sez/0j+GneNiQ3a3JPsA40mNI4fMiHXzj6tkKe/mIa7IRLxwaVrx
-	 gi5Z0XEWNeSuoiBQuEQe7gjzrYRaWFPyKD9o0yv0y/Oq8+xP5T7nxhjsa5Se8bXChd
-	 aijqc3Vh4E2cA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20260515; t=1793003409;
+	bh=G63bq4wpgZslgc8Jrbf5zqBVwNjBpTm05EKH4grfb9g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=eNjS8GtBeBPyA8EYl+0IroArRKZqddmttCe/pqhYkfWRzMvjs0xHUdFA5zBuwJ/dB
+	 cexNnd49Tts1u13A+p4i8tn4a6PQV0NVL4aKqOnr5UNq3cxWOoYv8fpIfiswUtP92d
+	 Z/9qaxzZpNLLPgIMFYE9xf3BEexK7pTS8AmZRw3kFDaXrDQy/VvVUq+JtED9OnVfGc
+	 ZydQEiSyZc1cxdXcaC5pdQtGfR9YCuabQKeK0u7lqpU5YbBU1ouoQYk3TpT3VuHNZj
+	 +NcclCy7JnHtweFs19IZK/1wJ01Z598SreYQSegk757HsENmnfVqZE/Na5wDhrrM/1
+	 utx8qgxT6pVpQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1xLG2O-00000007A7G-1A1g;
-	Mon, 26 Oct 2026 08:26:36 +0000
+	id 1xLG5n-00000007ABg-2krT;
+	Mon, 26 Oct 2026 08:30:07 +0000
+Date: Mon, 26 Oct 2026 08:30:07 +0000
+Message-ID: <861p9czwxc.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev
-Cc: Steffen Eiden <seiden@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+To: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>,
 	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
 	Fuad Tabba <fuad.tabba@linux.dev>,
-	Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCH] KVM: arm64: Don't let a guest overwrite HCRX_EL2.MCE2
-Date: Mon, 26 Oct 2026 08:26:33 +0000
-Message-ID: <20261026082633.2515820-1-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3] KVM: arm64: selftests: Test VNCR translation invalidation
+In-Reply-To: <20261026-b4-vncr-mapping-test-v3-1-7c094a00d46e@fujitsu.com>
+References: <20261026-b4-vncr-mapping-test-v3-1-7c094a00d46e@fujitsu.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -67,69 +79,35 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, mark.rutland@arm.com
+X-SA-Exim-Rcpt-To: itaru.kitayama@fujitsu.com, pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-FEAT_MOPS is fun. CPUs are allowed to implement any of two ways to
-perform the memory copy, and the hypervisor is in charge of hiding
-the difference between implementation when the vcpu migrates from
-one to another. This is unhelpfully signalled with an exception,
-which KVM diligently handles.
+On Mon, 26 Oct 2026 03:10:10 +0000,
+Itaru Kitayama <itaru.kitayama@fujitsu.com> wrote:
+> 
+> Add a standalone KVM selftest that checks VNCR accesses after L1
+> updates its stage-1 mapping and issues a TLBI. This guards against
+> stale VNCR translations, as KVM caches L1's translation of
+> VNCR_EL2 and must drop it when L1 invalidates the mapping in
+> kvm_handle_s1e2_tlbi().
+> 
+> Keep VNCR_EL2 unchanged while remapping its backing page A to B then
+> again to A. At each step, L2 reads and writes TPIDR_EL2, and L1
+> verifies that the accesses reach the selected page while leaving the
+> other page unchanged.
 
-Today, we don't really make a good job of it in the sense that
-if L1 also has the trap bit set, we don't forward the trap as
-the architecture would require us to do.
+If you were tracking cross vcpu invalidation and exercising all the
+architecture corner cases (such as permission changes and co), that
+would be helpful.
 
-But there is no good reason to forward this to the L1 guest if
-L2 generates the "I'm on the wrong implementation". KVM can fix
-it up in place and return to L2 directly, as if the physical CPU
-was able to implement both options.
+But as it is, it doesn't help much as a validation tool. Its scope is
+way too narrow.
 
-Conversely, allowing L1 to clear HCRX_EL2.MCE2 is counter-productive,
-and violates the abstraction that KVM aims to give.
+	M.
 
-Implement this behaviour by never allowing the guest's view of
-HCRX_EL2.MCE2 to make it into the HW, and document that KVM is in
-charge of the A/B handling.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/hyp/include/hyp/switch.h | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index a2a054fec2e2f..e18cf84a4993e 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -330,7 +330,7 @@ static inline void __deactivate_traps_mpam(void)
-  * Just like for HCR_EL2, we can't let the guest mess with some of the
-  * basics we rely on in HCRX_EL2. However, the major difference is that
-  * HCRX_EL2 only affects EL1, and never EL2 (sudden outburst of sanity, I
-- * guess). So it is always the guest inflicting it on its own guestx.
-+ * guess). So it is always the guest inflicting it on its own guest.
-  *
-  * Things we don't want to let the guest control are:
-  *
-@@ -339,10 +339,14 @@ static inline void __deactivate_traps_mpam(void)
-  * - PTTWI: Similarly, it is for us to decide whether Reduced Coherency for
-  *   the PTW is a thing. It really isn't.
-  *
-+ * - MCE2: FEAT_MOPS generated exceptions for Option-{A,B} interoperability
-+ *   are always handled on the host and not forwarded to a guest hypervisor
-+ *   in order to give the (poor) illusion of a homogeneous system.
-+ *
-  * - EnIDCP128: We don't allow IMPDEF sysregs -- full stop.
-  */
- #define NV_HCRX_GUEST_EXCLUDE	(HCRX_EL2_TMEA	    | HCRX_EL2_PTTWI | \
--				 HCRX_EL2_EnIDCP128)
-+				 HCRX_EL2_MCE2	    | HCRX_EL2_EnIDCP128)
- 
- static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
- {
 -- 
-2.47.3
-
+Without deviation from the norm, progress is not possible.
