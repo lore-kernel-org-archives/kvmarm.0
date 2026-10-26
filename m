@@ -1,76 +1,69 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.1
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793003410;
-	b=1/g//3nLN4OPXj9L4q4rfBwWrAkgwdWeQlqTIlgHsy3IvS5XmljfgJfxtCF6g/s28z0G
-	 nnpbNNcfh+1FUo1mPhOXGFgOdZyIF+wXNzJqMwgFEkPl3ixxDletcgQ9pNq9/W0ALJQJq
-	 YeZhI9u0+hFLV0oLagL0D2Fqx5f0eqN4KnObPZBlkLZscxSB6miwU0Ckt2UBoCifXzISJ
-	 8LMlJOirA+4wBPNJTaN8Yt7RYQG9PwD96XPaydY/ukz97Qm0hFAd0I4Ax5uuJhlSIHYTB
-	 oqIbXpNyrMk0ucSlpb+h6LAAvN0Uug4TFXPxghn48+HJbV4J81rBM0/X5be6Wge44ng==
+	t=1793006899;
+	b=alxNBoq2h+AJG2OOee92FNsdmOKrkFx26GCrdr38S+bpiRIzj5kRTngflsJaR39nEuoM
+	 j85V9XCo7TYWRW+ahISmK7eNerZZzwlNxJ2B10XlDLo9zWFlTef/cTu1bmZLLokwbg+AL
+	 1P/Oy1rA+xb2cysisQlRJEpZdVEV8To0P6zcv4rLbphP/J0y4JezcXCZDMO5oXyti1B2Z
+	 qAD2rm9HGaGu4VTy6fj4fDupKLe+Hhe6I7rUlgln2iO9aAjow7z9BqbDGRuQExn9ZIq4L
+	 rAhePGubXW2H/jfXSpyPJjpelPzISMUaRy6WIMMI5DY/6fygeunStU0JW3Gp52+tj/A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793003410;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=G63bq4wpgZslgc8Jrbf5zqBVwNjBpTm05EKH4grfb9g=;
-	b=NFmlvwjOy7lmBgJG9AS9vbdK72ginn+ultA0bf/GnF7Pj3AxgQIDbeBMJEUA7NgWkCzv
-	 zD0dtPWVPijOdbHkgJYERUpjDcd4bWBr96IJp0zK1b5V4zOD7wDeM8uyGwGWQ+P6gZkea
-	 1T/CDLJc0YOX04JqlJQrkzpCTUqgKDtHudg/Htpw/yeIRX/vBeAZ4c2qT3bwOz5d9yMNm
-	 QThQo67onFEqwAEyhh15lA7GMlwWnBIcRNpAwi3NIdzp/ikXIXV8W7EqYyvC0xy662msm
-	 8iLiBvs2XHR0J2vULelbuliq726WhRNfiaomnaEJORaWl6Tnm1VqrqDMjMUzOfBIkfw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793006899;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=x2kCiKkeOScUv4vRg+ADH3IUUv29+dTbC2OT5+HKXDc=;
+	b=Lj9vv8iFLBbqraxXmAjLljUXzF8ydgO5zL2XCyhplFxl50gvJH4U7uEcpdpuSGTEidoQ
+	 n5qk5xWioxrLrZy68FGsCAOId6uacBFUEXij84KzNeO47rYrClWQe5E1NMzOcdThialax
+	 iqJjnIRGiHx17cco76XiDPKsM1KhUk6/HC4pDqCz3imjN7cGKM8LWsKYyoYYQwZBVGiI6
+	 sVqVVNxJ2W2MBFdxNNzec3LcPARyZRvYMtFXRgLnZfACZHnEgE2y/GDjGlzZ7w5Zght8X
+	 kOe6OTr91upi4fYWOO0yUdwtNrbn/wPxIjLy7SZNjIGWnbywzkaxMuCO0+TG3TPClOA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eNjS8GtB;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	arc=none smtp.remote-ip=91.218.175.1
+Received: from mta0.migadu.com (out-1.mta0.migadu.com [91.218.175.1])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453E2606A32C;
-	Mon, 26 Oct 2026 08:30:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eNjS8GtB
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFF321F01825;
-	Mon, 26 Oct 2026 08:30:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793003409;
-	bh=G63bq4wpgZslgc8Jrbf5zqBVwNjBpTm05EKH4grfb9g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=eNjS8GtBeBPyA8EYl+0IroArRKZqddmttCe/pqhYkfWRzMvjs0xHUdFA5zBuwJ/dB
-	 cexNnd49Tts1u13A+p4i8tn4a6PQV0NVL4aKqOnr5UNq3cxWOoYv8fpIfiswUtP92d
-	 Z/9qaxzZpNLLPgIMFYE9xf3BEexK7pTS8AmZRw3kFDaXrDQy/VvVUq+JtED9OnVfGc
-	 ZydQEiSyZc1cxdXcaC5pdQtGfR9YCuabQKeK0u7lqpU5YbBU1ouoQYk3TpT3VuHNZj
-	 +NcclCy7JnHtweFs19IZK/1wJ01Z598SreYQSegk757HsENmnfVqZE/Na5wDhrrM/1
-	 utx8qgxT6pVpQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xLG5n-00000007ABg-2krT;
-	Mon, 26 Oct 2026 08:30:07 +0000
-Date: Mon, 26 Oct 2026 08:30:07 +0000
-Message-ID: <861p9czwxc.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD653606A31D
+	for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 09:28:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AD653606A31D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=8LYCyZMI/ydZ4XMUTIjdTOfkLiQ3ZW2NdQjMgtJy9r0=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793006887; v=1; x=1793611687;
+ b=jHgz+9HGTK4xRN3DP7+8+Rb/pGUvSwYzPf7AvOFunZwinQwGQWams5T09sZU34UMrOIH7CiM
+ W4+hO0O8/0MsyHOCpUQLai1ocniUUAQctYGrmxkwZIAbsytL+V0BWCvnB8sqvpjgVkmj4h0dKqm
+ mNlwVKyYrbNcQvN9ubAmc0lA=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 312a495375034eab;
+	Mon, 26 Oct 2026 09:28:07 +0000
+X-Mizu-Trace-ID: 312a495375034eab
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Oliver Upton <oupton@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3] KVM: arm64: selftests: Test VNCR translation invalidation
-In-Reply-To: <20261026-b4-vncr-mapping-test-v3-1-7c094a00d46e@fujitsu.com>
-References: <20261026-b4-vncr-mapping-test-v3-1-7c094a00d46e@fujitsu.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Yuchao Zhang <ndaugoing@gmail.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] KVM: arm64: vgic: LPI fixes for redistributors with LPIs disabled
+Date: Mon, 26 Oct 2026 09:28:00 +0000
+Message-ID: <20261026092802.2636798-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -79,35 +72,52 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: itaru.kitayama@fujitsu.com, pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Mon, 26 Oct 2026 03:10:10 +0000,
-Itaru Kitayama <itaru.kitayama@fujitsu.com> wrote:
-> 
-> Add a standalone KVM selftest that checks VNCR accesses after L1
-> updates its stage-1 mapping and issues a TLBI. This guards against
-> stale VNCR translations, as KVM caches L1's translation of
-> VNCR_EL2 and must drop it when L1 invalidates the mapping in
-> kvm_handle_s1e2_tlbi().
-> 
-> Keep VNCR_EL2 unchanged while remapping its backing page A to B then
-> again to A. At each step, L2 reads and writes TPIDR_EL2, and L1
-> verifies that the accesses reach the selected page while leaving the
-> other page unchanged.
+Hi folks,
 
-If you were tracking cross vcpu invalidation and exercising all the
-architecture corner cases (such as permission changes and co), that
-would be helpful.
+Two fixes on top of Marc's cross-CPU vcpu pausing series [1], for LPIs
+whose redistributor has LPIs disabled. Without them, the guest can take
+such an LPI with EnableLPIs clear, or lose one mapped before it enables
+them.
 
-But as it is, it doesn't help much as a validation tool. Its scope is
-way too narrow.
+The first is the vgic_target_oracle() change Oliver suggested on v2 of
+that series [2]. It stops an LPI from being queued to a redistributor
+with EnableLPIs clear once the disable path has retired the vCPU's AP
+list. With that check, the path has to pause the vCPU before clearing
+EnableLPIs, so that the retire still finds its LPIs.
 
-	M.
+With the second, an LPI mapped while its redistributor has LPIs
+disabled keeps its pending bit when they're enabled. The second relies
+on the first to keep such an LPI off the AP list until the enable.
 
+Reproducers for the INVALL case in the first and the map in the second
+fail in every run without the patch and pass with it.
+
+Based on kvm-arm64/cross-vcpu-sync as merged in kvmarm/fixes, which the
+first builds on (e99ff76f4a02b; also applies to kvmarm/fixes
+309e1d2215255).
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20261015100539.1011760-1-maz@kernel.org/
+[2] https://lore.kernel.org/all/asf87i2RDh-WksL-@kernel.org/
+
+Fuad Tabba (2):
+  KVM: arm64: vgic: Don't forward LPIs to a redistributor with LPIs
+    disabled
+  KVM: arm64: vgic-v3: Don't drop a pending LPI mapped with LPIs
+    disabled
+
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c | 31 ++++++++++++++++--------------
+ arch/arm64/kvm/vgic/vgic-v3.c      |  3 ++-
+ arch/arm64/kvm/vgic/vgic.c         | 12 ++++++++----
+ 3 files changed, 27 insertions(+), 19 deletions(-)
+
+
+base-commit: e99ff76f4a02be8542e2c3ecc8843d7339a0200d
 -- 
-Without deviation from the norm, progress is not possible.
+2.47.3
+
