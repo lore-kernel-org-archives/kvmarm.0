@@ -1,50 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.102
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.203
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793028404;
-	b=SBXEI0+EgEDdk39d0SThElKlF7BmFe6sCLmHGNbbhKUHcWJf0E6qqQrA/sK+4qwc960/
-	 T5JbO/VcwUmFRi/Z2zb0hU8JyZXymv15/cRtIS6VSN5fzTvg0rzTSBLWuFVGzZMBzLoVH
-	 xqPYVA70ym6pFdWl2cF7NDdp/hN8Wbe/96CbMXPdMdKtQFm748NnRTB9WeEYrgCvg74Rm
-	 Z7xP3E3eRyRBkusDiKYd4p4hPRBvQnX3pBezE9h8BQWd0PrG/Pjqa4cDp10I+6D2eyxLN
-	 Ka8j2kdR4tSDuYR5JoAF91VCM3QjWbk8b45f4eepP4VQPUXN7r24ZpiEciQGF+SZrjg==
+	t=1793028410;
+	b=3dyW937JbKFnhW0VZxbh3zxkbW0ZFUJ9db00hpBhcnJz/xy5DtALtLXfPqgfiARx2I8X
+	 gcgV7DoN9NeV/o7An4TYJwrELdnbozCVUctAXEDvEHhB1exYy4SClrfV4njOGm9vgdLY1
+	 q5OByn84OZ7SJlySRGcHenuOWEGEuLaq6Cj8stHEk/f1nN4Ns++RrsytiQlgyMvXrRfSO
+	 gkySfY9ji9a/t2cA3o/IwQPiuJ22qNYTE+YNpondKEEQo+oYAFwGwwXQhxEWJI2b19kR8
+	 MwQisaJss973qlYP7zMLqF3iHQN+JCBTo3fAEOV2kdoNhFe/57adTuxN29JEONfaNEA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793028404;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793028410;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=6sX1ckCkCo0C9crGPLuXV3itI4WluLyfMysqHfXOIc8=;
-	b=b27kE85ML8nm2dmZSYpb0tPrDfb4AUbDwdkbv3Jc2iKuSARZ4SShFIPQTP92A53yQDS5
-	 QpskpsRGqg5gbTLDgKzhgBhUhtW0tzvTNY8niHTlindJrbshUW5o2wq0kU3RxssjLxD/L
-	 UF4jDor9VPD+dAB9a5eU3njvQWKDGg9o3ZC7isgr1DhFPyoi31eZfcb80jvfqBXXhN8A2
-	 rCUVy292lfR9Cq4j5uvDqF6IfKG3YtG8JMC2Iy1aVZ5jGjr0OUTPnoYTJQ+hVQ9YZT8Qp
-	 5RnBxyyaOt8LB5nD4C+cNo/NIoHYGA9OT27fZmUjfYxXSCxArEDHf4JDocDmclOlsDg==
+	 X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=dAFgr5GFVCUFPSyhlg3DUaZpfnARnQey3lMyxNdSf/I=;
+	b=v6i63m2cywPj3UqkH8iDkhPSuWSdMCQzxL7qJy/AKd2CLwkUKoVyCa5YJFjDbep2XpvN
+	 WIcvPSvjQbVurLRS8m/V9ky43aw/WpJUUuQ1lJzyDb/QJ5WoYZ99IA/Blt5IzuAM6pGgB
+	 fq/YgDU0MomvUtCN7cNiMmVqkAUHzPbHseOAF6BFQA5XNhy+kONC2C3QyZBVyto3lHk27
+	 gADBwWIBDoZKerIWXJ46f4CwX9wlGLRHZ6pT0kwX/LXIHEidpyYB6DWrBRqOKXXznzNGs
+	 z8zU7WNsIvsztTnHaZOm/34cedR+hh0AyBghggQFrzho5HxkIoecWoBAsJcO3ibEOwQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Yug95bfy;
-	arc=none smtp.remote-ip=95.215.58.102
-Received: from mta1.migadu.com (out-102.mta1.migadu.com [95.215.58.102])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=lfvq+ASi;
+	arc=none smtp.remote-ip=91.218.175.203
+Received: from mta0.migadu.com (out-203.mta0.migadu.com [91.218.175.203])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02F5E606A31A
-	for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 15:26:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 02F5E606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E3AF606A31B
+	for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 15:26:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7E3AF606A31B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Yug95bfy
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=lfvq+ASi
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=s46YFljZH4peYcKfdSw0ukYEvKh0IVavDFv9NTBlyqg=;
+DKIM-Signature: a=rsa-sha256; bh=Gpfg/CtXJGh5QbnPt7iVXc/Il3CyiL4OHB1+vx17vOU=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793028402; v=1; x=1793633202;
- b=Yug95bfyhInIBBLxd8u3eOeUaRUZqKDFTlAV245v9MCfpVidsG9MXF15Tx24oWy50Mg1BJkh
- V0TMFYqROCTeGQCVJ3V0OBA0bbduJ0VkrglxqpiOGhozxi1/5kfGZmon83H6SE8PJdBGObF1qqY
- 1cJJ1un2J85n79Im7RnTVi8s=
+ t=1793028407; v=1; x=1793633207;
+ b=lfvq+ASiumxv1EPzTQfGbflJ5htPolqDQumFs20FyCg5RYvXBgDs4KRLcmAI9kRLsgulaSNb
+ i36nGDemw02DdXpl7Tcs4S53ofD0IlYjpRnUmu32/BkKvGiWGXpqBdosR3BLHgNUpai5oIIkFGV
+ qlz1fuO37/fI1/eesQp8H6Ms=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id c79fc02862921bcd;
-	Mon, 26 Oct 2026 15:26:42 +0000
-X-Mizu-Trace-ID: c79fc02862921bcd
+Received: by smtp.migadu.com with ESMTPS id 8be23b0417c64883;
+	Mon, 26 Oct 2026 15:26:47 +0000
+X-Mizu-Trace-ID: 8be23b0417c64883
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -60,10 +61,12 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 0/2] KVM: arm64: vgic-v4: Don't allocate vPEs that a VM can't use
-Date: Mon, 26 Oct 2026 15:26:37 +0000
-Message-ID: <20261026152639.3926498-1-fuad.tabba@linux.dev>
+Subject: [PATCH 1/2] KVM: arm64: vgic-v4: Don't allocate vPEs for a GICv2 VM
+Date: Mon, 26 Oct 2026 15:26:38 +0000
+Message-ID: <20261026152639.3926498-2-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261026152639.3926498-1-fuad.tabba@linux.dev>
+References: <20261026152639.3926498-1-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -75,41 +78,37 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi folks,
+KVM can run a GICv2 VM on a GICv4.0 host whose CPU interface supports
+legacy operation. Such a VM has no LPIs and never uses vPEs, so
+vgic_supports_direct_irqs() is false for it and kvm_vgic_dist_destroy()
+never tears them down. However, userspace can still create an ITS for
+it. Once the vgic is initialised, vgic_its_create() calls
+vgic_v4_init(), which allocates the vPEs and requests a doorbell IRQ for
+each vCPU. They're then never freed, and each doorbell handler stays
+registered with a vCPU that's freed with the VM.
 
-Two fixes for vgic_its_create() allocating vPEs for a VM that never
-uses them. Nothing frees them when the VM is destroyed, and each
-doorbell handler stays registered with a freed vCPU.
+Only allocate vPEs for a GICv3 VM.
 
-The first is for a GICv2 VM, which KVM can run on a GICv4.0 host whose
-CPU interface supports legacy operation. The second is for a GICv3 VM
-whose VMM cleared nASSGIcap on a GICv4.1 host with vSGIs.
+Fixes: 74fe55dc9ab77 ("KVM: arm/arm64: GICv4: Add init/teardown of the per-VM vPE irq domain")
+Cc: stable@vger.kernel.org
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ arch/arm64/kvm/vgic/vgic-v4.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Tested on AEM FVP, with has-gicv4.1=0 for the GICv2 case and =1 for the
-other. With my reproducer (clear nASSGIcap for the second case,
-initialise the vgic, create an ITS, destroy the VM), the kernel without
-the fix leaves four "vcpu" doorbells in /proc/interrupts in each case,
-and the fixed one doesn't leave any.
-
-It doesn't conflict with my vgic init error-path series [1].
-
-Based on Linux 7.3-rc3 (fd73f4a665989; also applies to kvmarm-7.4).
-
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/20260921072958.2918477-1-fuad.tabba@linux.dev/
-
-Fuad Tabba (2):
-  KVM: arm64: vgic-v4: Don't allocate vPEs for a GICv2 VM
-  KVM: arm64: vgic-v4: Don't allocate vPEs when userspace clears
-    nASSGIcap
-
- arch/arm64/kvm/vgic/vgic-v4.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-
-base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
+diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+index ed236f083f0d7..a01de4de608a6 100644
+--- a/arch/arm64/kvm/vgic/vgic-v4.c
++++ b/arch/arm64/kvm/vgic/vgic-v4.c
+@@ -248,7 +248,7 @@ int vgic_v4_init(struct kvm *kvm)
+ 
+ 	lockdep_assert_held(&kvm->arch.config_lock);
+ 
+-	if (!kvm_vgic_global_state.has_gicv4)
++	if (!kvm_vgic_global_state.has_gicv4 || dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
+ 		return 0; /* Nothing to see here... move along. */
+ 
+ 	if (dist->its_vm.vpes)
 -- 
 2.47.3
 
