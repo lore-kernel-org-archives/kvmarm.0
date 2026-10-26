@@ -1,57 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.102
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793010824;
-	b=BYzhwIeUoUe/oK2M99fZP9tNyy8AEaSPjoy7/cAXcO6eNu08DXAXphKmTdjZlcUcjPrt
-	 obg6HjFxK/APwMFio7GTu9viugvx0wiH4acC0g9aPTZRGb4WsHeem+LRdwN1OfoWEDDLc
-	 1/ZpgKLyYSPCJvG88DY/ThP2w6s42O4d5fB6dJU319rD2lUCHnsAjeM3q3yO2ONnQEyig
-	 4n4p4CT/tQ0GIxI6sRXQPqSu6Sy3C2r1RXw/AxECsyqsL8vxWTiNiBXnRS4LxyX3ZIX1V
-	 9sFgIkttTNk0NcYHF6ZqZvndjP9Q1W7brfl5feM9PIfz16EtNjAJsmHaskER2aaX7fA==
+	t=1793013287;
+	b=i5hw86b5CuQX5Yb3ebbvTgp2392grdGSrCfOeIeVp3QcDu9VWwPX1pxwrpCPwdKEmsn7
+	 qufBJRkmHPZV0nrW7WLZ47uDTEeZyfrRZs5dj5SMfEfwHFa/vB6W4PqtiFLK8iq6JdqJX
+	 8CdztttQwk+36vcs0WFwVkzyIWaeNcxPgycCTAsG3jAsJrS7nMKufURNfakwe1pKzt8LC
+	 izvaESe1PqxW2AR0S2VjRFE2ER6gytV2OHSXR7WcHz40sdTxSjVbCbtwpnV82Q+BamrEQ
+	 5qCUQJKj7p7+cX4LQFkicA0etFR6sHWgNZV7p5F6l7CCLXqUyfJvKP6KqfroumoVBSw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793010824;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=codivIgbZl7UJS8uokRy9UYat5bUEoobYqhUzGVImnc=;
-	b=MBQnZeM9DJyB3FT90eE5ZEtR+DtarH+7kL6V6x44yEYlCcGPluYK14eDv6wM4hpS/wI+
-	 A7NJpm62rKTsfKgeelHsfIs/lZNm9duL5XAAnVp0XZFJC4ZV/q53yUKtyb4pdGi0hyTUr
-	 y39cdp7bXww0aKAngRj3YVttFXU8ZyYSDG6+AIuEzFLb3HumbmnPp4VCGsQc/Yb7FMJN6
-	 tY3ZtLB+FShuNtRdVotkjt3hUAhUkf3veXKmucqR7cLLWA/FBJRMaMulMd9C1niT49YsI
-	 OQKteAAYCBeKzqa4hL8Hb+sV1KhpWHd6BQ5rXrn8eGXUtk5LTlTAYWeuanchcmKKaoA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793013287;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Gm-Message-State:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:
+	 X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:Subject:To:Cc:
+	 Content-Type;
+	bh=D7xYMUq8jcHCw/udL91J2awlO7GtcxDGTY/T8x3DLkQ=;
+	b=uY5uKsAeXq0sX+cguXK5BfwMZ7zEHoNr1eY8w3+S/EMQqvn94Pahd0lU5Zt0UIfjuFYA
+	 ARKdiTtPMFvQfgsuCJkMgT5vrIQiHZEN00cDh1Tb5fT/gqWOkxWgLLSHMzqngTYzgE8dl
+	 EktU7fxMiDKMmjbG+qMc34c99VLWNsR4/nxZQvykluqsqOR1vF0v4aswqVwllGPxvWcBN
+	 d8E9tzif9dCCSTxgZX81iRF/JnNpIQ+F+xjXZiZdq2+OV0n8Qbn8B6TmIdsnCtcgBFGJE
+	 W8LmhkZWTHOkG6xvbN+M98sH51fheoVnlv82nFZcXkNiqoRtiF+VUp9jn0XxoszgfPw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="G/AFVdQy";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=f8LHNjPJ;
+	arc=none smtp.remote-ip=95.215.58.102
+Received: from mta1.migadu.com (out-102.mta1.migadu.com [95.215.58.102])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D18A606A31B
-	for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 10:33:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0256606F829
+	for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 11:14:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B0256606F829
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=G/AFVdQy
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23ED51F01828;
-	Mon, 26 Oct 2026 10:33:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793010823;
-	bh=codivIgbZl7UJS8uokRy9UYat5bUEoobYqhUzGVImnc=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=G/AFVdQy2OhcpOoyqpICY6pi1f0WqScpHa8X1Au+L69KBJBMFGN0/nAD6u2DZI1UG
-	 vbYKs4/mSaipH7Dboc+OKeSMEbxbkO/hCnFsNrH20l+3WfQYsji7kRi7JrGgSsOCGk
-	 uXSXj3VokY+qqmxArql6t/GJIRGooOqkKMQHrdQIssfxqGiI2ahdGLc64KEqpYmMuN
-	 xtR92wKFE0rnmCOAuCVyhxktcEW1yj7n9z+b9vujliqcYgwY4MogIW1nxBSJh1aYWc
-	 MAM5WqTOV6oDhBsYUSipN3tANmVJZyhXSyx+GGmfM1MhgijgU87PYBTWRg6FriSMiZ
-	 TEJ9Q1yjuCqFA==
-Message-ID: <sashiko-outbox-184962@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 2/2] KVM: arm64: vgic-v3: Don't drop a pending LPI
- mapped with LPIs disabled
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>, kvmarm@lists.linux.dev
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261026092802.2636798-3-fuad.tabba@linux.dev>
-References: <20261026092802.2636798-1-fuad.tabba@linux.dev>
- <20261026092802.2636798-3-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 26 Oct 2026 10:33:42 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=f8LHNjPJ
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=/kw6LIbxjBOzGprj6R15Znq++scfwHjoCNzPIlnqSgo=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793013283; v=1; x=1793618083;
+ b=f8LHNjPJG+AYfTQi323SFExct9Sbu8SlXKi+lKq13rL9sX2qgLZf12VxFIwHRjRCPGUOyQuw
+ YcbR2bq8gGle+mP69DNYuH09HEiBq84CbVrHQUj1W8ywrSdZwPSEYPboPyJk6hIeqOZ5QH4rnht
+ 9U+fMTUumJiSSZlP5+tTCRm8=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 35c3723e73a6d147;
+	Mon, 26 Oct 2026 11:14:43 +0000
+X-Mizu-Trace-ID: 35c3723e73a6d147
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5be4a7b9e6fso7331e87.1
+        for <kvmarm@lists.linux.dev>; Mon, 26 Oct 2026 04:14:38 -0700 (PDT)
+X-Gm-Message-State: AFq9FYLE/SzqyeRhdNjnvUbMy5BRweP1NbebkaeKwoasBh8JGPFIWIX2
+	y+lazWEaDDwj99QLp6y2FG1xvXnmeC2U0kDHry8j+dQQqg3rN7QH315pOyO69Jc9SHknLQcjD/e
+	ewsfqz6EsRXNAtL5tzMcDvbUzdFbi7sXzNeRV3HX+
+X-Received: by 2002:a05:6512:1056:b0:5bf:c3e1:532b with SMTP id
+ 2adb3069b0e04-5bfc3e1545fmr10691e87.5.1793013277753; Mon, 26 Oct 2026
+ 04:14:37 -0700 (PDT)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -60,139 +64,55 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+References: <20261026092802.2636798-1-fuad.tabba@linux.dev>
+ <20261026092802.2636798-2-fuad.tabba@linux.dev> <sashiko-outbox-184898@kernel.org>
+In-Reply-To: <sashiko-outbox-184898@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 26 Oct 2026 11:14:01 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTwG44zRA3c4UcZ3ynDsK-pqSG2LJ8Z8QCDLDLrZuQRaUg@mail.gmail.com>
+X-Gm-Features: AclHuK9o2uKydOCj3eQ0PTMJbxnin7clpegfUuD7yjIGSfLi1gluUuhbM1DRizM
+Message-ID: <CA+EHjTwG44zRA3c4UcZ3ynDsK-pqSG2LJ8Z8QCDLDLrZuQRaUg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: vgic: Don't forward LPIs to a
+ redistributor with LPIs disabled
+To: sashiko-reviews@lists.linux.dev
+Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
-s) to consider:
-- [High] KVM: arm64: vgic-v3: unconsumed pending table bit when LPIs are en=
-abled
-- [High] KVM: arm64: vgic-v3: TOCTOU race on vgic_lpis_enabled() drops pend=
-ing LPI
---
+On Mon, 26 Oct 2026 10:13:14 +0000, sashiko-bot@kernel.org wrote:
+[...]
+> > +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > @@ -293,28 +293,31 @@ static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
+[...]
+> > +                if (ctlr == GICR_CTLR_ENABLE_LPIS) {
+> > +                        vgic_flush_pending_lpis(vcpu);
+>
+> [Severity: Medium]
+> Is kvm_pause_vcpu() sufficient to prevent vgic_prune_ap_list() from seeing
+> !vgic_lpis_enabled(vcpu) and dropping pending LPIs off an ap_list without
+> clearing irq->pending_latch before vgic_flush_pending_lpis() retires them?
+[...]
 
-commit 1318a5e945ab06141897d5ffe8f4348f6a0ecf31
-Author: Fuad Tabba <fuad.tabba@linux.dev>
+No. A prune on a KVM_REQ_VGIC_PROCESS_UPDATE request, or on the vCPU
+the LPI was retargeted away from, can drop it with its latch set. The
+guest still doesn't take it with EnableLPIs clear. Taking it after a
+re-enable with PTZ set is a pre-existing bug, which I'll fix in its
+own patch, not in this series.
 
-KVM: arm64: vgic-v3: Don't drop a pending LPI mapped with LPIs disabled
+> > +++ b/arch/arm64/kvm/vgic/vgic.c
+> > @@ -273,14 +273,18 @@ struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
+[...]
+> > +                if (unlikely(vcpu && irq_is_lpi(vcpu->kvm, irq->intid) && !vgic_lpis_enabled(vcpu)))
+> >                          return NULL;
+>
+> [Severity: Medium]
+> When an MSI injection races with clearing GICR_CTLR.EnableLPIs in
+> vgic_mmio_write_v3r_ctlr(), can returning NULL here leave irq->pending_latch
+> stuck at true and leave a live entry in its->translation_cache?
+[...]
 
-This commit updates vgic_v3_lpi_sync_pending_status() so that it only clears
-the pending bit in the guest redistributor's pending table when LPIs are
-enabled on the target vCPU. This ensures that when LPIs are subsequently
-enabled and its_sync_lpi_pending_table() reloads pending state from guest
-memory, a pending LPI mapped while LPIs were disabled does not lose its
-pending status.
+The same latch, with the same limit and the same separate fix.
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> index 346bacb3198f2..65b77fb35be37 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> @@ -552,7 +552,8 @@ int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, =
-struct vgic_irq *irq)
->  	irq->pending_latch =3D status;
->  	vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
-> =20
-> -	if (status) {
-> +	/* Enabling LPIs resets the latch from the table: leave the bit for it =
-*/
-> +	if (status && vgic_lpis_enabled(vcpu)) {
-
-[Severity: High]
-When vgic_lpis_enabled(vcpu) is false, vgic_v3_lpi_sync_pending_status() le=
-aves
-the pending bit set in the guest's pending table for its_sync_lpi_pending_t=
-able()
-to consume later.
-
-However, when the guest enables LPIs on the redistributor via
-vgic_mmio_write_v3r_ctlr() -> vgic_enable_lpis() -> its_sync_lpi_pending_ta=
-ble(),
-its_sync_lpi_pending_table() reads the pending bit into irq->pending_latch
-without clearing the bit in guest memory:
-
-arch/arm64/kvm/vgic/vgic-its.c:its_sync_lpi_pending_table() {
-	...
-	raw_spin_lock_irqsave(&irq->irq_lock, flags);
-	if (irq->target_vcpu =3D=3D vcpu)
-		irq->pending_latch =3D pendmask & (1U << bit_nr);
-	vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
-	vgic_put_irq(vcpu->kvm, irq);
-	...
-}
-
-Could leaving that bit set in guest RAM cause spurious LPI delivery in the
-following cases?
-
-1. After the guest acknowledges and deactivates the LPI, only irq->pending_=
-latch
-   is cleared in software while the bit in guest RAM remains 1. If the guest
-   later discards and remaps the LPI while LPIs are enabled, vgic_add_lpi()=
- ->
-   vgic_v3_lpi_sync_pending_status() will read the stale bit from guest RAM=
- and
-   inject a spurious interrupt (or if the guest disables and re-enables LPI=
-s,
-   its_sync_lpi_pending_table() will re-inject the already-consumed interru=
-pt).
-
-2. If the guest issues an ITS CLEAR command (vgic_its_cmd_handle_clear())
-   before enabling LPIs, CLEAR only clears irq->pending_latch, and enabling
-   LPIs via its_sync_lpi_pending_table() will resurrect the cleared interru=
-pt
-   from the bit left in guest RAM.
-
-[Severity: High]
-Can a race between vgic_v3_lpi_sync_pending_status() on one vCPU and
-vgic_mmio_write_v3r_ctlr() enabling LPIs on another vCPU cause the pending =
-LPI
-to still be dropped?
-
-In vgic_v3_lpi_sync_pending_status(), vgic_queue_irq_unlock() calls
-vgic_target_oracle(irq) while holding irq->irq_lock:
-
-arch/arm64/kvm/vgic/vgic.c:vgic_target_oracle() {
-	...
-	if (unlikely(vcpu && irq_is_lpi(vcpu->kvm, irq->intid) && !vgic_lpis_enabl=
-ed(vcpu)))
-		return NULL;
-	...
-}
-
-If vgic_lpis_enabled(vcpu) is false at that point, vgic_target_oracle() ret=
-urns
-NULL and vgic_queue_irq_unlock() unlocks irq->irq_lock without queueing the=
- LPI
-onto the target vCPU's ap_list.
-
-If another vCPU concurrently writes GICR_CTLR_ENABLE_LPIS in
-vgic_mmio_write_v3r_ctlr() right after vgic_queue_irq_unlock() checks
-vgic_lpis_enabled(vcpu):
-
-CPU 0 (vgic_v3_lpi_sync_pending_status)     CPU 1 (vgic_mmio_write_v3r_ctlr)
----------------------------------------     --------------------------------
-vgic_queue_irq_unlock()
-  vgic_target_oracle()
-    !vgic_lpis_enabled(vcpu) -> returns NULL
-  unlocks irq->irq_lock (not queued)
-                                            atomic_cmpxchg_acquire(&vgic_cp=
-u->ctlr,
-                                                0, GICR_CTLR_ENABLE_LPIS);
-if (status && vgic_lpis_enabled(vcpu))
-  /* now true! */
-  val &=3D ~(1 << bit_nr);
-  vgic_write_guest_lock(kvm, ptr, &val, 1);
-                                            vgic_enable_lpis(vcpu)
-                                              its_sync_lpi_pending_table(vc=
-pu)
-                                                /* reads 0 from guest table=
- */
-                                                irq->pending_latch =3D 0;
-
-Wouldn't CPU 0 observe vgic_lpis_enabled(vcpu) as true on the second check =
-and
-clear the bit in the guest pending table before its_sync_lpi_pending_table()
-reads it, causing its_sync_lpi_pending_table() to overwrite irq->pending_la=
-tch
-with 0 and lose the pending interrupt?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261026092802.2636=
-798-1-fuad.tabba@linux.dev?part=3D2
+Cheers,
+/fuad
