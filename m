@@ -1,66 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793110987;
-	b=Bvt4dlnFq324LS4iiSwB86MO9W1G3hhFUB2RWjWvu18Y9Y89xCg6hTZM2QHdO/JTsDqu
-	 Uxn9+gjeWv511ZSYbauED6up/50QfrkocfAEmBDOn4oMy5Es99e9CByxNdCmFaD2SPhfY
-	 XLYwqvQie6OPiF+3lio4Y5AeqHIJXDOZBkTpi/mQRZMGjxR37A886sqVLjdATNiGk2FRX
-	 H4/tRTT8evuzoE6Vl+2H/dnkhnM3ymnnSPWutT70CfkIr4BitvAA/hC3B8W1Cnb+aKJtA
-	 zVT9jbaaqcwK91cK/5cFWkQPhm0hUcONTF76kXV5d1CtRmzieuWdbX87hEEI/KTHq5Q==
+	t=1793111067;
+	b=Mf0YCZta4VFWmQc5y9/MVF+KGNJyxgtWStn76k8ci0v+gcfiQye8pcwo4rfbhlJBt7Xc
+	 Gf5shJ9NhagdrAsIQX6qvTl+I5ttigZI47bEaXCyAmQmI3t704TMS4J3cYcT1dmKbrzBb
+	 DsSLSl3Uba4klfDWBaXlDnDEt7FaIf1wP64vlrPFzDO+CB6qdcGhrToXJfiGiZPYCxD7n
+	 3o8LC821C7bx2nWrBU5wT+JBtpZDz8UcPqJULORIJAwtaEoGDrZWM4NyyhQpPPrv3RlDb
+	 iaHRKBMcI69DiaTFiSiAiIP+RwMrgcSVV1hUGOT/cjJAlKWDictv6qFk0vVDoQPdXCQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793110987;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To;
-	bh=YCM1R6dVVWvuIH+UBR6TH5CMJ3bKt8HZdVGd2g1zmYs=;
-	b=02POx9IapN1F2n0ALapkUdBUkR+x/XsM37FHYyr3Hgyq0s9N5GojEpKycy4vIFv9mjFQ
-	 mKorD8Ocgg9/nO0wxUs5yeFIYM/jHNXPQGedK7WwVWKhqf8OX+haW4WsPik+ZMHGyLI0x
-	 N42p2GqEQoX1RxMPQAnNO4ovNdmiDS1/j0l61Op9B4BpuI2SLQ9mw3lfmj0YkY6Fm7KcH
-	 BOxGmLC7Gi3JXC7U8Y17eb/WDJAYzp5p/SnNFf2ruDPubWHPaVqibB3AHIHc04oV8S9Gc
-	 ofH4+fzm0QBLdliiLOGKNMYP2X+3C8ShaKZ3Fl3lw5W+ued272KvfBhYMJ5ZxMLKMZA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793111067;
+	h=Received:DKIM-Signature:Received:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:
+	 X-SA-Exim-Mail-From:X-SA-Exim-Scanned;
+	bh=jwywrlpki9bMHHIBRrQFn5CCln+QEbHNkdjd7saLhsU=;
+	b=NZHSMDdLWOlhNiOSfC+chGeR8LRczxyWtlgxPMV/kbbBpDLCR/0+luBGBmWrIQ4yHRDh
+	 Oq/3Y+oubzgCl5xpFfakvfeBjAvHQQuFdK8bV+GNfFxPCgV9Mk9HDugdVBEueef3zjmtg
+	 LgBXyT9M5p3kyaOohBbm5+Sb/6x2Qh8Xpy+5w8w8QgJUX5TMiNY52wJ1nCGbj6iizhOB3
+	 zVGF00zl0hHHt7Pmv3y2cIZIVTQHvgm0HuoB+/HquyT9n0Rsx+i9YT+nCMyef48m35Ex8
+	 4VKRRIM7WddPpibLge6oiJ09X38U7qA16ZVQuVpi9UD2KFcrud0QYApWDk1Tdx8+sFw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Y1y72I7Z;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2822D606A31B
-	for <kvmarm@lists.linux.dev>; Tue, 27 Oct 2026 14:23:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2822D606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UrCfeUe+;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9478606A31B;
+	Tue, 27 Oct 2026 14:24:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Y1y72I7Z
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D4A8F15A1;
-	Tue, 27 Oct 2026 07:23:00 -0700 (PDT)
-Received: from e142392.arm.com (e142392.arm.com [10.2.213.23])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7565A3F7B4;
-	Tue, 27 Oct 2026 07:23:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793110984; bh=5oj/0Olu6P0vOlAuhliwwyRovCufR2SAkrdb83vbrEU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Y1y72I7ZZgHOwDZ52neOkUJTOFHLGM6SpPrLJVlApi2ONKuPpXy5gvo/YDy6bjRdY
-	 UjZ8l/7y5kF6noVILXl0H6e+7Nb7KYz93CLjCCr7D1N2FQkJe6kC1ZNYqjb4NZfw1c
-	 kqwUht3UItiP8Y9UtMdtZaMB+dEp84ku6EU01etY=
-Date: Tue, 27 Oct 2026 14:22:50 +0000
-From: Kristina =?utf-8?Q?Mart=C5=A1enko?= <kristina.martsenko@arm.com>
-To: Jinqian Yang <yangjinqian1@huawei.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-acpi@vger.kernel.org, 
-	kvmarm@lists.linux.dev, linux-efi@vger.kernel.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	David Hildenbrand <david@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, 
-	Linu Cherian <linu.cherian@arm.com>, Anshuman Khandual <anshuman.khandual@arm.com>, 
-	Lorenzo Pieralisi <lpieralisi@kernel.org>, Hanjun Guo <guohanjun@huawei.com>, 
-	Sudeep Holla <sudeep.holla@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Subject: Re: [RFC 00/12] arm64: Add support for TLBI domains
-Message-ID: <cs3tsczrky7egqzde6gnsf7l22t53jit3cygtwe56yfeka5ue7@zesz6zptww3v>
-References: <20261001110655.461473-1-kristina.martsenko@arm.com>
- <9eb6e0fe-5d8a-499c-b19b-ce73fe982451@huawei.com>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UrCfeUe+
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BCC41F01829;
+	Tue, 27 Oct 2026 14:24:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793111067;
+	bh=jwywrlpki9bMHHIBRrQFn5CCln+QEbHNkdjd7saLhsU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=UrCfeUe+fb3TmiBWvrRfzazy9kqW+cw4mJpuRy/iD27QfDHrJs+CYjvuCemQ1D9LU
+	 KzBvECnAI1cG7LQLmeBcRdRb9qC+PlPw+WOPTp8C8cSMMrq3uAjgMmbG5e6W+rTOoS
+	 IvJgLkhR4dcp848RYdR3/+yOQCKMvvpAmPxhe7BwbRbOoukZNovKujzpyc+cU2NZw9
+	 bi16C2AYxa+UTIZV/jKLDxHOma+ijQ03hAPR40Bq11z+EbBKGtIOd6hoxCdKZJKQnC
+	 Agd6K9KO0iXA9NZvxMkf6xViYvnO8A5QBdw5ctZjjgjzJO5InPQ/cwIQWsexqLhR7V
+	 oAtq4FBvcV2tw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xLi6C-00000007k8T-2lj1;
+	Tue, 27 Oct 2026 14:24:24 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Thomas Gleixner <tglx@kernel.org>,
+	Eric Auger <eauger@redhat.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Yuan Yao <yaoyuan@linux.alibaba.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 0/4] irqchip/gic-v4, KVM: arm64: Fix the vgic init error paths
+Date: Tue, 27 Oct 2026 14:24:22 +0000
+Message-ID: <179311103723.2732161.15358895757190897834.b4-ty@b4>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260921072958.2918477-1-fuad.tabba@linux.dev>
+References: <20260921072958.2918477-1-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -70,59 +78,40 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <9eb6e0fe-5d8a-499c-b19b-ce73fe982451@huawei.com>
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@kernel.org, fuad.tabba@linux.dev, tglx@kernel.org, eauger@redhat.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, Sascha.Bischoff@arm.com, sebastianene@google.com, yaoyuan@linux.alibaba.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Oct 19, 2026 at 04:52:04PM +0800, Jinqian Yang wrote:
-> Hi,
+On Mon, 21 Sep 2026 08:29:54 +0100, Fuad Tabba wrote:
+> Changes since v2 [1]:
+>   - Patch 3: a vgic_v4_init() failure now frees only the SPI array,
+>     since that function unwinds its own state; the teardown label is
+>     for the routing failure. (Yuan Yao)
+>   - Rebased on kvmarm/next, where the routing failure already tears
+>     down the GICv5 state. Patch 3 moves that into the shared label, so
+>     the SPI array is freed on that path too.
+>   - Collected Reviewed-by from Yuan Yao on patches 1 and 2. (thanks!)
 > 
-> On 2026/10/1 19:06, Kristina Martšenko wrote:
-> > Hi,
-> > 
-> > This series allows the kernel to use TLBI domains. TLBI domains (FEAT_TLBID) is
-> > an Arm architecture feature that enables a TLB invalidation to target a subset
-> > of CPUs instead of the whole system. It can improve performance on systems with
-> > many CPUs. TLBID is not yet part of the Arm Architecture Reference Manual but
-> > some of it is described in the latest XML [1].
-> > 
-> > The goal of this series is to send TLBI commands only to the CPUs where a
-> > process has run (i.e. where its page tables have been installed). The last
-> > patch explains a bit about how it works. This is an RFC since I'm not familiar
-> > with the kernel's TLB/mm code and I'd like feedback on whether the general
-> > approach is correct.
-> > 
-> 
-> Thanks for posting this series.
-> 
-> I'm working on the KVM side of TLBID, and have a series that
-> virtualizes TLBI domains for guests. It includes:
-> 
->  - per-vCPU vDomain configuration via a new capability and
->    two ioctls
->  - VTLBID_EL2 programming at vCPU load/put, mapping vDomains
->    to physical domains
->  - a guest visible TLBIDIDR_EL1 with virtual domain counts,
->    and conditional exposure of ID_AA64MMFR4_EL1.TLBID
-> 
-> You mentioned you planned to look at KVM support in your next
-> version. Would it be OK for us to post this as an RFC on top
-> of your series? :)
+> [...]
 
-Thanks for sharing.
+Applied to fixes, thanks!
 
-I’m starting to look at KVM support but I’m not working on exposing
-domains to guests. I’m looking at if we can track which CPUs a guest has
-run on and transparently redirect all of a guest’s TLBIs to a single
-domain that contains those CPUs. This could be a fallback in case the
-guest is not configured to have virtual domains itself (which your
-series enables).
+[1/4] irqchip/gic-v4: Clear the domain and fwnode pointers after freeing them
+      commit: 1fbdcc13ab303987048669c73134352ef5706666
+[2/4] irqchip/gic-v4: Unwind what its_alloc_vcpu_irqs() allocated on failure
+      commit: 6b44f7777ee826360714044b1a82fbdb1388304c
+[3/4] KVM: arm64: vgic: Tear down what vgic_init() created when it fails
+      commit: 25993ec8c5bb30baa746936d7a76f03c58150927
+[4/4] KVM: arm64: vgic-v4: Restore nr_vpes before freeing the vPE resources
+      commit: 99ec74a33d52219f57cc61a2bc7bd5114cc997b0
 
-I think there is some overlap between what we’re doing (e.g. configuring
-VTLBID), but also lots of separate parts. So no objection from my side,
-please feel free to post your series.
+Cheers,
 
-Thanks,
-Kristina
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
 
