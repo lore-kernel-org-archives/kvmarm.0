@@ -1,63 +1,63 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793143178;
-	b=25JrBPHNzEfO0DUuJMt176sXYTYTaB7KVI50vUZpWCr/qKdaxOoCF6q5zFN+T6iuBE5a
-	 jbpRkUnX5ke2HN6qI43+4TOqkP0X6cyK/ZO7OTH+Qo5YAaBS8fpTvi+5+uD/tOECWSOIR
-	 qpeqSl/FQW6jbJty7tSH54CVrExBzGFFtXYrIgjtJlERVUZF2Q/q7x9ihY7mE7bv0/1j8
-	 zVJoIdKR88ksu6N3dzK9nOOTWglimM6Zop4PjFD7z8F6/+i0lfx5AfpFc1De5NWt9nhrE
-	 i/hF5EPq9aSfYHmqxQl+HLFmUsrR6xWj/lVFCYH2M2Q+HY+ipKcpCfH8av9xDQO0biw==
+	t=1793145199;
+	b=OuNS/bGAKJSoMrzUx3pDvWG796/9TYoY+AVAnp7dVkyzDo8acxms3tin/KTxq9K9003W
+	 ZEAR5VvkGr2ulfWNDIy8dJUi2ZqFdjX9gBVz2h4IHViWAuPQv4U5a208OG/utz7YeXcFY
+	 ruHPwXiYDAJ1uGodYkR3q6EIDJycEMHuIAs2QypOpBtzc1sMoLfhFwN6k6Z0QgwQAFM4H
+	 ToGH7Fptgz2euTSD8bH226uhv6xmZ7i9nzBLTZwphTYox8SiphSHOrmUXT/wq8XCA2pUj
+	 MNhOKF+HSrzymbZuVQhBGdrkpCnlCoejsCwaV2rFIuumFfVTwv7yl6IT2LgsQSoFyEg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793143178;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793145199;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=gcC21IdQ6bspw7TEhlauUEjBQvyVhgVj7MtVw7/gPRo=;
-	b=bTPZ6aMtDc0hI46AMVm4cDJd5UqfJrNs8snbua2LOC1rCqqY2/p6/JhSezJp1Yz/cl/d
-	 B4uumYHBE8iFSjUABnp/r101kUPVb1fDCVKOEggCdgDp/HDAgUrYrTCMQtDbFvW1QXB6P
-	 7cPbQVWDFYKyqhlbwgS2DMKcBzpCx5RBh7tXJ/MQiD/OALBTb3I3GsMrEn2FLNaW8nwpH
-	 EW0AFvzGQoRFgDoW0MBW7+v8x/6hOOGa1dQUAOHpGwE2uOVvdjh1MczmtNryCaR7dXM1M
-	 VdrE7h02ox7w+ZdlbqJEaMQzNsQhjMI40f7MY4IkgkL1sa3EUrZyl0hjoVGwfj4M68Q==
+	bh=iuQfgeNxA6wGpTGomQMxImyXHDaKIESamcJco6bW6WQ=;
+	b=p+Ju7GOKyss4X3gynMx/MHR/ym865S5m6LyD5A4wgcSrVDFuK/8XbLYYrRQasRh/3b4+
+	 iSTQWaHFJZ2VfTLGG//bQtqf/LHwoOpxosIvTnD/HBFB1qEvvikYfxyJoRO0bDY4R2BHG
+	 EXgzbLSPS38b5UxPTTwpbi7iCRvxxfDBe7TDNJR2ZeqdkMPmERXP3LDU0TZD5mZO9ijSi
+	 vRDo41bF5sSpwAT4kZ6xAW+lYJKUIH9YsFFzaUht0SQsHni3l1Jz8dYW2+7khsk9svbTv
+	 5wTxHrGvNQ90yJjjh/tZ8RtmoSJwOC1glc9ztPfYGkpYeGhIyTU6BJJOIiTsJtYXGtQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VgjbfQwc;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ksBxNZON;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6CF9606A31A;
-	Tue, 27 Oct 2026 23:19:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6091A606A31A;
+	Tue, 27 Oct 2026 23:53:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VgjbfQwc
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08BED1F01825;
-	Tue, 27 Oct 2026 23:19:37 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ksBxNZON
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5F7A1F01825;
+	Tue, 27 Oct 2026 23:53:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793143177;
-	bh=gcC21IdQ6bspw7TEhlauUEjBQvyVhgVj7MtVw7/gPRo=;
+	s=k20260515; t=1793145198;
+	bh=iuQfgeNxA6wGpTGomQMxImyXHDaKIESamcJco6bW6WQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=VgjbfQwcwbx4G42W26MolZaeZmmXJ+28ATNkVJuDLpN6KYpStv2PVQpQCZthLi0Sy
-	 Vg0fSiXXlPFlQ2xu6X1+pCN+9q6fY7DXGldExk148QvFsIMOnibTPS5MsHvQvqsHGo
-	 07mQQeDmtm7rZSrNK8pHGNFYOR5ywAuC4MhrwEaXpmUq8KKc33oP7JqKe0HzJxHc4Y
-	 cvsHOp+fAuG8FjhIKLfqOa3ge07+dILxP+q5mEHAnecHIR/yExBg4iTxMbXktXJjd7
-	 WnCBeJjmEbHqadHxsujCA5q1asob8LX6bl2nZWJtVF+b9irHKjGz47+rLya+R9tQ2D
-	 P1OmVj1Q4oAaQ==
-Date: Tue, 27 Oct 2026 16:19:35 -0700
+	b=ksBxNZONPb8UCXkhTBve3goFXZZQLNXqWYD1psAQqmQ3PV384sVnXrWRRZtDEQirR
+	 KoYFh1V1XqfzzHUyFKBpYgXrgq7+gneJRolr49gTjumAnLJ75m9M4q3zSMoDVWWq36
+	 6sjR3kzQWhZTBeU8/mx+8BUMTK8Tca1N5+PrlgL4KCKf25Z/Kmmw6BEdZy0A/gCG1Y
+	 qk0Rizpie+M/WaCYxcVrjY5to3BMnQCN8GL2VCKQTDq9I0WG8Z82PzWUDjRMLQu09v
+	 95QGDJgRDeR9ueS0uM9hU68vTH7tYwA9gmiAQ3aWNE+Pnds1AHMTTL17VP50qDuNdw
+	 tDVMS4Sh/NGUA==
+Date: Tue, 27 Oct 2026 16:53:17 -0700
 From: Oliver Upton <oupton@kernel.org>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
 	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Tian Zheng <zhengtian10@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Andre Przywara <andre.przywara@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Yuchao Zhang <ndaugoing@gmail.com>, Fuad Tabba <tabba@google.com>,
 	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v2 0/3] Set DBM bit on writable pages
-Message-ID: <auExh5laWQbUKmUY@kernel.org>
-References: <20261026144413.441566-1-leo.bras@arm.com>
- <at-lSy7H-K60LhCB@kernel.org>
- <auCOj9dgk42AE1WX@LeoBrasDK>
+Subject: Re: [PATCH 0/2] KVM: arm64: vgic: LPI fixes for redistributors with
+ LPIs disabled
+Message-ID: <auE5bc4NJTZO-C1o@kernel.org>
+References: <20261026092802.2636798-1-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -69,75 +69,55 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <auCOj9dgk42AE1WX@LeoBrasDK>
+In-Reply-To: <20261026092802.2636798-1-fuad.tabba@linux.dev>
 
-On Tue, Oct 27, 2026 at 11:44:15AM +0000, Leonardo Bras wrote:
-> > I'm pretty sure I shared this feedback before, but patches that enable
-> > DBM do not make sense in isolation. We need a single series that
-> > contains the DBM enablement as well as the corresponding HDBSS support.
-> >
+On Mon, Oct 26, 2026 at 09:28:00AM +0000, Fuad Tabba wrote:
+> Hi folks,
 > 
-> Right, 
-> My reasoning is that we can discuss this new version, and make the needed 
-> changes, so Tian could pick this for his own patch series for the next 
-> version. I do not intend to get this merged by itself.
+> Two fixes on top of Marc's cross-CPU vcpu pausing series [1], for LPIs
+> whose redistributor has LPIs disabled. Without them, the guest can take
+> such an LPI with EnableLPIs clear, or lose one mapped before it enables
+> them.
 > 
-> Next time I will make sure to state this in the cover letter so it's clear.
+> The first is the vgic_target_oracle() change Oliver suggested on v2 of
+> that series [2]. It stops an LPI from being queued to a redistributor
+> with EnableLPIs clear once the disable path has retired the vCPU's AP
+> list. With that check, the path has to pause the vCPU before clearing
+> EnableLPIs, so that the retire still finds its LPIs.
+> 
+> With the second, an LPI mapped while its redistributor has LPIs
+> disabled keeps its pending bit when they're enabled. The second relies
+> on the first to keep such an LPI off the AP list until the enable.
+> 
+> Reproducers for the INVALL case in the first and the map in the second
+> fail in every run without the patch and pass with it.
+> 
+> Based on kvm-arm64/cross-vcpu-sync as merged in kvmarm/fixes, which the
+> first builds on (e99ff76f4a02b; also applies to kvmarm/fixes
+> 309e1d2215255).
+> 
+> Cheers,
+> /fuad
+> 
+> [1] https://lore.kernel.org/all/20261015100539.1011760-1-maz@kernel.org/
+> [2] https://lore.kernel.org/all/asf87i2RDh-WksL-@kernel.org/
+> 
+> Fuad Tabba (2):
+>   KVM: arm64: vgic: Don't forward LPIs to a redistributor with LPIs
+>     disabled
+>   KVM: arm64: vgic-v3: Don't drop a pending LPI mapped with LPIs
+>     disabled
 
-Can you just work this out off-list? Let's keep the on-list dialogue
-consolidated to a single series to review.
+Reviewed-by: Oliver Upton <oupton@kernel.org>
 
-> > The abstract permission flags need to have a WRITE an DIRTY state, which
-> > we then map to hardware based on the capabilities of the system.
-> > 
-> > !FEAT_HAFDBS:
-> > 
-> > 	DIRTY	=> S2AP[1]
-> > 	WRITE	=> S2AP[1]
-> > 
-> > FEAT_HAFDBS:
-> > 
-> > 	DIRTY	=> S2AP[1]
-> > 	WRITE	=> DBM
-> > 
+>  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 31 ++++++++++++++++--------------
+>  arch/arm64/kvm/vgic/vgic-v3.c      |  3 ++-
+>  arch/arm64/kvm/vgic/vgic.c         | 12 ++++++++----
+>  3 files changed, 27 insertions(+), 19 deletions(-)
 > 
-> I agree that it could work, and my first version was based on that.
 > 
-> But looks weird to me that we have to decide the writable bit based on 
-> having a feature enabled.
+> base-commit: e99ff76f4a02be8542e2c3ecc8843d7339a0200d
+> -- 
+> 2.47.3
 > 
-> Take in account that we can only have DBM being the writable bit while 
-> HAFDBS is enabled (not only present), and that it is just enabled during 
-> dirty-tracking. 
 > 
-> It means we would need to convert the whole pagetable between DIRTY=S2AP[1] 
-> and DIRTY=DBM every time we enable or disable dirty-tracking.
-> 
-> My suggestion with this series is to have WRITE=DIRTY=S2AP[1] at all 
-> times, and have DBM to act as a "can be promoted to writable on write" bit.
-> This way we don't actually need to convert between encodings, and it still 
-> works and complies with the architecture.
-
-There's no such "can be promoted to writable on write" in the indirect
-permission model. This is why I'm suggesting that we align the abstract
-permission bits (i.e. KVM_PGTABLE_PROT_*) with the architecture's own
-abstracted permissions (e.g. uX, pX, RO, RW).
-
-That composes nicely with nested virt as it is unambiguous what
-permissions we're trying to represent in a shadow stage-2. And in the
-non-nested case you can just lay down writable-dirty translations for
-most things and use writable-clean when necessary for HDBSS.
-
-> > Beyond making the whole HAFDBS easy to reason about, I want this for
-> > FEAT_S2PIE which reimagines bit 7 as a literal dirty bit that can be
-> > managed by software or hardware.
-> 
-> Humm, and would not that work with the above suggested approach?
-> I mean, bit 7 (Dirty, S2AP[1]) will both mean WRITE/DIRTY, but it will be 
-> able to get promoted (nonW->W, or clean->dirty) based on the indirect 
-> permissions.
-
-There's a bit more though. We need to have an entry in S2PIR_EL2 that
-encodes write permission and select that with PIIndex. So then we wind
-up mapping the abstract WRITE permission bit to two fields into the
-descriptor rather than 1.
