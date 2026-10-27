@@ -1,73 +1,115 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.173
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793111693;
-	b=x0gydnOYW3lfQ6r9DGdZKj4srlsyfeMJNMeJyoo7AVDGp3cFNvqkYXho9MsAm98y/ihd
-	 q7lZ7CKghfFXiwDyFW5d+m6JL6/6ag6EjLe9wp5eWe4DngJPau+kSAd5EQmYXnsAWk6s1
-	 2TGHfkP0kbFndD6lucayAjxT7ByO+CCfdpIp061rYDu0D4fEoHp6lbE6CB+UJzpih+9P9
-	 tVhhDoS0WPeuHdeLPaNsPUfp1OCfdciFyat6hBT3o32WMEOApuophB/QC1zpg6ModNMR3
-	 lyxQDL96IiQig92V9nvRXWuYsCQ/2tEsz/99r/N8cCd9MFEuTKFvCjKwx6YFL2qfO8Q==
+	t=1793118075;
+	b=HwAXEzsCr7R4awF8yP0P5QeGZH4SnSETUXsg2NYmy/3ZKylEoyE42PRA1NukBgZMlIuj
+	 Wk97BrSrJXw/pP9NMGZU8rJ4kmjxCs+00bHi03JAzwLPTOucM1jR1fRrfpVgPrtFiY2BH
+	 oiGNyLkrkmxq1qWIh8gZ476DbVfjJIQzjMipBHslZ1rmgOzoFXs00X8qJomY2PRGWKrMw
+	 lWiqjBZUaswVK8hPWmv+gH8P52tHZxo+UIm7+YMQO/H/0ZFBSyPfaa/3pTBB8hr0cRae3
+	 rFhff/riAaBoHjh1B7zerpaDuULMMY2Q/sGmvxrtgzjS8+Ga4BKqXpga5LCd+uI1VxA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793111693;
-	h=Received:DKIM-Signature:Received:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding:X-SA-Exim-Connect-IP:
-	 X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:X-SA-Exim-Scanned;
-	bh=wjtchPQeONVkp4MunXk9fa9KT+Wa3IU0Hsl5gORHKVI=;
-	b=4EmWZpgyXTHjOeEnzQ0x6NaEwS1t918t+D2qK9SV2kyqw1Wx9m5fWgK/w/Jcdi/6H8Os
-	 KE9cBLPFWoQpRmWr7FB8XJsM/SN8WOXxM+akUESJTmVb44ZhSCpbNWTzl8K/smedM4q7d
-	 1i1cbnw3Pm4N3p2fuqyBB33S1FA3xeob0Swqiac2TLCGvxDazRiZbkOF6Fj/AibPNUIdt
-	 6vZkDePNbgSVpz84+eN5TZVOHXECWGRxtFUTpj+sqWo9Qh7prHHxAqpCiykZgDaTctn8s
-	 UTwUoNSqRtePXKp6n+ygjlaKfEfXNHY2z0koowO2WKsj/mwV2Z1eZWwIZVEEMOJaYvQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793118075;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=PxRb990Xj/uwND6b4fXh9A/3T5i+xI2zB08D/68nqZA=;
+	b=hqO4lyI11Bjvr/+j/sRoZ/IWJlKWiqPIolVwFChl30cDRDPXP/jdenYUjS0SdGPV83Kh
+	 PmQdojlvDT99U43ARKNgZY3xmgXaj1Obv4rwFRvg0Ou2DXrvpNxVhUPubshgfiLg7psT6
+	 gkymLmUBhXoZ48lChZZ91Bf9Pc4jkkGN/vuNOY9DaW1FPDdyWfEyQkJU99Z1Z+iBo1acG
+	 mUfFDPKa4QaC9ggIrVD65+VMxJ+zjDvrzu0TcdTigv2Tg8IROxlK6wALTDj9i8XcqajAt
+	 LYZaq8nmGcqyEVoMKVhYZqOOKj6WmPl/dURSrYrkGfR55wrvsok53o0hoxxXco9Gj0Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BWbUfAK2;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=soleen.com;
+	spf=pass smtp.mailfrom=soleen.com;
+	dkim=pass header.d=soleen.com header.i=@soleen.com header.a=rsa-sha256 header.s=google header.b=OsE63lTW;
+	arc=none smtp.remote-ip=209.85.221.173
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23572606A31B;
-	Tue, 27 Oct 2026 14:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F976606A320
+	for <kvmarm@lists.linux.dev>; Tue, 27 Oct 2026 16:21:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9F976606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soleen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BWbUfAK2
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D485A1F01825;
-	Tue, 27 Oct 2026 14:34:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793111693;
-	bh=wjtchPQeONVkp4MunXk9fa9KT+Wa3IU0Hsl5gORHKVI=;
-	h=From:To:Cc:Subject:Date;
-	b=BWbUfAK2x1k3xV3EdygtW85S9Iq5wm16Snu8UA1z4E2ZyisZNXQndSH0QMx2VNRwP
-	 Z76bBvpzuvrzmP2htOSTC1N6hBEMNHwc1VpK++QgNCGqjBZ7Kq0NwBvQ0CeC3x1Shp
-	 Bnu+GDssVA73ZDWsonXuiJuMEFkfhjdf9xJEJuiKF8yblrQJXp2dRlHF6iEziSDh04
-	 kd2TyQnnYCpl9DBAgfQC3rJ+CT5nG0KL7rVjOTH3fZ6Cut/Ot6r8AENsqa9WBrEXTF
-	 VXqKjzMRCNwnXovd4Rn9fROaM9V18r3FVA+0FHbXh6O410TBWZUNmogVIbFEnoQymL
-	 D4WaMuunu1mPw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xLiGI-00000007kSQ-392O;
-	Tue, 27 Oct 2026 14:34:50 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>,
-	Itaru Kitayama <itaru.kitayama@fujitsu.com>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Sascha Bischoff <sascha.bischoff@arm.com>,
-	Sasha Levin <sashal@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 7.4, take #1
-Date: Tue, 27 Oct 2026 14:34:24 +0000
-Message-ID: <20261027143424.2732449-1-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key, unprotected) header.d=soleen.com header.i=@soleen.com header.a=rsa-sha256 header.s=google header.b=OsE63lTW
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-5eac4855401so49000e0c.1
+        for <kvmarm@lists.linux.dev>; Tue, 27 Oct 2026 09:21:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=soleen.com; s=google; t=1793118073; x=1793722873; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=PxRb990Xj/uwND6b4fXh9A/3T5i+xI2zB08D/68nqZA=;
+        b=OsE63lTWxQaw7nqE6T/Dwz8uaDWiBINZ5YD03OSKwm/8iblKeBSVZu5ostn4DRGUT6
+         Amh7mCOp4r+QF/ocaGJTIRjoUMcSDa29DLR63kxeLHGg3EBThXrEAM6O/gSPTJWgT7tB
+         xoIXL4mhc1kYBjqDlPvcu8eFHHhE2euwaO9qv7IUm8vIE8UwmkS8KEpDkKBbMTulW4xw
+         ZUmOuo4x8ZUdsmpSInIgOPFRITIPGqfdbHK4unf8yPSUktFizgLXCqbLvMnEU4rPSkaa
+         fVYb1et1HEtEq+4wcKRsjlSLGmfthujW+VlkJs5RMGlN9ldzCfO+bUvQkkhRv2xChAhr
+         wkCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793118073; x=1793722873;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=PxRb990Xj/uwND6b4fXh9A/3T5i+xI2zB08D/68nqZA=;
+        b=vEsE5BFeXUajEzuKvg9qyIR7I3xo+rACmcNBvVjQ4cLWs3kip4iQW8KDfG58HlGQd4
+         68GBj0mTmS7jtYAurXxMMaHLKDoRiZAaD2sPLpmI/8kx1n0lYGFSbjCQZPerP93VdHLU
+         hmRU4dsMmtTbsn7gnGPBT718v4DdxOBInozPRtAX2NCM7tBDEo63xbCtqLqGBHUt9ZqJ
+         2AhC5a4mb8Onp8NpXJvTZ9gv8oMYhracolWIunh3aZCEjyzKY6JufgiYNqHhZEbwgzrS
+         hMqZQek13hQ8t8D7UVSRBFheSZf0F2MA5n7XV5VueXIvg2w3oeQOyiC1nu3Hc0IEzz9+
+         U7Iw==
+X-Forwarded-Encrypted: i=1; AKwUvByNmJOMIwoOJd60PCgoQDqHUjOu7xRaUfc9i57jrxQGArhqydqiqBA774aoii9NpSS+LlTnA9Y=@lists.linux.dev
+X-Gm-Message-State: AFq9FYKMCxehTXJ9KsT9SlQ4DzbUIIqu+zSAAOlHE0KihANDtMNyX2Mj
+	4ww1kkgseusHLWseHWza9JnwOL5leTN+2dj4Ba6QkpAE0UIdjECE1oX21HDrFyR3XMk=
+X-Gm-Gg: AYBFou04faB58tyFSkeTcQLU8C/YiTVLK/iUysfu5vn1LDZisTi/3kxpfBkOJYx/Anr
+	MP+w5+IjLuOEx9C8ZNSHQ1DmcOMhW7d1h+EZJc5JdhX7t1XRA+899LHl25rnTgfWT15r86XYkfd
+	DPH57IoPoL2A/np3wWxD0epPmNgYNbvhyA7jLlzdC09pHA1pnzDUHCkqzyAEG9quf+gO3Db3jkf
+	4PDM3/CbYpLePLQF33psfK56wk97URryQU5PSh5g6P42VfnCBsRj6ClkymSyvg+SvPe2vwFaRm4
+	sDT2CnoBeR7YS4oSyuPWBdwMQHNrXi9WCl2O9ka6wupWd8SMc1FZsJervPWFcS8RhE/hHxrK3tJ
+	0vkYoEux3Kf6AW+LpEedEHFthCBLAWOjiaj7DW8hEWAy/zXAeM8zNG7rOZRdh9a01kM+cePHLFj
+	p9fHrbp9Q3qsO4/0JpS8YVKdwPlt9+vWfR9AEquhEBi/zprLRut4JIO7W+gYDoqk9sTVBrRd8BJ
+	m+EB1svRM80y8jL1Sy2Q8Ras0wWXlaicga1h4cLMhGYI5SlzrLw9KNlwKOGvuLime6g0IjB4I/w
+	s+zQi6TpON9ZwN6cqtyUwsZnYzgUPsisLd8l4R30Gar1Gq16mYXQOq/7q8xEt5VpGM28NWiQozh
+	viCf/d5nssxoyR8bLWx54OLPzgN1Jgg==
+X-Received: by 2002:a05:6122:1352:b0:5c9:c60e:3a40 with SMTP id 71dfb90a1353d-5ec232e48ecmr4515149e0c.18.1793118073126;
+        Tue, 27 Oct 2026 09:21:13 -0700 (PDT)
+Received: from google.com (16.49.199.35.bc.googleusercontent.com. [35.199.49.16])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ec4a5f26c7sm304662e0c.9.2026.10.27.09.21.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Oct 2026 09:21:12 -0700 (PDT)
+Date: Tue, 27 Oct 2026 12:21:11 -0400
+From: Pasha Tatashin <pasha.tatashin@soleen.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Pasha Tatashin <pasha.tatashin@soleen.com>, tarunsahu@google.com,
+	Andrew Morton <akpm@linux-foundation.org>, joro@8bytes.org,
+	Mike Rapoport <rppt@kernel.org>,
+	Pratyush Yadav <pratyush@kernel.org>, maz@kernel.org, arnd@arndb.de,
+	jgg@nvidia.com, robin.murphy@arm.com, loganodell@google.com,
+	oupton@kernel.org, kevin.tian@intel.com, alex@shazbot.org,
+	dwmw2@infradead.org, pbonzini@redhat.com, seanjc@google.com,
+	will@kernel.org, Alexander Graf <graf@amazon.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, baolu.lu@linux.intel.com,
+	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
+	sagis@google.com, linux-mm@kvack.org, kvmarm@lists.linux.dev,
+	iommu@lists.linux.dev, linux-pci@vger.kernel.org,
+	kexec@lists.infradead.org, skhawaja@google.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v2 3/4] liveupdate: Replace compatibility string with
+ a 2-bit pair feature header
+Message-ID: <auDPd6tjzACQVszf@google.com>
+References: <CA+CK2bABt4OZO31TenVF2+uBUWVwViWbvfE00=0xbAw=f7K9SA@mail.gmail.com>
+ <atl7peoVHdP5hz7z@google.com>
+ <CA+CK2bBFXnJA1kddbLKGq0DAHDgjYhsTSQQay-xeX7jJC1V_UQ@mail.gmail.com>
+ <CALzav=e=ho2gVrn+7KpZ3ZyasvH2u15-pC-RSRSS7KcMfKqUJQ@mail.gmail.com>
+ <CA+CK2bAJo8dnTOyKMgnnMnk-SCXbTsv+JCLEOWkjyj-wqtEkHg@mail.gmail.com>
+ <atpNFEFIlqAoYIwH@google.com>
+ <CA+CK2bB2C3Am5ssRuzYpfiU7_vB81vxMGc19HQLq7N=_7YrbTg@mail.gmail.com>
+ <attmFVIFU_mS0Y7p@google.com>
+ <CA+CK2bDXDWbww_d3sD6OZqpo37V1a3t76_ubbrXLQS=9DB3dWA@mail.gmail.com>
+ <at-8vkVpN2SF3XgB@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -77,163 +119,74 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, fuad.tabba@linux.dev, itaru.kitayama@fujitsu.com, ljs@kernel.org, broonie@kernel.org, oupton@kernel.org, sascha.bischoff@arm.com, sashal@kernel.org, rostedt@goodmis.org, suzuki.poulose@arm.com, vdonnefort@google.com, seiden@linux.ibm.com, joey.gouly@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <at-8vkVpN2SF3XgB@google.com>
 
-Paolo,
+On 10-26 20:49, David Matlack wrote:
+> I still think it's not advisable to define name##_wrap since anyone
+> could accidentally start using it on the incoming path and we wouldn't
+> notice at first (especially since same kernel Live Update tests would
+> keep working totally fine). I also don't think asserting the combined
+> size buys us anything. The header size is just a function of the
+> number of features, and what we are trying to protect against is
+> structs embedded in the payload changing size.
 
-Here's the first set of KVM/arm64 fixes for 7.4, most of which have
-been brewing for some time. Of note: a couple of fixes for mismerges
-in the initial kvmarm-7,4 pull request, fixes for the publication of
-IN/OUTSIDE_GUEST_MODE, and nesting for vcpu pausing. The rest is a
-bunch of cleanups for nonsensical configurations and some more pKVM
-fixes. I have already started queuing more fixes, so it is likely that
-I'll be back next week with a similar email.
+Fair point.
 
-Note that this is on top of the initial pull-request that you sent to
-Linus, so hopefully conflict free.
+> 
+> So I would just do:
+> 
+>   /* Marks struct name as a KHO serialized payload with a kho_ser_hdr. */
+>   #define DECLARE_KHO_SER(name, payload_size) \
+>           static_assert(sizeof(struct name) == (payload_size))
+> 
+>   DECLARE_KHO_SER(luo_memfd_ser, 16);
 
-Please pull,
+My main requirement is that DECLARE_KHO_SER() in include/linux/kho/abi/ 
+must be enforced by the compiler rather than being just a bare 
+static_assert() that someone could forget to add. Since kho/abi/ headers 
+contain both versioned structs and unversioned sub-structs, it must be 
+mandatory to declare versioned structs in kho/abi/ with their 
+static_assert size check before the kho_ser_*() helpers can be used on 
+them.
 
-	M.
+So, how about adding enum names like this, that are going to be required 
+in accessor functions later:
 
-The following changes since commit 814607cd40df80d5727957adaa857e0feca43497:
+#define DECLARE_KHO_SER(name, payload_size, nr_feats)             \
+    static_assert(sizeof(struct name) == (payload_size),          \
+                  "struct " #name " size mismatch");              \
+    enum {                                                        \
+        __KHO_SER_SIZE_##name = (payload_size),                   \
+        __KHO_SER_NR_FEATS_##name = (nr_feats),                   \
+    }
 
-  Merge tag 'kvm-s390-next-7.4-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD (2026-10-19 15:11:58 +0200)
+> Plus helpers that allocate and initialize the header and return the
+> payload as a typed pointer. Both the outgoing and incoming paths find
+> the payload the same way, by computing its offset from the header,
+> rather than through a struct with a fixed payload offset:
+> 
+>   /* outgoing */
+>   hdr = kho_ser_alloc(luo_memfd_ser, LUO_MEMFD_NR_FEATS);
+>   ser = kho_ser_payload(hdr, luo_memfd_ser);
+> 
+>   /* incoming */
+>   hdr = phys_to_virt(args->serialized_data);
+>   ser = kho_ser_payload(hdr, luo_memfd_ser);
 
-are available in the Git repository at:
+These would become, where without enum, the init would fail:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-7.4-1
+#define kho_ser_init(buf, name)                                     \
+      __kho_ser_init(buf, __KHO_SER_SIZE_##name,                    \
+                          __KHO_SER_NR_FEATS_##name)
 
-for you to fetch changes up to 9e9283e4c941e806d2735f09b66763487bc48b50:
+And payload can also check the existance of DECLARE_KHO_SER, using 
+(expr1, expr2):
 
-  Merge branch kvm-arm64/misc-fixes-7.4-1 into kvmarm-master/fixes (2026-10-26 10:57:37 +0000)
+#define kho_ser_payload(hdr, name)                                  \
+      ((void)__KHO_SER_SIZE_##name,                                 \
+       (struct name *)__kho_ser_payload(hdr))
 
-----------------------------------------------------------------
-KVM/arm64 fixes for 7.4, take #1
-
-- Fix a couple of embarrassing merge mistakes in kvmarm-7.4
-
-- Cleanup the HCR_EL2 bit fields to exclusively use the generated
-  definitions, fixings a nasty regression introduced in 6.16, where
-  barriers were not upgraded from NSH to ISH anymore
-
-- Fix publication of state when a vcpu is forced out of the guest
-
-- Let vcpu pausing nest correctly
-
-- Sanitise ID_AA64MMFR3_EL1.S1P[IO]E to follow the rules of the architecture
-
-- Don't warn on SMCCC filter reserved range allocation failure
-
-- Prevent GICv5 and TLBI hypercalls to be used from the host when pKVM
-  is active
-
-- Enforce that only GICv3 guests are supported for pKVM
-
-- Don't try to access GICv5 EL2 sysregs from EL1
-
-- Compute architectrally correct values for ID_AA64MMFR3_EL1.S1P[IO]E
-  by checking the feature dependencies
-
-- Require matching VGIC and ITS model
-
-- Cleanup TRACE_REMOTE dependencies
-
-- selftests: Skip unwritable ID fields in the failed-run test
-
-- Move pkvm_selftests() after all CPUs have initialized EL2
-
-- Fix random comments
-
-----------------------------------------------------------------
-Fuad Tabba (10):
-      KVM: arm64: vgic-its: Don't map an LPI from more than one event
-      KVM: arm64: vgic-its: Remove the pending state of a discarded LPI
-      KVM: arm64: Don't WARN on SMCCC filter reserved range allocation failure
-      KVM: arm64: Reject the GICv5 CPU interface hypercalls under pKVM
-      KVM: arm64: Return on kvm_gmem_get_pfn() failure in gmem_abort()
-      KVM: arm64: Reject the stage-2 flush hypercalls under pKVM
-      KVM: arm64: Validate the host-provided vgic model in pKVM
-      KVM: arm64: vgic: Do not access the GICv5 CPU interface from EL1
-      KVM: arm64: Fix stale VGICv3 comments in the nVHE world switch
-      KVM: arm64: Set HCR_EL2.BSU to Inner Shareable for guests
-
-Marc Zyngier (12):
-      KVM: arm64: nv: Move L2->L1 switch on interrupt early
-      KVM: arm64: Move OUTSIDE_GUEST_MODE publication past context being saved
-      KVM: arm64: Move IN_GUEST_MODE ahead of state being loaded
-      KVM: arm64: Turn vcpu->arch.pause into a counter
-      KVM: arm64: vgic: Stop the target vcpu when disabling LPIs
-      KVM: arm64: vgic-its: Stop the VM when handling MOVALL
-      KVM: arm64: Convert HCR_xyz to HCR_EL2_xyz
-      KVM: arm64: Get rid of compatibility HCR_EL2 aliases
-      KVM: arm64: Sanitise ID_AA64MMFR3_EL1.S1P[IO]E
-      Merge branch kvm-arm64/hcr-cleanup into kvmarm-master/fixes
-      Merge branch kvm-arm64/cross-vcpu-sync into kvmarm-master/fixes
-      Merge branch kvm-arm64/misc-fixes-7.4-1 into kvmarm-master/fixes
-
-Oliver Upton (1):
-      KVM: arm64: Add helpers to halt a vCPU
-
-Sascha Bischoff (3):
-      KVM: arm64: gic-v5: Drop unused addr variable
-      KVM: arm64: vgic: Require matching VGIC and ITS models
-      KVM: selftests: Reject GICv3 ITS with a GICv5 VGIC
-
-Sasha Levin (2):
-      KVM: arm64: Take a protected vCPU's TWI and TWE only at vCPU load
-      KVM: arm64: selftests: Skip unwritable ID fields in the failed-run test
-
-Vincent Donnefort (2):
-      KVM: arm64: Move pkvm_selftests() after all CPUs have initialized EL2
-      tracing/remotes: Fix TRACE_REMOTE build when TRACING=n
-
- arch/arm64/include/asm/el2_setup.h              |   4 +-
- arch/arm64/include/asm/hardirq.h                |   6 +-
- arch/arm64/include/asm/kvm_arm.h                |  79 ++--------------
- arch/arm64/include/asm/kvm_asm.h                |  22 ++---
- arch/arm64/include/asm/kvm_emulate.h            |  18 ++--
- arch/arm64/include/asm/kvm_host.h               |  10 +-
- arch/arm64/include/asm/kvm_mte.h                |   4 +-
- arch/arm64/include/asm/kvm_pkvm.h               |   1 -
- arch/arm64/include/asm/kvm_ptrauth.h            |   4 +-
- arch/arm64/kernel/head.S                        |   4 +-
- arch/arm64/kvm/Kconfig                          |   2 +-
- arch/arm64/kvm/arm.c                            | 100 ++++++++++++--------
- arch/arm64/kvm/at.c                             |  18 ++--
- arch/arm64/kvm/config.c                         |  78 ++++++++++++++++
- arch/arm64/kvm/emulate-nested.c                 | 116 ++++++++++++------------
- arch/arm64/kvm/guest.c                          |   2 +-
- arch/arm64/kvm/handle_exit.c                    |   2 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h         |  14 +--
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h          |  13 +--
- arch/arm64/kvm/hyp/nvhe/host.S                  |   2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-init.S              |   2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c              |  15 +--
- arch/arm64/kvm/hyp/nvhe/mem_protect.c           |   6 +-
- arch/arm64/kvm/hyp/nvhe/pkvm.c                  |  41 +++++----
- arch/arm64/kvm/hyp/nvhe/switch.c                |   4 +-
- arch/arm64/kvm/hyp/vgic-v3-sr.c                 |   4 +-
- arch/arm64/kvm/hyp/vhe/switch.c                 |  12 +--
- arch/arm64/kvm/hyp/vhe/tlb.c                    |   2 +-
- arch/arm64/kvm/hypercalls.c                     |   4 +-
- arch/arm64/kvm/inject_fault.c                   |   6 +-
- arch/arm64/kvm/mmu.c                            |   9 +-
- arch/arm64/kvm/nested.c                         |  16 +++-
- arch/arm64/kvm/pkvm.c                           |   4 +-
- arch/arm64/kvm/sys_regs.c                       |  26 +++---
- arch/arm64/kvm/vgic/vgic-init.c                 |  17 ++++
- arch/arm64/kvm/vgic/vgic-irs-v5.c               |   3 +-
- arch/arm64/kvm/vgic/vgic-its.c                  |  85 +++++++++++++++--
- arch/arm64/kvm/vgic/vgic-mmio-v3.c              |  15 ++-
- arch/arm64/kvm/vgic/vgic-v3-nested.c            |   4 +-
- arch/arm64/kvm/vgic/vgic.c                      |  15 +--
- include/kvm/arm_vgic.h                          |   6 +-
- kernel/trace/Kconfig                            |   1 +
- tools/testing/selftests/kvm/arm64/set_id_regs.c |  13 ++-
- tools/testing/selftests/kvm/arm64/vgic_v5.c     |  32 +++++++
- 44 files changed, 517 insertions(+), 324 deletions(-)
+We can also add an optional kho_ser_alloc(name) to allocate, init, and 
+preserve.
