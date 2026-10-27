@@ -1,78 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.201
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793093556;
-	b=HO74Tgbb2dwl/g6rHzk9Sa4oFZJPiOHh2hjvCybJzPRe1Irr6pQPuRLAG8hW9yG2dTd/
-	 TRQs5emLRABT4dMhxjz0l8H6wePIBBnAdGzkyBzvfRiFQqmc7A6wdyIXUsE2eOMcB3CH0
-	 UmirgdKZjFDbELsa+oTiOIlPyrlv+cMEdYupUUXgaKlyYikMNPFbmK3IrXA98wlp5iLrz
-	 ooutVodEeucaw+w7DeoW2zL+6CZGbiVj0KoBdYXnlzF5tHwNXuAGCUaSEsyBGiOFfQtZY
-	 BmynC9fzECMbWKCPuBaCcLLpfedZU9vNiRvm581WktQko6F/RSW6yRo9U7QeiA8xPhQ==
+	t=1793094130;
+	b=2UIFoxoAuLcNZmJjQRwEk1GFtoRWKVhM0dtNlVC/28fBWHBasz4gF5mFkcjTiPsj+YmL
+	 CrbKUVcpMvkcRrT6zIBLh0CxSxm01pXt9O+8S3zb4LdoE8vdpFQOcEKbXWyikF1d8LWnr
+	 MUBdK4bhPYIpUmqxKUxT+HuXHpaJMMlKhDpokd7F9/RpGpP5sGbwNdJTV0uh5wTHoDXK1
+	 ASZ3QpVXFGcSusQwMx/bG7cF4SlnhKcq+3xSQlqJ+Amk5xnaY8U25l6RiNfH3TlOib/wU
+	 wfIo2SZLM2J7CxCsjF+M7McRbeI7Xaup2ZoTDSKYPyzsXg0s/crmJp4iMrk3hTCnBCg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793093556;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=v8kRiQmXlExTl6nzzD7dQ3TcCyE/USPMyj+a4wHCWzg=;
-	b=pDjauhEl0oNmVHHOvgpBcT5eUahMsaVDjQBOEN5hQC8K3ybKm1zJQ5uTCbdVuY4FJQBq
-	 xxxnYQY76Cx4YDMFmcWKcU59NjUKmiiUcJt4MB7MvVkCzdPud5lwSqXbTGU6NAHSkXBZd
-	 mV1u3oUN32Df9bTgaeQrRojmIeXw+BPyXqDZh9LJrnnQ/wShzVS2XMAwlxOTdl4W3zPo4
-	 brFZv8L9U8NO3eeobrXqULwFQybcYZzhOo4TcMMaP3BEr2FGPSh62h0wyriFJ8GTCPwk+
-	 IJu2rzO0xsKLxuyxag0KbcIr1yXnUHransBGaCgovtWnxea+cpnlreBJ3Lq1amB/j8Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793094130;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=+t8OXJ27yQjE3O++/rKAi/jak7lrU5zBJrJZpSfBZnw=;
+	b=CsRbLQ+6T/SoPv08f1cZp5PN3TqUbm3diF/hAaEJTq9ELUBK4tE1Asc40E5IsmXlkRUy
+	 PJPGl5PoWGyIzOwcGtA6ZNKvGFOXXBYhh0pTryrS8HQYgflXmXfYFksZknWZV6XzcpLkA
+	 lPAQiYCyJPuGcmpw1yU6oHOKlEwITAYXZIhTVWPrpvtfuO1J+rwDXj/mkxlCe3OvbSe1M
+	 gK81kTFs8HIIqwoRZsRNiurG8u+ny81j3UnGfOPULRzC0uccRJe9on2oed4bz76rbYqSS
+	 lei2neNd92gChwz5w8tBuCojUV+E0oGdKSue4J2z8vFekPkRjg4tyZRer9i3Uylf70A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AoUlGtx+;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=UlUeCDGh;
+	arc=none smtp.remote-ip=95.215.58.201
+Received: from mta1.migadu.com (out-201.mta1.migadu.com [95.215.58.201])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD85606A31A;
-	Tue, 27 Oct 2026 09:32:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869E2606A31F
+	for <kvmarm@lists.linux.dev>; Tue, 27 Oct 2026 09:42:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 869E2606A31F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AoUlGtx+
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D1E41F01828;
-	Tue, 27 Oct 2026 09:32:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793093555;
-	bh=v8kRiQmXlExTl6nzzD7dQ3TcCyE/USPMyj+a4wHCWzg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=AoUlGtx+436lsWzCJkKEElbkUxqyrXz3URLfAQlUCAt1e8rVctNX+G3ZGr1Ai5JuL
-	 aoHVtIUKxAttvjydnhGIGFCcRmN2ozbKEPJi5W7By5TussH7TgQ1nTBFzvu250fLQ4
-	 rW7Vebvgegixr7+D14kXWn/2/q/xnR2w2DMSFZMoGJOtNKl4tZ3Jeq0fJiqLyFcxd9
-	 3QM/enVtC9OiIFGLSl2E5k6946WFamOiYgHs9m3I4YP0fNb/jewpozC7gWgGtFc4p5
-	 g7Mz20GRwOPpRMqVSveCv3ZPm3eZf8G7ug0MA/Dlw7wFJoMB3dQ9QyPhF690TVMkJe
-	 Dww6KduBsxwaA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xLdXk-00000007cVr-3TKm;
-	Tue, 27 Oct 2026 09:32:32 +0000
-Date: Tue, 27 Oct 2026 09:32:32 +0000
-Message-ID: <86wlr3xzdb.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	kernel-team@android.com,
-	linux-kernel@vger.kernel.org,
-	Oculytic <oculytic@gmail.com>,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH 3/3] KVM: arm64: Disable host PMU counters for protected guests
-In-Reply-To: <20261027081147.498183-4-fuad.tabba@linux.dev>
-References: <20261027081147.498183-1-fuad.tabba@linux.dev>
-	<20261027081147.498183-4-fuad.tabba@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=UlUeCDGh
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=1vSES+s04GHXXZ3aI3e5tzkJqHQjxYx925g4IWtLlCc=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793094126; v=1; x=1793698926;
+ b=UlUeCDGhrYoeoYvvx3uuE5GRfm909Lx5E+i9/BJHJ8XbUaujuoHeZ4ROgFriBeMF4yTvFVCO
+ eGbFAiJ99elDAqRDWU+RUDUdlfO2kHqb/PtXQHewHAwDslkm29VwoLJtKmuQKZenN6STNt2HesZ
+ PPi9FD3bwAvHh54+TYLCEDDc=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 3110a5ed4cc3142b;
+	Tue, 27 Oct 2026 09:42:06 +0000
+X-Mizu-Trace-ID: 3110a5ed4cc3142b
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5bcbb378fc9so6850e87.0
+        for <kvmarm@lists.linux.dev>; Tue, 27 Oct 2026 02:42:03 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBxxEQTSB4SFF0wFul0OyQvz2/71om7mJH+cv0rEeGPHhntK/Nd8gpxJFfBykCUbKoCAR2iTMsw=@lists.linux.dev
+X-Gm-Message-State: AFq9FYLMgxPhC9RSIgqscZckcbaag/sSJcoVgB+4fF2ry2m+Jk1N1HpR
+	cp8Pq6lZaZJiGW411N6VdelTUZdNj3QIsIcp2hyUac3I9ObW0lhqXkkMI/ICu4FsGkiRG1HKcBb
+	8fW80XAHvq+yD5y0yg68Z6JHO79oQBHwFl1rxM3li
+X-Received: by 2002:a05:6512:2250:b0:5bf:b27b:6371 with SMTP id
+ 2adb3069b0e04-5bfc6972c1fmr93556e87.10.1793094123098; Tue, 27 Oct 2026
+ 02:42:03 -0700 (PDT)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -81,69 +65,39 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, vdonnefort@google.com, kernel-team@android.com, linux-kernel@vger.kernel.org, oculytic@gmail.com, tabba@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20261027081147.498183-1-fuad.tabba@linux.dev> <20261027081147.498183-4-fuad.tabba@linux.dev>
+ <86wlr3xzdb.wl-maz@kernel.org>
+In-Reply-To: <86wlr3xzdb.wl-maz@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 27 Oct 2026 09:41:26 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTwt5c2GiMZXdaEZ7cb=Op_0FQPXgrih1bN0bpqcib63vg@mail.gmail.com>
+X-Gm-Features: AclHuK-5R5nG2ZiFsbhrO7zAaWYXWI133N9FKiM4gKJbvEm8i2qdS390y_nJajM
+Message-ID: <CA+EHjTwt5c2GiMZXdaEZ7cb=Op_0FQPXgrih1bN0bpqcib63vg@mail.gmail.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: Disable host PMU counters for protected guests
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Vincent Donnefort <vdonnefort@google.com>, kernel-team@android.com, 
+	linux-kernel@vger.kernel.org, Oculytic <oculytic@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 27 Oct 2026 08:11:47 +0000,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
-> 
-> A protected guest has no PMU, and EL2 clears MDCR_EL2.HPME for it.
-> However, HPME has no effect, since __pkvm_vcpu_load() sets HPMN to cover
-> every event counter, and HPME never covers the cycle or instruction
-> counter. The counters the host has enabled therefore keep counting the
-> guest.
-> 
-> Stop them in the world switch while a protected guest runs, reading
-> PMCNTENSET_EL0 rather than trusting the host-controlled events mask.
-> Gate this on a new per-CPU HAS_PMUV3 flag, since system_supports_pmuv3()
-> is false when the CPUs implement different PMU versions.
-> 
-> Side channels are outside pKVM's threat model, so this is hardening
-> rather than a fix.
-> 
-> Reported-by: Oculytic <oculytic@gmail.com>
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  1 +
->  arch/arm64/kvm/debug.c            |  4 +++-
->  arch/arm64/kvm/hyp/nvhe/switch.c  | 24 ++++++++++++++++++++++++
->  3 files changed, 28 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 1c6632216e327..7ecb55e5018eb 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -834,6 +834,7 @@ struct kvm_host_data {
->  #define KVM_HOST_DATA_FLAG_VCPU_IN_HYP_CONTEXT		4
->  #define KVM_HOST_DATA_FLAG_L1_VNCR_MAPPED		5
->  #define KVM_HOST_DATA_FLAG_HAS_BRBE			6
-> +#define KVM_HOST_DATA_FLAG_HAS_PMUV3			7
->  	unsigned long flags;
->  
->  	struct kvm_cpu_context host_ctxt;
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index f4d7b12045e8f..3c74b076b5278 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
-> @@ -79,9 +79,11 @@ void kvm_init_host_debug_data(void)
->  	unsigned int pmuver = cpuid_feature_extract_unsigned_field(dfr0,
->  								   ID_AA64DFR0_EL1_PMUVer_SHIFT);
->  
-> -	if (pmuv3_implemented(pmuver))
-> +	if (pmuv3_implemented(pmuver)) {
->  		*host_data_ptr(nr_event_counters) = FIELD_GET(ARMV8_PMU_PMCR_N,
->  							      read_sysreg(pmcr_el0));
-> +		host_data_set_flag(HAS_PMUV3);
+On Tue, 27 Oct 2026 at 09:32, Marc Zyngier <maz@kernel.org> wrote:
+[...]
+> > -     if (pmuv3_implemented(pmuver))
+> > +     if (pmuv3_implemented(pmuver)) {
+> >               *host_data_ptr(nr_event_counters) = FIELD_GET(ARMV8_PMU_PMCR_N,
+> >                                                             read_sysreg(pmcr_el0));
+> > +             host_data_set_flag(HAS_PMUV3);
+>
+> Honestly, I don't think we need to work out which CPUs have PMUv3 and
+> which don't. I'd be perfectly happy to disable KVM on asymmetric
+> systems, simply because they don't exist.
 
-Honestly, I don't think we need to work out which CPUs have PMUv3 and
-which don't. I'd be perfectly happy to disable KVM on asymmetric
-systems, simply because they don't exist.
+Ack. I'll drop the per-CPU flag on the respin, gate on
+system_supports_pmuv3(), and refuse KVM on asymmetric systems.
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+/fuad
