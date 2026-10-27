@@ -1,85 +1,76 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.70
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793124824;
-	b=EsDD3Yx+mR7U+Mn/JEDO2swXqOaoav96lUDEK/hwPoAPoTycg0BUlRBOKyu84K2sl2rV
-	 rnAql0dFfIhPIOHpf6SXAmjhJE8eDgyDFr1j/OMcgtCvs3jvzreS9dhehIS2OiVZXuSEM
-	 +1KqyKhm5D9pnSiaj/OwSTwWLwPq9Eh3lI1XZgFJuCvYGE/wlnaM3+KOueDZuaoOfagCJ
-	 OnzWY5hDXRkgdzsTIRPjLexKEiNupGGNA8cFti2VVhvB4qGRLIvAEtllv3139PQBInm1k
-	 QD7Q7lzwx1YZ3Os5s5ycrMaV9JI3Kb8EE1sLq1BeLkVyUqny+xttT30y9phzSkia+ew==
+	t=1793138235;
+	b=pWES3C3Qeo4huz11IgTANPHb+0lZgNQMlvgMrvkjcw4alREye5GYcRQExCMw7RMDt1O7
+	 jcRrNRj/QTUTShMuWkKkPv/XqAiTN8UrHOVlq8iVGKXkLOxDTWZSp5/oCuYUivLWgsLyV
+	 fUFdw9HIK+atU/FHjquhh4+pQDzE+uJmEUzSwtSANuBv8TFasPh1fpe0uX5yx3sNC73wm
+	 DaiNVS/L9EwUunJ2ZUrREfgJtMwVa/NnQdKZYePF3cK+vC68e2myzZu9gyfXeh56Z8UkF
+	 DKA4JNQ7+s5k+FLECTUNDi+5stDnDqKGW2MRaalDjwJG85RzQHy3DuJvYmsW7zL3Mlw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793124824;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
-	bh=SEGsNEKzJFKAXCSwgMTuyhg9hYL4zxxvha+xxLEPLv0=;
-	b=sHb+kRLY/FSWWEYb6qgoSPtQhPNmo0AiBKAtxkOt+iDkUzaFerkjLOVRDaQTk2i9xshS
-	 cuBkU7F+b3l/T3zG7K+66xd4PVux3IzKCOLKgsTb4ZRrJM74GMCrQsEyYqJKD4QM4IAql
-	 2ULgn5xUbU4LbUKo637HiwL+Z9+NKOuhrW5VyAJzu1G5HpX8lrElaXfAvempd++uChD04
-	 YnygOdiFpAElpX/5QWpqzvXs2eW9cmeftsyOu6Sj5yfxTkJX7W5KKLgQ9X8DxK/3/NGhA
-	 auBzsZNs//MxtkKYf/2/6YjTBvLwFr18zF37sxR2oHhftXwGSordg/CElrOxzGRxNoA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793138235;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
+	 Mime-Version:References:Message-ID:Subject:From:To:Cc:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=INM4lTecUqg3+ORjH8the43AegIL5wVO95lrhujQQt0=;
+	b=S7Xew42K93/4AFv5zFCb6ySeZLwlcY8nN4FFLrcazk47Kt3FM3y6LdhXgw/OFNV/hoN1
+	 dpX9G2hltSt3wY3fpuyYNxJMzWkAzJZY0lK6/vmHq94cfkp+U7JETuvpH9hlzGMPtDroo
+	 nTsf/sijnn618YPGOqm/Uo0LGLQDnoArOR7SUZj04lrQiOxYXwLnG01QhocYvXVg6iJjT
+	 8xnagxNkmas0L03rwry2AOc/0SwKmlhAkJDyB+mJu1jvvSzxtcjuqsK0hzoTxhJ/gbfSj
+	 SEihL8juvd18BxNfyoexnp5sVUiAk3OOFCq5VUf8lwWLErP7htxt3jjDqXt9qcFJfvw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=MRWCaJvB;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 857C8606A31D
-	for <kvmarm@lists.linux.dev>; Tue, 27 Oct 2026 18:13:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 857C8606A31D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=kxsoicWg;
+	arc=none smtp.remote-ip=209.85.218.70
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com [209.85.218.70])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86BA5606A31D
+	for <kvmarm@lists.linux.dev>; Tue, 27 Oct 2026 21:57:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 86BA5606A31D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=MRWCaJvB
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5256C1650;
-	Tue, 27 Oct 2026 11:13:39 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2746E3F59E;
-	Tue, 27 Oct 2026 11:13:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793124822; bh=StP32dfIcKd8YphSKpAL+/HMutnlIIEzCaQQmma93NA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MRWCaJvB6Q28OPTMIyyC6DjI8k5TlohZktMkWptC/He2/3HJxzp5kYwhVFDcW74p3
-	 o33mnJ07QNYP5dUnmQi2BdWSac/cz93NF/qOl3XcNpzMvuUI9ZLP8rq0VqQ5Xx4KuG
-	 8wbM62lsVAv+Qy+Es7f5beZKEbQGV8ixw8A3RHbI=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	maz@kernel.org,
-	oupton@kernel.org,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	corbet@lwn.net,
-	pbonzini@redhat.com,
-	yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com,
-	yangjinqian1@huawei.com,
-	caijian11@h-partners.com,
-	liuyonglong@huawei.com,
-	tangchengchang@huawei.com,
-	yezhenyu2@huawei.com,
-	yubihong@huawei.com,
-	linuxarm@huawei.com,
-	joey.gouly@arm.com,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	fuad.tabba@linux.dev,
-	mark.rutland@arm.com,
-	seanjc@google.com,
-	rdunlap@infradead.org,
-	linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	skhan@linuxfoundation.org
-Subject: Re: [PATCH v5 08/15] KVM: arm64: Flush the HDBSS buffer on VM exit
-Date: Tue, 27 Oct 2026 18:13:35 +0000
-Message-ID: <auDpyRNpeDNzIk3W@LeoBrasDK>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20260929103655.85107-9-zhengtian10@huawei.com>
-References: <20260929103655.85107-1-zhengtian10@huawei.com> <20260929103655.85107-9-zhengtian10@huawei.com>
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=kxsoicWg
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-c414c206673so28545466b.0
+        for <kvmarm@lists.linux.dev>; Tue, 27 Oct 2026 14:57:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1793138234; x=1793743034; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:from:subject
+         :message-id:references:mime-version:in-reply-to:date:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=INM4lTecUqg3+ORjH8the43AegIL5wVO95lrhujQQt0=;
+        b=kxsoicWgG7G1+eLe9hFdJSwgP8qLVfrgCB2Zm6fy0Prna5EfvBeRzlhOf5yBottD++
+         vPnAvGJGZpH82myuYnNvj42kpluDlTVGvANSLPUnT/D1uVmhyPiJK9K6Mzn6AUrJIo14
+         noe0+cJQJMcVZX4QxvhfqvIm4r+NDmLv8WGU7ZkbfbI3Ol3heMYUizHZpMq9r8i1LN2q
+         WTp3rRb9/92FnRI6We2dvrqlCAxhfTuprzbl2ivz6uZYSlF93EZntrPp+BW1E6jVf5LL
+         bli1HDbTA4+ZaMQThfc/dKdYA8aoMa2WOhrud8Qp0qXVe/wMpR/OrFNZmZAByvpxoNaT
+         b24w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793138234; x=1793743034;
+        h=content-transfer-encoding:content-type:cc:to:from:subject
+         :message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=INM4lTecUqg3+ORjH8the43AegIL5wVO95lrhujQQt0=;
+        b=2vC47ZmAmgxqN3uyHP07f5IvUZXZdbNcvCoLLKzuFBOp/Ubxle48XrLDoAKeNzSCE/
+         SSjjxJAskyt64UuoNnSHeYf05TCEL6WrkbmNeniOnSNl1shPpO9aZp6fRJB2t8x0vhNK
+         OzCsKf3X9v6ICiSbONlQxxU17jQqCBYTjkuOnvLksEf63vdsIta4hjhc2/FxfgJb7gTp
+         aEOUJeTEwyGnkdxO4DSOd4FuFTyHsTyjvZ5/U8v/CtU2mr57a0IEj8/3N9VQ1AqfnSJj
+         Rqli5J4DeajRGoQ8kK61YEGybTVJSKdxbOB///D0DrJGbIMV7he08zUcwuvvPGu09ClJ
+         z98g==
+X-Forwarded-Encrypted: i=1; AKwUvBwsKKHkYeBsyv5CXVTbVUutYKjLbeKeQH6j3Un0DFnz8Qd/ES8M3Yp8OK4sCEsuYEp79+gMEPA=@lists.linux.dev
+X-Gm-Message-State: AFq9FYKH75I0VDTm15vYEvAlS5veU4fxZJ+99tnSAnnXPd1QNBT9VNOM
+	4CKS6TBvHgYbUBcTeGFCLoxyUQUfcf3843etKBbxQrWQJ42UrfC3hsHcv7KKlS5bwYbrJEF31mE
+	kcs+QZw6oT8n/Q9T1aQ==
+X-Received: from ejkh2.prod.google.com ([2002:a17:906:7182:b0:c46:743f:a4b9])
+ (user=tarunsahu job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:907:e84b:b0:c2e:3a72:ffbd with SMTP id a640c23a62f3a-c49bdf71b7bmr44517166b.41.1793138233642;
+ Tue, 27 Oct 2026 14:57:13 -0700 (PDT)
+Date: Tue, 27 Oct 2026 21:57:12 +0000
+In-Reply-To: <CALzav=dYKAP7pKfoPtz32X1cT_tH4LN0X47_jTO8_HOCT4Pi=w@mail.gmail.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -88,203 +79,130 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20261021152527.375070-1-tarunsahu@google.com> <20261021152527.375070-4-tarunsahu@google.com>
+ <atlQ_Er0Ig7CCSxv@google.com> <CALzav=f00C4yOAseNunW8GgQTDUGWT927Qy=TLm-3-J0TEDH8Q@mail.gmail.com>
+ <9huzzew0el59.fsf@tarunix.c.googlers.com> <at_CncIPYCxOVkLo@google.com>
+ <auDT5MjXYq3lcQjE@google.com> <CALzav=dYKAP7pKfoPtz32X1cT_tH4LN0X47_jTO8_HOCT4Pi=w@mail.gmail.com>
+Message-ID: <9huztsm6958n.fsf@tarunix.c.googlers.com>
+Subject: Re: [RFC PATCH v2 3/4] liveupdate: Replace compatibility string with
+ a 2-bit pair feature header
+From: tarunsahu@google.com
+To: David Matlack <dmatlack@google.com>, Pasha Tatashin <pasha.tatashin@soleen.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, joro@8bytes.org, 
+	Mike Rapoport <rppt@kernel.org>, Pratyush Yadav <pratyush@kernel.org>, maz@kernel.org, arnd@arndb.de, 
+	jgg@nvidia.com, robin.murphy@arm.com, loganodell@google.com, 
+	oupton@kernel.org, kevin.tian@intel.com, alex@shazbot.org, 
+	dwmw2@infradead.org, pbonzini@redhat.com, seanjc@google.com, will@kernel.org, 
+	Alexander Graf <graf@amazon.com>, Bjorn Helgaas <bhelgaas@google.com>, baolu.lu@linux.intel.com, 
+	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, 
+	sagis@google.com, linux-mm@kvack.org, kvmarm@lists.linux.dev, 
+	iommu@lists.linux.dev, linux-pci@vger.kernel.org, kexec@lists.infradead.org, 
+	skhawaja@google.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 29, 2026 at 06:36:48PM +0800, Tian Zheng wrote:
-> From: Eillon <yezhenyu2@huawei.com>
-> 
-> HDBSS entries accumulate in the per-vCPU buffer while the guest runs,
-> and must be drained into the dirty bitmap or dirty ring before
-> userspace can observe them.
-> 
-> Drain the buffer at a single point: kvm_arch_vcpu_ioctl_run() flushes
-> it on every VM exit, before the exit reason is handled. Flushing
-> inside the run loop keeps the dirty-ring feedback timely: when a flush
-> pushes the ring past its soft limit, kvm_dirty_ring_push() raises
-> KVM_REQ_DIRTY_RING_SOFT_FULL, which check_vcpu_requests() observes at
-> the top of the next loop iteration, so the vCPU exits to userspace for
-> the harvest before re-entering the guest.
-> 
-> kvm_arch_sync_dirty_log() relies on the exit path to flush: it kicks
-> vCPUs out of guest mode, and the GET/CLEAR protocol tolerates
-> concurrent bitmap writes, so the snapshot is complete without extra
-> synchronization.
-> 
-> Signed-off-by: Eillon <yezhenyu2@huawei.com>
-> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
-> ---
->  arch/arm64/include/asm/kvm_dirty_bit.h | 15 +++++++++
->  arch/arm64/kvm/arm.c                   | 20 ++++++++++++
->  arch/arm64/kvm/dirty_bit.c             | 45 ++++++++++++++++++++++++++
->  3 files changed, 80 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_dirty_bit.h b/arch/arm64/include/asm/kvm_dirty_bit.h
-> index fe703f02626b..d828e6b43fe9 100644
-> --- a/arch/arm64/include/asm/kvm_dirty_bit.h
-> +++ b/arch/arm64/include/asm/kvm_dirty_bit.h
-> @@ -13,6 +13,9 @@
->  #include <asm/sysreg.h>
->  #include <linux/sizes.h>
-> 
-> +#define HDBSS_ENTRY_VALID	BIT(0)
-> +#define HDBSS_ENTRY_IPA	GENMASK_ULL(55, 12)
-> +
->  #define KVM_ARM_HDBSS_DEFAULT_SIZE  PAGE_SIZE
->  #define KVM_ARM_HDBSS_MAX_SIZE      SZ_2M
-> 
-> @@ -22,7 +25,19 @@ static inline u32 kvm_hdbss_buffer_size(struct kvm *kvm)
->  	return kvm->arch.hdbss_buffer_size ?: KVM_ARM_HDBSS_DEFAULT_SIZE;
->  }
-> 
-> +static inline bool kvm_hdbss_enabled(struct kvm *kvm)
-> +{
-> +	return kvm->arch.mmu.vtcr & VTCR_EL2_HDBSS;
-> +}
-> +
-> +static inline bool vcpu_hdbss_enabled(struct kvm_vcpu *vcpu)
-> +{
-> +	return vcpu->arch.hw_mmu &&
-> +		(vcpu->arch.hw_mmu->vtcr & VTCR_EL2_HDBSS);
-> +}
-> +
+David Matlack <dmatlack@google.com> writes:
 
-IIUC, arch.mmu is always the canonical s2_mmu, while hw_mmu can be the 
-nested s2_mmu, if enabled.
-
-Was that your intend here?
-If not, we could use only kvm* version, which can be called with vcpu->kvm.
-
-If it was, then I would like to understand the logic here, as IIUC the 
-buffer is accessible only for the non-nested guest, as it's 
-allocated in a per-vcpu structure. (vcpu->arch)
-
->  int kvm_arm_vcpu_alloc_hdbss(struct kvm_vcpu *vcpu);
->  void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu);
-> +void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu);
-> 
->  #endif /* __ARM64_KVM_DIRTY_BIT_H__ */
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 5ea4ac26995e..9d7bdece149a 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1430,6 +1430,14 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-> 
->  		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
-> 
-> +		/*
-> +		 * Drain the HDBSS buffer before the exit is handled, so
-> +		 * entries pushed to the dirty ring are accounted for by
-> +		 * dirty_ring_check_request() on the next iteration.
-> +		 */
-> +		if (vcpu_hdbss_enabled(vcpu))
-> +			kvm_flush_hdbss_buffer(vcpu);
-> +
->  		/* Exit types that need handling before we can be preempted */
->  		handle_exit_early(vcpu, ret);
-> 
-
-
-looks the correct place, haven't looked too much on that, though.
-
-
-> @@ -2017,7 +2025,19 @@ long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
-> 
->  void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
->  {
-> +	unsigned long i;
-> +	struct kvm_vcpu *vcpu;
-> 
-> +	if (!kvm_hdbss_enabled(kvm))
-> +		return;
-> +
-> +	/*
-> +	 * The buffer is drained on every VM exit, so kicking running
-> +	 * vCPUs is enough to flush them; the dirty-log GET/CLEAR
-> +	 * protocol tolerates bits set concurrently with the snapshot.
-> +	 */
-> +	kvm_for_each_vcpu(i, vcpu, kvm)
-> +		kvm_vcpu_kick(vcpu);
->  }
-> 
->  static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
-> diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
-> index f9aeb9f34ad0..be0d12555c84 100644
-> --- a/arch/arm64/kvm/dirty_bit.c
-> +++ b/arch/arm64/kvm/dirty_bit.c
-> @@ -13,6 +13,7 @@
->  #include <linux/kconfig.h>
->  #include <linux/log2.h>
->  #include <linux/mm.h>
-> +#include <linux/srcu.h>
-> 
-
-Out of curiosity, could you please explain you reasoning on selecting srcu 
-as locking here? 
-
-(Like, what are you protecting against, and why srcu is a good choice)
-
->  int kvm_arm_vcpu_alloc_hdbss(struct kvm_vcpu *vcpu)
->  {
-> @@ -53,3 +54,47 @@ void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu)
->  	vcpu->arch.hdbss.hdbss_pg = NULL;
->  	vcpu->arch.hdbss.hdbssbr_el2 = 0;
->  }
-> +
-> +void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu)
-> +{
-> +	int idx, curr_idx;
-> +	u64 prod;
-> +	u32 entries;
-> +	u64 *hdbss_buf;
-> +	struct kvm *kvm = vcpu->kvm;
-> +	int srcu_idx;
-> +
-> +	if (!vcpu_hdbss_enabled(vcpu))
-> +		return;
-
-You test this before calling, is it really necessary to test it again, just 
-after calling?
-
-> +
-> +	prod = read_sysreg_s(SYS_HDBSSPROD_EL2);
-> +	curr_idx = HDBSSPROD_IDX(prod);
-> +
-> +	if (curr_idx == 0 || !vcpu->arch.hdbss.hdbss_pg)
-> +		return;
-> +
-> +	hdbss_buf = page_address(vcpu->arch.hdbss.hdbss_pg);
-> +	if (!hdbss_buf)
-> +		return;
-> +
-> +	entries = kvm_hdbss_buffer_size(kvm) / sizeof(u64);
-> +
-> +	/* kvm_vcpu_mark_page_dirty() resolves the memslot under SRCU. */
-> +	srcu_idx = srcu_read_lock(&kvm->srcu);
-> +	for (idx = 0; idx < min_t(u32, curr_idx, entries); idx++) {
-> +		u64 gpa;
-> +
-> +		gpa = hdbss_buf[idx];
-> +		if (!(gpa & HDBSS_ENTRY_VALID))
-> +			continue;
-> +
-> +		gpa &= HDBSS_ENTRY_IPA;
-> +		kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
-> +	}
-> +	srcu_read_unlock(&kvm->srcu, srcu_idx);
-> +
-> +	prod &= ~HDBSSPROD_EL2_INDEX_MASK;
-> +	write_sysreg_s(prod, SYS_HDBSSPROD_EL2);
-> +	vcpu->arch.hdbss.hdbssprod_el2 = prod;
-> +	isb();
-> +}
-> --
-> 2.43.0
-> 
+> On Tue, Oct 27, 2026 at 9:40=E2=80=AFAM Pasha Tatashin
+> <pasha.tatashin@soleen.com> wrote:
+>>
+>> On 10-26 21:14, David Matlack wrote:
+>> > On 2026-10-26 11:50 AM, tarunsahu@google.com wrote:
+>> > > Right, Required bit should be source kernel payload property to tell
+>> > > target kernel that the payload must be handled to correctly deserial=
+ize
+>> > > the data. It should be source kernel (userspace) responsiblity to ma=
+ke
+>> > > sure it understand the target kernel before doing liveupdate.
+>> > >
+>> > > Saying this, During deserialization, target kernel's required bit is=
+ not
+>> > > necessary. So I propose the following truth table.
+>> > >
+>> > > Source hdr  Target supported[i]  Action
+>> > > ----------  -------------------  ----------------------------------
+>> > > 00          0 or 1               Accept: feature absent in payload
+>> > > 01          0                    Accept: ignore the feature data
+>> > > 01          1                    Accept: use the feature data
+>> > > 11          0                    Reject: -EOPNOTSUPP
+>> > > 11          1                    Accept: use the feature data
+>> > > 10          0 or 1               Reject: -EINVAL (invalid encoding)
+>> >
+>> > Yes, this matches what I had in mind for the semantics.
+>> >
+>> > To be explicit: the source kernel should set the bits for each Live
+>> > Update based on what is actually preserved, rather than generating the
+>> > header from a static per-kernel array. E.g. memfd would only mark a
+>> > feature present for memfds that actually use it. That's what allows
+>> > rollback to an older kernel as long as nothing being preserved depends
+>> > on the new feature.
+>> >
+>> > But looking at this again, I think the required bit is redundant. Whet=
+her
+>> > a feature can be safely ignored is a property of the feature itself, n=
+ot
+>> > of any particular file. Every file that has a feature present will hav=
+e
+>> > the same required bit for it. The only thing that actually varies per
+>> > file is whether the feature is present.
+>> >
+>> > The required bit still has to be conveyed to the target somehow, since
+>> > the kernel that needs it is the one that doesn't know about the featur=
+e.
+>> > But it can be conveyed by the feature's number rather than an extra bi=
+t:
+>> > split the flag space into required features and optional features, and
+>> > assign each feature to one of them when it is defined. This is similar
+>> > to the required_flags and optional_flags approach in struct pci_ser [1=
+].
+>> >
+>> > Keeping the same header shape as discussed with Pasha:
+>> >
+>> > struct kho_ser_hdr {
+>> >     __u32 size;           /* Size of header + payload in bytes */
+>> >     __u16 nr_required;    /* Number of required feature bits */
+>> >     __u16 nr_optional;    /* Number of optional feature bits */
+>> >     __u64 flags[];        /* Required bits, followed by optional bits =
+*/
+>> > };
+>> >
+>> > Required feature N is bit N of flags[], and optional feature N is bit
+>> > nr_required + N (using nr_required from the incoming header). The leng=
+th
+>> > of flags[] is DIV_ROUND_UP(nr_required + nr_optional, 64). Both spaces
+>> > are numbered contiguously, so there are no gaps, and up to 64 features
+>> > still fit in a 16-byte header.
+>> >
+>> > Each bit just means the feature is present, so the truth table becomes=
+:
+>> >
+>> > Source bit       Target supports  Action
+>> > ---------------  ---------------  ------------------------------
+>> > Not set          -                Accept: feature absent
+>> > Optional set     No               Accept: ignore the feature data
+>> > Optional set     Yes              Accept: use the feature data
+>> > Required set     No               Reject: -EOPNOTSUPP
+>> > Required set     Yes              Accept: use the feature data
+>> >
+>>
+>> I like this proposal. I bet most features are going to be either
+>> optional or required, and even if we ever have a magical
+>> sometimes-optional feature, it can have its own required flag. So, no
+>> need to pay double the cost on every flag.
+>>
+>> Just need to make sure that optional features always start from 0, in
+>> their own enum, so the offset can be computed correctly in the incoming
+>> kernel.
+>
+> Right. Instead of having a single 32-bit feature space where every
+> feature can either be optional or required, we have 2 16-bit feature
+> spaces, one for required features and one for optional features. Both
+> feature spaces span from 0 to 2^16-1, and then are packed into
+> flags[].
 
 
-Thanks!
-Leo
+Okay sounds good. I will send the next version soon. Also I belive the
+design is decided, So I will drop the RFC tag also.
 
+~Tarun
