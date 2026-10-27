@@ -1,72 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.199
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793124372;
-	b=tdzR/7maj1I6ph4s8SLMBV8FHXVmZOTZSCF1YrdCyetB4tAzCSh78+XeePo6+Bu2hy7o
-	 uk/2PGaNB5C/kQtW/U+S8VoCqNDWGh3Z5UJj5IUBZ2X/Qo11KlIwDm0k+qaiC0QNigT6O
-	 IDkMsxtv5N5PbWmAN/S1NEhCv23v/1Hzc5GR8UWMlPi07t3c9a12QwZXRof3d3mCvq3DF
-	 usrKjcPWwHg3/HVDcpctnBTwBudKQaUCyMYdgk2uwjPB8GlJ/EkPygE2ddT919tpxW1h4
-	 SdVtnbDyAXbyp5eWK5YcvGGpMqv0KS6geOS5reXpPAnW1qlxoOz2ViGKnRpSXsiAM4Q==
+	t=1793124824;
+	b=EsDD3Yx+mR7U+Mn/JEDO2swXqOaoav96lUDEK/hwPoAPoTycg0BUlRBOKyu84K2sl2rV
+	 rnAql0dFfIhPIOHpf6SXAmjhJE8eDgyDFr1j/OMcgtCvs3jvzreS9dhehIS2OiVZXuSEM
+	 +1KqyKhm5D9pnSiaj/OwSTwWLwPq9Eh3lI1XZgFJuCvYGE/wlnaM3+KOueDZuaoOfagCJ
+	 OnzWY5hDXRkgdzsTIRPjLexKEiNupGGNA8cFti2VVhvB4qGRLIvAEtllv3139PQBInm1k
+	 QD7Q7lzwx1YZ3Os5s5ycrMaV9JI3Kb8EE1sLq1BeLkVyUqny+xttT30y9phzSkia+ew==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793124372;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
-	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
-	bh=TxYi1TQ/n9gm4Dyl6a+4Ba89b3B/1LYi/mstI8Zdh48=;
-	b=qhpYRRsn/CTjWF7MQ3V8hbtg8FzK0wGD4sgdsI9w2TPlMQETPSehg0hTqhIuGYFD7LZv
-	 9HrQKkvUev4lAThf6PsFYgqEl0DgYDw0UlH2MzqH7yYmRnXGCqeBIueX/xpZnoh9NcT9V
-	 ofj5cSq+ed3AStcwoC1uCzuiZBpswc/TjxQTiqFOu19rh3ovOK1aoBWctgpmEajBMGLOR
-	 2S1ql4Dqb+gLyuzg4hOu0XW/TcmSLWY5AP+jPj0phlycBYtL0diGTq7tLMsxu4fZwZ8GM
-	 0tQ6AtM8ewc5qVQINePRtVKITNbo2hykvEhWb+8VErJsNH63ICJ8Syc7j/F+QzJr9GA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793124824;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
+	bh=SEGsNEKzJFKAXCSwgMTuyhg9hYL4zxxvha+xxLEPLv0=;
+	b=sHb+kRLY/FSWWEYb6qgoSPtQhPNmo0AiBKAtxkOt+iDkUzaFerkjLOVRDaQTk2i9xshS
+	 cuBkU7F+b3l/T3zG7K+66xd4PVux3IzKCOLKgsTb4ZRrJM74GMCrQsEyYqJKD4QM4IAql
+	 2ULgn5xUbU4LbUKo637HiwL+Z9+NKOuhrW5VyAJzu1G5HpX8lrElaXfAvempd++uChD04
+	 YnygOdiFpAElpX/5QWpqzvXs2eW9cmeftsyOu6Sj5yfxTkJX7W5KKLgQ9X8DxK/3/NGhA
+	 auBzsZNs//MxtkKYf/2/6YjTBvLwFr18zF37sxR2oHhftXwGSordg/CElrOxzGRxNoA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=cTgkSpDg;
-	arc=none smtp.remote-ip=209.85.167.199
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC00606A320
-	for <kvmarm@lists.linux.dev>; Tue, 27 Oct 2026 18:06:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2EC00606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=MRWCaJvB;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 857C8606A31D
+	for <kvmarm@lists.linux.dev>; Tue, 27 Oct 2026 18:13:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 857C8606A31D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=cTgkSpDg
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-5587351d419so157390b6e.1
-        for <kvmarm@lists.linux.dev>; Tue, 27 Oct 2026 11:06:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1793124371; x=1793729171; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=TxYi1TQ/n9gm4Dyl6a+4Ba89b3B/1LYi/mstI8Zdh48=;
-        b=cTgkSpDgAwcvyApe51MpjHOme2ZM/xqNsNZFywBtlD/ELcpv083YWV1VR9Mnr+lhI3
-         IKdU20ATFImssL5MqcUXnYRO+ZVpIJPKcfRh+P4bL8n8y6yEtLkqtmAlZuQjiuZC+YMt
-         K6+N0BaYP+h0H84+thaIFlZxuDZUYJQpUF8EBih//qCKcGj/50bQNu+JMBjFiRw32OUE
-         jEnv9FVec6iFz8FKTm8PAHdMISshvO8nPu+ssn+PKOIKS8w4zmaq1onTuq64MIGoNOeC
-         Ugvpk14pj/acJhQ8WbJDA5eUcLrbMFdunz8ua3g/XE0ACe2glGiepemzq3W9aR0jMsHI
-         E3pA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793124371; x=1793729171;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=TxYi1TQ/n9gm4Dyl6a+4Ba89b3B/1LYi/mstI8Zdh48=;
-        b=MTq4vBxjKyFDiiwN6tniFIXKYdhwKcWC1LpDFaWpQwjldLgJc3yhUC9BXoZe+WQdHK
-         CaMTwuKntTUsYkU0sc1Or6q/95D/pAHYRmo6T7DEEBOmgbuVy9o9FisQO6fvlVyd0Qpa
-         kD3w2j9AmbQ/KUWeCNwd+x4o1OE0bTc7UK65H3ChBbE1TWnWCLL1nxMlzXMkAK2NpHxm
-         tLgkY0MqRYMI7jb3iM1ul1nXJN+S0/sHyq9eiP9sQA8K4w3jTkjH5u4IVUqcsY3v743A
-         J0/5OCgKV0ZkKzLjDZxQ+2niVoIGONpWWUbJY5YaZNq0vsn4YoQPRP9a9BjfaF9IOoOp
-         BbXw==
-X-Forwarded-Encrypted: i=1; AKwUvBwKN6ejC1GANmJayfQDa0ugZRh8/HUfes8HQl5xgedq2K7Xo0TQzTPw3qrZOT0OpII6tLvgHPs=@lists.linux.dev
-X-Gm-Message-State: AFq9FYKjGddHuemmX7VlbK3coIgSNl/F7nRfPvDzATmFqsxmzJ963EqR
-	G+TLHa7ReVqUnj9m/MpZ6ha4Cj0EMcocG6OEh1orxdWMbLGJiyaHsGtjmwIaqo6guFY+hN31zvB
-	ympRw1mzM+NLa/Y7oDFDUXLKMtA==
-X-Received: from ilei7-n2.prod.google.com ([2002:a05:6e02:61c7:20b0:516:a6c6:8fa3])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6808:1694:b0:53a:8c5:d7d7 with SMTP id 5614622812f47-55c003426cbmr6749991b6e.58.1793124370805;
- Tue, 27 Oct 2026 11:06:10 -0700 (PDT)
-Date: Tue, 27 Oct 2026 18:06:09 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=MRWCaJvB
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5256C1650;
+	Tue, 27 Oct 2026 11:13:39 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2746E3F59E;
+	Tue, 27 Oct 2026 11:13:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793124822; bh=StP32dfIcKd8YphSKpAL+/HMutnlIIEzCaQQmma93NA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=MRWCaJvB6Q28OPTMIyyC6DjI8k5TlohZktMkWptC/He2/3HJxzp5kYwhVFDcW74p3
+	 o33mnJ07QNYP5dUnmQi2BdWSac/cz93NF/qOl3XcNpzMvuUI9ZLP8rq0VqQ5Xx4KuG
+	 8wbM62lsVAv+Qy+Es7f5beZKEbQGV8ixw8A3RHbI=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	maz@kernel.org,
+	oupton@kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	corbet@lwn.net,
+	pbonzini@redhat.com,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	yangjinqian1@huawei.com,
+	caijian11@h-partners.com,
+	liuyonglong@huawei.com,
+	tangchengchang@huawei.com,
+	yezhenyu2@huawei.com,
+	yubihong@huawei.com,
+	linuxarm@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	fuad.tabba@linux.dev,
+	mark.rutland@arm.com,
+	seanjc@google.com,
+	rdunlap@infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	skhan@linuxfoundation.org
+Subject: Re: [PATCH v5 08/15] KVM: arm64: Flush the HDBSS buffer on VM exit
+Date: Tue, 27 Oct 2026 18:13:35 +0000
+Message-ID: <auDpyRNpeDNzIk3W@LeoBrasDK>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20260929103655.85107-9-zhengtian10@huawei.com>
+References: <20260929103655.85107-1-zhengtian10@huawei.com> <20260929103655.85107-9-zhengtian10@huawei.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -75,115 +88,203 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.56.0.307.g5fe7bd680c-goog
-Message-ID: <20261027180610.2840837-1-coltonlewis@google.com>
-Subject: [PATCH v2] irqchip/gic-v4: Use a separate lockdep class for vPE
- doorbell IRQs
-From: Colton Lewis <coltonlewis@google.com>
-To: Marc Zyngier <maz@kernel.org>, Thomas Gleixner <tglx@kernel.org>
-Cc: Radu Rendec <radu@rendec.net>, Oliver Upton <oupton@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Raghavendra Rao Ananta <rananta@google.com>, 
-	Colton Lewis <coltonlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-By default, init_desc() assigns the shared irq_desc_lock_class lockdep
-key to desc->lock for every struct irq_desc. Device drivers that
-register an IRQ affinity notifier establish a lock dependency chain of
-&irq_desc_lock_class --> &pool->lock --> &p->pi_lock --> &rq->__lock
-when irq_set_affinity_locked() calls schedule_work() while holding
-desc->lock.
+On Tue, Sep 29, 2026 at 06:36:48PM +0800, Tian Zheng wrote:
+> From: Eillon <yezhenyu2@huawei.com>
+> 
+> HDBSS entries accumulate in the per-vCPU buffer while the guest runs,
+> and must be drained into the dirty bitmap or dirty ring before
+> userspace can observe them.
+> 
+> Drain the buffer at a single point: kvm_arch_vcpu_ioctl_run() flushes
+> it on every VM exit, before the exit reason is handled. Flushing
+> inside the run loop keeps the dirty-ring feedback timely: when a flush
+> pushes the ring past its soft limit, kvm_dirty_ring_push() raises
+> KVM_REQ_DIRTY_RING_SOFT_FULL, which check_vcpu_requests() observes at
+> the top of the next loop iteration, so the vCPU exits to userspace for
+> the harvest before re-entering the guest.
+> 
+> kvm_arch_sync_dirty_log() relies on the exit path to flush: it kicks
+> vCPUs out of guest mode, and the GET/CLEAR protocol tolerates
+> concurrent bitmap writes, so the snapshot is complete without extra
+> synchronization.
+> 
+> Signed-off-by: Eillon <yezhenyu2@huawei.com>
+> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+> ---
+>  arch/arm64/include/asm/kvm_dirty_bit.h | 15 +++++++++
+>  arch/arm64/kvm/arm.c                   | 20 ++++++++++++
+>  arch/arm64/kvm/dirty_bit.c             | 45 ++++++++++++++++++++++++++
+>  3 files changed, 80 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_dirty_bit.h b/arch/arm64/include/asm/kvm_dirty_bit.h
+> index fe703f02626b..d828e6b43fe9 100644
+> --- a/arch/arm64/include/asm/kvm_dirty_bit.h
+> +++ b/arch/arm64/include/asm/kvm_dirty_bit.h
+> @@ -13,6 +13,9 @@
+>  #include <asm/sysreg.h>
+>  #include <linux/sizes.h>
+> 
+> +#define HDBSS_ENTRY_VALID	BIT(0)
+> +#define HDBSS_ENTRY_IPA	GENMASK_ULL(55, 12)
+> +
+>  #define KVM_ARM_HDBSS_DEFAULT_SIZE  PAGE_SIZE
+>  #define KVM_ARM_HDBSS_MAX_SIZE      SZ_2M
+> 
+> @@ -22,7 +25,19 @@ static inline u32 kvm_hdbss_buffer_size(struct kvm *kvm)
+>  	return kvm->arch.hdbss_buffer_size ?: KVM_ARM_HDBSS_DEFAULT_SIZE;
+>  }
+> 
+> +static inline bool kvm_hdbss_enabled(struct kvm *kvm)
+> +{
+> +	return kvm->arch.mmu.vtcr & VTCR_EL2_HDBSS;
+> +}
+> +
+> +static inline bool vcpu_hdbss_enabled(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->arch.hw_mmu &&
+> +		(vcpu->arch.hw_mmu->vtcr & VTCR_EL2_HDBSS);
+> +}
+> +
 
-On GICv4 systems, scheduling out a KVM vCPU calls kvm_sched_out() ->
-kvm_arch_vcpu_put() -> vgic_v3_put() -> vgic_v4_put() ->
-its_make_vpe_non_resident() -> irq_set_vcpu_affinity() while holding the
-scheduler runqueue lock (&rq->__lock). Acquiring the vPE doorbell IRQ's
-desc->lock establishes &rq->__lock --> &irq_desc_lock_class, triggering
-a lockdep circular locking splat:
+IIUC, arch.mmu is always the canonical s2_mmu, while hw_mmu can be the 
+nested s2_mmu, if enabled.
 
-  WARNING: possible circular locking dependency detected
-  ------------------------------------------------------
-  VCPU-0/109705 is trying to acquire lock:
-  ffff0001e41e4cc8 (&irq_desc_lock_class){-.-.}-{2:2}, at: __irq_get_desc_lock+0x5c/0xb0
+Was that your intend here?
+If not, we could use only kvm* version, which can be called with vcpu->kvm.
 
-  but task is already holding lock:
-  ffff00dad15fd260 (&rq->__lock){-.-.}-{2:2}, at: __schedule+0x23c/0x1850
+If it was, then I would like to understand the logic here, as IIUC the 
+buffer is accessible only for the non-nested guest, as it's 
+allocated in a per-vcpu structure. (vcpu->arch)
 
-  which lock already depends on the new lock.
+>  int kvm_arm_vcpu_alloc_hdbss(struct kvm_vcpu *vcpu);
+>  void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu);
+> +void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu);
+> 
+>  #endif /* __ARM64_KVM_DIRTY_BIT_H__ */
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 5ea4ac26995e..9d7bdece149a 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1430,6 +1430,14 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> 
+>  		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
+> 
+> +		/*
+> +		 * Drain the HDBSS buffer before the exit is handled, so
+> +		 * entries pushed to the dirty ring are accounted for by
+> +		 * dirty_ring_check_request() on the next iteration.
+> +		 */
+> +		if (vcpu_hdbss_enabled(vcpu))
+> +			kvm_flush_hdbss_buffer(vcpu);
+> +
+>  		/* Exit types that need handling before we can be preempted */
+>  		handle_exit_early(vcpu, ret);
+> 
 
-  Chain exists of:
-    &irq_desc_lock_class --> &p->pi_lock --> &rq->__lock
 
-   Possible unsafe locking scenario:
+looks the correct place, haven't looked too much on that, though.
 
-         CPU0                    CPU1
-         ----                    ----
-    lock(&rq->__lock);
-                                 lock(&p->pi_lock);
-                                 lock(&rq->__lock);
-    lock(&irq_desc_lock_class);
 
-GICv4 vPE doorbell IRQs are internal to KVM and GICv4, set
-IRQ_NO_BALANCING, and never register an affinity notifier or queue work
-under desc->lock. However, under forced IRQ threading (threadirqs or
-CONFIG_PREEMPT_RT), request_irq() creates an IRQ thread for the doorbell
-handler, causing irq_set_affinity() -> irq_set_thread_affinity() in
-vgic_v4_load() to call wake_up_process() under desc->lock and establish
-a real desc->lock --> &p->pi_lock --> &rq->__lock dependency on the vPE
-doorbell IRQ itself.
+> @@ -2017,7 +2025,19 @@ long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
+> 
+>  void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+>  {
+> +	unsigned long i;
+> +	struct kvm_vcpu *vcpu;
+> 
+> +	if (!kvm_hdbss_enabled(kvm))
+> +		return;
+> +
+> +	/*
+> +	 * The buffer is drained on every VM exit, so kicking running
+> +	 * vCPUs is enough to flush them; the dirty-log GET/CLEAR
+> +	 * protocol tolerates bits set concurrently with the snapshot.
+> +	 */
+> +	kvm_for_each_vcpu(i, vcpu, kvm)
+> +		kvm_vcpu_kick(vcpu);
+>  }
+> 
+>  static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+> diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
+> index f9aeb9f34ad0..be0d12555c84 100644
+> --- a/arch/arm64/kvm/dirty_bit.c
+> +++ b/arch/arm64/kvm/dirty_bit.c
+> @@ -13,6 +13,7 @@
+>  #include <linux/kconfig.h>
+>  #include <linux/log2.h>
+>  #include <linux/mm.h>
+> +#include <linux/srcu.h>
+> 
 
-Mark vPE doorbell IRQs with irq_set_nothread() so they are never
-force-threaded, and assign them a dedicated lockdep class in
-its_alloc_vcpu_irqs() via irq_set_lockdep_class().
+Out of curiosity, could you please explain you reasoning on selecting srcu 
+as locking here? 
 
-Fixes: 8e01d9a396e6 ("KVM: arm64: vgic-v4: Move the GICv4 residency flow to be driven by vcpu_load/put")
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
+(Like, what are you protecting against, and why srcu is a good choice)
 
-Notes:
-    Changes in v2:
-    - Call irq_set_nothread() on vPE doorbell IRQs in
-      its_alloc_vcpu_irqs() so forced IRQ threading cannot create a
-      desc->lock -> rq->__lock inversion via irq_set_thread_affinity()
-      (Sashiko, Marc Zyngier).
-    - Link to v1: https://lore.kernel.org/r/20261023215207.1465369-1-coltonlewis@google.com
-    
-    An LLM-based coding assistant was used to help analyze the lockdep
-    report and draft this patch. I reviewed the analysis and the change.
-    
-    Tested v2 with threadirqs and CONFIG_PROVE_LOCKING=y on a GICv4.1 host
-    with an idpf NIC: confirmed vPE doorbell IRQs remain non-threaded while
-    normal IRQs are threaded, and co-pinned vgic_lpi_stress runs after
-    bouncing an idpf interface pass with no lockdep warnings. Also
-    compile-tested for arm64 against v7.3.
+>  int kvm_arm_vcpu_alloc_hdbss(struct kvm_vcpu *vcpu)
+>  {
+> @@ -53,3 +54,47 @@ void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.hdbss.hdbss_pg = NULL;
+>  	vcpu->arch.hdbss.hdbssbr_el2 = 0;
+>  }
+> +
+> +void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu)
+> +{
+> +	int idx, curr_idx;
+> +	u64 prod;
+> +	u32 entries;
+> +	u64 *hdbss_buf;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	int srcu_idx;
+> +
+> +	if (!vcpu_hdbss_enabled(vcpu))
+> +		return;
 
- drivers/irqchip/irq-gic-v4.c | 5 +++++
- 1 file changed, 5 insertions(+)
+You test this before calling, is it really necessary to test it again, just 
+after calling?
 
-diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
-index 8455b4a5fbb0d..e1e20aeb8fe2a 100644
---- a/drivers/irqchip/irq-gic-v4.c
-+++ b/drivers/irqchip/irq-gic-v4.c
-@@ -157,6 +157,8 @@ static int its_alloc_vcpu_sgis(struct its_vpe *vpe, int idx)
- 
- int its_alloc_vcpu_irqs(struct its_vm *vm)
- {
-+	static struct lock_class_key vpe_irq_lock_class;
-+	static struct lock_class_key vpe_irq_request_class;
- 	int vpe_base_irq, i;
- 
- 	vm->fwnode = irq_domain_alloc_named_id_fwnode("GICv4-vpe",
-@@ -183,6 +185,9 @@ int its_alloc_vcpu_irqs(struct its_vm *vm)
- 	for (i = 0; i < vm->nr_vpes; i++) {
- 		int ret;
- 		vm->vpes[i]->irq = vpe_base_irq + i;
-+		irq_set_lockdep_class(vm->vpes[i]->irq, &vpe_irq_lock_class,
-+				      &vpe_irq_request_class);
-+		irq_set_nothread(vm->vpes[i]->irq);
- 		ret = its_alloc_vcpu_sgis(vm->vpes[i], i);
- 		if (ret)
- 			goto err;
--- 
-2.56.0.307.g5fe7bd680c-goog
+> +
+> +	prod = read_sysreg_s(SYS_HDBSSPROD_EL2);
+> +	curr_idx = HDBSSPROD_IDX(prod);
+> +
+> +	if (curr_idx == 0 || !vcpu->arch.hdbss.hdbss_pg)
+> +		return;
+> +
+> +	hdbss_buf = page_address(vcpu->arch.hdbss.hdbss_pg);
+> +	if (!hdbss_buf)
+> +		return;
+> +
+> +	entries = kvm_hdbss_buffer_size(kvm) / sizeof(u64);
+> +
+> +	/* kvm_vcpu_mark_page_dirty() resolves the memslot under SRCU. */
+> +	srcu_idx = srcu_read_lock(&kvm->srcu);
+> +	for (idx = 0; idx < min_t(u32, curr_idx, entries); idx++) {
+> +		u64 gpa;
+> +
+> +		gpa = hdbss_buf[idx];
+> +		if (!(gpa & HDBSS_ENTRY_VALID))
+> +			continue;
+> +
+> +		gpa &= HDBSS_ENTRY_IPA;
+> +		kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
+> +	}
+> +	srcu_read_unlock(&kvm->srcu, srcu_idx);
+> +
+> +	prod &= ~HDBSSPROD_EL2_INDEX_MASK;
+> +	write_sysreg_s(prod, SYS_HDBSSPROD_EL2);
+> +	vcpu->arch.hdbss.hdbssprod_el2 = prod;
+> +	isb();
+> +}
+> --
+> 2.43.0
+> 
+
+
+Thanks!
+Leo
 
