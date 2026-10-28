@@ -1,87 +1,76 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.72
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793210815;
-	b=kifvIMhZ0JKzFZNmXKzqNtykDYx8hdA8nkpZ0+52IRhFgA480F3UVxJ/Qancq1MFPAtR
-	 QjcS2Vm2rcmmkXbDpHqvitxDZy6+Q85JIPw+mPFkyzLBs02uI0cUoaMvkjXH+dP+H1DlS
-	 qRXLiLgKiKO9PzaaVmO6GSgSpyxDt3IAwI/jMhospcPmHosEkoje4FmInZFo8SiGT9t0l
-	 iV9k9uq8+vS2XyMZ2+OokmLRvegWQ8cbv6zPkPFUwtA/CGQ775U633i/21BFSJO+fddJZ
-	 IEKqO0Ak1/PyIslqJOdCWOBaMNfN9yHRGFDqbCvQpxc2psNzUfecAuBqnyo/+kExHuQ==
+	t=1793214184;
+	b=wdae/xlvOT65u90Ne1N+uMqq3wTXfCDZGYASzn89lJ+Omi6Yx0Hf8nCsx0q3/hsNbKhL
+	 xaCJjwh8ws5jWOEXVliZVRJZ2Y2DQJ18gajtFnOz4AToW5dEIj5S+l3ROQvPjSqO+jIzm
+	 pZClCxd5tq25eI4Dv5p8qARKDc45abbLqZcmJDAQOEY8C1XoPYmNnLIsxQ7PGsjKbiAJ1
+	 dg5NPu9IlMTkE85OwZqbNCKdnf6Za1R/DPgB7AdpsMAOUVYb0gUFCKvzVBwHR0p+W09br
+	 nPdlM3LXS6r4XO5BXroe13WmX1tEipgBo6vqb7HOFcRGn4kaLnFW/qXYZq5BNh6mnHQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793210815;
-	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
-	 X-Mimecast-MFC-AGG-ID:Received:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 X-Received:MIME-Version:References:In-Reply-To:From:Date:
-	 X-Gm-Features:Message-ID:Subject:To:Cc:X-Mimecast-Spam-Score:
-	 X-Mimecast-MFC-PROC-ID:X-Mimecast-Originator:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=YCIM+YQFrajHkl7Ol4fId4ZkAJB6I0ksGBZA0GnY5pM=;
-	b=kvRgtOvFoeH3ZG05XvhaLfgNkFXIgYkO8EzKbCgE+Wtiu9gp8erua+JJ/ZhNYou/U4U8
-	 L25eRT1jD1YoRo5/Gp1EN6W9d137V+a52luxykcqNjzpe/hcFdugTK2ravrzvWC7GPVfl
-	 hWP0DXjRyBeyrBY5cz6Lh8pbQG8IUaRTA4l6oj6jk/X+LwbhEj9SS5VGfJUN25RC1BY1r
-	 fN6LKYfkqjoygxdbwrCJjqAsWAEaX7sP6vwpzKPifCZlqHgsPNo9M4H+rWQGlKtBk1+uv
-	 ZSqlcz+IRII4wHav7DlGBwJbO8LE0DOFUF6C+ueDBfQUsEm7ZLW9l4/UwhVw6FbnlbQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793214184;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Reply-To:Date:
+	 In-Reply-To:Mime-Version:References:X-Mailer:Message-ID:Subject:From:
+	 To:Cc:Content-Type;
+	bh=LaqWhYbOMD7sY9Ovf2nEN4IH4sn07uRJnSek/bjgEtY=;
+	b=5Fc85J4lP8kxJHIxpfn7AvNL1VnGmJy9jMyyayYMl84hC/PWuUkftUut8WBaMLChPG0/
+	 vRJVP1Fc5wC8x0iwFSQ0cG5EyZsSlChofBkRupAFiyp0n/lr9Ryjqz+f7B1sRW+8nnJUS
+	 cWs7H7rNJE8nCpZltvbj8luCD/rSCzGBOZIgq7XolDrayOt9GJ8WUPWBq3IXYtfErokTz
+	 dxSiYHMFNcRglyDLnLMne5EE02eLqqAW7ej3dPbiUuv/nZoxpnM6zWbFLUaM+gUn7Z8Cu
+	 esi5ZdmOxiOn+y+Git7zRyOSPO11AZdlyRGuKF6f+6BfV5v7Nh1h8rkc2gds0jbS7XQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=redhat.com;
-	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=ftwbVx+X;
-	arc=none smtp.remote-ip=170.10.129.124
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=SRelg7ym;
+	arc=none smtp.remote-ip=209.85.216.72
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com [209.85.216.72])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46822606A323
-	for <kvmarm@lists.linux.dev>; Wed, 28 Oct 2026 18:06:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 46822606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D855606A339
+	for <kvmarm@lists.linux.dev>; Wed, 28 Oct 2026 19:03:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9D855606A339
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=ftwbVx+X
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1793210814;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YCIM+YQFrajHkl7Ol4fId4ZkAJB6I0ksGBZA0GnY5pM=;
-	b=ftwbVx+X7kyaaoB+Xji1FTum2/KukPUx2YNVsyF82Co/85PHkkF+DIYtDDCRaAuyGSHkG3
-	oOQ205uqIc8o3e0gU9xMZdX0vRoxC5TIDhOsP9RCHZrJnj1VsalgVpZD7QU/eDFrj+yfk7
-	6YVuWWnNEWD/SK8FqlVO+9vyIWd8HEg=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-509-W9UNAREEMLeQuo6kdb5T1Q-1; Wed, 28 Oct 2026 14:06:50 -0400
-X-MC-Unique: W9UNAREEMLeQuo6kdb5T1Q-1
-X-Mimecast-MFC-AGG-ID: W9UNAREEMLeQuo6kdb5T1Q_1793210810
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4a2063be141so11038615e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 28 Oct 2026 11:06:50 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=SRelg7ym
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-3ad30487d55so1920896a91.2
+        for <kvmarm@lists.linux.dev>; Wed, 28 Oct 2026 12:03:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1793214183; x=1793818983; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:reply-to:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=LaqWhYbOMD7sY9Ovf2nEN4IH4sn07uRJnSek/bjgEtY=;
+        b=SRelg7ym7xcHnKqSh95pRwfJN3CvpXWHSRuF3+HDzy9lkJHxi5kJvEJuJwFoqiX2r/
+         uJupVzgCz7jJFbMyMpp1N4k3rmj9jJ9j6xZWCfr1PfGlahcc7AA53lwTWerAb7gKqgVP
+         MrRIq4EoVKXt+Q7kibLMmKBJWK40SPCSWe6PkU0JhtUSXyMPbW3f4EHwlyevXgpxhT0a
+         2XuFZHiHDD+rtdUwu0rMekg9PgSi/bblwBD0TnN2OZRhZfCZZyMICmoUp7qSqXm6j3iF
+         kRvvRzyjpQDMhzjD6iF01OQ2T0LweMJWOA6vH03UOxfWrnD2+gwYkzt59ry5N2oOnaMo
+         g/Lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793210809; x=1793815609;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=YCIM+YQFrajHkl7Ol4fId4ZkAJB6I0ksGBZA0GnY5pM=;
-        b=sH+R0uAcz0C7VKpBCKxBsxMuRg+zZtiDuta48b7wW+Vyla6tGWLKGmIoE2g1A7A0iC
-         L74uOW3tLRWw8Ad+3VMo1x262V0AIKpPwuEJ0aH79j9QJdo2Ci53cvPzxKm3pg5hRSoe
-         dU9MW3TTUpsM1XbmNc25xsjuSzphosZDON3yWHSZ0ZD/iRodIv6jjik7h6Reud/rZAar
-         vfRAU3IfC+x+XiIgmbabT6bqX4Uy/Gb2SlhyHU17aESJKgJtvpCpfBEvtd2g+ujRR7/D
-         KqfKrKyQ7/rxg1ujBpDNMEMJN0ywegQnmixPrpo8vQfvVHxduBbinFO0qnHUV5yyQ9Qv
-         8Evg==
-X-Forwarded-Encrypted: i=1; AKwUvByOUJzV+k5Llp89iAsome5KUtXhxOLEmShR0TLPbb/ueAY5q2sGtgpWvJWs93XYLEtcWP4iw4Q=@lists.linux.dev
-X-Gm-Message-State: AFq9FYI2GWpmftVhuF+TWtB5gaDS9zup1/KMXEq3NzThdel6a5WtL3Gb
-	b/enwOsT4di4e/oWU2t+VIiKmZrlW2Hn2OZ0xs42ZVv4ivbHXh3Fwzk5OunHpaZ7lwcxd/3u9XV
-	zmHBeQ/c05vr/bcqzZaT8zKPGNKzAwAkGztrwDOCTDPp8bBHneSKeTWPzjVttx5+48cKmcnO5kt
-	vTUrw3gYdcVQneW4K+U/KK7NR6iIMdVOeS
-X-Gm-Gg: AYBFou0+S77bU7nzIes09rK8+p1HLJWZDKmDUe16HUWy7ybXjmHl211xn4JOWR4iUpg
-	pJ/Stp6qPIUhXqn2URUlC/8yqMY/pOWWEUKagcDMhXkMQNZCpJaeDwkyBdFQi4HRp1Gd9ukFziB
-	QbPquii1iXB9AlmnXqPcLgQq3Ub+qbl+C3DNvFZwqLyXA856gsirAFp88rhyYox8kI++XcHqTgT
-	aRB6Du5qWjk9JvVFPbbXrAfC/o+J9RjMngeSZutnl4lJrcMhoCei8Uet7wg
-X-Received: by 2002:a05:600c:4ece:b0:4a1:6c0c:ab93 with SMTP id 5b1f17b1804b1-4a9674e69dcmr70364655e9.28.1793210809532;
-        Wed, 28 Oct 2026 11:06:49 -0700 (PDT)
-X-Received: by 2002:a05:600c:4ece:b0:4a1:6c0c:ab93 with SMTP id
- 5b1f17b1804b1-4a9674e69dcmr70363965e9.28.1793210809079; Wed, 28 Oct 2026
- 11:06:49 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1793214183; x=1793818983;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:reply-to:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=LaqWhYbOMD7sY9Ovf2nEN4IH4sn07uRJnSek/bjgEtY=;
+        b=MD1CkgiR2+XZxpm72Hw23cXOKJa8kXncjGtQuGxCKhXzgLstClkAmThEY2QymySmYI
+         KpF3XuqtdvDsVkGOoWzBt8dAd1A/gk8hiAbl7+SSUl0Q8rk8r67yA2IFhiokDyXG7kxI
+         1ULMNcMo8nHJQ8j1y8ZfR4bvIq5gi/ws1ZBrV7OSO/xo4TSaU6RCLLYxyrELrHvIzDM8
+         BEPJ1oJqzY87ECaYQ50uXScplSb8IzXl99NWlyYbSfxmcNNR1fZPcNViWqebUaho3iQP
+         VMKaEcDhMU/k0YjIHFD0MJ4I4BiaXnRHOXkmftD9G0gZLoE/DKHIUGwKHjy4MY3mbzAL
+         C9iw==
+X-Forwarded-Encrypted: i=1; AKwUvBwkF0kkalOzWcc6oBw5FP3/L6/fEgFtoJKsz3PRe/n7sSObCPt3tjXTvXnsHYfEtxVdQbo10x8=@lists.linux.dev
+X-Gm-Message-State: AFq9FYLKchKn1L1bmjBl3iAF01FGHYwJbW4YzLThHVoteMzq3Ydd0Dmh
+	iImI/uq+07hqRpMPsbOT4kEY/qHEsXKtWCYAiYUOw4PZV+VwyW7ijL7gAo3ybN4H7SGq0/QBPba
+	/wPDjNA==
+X-Received: from pjbmh6.prod.google.com ([2002:a17:90b:4ac6:b0:3aa:f38e:cb2d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:264d:b0:3ac:9d83:8856
+ with SMTP id 98e67ed59e1d1-3ae57e3d6c1mr2423992a91.9.1793214182870; Wed, 28
+ Oct 2026 12:03:02 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Wed, 28 Oct 2026 12:02:53 -0700
+In-Reply-To: <20261028190259.1819571-1-seanjc@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -90,45 +79,57 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-References: <20261027143424.2732449-1-maz@kernel.org>
-In-Reply-To: <20261027143424.2732449-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 28 Oct 2026 19:06:36 +0100
-X-Gm-Features: AclHuK9bNQt52dZaGcgL3nkbgBCrd6uMFuOFFsScp1NU61vx-ZKL1_doFNpPh7w
-Message-ID: <CABgObfYonkEvFNzm=94UWCnH5h9Jv_FFfwOir5EAoaeW29eqwQ@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 7.4, take #1
-To: Marc Zyngier <maz@kernel.org>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>, Itaru Kitayama <itaru.kitayama@fujitsu.com>, 
-	Lorenzo Stoakes <ljs@kernel.org>, Mark Brown <broonie@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Sascha Bischoff <sascha.bischoff@arm.com>, Sasha Levin <sashal@kernel.org>, 
-	Steven Rostedt <rostedt@goodmis.org>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Vincent Donnefort <vdonnefort@google.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: 3HfyEVrbtxs_WIPuELk5fMMn2um8ZtPUG267gcZBC6A_1793210810
-X-Mimecast-Originator: redhat.com
+Mime-Version: 1.0
+References: <20261028190259.1819571-1-seanjc@google.com>
+X-Mailer: git-send-email 2.56.0.313.g2479322e68-goog
+Message-ID: <20261028190259.1819571-2-seanjc@google.com>
+Subject: [PATCH 1/7] KVM: s390: Drop unused and unreachable kvm_arch_vcpu_should_kick()
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Nicholas Piggin <npiggin@gmail.com>, 
+	Atish Patra <atish.patra@linux.dev>, Alexandre Ghiti <alex@ghiti.fr>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Stefan Teodorescu <fane@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 27, 2026 at 3:35=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> Paolo,
->
-> Here's the first set of KVM/arm64 fixes for 7.4, most of which have
-> been brewing for some time. Of note: a couple of fixes for mismerges
-> in the initial kvmarm-7,4 pull request, fixes for the publication of
-> IN/OUTSIDE_GUEST_MODE, and nesting for vcpu pausing. The rest is a
-> bunch of cleanups for nonsensical configurations and some more pKVM
-> fixes. I have already started queuing more fixes, so it is likely that
-> I'll be back next week with a similar email.
->
-> Note that this is on top of the initial pull-request that you sent to
-> Linus, so hopefully conflict free.
+Drop s390's kvm_arch_vcpu_should_kick() stub as the one and only call site
+is wrapped with "#ifndef CONFIG_S390".
 
-Pulled, thanks.
+No functional change intended.
 
-Paolo
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/s390/kvm/s390/s390.c | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/arch/s390/kvm/s390/s390.c b/arch/s390/kvm/s390/s390.c
+index 18fb200f854a..9900a1a1c148 100644
+--- a/arch/s390/kvm/s390/s390.c
++++ b/arch/s390/kvm/s390/s390.c
+@@ -3922,13 +3922,6 @@ bool kvm_arch_no_poll(struct kvm_vcpu *vcpu)
+ 	return false;
+ }
+ 
+-int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+-{
+-	/* kvm common code refers to this, but never calls it */
+-	BUG();
+-	return 0;
+-}
+-
+ static int kvm_arch_vcpu_ioctl_get_one_reg(struct kvm_vcpu *vcpu,
+ 					   struct kvm_one_reg *reg)
+ {
+-- 
+2.56.0.313.g2479322e68-goog
 
