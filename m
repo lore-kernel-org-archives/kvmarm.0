@@ -1,62 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.21
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793194116;
-	b=kgOIz8qMpF09BxVzNJm0cBeWm2QkkhxADbioVKhsPo5f3uKVuRjskPiut/H5hUqaANwY
-	 Ad0HGOT1PDc83Z7GOTzUMsUU7uc1Df/7iJIVrkEZL0gHU0bmBmGn8RKvHoUl8PxNCAKq/
-	 pAQs1VqUYW4nOd5dOouIv6qOpKr8gvLcQlOvLZ6ojxqv4U5uWpAQ6lhpPzBtUYcdIFuSw
-	 mdt6wk8tFCTmdbifR/J9Bg61ZWfBTYdS+Us05/T1GPpYTdT7p3d3gWTuKdL0Dd74vqbIf
-	 M1YPB6Hc96wUyaKNcXszOjqnlK7+FJW2nMc1CROCfoqArQYUsbcdB6twJVvaadrfvqg==
+	t=1793195112;
+	b=AYKrYY53SIiX+/BqIm7OZBdYid6tPBNQ1X4agoyyU0wwI2A7UKvf7r3szRhQg8i0IMkY
+	 yfh6P6DVjnbJon+c5UGxsgd6XKTPj5Tz0IJdsWdzVpqjeeXta5WQBJcbleh3HDet/VH0o
+	 v3Y16eqLbPIm/kX79xOPQrQLERi0sF34C8eO9//wBeuqC1rIdCwVNY4UYXJoG65sSo+ca
+	 wa0eoXv1SrxQM+fnboPblCP+EJWf50FKby3AZNuLv+QwCaWb3uF5ziCM8QZHP+m0K87hQ
+	 Z/3Y36EVtphP4RXtcwjG3MZkX8+Yaqa1j8Pusf8JoqSuzCNus5jVLBYz4q0Q9V6XPEw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793194116;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=W1HmmaCLaDmxQDxSww48MVKAfAl+hw686KsydqXGP8E=;
-	b=DDVgbqmgQC+3Ct+AzHF9/u7csNCEWAK7pHSAnc+WgUSlTJ9IdyJnTq7u+jStFjuzXift
-	 sqiDK/Q6bMd6sTXDvSiQHciELUpVymbwmaA2LDL+THs2BmvqQmjsbHLdoPhOW+qtUBUaR
-	 YCQ5OMltBFv6OlYAWvEwOf8FlnCWTA/pcSNdKl+YT2OzWv2K2DBPi0Tkx2sUM8djmGQ9u
-	 sQCfGPcdZpOmds37JJAtThe8/X0Kt246Qw+uIl13c7A3m7DhJLpIEKDHvZLXMUTFgLX3T
-	 3uM8SkpgibKftLb3r7ATNrA2VV9UW/aHHiPsY3vfp7cK0P18cMZ2RF96dWPvvSIjYyQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793195112;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=yURS2hXuvzV92pMc05dUU/QQG9YV7RclfziXU/y0sU8=;
+	b=Q4qtkq1eaXY3RAHMqgHPc2+WuSM7pQcGjDLB4PHXG2OmBD/EAjeBHzOMDPGLa4TD41p/
+	 J20vqfl3mZCywDtH+/BbpINBR1uUnWfgUOZlCjJgsrueC7yC7okwUHSirnLzZQKaI7kBB
+	 zH5/Ygvo2knuNW6+983s+0fUC9oH2j9pL1aKi/jY4HJe2k/10LIJa/+UyKrVUBJxv2kEi
+	 HNA0oEhbvUGTVZw3uIaj0JMbtNcQaFyErk5Id0loiblbU2oJoS2bmaQYF+AmKjzNsemub
+	 TWIIflne+hPYCHUqUna0ER3ckXpxZkIu0WbiClYzQzEYPQ5H+s/rvg6gCxEMawTt4Cw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="R7x/orGj";
-	arc=none smtp.remote-ip=95.215.58.21
-Received: from mta1.migadu.com (out-21.mta1.migadu.com [95.215.58.21])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NcM0ThU6;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F42606A31C
-	for <kvmarm@lists.linux.dev>; Wed, 28 Oct 2026 13:28:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D2F42606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C8E606A321;
+	Wed, 28 Oct 2026 13:45:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=R7x/orGj
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=9P2Z/y6NjVdpld2CTv7DpvYDbQvScjoFFhdxAr3DRcA=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793194107; v=1; x=1793798907;
- b=R7x/orGjIYhBNm/AtnArv8Lt/Q9xSyb9WMTrLac4iI+EwwBrwfzNFUs9ud5+YVl1+Aqsy4YS
- H3NGB8L3qQZ+5d07xV2WnvLm3LcOtWeMZpIeZDu2qogXqubbC9ZH3+x37LV8QYL0OAkqrRW3Dr7
- 3XaS4sX5AhiSyNl1FlzLvPyY=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 0ae42f46bda83b11;
-	Wed, 28 Oct 2026 13:28:27 +0000
-X-Mizu-Trace-ID: 0ae42f46bda83b11
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5be58ad9600so8334e87.0
-        for <kvmarm@lists.linux.dev>; Wed, 28 Oct 2026 06:28:27 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwlS1FWCV3oxWLlA13rdGskiSeChU/uYVcK4Jg6bjKBUpmsfA8KJfUYQ7A0wF1t6v/fOpXsedg=@lists.linux.dev
-X-Gm-Message-State: AFq9FYJioUV+SetYGZOa6HUp7mj5SbrFJOjhd9ejAEXvoT36WDIqnrps
-	6qP6BHIqF3DoQ8F3WYYVfwxXvAXJ+kCu5aUdysVyiFJaSLJYpIx0MTqTGB42t1nolSUeq40j8D1
-	cOhEOl4BLgHKRuRl6O1dq2xEtoyoCtVm7x2dhiUPQ
-X-Received: by 2002:a05:6512:3191:b0:5bf:a191:c132 with SMTP id
- 2adb3069b0e04-5bfcadddf9cmr156064e87.2.1793194106543; Wed, 28 Oct 2026
- 06:28:26 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NcM0ThU6
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2B2B1F01825;
+	Wed, 28 Oct 2026 13:45:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793195111;
+	bh=yURS2hXuvzV92pMc05dUU/QQG9YV7RclfziXU/y0sU8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=NcM0ThU63PoKJPDTxUWSqpakP0z87uWj9w/igy4q3OJBPPYedRf72ofmtVj4w1NIO
+	 bt7xxrI7T3En4XLPFoKOuC4U8VYH2JyVhBTNqOIneRcv5KhVUmKoDkLhnMWuYL03pD
+	 xMCFeYgs2t5WPEQrD3AHxteJA5+Sp88nP2Zlxgg4aaZcoaQj+MOORI8+lAGNzexLoJ
+	 jcumZWTCzlmhhuar3cJpwPRglgqdVEyUNL6QcWyayIM9BamWQfu+v7MKX9t11YV/KR
+	 WUCJFWYMSZk2WGmIBE2Qiak17nKgsWKe2rbXorUYUWJMG9PMJ2Zd+u8J+adfuPLMVp
+	 LDJmVB7ZOCmUw==
+Date: Wed, 28 Oct 2026 13:45:05 +0000
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, 
+	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	will@kernel.org, mark.rutland@arm.com, linux-perf-users@vger.kernel.org, 
+	catalin.marinas@arm.com, james.clark@linaro.org, Sudeep Holla <sudeep.holla@arm.com>
+Subject: Re: [RFC PATCH v7 14/28] KVM: arm64: Add SPE VCPU device attribute
+ to initialize SPE
+Message-ID: <auH00DS9sS-eKZoR@gremlin>
+References: <20260903160623.315525-1-alexandru.elisei@arm.com>
+ <20260903160623.315525-15-alexandru.elisei@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,49 +61,249 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261028110739.2366566-1-fuad.tabba@linux.dev>
- <20261028110739.2366566-4-fuad.tabba@linux.dev> <86mrryxa0b.wl-maz@kernel.org>
-In-Reply-To: <86mrryxa0b.wl-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 28 Oct 2026 13:27:50 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTzNWj06JAJsJJgojC1j+TuZbfQbyB-5s+h=9DbOtYU1BQ@mail.gmail.com>
-X-Gm-Features: AclHuK-dO70Ki_OMkN_Ee00KAstB-ItAriaRWTmXYHNfORmvfHh-SoeIMyJdhEA
-Message-ID: <CA+EHjTzNWj06JAJsJJgojC1j+TuZbfQbyB-5s+h=9DbOtYU1BQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] KVM: arm64: Disable host PMU counters for
- protected guests
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Vincent Donnefort <vdonnefort@google.com>, kernel-team@android.com, 
-	linux-kernel@vger.kernel.org, Oculytic <oculytic@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260903160623.315525-15-alexandru.elisei@arm.com>
 
-On Wed, 28 Oct 2026 at 12:52, Marc Zyngier <maz@kernel.org> wrote:
->
-> On Wed, 28 Oct 2026 11:07:39 +0000,
-> Fuad Tabba <fuad.tabba@linux.dev> wrote:
-[...]
-> > +static u64 __pmu_stop_host_counters(struct kvm_vcpu *vcpu)
-> > +{
-> > +     u64 pmcnten;
-> > +
-> > +     if (!vcpu_is_protected(vcpu) || !system_supports_pmuv3())
-> > +             return 0;
-> > +
-> > +     pmcnten = read_sysreg(pmcntenset_el0);
-> > +     if (pmcnten)
-> > +             write_sysreg(pmcnten, pmcntenclr_el0);
->
-> It feels a bit odd to change the individual counter enables, rather
-> than just use PMCR_EL0.E, which is designed for this purpose.
->
-> It probably doesn't change much, but it'd certainly make the intent a
-> bit more obvious. Or am I missing something?
+On Thu, Sep 03, 2026 at 05:06:09PM +0100, Alexandru Elisei wrote:
+> Add KVM_ARM_VCPU_SPE_CTRL(KVM_ARM_VCPU_SPE_INIT) VCPU ioctl to initialize
+> SPE. Initialization must be done exactly once for each VCPU.
 
-Nope, my miss. I'll move to PMCR_EL0.E in v3.
+Again be good to have a little more in the commit message.
 
-Thanks,
-/fuad
+>
+> [ Alexandru E: Split from "KVM: arm64: Add a new VCPU device control group
+> 	   for SPE" ]
+>
+> Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  Documentation/virt/kvm/devices/vcpu.rst | 28 ++++++++++++++++++++---
+>  arch/arm64/include/asm/kvm_spe.h        |  6 +++++
+>  arch/arm64/include/uapi/asm/kvm.h       |  1 +
+>  arch/arm64/kvm/arm.c                    |  6 +++++
+>  arch/arm64/kvm/spe.c                    | 30 +++++++++++++++++++++++++
+>  5 files changed, 68 insertions(+), 3 deletions(-)
+>
+> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+> index d60dd1daa67f..e2eac48b9d28 100644
+> --- a/Documentation/virt/kvm/devices/vcpu.rst
+> +++ b/Documentation/virt/kvm/devices/vcpu.rst
+> @@ -317,6 +317,7 @@ From the destination VMM process:
+>  Returns:
+>
+>  	 =======  ==========================================================
+> +	 -EBUSY   SPE already initialized
+>  	 -EFAULT  Error accessing the buffer management interrupt number
+>  	 -EINVAL  Invalid interrupt number or not using an in-kernel irqchip
+>  	 -ENODEV  KVM_ARM_VCPU_HAS_SPE VCPU feature not set
+> @@ -338,15 +339,15 @@ vGIC implementation.
+>
+>  :Returns:
+
+Just highlighting again the very nitty point about consistency between
+'Returns:' and ':Returns:' :P.
+
+>
+> -	 =======  =========================================================
+> -	 -EBUSY   Virtual machine has already run
+> +	 =======  ===========================================================
+> +	 -EBUSY   Virtual machine has already run, or SPE already initialized
+>  	 -EFAULT  Error accessing the SPE identifier
+>  	 -EINVAL  A different SPE instance already assigned, or no physical
+>                    CPUs found
+>  	 -ENXIO   SPE not supported or not properly configured, or the SPE
+>                    module not loaded
+>  	 -ENODEV  KVM_ARM_VCPU_HAS_SPE VCPU feature not set
+> -	 =======  =========================================================
+> +	 =======  ===========================================================
+>
+>  Required.
+>
+> @@ -361,3 +362,24 @@ responsible for making sure that the VCPU is run only on physical CPUs which
+>  share the specified SPE instance. If the VCPU has a PMU assigned, and there are
+>  no physical CPUs which share the same SPE and PMU instance, an error is
+>  returned.
+> +
+> +5.3 ATTRIBUTE: KVM_ARM_VCPU_SPE_INIT
+> +-----------------------------------
+
+This underline looks short?
+
+> +
+> +:Parameters: no additional parameter in kvm_device_attr.addr
+> +
+> +Returns:
+> +
+> +	 =======  ============================================
+> +	 -EBUSY   SPE already initialized for this VCPU
+> +	 -ENXIO   SPE not supported or not properly configured
+> +	 =======  ============================================
+> +
+> +Required.
+> +
+> +Request initialization of the Statistical Profiling Extension for this VCPU.
+> +Must be done last, after SPE has been fully configured for the VCPU, and after
+> +the in-kernel irqchip has been initialized.
+> +
+> +KVM will refuse to run the VCPU and KVM_RUN will return an error if the SPE
+> +feature has been set for the VCPU, but SPE hasn't been initialized.
+> diff --git a/arch/arm64/include/asm/kvm_spe.h b/arch/arm64/include/asm/kvm_spe.h
+> index b8afb419c851..a6999709b298 100644
+> --- a/arch/arm64/include/asm/kvm_spe.h
+> +++ b/arch/arm64/include/asm/kvm_spe.h
+> @@ -18,6 +18,7 @@ struct kvm_spe {
+>
+>  struct kvm_vcpu_spe {
+>  	int irq_num;		/* Buffer management interrupt number */
+> +	bool initialized;	/* SPE initialized for the VCPU */
+>  };
+>
+>  bool kvm_supports_spe(void);
+> @@ -25,6 +26,7 @@ bool kvm_supports_spe(void);
+>  #define vcpu_has_spe(vcpu)					\
+>  	(vcpu_has_feature(vcpu, KVM_ARM_VCPU_SPE))
+>
+> +int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu);
+>  void kvm_spe_destroy_vm(struct kvm *kvm);
+>
+>  int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+> @@ -46,6 +48,10 @@ static __always_inline bool kvm_supports_spe(void)
+>
+>  #define vcpu_has_spe(vcpu)	false
+>
+> +static inline int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+> +{
+> +	return 0;
+> +}
+>  static inline void kvm_spe_destroy_vm(struct kvm *kvm)
+>  {
+>  }
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 8ffa3e89d38c..c695aae484d3 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -449,6 +449,7 @@ enum {
+>  #define KVM_ARM_VCPU_SPE_CTRL		3
+>  #define   KVM_ARM_VCPU_SPE_IRQ		0
+>  #define   KVM_ARM_VCPU_SPE_ID		1
+> +#define   KVM_ARM_VCPU_SPE_INIT		2
+>
+>  /* KVM_IRQ_LINE irq field index values */
+>  #define KVM_ARM_IRQ_VCPU2_SHIFT		28
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 132df44c3088..c9a026c61ce7 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1026,6 +1026,12 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+>  			return ret;
+>  	}
+>
+> +	if (vcpu_has_spe(vcpu)) {
+> +		ret = kvm_spe_vcpu_first_run_init(vcpu);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+>  	ret = vgic_v5_finalize_ppi_state(kvm);
+>  	if (ret)
+>  		return ret;
+> diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
+> index 87fcdbbcbd67..fa87d224c8af 100644
+> --- a/arch/arm64/kvm/spe.c
+> +++ b/arch/arm64/kvm/spe.c
+> @@ -59,6 +59,16 @@ bool kvm_supports_spe(void)
+>  	return !list_empty(&spe_pmus);
+>  }
+>
+> +int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+
+This isn't initialising anything, I guess you plan to build it up over patches
+but maybe worth mentioning that in the commit msg?
+
+
+> +{
+> +	struct kvm_vcpu_spe *vcpu_spe = &vcpu->arch.vcpu_spe;
+> +
+> +	if (!vcpu_spe->initialized)
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+>  void kvm_spe_destroy_vm(struct kvm *kvm)
+>  {
+>  	struct arm_spe_pmu *spe_pmu;
+> @@ -147,12 +157,16 @@ int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  {
+>  	struct kvm_vcpu_spe *vcpu_spe = &vcpu->arch.vcpu_spe;
+>  	struct kvm *kvm = vcpu->kvm;
+> +	struct kvm_spe *kvm_spe = &kvm->arch.kvm_spe;
+>
+>  	lockdep_assert_held(&kvm->arch.config_lock);
+>
+>  	if (!vcpu_has_spe(vcpu))
+>  		return -ENODEV;
+>
+> +	if (vcpu_spe->initialized)
+> +		return -EBUSY;
+> +
+>  	switch (attr->attr) {
+>  	case KVM_ARM_VCPU_SPE_IRQ: {
+>  		int __user *uaddr = (int __user *)(long)attr->addr;
+> @@ -182,6 +196,21 @@ int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>
+>  		return kvm_spe_set_spe_id(vcpu, spe_id);
+>  	}
+> +	case KVM_ARM_VCPU_SPE_INIT:
+> +		if (!vcpu_spe->irq_num)
+> +			return -ENXIO;
+> +
+> +		if (!kvm_spe->spe_pmu)
+> +			return -ENXIO;
+> +
+> +		if (!vgic_initialized(kvm))
+> +			return -ENXIO;
+
+PMU returns -ENODEV in this case (+ documents it), worth keeping consistent with
+that?
+
+E.g.:
+
+	1.2 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_INIT
+	...
+	 -ENODEV  PMUv3 not supported or GIC not initialized
+
+> +
+> +		if (kvm_vgic_set_owner(vcpu, vcpu_spe->irq_num, vcpu_spe))
+
+This is getting an error then replacing it with -ENXIO, so probably better as:
+
+	int err;
+	...
+	err = kvm_vgic_set_owner(vcpu, vcpu_spe->irq_num, vcpu_spe);
+	if (err)
+		return err;
+
+> +			return -ENXIO;
+> +
+> +		vcpu_spe->initialized = true;
+> +		return 0;
+>  	}
+>
+>  	return -ENXIO;
+> @@ -240,6 +269,7 @@ int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  	switch(attr->attr) {
+>  	case KVM_ARM_VCPU_SPE_IRQ:
+>  	case KVM_ARM_VCPU_SPE_ID:
+> +	case KVM_ARM_VCPU_SPE_INIT:
+>  		return 0;
+>  	}
+>
+> --
+> 2.43.0
+>
+>
+
+--
+Cheers, Lorenzo
