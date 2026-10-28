@@ -1,63 +1,56 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793145199;
-	b=OuNS/bGAKJSoMrzUx3pDvWG796/9TYoY+AVAnp7dVkyzDo8acxms3tin/KTxq9K9003W
-	 ZEAR5VvkGr2ulfWNDIy8dJUi2ZqFdjX9gBVz2h4IHViWAuPQv4U5a208OG/utz7YeXcFY
-	 ruHPwXiYDAJ1uGodYkR3q6EIDJycEMHuIAs2QypOpBtzc1sMoLfhFwN6k6Z0QgwQAFM4H
-	 ToGH7Fptgz2euTSD8bH226uhv6xmZ7i9nzBLTZwphTYox8SiphSHOrmUXT/wq8XCA2pUj
-	 MNhOKF+HSrzymbZuVQhBGdrkpCnlCoejsCwaV2rFIuumFfVTwv7yl6IT2LgsQSoFyEg==
+	t=1793146322;
+	b=SNIFdvSJjVk+/EST6kCwCKxtAVxGQBt80YQ1wURE+x/buEin8oSL5ZZb3S1crBL6CKy7
+	 IuoI7jS3bcCZSctzyRoIfGvGM8X6JrLflh05lAF3BU68QvYoHO3pR+H3XTO04HoL5o8lW
+	 d9MiWCourLs7sn4joJ3ggKjrPAWgRam8vFQgXB5tmdDbQrVOYQbkcF5fG9RQACaGhMuQe
+	 hUt/c9cmzjDHpSTaYHsryy8omwnIBcXE7REftLKdXnmRX3Gc12OGJCcKS+3u4XnkhgjWV
+	 jtXdHqJQF4GlfvGnVCmBHcaspIXJ9of2KK+WX0g7pA28A8/CFx/xfrjErKbcjJFxWxA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793145199;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793146322;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=iuQfgeNxA6wGpTGomQMxImyXHDaKIESamcJco6bW6WQ=;
-	b=p+Ju7GOKyss4X3gynMx/MHR/ym865S5m6LyD5A4wgcSrVDFuK/8XbLYYrRQasRh/3b4+
-	 iSTQWaHFJZ2VfTLGG//bQtqf/LHwoOpxosIvTnD/HBFB1qEvvikYfxyJoRO0bDY4R2BHG
-	 EXgzbLSPS38b5UxPTTwpbi7iCRvxxfDBe7TDNJR2ZeqdkMPmERXP3LDU0TZD5mZO9ijSi
-	 vRDo41bF5sSpwAT4kZ6xAW+lYJKUIH9YsFFzaUht0SQsHni3l1Jz8dYW2+7khsk9svbTv
-	 5wTxHrGvNQ90yJjjh/tZ8RtmoSJwOC1glc9ztPfYGkpYeGhIyTU6BJJOIiTsJtYXGtQ==
+	bh=+o/Jezqz4HVBNzci1q7oB9zR4EjyM0MvcXJlOshr7WU=;
+	b=1lX8GhV2cNy9Zu0Z9T7dHQtWuxSrmhCicea1EnRymsmdpniT0fflxJvhHwbcGFh65eWW
+	 k21oSiXQFuNqx+Yf2/p7fibNBKGjSPxI3fZWnDugTiSvWiuqjRtyf+eeKJzTme8e1m2PZ
+	 g3wQsIWKKadQEDz/U61hXduo/38KtV+eBhMGf7uuSwUZBMcO0gktpAkwKiB7VK/Ylx9JM
+	 RP5TVwWTSqZxbq79NQzRsLJr+BlZjmVZATUKOwJmrHMIwz3uWmModkosl+b+kYYsoy0N9
+	 7MK3JoLpJ+72/eU95RbHKMk/UbWQb4g+ExnSUI/5GjeJ9Gd5TLPzIUcsiwETd8h3Uig==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ksBxNZON;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PG1MtLKU;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6091A606A31A;
-	Tue, 27 Oct 2026 23:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038BC606A31A
+	for <kvmarm@lists.linux.dev>; Wed, 28 Oct 2026 00:12:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ksBxNZON
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5F7A1F01825;
-	Tue, 27 Oct 2026 23:53:18 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PG1MtLKU
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 749C91F01825;
+	Wed, 28 Oct 2026 00:12:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793145198;
-	bh=iuQfgeNxA6wGpTGomQMxImyXHDaKIESamcJco6bW6WQ=;
+	s=k20260515; t=1793146321;
+	bh=+o/Jezqz4HVBNzci1q7oB9zR4EjyM0MvcXJlOshr7WU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ksBxNZONPb8UCXkhTBve3goFXZZQLNXqWYD1psAQqmQ3PV384sVnXrWRRZtDEQirR
-	 KoYFh1V1XqfzzHUyFKBpYgXrgq7+gneJRolr49gTjumAnLJ75m9M4q3zSMoDVWWq36
-	 6sjR3kzQWhZTBeU8/mx+8BUMTK8Tca1N5+PrlgL4KCKf25Z/Kmmw6BEdZy0A/gCG1Y
-	 qk0Rizpie+M/WaCYxcVrjY5to3BMnQCN8GL2VCKQTDq9I0WG8Z82PzWUDjRMLQu09v
-	 95QGDJgRDeR9ueS0uM9hU68vTH7tYwA9gmiAQ3aWNE+Pnds1AHMTTL17VP50qDuNdw
-	 tDVMS4Sh/NGUA==
-Date: Tue, 27 Oct 2026 16:53:17 -0700
+	b=PG1MtLKU3TH3/acn+1lJTwBJq0Sv2rkNb6ffQC/pJrUuIxUrsH93IfG/urmyQW/N5
+	 8su4Ob+HV+N8q0iZ2WyiZPW0zp7HTKdlpr7rlRykxZJ6jqIboKMHhe5ZomOklZ0d75
+	 RcmEemghZfEhFwK2bBYNPgRwx5h0g8Hb63U3kEfYkZY/bG2rOp/xGKCzxBQB0QgjKM
+	 4DG87str/ikZMBrwkntHSp52pVQ5XRaQ7uWYXTo+qJ4+oFlu6sCu1nbyRJrKOqtXyK
+	 SyudzwtoQVu9kQp/DtPv+OsnGnWNiqCHzYDRbUZabdycupCiqqTXYMOmvAujFUSd66
+	 VErW+/MwipAEA==
+Date: Tue, 27 Oct 2026 17:12:00 -0700
 From: Oliver Upton <oupton@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, Steffen Eiden <seiden@linux.ibm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Yuchao Zhang <ndaugoing@gmail.com>, Fuad Tabba <tabba@google.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] KVM: arm64: vgic: LPI fixes for redistributors with
- LPIs disabled
-Message-ID: <auE5bc4NJTZO-C1o@kernel.org>
-References: <20261026092802.2636798-1-fuad.tabba@linux.dev>
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Don't let a guest overwrite HCRX_EL2.MCE2
+Message-ID: <auE90LmMMmac8J1s@kernel.org>
+References: <20261026082633.2515820-1-maz@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -69,55 +62,49 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261026092802.2636798-1-fuad.tabba@linux.dev>
+In-Reply-To: <20261026082633.2515820-1-maz@kernel.org>
 
-On Mon, Oct 26, 2026 at 09:28:00AM +0000, Fuad Tabba wrote:
-> Hi folks,
+Hey,
+
+On Mon, Oct 26, 2026 at 08:26:33AM +0000, Marc Zyngier wrote:
+> FEAT_MOPS is fun. CPUs are allowed to implement any of two ways to
+> perform the memory copy, and the hypervisor is in charge of hiding
+> the difference between implementation when the vcpu migrates from
+> one to another. This is unhelpfully signalled with an exception,
+> which KVM diligently handles.
 > 
-> Two fixes on top of Marc's cross-CPU vcpu pausing series [1], for LPIs
-> whose redistributor has LPIs disabled. Without them, the guest can take
-> such an LPI with EnableLPIs clear, or lose one mapped before it enables
-> them.
+> Today, we don't really make a good job of it in the sense that
+> if L1 also has the trap bit set, we don't forward the trap as
+> the architecture would require us to do.
 > 
-> The first is the vgic_target_oracle() change Oliver suggested on v2 of
-> that series [2]. It stops an LPI from being queued to a redistributor
-> with EnableLPIs clear once the disable path has retired the vCPU's AP
-> list. With that check, the path has to pause the vCPU before clearing
-> EnableLPIs, so that the retire still finds its LPIs.
+> But there is no good reason to forward this to the L1 guest if
+> L2 generates the "I'm on the wrong implementation". KVM can fix
+> it up in place and return to L2 directly, as if the physical CPU
+> was able to implement both options.
 > 
-> With the second, an LPI mapped while its redistributor has LPIs
-> disabled keeps its pending bit when they're enabled. The second relies
-> on the first to keep such an LPI off the AP list until the enable.
+> Conversely, allowing L1 to clear HCRX_EL2.MCE2 is counter-productive,
+> and violates the abstraction that KVM aims to give.
+
+What abstraction? :-)
+
+At least in the non-nested case we can blame the VMM since it's
+responsible for scheduling vCPUs on the right pCPUs in a heterogeneous
+system.
+
+There is a subtlety here where if the VMM does the right thing with
+sched affinities then a MOPS exception taken from L2 is definitely the
+L1's fault and architecturally visible.
+
+But oh well. We're obviously oriented towards presenting a homogeneous
+set of vCPUs and anything else works by accident.
+
+> Implement this behaviour by never allowing the guest's view of
+> HCRX_EL2.MCE2 to make it into the HW, and document that KVM is in
+> charge of the A/B handling.
 > 
-> Reproducers for the INVALL case in the first and the map in the second
-> fail in every run without the patch and pass with it.
-> 
-> Based on kvm-arm64/cross-vcpu-sync as merged in kvmarm/fixes, which the
-> first builds on (e99ff76f4a02b; also applies to kvmarm/fixes
-> 309e1d2215255).
-> 
-> Cheers,
-> /fuad
-> 
-> [1] https://lore.kernel.org/all/20261015100539.1011760-1-maz@kernel.org/
-> [2] https://lore.kernel.org/all/asf87i2RDh-WksL-@kernel.org/
-> 
-> Fuad Tabba (2):
->   KVM: arm64: vgic: Don't forward LPIs to a redistributor with LPIs
->     disabled
->   KVM: arm64: vgic-v3: Don't drop a pending LPI mapped with LPIs
->     disabled
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
 Reviewed-by: Oliver Upton <oupton@kernel.org>
 
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 31 ++++++++++++++++--------------
->  arch/arm64/kvm/vgic/vgic-v3.c      |  3 ++-
->  arch/arm64/kvm/vgic/vgic.c         | 12 ++++++++----
->  3 files changed, 27 insertions(+), 19 deletions(-)
-> 
-> 
-> base-commit: e99ff76f4a02be8542e2c3ecc8843d7339a0200d
-> -- 
-> 2.47.3
-> 
-> 
+Thanks,
+Oliver
