@@ -1,73 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.73
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.238
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793182416;
-	b=EqphwvweTkYyNWjuyqVlV8niWHn/YUikRNt1z0s9Abtduy/YuQg2qAoLZKLBd8GWkoD2
-	 kK0glpCB+qfPQmMzoUXeF4Q3k83ePqykEday0dx5c06pB6oO/pd3IZWP3QawCm7eVy3aw
-	 jEPOAWlkPsNjW0+AqfG/7WKkoCsEoFl+7IjmrWUm9Jc4v4iyrzwpr+ofiKraMct+SDAVA
-	 HKW4azjolxOQd9RpnM4yJNlSwmmVV9dQ3iYzzszeobc0X4zMK+hkp6PKAHkOu5n52w5bf
-	 ymbG/co2T8izvknkl3yzzi65mDk2Tlc8hB9Z+bKOq8FHBcgPzQVmgoWy9rl6r62aPAA==
+	t=1793185323;
+	b=4ush4I9GHIY50XKVbFrC7lJy6hq9YHUK/qOrzWuIgf26QSNVBSYFaX0iCGiHjyS4/e3E
+	 aPnLm3MRoUbZKk7s0df0sqoCN7DyVsZrcaFuHooOMlEWzZu5c29kZwBxj2Na9FOYLNXUE
+	 g/I57MMSgr6ml2EwUvuHNW94RWFyS2BWDHEI/OMdAfGa7ZFnfRHLdxLUd5iYXlYqRw4Oh
+	 /Ii3xpJ5yEElBE/9J0918j9c8Pvj1IHvT+CtrRabxPRTC8qpsrPo3fi2pipi24Hf77hM5
+	 JZV19dUnTAyexuFw+psG2PNoz+F8RM+QdjZfaXgKbJnMeBfyGKjluHIhSw3J7d40PkQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793182416;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793185323;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=5NABG2AiXntzQQhgrbFs5uOv8MiJIKrNTvyQWAjpfGM=;
-	b=r5pbaSmFuOZPLUYeDhihqIchXm/aCKGsn9PadnCP2+ZkcS7fk+Fj4tzpKM0x47YatO3a
-	 sqQ9R3jJZLNTdxT5t2i+4G/yldvSzwhcZqtKYzIYpdcmMXaU9mZuxy7B+jvRnwCZrhJG4
-	 jOHpebulebiFZPrGPbqiqhU9pwTu6rbtKqdrrXWI1ETNCrb4ncFWrNdOeoMqdJ6Yiwe68
-	 96Ufmp9IDOLXBQF+oql1RMMo/5tP9QUlVRRpVm2BsmSmPXWNEDQUtJ/oSOVk51kNOKIkA
-	 UUTmoQvoMg4RMhNeDpBmwgxcmq2RfD7QjrabJFeZd8zwRwuEfzkqVhJISgoDHXniKMg==
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=qcokdDgL4mvoHte5dbQtGJJPejEfezJaBPHvPpNg2A8=;
+	b=3bJBm0Nm2K4zyHByNUMpwjZIPKxc0keRvOamflMcxh3dkoyrt0S5t06dsWN8VfcHdtMJ
+	 LXJrEROrrai8ygMYNYsZl+OyctMQKIa90bFSyZ3lvWDFKl7T0Q+3jS0n2obRnzk0NsC3o
+	 szi7eMc46LfuS4UHnWVswsoj1hlQowhxdX4m2IzA+Tp/0FR23CW8/eawRFO3ItswgizDT
+	 wMokAbwSO2kzYmwlJJhlKnxvQJaCjTL9fAAZXWRGZbxiFY8lWoLCAIL3CQJ/cHS/WLrpC
+	 JfbvqMW3G2Vk9SboBuToKFPmRq4CV3UmMEyCn+Xa8JIvPPdf8atwwjZKbtt/9NVSVWg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=j64q8qUb;
-	arc=none smtp.remote-ip=91.218.175.73
-Received: from mta0.migadu.com (out-73.mta0.migadu.com [91.218.175.73])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Hn6DOZ3Z;
+	arc=none smtp.remote-ip=95.215.58.238
+Received: from mta1.migadu.com (out-238.mta1.migadu.com [95.215.58.238])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48609606A31C
-	for <kvmarm@lists.linux.dev>; Wed, 28 Oct 2026 10:13:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 48609606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67F7606A31A
+	for <kvmarm@lists.linux.dev>; Wed, 28 Oct 2026 11:02:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C67F7606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=j64q8qUb
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Hn6DOZ3Z
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=kg3kdJ38Ft3AD46ZxOYLXC0C0yujn9suVYw9Z8g/U9Y=;
+DKIM-Signature: a=rsa-sha256; bh=rh4zM0t9OB8EXFXZvzLi8a+hQvyHbDJz8WyuNEI5q98=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793182414; v=1; x=1793787214;
- b=j64q8qUbnIImZVnnR94EjYfCqijHtVApq4tBd9c7UecgpowHQdKQ0YVAzh/473sxqNm+N3Eb
- RgxM1RTMOfqkd17Ph5ETyzwZ4fygmIS+uFy56vYlIutGl2koa4ScNG4rNMHmaUpq29QVVBRNvmq
- j1kUINqeL81wTs9XPrBqc1Zs=
+ t=1793185319; v=1; x=1793790119;
+ b=Hn6DOZ3ZMJ5PHyEyna4gwB3HF1mQcJrMU2moiZRpqMDIUOjTxpO/Fy//TkdFqzFutynHbarb
+ yv2ptQQcUNDCxDLsC0SeSdGVao0zPYLQPWd1MbNqLd++xy8aFToGdBcEykM6ubUXgRmiOkBTElp
+ w7wrfr+yNn6uAeXXo9wCrzck=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 8e770c70f83dabeb;
-	Wed, 28 Oct 2026 10:13:34 +0000
-X-Mizu-Trace-ID: 8e770c70f83dabeb
+Received: by smtp.migadu.com with ESMTPS id fa6f22072bc32f31;
+	Wed, 28 Oct 2026 11:01:59 +0000
+X-Mizu-Trace-ID: fa6f22072bc32f31
 X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] KVM: arm64: vgic-v4: Don't allocate vPEs when userspace clears nASSGIcap
-Date: Wed, 28 Oct 2026 10:13:18 +0000
-Message-ID: <20261028101318.2170928-3-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261028101318.2170928-1-fuad.tabba@linux.dev>
-References: <20261028101318.2170928-1-fuad.tabba@linux.dev>
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5bfca2a2af4so5863e87.1
+        for <kvmarm@lists.linux.dev>; Wed, 28 Oct 2026 04:01:52 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBx0ybAC1lMoLYyJInT18kN0/BWmYLLOWx+XYOInHW6/LIsTte/vrMcv6Ihn2u/Ms7t484yNZOg=@lists.linux.dev
+X-Gm-Message-State: AFq9FYKxWPaOAQQ/FrKoWkkHHcBRrJfeaHLcUydxrrXh/FLaBAKJY39p
+	XrFtgLSdXWSTbEXfl3P5lQGXc4CVav+Q58ky70ZVrazHMTsfw7z9WmnMexud7HdTbWRxmQ+lggY
+	wZXxGyVT/5R0msKb0Q9XSmjeRE7kmcdjD0pkdsO/S
+X-Received: by 2002:a05:6512:3a86:b0:5bb:27df:415f with SMTP id
+ 2adb3069b0e04-5bfcd0262a4mr142862e87.15.1793185311685; Wed, 28 Oct 2026
+ 04:01:51 -0700 (PDT)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -77,87 +66,45 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261027081147.498183-1-fuad.tabba@linux.dev> <20261027081147.498183-3-fuad.tabba@linux.dev>
+ <auCFa2VPEmxx2ZcC@google.com>
+In-Reply-To: <auCFa2VPEmxx2ZcC@google.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Wed, 28 Oct 2026 11:01:15 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTzS_rqHYR+bxvMkJt6KAagrDE9VJecAaS4qimqTQa3LjQ@mail.gmail.com>
+X-Gm-Features: AclHuK-N-iC_NAvcm9TdrzyXjqM3xFcWr7x8zL-7NgW85hvGrrNZ88luGxX9CiU
+Message-ID: <CA+EHjTzS_rqHYR+bxvMkJt6KAagrDE9VJecAaS4qimqTQa3LjQ@mail.gmail.com>
+Subject: Re: [PATCH 2/3] KVM: arm64: Pass the PMU events to the hyp vCPU of
+ non-protected guests
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, kernel-team@android.com, 
+	linux-kernel@vger.kernel.org, Oculytic <oculytic@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Since commit c652887a92887 ("KVM: arm64: vgic-v3: Allow userspace to
-write GICD_TYPER2.nASSGIcap"), userspace can disable vPE allocation for
-a VM on a GICv4.1 host with vSGIs by clearing nASSGIcap before the vgic
-is initialised. vgic_init() then skips vgic_v4_init(), and
-kvm_vgic_dist_destroy() skips vgic_v4_teardown(). vgic_its_create()
-still calls vgic_v4_init() for an ITS created after the vgic is
-initialised, though, and vgic_v4_init() allocates the vPEs and requests
-a doorbell IRQ for each vCPU. Destroying the VM leaks them, and leaves
-each doorbell handler registered with a vCPU that's about to be freed.
+On Tue, 27 Oct 2026 at 11:05, Vincent Donnefort <vdonnefort@google.com> wrote:
+[...]
+> > +#ifdef CONFIG_HW_PERF_EVENTS
+> > +static void flush_pmu_state(struct pkvm_hyp_vcpu *hyp_vcpu)
+> > +{
+> > +     if (!pkvm_hyp_vcpu_is_protected(hyp_vcpu))
+> > +             hyp_vcpu->vcpu.arch.pmu.events = hyp_vcpu->host_vcpu->arch.pmu.events;
+> > +}
+> > +#else
+> > +static void flush_pmu_state(struct pkvm_hyp_vcpu *hyp_vcpu) {}
+> > +#endif
+>
+> nit: Could save a couple of lines by just doing?
 
-Move the part of vgic_supports_direct_msis() that doesn't depend on the
-ITS into vgic_supports_vpes(), together with vgic_v4_init()'s GICv3
-check. Gate vgic_v4_init() on it rather than on
-vgic_supports_direct_irqs(), which reads has_its before
-vgic_its_create() sets it. vgic_supports_direct_msis() returns what it
-did before, since vgic_has_its() is already false for a non-GICv3 VM.
+The coding style says to "Prefer to compile out entire functions,
+rather than portions of functions", as do similar functions here.
 
-Fixes: c652887a92887 ("KVM: arm64: vgic-v3: Allow userspace to write GICD_TYPER2.nASSGIcap")
-Suggested-by: Oliver Upton <oupton@kernel.org>
-Cc: stable@vger.kernel.org
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- arch/arm64/kvm/vgic/vgic-mmio-v3.c | 9 +++++++--
- arch/arm64/kvm/vgic/vgic-v4.c      | 2 +-
- arch/arm64/kvm/vgic/vgic.h         | 1 +
- 3 files changed, 9 insertions(+), 3 deletions(-)
+[...]
+> Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+> Tested-by: Vincent Donnefort <vdonnefort@google.com>
 
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index 5913a20d83019..a60697238a7a7 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -48,7 +48,7 @@ bool vgic_has_its(struct kvm *kvm)
- 	return dist->has_its;
- }
- 
--bool vgic_supports_direct_msis(struct kvm *kvm)
-+bool vgic_supports_vpes(struct kvm *kvm)
- {
- 	/*
- 	 * Deliberately conflate vLPI and vSGI support on GICv4.1 hardware,
-@@ -58,7 +58,12 @@ bool vgic_supports_direct_msis(struct kvm *kvm)
- 	if (system_supports_direct_sgis() && !vgic_supports_direct_sgis(kvm))
- 		return false;
- 
--	return kvm_vgic_global_state.has_gicv4 && vgic_has_its(kvm);
-+	return kvm_vgic_global_state.has_gicv4 && vgic_is_v3(kvm);
-+}
-+
-+bool vgic_supports_direct_msis(struct kvm *kvm)
-+{
-+	return vgic_supports_vpes(kvm) && vgic_has_its(kvm);
- }
- 
- bool system_supports_direct_sgis(void)
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index a01de4de608a6..0a4b9a74425b4 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -248,7 +248,7 @@ int vgic_v4_init(struct kvm *kvm)
- 
- 	lockdep_assert_held(&kvm->arch.config_lock);
- 
--	if (!kvm_vgic_global_state.has_gicv4 || dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
-+	if (!vgic_supports_vpes(kvm))
- 		return 0; /* Nothing to see here... move along. */
- 
- 	if (dist->its_vm.vpes)
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index b71d486ae5145..7fc29a395a7db 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -500,6 +500,7 @@ static inline bool vgic_host_has_gicv5(void)
- }
- 
- bool system_supports_direct_sgis(void);
-+bool vgic_supports_vpes(struct kvm *kvm);
- bool vgic_supports_direct_msis(struct kvm *kvm);
- bool vgic_supports_direct_sgis(struct kvm *kvm);
- 
--- 
-2.47.3
-
+Thanks!
+/fuad
