@@ -1,49 +1,78 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793206385;
-	b=cnsfDT2Mjhooe/k5SSeeR83z8Mnh9N7wA0ERbX+k2QyFbQJeOnVhXYt/Wk5qgOAhwV0O
-	 xLk/Ftdvmx7MEJzkNHBwCZNh3RIgqDHkU55SFiEcz76jiXlBBuKRRzQW6YYh9LhS5ND9L
-	 20uJOxdgysxEPHgQ4BicMQzenVL3+x5sOEosMxz1mC2ewMJCdzbp1x7BvXHT2Qt5Rnthq
-	 cyY6J3ITGzkVFIV3fEf9lwtjw68cAveLbQxaUHrAHh6YT0Ifw1ygE4KIsW5N/dnldr7Tx
-	 PrtJl70Cm2+CxfP0B/7x/PY78XkHNWygIM/CbDK8jqsAWxQ026+sD8fnc/K2WsR29pQ==
+	t=1793207829;
+	b=rsjNvs1gw5szYiMXeRn25J76NXPBKngnVSWVbDb2S7p7j+2FnwGkXJTW7xRLabpetkVW
+	 fMRUkooK76Tqt30kI/eS4vwqZAawNvob1tyCPW4qEUQSwJK8UdwsRButxOPnCczzqpLtF
+	 MzIXibBNIRTOpzCFkjMZm8iOl5HD8tZt5eIulFxnpmGIqfDsGJmfiTn2Io3UHlf2N7f3z
+	 3bvy6vW5y3aEYreJtDTM24uExjHfaWBSswY4xU6mVdOw3z3tqa2zM5uNfLR1ohHkWowp3
+	 mj09ECHVB75i++FS2PEnIT4XpW7Q+JS7wmTcZN9c0k3m1VtaMkn0wIp9eKw1Imuo3UA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793206385;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:Content-Language:To:Cc:References:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=YSDSgjpQLJHyewcbdkRbRSJusGm4cUM3Dgl9o9009Ec=;
-	b=UUSFT2gM/kopE4RXjs0meK8FrOXfzF1R2qz1kai2z6E2/53QSedisL8DZI0m0tEyAwXx
-	 dqsiduzsu3O/10qd9nWyQKstLGfwgOXRunDCH2cPZDD3zSTAei7LJnscP13BcmxDTfH7F
-	 EzDh1+sa+kTEQ2GKXnIN6c63zCyJgydbA92MDW+tETsagzjtUwOuRoiqlNIBqv2KhYlGz
-	 iycUEFHQEtCxM8orcp554NvkTl9qzsexI0JF+rpXvN4rbXn5myTDD8hBcy9lkRTQPpZ4K
-	 OwWf/mkujr59c7QNl2p8BBINZ+SjrcojYzlLNCnOCbZR+LL7adMZsuas/HTwqo8sUEg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793207829;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:In-Reply-To:References:
+	 Date:Message-ID:User-Agent:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=05SG7gAJ008w03i9CCuLSraJDJiyVFmW6Oo7ipBrjbs=;
+	b=4EMPikBDoKCMWj8vwTaCapSZRO8Jzk3LYcDxRNl/pWCv1iP1cK7Ean50hAJfNVeWZ8RS
+	 +ndICaITPInxXuoaK0vlQHxm7BfOf7jCfP+raAgTnf1VpG2MPaGpQR8AC/T2hBqc4u6uB
+	 RoZowgULkSQUOLpJkIjInuhn4gNbfqCAm1XZE9IfC1Qnh/U8Ka8OEfhZnBW9aZlbt8SG6
+	 hUiKWs8tqHub3NzasnkF3wcPux6cstVr9Q33W6tb3wA7u2ilv6D5BZAsPHxHPmY0CYQ3R
+	 cZElWfwGyUM/fctVYAiOFLD8vNvWeLfcqirYjYRrQH46BUhUKnN8ZX+2wM+r5aPgLDA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Jet83GLP;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6709606A31A
-	for <kvmarm@lists.linux.dev>; Wed, 28 Oct 2026 16:53:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C6709606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LIVACHG1;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8CB6606A320;
+	Wed, 28 Oct 2026 17:17:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Jet83GLP
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 049651756;
-	Wed, 28 Oct 2026 09:52:54 -0700 (PDT)
-Received: from [10.57.16.117] (unknown [10.57.16.117])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1A7D13F59E;
-	Wed, 28 Oct 2026 09:52:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793206377; bh=vJ+LPeiA2zykY87kypyN7HwDrT7gAk57eYzbxdUxVq4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Jet83GLPCj8+yixKuGbe68KlDg4d2iybThkNYU9F6Ea5jitw0eidM9kZcZqQi/3CI
-	 wH8bTu5nposSzApqJwqyOjNNTxMt89rNL8giOw0LyOem6IL6V38coDJrAtDRYej3Vj
-	 cEYZJPrASJc4Y8RsPiHVO6F6RpxaKrrqmcgFFO1U=
-Message-ID: <69288872-2576-4697-a62d-87ab2bcedd49@arm.com>
-Date: Wed, 28 Oct 2026 16:52:53 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LIVACHG1
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A438E1F01828;
+	Wed, 28 Oct 2026 17:17:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793207828;
+	bh=05SG7gAJ008w03i9CCuLSraJDJiyVFmW6Oo7ipBrjbs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=LIVACHG1RijgMjCcG/Za6quG10uP/bwvgH9QE8LBE1Ivatgc9Gsxomr3AtpNUFPU0
+	 A+6txV+JhFA/FQ9wi7C+7pWYpZ0e+Pc7WqKMe9jkABrVblw1ZFcwlZAztCqgB1P/e3
+	 p9b8wN4tDVitUGLc/V+1hQT1NZFTVD7m3WdPU0oqKQlNmHSSGk9l9hK3CeTbNDWqSe
+	 VN3sAKFewBC6xe0t5rYtB+sbuiw5e5lDQoKvIRxdjJ0DrtoKis23WnQwx7fOelIVvL
+	 Atltab4Pstjrs4D4dYuIJSyaVZnuHq7QWlD07iE6RtqSOvkxEaO4SzTr/vUKZm0prA
+	 whzCKqWsehupA==
+From: Pratyush Yadav <pratyush@kernel.org>
+To: David Matlack <dmatlack@google.com>
+Cc: Pasha Tatashin <pasha.tatashin@soleen.com>,  tarunsahu@google.com,
+  Andrew Morton <akpm@linux-foundation.org>,  joro@8bytes.org,  Mike
+ Rapoport <rppt@kernel.org>,  Pratyush Yadav <pratyush@kernel.org>,
+  maz@kernel.org,  arnd@arndb.de,  jgg@nvidia.com,  robin.murphy@arm.com,
+  loganodell@google.com,  oupton@kernel.org,  kevin.tian@intel.com,
+  alex@shazbot.org,  dwmw2@infradead.org,  pbonzini@redhat.com,
+  seanjc@google.com,  will@kernel.org,  Alexander Graf <graf@amazon.com>,
+  Bjorn Helgaas <bhelgaas@google.com>,  baolu.lu@linux.intel.com,
+  linux-arm-kernel@lists.infradead.org,  linux-arch@vger.kernel.org,
+  sagis@google.com,  linux-mm@kvack.org,  kvmarm@lists.linux.dev,
+  iommu@lists.linux.dev,  linux-pci@vger.kernel.org,
+  kexec@lists.infradead.org,  skhawaja@google.com,  kvm@vger.kernel.org,
+  linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v2 3/4] liveupdate: Replace compatibility string
+ with a 2-bit pair feature header
+In-Reply-To: <at-8vkVpN2SF3XgB@google.com> (David Matlack's message of "Mon,
+	26 Oct 2026 20:49:02 +0000")
+References: <atlKsD-aJB3mJr2j@google.com>
+	<CA+CK2bABt4OZO31TenVF2+uBUWVwViWbvfE00=0xbAw=f7K9SA@mail.gmail.com>
+	<atl7peoVHdP5hz7z@google.com>
+	<CA+CK2bBFXnJA1kddbLKGq0DAHDgjYhsTSQQay-xeX7jJC1V_UQ@mail.gmail.com>
+	<CALzav=e=ho2gVrn+7KpZ3ZyasvH2u15-pC-RSRSS7KcMfKqUJQ@mail.gmail.com>
+	<CA+CK2bAJo8dnTOyKMgnnMnk-SCXbTsv+JCLEOWkjyj-wqtEkHg@mail.gmail.com>
+	<atpNFEFIlqAoYIwH@google.com>
+	<CA+CK2bB2C3Am5ssRuzYpfiU7_vB81vxMGc19HQLq7N=_7YrbTg@mail.gmail.com>
+	<attmFVIFU_mS0Y7p@google.com>
+	<CA+CK2bDXDWbww_d3sD6OZqpo37V1a3t76_ubbrXLQS=9DB3dWA@mail.gmail.com>
+	<at-8vkVpN2SF3XgB@google.com>
+Date: Wed, 28 Oct 2026 18:17:02 +0100
+Message-ID: <2vxz8q3hoicx.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,103 +82,46 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v7 12/28] KVM: arm64: Add SPE VCPU device attribute to
- set the interrupt number
-Content-Language: en-GB
-To: Alexandru Elisei <alexandru.elisei@arm.com>, maz@kernel.org,
- oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com,
- seiden@linux.ibm.com, yuzenghui@huawei.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- will@kernel.org, mark.rutland@arm.com, linux-perf-users@vger.kernel.org,
- catalin.marinas@arm.com, james.clark@linaro.org
-Cc: Sudeep Holla <sudeep.holla@arm.com>
-References: <20260903160623.315525-1-alexandru.elisei@arm.com>
- <20260903160623.315525-13-alexandru.elisei@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260903160623.315525-13-alexandru.elisei@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 03/09/2026 17:06, Alexandru Elisei wrote:
-> From: Sudeep Holla <sudeep.holla@arm.com>
-> 
-> Add KVM_ARM_VCPU_SPE_CTRL(KVM_ARM_VCPU_SPE_IRQ) to allow the user to set
-> the interrupt number for the buffer management interrupt.
-> 
-> [ Alexandru E: Split from "KVM: arm64: Add a new VCPU device control group
->                 for SPE" ]
-> 
-> Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
+On Mon, Oct 26 2026, David Matlack wrote:
 
-...
+> On 2026-10-25 04:38 PM, Pasha Tatashin wrote:
+>> On Fri, Oct 23, 2026 at 9:50=E2=80=AFAM David Matlack <dmatlack@google.c=
+om> wrote:
+>
+[...]
+>> The reason I care about keeping the header compact is that we are
+>> defining a foundational kernel ABI and want to use this header across
+>> almost every serialized data structure so we can evolve them later
+>> without breaking compatibility. While some top-level structs are on
+>> sparse folios today, other serialized structs are tightly packed, and
+>> we are looking to add KHO slab support in the future where tightly
+>> packed allocations will be common.
+>
+> My intuition is we will have a small number of headers per preserved
+> file and per preserved FLB. One for the top-level struct and then
+> optionally a few more for sub-structs like arch-specific data. That is
+> why I am less worried 8 bytes per header, even if we fix the folio
+> problem.
+>
+> Maybe where our visions differ is when there are collections of
+> serialized structs, like KHO blocks. For collections I don't think the
+> elements will each have their own headers. Otherwise the elements could
+> be different sizes.
 
-> diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
-> index fe45ad4c703a..dd5f80318ba4 100644
-> --- a/arch/arm64/kvm/spe.c
-> +++ b/arch/arm64/kvm/spe.c
-> @@ -59,17 +59,99 @@ bool kvm_supports_spe(void)
->   	return !list_empty(&spe_pmus);
->   }
->   
+kho_block today doesn't store entry_size in the serialized payload. It
+relies on its caller to do so. With extensible structures, this can get
+messy. Sure, the owner of the kho_block_set can track the size somewhere
+in its payload, but perhaps we should store the size in
+kho_block_header_ser to begin with?
 
-...
+Anyway, not a problem this series needs to solve, but something we
+should eventually do.
 
->   int kvm_spe_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->   {
-> +	struct kvm_vcpu_spe *vcpu_spe = &vcpu->arch.vcpu_spe;
-> +	struct kvm *kvm = vcpu->kvm;
-> +
-> +	if (!vcpu_has_spe(vcpu))
-> +		return -ENODEV;
-> +
-> +	switch (attr->attr) {
-> +	case KVM_ARM_VCPU_SPE_IRQ: {
-> +		int __user *uaddr = (int __user *)(long)attr->addr;
-> +		int irq;
-> +
-> +		if (!irqchip_in_kernel(kvm))
-> +			return -EINVAL;
-> +
-> +		if (!vcpu_spe->irq_num)
-> +			return -ENXIO;
-> +
-> +		irq = vcpu_spe->irq_num;
-> +		if (put_user(irq, uaddr))
-> +			return -EFAULT;
-> +
-> +		return 0;
-> +	}
-> +	}
-> +
->   	return -ENXIO;
->   }
->   
->   int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->   {
-> +	if (!vcpu_has_spe(vcpu))
-> +		return -ENODEV;
-> +
-> +	switch(attr->attr) {
-> +	case KVM_ARM_VCPU_SPE_IRQ:
-> +		return 0;
+[...]
 
-Should we gate this too on irqchip_in_kernel(vcpu->kvm) ? Otherwise
-we would advertise to the userspace that it has the SPE_IRQ, but
-would return -EINVAL when we try get_attr if the irqchip is not
-in kernel.
-
-Also, do we need to mandate the ordering of the SPE configuration on
-VGIC ?
-
-Cheers
-Suzuki
-
-
-> +	}
-> +
->   	return -ENXIO;
->   }
-
+--=20
+Regards,
+Pratyush Yadav
