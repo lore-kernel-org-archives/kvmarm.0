@@ -1,75 +1,75 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.199
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.198
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793214187;
-	b=OxZhteRYR2BEpEmyrZFOS2+troIN4qUa7ZL+q02tbKTS29DCU2vbkYJZJwv3/VrNuk+q
-	 Ol5QXpBfcrNV46HK103OxUtOBpCNy3RfWo4AxEitOZuI+FUDvzzRhrp/siyn/KpXJ+DYv
-	 9s7RHeFLKhIcTsJo/WoEwLQsNlP76lKZ79DrNWZAaTnrMWDQ4Cb/UpNrkRfmcUEyqV0LI
-	 3drNXXwHvdbqy4tRpEXE6nooJEfGuAxiSCPl2HjZTQ8v33GsvhQ/YAv3eBT5QmjNPSJSH
-	 CkmwhpjYrNMDWxsOXoxf5FXEVNElipxRVXZnbRrRv39zd628T7wRwwJ9VF9HCpDsSfQ==
+	t=1793214189;
+	b=5oUzEptba/EpptYF3QcTpg3NTM0/oMHMChoKhZdE349xPOyZI2APoLF0mksKDjWrlTyE
+	 7F368NaWad79lWxD+jnFlwAwAWn0OeWVkuyqwojIrakqXbWb9/ryLy/jxL7dMaLnHcSXM
+	 eJRFddYqnNMfJKrBqfalaov/Or7RHh+o41M62CN8Nrsp1VDfHvsAQNtQ2VZr4oLom4aaU
+	 gqyPOy2Nrw7VfK1uhX2yZwitBBaH5WP9GCj/MHzrrS05VBb+Ecf2f1f4+KbL+oBeh5UKj
+	 2OFGod8lX3mfZdZUDRWTXD4AZabpKMdIfYcz2zjMJhMAHZ13w5Xp2SaxTjZFHH0bgZA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793214187;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793214189;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Reply-To:Date:
 	 In-Reply-To:Mime-Version:References:X-Mailer:Message-ID:Subject:From:
 	 To:Cc:Content-Type;
-	bh=RloCiG6ktfajfft7oZXWWlUR2yO2W/arq16CEWx06hk=;
-	b=rrv+uIc3RXPQaipJo/+QyY5sv3nBZ8v/ToZq/SQFJ93HmbBoxDS7HhfzWVaFH9M3iQzm
-	 ZUx85+Sf2jqASzL3DnZIvyQriCxFY54ITZsmdnfck47ilgGjE9ppa/MmOdpV8LYa02baS
-	 zh3fbxGVaWxrdb886lYyTBQ5AYCVUOa85nhxdMUOP8o9mf6aL8dfpIsvdkCEQXgrHQsVF
-	 2e9aozXDQEFD3C95MGqPf7pmYyQSjl0NWwdCmuH9ZUExoSomjniqudWpGmBrEuMqHrTYc
-	 TNmROr/cGFFh9UKz9lfTjIsJc2aQIA5gtzggLBZNvOJqqMtadmtaRmXVmBti7Kztxaw==
+	bh=Sl+Mk8tjT6q271G5BWlaeNMAilxi46BFejIwHYIwO+I=;
+	b=2bbyAOhvFHsIz81MG95yrL2Oz6NK8Foi3V4vcX6rn5cC7SL2rfb2lut1ZBNUMyRHZbbt
+	 zWWMh/SOAvuSUcH/tziCTtu+mvfMJkDqKw0/wCkhtGa2vTckWUpqc/PO6M9Va6wd/PHL1
+	 rQE/7tbcRfqxJevly6OwXgYOCSGX8woj5umKhJg19ntFylrYJl2dGz4+jBCdVhP28GOXs
+	 rB8nBVz+V6qN2DgBen4jZJH+zde6D39oQEKQwd6wGa5AjTd1IGJoAWFWqESEHzsn/QAKH
+	 5BtJfMLDnu70K7q/Iwzayp1837H/tRyZnycWZZuL2/RxU3WNyMNX7Uc28Fyd7V+H6CQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=jgOznClL;
-	arc=none smtp.remote-ip=209.85.214.199
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=lrv09B3P;
+	arc=none smtp.remote-ip=209.85.214.198
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E7260A380C
-	for <kvmarm@lists.linux.dev>; Wed, 28 Oct 2026 19:03:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 94E7260A380C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0FE660A3829
+	for <kvmarm@lists.linux.dev>; Wed, 28 Oct 2026 19:03:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D0FE660A3829
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=jgOznClL
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2e60770381cso13090645ad.0
-        for <kvmarm@lists.linux.dev>; Wed, 28 Oct 2026 12:03:07 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=lrv09B3P
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2e8ad8c5f80so17855115ad.0
+        for <kvmarm@lists.linux.dev>; Wed, 28 Oct 2026 12:03:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1793214187; x=1793818987; darn=lists.linux.dev;
+        d=google.com; s=20260707; t=1793214188; x=1793818988; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:reply-to:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=RloCiG6ktfajfft7oZXWWlUR2yO2W/arq16CEWx06hk=;
-        b=jgOznClLJwgacVlChWeCXOkf6vNx2OifWn7Y4zHBhXsO106HbUUeLT4pFUpOaVLccM
-         X2fthXMOFShqq6dp37AR7wO9X3QG0VwHPd9n1tKqCB/dOx00FPcsS7GWuWTpY1L4mYQu
-         oVAUH/1NWiyfEFecCP7OLAU2wl/uFCm4pX0rC/Xi3f+/t/v1VXZLU/oEDPbsctPFf/CB
-         Fd3+S2SR/VcLALJsufORjssatUex0KWkxxaMWZaRvW9U60DF90md5/xoGjk52uM57qdq
-         C8YkNnYW4OYYOGIVmCSqve8GjqDgLJMsPzzt4vCfjHy5BwVSLGu9MpCGztGZzRvafMic
-         PwOw==
+        bh=Sl+Mk8tjT6q271G5BWlaeNMAilxi46BFejIwHYIwO+I=;
+        b=lrv09B3P8VQc1ZmeMWcG7QEeywMEow6HbRLEJ6JqbbD6s+dCMrNre13ECh/bVGc2hw
+         45AOhPyShI2qREJ+NCCDzUNSP3Aj1ZqSHBJOGucTZ8I6rHG2wCi2qvgLcT36Wyabk1yh
+         qi1pJ+Pd+6oc5u8daJeAtfyRpS3//XiSxWT3tqGn9joW0ioIdPMxNsZ7TSMd6PmGhb1p
+         7OGc16p8K7AZ6/QxVUTSCh3DSZ/EhyJ6cDRfP93TTMssckTROz3KouxNuyKR+FKTno88
+         B/WcKYHqwiI8mHYva8EtjtqcHwDn8laikRJ+1lDazXnomA8EosnZzrKUZm3dV8qY0dtu
+         SYzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793214187; x=1793818987;
+        d=1e100.net; s=20260707; t=1793214188; x=1793818988;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:reply-to:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=RloCiG6ktfajfft7oZXWWlUR2yO2W/arq16CEWx06hk=;
-        b=nn7WOQbYc2D4CWc7AXtIRva1DhfsFzmyuMEGC+sIjQBlC0ZSqWmkJ2zVNq56D2kshF
-         NToC+a32crJHyGyPZpQ3Y95N62Mb1KB+ewdkpu7sj6+6qb1K1fKGsJ5WzZM5+IJ1Uy7a
-         Zkv15xf/CpY8cg63d6wy7m/r4JqIAZ06So3yPJiVZs/rx5aF6vnd8/1+XNkyGoNhKONl
-         3fqHPP1CBIkmo2JcKRxX1oIsrZGHHG/iYbT+zJU4TlnEBIGVzG5+V4CxRFkkS1xnNo/l
-         Zk08IQRJSzrHpyaPdzjCJo9v87WCudtbMB01cB9OUviJPS5HL097JTMYOuwV+TV2Ewak
-         0ITA==
-X-Forwarded-Encrypted: i=1; AKwUvByLKtDkPRCmQKDup8z8ufHKVnmy9mzwUdGuyxkq9aK3Zk5/Q/hd4m4euSsiQZfIUcmtZY8Dom0=@lists.linux.dev
-X-Gm-Message-State: AFq9FYKSrNwA0RcY2TEXppK5Lvs1HhZNamMfh4ny31zR+AxwCoCShYW4
-	7RmhK8Obp1IEYnWE4tjV717N8bcMePi9gRYH2id+8D9idLISGrZqOQ7NsufRiApQY9Fzh1C7gHB
-	+6EePzA==
-X-Received: from plma18.prod.google.com ([2002:a17:902:7d92:b0:2e9:73da:58d6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d504:b0:2e8:3d48:4d92
- with SMTP id d9443c01a7336-2eb003bf1dfmr27738995ad.33.1793214186739; Wed, 28
- Oct 2026 12:03:06 -0700 (PDT)
+        bh=Sl+Mk8tjT6q271G5BWlaeNMAilxi46BFejIwHYIwO+I=;
+        b=vnwH1b/d42olRDywaD6THN1KP1owNENC4h49yeb6ygZkBaVEO87ggOBmplkYqAQAhq
+         i1Q1DWc4jCC6c3GWGKsICeJAcpGWHToECUhMFerljt0kilrR3fxnexLa88hbdolyulcn
+         +8SLYRk3wI0Ivibqh1Ez78COOzqtYr5oWNLyv2yxq6vV2Cu5DbMFKVBXxe5Ji8KpInR+
+         HLfIjS27L8T749TpiWcje7u/d0XN6hUaFOyNKJKu8ac+5VC8bWy49SMZISeZ8Xm+vgFS
+         CPw2GyrZ5Q9NwNL5QXpFj7lKGVIenn5AHbFyKJfK34U5ecI2g+wIpBJu5GwPofquTrhP
+         BwqA==
+X-Forwarded-Encrypted: i=1; AKwUvBxLSmSCj9ImjBju8bYlCeKy+kIe7W2JaAvYDNpE9RwTVNGAm84NCaIWIepsU5sNtAPSLFJYBZM=@lists.linux.dev
+X-Gm-Message-State: AFq9FYKAo6y06D7ZWeLu8+5zkpqCHOgbxyTVPHe7uK5KsGNZBtlc0T1M
+	zLcqqsw1yfz5QR8otS7HBTSWgkXvN80jRdKZ4uZQ9laeQ1mC8jADserbxi+lqXUyc4virzLi00E
+	SLYnEzA==
+X-Received: from plic8.prod.google.com ([2002:a17:903:3708:b0:2e8:4252:d40c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:40c9:b0:2cc:6018:f030
+ with SMTP id d9443c01a7336-2eb0033e60cmr28999775ad.14.1793214188023; Wed, 28
+ Oct 2026 12:03:08 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 28 Oct 2026 12:02:56 -0700
+Date: Wed, 28 Oct 2026 12:02:57 -0700
 In-Reply-To: <20261028190259.1819571-1-seanjc@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -82,9 +82,8 @@ Precedence: list
 Mime-Version: 1.0
 References: <20261028190259.1819571-1-seanjc@google.com>
 X-Mailer: git-send-email 2.56.0.313.g2479322e68-goog
-Message-ID: <20261028190259.1819571-5-seanjc@google.com>
-Subject: [PATCH 4/7] KVM: MIPS: Rework kvm_arch_vcpu_should_kick() to use
- standard implementation
+Message-ID: <20261028190259.1819571-6-seanjc@google.com>
+Subject: [PATCH 5/7] KVM: Move kvm_arch_vcpu_should_kick() to common code as kvm_vcpu_should_kick()
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -103,37 +102,175 @@ Cc: Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
 	Stefan Teodorescu <fane@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Rework MIPS' kvm_arch_vcpu_should_kick() to use the "standard" arch
-implementation so that the arch hook can be dropped (MIPS is the only
-arch other than PPC that implements a non-standard hook, and PPC uses the
-recently added @force param when invoking __kvm_vcpu_kick() instead of
-relying on kvm_arch_vcpu_should_kick()).
+Dedup kvm_arch_vcpu_should_kick() now that all architectures except for PPC
+have identical implementations.  PPC's implementation is unreachable as PPC
+always invokes __kvm_vcpu_kick() with @force=true.
 
-Convert MIPS to the standard implementation even though the code should be
-unreachable (neither kvm_vcpu_kick() nor kvm_make_request_and_kick() are
-used by MIPS or common KVM), so that there is a bisection point if the
-code is somehow reachable.
-
-No functional change intended (because the code is currently unreachable).
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/mips/kvm/mips.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/kvm/arm.c       |  5 -----
+ arch/loongarch/kvm/vcpu.c  |  5 -----
+ arch/mips/kvm/mips.c       |  5 -----
+ arch/powerpc/kvm/powerpc.c |  5 -----
+ arch/riscv/kvm/vcpu.c      |  5 -----
+ arch/x86/kvm/x86.c         |  5 -----
+ include/linux/kvm_host.h   |  1 -
+ virt/kvm/kvm_main.c        | 11 ++++++++---
+ 8 files changed, 8 insertions(+), 34 deletions(-)
 
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index a53abbba43ea..c37e212bc0a3 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -122,7 +122,7 @@ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
- 
- int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
- {
--	return 1;
-+	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 775d11f96813..99d540d67b5b 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -128,11 +128,6 @@ bool is_kvm_arm_initialised(void)
+ 	return kvm_arm_initialised;
  }
  
+-int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+-{
+-	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
+-}
+-
+ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 			    struct kvm_enable_cap *cap)
+ {
+diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+index 4026b9bf9f2d..76afd386abd2 100644
+--- a/arch/loongarch/kvm/vcpu.c
++++ b/arch/loongarch/kvm/vcpu.c
+@@ -379,11 +379,6 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.mp_state.mp_state == KVM_MP_STATE_RUNNABLE;
+ }
+ 
+-int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+-{
+-	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
+-}
+-
+ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+ {
+ 	unsigned long val;
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index c37e212bc0a3..273dd932d119 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -120,11 +120,6 @@ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+ 	return false;
+ }
+ 
+-int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+-{
+-	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
+-}
+-
  int kvm_arch_enable_virtualization_cpu(void)
+ {
+ 	return kvm_mips_callbacks->enable_virtualization_cpu();
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index 09c94b849185..ac259fcd85c2 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -62,11 +62,6 @@ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+ 	return false;
+ }
+ 
+-int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+-{
+-	return 1;
+-}
+-
+ /*
+  * Common checks before entering the guest world.  Call with interrupts
+  * enabled.
+diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+index dd786f758eb7..3981ba39ffc2 100644
+--- a/arch/riscv/kvm/vcpu.c
++++ b/arch/riscv/kvm/vcpu.c
+@@ -239,11 +239,6 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
+ 		!kvm_riscv_vcpu_stopped(vcpu) && !vcpu->arch.pause);
+ }
+ 
+-int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+-{
+-	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
+-}
+-
+ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+ {
+ 	return (vcpu->arch.guest_context.sstatus & SR_SPP) ? true : false;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 32563a91fba9..d9fa2690153a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10472,11 +10472,6 @@ unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu)
+ 	return kvm_rip_read(vcpu);
+ }
+ 
+-int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+-{
+-	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
+-}
+-
+ static inline u32 kvm_async_pf_hash_fn(gfn_t gfn)
+ {
+ 	BUILD_BUG_ON(!is_power_of_2(ASYNC_PF_PER_VCPU));
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 3b9844c3906d..9db42f58c561 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1694,7 +1694,6 @@ void kvm_arch_disable_virtualization_cpu(void);
+ bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu);
+ int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu);
+ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu);
+-int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
+ bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu);
+ bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu);
+ bool kvm_arch_vcpu_preempted_in_kernel(struct kvm_vcpu *vcpu);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 67addb9e48a7..e1a9da8b43d7 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -191,7 +191,7 @@ void vcpu_put(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_FOR_KVM_INTERNAL(vcpu_put);
+ 
+-/* TODO: merge with kvm_arch_vcpu_should_kick */
++/* TODO: merge with kvm_vcpu_should_kick */
+ static bool kvm_request_needs_ipi(struct kvm_vcpu *vcpu, unsigned req)
+ {
+ 	int mode = kvm_vcpu_exiting_guest_mode(vcpu);
+@@ -209,6 +209,11 @@ static bool kvm_request_needs_ipi(struct kvm_vcpu *vcpu, unsigned req)
+ 	return mode == IN_GUEST_MODE;
+ }
+ 
++static int kvm_vcpu_should_kick(struct kvm_vcpu *vcpu)
++{
++	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
++}
++
+ static void ack_kick(void *_completed)
+ {
+ }
+@@ -3930,7 +3935,7 @@ void __kvm_vcpu_kick(struct kvm_vcpu *vcpu, bool wait, bool force)
+ 
+ 	/*
+ 	 * Note, the vCPU could get migrated to a different pCPU at any point
+-	 * after kvm_arch_vcpu_should_kick(), which could result in sending an
++	 * after kvm_vcpu_should_kick(), which could result in sending an
+ 	 * IPI to the previous pCPU.  But, that's ok because the purpose of the
+ 	 * IPI is to force the vCPU to leave IN_GUEST_MODE, and migrating the
+ 	 * vCPU also requires it to leave IN_GUEST_MODE
+@@ -3939,7 +3944,7 @@ void __kvm_vcpu_kick(struct kvm_vcpu *vcpu, bool wait, bool force)
+ 	 * check also modifies vcpu->mode and KVM PPC needs to avoid that side
+ 	 * effect for unknown historical reasons.
+ 	 */
+-	if (force || kvm_arch_vcpu_should_kick(vcpu)) {
++	if (force || kvm_vcpu_should_kick(vcpu)) {
+ 		cpu = READ_ONCE(vcpu->cpu);
+ 		if (cpu != me && (unsigned int)cpu < nr_cpu_ids && cpu_online(cpu)) {
+ 			/*
 -- 
 2.56.0.313.g2479322e68-goog
 
