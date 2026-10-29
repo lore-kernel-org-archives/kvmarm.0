@@ -1,46 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793296377;
-	b=ZNXCM0H+hzdGfhc/WoT3mXvrWan2GbE+7vtxeklQpZZF4JzgQ4hq0b938Acf1FoYjzAK
-	 EDl+PuJzcl88NtqkFGNle/vdKNHlHyofzP46wQJvGMEHJRn3ruq+/FpsSmGYtuKdUfUTN
-	 0KCqsWSqOU1smvcwruzCfsIXjzKL8XJeIWeyBwLhgrF/bsfm6T2L4CQCirrGjikeT8nXB
-	 MiaBDCMfUSX4LE+/twZH3tlPMBGlx15Krct1/tljjnu12V1Cpr5yx6ku7O2fsfIJMe9Vm
-	 4KJuL8DS6V85YkgosuVAh4DNkTp3+C0d1CIejguai1jFbgG/ZUbjW982Ur30m1/w2jQ==
+	t=1793296379;
+	b=xldQUhXlChInTNsvUbJCbZNPXYkNLaQktw3MFVHHeOh11cv5HtQIJvQjBBxZ1tW/VIej
+	 QHW1tgIpVIdKmrKdHbc6Sea+dbW3t5ZmJZPuTTirwXZoRMTn5ag+XV83ElNJK+c5HW1GJ
+	 q/egTh8OEDhIhAkf4FU52S6ApYLIqfGuU02M7KFFSNpQSqPIPjTHVrcu5oqBB0PSosvOo
+	 ahYPt7Hq7IpKOs7gNyVL6E7ltasYGQe/rSmTRbft/lKuwd4i9b3pek4sKGIWj9CQUS9iI
+	 m5KnRrP4IsE0S3DbeV23GK1vcTL1kM3ZxLU+KcKoE4IKuzBamdoWEvSRcETfDIRsQfA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793296377;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793296379;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=V7BTev0WvCIE8h6eACl3FNzYopQ4CdXZtkVISOrxWo4=;
-	b=Gxf+r18EgMgRLAEvqTuFKeJqCcJSgOo8GYkpPdVrguHQqhSRVT8e2ScjtFvtKYvmmMff
-	 kQp/Mxf5hgqvjNS1qZnNhFPcIGfWvhZ8Nyqe9fSLVVWTkRusqD3HxlFcYj9iW23Ukc1nr
-	 m/ph9/OUcrBoM+MZarnWrbDa+sy/rZG09XSu6XbInC+3EHxpqX8MsZGR/E3HcOgy4tIG6
-	 z5ijJ5N/9nq0Wq07ZsLN+dAJ+yCqUxIDN3YNyWqF2lMtabZwKhSywsa3dKAkOC/OX3ou8
-	 l0yUmv1+WXcz9V+/pcdSixYCkrJvDuNFpMpalqUlt3qXkCLFXudhJH3OsxuQPkwdtiQ==
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=S5U2Nx4uu0l5UY+vpx3TvB7FV+qMp+ahvwvUvYtuJ00=;
+	b=yE8bbK4n5AeCPn6NINXunBTCioT0vRiHj6o4mDDJOYzRa/WYuMDD3L56/2mLFJXZRnRt
+	 IoLXJd75n/xz7SdM3glQdjSVnFY1I3F+G5HbAnRytdNb11ssVuX1kES73OREWwoUFYMXv
+	 mE3rw7zwqa2DPtISkdYKKyQKTHvvhP51tavAj+065E2OwAPjnusca9rPZMROL6yZCY8Mb
+	 Tm7iDSf2bxfrCKH1njUxDFTc/mQ3LvxvU/PMQjZ6IYDryzBHgGrOuO6fFw1UOHo4FkqLW
+	 Ea8sabI6ZpZYWB5eKOPLeBWNxVcPdH4+YH1ZL3YwgovBgpKmgpETVuiOEYNkc06Gecg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=u21D0kvR;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=NV2zPwOw;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41022606A31A
-	for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 17:52:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 41022606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7525606A329
+	for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 17:52:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A7525606A329
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=u21D0kvR
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=NV2zPwOw
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 16FC91682;
-	Thu, 29 Oct 2026 10:52:52 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D5B6D169E;
+	Thu, 29 Oct 2026 10:52:54 -0700 (PDT)
 Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C16FC3F59E;
-	Thu, 29 Oct 2026 10:52:52 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6E2693F59E;
+	Thu, 29 Oct 2026 10:52:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793296375; bh=MNFLu7TIDuMgXYx4iE9e2hGmnIPJuc4afAnBP3Vqi/M=;
-	h=From:To:Cc:Subject:Date:From;
-	b=u21D0kvR1fNWXpIClKGGaqeqXHxTgbsSymQisb5BH1b78NUzlwCulVk/KTLyPs7mB
-	 ba9oY4769umLVIEO5efHcazaKglIuThMRc7TrB1zRZwb5iJCtdbCP/Xwpf9MAdZCpQ
-	 SDWHyjkgka9xfE3Dk5ufmflxBIKikBCi0t/L3euU=
+	t=1793296377; bh=xrY9NPZLAByOeK2cryjztDk7I9iH/vElRi5/N8juw04=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=NV2zPwOwPWucx2y+IgN5JcV+z1JRay0Ov2VIsmtxTY03FiQHkZQqvAxIyIcL8iW6l
+	 +RujiVAVn1IE7J1lE2FTIrozzsEEdzbVcPnQ3bcqiR1b9hiO6+Bo5XivlYaAJ9GqVN
+	 8LiXkpR+86e+iXVe0B0BawRRkJlG1vBaLzR5psiI=
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
@@ -57,11 +58,14 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Gavin Shan <gshan@redhat.com>,
 	Leonardo Bras <leo.bras@arm.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH v2 0/2] KVM: arm64: Dirty logging fixes/cleanups
-Date: Thu, 29 Oct 2026 17:52:36 +0000
-Message-ID: <20261029175238.3214788-1-weilin.chang@arm.com>
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2 1/2] KVM: arm64: Fix dirty logging detection in ring-only mode
+Date: Thu, 29 Oct 2026 17:52:37 +0000
+Message-ID: <20261029175238.3214788-2-weilin.chang@arm.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20261029175238.3214788-1-weilin.chang@arm.com>
+References: <20261029175238.3214788-1-weilin.chang@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -73,33 +77,40 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+When checking whether a memslot has dirty logging enabled, the
+KVM_MEM_LOG_DIRTY_PAGES flag is the source of truth. Previously in
+memslot_is_logging() we were testing the dirty bitmap only and did not
+consider dirty ring.
 
-These are two fixes/cleanups I found when reading the code. It fixes
-dirty logging detection in ring-only mode and updates a stale comment.
-Please view the patches for more detail.
+With the ring and no bitmap, a logged memslot can still get block
+mappings, so guest writes to most of a block are never logged and a
+migration can copy stale memory.
 
-* Changes from v1 ([1]):
+Fix this by using kvm_slot_dirty_track_enabled() instead which checks
+KVM_MEM_LOG_DIRTY_PAGES, within memslot_is_logging().
 
-  - Keep memslot_is_logging() and use kvm_slot_dirty_track_enabled() in
-    it. This preserves the RO memslot check.
+Fixes: 9cb1096f8590 ("KVM: arm64: Enable ring-based dirty memory tracking")
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: stable@vger.kernel.org
+---
+ arch/arm64/kvm/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  - Change patch 2 to updating the stale comment only, the original
-    change is obsolete now.
-
-  - Collect Reviewed-by and Tested-by tags from Fuad (thanks!).
-
-Thanks!
-
-[1]: https://lore.kernel.org/kvmarm/20260605153248.2412064-1-weilin.chang@arm.com/
-
-Wei-Lin Chang (2):
-  KVM: arm64: Fix dirty logging detection in ring-only mode
-  KVM: arm64: Remove stale remark on canonical IPA alignment
-
- arch/arm64/kvm/mmu.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
-
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 705f6d84770e..c7df646af79f 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -176,7 +176,7 @@ static int kvm_mmu_split_huge_pages(struct kvm *kvm, phys_addr_t addr,
+ 
+ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
+ {
+-	return memslot->dirty_bitmap && !(memslot->flags & KVM_MEM_READONLY);
++	return kvm_slot_dirty_track_enabled(memslot) && !(memslot->flags & KVM_MEM_READONLY);
+ }
+ 
+ static int pkvm_flush_remote_tlbs(struct kvm *kvm)
 -- 
 2.43.0
 
