@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793311483;
-	b=THgJ2Xh5HEsCOB4B5GK4qx3Zw+jba4CPCu2WLP3xkpBayB6yrWdSCBrcaPBSSUxNn4KG
-	 k6QvV+wom8L4AlC080TCt8ZuT/sKiW8OC7L6J/2gMoWsMnP46yJej0c3SFEIWRgUZlHKB
-	 DdMPFbq5Grr/6U2wUdDFdt9fSiBEWcfOdhiuf96nOsPD+ZWoE13wwSuhz4/ydw9e4qY0J
-	 Wgq2DnxwGCbqRehhRfavg/qwJbTE4Ki/zb4FduSH/ueY6Y6pSzon7uoqSZvCcdz293COa
-	 9CwCimyOoxrR6R/hqoze1PbnAnxqde7yeox9JeitxMp8NT80VurRRNnZkXAnzmk81HQ==
+	t=1793311517;
+	b=rdvg+vxT0MIqIBUeFQ6zvchSU1jTnMRS+Miw+nfRXUR2rkth3mrYkEeJPEpGBD9U1B/z
+	 XHEXmXH+ZZuutRdfYMSVizBgEmQl/0vpm3zkuxV3QHlXN+eNue0KhdZeAdGmvy10f+tFK
+	 XfJvyrHYDl817VOEIymCCpDmMSlqEyMhNQnjEx8wsaNfS/Dbl+S79X088aGG6J98tTaG6
+	 37Q6p7z6TAGyAbD4rAYzzyhVF3UShNf/Eyr3IvBEC5dQTbDvOnZgoSm1QccDzWPuXIbui
+	 tK29754QD+o+YVS6QI334Ot6KEIVfB7qzU1O+sL8tAtV61V4KsqVIU3jPAIchsJCIxg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793311483;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793311517;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=qYbQzwwz9h4FO+VW0r/egh1lxyBMUI0Ck4LAOJSy2I0=;
-	b=l6lbDD1jR2JtWx2ip8WP+loi99COj9oUaFv4autl7L3UC3iSSdWfGJLDfWOiJpwhnAUQ
-	 FIVqGCE2TqUoOWgQDUzviUl3+iNnl58+LYr2H20hhCO/ajo5pr9Y/QIjTCLlY9Ek3S3Zu
-	 R8jh8wcyClHm9imVvwbd2jatT7EgxZqKwG0spX1ZnIXCcZ3KB1Tpvnbe1kt8/Vn1ey99j
-	 YgXeG/95uv1Jd5Nhkh2tHl52U3WUwCvHMoquNc2kzgAYRsjbojDuJUgvW4dnFUgoIYVqL
-	 qXzF+cMI/E2Ck7v8thdPp+M1WV7r03unfEalaelWuljpDLn7ScYWeTR75GuqZdR8A4w==
+	bh=BOIOVIeuoZTPYLCw9qgl59aa+oUmsxHGBfBI4tPDjNk=;
+	b=J3dYdFVa43jx8gdzvabDdFWJdriDQoY0HxG3btUUg+KDelMu9JZDK6ZR3o8E9BeLii6G
+	 RQUxaQQKjGFBXQ74YeRHJWc6SEsgeGgCWkoahsUXVM2QdmHewzIS9CtbfrFuqDUTWHb9c
+	 UMNdmHKn5c3BD4MtYyH6l9o1BBNFwAWCJbR9G7bABNqAWqpZWb2yaqrAlPuIRuWJWLMd8
+	 AXr6ogdwaC7FWIQOlPvwOchztdRqdCFBGFJnLsRfC+jalvUXfRlzX3OSgGNFOaOfx3RO9
+	 A9U6Z2zDcUbMSpcNW3p7IkMdgTJeRWfhn5iEdMyd6nPWGTXNeqrX0nnw0DeQCOL/5Hw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=upv+BRLR;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Q1HLeuNJ;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B101E606A31C
-	for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 22:04:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B101E606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76975606A31A
+	for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 22:05:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 76975606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=upv+BRLR
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Q1HLeuNJ
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CD07815A1;
-	Thu, 29 Oct 2026 15:04:38 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BDA4815A1;
+	Thu, 29 Oct 2026 15:05:12 -0700 (PDT)
 Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DE4453F673;
-	Thu, 29 Oct 2026 15:04:39 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CE5AD3F673;
+	Thu, 29 Oct 2026 15:05:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793311481; bh=cF8ZXU+yg8O7anxbXOyalOzsUNIxFJB1v9XBEV+iq38=;
+	t=1793311515; bh=Ijs585yEk7skk5Tt9uzpTzRD8zZrNST3f/danWDydDE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=upv+BRLRwQd8M2cIlnBmc1JNLj9LEYmnebc9S1iNqq1j4x5hI/D9+E1myTzbd/rym
-	 1p/DchbDZg2h79bXS7E+j03dg7Lpn9wXbnSDrELDsekIhhybEFQAAIGGco0MdD6FYB
-	 hPBp7C8PNo1dzEk0Ho99RvctNqSedz751cjm88fU=
-Date: Thu, 29 Oct 2026 22:04:37 +0000
+	b=Q1HLeuNJ6kUbLgKJbyCy8NiFp2jr5MnpfDLave9KjaLtv7f17AEgdwnAF7e5lb6Ro
+	 tVVtAHTLlFvSsEdFncJ6eGP961Hg7yMz4IR1dHygDt/zYxGNOmAmFdq9mHa/82Rt1J
+	 eh9vd1QlT9ochELhnF9vdn4cxoch5nBM4dVrR9B0=
+Date: Thu, 29 Oct 2026 22:05:11 +0000
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Fuad Tabba <fuad.tabba@linux.dev>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
@@ -57,11 +57,10 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
 	David Hildenbrand <david@kernel.org>,
 	Lorenzo Stoakes <ljs@kernel.org>, Fuad Tabba <tabba@google.com>,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/4] KVM: arm64: Sanitise MTE tags when a permission
- fault installs a mapping
-Message-ID: <auPC9aOxXE1mIJn7@arm.com>
+Subject: Re: [PATCH v2 4/4] arm64: mte: Add mte_clear_folio_tags()
+Message-ID: <auPDF0KIpU_WjK_k@arm.com>
 References: <20261021110700.493315-1-fuad.tabba@linux.dev>
- <20261021110700.493315-4-fuad.tabba@linux.dev>
+ <20261021110700.493315-5-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -73,27 +72,18 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261021110700.493315-4-fuad.tabba@linux.dev>
+In-Reply-To: <20261021110700.493315-5-fuad.tabba@linux.dev>
 
-On Wed, Oct 21, 2026 at 12:06:59PM +0100, Fuad Tabba wrote:
-> The stage-2 fault path sanitises MTE tags only on translation faults, as
-> a permission fault normally just relaxes an existing leaf. However, when
-> the page is backed by a THP, a permission fault at page granule installs
-> a block whose other pages may never have been mapped or sanitised. Once
-> dirty logging is off, a guest write to a page mapped read-only during
-> logging installs the block, and the guest can read the tags those pages'
-> previous owners left.
+On Wed, Oct 21, 2026 at 12:07:00PM +0100, Fuad Tabba wrote:
+> mte_sync_tags(), sanitise_mte_tags() and kvm_vm_ioctl_mte_copy_tags()
+> each open-code the loop that clears the tags of every page in a hugetlb
+> folio. Add mte_clear_folio_tags() and use it in all three.
+> kvm_vm_ioctl_mte_copy_tags() then tests for hugetlb first, as it does
+> where it sets the tagged flag below.
 > 
-> Sanitise whenever the fault path calls kvm_pgtable_stage2_map() rather
-> than relaxing permissions. If the VMM replaces the VMA after the guest
-> takes a permission fault but before vma_lookup(), that path would map
-> and sanitise memory from the new VMA without checking it. Run the
-> VM_MTE_ALLOWED check in kvm_s2_fault_compute_prot() on permission
-> faults too.
+> No functional change intended.
 > 
-> Fixes: ea7fc1bb1cd1b ("KVM: arm64: Introduce MTE VM feature")
-> Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> Cc: stable@vger.kernel.org
+> Suggested-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 > Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 
 Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
