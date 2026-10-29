@@ -1,71 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.221
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793277531;
-	b=wmVdxf1jnTf4jhBLrCSC64sgm98NEhLfn1Q99jLS64AQmVhI3zULGoF6zZmGaAS9hzfl
-	 AgTRlgHMHY+KampmdSs4L5x0kHud6NYHEIT6h6jnhJBEhP5Jao8VLm2lcOdDYX9eBV1xO
-	 g860t1khxxP0SoTCIvdyvGsU80JrWj9lkUtNYPgIXDztvRVYRRPlZRjaHieoSQ1kREQzl
-	 ie0PX2P5MBT7hSZAKjOmZFhSC/JaRwlFAIMbL9M+rRVBPHINeIyMDhzPLAJ7rsWAtsaMP
-	 pJxnGWXZx197tKKlOLGmvJd480dOc+Rg0mI/xiMEHtMrWQbnggeDZGpsfWZ0VFNG2nw==
+	t=1793282543;
+	b=OtSOSIiEMjICaOiv6bI/Q33zIt9XCkEf83+KbEQPIX2YZnr+W6cKUZ4UD6Q5ioMX6yZt
+	 iCErY7mXieoJ6IbMGI9umO3hFITPSlCAIBTpn7K4OoekWOFwuZricOFdkzKXzMPUeQbjV
+	 gQTwZf+sQ5QFRza+6uSTSDBbGoaIYaGbXO/Ux4Vve7GoA2muTsbLj8173yHJ+tq6A2SJw
+	 o+TZyZpfOwgUk8TpFEFEHdFtjswO0Y5DQxpK2uH470/pQpunqZ4mmAWnETaMdp0DfgBBn
+	 aCZRgDqRjyXvS8L05mnIbCml/3plOEFqV0SQbyAt/MsQ4VJQCQobri4IktUQfpFJtRQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793277531;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=eQmQECDJWHvO2kywZft/qBs1hdVqb5TuQeF4KeKH0xE=;
-	b=0X3nVX+0uTTnN1iGUTlZjWcwcTlTsDmmBRvx3Iq0CBmR634mJoNkzZ6gVxpbKWIC1vkD
-	 wxnAd5Sy1O1VR9vFcFx3ZSghmC6QVkDOptvrkw8fdC8B4Dkfr6NKrm9yjduecba4IJ/2R
-	 WSippmcEVNlmm/P8LLhUBqautpgd+tXYiJ4y3mavuLfpJeoHM1m6gLsjLpkdeaP92wDGU
-	 /fs3Zbs5dwGo4LWZIW8HuHi//yHFA6VLTbjpMxEbf0fUmZ+mrFIL3cdZ3UWYtLJ1qX+hj
-	 71BDTFcXqM+V3uCkp2ykRL/o/W3aIIZiakLp//UIB6ui7IpE4ESsmwmlp9+XwSObUiQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793282543;
+	h=DMARC-Filter:dkim-signature:Received:Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type:Content-Transfer-Encoding:X-Originating-IP:
+	 X-ClientProxiedBy;
+	bh=46BTS2L17vKUMaAXzO89PlCn4e9X2ecYyyZ5hRRDLBc=;
+	b=Ek1kML0o+EO8jp2Or9/xAbZJVvG95dSiUm6yOhwX3xz4CE0iIUJLVbffpW/v61KEzXGJ
+	 Lv8AC6Z4/WF5ucYxGalFfakBBecz8XC4QnWGLq38yl0CK55T/S0JXBdqMI1iZPYef66Du
+	 fEI8+y0Fxtk4shP2v6Y+G6vRnPvIH48rhUNz4l2FeCtqbSwzOkwpizmVrvtr8P3K11iy8
+	 USaqEXXPABVUVXV/PozDVZIfy9UNUoQh3aAcElP2Q6EVTdxr/1+a1f6I2KIRlRU5a+fIC
+	 g9q59JoDQ1lW7ZQcCnnR0AteugS7aQPltO0psRjy1yCS0fxKBMUHKMG8dKDAcRizc5g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="PIZ/WQPn";
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0C7606A31C
-	for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 12:38:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1D0C7606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=huawei.com;
+	spf=pass smtp.mailfrom=huawei.com;
+	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=Xxcr1uEv;
+	arc=none smtp.remote-ip=113.46.200.221
+Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45BE606A332
+	for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 14:02:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C45BE606A332
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=PIZ/WQPn
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0E11F1682;
-	Thu, 29 Oct 2026 05:38:41 -0700 (PDT)
-Received: from e143914.arm.com (e143914.arm.com [10.2.213.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2BD4B3F673;
-	Thu, 29 Oct 2026 05:38:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793277524; bh=5Ohowt5GpvCq73G4D7RyNV1azF5WSg2W9v5c047K+uY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PIZ/WQPnaAiPAJ8YMlVfqT/5txKEid+kjPXMwOoYS4LtAwnRhNd0RyPa4rDoYP5ze
-	 zWce3D5nc5Q35Az1u3s99o+0jug2TIiohTxnNsCtomHQNw34o8QyD0GY74dS5Yb4t0
-	 +nn6V8FvTIp9vq9JWpYrrfNH0jj32LEW04QwbqrE=
-Date: Thu, 29 Oct 2026 12:38:38 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	James Clark <james.clark@linaro.org>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Thomas Huth <thuth@redhat.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v2 4/4] KVM: arm64: Convert TCR_EL2 to config-driven
- sanitisation
-Message-ID: <auM-TnZ0i_1G01ad@e143914.arm.com>
-References: <20260917214215.74135-1-weilin.chang@arm.com>
- <20260917214215.74135-5-weilin.chang@arm.com>
+	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=Xxcr1uEv
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=46BTS2L17vKUMaAXzO89PlCn4e9X2ecYyyZ5hRRDLBc=;
+	b=Xxcr1uEvjyUncblEyLuJ13eru1beYW/GY5GFrPE5ZiK43B4KlA7E+sfVr4qhA3hrvIBxIwDSM
+	8bbmRWDAsZAUJOf4aPz+Fkbsf8dlBiYZwCbJ4LCU36/fQiGVBZ8WrYc5WWyoqZLYFc7PE1SX2xp
+	egChEha82ieFCMIiUlrLwNo=
+Received: from mail.maildlp.com (unknown [172.19.163.0])
+	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4jFmBT2KpwzRhQX;
+	Thu, 29 Oct 2026 22:02:09 +0800 (CST)
+Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
+	by mail.maildlp.com (Postfix) with ESMTPS id 162B340561;
+	Thu, 29 Oct 2026 22:02:12 +0800 (CST)
+Received: from [10.67.120.103] (10.67.120.103) by
+ kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.45; Thu, 29 Oct 2026 22:02:10 +0800
+Message-ID: <009b13c6-f618-43fe-8a56-8519d31b239b@huawei.com>
+Date: Thu, 29 Oct 2026 22:02:10 +0800
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -75,241 +62,143 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260917214215.74135-5-weilin.chang@arm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 05/15] KVM: arm64: Harvest stage-2 dirty state into the
+ host folio account
+To: Leonardo Bras <leo.bras@arm.com>
+CC: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
+	<will@kernel.org>, <corbet@lwn.net>, <pbonzini@redhat.com>,
+	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <yangjinqian1@huawei.com>,
+	<caijian11@h-partners.com>, <liuyonglong@huawei.com>,
+	<tangchengchang@huawei.com>, <yezhenyu2@huawei.com>, <yubihong@huawei.com>,
+	<linuxarm@huawei.com>, <joey.gouly@arm.com>, <kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <seiden@linux.ibm.com>,
+	<suzuki.poulose@arm.com>, <fuad.tabba@linux.dev>, <mark.rutland@arm.com>,
+	<seanjc@google.com>, <rdunlap@infradead.org>, <linux-doc@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <skhan@linuxfoundation.org>
+References: <20260929103655.85107-1-zhengtian10@huawei.com>
+ <20260929103655.85107-6-zhengtian10@huawei.com> <at-WceRKAVM2kEnI@LeoBrasDK>
+From: Tian Zheng <zhengtian10@huawei.com>
+In-Reply-To: <at-WceRKAVM2kEnI@LeoBrasDK>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemr100010.china.huawei.com (7.202.195.125)
 
-On Thu, Sep 17, 2026 at 10:42:14PM +0100, Wei-Lin Chang wrote:
-> Feature dependencies of the fields in TCR_EL2 are extracted from
-> Registers.json of the BSD licenced AARCHMRS
-> (AARCHMRS_OPENSOURCE_A_profile_FAT-2026-06).
-> 
-> Places where we slightly deviate from the above:
-> 
->  - Stick to the ARM ARM M.c requirement for TCR_EL2.TCMA*, which only
->    depends on FEAT_MTE2. This avoids updating ID_AA64PFR2_EL1 with new
->    VMTE* definitions that we don't know the meaning of, as they aren't
->    present in the ARM ARM yet.
-> 
->  - Ignore TCR_EL2.DS's requirement of needing the effective value of
->    TCR2_EL2.D128 be 0. This requires runtime detection of TCR2_EL2.D128
->    and we don't have D128 support yet.
-> 
->  - TCR_EL2.AS is dependent on FEAT_ASID16, this information is missing
->    from the json.
 
-In the 2026-9 release, FEAT_ASID16 is now there for TCR_EL2.AS.
-Otherwise I think this matches the newer release.
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+On 10/27/2026 2:05 AM, Leonardo Bras wrote:
+> Hi Tian,
+> Sorry for the delay in reviewing...
+> 
+> On Tue, Sep 29, 2026 at 06:36:45PM +0800, Tian Zheng wrote:
+>> With VTCR_EL2.HD set, hardware promotes writable-clean descriptors to
+>> writable-dirty without any VM exit, and the only record of the write
+>> is the S2AP[1] bit in the stage-2 PTE. The write never passed through
+>> the host stage-1, and no unmap path reads the bit, so the record dies
+>> with the PTE and reclaim may discard written guest data (silent
+>> corruption).
+> 
+> Sorry, I didn't get what you are trying to achieve here.
+> 
+> On your patch, I see you marking backing pages dirty at wrprotect and unmap
+> walkers, and it's very confusing to me on why you are doing this.
+> 
+> IIUC, what you are trying to do is make sure a page does not lose it's
+> contents in case it is reclaimed by the OS.
+> 
+> IIUC, when a page is reclaimed, it will unmap the S2 PTE, and save it's
+> contents to swap, so when the guest read or write to that page will cause
+> it to fault.
+> 
+> The page can never be just unmaped, as if there was a single write to it,
+> the backing pages should be writable, and the contents need to be saved
+> somewhere.
+> 
+> So, if I was able to understand your suggestion, we don't need to worry
+> about this, and this patch wouldn't be necessary.
+> 
+> Did you hit this issue?
+> Can you please expand on your issue, if I could not describe it above?
+> 
+> Thanks!
+> Leo
+
+Hi Leo,
+
+Thanks for the review. I haven't hit this in practice, and based on your
+analysis the patch doesn't look necessary.
+
+Reclaim only writes back folios whose PG_dirty flag is set; a clean
+folio is simply freed. A stage-2 write never touches the host
+stage-1, so the folio depends entirely on kvm_release_faultin_page()
+at fault-in to be marked as dirty; without it, the page stays clean from
+the host's perspective and reclaim drops the data.
+
+Your **RFC v1** patch 2 changed that marking from writable to dirty:
+
+```
+- kvm_release_faultin_page(kvm, s2vi->page, !!ret, writable);
++ kvm_release_faultin_page(kvm, s2vi->page, !!ret, dirty);
+```
+
+During logging, a read fault maps the page as WC: the folio is not
+marked PG_dirty in kvm_s2_fault_map() and hardware promotes the PTE to
+WD on write without any fault, so reclaim frees the page without saving
+it (the folio was treated as clean).
+
+Therefore, **HDBSS v5** patch 2 reverted to marking the folio for any
+write-permitting mapping:
+
+```
+kvm_release_faultin_page(kvm, s2vi->page, !!ret, writable);
+```
+
+Together with the v5 scheme, this makes patch 5 unnecessary:
+
+- kvm_s2_fault_compute_prot: always set PROT_W when map_writable
+- stage2_set_prot_attr: PROT_W -> DBM unconditionally
+
+
+---------
+
+On a related note, I'd like to discuss the next version of the DBM
+scheme, following Oliver's suggestion [1].
+
+Oliver asked for the write bit to be selected by the system capability:
+
+	FEAT_HAFDBS: PROT_W => DBM, PROT_DIRTY => S2AP[1]
+	!FEAT_HAFDBS: both => S2AP[1]
+
+However, our v5 kvm_s2_fault_compute_prot() granted PROT_W
+unconditionally. With PROT_W => S2AP[1] on !FEAT_HAFDBS, a read fault on
+a dirty-tracked memslot would install a writable page. Since dirty-
+logging relies on the write fault to observe the page, we would fail to
+track it.
+
+So we also need to fix kvm_s2_fault_compute_prot():
+
+```
+if (s2vi->map_writable) {
+         if (s2vi->device ||
+             !memslot_is_logging(s2fd->memslot) ||
+             kvm_is_write_fault(s2fd->vcpu)) {
+                 *prot |= KVM_PGTABLE_PROT_W |
+                          KVM_PGTABLE_PROT_DIRTY;
+         } else if (kvm_supports_hafdbs()) {
+                 *prot |= KVM_PGTABLE_PROT_W;
+         }
+}
+```
+
+For normal RAM on a system without FEAT_HAFDBS:
+
+	logging + read fault  -> PTE read-only
+	logging + write fault -> PTE S2AP[1]=1
+
+[1] 
+https://lore.kernel.org/all/ff218960-c412-4283-aa41-b7af2a7048b8@huawei.com/
 
 Thanks,
-Joey
-
-> 
-> Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |   2 +-
->  arch/arm64/kvm/config.c           | 113 ++++++++++++++++++++++++++++++
->  arch/arm64/kvm/nested.c           |   4 ++
->  3 files changed, 118 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 27fe0cd5b2d7..6a5e22ca3430 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -516,7 +516,6 @@ enum vcpu_sysreg {
->  	HACR_EL2,	/* Hypervisor Auxiliary Control Register */
->  	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
->  	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
-> -	TCR_EL2,	/* Translation Control Register (EL2) */
->  	PIRE0_EL2,	/* Permission Indirection Register 0 (EL2) */
->  	PIR_EL2,	/* Permission Indirection Register 1 (EL2) */
->  	POR_EL2,	/* Permission Overlay Register 2 (EL2) */
-> @@ -541,6 +540,7 @@ enum vcpu_sysreg {
->  	/* Anything from this can be RES0/RES1 sanitised */
->  	MARKER(__SANITISED_REG_START__),
->  	SCTLR_EL2,	/* System Control Register (EL2) */
-> +	TCR_EL2,	/* Translation Control Register (EL2) */
->  	TCR2_EL2,	/* Extended Translation Control Register (EL2) */
->  	SCTLR2_EL2,	/* System Control Register 2 (EL2) */
->  	MDCR_EL2,	/* Monitor Debug Configuration Register (EL2) */
-> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> index 1053676551af..080b3510b783 100644
-> --- a/arch/arm64/kvm/config.c
-> +++ b/arch/arm64/kvm/config.c
-> @@ -203,8 +203,11 @@ struct reg_feat_map_desc {
->  #define FEAT_CPA2		ID_AA64ISAR3_EL1, CPA, CPA2
->  #define FEAT_ASID2		ID_AA64MMFR4_EL1, ASID2, IMP
->  #define FEAT_MEC		ID_AA64MMFR3_EL1, MEC, IMP
-> +#define FEAT_HAF		ID_AA64MMFR1_EL1, HAFDBS, AF
->  #define FEAT_HAFT		ID_AA64MMFR1_EL1, HAFDBS, HAFT
-> +#define FEAT_HAFDBS		ID_AA64MMFR1_EL1, HAFDBS, DBM
->  #define FEAT_HDBSS		ID_AA64MMFR1_EL1, HAFDBS, HDBSS
-> +#define FEAT_HPDS		ID_AA64MMFR1_EL1, HPDS, IMP
->  #define FEAT_HPDS2		ID_AA64MMFR1_EL1, HPDS, HPDS2
->  #define FEAT_BTI		ID_AA64PFR1_EL1, BT, IMP
->  #define FEAT_ExS		ID_AA64MMFR0_EL1, EXS, IMP
-> @@ -215,6 +218,10 @@ struct reg_feat_map_desc {
->  #define FEAT_MixedEndEL0	ID_AA64MMFR0_EL1, BIGENDEL0, IMP
->  #define FEAT_MTE_ASYNC		ID_AA64PFR1_EL1, MTE_frac, ASYNC
->  #define FEAT_MTE_STORE_ONLY	ID_AA64PFR2_EL1, MTESTOREONLY, IMP
-> +#define FEAT_MTE_CANONICAL_TAGS	ID_AA64PFR1_EL1, MTEX, MTE4
-> +#define FEAT_MTE_NO_ADDRESS_TAGS	ID_AA64PFR1_EL1, MTEX, MTE4
-> +#define FEAT_E0PD		ID_AA64MMFR2_EL1, E0PD, IMP
-> +#define FEAT_SVE		ID_AA64PFR0_EL1, SVE, IMP
->  #define FEAT_PAN		ID_AA64MMFR1_EL1, PAN, IMP
->  #define FEAT_PAN3		ID_AA64MMFR1_EL1, PAN, PAN3
->  #define FEAT_SSBS		ID_AA64PFR1_EL1, SSBS, IMP
-> @@ -227,6 +234,19 @@ struct reg_feat_map_desc {
->  #define FEAT_GCIE		ID_AA64PFR2_EL1, GCIE, IMP
->  #define FEAT_NV3		ID_AA64MMFR4_EL1, NV_frac, NV3
->  
-> +static bool feat_asid16(struct kvm *kvm)
-> +{
-> +	return kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, ASIDBITS, 16);
-> +}
-> +
-> +static bool feat_mte_no_addr_tags_or_canonical_tags(struct kvm *kvm)
-> +{
-> +	bool no_addr_tags = kvm_has_feat(kvm, FEAT_MTE_NO_ADDRESS_TAGS);
-> +	bool canonical_tags = kvm_has_feat(kvm, FEAT_MTE_CANONICAL_TAGS);
-> +
-> +	return no_addr_tags || canonical_tags;
-> +}
-> +
->  static bool not_feat_aa64el3(struct kvm *kvm)
->  {
->  	return !kvm_has_feat(kvm, FEAT_AA64EL3);
-> @@ -1044,6 +1064,91 @@ static const struct reg_bits_to_feat_map sctlr2_feat_map[] = {
->  static const DECLARE_FEAT_MAP(sctlr2_desc, SCTLR2_EL1,
->  			      sctlr2_feat_map, FEAT_SCTLR2);
->  
-> +static const struct reg_bits_to_feat_map vhe_tcr_el2_feat_map[] = {
-> +	NEEDS_FEAT(VHE_TCR_EL2_MTX1	|
-> +		   VHE_TCR_EL2_MTX0,
-> +		   feat_mte_no_addr_tags_or_canonical_tags),
-> +	NEEDS_FEAT(VHE_TCR_EL2_DS, feat_lpa2),
-> +	NEEDS_FEAT(VHE_TCR_EL2_TCMA1	|
-> +		   VHE_TCR_EL2_TCMA0,
-> +		   FEAT_MTE2),
-> +	NEEDS_FEAT(VHE_TCR_EL2_E0PD1	|
-> +		   VHE_TCR_EL2_E0PD0,
-> +		   FEAT_E0PD),
-> +	NEEDS_FEAT(VHE_TCR_EL2_NFD1	|
-> +		   VHE_TCR_EL2_NFD0,
-> +		   FEAT_SVE),
-> +	NEEDS_FEAT(VHE_TCR_EL2_TBID1	|
-> +		   VHE_TCR_EL2_TBID0,
-> +		   feat_pauth),
-> +	NEEDS_FEAT(VHE_TCR_EL2_HWU162	|
-> +		   VHE_TCR_EL2_HWU161	|
-> +		   VHE_TCR_EL2_HWU160	|
-> +		   VHE_TCR_EL2_HWU159	|
-> +		   VHE_TCR_EL2_HWU062	|
-> +		   VHE_TCR_EL2_HWU061	|
-> +		   VHE_TCR_EL2_HWU060	|
-> +		   VHE_TCR_EL2_HWU059,
-> +		   FEAT_HPDS2),
-> +	NEEDS_FEAT(VHE_TCR_EL2_HPD1	|
-> +		   VHE_TCR_EL2_HPD0,
-> +		   FEAT_HPDS),
-> +	NEEDS_FEAT(VHE_TCR_EL2_HD, FEAT_HAFDBS),
-> +	NEEDS_FEAT(VHE_TCR_EL2_HA, FEAT_HAF),
-> +	NEEDS_FEAT(VHE_TCR_EL2_AS, feat_asid16),
-> +	NEEDS_FEAT(VHE_TCR_EL2_TBI1		|
-> +		   VHE_TCR_EL2_TBI0		|
-> +		   VHE_TCR_EL2_IPS		|
-> +		   VHE_TCR_EL2_TG1		|
-> +		   VHE_TCR_EL2_SH1		|
-> +		   VHE_TCR_EL2_ORGN1		|
-> +		   VHE_TCR_EL2_IRGN1		|
-> +		   VHE_TCR_EL2_EPD1		|
-> +		   VHE_TCR_EL2_A1		|
-> +		   VHE_TCR_EL2_T1SZ		|
-> +		   VHE_TCR_EL2_TG0		|
-> +		   VHE_TCR_EL2_SH0		|
-> +		   VHE_TCR_EL2_ORGN0		|
-> +		   VHE_TCR_EL2_IRGN0		|
-> +		   VHE_TCR_EL2_EPD0		|
-> +		   VHE_TCR_EL2_T0SZ,
-> +		   FEAT_AA64EL2),
-> +	FORCE_RES0(VHE_TCR_EL2_RES0),
-> +	FORCE_RES1(VHE_TCR_EL2_RES1),
-> +};
-> +
-> +static const DECLARE_FEAT_MAP(vhe_tcr_el2_desc, VHE_TCR_EL2,
-> +			      vhe_tcr_el2_feat_map, FEAT_AA64EL2);
-> +
-> +static const struct reg_bits_to_feat_map tcr_el2_feat_map[] = {
-> +	NEEDS_FEAT(TCR_EL2_MTX,
-> +		   feat_mte_no_addr_tags_or_canonical_tags),
-> +	NEEDS_FEAT(TCR_EL2_DS, feat_lpa2),
-> +	NEEDS_FEAT(TCR_EL2_TCMA, FEAT_MTE2),
-> +	NEEDS_FEAT(TCR_EL2_TBID, feat_pauth),
-> +	NEEDS_FEAT(TCR_EL2_HWU62	|
-> +		   TCR_EL2_HWU61	|
-> +		   TCR_EL2_HWU60	|
-> +		   TCR_EL2_HWU59,
-> +		   FEAT_HPDS2),
-> +	NEEDS_FEAT(TCR_EL2_HPD, FEAT_HPDS),
-> +	NEEDS_FEAT(TCR_EL2_HD, FEAT_HAFDBS),
-> +	NEEDS_FEAT(TCR_EL2_HA, FEAT_HAF),
-> +	NEEDS_FEAT(TCR_EL2_TBI		|
-> +		   TCR_EL2_PS		|
-> +		   TCR_EL2_TG0		|
-> +		   TCR_EL2_SH0		|
-> +		   TCR_EL2_ORGN0	|
-> +		   TCR_EL2_IRGN0	|
-> +		   TCR_EL2_T0SZ,
-> +		   FEAT_AA64EL2),
-> +	FORCE_RES0(TCR_EL2_RES0),
-> +	FORCE_RES1(TCR_EL2_RES1),
-> +};
-> +
-> +static const DECLARE_FEAT_MAP(tcr_el2_desc, TCR_EL2,
-> +			      tcr_el2_feat_map, FEAT_AA64EL2);
-> +
->  static const struct reg_bits_to_feat_map tcr2_el2_feat_map[] = {
->  	NEEDS_FEAT_FLAG(TCR2_EL2_FNG1	|
->  			TCR2_EL2_FNG0	|
-> @@ -1398,6 +1503,8 @@ void __init check_feature_map(void)
->  	check_reg_desc(&hcr_desc);
->  	check_reg_desc(&nvhcr_desc);
->  	check_reg_desc(&sctlr2_desc);
-> +	check_reg_desc(&vhe_tcr_el2_desc);
-> +	check_reg_desc(&tcr_el2_desc);
->  	check_reg_desc(&tcr2_el2_desc);
->  	check_reg_desc(&sctlr_el1_desc);
->  	check_reg_desc(&sctlr_el2_desc);
-> @@ -1611,6 +1718,12 @@ struct resx get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg)
->  	case SCTLR2_EL2:
->  		resx = compute_reg_resx_bits(kvm, &sctlr2_desc, 0, 0);
->  		break;
-> +	case TCR_EL2:
-> +		if (kvm_has_feat(kvm, FEAT_E2H0))
-> +			resx = compute_reg_resx_bits(kvm, &tcr_el2_desc, 0, 0);
-> +		else
-> +			resx = compute_reg_resx_bits(kvm, &vhe_tcr_el2_desc, 0, 0);
-> +		break;
->  	case TCR2_EL2:
->  		resx = compute_reg_resx_bits(kvm, &tcr2_el2_desc, 0, 0);
->  		break;
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 4a860904c1ce..2536ea4297b0 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1957,6 +1957,10 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
->  	resx = get_reg_fixed_bits(kvm, HFGITR2_EL2);
->  	set_sysreg_masks(kvm, HFGITR2_EL2, resx);
->  
-> +	/* TCR_EL2 */
-> +	resx = get_reg_fixed_bits(kvm, TCR_EL2);
-> +	set_sysreg_masks(kvm, TCR_EL2, resx);
-> +
->  	/* TCR2_EL2 */
->  	resx = get_reg_fixed_bits(kvm, TCR2_EL2);
->  	set_sysreg_masks(kvm, TCR2_EL2, resx);
-> -- 
-> 2.43.0
-> 
+Tian
