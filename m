@@ -1,57 +1,99 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793288584;
-	b=4Ih51DsuV6bEkXKqRR+UhdAgZKRx8tGe7kry70Tkz3yj/FZqjutrcnUYWuifskZOK4/g
-	 4lOyJs9Ow9kqQ9cPjbsvP0hmOBntBFyFTGh9myqu7ana80nGRkPaYNlCa7qFI8VV67dWC
-	 rUJsXq6Ys47kZRFE2UN1Bo8SVVw14WQBcihOR/urgc8SNbPVOQBeWAwmsd60Tm/ocneTZ
-	 lZeQNXFRcxX3sLHOOpY2+xy/ULDutIE3rADOsjMPFzv01q7XQ733ic2cm/+Of4p/wzYwQ
-	 gES6ncypwvxEEN6IjQipTzra3vbRuaWii+VjBhj5DGOgf8mK1TtFVv0QjnuF/FQDdhg==
+	t=1793290458;
+	b=R9AhtihwUIW+Lbl+gDV2kzyaS8uzsHVDjG4gb/Jjn/tCBIKUieDJZi6QYSeDAIqXwPhW
+	 QUUKgsZS5itNAHp2yh+5nUGBQzjgUIrn/xQjZ7abnrRcUN3yAPjhMAVR9ZRX19b2KyAsQ
+	 wRxkOf+Oq4O1RcdtjqMxjHg6X9pe7BeJK32G/ZxJfNxXMVuFjspxu9aRTLItDLkVfNqy4
+	 odoHmFK1qC8LwCtVn03761UjK3Hrc6Drc23ub74/OimfC3bgCSW23ZB5KyuEaTs9udQ1v
+	 FT1WzSMnVYqcs5AbKF7YmnewSmI6EUYmAykmo72hIxXVmMp+eiMt4MMnACehWxdtVCA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793288584;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=sCMf8bTlLJjVonCG39n3/nvXT5kk93Y5zWJCFDcw/+M=;
-	b=hQ1vC2pAXMZxlvpB5LVc3J6Po4lz3CCIytEpzwuZeVUrSivoPotg4F7WMq7jQnFeGgYc
-	 va17p73OPjoszfnj0YMK0msi8O35p8KZZm+r+QMnnK2WGo4956kWOhBUHC2NjZr7nQnPA
-	 DNBSk1InJPmd81ZM4IxbhUC9Q2qkWPKXMC7YjQmRWX3PgRs2vMIWsG4DQ47v26uzVV/TF
-	 Z0dZMGu4AtV4Rnof+IkoIfYNMtpGLRnEBtfTGovMc3X5QpwfedX45bh2h7Dm3alFQhN3y
-	 Qet531B7pJ1yLmzxiX6g5x5jLaKyQuoFEWyB/8zkvbyAat+QfRLqyWrHbW/R16ILrOQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793290458;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=PoVbrwCfEjEF6sp4WaMxqKx0B+uh55PhpThxxt4vZZ4=;
+	b=R5UUBQJo7QxK1eqn5xZteFvsLi2eTYGcg3oVe2/LlOKiBHVp+jSnHJg/4gYbJ40BKV2f
+	 UDU/VVN4Tgs8DXBYbleWcn05kS0AWgqLdKcOpMdeKFMtvfnn7lu2ta9Jq8Un/7QWubOYG
+	 Jzg6c0/suE3uH/6Yu2CkLmFhTLkajGlkAOC6X46TLhRmwqK2rEf7p1q+fvYMYgDFbfWvA
+	 mwxOEEGAHM7Dri4nGA+7wr8MWPBMkDRfSRoCR7etXUiFw5xFE3wS1dVUhpGVTRu3L5e1n
+	 ELVIIMiVQr+9aXVvLC06yISwP4YXKu3IKR0DqcYn/4M7+zrVbk6JQKo9O+1haotSq+Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dC3HqA+3;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=N2iJzd2X;
+	arc=none smtp.remote-ip=209.85.128.50
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80E2606A31A;
-	Thu, 29 Oct 2026 15:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50808606A31A
+	for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 16:14:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 50808606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dC3HqA+3
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0595B1F031E0;
-	Thu, 29 Oct 2026 15:42:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793288583;
-	bh=sCMf8bTlLJjVonCG39n3/nvXT5kk93Y5zWJCFDcw/+M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=dC3HqA+3dnHdbi2yhZJbhaggvZa889aJdyvvPnMRPPg/4eSYfRIZykHitQ9GMAbjh
-	 BOrdCf+Hfn8um3F0MFmUCUUOgFLScpVr+h2BK3afFAkc6Qk6PKFFSwD07r/rjK1OHU
-	 vN4mdJO04K4fK7xs0g33Ki7lMGAb5THFqN9pFXTTDcfOXYFcNlBgxI1FyyizIfeO6v
-	 EWL3A8hbiELEMZLutCnwMJtsHtxBi64kQagmoaUmxApkmp7Af7HvNppWFJcxzBLYSe
-	 ZjORrqtDaQvhZS3nHCG9gWIOfSym/ishmx4C/kFZCWKyryEKUl4QNxlqvzHY91vkbY
-	 t0o8Tb537NGQg==
-Date: Thu, 29 Oct 2026 15:42:57 +0000
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, 
-	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	will@kernel.org, mark.rutland@arm.com, linux-perf-users@vger.kernel.org, 
-	catalin.marinas@arm.com, james.clark@linaro.org
-Subject: Re: [RFC PATCH v7 16/28] KVM: arm64: Add SPE system registers to
- VCPU context
-Message-ID: <auNTJpFW3XOPLXVP@gremlin>
-References: <20260903160623.315525-1-alexandru.elisei@arm.com>
- <20260903160623.315525-17-alexandru.elisei@arm.com>
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=N2iJzd2X
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4a35d5d4a20so25984255e9.2
+        for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 09:14:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1793290457; x=1793895257; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=PoVbrwCfEjEF6sp4WaMxqKx0B+uh55PhpThxxt4vZZ4=;
+        b=N2iJzd2XjGTIbQrbp0fFLvz6s4jUJSDsFgVG11hGEqqeV9HS9vSHoResEJdJETv8KU
+         cQgOmR/1xS9qk1nD/uqUFgfyXNye3tOmKZGOcqjq9qMByFQ3D4mhzi6lej4BZsv8susQ
+         50vymkDJ21i8Bp43/oslpqiejNU8hYAtNJ2Uztq2swJvCqSjC/eeemAIis58aBW4lZ3k
+         Ylbvsrb5aO5s9Z5ony5tGqR2QuSjUr+ViY0WhM3rayv88O0iCrx9UShogcaitZRDwFYo
+         3clbcYVa0oWy/83+u7eEwjE24r2h+Gva17V/VwSpuaA9HKHhwtseXRbiQap52i2wbO24
+         TJUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793290457; x=1793895257;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=PoVbrwCfEjEF6sp4WaMxqKx0B+uh55PhpThxxt4vZZ4=;
+        b=kNIbp3WODV4OgSWAVp+BVi4raJqjI6BIUxjnXnRYQ/dpVdoxbySZ/r0OQ/2RdZNTdi
+         DEUSp1zumUmOdZAXKtBxreZFicXQZimRxNoP8itHL+tozbkfxznZFxaSn+/iqky77qGB
+         oufLszP9ARsI0CRxnVNNJA7sLlxiLxK2/xkGHXqUNQRVYnh6b2L848RE/Cgctdx4jetm
+         tSqoPQCtNca4aopQUgXA7QjijMSihfaXVXNqqiYmhp4CNaxnGU+Uo1YU+DSCQJomdi0t
+         djHWLqyADjXpFt6XyYJ4jEEBgRFu0gUFbwEqTTmYLBIcXe9GcNit3XSoJYJXEs2VN9GO
+         G+iQ==
+X-Forwarded-Encrypted: i=1; AKwUvBxGvY5eeUvtBfGsOSjpIU1nHhj33wiPBYITUxvRrrcjaiH3iwJ/IZqEhGWrxGSVobTG8R5irH0=@lists.linux.dev
+X-Gm-Message-State: AFq9FYIifW//9+56FBBrqZ1t3OapG/KIEFf86MfUnL61ooWOkyY3iK2T
+	jrXCDjyboXSQkVwMJLctYfNUeyVaXAqGddx7viogqRTeNlY9dXqOMAq3xEshv7RexSh27RpEKoD
+	A1+hhEQ==
+X-Gm-Gg: AYBFou0PcxbiI6hKOjQJ/85U4s/MxGYVGCaxmw0Y8PBi1+qD2NcJQgvcmfb0Q019WIW
+	8SKTyx0KnNmefdCl1v4qL2zi8+4cjTvjgR7MIntoiIPgO3CTex0VZx6yd0xwYMX8Hmyyct5D1O8
+	lHqxFLd/VOOuJIRVJt3I7dzFoGJkEckG3vKx7V8l40hKoHUwqvT8opbQYJqpk7EM5F5WgU7N4JP
+	M0GnFx28XoVPPKDsWz3S/A+9iW7ZKhVCQTHozNKuMbNud8VgbwDlxARpfFvl68EHqGL+7F7qrQi
+	vNDeZ3I+1wqP1ONEFH47oNnLc7YH1P9pxXumgtYJFrDlbKAmU5rPeoeYtfsMtVl/24GocwL3ed1
+	++nA2Q1dvm6DKtqJ8b89wb/GQjzaOZRqAD4fiFSqqEL0+gtaxhEEg1RFh1en8srWzlykp5R1WlT
+	LzQAud9cQhuzqeh0RYftjt7ANROZQzjVdgGDH7yC60e1QWCGV5o/kGpLbfQvBBccS9qdd9v+mjf
+	fSIoeeSbGjmbfJoO0iaTY4j993MAECf1BX7xCcFcOxOu6GV/hCAfvGJjyuL4CGX5bay84vCc0Tl
+	/jOMqvZR8fwAlEigfYuua6LbajBVMMVIYjceBsVszfmFMyeQRkHun1AzLmZLZcCXVw==
+X-Received: by 2002:a05:600c:1913:b0:4a2:1655:87db with SMTP id 5b1f17b1804b1-4a96552db88mr133139285e9.0.1793290456110;
+        Thu, 29 Oct 2026 09:14:16 -0700 (PDT)
+Received: from google.com (0.182.34.34.bc.googleusercontent.com. [34.34.182.0])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a930a63eb3sm118585755e9.1.2026.10.29.09.14.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Oct 2026 09:14:14 -0700 (PDT)
+Date: Thu, 29 Oct 2026 16:14:10 +0000
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com,
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com,
+	qperret@google.com, weilin.chang@arm.com, tabba@google.com
+Subject: Re: [PATCH v2 22/22] KVM: arm64: Stage-2 huge mappings for protected
+ VMs
+Message-ID: <auNw0iXzwKkOSJAa@google.com>
+References: <20260911135053.146435-1-vdonnefort@google.com>
+ <20260911135053.146435-23-vdonnefort@google.com>
+ <20261029152959.3552746-1-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -63,296 +105,119 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260903160623.315525-17-alexandru.elisei@arm.com>
+In-Reply-To: <20261029152959.3552746-1-fuad.tabba@linux.dev>
 
-On Thu, Sep 03, 2026 at 05:06:11PM +0100, Alexandru Elisei wrote:
-> Add the SPE registers to the VCPU context. Guest writes to the service bit,
-> which change the state of the SPE maintenance interrupt, will be handled in
-> a subsequent patch.
->
-> Only the buffer registers are trapped, because KVM will need to keep track
+On Thu, Oct 29, 2026 at 03:29:59PM +0000, Fuad Tabba wrote:
+> Hi Vincent,
+> 
+> On Fri, 11 Sep 2026 14:50:53 +0100, Vincent Donnefort <vdonnefort@google.com> wrote:
+> [...]
+> > diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> [...]
+> > @@ -513,17 +512,23 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> [...]
+> > +                /*
+> > +                 * If a huge mapping overlaps an existing PAGE_SIZE one,
+> > +                 * then the VMM has played games with the stage-1. Abort.
+> > +                 */
+> > +                if (WARN_ON_ONCE(mapping && mapping->nr_pages == 1 && size > PAGE_SIZE))
+> > +                        return -EFAULT;
+> 
+> A guest can hit this on its own, without the VMM touching its stage-1.
+> I ran into it while porting your unposted v3 to android18-7.3, and v3
+> has the same race. A pVM shares one page of a 2M block, and another
+> vCPU touches the block during the split's break-before-make. The host
+> sizes that fault at 2M from the THP, but under the mmu_lock it finds
+> the split's PAGE_SIZE mappings.
 
-Maybe worth saying which registers for ease?
+Nice catch!
 
-Is this currently true as of this commit message? As this it is this commit
-that's introducing these registers and I don't see anything that enforces
-this?
+> 
+> I made the following change in the android18-7.3 port. It maps just
+> the faulting page, since retrying alone re-faults forever if the VMM
+> puts a fresh THP behind a partly mapped block. If you're happy with it,
+> can you fold it into v3?
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 70b002eb17e05..72fc2577f51cd 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1921,6 +1921,7 @@ static int protected_pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+>  	struct mm_struct *mm = current->mm;
+>  	struct kvm *kvm = vcpu->kvm;
+>  	void *hyp_memcache;
+> +	u64 size;
+>  	int ret;
+>  
+>  	hyp_memcache = get_mmu_memcache(vcpu);
+> @@ -1936,13 +1937,21 @@ static int protected_pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+>  	if (ret)
+>  		goto unpin;
+>  
+> +	size = s2vi.vma_pagesize;
+>  	kvm_fault_lock(kvm);
+>  	if (mmu_invalidate_retry(kvm, s2vi.mmu_seq)) {
+>  		ret = -EAGAIN;
+>  	} else {
+> -		ret = pkvm_pgtable_stage2_map(pgt, gfn_to_gpa(s2vi.gfn), s2vi.vma_pagesize,
+> +		ret = pkvm_pgtable_stage2_map(pgt, gfn_to_gpa(s2vi.gfn), size,
+>  					      __pfn_to_phys(s2vi.pfn), KVM_PGTABLE_PROT_RWX,
+>  					      hyp_memcache, 0);
+> +		/* The block may hold PAGE_SIZE mappings from a split: map the page alone. */
+> +		if (ret == -EAGAIN && size > PAGE_SIZE) {
+> +			size = PAGE_SIZE;
+> +			ret = pkvm_pgtable_stage2_map(pgt, ALIGN_DOWN(s2fd->fault_ipa, size), size,
+> +						      page_to_phys(s2vi.page), KVM_PGTABLE_PROT_RWX,
+> +						      hyp_memcache, 0);
+> +		}
 
-If not, maybe worth saying something like 'ultimately, only the buffer registers
-will be trapped. A warning is raised if a trap occurs for
+I do not believe the retry does anything, this would just hit the "if (mapping)"
+path in pkvm_pgtable_stage2_map().
 
-> of the buffer enabled state for dirty page logging, errata handling and to
-> sanitise writes to PMBLIMITR_EL1 based on the features exposed to the VM.
+And in any case, the split will remap the entire range at PTE-level. This is
+just transient and it is safe to return EAGAIN.
 
-I think the commit message needs detail on what each of these means.
+To keep the return -EFAULT, I could eventually mark the mapping as "split in
+progress". 
 
-I think a key aspect of commit messages is to orient the reader in what the
-series is trying to achieve - the code already tells you WHAT is going on but
-the WHY and what foundations this patch establishes, etc. are not things that
-people can automatically derive from the code.
+-- 
+Vincent
 
-In this case for instance, coming fresh to it - I wonder 'how does this interact
-with dirty page logging, errata handling and santising writes to PMBLIMITR_EL1?
-And why does SPE need to touch these things?' etc.
-
-So I think thinking in those terms - giving context and orientating people
-really helps drive a good commit message :)
-
-I guess this is a long-winded way of suggesting that you should describe what
-teach of these is needed for and how it influenced what you do here :P
-
->
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Logic looks good here, but various nits and thoughts, and obviously the bot
-raised a couple of things also.
-
-> ---
->  arch/arm64/include/asm/kvm_host.h | 13 +++++++
->  arch/arm64/include/asm/kvm_spe.h  | 11 ++++++
->  arch/arm64/kvm/spe.c              | 29 ++++++++++++++++
->  arch/arm64/kvm/sys_regs.c         | 56 ++++++++++++++++++++++++-------
->  4 files changed, 96 insertions(+), 13 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 10fa223bdbda..b92b19229c36 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -483,6 +483,19 @@ enum vcpu_sysreg {
->  	PMOVSSET_EL0,	/* Overflow Flag Status Set Register */
->  	PMUSERENR_EL0,	/* User Enable Register */
->
-> +	/* SPE registers */
-> +	PMSCR_EL1,
-> +	PMSNEVFR_EL1,
-> +	PMSICR_EL1,
-> +	PMSIRR_EL1,
-> +	PMSFCR_EL1,
-> +	PMSEVFR_EL1,
-> +	PMSLATFR_EL1,
-> +	PMBLIMITR_EL1,
-> +	PMBPTR_EL1,
-> +	PMBSR_EL1,
-> +	PMSDSFR_EL1,
-
-OK so this is establishing the registers that SPE uses.
-
+>  	}
+>  	kvm_fault_unlock(kvm);
+>  	if (ret) {
+> @@ -1953,6 +1962,9 @@ static int protected_pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+>  		goto unpin;
+>  	}
+>  
+> +	if (size != s2vi.vma_pagesize)
+> +		account_locked_vm(mm, (s2vi.vma_pagesize - size) / PAGE_SIZE, false);
 > +
->  	/* Pointer Authentication Registers in a strict increasing order. */
->  	APIAKEYLO_EL1,
->  	APIAKEYHI_EL1,
-> diff --git a/arch/arm64/include/asm/kvm_spe.h b/arch/arm64/include/asm/kvm_spe.h
-> index 4bae3e6b05c8..56dc9e660bef 100644
-> --- a/arch/arm64/include/asm/kvm_spe.h
-> +++ b/arch/arm64/include/asm/kvm_spe.h
-> @@ -37,6 +37,9 @@ int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
->
->  bool kvm_spe_pmu_set(struct kvm *kvm);
->  u8 kvm_spe_get_pmsver(struct kvm *kvm);
-> +
-> +bool kvm_spe_write_sysreg(struct kvm_vcpu *vcpu, int reg, u64 val);
-> +u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg);
->  #else
->  struct kvm_spe {
->  };
-> @@ -81,6 +84,14 @@ static inline u8 kvm_spe_get_pmsver(struct kvm *kvm)
->  {
 >  	return 0;
->  }
-> +static inline bool kvm_spe_write_sysreg(struct kvm_vcpu *vcpu, int reg, u64 val)
-> +{
-> +	return true;
-> +}
-> +static inline u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg)
-> +{
-> +	return 0;
-> +}
->  #endif /* CONFIG_KVM_ARM_SPE */
->
->  #endif /* __ARM64_KVM_SPE_H__ */
-> diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
-> index 4426d614a9e0..6a00a44c73ed 100644
-> --- a/arch/arm64/kvm/spe.c
-> +++ b/arch/arm64/kvm/spe.c
-> @@ -7,6 +7,7 @@
->  #include <linux/kvm_host.h>
->  #include <linux/perf/arm_spe_pmu.h>
->
-> +#include <asm/kvm_emulate.h>
->  #include <asm/kvm_spe.h>
->  #include <asm/sysreg.h>
->
-> @@ -82,6 +83,34 @@ void kvm_spe_destroy_vm(struct kvm *kvm)
->  	module_put(spe_pmu->pmu.module);
->  }
->
-> +bool kvm_spe_write_sysreg(struct kvm_vcpu *vcpu, int reg, u64 val)
-> +{
-> +	switch (reg) {
-> +	case PMBLIMITR_EL1:
-> +	case PMBSR_EL1:
-> +	case PMBPTR_EL1:
-> +		__vcpu_assign_sys_reg(vcpu, reg, val);
-> +		break;
-> +	default:
-> +		WARN_ON_ONCE("unexpected trap");
+>  unpin:
+>  	unpin_user_page(s2vi.page);
+> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> index 8a74df9f9fec3..6b5df4595f6a6 100644
+> --- a/arch/arm64/kvm/pkvm.c
+> +++ b/arch/arm64/kvm/pkvm.c
+> @@ -650,14 +650,8 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  			return -EINVAL;
+>  
+>  		/*
+> -		 * If a huge mapping overlaps an existing PAGE_SIZE one,
+> -		 * then the VMM has played games with the stage-1. Abort.
+> -		 */
+> -		if (WARN_ON_ONCE(mapping && mapping->nr_pages == 1 && size > PAGE_SIZE))
+> -			return -EFAULT;
+> -
+> -		/*
+> -		 * We either raced with another vCPU or the guest PTE
+> +		 * We either raced with another vCPU, a block overlaps the
+> +		 * PAGE_SIZE mappings of a guest-driven split, or the guest PTE
+>  		 * has been poisoned by an erroneous host access.
+>  		 */
+>  		if (mapping) {
+> 
+> Cheers,
+> /fuad
 
-I see the bot already raised this :)
-
-> +	}
-> +
-> +	return true;
-
-Hmm, this returns true unconditionally, should it be a void?
-
-> +}
-> +
-> +u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg)
-> +{
-> +	switch (reg) {
-> +	case PMBLIMITR_EL1:
-> +	case PMBSR_EL1:
-> +	case PMBPTR_EL1:
-> +		return __vcpu_sys_reg(vcpu, reg);
-
-OK so only the buffer registers can be read?
-
-> +	default:
-> +		WARN_ON_ONCE("unexpected trap");
-
-Obviously also needs a fixup as per bot :P (I'm pretty sure I've made this
-exactly same mistake myself quite a few times so don't worry!)
-
-> +		return 0;
-> +	}
-> +}
-> +
->  bool kvm_spe_pmu_set(struct kvm *kvm)
->  {
->  	return !!kvm->arch.kvm_spe.spe_pmu;
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index a6bb6884b965..89b01b6ac783 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1554,6 +1554,28 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
->  	return 0;
->  }
->
-> +static unsigned int spe_visibility(const struct kvm_vcpu *vcpu,
-> +				   const struct sys_reg_desc *r)
-> +{
-> +	if (vcpu_has_spe(vcpu))
-> +		return 0;
-> +
-> +	return REG_HIDDEN;
-> +}
-
-OK so this, I gather, is simply saying 'if the VCPU supports SPE, allow access
-to the registers, otherwise don't.
-
-> +
-> +static bool access_spe_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			   const struct sys_reg_desc *r)
-> +{
-> +	u64 val = p->regval;
-> +	int reg = r->reg;
-> +
-> +	if (p->is_write)
-> +		return kvm_spe_write_sysreg(vcpu, reg, val);
-> +
-> +	p->regval = kvm_spe_read_sysreg(vcpu, reg);
-> +	return true;
-
-NIT: I'm not sure the locals are really needed here, especially since you
-reassign p->regval, so I think this would be better as:
-
-static bool access_spe_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-			   const struct sys_reg_desc *r)
-{
-	if (p->is_write)
-		return kvm_spe_write_sysreg(vcpu, r->reg, p->regval);
-
-	p->regval = kvm_spe_read_sysreg(vcpu, r->reg);
-	return true;
-}
-
-> +}
-> +
->  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
->  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
->  	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
-> @@ -1586,6 +1608,14 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
->  	  .reset = reset_pmevtyper,					\
->  	  .access = access_pmu_evtyper, .reg = (PMEVTYPER0_EL0 + n), }
->
-> +#define SPE_SYS_REG(name)						\
-> +	SYS_DESC(SYS_##name), .reg = name, .access = access_spe_reg,	\
-> +	.reset = reset_val, .val = 0, .visibility = spe_visibility
-> +
-> +#define SPE_UNTRAPPED_REG(name)						\
-> +	SYS_DESC(SYS_##name), .reg = name, .access = undef_access,	\
-> +	.reset = reset_val, .val = 0, .visibility = spe_visibility
-
-Could the first just be SPE_REG()? 'SYS' seems a bit redundant here.
-
-And these are identical other than access, could you just make this
-SPE_REG() with a parameter for visibility?
-
-Actually, it seems like this pattern already exists, e.g. TIMER_REG():
-
-#define TIMER_REG(name, vis)					   \
-	SYS_REG_USER_FILTER(name, access_arch_timer, reset_val, 0, \
-			    arch_timer_get_user, arch_timer_set_user, vis)
-
-So this could be something like:
-
-#define SPE_REG(name, acc)						\
-	SYS_REG_USER_FILTER(name, acc, reset_val, 0, NULL, NULL,	\
-			    spe_visibility)
-
-Perhaps?
-
-> +
->  /* Macro to expand the AMU counter and type registers*/
->  #define AMU_AMEVCNTR0_EL0(n) { SYS_DESC(SYS_AMEVCNTR0_EL0(n)), undef_access }
->  #define AMU_AMEVTYPER0_EL0(n) { SYS_DESC(SYS_AMEVTYPER0_EL0(n)), undef_access }
-> @@ -3525,19 +3555,19 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ SYS_DESC(SYS_FAR_EL1), access_vm_reg, reset_unknown, FAR_EL1 },
->  	{ SYS_DESC(SYS_PAR_EL1), NULL, reset_unknown, PAR_EL1 },
->
-> -	{ SYS_DESC(SYS_PMSCR_EL1), undef_access },
-> -	{ SYS_DESC(SYS_PMSNEVFR_EL1), undef_access },
-> -	{ SYS_DESC(SYS_PMSICR_EL1), undef_access },
-> -	{ SYS_DESC(SYS_PMSIRR_EL1), undef_access },
-> -	{ SYS_DESC(SYS_PMSFCR_EL1), undef_access },
-> -	{ SYS_DESC(SYS_PMSEVFR_EL1), undef_access },
-> -	{ SYS_DESC(SYS_PMSLATFR_EL1), undef_access },
-> -	{ SYS_DESC(SYS_PMSIDR_EL1), undef_access },
-> -	{ SYS_DESC(SYS_PMBLIMITR_EL1), undef_access },
-> -	{ SYS_DESC(SYS_PMBPTR_EL1), undef_access },
-> -	{ SYS_DESC(SYS_PMBSR_EL1), undef_access },
-> -	{ SYS_DESC(SYS_PMSDSFR_EL1), undef_access },
-> -	/* PMBIDR_EL1 is not trapped */
-> +	{ SPE_UNTRAPPED_REG(PMSCR_EL1) },
-> +	{ SPE_UNTRAPPED_REG(PMSNEVFR_EL1) },
-> +	{ SPE_UNTRAPPED_REG(PMSICR_EL1) },
-> +	{ SPE_UNTRAPPED_REG(PMSIRR_EL1) },
-> +	{ SPE_UNTRAPPED_REG(PMSFCR_EL1) },
-> +	{ SPE_UNTRAPPED_REG(PMSEVFR_EL1) },
-> +	{ SPE_UNTRAPPED_REG(PMSLATFR_EL1) },
-> +	{ SYS_DESC(SYS_PMSIDR_EL1), .access = undef_access },
-> +	{ SPE_SYS_REG(PMBLIMITR_EL1) },
-> +	{ SPE_SYS_REG(PMBPTR_EL1) },
-> +	{ SPE_SYS_REG(PMBSR_EL1) },
-> +	{ SPE_UNTRAPPED_REG(PMSDSFR_EL1) },
-> +	/* PMBIDR_EL1 is not trapped and read-only */
->
->  	{ PMU_SYS_REG(PMINTENSET_EL1),
->  	  .access = access_pminten, .reg = PMINTENSET_EL1,
-> --
-> 2.43.0
->
->
-
---
-Cheers, Lorenzo
