@@ -1,58 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.221
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.105
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793282543;
-	b=OtSOSIiEMjICaOiv6bI/Q33zIt9XCkEf83+KbEQPIX2YZnr+W6cKUZ4UD6Q5ioMX6yZt
-	 iCErY7mXieoJ6IbMGI9umO3hFITPSlCAIBTpn7K4OoekWOFwuZricOFdkzKXzMPUeQbjV
-	 gQTwZf+sQ5QFRza+6uSTSDBbGoaIYaGbXO/Ux4Vve7GoA2muTsbLj8173yHJ+tq6A2SJw
-	 o+TZyZpfOwgUk8TpFEFEHdFtjswO0Y5DQxpK2uH470/pQpunqZ4mmAWnETaMdp0DfgBBn
-	 aCZRgDqRjyXvS8L05mnIbCml/3plOEFqV0SQbyAt/MsQ4VJQCQobri4IktUQfpFJtRQ==
+	t=1793287802;
+	b=pASrqyTXeJvndReAXUd4Wvn46mq53xFOvIDnrKZTcV1roydUJWZMO1qr0QkyH02AmZ+h
+	 z9C4GWyY5FJPuwEW1LRpb5jYab1dpt/dKmfeGdT9lGmZfX10pQw3ci/tifU9G5zVfprPJ
+	 YXmm+UpOtyAeRKf7ZpknpdOyFkxFBOhoLMB5G9hRv/VX7S/1SS09nAGHRTaO3UoNEJgrg
+	 VIfDLJHATdkX/5aoB3s5qgt3z/Z47B27eWBgp4TCEpjfFkJRIUnRBOfhjOX5O7eTA/FYr
+	 S/YV+RddoJNtE3LI50XAcRJnDmitw+R6pzpxHZj8WRUxrr5ThLgNOvRI/OtFQNDXMng==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793282543;
-	h=DMARC-Filter:dkim-signature:Received:Received:Received:Message-ID:
-	 Date:MIME-Version:User-Agent:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type:Content-Transfer-Encoding:X-Originating-IP:
-	 X-ClientProxiedBy;
-	bh=46BTS2L17vKUMaAXzO89PlCn4e9X2ecYyyZ5hRRDLBc=;
-	b=Ek1kML0o+EO8jp2Or9/xAbZJVvG95dSiUm6yOhwX3xz4CE0iIUJLVbffpW/v61KEzXGJ
-	 Lv8AC6Z4/WF5ucYxGalFfakBBecz8XC4QnWGLq38yl0CK55T/S0JXBdqMI1iZPYef66Du
-	 fEI8+y0Fxtk4shP2v6Y+G6vRnPvIH48rhUNz4l2FeCtqbSwzOkwpizmVrvtr8P3K11iy8
-	 USaqEXXPABVUVXV/PozDVZIfy9UNUoQh3aAcElP2Q6EVTdxr/1+a1f6I2KIRlRU5a+fIC
-	 g9q59JoDQ1lW7ZQcCnnR0AteugS7aQPltO0psRjy1yCS0fxKBMUHKMG8dKDAcRizc5g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793287802;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=4uo4YwZye5gbwG4LR+me6BP44T84OykPaJHKbYTcGKA=;
+	b=wgc8O3qW4oslsPCDCPcr7+SSNLlXHWUpj+9JDjOfJ04GQ3/buy6wU5V1dkU20JPht5Ko
+	 HPAjMALD/4lMtuvhunOoRh90GF5WOSD0d3/Az3K7bFVZu3vJ3lImJE7Ddp94QDNPs/baB
+	 ScMefqZbG+jCpy0N7O3h0wg6WKErzh8am/mIsfxQsSm0nN9iarwO+L47QyH89Xa+w8u3u
+	 uPoPkwka2rrvDWymFce6mf8fLhp3a9QhGjUM6iO/GTotvb9H17GJ4WfHJVpdpqOPFCFwJ
+	 /25fz6EgaAmMCcBqdR3qeJP8I64sgwJTQ9D8WI/ISyRWI45WS/b9KrdcBhyCsNoMEtQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=huawei.com;
-	spf=pass smtp.mailfrom=huawei.com;
-	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=Xxcr1uEv;
-	arc=none smtp.remote-ip=113.46.200.221
-Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="XZoYqSH/";
+	arc=none smtp.remote-ip=91.218.175.105
+Received: from mta0.migadu.com (out-105.mta0.migadu.com [91.218.175.105])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45BE606A332
-	for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 14:02:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C45BE606A332
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5AA760A262A
+	for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 15:30:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E5AA760A262A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=Xxcr1uEv
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=46BTS2L17vKUMaAXzO89PlCn4e9X2ecYyyZ5hRRDLBc=;
-	b=Xxcr1uEvjyUncblEyLuJ13eru1beYW/GY5GFrPE5ZiK43B4KlA7E+sfVr4qhA3hrvIBxIwDSM
-	8bbmRWDAsZAUJOf4aPz+Fkbsf8dlBiYZwCbJ4LCU36/fQiGVBZ8WrYc5WWyoqZLYFc7PE1SX2xp
-	egChEha82ieFCMIiUlrLwNo=
-Received: from mail.maildlp.com (unknown [172.19.163.0])
-	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4jFmBT2KpwzRhQX;
-	Thu, 29 Oct 2026 22:02:09 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 162B340561;
-	Thu, 29 Oct 2026 22:02:12 +0800 (CST)
-Received: from [10.67.120.103] (10.67.120.103) by
- kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Thu, 29 Oct 2026 22:02:10 +0800
-Message-ID: <009b13c6-f618-43fe-8a56-8519d31b239b@huawei.com>
-Date: Thu, 29 Oct 2026 22:02:10 +0800
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=XZoYqSH/
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=la7E0PWX7gnalEHWFdRBnWD3MsgOWAc+7PnzT7S9dEs=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793287799; v=1; x=1793892599;
+ b=XZoYqSH/aQZxkCrLSCy//P1p6IxM8xGicTQUKfRs6DhKhsCoLR7vUNmXoR7DXAk+IY1Kz+m1
+ 8t4fznkRl005Twkt3hEWMLvn26zd/omJrEJN565kpgb7OrlvZhcGaS2ND7zcVuNAQkx9BaYzWyX
+ XI/YS5MSmQDQY9Qh93mLonL0=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 8a1ab3f95cac30d7;
+	Thu, 29 Oct 2026 15:29:59 +0000
+X-Mizu-Trace-ID: 8a1ab3f95cac30d7
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org,
+	oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	kernel-team@android.com,
+	qperret@google.com,
+	weilin.chang@arm.com,
+	tabba@google.com
+Subject: Re: [PATCH v2 22/22] KVM: arm64: Stage-2 huge mappings for protected VMs
+Date: Thu, 29 Oct 2026 15:29:59 +0000
+Message-ID: <20261029152959.3552746-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260911135053.146435-23-vdonnefort@google.com>
+References: <20260911135053.146435-1-vdonnefort@google.com> <20260911135053.146435-23-vdonnefort@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -62,143 +78,101 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 05/15] KVM: arm64: Harvest stage-2 dirty state into the
- host folio account
-To: Leonardo Bras <leo.bras@arm.com>
-CC: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
-	<will@kernel.org>, <corbet@lwn.net>, <pbonzini@redhat.com>,
-	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <yangjinqian1@huawei.com>,
-	<caijian11@h-partners.com>, <liuyonglong@huawei.com>,
-	<tangchengchang@huawei.com>, <yezhenyu2@huawei.com>, <yubihong@huawei.com>,
-	<linuxarm@huawei.com>, <joey.gouly@arm.com>, <kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <seiden@linux.ibm.com>,
-	<suzuki.poulose@arm.com>, <fuad.tabba@linux.dev>, <mark.rutland@arm.com>,
-	<seanjc@google.com>, <rdunlap@infradead.org>, <linux-doc@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <skhan@linuxfoundation.org>
-References: <20260929103655.85107-1-zhengtian10@huawei.com>
- <20260929103655.85107-6-zhengtian10@huawei.com> <at-WceRKAVM2kEnI@LeoBrasDK>
-From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <at-WceRKAVM2kEnI@LeoBrasDK>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+Content-Transfer-Encoding: 8bit
 
+Hi Vincent,
 
+On Fri, 11 Sep 2026 14:50:53 +0100, Vincent Donnefort <vdonnefort@google.com> wrote:
+[...]
+> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+[...]
+> @@ -513,17 +512,23 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+[...]
+> +                /*
+> +                 * If a huge mapping overlaps an existing PAGE_SIZE one,
+> +                 * then the VMM has played games with the stage-1. Abort.
+> +                 */
+> +                if (WARN_ON_ONCE(mapping && mapping->nr_pages == 1 && size > PAGE_SIZE))
+> +                        return -EFAULT;
 
-On 10/27/2026 2:05 AM, Leonardo Bras wrote:
-> Hi Tian,
-> Sorry for the delay in reviewing...
-> 
-> On Tue, Sep 29, 2026 at 06:36:45PM +0800, Tian Zheng wrote:
->> With VTCR_EL2.HD set, hardware promotes writable-clean descriptors to
->> writable-dirty without any VM exit, and the only record of the write
->> is the S2AP[1] bit in the stage-2 PTE. The write never passed through
->> the host stage-1, and no unmap path reads the bit, so the record dies
->> with the PTE and reclaim may discard written guest data (silent
->> corruption).
-> 
-> Sorry, I didn't get what you are trying to achieve here.
-> 
-> On your patch, I see you marking backing pages dirty at wrprotect and unmap
-> walkers, and it's very confusing to me on why you are doing this.
-> 
-> IIUC, what you are trying to do is make sure a page does not lose it's
-> contents in case it is reclaimed by the OS.
-> 
-> IIUC, when a page is reclaimed, it will unmap the S2 PTE, and save it's
-> contents to swap, so when the guest read or write to that page will cause
-> it to fault.
-> 
-> The page can never be just unmaped, as if there was a single write to it,
-> the backing pages should be writable, and the contents need to be saved
-> somewhere.
-> 
-> So, if I was able to understand your suggestion, we don't need to worry
-> about this, and this patch wouldn't be necessary.
-> 
-> Did you hit this issue?
-> Can you please expand on your issue, if I could not describe it above?
-> 
-> Thanks!
-> Leo
+A guest can hit this on its own, without the VMM touching its stage-1.
+I ran into it while porting your unposted v3 to android18-7.3, and v3
+has the same race. A pVM shares one page of a 2M block, and another
+vCPU touches the block during the split's break-before-make. The host
+sizes that fault at 2M from the THP, but under the mmu_lock it finds
+the split's PAGE_SIZE mappings.
 
-Hi Leo,
+I made the following change in the android18-7.3 port. It maps just
+the faulting page, since retrying alone re-faults forever if the VMM
+puts a fresh THP behind a partly mapped block. If you're happy with it,
+can you fold it into v3?
 
-Thanks for the review. I haven't hit this in practice, and based on your
-analysis the patch doesn't look necessary.
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 70b002eb17e05..72fc2577f51cd 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1921,6 +1921,7 @@ static int protected_pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+ 	struct mm_struct *mm = current->mm;
+ 	struct kvm *kvm = vcpu->kvm;
+ 	void *hyp_memcache;
++	u64 size;
+ 	int ret;
+ 
+ 	hyp_memcache = get_mmu_memcache(vcpu);
+@@ -1936,13 +1937,21 @@ static int protected_pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+ 	if (ret)
+ 		goto unpin;
+ 
++	size = s2vi.vma_pagesize;
+ 	kvm_fault_lock(kvm);
+ 	if (mmu_invalidate_retry(kvm, s2vi.mmu_seq)) {
+ 		ret = -EAGAIN;
+ 	} else {
+-		ret = pkvm_pgtable_stage2_map(pgt, gfn_to_gpa(s2vi.gfn), s2vi.vma_pagesize,
++		ret = pkvm_pgtable_stage2_map(pgt, gfn_to_gpa(s2vi.gfn), size,
+ 					      __pfn_to_phys(s2vi.pfn), KVM_PGTABLE_PROT_RWX,
+ 					      hyp_memcache, 0);
++		/* The block may hold PAGE_SIZE mappings from a split: map the page alone. */
++		if (ret == -EAGAIN && size > PAGE_SIZE) {
++			size = PAGE_SIZE;
++			ret = pkvm_pgtable_stage2_map(pgt, ALIGN_DOWN(s2fd->fault_ipa, size), size,
++						      page_to_phys(s2vi.page), KVM_PGTABLE_PROT_RWX,
++						      hyp_memcache, 0);
++		}
+ 	}
+ 	kvm_fault_unlock(kvm);
+ 	if (ret) {
+@@ -1953,6 +1962,9 @@ static int protected_pkvm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+ 		goto unpin;
+ 	}
+ 
++	if (size != s2vi.vma_pagesize)
++		account_locked_vm(mm, (s2vi.vma_pagesize - size) / PAGE_SIZE, false);
++
+ 	return 0;
+ unpin:
+ 	unpin_user_page(s2vi.page);
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 8a74df9f9fec3..6b5df4595f6a6 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -650,14 +650,8 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 			return -EINVAL;
+ 
+ 		/*
+-		 * If a huge mapping overlaps an existing PAGE_SIZE one,
+-		 * then the VMM has played games with the stage-1. Abort.
+-		 */
+-		if (WARN_ON_ONCE(mapping && mapping->nr_pages == 1 && size > PAGE_SIZE))
+-			return -EFAULT;
+-
+-		/*
+-		 * We either raced with another vCPU or the guest PTE
++		 * We either raced with another vCPU, a block overlaps the
++		 * PAGE_SIZE mappings of a guest-driven split, or the guest PTE
+ 		 * has been poisoned by an erroneous host access.
+ 		 */
+ 		if (mapping) {
 
-Reclaim only writes back folios whose PG_dirty flag is set; a clean
-folio is simply freed. A stage-2 write never touches the host
-stage-1, so the folio depends entirely on kvm_release_faultin_page()
-at fault-in to be marked as dirty; without it, the page stays clean from
-the host's perspective and reclaim drops the data.
-
-Your **RFC v1** patch 2 changed that marking from writable to dirty:
-
-```
-- kvm_release_faultin_page(kvm, s2vi->page, !!ret, writable);
-+ kvm_release_faultin_page(kvm, s2vi->page, !!ret, dirty);
-```
-
-During logging, a read fault maps the page as WC: the folio is not
-marked PG_dirty in kvm_s2_fault_map() and hardware promotes the PTE to
-WD on write without any fault, so reclaim frees the page without saving
-it (the folio was treated as clean).
-
-Therefore, **HDBSS v5** patch 2 reverted to marking the folio for any
-write-permitting mapping:
-
-```
-kvm_release_faultin_page(kvm, s2vi->page, !!ret, writable);
-```
-
-Together with the v5 scheme, this makes patch 5 unnecessary:
-
-- kvm_s2_fault_compute_prot: always set PROT_W when map_writable
-- stage2_set_prot_attr: PROT_W -> DBM unconditionally
-
-
----------
-
-On a related note, I'd like to discuss the next version of the DBM
-scheme, following Oliver's suggestion [1].
-
-Oliver asked for the write bit to be selected by the system capability:
-
-	FEAT_HAFDBS: PROT_W => DBM, PROT_DIRTY => S2AP[1]
-	!FEAT_HAFDBS: both => S2AP[1]
-
-However, our v5 kvm_s2_fault_compute_prot() granted PROT_W
-unconditionally. With PROT_W => S2AP[1] on !FEAT_HAFDBS, a read fault on
-a dirty-tracked memslot would install a writable page. Since dirty-
-logging relies on the write fault to observe the page, we would fail to
-track it.
-
-So we also need to fix kvm_s2_fault_compute_prot():
-
-```
-if (s2vi->map_writable) {
-         if (s2vi->device ||
-             !memslot_is_logging(s2fd->memslot) ||
-             kvm_is_write_fault(s2fd->vcpu)) {
-                 *prot |= KVM_PGTABLE_PROT_W |
-                          KVM_PGTABLE_PROT_DIRTY;
-         } else if (kvm_supports_hafdbs()) {
-                 *prot |= KVM_PGTABLE_PROT_W;
-         }
-}
-```
-
-For normal RAM on a system without FEAT_HAFDBS:
-
-	logging + read fault  -> PTE read-only
-	logging + write fault -> PTE S2AP[1]=1
-
-[1] 
-https://lore.kernel.org/all/ff218960-c412-4283-aa41-b7af2a7048b8@huawei.com/
-
-Thanks,
-Tian
+Cheers,
+/fuad
