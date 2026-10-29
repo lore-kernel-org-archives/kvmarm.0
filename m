@@ -1,79 +1,79 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793287850;
-	b=YEOCdVhZwjCjo0kIfxgMfn+FceDaJLeT0pM8+Yi/KTbxDbvgFr+q/JDriuJzW0CEUWD9
-	 7PkhYWppt3AQXOeuQGpbY41WVJnH8f5kOrf3aUsehF4LifLOAS2MmjuIVf4G96eJTS5cB
-	 CXps/dCnfYMcDvuR9uk9LuqjJmFjUmftWrZC+NZKbab74SODqT44SRyXw7scKXaB3nz/0
-	 XLN3i/Omvbyu8GtBAXMxfrC0E87K26Yz7inP2gZXFNSiOAXwtr4CBujtujtxm+lZht7sL
-	 FnqDVXOb0XqJ2dX1NLLpwwU9o59KYxSYX4OiqkhFrViRWFim9/JOcMc0m/rn2PyK/aA==
+	t=1793288090;
+	b=gQyaX4KQv0jVT0PikQ3t/CL2vLwNLvArd2DrCJ4qX1g0+Fvo3DGxjyyRMUywt3sSHlMQ
+	 N2byPQAAMgiE1LBYbIc7A1Tch0ngTT25pubvr+y8+HFqs+HEKfr5tKEIaj4U6G6/I/1Uo
+	 PT6tiw8gey9s6qS5yUC0mwWMP2EbgCJWLR4SxykQIw5QSVYMIg/QeHPY/b5EVlCGjBG85
+	 GkETJzeH8HLDheQTQAT4Dk3r461YnJCvGghDlzDvhxNco/bbbYduibcVIbwFLOtVcb0TB
+	 5aj1Y+VMilBd4N1zGPtmV+/P3dRTSg3R3uNfdWbnlrTU6NvTFVePMiMoUl8Vmgwomnw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793287850;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793288090;
 	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
 	 Content-Type:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
 	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
 	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=jZCPT6n7N0kR/yox4krjMHcmGVLKx8L9Aa9+jbCUVqU=;
-	b=WoxCiewhr9HsALandNzEw1V4u1T97/tRZGshji7uoKmq67T5rPE6e0RKJk8mDX4w+c6m
-	 LWRfah76WpfKBlOhYJdfPDAJw2IoQQX7uDGhxEgP7t7CiTG2PCs1lze6hNPNNgW/QKm9R
-	 H8DU3JYARHWbriUcUupwLm2ccNTzZ6kndoMpi5xxYL4pCPMc8vkt5gJtA7bp7R/4Ax5Hy
-	 dgRyhp7vx+GANlYyL7qEoTrotPcilWh/phh1g5jI7zUXHmqx03TSghytuk8jByuckYIAC
-	 e72x5IoFJPSHKNI+JjT0ekfJUNJHEjHd4bv+sgxEBmQQtgaHY558bcblokhj+rVOSiQ==
+	bh=21UBwjN745OrDP2vnXLH2+DeJYrhc+swHwlN/Pu0D5U=;
+	b=PxnRt/wIs6enz4iEvDoY2F8fpc2yxhwlcmNKWowaXw583HOzLVsjkZ+TtXnKX9QmZ3v+
+	 cfgq69IL8vQCeY0Tt8/uekqyoz8X/lj76e2JGgBhkruVVAVTL/u70/ihBQOvIwwGTl/5y
+	 bOgtTj0/RRPaUbBN1BS6YuRFdrI05ysNu3wmyVk3b6RkuunSDut9PBJLQXcTkzrGiO4DB
+	 niPhsgJbfgtasSFdtdYao+aKpCLNwpHmhg8B5qgOxZCmosgCJmyvQpzdIewW7JpLiCu94
+	 cN+vIdVa3zo4AygIxNzUbaFHDNIUy41jxQfYZleh+m2gJV8f2bkb/C1ir5+ZU5JPDhA==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=URS0W4AE;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IA5XhRC1;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41678606A31E;
-	Thu, 29 Oct 2026 15:30:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6120D606A31A;
+	Thu, 29 Oct 2026 15:34:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=URS0W4AE
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IA5XhRC1
 Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
 ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1793287848;
-	b=K37wZQIU1wYfI4aeyMHZXjiCNQdlXqgVew09+rUXIAhfR6aQkZjbU2ndEPk/cmxkl5Fy
-	 1jCnBHwvUiolgN0h5Qc8UZU6pJzJF8kN79f1FME0Ef49IC24PmivrcR6zdeDrc7Bu5Da6
-	 phR+wHGGm+Yp+qlD1/r2Ur6eFw3DmwHQPFrVZLk2XpFfnJ7PJ/ykkm2sf4Psj6d2GMseB
-	 jlBU9p+woGaZ/35iTDEhBRLh9Ehw+3nGV++/aaw9UsAVvXlEX1ZBimAR9mbE6yBHGag0O
-	 hQ7gHHCYCCRdu25Ro+R1XTgYhymr9veQYnvUnJZ10Jkm+WVGzvLjsCM63B8gZNFHF4w==
+	t=1793288090;
+	b=Bglrp5wY1NHnL4s+NPAyVWl+Svszkr1wETSaCTM4oGHoELiAtALLk+uOxA7cpmAuq5fG
+	 kA5NfWxvIsyty9txBHkKkgxXh/BtVJ4XqK3GNUSQvM0hOFVa5X5klSwoPALVRbI0aB72m
+	 lgdpNDWvL/JaO+5RAZ3zhZekq3O0cGPreY3A18zD8W7RcJBTGfWgwctmJe0aAwIZxHgRD
+	 RBLBxEBYwlWXnVXfpyldmzX6hu5XhLRM5dClM2v/SCxepGhSt/RfUaRmdQD04m/uiEbLc
+	 LEB7r7X2kAt4R0URCE3mZAmJ5qAydB9eBmM9Vn82pfv0theAq6QzZ+zK6Kd9jUaeG4A==
 ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1793287848;
+	c=relaxed/relaxed; t=1793288090;
 	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
 	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
 	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
 	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=jZCPT6n7N0kR/yox4krjMHcmGVLKx8L9Aa9+jbCUVqU=;
-	b=mZetYta2Y4iZp8qvn+/t2gSOdsbeK0xoUoFl58a5aKpCb4sH7NkcNZ8AzD/rLBAM88qs
-	 0nZf/qxpB6We6wfDSQjFfkJUkz0QTDYLzaSWVTpqHa9vkCtmCFAqbdQWWEaZWsvtJ8Ors
-	 jd06MKfvkaDASSuftnEqTrBWrFZ4yYvwVC/MDOqqI7+jhqlHaL1hFSO+wdXTzbaq6l0Zy
-	 hOmDQct0XI5njRVLHed6QgaLaVr/PltK0ChUPcPoKlDqFnKAAD+t/ojqHnKvXv3YPajy3
-	 JpWOhPItP9k4csovNJFR+N1/mNvgI29zyFwZjUy/9hYJCUrVQsiSeWZhHHKhvNxAY8Q==
+	bh=21UBwjN745OrDP2vnXLH2+DeJYrhc+swHwlN/Pu0D5U=;
+	b=cqszNNaAaDd802UwCxTOeYxltoummd9af7T9tiMGaUGA87su/v9aFczWZEOLvk1lQLWU
+	 WTAMW4yTSoxDGIaiVahV+NAmCCryrVa6Kcpirno9vZNriZ9xgAKIefDIFMHpyZUk7mKEE
+	 8s7J4jau6TfesoSLPfxlKq1zVGbUN8ttj939qqxVKiQrhnsoGEhCjlOSHl1X/jdU/uHPI
+	 om1YcHlCFKhBuguza+ymWU6yUxSRRaODtxDFLqp1BULY5nulDvVLVVW+XRlicm1evozRa
+	 d3trGtM2Rr182NbD+o8fuo8T5az463AD6iwKajlJUeifpL1BDWddO7grjm0/zs09uFg==
 ARC-Authentication-Results: i=1; smtp.kernel.org; 
 	arc=none smtp.remote-ip=100.80.115.77
 Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id DF0471F01816;
-	Thu, 29 Oct 2026 15:30:47 +0000 (UTC)
+	by smtp.kernel.org (Postfix) with ESMTPS id 062151F01816;
+	Thu, 29 Oct 2026 15:34:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793287848;
-	bh=jZCPT6n7N0kR/yox4krjMHcmGVLKx8L9Aa9+jbCUVqU=;
+	s=k20260515; t=1793288089;
+	bh=21UBwjN745OrDP2vnXLH2+DeJYrhc+swHwlN/Pu0D5U=;
 	h=From:Date:Subject:To:Cc:Reply-To;
-	b=URS0W4AE2AXWA19JCds/C6X4zuy/iuQ7Ojubz2ZlQ0B4Oa467qIE/diu8sZq1YTeI
-	 eRkGPJU46+8h+E/rWQFZn+noraT3bJL64m9G5kseYbUcKexUHu+QafJDIGvasJenLI
-	 OQIWr8zR8Z+tTtyWI46o0lahC4eBfJ1YL/Z+I5N2zW6+wWON1W3vVCAzNdnKbD/ylz
-	 VALvXm47gLPb2JphZGtTWou6rpIghlTR++VOawT7XUUdUdfdHk5f+1NNWRe5jDr5X1
-	 z43WQdf3OwxE7JDGb8em0rZ01aidPPNod3herPNnRYx3/+hyVmK5UQ/RUCLkCi/MSL
-	 KTigrd9qAlA9A==
+	b=IA5XhRC1llZ+hUokn4xOLOeeqes+hs/SNRZ1CVjofBbOyGLsCQRQvi3X+T61MNrBi
+	 vUZ6YtuQ8QClLvC6P2c2AEVw4ltLuUbiBFmJUFbJo2zYE0VkTtk/CzSrYWBjZ9Z9rL
+	 WYO5NoLKIFEudMA9tnq7P9oDTAFmpoUOSFcArQFgORr/W1Z2UW2ktH36Xnx2vhHUBW
+	 v36CGcK99vZt6dV0oCrXRBfFZ2nJSZk1RlL13KTSHJgl/tTESS6+I0O63PtXB4Y3t+
+	 2MTJtZKfRjkt2CwnMuqx7ckUjhHbW4U7Th64dMTKKDK6f33oLXfa08u3Q1ZvwAdzzW
+	 pDB3hpeWZKHCQ==
 Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 3C411458DE;
-	Thu, 29 Oct 2026 15:30:47 +0000 (UTC)
+	by lkml.kernel.org (Postfix) with ESMTP id 8F1A3458E4;
+	Thu, 29 Oct 2026 15:34:48 +0000 (UTC)
 From: Francesco Boccola via B4 Relay <devnull+francesco.boccola.unina.it@kernel.org>
-Date: Thu, 29 Oct 2026 16:30:46 +0100
-Subject: [PATCH RFC] KVM: arm64: nVHE: Flush all TLBs when freeing a VM's
- stage-2
+Date: Thu, 29 Oct 2026 16:34:48 +0100
+Subject: [PATCH RFC v2] KVM: arm64: nVHE: Flush all TLBs when freeing a
+ VM's stage-2
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -84,10 +84,11 @@ List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261029-nvhe-stage2-flush-v1-1-a87c7aaa91e1@unina.it>
-X-B4-Tracking: v=1; b=H4sIAKVm42oC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIzNDAyNL3byyjFTd4pLE9FQj3bSc0uIMXcPUVItE4xSTVGNjQyWgvoKi1LT
- MCrCZ0UpBbs5KsRDB4tKkrNTkEpBpSrW1AEhTPUV6AAAA
+Message-Id: <20261029-nvhe-stage2-flush-v2-1-096723b28bef@unina.it>
+X-B4-Tracking: v=1; b=H4sIAJdn42oC/32NwQ6CMBBEf4Xs2Rq2GAFPJiZ+gFfDYYWFriHFt
+ KXREP5dwLvHmbx5M4FnJ+zhlEzgOIqXwS5B7xKoDdmOlTRLBp3qI6a6VDYaVj5Qx1q1/eiNQua
+ CsubAWYaw7F6OW3lvzjvcrheofqUfH0+uw2pbMSM+DO6zPUfc4D8nERUqKvI6J6ISGc+jFUt7C
+ VDN8/wFhz2CjMgAAAA=
 X-Change-ID: 20261029-nvhe-stage2-flush-1ee8a3d4e331
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
  Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
@@ -100,11 +101,11 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
  linux-kernel@vger.kernel.org, 
  Francesco Boccola <francesco.boccola@unina.it>
 X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1793287846; l=12631;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1793288088; l=14469;
  i=francesco.boccola@unina.it; s=20261029; h=from:subject:message-id;
- bh=UtI/YN5wADN8DnQ5jfEuOThcGftUiTaFauT7BPsh/+c=;
- b=xD7lyU3fZXM7phDidQjIcuDpjTj0ug9pOGdesW5XxmQsjm6gA4EZp5Tg4qPvz6Zw5Oh677DFk
- +NkzmlBsQEqAcePLdpBEeJyLW13tKrB0WeZkC91UHbl4TXk2ZxcbjBH
+ bh=9IF4V7AIed5CaK2oDNKXPIRINnVqS5Wh9/sL9HPf4nw=;
+ b=lj2DTPtaJ+JK5PaPBUKGi6P78ixO1QOocnpfev3lOa83n77hySpIjprdmArTmGwXwxRrYj/6M
+ Ft6oEhJN74qAeabaKNb0jzJdf0CHLxzID4Zo98muQSDNAUpXNlstWGA
 X-Developer-Key: i=francesco.boccola@unina.it; a=ed25519;
  pk=82q3OTrtEAajk43b58WBO5I1Hj8Gg8DU6k0GngJr9rA=
 X-Endpoint-Received: by B4 Relay for francesco.boccola@unina.it/20261029
@@ -191,7 +192,8 @@ Found while measuring containers run as KVM guests against plain containers
 on these boards.
 
 ==> Makefile <==
-
+# Native build on an arm64 host: make. Cross build (static, for hosts without
+# a compiler): make CROSS_COMPILE=aarch64-linux-gnu- LDFLAGS=-static
 CC = $(CROSS_COMPILE)gcc
 OBJCOPY = $(CROSS_COMPILE)objcopy
 CFLAGS = -O2 -Wall
@@ -219,11 +221,18 @@ clean:
  *   gcc -nostdlib -static -Wl,-Ttext=0x40000000 -Wl,--build-id=none -DMMU=1 \
  *       -o guest-mmu.elf guest.S && objcopy -O binary guest-mmu.elf guest-mmu.bin
  */
+#ifndef MMU
+#define MMU 1
+#endif
+#ifndef SPIN
+#define SPIN 0
+#endif
+#define MARKER_ADDR	0x40100000	/* 1 MB into the RAM, read back by tinyvm */
 
 	.text
 	.globl	_start
 _start:
-
+#if MMU
 	movz	x0, #0xff00		/* MAIR: attr0 Device-nGnRnE, attr1 Normal WB */
 	msr	mair_el1, x0
 	movz	x0, #0x3519		/* TCR: T0SZ 25, WBWA inner shareable walks, */
@@ -241,13 +250,13 @@ _start:
 	orr	x0, x0, x1
 	msr	sctlr_el1, x0
 	isb
-
+#endif
 	movz	x1, #(MARKER_ADDR >> 16), lsl #16
 	movz	w2, #0x4d4d		/* "MM" */
 	movk	w2, #(0x55 + MMU), lsl #16
 	str	w2, [x1]
 	dsb	sy
-
+#if SPIN
 	mrs	x3, cntfrq_el0		/* spin SPIN seconds */
 	mov	x4, #SPIN
 	mul	x3, x3, x4
@@ -256,7 +265,7 @@ _start:
 2:	mrs	x4, cntvct_el0
 	cmp	x4, x3
 	b.lo	2b
-
+#endif
 	movz	w0, #0x0008
 	movk	w0, #0x8400, lsl #16	/* PSCI SYSTEM_OFF */
 	hvc	#0
@@ -277,7 +286,26 @@ pgtable:	/* level 1, 1 GB blocks: 0-1 GB Device, 1-2 GB Normal WB (the RAM) */
  * the VM off through PSCI, checks the marker the guest wrote and exits 0.
  * Build: gcc -O2 -o tinyvm tinyvm.c
  */
+#define _GNU_SOURCE
+#include <errno.h>
+#include <fcntl.h>
+#include <linux/kvm.h>
+#include <sched.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
+#define RAM_BASE	0x40000000UL
+#define RAM_SIZE	(16UL << 20)
+#define MARKER_OFF	0x100000UL
+
+#define CORE_REG(x) (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE | \
 		     (offsetof(struct kvm_regs, x) / sizeof(uint32_t)))
 
 static void die(const char *what)
@@ -364,7 +392,18 @@ int main(int argc, char **argv)
 }
 
 ==> run.sh <==
-
+#!/bin/sh
+# run.sh [-v rt_cpu] [-c stress_cpus] [-g guest_cpu] [-t seconds] [-r runs] [-m 0|1]
+#
+# Does running a KVM guest make the host's broadcast TLB invalidations more
+# expensive, after the guest is gone? With stress-ng --tlb-shootdown on
+# stress_cpus (one worker per CPU), cyclictest (SCHED_FIFO 99) measures the
+# wake-up latency on rt_cpu and stress-ng its own throughput, -r times; then
+# tinyvm runs one guest on guest_cpu (-m 1: the guest turns its stage-1 MMU on,
+# the trigger; -m 0: it does not, the control); then the same measurements
+# again. The effect lasts until the next VMID rollover or reboot: run it on a
+# freshly booted, otherwise idle host. Needs stress-ng and cyclictest (rt-tests)
+# in PATH or STRESS_NG / CYCLICTEST; run as root from this directory after make.
 set -e
 V=3 C=0-2 G=2 T=20 N=3 M=1
 while getopts v:c:g:t:r:m: o; do
@@ -405,6 +444,11 @@ END { printf "after/before (means): cyclictest avg x%.2f, max x%.2f; stress-ng t
 	(m["after"] / n["after"]) / (m["before"] / n["before"]),
 	(o["after"] / n["after"]) / (o["before"] / n["before"]) }' results.txt
 rm -f sng.out results.txt
+---
+Changes in v2:
+- Restore the reproducer's lines starting with '#' (#include, #define, #if
+  and comments), which were dropped from v1.
+- Link to v1: https://patch.msgid.link/20261029-nvhe-stage2-flush-v1-1-a87c7aaa91e1@unina.it
 ---
  arch/arm64/kvm/mmu.c | 11 +++++++++++
  1 file changed, 11 insertions(+)
