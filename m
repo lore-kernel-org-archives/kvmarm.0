@@ -1,71 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793271538;
-	b=IqxQrk3sc0w9Ti3qcJuvUk2uFo3Jpr45s7jxvTGfTv0Sp1eR/UELAuSNrABB9keAkRx3
-	 nLITKGIpcu2V3d6erUkWlmPk1v2VXsU6KKdXeFkufUPfHBcYWDNVxo9MXr85/2q1+EtSz
-	 mhBfKEZycqQebozUFDW6iX8jRDTg6GyffYK6QPAjTLRUTFrrcgFHy+eNakUfztLuYuhzS
-	 ojm2EaBVZaJyXqZQ3/oONuSViH288pyx2exWtYbx0OL6IsIXyLypfUxrvbFLxOnqY4tyr
-	 7TtX52yLBHh4QocGTy5Vpwa4M18vtx0Vdfzua4iSq1lvhtNAFwm1qW2j78qeYTNDg6w==
+	t=1793273791;
+	b=eV2ZQQAP6ccWAzGHbrBxiVh23G1VBAcsI45EEF1DacZyggipAmxD/mcAV7zZ9jH8elwO
+	 k7qzUFsyRNpA6hbYN3zQpicZfuglfF9qM3y3LgAaKTjBrW0G/B7a0+zG+Yd5eDPm99A+s
+	 0s8X3xOXYFQ13rPwsrD4P4MF1S2YQ0ytMJ/k+hdbV1k5OcdQtSf18TgFglQTS+urMSE7f
+	 KR3hGTiPxpq75UbbqludpqEYXhdK7m8ddMBA753TAWqPOAefNZ7Cza2ovAON0abWqt6L6
+	 31wlEL/Ar9enaxLQOxUzIueOb9Wxb7kgLoAvsRsEFxq9dTwGHigzeyoA/YHnE6T6E/A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793271538;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=wqIKNGVdfkrptWgaeVqfIbbOwYH/8dZpAy0/6WAuLr0=;
-	b=Ys71h8GBVzEFHXhUE1ueNDtn/VqzOGC5PN5HS43BJxvQh5ealyL7TJ0P9HDGw0La6+vc
-	 Gj1uappE9oIvcUUW2ikdJtlZrMHi07pd4t1G/bHVx9vJpfYmrFo7sfDd0W6sj5fKm7dTC
-	 56xv5eqze/1FRHWTSjQAHCfVY9Br2lOCNH0nGk2ZbSInemSBbaJNLhXNPuKpmd4auLxCj
-	 hMkYL23jRtOlLR2cqjEuWFzlurTPvcg4HSpr+F907ztBKnpoFHKHgTxSOl0DKmkhX7/ic
-	 /unJuhamdVUldrCymbNcJUSm4BmIg4TK2v3Qh590GWGg27Tgjjeul2x7iyQEjkY94jg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793273791;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=EONOj0OHaUwSYU9N/VrCCNs20gpUnplCCd7yehPjBGA=;
+	b=zIZcsvPrzAv1ZCUlaHGL1N07q8dKj+zeScawAXgbaK15rWjGbOmuzIDYu92qKncdGGFl
+	 moaqSySmGxztxVHkm6zMxhut/ARUeDKgYmEOUh30cTS6mqJObdxokYIzz14q1dqDssgcV
+	 n0NEVwsomqetVDm5+mHHROoUhW9sbxN1LjE+zxD7zizH7HdC+oOZc8by89xg0CWXnczut
+	 IopBrN6HNiN/3lunMU26IdDFgOpSHJcDUh1P5LhxcJj9lWESZcRs0nmgyGQSswWgQ80kY
+	 Zlt9Y7wACQb+yvud4rCbjywKBjvWB6qDPtayzps+FuK1itY38yxkBs1UnSRzD/HvVjA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DbfAITP4;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9098606A31A;
-	Thu, 29 Oct 2026 10:58:57 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="KjZbwEu/";
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3A1D606A31A
+	for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 11:36:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D3A1D606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DbfAITP4
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DA561F01825;
-	Thu, 29 Oct 2026 10:58:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793271537;
-	bh=wqIKNGVdfkrptWgaeVqfIbbOwYH/8dZpAy0/6WAuLr0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=DbfAITP43mnXujBkidMw1VXT0oNbo+tpg3tR7bOzuB780AUdvqY+4em7GNuqMVOI+
-	 /9vGGFvYxJY5nv19x76EiMaaU1pupbb1TeKxwBv+eDDJBW+lowrvUiosMqB0muLJDW
-	 oZQWE3axBw/T5ZXch13QlCuLU7/TDES9r0SttwBTwdbHbLtVwP1u/mOQkPRVt4XU2z
-	 ka6PUf3+V44mkBpgZSLH4FKh4jweRumvj5WYSzqCEr+yd0ypovmx2zsWCiiiS0+I+3
-	 IEv383ypRf+4xMjQmzXKY5eYg5em8s4etsSqBuns5rZdxDKxvWmld57KIgVwGY9V0n
-	 RdjEAQ+sCyDtA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xMNqR-00000008VQy-0rgy;
-	Thu, 29 Oct 2026 10:58:55 +0000
-Date: Thu, 29 Oct 2026 10:58:54 +0000
-Message-ID: <86ld7gydqp.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=KjZbwEu/
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E03931BB2;
+	Thu, 29 Oct 2026 04:36:25 -0700 (PDT)
+Received: from e143914.arm.com (e143914.arm.com [10.2.213.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7F6E83F59E;
+	Thu, 29 Oct 2026 04:36:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793273789; bh=dTGDCsCEyj7FTwEr3QOxyYhJdKuSWQypWjxORP+0gqw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KjZbwEu/7pDEST1UcOZipx4PNL9nNtV9k4JfrRVNhaXNfLarV45iCTWV4XZJHtYBg
+	 7Qp8V4vg0BATp9y3eKpby/88Kdy0oRFzOenzdRcLRn8qQk5gAomlm+R8fdT7xSPCqV
+	 SKKx4Ybb/qFPlXDLhYwX4++/hczTt+/4/Xj4mTiw=
+Date: Thu, 29 Oct 2026 11:36:17 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: nv: Respect HA when computing translated TCR
-In-Reply-To: <CA+EHjTz-kXVbzcjtMte8B26f0Undr+kWjF2-d0B8TLT8n03hJg@mail.gmail.com>
-References: <20261029090522.64662-1-oupton@kernel.org>
-	<CA+EHjTz-kXVbzcjtMte8B26f0Undr+kWjF2-d0B8TLT8n03hJg@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	James Clark <james.clark@linaro.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v2 3/4] KVM: arm64: Reset TCR_EL2 according to guest's
+ E2H mode
+Message-ID: <auMvsSOJ7canv8lh@e143914.arm.com>
+References: <20260917214215.74135-1-weilin.chang@arm.com>
+ <20260917214215.74135-4-weilin.chang@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -74,55 +74,62 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, weilin.chang@arm.com, seiden@linux.ibm.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260917214215.74135-4-weilin.chang@arm.com>
 
-On Thu, 29 Oct 2026 10:05:19 +0000,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
+On Thu, Sep 17, 2026 at 10:42:13PM +0100, Wei-Lin Chang wrote:
+> From: Marc Zyngier <maz@kernel.org>
 > 
-> Hi Oliver,
+> Previously vCPU TCR_EL2's reset value didn't consider TCR_EL2's
+> different formats based on the value of HCR_EL2.E2H. It always resets to
+> the E2H == 0 version.
 > 
-> On Thu, 29 Oct 2026 09:05:22 +0000, Oliver Upton <oupton@kernel.org> wrote:
-> [...]
-> > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> [...]
-> > @@ -29,7 +29,8 @@ static inline u64 translate_tcr_el2_to_tcr_el1(u64 tcr)
-> >                (tcr & TCR_EL2_TG0_MASK) |
-> >                (tcr & TCR_EL2_ORGN0_MASK) |
-> >                (tcr & TCR_EL2_IRGN0_MASK) |
-> > -              (tcr & TCR_EL2_T0SZ_MASK);
-> > +              (tcr & TCR_EL2_T0SZ_MASK) |
-> > +              ((tcr & TCR_EL2_HA) ? TCR_HA : 0);
-> >  }
+> This didn't cause any problem because the bits set in the E2H == 0
+> version (TCR_EL2_RES1) all reset to UNKNOWN for E2H == 1 per the
+> architecture.
 > 
-> Should you forward SH0 in this patch as well? It's missing here, so
-> the walks are Non-shareable, and looking at the ARM ARM, this would
-> make every hardware Access flag update CONSTRAINED UNPREDICTABLE
-> (R_WLTNL, and the IsWBShareable() check in AArch64_S1Translate()). An
-> L1 that programmed SH0 as Inner Shareable could then take an
-> unsupported atomic update fault.
+> Still, it's better to fix it. Choose the correct reset value by checking
+> KVM_ARM_VCPU_HAS_EL2_E2H0.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
 
-That's a good point. However, my reading of the ARM ARM indicates that
-as long as S2 shareability is Inner-Shareable, the resulting
-shareability is Inner-Shareable (see R_ZNLRJ), so we're actually safe.
-This should be fixed though.
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
-> HPD isn't forwarded either, although at.c reads it from TCR_EL2 for an
-> E2H=0 guest. Was that intentional?
-
-Another bug (E2H==0 really doesn't see much love). This needs fixing,
-but also relies on sanitising TCR_EL2. Thankfully, there is [1] which
-requires some reviewing... ;-)
-
-Thanks,
-
-	M.
-
-[1] https://lore.kernel.org/r/20260917214215.74135-1-weilin.chang@arm.com
-
--- 
-Without deviation from the norm, progress is not possible.
+> ---
+>  arch/arm64/kvm/sys_regs.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 44aae52c473d..62c059747fbb 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -3275,6 +3275,14 @@ static u64 reset_mdcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+>  	return vcpu->kvm->arch.nr_pmu_counters;
+>  }
+>  
+> +static u64 reset_tcr_el2(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +{
+> +	__vcpu_assign_sys_reg(vcpu, r->reg,
+> +			      vcpu_has_feature(vcpu, KVM_ARM_VCPU_HAS_EL2_E2H0) ?
+> +			      TCR_EL2_RES1 : VHE_TCR_EL2_RES1);
+> +	return __vcpu_sys_reg(vcpu, r->reg);
+> +}
+> +
+>  /*
+>   * Architected system registers.
+>   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+> @@ -3853,7 +3861,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  
+>  	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(TTBR1_EL2, access_rw, reset_val, 0),
+> -	EL2_REG(TCR_EL2, access_rw, reset_val, TCR_EL2_RES1),
+> +	EL2_REG(TCR_EL2, access_rw, reset_tcr_el2, 0),
+>  	EL2_REG_FILTERED(TCR2_EL2, access_rw, reset_val, TCR2_EL2_RES1,
+>  			 tcr2_el2_visibility),
+>  	EL2_REG_VNCR(VTTBR_EL2, reset_val, 0),
+> -- 
+> 2.43.0
+> 
