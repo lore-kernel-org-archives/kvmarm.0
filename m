@@ -1,70 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793296382;
-	b=qA/m2SbXe4kIdv9KGq3+cbJgXNXvoWYtxOQlI7oOgO6+u+PRYhW3rrX5Tlztt7NzkVWB
-	 PAayiaMkxttq66Qc+z3FidRJHexEM4jD6V94yAf0XiVDG69GXf80ciHCLXsHv0dECnhmC
-	 LltKTZicS5dibz67IbD83lAvU/MXJVoz00gTC9twnVDSkoXjjqU6w4bCf9BTE4A2frjcs
-	 CcuBmQbKbrEeXUcUUeN9AaIg/JgGK+u5esmQHtwxBtrMOAzwNyGIuHaDaoNkmO0rdwdDG
-	 qLBWsd3Rs1Tp2SLIVH+s13U43ySRZ05fCQ4V1ZqUNNWCWksGQSStm/NkKhuZhzfactA==
+	t=1793296997;
+	b=zVZLv92x0TWbzBEIRk7oSj74FQSJWg1U2qdWG5uCsuUxHlEeVWgSN0TXJE99S/I+mtzQ
+	 2CsTf93jC1iVY2o/u0bf06tVPTOfS+CHoCqGe6eSsrv9cyERt20Ojzkz9FvUIZdDZQ6c9
+	 YnnWB+TiqXj74tma/gLXDwd0GaphZ6zIHuACtXg1oZ/lHTxqmybwcF/4GBRcGXux7PF+W
+	 bJdZ42QEni8mj5ekVjPBD0kvIoHfxCAweXyLCBI77voTSyudlwsPrURGGan6SCsek5t+0
+	 fKp8qrXS3c83yyKOlLfagbw0lD8ZqPjgbP9YK2iAUB0CFd1eJXsidYqZLadVD3WBM8w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793296382;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=cRx0GOxhxfhLERhNm3p7CKI4SQfBnK7vX+eZW7yZMiM=;
-	b=edVAlaT7D8pnA4J0WWodRh8YNLrUzFWAHf7MKg8aH/k2zXEQLMF8TjhIMPf9Nhgyr7BI
-	 4hUkeyZYq8axzEjff0ZShXli7ZiYxeSkT/w5erblmC3tI/iDY334fN73560DR9GAgYc6l
-	 CzNs0nsoudjLwpj+8LPVzSjTi+dA7IZFrQWoh0a9FJL7LU9yG79nfkmxY50qY95mmnHXU
-	 Tu9GHokuCmc6E2veY5wojCT0P66pptul12OFtkDRXCFGYog8hLBKu/j9m7MbAkPlh0VAu
-	 myNC56Nu7ph5APoKTbLaErC1xzDiZcpkEz1JQLWDue/nSUDgUdaeHopj2O3LZYsPZ2w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793296997;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=+BSfrJ0Fvk6pE1EEg+dZVSHnO3k4S6/t9PQDyacXF7o=;
+	b=CMmlAxhPPyt57fVO3OCORTEqavxNzxBLZj6jNHem81UWpjr/FSYNgTFIxpbvnWrDn3ah
+	 qtFW7Oyp5haHnbd5DU89Y6+EzdgJHqLt21NDWNPwWl3q45E0LTViioxnAcCr/NTA7v69z
+	 +zmvE7FONGZkz0h7FGaiHMe3WjxIpR8fL0X2a4eflE9Ei6m38Cr4caM+0VA/sxk8qQd2a
+	 /mzlhg4Jf7xCEgSfl2qbCPNZpIYEztn+1ds7MZqOoPe1VbxUGZey0baM2+Cp0PHHGdnDy
+	 TkDSDfn+D2Bi4myZjfM0BI8GdTe7Z8gBDLY3VxRyP01BOajQT8O4765JRrLekpzxEQQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=dwus6jWM;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37276606A31A
-	for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 17:53:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 37276606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=KYJwYCEl;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8271606A334;
+	Thu, 29 Oct 2026 18:03:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=dwus6jWM
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7F1DA16F2;
-	Thu, 29 Oct 2026 10:52:57 -0700 (PDT)
-Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3979A3F59E;
-	Thu, 29 Oct 2026 10:52:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793296380; bh=OxLxREo/Qf1RsgcWUzTubgxXR6sWtp0XKHSiO9WyI3g=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dwus6jWMApX65EEGcsQDaTpT6lCDKOIdlPSU7awmK6HFPULc/W5R+4NaN/lbIEVD3
-	 1PXRO7g9pYZsnvt3LsgCpbe2IXs/okNPPTVioTaSVsFH3Ii09CMGASmKyuhcNG5sIX
-	 f+9116doj55W9phdzlyQ8ZJlKR5D5cNN5UKcx46U=
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Cc: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Leonardo Bras <leo.bras@arm.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH v2 2/2] KVM: arm64: Remove stale remark on canonical IPA alignment
-Date: Thu, 29 Oct 2026 17:52:38 +0000
-Message-ID: <20261029175238.3214788-3-weilin.chang@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261029175238.3214788-1-weilin.chang@arm.com>
-References: <20261029175238.3214788-1-weilin.chang@arm.com>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=KYJwYCEl
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E3441F01824;
+	Thu, 29 Oct 2026 18:03:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793296996;
+	bh=+BSfrJ0Fvk6pE1EEg+dZVSHnO3k4S6/t9PQDyacXF7o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=KYJwYCElxdxWS679xOjC48/NIm/L2CqIDBLv8s8E+xU+vA+JqOfQHYixNUrQ0LzSY
+	 ItBepWZ6kKBBsr4E4tqXhGlEN/SnGuJgbAu0MTHIZ5BpcmzAlyzCL5huyegq4rEgh4
+	 ynKngZe7bRWzBHriiddEXebJEzThkroDmdl/3RzHf92eoIXv/D/ziF6MZxsJ+nyZbs
+	 6viFG1bK85EegdzHqSzwVNmESgMVIh77mXg9zSpnGNYnZlGph1vSpyWFhzQ3es0EOp
+	 LojqonfL/BvpvedyLH+EnNpRxqj+05ddEKLbEvZpMxUDI5sGb+uKqr2pnv0j6zjVec
+	 Qqu9+5Uyd4P5A==
+Date: Thu, 29 Oct 2026 18:03:09 +0000
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, 
+	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	will@kernel.org, mark.rutland@arm.com, linux-perf-users@vger.kernel.org, 
+	catalin.marinas@arm.com, james.clark@linaro.org, Sudeep Holla <sudeep.holla@arm.com>
+Subject: Re: [RFC PATCH v7 14/28] KVM: arm64: Add SPE VCPU device attribute
+ to initialize SPE
+Message-ID: <auOG5W5hxDVYL-hh@gremlin>
+References: <20260903160623.315525-1-alexandru.elisei@arm.com>
+ <20260903160623.315525-15-alexandru.elisei@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -74,38 +61,148 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260903160623.315525-15-alexandru.elisei@arm.com>
 
-Commit 3b8ce2b5132ae ("KVM: arm64: Use a variable for the canonical IPA
-in kvm_s2_fault_map()") created a variable to store the canonical IPA,
-instead of calculating it when needed. It moved the aligning just before
-mark_page_dirty_in_slot() to an earlier place but did not update the
-comment.
+On Thu, Sep 03, 2026 at 05:06:09PM +0100, Alexandru Elisei wrote:
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 8ffa3e89d38c..c695aae484d3 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -449,6 +449,7 @@ enum {
+>  #define KVM_ARM_VCPU_SPE_CTRL		3
+>  #define   KVM_ARM_VCPU_SPE_IRQ		0
+>  #define   KVM_ARM_VCPU_SPE_ID		1
+> +#define   KVM_ARM_VCPU_SPE_INIT		2
+>
+>  /* KVM_IRQ_LINE irq field index values */
+>  #define KVM_ARM_IRQ_VCPU2_SHIFT		28
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 132df44c3088..c9a026c61ce7 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1026,6 +1026,12 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+>  			return ret;
+>  	}
+>
+> +	if (vcpu_has_spe(vcpu)) {
+> +		ret = kvm_spe_vcpu_first_run_init(vcpu);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
 
-Remove the stale part of the comment.
+So, staring at patch 18 made me think about ordering again, which seems to be
+_super_ sensitive in KVM :)
 
-Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
----
- arch/arm64/kvm/mmu.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+The next patch in the series (15) makes PMSVer depend on the SPE instance having
+been assigned via KVM_ARM_VCPU_SPE_ID.
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index c7df646af79f..695c6229a216 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -2232,11 +2232,7 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
- 	kvm_fault_unlock(kvm);
- 	kfree(mapping);
- 
--	/*
--	 * Mark the page dirty only if the fault is handled successfully,
--	 * making sure we adjust the canonical IPA if the mapping size has
--	 * been updated (via a THP upgrade, for example).
--	 */
-+	/* Mark the page dirty only if the fault is handled successfully. */
- 	if (writable && !ret)
- 		mark_page_dirty_in_slot(kvm, s2fd->memslot,
- 					gpa_to_gfn(canonical_ipa));
--- 
-2.43.0
+But you can still KVM_RUN before KVM_ARM_VCPU_SPE_INIT, which means this will
+return -EINVAL:
 
+int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+{
+	...
+	if (!kvm_vcpu_spe_initialized(vcpu))
+		return -EINVAL;
+	...
+}
+
+And this is quite far down the function:
+
+int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+{
+	struct kvm *kvm = vcpu->kvm;
+	int ret;
+
+	if (!kvm_vcpu_initialized(vcpu))
+		return -ENOEXEC;
+
+	if (!kvm_arm_vcpu_is_finalized(vcpu))
+		return -EPERM;
+
+	if (likely(vcpu_has_run_once(vcpu)))
+		return 0;
+
+	...
+
+	ret = kvm_vcpu_finalize_sys_regs(vcpu);
+	if (ret)
+		return ret;
+
+	...
+
+	/*
+	 * This needs to happen after any restriction has been applied
+	 * to the feature set.
+	 */
+	kvm_calculate_traps(vcpu);
+
+	...
+
+	if (vcpu_has_spe(vcpu)) {
+		ret = kvm_spe_vcpu_first_run_init(vcpu);
+		if (ret)
+			return ret;
+	}
+
+	...
+}
+
+patch 18 made me think of this as kvm_calculate_traps() does the FGU
+initialisation (which derives from SPE state), and once done sets
+KVM_ARCH_FLAG_FGU_INITIALIZED, meaning this state is incorrectly setup.
+
+This is a real problem as HAS_RAN_ONCE isn't set on that failed path,
+userland can finish the SPE setup, set KVM_ARCH_FLAG_FGU_INITIALIZED, and
+that state is never recomputed.
+
+Also kvm_vcpu_finalize_sys_regs() calls kvm_spe_finalize_idregs() (via
+kvm_vm_finalize_sys_regs()) which writes PMSVer in the first place.
+
+So it seems you should put this check _before_ these, e.g.:
+
+int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+{
+	struct kvm *kvm = vcpu->kvm;
+	int ret;
+
+	if (!kvm_vcpu_initialized(vcpu))
+		return -ENOEXEC;
+
+	if (!kvm_arm_vcpu_is_finalized(vcpu))
+		return -EPERM;
+
+	if (likely(vcpu_has_run_once(vcpu)))
+		return 0;
+
+	...
+
+>>>>
+	if (vcpu_has_spe(vcpu)) {
+		ret = kvm_spe_vcpu_first_run_init(vcpu);
+		if (ret)
+			return ret;
+	}
+>>>
+
+	ret = kvm_vcpu_finalize_sys_regs(vcpu);
+	if (ret)
+		return ret;
+
+	...
+
+	/*
+	 * This needs to happen after any restriction has been applied
+	 * to the feature set.
+	 */
+	kvm_calculate_traps(vcpu);
+
+	...
+
+}
+
+--
+Cheers, Lorenzo
