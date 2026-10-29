@@ -1,62 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.40
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793274130;
-	b=dCcNECBuwDEHq49ldN+usoDh2KPUlj92yev8mZd0zxAPnlIm8Ja3liGpzKE45nLxTRrA
-	 Llvm5Ppck+zwd1N0R8b4SIrQDj8n9sILPUGoudU/EJww2o39NYGtPegpDsjEqGUHTrE6+
-	 xlHAGFFItjLzR2rhKtJXgrqb1hKddR+gHMBveFy48MmygTp5NMYN+t2TELOTZ+1NVPIhF
-	 d+VDeO8vdDSCONCoAY/A6jSzkBm88hxocGpH0w1WMdK7uQYlQpehLpUS9IPgdOtwVWEfc
-	 fPYLqEfV57eW0ruOstSEaMCmkVUAOUdOHdQpOp8ctZ6BMtIr+nbgswEmcdsTE9rPA3g==
+	t=1793274898;
+	b=XXoKoyQMc58kiwxq68wiGlIRfOPt+GibidIknJ2vbteLBT7rpWRTGIrDAdzM1qJZ+ctz
+	 DIw4cG3d/sQLQWGcsgTZve1jZ9lUGCr1BsOPT6scBUKdrZolILNx3qrPgym7BY38JBZ7k
+	 YlbWo7XB/+cdiYJK3ancU80Yv11rCf8zhuQ7g8rX13fHxSrBSzXnwewJuVRp51uRTC169
+	 JjYzViB0tMLvA+2aTwemaSuUUfJ0tNQTH0XBIKiga3Lz9NFrJq6A6ec7WiMD2in8C7o/G
+	 9SYqBaoCh/cYNhV5C3npW49y2YiTfLthyfS1gikQ5ZVy+j6lErzVJkqpVZgu3aRN7SA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793274130;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=lNKnDSm6DWP7OhUxWQd4mOe7im/nMYs8Ki0YFs7PQN8=;
-	b=d5GSgjlceVcHOGScjE0itmKK82ExLR1IVZmDe6bmmuot55litZ6D+o1Tf2+qmVqCetvL
-	 /t8WlNa/RSxnb7WnXlW+40gc1RHb+1u96fDToyRtXrsEEP9oE8sTegJkGJZmATEX2QJBr
-	 e90Eai5aTQ9E0AjJOcBHR4H8E8q0CoJNYwhFRovnwO6kYKhGspzh4IuWjfsAjRc3GCWvj
-	 puP6qnbHbdAGrf98DPABcq/FM40UnOHwy7UAJHkxnsakAq86uDHfPewyaLWAderS7rlft
-	 /4Ja5ZmjjQ91/19usXFEKHTIwhmRAs9uEgm/D0bNLNAwtlm66UCGCZTTHe6AgU9mGkQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793274898;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
+	bh=h/fSgV0zO2t1wf4b6fHc2vLg5ezMBdguHQgR0SISKi0=;
+	b=24dqmadH6vMDciOV49cUO1QjpEjzygNfyHjijK7GKjts9E/zZoV72dqTB1HpLYf2aZTG
+	 UN4t3ZAgC2vfqJdM/lzSNS1fc44We9WllblbdYPPrCfKIHEhmaVBWq3P80x6yX8dTTNob
+	 G4iChu0KX+D/RHJIDekUrDTKoqR1k8GIqzIfg0CFHtPQWpDlGoaVUx/vBsYVsKii64yxy
+	 KQn675fGcWpZfcj2D8KlBdqV+9f9yqixcNcEtxiiYUOQtJTi4N8abnu+S37f0YGgFxIjg
+	 Er8wT/2/Yhe1tPUhUGqOrk8WEBKLBq+ixdrXHpp07OZbccIJZsMJ+eoln3f4TJjG5sw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=kv3o1VY8;
-	arc=none smtp.remote-ip=91.218.175.40
-Received: from mta0.migadu.com (out-40.mta0.migadu.com [91.218.175.40])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6771606A31D
-	for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 11:42:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A6771606A31D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=I8KFvowK;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D0AE606A31C
+	for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 11:54:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2D0AE606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=kv3o1VY8
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=PnHgOuaW7I0Mn/MofV12U5YliQliS5wKeUNRMOs0Mn4=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793274127; v=1; x=1793878927;
- b=kv3o1VY8bYtasTGaWRbawLuIOTzogz4KAPJVzsk+vMYzSbCe7tyGoprqXBc8NM4LG+TkFcod
- Em7Wcf5kGPGSJQ1Ijgny+emjIFZZsOTmt9/DiQEWiCoQV9e1obES+HvXqv7ILbSIfUSu7gZ7GfY
- OthCgV/LTOcsiM27f4TmUUqc=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 5a8a3ed942ed644a;
-	Thu, 29 Oct 2026 11:42:07 +0000
-X-Mizu-Trace-ID: 5a8a3ed942ed644a
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5bcbb378fc9so7939e87.0
-        for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 04:42:02 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwhNcJzLPNxWwclu2idJCw6FqKG+NwQQhBB8KF6vKnFXZpV/822A+nBytkLXsS8tUTPnX7Q3qw=@lists.linux.dev
-X-Gm-Message-State: AFq9FYJsq4NJCRwJ5D+YGkWD4jXdnzw4pXtfWEfdRFbEz6QhwZGJvv8G
-	JIfNOVOFkJddhzBEh8xAMv8tbLBbx5hgH0yBEkDdQq/0zIcUZBMZhoDLNyRHo65raM641/EeTma
-	R6TF7MM7ibpmSb8X5xcXeBkcWdSmO5i5jTTLakUK9
-X-Received: by 2002:a05:6512:1052:b0:5bf:b994:6598 with SMTP id
- 2adb3069b0e04-5bfd142a3a5mr145865e87.6.1793274118982; Thu, 29 Oct 2026
- 04:41:58 -0700 (PDT)
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=I8KFvowK
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DE9161BB2;
+	Thu, 29 Oct 2026 04:54:52 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EB64F3F59E;
+	Thu, 29 Oct 2026 04:54:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793274896; bh=qViMHAB2Kt/5NwjHfumEcn0tMJKp0+ZDStMShfsDLVU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=I8KFvowKpOVUFgo6sy3X5C6rFJhaRyJnA25w33Wgx/17gKnukyLRomu1Pf1yI0Iof
+	 lcQnpe0Abth0EmgQxlHKa3rA+Kef/8Nq0SM2/MdkIDBqHJb0lHq64HxFrw1tmpcN78
+	 kDWC+g8JQgHOjQKJWsPFk6CCDbTnj7J797e+n+f4=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	liuyonglong <liuyonglong@huawei.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 5/5] KVM: arm64: Enable HAFDBS for guests not on migration
+Date: Thu, 29 Oct 2026 11:54:49 +0000
+Message-ID: <auM0CWJTPzYUTknh@LeoBrasDK>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <52945586-8c5c-4991-bd92-fe02aaf79fbe@huawei.com>
+References: <aqneWnlsdpocLIl6@kernel.org> <aqqhDs3NyjtkZzXK@LeoBrasDK> <aqsl1_IqnV2r8kUL@kernel.org> <aqvt2gnlBZeNsaf4@LeoBrasDK> <as-mH36YSMxAosND@LeoBrasDK> <3e464bef-8dfe-44a3-afea-3c276ae87cd8@huawei.com> <attMtUqxNsuPooix@LeoBrasDK> <8eaaba87-7881-49c4-a76a-51dec2f29ffc@huawei.com> <auCPEQmnFwWldTaM@LeoBrasDK> <52945586-8c5c-4991-bd92-fe02aaf79fbe@huawei.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,56 +75,36 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261029090522.64662-1-oupton@kernel.org> <CA+EHjTz-kXVbzcjtMte8B26f0Undr+kWjF2-d0B8TLT8n03hJg@mail.gmail.com>
- <86ld7gydqp.wl-maz@kernel.org>
-In-Reply-To: <86ld7gydqp.wl-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 29 Oct 2026 11:41:22 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTw0EjMHKOH8s0F6PZRR7WkmRJJrMrqTzpYoP9gm5n_9Gg@mail.gmail.com>
-X-Gm-Features: AclHuK_Z0kHPbYh0i1HryGJaOSIwXE6_zjBe1WXl1ax6QBriG_I6vIJcW96TN10
-Message-ID: <CA+EHjTw0EjMHKOH8s0F6PZRR7WkmRJJrMrqTzpYoP9gm5n_9Gg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: nv: Respect HA when computing translated TCR
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Wei-Lin Chang <weilin.chang@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Hi Marc,
+On Thu, Oct 29, 2026 at 10:54:24AM +0800, Tian Zheng wrote:
+> Hi Leo,
+> 
+> I've read your discussion with Oliver on DBM RFC v2. As a suggestion,
+> maybe we should go with Oliver's approach, i.e. revert to the v1 scheme
+> and continue fixing from there.
 
-On Thu, 29 Oct 2026 10:58:54 +0000, Marc Zyngier <maz@kernel.org> wrote:
-[...]
-> That's a good point. However, my reading of the ARM ARM indicates that
-> as long as S2 shareability is Inner-Shareable, the resulting
-> shareability is Inner-Shareable (see R_ZNLRJ), so we're actually safe.
-> This should be fixed though.
+Hi Tian,
+I have been reading a bit more about permission indirection to try figuring 
+out a way that the change may work for both ways.
 
-If my reading is correct, I don't think R_ZNLRJ is enough here.
-AArch64_S1Translate() (J1.2.4.57 in M.d) checks the walk attributes
-before it translates the update through stage 2:
+The problem with the previous approach is that it assume DBM=write at all 
+times, which is not architecturally correct. Having DBM=write only on 
+HAFDBS=on as suggested would require us to transverse the whole pagetable 
+to convert encodings when we enable/disable it, which can be quite 
+expensive.
 
-    // Either the access flag was clear or AP[2]/nDirty was set
-    if new_desc != descriptor then
-        if (!IsWBShareable(descipaddr.memattrs) &&
-            ConstrainUnpredictableBool(
-                Unpredictable_Unsupported_Atomic_HW_Update)) then
-            fault.statuscode = Fault_UnsupportedAtomicHWUpdate;
-            return (fault, ARBITRARY : AddressDescriptor);
-        end;
-        ...
-        if regime == Regime_EL10 && EL2Enabled() then
-            ...
-            (s2fault, descpaddr) = AArch64_S2Translate(fault,
-                    descipaddr, s1aarch64, s2aligned, descaccess);
+One option would be to always enable HAFDBS when system supports HDBSS, but 
+I still have to figure out if that causes any performance regression before 
+suggesting.
 
-descipaddr is what AArch64_S1Walk() returns, and it holds the stage 1
-walk attributes (walkaddress.memattrs = walkstate.memattrs, with SH0
-from TCR_EL1), never combined with stage 2. R_VSXXT also covers an
-update "not supported in the stage 1 translation due to the defined
-memory type": that one is a stage 1 abort, taken to EL1.
+The option I am pursuing is thinking on an unified code path for direct 
+permissison (both HACDBS=on and HACDBS=off) so we don't have to convert 
+between them, neither worry about the impact of HAFDBS=on on performance. 
 
-But it's not like the ARM ARM is an easy read :P
+I will reply on the thread once I figure one of those options out.
 
-Cheers,
-/fuad
+Thanks!
+Leo
