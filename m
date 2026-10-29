@@ -1,71 +1,65 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793274898;
-	b=XXoKoyQMc58kiwxq68wiGlIRfOPt+GibidIknJ2vbteLBT7rpWRTGIrDAdzM1qJZ+ctz
-	 DIw4cG3d/sQLQWGcsgTZve1jZ9lUGCr1BsOPT6scBUKdrZolILNx3qrPgym7BY38JBZ7k
-	 YlbWo7XB/+cdiYJK3ancU80Yv11rCf8zhuQ7g8rX13fHxSrBSzXnwewJuVRp51uRTC169
-	 JjYzViB0tMLvA+2aTwemaSuUUfJ0tNQTH0XBIKiga3Lz9NFrJq6A6ec7WiMD2in8C7o/G
-	 9SYqBaoCh/cYNhV5C3npW49y2YiTfLthyfS1gikQ5ZVy+j6lErzVJkqpVZgu3aRN7SA==
+	t=1793275612;
+	b=ZHa161zUgKGVhP3VBrEZAjxx4WhWPnYXfvPDc1PZGHi/0atIo1zUDGuWa+dVFnManrSx
+	 GfJI3jhbDRbmWetk/JKpNLD6MDKoMEVBvlShHtOzGr94gbQNH89OZwIfhplc70g9kvw7t
+	 ks3rFb8n9TKmqcLxagmoI4cJhqaLjaJekRfEk3SsYG7khWcFYiIl5MsEijb6Msaf0pMto
+	 mzNG+Iw4ymBeBed7pKFuqJJawtkVtJd7ypk3mdBUhIAfAZgzJLUbAwYTr2XUPr6bcuhnc
+	 WLzAYeJbwOFQWWstrYezPoGRAHTIhjnuJ81mD/RRbRN2CnVOpbugHmxbzaJ+Xj6KaKg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793274898;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
-	bh=h/fSgV0zO2t1wf4b6fHc2vLg5ezMBdguHQgR0SISKi0=;
-	b=24dqmadH6vMDciOV49cUO1QjpEjzygNfyHjijK7GKjts9E/zZoV72dqTB1HpLYf2aZTG
-	 UN4t3ZAgC2vfqJdM/lzSNS1fc44We9WllblbdYPPrCfKIHEhmaVBWq3P80x6yX8dTTNob
-	 G4iChu0KX+D/RHJIDekUrDTKoqR1k8GIqzIfg0CFHtPQWpDlGoaVUx/vBsYVsKii64yxy
-	 KQn675fGcWpZfcj2D8KlBdqV+9f9yqixcNcEtxiiYUOQtJTi4N8abnu+S37f0YGgFxIjg
-	 Er8wT/2/Yhe1tPUhUGqOrk8WEBKLBq+ixdrXHpp07OZbccIJZsMJ+eoln3f4TJjG5sw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793275612;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To;
+	bh=jZbLu0wzSjOdnjAJn+WXuj5iQYYS4qUcPU4E+L4JQbY=;
+	b=xKSBVUTul3mYXRaAN9gGjJluews4paiPYTMhaELsFGOyQxCFZpnugaBMkTr+9etmhQo0
+	 Dao/CkcMUPyq6J5Ba7bMcOZm1W1h70v5y308i2rj1AaKMbC9pqx8XQgk8tb8mTfTQeYAL
+	 HZOCC+QlJCt5YEyvCHI8u0ocDXi+/9jJt9w+/KcmX9R4pRw3kx+hCQKp1JlbTtlems0Ug
+	 HC8KjCxnraeV0wgzkFDepwReOKrl38b4QtdDrsaZmAAmrKM22O42jtcC1L0nfV+yWKzSB
+	 Mt5kDoRtBlVP6bisIA6p33poGWMHTuzgyWCIEY2+O2nu5o3g9p/MqPJV88WA2cMjtwA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=I8KFvowK;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=bo9O2Jkw;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D0AE606A31C
-	for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 11:54:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2D0AE606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B9E606A31E
+	for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 12:06:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 74B9E606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=I8KFvowK
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=bo9O2Jkw
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DE9161BB2;
-	Thu, 29 Oct 2026 04:54:52 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EB64F3F59E;
-	Thu, 29 Oct 2026 04:54:53 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9A18D1BB2;
+	Thu, 29 Oct 2026 05:06:47 -0700 (PDT)
+Received: from localhost (a079125.arm.com [10.164.21.43])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 09DC83F673;
+	Thu, 29 Oct 2026 05:06:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793274896; bh=qViMHAB2Kt/5NwjHfumEcn0tMJKp0+ZDStMShfsDLVU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=I8KFvowKpOVUFgo6sy3X5C6rFJhaRyJnA25w33Wgx/17gKnukyLRomu1Pf1yI0Iof
-	 lcQnpe0Abth0EmgQxlHKa3rA+Kef/8Nq0SM2/MdkIDBqHJb0lHq64HxFrw1tmpcN78
-	 kDWC+g8JQgHOjQKJWsPFk6CCDbTnj7J797e+n+f4=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	liuyonglong <liuyonglong@huawei.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 5/5] KVM: arm64: Enable HAFDBS for guests not on migration
-Date: Thu, 29 Oct 2026 11:54:49 +0000
-Message-ID: <auM0CWJTPzYUTknh@LeoBrasDK>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <52945586-8c5c-4991-bd92-fe02aaf79fbe@huawei.com>
-References: <aqneWnlsdpocLIl6@kernel.org> <aqqhDs3NyjtkZzXK@LeoBrasDK> <aqsl1_IqnV2r8kUL@kernel.org> <aqvt2gnlBZeNsaf4@LeoBrasDK> <as-mH36YSMxAosND@LeoBrasDK> <3e464bef-8dfe-44a3-afea-3c276ae87cd8@huawei.com> <attMtUqxNsuPooix@LeoBrasDK> <8eaaba87-7881-49c4-a76a-51dec2f29ffc@huawei.com> <auCPEQmnFwWldTaM@LeoBrasDK> <52945586-8c5c-4991-bd92-fe02aaf79fbe@huawei.com>
+	t=1793275610; bh=XuWqiX8GeiKnGK/0kw5HiwXWVYKheY7gCYzp1RS3dQ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bo9O2JkwLOS7LGpq9ufyaBMHKJAyRLCQQUNFQeXJmMvGyV9Ow2p9BmXWD+O5wgtKK
+	 0NTO/+3bHJSwx0SYyMwOzqehHeOFKu4M/hQWA9xKlna72cHxmebLV0qvJkeca0VnaB
+	 Jg3Wac3Ss3af0VKYKctrzqCeZvHnjSdOJMUY0iwk=
+Date: Thu, 29 Oct 2026 17:36:47 +0530
+From: Linu Cherian <linu.cherian@arm.com>
+To: Kristina =?utf-8?Q?Mart=C5=A1enko?= <kristina.martsenko@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-acpi@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-efi@vger.kernel.org, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+	David Hildenbrand <david@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, 
+	Anshuman Khandual <anshuman.khandual@arm.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, 
+	Hanjun Guo <guohanjun@huawei.com>, Sudeep Holla <sudeep.holla@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Subject: Re: [RFC 00/12] arm64: Add support for TLBI domains
+Message-ID: <upkds2ymzuztqvxxuysm62lxcdv5oa3ji6xrxbnz3yt3vntbp6@rw54ndtnpz3y>
+References: <20261001110655.461473-1-kristina.martsenko@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -75,36 +69,57 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20261001110655.461473-1-kristina.martsenko@arm.com>
 
-On Thu, Oct 29, 2026 at 10:54:24AM +0800, Tian Zheng wrote:
-> Hi Leo,
+Hi Kristina,
+
+On Thu, Oct 01, 2026 at 12:06:43PM +0100, Kristina Martšenko wrote:
+> Hi,
 > 
-> I've read your discussion with Oliver on DBM RFC v2. As a suggestion,
-> maybe we should go with Oliver's approach, i.e. revert to the v1 scheme
-> and continue fixing from there.
+> This series allows the kernel to use TLBI domains. TLBI domains (FEAT_TLBID) is
+> an Arm architecture feature that enables a TLB invalidation to target a subset
+> of CPUs instead of the whole system. It can improve performance on systems with
+> many CPUs. TLBID is not yet part of the Arm Architecture Reference Manual but
+> some of it is described in the latest XML [1].
+> 
+> The goal of this series is to send TLBI commands only to the CPUs where a
+> process has run (i.e. where its page tables have been installed). The last
 
-Hi Tian,
-I have been reading a bit more about permission indirection to try figuring 
-out a way that the change may work for both ways.
+Lets say if we have a TLB domain of 8 cpus and a process has ran on only
+one cpu, dont we end up broadcasting to all cpus in the domain as the 
+granularity is at the domain level ?
+If thats true, would be good to make that clear.
 
-The problem with the previous approach is that it assume DBM=write at all 
-times, which is not architecturally correct. Having DBM=write only on 
-HAFDBS=on as suggested would require us to transverse the whole pagetable 
-to convert encodings when we enable/disable it, which can be quite 
-expensive.
 
-One option would be to always enable HAFDBS when system supports HDBSS, but 
-I still have to figure out if that causes any performance regression before 
-suggesting.
+> patch explains a bit about how it works. This is an RFC since I'm not familiar
+> with the kernel's TLB/mm code and I'd like feedback on whether the general
+> approach is correct.
+> 
+> A few notes and open questions:
+> 
+>   * Domains are described in a new "TLBI" ACPI table. This is not yet part of
+>     the ACPI specification. There was an initial proposal [2] but this series
+>     uses a newer WIP version of the table that aims to be published by the end
+>     of the year.
+> 
+>   * There is currently no device tree binding since the feature is mainly meant
+>     for server-class systems.
+> 
+>   * It's also possible to use TLBI domains to limit a KVM guest's TLB
+>     invalidations to CPUs where the guest has run. I'll try to include that in
+>     the next version. This series only disables domains for guests.
+> 
+>   * With this series a long-running process may eventually run on all CPUs and
+>     just issue broadcast TLBIs. It may be worth periodically reducing the set
+>     of CPUs but it's not clear when.
 
-The option I am pursuing is thinking on an unified code path for direct 
-permissison (both HACDBS=on and HACDBS=off) so we don't have to convert 
-between them, neither worry about the impact of HAFDBS=on on performance. 
+Do you have some thoughts on how we could reduce the set of cpus, to avoid
+cross domain scheduling ? 
+IIUC, this should me more of a scheduling decision with domain awareness. 
 
-I will reply on the thread once I figure one of those options out.
 
-Thanks!
-Leo
+Thanks,
+Linu Cherian.
