@@ -1,57 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.26
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793265799;
-	b=Kkyqfi8e4SFY3bXSLl3Lpr1Kht0fmz7Yequ0RD12k4Wa7fSoInV2DbQUZlSB6YX1HFWz
-	 MtO9LGdq4WlQnckbubu7tdemtSqRB/Nd1x5cinTar9gbQABTRSZAm+6pzZRNIjCYFrzu1
-	 veOLW/6ppY1t2oEmR50evgHDwStdTX4vLO3r1+NTsKRc8Tbn3C2wSeb8y4clWgz7vEuwq
-	 kOEu5hokndjQpbu10mh+chU7fonbqlaeNfx856QM+TLB+5CqV1GtBygKpDrKLg5OmU7Qt
-	 04RI7u2znr93xvbsura7cbSqEiPOyXedRKo9BtP5iWK2Zz/tIPqplVmQmO1vBLdZFiQ==
+	t=1793268364;
+	b=F++sYvKlTda8FxEE0rtmSfcpCwG+f/zlZYEunkN1GxppMsERGCle5UaJSMzsdUvtSkIR
+	 3BDC9tsZ6KtDYc0J5sAov8VET3aWthWsyG1oiqO1k4+GS7eukz7q0WDi51oDnYXoXaAin
+	 4cJyfZ37RB13aUe5V/GEo9hVGUQu+ctGAb1JzIqszAuEZKN8s3y0Qs4hWpZynwN5eV3mE
+	 mwjJmTAZgRd5wgY8N4vq5QplNWMDm5X0DnWaCPaEAaI7Fv+NAOGfPk/jcuccJ94nvKHAd
+	 T9tEve2eBNRcL9pek2L3lUcosqIWf96yIqlWJ8nmAZ5vXOfiu8W/+61TvrTqXtxUgXw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793265799;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=068RARPUhpeNt5cdqdcKQHksPIpTlxwfCKWl/O6RHkI=;
-	b=szCxsrTU3gLshW+eihJPdbTpiLWiF7IrbRw38qxZP3T9jojXRVvEmmcjpIczuRSoEFDZ
-	 IH7LnaITE+l1GHjPhM6OMgcYjLdKNCQYGCI/vo88a8eSFzyFi/vHbHjP1Z8xT8pJ1kRrG
-	 395iFgBLI2DjLhwbtnndYQb87PHpfHRI9TpDWLZPyj1IWWbOYN6JrjofZcjThIu4u4vqw
-	 NLd/hf7LpEUuI1lGs0KZCsUs/RFj8dZB/O5O41Jd32e5aZ4vOrHqBXoXwrT35Ic7jrzS5
-	 TW7Ajdh7Wz8yTAQybzlGuQPZGqGpBWHTEKzbmvTntWpAoHMGGBi155AUkMtYMj/rLwQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793268364;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Gm-Message-State:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:
+	 X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:Subject:To:Cc:
+	 Content-Type;
+	bh=CwhmwwstFNj5j10OWiKD2vxusMpjkpm5sJ4KEs5Li5g=;
+	b=AlO2lRBzXYeoBDASbwPFQQnMy0Oo5QVObYvGycxc4AoxkUrDulzMzvt85adKK2zDhK5G
+	 InL0MG6txWyyl7Ps/Qt0fV5etN7ieFPH6FA3JJ+lmGnWEi+MRJAHVBUN6/mqWrnWLTEaH
+	 si+EnGhZjIyzhPiNuGO11IOvPl682g5hoPCEAUxh+o+XL4LR3YMdEQTXoU+46uPQzeSzh
+	 v2at8LA6NbNLiqqEIOQ1wBQbO6zACFsCJ9U0rSaRvWFuKiVPm3Zu0scF7wI+9Xp6fvuQp
+	 ojROv9IUFKEK22DCoacbbY3CcGvIO+YKb8pOa1nPxQYcfH/qfoh6rUG3Sa25aeOXzmw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Hl1arTt9;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=cQq2SEPn;
+	arc=none smtp.remote-ip=91.218.175.26
+Received: from mta0.migadu.com (out-26.mta0.migadu.com [91.218.175.26])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 842BD606A337;
-	Thu, 29 Oct 2026 09:23:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E7F606A338
+	for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 10:06:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A2E7F606A338
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Hl1arTt9
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCD8C1F01828;
-	Thu, 29 Oct 2026 09:23:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793265799;
-	bh=068RARPUhpeNt5cdqdcKQHksPIpTlxwfCKWl/O6RHkI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Hl1arTt9CLQDGptJengrqjKeO/CbPgOOLiN0GgPZ7OP4SrH7yv69hn2BZ34ibZZwj
-	 riXpYoM6I7ebc+BptLTZeaRG7HPvOiI7ypiF7RnGaJYpob/awILhwuT+sImxbOe6UF
-	 qYoRY4rkNJZwdYscvantXBkx955C6gZRNdUMyFT4mL8drqL/cIU3tKGSL8bSi79ePp
-	 5OY1HcF0rrk+nenDrPIkt8RJtvjagARti6Yb2PcMcCcuPPgzhiMgJ0L+SppbT/MfEd
-	 vdI2ObMITkJLxiG+cvBt6R549iZoEjWaqKaoKDmmVF1xhbTJhAZHJTEt7estahfIiB
-	 JrzzBODm+DPYA==
-Date: Thu, 29 Oct 2026 02:23:17 -0700
-From: Oliver Upton <oupton@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: xuheng@cs.columbia.edu, maz@kernel.org, qperret@google.com,
-	will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com,
-	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	tabba@google.com
-Subject: Re: [PATCH] KVM: arm64: Add an ISB after mapping a hyp fixmap slot
-Message-ID: <auMQhSmxIm5JMftF@kernel.org>
-References: <20261028-fixmap-isb-v1-1-6c9f0f9cb810@cs.columbia.edu>
- <20261029085414.2279900-1-fuad.tabba@linux.dev>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=cQq2SEPn
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=nHdmsnjBfSxwIaneBQeFmfOSq68GBVeIj65sbAMafCU=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793268360; v=1; x=1793873160;
+ b=cQq2SEPn+Jf/ZWFJatP4k8UfUzMA0vRvsYRQwjOexyPzuuQX0xi2tnTLd4AIVQQi5+INRPZq
+ nGVmU6h6UM3d9wY9RtrVEopN9yaihH3lkBvLXjW+gsDeVkA4/x+JYu8rIMD4bZs2PH7PmlqahHU
+ teutKOSBGhR3hODSnqEwCsak=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id fa188af9fb3718cd;
+	Thu, 29 Oct 2026 10:06:00 +0000
+X-Mizu-Trace-ID: fa188af9fb3718cd
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5bfca2a2af4so5464e87.1
+        for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 03:05:56 -0700 (PDT)
+X-Gm-Message-State: AFq9FYL27EY6LbFRWVmtQg2xa3kClNjjjiT7wFMf7PrwJIfp88kBPAVF
+	qYw++wZJ+hGHsstOOvF3XiW4vRkI0OFwxLjYVGhC2J1wDVBxKHRq1WCHBv5HEwXfwcEMXuydD3F
+	zUCKXRjRg9JU3tGHLJNIczrvsoJ+d7DrNGtLdlDyx
+X-Received: by 2002:a05:6512:138f:b0:5bf:d10c:ab94 with SMTP id
+ 2adb3069b0e04-5bfd1821c8dmr108375e87.11.1793268355473; Thu, 29 Oct 2026
+ 03:05:55 -0700 (PDT)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -61,64 +65,44 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261029085414.2279900-1-fuad.tabba@linux.dev>
+References: <20261029090522.64662-1-oupton@kernel.org>
+In-Reply-To: <20261029090522.64662-1-oupton@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Thu, 29 Oct 2026 10:05:19 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTz-kXVbzcjtMte8B26f0Undr+kWjF2-d0B8TLT8n03hJg@mail.gmail.com>
+X-Gm-Features: AclHuK-zARc41Snck-YLig2gcZHoGmmDIC8y2XoXzzXzf5M8gD2OxXTNVUK6Dxo
+Message-ID: <CA+EHjTz-kXVbzcjtMte8B26f0Undr+kWjF2-d0B8TLT8n03hJg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: nv: Respect HA when computing translated TCR
+To: Oliver Upton <oupton@kernel.org>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Wei-Lin Chang <weilin.chang@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Oct 29, 2026 at 08:54:14AM +0000, Fuad Tabba wrote:
-> Hi Xuheng,
-> 
-> On Wed, 28 Oct 2026 23:02:10 +0000, Xuheng Li <xuheng@cs.columbia.edu> wrote:
-> [...]
-> > A litmus test of the same shape (map the slot, DSB ISHST, load through
-> > it) faulted on a Cortex-A72 in 2 out of 100M runs.  Arm's herd7 model
-> > with -variant vmsa also allows the fault, and forbids it once the ISB
-> > is added.
-> 
-> nit: it would help to have the litmus test itself in the commit message,
-> or as a commit note, so the herd7 claim can be checked. Here's the one I
-> ran (herd7 7.58, -variant vmsa): "Sometimes" as below, "Never" with an
-> ISB after the DSB, and "Never" without the ISB under -variant vmsa,ETS2.
+Hi Oliver,
 
-Maybe I've been conditioned at this point but doing DSB; ISB to consume a
-translation after setting it up seems pretty straightforward. Especially
-since we don't care about ETS in the kernel at this point.
+On Thu, 29 Oct 2026 09:05:22 +0000, Oliver Upton <oupton@kernel.org> wrote:
+[...]
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+[...]
+> @@ -29,7 +29,8 @@ static inline u64 translate_tcr_el2_to_tcr_el1(u64 tcr)
+>                (tcr & TCR_EL2_TG0_MASK) |
+>                (tcr & TCR_EL2_ORGN0_MASK) |
+>                (tcr & TCR_EL2_IRGN0_MASK) |
+> -              (tcr & TCR_EL2_T0SZ_MASK);
+> +              (tcr & TCR_EL2_T0SZ_MASK) |
+> +              ((tcr & TCR_EL2_HA) ? TCR_HA : 0);
+>  }
 
-IOW, I'm not sure what additional detail the litmus test buys us.
+Should you forward SH0 in this patch as well? It's missing here, so
+the walks are Non-shareable, and looking at the ARM ARM, this would
+make every hardware Access flag update CONSTRAINED UNPREDICTABLE
+(R_WLTNL, and the IsWBShareable() check in AArch64_S1Translate()). An
+L1 that programmed SH0 as Inner Shareable could then take an
+unsupported atomic update fault.
 
-Anyway:
+HPD isn't forwarded either, although at.c reads it from TCR_EL2 for an
+E2H=0 guest. Was that intentional?
 
-Reviewed-by: Oliver Upton <oupton@kernel.org>
-
-Thanks,
-Oliver
-
-> 	AArch64 fixmap-noisb
-> 	{
-> 	 [PTE(x)]=(oa:PA(x), valid:0);
-> 	 0:X1=PTE(x); 0:X2=(oa:PA(x)); 0:X3=x;
-> 	}
-> 	 P0           ;
-> 	 STR X2,[X1]  ;
-> 	 DSB ISHST    ;
-> 	 LDR W4,[X3]  ;
-> 	exists (fault(P0,x))
-> 
-> FWIW, the result matches the ARM ARM (B2.3: without FEAT_ETS2, a DSB ST
-> doesn't order an earlier store before a later translation table walk),
-> and emit_pte_barriers() in arch/arm64/include/asm/pgtable.h has the same
-> dsb(ishst) plus isb() after making a kernel pte valid, for the same
-> reason.
-> 
-> [...]
-> 
-> Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-> 
-> Tested in protected mode on QEMU, booting a protected and a
-> non-protected guest, and on an Apple M4 (nested virtualization),
-> booting a protected guest. No regressions.
-> 
-> Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
-> 
-> Cheers,
-> /fuad
+Cheers,
+/fuad
