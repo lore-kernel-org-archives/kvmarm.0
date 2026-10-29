@@ -1,78 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793228532;
-	b=qeXsDVe30vd4uP28A6JfSRRrjUt7Xb3mlTcmp/VWG/lIWAuHdaCQjEZ2h9IggMZLT4he
-	 U9boiF+cBRVWY4WJgFdqAsYglyVWJDIFFcHbsACcCX+b1xDo93H7HDpWTJr6268+TRhrQ
-	 LO5KjPtK8/rncfHEVUDll8Rxpt1ILPi3JmpwPbqElYGGzpyDFJ5X5km2ayQOpp+vqP0Fh
-	 5TUMje1i4nLQCbzbJpLuYA0nUHouZWb9U8KzkCRDHRznw2s7ObYZ2zEbBTiRdP+V5R3PV
-	 lYUnHGPDX1rmpQTV4HIwLwl0KeUuKWMOkwHni4CEKa7aNJp0d3XRGLYQBZQnDE9DHNg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793228532;
-	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=x9PhEZroZ7s6qQbU4UDDHXsyI0SUTC2fQaTTCcL595k=;
-	b=iCr/cVnMwehG2T4YgnPDAcMvPtVmRilw8Gs77/IHhA49RrMCvk9+uJ6LJCFSaXD+1lvE
-	 H/V0Bu8kQTksEYVrt7iHvwl0qe5Hgs3aG8NIlh1zA3XwpYFijpQyQBwOXbtcwoWue1hKW
-	 7ALgNBuhBXOhzzvre6qsh27Q/NLjKlQWkVBjVA1CJHMsu8/Zi8DtuZAhYMqG0hhwLWDzD
-	 aF7cdC2HIjpJg22OYSs+8P8O4UbzFNJjjKzndRWhYztBl1vyeIR/2wzkLE6w7V75fzDRg
-	 3+ESqHZgqHZIebM4UFMloGF1LdjrvNEF/QMYHDF6oYUT5h+YarM4WQbzyMhAAaQdgrg==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=es5pmGVO;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80465606A31A;
-	Wed, 28 Oct 2026 23:02:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=es5pmGVO
-Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
-ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1793228532;
-	b=zK1yFaOEcGOG+TVK2haXDS8YcMRvOoJx5yo1ua6/Aio1f19k07grIJfnciPE3PXZPfte
-	 GEU/TIYo9H7/WqCY+PBZFErugA3Cvow/m1MQ8ozfxlLa76ZrkMH8wsS/puzkrSB81eaVP
-	 mIA9lkrN7nV5HwsehuDZ0lO0HJhHhz1Tutql77p6l8QD3q+3s8tFDXCYzWKBfC60CYBLC
-	 jRuDfJkzcvkuwV8Pe0bz1oFRojf5LLKcPWjjRwLo/matbtXkzfv7E/gTSOnQfgopqRx3k
-	 WoNV29wH4XDpQXXNNTQFghMfO4mzLWkkBApYcfK+4bB3lgip5Ym/WSlEvW7r5556DLw==
-ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1793228532;
-	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
-	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=x9PhEZroZ7s6qQbU4UDDHXsyI0SUTC2fQaTTCcL595k=;
-	b=hPXSRThHkVxc4S4bEhl+ByRLDvazCyHyJqKQKC7H7CmfEcYpDPkxz4/3T1iC/W7V93ac
-	 OrJWCslyHWk2+rb2E4/6QXyMfFzN/k/GvCiNBiczIXdq9wgrnN+/Ie1Kdt/tknTOtGfp5
-	 +UHTD62m0uSnyhp23COqlXRuYd/tikQOIEKtVGZytbeMErPnD5235ec5x5JrSHGo+uNW4
-	 SGAZTe7s7hJVE+6y1eU6QjD/prTnLCUV6CRdxK1M+lASjWsGvke2pzaQIilYqeeDPok/h
-	 0Jb/GA6zMGnnInniwGFEDoEVoAy1ZUeJNTw9J8w9K/2gGrN6aT8MihyJlBq/J+9deSw==
-ARC-Authentication-Results: i=1; smtp.kernel.org; 
-	arc=none smtp.remote-ip=100.80.115.77
-Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.219
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793242477;
+	b=3WKZuophlnUBIAQfKIR10cJZRNDdx+fe8WVcH6r0U3i+1AMZpQJM1nu1TNKdcbnxNa4z
+	 eQhr5WoUIfLoHmsKSXIfBHPD1+PwSXGdyLYnGTm9d03yndouNU9VM/dPwAACxykJd0q1y
+	 Ebd++gZUDmpNqsCERb13iIwNM8/oBOlLS5tkgOgDNnRWWWr1z3J20n8WaBIeM/vllI/+C
+	 PMt/VjEMfuwAnIfzEY0HvE662xkzs8uHPKJGEf1MrDSu9CoXTQsBdOxFvw/nbi7oyHhsy
+	 sqBHz6qDKBAnVgCepTC/Sxe1YO/+v3CcJ9LfInjVJa1v58mRvAJ4r4qPJ+OrU7duPEw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793242477;
+	h=DMARC-Filter:dkim-signature:Received:Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type:Content-Transfer-Encoding:X-Originating-IP:
+	 X-ClientProxiedBy;
+	bh=kG2dXNb8wO3/BgLfC0cpJvPGIyuZmV9XeLRw5RqugE4=;
+	b=0ERBKuMf4rvMIw4uFojq8XACKfxIsu4mUoJY9wkKryDz+ZRuR7mOxlQ+fu6ZCkR3CPk/
+	 0B4LDhUMASkbHYiDS2zkEE796zmkvWC3kY6thacxaZCjBi9I6kbrGSs9wM1ilOJvy72Vz
+	 xY5T8kwMufzQCkG4sgBHi/VKbUl1wiBB3KIi8QWlV/Ake9gHfXX/yjkGzsi/w6i/lxJGV
+	 ug2NhT6QkMoTP9UEfk9Awvyd4XIq6xex9Hki38dyUouE+/epcocaFKiNHwFowg23oubyr
+	 T6bwaBgDeTQYzI4fhCXLRWh6nccbDeNPVRNEvZ1CS9S5vWTa/xAPzIZYgmioTKqU/Yg==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=huawei.com;
+	spf=pass smtp.mailfrom=huawei.com;
+	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=2IklUx2L;
+	arc=none smtp.remote-ip=113.46.200.219
+Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id 921DA1F01825;
-	Wed, 28 Oct 2026 23:02:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793228532;
-	bh=x9PhEZroZ7s6qQbU4UDDHXsyI0SUTC2fQaTTCcL595k=;
-	h=From:Date:Subject:To:Cc:Reply-To;
-	b=es5pmGVO9hlHoqYn5bFIApN86T0Bva+Y7j2gwnn0UWcgX83OvLNkkzFfmgctWW+UC
-	 EiI0TazmpyLHaU7M5T7IONhoEekLNIiq5WYwIt4nb+35jAYiik6VcQWFgpHAwRfTyt
-	 Fp2AegJIupTduKFBLbrFg2qQHQfwkKzAm7q9lUMioGikrnipE36M0Bj6xk8F2B5c1c
-	 GsAGo0ei5z7azfTT2wOyE41PeH6ApcMzbHibXT/81MRDohleDF2Jr2X/gA2pUg3PO7
-	 dsJZFFQX76x3QvpBoBFc7mnnkKL/OLj90vp3c8F9j/wWPodT0jWVyLEU2tehfle82G
-	 wz3gEbxW2vrxw==
-Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id E4866455F9;
-	Wed, 28 Oct 2026 23:02:10 +0000 (UTC)
-From: Xuheng Li via B4 Relay <devnull+xuheng.cs.columbia.edu@kernel.org>
-Date: Wed, 28 Oct 2026 23:02:10 +0000
-Subject: [PATCH] KVM: arm64: Add an ISB after mapping a hyp fixmap slot
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CA5606A31A
+	for <kvmarm@lists.linux.dev>; Thu, 29 Oct 2026 02:54:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A0CA5606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=2IklUx2L
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=kG2dXNb8wO3/BgLfC0cpJvPGIyuZmV9XeLRw5RqugE4=;
+	b=2IklUx2LMEZLmggJ3mhG3a18Gubq8nvBArxV8GANZCGw0Mh/SwWlaUoh71DSi3Koh0Zc58dgz
+	ZnC7qz+ZGFcd1CCNqLyIRrdjgaN4noxkUUA3e15+fAR0pKK+46xWakBys78xRqfERtzl5a83qrW
+	mF8GnxsvytzPaFBLsPilyhc=
+Received: from mail.maildlp.com (unknown [172.19.163.104])
+	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4jFTMr6fy3z1prMP;
+	Thu, 29 Oct 2026 10:54:16 +0800 (CST)
+Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
+	by mail.maildlp.com (Postfix) with ESMTPS id 7A2844056E;
+	Thu, 29 Oct 2026 10:54:25 +0800 (CST)
+Received: from [10.67.120.103] (10.67.120.103) by
+ kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.45; Thu, 29 Oct 2026 10:54:24 +0800
+Message-ID: <52945586-8c5c-4991-bd92-fe02aaf79fbe@huawei.com>
+Date: Thu, 29 Oct 2026 10:54:24 +0800
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -82,83 +62,165 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261028-fixmap-isb-v1-1-6c9f0f9cb810@cs.columbia.edu>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIzNDAyML3bTMitzEAt3M4iTd5GTLFHMz01Rj86RkJaCGgqJUoCzYsOjY2lo
- AeJvqclwAAAA=
-X-Change-ID: 20261028-fixmap-isb-cc9d765e37bc
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
-Cc: Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>, 
- Catalin Marinas <catalin.marinas@arm.com>, 
- Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
- Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org, Xuheng Li <xuheng@cs.columbia.edu>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1793228530; l=1807;
- i=xuheng@cs.columbia.edu; s=20261028; h=from:subject:message-id;
- bh=MRI3I7XYX2g8m/5nRZspzMo8wXyH7lpxeGQhbbi2qGg=;
- b=QsMY43bA+fBdaVPVPnbfW9T26X1m6bDnOE7uREQ34isPF0d5YMF7mQSstVSg6VOotubIGaW9A
- r5yGUIqIiLpB2fu5VZSh8xzoazibgmP2GJdt7mXdoCFHaXbfoEdnjGO
-X-Developer-Key: i=xuheng@cs.columbia.edu; a=ed25519;
- pk=L1HVV+goqxYmEMO/OXakL6uf9isSpgk2QrLlFqyZ2Qs=
-X-Endpoint-Received: by B4 Relay for xuheng@cs.columbia.edu/20261028 with
- auth_id=1349
-X-Original-From: Xuheng Li <xuheng@cs.columbia.edu>
-Reply-To: xuheng@cs.columbia.edu
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 5/5] KVM: arm64: Enable HAFDBS for guests not on
+ migration
+To: Leonardo Bras <leo.bras@arm.com>
+CC: liuyonglong <liuyonglong@huawei.com>, Oliver Upton <oupton@kernel.org>,
+	Marc Zyngier <maz@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly
+	<joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose
+	<suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
+	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Mark Rutland
+	<mark.rutland@arm.com>, Raghavendra Rao Ananta <rananta@google.com>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>
+References: <20260901171558.2674031-1-leo.bras@arm.com>
+ <20260901171558.2674031-6-leo.bras@arm.com> <aqneWnlsdpocLIl6@kernel.org>
+ <aqqhDs3NyjtkZzXK@LeoBrasDK> <aqsl1_IqnV2r8kUL@kernel.org>
+ <aqvt2gnlBZeNsaf4@LeoBrasDK> <as-mH36YSMxAosND@LeoBrasDK>
+ <3e464bef-8dfe-44a3-afea-3c276ae87cd8@huawei.com>
+ <attMtUqxNsuPooix@LeoBrasDK>
+ <8eaaba87-7881-49c4-a76a-51dec2f29ffc@huawei.com>
+ <auCPEQmnFwWldTaM@LeoBrasDK>
+From: Tian Zheng <zhengtian10@huawei.com>
+In-Reply-To: <auCPEQmnFwWldTaM@LeoBrasDK>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemr100010.china.huawei.com (7.202.195.125)
 
-From: Xuheng Li <xuheng@cs.columbia.edu>
 
-fixmap_map_slot() installs a valid PTE for the CPU's fixmap slot (or
-the fixblock slot) and issues a DSB ISHST before returning the slot's
-VA, which the caller then accesses.  It does not issue an ISB.
 
-The DSB guarantees that the PTE write has completed, but without a
-context synchronization event the architecture does not guarantee that
-a later access on the same CPU uses the new entry: its translation may
-have been performed speculatively while the slot was still invalid, in
-which case the access takes a translation fault.  At EL2 that fault
-ends in hyp_panic().  The clear side, fixmap_clear_slot(), already ends
-with an ISB.
+On 10/27/2026 7:46 PM, Leonardo Bras wrote:
+> On Tue, Oct 27, 2026 at 10:02:55AM +0800, Tian Zheng wrote:
+>>
+>>
+>> On 10/23/2026 8:01 PM, Leonardo Bras wrote:
+>>> On Fri, Oct 23, 2026 at 03:23:04PM +0800, Tian Zheng wrote:
+>>>>
+>>>>
+>>>> On 10/14/2026 11:56 PM, Leonardo Bras wrote:
+>>>>> On Thu, Sep 17, 2026 at 02:40:42PM +0100, Leonardo Bras wrote:
+>>>>>> On Wed, Sep 16, 2026 at 04:27:19PM -0700, Oliver Upton wrote:
+>>>>>>> On Wed, Sep 16, 2026 at 03:00:46PM +0100, Leonardo Bras wrote:
+>>>>>>>> On Tue, Sep 15, 2026 at 05:10:02PM -0700, Oliver Upton wrote:
+>>>>>>>>> Hi,
+>>>>>>>>>
+>>>>>>>>> On Tue, Sep 01, 2026 at 06:15:56PM +0100, Leonardo Bras wrote:
+>>>>>>>>>> When dirty-logging is disabled, even non-write faults make a page dirty,
+>>>>>>>>>> which avoids a second fault when the page is actually written to.
+>>>>>>>>>>
+>>>>>>>>>> On dirty-logging enable, this approach causes all (writable) pages on the
+>>>>>>>>>> memslot to be marked clean, even if they were not written to, which can
+>>>>>>>>>> take a lot of time, while holding the MMU lock, doing atomic writes to
+>>>>>>>>>> PTEs.
+>>>>>>>>>
+>>>>>>>>> Do you have any performance numbers for this? Enabling HAFDBS seems a
+>>>>>>>>> bit involved to avoid some stores on the first pass.
+>>>>>>>>
+>>>>>>>> Not yet, but if the idea does not look too crazy I can find hardware and
+>>>>>>>> collect some data :)
+>>>>>>>
+>>>>>>> TBH this looks like a micro-optimization so I'm not expecting the
+>>>>>>> performance gains to justify the behavior change.
+>>>>>>>
+>>>>>>
+>>>>>> Okay then, I will get a machine to figure the performance gains :)
+>>>>>
+>>>>> Got the performance numbers here.
+>>>>> I tested both the case where all PTEs are dirty, and the case that 50% of
+>>>>> the PTEs are dirty.
+>>>>>
+>>>>> For that test, actually patch #5 could make kvm_pgtable_stage2_wrprotect()
+>>>>> slower, which is counter-intuitive, in all platforms tested:
+>>>>>
+>>>>> When we walk the S2 pagetable to wrprotect, using the new walker, the
+>>>>> write to the PTE itself is so cheap* that the cost of the branch
+>>>>> misprediction (write PTE or not) for the 50/50 case is significantly higher
+>>>>> than the cost of the 50% extra writes, which makes the 50/50 up to 60%
+>>>>> slower than the 100% dirty case. It is still slower in the '25% dirty' as
+>>>>> well, and starts to get even at '10% dirty'.
+>>>>>
+>>>>> * (non-atomic, everything is in order, walker is small, cpu will probably
+>>>>> bundle it all in a single cacheline write)
+>>>>>
+>>>>> Since the idea of patch #5 was to reduce PTE writes in the first wrprotect
+>>>>> walk, it becomes faster only if only a small portion (<10%) of the VM was
+>>>>> write-faulted while the remaining was read-faulted, which seems to be a
+>>>>> really reduced audience.
+>>>>>
+>>>>> Since this comes with increased complexity, and also carry costs of
+>>>>> having HAFDBS itself enabled outside dirty-tracking, I don't think it's a
+>>>>> good idea to further pursue patch #5. It's only value is that it served as
+>>>>> a base for HDBSS implementation.
+>>>>>
+>>>>> Thanks for reading!
+>>>>> Leo
+>>>>>
+>>>> Hi Leo,
+>>>>
+>>>> Thanks for running this, the numbers are really useful.
+>>>>
+>>>> It means the hardware dirty mode (HD=1) should only be enabled while
+>>>> dirty logging is active with HDBSS support, and stays off otherwise.
+>>>
+>>> Hi Tian,
+>>>
+>>> Correct, it's actually counter-productive for it to stay on without HDBSS
+>>> before dirty-logging.
+>>>
+>>>>
+>>>> With HD only enabled during dirty logging, we also keep the DBM-based
+>>>> encoding for the HD=0 case. On systems that support FEAT_HAFDBS, DBM
+>>>> remains the write bit and S2AP[1] the dirty bit even with HD=0. This
+>>>> works because kvm_s2_fault_compute_prot() maps any writable page of a
+>>>> non-tracked memslot writable-dirty (WD), including on read faults:
+>>>>
+>>>> ```c
+>>>> if (s2vi->map_writable) {
+>>>>           *prot |= KVM_PGTABLE_PROT_W;
+>>>>
+>>>>           if (s2vi->device ||
+>>>>               !memslot_is_logging(s2fd->memslot) ||
+>>>>               kvm_is_write_fault(s2fd->vcpu))
+>>>>                   *prot |= KVM_PGTABLE_PROT_DIRTY;
+>>>> }
+>>>> ```
+>>>>
+>>>> So there is no WC entry for hardware to promote, and HD is simply not
+>>>> needed outside dirty logging.
+>>>>
+>>>> In the next HDBSS version, we'll only turn on HD=1 when dirty logging
+>>>> is active.
+>>>>
+>>>
+>>> Right!
+>>> I will also send a new version of the pre-patch (4 patches) for us to
+>>> discuss. The first 2 patches will change meaning a bit, but should still
+>>> work as they do today.
+>>>
+>>> Thanks!
+>>> Leo
+>>>
+>> Hi Leo,
+>>
+>> OK, I've seen the new DBM RFC patchset. HDBSS v6 will be based on it.
+> 
+> 
+> Hi Tian, thanks for reading it, and for accepting it in your series!
+> 
+> Before rebasing, please wait for the ongoing discussion on it's
+> correctness. Maybe I will have to send new versions before it can be used.
+> 
+> Thanks!
+> Leo
 
-A litmus test of the same shape (map the slot, DSB ISHST, load through
-it) faulted on a Cortex-A72 in 2 out of 100M runs.  Arm's herd7 model
-with -variant vmsa also allows the fault, and forbids it once the ISB
-is added.
+Hi Leo,
 
-Add the missing ISB.  This covers both hyp_fixmap_map() and
-hyp_fixblock_map(), which share fixmap_map_slot().
+I've read your discussion with Oliver on DBM RFC v2. As a suggestion,
+maybe we should go with Oliver's approach, i.e. revert to the v1 scheme
+and continue fixing from there.
 
-Fixes: aa6948f82f0b ("KVM: arm64: Add per-cpu fixmap infrastructure at EL2")
-Cc: stable@vger.kernel.org
-Signed-off-by: Xuheng Li <xuheng@cs.columbia.edu>
----
- arch/arm64/kvm/hyp/nvhe/mm.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-index b95d98cfe..83b74c522 100644
---- a/arch/arm64/kvm/hyp/nvhe/mm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-@@ -316,6 +316,7 @@ static void *fixmap_map_slot(struct hyp_fixmap_slot *slot, phys_addr_t phys)
- 	pte |= kvm_phys_to_pte(phys) | KVM_PTE_VALID;
- 	WRITE_ONCE(*ptep, pte);
- 	dsb(ishst);
-+	isb();
- 
- 	return (void *)slot->addr;
- }
-
----
-base-commit: c339f4010dea8b0d754f84ace70cd1b089878ef8
-change-id: 20261028-fixmap-isb-cc9d765e37bc
-
-Best regards,
--- 
-Xuheng Li <xuheng@cs.columbia.edu>
-
+Thanks,
+Tian
 
