@@ -1,59 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793363052;
-	b=oCuHSMg0DGhiVn9KK6ngJpvT2g8n0KAML5YROgkg2AnaPSlvgjtqpTE4WFUk0CqI2jyL
-	 c3N+E0XmzSCfLtjiXQetUk+5WTLn//ozFxnWAYknEpAcHhQNr+6oqASQ6ZFXZob5eGXaB
-	 OcWe6D8BCIjYqF6W/UA96ZRMXVwNCG8GoEjNqh9ksuevu0KDl+waNhrSvZ/CqtCUtrcMH
-	 laBsNhUhWSltaHT1GEnDIaQJBtkcmGOwyfiTxhkojRf6sVKuDG89DswnIJKN9vgGPGWKA
-	 5sA77b47PEhjMVkuj+TnfZCGgSVEgVTF4ZepU35ANdKtMwqcJ6wduRQwfRjNoVy3woQ==
+	t=1793363097;
+	b=J/FvRxQqknVo+i0FlUGVT1fAkl/wMy+ORtCuw90zqsWJYl4GdoFQbFxTof3iIaiso2oN
+	 iIqPm+xlsM+8Gjo7+FlbSap4Ye158kxmZisY4UQj1BugkRXb9FUA+/Q0/vlZkUJDz0L00
+	 IrqYZZdFOe1n1uCnWwz0EMh7d5iZwQfr8UgJXK9CkCL8TooDQdtPttmy4GcGXTea5hYJU
+	 LW0erIvmg9zIN5AEmE7dpGBmSXNIc1nQCVPKqd7CD6TG9ArTvrLaQZMf1cuUthkQuDMBn
+	 uyiVgP0iy2ZH2uDHyOMvKNnUSmJywb8WyqLQihBarA2L7eT5KctlfhZQwcLI5uo/aag==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793363052;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=iK3PcvtF+u0Hw0tjGTktom3Ojqq/cjL49aUrJ/QI6GA=;
-	b=bSXvBsd0qTJrb3Y3ILNnY7+2lvg+2iA7/NNiFLHeWzOVAU8stf411a3KzJYMIVQXbtUy
-	 UbQ2iZ+cICFHkcYg02/s66uBj7XTOr1cIAg9zzliMgPT9cl4YiEvEu1Wgfo7vgZz+RHQ7
-	 iaPd8zyZc5nZdpvYY+W2XiYU/mAgoy64HdBUaHTqFAnhngliDPsm2pDzJaKElV7an0IpV
-	 BC+BZ/pypSpHuMa6a9REAkV6CnQUhw4Qmiid+0X+LylEV6om/VSgP6LKd2rMO9jatHRVx
-	 xXMmrqgYIL99ZK4ImD273vzb+rZ5/hvYPmcI9Bt9AKzym93xoPC28nkr5jKU0t1i8Cg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793363097;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
+	bh=BGYHEZ8/yGpunCTkOYvgRITEqUm5TYbCUQMtVfX6jU0=;
+	b=4IAsTCotD+zi3Z4v5dvvgUOKHiBOY/MopdSGIKO9wOUafXTc1zDuPPYRaGk+E6tyNGsF
+	 lrRtiliqCMpJVlVq/p6BK6G9rbs4YWWeXbb+qdJgfY8/ddE4nJg9kYWr3HwABH9BxBbPf
+	 eEVZRwDQuYG2DNfhSYXmNhsbtcOnRw/JMsmTFYVoiKApfdPstUtRwBFICka28doo1FPz3
+	 JISU3eC3RyR8iguE5bqxBajY92HREmjSXXCu9oYnzN/Lxais0djjOs/7ET5iPgrc64w+T
+	 AzpdRN6hG4byYA5D6RfdEG+3LffJ7vtGalyWh6ftzm83OTPdwmEDR/rgsr/7Fb5Az0w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Y0c6eGnT;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45410606A31A
-	for <kvmarm@lists.linux.dev>; Fri, 30 Oct 2026 12:24:12 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=oTraL4TW;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A2D0606A325
+	for <kvmarm@lists.linux.dev>; Fri, 30 Oct 2026 12:24:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5A2D0606A325
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Y0c6eGnT
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 946C31F000C1;
-	Fri, 30 Oct 2026 12:24:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793363051;
-	bh=iK3PcvtF+u0Hw0tjGTktom3Ojqq/cjL49aUrJ/QI6GA=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=Y0c6eGnTYsVvrV/drLwTzpfxf4ja/hVkI86IWYfG64MqzkpVuBSCfm7gwJIZzDtUz
-	 k0MV4HBeI2WPO706CNHdZvzz/otngDBUoDANRG+qbd6Cbv5hS9D832ekeJFM1IQWLq
-	 lozkgxKDFW46LGSguu8DCWkgreRteMjBs3Mz1vjE5UGSRQRFQzUzulV9GwkibMVmkN
-	 Ost7KJmX2j8edQmKfemNBAzW9lEy70trd7XM72FHZVB1zbZgWr/yaPqgr+mFvcLHxl
-	 cWoWCNdmKMddkuqRivo/1Jf8wDj3QMuqL2e7s9Bal/COipvA58Hh3pcNxi3KscM6fj
-	 dzAFCYngYFsKA==
-Message-ID: <sashiko-outbox-191007@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH] KVM: arm64: nv: Size nested stage-2 MMUs by the NV
- PARange cap
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Fuad Tabba" <fuad.tabba@linux.dev>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20261030120837.3752397-1-fuad.tabba@linux.dev>
-References: <20261030105139.3543230-1-fuad.tabba@linux.dev>
- <sashiko-outbox-190923@kernel.org>
- <20261030120837.3752397-1-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 30 Oct 2026 12:24:11 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=oTraL4TW
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7C4531682;
+	Fri, 30 Oct 2026 05:24:52 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E26493F673;
+	Fri, 30 Oct 2026 05:24:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793363095; bh=eGdbHVu74E1ReCplaksFUR7oTU7Slvjcv5W3BhCgOSQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=oTraL4TW6hdj6K6/eVqxzmeVe/O6RS5Hc/k5lTSA7nQwCWgUetERsiwu+MuBGb/M+
+	 E5ipFfUb7SrTtrmTnveMAht6d2TA78URXg27fGnLANURPAclKI5Vxoo+8H4TvEnGgB
+	 U3+Peb9gGg2q1ZA3QRpkBU3oaq2qWu1g5CGKx7b8=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	maz@kernel.org,
+	oupton@kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	corbet@lwn.net,
+	pbonzini@redhat.com,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	yangjinqian1@huawei.com,
+	caijian11@h-partners.com,
+	liuyonglong@huawei.com,
+	tangchengchang@huawei.com,
+	yezhenyu2@huawei.com,
+	yubihong@huawei.com,
+	linuxarm@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	fuad.tabba@linux.dev,
+	mark.rutland@arm.com,
+	seanjc@google.com,
+	rdunlap@infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	skhan@linuxfoundation.org
+Subject: Re: [PATCH v5 05/15] KVM: arm64: Harvest stage-2 dirty state into the host folio account
+Date: Fri, 30 Oct 2026 12:24:49 +0000
+Message-ID: <auSMkdEhLI7k8QbV@LeoBrasDK>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <009b13c6-f618-43fe-8a56-8519d31b239b@huawei.com>
+References: <20260929103655.85107-1-zhengtian10@huawei.com> <20260929103655.85107-6-zhengtian10@huawei.com> <at-WceRKAVM2kEnI@LeoBrasDK> <009b13c6-f618-43fe-8a56-8519d31b239b@huawei.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -62,74 +88,112 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] KVM: arm64: nv: missing base changes in kvm_get_pa_bits() and re=
-ply changelog
---
+On Thu, Oct 29, 2026 at 10:02:10PM +0800, Tian Zheng wrote:
+> 
+> 
+> On 10/27/2026 2:05 AM, Leonardo Bras wrote:
+> > Hi Tian,
+> > Sorry for the delay in reviewing...
+> > 
+> > On Tue, Sep 29, 2026 at 06:36:45PM +0800, Tian Zheng wrote:
+> > > With VTCR_EL2.HD set, hardware promotes writable-clean descriptors to
+> > > writable-dirty without any VM exit, and the only record of the write
+> > > is the S2AP[1] bit in the stage-2 PTE. The write never passed through
+> > > the host stage-1, and no unmap path reads the bit, so the record dies
+> > > with the PTE and reclaim may discard written guest data (silent
+> > > corruption).
+> > 
+> > Sorry, I didn't get what you are trying to achieve here.
+> > 
+> > On your patch, I see you marking backing pages dirty at wrprotect and unmap
+> > walkers, and it's very confusing to me on why you are doing this.
+> > 
+> > IIUC, what you are trying to do is make sure a page does not lose it's
+> > contents in case it is reclaimed by the OS.
+> > 
+> > IIUC, when a page is reclaimed, it will unmap the S2 PTE, and save it's
+> > contents to swap, so when the guest read or write to that page will cause
+> > it to fault.
+> > 
+> > The page can never be just unmaped, as if there was a single write to it,
+> > the backing pages should be writable, and the contents need to be saved
+> > somewhere.
+> > 
+> > So, if I was able to understand your suggestion, we don't need to worry
+> > about this, and this patch wouldn't be necessary.
+> > 
+> > Did you hit this issue?
+> > Can you please expand on your issue, if I could not describe it above?
+> > 
+> > Thanks!
+> > Leo
+> 
+> Hi Leo,
+> 
+> Thanks for the review. I haven't hit this in practice, and based on your
+> analysis the patch doesn't look necessary.
+> 
+> Reclaim only writes back folios whose PG_dirty flag is set; a clean
+> folio is simply freed. A stage-2 write never touches the host
+> stage-1, so the folio depends entirely on kvm_release_faultin_page()
+> at fault-in to be marked as dirty; without it, the page stays clean from
+> the host's perspective and reclaim drops the data.
+> 
 
-commit f427a1e42f6e3dddeb1163b0cde7acfb4c92d8ef
-Author: Fuad Tabba <fuad.tabba@linux.dev>
+Oh, okay. IIUC it will be enough if PG_dirty flag is set once, right?
 
-KVM: arm64: nv: Size nested stage-2 MMUs by the NV PARange cap
+While on HAFDBS/HDBSS we will skip the fault for marking them dirty again, 
+we always take the first fault for every PTE (or prefault them), so 
+PG_dirty should always be set once the page is first wroten to.  
 
-This commit replaces get_kvm_ipa_limit() with kvm_get_pa_bits(kvm) in
-kvm_handle_guest_abort() when checking whether a translation fault IPA
-exceeds the guest's PARange.
 
->     KVM: arm64: nv: Size nested stage-2 MMUs by the NV PARange cap
->    =20
->     On Fri, 30 Oct 2026 11:09:43 +0000, sashiko-bot@kernel.org wrote:
->     [...]
->     > Because fault_ipa < BIT_ULL(get_kvm_ipa_limit()) (52) and
->     > fault_ipa >=3D BIT_ULL(VTCR_EL2_IPA(vcpu->arch.hw_mmu->vtcr)) (48),=
- won't
->     > kvm_handle_guest_abort() fall through to kvm_inject_sea() and injec=
-t a
->     > synchronous external abort into the guest instead of calling
->     > kvm_inject_size_fault() to inject a stage-1 level 0 address size fa=
-ult?
->    =20
->     Yes. I'll fold this into v2:
->=20
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 1db10d8d6db73..596b2b6ebbdf0 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -2440,8 +2440,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  	is_iabt =3D esr_trap_is_iabt(esr);
-> =20
->  	if (esr_fsc_is_translation_fault(esr)) {
-> -		/* Beyond sanitised PARange (which is the IPA limit) */
-> -		if (fault_ipa >=3D BIT_ULL(get_kvm_ipa_limit())) {
-> +		/* Beyond sanitised PARange */
-> +		if (fault_ipa >=3D BIT_ULL(kvm_get_pa_bits(kvm))) {
->  			kvm_inject_size_fault(vcpu);
->  			return 1;
->  		}
+> Your **RFC v1** patch 2 changed that marking from writable to dirty:
+> 
+> ```
+> - kvm_release_faultin_page(kvm, s2vi->page, !!ret, writable);
+> + kvm_release_faultin_page(kvm, s2vi->page, !!ret, dirty);
+> ```
+> 
+> During logging, a read fault maps the page as WC: the folio is not
+> marked PG_dirty in kvm_s2_fault_map() and hardware promotes the PTE to
+> WD on write without any fault, so reclaim frees the page without saving
+> it (the folio was treated as clean).
 
-[Severity: Medium]
-Was the incremental reply diff applied directly instead of being folded into
-the base patch?
+Ah, I see your point.
+During dirty-tracking guest reads a page, then HAFDBS promotes it to 
+writable without marking it as dirty. Good catch!
 
-In arch/arm64/kvm/reset.c, kvm_get_pa_bits() is still unchanged and
-unconditionally returns kvm_ipa_limit:
+But wouldn't a simpler solution be to change the conditions in the fault 
+handler, so that it indeed marks it as dirty if dirty-tracking is on, even 
+if it's just a read fault? 
 
-u32 kvm_get_pa_bits(struct kvm *kvm)
-{
-	/* Fixed limit until we can configure ID_AA64MMFR0.PARange */
-	return kvm_ipa_limit;
-}
+Thanks! 
+Leo
 
-Without the base changes to kvm_get_pa_bits() (and with the commit message
-containing only the mailing-list reply text), this change in
-kvm_handle_guest_abort() in arch/arm64/kvm/mmu.c is a functional no-op: on a
-52-bit LPA2 host running a nested virtualization guest whose sanitised
-ID_AA64MMFR0_EL1.PARange is capped at 48 bits, kvm_get_pa_bits(kvm) still
-returns 52 rather than 48, so neither nested stage-2 MMU sizing nor stage-1
-level 0 address size fault injection is updated.
+> 
+> Therefore, **HDBSS v5** patch 2 reverted to marking the folio for any
+> write-permitting mapping:
+> 
+> ```
+> kvm_release_faultin_page(kvm, s2vi->page, !!ret, writable);
+> ```
+> 
+> Together with the v5 scheme, this makes patch 5 unnecessary:
+> 
+> - kvm_s2_fault_compute_prot: always set PROT_W when map_writable
+> - stage2_set_prot_attr: PROT_W -> DBM unconditionally
+> 
+> 
+> ---------
+> 
+> On a related note, I'd like to discuss the next version of the DBM
+> scheme, following Oliver's suggestion [1].
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261030120837.3752=
-397-1-fuad.tabba@linux.dev?part=3D1
+Just as a note for future readers: on another thread we agreed to wait for 
+the discussion to reach a point we are all happy before rebasing 
+everything.
