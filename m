@@ -1,72 +1,64 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.243
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793361074;
-	b=GdQhi+UUcgNm5xm3h6j5uwgQZsjZfyc2Btt8zzz+oJz4qPUtdiTJhI//PS1UX+oDW5gM
-	 FxIkKI30nNdFRqZCn5XvfnCcHsv/TGNfCkdZmu3G7ADucByfw6iySWLFWYHlFptL48Dz0
-	 BVWcNZKa+20Kr09L3ACyyDXbnvKDKToZrxGH06wj7g2ZG1HqGPpJDsKTO65opKDTMbkC3
-	 KpMjHpWkR1ToqeXkQJgSmpZge7cvG70UMa5Shgf2NBor1EdzG+v3Js0BNvzoBNmF5D59a
-	 yjNwoXm1ou93cZcL8e7p9t1fNVaEfty3dGbHOEnYeLoDoKqV1lIo56a1/nLZRUxDAGw==
+	t=1793362121;
+	b=UK8HO3+bcNZrbjiHNVZZn8+uPMf+hEe3LIhiHZagdDGHoXXvcgJz+oNrZySJ6VZ8Iu3N
+	 sCabQP2hEnv0caeCIZDbXN8a0nxelP1J1bTPXYH+e5XPkwuF07BLiuAiVoxdmd07/qOAw
+	 cMryCMgWEEuQc4KzXcD7vnVLteRPmQ0vDnYGhrxfc7j9seYtPj9x5sqK93WtwhF8jUsgP
+	 KZkSsUlaw1SczxEoFx/BhY/xQrK4DBzNp43rZVTUhGkfK60oSfG43M7vG7Q39rU2QQH7y
+	 Ryjd5sHcoiGfCz6w7PFSLiS27kBrWr9xowcO9SC9r9jFTdCxlM2kD5YFZ9+I2Y9zHCA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793361074;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
-	bh=EV9q3xMYUg7eyUdptCPQkT+NInqEVi2Bft0i/3u9pWc=;
-	b=hvg59mwm0qXleBFVL5DxzShWq8AEctBQCNELmQUq1+uQMj1cbGcQZnQJbkbNvp5NDQn8
-	 CuM94wz3TmZ3zP9W35bGd9gKMuraPNzKbtF/VThtIWHiggU4KT3LTKPYk3jN9xWK+Upfy
-	 PaKAsiEFR33FIrdcWEnV0+fzqP3MWNZ08VLbVzZ+Bt4t2DHbl8GLIlgie0ef5GwP0K5LF
-	 eAtARjYnG3wG3kI4wqe4a8JIbdg2YlAhlUqXZnCHb7qWoYlM8AvHERSGECRBrVCfirS2h
-	 QRdO42KuIgQjdcPGqCf5hUqsbnfZoXV+hiKGgMG6fSjpVkjl9V5lbp3MYmBSbGO4XDQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793362121;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=YHvdax8jNIqrjAvG+iPoCTwsX8ltDDoKhgA9s8mwwew=;
+	b=AUleGNWzz2TZivSYaYGdilp1ZodarENF/MdW2KuVaI0DtgLJ81lko11wxp1/vJSX6ehZ
+	 n3P04ypG2L5CL5k0+zhs6QMXSBddrTX6gxmRuNGfyAcKJ+jp72gk8HZqk3Nw3IzwXl/gq
+	 76Jou6ziI48qYAoXovwxzf3o4B5P0p6z6AP/Bpk3GGqANwjFdqNTczZV4XWZyGVvs7L/n
+	 29pjifcKsjCZhDHaKvF0sRLJAbYR+tVutxnByN9OMmFC6rNcFlH7NIR7eVYv1hG9erO8e
+	 SBNgQUTrGAEmC990CkfyIIYnLSg8jcFuyLMNOv6lX7ERpeqSbLSryW8rTfH0HbYZmWA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=lhbs403c;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D212606A31C
-	for <kvmarm@lists.linux.dev>; Fri, 30 Oct 2026 11:51:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0D212606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QCOP9HPp;
+	arc=none smtp.remote-ip=95.215.58.243
+Received: from mta1.migadu.com (out-243.mta1.migadu.com [95.215.58.243])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC467606A31A
+	for <kvmarm@lists.linux.dev>; Fri, 30 Oct 2026 12:08:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AC467606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=lhbs403c
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2A79E1682;
-	Fri, 30 Oct 2026 04:51:10 -0700 (PDT)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A3AE73F7B4;
-	Fri, 30 Oct 2026 04:51:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793361073; bh=Mc3ZxWgjpeC+0tTsnex0ZyBfJ8y4oR4Ncako7tOwxzw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lhbs403ceP0i6J8ZnKQpDhpeznmarJmBUeflvdmtHnlB2nPAIKDzzcVGkjSj9dQ7W
-	 vtYBO7rtqa2fVQpvzW5QK31u40tMnW4Jc2IGyVrESGNTwnIebruQEJnQGn+OPTDhPw
-	 Gf2ge37yfRyKGQJ5KxdYYDrHf/8gyFWRm3p7HOp4=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	liuyonglong <liuyonglong@huawei.com>,
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QCOP9HPp
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=Cc4U2874y8LkEiqSaDLuX6mELblZR/FqjhEmKbomCeE=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793362117; v=1; x=1793966917;
+ b=QCOP9HPpAJsjaLmb71l0+gCmO6SqrOivO9uLYQqMQ6bqEk0/Bn86v06DdeZ2zf4lttwN9x/B
+ zqaAv0l2qde83hbp+u9szYs610Tu5PwC5bISihqJFnKBQ9GSU3zLDnnicL86gzUmTxj6A4jjAov
+ zY2mTw2v9jIHFpcDOsEE7rQk=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 2ed175903d55f33c;
+	Fri, 30 Oct 2026 12:08:37 +0000
+X-Mizu-Trace-ID: 2ed175903d55f33c
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: sashiko-bot@kernel.org
+Cc: kvmarm@lists.linux.dev,
 	Oliver Upton <oupton@kernel.org>,
 	Marc Zyngier <maz@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Zhou Wang <wangzhou1@hisilicon.com>
-Subject: Re: [RFC PATCH 5/5] KVM: arm64: Enable HAFDBS for guests not on migration
-Date: Fri, 30 Oct 2026 11:51:08 +0000
-Message-ID: <auSErGzYpiTxgsgb@LeoBrasDK>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <b8f76a0a-8b1e-4167-81cc-b3a4ee79fb6b@huawei.com>
-References: <aqsl1_IqnV2r8kUL@kernel.org> <aqvt2gnlBZeNsaf4@LeoBrasDK> <as-mH36YSMxAosND@LeoBrasDK> <3e464bef-8dfe-44a3-afea-3c276ae87cd8@huawei.com> <attMtUqxNsuPooix@LeoBrasDK> <8eaaba87-7881-49c4-a76a-51dec2f29ffc@huawei.com> <auCPEQmnFwWldTaM@LeoBrasDK> <52945586-8c5c-4991-bd92-fe02aaf79fbe@huawei.com> <auM0CWJTPzYUTknh@LeoBrasDK> <b8f76a0a-8b1e-4167-81cc-b3a4ee79fb6b@huawei.com>
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH] KVM: arm64: nv: Size nested stage-2 MMUs by the NV PARange cap
+Date: Fri, 30 Oct 2026 12:08:37 +0000
+Message-ID: <20261030120837.3752397-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <sashiko-outbox-190923@kernel.org>
+References: <20261030105139.3543230-1-fuad.tabba@linux.dev> <sashiko-outbox-190923@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -76,51 +68,47 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 30, 2026 at 02:01:49PM +0800, Tian Zheng wrote:
-> 
-> 
-> On 10/29/2026 7:54 PM, Leonardo Bras wrote:
-> > On Thu, Oct 29, 2026 at 10:54:24AM +0800, Tian Zheng wrote:
-> > > Hi Leo,
-> > > 
-> > > I've read your discussion with Oliver on DBM RFC v2. As a suggestion,
-> > > maybe we should go with Oliver's approach, i.e. revert to the v1 scheme
-> > > and continue fixing from there.
-> > 
-> > Hi Tian,
-> > I have been reading a bit more about permission indirection to try figuring
-> > out a way that the change may work for both ways.
-> > 
-> > The problem with the previous approach is that it assume DBM=write at all
-> > times, which is not architecturally correct. Having DBM=write only on
-> > HAFDBS=on as suggested would require us to transverse the whole pagetable
-> > to convert encodings when we enable/disable it, which can be quite
-> > expensive.
-> > 
-> > One option would be to always enable HAFDBS when system supports HDBSS, but
-> > I still have to figure out if that causes any performance regression before
-> > suggesting.
-> > 
-> > The option I am pursuing is thinking on an unified code path for direct
-> > permissison (both HACDBS=on and HACDBS=off) so we don't have to convert
-> > between them, neither worry about the impact of HAFDBS=on on performance.
-> > 
-> > I will reply on the thread once I figure one of those options out.
-> > 
-> > Thanks!
-> > Leo
-> 
-> Hi Leo,
-> 
-> Sounds good. I'll wait for your next version and review it once it's
-> posted.
-> 
-> Thanks,
-> Tian
+On Fri, 30 Oct 2026 11:09:43 +0000, sashiko-bot@kernel.org wrote:
+[...]
+> Because fault_ipa < BIT_ULL(get_kvm_ipa_limit()) (52) and
+> fault_ipa >= BIT_ULL(VTCR_EL2_IPA(vcpu->arch.hw_mmu->vtcr)) (48), won't
+> kvm_handle_guest_abort() fall through to kvm_inject_sea() and inject a
+> synchronous external abort into the guest instead of calling
+> kvm_inject_size_fault() to inject a stage-1 level 0 address size fault?
 
-Awesome, thanks!
-Leo
+Yes. I'll fold this into v2:
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 705f6d84770e9..2a05c7cf8552a 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -2440,8 +2440,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 	is_iabt = esr_trap_is_iabt(esr);
+ 
+ 	if (esr_fsc_is_translation_fault(esr)) {
+-		/* Beyond sanitised PARange (which is the IPA limit) */
+-		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
++		/* Beyond sanitised PARange */
++		if (fault_ipa >= BIT_ULL(kvm_get_pa_bits(kvm))) {
+ 			kvm_inject_size_fault(vcpu);
+ 			return 1;
+ 		}
+
+[...]
+> Should setup_s1_walk() and setup_s2_walk() use kvm_get_pa_bits(vcpu->kvm)
+> instead of get_kvm_ipa_limit() so that check_output_size() raises a
+> stage-1 address size fault for TTBR base addresses and descriptors with
+> bits [51:48] set rather than letting walk_s1() and __kvm_at_s12() truncate
+> those bits when passing the address to stage-2?
+
+No. setup_s2_walk() passes pa52bit=false, so its output size is
+already at most 48. setup_s1_walk()'s output size can only exceed 48
+because, on an LPA2 host, NV guests see stage-1 TGRAN4/TGRAN16 at
+52_BIT, which Wei-Lin's patch [1] stops advertising.
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20261029223732.103785-2-oupton@kernel.org/
