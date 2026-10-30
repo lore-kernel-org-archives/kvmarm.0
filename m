@@ -1,58 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.225
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793323597;
-	b=XgHWGgDPOQen6n9OiYPzklgijablqXrc5XRYONrlmkI1X74K954KUu6fq57kn306U2CZ
-	 ZiuNuvV/pgHBiDsI+kDpwSDsWlnzfYRwv9TkjvBn9Z7NsOVIrh18Soj/R4G4QyEcziYrv
-	 r4gw9FjJc6vagf4L5dotoz1QPFlNbvO/YPVIzRs5eRHY6Y7JJNfJTS0cOG6pFgwGiV3sk
-	 I6BQfoEE3Zkn088gHBvawpzlAe4u5fFw+EKw29Le/z0DQp47HsxGnObIlPYCY9v6gDh2m
-	 iy5yPjgdFzTSsFV8hKQdJhdjEudTPiZUzLtL5a39qRmMDMGFZBWxNegpwLyB7/tetLg==
+	t=1793328845;
+	b=mathi8aMJuLww/CBo5aCQ6MVOUakdpUtkwxQvz/4xjigiDdxukLvR4rbHnTJvvkmrMFB
+	 w3Jk4DBF13J83x+SkV5XgmiE+XpuOcmCQGoMQJM/gQ5cJIWZYhxMvBUpjgbNminDwKYMv
+	 +twAObJwHQ6uKtMOgmn9pBJc99NjdoQaMa+4qazHWNNSRHxnNDl7scQDLMJoVyWegsm+1
+	 g+ZW9fW+L8XurnA2jzoPG0jn2hp64DZxcsJBSkUJpSVue2b/RZo/Jnf2d0knXUTOICso3
+	 1LV5KSDw4w23Wbj5C+xmqtxM5Ol2QkzNyJfLT5xw6S6vOnON27t5VS4cSI0SVzzWXLg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793323597;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=OJ+RA1MFN/tYwZT96jfvwbSkbkM4XrViFYe+9mXpmMQ=;
-	b=sKKz6QbnvYU4SSHzKWdYWG9GHIxIMzlqtY2WwiyOqkT2z9beb/M/O4rrj5x7+iCeLyVP
-	 96ZHdPxpTY+MdZOCf3KypL5Nn+tQVsF7tPOKTe0B2Pq89OXIAxgXnTjmI056VtzYNfk2U
-	 U0+NYaoshmlGXwABGseEIK2ibkTI0qDCSkHQPA3yjJDNHBTqaB7R0xq7HxI08wFMS8X2D
-	 6aEXsyKSDK2a/PDP5CiJhLg/PQUs4pZqJXZbPDnHg0BqNGfenb9iyO39Hq33/QwS2Czbr
-	 K9nCLQsXjKjfIrWskAgVSfkwFUtzMUMdP9hgnaL0C4Lkf6QUVzMx2oD5FmRHHiiBEiQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793328845;
+	h=DMARC-Filter:dkim-signature:Received:Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type:Content-Transfer-Encoding:X-Originating-IP:
+	 X-ClientProxiedBy;
+	bh=R32rGPcJuG+1kCDhnHECP/PCqav9h3by8BHulE0myn4=;
+	b=N/Q63FDHvIv94c/aWalg9kY2fFNLZLLwGqkizQ1TLO7kICzbNoET6UlrURbjGxKPrzc0
+	 RFu1r9smzMuEe6//OD2Rf0cDcb/n5TXZa0gHay/8oOEw5nXEQIDFiHbr/NATR8gA7sx6J
+	 QhsKcTvpBvkeTa3ql2vsd0NR+tc48S27HcodGonrVFdsT4zuSbbhcsdrfFV4qkPygUY+3
+	 UYWgdbN83Tgi8XmTjRZYEyZQjvjFfXq2Zj9ZPxBWVloDxPp9iXmoFAUok23gXJCW266CP
+	 JHiqABKAgvH9UHZ80UxCYSYKFe874aA/zmlUMyOXlgimVoxCW8dQ0+uqpINHbjrj/Eg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=U9IVcFYg;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F044A606A31A
-	for <kvmarm@lists.linux.dev>; Fri, 30 Oct 2026 01:26:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F044A606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=huawei.com;
+	spf=pass smtp.mailfrom=huawei.com;
+	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b="Unh/wbOF";
+	arc=none smtp.remote-ip=113.46.200.225
+Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AECB606A31C
+	for <kvmarm@lists.linux.dev>; Fri, 30 Oct 2026 02:54:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3AECB606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=U9IVcFYg
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C57901FC7;
-	Thu, 29 Oct 2026 18:26:32 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 042B93F7B4;
-	Thu, 29 Oct 2026 18:26:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793323595; bh=c3dCfOq5rdlhpaAn51I6eyxK5FRsCMeQ5FIKY6g7Mi4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=U9IVcFYgthdvT8M3/QbvAyyJ60gx3RhNU3kZbb9RFhGtTw8SZJiqMH8TIMQoqrHGE
-	 hkh4gOQJ/caOfqQeVJ8Pi1jnwV8WKIq6d/q2dHuOpfC3/+e96fO40SgH/xHSk4+sNm
-	 nC7tXfmxpdqBXfgTO1N2y7zr39ZvJClr8JI83HZc=
-Date: Fri, 30 Oct 2026 01:26:27 +0000
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Fuad Tabba <fuad.tabba@linux.dev>
-Subject: Re: [PATCH v3 4/5] KVM: arm64: Convert TCR_EL2 to config-driven
- sanitisation
-Message-ID: <xtnzg5xaw4lbya7br36nyxrfp2p3yvmbk74gesnp6jugsgrpzv@bk26zmsdjsrl>
-References: <20261029223732.103785-1-oupton@kernel.org>
- <20261029223732.103785-5-oupton@kernel.org>
+	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=Unh/wbOF
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=R32rGPcJuG+1kCDhnHECP/PCqav9h3by8BHulE0myn4=;
+	b=Unh/wbOFJAII1gDiU/F8veoDlAxf3h+Pjvdy/1dOAIZPRYuocBY31he/5knqTdGoGovtmcwML
+	XvQdJ+ueqPeQKCYaPPM0bZ1ZSGqYTs/EZxNqO4WTd4Q0zQ6D1+1LbnP+1BqJJmbgBiSkzqj+XeS
+	EvdUwJ1ckbq1VmqrXfnldKM=
+Received: from mail.maildlp.com (unknown [172.19.162.92])
+	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4jG5K16Mmmz1K9D6;
+	Fri, 30 Oct 2026 10:53:57 +0800 (CST)
+Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
+	by mail.maildlp.com (Postfix) with ESMTPS id 7CE2B40565;
+	Fri, 30 Oct 2026 10:53:59 +0800 (CST)
+Received: from [10.67.120.103] (10.67.120.103) by
+ kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.45; Fri, 30 Oct 2026 10:53:58 +0800
+Message-ID: <a301e884-f6d1-4082-8551-8d8a17276dc3@huawei.com>
+Date: Fri, 30 Oct 2026 10:53:57 +0800
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -62,55 +62,75 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261029223732.103785-5-oupton@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 06/15] KVM: arm64: Add support for FEAT_HDBSS
+To: Leonardo Bras <leo.bras@arm.com>
+CC: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
+	<will@kernel.org>, <corbet@lwn.net>, <pbonzini@redhat.com>,
+	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <yangjinqian1@huawei.com>,
+	<caijian11@h-partners.com>, <liuyonglong@huawei.com>,
+	<tangchengchang@huawei.com>, <yezhenyu2@huawei.com>, <yubihong@huawei.com>,
+	<linuxarm@huawei.com>, <joey.gouly@arm.com>, <kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <seiden@linux.ibm.com>,
+	<suzuki.poulose@arm.com>, <fuad.tabba@linux.dev>, <mark.rutland@arm.com>,
+	<seanjc@google.com>, <rdunlap@infradead.org>, <linux-doc@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <skhan@linuxfoundation.org>
+References: <20260929103655.85107-1-zhengtian10@huawei.com>
+ <20260929103655.85107-7-zhengtian10@huawei.com> <at-X_hFbsBU_Dsgr@LeoBrasDK>
+From: Tian Zheng <zhengtian10@huawei.com>
+In-Reply-To: <at-X_hFbsBU_Dsgr@LeoBrasDK>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemr100010.china.huawei.com (7.202.195.125)
 
-Hi Oliver,
 
-I have checked TCR_EL2 information in the latest 2026-09 release,
-the only difference is it correctly states TCR_EL2.AS is dependent on
-FEAT_ASID16 now, like what Joey said.
 
-On Thu, Oct 29, 2026 at 03:37:31PM -0700, Oliver Upton wrote:
-> From: Wei-Lin Chang <weilin.chang@arm.com>
+On 10/27/2026 2:12 AM, Leonardo Bras wrote:
+> On Tue, Sep 29, 2026 at 06:36:46PM +0800, Tian Zheng wrote:
+>> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+>> index 32102c3912fa..12fa37328dd2 100644
+>> --- a/arch/arm64/kernel/cpufeature.c
+>> +++ b/arch/arm64/kernel/cpufeature.c
+>> @@ -2158,6 +2158,11 @@ static bool hvhe_possible(const struct arm64_cpu_capabilities *entry,
+>>   	return arm64_test_sw_feature_override(ARM64_SW_FEATURE_OVERRIDE_HVHE);
+>>   }
+>>
+>> +static bool has_vhe_hdbss(const struct arm64_cpu_capabilities *entry, int scope)
+>> +{
+>> +	return is_kernel_in_hyp_mode() && has_cpuid_feature(entry, scope);
+>> +}
+>> +
 > 
-> Feature dependencies of the fields in TCR_EL2 are extracted from
-> Registers.json of the BSD licenced AARCHMRS
-> (AARCHMRS_OPENSOURCE_A_profile_FAT-2026-06).
 
-So if you like you can change this to 2026-09,
+Hi leo,
 
+> IIUC you run this on every cpu in the system, to make sure it's matching
+> the feature. Is there any chance the kernel is in EL2 only on some of the
+> cpus here?
 > 
-> Places where we slightly deviate from the above:
+
+It's impossible for the system to have only some CPUs in EL2 and others
+  not.
+
+> If not, maybe we can run it on system_supports_hdbss() instead, which would
+> be easier for the user to understand it only runs in EL2, on top of not
+> needing the above.
 > 
->  - Stick to the ARM ARM M.c requirement for TCR_EL2.TCMA*, which only
 
-and change this to M.d,
+However, The question is whether a cap should mean "this system can use
+the feature" or "this hardware supports the feature". If the cap only
+tracks hardware support, users may be confused when the hardware
+supports HDBSS but the system runs in nVHE mode — they would mistakenly
+believe they can use the feature.
 
->    depends on FEAT_MTE2. This avoids updating ID_AA64PFR2_EL1 with new
->    VMTE* definitions that we don't know the meaning of, as they aren't
->    present in the ARM ARM yet.
-> 
->  - Ignore TCR_EL2.DS's requirement of needing the effective value of
->    TCR2_EL2.D128 be 0. This requires runtime detection of TCR2_EL2.D128
->    and we don't have D128 support yet.
-> 
->  - TCR_EL2.AS is dependent on FEAT_ASID16, this information is missing
->    from the json.
+So I think we should keep is_kernel_in_hyp_mode() in has_vhe_hdbss(),
+and add a comment in system_supports_hdbss() explaining this.
 
-and remove this item.
-
-Not that these stay up to date for long though, but just thought I'd
-point them out.
+Does that work for you? Looking forward to your reply.
 
 Thanks,
-Wei-Lin Chang
+Tian
 
-> 
-> Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
-> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-> Signed-off-by: Oliver Upton <oupton@kernel.org>
-> ---
 
-[...]
