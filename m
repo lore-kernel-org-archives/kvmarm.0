@@ -1,72 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.219
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.107
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793353891;
-	b=fe3pn8u5o+rAwaJQ2kLz2CTTm8n9lwlCH8bnQwJypQc/pn5n2MWzqx3cOLRY5mw9IWjK
-	 2Jz4s+qDHWaTfl1iAM1Syxibv5xnE3Kf/9NS+sIv1AsoopSIRwMKWfA8gP6ecuU3UiBif
-	 S7m+TTaUrMxbHqBG3/2WfWYXtj42O4PEd79bJ503ChbFkZHwHvKTU78x5igX7rEK/htqi
-	 DsWtmKQBrtTolzh1K+jEWI5Vpoikls0VNTv+87QnnS3r9KEtoOsrg7NdymB44r+T2fn/l
-	 C/h6hL3u8uUHXY3fByr4AmCenuHdi/AcpPirdxnkm3ZxXKEXkB/5VF195UqC2gRdiYA==
+	t=1793357509;
+	b=wATbWVF+0Tv1R+R3kZ1UY8v1DVMKyLc9KfqgcJVpCbnl32JDjk1xTwlel9IjrT/eBo/p
+	 fVzEePoN6TfI71K1EHRw534ZHB1qdh2inbgsEdUcBhkonc2qNOXVrpfQlm2eYRexHqUV0
+	 JZw4JVWGzZtT0rDZM86qH5vfO/pACEi0A4yWqarEWVC3xCI9m9gTxMt261TIJr89DmzsS
+	 UBRrR0O5J3X0YaEjiAoyJnu+hsI4y3aCjOIMLuf0QlGlP5lqRgEmYQ+S+HPDAGR2UkK5M
+	 /8rZNeqswXE6k872yedDY8NinOEF2jMrt5YdHmV5xTXtVKUlAR9Tf7LVyOr/IEC6EPw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793353891;
-	h=DMARC-Filter:dkim-signature:Received:Received:Received:Subject:To:CC:
-	 References:From:Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-	 Content-Type:Content-Language:Content-Transfer-Encoding:
-	 X-Originating-IP:X-ClientProxiedBy;
-	bh=ZuzL8N0vlppJloy/muSuIIAe2Zftz1tlLIt/FEE//g4=;
-	b=fEVOhpq0dxhzPvlvwyQ/dsI9uk5wGt51yI8Wi/qmcV2YW0FSC0XwmGI2PC1TtV74hshh
-	 ER17i3i5d7kpgUvYETDTzU2Pph160axGRBSkJV0q2wm7Kk50Tx+GTeB0wgWxac1MwnouP
-	 vZmh3WsMD98tzLrLTuN554ey3WUcOQvFz+IU4xWDIYOAt50y5WN3dq19J9VZZ1LNGoCgE
-	 UHnc5W8O0GHbE4/u2zCv1HnXi/bojlRerL3Cjgjpu3Jg7HjzzjOpk68BydVxq/k8G7Bfa
-	 lIWq7hpwam1lRbmCKngb6YG9tecKkjth4HWqfsO42aNp1lW0MhHu+TmoH6SNy+CNOrQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793357509;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=A0dv3I3LgauzsxhnnoQrRe1KXsYEPPAsnmbINkJOsD0=;
+	b=txQrwcZDuhTWddVvtFvd+qIR3tHEHY2hmZ1CSZ0yAoI+fdNhZFV+NBmEgTgGKjL2We3Z
+	 UJLKf39grJxdkraiNOHNT7gfzjD6zYXNVuXc+2jIT4qwzoKJRqpjX55hUvhfg2pY15/m5
+	 angAN9ZtAG4qvSMp4nRhr7If6nKImPBu0tjNbZY4camEBX2URk1kFnnTDeDj4tOMO6J2l
+	 kDFYhmSEKPSN70P0ViYl+gQ2n5fmYtiFJ4FWtkw4fPXmkvgM4+IvtTTeSRjDs7h1gB3Ji
+	 kCFYF82YpIBhJE2S4J6Wxb+7fCJzu3e2vXfr9WtVxJQ28ftdVbeW0n2zw/UI0khxCUw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=huawei.com;
-	spf=pass smtp.mailfrom=huawei.com;
-	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=0UrTyjyV;
-	arc=none smtp.remote-ip=113.46.200.219
-Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=WaW7JSgj;
+	arc=none smtp.remote-ip=95.215.58.107
+Received: from mta1.migadu.com (out-107.mta1.migadu.com [95.215.58.107])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C53606A320
-	for <kvmarm@lists.linux.dev>; Fri, 30 Oct 2026 09:51:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 89C53606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7345606A32F
+	for <kvmarm@lists.linux.dev>; Fri, 30 Oct 2026 10:51:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C7345606A32F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=0UrTyjyV
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=ZuzL8N0vlppJloy/muSuIIAe2Zftz1tlLIt/FEE//g4=;
-	b=0UrTyjyVBnf6sKptfuORA4gghvLGNMWRrh5UmCN2USUQ+RRTVy20wvL5hedXymwwnx1WLmlT1
-	dFk71RHUewofm7xwqA2BFLWPX8QPbMPw3svRB9+d+9tvDuO25irRK8fJMAYE4TiEDBzCQkyGonR
-	K+fk3eRBbKlsBllNXL+ivFQ=
-Received: from mail.maildlp.com (unknown [172.19.162.223])
-	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4jGGZh3FNcz1prM0;
-	Fri, 30 Oct 2026 17:51:24 +0800 (CST)
-Received: from whupemo200006.china.huawei.com (unknown [7.152.185.252])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0A5FF40575;
-	Fri, 30 Oct 2026 17:51:26 +0800 (CST)
-Received: from [10.174.178.219] (10.174.178.219) by
- whupemo200006.china.huawei.com (7.152.185.252) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Fri, 30 Oct 2026 17:51:24 +0800
-Subject: Re: [PATCH v2] Documentation/process: Add a maintainer entry profile
- for KVM/arm64
-To: Matthias Goergens <matthias.goergens@gmail.com>
-CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Fuad
- Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Steffen Eiden
-	<seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Jonathan
- Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
-	<kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-doc@vger.kernel.org>, Randy Dunlap <rdunlap@infradead.org>,
-	<linux-kernel@vger.kernel.org>, <workflows@vger.kernel.org>
-References: <20261030083351.3040604-1-matthias.goergens@gmail.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <cc52465a-54b8-12ca-ec5f-fa1aa1c0c55d@huawei.com>
-Date: Fri, 30 Oct 2026 17:51:17 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=WaW7JSgj
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=1TcNP8eN2SDjaN1bgFoh1AhCvsMUSR+eK5knTA7zNYY=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793357500; v=1; x=1793962300;
+ b=WaW7JSgjXWApB6refU7TiKFy0lROwj3+RfWnq20yuV2N98nGHhAB6ziOqqeP9BpIOPXQqMUU
+ ElrZJIq8g/+aCsrrc+TY/96zGGojdAqmTHiSFfwRDYjDQQiAj7CdxoGBrpz5sG21DjkMhqry/QS
+ 3gDeuAleuuo4FQQ+2Ewf+St0=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 7a928a9d3355d0ef;
+	Fri, 30 Oct 2026 10:51:40 +0000
+X-Mizu-Trace-ID: 7a928a9d3355d0ef
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH] KVM: arm64: nv: Size nested stage-2 MMUs by the NV PARange cap
+Date: Fri, 30 Oct 2026 10:51:39 +0000
+Message-ID: <20261030105139.3543230-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -76,55 +75,48 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-In-Reply-To: <20261030083351.3040604-1-matthias.goergens@gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- whupemo200006.china.huawei.com (7.152.185.252)
+Content-Transfer-Encoding: 8bit
 
-Hi Matthias,
+init_nested_s2_mmu()'s comment says nested stage-2 MMUs use the PARange
+exposed to the guest, but it sizes them with kvm_get_pa_bits(), which
+returns the host's IPA limit rather than the 48 bits limit_nv_id_reg()
+caps an NV guest at.
 
-On 2026/10/30 16:33, Matthias Goergens wrote:
-> KVM/arm64 has no P: entry in MAINTAINERS, so nothing tells a contributor
-> that the kvmarm tree is used for integration only, or what the
-> maintainers expect patches to be based on.  Marc Zyngier said a profile
-> would help.
-> 
-> Add one covering the trees, the base for patches, the submit checklist,
-> key cycle dates and review cadence, and point the KVM/arm64 entry at it.
-> 
-> Link: https://lore.kernel.org/all/875wzu4vuv.wl-maz@kernel.org/
-> Link: https://lore.kernel.org/all/87tsnb2dtq.wl-maz@kernel.org/
-> Signed-off-by: Matthias Goergens <matthias.goergens@gmail.com>
-> ---
-> Changes since the RFC
-> (https://lore.kernel.org/all/20260925085621.562448-1-matthias.goergens@gmail.com/):
-> 
-> - Point at the MAINTAINERS entry instead of naming maintainers and lists.
-> - Describe master, topic branches and shared branches; drop the open
->   questions, which the RFC's Sashiko review had also flagged.
-> - Base: prefer -rc1 to -rc3, not kvmarm/next; leave conflicts visible.
-> - Subject lines: capital letter after the prefixes.
-> - Architecture references: prefer rule identifiers; drop the comparison
->   with KVM x86.
-> - Testing: selftests usually at the end of the series, reproducible
->   performance measurements, tests encouraged rather than required for NV.
-> - Key cycle dates: no new features after -rc6; how fixes are sent.
-> - Review cadence: stability of commit IDs; answering bot reviews.
-> - Posted as a new thread, with the documentation maintainers and lists
->   on Cc.
-> 
-> Steffen, Marc asked you for a short addition on KVM/arm64 on s390 for
-> the Trees section.  I've left it out and can add it as a follow-up.
-> 
-> Oliver, thanks for inviting an updated patch.  Corrections are welcome.
-> 
->  .../process/maintainer-kvm-arm64.rst          | 181 ++++++++++++++++++
->  MAINTAINERS                                   |   2 +
->  2 files changed, 183 insertions(+)
->  create mode 100644 Documentation/process/maintainer-kvm-arm64.rst
+On a 52-bit host, every TLBI ALLE1IS from the guest hypervisor then has
+KVM unmap each valid nested stage-2 across a range 16 times the one the
+guest can use. Under QEMU, the KVM init of an E2H0 guest hypervisor
+doesn't complete within 20 minutes.
 
-This looks pretty good. Thanks a lot for your efforts!
+Make kvm_get_pa_bits() return the 48-bit cap for an NV VM. That also
+bounds the nested walker's limits, the emulated TLBI ranges and AT's
+address size checks.
 
-Acked-by: Zenghui Yu <yuzenghui@huawei.com>
+Fixes: 4f128f8e1aaac ("KVM: arm64: nv: Support multiple nested Stage-2 mmu structures")
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+The 48 is written here and in limit_nv_id_reg(). I couldn't derive it
+from the VM's ID_AA64MMFR0_EL1, since the nested MMUs are created in
+kvm_setup_vcpu(), before kvm_reset_vcpu() initialises the VM's ID
+registers. Userspace can also lower PARange afterwards.
+
+ arch/arm64/kvm/reset.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 10eb7249aa9e8..1918837757682 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -220,6 +220,10 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 
+ u32 kvm_get_pa_bits(struct kvm *kvm)
+ {
++	/* An NV guest's PARange is capped by limit_nv_id_reg() */
++	if (test_bit(KVM_ARM_VCPU_HAS_EL2, kvm->arch.vcpu_features))
++		return min(kvm_ipa_limit, 48U);
++
+ 	/* Fixed limit until we can configure ID_AA64MMFR0.PARange */
+ 	return kvm_ipa_limit;
+ }
+-- 
+2.47.3
+
