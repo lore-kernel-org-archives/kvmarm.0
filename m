@@ -1,61 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.15
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793363375;
-	b=FMrL3p2GFjTdoASUIM4ppbPQkNxfJf4C5omJ6CN8netTodDOtha4ejF/YZaZUnRM9EB/
-	 krCvyPIsxkF6FiDHN42T4hYSaeWQTjw3J+GdRNC1ZvoFmGFfreyohMud9b1esTegzQqr2
-	 HDblNfprlcFnue2EGixZ89VpRFihoz8qDEYm9/4wzPJZwh6yn7GkwwIIIKyYfPUKSD8e2
-	 IgjnhPUxBLGP7njyzvQYsHZV1KGBgHjY6GTV/0fRVbhLSTK1BAa/8TXfQzahKH9Mg5fV9
-	 hzeAm2cVhLQ0caLLm7LulrwZo7TgNks83M8tnLWqyXJ+3G93HaiQ2qj5ZKcjGKnEZMw==
+	t=1793369763;
+	b=CQ3JxmbpJz2ZpPSuD+0qMNin/gk0ONfJ2W46LLKmpn6Lnew1l+juPj7rFjE9ooSivgKB
+	 wVZnmofUh+DsLbsD5NlwI+XVpOo8P0pMDTE/+qvqE5sVZYY95YUZ7EtWeBTGzPhDK2HkY
+	 pFKVQkZR12Saynl46VlDnUd/PCHJ+0SBt9AfYHXnpirnTqI6oCaP5pd3xJWkc+MIXMVHE
+	 0yEhipwgj2WAb+XI+wh4ysnrelH/N1GAGKz/MvXEAoVNwQYL5rpHgxamS7OBUF3kHQzTW
+	 20IpwzHNUmhMUQPNdOAEDCMfgibhb6FpNIqamkAHGOwBgtDsco0Z3zIYtDPs/SZXDXA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793363375;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Gm-Message-State:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:
-	 X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:Subject:To:Cc:
-	 Content-Type;
-	bh=O+fMJYNqO1rC4JyvXyWYRoIcA05TzHcyXa930/m//oM=;
-	b=0tQYJ7UjV9ic5prnonXZRIgwDoq8MnUWv4r94oHTBBQmNh1BDF046n4cLZzQZ6DAFT7n
-	 u3Czmbg3qcZ7KDXV8rc+YU5f24GVUCb0yKfTi+ggaysz652NUO1kEPWAfIlYp1ZBIDUE0
-	 BGlBQ/jBAO/bYYL7F8B6zR9BgjUJ/YZ7q8rGJ7ui+xYGMGwBNlfdUUiPhduCA2x0Pi0tv
-	 gXJq85NWXcCt6HdQ6Eb6IaoKQ1Gv/nLLHZEXT3mT4kS8rXZ+GdSZ0fJ9mwtdtTjoa5JCd
-	 KvIqW7gDgSp7MXCKrSdD900Lhb5lUPmEHk4CRECyVJFyIGPF8dOl8RbNov1MubbJkJg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793369763;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
+	bh=U3mh0uWcEKmF6rz6g3nv0SX0Dkn3wPP6PAyrpn5THiI=;
+	b=mMFD/jqRjP1+URclGD0XvRfwD/kBUcNZUFyCWM8Wg46uvZO1w1Cujb8Cju7sr+WrByGw
+	 PJbyPmLIfgaf7qBF3x1GVZUnOFVy1cR9TcsjvXYXN+TaHCWGo80cTc3FeXHpQ/oI5kk2+
+	 CNq0eVzrGmPC7iIg669QNZcG6zKGAF+DbWx/wfL6UMfaDQmEaoQSMiiQ7g4CDdrv4hMkK
+	 ZqycnFqOtKdO5sV2eLyRuATtH2nhmD59OJxt8C5eIjeMqefcWy5/CklJn1wrxgO86lbWw
+	 CcXeiit/xKC42rz0rrATpZP3Qrj2D1A4pqanfXlu9B2qS6s5aBwk2AlezTLDHPDJraA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=LV51gQtw;
-	arc=none smtp.remote-ip=91.218.175.15
-Received: from mta0.migadu.com (out-15.mta0.migadu.com [91.218.175.15])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65035606A31C
-	for <kvmarm@lists.linux.dev>; Fri, 30 Oct 2026 12:29:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 65035606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=dutMwEYA;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5590F606A31A
+	for <kvmarm@lists.linux.dev>; Fri, 30 Oct 2026 14:16:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5590F606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=LV51gQtw
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=ATotVCKzOa5daMcaBxaevqyz3J/MtuzsEl1bHk96I5s=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793363372; v=1; x=1793968172;
- b=LV51gQtwPnRic+PpoDXrtfuOiPj+iEUNMDvXqXtkNIPKTv9MBjP1fA+vjM7yGB+NRTkZwM/q
- 9o8FU2TE45K5q1J0eqtCCsO8idXaQ6ZVLM/Nzt0BYXFzIWnsYfJ8HNuPjfP1KHjuU7bEiPnadBz
- UkoE8xFo7ZahnDxgE7Bobudc=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id ac82bf94dcdc4453;
-	Fri, 30 Oct 2026 12:29:32 +0000
-X-Mizu-Trace-ID: ac82bf94dcdc4453
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5bfca2a2af4so5674e87.1
-        for <kvmarm@lists.linux.dev>; Fri, 30 Oct 2026 05:29:27 -0700 (PDT)
-X-Gm-Message-State: AFq9FYLNzE7Lq5xNBsoWoBsViQmXvKxoO1KPSiKf7BdCltsJuPPbzHoj
-	0xkBn7XToMI3iHiIjXB0PHDV4Cgzhj+wwV+AjHKx69ZHMpjFHyNrjA1RZX18VL6JVqokG3QsGUz
-	w51kB+0m2jDhOMT/+5VG2Btz2vv07RdB1rnPZTsne
-X-Received: by 2002:ac2:550e:0:b0:5bf:d226:862e with SMTP id
- 2adb3069b0e04-5bfd22686c8mr228723e87.2.1793363366455; Fri, 30 Oct 2026
- 05:29:26 -0700 (PDT)
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=dutMwEYA
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D02F71F60;
+	Fri, 30 Oct 2026 07:15:57 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7681D3F673;
+	Fri, 30 Oct 2026 07:15:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793369761; bh=GgEd+PH/jbq28UuYqcwDbQX/UOZkQ32m5RYqOej8J8E=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=dutMwEYAFpbCr/3XewPMFmB38iOS8ovV+p3UxpXzOGWbjtVHG7Al4HMwOz+NFMXD6
+	 /aaaD3oKAX2aT2ycObpBXr5+dBEcYMgzJBnPS2YuS/IDD/LhqDW+hN3V+rSuTryn9i
+	 bi+6s+GHCIUINFW1E+zM80eCwXTT1rVCtofpGbmg=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	maz@kernel.org,
+	oupton@kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	corbet@lwn.net,
+	pbonzini@redhat.com,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	yangjinqian1@huawei.com,
+	caijian11@h-partners.com,
+	liuyonglong@huawei.com,
+	tangchengchang@huawei.com,
+	yezhenyu2@huawei.com,
+	yubihong@huawei.com,
+	linuxarm@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	fuad.tabba@linux.dev,
+	mark.rutland@arm.com,
+	seanjc@google.com,
+	rdunlap@infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	skhan@linuxfoundation.org
+Subject: Re: [PATCH v5 06/15] KVM: arm64: Add support for FEAT_HDBSS
+Date: Fri, 30 Oct 2026 14:15:51 +0000
+Message-ID: <auSml6yTVYIQe7NZ@LeoBrasDK>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <a301e884-f6d1-4082-8551-8d8a17276dc3@huawei.com>
+References: <20260929103655.85107-1-zhengtian10@huawei.com> <20260929103655.85107-7-zhengtian10@huawei.com> <at-X_hFbsBU_Dsgr@LeoBrasDK> <a301e884-f6d1-4082-8551-8d8a17276dc3@huawei.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -65,70 +89,67 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261030105139.3543230-1-fuad.tabba@linux.dev>
- <sashiko-outbox-190923@kernel.org> <20261030120837.3752397-1-fuad.tabba@linux.dev>
- <sashiko-outbox-191007@kernel.org>
-In-Reply-To: <sashiko-outbox-191007@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Fri, 30 Oct 2026 12:28:50 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTww0xwZpCNO2O2zd08T_y23KffA1CsMCCZ2cfjtE_rFGA@mail.gmail.com>
-X-Gm-Features: AclHuK-DSjx38bmEPygqQZV-47VGAYcpoaYBLREG938yPZ9XUE_xpDZ28v470Ek
-Message-ID: <CA+EHjTww0xwZpCNO2O2zd08T_y23KffA1CsMCCZ2cfjtE_rFGA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: nv: Size nested stage-2 MMUs by the NV
- PARange cap
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On Fri, 30 Oct 2026 at 12:24, <sashiko-bot@kernel.org> wrote:
->
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Medium] KVM: arm64: nv: missing base changes in kvm_get_pa_bits() and reply changelog
-> --
->
-> commit f427a1e42f6e3dddeb1163b0cde7acfb4c92d8ef
-> Author: Fuad Tabba <fuad.tabba@linux.dev>
->
-> KVM: arm64: nv: Size nested stage-2 MMUs by the NV PARange cap
->
-> This commit replaces get_kvm_ipa_limit() with kvm_get_pa_bits(kvm) in
-> kvm_handle_guest_abort() when checking whether a translation fault IPA
-> exceeds the guest's PARange.
->
-> >     KVM: arm64: nv: Size nested stage-2 MMUs by the NV PARange cap
-> >
-> >     On Fri, 30 Oct 2026 11:09:43 +0000, sashiko-bot@kernel.org wrote:
-> >     [...]
-> >     > Because fault_ipa < BIT_ULL(get_kvm_ipa_limit()) (52) and
-> >     > fault_ipa >= BIT_ULL(VTCR_EL2_IPA(vcpu->arch.hw_mmu->vtcr)) (48), won't
-> >     > kvm_handle_guest_abort() fall through to kvm_inject_sea() and inject a
-> >     > synchronous external abort into the guest instead of calling
-> >     > kvm_inject_size_fault() to inject a stage-1 level 0 address size fault?
-> >
-> >     Yes. I'll fold this into v2:
-> >
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 1db10d8d6db73..596b2b6ebbdf0 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -2440,8 +2440,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
-> >       is_iabt = esr_trap_is_iabt(esr);
-> >
-> >       if (esr_fsc_is_translation_fault(esr)) {
-> > -             /* Beyond sanitised PARange (which is the IPA limit) */
-> > -             if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
-> > +             /* Beyond sanitised PARange */
-> > +             if (fault_ipa >= BIT_ULL(kvm_get_pa_bits(kvm))) {
-> >                       kvm_inject_size_fault(vcpu);
-> >                       return 1;
-> >               }
->
-> [Severity: Medium]
-> Was the incremental reply diff applied directly instead of being folded into
-> the base patch?
+On Fri, Oct 30, 2026 at 10:53:57AM +0800, Tian Zheng wrote:
+> 
+> 
+> On 10/27/2026 2:12 AM, Leonardo Bras wrote:
+> > On Tue, Sep 29, 2026 at 06:36:46PM +0800, Tian Zheng wrote:
+> > > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> > > index 32102c3912fa..12fa37328dd2 100644
+> > > --- a/arch/arm64/kernel/cpufeature.c
+> > > +++ b/arch/arm64/kernel/cpufeature.c
+> > > @@ -2158,6 +2158,11 @@ static bool hvhe_possible(const struct arm64_cpu_capabilities *entry,
+> > >   	return arm64_test_sw_feature_override(ARM64_SW_FEATURE_OVERRIDE_HVHE);
+> > >   }
+> > > 
+> > > +static bool has_vhe_hdbss(const struct arm64_cpu_capabilities *entry, int scope)
+> > > +{
+> > > +	return is_kernel_in_hyp_mode() && has_cpuid_feature(entry, scope);
+> > > +}
+> > > +
+> > 
+> 
+> Hi leo,
+> 
+> > IIUC you run this on every cpu in the system, to make sure it's matching
+> > the feature. Is there any chance the kernel is in EL2 only on some of the
+> > cpus here?
+> > 
+> 
+> It's impossible for the system to have only some CPUs in EL2 and others
+>  not.
+> 
+> > If not, maybe we can run it on system_supports_hdbss() instead, which would
+> > be easier for the user to understand it only runs in EL2, on top of not
+> > needing the above.
+> > 
+> 
+> However, The question is whether a cap should mean "this system can use
+> the feature" or "this hardware supports the feature". If the cap only
+> tracks hardware support, users may be confused when the hardware
+> supports HDBSS but the system runs in nVHE mode — they would mistakenly
+> believe they can use the feature.
+> 
+> So I think we should keep is_kernel_in_hyp_mode() in has_vhe_hdbss(),
+> and add a comment in system_supports_hdbss() explaining this.
+> 
+> Does that work for you? Looking forward to your reply.
 
-Patience, young grasshopper... this will be folded into the base
-patch, see above.
+Well, 
+That's just my personal view of this:
 
-/fuad
+If we have a function called "has_hdbss" it should only report if the 
+system has the feature available.
+
+On the "system_supports_*" we have to figure out if the system itself 
+supports the feature, which checks the feature bits itself and could mean 
+checking for other features being there, such as hyp_mode.  
+
+What do you think?
+
+Thx,
+Leo
