@@ -1,62 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.13
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793377570;
-	b=auAJPzndR4l3tZalkD6TFYuODreKW9M+q/fjCCqVgPup2r43/4GKZEpTiSMbI83gCD39
-	 FBAQTCCraTygiym6cZHBfyGINs8NWQelvj3E3NuwgfeMHLE/xVCZawf8p3EWFEl38tLAc
-	 /U/dM6QVC0RRSxkzvsLbchIHAaho+pddkTQzW3cFUUAJokMbWC4M49J75VGPOjHDl1z1a
-	 8iiXimeNJLNYINp8gq325JaXgM7StHBTDojmdl9XS8Nz6jG+a4HqpY9XbIr6pDnBuvWsr
-	 VVe4G5GtN6n503QccLZSsB1pqJ5pxfWIH3B/NMMkG+ewBzWLx2o2WOxtYHYNAMTpZYQ==
+	t=1793379154;
+	b=jVoJ5Z15Y55pk4wOznev5p0IvoVQcLTxx8WfDsKVmxe3v/omu1py5DRybwvZTzfMNf63
+	 g5rMIbKz5tZdiQoFijImmENgrfW1sr28VBrhPPXE5FKav2QGARM0LdGIIfD7Aqz+cZjGT
+	 +EX2wDeBJul4X8mJbWNHTF+pBYUQDrY8bh8gCLoa99en80a5oPP4LqrcUMziyqyVBaAi0
+	 EpJhrdm++tAzYpl+gL7cU+JSdfZeN8vsL1CdNod6LDDO/lxqz8isJAIIQiK0MzEV4M9il
+	 DwmS7X+EkSz1imTigALjU1Yp1QU+utAdZB3gduuL0TY27rumR4k2eDVoCiRSk3EJ8yw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793377570;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=BYFL3nmGIe5uqAJ7ySXc+HIMxodwTgtPAlbSO8zHUZc=;
-	b=PH9DGC+g4zkHJ5ix/LpkD5qs6CFbJ2oxbRzO+x0Rxnvy2I5MpPXhNOIAPmP5vE+Ayqnt
-	 j6zo7Bd797QTx05Jfam/DFrZScCl5c+BqxzpUbpraxTCTtHA/GvnXjXe1Yn4H0Wh7L0Uo
-	 7+L79Xab2YcJm85rGV2LZAPjxnK8ku9MBMkikvvd403nhRm25p7DyOFgROyT/ws9CzlBi
-	 h7NtfswzebcR3Vb0Njb/e0u+U2asEms/Rrv5jsZHRDRJtrhH2v4yabpGV63EpmmsIBwQR
-	 M6uCBHp8VM6Gyh8faj89zoRxiHunCiWsvwBOETQ1oSdhvnfVWpYdzQPgecgsV3BkaKg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793379154;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
+	bh=ktj+5dC08v5X6CbAXYodRMTXsnx7EjXTMl4rsHotSsw=;
+	b=YJvtphln2qK5XMYOKj6Qy4Sx7Ld0jqcEeMmQ45vPoHR/Ix4QLM8Tp06HibVWtwTR0BuK
+	 gO09lxbaUwfsVnL99+VgEFSiBOMTw7wnCGUzTRbspR8FyJvUJlHD/57gJQus6tqj0YQpp
+	 EZippGtxMa92yemv5wIK8x0cmtLI3VFC39vq8ZRFGGly47d3Mn91ZPcnzTALYUq06TiRB
+	 IBm73KLwz030/F3mNBp1rrsziOyAnCj1oy7y/1GJVXOYOOLqTluIdhLziMaRVLWZ0DAaU
+	 ehONyMqjb2NUhBTeqEFmBd2SRl8zQQ2ZJXuZNM1bs58uZweaVoeJtgiPz2Pkhxgm1TQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="fy9ErNh/";
-	arc=none smtp.remote-ip=95.215.58.13
-Received: from mta1.migadu.com (out-13.mta1.migadu.com [95.215.58.13])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7711F606A31D
-	for <kvmarm@lists.linux.dev>; Fri, 30 Oct 2026 16:26:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7711F606A31D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=vsLUxmt6;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B27B606A31C
+	for <kvmarm@lists.linux.dev>; Fri, 30 Oct 2026 16:52:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3B27B606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=fy9ErNh/
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=rlRDC0pvLWmlWBgv4+/1L8F8/Elr7ocDXxBBBXsFeHg=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793377565; v=1; x=1793982365;
- b=fy9ErNh/RoWVcFBikUbLHGQqJGzM3PFNCuSpActqS66c5rWhn7XKDEMJ3ADPvCYcw7YEQaOO
- +djy2mPrnVHNwcxGevwliPwxowZieuGjaEoCAQnM9NbBZ8AKT7J8l2cGMzmBcqZYEdyFbnRACxk
- q68/BgJOLNkdag4T7VgstDPg=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 00c95837bffe26bc;
-	Fri, 30 Oct 2026 16:26:05 +0000
-X-Mizu-Trace-ID: 00c95837bffe26bc
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5be3b2f17c1so7287e87.1
-        for <kvmarm@lists.linux.dev>; Fri, 30 Oct 2026 09:26:01 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBzKRuO6Z5yZDUFasxiGb6RpxOxn3QlaFfWlOS3WzB7J6uQqXB9ECc+1jXmB9S6PtOk5A2gEXrw=@lists.linux.dev
-X-Gm-Message-State: AFq9FYIHuLTNdDqpEZ15cvoH4YCk2+n4PaO5VZiUERJjt6fvlN15DOEK
-	tV41KR8EI9CiLQwYs2BipHCXO2fx10NUq7SgyP1ZjkMgnZyz5P5BNIgcVrZSEaIezh3xnNt2DJn
-	/WWyJdAZMioaQHvHTG8UFeQdNqzvF5acMHS/T/jbN
-X-Received: by 2002:a05:6512:b1c:b0:5bf:c1d8:b44b with SMTP id
- 2adb3069b0e04-5bfd182316amr366664e87.14.1793377560715; Fri, 30 Oct 2026
- 09:26:00 -0700 (PDT)
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=vsLUxmt6
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0249A1682;
+	Fri, 30 Oct 2026 09:52:29 -0700 (PDT)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BE1D03F673;
+	Fri, 30 Oct 2026 09:52:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793379152; bh=7VMMf7kMCadyG94rG4Zx25wwUW0u14+sRWOtUecg2H8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=vsLUxmt6b/5m7BzFV7Hd8fIIx1EsthiLTP6rN+Ce6YaebNT/TyYfDFqazq9LqUwgB
+	 9RphgrRu+PvjSC9PSvb4hysq0nLDGl2+UBl5il7GrIuZiENqtwODfbcpLMWOpptqBa
+	 6Mh5JBUfaxOKWika3tkdWGger6AD196OTOfbuvSA=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	maz@kernel.org,
+	oupton@kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	corbet@lwn.net,
+	pbonzini@redhat.com,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	yangjinqian1@huawei.com,
+	caijian11@h-partners.com,
+	liuyonglong@huawei.com,
+	tangchengchang@huawei.com,
+	yezhenyu2@huawei.com,
+	yubihong@huawei.com,
+	linuxarm@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	fuad.tabba@linux.dev,
+	mark.rutland@arm.com,
+	seanjc@google.com,
+	rdunlap@infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	skhan@linuxfoundation.org
+Subject: Re: [PATCH v5 08/15] KVM: arm64: Flush the HDBSS buffer on VM exit
+Date: Fri, 30 Oct 2026 16:52:08 +0000
+Message-ID: <auTLOIafIq4cjRho@LeoBrasDK>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <5bbd0d3b-1026-43f3-bc45-245472603144@huawei.com>
+References: <20260929103655.85107-1-zhengtian10@huawei.com> <20260929103655.85107-9-zhengtian10@huawei.com> <auDpyRNpeDNzIk3W@LeoBrasDK> <5bbd0d3b-1026-43f3-bc45-245472603144@huawei.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,68 +89,142 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261030105139.3543230-1-fuad.tabba@linux.dev>
- <sashiko-outbox-190923@kernel.org> <20261030120837.3752397-1-fuad.tabba@linux.dev>
- <e6bxdvc4utkt3circfrvzdxhtgdqxz2y736ufhjyxpi6xa5caf@qmtah7wbjx6g>
-In-Reply-To: <e6bxdvc4utkt3circfrvzdxhtgdqxz2y736ufhjyxpi6xa5caf@qmtah7wbjx6g>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Fri, 30 Oct 2026 16:25:24 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTzb0iEK+1jRem506W-oktJp9W+VC0j1hyUm7K2gzAtN3A@mail.gmail.com>
-X-Gm-Features: AclHuK9l39S_WZUCSKurnsOngPafKQCMrHrFT3A1BTygQFuis7J1Ue_h0K6N794
-Message-ID: <CA+EHjTzb0iEK+1jRem506W-oktJp9W+VC0j1hyUm7K2gzAtN3A@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: nv: Size nested stage-2 MMUs by the NV
- PARange cap
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: sashiko-bot@kernel.org, kvmarm@lists.linux.dev, 
-	Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On Fri, 30 Oct 2026 at 16:18, Wei-Lin Chang <weilin.chang@arm.com> wrote:
->
-> On Fri, Oct 30, 2026 at 12:08:37PM +0000, Fuad Tabba wrote:
-> > On Fri, 30 Oct 2026 11:09:43 +0000, sashiko-bot@kernel.org wrote:
-> > [...]
-> > > Because fault_ipa < BIT_ULL(get_kvm_ipa_limit()) (52) and
-> > > fault_ipa >= BIT_ULL(VTCR_EL2_IPA(vcpu->arch.hw_mmu->vtcr)) (48), won't
-> > > kvm_handle_guest_abort() fall through to kvm_inject_sea() and inject a
-> > > synchronous external abort into the guest instead of calling
-> > > kvm_inject_size_fault() to inject a stage-1 level 0 address size fault?
-> >
-> > Yes. I'll fold this into v2:
-> >
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 705f6d84770e9..2a05c7cf8552a 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -2440,8 +2440,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
-> >       is_iabt = esr_trap_is_iabt(esr);
-> >
-> >       if (esr_fsc_is_translation_fault(esr)) {
-> > -             /* Beyond sanitised PARange (which is the IPA limit) */
-> > -             if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
-> > +             /* Beyond sanitised PARange */
-> > +             if (fault_ipa >= BIT_ULL(kvm_get_pa_bits(kvm))) {
-> >                       kvm_inject_size_fault(vcpu);
-> >                       return 1;
-> >               }
-> >
-> > [...]
-> > > Should setup_s1_walk() and setup_s2_walk() use kvm_get_pa_bits(vcpu->kvm)
-> > > instead of get_kvm_ipa_limit() so that check_output_size() raises a
-> > > stage-1 address size fault for TTBR base addresses and descriptors with
-> > > bits [51:48] set rather than letting walk_s1() and __kvm_at_s12() truncate
-> > > those bits when passing the address to stage-2?
-> >
-> > No. setup_s2_walk() passes pa52bit=false, so its output size is
-> > already at most 48. setup_s1_walk()'s output size can only exceed 48
-> > because, on an LPA2 host, NV guests see stage-1 TGRAN4/TGRAN16 at
-> > 52_BIT, which Wei-Lin's patch [1] stops advertising.
->
-> Agreed, however would it be more future-proof if they are changed to
-> kvm_get_pa_bits() anyway?
+On Fri, Oct 30, 2026 at 12:57:06PM +0800, Tian Zheng wrote:
+> 
+> 
+> On 10/28/2026 2:13 AM, Leonardo Bras wrote:
+> > On Tue, Sep 29, 2026 at 06:36:48PM +0800, Tian Zheng wrote:
+> > > From: Eillon <yezhenyu2@huawei.com>
+> > > 
+> > > HDBSS entries accumulate in the per-vCPU buffer while the guest runs,
+> > > and must be drained into the dirty bitmap or dirty ring before
+> > > userspace can observe them.
+> > > 
+> > > Drain the buffer at a single point: kvm_arch_vcpu_ioctl_run() flushes
+> > > it on every VM exit, before the exit reason is handled. Flushing
+> > > inside the run loop keeps the dirty-ring feedback timely: when a flush
+> > > pushes the ring past its soft limit, kvm_dirty_ring_push() raises
+> > > KVM_REQ_DIRTY_RING_SOFT_FULL, which check_vcpu_requests() observes at
+> > > the top of the next loop iteration, so the vCPU exits to userspace for
+> > > the harvest before re-entering the guest.
+> > > 
+> > > kvm_arch_sync_dirty_log() relies on the exit path to flush: it kicks
+> > > vCPUs out of guest mode, and the GET/CLEAR protocol tolerates
+> > > concurrent bitmap writes, so the snapshot is complete without extra
+> > > synchronization.
+> > > 
+> > > Signed-off-by: Eillon <yezhenyu2@huawei.com>
+> > > Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+> > > ---
+> > >   arch/arm64/include/asm/kvm_dirty_bit.h | 15 +++++++++
+> > >   arch/arm64/kvm/arm.c                   | 20 ++++++++++++
+> > >   arch/arm64/kvm/dirty_bit.c             | 45 ++++++++++++++++++++++++++
+> > >   3 files changed, 80 insertions(+)
+> > > 
+> > > diff --git a/arch/arm64/include/asm/kvm_dirty_bit.h b/arch/arm64/include/asm/kvm_dirty_bit.h
+> > > index fe703f02626b..d828e6b43fe9 100644
+> > > --- a/arch/arm64/include/asm/kvm_dirty_bit.h
+> > > +++ b/arch/arm64/include/asm/kvm_dirty_bit.h
+> > > @@ -13,6 +13,9 @@
+> > >   #include <asm/sysreg.h>
+> > >   #include <linux/sizes.h>
+> > > 
+> > > +#define HDBSS_ENTRY_VALID	BIT(0)
+> > > +#define HDBSS_ENTRY_IPA	GENMASK_ULL(55, 12)
+> > > +
+> > >   #define KVM_ARM_HDBSS_DEFAULT_SIZE  PAGE_SIZE
+> > >   #define KVM_ARM_HDBSS_MAX_SIZE      SZ_2M
+> > > 
+> > > @@ -22,7 +25,19 @@ static inline u32 kvm_hdbss_buffer_size(struct kvm *kvm)
+> > >   	return kvm->arch.hdbss_buffer_size ?: KVM_ARM_HDBSS_DEFAULT_SIZE;
+> > >   }
+> > > 
+> > > +static inline bool kvm_hdbss_enabled(struct kvm *kvm)
+> > > +{
+> > > +	return kvm->arch.mmu.vtcr & VTCR_EL2_HDBSS;
+> > > +}
+> > > +
+> > > +static inline bool vcpu_hdbss_enabled(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +	return vcpu->arch.hw_mmu &&
+> > > +		(vcpu->arch.hw_mmu->vtcr & VTCR_EL2_HDBSS);
+> > > +}
+> > > +
+> > 
+> > IIUC, arch.mmu is always the canonical s2_mmu, while hw_mmu can be the
+> > nested s2_mmu, if enabled.
+> > 
+> > Was that your intend here?
+> > If not, we could use only kvm* version, which can be called with vcpu->kvm.
+> > 
+> > If it was, then I would like to understand the logic here, as IIUC the
+> > buffer is accessible only for the non-nested guest, as it's
+> > allocated in a per-vcpu structure. (vcpu->arch)
+> > 
+> 
+> Hi leo,
+> 
+> Yes, that was the intent. The shadow MMU never carries VTCR_EL2.HDBSS,
+> so the flush is naturally skipped when running nested.
 
-Ack. A walk on behalf of the guest should be bounded by the guest's
-PARange rather than the host's IPA limit. Will do that in v2.
+Ah, right. If we always test the kvm one, we may enable it for the nested 
+guest, which is undesired.
+
+[...]
+> 
+> > 
+> > > @@ -2017,7 +2025,19 @@ long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
+> > > 
+> > >   void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+> > >   {
+> > > +	unsigned long i;
+> > > +	struct kvm_vcpu *vcpu;
+> > > 
+> > > +	if (!kvm_hdbss_enabled(kvm))
+> > > +		return;
+> > > +
+
+And then here you check for the L1 VM because during migration the host 
+could have dirtied memory, and you want to track that as well.
+
+Makes sense
+
+> > > +	/*
+> > > +	 * The buffer is drained on every VM exit, so kicking running
+> > > +	 * vCPUs is enough to flush them; the dirty-log GET/CLEAR
+> > > +	 * protocol tolerates bits set concurrently with the snapshot.
+> > > +	 */
+> > > +	kvm_for_each_vcpu(i, vcpu, kvm)
+> > > +		kvm_vcpu_kick(vcpu);
+> > >   }
+> > > 
+> > >   static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+> > > diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
+> > > index f9aeb9f34ad0..be0d12555c84 100644
+> > > --- a/arch/arm64/kvm/dirty_bit.c
+> > > +++ b/arch/arm64/kvm/dirty_bit.c
+> > > @@ -13,6 +13,7 @@
+> > >   #include <linux/kconfig.h>
+> > >   #include <linux/log2.h>
+> > >   #include <linux/mm.h>
+> > > +#include <linux/srcu.h>
+> > > 
+> > 
+> > Out of curiosity, could you please explain you reasoning on selecting srcu
+> > as locking here?
+> > 
+> > (Like, what are you protecting against, and why srcu is a good choice)
+> > 
+> 
+> kvm_vcpu_mark_page_dirty() resolves the memslot under SRCU
+> (kvm_vcpu_gfn_to_memslot), and the flush loop calls it for each entry,
+> so the whole loop needs the read lock held.
+
+Oh, right, it's just about getting the memslot... now I see it :)
 
 Thanks!
-/fuad
+Leo
