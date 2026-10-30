@@ -1,69 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.216
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.253
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793343385;
-	b=21VRG1QAXeBLFDym9y4epxw7u6ur3NYM1TAs+PhtTNbEFwDJXnuDnEfaZnbLNOSq9hC4
-	 5bXa5sMPGjmaJtH/dY/kWeVrBxUUKGozCz8tZvxbOmeO3W4A79gUbA4++wEZUe4xY4N7E
-	 Mg+oCa7Rruw5OPgznX9EFAmJJDVpDDjCzuz2fyxh38v2g9sAea6fJco468mEmwNL/tTwY
-	 lJBlHUuPXtJL+ebs5UlFso42wMuIu3qXkE5GFWjcOVInQ2VBKX2RbW5wWVhOs1Bv6VIHd
-	 ebXlA40PeGSw7m9rlPj7nkz1WMRDrtalTz30od/BUJlEWu6g+EqpGg2dUlKGPAB/Ppw==
+	t=1793346204;
+	b=HGeKOYZ6HiTJbgiSiSc/xGSzyGAoc8np0ovLjs0T2oZovuMZT4szt/g+xBcTpleb+rx5
+	 qkt0vCjVchF+Poi/NW2OCwBJzK7tCJ484FvbUCiR2cSRFiObczldDcNbpfNBZEBT7rfD6
+	 KbiTTc+Sn+NM7x13txuvCUjPXQ/lU3NoI6Xg89UVyTRwPfkvcLEw3eu4YOShGwmubTlZp
+	 q3huMlBTrjUgSxVMBHFEY7N/G5tzfDcGglX1E48DwmnHgrHCpMzXinn1CH5TeBsZ6fIqa
+	 cc1rIjpuxCZYmLPEZ0/FwPNCj2MoljPxxlHkfOFFt7Qu1OadnfOMQlOKtYt15y4rulg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793343385;
-	h=DMARC-Filter:dkim-signature:Received:Received:Received:From:To:CC:
-	 Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
-	 X-ClientProxiedBy;
-	bh=aX9oxzryrpP/N+LbstdWGgRShaz+ZIQX/4rMf7PZOrM=;
-	b=NyFtD6uEb5fuiNaoYPkfd+YwaRERqlk+FFCfvx59RpUDHZXUar2LOAcFQY2wODyvU15A
-	 XqRclYKJTm0qrVdNOGxG/o4VtMFaMyEuNJYVMcQDhLBNbbUBwf9v2T+292YhEw4A92VbU
-	 kPtEi7DHppPxOID30wLKCzj1ntRWqVdX83TcJqHI7DoK5uQOjIhfrsAEnifDznP1SfYYr
-	 r1DSBpgpyltsQ492C2b11uu5/8TVrt3ACp2oDtleJ6bxco37KOGaaXlqnHDeE8VbYcwjZ
-	 pQ8lT6+WydAuonRM4zH623XWFm1GJ9u2z9nVga/FvCyhZSqlYyT3j3g7e+B4sNJ1aWQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793346204;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=Ic/DznHWY6qYKyiKcZAzEYcjT1Csqaqbv7FtlV+91D8=;
+	b=GeI5imbVU39+NQ/EjBEmBgX2/W49dL5NPS8vAZCr+R/E7H8p+VtMhoc+fGhGLKa6X/4u
+	 EfMPJoLwRI0Uu2F7KukeF+kKzQQP6rbVz7gRlOzhXXEoK3T5WQTkxbUUooF35v6J9mze5
+	 kNWchzR1IjhNJpYd1zrYUq2KPijyCXQAKRQGGtlA8lVh4yGTQKisHZEUmMidgLoFZa0UK
+	 GsAZKZvpqprDNXNpcQS2IHk7qUiGNDSiPYpqzyxChF2Eyy2HdVmL55N2X71KQzcABiCZr
+	 39Rl9gasn/xvyeyN7cAP8wMdeWJbsPQW+4vB1tpQeiIuIni+PwNjLpdMhDZzJ7aL1cw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=huawei.com;
-	spf=pass smtp.mailfrom=huawei.com;
-	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b="Noh/vIGl";
-	arc=none smtp.remote-ip=113.46.200.216
-Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=t9TgI5jW;
+	arc=none smtp.remote-ip=91.218.175.253
+Received: from mta0.migadu.com (out-253.mta0.migadu.com [91.218.175.253])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C7D606A31C
-	for <kvmarm@lists.linux.dev>; Fri, 30 Oct 2026 06:56:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 36C7D606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8D9606A320
+	for <kvmarm@lists.linux.dev>; Fri, 30 Oct 2026 07:43:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CA8D9606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=Noh/vIGl
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=aX9oxzryrpP/N+LbstdWGgRShaz+ZIQX/4rMf7PZOrM=;
-	b=Noh/vIGlrIcfT7ytLHg4hzZRsj3j26ToV2uJy0btNnOrClRsUy/Bs1AbxtM2jwe5Maje6WNJG
-	imSedcH2dmfQqrHq55yPX7JcPVJmAnz0Z7zJmf0EpH0BZ7yPXgxgykVwKwuj4/F908TyUO+7Bwe
-	c/RLnrxuSTbKo/sXjSy5bns=
-Received: from mail.maildlp.com (unknown [172.19.163.104])
-	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4jGBhS6zjlz1T4GZ;
-	Fri, 30 Oct 2026 14:56:08 +0800 (CST)
-Received: from kwepemk300013.china.huawei.com (unknown [7.202.194.231])
-	by mail.maildlp.com (Postfix) with ESMTPS id 60ACC4057F;
-	Fri, 30 Oct 2026 14:56:21 +0800 (CST)
-Received: from huawei.com (10.50.163.32) by kwepemk300013.china.huawei.com
- (7.202.194.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Fri, 30 Oct
- 2026 14:56:20 +0800
-From: Jinqian Yang <yangjinqian1@huawei.com>
-To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <linux-doc@vger.kernel.org>
-CC: <maz@kernel.org>, <oupton@kernel.org>, <yuzenghui@huawei.com>,
-	<wangzhou1@hisilicon.com>, <zhengtian10@huawei.com>, <linuxarm@huawei.com>,
-	<kristina.martsenko@arm.com>, <pbonzini@redhat.com>, <fuad.tabba@linux.dev>,
-	<joey.gouly@arm.com>, <seiden@linux.ibm.com>, <prime.zeng@hisilicon.com>
-Subject: [RFC 6/6] KVM: arm64: Add tracepoints for TLBID vDomain load events
-Date: Fri, 30 Oct 2026 14:56:17 +0800
-Message-ID: <20261030065617.4090073-7-yangjinqian1@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20261030065617.4090073-1-yangjinqian1@huawei.com>
-References: <20261030065617.4090073-1-yangjinqian1@huawei.com>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=t9TgI5jW
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=Ic/DznHWY6qYKyiKcZAzEYcjT1Csqaqbv7FtlV+91D8=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793346195; v=1; x=1793950995;
+ b=t9TgI5jWPB5V4qovkpq1PvudxkP7d8Fq2gMsBw5RdWQ6/0B6mX902LGwfDP/cCekem82bZd7
+ k8vb4bygjTGRHHUVscuLVzLm7hfke4AXFzPtTjY+RdJ0tNikUZjcyxYid1SXYh+oc8VUL/cGk0i
+ QfcQKg7PVUqkIjm0gbQoPZbo=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id f3227d9b7d3f97b4;
+	Fri, 30 Oct 2026 07:43:15 +0000
+X-Mizu-Trace-ID: f3227d9b7d3f97b4
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5bfca2a2af4so3863e87.1
+        for <kvmarm@lists.linux.dev>; Fri, 30 Oct 2026 00:43:10 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBwkuFf2ADg925ThNQVHflwioxNo+8zWbPCWWOVrLtyt1M/1G0Taz3tXP1C26gdt7u+ZOW2jBxE=@lists.linux.dev
+X-Gm-Message-State: AFq9FYJK6nU1apUREb4/ASKO87aXAoc1Zxhi8noUdR3hPjptiu3fUC4N
+	NiRUBFBvf5jB/3CHy0ppCLLn7835MZ+Aa4jlsxMMEf1A2Jlaq0oxZkmSzNj/ZtJQMvGPVK9wt2n
+	xi9qWdRIBqHEUXMEoF9xzbM4CwfA0XlGA9Orr7TW+
+X-Received: by 2002:a05:6512:39ce:b0:5bf:dcd7:86d9 with SMTP id
+ 2adb3069b0e04-5bfdcd78993mr28332e87.16.1793346189429; Fri, 30 Oct 2026
+ 00:43:09 -0700 (PDT)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -73,115 +66,41 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemk300013.china.huawei.com (7.202.194.231)
+References: <20261025075138.2919734-1-fuad.tabba@linux.dev>
+ <20261025075138.2919734-2-fuad.tabba@linux.dev> <auO3Kiykovvs279e@arm.com>
+In-Reply-To: <auO3Kiykovvs279e@arm.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Fri, 30 Oct 2026 07:42:33 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTzvCAStFp4TOBJZ2dEi9GT_S0CW0i7HzB4Q_+qLbv5Uew@mail.gmail.com>
+X-Gm-Features: AclHuK-iAV_pLdWc4hp6CdmUshGwwfxe2S4f_ErlrqMD7iHGLjhkPDfxfT1tlNg
+Message-ID: <CA+EHjTzvCAStFp4TOBJZ2dEi9GT_S0CW0i7HzB4Q_+qLbv5Uew@mail.gmail.com>
+Subject: Re: [PATCH v2 1/5] arm64: Add override for ID_AA64ISAR1_EL1.LS64
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Yicong Yang <yangyicong@hisilicon.com>, 
+	Zhou Wang <wangzhou1@hisilicon.com>, Arnd Bergmann <arnd@arndb.de>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-kvm_tlbid_vcpu_info logs each vCPU's vDomain bitmap on migration,
-and kvm_tlbid_domain_mapping logs the pCPU mask and physical domain
-mapped for each vDomain, covering both the default vDomain0 mapping
-and the per-vDomain updates.
+Hi Catalin,
 
-Signed-off-by: Jinqian Yang <yangjinqian1@huawei.com>
----
- arch/arm64/kvm/arm.c       | 10 ++++++++
- arch/arm64/kvm/trace_arm.h | 47 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 57 insertions(+)
+On Thu, 29 Oct 2026 21:14:18 +0000, Catalin Marinas
+<catalin.marinas@arm.com> wrote:
+[...]
+> However, does this need a plain cc stable? I assume you want it to go in
+> with patch 3 but that one only goes as far as 7.0. Same cc stable in
+> patch 2 which you may want to limit (or add both as dependencies to the
+> cc stable in patch 3 when committing).
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index b5ab89db1c07..0352d62cea18 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -954,6 +954,9 @@ static void kvm_tlbidomain_vcpu_load(struct kvm_vcpu *vcpu)
- 				      max_vdomains);
- 		}
- 	}
-+	trace_kvm_tlbid_vcpu_info(vcpu->vcpu_idx, vcpu->cpu,
-+				  current_data->last_pcpu,
-+				  current_data->vdomain_bitmap);
- 
- 	if (!vdomain->guest_tlbid_enabled) {
- 		old_map = vdomain->domain_map[0];
-@@ -966,6 +969,10 @@ static void kvm_tlbidomain_vcpu_load(struct kvm_vcpu *vcpu)
- 							   0,
- 							   current_data->last_pcpu,
- 							   test_bit(0, clear_bits));
-+		trace_kvm_tlbid_domain_mapping(0,
-+					       vdomain->vdomain_cpumasks[0],
-+					       vdomain->domain_map[0]);
-+
- 		if (vdomain->domain_map[0] == old_map)
- 			goto unlock;
- 	} else {
-@@ -983,6 +990,9 @@ static void kvm_tlbidomain_vcpu_load(struct kvm_vcpu *vcpu)
- 								   i,
- 								   current_data->last_pcpu,
- 								   test_bit(i, clear_bits));
-+			trace_kvm_tlbid_domain_mapping(i,
-+						       vdomain->vdomain_cpumasks[i],
-+						       vdomain->domain_map[i]);
- 
- 			if (vdomain->domain_map[i] != old_map)
- 				domain_map_changed = true;
-diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
-index 9c60f6465c78..0e8faeb8964e 100644
---- a/arch/arm64/kvm/trace_arm.h
-+++ b/arch/arm64/kvm/trace_arm.h
-@@ -415,6 +415,53 @@ TRACE_EVENT(kvm_forward_sysreg_trap,
- 		      sys_reg_Op2(__entry->sysreg))
- );
- 
-+TRACE_EVENT(kvm_tlbid_vcpu_info,
-+	TP_PROTO(int vcpu_idx, int current_pcpu, int last_pcpu,
-+		 u32 vdomain_bitmap),
-+	TP_ARGS(vcpu_idx, current_pcpu, last_pcpu, vdomain_bitmap),
-+
-+	TP_STRUCT__entry(
-+		__field(int,	vcpu_idx)
-+		__field(int,	current_pcpu)
-+		__field(int,	last_pcpu)
-+		__field(u32,	vdomain_bitmap)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->vcpu_idx	= vcpu_idx;
-+		__entry->current_pcpu	= current_pcpu;
-+		__entry->last_pcpu	= last_pcpu;
-+		__entry->vdomain_bitmap	= vdomain_bitmap;
-+	),
-+
-+	TP_printk("vcpu=%d current_pcpu=%d last_pcpu=%d vdomain_bitmap=0x%x",
-+		  __entry->vcpu_idx, __entry->current_pcpu,
-+		  __entry->last_pcpu, __entry->vdomain_bitmap)
-+);
-+
-+TRACE_EVENT(kvm_tlbid_domain_mapping,
-+	TP_PROTO(int vdomain_id, const struct cpumask *cpumask,
-+		 int pdomain_id),
-+	TP_ARGS(vdomain_id, cpumask, pdomain_id),
-+
-+	TP_STRUCT__entry(
-+		__field(int,	vdomain_id)
-+		__cpumask(cpumask)
-+		__field(int,	pdomain_id)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->vdomain_id	= vdomain_id;
-+		__assign_cpumask(cpumask, cpumask_bits(cpumask));
-+		__entry->pdomain_id	= pdomain_id;
-+	),
-+
-+	TP_printk("Domain mapping: vDomain=%d, cpumask=%s, pDomain=%d",
-+		  __entry->vdomain_id,
-+		  __get_cpumask(cpumask),
-+		  __entry->pdomain_id)
-+);
-+
- #endif /* _TRACE_ARM_ARM64_KVM_H */
- 
- #undef TRACE_INCLUDE_PATH
--- 
-2.33.0
+No, it doesn't. Patches 1, 2 and 5 are only there for patches 3 and 4,
+so none of them need to go further back than 7.0.
 
+Marc, Oliver, could the tag on all five patches become "Cc:
+stable@vger.kernel.org # 7.0.x" when you apply them? I'll respin if
+that's easier.
+
+Thanks!
+/fuad
