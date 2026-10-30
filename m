@@ -1,102 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793371754;
-	b=IBP61aViy3kV4QhYxINIa66zPZC/b7YOq0lvK5NUMrf1fRDIKgeJH/FPBnOJm2JzStn7
-	 d5RoGKYPTDrYQN3//60cvfeOI5ftXW1QKpN1i9ma2uMKoZIKc2SzG3CvA+fd7b5jt179U
-	 aMjplSEtvF1bBqUErHd9MM798gC+GO5UOx7ntRNBbU4FhwuoPGo5WUF+qonzIjGQqSvxW
-	 zh7vNAU79f5TDEZsXIryof8+ugW8zEPQS5XEH0IxqiI/5n3jTVjm76PCLsKBNpJKfgDnR
-	 8u3G9YwZXLG0aPiNTMLeOTYaWUBIzHODtQ2N4T4V+yAPIrSU3jVD4ZuojOyhBTyMRCw==
+	t=1793377118;
+	b=m6Mbfgy0bd853I2viW8xGD71wBWE0+95EKjE4XF52WdTYO5wkaMQ0RPb4HVB3GDUNUZq
+	 w4blTxFue7/PX7uBGfrXThm8xaAyyJxcVPMd6WI/4P41K/Gwrtco/PrhdtKCN90iIRyux
+	 KaeDjWx7RaPknKVg8Venb31FPucxjQgBYQS6HZyXP8wSeQNvSrc5gXYIs0e0dlMwhaA4z
+	 BwXDYuILlqKROMs0o0fqqX/MG6JJCoHWWr+MUqrDePpxnu1cuDqpFo15AxO767Sns2kPq
+	 OMjc5Yw4+Z4jtghtK6kK9CWjRERBqxrW37tjcR4F0UNxKPKGbRO80woOTc9Xtv1TsJQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793371754;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
-	 Received:Received:Received:Received:Date:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To:X-TM-AS-GCONF:X-Proofpoint-Reinject:
-	 X-Proofpoint-Spam-Details-Enc:X-Authority-Analysis:
-	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Info:X-Proofpoint-GUID:
-	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=HEHKW4LBT6GpwoTEpcbAbsyC2GPR8DDtx+QfBPo6gbI=;
-	b=XTiX8bl9swnvD2tmyZtiKx7dMeRMfp1hO/bkIrZuI4QcrUI4Q3WA+Qi/yHlpueNeyqp0
-	 s2qDB/yAc6bBlhQenJKnHCdrELWzNrjPXCeM8lyxT6s+vwE4At9YFOP+ANkFXH5vxyEBb
-	 T1WX/RU7l9awlYpzcsVyFhXZuFcF2wtJSMx0c/z/MwJvh5cgwbXafjPawXagbu8z7flVd
-	 GdQwaw1WXPUxSC1x3aR/iZxJ67I8Y9LB/g6Id3A3YJAYZrzKs+vBsJJFlsQIX9yOtf8Vw
-	 Ws9JzqWty593UbBzQcIh6eYdk1y445qQkRdyXlvtOP7x4LgakKB3fVwbZTmOiR4Egpg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793377118;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=Lp6EuBO/yUZZMjLIO6sxTrSSoT4jD8wY3QkSoLkgUeY=;
+	b=4FrfAEDmbWEEs10c+sTfX3FU3kcBlL256WS2UhDFhZylgnEt/3OvMGuI53NIp1DVPm9q
+	 7qXL84lfbqMfqlwnLeVFJpJWgt0N8l8MhyWcK52OiXPCckpCAEfYHhZ8wV03HC1wI0WIK
+	 bdnQt/AQqA5wvmyLCeolJrh4PF1paT42S/scRhZLZXAsZhibt7sfMM4GgJdx8FrqzWfjP
+	 /tl3im4b9Z/F3VrBoJWDwgSBZiXPP+nODp5qaub+uQm7rzmDIjXTNs7cixc56fkLe+v1x
+	 lwX/vv9rD5n4goSrZDj/sXR45QokssMlWvN5Ru8RxBpJPvqkepDqORS26W6B7flVvOQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.ibm.com;
-	spf=pass smtp.mailfrom=linux.ibm.com;
-	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=ExggUzQ4;
-	arc=none smtp.remote-ip=148.163.156.1
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99BB2606A31C;
-	Fri, 30 Oct 2026 14:49:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 99BB2606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=uAwB7+ly;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD90606A321
+	for <kvmarm@lists.linux.dev>; Fri, 30 Oct 2026 16:18:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CAD90606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=ExggUzQ4
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69UEiNBi3396324;
-	Fri, 30 Oct 2026 14:48:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=HEHKW4LBT6GpwoTEpcbAbsyC2GPR8D
-	Dtx+QfBPo6gbI=; b=ExggUzQ455ydNTjuXERdQK9pJ5iTVLioyncMYKtaMrybI6
-	krGz53pMUesedVdfoSwrjfyPFN6oKtLJ9ZGSc6iL6qdxumYmBDC53vPEnudKaHv7
-	ymcnCFyMC7J+0pWxlYcBqIeK0xL5Z/9YzRGeSHdJ6yt7M3KM5utOvyLsWcKlRXcF
-	yEHSvxiNs8gr20+K59YSPCoH6Bsi/Qm8mTA/OrqwXkpguyWfsWkKRySnaBj+fjZY
-	gasiwKpQjKQZBIjrcRsE6shxU/5OSa3YS9rziGJQij26td/8OPz7JnoUzaAZC1iQ
-	8CB0BpLwyIXpKLthffDo9so7x8Bqsy+nL7Fptlrw==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4hmeay399t-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 30 Oct 2026 14:48:50 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 69UEZ5nw649967;
-	Fri, 30 Oct 2026 14:48:49 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4hm69e50qj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 30 Oct 2026 14:48:49 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 69UEmjGw30737002
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 30 Oct 2026 14:48:45 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0E9BE2004B;
-	Fri, 30 Oct 2026 14:48:45 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 69B4D20040;
-	Fri, 30 Oct 2026 14:48:38 +0000 (GMT)
-Received: from li-fbf77acc-29ba-11b2-a85c-e8e934f50a46.ibm.com (unknown [9.124.208.227])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri, 30 Oct 2026 14:48:38 +0000 (GMT)
-Date: Fri, 30 Oct 2026 20:18:35 +0530
-From: Gautam Menghani <gautam@linux.ibm.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-        Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
-        Paolo Bonzini <pbonzini@redhat.com>, Fuad Tabba <fuad.tabba@linux.dev>,
-        Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>, Nicholas Piggin <npiggin@gmail.com>,
-        Atish Patra <atish.patra@linux.dev>, Alexandre Ghiti <alex@ghiti.fr>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, loongarch@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Stefan Teodorescu <fane@google.com>
-Subject: Re: [PATCH 3/7] KVM: PPC: Explicitly force IPIs when directly
- kicking vCPUs
-Message-ID: <auStM0rbFol79h5o@li-fbf77acc-29ba-11b2-a85c-e8e934f50a46.ibm.com>
-References: <20261028190259.1819571-1-seanjc@google.com>
- <20261028190259.1819571-4-seanjc@google.com>
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=uAwB7+ly
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 629A11682;
+	Fri, 30 Oct 2026 09:18:32 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C8A6A3F673;
+	Fri, 30 Oct 2026 09:18:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793377115; bh=7oTpehWmFbYAsoZtB/D9o/RfJCE3obn/J8/upR1nrKI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uAwB7+lyL90I+g2BBk+QSjpwL46XuovIUDrreeJpBOgYrX3eL0HtAc5t/KyQ6LCJe
+	 bGnxDtE7u0bxV9OvrWyJhNIsmGMKt1Iu+dSRnU3JKdJ/kRk9Td+uIY8B9e1JPIFFM2
+	 c1j7rW3wuzkSxND9PoYkOWoeTf2fUw0O1qkShnBI=
+Date: Fri, 30 Oct 2026 16:18:25 +0000
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>, sashiko-bot@kernel.org
+Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>, Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH] KVM: arm64: nv: Size nested stage-2 MMUs by the NV
+ PARange cap
+Message-ID: <e6bxdvc4utkt3circfrvzdxhtgdqxz2y736ufhjyxpi6xa5caf@qmtah7wbjx6g>
+References: <20261030105139.3543230-1-fuad.tabba@linux.dev>
+ <sashiko-outbox-190923@kernel.org>
+ <20261030120837.3752397-1-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -108,85 +64,61 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261028190259.1819571-4-seanjc@google.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDMwMDA1OCBTYWx0ZWRfX231ITCmOe99R
- dfESFyd3RUHjMlk75/eFc/1OXzNu84c9omPa7EIxtAYWLGJA9eAO3zzjK7VTQa9llnkJXi4gWU8
- r/unyeMYxDjuR+cWiyOnVdmS7GG+HF21UyJwsDX2Xub75Vlm2pm0bctwtvWSinYL1jvetutMT9u
- syV9gMRp2C27a9ai2jX5gVTbQI0zWTEnKBPJsAESqMw35ihGvBQsvADDXhk3kK6RJKPFkGzUu/R
- 8hbWWaTe5yOXFUonP/DisFXU6OHDNrpGGIOnidy7knS9ossfiCuv+PjkyxIdfgZNrxB3ogLWnb/
- wIJApNH46JPjtF8WaAFMzRRJRq4ipRnblJwCI0gUhomM9spjDCQUvGpKUJceKZB8VwfgH+dzVOz
- eTTsRDooCRzKNdGwyScusI3QLV5OU6ngYDGXyI76iB5Vyotd+IKq7x3NvGErCC7qtLRge/dkbPg
- 7yc+RWco6LUsGg+cWpw==
-X-Authority-Analysis: v=2.4 cv=WJHqzXsR c=1 sm=1 tr=0 ts=6ae4ae52 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=kj9zAlcOel0A:10 a=660iZSQnnn4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VwQbUJbxAAAA:8
- a=1XWaLZrsAAAA:8 a=1goJhm9fjgf-yEZC_jsA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-ORIG-GUID: Zln3Uvbt51spdXgJNma7nXq9r9SgUHNe
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDMwMDA1OCBTYWx0ZWRfX7S7KOd9POaV1
- Em+dt+hSOwRtH43TAR/rRI11q7Tee1s+P5cCU6Nfy9sKiFGQWrAn7ONzOJvQd/a2ydad09/AQ7n
- DooPLMaRQuyB21j0hWOf5aPFwNJGtms=
-X-Proofpoint-GUID: OIZDK0-t9uUR5jTdFJ0BXTWF-ze0VlkH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-10-30_05,2026-10-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1011 spamscore=0 lowpriorityscore=0 adultscore=0 priorityscore=1501
- bulkscore=0 impostorscore=0 malwarescore=0 suspectscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2610190000 definitions=main-2610300058
+In-Reply-To: <20261030120837.3752397-1-fuad.tabba@linux.dev>
 
-On Wed, Oct 28, 2026 at 12:02:55PM -0700, Sean Christopherson wrote:
-> Explicitly force an IPI when invoking kvm_vcpu_kick() directly instead of
-> relying on kvm_arch_vcpu_should_kick() to unconditionally return 1/true.
-> This will allow dropping kvm_arch_vcpu_should_kick() in favor of
-> kvm_request_needs_ipi().
+On Fri, Oct 30, 2026 at 12:08:37PM +0000, Fuad Tabba wrote:
+> On Fri, 30 Oct 2026 11:09:43 +0000, sashiko-bot@kernel.org wrote:
+> [...]
+> > Because fault_ipa < BIT_ULL(get_kvm_ipa_limit()) (52) and
+> > fault_ipa >= BIT_ULL(VTCR_EL2_IPA(vcpu->arch.hw_mmu->vtcr)) (48), won't
+> > kvm_handle_guest_abort() fall through to kvm_inject_sea() and inject a
+> > synchronous external abort into the guest instead of calling
+> > kvm_inject_size_fault() to inject a stage-1 level 0 address size fault?
 > 
-> No functional change intended (1 || 1 == true).
+> Yes. I'll fold this into v2:
 > 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/powerpc/include/asm/kvm_ppc.h | 13 ++++++++++++-
->  arch/powerpc/kvm/book3s.c          |  4 ++--
->  arch/powerpc/kvm/book3s_pr.c       |  2 +-
->  arch/powerpc/kvm/booke.c           |  6 +++---
->  arch/powerpc/kvm/e500_emulate.c    |  2 +-
->  arch/powerpc/kvm/powerpc.c         |  2 +-
->  6 files changed, 20 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-> index 169ea6a7fbad..bbe7378ad0ef 100644
-> --- a/arch/powerpc/include/asm/kvm_ppc.h
-> +++ b/arch/powerpc/include/asm/kvm_ppc.h
-> @@ -30,6 +30,17 @@
->  #endif
->  #include <asm/inst.h>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 705f6d84770e9..2a05c7cf8552a 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -2440,8 +2440,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  	is_iabt = esr_trap_is_iabt(esr);
 >  
-> +/*
-> + * TODO: For unknown reasons, KVM PPC has historically ignored vcpu->mode when
-> + *       determining if kicking a vCPU needs an IPI.  Either document why that
-> + *       behavior is necessary, or drop this helper and the @force param from
-> + *       __kvm_vcpu_kick().
-> + */
-> +static inline void kvmppc_vcpu_kick(struct kvm_vcpu *vcpu)
-> +{
-> +	__kvm_vcpu_kick(vcpu, false, true);
-> +}
-> +
+>  	if (esr_fsc_is_translation_fault(esr)) {
+> -		/* Beyond sanitised PARange (which is the IPA limit) */
+> -		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
+> +		/* Beyond sanitised PARange */
+> +		if (fault_ipa >= BIT_ULL(kvm_get_pa_bits(kvm))) {
+>  			kvm_inject_size_fault(vcpu);
+>  			return 1;
+>  		}
+> 
+> [...]
+> > Should setup_s1_walk() and setup_s2_walk() use kvm_get_pa_bits(vcpu->kvm)
+> > instead of get_kvm_ipa_limit() so that check_output_size() raises a
+> > stage-1 address size fault for TTBR base addresses and descriptors with
+> > bits [51:48] set rather than letting walk_s1() and __kvm_at_s12() truncate
+> > those bits when passing the address to stage-2?
+> 
+> No. setup_s2_walk() passes pa52bit=false, so its output size is
+> already at most 48. setup_s1_walk()'s output size can only exceed 48
+> because, on an LPA2 host, NV guests see stage-1 TGRAN4/TGRAN16 at
+> 52_BIT, which Wei-Lin's patch [1] stops advertising.
 
-AFAICS, there is no reason for PPC to always return 1. I was looking at
-the old patches on mailing list and found this - https://lore.kernel.org/kvm/0FEE585F-5E21-47F2-A3F0-AD0DE05EBB43@suse.de
+Agreed, however would it be more future-proof if they are changed to
+kvm_get_pa_bits() anyway?
 
-```
-How about we return 1 for kvm_arch_vcpu_in_guest_mode() on !x86 always, just like it's done today basically? Then we can
-worry about needless IPIs later and don't regress from the respective current kick implementations.
-```
+I.e. If kvm_get_pa_bits() < get_kvm_ipa_limit() is possible in the
+future, the resulting max_oa_bits could be too large.
 
-However, I'll do some testing and get back by mid next week to make sure
-there are no suprises.
-
+Also I don't see why we should use get_kvm_ipa_limit() (a host KVM
+global limit) during a guest specific translation table walk.
 
 Thanks,
-Gautam
+Wei-Lin Chang
+
+> 
+> Cheers,
+> /fuad
+> 
+> [1] https://lore.kernel.org/all/20261029223732.103785-2-oupton@kernel.org/
