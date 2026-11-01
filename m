@@ -1,61 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793480623;
-	b=tVcL8fba6kEPKhDTlpo8bgGam3C+sOyM/+FVbNXfDgi5FtWymLHU+nmD7eTW3EBzU70d
-	 SVhTIDwMeeLEgaeNyiwxoyUoqQv8j9aKHjS1+1AljXYOZfsXlshZN3f7Dla6nX93uLAjw
-	 UTUsMyK6AdeIxvRBHAa05M6Tx/5C9mGGS4IM2A5isXD1mHhHrXL1GAkNE2aUNysZMGgFQ
-	 /Nlg6gI6ky/xd2vbuGClX0dKmzvmfE5gDyx9C1vhVX7qT//2DYICI32IRteIA6/G/aCYy
-	 le1bK9Wxykb3K56mM68FrjXR+VjyWjo/xDD7gK7MsavZn8ruUyHuytn7yY5yo1iFU/A==
+	t=1793571363;
+	b=wJi/h4rewJ8R5zLwgmMDs3xvTBGT/GcROnFDDnXQjy8CweG9npzSYYuRYedB9gsNHck6
+	 iG1oeimpjXYzsIVNSixprLDMSdZs7ObiBkstUX8+spYD5sXeuRXB4WDwFlJfdY2luImDH
+	 CywSbdZn2qtr1lh6DmQ5pNj5JKQszzdp8WX36G/hBqpS4uGVMMElnLl2qnwA7980ZDaqR
+	 j5fqOdcK0nL7loraQOC3UMM5vQ5nWO4X4yGfFS85BrHbQUVQIExBflC6jBjuZtA0DzJlu
+	 2SA8wtdP5ITwICiSwNIsaQfbzrzVyTaUYG3Rsi12rvYk5c26FRzPO6Lci8wzgqMoROQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793480623;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=piub7Jp3Cm0dildjXbw9IOWYUttRHS+jgsIN+7iJt8Q=;
-	b=QI0pwTeC9mfza+2WelxI64ItfQ651j7HUS4aIvRQeoOhXLVIO9Ca7zhnkCVckDQ8bpwA
-	 Jk7XNvaS7j3K8uOYSRwgp70wkoVyjWgRHpzwpNSd3ecIbBhM9EjPaljSJ6J5g04rtYYtb
-	 mo6U4g3ptmJJu2ratkxweUMa6DvLGkooHHiB2US1ztAvD5jWxCDZ/9L/OfrZKsvUbFBQb
-	 5Jj9l9bAalXXo6qguXNX36mkDx5i1XXJkHnmmd88yT5xihAco/D4OvsweOsqE8yoX+JlZ
-	 yNTx2/HXlwYxo0PEAlj5a3iAsl2o6dYuE787Wf5YcXHHt03RMip0HW18ED3otjPhIAg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793571363;
+	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
+	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc;
+	bh=FTHI4iJKGW8nTdZJYWi2ZEsJRVp05NwkVgRYnkQTnQI=;
+	b=FLC5QatAjRXvYnSKyR9TBggNGcXxfgoHtXWOBZsVs4g0TgEApjydffc5xIVtMjlumt2i
+	 DAP76GvvKrrXtOySGTh4HdTi3YvitBNZU/GB/UZN0g48Flv20iL7X283Jm31E7cET9Czk
+	 sIBNU5K+/t8DXnvYkDEi0G1PQeZnH7zn2cugjO/VNdp94klNMfRc/N2x9kjSBwl9OLdCx
+	 M/bCcaYfzH5sQMsm7sFozJCnMDPF6ebQ5fpM6Ot/GHpo5TECq+qRmhHE5zJ8uwWlojlJ8
+	 6e3gnXIVatDPnN0tCn/7enO2+FWBCMcfAj0cyFmCB9gu86mc9W+Ttt83cUfbP+iHwtg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=bSkmaaid;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32E3606A31C
-	for <kvmarm@lists.linux.dev>; Sat, 31 Oct 2026 21:03:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C32E3606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kSuQm1gi;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A2E5606A33B;
+	Sun,  1 Nov 2026 22:15:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=bSkmaaid
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E7151576;
-	Sat, 31 Oct 2026 14:03:31 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3C96D3F673;
-	Sat, 31 Oct 2026 14:03:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793480614; bh=X15v248WCrjIN9447mjAtpg0bDk6UpQdgiQ7F2EU17w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bSkmaaiddT7s+KcKDc0Xx/M0zrWzbr+f2iIijNOn5Mb1EUh4/9YVYYH8LAmEbjqaw
-	 xkYgkjfiF9GVDkCXkuJ8ypTpFyzLJEdKLTlLtbv2cVEgIBvYIzKaSKF05t/OwZgHR6
-	 267xhQnmeZ77CiCWBkwao/m9EGfYxOEpa59jypy0=
-Date: Sat, 31 Oct 2026 21:03:17 +0000
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Matthias Goergens <matthias.goergens@gmail.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-doc@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>, 
-	linux-kernel@vger.kernel.org, workflows@vger.kernel.org
-Subject: Re: [PATCH v2] Documentation/process: Add a maintainer entry profile
- for KVM/arm64
-Message-ID: <6urqt376s23fcyr5pchfrrowvjoo6acg5xt4ujkft7gww6sagj@jxz5rqihtkja>
-References: <20261030083351.3040604-1-matthias.goergens@gmail.com>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kSuQm1gi
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 155181F00A1F;
+	Sun,  1 Nov 2026 22:15:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793571353;
+	bh=FTHI4iJKGW8nTdZJYWi2ZEsJRVp05NwkVgRYnkQTnQI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=kSuQm1gig26F3a5hbFrlCEgTV6KZdAUm8pVgji64pGU9IHFtmj1+0lqa6FjFwtpwY
+	 RQDDMAWpx0nuTd442k2/dkXZmO3ak6/b0bODbLMMOiXHR7sqan7+OYTSomVvsVhatc
+	 5sO4YlxH84ZbDrCWiv6NIlf3enn6ckTlaSH0A2hbLwanZ7TAw2vRzqI9LjdgxD9mYw
+	 rVyzHjy74WbfzuCKilIc61p8YM/etpQQgk31aiPP5AoELP2cxYQDze2rDXYJz/8udp
+	 9mbnMTtDK0Vamho7QvOMgWKAobDTF7XMy60kwODafcPU8OakiOi1fCrlQV4kt03Hd9
+	 bPj8B6YTEsy3w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 032DA38003B8;
+	Sun,  1 Nov 2026 22:15:53 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -65,69 +53,168 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261030083351.3040604-1-matthias.goergens@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v6 00/39] mm: make VMA flag semantics explicit, eliminate
+ VM_SPECIAL
+From: patchwork-bot+linux-riscv@kernel.org
+Message-Id: 
+ <179357135155.2624073.13862678489444424470.git-patchwork-notify@kernel.org>
+Date: Sun, 01 Nov 2026 22:15:51 +0000
+References: 
+ <20261013-b4-mmap-prepare-vma-flag-sanify-v6-0-1aa3c9b139f9@kernel.org>
+In-Reply-To: 
+ <20261013-b4-mmap-prepare-vma-flag-sanify-v6-0-1aa3c9b139f9@kernel.org>
+To: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+Cc: linux-riscv@lists.infradead.org, akpm@linux-foundation.org,
+ liam@infradead.org, vbabka@kernel.org, jannh@google.com, pfalcato@suse.de,
+ david@kernel.org, rppt@kernel.org, surenb@google.com, mhocko@suse.com,
+ corbet@lwn.net, gregkh@linuxfoundation.org,
+ dennis.dalessandro@cornelisnetworks.com, jgg@ziepe.ca, leon@kernel.org,
+ paul@paul-moore.com, stephen.smalley.work@gmail.com, perex@perex.cz,
+ tiwai@suse.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, memxor@gmail.com, ziy@nvidia.com,
+ baolin.wang@linux.alibaba.com, nico.pache@linux.dev, ryan.roberts@arm.com,
+ dev.jain@arm.com, baohua@kernel.org, lance.yang@linux.dev,
+ usama.arif@linux.dev, kas@kernel.org, dgilbert@interlog.com,
+ James.Bottomley@HansenPartnership.com, mkp@kernel.org, simona@ffwll.ch,
+ deller@gmx.de, sre@kernel.org, jhubbard@nvidia.com, peterx@redhat.com,
+ mhiramat@kernel.org, oleg@redhat.com, peterz@infradead.org, tglx@kernel.org,
+ mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+ acme@kernel.org, namhyung@kernel.org, mark.rutland@arm.com, riel@surriel.com,
+ harry@kernel.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
+ maarten.lankhorst@linux.intel.com, mripard@kernel.org, tzimmermann@suse.de,
+ airlied@gmail.com, will@kernel.org, aneesh.kumar@kernel.org,
+ npiggin@gmail.com, arnd@arndb.de, muchun.song@linux.dev, osalvador@suse.de,
+ willy@infradead.org, jack@suse.cz, maz@kernel.org, oupton@kernel.org,
+ catalin.marinas@arm.com, maddy@linux.ibm.com, anup@brainfault.org,
+ pjw@kernel.org, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+ borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
+ agordeev@linux.ibm.com, gerald.schaefer@linux.ibm.com, hca@linux.ibm.com,
+ gor@linux.ibm.com, davem@davemloft.net, andreas@gaisler.com,
+ viro@zeniv.linux.org.uk, brauner@kernel.org, matthew.brost@intel.com,
+ joshua.hahnjy@gmail.com, rakie.kim@sk.com, byungchul@sk.com,
+ gourry@gourry.net, ying.huang@linux.alibaba.com, apopple@nvidia.com,
+ chrisl@kernel.org, kasong@tencent.com, shikemeng@huaweicloud.com,
+ nphamcs@gmail.com, baoquan.he@linux.dev, youngjun.park@lge.com,
+ hannes@cmpxchg.org, qi.zheng@linux.dev, shakeel.butt@linux.dev,
+ axelrasmussen@google.com, yuanchu@google.com, weixugc@google.com,
+ chengming.zhou@linux.dev, mhocko@kernel.org, miklos@szeredi.hu,
+ xu.xin@linux.dev, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-rdma@vger.kernel.org, selinux@vger.kernel.org,
+ linux-sound@vger.kernel.org, bpf@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-trace-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev,
+ ihor.solodrai@linux.dev, spasswolf@web.de, tiwai@suse.de,
+ emil@etsalapatis.com
 
-On Fri, Oct 30, 2026 at 04:33:51PM +0800, Matthias Goergens wrote:
+Hello:
 
-[...]
+This series was applied to riscv/linux.git (fixes)
+by Andrew Morton <akpm@linux-foundation.org>:
 
-> +Review Cadence
-> +--------------
-> +
-> +Unless the maintainers ask for a new version sooner, allow at least a week
-> +between versions of a series, and only post a new version once there has
-> +been enough review to justify it.  Posting more often delays review rather
-> +than speeding it up.
-> +
-> +Pinging a series that has had no response is fine.
-> +
-> +Answer reviews from bots such as Sashiko as you would any other review, even
-> +if only to say that a finding is wrong.  Pre-existing problems that a bot
-> +points out, and that are unrelated to the series, need not be fixed in its
-> +initial posting.
-> +
-> +Applied patches are normally acknowledged in reply to the posting, naming the
-> +branch (``next`` or ``fixes``) and the commits.  The maintainers try not to
-> +change the commit IDs of applied patches, but the IDs of merge commits almost
-> +always change.
-> +
-> +Minor problems are often fixed up by the maintainers when applying; if they
-> +say "no need to resend", don't.
-
-The second half of this is a little silly :P
-What about just:
-
-Minor problems are often fixed up by the maintainers when applying; ask
-if you are unsure whether to resend.
-
-Thanks,
-Wei-Lin Chang
-
-> +
-> +Security issues
-> +---------------
-> +
-> +Bugs that let a guest attack its host, or a nested guest attack its guest
-> +hypervisor, should be reported as described in
-> +Documentation/process/security-bugs.rst.
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 7a162e9..183bf34 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -14596,7 +14596,9 @@ R:	Zenghui Yu <yuzenghui@huawei.com>
->  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
->  L:	kvmarm@lists.linux.dev
->  S:	Maintained
-> +P:	Documentation/process/maintainer-kvm-arm64.rst
->  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git
-> +F:	Documentation/process/maintainer-kvm-arm64.rst
->  F:	Documentation/virt/kvm/arm/
->  F:	Documentation/virt/kvm/devices/arm*
->  F:	arch/arm64/include/asm/kvm*
+On Tue, 13 Oct 2026 16:04:40 +0100 you wrote:
+> The VM_SPECIAL / VMA_SPECIAL_FLAGS mask conflates several unrelated
+> properties:
 > 
-> base-commit: d89e1d186ec9271bf78e62771779e9fc03bf0fc3
-> -- 
-> 2.56.0
+> * Is this managed by core mm, or by a driver mapping MMIO, kernel-allocated
+>   pages, or even ordinary pages itself?
+> * Can it be expanded or merged?
+> * Is this a 'weird' case like mlock where migration might race and we
+>   'have' to set invalid flags to notify?
+> * Is it another 'weird' case where we just want to stop GUP from touching
+>   it?
 > 
+> [...]
+
+Here is the summary with links:
+  - [v6,01/39] mm/vma: fix mmap_prepare file handling, remove file_doesnt_need_get
+    (no matching commit)
+  - [v6,02/39] mm/vma: introduce and use vma_[flags_]can_merge()
+    https://git.kernel.org/riscv/c/86a779c53204
+  - [v6,03/39] mm: consistently validate VMA state after mmap[_prepare] hooks
+    https://git.kernel.org/riscv/c/9cae38dc11da
+  - [v6,04/39] mm/vma: ensure mmap_prepare doesn't set actions on a mergeable vma
+    https://git.kernel.org/riscv/c/6335c786299f
+  - [v6,05/39] mm: make map_kernel_pages_[prepare,complete] internal and unexported
+    https://git.kernel.org/riscv/c/2a234f79d416
+  - [v6,06/39] mm/vma: tidy up map kernel pages enum values
+    https://git.kernel.org/riscv/c/4852f3421456
+  - [v6,07/39] mm: assert mmap lock held, use new flags API in vm_insert_page[s]
+    https://git.kernel.org/riscv/c/dad8e88fcfce
+  - [v6,08/39] mm: add mmap action for discontiguous kernel page mapping
+    https://git.kernel.org/riscv/c/b7b4d8f37a4f
+  - [v6,09/39] docs: filesystems: update mmap_prepare docs for discontig kernel pgs
+    https://git.kernel.org/riscv/c/ae60723abb65
+  - [v6,10/39] drivers/usb/mon: update to use mmap_prepare + map kernel pages
+    https://git.kernel.org/riscv/c/5323bb5f6ef3
+  - [v6,11/39] infiniband: update hfi1 to use remap_vmalloc_range()
+    (no matching commit)
+  - [v6,12/39] selinux: reject writable opens of policy file, drop mmap shared/write check
+    https://git.kernel.org/riscv/c/c6ce4378f20a
+  - [v6,13/39] ALSA: pcm: use vm_insert_page() to map PCM status page
+    https://git.kernel.org/riscv/c/ceb0de27371f
+  - [v6,14/39] bpf: arena: mark arena_map_mmap() mappings VM_MIXEDMAP
+    https://git.kernel.org/riscv/c/0c2c9885c5e9
+  - [v6,15/39] mm/vma: add vma[_flags]_is_mm_managed() predicates
+    https://git.kernel.org/riscv/c/7fdbc26b69c0
+  - [v6,16/39] mm/vma: only allow mmap to clear VMA_MAYWRITE_BIT if not mm-managed
+    https://git.kernel.org/riscv/c/d99c4a302c5a
+  - [v6,17/39] mm/vma: add and use vma_[flags]_is_fixed_mapping
+    https://git.kernel.org/riscv/c/9201d0f5b9d5
+  - [v6,18/39] scsi: sg: convert mmap hook to mmap_prepare and rework
+    https://git.kernel.org/riscv/c/abdd54cef5fc
+  - [v6,19/39] fbdev: defio: assert FBINFO_VIRTFB, drop VM_IO, add VM_MIXEDMAP
+    https://git.kernel.org/riscv/c/19458d015fcc
+  - [v6,20/39] HSI: cmt_speech: convert mmap hook to mmap_prepare, refactor
+    https://git.kernel.org/riscv/c/5605c40895fc
+  - [v6,21/39] mm/gup: error out early on !VMA_MAYREAD_BIT VMAs
+    https://git.kernel.org/riscv/c/2d2b1c508f21
+  - [v6,22/39] uprobes: remove VM_IO, set VM_MIXEDMAP for mapped kernel pages
+    https://git.kernel.org/riscv/c/0d219bc3cb88
+  - [v6,23/39] mm/mlock: clear VMA_LOCKED_MASK over mmap callback
+    https://git.kernel.org/riscv/c/61e012ab9a1c
+  - [v6,24/39] mm/mlock: eliminate weird VMA_IO_BIT abuse and simplify
+    https://git.kernel.org/riscv/c/aea83f2694ed
+  - [v6,25/39] mm/vma: enforce that mm-managed mappings may not set VMA_IO_BIT
+    https://git.kernel.org/riscv/c/99fd6bf43d5d
+  - [v6,26/39] mm: remove VMA_IO_BIT check in vma[_flags]_is_mm_managed()
+    https://git.kernel.org/riscv/c/88d77002e1a1
+  - [v6,27/39] mm: remove hugetlb_inline.h
+    https://git.kernel.org/riscv/c/94c86564538e
+  - [v6,28/39] mm: rename is_vm_hugetlb_page() to vma_is_hugetlb()
+    (no matching commit)
+  - [v6,29/39] mm: drop some redundant checks around hugetlb VMAs
+    (no matching commit)
+  - [v6,30/39] mm/vma: introduce vma[_flags]_is_mm_backed()
+    https://git.kernel.org/riscv/c/44debd840ec9
+  - [v6,31/39] mm/madvise: update is_valid_guard_vma() to use vma_is_mm_backed()
+    https://git.kernel.org/riscv/c/fc95d1cf4a13
+  - [v6,32/39] mm/uffd: use predicates for userfaultfd checks
+    https://git.kernel.org/riscv/c/fb700342f506
+  - [v6,33/39] mm/madvise: use predicates for madvise(..., MADV_DOFORK)
+    https://git.kernel.org/riscv/c/1d1104fe6dc6
+  - [v6,34/39] mm: eliminate VMA_SPECIAL_FLAGS usage when hugetlb explicitly tested
+    https://git.kernel.org/riscv/c/531e56359ffb
+  - [v6,35/39] mm: eliminate VMA_SPECIAL_FLAGS check in lru_gen_look_around()
+    https://git.kernel.org/riscv/c/5997da57a09b
+  - [v6,36/39] mm: avoid use of VMA_SPECIAL_FLAGS in migrate_vma_setup()
+    https://git.kernel.org/riscv/c/8bf792b7afcb
+  - [v6,37/39] mm: eliminate VM_SPECIAL, VMA_SPECIAL_FLAGS
+    https://git.kernel.org/riscv/c/72a993449cb0
+  - [v6,38/39] fuse: dax: do not set VM_MIXEDMAP
+    https://git.kernel.org/riscv/c/b0d88bfa7515
+  - [v6,39/39] mm/huge_memory: remove vma_is_special_huge()
+    https://git.kernel.org/riscv/c/e2a1d080f510
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
