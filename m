@@ -1,75 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.70
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793628891;
-	b=jeIaleJXq3dZmY6YflE+z7lbwRXsioeJEF4QtGXJ7qhtI3ni/qVUy0PMY4xX4Y0TbOoe
-	 UFzreGI5Ic+FlJQcFarUOsss4pifpzgn/6VDTLnzCqUBu2qV5J1XQufz+fjVc0w3NEso2
-	 5/izQlEH7L/lfPBOFB8WvckmU1h4gHKMHM0ujpzrF/K/KmgWf3VSuvosDH7jiLBzLxHIh
-	 aIp5g2yQkNe5BlbyWy3d5DjHlqvbcVadoT+hAgJk23pWEXwX4iYnbqikvXL5SQMcr8tSM
-	 kb/CcmNU4bP0lxMXxNU2YZgIkFUOyRk3VNMU0rrsy/EK4BZYuTgoZn9JnINVh9PaDGg==
+	t=1793629004;
+	b=QPvbSltDsz3jetmg8MGZ9pvAaGcqSlrO6exKah52Cmuhpoe4907CnMs5SrCuzULLN8xa
+	 FH85hdV5JHHemnJFdrtbaVC0wEKcoALYC88qhGze1mJB0j5M6DluIOCcqnkj7JcIOGDb5
+	 5j8uvxdR6SdgdWsAXgcooxC1LgoM0RPvIa5YATICaAyEkZaC9mI4Wr9MMS0KTbxax1FbA
+	 vCrFM/vvrkoHXtr9M5KQhErd88rXaCAcSSEUwNQM529W6/yvc1tzhs4UHoGOXLUoAfnp+
+	 2vAadq7PYN1hkw0VJ7p3K5g+9dlrhc7a8bOw7XzMrA3+VQ+66D7sdIyTg+sHpl4H4lw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793628891;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
-	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
-	 Content-Type;
-	bh=aObHiAl14ISYnHTiq56WBT9/HZ+h1+3i8W9JjZxKwNA=;
-	b=u5JEKilgod3wuRgECPJJIN/v+Iq4vehprUXJCBdMt5q3YzOjVOaEm5h2XDy5xjD0zFbA
-	 oYTJpJuJBZzHQS3COscHODGR+ouxXmEhvXk2OgC5ihF+iKn20PexCk2QYf3AmlSxThEYT
-	 p5UA0bMlmk353+E12sSc2Fqe9k+tTR++iDeulgXxk8FXp8vU6CZYbMiYzjQtl5CaF1NlK
-	 eW1a89NSqwgWbmHUdL65+QWe3xqyV4iv0GQv/sFNly2lDoIb4fSGP53xsxpVdMsR9a0y/
-	 6oY6OBEetzdlTbF9GIcXKJ2Ot965anr/h+v6aS2DOO+p/XqAoQVLufvAwC2+tPKzhLg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793629004;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=PAuzFOuclOSMC3fnm+jBEciQlj+SqOgZ/K1w8865E7Q=;
+	b=Vygz1UeOnYUq7VBOKT+lbtpA3OJz3MimP32WPhuGjWl5C+ZDQ6CJuK7LhS4YBmmQ0YZP
+	 hfgQ7mh84Eh7wXu0fe4aFG6ibz7UegM4MtGQdBYt0VqFPzdoYBaPGGwEdhj6hWRChWewD
+	 P16KfXmMZmZ18pCJ0DtGOEqi6Y07MNmk6gAbhLm6BgQu87893B3KGm/75Py3rl8R+m5xP
+	 NWerq/788SGnnMisY8k9/vovUlCyrTAvXb8EUPO9R4HpEQYs/LQaHOJdM0W1YOlYcYWRw
+	 yen4Xfj9fNkAbIjvTk0qAGykpQXrin5qhVbgUskYtopKOh42VS7y/PhnQ/uJeP2un0g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=flex--snehalreddy.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=qO5yYbXu;
-	arc=none smtp.remote-ip=209.85.128.70
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WewyZlvL;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA1560A263A
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 14:14:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2DA1560A263A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--snehalreddy.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C061A606A334
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 14:16:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=qO5yYbXu
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4ad3d35e899so15446615e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 02 Nov 2026 06:14:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1793628888; x=1794233688; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=aObHiAl14ISYnHTiq56WBT9/HZ+h1+3i8W9JjZxKwNA=;
-        b=qO5yYbXu1nWGFJMfrLcwD0bRE6VMMDXUPUYRKFuADo4eV2G90jEG2aFWdFGJy1++7v
-         DOba4kadsQPtiJ0T/5JKzb732r8obly/xRx5n+iUtC/TowgoPMLEmuiaye8BbBthQM4I
-         fy97BSBhDP896u45U82mXoG2OuDdWLouGmkFRMquJjE1mYJb0yp0QaI0WS5JLP9SSOfd
-         BE5E/leCk5/O9zF5kA315Ls9/F1UUHk6umBkuDWz6sbCbVW3TrPKQ+7rmS39MNJkY22G
-         9N1mVb/uG3BuAGROekn3XN+VTlkKuyJhAK3xOjOw6iLxK7dFK/hpauQO0nmPbARE15tu
-         gyHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793628888; x=1794233688;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=aObHiAl14ISYnHTiq56WBT9/HZ+h1+3i8W9JjZxKwNA=;
-        b=MQQn/swQaASNfKbQ8yj7P2vouvUkshtQjAxlq/YtP6LbZFkfkqPSBiJRfZherteWxF
-         s8QVoFalwJRGaobA8Xan/z8HHr1wAqE/h2efd7lCE44XtU6uXwOvZxQPey3wGNx/ycdj
-         0Kh2i4+xNY6t/uNKxVyZ33d5PazH4Qf/kFxHVScovDw1Y3TNJuZy0W59tY93s39sAVym
-         w5Bvux5FI1oQPCdkfV3LUGjjr7mc8GsGiAmWRtfS8VH2WzGMV8WXmBYs8WnJ8YKuhube
-         x8X/26cxirnZIQglg8Gv00SHw7cA1IgZtiWduE3mbgHrDW9cXWjNXGsJH0/r0TZtQssi
-         T6rQ==
-X-Forwarded-Encrypted: i=1; AKwUvByD81vkphHOuYIf56YihozgTgeseuK8Tr7V6ksbIa2BHkJ/vkyHGj29l+5B3Glbp6X6K+eVi/I=@lists.linux.dev
-X-Gm-Message-State: AFq9FYKnCSAtTNdURS0n5P5NaaFmwcfMr6fC4uEOwYpMTr6tuIWvUk+J
-	Yi75u0Oux2TbAErmhc9l6lhd+qlflyVkhjYJDcePEgla7Q4ETTdmpRRKHSLb4vTU5ZEPHMxpBKm
-	qTrLoxZLxAGO4V+pJZSLcPFmJcg==
-X-Received: from wrbbn9.prod.google.com ([2002:a05:6000:609:b0:488:62a3:a2ef])
- (user=snehalreddy job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:19c8:b0:4a3:59c9:a743 with SMTP id 5b1f17b1804b1-4ac1913ef8fmr237585955e9.27.1793628888027;
- Mon, 02 Nov 2026 06:14:48 -0800 (PST)
-Date: Mon,  2 Nov 2026 14:14:44 +0000
-In-Reply-To: <20261102141444.1830221-1-snehalreddy@google.com>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WewyZlvL
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 473361F00A18;
+	Mon,  2 Nov 2026 14:16:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793629003;
+	bh=PAuzFOuclOSMC3fnm+jBEciQlj+SqOgZ/K1w8865E7Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=WewyZlvLd/tRB9W7Op0jcHwzO/nJrik6O/1bDl/hIi4CsBwgeAkNHKATizUZsplzK
+	 VlS8xH4qbw1szzCBVN6octtHmG4g3XelmIz07mRt2Z4Pdzrdc0V1By/Mh/QEgLEDUv
+	 dExjixtKNxEt1zlgnC3zuHvUF8trtUstZ9/mp08G7452k4jYtNlxEjmIc9nQ/K8UAv
+	 3wskhVB+0LxmRntj4hvbRe7szA6Rbxuk6FajrLwerPlQjqpr9EFyjQJ+5wX5wUMA2K
+	 PcbawXfU/YwBlWvH52fIknOnFT4LieJILxnQNgGH1/EnmtpEVJfvYkUgyU79wEDuk4
+	 44JtCx1V9i3YA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xNsq0-00000009sib-3jtI;
+	Mon, 02 Nov 2026 14:16:40 +0000
+Date: Mon, 02 Nov 2026 14:16:40 +0000
+Message-ID: <86ecd32u9j.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ard Biesheuvel <ardb+git@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: Don't livelock when AT can't resolve a fault IPA
+In-Reply-To: <20261102094748.2638468-2-ardb+git@google.com>
+References: <20261102094748.2638468-2-ardb+git@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -78,216 +74,71 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-Mime-Version: 1.0
-References: <20261102141444.1830221-1-snehalreddy@google.com>
-X-Mailer: git-send-email 2.56.0.317.g454f8302e1-goog
-Message-ID: <20261102141444.1830221-3-snehalreddy@google.com>
-Subject: [PATCH v3 2/2] KVM: arm64: Support FFA_MEM_RECLAIM2 in host handler
-From: Snehal Koukuntla <snehalreddy@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Sudeep Holla <sudeep.holla@kernel.org>
-Cc: Vincent Donnefort <vdonnefort@google.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Mark Rutland <mark.rutland@arm.com>, Sebastian Ene <sebastianene@google.com>, 
-	Mostafa Saleh <smostafa@google.com>, Snehal Koukuntla <snehalreddy@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ardb+git@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, ardb@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-FF-A v1.3 BET0 (DEN0140 rev K) adds the FFA_MEM_RECLAIM2 interface,
-allowing an Owner to reclaim a subset of pages from a shared or lent
-memory region by populating constituent memory region descriptors in
-its TX buffer along with a starting descriptor byte offset and initial
-page index. Upon completion, the Relayer returns the number of 4K pages
-reclaimed in x3.
+On Mon, 02 Nov 2026 09:47:49 +0000,
+Ard Biesheuvel <ardb+git@google.com> wrote:
+> 
+> From: Ard Biesheuvel <ardb@kernel.org>
+> 
+> When a stage-2 permission fault doesn't report its IPA in HPFAR_EL2,
+> __get_fault_info() recovers it with an AT S1E1R/S1E1A on FAR_EL2. If that
+> fails, kvm_hyp_handle_memory_fault() goes straight back to the guest, on
+> the assumption that the replayed access will either succeed or take a
+> fault that the slow path can handle.
+> 
+> That assumption doesn't hold when the AT fails because its stage-1 walk
+> takes a stage-2 fault on one of the guest's page-table pages, while the
+> guest still holds a cached translation for the faulting VA. The guest
+> doesn't walk its page tables, so it never takes the S1PTW fault that
+> would let the slow path fix things up. It takes the same permission fault
+> again, the AT fails again, and the vCPU livelocks in the world switch.
 
-Support FFA_MEM_RECLAIM2 in the host FF-A proxy handler. Validate the
-register arguments, copy the constituent descriptors from the host TX
-buffer into the hypervisor's TX buffer, and check the descriptor bounds,
-the total page count and the initial page index on that copy before
-forwarding the call to the SPMD. On success, unshare the reclaimed page
-ranges from the host stage-2 page tables.
+That's because the TLBs tend to cache VA->PA, while ATS1R is after the
+IPA.  So you get the permission fault from the TLB, and the access
+fault from AT. Rinse, repeat.
 
-On a Pixel board (pKVM, 16K pages, EL3 SPMC), reclaiming a single 16K
-range drops from 1.3us to 0.7us (~45% faster) by avoiding
-FFA_MEM_RETRIEVE_REQ/RX_RELEASE (~0.6us), and single-call
-FFA_MEM_RECLAIM2 stays faster across small range counts (1.3us vs 1.9us
-at 16 ranges; 2 calls break even). Up to 64MiB (4096 ranges), batching
-256 descriptors/call adds 15 preemption points, capping each EL2/EL3
-call at ~11us while keeping total SMC time within 5%.
+Amazing find, really. This code has been in this exact shape for 13
+years, and it took that long to notice the issue.
 
-Link: https://support.arm.com/documentation/den0140/k
-Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
-Signed-off-by: Snehal Koukuntla <snehalreddy@google.com>
----
-Changes in v3:
-- Drop RFC tag and update specification reference to FF-A v1.3 BET0
-  (DEN0140 rev K)
-- Add benchmark numbers to commit description
-- Add Vincent's Reviewed-by tag (no code changes)
+[...]
 
-Changes in v2:
-- Rename FFA_FN64_MEM_RECLAIM2 to FFA_MEM_RECLAIM2 (sashiko)
-- Check that the sum of pg_cnt across all constituent descriptors
-  matches total_pages, guarding against overflow (Vincent)
-- Simplify the flags and offset alignment checks (Vincent)
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index e0c55644224c..4ba61b71d511 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -843,8 +843,21 @@ static inline bool kvm_hyp_handle_cp15_32(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  static inline bool kvm_hyp_handle_memory_fault(struct kvm_vcpu *vcpu,
+>  					       u64 *exit_code)
+>  {
+> -	if (!__populate_fault_info(vcpu))
+> +	if (!__populate_fault_info(vcpu)) {
+> +		/*
+> +		 * The AT couldn't resolve the IPA, typically because its
+> +		 * stage-1 walk took a stage-2 fault, such as an Access flag
+> +		 * fault on an aged page-table page. If the guest still has a
+> +		 * cached translation for the VA, it won't take that fault
+> +		 * itself, and would replay the same permission fault forever.
+> +		 * Drop this VMID's TLB entries on this CPU, so that the replay
+> +		 * walks the page tables and faults with a valid HPFAR_EL2.
+> +		 */
+> +		__tlbi(vmalls12e1);
 
- arch/arm64/kvm/hyp/nvhe/ffa.c | 126 ++++++++++++++++++++++++++++++++++
- 1 file changed, 126 insertions(+)
+As I was saying in my response to Will, I reckon this could be made
+more focused on the faulting VA. Something like:
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 5ad74ab265b5..2f49ffaa9361 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -232,6 +232,19 @@ static void ffa_mem_reclaim(struct arm_smccc_1_2_regs *res, u32 handle_lo,
- 	}, res);
- }
- 
-+static void ffa_mem_reclaim2(struct arm_smccc_1_2_regs *res, u64 handle,
-+			     u64 flags, u64 x3, u64 x4, u64 x5)
-+{
-+	hyp_smccc_1_2_smc(&(struct arm_smccc_1_2_regs) {
-+		.a0 = FFA_MEM_RECLAIM2,
-+		.a1 = handle,
-+		.a2 = flags,
-+		.a3 = x3,
-+		.a4 = x4,
-+		.a5 = x5,
-+	}, res);
-+}
-+
- static void ffa_retrieve_req(struct arm_smccc_1_2_regs *res, u32 len)
- {
- 	hyp_smccc_1_2_smc(&(struct arm_smccc_1_2_regs) {
-@@ -611,6 +624,116 @@ static void __do_ffa_mem_xfer(const u64 func_id,
- 		__do_ffa_mem_xfer((fid), (res), (ctxt));	\
- 	} while (0);
- 
-+static void do_ffa_mem_reclaim2(struct arm_smccc_1_2_regs *res,
-+				struct kvm_cpu_context *ctxt)
-+{
-+	DECLARE_REG(u64, handle, ctxt, 1);
-+	DECLARE_REG(u64, flags, ctxt, 2);
-+	DECLARE_REG(u64, x3, ctxt, 3);
-+	DECLARE_REG(u64, x4, ctxt, 4);
-+	DECLARE_REG(u64, x5, ctxt, 5);
-+	u32 req_desc_cnt = (u32)(x3 >> 32);
-+	u32 total_pages = (u32)x3;
-+	u32 desc_size = (u32)x4;
-+	u32 offset = (u32)x5;
-+	u32 page_index = (u32)(x5 >> 32);
-+	struct ffa_mem_region_addr_range *range;
-+	u32 declared_pages = 0;
-+	u32 reclaimed_pages;
-+	u32 reclaimed_count = 0;
-+	u32 in_idx;
-+	int ret = 0;
-+
-+	if (ffa_check_unused_args_sbz(ctxt, 6) || flags > 1 || (x4 >> 32)) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
-+	if (!req_desc_cnt || !total_pages) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
-+	if (desc_size != sizeof(struct ffa_mem_region_addr_range)) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
-+	if ((u64)req_desc_cnt * desc_size > KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
-+	if (offset % desc_size) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
-+	if (offset >= (u64)req_desc_cnt * desc_size) {
-+		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
-+	hyp_spin_lock(&host_buffers.lock);
-+	if (!host_buffers.tx) {
-+		ret = FFA_RET_INVALID_PARAMETERS;
-+		goto out_unlock;
-+	}
-+
-+	memcpy(hyp_buffers.tx, host_buffers.tx, (u64)req_desc_cnt * desc_size);
-+
-+	for (in_idx = 0; in_idx < req_desc_cnt; in_idx++) {
-+		range = (void *)hyp_buffers.tx + in_idx * desc_size;
-+		if (check_add_overflow(declared_pages, range->pg_cnt, &declared_pages)) {
-+			ret = FFA_RET_INVALID_PARAMETERS;
-+			goto out_unlock;
-+		}
-+	}
-+
-+	range = (void *)hyp_buffers.tx + offset;
-+	if (declared_pages != total_pages || page_index >= range->pg_cnt) {
-+		ret = FFA_RET_INVALID_PARAMETERS;
-+		goto out_unlock;
-+	}
-+
-+	ffa_mem_reclaim2(res, handle, flags, x3, x4, x5);
-+	if (res->a0 != FFA_SUCCESS)
-+		goto out_unlock;
-+
-+	reclaimed_pages = res->a3;
-+
-+	for (in_idx = offset / desc_size; in_idx < req_desc_cnt; in_idx++) {
-+		struct ffa_mem_region_addr_range temp;
-+		u32 pg_cnt, to_reclaim;
-+
-+		if (reclaimed_count >= reclaimed_pages)
-+			break;
-+
-+		range = (void *)hyp_buffers.tx + in_idx * desc_size;
-+		if (!range->pg_cnt)
-+			continue;
-+
-+		pg_cnt = range->pg_cnt - page_index;
-+		to_reclaim = min(pg_cnt, reclaimed_pages - reclaimed_count);
-+
-+		temp = (struct ffa_mem_region_addr_range) {
-+			.address = range->address + (u64)page_index * FFA_PAGE_SIZE,
-+			.pg_cnt = to_reclaim,
-+		};
-+
-+		WARN_ON(ffa_host_unshare_ranges(&temp, 1));
-+
-+		reclaimed_count += to_reclaim;
-+		page_index = 0;
-+	}
-+
-+out_unlock:
-+	hyp_spin_unlock(&host_buffers.lock);
-+
-+	if (ret)
-+		ffa_to_smccc_res(res, ret);
-+}
-+
- static void do_ffa_mem_reclaim(struct arm_smccc_1_2_regs *res,
- 			       struct kvm_cpu_context *ctxt)
- {
-@@ -1107,6 +1230,9 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
- 	case FFA_MEM_RECLAIM:
- 		do_ffa_mem_reclaim(&res, host_ctxt);
- 		goto out_handled;
-+	case FFA_MEM_RECLAIM2:
-+		do_ffa_mem_reclaim2(&res, host_ctxt);
-+		goto out_handled;
- 	case FFA_MEM_LEND:
- 	case FFA_FN64_MEM_LEND:
- 		do_ffa_mem_xfer(FFA_FN64_MEM_LEND, &res, host_ctxt);
+	__tlbi(vae1, read_sysreg_el2(SYS_FAR));
+
+If you respin, a Cc: stable would be appreciated.
+
+Thanks,
+
+	M.
+
 -- 
-2.56.0.317.g454f8302e1-goog
-
+Without deviation from the norm, progress is not possible.
