@@ -1,46 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793628811;
-	b=UG87R9XWzPlKSzrOVrc+saBpzFcWBqfYRduPm5HICfoOz5vtGDKu8fbkuZjEETDGt43O
-	 X5H+InsQuYiEeEjj1yw9Su50C+JCbFAsxH4lp+6kn32ORPsdYn02emfUzkcr3gb+Qopye
-	 EdjNQWgqNABPeAAJf6L5HaU04twKuGsiwjM+9g+46Dr3VUqHBfoqTgIxGNA2MOMrUUCuD
-	 GDqhpTBqSha+uQZ7kllboxqeMVP/3dGAFImmUYXguPx8sZmAGALl3hR8VLht8zau3eyLE
-	 ImPOJobe0JG2pIFIq3ZsQrC6smS079+hTdc5sg96HwM5R7JOIzxStHmYDhntS2Q5rmg==
+	t=1793628817;
+	b=GdLZBNlVsRKDnC6JL6Sf5HnABsRFQ5M6NEkGysFYTNU+8WsvP6Va96O53E5TV1A4Oq2R
+	 ar8PLnMnGUwwLeWQeL+mMmuoyFwWKa37LxwUP5hE98jlfZeN0pLclQO1+fPYxB4sxNP1Y
+	 1uUhdaEX0ZacEh8kK1v7tnsRniUqaIuo5iqc2kZxsKw2jnRT18LJDmS7BQ8iZ5KDDe6GR
+	 urNOcJSwjpME98AXHvvLo33WIcWKfiUXdkOZAYHVGxYr8ZQ8VaTUjaSMRcZfdsU1hg8Sp
+	 me8DXVj8kS6kVttMdpR0NXEt6lmiv5YR4moG28gX2LdnD1XqnN0Nx82LBiACVt33CAg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793628811;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793628817;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=Ua1DOoDM2ycibNdB6MjyfXMQfwPGZxy1wTaNHdPExSE=;
-	b=xARI+BiYIZvTPJjWvsWtOyL5enuSwVVx2oSmQzq8McXCQVeKPOrVnxR4b3YRIXzvfvOh
-	 0eDYyN8a80dXlICJJAp82kCBjhONIMvarCsDCYWo+akNNrshHzx5fKXi1OoaJRNSHo/gN
-	 rJEopX3TB456uW/HKbyw1LfjRnpSQz7H4J6fKT6mRn80ItJhoqQ/iCckDkxbl22LZpjI6
-	 H/3TCNbfxIe+cIs/ZCqGccVmA+OIsHwkJvfkonc7vzfUknEJb9DlBNsYcL5iALQA6T6qQ
-	 co3UEACMnjPW0WCgzbnWPc3NyVKLfqfHFDacntbmhrhYm5h5JZsyxLrAumTzj47lqgw==
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=hBoCvN90n2kNl5TqLdsKoeXkUjH0fLvT8u+lK5yYPXU=;
+	b=F3GiUarqCWu4fo0+KfXVOHrtfpZe8edrS034cFThdkgd7sJcpT00E8AYKpjzhOffCUZd
+	 n+Ijaqb4aCWuLQAuO6z54FfassfOJl6S01MPAX/tHUc3xi72vA2jRfLSXJgN935ljpAXi
+	 Ty3I3pPaioxa9XIvZCkTVKr/EV03VKn6eLbAS5BAMWm83csInHKvN2C6N5ZqsjMaf2t7F
+	 6892U3H4mMnZNj9yV551rd575bZyFLg/2BV7KO43ayyKKfKcn6CAxrU51lBF6y2/aJsZL
+	 WrwWs/i/q96I20j9fTlglYVFuWqm8q6swn2qf2hFYeLO0QdztYJeLN+bixjaoqnOKoA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=N3l60SDP;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=FAaV23A4;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C360606A329;
-	Mon,  2 Nov 2026 14:13:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5C360606A329
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3C38606A33D;
+	Mon,  2 Nov 2026 14:13:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A3C38606A33D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=N3l60SDP
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=FAaV23A4
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 43EB31691;
-	Mon,  2 Nov 2026 06:13:26 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C1FBD19F0;
+	Mon,  2 Nov 2026 06:13:31 -0800 (PST)
 Received: from e122027.arm.com (unknown [10.57.58.9])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A554D3F59E;
-	Mon,  2 Nov 2026 06:13:24 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C84AD3F59E;
+	Mon,  2 Nov 2026 06:13:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793628809; bh=c0J8oAMjRRRr84vzXcxPgHvZvqambP7No/QhePqrRBE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=N3l60SDPbFfZ/rOuZxoYhJ8tcOkCD9sP+8uYKl4eoZq/cgrmQrEnoisz5nMtdJLuD
-	 qWSdXM9gtzbElbowMGwonb6XxZqM4kWzYJXehgEmhhYeY30TR0+NZkpilaJfrOo8Bi
-	 7jmItYOE9907P8VlBdZFksu/Z3QQYoEXRV8ARkH8=
+	t=1793628814; bh=KoW+YqMwa9yLUI3NuylseR2UJKKrqQYGRZ3rfuc+be0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=FAaV23A4XLGLNycFYqUcI8RreKcQLiCbsiUq3t86DFqgQX0wNAUwgC3fzqotM+059
+	 /4r+B7yhNxfJZSMUcvWfjB/nBYXe0VcZ45TFx9Qb8LGep+P9QhN2MuPwtAjizTMEC/
+	 QpgkrAnhvCdP0FUv/O6Rria/9AH+PERympWtVUgQ=
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -68,10 +69,12 @@ Cc: Steven Price <steven.price@arm.com>,
 	Vishal Annapurve <vannapurve@google.com>,
 	WeiLin.Chang@arm.com,
 	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: [PATCH 00/11] KVM: arm64: CCA: Prepare Realm memory management
-Date: Mon,  2 Nov 2026 14:12:51 +0000
-Message-ID: <20261102141304.126883-1-steven.price@arm.com>
+Subject: [PATCH 01/11] KVM: arm64: CCA: Reserve the RMM mode
+Date: Mon,  2 Nov 2026 14:12:52 +0000
+Message-ID: <20261102141304.126883-2-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20261102141304.126883-1-steven.price@arm.com>
+References: <20261102141304.126883-1-steven.price@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -83,59 +86,27 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series adds the memory plumbing for CCA building on the basic
-plumbing[1] that has just been merged.
+Reserve KVM_MODE_RMM for CCA realm support. The kernel parameter that
+selects this mode will be added when the Linux CCA implementation is
+ready.
 
-These patches add the internal realm VM state and RMM feature checks,
-prepare realm stage-2 setup and teardown, and provide RTT mapping and
-invalidation helpers. Realm memslots are now contrained to the lower
-half of the IPA space, because faults treat the protected and shared
-halves as aliasing. The final patch then connects these helpers to the
-KVM stage-2 MMU operations.
+Signed-off-by: Steven Price <steven.price@arm.com>
+---
+ arch/arm64/include/asm/kvm_host.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-There's also an integration branch[2] that builds on this series and
-includes the realm descriptor creation, REC entry/exit, activation and
-the new uAPI. This series by itself is also available as a git
-branch[3]. However the new code isn't generally active without the full
-integration branch.
-
-[1] https://lore.kernel.org/all/20261007073537.2454351-1-suzuki.poulose@arm.com/
-[2] https://gitlab.arm.com/linux-arm/linux-cca
-    branch: cca-host-mm/v1/integration
-[3] https://gitlab.arm.com/linux-arm/linux-cca
-    branch: cca-host-mm/v1/mm
-
-Steven Price (7):
-  KVM: arm64: CCA: Reserve the RMM mode
-  KVM: arm64: CCA: Check for RMI support at KVM init
-  KVM: arm64: CCA: Check for LPA2 support and SHA-256
-  KVM: arm64: CCA: Add basic infrastructure for creating a realm
-  KVM: arm64: CCA: Tear down RTTs
-  KVM: arm64: CCA: Add Realm RTT mapping and invalidation helpers
-  KVM: arm64: CCA: Support runtime faulting of memory
-
-Suzuki K Poulose (4):
-  KVM: arm64: CCA: Introduce Realms
-  KVM: arm64: Handle attributes in stage2_unmap_range
-  KVM: arm64: CCA: Prevent memslot modifications after Realm creation
-  KVM: arm64: CCA: Add Realm stage-2 MMU operations
-
- arch/arm64/include/asm/kvm_emulate.h   |  29 +
- arch/arm64/include/asm/kvm_host.h      |  62 +-
- arch/arm64/include/asm/kvm_rmi.h       | 109 ++++
- arch/arm64/include/asm/virt.h          |   1 +
- arch/arm64/kvm/Kconfig                 |   1 +
- arch/arm64/kvm/Makefile                |   2 +-
- arch/arm64/kvm/arm.c                   |  33 +-
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |   2 +-
- arch/arm64/kvm/hyp/nvhe/switch.c       |   4 +-
- arch/arm64/kvm/hyp/nvhe/timer-sr.c     |   2 +-
- arch/arm64/kvm/mmu.c                   | 242 +++++--
- arch/arm64/kvm/rmi.c                   | 852 +++++++++++++++++++++++++
- 12 files changed, 1275 insertions(+), 64 deletions(-)
- create mode 100644 arch/arm64/include/asm/kvm_rmi.h
- create mode 100644 arch/arm64/kvm/rmi.c
-
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 97332ffcb130..ccd2dc8f73c3 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -120,6 +120,7 @@ enum kvm_mode {
+ 	KVM_MODE_DEFAULT,
+ 	KVM_MODE_PROTECTED,
+ 	KVM_MODE_NV,
++	KVM_MODE_RMM,
+ 	KVM_MODE_NONE,
+ };
+ #ifdef CONFIG_KVM
 -- 
 2.43.0
 
