@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793612915;
-	b=QfdQbzyeysV+3hSuZDmwTlRezDYVfG0Jd+ysKTjb0clwwEUjcnAktKdYUVtOalwqnFlV
-	 it+WryTNIn4xGvoVRebwFF6I9EnVwvEAAWFDaOU7YwUBIe6KP+c0HjUq7E7RiPcoifiEl
-	 g+se5tQ4yak7AkK1+Lme9jV6RCyf/p7QIlQM5aqDePfGkJ6Zw4b10WJxCJwp6dEdHK7dG
-	 sUiKa5fpmMG7+vOM/3B1EtC3j0XBc0w7JBkDF4Niob/dQlfMTtiMYU+G8SOl/RRr+b5iD
-	 dHzQ3rT54oCYsrJdIHAxSWzBkbCPQtQtUmIbFVVcyaURS3c5+1SMAvW3LWaG8qaShqA==
+	t=1793613419;
+	b=tOtlaHMu3BdtoBzF+wminIUMyitD/gv49uchP19Y4q3bh/lnAaIXLjZT5XBj53B2fujs
+	 toHmN8/IQp6IsQdVUm5LsLwd3dl1pVl58wnakg5zUHk1SrOn1SA5oK6C57MJcrrctWdtQ
+	 2OruVUEeG4BzEeCiG6mp2C0MFaw7H9jTtS3pX+jKhAyw/dlmfefVe4rldOADGD+JeVzXD
+	 3LB3WaxqqoMO76pMZBJbCICLNc9hx+AikfYsQuK3zauqWjjuXX0GSFWvy9TUVAs5BxCQd
+	 qc5RwldEm6K6TuGqDo+c6vAbqCgi1D9Oat+cMVaMs3IpZ+yF2fmw+z9NAhATLKsJY4w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793612915;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793613419;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
 	 MIME-Version:User-Agent:Subject:Content-Language:To:Cc:References:
 	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=XzXbFa9dhaHcA5InRfsQcpgxHEo38p/rPjsetoAUqnI=;
-	b=JIQ71Kuk7ngkpPKa3i9sUxREg7dAhJqqDj4j52PgKU8IXU1zvR0HCLatUV0Ei118ZpiS
-	 UYcc5kJsFKjjG1b4TWlQn/WeQucdmvUiskFS5/0S7GO1m5+ydqska/lzmqGLUZW0FQm9j
-	 AAwYW9lXi33bw0oU1EwqQs81xb0bqIgLwBx1oSh7nx4mRhC+krtpaIKfRh6YrgtiT54uX
-	 CuhketcRptFxaLqlcot4/LruzJixWujmMwobZO7JDfLuBM2FctTe3Tid2iKlzFUxx0Heb
-	 u+23s7Mlga0GtqAp+wpUq3zuQnJQ2m06lpl5swDuXcPdF7vB6lALa146SJ2wD5QQTkw==
+	bh=vhiIK5PdTbwawB02fP2FOqUEIxrnLxsctWx372F2gzw=;
+	b=fe+H6T82Bdp2SWg/svv+BJ3lUWBbXlE9ZC5HuDw9aWwgucw9uP+lrRSE2xDsyoSVC2cz
+	 LxdzoHD/7sQN8LDKW5mq0OLdonFkJSctsHTVY11jPgtPfj7XTr7XXTrOHa1imS/dzfFcl
+	 Ku5ImkA55DyD4muLtu5VjOcdk+cIQQf4SMcaL4jvxEPw5Vjd2dbDP/tpX77unGeS2BCEb
+	 rEQ2TPfU86BYbpW27JapuNfs/YL3vl8YbFgtdh42D4RLgp+3W3hlo3mpbVEkKfzH/tCs1
+	 ZccGer36T+YP9L8Gb7uET4yqOmGN84LPt8gIohNCDWRnWNdp985xhi33FqCy+s7HfWQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Ynon53Hc;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=gccdexj1;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68330606A324
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 09:48:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 68330606A324
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A74CD606A330
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 09:56:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A74CD606A330
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Ynon53Hc
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=gccdexj1
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5E4CA1595;
-	Mon,  2 Nov 2026 01:48:30 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 069301595;
+	Mon,  2 Nov 2026 01:56:54 -0800 (PST)
 Received: from [10.57.66.79] (unknown [10.57.66.79])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7E03B3F59E;
-	Mon,  2 Nov 2026 01:48:31 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0CC263F59E;
+	Mon,  2 Nov 2026 01:56:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793612913; bh=egNufJ8Fs17VQdSUqK9Yn8uet05avqZAAkBSvGK+45M=;
+	t=1793613417; bh=41gNfj/3A8ki9t26Cg2dgECj8r+E6+sd8etdy9Thqd8=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ynon53HcE64fp/Me7zZFgCGztnBBDUBW2GmC+Sf0pi8kPLH8QE/kKP57h0JRrEBB2
-	 1vC78ArVZuvu+b0nB3+ViqwkWzHLr+ImoxH8RD00O18DKfY/qipoYKFE9sbFOfdk/G
-	 cKmlmZZY59kGB9LXU/LSMpUJNexVZvouUd7nWaTs=
-Message-ID: <2458da32-5235-4dfb-a817-7557230b9885@arm.com>
-Date: Mon, 2 Nov 2026 09:48:30 +0000
+	b=gccdexj1jX8rBkY14YBg4UcTDhTgWONWIbGeArCgbRMNdU0/2G6ZZ43/73JSxGiVV
+	 7jKecXSJ+s1jgCav7JcsrTvW6tVxqbDJNiseB9CxPP2+6rmo1SUz8tZ8XOh/yIwWg/
+	 jUYkUKUNJop5w32l1YPjfgU4MDwn6mfs1ZxeXTMc=
+Message-ID: <5f82a68f-cb2c-4155-8f9f-cf287d5b00d6@arm.com>
+Date: Mon, 2 Nov 2026 09:56:53 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -54,61 +54,96 @@ List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/2] KVM: arm64: Clear the VM's feature bitmap when
+Subject: Re: [PATCH v4 2/2] KVM: arm64: Clear the default PMU when
  kvm_setup_vcpu() fails
 Content-Language: en-GB
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
- Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>,
+To: Fuad Tabba <fuad.tabba@linux.dev>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oupton@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>,
  Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
  Lorenzo Stoakes <ljs@kernel.org>, Jack Thomson <jackabt@amazon.com>,
  Congkai Tan <congkai@amazon.com>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Fuad Tabba <tabba@google.com>
 References: <20261102075843.2556018-1-fuad.tabba@linux.dev>
- <20261102075843.2556018-2-fuad.tabba@linux.dev>
- <07d0afa8-1b9a-4991-a419-9840cf629d57@arm.com>
- <CA+EHjTwNSxBa8-_0Q6zmgqW0RGyVhpUU3xnFg3-sqqmsdL4s8A@mail.gmail.com>
+ <20261102075843.2556018-3-fuad.tabba@linux.dev>
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <CA+EHjTwNSxBa8-_0Q6zmgqW0RGyVhpUU3xnFg3-sqqmsdL4s8A@mail.gmail.com>
+In-Reply-To: <20261102075843.2556018-3-fuad.tabba@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 02/11/2026 09:42, Fuad Tabba wrote:
-> Hi Suzuki,
+On 02/11/2026 07:58, Fuad Tabba wrote:
+> Under KVM_ARM_VCPU_PMU_V3_STRICT, the VM has no PMU until userspace
+> selects one, and initializing the PMU fails with -ENXIO until then.
+> However, without STRICT, kvm_setup_vcpu() selects the default PMU
+> before it prepares the vCPU for nested virtualization, and leaves it
+> set when that preparation fails. After a retry with STRICT,
+> initializing the PMU succeeds and the guest gets the PMU of the CPU
+> the failed INIT ran on.
 > 
-> On Mon, 02 Nov 2026 09:24:15 +0000, Suzuki K Poulose
-> <suzuki.poulose@arm.com> wrote:
-> [...]
->>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> [...]
->>> @@ -1856,8 +1856,13 @@ static int __kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
->>>           bitmap_copy(kvm->arch.vcpu_features, &features, KVM_VCPU_MAX_FEATURES);
->>>
->>>           ret = kvm_setup_vcpu(vcpu);
->>> -        if (ret)
->>> +        if (ret) {
->>> +                /* Clear the bitmap if setup fails on the first vCPU to be initialized. */
->>> +                if (!test_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags))
->>
->> Is this check necessary ? We go into kvm_setup_vcpu() only if the bit is
->> cleared and we do this under the config_lock mutex. The flag is only set
->> after we have finished the kvm_setup_vcpu() successfully, later down.
+> Drop the PMU and its number of counters along with the VM's feature
+> bitmap. While KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED is clear, no vCPU
+> has been initialized and the PMU attributes return -ENODEV, so only
+> such a failure can have set them. Once the flag is set, every INIT has the
+> features of the first one that succeeded, which either selected a PMU
+> or had none to select, so kvm_setup_vcpu() doesn't select another.
 > 
-> It is. An INIT on a second vCPU with the same features also calls
-> kvm_setup_vcpu(), with the flag already set, and
-> kvm_vcpu_init_nested() can return -ENOMEM there.
-
-
-Sorry, my bad. I missed the second condition after the flag check
-in.
-
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-
-
-
-/me Where's coffee!
-
+> Fixes: ad220e275c398 ("KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_STRICT vCPU feature")
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>   arch/arm64/kvm/arm.c | 7 +++++--
+>   1 file changed, 5 insertions(+), 2 deletions(-)
 > 
-> Thanks,
-> /fuad
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 3e91e01b032c4..65194e02cdbc2 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1857,9 +1857,12 @@ static int __kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+>   
+>   	ret = kvm_setup_vcpu(vcpu);
+>   	if (ret) {
+> -		/* Clear the bitmap if setup fails on the first vCPU to be initialized. */
+> -		if (!test_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags))
+> +		/* Clear the bitmap and PMU if setup fails on the first vCPU to be initialized. */
+> +		if (!test_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags)) {
+>   			bitmap_zero(kvm->arch.vcpu_features, KVM_VCPU_MAX_FEATURES);
+> +			kvm->arch.arm_pmu = NULL;
+> +			kvm->arch.nr_pmu_counters = 0;
+> +		}
+
+minor nit: While the above works, it looks a bit too much extracting the 
+PMU details to arm.c. Alternatively we could do something like this:
+
+
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index e2b28dbc0451..7a669cccf912 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -1088,6 +1088,11 @@ int kvm_arm_set_default_pmu(struct kvm *kvm)
+         return 0;
+  }
+
++int kvm_arm_clear_default_pmu(struct kvm *kvm)
++{
++       kvm_arm_set_pmu(kvm, NULL);
++}
++
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 6b4a118d17ca..571c0ba8507c 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -92,6 +92,7 @@ void kvm_vcpu_pmu_resync_el0(void);
+  u8 kvm_arm_pmu_get_pmuver_limit(void);
+  u64 kvm_pmu_evtyper_mask(struct kvm *kvm);
+  int kvm_arm_set_default_pmu(struct kvm *kvm);
++int kvm_arm_clear_default_pmu(struct kvm *kvm);
+  u8 kvm_arm_pmu_get_max_counters(struct kvm *kvm);
+
+  u64 kvm_vcpu_read_pmcr(struct kvm_vcpu *vcpu);
+
+
+
+Either ways,
+
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com
 
