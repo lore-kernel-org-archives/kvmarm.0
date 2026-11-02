@@ -1,49 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793634359;
-	b=X7wIDpfPZZydEe2Zu69RHm4afhNYeoeXigs4q4Qg8CeIj//NEYtKJhRgR383jwOsilAu
-	 m/N5QaRegrYBt6rSF0WI3vIiaYjgvAQxB4J9ws2ge6zr2ZguxcQMzTAHk6xEia03xdMJ1
-	 vEibQ0o8O6nbtgAYWoWSkQgK/NxVbqDzy+xkAkqxzb5+mjUz/0zZevL2qrFHnLnMEhT8s
-	 ZpIuTDy0SZmV3/cd0/0j70a/jI9jnJWmlPzqwnLw6YD3e5BD48gLTgJ5rf8dPf2hC2n1C
-	 qitIWop2hsVfuiuQvmxXHBGOq1qknLjDLAntq9rE8Vv5sDcV5qo8cRxgX8Qyj42Lj5A==
+	t=1793634639;
+	b=pVdOsnLewMWkBG6aepaw9OdPt4KMATzXcIXIR7el7X5JgMU/l2EL3OBs2gBimfNuyD73
+	 YQ/qsRHLr2h4RA69pfcZqF5K9tiAYvYgT18fA/Ai1I4ogiM24OvRW+JtlxJXaNf3ltaMX
+	 CGnKkxPwbYsFBHFSBQGePrsJflT8gi8Gr/BnZHwd2J3VEOAGF5a2iVAvN673Jp960qgaG
+	 4U+lmtw/HSy7rp2yVhlGltYx+daQJWh6O0bju4eaXEvwBmZuQSmytbj906shNTVIzL4r/
+	 PzjX4UNMXEJyMQyex3cXce6tCsUDYJ7e/OxWPgLCDiugjHwUJlOZvGiq0iG6524Mw9w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793634359;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
-	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=OxZ1FKz93yFmSf3rlu7UFTVP3JEk6naoYRS2+rfDo78=;
-	b=Q7V32JF8hwBodjxNrsoRpKjydGO+TmJsFJt1IDmPCWMgmn0lYFfvrMUKjkacQwB+F/Gl
-	 B+rr5qX2enXZn7AcD5F71C+vPg+k8jYIZMKGPzUQ2CPBTRA77dq8SH51fReoz2uQ5uZjX
-	 RpaoNp5KoKmNf8GIlmxvXx64aUyQm5vnt9G0+yTPhrNmmD7odg44bWR5/JbXDYpeEwnyE
-	 M9B33TT3ULtMJZmV/PwS1gxdGdAaU3LtPmUYZtL65cdU3P+rOaHLYg91QyCLHCUjE7m+l
-	 sv5iUeO0mQq5v9HXQjK5+UT2s3pN6fV/2wZUnTltW6fn4kG3T57OeomgI9a8eCM1e9A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793634639;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=oJOlbfrbq+QWTTG2303HNnGFWzN3n3+4lbjaPeEbYCM=;
+	b=GFQHATz6QDAU5hg4VD25jyJNpY2OBLF6dgVACJ8Sae+IUkYs5a1Kfkn3ke/gklN69Ky5
+	 dkOrM/M2tRaTNiuMyjoqzpJWLZOs4k2x4xBAaq7muJ63YV4ESui8xcbkrbTJMNENIzGvM
+	 XB7phl4Gxa9hcGNJiImRMryPbVN3UVZG7DvLZKuriQT8Vxhqy7g46XJKGFZKswvJCKq55
+	 Y2AwVKx8Ibjkx3O5dxDS1XJYegpU0qgqCq7HUvzEImRjXOzObAEvYsFd9wwolXj4pOYhH
+	 UB0XFoifK7WN4q+XcIM7vWGCoVmSTpGM09ZHQT32oULd7mUewaYWlocsHH+WI0BXCgA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="cOCS/GGj";
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655146074659;
-	Mon,  2 Nov 2026 15:45:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 655146074659
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PCFNvtb7;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698E7607991C;
+	Mon,  2 Nov 2026 15:50:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=cOCS/GGj
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ABA581691;
-	Mon,  2 Nov 2026 07:45:54 -0800 (PST)
-Received: from [10.57.58.9] (unknown [10.57.58.9])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 85CB43F673;
-	Mon,  2 Nov 2026 07:45:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793634357; bh=20817R1mA1QbVjTwjDkW4AThGUuc7p8N/sVrM+ih4AM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cOCS/GGjHAgkaZa/DZHphD0w3MxNA7tE7wxbCjH8zp+5E7JfZTNU8KDbBKcYTkzOx
-	 P6yo5GiKL8de1WXQF+qhbIqjXEZz6rB1M9ziyY9EMMl4CCUM+JI7JSq+3rS6d0FCAP
-	 MgQUxyTQuOyY5SBKB0xtNrB55E8y/cf5P+PdJUYE=
-Message-ID: <b0755ab6-d7a9-4952-8f18-09b72fbd662d@arm.com>
-Date: Mon, 2 Nov 2026 15:45:54 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PCFNvtb7
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDFF41F00A16;
+	Mon,  2 Nov 2026 15:50:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793634639;
+	bh=oJOlbfrbq+QWTTG2303HNnGFWzN3n3+4lbjaPeEbYCM=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=PCFNvtb7ZVvwG/E1wyuDeo3kJBLodo8FVaM6FZEyp+4jgdeyc+DmL0QtgHaEjL5bL
+	 zPJjFZHGT7wlQnGAgd6CFkRKT3R7qEmT5IYAYNHwHYyFUZxtT1oFMBwblWZ7fBjPZ1
+	 wlHBj56CmyrqPpehcSgHhec1/guodkBbH0KABs30iCMOKNOGsyiIn8WmHNkKumYFrs
+	 SzZF4ImiJXYxud+hab5gA3sTCMxFhaanLxdps9SQ/9ji4Gm75h2MPMIo41xg+vt5E9
+	 Jvp/6dfCWlwtkRpBroE425M2+D0u605indvgNkcHVwH4T5JwZDWl/mM4vDzw3oUtY1
+	 r59qVCLpZg3og==
+Message-ID: <sashiko-outbox-193708@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 09/11] KVM: arm64: CCA: Prevent memslot modifications
+ after Realm creation
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Steven Price" <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
+In-Reply-To: <20261102141304.126883-10-steven.price@arm.com>
+References: <20261102141304.126883-1-steven.price@arm.com>
+ <20261102141304.126883-10-steven.price@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 02 Nov 2026 15:50:38 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -52,155 +60,108 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/11] KVM: arm64: CCA: Introduce Realms
-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
-References: <20261102141304.126883-1-steven.price@arm.com>
- <20261102141304.126883-3-steven.price@arm.com>
- <sashiko-outbox-193575@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <sashiko-outbox-193575@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 02/11/2026 14:30, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
-> - [High] KVM: arm64: premature kvm_arch_has_private_mem() breaks gmem checks and caps
-> - [Low] KVM: arm64: duplicate kvm_arm_vcpu_finalize() declarations in kvm_host.h
-> --
-> 
-> commit d7e08ee0dbb02a4cf114f13c026edc843145fe6e
-> Author: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
-> KVM: arm64: CCA: Introduce Realms
-> 
-> This commit adds foundational infrastructure for Arm CCA Realm VMs,
-> including the VM_REALM flavor, a static key for RMI availability,
-> per-VM Realm state tracking in struct kvm_arch, and initial feature and
-> memslot checks.
-> 
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index ccd2dc8f73c3a..7d0222047ca1e 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
-> [ ... ]
->> @@ -1572,30 +1584,43 @@ struct kvm *kvm_arch_alloc_vm(void);
-> [ ... ]
->> +#define kvm_vm_is_realm(kvm)		((kvm)->arch.vm_flavor == VM_REALM)
->> +#define vcpu_is_rec(vcpu)		kvm_vm_is_realm((vcpu)->kvm)
->>  
->>  #define kvm_vm_hyp_is_distrusting(kvm)	((kvm)->arch.vm_flavor >= __VM_DISTRUSTING_HYP)
->>  
->> -#endif	/* __KVM_NVHE_HYPERVISOR__ */
->> +#define kvm_arch_has_private_mem(kvm) kvm_vm_is_realm(kvm)
-> 
-> [Severity: High]
-> Does defining kvm_arch_has_private_mem(kvm) here cause a regression in
-> guest_memfd memslot validation and capability reporting across arm64?
-> 
-> Because CONFIG_KVM_PRIVATE_MEMATTR_VM is not selected on arm64, defining
-> kvm_arch_has_private_mem activates the preprocessor branch in
-> include/linux/kvm_host.h that sets gmem_in_place_conversion to true at
-> compile time:
-> 
-> include/linux/kvm_host.h:
->     #elif defined kvm_arch_has_private_mem
->     #define gmem_in_place_conversion true
->     #define kvm_is_private_gfn kvm_gmem_is_private_gfn
-> 
-> With gmem_in_place_conversion unconditionally true,
-> kvm_gmem_prepare_memory_region() in virt/kvm/guest_memfd.c sets
-> KVM_MEMSLOT_GMEM_ONLY on every guest_memfd memslot even when
-> GUEST_MEMFD_FLAG_MMAP is not set:
-> 
-> virt/kvm/guest_memfd.c:kvm_gmem_prepare_memory_region() {
->     ...
->     if (gmem_in_place_conversion || kvm_gmem_supports_mmap(inode))
->         slot->flags |= KVM_MEMSLOT_GMEM_ONLY;
-> }
-> 
-> As a result, the check in kvm_arch_prepare_memory_region() in
-> arch/arm64/kvm/mmu.c that rejects non-mappable guest_memfd memslots:
-> 
-> arch/arm64/kvm/mmu.c:kvm_arch_prepare_memory_region() {
->     ...
->     if (kvm_slot_has_gmem(new) && !kvm_memslot_is_gmem_only(new))
->         return -EINVAL;
-> }
-> 
-> is bypassed for non-Realm VMs, allowing userspace to bind a private
-> guest_memfd created with flags == 0 via KVM_SET_USER_MEMORY_REGION2 and
-> fault those pages into non-Realm stage-2 page tables through gmem_abort().
-> 
-> In addition, when userspace queries
-> KVM_CHECK_EXTENSION(KVM_CAP_GUEST_MEMFD_MEMORY_ATTRIBUTES) on the /dev/kvm
-> fd (where kvm is NULL), kvm_vm_ioctl_check_extension_generic() in
-> virt/kvm/kvm_main.c calls kvm_supports_private_mem(NULL):
-> 
-> virt/kvm/kvm_main.c:kvm_supports_private_mem() {
->     return !kvm || kvm_arch_has_private_mem(kvm);
-> }
-> 
-> virt/kvm/kvm_main.c:kvm_vm_ioctl_check_extension_generic() {
->     ...
->     case KVM_CAP_GUEST_MEMFD_MEMORY_ATTRIBUTES:
->         if (!gmem_in_place_conversion || !kvm_supports_private_mem(kvm))
->             return 0;
-> 
->         return KVM_MEMORY_ATTRIBUTE_PRIVATE;
-> }
-> 
-> This advertises KVM_MEMORY_ATTRIBUTE_PRIVATE on all arm64 hosts even when
-> KVM_MODE_RMM is not active and while kvm_gmem_set_attributes() in
-> virt/kvm/guest_memfd.c rejects KVM_SET_MEMORY_ATTRIBUTES2 with -EINVAL on
-> every creatable VM.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [High] KVM: arm64: CCA: guest_memfd memslot delete rejected after Stage-2=
+ unmap
+--
 
-Dang, yes that's broken. The later commit "KVM: arm64: CCA: Support
-runtime faulting of memory" changes the condition in
-kvm_arch_prepare_memory_region() to check "!kvm_vm_is_realm()" but
-clearly I've broken the bisect here. That check also isn't quite right.
-I think rather than using kvm_memslot_is_gmem_only() we should check the
-gmem file with kvm_gmem_supports_mmap(). So we end up with the check:
+commit 5106402397c36eec1e5fa59a5bb2c5adf4ee2aa8
+Author: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-       if (kvm_slot_has_gmem(new) && !kvm_vm_is_realm(kvm) &&
-           !kvm_gmem_slot_supports_mmap(new))
+KVM: arm64: CCA: Prevent memslot modifications after Realm creation
 
-and a new function:
+This commit updates kvm_arch_prepare_memory_region() to disallow creating,
+modifying, or deleting guest_memfd-backed memslots once a Realm has been
+created.
 
- bool kvm_gmem_slot_supports_mmap(const struct kvm_memory_slot *slot)
- {
-        /* The guest_memfd file is pinned while preparing a new memslot. */
-        return kvm_gmem_supports_mmap(file_inode(slot->gmem.file));
- }
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 51fda7b2ff7f3..eb8c5f9e9791d 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -2862,13 +2862,28 @@ int kvm_arch_prepare_memory_region(struct kvm *kv=
+m,
+>  	    (new->flags & (KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY)))
+>  		return -EPERM;
+> =20
+> -	if (kvm->arch.vm_flavor =3D=3D VM_PROTECTED_PKVM) {
+> +	switch (kvm->arch.vm_flavor) {
+> +	case VM_PROTECTED_PKVM:
+>  		/* Cannot modify memslots once a pVM has run. */
+>  		if (pkvm_hyp_vm_is_created(kvm) &&
+> -		    (change =3D=3D KVM_MR_DELETE || change =3D=3D KVM_MR_MOVE)) {
+> +		    (change =3D=3D KVM_MR_DELETE || change =3D=3D KVM_MR_MOVE))
+>  			return -EPERM;
+> -		}
+> +		break;
+> +	case VM_REALM:
+> +		/*
+> +		 * Once the Realm is created, we cannot modify any slots that
+> +		 * could be providing private memory. i.e., guest_memfd backed
+> +		 * slots.
+> +		 * TODO: Handle trusted device private memory slots
+> +		 */
+> +		if (!kvm_realm_is_created(kvm))
+> +			break;
+> =20
+> +		if (kvm_slot_has_gmem(old) || kvm_slot_has_gmem(new))
+> +			return -EPERM;
 
+[Severity: High]
+Does checking kvm_slot_has_gmem(old) in kvm_arch_prepare_memory_region() run
+too late to prevent Stage-2 unmapping when deleting a guest_memfd-backed
+memslot on a created Realm?
 
-I'm not sure what we can do about the KVM extension when !kvm. x86
-presumably already has the situation where !kvm can expose
-KVM_MEMORY_ATTRIBUTE_PRIVATE even if the host doesn't support it. Is
-this a problem?
+In virt/kvm/kvm_main.c:kvm_set_memory_region(), non-delete changes
+(KVM_MR_MOVE and KVM_MR_FLAGS_ONLY) on KVM_MEM_GUEST_MEMFD memslots are
+already rejected upfront with -EINVAL, so kvm_slot_has_gmem(old) is reached
+here when change =3D=3D KVM_MR_DELETE.
 
->> +
->> +int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
->> +bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
-> 
-> [Severity: Low]
-> This isn't a bug, but commit df6a70516adec8 already moved the declarations
-> of kvm_arm_vcpu_finalize() and kvm_arm_vcpu_is_finalized() earlier in
-> arch/arm64/include/asm/kvm_host.h right below VCPU_PKVM_FINALIZED:
-> 
-> arch/arm64/include/asm/kvm_host.h:
->     #define VCPU_PKVM_FINALIZED	__vcpu_single_flag(cflags, BIT(2))
-> 
->     int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
->     bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
-> 
-> Can these duplicate declarations be dropped?
+However, in virt/kvm/kvm_main.c:kvm_set_memslot(), KVM invalidates and
+flushes the old memslot before calling kvm_prepare_memory_region():
 
-Indeed they can.
+virt/kvm/kvm_main.c:kvm_set_memslot() {
+	if (change =3D=3D KVM_MR_DELETE || change =3D=3D KVM_MR_MOVE) {
+		invalid_slot =3D kzalloc_obj(*invalid_slot, GFP_KERNEL_ACCOUNT);
+		if (!invalid_slot) {
+			mutex_unlock(&kvm->slots_arch_lock);
+			return -ENOMEM;
+		}
+		kvm_invalidate_memslot(kvm, old, invalid_slot);
+	}
 
-Steve
+	r =3D kvm_prepare_memory_region(kvm, old, new, change);
+	if (r)
+		goto err;
+}
 
+kvm_invalidate_memslot() marks the active slot as KVM_MEMSLOT_INVALID and
+calls arch/arm64/kvm/mmu.c:kvm_arch_flush_shadow_memslot():
+
+arch/arm64/kvm/mmu.c:kvm_arch_flush_shadow_memslot() {
+	write_lock(&kvm->mmu_lock);
+	kvm_stage2_unmap_range(&kvm->arch.mmu, gpa, size, true);
+	kvm_nested_unmap_cipa_range(kvm, gpa, size, true);
+	write_unlock(&kvm->mmu_lock);
+}
+
+For a Realm VM, kvm_stage2_unmap_range() invokes
+arch/arm64/kvm/rmi.c:kvm_realm_unmap_range_filter() with
+KVM_FILTER_PRIVATE | KVM_FILTER_SHARED:
+
+arch/arm64/kvm/rmi.c:kvm_realm_unmap_range_filter() {
+	if (attr_filter & KVM_FILTER_SHARED)
+		realm_unmap_shared_range(kvm, start, end, may_block);
+	if (attr_filter & KVM_FILTER_PRIVATE)
+		realm_unmap_private_range(kvm, start, end, may_block);
+}
+
+By the time kvm_arch_prepare_memory_region() returns -EPERM and
+kvm_set_memslot() restores the old memslot in the error path, hasn't
+realm_unmap_private_range() already unmapped and undelegated the Realm's
+private Stage-2 DATA granules across the memslot's GPA range?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261102141304.1268=
+83-1-steven.price@arm.com?part=3D9
