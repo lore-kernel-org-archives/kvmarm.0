@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793648745;
-	b=OArbmN3WCIcY0OdAx7LCMF0VAeYlRm36g4xe0TrqVYj3/4EkXsbuc4D+A+WSN2z+mIZR
-	 iqJqZjByx6SGt/mum706hKrN1Ubh+W4jed1SShQUUyjQaGwD+Iy9PVhfRBjlL0N8QKsKr
-	 w8qnZ+BLPYEwbKKCPgBUMsCxRmdkfSkIWs9BbPf+lZT8iet2XY92/JHCazBZxbu9a+71/
-	 /Dsyx98eWYDrW1x275m1Q9QnWZWfOqakmvmV6KG6B1yo205AA2K40v4z+DHSb/8Sl+8OQ
-	 jlvJPUphLNLMzsoFCaWkzMeehD1azTi/f6AtM6E6gL3p1yCEhMxwMLQV8uVGRCil2Iw==
+	t=1793648750;
+	b=t32XYgV8eqahrBBg++9NTsuN+BHKYK54Wj353jwe/RWK9oZCBSYSsogZEB4vqQFDTSA0
+	 LiSptSYcRqA/pVBUgzrxkfmCtEC132lFTjaF2xeCrHm75pdwcONMtyq3NpSgeJMb7opkH
+	 m3OHelwR6urS2lT8sNZYEB9jEtM5du0Mr9FLHPYm6bFPexiyPYohCNDiuFUYApLeSURLO
+	 dPqsR+Iy3WSkKPmGm/pWL4zmaGLxEAX++reM9ysYtsoFZsA+E/82DPDTbtlkAUR5b2aEY
+	 wgmqFklSJRI/8uYgDwJ3LGWytLDbTSfS5gfdArKyH5aQ3F20A9t/c5iSKOZDSHFbrew==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793648745;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793648750;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
 	 Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=o9Zj0uDrLtT59Cp5ilWqKygvn3OZ7IulIamM3tG1l8g=;
-	b=BAlX3XCYjse/UADsDnoWPNOfPKXnUxczy76e5qjzRrJnhvcH6qvWdZTmaxUSRIK/G0nu
-	 JkK5rKGQ7r0BFXBGEYP4zBrlwZGWSMlQDzZ9Z80GJseWlc+cT7ZG+dR5O4Y/zOYTsAlKz
-	 rlPStJRCeVJlxG+7QzI3pWgvvY2eUdW5sjGYymKH4cOcuGZV0P+mOpVZxov6PQcANGhMA
-	 DOj9onZx1kCtffpC6INm9WnN+3A9l/65iwaEdxdboI9QuRd8t5GQ7LK23BkVCku2tQaLz
-	 0oiExmGwx48T715DuHDsaHakGjPw/IpxI0fCEkMSQvNiqKLJmqPyxoIIPOY69ZJ9sTQ==
+	bh=61OnxPWIOl0SBfgH14SW36eRMsyA/CyEvSNcHeQuje8=;
+	b=EUpfs1nsjExE7nJ+7lCIo3BLokjqB+dlI6/t99khgCa9cvAMN1V/QNndTNeOcbDVo0pc
+	 MFJ4v+Fy9NAmew2jACLiLLFam+O/GFosrtSA3pvCuTUtOExG6ExNkDeOBuNzVPEhvKR9M
+	 NH69LRgkeehZOzMkvBFyjTREy08sj1dQwCZm8UrbL8lYhhMOOcqhl3h7j3O8JXxjlNu0c
+	 Ob9pPrrKp3doyKydLh+JsX0/2ACWleK99EqyS+h3rWQ37r2cKPHBHFSnaHE4A1FVVV2l9
+	 1dLCQAI+U97pTgYqRsXqrqb/JjKzEl+lcAV4xiRR8olpOxSviDYT7S0h5/Gl3DINQ+Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=DP5v9FC4;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=NmK2GtGJ;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F24A1606EEBC
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 19:45:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F24A1606EEBC
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D1A9606D817
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 19:45:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8D1A9606D817
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=DP5v9FC4
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=NmK2GtGJ
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7129D16A3;
-	Mon,  2 Nov 2026 11:45:41 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C409E175D;
+	Mon,  2 Nov 2026 11:45:45 -0800 (PST)
 Received: from e133894.cambridge.arm.com (e133894.arm.com [10.2.80.62])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BA62B3F871;
-	Mon,  2 Nov 2026 11:45:42 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 43B773F673;
+	Mon,  2 Nov 2026 11:45:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793648744; bh=alN/4224zFytf27w5ONkJJlEll5Qao+G1kFWCP+heqw=;
+	t=1793648748; bh=XNXL2rh2PFKC69FRZUf4CXkWdEGDiTwBxzwFwejt0sw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DP5v9FC4bJANz8W8DHeF9GlYzUAEokxRLfnup46ImzhOGp8t0wEBUpCEyazHKpamb
-	 nS849c+h66nsDk5y05HhgMtmLw4Pr86PQs9UbSkwcTOCNFd0NofmrRuvioOkOclMCb
-	 4OFVMlbgfKSWDT2LVRH4D+Ipaw2lHnG2Xs7cs4ys=
+	b=NmK2GtGJ+KvFBtubEvIXB/yZqgnhU9EASydovoCTstH2voMWni2FS8LwNB+oKpiXp
+	 heMhc+Q86ERQeKnBmtCfTSs0OsNOyYVV4Ylkni+cJ+g+v3kkZZat/gDxsBm0yWuJ8+
+	 QpnPgEN4iP2H8IkWrtgpE6+XvzNI9psKNJhFo4Jg=
 From: Sascha Bischoff <sascha.bischoff@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
@@ -55,9 +55,9 @@ Cc: maz@kernel.org,
 	lpieralisi@kernel.org,
 	timothy.hayes@arm.com,
 	fuad.tabba@linux.dev
-Subject: [PATCH v2 09/16] KVM: arm64: gic-v5: Add ITS MSI injection
-Date: Mon,  2 Nov 2026 19:44:47 +0000
-Message-Id: <20261102194454.4086911-10-sascha.bischoff@arm.com>
+Subject: [PATCH v2 10/16] KVM: arm64: gic-v5: Add ITS userspace register access
+Date: Mon,  2 Nov 2026 19:44:48 +0000
+Message-Id: <20261102194454.4086911-11-sascha.bischoff@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261102194454.4086911-1-sascha.bischoff@arm.com>
 References: <20261102194454.4086911-1-sascha.bischoff@arm.com>
@@ -72,292 +72,481 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Now that KVM can resolve GICv5 ITS translations from guest memory,
-allow userspace and irqfd MSI injection to target a virtual GICv5 ITS.
+Userspace needs access to the emulated GICv5 ITS MMIO state in order
+to inspect and restore the device state around VM reset and migration.
+Expose the GICv5 ITS register frame through KVM_DEV_ARM_VGIC_GRP_ITS_REGS.
 
-Add helpers to validate that an MSI address resolves to a GICv5 ITS
-IODEV, find the ITS for an MSI, resolve the DeviceID/EventID pair to a
-vgic_irq, and inject the resulting LPI with the GICv5 VDPEND path.
-GICv5 MSIs require KVM_MSI_VALID_DEVID, as the DeviceID is part of the
-ITS translation key.
+Reuse the same MMIO register descriptors used by the guest-facing
+IODEV, but apply the usual userspace access constraints: the ITS base
+address must have been configured, the register offset must map to an
+emulated ITS register, and userspace accesses must use the natural
+32-bit or 64-bit register alignment.
 
-Although MSI data is 32 bits, GICv5 supports only 16-bit EventIDs.
-Reject a nonzero upper half before narrowing the EventID for cache
-lookups, so malformed MSI data cannot alias a valid translation.
+Add control handling for KVM_DEV_ARM_ITS_CTRL_RESET. The reset is
+performed while all vCPUs are stopped and while holding the ITS lock,
+so it cannot race with guest MMIO updates or translation lookups. The
+reset clears guest-programmed state and cached translations while
+preserving the advertised ITS capability defaults.
 
-Provide both the slow path, which resolves the translation from guest
-memory and populates the ITS cache, and the inatomic cached path used
-by irqfd. If the cached path misses, irqfd retries in a work item. The
-worker borrows the VM's mm while walking the guest tables, then drops
-it before injecting the LPI.
+Do not expose GICv5 ITS SAVE_TABLES or RESTORE_TABLES controls. For
+GICv5, the guest-owned DT and ITTs are the authoritative translation
+state, and the KVM translation cache is disposable state that can be
+rebuilt from guest memory.
 
-Wire kvm_set_msi() and kvm_arch_set_irq_inatomic() to use the GICv5
-ITS injection helpers for GICv5 VMs, while keeping the existing GICv3
-ITS path unchanged for GICv3 VMs.
+Restore guest read-only IDR0-IDR2 through dedicated userspace writes,
+validating the advertised capabilities before changing them. Also
+allow userspace to restore READ_EVENT_DATAR while keeping guest writes
+to that result register ignored.
 
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- arch/arm64/kvm/vgic/vgic-irqfd.c  |   8 ++
- arch/arm64/kvm/vgic/vgic-its-v5.c | 132 ++++++++++++++++++++++++++++--
- arch/arm64/kvm/vgic/vgic.h        |   6 ++
- 3 files changed, 139 insertions(+), 7 deletions(-)
+ arch/arm64/kvm/vgic/vgic-its-v5.c | 371 ++++++++++++++++++++++++++----
+ 1 file changed, 322 insertions(+), 49 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c b/arch/arm64/kvm/vgic/vgic-irqfd.c
-index ee1a1b214f03c..c5f5ce8b80c1d 100644
---- a/arch/arm64/kvm/vgic/vgic-irqfd.c
-+++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
-@@ -114,6 +114,10 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
- 		return -1;
- 
- 	kvm_populate_msi(e, &msi);
-+
-+	if (vgic_is_v5(kvm))
-+		return vgic_v5_its_inject_msi(kvm, &msi);
-+
- 	return vgic_its_inject_msi(kvm, &msi);
- }
- 
-@@ -135,6 +139,10 @@ int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
- 			break;
- 
- 		kvm_populate_msi(e, &msi);
-+
-+		if (vgic_is_v5(kvm))
-+			return vgic_v5_its_inject_cached_translation(kvm, &msi);
-+
- 		return vgic_its_inject_cached_translation(kvm, &msi);
- 	}
- 
 diff --git a/arch/arm64/kvm/vgic/vgic-its-v5.c b/arch/arm64/kvm/vgic/vgic-its-v5.c
-index 9f4783b243221..b69a1d107c0ae 100644
+index b69a1d107c0ae..638ee47f6e27d 100644
 --- a/arch/arm64/kvm/vgic/vgic-its-v5.c
 +++ b/arch/arm64/kvm/vgic/vgic-its-v5.c
-@@ -3,8 +3,10 @@
-  * Copyright (C) 2025 ARM Limited, All Rights Reserved.
-  */
- 
-+#include <linux/kthread.h>
- #include <linux/kvm_host.h>
- #include <linux/rcupdate.h>
-+#include <linux/sched/mm.h>
- #include <linux/slab.h>
- 
- #include <asm/kvm_arm.h>
-@@ -19,6 +21,7 @@
- 
- #define VITS_V5_DEVICE_ID_BITS		16
- #define VITS_V5_EVENT_ID_BITS		16
-+#define VITS_V5_UNMAPPED		1
- 
- struct its_cache_translation_entry {
- 	struct rcu_head rcu;
-@@ -359,8 +362,46 @@ static int get_itte(struct kvm *kvm, u32 event_id, gpa_t itt_base,
- 				   itt_l2_entry);
+@@ -688,6 +688,70 @@ static void vgic_v5_mmio_write_its_misc(struct kvm *kvm, void *dev, gpa_t addr,
+ 	}
  }
  
-+struct vgic_v5_its *vgic_v5_msi_to_its(struct kvm *kvm, struct kvm_msi *msi)
++static int vgic_v5_uaccess_write_its_idr(struct kvm *kvm, void *dev,
++					gpa_t addr, unsigned int len,
++					unsigned long val)
 +{
-+	struct kvm_io_device *kvm_io_dev;
-+	struct vgic_io_device *iodev;
-+	u64 address;
++	struct vgic_v5_its *its = dev;
++	size_t offset = addr & (SZ_64K - 1);
++	u64 mmfr0;
 +
-+	if (!vgic_has_its(kvm))
-+		return ERR_PTR(-ENODEV);
-+
-+	if (!(msi->flags & KVM_MSI_VALID_DEVID))
-+		return ERR_PTR(-EINVAL);
-+
-+	/*
-+	 * MSI data is 32 bits, but GICv5 limits EventIDs to 16 bits.
-+	 * Match that limit in the vITS.
-+	 */
-+	if (msi->data >> VITS_V5_EVENT_ID_BITS)
-+		return ERR_PTR(-EINVAL);
-+
-+	address = (u64)msi->address_hi << 32 | msi->address_lo;
-+
-+	guard(srcu)(&kvm->srcu);
-+
-+	kvm_io_dev = kvm_io_bus_get_dev(kvm, KVM_MMIO_BUS, address);
-+	if (!kvm_io_dev)
-+		return ERR_PTR(-EINVAL);
-+
-+	if (kvm_io_dev->ops != &kvm_io_gic_ops)
-+		return ERR_PTR(-EINVAL);
-+
-+	iodev = container_of(kvm_io_dev, struct vgic_io_device, dev);
-+	if (iodev->iodev_type != IODEV_GICV5_ITS)
-+		return ERR_PTR(-EINVAL);
-+
-+	return iodev->v5its;
-+}
-+
-+/* A positive return means the guest has no usable translation. */
- static int __vgic_v5_its_resolve_lpi(struct kvm *kvm, struct vgic_v5_its *its,
--				     u32 device_id, u16 event_id,
-+				     u32 device_id, u32 event_id,
- 				     struct vgic_irq **irq)
- {
- 	unsigned int itt_l2sz, event_id_bits;
-@@ -372,13 +413,15 @@ static int __vgic_v5_its_resolve_lpi(struct kvm *kvm, struct vgic_v5_its *its,
- 	int ret;
- 
- 	lockdep_assert_held(&its->its_lock);
-+	if (event_id >> VITS_V5_EVENT_ID_BITS)
-+		return -EINVAL;
- 
- 	if (!its->enabled) {
- 		kvm_debug("Cannot look up LPI; vITS is disabled\n");
- 		return -ENXIO;
- 	}
- 
--	ret = its_cache_look_up_translation(its, device_id, event_id, irq);
-+	ret = its_cache_look_up_translation(its, device_id, (u16)event_id, irq);
- 	if (!ret)
- 		return 0;
- 
-@@ -389,23 +432,23 @@ static int __vgic_v5_its_resolve_lpi(struct kvm *kvm, struct vgic_v5_its *its,
- 		      &event_id_bits, &itt_l2sz);
- 	if (ret) {
- 		kvm_debug("Error parsing guest's DT\n");
--		return ret;
-+		return VITS_V5_UNMAPPED;
- 	}
- 
- 	if (event_id >= 1UL << event_id_bits) {
- 		kvm_debug("Event ID out of range\n");
--		return -E2BIG;
-+		return VITS_V5_UNMAPPED;
- 	}
- 
- 	ret = get_itte(kvm, event_id, itt_base, two_level_itt, itt_l2sz,
- 		       &itt_l2_entry);
- 	if (ret)
--		return ret;
-+		return VITS_V5_UNMAPPED;
- 
- 	val = le64_to_cpu(itt_l2_entry);
- 	if (!FIELD_GET(GICV5_ITTL2E_VALID, val)) {
- 		kvm_debug("ITTE is not valid\n");
--		return -EINVAL;
-+		return VITS_V5_UNMAPPED;
- 	}
- 
- 	lpi = FIELD_GET(GICV5_ITTL2E_LPI_ID, val);
-@@ -415,7 +458,8 @@ static int __vgic_v5_its_resolve_lpi(struct kvm *kvm, struct vgic_v5_its *its,
- 		return PTR_ERR(*irq);
- 
- 	vgic_get_irq_ref(*irq);
--	ret = its_cache_add_translation(kvm, its, device_id, event_id, *irq);
-+	ret = its_cache_add_translation(kvm, its, device_id, (u16)event_id,
-+					 *irq);
- 	if (ret) {
- 		vgic_put_irq(kvm, *irq);
- 		return 0;
-@@ -424,12 +468,86 @@ static int __vgic_v5_its_resolve_lpi(struct kvm *kvm, struct vgic_v5_its *its,
- 	return ret;
- }
- 
-+int vgic_v5_its_resolve_lpi(struct kvm *kvm, struct vgic_v5_its *its,
-+			    u32 device_id, u32 event_id,
-+			    struct vgic_irq **irq)
-+{
 +	guard(mutex)(&its->its_lock);
 +
-+	return __vgic_v5_its_resolve_lpi(kvm, its, device_id, event_id, irq);
++	switch (offset) {
++	case GICV5_ITS_IDR0:
++		if (FIELD_GET(GICV5_ITS_IDR0_DOM, val) !=
++		    GICV5_ITS_IDR0_DOMAIN_NON_SECURE ||
++		    (val & ~(GICV5_ITS_IDR0_ITSID |
++			     GICV5_ITS_IDR0_PA_RANGE | GICV5_ITS_IDR0_DOM)))
++			return -EINVAL;
++
++		mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
++		if (FIELD_GET(GICV5_ITS_IDR0_PA_RANGE, val) >
++		    cpuid_feature_extract_unsigned_field(mmfr0,
++					ID_AA64MMFR0_EL1_PARANGE_SHIFT))
++			return -EINVAL;
++
++		its->idr0.pa_range = FIELD_GET(GICV5_ITS_IDR0_PA_RANGE, val);
++		its->idr0.its_id = FIELD_GET(GICV5_ITS_IDR0_ITSID, val);
++		return 0;
++	case GICV5_ITS_IDR1:
++		if ((val & ~(GICV5_ITS_IDR1_L2SZ |
++			     GICV5_ITS_IDR1_ITT_LEVELS |
++			     GICV5_ITS_IDR1_DT_LEVELS |
++			     GICV5_ITS_IDR1_DEVICEID_BITS)) ||
++		    FIELD_GET(GICV5_ITS_IDR1_DEVICEID_BITS, val) >
++		    VITS_V5_DEVICE_ID_BITS)
++			return -EINVAL;
++
++		/*
++		 * Userspace can change the DeviceID limit after translations have
++		 * been cached. Drop them so the old limit cannot remain in effect.
++		 */
++		if (its->idr1.device_id_bits !=
++		    FIELD_GET(GICV5_ITS_IDR1_DEVICEID_BITS, val))
++			its_cache_clear_translations(its);
++
++		its->idr1.device_id_bits = FIELD_GET(GICV5_ITS_IDR1_DEVICEID_BITS,
++							 val);
++		its->idr1.dt_levels = !!(val & GICV5_ITS_IDR1_DT_LEVELS);
++		its->idr1.itt_levels = !!(val & GICV5_ITS_IDR1_ITT_LEVELS);
++		its->idr1.l2sz = FIELD_GET(GICV5_ITS_IDR1_L2SZ, val);
++		return 0;
++	case GICV5_ITS_IDR2:
++		if ((val & ~GICV5_ITS_IDR2_EVENTID_BITS) ||
++		    FIELD_GET(GICV5_ITS_IDR2_EVENTID_BITS, val) >
++		    VITS_V5_EVENT_ID_BITS)
++			return -EINVAL;
++
++		its->idr2.event_id_bits = FIELD_GET(GICV5_ITS_IDR2_EVENTID_BITS,
++							 val);
++		return 0;
++	default:
++		return -EINVAL;
++	}
 +}
 +
- static void vgic_v5_its_inject_lpi(struct kvm *kvm, struct vgic_irq *irq)
+ static void vgic_v5_write_its_dt_reg(struct vgic_v5_its *its, size_t offset,
+ 				     unsigned long val)
  {
- 	kvm_call_hyp(__vgic_v5_vdpend, irq->intid, true,
- 		     kvm->arch.vgic.gicv5_vm.vm_id);
+@@ -732,6 +796,37 @@ static u64 vgic_v5_read_its_dt_baser(struct vgic_v5_its *its)
+ 			  its->dt_baser.addr >> GICV5_ITS_DT_BASER_ADDR_SHIFT);
  }
  
-+int vgic_v5_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
++static int vgic_v5_uaccess_write_its_dt_itt(struct kvm *kvm, void *dev,
++					    gpa_t addr, unsigned int len,
++					    unsigned long val)
 +{
-+	struct vgic_v5_its *its;
-+	struct vgic_irq *irq;
-+	bool borrowed_mm = false;
-+	int ret;
++	struct vgic_v5_its *its = dev;
++	size_t offset = addr & (SZ_64K - 1);
 +
-+	its = vgic_v5_msi_to_its(kvm, msi);
-+	if (IS_ERR(its))
-+		return PTR_ERR(its);
++	guard(mutex)(&its->its_lock);
 +
-+	/* An irqfd cache miss is resolved by a worker outside the VM's mm. */
-+	if (current->mm != kvm->mm) {
-+		if (WARN_ON_ONCE(current->mm || !(current->flags & PF_KTHREAD)))
-+			return -EWOULDBLOCK;
-+
-+		if (!mmget_not_zero(kvm->mm))
-+			return -EFAULT;
-+
-+		kthread_use_mm(kvm->mm);
-+		borrowed_mm = true;
-+	}
-+
-+	ret = vgic_v5_its_resolve_lpi(kvm, its, msi->devid, msi->data, &irq);
-+	if (borrowed_mm) {
-+		kthread_unuse_mm(kvm->mm);
-+		mmput(kvm->mm);
-+	}
-+
-+	if (ret < 0)
-+		return ret;
-+	/* KVM_SIGNAL_MSI reports guest translation failures as blocked MSIs. */
-+	if (ret)
-+		return 0;
-+
-+	vgic_v5_its_inject_lpi(kvm, irq);
-+	vgic_put_irq(kvm, irq);
-+
-+	return 1;
++	vgic_v5_write_its_dt_reg(its, offset, val);
++	return 0;
 +}
 +
-+int vgic_v5_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi)
++static int vgic_v5_uaccess_write_its_event_datar(struct kvm *kvm, void *dev,
++						gpa_t addr, unsigned int len,
++						unsigned long val)
 +{
-+	struct vgic_v5_its *its;
-+	struct vgic_irq *irq;
-+	int ret;
++	struct vgic_v5_its *its = dev;
 +
-+	its = vgic_v5_msi_to_its(kvm, msi);
-+	if (IS_ERR(its))
-+		return PTR_ERR(its);
++	guard(mutex)(&its->its_lock);
 +
-+	if (!READ_ONCE(its->enabled))
-+		return -EWOULDBLOCK;
-+
-+	ret = its_cache_look_up_translation(its, msi->devid, (u16)msi->data,
-+					    &irq);
-+	if (ret)
-+		return -EWOULDBLOCK;
-+
-+	vgic_v5_its_inject_lpi(kvm, irq);
-+	vgic_put_irq(kvm, irq);
++	its->read_event_datar.valid = !!(val & GICV5_ITS_READ_EVENT_DATAR_VALID);
++	its->read_event_datar.lpi_id = FIELD_GET(GICV5_ITS_READ_EVENT_DATAR_LPI_ID,
++							 val);
++	its->read_event_datar.virt = !!(val & GICV5_ITS_READ_EVENT_DATAR_VIRT);
++	its->read_event_datar.vm_id = FIELD_GET(GICV5_ITS_READ_EVENT_DATAR_VM_ID,
++							 val);
 +
 +	return 0;
 +}
 +
- static void vgic_v5_its_handle_read_event(struct kvm *kvm,
- 					  struct vgic_v5_its *its)
+ static unsigned long vgic_v5_mmio_read_its_dt_itt(struct kvm *kvm, void *dev,
+ 						  gpa_t addr, unsigned int len)
  {
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 9e1cbcdedf3f5..64f6229fe555e 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -364,6 +364,12 @@ void vgic_v3_put(struct kvm_vcpu *vcpu);
- bool vgic_has_its(struct kvm *kvm);
- int kvm_vgic_register_its_device(void);
- int kvm_vgic_v5_register_its_device(void);
-+struct vgic_v5_its *vgic_v5_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
-+int vgic_v5_its_resolve_lpi(struct kvm *kvm, struct vgic_v5_its *its,
-+			    u32 device_id, u32 event_id,
-+			    struct vgic_irq **irq);
-+int vgic_v5_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
-+int vgic_v5_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi);
- void vgic_enable_lpis(struct kvm_vcpu *vcpu);
- void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu);
- int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
+@@ -901,13 +996,26 @@ static void vgic_v5_mmio_write_its_wi(struct kvm *kvm, void *dev, gpa_t addr,
+ 		.its_read = rd, .its_write = wr,                       \
+ 	}
+ 
++#define REGISTER_ITS_V5_DESC_UACCESS(off, rd, wr, uwr, length, acc)    \
++	{                                                              \
++		.reg_offset = off, .len = length, .access_flags = acc, \
++		.its_read = rd, .its_write = wr,                       \
++		.uaccess_its_write = uwr,                              \
++	}
++
+ static const struct vgic_register_region vgic_v5_its_registers[] = {
+-	REGISTER_ITS_V5_DESC(GICV5_ITS_IDR0, vgic_v5_mmio_read_its_misc,
+-			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
+-	REGISTER_ITS_V5_DESC(GICV5_ITS_IDR1, vgic_v5_mmio_read_its_misc,
+-			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
+-	REGISTER_ITS_V5_DESC(GICV5_ITS_IDR2, vgic_v5_mmio_read_its_misc,
+-			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
++	REGISTER_ITS_V5_DESC_UACCESS(GICV5_ITS_IDR0, vgic_v5_mmio_read_its_misc,
++				     vgic_v5_mmio_write_its_wi,
++				     vgic_v5_uaccess_write_its_idr, 4,
++				     VGIC_ACCESS_32bit),
++	REGISTER_ITS_V5_DESC_UACCESS(GICV5_ITS_IDR1, vgic_v5_mmio_read_its_misc,
++				     vgic_v5_mmio_write_its_wi,
++				     vgic_v5_uaccess_write_its_idr, 4,
++				     VGIC_ACCESS_32bit),
++	REGISTER_ITS_V5_DESC_UACCESS(GICV5_ITS_IDR2, vgic_v5_mmio_read_its_misc,
++				     vgic_v5_mmio_write_its_wi,
++				     vgic_v5_uaccess_write_its_idr, 4,
++				     VGIC_ACCESS_32bit),
+ 	REGISTER_ITS_V5_DESC(GICV5_ITS_IIDR, vgic_v5_mmio_read_its_misc,
+ 			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
+ 	REGISTER_ITS_V5_DESC(GICV5_ITS_AIDR, vgic_v5_mmio_read_its_misc,
+@@ -916,14 +1024,16 @@ static const struct vgic_register_region vgic_v5_its_registers[] = {
+ 			     vgic_v5_mmio_write_its_misc, 4, VGIC_ACCESS_32bit),
+ 	REGISTER_ITS_V5_DESC(GICV5_ITS_CR1, vgic_v5_mmio_read_its_misc,
+ 			     vgic_v5_mmio_write_its_misc, 4, VGIC_ACCESS_32bit),
+-	REGISTER_ITS_V5_DESC(GICV5_ITS_DT_BASER,
+-			     vgic_v5_mmio_read_its_dt_itt,
+-			     vgic_v5_mmio_write_its_dt_itt, 8,
+-			     VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+-	REGISTER_ITS_V5_DESC(GICV5_ITS_DT_CFGR,
+-			     vgic_v5_mmio_read_its_dt_itt,
+-			     vgic_v5_mmio_write_its_dt_itt, 4,
+-			     VGIC_ACCESS_32bit),
++	REGISTER_ITS_V5_DESC_UACCESS(GICV5_ITS_DT_BASER,
++				     vgic_v5_mmio_read_its_dt_itt,
++				     vgic_v5_mmio_write_its_dt_itt,
++				     vgic_v5_uaccess_write_its_dt_itt, 8,
++				     VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
++	REGISTER_ITS_V5_DESC_UACCESS(GICV5_ITS_DT_CFGR,
++				     vgic_v5_mmio_read_its_dt_itt,
++				     vgic_v5_mmio_write_its_dt_itt,
++				     vgic_v5_uaccess_write_its_dt_itt, 4,
++				     VGIC_ACCESS_32bit),
+ 	REGISTER_ITS_V5_DESC(GICV5_ITS_DIDR, vgic_v5_mmio_read_its_dt_itt,
+ 			     vgic_v5_mmio_write_its_dt_itt, 8,
+ 			     VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+@@ -939,9 +1049,10 @@ static const struct vgic_register_region vgic_v5_its_registers[] = {
+ 	REGISTER_ITS_V5_DESC(GICV5_ITS_READ_EVENTR, vgic_v5_mmio_read_its_raz,
+ 			     vgic_v5_mmio_write_its_dt_itt, 4,
+ 			     VGIC_ACCESS_32bit),
+-	REGISTER_ITS_V5_DESC(GICV5_ITS_READ_EVENT_DATAR,
++	REGISTER_ITS_V5_DESC_UACCESS(GICV5_ITS_READ_EVENT_DATAR,
+ 			     vgic_v5_mmio_read_its_dt_itt,
+-			     vgic_v5_mmio_write_its_wi, 8,
++			     vgic_v5_mmio_write_its_wi,
++			     vgic_v5_uaccess_write_its_event_datar, 8,
+ 			     VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+ 	REGISTER_ITS_V5_DESC(GICV5_ITS_STATUSR, vgic_v5_mmio_read_its_dt_itt,
+ 			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
+@@ -1130,64 +1241,226 @@ static int vgic_v5_register_its_iodev(struct kvm *kvm, struct vgic_v5_its *its,
+ 	return ret;
+ }
+ 
++static int vgic_v5_its_has_attr_regs(struct kvm_device *dev,
++				     struct kvm_device_attr *attr)
++{
++	const struct vgic_register_region *region;
++	gpa_t offset = attr->attr;
++	int align;
++
++	region = vgic_find_mmio_region(vgic_v5_its_registers,
++				       ARRAY_SIZE(vgic_v5_its_registers),
++				       offset);
++	if (!region)
++		return -ENXIO;
++
++	align = region->access_flags & VGIC_ACCESS_64bit ? 0x7 : 0x3;
++	if (offset & align)
++		return -EINVAL;
++
++	return 0;
++}
++
++static int vgic_v5_its_attr_regs_access(struct kvm_device *dev,
++					struct kvm_device_attr *attr,
++					u64 *reg, bool is_write)
++{
++	const struct vgic_register_region *region;
++	struct vgic_v5_its *its = dev->private;
++	gpa_t offset = attr->attr;
++	unsigned int len;
++	gpa_t addr;
++	int align;
++	int ret = 0;
++
++	mutex_lock(&dev->kvm->lock);
++
++	if (kvm_trylock_all_vcpus(dev->kvm)) {
++		mutex_unlock(&dev->kvm->lock);
++		return -EBUSY;
++	}
++
++	mutex_lock(&dev->kvm->arch.config_lock);
++
++	if (IS_VGIC_ADDR_UNDEF(its->vgic_v5_its_base)) {
++		ret = -ENXIO;
++		goto out;
++	}
++
++	region = vgic_find_mmio_region(vgic_v5_its_registers,
++				       ARRAY_SIZE(vgic_v5_its_registers),
++				       offset);
++	if (!region) {
++		ret = -ENXIO;
++		goto out;
++	}
++
++	/*
++	 * Although the spec supports upper/lower 32-bit accesses to
++	 * 64-bit ITS registers, the userspace ABI requires 64-bit
++	 * accesses to all 64-bit wide registers.
++	 */
++	align = region->access_flags & VGIC_ACCESS_64bit ? 0x7 : 0x3;
++	len = region->access_flags & VGIC_ACCESS_64bit ? 8 : 4;
++
++	if (offset & align) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	addr = its->vgic_v5_its_base + offset;
++
++	if (is_write) {
++		if (region->uaccess_its_write)
++			ret = region->uaccess_its_write(dev->kvm, its, addr,
++							len, *reg);
++		else
++			region->its_write(dev->kvm, its, addr, len, *reg);
++	} else {
++		*reg = region->its_read(dev->kvm, its, addr, len);
++	}
++out:
++	mutex_unlock(&dev->kvm->arch.config_lock);
++	kvm_unlock_all_vcpus(dev->kvm);
++	mutex_unlock(&dev->kvm->lock);
++
++	return ret;
++}
++
++static int vgic_v5_its_ctrl(struct kvm *kvm, struct vgic_v5_its *its, u64 attr)
++{
++	int ret = 0;
++
++	if (attr == KVM_DEV_ARM_VGIC_CTRL_INIT)
++		return 0;
++
++	mutex_lock(&kvm->lock);
++
++	if (kvm_trylock_all_vcpus(kvm)) {
++		mutex_unlock(&kvm->lock);
++		return -EBUSY;
++	}
++
++	mutex_lock(&kvm->arch.config_lock);
++	mutex_lock(&its->its_lock);
++
++	switch (attr) {
++	case KVM_DEV_ARM_ITS_CTRL_RESET:
++		vgic_v5_its_reset(its);
++		break;
++	default:
++		ret = -ENXIO;
++		break;
++	}
++
++	mutex_unlock(&its->its_lock);
++	mutex_unlock(&kvm->arch.config_lock);
++	kvm_unlock_all_vcpus(kvm);
++	mutex_unlock(&kvm->lock);
++
++	return ret;
++}
++
+ static int vgic_v5_its_set_attr(struct kvm_device *dev,
+ 				struct kvm_device_attr *attr)
+ {
+ 	struct vgic_v5_its *its = dev->private;
+-	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+-	unsigned long type = (unsigned long)attr->attr;
+-	u64 addr;
+ 	int ret;
+ 
+-	if (attr->group != KVM_DEV_ARM_VGIC_GRP_ADDR)
+-		return -ENXIO;
++	switch (attr->group) {
++	case KVM_DEV_ARM_VGIC_GRP_ADDR: {
++		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
++		unsigned long type = (unsigned long)attr->attr;
++		u64 addr;
+ 
+-	if (type != KVM_VGIC_V5_ADDR_TYPE_ITS)
+-		return -ENODEV;
++		if (type != KVM_VGIC_V5_ADDR_TYPE_ITS)
++			return -ENODEV;
+ 
+-	if (copy_from_user(&addr, uaddr, sizeof(addr)))
+-		return -EFAULT;
++		if (copy_from_user(&addr, uaddr, sizeof(addr)))
++			return -EFAULT;
+ 
+-	ret = vgic_check_iorange(dev->kvm, its->vgic_v5_its_base, addr,
+-				 SZ_64K, KVM_VGIC_V5_ITS_SIZE);
+-	if (ret)
+-		return ret;
++		ret = vgic_check_iorange(dev->kvm, its->vgic_v5_its_base,
++					 addr, SZ_64K, KVM_VGIC_V5_ITS_SIZE);
++		if (ret)
++			return ret;
++
++		return vgic_v5_register_its_iodev(dev->kvm, its, addr);
++	}
++	case KVM_DEV_ARM_VGIC_GRP_CTRL:
++		return vgic_v5_its_ctrl(dev->kvm, its, attr->attr);
++	case KVM_DEV_ARM_VGIC_GRP_ITS_REGS: {
++		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
++		u64 reg;
++
++		if (get_user(reg, uaddr))
++			return -EFAULT;
+ 
+-	return vgic_v5_register_its_iodev(dev->kvm, its, addr);
++		return vgic_v5_its_attr_regs_access(dev, attr, &reg, true);
++	}
++	}
++
++	return -ENXIO;
+ }
+ 
+ static int vgic_v5_its_get_attr(struct kvm_device *dev,
+ 				struct kvm_device_attr *attr)
+ {
+-	struct vgic_v5_its *its = dev->private;
+-	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+-	unsigned long type = (unsigned long)attr->attr;
+-	u64 addr = its->vgic_v5_its_base;
++	switch (attr->group) {
++	case KVM_DEV_ARM_VGIC_GRP_ADDR: {
++		struct vgic_v5_its *its = dev->private;
++		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
++		unsigned long type = (unsigned long)attr->attr;
++		u64 addr = its->vgic_v5_its_base;
+ 
+-	if (attr->group != KVM_DEV_ARM_VGIC_GRP_ADDR)
+-		return -ENXIO;
++		if (type != KVM_VGIC_V5_ADDR_TYPE_ITS)
++			return -ENODEV;
+ 
+-	if (type != KVM_VGIC_V5_ADDR_TYPE_ITS)
+-		return -ENODEV;
++		if (copy_to_user(uaddr, &addr, sizeof(addr)))
++			return -EFAULT;
++
++		return 0;
++	}
++	case KVM_DEV_ARM_VGIC_GRP_ITS_REGS: {
++		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
++		u64 reg;
++		int ret;
+ 
+-	if (copy_to_user(uaddr, &addr, sizeof(addr)))
+-		return -EFAULT;
++		ret = vgic_v5_its_attr_regs_access(dev, attr, &reg, false);
++		if (ret)
++			return ret;
+ 
+-	return 0;
++		if (put_user(reg, uaddr))
++			return -EFAULT;
++
++		return 0;
++	}
++	}
++
++	return -ENXIO;
+ }
+ 
+ static int vgic_v5_its_has_attr(struct kvm_device *dev,
+ 				struct kvm_device_attr *attr)
+ {
+-	if (attr->group != KVM_DEV_ARM_VGIC_GRP_ADDR)
+-		return -ENXIO;
+-
+-	switch (attr->attr) {
+-	case KVM_VGIC_V5_ADDR_TYPE_ITS:
+-		return 0;
+-	default:
+-		return -ENXIO;
++	switch (attr->group) {
++	case KVM_DEV_ARM_VGIC_GRP_ADDR:
++		switch (attr->attr) {
++		case KVM_VGIC_V5_ADDR_TYPE_ITS:
++			return 0;
++		}
++		break;
++	case KVM_DEV_ARM_VGIC_GRP_CTRL:
++		switch (attr->attr) {
++		case KVM_DEV_ARM_VGIC_CTRL_INIT:
++		case KVM_DEV_ARM_ITS_CTRL_RESET:
++			return 0;
++		}
++		break;
++	case KVM_DEV_ARM_VGIC_GRP_ITS_REGS:
++		return vgic_v5_its_has_attr_regs(dev, attr);
+ 	}
++
++	return -ENXIO;
+ }
+ 
+ static struct kvm_device_ops kvm_arm_vgic_v5_its_ops = {
 -- 
 2.34.1
 
