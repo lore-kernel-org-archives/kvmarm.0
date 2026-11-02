@@ -1,71 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793629004;
-	b=QPvbSltDsz3jetmg8MGZ9pvAaGcqSlrO6exKah52Cmuhpoe4907CnMs5SrCuzULLN8xa
-	 FH85hdV5JHHemnJFdrtbaVC0wEKcoALYC88qhGze1mJB0j5M6DluIOCcqnkj7JcIOGDb5
-	 5j8uvxdR6SdgdWsAXgcooxC1LgoM0RPvIa5YATICaAyEkZaC9mI4Wr9MMS0KTbxax1FbA
-	 vCrFM/vvrkoHXtr9M5KQhErd88rXaCAcSSEUwNQM529W6/yvc1tzhs4UHoGOXLUoAfnp+
-	 2vAadq7PYN1hkw0VJ7p3K5g+9dlrhc7a8bOw7XzMrA3+VQ+66D7sdIyTg+sHpl4H4lw==
+	t=1793629037;
+	b=pgKkGnGLyVVGCXLIgtf9niYMcxzF1/Rw+FUZBq9xCk6oOTZXy9Qy16/L99CJBaM7cxtC
+	 a2C3QwB88LH3KHHLR12eIOO9596r8n4TUxMhSBZ7VBRdH/vzlwjksRJxVfGBRsmWewSZQ
+	 dT4T938vLuCE0e11ejtsJNCt1xNfW1FxPWaMEyGa/k6VqAs+i+zz417I3SBbCco6cTEtx
+	 /bupGdf+E49pmKo3heaH0xg6MdSVuO4mnG30KC87KX0UXX1EhUIgJD6ZuKTSQWgxcGwyS
+	 zwb+iZ0rcETWyGLbgwXB1pma8GELNRWsVZoGBkHwJQFDO4Bf5AlmNwOk3dKbgXCDKog==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793629004;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=PAuzFOuclOSMC3fnm+jBEciQlj+SqOgZ/K1w8865E7Q=;
-	b=Vygz1UeOnYUq7VBOKT+lbtpA3OJz3MimP32WPhuGjWl5C+ZDQ6CJuK7LhS4YBmmQ0YZP
-	 hfgQ7mh84Eh7wXu0fe4aFG6ibz7UegM4MtGQdBYt0VqFPzdoYBaPGGwEdhj6hWRChWewD
-	 P16KfXmMZmZ18pCJ0DtGOEqi6Y07MNmk6gAbhLm6BgQu87893B3KGm/75Py3rl8R+m5xP
-	 NWerq/788SGnnMisY8k9/vovUlCyrTAvXb8EUPO9R4HpEQYs/LQaHOJdM0W1YOlYcYWRw
-	 yen4Xfj9fNkAbIjvTk0qAGykpQXrin5qhVbgUskYtopKOh42VS7y/PhnQ/uJeP2un0g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793629037;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=GK/zYkbxN3VzWhtqC7xjmL7luflOc6FLP0sVUxCWVtk=;
+	b=0sOF4/TW3y3aiGX9whfQrVv0veQclfR/BVbsszb7KNf8u0kiopho4LRBBt1L9NW5qT8W
+	 w9Xm9BW8w0QeoVHGv/IZF7Ri1c84045Q0hTo2J81mydYqxvUnWurny+2A5ffFUPx6aOgI
+	 E/SPgpCte3/vbeemrhXaGkYQCGCcZx8oCTbBzwlCIEv6e3BM3oAuTXmm46a4TzucIMrO6
+	 qp5kEJtco48z2gvNFdcZ/yBSNDdaBiKSntSO+G4aXxhYMBc0B4N8ZeA4elkYjGItSuOnj
+	 2L19Wb0nrof7wZwxofNJ9VHylFrS2LNkaARjMfpBwfFHNyEuksQQ9XwS55cAh77PJcw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WewyZlvL;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QYF5wnRL;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C061A606A334
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 14:16:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA974606A33B
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 14:17:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WewyZlvL
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 473361F00A18;
-	Mon,  2 Nov 2026 14:16:43 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QYF5wnRL
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41BEF1F00A16;
+	Mon,  2 Nov 2026 14:17:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793629003;
-	bh=PAuzFOuclOSMC3fnm+jBEciQlj+SqOgZ/K1w8865E7Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=WewyZlvLd/tRB9W7Op0jcHwzO/nJrik6O/1bDl/hIi4CsBwgeAkNHKATizUZsplzK
-	 VlS8xH4qbw1szzCBVN6octtHmG4g3XelmIz07mRt2Z4Pdzrdc0V1By/Mh/QEgLEDUv
-	 dExjixtKNxEt1zlgnC3zuHvUF8trtUstZ9/mp08G7452k4jYtNlxEjmIc9nQ/K8UAv
-	 3wskhVB+0LxmRntj4hvbRe7szA6Rbxuk6FajrLwerPlQjqpr9EFyjQJ+5wX5wUMA2K
-	 PcbawXfU/YwBlWvH52fIknOnFT4LieJILxnQNgGH1/EnmtpEVJfvYkUgyU79wEDuk4
-	 44JtCx1V9i3YA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xNsq0-00000009sib-3jtI;
-	Mon, 02 Nov 2026 14:16:40 +0000
-Date: Mon, 02 Nov 2026 14:16:40 +0000
-Message-ID: <86ecd32u9j.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ard Biesheuvel <ardb+git@google.com>
-Cc: kvmarm@lists.linux.dev,
+	s=k20260515; t=1793629036;
+	bh=GK/zYkbxN3VzWhtqC7xjmL7luflOc6FLP0sVUxCWVtk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=QYF5wnRLn3/Kjp+T10uY3n4JfNN1Eu67yKdslXUOeWH2xWJflEuXY19aJmVA2tOXu
+	 OEX25YRIFH/swIxrowWUdW05nA4tjobSWn4yu0prjH90eBZVn4qsX9q+GVNNkQVVOp
+	 Dt8gVb23xnnaiS1rcPy6BiWy4+htQA/MHh/Ukgok722SNyIGbnHBjUuBaXq/d5jqsI
+	 BH+AJMyuzVFFOUA0HWO4hLvPE9vionC6e+SpCKUDi/IoQlft65q+hZlTWX9Iy6r8uL
+	 2+Lx3qgNiAvEe+r0yB3oDqpfPyAm38jZs8tLyPdXIEKp2lr0T+Z7T6Yv5W7P9GW6L8
+	 Cb1CQ+ngDXKEA==
+Date: Mon, 2 Nov 2026 14:17:10 +0000
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Ard Biesheuvel <ardb+git@google.com>, kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Don't livelock when AT can't resolve a fault IPA
-In-Reply-To: <20261102094748.2638468-2-ardb+git@google.com>
+Subject: Re: [PATCH] KVM: arm64: Don't livelock when AT can't resolve a fault
+ IPA
+Message-ID: <auibZqSgrijjigWM@willie-the-truck>
 References: <20261102094748.2638468-2-ardb+git@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <auiXMN5td-2QlDkd@willie-the-truck>
+ <86fqxj2ulm.wl-maz@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -74,71 +63,56 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ardb+git@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, ardb@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86fqxj2ulm.wl-maz@kernel.org>
 
-On Mon, 02 Nov 2026 09:47:49 +0000,
-Ard Biesheuvel <ardb+git@google.com> wrote:
+On Mon, Nov 02, 2026 at 02:09:25PM +0000, Marc Zyngier wrote:
+> On Mon, 02 Nov 2026 13:59:12 +0000,
+> Will Deacon <will@kernel.org> wrote:
+> > 
+> > On Mon, Nov 02, 2026 at 10:47:49AM +0100, Ard Biesheuvel wrote:
+> > > From: Ard Biesheuvel <ardb@kernel.org>
 > 
-> From: Ard Biesheuvel <ardb@kernel.org>
+> [...]
 > 
-> When a stage-2 permission fault doesn't report its IPA in HPFAR_EL2,
-> __get_fault_info() recovers it with an AT S1E1R/S1E1A on FAR_EL2. If that
-> fails, kvm_hyp_handle_memory_fault() goes straight back to the guest, on
-> the assumption that the replayed access will either succeed or take a
-> fault that the slow path can handle.
+> > > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > > index e0c55644224c..4ba61b71d511 100644
+> > > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > > @@ -843,8 +843,21 @@ static inline bool kvm_hyp_handle_cp15_32(struct kvm_vcpu *vcpu, u64 *exit_code)
+> > >  static inline bool kvm_hyp_handle_memory_fault(struct kvm_vcpu *vcpu,
+> > >  					       u64 *exit_code)
+> > >  {
+> > > -	if (!__populate_fault_info(vcpu))
+> > > +	if (!__populate_fault_info(vcpu)) {
+> > 
+> > Presumably we need a barrier (DSB?) here, to ensure that the TLBI happens
+> > after the AT instruction?
+> >
+> > > +		/*
+> > > +		 * The AT couldn't resolve the IPA, typically because its
+> > > +		 * stage-1 walk took a stage-2 fault, such as an Access flag
+> > > +		 * fault on an aged page-table page. If the guest still has a
+> > > +		 * cached translation for the VA, it won't take that fault
+> > > +		 * itself, and would replay the same permission fault forever.
+> > > +		 * Drop this VMID's TLB entries on this CPU, so that the replay
+> > > +		 * walks the page tables and faults with a valid HPFAR_EL2.
+> > > +		 */
+> > > +		__tlbi(vmalls12e1);
+> > 
+> > Can we get away with an ALLE1 here, or do we really need to blow away the
+> > whole lot?
 > 
-> That assumption doesn't hold when the AT fails because its stage-1 walk
-> takes a stage-2 fault on one of the guest's page-table pages, while the
-> guest still holds a cached translation for the faulting VA. The guest
-> doesn't walk its page tables, so it never takes the S1PTW fault that
-> would let the slow path fix things up. It takes the same permission fault
-> again, the AT fails again, and the vCPU livelocks in the world switch.
+> ALLE1 blows EL1 translations for all VMIDs, while VMALLS12E1 is
+> localised to this VMID. Feels like the latter is the least invasive
+> option.
+> 
+> Alternatively, VMALLE1 or even VAE1 should be enough to get rid of the
+> S1 TLB.
 
-That's because the TLBs tend to cache VA->PA, while ATS1R is after the
-IPA.  So you get the permission fault from the TLB, and the access
-fault from AT. Rinse, repeat.
+Ah, sorry, VMALLE1 is what I meant to ask about. I basically haven't
+understood the need to invalidate the stage-2.
 
-Amazing find, really. This code has been in this exact shape for 13
-years, and it took that long to notice the issue.
-
-[...]
-
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index e0c55644224c..4ba61b71d511 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -843,8 +843,21 @@ static inline bool kvm_hyp_handle_cp15_32(struct kvm_vcpu *vcpu, u64 *exit_code)
->  static inline bool kvm_hyp_handle_memory_fault(struct kvm_vcpu *vcpu,
->  					       u64 *exit_code)
->  {
-> -	if (!__populate_fault_info(vcpu))
-> +	if (!__populate_fault_info(vcpu)) {
-> +		/*
-> +		 * The AT couldn't resolve the IPA, typically because its
-> +		 * stage-1 walk took a stage-2 fault, such as an Access flag
-> +		 * fault on an aged page-table page. If the guest still has a
-> +		 * cached translation for the VA, it won't take that fault
-> +		 * itself, and would replay the same permission fault forever.
-> +		 * Drop this VMID's TLB entries on this CPU, so that the replay
-> +		 * walks the page tables and faults with a valid HPFAR_EL2.
-> +		 */
-> +		__tlbi(vmalls12e1);
-
-As I was saying in my response to Will, I reckon this could be made
-more focused on the faulting VA. Something like:
-
-	__tlbi(vae1, read_sysreg_el2(SYS_FAR));
-
-If you respin, a Cc: stable would be appreciated.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Will
