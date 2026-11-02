@@ -1,57 +1,56 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793653825;
-	b=IcwjyE5Q9yUlTRCKFPtIXmhZ5/BPbtY+ss5MCmF9dlE5mTsxgY9F5o9P+UsbopWcb5hK
-	 IerbEQqPODjuKBN8jtXF14r/ErKkVPDGhO181RGY1Uel9GbVg9OvYwHK8jDxaLUY+vXaO
-	 5BbAJ3yEId9G0G5szpvMWIYGSLARc1i/qiU985IEtBrAI4eb7uh5PWCOjvDkQLQoNV7hv
-	 TSgrorMNnPizjO4JiwPpa1muj0SNCG9epEatcEmhRWKJsGN+adFGma8nyk4G4MhZTILd2
-	 aSojX2zSLFCS/Qek2bRueKGnfaJVw/LVf/qHJtZgxEFvnxlGbwxGR5LHO+zxiC8dyFw==
+	t=1793654033;
+	b=boTBKbvcy+fphtZbJVvj4hhIpUSqwZya2bzq1YSC6ASVmwxRy4Z/ktflTyN6MVf5QYaE
+	 CCOyYusqimPGn24ItwPqWOHFSBhywy78dPhcNVTYO7u8yAInecBATMnLPIeRC/7RhoZxy
+	 2v3Ymcw5kFPy0FpT/z6ZaAdyl1ZU81ZwrAzUDDe8c7GOxg45tVoCU6TDQpeZW6nZvECUR
+	 cSl/pNQ164OdBDf6mG8+208bVxrLxWk4f+FWrOkntt5CnHNaymxbmVVaGysZ1K1CrRP6Q
+	 aqUFeR3ceES1mDBICk/uyZHMeVh5K26Gd9L5kEMQCrde1Fni7utE4NaFyrRdnZ9nNug==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793653825;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793654033;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=Wlm2d+Fq1WMlOcQj4TO/7g8bQ/QFX9DP+H+2zPFCKJE=;
-	b=wAfQcqdPNrR/fEE3sI9VUPTL86tg3F/h2d3GBdza6eyS79NWuxA9npEqj3kUdeGV+/1A
-	 Ph4d0/KnSZznF9M0PQrw5hCk1NynJJVEyuD5F1rvpcP4PydYlxTUEP6sJK8u1JHwmFyWt
-	 wgofXtf2iU6yH+xlJXNmDZvVk2bAZRywDKhL+yGu9s+Yy2no6JYX45qUVGZ0+6+r0HFTm
-	 0RZHRO4IF8aG2aBKyRrMuAchds/dhPtjbVLJaJOKZDFr787j39IAjK6FTZSQyax95RR9D
-	 cgs5gsQ6+zU1okWlrpraaZTiM52Sj0Uvu2oiwMUJ7+YJAicr/T9B6q10OFsbpU45BsA==
+	bh=CsMyiZH2K+p/Wo2C7JC4euPw6GtYfu1kt2BHGZFE0tc=;
+	b=pjli3Dc/65f135uniwKgO50FBJ1OeidKrfq1sfEosp2BZpuru42GkjOWvOpQwnNGavJP
+	 d84uuI3lLjSy5DmeIyJb8SvzmAQUA4AaWGhNXEZuIAgM0485OTNIvTe8i1jVgtS4cBwbR
+	 BKZXhklf43ZNHiYzlnWMZgol8emlKcEz5yZqVSPAV+niTgxCqK75IQC7Xzers3BheNcvP
+	 XU5vLCNK5zjkmwRnuLlnin3qJfFu1epR7qUG+M5Y0hsReqBtgmmQMB9b7QoWS1RXhtpI4
+	 HpCS4nCA5m3XCEPG0q3plo8x9yR4UwX33s0I8WK0dahFX8+K+helJMWE+whgXmQpkWw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=n+VldVZs;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=W0o4G8Lr;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FEA3606A327
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 21:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB214606A32C
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 21:13:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=n+VldVZs
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A2451F00A18;
-	Mon,  2 Nov 2026 21:10:24 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=W0o4G8Lr
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AD881F00A16;
+	Mon,  2 Nov 2026 21:13:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793653824;
-	bh=Wlm2d+Fq1WMlOcQj4TO/7g8bQ/QFX9DP+H+2zPFCKJE=;
+	s=k20260515; t=1793654032;
+	bh=CsMyiZH2K+p/Wo2C7JC4euPw6GtYfu1kt2BHGZFE0tc=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=n+VldVZsGqkFy5+47RJ8EYLKkfYItiuN3XNqKtqTj11dRUllSXIUv9De0WlB9JdCM
-	 OcWown5+uylpzrhmmu76IC0lmjSeQkvdu0hNoZENuoboB+BAb5y266qPj8f/1OEOB1
-	 01/VQWOH1e07OOqISXKK4oAfEB5WbgzD08ijnDbp8MMiMMIq92IMHPysfEKDOjICgV
-	 5Kak6dY1oXjC762HkljucIzgJQ+YJkNb2KpPxg13Iaa8JMSurfvdW6vO+Czy+eT391
-	 UUnz0WyVmDx2xR3lfkrrc9UtMZEIxFN7W7/nwKiQ81TkgmhYt2tE8mxBpWjN6/Omj6
-	 u1zFsLNKU4EHQ==
-Message-ID: <sashiko-outbox-194183@kernel.org>
+	b=W0o4G8Lri8fayI70hus3GHu61wrH0xvlSzAJJ869cm+FoWmPuyaMbdXgeXFFoBz0G
+	 nUiNnNgJ+OF+F9BBpeO1BXkGUv+rGQFbhpS53lFLbjJXqyNy5XUJQnQQ2Zxjx2mks5
+	 hVr3RO2QRVqcD2BUDcGrNp9rvkxlPQXURcMd7NvCaIfVeh1BO9zkaVsUMj25X9Trtb
+	 vzSWiCgbSwuWaiOw4ZgfXHQ9fd06EAaW8Eqw+UL6auhC7QhrzXqUvLYjX9lgjGHO95
+	 8SCPJ6hY8a+HV9uqos14hi8/rIclQDhw9hVzxpjb5jhdmlfwuRCFBtFvpZOZ1zz1EX
+	 w2i/3ppxeZtdw==
+Message-ID: <sashiko-outbox-194185@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 22/23] KVM: arm64: Raise PKVM_HYP_REQ_SPLIT on guest
- to host sharing
+Subject: Re: [PATCH v3 19/23] KVM: arm64: Add __pkvm_host_split_guest HVC
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Vincent Donnefort" <vdonnefort@google.com>, kvmarm@lists.linux.dev
 Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261102204628.401871-23-vdonnefort@google.com>
+In-Reply-To: <20261102204628.401871-20-vdonnefort@google.com>
 References: <20261102204628.401871-1-vdonnefort@google.com>
- <20261102204628.401871-23-vdonnefort@google.com>
+ <20261102204628.401871-20-vdonnefort@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 02 Nov 2026 21:10:24 +0000
+Date: Mon, 02 Nov 2026 21:13:51 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -63,113 +62,139 @@ Precedence: list
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Medium] KVM: arm64: unwanted block split and latent panic in pkvm_memuns=
-hare_call()
+- [Medium] KVM: arm64: Missing host_stage2_try() when splitting host stage-=
+2 GFN metadata
 --
 
-commit 8b44fbe0de868cf9681f0eef63a65d11368c1c9d
+commit 1780446e119343d8ac04e9e17e8d107c87019c8d
 Author: Vincent Donnefort <vdonnefort@google.com>
 
-KVM: arm64: Raise PKVM_HYP_REQ_SPLIT on guest to host sharing
+KVM: arm64: Add __pkvm_host_split_guest HVC
 
-This commit raises a PKVM_HYP_REQ_SPLIT hypervisor request and rewinds
-ELR_EL2 when a guest MEM_SHARE or MEM_UNSHARE hypercall encounters a huge
-stage-2 block mapping (-E2BIG) so that the host can split the block and
-replay the hypercall.
+This commit introduces the __pkvm_host_split_guest hypercall so the host can
+split a PMD block mapping in a protected VM's stage-2 page table and update
+the corresponding host stage-2 GFN metadata annotations to page granularity.
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkv=
-m.c
-> index d92f4da1c1807..6c126fcc3831b 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/n=
+vhe/mem_protect.c
+> index 88af0aec1ea92..7ecf4c98d7b5e 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
 
 [ ... ]
 
-> @@ -1197,17 +1218,29 @@ static bool pkvm_memshare_call(u64 *ret, struct k=
-vm_vcpu *vcpu, u64 *exit_code)
->  	return false;
+> @@ -690,17 +693,59 @@ static int host_stage2_decode_gfn_meta(kvm_pte_t pt=
+e, struct pkvm_hyp_vm **vm,
+>  		return -EPERM;
+> =20
+>  	meta =3D FIELD_GET(KVM_HOST_DONATION_PTE_EXTRA_MASK, pte);
+> -	handle =3D FIELD_GET(KVM_HOST_PTE_OWNER_GUEST_HANDLE_MASK, meta);
+> -	*vm =3D get_vm_by_handle(handle);
+> -	if (!*vm) {
+> -		/* We probably raced with teardown; try again */
+> -		return -EAGAIN;
+> -	}
+> -
+> +	*handle =3D FIELD_GET(KVM_HOST_PTE_OWNER_GUEST_HANDLE_MASK, meta);
+>  	*gfn =3D FIELD_GET(KVM_HOST_PTE_OWNER_GUEST_GFN_MASK, meta);
+>  	return 0;
 >  }
 > =20
-> -static void pkvm_memunshare_call(u64 *ret, struct kvm_vcpu *vcpu)
-> +static bool pkvm_memunshare_call(u64 *ret, struct kvm_vcpu *vcpu, u64 *e=
-xit_code)
->  {
->  	struct pkvm_hyp_vcpu *hyp_vcpu;
->  	u64 ipa =3D smccc_get_arg1(vcpu);
-> +	u64 gfn =3D hyp_phys_to_pfn(ipa);
+> +static int host_stage2_split_gfn_meta(phys_addr_t phys, u64 ipa, u64 siz=
+e, struct pkvm_hyp_vm *vm)
+> +{
+> +	struct kvm_pgtable_mm_ops *mm_ops =3D &host_mmu.mm_ops;
+> +	struct kvm_pgtable *pgt =3D &host_mmu.pgt;
+> +	kvm_pte_t pte, *table, *ptep;
+> +	pkvm_handle_t handle;
+> +	s8 level;
+> +	u64 gfn;
+> +	int ret;
+> +
+> +	ret =3D kvm_pgtable_get_leaf(pgt, phys, &pte, &level, 0);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (kvm_granule_size(level) !=3D size)
+> +		return -EINVAL;
+> +
+> +	ret =3D host_stage2_decode_gfn_meta(pte, &handle, &gfn);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (handle !=3D vm->kvm.arch.pkvm.handle || gfn !=3D (ipa >> PAGE_SHIFT=
+))
+> +		return -EINVAL;
+> +
+> +	table =3D mm_ops->zalloc_page(&host_s2_pool);
+> +	if (!table)
+> +		return -ENOMEM;
+
+[ ... ]
+
+> @@ -1778,6 +1830,55 @@ int __pkvm_host_mkyoung_guest(u64 gfn, struct pkvm=
+_hyp_vcpu *vcpu)
+>  	return 0;
+>  }
 > =20
->  	if (!PAGE_ALIGNED(ipa))
-> -		return;
-> +		goto out_guest;
-> =20
->  	hyp_vcpu =3D container_of(vcpu, struct pkvm_hyp_vcpu, vcpu);
-> -	if (!__pkvm_guest_unshare_host(hyp_vcpu, hyp_phys_to_pfn(ipa), 1))
-> +	switch (__pkvm_guest_unshare_host(hyp_vcpu, gfn, 1)) {
-> +	case 0:
->  		ret[0] =3D SMCCC_RET_SUCCESS;
-> +		goto out_guest;
-> +	case -E2BIG:
-> +		*exit_code =3D pkvm_request_split(hyp_vcpu, gfn, 1);
-> +		goto out_host;
+> +int __pkvm_host_split_guest(u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu =
+*vcpu)
+> +{
+> +	struct kvm_hyp_memcache *mc =3D &vcpu->vcpu.arch.stage2_mc;
+> +	struct pkvm_hyp_vm *vm =3D pkvm_hyp_vcpu_to_hyp_vm(vcpu);
+> +	u64 size =3D nr_pages << PAGE_SHIFT;
+> +	u64 ipa =3D hyp_pfn_to_phys(gfn);
+> +	kvm_pte_t pte, *table;
+> +	phys_addr_t phys;
+> +	s8 level;
+> +	int ret;
+> +
+> +	if (!mc->nr_pages)
+> +		return -ENOMEM;
+> +
+> +	if (size !=3D PMD_SIZE || !IS_ALIGNED(ipa, PMD_SIZE))
+> +		return -EINVAL;
+> +
+> +	level =3D KVM_PGTABLE_LAST_LEVEL - 1;
+> +
+> +	host_lock_component();
+> +	guest_lock_component(vm);
+> +
+> +	ret =3D get_valid_guest_pte(vm, ipa, size, &pte, &phys);
+> +	if (ret)
+> +		goto unlock;
+> +
+> +	table =3D kvm_pgtable_stage2_create_unlinked(&vm->pgt, kvm_pte_to_phys(=
+pte), level,
+> +						   kvm_pgtable_stage2_pte_prot(pte),
+> +						   mc, true);
+> +	if (IS_ERR(table)) {
+> +		ret =3D PTR_ERR(table);
+> +		goto unlock;
 > +	}
+> +
+> +	ret =3D host_stage2_split_gfn_meta(phys, ipa, size, vm);
 
 [Severity: Medium]
-Should pkvm_memunshare_call() request a block split when
-__pkvm_guest_unshare_host() returns -E2BIG?
+Should the call to host_stage2_split_gfn_meta() be wrapped with
+host_stage2_try()?
 
-In arch/arm64/kvm/hyp/nvhe/mem_protect.c, __pkvm_guest_unshare_host() calls
-get_valid_guest_pte() before checking whether the page state is
-PKVM_PAGE_SHARED_OWNED:
+In host_stage2_split_gfn_meta(), mm_ops->zalloc_page(&host_s2_pool)
+allocates a page-table page from the fixed-size host_s2_pool. When system
+RAM is mapped or donated at PMD block granularity in host_mmu.pgt, the
+unused PTE-level page-table pages in host_s2_pool can be consumed by host
+MMIO mappings faulted in via handle_host_mem_abort() -> host_stage2_idmap().
 
-arch/arm64/kvm/hyp/nvhe/mem_protect.c:__pkvm_guest_unshare_host() {
-	...
-	ret =3D get_valid_guest_pte(vm, ipa, size, &pte, &phys);
-	if (ret)
-		goto unlock;
+Other callers that allocate from host_s2_pool (such as
+host_stage2_idmap_locked() and host_stage2_set_owner_metadata_locked()) wrap
+their page-table operations in host_stage2_try(), which handles -ENOMEM by
+calling host_stage2_unmap_dev_all() to reclaim MMIO page-table pages and
+retrying.
 
-	ret =3D -EPERM;
-	if (pkvm_getstate(kvm_pgtable_stage2_pte_prot(pte)) !=3D PKVM_PAGE_SHARED_=
-OWNED)
-		goto unlock;
-	...
-}
-
-If a protected guest issues ARM_SMCCC_VENDOR_HYP_KVM_MEM_UNSHARE_FUNC_ID on
-an IPA backed by an unshared (PKVM_PAGE_OWNED) PMD block mapping,
-get_valid_guest_pte() sees size =3D=3D PAGE_SIZE against the level-2 block =
-leaf
-and immediately returns -E2BIG.
-
-With this change, pkvm_memunshare_call() catches -E2BIG and exits to the
-host via pkvm_request_split() to shatter the unshared 2MB block in both
-guest and host stage-2 page tables (and split its pkvm_mapping into 512
-entries), only for the replayed MEM_UNSHARE hypercall to fail the
-PKVM_PAGE_SHARED_OWNED check with -EPERM.
-
-Furthermore, if a PMD block were ever shared with the host in the future as
-mentioned in the commit message, __pkvm_guest_share_host() ->
-__host_set_page_state_range() installs a valid PKVM_HOST_MEM_PROT entry in
-host_mmu.pgt (replacing the invalid donation metadata PTE). If
-pkvm_memunshare_call() then triggers PKVM_HYP_REQ_SPLIT on that shared
-block, the host split path calls:
-
-  __pkvm_host_split_guest()
-    -> host_stage2_split_gfn_meta()
-      -> host_stage2_decode_gfn_meta()
-
-which hits WARN_ON(kvm_pte_valid(pte)) and panics EL2:
-
-arch/arm64/kvm/hyp/nvhe/mem_protect.c:host_stage2_decode_gfn_meta() {
-	...
-	if (WARN_ON(kvm_pte_valid(pte)))
-		return -EINVAL;
-	...
-}
-
-Would it be better not to request PKVM_HYP_REQ_SPLIT in
-pkvm_memunshare_call() while MEM_SHARE is single-page only (or check the
-guest PTE state before returning -E2BIG)?
+Because pkvm_refill_memcache() only refills the guest stage2_mc, can
+__pkvm_host_split_guest() fail with -ENOMEM if host MMIO mappings have
+exhausted host_s2_pool?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261102204628.4018=
-71-1-vdonnefort@google.com?part=3D22
+71-1-vdonnefort@google.com?part=3D19
