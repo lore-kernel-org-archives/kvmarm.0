@@ -1,56 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793653074;
-	b=z8mWQXqC7CJshNfapmIVJPmDUrxzh3e/z2OB3R4PhmKUgRqtg4k/cjMWu5KN8M/qkxqx
-	 MZYUy0p3GbvCsMe+EjrlAgmSilbFMokZZdl/6iphcE01FlTeOhx0KygLlIfOLGrY5jLA8
-	 vTA3EvYVu6+10ynvYhxUlvcKe38tohud6NslXnBOp3j/Te2vPfu9kB1RPS/GDhkVu8dt7
-	 cbAt4kMOlyRTbz8HnZw2LILzJwQKMIKggXLMIEtetymTAkCoumdB5OkIioC2GlQGDK8EU
-	 4BtYu5ooCJUtqLos65jPfjVObl7ZwLIKA2dbbLltJ4QHpBiAsNQJRP0YRtNhq3ESaQw==
+	t=1793653333;
+	b=qDda6UatQB1mQIJ1aDp3Wyf0l5rxoc07onB0Kc+Ncp9Pfpa1Pi4mo3MxSh3qnRYwEiIn
+	 dGwvrktAvPQyCLKtYDcIM47+yvZ9Ygh2FfeRMEWYd5SMv9dGwr7eo1uhuW4ylOlIIgOY2
+	 z2FzmpQzjSaFURSWafVojksB4ji3P0c5fdia1H2fx7xSFjHmlsSuqlqIP5CbI6BKg2MZt
+	 qOAsSPeuEhNOWUQT4w1E9iAoseCNhsHNVpGAjiiH6YnjoMnJtTb6WiFBTFT17yViR4Ak5
+	 skclUS2vtI/E4Rsqs4Q9EPEEQfTDZuS5TDHRGPenWISFObGHiYtJPAyVNqgRqUJtSUQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793653074;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793653333;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=mgfd7drWnJTsLYHZtrgehegaVlJMIqsSPz3c/tif2Ow=;
-	b=u30LPyiYyr2MYnLLyZLNNL9uEefmlOlGfeZ4H947//D25NlvTbpgHGTuwU86x4tU7jM5
-	 fNqeDFqInU2aVKhDyonxvYmRCZphvBTKt+3iEv4FdpBhvZfIVCfWPLJ5LCiDHL71Dgm86
-	 lCCggDMSHKtPzySdiM0WxnnEj5tae+xLAWrPfKuBDlsbB9Lp1MKzuuIUfTlX2OviBSBXz
-	 l5nK2LSgvU1m1BX5BZE7sH/RUCl4N/HqrOsMU6OmNAYxlq2BsouAKc1PXaX8pGS/vmVFF
-	 /+CGqooeGmXzIACzRr5N21c7JGdmD2XOEN/ukxh+to/9A8YsIDZ54IuBtbj9LUpZZqQ==
+	bh=wjWu7VvkLGEqTrRPFY+Zv7k0bSSZtSEPQACQbhPOJtQ=;
+	b=v8E/uSObKcP1X9s6eAMTeJuz/oCBdrj0RYEGmXe5mwJcZcIjbAMm6ts6vwo53755DL9i
+	 JcxJoAStFbWT4N6d4I/9OsQkj/gTXItLOMryqxlmm3OxgGUNzQ/y6Hkm2vrNr1aERQ9DX
+	 RWO6NJsoP3G7PN4G5bpA7Y0PBIh3wxZEXVRHVhRsRYsRA0LrOwgVQOWfMolAu3QEesuoh
+	 pNlJl6Bsbg/Fc3DjIvtTGB9VnLS23PGffl8pss48RK+Jjyekbujd7b1uSXO9Ld8ne01bv
+	 VJyVHzlc0xFkFkrQ/u4sTsCCuwhuKdUzBGUJcyDND8IlFOt4GFSgWn4eEl3Mtejy/pg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mPGrT66U;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Wuudxzj3;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76137606A324;
-	Mon,  2 Nov 2026 20:57:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CEB606A324
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 21:02:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mPGrT66U
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C326B1F00A16;
-	Mon,  2 Nov 2026 20:57:53 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Wuudxzj3
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 615521F00A16;
+	Mon,  2 Nov 2026 21:02:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793653074;
-	bh=mgfd7drWnJTsLYHZtrgehegaVlJMIqsSPz3c/tif2Ow=;
+	s=k20260515; t=1793653332;
+	bh=wjWu7VvkLGEqTrRPFY+Zv7k0bSSZtSEPQACQbhPOJtQ=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=mPGrT66U2E2V+m9WKDraprn8sG90I6Mty3WcwKjXZdWff2emcmDrBF/aPH8yV/ohc
-	 a8z/9XfwidVvKHu0dxcOG8zHpXcwR5VDe6iA2PvvIoHx06B8zIDsDxGVj49QXJ4Pmx
-	 bwm2TO8dgiyQp1ma/UdB9FD+ozpOfD/CbkbHebpbxdSM6YhCabNvXxKX2tB4w2t5qp
-	 cmcWQXaXxd6ap3QJ4WgLB3Su9rzxBKz0Kw5nUMV6OfXOW2tSOo5pMhAt+h+U/g9BJ2
-	 5IHzRWnRkFH9cc1u408Bu/GJyK5qaRHlH0j1EFCQ/iem0Ie/XMQzTottgkDuMq320p
-	 dcpSOmut4GqQQ==
-Message-ID: <sashiko-outbox-194164@kernel.org>
+	b=Wuudxzj3iU9mIpPNvGrS6lU6bjokDyz9rogMDkqcJ47gTl/zbFOTzWUZhvvXVwxYG
+	 2LcNdPuzsEmhrM9mHsnW3KbqEAzlOvPyeBcO5tZLUlBRBFOM6ps4WHjOUGom3zBEX4
+	 cGhl9zovWrmKXNEW2di1q+8YzwuUfADxjQNP08ZxgCNeN4LXeDE7In2oREetA8KyUa
+	 hN6/uOmJUBBouhwLOVGB4DvzY3RAlKGNlEuByPPby8Emf1Pewi1J5lT+CdezAt+GNd
+	 5oka7EdR+/C9FAt4mKwluqZj1WcFKyj8aT5O4l77emVIJ6HvCJ/gXCJTGhzS3Wb1Ky
+	 bssyE3cy+Vavw==
+Message-ID: <sashiko-outbox-194174@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 11/16] irqchip/gic-v5: Enable direct injection in ITS
+Subject: Re: [PATCH v3 18/23] KVM: arm64: Introduce
+ kvm_pgtable_stage2_table_install()
 Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sascha Bischoff" <sascha.bischoff@arm.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+To: "Vincent Donnefort" <vdonnefort@google.com>, kvmarm@lists.linux.dev
 Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261102194454.4086911-12-sascha.bischoff@arm.com>
-References: <20261102194454.4086911-1-sascha.bischoff@arm.com>
- <20261102194454.4086911-12-sascha.bischoff@arm.com>
+In-Reply-To: <20261102204628.401871-19-vdonnefort@google.com>
+References: <20261102204628.401871-1-vdonnefort@google.com>
+ <20261102204628.401871-19-vdonnefort@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 02 Nov 2026 20:57:53 +0000
+Date: Mon, 02 Nov 2026 21:02:11 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -60,145 +61,127 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [High] irqchip/gic-v5: sleep in atomic context via gicv5_irs_syncr() unde=
-r desc->lock
-- [High] irqchip/gic-v5: unlocked concurrent MMIO access in gicv5_its_itt_c=
-ache_inv()
-- [Medium] irqchip/gic-v5: ignored timeout in gicv5_irs_syncr() during ITTE=
- restoration
+- [Medium] KVM: arm64: missing block alignment check in stage2_table_instal=
+l_walker()
+- [Low] KVM: arm64: kernel-doc mismatch for kvm_pgtable_stage2_table_instal=
+l()
 --
 
-commit 0ced984dd99b707bdb6169e0051131c256a7148e
-Author: Sascha Bischoff <sascha.bischoff@arm.com>
+commit 2ec53eff489eca020eb2705b64a21720b1def67f
+Author: Vincent Donnefort <vdonnefort@google.com>
 
-irqchip/gic-v5: Enable direct injection in ITS
+KVM: arm64: Introduce kvm_pgtable_stage2_table_install()
 
-This commit adds the irq_set_vcpu_affinity callback and helper functions to
-install and remove virtual ITTE translations in the GICv5 ITS for KVM direct
-interrupt injection, while disabling lazy masking for forwarded interrupts.
+This commit introduces kvm_pgtable_stage2_table_install() to replace a
+stage-2 leaf entry with a pre-allocated table, enabling pKVM to handle block
+splitting in mem_protect.c without relying on kvm_mmu_memory_cache.
 
-> diff --git a/drivers/irqchip/irq-gic-v5-its.c b/drivers/irqchip/irq-gic-v=
-5-its.c
-> index 28e39b065de0e..d91f4ea1ef440 100644
-> --- a/drivers/irqchip/irq-gic-v5-its.c
-> +++ b/drivers/irqchip/irq-gic-v5-its.c
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/as=
+m/kvm_pgtable.h
+> index 1c9c57cd6ae40..587874c3a5259 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -835,6 +835,18 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt=
+, u64 addr, u64 size);
+>  int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  			     struct kvm_mmu_memory_cache *mc);
+> =20
+> +/**
+> + * kvm_pgtable_stage2_table_install() - Replace a stage-2 leaf entry wit=
+h a table.
+> + * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_create_u=
+nlinked().
+> + * @addr:	Address identifying the leaf entry to replace.
+> + * @size:	Size of the block to replace.
+> + * @tab:	Pointer to the pre-allocated table to install.
+> + *
+> + * Return: 0 on success, negative error code on failure.
+> + */
+> +int kvm_pgtable_stage2_table_install(struct kvm_pgtable *pgt, u64 addr, =
+u64 size,
+> +				     kvm_pte_t *table);
+
+[Severity: Low]
+In the kernel-doc comment for kvm_pgtable_stage2_table_install(), @tab does
+not match the parameter name table in the prototype (and definition in
+arch/arm64/kvm/hyp/pgtable.c), which triggers a scripts/kernel-doc warning.
+
+Also, @pgt is described as initialised by
+kvm_pgtable_stage2_create_unlinked(). Should @pgt be documented as
+initialised by kvm_pgtable_stage2_init*(), with @table being the table that
+may be created by kvm_pgtable_stage2_create_unlinked()?
+
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index abd32e94f6ff0..19634e5ec5557 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
 
 [ ... ]
 
-> @@ -723,6 +765,102 @@ static void gicv5_its_compose_msi_msg(struct irq_da=
-ta *d, struct msi_msg *msg)
->  	msi_msg_set_addr(irq_data_get_msi_desc(d), msg, addr);
+> @@ -1620,6 +1634,55 @@ int kvm_pgtable_stage2_split(struct kvm_pgtable *p=
+gt, u64 addr, u64 size,
+>  	return ret;
 >  }
 > =20
-> +#ifdef CONFIG_KVM
-> +static int gicv5_its_set_vcpu_affinity(struct irq_data *d, void *int_dat=
-a)
+> +struct stage2_table_install_data {
+> +	struct kvm_s2_mmu	*mmu;
+> +	kvm_pte_t		*table;
+> +};
+> +
+> +static int stage2_table_install_walker(const struct kvm_pgtable_visit_ct=
+x *ctx,
+> +				       enum kvm_pgtable_walk_flags visit)
 > +{
-> +	struct gicv5_its_dev *its_dev =3D irq_data_get_irq_chip_data(d);
-> +	u16 event_id =3D FIELD_GET(GICV5_ITS_HWIRQ_EVENT_ID, d->hwirq);
-> +	u32 dev_id =3D FIELD_GET(GICV5_ITS_HWIRQ_DEVICE_ID, d->hwirq);
-> +	struct virt_intr_data *data =3D int_data;
-> +	struct gicv5_its_chip_data *its;
-> +	__le64 *itte;
-> +	u64 itte_val, tmp;
-> +	int ret =3D 0;
-
-[ ... ]
-
-> +invalidate:
-> +	/* Make the change ITS-visible */
-> +	dsb(st);
-> +	ret =3D gicv5_its_itt_cache_inv(its, dev_id, event_id);
-
-[Severity: High]
-As reported by Sashiko on v1 [1], can concurrent calls to
-gicv5_its_itt_cache_inv() on the same physical ITS race with each other?
-
-Both gicv5_its_enable_direct_injection() and
-gicv5_its_disable_direct_injection() invoke irq_set_vcpu_affinity(), which
-only holds the per-IRQ desc->lock before calling
-gicv5_its_set_vcpu_affinity().
-
-Inside gicv5_its_itt_cache_inv():
-
-drivers/irqchip/irq-gic-v5-its.c:gicv5_its_itt_cache_inv() {
-	...
-	its_writeq_relaxed(its, didr, GICV5_ITS_DIDR);
-	its_writel_relaxed(its, eidr, GICV5_ITS_EIDR);
-	its_writel_relaxed(its, eventr, GICV5_ITS_INV_EVENTR);
-
-	return gicv5_its_cache_sync(its);
-}
-
-Because struct gicv5_its_chip_data has no spinlock serializing access to the
-shared ITS MMIO registers, two CPUs concurrently configuring different IRQs
-on the same ITS (or racing with gicv5_its_irq_domain_activate(),
-gicv5_its_irq_domain_deactivate(), or gicv5_its_device_cache_inv()) can
-overwrite each other's GICV5_ITS_DIDR and GICV5_ITS_EIDR values before
-GICV5_ITS_INV_EVENTR is written, invalidating the wrong (DeviceID, EventID)
-entry and leaving stale translations cached in the ITS.
-
-> +	if (!ret && !data) {
-> +		/*
-> +		 * Invalidation sends events using the old translation to the
-> +		 * IRS, but does not wait for them to be processed.
-> +		 */
-> +		gicv5_irs_syncr();
-> +	}
-
-[Severity: High]
-Will calling gicv5_irs_syncr() here sleep in atomic context?
-
-gicv5_its_disable_direct_injection() calls irq_set_vcpu_affinity(virq, NULL=
-),
-which acquires raw_spin_lock_irqsave(&desc->lock, flags) via
-scoped_irqdesc_get_and_lock() before invoking gicv5_its_set_vcpu_affinity().
-
-When gicv5_its_set_vcpu_affinity() calls gicv5_irs_syncr():
-
-drivers/irqchip/irq-gic-v5-irs.c:gicv5_irs_syncr() {
-	...
-	syncr =3D FIELD_PREP(GICV5_IRS_SYNCR_SYNC, 1);
-	irs_writel_relaxed(irs_data, syncr, GICV5_IRS_SYNCR);
-
-	gicv5_wait_for_op(irs_data->irs_base, GICV5_IRS_SYNC_STATUSR,
-			  GICV5_IRS_SYNC_STATUSR_IDLE);
-}
-
-Unlike gicv5_wait_for_op_atomic(), gicv5_wait_for_op() expands to
-gicv5_wait_for_op_s(), which calls readl_poll_timeout() with a sleep_us of =
-1,
-executing might_sleep_if(1) and usleep_range() while holding desc->lock with
-interrupts disabled.
-
-> +	if (ret) {
-> +		/* Keep a failed restoration distinguishable from a clean host ITTE. */
-> +		if (!data)
-> +			irqd_set_forwarded_to_vcpu(d);
-> +		return ret;
-> +	}
+> +	struct stage2_table_install_data *data =3D ctx->arg;
+> +	struct kvm_s2_mmu *mmu =3D data->mmu;
+> +	kvm_pte_t *childp =3D data->table;
+> +
+> +	if (ctx->level =3D=3D KVM_PGTABLE_LAST_LEVEL)
+> +		return -EINVAL;
+> +
+> +	if (ctx->addr !=3D ctx->start ||
+> +	    ctx->end !=3D ctx->addr + kvm_granule_size(ctx->level))
+> +		return -EINVAL;
 
 [Severity: Medium]
-What happens if polling GICV5_IRS_SYNC_STATUSR times out inside
-gicv5_irs_syncr() while restoring a host ITTE?
+Does this check verify that ctx->addr is aligned to the block granule size
+kvm_granule_size(ctx->level)?
 
-gicv5_irs_syncr() returns void and discards the -ETIMEDOUT return value from
-gicv5_wait_for_op(). If the IRS synchronization times out after
-gicv5_its_itt_cache_inv() succeeds, ret remains 0.
+In kvm_pgtable_walk(), both walk_data.start and walk_data.addr are
+initialised to ALIGN_DOWN(addr, PAGE_SIZE):
 
-As a result, gicv5_its_set_vcpu_affinity() will proceed to clear
-IRQD_FORWARDED_TO_VCPU instead of keeping the retryable forwarded state, and
-gicv5_its_disable_direct_injection() will clear IRQ_DISABLE_UNLAZY and retu=
-rn
-0 to the caller while events using the old virtual translation may still be
-in flight at the IRS. Should gicv5_irs_syncr() propagate its error so ret c=
-an
-be checked here?
+	struct kvm_pgtable_walk_data walk_data =3D {
+		.start	=3D ALIGN_DOWN(addr, PAGE_SIZE),
+		.addr	=3D ALIGN_DOWN(addr, PAGE_SIZE),
+		.end	=3D PAGE_ALIGN(walk_data.addr + size),
+		.walker	=3D walker,
+	};
 
-[1] https://lore.kernel.org/r/sashiko-outbox-174629@kernel.org
+In __kvm_pgtable_visit(), data->addr is only aligned down to
+kvm_granule_size(level) and advanced after the leaf callback returns 0:
+
+	if (!table) {
+		data->addr =3D ALIGN_DOWN(data->addr, kvm_granule_size(level));
+		data->addr +=3D kvm_granule_size(level);
+		goto out;
+	}
+
+Because stage2_table_install_walker() is only invoked for
+KVM_PGTABLE_WALK_LEAF and always returns a non-zero value, ctx->addr is
+always equal to ctx->start on the first visited leaf entry, making
+ctx->addr !=3D ctx->start always false.
+
+If kvm_pgtable_stage2_table_install() is called with an addr that is
+page-aligned but not aligned to kvm_granule_size(ctx->level) and with size
+equal to kvm_granule_size(ctx->level), this check will pass, replacing the
+enclosing block PTE and passing an unaligned IPA to stage2_try_break_pte().
+Although the callers added later in the series (__pkvm_host_split_guest()
+and host_stage2_split_gfn_meta()) check PMD_SIZE alignment beforehand,
+should stage2_table_install_walker() check
+!IS_ALIGNED(ctx->addr, kvm_granule_size(ctx->level))?
 
 --=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261102194454.4086=
-911-1-sascha.bischoff@arm.com?part=3D11
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261102204628.4018=
+71-1-vdonnefort@google.com?part=3D18
