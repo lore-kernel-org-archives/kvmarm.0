@@ -1,72 +1,108 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.150
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.174
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793608177;
-	b=3NOQAt1kBAUXoolLpVrU/fWrjjrT/HDIl0M2bJr8I8Q0KGqig/jwCz3gtppbKrCNndtI
-	 63aQJRS66TRoS7LjwWVveFNkT9eNw9z+mAhC3eT4nA/r4TRIqD4Fe0uPlniwzkZfDzpJI
-	 goyNj/59yZ8smQR2dwrAsoutyJXzzPaO1TDHLMvOi+7vc8AAa1LWKbhouon+TqHhLWhj+
-	 wtOBAzQCAhG+x4bjOb4jj1xTWrNQtdoUOl+WVoQJHhm9IcKC9XRHdkXQ36Dv5SMLyA3ZI
-	 Fi9byDmz+0+oFpySSpKN2ek8cDFsRW/L7BHq5aMEbvZq308uZ9l2HxLqfW053tIQThA==
+	t=1793608686;
+	b=BKBjqIWitTtSdbbEh0ryooT+GufBg2eOMpRRx/LQmjKj9PDHEt46cCukTYqkLTyd0gJ+
+	 oCn+jO5SxFw62IiAYM3r+imwA4E+NnTaXUzw1v/J6xzuhtOy/YD53U89UsLk74F8zifHn
+	 kfjP/vHRPIorBrPS58LevUa00vqlj7zf5Nz7D2zDQQG91rOstyx7KvlJ74Jv39bR/rH/t
+	 LQG4zi3I1Kwl0NIJvcV0Ey4lR7HISgBqi9pbaKko1FHmq1G8Ft+rgAKVmV4KOpkiDnsDJ
+	 rTKjIS9q5Io0M9I+xQeryjB4neyy8rIKig/sl48CiQu5/oaluY9uwdgEtAFfvgPioNw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793608177;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=euznYBocIb8kfNgcKlt2GHcUVDSBs2gzY/11E05nVeE=;
-	b=wql4P9jBBtH2fWQT20XnCgqn81Sk8UU27eLTMAgTVMvM160TiPtIcfuF9Y287l+CxAn2
-	 WiQ1ljL6gDpInQPWqNaNyr2iR7Fat1kr6wC/o0y93rOPQDmeF55GK7hchVSuYvT3Opx+M
-	 /Bf/1lZkDbtzj8URJuZRn0Br0VYXrf6E5LJo8NjbB4h8pjg8JfoWlbQ6WxYT1HndHCxBn
-	 BkpucYf3TyQTBz8UzXC2+QIozMHYCiu6jiArwwuQgvbBp0bYc1nhU1B3+Zd8o7E6Jlqgb
-	 jQbGh8PwypIU91CGn8XrBtMzNcKEdbtMyCIdkgz1CTzC2qhp4jm45iAvPYjfBZj+Xhw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793608686;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=8d0vDitzezDWa7J6bkNN1sM4Lg1Dh0lgOVgctT1VpEs=;
+	b=s/H2/ausQecLfz1dKSsGrFxBbltyTaa40V8OnlBrol1ZvSXq0S6jfj4xF4b6FKkNoqDa
+	 Of2QgI+BVNKWQ1AQ4HmZ412hR08fokUkFgAVII5jlV5fn+7bb7wiNGL9Z8Kh8lp88DzG7
+	 m5mxCSIAYqITpQsqB0QzLBFpj3MvIGAG7deCAGOmDlWgkZ0JcCsJn2JlBE9PcEVyfWe3E
+	 +up/xjunX8elf3d0ZH9BFcKWgchAh1Z6ETm3QAVK8V1pzkI3wGejRvgB7knUsTz3adIHo
+	 PWSk0X6LTzqHXrBTqb/gtKIVcDo9LTZyXQ8PXNcIMqRqWtCzKIN1JrglRXAGgxL/7yQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=F+5WWgPW;
-	arc=none smtp.remote-ip=91.218.175.150
-Received: from mta0.migadu.com (out-150.mta0.migadu.com [91.218.175.150])
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=J3d67s7D;
+	arc=none smtp.remote-ip=209.85.215.174
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5B4606A329
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 08:29:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AD5B4606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AAA9606A326
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 08:38:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5AAA9606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=F+5WWgPW
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=y8BgwjagvHGf78IlM6ng3nm9vDTk3b3hu1EyL1SF7ec=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793608174; v=1; x=1794212974;
- b=F+5WWgPWHTgZkLOdWp34fjp8vKNTzLwWGqZ/4900AI/b1FTmGpR1sFpQt8SzIiPVy20OvRLv
- h7fwwNHkpAZeLqoAxkwBPghJibjqFi5yr5vvVF8G2NWNsTRh8Fx/D44CNgsqKctPTHRQgrIphKQ
- IaHcegGiTwV+63OFDSO3Vjy0=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id eddade33f188acbf;
-	Mon, 02 Nov 2026 08:29:34 +0000
-X-Mizu-Trace-ID: eddade33f188acbf
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=J3d67s7D
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-cdb1199bfd8so663634a12.1
+        for <kvmarm@lists.linux.dev>; Mon, 02 Nov 2026 00:38:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793608686; x=1794213486; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=8d0vDitzezDWa7J6bkNN1sM4Lg1Dh0lgOVgctT1VpEs=;
+        b=J3d67s7DNbFR+tWWfdI+VcV0MeOPtK+ppyhwflvXXsZ7AxWM2vOXnAojhio5IU7DNJ
+         ZkWEB63d3tsK1sv1gXqSKweCfW4uzaMSxwAGx9eXnzjXzBlxPODQ0JLZHwvm3ueWDtFz
+         YToedbnPMXY7uuxkYVc3wggcJnwM1qXw0vY6kIFuvaI+BXcVjiBRXzltetpx19+KWZZP
+         Ck8GxWj46L9ysDn1PtkfV+7iL6ZtkXITezwZXneOVpMTy6j84e/a9UuAeM5EIqQpX9uY
+         qDWjWivBnbr91m/A4loAZvVxZkSSOe39aSCCrgqDXLHR834PNc6KwhewXOhA1icLqXWq
+         pXbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793608686; x=1794213486;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=8d0vDitzezDWa7J6bkNN1sM4Lg1Dh0lgOVgctT1VpEs=;
+        b=1T0NPXjm6FwdVG/t4/SN4M44uY4GBqbzcRTg4jWVC3L7KETZiFDdvCGEWrhDnxglIV
+         O71LTKLS4lrUv80LTrfiPU1aP52wPvnqFcDNQWKBrmJVIhT8+qIPwuZxCrYQ8SqQ1S1a
+         pze+dShJ8QKdhGu1YR/fqoCLWoMZR/XWP9PbKV+UY+dcujwBRVpiqgzw9O7kHbrTFiYJ
+         Q3k9pxTfhr7gNGLtF5vaJ0nNEnOurUNg/Xz/YHXJWPKs/VVilAL0bGD4ty6/05JNFgJk
+         rxMKGFUoQTK7GZ1U8zDTg35uu1lMINmpeip1/wIKzx5xh6BA9Kyoj0+M/zFUD55MOayO
+         5Mtg==
+X-Forwarded-Encrypted: i=1; AKwUvBzSt1pAy9T/9/9+VfDiK/WpIkZFCf97PG1KBaNpPtKSe4wy701kC7mcIYrkc59DOndhOCFMq4U=@lists.linux.dev
+X-Gm-Message-State: APuU4Z8qZvbHZeCS7aWBpy/Ts/eLtHBKYujt+fUdWuWHs8JqylVFEPAO
+	+C37UlZHu4wnf+A6vTkUBMkGjDnSfOuS2vY9qQGfe+xFNumW8XMflXIS
+X-Gm-Gg: AYBFou3I/x0wzoe4rqU20PJOq20mNxs8ScptSprM4KjxnOlyCZig7JPC10nKr2KRIOK
+	qH6FWUEJ9QwFA7NC8nPSvnE6zsDDvSsL65EhZfmpLhsCT2CrwrE4Ck9HL+4mBlXNe/NLiXSu5zv
+	M+N2QAs7OZqQRFw0s4LmVemxitMwRZXAhyEpt/2XM0rMp0RsXIS7Sjl+4JHlxoSOQMEPlDWYYbN
+	49tEdl780DNtdIarX0Uv7dKXOl2j3QhM8z8fmLXvY8cNfGnsDenfAmGdf+V7254XPZkiFSOB/TR
+	k1W/kT02D4HuaGAGeqy0LuUEO8E038rNuVzIHOxDhRNHmGxF0NP3fQMUmFrsw31f3A/g/3KFzLv
+	dN6T0tFM+1h28+QJWw5qhjHN6dYkdJ5HaanNpBRJ7/kl1CKMcDFLr/qehIONdmGIxkO11subCqJ
+	J7ehGdYAO/iLf/Wj/gHQCo24YhkFQeBCXcNp/V+bPSbm+GuRZmxUL9OTRjqr4HtPy3ZlSaWpPEB
+	IWHYnsZZR4AmuKPgy8DEDPFQODk5oRcc6n+tptXiut9c/ijPbiaCQmQ+1jFiZ8hLR+5fzbamymI
+	My3uvGmdCeqwXj1tZFM3hIybLhseuy5HYcDluFL/cpjSCT1VprBuafB66C8ndMtfGbF0jAGILMJ
+	lrzQKTgANeYaq7vNjzWdPAIDqlln93bqddgtR8Sd1wmB+AT/ZFVpIKNs5Td2RVapbUXyNISKZgc
+	CwzVAczOaOWuCKBA==
+X-Received: by 2002:a17:90b:5648:b0:3ad:93b4:718f with SMTP id 98e67ed59e1d1-3ae89879b52mr8145082a91.65.1793608685557;
+        Mon, 02 Nov 2026 00:38:05 -0800 (PST)
+Received: from spider.bream-herring.ts.net ([103.6.151.236])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ae85f3e087sm7861463a91.1.2026.11.02.00.38.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Nov 2026 00:38:05 -0800 (PST)
+From: Matthias Goergens <matthias.goergens@gmail.com>
+To: Wei-Lin Chang <weilin.chang@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oupton@kernel.org>
-Cc: Hyunwoo Kim <imv4bel@gmail.com>,
-	Eric Auger <eauger@redhat.com>,
+Cc: Fuad Tabba <fuad.tabba@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Sascha Bischoff <sascha.bischoff@arm.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	Fuad Tabba <tabba@google.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	Randy Dunlap <rdunlap@infradead.org>,
 	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH v2] KVM: arm64: vgic-its: Update GITS_CTLR.Enabled under its_lock
-Date: Mon,  2 Nov 2026 08:29:33 +0000
-Message-ID: <20261102082933.2673799-1-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.47.3
+	workflows@vger.kernel.org
+Subject: Re: [PATCH v2] Documentation/process: Add a maintainer entry profile for KVM/arm64
+Date: Mon,  2 Nov 2026 16:37:59 +0800
+Message-ID: <20261102083759.1561867-1-matthias.goergens@gmail.com>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <6urqt376s23fcyr5pchfrrowvjoo6acg5xt4ujkft7gww6sagj@jxz5rqihtkja>
+References: <20261030083351.3040604-1-matthias.goergens@gmail.com> <6urqt376s23fcyr5pchfrrowvjoo6acg5xt4ujkft7gww6sagj@jxz5rqihtkja>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -78,77 +114,17 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A GITS_CTLR write that disables the ITS clears its->enabled and
-invalidates the translation cache under cmd_lock, while an MSI
-injection tests the enable bit and populates the cache under its_lock.
-An injection that passed the test before the disable can cache its
-translation after the invalidation, and the cached path then injects
-the LPI from the disabled ITS on every later MSI for that event.
+On Sat, 31 Oct 2026 21:03:17 +0000, Wei-Lin Chang wrote:
+>> +Minor problems are often fixed up by the maintainers when applying; if they
+>> +say "no need to resend", don't.
+>
+> The second half of this is a little silly :P
+> What about just:
+>
+> Minor problems are often fixed up by the maintainers when applying; ask
+> if you are unsure whether to resend.
 
-Take its_lock around the store and the invalidation, so that it
-serializes the store against the test. Nest it under cmd_lock, as the
-command handlers do.
+Agreed, that reads better.  I'll use your wording in v3.
 
-Fixes: 86a7dae884f38 ("KVM: arm/arm64: vgic-its: Check the LPI translation cache on MSI injection")
-Reported-by: Hyunwoo Kim <imv4bel@gmail.com>
-Link: https://lore.kernel.org/ah6Lsi4MfKUU6wBR@v4bel/
-Suggested-by: Oliver Upton <oupton@kernel.org>
-Cc: stable@vger.kernel.org
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
-
-Notes:
-    Changes since v1 [1]:
-      - Reworded the commit message.
-      - Rebased on 7.4-rc1.
-    
-    Picking up the fix Marc was worried had stalled [2].
-    
-    The GICR_CTLR.EnableLPIs path has the same window and is left as
-    is. vgic_its_invalidate_all_caches() can't take kvm->lock there (it
-    runs with vcpu->mutex held) or config_lock (the userspace GICR_CTLR
-    route already holds it). Instead, the vgic_target_oracle() check in
-    my LPIs-disabled series [3] keeps an LPI off a redistributor with
-    EnableLPIs clear. The two don't depend on each other.
-    
-    vgic_its_free_collection_list() still leaves the cache alone. A
-    guest reaches it only through a GITS_BASER write, which already
-    drops the cache (8cd92f77ae4f). An ITS reset frees the devices
-    first, which drops it too. That leaves a failed collection-table
-    restore. A VMM gets there with translations cached only by enabling
-    the ITS before the restore, against the documented order. Those
-    translations then keep injecting their LPIs into the old target
-    vCPUs.
-    
-    Based on Linux 7.4-rc1 (6628e7d4c6b25; also applies to kvmarm/fixes
-    79f3724ca8913).
-    
-    [1] https://lore.kernel.org/all/20260917162020.1612577-1-fuad.tabba@linux.dev/
-    [2] https://lore.kernel.org/861pbr6emw.wl-maz@kernel.org/
-    [3] https://lore.kernel.org/all/20261026092802.2636798-1-fuad.tabba@linux.dev/
-
- arch/arm64/kvm/vgic/vgic-its.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 7e9b265b1f521..68e3034e52236 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -1800,9 +1800,12 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
- 		 !(its->cbaser & GITS_CBASER_VALID)))
- 		goto out;
- 
-+	/* vgic_its_resolve_lpi() tests the enable bit and caches under its_lock. */
-+	mutex_lock(&its->its_lock);
- 	its->enabled = !!(val & GITS_CTLR_ENABLE);
- 	if (!its->enabled)
- 		vgic_its_invalidate_cache(its);
-+	mutex_unlock(&its->its_lock);
- 
- 	/*
- 	 * Try to process any pending commands. This function bails out early
-
-base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
--- 
-2.47.3
-
+Thanks,
+Matthias
