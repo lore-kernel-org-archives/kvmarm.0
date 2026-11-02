@@ -1,49 +1,76 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793644359;
-	b=qGU3txi7fVxzvuv1/DBrLiCbnWOoAhBt3SHNV3CcjxpvfBNgIC6aqJeg/sn39iTMpEaA
-	 h3WT+VBpY4FBRdclbLTZBM/TvgdWLWTO3i8KYsbIjQUGVNJInJ8NFZ5Ww0K4jJZREXdaN
-	 2bc+lLaDaP32h97YsyQ+4+DIuT/xXgZoXGsSvvSa9IXkZhWjznkSJCME994xIPcdg0Y2Y
-	 Sbm8UoM12jW2r75SVloJVY7RMwMoW4IWXlTeKecHDQ8qJTvo/6w4A6M8ow1oBBaLQP/hB
-	 cieyPg5lxrXzQ6Oz6hOSQWKBjQcFwePkD6KM0c9nNDTb7n0CnzoHzmppL0zBGef02Rg==
+	t=1793644879;
+	b=NV87zROip8b8KlDy8y3IfumcYYMQMRbExlOngcUDzNEiq2YX7y7bbNhkyeWh0tuJTBwl
+	 I8EJXtjOsItrcGxeu8wCfq9jt5XgA1e60uhT6FgqnBFoKpVUXTHRv4bdH0dfJ4RyeAOyz
+	 GDnlfU3mfqisVR5/8nnIx/SVTGL34oRM/4jnGR4x35xNaVe4RtjMPHgtQ30aoXO8tL8IL
+	 NMESMTG2squLABi1fZrrxM4R5zYsOEW6ip6Y7DN04gQd0d5Nj1u5KFMRdpcDQcNbMVsA+
+	 s9V/qqLqPqbFJLamI92pCT9iQjGZ0jl0s7QB3pkPb+0gPYlRxloVODrseJrWhj7vcsA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793644359;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=d6Zs7hYlOcAb9GpTpzgd4RT7Z8RUJLNrzQEbBotUN6E=;
-	b=VgcK6GAvxJIr5hgDnfYU3laMRg6BP9REmr5ZZHKEPPjK/S2o5ZsyEm3yglYCmGCr9q9W
-	 f5suyXtgOpQYnkrv33YIwhEao7HzyttxyAOL0HcciAaB01B/+WG3YhkuDl/rWHnjIVslj
-	 JDT3cEkjCf9zRLSyCBYuuLx3siTr5giApA3q3JXiuBdBgHsE653rqLYowcscFJQWjqHGf
-	 RrY9B27ucMnBCC3TlN4Exvb70otrrfoEwuw6o+L43kmI9ntRVPPVZBFAz2LsO5vEZ8dTk
-	 6j/OU4cZiLCrKx9IyxLCwgWNhOKLck/sV1f/9VQf3naYIFCzuYu1jrbvfQPL9flxLUA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793644879;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=1siRmUO4vM6mmsoG9PiDb9+LFZeVOS+fG7WHL62iNvw=;
+	b=jkDBy+IBYJGy0sP0uFb9gsGgZ42686spmU6QjPzel1Gp86LWZWZpUYn2l4BTrX3s68V4
+	 zbl3Q0+K8E7DBGsbLUzJK44yLusNLDRU66tlhCkQwfQYIlatzZZ4IiHvu69teewb6Y6ro
+	 w/tgICd+ZOHEMMoZ9dk+lfgASC1A1+rZ1ijQPfN7tEvhtdrRjX8g45G/T7lrBFHG+JlT5
+	 4JDmQfhTEoGbVeV9GSXZam67Qd8weaAmkJN7MZ45j+PHwuBJh+oDynZ+5RyoyniFC/wuG
+	 QO57IJapCioufhcnFswabMnkzz9f8NXKj0rTHsOrx3SQDyG/+4b/J0ON45L+LUMybtQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=dtYbcMk9;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE54606A33B;
-	Mon,  2 Nov 2026 18:32:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1BE54606A33B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SCW3pZSQ;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9EFF606D803
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 18:41:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=dtYbcMk9
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 447D41C14;
-	Mon,  2 Nov 2026 10:32:34 -0800 (PST)
-Received: from [10.57.89.36] (unknown [10.57.89.36])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9CA6C3F673;
-	Mon,  2 Nov 2026 10:32:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793644357; bh=nI0YXxpb9UJqKj3m7hjIKI17k4V7uhAOorjJL+Fywkg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dtYbcMk9SJkWCbo6y4hdjHWxZOwL9CpwtcA2b4elAGjGLsZeaCJN663iacuO5uYbO
-	 XLI0yB1qxIUfPQOvxrnkTtNZ2VAro4Kl3tyrcL3mo936a2wRfsoA2DtOWK2+2IiEU9
-	 mEbbnIYtqLnx8pJ63j9bC3J5QzCb8Ceqa7joSIw4=
-Message-ID: <1a069f22-64ac-44f3-9eb0-bd4b9416d2bf@arm.com>
-Date: Mon, 2 Nov 2026 18:32:34 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SCW3pZSQ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AF831F00A1A;
+	Mon,  2 Nov 2026 18:41:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793644878;
+	bh=1siRmUO4vM6mmsoG9PiDb9+LFZeVOS+fG7WHL62iNvw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=SCW3pZSQiuuCCSRrJEbYUc/Rtta1yJfKnOc7PlPInpy6+CvR4M5f94reuHeIOq20p
+	 eV8ZksdI+7U3MTC+Sh4es8lXO5ej8E2aT8tkViYrN8qSFVLE3GwnoyjZt0/dFAD2kO
+	 qEKyvVrXiwX90O6FW+3NhoBoE5Jdk2WPUt7zPwVx7EuscnxvQMM91BAPfTqx/ZsBs0
+	 jICmqnf5y+TVgNJ8TVmAKljm2/dHOd+v20IedDJmNPVyLs58TgAul6/6u3qehoH6Fd
+	 HjBPxKUCp73f82UApmNo9WkX6JVs8FUW2l9bm/DSxBgjyKlbMpWC2mcioLXMfgdkBH
+	 s80etyyTOYvKQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xNwy4-0000000A2b6-0jFh;
+	Mon, 02 Nov 2026 18:41:16 +0000
+Date: Mon, 02 Nov 2026 18:41:15 +0000
+Message-ID: <86a4nr2i0k.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "Ard Biesheuvel" <ardb@kernel.org>
+Cc: "Fuad Tabba" <fuad.tabba@linux.dev>,
+	"Will Deacon" <will@kernel.org>,
+	"Ard Biesheuvel" <ardb+git@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	"Oliver Upton" <oupton@kernel.org>,
+	"Joey Gouly" <joey.gouly@arm.com>,
+	"Steffen Eiden" <seiden@linux.ibm.com>,
+	"Suzuki K Poulose" <suzuki.poulose@arm.com>,
+	"Zenghui Yu" <yuzenghui@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: Don't livelock when AT can't resolve a fault IPA
+In-Reply-To: <08db10ef-c3d8-44b8-9d80-e7505400bf12@app.fastmail.com>
+References: <20261102094748.2638468-2-ardb+git@google.com>
+	<auiXMN5td-2QlDkd@willie-the-truck>
+	<CA+EHjTxVPyY70Dm+BiwgQQNwx1cJpEKvJBJGZWPCKLx2M8X2FA@mail.gmail.com>
+	<86bj872n1b.wl-maz@kernel.org>
+	<08db10ef-c3d8-44b8-9d80-e7505400bf12@app.fastmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -52,346 +79,109 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 13/16] KVM: arm64: gic-v5: Implement irq forwarding
-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org
-Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
-References: <20261016155741.979985-1-sascha.bischoff@arm.com>
- <20261016155741.979985-14-sascha.bischoff@arm.com>
- <sashiko-outbox-174635@kernel.org>
-Content-Language: en-GB
-From: Sascha Bischoff <sascha.bischoff@arm.com>
-In-Reply-To: <sashiko-outbox-174635@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ardb@kernel.org, fuad.tabba@linux.dev, will@kernel.org, ardb+git@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 16/10/2026 17:25, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 6 potential issue(s) to consider:
-> - [High] kvm: passing full typed INTID to hardware VDPEND instruction
-> - [High] kvm: use of undefined macro kzalloc_obj
-> - [High] kvm: ABBA deadlock due to translation_cache_lock acquired without disabling IRQs
-> - [High] kvm/vgic: TOCTOU race in its_cache_drop_translation disables wrong host IRQ
-> - [Medium] kvm: data race from lockless read of irq->hw bitfield
-> - [Low] cleanup: mixing goto-based cleanup with guard() declarations
-> --
+On Mon, 02 Nov 2026 18:23:09 +0000,
+"Ard Biesheuvel" <ardb@kernel.org> wrote:
 > 
-> commit 3a376f5ffceb9df2e3023c6def306e4b00a9eba1
-> Author: Sascha Bischoff <sascha.bischoff@arm.com>
 > 
->      KVM: arm64: gic-v5: Implement irq forwarding
 > 
->      GICv5, like GICv4, supports direct injection of interrupts via the
->      ITS. Move the existing GICv4 interface behind a common shim that selects
->      the appropriate implementation. For GICv5 forwarding, the ITS driver
->      replaces a host ITTE with one targeting a guest. The host no longer
->      receives that interrupt until forwarding is removed and the host ITTE is
->      restored.
+> On Mon, 2 Nov 2026, at 17:52, Marc Zyngier wrote:
+> > On Mon, 02 Nov 2026 15:57:51 +0000,
+> > Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> >> 
+> >> Hi Will,
+> >> 
+> >> On Mon, 02 Nov 2026 14:17:10 +0000, Will Deacon <will@kernel.org> wrote:
+> >> > On Mon, Nov 02, 2026 at 02:09:25PM +0000, Marc Zyngier wrote:
+> >> > > On Mon, 02 Nov 2026 13:59:12 +0000,
+> >> > > Will Deacon <will@kernel.org> wrote:
+> >> [...]
+> >> > > > > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> >> [...]
+> >> > > > >  static inline bool kvm_hyp_handle_memory_fault(struct kvm_vcpu *vcpu,
+> >> > > > >                                                 u64 *exit_code)
+> >> > > > >  {
+> >> > > > > -        if (!__populate_fault_info(vcpu))
+> >> > > > > +        if (!__populate_fault_info(vcpu)) {
+> >> > > >
+> >> > > > Presumably we need a barrier (DSB?) here, to ensure that the TLBI happens
+> >> > > > after the AT instruction?
+> >> 
+> >> I don't think the TLBI requires a barrier before it, because it
+> >> doesn't matter if the AT's walk allocates entries after the TLBI.
+> >> Anything it allocates matches memory, and the stage-2 descriptor the
+> >> AT faulted on has AF clear, so that descriptor can't be cached:
+> >> 
+> >> R_XCLRD: Translation table entries that generate a Translation
+> >> fault, an Address size fault, or an Access flag fault are never cached
+> >> in a TLB.
+> >> 
+> >> The stale entries the guest keeps hitting were already there before
+> >> the TLBI, and the dsb(nsh) and isb after it are what complete it
+> >> against them.
+> >> 
+> >> [... your other reply ... ]
+> >> > > Alternatively, VMALLE1 or even VAE1 should be enough to get rid of the
+> >> > > S1 TLB.
+> >> >
+> >> > Ah, sorry, VMALLE1 is what I meant to ask about. I basically haven't
+> >> > understood the need to invalidate the stage-2.
+> >> 
+> >> The guest's walk can also go through a stage-2 entry for its
+> >> page-table page, cached before the aging cleared that page's AF, and
+> >> nothing requires the AT to use that entry:
+> >> 
+> >> R_NPZWX: When an address translation instruction is executed, it is
+> >> IMPLEMENTATION DEFINED whether the result can be returned from a TLB,
+> >> or a translation table walk occurs.
+> >> 
+> >> So if my reading is correct, on a CPU whose AT walks memory instead,
+> >> the AT keeps failing while the guest's walk goes through the stale
+> >> entry, and the guest takes the same permission fault again. VMALLE1
+> >> and VAE1 only cover stage 1, so they'd leave that loop in place.
+> >
+> > If we assume that the TLB covers VA->PA (which is a very likely case),
+> > TLBI VAE1 should nuke the permission fault that brought the vcpu to
+> > EL2, and instead walk the page tables, getting the access fault.
+> >
+> > The only case I can imagine where invalidating S2 would matter is if
+> > you are running under NV, because there is an independent S2 TLB (the
+> > shadow S2), and then VMALLS12E1 makes total sense.
+> >
+> > Ard, was this solely observed under NV? Or did you see it on a non NV
+> > guest as well?
+> >
 > 
->> diff --git a/arch/arm64/kvm/vgic/vgic-its-v5.c b/arch/arm64/kvm/vgic/vgic-its-v5.c
->> index 62c1ca8004007..e71cd67652bae 100644
->> --- a/arch/arm64/kvm/vgic/vgic-its-v5.c
->> +++ b/arch/arm64/kvm/vgic/vgic-its-v5.c
-> [ ... ]
->> @@ -31,7 +32,41 @@ static void its_cache_drop_translation(struct kvm *kvm,
->>   				       struct its_cache_translation_entry *entry)
->>   {
->>   	struct vgic_irq *irq = entry->irq;
->> +	unsigned long flags;
->> +	int virq = 0;
->> +	bool hw = false;
->> +	bool drop_forwarding_ref = false;
->>   
->> +	/*
->> +	 * Multiple translations can share an LPI as we have no way of stopping
->> +	 * the guest from doing so. Only the entry associated with direct injection
->> +	 * may tear down the IRQ's forwarding state, as otherwise we can end up
->> +	 * accidentally tearing something down. Realistically, this only would
->> +	 * result in a performance degradation, but we might as well avoid that
->> +	 * in the first place if we can.
->> +	 */
->> +	raw_spin_lock_irqsave(&irq->irq_lock, flags);
->> +	if (irq->forwarding_owner == entry) {
->> +		/* The entry is about to be freed, even if unforwarding fails. */
->> +		irq->forwarding_owner = NULL;
->> +		virq = irq->host_irq;
->> +		hw = irq->hw;
->> +	}
->> +	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
->> +
->> +	if (hw && !WARN_ON_ONCE(gicv5_its_disable_direct_injection(virq))) {
-> 
-> [Severity: High]
-> Is there a TOCTOU race here when the lock is dropped before calling
-> gicv5_its_disable_direct_injection?
-> 
-> While the lock is released, a concurrent host unbind operation could invoke
-> irq_bypass_del_producer, unset the forwarding, and free the host IRQ. The Linux
-> IRQ number could then be immediately reallocated to a different device. When
-> this thread resumes, it would unconditionally disable hardware direct injection
-> for the newly assigned device/VM using the stale virq identifier, potentially
-> causing lost interrupts.
+> No it happens with guests running at EL1 too.
 
-I agree that this is an issue with the commit as posted here. I've 
-re-worked this to keep the lock held while disabling direct injection. 
-This prevents a concurrent unbind from freeing or reusing the host IRQ 
-until we're done with the disable operation. At the point where the lock 
-is release, we no longer use the host IRQ.
+Damn!
 
+> My experiments seem to indicate that on this uarch, the AT instruction
+> does not hit in the TLB, and so it can fail on AF==0 for an IPA that
+> is covered by a S2-only TLB entry (with AF==1 and XN==1 due to lazy exec).
 > 
->> +		raw_spin_lock_irqsave(&irq->irq_lock, flags);
->> +		if (irq->hw && irq->host_irq == virq &&
->> +		    !irq->forwarding_owner) {
->> +			irq->hw = false;
->> +			irq->host_irq = 0;
->> +			drop_forwarding_ref = true;
->> +		}
->> +		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
->> +	}
-> [ ... ]
->> @@ -50,7 +85,8 @@ static void its_cache_drop_removed_translations(struct kvm *kvm,
->>   
->>   static int its_cache_add_translation(struct kvm *kvm, struct vgic_v5_its *its,
->>   				     u32 device_id, u16 event_id,
->> -				     struct vgic_irq *irq)
->> +				     struct vgic_irq *irq,
->> +				     void **owner)
->>   {
->>   	u64 key = ((u64)device_id << 16) | (u64)event_id;
->>   	struct its_cache_translation_entry *entry;
->> @@ -78,6 +114,8 @@ static int its_cache_add_translation(struct kvm *kvm, struct vgic_v5_its *its,
->> +	struct its_cache_translation_entry *old;
->> +	struct hlist_node *tmp;
->> +	HLIST_HEAD(removed);
->>
->> -	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
->> +	entry = kzalloc_obj(*entry, GFP_KERNEL);
-> 
-> [Severity: High]
-> Is kzalloc_obj defined anywhere in the tree? It looks like this might be a
-> typo for kzalloc(sizeof(*entry), GFP_KERNEL) which will cause compilation
-> failures.
+> So after the VAAE1, the S1 walk happily produces the same translation
+> we just invalidated, without taking a S1PTW fault, and the guest faults
+> again on the I-fetch that took us to hyp the first time around.
 
-Uh, yes. I certainly hope so! kzalloc_obj is defined in 
-include/linux/slab.h, which this file includes, and this allocation 
-predates this commit. I'm not fixing this non-issue.
+Ah, I think I see what can happen, even without split TLBs.
 
-> 
->>   	if (!entry)
->>   		return -ENOMEM;
->>   
->>   	entry->key = key;
->>   	entry->irq = irq;
->>   
->> -	raw_spin_lock(&its->translation_cache_lock);
->> +	scoped_guard(raw_spinlock, &its->translation_cache_lock) {
-> 
-> [Severity: High]
-> Should this use the irqsave variant of scoped_guard? Acquiring
-> translation_cache_lock in process context without disabling local hardware
-> interrupts could lead to an ABBA deadlock. If irqfd_wakeup runs in HardIRQ
-> context on a CPU that already holds this lock, the interrupt handler might
-> spin forever trying to acquire it.
+If you have a S2 walk cache that skips the descriptor where AF=0, then
+the TLB refill just succeeds, and the cycle repeats. OK, I'm now
+convinced we need S2 invalidation as well even in the VA->PA case. We
+needed it for NV anyway, but hey...
 
-With the series as posted, this is an issue. Now that I've reworked it 
-to use an XArray to track the translations it is no longer an issue. The 
-lookup is now using RCU for the XArray.
-
-> 
->>   		hash_for_each_possible_safe(its->translation_cache, old, tmp,
->>   					    node, key) {
->>   			if (old->key == key) {
-> [ ... ]
->> @@ -129,7 +167,8 @@ static void its_cache_clear_translations(struct vgic_v5_its *its)
->>   
->>   static int its_cache_look_up_translation(struct vgic_v5_its *its,
->>   					 u32 device_id, u16 event_id,
->> -					 struct vgic_irq **irq)
->> +					 struct vgic_irq **irq,
->> +					 void **owner)
->>   {
->>   	u64 key = ((u64)device_id << 16) | (u64)event_id;
->>   	struct its_cache_translation_entry *entry;
->>
->> -	raw_spin_lock(&its->translation_cache_lock);
->> +	guard(raw_spinlock)(&its->translation_cache_lock);
-> 
-> [Severity: High]
-> Similarly here, acquiring translation_cache_lock without disabling interrupts
-> leaves the system vulnerable to the same ABBA deadlock if the lock is
-> contended by HardIRQ context.
-
-This is the same issue as reported above. The translation_cache_lock has 
-now been removed, and we're not taking any lock on the XArray itself. 
-Therefore, this is no longer an issue with the upcoming repost.
-
-> 
->>   	hash_for_each_possible(its->translation_cache, entry, node, key) {
->>   		if (entry->key == key) {
-> [ ... ]
->> @@ -657,8 +735,8 @@ int vgic_v5_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi)
->>   static void vgic_v5_its_inject_lpi(struct kvm *kvm, struct vgic_irq *irq)
->>   {
->>   	kvm_call_hyp(__vgic_v5_vdpend, irq->intid, true,
->>   		     kvm->arch.vgic.gicv5_vm.vm_id);
->>   }
-> 
-> [Severity: High]
-> Does this pass the full typed INTID directly to the hardware GIC VDPEND
-> instruction?
-> 
-> GICv5 INTIDs encode the type in bits [31:29]. The architecture limits hardware
-> instructions to expecting a raw hardware ID. Should this be masked using
-> vgic_v5_get_hwirq_id(irq->intid) to avoid feeding the type bits into the
-> hardware operand?
-
-Yes, of course this is passing the typed INTID directly to GIC VDPEND! 
-We need to tell the GIC which type of interrupt we are injecting, so 
-that's absolutely by design. We could arguably split this into type and 
-ID, but what's the point? All we'd do is reconstrut that again on the 
-other side.
-
-Leaving this as is.
-
-> 
-> [ ... ]
->> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
->> index c90e00f56b298..970df3f41cf24 100644
->> --- a/arch/arm64/kvm/vgic/vgic-v5.c
->> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> [ ... ]
->> +int kvm_vgic_v5_set_forwarding(struct kvm *kvm, int virq,
->> +			       struct kvm_kernel_irq_routing_entry *irq_entry)
->> +{
->> +	struct vgic_v5_its *its_data;
->> +	struct vgic_irq *irq;
->> +	void *owner;
->> +	bool hw;
->> +	int ret;
->> +
->> +	if (!vgic_has_its(kvm))
->> +		return 0;
->> +
->> +	/* Look up the ITS; bail out if we can't look it up */
->> +	its_data = vgic_v5_get_its(kvm, irq_entry);
->> +	if (IS_ERR(its_data))
->> +		return 0;
->> +
->> +	/*
->> +	 * Look up and cache the translation. Bail out if we failed to look up
->> +	 * the translation at this stage. If the translation becomes valid at a
->> +	 * later stage, we should fall back to software-based injection.
->> +	 */
->> +	guard(mutex)(&its_data->its_lock);
->> +
->> +	ret = vgic_v5_its_resolve_lpi_locked(kvm, its_data,
->> +					     irq_entry->msi.devid,
->> +					     irq_entry->msi.data, &irq, &owner);
->> +	if (ret)
->> +		return 0;
->> +
->> +	scoped_guard(raw_spinlock_irqsave, &irq->irq_lock) {
->> +		hw = irq->hw;
->> +	}
->> +
->> +	if (hw)
->> +		goto out_put_irq;
-> 
-> [Severity: Low]
-> Does this mix goto-based error handling with scope-based cleanup helpers like
-> guard() and scoped_guard()? The kernel cleanup guidelines strongly discourage
-> mixing these in the same function to avoid confusing ownership semantics.
-> Should this function be standardized to use only one of the approaches?
-
-Yeah, agreed that the posted code is confusing and does mix those two 
-styles. I've dropped the gotos and have replaced them with explcit 
-reference drops and returns, instead. The scoped_guard()s remain.
-
-> 
-> [ ... ]
->> +static struct vgic_irq *vgic_v5_host_irq_get_lpi(struct kvm *kvm, int host_irq)
->> +{
->> +	struct vgic_irq *irq;
->> +	unsigned long idx;
->> +
->> +	guard(rcu)();
->> +	xa_for_each(&kvm->arch.vgic.lpi_xa, idx, irq) {
->> +		if (!irq->hw || irq->host_irq != host_irq)
->> +			continue;
-> 
-> [Severity: Medium]
-> Is it safe to locklessly read the irq->hw bitfield here?
-> 
-> This bitfield is modified concurrently by kvm_vgic_v5_set_forwarding and
-> kvm_vgic_v5_unset_forwarding under irq_lock. Concurrent read and write access
-> to a C bitfield is undefined behavior and can result in torn reads or
-> corrupted data.
-
-These now happen under irq_lock, and therefore concurrent updates are no 
-longer possible. We hold the lock when setting up and tearing down the 
-forwarding, so these should not be able to unexpectedly change 
-underneath us.
-
-> 
->> +
->> +		if (!vgic_try_get_irq_ref(irq))
->> +			return NULL;
->> +
->> +		return irq;
->> +	}
->> +
->> +	return NULL;
->> +}
->> +
->> +void kvm_vgic_v5_unset_forwarding(struct kvm *kvm, int virq)
->> +{
->> +	struct vgic_irq *irq;
->> +	bool drop_forwarding_ref = false;
->> +
->> +	if (!vgic_has_its(kvm))
->> +		return;
->> +
->> +	/*
->> +	 * Note: We don't remove the entry from our translation cache here. It
->> +	 * is up to the guest to invalidate the old translations, and hence the
->> +	 * removal path is tied into ITS_INV_DEVICER and ITS_INV_EVENTR, rather
->> +	 * than being explicitly called here.
->> +	 */
->> +	irq = vgic_v5_host_irq_get_lpi(kvm, virq);
->> +	if (!irq)
->> +		return;
->> +
->> +	if (WARN_ON_ONCE(gicv5_its_disable_direct_injection(virq)))
->> +		goto out_put_irq;
->> +
->> +	scoped_guard(raw_spinlock_irqsave, &irq->irq_lock) {
-> 
-> [Severity: Low]
-> This is another instance of mixing goto-based error handling alongside
-> scoped_guard(). Should we convert this completely to scope-based cleanup or
-> stick entirely to traditional goto labels?
-
-I've done the same as I said above - the gotos are now gone and have 
-been replaced with explicit returns instead. scoped_guard() is still 
-used to handle the locking.
-
-> 
->> +		if (irq->hw && irq->host_irq == virq) {
->> +			irq->hw = false;
->> +			irq->host_irq = 0;
->> +			irq->forwarding_owner = NULL;
->> +			drop_forwarding_ref = true;
->> +		}
->> +	}
->> +
->> +	if (drop_forwarding_ref)
->> +		vgic_put_irq(kvm, irq);
->> +
->> +out_put_irq:
->> +	vgic_put_irq(kvm, irq);
->> +}
-> 
+Hopefully this doesn't happen too often.
 
 Thanks,
-Sascha
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
