@@ -1,56 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793650112;
-	b=SiepblLEdLMn3mAXBoZ7HpGf2QJWQ05bZ7V1/CUQoSELEOgqS+jbtBq0DrSqVKaykOdM
-	 9MnwBC9HmIbtKWXucJs6XR+BeHKzReEEUuVk8YDjKxWhAWWDYqySQz+z6+QJTXYCCpL2E
-	 Q1l4dNKG8Dndx4I5w3+MGHl9S/SC//lTFrFJQ/jqBPB6NWXpOlQWPs9vUiqsPzU9nUnZP
-	 yKPaUGEWf2vKpiKMDZa0LzsQoK1KOJQv5+fiUfpJouICgSBI8tGkV1q9bbtcWgHsSYOJt
-	 xBa/TmVYIanPsJdaFkQ70PNfBkfiyydnx7l8Jv2JLl6YfbJnF2ydYKhLy6gQVE3D5UQ==
+	t=1793650458;
+	b=BfYgVoOem0UtH7lws96BoJoeU/pG6+3btJvMKu0OJz8zpIbFJ4BoGOILg6aCynPTe3Zt
+	 OZvg1TchDTnN/cb5tg+Jl0OT3ZxLYzMqCU8gTfbLNdBFVgizvmp0qj9PK7Kf+J66MSJ/Z
+	 uM9MtHx8xFVMB9FlE7dNMYBYU/uPem0L+A1MpL3azErX2q0+RXCtILgf3wmxQ5ypBTOH5
+	 LuBgFC+X2vOWH6yVpb9DFYbc+FgKrT+r8Nj53YT33RXfCqjiK/mGhMa19OwKmvGq4dAOe
+	 FCeRc2/wRPodD8NeMVbxPSWPIooR1LwW8G6cj4Fs8kMwl6o2nVs4Mj7n4L2AJt0Vg/Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793650112;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=wPiOj6Ramt3ftxK4C2lZHrvYb9x8b9IA7sKO2384dFo=;
-	b=05A/kI3/3XfM7TruSPvS2MM9ENIMzcxDKGvIj8GLMNcFtfoGta1vH3xK275ssSLepuqD
-	 +ukmAcJZ/NQ35KN7L9D2+OMD6eSGH5eoeFhFj0poU6tMKGWLqKL0lM06/84GK6kmXbgGE
-	 XS9ZHLKGmdjRJIQPzJBAFB6B9VLAVmrgeuNP0j2vyBUEZmGjkGPcaDz39rSI624VSHxNZ
-	 PMgFNN3k2wyHjC/8fk0pAnuwD2ug5IMzJN/WGcrgkIUeh9790vIMsk6dKXOj3cWZOKoKx
-	 5w+Hw5WB/Cblf9IgVzqeG+AfwJT2wOcibALrCBFL322zpKPNqlGAXVEVXaqJrEdri1A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793650458;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=yV4gHX4gReP9QDDnhEoPhM7XeCQPJJESkGHWythfJxA=;
+	b=0LOj8+eD8ZNv4ODAbSqd/cXLQFV1wFRerx5r2siTyCt6nxLG+PjkBw/+SHoAFJTwUUVC
+	 I0ZYDiX6eSVF9Eper6Ov3vX7A2L1LI+u8nLc0J32qV1SpYh8CegAsdZn8OiK4uelrP+iq
+	 1rZhDEQTZrFLyhCl3BkC1IYKNyZT7f1BTKQ6EhDAMgfTx+JFJeqCqv/SkbYKWH2Knv3WG
+	 Pkl2Ul6ObUYvSEyd1/UCYgRomUv2RlKWEwUGXEyL34KT3CiSaT4tXwJKS4ZTd7j9uRW6S
+	 aPnAcmOugIvdNeVds9IgZ5grgL95IihllREDAxyDWrV4r/+ucBFJlSiV7lzZS+Ydt+A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CqSoXnRP;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2E3606A324;
-	Mon,  2 Nov 2026 20:08:32 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=l51KDHrw;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC0B0606A324
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 20:14:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DC0B0606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CqSoXnRP
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7AF31F00A16;
-	Mon,  2 Nov 2026 20:08:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793650112;
-	bh=wPiOj6Ramt3ftxK4C2lZHrvYb9x8b9IA7sKO2384dFo=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=CqSoXnRPMJgqKQRTji8LJguf4Gk6viJOwdIrrHd+MQeVI6kprG5MOa51HeAcOyYV9
-	 9yrH/vUxcG1gEXwjtmctK2AwBziwDlCLFFOFRxfGmQwK2EtZrue9/A26gntIW1Nljy
-	 k1xFshYZs3Qui0n+qLNO4BukrWh9+/4BE8fFfqFqAa3uLQvhvNeaVNVDEVdOFHLN2j
-	 GZ0NekRLWHAYAEx5lwyhNKUS99IE/9+XqZeXxcFjG7kI9R8Pobb1gqMySz8sj+i5gm
-	 4NdvMB8bb4yF4cdkJI8KlMaAzjj082g0qJ5UqUP5fV6F4hAW4LCofZpc4rdIlh59q7
-	 RtqC3e2lysM+Q==
-Message-ID: <sashiko-outbox-194065@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 05/16] KVM: arm64: gic-v5: Add ITS device skeleton
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sascha Bischoff" <sascha.bischoff@arm.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261102194454.4086911-6-sascha.bischoff@arm.com>
-References: <20261102194454.4086911-1-sascha.bischoff@arm.com>
- <20261102194454.4086911-6-sascha.bischoff@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 02 Nov 2026 20:08:31 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=l51KDHrw
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0F94C1691;
+	Mon,  2 Nov 2026 12:14:14 -0800 (PST)
+Received: from [10.57.89.36] (unknown [10.57.89.36])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F03E13F59E;
+	Mon,  2 Nov 2026 12:14:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793650457; bh=1Hr3ZVUtIeW7dgD+1nWZQR0cyBw0kI0w/o/R3hrCSFw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=l51KDHrwmwrkM4qhYoShz4+k594vXDVvinYdi4cFl7638Y9Sb7hCNWWxBPCc9n9xu
+	 BG7M5j+HTAeRY9yOtkHW17m76hlZVJOuKis6UXm2Zny7GElwPaPmdz9HQYoUhR/lsC
+	 dUE29kpvaQ0+/no1qvVK/fPIOKjTZ9taEwobcA4I=
+Message-ID: <2c6ca334-f188-48fc-8636-c10cacd4c37f@arm.com>
+Date: Mon, 2 Nov 2026 20:14:14 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -59,153 +52,220 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH kvmtool v3 04/21] arm64: Add GICv5 irqchip device support
+To: Vladimir Murzin <vladimir.murzin@arm.com>, will@kernel.org,
+ julien.thierry.kdev@gmail.com
+Cc: maz@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ timothy.hayes@arm.com, Peter Maydell <peter.maydell@linaro.org>
+References: <20261016153939.913764-1-sascha.bischoff@arm.com>
+ <20261016153939.913764-5-sascha.bischoff@arm.com>
+ <c28aad8e-c361-4e25-9fee-ea29a018c785@arm.com>
+Content-Language: en-GB
+From: Sascha Bischoff <sascha.bischoff@arm.com>
+In-Reply-To: <c28aad8e-c361-4e25-9fee-ea29a018c785@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 4 potential issue(=
-s) to consider:
-- [Medium] KVM: arm64: gic-v5: unrestored base address in vgic_v5_register_=
-its_iodev()
-- [Low] KVM: arm64: gic-v5: missing tools UAPI header sync for GICv5 ITS de=
-finitions
-- [Low] KVM: arm64: gic-v5: dead code in vgic_v5_register_its_iodev()
-- [Low] KVM: arm64: gic-v5: stale GICv3 ITS description in commit message
---
+On 22/10/2026 18:56, Vladimir Murzin wrote:
+> On 10/16/26 16:39, Sascha Bischoff wrote:
+>> Add IRQCHIP_GICV5 and create KVM_DEV_TYPE_ARM_VGIC_V5 for it. GICv5
+>> has no distributor or redistributor MMIO frame, so omit those address
+>> attributes. Also omit the GICv2 PPI CPU mask from GICv5 interrupt
+>> specifiers.
+>>
+>> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+>> ---
+>>   arm64/gic.c             | 19 +++++++++++++++----
+>>   arm64/include/kvm/gic.h |  1 +
+>>   2 files changed, 16 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arm64/gic.c b/arm64/gic.c
+>> index f8371f50..5c8a33b5 100644
+>> --- a/arm64/gic.c
+>> +++ b/arm64/gic.c
+>> @@ -189,6 +189,9 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+>>   		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V3;
+>>   		dist_attr.attr  = KVM_VGIC_V3_ADDR_TYPE_DIST;
+>>   		break;
+>> +	case IRQCHIP_GICV5:
+>> +		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V5;
+>> +		break;
+>>   	case IRQCHIP_AUTO:
+>>   		return -ENODEV;
+>>   	}
+>> @@ -208,15 +211,20 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+>>   	case IRQCHIP_GICV3:
+>>   		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &redist_attr);
+>>   		break;
+>> +	case IRQCHIP_GICV5:
+>> +		break;
+>>   	case IRQCHIP_AUTO:
+>>   		return -ENODEV;
+>>   	}
+>>   	if (err)
+>>   		goto out_err;
+>>   
+>> -	err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &dist_attr);
+>> -	if (err)
+>> -		goto out_err;
+>> +	/* Only set the dist_attr for non-GICv5 */
+>> +	if (type != IRQCHIP_GICV5) {
+>> +		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &dist_attr);
+>> +		if (err)
+>> +			goto out_err;
+>> +	}
 
-commit bdded985e667a6d1396b4ac9faceeadebc56557f
-Author: Sascha Bischoff <sascha.bischoff@arm.com>
+Hi Valdimir,
 
-KVM: arm64: gic-v5: Add ITS device skeleton
+> 
+> Given that we had two switch statement for irq type above, this if condition
+> look like complete surprise to my eye :D. Asking for third switch statement is
+> no go - gic__create_device() is already crowded. OTOH, I like approach of
+> gic__create_msi_frame(), so what do you think about some refactoring (perhaps
+> in separate patch), like
+> 
+> static int gic__set_cpu_if(enum irqchip_type type)
+> {
+>          u64 cpu_if_addr = ARM_GIC_CPUI_BASE;
+>          struct kvm_device_attr cpu_if_attr = {
+>                  .group  = KVM_DEV_ARM_VGIC_GRP_ADDR,
+>                  .attr   = KVM_VGIC_V2_ADDR_TYPE_CPU,
+>                  .addr   = (u64)(unsigned long)&cpu_if_addr,
+>          };
+> 
+>          switch (type) {
+>          case IRQCHIP_GICV2M:
+>          case IRQCHIP_GICV2:
+>                  return ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &cpu_if_attr);
+>          default:        /* No CPUIF needed */
+>                  return 0;
+>          }
+> }
+> 
+> static int gic__set_redist(enum irqchip_type type)
+> {
+>          struct kvm_device_attr redist_attr = {
+>                  .group  = KVM_DEV_ARM_VGIC_GRP_ADDR,
+>                  .attr   = KVM_VGIC_V3_ADDR_TYPE_REDIST,
+>                  .addr   = (u64)(unsigned long)&gic_redists_base,
+>          };
+> 
+>          switch (type) {
+>          case IRQCHIP_GICV3_ITS:
+>          case IRQCHIP_GICV3:
+>                  return ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &redist_attr);
+>          default:        /* No redist needed */
+>                  return 0;
+>          }
+> }
+> 
+> static int gic__set_dist(enum irqchip_type type)
+> {
+>          u64 dist_addr = ARM_GIC_DIST_BASE;
+>          struct kvm_device_attr dist_attr = {
+>                  .group  = KVM_DEV_ARM_VGIC_GRP_ADDR,
+>                  .addr   = (u64)(unsigned long)&dist_addr,
+>          };
+> 
+>          switch (type) {
+>          case IRQCHIP_GICV2M:
+>          case IRQCHIP_GICV2:
+>                  dist_attr.attr  = KVM_VGIC_V2_ADDR_TYPE_DIST;
+>                  return ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &dist_attr);
+>          case IRQCHIP_GICV3_ITS:
+>          case IRQCHIP_GICV3:
+>                  dist_attr.attr  = KVM_VGIC_V3_ADDR_TYPE_DIST;
+>                  return ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &dist_attr);
+>          default:        /* No dist needed */
+>                  return 0;
+>          }
+> }
+> 
+> static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+> {
+> ...
+>          gic_fd = gic_device.fd;
+> 
+>          err = gic__set_cpu_if(type);
+>          if (err)
+>                  goto out_err;
+> 
+>          err = gic__set_redist(type);
+>          if (err)
+>                  goto out_err;
+> 
+>          err = gic__set_dist(type);
+>          if (err)
+>                  goto out_err;
+> 
+>          err = gic__create_msi_frame(kvm, type, gic_msi_base);
+>          if (err)
+>                  goto out_err;
+> ...
+> }
+> > You might also notice that gic_msi_base is global, so maybe there
+> is no point keep it as function argument ;)
+> 
 
-This commit introduces the initial KVM device plumbing for a GICv5 ITS,
-including the UAPI device type and address attribute, struct vgic_v5_its
-state, and a RAZ/WI MMIO region placeholder registered when userspace sets
-the ITS base address.
+I think that this is a great suggestion. I've made the change and the 
+series is so much better because of it. It is a lot more readable now, 
+even if some of these gic__set_x() functions only do one thing, it helps 
+to separate them out into something much more readable.
 
->     KVM: arm64: gic-v5: Add ITS device skeleton
->    =20
->     Introduce the basic KVM device plumbing for a GICv5 ITS. This adds the
->     GICv5 ITS device type and address attribute, registers the device ops,
->     and wires a GICv5 ITS IODEV into the generic VGIC MMIO dispatch path.
->    =20
->     Add struct vgic_v5_its to hold the ITS base address, the IODEV plumbi=
-ng,
->     the backing KVM device pointer, and the general ITS mutex. Allocate t=
-his
->     state from the KVM device create path, initialise the mutex and base
->     address, and mark the VM as having an ITS. GICv5 MSIs require a Devic=
-eID,
->     so set msis_require_devid when the ITS is created.
->    =20
->     Record the VGIC model required by an ITS and reject mismatched device
->     creation in either order. Check GICv3 ITS creation as well, so the two
->     ITS models cannot be combined in one VM.
->    =20
->     The MMIO region is registered once userspace provides the ITS base
->     address through KVM_VGIC_V5_ADDR_TYPE_ITS. For now the IODEV only
->     provides a RAZ/WI placeholder region; the actual ITS register emulati=
-on
->     is added separately.
->    =20
->     Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+Thank you for suggesting this.
 
-[Severity: Low]
-This isn't a bug, but is the third paragraph of the commit message stale?
-struct vgic_dist::its_model, the check in kvm_vgic_create(), and the GICv3
-ITS creation check in vgic_its_create() were already introduced in commit
-05620a314219 ("KVM: arm64: vgic: Require matching VGIC and ITS models"),
-whereas this commit only checks and sets its_model in vgic_v5_its_create().
+>>   
+>>   	err = gic__create_msi_frame(kvm, type, gic_msi_base);
+>>   	if (err)
+>> @@ -290,6 +298,8 @@ int gic__create(struct kvm *kvm, enum irqchip_type type)
+>>   		gic_redists_base = ARM_GIC_DIST_BASE - gic_redists_size;
+>>   		gic_msi_base = gic_redists_base - gic_msi_size;
+>>   		break;
+>> +	case IRQCHIP_GICV5:
+>> +		break;
+>>   	default:
+>>   		return -ENODEV;
+>>   	}
+>> @@ -440,7 +450,8 @@ u32 gic__get_fdt_irq_cpumask(struct kvm *kvm)
+>>   {
+>>   	/* Only for GICv2 */
+>>   	if (kvm->cfg.arch.irqchip == IRQCHIP_GICV3 ||
+>> -	    kvm->cfg.arch.irqchip == IRQCHIP_GICV3_ITS)
+>> +	    kvm->cfg.arch.irqchip == IRQCHIP_GICV3_ITS ||
+>> +	    kvm->cfg.arch.irqchip == IRQCHIP_GICV5)
+>>   		return 0;
+> 
+> Nitpick: maybe we can take advantage of order of irqchip_type and do
+> 
+> 	/* Only for GICv2 */
+> 	if (kvm->cfg.arch.irqchip >= IRQCHIP_GICV3)
+> 		return 0;
 
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/=
-asm/kvm.h
-> index 65ee09bd14636..8c701173a2d88 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -99,8 +99,10 @@ struct kvm_regs {
-> =20
->  /* Supported VGICv5 address types  */
->  #define KVM_VGIC_V5_ADDR_TYPE_IRS	6
-> +#define KVM_VGIC_V5_ADDR_TYPE_ITS	7
-> =20
->  #define KVM_VGIC_V5_IRS_SIZE		(2 * SZ_64K)
-> +#define KVM_VGIC_V5_ITS_SIZE		(2 * SZ_64K)
-> =20
->  #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
->  #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
+Done.
 
-[Severity: Low]
-Should tools/arch/arm64/include/uapi/asm/kvm.h also be updated with
-KVM_VGIC_V5_ADDR_TYPE_ITS and KVM_VGIC_V5_ITS_SIZE so that
-tools/perf/check-headers.sh does not report an out-of-sync header warning
-during tools builds?
+> 
+> Thanks
+> Vladimir
+> 
+>>   
+>>   	if (kvm->nrcpus > 8)
+>> diff --git a/arm64/include/kvm/gic.h b/arm64/include/kvm/gic.h
+>> index 8490cca6..630f0bbd 100644
+>> --- a/arm64/include/kvm/gic.h
+>> +++ b/arm64/include/kvm/gic.h
+>> @@ -29,6 +29,7 @@ enum irqchip_type {
+>>   	IRQCHIP_GICV2M,
+>>   	IRQCHIP_GICV3,
+>>   	IRQCHIP_GICV3_ITS,
+>> +	IRQCHIP_GICV5,
+>>   };
+>>   
+>>   struct kvm;
+>> -- 2.34.1
+>>
+> 
 
-[ ... ]
-
-> diff --git a/arch/arm64/kvm/vgic/vgic-its-v5.c b/arch/arm64/kvm/vgic/vgic=
--its-v5.c
-> new file mode 100644
-> index 0000000000000..5790b029f09b6
-> --- /dev/null
-> +++ b/arch/arm64/kvm/vgic/vgic-its-v5.c
-> @@ -0,0 +1,186 @@
-
-[ ... ]
-
-> +static int vgic_v5_register_its_iodev(struct kvm *kvm, struct vgic_v5_it=
-s *its,
-> +				      u64 addr)
-> +{
-> +	struct vgic_io_device *iodev =3D &its->iodev;
-> +	int ret;
-> +
-> +	mutex_lock(&kvm->slots_lock);
-> +	if (!IS_VGIC_ADDR_UNDEF(its->vgic_v5_its_base)) {
-> +		ret =3D -EBUSY;
-> +		goto out;
-> +	}
-> +
-> +	if (!IS_ALIGNED(addr, SZ_64K)) {
-> +		kvm_err("ITS Base address is not aligned to 64k\n");
-> +		ret =3D -EINVAL;
-> +		goto out;
-> +	}
-> +
-> +	its->vgic_v5_its_base =3D addr;
-> +	iodev->base_addr =3D addr;
-> +	iodev->regions =3D vgic_v5_its_registers;
-> +	iodev->nr_regions =3D ARRAY_SIZE(vgic_v5_its_registers);
-> +	iodev->iodev_type =3D IODEV_GICV5_ITS;
-> +	iodev->redist_vcpu =3D NULL;
-> +	iodev->v5its =3D its;
-
-[Severity: Low]
-This isn't a bug, but since vgic_v5_its_set_attr() is the only caller of
-vgic_v5_register_its_iodev() and already checks SZ_64K alignment in
-vgic_check_iorange(), is the !IS_ALIGNED(addr, SZ_64K) check here needed?
-
-Also, redist_vcpu and v5its are members of the same anonymous union in
-struct vgic_io_device, so setting iodev->redist_vcpu =3D NULL is immediately
-overwritten by iodev->v5its =3D its.
-
-> +	kvm_iodevice_init(&iodev->dev, &kvm_io_gic_ops);
-> +
-> +	ret =3D kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, iodev->base_addr,
-> +				      KVM_VGIC_V5_ITS_SIZE, &iodev->dev);
-> +out:
-> +	mutex_unlock(&kvm->slots_lock);
-> +
-> +	return ret;
-> +}
-
-[Severity: Medium]
-If kvm_io_bus_register_dev() fails in vgic_v5_register_its_iodev() (for
-example with -ENOMEM or -ENOSPC), should its->vgic_v5_its_base be reset to
-VGIC_ADDR_UNDEF before returning?
-
-Leaving its->vgic_v5_its_base set to addr on failure causes
-vgic_v5_its_get_attr() to report the address as configured even though the
-MMIO device was never registered on KVM_MMIO_BUS, and causes any subsequent
-retry of KVM_SET_DEVICE_ATTR via vgic_v5_its_set_attr() to fail with
--EEXIST in vgic_check_iorange().
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261102194454.4086=
-911-1-sascha.bischoff@arm.com?part=3D5
+Thanks,
+Sascha
