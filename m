@@ -1,74 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.70
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.69
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793652445;
-	b=wDHZ/0s7RQ1dF9gnc/gRHLnVMT4Pfx6wKqno5kWJuvUTwcBqajhmFZIsfc3UkC2TiymO
-	 N9iP0RQir2rcvo/BY3wOACDmlolqlSt0SnjhUGmd1m/ISNUKQQNMY2+I2tJfs31Xp5eLb
-	 U9aZlC1mkKQXXO+AHpK6k6Ov+C8Axbze/3wGIzBc5oHX2mONUVX9btmIWCggCsQtIWHpK
-	 etbjf48jj756SmZ/9vy5O2UmRRZugpfoM2YRMESHknefpbIBVGpzSNtL0IOqu5Qzf5ssS
-	 eWx/eCJV0OH4UIgxytkzgqtqfEYTCHHTn0wMLqeHBp284kHBzxZF3rnWmo+GI4xF3Hg==
+	t=1793652447;
+	b=t3ZgoHF2rHSroqVu4xtTrjeSdMghcOCktN1ujffgmjtsYD4ER/IsWdoKGXZQE8pEqA40
+	 MlhRmQxlkhwOsV6Z5ScEAJt6XC2mR7QYBCX3D/icwAjDKYexBXoSFN2+WZt/qkt4oRIKd
+	 D0B7F1eHxq66uuRxd6LZCU3L0mweU9VAGSj3AIDAR2FEhx/Npy5GsGo9WtlnD3JB6suT9
+	 Tl8VVUcGfA2L9cng041zAi0WaxwbVRoAUI6F3hxv7RkwPIRYgYz59iwILKSQOoYw5TN+2
+	 DYgCj0H+4GYb51QykuhlcL3Hqgz78MU4s83WNO+LEUbBSE0EZU6R2ZFui33RPniGX9w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793652445;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793652447;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
 	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
 	 Content-Type;
-	bh=kVp/0GTX/TyDJlLVG6qMhJVaGtnr4QyC8tDer4ir+Gc=;
-	b=29A5z+rmwZCPvXW+QaQiRC4g+N/T5N+Ofu/E0bRkTw63Yze1Y8q+3Hw6S5H0EsJpvV6/
-	 /qwTrdaUQEjNHc7o0ZmtnMrMG3OosLzm7NE+xc5LbMJm0IuccaaZRCpep8jNh4YMPibHq
-	 xcD9ooeXu5gHHzeqnqWgYK2xMJK+2e2oZCTrwBm4s0GYJsOy+p8lfW55NEJnhp97aFd/T
-	 69Hh891vq2coeklOhsxMdR/oWHvWK2YZVoWteOiuCOBJWaegZ2EnfeTtDK1jdl7rrkhVN
-	 BkpxCfnyDvryM/m7xOyWRBXAMryKkHn2E6Jfx4x3P+75lbx8IkJPB2Eoxu8WQBquyoA==
+	bh=vvL2Ie8/QPWYQD4V2guIi0wkBoonvwzrKKwfja3Hjq8=;
+	b=1eDcJHJjatUOtOjglEwrhZFouxiQA40dNNphCCXcIjZGEdW4+K+heIwd5DQq7uav0RrV
+	 1OHLojqH/ytZqQEbCF8S9Ml30qCx9stZHQZ00eumSca2JgIwHJhqYgS9GYtNjK1Nn6QOl
+	 qb6sQH8H6NW0cLFw+bm5Cop6BnBf19HG/ZxR1XBR19UZBEJULzArx11qVaBZTGRnhTuWj
+	 CNzxNvqFgt/di8dNlPugjPOqrCxw7SjPheE2rUf7pGvAJ+uDLQaeeO0j+7fz22a8lVD3a
+	 p5zA/Pi0htIYcMGLB4Bbd7eyAlsY0EH+/s2NRdwd6xKSiRTMJJmijlDHg72wl/2fhVg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=oVxc+pxZ;
-	arc=none smtp.remote-ip=209.85.128.70
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=m7PDxpqk;
+	arc=none smtp.remote-ip=209.85.128.69
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835D6606A326
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 20:47:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 835D6606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C956606A326
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 20:47:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9C956606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=oVxc+pxZ
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4a359c7f47bso30944635e9.2
-        for <kvmarm@lists.linux.dev>; Mon, 02 Nov 2026 12:47:25 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=m7PDxpqk
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4a318cd95e8so304455e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 02 Nov 2026 12:47:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1793652444; x=1794257244; darn=lists.linux.dev;
+        d=google.com; s=20260707; t=1793652445; x=1794257245; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=kVp/0GTX/TyDJlLVG6qMhJVaGtnr4QyC8tDer4ir+Gc=;
-        b=oVxc+pxZwO3BSIocvYfpvdJeRR/o6g2pZ/u54dVciTX64Sra1SjXUZyCkKLYln+K5A
-         bNJvL6vnIw58y+zMPBvyCsoN6/WBEEqcVtNCMnZzoN144iLJB1ycgMP8KwgpeLUgqIEE
-         SPqAObrwjHY4GwEBLBQU4pxU5CfdtZ384iKeE9K3nnuVDdfa2nBVYQKXBYnPbl1gwQiR
-         3z5rpdrrHrpPQ2hqsr4CjyIG2R6jFnlVza7WNj8AA6Nx0sCzNX4aZa5c64dhnAqqQUIW
-         UH6Fb7kMqvvgfrkI5s6Ng28NbnalHj8kxmTILBA8KVMU8Bqg7qrjszjtPZ91/fvweugy
-         0OVw==
+        bh=vvL2Ie8/QPWYQD4V2guIi0wkBoonvwzrKKwfja3Hjq8=;
+        b=m7PDxpqkvooZEZH8UUT7pYMqYM/9lvLI992GsOOq/uv57dlezcxoyREJNayMTmy1u5
+         aEF1wSlOSudYr0v0vm8DAnedZak1yzD8Tj2iRv5QtbmsAIAjLb+oBPOZYtS1ggGDcwXd
+         o6MotLUcUcSLmiF+V8dVRt37h8pIUIMhVI2/FZcqK0om7pv07WqFnkCCbzAn8P+z3DZx
+         n4TnzJlpFs7gCpjL5hKI9LQcoZ2cEmw6zJCfAs1Pu0i+YQSY9w2w8iqLr+bCQCEZPTDQ
+         sOsI0vVQ3TC8fIhG1VgBZ9pOkM5341OsMuLJ8S6xmAvSsetPYt0MtzGiV3v+bJjfs53l
+         S3YQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793652444; x=1794257244;
+        d=1e100.net; s=20260707; t=1793652445; x=1794257245;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=kVp/0GTX/TyDJlLVG6qMhJVaGtnr4QyC8tDer4ir+Gc=;
-        b=Glo5Q3IWPL55wnahBOPD9rOJw3K4ARSrDhMHhcuLKCfqSTRsPstnT26tXy8NBfbdmO
-         NKPi8tew8DUe8ujxbSXXiRIrhpnICm0oQP0XMaQ3IXB+NdDlDmC6MkeInw2BiNE+llNR
-         tSfaXK0XYKTPclUYLnRHZ5WIm2gIuURuuAg7Rwu78FOfMk5hklY0NbHCgjIKbrx5cay5
-         AbELdS5PO4JorYXiQ3TlEQkGxRYf7dbN5a/zp5FKof0KWU9J3H/vrX9MeWeTowEM59ON
-         wfTtZRtSZgnuBMSvQQaO0mwzGVLl7C2S3xwwrNK3SBkgA4Yv3Y0glA6KRZxwC5DCW9UR
-         oURg==
-X-Forwarded-Encrypted: i=1; AKwUvBzivvPkue6qmGVyRZBSTPl2LOCmSCHxgQVzfV2ugyE8n5X+5V0NHhv0HVthbQg6+rZKpCaHY2I=@lists.linux.dev
-X-Gm-Message-State: AFq9FYLfkjmQssvbZPB2fcsAi6DK3x6F8AeQo86lrS2Q65xLUQ8jnlpy
-	HNJLJ0OWA2MP/4jK78YcmtqACdfTx31lOOQeLaJw2D0ghxTSZR8gPUrtGoKNn5v4eMm7Y7e2Bns
-	6heShJZBP5pxMyiIVoAkmLA==
-X-Received: from wrwc14.prod.google.com ([2002:a5d:63ce:0:b0:48b:273:b184])
+        bh=vvL2Ie8/QPWYQD4V2guIi0wkBoonvwzrKKwfja3Hjq8=;
+        b=Cb4pDHv/ByXBajZyOFVNIA48JdjxNf9DKmf9ix8EEsDuRbZRd0XlMSKmBY2PLdOVCJ
+         iD3+2D8R5CNik5hhKKtZdseWvFhLyEXvsj1ZYhwm2DdZRBE7V2IAl60th/ZHncvNS3/f
+         9TlKH1Mi7PT15/PwGJuWxiYVVxRTkaReMCokEcU4M4DxLDabrRAAxYriGw1b5noeERd5
+         IXC/BuDEX33CtbYyjVMYR0/OtTN1pL3/LnvOZNkYV44B6e2ehVJ8B5Z5BZw+wx5hQNdb
+         g7tTblE7Vn/3VB+eoPlYacVbocrhmdF6LpIghC/19+/FyZgbexn0L8vPxP2k665rNP0w
+         VhIA==
+X-Forwarded-Encrypted: i=1; AKwUvByLKEkWOHWaQvJpSBJ8TkklJBCeKYQHW43vVaSwFHPk/xbqjf9aAodOnyYZTqhOYp+hT0oeb+Q=@lists.linux.dev
+X-Gm-Message-State: AFq9FYIdg9IrESgoQY39L38ZLTVpejWKEcn7rncabLQzn4WjDdtfkjr0
+	vreKn7rO8Hm4+KsuKvCpsjfzXcv9FJeyZT3G0YbcllnWn0GVDYmzYLp2gfZNRV+zPcQAZmWwDPK
+	kmsLdry/ir/1fOle+xHowGw==
+X-Received: from wrpb10.prod.google.com ([2002:adf:f24a:0:b0:48c:41d4:a0ef])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:4e50:b0:4a9:2a92:231f with SMTP id 5b1f17b1804b1-4ac16bc461emr257883815e9.7.1793652443932;
- Mon, 02 Nov 2026 12:47:23 -0800 (PST)
-Date: Mon,  2 Nov 2026 20:46:26 +0000
+ 2002:a05:600c:6285:b0:4a1:c6f5:2450 with SMTP id 5b1f17b1804b1-4ac180f07d1mr278924195e9.17.1793652445029;
+ Mon, 02 Nov 2026 12:47:25 -0800 (PST)
+Date: Mon,  2 Nov 2026 20:46:27 +0000
 In-Reply-To: <20261102204628.401871-1-vdonnefort@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,8 +81,9 @@ Precedence: list
 Mime-Version: 1.0
 References: <20261102204628.401871-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.56.0.385.gac671c819a-goog
-Message-ID: <20261102204628.401871-22-vdonnefort@google.com>
-Subject: [PATCH v3 21/23] KVM: arm64: Add PKVM_HYP_REQ_SPLIT
+Message-ID: <20261102204628.401871-23-vdonnefort@google.com>
+Subject: [PATCH v3 22/23] KVM: arm64: Raise PKVM_HYP_REQ_SPLIT on guest to
+ host sharing
 From: Vincent Donnefort <vdonnefort@google.com>
 To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -92,264 +93,115 @@ Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
 	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-With the upcoming support for stage-2 huge mappings for protected VMs,
-we need a way to split blocks. Since the host has its own "copy" of the
-guest stage-2 in the pkvm_mappings rb-tree, the split must be done
-simultaneously for both that tree and the guest stage-2. Therefore the
-hypervisor can't do it on its own and must rely on the host for this
-operation.
+Pages shared by the guest with the host are annotated into the guest
+stage-2. If the shared page is backed by a huge mapping, we need to
+split it first.
 
-Create a pKVM hypervisor request to ask the host to split a specified
-region of the guest. On this request, the host can synchronise the split
-of both guest stage-2 (HVC __pkvm_host_split_guest) and the
-pkvm_mappings tree. It ensures a concurrent VM teardown can't observe a
-PMD_SIZE pkvm_mapping while the guest stage-2 is PAGE_SIZE.
+Raise a PKVM_HYP_REQ_SPLIT for the host on the guest HVC MEM_SHARE, if a
+block exists (-E2BIG) and replay the HVC (by rewinding the ELR).
+
+At the moment, the guest HVC MEM_SHARE is single-page only. This means
+unsharing is ensured to find a PTE-level mapping. However, as this will
+most likely be extended later, raise the same PKVM_HYP_REQ_SPLIT on the
+guest HVC MEM_UNSHARE.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h |   5 +
- arch/arm64/include/asm/kvm_pkvm.h |   5 +-
- arch/arm64/kvm/pkvm.c             | 148 ++++++++++++++++++++++++++++++
- arch/arm64/kvm/trace_pkvm.h       |   4 +-
- 4 files changed, 160 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/pkvm.c | 43 ++++++++++++++++++++++++++++++----
+ 1 file changed, 38 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 0161bcb8123b..c68693509c1e 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -142,6 +142,7 @@ enum pkvm_hyp_req_type {
- 	PKVM_HYP_NO_REQ = 0,
- 	PKVM_HYP_REQ_HYP_ALLOC,
- 	PKVM_HYP_REQ_HYP_ALLOC_SELFTEST,
-+	PKVM_HYP_REQ_SPLIT,
- 	__PKVM_HYP_REQ_TYPE_MAX,
- };
- 
-@@ -154,6 +155,10 @@ struct pkvm_hyp_req {
- 		struct {
- 			u32	nr_pages;
- 		} mem;
-+		struct {
-+			u32	nr_pages;
-+			u64	gfn;
-+		} split;
- 		struct {
- 			/* Helper for SMCCC encoding/decoding */
- 			u8	args[PKVM_HYP_REQ_SMCCC_ARG_SIZE_MAX];
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index 3e51337f2d9e..5676eed1c71e 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -222,7 +222,10 @@ static inline size_t pkvm_host_sve_state_size(void)
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index d92f4da1c180..6c126fcc3831 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -1169,16 +1169,34 @@ static u64 __pkvm_memshare_page_req(struct kvm_vcpu *vcpu, u64 ipa)
+ 	return ARM_EXCEPTION_TRAP;
  }
  
- struct pkvm_mapping {
--	struct rb_node node;
-+	union {
-+		struct rb_node node;
-+		struct list_head list;
-+	};
- 	u64 gfn;
- 	u64 pfn;
- 	struct {
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index c55b6d442d0e..58ca7ffa68e3 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -488,6 +488,64 @@ INTERVAL_TREE_DEFINE(struct pkvm_mapping, node, u64, __subtree_last,
- 		       });									\
- 	    )
- 
-+static void pkvm_mapping_free_spares(struct list_head *spares)
++static u64 pkvm_request_split(struct pkvm_hyp_vcpu *hyp_vcpu, u64 gfn, u64 nr_pages)
 +{
-+	struct pkvm_mapping *m, *tmp;
++	struct pkvm_hyp_req *req = &hyp_vcpu->host_vcpu->arch.pkvm_hyp_req;
++	u64 elr;
 +
-+	list_for_each_entry_safe(m, tmp, spares, list) {
-+		list_del(&m->list);
-+		kfree(m);
-+	}
++	req->type = PKVM_HYP_REQ_SPLIT;
++	req->split.gfn = gfn;
++	req->split.nr_pages = nr_pages;
++
++	/* Rewind the ELR so we return to the HVC once the block is split */
++	elr = read_sysreg(elr_el2);
++	elr -= 4;
++	write_sysreg(elr, elr_el2);
++
++	return ARM_EXCEPTION_PKVM_HYP_REQ;
 +}
 +
-+static int pkvm_mapping_alloc_spares(struct list_head *head, u64 nr_spares)
-+{
-+	struct pkvm_mapping *m;
-+
-+	while (nr_spares--) {
-+		m = kzalloc_obj(*m, GFP_KERNEL_ACCOUNT);
-+		if (!m) {
-+			pkvm_mapping_free_spares(head);
-+			return -ENOMEM;
-+		}
-+
-+		list_add(&m->list, head);
-+	}
-+
-+	return 0;
-+}
-+
-+static void pkvm_mapping_split(struct pkvm_mapping *mapping, struct kvm_pgtable *pgt,
-+			       struct list_head *spares)
-+{
-+	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
-+	u64 nr_pages = mapping->nr_pages - 1;
-+	gfn_t gfn = mapping->gfn + 1;
-+	u64 pfn = mapping->pfn + 1;
-+
-+	lockdep_assert_held_write(&kvm->mmu_lock);
-+
-+	pkvm_mapping_remove(mapping, &pgt->pkvm_mappings);
-+	mapping->nr_pages = 1;
-+	pkvm_mapping_insert(mapping, &pgt->pkvm_mappings);
-+
-+	while (nr_pages--) {
-+		struct pkvm_mapping *m;
-+
-+		if (WARN_ON(list_empty(spares)))
-+			break;
-+
-+		m = list_first_entry(spares, struct pkvm_mapping, list);
-+		list_del(&m->list);
-+
-+		m->nr_pages = 1;
-+		m->gfn = gfn++;
-+		m->pfn = pfn++;
-+
-+		pkvm_mapping_insert(m, &pgt->pkvm_mappings);
-+	}
-+}
-+
- int pkvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
- 			     struct kvm_pgtable_mm_ops *mm_ops)
+ static bool pkvm_memshare_call(u64 *ret, struct kvm_vcpu *vcpu, u64 *exit_code)
  {
-@@ -753,6 +811,73 @@ int pkvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 	return -EINVAL;
- }
+ 	struct pkvm_hyp_vcpu *hyp_vcpu;
+ 	u64 ipa = smccc_get_arg1(vcpu);
++	u64 gfn = hyp_phys_to_pfn(ipa);
  
-+/*
-+ * Splitting is only expected on the back of a guest HVC, while
-+ * pkvm_pgtable_stage2_split() can be called with dirty logging.
-+ */
-+static int __pkvm_pgtable_stage2_split(struct kvm_vcpu *vcpu, phys_addr_t ipa, u64 size)
-+{
-+	struct kvm_hyp_memcache *mc = &vcpu->arch.stage2_mc;
-+	struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
-+	struct pkvm_mapping *mapping;
-+	struct kvm *kvm = vcpu->kvm;
-+	struct list_head spares;
-+	u64 nr_pages;
-+	int ret;
-+
-+	if (WARN_ON(!kvm_vm_is_protected(kvm)))
-+		return -EINVAL;
-+
-+	if (!IS_ALIGNED(ipa, PMD_SIZE) || size != PMD_SIZE)
-+		return -EINVAL;
-+
-+	ret = topup_hyp_memcache(mc, 1);
-+	if (ret)
-+		return ret;
-+
-+	/* We already have 1 pin on the huge-page */
-+	nr_pages = (size / PAGE_SIZE) - 1;
-+
-+	INIT_LIST_HEAD(&spares);
-+	ret = pkvm_mapping_alloc_spares(&spares, nr_pages);
-+	if (ret)
-+		return ret;
-+
-+	write_lock(&kvm->mmu_lock);
-+
-+	mapping = pkvm_mapping_iter_first(&pgt->pkvm_mappings, ipa, ipa + size - 1);
-+	if (!mapping) {
-+		ret = -EPERM;
-+		goto unlock_mmu;
-+	} else if (mapping->nr_pages == 1) {
-+		/* We've raced with another vCPU */
-+		ret = 0;
-+		goto unlock_mmu;
-+	} else if (mapping->nr_pages * PAGE_SIZE != PMD_SIZE) {
-+		ret = -EINVAL;
-+		goto unlock_mmu;
-+	}
-+
-+	ret = folio_add_pins(page_folio(pfn_to_page(mapping->pfn)), nr_pages);
-+	if (ret)
-+		goto unlock_mmu;
-+
-+	ret = kvm_call_hyp_nvhe(__pkvm_host_split_guest, gpa_to_gfn(ipa), size / PAGE_SIZE);
-+	if (ret) {
-+		for (int i = 0; i < nr_pages; i++)
-+			unpin_user_page(pfn_to_page(mapping->pfn + 1 + i));
-+		goto unlock_mmu;
-+	}
-+
-+	pkvm_mapping_split(mapping, pgt, &spares);
-+
-+unlock_mmu:
-+	write_unlock(&kvm->mmu_lock);
-+	pkvm_mapping_free_spares(&spares);
-+
-+	return ret;
-+}
-+
- /*
-  * Forcefully reclaim a page from the guest, zeroing its contents and
-  * poisoning the stage-2 pte so that pages can no longer be mapped at
-@@ -765,6 +890,23 @@ bool pkvm_force_reclaim_guest_page(phys_addr_t phys)
- 	return !ret || ret == -EAGAIN;
- }
+ 	if (!PAGE_ALIGNED(ipa))
+ 		goto out_guest;
  
-+static int pkvm_hyp_req_handle_split(struct kvm_vcpu *vcpu, u64 gfn, u64 nr_pages)
-+{
-+	phys_addr_t addr = ALIGN_DOWN(gfn << PAGE_SHIFT, PMD_SIZE);
-+	phys_addr_t end = ALIGN((gfn + nr_pages) << PAGE_SHIFT, PMD_SIZE);
-+
-+	while (addr < end) {
-+		int ret = __pkvm_pgtable_stage2_split(vcpu, addr, PMD_SIZE);
-+
-+		if (ret)
-+			return ret;
-+
-+		addr += PMD_SIZE;
-+	}
-+
-+	return 0;
-+}
-+
- static int pkvm_handle_hyp_req(struct pkvm_hyp_req *req, struct kvm_vcpu *vcpu)
- {
- 	int ret = -EINVAL;
-@@ -776,6 +918,12 @@ static int pkvm_handle_hyp_req(struct pkvm_hyp_req *req, struct kvm_vcpu *vcpu)
- 	case PKVM_HYP_REQ_HYP_ALLOC_SELFTEST:
- 		ret = pkvm_hyp_topup(PKVM_TOPUP_HYP_ALLOC_SELFTEST, req->mem.nr_pages);
- 		break;
-+	case PKVM_HYP_REQ_SPLIT:
-+		if (WARN_ON_ONCE(!vcpu))
-+			break;
-+
-+		ret = pkvm_hyp_req_handle_split(vcpu, req->split.gfn, req->split.nr_pages);
-+		break;
+ 	hyp_vcpu = container_of(vcpu, struct pkvm_hyp_vcpu, vcpu);
+-	switch (__pkvm_guest_share_host(hyp_vcpu, hyp_phys_to_pfn(ipa), 1)) {
++	switch (__pkvm_guest_share_host(hyp_vcpu, gfn, 1)) {
+ 	case 0:
+ 		ret[0] = SMCCC_RET_SUCCESS;
+ 		goto out_guest;
+@@ -1189,6 +1207,9 @@ static bool pkvm_memshare_call(u64 *ret, struct kvm_vcpu *vcpu, u64 *exit_code)
+ 		 */
+ 		*exit_code = __pkvm_memshare_page_req(vcpu, ipa);
+ 		goto out_host;
++	case -E2BIG:
++		*exit_code = pkvm_request_split(hyp_vcpu, gfn, 1);
++		goto out_host;
  	}
  
- 	trace_kvm_handle_pkvm_hyp_req(req, ret);
-diff --git a/arch/arm64/kvm/trace_pkvm.h b/arch/arm64/kvm/trace_pkvm.h
-index 493225e3282d..a0787114b892 100644
---- a/arch/arm64/kvm/trace_pkvm.h
-+++ b/arch/arm64/kvm/trace_pkvm.h
-@@ -10,10 +10,12 @@
+ out_guest:
+@@ -1197,17 +1218,29 @@ static bool pkvm_memshare_call(u64 *ret, struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	return false;
+ }
  
- TRACE_DEFINE_ENUM(PKVM_HYP_NO_REQ);
- TRACE_DEFINE_ENUM(PKVM_HYP_REQ_HYP_ALLOC);
-+TRACE_DEFINE_ENUM(PKVM_HYP_REQ_SPLIT);
+-static void pkvm_memunshare_call(u64 *ret, struct kvm_vcpu *vcpu)
++static bool pkvm_memunshare_call(u64 *ret, struct kvm_vcpu *vcpu, u64 *exit_code)
+ {
+ 	struct pkvm_hyp_vcpu *hyp_vcpu;
+ 	u64 ipa = smccc_get_arg1(vcpu);
++	u64 gfn = hyp_phys_to_pfn(ipa);
  
- #define PKVM_HYP_REQ_TYPES				\
- 	{ PKVM_HYP_NO_REQ, "NO_REQ" },			\
--	{ PKVM_HYP_REQ_HYP_ALLOC, "HYP_ALLOC" }
-+	{ PKVM_HYP_REQ_HYP_ALLOC, "HYP_ALLOC" },	\
-+	{ PKVM_HYP_REQ_SPLIT, "SPLIT" }
+ 	if (!PAGE_ALIGNED(ipa))
+-		return;
++		goto out_guest;
  
- TRACE_EVENT(kvm_handle_pkvm_hyp_req,
- 	TP_PROTO(struct pkvm_hyp_req *req, int ret),
+ 	hyp_vcpu = container_of(vcpu, struct pkvm_hyp_vcpu, vcpu);
+-	if (!__pkvm_guest_unshare_host(hyp_vcpu, hyp_phys_to_pfn(ipa), 1))
++	switch (__pkvm_guest_unshare_host(hyp_vcpu, gfn, 1)) {
++	case 0:
+ 		ret[0] = SMCCC_RET_SUCCESS;
++		goto out_guest;
++	case -E2BIG:
++		*exit_code = pkvm_request_split(hyp_vcpu, gfn, 1);
++		goto out_host;
++	}
++
++out_guest:
++	return true;
++out_host:
++	return false;
+ }
+ 
+ /*
+@@ -1547,7 +1580,7 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 			break;
+ 		}
+ 
+-		pkvm_memunshare_call(val, vcpu);
++		handled = pkvm_memunshare_call(val, vcpu, exit_code);
+ 		break;
+ 	default:
+ 		return pkvm_handle_psci(hyp_vcpu);
 -- 
 2.56.0.385.gac671c819a-goog
 
