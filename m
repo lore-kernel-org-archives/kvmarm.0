@@ -1,76 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793644879;
-	b=NV87zROip8b8KlDy8y3IfumcYYMQMRbExlOngcUDzNEiq2YX7y7bbNhkyeWh0tuJTBwl
-	 I8EJXtjOsItrcGxeu8wCfq9jt5XgA1e60uhT6FgqnBFoKpVUXTHRv4bdH0dfJ4RyeAOyz
-	 GDnlfU3mfqisVR5/8nnIx/SVTGL34oRM/4jnGR4x35xNaVe4RtjMPHgtQ30aoXO8tL8IL
-	 NMESMTG2squLABi1fZrrxM4R5zYsOEW6ip6Y7DN04gQd0d5Nj1u5KFMRdpcDQcNbMVsA+
-	 s9V/qqLqPqbFJLamI92pCT9iQjGZ0jl0s7QB3pkPb+0gPYlRxloVODrseJrWhj7vcsA==
+	t=1793645008;
+	b=xWC3pOkw92EpxSwLpzBi02jx/89zJAISKVsGygY85rOiPghq7aWHBbqdRe4Hn7uOZJSK
+	 WnXAetBGcB4y6uLPG9NxsKqvtdj8D8Q2x8j30+dnOwq/IsRQPoTnBSz03sTETNxXz0g1l
+	 MaM4pOPABT+qY0rvJmbw5o0QEpgAH3xn70FRaIsODHzIBy9bI5Z9OTdxl/5EFsJfiyywc
+	 AYVC1fBu0QGhGeftVKG/tQ6np2FpPZ+p8bhipRxx+AGec3JU0gnH3Zs2Nz+NJOjGLMZho
+	 J09a04f6bLb3eZ6L4i6gaQjMYGW/MbQPBGRl+rUKDMtBwLrpbjwVvWrD2soOeVeVfeQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793644879;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=1siRmUO4vM6mmsoG9PiDb9+LFZeVOS+fG7WHL62iNvw=;
-	b=jkDBy+IBYJGy0sP0uFb9gsGgZ42686spmU6QjPzel1Gp86LWZWZpUYn2l4BTrX3s68V4
-	 zbl3Q0+K8E7DBGsbLUzJK44yLusNLDRU66tlhCkQwfQYIlatzZZ4IiHvu69teewb6Y6ro
-	 w/tgICd+ZOHEMMoZ9dk+lfgASC1A1+rZ1ijQPfN7tEvhtdrRjX8g45G/T7lrBFHG+JlT5
-	 4JDmQfhTEoGbVeV9GSXZam67Qd8weaAmkJN7MZ45j+PHwuBJh+oDynZ+5RyoyniFC/wuG
-	 QO57IJapCioufhcnFswabMnkzz9f8NXKj0rTHsOrx3SQDyG/+4b/J0ON45L+LUMybtQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793645008;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=d8M95H69R0GVpRra/FsjqWhUbWLcwcGJtzbc38SKSco=;
+	b=v172cfbPoXMbuRSlSXZCdJF0CVBkthHgYxPBtItrSbO5xEGvEgRK6svb008OaoMhiJzq
+	 MnZ9OjKjA2cxvtaOZ3jIxbm3M9oerdJRniFdgJRqShw9+pt1y526HYibwifDIcDBKadF3
+	 UoOnvqvzyXBJMp9EZv+5g9GJ0LPWGsbbkMwY+N7z/H0y8YmGJDzqHdKseivZTSRC8O4Cq
+	 FHyYllOzDLQxlXGz/UF0dgKURn9vrEJxnpJB1PvDLIEWatmQg0fgK04aqe9rmVEcsN+9E
+	 Dmu7FrOk07rqe2MPn+cIeC38496WkOIWgYkWou2Z3Yp+zE205VtebXAI6y0FHhkc5YQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SCW3pZSQ;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9EFF606D803
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 18:41:18 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Rt49Ezrz;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707F6606A324;
+	Mon,  2 Nov 2026 18:43:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 707F6606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SCW3pZSQ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AF831F00A1A;
-	Mon,  2 Nov 2026 18:41:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793644878;
-	bh=1siRmUO4vM6mmsoG9PiDb9+LFZeVOS+fG7WHL62iNvw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=SCW3pZSQiuuCCSRrJEbYUc/Rtta1yJfKnOc7PlPInpy6+CvR4M5f94reuHeIOq20p
-	 eV8ZksdI+7U3MTC+Sh4es8lXO5ej8E2aT8tkViYrN8qSFVLE3GwnoyjZt0/dFAD2kO
-	 qEKyvVrXiwX90O6FW+3NhoBoE5Jdk2WPUt7zPwVx7EuscnxvQMM91BAPfTqx/ZsBs0
-	 jICmqnf5y+TVgNJ8TVmAKljm2/dHOd+v20IedDJmNPVyLs58TgAul6/6u3qehoH6Fd
-	 HjBPxKUCp73f82UApmNo9WkX6JVs8FUW2l9bm/DSxBgjyKlbMpWC2mcioLXMfgdkBH
-	 s80etyyTOYvKQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xNwy4-0000000A2b6-0jFh;
-	Mon, 02 Nov 2026 18:41:16 +0000
-Date: Mon, 02 Nov 2026 18:41:15 +0000
-Message-ID: <86a4nr2i0k.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: "Ard Biesheuvel" <ardb@kernel.org>
-Cc: "Fuad Tabba" <fuad.tabba@linux.dev>,
-	"Will Deacon" <will@kernel.org>,
-	"Ard Biesheuvel" <ardb+git@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	"Oliver Upton" <oupton@kernel.org>,
-	"Joey Gouly" <joey.gouly@arm.com>,
-	"Steffen Eiden" <seiden@linux.ibm.com>,
-	"Suzuki K Poulose" <suzuki.poulose@arm.com>,
-	"Zenghui Yu" <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Don't livelock when AT can't resolve a fault IPA
-In-Reply-To: <08db10ef-c3d8-44b8-9d80-e7505400bf12@app.fastmail.com>
-References: <20261102094748.2638468-2-ardb+git@google.com>
-	<auiXMN5td-2QlDkd@willie-the-truck>
-	<CA+EHjTxVPyY70Dm+BiwgQQNwx1cJpEKvJBJGZWPCKLx2M8X2FA@mail.gmail.com>
-	<86bj872n1b.wl-maz@kernel.org>
-	<08db10ef-c3d8-44b8-9d80-e7505400bf12@app.fastmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Rt49Ezrz
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B3A9A1C14;
+	Mon,  2 Nov 2026 10:43:23 -0800 (PST)
+Received: from [10.57.89.36] (unknown [10.57.89.36])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1E39C3F673;
+	Mon,  2 Nov 2026 10:43:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793645006; bh=e/apkQ+PUTPkWx2JCcH7zwo0mzEjRVDTMtVntiX6q2I=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Rt49Ezrzyu8ojaEZum7Pvn5HC/hulevEkgupKNQAcGqvZKdKkGcS8ZOFd8Ro3Dw2M
+	 Gt2x/7FiaFLK8oro7pIl6oq7iB+X+WNpZAlxZRv0xe9ETdkaUkKuL4Fqsnx04Gbi0z
+	 +66d8Jz42ioQW/tYZrNYwG2ofQFVj92braPUmKIs=
+Message-ID: <05133376-f88a-49d4-bcc8-4b406c18aa7d@arm.com>
+Date: Mon, 2 Nov 2026 18:43:24 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -79,109 +52,125 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ardb@kernel.org, fuad.tabba@linux.dev, will@kernel.org, ardb+git@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 14/16] KVM: selftests: Add VGICv5 ITS attribute tests
+To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
+References: <20261016155741.979985-1-sascha.bischoff@arm.com>
+ <20261016155741.979985-15-sascha.bischoff@arm.com>
+ <sashiko-outbox-174624@kernel.org>
+Content-Language: en-GB
+From: Sascha Bischoff <sascha.bischoff@arm.com>
+In-Reply-To: <sashiko-outbox-174624@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 02 Nov 2026 18:23:09 +0000,
-"Ard Biesheuvel" <ardb@kernel.org> wrote:
+On 16/10/2026 17:18, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
+> - [Low] kvm: selftests: tautological test for ITS DT_CFGR/DT_BASER updates
+> - [Low] kvm: selftests: missing idle status register checks for ITS
+> --
 > 
+> commit c7601fac392a61f968d6064e81cd764b666cb504
+> Author: Sascha Bischoff <sascha.bischoff@arm.com>
 > 
+> KVM: selftests: Add VGICv5 ITS attribute tests
 > 
-> On Mon, 2 Nov 2026, at 17:52, Marc Zyngier wrote:
-> > On Mon, 02 Nov 2026 15:57:51 +0000,
-> > Fuad Tabba <fuad.tabba@linux.dev> wrote:
-> >> 
-> >> Hi Will,
-> >> 
-> >> On Mon, 02 Nov 2026 14:17:10 +0000, Will Deacon <will@kernel.org> wrote:
-> >> > On Mon, Nov 02, 2026 at 02:09:25PM +0000, Marc Zyngier wrote:
-> >> > > On Mon, 02 Nov 2026 13:59:12 +0000,
-> >> > > Will Deacon <will@kernel.org> wrote:
-> >> [...]
-> >> > > > > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> >> [...]
-> >> > > > >  static inline bool kvm_hyp_handle_memory_fault(struct kvm_vcpu *vcpu,
-> >> > > > >                                                 u64 *exit_code)
-> >> > > > >  {
-> >> > > > > -        if (!__populate_fault_info(vcpu))
-> >> > > > > +        if (!__populate_fault_info(vcpu)) {
-> >> > > >
-> >> > > > Presumably we need a barrier (DSB?) here, to ensure that the TLBI happens
-> >> > > > after the AT instruction?
-> >> 
-> >> I don't think the TLBI requires a barrier before it, because it
-> >> doesn't matter if the AT's walk allocates entries after the TLBI.
-> >> Anything it allocates matches memory, and the stage-2 descriptor the
-> >> AT faulted on has AF clear, so that descriptor can't be cached:
-> >> 
-> >> R_XCLRD: Translation table entries that generate a Translation
-> >> fault, an Address size fault, or an Access flag fault are never cached
-> >> in a TLB.
-> >> 
-> >> The stale entries the guest keeps hitting were already there before
-> >> the TLBI, and the dsb(nsh) and isb after it are what complete it
-> >> against them.
-> >> 
-> >> [... your other reply ... ]
-> >> > > Alternatively, VMALLE1 or even VAE1 should be enough to get rid of the
-> >> > > S1 TLB.
-> >> >
-> >> > Ah, sorry, VMALLE1 is what I meant to ask about. I basically haven't
-> >> > understood the need to invalidate the stage-2.
-> >> 
-> >> The guest's walk can also go through a stage-2 entry for its
-> >> page-table page, cached before the aging cleared that page's AF, and
-> >> nothing requires the AT to use that entry:
-> >> 
-> >> R_NPZWX: When an address translation instruction is executed, it is
-> >> IMPLEMENTATION DEFINED whether the result can be returned from a TLB,
-> >> or a translation table walk occurs.
-> >> 
-> >> So if my reading is correct, on a CPU whose AT walks memory instead,
-> >> the AT keeps failing while the guest's walk goes through the stale
-> >> entry, and the guest takes the same permission fault again. VMALLE1
-> >> and VAE1 only cover stage 1, so they'd leave that loop in place.
-> >
-> > If we assume that the TLB covers VA->PA (which is a very likely case),
-> > TLBI VAE1 should nuke the permission fault that brought the vcpu to
-> > EL2, and instead walk the page tables, getting the access fault.
-> >
-> > The only case I can imagine where invalidating S2 would matter is if
-> > you are running under NV, because there is an independent S2 TLB (the
-> > shadow S2), and then VMALLS12E1 makes total sense.
-> >
-> > Ard, was this solely observed under NV? Or did you see it on a non NV
-> > guest as well?
-> >
+> This commit adds coverage for the VGICv5 ITS device address and ITS_REGS
+> attribute groups. Userspace needs to be able to discover and save the virtual
+> ITS register state, while KVM must reject invalid address placement and
+> malformed register accesses.
 > 
-> No it happens with guests running at EL1 too.
-
-Damn!
-
-> My experiments seem to indicate that on this uarch, the AT instruction
-> does not hit in the TLB, and so it can fail on AF==0 for an IPA that
-> is covered by a S2-only TLB entry (with AF==1 and XN==1 due to lazy exec).
+>> diff --git a/tools/testing/selftests/kvm/arm64/vgic_v5.c b/tools/testing/selftests/kvm/arm64/vgic_v5.c
+>> index d5df742b23001..b7fb002a64f6c 100644
+>> --- a/tools/testing/selftests/kvm/arm64/vgic_v5.c
+>> +++ b/tools/testing/selftests/kvm/arm64/vgic_v5.c
+> [ ... ]
+>> @@ -1287,6 +1339,177 @@ static void test_vgic_v5_irs_regs_attrs(void)
+>>   	vm_gic_destroy(&v);
+>>   }
+>>   
+>> +static void test_vgic_v5_its_attrs(void)
+>> +{
+> [ ... ]
+>> +	/* Check MMIO by checking if present, reading, then writing back */
+>> +	for (i = 0; i < ARRAY_SIZE(gic_v5_its_regs); i++) {
+>> +		attr = gic_v5_its_regs[i].attr;
+>> +		ret = __kvm_has_device_attr(v.its_fd,
+>> +					    KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
+>> +					    attr);
 > 
-> So after the VAAE1, the S1 walk happily produces the same translation
-> we just invalidated, without taking a S1PTW fault, and the guest faults
-> again on the I-fetch that took us to hyp the first time around.
+> [Severity: Low]
+> The commit message mentions exercising "idle status register values", but this
+> loop only reads and writes back the registers without checking their values.
+> Should there be an explicit assertion that the status registers (like STATUSR,
+> SYNC_STATUSR, GEN_EVENT_STATUSR) actually read as idle? The corresponding
+> test_vgic_v5_irs_regs_attrs() test includes these checks for the IRS.
 
-Ah, I think I see what can happen, even without split TLBs.
+The virtual ITS always reports these registers as idle and has no 
+in-progress state for this test to observe. Some of the idle bits also 
+have architecturally UNKNOWN reset values. An assertion here would only 
+check KVM's chosen constant, so I've left the test unchanged.
 
-If you have a S2 walk cache that skips the descriptor where AF=0, then
-the TLB refill just succeeds, and the cycle repeats. OK, I'm now
-convinced we need S2 invalidation as well even in the VA->PA case. We
-needed it for NV anyway, but hey...
+All of that said, the commit message definitely claimed things that it 
+was not doing. I've dropped that from the commit message. We don't check 
+the idle values, and never should bother to check those as they tell us 
+nothing meaningful.
 
-Hopefully this doesn't happen too often.
+> 
+> [ ... ]
+>> +	/* Make sure we can restore the vITS's enable state */
+>> +	val = GICV5_ITS_CR0_ITSEN;
+>> +	ret = __kvm_device_attr_set(v.its_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
+>> +				    GICV5_ITS_CR0, &val);
+>> +	TEST_ASSERT(!ret, "GICv5 ITS_REGS failed to enable ITS");
+>> +
+>> +	/* And DT CFGR/BASER */
+>> +	val = 0;
+>> +	ret = __kvm_device_attr_set(v.its_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
+>> +				    GICV5_ITS_DT_CFGR, &val);
+>> +	TEST_ASSERT(!ret, "GICv5 ITS_REGS rejected enabled DT_CFGR update");
+>> +	ret = __kvm_device_attr_get(v.its_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
+>> +				    GICV5_ITS_DT_CFGR, &val);
+>> +	TEST_ASSERT(!ret && !val, "GICv5 ITS_REGS DT_CFGR restore mismatch");
+> 
+> [Severity: Low]
+> Is this test effectively verifying that the updates to GICV5_ITS_DT_CFGR work
+> while the ITS is enabled?
+> 
+> Because val is set to 0 (the default/reset value of the register) before the
+> write, if the kernel incorrectly discards the write while ITSEN=1, the
+> register will remain 0 and the read-back will return 0, allowing the test to
+> pass spuriously. Writing a non-zero valid value would avoid this tautology.
+> 
+> Also, the test writes GICV5_ITS_CR0_ITSEN to CR0 but never reads it back.
+> Could the test be trying to update the configuration registers on a disabled
+> ITS if the enable bit didn't actually stick?
+
+Ah, yes. Writing zero to DT_CFGR could pass even if the write was 
+ignored so that wasn't the most helpful. Also, the test did not confirm 
+that the ITSEN value stuck. I've added CR0.ITSEN read-back to check that 
+the set value persists, and a nonzero, valid DT_CFGR DeviceID limit with 
+read-back. Hopefully, that addresses the issues raised here.
+
+> 
+>> diff --git a/tools/testing/selftests/kvm/include/arm64/gic_v5.h b/tools/testing/selftests/kvm/include/arm64/gic_v5.h
+>> index 2d455515563e0..22ab78626af5a 100644
+>> --- a/tools/testing/selftests/kvm/include/arm64/gic_v5.h
+>> +++ b/tools/testing/selftests/kvm/include/arm64/gic_v5.h
+> [ ... ]
+>> +#define GICV5_ITS_CR0_IDLE		BIT(1)
+> 
+> [Severity: Low]
+> Is this macro correct for the ITS? It defines an IDLE bit for CR0, but it
+> appears to be unused in the test. Looking at the GICv5 architecture, it seems
+> only the IRS has an IDLE bit in CR0, not the ITS.
+> 
+
+ITS_CR0 definitely has an IDLE field at BIT(1) so that definition is 
+correct. That said, I've dropped it given that we don't use it.
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Sascha
