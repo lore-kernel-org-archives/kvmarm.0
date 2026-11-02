@@ -1,73 +1,77 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793628568;
-	b=bmlyx+AcbeZpNeqtTbStRWtbvbWigyYZ0nUYaypkIOI1vrroLdW4wE5zvNW0M3quv+8I
-	 x8XwOkWbC9FeT2VfGaj/WFHgCzNyGkwdSJHpKwUWbjflndBgAo4i/nxKSDTHah8vgK1xp
-	 ad1auRBQ4FRnXdtGLuVl/HxlTLOltrdEPZ8qYfrqA3M79+8lDOVgFzyLhfiLtjKVUISDd
-	 SaA9zgUWLictRhaAzYQubgWGraXhMsF2jfuyJdAg9t59sv6yxrk12tyl4OZpJFwwkXNXJ
-	 hBU5HQXjiZzXIAZDshgtgLvho1uXaLxk0BQuK6SLadsi+DgEE38VxkeNejV1w6oIIFA==
+	t=1793628811;
+	b=UG87R9XWzPlKSzrOVrc+saBpzFcWBqfYRduPm5HICfoOz5vtGDKu8fbkuZjEETDGt43O
+	 X5H+InsQuYiEeEjj1yw9Su50C+JCbFAsxH4lp+6kn32ORPsdYn02emfUzkcr3gb+Qopye
+	 EdjNQWgqNABPeAAJf6L5HaU04twKuGsiwjM+9g+46Dr3VUqHBfoqTgIxGNA2MOMrUUCuD
+	 GDqhpTBqSha+uQZ7kllboxqeMVP/3dGAFImmUYXguPx8sZmAGALl3hR8VLht8zau3eyLE
+	 ImPOJobe0JG2pIFIq3ZsQrC6smS079+hTdc5sg96HwM5R7JOIzxStHmYDhntS2Q5rmg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793628568;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=CZoEVf6F8YCU84CWatPj9epyRoPyWPQUR01ARmr0ePM=;
-	b=wqJddrlZFDzjixdMmWukudQvoDfU/62t/7cnKSDpRtmbDmE8P6vd0W14Ook4elFJ1FFc
-	 CH4O/EeJ6uR8srEo+kXWUZTPpWpPxOEgU2i60x/aKLqFdkp+NbUAd0BXsfNrcuynY99tS
-	 fttGuaMlJaQknf6f1Wl3ZANDuXjmf60XMHODCJJjhI/11c70t1I8a+V3mEZemSC057mUF
-	 lJVE09pAY72xffe8J42z9DBzThUZ8jHqU+1wyC7fJ5438QqKLWPaiGn+pWRkVkWVREEeX
-	 Q1YMKNSxs45eaKyn0x/6Qzafi4F6qQcIcaZR3MNirDpwUbmCyHfpnSnPhjr8+of2zVQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793628811;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=Ua1DOoDM2ycibNdB6MjyfXMQfwPGZxy1wTaNHdPExSE=;
+	b=xARI+BiYIZvTPJjWvsWtOyL5enuSwVVx2oSmQzq8McXCQVeKPOrVnxR4b3YRIXzvfvOh
+	 0eDYyN8a80dXlICJJAp82kCBjhONIMvarCsDCYWo+akNNrshHzx5fKXi1OoaJRNSHo/gN
+	 rJEopX3TB456uW/HKbyw1LfjRnpSQz7H4J6fKT6mRn80ItJhoqQ/iCckDkxbl22LZpjI6
+	 H/3TCNbfxIe+cIs/ZCqGccVmA+OIsHwkJvfkonc7vzfUknEJb9DlBNsYcL5iALQA6T6qQ
+	 co3UEACMnjPW0WCgzbnWPc3NyVKLfqfHFDacntbmhrhYm5h5JZsyxLrAumTzj47lqgw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Or6+I7EF;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A5B7606A326
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 14:09:28 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=N3l60SDP;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C360606A329;
+	Mon,  2 Nov 2026 14:13:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5C360606A329
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Or6+I7EF
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 151A41F00A16;
-	Mon,  2 Nov 2026 14:09:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793628568;
-	bh=CZoEVf6F8YCU84CWatPj9epyRoPyWPQUR01ARmr0ePM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Or6+I7EFdsKuZBQJXq9kNEm+ElOS/QCA1+vNT24vSXNWQw82ZplS9esCoI1O9PXNO
-	 kd5WYCxtllLVTJDuL5gSxeQwg3Js2onA3eTwO0oYF7i9tOxzw+3S3MLbTsfpezUtI+
-	 YVbvQBnacOYM4C9ZkzKhqi+SU3lFHlATPMzBuC7Soq1Tz6BIBUf6xmyQcBIQHY/Xm9
-	 u4fbL33PYo/gpsQwX8/FC4WZ4bEnZI66OwrG2oOH8HvD5Eek3mjOToij/lLQ0invVn
-	 d4ZU6gB0NMSwBjzzS70ZDAv3dvL4Q76aFXtgaSdFp93WOZihJlzusgFp2AGcC3cLyh
-	 M1H1YU9Mm6aGQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xNsiz-00000009sMz-3ARh;
-	Mon, 02 Nov 2026 14:09:25 +0000
-Date: Mon, 02 Nov 2026 14:09:25 +0000
-Message-ID: <86fqxj2ulm.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: Ard Biesheuvel <ardb+git@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=N3l60SDP
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 43EB31691;
+	Mon,  2 Nov 2026 06:13:26 -0800 (PST)
+Received: from e122027.arm.com (unknown [10.57.58.9])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A554D3F59E;
+	Mon,  2 Nov 2026 06:13:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793628809; bh=c0J8oAMjRRRr84vzXcxPgHvZvqambP7No/QhePqrRBE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=N3l60SDPbFfZ/rOuZxoYhJ8tcOkCD9sP+8uYKl4eoZq/cgrmQrEnoisz5nMtdJLuD
+	 qWSdXM9gtzbElbowMGwonb6XxZqM4kWzYJXehgEmhhYeY30TR0+NZkpilaJfrOo8Bi
+	 7jmItYOE9907P8VlBdZFksu/Z3QQYoEXRV8ARkH8=
+From: Steven Price <steven.price@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Don't livelock when AT can't resolve a fault IPA
-In-Reply-To: <auiXMN5td-2QlDkd@willie-the-truck>
-References: <20261102094748.2638468-2-ardb+git@google.com>
-	<auiXMN5td-2QlDkd@willie-the-truck>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	WeiLin.Chang@arm.com,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: [PATCH 00/11] KVM: arm64: CCA: Prepare Realm memory management
+Date: Mon,  2 Nov 2026 14:12:51 +0000
+Message-ID: <20261102141304.126883-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -76,59 +80,62 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, ardb+git@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, ardb@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Mon, 02 Nov 2026 13:59:12 +0000,
-Will Deacon <will@kernel.org> wrote:
-> 
-> On Mon, Nov 02, 2026 at 10:47:49AM +0100, Ard Biesheuvel wrote:
-> > From: Ard Biesheuvel <ardb@kernel.org>
+This series adds the memory plumbing for CCA building on the basic
+plumbing[1] that has just been merged.
 
-[...]
+These patches add the internal realm VM state and RMM feature checks,
+prepare realm stage-2 setup and teardown, and provide RTT mapping and
+invalidation helpers. Realm memslots are now contrained to the lower
+half of the IPA space, because faults treat the protected and shared
+halves as aliasing. The final patch then connects these helpers to the
+KVM stage-2 MMU operations.
 
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > index e0c55644224c..4ba61b71d511 100644
-> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > @@ -843,8 +843,21 @@ static inline bool kvm_hyp_handle_cp15_32(struct kvm_vcpu *vcpu, u64 *exit_code)
-> >  static inline bool kvm_hyp_handle_memory_fault(struct kvm_vcpu *vcpu,
-> >  					       u64 *exit_code)
-> >  {
-> > -	if (!__populate_fault_info(vcpu))
-> > +	if (!__populate_fault_info(vcpu)) {
-> 
-> Presumably we need a barrier (DSB?) here, to ensure that the TLBI happens
-> after the AT instruction?
->
-> > +		/*
-> > +		 * The AT couldn't resolve the IPA, typically because its
-> > +		 * stage-1 walk took a stage-2 fault, such as an Access flag
-> > +		 * fault on an aged page-table page. If the guest still has a
-> > +		 * cached translation for the VA, it won't take that fault
-> > +		 * itself, and would replay the same permission fault forever.
-> > +		 * Drop this VMID's TLB entries on this CPU, so that the replay
-> > +		 * walks the page tables and faults with a valid HPFAR_EL2.
-> > +		 */
-> > +		__tlbi(vmalls12e1);
-> 
-> Can we get away with an ALLE1 here, or do we really need to blow away the
-> whole lot?
+There's also an integration branch[2] that builds on this series and
+includes the realm descriptor creation, REC entry/exit, activation and
+the new uAPI. This series by itself is also available as a git
+branch[3]. However the new code isn't generally active without the full
+integration branch.
 
-ALLE1 blows EL1 translations for all VMIDs, while VMALLS12E1 is
-localised to this VMID. Feels like the latter is the least invasive
-option.
+[1] https://lore.kernel.org/all/20261007073537.2454351-1-suzuki.poulose@arm.com/
+[2] https://gitlab.arm.com/linux-arm/linux-cca
+    branch: cca-host-mm/v1/integration
+[3] https://gitlab.arm.com/linux-arm/linux-cca
+    branch: cca-host-mm/v1/mm
 
-Alternatively, VMALLE1 or even VAE1 should be enough to get rid of the
-S1 TLB.
+Steven Price (7):
+  KVM: arm64: CCA: Reserve the RMM mode
+  KVM: arm64: CCA: Check for RMI support at KVM init
+  KVM: arm64: CCA: Check for LPA2 support and SHA-256
+  KVM: arm64: CCA: Add basic infrastructure for creating a realm
+  KVM: arm64: CCA: Tear down RTTs
+  KVM: arm64: CCA: Add Realm RTT mapping and invalidation helpers
+  KVM: arm64: CCA: Support runtime faulting of memory
 
-Thanks,
+Suzuki K Poulose (4):
+  KVM: arm64: CCA: Introduce Realms
+  KVM: arm64: Handle attributes in stage2_unmap_range
+  KVM: arm64: CCA: Prevent memslot modifications after Realm creation
+  KVM: arm64: CCA: Add Realm stage-2 MMU operations
 
-	M.
+ arch/arm64/include/asm/kvm_emulate.h   |  29 +
+ arch/arm64/include/asm/kvm_host.h      |  62 +-
+ arch/arm64/include/asm/kvm_rmi.h       | 109 ++++
+ arch/arm64/include/asm/virt.h          |   1 +
+ arch/arm64/kvm/Kconfig                 |   1 +
+ arch/arm64/kvm/Makefile                |   2 +-
+ arch/arm64/kvm/arm.c                   |  33 +-
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h |   2 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c       |   4 +-
+ arch/arm64/kvm/hyp/nvhe/timer-sr.c     |   2 +-
+ arch/arm64/kvm/mmu.c                   | 242 +++++--
+ arch/arm64/kvm/rmi.c                   | 852 +++++++++++++++++++++++++
+ 12 files changed, 1275 insertions(+), 64 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_rmi.h
+ create mode 100644 arch/arm64/kvm/rmi.c
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.43.0
+
