@@ -1,57 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793650994;
-	b=2b+RtAFj53doftKJjkkq7vs0h7K17qPcVdWnO+wkNfEHfTHoQ2G/+c7ED0TolVjHMwZz
-	 pDFAsSLhsATej1ByXouktob2ACZARfcMDGF6DdO/5nbaKoZaZW/KYfCy0msYNehyv6D7j
-	 ShLDyQeM+jLzBCh3j6nTiX94lFUqhB99e3x61hcbdMjMGBIWl5D0pSxMwcQ1jHcCa5rCR
-	 nolzoOzESJpK1EDBjJJEChy9UPIiaB7FkCHkqIdn8P4/oICiQ4VwX6pygtDtAhe6wOVxA
-	 vvbovSY8ItUw2cP2Md8xf/2rlKsEAXS8SQGJNpOSu3+d9w6Z/QrFR9zADNo4hGZctFg==
+	t=1793651704;
+	b=I1FFc94JDmmawZ3YUX7RwV1R3roF7d6g5A7gv2hYIIfM3bCC0u9mZzRAQkxCkyfRgM+r
+	 2+CA2g24aPK7Czwk4kC1WBkC5p+FDbnxql9jwVYxqTNm0Jl3mWGQObV4RfyJEmXf7WEeC
+	 KMBTeP6v9l2mDVAqywRFbumy4NgwOhVQZoruGQU21jAmF5ulbPST6lXABCP42pe0dXE4+
+	 dRftmbLj4c+W1PpzzzQ7KrBpyUQK4BRmk3tF2HhO/coJl6LxiV0Ttg7TpWGbeoMrnK/qA
+	 ++oLWUkYFbE5iR+AgKzROUfBtfFwm7usMpV1fmKh0p4aTzILTCFRl9kK0VoDYaBSKFg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793650994;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=Hpvg0OIDIp+QrQZ1vdkITYgeyn4m69nTA45GpchRF1A=;
-	b=1B4xx8EsWS8/quWsBNZ9lJjM6FAR4Di3PcWbbZ6YNyRBz6667xFQjEYK8lWo3/2Kv1Pn
-	 e0sw/aXGPwzMoECXG9ljzkbVSDFzpP3M6rzJF4xY99JkGYSHX1ULg9DzlfDxL6iAwb/D9
-	 IVemlP6xoB3nUu8Kdje9JtIAD0NjCUlAksnbCfCq7VZE5+U4udBmDtAdPzRNajtEsdoUp
-	 wmqsBKyP38fRSx0nKMvIzhP6OElID3MpNAjP+7R4p7Zh8byIMC+T+gBguJZISJj21Jn7f
-	 zhVILxqLaYCrO/KkMQgvp2Zl5OO+lzgEFtqJ1qSznECKHVawjcVKBuDzHWTw72A/lZw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793651704;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=fVrdTInYLrRvxbYB/XixLqPaHg4vKcQOHbKR4Xq9psA=;
+	b=CAwGa/6+LXY2NvxFUXMZWfR1NR57SQ/WSLZeYVic8vIjfzHvf2DafLrrKNVI7FeaRVZH
+	 RAul9kr5IqhswQ6m6TEMrOtaYQBDKJcjZm4C8wey+xl6JAozGJlAdkscpHrCUwu9X+BCF
+	 7DmfEksaHMyVPprSswbMUoJX/PJZ26gPnMLIvr9j5ZG9YnVxuhaSp2Vb1jckRbJCRV7fx
+	 ZgHryMyZ+yaOaZA7h+lnr20D2d6QBS/vstRcCkoLxYy470YkE1kFwr9hi3IZrxnuNxttk
+	 ILP0Xcn8yLsfEqEDvGFgUCs88ATMjo3rJIGmQgX5wB4No72T1RQFSDKx/BbVtw0nqmQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eNrDoPuf;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5649C606D815;
-	Mon,  2 Nov 2026 20:23:14 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=QIrAqOTk;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FB37606A326
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 20:35:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5FB37606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eNrDoPuf
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C6311F00A1E;
-	Mon,  2 Nov 2026 20:23:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793650993;
-	bh=Hpvg0OIDIp+QrQZ1vdkITYgeyn4m69nTA45GpchRF1A=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=eNrDoPufnAkpNkp1KiXVeS9LpQd8u4Woeeqzzk+oC+8t/Eis3hT6Bx8pxJi+9S9ku
-	 kiaJ7lnbLyP79//RT/5U3RqZ0GlZZFwe0c/JNf9EnmPOT/tNnqewBMK8yZM2ygVq8F
-	 ykIbCIL762P210wfdO2ezoyTbAvb+VmBk9576986GE1ssdfu8rPCQFyHKk2ncbVmy6
-	 9J7WKB5fxEMnYyHY8Xnvm+4sVEETlA//x8kIfmyhGXh4n47s400Jp/BcqeOGurAVE0
-	 jUxyOqOGbYPILYlcuzaXhMd2Z0OctC2yJhf1O/3p0len2IHAnZkJXZBKpDllBInB6v
-	 Lf4nEfOQq/kFQ==
-Message-ID: <sashiko-outbox-194102@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 07/16] KVM: arm64: gic-v5: Add ITS guest table
- translation emulation
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sascha Bischoff" <sascha.bischoff@arm.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261102194454.4086911-8-sascha.bischoff@arm.com>
-References: <20261102194454.4086911-1-sascha.bischoff@arm.com>
- <20261102194454.4086911-8-sascha.bischoff@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 02 Nov 2026 20:23:13 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=QIrAqOTk
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7CE2216A3;
+	Mon,  2 Nov 2026 12:34:59 -0800 (PST)
+Received: from [10.57.89.36] (unknown [10.57.89.36])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5CCA13F59E;
+	Mon,  2 Nov 2026 12:35:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793651702; bh=725ybgwJOHxvoUcVecTQi5DQqHyETUmEkAV+ZJ9LX1s=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=QIrAqOTk84L/BSjZitTtpAM9Cp89xzVYRTOS7Ao+Gqu/H6rIBfxcQcS+iARkyabD2
+	 4mZeDuAvv8TIujccZ5BJk0t2KqT3AMHKUEpOdgB2e4rW0obNhgImgjzlxFjxfWai5E
+	 iL2bn8/WlEACpgPytDROnCgXl3pA6jmIKi5RD6j0=
+Message-ID: <2e04c316-d5e4-4f9b-953f-b7e930cccfac@arm.com>
+Date: Mon, 2 Nov 2026 20:34:59 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -60,345 +52,257 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH kvmtool v3 05/21] arm64: Track whether the VM uses GICv5
+To: Vladimir Murzin <vladimir.murzin@arm.com>, will@kernel.org,
+ julien.thierry.kdev@gmail.com
+Cc: maz@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ timothy.hayes@arm.com, Peter Maydell <peter.maydell@linaro.org>
+References: <20261016153939.913764-1-sascha.bischoff@arm.com>
+ <20261016153939.913764-6-sascha.bischoff@arm.com>
+ <4fcaa349-6c0c-4660-89cc-5cd34872fa7a@arm.com>
+Content-Language: en-GB
+From: Sascha Bischoff <sascha.bischoff@arm.com>
+In-Reply-To: <4fcaa349-6c0c-4660-89cc-5cd34872fa7a@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
-s) to consider:
-- [Critical] KVM: arm64: gic-v5: missing vgic init check in __vgic_v5_its_r=
-esolve_lpi()
-- [Low] KVM: arm64: gic-v5: unclamped event_id_bits in __vgic_v5_its_resolv=
-e_lpi()
-- [Low] KVM: arm64: gic-v5: duplicated L2SZ decoding in parse_two_level_itt=
-()
---
+On 22/10/2026 19:22, Vladimir Murzin wrote:
+> On 10/16/26 16:39, Sascha Bischoff wrote:
+>> Expose the selected GIC generation to interrupt and DT setup code that
+>> does not receive the irqchip type directly. Set the state only after
+>> the GIC device has been configured successfully.
+>>
+>> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+>> ---
+>>   arm64/gic.c             | 7 +++++++
+>>   arm64/include/kvm/gic.h | 1 +
+>>   2 files changed, 8 insertions(+)
+>>
+>> diff --git a/arm64/gic.c b/arm64/gic.c
+>> index 5c8a33b5..c1bd0771 100644
+>> --- a/arm64/gic.c
+>> +++ b/arm64/gic.c
+>> @@ -21,6 +21,12 @@ static u64 gic_redists_size;
+>>   static u64 gic_msi_base;
+>>   static u64 gic_msi_size = 0;
+>>   static bool vgic_is_init = false;
+>> +static bool vgic_is_v5;
+>> +
+>> +bool gic__is_v5(void)
+>> +{
+>> +	return vgic_is_v5;
+>> +}
+>>   
+>>   struct kvm_irqfd_line {
+>>   	unsigned int		gsi;
+>> @@ -230,6 +236,7 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+>>   	if (err)
+>>   		goto out_err;
+>>   
+>> +	vgic_is_v5 = type == IRQCHIP_GICV5;
+>>   	return 0;
+>>   
+>>   out_err:
+>> diff --git a/arm64/include/kvm/gic.h b/arm64/include/kvm/gic.h
+>> index 630f0bbd..991aa912 100644
+>> --- a/arm64/include/kvm/gic.h
+>> +++ b/arm64/include/kvm/gic.h
+>> @@ -34,6 +34,7 @@ enum irqchip_type {
+>>   
+>>   struct kvm;
+>>   
+>> +bool gic__is_v5(void);
+>>   int gic__alloc_irqnum(void);
+>>   int gic__create(struct kvm *kvm, enum irqchip_type type);
+>>   int gic__create_gicv2m_frame(struct kvm *kvm, u64 msi_frame_addr);
+>> -- 2.34.1
+>>
 
-commit 48d54735882d147618fe3ac1bc65671388c7716f
-Author: Sascha Bischoff <sascha.bischoff@arm.com>
+Hi Vladimir,
 
-KVM: arm64: gic-v5: Add ITS guest table translation emulation
+I've made your suggested changes here. Thanks to making these changes, 
+gic__is_v5() is now gone altogether, which makes me rather happy. I was 
+always annoyed by the GICv5 tentacles throughout the code, so being able 
+to make those things more generic is much better. Thanks again!
 
-This commit adds helpers to walk linear and two-level guest Device Tables
-and Interrupt Translation Tables for GICv5 ITS emulation, resolving
-DeviceID/EventID pairs to LPIs and wiring up the READ_EVENTR and
-GEN_EVENTR MMIO handlers.
+> 
+> I noticed that gic__is_v5() is used later on in places which, in theory,
+> should not care about what exact gic type is in use. Those places are
+> 
+> 1. adjustments for fdt generations
+> 
+> For that case, can we have some helpers, say
+> 
+> int gic__get_spi_base(void)
+> {
+>          return gic_spi_base;
+> }
+> 
+> int gic__get_ppi_base(void)
+> {
+>          return gic_ppi_base;
+> }
+> 
+> int gic__get_spi_fdt_type(void)
+> {
+>          return gic_spi_fdt_type;
+> }
+> 
+> int gic__get_ppi_fdt_type(void)
+> {
+>          return gic_ppi_fdt_type;
+> }
+> 
+> which we configure from
+> 
+> static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+> {
+> ...
+>          err = gic__set_spi(type);
+>          if (err)
+>                  goto out_err;
+> 
+>          err = gic__set_ppi(type);
+>          if (err)
+>                  goto out_err;
+> ...
+> }
+> 
+> where
+> 
+> static int gic__set_spi(enum irqchip_type type)
+> {
+>          switch (type) {
+>          case IRQCHIP_GICV5:
+>                  gic_spi_base = GICV5_SPI_IRQ_BASE;
+>                  gic_spi_fdt_type = GICV5_FDT_IRQ_TYPE_SPI;
+>                  break;
+>          default:
+>                  gic_spi_base = GIC_SPI_IRQ_BASE;
+>                  gic_spi_fdt_type = GIC_FDT_IRQ_TYPE_SPI;
+>                  break;
+>          }
+> 
+>          return irq__init_irq_offset(gic_spi_base);
+> }
+> 
+> static int gic__set_ppi(enum irqchip_type type)
+> {
+>          switch (type) {
+>          case IRQCHIP_GICV5:
+>                  gic_ppi_base = GICV5_PPI_IRQ_BASE;
+>                  gic_ppi_fdt_type = GICV5_FDT_IRQ_TYPE_PPI;
+>                  break;
+>          default:
+>                  gic_ppi_base = GIC_PPI_IRQ_BASE;
+>                  gic_ppi_fdt_type = GIC_FDT_IRQ_TYPE_PPI;
+>                  break;
+>          }
+> 
+>          return 0;
+> }
+> 
+> so
+> 
+> void pci__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+> {
+> ...
+>          int_type = gic__get_spi_fdt_type();
+>          int_id = irq - gic__get_spi_base();
+> ...
+> }
+> 
+> and
+> 
+> void pmu__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+> {
+> ...
+>          irq_prop[0] = cpu_to_fdt32(gic__get_ppi_fdt_type());
+>          irq_prop[1] = cpu_to_fdt32(irq - gic__get_ppi_base());
+> 
+> ...
+> }
+> 
+> and
+> 
+> void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+> {
+> ...
+>          type = gic__get_ppi_fdt_type();
+>          offset = gic__get_ppi_base();
+> ...
+> }
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-its-v5.c b/arch/arm64/kvm/vgic/vgic=
--its-v5.c
-> index f04161c315b78..caa68c4680d02 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its-v5.c
-> @@ -19,6 +19,302 @@
->  #define VITS_V5_DEVICE_ID_BITS		16
->  #define VITS_V5_EVENT_ID_BITS		16
-> =20
-> +static int parse_linear_dt(struct kvm *kvm, gpa_t dt_base, u32 device_id,
-> +			   gpa_t *itt_base, bool *two_level_itt,
-> +			   unsigned int *event_id_bits, unsigned int *itt_l2sz)
-> +{
-> +	__le64 dt_l2_entry;
-> +	gpa_t entry_addr;
-> +	u64 val;
-> +	int ret;
-> +
-> +	entry_addr =3D dt_base + device_id * sizeof(__le64);
-> +	ret =3D kvm_read_guest_lock(kvm, entry_addr, &dt_l2_entry,
-> +				  sizeof(dt_l2_entry));
-> +	if (ret) {
-> +		kvm_debug("Failed to read guest memory for L2 DT\n");
-> +		return ret;
-> +	}
-> +
-> +	val =3D le64_to_cpu(dt_l2_entry);
-> +	if (!FIELD_GET(GICV5_DTL2E_VALID, val)) {
-> +		kvm_debug("Guest DT entry is invalid\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	*itt_base =3D FIELD_GET(GICV5_DTL2E_ITT_ADDR_MASK, val) << 3;
-> +	*two_level_itt =3D FIELD_GET(GICV5_DTL2E_ITT_STRUCTURE, val);
-> +	*event_id_bits =3D FIELD_GET(GICV5_DTL2E_EVENT_ID_BITS, val);
-> +	*itt_l2sz =3D FIELD_GET(GICV5_DTL2E_ITT_L2SZ, val);
-> +
-> +	return 0;
-> +}
-> +
-> +static int parse_two_level_dt(struct kvm *kvm, gpa_t dt_base,
-> +			      unsigned int dt_l2sz, u32 device_id,
-> +			      gpa_t *itt_base, bool *two_level_itt,
-> +			      unsigned int *event_id_bits,
-> +			      unsigned int *itt_l2sz)
-> +{
-> +	unsigned int device_id_l1_shift, l2_device_id;
-> +	__le64 dt_l1_entry;
-> +	gpa_t dt_l2_base;
-> +	gpa_t entry_addr;
-> +	u64 val;
-> +	int ret;
-> +
-> +	switch (dt_l2sz) {
-> +	case 0:
-> +		device_id_l1_shift =3D 9;
-> +		break;
-> +	case 1:
-> +		device_id_l1_shift =3D 11;
-> +		break;
-> +	case 2:
-> +		device_id_l1_shift =3D 13;
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	entry_addr =3D dt_base +
-> +		     (device_id >> device_id_l1_shift) * sizeof(__le64);
-> +
-> +	ret =3D kvm_read_guest_lock(kvm, entry_addr, &dt_l1_entry,
-> +				  sizeof(dt_l1_entry));
-> +	if (ret) {
-> +		kvm_debug("Failed to read guest memory for L1 DT\n");
-> +		return ret;
-> +	}
-> +
-> +	val =3D le64_to_cpu(dt_l1_entry);
-> +	if (!FIELD_GET(GICV5_DTL1E_VALID, val)) {
-> +		kvm_debug("Guest DT L1 entry is invalid\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	dt_l2_base =3D FIELD_GET(GICV5_DTL1E_L2_ADDR_MASK, val) << 3;
-> +	l2_device_id =3D device_id % (1UL << device_id_l1_shift);
-> +	if (l2_device_id >=3D (1UL << FIELD_GET(GICV5_DTL1E_SPAN, val))) {
-> +		kvm_debug("DeviceID 0x%x out of range of guest DT\n",
-> +			  device_id);
-> +		return -ENXIO;
-> +	}
-> +
-> +	return parse_linear_dt(kvm, dt_l2_base, l2_device_id, itt_base,
-> +			       two_level_itt, event_id_bits, itt_l2sz);
-> +}
+Done.
 
-[ ... ]
+> 
+> 2. adjustment for IRQ line
+> 
+> With helpers introduced above
+> 
+> static int gic__init_gic(struct kvm *kvm)
+> {
+> ...
+>          nr_irqs += gic__get_spi_base();
+> ...
+> }
+> 
+> and
+> 
+> void kvm__irq_line(struct kvm *kvm, int irq, int level)
+> {
+> ...
+>          if (irq < gic__get_spi_base() || irq > GIC_MAX_IRQ)
+> ...
+> }
+> 
+> }
 
-> +static int parse_two_level_itt(struct kvm *kvm, u32 event_id, gpa_t itt_=
-base,
-> +			       unsigned int itt_l2sz, __le64 *itt_l2_entry)
-> +{
-> +	unsigned int itt_split_bits, l2_event_id_bits;
-> +	gpa_t itt_l2_base, entry_addr;
-> +	u32 l1_event_id, l2_event_id;
-> +	__le64 itt_l1_entry;
-> +	u64 val;
-> +	int ret;
-> +
-> +	switch (itt_l2sz) {
-> +	case 0:
-> +		itt_split_bits =3D 9;
-> +		break;
-> +	case 1:
-> +		itt_split_bits =3D 11;
-> +		break;
-> +	case 2:
-> +		itt_split_bits =3D 13;
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	l1_event_id =3D event_id >> itt_split_bits;
-> +	entry_addr =3D itt_base + l1_event_id * sizeof(itt_l1_entry);
-> +	ret =3D kvm_read_guest_lock(kvm, entry_addr, &itt_l1_entry,
-> +				  sizeof(itt_l1_entry));
-> +	if (ret) {
-> +		kvm_debug("Failed to read guest memory for L1 ITT\n");
-> +		return ret;
-> +	}
-> +
-> +	val =3D le64_to_cpu(itt_l1_entry);
-> +	if (!FIELD_GET(GICV5_ITTL1E_VALID, val)) {
-> +		kvm_debug("Guest ITT L1 entry is invalid\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	itt_l2_base =3D FIELD_GET(GICV5_ITTL1E_L2_ADDR_MASK, val) << 3;
-> +	l2_event_id_bits =3D
-> +		min(FIELD_GET(GICV5_ITTL1E_SPAN, val), itt_split_bits);
-> +	l2_event_id =3D event_id % (1UL << l2_event_id_bits);
-> +
-> +	if ((itt_split_bits !=3D l2_event_id_bits) &&
-> +	    (event_id & ((1UL << itt_split_bits) - 1)) !=3D l2_event_id) {
-> +		kvm_debug("EventID is out of range of L2 ITT\n");
-> +		return -ENXIO;
-> +	}
-> +
-> +	return parse_linear_itt(kvm, l2_event_id, itt_l2_base, itt_l2_entry);
-> +}
+Done.
 
-[Severity: Low]
-This isn't a bug, but both parse_two_level_dt() and parse_two_level_itt()
-duplicate the same switch statement mapping L2SZ encodings (0, 1, 2) to bit
-shifts (9, 11, 13).
+> 
+> 3. PMU initialisation
+> 
+> Can we introduce another helper
+> 
+> int gic__encode_ppi_irq(enum irqchip_type type, int irq)
+> {
+>          switch (type) {
+>          case IRQCHIP_GICV5:
+>                  return irq | (GICV5_IRQ_TYPE_PPI <<  GICV5_IRQ_TYPE_SHIFT);
+>          default:
+>                  return irq;
+>          }
+> }
+> 
+> so
+> 
+> int pmu__init(struct kvm *kvm)
+> {
+> ...
+>          irq = gic__encode_ppi_irq(kvm->cfg.arch.irqchip, irq);
+> ...
+> }
 
-For validating the L2 index against the L1 entry's SPAN field,
-parse_two_level_dt() computes l2_device_id =3D device_id % (1UL <<
-device_id_l1_shift) and directly checks l2_device_id >=3D (1UL <<
-FIELD_GET(GICV5_DTL1E_SPAN, val)), whereas parse_two_level_itt() clamps
-l2_event_id_bits with min() and compares (event_id & ((1UL << itt_split_bit=
-s)
-- 1)) against l2_event_id.
+Done.
 
-Could the L2SZ-to-shift conversion be factored into a small helper, and cou=
-ld
-parse_two_level_itt() use the same direct SPAN bounds check as
-parse_two_level_dt()?
+> 
+> 4. phandle generation for CPU node(s)
+> 
+> We can either guard by kvm->cfg.arch.irqchip == IRQCHIP_GICV5 or, perhaps
+> generate it unconditionally?
 
-[ ... ]
+And done - I've chosen to always emit them as they should not be 
+harmful. However, if we are worried about changing existing VMs though 
+this change, it might be better to omit them. IIRC, even unused phandles 
+will affect the final FDT.
 
-> +static int __vgic_v5_its_resolve_lpi(struct kvm *kvm, struct vgic_v5_its=
- *its,
-> +				     u32 device_id, u16 event_id,
-> +				     struct vgic_irq **irq)
-> +{
-> +	unsigned int itt_l2sz, event_id_bits;
-> +	__le64 itt_l2_entry;
-> +	bool two_level_itt;
-> +	gpa_t itt_base;
-> +	u32 lpi;
-> +	u64 val;
-> +	int ret;
-> +
-> +	lockdep_assert_held(&its->its_lock);
-> +
-> +	if (!its->enabled) {
-> +		kvm_debug("Cannot look up LPI; vITS is disabled\n");
-> +		return -ENXIO;
-> +	}
-> +
-> +	if (WARN_ON_ONCE(kvm->mm !=3D get_current()->mm))
-> +		return -EWOULDBLOCK;
-> +
-> +	ret =3D get_itt(kvm, its, device_id, &itt_base, &two_level_itt,
-> +		      &event_id_bits, &itt_l2sz);
-> +	if (ret) {
-> +		kvm_debug("Error parsing guest's DT\n");
-> +		return ret;
-> +	}
-> +
-> +	if (event_id >=3D 1UL << event_id_bits) {
-> +		kvm_debug("Event ID out of range\n");
-> +		return -E2BIG;
-> +	}
+> 
+> 
+> Cheers
+> Vladimir
 
-[Severity: Low]
-In get_itt(), the guest-configured DeviceID width is clamped to the maximum
-supported by the ITS in IDR1 via min(its->dt_cfgr.device_id_bits,
-its->idr1.device_id_bits).
-
-In parse_linear_dt(), *event_id_bits =3D FIELD_GET(GICV5_DTL2E_EVENT_ID_BIT=
-S,
-val) extracts the 5-bit EVENT_ID_BITS field (0..31) from the guest DTL2E, a=
-nd
-__vgic_v5_its_resolve_lpi() checks event_id >=3D 1UL << event_id_bits witho=
-ut
-clamping event_id_bits to or validating it against its->idr2.event_id_bits.
-
-This rests on a GICv5 architectural detail that could not be confirmed from
-the kernel source: when GICV5_DTL2E_EVENT_ID_BITS exceeds
-GICV5_ITS_IDR2_EVENTID_BITS, does the architecture require clamping the
-effective EventID width to ITS_IDR2.EVENTID_BITS or treating the DTL2E as
-invalid? If yes, parse_linear_dt() and __vgic_v5_its_resolve_lpi() will acc=
-ept
-an oversized DTL2E.EVENT_ID_BITS without capping or rejecting it when
-its->idr2.event_id_bits is smaller than DTL2E.EVENT_ID_BITS.
-
-> +
-> +	ret =3D get_itte(kvm, event_id, itt_base, two_level_itt, itt_l2sz,
-> +		       &itt_l2_entry);
-> +	if (ret)
-> +		return ret;
-> +
-> +	val =3D le64_to_cpu(itt_l2_entry);
-> +	if (!FIELD_GET(GICV5_ITTL2E_VALID, val)) {
-> +		kvm_debug("ITTE is not valid\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	lpi =3D FIELD_GET(GICV5_ITTL2E_LPI_ID, val);
-> +
-> +	*irq =3D vgic_add_lpi(kvm, vgic_v5_make_lpi(lpi), NULL);
-> +	if (IS_ERR(*irq))
-> +		return PTR_ERR(*irq);
-> +
-> +	return 0;
-> +}
-> +
-> +static void vgic_v5_its_inject_lpi(struct kvm *kvm, struct vgic_irq *irq)
-> +{
-> +	kvm_call_hyp(__vgic_v5_vdpend, irq->intid, true,
-> +		     kvm->arch.vgic.gicv5_vm.vm_id);
-> +}
-
-[Severity: Critical]
-What happens if userspace creates a KVM_DEV_TYPE_ARM_VGIC_V5_ITS device, se=
-ts
-KVM_VGIC_V5_ADDR_TYPE_ITS, and runs a vCPU without ever creating a
-KVM_DEV_TYPE_ARM_VGIC_V5 irqchip device?
-
-In vgic_v5_its_create(), creating the ITS device is permitted when
-irqchip_in_kernel(dev->kvm) is false:
-
-arch/arm64/kvm/vgic/vgic-its-v5.c:vgic_v5_its_create() {
-	...
-	if ((irqchip_in_kernel(dev->kvm) && !vgic_is_v5(dev->kvm)) ||
-	    (dev->kvm->arch.vgic.its_model &&
-	     dev->kvm->arch.vgic.its_model !=3D KVM_DEV_TYPE_ARM_VGIC_V5)) {
-		kfree(its);
-		return -ENODEV;
-	}
-	...
-}
-
-Setting KVM_VGIC_V5_ADDR_TYPE_ITS via vgic_v5_its_set_attr() immediately
-registers the ITS MMIO device on KVM_MMIO_BUS via
-vgic_v5_register_its_iodev(). When userspace runs a vCPU via KVM_RUN,
-kvm_arch_vcpu_run_pid_change() only calls kvm_vgic_map_resources(kvm) when
-irqchip_in_kernel(kvm) is true:
-
-arch/arm64/kvm/arm.c:kvm_arch_vcpu_run_pid_change() {
-	...
-	if (likely(irqchip_in_kernel(kvm))) {
-		/*
-		 * Map the VGIC hardware resources before running a vcpu the
-		 * first time on this VM.
-		 */
-		ret =3D kvm_vgic_map_resources(kvm);
-		if (ret)
-			return ret;
-	}
-	...
-}
-
-Because kvm_vgic_create() was never called to initialize
-kvm->arch.vgic.gicv5_vm.vm_id to VGIC_V5_VM_ID_INVAL (and
-vgic_v5_allocate_vm_id() was never called), kvm->arch.vgic.gicv5_vm.vm_id
-remains 0 from the zero-initialized struct kvm allocation.
-
-When the guest enables the vITS via GICV5_ITS_CR0 and writes
-GICV5_ITS_GEN_EVENTR_R to GICV5_ITS_GEN_EVENTR,
-vgic_v5_its_handle_gen_event() calls __vgic_v5_its_resolve_lpi() and
-vgic_v5_its_inject_lpi(). Neither function checks vgic_initialized(kvm) or
-vgic_has_its(kvm), so __vgic_v5_its_resolve_lpi() allocates LPIs in lpi_xa =
-and
-vgic_v5_its_inject_lpi() executes kvm_call_hyp(__vgic_v5_vdpend, irq->intid,
-true, kvm->arch.vgic.gicv5_vm.vm_id) with vm_id =3D=3D 0.
-
-Since vgic_v5_allocate_vm_id() allocates valid hardware VM IDs from
-vmt_info->vm_id_ida starting at 0, won't the EL2 VDPEND instruction inject
-guest-controlled LPIs directly into whichever active GICv5 VM on the host o=
-wns
-hardware VM ID 0? Should __vgic_v5_its_resolve_lpi() (or vgic_v5_its_create=
-())
-verify that the in-kernel GICv5 irqchip is initialized before resolving and
-injecting LPIs?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261102194454.4086=
-911-1-sascha.bischoff@arm.com?part=3D7
+Thanks,
+Sascha
