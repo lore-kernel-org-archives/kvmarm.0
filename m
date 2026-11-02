@@ -1,49 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=115.124.30.101
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793571363;
-	b=wJi/h4rewJ8R5zLwgmMDs3xvTBGT/GcROnFDDnXQjy8CweG9npzSYYuRYedB9gsNHck6
-	 iG1oeimpjXYzsIVNSixprLDMSdZs7ObiBkstUX8+spYD5sXeuRXB4WDwFlJfdY2luImDH
-	 CywSbdZn2qtr1lh6DmQ5pNj5JKQszzdp8WX36G/hBqpS4uGVMMElnLl2qnwA7980ZDaqR
-	 j5fqOdcK0nL7loraQOC3UMM5vQ5nWO4X4yGfFS85BrHbQUVQIExBflC6jBjuZtA0DzJlu
-	 2SA8wtdP5ITwICiSwNIsaQfbzrzVyTaUYG3Rsi12rvYk5c26FRzPO6Lci8wzgqMoROQ==
+	t=1793583948;
+	b=JVrke6SAf2inv7ayH0ZtkllTW91NUkaxaDpwgLKpBLfht7yNmGsjMhwQQuY1j0Gw0ZkB
+	 Pr0O5H0jO5kQISAZxk3us1IQVPrRsLVyLcG11d3K5HVPj1S1hQfL1t9Uihtj7yFzNMyPa
+	 4s+vHUMwIh71HYC2r0L05KAcqmyBjzuGYqv0Noz2kRXEKiaEBERjNoTfxc9VpU6rY/8N+
+	 kE45Qj59NF2m4K7W10KUq5qr1+llMT4gJhc6hP8mytqEROt7VxvQgnnV6BrWUKAY/d1Uj
+	 3ANG66SC5OV2mY+OnknwHdln2r1RxapbjDOjGd0UeO9fx8dq1j0+xhVzclzlQZrEakQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793571363;
-	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
-	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc;
-	bh=FTHI4iJKGW8nTdZJYWi2ZEsJRVp05NwkVgRYnkQTnQI=;
-	b=FLC5QatAjRXvYnSKyR9TBggNGcXxfgoHtXWOBZsVs4g0TgEApjydffc5xIVtMjlumt2i
-	 DAP76GvvKrrXtOySGTh4HdTi3YvitBNZU/GB/UZN0g48Flv20iL7X283Jm31E7cET9Czk
-	 sIBNU5K+/t8DXnvYkDEi0G1PQeZnH7zn2cugjO/VNdp94klNMfRc/N2x9kjSBwl9OLdCx
-	 M/bCcaYfzH5sQMsm7sFozJCnMDPF6ebQ5fpM6Ot/GHpo5TECq+qRmhHE5zJ8uwWlojlJ8
-	 6e3gnXIVatDPnN0tCn/7enO2+FWBCMcfAj0cyFmCB9gu86mc9W+Ttt83cUfbP+iHwtg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793583948;
+	h=DMARC-Filter:DKIM-Signature:X-Alimail-AntiSpam:Received:Date:From:To:
+	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=9uLkggi5jeL9sGYQHyTyByYxkgZ/xZRTq5JwmLkTNLA=;
+	b=UpQ01HbiJT4/c+F9EEIepVuu/GCg+bO3JHa5ovSB607fRdSOIMD/iJB91GYo0JvUBSHC
+	 Dl/9lNRxJpU2nXAesPjNklw3rYR8GENv9Ecu3BHC4uH4+DEV4/je8XaFaZDO+ExPTwW+6
+	 AcCo95h90QI6KVUGOevfQf/UR0wo/rpVhYn8OX111o2s7XhymFGU7f74cnvcCRSNoDOm7
+	 XwSsZSerfOE0em4jtP/UR2OGt5Jp/D1zKIWSslr/XRF65BiFrRu9Jakcdz28wpzqxIOIx
+	 ks/GZX2aNpAw32X90gH2OKAg6pwka0sJ+UW7QCAMLG0P9OUxvR40JTuPGh1SkNABTLQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kSuQm1gi;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=linux.alibaba.com;
+	spf=pass smtp.mailfrom=linux.alibaba.com;
+	dkim=pass header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=HoplrZB8;
+	arc=none smtp.remote-ip=115.124.30.101
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A2E5606A33B;
-	Sun,  1 Nov 2026 22:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98E0E606A32C
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 01:45:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 98E0E606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kSuQm1gi
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 155181F00A1F;
-	Sun,  1 Nov 2026 22:15:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793571353;
-	bh=FTHI4iJKGW8nTdZJYWi2ZEsJRVp05NwkVgRYnkQTnQI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=kSuQm1gig26F3a5hbFrlCEgTV6KZdAUm8pVgji64pGU9IHFtmj1+0lqa6FjFwtpwY
-	 RQDDMAWpx0nuTd442k2/dkXZmO3ak6/b0bODbLMMOiXHR7sqan7+OYTSomVvsVhatc
-	 5sO4YlxH84ZbDrCWiv6NIlf3enn6ckTlaSH0A2hbLwanZ7TAw2vRzqI9LjdgxD9mYw
-	 rVyzHjy74WbfzuCKilIc61p8YM/etpQQgk31aiPP5AoELP2cxYQDze2rDXYJz/8udp
-	 9mbnMTtDK0Vamho7QvOMgWKAobDTF7XMy60kwODafcPU8OakiOi1fCrlQV4kt03Hd9
-	 bPj8B6YTEsy3w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 032DA38003B8;
-	Sun,  1 Nov 2026 22:15:53 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key, unprotected) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=HoplrZB8
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1793583939; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=9uLkggi5jeL9sGYQHyTyByYxkgZ/xZRTq5JwmLkTNLA=;
+	b=HoplrZB8Ir17a8gq+0Um4Dv9B9qGQab9LlnOpq7Gc0nTVwO0ZgshKeHXVJr/KnBnlP+Tr8RSFxPlCtPdFPFsPVUfzSU1w6I9bYWTFgsZS8p4676cjm4hnSwWKEQWuQoi66EzoYavtcRiNHZWRfIKPjDqdalHq3RWk8nayHTdNHY=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R741e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=yaoyuan@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0XDrYjc._1793583936;
+Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0XDrYjc._1793583936 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 02 Nov 2026 09:45:36 +0800
+Date: Mon, 2 Nov 2026 09:45:36 +0800
+From: Yao Yuan <yaoyuan@linux.alibaba.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Mark Rutland <mark.rutland@arm.com>, 
+	Yicong Yang <yangyicong@hisilicon.com>, Zhou Wang <wangzhou1@hisilicon.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/5] KVM: arm64: Add ACCDATA_EL1 to the sysreg array
+Message-ID: <7s5ptzeolghvb6aplrf4cy3kwxeh6hvca5clneexutbvz3u3rr@g5ejdynebrnk>
+References: <20261025075138.2919734-1-fuad.tabba@linux.dev>
+ <20261025075138.2919734-3-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,168 +66,76 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v6 00/39] mm: make VMA flag semantics explicit, eliminate
- VM_SPECIAL
-From: patchwork-bot+linux-riscv@kernel.org
-Message-Id: 
- <179357135155.2624073.13862678489444424470.git-patchwork-notify@kernel.org>
-Date: Sun, 01 Nov 2026 22:15:51 +0000
-References: 
- <20261013-b4-mmap-prepare-vma-flag-sanify-v6-0-1aa3c9b139f9@kernel.org>
-In-Reply-To: 
- <20261013-b4-mmap-prepare-vma-flag-sanify-v6-0-1aa3c9b139f9@kernel.org>
-To: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-Cc: linux-riscv@lists.infradead.org, akpm@linux-foundation.org,
- liam@infradead.org, vbabka@kernel.org, jannh@google.com, pfalcato@suse.de,
- david@kernel.org, rppt@kernel.org, surenb@google.com, mhocko@suse.com,
- corbet@lwn.net, gregkh@linuxfoundation.org,
- dennis.dalessandro@cornelisnetworks.com, jgg@ziepe.ca, leon@kernel.org,
- paul@paul-moore.com, stephen.smalley.work@gmail.com, perex@perex.cz,
- tiwai@suse.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- eddyz87@gmail.com, memxor@gmail.com, ziy@nvidia.com,
- baolin.wang@linux.alibaba.com, nico.pache@linux.dev, ryan.roberts@arm.com,
- dev.jain@arm.com, baohua@kernel.org, lance.yang@linux.dev,
- usama.arif@linux.dev, kas@kernel.org, dgilbert@interlog.com,
- James.Bottomley@HansenPartnership.com, mkp@kernel.org, simona@ffwll.ch,
- deller@gmx.de, sre@kernel.org, jhubbard@nvidia.com, peterx@redhat.com,
- mhiramat@kernel.org, oleg@redhat.com, peterz@infradead.org, tglx@kernel.org,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
- acme@kernel.org, namhyung@kernel.org, mark.rutland@arm.com, riel@surriel.com,
- harry@kernel.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
- maarten.lankhorst@linux.intel.com, mripard@kernel.org, tzimmermann@suse.de,
- airlied@gmail.com, will@kernel.org, aneesh.kumar@kernel.org,
- npiggin@gmail.com, arnd@arndb.de, muchun.song@linux.dev, osalvador@suse.de,
- willy@infradead.org, jack@suse.cz, maz@kernel.org, oupton@kernel.org,
- catalin.marinas@arm.com, maddy@linux.ibm.com, anup@brainfault.org,
- pjw@kernel.org, palmer@dabbelt.com, aou@eecs.berkeley.edu,
- borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
- agordeev@linux.ibm.com, gerald.schaefer@linux.ibm.com, hca@linux.ibm.com,
- gor@linux.ibm.com, davem@davemloft.net, andreas@gaisler.com,
- viro@zeniv.linux.org.uk, brauner@kernel.org, matthew.brost@intel.com,
- joshua.hahnjy@gmail.com, rakie.kim@sk.com, byungchul@sk.com,
- gourry@gourry.net, ying.huang@linux.alibaba.com, apopple@nvidia.com,
- chrisl@kernel.org, kasong@tencent.com, shikemeng@huaweicloud.com,
- nphamcs@gmail.com, baoquan.he@linux.dev, youngjun.park@lge.com,
- hannes@cmpxchg.org, qi.zheng@linux.dev, shakeel.butt@linux.dev,
- axelrasmussen@google.com, yuanchu@google.com, weixugc@google.com,
- chengming.zhou@linux.dev, mhocko@kernel.org, miklos@szeredi.hu,
- xu.xin@linux.dev, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-rdma@vger.kernel.org, selinux@vger.kernel.org,
- linux-sound@vger.kernel.org, bpf@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-trace-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- sparclinux@vger.kernel.org, fuse-devel@lists.linux.dev,
- ihor.solodrai@linux.dev, spasswolf@web.de, tiwai@suse.de,
- emil@etsalapatis.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261025075138.2919734-3-fuad.tabba@linux.dev>
 
-Hello:
+On Sun, Oct 25, 2026 at 07:51:35AM +0800, Fuad Tabba wrote:
+> From: Marc Zyngier <maz@kernel.org>
+>
+> Make ACCDATA_EL1 a first-class citizen, and add it to the sysreg
+> array. Visibility is conditioned on the feature being enabled.
+>
 
-This series was applied to riscv/linux.git (fixes)
-by Andrew Morton <akpm@linux-foundation.org>:
+Hi Tabba,
 
-On Tue, 13 Oct 2026 16:04:40 +0100 you wrote:
-> The VM_SPECIAL / VMA_SPECIAL_FLAGS mask conflates several unrelated
-> properties:
-> 
-> * Is this managed by core mm, or by a driver mapping MMIO, kernel-allocated
->   pages, or even ordinary pages itself?
-> * Can it be expanded or merged?
-> * Is this a 'weird' case like mlock where migration might race and we
->   'have' to set invalid flags to notify?
-> * Is it another 'weird' case where we just want to stop GUP from touching
->   it?
-> 
-> [...]
+LGTM.
+Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
 
-Here is the summary with links:
-  - [v6,01/39] mm/vma: fix mmap_prepare file handling, remove file_doesnt_need_get
-    (no matching commit)
-  - [v6,02/39] mm/vma: introduce and use vma_[flags_]can_merge()
-    https://git.kernel.org/riscv/c/86a779c53204
-  - [v6,03/39] mm: consistently validate VMA state after mmap[_prepare] hooks
-    https://git.kernel.org/riscv/c/9cae38dc11da
-  - [v6,04/39] mm/vma: ensure mmap_prepare doesn't set actions on a mergeable vma
-    https://git.kernel.org/riscv/c/6335c786299f
-  - [v6,05/39] mm: make map_kernel_pages_[prepare,complete] internal and unexported
-    https://git.kernel.org/riscv/c/2a234f79d416
-  - [v6,06/39] mm/vma: tidy up map kernel pages enum values
-    https://git.kernel.org/riscv/c/4852f3421456
-  - [v6,07/39] mm: assert mmap lock held, use new flags API in vm_insert_page[s]
-    https://git.kernel.org/riscv/c/dad8e88fcfce
-  - [v6,08/39] mm: add mmap action for discontiguous kernel page mapping
-    https://git.kernel.org/riscv/c/b7b4d8f37a4f
-  - [v6,09/39] docs: filesystems: update mmap_prepare docs for discontig kernel pgs
-    https://git.kernel.org/riscv/c/ae60723abb65
-  - [v6,10/39] drivers/usb/mon: update to use mmap_prepare + map kernel pages
-    https://git.kernel.org/riscv/c/5323bb5f6ef3
-  - [v6,11/39] infiniband: update hfi1 to use remap_vmalloc_range()
-    (no matching commit)
-  - [v6,12/39] selinux: reject writable opens of policy file, drop mmap shared/write check
-    https://git.kernel.org/riscv/c/c6ce4378f20a
-  - [v6,13/39] ALSA: pcm: use vm_insert_page() to map PCM status page
-    https://git.kernel.org/riscv/c/ceb0de27371f
-  - [v6,14/39] bpf: arena: mark arena_map_mmap() mappings VM_MIXEDMAP
-    https://git.kernel.org/riscv/c/0c2c9885c5e9
-  - [v6,15/39] mm/vma: add vma[_flags]_is_mm_managed() predicates
-    https://git.kernel.org/riscv/c/7fdbc26b69c0
-  - [v6,16/39] mm/vma: only allow mmap to clear VMA_MAYWRITE_BIT if not mm-managed
-    https://git.kernel.org/riscv/c/d99c4a302c5a
-  - [v6,17/39] mm/vma: add and use vma_[flags]_is_fixed_mapping
-    https://git.kernel.org/riscv/c/9201d0f5b9d5
-  - [v6,18/39] scsi: sg: convert mmap hook to mmap_prepare and rework
-    https://git.kernel.org/riscv/c/abdd54cef5fc
-  - [v6,19/39] fbdev: defio: assert FBINFO_VIRTFB, drop VM_IO, add VM_MIXEDMAP
-    https://git.kernel.org/riscv/c/19458d015fcc
-  - [v6,20/39] HSI: cmt_speech: convert mmap hook to mmap_prepare, refactor
-    https://git.kernel.org/riscv/c/5605c40895fc
-  - [v6,21/39] mm/gup: error out early on !VMA_MAYREAD_BIT VMAs
-    https://git.kernel.org/riscv/c/2d2b1c508f21
-  - [v6,22/39] uprobes: remove VM_IO, set VM_MIXEDMAP for mapped kernel pages
-    https://git.kernel.org/riscv/c/0d219bc3cb88
-  - [v6,23/39] mm/mlock: clear VMA_LOCKED_MASK over mmap callback
-    https://git.kernel.org/riscv/c/61e012ab9a1c
-  - [v6,24/39] mm/mlock: eliminate weird VMA_IO_BIT abuse and simplify
-    https://git.kernel.org/riscv/c/aea83f2694ed
-  - [v6,25/39] mm/vma: enforce that mm-managed mappings may not set VMA_IO_BIT
-    https://git.kernel.org/riscv/c/99fd6bf43d5d
-  - [v6,26/39] mm: remove VMA_IO_BIT check in vma[_flags]_is_mm_managed()
-    https://git.kernel.org/riscv/c/88d77002e1a1
-  - [v6,27/39] mm: remove hugetlb_inline.h
-    https://git.kernel.org/riscv/c/94c86564538e
-  - [v6,28/39] mm: rename is_vm_hugetlb_page() to vma_is_hugetlb()
-    (no matching commit)
-  - [v6,29/39] mm: drop some redundant checks around hugetlb VMAs
-    (no matching commit)
-  - [v6,30/39] mm/vma: introduce vma[_flags]_is_mm_backed()
-    https://git.kernel.org/riscv/c/44debd840ec9
-  - [v6,31/39] mm/madvise: update is_valid_guard_vma() to use vma_is_mm_backed()
-    https://git.kernel.org/riscv/c/fc95d1cf4a13
-  - [v6,32/39] mm/uffd: use predicates for userfaultfd checks
-    https://git.kernel.org/riscv/c/fb700342f506
-  - [v6,33/39] mm/madvise: use predicates for madvise(..., MADV_DOFORK)
-    https://git.kernel.org/riscv/c/1d1104fe6dc6
-  - [v6,34/39] mm: eliminate VMA_SPECIAL_FLAGS usage when hugetlb explicitly tested
-    https://git.kernel.org/riscv/c/531e56359ffb
-  - [v6,35/39] mm: eliminate VMA_SPECIAL_FLAGS check in lru_gen_look_around()
-    https://git.kernel.org/riscv/c/5997da57a09b
-  - [v6,36/39] mm: avoid use of VMA_SPECIAL_FLAGS in migrate_vma_setup()
-    https://git.kernel.org/riscv/c/8bf792b7afcb
-  - [v6,37/39] mm: eliminate VM_SPECIAL, VMA_SPECIAL_FLAGS
-    https://git.kernel.org/riscv/c/72a993449cb0
-  - [v6,38/39] fuse: dax: do not set VM_MIXEDMAP
-    https://git.kernel.org/riscv/c/b0d88bfa7515
-  - [v6,39/39] mm/huge_memory: remove vma_is_special_huge()
-    https://git.kernel.org/riscv/c/e2a1d080f510
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/20240815125959.2097734-4-maz@kernel.org
+> [Fuad: rebased]
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  3 +++
+>  arch/arm64/kvm/sys_regs.c         | 12 +++++++++++-
+>  2 files changed, 14 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 27fe0cd5b2d7a..5b1cd1f502b7d 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -498,6 +498,9 @@ enum vcpu_sysreg {
+>  	GCR_EL1,	/* Tag Control Register */
+>  	TFSRE0_EL1,	/* Tag Fault Status Register (EL0) */
+>
+> +	/* Random stuff */
+> +	ACCDATA_EL1,	/* Accelerator Data */
+> +
+>  	POR_EL0,	/* Permission Overlay Register 0 (EL0) */
+>
+>  	/* FP/SIMD/SVE */
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 44aae52c473d7..40f8be41da3a4 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2914,6 +2914,15 @@ static unsigned int sve_el2_visibility(const struct kvm_vcpu *vcpu,
+>  	return __el2_visibility(vcpu, rd, sve_visibility);
+>  }
+>
+> +static unsigned int accdata_visibility(const struct kvm_vcpu *vcpu,
+> +				       const struct sys_reg_desc *rd)
+> +{
+> +	if (kvm_has_feat(vcpu->kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA))
+> +		return 0;
+> +
+> +	return REG_HIDDEN;
+> +}
+> +
+>  static unsigned int vncr_el2_visibility(const struct kvm_vcpu *vcpu,
+>  					const struct sys_reg_desc *rd)
+>  {
+> @@ -3601,7 +3610,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_CONTEXTIDR_EL1), access_vm_reg, reset_val, CONTEXTIDR_EL1, 0 },
+>  	{ SYS_DESC(SYS_TPIDR_EL1), NULL, reset_unknown, TPIDR_EL1 },
+>
+> -	{ SYS_DESC(SYS_ACCDATA_EL1), undef_access },
+> +	{ SYS_DESC(SYS_ACCDATA_EL1), undef_access, reset_val, ACCDATA_EL1, 0,
+> +	  .visibility = accdata_visibility},
+>
+>  	{ SYS_DESC(SYS_SCXTNUM_EL1), undef_access },
+>
+> --
+> 2.47.3
+>
