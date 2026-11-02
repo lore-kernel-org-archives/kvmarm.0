@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793655323;
-	b=BXWafopzmKJI7phbY/j081zSB6CCy0OpMD3mAkPBR71DhaAh3lc5m3URZ53fQiHqudqQ
-	 J3TfBsBXg/9QW84ujxISbCZzsIMZ/tbm3MrquRc/SKpRDaOQufs4KjGCxsqAAPr13825L
-	 gApL9zVLK6GvsYMCSGpGxtYnNMf7Zqr2eQ2UKyXqEh3wgJXrjYngTipi1wb3IqAfqERoN
-	 +dNQBTW7WugZX9CPXn8x4In1Qsk/g7PQuaLMXkorjryfr+CZpyGiA8KCaqVmR3mNFUXrg
-	 b38yNlg0JR35Kh1mfw+HIhXDWl9NMDYOuKfHuaYKn5XrJmbNUamgijE0KcKTC8h+lVg==
+	t=1793655328;
+	b=5d11lETwdjcAs6pOnfme0xJmKR+V4u2W4du7vnTQUPUsj90pnr61YqB5qqQpukbcLqfK
+	 ZUfVBnCs20HluiVjdhS87EEwJG+fS9V466H34kxB4OgM1KW1ZGculzOK2rgPT1pJHT0Yg
+	 3kgqpgFRlEKsXVFzrIEDlvBTn8EbCLhV/3ho+UjUFTwofnNywzqdPhNbeAJ+XiGwctmzo
+	 m/4+0aTKv5JsupDSgShfgM5cjdxrUnhAYsYL8bZtMstgfiJd5SFY5+KJa5rysEbiINi0r
+	 MM8BKrYbQ7/OfLSsMZowuXzrnzib8Tlkiv1RE+LGLFoYD1SceZEUnDkaQEFiPdRPQcg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793655323;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793655328;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
 	 Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=AN4a81Z9UJtQPnLgJ+RkAktom/qeg65wVEkaF18Qw/Y=;
-	b=JbX4EjnBJ2FrxnNbNQOwtBgIqgMcK3DAT2ftVcWk+xIaOkpNeCISd1xjd8tThmJ75FDL
-	 7+U9txK8tfmAuVZnBDtRY/LnMR6YTtKZeFoaUIXFybK55RMi6ETSgzHgsXOolTBo2IzQD
-	 skIwT7BrI8bRTTWYK4mn+V/5A6hsQchojJawchJgGP0Dz/dDqDcctiBGCbXyhXar5wfoQ
-	 pNNCO02WdWTEzR+Upnk+0Knc84nIlb4l83QXTwYq0MPg+xLDNnK7oXxpOKn1hmjkmwrCw
-	 Vb6j1AGuOZREPfC6rq+24lLseBfH8lzABQb5SL2Rmhl4+lPvIrrpa83xOjoGz/tTzCA==
+	bh=foE+8Kof6LbdOYig+diwcHlzAv8+58dS/mpVZgTxm2I=;
+	b=MyJGyC7+rRpXJA6OkoByOynohe1f+onv8K3WQqUNEKejegzx4yHcSyi9y94yE4H224n4
+	 cSPRUaA1oVGaDJXWUUO/Or8KY6EyXEDa6Cz6xaeAUlHMe6fmaLhE2Je1/GkTQ7UftHvrW
+	 j6KJYuyApJFHO5Ud6AZloGnDbPkS3d7KWI+/euF92LHSY12nn/xlxk0+ps1JYj/N1+Amr
+	 MFb3Q6BNCVkTd52IHhv7Ee8NGlw5gOqr0BMdEyoVPpYRGA/YiFxUSwygIneDjRp+ZjKCU
+	 j111RsWX60C6BAG58Ky8bRypbMvlU3d63BeafM5mPvmtLmSsmbIpL+a+xXwM3OTK4BQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Fif+52Ya;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=RBkRfBHs;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C953606D810
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 21:35:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4C953606D810
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6F9E606EE85
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 21:35:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B6F9E606EE85
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Fif+52Ya
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=RBkRfBHs
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C8AE31595;
-	Mon,  2 Nov 2026 13:35:19 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 060241595;
+	Mon,  2 Nov 2026 13:35:24 -0800 (PST)
 Received: from e133894.cambridge.arm.com (e133894.arm.com [10.2.80.62])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 926303F673;
-	Mon,  2 Nov 2026 13:35:21 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C486D3F673;
+	Mon,  2 Nov 2026 13:35:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793655322; bh=43k+9jU20ktuHYEgwEIXmQdpwB5aJB3Ksk7i8S+YwmY=;
+	t=1793655327; bh=Iv/VwfIyikLXQy5eCHqhGt1VBnwP/NThFwcmk19S6/U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Fif+52Ya8ozE6ScJ3kHscKufOpKyFMwCnKn2Km2ASS+YsbNsasnWM6Ip0Uvza1+av
-	 aQFXBY9WAIwuQKAstE8tvdLtJq8OD+A7dr84DYcMBLgcKM5qid8++nGwy9Ha7BpyjK
-	 RpufmR7O09Ck9YJuw70C8BAnlSxehcIPsc4ApSiM=
+	b=RBkRfBHsKw2CwQGDZ3qlAHYwapQ6FRrlinZmK31EVDlVCXmiHlZXbn3QjPb4DkThJ
+	 O6SSsIzhDK80+ergehFfHuvAHgUAP2POCuKpAyNzy1AqFIF+siCcKJbZjIVYiZzC7d
+	 lGAPDYroPBQHVISS7PnXMPN/scAA57H+nnN2ToNk=
 From: Sascha Bischoff <sascha.bischoff@arm.com>
 To: will@kernel.org,
 	julien.thierry.kdev@gmail.com
@@ -51,9 +51,9 @@ Cc: vladimir.murzin@arm.com,
 	kvmarm@lists.linux.dev,
 	timothy.hayes@arm.com,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH kvmtool v4 15/23] arm64: Describe the GICv5 IRS in the DT
-Date: Mon,  2 Nov 2026 21:34:05 +0000
-Message-Id: <20261102213413.4136118-16-sascha.bischoff@arm.com>
+Subject: [PATCH kvmtool v4 16/23] arm64: Generate GICv5 SPI specifiers for platform devices
+Date: Mon,  2 Nov 2026 21:34:06 +0000
+Message-Id: <20261102213413.4136118-17-sascha.bischoff@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261102213413.4136118-1-sascha.bischoff@arm.com>
 References: <20261102213413.4136118-1-sascha.bischoff@arm.com>
@@ -68,69 +68,38 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Describe the IRS CONFIG and SETLPI frames and associate each CPU
-phandle with its IAFFID. This lets the guest discover and configure
-the IRS for shared interrupts.
+Use the GICv5 interrupt type and absolute SPI number for platform
+devices. Preserve the legacy GICv2/v3 DT encoding for other VMs.
 
 Tested-by: Vladimir Murzin <vladimir.murzin@arm.com>
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- arm64/gic.c | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ arm64/fdt.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/arm64/gic.c b/arm64/gic.c
-index e69f2742..91447703 100644
---- a/arm64/gic.c
-+++ b/arm64/gic.c
-@@ -587,6 +587,16 @@ void gic__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+diff --git a/arm64/fdt.c b/arm64/fdt.c
+index 5413956d..e92ae044 100644
+--- a/arm64/fdt.c
++++ b/arm64/fdt.c
+@@ -63,11 +63,13 @@ static void generate_cpu_nodes(void *fdt, struct kvm *kvm)
  
- static void gic__generate_gicv5_fdt_nodes(void *fdt, struct kvm *kvm)
+ static void generate_irq_prop(void *fdt, u8 irq, enum irq_type irq_type)
  {
-+	char node_at_addr[64];
-+	u32 cpus[kvm->nrcpus];
-+	u16 iaffids[kvm->nrcpus];
-+	u64 irs_reg_prop[] = {
-+		cpu_to_fdt64(ARM_GICV5_IRS_CONFIG_BASE),
-+		cpu_to_fdt64(ARM_GICV5_IRS_CONFIG_SIZE),
-+		cpu_to_fdt64(ARM_GICV5_IRS_SETLPI_BASE),
-+		cpu_to_fdt64(ARM_GICV5_IRS_SETLPI_SIZE)
-+	};
+-	u32 irq_prop[] = {
+-		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_SPI),
+-		cpu_to_fdt32(irq - GIC_SPI_IRQ_BASE),
+-		cpu_to_fdt32(irq_type)
+-	};
++	u32 irq_prop[3];
++	u32 type = gic__get_spi_fdt_type();
++	u32 intid = irq - gic__get_spi_base();
 +
- 	_FDT(fdt_begin_node(fdt, "gicv5-cpuif"));
- 	_FDT(fdt_property_string(fdt, "compatible", "arm,gic-v5"));
- 	_FDT(fdt_property_cell(fdt, "#interrupt-cells", GIC_FDT_IRQ_NUM_CELLS));
-@@ -598,6 +608,31 @@ static void gic__generate_gicv5_fdt_nodes(void *fdt, struct kvm *kvm)
- 	/* Use a hard-coded phandle for the GIC to help wire things up */
- 	_FDT(fdt_property_cell(fdt, "phandle", PHANDLE_GIC));
++	irq_prop[0] = cpu_to_fdt32(type);
++	irq_prop[1] = cpu_to_fdt32(intid);
++	irq_prop[2] = cpu_to_fdt32(irq_type);
  
-+	/*
-+	 * GICv5 IRS node
-+	 */
-+	snprintf(node_at_addr, sizeof(node_at_addr), "irs@%llx",
-+		 (unsigned long long)ARM_GICV5_IRS_CONFIG_BASE);
-+	_FDT(fdt_begin_node(fdt, node_at_addr));
-+	_FDT(fdt_property_string(fdt, "compatible", "arm,gic-v5-irs"));
-+	_FDT(fdt_property_cell(fdt, "#address-cells", 2));
-+	_FDT(fdt_property_cell(fdt, "#size-cells", 2));
-+	_FDT(fdt_property(fdt, "ranges", NULL, 0));
-+
-+	_FDT(fdt_property(fdt, "reg", irs_reg_prop, sizeof(irs_reg_prop)));
-+	_FDT(fdt_property(fdt, "reg-names", "ns-config\0ns-setlpi",
-+			  sizeof("ns-config\0ns-setlpi")));
-+
-+	for (int cpu = 0; cpu < kvm->nrcpus; cpu++) {
-+		cpus[cpu] = cpu_to_fdt32(PHANDLE_CPU_BASE + cpu);
-+		iaffids[cpu] = cpu_to_fdt16(cpu);
-+	}
-+
-+	_FDT(fdt_property(fdt, "cpus", cpus, sizeof(u32) * kvm->nrcpus));
-+	_FDT(fdt_property(fdt, "arm,iaffids", iaffids, sizeof(u16) * kvm->nrcpus));
-+
-+	_FDT(fdt_end_node(fdt));
-+
- 	_FDT(fdt_end_node(fdt));
+ 	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
  }
- 
 -- 
 2.34.1
 
