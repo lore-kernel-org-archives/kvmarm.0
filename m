@@ -1,49 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793645534;
-	b=KebsbGMtwam6hW2Xyzo3fMOgRJLY4vt8i2Ae21Z7LxnULpCsb6bUYR6BMOMNe2u+2BuB
-	 O0US7+xcfrh73FmdZds5R9GLpfoHW4u+YXDfaEeo6N5WRaPPXot0Gzb4VRDo5eYykAaLO
-	 ie3EU0pEZCxL3B9PxNMmKPwJzOKkVJCE50J9C0VllUmigeeU7FxA7NleSHxzi5zXtOln/
-	 nI38MGwAZszSny5y8IIPcKZ0amujbL6xjgp2aThbp/YRy7sQ3M7WxEgWmglmgE7/9zDVo
-	 imYLh6rLmzUZOPq6t2KhRLjlzWiE/pt2THEknXugARh0qFfsAcseW/TVXLQaE6msoWw==
+	t=1793645952;
+	b=OtspCJU/MjjJQdYsvu25HDPtZNTEYyEpF4IfHPNormfz+uhLpWh/V2NMCKS+Vnut6jkQ
+	 jZxcVSapMveJ7WImyutQbMNFcSqhr9VFLXEwkBg5IJY6vpcfKLdr9hdEkkqbO/aLimESn
+	 3+u7xG35HgFz/OZFOBk/8WahLjKM0Pm4wT/VliIBKKjBOjbYwwtV5QlP53xaJImodJZmT
+	 Y/qwIIYcub1CPsnAmrB8gkBErd61v0swY3cIKP0WxPo2sxDbKikrVT386vgXz2x5xfWjN
+	 zqf1f0mlkueMA0SelXYSVy7EQIqbtJEnbGpM2UOSq2hH5zM6ariv+qNwBhwXLfHTYgg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793645534;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=IK5p9/oAjFQaLEk4iOn+2jSpIJGhuFIILB+nKJjM5W4=;
-	b=r096VYwEBOcO6tcSwb41VDqoPXiRW+deWkRXc+YeYmoqS6AhBBpB5VfUGBuT4U8i8dii
-	 v/94SqFy6URE5rd96zAOPZxvutc57aKJoFKXCu6lBwETO7BKns4XMYtFFzl1lY9b3xyYI
-	 7hO6Bsde7I48o2pHc0MiFOEE1Td5LuZuyXBKrlvGPs4gl0ePIyEdYAhtSx+5YUBSKzMFc
-	 VYodJU22aLM6LmJx4R7yugl14TPSjXu3EJgiwb4Bi1mN6dbSYDJKe2Qk0ZHRM8jTKcY5K
-	 FZFsY0UHPmSsBYujZ9JeBoTLmfgT0gsls/kLtAZu425azJcweD7cat4fpWVzqU+pDfg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793645952;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=r9JhDIOHPdsZllQyxUB4H0ZlgUBt8v+L3mtCQBDQk2A=;
+	b=R4plFPXdcM2WNVTeAnwqiuRvf9CUlxmGQqVFmH338iiC0E7C9wuJaOR9oAtETQXwlQoq
+	 jj56NKqyAf0SOpRnwdWilpoeKaEiP6jlzZYCJ/ZjJAGmCBW1RrIg2RlY0u6v5COI97XU0
+	 lccvesQ2xgn3zBVizAxRodDY+E1QU47O4JEhbjljQjMWvlYfj7AZfxDzVftpYnG3gtXTV
+	 aCkdn8KPZwyYZHKz8Zo6AIhx7FLVaO5My/0Jjuubqg4ZXvaz16yYGkJKfrcV1KRz1lLRv
+	 yEoZn6xzJuchTVHlRixyl45W1NXhqW34hrwDNredeXib3wvKsq4kE+wWZnwKf6ruszA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=rpf7QTW0;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 402FF606A327;
-	Mon,  2 Nov 2026 18:52:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 402FF606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Jkm0dngw;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD756606A326;
+	Mon,  2 Nov 2026 18:59:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=rpf7QTW0
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 721EF1FC4;
-	Mon,  2 Nov 2026 10:52:09 -0800 (PST)
-Received: from [10.57.89.36] (unknown [10.57.89.36])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D17523F673;
-	Mon,  2 Nov 2026 10:52:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793645532; bh=eRT8EPlGmj8VVlfVMAD9ve9ebI+67LjsP9Gf4hzofTg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=rpf7QTW00lwV9uTdlfHmVNFktsConMIdlqcqODPOVAoWzTp/3ZRQLmYqIG/rB3/O2
-	 B43c7J+phQXwSkzgHrVn+KcB5LCXoLOCtrWx8k8KB+MD49amIYjt2Wg0OljbJdEkDw
-	 nQjecks+ITNlOMcG9zeZ9omftVPNSf4vFKcf0l94=
-Message-ID: <ab0d81a4-da63-4f36-8412-0649153ebd49@arm.com>
-Date: Mon, 2 Nov 2026 18:52:10 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Jkm0dngw
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 856791F00A1D;
+	Mon,  2 Nov 2026 18:59:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793645951;
+	bh=r9JhDIOHPdsZllQyxUB4H0ZlgUBt8v+L3mtCQBDQk2A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=Jkm0dngwCyiFMAtdq8uZCeoHgOKz40OfTyEqYb7LUTXQ0+gLkMQKeojaUUYQXX5JU
+	 3Mff/Cs1Zffhd9g0Ndcxmuysy4EAL5pVaqyBUpdWX/aWNcjBDz6UDplXA8odNelu8v
+	 UZksY6CPr8r/s4XojB2ygsTFW4rkFxpz3PezpoPlXsTQfQ28uqLLr1LzFJXixPaWAj
+	 uFpABQmYM6DAeIbADgO5INNelNYsXyjJPkmIPIlzK9hGphnmbL7rJTu9oRc6eLiPUq
+	 I5bR3ITar9avmfr3Q+FZgFMX+OUin+2LhaXaKJD4urmdYeDGczbQ88Oe/OPOMHNhrX
+	 qIh4WPeketSsw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xNxFN-0000000A384-0KTo;
+	Mon, 02 Nov 2026 18:59:09 +0000
+Date: Mon, 02 Nov 2026 18:59:08 +0000
+Message-ID: <868q3b2h6r.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Matthias Goergens <matthias.goergens@gmail.com>
+Cc: Wei-Lin Chang <weilin.chang@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	Randy Dunlap <rdunlap@infradead.org>,
+	linux-kernel@vger.kernel.org,
+	workflows@vger.kernel.org
+Subject: Re: [PATCH v2] Documentation/process: Add a maintainer entry profile for KVM/arm64
+In-Reply-To: <20261102083759.1561867-1-matthias.goergens@gmail.com>
+References: <20261030083351.3040604-1-matthias.goergens@gmail.com>
+	<6urqt376s23fcyr5pchfrrowvjoo6acg5xt4ujkft7gww6sagj@jxz5rqihtkja>
+	<20261102083759.1561867-1-matthias.goergens@gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -52,82 +82,33 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 16/16] KVM: arm64: gic-v5: Document ITS userspace ABI
-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org
-Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
-References: <20261016155741.979985-1-sascha.bischoff@arm.com>
- <20261016155741.979985-17-sascha.bischoff@arm.com>
- <sashiko-outbox-174640@kernel.org>
-Content-Language: en-GB
-From: Sascha Bischoff <sascha.bischoff@arm.com>
-In-Reply-To: <sashiko-outbox-174640@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: matthias.goergens@gmail.com, weilin.chang@arm.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, corbet@lwn.net, skhan@linuxfoundation.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, rdunlap@infradead.org, linux-kernel@vger.kernel.org, workflows@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 16/10/2026 17:27, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [Medium] kvm: arm64: gic-v5: userspace writes to READ_EVENT_DATAR are silently ignored causing state loss
-> --
+On Mon, 02 Nov 2026 08:37:59 +0000,
+Matthias Goergens <matthias.goergens@gmail.com> wrote:
 > 
-> commit 3a4606444ec9f90ae2360e066a229c789d9eca15
-> Author: Sascha Bischoff <sascha.bischoff@arm.com>
+> On Sat, 31 Oct 2026 21:03:17 +0000, Wei-Lin Chang wrote:
+> >> +Minor problems are often fixed up by the maintainers when applying; if they
+> >> +say "no need to resend", don't.
+> >
+> > The second half of this is a little silly :P
+> > What about just:
+> >
+> > Minor problems are often fixed up by the maintainers when applying; ask
+> > if you are unsure whether to resend.
 > 
-> KVM: arm64: gic-v5: Document ITS userspace ABI
-> 
-> Document the GICv5 ITS device and its userspace ABI, including the
-> MMIO address, reset control, register attributes, and MSI requirements.
-> 
->> diff --git a/Documentation/virt/kvm/devices/arm-vgic-v5-its.rst b/Documentation/virt/kvm/devices/arm-vgic-v5-its.rst
->> new file mode 100644
->> index 0000000000000..250057e4445d7
->> --- /dev/null
->> +++ b/Documentation/virt/kvm/devices/arm-vgic-v5-its.rst
-> 
-> [ ... ]
-> 
->> +KVM_DEV_ARM_VGIC_GRP_ITS_REGS
->> +-----------------------------
->> +
->> +  Attributes:
->> +    The attr field of kvm_device_attr contains the ITS register offset from
->> +    the control frame base address. kvm_device_attr.addr points to a __u64,
->> +    regardless of whether the register is 32 or 64 bits wide. A 64-bit
->> +    register must be addressed at its base offset; userspace cannot access
->> +    its upper or lower half separately. Guest MMIO may use aligned 32-bit
->> +    accesses to DT_BASER, DIDR, READ_EVENT_DATAR, and GEN_EVENT_DIDR.
->> +
->> +    The ITS base address must be configured before this group can be used.
->> +    Writes to read-only registers are ignored. Writes to DT_CFGR and DT_BASER
-> 
-> [Severity: Medium]
-> Does this design violate the rule that read-only attributes must return an
-> error on set?
-> 
-> A device attribute documented as read-only whose set path does not return an
-> error can lead to silent migration state loss. For example, READ_EVENT_DATAR
-> is a stateful register that holds the result of the READ_EVENTR command. If
-> userspace restores this state during migration, but the write path returns 0
-> while ignoring the value, the restored state is silently dropped, corrupting
-> the guest's view of the command result upon resume.
-> 
-> Looking at the implementation, READ_EVENT_DATAR is defined without a uaccess
-> write override in vgic_v5_its_registers() and uses vgic_v5_mmio_write_its_wi.
-> The userspace attribute set path in vgic_v5_its_attr_regs_access() defaults
-> to calling the guest its_write handler, which invokes the Write Ignore stub
-> and successfully returns 0 instead of returning -EINVAL or -EPERM.
-> 
+> Agreed, that reads better.  I'll use your wording in v3.
 
-The posted userspace access patch in this series (patch 10) silently 
-discarded READ_EVENT_DATAR, which was a mistake on my part.
-
-I've added its restore handler in patch 10, and a read-back test in 
-patch 14, and ABI text in this patch documenting that userspace can 
-(read: must) restore it. Guest MMIO writes remain ignored, as this is a 
-RO register from the guest's point of view, but it must persist across 
-save/restore.
+If that's the only change, I'll fix it when applying.
 
 Thanks,
-Sascha
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
