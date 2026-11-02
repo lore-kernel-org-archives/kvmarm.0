@@ -1,85 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793630062;
-	b=XIeYVPQ9tVavAGZSy3ma319bruaEoeYss8pgi+kOgrpa0f4UCwGx2GoUo2T7e6TUlHur
-	 UT5dTsLJd34AOOKXfkfhAMqyMDTSubrQNNFcWSh5+OUPZ545c2d02rzpNpPdKHWd6GJ5O
-	 VrQ7yDxz8EmYOlMjT5+frTAuL717QJz3GVnkK306F3gZUYM78f5mmWMyl0KAU6ycsTu5e
-	 3J2yHRPO6udtTiGP8j+Bvke7xMhjITijcb7NILfhXvnl9mWTWfs1kjBDrb0gMm9GVAqv/
-	 q5vZzXB5p3csLC+UyXSuKy2WqsblRBhVzbxS5SmXzjKvN7jvGF0rVD/dXMQcMaruUog==
+	t=1793630302;
+	b=SyEUDhZ2UtUSzgfar+GxmGfkTXfPk8MIdylyOa6XE6VM+9R5NwE3tAsHqhgVjfSyXHGC
+	 Vz0+vWWkifvaNYEhW/A9+DQ3FO3lNKn1X2nHzNfGDy1mquCPtLWM0wDskzqx83I97RYCt
+	 RN4vs8aNOWULtD0VPRr93nsgRrjAp4eQN/ZGrGHZQoxFdBHr+Ug5Wfbu354MeDthrR5H+
+	 HdLH9O9sDypwiW7p1t8epcMZ/FmfpQyDDG+mlve2LLH/3IR0RCKjwQzSLazl61ghlxohm
+	 LFwDvoNvx5YeIraTMt8LMBNFhGhHh9M9L3at9w27zrBe3oTY65svgcoYp+7TY0LVL5A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793630062;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
-	bh=mnbEcy9yAD6phXCBWi7ToEYZPml/PD9q0TObYO3iXg0=;
-	b=0wdLHFksv53k9bL96Tn6IQM0Lz9v4lKbe2UYajUviW84Dvcn6hTad5Mow8Cyv1dYDEwK
-	 cv7EbZOJsKTZPV27V8WVvsSjjjMVYOZ2J7KSe9GZB0I0ctAqajBr0OChpyRopuoXpmfP/
-	 Zhsgukt6RYfJ8BRvht84s6YalXHOuVv4Yat69agqCgl20L5swpSSTSdhd8BtcKUKl+8mP
-	 UDQvQ4iI9oJzVWHRb6fd1747lbhGISmB6NWq4EmqPr5Y0yWfA0HFORiE7+5J2zYwOY4Fv
-	 knJMiQ75IlE+E+dwd4zghwqd15QP9xV4h1c0Jm2AEUbMzmrUW8LIzUMqHfK5bqZrLxA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793630302;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=Ny9oIIVnbfsFrLspkH3cGjZ/uaZlRr0vfRl2YcrQ1WU=;
+	b=QgA3fbn1PoBsU7FipUPGPEMo3KHbJyNQ0VC75t2XOKRViLbZkc0pmd5WgV96wAulT4Zl
+	 Ni/tMK95WEfoVxVIwyigyGna1TV4/eZ0AnOhEy6O4JW7auKICyvcXkd7CDUyF3DspH57U
+	 1lJ7+R2XcJF8uL5KLrAbE3RB5w62QST761S/TJZnxBA25dO0P8vPrFUec5CgSIp36QkyZ
+	 AuEw5m87HYjb1nqHLqvX7r4o/28Bq1oNtWq3V00P6NaQFeqiALk2pqLxaKkIp/zmnYFYr
+	 3p9jP70SzwwnHfafktAk0rtZj93GALkPxgKj9Dgw0N4tSQowICkGpy2Ape6+hWVIZGg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=OrR46o0z;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53988606B0FE
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 14:34:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 53988606B0FE
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SJ2jMuQJ;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094E6607A890;
+	Mon,  2 Nov 2026 14:38:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=OrR46o0z
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7C1CD1576;
-	Mon,  2 Nov 2026 06:34:16 -0800 (PST)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3F42D3F59E;
-	Mon,  2 Nov 2026 06:34:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793630059; bh=sSMXuhaToN1bbAGIonxsHXOHufl/pcpSiAvNaSVjj+o=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OrR46o0zexxiwk2zJWR5KHZn9xMWBWhTC1MviO+EetdzupvPVTzTZsZ4QeJxUM3+L
-	 XJ3Rvwgg9U7dRNVQm62aibAmTq/cDOGknoI2kI+vuyt/LJ4BLAFCf3NvpYpeOAekuo
-	 u7A3xYfqid7T5oZMMXLVocyyLHQU439ZM9ugRbeM=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	maz@kernel.org,
-	oupton@kernel.org,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	corbet@lwn.net,
-	pbonzini@redhat.com,
-	yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com,
-	yangjinqian1@huawei.com,
-	caijian11@h-partners.com,
-	liuyonglong@huawei.com,
-	tangchengchang@huawei.com,
-	yezhenyu2@huawei.com,
-	yubihong@huawei.com,
-	linuxarm@huawei.com,
-	joey.gouly@arm.com,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	fuad.tabba@linux.dev,
-	mark.rutland@arm.com,
-	seanjc@google.com,
-	rdunlap@infradead.org,
-	linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	skhan@linuxfoundation.org
-Subject: Re: [PATCH v5 09/15] KVM: arm64: Handle HDBSS faults
-Date: Mon,  2 Nov 2026 14:34:03 +0000
-Message-ID: <auifWrY1u72afXfJ@LeoBrasDK>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20260929103655.85107-10-zhengtian10@huawei.com>
-References: <20260929103655.85107-1-zhengtian10@huawei.com> <20260929103655.85107-10-zhengtian10@huawei.com>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SJ2jMuQJ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DA8E1F00A16;
+	Mon,  2 Nov 2026 14:38:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793630300;
+	bh=Ny9oIIVnbfsFrLspkH3cGjZ/uaZlRr0vfRl2YcrQ1WU=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=SJ2jMuQJXONMMg5MDW1xvXHTdBCnKJbFXmcR9JjeUBpCC5/C3g0ukxB8MxL9agRoT
+	 mb7GlxFl4/OTfd9/6DqW8gCu6SfuX8h20feGKnK82Lo9gZ9lh48zZTpb+oeOH1uGwd
+	 CTlWEkHDdY3sJQrDBKwqiUyfePqqhEtwNeMkAh96qS1mAzWeAy5iXKu8Hd8yOUeodf
+	 6vVDhLr4whdAeiXA6cArg/tR7Y03fGJoIn1rmJJv8h3fUW0r0GwjTFd5ssn43Cu8Ps
+	 kCMb+YQfDDIyCFUqsRoeNeKoRe2NmPJ3fwecsd3jJxCA5KGdHY+T388vaevbgiZpGY
+	 fzmBepkpz1qCQ==
+Message-ID: <sashiko-outbox-193589@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 04/11] KVM: arm64: CCA: Check for LPA2 support and
+ SHA-256
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Steven Price" <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
+In-Reply-To: <20261102141304.126883-5-steven.price@arm.com>
+References: <20261102141304.126883-1-steven.price@arm.com>
+ <20261102141304.126883-5-steven.price@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 02 Nov 2026 14:38:20 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -88,131 +60,64 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 29, 2026 at 06:36:49PM +0800, Tian Zheng wrote:
-> From: Eillon <yezhenyu2@huawei.com>
-> 
-> Once the buffer is full, hardware stops promoting writable-clean
-> descriptors and raises a stage-2 Permission fault with
-> ESR_EL2.ISS2.HDBSSF instead. Failed HDBSS accesses, such as external
-> aborts and granule protection faults, are reported the same way.
-> 
-> Dispatch from kvm_handle_guest_abort() via the new esr_iss2_is_hdbssf()
-> helper. FSC == OK means the exit path already flushed, so resume the
-> guest; any other FSC is an error - clear it and report -EFAULT.
-> 
-> Signed-off-by: Eillon <yezhenyu2@huawei.com>
-> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
-> ---
->  arch/arm64/include/asm/esr.h           |  5 +++++
->  arch/arm64/include/asm/kvm_dirty_bit.h |  1 +
->  arch/arm64/kvm/dirty_bit.c             | 29 ++++++++++++++++++++++++++
->  arch/arm64/kvm/mmu.c                   |  4 ++++
->  4 files changed, 39 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> index f816f5d77f1a..4b3ccd407faa 100644
-> --- a/arch/arm64/include/asm/esr.h
-> +++ b/arch/arm64/include/asm/esr.h
-> @@ -437,6 +437,11 @@
->  #ifndef __ASSEMBLER__
->  #include <asm/types.h>
-> 
-> +static inline bool esr_iss2_is_hdbssf(unsigned long esr)
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Low] KVM: arm64: rmi_has_feature() passes non-constant mask to u64_get_b=
+its()
+--
+
+commit a9400749495394b73c9cccd919996b48771556fe
+Author: Steven Price <steven.price@arm.com>
+
+KVM: arm64: CCA: Check for LPA2 support and SHA-256
+
+This commit adds feature checks during KVM RMI initialization to verify that
+the RMM supports LPA2 when KVM has LPA2 enabled and that the RMM supports
+SHA-256 measurements.
+
+> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+> index 9d118768550d6..5b07beff8bc91 100644
+> --- a/arch/arm64/kvm/rmi.c
+> +++ b/arch/arm64/kvm/rmi.c
+> @@ -6,8 +6,30 @@
+>  #include <linux/arm-rmi-cmds.h>
+>  #include <linux/kvm_host.h>
+> =20
+> +#include <asm/kvm_pgtable.h>
+>  #include <asm/virt.h>
+> =20
+> +static bool rmi_has_feature(int reg, unsigned long feature)
 > +{
-> +	return !!(ESR_ELx_ISS2(esr) & ESR_ELx_HDBSSF);
+> +	return !!u64_get_bits(rmi_feat_reg(reg), feature);
 > +}
-> +
->  static inline unsigned long esr_brk_comment(unsigned long esr)
->  {
->  	return esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
-> diff --git a/arch/arm64/include/asm/kvm_dirty_bit.h b/arch/arm64/include/asm/kvm_dirty_bit.h
-> index d828e6b43fe9..eb2039820777 100644
-> --- a/arch/arm64/include/asm/kvm_dirty_bit.h
-> +++ b/arch/arm64/include/asm/kvm_dirty_bit.h
-> @@ -39,5 +39,6 @@ static inline bool vcpu_hdbss_enabled(struct kvm_vcpu *vcpu)
->  int kvm_arm_vcpu_alloc_hdbss(struct kvm_vcpu *vcpu);
->  void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu);
->  void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu);
-> +int kvm_handle_hdbss_fault(struct kvm_vcpu *vcpu);
-> 
->  #endif /* __ARM64_KVM_DIRTY_BIT_H__ */
-> diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
-> index be0d12555c84..893a8c4248bc 100644
-> --- a/arch/arm64/kvm/dirty_bit.c
-> +++ b/arch/arm64/kvm/dirty_bit.c
-> @@ -98,3 +98,32 @@ void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu)
->  	vcpu->arch.hdbss.hdbssprod_el2 = prod;
->  	isb();
->  }
-> +
-> +int kvm_handle_hdbss_fault(struct kvm_vcpu *vcpu)
-> +{
-> +	u64 prod;
-> +	u64 fsc;
-> +
-> +	if (WARN_ON_ONCE(!system_supports_hdbss()))
-> +		return -EFAULT;
-> +
-> +	if (WARN_ON_ONCE(!vcpu_hdbss_enabled(vcpu)))
-> +		return -EFAULT;
-> +
-> +	prod = read_sysreg_s(SYS_HDBSSPROD_EL2);
-> +	fsc = FIELD_GET(HDBSSPROD_EL2_FSC_MASK, prod);
-> +
-> +	if (fsc == HDBSSPROD_EL2_FSC_OK)
-> +		/* Buffer full: the exit path drained it before handle_exit. */
-> +		return 1;
-> +
-> +	if (fsc != HDBSSPROD_EL2_FSC_ExternalAbort &&
-> +	    fsc != HDBSSPROD_EL2_FSC_GPF)
-> +		WARN_ONCE(1,
-> +			  "Unexpected HDBSS fault type, FSC: 0x%llx (prod=0x%llx, vcpu=%d)\n",
-> +			  fsc, prod, vcpu->vcpu_id);
 
-Any reason for using if() before warn_once, given the first parameter is a 
-condition? I mean, why not use, instead:
+[Severity: Low]
+Can this fail to build if the compiler decides not to inline
+rmi_has_feature()?
 
-+	WARN_ONCE(fsc != HDBSSPROD_EL2_FSC_ExternalAbort &&
-+		  fsc != HDBSSPROD_EL2_FSC_GPF,
-+		  "Unexpected HDBSS fault type, FSC: 0x%llx (prod=0x%llx, vcpu=%d)\n",
-+		  fsc, prod, vcpu->vcpu_id);
+In include/linux/bitfield-fix-width.h, u64_get_bits() calls
+field_multiplier(field):
 
-> +
-> +	/* Clear FSC so hardware dirty state updates can resume. */
-> +	write_sysreg_s(prod & ~HDBSSPROD_EL2_FSC_MASK, SYS_HDBSSPROD_EL2);
-> +	return -EFAULT;
-> +}
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 85a98d2c23a9..7bf82d65041c 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -15,6 +15,7 @@
->  #include <asm/pgalloc.h>
->  #include <asm/cacheflush.h>
->  #include <asm/kvm_arm.h>
-> +#include <asm/kvm_dirty_bit.h>
->  #include <asm/kvm_mmu.h>
->  #include <asm/kvm_pgtable.h>
->  #include <asm/kvm_pkvm.h>
-> @@ -2315,6 +2316,9 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
-> 
->  	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
-> 
-> +	if (esr_iss2_is_hdbssf(esr))
-> +		return kvm_handle_hdbss_fault(vcpu);
-> +
->  	if (esr_fsc_is_translation_fault(esr)) {
->  		/* Beyond sanitised PARange (which is the IPA limit) */
->  		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
+static __always_inline
+u64 field_multiplier(u64 field)
+{
+	if ((field | (field - 1)) & ((field | (field - 1)) + 1))
+		__bad_mask();
+	return field & -field;
+}
 
-I did not get the criteria used to positioning it here:
-Why placed before is_abt, if not using the result before returning?
-What is the rationale to putting it here?
+Because rmi_has_feature() is not marked __always_inline, if the compiler do=
+es
+not inline it (for example under CONFIG_CC_OPTIMIZE_FOR_SIZE or compiler
+instrumentation), the feature parameter is not a compile-time constant insi=
+de
+field_multiplier(), preventing constant folding from eliminating the call to
+__bad_mask().
 
-Thanks!
-Leo 
+Should rmi_has_feature() be marked __always_inline, or use field_get() or a
+direct bitwise test instead?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261102141304.1268=
+83-1-steven.price@arm.com?part=3D4
