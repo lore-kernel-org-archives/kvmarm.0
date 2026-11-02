@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793645349;
-	b=nBqX2OOxpbdF3+dKGbI6eAbWYEbcNF4vhLHtMFGjgZp6UMjeYCBP3zj+7KbMf+YpBtA3
-	 E39xqfwmZNHHzHFba98X+aigCnwWLikbsZ6rmn589MhtL6hC13+E1M2nBenP2kZqqC1cg
-	 mlML/xo7L6/C+ib5C7WVIKnH24uVBh1GkAXOLjnxIyIguUzz152SVowf1WJW8d+JmA1A/
-	 ejAv+jV6hRXsNLTkC5ApswH8tWA9PiTLxtgScZKh92TQ0b2c8AGn+yDQiXW6nWAGYQZGQ
-	 Q2RUVEbvKoOm/01y5HKRMBi209fvsmUTiH7kVeNpjOQ2J0dZNMx3xliPbbCDh2kbxZg==
+	t=1793645534;
+	b=KebsbGMtwam6hW2Xyzo3fMOgRJLY4vt8i2Ae21Z7LxnULpCsb6bUYR6BMOMNe2u+2BuB
+	 O0US7+xcfrh73FmdZds5R9GLpfoHW4u+YXDfaEeo6N5WRaPPXot0Gzb4VRDo5eYykAaLO
+	 ie3EU0pEZCxL3B9PxNMmKPwJzOKkVJCE50J9C0VllUmigeeU7FxA7NleSHxzi5zXtOln/
+	 nI38MGwAZszSny5y8IIPcKZ0amujbL6xjgp2aThbp/YRy7sQ3M7WxEgWmglmgE7/9zDVo
+	 imYLh6rLmzUZOPq6t2KhRLjlzWiE/pt2THEknXugARh0qFfsAcseW/TVXLQaE6msoWw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793645349;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793645534;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
 	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
 	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=n7o3SIXEgY1AZum4i/LM2rBPqStfgk/ecjxWJ8N54rk=;
-	b=MWdytq46H8spyoLtdOs1+D31pFnVXO46mzbxDx4mq7kuWUHEZjF2ro8wpnTi3fWd47HF
-	 hBiXvTxHtIEUJQR92rTwHhNx/SHurKgjEUH2mEj+wpwmF3EqDCYtfgnj4AqqWu1yP0YUt
-	 BVPZO0VonxcGzppt9dClK2CdlUNBPsaDD+UwSTKzeuLhkwee3Ye04QM7Seuf6FKUzd/VN
-	 4G9e4YMZJpXzlQT9AP19uQPOOGkURuzcI/4RcMGy2LXnyKudCszNfSOgcKI2Boolf/+KG
-	 UIU9GlB2VkuR0Q+TNJmWH647uoN9jVg7YcTdDVgDHT6BzSwW9OvXJtd7ZSRWI0PYuCw==
+	bh=IK5p9/oAjFQaLEk4iOn+2jSpIJGhuFIILB+nKJjM5W4=;
+	b=r096VYwEBOcO6tcSwb41VDqoPXiRW+deWkRXc+YeYmoqS6AhBBpB5VfUGBuT4U8i8dii
+	 v/94SqFy6URE5rd96zAOPZxvutc57aKJoFKXCu6lBwETO7BKns4XMYtFFzl1lY9b3xyYI
+	 7hO6Bsde7I48o2pHc0MiFOEE1Td5LuZuyXBKrlvGPs4gl0ePIyEdYAhtSx+5YUBSKzMFc
+	 VYodJU22aLM6LmJx4R7yugl14TPSjXu3EJgiwb4Bi1mN6dbSYDJKe2Qk0ZHRM8jTKcY5K
+	 FZFsY0UHPmSsBYujZ9JeBoTLmfgT0gsls/kLtAZu425azJcweD7cat4fpWVzqU+pDfg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=GTQZT+v7;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=rpf7QTW0;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4005C606A326;
-	Mon,  2 Nov 2026 18:49:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4005C606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 402FF606A327;
+	Mon,  2 Nov 2026 18:52:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 402FF606A327
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=GTQZT+v7
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=rpf7QTW0
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 27D9A1FC4;
-	Mon,  2 Nov 2026 10:49:05 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 721EF1FC4;
+	Mon,  2 Nov 2026 10:52:09 -0800 (PST)
 Received: from [10.57.89.36] (unknown [10.57.89.36])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7F10E3F673;
-	Mon,  2 Nov 2026 10:49:07 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D17523F673;
+	Mon,  2 Nov 2026 10:52:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793645348; bh=Pcr+BiS/TLBeuOURNXAbQTQWOpwhSvgvlq1SaHDLKY4=;
+	t=1793645532; bh=eRT8EPlGmj8VVlfVMAD9ve9ebI+67LjsP9Gf4hzofTg=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GTQZT+v7sl58fUyY76BbeAlLMUzHOqQXEPs8V26JNeZ9hmG0NOrkaKsv5gXVrdVH9
-	 AvgYyHJulEjKyOJsu6ERrGMIOZMRKwyeNnYcPjdxCSv2JNcgRokd8O86LvpT5r7aoI
-	 SVdiJc8TPbLulskPQSxuKJRU2CKGLofIf1zY3bLY=
-Message-ID: <1d2ad2f1-90bc-419f-9be3-176edc0472cb@arm.com>
-Date: Mon, 2 Nov 2026 18:49:05 +0000
+	b=rpf7QTW00lwV9uTdlfHmVNFktsConMIdlqcqODPOVAoWzTp/3ZRQLmYqIG/rB3/O2
+	 B43c7J+phQXwSkzgHrVn+KcB5LCXoLOCtrWx8k8KB+MD49amIYjt2Wg0OljbJdEkDw
+	 nQjecks+ITNlOMcG9zeZ9omftVPNSf4vFKcf0l94=
+Message-ID: <ab0d81a4-da63-4f36-8412-0649153ebd49@arm.com>
+Date: Mon, 2 Nov 2026 18:52:10 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -54,185 +54,80 @@ List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 15/16] KVM: selftests: Add VGICv5 ITS translation cache
- tests
+Subject: Re: [PATCH 16/16] KVM: arm64: gic-v5: Document ITS userspace ABI
 To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev,
  kvm@vger.kernel.org
 Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
 References: <20261016155741.979985-1-sascha.bischoff@arm.com>
- <20261016155741.979985-16-sascha.bischoff@arm.com>
- <sashiko-outbox-174630@kernel.org>
+ <20261016155741.979985-17-sascha.bischoff@arm.com>
+ <sashiko-outbox-174640@kernel.org>
 Content-Language: en-GB
 From: Sascha Bischoff <sascha.bischoff@arm.com>
-In-Reply-To: <sashiko-outbox-174630@kernel.org>
+In-Reply-To: <sashiko-outbox-174640@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 16/10/2026 17:22, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
-> - [High] vgic_v5: missing ITS_STATUSR/ITS_GEN_EVENT_STATUSR completion poll
-> - [High] vgic_v5: priority drop coupled with deactivation in ITS IRQ handler
+On 16/10/2026 17:27, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [Medium] kvm: arm64: gic-v5: userspace writes to READ_EVENT_DATAR are silently ignored causing state loss
 > --
 > 
-> commit fe8f40c11d68589dddb7ff395093f6a131cf59d8
+> commit 3a4606444ec9f90ae2360e066a229c789d9eca15
 > Author: Sascha Bischoff <sascha.bischoff@arm.com>
 > 
-> KVM: selftests: Add VGICv5 ITS translation cache tests
+> KVM: arm64: gic-v5: Document ITS userspace ABI
 > 
-> This commit adds end-to-end coverage for VGICv5 ITS translation and cache
-> invalidation. It verifies that KVM can parse guest-provided linear DT and
-> ITT state and use it to deliver LPIs through guest GEN_EVENTR and
-> KVM_SIGNAL_MSI. The test builds a two-VPE VM with IRS, ITS, and an LPI IST.
+> Document the GICv5 ITS device and its userspace ABI, including the
+> MMIO address, reset control, register attributes, and MSI requirements.
 > 
->> diff --git a/tools/testing/selftests/kvm/arm64/vgic_v5.c b/tools/testing/selftests/kvm/arm64/vgic_v5.c
->> index b7fb002a64f6c..6ea6aef4f0f46 100644
->> --- a/tools/testing/selftests/kvm/arm64/vgic_v5.c
->> +++ b/tools/testing/selftests/kvm/arm64/vgic_v5.c
-> 
-> [ ... ]
-> 
->> +/* Inject a manually triggered translation via the ITS_GEN_EVENTR */
->> +static void gicv5_send_its_gen_event(u32 device_id, u32 event_id)
->> +{
->> +	u64 val;
->> +
->> +	val = FIELD_PREP(GICV5_ITS_GEN_EVENT_DIDR_DEVICEID, device_id);
->> +	writeq(val, GICV5_ITS_BASE_GVA + GICV5_ITS_GEN_EVENT_DIDR);
->> +
->> +	val = FIELD_PREP(GICV5_ITS_GEN_EVENT_EIDR_EVENTID, event_id);
->> +	writel(val, GICV5_ITS_BASE_GVA + GICV5_ITS_GEN_EVENT_EIDR);
->> +
->> +	writel(GICV5_ITS_GEN_EVENTR_R |
->> +	       FIELD_PREP(GICV5_ITS_GEN_EVENTR_TARGET_DOMAIN, 0),
->> +	       GICV5_ITS_BASE_GVA + GICV5_ITS_GEN_EVENTR);
-> 
-> [Severity: High]
-> Does this operation require polling for completion? In gicv5_send_its_gen_event,
-> the event generation command is issued asynchronously by writing to
-> GICV5_ITS_GEN_EVENTR without a subsequent poll of the ITS_GEN_EVENT_STATUSR
-> IDLE bit.
-> 
-> Since the test subsequently yields to the host via GUEST_SYNC and expects the
-> event to be delivered, failing to wait for the virtual hardware to complete
-> introduces a race condition. The host might act before the virtual ITS finishes
-> processing, leading to flaky test execution.
-
-The virtual GEN_EVENTR handler resolves the translation and issues 
-VDPEND before the trapped write returns; the receiving vCPU then waits 
-for the interrupt handler's GUEST_SYNC. The virtual status register 
-always reads idle, so I've left out a poll that would add no ordering.
-
-This isn't an issue, so I've not changed anything.
-
-> 
->> +}
->> +
->> +static void gicv5_invalidate_its_event(u32 device_id, u32 event_id)
->> +{
->> +	u64 val;
->> +
->> +	val = FIELD_PREP(GICV5_ITS_DIDR_DEVICEID, device_id);
->> +	writeq(val, GICV5_ITS_BASE_GVA + GICV5_ITS_DIDR);
->> +
->> +	val = FIELD_PREP(GICV5_ITS_EIDR_EVENTID, event_id);
->> +	writel(val, GICV5_ITS_BASE_GVA + GICV5_ITS_EIDR);
->> +
->> +	writel(GICV5_ITS_INV_EVENTR_I,
->> +	       GICV5_ITS_BASE_GVA + GICV5_ITS_INV_EVENTR);
-> 
-> [Severity: High]
-> Should this function poll ITS_STATUSR IDLE after invalidating the event?
-> 
-> In gicv5_invalidate_its_event, the event invalidation command is issued
-> without a subsequent completion poll. The GICv5 guidelines state that an
-> ITS table entry invalidated without polling ITS_STATUSR IDLE is a bug, as
-> the host might act before the virtual ITS finishes processing the
-> invalidation.
-
-KVM removes the cached translation before the virtual INV_EVENTR write 
-returns (similar to the case above), and the following GUEST_SYNC 
-precedes the host's next MSI. Again, the status register always reads 
-idle, so I've left this test unchanged.
-
-If we want the selftests to be proper reference code, I am happy to 
-change this, but I don't see much of a point in polling state that we 
-know the state of in this case.
-
-> 
->> +}
->> +
->> +static void gicv5_invalidate_its_device(u32 device_id, u32 event_id_bits)
->> +{
->> +	u64 val;
->> +
->> +	val = FIELD_PREP(GICV5_ITS_DIDR_DEVICEID, device_id);
->> +	writeq(val, GICV5_ITS_BASE_GVA + GICV5_ITS_DIDR);
->> +
->> +	val = GICV5_ITS_INV_DEVICER_I |
->> +	      FIELD_PREP(GICV5_ITS_INV_DEVICER_EVENTID_BITS, event_id_bits);
->> +	writel(val, GICV5_ITS_BASE_GVA + GICV5_ITS_INV_DEVICER);
-> 
-> [Severity: High]
-> Similar to the event invalidation above, should gicv5_invalidate_its_device
-> wait for the device invalidation to complete by polling ITS_STATUSR IDLE
-> before returning? Failing to do so can race with the host side.
-
-And this is the third one of these. The virtual INV_DEVICER write 
-removes matching cached translations before returning, and the host acts 
-only after GUEST_SYNC. I've left out the status poll because it nothing 
-in this case.
-
-> 
->> +}
+>> diff --git a/Documentation/virt/kvm/devices/arm-vgic-v5-its.rst b/Documentation/virt/kvm/devices/arm-vgic-v5-its.rst
+>> new file mode 100644
+>> index 0000000000000..250057e4445d7
+>> --- /dev/null
+>> +++ b/Documentation/virt/kvm/devices/arm-vgic-v5-its.rst
 > 
 > [ ... ]
 > 
->> +static void guest_its_irq_handler(struct ex_regs *regs)
->> +{
->> +	u64 expected_hwirq = gicv5_lpi_hwirq(READ_ONCE(its_expected_lpi));
->> +	u32 hwirq;
->> +	u64 ia;
+>> +KVM_DEV_ARM_VGIC_GRP_ITS_REGS
+>> +-----------------------------
 >> +
->> +	ia = gicr_insn(CDIA);
->> +	if (!GICV5_GICR_CDIA_VALID(ia))
->> +		return;
+>> +  Attributes:
+>> +    The attr field of kvm_device_attr contains the ITS register offset from
+>> +    the control frame base address. kvm_device_attr.addr points to a __u64,
+>> +    regardless of whether the register is 32 or 64 bits wide. A 64-bit
+>> +    register must be addressed at its base offset; userspace cannot access
+>> +    its upper or lower half separately. Guest MMIO may use aligned 32-bit
+>> +    accesses to DT_BASER, DIDR, READ_EVENT_DATAR, and GEN_EVENT_DIDR.
 >> +
->> +	gsb_ack();
->> +	isb();
->> +
->> +	hwirq = FIELD_GET(GICV5_GICR_CDIA_INTID, ia);
->> +	GUEST_ASSERT_EQ(hwirq, expected_hwirq);
->> +
->> +	gic_insn(hwirq, CDDI);
->> +	gic_insn(0, CDEOI);
+>> +    The ITS base address must be configured before this group can be used.
+>> +    Writes to read-only registers are ignored. Writes to DT_CFGR and DT_BASER
 > 
-> [Severity: High]
-> Can we separate the priority drop from the deactivation in this handler?
+> [Severity: Medium]
+> Does this design violate the rule that read-only attributes must return an
+> error on set?
 > 
-> In guest_its_irq_handler, the priority drop instruction (CDEOI) is
-> executed back-to-back with deactivation (CDDI) at the end of the handler.
-> The GICv5 architecture strictly enforces a split-EOI model where the
-> priority drop must be performed immediately after the acknowledge and
-> synchronization barriers, before dispatching to the main handler logic.
+> A device attribute documented as read-only whose set path does not return an
+> error can lead to silent migration state loss. For example, READ_EVENT_DATAR
+> is a stateful register that holds the result of the READ_EVENTR command. If
+> userspace restores this state during migration, but the write path returns 0
+> while ignoring the value, the restored state is silently dropped, corrupting
+> the guest's view of the command result upon resume.
 > 
-> Deferring the priority drop until the end blocks all interrupts of equal
-> or lower priority for the handler's duration.
+> Looking at the implementation, READ_EVENT_DATAR is defined without a uaccess
+> write override in vgic_v5_its_registers() and uses vgic_v5_mmio_write_its_wi.
+> The userspace attribute set path in vgic_v5_its_attr_regs_access() defaults
+> to calling the guest its_write handler, which invokes the Write Ignore stub
+> and successfully returns 0 instead of returning -EINVAL or -EPERM.
+> 
 
-The architecture permits software to choose the order of GIC CDEOI and 
-GIC CDDI - they are explicitly split for that exact reason. It might be 
-that software wants to deactivate before doing the priority drop, or it 
-might want to drop the priority before deactivating. That's for software 
-to decide and use as required.
+The posted userspace access patch in this series (patch 10) silently 
+discarded READ_EVENT_DATAR, which was a mistake on my part.
 
-This handler has no interrupt nesting requirement, so keeping the 
-priority active until its end is prefectly valid. I've left the handler 
-unchanged.
-
-> 
->> +
->> +	GUEST_SYNC(GUEST_CMD_ITS_LPI_DELIVERED);
->> +}
-> 
+I've added its restore handler in patch 10, and a read-back test in 
+patch 14, and ABI text in this patch documenting that userspace can 
+(read: must) restore it. Guest MMIO writes remain ignored, as this is a 
+RO register from the guest's point of view, but it must persist across 
+save/restore.
 
 Thanks,
 Sascha
