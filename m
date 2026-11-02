@@ -1,49 +1,64 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793642229;
-	b=HbWFIHzr1d1sLOP9RWmesRWK2iCF9fE/jegyqIkbQZMzqb7lqua3kBPt724BNe51hXsN
-	 sQrE/23UnRJzpPYQ7dKijzt8kUcWuRr2wvWAO7fxFufG2wVJHcso0GTKZsa0XMUldwuGX
-	 12c0O6wRX/oUwzkcwa9UI1/wlhxu0TqjCpRQhRHTriBujN4/QCHjlTSLEIa7Rda9DLtOf
-	 XbVwGfsuhznpOveAZ/TP8lYxLxPlJslMxf2iZNtnA/Ww8U6BmgPyrvs6C3+ievH2ZUTID
-	 YMVZkVGu88gfrL8Y2KDXNm3TgR6JWq8VB/QS+ZwssI0gVJ7xusaBRwI/9JI7GPPPLzw==
+	t=1793643295;
+	b=UEo2tLK81qBxT5CHgLvYyrOb6Gl2ZUlYe0P7SDGhGytjE+ft4LME9qEkprS/OjTrC7Tr
+	 JJ3CS0zhlpXDA7e4f5GzcHuq8nLw0ST6/9GkI04F2Z+qgCVK5+ZbVQXbPp1MwN3HJp/D2
+	 KdSenPsKUtN3UwVXGSn8GweYjn3PCw9sbHKfhDHAqNbQDkGiUJGrwkSFtDsaHyUeq3V/Z
+	 BgfpCwan9XowHiNQ5P5pu5wkctebgxehMwLT6I8jKhAhJhXTdsURC8Wr+2zQ9z9s7Wp3O
+	 pQziZZlq+f6EftDmTvu0O2jpmS8ITRGHiw53wdy15Wqvn1xhsmYkr1Zs2bO/j1WbMug==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793642229;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=xjyTXjB2wAHAAsP40xGjOOv4kKPxaKWcHukk2jT9TJs=;
-	b=bL63ri9Z/xOUaV6Xq5z/qg+dy7JtlwyITVLLPEOtvNV/lEJAHBPlmhUAewuZSSEEZ7oN
-	 qKp8AZjQ+DwXijG1liXkFYcgbw9tRC6KWuMtK5x4xbCM/7IuG882X8xNdro5742WTin9m
-	 LTbOYW3j07l9DOseNcaKgrUhLFTNFgnZu/snS8m/qek1cTMD2P1RSqr30ZgP4qSser7XJ
-	 9TChv/+7+rNBP6qsfkxTiT565cAak4TbYK7wIFCjDKZxMgidxQe274qXWkM/s1jJE0Fhv
-	 LvIuCYsJB1tF9JnPLQ8Jq9JHYWj/Bja8NjwEgJyWYDa5kZVGrlCadq1AAuPzf21Q9Kw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793643295;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
+	bh=pkPN+xY3L0Qfr9wcegQPH3A4C/l/pEV4vQo3GiExsQQ=;
+	b=Km+c2PpvpDKWms5/xLFx8uLjly8rIgMk4gOkn7kWx3d4csuF2A4TU7djk+mxeF8Xyke5
+	 XzWow8yLpZLEYwYDQ5k6YBTEnFafO22TO2tvg3/QAye4aJuWEXM9jxxBC/rls1ET0ljy8
+	 LV/662yAIQDqb/EZRVdkOxOJ3OY9Gk6nkaQzxLnO5/uVcMKakgr9qPvXfkDUHkkNJNiu7
+	 jHDDPhccCPS1uwaPMo7riryIgHT4ZJfPLzPnC0mvzcDWGSkWfnoJLtN5eBYQyvcO+ecin
+	 Y55T64bf0kDz2emKzH9bFo6SleZIUfl/Xq4ACDiqsN5qeGgiJ8lyAb+XqdPQ3OFLNVQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=BKE84h0E;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=XHn6qwUi;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 407FB606D82C;
-	Mon,  2 Nov 2026 17:57:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 407FB606D82C
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0742606A326
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 18:14:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B0742606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=BKE84h0E
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=XHn6qwUi
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 57C2F1C14;
-	Mon,  2 Nov 2026 09:57:04 -0800 (PST)
-Received: from [10.0.136.93] (M0PRX50XMG.cambridge.arm.com [10.0.136.93])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D567A3F59E;
-	Mon,  2 Nov 2026 09:57:06 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C52C31C14;
+	Mon,  2 Nov 2026 10:14:50 -0800 (PST)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 68F973F673;
+	Mon,  2 Nov 2026 10:14:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793642227; bh=Bt0frdHKGBbUPamp1w+4GcmozA3dEEooJHfwDzZsC4k=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=BKE84h0EpGmT3Zx5XyqXfCDcKZzHDVUGBKr9tKzGVdesA2PfPUkbRDcVw7q+Eeurl
-	 9u9pyG3I24g5JsUrwnzDi9av3uOXHBTtGyVhhvp6SvHJ/QeeTCQmTlqHwB1uCHWic2
-	 I/P6IARqEpV08Zc5nFlTrTeHYYZiA3h0fR9hNZig=
-Message-ID: <1e3c0416-283d-4768-a0e6-01e036e099b9@arm.com>
-Date: Mon, 2 Nov 2026 17:57:05 +0000
+	t=1793643294; bh=27pau5S5uokMsAT08PVwL/ml+3ox+5UnlnMf+zd9nAM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=XHn6qwUivwORTbvbj3zwkMBmp6GPU2w0yg1eXw+6tuZjPHCY4NcA9WflRxR7olJzu
+	 L4tyoWX8mqa88oEfLCQF2nLaBWEbqeVvnmSJn4zpTibWWcSWCBwR3qHuqbtVaIui/x
+	 +dPnfBTjr0Jd4UfqDLVhXew36zqYA4zPIgoATLeE=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Subject: Re: [PATCH v2 07/28] KVM: arm64: nv: Set dirty state at stage-2
+Date: Mon,  2 Nov 2026 18:14:49 +0000
+Message-ID: <aujTGWJDPIsKBv3V@LeoBrasDK>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261023205610.1044532-8-oupton@kernel.org>
+References: <20261023205610.1044532-1-oupton@kernel.org> <20261023205610.1044532-8-oupton@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,127 +68,145 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 11/16] irqchip/gic-v5: Enable direct injection in ITS
-To: sashiko-reviews@lists.linux.dev, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org
-Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
-References: <20261016155741.979985-1-sascha.bischoff@arm.com>
- <20261016155741.979985-12-sascha.bischoff@arm.com>
- <sashiko-outbox-174629@kernel.org>
-Content-Language: en-GB
-From: Sascha Bischoff <sascha.bischoff@arm.com>
-In-Reply-To: <sashiko-outbox-174629@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On 16/10/2026 17:22, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
-> - [High] irqchip/gic-v5: Racy ITS MMIO invalidation sequence
-> - [High] irqchip/gic-v5: missing event drain in set_vcpu_affinity causes cross-VM interrupt
-> --
+On Fri, Oct 23, 2026 at 01:55:49PM -0700, Oliver Upton wrote:
+> Set the dirty state on descriptors at stage-2 for write accesses when
+> DBM is set.
 > 
-> commit 4f462ff132c79e74a3a82cf356a72402e7a44799
-> Author: Sascha Bischoff <sascha.bischoff@arm.com>
+> Signed-off-by: Oliver Upton <oupton@kernel.org>
+> ---
+>  arch/arm64/kvm/nested.c | 51 +++++++++++++++++++++++++++++++----------
+>  1 file changed, 39 insertions(+), 12 deletions(-)
 > 
-> irqchip/gic-v5: Enable direct injection in ITS
-> 
-> This commit introduces an irq_chip callback to allow KVM to install and remove
-> virtual translations for direct interrupt injection. It replaces a host ITTE
-> with a virtual translation and disables lazy masking while the interrupt is
-> forwarded.
-> 
->> diff --git a/drivers/irqchip/irq-gic-v5-its.c b/drivers/irqchip/irq-gic-v5-its.c
->> index 28e39b065de0e..7de40a7cff403 100644
->> --- a/drivers/irqchip/irq-gic-v5-its.c
->> +++ b/drivers/irqchip/irq-gic-v5-its.c
-> [ ... ]
->> @@ -723,6 +765,95 @@ static void gicv5_its_compose_msi_msg(struct irq_data *d, struct msi_msg *msg)
->>   	msi_msg_set_addr(irq_data_get_msi_desc(d), msg, addr);
->>   }
->>   
->> +#ifdef CONFIG_KVM
->> +static int gicv5_its_set_vcpu_affinity(struct irq_data *d, void *int_data)
->> +{
-> [ ... ]
->> +invalidate:
->> +	/* Make the change ITS-visible */
->> +	dsb(st);
->> +	ret = gicv5_its_itt_cache_inv(its, dev_id, event_id);
-> 
-> [Severity: High]
-> Does this new KVM callback expose the gicv5_its_itt_cache_inv() sequence
-> to concurrent execution?
-> 
-> This callback appears to only be serialized by the per-IRQ lock, but
-> gicv5_its_itt_cache_inv() writes to the global shared ITS MMIO registers:
-> 
-> drivers/irqchip/irq-gic-v5-its.c:gicv5_its_itt_cache_inv() {
->      ...
->      its_writeq_relaxed(its, didr, GICV5_ITS_DIDR);
->      its_writel_relaxed(its, eidr, GICV5_ITS_EIDR);
->      its_writel_relaxed(its, eventr, GICV5_ITS_INV_EVENTR);
-> 
->      return gicv5_its_cache_sync(its);
-> }
-> 
-> Without an ITS-wide spinlock, concurrent configuration of different IRQs/vCPUs
-> from the same or different guests could freely interleave their MMIO writes on
-> the shared physical ITS.
-> 
-> Could this result in the ITS hardware receiving corrupted invalidation commands
-> (e.g. invalidating the wrong device/event while leaving another stale), leading
-> to dropped or misrouted interrupts?
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index dea5c31f10df..1d581d3bd557 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -151,6 +151,7 @@ struct s2_walk_info {
+>  	unsigned int	t0sz;
+>  	bool		be;
+>  	bool		ha;
+> +	bool		hd;
+>  };
+>  
+>  struct s2_walk_step {
+> @@ -246,6 +247,20 @@ static int read_guest_s2_desc(struct kvm_vcpu *vcpu, struct s2_walk_step *ws,
+>  	return 0;
+>  }
+>  
+> +static bool should_set_dirty_state(struct s2_walk_info *wi, struct s2_walk_step *ws,
+> +				   struct kvm_s2_trans *out, struct kvm_walk_access *access)
+> +{
+> +	switch (access->type) {
+> +	/* R_ZYGHJ */
+> +	case WALK_ACCESS_CMO:
+> +	case WALK_ACCESS_AT:
+> +		return false;
+> +	default:
+> +		/* R_NSXRD */
+> +		return access->write && wi->hd && out->writable;
+> +	}
+> +}
+> +
+>  static int handle_desc_update(struct kvm_vcpu *vcpu, struct s2_walk_info *wi,
+>  			      struct s2_walk_step *ws, struct kvm_s2_trans *out,
+>  			      struct kvm_walk_access *access)
+> @@ -258,6 +273,9 @@ static int handle_desc_update(struct kvm_vcpu *vcpu, struct s2_walk_info *wi,
+>  	if (wi->ha)
+>  		new |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
+>  
+> +	if (should_set_dirty_state(wi, ws, out, access))
+> +		new |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> +
+>  	if (old == new)
+>  		return 0;
+>  
+> @@ -272,11 +290,15 @@ static int handle_desc_update(struct kvm_vcpu *vcpu, struct s2_walk_info *wi,
+>  	}
+>  
+>  	ret = __kvm_at_swap_desc(vcpu->kvm, ws->desc_pa, old, new);
+> -	if (!ret || ret == -EAGAIN)
+> +	if (ret == -EAGAIN)
+>  		return ret;
+> +	if (!ret) {
+> +		out->desc = ws->desc;
+> +		out->dirty = out->desc & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+> +		return 0;
+> +	}
+>  
+>  	out->esr = ESR_ELx_FSC_SEA_TTW(ws->level);
+> -	out->desc = ws->desc;
+>  	return 1;
+>  }
 
-This is definitely an issue. I've posted a fix for the host driver to 
-address this:
 
-https://lore.kernel.org/all/20261102-host_gicv5_fixes-v1-4-743b61626fc5@arm.com/
+Before that out->desc would only be updated if __kvm_at_swap_desc() 
+returned != (0 or -EAGAIN). Now it only gets updated if ret == 0.
+Is this intentional?
 
-> 
-> 
-> [Severity: High]
-> Are in-flight events drained here when direct injection is disabled?
-> 
-> When disabling direct injection (where data is NULL), the ITTE is updated to
-> the host LPI and the ITS cache is invalidated. However, there is no call to
-> gicv5_its_syncr() or gicv5_irs_syncr() to drain accepted events before
-> returning.
-> 
-> If KVM subsequently tears down the VM and reuses the VM ID for a new guest,
-> could an in-flight event reach the IRS and be injected into the new VM's IST
-> using the old translation?
-> 
-> Disabling forwarding would likely need to drain events before returning to
-> safely reuse the resources.
+>  
+> @@ -422,16 +444,6 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, struct kvm_walk_access *acc
+>  		return 1;
+>  	}
+>  
+> -	ret = handle_desc_update(vcpu, wi, &ws, out, access);
+> -	if (ret)
+> -		return ret;
+> -
+> -	if (!(ws.desc & KVM_PTE_LEAF_ATTR_LO_S2_AF)) {
+> -		out->esr = compute_fsc(ws.level, ESR_ELx_FSC_ACCESS);
+> -		out->desc = ws.desc;
+> -		return 1;
+> -	}
+> -
+>  	addr_bottom += contiguous_bit_shift(ws.desc, wi, ws.level);
+>  
+>  	/* Calculate and return the result */
+> @@ -441,6 +453,20 @@ static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, struct kvm_walk_access *acc
+>  	compute_s2_permissions(vcpu, wi, &ws, out);
+>  	out->level = ws.level;
+>  	out->desc = ws.desc;
+> +
+> +	ret = handle_desc_update(vcpu, wi, &ws, out, access);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (!(ws.desc & KVM_PTE_LEAF_ATTR_LO_S2_AF)) {
+> +		*out = (struct kvm_s2_trans) {
+> +			.esr	= compute_fsc(ws.level, ESR_ELx_FSC_ACCESS),
+> +			.desc	= ws.desc,
+> +		};
+> +
+> +		return 1;
+> +	}
+> +
+>  	return 0;
+>  }
 
-We were missing a called to the IRS_SYNCR, which has now been added. The 
-ITS_INV_EVENTR that is already present should be sufficient on the ITS side:
+The block got moved down in walk_nested_s2_pgd(), and IIUC if the 
+descriptor lacks the AF, we zero all other fields except esr and desc, 
+cleaning everything that just got set in the lines above (out->writable, 
+etc).
 
-R_ZXXJF: When ITS_STATUSR.IDLE transitions from 0 to 1, any ITS event 
-that used information from ITS translation structure entries prior to 
-the invalidate have been Accepted by the IRS.
+Any particular reason for doing it like this, instead of keeping where it 
+was, and avoid calculating the other out->* fields?
 
-Successful VM teardown removes the translations, so incoming events 
-should not be injected into a new guest's IST.
 
-> 
->> +	if (ret) {
->> +		/* Keep a failed restoration distinguishable from a clean host ITTE. */
->> +		if (!data)
->> +			irqd_set_forwarded_to_vcpu(d);
->> +		return ret;
->> +	}
->> +
->> +	if (data)
->> +		irqd_set_forwarded_to_vcpu(d);
->> +	else
->> +		irqd_clr_forwarded_to_vcpu(d);
->> +
->> +	return 0;
->> +}
->> +#endif /* CONFIG_KVM */
+>  
+> @@ -537,6 +563,7 @@ static void setup_s2_walk(struct kvm_vcpu *vcpu, struct s2_walk_info *wi)
+>  			      ps_to_output_size(FIELD_GET(VTCR_EL2_PS_MASK, vtcr), false));
+>  	wi->ha = vtcr & VTCR_EL2_HA;
+>  	wi->be = vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_ELx_EE;
+> +	wi->hd = wi->ha && (vtcr & VTCR_EL2_HD);
+>  }
+>  
+>  int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, struct kvm_walk_access *access,
+> -- 
+> 2.47.3
 > 
 
-Thanks,
-Sascha
+Thanks!
+Leo
