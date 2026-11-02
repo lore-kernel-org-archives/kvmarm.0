@@ -1,73 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793635964;
-	b=CAMXQUo89VzSnYPr9ih7U0w85JP19RwZFVEN51MB/No2m46hcLbvVFN3Yr1PhcuUuFU5
-	 7vwvzqjfbs7U742DxT8dyo9ps04HZDs7ppmJywBTV9ldUTpGGkTbpXQIaM9YBNnvSv82x
-	 SYSp1Hgbf3llJDu8idjrU3tkwy0CI91yiB2c8DaY2w4s2/XwHuaUvqNtwHMQcHdPsz4nA
-	 iVVhqdG8nlRWDp+XEB2vGa4zh0w9NQvBL+2qxb16WmKzqIRXIZ4KoMWwd3102N4WElzs8
-	 Oyqty+ikkMTXrUqMHu83JrUzOqQeGtzTj5FacKN0uFrvth3FBBrZQgM97pjl5bBgYzA==
+	t=1793636670;
+	b=01qVUK8fgkV/JLZQWXkrG7vWhnSwmqgVzGkqLu6eOkFn8DCj0eInuWeQxd2nblCvLoGm
+	 +2VRYzWCZ/tzfllYui/6zUTWKNRCbBEZbLJn7Z2ObFeKkyx/1KQbihOaviJeKlq8cpmDl
+	 sqG6X52nxGSaAgin9zOxBRntyDGogrXpdge4jDUUypooCYh3VEZ72ak4tq19d7tyNpXJh
+	 aDqNjmkO2o0qGLMVKo4hNGyqL07jyw1P6K/Sb5HxqWc8krIH1XjRYzdoBw9/z9mrcBqBk
+	 DxlwSm9DbjtQ12EztbLm3/UQo2si/zaIqhEEC3R14TSiRc1z5eQwVHcRG+Th7DUAHzg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793635964;
-	h=Received:DKIM-Signature:Received:Received:X-ME-Sender:
-	 X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
-	 MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type:Content-Transfer-Encoding;
-	bh=Eo8yP9CSL6fw8R43nEuGtMZv/VD/kgNj4KIMa1kxKis=;
-	b=NAvwvs4MnYkaDE13mfjf1bD1TP1TNzHvWxpiaXZt9xVSNSi7L3BMI6WYqIq1LZVnENUb
-	 6a9ptknwQVVxNCaFH2+FRi6ZH8BlOA8BU0/uV6dGU7w9Wa3uM+OekSNY4DV0QIFGXD2hh
-	 wKYNSuephdXh7dTtkt5ltvjxY+TPgKc49/fa3woRVU9mkbtvwJHzaDjaAuC5HwLwl7zFT
-	 re206cuPHPv511vP7s0UBq12y7fxPiYOOcRk4zPnaxXSoihLOYMZW8EbbcX0C7PVIjPGV
-	 F0G6o67d9151qzSKk9Eox0KwyUwQCkmNRO8Iho6zxbMMF4iB0JodsjBWl9FhbgnEBsQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793636670;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
+	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=i8ppdNIdxqrbzcwXDKOqV5mCDQqBWwlYUQimNYyOKAs=;
+	b=ZI/9pJ5hnbraStSCImVV/yCucghrHpFQJZj8Uj3GPhqC/SNOGHSDLFDIYoMAyZMLsCp2
+	 cVWDMh0CuT2Vi90VLYJFkSo86rifWkz2oWioYh548xaQay6Sfhhn5v2WO6wLeb0vfrId4
+	 GcTBBG4XnKfHx5VxNOao3wgkPUe59KJ+k+BnIDyJBYpHK1nqHCNgVDFVxhgP/zMSvb/5a
+	 enquamkhsBgB74NfpGdaGD5Rff/Dtl9zILvAy9/2kLqmjIGpgSuvB6OGevn2t53m+cdDz
+	 k8E2xt844k82mfFRoKe8O+h/5WNjk2+P8ePCUrDq5L+k6WxEFNhRtRPoxPdO8L9X0OA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AToYC0li;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86A6A606A90C
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 16:12:44 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=SUj+o82S;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A86D7608508F;
+	Mon,  2 Nov 2026 16:24:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A86D7608508F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AToYC0li
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 717881F00A16;
-	Mon,  2 Nov 2026 16:12:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793635964;
-	bh=Eo8yP9CSL6fw8R43nEuGtMZv/VD/kgNj4KIMa1kxKis=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=AToYC0lieS4WH+qEKwrI2EJ71TXdgrpyxmLUj6PbCNQhGZ8+4i0DPy8RlW0BlbdCI
-	 sY+GjR+J9jA03Q2txHHV+Al/sf4voalGzkzS9OQDsHdoUi7aHhTMf3MtHZhZyhEI+L
-	 A9DkRAhnpf/5g6ZcgEKo94+MGzSfYGAZSxDfqYD+/Hpe9iKN+aDhIxkbv2gKaehPba
-	 rCBGoe8UsiN8xkZ3Ejg17g5fW95HULon/jVMRfBNgMalrSunpCSjDeL7oyCrP9Xwps
-	 JQl0iWaEP3A/3dZeMPU7O8cFnIGDqNxLc/IMv4mWdZCm58hpXGJao1By1imZNv+FiD
-	 6gMUvQ7wS/2DA==
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfauth.ams.internal (Postfix) with ESMTP id B582B198003A;
-	Mon,  2 Nov 2026 11:12:41 -0500 (EST)
-Received: from ams-imap-11 ([10.64.2.31])
-  by ams-compute-02.internal (MEProxy); Mon, 02 Nov 2026 11:12:41 -0500
-X-ME-Sender: <xms:d7boau4GEVq2dDqp84qlY1HQ-SlrPx6qvrRq388XuU-qOvRcWVD5gw>
-    <xme:d7boaiubcEiIUW-FyvPP5VrH9F4Cv_q_se0-I7ZaeRtKKQ0OC7lqHV8Ytjhz00Zzx
-    YL0fTEb5T2MFqzr13xTvfoQe9Ye0q63EH57c__S8QqWRJfeOr9o95s>
-X-ME-Proxy-Cause: dmFkZTGJsUswHNgg1IGdHToMXw9N6Gez+gackLd4HLz/4Nuo00/0XFK8CkxG13I7ioNyBc
-    nDBBorVxL1kzpl0PoYwNm0iMiflIpq/70DkAfSySqYdWSQwqTSHHSCcIhy74Dn87OTMtMY
-    CthPehOyjaKbLho9md+3hQQV0cloAk7jrZSZ7o3KHhqm5PMz14J9+DmYD07dvZDHLnwWOp
-    bUNC16gH6HnMW6D+tJ4ine+ZO835ooBnay9Snpl/XYhSdqNV79LLVQGxeUy1ODvxMkJscS
-    G1c6SXp0gzwuK5bYJcHh3UW/7JTNjSlCxTGfT96gu+BeF5c4CxT/RhU9MyQCyGv5+NFqB4
-    KNJWOTAbvn1uyeMUQKsWudXPoU9eeYmLNhG/84L+ed0H/ksd0/N99+k71By8aCajjTQKy7
-    Xj+pFZhBuNEL+j2jJF3OBVFDzhECCxALNIUWMZZZyAYro4rOW/P0te5Hh6vcg33+u4PJ/C
-    XouGjxUhnb+D4/UhQNr/yjq4C5ojQHzkzrhGWet2361DmISuCbKPH5aqm4sN9uN622BIWX
-    09PD76r+GKjAVS/bP54doEoGB3dydU7MrWJtam2imAs2bYg8gV0a3/AYUlpEBOpSDjuift
-    KKashaUjaGLOxbWlNQiRP7fNNqB6EgExcXUwZAH4x6SsHYChnnjWdj1BXx0w
-X-ME-Proxy: <xmx:ebboamjBTGUkbEbxDHGTSKs0m3JgmaK0G-dGOMXNx5MsKFjJavfbBg>
-    <xmx:ebboai00g1BIg48j0OMpzESO9grHH6pkq1623htVd2n2MNcghpUxcA>
-    <xmx:ebboapfeihBQdu2kDqvxccP1sWw9nOwXtWcfj_FpXwCvJD6VZdYlDg>
-    <xmx:ebboaoyt_ibuWyY3dETVC8ZAP_qDjttqqVQpXKCAMrIzrMWsxiXXfA>
-    <xmx:ebboahxD9hVAhRC8InX78SdY2p9pSFE3N9UAUUn4Z87qpxAk6o874Xij>
-Feedback-ID: ice86485a:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 5936DF80093; Mon,  2 Nov 2026 11:12:39 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=SUj+o82S
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B6C5B1691;
+	Mon,  2 Nov 2026 08:24:24 -0800 (PST)
+Received: from [10.57.58.9] (unknown [10.57.58.9])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B48703F59E;
+	Mon,  2 Nov 2026 08:24:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793636667; bh=IW6I+BWc2r7Uvn3Hy9ubGbplk7TZAmLObKxp10D6nPM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=SUj+o82SX6vNN52jtgSzYnWP2gAV5nUmd0iZBriNPzdhoRLD+7g7NlMGLpBvDXQZz
+	 5lDf+V4OLbkL7xKitSv9l1gxqnGCXdb5Y6YteajX4voPgoqZEmtY4KqYxFBuN0nix3
+	 9xkSANJUWbIcKVYBk0RIQcTzQ8fS/Y8ul8ZQ3Wgg=
+Message-ID: <446aeea8-4b91-4395-847e-c1ad47b18e58@arm.com>
+Date: Mon, 2 Nov 2026 16:24:24 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -77,52 +53,137 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Date: Mon, 02 Nov 2026 17:12:19 +0100
-From: "Ard Biesheuvel" <ardb@kernel.org>
-To: "Fuad Tabba" <fuad.tabba@linux.dev>, "Will Deacon" <will@kernel.org>
-Cc: "Ard Biesheuvel" <ardb+git@google.com>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, "Marc Zyngier" <maz@kernel.org>,
- "Oliver Upton" <oupton@kernel.org>, "Joey Gouly" <joey.gouly@arm.com>,
- "Steffen Eiden" <seiden@linux.ibm.com>,
- "Suzuki K Poulose" <suzuki.poulose@arm.com>,
- "Zenghui Yu" <yuzenghui@huawei.com>
-Message-Id: <f226b1c1-baee-4bd3-83cd-13b9fc6996df@app.fastmail.com>
-In-Reply-To: 
- <CA+EHjTxVPyY70Dm+BiwgQQNwx1cJpEKvJBJGZWPCKLx2M8X2FA@mail.gmail.com>
-References: <20261102094748.2638468-2-ardb+git@google.com>
- <auiXMN5td-2QlDkd@willie-the-truck>
- <CA+EHjTxVPyY70Dm+BiwgQQNwx1cJpEKvJBJGZWPCKLx2M8X2FA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Don't livelock when AT can't resolve a fault IPA
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 06/11] KVM: arm64: CCA: Add basic infrastructure for
+ creating a realm
+To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
+References: <20261102141304.126883-1-steven.price@arm.com>
+ <20261102141304.126883-7-steven.price@arm.com>
+ <sashiko-outbox-193628@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <sashiko-outbox-193628@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
+On 02/11/2026 15:05, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
+> - [High] KVM: arm64: missing realm->ia_bits initialization in kvm_init_realm()
+> - [Medium] KVM: arm64: cca: clamp Realm IPA limit to host limit in kvm_init_ipa_range()
+> --
+> 
+> commit e03ea9b753f8211e9e93f2e5edff9ba91b09d112
+> Author: Steven Price <steven.price@arm.com>
+> 
+> KVM: arm64: CCA: Add basic infrastructure for creating a realm
+> 
+> This commit introduces the initial functions and state structures for
+> creating and destroying a Realm VM, and checks the requested IPA size
+> against the RMM's supported Stage-2 address size.
+> 
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 1301c563d7052..b049ea67d9af3 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -981,10 +981,14 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
+>>  
+>>  static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
+>>  {
+>> +	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+>>  	u32 kvm_ipa_limit = get_kvm_ipa_limit();
+>>  	u64 mmfr0, mmfr1;
+>>  	u32 phys_shift;
+>>  
+>> +	if (kvm_vm_is_realm(kvm))
+>> +		kvm_ipa_limit = kvm_rmm_ipa_limit();
+> 
+> [Severity: Medium]
+> Should kvm_init_ipa_range() clamp kvm_ipa_limit with min(kvm_ipa_limit,
+> kvm_rmm_ipa_limit()) instead of overwriting it?
+> 
+> In arch/arm64/kvm/rmi.c, rmm_check_features() only rejects the case where
+> kvm_lpa2_is_enabled() is true and the RMM lacks RMI_FEATURE_REGISTER_0_LPA2:
+> 
+> 	if (kvm_lpa2_is_enabled() &&
+> 	    !rmi_has_feature(0, RMI_FEATURE_REGISTER_0_LPA2)) {
+> 		kvm_err("RMM doesn't support LPA2\n");
+> 		return -ENXIO;
+> 	}
+> 
+> It does not prevent running with !kvm_lpa2_is_enabled() when the RMM supports
+> LPA2 and reports a 52-bit S2SZ in RMI_FEATURE_REGISTER_0_S2SZ, or when S2SZ
+> exceeds the host's sanitised ID_AA64MMFR0_EL1.PARange. Meanwhile,
+> kvm_set_ipa_limit() caps get_kvm_ipa_limit() to 48 bits when
+> !kvm_lpa2_is_enabled() && PAGE_SIZE != SZ_64K.
+> 
+> If kvm_rmm_ipa_limit() is larger than get_kvm_ipa_limit(), overwriting
+> kvm_ipa_limit allows userspace to create a Realm via
+> kvm_arch_init_vm()->kvm_init_stage2_mmu()->kvm_init_ipa_range() with
+> phys_shift > get_kvm_ipa_limit(). That causes kvm_get_vtcr() to configure
+> VTCR_EL2_T0SZ for 52 bits without VTCR_EL2_DS, kvm_pgtable_stage2_init() to
+> attempt allocating 256 concatenated PGD pages, and kvm_handle_guest_abort()
+> to inject an address size fault for any fault_ipa >=
+> BIT_ULL(get_kvm_ipa_limit()):
+> 
+> 		/* Beyond sanitised PARange (which is the IPA limit) */
+> 		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
+> 			kvm_inject_size_fault(vcpu);
+> 			return 1;
+> 		}
+> 
+> [ ... ]
 
+Valid point - I'm not really convinced the situation will happen in
+reality but if for some reason Linux has capped the IPA size it supports
+then we don't want to override that just because the RMM supports a
+larger size.
 
-On Mon, 2 Nov 2026, at 16:57, Fuad Tabba wrote:
-> Hi Will,
->
-> On Mon, 02 Nov 2026 14:17:10 +0000, Will Deacon <will@kernel.org> wrote:
->> On Mon, Nov 02, 2026 at 02:09:25PM +0000, Marc Zyngier wrote:
->> [...]
->> > Alternatively, VMALLE1 or even VAE1 should be enough to get rid of the
->> > S1 TLB.
->>
->> Ah, sorry, VMALLE1 is what I meant to ask about. I basically haven't
->> understood the need to invalidate the stage-2.
->
-> The guest's walk can also go through a stage-2 entry for its
-> page-table page, cached before the aging cleared that page's AF, and
-> nothing requires the AT to use that entry:
->
-> R_NPZWX: When an address translation instruction is executed, it is
-> IMPLEMENTATION DEFINED whether the result can be returned from a TLB,
-> or a translation table walk occurs.
->
-> So if my reading is correct, on a CPU whose AT walks memory instead,
-> the AT keeps failing while the guest's walk goes through the stale
-> entry, and the guest takes the same permission fault again. VMALLE1
-> and VAE1 only cover stage 1, so they'd leave that loop in place.
->
+>> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+>> index 5b07beff8bc91..45ecbaa467d1d 100644
+>> --- a/arch/arm64/kvm/rmi.c
+>> +++ b/arch/arm64/kvm/rmi.c
+> 
+> [ ... ]
+> 
+>> +int kvm_init_realm(struct kvm *kvm)
+>> +{
+>> +	struct realm *realm = &kvm->arch.realm;
+>> +
+>> +	realm->sro = kmalloc_obj(*realm->sro);
+>> +	if (!realm->sro)
+>> +		return -ENOMEM;
+>> +
+>> +	return 0;
+>> +}
+> 
+> [Severity: High]
+> Where does realm->ia_bits get initialized?
+> 
+> This patch adds unsigned int ia_bits to struct realm in
+> arch/arm64/include/asm/kvm_rmi.h and calls kvm_init_realm() from
+> kvm_arch_init_vm() after kvm_init_stage2_mmu() has configured
+> kvm->arch.mmu.vtcr, but neither kvm_init_realm() nor kvm_init_ipa_range()
+> sets realm->ia_bits (for example to VTCR_EL2_IPA(kvm->arch.mmu.vtcr)).
+> 
+> Later patches in the series ("KVM: arm64: CCA: Tear down RTTs", "KVM: arm64:
+> CCA: Add Realm RTT mapping and invalidation helpers", and "KVM: arm64: CCA:
+> Support runtime faulting of memory") read realm->ia_bits in
+> get_start_level(), realm_destroy_rtts(), realm_unmap_stage2(),
+> realm_unmap_shared_range(), kvm_realm_unmap_range_filter(),
+> kvm_realm_is_private_address(), and kvm_gpa_from_fault(). With realm->ia_bits
+> left at 0, expressions such as stage2_pgtable_levels(realm->ia_bits),
+> (1UL << ia_bits), and BIT(realm->ia_bits - 1) will compute wrong RTT start
+> levels, wrong IPA bounds, and undefined shifts.
 
-This matches my findings on the Apple M2: TLB invalidation at stage 1
-only (using VAAE1 on the FAR) does not solve the issue.
+The assignment of ia_bits is in a later commit (not in this posted
+series) as part of realm_create_rd(). But actually it probably makes
+more sense done here, so I'll fix that up. Imagine kvm_init_realm() has
+the following:
+
+	realm->ia_bits = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
+
+Thanks,
+Steve
+
