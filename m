@@ -1,73 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.71
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793606337;
-	b=3HYzzxgAyMDr+tu9oZ/3Ts7AJeqpKXh1U8hHiPndFYkA8G7/RpBcEVxY27RaMZbtlaK/
-	 U6yXX1Ki3J6MWRdgYoJPwEB/e2Qa/5lwwML9JX4biAZi+JVexoahT37/CMujLY0Kqv//X
-	 Y2J62t5McvPOhgMRMgwLxzHUSX8RnvdDhDSdOTLd2cOGRpoD+4YPnx44DQORrUYL49M7j
-	 ga6EanMf3p4xQFtkFz69fHjzGro/T50/wPfmcWg0wnSh+bro1cDTagA0V25JBCSteXnrm
-	 /Hjj4uQWG+RaT5+Jz0m86kX/b5wnLtJX1ekGnmVSSGx/CBf8U93z5I4l5c59JWtiIlg==
+	t=1793606728;
+	b=AfdzXl74FNZTdhoULaUtM1a6CfXDfB/rEPhLW9RJtIyBW1OGIfZtjJQf8c9R1yzjp36N
+	 4Eai/JKkKGuS8hvaGCDEJfhXnLa445kV8nVs6f6SwwUdp2Z2fnJxZ1+I14l4S/3hi+E76
+	 rUO2P+oHFDW2rEJIyoR3LoVA4urjijwNIV9TvS8rBNuQbImtefsJfTPEb9Dt90byHk8mM
+	 NXYTI1mSwSoEW47qZgy9jymmCtLixmNPDyOqd4lcujf5uwZBDGtgywLgAIblppcDQ/BB6
+	 j7LGPGZiCIgFf4LyuMUj0xbpTxopRCMFgk0wqC0a5eEzHlExjglQ4nWHwr6VbdZehuw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793606337;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=z58+V1LgFPW+j6akovhxZv60ektir/LOJatWFadIMFw=;
-	b=i7YvCBhHkiJJT2nNXmR9p6m453yjGcFeDgTiRnIPizMLazZHfLmMsoOghjS7p/pk2YAe
-	 e7zZf3ORg94w7xTiVUeFKZqw2KfWjJVu6mo1x7E/Tit+GTUF+PwY29+FrkKvQ3/Fd2vfH
-	 tJ10nQg7hfocBomXruNYOFCnpMf7cHR/iLUhrrIWF9aLp4dXOArbrEuEd1EFr2d6CO9Bj
-	 fxDSW2y0ZCZp2nZnwjtRO5q9mElFCQhKY3kDeCc/cihk43IKPGnr/K/T64XGuL1bfaEZ/
-	 NPmNQf2TM/fa507+swdQ5fTK+mB5zheEoMqRTBzbxxQmalual0nWa//HiOI38UZ1xxQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793606728;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=s3MVvxzGnSWvttHCkz12dBX/2TzSeRqwx2B+vBpsohA=;
+	b=dzbrT7mwtF0AvQelfAEUNWkbjP6y6NV3pA+VwOhjtF9JFBrSFh4kcW0SCcQV2lWGLbLW
+	 WNiAzB0ibHVrTUI9lBaGbUllOa43MOzM4/07S/GgXg/n0y3Jr16dXGJ4kTeoG113PEBUY
+	 xavJXSZWeDsym2SpNDmmKgZusHenr19liRyNUMuQluQcHdnd0kkdIdaSuhckwuKuvAQKO
+	 IEJXi355fK+LBD0swS6d33k0NC9b4AEL3ZwGHxhw9PrzVxY2K9DAcCzML5bSgRrSvgnWK
+	 o/ZFp5B8YR48WrxLcgq/I5BAP88bZFDLcGN0uZFkPVn/1QRfR8z7SjJo3v5yYz2PrBg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=a0DPpKqq;
-	arc=none smtp.remote-ip=91.218.175.71
-Received: from mta0.migadu.com (out-71.mta0.migadu.com [91.218.175.71])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AR6KG4f6;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E78606A32E
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 07:58:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 50E78606A32E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 717C9606A326;
+	Mon,  2 Nov 2026 08:05:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=a0DPpKqq
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=E+yNN660ZSvNAcxzl1biL8JK8VlI5gYHahRxIDWZ1l4=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793606329; v=1; x=1794211129;
- b=a0DPpKqqdE39iZynjDq4nwTpgkIP3QqfmtbeYZJHXrl5DfT9kvVRcmYbyltl5ncZtL8Z7ZyM
- tzWmjc6Nh2e7Frx+sERoyChDcCA/2NCCwBXJ5qhqTBtacqIW9NX61nODjv+I4kvkjqwoT0rrnBI
- HOnd7vRXi32EPLCIwHGpJnjU=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id af6687c61325397b;
-	Mon, 02 Nov 2026 07:58:49 +0000
-X-Mizu-Trace-ID: af6687c61325397b
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AR6KG4f6
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 047321F000C1;
+	Mon,  2 Nov 2026 08:05:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793606728;
+	bh=s3MVvxzGnSWvttHCkz12dBX/2TzSeRqwx2B+vBpsohA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=AR6KG4f6xIXaHUlSombXmoSQ3IvLm0GY8dPAquP6rdFe+3aO/0eJ/SyIZX18LyxEA
+	 oPhCDuI8dM4a1KeoQdYB8PpxAL50hgODsXNIG5Ym19gtekg3Yr3cZWWe+RhYohzB9g
+	 7OSHewDoFxYPaUJUPLsxc4k1knuZiHL55xm0f72hKmfloHJMrwybTLcK45oIprHLyb
+	 my/qQh3w5ZW21XTNdKICi8B6RQtTl8BlwIdkMVE8ZOIT4+sL0ef/Vf0bdxZ1oIwKY2
+	 zSit37Mkx1ls5d6VKOIZJFa0RXAuERrEocaENfN9F1FY0asgN8o3rYYEJpE9dl0xqs
+	 zs4zSuOmYeSHA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xNn2j-00000009iDv-2tka;
+	Mon, 02 Nov 2026 08:05:25 +0000
+Date: Mon, 02 Nov 2026 08:05:25 +0000
+Message-ID: <86ik2f3bga.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Matthias Goergens <matthias.goergens@gmail.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Jack Thomson <jackabt@amazon.com>,
-	Congkai Tan <congkai@amazon.com>,
+	Zenghui Yu
+ <yuzenghui@huawei.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	Randy Dunlap <rdunlap@infradead.org>,
 	linux-kernel@vger.kernel.org,
-	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v4 2/2] KVM: arm64: Clear the default PMU when kvm_setup_vcpu() fails
-Date: Mon,  2 Nov 2026 07:58:43 +0000
-Message-ID: <20261102075843.2556018-3-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261102075843.2556018-1-fuad.tabba@linux.dev>
-References: <20261102075843.2556018-1-fuad.tabba@linux.dev>
+	workflows@vger.kernel.org
+Subject: Re: [PATCH v2] Documentation/process: Add a maintainer entry profile for KVM/arm64
+In-Reply-To: <8ffc41d7-b032-481c-9643-a87847b8452b@kernel.org>
+References: <20261030083351.3040604-1-matthias.goergens@gmail.com>
+	<8ffc41d7-b032-481c-9643-a87847b8452b@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -76,49 +82,51 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: krzk@kernel.org, matthias.goergens@gmail.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, corbet@lwn.net, skhan@linuxfoundation.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, rdunlap@infradead.org, linux-kernel@vger.kernel.org, workflows@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Under KVM_ARM_VCPU_PMU_V3_STRICT, the VM has no PMU until userspace
-selects one, and initializing the PMU fails with -ENXIO until then.
-However, without STRICT, kvm_setup_vcpu() selects the default PMU
-before it prepares the vCPU for nested virtualization, and leaves it
-set when that preparation fails. After a retry with STRICT,
-initializing the PMU succeeds and the guest gets the PMU of the CPU
-the failed INIT ran on.
+On Mon, 02 Nov 2026 07:16:47 +0000,
+Krzysztof Kozlowski <krzk@kernel.org> wrote:
+> 
+> On 30/10/2026 09:33, Matthias Goergens wrote:
+> > +
+> > +If your series depends on something else that is not yet in mainline, such as
+> > +another series under review, say so in the cover letter and name exactly what
+> > +it applies on top of.
+> > +
+> > +Use ``git format-patch --base`` so that the base commit is recorded in the
+> > +patches.
+> 
+> You should rather encourage usage of b4, which does above for you.
 
-Drop the PMU and its number of counters along with the VM's feature
-bitmap. While KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED is clear, no vCPU
-has been initialized and the PMU attributes return -ENODEV, so only
-such a failure can have set them. Once the flag is set, every INIT has the
-features of the first one that succeeded, which either selected a PMU
-or had none to select, so kvm_setup_vcpu() doesn't select another.
+No. People use whatever they want to use, and we don't have to be
+prescriptive.
 
-Fixes: ad220e275c398 ("KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_STRICT vCPU feature")
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- arch/arm64/kvm/arm.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+>
+> ...
+> 
+> > +
+> > +Security issues
+> > +---------------
+> > +
+> > +Bugs that let a guest attack its host, or a nested guest attack its guest
+> > +hypervisor, should be reported as described in
+> > +Documentation/process/security-bugs.rst.
+> 
+> Do we need to repeat standard stuff in every maintainer profile? Above
+> is quite obvious, so maybe skip it which would make the document shorter
+> increasing the chances anyone will read it.
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 3e91e01b032c4..65194e02cdbc2 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1857,9 +1857,12 @@ static int __kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
- 
- 	ret = kvm_setup_vcpu(vcpu);
- 	if (ret) {
--		/* Clear the bitmap if setup fails on the first vCPU to be initialized. */
--		if (!test_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags))
-+		/* Clear the bitmap and PMU if setup fails on the first vCPU to be initialized. */
-+		if (!test_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags)) {
- 			bitmap_zero(kvm->arch.vcpu_features, KVM_VCPU_MAX_FEATURES);
-+			kvm->arch.arm_pmu = NULL;
-+			kvm->arch.nr_pmu_counters = 0;
-+		}
- 
- 		goto out_unlock;
- 	}
+I'm perfectly happy to have this here. Most people will only read the
+one document they need to (if any). And I really doubt that the
+mention of a nested guest escape is that common (as a basic grep would
+have shown you).
+
+	M.
+
 -- 
-2.47.3
-
+Without deviation from the norm, progress is not possible.
