@@ -1,49 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.45
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793635058;
-	b=cIA9mZzWdWZzDBEjtfAdJeDzeplKb4BuKUqSw3LcfDnjRl4CqsRiujoIctgylCkiPH6S
-	 8u9/ypueMcb8CpKV1VlJZo0Dc4nuu/Kd2zmqHds1h8ySDmJZnGqcUTpRfSMkhBXHuUHoT
-	 UPVma2TByaTyJlBwMvBPynn1BGOaQbe6dYNoUDEF5oOniHAtO007gl8fUhKeSYBZ92sYz
-	 9IX6pqI++xf6dy16NMfNlyqyNCpRe7Y1ZpL7InKIgsDz9O0nqyMy3XS8W+NAlzs6o7jrY
-	 M97lFcxMFCEe9zMJcfcrKajCE21fVPvR71E6Bn3W352T1GG9AL/zk2ktXVzwvlicArg==
+	t=1793635111;
+	b=xjgB7h/vHpk2rEQ/BrpgEUvtvbWV/LheqVeWzd2mTMS/yad20NAF1f4bvq1p9cfmrfVp
+	 E83kYFf1I8VMdYUAxm9P5sQ5lpabU8lrC0CWBmXkQYyNImLGDBCUv++pAR/z8uxOTWwq2
+	 LPOVl8dvZYRDfEf/IP98e1ztm5pzvOEo1/uGkzFiYrI/olvS5PsNg0AtLqJNZRFvrJyiW
+	 kQ7S64tck1LnE4+34m5bxKtrZkIwTYaK/+xgkTn1CHECtuMVPgcycy7K5zUu8zt74Fcci
+	 2Vc4jhbkKaCkDd0OGN6f7Q2mxFxUb5CaP0isjQQ4l1oWdv2j/JE7UBj8bwePFRBmUdQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793635058;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:Content-Language:To:Cc:References:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=nmjX+gZnq1JmQb9kEyFBLchOqDlgvPlEFS1E5xvlvxE=;
-	b=jrjNasuJdQCivoVUjVlyDoE2qJGb+KXu8VqaOr0N3Sc8KzVfmv5MEJPNHiBdCwgPoV0b
-	 z9MDz+QbD13Is35nfX1YicJBwO2Z6lGsobkWgQIxJkS49mBFqNQARmGFi4b1OXNHidYKy
-	 KVq84UxxQ4q3IxRgDz8Q0nv60fuuT0eTOrGMsxIhlmfRkWJHYqDmcRX7iTDP3dUOSiFAZ
-	 /3CGrBvey6icBoXIJT0z6iaRRE8Htp0cemVRRFJ8D1GRCPeWdqs6H9p8kF9HQDxppxVat
-	 7aPlooVBewZ8QrHtFF5IGTnzc6nFDJUCiGv/CsSkKpfv1RSVrg76j0hQZw9aGtaPOxA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793635111;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=Zqk5EosFBXrVefcK+m2mlV2/eICrUeTU+WY9gyPrY4E=;
+	b=zOs3XYojRJF0tP56c3jDGLvCxmERVumtVqF1n4M2IRvZ3F88DN7SPACiFEaM86zbxGm3
+	 9+DsGCyikEGb5mCEmboZr52wQI3Pw/Jg4254hJG/KFgQ20LOPic90//1LEuA+TQVPsFV7
+	 FufB7kPXECbqgmSG/CL68m0wm1w7BFjno/TVPafUFMAAYKWz6d5Ena90b4HxUmD4GeIH4
+	 boqP3FHs6uhpg3jeeHJnlZ5OA6ZFLWEkI2dtFwy8jC80UJMuuDahTByAfnySfosEAxigU
+	 0eRGw1H43zrdduWyDd/bzGmAesgx5hjHYelibQJfL+9LgEBg9larUsOFyX6Zxy4HP3Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=fnGlHX+U;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FECE606EE81;
-	Mon,  2 Nov 2026 15:57:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1FECE606EE81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QwNXfuJw;
+	arc=none smtp.remote-ip=91.218.175.45
+Received: from mta0.migadu.com (out-45.mta0.migadu.com [91.218.175.45])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C676075282
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 15:58:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D5C676075282
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=fnGlHX+U
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 06AA11691;
-	Mon,  2 Nov 2026 07:57:33 -0800 (PST)
-Received: from [10.57.66.79] (unknown [10.57.66.79])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8B8703F673;
-	Mon,  2 Nov 2026 07:57:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793635056; bh=17j2yXfs58CpqKQEHFy6H451nac5qtYTTRF17xOQiSw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=fnGlHX+UPMKGBP4eiXdt3RMc/CD0IYMClJYY6xjctAvQ6jZVSB9jGzI//Eeq8Tlp1
-	 b5pFugq0mn9nU1RHNbvkKV4aYN7E24deQtMM8+tufCWNMZWa39mw5yvvqiRx4GIOMG
-	 XfBRk/rotWv3ZIXj8FtfUybUKIm4ZQabM2yXAqlk=
-Message-ID: <46c28259-086e-4948-8c00-183f9e62114a@arm.com>
-Date: Mon, 2 Nov 2026 15:57:33 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QwNXfuJw
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=IOueXIDbWvxDU66CPZpA4KpxoAIR1G1INRDIBFHDNvQ=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793635108; v=1; x=1794239908;
+ b=QwNXfuJwaKs1o4ABMkLKUVBTCEyDR+KMCnAl6GNrPDGAjd+qbTg0t0bHDuIUAMIbUjAcHF8v
+ 8mPYURAhbPvsKXAmF6G9j1a+58gv/UMhQnnJISBh+o7LVOrpq7zfTFHRjeUqOD0FX1mnPDxuwqq
+ uq9GSSNH4MOVO+1aL1OlDQXM=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id cfd6e5551e85fa68;
+	Mon, 02 Nov 2026 15:58:28 +0000
+X-Mizu-Trace-ID: cfd6e5551e85fa68
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5bfca2a2af4so11208e87.1
+        for <kvmarm@lists.linux.dev>; Mon, 02 Nov 2026 07:58:28 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AKwUvBx76CiLn1qKk99cHMvklkUqmGPqqFGqb4TKlhc6rLqAcSKlTBiF3g/Ea+DVnCeaTugHADMTTUs=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+fzh3KmYTpEL07rO4jIxc2z5EjA/kLRVPfFMqIxicIIGRy8rbq
+	2EFh6YZfSFZeq93wKW8uyaTQuTxXTf1jlTYbVaZKye/z43Qg5w7uij1OZSNucfSSa32f5OITqyK
+	yedX4pD/SPjJuuiJ7jFP/mWAodEoKco0qpgfFe0yY
+X-Received: by 2002:a05:6512:118f:b0:5bf:a911:7ee3 with SMTP id
+ 2adb3069b0e04-5bfd13d8cdbmr607141e87.3.1793635107619; Mon, 02 Nov 2026
+ 07:58:27 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,111 +66,72 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 1/2] KVM: arm64: CCA: Add support for configuring
- the Realm MEC policy
-Content-Language: en-GB
-To: Kohei Enju <enju.kohei@fujitsu.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev, cgroups@vger.kernel.org, linux-coco@lists.linux.dev,
- Marc Zyngier <maz@kernel.org>, Fuad Tabba <tabba@google.com>,
- Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>
-References: <20260724094120.166536-1-enju.kohei@fujitsu.com>
- <20260724094120.166536-2-enju.kohei@fujitsu.com>
- <46d78aa2-cacb-4efd-ae62-3026f5fe9b3f@arm.com>
- <amwrnJ1KhllC-gVu@FCCLS0092175.localdomain>
- <auio781Uu9Zzyq3i@FCCLS0092175.localdomain>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <auio781Uu9Zzyq3i@FCCLS0092175.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20261102094748.2638468-2-ardb+git@google.com> <auiXMN5td-2QlDkd@willie-the-truck>
+In-Reply-To: <auiXMN5td-2QlDkd@willie-the-truck>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 2 Nov 2026 15:57:51 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTxVPyY70Dm+BiwgQQNwx1cJpEKvJBJGZWPCKLx2M8X2FA@mail.gmail.com>
+X-Gm-Features: AclHuK9bY5GhZz09yeG7qP1mqDl9dnGaY92IKxCsC7wirWm_wSZDIj5t5JuS5VU
+Message-ID: <CA+EHjTxVPyY70Dm+BiwgQQNwx1cJpEKvJBJGZWPCKLx2M8X2FA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Don't livelock when AT can't resolve a fault IPA
+To: Will Deacon <will@kernel.org>
+Cc: Ard Biesheuvel <ardb+git@google.com>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ardb@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Kohei,
+Hi Will,
 
-On 02/11/2026 15:19, Kohei Enju wrote:
-> Hi Suzuki,
-> 
-> I sent the message below off-list a few weeks ago, but I'm following up
-> on-list in case it didn't reach you.
-> 
-> Since then, I've started reworking the series based on the
-> kvm_device_attr approach you suggested, and I'm currently testing it
-> against v23 of the CCA host support.
-> 
-> I'd still appreciate any feedback on the ABI direction, as well as
-> whether you see any concerns with posting the RFC series while the host
-> support is not yet upstream.
-> 
-> Thanks,
-> Kohei
-> 
-> On Fri, Oct 9, 2026 at 03:15:23PM +0900, Kohei Enju wrote:
->> On 07/31 14:09, Kohei Enju wrote:
->>> On 07/29 12:47, Suzuki K Poulose wrote:
->>>> Hello
->>>>
->>>> Thanks for sending the patch. Please find my comments inline below.
->>>>
->>>>
->>>> On 24/07/2026 10:40, Kohei Enju wrote:
->>>>> Introduce the KVM_ARM_RMI_CONFIG ioctl to allow userspace to configure
->>>>> Realm VM parameters before the Realm is created.
->>>>
->>>> This approach is something we tried in the past. Another option is to
->>>> add these as kvm_device_attr for the KVM VM, under a new group, e.g.,
->>>> KVM_ARM_VM_RMI_CTRL and add the following attributes :
->>>>
->>>> KVM_ARM_VM_RMI_CTRL_RPV 		-> Realm Personalization Value
->>>> KVM_ARM_VM_RMI_CTRL_MEASUREMENT_ALGO	-> Measuerment algo
->>>> KVM_ARM_VM_RMI_CTRL_MEC_PRIVATE		-> Private MEC Policy. By default to shared
->>>> ?
->>>
->>> Hi Suzuki, thanks for suggesting another option. That looks good to me,
->>> and I'd be happy with either approach.
->>> Anyway I'd like to wait for feedback from the maintainers and other
->>> reviewers.
->>
->> Hi Suzuki,
->>
->> I'm thinking of respinning the MEC policy series as RFC v2, as you
->> mentioned in the Core Collective WG last month.
->>
->> For the ABI, I'm planning to switch to the kvm_device_attr-based
->> approach you suggested instead of introducing a new VM ioctl. Before I
->> start reworking the series, do you have any concerns with that
->> direction?
+On Mon, 02 Nov 2026 14:17:10 +0000, Will Deacon <will@kernel.org> wrote:
+> On Mon, Nov 02, 2026 at 02:09:25PM +0000, Marc Zyngier wrote:
+> > On Mon, 02 Nov 2026 13:59:12 +0000,
+> > Will Deacon <will@kernel.org> wrote:
+[...]
+> > > > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+[...]
+> > > >  static inline bool kvm_hyp_handle_memory_fault(struct kvm_vcpu *vcpu,
+> > > >                                                 u64 *exit_code)
+> > > >  {
+> > > > -        if (!__populate_fault_info(vcpu))
+> > > > +        if (!__populate_fault_info(vcpu)) {
+> > >
+> > > Presumably we need a barrier (DSB?) here, to ensure that the TLBI happens
+> > > after the AT instruction?
 
-...
+I don't think the TLBI requires a barrier before it, because it
+doesn't matter if the AT's walk allocates entries after the TLBI.
+Anything it allocates matches memory, and the stage-2 descriptor the
+AT faulted on has AF clear, so that descriptor can't be cached:
 
+R_XCLRD: Translation table entries that generate a Translation
+fault, an Address size fault, or an Access flag fault are never cached
+in a TLB.
 
->>
->> One other point is that the series still depends on the CCA host
->> support, which is not upstream yet. As a result, tools such as Sashiko
->> would likely be unable to identify the correct base tree and may not be
->> able to provide useful automated review feedback.
->>
->> Personally, I think this is acceptable since the series is still RFC and
->> the primary goal is to get feedback on the ABI and overall design rather
->> than seeking integration at this stage. However, I am aware that posting
->> patches on top of non-upstream trees can sometimes be problematic from a
->> review perspective.
->>
->> Do you have any concerns about posting an RFC series in this situation,
->> or would you prefer that I wait until the host support lands upstream?
+The stale entries the guest keeps hitting were already there before
+the TLBI, and the dsb(nsh) and isb after it are what complete it
+against them.
 
-It would be useful to have the RFC on the list to get an idea on shaping
-the UABI. It may also be useful for people to verify the end-to-end
-stack, including the remote attestation flow. (the branch we have is
-ancient)
+[... your other reply ... ]
+> > Alternatively, VMALLE1 or even VAE1 should be enough to get rid of the
+> > S1 TLB.
+>
+> Ah, sorry, VMALLE1 is what I meant to ask about. I basically haven't
+> understood the need to invalidate the stage-2.
 
-But nothing else, i.e, code correctness or functional reviews
-etc (that rules out meaningful Sashiko reviews etc).
+The guest's walk can also go through a stage-2 entry for its
+page-table page, cached before the aging cleared that page's AF, and
+nothing requires the AT to use that entry:
 
-Suzuki
+R_NPZWX: When an address translation instruction is executed, it is
+IMPLEMENTATION DEFINED whether the result can be returned from a TLB,
+or a translation table walk occurs.
 
+So if my reading is correct, on a CPU whose AT walks memory instead,
+the AT keeps failing while the guest's walk goes through the stale
+entry, and the guest takes the same permission fault again. VMALLE1
+and VAE1 only cover stage 1, so they'd leave that loop in place.
 
-
->>
->> Thanks,
->> Kohei
-
+Cheers,
+/fuad
