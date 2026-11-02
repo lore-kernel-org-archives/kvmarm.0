@@ -1,57 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793633856;
-	b=BCXFdmhOW/oXAqPwuB9C2UmXX2AXobm0b6QGu3oYWVulJiSU0aX+R/wnrCGMmjJc544e
-	 LlunOPI83WgovVjsmUMuef7cUayl9mTEsKXA62UNJvqHl7iwuL9vAI2pRif1QlWKNeYQ7
-	 kEYiPB4AZq4+uecCEDyxkbCJ/qBcjQOowVorcOfF7EvyWR6F9L88pXwqBZWOoGta42pGe
-	 WQyn/PZGLlK8f343zinh9N2YyrWm/cxzKIlS/CXFD+oG5vR/RbVO+b1+v8EakX6XN8yEg
-	 n2p1ZaO4rODH49t7/0PhnWQz+8o1LDUjSb2UteCzjAt2ahYX65krDdN5dUse2qXMd/A==
+	t=1793634359;
+	b=X7wIDpfPZZydEe2Zu69RHm4afhNYeoeXigs4q4Qg8CeIj//NEYtKJhRgR383jwOsilAu
+	 m/N5QaRegrYBt6rSF0WI3vIiaYjgvAQxB4J9ws2ge6zr2ZguxcQMzTAHk6xEia03xdMJ1
+	 vEibQ0o8O6nbtgAYWoWSkQgK/NxVbqDzy+xkAkqxzb5+mjUz/0zZevL2qrFHnLnMEhT8s
+	 ZpIuTDy0SZmV3/cd0/0j70a/jI9jnJWmlPzqwnLw6YD3e5BD48gLTgJ5rf8dPf2hC2n1C
+	 qitIWop2hsVfuiuQvmxXHBGOq1qknLjDLAntq9rE8Vv5sDcV5qo8cRxgX8Qyj42Lj5A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793633856;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=vq8Jkl0nekFnNp5l7od8z4hsttA48/j4aZwu0QX4oxg=;
-	b=nOTHighSxaJpf+8rFeb+9fPe2lCjMACcilZG9E5Gdfo+cKY6K5xvFxqAnONwDcifYfzf
-	 kWNjI/+GXAdo/w3ooXU0uc6PHz5H/qyYS9oPK1hKghM61NCal6YYmoUV77xozgJkwuTG2
-	 KDG31USrvndsLVnvVAw7bgcDq9wTvI0jctD9YV0+tx/0mSqur8qM7YePFWab0Fb091esJ
-	 TOsLyhcYLGWrawfMPrPNFA8qSCRJXWu2M9mSxcxadxcmFns9EcccNOajBbLQ8p8HMlhe1
-	 qY+ueoIZ6eNJrKlPKMUFQHFiBlFP4MfPlvaB+CNZdVhOJ6D0KXG0LADiP8uq+JyVmVw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793634359;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
+	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=OxZ1FKz93yFmSf3rlu7UFTVP3JEk6naoYRS2+rfDo78=;
+	b=Q7V32JF8hwBodjxNrsoRpKjydGO+TmJsFJt1IDmPCWMgmn0lYFfvrMUKjkacQwB+F/Gl
+	 B+rr5qX2enXZn7AcD5F71C+vPg+k8jYIZMKGPzUQ2CPBTRA77dq8SH51fReoz2uQ5uZjX
+	 RpaoNp5KoKmNf8GIlmxvXx64aUyQm5vnt9G0+yTPhrNmmD7odg44bWR5/JbXDYpeEwnyE
+	 M9B33TT3ULtMJZmV/PwS1gxdGdAaU3LtPmUYZtL65cdU3P+rOaHLYg91QyCLHCUjE7m+l
+	 sv5iUeO0mQq5v9HXQjK5+UT2s3pN6fV/2wZUnTltW6fn4kG3T57OeomgI9a8eCM1e9A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kbA++yJ4;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F94160EDEC3;
-	Mon,  2 Nov 2026 15:37:35 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="cOCS/GGj";
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655146074659;
+	Mon,  2 Nov 2026 15:45:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 655146074659
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kbA++yJ4
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDBF11F01579;
-	Mon,  2 Nov 2026 15:37:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793633855;
-	bh=vq8Jkl0nekFnNp5l7od8z4hsttA48/j4aZwu0QX4oxg=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=kbA++yJ4en6wC6cO939k7VBCvx3vR4V8W9fX8HezXW3dTuT9dpozPxMoEP3kutu2c
-	 rTOIydgMS+zOvffJTXHNxhtAwCI6YZ6JFd0ghMyGjnPLgC03MMYFR/PFcUyM3KZhOC
-	 n7YonUgrM8el+fnoQKLT2xHi76foH/sdqByPtH7dGNO40q8HHEoCHUA8kCMmfSSNpk
-	 CulLQ6lYNtgmuhJdTRyoP537/yKdd9UxGt8xnctwIg9G2ox4JXfoVw/7aaP5opR/3j
-	 adhnwDgn9cTcHsqc9YDCRI93Xgm/CIXYQISRfIxxrefqcK3qXkh3iUbmLF77bThxLa
-	 cFRUOsgfbj6eg==
-Message-ID: <sashiko-outbox-193686@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 08/11] KVM: arm64: CCA: Add Realm RTT mapping and
- invalidation helpers
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Steven Price" <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261102141304.126883-9-steven.price@arm.com>
-References: <20261102141304.126883-1-steven.price@arm.com>
- <20261102141304.126883-9-steven.price@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 02 Nov 2026 15:37:34 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=cOCS/GGj
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ABA581691;
+	Mon,  2 Nov 2026 07:45:54 -0800 (PST)
+Received: from [10.57.58.9] (unknown [10.57.58.9])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 85CB43F673;
+	Mon,  2 Nov 2026 07:45:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793634357; bh=20817R1mA1QbVjTwjDkW4AThGUuc7p8N/sVrM+ih4AM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=cOCS/GGjHAgkaZa/DZHphD0w3MxNA7tE7wxbCjH8zp+5E7JfZTNU8KDbBKcYTkzOx
+	 P6yo5GiKL8de1WXQF+qhbIqjXEZz6rB1M9ziyY9EMMl4CCUM+JI7JSq+3rS6d0FCAP
+	 MgQUxyTQuOyY5SBKB0xtNrB55E8y/cf5P+PdJUYE=
+Message-ID: <b0755ab6-d7a9-4952-8f18-09b72fbd662d@arm.com>
+Date: Mon, 2 Nov 2026 15:45:54 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -60,304 +52,155 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/11] KVM: arm64: CCA: Introduce Realms
+To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
+References: <20261102141304.126883-1-steven.price@arm.com>
+ <20261102141304.126883-3-steven.price@arm.com>
+ <sashiko-outbox-193575@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <sashiko-outbox-193575@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
-s) to consider:
-- [High] KVM: arm64: uninitialized next_addr in realm_unmap_private_range()
-- [High] KVM: arm64: broken address alignment and recursion in realm_fold_r=
-tt_level()
-- [Medium] KVM: arm64: page accounting after free_page() in free_rtt()
---
+On 02/11/2026 14:30, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
+> - [High] KVM: arm64: premature kvm_arch_has_private_mem() breaks gmem checks and caps
+> - [Low] KVM: arm64: duplicate kvm_arm_vcpu_finalize() declarations in kvm_host.h
+> --
+> 
+> commit d7e08ee0dbb02a4cf114f13c026edc843145fe6e
+> Author: Suzuki K Poulose <suzuki.poulose@arm.com>
+> 
+> KVM: arm64: CCA: Introduce Realms
+> 
+> This commit adds foundational infrastructure for Arm CCA Realm VMs,
+> including the VM_REALM flavor, a static key for RMI availability,
+> per-VM Realm state tracking in struct kvm_arch, and initial feature and
+> memslot checks.
+> 
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index ccd2dc8f73c3a..7d0222047ca1e 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+> [ ... ]
+>> @@ -1572,30 +1584,43 @@ struct kvm *kvm_arch_alloc_vm(void);
+> [ ... ]
+>> +#define kvm_vm_is_realm(kvm)		((kvm)->arch.vm_flavor == VM_REALM)
+>> +#define vcpu_is_rec(vcpu)		kvm_vm_is_realm((vcpu)->kvm)
+>>  
+>>  #define kvm_vm_hyp_is_distrusting(kvm)	((kvm)->arch.vm_flavor >= __VM_DISTRUSTING_HYP)
+>>  
+>> -#endif	/* __KVM_NVHE_HYPERVISOR__ */
+>> +#define kvm_arch_has_private_mem(kvm) kvm_vm_is_realm(kvm)
+> 
+> [Severity: High]
+> Does defining kvm_arch_has_private_mem(kvm) here cause a regression in
+> guest_memfd memslot validation and capability reporting across arm64?
+> 
+> Because CONFIG_KVM_PRIVATE_MEMATTR_VM is not selected on arm64, defining
+> kvm_arch_has_private_mem activates the preprocessor branch in
+> include/linux/kvm_host.h that sets gmem_in_place_conversion to true at
+> compile time:
+> 
+> include/linux/kvm_host.h:
+>     #elif defined kvm_arch_has_private_mem
+>     #define gmem_in_place_conversion true
+>     #define kvm_is_private_gfn kvm_gmem_is_private_gfn
+> 
+> With gmem_in_place_conversion unconditionally true,
+> kvm_gmem_prepare_memory_region() in virt/kvm/guest_memfd.c sets
+> KVM_MEMSLOT_GMEM_ONLY on every guest_memfd memslot even when
+> GUEST_MEMFD_FLAG_MMAP is not set:
+> 
+> virt/kvm/guest_memfd.c:kvm_gmem_prepare_memory_region() {
+>     ...
+>     if (gmem_in_place_conversion || kvm_gmem_supports_mmap(inode))
+>         slot->flags |= KVM_MEMSLOT_GMEM_ONLY;
+> }
+> 
+> As a result, the check in kvm_arch_prepare_memory_region() in
+> arch/arm64/kvm/mmu.c that rejects non-mappable guest_memfd memslots:
+> 
+> arch/arm64/kvm/mmu.c:kvm_arch_prepare_memory_region() {
+>     ...
+>     if (kvm_slot_has_gmem(new) && !kvm_memslot_is_gmem_only(new))
+>         return -EINVAL;
+> }
+> 
+> is bypassed for non-Realm VMs, allowing userspace to bind a private
+> guest_memfd created with flags == 0 via KVM_SET_USER_MEMORY_REGION2 and
+> fault those pages into non-Realm stage-2 page tables through gmem_abort().
+> 
+> In addition, when userspace queries
+> KVM_CHECK_EXTENSION(KVM_CAP_GUEST_MEMFD_MEMORY_ATTRIBUTES) on the /dev/kvm
+> fd (where kvm is NULL), kvm_vm_ioctl_check_extension_generic() in
+> virt/kvm/kvm_main.c calls kvm_supports_private_mem(NULL):
+> 
+> virt/kvm/kvm_main.c:kvm_supports_private_mem() {
+>     return !kvm || kvm_arch_has_private_mem(kvm);
+> }
+> 
+> virt/kvm/kvm_main.c:kvm_vm_ioctl_check_extension_generic() {
+>     ...
+>     case KVM_CAP_GUEST_MEMFD_MEMORY_ATTRIBUTES:
+>         if (!gmem_in_place_conversion || !kvm_supports_private_mem(kvm))
+>             return 0;
+> 
+>         return KVM_MEMORY_ATTRIBUTE_PRIVATE;
+> }
+> 
+> This advertises KVM_MEMORY_ATTRIBUTE_PRIVATE on all arm64 hosts even when
+> KVM_MODE_RMM is not active and while kvm_gmem_set_attributes() in
+> virt/kvm/guest_memfd.c rejects KVM_SET_MEMORY_ATTRIBUTES2 with -EINVAL on
+> every creatable VM.
 
-commit cc0b24728b73f60b1dd39eb4cc60fe5eb12322c6
-Author: Steven Price <steven.price@arm.com>
+Dang, yes that's broken. The later commit "KVM: arm64: CCA: Support
+runtime faulting of memory" changes the condition in
+kvm_arch_prepare_memory_region() to check "!kvm_vm_is_realm()" but
+clearly I've broken the bisect here. That check also isn't quite right.
+I think rather than using kvm_memslot_is_gmem_only() we should check the
+gmem file with kvm_gmem_supports_mmap(). So we end up with the check:
 
-KVM: arm64: CCA: Add Realm RTT mapping and invalidation helpers
+       if (kvm_slot_has_gmem(new) && !kvm_vm_is_realm(kvm) &&
+           !kvm_gmem_slot_supports_mmap(new))
 
-This commit adds Realm Management Interface (RMI) Realm Translation Table
-(RTT) creation, folding, and unmap helpers needed for CCA Realm stage-2
-memory operations.
+and a new function:
 
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index f190143b33ba5..1066f767f85d9 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -34,6 +34,83 @@ static int get_start_level(struct realm *realm)
+ bool kvm_gmem_slot_supports_mmap(const struct kvm_memory_slot *slot)
+ {
+        /* The guest_memfd file is pinned while preparing a new memslot. */
+        return kvm_gmem_supports_mmap(file_inode(slot->gmem.file));
+ }
 
-[ ... ]
 
-> +static phys_addr_t alloc_delegated_granule(struct kvm_mmu_memory_cache *=
-mc)
-> +{
-> +	phys_addr_t phys;
-> +	void *virt;
-> +
-> +	if (mc) {
-> +		virt =3D kvm_mmu_memory_cache_alloc(mc);
-> +	} else {
-> +		virt =3D (void *)__get_free_page(GFP_ATOMIC | __GFP_ZERO |
-> +					       __GFP_ACCOUNT);
-> +	}
-> +
-> +	if (!virt)
-> +		return PHYS_ADDR_MAX;
-> +
-> +	phys =3D virt_to_phys(virt);
-> +	if (rmi_delegate_page(phys)) {
-> +		free_page((unsigned long)virt);
-> +		return PHYS_ADDR_MAX;
-> +	}
-> +
-> +	return phys;
-> +}
-> +
-> +static phys_addr_t alloc_rtt(struct kvm_mmu_memory_cache *mc)
-> +{
-> +	phys_addr_t phys =3D alloc_delegated_granule(mc);
-> +
-> +	if (phys !=3D PHYS_ADDR_MAX)
-> +		kvm_account_pgtable_pages(phys_to_virt(phys), 1);
-> +
-> +	return phys;
-> +}
-> +
->  static void free_rtt(phys_addr_t phys)
->  {
->  	if (rmi_free_delegated_page(phys))
-> @@ -42,6 +119,32 @@ static void free_rtt(phys_addr_t phys)
->  	kvm_account_pgtable_pages(phys_to_virt(phys), -1);
->  }
+I'm not sure what we can do about the KVM extension when !kvm. x86
+presumably already has the situation where !kvm can expose
+KVM_MEMORY_ATTRIBUTE_PRIVATE even if the host doesn't support it. Is
+this a problem?
 
-[Severity: Medium]
-Does free_rtt() leak the NR_SECONDARY_PAGETABLE counter in the memory cgroup
-lruvec (or touch a reallocated page) by calling kvm_account_pgtable_pages()
-after rmi_free_delegated_page()?
+>> +
+>> +int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
+>> +bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+> 
+> [Severity: Low]
+> This isn't a bug, but commit df6a70516adec8 already moved the declarations
+> of kvm_arm_vcpu_finalize() and kvm_arm_vcpu_is_finalized() earlier in
+> arch/arm64/include/asm/kvm_host.h right below VCPU_PKVM_FINALIZED:
+> 
+> arch/arm64/include/asm/kvm_host.h:
+>     #define VCPU_PKVM_FINALIZED	__vcpu_single_flag(cflags, BIT(2))
+> 
+>     int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
+>     bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+> 
+> Can these duplicate declarations be dropped?
 
-In alloc_rtt(), RTT pages are allocated via alloc_delegated_granule() with
-__GFP_ACCOUNT and accounted with kvm_account_pgtable_pages(..., 1). However,
-when free_rtt() frees an RTT, rmi_free_delegated_page() already calls
-free_page() before returning:
+Indeed they can.
 
-drivers/firmware/arm_rmm/rmi.c:rmi_free_delegated_page() {
-	if (WARN_ON_ONCE(rmi_undelegate_page(phys))) {
-		/* Undelegate failed: leak the page */
-		return -EBUSY;
-	}
+Steve
 
-	free_page((unsigned long)phys_to_virt(phys));
-
-	return 0;
-}
-
-Because free_page() uncharges the page and clears page->memcg_data (and
-returns the page to the allocator where another CPU can immediately
-reallocate it), the subsequent kvm_account_pgtable_pages(phys_to_virt(phys),
--1) in free_rtt() operates on a freed page whose memcg association has been
-cleared.
-
-[ ... ]
-
-> @@ -161,6 +301,64 @@ static int realm_tear_down_rtt_range(struct realm *r=
-ealm,
->  					 start, end);
->  }
-> =20
-> +/*
-> + * Returns 0 on successful fold, a negative value on error, a positive v=
-alue if
-> + * we were not able to fold all tables at this level.
-> + */
-> +static int realm_fold_rtt_level(struct realm *realm, int level,
-> +				unsigned long start, unsigned long end)
-> +{
-> +	int not_folded =3D 0;
-> +	ssize_t map_size;
-> +	unsigned long addr, next_addr;
-> +
-> +	if (WARN_ON(level > KVM_PGTABLE_LAST_LEVEL))
-> +		return -EINVAL;
-> +
-> +	map_size =3D rmi_rtt_level_mapsize(level - 1);
-> +
-> +	for (addr =3D start; addr < end; addr =3D next_addr) {
-> +		phys_addr_t rtt_granule;
-> +		long ret;
-> +		unsigned long align_addr =3D ALIGN(addr, map_size);
-> +
-> +		next_addr =3D ALIGN(addr + 1, map_size);
-> +
-> +		ret =3D realm_rtt_fold(realm, align_addr, level, &rtt_granule);
-> +		if (ret < 0)
-> +			return ret;
-> +
-> +		switch (RMI_RESULT_STATUS(ret)) {
-> +		case RMI_SUCCESS:\
-> +			free_rtt(rtt_granule);
-> +			break;
-> +		case RMI_ERROR_RTT:
-> +			if (level =3D=3D KVM_PGTABLE_LAST_LEVEL ||
-> +			    RMI_RESULT_DATA_LEVEL(ret) < level) {
-> +				not_folded++;
-> +				break;
-> +			}
-> +			/* Recurse a level deeper */
-> +			ret =3D realm_fold_rtt_level(realm,
-> +						   level + 1,
-> +						   addr,
-> +						   next_addr);
-> +			if (ret < 0) {
-> +				return ret;
-> +			} else if (ret =3D=3D 0) {
-> +				/* Try again at this level */
-> +				next_addr =3D addr;
-> +			}
-> +			break;
-> +		default:
-> +			WARN_ON(1);
-> +			return -ENXIO;
-> +		}
-> +	}
-> +
-> +	return not_folded;
-> +}
-
-[Severity: High]
-In realm_fold_rtt_level(), align_addr is computed using ALIGN(addr, map_siz=
-e)
-before calling realm_rtt_fold(realm, align_addr, level, &rtt_granule).
-
-When addr is not aligned to map_size, ALIGN(addr, map_size) rounds addr up
-to the next RTT boundary (equal to next_addr), defeating the ALIGN_DOWN()
-inside realm_rtt_fold(). As a result, realm_rtt_fold() folds the next RTT
-instead of the RTT covering addr, and if addr lies in the final map_size
-block below BIT(realm->ia_bits), align_addr rounds up to BIT(realm->ia_bits=
-),
-which is out of bounds for rmi_rtt_fold() and triggers the default WARN_ON(=
-1)
-path.
-
-Additionally, in the RMI_ERROR_RTT case:
-1. The recursive call passes next_addr instead of min(next_addr, end),
-   scanning up to a full parent map_size beyond end while holding
-   kvm->mmu_lock for write.
-2. When the recursive call returns a positive value (some child tables were
-   not folded), not_folded is not incremented at the current level. If this
-   level returns 0 to its caller, the caller sees ret =3D=3D 0, sets
-   next_addr =3D addr to retry, and can loop indefinitely.
-3. Conversely, when recursing to level + 1 across [addr, next_addr), any
-   entry at level that is already a leaf entry (such as UNASSIGNED) has no
-   table at level + 1, so rmi_rtt_fold() returns RMI_ERROR_RTT with
-   RMI_RESULT_DATA_LEVEL(ret) < level + 1 and increments not_folded,
-   preventing the parent table at level from being retried and folded even =
-if
-   all of its child RTTs were folded. And if ret =3D=3D 0 is returned when =
-the
-   table at level still cannot be folded (because entries in [addr, next_ad=
-dr)
-   are non-homogeneous or align_addr targeted the next block), setting
-   next_addr =3D addr will retry and recurse on the same range in an infini=
-te
-   loop.
-
-Should realm_fold_rtt_level() pass addr directly to realm_rtt_fold() (which
-already aligns down to map_size), clamp the recursive end to
-min(next_addr, end), and avoid retrying in a loop when the parent table
-itself cannot be folded?
-
-> @@ -196,6 +394,154 @@ int kvm_realm_teardown_stage2(struct kvm *kvm)
-
-[ ... ]
-
-> +static void realm_unmap_private_range(struct kvm *kvm,
-> +				      unsigned long start,
-> +				      unsigned long end,
-> +				      bool may_block)
-> +{
-> +	struct realm *realm =3D &kvm->arch.realm;
-> +	unsigned long rd =3D virt_to_phys(realm->rd);
-> +	unsigned long next_addr, addr;
-> +	long ret;
-> +
-> +	for (addr =3D start; addr < end; addr =3D next_addr) {
-> +		unsigned long out_range;
-> +		unsigned long flags =3D RMI_ADDR_TYPE_SINGLE;
-> +		/* TODO: Optimise using RMI_ADDR_TYPE_LIST */
-> +
-> +retry:
-> +		ret =3D rmi_rtt_data_unmap(rd, addr, end, flags, 0,
-> +					 &next_addr, &out_range, NULL);
-> +		if (WARN_ON(ret < 0))
-> +			return;
-> +
-> +		if (RMI_RESULT_STATUS(ret) =3D=3D RMI_ERROR_RTT) {
-> +			phys_addr_t rtt;
-> +
-> +			if (next_addr > addr)
-> +				continue; /* UNASSIGNED */
-> +
-> +			rtt =3D alloc_rtt(NULL);
-> +			if (WARN_ON(rtt =3D=3D PHYS_ADDR_MAX))
-> +				return;
-> +			ret =3D realm_rtt_create(realm, addr,
-> +					       RMI_RESULT_DATA_LEVEL(ret) + 1, rtt);
-> +			if (WARN_ON(ret)) {
-> +				free_rtt(rtt);
-> +				return;
-> +			}
-> +			goto retry;
-> +		} else if (WARN_ON(ret)) {
-> +			continue;
-> +		}
-
-[Severity: High]
-What happens in realm_unmap_private_range() when rmi_rtt_data_unmap() retur=
-ns
-RMI_ERROR_RTT or another non-zero status?
-
-Looking at rmi_rtt_data_unmap() in include/linux/arm-rmi-cmds.h:
-
-	ret =3D rmi_sro_execute(&regs);
-
-	if (ret !=3D RMI_SUCCESS)
-		return ret;
-
-	if (out_top)
-		*out_top =3D regs.a1;
-
-*out_top (&next_addr) is only written when ret =3D=3D RMI_SUCCESS.
-
-When rmi_rtt_data_unmap() returns RMI_ERROR_RTT on the first iteration
-(addr =3D=3D start), next_addr is uninitialized on the stack when evaluated=
- by:
-
-	if (next_addr > addr)
-		continue; /* UNASSIGNED */
-
-If the uninitialized stack value happens to be greater than start, the loop
-advances addr to that garbage address and skips unmapping the range.
-
-If next_addr <=3D addr on the first iteration (or on any subsequent iterati=
-on
-where addr =3D=3D next_addr from the loop header), next_addr > addr is fals=
-e even
-when the entry is UNASSIGNED. The code then allocates RTTs and calls
-realm_rtt_create(realm, addr, RMI_RESULT_DATA_LEVEL(ret) + 1, rtt) in a ret=
-ry
-loop until RMI_RESULT_DATA_LEVEL(ret) reaches KVM_PGTABLE_LAST_LEVEL (3),
-where it attempts to create an RTT at level 4, hits WARN_ON(ret), and retur=
-ns
-early without unmapping the remaining range.
-
-Similarly, in the else if (WARN_ON(ret)) continue; branch, next_addr was not
-updated by rmi_rtt_data_unmap(), so continuing either jumps to uninitialized
-stack memory on the first iteration or repeats the same addr in an infinite
-loop while holding kvm->mmu_lock for write.
-
-Should this handle RMI_ERROR_RTT in the same way as
-realm_unmap_shared_range(), using find_map_level(realm, addr, end) and
-advancing next_addr by rmi_rtt_level_mapsize(err_level) when err_level >=3D
-level?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261102141304.1268=
-83-1-steven.price@arm.com?part=3D8
