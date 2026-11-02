@@ -1,79 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793645952;
-	b=OtspCJU/MjjJQdYsvu25HDPtZNTEYyEpF4IfHPNormfz+uhLpWh/V2NMCKS+Vnut6jkQ
-	 jZxcVSapMveJ7WImyutQbMNFcSqhr9VFLXEwkBg5IJY6vpcfKLdr9hdEkkqbO/aLimESn
-	 3+u7xG35HgFz/OZFOBk/8WahLjKM0Pm4wT/VliIBKKjBOjbYwwtV5QlP53xaJImodJZmT
-	 Y/qwIIYcub1CPsnAmrB8gkBErd61v0swY3cIKP0WxPo2sxDbKikrVT386vgXz2x5xfWjN
-	 zqf1f0mlkueMA0SelXYSVy7EQIqbtJEnbGpM2UOSq2hH5zM6ariv+qNwBhwXLfHTYgg==
+	t=1793647668;
+	b=UvnuhZzL3F2khZkARSwds8D4B2Pwyzr2jmFLLtOLY85Rm2AnR00VC73oVu9C8OFv1dBr
+	 YUf9UvAYCodtslfHuNq9I5OnsYnJrTW4VIZD361a6YKfMpTygyCfWRMwGaGqpf814R+ky
+	 6ayfcH9kk8wB3RaB3gP7isV9Qg5vTesMzarsXj7+wb0TkEXi6rw+VTMF32KXflNz86jHJ
+	 lY49X7a6V7ShAmdGCTxaeMtCjnADi9zLJ6JaDwJTQk4NXIW2E2G1Oni6qmq65yZykgGXW
+	 XGzfSf8kbVd87CoOsxwf3C0muho79ykw2AO82YDbSZwltRHLye2XP/75lX4YbfUNOrQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793645952;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=r9JhDIOHPdsZllQyxUB4H0ZlgUBt8v+L3mtCQBDQk2A=;
-	b=R4plFPXdcM2WNVTeAnwqiuRvf9CUlxmGQqVFmH338iiC0E7C9wuJaOR9oAtETQXwlQoq
-	 jj56NKqyAf0SOpRnwdWilpoeKaEiP6jlzZYCJ/ZjJAGmCBW1RrIg2RlY0u6v5COI97XU0
-	 lccvesQ2xgn3zBVizAxRodDY+E1QU47O4JEhbjljQjMWvlYfj7AZfxDzVftpYnG3gtXTV
-	 aCkdn8KPZwyYZHKz8Zo6AIhx7FLVaO5My/0Jjuubqg4ZXvaz16yYGkJKfrcV1KRz1lLRv
-	 yEoZn6xzJuchTVHlRixyl45W1NXhqW34hrwDNredeXib3wvKsq4kE+wWZnwKf6ruszA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793647668;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=pf5mnv312thSQfR85MzimBrWC+L47vaGI/Xim2J2b1Y=;
+	b=nda5uCUs4TBiU4Wrp6m5EyScodYajUD7vLLfd1x+AMVNOYibMSYrgKD0l8ES5px5YgM4
+	 rebwm5HqBU4j8lbiuTh9DN6hqvRom3kIAGFoEA0zfUwQQRNS9+E9QgmDBpurezqyf/dpp
+	 arZcmmSRfur75bTEB3gqoV0v0wPs1bukM+HLGygVt5iCzBDWZ7DLUi1IMlH44egHHkkWw
+	 GU+7pZBM6dccgVPiZTIICb5ZPJ8r47KAKNEx5iZlnvONcIQaq/Wpz5g0/5oH9Z/FQqDKP
+	 R/5YQwxEKsenGHPX0GvYTGT2Zw3Da4ZgsSO88HAqgCbX9p65KcEBVu6xIIZsKk1jBng==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Jkm0dngw;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jGRoR1ET;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD756606A326;
-	Mon,  2 Nov 2026 18:59:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D36E9606A329
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 19:27:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Jkm0dngw
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 856791F00A1D;
-	Mon,  2 Nov 2026 18:59:11 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jGRoR1ET
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D3D31F00A16;
+	Mon,  2 Nov 2026 19:27:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793645951;
-	bh=r9JhDIOHPdsZllQyxUB4H0ZlgUBt8v+L3mtCQBDQk2A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=Jkm0dngwCyiFMAtdq8uZCeoHgOKz40OfTyEqYb7LUTXQ0+gLkMQKeojaUUYQXX5JU
-	 3Mff/Cs1Zffhd9g0Ndcxmuysy4EAL5pVaqyBUpdWX/aWNcjBDz6UDplXA8odNelu8v
-	 UZksY6CPr8r/s4XojB2ygsTFW4rkFxpz3PezpoPlXsTQfQ28uqLLr1LzFJXixPaWAj
-	 uFpABQmYM6DAeIbADgO5INNelNYsXyjJPkmIPIlzK9hGphnmbL7rJTu9oRc6eLiPUq
-	 I5bR3ITar9avmfr3Q+FZgFMX+OUin+2LhaXaKJD4urmdYeDGczbQ88Oe/OPOMHNhrX
-	 qIh4WPeketSsw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xNxFN-0000000A384-0KTo;
-	Mon, 02 Nov 2026 18:59:09 +0000
-Date: Mon, 02 Nov 2026 18:59:08 +0000
-Message-ID: <868q3b2h6r.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Matthias Goergens <matthias.goergens@gmail.com>
-Cc: Wei-Lin Chang <weilin.chang@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
+	s=k20260515; t=1793647667;
+	bh=pf5mnv312thSQfR85MzimBrWC+L47vaGI/Xim2J2b1Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=jGRoR1ETQLbTAOhLX+NItAiw0MtdHIAiUqMQ9DEbySqB38+jcDGhWsMBrgksp1mb2
+	 3Lyw90eoGhi1jy+5yqlgI4Qm9dxwqs+hTFjB4Usrtz1St9Fh9tOMMBR9PA3/oswKI9
+	 jzF4u/Unx0G2AA3iL07wuPpBdkn4M0sbajbWAukB0SfWxMpTBh9sIzwRgEpL+w6QZr
+	 aJIMwTEvDEfghXkh9TUTCwm6EiVCNim1SxrXzhYPHiePtMYuHZokimiFHBDsBqXcw+
+	 lb5XZZ2OG3tk26ibFnBIcoH06WFr22vLf+qkBM0R77d0Ols4PoI2s9aVnce04kX3hA
+	 sGatS3MVQoHJg==
+Date: Mon, 2 Nov 2026 19:27:41 +0000
+From: Will Deacon <will@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Ard Biesheuvel <ardb+git@google.com>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Ard Biesheuvel <ardb@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	Randy Dunlap <rdunlap@infradead.org>,
-	linux-kernel@vger.kernel.org,
-	workflows@vger.kernel.org
-Subject: Re: [PATCH v2] Documentation/process: Add a maintainer entry profile for KVM/arm64
-In-Reply-To: <20261102083759.1561867-1-matthias.goergens@gmail.com>
-References: <20261030083351.3040604-1-matthias.goergens@gmail.com>
-	<6urqt376s23fcyr5pchfrrowvjoo6acg5xt4ujkft7gww6sagj@jxz5rqihtkja>
-	<20261102083759.1561867-1-matthias.goergens@gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: Don't livelock when AT can't resolve a fault
+ IPA
+Message-ID: <aujkLeo6QaiDMOv2@willie-the-truck>
+References: <20261102094748.2638468-2-ardb+git@google.com>
+ <auiXMN5td-2QlDkd@willie-the-truck>
+ <CA+EHjTxVPyY70Dm+BiwgQQNwx1cJpEKvJBJGZWPCKLx2M8X2FA@mail.gmail.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -82,33 +63,52 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: matthias.goergens@gmail.com, weilin.chang@arm.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, corbet@lwn.net, skhan@linuxfoundation.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, rdunlap@infradead.org, linux-kernel@vger.kernel.org, workflows@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTxVPyY70Dm+BiwgQQNwx1cJpEKvJBJGZWPCKLx2M8X2FA@mail.gmail.com>
 
-On Mon, 02 Nov 2026 08:37:59 +0000,
-Matthias Goergens <matthias.goergens@gmail.com> wrote:
+On Mon, Nov 02, 2026 at 03:57:51PM +0000, Fuad Tabba wrote:
+> On Mon, 02 Nov 2026 14:17:10 +0000, Will Deacon <will@kernel.org> wrote:
+> > On Mon, Nov 02, 2026 at 02:09:25PM +0000, Marc Zyngier wrote:
+> > > On Mon, 02 Nov 2026 13:59:12 +0000,
+> > > Will Deacon <will@kernel.org> wrote:
+> [...]
+> > > > > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> [...]
+> > > > >  static inline bool kvm_hyp_handle_memory_fault(struct kvm_vcpu *vcpu,
+> > > > >                                                 u64 *exit_code)
+> > > > >  {
+> > > > > -        if (!__populate_fault_info(vcpu))
+> > > > > +        if (!__populate_fault_info(vcpu)) {
+> > > >
+> > > > Presumably we need a barrier (DSB?) here, to ensure that the TLBI happens
+> > > > after the AT instruction?
 > 
-> On Sat, 31 Oct 2026 21:03:17 +0000, Wei-Lin Chang wrote:
-> >> +Minor problems are often fixed up by the maintainers when applying; if they
-> >> +say "no need to resend", don't.
-> >
-> > The second half of this is a little silly :P
-> > What about just:
-> >
-> > Minor problems are often fixed up by the maintainers when applying; ask
-> > if you are unsure whether to resend.
-> 
-> Agreed, that reads better.  I'll use your wording in v3.
+> I don't think the TLBI requires a barrier before it, because it
+> doesn't matter if the AT's walk allocates entries after the TLBI.
+> Anything it allocates matches memory, and the stage-2 descriptor the
+> AT faulted on has AF clear, so that descriptor can't be cached:
 
-If that's the only change, I'll fix it when applying.
+I'm not sure that's relevant. The S1PTW case described by Ard in the
+first part of his cover letter could look like this:
 
-Thanks,
+1. vCPU takes an S2 permission fault on VA 0x1000
+	-> The permission faulting entry is in the TLB
+2. Another vCPU unmaps a S1 page-table page used to translate 0x1000 from S2
+3. EL2 does an AT S1E1R on 0x1000 as part of handling (1)
+	-> Due to the uarch, this always walks the page-tables
+4. The S1PTW from (3) faults at S2 because of (2)
+	-> The AT fails
 
-	M.
+If we invalidate the TLB after step (4), then we will see the S1PTW
+fault upon retrying the access that originally caused a permission fault
+in (1). Without barriers, however, this invalidation could float up
+between steps (1) and (2) and wouldn't be effective.
 
--- 
-Without deviation from the norm, progress is not possible.
+Now, having written it out, I think we would eventually resolve that by
+replaying the faulting instruction a second time, but it feels odd to me
+that we wouldn't just prevent this race once we know that the AT has
+failed.
+
+Will
