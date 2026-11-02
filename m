@@ -1,60 +1,63 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793647668;
-	b=UvnuhZzL3F2khZkARSwds8D4B2Pwyzr2jmFLLtOLY85Rm2AnR00VC73oVu9C8OFv1dBr
-	 YUf9UvAYCodtslfHuNq9I5OnsYnJrTW4VIZD361a6YKfMpTygyCfWRMwGaGqpf814R+ky
-	 6ayfcH9kk8wB3RaB3gP7isV9Qg5vTesMzarsXj7+wb0TkEXi6rw+VTMF32KXflNz86jHJ
-	 lY49X7a6V7ShAmdGCTxaeMtCjnADi9zLJ6JaDwJTQk4NXIW2E2G1Oni6qmq65yZykgGXW
-	 XGzfSf8kbVd87CoOsxwf3C0muho79ykw2AO82YDbSZwltRHLye2XP/75lX4YbfUNOrQ==
+	t=1793648705;
+	b=I48CJjKSlmI90U48n5PI/L4+iuCGcFVQaPGk/BBcQ6FQqpp7koyV8fSgqu4WGxqF5wWC
+	 Wi19clWdIxszBdoR8lbgcCja96dyzjoh/3zY89RBU3sBBolU0n7lsRlnQ4+94AZ34WwcY
+	 /g2DzuOnwOw/9CrcZYKQQWYbueyzdhhpDQfyaPAgy8zoAhGbY6PGqbdt1U3gS9HeTh8JA
+	 kM7FfZZso57HYy13IrspPycLWqBc85Rm4BU8lHoseB2ocgQMsZN+Pe+1qK/0FPHLPn50X
+	 VYdSDrziMUIH1nbmXcPJw1HUqsdvpKW2MTQoIfoUeLNyXtyyJd4cTv5UFsU4OQkoR3Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793647668;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=pf5mnv312thSQfR85MzimBrWC+L47vaGI/Xim2J2b1Y=;
-	b=nda5uCUs4TBiU4Wrp6m5EyScodYajUD7vLLfd1x+AMVNOYibMSYrgKD0l8ES5px5YgM4
-	 rebwm5HqBU4j8lbiuTh9DN6hqvRom3kIAGFoEA0zfUwQQRNS9+E9QgmDBpurezqyf/dpp
-	 arZcmmSRfur75bTEB3gqoV0v0wPs1bukM+HLGygVt5iCzBDWZ7DLUi1IMlH44egHHkkWw
-	 GU+7pZBM6dccgVPiZTIICb5ZPJ8r47KAKNEx5iZlnvONcIQaq/Wpz5g0/5oH9Z/FQqDKP
-	 R/5YQwxEKsenGHPX0GvYTGT2Zw3Da4ZgsSO88HAqgCbX9p65KcEBVu6xIIZsKk1jBng==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793648705;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-Id:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=b8ykW9KPLcaIcZvWtgJoASK+Yo/mXwwP8pWBtC51TXQ=;
+	b=RgTpa1KNcLy7OwP/LT9TMCE4NXqlcZb0/QRKaUOu7BDeY1zEgwJdA+Ebb25UyBrCOFiJ
+	 7sB2uJcFNfy6YGbtcdeFtMjfOXQMRcLecDUUwFnR+SngtX582PyD1HiKnZ1RnSIdpTztW
+	 Zo50N33jY8qs6NaOtWuc3YxNRpQgRyoAeaZLLNk4It6k8P8/bzrUw4CZNjMxIqLQcuASE
+	 +70PyiMKoGAkzYPBoyPpHCNMeduE7EygZwquAzXQFsSXn3JAKNrt7CW/BgrZNhS273nCk
+	 A5PkXEFjQpcIYuxg3xVL8zv/c7QVFcFhY/BZ5tmiYf0dvsgetzvSs5m0tFB2RmjZBlA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jGRoR1ET;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D36E9606A329
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 19:27:47 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=j9ZkicYC;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF26C606A32E
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 19:45:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DF26C606A32E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jGRoR1ET
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D3D31F00A16;
-	Mon,  2 Nov 2026 19:27:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793647667;
-	bh=pf5mnv312thSQfR85MzimBrWC+L47vaGI/Xim2J2b1Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=jGRoR1ETQLbTAOhLX+NItAiw0MtdHIAiUqMQ9DEbySqB38+jcDGhWsMBrgksp1mb2
-	 3Lyw90eoGhi1jy+5yqlgI4Qm9dxwqs+hTFjB4Usrtz1St9Fh9tOMMBR9PA3/oswKI9
-	 jzF4u/Unx0G2AA3iL07wuPpBdkn4M0sbajbWAukB0SfWxMpTBh9sIzwRgEpL+w6QZr
-	 aJIMwTEvDEfghXkh9TUTCwm6EiVCNim1SxrXzhYPHiePtMYuHZokimiFHBDsBqXcw+
-	 lb5XZZ2OG3tk26ibFnBIcoH06WFr22vLf+qkBM0R77d0Ols4PoI2s9aVnce04kX3hA
-	 sGatS3MVQoHJg==
-Date: Mon, 2 Nov 2026 19:27:41 +0000
-From: Will Deacon <will@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Ard Biesheuvel <ardb+git@google.com>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Ard Biesheuvel <ardb@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Don't livelock when AT can't resolve a fault
- IPA
-Message-ID: <aujkLeo6QaiDMOv2@willie-the-truck>
-References: <20261102094748.2638468-2-ardb+git@google.com>
- <auiXMN5td-2QlDkd@willie-the-truck>
- <CA+EHjTxVPyY70Dm+BiwgQQNwx1cJpEKvJBJGZWPCKLx2M8X2FA@mail.gmail.com>
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=j9ZkicYC
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1975A16A3;
+	Mon,  2 Nov 2026 11:45:00 -0800 (PST)
+Received: from e133894.cambridge.arm.com (e133894.arm.com [10.2.80.62])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 60AE73F673;
+	Mon,  2 Nov 2026 11:45:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793648703; bh=LKycxJwdqBPls6Zote9opLCnQI+1WQCo59QObvax/Ro=;
+	h=From:To:Cc:Subject:Date:From;
+	b=j9ZkicYC/zXxj3W43V0qg0DyPe1/T4BGqYFMNiIiO02JMG6NsQJHyHn9RVm07D3Lp
+	 9b+YPzqYDFl/p1NvgEjSgAJsWTWmZwpjyE0bDhjFri1ZUxOVKqqWmVat/GGEzpiRNw
+	 cB4zaCxRhblOryuYXaXD0A4THOlFaJD3PfxZQY7U=
+From: Sascha Bischoff <sascha.bischoff@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org
+Cc: maz@kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	peter.maydell@linaro.org,
+	lpieralisi@kernel.org,
+	timothy.hayes@arm.com,
+	fuad.tabba@linux.dev
+Subject: [PATCH v2 00/16] KVM: arm64: Add GICv5 ITS support
+Date: Mon,  2 Nov 2026 19:44:38 +0000
+Message-Id: <20261102194454.4086911-1-sascha.bischoff@arm.com>
+X-Mailer: git-send-email 2.34.1
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -64,51 +67,160 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTxVPyY70Dm+BiwgQQNwx1cJpEKvJBJGZWPCKLx2M8X2FA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 02, 2026 at 03:57:51PM +0000, Fuad Tabba wrote:
-> On Mon, 02 Nov 2026 14:17:10 +0000, Will Deacon <will@kernel.org> wrote:
-> > On Mon, Nov 02, 2026 at 02:09:25PM +0000, Marc Zyngier wrote:
-> > > On Mon, 02 Nov 2026 13:59:12 +0000,
-> > > Will Deacon <will@kernel.org> wrote:
-> [...]
-> > > > > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> [...]
-> > > > >  static inline bool kvm_hyp_handle_memory_fault(struct kvm_vcpu *vcpu,
-> > > > >                                                 u64 *exit_code)
-> > > > >  {
-> > > > > -        if (!__populate_fault_info(vcpu))
-> > > > > +        if (!__populate_fault_info(vcpu)) {
-> > > >
-> > > > Presumably we need a barrier (DSB?) here, to ensure that the TLBI happens
-> > > > after the AT instruction?
-> 
-> I don't think the TLBI requires a barrier before it, because it
-> doesn't matter if the AT's walk allocates entries after the TLBI.
-> Anything it allocates matches memory, and the stage-2 descriptor the
-> AT faulted on has AF clear, so that descriptor can't be cached:
+Hi all,
 
-I'm not sure that's relevant. The S1PTW case described by Ard in the
-first part of his cover letter could look like this:
+This is the second posting of my GICv5 KVM ITS series.
 
-1. vCPU takes an S2 permission fault on VA 0x1000
-	-> The permission faulting entry is in the TLB
-2. Another vCPU unmaps a S1 page-table page used to translate 0x1000 from S2
-3. EL2 does an AT S1E1R on 0x1000 as part of handling (1)
-	-> Due to the uarch, this always walks the page-tables
-4. The S1PTW from (3) faults at S2 because of (2)
-	-> The AT fails
+This series builds on the GICv5 IRS support now in 7.4-rc1 and adds
+support for the GICv5 ITS, as described by the GICv5 specification
+[1]. It allows a GICv5 guest to receive LPIs generated by MSIs,
+including those from physical PCI devices mapped into the guest via
+VFIO.
 
-If we invalidate the TLB after step (4), then we will see the S1PTW
-fault upon retrying the access that originally caused a permission fault
-in (1). Without barriers, however, this invalidation could float up
-between steps (1) and (2) and wouldn't be effective.
+The ITS is exposed as a separate KVM device, alongside the VGICv5
+device. The guest owns the device table and interrupt translation
+tables. KVM walks these tables to resolve a DeviceID and EventID to an
+LPI, and caches the result until the guest invalidates the relevant
+translation or changes the table configuration.
 
-Now, having written it out, I think we would eventually resolve that by
-replaying the faulting instruction a second time, but it feels odd to me
-that we wouldn't just prevent this race once we know that the AT has
-failed.
+The main pieces are:
 
-Will
+* An emulated GICv5 ITS CONFIG_FRAME, including table configuration,
+  event generation, and invalidation registers.
+
+* Guest table walking for linear and two-level device and interrupt
+  translation tables, together with a disposable XArray-based
+  translation cache.
+
+* MSI injection through KVM_SIGNAL_MSI and irqfd. GICv5 requires a
+  DeviceID for each MSI, and the virtual ITS supports 16-bit EventIDs.
+
+* Direct injection through the host ITS when an interrupt is forwarded
+  to a vCPU. Forwarding teardown restores the host translation.
+
+* Userspace attributes to configure the ITS address, access its
+  registers, and reset the emulated state, together with ABI
+  documentation.
+
+* Selftests for the ITS attributes, guest table translation, MSI
+  delivery, and guest-driven cache invalidation.
+
+The guest tables remain the authoritative translation state. KVM's
+cache can be discarded and rebuilt from guest memory; there is no
+separate ITS table data for the VMM to save/restore.
+
+Lorenzo's GICv5 Linux software enablement guide [2] describes how to
+set up the GICv5 software stack. These changes have been tested on an
+Arm FVP 11.32 release [3].
+
+These changes are based on v7.4-rc1. The corresponding kvmtool patches
+have been posted separately [4]. I plan to post an updated kvmtool
+series shortly.
+
+These changes are also available as a branch at [5]. For reference, v1
+of this series can be found at [6].
+
+This series applies independently of the host GICv5 fixes [7], but
+concurrent use may encounter the host driver issues described there. A
+branch with both series is available at [8]. Both series need to be
+merged for the ITS support to be complete.
+
+The main changes since v1 are:
+
+* Rebased onto v7.4-rc1.
+
+* Reused upstream ITS model tracking, removing the separate has_its
+  state.
+
+* Sashiko flagged some races for GICv3 LPIs, which were caused by me
+  making the allocation common to both vITSes. Group 1 is set before
+  adding the LPI to the tracking XArray. The GICv3 ITS path performs
+  one initial lookup before allocating a new LPI.
+
+* Replaced the translation cache hash table with an XArray. This
+  avoids the locking/lockup issues raised by Sashiko. Furthermore, it
+  is no longer possible for a malicious guest to force all LPI
+  mappings into one hashtable bucket.
+
+* Tightened translation and MSI handling: enforce advertised DeviceID
+  and EventID limits, report invalid guest translations as blocked
+  MSIs, and allow software injection to proceed if caching fails.
+
+* Expanded ITS register handling and the userspace ABI: serialise
+  register access, support 32-bit accesses to 64-bit registers, and
+  validate restoration of IDR0-IDR2 and READ_EVENT_DATAR while keeping
+  them read-only to the guest.
+
+* Hardened direct injection teardown: track which translation owns
+  forwarding, synchronise host translation restoration, and retain the
+  IRQ association when a timeout requires a later retry.
+
+* Extended selftests for register access widths, read-only behaviour,
+  ID limits, malformed MSIs, and cache invalidation.
+
+Thanks for taking the time to look at these changes!
+
+Thanks,
+Sascha
+
+[1] https://support.arm.com/documentation/111701/latest
+[2] https://linaro.atlassian.net/wiki/x/CQAF-wY
+[3] https://support.arm.com/tools-and-software/fixed-virtual-platforms/arm-architecture-fvps
+[4] https://lore.kernel.org/all/20261016153939.913764-1-sascha.bischoff@arm.com
+[5] https://gitlab.arm.com/linux-arm/linux-sb/-/tree/gicv5_kvm_its_support_v2
+[6] https://lore.kernel.org/all/20261016155741.979985-1-sascha.bischoff@arm.com/
+[7] https://lore.kernel.org/all/20261102-host_gicv5_fixes-v1-0-743b61626fc5@arm.com/
+[8] https://gitlab.arm.com/linux-arm/linux-sb/-/tree/gicv5_kvm_its_support_v2_with_host_fixes
+
+Sascha Bischoff (16):
+  KVM: arm64: vgic: Split out common LPI allocation
+  KVM: arm64: vgic: Pass opaque device pointer to ITS MMIO callbacks
+  KVM: arm64: gic-v5: Share CoreSight ID register emulation
+  irqchip/gic-v5: Add ITS MMIO register definitions
+  KVM: arm64: gic-v5: Add ITS device skeleton
+  KVM: arm64: gic-v5: Add ITS MMIO state emulation
+  KVM: arm64: gic-v5: Add ITS guest table translation emulation
+  KVM: arm64: gic-v5: Add ITS translation cache maintenance
+  KVM: arm64: gic-v5: Add ITS MSI injection
+  KVM: arm64: gic-v5: Add ITS userspace register access
+  irqchip/gic-v5: Enable direct injection in ITS
+  KVM: arm64: vgic: Move direct MSI support helper to common MMIO code
+  KVM: arm64: gic-v5: Implement irq forwarding
+  KVM: selftests: Add VGICv5 ITS attribute tests
+  KVM: selftests: Add VGICv5 ITS translation cache tests
+  KVM: arm64: gic-v5: Document ITS userspace ABI
+
+ .../virt/kvm/devices/arm-vgic-v5-its.rst      |  111 ++
+ Documentation/virt/kvm/devices/index.rst      |    1 +
+ arch/arm64/include/uapi/asm/kvm.h             |    2 +
+ arch/arm64/kvm/Makefile                       |    1 +
+ arch/arm64/kvm/arm.c                          |    6 +-
+ arch/arm64/kvm/vgic/vgic-irqfd.c              |    8 +
+ arch/arm64/kvm/vgic/vgic-irs-v5.c             |   75 +-
+ arch/arm64/kvm/vgic/vgic-its-v5.c             | 1562 +++++++++++++++++
+ arch/arm64/kvm/vgic/vgic-its.c                |  130 +-
+ arch/arm64/kvm/vgic/vgic-kvm-device.c         |    4 +
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c            |   20 -
+ arch/arm64/kvm/vgic/vgic-mmio.c               |   34 +
+ arch/arm64/kvm/vgic/vgic-mmio.h               |    6 +-
+ arch/arm64/kvm/vgic/vgic-v5.c                 |  182 ++
+ arch/arm64/kvm/vgic/vgic.c                    |   99 ++
+ arch/arm64/kvm/vgic/vgic.h                    |   20 +
+ drivers/irqchip/irq-gic-v5-its.c              |  141 ++
+ include/kvm/arm_vgic.h                        |  107 +-
+ include/linux/irqchip/arm-gic-v5.h            |  136 +-
+ include/uapi/linux/kvm.h                      |    2 +
+ tools/include/uapi/linux/kvm.h                |    2 +
+ tools/testing/selftests/kvm/arm64/vgic_v5.c   |  882 +++++++++-
+ .../selftests/kvm/include/arm64/gic_v5.h      |   88 +
+ 23 files changed, 3384 insertions(+), 235 deletions(-)
+ create mode 100644 Documentation/virt/kvm/devices/arm-vgic-v5-its.rst
+ create mode 100644 arch/arm64/kvm/vgic/vgic-its-v5.c
+
+
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+-- 
+2.34.1
+
