@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793648710;
-	b=Yc0h+vNRitaj2/n6eCNQwmCFzM6MH0LIq/H+7QM30Gb93i4cNLPpRR43XRYXQkj82O5U
-	 jcPDQMdCymJVKAAxQ4cdRXFlbSji4aSwPDEPIoj5Emp85LSZVH93LnrWv6mlXG6wh2sIJ
-	 royrkLVMkaGNuBtNTaPkpmA8S/uYJQj/ejKBmQfXYPt73uPpbFMuJIe9cXRdFL9kmiM2Z
-	 gohsM+VtV3owkRNM3y1VfhrctkqBbQKuNlSWpx6XaV6vx4nu7VnOkd9AkiNdswmJzvhpE
-	 ATdQcNjMLYfSDTU5Akv5c7UP2iujkj7yMDH6Fax32eiD7f5TtH6xtuQeUtv0w3/JLRw==
+	t=1793648715;
+	b=M5cAM4eIUnTB96nq6fPOM/KBZFQdA2CGediS63MFFwfzj9YKNefwmOaWx4822siHvUBv
+	 hw2LLej6/AsFcHebKVzPr/Yv3kMqxHeF/HfINS4NF9SzNdVTnRwlU4N5Zr6Trf8KVD3+q
+	 W/FsWZo4n1qUiAnFRzPwCpTXVOAPyOtlZhp0ZE4H85DB9cHam6w6ifv20knKgd3F4OOOU
+	 93h0XuKTDuueIPtPOPSqEnG+zwfU/5zC3jH9LXgiRg7DBuH28vAgMVFHjIN1beugx2oVu
+	 uq+htEOtw/Rl6U9neyoDgys19GWsFpk2PYkhiP4zjR1yJjoewZDjdIGR1rjNddh2F0w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793648710;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793648715;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
 	 Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=3ygiqX61PrFH9HwNeh9XfilPxDP9qCP4o+ydEiPw9Bk=;
-	b=PSIqf4iTecAO/4cemMZyssmtzwSlgv2yxRzlP+zBAh61d6ws6PvWChh4bNOype4vOvAo
-	 rHE9t+qdhYboZIRjg2edLa1jGmdauRg4oWOjHGbdpMAIgKPR98yrwHMwk1psWUjbWUMnN
-	 JVs7wGcAL6dE7Y0wmp+mmtG43WLXVSsgPb06nsdewwzRkLofx74Xralzph90tn+4b6S5/
-	 nVR2rebWVeztftSnSWwtp4r15XIR3EbOGgi4AsFIMF9e/9Mh9ErRMfJMsoLPC9sWmQlGF
-	 q2Ib7JvF4x7spqY1n7/D3aWW6khN8cPmKXEJiQY6rBqRYPtvWV8BY2d9ls2xHozzw9Q==
+	bh=SxDeP+VVrehaEoxAacbpEcDKEnQestaQVUxckwi1z4Q=;
+	b=a+LCzGkuyAjHbRnc5TY4h7kAPcxc6+DLL1DE8AslofUSVo7/7Nq/LDPRVLl9R7xfvmpI
+	 PQVVLix3xaFakyh3m2cz00pVa5+qhjyMUeFfDB2upxz+I1PVA/OFZZScrwG1Yx/74YZ69
+	 VqDe170Zw9xIDD4sl+LxoaHcVfnKxVLcgSb/oV0xE6TRNPraHQB6uKgfNzGaQLh1y3QUZ
+	 K23ekQVheFRRfuszgBbPg97ZR3hqlB/8k7RpDCbBSwo7185dLtHg3mm3Es7ELK+E7CuZb
+	 J5PvbSzCgrfoqnba/bfNO1oJ7eOaF/Wgopne2lMMG1M5e+10T0qiWYIWE31H7cafU/w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Jz5k6nBm;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Yq44rYbu;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86BD1606A334
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 19:45:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 86BD1606A334
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81EA1606D83D
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 19:45:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 81EA1606D83D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Jz5k6nBm
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Yq44rYbu
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CF3A3175D;
-	Mon,  2 Nov 2026 11:45:04 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8D4CC16A3;
+	Mon,  2 Nov 2026 11:45:09 -0800 (PST)
 Received: from e133894.cambridge.arm.com (e133894.arm.com [10.2.80.62])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 21A643F673;
-	Mon,  2 Nov 2026 11:45:06 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D98B63F673;
+	Mon,  2 Nov 2026 11:45:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793648707; bh=ZuYr6qVTm1wwSQygOFIq7lWk/77FuQwOyMFBHE73dr8=;
+	t=1793648712; bh=amDiy+/ROWpP26/w1KGH5V47ch5HrMmB725iyWflZog=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Jz5k6nBm/Xaq84x/5pG9Jfi3QGvXwl4d+Y5Xadru0YNR8EzOD8+0iUUG708It8KxS
-	 wsm0+/5Xv39qyMuk+f2ec0y0lFI6LSwJrnU/m/nRaNiEOu/Xb4doLl/XXXav2RI1rP
-	 puR2xt/SkYk/AdDo5gJ3f7XHc4PlOf7HzZtiXvDI=
+	b=Yq44rYbu5yvylisult486QxQUL3jSeYkEcobdMl251Kz5R75syCv5ICA26XR9Dd0i
+	 7BMBMo1ZiSBQJNTRKH/bLIOzbDQqQzIPywdNUneIPtGis2al1NtHvgNzYqcbV8DAFy
+	 9pT5++s+Os+RyAFJrjy1V4llCOme+aHHj/7z5mAM=
 From: Sascha Bischoff <sascha.bischoff@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
@@ -55,9 +55,9 @@ Cc: maz@kernel.org,
 	lpieralisi@kernel.org,
 	timothy.hayes@arm.com,
 	fuad.tabba@linux.dev
-Subject: [PATCH v2 01/16] KVM: arm64: vgic: Split out common LPI allocation
-Date: Mon,  2 Nov 2026 19:44:39 +0000
-Message-Id: <20261102194454.4086911-2-sascha.bischoff@arm.com>
+Subject: [PATCH v2 02/16] KVM: arm64: vgic: Pass opaque device pointer to ITS MMIO callbacks
+Date: Mon,  2 Nov 2026 19:44:40 +0000
+Message-Id: <20261102194454.4086911-3-sascha.bischoff@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261102194454.4086911-1-sascha.bischoff@arm.com>
 References: <20261102194454.4086911-1-sascha.bischoff@arm.com>
@@ -72,254 +72,232 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The GICv3 ITS code currently owns vgic_add_lpi(), even though the
-first half of the helper is not ITS specific. It allocates or finds
-the VM-wide vgic_irq object in lpi_xa and initialises the common LPI
-state before the GICv3 ITS code reads the property table and pending
-state.
+The ITS MMIO callbacks currently take a struct vgic_its pointer,
+which ties them to the GICv3 ITS. GICv5 needs to use the same MMIO
+dispatch path with a different device structure.
 
-GICv5 needs to reuse the same LPI object lifetime and refcounting, but
-without reading the GICv3 property table. Move the allocation and
-xarray insertion path into vgic_alloc_lpi() in vgic.c. Both
-vgic_add_lpi() and the GICv3 ITS wrapper perform an initial lookup,
-then call this helper on a miss. The ITS wrapper continues to load the
-property and pending state, while GICv5 can use the common allocator
-without GICv3 setup.
-
-Keeping the lookup outside vgic_alloc_lpi() preserves GICv3 behaviour
-when another caller inserts the LPI during allocation: the ITS wrapper
-still performs its setup on the returned LPI. A second lookup inside
-the allocator could instead treat it as already initialised and skip
-that setup.
-
-Initialise LPIs as Group 1 before publishing them in lpi_xa. GICv3
-LPIs are Group 1, and another vCPU can find a new LPI as soon as it is
-published. GICv5 does not use the group field.
-
-This preserves the intended GICv3 behaviour while making the common
-LPI storage usable by other VGIC users.
+Pass an opaque device pointer to the callbacks and cast it in the
+GICv3 handlers. This does not change GICv3 behaviour.
 
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- arch/arm64/kvm/vgic/vgic-its.c | 75 ++++---------------------------
- arch/arm64/kvm/vgic/vgic.c     | 82 ++++++++++++++++++++++++++++++++++
- arch/arm64/kvm/vgic/vgic.h     |  4 ++
- 3 files changed, 95 insertions(+), 66 deletions(-)
+ arch/arm64/kvm/vgic/vgic-its.c  | 55 +++++++++++++++++----------------
+ arch/arm64/kvm/vgic/vgic-mmio.h |  6 ++--
+ 2 files changed, 32 insertions(+), 29 deletions(-)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 7e9b265b1f521..34c1c89bfbfe1 100644
+index 34c1c89bfbfe1..c6e069af7c614 100644
 --- a/arch/arm64/kvm/vgic/vgic-its.c
 +++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -66,76 +66,19 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
- 		__ret;							\
- 	})
- 
--/*
-- * Creates a new (reference to a) struct vgic_irq for a given LPI.
-- * If this LPI is already mapped on another ITS, we increase its refcount
-- * and return a pointer to the existing structure.
-- * If this is a "new" LPI, we allocate and initialize a new struct vgic_irq.
-- * This function returns a pointer to the _unlocked_ structure.
-- */
--static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
--				     struct kvm_vcpu *vcpu)
-+static struct vgic_irq *vgic_its_add_lpi(struct kvm *kvm, u32 intid,
-+					 struct kvm_vcpu *vcpu)
- {
--	struct vgic_dist *dist = &kvm->arch.vgic;
--	struct vgic_irq *irq = vgic_get_irq(kvm, intid), *oldirq;
--	unsigned long flags;
-+	struct vgic_irq *irq;
- 	int ret;
- 
--	/* In this case there is no put, since we keep the reference. */
-+	irq = vgic_get_irq(kvm, intid);
- 	if (irq)
- 		return irq;
- 
--	irq = kzalloc_obj(struct vgic_irq, GFP_KERNEL_ACCOUNT);
--	if (!irq)
--		return ERR_PTR(-ENOMEM);
--
--	ret = xa_reserve_irq(&dist->lpi_xa, intid, GFP_KERNEL_ACCOUNT);
--	if (ret) {
--		kfree(irq);
--		return ERR_PTR(ret);
--	}
--
--	INIT_LIST_HEAD(&irq->ap_list);
--	raw_spin_lock_init(&irq->irq_lock);
--
--	irq->config = VGIC_CONFIG_EDGE;
--	refcount_set(&irq->refcount, 1);
--	irq->intid = intid;
--	irq->target_vcpu = vcpu;
--	irq->group = 1;
--
--	xa_lock_irqsave(&dist->lpi_xa, flags);
--
--	/*
--	 * There could be a race with another vgic_add_lpi(), so we need to
--	 * check that we don't add a second list entry with the same LPI.
--	 */
--	oldirq = xa_load(&dist->lpi_xa, intid);
--	if (vgic_try_get_irq_ref(oldirq)) {
--		/* Someone was faster with adding this LPI, lets use that. */
--		kfree(irq);
--		irq = oldirq;
--	} else {
--		/*
--		 * The entry is either empty or contains a dead LPI (refcount=0)
--		 * from the deferred release path, pending cleanup by
--		 * vgic_release_deleted_lpis(). Evict and free it if present.
--		 */
--		oldirq = __xa_store(&dist->lpi_xa, intid, irq,
--				    GFP_NOWAIT | __GFP_ACCOUNT);
--		ret = xa_err(oldirq);
--		if (ret) {
--			xa_unlock_irqrestore(&dist->lpi_xa, flags);
--			kfree(irq);
--
--			return ERR_PTR(ret);
--		}
--
--		if (oldirq && !WARN_ON_ONCE(refcount_read(&oldirq->refcount)))
--			kfree_rcu(oldirq, rcu);
--	}
--
--	xa_unlock_irqrestore(&dist->lpi_xa, flags);
-+	irq = vgic_alloc_lpi(kvm, intid, vcpu);
-+	if (IS_ERR(irq))
-+		return irq;
- 
- 	/*
- 	 * We "cache" the configuration table entries in our struct vgic_irq's.
-@@ -1133,7 +1076,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
- 	if (its_is_collection_mapped(collection))
- 		vcpu = collection_to_vcpu(kvm, collection);
- 
--	irq = vgic_add_lpi(kvm, lpi_nr, vcpu);
-+	irq = vgic_its_add_lpi(kvm, lpi_nr, vcpu);
- 	if (!IS_ERR(irq) && !vgic_its_map_lpi(kvm, ite, irq, vcpu))
- 		irq = ERR_PTR(-EEXIST);
- 	if (IS_ERR(irq)) {
-@@ -2269,7 +2212,7 @@ static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
- 	if (its_is_collection_mapped(collection))
- 		vcpu = kvm_get_vcpu_by_id(kvm, collection->target_addr);
- 
--	irq = vgic_add_lpi(kvm, lpi_id, vcpu);
-+	irq = vgic_its_add_lpi(kvm, lpi_id, vcpu);
- 	if (IS_ERR(irq)) {
- 		its_free_ite(kvm, ite);
- 		return PTR_ERR(irq);
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index bea848c93a990..d1a1a2cea386e 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -79,6 +79,88 @@ static struct vgic_irq *vgic_get_lpi(struct kvm *kvm, u32 intid)
- 	return irq;
+@@ -386,10 +386,10 @@ static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
+ 	return ret;
  }
  
-+/* Allocate an LPI or acquire one inserted by a concurrent caller. */
-+struct vgic_irq *vgic_alloc_lpi(struct kvm *kvm, u32 intid,
-+				struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_dist *dist = &kvm->arch.vgic;
-+	struct vgic_irq *irq, *oldirq;
-+	unsigned long flags;
-+	int ret;
-+
-+	irq = kzalloc_obj(struct vgic_irq, GFP_KERNEL_ACCOUNT);
-+	if (!irq)
-+		return ERR_PTR(-ENOMEM);
-+
-+	ret = xa_reserve_irq(&dist->lpi_xa, intid, GFP_KERNEL_ACCOUNT);
-+	if (ret) {
-+		kfree(irq);
-+		return ERR_PTR(ret);
-+	}
-+
-+	INIT_LIST_HEAD(&irq->ap_list);
-+	raw_spin_lock_init(&irq->irq_lock);
-+
-+	irq->config = VGIC_CONFIG_EDGE;
-+	refcount_set(&irq->refcount, 1);
-+	irq->intid = intid;
-+	irq->target_vcpu = vcpu;
-+	irq->group = 1;
-+
-+	xa_lock_irqsave(&dist->lpi_xa, flags);
-+
-+	/*
-+	 * There could be a race with another vgic_add_lpi(), so we need to
-+	 * check that we don't add a second list entry with the same LPI.
-+	 */
-+	oldirq = xa_load(&dist->lpi_xa, intid);
-+	if (vgic_try_get_irq_ref(oldirq)) {
-+		/* Someone was faster with adding this LPI, lets use that. */
-+		kfree(irq);
-+		irq = oldirq;
-+	} else {
-+		/*
-+		 * The entry is either empty or contains a dead LPI (refcount=0)
-+		 * from the deferred release path, pending cleanup by
-+		 * vgic_release_deleted_lpis(). Evict and free it if present.
-+		 */
-+		oldirq = __xa_store(&dist->lpi_xa, intid, irq,
-+				    GFP_NOWAIT | __GFP_ACCOUNT);
-+		ret = xa_err(oldirq);
-+		if (ret) {
-+			xa_unlock_irqrestore(&dist->lpi_xa, flags);
-+			kfree(irq);
-+
-+			return ERR_PTR(ret);
-+		}
-+
-+		if (oldirq && !WARN_ON_ONCE(refcount_read(&oldirq->refcount)))
-+			kfree_rcu(oldirq, rcu);
-+	}
-+
-+	xa_unlock_irqrestore(&dist->lpi_xa, flags);
-+
-+	return irq;
-+}
-+
-+/*
-+ * Creates a new (reference to a) struct vgic_irq for a given LPI.
-+ * If this LPI already exists, we increase its refcount and return it.
-+ * If this is a "new" LPI, we allocate and initialize a new struct vgic_irq.
-+ * This function returns a pointer to the _unlocked_ structure.
-+ */
-+struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
-+			      struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_irq *irq = vgic_get_irq(kvm, intid);
-+
-+	/* In this case there is no put, since we keep the reference. */
-+	if (irq)
-+		return irq;
-+
-+	return vgic_alloc_lpi(kvm, intid, vcpu);
-+}
-+
- /*
-  * This looks up the virtual interrupt ID to get the corresponding
-  * struct vgic_irq. It also increases the refcount, so any caller is expected
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 97fc3bdf520e5..8792953057bb7 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -280,6 +280,10 @@ vgic_get_mmio_region(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
- 		     gpa_t addr, int len);
- struct vgic_irq *vgic_get_irq(struct kvm *kvm, u32 intid);
- struct vgic_irq *vgic_get_vcpu_irq(struct kvm_vcpu *vcpu, u32 intid);
-+struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
-+			      struct kvm_vcpu *vcpu);
-+struct vgic_irq *vgic_alloc_lpi(struct kvm *kvm, u32 intid,
-+				struct kvm_vcpu *vcpu);
- void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
- struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq);
- bool vgic_get_phys_line_level(struct vgic_irq *irq);
+-static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
+-					      struct vgic_its *its,
++static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm, void *dev,
+ 					      gpa_t addr, unsigned int len)
+ {
++	struct vgic_its *its = dev;
+ 	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+ 	u64 reg = GITS_TYPER_PLPIS;
+ 
+@@ -408,10 +408,10 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
+ 	return extract_bytes(reg, addr & 7, len);
+ }
+ 
+-static unsigned long vgic_mmio_read_its_iidr(struct kvm *kvm,
+-					     struct vgic_its *its,
++static unsigned long vgic_mmio_read_its_iidr(struct kvm *kvm, void *dev,
+ 					     gpa_t addr, unsigned int len)
+ {
++	struct vgic_its *its = dev;
+ 	u32 val;
+ 
+ 	val = (its->abi_rev << GITS_IIDR_REV_SHIFT) & GITS_IIDR_REV_MASK;
+@@ -419,11 +419,11 @@ static unsigned long vgic_mmio_read_its_iidr(struct kvm *kvm,
+ 	return val;
+ }
+ 
+-static int vgic_mmio_uaccess_write_its_iidr(struct kvm *kvm,
+-					    struct vgic_its *its,
++static int vgic_mmio_uaccess_write_its_iidr(struct kvm *kvm, void *dev,
+ 					    gpa_t addr, unsigned int len,
+ 					    unsigned long val)
+ {
++	struct vgic_its *its = dev;
+ 	u32 rev = GITS_IIDR_REV(val);
+ 
+ 	if (rev >= NR_ITS_ABIS)
+@@ -433,7 +433,7 @@ static int vgic_mmio_uaccess_write_its_iidr(struct kvm *kvm,
+ }
+ 
+ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
+-					       struct vgic_its *its,
++					       void *dev,
+ 					       gpa_t addr, unsigned int len)
+ {
+ 	switch (addr & 0xffff) {
+@@ -1496,17 +1496,18 @@ static u64 vgic_sanitise_its_cbaser(u64 reg)
+ 	return reg;
+ }
+ 
+-static unsigned long vgic_mmio_read_its_cbaser(struct kvm *kvm,
+-					       struct vgic_its *its,
++static unsigned long vgic_mmio_read_its_cbaser(struct kvm *kvm, void *dev,
+ 					       gpa_t addr, unsigned int len)
+ {
++	struct vgic_its *its = dev;
+ 	return extract_bytes(its->cbaser, addr & 7, len);
+ }
+ 
+-static void vgic_mmio_write_its_cbaser(struct kvm *kvm, struct vgic_its *its,
++static void vgic_mmio_write_its_cbaser(struct kvm *kvm, void *dev,
+ 				       gpa_t addr, unsigned int len,
+ 				       unsigned long val)
+ {
++	struct vgic_its *its = dev;
+ 	/* When GITS_CTLR.Enable is 1, this register is RO. */
+ 	if (its->enabled)
+ 		return;
+@@ -1564,10 +1565,11 @@ static void vgic_its_process_commands(struct kvm *kvm, struct vgic_its *its)
+  * protects our ring buffer variables, so that there is only one user
+  * per ITS handling commands at a given time.
+  */
+-static void vgic_mmio_write_its_cwriter(struct kvm *kvm, struct vgic_its *its,
++static void vgic_mmio_write_its_cwriter(struct kvm *kvm, void *dev,
+ 					gpa_t addr, unsigned int len,
+ 					unsigned long val)
+ {
++	struct vgic_its *its = dev;
+ 	u64 reg;
+ 
+ 	if (!its)
+@@ -1588,25 +1590,25 @@ static void vgic_mmio_write_its_cwriter(struct kvm *kvm, struct vgic_its *its,
+ 	mutex_unlock(&its->cmd_lock);
+ }
+ 
+-static unsigned long vgic_mmio_read_its_cwriter(struct kvm *kvm,
+-						struct vgic_its *its,
++static unsigned long vgic_mmio_read_its_cwriter(struct kvm *kvm, void *dev,
+ 						gpa_t addr, unsigned int len)
+ {
++	struct vgic_its *its = dev;
+ 	return extract_bytes(its->cwriter, addr & 0x7, len);
+ }
+ 
+-static unsigned long vgic_mmio_read_its_creadr(struct kvm *kvm,
+-					       struct vgic_its *its,
++static unsigned long vgic_mmio_read_its_creadr(struct kvm *kvm, void *dev,
+ 					       gpa_t addr, unsigned int len)
+ {
++	struct vgic_its *its = dev;
+ 	return extract_bytes(its->creadr, addr & 0x7, len);
+ }
+ 
+-static int vgic_mmio_uaccess_write_its_creadr(struct kvm *kvm,
+-					      struct vgic_its *its,
++static int vgic_mmio_uaccess_write_its_creadr(struct kvm *kvm, void *dev,
+ 					      gpa_t addr, unsigned int len,
+ 					      unsigned long val)
+ {
++	struct vgic_its *its = dev;
+ 	u32 cmd_offset;
+ 	int ret = 0;
+ 
+@@ -1630,10 +1632,10 @@ static int vgic_mmio_uaccess_write_its_creadr(struct kvm *kvm,
+ }
+ 
+ #define BASER_INDEX(addr) (((addr) / sizeof(u64)) & 0x7)
+-static unsigned long vgic_mmio_read_its_baser(struct kvm *kvm,
+-					      struct vgic_its *its,
++static unsigned long vgic_mmio_read_its_baser(struct kvm *kvm, void *dev,
+ 					      gpa_t addr, unsigned int len)
+ {
++	struct vgic_its *its = dev;
+ 	u64 reg;
+ 
+ 	switch (BASER_INDEX(addr)) {
+@@ -1652,11 +1654,11 @@ static unsigned long vgic_mmio_read_its_baser(struct kvm *kvm,
+ }
+ 
+ #define GITS_BASER_RO_MASK	(GENMASK_ULL(52, 48) | GENMASK_ULL(58, 56))
+-static void vgic_mmio_write_its_baser(struct kvm *kvm,
+-				      struct vgic_its *its,
++static void vgic_mmio_write_its_baser(struct kvm *kvm, void *dev,
+ 				      gpa_t addr, unsigned int len,
+ 				      unsigned long val)
+ {
++	struct vgic_its *its = dev;
+ 	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+ 	u64 old, entry_size, table_type;
+ 	u64 reg, *regptr, clearbits = 0;
+@@ -1711,10 +1713,10 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
+ 	}
+ }
+ 
+-static unsigned long vgic_mmio_read_its_ctlr(struct kvm *vcpu,
+-					     struct vgic_its *its,
++static unsigned long vgic_mmio_read_its_ctlr(struct kvm *vcpu, void *dev,
+ 					     gpa_t addr, unsigned int len)
+ {
++	struct vgic_its *its = dev;
+ 	u32 reg = 0;
+ 
+ 	mutex_lock(&its->cmd_lock);
+@@ -1727,10 +1729,11 @@ static unsigned long vgic_mmio_read_its_ctlr(struct kvm *vcpu,
+ 	return reg;
+ }
+ 
+-static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
++static void vgic_mmio_write_its_ctlr(struct kvm *kvm, void *dev,
+ 				     gpa_t addr, unsigned int len,
+ 				     unsigned long val)
+ {
++	struct vgic_its *its = dev;
+ 	mutex_lock(&its->cmd_lock);
+ 
+ 	/*
+@@ -1776,8 +1779,8 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
+ 	.uaccess_its_write = uwr,				\
+ }
+ 
+-static void its_mmio_write_wi(struct kvm *kvm, struct vgic_its *its,
+-			      gpa_t addr, unsigned int len, unsigned long val)
++static void its_mmio_write_wi(struct kvm *kvm, void *dev, gpa_t addr,
++			      unsigned int len, unsigned long val)
+ {
+ 	/* Ignore */
+ }
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio.h b/arch/arm64/kvm/vgic/vgic-mmio.h
+index 38ed730d68ac3..c3b6d3e752d8d 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio.h
++++ b/arch/arm64/kvm/vgic/vgic-mmio.h
+@@ -13,13 +13,13 @@ struct vgic_register_region {
+ 	union {
+ 		unsigned long (*read)(struct kvm_vcpu *vcpu, gpa_t addr,
+ 				      unsigned int len);
+-		unsigned long (*its_read)(struct kvm *kvm, struct vgic_its *its,
++		unsigned long (*its_read)(struct kvm *kvm, void *dev,
+ 					  gpa_t addr, unsigned int len);
+ 	};
+ 	union {
+ 		void (*write)(struct kvm_vcpu *vcpu, gpa_t addr,
+ 			      unsigned int len, unsigned long val);
+-		void (*its_write)(struct kvm *kvm, struct vgic_its *its,
++		void (*its_write)(struct kvm *kvm, void *dev,
+ 				  gpa_t addr, unsigned int len,
+ 				  unsigned long val);
+ 	};
+@@ -28,7 +28,7 @@ struct vgic_register_region {
+ 	union {
+ 		int (*uaccess_write)(struct kvm_vcpu *vcpu, gpa_t addr,
+ 				     unsigned int len, unsigned long val);
+-		int (*uaccess_its_write)(struct kvm *kvm, struct vgic_its *its,
++		int (*uaccess_its_write)(struct kvm *kvm, void *dev,
+ 					 gpa_t addr, unsigned int len,
+ 					 unsigned long val);
+ 	};
 -- 
 2.34.1
 
