@@ -1,56 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793651882;
-	b=efwXmS47JkX71D5nqgtTacBRbs2Ve0mBPvmp7LkZYoZnLuaou7CvZJQTDv/yiB6vMezl
-	 OO3gv9YQsXoqnkQ5MLVtTQ+3GBxBPGGhXgz8X+V2+4Hj1kO/Ax4ITHWF2zuasRqw9Hjv1
-	 iZKcx/q9R1bTMsj9nYzPEzj1yDhsFPUxNIECfKHhaZsN3NJsbMyKQhFV2HB/L1gtDVOQi
-	 7+I3xa+1vaXrZhtgXrMkKfyYn7Of6VXTKDeHTWBOHcJQ4kOprM2UjgE3ymT44wjFrHs4D
-	 0mhX1ayTZQHfouxOi/7uBZBYEgmSKFcUKlvisyYIbQxA3L8qmm+YK40QUIOsomUTR0w==
+	t=1793652029;
+	b=ElJiXTBwemYe28LaB49DaWm4EcRSRICYq0Pp1wjzHdmmN94uyiyl4FuQZuPtywdjKB4u
+	 OeQKTzJ7WVtuHGyaCS3IiJKo5YV1EYhpr//gZoZZDZa3+qTGo8XR4DNGqbCqzcowk+C7B
+	 fJTp9fgauLCI+0gGvWnw9j5/GdzuNuDhk/KRsahTScC8xHyu4F77HkAx4eilscjQOj5u2
+	 QjFqM7BFHJHfyrTbFUMxP+AmTLAncmYW+GNEsXZ/1sRHyEvAqXN2XJc7CHtlkR2FJ38Qo
+	 2AE95KSqiIOCCck2uxa8Q2EOxN+HMuhdEE8YoXdgGU4CDFxfYvCwsj2LbA3cZkWqe1w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793651882;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=thytxbJXxeGikUjHXwlRX1Hc7pfpqIWn3LGnZlH7d0A=;
-	b=jLmtql+1nZr3BdLxDA/7cQP1gUR824/hnV1Zprb1hiWCC0g7ghluW+rW5QPsJCxybSrq
-	 sSNHTNxqLA1oLlyftC3aykB/oTLP3u5UKiOWVN3Nz3fVWHA1FYLP/5Kwz+AR77Ji1sUFD
-	 qqSv5+QGuuBHigYnvA1FewgGSHXWlKvwCWSiUoMLvRd8Iu37uoNw5cp8ts5q+M80Dig1U
-	 JFoDw4y5GH8aGIfKuWTj9DemNnMYdpbYpdfUIXY7rBFdOeGvUL5YxfYpDnQMD2FRcQNdf
-	 1DnexSumuyvKuRwEaPGkKUP3sl6egaS9jkLy/w4qGZOz+HJW9iLCyFP/ZnOJoVdcp9w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793652029;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=tYy2Ku4xegZqnpb2I1Vkofx7a7V4Wnlk/wyQiLH6WOM=;
+	b=v0oZabYQpUaSSQUKucIJqxUB6Pb2/MftyqAPTxDo9RuR5+hqt4cxa1ueJ5ijU3UOhweG
+	 DipIehrwI4rRi0AwGNNkU82tMu1n9+xizwEIPhBVAiA7gnQJtKhpcFBcNlfNYHP2/GxM1
+	 5NIY5FWOSC9dBkeELoitVeoXb3Whnk30vxyQg6ED1EuSiHRfLxy7RLi+0vATV4y3cScgP
+	 PQrYyWt9NoOyLnEoqQZxg1+pO9Hn37dHJ+VDCSgiP+8PrS+WP3jKt+N6KaDmpvUI+7tJR
+	 oHcD+IhsNpPMyvFXGiXxcY44vJojedB5V+Vt1r1wQCTAALOpfb6E8AkSAvSLVZKR2Eg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YAglJoQq;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C581606A324;
-	Mon,  2 Nov 2026 20:38:02 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=BXGpf9zn;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC04606A327
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 20:40:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5AC04606A327
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YAglJoQq
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3FD31F00A16;
-	Mon,  2 Nov 2026 20:38:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793651882;
-	bh=thytxbJXxeGikUjHXwlRX1Hc7pfpqIWn3LGnZlH7d0A=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=YAglJoQqXQSAZYcjPDpyN5onTlSFpGfdM7MrStdZS+GFaO931q570MlIzp30ZT1d3
-	 Z//JPMiS7X1P7tsHC8ctt9qNIX8SGeV1pf34bLp8O0v1LVtAEqBF7qbLlVZXX/fWFP
-	 50bvXO3OkeZdmBuI0/9BsOeBFgHPw0KYONQiBce1+mp1thJccILo5xPdo7bGPFVnoi
-	 D4ca1BN1CKDRabnaAIcq+ycG5/Z/6fEO39N8yCjTrgqXrGn5+5txrxczxwpVbIzaIs
-	 NgaMZXE8ZI3wc5R92EvR70zWKAoK2rwPl4e9xX4QQjt5HBPn+zXFscp0p9Yzsmmq7k
-	 86luyHXp+XBMw==
-Message-ID: <sashiko-outbox-194134@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 09/16] KVM: arm64: gic-v5: Add ITS MSI injection
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Sascha Bischoff" <sascha.bischoff@arm.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261102194454.4086911-10-sascha.bischoff@arm.com>
-References: <20261102194454.4086911-1-sascha.bischoff@arm.com>
- <20261102194454.4086911-10-sascha.bischoff@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 02 Nov 2026 20:38:01 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=BXGpf9zn
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7B84916A3;
+	Mon,  2 Nov 2026 12:40:24 -0800 (PST)
+Received: from [10.57.89.36] (unknown [10.57.89.36])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 60D473F59E;
+	Mon,  2 Nov 2026 12:40:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793652027; bh=Al3MzymMSlrWFMZrAzyd8qpQMKaF7iqTXVesurs2tQ0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=BXGpf9znMXiBy/aUiVFFwoePYTHrv2TnzJNeA8bzzRZ/6cR9ep7AiNLgj/CTi9zPK
+	 /bVriCa8rbZpJ5L2ne8LKzjaVJLalQ87NAbSPKhni08AlQ+vgAth+rSBF6EeBzS8d3
+	 71a78kN6A4pa4PENsCl3t/rZlkXxt3ymfWA76RaY=
+Message-ID: <c8164a81-5481-4372-99fc-ce3756930d5f@arm.com>
+Date: Mon, 2 Nov 2026 20:40:24 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -59,146 +52,77 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH kvmtool v3 08/21] arm64: Define GICv5 interrupt types
+To: Vladimir Murzin <vladimir.murzin@arm.com>, will@kernel.org,
+ julien.thierry.kdev@gmail.com
+Cc: maz@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ timothy.hayes@arm.com, Peter Maydell <peter.maydell@linaro.org>
+References: <20261016153939.913764-1-sascha.bischoff@arm.com>
+ <20261016153939.913764-9-sascha.bischoff@arm.com>
+ <a754d5cb-dc7f-49f9-a815-98efa3d57574@arm.com>
+Content-Language: en-GB
+From: Sascha Bischoff <sascha.bischoff@arm.com>
+In-Reply-To: <a754d5cb-dc7f-49f9-a815-98efa3d57574@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] KVM: arm64: gic-v5: missing vgic_initialized() check in MSI inject=
-ion
---
+On 22/10/2026 19:28, Vladimir Murzin wrote:
+> On 10/16/26 16:39, Sascha Bischoff wrote:
+>> Define the PPI and SPI type values used by GICv5 interrupt specifiers,
+>> and the type-field shift used to construct a full GICv5 INTID for
+>> KVM's PMU IRQ attribute.
+>>
+>> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+>> ---
+>>   arm64/include/kvm/gic.h | 4 ++++
+>>   1 file changed, 4 insertions(+)
+>>
+>> diff --git a/arm64/include/kvm/gic.h b/arm64/include/kvm/gic.h
+>> index 991aa912..bef871be 100644
+>> --- a/arm64/include/kvm/gic.h
+>> +++ b/arm64/include/kvm/gic.h
+>> @@ -10,6 +10,10 @@
+>>   #define GIC_FDT_IRQ_TYPE_SPI		0
+>>   #define GIC_FDT_IRQ_TYPE_PPI		1
+>>   
+>> +#define GICV5_IRQ_TYPE_PPI		1
+>> +#define GICV5_IRQ_TYPE_SPI		3
+>> +#define GICV5_IRQ_TYPE_SHIFT		29
+>> +
+> 
 
-commit b2f7c0263871635da8ddb0614e8b96f1cb1f641c
-Author: Sascha Bischoff <sascha.bischoff@arm.com>
+Hi Vladimir,
 
-KVM: arm64: gic-v5: Add ITS MSI injection
+> Can we also add
+> 
+> #define GICV5_FDT_IRQ_TYPE_PPI          GICV5_IRQ_TYPE_PPI
+> #define GICV5_FDT_IRQ_TYPE_SPI          GICV5_IRQ_TYPE_SPI
+> 
 
-This commit adds MSI injection support for the virtual GICv5 ITS via both
-the slow guest-memory translation path and the inatomic cached translation
-path. It wires kvm_set_msi() and kvm_arch_set_irq_inatomic() to invoke the
-new GICv5 ITS injection helpers for GICv5 VMs.
+Yes, we can and I have.
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-its-v5.c b/arch/arm64/kvm/vgic/vgic=
--its-v5.c
-> index 9f4783b243221..b69a1d107c0ae 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its-v5.c
+> since seeing both GIC_FDT_IRQ_... and GICV5_IRQ_... back to
+> back in FDT code is slightly confusing.
 
-[ ... ]
+Yeah, agreed. For GICv5, they're both the same, but we might as well be 
+explicit about how they are used and assuage any doubts that the reader 
+might have.
 
-> @@ -424,12 +468,86 @@ static int __vgic_v5_its_resolve_lpi(struct kvm *kv=
-m, struct vgic_v5_its *its,
->  	return ret;
->  }
-> =20
-> +int vgic_v5_its_resolve_lpi(struct kvm *kvm, struct vgic_v5_its *its,
-> +			    u32 device_id, u32 event_id,
-> +			    struct vgic_irq **irq)
-> +{
-> +	guard(mutex)(&its->its_lock);
-> +
-> +	return __vgic_v5_its_resolve_lpi(kvm, its, device_id, event_id, irq);
-> +}
-> +
->  static void vgic_v5_its_inject_lpi(struct kvm *kvm, struct vgic_irq *irq)
->  {
->  	kvm_call_hyp(__vgic_v5_vdpend, irq->intid, true,
->  		     kvm->arch.vgic.gicv5_vm.vm_id);
->  }
-> =20
-> +int vgic_v5_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
-> +{
-> +	struct vgic_v5_its *its;
-> +	struct vgic_irq *irq;
-> +	bool borrowed_mm =3D false;
-> +	int ret;
-> +
-> +	its =3D vgic_v5_msi_to_its(kvm, msi);
-> +	if (IS_ERR(its))
-> +		return PTR_ERR(its);
-> +
-> +	/* An irqfd cache miss is resolved by a worker outside the VM's mm. */
-> +	if (current->mm !=3D kvm->mm) {
-> +		if (WARN_ON_ONCE(current->mm || !(current->flags & PF_KTHREAD)))
-> +			return -EWOULDBLOCK;
-> +
-> +		if (!mmget_not_zero(kvm->mm))
-> +			return -EFAULT;
-> +
-> +		kthread_use_mm(kvm->mm);
-> +		borrowed_mm =3D true;
-> +	}
-> +
-> +	ret =3D vgic_v5_its_resolve_lpi(kvm, its, msi->devid, msi->data, &irq);
-> +	if (borrowed_mm) {
-> +		kthread_unuse_mm(kvm->mm);
-> +		mmput(kvm->mm);
-> +	}
-> +
-> +	if (ret < 0)
-> +		return ret;
-> +	/* KVM_SIGNAL_MSI reports guest translation failures as blocked MSIs. */
-> +	if (ret)
-> +		return 0;
-> +
-> +	vgic_v5_its_inject_lpi(kvm, irq);
-> +	vgic_put_irq(kvm, irq);
-> +
-> +	return 1;
-> +}
-> +
-> +int vgic_v5_its_inject_cached_translation(struct kvm *kvm, struct kvm_ms=
-i *msi)
-> +{
-> +	struct vgic_v5_its *its;
-> +	struct vgic_irq *irq;
-> +	int ret;
-> +
-> +	its =3D vgic_v5_msi_to_its(kvm, msi);
-> +	if (IS_ERR(its))
-> +		return PTR_ERR(its);
-> +
-> +	if (!READ_ONCE(its->enabled))
-> +		return -EWOULDBLOCK;
-> +
-> +	ret =3D its_cache_look_up_translation(its, msi->devid, (u16)msi->data,
-> +					    &irq);
-> +	if (ret)
-> +		return -EWOULDBLOCK;
-> +
-> +	vgic_v5_its_inject_lpi(kvm, irq);
-> +	vgic_put_irq(kvm, irq);
-> +
-> +	return 0;
-> +}
+I've made sure to use the _FDT_ variant when we're configuring the DT, 
+and the non-_FDT_ variant otherwise.
 
-[Severity: High]
-Can userspace trigger vgic_v5_its_inject_lpi() before the GICv5 VM has been
-initialized?
+> 
+> Cheers
+> Vladimir
+> 
+>>   #define GIC_FDT_IRQ_PPI_CPU_SHIFT	8
+>>   #define GIC_FDT_IRQ_PPI_CPU_MASK	(0xff << GIC_FDT_IRQ_PPI_CPU_SHIFT)
+>>   
+>> -- 2.34.1
+>>
+> 
 
-When a VM creates KVM_DEV_TYPE_ARM_VGIC_V5 and KVM_DEV_TYPE_ARM_VGIC_V5_ITS,
-kvm_vgic_create() initializes kvm->arch.vgic.gicv5_vm.vm_id to
-VGIC_V5_VM_ID_INVAL (-1), and a valid VM ID is only allocated later during
-KVM_DEV_ARM_VGIC_CTRL_INIT via:
-
-  vgic_init()
-    vgic_v5_init()
-      vgic_v5_allocate_vm_id()
-
-However, vgic_v5_register_its_iodev() registers the ITS on KVM_MMIO_BUS as
-soon as KVM_VGIC_V5_ADDR_TYPE_ITS is set, and userspace register access
-allows writing GICV5_ITS_CR0 (setting its->enabled =3D true),
-GICV5_ITS_DT_CFGR, and GICV5_ITS_DT_BASER before vgic_init() is called.
-
-If userspace invokes KVM_SIGNAL_MSI or triggers an irqfd before
-KVM_DEV_ARM_VGIC_CTRL_INIT, neither __vgic_v5_its_resolve_lpi(),
-vgic_v5_its_inject_msi(), nor vgic_v5_its_inject_cached_translation() checks
-vgic_initialized(kvm). As a result, vgic_v5_its_inject_lpi() will pass
-VGIC_V5_VM_ID_INVAL truncated to u16 (0xffff) to __vgic_v5_vdpend(), which
-executes the hardware VDPEND instruction with an unallocated VM ID (or
-targets another active VM using VM ID 0xffff).
-
-Should the MSI resolution and injection paths check vgic_initialized(kvm)
-before resolving translations or calling vgic_v5_its_inject_lpi()?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261102194454.4086=
-911-1-sascha.bischoff@arm.com?part=3D9
+Thanks,
+Sascha
