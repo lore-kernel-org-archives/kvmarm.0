@@ -1,72 +1,75 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.71
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.72
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793652423;
-	b=PUQbkN/sEMBjMRU46y7/QvlSpptDyx16sRYToxlJyh+m6wVjVtWeZp5JnnMS2e5Swbst
-	 Jg7raxzueuPfXauT4z/AVBOTMGzYjfaaPqyk4YdlcULiBcKnMbJQE+USZ47Gbgyo7Vop+
-	 tBVwFjxUopHOKFyUfp6OyzFDZl0pC2AtgU8lL7ZuLfFFwGqfyzLchtgnSsSBZByP54DSG
-	 oiG3RrgZ/FZvKIfv8kQl4j19pvHuvnWtSSvIcfmd4DiPvtQJL8QoXx0tWL4rcOgu4Diqb
-	 10aWbAIndAqh5rZo5YvCFkFuNw+LryPBYcM1qnS+RBF2JgHucQ4gGsxuAXFGYqpE3Dg==
+	t=1793652424;
+	b=IgAybWVQaceCeBn/oaMHR+xJMIi4qb0FfaN1kt/C9mBP4y35VFtkBVtKjyTnIky9biQO
+	 gwZgpgxpQfaq9Hk/kkDSMN+9jw4Dx6dR9voN5f3nMRgZZVkXdCsg3eAY+PiWSVcXo9mc5
+	 go2qQlYUoncM4htI6NTgvHcRcWyDzDfQXROBojLJUiRo/A+vAMztEWSs+DlpS/NZXTGiG
+	 QhbRn1AB6F/8Uws8X0TsbXL4jenxjKdHV5RumHjd6JF/M+DCJ6Ee0Yg65r091Ol+3ZpQS
+	 K8MeyLRLM4CtxJbFCLD4+j00H31Ghq2YLZq32LhMo+X/20JIjhOfJnBjb0Fre5t67Bg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793652423;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793652424;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
-	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
-	bh=zMsJQgVrf0JZ++d3iFatLVEh5rUSU8qY+49KgPh446g=;
-	b=fZWrVO647MQ+xqBynBo/HoyrZIJaAMFCln/x1J3vT3DT2eVnoSG6YZCwIs6I3+WI5Eb4
-	 //w+qFrGDHa0QHeKZ/w0opPAiOGF6IWkKDoJrAaAqilSxBWtoCsC3ZpUhDK3uATMEFRCq
-	 HZyl6h9vR01KdgS+k6hp6WZiDDXRjWeZIr7tywPXUs/YkAYRdBXVTsTMAk3Pu+429L0W9
-	 zn5U683nEEcg2Kc3PxUTkVAE6QS/es2a2b733MHQ6fA0e4hmYOMT7IMNMm1yZYPeJG+ei
-	 jhuV+vzQ/y0eMdYAm4CvHWcPyzUhTgBNM0WLl1x709uXBJQtUZc3O8Yhtcbf18wSxqQ==
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
+	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
+	 Content-Type;
+	bh=N9/aAcI8tDrlGXTuOLbUQjQM2gmmk27o5OqCSTvv6zc=;
+	b=XzpbJAdP3IlnonHoyUnEFiybTDp9YPe7R58a3cnLoD6qoEIVm2fT5T3xDwntacZmZDkb
+	 /VYmGQKIQDUiYo+EHBezY2lnW7WEi21Z1IcpSblWQ9g0hlxPc+jiVrl92LIIvAvrHntBQ
+	 msqmCdzT9oj/jNyaeHETGrJjQGeF39508a735ekDsn7cCqcXYxpmQclQf8TUgg5fosKhi
+	 XGLgo2C/Aj0xKzHecn0eTRPfefZcZ4dQNvpDr2nPDO9h2BK19yPJ6Q6LcwetE7f7QHtyG
+	 xfoDVugYtKYgxlqMup/Xiafc7PyiG8Cqta+Dap++xyrktJOd0A2wNi6ArKP6UB1Na5A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Gg2txX4I;
-	arc=none smtp.remote-ip=209.85.128.71
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=FzmbDXln;
+	arc=none smtp.remote-ip=209.85.221.72
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A59EC606A329
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 20:47:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A59EC606A329
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07ACA606A326
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 20:47:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 07ACA606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Gg2txX4I
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4a35e1d2dddso32294905e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 02 Nov 2026 12:47:02 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=FzmbDXln
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-48e4d1e29f3so3082948f8f.3
+        for <kvmarm@lists.linux.dev>; Mon, 02 Nov 2026 12:47:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1793652421; x=1794257221; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=zMsJQgVrf0JZ++d3iFatLVEh5rUSU8qY+49KgPh446g=;
-        b=Gg2txX4Ivhcv6tzWtsVdHggSo8YQlskHy0LUJrfmoFhNHe19WKWu43OaTLFkyFDK4x
-         vouWePE/VGOpgBZ2l6nvdqNxlLzc+p1Gtw8S2grFewnSVMo5m7kXQGzZOraP9NMyIPXs
-         mORpjBKCed1th1B7X1W9gOdSl+EcgYb25EP51v4CB7sCqCvdJCsZT+rUtUG0zj42ALhq
-         +h7SdM9g25ed9SawpDqWAQPJCqqDIiulKd1GnwpiPFgpaFUUGT9QdsmpIqbKDqRXOBZR
-         AtRI7n2gVnJNJJ3Ta2tdUSRMEkAKqN2DmkNQUtljQtiTjGdufdsX3cmIV7oDRmAPw6FR
-         Kv1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793652421; x=1794257221;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=google.com; s=20260707; t=1793652422; x=1794257222; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=zMsJQgVrf0JZ++d3iFatLVEh5rUSU8qY+49KgPh446g=;
-        b=tVtBT1MXpGjDHQr8TUgmGaOpxTvt/JU+/yZTNKRfjB/l452+qy+8v6L8j9Nxc0aERi
-         Uslt9WJxLUxjBN/7x6he/IYMxfelItAqNb11sd024F6LoE9yUdlbE8nm8tAojd1cF1qk
-         EN25xRhvx5YmwTu96qo7gw7CisRGWjrMpDAz+0RheA5uKjBselF76VCYUo1rfNMKYI39
-         sckZ5e93WPOyVz4YB6imnP+yImQEFX9QrwPXb9IC6X1rc4eWl2wP4i/sPbptxkumDPnT
-         o1x+qJx9eQHcwKcSV2VY5h3u6ecdixDp+8pvfDgI0Fj1AhdEloE4/xsPv04NFQSC5ZWO
-         wCgQ==
-X-Forwarded-Encrypted: i=1; AKwUvByYdR8d3+WHRr318SmkT+YVDj65ms1Bjw/qagUX7orPkZ5KBIdVqQswAdF5ej1oXwTiKS3WeFg=@lists.linux.dev
-X-Gm-Message-State: AFq9FYJJp3YLU3IDUV+U0pSfPgWuaRO++tp8ZStC3Q2K5GJiqUxiDb1G
-	D4fUSgr2Qc5SOmVUDI8/lodhqtqTDhs5EbzklXzH7jzlXwI9L7GpsiVwDffqT5eopsIuKcMHF+K
-	al8xs5rNZ3w1XriMzwTSaiQ==
-X-Received: from wmos18.prod.google.com ([2002:a05:600c:45d2:b0:4b0:ea12:73b5])
+        bh=N9/aAcI8tDrlGXTuOLbUQjQM2gmmk27o5OqCSTvv6zc=;
+        b=FzmbDXlnPDn/Bj+vInHIzsaOoyupRv+OCfL1nqn261T5o7zMNSy46XEM19CcQDbaH9
+         5X6GJODycztsEYAZNjJ1Qs4cbkXxh1EXHsSzPYW6QaluDacFIdl+ibyIlvY1ExVjjj0f
+         99NV6J+ey0p+JsBhtLYD9LEl1Ra+oRPJBX9wptlqsoLi0ycDYM8LLtUDeoakcXskWTg4
+         62JdzMIelG2/5/gv268W4imn0mbKfRr0SXTMWV99x92A84LGPXh4gI+h8HNGYGEnx2bd
+         EWoekxILyGWkC+FQRH2wKzBLYTqU2HcMawOWCeRXWjIHW4m+CpHpQXSlwlvNO0DGoBdR
+         lrbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793652422; x=1794257222;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=N9/aAcI8tDrlGXTuOLbUQjQM2gmmk27o5OqCSTvv6zc=;
+        b=hs+BaVmcx/IqZQPJMKkXGlXAdXVTzVrABnGF9zpA1i4Loo1xHc5UhKZexwVhkTdNpf
+         MWwYxFYYL9lB3W413lhFY0E26SbOlJ2VnC3S4AWcqXnjhnSTcmQipFzWbSavGQMtxjBp
+         yRVyNO2pKMnikfgJln7M4u3afjAU7AY/gmLUQhNv3XmUwkpVpw2Qi3IP2VKLAPORbaND
+         JFmOkb4hSTV+PunXO5FXriElpp6nqtufntvYtpl5mtA5LisYdKJSvu4NNbtsoQgecrwu
+         NKaPK7wh2Qm+lZ2KYfTpw5GMsvPKJgUTantrLPKMLRFdSePg6mawPpO0XN7j8xqdEhG8
+         wF3A==
+X-Forwarded-Encrypted: i=1; AKwUvBwnwEbeRGONakNKlOYXVTP6r4pAeOLxLyRAfAehE8Bi/ezt5r++yFHIHDnlefY9A2bGnETydcg=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+jbS6oYAOwI8HVhjebfqYe94Qx/O71Lbi4RuJyBYxVBL+M9jw5
+	4Lil6ZSoDLUda+e86UZh8IUQId4bW/+/+JOOeWhVHiuHROJdtOM/PWhWcC2InPZECvEAE4tKqZb
+	qP3+wQiXTsGGVss4/6aHPnA==
+X-Received: from wrna10.prod.google.com ([2002:adf:e5ca:0:b0:48d:f161:cdaf])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:609a:b0:4a1:7c56:d4e2 with SMTP id 5b1f17b1804b1-4ac1709aa77mr243577525e9.16.1793652420742;
- Mon, 02 Nov 2026 12:47:00 -0800 (PST)
-Date: Mon,  2 Nov 2026 20:46:05 +0000
+ 2002:a05:6000:4810:b0:48e:f8d:8cab with SMTP id ffacd0b85a97d-48e6e2bcd79mr27169760f8f.4.1793652422051;
+ Mon, 02 Nov 2026 12:47:02 -0800 (PST)
+Date: Mon,  2 Nov 2026 20:46:06 +0000
+In-Reply-To: <20261102204628.401871-1-vdonnefort@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -76,129 +79,100 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 Mime-Version: 1.0
+References: <20261102204628.401871-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.56.0.385.gac671c819a-goog
-Message-ID: <20261102204628.401871-1-vdonnefort@google.com>
-Subject: [PATCH v3 00/23] Huge mapping support for protected VMs
+Message-ID: <20261102204628.401871-2-vdonnefort@google.com>
+Subject: [PATCH v3 01/23] KVM: arm64: Prefault host stage-2 entries on block split
 From: Vincent Donnefort <vdonnefort@google.com>
 To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
 Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
 	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	kernel-team@android.com, fuad.tabba@linux.dev, 
-	Vincent Donnefort <vdonnefort@google.com>
+	kernel-team@android.com, fuad.tabba@linux.dev, Keir Fraser <keirf@google.com>, 
+	Quentin Perret <qperret@google.com>, Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Currently, pKVM handles stage-2 mappings and ownership tracking strictly
-at the PAGE_SIZE level. This series extends pKVM to support PMD_SIZE
-block mappings, thereby enabling Transparent Huge Pages (THP) for
-protected guests. hugetlbfs is currently unsupported as it does not
-appear as swapbacked.
+From: Keir Fraser <keirf@google.com>
 
-Summary of changes:
+For the host stage-2 that is idmap, we can avoid lazy-mapping on block
+splitting by propagating existing valid mappings to neighbouring entries
+of the new table.
 
-1. Enable host stage-2 block-level annotations:
+Signed-off-by: Keir Fraser <keirf@google.com>
+Co-developed-by: Quentin Perret <qperret@google.com>
+Signed-off-by: Quentin Perret <qperret@google.com>
+Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+---
+ arch/arm64/kvm/hyp/pgtable.c | 45 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-The host stage-2 being annotated with the GFN of the guest on the
-host->guest donation transitions, we allow block-level annotations to
-ensure the host stage-2 mapping size matches the guest stage-2.
-
-2. Expand ownership transition HVCs:
-
-Enable the ownership test to work with PMD_SIZE so we can test
-transitions supporting more than PAGE_SIZE.
-
-3. Implements the PKVM_HYP_REQ_SPLIT hypervisor request:
-
-Allows the hypervisor to ask the host to split a mapping. This ensures
-the guest s2, pkvm_mapping tree and host s2 are always using the same
-mapping size.
-
-4. Wires up THP support for protected VMs:
-
-Use a PMD_SIZE mapping for protected VMs whenever
-transparent_hugepage_adjust() acknowledge the presence of a huge-mapping
-in the VMM stage-1.
-
-Changelog:
-
-v3:
-  - Move get_page() in stage2_map_prefault_idmap() from PATCH2 to PATCH1 (Wei-Lin, Mostafa)
-  - Set map_data.phys in kvm_pgtable_stage2_annotate() (Sashiko)
-  - Propagate -EHWPOISON and -EAGAIN from pkvm_pin_user_pages() to protected_pkvm_mem_abort() (Sashiko)
-  - Fall back to PAGE_SIZE when a PMD_SIZE mapping overlaps an existing PAGE_SIZE one (Fuad)
-  - Reject !nr_pages in pfn_range_is_valid()
-  - Use mmu_invalidate_retry()
-  - Rebase on 7.4-rc1
-
-v2 (https://lore.kernel.org/all/20260911135053.146435-1-vdonnefort@google.com/):
-  - Reorder patches to make the series bisectable.
-  - Check memcache and WARN_ON if stage-2 split fails in __pkvm_host_split_guest()
-  - __pkvm_pgtable_stage2_split(): return 0 if the block is already split.
-  - kvm_pgtable_stage2_table_install() to let mem_protect handle the stage-2 splitting.
-  - Refactor fix_host_ownership() (Wei-Lin)
-  - Handle non-linear mappings in fix_host_ownership()
-  - Drop _page_ from __pkvm_host_reclaim_page_guest and __pkvm_reclaim_dying_guest_page() (Wei-Lin)
-  - Make a separate patch for hyp_poison_range() (Wei-Lin)
-  - Use folio_add_pins in __pkvm_pgtable_stage2_split() (Wei-Lin)
-  - Hold the mmap_read_lock() for transparent_hugepage_adjust() (Sashiko)
-  - Catch 2MiB fault on existing 4KiB fault (Sashiko)
-  - Add share/unshare testing of split blocks.
-  - Rebased on 7.3-rc2
-
-v1 (https://lore.kernel.org/all/20260803100904.3563942-1-vdonnefort@google.com/)
-
-Keir Fraser (1):
-  KVM: arm64: Prefault host stage-2 entries on block split
-
-Vincent Donnefort (22):
-  KVM: arm64: Propagate host stage-2 annotated entries on block split
-  KVM: arm64: Allow block-level stage-2 annotation
-  KVM: arm64: Use block-level annotations when setting up the host
-    stage-2
-  KVM: arm64: Make pKVM ownership selftest an HVC
-  KVM: arm64: Reject zero-sized ranges in pfn_range_is_valid()
-  KVM: arm64: Add a range to __pkvm_host_share/unshare_hyp()
-  KVM: arm64: Add a range to __pkvm_host_donate_guest()
-  KVM: arm64: Add a range to hyp_poison_page()
-  KVM: arm64: Add a range to __pkvm_host_reclaim_guest()
-  KVM: arm64: Add a range to __pkvm_guest_share_host()
-  KVM: arm64: Add a range to __pkvm_guest_unshare_host()
-  KVM: arm64: Handle huge mappings in
-    __pkvm_host_force_reclaim_page_guest()
-  KVM: arm64: Handle huge mappings in __pkvm_vcpu_in_poison_fault()
-  KVM: arm64: Add a range to pKVM ownership selftest
-  KVM: arm64: Warn on pKVM guest stage-2 block collapse
-  KVM: arm64: Add vcpu conduit for pkvm_hyp_req
-  KVM: arm64: Introduce kvm_pgtable_stage2_table_install()
-  KVM: arm64: Add __pkvm_host_split_guest HVC
-  KVM: arm64: Extend pKVM page ownership selftests to cover guest block
-    split
-  KVM: arm64: Add PKVM_HYP_REQ_SPLIT
-  KVM: arm64: Raise PKVM_HYP_REQ_SPLIT on guest to host sharing
-  KVM: arm64: Stage-2 huge mappings for protected VMs
-
- arch/arm64/include/asm/kvm_asm.h              |  14 +-
- arch/arm64/include/asm/kvm_hcall.h            |  10 +-
- arch/arm64/include/asm/kvm_host.h             |  31 +
- arch/arm64/include/asm/kvm_pgtable.h          |  12 +
- arch/arm64/include/asm/kvm_pkvm.h             |  35 +-
- arch/arm64/kvm/handle_exit.c                  |   3 +
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  25 +-
- arch/arm64/kvm/hyp/include/nvhe/memory.h      |   5 +
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |   6 +-
- arch/arm64/kvm/hyp/nvhe/ffa.c                 |  12 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  43 +-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 591 ++++++++++++------
- arch/arm64/kvm/hyp/nvhe/pkvm.c                |  59 +-
- arch/arm64/kvm/hyp/nvhe/setup.c               | 165 +++--
- arch/arm64/kvm/hyp/pgtable.c                  | 139 +++-
- arch/arm64/kvm/mmu.c                          | 128 ++--
- arch/arm64/kvm/pkvm.c                         | 247 +++++++-
- arch/arm64/kvm/trace_pkvm.h                   |   4 +-
- 18 files changed, 1126 insertions(+), 403 deletions(-)
-
-
-base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 9c83837b184d..dfbcdd3d91a4 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -1032,10 +1032,52 @@ static int stage2_map_walk_table_pre(const struct kvm_pgtable_visit_ctx *ctx,
+ 	return 0;
+ }
+ 
++static void stage2_map_prefault_idmap(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t *ptep)
++{
++	kvm_pte_t block_pte = ctx->old;
++	bool counted;
++	u64 pa;
++	int i;
++
++	if (!kvm_pte_valid(block_pte))
++		return;
++
++	counted = stage2_pte_is_counted(block_pte);
++
++	/*
++	 * Shared walks not supported: cannot rollback refcounts on break
++	 * failure.
++	 */
++	if (counted && WARN_ON_ONCE(kvm_pgtable_walk_shared(ctx)))
++		return;
++
++	pa = ALIGN_DOWN(ctx->addr, kvm_granule_size(ctx->level));
++	for (i = 0; i < PTRS_PER_PTE; ++i, ++ptep, pa += kvm_granule_size(ctx->level + 1)) {
++		kvm_pte_t pte = kvm_init_valid_leaf_pte(pa, block_pte, ctx->level + 1);
++
++		/*
++		 * Skip ptes in the range being modified by the caller if we're
++		 * installing last level entries. Otherwise, we need to
++		 * temporarily put in a valid mapping to make sure the
++		 * prefaulting logic is triggered on the next
++		 * stage2_map_walk_leaf(). This adds an unnecessary TLBI as
++		 * we'll presumably re-break the freshly installed block, but
++		 * that should happen very infrequently.
++		 */
++		if ((ctx->level < (KVM_PGTABLE_LAST_LEVEL - 1)) ||
++		    (pa < ctx->addr) || (pa >= ctx->end)) {
++			*ptep = pte;
++			if (counted)
++				ctx->mm_ops->get_page(ptep);
++		}
++	}
++}
++
+ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+ 				struct stage2_map_data *data)
+ {
+ 	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
++	struct kvm_pgtable *pgt = data->mmu->pgt;
+ 	kvm_pte_t *childp, new;
+ 	int ret;
+ 
+@@ -1053,6 +1095,9 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+ 	if (!childp)
+ 		return -ENOMEM;
+ 
++	if (pgt->flags & KVM_PGTABLE_S2_IDMAP)
++		stage2_map_prefault_idmap(ctx, childp);
++
+ 	if (!stage2_try_break_pte(ctx, data->mmu)) {
+ 		mm_ops->put_page(childp);
+ 		return -EAGAIN;
 -- 
 2.56.0.385.gac671c819a-goog
 
