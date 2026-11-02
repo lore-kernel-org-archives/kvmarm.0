@@ -1,61 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.26
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.164
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793622039;
-	b=Ya8D/0pVp/CO18i6SCYf9YmUXhsJPqViZiRs72KFiOsx81BfaMZekjQIxGcpMFC5kfqt
-	 wW+EQEeEB6LKF5765a65AVmIpS9rscuNcSRXWoW0G3lLHOnkrDYLLWt4zPeqhJOoTIQNZ
-	 eIu7I+PalEpSv41TGA72fBOh/0nqAaxY6UNIPh2qnNFBQCQi4gT+Y1RMIQs4WU7czXhou
-	 Io0ZUiVYb8lLIqVd7dIRuoferWdhmESUOZDS5EuCHv3aFSKZrlQmOmcqgYWIY9bsY4Hp4
-	 LOt4waiaM7qCKppgl9NxQWmAHKKcdyn4xdj3oAWdn0pMPB1LjOlJAJL0DteSMsPu6Cg==
+	t=1793624501;
+	b=BjZmUoZuGAtOVoI9Hmq20mi0Gb30+gZhar5pvb8w8w9vGERqLDiCyILZbwna8OSG9XhJ
+	 HSSmtE/2Ngy5aahv5QNebSGiVOGKAU/6by33KNOsg/nKLnNjpygweuEbip+tvSH8oHnfU
+	 wdrTKv59JNLchIOIoR3wc03ZjGD/01hL8VCRQEstYWgSNeyGn8tw1qm/Pm97RiVBX1LQH
+	 i99iR+JKgKOcXEmIf5rFDi/1rPIV+SwRe50TE2lNMOe7UkLSxvO6neQiaessbZSnDWw++
+	 qoc4+QbiEfgLXKfnNLIdTGlS8jxYBys8R4AB9h4MN2YmVLw5Tx+Gcv7j7Qltm3fcKfg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793622039;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793624501;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Gm-Message-State:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:
-	 X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:Subject:To:Cc:
-	 Content-Type;
-	bh=n9Qb7Zv26gUhtCXZTzB8VxfwAxcPhk4AxUJPcz95PHE=;
-	b=oQRprpiX5LYasEfJJSosQIV4xRPr5TUdR16BubKcgfJwLT9dU/Ec4EtW8+mTJUS/hFcz
-	 d7RELuUsXmwVxryaIHp29Mc8ZTqpXml9PsnHF6F8p9QbJy9oE4EYFbDxh1ft5njrfwTYI
-	 K5PJFktj9GvV5Mn5MioeD7FEH+a9/Ve5UhJNM3vMDpVQmKJ9hWU+zZB5ePV1GydxJkSdl
-	 nkN8zfiBz6nWeA/u6shaZIkTmv3l2rA9AoqqNCMlgTh71VPqro7Jp1T79jAXDux6kWJKf
-	 TdyskU8d9I2xsSwP2Kd6TpKeYoC7Z0jeOy21yTuCiC8xwAdvpV/EqJ6y2M+EtU1AheQ==
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Type:Content-Transfer-Encoding;
+	bh=cBC7srJMZfkKBmSIaxASX5h7RvkEOMv1BFV9kmI3PJo=;
+	b=NXFx9x9KmHns9rBCG/C5ZRs5dNoelqilOtWIEI4f5LBLaOcnlcSb/j07Zsuzv09cnFri
+	 DAu1bUJ3SC8oCrjiGrQ9y5gn5Gufre7OQfJdxxnv0Pi9Sf17e0GtkDGOL2M5cSPmJx4SA
+	 pLjOasjLJ1MaoPscKX6DUMqGuykGgrWiXpqZKogWBEJw/Jwc0VAUl/QIANGw5Tkw42w0B
+	 E8e/6zvZpn3dTJBr1+sZIJqcxlkDI9tFZ6fwnTEvuLmb1XH7UbcfwIW+hPUXzaF4P/vE3
+	 ywiTieY1MjvMz47MgSm/JkUMS3kwzXDiiKHO66Q/FuoHtUdLl4t9pWLapSMOSRxdNEg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=frpi1aMT;
-	arc=none smtp.remote-ip=91.218.175.26
-Received: from mta0.migadu.com (out-26.mta0.migadu.com [91.218.175.26])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=mi+ipPC1;
+	arc=none smtp.remote-ip=95.215.58.164
+Received: from mta1.migadu.com (out-164.mta1.migadu.com [95.215.58.164])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A903606A326
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 12:20:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5A903606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C538606A324
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 13:01:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6C538606A324
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=frpi1aMT
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=mi+ipPC1
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=n9Qb7Zv26gUhtCXZTzB8VxfwAxcPhk4AxUJPcz95PHE=;
+DKIM-Signature: a=rsa-sha256; bh=oaewjRBjkq9+BUbIscHYddd1XYcswqnQ9DXIMebK79Y=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793622036; v=1; x=1794226836;
- b=frpi1aMT0grWOz2DbYDK5kmGCLFmpaykVNGiN2WrgYXCLoBU5dUH/2bclxmTXdfuGs7rU/Ra
- BieGWQQYhWKmT0H5/1NhlRj+8EKDcgbXXZxh9AVvQDzV5nncWOlVqgnFEfpYDAE95vt0RYufo3q
- 2Ygcsh/hSqyBMESdnemx8aOg=
+ t=1793624498; v=1; x=1794229298;
+ b=mi+ipPC16wf8eFieOnvJlUYlgPHcZj/4z7oGx4Msn6LnpF+IGVAvqNs8nX5a0l8wq7YKS+eK
+ LuC39CqBdgLPiwKdEgQ3Lm589UlrXhVlH6Xh61BnkqyQbDoEnJ1ZiLigsZSnBbrN9UhIV0F9Y+k
+ W5LwVYgmVJJ/eoj2Pp1x6c2Q=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 217921ee7ee95273;
-	Mon, 02 Nov 2026 12:20:34 +0000
-X-Mizu-Trace-ID: 217921ee7ee95273
+Received: by smtp.migadu.com with ESMTPS id 9df1652454d8c181;
+	Mon, 02 Nov 2026 13:01:38 +0000
+X-Mizu-Trace-ID: 9df1652454d8c181
 X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5be58ad9600so11204e87.0
-        for <kvmarm@lists.linux.dev>; Mon, 02 Nov 2026 04:20:32 -0800 (PST)
-X-Gm-Message-State: APuU4Z+4HNBS+HOyMreM8l+tOpjfEPPnZW3BE/fXlJARo5uZvHjPPFQM
-	VbsRQoU2XI/tqpiqA1ICDjK81R6gG6s0XjWaagRjj688hYRoDoHb8/czCRAB7Y9ICkpeAvhEjwk
-	TPbFniinqLXIwKOyvpurdyYfI+/1lGtZd9NGrJO9M
-X-Received: by 2002:a05:6512:67c3:b0:5bf:d238:4671 with SMTP id
- 2adb3069b0e04-5bfd23846eamr373591e87.9.1793622031728; Mon, 02 Nov 2026
- 04:20:31 -0800 (PST)
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Sebastian Ene <sebastianene@google.com>,
+	=?UTF-8?q?Bart=C5=82omiej=20Grzesik?= <bgrzesik@google.com>,
+	Mostafa Saleh <smostafa@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Vladimir Murzin <vladimir.murzin@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Zenghui Yu <zenghui.yu@linux.dev>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Radu Rendec <radu@rendec.net>,
+	Fuad Tabba <tabba@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 00/13] KVM: ITS hardening for pKVM
+Date: Mon,  2 Nov 2026 13:01:20 +0000
+Message-ID: <20261102130133.3684226-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -65,42 +83,144 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261102094748.2638468-2-ardb+git@google.com>
-In-Reply-To: <20261102094748.2638468-2-ardb+git@google.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 2 Nov 2026 12:19:55 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTwW9Pg+sMPOY49d9M5WLCM3Opz8ZBL4vBVqk9qJT9q0Nw@mail.gmail.com>
-X-Gm-Features: AclHuK9zQLM777IMz9gaSa4k5VTfHhR4TDeMPA5ad8PHcF0LDzew-mhjZ3P0zAY
-Message-ID: <CA+EHjTwW9Pg+sMPOY49d9M5WLCM3Opz8ZBL4vBVqk9qJT9q0Nw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Don't livelock when AT can't resolve a fault IPA
-To: Ard Biesheuvel <ardb+git@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	Ard Biesheuvel <ardb@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Ard,
+Hi folks,
 
-On Mon, 02 Nov 2026 09:47:49 +0000, Ard Biesheuvel <ardb+git@google.com> wrote:
-[...]
-> When a stage-2 permission fault doesn't report its IPA in HPFAR_EL2,
-> __get_fault_info() recovers it with an AT S1E1R/S1E1A on FAR_EL2. If that
-> fails, kvm_hyp_handle_memory_fault() goes straight back to the guest, on
-> the assumption that the replayed access will either succeed or take a
-> fault that the slow path can handle.
-[...]
+Changes since v2 [1]:
+  - Redesigned: the takeover, the register handling, the command checks,
+    and how the tables and ITTs are taken. The new design is described
+    below, and each patch from v2 lists its changes below its ---.
+  - Restructured the patches, merging and redoing some of them.
 
-Tested on QEMU (pKVM with protected and non-protected guests, VHE and
-nVHE, and page_fault_test) and on an Apple M4 in nVHE, booting UEFI
-guests with DAMON_STAT on. On the M4 I added a trace event to the new
-branch, and it fired once in 120 boots, on a guest write to the UEFI
-flash (a read-only memslot).
+This is v3 of the ITS hardening series [1], which I'm carrying while
+Seb is on leave. Much of the design and the code were redone, so it's
+described whole here.
 
-Since a guest can livelock on this, I was wondering if it should be Cc: stable.
+The ITS writes to the memory its command queue and tables point to, and
+the host owns all of it, so host control of the ITS is a write
+primitive into hypervisor and protected-VM memory.
 
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-Tested-by: Fuad Tabba <fuad.tabba@linux.dev>
+When the hypervisor initialises, it takes ownership of each ITS's
+control frame. Inside the stop_machine() that deprivileges the host, it
+takes the command queue and tables the ITS registers point to, and the
+ITTs of the devices already mapped. If that fails, no CPU is
+deprivileged and KVM_CREATE_VM fails.
+
+From then on, every host access to the control frame traps
+(GITS_TRANSLATER stays host-mapped). The hypervisor checks each command
+before copying it into the hardware queue, takes each ITT for as long
+as its device is mapped, and writes each level-1 device table entry
+only once. A command or register write it rejects aborts the host's
+access.
+
+This is the ITS part. The redistributor part follows as its own series.
+
+A few points for discussion:
+
+  - GICv4 is off for the host in protected mode (patch 3): the vLPI
+    commands aren't emulated yet, and VMAPP's VPT_base is a host-chosen
+    address the ITS and the redistributors write to. The host loses
+    direct injection for its non-protected guests. The ITS part stands
+    on its own, and what the host gives up is a feature that is off by
+    default (kvm-arm.vgic_v4_enable).
+
+  - The hypervisor's device tracker lives in the eight pages the driver
+    gives it at setup, which hold about a thousand devices per ITS on a
+    4K host. Past that, its_create_device() fails as it would on running
+    out of LPIs. I've left growing it for when a platform needs more.
+
+  - KVM doesn't initialise in protected mode on a host with more than
+    eight ITSes, as each ITS takes one of the eight MMIO region slots
+    (patch 9).
+
+Tested on QEMU with a reproducer that writes to the ITS through /dev/mem
+from the host's userspace, as a hostile host would. The hypervisor
+rejects forged level-1 entries, out-of-range MAPTIs, MAPTIs queued after
+their device's unmap and the register writes it doesn't allow, and
+still forwards the commands queued before a rejected one.
+
+A PCIe device hot-added after deprivilege, then unbound and rebound,
+exercises publishing a level-1 entry and taking and releasing the ITT,
+and is clean under PROVE_LOCKING. Hosts with 16K or 64K pages, or with
+GICv3 and no GICv4, boot and run a non-protected guest, and
+vgic_lpi_stress passes with and without pKVM.
+
+In a debug build that caps the tracker, the driver fails the extra
+device. In one that forces the takeover to fail, the host boots and
+KVM_CREATE_VM fails. Not tested: hardware, two ITSes, and suspend and
+resume (QEMU's PSCI has no SYSTEM_SUSPEND).
+
+The series is structured as follows:
+
+  01:     MMIO donation.
+  02:     Taking host-registered MMIO regions at finalisation.
+  03-06:  Driver preparation: GICv4 off, page-aligned ITTs, the wait
+          target under the ITS lock, the shared command accessors.
+  07:     Deprivileging the host under stop_machine().
+  08-09:  The takeover: the driver's entry points, then the hypervisor
+          trapping the control frame, taking the command queue and
+          emulating GITS_CTLR and GITS_CBASER.
+  10-11:  The tables and GITS_BASER<n>, then the ITTs.
+  12:     Bounding the IDs that select what the ITS writes.
+  13:     Documentation.
+
+Based on v7.4-rc1.
 
 Cheers,
 /fuad
+
+[1] https://lore.kernel.org/all/20260807164322.2970811-2-sebastianene@google.com/
+
+Bartłomiej Grzesik (2):
+  irqchip/gic-v3: Disable GICv4 features in protected KVM mode
+  irqchip/gic-v3-its: Page-align ITT allocations under protected KVM
+
+Fuad Tabba (7):
+  irqchip/gic-v3-its: Compute the wait target under the ITS lock
+  KVM: arm64: Share the ITS command field accessors with the hypervisor
+  KVM: arm64: Deprivilege the host under stop_machine()
+  KVM: arm64: Take the ITS tables and restrict GITS_BASER<n>
+  KVM: arm64: Take the ITT for the lifetime of a device mapping
+  KVM: arm64: Reject ITS commands whose IDs are out of range
+  Documentation: KVM: arm64: Describe the ITS hardening
+
+Mostafa Saleh (1):
+  KVM: arm64: Donate MMIO to the hypervisor
+
+Sebastian Ene (3):
+  KVM: arm64: Take host-registered MMIO regions at pKVM finalisation
+  irqchip/gic-v3-its: Add the protected-KVM takeover entry points
+  KVM: arm64: Emulate the ITS command queue
+
+ .../admin-guide/kernel-parameters.txt         |   8 +-
+ Documentation/virt/kvm/arm/pkvm.rst           |  32 +
+ arch/arm64/include/asm/kvm_asm.h              |   2 +
+ arch/arm64/include/asm/kvm_hcall.h            |   2 +
+ arch/arm64/include/asm/kvm_pgtable.h          |   2 +
+ arch/arm64/include/asm/kvm_pkvm.h             |  16 +
+ arch/arm64/kvm/arm.c                          |   4 +
+ arch/arm64/kvm/hyp/include/nvhe/its_emulate.h |  16 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   5 +
+ arch/arm64/kvm/hyp/nvhe/Makefile              |   3 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |   8 +
+ arch/arm64/kvm/hyp/nvhe/its_emulate.c         | 777 ++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 130 ++-
+ arch/arm64/kvm/hyp/nvhe/setup.c               |  22 +
+ arch/arm64/kvm/hyp/pgtable.c                  |   8 +-
+ arch/arm64/kvm/pkvm.c                         | 105 ++-
+ arch/arm64/kvm/vgic/vgic-its.c                |  15 -
+ drivers/irqchip/irq-gic-common.h              |  13 +
+ drivers/irqchip/irq-gic-v3-its.c              | 256 +++++-
+ drivers/irqchip/irq-gic-v3.c                  |   8 +
+ include/linux/irqchip/arm-gic-v3.h            |  60 ++
+ 21 files changed, 1439 insertions(+), 53 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/its_emulate.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/its_emulate.c
+
+
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+-- 
+2.47.3
+
