@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793655307;
-	b=VHeU/AbfJEyBAKXnFWjJVg2+muRXOMBa3ID2WfIqnsM+yuFjL9DrTN3yTV+zg7L9fw03
-	 EhNgol2T3jPxpVh35jFJQ8md9tOm6o2z7D3YuDq9Qi2KjtNIIwU4HTlNieNtEaVTYyDmF
-	 3j295BuQMOcR5Aro7g+zF+zpIHqLogMRVTkBzvKvZ4/Oqs98wJcbNCruAmkcbZiMlXlRS
-	 lAnaAz6bYh3/gm/hJEr+ElW5iimielZ7foRI1eiJuJ8RWQ0BFVtNdbNHe9b8VQRPNQwz2
-	 O4xjmMf4nBkBbDUcAD+Q4+mrZdtxTnLoc9AberE4YpMfcqGJqiRRFTyCqMzTKCtf9Rg==
+	t=1793655311;
+	b=vedmuHlXMo+Qomrtr70VwQWgwd/4ILjmV788H0VyAJ8UxBpPUEb+DXEesDd3cJK6O62E
+	 C3HDzNpOm+CdgZQNha/ZBvEJVO+fdAFg/KRLixWuPx84ROYcw5Z0oFWgthH3fN9i/Rn+l
+	 nFW6xRJpEyxwDmtfQOEYm870zCEj5Z4ftsYwvyAqPECflEDIpLpuBvvlkBAE+yuviP0Je
+	 BD2w5z9rwXiZ1Vi1HPFDHZknuWC8US6ASgiSfiNHCn246WjPN5XE4rFPCobGFXe4kfofv
+	 dcYMb+i6IZzgCQWD4lT8g/T2O+kzAg2GV7VjeG/isrGqG1EZNtDmHf+NcjOgpGEx4cg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793655307;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793655311;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
 	 Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=dFb7iUfCIvZEd9GBgZXqiz2YQwlJPnqCRUU9ZuRiB/E=;
-	b=5itiH2o9YibxO//MO6SSftCyl92XeCZS1nLtoOR7UXAsEx2LEwSd/Pi0UbHxVG6tW9YO
-	 NGcTrvly/Ct2xlx4tUHAW24qP6eWmdGApB9Nq6vBE8MZVagDlUrT+S6iuNXu5GmYud33n
-	 rgcSbNn9RcBtG40C7Gk5VjxYtL+cyNkbWGSvlTyke+096ERN40Hnk552OnNP78A0pkYlx
-	 0YajL1GRn/rLuk9bvvd9zLtKuRbskBYMowtwjPaCPDAlBKBaFnLYoILo4zUfWOw0uYAsS
-	 jnjcW6kQhTQzP7bYT8gb2NaF6OK6QG7GWSq5Gs7iovpBepfJuXcO60L0xExCcylW55Q==
+	bh=YTdHceFIHuX2hn25hTLrg/0uXYJWfR396YcPpUWiUT0=;
+	b=g/MSQTl3z+D0+ZUNzLc6cLAszgSN5gU3OE2pXeWTp+0nHXQ+xocOYRCgMlUV0xuWISls
+	 H5SwV6RI08+I+BFVlcO6E1Mvhvd/Tpp0doI4XdPS387ZJ2+vpkF/CHALZYnqDYZupmxQL
+	 SUO2MW9+4rGMISE/X8Na5YIUF5YYtKJyrSz6xyzWfhjbPpfM/wfQAYYifk3nwlRM7HJ7F
+	 l8qExOQY0XLGMJvfmodMqbIjaT6mql7iVPwVpyp5mpRW7y/O/yKaScW/O9zWZ5n97bgvo
+	 +awz9ku5AZeQN5RUIfOI0cVHnRpDAJbNEKbKajaeQborYoJzUvXaBmfM0hvNiEUh8Iw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=TcLq00jr;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="iMq/+Shb";
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17077606A329
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 21:35:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 17077606A329
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B78B1606A326
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 21:35:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B78B1606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=TcLq00jr
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=iMq/+Shb
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7E4A21595;
-	Mon,  2 Nov 2026 13:35:03 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3E25D1595;
+	Mon,  2 Nov 2026 13:35:07 -0800 (PST)
 Received: from e133894.cambridge.arm.com (e133894.arm.com [10.2.80.62])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7C7213F673;
-	Mon,  2 Nov 2026 13:35:05 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 38CFD3F673;
+	Mon,  2 Nov 2026 13:35:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793655306; bh=2BXXxQwwdafYo44AKHXg+KQXDQYb+Ts+VimWwopDPBI=;
+	t=1793655310; bh=8C9yB5pmXzwd06VKtkpuJOCFLJcSxezaZOYd3a+Syi4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TcLq00jrjQ4TAh4RcuKdvPRqK1flEIn/BDMVJJShEBEO0wlO9qjr8YD15WkkRH1p8
-	 dVPBYk5iZuqwqrW1Nh5MZQxWR1AgDaHLg6MF2vzVhX2KtSFHD+8nAzhgNMDPvf3xXd
-	 9f8zEgqZEju8CNgoTpSDG8qeKp6nwPaD0iW0jq30=
+	b=iMq/+Shb7TJSwGxwdj3ICOAAqXqEa1SXonURkhisYrY17r0jG7xj1usiUfg+k3fOD
+	 e89klJLdRaeiSwTdZfAoySfCpZxCzj5kea8QW+h1b6PCSPZHjskuUjqXQ+EiuXCXjf
+	 ojxFgG0ec9ZLGSSCuVIFITvgLKss0lMYJvD0xSvM=
 From: Sascha Bischoff <sascha.bischoff@arm.com>
 To: will@kernel.org,
 	julien.thierry.kdev@gmail.com
@@ -51,9 +51,9 @@ Cc: vladimir.murzin@arm.com,
 	kvmarm@lists.linux.dev,
 	timothy.hayes@arm.com,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH kvmtool v4 11/23] arm64: Describe the PMU interrupt for GICv5
-Date: Mon,  2 Nov 2026 21:34:01 +0000
-Message-Id: <20261102213413.4136118-12-sascha.bischoff@arm.com>
+Subject: [PATCH kvmtool v4 12/23] arm64: Describe timer PPIs for GICv5
+Date: Mon,  2 Nov 2026 21:34:02 +0000
+Message-Id: <20261102213413.4136118-13-sascha.bischoff@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261102213413.4136118-1-sascha.bischoff@arm.com>
 References: <20261102213413.4136118-1-sascha.bischoff@arm.com>
@@ -68,52 +68,48 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Use the GICv5 PPI specifier in the DT. KVM also expects the PMU IRQ
-attribute to contain the GICv5 interrupt type in the upper bits, so
-encode it before setting KVM_ARM_VCPU_PMU_V3_IRQ.
+GICv5 DT specifiers use absolute PPI numbers due to having separate
+namespaces for the different interrupt types. Keep the existing
+GICv2/v3 specifiers by subtracting the legacy PPI base for those
+irqchips.
 
 Tested-by: Vladimir Murzin <vladimir.murzin@arm.com>
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- arm64/pmu.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ arm64/timer.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/arm64/pmu.c b/arm64/pmu.c
-index ef7faca1..b3026d50 100644
---- a/arm64/pmu.c
-+++ b/arm64/pmu.c
-@@ -214,16 +214,17 @@ static int find_pmu(struct kvm *kvm)
- void pmu__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+diff --git a/arm64/timer.c b/arm64/timer.c
+index 2ac6144f..01b9875c 100644
+--- a/arm64/timer.c
++++ b/arm64/timer.c
+@@ -9,16 +9,18 @@ void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm)
  {
- 	const char compatible[] = "arm,armv8-pmuv3";
-+	int irq = KVM_ARM_PMUv3_PPI;
-+	u32 irq_prop[3];
+ 	const char compatible[] = "arm,armv8-timer\0arm,armv7-timer";
  	u32 cpu_mask = gic__get_fdt_irq_cpumask(kvm);
--	u32 irq_prop[] = {
--		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
--		cpu_to_fdt32(KVM_ARM_PMUv3_PPI - 16),
--		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_HIGH),
--	};
+-	int irqs[5] = {13, 14, 11, 10, 12};
++	const int irqs[5] = { 29, 30, 27, 26, 28 };
+ 	int nr = ARRAY_SIZE(irqs);
+ 	u32 irq_prop[nr * 3];
++	u32 type = gic__get_ppi_fdt_type();
++	int ppi_base = gic__get_ppi_base();
  
- 	if (!kvm->cfg.arch.has_pmuv3)
- 		return;
+ 	if (!kvm->cfg.arch.nested_virt)
+ 		nr--;
  
-+	irq_prop[0] = cpu_to_fdt32(gic__get_ppi_fdt_type());
-+	irq_prop[1] = cpu_to_fdt32(irq - gic__get_ppi_base());
-+	irq_prop[2] = cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_HIGH);
-+
- 	_FDT(fdt_begin_node(fdt, "pmu"));
- 	_FDT(fdt_property(fdt, "compatible", compatible, sizeof(compatible)));
- 	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
-@@ -248,6 +249,8 @@ int pmu__init(struct kvm *kvm)
- 		}
+ 	for (int i = 0; i < nr; i++) {
+-		irq_prop[i * 3 + 0] = cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI);
+-		irq_prop[i * 3 + 1] = cpu_to_fdt32(irqs[i]);
++		irq_prop[i * 3 + 0] = cpu_to_fdt32(type);
++		irq_prop[i * 3 + 1] = cpu_to_fdt32(irqs[i] - ppi_base);
+ 		irq_prop[i * 3 + 2] = cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW);
  	}
  
-+	irq = gic__encode_ppi_irq(kvm->cfg.arch.irqchip, irq);
-+
- 	for (i = 0; i < kvm->nrcpus; i++) {
- 		vcpu = kvm->cpus[i];
- 		set_pmu_attr(vcpu, &irq, KVM_ARM_VCPU_PMU_V3_IRQ);
+@@ -30,4 +32,3 @@ void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ 		_FDT(fdt_property_cell(fdt, "clock-frequency", kvm->cfg.arch.force_cntfrq));
+ 	_FDT(fdt_end_node(fdt));
+ }
+-
 -- 
 2.34.1
 
