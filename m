@@ -1,74 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.72
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.70
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793652425;
-	b=nHYJHPWBjfTIPtEJUmKJrIF3JyJ3hGQA+rDJz/ytEEPrINDyBVF11VAuNXEwZNiVXYLX
-	 WnHFj4mowCza3TNpwFrcpdsLReV4LovbLwFvVessslH9Teqqs6mMcKu7oqQ7WCAccc4vT
-	 Ei6Cc6t0wiA23/dUSvlqqtA9/gfpBuO9MmbkdsdEA6IQDXR8/TqJwUcTG1RLcP7X392ja
-	 ytEEEtSJhRB1nuNuK+lGGB4mL5eyt8B3THH7n/ZtC/bd1VV3V4zXRJ/OmlDJjxUHxskqm
-	 bcNSmQko3CSRKRMdYNrJ4r8wVzYWl9aii13KvYMm6/VPVuElJ6iXa6D0694OwbtkJDA==
+	t=1793652426;
+	b=mkNuS9j77oTSC2IwiMkMcApmhUchjZKOg6KUYHLXUjpeadLo2ZEvXaXnuNBCzKNj62ry
+	 3EqUNXglVPOENUB+JZtv/HS71cMBv3ZMq2Ul0a7WQ/aPN+EuhGSgkBjarE+TcNmMrrBY6
+	 GmSYamzKlRcQfnlGH0YqWvNk8bis+leaUmmtKmsGRpcJLRZEIyLeNJFbrqzhIrfqVPw5j
+	 FKrcEUk8TUdE4WndHdg+5NF+iSutPyRIO7B4dtT9w/yENuhMqLH1aDXuLfZr5EBfyzb4r
+	 abypmEmJ1weYgWCOB+ptK/02QClcUO9SugaTVph7AYI2N5Lnl+JftSlbi5NVqTguoxQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793652425;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793652426;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
 	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
 	 Content-Type;
-	bh=DdPclGcz/C8ziGiUWCbTieOEXG2PqBiYeYgzWvSzdrs=;
-	b=O23hZWArG3LR/2/CzikAsvQQrp7Uq1wOiRA28fcTTIUyYb8W0a27/BP4Unnbaj3Zuik0
-	 PnlE/4O0g4i7OPFT53dEzOo59RrnQ1Khyms2KsL1Y76XBLsq5aJWSXbI/YmbrlJNurMIE
-	 gJ1OvgNSpVUuTI0zN7UbB9vfw/EK+eCFutdxS8q/iRWYmfSaa6MX6XNHk5QpZCtuzfZtM
-	 yolYVvRhaR7ldWr1r7d25eYj/Qn/UZbFunTJQhdGwyRHd2SdZyXtxrmVlCtY/0mhy1e4I
-	 KUyjDe4WyecNyGWvcgsNvqZTL4ChNQmIL4IHEa+VETJh6hJiSBb2ip7+wNX11N3XQcg==
+	bh=M0SPwlooo8QFrnwNZf/PyV+WJMNWJ9T5R+ygx0SnAo4=;
+	b=XzyhLHXYiBsjTpC58z8mG0nVAarABUxIhGDMAEaGL8s0rsZEPwmxGsptQLlBICbv8gXA
+	 O++Zw4si2GYTrq60Ao0RthsiE/Y6oFPSYLg1Ro5aVqXK/fwe5DAXl5Y/GCtyyJqt6HAlA
+	 YEE6YBvpcyM56lt4SYSAZxJHZGTahlpNSwhtU8kxKaOuyPS/f+X7FckWKOR3sY/ueZjb0
+	 x4sBLB8CdaRECHkGVE2kppOS8DXUe+D2qOSfQH3i/iBeewgK4upEMSOpNGg/yqYM4dzEH
+	 14pz0EXx068KnpJQKFGjyVypjz6pFqdrYe+Lxcu+3WNb0vgYGhA/vYg60wNZDft2Vfw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=GyxeC3DY;
-	arc=none smtp.remote-ip=209.85.128.72
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=moWdyy5j;
+	arc=none smtp.remote-ip=209.85.221.70
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39CA6606A329
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 20:47:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 39CA6606A329
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62311606A326
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 20:47:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 62311606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=GyxeC3DY
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4a1fa972b4fso17344995e9.2
-        for <kvmarm@lists.linux.dev>; Mon, 02 Nov 2026 12:47:04 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=moWdyy5j
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-48e1ad3cb66so2419288f8f.3
+        for <kvmarm@lists.linux.dev>; Mon, 02 Nov 2026 12:47:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1793652423; x=1794257223; darn=lists.linux.dev;
+        d=google.com; s=20260707; t=1793652425; x=1794257225; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=DdPclGcz/C8ziGiUWCbTieOEXG2PqBiYeYgzWvSzdrs=;
-        b=GyxeC3DYtPgukq79mMz445Mr4pSYPGQbaZiZlZDL3IVXsa39FOYiUpVYZiAXIJP/8E
-         7mtrJUUwWJvSOvZY1IAkXVwLw0lrtqgyu1ald/rxovneES/tsYJAY+1zg48n47XinWLu
-         xDnDpxUY8fzFaBfVYwDOqjKvKcJWOs7KwoZoiDMYVwz47tRnJFCalkmVTQ5+aRxI8uD+
-         AD9RMdmwTUxKivtRo4mCmv7iwYpt3QA3cLwFra2JcH2A20TvJkJUyMWPds/C7RxE41bz
-         +fMWTzBSu6IX5YqXntMlAfaVMAKkjYXJMfxY8yoUYpSr93zkQ+2H2OqMi6ZsYdHa/XPg
-         DD/w==
+        bh=M0SPwlooo8QFrnwNZf/PyV+WJMNWJ9T5R+ygx0SnAo4=;
+        b=moWdyy5jCJx+ZgC4dJXwPK1AIgL5Xc7+WIIm9eIWdyqJ5VY/mBXntrThNzAUrsGKhx
+         nqCbqZtDkClTDgd60CB2XDxczJ+HcehkeYRwvNXYdTSlW02wDPp5mIKxSOq8nfmH5GHB
+         0oC3W37QQ/6OLLiJ4o8H6nLjBmXHT9YWURt4rcHKO6PdVXXHFjjMRVmxW9u4hazd9mad
+         xsPkK6Px/YqPGmpp+DG/W1Hyu6Rr4jknElxE6f1RjKZ1vA4PyV01TH2W//ndnUVqv9OV
+         cA2mJosTWMx8hGoHMPOs2jlPNKooLAt1velj/YJE94TvanglNEwNLxg+uEKJwWorziBn
+         16OA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793652423; x=1794257223;
+        d=1e100.net; s=20260707; t=1793652425; x=1794257225;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=DdPclGcz/C8ziGiUWCbTieOEXG2PqBiYeYgzWvSzdrs=;
-        b=abEO0lJINTWyma9pp6U9VW4/0rQIBg0pKyWKX4LbHezMmRTjTsjepSg2BjOBNRaYzV
-         MrjLhDQGTGMrMRw53MVC1F0odM69lW5qfIf/g4HnwYOeMgKaJcTBXLNt1JSfqPhjoU9H
-         pFPzhMT+U7M02Lo6s3fKxvOApfd3nzDXxq+5f9Sm5Y5fTN1ohq6KWRfxu8OfG2e1vATh
-         gOIRyKITPyUOBhzVvCKAaE23yYruPLmLdsONsjVvhaAK3iYibw0ZvuRLclk8ihTpkcSQ
-         B6VlLT7SW98vuBbuTnzzYkCHSVmQJ1St8epv6s83qKufjtnlqvtcWuFNGvQEenpeQygN
-         R18Q==
-X-Forwarded-Encrypted: i=1; AKwUvBxm69+/zS3k+s+qcdVDKG79YDduD0bQrSW4A2zRlhryTBsyNaqKSaiKYrsuIqQiVS8UMdhTFZY=@lists.linux.dev
-X-Gm-Message-State: AFq9FYJ1aaQN9M5K1nfSG/yf0x6LN9ti8l/jjLcJGL1dF4PvPT0jYXKO
-	fZ4K4yc5bWl08wSLtJroedk1t2XZLpWgpMOikAUtzOQzsWNMLwuJ3GIIoma7Dur8h2JSOEvMXDd
-	uKWSt2D7l0bB6ANGaJ9Ixwg==
-X-Received: from wmco7.prod.google.com ([2002:a05:600c:a307:b0:4b2:2ec5:89f8])
+        bh=M0SPwlooo8QFrnwNZf/PyV+WJMNWJ9T5R+ygx0SnAo4=;
+        b=14eQgBE4M7LDXKWdapUAAnDLE15zpOGoMzB9WjifJlRhD29NzBAV+Yd6VdpZHijwp0
+         y5TrayIVfvorTWE0iC4pSSLPdjAykvycL3Dnk2XQJZTcex39j7R82rZ7+7ulATbfwd3u
+         A11htCYPHfijXR5ZpWavfT/W7h/Bk7OojFY5mew0aRWopSPh0IASEA8x3xQff3k1hZHD
+         B6zJ/WmWXbsmHx4LKDeHHOnJ+pugto4EjJyiK1Koi1s7Woqv2rZVilsQQ/QaS4Bqc9V8
+         cFsJBbek25ofczd7RLoLJuggwa+yn5uvwGAoFm8+vd1xYEBvFJnukzemB3qSNONzwRuR
+         1LiQ==
+X-Forwarded-Encrypted: i=1; AKwUvBzzEdm/bQ36ZxhqrsLwQ8UyDC3DTh7hTdIn3QJ4PJf7iB0SrT54/yZVtabuWgEDjrOM5sfem7E=@lists.linux.dev
+X-Gm-Message-State: AFq9FYL4lHGfgn5qBMxgKuif1aPhhwrsV/rPF3XOx9NODKHvBgAaPFAy
+	HyIpbAsogQAEsHyXShc8brFE6HjBhiLEFznlY+UJorSgNfGJFix07xZbhjiZHOoRnM/6fiQwMra
+	zGbCjW71pLgeB0FLGnP+JFg==
+X-Received: from wrxm15.prod.google.com ([2002:a05:6000:8f:b0:48d:ed12:7c4c])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:6992:b0:4a1:a2c0:7b73 with SMTP id 5b1f17b1804b1-4ac18992c01mr253389695e9.30.1793652423340;
- Mon, 02 Nov 2026 12:47:03 -0800 (PST)
-Date: Mon,  2 Nov 2026 20:46:07 +0000
+ 2002:a05:600c:34cf:b0:4a1:dbdf:17a8 with SMTP id 5b1f17b1804b1-4ac150b3d01mr268972445e9.2.1793652424698;
+ Mon, 02 Nov 2026 12:47:04 -0800 (PST)
+Date: Mon,  2 Nov 2026 20:46:08 +0000
 In-Reply-To: <20261102204628.401871-1-vdonnefort@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,9 +81,8 @@ Precedence: list
 Mime-Version: 1.0
 References: <20261102204628.401871-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.56.0.385.gac671c819a-goog
-Message-ID: <20261102204628.401871-3-vdonnefort@google.com>
-Subject: [PATCH v3 02/23] KVM: arm64: Propagate host stage-2 annotated entries
- on block split
+Message-ID: <20261102204628.401871-4-vdonnefort@google.com>
+Subject: [PATCH v3 03/23] KVM: arm64: Allow block-level stage-2 annotation
 From: Vincent Donnefort <vdonnefort@google.com>
 To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -93,50 +92,45 @@ Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
 	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Propagate ownership refcounts for invalid stage-2 entries mapped on
-block split. This intends to allow splitting host stage-2 blocks while
-keeping existing page ownership and metadata annotations.
+On host to guest donation, pKVM annotates the host stage-2 invalid
+entries with the GFN. Now that the host stage-2 preserves annotations on
+block split, we can allow these annotations at block-level. This enables
+safe support for guest stage-2 huge mappings.
+
+Allowing block-level annotations also reduces stage-2 fragmentation when
+unmapping a huge region, and reduces host stage-2 memory usage by
+avoiding the allocation of intermediate page tables.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 ---
- arch/arm64/kvm/hyp/pgtable.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/hyp/pgtable.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index dfbcdd3d91a4..bf5c8e75dd52 100644
+index bf5c8e75dd52..abd32e94f6ff 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1035,14 +1035,15 @@ static int stage2_map_walk_table_pre(const struct kvm_pgtable_visit_ctx *ctx,
- static void stage2_map_prefault_idmap(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t *ptep)
- {
- 	kvm_pte_t block_pte = ctx->old;
--	bool counted;
-+	bool counted, valid;
- 	u64 pa;
- 	int i;
+@@ -949,9 +949,6 @@ static bool stage2_leaf_mapping_allowed(const struct kvm_pgtable_visit_ctx *ctx,
+ 	if (data->force_pte && ctx->level < KVM_PGTABLE_LAST_LEVEL)
+ 		return false;
  
--	if (!kvm_pte_valid(block_pte))
--		return;
+-	if (data->annotation)
+-		return true;
 -
- 	counted = stage2_pte_is_counted(block_pte);
-+	valid = kvm_pte_valid(block_pte);
-+
-+	if (!valid && !counted)
-+		return;
+ 	return kvm_block_mapping_supported(ctx, phys);
+ }
  
- 	/*
- 	 * Shared walks not supported: cannot rollback refcounts on break
-@@ -1053,7 +1054,9 @@ static void stage2_map_prefault_idmap(const struct kvm_pgtable_visit_ctx *ctx, k
- 
- 	pa = ALIGN_DOWN(ctx->addr, kvm_granule_size(ctx->level));
- 	for (i = 0; i < PTRS_PER_PTE; ++i, ++ptep, pa += kvm_granule_size(ctx->level + 1)) {
--		kvm_pte_t pte = kvm_init_valid_leaf_pte(pa, block_pte, ctx->level + 1);
-+		kvm_pte_t pte = valid ?
-+			kvm_init_valid_leaf_pte(pa, block_pte, ctx->level + 1) :
-+			block_pte;
- 
- 		/*
- 		 * Skip ptes in the range being modified by the caller if we're
+@@ -1180,8 +1177,9 @@ int kvm_pgtable_stage2_annotate(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 	struct stage2_map_data map_data = {
+ 		.mmu		= pgt->mmu,
+ 		.memcache	= mc,
+-		.force_pte	= true,
+ 		.annotation	= true,
++		/* Pretend ID-mapped for kvm_block_mapping_supported() */
++		.phys		= ALIGN_DOWN(addr, PAGE_SIZE),
+ 		.pte_annot	= pte_annot |
+ 				  FIELD_PREP(KVM_INVALID_PTE_TYPE_MASK, type),
+ 	};
 -- 
 2.56.0.385.gac671c819a-goog
 
