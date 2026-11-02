@@ -1,73 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793638371;
-	b=IGt7OXi2aFis428LzgKnYy3ySRiZ2Une8fCNK+O/ce5JNf6ZSVcXp8or+hszN9UkEvXe
-	 EuInZkQrhb8kmXeNzl6UdzJz7RCbbzBO3Va7XyG4nIfRf9ziKeKOzzSbMEzCZ00hPxo8W
-	 4e+6naYS7l+5IOsqZOtf2BfHNSQm4Su1xXYXouUnJnbzKfjDRQ4j6L98UUj8PwLxwrM3Q
-	 /nLSnEhLlncqYXuuKlkBqB48IvDLddjrVg5+J6i+TqopIsub2Jh2YMSHm5rgu0TGAmNsU
-	 Cfh94JkRQC/bSWy9uN8x1RW7qtdl1q0ObjPu+bR21BrbEpa1ALGMy9DNx0dO39frCWQ==
+	t=1793638924;
+	b=uAWU/u7BrsG1fUVUcuDCEdKuChcBMlG0QKs3rgHMvnD41nl9ZDgr67fRuB4KVuZoS403
+	 NwhBW6apZcG89PnMqKWD8bOducZrfpXh/38TRiCjliDMRcrImKksZtJgtsbGaXJS6Hl7t
+	 ivHtPEIDsDm/m1e4gHO4VEjio+FjVdeDA4e+pfkNitRB7zxfFhJC9ymdSFpTcS+8Szq2p
+	 kax4jiU9vHfM2+raV/S+xkx+XOpqdxO/lLxwA+uIk3PZawdbE3qFUQAVrouWeglZsIGIl
+	 RtN1v/QigD5ESOqM0P/N8bSCMrVoagha57/Z6Tk8goZkfkyDFpA7tA6wW3yp6+I7yIQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793638371;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=BZ5RmFxRoz8rcy8X7QXJx9lbysA5ICz4SCKVtxX405I=;
-	b=afFpwAV25UfoVdxqPduQ6Ss5bqOXlpTmZBIR2WdD2RmE+CF74/d8NUQkVfPAavup83QI
-	 gl6mpikny4+NWHz/2nBAGj0LKbKtn1Op5aNL5PS6Px8hejZzqJPh512gocgE6y73UYUWF
-	 K4MNuv0g3gwMiWyZkroFG7tIs1NAa8Uwvji69Z47Oxswf0rwpFAOHONOxdD6wkvmySSwQ
-	 JQzXweqLHGrxJJ9l6yLYTamUQzhSj5zADegbIA6TpaGg0+w5t4nqMrxL2FRkl6BrNE3x3
-	 gKG6TKOUKNEiWExbuDGw34ptNKgthXo0Y9KRLNamjkyD6wgtxRzBM+sdZdI+6eUFwJQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793638924;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
+	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=bpH9MkRAZiC53uZXlhyRKBkxR5xRQR1vmni4kZzNvpA=;
+	b=LZo3q71Hf/5bkhq0TeAyOhZBoAvey/1bnh8fGbor3/ONXrPDVwQabMSpqSucs5CQWoSu
+	 GpdtRzcdil80SbFKOiCUsEQTxMXy3bjb1ILl+L2ODMJ5WDQF/7UPrjKYgYUpyS6M95IKr
+	 d/YlYu6Isrdz4QU548wehgs5zAHGs+OGQnz//Dokb/cohGO6337YsLTVzIGPRSltcJUa7
+	 pSciPivNZZrb7dRGb3IuE/Xykr5I8ccllPp4E3tY3ATsjYrTwndNpQJHGjpKfKQZRLyGQ
+	 6anB/iqeD9ArmTkg7mOzhYurFTLMUH145t3oyOtag7ErZ7Jf6UDfXLebmmS74EgsOqQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NkrBxRCM;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0AB606E00B
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 16:52:51 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=nYDGH9IB;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97AB606F3DE;
+	Mon,  2 Nov 2026 17:02:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E97AB606F3DE
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NkrBxRCM
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78F5B1F00A1D;
-	Mon,  2 Nov 2026 16:52:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793638371;
-	bh=BZ5RmFxRoz8rcy8X7QXJx9lbysA5ICz4SCKVtxX405I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=NkrBxRCMP6tQJNMDILPONUCfTdDs4GJu675qFwgE0O2s30ln4ywM9gteok7RdWdAc
-	 Fw1ZCnHHgI3z8YY1kL2eE+84CYz/UncCSA3Cl1KwTsvepIYa8bKoPKyvl8CHf6BFyK
-	 Ahng0UjLEjtMMFcI23CLSgjy9aEQwmKkk49DfTlh5h0ZEJO3J6Evuo+1ievc1RehAx
-	 dZGexaiRA6HL+eIr0ZK7VRQ1YJo4KDESPOeEe/LU1MnUBIabMKh/6cNpdBtUZiTu5Q
-	 +YrVpzGOxC9sJ3T4ZaqkyvWqzReColK/vWhYtFQoascasJLSyWwvVRSo6woGqm6r4d
-	 IeUpa4Ox4cbsw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xNvH7-00000009z5S-1qpv;
-	Mon, 02 Nov 2026 16:52:49 +0000
-Date: Mon, 02 Nov 2026 16:52:48 +0000
-Message-ID: <86bj872n1b.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: 	Ard Biesheuvel <ardb@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Will Deacon <will@kernel.org>,
-	Ard Biesheuvel <ardb+git@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Don't livelock when AT can't resolve a fault IPA
-In-Reply-To: <CA+EHjTxVPyY70Dm+BiwgQQNwx1cJpEKvJBJGZWPCKLx2M8X2FA@mail.gmail.com>
-References: <20261102094748.2638468-2-ardb+git@google.com>
-	<auiXMN5td-2QlDkd@willie-the-truck>
-	<CA+EHjTxVPyY70Dm+BiwgQQNwx1cJpEKvJBJGZWPCKLx2M8X2FA@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=nYDGH9IB
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BE33A16F3;
+	Mon,  2 Nov 2026 09:01:58 -0800 (PST)
+Received: from [10.57.58.9] (unknown [10.57.58.9])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F10C83F59E;
+	Mon,  2 Nov 2026 09:02:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793638921; bh=E9jNczzchk5nHtI0CgVSTbFnwcvfP7xLsfmDy95J5TI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=nYDGH9IBV5B8LPpqW6tP4xAjJO9W19nd1DYv9I4nTTI5W+6UCqTuKXWi/Qst8LFSi
+	 hP7+J/AsSNIRBGUquck3lr3ycA04Ut4VYaal8plplh1VkM9n+ASRvMm3zumxl6gEdP
+	 7nqaO74SBk+j5J9Xi984sCJl9sU2t6KRNdSScrCI=
+Message-ID: <be11184a-909c-4fed-83b7-90ff6d3aac28@arm.com>
+Date: Mon, 2 Nov 2026 17:01:58 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -76,81 +52,235 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ardb@kernel.org, fuad.tabba@linux.dev, will@kernel.org, ardb+git@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 07/11] KVM: arm64: CCA: Tear down RTTs
+To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
+References: <20261102141304.126883-1-steven.price@arm.com>
+ <20261102141304.126883-8-steven.price@arm.com>
+ <sashiko-outbox-193650@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <sashiko-outbox-193650@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, 02 Nov 2026 15:57:51 +0000,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
+On 02/11/2026 15:18, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 4 potential issue(s) to consider:
+> - [High] KVM: arm64: stage-2 PGD leak for uncreated Realms in kvm_destroy_realm()
+> - [High] KVM: arm64: unclamped stage-2 levels in get_start_level() breaks 64K RTT teardown
+> - [High] KVM: arm64: free_rtt() accounts page table pages after freeing the page
+> - [Medium] KVM: arm64: kvm_realm_uninit_stage2() ignores REALM_STATE_NEW
+> --
 > 
-> Hi Will,
+> commit 5954ac2ccf8825a659e2f39dc0db05d96c40be84
+> Author: Steven Price <steven.price@arm.com>
 > 
-> On Mon, 02 Nov 2026 14:17:10 +0000, Will Deacon <will@kernel.org> wrote:
-> > On Mon, Nov 02, 2026 at 02:09:25PM +0000, Marc Zyngier wrote:
-> > > On Mon, 02 Nov 2026 13:59:12 +0000,
-> > > Will Deacon <will@kernel.org> wrote:
-> [...]
-> > > > > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> [...]
-> > > > >  static inline bool kvm_hyp_handle_memory_fault(struct kvm_vcpu *vcpu,
-> > > > >                                                 u64 *exit_code)
-> > > > >  {
-> > > > > -        if (!__populate_fault_info(vcpu))
-> > > > > +        if (!__populate_fault_info(vcpu)) {
-> > > >
-> > > > Presumably we need a barrier (DSB?) here, to ensure that the TLBI happens
-> > > > after the AT instruction?
+> KVM: arm64: CCA: Tear down RTTs
 > 
-> I don't think the TLBI requires a barrier before it, because it
-> doesn't matter if the AT's walk allocates entries after the TLBI.
-> Anything it allocates matches memory, and the stage-2 descriptor the
-> AT faulted on has AF clear, so that descriptor can't be cached:
+> This commit adds stage-2 page table and Realm Translation Table (RTT)
+> teardown for arm64 CCA realms. It unmaps the Realm IPA space during stage-2
+> teardown and walks non-root RTTs during final Realm destruction to destroy
+> and undelegate them before destroying the Realm Descriptor.
 > 
-> R_XCLRD: Translation table entries that generate a Translation
-> fault, an Address size fault, or an Access flag fault are never cached
-> in a TLB.
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index b049ea67d9af3..51fda7b2ff7f3 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -1145,9 +1145,24 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+>>  	return err;
+>>  }
+>>  
+>> +static void kvm_realm_uninit_stage2(struct kvm_s2_mmu *mmu)
+>> +{
+>> +	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+>> +
+>> +	mutex_lock(&kvm->arch.config_lock);
+>> +	if (kvm_realm_state(kvm) == REALM_STATE_ACTIVE) {
+>> +		kvm_set_realm_state(kvm, REALM_STATE_DYING);
+>> +		WARN_ON(kvm_realm_teardown_stage2(kvm));
+>> +	}
+>> +	mutex_unlock(&kvm->arch.config_lock);
+>> +}
 > 
-> The stale entries the guest keeps hitting were already there before
-> the TLBI, and the dsb(nsh) and isb after it are what complete it
-> against them.
+> [Severity: Medium]
+> What happens if kvm_uninit_stage2_mmu() is called via
+> kvm_mmu_notifier_release() -> kvm_flush_shadow_all() ->
+> kvm_arch_flush_shadow_all() while the Realm is in REALM_STATE_NEW?
 > 
-> [... your other reply ... ]
-> > > Alternatively, VMALLE1 or even VAE1 should be enough to get rid of the
-> > > S1 TLB.
-> >
-> > Ah, sorry, VMALLE1 is what I meant to ask about. I basically haven't
-> > understood the need to invalidate the stage-2.
+> According to enum realm_state in arch/arm64/include/asm/kvm_rmi.h, the Realm
+> Descriptor has already been created and stage-2 memory may already be
+> populated in REALM_STATE_NEW. Unlike kvm_destroy_realm(), which checks
+> kvm_realm_is_created(kvm), sets REALM_STATE_DYING, and unmaps stage-2 for
+> both REALM_STATE_NEW and REALM_STATE_ACTIVE, kvm_realm_uninit_stage2() only
+> checks for REALM_STATE_ACTIVE.
 > 
-> The guest's walk can also go through a stage-2 entry for its
-> page-table page, cached before the aging cleared that page's AF, and
-> nothing requires the AT to use that entry:
-> 
-> R_NPZWX: When an address translation instruction is executed, it is
-> IMPLEMENTATION DEFINED whether the result can be returned from a TLB,
-> or a translation table walk occurs.
-> 
-> So if my reading is correct, on a CPU whose AT walks memory instead,
-> the AT keeps failing while the guest's walk goes through the stale
-> entry, and the guest takes the same permission fault again. VMALLE1
-> and VAE1 only cover stage 1, so they'd leave that loop in place.
+> Should kvm_realm_uninit_stage2() also handle REALM_STATE_NEW (for example by
+> checking kvm_realm_is_created(kvm)) so that stage-2 mappings are unmapped
+> before exit_mmap() finishes and the Realm transitions to REALM_STATE_DYING?
 
-If we assume that the TLB covers VA->PA (which is a very likely case),
-TLBI VAE1 should nuke the permission fault that brought the vcpu to
-EL2, and instead walk the page tables, getting the access fault.
+Yes we should handle REALM_STATE_NEW. I'm not convinced about using
+kvm_realm_is_created(). That would include REALM_STATE_DYING.
 
-The only case I can imagine where invalidating S2 would matter is if
-you are running under NV, because there is an independent S2 TLB (the
-shadow S2), and then VMALLS12E1 makes total sense.
+>>  void kvm_uninit_stage2_mmu(struct kvm *kvm)
+>>  {
+>> -	kvm_free_stage2_pgd(&kvm->arch.mmu);
+>> +	if (kvm_vm_is_realm(kvm))
+>> +		kvm_realm_uninit_stage2(&kvm->arch.mmu);
+>> +	else
+>> +		kvm_free_stage2_pgd(&kvm->arch.mmu);
+>>  	kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
+>>  }
+> 
+> [Severity: High]
+> Does skipping kvm_free_stage2_pgd() here leak mmu->pgt, the root stage-2 PGD
+> pages (mmu->pgt->pgd), and the per-CPU mmu->last_vcpu_ran allocation when a
+> Realm VM is destroyed before the Realm is created in the RMM?
+> 
+> During VM creation, kvm_arch_init_vm() calls kvm_init_stage2_mmu() while the
+> Realm state is still REALM_STATE_NONE. If userspace closes the VM file
+> descriptor without creating the Realm in the RMM, kvm_destroy_realm() takes
+> its early return before reaching kvm_free_stage2_pgd(&kvm->arch.mmu):
+> 
+> arch/arm64/kvm/rmi.c:kvm_destroy_realm() {
+> 	...
+> 	if (!kvm_realm_is_created(kvm)) {
+> 		kfree(realm->sro);
+> 		realm->sro = NULL;
+> 		return;
+> 	}
+> 	...
+> 	kvm_free_stage2_pgd(&kvm->arch.mmu);
+> }
+> 
+> Similarly, if kvm_init_nested() or kvm_init_realm() fails in
+> kvm_arch_init_vm() after kvm_init_stage2_mmu() succeeds:
+> 
+> arch/arm64/kvm/arm.c:kvm_arch_init_vm() {
+> 	...
+> 	ret = kvm_init_nested(kvm);
+> 	if (ret)
+> 		goto err_uninit_mmu;
+> 
+> 	if (kvm_vm_is_realm(kvm)) {
+> 		ret = kvm_init_realm(kvm);
+> 		if (ret)
+> 			goto err_uninit_mmu;
+> 	}
+> 
+> 	return 0;
+> 
+> err_uninit_mmu:
+> 	kvm_uninit_stage2_mmu(kvm);
+> 	return ret;
+> }
+> 
+> the error path only calls kvm_uninit_stage2_mmu(kvm) and never calls
+> kvm_destroy_realm(), leaking the stage-2 PGD allocations there as well.
 
-Ard, was this solely observed under NV? Or did you see it on a non NV
-guest as well?
+Here I think using kvm_realm_is_created() make sense. Once the realm is
+up we want to "skip" kvm_free_stage2_pgd() because we need the RMM to
+tear things down first.
+
+>> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+>> index 45ecbaa467d1d..f190143b33ba5 100644
+>> --- a/arch/arm64/kvm/rmi.c
+>> +++ b/arch/arm64/kvm/rmi.c
+> 
+> [ ... ]
+> 
+>> @@ -21,11 +29,180 @@ u32 kvm_rmm_ipa_limit(void)
+>>  	return u64_get_bits(rmi_feat_reg(0), RMI_FEATURE_REGISTER_0_S2SZ);
+>>  }
+>>  
+>> +static int get_start_level(struct realm *realm)
+>> +{
+>> +	return 4 - stage2_pgtable_levels(realm->ia_bits);
+>> +}
+> 
+> [Severity: High]
+> Can get_start_level() return a level that mismatches the stage-2 page table
+> configuration on 64KB page kernels and cause realm_destroy_rtts() to fail?
+> 
+> When kvm_init_ipa_range() configures mmu->vtcr via kvm_get_vtcr(), the
+> number of stage-2 levels is clamped to at least 2:
+> 
+> arch/arm64/kvm/hyp/pgtable.c:kvm_get_vtcr() {
+> 	...
+> 	lvls = stage2_pgtable_levels(phys_shift);
+> 	if (lvls < 2)
+> 		lvls = 2;
+> 	...
+> }
+> 
+> Under CONFIG_ARM64_64K_PAGES with a 32-bit or 33-bit IPA,
+> stage2_pgtable_levels(realm->ia_bits) evaluates to 1, so get_start_level()
+> returns 3 (KVM_PGTABLE_LAST_LEVEL) instead of 2.
+> 
+> When kvm_destroy_realm() -> realm_destroy_rtts() ->
+> realm_tear_down_rtt_range() then calls:
+> 
+> 	realm_tear_down_rtt_level(realm, get_start_level(realm) + 1,
+> 				  start, end);
+> 
+> it passes level 4 into realm_tear_down_rtt_level(), hitting
+> WARN_ON(level > KVM_PGTABLE_LAST_LEVEL) and returning -EINVAL. That in turn
+> causes kvm_destroy_realm() to warn and return early, leaking the delegated
+> RD, RTT granules, root stage-2 PGD pages, and realm->sro.
+
+Good spot - yes get_start_level() should do the same clamping to a min of 2.
+
+>> +
+>> +static void free_rtt(phys_addr_t phys)
+>> +{
+>> +	if (rmi_free_delegated_page(phys))
+>> +		return;
+>> +
+>> +	kvm_account_pgtable_pages(phys_to_virt(phys), -1);
+>> +}
+> 
+> [Severity: High]
+> Does calling kvm_account_pgtable_pages() after rmi_free_delegated_page()
+> access the page after it has already been freed and uncharged from its
+> memcg?
+> 
+> In drivers/firmware/arm_rmm/rmi.c, rmi_free_delegated_page() undelegates the
+> granule and immediately frees the page back to the page allocator:
+> 
+> drivers/firmware/arm_rmm/rmi.c:rmi_free_delegated_page() {
+> 	if (WARN_ON_ONCE(rmi_undelegate_page(phys))) {
+> 		/* Undelegate failed: leak the page */
+> 		return -EBUSY;
+> 	}
+> 
+> 	free_page((unsigned long)phys_to_virt(phys));
+> 
+> 	return 0;
+> }
+> 
+> Because free_page() clears page->memcg_data in __free_pages_prepare() and
+> releases the page for reallocation, the subsequent call to
+> kvm_account_pgtable_pages(phys_to_virt(phys), -1) ->
+> mod_lruvec_page_state() operates on a freed struct page and sees a NULL
+> folio_memcg(), failing to decrement the memory cgroup's
+> NR_SECONDARY_PAGETABLE counter (or racing with a concurrent reallocation of
+> that page).
+> 
+> Should kvm_account_pgtable_pages(phys_to_virt(phys), -1) be called before
+> freeing the page, matching kvm_s2_free_pages_exact() and kvm_s2_put_page()
+> in arch/arm64/kvm/mmu.c?
+> 
+
+Yes. The issue here is that rmi_free_delegated_page() could fail and
+then the accounting is wrong. I guess we can decrement the account,
+attempt the free and increment the account again if it fails.
+
+        kvm_account_pgtable_pages(phys_to_virt(phys), -1);
+        if (rmi_free_delegated_page(phys))
+                kvm_account_pgtable_pages(phys_to_virt(phys), 1);
 
 Thanks,
+Steve
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
