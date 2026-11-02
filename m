@@ -1,74 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.71
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.70
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793652437;
-	b=wwcE/RHJj/RFtCzIGdOPJdrMv7GGLX67XO1RZlXNTqmN31ZGpdHZIt6NK1lbRybRRfH8
-	 ucvmkb+EIckwdyZJOyZZ6tqZg3hz75tSsXbpsKSxge3JilBR2trc4vPYlPdNz9WUEr+go
-	 WGNKD6S0ki/Jt+E54ReqOTzpmfvwqrAIHKxaMhOJto3WJKwouwNUeXYHW9RQS4XTrisl4
-	 j2d69dhzRIy2GqMMYf1f7IjVTTcL3ySlMI1wZKYHCVVxyxyWefRPNFvaynB6udtKm9zp2
-	 2x++lndqhOObPjD6Bz0Q8YtMvvxk/IQenmHrEIfMWPAN6iBGhFr/rK8Mp2lArohExbg==
+	t=1793652438;
+	b=XbiVvqwlji+Mu97xl+XO9CZrlTSxmaqFBvi9YVHO4+oPpJn9jADb142U/QhUlbz1m5z3
+	 Ylp1fIz1YdxWiNZ1rLaFwnf34pIjPKXH22D0jmGp5ByZGfpkAqA353D6zFMkgMOeXUr+Y
+	 gXo1zf9lpezRut1mUPr4em8//wkTCAy1Yl139hZgC1mGS229kcZ4PNSWi0gImTPFh/awT
+	 MF/FJSNH/f/SywBh+rtefb02mRAFrDegOu6l59XxSopVal8MBJqPxRM0mKtJJyYXeKAOH
+	 WSm+eNq+mR4HsQ7YGVC7AOHmo0Ux7cOCaUd/nqkM880OUTTxJDgUYQLzoFilHpsevNQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793652437;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793652438;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
 	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
 	 Content-Type;
-	bh=e6Dn35ZTrHhUrWwyLjwezkHEWmgek2c8fRcIdn4hvLg=;
-	b=sMN05MLMKlx8Tdh9gHg8jepZlt2AVDLPHNcWvLIMnjgxR8ostoPl1IHuohaPST+6Ffc+
-	 CpT7kui6RfMP5DgfapkxannCXSSUKP6mWPtT0ZVzJ7iDxmyLSEzv/lLsvFz2yNPf4Np1z
-	 DKRT8GkAR4QwqTGAvNGayzSFvieV+zYb7ZqW6FX8Dc3N6kIlv5GPs0JNPwzT8+nHz9ife
-	 wt6fsRAOsJO69yYB7WKdIpPs0WemK7z0IPjCOz2KzsNphG11SFlyqGEGRaCmMvAJJgbsx
-	 KncwGS4iND+7+Ji/RmhzmsQ4hJyKQFJLYsNazMSaWLxtCcz0lCyS4UIra/umNsWPeyw==
+	bh=W8pU5bTLgvDP6PnnKl35Nqm4I8JchvKzNMP0M/KHP68=;
+	b=YGQCaqJi0ZxrBhMxa7WSZQnBCiNscgqzzDCalbzKGMII+LT7SY30fhbmievMtLjDbqkC
+	 kXwiMsb+STKDeRNTrTFb6AvELyGII0YUlL0GOyIHaFoWIX5IX5iw8pOvys55U5DuxiCDb
+	 qYPJpWQH7Vyu2MZrCaUGEyhuKk/oe/S2j1H6QSwFy087Td0a4ePLMfcmoANdmFRNGm/lN
+	 2i9qW/RLf67YRgXfRhsErln/gFaJOMEQBHm7fxnrkxrHQIeYjN/ytPIvGUsPBCfu5AR4F
+	 bOGg2puB6a9eY6Wk7KEhWDbsOnxXHSsfp3ZSh0PvcMJwkGpI1Z7XDkUdTMpcgKwnQBA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=EUG2svi0;
-	arc=none smtp.remote-ip=209.85.221.71
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=iTnrPlNh;
+	arc=none smtp.remote-ip=209.85.221.70
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7AF606A32D
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 20:47:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EE7AF606A32D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16D8B606A32E
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 20:47:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 16D8B606A32E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=EUG2svi0
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-48b0a199b20so2818276f8f.1
-        for <kvmarm@lists.linux.dev>; Mon, 02 Nov 2026 12:47:16 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=iTnrPlNh
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-48e011829easo2350105f8f.3
+        for <kvmarm@lists.linux.dev>; Mon, 02 Nov 2026 12:47:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1793652435; x=1794257235; darn=lists.linux.dev;
+        d=google.com; s=20260707; t=1793652437; x=1794257237; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=e6Dn35ZTrHhUrWwyLjwezkHEWmgek2c8fRcIdn4hvLg=;
-        b=EUG2svi08eaSn0jJEKyL6yVvKo9Dx5fs/JeHULVrVlm2KtQ90lPUZiZG3JAS4+0LYw
-         dnMBB5ZfpDgxkOXg/bWhk/MtPwWRFU8txVYT7E4Rq33pZG8/tPz9cZRT0T220YS+EbY/
-         wWtPAjmwv0/gjvekQ8z6ekHpck9GkJpzicU2Ukb/z1IBj/ZPORAeuJqzR0TGFDQLxFNo
-         mTU0LS+5+dFKr0YUqIliCOMBmaa/f4r1hTP5hw5Z3DnDzU2c+saaVBO9IiAozlBAPpp0
-         edtIqzvzxq/0bk9VwbpiksaCRtGyDrWoX9IFszZ1dQbj4wWEzf40H/ZgxkDo2h9if0hk
-         dDuQ==
+        bh=W8pU5bTLgvDP6PnnKl35Nqm4I8JchvKzNMP0M/KHP68=;
+        b=iTnrPlNhWNo1zgxT+kYkgzEAgugB0nroOSBsh3eCkW8CKQ7liKI9LpvzJlhUnXaVc2
+         7qx8+LZyk77bVE9k2JntdqigzKnHJ1IY/cGkM3Z6qoWbwISGYiCsvLDNLBlcT9f08D1i
+         /UVvi76ESIdC2WmKL+hVpJOnIDa+2TGutksB1O0oERjpoPaqUxMV0dFPz6Cx9gl25fZX
+         l2k6Q65Zi2CW4i0osaJtA18mHUx9zqx0IpkL3yQnSg1VAR5ZMTCZkTvfW5kT9cZe21jL
+         DHhOj2bwFtNCv4mUOgESy+zabT9Yx3bQ4E9BlWmmBNqOK0UO3ysIAMSzFaMUvZoqS8ec
+         6c8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793652435; x=1794257235;
+        d=1e100.net; s=20260707; t=1793652437; x=1794257237;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=e6Dn35ZTrHhUrWwyLjwezkHEWmgek2c8fRcIdn4hvLg=;
-        b=2UP/zI0kCOpwF4Xvb/wPLEUJBVUv2cHRiWLkek5m2LW+3K59LqiwcIm8RfgoszoAXx
-         v+/ICbEsvx01UZCgjTYVTg2zWFhwytV2bqVjz3rftIaPXipXlfotb93YbgfzU3W7YX4E
-         iEh2H2EVvgH99v31fnfbLtwRP6TGGU+YMuVgWtCAjCBafBPcaI3ekikQcQuQerYGdTvY
-         V+doDh+RT5rVV5dxK7Mi66uwPWBzljgSPuJfvvOtzcgefOiNsnMyrsNdDF+PGfVSoemF
-         4bdg/I4sZHzrWSe/zJmrgfNveFwl2UPf+tlgu+40WYzjzuEo7I/k8/uoiSL+C8mT8ixS
-         IP9Q==
-X-Forwarded-Encrypted: i=1; AKwUvBw3gN6oKo9Bpg2EUH7iNU9x/+6cy5DRFaIKzgOlrK2la7Mgp3Znl6dvtuU4ZFmuKPBWj9Hj7Ew=@lists.linux.dev
-X-Gm-Message-State: APuU4Z8Vg0I9WQ8h/qdLvRoF3MnoyX09jzE+wuilGIZSo+iGWeaH+5dt
-	dqlKOnGs3zR8r2NsOdvOeSi0T8WBA3P+7nzfd409OsAIWf/iPiNNhdjzc//KUllozZSpjNbsL4/
-	ic1sBth/DMjYis4WlaFPclA==
-X-Received: from wrrd17.prod.google.com ([2002:adf:fd91:0:b0:488:8b9b:19f9])
+        bh=W8pU5bTLgvDP6PnnKl35Nqm4I8JchvKzNMP0M/KHP68=;
+        b=21Hksz5/RQvzaSJ8xbo4OLqSMyEEhH057M9g8zXAB3uneTWt/RGRKWMSy1aeq6p0VS
+         UlfDNZzxWu68RbM8PWvQ8B2mXeNh50QK+Aq0bDEQLRXMbAzUhry2f8OwwUmhmdPoZccI
+         Cfn5X/F5r8BrGkkx5enF5U1b1pzHwz2g2MDhnvOQVUGt3zRQ3RCZ1kxO5djTg+0f83PE
+         HbowAtUXm/8c4JAaFzfQm8mSsUlMzHShX4oaUuGthiRMvZ2xCVx/EqeMUsohnLr2SRay
+         XC81djvKfGRV24htzrbO8CBuU2sH37JMQGMDeNl8iZuCO3ft7cGoG+F6XvSLkDcJ+OPR
+         ZJnQ==
+X-Forwarded-Encrypted: i=1; AKwUvByHbKrtwdVt5Gwp1h0mdRDqeQh7RSGgooL4L07F15dvbaTNjzmomYSOZKdIN/npOnDj/xFnCYc=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/93ej2D4u8Et4feKhnz2IubSktNqc25jh3JbpRB5eB4U7be28n
+	2m1qDNcdbjBeIQr2PHc5zYkcwchJDk+DekyG9XJjFZlAsf2tlN28wD9Ih8sh0yoqDr6SOUJozmH
+	LV4cFBmOnTE/DOu/K1mkW5Q==
+X-Received: from wrwh9.prod.google.com ([2002:a5d:4fc9:0:b0:48d:eacb:c491])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a5d:5388:0:b0:48e:666d:c96d with SMTP id ffacd0b85a97d-48e6e50c8d4mr18081477f8f.51.1793652435099;
- Mon, 02 Nov 2026 12:47:15 -0800 (PST)
-Date: Mon,  2 Nov 2026 20:46:18 +0000
+ 2002:a05:6000:4810:b0:487:106f:ee31 with SMTP id ffacd0b85a97d-48e6e304036mr28089625f8f.27.1793652436386;
+ Mon, 02 Nov 2026 12:47:16 -0800 (PST)
+Date: Mon,  2 Nov 2026 20:46:19 +0000
 In-Reply-To: <20261102204628.401871-1-vdonnefort@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,8 +81,8 @@ Precedence: list
 Mime-Version: 1.0
 References: <20261102204628.401871-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.56.0.385.gac671c819a-goog
-Message-ID: <20261102204628.401871-14-vdonnefort@google.com>
-Subject: [PATCH v3 13/23] KVM: arm64: Handle huge mappings in __pkvm_host_force_reclaim_page_guest()
+Message-ID: <20261102204628.401871-15-vdonnefort@google.com>
+Subject: [PATCH v3 14/23] KVM: arm64: Handle huge mappings in __pkvm_vcpu_in_poison_fault()
 From: Vincent Donnefort <vdonnefort@google.com>
 To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -93,100 +93,26 @@ Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
 Content-Type: text/plain; charset="UTF-8"
 
 In preparation for supporting stage-2 huge mappings for protected VMs,
-allow __pkvm_host_force_reclaim_page_guest() to work with PMD_SIZE
-mappings.  As this HVC is called from a non-preemptible context, it is
-not possible to rely on the host pkvm_mappings tree to get the mapping
-size. Instead, use the actual host stage-2 mapping size and compare it
-with the guest stage-2.
+allow __pkvm_vcpu_in_poison_fault() to work with PMD_SIZE mappings.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 33 +++++++++++++++++----------
- 1 file changed, 21 insertions(+), 12 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 030bfc1155f8..68ed886e294e 100644
+index 68ed886e294e..b9b591533b30 100644
 --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
 +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -1340,7 +1340,7 @@ static void hyp_poison_range(phys_addr_t phys, u64 size)
- 	__apply_guest_page(__hyp_va(phys), size, __hyp_poison_page);
- }
- 
--static int host_stage2_get_guest_info(phys_addr_t phys, struct pkvm_hyp_vm **vm,
-+static int host_stage2_get_guest_info(phys_addr_t phys, u64 *size, struct pkvm_hyp_vm **vm,
- 				      u64 *gfn)
- {
- 	enum pkvm_page_state state;
-@@ -1368,34 +1368,43 @@ static int host_stage2_get_guest_info(phys_addr_t phys, struct pkvm_hyp_vm **vm,
+@@ -994,7 +994,7 @@ int __pkvm_vcpu_in_poison_fault(struct pkvm_hyp_vcpu *hyp_vcpu)
  	if (ret)
- 		return ret;
+ 		goto unlock;
  
--	if (WARN_ON(level != KVM_PGTABLE_LAST_LEVEL))
--		return -EINVAL;
-+	/* We only support either PAGE_SIZE or PMD_SIZE */
-+	if (level < KVM_PGTABLE_LAST_LEVEL - 1)
-+		return -E2BIG;
- 
--	return host_stage2_decode_gfn_meta(pte, vm, gfn);
-+	ret = host_stage2_decode_gfn_meta(pte, vm, gfn);
-+	if (ret)
-+		return ret;
-+
-+	*size = kvm_granule_size(level);
-+
-+	return 0;
- }
- 
- int __pkvm_host_force_reclaim_page_guest(phys_addr_t phys)
- {
-+	u64 gfn, ipa, pa, size;
- 	struct pkvm_hyp_vm *vm;
--	u64 gfn, ipa, pa;
- 	kvm_pte_t pte;
- 	int ret;
- 
--	phys &= PAGE_MASK;
--
- 	hyp_spin_lock(&vm_table_lock);
- 	host_lock_component();
- 
--	ret = host_stage2_get_guest_info(phys, &vm, &gfn);
-+	ret = host_stage2_get_guest_info(phys, &size, &vm, &gfn);
- 	if (ret)
- 		goto unlock_host;
- 
- 	ipa = hyp_pfn_to_phys(gfn);
-+
- 	guest_lock_component(vm);
--	ret = get_valid_guest_pte(vm, ipa, PAGE_SIZE, &pte, &pa);
-+	ret = get_valid_guest_pte(vm, ipa, size, &pte, &pa);
- 	if (ret)
- 		goto unlock_guest;
- 
-+	phys = ALIGN_DOWN(phys, size);
-+	pa = ALIGN_DOWN(pa, size);
-+
- 	WARN_ON(pa != phys);
- 	if (guest_get_page_state(pte, ipa) != PKVM_PAGE_OWNED) {
- 		ret = -EPERM;
-@@ -1403,14 +1412,14 @@ int __pkvm_host_force_reclaim_page_guest(phys_addr_t phys)
+-	if (level != KVM_PGTABLE_LAST_LEVEL) {
++	if (level < KVM_PGTABLE_LAST_LEVEL - 1) {
+ 		ret = -EINVAL;
+ 		goto unlock;
  	}
- 
- 	/* We really shouldn't be allocating, so don't pass a memcache */
--	ret = kvm_pgtable_stage2_annotate(&vm->pgt, ipa, PAGE_SIZE, NULL,
-+	ret = kvm_pgtable_stage2_annotate(&vm->pgt, ipa, size, NULL,
- 					  KVM_GUEST_INVALID_PTE_TYPE_POISONED,
- 					  0);
- 	if (ret)
- 		goto unlock_guest;
- 
--	hyp_poison_range(phys, PAGE_SIZE);
--	WARN_ON(host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_HOST));
-+	hyp_poison_range(phys, size);
-+	WARN_ON(host_stage2_set_owner_locked(phys, size, PKVM_ID_HOST));
- unlock_guest:
- 	guest_unlock_component(vm);
- unlock_host:
 -- 
 2.56.0.385.gac671c819a-goog
 
