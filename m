@@ -1,57 +1,76 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.69
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793634639;
-	b=pVdOsnLewMWkBG6aepaw9OdPt4KMATzXcIXIR7el7X5JgMU/l2EL3OBs2gBimfNuyD73
-	 YQ/qsRHLr2h4RA69pfcZqF5K9tiAYvYgT18fA/Ai1I4ogiM24OvRW+JtlxJXaNf3ltaMX
-	 CGnKkxPwbYsFBHFSBQGePrsJflT8gi8Gr/BnZHwd2J3VEOAGF5a2iVAvN673Jp960qgaG
-	 4U+lmtw/HSy7rp2yVhlGltYx+daQJWh6O0bju4eaXEvwBmZuQSmytbj906shNTVIzL4r/
-	 PzjX4UNMXEJyMQyex3cXce6tCsUDYJ7e/OxWPgLCDiugjHwUJlOZvGiq0iG6524Mw9w==
+	t=1793634736;
+	b=XKQDqH3LwG92xO7ZFVHd2aY6ioeMqaiU/kaTwTigZQJ3o4wKIT1aVofaiBKVVGu2ZLl/
+	 5NEYu1d3fYjjMtW1dYlE/HQ2NpL1u3uUGW9VyeOQQH1olPZYjbF9Q4plI/H6y6h2lKW8n
+	 Dhgtx/YTYW/71nN0UwfTGSF/K/B0kHwLnM3WWJOJkv/N5LwLGrCbas/X6q7u0TWhNtHgM
+	 GUiZNK7Aq0SF+o+Fjo74Iha33MFQq/c8teGOa6R3jQfqQjbwtZW79o2V2wu4miD3t+A4Z
+	 NSznwgzmy2gYPRgs/HMyTxObOVhFO7rgw1YdPv3pBUAUNdQBNKWadq/rMLQYjbXRMaQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793634639;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=oJOlbfrbq+QWTTG2303HNnGFWzN3n3+4lbjaPeEbYCM=;
-	b=GFQHATz6QDAU5hg4VD25jyJNpY2OBLF6dgVACJ8Sae+IUkYs5a1Kfkn3ke/gklN69Ky5
-	 dkOrM/M2tRaTNiuMyjoqzpJWLZOs4k2x4xBAaq7muJ63YV4ESui8xcbkrbTJMNENIzGvM
-	 XB7phl4Gxa9hcGNJiImRMryPbVN3UVZG7DvLZKuriQT8Vxhqy7g46XJKGFZKswvJCKq55
-	 Y2AwVKx8Ibjkx3O5dxDS1XJYegpU0qgqCq7HUvzEImRjXOzObAEvYsFd9wwolXj4pOYhH
-	 UB0XFoifK7WN4q+XcIM7vWGCoVmSTpGM09ZHQT32oULd7mUewaYWlocsHH+WI0BXCgA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793634736;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
+	 Mime-Version:References:Message-ID:Subject:From:To:Cc:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=j6RtsTbIlQ1+MerKC0xhFDG/d459vnICRyJwyVtriLE=;
+	b=tlqytQM0JOQlsUjdcq12xKu7ZSOm3CvkPKr6KaG3l8ZsK+81MF9sxIEVSR7SnPr02TnO
+	 cERmLaXBynocww6Zp0VAtbR8/bd3YKUjPCQhQxNKHhFLQNeVBj4aS2Z/SkgRsBVY+OBLf
+	 +6LNQ8PHeFGl0/vOywhSE7zycdU3edCenRcyLa3vDUcp/hpqcB12u4Kr/zTf90BSRVn3w
+	 Wx27ZV76ahO33OB7G2yX6j9NqseSe9yW0EtU+Uhjbn548gdQnX49cP38cEYcbP4fM5kmY
+	 gIDQOrMDnCiQAPjgh2wO079Uj/sTfEMIfuj17j4kEU6oCzihO/pHn01Qlnc7V1Z9Gmg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PCFNvtb7;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=MuCaB+GT;
+	arc=none smtp.remote-ip=209.85.208.69
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698E7607991C;
-	Mon,  2 Nov 2026 15:50:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1248607904A
+	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 15:52:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B1248607904A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PCFNvtb7
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDFF41F00A16;
-	Mon,  2 Nov 2026 15:50:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793634639;
-	bh=oJOlbfrbq+QWTTG2303HNnGFWzN3n3+4lbjaPeEbYCM=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=PCFNvtb7ZVvwG/E1wyuDeo3kJBLodo8FVaM6FZEyp+4jgdeyc+DmL0QtgHaEjL5bL
-	 zPJjFZHGT7wlQnGAgd6CFkRKT3R7qEmT5IYAYNHwHYyFUZxtT1oFMBwblWZ7fBjPZ1
-	 wlHBj56CmyrqPpehcSgHhec1/guodkBbH0KABs30iCMOKNOGsyiIn8WmHNkKumYFrs
-	 SzZF4ImiJXYxud+hab5gA3sTCMxFhaanLxdps9SQ/9ji4Gm75h2MPMIo41xg+vt5E9
-	 Jvp/6dfCWlwtkRpBroE425M2+D0u605indvgNkcHVwH4T5JwZDWl/mM4vDzw3oUtY1
-	 r59qVCLpZg3og==
-Message-ID: <sashiko-outbox-193708@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 09/11] KVM: arm64: CCA: Prevent memslot modifications
- after Realm creation
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Steven Price" <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261102141304.126883-10-steven.price@arm.com>
-References: <20261102141304.126883-1-steven.price@arm.com>
- <20261102141304.126883-10-steven.price@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 02 Nov 2026 15:50:38 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=MuCaB+GT
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-6b4b9758988so970652a12.2
+        for <kvmarm@lists.linux.dev>; Mon, 02 Nov 2026 07:52:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1793634734; x=1794239534; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:cc:to:from:subject
+         :message-id:references:mime-version:in-reply-to:date:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=j6RtsTbIlQ1+MerKC0xhFDG/d459vnICRyJwyVtriLE=;
+        b=MuCaB+GTYMxmcJtPAmojImXs1ZfJww+ULlr13ewzpSOz0MpqQVqZpeTWg8QkCp2Feb
+         C6yA4X5YAg8feQGj9dy6M3XU7v1PQ6mMK9TWcCRTYKkbPzHb/y9PB89tXWfGUe68HwWs
+         2XZMW3gCIIkZef+YzeZnn9TV4buF3ByLNd8FtWwLUYIgI+5RjbwaBzYz1weOF/+92Fxd
+         AV9kf9jRkZVm903V6ZLw6dHurRW3Ws+dlGMNZlWfeogcT2HB8nIZZe0p75QPUir+1E/p
+         Dktbij0jZ4BPuCXnmBgPMEj/1jYDSC4qHts71xx71M7p9Bcxj0o5hzHPLQthLybEl18y
+         mKiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793634734; x=1794239534;
+        h=content-transfer-encoding:content-type:cc:to:from:subject
+         :message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=j6RtsTbIlQ1+MerKC0xhFDG/d459vnICRyJwyVtriLE=;
+        b=ANm7OUReJgd3QAm8XeKnAMeYTFOoBbSiqwfkRbMRVFVXoGvwoxrnfG9J9vEtLC0xzR
+         KzF8nbiZ/w/KouyIL6/aRP86ALt2pwMXF5BMbT96VPKvy7PEbJc/J4V+ECy2MuUKR7T9
+         Pxfwvkjzr1RrY7jPDtTbBvFVrgtYrmpTeGzHTc2RGB5rQU4w0Sq0wh6IR9JO70VB5+1h
+         OTnAH5g/Mzwxg6Twa1Ya86OL1lEALN3y56BjRTEbsbof0pHIhtMP8ScXD2X80a748FQO
+         Gygyh7mz7cFuVBt5bUtF54L0bLeQSFQsuC3LQvmJVpVAII4e7eFv3aSPJmrzdN6K47W2
+         2N+g==
+X-Forwarded-Encrypted: i=1; AKwUvBxodLnVbCsMryCM7+cJmryyya8OUwc4z8/A9QLpC7qtULbHbMxgCPcKvNKMaPSYKZBSh+udx60=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+XydXSUT2BdWAgt9JuhqGAhno64V15rP7HJUuLUpizU1LW6jXM
+	oK8iR26PzsSBsD2Z1jw1Te3XJT2bvo2mbAACm1j3UQil80kvbuqeKfuP9UQU0hadCpgiEcGK7IF
+	PZgkiMulnZu1rkBSLBg==
+X-Received: from edwr13.prod.google.com ([2002:a05:6402:34d:b0:6ac:bd6a:1c30])
+ (user=tarunsahu job=prod-delivery.src-stubby-dispatcher) by
+ 2002:aa7:cc09:0:b0:6ac:7737:e50d with SMTP id 4fb4d7f45d1cf-6b4d4d83eb2mr5865537a12.29.1793634733847;
+ Mon, 02 Nov 2026 07:52:13 -0800 (PST)
+Date: Mon, 02 Nov 2026 15:52:12 +0000
+In-Reply-To: <auI02M-pZO_aQ4jn@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -60,108 +79,109 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+Mime-Version: 1.0
+References: <CA+CK2bBFXnJA1kddbLKGq0DAHDgjYhsTSQQay-xeX7jJC1V_UQ@mail.gmail.com>
+ <CALzav=e=ho2gVrn+7KpZ3ZyasvH2u15-pC-RSRSS7KcMfKqUJQ@mail.gmail.com>
+ <CA+CK2bAJo8dnTOyKMgnnMnk-SCXbTsv+JCLEOWkjyj-wqtEkHg@mail.gmail.com>
+ <atpNFEFIlqAoYIwH@google.com> <CA+CK2bB2C3Am5ssRuzYpfiU7_vB81vxMGc19HQLq7N=_7YrbTg@mail.gmail.com>
+ <attmFVIFU_mS0Y7p@google.com> <CA+CK2bDXDWbww_d3sD6OZqpo37V1a3t76_ubbrXLQS=9DB3dWA@mail.gmail.com>
+ <at-8vkVpN2SF3XgB@google.com> <2vxz8q3hoicx.fsf@kernel.org>
+ <CALzav=eG5j2n5omO2Mxqw8xA4sZLduxdbBYFcnHpPn0PDpt9Hg@mail.gmail.com> <auI02M-pZO_aQ4jn@google.com>
+Message-ID: <9huzik2fz0wj.fsf@tarunix.c.googlers.com>
+Subject: Re: [RFC PATCH v2 3/4] liveupdate: Replace compatibility string with
+ a 2-bit pair feature header
+From: tarunsahu@google.com
+To: Pasha Tatashin <pasha.tatashin@soleen.com>, David Matlack <dmatlack@google.com>
+Cc: Pratyush Yadav <pratyush@kernel.org>, Pasha Tatashin <pasha.tatashin@soleen.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, joro@8bytes.org, 
+	Mike Rapoport <rppt@kernel.org>, maz@kernel.org, arnd@arndb.de, jgg@nvidia.com, 
+	robin.murphy@arm.com, loganodell@google.com, oupton@kernel.org, 
+	kevin.tian@intel.com, alex@shazbot.org, dwmw2@infradead.org, 
+	pbonzini@redhat.com, seanjc@google.com, will@kernel.org, 
+	Alexander Graf <graf@amazon.com>, Bjorn Helgaas <bhelgaas@google.com>, baolu.lu@linux.intel.com, 
+	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, 
+	sagis@google.com, linux-mm@kvack.org, kvmarm@lists.linux.dev, 
+	iommu@lists.linux.dev, linux-pci@vger.kernel.org, kexec@lists.infradead.org, 
+	skhawaja@google.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [High] KVM: arm64: CCA: guest_memfd memslot delete rejected after Stage-2=
- unmap
---
+Pasha Tatashin <pasha.tatashin@soleen.com> writes:
 
-commit 5106402397c36eec1e5fa59a5bb2c5adf4ee2aa8
-Author: Suzuki K Poulose <suzuki.poulose@arm.com>
+> On 10-28 10:24, David Matlack wrote:
+>> On Wed, Oct 28, 2026 at 10:17=E2=80=AFAM Pratyush Yadav <pratyush@kernel=
+.org> wrote:
+>> >
+>> > On Mon, Oct 26 2026, David Matlack wrote:
+>> >
+>> > > On 2026-10-25 04:38 PM, Pasha Tatashin wrote:
+>> > >> On Fri, Oct 23, 2026 at 9:50=E2=80=AFAM David Matlack <dmatlack@goo=
+gle.com> wrote:
+>> > >
+>> > [...]
+>> > >> The reason I care about keeping the header compact is that we are
+>> > >> defining a foundational kernel ABI and want to use this header acro=
+ss
+>> > >> almost every serialized data structure so we can evolve them later
+>> > >> without breaking compatibility. While some top-level structs are on
+>> > >> sparse folios today, other serialized structs are tightly packed, a=
+nd
+>> > >> we are looking to add KHO slab support in the future where tightly
+>> > >> packed allocations will be common.
+>> > >
+>> > > My intuition is we will have a small number of headers per preserved
+>> > > file and per preserved FLB. One for the top-level struct and then
+>> > > optionally a few more for sub-structs like arch-specific data. That =
+is
+>> > > why I am less worried 8 bytes per header, even if we fix the folio
+>> > > problem.
+>> > >
+>> > > Maybe where our visions differ is when there are collections of
+>> > > serialized structs, like KHO blocks. For collections I don't think t=
+he
+>> > > elements will each have their own headers. Otherwise the elements co=
+uld
+>> > > be different sizes.
+>> >
+>> > kho_block today doesn't store entry_size in the serialized payload. It
+>> > relies on its caller to do so. With extensible structures, this can ge=
+t
+>> > messy. Sure, the owner of the kho_block_set can track the size somewhe=
+re
+>> > in its payload, but perhaps we should store the size in
+>> > kho_block_header_ser to begin with?
+>>=20
+>> +1000
+>>=20
+>> KHO block should track the entry size automatically and not rely on
+>> the caller. Otherwise every caller is going to have to store the entry
+>> size in the struct that owns the KHO block, like I had to do in the
+>> PCI v10 series :(
+>
+> I am fine with updating this as part of the versioning change so that we=
+=20
+> do not have to do it twice.
+>
+> Tarun, could you pelase include entry size change into the next version a=
+s=20
+> well?
 
-KVM: arm64: CCA: Prevent memslot modifications after Realm creation
+Yes, This will be important to track the extensible serialized structure
+across kernel. For example struct luo_session_ser has larger size in N+1
+kernel which gets deserialized on the beginning of the boot so incoming
+block_set must use entry_size of the kernel N which we can update inside
+kho_block_set_restore(). And this updated incoming->block_set be used
+for iterator in luo_session_deserialize to properly walk through
+session_ser entries.
 
-This commit updates kvm_arch_prepare_memory_region() to disallow creating,
-modifying, or deleting guest_memfd-backed memslots once a Realm has been
-created.
+I will send v4 soon including this.
 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 51fda7b2ff7f3..eb8c5f9e9791d 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -2862,13 +2862,28 @@ int kvm_arch_prepare_memory_region(struct kvm *kv=
-m,
->  	    (new->flags & (KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY)))
->  		return -EPERM;
-> =20
-> -	if (kvm->arch.vm_flavor =3D=3D VM_PROTECTED_PKVM) {
-> +	switch (kvm->arch.vm_flavor) {
-> +	case VM_PROTECTED_PKVM:
->  		/* Cannot modify memslots once a pVM has run. */
->  		if (pkvm_hyp_vm_is_created(kvm) &&
-> -		    (change =3D=3D KVM_MR_DELETE || change =3D=3D KVM_MR_MOVE)) {
-> +		    (change =3D=3D KVM_MR_DELETE || change =3D=3D KVM_MR_MOVE))
->  			return -EPERM;
-> -		}
-> +		break;
-> +	case VM_REALM:
-> +		/*
-> +		 * Once the Realm is created, we cannot modify any slots that
-> +		 * could be providing private memory. i.e., guest_memfd backed
-> +		 * slots.
-> +		 * TODO: Handle trusted device private memory slots
-> +		 */
-> +		if (!kvm_realm_is_created(kvm))
-> +			break;
-> =20
-> +		if (kvm_slot_has_gmem(old) || kvm_slot_has_gmem(new))
-> +			return -EPERM;
+~Tarun
 
-[Severity: High]
-Does checking kvm_slot_has_gmem(old) in kvm_arch_prepare_memory_region() run
-too late to prevent Stage-2 unmapping when deleting a guest_memfd-backed
-memslot on a created Realm?
-
-In virt/kvm/kvm_main.c:kvm_set_memory_region(), non-delete changes
-(KVM_MR_MOVE and KVM_MR_FLAGS_ONLY) on KVM_MEM_GUEST_MEMFD memslots are
-already rejected upfront with -EINVAL, so kvm_slot_has_gmem(old) is reached
-here when change =3D=3D KVM_MR_DELETE.
-
-However, in virt/kvm/kvm_main.c:kvm_set_memslot(), KVM invalidates and
-flushes the old memslot before calling kvm_prepare_memory_region():
-
-virt/kvm/kvm_main.c:kvm_set_memslot() {
-	if (change =3D=3D KVM_MR_DELETE || change =3D=3D KVM_MR_MOVE) {
-		invalid_slot =3D kzalloc_obj(*invalid_slot, GFP_KERNEL_ACCOUNT);
-		if (!invalid_slot) {
-			mutex_unlock(&kvm->slots_arch_lock);
-			return -ENOMEM;
-		}
-		kvm_invalidate_memslot(kvm, old, invalid_slot);
-	}
-
-	r =3D kvm_prepare_memory_region(kvm, old, new, change);
-	if (r)
-		goto err;
-}
-
-kvm_invalidate_memslot() marks the active slot as KVM_MEMSLOT_INVALID and
-calls arch/arm64/kvm/mmu.c:kvm_arch_flush_shadow_memslot():
-
-arch/arm64/kvm/mmu.c:kvm_arch_flush_shadow_memslot() {
-	write_lock(&kvm->mmu_lock);
-	kvm_stage2_unmap_range(&kvm->arch.mmu, gpa, size, true);
-	kvm_nested_unmap_cipa_range(kvm, gpa, size, true);
-	write_unlock(&kvm->mmu_lock);
-}
-
-For a Realm VM, kvm_stage2_unmap_range() invokes
-arch/arm64/kvm/rmi.c:kvm_realm_unmap_range_filter() with
-KVM_FILTER_PRIVATE | KVM_FILTER_SHARED:
-
-arch/arm64/kvm/rmi.c:kvm_realm_unmap_range_filter() {
-	if (attr_filter & KVM_FILTER_SHARED)
-		realm_unmap_shared_range(kvm, start, end, may_block);
-	if (attr_filter & KVM_FILTER_PRIVATE)
-		realm_unmap_private_range(kvm, start, end, may_block);
-}
-
-By the time kvm_arch_prepare_memory_region() returns -EPERM and
-kvm_set_memslot() restores the old memslot in the error path, hasn't
-realm_unmap_private_range() already unmapped and undelegated the Realm's
-private Stage-2 DATA granules across the memslot's GPA range?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261102141304.1268=
-83-1-steven.price@arm.com?part=3D9
+>
+> Thanks,
+> Pasha
+>
+>>=20
+>> > Anyway, not a problem this series needs to solve, but something we
+>> > should eventually do.
