@@ -1,49 +1,56 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793651789;
-	b=RVlDSxaUwNuI3ey9dnusiXkhUzuiY2DPILG+dB6nZZOwtN7ammTlFnIq5MfdIqnf8G9p
-	 lLS5Af3IGcNOKsZLqrd0g73e6Jy3RDR/fiIOfLi3tq12+Ho5/N2gBwrV1fEnhB7Rggk8y
-	 I/b/ZX10M/rOZy0QwXiMC8H++YmHQ5RLve9hcVlVZ63cWs6LSlXnTVJeLdkCobDoLhDXn
-	 rV1yYoV3jSpRYSdb6hlo768QIir70ZJaFavFhpbX2FyzNsPky1RZs8nMVVTr53Pbm0Tzb
-	 yy+WtxrSdE/7HQ9kFKml9r8RFvjTyl0SyyI/WTdYnTNiPe37uryLo0ghHWDVZuOKEnQ==
+	t=1793651882;
+	b=efwXmS47JkX71D5nqgtTacBRbs2Ve0mBPvmp7LkZYoZnLuaou7CvZJQTDv/yiB6vMezl
+	 OO3gv9YQsXoqnkQ5MLVtTQ+3GBxBPGGhXgz8X+V2+4Hj1kO/Ax4ITHWF2zuasRqw9Hjv1
+	 iZKcx/q9R1bTMsj9nYzPEzj1yDhsFPUxNIECfKHhaZsN3NJsbMyKQhFV2HB/L1gtDVOQi
+	 7+I3xa+1vaXrZhtgXrMkKfyYn7Of6VXTKDeHTWBOHcJQ4kOprM2UjgE3ymT44wjFrHs4D
+	 0mhX1ayTZQHfouxOi/7uBZBYEgmSKFcUKlvisyYIbQxA3L8qmm+YK40QUIOsomUTR0w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793651789;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=MDDeRU4d0nx+E0eXi1w8CF2FxMkkVCg82SPJez1bIKw=;
-	b=mTKY0j+biBYDkBD2S0vgrpoMtXiPXNGO3UPHfvG9KO6xUCUDSilSfuz/nmaZxTeobVml
-	 6jcgtqfogjbyjrFvW59cmerfFAPXCkajTqYB5qW9HTw09FWkuXJJZe3t013DTz4Tp9EvU
-	 67iWVvJ4WRI/66BwsOece6jTyyyyrsUN4v3O94hM5afBbJxGryGLxdq2iaVeMuVC2SzKl
-	 XRpdAPBtbcxYn0JVk9g+RTlot8eop0m9xuqMK1ciNsTGu/C4Onr0rpTs8AYFwq1BJUfFT
-	 Lxx8PNTVT8pNo6zqg1qxFH850t5w3vCFcxMtYVtxlILDIKIYc6cH/GuORPSZKURYIrA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793651882;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=thytxbJXxeGikUjHXwlRX1Hc7pfpqIWn3LGnZlH7d0A=;
+	b=jLmtql+1nZr3BdLxDA/7cQP1gUR824/hnV1Zprb1hiWCC0g7ghluW+rW5QPsJCxybSrq
+	 sSNHTNxqLA1oLlyftC3aykB/oTLP3u5UKiOWVN3Nz3fVWHA1FYLP/5Kwz+AR77Ji1sUFD
+	 qqSv5+QGuuBHigYnvA1FewgGSHXWlKvwCWSiUoMLvRd8Iu37uoNw5cp8ts5q+M80Dig1U
+	 JFoDw4y5GH8aGIfKuWTj9DemNnMYdpbYpdfUIXY7rBFdOeGvUL5YxfYpDnQMD2FRcQNdf
+	 1DnexSumuyvKuRwEaPGkKUP3sl6egaS9jkLy/w4qGZOz+HJW9iLCyFP/ZnOJoVdcp9w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=ql0I2vvo;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F55E606A326
-	for <kvmarm@lists.linux.dev>; Mon,  2 Nov 2026 20:36:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8F55E606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YAglJoQq;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C581606A324;
+	Mon,  2 Nov 2026 20:38:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=ql0I2vvo
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BFBA616A3;
-	Mon,  2 Nov 2026 12:36:24 -0800 (PST)
-Received: from [10.57.89.36] (unknown [10.57.89.36])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A72363F59E;
-	Mon,  2 Nov 2026 12:36:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793651787; bh=qa5nJdTMdWsjWuKo5pGJg/ac6E9Vv4VQtwfe5yhRkRY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ql0I2vvod+2atDtLyYSwBRnutRleT1fV8638Hu8VK1NIBdgA+87m6A6HZ2REfDqdd
-	 jVQ5DHYX+JLbRxE8TYtU1bZ55gJwncX96qDG6A9nm1aC4rCpspLfXc8Hnt1imHsYf4
-	 IfACKHPma8pYAwu+CxHfMw0JAe4HcF9xgZIIzFYk=
-Message-ID: <eb50ce99-d586-45b3-9584-fc875ebc81fb@arm.com>
-Date: Mon, 2 Nov 2026 20:36:25 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YAglJoQq
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3FD31F00A16;
+	Mon,  2 Nov 2026 20:38:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793651882;
+	bh=thytxbJXxeGikUjHXwlRX1Hc7pfpqIWn3LGnZlH7d0A=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=YAglJoQqXQSAZYcjPDpyN5onTlSFpGfdM7MrStdZS+GFaO931q570MlIzp30ZT1d3
+	 Z//JPMiS7X1P7tsHC8ctt9qNIX8SGeV1pf34bLp8O0v1LVtAEqBF7qbLlVZXX/fWFP
+	 50bvXO3OkeZdmBuI0/9BsOeBFgHPw0KYONQiBce1+mp1thJccILo5xPdo7bGPFVnoi
+	 D4ca1BN1CKDRabnaAIcq+ycG5/Z/6fEO39N8yCjTrgqXrGn5+5txrxczxwpVbIzaIs
+	 NgaMZXE8ZI3wc5R92EvR70zWKAoK2rwPl4e9xX4QQjt5HBPn+zXFscp0p9Yzsmmq7k
+	 86luyHXp+XBMw==
+Message-ID: <sashiko-outbox-194134@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 09/16] KVM: arm64: gic-v5: Add ITS MSI injection
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Sascha Bischoff" <sascha.bischoff@arm.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
+In-Reply-To: <20261102194454.4086911-10-sascha.bischoff@arm.com>
+References: <20261102194454.4086911-1-sascha.bischoff@arm.com>
+ <20261102194454.4086911-10-sascha.bischoff@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 02 Nov 2026 20:38:01 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -52,119 +59,146 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kvmtool v3 06/21] irq: Allow the initial interrupt line
- number to be set
-To: Vladimir Murzin <vladimir.murzin@arm.com>, will@kernel.org,
- julien.thierry.kdev@gmail.com
-Cc: maz@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- timothy.hayes@arm.com, Peter Maydell <peter.maydell@linaro.org>
-References: <20261016153939.913764-1-sascha.bischoff@arm.com>
- <20261016153939.913764-7-sascha.bischoff@arm.com>
- <6964001c-3032-4c69-b1a6-382749dfc73b@arm.com>
-Content-Language: en-GB
-From: Sascha Bischoff <sascha.bischoff@arm.com>
-In-Reply-To: <6964001c-3032-4c69-b1a6-382749dfc73b@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 22/10/2026 19:25, Vladimir Murzin wrote:
-> On 10/16/26 16:39, Sascha Bischoff wrote:
->> GICv5 SPIs start at zero, while earlier GICs use an offset of 32.
->> Allow the offset to be changed before any line is allocated and set
->> it to zero when creating a GICv5 VM.
->>
->> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
->> ---
->>   arm64/gic.c       |  6 ++++++
->>   include/kvm/irq.h |  1 +
->>   irq.c             | 15 ++++++++++++++-
->>   3 files changed, 21 insertions(+), 1 deletion(-)
->>
->> diff --git a/arm64/gic.c b/arm64/gic.c
->> index c1bd0771..23c68862 100644
->> --- a/arm64/gic.c
->> +++ b/arm64/gic.c
->> @@ -236,6 +236,12 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
->>   	if (err)
->>   		goto out_err;
->>   
->> +	/* GICv5 SPIs start at zero. Set this before allocating IRQs. */
->> +	if (type == IRQCHIP_GICV5) {
->> +		err = irq__init_irq_offset(0);
->> +		if (err)
->> +			goto out_err;
->> +	}
->>   	vgic_is_v5 = type == IRQCHIP_GICV5;
->>   	return 0;
->>   
->> diff --git a/include/kvm/irq.h b/include/kvm/irq.h
->> index 2a3f8c9d..17113979 100644
->> --- a/include/kvm/irq.h
->> +++ b/include/kvm/irq.h
->> @@ -23,6 +23,7 @@ extern struct msi_routing_ops *msi_routing_ops;
->>   extern struct kvm_irq_routing *irq_routing;
->>   extern int next_gsi;
->>   
->> +int irq__init_irq_offset(u8 offset);
->>   int irq__alloc_line(void);
->>   int irq__get_nr_allocated_lines(void);
->>   
->> diff --git a/irq.c b/irq.c
->> index cdcf9923..7c4bfec4 100644
->> --- a/irq.c
->> +++ b/irq.c
->> @@ -8,6 +8,7 @@
->>   #include "kvm/irq.h"
->>   #include "kvm/kvm-arch.h"
->>   
->> +static u8 irq_offset = KVM_IRQ_OFFSET;
->>   static u8 next_line = KVM_IRQ_OFFSET;
->>   static int allocated_gsis = 0;
->>   
->> @@ -18,6 +19,18 @@ struct msi_routing_ops *msi_routing_ops = &irq__default_routing_ops;
->>   
->>   struct kvm_irq_routing *irq_routing = NULL;
->>   
->> +/* Override the default offset before the first IRQ allocation. */
->> +int irq__init_irq_offset(u8 offset)
->> +{
->> +	if (irq__get_nr_allocated_lines())
->> +		return -EBUSY;
->> +
->> +	irq_offset = offset;
->> +	next_line = offset;
->> +
->> +	return 0;
->> +}
->> +
->>   int irq__alloc_line(void)
->>   {
->>   	return next_line++;
->> @@ -25,7 +38,7 @@ int irq__alloc_line(void)
->>   
->>   int irq__get_nr_allocated_lines(void)
->>   {
->> -	return next_line - KVM_IRQ_OFFSET;
->> +	return next_line - irq_offset;
->>   }
->>   
->>   int irq__allocate_routing_entry(void)
->> -- 2.34.1
->>
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [High] KVM: arm64: gic-v5: missing vgic_initialized() check in MSI inject=
+ion
+--
 
-Hi Vladimir,
+commit b2f7c0263871635da8ddb0614e8b96f1cb1f641c
+Author: Sascha Bischoff <sascha.bischoff@arm.com>
 
-> 
-> Perhaps should be split into:
-> - changes in generic infrastructure
-> - plumbing of GICv5
+KVM: arm64: gic-v5: Add ITS MSI injection
 
-I've created this split as you suggested.
-> 
-> Cheers
-> Vladimir
+This commit adds MSI injection support for the virtual GICv5 ITS via both
+the slow guest-memory translation path and the inatomic cached translation
+path. It wires kvm_set_msi() and kvm_arch_set_irq_inatomic() to invoke the
+new GICv5 ITS injection helpers for GICv5 VMs.
 
-Thanks,
-Sascha
+> diff --git a/arch/arm64/kvm/vgic/vgic-its-v5.c b/arch/arm64/kvm/vgic/vgic=
+-its-v5.c
+> index 9f4783b243221..b69a1d107c0ae 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its-v5.c
+
+[ ... ]
+
+> @@ -424,12 +468,86 @@ static int __vgic_v5_its_resolve_lpi(struct kvm *kv=
+m, struct vgic_v5_its *its,
+>  	return ret;
+>  }
+> =20
+> +int vgic_v5_its_resolve_lpi(struct kvm *kvm, struct vgic_v5_its *its,
+> +			    u32 device_id, u32 event_id,
+> +			    struct vgic_irq **irq)
+> +{
+> +	guard(mutex)(&its->its_lock);
+> +
+> +	return __vgic_v5_its_resolve_lpi(kvm, its, device_id, event_id, irq);
+> +}
+> +
+>  static void vgic_v5_its_inject_lpi(struct kvm *kvm, struct vgic_irq *irq)
+>  {
+>  	kvm_call_hyp(__vgic_v5_vdpend, irq->intid, true,
+>  		     kvm->arch.vgic.gicv5_vm.vm_id);
+>  }
+> =20
+> +int vgic_v5_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
+> +{
+> +	struct vgic_v5_its *its;
+> +	struct vgic_irq *irq;
+> +	bool borrowed_mm =3D false;
+> +	int ret;
+> +
+> +	its =3D vgic_v5_msi_to_its(kvm, msi);
+> +	if (IS_ERR(its))
+> +		return PTR_ERR(its);
+> +
+> +	/* An irqfd cache miss is resolved by a worker outside the VM's mm. */
+> +	if (current->mm !=3D kvm->mm) {
+> +		if (WARN_ON_ONCE(current->mm || !(current->flags & PF_KTHREAD)))
+> +			return -EWOULDBLOCK;
+> +
+> +		if (!mmget_not_zero(kvm->mm))
+> +			return -EFAULT;
+> +
+> +		kthread_use_mm(kvm->mm);
+> +		borrowed_mm =3D true;
+> +	}
+> +
+> +	ret =3D vgic_v5_its_resolve_lpi(kvm, its, msi->devid, msi->data, &irq);
+> +	if (borrowed_mm) {
+> +		kthread_unuse_mm(kvm->mm);
+> +		mmput(kvm->mm);
+> +	}
+> +
+> +	if (ret < 0)
+> +		return ret;
+> +	/* KVM_SIGNAL_MSI reports guest translation failures as blocked MSIs. */
+> +	if (ret)
+> +		return 0;
+> +
+> +	vgic_v5_its_inject_lpi(kvm, irq);
+> +	vgic_put_irq(kvm, irq);
+> +
+> +	return 1;
+> +}
+> +
+> +int vgic_v5_its_inject_cached_translation(struct kvm *kvm, struct kvm_ms=
+i *msi)
+> +{
+> +	struct vgic_v5_its *its;
+> +	struct vgic_irq *irq;
+> +	int ret;
+> +
+> +	its =3D vgic_v5_msi_to_its(kvm, msi);
+> +	if (IS_ERR(its))
+> +		return PTR_ERR(its);
+> +
+> +	if (!READ_ONCE(its->enabled))
+> +		return -EWOULDBLOCK;
+> +
+> +	ret =3D its_cache_look_up_translation(its, msi->devid, (u16)msi->data,
+> +					    &irq);
+> +	if (ret)
+> +		return -EWOULDBLOCK;
+> +
+> +	vgic_v5_its_inject_lpi(kvm, irq);
+> +	vgic_put_irq(kvm, irq);
+> +
+> +	return 0;
+> +}
+
+[Severity: High]
+Can userspace trigger vgic_v5_its_inject_lpi() before the GICv5 VM has been
+initialized?
+
+When a VM creates KVM_DEV_TYPE_ARM_VGIC_V5 and KVM_DEV_TYPE_ARM_VGIC_V5_ITS,
+kvm_vgic_create() initializes kvm->arch.vgic.gicv5_vm.vm_id to
+VGIC_V5_VM_ID_INVAL (-1), and a valid VM ID is only allocated later during
+KVM_DEV_ARM_VGIC_CTRL_INIT via:
+
+  vgic_init()
+    vgic_v5_init()
+      vgic_v5_allocate_vm_id()
+
+However, vgic_v5_register_its_iodev() registers the ITS on KVM_MMIO_BUS as
+soon as KVM_VGIC_V5_ADDR_TYPE_ITS is set, and userspace register access
+allows writing GICV5_ITS_CR0 (setting its->enabled =3D true),
+GICV5_ITS_DT_CFGR, and GICV5_ITS_DT_BASER before vgic_init() is called.
+
+If userspace invokes KVM_SIGNAL_MSI or triggers an irqfd before
+KVM_DEV_ARM_VGIC_CTRL_INIT, neither __vgic_v5_its_resolve_lpi(),
+vgic_v5_its_inject_msi(), nor vgic_v5_its_inject_cached_translation() checks
+vgic_initialized(kvm). As a result, vgic_v5_its_inject_lpi() will pass
+VGIC_V5_VM_ID_INVAL truncated to u16 (0xffff) to __vgic_v5_vdpend(), which
+executes the hardware VDPEND instruction with an unallocated VM ID (or
+targets another active VM using VM ID 0xffff).
+
+Should the MSI resolution and injection paths check vgic_initialized(kvm)
+before resolving translations or calling vgic_v5_its_inject_lpi()?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261102194454.4086=
+911-1-sascha.bischoff@arm.com?part=3D9
