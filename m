@@ -1,50 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793730051;
-	b=olmEiqIhFY0eS6nEaPDACnwnrexdWHM1fsLUFVT+wglAIZ+UfwaECAJzndUY5KzByGDX
-	 OhkKfd00mff2x4MSP3dexAViyEc9++6Ns1jZbaqQ0gcfj2Xi6gviT0uw7zX+ggathzigo
-	 H/x8DPEWQHBlVcSW5mCfwOgqRd+QJKe2qqdNibSIG2TFb7VhMRChDR97T7u5CaMNbt/ZB
-	 hovW7lJlZJ2co4OQgVgC86NKMQ3rHanq8HKTpDevP2jlctlzI9Ntm7I9hyAJRSYhB22th
-	 1JyUZOucbyX7ouVG6Fn04zsGRln3iCc2BzsYDClooyuJZpDf+OK8ZXFzmDDfzVv3+Hg==
+	t=1793730056;
+	b=KuEMPGydP4x1DxqVO6hl+Wzkb7sTZwGaMyuM/CpIZ7rmUozgGflmEnNr2ZzRsb8B2hCW
+	 +vBSqkthFEcOP3NQF9JCnrVaNmY+r09gIX5PXjWrn8Rf5WOya9kyDbJY8l3vU0HANF0Bu
+	 2u+Haaf9ib4B41qbrorVJLXjpM1+4NWsLQwXTC6zPTGrH9H2/GXAf+RnuBlCWyGBDsjyH
+	 65hcgTM+HEaO6eSphN5IT13zH1w4tfsPH3Oikr8sLWeNs6DIHOL95oUo3LgbgseXATEwV
+	 PV1884I7eLxufl8K03u0c/fo5iual8gMOJEq5LPtVU+12A3BXYPYgdw4Nytupi9VbhQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793730051;
-	h=Received:DKIM-Signature:From:Subject:Date:Message-Id:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
-	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=FPwk+Obv3JX7khvwqPN/UuLuPSKvZ6g9lKWJcYLlWQk=;
-	b=bSb7T+ExCb8g+WraSfr9M2GVa2W03OhZ4cNtqtRRtb9CQA98QDzXOgzxo2tG4YT80FTW
-	 ks2Rs0KDSl1gv/hHoW1mvL8QrQXA2gsa8c0ZRVfRV3na0reTwgT6XNRGwgvgmc9SnMgQL
-	 VJz0D3tVZGN7c+6t3sUDsTXBLTUxhUi8lJhypUL7FJvH3zwZvm40nRiCk+egPxNWLwGPM
-	 YCbjqdQAT3dK9aFhE2HAiRzJW+ahl79fvwHLlPgFN/2vzN2/imTi3v6cIfTST5iVjPXco
-	 BbkFHBLJ6e74xAt7PHrRgnc6DWeEWMSKrxd14muUrbY9XKE2l2KJP4YaPM/vMJV0+cA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793730056;
+	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
+	 X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=CPXc0O7MKcjSrwtn6DF7S5L9f42l8jD3XdoUxmsVzys=;
+	b=bhvp+X6LGbkdFQP+F1vgcX15/YQ8AyfUpQMCU73J3p0/GkRYnkC/KlQfTB1Z8xodW8Gk
+	 fVxkQEgFdLXmgvRybpI9Bewd4xRub5CV5F12eAiWpN5Z9+Zs88rI8ysE334BI9Dk6mqK2
+	 /hk8k4jRz+QKSdgUvmJ6wPk2JiPi00iYKR3Amahyx2OGfXhh3GamOS4vgMQu3LlEmOhv2
+	 lJdXd2hyZPStXYwn+MvIvHjoJZZljwpSGuL0KTMWB2NB92akfsnnpZmoL6k0NDvYy3WtT
+	 RerTwJkdQbTBX0u3Aq0knR433qSx/f+qCEu9BWjLSPHcRF0tv92S6dBoCawDfieE03w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=H5g8y4HA;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mk9KQ5XO;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B72C606A326;
-	Tue,  3 Nov 2026 18:20:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C75606A32F;
+	Tue,  3 Nov 2026 18:20:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=H5g8y4HA
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33EF71F000C1;
-	Tue,  3 Nov 2026 18:20:48 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mk9KQ5XO
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 000E71F00A1D;
+	Tue,  3 Nov 2026 18:20:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793730050;
-	bh=FPwk+Obv3JX7khvwqPN/UuLuPSKvZ6g9lKWJcYLlWQk=;
-	h=From:Subject:Date:To:Cc;
-	b=H5g8y4HAdMcsyMgO7MOqQ7BuM7LXnzIK+xJ3SWXbf7IAmivibRHPYgmSiUZ243K3o
-	 xuWunLgtOHqbrBnOvLZbfi128Hd2EqEGcsBWaZKMUaop6dKuKjVS2YZmtRELp7IXYl
-	 h1DGNIlHCuXUtyihEW3rpzB7JWXvLE8xMbchZD2EiWSPEZZcceQ5rXTV/7IkNSvNmF
-	 od7d8WVYID0QNkeqoC0ubXbh6Ide9beDyteguOycx9bUBjjIcANmN65D9INpW/sTft
-	 eX9PPc26rBBh/MPvac7EftUKHdd/s6M7sPg5bQg6N7ikd14uDW+Ie3Yis9JU2NE26u
-	 Eno1+FFFIK8kA==
+	s=k20260515; t=1793730056;
+	bh=CPXc0O7MKcjSrwtn6DF7S5L9f42l8jD3XdoUxmsVzys=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc;
+	b=mk9KQ5XOQnfQGcYANyqz4cYvRavaP5wjATSQoyUh0VUTh6j6Yb24flZdf/DcRyh3S
+	 VufQJfUJsU8fPBglU4ck6NLkFHetD5bL7KqUqxGlWsQiIgpVUN9Odkvu4tJLRyhCTy
+	 1fEbqyEhZdj9L0+ZQbj3rOtx4ong7/XRneCCw7Z6UT6jyb8rbMhxKtebf62fpfCjZA
+	 Xi5mlwiLS8DkzdjTSJXSSuC3fYaBXqFEEnr3UKtnjL9rhs40pILFZXZUrlWP20zHVx
+	 RRH8JIP1U0omxsKEc6NySr3b7VzJXstT+S4uGd5nkANJrIa9cBdZvVui2teBqeIbsr
+	 nOyFGoKcFtoVg==
 From: Mark Brown <broonie@kernel.org>
-Subject: [PATCH v9 0/3] KVM: selftests: arm64: Improve diagnostics from
- set_id_regs
-Date: Tue, 03 Nov 2026 18:19:20 +0000
-Message-Id: <20261103-kvm-arm64-set-id-regs-aarch64-v9-0-ab32bc79fa9c@kernel.org>
+Date: Tue, 03 Nov 2026 18:19:22 +0000
+Subject: [PATCH v9 2/3] KVM: selftests: arm64: Report register reset tests
+ individually
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -56,13 +55,9 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAKkl6moC/4XPz07DMAwG8FeZcibIdvN3J94DcUhSZ6vGOpROF
- Wjau5NOoIJ6yPH7LP1s38TEZeBJ7Hc3UXgepuEy1uCfdiIdw3hgOfQ1CwLSCOTkaT7LUM5GyYm
- vdSgLHyYZQknH2nGM1nrjFWAS1fgonIfPh//6VvNxmK6X8vVYN+PS/sgdNOQZJUhvMkNPEa3jl
- xOXkd+fL+UgFnqmlUNULY4qZyxlQpUVxrzhupUj9C2uq1zMQVnFqSN0G079cgYQTItTlUuWs9I
- aQ47dhtMr16FtcbpywUCm6LVhog1nVs62nzWVs6TI2awzwvZZu3IesMXZhYtgdITYBx82nPvDU
- fM6VzntQohMiXJI/7j7/f4Nq5c/dvQCAAA=
-X-Change-ID: 20251028-kvm-arm64-set-id-regs-aarch64-ebb77969401c
+Message-Id: <20261103-kvm-arm64-set-id-regs-aarch64-v9-2-ab32bc79fa9c@kernel.org>
+References: <20261103-kvm-arm64-set-id-regs-aarch64-v9-0-ab32bc79fa9c@kernel.org>
+In-Reply-To: <20261103-kvm-arm64-set-id-regs-aarch64-v9-0-ab32bc79fa9c@kernel.org>
 To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
  Suzuki K Poulose <suzuki.poulose@arm.com>, 
  Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
@@ -72,78 +67,78 @@ Cc: Ben Horgan <ben.horgan@arm.com>, linux-arm-kernel@lists.infradead.org,
  linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Mark Brown <broonie@kernel.org>, "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
 X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2800; i=broonie@kernel.org;
- h=from:subject:message-id; bh=4ky2ZC0HdjDT4ejqM8lZ1oDOfp+5HqQ3XaDMShmtQSc=;
- b=owGbwMvMwCWm/754w+YLFp2Mp9WSGLJeqf5b/ddyypdmNuNDU6bLP3ELdL7t9ux9kmWocKLp+
- r2sX3Yd6ShlYRDjYpAVU2SJy+J+WV/yeg3fwYVtMHNYmUCGMHBxCsBEGB4x/M+65vjVp6jt04RJ
- c97bTN424Ye/xP+gp2nCaaq/NPWTfscw/E+s+lVn97I7KWzdNcdVxz/aaMp/fZ64xPZX/w6Hc93
- ijMwA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2558; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=JfGzRjUuJXbYAXGFKmvMsIMx4V5AP4Sez6FLWFTsalI=;
+ b=owGbwMvMwCWm/754w+YLFp2Mp9WSGLJeqf577MX1kGOfpc+laVd6vxj0VzQ+3H98fd1mKyO+9
+ fb5s5c5dZSyMIhxMciKKbLEZXG/rC95vYbv4MI2mDmsTCBDGLg4BWAi898y/M9gYZzZlLy3vtJ4
+ hZFl8N1vsWwZh7JfL13xdErJ4mXzT25m+F+26M3zy3MTU1WkDe1OLi1Y+aZZfRfXgruNs4V+bvP
+ JEWMDAA==
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-While debugging issues related to aarch64 only systems I ran into
-speedbumps due to the lack of detail in the results reported when the
-guest register read and reset value preservation tests were run, they
-generated an immediately fatal assert without indicating which register
-was being tested. Update these tests to non-fatally report a standard
-kselftest result per register, making it much easier to see what the
-problem being reported is.
+set_id_regs tests that registers have their values preserved over reset.
+Currently it reports all registers in a single test with an instantly fatal
+assert which isn't great for diagnostics, it's hard to tell which register
+failed or if it's just one register. Change this to report each register as
+a separate test so that it's clear from the program output which registers
+have problems.
 
-A similar issue exists with the validation of the individual bitfields
-in registers due to the use of immediately fatal asserts. Update those
-asserts to be standard kselftest reports.
-
+Reviewed-by: Ben Horgan <ben.horgan@arm.com>
+Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
-Changes in v9:
-- Rebase onto v7.4-rc1.
-- Link to v8: https://patch.msgid.link/20260929-kvm-arm64-set-id-regs-aarch64-v8-0-58aabe2c2fac@kernel.org
+ tools/testing/selftests/kvm/arm64/set_id_regs.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
-Changes in v8:
-- Convert another assert.
-- Link to v7: https://patch.msgid.link/20260901-kvm-arm64-set-id-regs-aarch64-v7-0-7b065b0bda9a@kernel.org
+diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+index 0e6fd7b57e52..37107eadd985 100644
+--- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
++++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+@@ -820,13 +820,21 @@ static void test_vcpu_non_ftr_id_regs(struct kvm_vcpu *vcpu)
+ static void test_assert_id_reg_unchanged(struct kvm_vcpu *vcpu, u32 encoding)
+ {
+ 	size_t idx = encoding_to_range_idx(encoding);
+-	u64 observed;
++	u64 observed, expected;
++	bool pass;
+ 
+ 	observed = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(encoding));
+-	TEST_ASSERT_EQ(reset_mutable_bits(encoding, test_reg_vals[idx]),
+-		       reset_mutable_bits(encoding, observed));
++	observed = reset_mutable_bits(encoding, observed);
++	expected = reset_mutable_bits(encoding, test_reg_vals[idx]);
++	pass = expected == observed;
++	if (!pass)
++		ksft_print_msg("%lx != %lx\n", expected, observed);
++	ksft_test_result(pass, "%s unchanged by reset\n",
++			 get_reg_name(encoding));
+ }
+ 
++#define ID_REG_RESET_UNCHANGED_TEST (ARRAY_SIZE(test_regs) + NUM_EXTRA_REGS)
++
+ static void test_reset_preserves_id_regs(struct kvm_vcpu *vcpu)
+ {
+ 	/*
+@@ -844,8 +852,6 @@ static void test_reset_preserves_id_regs(struct kvm_vcpu *vcpu)
+ 	test_assert_id_reg_unchanged(vcpu, SYS_MIDR_EL1);
+ 	test_assert_id_reg_unchanged(vcpu, SYS_REVIDR_EL1);
+ 	test_assert_id_reg_unchanged(vcpu, SYS_AIDR_EL1);
+-
+-	ksft_test_result_pass("%s\n", __func__);
+ }
+ 
+ /*
+@@ -985,7 +991,8 @@ int main(void)
+ 
+ 	ksft_print_header();
+ 
+-	test_cnt = 4 + MPAM_IDREG_TEST + MTE_IDREG_TEST + GUEST_READ_TEST;
++	test_cnt = 3 + MPAM_IDREG_TEST + MTE_IDREG_TEST + GUEST_READ_TEST +
++		ID_REG_RESET_UNCHANGED_TEST;
+ 	for (i = 0; i < ARRAY_SIZE(test_regs); i++)
+ 		for (j = 0; test_regs[i].ftr_bits[j].type != FTR_END; j++)
+ 			test_cnt++;
 
-Changes in v7:
-- Rebase onto v7.3-rc1.
-- Link to v6: https://patch.msgid.link/20260719-kvm-arm64-set-id-regs-aarch64-v6-0-724287f5f108@kernel.org
-
-Changes in v6:
-- Rebase onto v7.2-rc3.
-- Drop changes to handling of aarch32 related registers on 64 bit only
-  systems, an in kernel solution is preferred for those.
-- Use a define to count the non-test_regs registers.
-- Link to v5: https://patch.msgid.link/20260317-kvm-arm64-set-id-regs-aarch64-v5-0-a60f2b956e22@kernel.org
-
-Changes in v5:
-- Rebase onto v7.0-rc1.
-- Link to v4: https://patch.msgid.link/20260106-kvm-arm64-set-id-regs-aarch64-v4-0-c7ef4551afb3@kernel.org
-
-Changes in v4:
-- Correct check for 32 bit ID registers.
-- Link to v3: https://patch.msgid.link/20251219-kvm-arm64-set-id-regs-aarch64-v3-0-bfa474ec3218@kernel.org
-
-Changes in v3:
-- Rebase onto v6.19-rc1.
-- Link to v2: https://patch.msgid.link/20251114-kvm-arm64-set-id-regs-aarch64-v2-0-672f214f41bf@kernel.org
-
-Changes in v2:
-- Add a fix for spurious failures with 64 bit only guests.
-- Link to v1: https://patch.msgid.link/20251030-kvm-arm64-set-id-regs-aarch64-v1-0-96fe0d2b178e@kernel.org
-
----
-Mark Brown (3):
-      KVM: selftests: arm64: Report set_id_reg reads of test registers as tests
-      KVM: selftests: arm64: Report register reset tests individually
-      KVM: selftests: arm64: Make set_id_regs bitfield validity checks non-fatal
-
- tools/testing/selftests/kvm/arm64/set_id_regs.c | 130 ++++++++++++++++++------
- 1 file changed, 98 insertions(+), 32 deletions(-)
----
-base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
-base-tree: git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-change-id: 20251028-kvm-arm64-set-id-regs-aarch64-ebb77969401c
-
-Best regards,
---  
-Mark Brown <broonie@kernel.org>
+-- 
+2.47.3
 
