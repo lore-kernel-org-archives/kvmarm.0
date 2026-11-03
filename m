@@ -1,74 +1,71 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793711186;
-	b=IfqgoaNYu4mBR9o0T5kwcOXxS/IQOraoOQQozKjEWfEV0wmBmshod38gbd4bRPd6/SVA
-	 XDG3Ia431E+UmjBdxn5hol5qr4tuLbzkqTDoEdSxzDmhelqp392ZQvMeAnHuJGgB1u820
-	 JD8TQ1Kd+QTv+YM9kY0r8Nq2a5kuY8rskoU8lfU+xgsF+OxvHCQfXCfSV/moep4ydBo0J
-	 FnvYwUJ/bf+gE/cTbHKZuNy8GFTnMvQkWykcUYdIsw5Jur+/sUMxoTBqVOdDnUYl/NZRf
-	 dI2SJbzOLoRjqkL6BQKO4JIHudbJ6jaKlXk0QRDZP8yfXxtwjV7om/dL0Ap75hxPnDQ==
+	t=1793711182;
+	b=diGkEu8ZLAKV0I0XjQaA9LbJQ9YceHwc3rzhb3foFK0AzFH/68MD6DeA8HwCsjRCsbEj
+	 SzG64i2PUChQdQEL+GjGo3QNqdFfGZhqiVGOSv7vkm7TivdjtvKjtjlylFWEvntNBa5yQ
+	 IZrlOY5RdokckKAFvE0aEDbXM4rukpC8DfA9CsyJ8SvqMyK9s05Oo2DCUVAjgs7xoJfbE
+	 j4nzFqBTv2hOu2WviDX+iu4abmU3XFgINmOb/HNJAhklPENYJveHFXNHv/jnoI9XOdutp
+	 tyo5NQP1tvaKWgKk7jj6m1AgxtSnffsu1MmIgca9owEnKSmfiK44KkcvR78nBYr32pw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793711186;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793711182;
 	h=Received:DKIM-Signature:Received:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding:X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:
 	 X-SA-Exim-Mail-From:X-SA-Exim-Scanned;
-	bh=x/FsVPxFZdwretPYcMBzrm58LiH7fpqIQNmVBOK7HkE=;
-	b=fkeeD0EONqgUgSAkk/xhuH0yndtNqVTRBheH4n2BQ5qnCtyTDhoTEDKp3DZ+yeiXRmjL
-	 2h4URdiJrJvNpB5NOTawUX8zhg85v/0ypq8KQ/GbIzyUitNf6hmSjDLH6dN/IxgbBbC2M
-	 gPP6a18PMD6yA/zrAvKT67tkzF0F2tnrZLIWxvBS6XyMU20hI6qf+3jamFFwyYtoR02TY
-	 y31HLZ2zaCRCsOBGBffdjkTpoAZgxgOOQ+9kXKRkJhATFIXXZ6MrM5rBgpMkCq6Merpct
-	 O4hQrO8KuhPOPwxUB4JGeefgI/qBOpfFdzm4xV1MUKyan3uyq0Ojv78fJ/F9Zl4N62Q==
+	bh=gi/ch/JS08KZSEQShoG8gR4zN7dxLDnzLol7acy/5Vg=;
+	b=XgYFnhgi9AGz0GYtH503gL/FmRp76zmfHN77iGMIdsW0YTTCBzOVs4qRz8lBAM8uUl8E
+	 wWoU6qKTzK4uSvXEw0MEa8s3fYiccCdg1Esh6YIcWZe5oSJ6N3F5J4KzDpqj7ZutBbjb2
+	 rNvNTbkpjlEomsTerOXzVDoDuXbFxZf0t9EU7PacuNEg1FDLk8g7Bg1wFAckVHcHfsieO
+	 EgZgvxG68pqeLhZyglT2UhIOAXAOJfqqGeVI2QYgMA9/khIoLK7YDXf1JSa65oaq7U0SO
+	 2PtD5kw/f9AStpWfAEHy/5wOrK4utnJq/fFWDaGIiYpgbh2QuvJBERPHQ2fjycDUkJA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RfmHz4Fz;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EvQhj2iV;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A68606D81F;
-	Tue,  3 Nov 2026 13:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F320606EE83
+	for <kvmarm@lists.linux.dev>; Tue,  3 Nov 2026 13:06:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RfmHz4Fz
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B8601F00A21;
-	Tue,  3 Nov 2026 13:06:21 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EvQhj2iV
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8642E1F00A1D;
+	Tue,  3 Nov 2026 13:06:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793711181;
-	bh=x/FsVPxFZdwretPYcMBzrm58LiH7fpqIQNmVBOK7HkE=;
+	s=k20260515; t=1793711182;
+	bh=gi/ch/JS08KZSEQShoG8gR4zN7dxLDnzLol7acy/5Vg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=RfmHz4FzxU3w2f6jRloSc2Y/6x40zsf77FmNb/Foh3p4Ddi8OE4c1dyG/Nt0Td3P1
-	 2bu28l1OXKmGYoxdGFrh1XlLJRsWqVlNo/Hxx8DwnZMwLKxKuUHTKYjL3jWjlv6dip
-	 Mltp+8YTjUVtgPKhYdcCG9xZanU71Ppc2bCANdoxCMd9IZXfQMVFpb75hcAvgtEbn7
-	 chdrUYNIoO0S99LN+I4SAlE0QYAN/Egc2Lh5MBNrn9YebJkNeCRSGQeLjVT4DczdKM
-	 qwOil4H/LbiwXpQ16/pW1Zfy68zb20H6dozXRVo+Nx78UolqCu03HKyKyuQ/srQIw0
-	 PJSuV5qWDtZDw==
+	b=EvQhj2iVix1aRypilF9q5+I4jRU6doXjIxnrceClJ2CCua5UejUQacIa9qU0b8P0A
+	 3/HLIwKBzEuZxE6FuYx30iQXymrdxQ9PQIGsgiCT1gGiC6iJjiDfs+aQhme95KN+tp
+	 hYy1w8Ym09+e8bOrwC89CmOFaEjUumLuV8MuywguvanpYsTuPSDx+/zRU/iLYn7WGK
+	 /PkEf9GBLizjkkEBtYzVJTvQB9Px7wSZCNkTeei6f4rqSFxLnPRy1tkKanonEmPJ1X
+	 6ARFk565Ijt5CwMNcnm2+WM4oKtAFGRz0r3ELbrLdHvYAgMbFAeam0k+2w55/yHIca
+	 fjpwUu8Yn+tMw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1xOEDT-0000000ATWs-1Lis;
-	Tue, 03 Nov 2026 13:06:19 +0000
+	id 1xOEDU-0000000ATWs-3brp;
+	Tue, 03 Nov 2026 13:06:20 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>,
+To: oupton@kernel.org,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>
+Cc: joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
 	kernel-team@android.com,
-	linux-kernel@vger.kernel.org,
-	Oculytic <oculytic@gmail.com>
-Subject: Re: [PATCH v3 0/3] KVM: arm64: Fix PMU handling in pKVM
-Date: Tue,  3 Nov 2026 13:05:37 +0000
-Message-ID: <179371111276.2844725.10156435514804417873.b4-ty@b4>
+	fuad.tabba@linux.dev
+Subject: Re: [PATCH v3 0/3] KVM: arm64: pkvm: Fix missing reset of GICv3 LRs
+Date: Tue,  3 Nov 2026 13:05:43 +0000
+Message-ID: <179371111274.2844725.10738351642638708821.b4-ty@b4>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261028153152.1740044-1-fuad.tabba@linux.dev>
-References: <20261028153152.1740044-1-fuad.tabba@linux.dev>
+In-Reply-To: <20261026163937.963087-1-vdonnefort@google.com>
+References: <20261026163937.963087-1-vdonnefort@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -81,28 +78,32 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, vdonnefort@google.com, kernel-team@android.com, linux-kernel@vger.kernel.org, oculytic@gmail.com
+X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, vdonnefort@google.com, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, fuad.tabba@linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 28 Oct 2026 15:31:49 +0000, Fuad Tabba wrote:
-> Changes since v2 [1]:
->   - Stop the host's counters with PMCR_EL0.E rather than the individual
->     counter enables. (Marc)
+On Mon, 26 Oct 2026 16:39:34 +0000, Vincent Donnefort wrote:
+> The GICv3 List Registers (LRs) are architecturally UNKNOWN when a CPU
+> boots or wakes up from a low-power state. When pKVM is enabled,
+> __vgic_v3_init_lrs() is currently never called on boot, CPU hotplug, or
+> CPU PM resume.
 > 
-> Two fixes and a hardening patch for PMU handling in pKVM, as one series
-> [2].
+> Following Marc's comments on v1, instead of handling the LR reset inside
+> the pKVM hypervisor, this series fixes the host CPU init, hotplug, and
+> PM paths to properly reset the vGIC LRs even when pKVM is enabled. This
+> removes a few calls to is_protected_kvm_enabled(), making the whole
+> hypervisor init machinery more generic.
 > 
 > [...]
 
 Applied to fixes, thanks!
 
-[1/3] KVM: arm64: Synchronise kvm_host_data before host deprivileging
-      commit: 9e29ea628848d29eea948200c4357f530b0e1768
-[2/3] KVM: arm64: Pass the PMU events to the hyp vCPU of non-protected guests
-      commit: 8ee90ca40b10cc040544fdccf24b20115f46aa7d
-[3/3] KVM: arm64: Disable host PMU counters for protected guests
-      commit: a7dd36f7e381025bdf01d8665bf37167368754c4
+[1/3] KVM: arm64: Make __vgic_v3_init_lrs HVC always available
+      commit: a511905b3c0d6e73afcc4016b2eddc159703060e
+[2/3] KVM: arm64: pkvm: Fix missing reset of GICv3 LRs
+      commit: 91e496a1e474d56e296f3997ed2a34185e9a1c0c
+[3/3] KVM: arm64: pkvm: Reset GICv3 LRs in the hypervisor
+      commit: 5fe9e7dbc78e3ade118a8f64952b7ed84e502afa
 
 Cheers,
 
