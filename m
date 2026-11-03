@@ -1,64 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.240
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793709766;
-	b=gbSGJk29uXZUHFc2iThjc+7IjHb6BMK76i5tOE5TiJFBLVwcV4l6Wg3gyNLd3cZ6zfSm
-	 3Ote6o1TYwnfgWBT5+C3QyEqe7JZ7wN25J5HfNvRT81jl5+48/+ysgPcn6/Fzuso8qBaI
-	 W7Rpqyy02GTZ4Z90MlXaQ71vekgBS2Uig6zEj2MDS7+OzUEOJkhVgwfpALdAZtX/FBUv6
-	 7bnaU6LDPQHB9vxWTK7++lCt2d8qJe31z74YT0sMz3qPO5MSy4PwCARg4I4UaJAoe7U9m
-	 PK9Q55nTdI2FsmLXYTfPeBxlEdAssBEBxPrQLblWFdQ8WCew2E4NtOl/c37/sAEubZg==
+	t=1793711179;
+	b=SOL/3Bc6efzqB7RBMuu0hhX82ndcxFsFcesARoe9GF2bc+b9dPIm5xcbQ63XvJ8hBvKy
+	 q75gGcLYExUnQs7z9LGGC6JbtE1oXsO60i4fhS15p1kdOEKoLyywd1tLUqEtQbmxY5hcV
+	 2P0qjcuj+s+iqRbJqBO6by6mpnZz60yTZJbz6wOVnlYsLwd1efIcMwvHPa7CMhmHRLO0r
+	 dWd4ieaA1KeZ0GedaCPPIKlMWVKHdknIW8xI6Wc6ko/pNzlcCA5bNk89Axfdj2sZIJ+F1
+	 y5DUxnipDX3BZJgJsxxqKq55ha2Km7y9jUemWOZym9RPellb6uQ9lvmnOQ/UzzfkQvw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793709766;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=sCjolPt5zocwoOY1DIpOdaSXAojR7+UgtysjrvaooX8=;
-	b=u5TQUmLlV60DKRyKK0PlPHN3U1WN2veEDj1cgaQElxBAGi/h6HS2w0gjkCpMNObq2u/x
-	 LQrG3C9jQcYereE02H0c4qF8qJixeWGlClraqfkq7EH+Nj728s+1iwt+F7RtDzJIq3bJS
-	 P6W0nlvwh0hr9uvYsQydDDbUB+l9qtPJHtIpFJ+wrMmJMeDangQMDM6u8TGuZOBZXinjv
-	 YcBGlamfhrT3sbt+dDmnK2cXjbmR7M5QJ8NPbhkd8lYhqeIOxkG+dIyqqsFDluBsRmjBr
-	 5GcBr43M6DHHWT7DV8M9EwVeF9Uh/YMhPZLBmhL9zPLniZk4sknasuvJOucSl36546Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793711179;
+	h=Received:DKIM-Signature:Received:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:
+	 X-SA-Exim-Mail-From:X-SA-Exim-Scanned;
+	bh=jpC9vuyM0oDYGwUVcqxTgssTiCR7zkzLjAhyFTXihMI=;
+	b=fJvASzleC+1Z7S7qWWAAOU1IQ5rSaxXdSWN11lAq4BeJ3Y2DkzgZEwvLmcnq3PGXA8Rd
+	 cgRajdQI3vDzasITlOmJFYS5qwKJPf8fJyVR20FyHmm8Rcvs1RJ7VD3zMY1HubUOA88lM
+	 Nen94AiWVZvpO57L0RkEcHUPeQKrg9lPV+peahzKs6V0rVhs7dKfoob6Qddza+0s/ruB5
+	 6iEgTL3YQIgYDgVFeTSrzdXyrFPpN6thqtehln3Jp549nFMyXTbXtzSdoTlD1ukhpTHEU
+	 It6u9qtm1AAEwqCzq43PGG8onbxnim4w9OTQDcQItsAsjo7B5zXhuq3SmUVcDQX0HLQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="hVcmXel/";
-	arc=none smtp.remote-ip=91.218.175.240
-Received: from mta0.migadu.com (out-240.mta0.migadu.com [91.218.175.240])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GmUeDqRi;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEABD606A328
-	for <kvmarm@lists.linux.dev>; Tue,  3 Nov 2026 12:42:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DEABD606A328
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C53606A329;
+	Tue,  3 Nov 2026 13:06:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=hVcmXel/
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=sCjolPt5zocwoOY1DIpOdaSXAojR7+UgtysjrvaooX8=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793709762; v=1; x=1794314562;
- b=hVcmXel/HDoDFM+b1poMqU9g5bDjZsPCVz4qvjd8tLp6G7tclXR1cE2oMhQEBs5bJjGGGQFP
- TCyZwC/6ufWxttcgt4IqDEbGB9Ss7PC0xxf9oCwj4NaLkNZ2dXPjRGjHWw7Dlo5HGWo2xb3P7ya
- XqzMlbB3YMo9EazoMpFxHdhY=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 585fc12482fdff96;
-	Tue, 03 Nov 2026 12:42:42 +0000
-X-Mizu-Trace-ID: 585fc12482fdff96
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: sashiko-bot@kernel.org
-Cc: kvmarm@lists.linux.dev,
-	Oliver Upton <oupton@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v2] KVM: arm64: nv: Size nested stage-2 MMUs by the NV PARange cap
-Date: Tue,  3 Nov 2026 12:42:42 +0000
-Message-ID: <20261103124242.2177173-1-fuad.tabba@linux.dev>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GmUeDqRi
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F32C1F00A18;
+	Tue,  3 Nov 2026 13:06:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793711179;
+	bh=jpC9vuyM0oDYGwUVcqxTgssTiCR7zkzLjAhyFTXihMI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=GmUeDqRiqyFQcvTbGC+coMj8CxGZAvxnQJCXNyGsRAh2/9RZN9iQJC6jihMnZPCtx
+	 wJdP7j6kbof2dCwHOVI1q7tEfu4pQwjxrL9mxx1PMRIQGy4WQy9no+TZqt8wRnn4Rj
+	 ChnfVoeB7d3roJXeLq8GVrRU1rdytqyTiqYQ5ypRiRV5hsdYlN/3rlVQ8jRLcuLDXG
+	 RSMDPxtnaeGUjMOeIGY2BChfgsCjx1XAl82QfobI2T2+XUD/e6ekVIzvafsY6ngpA9
+	 +o0/yuN04ouux4/5H71nw5Us7I9FxnZIEWBSh5mNZTntn+RkZZiCU4eYnQrIU8Az6s
+	 NYnXul8JBksnw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xOEDR-0000000ATWs-1t0Z;
+	Tue, 03 Nov 2026 13:06:17 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Yuchao Zhang <ndaugoing@gmail.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] KVM: arm64: vgic: LPI fixes for redistributors with LPIs disabled
+Date: Tue,  3 Nov 2026 13:05:30 +0000
+Message-ID: <179371111251.2844725.11327747024377032677.b4-ty@b4>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <sashiko-outbox-195084@kernel.org>
-References: <20261103102436.1605347-1-fuad.tabba@linux.dev> <sashiko-outbox-195084@kernel.org>
+In-Reply-To: <20261026092802.2636798-1-fuad.tabba@linux.dev>
+References: <20261026092802.2636798-1-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -68,52 +78,38 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, fuad.tabba@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, seiden@linux.ibm.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, andre.przywara@arm.com, eric.auger@redhat.com, ndaugoing@gmail.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 03 Nov 2026 10:55:42 +0000, sashiko-bot@kernel.org wrote:
-[...]
-> TGRAN4/TGRAN16 at 52_BIT and TCR_EL1/TCR_EL2 unsanitised) only against
-> TCR_EL1.{DS,IPS} and the physical CPU's 52-bit PARange rather than bounding
-> it by VTCR_EL2?
+On Mon, 26 Oct 2026 09:28:00 +0000, Fuad Tabba wrote:
+> Two fixes on top of Marc's cross-CPU vcpu pausing series [1], for LPIs
+> whose redistributor has LPIs disabled. Without them, the guest can take
+> such an LPI with EnableLPIs clear, or lose one mapped before it enables
+> them.
+> 
+> The first is the vgic_target_oracle() change Oliver suggested on v2 of
+> that series [2]. It stops an LPI from being queued to a redistributor
+> with EnableLPIs clear once the disable path has retired the vCPU's AP
+> list. With that check, the path has to pause the vCPU before clearing
+> EnableLPIs, so that the retire still finds its LPIs.
+> 
+> [...]
 
-Yes, but only for a guest that sets {I}PS beyond the 48-bit PARange
-it's given, and this patch doesn't change the fast path.
+Applied to fixes, thanks!
 
-[...]
-> When __kvm_find_s1_desc_level() returns an error, inject_abt64() returns
-> early without pending an exception or updating FAR_ELx/ESR_ELx.
-> kvm_inject_size_fault() then unconditionally clears bits [5:0] of the guest's
-> existing exception_esr_elx(vcpu), and kvm_handle_guest_abort() returns 1,
-> re-entering the guest at the same instruction in an infinite loop.
-
-Pre-existing: kvm_inject_size_fault() and the out-of-IPA-range SEA pass
-the IPA as the abort address, which the S1PTW re-walk has taken as the
-VA since 50f77dc87f133 ("KVM: arm64: Populate level on S1PTW SEA
-injection"). With this patch, an NV guest's table walk above 2^48
-reaches it too.
-
-I'll fix it in v3, with two patches added before this one: build the
-address size fault without the re-walk, which can't reach a table above
-the limit, and pass FAR_EL2 at both sites.
-
-> Also, when S1PTW == 0 with stage-1 translation enabled (a stage-1 leaf
-> descriptor outputs an OA in [2^48, 2^52)), doesn't kvm_inject_size_fault()
-> write the reconstructed fault IPA into exception_far_elx(vcpu) instead of
-> kvm_vcpu_get_hfar(vcpu) and report level 0 instead of the leaf level?
-
-Yes for the FAR, same fix. Level 0 is deliberate, from 85ea6b1ec915c
-("KVM: arm64: Inject exception on out-of-IPA-range translation fault"),
-and it will be there in v3.
-
-[...]
-> Once valid stage-2 PTEs are installed above 48 bits in kvm->arch.mmu.pgt,
-> wouldn't L1 accesses to those GPAs succeed directly in hardware (or take
-> stage-2 permission or access flag faults that bypass the
-> esr_fsc_is_translation_fault(esr) check in kvm_handle_guest_abort()) instead
-> of getting an address size fault?
-
-Only for memory userspace placed beyond the advertised 48-bit PARange,
-where the guest gets what it had before this patch.
+[1/2] KVM: arm64: vgic: Don't forward LPIs to a redistributor with LPIs disabled
+      commit: bf9c9ed5204fe8155bfff96a737faaae6afe07d8
+[2/2] KVM: arm64: vgic-v3: Don't drop a pending LPI mapped with LPIs disabled
+      commit: b4c9f30194a421b069bcfef18ccbee004c97b9f2
 
 Cheers,
-/fuad
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
