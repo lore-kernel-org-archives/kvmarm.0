@@ -1,75 +1,70 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.78
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793694171;
-	b=WVZlumb9p4zk4VENb6X9f4qZPgTeXMRTHvMqnszU3aSd4AWfYjd3wjUh/PyIu9sT/X6m
-	 IBRJ8BOcKeeP+3u7LlY1Yc87zcYCbSTy6uU3lleXQMoadLxPsUG0IJBQIK+i4TPzp3H7/
-	 17B8cPzYetYuuO7PHoRRjW6NtopvT+uMBJGH5zgWVvESf94bOUZZobWmvaonhCGFnUclR
-	 IRoIPeLtXhesNPT4W+wmbs4AooKff9iHb5OVKe1Fxbnh+5BjHfFR0o8lC99P1ZGdrwF7w
-	 16MCUJjX3ne0Inx3Oaqds7/3LYb7n6s9GtZwPF2VQtaYsE8zkf/lkM++RzOWFQ9SMbw==
+	t=1793695665;
+	b=qIVwwjcYDXTBNGtD8pN0jjJiJE61j+0DDSa6J28ygJt5OlEGkpw2T4C0jEywkN4ucXTD
+	 faoBdRWbAtmwIpdtt5QfZvEH1cEUNd0Qf594OzARSJ69UlKz6MOq8k0KZrPEy1oGD8u9Z
+	 3VhDnharQ4JARBEbHhGjZXDAtSd85Ip09Fc8nd7XlcG3eL4FqifMEi7rS7gFQFuU13Llc
+	 gNCfq0GpAHyeVVPaAOg95hjCBSfLjPP5T6Wypg3zt1T83vFyXXH68d0efuuN9Zgyp+gIg
+	 ODb3uWpyspWnxI8XgX3UdTLmWjFZdJDaFNxD+Y57nmhDudlZwW+scwDktSkIk+FLWcg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793694171;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=13JW4Jg1dgguEj52L1u0IsGyjIw3tDUJ2h7ClviJyY8=;
-	b=fk2Fp7bZaUdLxcVCgGQhGcHv+GQQNOL+3mbNt4xYVva2jLnWbTWWXwIv+S65N/e75MXc
-	 IYITQODg3VfXHrExo1L1Tr8Lo8eS8nRvJJWGOJYom4E/jPshHm7xxu2QCAN2i4qGntkN9
-	 0skDbmwQpdIoUS5vd3IsZ0ekh6V7wHmYHr51LP5Zj41OCS7onW1S+OjdEjmaMSXxnVCFJ
-	 ODUnRsV8HXjqdu29VoZjsBNZCMmoU/+ZjDHzYmz1FoLcqEETNq9Hh7LJoDDtECRJIRby5
-	 1mKGPrk0Zu5Qg1rVFH0PvTD4aMOEHll1gXWF8opuI2WJ6z1yzEk5C4ggsJmGOaiPztg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793695665;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=7OZDcry484hFtiEDsHMeu9Vb1PBCwc08Fystmbso2yg=;
+	b=nqa5NyUJ0EiW95mJ/wV2cqk7Gi/0Fge3JJqI1Xcx23GDN0sVUTKc7GGs5/FDtCWJtyek
+	 fEBqlniqLXFgRt0k88oj+sp/ICvezPHezKTJUTCqa7zqb+p1pvnv4qlLHdaRdaQK3I/X+
+	 LrNz26aBNi1JqoRoKj9bANMHlem2KHZ0luGTxK0BlMRUHTQ388e4YRUfX1XcypieWohKA
+	 OeCjGJIn6YL3McaA5n/hdfAGJOPF2XVy0F/ZFgCW4G0nWEj6IjiRTVKXfB+sLYe1sKc/+
+	 sIMLMDaFAXkPZN9TLs4jqk/RFGPet/DKmGb/RsAzwX8F4zTpMEeaQhUUzqxFVjETRjg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fSwwEMS8;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="p/wfeKAm";
+	arc=none smtp.remote-ip=95.215.58.78
+Received: from mta1.migadu.com (out-78.mta1.migadu.com [95.215.58.78])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE70606A324
-	for <kvmarm@lists.linux.dev>; Tue,  3 Nov 2026 08:22:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C24606A94A
+	for <kvmarm@lists.linux.dev>; Tue,  3 Nov 2026 08:47:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 63C24606A94A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fSwwEMS8
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 634931F00919;
-	Tue,  3 Nov 2026 08:22:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793694170;
-	bh=13JW4Jg1dgguEj52L1u0IsGyjIw3tDUJ2h7ClviJyY8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=fSwwEMS8pmYxYNewqxpreRAZUTtGEezumjUaaQfeWPeliuCX1y4K4Lvv7BUhRO27R
-	 Nn8UgjSY/gr417JvHxxnjQS9+CoEsWXO/IhyZvx0iZXjawwMgS2UjUEzkHKkdIpL0u
-	 orG1VzSyyVj+SZUUH0Bc4kWTQh24Ap7Nhbwrlf38lDXfFxmzDtE+EURHCEm55pCTzv
-	 c5FYXuyMk6c7juSyVfc8UJBtUruPoHsXOwI+vGe2seSZJrtl3PFt75aVux4fpIE7sE
-	 PICibbKPcNRBYX/3y5EzN1GpbTRKHXVmTg2CDQu0Bbp8M+kmUfBc31TYYMfJJTQh2u
-	 G0a7j2yo/+YRg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xO9n6-0000000AKdK-0bgT;
-	Tue, 03 Nov 2026 08:22:48 +0000
-Date: Tue, 03 Nov 2026 08:22:47 +0000
-Message-ID: <867biu2ujs.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: oupton@kernel.org,
-	kvmarm@lists.linux.dev,
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=p/wfeKAm
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=Sc7XzR1F0B2mglhUJrIyIo1lpOjbjlFeRWehGGCyC88=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793695662; v=1; x=1794300462;
+ b=p/wfeKAmmURwMhMhocRJeQ7uKxogG77Ispk7mg+UEZOnmn8QtA/lBWL5HsBcpt/iLkR7+Oxv
+ x5D2mxHYyPkrh3lktlWaZ0HDSo8KzZg+7gY9/hT69mTNJuXqcP71zx27m0sxT+xGbVS12d57UzW
+ wmaP1iey/2yJr/TEsEhbdVDg=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id af8506901e183db4;
+	Tue, 03 Nov 2026 08:47:42 +0000
+X-Mizu-Trace-ID: af8506901e183db4
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	kernel-team@android.com,
-	fuad.tabba@linux.dev,
-	ljs@kernel.org,
-	ryan.roberts@arm.com
-Subject: Re: [PATCH v1] KVM: arm64: Fast path transparent_hugepage_adjust() for non-PMD folios
-In-Reply-To: <20261102211900.504192-1-vdonnefort@google.com>
-References: <20261102211900.504192-1-vdonnefort@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH 0/3] KVM: arm64: Stop stage-2 teardown scaling with the IPA size
+Date: Tue,  3 Nov 2026 08:47:39 +0000
+Message-ID: <20261103084742.1302597-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -78,43 +73,55 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vdonnefort@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com, fuad.tabba@linux.dev, ljs@kernel.org, ryan.roberts@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Mon, 02 Nov 2026 21:19:00 +0000,
-Vincent Donnefort <vdonnefort@google.com> wrote:
-> 
-> transparent_hugepage_adjust() must walk the userspace stage-1 to detect
-> if a PMD-level mapping is installed. If it is, then a stage-2 block
-> mapping can be installed. Even though this stage-1 walk is most likely
-> cache hot (in most cases, the mapping has just been installed), walking
-> a page-table is still costly. This walks accounts for ~5% of the
-> user_mem_abort() execution time on an Apple M2 big core. This makes a
-> fast path interesting.
+Hi folks,
 
-This raises a few questions:
+Two fixes for stage-2 teardown, which since 4ddfab5436b6 takes time
+proportional to the size of the IPA space rather than to what is mapped.
 
-- Isn't this a "fast fail" rather than a fast path? You don't make the
-  S1 walk faster, but you instead avoid cases where it would have
-  returned an level-3 size.
+Under QEMU TCG ('-cpu max', 16K pages with LPA2), destroying even an
+empty VM takes about 7 seconds in pKVM. Without pKVM it takes about 19
+seconds if the VM requests a 52-bit IPA (crosvm requests the host's
+limit). I would expect it to scale the same way in hardware. I tested
+only under QEMU, since I don't have hardware with LPA2.
 
-  If anything, you make transparent_hugepage_adjust() slower for the
-  case that succeeds. I don't think this invalidates the approach, but
-  it feels that the commit message is just wrong.
+pKVM gives every VM the host's IPA limit. The first makes it release the
+VM's mappings from its tree instead of walking that space. My series
+honoring KVM_VM_TYPE_ARM_IPA_SIZE in pKVM [1] (respinning it soon)
+doesn't replace the fix, as crosvm requests the limit there too.
 
-- How do you measure this? 5% feels like a huge amount for something
-  that should be 3 loads. Isn't this more an indication that the page
-  table walker is overly complicated because it was designed for
-  something else? In any case, It'd be good to verify your findings,
-  so please provide a minimal reproducer.
+The second makes the non-pKVM teardown step over an empty entry larger
+than the largest block in one go, rather than start a new walk for each
+block-sized chunk of it. It depends on the first, as the lookup it adds
+reads fields that hold the mapping tree on a pKVM stage-2.
 
-Thanks,
+The third moves the pKVM/non-pKVM split in the teardown into
+kvm_vm_s2_ops, with no functional change. The first two apply back to
+7.1, except that a backport of the second drops the flags argument 7.4
+added to kvm_pgtable_get_leaf().
 
-	M.
+Based on Linux 7.4-rc1 (6628e7d4c6b25).
 
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20260917091826.2639205-1-fuad.tabba@linux.dev/
+
+Fuad Tabba (3):
+  KVM: arm64: Don't walk the whole IPA space when destroying a pKVM
+    stage-2
+  KVM: arm64: Skip empty IPA ranges when destroying stage-2 page-tables
+  KVM: arm64: Move stage-2 teardown into kvm_vm_s2_ops
+
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ arch/arm64/kvm/mmu.c              | 34 +++++++++++++++++++++++--------
+ arch/arm64/kvm/pkvm.c             | 17 ++++++++++++----
+ 3 files changed, 41 insertions(+), 12 deletions(-)
+
+
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
 -- 
-Without deviation from the norm, progress is not possible.
+2.47.3
+
