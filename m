@@ -1,58 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793730681;
-	b=kJfl+DZYMvQ/sJ6Cw9EU2qEqbZ0O4jn4LPCrz9zp6FnTebMKDZNeLC0Uqvnpp4M/VEg4
-	 BhRJ7TtSDELAM7JPcrD89STyZIbR5OSNXLHRcldNj8YPGdkwYadVQtrvDe+lxuP/gdzNW
-	 zLIkg3vkcG/8jwny7lMq5eTsnOeb0mk+M8ieFT7kNbdsrosF7k+fwmtvtEVb2+ZsDquxL
-	 yMrdjuSpDGPvdCAP03WjOxqU33sYUXSeI0QqPN6dKKXHq6KySeYuyF9X54ZooWOzfW6pT
-	 Dx5bh/1DRh3+vNA0X0r6T+VoeVb36djRjoVmQf94HpwoHl05o1z5aWzbO7jZzpZVj/A==
+	t=1793732863;
+	b=sRmrHu7g7O0U9ConqVUMWhv2GHWO3+wV2SXK9Ih8qxOakCnxnZRbZ8az4AIuWCJLrMAT
+	 dkkVGV+LDkSwfE8Pz1D9/mv7odvLxW9AgU/wiDVJnUhBWZ9mvrMyXJbccTITSaPVvUahv
+	 ISLF2rOI7mMyVlKIiiBdALknuuO2eAqYbDdN6Tulfac1N9mV6ha+b8xlAX7xJd225xJvH
+	 ODvyCX63DB9gKT43OCJWzLt+3Re1LuClv7HgAv6cWk7kzUyxAaIxB5IWAKpCHg9gKXWhx
+	 p2cMLRw3o3Vj++b3On6XO0SMrMzrVJgpSWcJxeqygtqkfrzHANWJKhyD77wp1JJ6C5Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793730681;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=Bx3Axi7kmYN6HEZS0ZMX6Y3+JCnWA7wgIjqfYLJTD5A=;
-	b=3XHZKwRw5tHejGW2RszsKDSfU+UGt7o6OFMJpJofpDuVoX2zxsALOFI7lEpN9Zspnyj7
-	 7KsHfaXX7ydZB1VACj4xTmbnWNT4J7nMM/2UerR5GTKBEskUQWRza4JUMKri/XkQTSdSu
-	 G2rbb6imDyFPUylCI++rZbuWkm2L9EvD8CQueExIKh1kSllRFCsn+04vpX3hCVl1TK20p
-	 SJrcp+MSxrcCQCh8UwWTbk7FOiBdvtRKtNeUbTLORpTpjE5IW7L9C6ypvX2Y9pKC+ezKO
-	 cRQNx8Jnm06xP7AsovzgMFhCEHDGArZ7QI4iNw/t7W+5rUc2hGTyUd1y++QdoUeX9sg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793732863;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=j6MbSsBqXrp0dMj1UoXcAeObU3QV9NcnvNWemCX499Y=;
+	b=RK2u0rZ4KjYHtdBgppFeRCqqwqQvNTt903Rt+c+Qk22ZYANI3YdkHOjshzqpXs4fJasZ
+	 L/IBGrAPovR8GPo8jXX1kC9YgqOxohHJ/slOxUXEGeoKmcZ6jSQE6GbWJ16vUoAOHe/hb
+	 Q+2pgpBrfIBrxs0RU2oQKJGtvsN3kQWrNmZUzmrUo2CETU2RMPVn8yNvs9+hP64auN2Rb
+	 fKFg00RnIQrwMAcalzFLWpTjrB+SgL8hTXMPgI99ICQJhN+UFf2NcIGK+It/1dwCVZVaQ
+	 PAzy16fi+G47fDXnlkYO6RaKC+ueo+XJAYN0FdymopFFWueESg6QCizI6zFVwamKaOQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FeUVFkLv;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lqUks20W;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC20606A32F;
-	Tue,  3 Nov 2026 18:31:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52949606A339;
+	Tue,  3 Nov 2026 19:07:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FeUVFkLv
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1333B1F000C1;
-	Tue,  3 Nov 2026 18:31:20 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lqUks20W
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98E551F000C1;
+	Tue,  3 Nov 2026 19:07:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793730680;
-	bh=Bx3Axi7kmYN6HEZS0ZMX6Y3+JCnWA7wgIjqfYLJTD5A=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=FeUVFkLv+d4UD6VxK6RWXHmiYjf9+SWtAqQifjG5tFA6pcLvjO1xXaKDuR6ZRPXNN
-	 eZzLzDtbfe9jnG3mO30+NPWrRIXp8LCH3jwcM7/xQYEUatuX5VIM+ylAVm12oCvjWC
-	 fbZbidf1pDMiwEMQlVVMOtv+Luv6mpu55JR3+kq1TJfl7eWD4EyDK0bRaik+tvujF6
-	 qfOxpv9f5AAaj/U7wYi1YFqSGSlfCozcWWM8Q3WNNxP0b0+T/EJekmH2rj1JiqOY33
-	 9nq8y034lWAxy1ODkbvxL20QE23YEbV69/gK9Mz1GAuv8Ya/w1V70ITdg3IhEqmLq5
-	 katzo/XMTGHag==
-Message-ID: <sashiko-outbox-195843@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v9 3/3] KVM: selftests: arm64: Make set_id_regs bitfield
- validity checks non-fatal
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Mark Brown" <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <20261103-kvm-arm64-set-id-regs-aarch64-v9-3-ab32bc79fa9c@kernel.org>
-References: <20261103-kvm-arm64-set-id-regs-aarch64-v9-0-ab32bc79fa9c@kernel.org>
- <20261103-kvm-arm64-set-id-regs-aarch64-v9-3-ab32bc79fa9c@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 03 Nov 2026 18:31:19 +0000
+	s=k20260515; t=1793732862;
+	bh=j6MbSsBqXrp0dMj1UoXcAeObU3QV9NcnvNWemCX499Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=lqUks20WYDC7B2p/rL/zhBI3ASQnV205gEchgxjPoRmPWScFWzYNzb6ZqSb2r62Rp
+	 Fvd8SGw4VViGJtuMd93yhAANJQrwKRaWE5/althCzxSD9BdS/UI8ESRv2jUi2zsC+d
+	 G7ksyu+3dCIpxgIjUb95bNZB6rPDA5v1/74zg9ArZTK3Q6A9jTQQZzQi4oWKB/wK6s
+	 6mee1OfY/BNieYq6qKh4KTAxvHeg2YOQTVwMSJxqn8cOwo00nEgeqDiAsTvFGaCz0V
+	 8hl3++ZMSvrlHxNpFidWGbSZmHv2OGWAUl0+NrJE1w3uK4a2IUFBm9BNCVZ7AxdeC0
+	 ueUCiU9kwTMWQ==
+Date: Tue, 3 Nov 2026 19:07:37 +0000
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Use S1E1A when Stage-1 PIE is supported
+Message-ID: <auoprWUijipSDn83@gremlin>
+References: <20261103133540.29566-1-will@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -61,92 +57,92 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261103133540.29566-1-will@kernel.org>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Low] KVM: selftests: arm64: fatal vcpu_set_reg() in test_reg_set_success=
-()
+On Tue, Nov 03, 2026 at 01:35:39PM +0000, Will Deacon wrote:
+> On a system with stage-1 PIE, a guest can try to execute from an
+> execute-only mapping at stage-1 but trigger a permission fault at
+> stage-2 if the stage-2 mapping is execute-never.
+>
+> In this case, the EL2 permission fault handler will attempt to translate
+> the faulting VA using an AT S1E1R operation, which will fail due to the
+> lack of read permission at stage-1. We will then return to the guest and
+> take the exact same fault the next time around.
+>
+> Similarly to commit 55f4b215fb60 ("KVM: arm64: use `at s1e1a` for POE"),
+> use the S1E1A operation to bypass stage-1 permission checks when
+> obtaining the IPA for a stage-2 permission fault. Like FEAT_S1POE,
+> FEAT_S1PIE implies FEAT_ATS1A, so extend the existing AT invocation in
+> __translate_far_to_hpfar() to use the permission-bypassing variant when
+> S1PIE is implemented.
+
+>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oupton@kernel.org>
+> Cc: Fuad Tabba <fuad.tabba@linux.dev>
+> Cc: Joey Gouly <joey.gouly@arm.com>
+> Cc: Steffen Eiden <seiden@linux.ibm.com>
+> Cc: Ard Biesheuvel <ardb@kernel.org>
+> Signed-off-by: Will Deacon <will@kernel.org>
+
+This was useful as an excuse to go and investigate all this, take notes,
+and learn why it all makes sense :)
+
+And it does, so:
+
+Acked-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+
+> ---
+>
+> I've been debugging an external report of a failure in Android related
+> to S1PIE. The symptoms match what I would expect from this issue and
+> this patch has been reported to fix the problem, but I don't have enough
+> information to know for sure that my analysis is correct. I've had to
+> piece things together based on partial information and bits of logs.
+>
+>  arch/arm64/include/asm/cpufeature.h    | 5 +++++
+>  arch/arm64/kvm/hyp/include/hyp/fault.h | 5 +++--
+>  2 files changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index 4f04ad82ea34..f05ace660fa2 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -841,6 +841,11 @@ static inline bool system_supports_lpa2(void)
+>  	return cpus_have_final_cap(ARM64_HAS_LPA2);
+>  }
+>
+> +static inline bool system_supports_pie(void)
+> +{
+> +	return alternative_has_cap_unlikely(ARM64_HAS_S1PIE);
+> +}
+> +
+>  static inline bool system_supports_poe(void)
+>  {
+>  	return alternative_has_cap_unlikely(ARM64_HAS_S1POE);
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/fault.h b/arch/arm64/kvm/hyp/include/hyp/fault.h
+> index fc573fc767b0..741ea12be07d 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/fault.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/fault.h
+> @@ -38,8 +38,9 @@ static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
+>  	 * saved the guest context yet, and we may return early...
+>  	 */
+>  	par = read_sysreg_par();
+> -	ret = system_supports_poe() ? __kvm_at(OP_AT_S1E1A, far) :
+> -	                              __kvm_at(OP_AT_S1E1R, far);
+> +	ret = system_supports_poe() || system_supports_pie() ?
+> +		__kvm_at(OP_AT_S1E1A, far) :
+> +		__kvm_at(OP_AT_S1E1R, far);
+>  	if (!ret)
+>  		tmp = read_sysreg_par();
+>  	else
+> --
+> 2.56.0.385.gac671c819a-goog
+>
+>
+
 --
-
-commit 528a199af5ef8c602f0139ccc2860e91e650c762
-Author: Mark Brown <broonie@kernel.org>
-
-KVM: selftests: arm64: Make set_id_regs bitfield validity checks non-fatal
-
-This commit converts fatal assertions in set_id_regs feature register
-validation checks into non-fatal kselftest result reports that include the
-affected bitfield name and allow subsequent tests to continue running.
-
-> diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/test=
-ing/selftests/kvm/arm64/set_id_regs.c
-> index 37107eadd9854..d7f8b8efe1e28 100644
-> --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> @@ -423,6 +423,7 @@ static u64 test_reg_set_success(struct kvm_vcpu *vcpu=
-, u64 reg,
->  	u8 shift =3D ftr_bits->shift;
->  	u64 mask =3D ftr_bits->mask;
->  	u64 val, new_val, ftr;
-> +	bool match;
-> =20
->  	val =3D vcpu_get_reg(vcpu, reg);
->  	ftr =3D (val & mask) >> shift;
-> @@ -435,7 +436,10 @@ static u64 test_reg_set_success(struct kvm_vcpu *vcp=
-u, u64 reg,
-> =20
->  	vcpu_set_reg(vcpu, reg, val);
->  	new_val =3D vcpu_get_reg(vcpu, reg);
-> -	TEST_ASSERT_EQ(new_val, val);
-> +	match =3D new_val =3D=3D val;
-> +	if (!match)
-> +		ksft_print_msg("%lx !=3D %lx\n", new_val, val);
-> +	ksft_test_result(match, "%s valid write succeeded\n", ftr_bits->name);
-
-[Severity: Low]
-As reported by Sashiko on v8 [1], in test_reg_set_success() in
-tools/testing/selftests/kvm/arm64/set_id_regs.c, vcpu_set_reg() is still us=
-ed
-to write the register value before checking whether the write succeeded.
-
-In tools/testing/selftests/kvm/include/kvm_util.h, vcpu_set_reg() calls
-vcpu_ioctl(), which triggers a fatal assertion if the KVM_SET_ONE_REG ioctl
-returns a non-zero value:
-
-tools/testing/selftests/kvm/include/kvm_util.h:vcpu_set_reg() {
-	struct kvm_one_reg reg =3D { .id =3D id, .addr =3D (u64)&val };
-
-	TEST_ASSERT(KVM_REG_SIZE(id) <=3D sizeof(val), "Reg %lx too big", id);
-
-	vcpu_ioctl(vcpu, KVM_SET_ONE_REG, &reg);
-}
-
-When KVM rejects an ID register bitfield write in arch/arm64/kvm/sys_regs.c,
-set_id_reg() returns -EINVAL from the ioctl rather than succeeding and
-leaving the register unchanged:
-
-arch/arm64/kvm/sys_regs.c:set_id_reg() {
-	...
-	ret =3D arm64_check_features(vcpu, rd, val);
-	if (!ret)
-		kvm_set_vm_id_reg(vcpu->kvm, id, val);
-
-	mutex_unlock(&vcpu->kvm->arch.config_lock);
-
-	if (ret =3D=3D -E2BIG)
-		ret =3D -EINVAL;
-	return ret;
-}
-
-If KVM unexpectedly rejects a valid write during
-main() -> test_vm_ftr_id_regs() -> test_reg_set_success(), wouldn't
-vcpu_set_reg() abort the test binary immediately before reaching
-ksft_test_result() to report ftr_bits->name and continue running the remain=
-ing
-tests? Should test_reg_set_success() use __vcpu_set_reg() and handle a
-non-zero return value non-fatally, similar to test_reg_set_fail()?
-
-[1] https://lore.kernel.org/r/20260929163445.0D9331F000FF@smtp.kernel.org
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261103-kvm-arm64-=
-set-id-regs-aarch64-v9-0-ab32bc79fa9c@kernel.org?part=3D3
+Cheers, Lorenzo
