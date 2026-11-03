@@ -1,49 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.217
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793698664;
-	b=keSrwx6KvY5h8LN6K4zBLdDy4BPeYF0hUYmn0vtpufSXU6jiTwQUNwDy2+h78WIhnikB
-	 xn9n6zI1V3/iN0FnZoohZ3y4kr74jMqlTW9VtPnZirGBXc6+LHruC+sIiTXmyBOTQeo31
-	 gtu6hBR6DcdL1PigmGjPJl3fTP7QhfhUYdBQewYbMfrf26Po4u8ek1lVGYQNCzRcjiaES
-	 Bmieajdr8sYlU+yOQzaVqRNOSVz1z39MYE8slYl0yBb6EmN4rHS6XTD0L9vmWCEwap50E
-	 fHc6uOsr6Spjqry4wyD44AP4/TuGmsPMe3IjF9eGJHcbCHbrmilsqrMphI9DjQHgEEg==
+	t=1793701481;
+	b=XDY9CpAkz3rTue2TTVyqHjgb4FN8AVSCMURkwSBtw66OJS1TpSbhuhJ5rxQ3pWbpEpn4
+	 O5je5cL8auV6L+qVpq3Yh3P8qxgblinzDOTmEspQPvnLz2WYsdXknsWAFw/Zts8pVoqq1
+	 xM7Y51Wtmc8mxkahkKuXimhWMJAnTHFFLCU2VEtFMeS/EtAOIAPWKfkgxGooqQe0Mhk9W
+	 jF0oFpRpdd86ElPkiObVh+p/bhJJ/5rflTfB9gDwSmsyI+L8bnGnxD+3uK2c8Dmf9WPtO
+	 cc632JLkMG1SESIDRuXS5ml69XrXDAMTtRRuCCnMOgV+WZvGWdOqNOopebixyP/INTg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793698664;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:Content-Language:To:Cc:References:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=m96nh3pIfd5T2dHjgVJW57pUnSKhZsnJmnbKqdVYY3w=;
-	b=B7lYPKJ9YgYlnhDaABD2MOlTO27znbnlQ2fCwbwl7YMqDNGTVrZ/T93LbDGyeDih3Ium
-	 84tQV2NSEFjhibfpDFWWWtFSGZJBz8F9j0RjMUKAu/PjRx89+QSQjZcLZxVe8BoE8f+O2
-	 UTfk50Zi06iul+ojyqBEYXZzUpl29oUBI+ljW2WWl8tw7mGuhJ/Pa0J0hKO+P5yLgBHZ0
-	 OCO1F/QuE2AbxxziRON9BZp92mWv4l08Zb4wRIlEEwhWe3YZLKQ1s1GL7dWl+sSl3L8qW
-	 0RDXTSPsxKrEwBABJwuNqR5mRrLMVEW8BRBH8Vz2HsKnv/r6w6GES0PZFnqbF8tsEfg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793701481;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=iqtjYzgu2I1Hylg8Qdsswr/+z0+QJovnigJsnMXHcB0=;
+	b=nyxi359hPgr6dMUXyKYrz1zWULNXVljBOXRAShOPEt0rUskt3Ld2FfKWK55ZzbHyaQOZ
+	 BnH0IzjAirp6YlnPpFGJt1+w+XQLXi5bSlZ6y/UlH0hdusnBD0pQ7q8bC0+jaEXZkwdGo
+	 ezEvJPeUUoffXV8n29r2eSS772Jt+KMPsszzl+j3LA8H1Zh44iOlWlbInD1TbOKIL249m
+	 TRsjfBqld/VgN95tLMCj7fg//gJNNV0wzl2YOCD/zWidELK4X5LM1B5yczw8b0AVTnGdk
+	 rYNYmFedTO6MZAt26u/ZJAV6JJaO+uwH5JdSXgLEsQPizBjXAhhoB2ed98YrL1CIZeg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=SOfMxzkm;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35479606A32E
-	for <kvmarm@lists.linux.dev>; Tue,  3 Nov 2026 09:37:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 35479606A32E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=C8wTTWMq;
+	arc=none smtp.remote-ip=91.218.175.217
+Received: from mta0.migadu.com (out-217.mta0.migadu.com [91.218.175.217])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1042606A326
+	for <kvmarm@lists.linux.dev>; Tue,  3 Nov 2026 10:24:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B1042606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=SOfMxzkm
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E745716F3;
-	Tue,  3 Nov 2026 01:37:37 -0800 (PST)
-Received: from [10.57.66.79] (unknown [10.57.66.79])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 06A0E3F632;
-	Tue,  3 Nov 2026 01:37:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793698661; bh=4hSUFNsDMJJkO6LJAwKFbCYlyI1ujmGAiIPD2tV7jDc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SOfMxzkmC0WLCulHw8RhMkwhBbOS3LfHThPnXAfMcQ1ejTjY8GOyHWmk0VeH0M+Kj
-	 DoqLF5MwvyySThN1AIT3/ZrIT2TMGZkLcWwUHiB1/xts4ToUmXfC2kEXOS3XMJFRMI
-	 IXVzE9me7YgLPHBjn6uG14p9+OONA7PoSNQraelY=
-Message-ID: <29e7d214-b7b0-403a-a40f-dbc5b6951e22@arm.com>
-Date: Tue, 3 Nov 2026 09:37:37 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=C8wTTWMq
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=VkGYg50QptEgAf+1QC8qCKNvD4ydGpa/wOII2vh6grI=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793701477; v=1; x=1794306277;
+ b=C8wTTWMqhQK3fXLRmjnTuBXUHcsLeAAWYNwujf9BzhO5XJbMOl/H5lB8Gqvx3tK+VW7aJUw6
+ WueGjPcDi3FGZz/T3fHF6gl942L3J96tg/FrexwkgZdz3AS5fK8UPOzv6TZBUfuRT4zTQEeltRj
+ qHgMH4B9/6opc0b01MXJF5ww=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id eca278e05c33fc76;
+	Tue, 03 Nov 2026 10:24:37 +0000
+X-Mizu-Trace-ID: eca278e05c33fc76
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH v2] KVM: arm64: nv: Size nested stage-2 MMUs by the NV PARange cap
+Date: Tue,  3 Nov 2026 10:24:36 +0000
+Message-ID: <20261103102436.1605347-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,147 +75,111 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] KVM: arm64: Move stage-2 teardown into kvm_vm_s2_ops
-Content-Language: en-GB
-To: Fuad Tabba <fuad.tabba@linux.dev>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oupton@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Steffen Eiden <seiden@linux.ibm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>,
- Raghavendra Rao Ananta <rananta@google.com>, Fuad Tabba <tabba@google.com>
-References: <20261103084742.1302597-1-fuad.tabba@linux.dev>
- <20261103084742.1302597-4-fuad.tabba@linux.dev>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20261103084742.1302597-4-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Fuad
+KVM caps the PARange it exposes to an NV guest at 48 bits, but sizes
+the nested stage-2 MMUs with kvm_get_pa_bits(), which returns the host's
+IPA limit.
 
-On 03/11/2026 08:47, Fuad Tabba wrote:
-> Replace kvm_stage2_destroy()'s is_protected_kvm_enabled() and
-> KVM_PGT_FN() dispatch with a vm_stage2_destroy hook in kvm_vm_s2_ops,
-> like the other stage-2 operations. Both pKVM flavors share
-> pkvm_stage2_destroy(). Like kvm_vm_stage2_destroy(), it takes the range
-> from kvm_phys_size().
-> 
-> No functional change intended.
+On a 52-bit host, every TLBI ALLE1IS from the guest hypervisor then has
+KVM unmap each valid nested stage-2 across a range 16 times the one the
+guest can use. Under QEMU, the KVM init of an E2H0 guest hypervisor
+doesn't complete within 20 minutes.
 
-Someone beat you on this (well almost) ;-)
+Make kvm_get_pa_bits() return the 48-bit cap for an NV VM, and bound the
+walks KVM does on the guest's behalf by it rather than by the host's IPA
+limit. Have kvm_handle_guest_abort() inject its address size fault above
+the cap too, so that an L2 access above 48 bits doesn't get an SEA from
+the smaller nested MMU. If userspace gave the NV VM an IPA size above 48
+bits, an L1 access above 48 bits then also gets the address size fault,
+instead of normal stage-2 handling.
 
-https://lore.kernel.org/all/4304d0c7-2220-4add-9c71-e6dc6b4fbc11@arm.com
+Fixes: 4f128f8e1aaac ("KVM: arm64: nv: Support multiple nested Stage-2 mmu structures")
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
 
+Notes:
+    Changes since v1 [1]:
+    - Fold in the kvm_handle_guest_abort() change from my reply to
+      Sashiko, so that an L2 access above 48 bits gets an address size
+      fault rather than an SEA.
+    - Bound setup_s1_walk() and setup_s2_walk() by kvm_get_pa_bits()
+      rather than by the host's IPA limit (Wei-Lin).
+    
+    The 48 is written here and in limit_nv_id_reg(). I couldn't derive
+    it from the VM's ID_AA64MMFR0_EL1, since the nested MMUs are created
+    in kvm_setup_vcpu(), before kvm_reset_vcpu() initialises the VM's ID
+    registers. Userspace can also lower PARange afterwards.
+    
+    Based on v7.4-rc1.
+    
+    [1] https://lore.kernel.org/all/20261030105139.3543230-1-fuad.tabba@linux.dev/
 
-> 
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->   arch/arm64/include/asm/kvm_host.h |  2 ++
->   arch/arm64/kvm/mmu.c              | 24 +++++++++++++-----------
->   2 files changed, 15 insertions(+), 11 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 97332ffcb1300..b36779bafae9b 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -233,6 +233,7 @@ struct kvm_vcpu_ops {
->   
->   struct kvm_gfn_range;
->   struct kvm_s2_fault_desc;
-> +struct kvm_pgtable;
->   
->   struct kvm_vm_s2_ops {
->   	bool (*vm_age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
-> @@ -243,6 +244,7 @@ struct kvm_vm_s2_ops {
->   	void (*vm_stage2_unmap_range)(struct kvm_s2_mmu *mmu,
->   				      phys_addr_t start, u64 size,
->   				      bool may_block);
-> +	void (*vm_stage2_destroy)(struct kvm_pgtable *pgt);
->   	int (*vm_mem_abort)(const struct kvm_s2_fault_desc *s2fd);
->   };
->   
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 10b425a0141be..9df3c80a5acd1 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1029,17 +1029,16 @@ static void stage2_destroy_range(struct kvm_pgtable *pgt, phys_addr_t addr,
->   	} while (addr = next, addr != end);
->   }
->   
-> -static void kvm_stage2_destroy(struct kvm_pgtable *pgt)
-> +static void kvm_vm_stage2_destroy(struct kvm_pgtable *pgt)
->   {
-> -	unsigned int ia_bits = VTCR_EL2_IPA(pgt->mmu->vtcr);
-> +	stage2_destroy_range(pgt, 0, kvm_phys_size(pgt->mmu));
-> +	kvm_pgtable_stage2_destroy_pgd(pgt);
-> +}
->   
-> -	/* pKVM walks its mapping tree, not the IPA space, and reschedules per mapping */
-> -	if (is_protected_kvm_enabled())
-> -		pkvm_pgtable_stage2_destroy_range(pgt, 0, BIT(ia_bits));
-> -	else
-> -		stage2_destroy_range(pgt, 0, BIT(ia_bits));
-> -
-> -	KVM_PGT_FN(kvm_pgtable_stage2_destroy_pgd)(pgt);
-> +static void pkvm_stage2_destroy(struct kvm_pgtable *pgt)
-> +{
-> +	pkvm_pgtable_stage2_destroy_range(pgt, 0, kvm_phys_size(pgt->mmu));
-> +	pkvm_pgtable_stage2_destroy_pgd(pgt);
->   }
->   
->   /**
-> @@ -1126,7 +1125,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
->   	return 0;
->   
->   out_destroy_pgtable:
-> -	kvm_stage2_destroy(pgt);
-> +	kvm->arch.vm_s2_ops->vm_stage2_destroy(pgt);
+ arch/arm64/kvm/at.c     | 2 +-
+ arch/arm64/kvm/mmu.c    | 4 ++--
+ arch/arm64/kvm/nested.c | 3 +--
+ arch/arm64/kvm/reset.c  | 4 ++++
+ 4 files changed, 8 insertions(+), 5 deletions(-)
 
-minor nit: should we retain the kvm_stage2_destroy() to dispatch the 
-callback ?
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index 30d8f062b2c29..69bc621226cc2 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -383,7 +383,7 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 	ps = (wi->regime == TR_EL2 ?
+ 	      FIELD_GET(TCR_EL2_PS_MASK, tcr) : FIELD_GET(TCR_IPS_MASK, tcr));
+ 
+-	wi->max_oa_bits = min(get_kvm_ipa_limit(), ps_to_output_size(ps, wi->pa52bit));
++	wi->max_oa_bits = min(kvm_get_pa_bits(vcpu->kvm), ps_to_output_size(ps, wi->pa52bit));
+ 
+ 	/* Compute minimal alignment */
+ 	x = 3 + ia_bits - ((3 - wi->sl) * stride + wi->pgshift);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 1db10d8d6db73..620fc6d1674bc 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -2440,8 +2440,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 	is_iabt = esr_trap_is_iabt(esr);
+ 
+ 	if (esr_fsc_is_translation_fault(esr)) {
+-		/* Beyond sanitised PARange (which is the IPA limit) */
+-		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
++		/* Beyond the VM's PA limit */
++		if (fault_ipa >= BIT_ULL(kvm_get_pa_bits(kvm))) {
+ 			kvm_inject_size_fault(vcpu);
+ 			return 1;
+ 		}
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 4d83281a7a28b..a04ba4bf30a40 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -491,8 +491,7 @@ static void setup_s2_walk(struct kvm_vcpu *vcpu, struct s2_walk_info *wi)
+ 	wi->t0sz = vtcr & VTCR_EL2_T0SZ_MASK;
+ 	wi->pgshift = vtcr_to_tg0_pgshift(vcpu->kvm, vtcr);
+ 	wi->sl = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
+-	/* Global limit for now, should eventually be per-VM */
+-	wi->max_oa_bits = min(get_kvm_ipa_limit(),
++	wi->max_oa_bits = min(kvm_get_pa_bits(vcpu->kvm),
+ 			      ps_to_output_size(FIELD_GET(VTCR_EL2_PS_MASK, vtcr), false));
+ 	wi->ha = vtcr & VTCR_EL2_HA;
+ 	wi->be = vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_ELx_EE;
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 10eb7249aa9e8..1918837757682 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -220,6 +220,10 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 
+ u32 kvm_get_pa_bits(struct kvm *kvm)
+ {
++	/* An NV guest's PARange is capped by limit_nv_id_reg() */
++	if (test_bit(KVM_ARM_VCPU_HAS_EL2, kvm->arch.vcpu_features))
++		return min(kvm_ipa_limit, 48U);
++
+ 	/* Fixed limit until we can configure ID_AA64MMFR0.PARange */
+ 	return kvm_ipa_limit;
+ }
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-
-Cheers
-Suzuki
-
-
->   	mmu->pgt = NULL;
->   out_free_pgtable:
->   	kfree(pgt);
-> @@ -1246,7 +1245,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
->   	write_unlock(&kvm->mmu_lock);
->   
->   	if (pgt) {
-> -		kvm_stage2_destroy(pgt);
-> +		kvm->arch.vm_s2_ops->vm_stage2_destroy(pgt);
->   		kfree(pgt);
->   	}
->   
-> @@ -3152,6 +3151,7 @@ static const struct kvm_vm_s2_ops protected_pkvm_vm_s2_ops = {
->   	.vm_age_gfn			= no_age_gfn,
->   	.vm_test_age_gfn		= no_age_gfn,
->   	.vm_stage2_unmap_range		= no_stage2_unmap_range,
-> +	.vm_stage2_destroy		= pkvm_stage2_destroy,
->   	.vm_mem_abort			= protected_pkvm_mem_abort,
->   };
->   
-> @@ -3161,6 +3161,7 @@ static const struct kvm_vm_s2_ops pkvm_vm_s2_ops = {
->   	.vm_age_gfn			= pkvm_age_gfn,
->   	.vm_test_age_gfn		= pkvm_test_age_gfn,
->   	.vm_stage2_unmap_range		= pkvm_stage2_unmap_range,
-> +	.vm_stage2_destroy		= pkvm_stage2_destroy,
->   	.vm_mem_abort			= kvm_vm_mem_abort,
->   };
->   
-> @@ -3170,6 +3171,7 @@ static const struct kvm_vm_s2_ops kvm_default_vm_s2_ops = {
->   	.vm_age_gfn			= kvm_vm_age_gfn,
->   	.vm_test_age_gfn		= kvm_vm_test_age_gfn,
->   	.vm_stage2_unmap_range		= kvm_vm_stage2_unmap_range,
-> +	.vm_stage2_destroy		= kvm_vm_stage2_destroy,
->   	.vm_mem_abort			= kvm_vm_mem_abort,
->   };
->   
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+-- 
+2.47.3
 
