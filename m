@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793728745;
-	b=d+VYB0vQIpWM+srr3QsIkaW23PcrxC7SjjeyLVcVgZ9+KiFC9Zt++HIFn/Wt1uVkFpSo
-	 9XPV3P1N9LgZT18I6NoJYQA6tU0N/sayGmSeIWW1w2qH/fFaZeOzAio6y4xPWuRwKVg4Y
-	 fC9WSVGNVsglCXcN4GmoJLa5FzYZDSMSeuiVmPm8BsH6JzRaIQ/Pl0xHMntAfywSvT/O0
-	 UF92YsQLQEKqCrSYx8rMVeOJQqNhDjgsM+ZKQyIBDrL2fKG8thrIbKo3imKE8hiTiJQ9H
-	 ltG9a7kSPcYmD7RXB8dKxP8LOQp/XHM7QHUFzmdUtoorOb5+S1oaE7hn3Nb1DRqjCZA==
+	t=1793729294;
+	b=nCbf1YPtpOXVkAFxPTBvzGnAQjqjWd5A2jtrV9RVQGUdUxIjv+XLyb7JyJD6AEtYiF6v
+	 wedbCeiJKL5pAmGHR+EnAK2YEtu00hBAwrQ4QZmmASrIJSN5qngqiqV1/awGVBn13+L8n
+	 TXeJPW4CnsbCDtPy1yU1yYq32mHCVwr4W2VJmnx71J34jOEdi3NHxtKaIlEVSNPuLIMwA
+	 BB/BRW21ooIVsGR2AqGoCJSy3rmFDYSbhrFgIMRfZiC/YykJUaWqystPIjxRp4y3NRhaC
+	 HZtjQMpRNLpnjbhvz6MlkyHzh+Ad9UH4LPrRxCfJ/qudtwIS3zWXip9eycwalpjR3CA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793728745;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793729294;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
-	bh=nb+2zXteSe9K33gFH0nZhNQtZBhsvYeg6g30yRJfQBc=;
-	b=3R0VatvMcORjVroPIdYKpTDzK/pQK4uYJAkUPW/N8b/K138eODchiP2eb1skujnYgjIF
-	 ue/PTXgM9m4gWRcj8czeFu4YCdcSLOil3Z25cp/Nxzwdsvc2wNAcFcXiX/kZd62Ehy4f1
-	 ZzO6tmf0Eni5EUDM/JLyrNwQGMGBP344Y982IhxRl5i7NxS92QrCAAI1skYMiE4ppJUJa
-	 nQ397JkeTUI3+XSAC7xEw4pOMu0n864soGEkH8sFOa9q9kVDsJV7xFrwqvmmg4pK06tOR
-	 ainp2QSsetFm2sXWEgaz+jDIU3InCr2m11RWwI6b6RD26O7zYHFg4OOHyRI5yCmiQ4A==
+	bh=CX7KsGRvfMi8sSaFIycRH1gk1nz8kOlyJvWAR6hLDGQ=;
+	b=tugtx6u1GMfewrHD6eK1BwGhZKjqHXJlQHiRx1LbtKoLXZZIDv6Xftec3KgI4ZjyH8oh
+	 FNBs5oVF32ypSbKgKPizsHdoGrlph3ybEs/fNjG2PZbVlWDkwDb3KTendMpHbW1hgAxFl
+	 4LNjBSkbivhRTH1B2NLVXEVLWD9NFSEF8ZHykOMXTWtfbumZYd4jQod1ICrUHTzTLbp8K
+	 CMcNGcdCIxDLqTk9kVr8+yeAQ4OcypewDvAx75Zx4bAGdn9rcmW7m7ALMBw4hHqYUFgL8
+	 pqdUEphSsSHCyhM1JRtdDTwt6GS97HUzjAcvcEOtHQeoii+ULM74cZt5yQjGF0ypnGA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="l/VQOHns";
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=oRvRPA21;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F863606A31B
-	for <kvmarm@lists.linux.dev>; Tue,  3 Nov 2026 17:59:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4F863606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB1B0606A330
+	for <kvmarm@lists.linux.dev>; Tue,  3 Nov 2026 18:08:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DB1B0606A330
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=l/VQOHns
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=oRvRPA21
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8E97E1595;
-	Tue,  3 Nov 2026 09:59:00 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 17BB01595;
+	Tue,  3 Nov 2026 10:08:10 -0800 (PST)
 Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3CDCF3F673;
-	Tue,  3 Nov 2026 09:59:02 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D1E0E3F628;
+	Tue,  3 Nov 2026 10:08:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793728743; bh=WCd0FKNSdDbaUSntYCHvua7YbBIJWQFqFb59a97J1Yc=;
+	t=1793729293; bh=eMBQh6Es3Cx6YejfUPOcrZdff/o/zTyZB1GbN6OabuE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=l/VQOHnsGnQqRpstpZmODKUw5JRrBreeQ81n4Xwg+Vz3Dh02WmD+Im51nEvjhj/H3
-	 JEyCbulUBSur0uG1QPpC4bOjh/Vs+a+CfOpoeTcO/m0OE8UK9cBYofVNVmekuaR6/j
-	 w31j2ZsipQaEO17ZjnQr0sEnIgdmvPOFdmFv7uMM=
+	b=oRvRPA21izd1QR+JpVJV7Gz7W1GzdJ9NQs3onqSVR18r2cfconpjhwoKBTt17sGlB
+	 k7PNjWMnK7TZDeYUiSeFUATB465UhU8iMKarv6+Ex8J+Al8AITM56nUTT3+DGz7FkX
+	 9eMOAXA9bVXRgPlnH57y93zriiED6KUg++EtwB2k=
 From: Leonardo Bras <leo.bras@arm.com>
 To: Oliver Upton <oupton@kernel.org>
 Cc: Leonardo Bras <leo.bras@arm.com>,
@@ -52,14 +52,13 @@ Cc: Leonardo Bras <leo.bras@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2 14/28] KVM: arm64: nv: Respect HA when computing translated TCR
-Date: Tue,  3 Nov 2026 17:58:59 +0000
-Message-ID: <auog45RgAkr2PhoE@LeoBrasDK>
+	Fuad Tabba <fuad.tabba@linux.dev>
+Subject: Re: [PATCH v2 15/28] KVM: arm64: nv: Respect HD when computing translated TCR
+Date: Tue,  3 Nov 2026 18:08:09 +0000
+Message-ID: <auojCeTzUnG0ljcF@LeoBrasDK>
 X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261023205610.1044532-15-oupton@kernel.org>
-References: <20261023205610.1044532-1-oupton@kernel.org> <20261023205610.1044532-15-oupton@kernel.org>
+In-Reply-To: <20261023205610.1044532-16-oupton@kernel.org>
+References: <20261023205610.1044532-1-oupton@kernel.org> <20261023205610.1044532-16-oupton@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -73,29 +72,28 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 23, 2026 at 01:55:56PM -0700, Oliver Upton wrote:
-> Add the missing forwarding of TCR_EL2.HA to TCR_EL1.HA, which are
-> different bit indices, to ensure that FEAT_HAF actually works for an L1
-> hypervisor in the EL2 translation regime.
+On Fri, Oct 23, 2026 at 01:55:57PM -0700, Oliver Upton wrote:
+> In a similar vein to the recent fix for FEAT_HAF, propagate the L1
+> hypervisor's setting for HD to the translated TCR_EL1 value, allowing
+> FEAT_HAFDBS to be used by an L1 hypervisor in the EL2 translation
+> regime.
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: d5bbb76f4474 ("KVM: arm64: nv: Expose hardware access flag management to NV guests")
 > Signed-off-by: Oliver Upton <oupton@kernel.org>
 > ---
 >  arch/arm64/include/asm/kvm_nested.h | 3 ++-
 >  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
 > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index f0ac36fff652..d51d011fc68a 100644
+> index d51d011fc68a..11944dfb204c 100644
 > --- a/arch/arm64/include/asm/kvm_nested.h
 > +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -29,7 +29,8 @@ static inline u64 translate_tcr_el2_to_tcr_el1(u64 tcr)
->  	       (tcr & TCR_EL2_TG0_MASK) |
+> @@ -30,7 +30,8 @@ static inline u64 translate_tcr_el2_to_tcr_el1(u64 tcr)
 >  	       (tcr & TCR_EL2_ORGN0_MASK) |
 >  	       (tcr & TCR_EL2_IRGN0_MASK) |
-> -	       (tcr & TCR_EL2_T0SZ_MASK);
-> +	       (tcr & TCR_EL2_T0SZ_MASK) |
-> +	       ((tcr & TCR_EL2_HA) ? TCR_HA : 0);
+>  	       (tcr & TCR_EL2_T0SZ_MASK) |
+> -	       ((tcr & TCR_EL2_HA) ? TCR_HA : 0);
+> +	       ((tcr & TCR_EL2_HA) ? TCR_HA : 0) |
+> +	       ((tcr & TCR_EL2_HD) ? TCR_HD : 0);
 >  }
 >  
 >  static inline u64 translate_cptr_el2_to_cpacr_el1(u64 cptr_el2)
@@ -103,7 +101,9 @@ On Fri, Oct 23, 2026 at 01:55:56PM -0700, Oliver Upton wrote:
 > 2.47.3
 > 
 
-LGTM. FWIW:
+Same as previous patch, but for dirty-bit management.
+LGTM.
+
 Reviewed-by: Leonardo Bras <leo.bras@arm.com>
 
 Thanks!
