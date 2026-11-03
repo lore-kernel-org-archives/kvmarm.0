@@ -1,54 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.246
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793732863;
-	b=sRmrHu7g7O0U9ConqVUMWhv2GHWO3+wV2SXK9Ih8qxOakCnxnZRbZ8az4AIuWCJLrMAT
-	 dkkVGV+LDkSwfE8Pz1D9/mv7odvLxW9AgU/wiDVJnUhBWZ9mvrMyXJbccTITSaPVvUahv
-	 ISLF2rOI7mMyVlKIiiBdALknuuO2eAqYbDdN6Tulfac1N9mV6ha+b8xlAX7xJd225xJvH
-	 ODvyCX63DB9gKT43OCJWzLt+3Re1LuClv7HgAv6cWk7kzUyxAaIxB5IWAKpCHg9gKXWhx
-	 p2cMLRw3o3Vj++b3On6XO0SMrMzrVJgpSWcJxeqygtqkfrzHANWJKhyD77wp1JJ6C5Q==
+	t=1793732934;
+	b=wWTzRf1of+ozK78IE6RhjDIsV8gUQLMThN2cxkQyxPWgbiWI06JQ7qHVFSaIjOxQWn3k
+	 1lt9LkAyNOA1moHf+BoDVplmJZ+A+adGzd6vBKfsRm/2Y8CXeEaAaAeWBxgFWlAW2TMc4
+	 2nslnFxqYAH6cgdobfHX6E0AtrmpkwUOucs87kcRWaEvQ9vAhGxmMnTlTgeL6CCrZUciX
+	 CMiQuD24+ZT9PiWON+kRB+bq6IoEaHgwoSAx6xlfS2h0qKM2AZMi2ANMVALAxruRnvYmb
+	 Y2qVxjg3g4TAT+dBbCvhg8wDy8hQY78cIB6Ll8b/JMBWoacNigwp+60cqM/dMgjwEzQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793732863;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=j6MbSsBqXrp0dMj1UoXcAeObU3QV9NcnvNWemCX499Y=;
-	b=RK2u0rZ4KjYHtdBgppFeRCqqwqQvNTt903Rt+c+Qk22ZYANI3YdkHOjshzqpXs4fJasZ
-	 L/IBGrAPovR8GPo8jXX1kC9YgqOxohHJ/slOxUXEGeoKmcZ6jSQE6GbWJ16vUoAOHe/hb
-	 Q+2pgpBrfIBrxs0RU2oQKJGtvsN3kQWrNmZUzmrUo2CETU2RMPVn8yNvs9+hP64auN2Rb
-	 fKFg00RnIQrwMAcalzFLWpTjrB+SgL8hTXMPgI99ICQJhN+UFf2NcIGK+It/1dwCVZVaQ
-	 PAzy16fi+G47fDXnlkYO6RaKC+ueo+XJAYN0FdymopFFWueESg6QCizI6zFVwamKaOQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793732934;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=yRNBCNleXapj6/D9Dy5JVT8U1O3DIrFP6P/UGlFxQWo=;
+	b=oXBdfRHjJYZmtjDETpBv/QzODxHsTTMpuVAJfBgwutf0B9IOjAlFToH42p/qFP934qJX
+	 A256tv47mBoKv1a1ntKMiVOSSHtBHeQHETlpgcH00o1EtfkHosyNXlpEaDxp7CH/fxmj8
+	 0AEj/KrT5x8n9a8qG2OwG5NN5U/IB0h4ZFb1m0ZMZ5+wg5o9tGSJdYKEuzQz7dBlStGm9
+	 Ns9H0WlnNCq+GgT8U+Hhk2IEQMpbRhBtis9zMjrIlC/CfBmHAKpBdAN4jJOuj8R18n5El
+	 CbAlnIKjsiuKciM3AeNeL7zQyypKQDuXwG1jnlpZQRFQcWZreMIbb4FZ/O+qf/bIIAA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lqUks20W;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=k7QRZwec;
+	arc=none smtp.remote-ip=95.215.58.246
+Received: from mta1.migadu.com (out-246.mta1.migadu.com [95.215.58.246])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52949606A339;
-	Tue,  3 Nov 2026 19:07:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83559606D808
+	for <kvmarm@lists.linux.dev>; Tue,  3 Nov 2026 19:08:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 83559606D808
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lqUks20W
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98E551F000C1;
-	Tue,  3 Nov 2026 19:07:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793732862;
-	bh=j6MbSsBqXrp0dMj1UoXcAeObU3QV9NcnvNWemCX499Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=lqUks20WYDC7B2p/rL/zhBI3ASQnV205gEchgxjPoRmPWScFWzYNzb6ZqSb2r62Rp
-	 Fvd8SGw4VViGJtuMd93yhAANJQrwKRaWE5/althCzxSD9BdS/UI8ESRv2jUi2zsC+d
-	 G7ksyu+3dCIpxgIjUb95bNZB6rPDA5v1/74zg9ArZTK3Q6A9jTQQZzQi4oWKB/wK6s
-	 6mee1OfY/BNieYq6qKh4KTAxvHeg2YOQTVwMSJxqn8cOwo00nEgeqDiAsTvFGaCz0V
-	 8hl3++ZMSvrlHxNpFidWGbSZmHv2OGWAUl0+NrJE1w3uK4a2IUFBm9BNCVZ7AxdeC0
-	 ueUCiU9kwTMWQ==
-Date: Tue, 3 Nov 2026 19:07:37 +0000
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Use S1E1A when Stage-1 PIE is supported
-Message-ID: <auoprWUijipSDn83@gremlin>
-References: <20261103133540.29566-1-will@kernel.org>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=k7QRZwec
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=yRNBCNleXapj6/D9Dy5JVT8U1O3DIrFP6P/UGlFxQWo=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793732930; v=1; x=1794337730;
+ b=k7QRZwecMPnx/QNoipPrtAdaySBRx3hl/uQlIte0h3pc6j81BpJEyvmJMLgjW27PEHJq3fn7
+ GkuylPGVP2vVQAAVeS8Oy4wl+cJyPCsgsCg66qoNrR9SUQFmRC8N3yFoJZsBgcarJPO7eHERG1h
+ Rmgtj6Y4C/A9hI8OmLBMy01o=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id ad2d3477951902c1;
+	Tue, 03 Nov 2026 19:08:50 +0000
+X-Mizu-Trace-ID: ad2d3477951902c1
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5bfca2a2af4so904e87.1
+        for <kvmarm@lists.linux.dev>; Tue, 03 Nov 2026 11:08:46 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AKwUvBz72IO9uUU0DG1vptklDTmqHpIaipf90Fy78EHSC2J1ts/zO1QN9oL6K/hodEkfDG0Lb1ZLJhI=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+P+oEudefyaYv++Hoci3ZUhxqnOvY/TwRIuO9ldw9A3flulb8y
+	jW880RYXdRFzkMB/XjnkUZ7HaYPuFG5YaHGAnt1l5xE2moAgnDUfwWnvOKkUSq9LuRJviGZeV6V
+	XZpHWLVwqOBSQJHcfy/1MKolbYkpCV5tL6Oxk7Lqw
+X-Received: by 2002:a05:6512:6c8:b0:5bf:c9c6:ae92 with SMTP id
+ 2adb3069b0e04-5bff406f902mr12922e87.7.1793732925312; Tue, 03 Nov 2026
+ 11:08:45 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -58,91 +66,42 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261103133540.29566-1-will@kernel.org>
+References: <20261103084742.1302597-1-fuad.tabba@linux.dev> <auoT0b1LxuDlZOnc@kernel.org>
+In-Reply-To: <auoT0b1LxuDlZOnc@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 3 Nov 2026 19:08:08 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTynpZOE5s4U_Ls4WHdhHqTTo5Vp8YqKxK3EwxBT3O2XVg@mail.gmail.com>
+X-Gm-Features: AclHuK8AbjAuWLo00Tzpop7EQF-bwBMdIvmJij4-h9aVeKs-eFdilzti7zR-K-4
+Message-ID: <CA+EHjTynpZOE5s4U_Ls4WHdhHqTTo5Vp8YqKxK3EwxBT3O2XVg@mail.gmail.com>
+Subject: Re: [PATCH 0/3] KVM: arm64: Stop stage-2 teardown scaling with the
+ IPA size
+To: Oliver Upton <oupton@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Nov 03, 2026 at 01:35:39PM +0000, Will Deacon wrote:
-> On a system with stage-1 PIE, a guest can try to execute from an
-> execute-only mapping at stage-1 but trigger a permission fault at
-> stage-2 if the stage-2 mapping is execute-never.
->
-> In this case, the EL2 permission fault handler will attempt to translate
-> the faulting VA using an AT S1E1R operation, which will fail due to the
-> lack of read permission at stage-1. We will then return to the guest and
-> take the exact same fault the next time around.
->
-> Similarly to commit 55f4b215fb60 ("KVM: arm64: use `at s1e1a` for POE"),
-> use the S1E1A operation to bypass stage-1 permission checks when
-> obtaining the IPA for a stage-2 permission fault. Like FEAT_S1POE,
-> FEAT_S1PIE implies FEAT_ATS1A, so extend the existing AT invocation in
-> __translate_far_to_hpfar() to use the permission-bypassing variant when
-> S1PIE is implemented.
+Hi Oliver,
 
+On Tue, 03 Nov 2026 17:03:13 +0000, Oliver Upton <oupton@kernel.org> wrote:
+[...]
+> I don't see why optimized destroy walks for CCA and pKVM is
+> fundamentally incompatible with driving them from a loop that
+> reschedules. Non-preemptible kernels are still very much a thing, I'd
+> rather not undo the fix we took for that exact use case.
 >
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oupton@kernel.org>
-> Cc: Fuad Tabba <fuad.tabba@linux.dev>
-> Cc: Joey Gouly <joey.gouly@arm.com>
-> Cc: Steffen Eiden <seiden@linux.ibm.com>
-> Cc: Ard Biesheuvel <ardb@kernel.org>
-> Signed-off-by: Will Deacon <will@kernel.org>
+> So unless I'm missing something completely obvious, I'd rather that CCA
+> and pKVM do teardowns from that loop.
 
-This was useful as an excuse to go and investigate all this, take notes,
-and learn why it all makes sense :)
+In v2, pKVM's teardown will run from that loop.
+kvm_pgtable_stage2_destroy_range() will return where its walk stopped
+(Suzuki's suggestion) and pkvm_pgtable_stage2_destroy_range() where
+the next mapping starts, so stage2_destroy_range() resumes from there.
+That replaces the pKVM path in patch 1 and the lookup in patch 2, and
+I'll drop patch 3 and the Fixes: tags.
 
-And it does, so:
-
-Acked-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-
-> ---
->
-> I've been debugging an external report of a failure in Android related
-> to S1PIE. The symptoms match what I would expect from this issue and
-> this patch has been reported to fix the problem, but I don't have enough
-> information to know for sure that my analysis is correct. I've had to
-> piece things together based on partial information and bits of logs.
->
->  arch/arm64/include/asm/cpufeature.h    | 5 +++++
->  arch/arm64/kvm/hyp/include/hyp/fault.h | 5 +++--
->  2 files changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> index 4f04ad82ea34..f05ace660fa2 100644
-> --- a/arch/arm64/include/asm/cpufeature.h
-> +++ b/arch/arm64/include/asm/cpufeature.h
-> @@ -841,6 +841,11 @@ static inline bool system_supports_lpa2(void)
->  	return cpus_have_final_cap(ARM64_HAS_LPA2);
->  }
->
-> +static inline bool system_supports_pie(void)
-> +{
-> +	return alternative_has_cap_unlikely(ARM64_HAS_S1PIE);
-> +}
-> +
->  static inline bool system_supports_poe(void)
->  {
->  	return alternative_has_cap_unlikely(ARM64_HAS_S1POE);
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/fault.h b/arch/arm64/kvm/hyp/include/hyp/fault.h
-> index fc573fc767b0..741ea12be07d 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/fault.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/fault.h
-> @@ -38,8 +38,9 @@ static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
->  	 * saved the guest context yet, and we may return early...
->  	 */
->  	par = read_sysreg_par();
-> -	ret = system_supports_poe() ? __kvm_at(OP_AT_S1E1A, far) :
-> -	                              __kvm_at(OP_AT_S1E1R, far);
-> +	ret = system_supports_poe() || system_supports_pie() ?
-> +		__kvm_at(OP_AT_S1E1A, far) :
-> +		__kvm_at(OP_AT_S1E1R, far);
->  	if (!ret)
->  		tmp = read_sysreg_par();
->  	else
-> --
-> 2.56.0.385.gac671c819a-goog
->
->
-
---
-Cheers, Lorenzo
+Thanks,
+/fuad
