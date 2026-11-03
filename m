@@ -1,57 +1,64 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793725460;
-	b=yXxOn/H288Kbha++P279avtE4PG267i7ziKZ9BjOLf+9v9FlTJu7vlVzsRlykyZAgj/M
-	 D6jSIXf0oObILzzATlEbWm49lVguiKUU6Rbmu8JanlIZ4L8klqlD1QLljhvbHbDxWvW5Y
-	 KrznqdFO6aw/qCb00W/P7UA3eYD2ZKhm+xo2HRbSTxABJ+Of25/wuMFQUfKBkXchVsNLn
-	 I9X8NhtANFzibuYDFX6QKWBUzRDjB0tksV+omKkzZvZo7cCVQshPBl5guoJdmOxn3ly3I
-	 QnOjDrgJHzZ5ZmA5bsrt/gyVxrKABDJT9Bqx4T8/D66F7SPFpaE9d5KcGdv9BQjjO2Q==
+	t=1793727473;
+	b=Fpq7moGiC7fZAxKQ3ejBvt+1rz5uNxXa20O0Z+8JnuVkpEctluzilcNa4Gqd7RTwkoEi
+	 I+0eydyzCG1VYqB1qqQI9Lr9OYkeT0GGCK93Eg9bf760BFhEmtxaFz0C7i+gkYAbCJCs0
+	 MV0EXrJWgfbO3DSttZk3wxPAMj8A3T2a2j9BUeCFTF8xFVAFmeKX+1qy5td+t7n2paPHx
+	 lRSY6dbtbCZaxGVepkDBEw24cwo1/z/QVhn7OsJUUQCn7SDCb4yibzk8foal/Pi2fNcrf
+	 SdcZb1AfNAlHaC9DKYSBy0bdHMdkbnyxKB4xiFE+X9fIrpkYYwbsToKBb8JKuxu2yvQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793725460;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=4sghRfvpX+eAonCWMENYaARxGNgqibOAgOQ2PAAwmw4=;
-	b=0FMCPxPkDSzo1PcZpfL9lOQjzLph+WxZHYpBUvnbpkqdN+3GwgtsTjhvVmgshzO2+v89
-	 3xnNzl5sdH7nYfvoJMpbdTsrc78DU+42j2yMGxMGPQXGVpyB1pQatajASVY5IRS67HnI/
-	 T77rxSAyU2yLukr+S2LId74VS20LIlZUphd3NnJMFxJj3EIiQWi73Jr1fO4Ey10GGiF3V
-	 lorGEnDqUwMjzCrKioQ0TFSA8nCfmyC9VOr4JcrmjAviXbOdv78l0F+RnhJfl1U9RX7g4
-	 bSUf/lANdPLYH7E4AUsJE5icRhOqaKurH3uNheI52A8Lpi+nB2GPAOP1AeRffLD/YLA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793727473;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
+	bh=Rh3s+qyHIxW4v4BFIQEz4TFdDGw/JszjDvPvKd0lX3Y=;
+	b=Ozntkm/yqrNArtjnCOXTBoxBfCTeFb+pi5KktgBB+dy2zTse+1JRK/cLchi17DerG5TK
+	 7XoMSJTwTwENtGJkTvhhj0GsOfrVCmfVK69NGiMbVzFqiLxgqv0XLSKhoHkBEa1c6SbuD
+	 wPHUj58lRF2l77ZFNbrJL3QEyfchU9gycoU7Kn+vdA47NBQ8znc7z5AsJZdE4bkxDcNbp
+	 rkKvEBBm/LRTX5DpOY/Ey66mVRrDOA9jwgsc+5B4876ZgE0KsqcDgnJ/co1b0MnT6pwt6
+	 Xt3+qEByUwVknAW0OlssGYfUca0+HR2Cuj0sc5i1spYWENRxC45QsbNebG35iU3Y4Ow==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZfVrbbFu;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC801606A328;
-	Tue,  3 Nov 2026 17:04:19 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=eAdJvHyP;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED968606A32C
+	for <kvmarm@lists.linux.dev>; Tue,  3 Nov 2026 17:37:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ED968606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZfVrbbFu
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40C151F00A1A;
-	Tue,  3 Nov 2026 17:04:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793725459;
-	bh=4sghRfvpX+eAonCWMENYaARxGNgqibOAgOQ2PAAwmw4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ZfVrbbFufgZA6P/d4rWcT527uw6YZfQsIVznyaLz4A1a/OAXgncABl+7dSLuy4iID
-	 l9NIRi3hzDhTSqf/QfojeZs+qo/5xwGsxXoieFKBWf8s3rvR4H1zCG8urUW11azHI5
-	 1uTSmXMVQOpV8pTXKBgsL/qD3BSD09Qp1YozTeSZf7H1BEtzikIYf6yNwPBiaCfoHp
-	 UEp9frYgP9OvM7Sux9j6uM9L7ar9TcLKtvpl/mWOHYlNFnEr4FspOxRgfSknwki7eR
-	 vHHV0kT4k+0PBo0HPL9A9H3O6ypPu3nTCTEKF78+cH4cSs+sgid0tY72l85X9dvMF5
-	 mNdjbhTIAHj+Q==
-Date: Tue, 3 Nov 2026 17:04:13 +0000
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, 
-	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	will@kernel.org, mark.rutland@arm.com, linux-perf-users@vger.kernel.org, 
-	catalin.marinas@arm.com, james.clark@linaro.org
-Subject: Re: [RFC PATCH v7 20/28] KVM: arm64: Allow guest SPE physical
- timestamps only if kernel allows it
-Message-ID: <auoFWWJHUcmvif7s@gremlin>
-References: <20260903160623.315525-1-alexandru.elisei@arm.com>
- <20260903160623.315525-21-alexandru.elisei@arm.com>
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=eAdJvHyP
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 27CFC1595;
+	Tue,  3 Nov 2026 09:37:49 -0800 (PST)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E0DF23F673;
+	Tue,  3 Nov 2026 09:37:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793727472; bh=DHM3QUrqQSRyFNSwfnpIbWNSLFF3/WzimQuFsFbnqaY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=eAdJvHyPfAALRnhlBgyuQUwqfXO8myEub28hnZ6lDNwpTxx+ZAOCAlkySw1qLrCS+
+	 WJx28QP9oPvyUqBJiTyQKgaxW0Oc5qj6o86ANuJjNl4IXSIPqRJ9HwZHdXOcGCjOHR
+	 ESSFnTopoTteAm/z8fLVByN2NRgz+jAn8DN5PTxo=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Subject: Re: [PATCH v2 10/28] KVM: arm64: Plumb through access descriptor for stage-1
+Date: Tue,  3 Nov 2026 17:37:35 +0000
+Message-ID: <auob34YYUP1zUb0_@LeoBrasDK>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261023205610.1044532-11-oupton@kernel.org>
+References: <20261023205610.1044532-1-oupton@kernel.org> <20261023205610.1044532-11-oupton@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -63,169 +70,182 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260903160623.315525-21-alexandru.elisei@arm.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 03, 2026 at 05:06:15PM +0100, Alexandru Elisei wrote:
-> The SPE driver allows userspace to use physical timestamps for records only
-> if the kernel allows it, do the same for a virtual machine.
-
-This is really bare bones again. You are making a broader change of restoring
-PMSCR_EL2 and gating on perf_allow_kernel() etc. - you should explain what
-you're doing here.
-
-Also you definitely need a 'why' here :>)
-
->
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+On Fri, Oct 23, 2026 at 01:55:52PM -0700, Oliver Upton wrote:
+> Pass sufficient context to the stage-1 walk such that access-dependent
+> features like FEAT_HAFDBS can implement the correct behavior.
+> 
+> Signed-off-by: Oliver Upton <oupton@kernel.org>
 > ---
->  arch/arm64/include/asm/kvm_spe.h | 1 +
->  arch/arm64/kvm/hyp/vhe/spe-sr.c  | 5 +++--
->  arch/arm64/kvm/spe.c             | 8 ++++++++
->  3 files changed, 12 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_spe.h b/arch/arm64/include/asm/kvm_spe.h
-> index ad0ad6ace93c..8a55ea0de4e5 100644
-> --- a/arch/arm64/include/asm/kvm_spe.h
-> +++ b/arch/arm64/include/asm/kvm_spe.h
-> @@ -15,6 +15,7 @@ struct arm_spe_pmu;
->  struct kvm_spe {
->  	struct arm_spe_pmu *spe_pmu;
->  	u64 pmblimitr_el1_res0_mask;
-> +	u64 guest_pmscr_el2;
->  };
->
->  struct kvm_vcpu_spe {
-> diff --git a/arch/arm64/kvm/hyp/vhe/spe-sr.c b/arch/arm64/kvm/hyp/vhe/spe-sr.c
-> index 978620ad99fa..3c32a1338cc8 100644
-> --- a/arch/arm64/kvm/hyp/vhe/spe-sr.c
-> +++ b/arch/arm64/kvm/hyp/vhe/spe-sr.c
-> @@ -107,6 +107,7 @@ static bool __kvm_spe_profiling_buffer_enabled(u64 pmblimitr, u64 pmbsr)
->   */
->  void __kvm_spe_restore_guest_state_vhe(struct kvm_vcpu *vcpu, struct kvm_cpu_context *guest_ctxt)
+>  arch/arm64/include/asm/kvm_nested.h |  4 +++-
+>  arch/arm64/kvm/at.c                 | 32 ++++++++++++++++++++++-------
+>  arch/arm64/kvm/nested.c             | 10 ++++++---
+>  3 files changed, 35 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 89a860b92826..d7c1fa66f029 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -118,6 +118,8 @@ struct kvm_walk_access {
+>  		WALK_ACCESS_CMO,
+>  		WALK_ACCESS_AT,
+>  		WALK_ACCESS_S1PTW,
+> +		WALK_ACCESS_NV2,
+> +		WALK_ACCESS_NONARCH,
+>  	} type;
+>  
+>  	u64	ia;
+> @@ -385,7 +387,7 @@ static inline bool s1_walk_translated(struct s1_walk_result *wr)
+>  }
+>  
+>  int __kvm_translate_va(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+> -		       struct s1_walk_result *wr, u64 va);
+> +		       struct s1_walk_result *wr, struct kvm_walk_access *access);
+>  int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa,
+>  			     int *level);
+>  
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index 3031f5855316..fe1d8a674d64 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -464,12 +464,13 @@ static void compute_s1_permissions(struct kvm_vcpu *vcpu,
+>  				   struct s1_walk_result *wr);
+>  
+>  static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+> -		   struct s1_walk_result *wr, u64 va)
+> +		   struct s1_walk_result *wr, struct kvm_walk_access *access)
 >  {
-> +	struct kvm *kvm = vcpu->kvm;
->  	u64 pmblimitr, pmbsr;
->
->  	pmbsr = ctxt_sys_reg(guest_ctxt, PMBSR_EL1);
-> @@ -120,10 +121,10 @@ void __kvm_spe_restore_guest_state_vhe(struct kvm_vcpu *vcpu, struct kvm_cpu_con
->  		write_sysreg_s(pmbsr, SYS_PMBSR_EL1);
->  	}
->
-> -	__kvm_spe_restore_sampling_regs(vcpu->kvm, guest_ctxt);
-> +	__kvm_spe_restore_sampling_regs(kvm, guest_ctxt);
->
->  	write_sysreg_el1(ctxt_sys_reg(guest_ctxt, PMSCR_EL1), SYS_PMSCR);
-> -	write_sysreg_el2(0, SYS_PMSCR);
-> +	write_sysreg_el2(kvm->arch.kvm_spe.guest_pmscr_el2, SYS_PMSCR);
->  }
->  NOKPROBE_SYMBOL(__kvm_spe_restore_guest_state_vhe);
->
-> diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
-> index af1e19cb8e9a..68b751bdb384 100644
-> --- a/arch/arm64/kvm/spe.c
-> +++ b/arch/arm64/kvm/spe.c
-> @@ -3,9 +3,11 @@
->   * Copyright (C) 2021 - ARM Ltd
+> -	u64 va_top, va_bottom, baddr, desc, new_desc, ipa;
+> +	u64 va_top, va_bottom, baddr, desc, new_desc, ipa, va;
+>  	struct kvm_s2_trans s2_trans = {};
+>  	int level, stride, ret;
+>  
+> +	va = access->ia;
+>  	level = wi->sl;
+>  	stride = wi->pgshift - 3;
+>  	baddr = wi->baddr;
+> @@ -1338,6 +1339,7 @@ static void compute_s1_permissions(struct kvm_vcpu *vcpu,
+>  
+>  static int handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr, u64 *par)
+>  {
+> +	struct kvm_walk_access access = {};
+>  	struct s1_walk_result wr = {};
+>  	struct s1_walk_info wi = {};
+>  	bool perm_fail = false;
+> @@ -1355,9 +1357,21 @@ static int handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr, u64 *par)
+>  	if (wr.level == S1_MMU_DISABLED)
+>  		goto compute_par;
+>  
+> +	access.type = WALK_ACCESS_AT;
+> +	access.ia = vaddr;
+> +	switch (op) {
+> +	case OP_AT_S1E1WP:
+> +	case OP_AT_S1E1W:
+> +	case OP_AT_S1E2W:
+> +	case OP_AT_S1E0W:
+> +		access.write = true;
+> +		break;
+> +	default:
+> +	}
+> +
+>  	idx = srcu_read_lock(&vcpu->kvm->srcu);
+>  
+> -	ret = walk_s1(vcpu, &wi, &wr, vaddr);
+> +	ret = walk_s1(vcpu, &wi, &wr, &access);
+>  
+>  	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>  
+> @@ -1681,11 +1695,11 @@ int __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>   * set. The rest of the wi and wr should be 0-initialised.
 >   */
->
-> +#include <linux/capability.h>
->  #include <linux/cpumask.h>
->  #include <linux/kvm_host.h>
->  #include <linux/perf/arm_spe_pmu.h>
-> +#include <linux/perf_event.h>
->
->  #include <asm/kvm_emulate.h>
->  #include <asm/kvm_spe.h>
-> @@ -97,6 +99,12 @@ int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu)
->  	if (!kvm_spe->pmblimitr_el1_res0_mask)
->  		kvm_spe_compute_pmblimitr_el1_res0_mask(kvm);
->
-> +	if (kvm_vm_has_ran_once(kvm))
-> +		return 0;
-> +
-> +	if (perf_allow_kernel())
-> +		kvm_spe->guest_pmscr_el2 = PMSCR_EL2_PCT_PHYS;
-
-Ouch, I see the bot raised that perf_allow_kernel() does the 'return 0 if
-success' pattern which is just AWFUL naming.
-
-Though I'm confused as to why you're gating on this at all? The driver needs to,
-I get that, as you don't want host userspace to gain access.
-
-But physical timestamps in the SPE buffer seems fine? What's the threat model
-there? This should be explained with a comment/commit msg if there if it's
-needed.
-
-Does it expose this data to userspace in a way that is not correctly gated? Or
-does the driver already handle this?
-
-Looking at [0], I can see that there are multiple options here in PMSCR_EL2.PCT:
-
-* PMSCR_EL2_PCT_VIRT = 0b00 - Virtual, offset by CNTVOFF_EL2 (unless EL2-owned
-  then 0, but patch 19 already made it EL1-owned when guest sampling).
-
-* PMSCR_EL2_PCT_PHYS = 0b01 - Defer to PMSCR_EL1.PCT if EL1-owned, otherwise
-  phys. Define phys as the RAW physical counter (no offset).
-
-* PMSCR_EL2_PCT_GUEST = 0b11 - Defer to PMSCR_EL1.PCT if EL1-owned.
-  Virtual means raw phys minus CNTVOFF_EL2. Phys means raw phys minus
-  CNTPOFF_EL2 when ECV is enabled, otherwise no offset.
-
-And [1], [2] tells me that there are offsets to take into account (ugh)
-which I see can be set via KVM_ARM_SET_COUNTER_OFFSET, and these counters will
-be what is used to correlate the data with other perf counters.
-
-As far as I can make out from the timer code, if there's no CNTPOFF_EL2
-but userspace has set a physical offset, KVM traps the guest's CNTPCT
-reads and applies the offset in software, i.e. in timer_set_traps():
-
-    /*
-     * We have two possibility to deal with a physical offset:
-     *
-     * - Either we have CNTPOFF (yay!) or the offset is 0:
-     *	 we let the guest freely access the HW
-     *
-     * - or neither of these condition apply:
-     *	 we trap accesses to the HW, but still use it
-     *	 after correcting the physical offset
-     */
-    if (!has_cntpoff() && timer_get_offset(map->direct_ptimer))
-	tpt = tpc = true;
-
-So just accepting physical timestamps in SPE would mean they'd be offset
-from the physical counter.
-
-Where CNTPOFF_EL2 exists, PMSCR_EL2_PCT_GUEST does the right thing in
-both directions - virtual minus CNTVOFF_EL2, physical minus
-CNTPOFF_EL2).
-
-But you're kinda screwed if it doesn't, so the only way for the timestamps
-to be consistent with what's expected is to force a virtual offset.
-
-So the code should look like:
-
-    u64 pct;
-
-    ...
-
-    /* Without CNTPOFF_EL2 physical timestamps can't be offset, so deny them. */
-    pct = has_cntpoff() ? PMSCR_EL2_PCT_GUEST : PMSCR_EL2_PCT_VIRT;
-    kvm_spe->guest_pmscr_el2 = FIELD_PREP(PMSCR_EL2_PCT, pct);
-
-I think.
-
-> +
->  	return 0;
+>  int __kvm_translate_va(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+> -		       struct s1_walk_result *wr, u64 va)
+> +		       struct s1_walk_result *wr, struct kvm_walk_access *access)
+>  {
+>  	int ret;
+>  
+> -	ret = setup_s1_walk(vcpu, wi, wr, va);
+> +	ret = setup_s1_walk(vcpu, wi, wr, access->ia);
+>  	if (ret)
+>  		return ret;
+>  
+> @@ -1696,7 +1710,7 @@ int __kvm_translate_va(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+>  		return 0;
+>  	}
+>  
+> -	return walk_s1(vcpu, wi, wr, va);
+> +	return walk_s1(vcpu, wi, wr, access);
 >  }
->
-> --
-> 2.43.0
->
->
+>  
+>  struct desc_match {
+> @@ -1734,6 +1748,10 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
+>  		.as_el0	= false,
+>  		.pan	= false,
+>  	};
+> +	struct kvm_walk_access access = {
+> +		.type	= WALK_ACCESS_NONARCH,
+> +		.ia	= va,
+> +	};
+>  	struct s1_walk_result wr = {};
+>  	int ret;
+>  
+> @@ -1754,7 +1772,7 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
+>  
+>  	/* Walk the guest's PT, looking for a match along the way */
+>  	scoped_guard(srcu, &vcpu->kvm->srcu)
+> -		ret = walk_s1(vcpu, &wi, &wr, va);
+> +		ret = walk_s1(vcpu, &wi, &wr, &access);
+>  	switch (ret) {
+>  	case -EINTR:
+>  		/* We interrupted the walk on a match, return the level */
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index e388cefad9e5..964331dbf475 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -1639,6 +1639,7 @@ static bool vncr_can_map_writable(struct vncr_tlb *vt)
+>  
+>  static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
+>  {
+> +	struct kvm_walk_access access = {};
+>  	struct kvm_memory_slot *memslot;
+>  	bool write_fault, writable;
+>  	unsigned long mmu_seq;
+> @@ -1648,6 +1649,7 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
+>  	int ret;
+>  
+>  	vt = vcpu->arch.vncr_tlb;
+> +	write_fault = kvm_is_write_fault(vcpu);
+>  
+>  	/*
+>  	 * If we're about to walk the EL2 S1 PTs, we must invalidate the
+> @@ -1674,15 +1676,17 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
+>  
+>  	va =  read_vncr_el2(vcpu);
+>  
+> +	access.type = WALK_ACCESS_NV2;
+> +	access.ia = va;
+> +	access.write = write_fault;
+> +
+>  	mmu_seq = vcpu->kvm->mmu_invalidate_seq;
+>  	smp_rmb();
+>  
+> -	ret = __kvm_translate_va(vcpu, &vt->wi, &vt->wr, va);
+> +	ret = __kvm_translate_va(vcpu, &vt->wi, &vt->wr, &access);
+>  	if (ret)
+>  		return ret;
+>  
+> -	write_fault = kvm_is_write_fault(vcpu);
+> -
+>  	gfn = vt->wr.pa >> PAGE_SHIFT;
+>  	memslot = gfn_to_memslot(vcpu->kvm, gfn);
+>  	if (!memslot) {
+> -- 
+> 2.47.3
+> 
 
---
-Cheers, Lorenzo
+LGTM. FWIW:
+Reviewed-by: Leonardo Bras <leo.bras@arm.com>
 
-[0]:https://support.arm.com/documentation/ddi0601/2026-09/AArch64-Registers/PMSCR-EL2--Statistical-Profiling-Control-Register--EL2-?lang=en
-[1]:https://support.arm.com/documentation/ddi0601/2026-09/AArch64-Registers/CNTVOFF-EL2--Counter-timer-Virtual-Offset-Register?lang=en
-[2]:https://support.arm.com/documentation/ddi0601/2026-09/AArch64-Registers/CNTPOFF-EL2--Counter-timer-Physical-Offset-Register?lang=en
+Thanks!
+Leo
