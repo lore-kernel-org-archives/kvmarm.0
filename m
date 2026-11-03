@@ -1,62 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.121
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793713512;
-	b=MnKQ9oD03WXLpRIoN7iNMjJoGvgDSHXTkEHPY19RnE/YYWiSzCAYJXc6FJLQxzlNhQp9
-	 d962i/ExfyME8eWAiQgDfhdPuqj4503sDpX8Tk0db2n8pDUM8Bqw0lf707o8+fcHp2fAD
-	 P7Hy+UgtU7IaVb4nvKNXDv45VVxk2ahM8Wp+1M6YU/1RnW9cSrdzpiRnQ6U5bUwgG85GD
-	 B4tjFn/8+bXOrZw3SZoMmSFZHhEqwYtvTfBHgPNuSRZ+3Fru7VuF4ADS6EvHsr4LYysBI
-	 dRL/24ewzRyiSKRPKAOHntqny6+Laimmis7oCAmaGbT5eDeZXUISFTq6toQSU6PbD8g==
+	t=1793713526;
+	b=o04EfVM61r8JdmVwyKMWCZMeRSLjdXnqvMuDCavm3yTLOtoGfTxFsHFUN77PXboWd0qQ
+	 lLHo9oFuzE4nh5G92RXqUDfK3Hz5L4G/KyChLMiODHpJ2aQnclk3jJoCfmoEr7sdsUhJk
+	 TatrfjOHtpwMZlSiAn0V4KfJpigs0Qg4+W/UEjDXB2XX3HN1ZVK080snxul+Jfm9meYCO
+	 kkBDhCIiTknpbyS4l3SeURGQEQDkPj/7FejzdST1exhLvLzO5Fzi3KCDqrSikBD7mkGKa
+	 9LjoukzSPP+iPe8oL9y4z47W3a16ARE2AOiA3YVw8mvNCthFhIU5R2NYU4IPrAEwH/w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793713512;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=7JATDHeSysjhrflLAzQ9XRWSKRJGHXy+wbdwm4zZP4o=;
-	b=hGIxdPRk7Uhh7BHo+opNGQkttXpimuQ8CtErBqzgeP1sKDWQMtLkGOBD8JhD9+dSdZC+
-	 BIvPigVu6R1gKVas0qBjPKwmkkZpuSqqp/I9qCqVHqTokdo9Pa15UtcRGqkjOzcZilmt7
-	 hS488OYoNS/4l7ebiFhE2F+xEFNoBJDKkoovWXxcU4EQcNmxPQWhoZPXg35OA/4IpDAgt
-	 Gkv8EufICvmr+jz9TrfhkxaGL+i6OUx6b8M7UUCl88bFfmwCGCdQMz+VbKV2XlDafbYqv
-	 TRp4sOBzD3YnAp86Lb56dhRcAbYtvaKzxxRC8nG2TlFc7CG3laJTQNA5ag01SyDycXg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793713526;
+	h=Received:DKIM-Signature:Received:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:
+	 X-SA-Exim-Mail-From:X-SA-Exim-Scanned;
+	bh=eirSbdBsDnP2H3EX3QFaToBg2WK7+I8nA5mg6pTJZAc=;
+	b=Tlr7YHfMwV4tj3NrpKgD4x5JuaYpyILhM4+vKXtRFMmFAo3zn8d8FS8/Ld/AghQIILtd
+	 iVLKU6jqLtma1Bd9AS7Yxi90xHv3n5vA7XGYEmpouuuvQqSeA0uVlYL0kMiJiRplEJRw+
+	 vMkd0iCQfzkIsDWBusGK3EkAdOUDC8G7ixlCEnkE/0gYZsvdWst7/POSsMSJ0oosDaDzq
+	 1ko5PEszwH1WnP00Rayc133kHjlZNW6bBYzVd3Ncosy9VILmAqR8GPd5C5+uOc7V2HLn+
+	 X3w6SPL7S9rx/jPcqDYnQVjKD/tRHwWwfFjVCzBKj4m1a0ncBPyGLs9IyLAw53iF8hQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=T5mn3YGa;
-	arc=none smtp.remote-ip=95.215.58.121
-Received: from mta1.migadu.com (out-121.mta1.migadu.com [95.215.58.121])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fOIpFBTM;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B87F3606A328
-	for <kvmarm@lists.linux.dev>; Tue,  3 Nov 2026 13:45:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B87F3606A328
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A1CE606A326
+	for <kvmarm@lists.linux.dev>; Tue,  3 Nov 2026 13:45:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=T5mn3YGa
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=7JATDHeSysjhrflLAzQ9XRWSKRJGHXy+wbdwm4zZP4o=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793713509; v=1; x=1794318309;
- b=T5mn3YGaEG0QCMmW26wojeLW3zrjcz46RH/wKpY0ghGOXG6wwJmLuRmd4gDPnbj4mGQxTAAk
- EvCeEiydRDj0G3mJRyTuChcn5fHkJDBXnUNk/Jz3hRy2gdNxenGUKJkds5agcbMmzaTuIUEg1oU
- szY1SlsNql+4j7+zkfMJeDqI=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id fa2c90b4c25e179d;
-	Tue, 03 Nov 2026 13:45:09 +0000
-X-Mizu-Trace-ID: fa2c90b4c25e179d
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5be58ad9600so7348e87.0
-        for <kvmarm@lists.linux.dev>; Tue, 03 Nov 2026 05:45:08 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AKwUvBylwn6hPxWKH/HpgJRlBAx5GxCWbu4emTdXVsOiMHIHPgP+e82o7A2knNQVwVffz6yDzKrQ3yY=@lists.linux.dev
-X-Gm-Message-State: APuU4Z8fcmenqnjYDw+ULsrJUNhgRpYMbP1CrUoAqKmvcbUYgLYAha7O
-	tFIB3CwjEloQB2nZKBidVErFrYSymb23nuJvgJc04uz4brRCTctEetCIrxtVDQjF0BXejhjNHhS
-	FfN1niiOHe7/peazPviXChQrsW2oua+ZAmebLg9Lk
-X-Received: by 2002:a05:6512:3e06:b0:5bf:a49c:ddde with SMTP id
- 2adb3069b0e04-5bff0efce9emr111926e87.10.1793713507212; Tue, 03 Nov 2026
- 05:45:07 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fOIpFBTM
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE3541F00919;
+	Tue,  3 Nov 2026 13:45:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793713525;
+	bh=eirSbdBsDnP2H3EX3QFaToBg2WK7+I8nA5mg6pTJZAc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=fOIpFBTMyxU45+1ODm2v727R+mJeqTcyXMPJoW27BGVkQH8/UcwqGUhiY2OoI/rbg
+	 qguwGOOQKUUX8ccM+Mh+2ZrG7w469jX/FfAM7RrByixMCvXq+HK+ke8Gm8Fo5HJowC
+	 Ngn7JfIb8OiWC6YN3MTlO0+/zQnp8BijHUdOPKczu08foCQDYEmuqBtIOfsHEmrpVg
+	 qFf0vEkAtuUvh8Ef9L5NGjPNPA7JKfdFJWZy5XZkzYmRSF6PGcsu9PrgHmkTRsit4t
+	 Hti6kTxBV3WLREHPrhiJR3wkukw2SsJOw4smiFR1KiVxaCpPtgEtPPOOc8Z507VK2C
+	 UgSpuAsMru5pg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xOEpH-0000000AV4j-2A9l;
+	Tue, 03 Nov 2026 13:45:23 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Marc Zyngier <maz@kernel.org>
+Cc: Steffen Eiden <seiden@linux.ibm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 0/2] KVM: arm64: Reenable MTE on VHE guest exit
+Date: Tue,  3 Nov 2026 13:45:19 +0000
+Message-ID: <179371351574.2945223.14818427732835128303.b4-ty@b4>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261026082305.2515705-1-maz@kernel.org>
+References: <20261026082305.2515705-1-maz@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,31 +75,36 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261102194454.4086911-1-sascha.bischoff@arm.com> <20261102194454.4086911-5-sascha.bischoff@arm.com>
-In-Reply-To: <20261102194454.4086911-5-sascha.bischoff@arm.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 3 Nov 2026 13:44:30 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTx6RuEs7gP=kUMJEJ-ktC_p0UNxG38rq3P68Xyo8xOMag@mail.gmail.com>
-X-Gm-Features: AclHuK_8x91av0-bAi-LcSEBarsfA-5SHr6ALUzPfLF0-91WlZxDuJwLvudbzOc
-Message-ID: <CA+EHjTx6RuEs7gP=kUMJEJ-ktC_p0UNxG38rq3P68Xyo8xOMag@mail.gmail.com>
-Subject: Re: [PATCH v2 04/16] irqchip/gic-v5: Add ITS MMIO register definitions
-To: Sascha Bischoff <sascha.bischoff@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	peter.maydell@linaro.org, lpieralisi@kernel.org, timothy.hayes@arm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, maz@kernel.org, seiden@linux.ibm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, fuad.tabba@linux.dev, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 02 Nov 2026 19:44:42 +0000, Sascha Bischoff
-<sascha.bischoff@arm.com> wrote:
-[...]
-> Keeping the ITS register frame definitions together avoids spreading
-> register-definition churn across the subsequent KVM ITS emulation
-> patches.
+On Mon, 26 Oct 2026 08:23:03 +0000, Marc Zyngier wrote:
+> Upton taking an exception, the CPU sets PSTATE.TCO to ensure that no
+> tag fault can be taken while handling the exception. It is SW's job to
+> eventually clear it when it is safe to do so.
+> 
+> It appears that when MTE is enabled and that the kernel is running
+> VHE, nothing eventually clears TCO when we come back from the guest,
+> so things such as KASAN_HW_TAGS will not work until the next exit to
+> userspace.
+> 
+> [...]
 
-nit: the re-tab and the XDMN_EVENTs rename worth a mention here?
+Applied to fixes, thanks!
 
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
+[1/2] arm64: Add return value to mte_disable_tco_entry()
+      commit: 09436ffe8f1b396c6446eda12798e46f82fed48c
+[2/2] KVM: arm64: Reenable MTE tag checking on exit from guest when running VHE
+      commit: 491fe17530d662a7e6c6b4d139d950dfa0e3a210
 
-Thanks!
-/fuad
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
