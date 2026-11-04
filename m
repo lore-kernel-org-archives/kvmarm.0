@@ -1,64 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793804635;
-	b=DmPbS4vBdEOdeaJ2NzN5rBywVwOZKJxlGrVr6YrC+G8J+JFfSvwqBltvZNmuApkFxBR7
-	 NJe1wmzlTdFJ2looIdtPFAQVRI9RMq4uqz4CPbtgsM6nSVATCPGQBcG+gHAO4IpQIKV91
-	 j9DRbDV3fHMHn27KO0QZCFrC/h7cmj7ixoDFU+cpCooou6X13Wq8wHzyCwVJIAFuWn8rN
-	 VmHAU3K588pBG/iB7xvyid6S/bgJnGucIb3DJjaA9cTqrv4ZaX+tED4rXNgmUW0vtcPTV
-	 mGNlKoGhxdNAjxm6i48V/lQp+ZQ9LndPpnHWt8JSM9zGHdpYeImXzYRS042wkeVlesg==
+	t=1793804971;
+	b=V8jUgUNwrMOhdHIMP6SJ/Gvfe1U/NHx9qfXah/VutMt6xXH2vmWJAUTh5a/WmVhEbata
+	 lYCDD0YJBR/Tj5q4cpCjZ01lOevx+oHBRmO268bcKoSeEjvqIUqc81lnJbp0rXbe14rJO
+	 DhZeqcYTeArO55Lxj1mjAfmBY0TLOiIlClLvCzrrH0frP3cpuF5sZsIhnERPpFdYsOST4
+	 mtcS8IPPitBXnn9RC/qyMlOsFC7nwQmNF5hsLa48K0zU5DIE07pfqnbmKuYd2o23D53pl
+	 bQZZ2teMW0khK7DV74W+aFBoA8MYLK+3hvXE00XIE7MOySEvRs6bDmCH7NS/KrbQD6g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793804635;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
-	bh=D3RFMx/5mZgCj1sjqXMeEDTjXmhS8Qlkfoo1pL/LuME=;
-	b=bUOSY9YlX/IrORahtGG+ahw1ZwG6g8pnSZ+bxj4+3TMj07zqoe5Bg3GG5RgNzVYHig+a
-	 czOsWfFRoXF7Br9pfrvPSgp6YBjH1QMeyyasItptxTWGN81sM6h/6Cp/PzUGVGPXtSZWT
-	 9PkAmh+RtJmSKsbAnmMSNkOOzcKwY2LRN28+J7Crm2PDQ5bab2yDuMMV3fek2ZA8cmf17
-	 onl3ekEDgVDd2TXqBU0dXUakeeRYmrw3ghAMKl4Xq27PCUB0Y5BwxSODxixFtdAs2RRkg
-	 s91oCi9XSgQSvTR5B5EXPhR4gb5bSlguOafvZvxeuweYXjsq5LKGQI5kvhsvAg19ysA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793804971;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=BFGjOyP5UIQiJBxM/VFU684BMQoEd0KQaBTYoIf/jec=;
+	b=rmC2amJBZ+bTELzX+RyzfGdC4CNhAXg8155IB58bGnuQUeH81gUJe3rUfXo/MQdSJ4Ut
+	 ClEKhkcz0HyyyawppoDSeIb3hnCVoopTZimwbJfcjVW5utFa5K8CawijsmdkC7SUmUulA
+	 T12LicSo2O58CYfQfgxXimrTVlDw7FLdsOIPX5p379D6uP78fdd5jtAe6ZuLgnoCNhk4O
+	 3plkBiqZhG09LwGIin0dV04RLv8tlRwkgHPxrDob3WxSKqs7KWqVP9rdCheHjzaTzzlRn
+	 2sfMAMelLIxDzmcKvVdCEASKNdzJDkaE1XjmFinzNviZt+yyRWm7Stt2l+ewmQhIFvw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="vim/6tm3";
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E084606A328
-	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 15:03:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4E084606A328
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=MikdqmwL;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C2B606A335;
+	Wed,  4 Nov 2026 15:09:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=vim/6tm3
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 046E51576;
-	Wed,  4 Nov 2026 07:03:51 -0800 (PST)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BAEE13F632;
-	Wed,  4 Nov 2026 07:03:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793804634; bh=5ckB1l8xBYIth30jPzNDkUdK+ZATGGMmES9msLUO6Bk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=vim/6tm3QVAPkQu3TR++tMGdFeDqwHHTn+AqYe5KY6IgwVh25h4Q9qEWLBGYIUrJ8
-	 qYjfw5NVM3Qxg6h4R/MqbAxiAak+ze2M9Ye64aHiMSC9PQJxyXeX4KWAksKFOjytcL
-	 lpmeDnH6VR1c48ov2Zixj3x3z7T8CSuLI+aw/+Qk=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>
-Subject: Re: [PATCH v2 18/28] KVM: arm64: nv: Emulate CMOs via writable-clean translations as NOPs
-Date: Wed,  4 Nov 2026 15:03:46 +0000
-Message-ID: <autJUntFMhCoqZeH@LeoBrasDK>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261023205610.1044532-19-oupton@kernel.org>
-References: <20261023205610.1044532-1-oupton@kernel.org> <20261023205610.1044532-19-oupton@kernel.org>
+	dkim=pass (1024-bit key, unprotected) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=MikdqmwL
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73CDA1F00A02;
+	Wed,  4 Nov 2026 15:09:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1793804970;
+	bh=BFGjOyP5UIQiJBxM/VFU684BMQoEd0KQaBTYoIf/jec=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=MikdqmwL0zghAEx2caid1swCm7g3GXwsdv3H7ISWA6PMwbbp18mgRC71GTVXDaZdp
+	 Exq1UpQ2I5D35E9K9/i5jEsZiRyjQIAufLiJqfUcJfGZelAI8H2IwcwK6rcav4yw+s
+	 6SJzuQcTygDY66L5tYG6ssqTjXgPz1rXTO+TEM94=
+Date: Wed, 4 Nov 2026 16:09:29 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Alex Williamson <alex@shazbot.org>,
+	Jason Gunthorpe <jgg@nvidia.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jean-Philippe Brucker <jpb@kernel.org>,
+	Oded Gabbay <ogabbay@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [BUMP] [RFC PATCH v2 00/15] Arm Core Local Accelerator Driver
+Message-ID: <2026110454-conjure-unfasten-1fe3@gregkh>
+References: <20261015142552.4128028-1-ryan.roberts@arm.com>
+ <80b69632-dbe1-405b-910a-c17a943d8fc2@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -70,87 +68,20 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <80b69632-dbe1-405b-910a-c17a943d8fc2@arm.com>
 
-On Fri, Oct 23, 2026 at 01:56:00PM -0700, Oliver Upton wrote:
-> Virtualizing FEAT_HAFDBS for an L1 hypervisor has a pretty large
-> architectural deficiency by way of cache maintenance instructions.
-> CMOs (e.g. DC IVAC) require write permission but do not set the dirty
-> state on the descriptor.
+On Wed, Nov 04, 2026 at 02:41:59PM +0000, Ryan Roberts wrote:
+> Hi All,
 > 
-> There's no way to shadow a writable-clean translation in such a way that
-> these CMOs pass the permission check and subsequent writes generate a
-> permission fault. Worse yet, data aborts taken on CMOs do not have
-> sufficient syndrome information to perform instruction emulation and
-> trapping all CMOs is unpalatable.
-> 
-> So what do we do? Absolutely nothing. Treat CMOs to writable-clean
-> translations as NOPs in anticipation of KVM only exposing FEAT_HAFDBS
-> when the VM is fully coherent (FEAT_S2FWB, CTR_EL0.{DIC,IDC}={1,1}, no
-> noncoherent DMA).
-> 
-> Signed-off-by: Oliver Upton <oupton@kernel.org>
-> ---
->  arch/arm64/kvm/mmu.c    |  4 ++++
->  arch/arm64/kvm/nested.c | 20 ++++++++++++++++++++
->  2 files changed, 24 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 7b29be33a1ea..a21b674a1981 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -2548,6 +2548,10 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  		}
->  
->  		ret = kvm_s2_handle_perm_fault(vcpu, &nested_trans);
-> +		if (ret == -EAGAIN) {
-> +			ret = 1;
-> +			goto out_unlock;
-> +		}
->  		if (ret) {
->  			esr = nested_trans.esr;
->  			kvm_inject_s2_fault(vcpu, esr);
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 7dda95d37925..46fcc75f4c20 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1150,6 +1150,26 @@ int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, struct kvm_s2_trans *trans)
->  	} else {
->  		bool write_fault = kvm_is_write_fault(vcpu);
->  
-> +		/*
-> +		 * Plug your nose for a moment.
-> +		 *
-> +		 * Writable-clean translations are shadowed using a read-only
-> +		 * mapping so KVM can set the dirty state on the L1 descriptor
-> +		 * before installing a writable mapping.
-> +		 *
-> +		 * Certain cache maintenance instructions require a write
-> +		 * permission check but leave the translation in a writable-clean
-> +		 * state, meaning KVM is on the hook to emulate CMOs that use a
-> +		 * writable-clean translation.
-> +		 *
-> +		 * "Emulate" the CMO as a NOP, as KVM only exposes FEAT_HAFDBS
-> +		 * when FEAT_S2FWB is present and the I-cache is coherent.
-> +		 */
-> +		if (kvm_vcpu_dabt_is_cm(vcpu) && trans->writable && !trans->dirty) {
-> +			kvm_incr_pc(vcpu);
-> +			return -EAGAIN;
-> +		}
-> +
->  		forward_fault = ((write_fault && !trans->writable) ||
->  				 (!write_fault && !trans->readable));
->  	}
+> Just a polite bump; now that -rc1 is out, if anyone can spare any time to cast
+> an eye and offer opinions, I'd be grateful. At this point, I'm most interested
+> in feedback on the arm64 integration aspect; If you see blockers I'd like to
+> discuss early.
 
-Maybe it's just to messy or plain wrong, but could we make the descriptor 
-WC, then run the said DC instruction, then make it RO again?
+We are _drowning_ in real patches right now, RFC ones go to the bottom
+of the pile.  Please work to make this good enough that you feel it is
+no longer a RFC and submit it that way.
 
-I mean, maybe I got it wrong, but if we can't enable HAFDBS for the 
-nested guest, as updating a shadow PTE from WC->WD would require us to 
-take a fault to update the PTE inside the guest hypervisor, we could have 
-the PTE as WC without risking it to be promoted to WD by hardware.
+thanks,
 
-I am probably missing something.
-
-Thanks!
-Leo
+greg k-h
