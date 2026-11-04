@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.80
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.88
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793782242;
-	b=Toeea+oLukWKdHTLUvZ6QPT1eWva5qtGLHcpFxjsPiddhU8PP0KNDIZNOYJvYhCRgsbi
-	 S69h7g/4wINFEWcjgeMYjUlTs6C+YD2cjJ1R9ywMOp9IMHQ8jHzUIixTelvmBaNuFhl31
-	 sJWD7gHYhCt4wR5F/VA1j5PSCHyabHTmdIgirmAQnAiCnI9Gpjzb71HyEbjPvwH1TzTBe
-	 nYHbf8JA7y9JRFquDN8BRDiWbYbDI7hd+bABhX8oPK8oHKy97cgUpNxDDi+w3fKMo1lkX
-	 iPnyQvJ2E9Cji9NE+s9rmRUo75JCa2bc2HIv701kNawcXNaoCOYNtGFaT/ppOXtWwkQ==
+	t=1793782248;
+	b=F8xaxpSanTX9xSM72qbDm8yzt6qv8Of2HW6lWyOgsKzkTszHapj39y+GM1PTBHKUBxFR
+	 8AHnAWjWwWMQRpSW9LPDzd4S8n/w4GlJeW3Wjofcc/EzwLmBVONv0bJTJSK2KYVZTmUqe
+	 cLCa5arGEL5deW8PoFzCaCwJAbdKc53BHD3i3OFWQyKv3g1ezfgBdUDE5jTUit/uXFWw8
+	 H+We37E/GLx8Ga+JEpVoXCA3H08i2DiwMs5GnthiJ++TRPw5+wcSqPvS/pvqkW2m0edJD
+	 PjE5k1MIRXjSpTYOwBGfff4gv9SgUrR/8Qutk0jruJaeePgpnC7evQDcXk2jersNo9Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793782242;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793782248;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=U2XBWSBfcfQCqve1wrsykzKjay5QUHR6JzVkYSHce1U=;
-	b=2Igw1aF7idP0/ms/3SFCwKyGwzyT0yHNqniJ6GUAXMWb0+7up+n9UIMn7p5+mBZzuYO1
-	 /QooX0eYhYp+iSfVQ+LM9tyDTzLyaj25EW4bduFkUNDvDalcdK+emoTUc4L5v5fsZd0am
-	 DwUVkqZPVlLHGfcmKBnLZqhqxtBuiACFOw6+hEU8D+wLAxCYADkREhQrDRkWbJv9qH9PT
-	 7gRWBtDXCwHfvX6N330oD5QL7QgG4UWd5wOGC7pxQD8Q8h2k4YfTg29hopJaFtOXZGgL1
-	 dBJjynyeeibvo9SMbSTb4QtWOMGCCevSrIouyE3Eznud0vyzOFEWZnfTJIQbJMsIi0A==
+	bh=YYtZXvG9+UdS+4Z9GxZSoWsbkG0GwWt2msV5s/Y8pAo=;
+	b=00oKfwhb/IiF6HTGWdxPWns+TXxCX4Dw0MG2g5ouhjwjQIXsxBTxYyXxJaSOEZgn7WvB
+	 YnsKOv6X2BZlcT5HXpxYu4XRkzRaHf2x8vUg2kr6wa1bgBAfPL6oSGzp/NE4sbbzZ4KcJ
+	 QK2XgJYUtSgOptrcJB7l/l+vogYi4/vvCH+xMXyPhwq2iHv4c5aM/Bt7UvH//0/LUi992
+	 /EsUw/0sP0KJ4aOnu6pZroCKNmsDKqlY3XjhRpquciXks+Zgf4CXrPADV1uBQKkfhXmm6
+	 73cbotDixTXZBP1S6El7XmhEY1WpjKj72k6kf4UyIJR2pd2idTZKzDT0pctjmGOkmeA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=nBZAeV24;
-	arc=none smtp.remote-ip=91.218.175.80
-Received: from mta0.migadu.com (out-80.mta0.migadu.com [91.218.175.80])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="phcI9/rK";
+	arc=none smtp.remote-ip=91.218.175.88
+Received: from mta0.migadu.com (out-88.mta0.migadu.com [91.218.175.88])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF1A5606D804
-	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 08:50:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EF1A5606D804
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76475606D80E
+	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 08:50:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 76475606D80E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=nBZAeV24
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=phcI9/rK
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=p3Len8xL7Q9ENP4Ztv32/RbG11wP2iP1K8oXCC/ZeVA=;
+DKIM-Signature: a=rsa-sha256; bh=Ia4ROUhNRdc6AFPTEZfdVXbpoKxOmfz2LXLKwxYl31Q=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793782239; v=1; x=1794387039;
- b=nBZAeV24BizL3hYLqFVzpAzWVwpnQB4WFabcCIRe7chyqZnK3StyqxSMjPkeruouE9Extzxl
- ffqHVPU/9Na6LfPt0RrBuq9cytahn1YkUwGzeIqTfs6s82XLrv8PD3c0UegGM1VtimLBkDnMqfP
- d0rljpawOHfN6bS/NtQBdQnI=
+ t=1793782245; v=1; x=1794387045;
+ b=phcI9/rKxlOSpz5zlsSr4yNnVqAYZwezIzSGB3yDKYoTKTLeyRDJRVNPlVQgDjHWTrUCRfBQ
+ MmHPJkztcGO+aTRitHsXqMgHolxmrL0g+GAsvq+XVEVmOKvwETHesP0OPve8WPOwOz5F7DVYvL8
+ LLds8dZ/Y0uYZX9u6M9uAGA8=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id ad119996fe61293c;
-	Wed, 04 Nov 2026 08:50:39 +0000
-X-Mizu-Trace-ID: ad119996fe61293c
+Received: by smtp.migadu.com with ESMTPS id 3647c177266f6c99;
+	Wed, 04 Nov 2026 08:50:44 +0000
+X-Mizu-Trace-ID: 3647c177266f6c99
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -66,9 +66,9 @@ Cc: Will Deacon <will@kernel.org>,
 	kvm@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 15/16] KVM: arm64: selftests: Add pkvm_lifecycle teardown test
-Date: Wed,  4 Nov 2026 08:48:41 +0000
-Message-ID: <20261104084842.132944-16-fuad.tabba@linux.dev>
+Subject: [PATCH 16/16] KVM: arm64: selftests: Add pkvm_exceptions debug and SError test
+Date: Wed,  4 Nov 2026 08:48:42 +0000
+Message-ID: <20261104084842.132944-17-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261104084842.132944-1-fuad.tabba@linux.dev>
 References: <20261104084842.132944-1-fuad.tabba@linux.dev>
@@ -83,148 +83,300 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Each protected VM holds an entry in EL2's table of KVM_MAX_PVMS (255)
-VMs until teardown has reclaimed its pages, so if teardown leaks
-entries, KVM_CREATE_VM eventually fails.
+pKVM can hide self-hosted debug from a protected guest, which then reads
+ID_AA64DFR0_EL1.DebugVer as 0. A virtual SError the host injects has to
+be delivered by EL2, since the host can't see whether the guest has it
+masked.
 
-Create, run and free twice that many VMs, four alive at once and freed
-in random order. Check that each VM's memory survives the others'
-teardown, and that freeing a VM drops the process's locked memory by
-what its runs added.
+Verify that the guest's own handler takes a hardware breakpoint, a
+watchpoint and a single step, and that an injected SError is pending in
+ISR_EL1.A while PSTATE.A masks it and is taken once unmasked. The debug
+cases skip while ID_AA64DFR0_EL1.DebugVer is 0.
 
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/arm64/pkvm_lifecycle.c      | 110 ++++++++++++++++++
- 2 files changed, 111 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/pkvm_lifecycle.c
+ .../selftests/kvm/arm64/pkvm_exceptions.c     | 261 ++++++++++++++++++
+ 2 files changed, 262 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/arm64/pkvm_exceptions.c
 
 diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 68bdd01f62270..214f38e3f67a7 100644
+index 214f38e3f67a7..1045136aacc16 100644
 --- a/tools/testing/selftests/kvm/Makefile.kvm
 +++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -194,6 +194,7 @@ TEST_GEN_PROGS_arm64 += arm64/pkvm_host_abi
+@@ -190,6 +190,7 @@ TEST_GEN_PROGS_arm64 += arm64/nv_pre_fault_memory_test
+ TEST_GEN_PROGS_arm64 += arm64/external_aborts
+ TEST_GEN_PROGS_arm64 += arm64/mmio_sign_ext
+ TEST_GEN_PROGS_arm64 += arm64/page_fault_test
++TEST_GEN_PROGS_arm64 += arm64/pkvm_exceptions
+ TEST_GEN_PROGS_arm64 += arm64/pkvm_host_abi
  TEST_GEN_PROGS_arm64 += arm64/pkvm_id_regs
  TEST_GEN_PROGS_arm64 += arm64/pkvm_irq
- TEST_GEN_PROGS_arm64 += arm64/pkvm_isolation
-+TEST_GEN_PROGS_arm64 += arm64/pkvm_lifecycle
- TEST_GEN_PROGS_arm64 += arm64/pkvm_mem_share
- TEST_GEN_PROGS_arm64 += arm64/pkvm_psci
- TEST_GEN_PROGS_arm64 += arm64/pkvm_smccc
-diff --git a/tools/testing/selftests/kvm/arm64/pkvm_lifecycle.c b/tools/testing/selftests/kvm/arm64/pkvm_lifecycle.c
+diff --git a/tools/testing/selftests/kvm/arm64/pkvm_exceptions.c b/tools/testing/selftests/kvm/arm64/pkvm_exceptions.c
 new file mode 100644
-index 0000000000000..0ee475799abc5
+index 0000000000000..f7f9b666dd089
 --- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/pkvm_lifecycle.c
-@@ -0,0 +1,110 @@
++++ b/tools/testing/selftests/kvm/arm64/pkvm_exceptions.c
+@@ -0,0 +1,261 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * pkvm_lifecycle - more protected VMs than EL2's VM table holds, freed out of order.
++ * pkvm_exceptions - debug exceptions and a virtual SError in a protected VM.
 + *
 + * Copyright (C) 2026 Google LLC
 + * Author: Fuad Tabba <fuad.tabba@linux.dev>
 + */
-+
-+#include <stdlib.h>
 +
 +#include "kvm_util.h"
 +#include "pkvm.h"
 +#include "processor.h"
 +#include "test_util.h"
 +
-+/* EL2's VM table has KVM_MAX_PVMS entries, and a VM holds one until it's freed. */
-+#define VM_TABLE_SIZE	255
-+/* Enough that leaking the entry of one VM in two fills the table. */
-+#define NR_VMS		(2 * VM_TABLE_SIZE)
-+#define NR_ALIVE	4
++/* Debug register programming bits, as debug-exceptions.c has them. */
++#define DBGBCR_LEN8	(0xff << 5)
++#define DBGBCR_EXEC	(0x0 << 3)
++#define DBGBCR_EL1	(0x1 << 1)
++#define DBGBCR_E	(0x1 << 0)
 +
-+struct pvm {
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+	u64 tag;
-+	size_t locked;
-+};
++#define DBGWCR_LEN8	(0xff << 5)
++#define DBGWCR_RD	(0x1 << 3)
++#define DBGWCR_WR	(0x2 << 3)
++#define DBGWCR_EL1	(0x1 << 1)
++#define DBGWCR_E	(0x1 << 0)
 +
-+/* Set in the guest's copy by the host before the first run. */
-+static u64 tag;
++#define SPSR_SS		(1 << 21)
 +
-+static void guest_code(void)
++#define NR_STEPS	3
++
++enum { CMD_INJECT_SERROR, CMD_CHECK_SERROR };
++
++extern unsigned char hw_bp, ss_start;
++
++static volatile u64 ex_pc, ex_addr;
++static volatile u64 ss_addr[NR_STEPS + 1];
++static volatile int ss_idx;
++static volatile char write_data;
++static volatile bool serror_taken;
++
++static bool debug_exposed;
++
++/* Masks debug on return so the breakpointed instruction runs. */
++static void hw_bp_handler(struct ex_regs *regs)
++{
++	ex_pc = regs->pc;
++	regs->pstate |= PSR_D_BIT;
++}
++
++/* Records FAR, the accessed address, and masks debug on return so the access completes. */
++static void wp_handler(struct ex_regs *regs)
++{
++	ex_pc = regs->pc;
++	ex_addr = read_sysreg(far_el1);
++	regs->pstate |= PSR_D_BIT;
++}
++
++/* Records the stepped PC and sets SPSR.SS so that the next instruction is stepped too. */
++static void ss_handler(struct ex_regs *regs)
++{
++	__GUEST_ASSERT(ss_idx <= NR_STEPS, "step %d past the stepped range", ss_idx);
++	ss_addr[ss_idx++] = regs->pc;
++	regs->pstate |= SPSR_SS;
++}
++
++static void reset_debug_state(void)
++{
++	asm volatile("msr daifset, #8");
++
++	/* Clear the OS lock and double lock so debug exceptions are permitted. */
++	write_sysreg(0, osdlr_el1);
++	write_sysreg(0, oslar_el1);
++	isb();
++
++	write_sysreg(0, mdscr_el1);
++	write_sysreg(0, dbgbcr0_el1);
++	write_sysreg(0, dbgbvr0_el1);
++	write_sysreg(0, dbgwcr0_el1);
++	write_sysreg(0, dbgwvr0_el1);
++	isb();
++
++	ex_pc = 0;
++	ex_addr = 0;
++}
++
++/* A zero DebugVer means EL2 hides self-hosted debug, so the case has nothing to test. */
++static bool guest_debug_exposed(void)
++{
++	bool exposed = SYS_FIELD_GET(ID_AA64DFR0_EL1, DebugVer, read_sysreg(id_aa64dfr0_el1));
++
++	GUEST_SYNC(exposed);
++	return exposed;
++}
++
++static void enable_monitor_debug(void)
++{
++	asm volatile("msr daifclr, #8");
++	write_sysreg(read_sysreg(mdscr_el1) | MDSCR_EL1_KDE | MDSCR_EL1_MDE, mdscr_el1);
++	isb();
++}
++
++static void guest_hw_breakpoint(void)
 +{
 +	pkvm_guest_init();
-+	for (;;)
-+		GUEST_SYNC(READ_ONCE(tag));
++	if (!guest_debug_exposed())
++		GUEST_DONE();
++
++	reset_debug_state();
++	write_sysreg(DBGBCR_LEN8 | DBGBCR_EXEC | DBGBCR_EL1 | DBGBCR_E, dbgbcr0_el1);
++	write_sysreg((u64)&hw_bp, dbgbvr0_el1);
++	enable_monitor_debug();
++	asm volatile("hw_bp: nop");
++	GUEST_ASSERT_EQ(ex_pc, (u64)&hw_bp);
++
++	reset_debug_state();
++	GUEST_DONE();
 +}
 +
-+/* The tag comes from the guest's own memory, so the VM must survive the others' teardown. */
-+static void run_vm(struct pvm *p)
++static void guest_watchpoint(void)
 +{
-+	size_t locked = pkvm_host_locked_vm();
-+	struct ucall uc;
-+	u64 cmd;
++	pkvm_guest_init();
++	if (!guest_debug_exposed())
++		GUEST_DONE();
 +
-+	vcpu_run(p->vcpu);
++	reset_debug_state();
++	write_sysreg(DBGWCR_LEN8 | DBGWCR_RD | DBGWCR_WR | DBGWCR_EL1 | DBGWCR_E, dbgwcr0_el1);
++	/*
++	 * BAS = 0xff watches all eight bytes only from a doubleword-aligned DBGWVR.
++	 * FAR still holds the byte's address.
++	 */
++	write_sysreg((u64)&write_data & ~7UL, dbgwvr0_el1);
++	enable_monitor_debug();
++	write_data = 'x';
++	GUEST_ASSERT_EQ(write_data, 'x');
++	GUEST_ASSERT_EQ(ex_addr, (u64)&write_data);
 +
-+	switch (cmd = get_ucall(p->vcpu, &uc)) {
-+	case UCALL_SYNC:
++	reset_debug_state();
++	GUEST_DONE();
++}
++
++static void guest_single_step(void)
++{
++	pkvm_guest_init();
++	if (!guest_debug_exposed())
++		GUEST_DONE();
++
++	reset_debug_state();
++	write_sysreg(read_sysreg(mdscr_el1) | MDSCR_EL1_KDE | MDSCR_EL1_SS, mdscr_el1);
++	isb();
++	ss_idx = 0;
++	/* Unmasking makes the step active-pending, so the first one is taken at ss_start. */
++	asm volatile("msr daifclr, #8\n"
++		     "ss_start:\n"
++		     "mrs x0, esr_el1\n"
++		     "add x0, x0, #1\n"
++		     "msr daifset, #8\n"
++		     : : : "x0");
++	GUEST_ASSERT_EQ(ss_addr[0], (u64)&ss_start);
++	GUEST_ASSERT_EQ(ss_addr[1], (u64)&ss_start + 4);
++	GUEST_ASSERT_EQ(ss_addr[2], (u64)&ss_start + 8);
++
++	reset_debug_state();
++	GUEST_DONE();
++}
++
++static void serror_handler(struct ex_regs *regs)
++{
++	GUEST_ASSERT_EQ(ESR_ELx_EC(read_sysreg(esr_el1)), ESR_ELx_EC_SERROR);
++	serror_taken = true;
++}
++
++/*
++ * The guest sees the injected SError in ISR_EL1.A while PSTATE.A masks it, and
++ * takes it on unmasking. EL2 has to deliver it through HCR_EL2.VSE, because the
++ * host can't read a protected guest's PSTATE.A for serror_is_masked().
++ */
++static void guest_serror(void)
++{
++	pkvm_guest_init();
++
++	GUEST_SYNC(CMD_INJECT_SERROR);
++	GUEST_ASSERT(read_sysreg(isr_el1) & ISR_EL1_A);
++	GUEST_ASSERT(!serror_taken);
++
++	local_serror_enable();
++	isb();
++	local_serror_disable();
++
++	GUEST_ASSERT(serror_taken);
++	GUEST_SYNC(CMD_CHECK_SERROR);
++	GUEST_DONE();
++}
++
++static void serror_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
++{
++	struct kvm_vcpu_events events = {};
++
++	switch (uc->args[1]) {
++	case CMD_INJECT_SERROR:
++		events.exception.serror_pending = true;
++		vcpu_events_set(vcpu, &events);
++		memset(&events, 0, sizeof(events));
++		vcpu_events_get(vcpu, &events);
++		TEST_ASSERT(events.exception.serror_pending, "vSError not pending after injection");
 +		break;
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT(uc);
++	case CMD_CHECK_SERROR:
++		vcpu_events_get(vcpu, &events);
++		TEST_ASSERT(!events.exception.serror_pending, "vSError still pending once taken");
 +		break;
-+	default:
-+		TEST_FAIL("Unexpected guest exit: ucall %lu", cmd);
 +	}
-+	TEST_ASSERT_EQ(uc.args[1], p->tag);
-+
-+	p->locked += pkvm_host_locked_vm() - locked;
 +}
 +
-+static void create_vm(struct pvm *p, u64 tag_val)
++static void test_serror(void)
 +{
-+	p->vm = pkvm_vm_create_with_one_vcpu(&p->vcpu, guest_code);
-+	p->tag = tag_val;
-+	p->locked = 0;
-+	write_guest_global(p->vm, tag, tag_val);
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
 +
-+	run_vm(p);
-+	TEST_ASSERT(p->locked, "VM %lu pinned no memory", tag_val);
++	vm = pkvm_vm_create_with_one_vcpu(&vcpu, guest_serror);
++	vm_install_exception_handler(vm, VECTOR_ERROR_CURRENT, serror_handler);
++	pkvm_run_loop(vcpu, serror_sync);
++	kvm_vm_free(vm);
 +}
 +
-+static void free_vm(struct pvm *p)
++static void debug_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
 +{
-+	size_t locked = pkvm_host_locked_vm();
++	debug_exposed = uc->args[1];
++}
 +
-+	kvm_vm_free(p->vm);
-+	TEST_ASSERT_EQ(locked - pkvm_host_locked_vm(), p->locked);
++static void run_debug_guest(void *guest_code, int ec, handler_fn handler, const char *name)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++
++	vm = pkvm_vm_create_with_one_vcpu(&vcpu, guest_code);
++	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ec, handler);
++	pkvm_run_loop(vcpu, debug_sync);
++	kvm_vm_free(vm);
++
++	if (debug_exposed)
++		ksft_test_result_pass("%s\n", name);
++	else
++		ksft_test_result_skip("%s: self-hosted debug not exposed to protected guests\n",
++				      name);
 +}
 +
 +int main(void)
 +{
-+	struct pvm vms[NR_ALIVE];
-+	int i, j;
-+
 +	TEST_REQUIRE(pkvm_supported());
 +
 +	ksft_print_header();
-+	ksft_set_plan(1);
++	ksft_set_plan(4);
 +
-+	for (i = 0; i < NR_ALIVE; i++)
-+		create_vm(&vms[i], i + 1);
++	run_debug_guest(guest_hw_breakpoint, ESR_ELx_EC_BREAKPT_CUR, hw_bp_handler,
++			"hardware breakpoint");
++	run_debug_guest(guest_watchpoint, ESR_ELx_EC_WATCHPT_CUR, wp_handler, "watchpoint");
++	run_debug_guest(guest_single_step, ESR_ELx_EC_SOFTSTP_CUR, ss_handler, "single step");
 +
-+	for (; i < NR_VMS; i++) {
-+		struct pvm *victim = &vms[random() % NR_ALIVE];
++	test_serror();
++	ksft_test_result_pass("virtual SError taken on unmasking\n");
 +
-+		for (j = 0; j < NR_ALIVE; j++)
-+			run_vm(&vms[j]);
-+
-+		free_vm(victim);
-+		create_vm(victim, i + 1);
-+	}
-+
-+	for (j = 0; j < NR_ALIVE; j++)
-+		free_vm(&vms[j]);
-+
-+	ksft_test_result_pass("%d VMs, %d alive at once, freed in random order\n",
-+			      NR_VMS, NR_ALIVE);
 +	ksft_finished();
 +}
 -- 
