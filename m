@@ -1,62 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793815457;
-	b=czOoizFupQyyRmNu4whY5QcyJdagE2qWMyc8peGLHj2y6O1BeHTz6W1hKvwhC5AOUcvC
-	 fkwt7CVOyOrL6uf+SrrLzOXd1nt4bUikRud8dHFidtmdgS9jQkMflK7QHl4vZcyEvfmwS
-	 CAjPsLdBeye8mwwTw4e8VCoGLJiME+a6ra6EVy1RuE+hC4BDAIUyeScVehmyL1Hgnq0BE
-	 MPRoUS9dV8ZgPTWl+ZVuIhMYEKxrnvJeE39jbjFo0DlQPZLzPO+eI92cu0tth29G300ao
-	 LNYY4aIDx4ffu4my11b9+TfYE73O78JyZBjqJwfB4ZKjQTCdkGTF2coYY7oA+gX0Uzw==
+	t=1793815579;
+	b=YIn6GXn+25F4uGKEl9QNVOn+FPKJrqwzf3g9yj9xC+tU6+vKGKLf0B/xw3P0O37DlXAx
+	 5VKnOKLU2jFV/CdHtAhxaswdGVoaxWtH8aW4FXHh3mTKP+mGspC1YHvlgAceEdRkrpLuO
+	 pgMzD+Yh7NsYGJ4ynYnJAa/8SXoiK1/w8Aku9+i4hZYokZCx06hoEkG/C4hOrEnjdfZ9e
+	 FJzzePUxi/QpZaQ8aJzKBO1Z/CiBvEPYXglm+YHMoD3pNd+6xFmlbgTqaL6yROiyyf0fj
+	 Wty838JPLQ5sb73PJqWYMqV6RUC50tXGkPuPO/kjOe9zz5swQJ3u9cJwkhVnv/5J7Ug==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793815457;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793815579;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=Und4D4ow7DAvuQu9jjQ2COay1VB0KMeWjaIjSCk7WfE=;
-	b=h50LmDURKwjW9X+G8wTwZOmGADw8atdjsjY5e9x/iXSDFR0jvhl572qS5C1Ow84ItHN5
-	 TCKyAg8g/0F6oCzKp35v4RVScfzzpNeB7Xoi+zXA0iNRjM7ihxRrZ8TwcU1dduPnObgug
-	 cXagl/fqAIiZNZxk3QXuVxHMX2FuyZvTwx1fVhPA5wOpOlUl+9zLevLXbs1AH4CaG526u
-	 IjSM9tNm5KNs23lRBlQLpHIgarnuLfYL4CPkWv2WlKUoeCQwa5R74iSFEt22if20GxJbw
-	 sxgnVS8A3Rjb9z2J4amv6IInbuQP9M7HYM9OnC1NsUzt1qutCyyLZ2o6tEFvHx6OU4g==
+	bh=BKcs+4/yEuxVnS2VouqR2WzhlLvVEKGo4vjTDXvNfG0=;
+	b=1vstN06z/PRaCKPDkTmmyeiJDRdYtduKLZkoiCnarFS/z5hHi00ac2rCh+dt8R4dqHM/
+	 qQ+yWXVIgICAmKS59hmnl6kMCH+8dPevdF/+N6cQrBj1NhaQkwhreyZsmzYN0Qn2zdb3R
+	 hppT/8GBDEsMdVXSU/h/uscBME83XdK5D3F/NkneHrOU7kYohfQhcCluHIARE/LATFOSI
+	 2A21nBOS9J4mn7Zg2bH3qK+goTpFi4+BWdFgvZQUfFDlcJJOdjsnbqVeI6Zd+VE3nO6Dz
+	 i5rg2jSCiuluZvjYcROPbbrBizAqGDZJ6v3fID9Z7wmLnd0bk/HlVC8wTC+zz6kNOSg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hpQN0bYp;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TRjh1EW7;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB941606A33B
-	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 18:04:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189A2606A328;
+	Wed,  4 Nov 2026 18:06:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hpQN0bYp
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EE131F000C1;
-	Wed,  4 Nov 2026 18:04:16 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TRjh1EW7
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 599191F000C1;
+	Wed,  4 Nov 2026 18:06:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793815456;
-	bh=Und4D4ow7DAvuQu9jjQ2COay1VB0KMeWjaIjSCk7WfE=;
+	s=k20260515; t=1793815578;
+	bh=BKcs+4/yEuxVnS2VouqR2WzhlLvVEKGo4vjTDXvNfG0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=hpQN0bYpwt4CXvj54kF2CsMJOs3bmK/IHGMDYhQZ+r6B/+/oWkBLxoP+kavOupU11
-	 +AylIUz0xoUQfIkFUye4+KW7I5k1rxKpFF9xipsTqUrJVRsOYE79xpvMBMqzthUJL/
-	 y/IhCVqg2GE7JeiYdVvkW0aGIMTRWr1o1XX+Yaym2umytW4WeCABKQ0ZpNeCQ1drCA
-	 kWKg9bOUMBOkZbaU11FK5B4jrSfm3g9Go6WDqIxeQdqpPEgSqe7yCOExSUwqbhDmcY
-	 9tXTLU31zt7IDq5eAfOFDE/k/A7aBxpO4am32Vg9cowz4hKzzvQdS+nMWp2VYfRKhH
-	 m8r4cy1oGhwUg==
-Date: Wed, 4 Nov 2026 10:04:14 -0800
-From: Oliver Upton <oupton@kernel.org>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>
-Subject: Re: [PATCH v2 18/28] KVM: arm64: nv: Emulate CMOs via writable-clean
- translations as NOPs
-Message-ID: <autzno1eEpw4X-0I@kernel.org>
-References: <20261023205610.1044532-1-oupton@kernel.org>
- <20261023205610.1044532-19-oupton@kernel.org>
- <autJUntFMhCoqZeH@LeoBrasDK>
- <autp0cVkXwvSXPGC@kernel.org>
- <autrOLZWT-s4Ailc@LeoBrasDK>
+	b=TRjh1EW7SELcNJfvo8muQIl89zA8WNp5y+E/1UNt7WjdfWpTr2l0YsLmXukzDVdcb
+	 MtN2Cul5ftUHPOTHRrWXZz15d4519+/JX99BQ9EFBwDMa6Z/p/gA/7JD6TVOjZ/vBi
+	 OB2BFXWBdTOLqM3i58cTC7RkkGMn7JN3bmprsMKqcRE4sWc3gaCR5ux18JUu+f9BiO
+	 BCPYty2It/rmH4QXelFrEbogHGZF8Vt5TPltvlSpfWz7CqHpOWk6+r1T5T2x9a+Mth
+	 pJ5gQEHLZXIi9vb1beXsTVGfz4uej5iLeuj8/pO+5HwMB3yX/Yju+Mj/kKNoIeWGj2
+	 9/KBA+HcaF4xA==
+Date: Wed, 4 Nov 2026 18:06:12 +0000
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>, pbonzini@redhat.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, maz@kernel.org, oupton@kernel.org, 
+	suzuki.poulose@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	david@kernel.org, mark.rutland@arm.com, ackerleytng@google.com
+Subject: Re: [PATCH v2] KVM: Ignore MMU notifiers for guest_memfd-only
+ memslots
+Message-ID: <autwsR83Ii-tRrqF@gremlin>
+References: <20260714160411.302386-1-alexandru.elisei@arm.com>
+ <amPCdAswlk24Xilf@google.com>
+ <anxAGkdyPYXBlS00@raptor>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -68,52 +63,83 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <autrOLZWT-s4Ailc@LeoBrasDK>
+In-Reply-To: <anxAGkdyPYXBlS00@raptor>
 
-On Wed, Nov 04, 2026 at 05:28:24PM +0000, Leonardo Bras wrote:
-> > The writable-clean state is nonexistent when VTCR_EL2.HD=0 in the direct
-> > permission model. So we have no way to construct a translation in the
-> > stage-2 that satisfies our requirements.
-> 
-> Since other vcpus will have VTCR_EL2.HD=0, couldn't we enable it just for 
-> the sake of processing this CMO?
-> 
-> I guess it would need to either decode the instruction or single-step this 
-> vcpu just to make sure it does not write to the same page we just did mark 
-> WC.
-> 
-> > 
-> > The other way to do this would likely involve halting all vCPUs in the
-> > VM and attempting to single-step which has a near 100% chance of blowing
-> > up in our face.
-> 
-> Sorry, why all vCPUs?
-> 
-> I know for all vCPUs it would be terrible for performance, what else 
-> do you mean by "blowing up in our face"? 
+[updated David's email address to @kernel.org]
 
-In order to make this work, you need to guarantee that there's no
-concurrent updates to either the instruction itself of the stage-1
-translation.
+On Wed, Aug 12, 2026 at 10:42:50AM +0100, Alexandru Elisei wrote:
+[ ... ]
+> On Fri, Jul 24, 2026 at 12:52:20PM -0700, Sean Christopherson wrote:
+> > It'll probably take me a few weeks to circle back to this, as I finally crawled
+> > out from underneath a pile of urgent and am just now getting back into review
+> > mode, but this is fairly high on my todo list, so with luck we might still squeeze
+> > this into 7.3.
 
-The operations would be, approximately:
+Hey Sean,
 
- - Take a stage-2 permission fault on the cache maintenance instruction.
-   Walk the guest's stage-2 and find a translation in writable-clean
-   state.
+I wondered whether you'd had a chance to look at this?
 
- - Pause the VM, re-enter the guest and single-step the instruction. If
-   we take the debug exception then the guest must've changed the
-   instruction. Go back to base state.
+After discussing this with Marc and Alex it is clear that this is really a
+blocker for Alex's SPE series, as we need a sensible means of ensuring
+that stage-2 mappings stay in place.
 
- - If we take another stage-2 permission fault for a cache maintenance
-   instruction, temporarily promote the translation to RW in the shadow
-   stage-2 and re-enter with single-step enabled.
+So ideally would prefer to get something like this in in the next cycle,
+if you don't have any objections to it? :)
 
- - Take the debug exception, invalidate the shadow stage-2 translation,
-   disarm single-step, restart the VM.
+If it'd be easier, I think a smaller version of the same patch would also
+give us what we need? I.e. your snippet from June with the page ageing part
+dropped, as below.
 
-The transient RW mappings seems ripe for pretty nasty bugs.
+Thanks!
 
-Thanks,
-Oliver
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index e7fc94e2910a..a6f37bdb0902 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -264,6 +264,7 @@ union kvm_mmu_notifier_arg {
+ enum kvm_gfn_range_filter {
+ 	KVM_FILTER_SHARED		= BIT(0),
+ 	KVM_FILTER_PRIVATE		= BIT(1),
++	KVM_FILTER_USERSPACE_MAPPINGS	= BIT(2),
+ };
+
+ struct kvm_gfn_range {
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index cf4cb586f140..6fc3b443c305 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -616,8 +616,13 @@ static __always_inline kvm_mn_ret_t kvm_handle_hva_range(struct kvm *kvm,
+ 			/*
+ 			 * HVA-based notifications aren't relevant to private
+ 			 * mappings as they don't have a userspace mapping.
++			 *
++			 * Memslots where guest_memfd is the only memory
++			 * provider can also safely ignore changes to the
++			 * userspace mapping.
+ 			 */
+-			gfn_range.attr_filter = KVM_FILTER_SHARED;
++			gfn_range.attr_filter = KVM_FILTER_SHARED |
++						KVM_FILTER_USERSPACE_MAPPINGS;
+
+ 			/*
+ 			 * {gfn(page) | page intersects with [hva_start, hva_end)} =
+@@ -724,6 +729,17 @@ void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end)
+ bool kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	kvm_mmu_invalidate_range_add(kvm, range->start, range->end);
++
++	/*
++	 * When reacting to changes in userspace mappings, don't unmap memslots
++	 * that are guest_memfd-only, in which case KVM's MMU mappings are
++	 * pulled directly from guest_memfd, i.e. don't depend on the userspace
++	 * mappings.
++	 */
++	if (range->attr_filter & KVM_FILTER_USERSPACE_MAPPINGS &&
++	    kvm_memslot_is_gmem_only(range->slot))
++		return false;
++
+ 	return kvm_unmap_gfn_range(kvm, range);
+ }
+
+--
+Cheers, Lorenzo
