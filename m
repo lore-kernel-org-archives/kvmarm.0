@@ -1,56 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.167
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793821076;
-	b=BVZOfY7jIDU9ORHKqKTRh1H+YLPrwsTzfILvIzIvLrFCmFzOb3l/2meTy/Q5lDqldo7Q
-	 FSSCnVBBCzJpWPm8+Hy+t54ifewij5lpp7WMfzfcBkBPyfww40Pd9RYQUvXmo/0tov5lA
-	 d997ZHrZsbJCj01AaXIZBVGn9zN/pMMS7gbLqhWysGfwkNp8MyhFcHoJngV+QfqepdjX6
-	 Zw6uTH0oWcy9TAlZCE3XgcDd0l/DsKrBBDeFg4lFZopvhH4FRQZs3vA+/6uXQZN0D/lQP
-	 ZEJdGjoY+MEB7C1VU+UuCis8Yvi1mGN3jyYwqFjrjcGZ8CuWWzvXTnJeG8RlBWDwAdg==
+	t=1793821174;
+	b=RixrLamE0dx5vzEydriqdSzIAGIP4pixH3875x/ngMjRhjZ5HCC2zoUNoNgvkBSeAjl8
+	 rGM8Pt42ry4y+eSmVhd7m9N0o4eF60QcVDgpxVpOu0ji+ubTlQW++GUxAoKr4PSNH2Nvi
+	 xWM1GXrhVGxU6Y59dk4v6JUDrod1RvdJonG+S/bG4ePjhhYX93bwPIxqPwrTfXxSgwxXx
+	 UFDmTyKSHQYp2MRegrj7aQWOLJgDUq0t5X8jewonkgvSteywujGABqoNol48mKRa02jvR
+	 8c84R8X+0rM6o6YVNNmwTx65IxfddxV2z6YlCq2wzkpd5q5GzkWMo3FY+RC8xa6Xb8g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793821076;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=QVysjEVRogPF+B3yzd6pfisjlcvHAyVumWQT5W125rY=;
-	b=LRV2aHq5d6oMY+PgdPj/UM4yaasz1FCv6TcU+LD18BDtV/cPNt2chB+0jVaWBbfJT7ey
-	 T1kdqPnFZsjc+yjVNvzYWNek2VwPxEGV2/T58HdNqqtMDpkUPgHfLqBewlExtxDl6NRGV
-	 LBCghdoOjUGb5anj3d66UAI9VvsgJRxJ9s2iuZ9e/fHCjWln4s82FJspz+sA7BnGTKZ3l
-	 dHZ1Zoz5wCwfZiq2uQ46UMn+vRCHPP7fClIwxod3z7Yhs1HR8XHq8OoY2BAz8kEoj1SqZ
-	 Rw1vTGfkQ4CHfVy84At3Bd5YJIIJ1dFcB/q4S4RR7l2iD3IJbpPQD2IhUXWDwwzC8oA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793821174;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=D7WbQXrrSrOg6sS9GtWj6hAsCJUVrDxUGniXvXJ1jxo=;
+	b=Fab7VHV4bps99EYSYkNJWORxZiEOYyZcmbM9jW4dgvPbklI7DwIV7XPLr182wXlAYLTE
+	 HboUwC0xi8CIR22ryNp3gtDEQX91UEoZ5CpVBbWz22rv/tqAEpL+wFaxJ5wgtZ4fUSKSt
+	 Zh2h5csbxAQ2/DEFkHta2FknMB/vXjHfydxIxOgcr1Y2TGKc2JxIyPqNuSp6sOX/Ega3l
+	 GpGGH+u4pUDAIjBfMNQi8Gcr8CghVbLCqZk4R1wGFzxZAmYW/1AFA/jGSKLKzNBVlqY1W
+	 ydDvbcz/0S9zqg/i34y1s/k9v6Nu4bfClgWpsETd3o4GGejYqAMQg6oO+aKx9fxS1+g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HBtDzDXB;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=RaR16Qae;
+	arc=none smtp.remote-ip=91.218.175.167
+Received: from mta0.migadu.com (out-167.mta0.migadu.com [91.218.175.167])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A931260B4C2C
-	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 19:37:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA94606EEB1
+	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 19:39:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0EA94606EEB1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HBtDzDXB
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A6CA1F0093A;
-	Wed,  4 Nov 2026 19:37:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793821075;
-	bh=QVysjEVRogPF+B3yzd6pfisjlcvHAyVumWQT5W125rY=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=HBtDzDXBP0KRzJYiZn7wRkvZMckJAN761k0CFcivH6xpmesI76n1nUrk6ABAsdWO7
-	 Ek7sqm2CB6KqrHeGy0kvRitjhgKZ8DtMdAJMjIyPpB88a7eDcYIt1UTZKlpF3IKquY
-	 lj4dZAJoBM5HtVqdis4RJLaX+ttuH5ZaOcUq0qml1oKEGCTUbPk38BVeW8MdUBOb8H
-	 IIonoxBGI3f3/RBxzXQhnzsl9qTdxnpWcuN88zur9azBqPyncqcuc5QofGGo42HZmF
-	 ehN363AefG5SwO7FcPrvtwnTwOs8husyhVBv0rNUFHgasi2tiicRrUsUN4v25284KG
-	 k/MNZpPOC4uQg==
-Message-ID: <sashiko-outbox-197967@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 1/8] KVM: arm64: nv: Disallow KVM_CAP_ARM_MTE + FEAT_EL2
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
-Cc: "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261104192124.3932743-2-oupton@kernel.org>
-References: <20261104192124.3932743-1-oupton@kernel.org>
- <20261104192124.3932743-2-oupton@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Nov 2026 19:37:54 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=RaR16Qae
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=74ExVBB+ei6S46cEXVQqMO9R7/DDzZNlWMQikqnEM6k=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793821172; v=1; x=1794425972;
+ b=RaR16QaeKpmq31kBMxJRXUxh/m1/qSf62Cz3hJ1XSOZvYJTFQoiF/JqWsDlRT/fWRVHVcK76
+ 3dGf964SgdC8Oj07UNR7SA5afAvWBZ4/8UrNuioHCC8oIFslAUdAncr0rVsyes0JlwBQ5GlmCTT
+ NEQAglVJq9SSEhPQWJiEAHA4=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 64b969e920bb14cf;
+	Wed, 04 Nov 2026 19:39:32 +0000
+X-Mizu-Trace-ID: 64b969e920bb14cf
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5be3b2f17c1so1176e87.1
+        for <kvmarm@lists.linux.dev>; Wed, 04 Nov 2026 11:39:27 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AKwUvBxLVnwrGLgadm2JzNban7MygifuYjbkm1xrjzF5BUAQc0Eb0zBBb9oppndN01X00N27+o9jf5Y=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/WZbctQlYbsY+HhsJWN86j2vobAMaQhOOiwlFBWsA2n6GVJ+dS
+	3fyCfF5ajf3Tuy3ojmCTKTia2i0BhlcFWdmnDZp9LsZilXhjQmiJr+qRWWi7aq/XPuNHNloK1EV
+	Txv9WxAYoFErG8bs5X7kdLhMb7auuKij6FssQ1vEI
+X-Received: by 2002:a05:6512:3dab:b0:5bf:ec8f:c361 with SMTP id
+ 2adb3069b0e04-5bff59a5dadmr217277e87.14.1793821166164; Wed, 04 Nov 2026
+ 11:39:26 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -59,96 +65,66 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+References: <20261104084842.132944-1-fuad.tabba@linux.dev> <aus8xb_xT64WKHDu@e143914.arm.com>
+In-Reply-To: <aus8xb_xT64WKHDu@e143914.arm.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Wed, 4 Nov 2026 19:38:49 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTxkaNRhiq6mFFZTODfntk_e_o4gYGOGrjDd7Ehj4R9nYQ@mail.gmail.com>
+X-Gm-Features: AclHuK8riSEhzUcDf-9TQZh3Kvvf2G4Bq4PoB9O0DW_xpYQYnA8l-TCApe4f2jc
+Message-ID: <CA+EHjTxkaNRhiq6mFFZTODfntk_e_o4gYGOGrjDd7Ehj4R9nYQ@mail.gmail.com>
+Subject: Re: [PATCH 00/16] KVM: arm64: selftests: Tests for protected VMs
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Will Deacon <will@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Vincent Donnefort <vdonnefort@google.com>, 
+	Quentin Perret <qperret@google.com>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] KVM: arm64: rejecting MTE with EL2 breaks set_id_regs selftest o=
-n NV+MTE hosts
---
+Hi Joey,
 
-commit 6863183ae448414619eb0267884e7d66bfaf521c
-Author: Oliver Upton <oupton@kernel.org>
+Thanks for sharing this.
 
-KVM: arm64: nv: Disallow KVM_CAP_ARM_MTE + FEAT_EL2
+On Wed, 04 Nov 2026 14:10:45 +0000, Joey Gouly <joey.gouly@arm.com> wrote:
+[...]
+> For example I also added a 'pre-boot' stub, which looks like your
+> pvm-entry.S:
+>
+>         https://gitlab.arm.com/linux-arm/linux-jg/-/commit/cd3ae35d89974b02b7051a0c45cc68b4df8f9d3e
+>
+> However I extracted the registers needed for the stub like this:
+>
+>         https://gitlab.arm.com/linux-arm/linux-jg/-/commit/f559d5b61fa1a37e2d7b23704bd367e079cf8eae
+>
+> This is because the current Realm branch I'm working on top of rejects
+> writes to those system registers (TCR_EL1, CPACR_EL1 etc). Which is why
+> I had to modify these functions, along with __aarch64_vcpu_add() and
+> some others.
 
-This commit updates kvm_vcpu_init_check_features() to return -EINVAL when
-KVM_ARM_VCPU_HAS_EL2 is requested on a VM that has KVM_CAP_ARM_MTE enabled.
+When EL2 boots a protected guest, it takes only PC and X0 from the
+host, so pvm-entry.S reads the registers from a block that X0 points
+to, rather than from X0-X7 like your stub. I think a block would work
+for a realm too, since your test sets X0. The trampoline also sets
+VBAR_EL1 and passes X0-X7 on to the guest code, for tests that install
+exception handlers or take arguments.
 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 157bf4b812020..a750413c684be 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1793,13 +1793,15 @@ static int kvm_vcpu_init_check_features(struct kv=
-m_vcpu *vcpu,
->  	    !test_bit(KVM_ARM_VCPU_PMU_V3, &features))
->  		return -EINVAL;
-> =20
-> +	/* MTE is incompatible with AArch32 and nested virt */
-> +	if (kvm_has_mte(vcpu->kvm) &&
-> +	    (test_bit(KVM_ARM_VCPU_EL1_32BIT, &features) ||
-> +	     test_bit(KVM_ARM_VCPU_HAS_EL2, &features)))
-> +		return -EINVAL;
+The host side of pKVM accepts those register writes, so pkvm.c creates
+the vCPUs with aarch64_vcpu_add() as for any VM and reads the
+registers back, SP_EL1 and VBAR_EL1 included.
 
-[Severity: Medium]
-Does rejecting KVM_ARM_VCPU_HAS_EL2 when kvm_has_mte(vcpu->kvm) is true bre=
-ak
-the arm64 set_id_regs selftest on hosts that support both MTE and nested
-virtualization?
+> I'm not sure how much there is to gain by sharing overall, but good to
+> bring it up early!
 
-In tools/testing/selftests/kvm/arm64/set_id_regs.c, main() enables MTE and
-then creates a default vCPU:
+Thanks again for raising it. I'd keep this series as it is for now.
+When you post the realm tests, would it make sense for you to move the
+trampoline and its boot-args block to neutral names and boot the realm
+tests through them, with your register extraction in the same series?
+Patch 2 is close to your "Allow VM types for arm64", but allows only
+KVM_VM_TYPE_ARM_PROTECTED, so you'd only need to add the realm type to
+that check.
 
-tools/testing/selftests/kvm/arm64/set_id_regs.c:main() {
-	...
-	test_wants_mte();
-
-	vm =3D vm_create(1);
-	vm_enable_cap(vm, KVM_CAP_ARM_WRITABLE_IMP_ID_REGS, 0);
-	vcpu =3D vm_vcpu_add(vm, 0, guest_code);
-	...
-}
-
-During vm_create(), kvm_arch_vm_post_create() in
-tools/testing/selftests/kvm/lib/arm64/processor.c enables KVM_CAP_ARM_MTE on
-the VM when request_mte is set:
-
-	if (request_mte && vm_check_cap(vm, KVM_CAP_ARM_MTE))
-		vm_enable_cap(vm, KVM_CAP_ARM_MTE, 0);
-
-Then during vm_vcpu_add() -> aarch64_vcpu_setup() ->
-kvm_get_default_vcpu_target(), the selftest library checks vm_supports_el2()
-and sets KVM_ARM_VCPU_HAS_EL2 by default on NV-capable hosts:
-
-tools/testing/selftests/kvm/lib/arm64/processor.c:vm_supports_el2() {
-	return vm_check_cap(vm, KVM_CAP_ARM_EL2) && vm->arch.has_gic;
-}
-
-tools/testing/selftests/kvm/lib/arm64/processor.c:kvm_get_default_vcpu_targ=
-et() {
-	...
-	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &preferred);
-	if (vm_supports_el2(vm))
-		preferred.features[0] |=3D BIT(KVM_ARM_VCPU_HAS_EL2);
-	...
-}
-
-Because kvm_vm_ioctl_check_extension() in arch/arm64/kvm/arm.c still reports
-KVM_CAP_ARM_EL2 as supported on a VM fd where KVM_CAP_ARM_MTE was enabled:
-
-	case KVM_CAP_ARM_EL2:
-		r =3D cpus_have_final_cap(ARM64_HAS_NESTED_VIRT);
-		break;
-
-and vm_supports_el2() does not check !request_mte, aarch64_vcpu_setup() pas=
-ses
-KVM_ARM_VCPU_HAS_EL2 to KVM_ARM_VCPU_INIT, which now fails with -EINVAL unl=
-ess
-the test is run with NV=3D0.
-
-Should kvm_vm_ioctl_check_extension() gate KVM_CAP_ARM_EL2 on
-!kvm_has_mte(kvm) (or vm_supports_el2() check !request_mte) so userspace and
-selftests do not request EL2 on MTE-enabled VMs?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261104192124.3932=
-743-1-oupton@kernel.org?part=3D1
+Cheers,
+/fuad
