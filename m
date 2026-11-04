@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1793820088;
-	b=bEBOWMUSNr3vs4hml+ykKIjAiDcoy4htI8t/s8UG7VOHdLL/ZPGj6CTMlkJOIDGzR6Sx
-	 CFRDSkvNsHbom/0QjocLXtO6w6CqlLcoMBXBPrsLtXVT6z5XclrAcktsasTMOIDYvsnBv
-	 e2zUwhpdhTAK62DqeXQaYwAE0Op0fTZmPYSGzuBg54AGf7F07YADf6BQU0M1yd30HETnQ
-	 yxIQOi6WKvxDOVN/DW0hCMGlQg1H94cA7G5+kAeBpFA+tfXQjUgOW2s9FnEnC6sm9Ch5v
-	 KwgOSAGW4yupNFc3j5Wsxa4koFy45lVY3fYRPizDj0mkaboJPnf9LgRyVQGjf5Mw5Vg==
+	b=vUCH5jCsCUJ+pXPpk6Sx4wE/J2ZFcMTdXSMT9sXT8pihwkts6s4F4JQbxffxKKoqUBgW
+	 TeDDopvOv3MmoZRPJIuWgzr83x7+M5NZ1ouL4DcEcM46MNBaL0DBCMcYz6mY+5ZLqA2dy
+	 YrUuo6LloZVTmv7I+cLK1XHTy+U5t9ptkd7ZvwWXHbohHcIN7/9aVtKQ2sJbZGDH6E6ku
+	 KWugSflSyN17LXRIJ4x4XwWdfq0B6/PsGjxGzf9TkerAHScfBImJ5tccDiQthlZFGvSSN
+	 54ORs7pdzpD+4AEwuFCv8vLymdv2dOpGWaaptLW2UJZrWUy9i2Fs/hWNtuxk58xJnig==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1793820088;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=Aov1mH5ZweYjLRKlTFegOjFhQQ4TyRA4Xy8OWGjaupM=;
-	b=MgirCYJmPJSzgkgaNuOfIASFHn/+mQIcMJ5uNNuXDh7lksuQZa2HM3IGJvH0cvv94A41
-	 GIoDiqPDN9Oo453IE+TggFOtPy5w2osR/OQzUH02QSuku6aoZW4DMiPEBjIx6vdcDCL+i
-	 LIwkmJf6Jf9SIre1jtsFTn+T6OHtL1CIm00CMLNSvAb6nZsVHL+KQGN2UnaN/jncj4tgx
-	 AFOumEtIWyJyZHrpfchP7OPPJ751CGScotAnhidh5u6GWp3T3vZs9ZoG2Gwktr1GWqwRE
-	 qPANEXkl/11F6dt00wK/yd9o4Q2RjGQDLT1lu5ZiBzAFy67sJ1hVXDehMFoOcxeecFA==
+	bh=rJ4hkdahi2jk6fxl30kbgS8EJOmA46DverGIQ/HpfEA=;
+	b=vgGw0L5ckTY/9kLUb5eAHVfdgKCqPvRiAc5m4ZaegLEWf3q3ijecR/Vh1t9/U/bjPCB0
+	 QFZqwJ846P6wkgdSbNuDm4vsSSg42FXkmu1FTkvSIT23IKND0iexDFTqYXFq2OnzURFKp
+	 aLs0TdTdaS54ebmHI0opDTwQ3Cx7BYc2VQmSIoRrScnyMwgZOhjDwToK7Gg6TL3DcyUZK
+	 AO4h3Ycc3sglJcv5+Hcm54mZu9pTcx3x9qIGJjv86azMEVM9VV3VV9E77mqxIIAoymQ6Y
+	 QvpBTmUhZOeXOTL9olX+k9NHMu3tHR0mUfrfrIscYbuIB0vqqkZZ1Dvj1bbhkfNnXfQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Esb97uYN;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X1zeQKH4;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA20D606AB34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3903606A879
 	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 19:21:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Esb97uYN
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CFA71F00A02;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X1zeQKH4
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A60121F00A1B;
 	Wed,  4 Nov 2026 19:21:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1793820087;
-	bh=Aov1mH5ZweYjLRKlTFegOjFhQQ4TyRA4Xy8OWGjaupM=;
+	bh=rJ4hkdahi2jk6fxl30kbgS8EJOmA46DverGIQ/HpfEA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Esb97uYNIei8OA8OYGczbw5/ZNkVAEuNuwzHIMyOUt0xh4ccA2ejcwlajATX61dEU
-	 6ESL9TF9W3j/ho7BoKt0dF2K4jDOh5eBKQ2AdB/HWlgOLzDNveh3Usv9zGDQiqnTfY
-	 b2Jgsd4lq9LEkz0Tc+4IWJQXh+MJNHsNHm8Pd4eqonuM8j0GGaiQ6gUxRL96rXe0Ow
-	 v6RN9UV+MYW2Y7JV2t0231isyL+/4igz5lEA0Aq0/L3lTAZlDhNIqtumAr6WAflH4v
-	 bgHk6E4PzqszySZCrC0mMrpT56fwyp4/PakGtINiEkB8ixt0mibl+yCGwpRuThN7pN
-	 CMcI2j1r43yAQ==
+	b=X1zeQKH4F2iboNf5t8ER6KwQnrCbkMhWlPLYDaAGti9NZ/MFtiojGbmX+T4EwUXl/
+	 zDpVR6gCeYWiQhrI6hHpNvrdsRRa21Enlq/MXZOtJPrJZRo9DRexMUr21BBfwOC7Rd
+	 XxAlKJKeM9RgAFypj6TpHrg8ZPg8AarJfsGCb8lYKSA2deYBUhXYeKbHB5GOmYiVmA
+	 /T+gSk6V20R2DcmdpssyCD67akEEQfi5iXKjQ/46AcM2Ju8Y8udK6YYV7Yk7fQnrh3
+	 w7cHpccn6A3UjTN1pKgtcGghWtUJ5hcVYV59LMvaDGCeUoRv/idGa+wS2Prdxq3Hdi
+	 3iiLP9g8E1G9Q==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -49,9 +49,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Fuad Tabba <fuad.tabba@linux.dev>,
 	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH 4/8] KVM: arm64: nv: Treat the VNCR GICv3 registers as hidden from user
-Date: Wed,  4 Nov 2026 11:21:20 -0800
-Message-ID: <20261104192124.3932743-5-oupton@kernel.org>
+Subject: [PATCH 5/8] KVM: arm64: Use ->visibility() to filter MTE CMO instructions
+Date: Wed,  4 Nov 2026 11:21:21 -0800
+Message-ID: <20261104192124.3932743-6-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261104192124.3932743-1-oupton@kernel.org>
 References: <20261104192124.3932743-1-oupton@kernel.org>
@@ -66,53 +66,73 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-KVM's emulation of sysreg traps will soon need to evaluate the
-visibility of a sysreg prior to the effects of the L1 hypervisor's traps
-to cope with instructions that intersect with a CGT but lack a
-corresponding FGU bit (I know, not enough TLAs).
-
-The VNCR GICv3 registers are marked as hidden from both user/guest on
-the basis that KVM never handles these traps locally and unconditinally
-relies on VNCR redirection. But an L1 hypervisor could trap these.
-
-Remap the visibility as being specific to user accesses, giving the
-indication that guest accesses to the sysreg are legal at least from an
-architecture POV. Note that the guest side of the visibility was a bit
-belt-and-braces as the bad_vncr_trap() accessor will act as a backstop
-against any unexpected local trap handling.
+More descriptors for MTE CMO instructions are on the way; prepare by
+using sys_reg_desc::visibility() to hide instructions when MTE isn't
+implemented.
 
 Signed-off-by: Oliver Upton <oupton@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 30 +++++++++++++-----------------
+ 1 file changed, 13 insertions(+), 17 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 870dcb25d0d7..0b21b454242c 100644
+index 0b21b454242c..b45635471344 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1020,10 +1020,10 @@ static u64 reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	return mpidr;
+@@ -556,17 +556,6 @@ static bool access_dcsw(struct kvm_vcpu *vcpu,
+ 	return true;
  }
  
--static unsigned int hidden_visibility(const struct kvm_vcpu *vcpu,
--				      const struct sys_reg_desc *r)
-+static unsigned int hidden_user_visibility(const struct kvm_vcpu *vcpu,
-+					   const struct sys_reg_desc *r)
+-static bool access_dcgsw(struct kvm_vcpu *vcpu,
+-			 struct sys_reg_params *p,
+-			 const struct sys_reg_desc *r)
+-{
+-	if (!kvm_has_mte(vcpu->kvm))
+-		return undef_access(vcpu, p, r);
+-
+-	/* Treat MTE S/W ops as we treat the classic ones: with contempt */
+-	return access_dcsw(vcpu, p, r);
+-}
+-
+ static void get_access_mask(const struct sys_reg_desc *r, u64 *mask, u64 *shift)
  {
--	return REG_HIDDEN;
-+	return REG_USER_HIDDEN;
- }
+ 	switch (r->aarch32_map) {
+@@ -4306,10 +4295,17 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 		.access = (access_fn),					\
+ 	}
  
- static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
-@@ -2757,7 +2757,7 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
- #define EL2_REG_VNCR_FILT(name, vis)			\
- 	EL2_REG_FILTERED(name, bad_vncr_trap, reset_val, 0, vis)
- #define EL2_REG_VNCR_GICv3(name)			\
--	EL2_REG_VNCR_FILT(name, hidden_visibility)
-+	EL2_REG_VNCR_FILT(name, hidden_user_visibility)
- #define EL2_REG_REDIR(name, rst, v)	EL2_REG(name, bad_redir_trap, rst, v)
++#define MTE_CMO_INSN(insn, access_fn)					\
++	{								\
++		SYS_DESC(SYS_##insn),					\
++		.access	= (access_fn),					\
++		.visibility = mte_visibility,				\
++	}
++
+ static struct sys_reg_desc sys_insn_descs[] = {
+ 	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
+-	{ SYS_DESC(SYS_DC_IGSW), access_dcgsw },
+-	{ SYS_DESC(SYS_DC_IGDSW), access_dcgsw },
++	MTE_CMO_INSN(DC_IGSW, access_dcsw),
++	MTE_CMO_INSN(DC_IGDSW, access_dcsw),
  
- #define TIMER_REG(name, vis)					   \
+ 	SYS_INSN(AT_S1E1R, handle_at_s1e01),
+ 	SYS_INSN(AT_S1E1W, handle_at_s1e01),
+@@ -4320,11 +4316,11 @@ static struct sys_reg_desc sys_insn_descs[] = {
+ 	SYS_INSN(AT_S1E1A, handle_at_s1e01),
+ 
+ 	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
+-	{ SYS_DESC(SYS_DC_CGSW), access_dcgsw },
+-	{ SYS_DESC(SYS_DC_CGDSW), access_dcgsw },
++	MTE_CMO_INSN(DC_CGSW, access_dcsw),
++	MTE_CMO_INSN(DC_CGDSW, access_dcsw),
+ 	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
+-	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
+-	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
++	MTE_CMO_INSN(DC_CIGSW, access_dcsw),
++	MTE_CMO_INSN(DC_CIGDSW, access_dcsw),
+ 
+ 	SYS_INSN(TLBI_VMALLE1OS, handle_tlbi_el1),
+ 	SYS_INSN(TLBI_VAE1OS, handle_tlbi_el1),
 -- 
 2.47.3
 
