@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.55
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793782203;
-	b=geIX9w2bAxyQjK3/JmgUzM2eNyDRDlsW7VN1pCv2qWmXBKvOQFNw3Yizg4uC3ARKBcq3
-	 T3tYkQZHBqmsjA7hzkkkI+mUuA/lmMDizMVupYdY+aLNWW9bNi/ldtuR6gRiHDtXDsh0e
-	 XUXdaambnrPFw/aJmdpL49atv0f3RlHvnvMWfB90Ro4jMxcAJZqB2VqBprg68jGa0oU1u
-	 y7CayXQKOe/Ysf/3af3mc33ZJ32glDTNPNkiTvljzPozJK32CZRgL3ECkBYioEwadxGiz
-	 1Al0wAJ3vbdjo3QaCPV8nTAOQOORVBNPnWz8Nn+kmCOOkVu4zfgjWfP764Dj9QzgqnQ==
+	t=1793782209;
+	b=2yZ230RF6ahR1XVb0wYpyv20GDatq4IJ+9kiiuMI/gYaE3lXpHrAv/ZLT4p+aE08PqEk
+	 BIKkzLLYXsUEiaxNADHCl9vywoWhDZJqa7AaQs98fdrYgoQrQhVvt83QEZ1q19wuua5q7
+	 y96Io8rcLQrHfQ2H8GDpq4SyNx68E9XI0rS2GxpEoqWq0xaSRMo9SJHwLsPxxWn8YnG1y
+	 8CdmhwfPUXxkEhelTQVDV7bnEK6B1eRy6KCFvF32/UFpMhIhf6ssaWfI2fgtL5yvz07g+
+	 mKipN0Aqh5AoSwDh8Rt6ozrYS7rceGotRQ37dk4JYTVmz8VPuetZXazrIUg1bQXm3DA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793782203;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793782209;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=cEjGGc4ra+Jku+/t9g0Fp5ckv970tCkfQhpv01qfbxk=;
-	b=XDbs3Ik3gw9BXNjKS9ej48rA5CldPkwXRqtT4A7QUh64ffK8MFbXOy79pXG8qJaxmCaY
-	 MHSgPileJ7Flkrc53z3ov+bTTR6y5Y/qrOlfpav6Z5Vqx95tvMhRhAysM0D352NLWf98w
-	 uY/MFQxHcalQh5p6LJb66+dpW9iOOcMbg//5g4AsElvUIPrVpDlqzRHGFpRjNi6gy5f2X
-	 IS0Ol79Z4RBXfNGTi6FbpWiVWxk+pmK7/9XByhheHhD2AptR90gC9rCVHWX4Z8zhiZL6W
-	 ltck1hrZSCpLlASW4Zce4FUS8IkHB2W9DiSwRRJ/2jvqkqhnBSnL/dhNMmbCiFw2njg==
+	bh=k6cFiPxDKZRgK9kMm6ffD3lcFe9pofTaWFF6Z8LHBvA=;
+	b=CqlvVwOBLjSG2tznvEgxjJirrvKOkIC+Yc3fnPZNybx1qhdA5guKPi56BZrC44cVnISO
+	 D1bY99VIXEUO70T6oAimodYCHAh6DG7Jos0tEnjzeMUr0E8J/RwCwnslnWTIdxp90S6GX
+	 Ix39MiRdRM15hDvYUCfTdx/SUXU0WkDKon7E7/YyDe8mmrUj86WtMN0LxbkRk+hZG8wxe
+	 v0TuT5v2FxTDSf/LP02boY0KogUScOaywNTX6EbqUg+FXg8meDh+7PjqC2/2HIsql3fKf
+	 ZtWtu9vSKzsSaxkT5N2CCuWEh2D4GCIvRycJ69MecVJQ4507cKYOYwmWU5H5ijtdEBA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=nidFAkWC;
-	arc=none smtp.remote-ip=91.218.175.48
-Received: from mta0.migadu.com (out-48.mta0.migadu.com [91.218.175.48])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=PowOMSN5;
+	arc=none smtp.remote-ip=91.218.175.55
+Received: from mta0.migadu.com (out-55.mta0.migadu.com [91.218.175.55])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A204606A328
-	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 08:50:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3A204606A328
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CBFA606D80A
+	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 08:50:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1CBFA606D80A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=nidFAkWC
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=PowOMSN5
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=hbXO7VRqPpHhMkTHPIX3sU6rDHeRwFxxaEjp+HLzH4U=;
+DKIM-Signature: a=rsa-sha256; bh=IhkYbzhiK9uOMZTCAa9N1LaNA5uVBTFupFJmfgNvMLQ=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793782200; v=1; x=1794387000;
- b=nidFAkWCZmib6vpbWKRZdvEDDxHdPfVo4sOr+3Q3p8x1gSp2iRJPYe6+k/kbkvYDlFfh9bsH
- suLu1dB1HUn8qgFnxAYk399blCjPG6rOJ94tJwnjI7PoxLKePXlPRXgS9Z5LmV10jyW4iH6Hlna
- y3GSFAnqKz3RXJaX6Oh1JFes=
+ t=1793782207; v=1; x=1794387007;
+ b=PowOMSN57XHcsi6ghMGJUA7es/pqdtbkTm5370VlKFHoj5T90RWHEWfGtiZaXGb4NrADCPY8
+ WZYTffx+q4sp9ElPm/pUpzIhxmpVJ7NLe0Ss6PeLwPS3ZlRi6SbkVuXRqY9NQfq++Iy/eYaBCPH
+ X5ixV3Vqk7wDBmzrLvjILnb8=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 0757b0a4fa57e123;
-	Wed, 04 Nov 2026 08:50:00 +0000
-X-Mizu-Trace-ID: 0757b0a4fa57e123
+Received: by smtp.migadu.com with ESMTPS id 16f814717aa144a4;
+	Wed, 04 Nov 2026 08:50:06 +0000
+X-Mizu-Trace-ID: 16f814717aa144a4
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -66,9 +66,9 @@ Cc: Will Deacon <will@kernel.org>,
 	kvm@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 11/16] KVM: arm64: selftests: Add pkvm_id_regs register and trap test
-Date: Wed,  4 Nov 2026 08:48:37 +0000
-Message-ID: <20261104084842.132944-12-fuad.tabba@linux.dev>
+Subject: [PATCH 12/16] KVM: arm64: selftests: Add pkvm_vcpu_regs register-state test
+Date: Wed,  4 Nov 2026 08:48:38 +0000
+Message-ID: <20261104084842.132944-13-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261104084842.132944-1-fuad.tabba@linux.dev>
 References: <20261104084842.132944-1-fuad.tabba@linux.dev>
@@ -83,344 +83,256 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-pKVM gives a protected guest its own view of the ID registers, which
-hides the features pKVM doesn't support. The registers of those features
-UNDEF in the guest, except some of the hidden debug registers, which
-read as zero and ignore writes.
+A protected vCPU's registers are held at EL2, which handles some exits
+itself and returns others to the host. The host can move the vCPU's
+thread to another CPU at any exit. The guest's registers have to keep
+their values through all of that.
 
-Test that view and those UNDEFs from the guest, along with the registers
-EL2 emulates with fixed values. The debug checks read
-ID_AA64DFR0_EL1.DebugVer to choose between the hidden view and the
-exposed one. PtrAuth, which a protected VM can be granted, gets its own
-case.
+Verify that x19-x28 and v0-v31 keep the values the guest loaded across
+each kind of exit, and across a host CPU migration at every MMIO exit.
 
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/arm64/pkvm_id_regs.c        | 306 ++++++++++++++++++
- 2 files changed, 307 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/pkvm_id_regs.c
+ .../selftests/kvm/arm64/pkvm_vcpu_regs.c      | 221 ++++++++++++++++++
+ 2 files changed, 222 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/arm64/pkvm_vcpu_regs.c
 
 diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 6bb436bd36205..8855c9abb2fd0 100644
+index 8855c9abb2fd0..1e40e793aa6f3 100644
 --- a/tools/testing/selftests/kvm/Makefile.kvm
 +++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -191,6 +191,7 @@ TEST_GEN_PROGS_arm64 += arm64/external_aborts
- TEST_GEN_PROGS_arm64 += arm64/mmio_sign_ext
- TEST_GEN_PROGS_arm64 += arm64/page_fault_test
- TEST_GEN_PROGS_arm64 += arm64/pkvm_host_abi
-+TEST_GEN_PROGS_arm64 += arm64/pkvm_id_regs
+@@ -195,6 +195,7 @@ TEST_GEN_PROGS_arm64 += arm64/pkvm_id_regs
  TEST_GEN_PROGS_arm64 += arm64/pkvm_mem_share
  TEST_GEN_PROGS_arm64 += arm64/pkvm_psci
  TEST_GEN_PROGS_arm64 += arm64/pkvm_smccc
-diff --git a/tools/testing/selftests/kvm/arm64/pkvm_id_regs.c b/tools/testing/selftests/kvm/arm64/pkvm_id_regs.c
++TEST_GEN_PROGS_arm64 += arm64/pkvm_vcpu_regs
+ TEST_GEN_PROGS_arm64 += arm64/psci_test
+ TEST_GEN_PROGS_arm64 += arm64/sea_to_user
+ TEST_GEN_PROGS_arm64 += arm64/set_id_regs
+diff --git a/tools/testing/selftests/kvm/arm64/pkvm_vcpu_regs.c b/tools/testing/selftests/kvm/arm64/pkvm_vcpu_regs.c
 new file mode 100644
-index 0000000000000..10c77ad9601dc
+index 0000000000000..a9b9615a9075b
 --- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/pkvm_id_regs.c
-@@ -0,0 +1,306 @@
++++ b/tools/testing/selftests/kvm/arm64/pkvm_vcpu_regs.c
+@@ -0,0 +1,221 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * pkvm_id_regs - the ID registers a protected VM sees, and which of its
-+ * register accesses UNDEF.
++ * pkvm_vcpu_regs - a protected guest's registers across every kind of exit.
 + *
-+ * Copyright (C) 2025 Google LLC
++ * Copyright (C) 2026 Google LLC
 + * Author: Fuad Tabba <fuad.tabba@linux.dev>
 + */
 +
-+#include <linux/bitfield.h>
-+#include <linux/bits.h>
++#include <errno.h>
++#include <sched.h>
 +
-+#include "gic_v3.h"
 +#include "kvm_util.h"
 +#include "pkvm.h"
 +#include "processor.h"
 +#include "test_util.h"
 +
-+/* vCPU 0's MPIDR: Aff0=0, bit31=1, MT=0. */
-+#define MPIDR_VCPU0	0x80000000UL
++/* Accesses to this IPA, outside every memslot, exit to the VMM as MMIO. */
++#define MMIO_IPA	BIT_ULL(31)
++#define MMIO_READ_VAL	0x0123456789abcdefUL
 +
-+/* Hidden fields with a non-zero Not-Implemented encoding. */
-+#define PVM_ID_AA64DFR0_NI	(					\
-+	SYS_FIELD_PREP_ENUM(ID_AA64DFR0_EL1, DoubleLock, NI) |		\
-+	SYS_FIELD_PREP_ENUM(ID_AA64DFR0_EL1, MTPMU, NI))
-+#define PVM_ID_AA64MMFR4_NI	SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, E2H0, NI)
++/* One new host page per stage-2 fault. */
++#define FAULT_MEMSLOT	(PKVM_IDMAP_MEMSLOT + 1)
++#define FAULT_GPA	BIT_ULL(30)
 +
-+/* What self-hosted debug exposes: DebugVer and the breakpoint, watchpoint and CTX counts. */
-+#define PVM_ID_AA64DFR0_DEBUG	(ID_AA64DFR0_EL1_DebugVer_MASK | ID_AA64DFR0_EL1_BRPs_MASK | \
-+				 ID_AA64DFR0_EL1_WRPs_MASK | ID_AA64DFR0_EL1_CTX_CMPs_MASK)
++#define NR_EXITS	64
 +
-+/* Breakpoint and watchpoint 0 controls with E clear: every byte, EL1, loads and stores. */
-+#define DBGBCR_VAL	((0xfUL << 5) | (1UL << 1))
-+#define DBGWCR_VAL	((0xffUL << 5) | (3UL << 3) | (1UL << 1))
++enum exit_kind {
++	EXIT_MMIO_WRITE,
++	EXIT_MMIO_READ,
++	EXIT_HVC,
++	EXIT_SYSREG_EL2,
++	EXIT_SYSREG_HOST,
++	EXIT_S2_FAULT,
++	NR_EXIT_KINDS,
++};
 +
-+extern unsigned char brk_insn;
++static const char * const exit_kind_names[] = {
++	[EXIT_MMIO_WRITE]	= "MMIO writes to the VMM",
++	[EXIT_MMIO_READ]	= "MMIO reads from the VMM",
++	[EXIT_HVC]		= "hypercalls EL2 handles",
++	[EXIT_SYSREG_EL2]	= "sysreg traps EL2 handles",
++	[EXIT_SYSREG_HOST]	= "sysreg traps the host handles",
++	[EXIT_S2_FAULT]		= "stage-2 faults on new memory",
++};
 +
-+static volatile bool undef_seen;
-+static volatile u64 brk_pc;
++/* x19-x28, v0-v31, then what the exit left in x0. */
++struct reg_state {
++	u64 x[10];
++	u64 v[32][2];
++	u64 x0;
++};
 +
-+static void undef_handler(struct ex_regs *regs)
++#define REG_WORDS	(offsetof(struct reg_state, x0) / sizeof(u64))
++
++static_assert(offsetof(struct reg_state, v) == 80, "v0 offset");
++static_assert(offsetof(struct reg_state, x0) == 592, "x0 offset");
++
++#define X_REGS	"19, 20, 21, 22, 23, 24, 25, 26, 27, 28"
++#define V_REGS	"0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, "		\
++		"16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31"
++
++/* @op x19-x28 and v0-v31 at their struct reg_state offsets from @buf. */
++#define REGS_OP(op, buf)								\
++	".irp num, " X_REGS "\n" op "	x\\num, [%[" buf "], #8 * (\\num - 19)]\n.endr\n"	\
++	".irp num, " V_REGS "\n" op "	q\\num, [%[" buf "], #80 + 16 * \\num]\n.endr\n"
++
++/* Load the registers, take the exit @insn causes, and store them again. */
++#define REGS_ACROSS(insn, addr)								\
++({											\
++	asm volatile(REGS_OP("ldr", "in") insn "\n" REGS_OP("str", "out")		\
++		     "str	x0, [%[out], #592]\n"						\
++		     : : [in] "r"(&regs_in), [out] "r"(&regs_out), [arg] "r"(addr)		\
++		     : "x0", "x1", "x2", "x3",						\
++		       "x19", "x20", "x21", "x22", "x23", "x24", "x25", "x26", "x27", "x28",	\
++		       "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7",			\
++		       "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15",		\
++		       "v16", "v17", "v18", "v19", "v20", "v21", "v22", "v23",		\
++		       "v24", "v25", "v26", "v27", "v28", "v29", "v30", "v31",		\
++		       "memory");							\
++})
++
++/* Set in the guest's copy by the host before the first run. */
++static int exit_kind;
++static u64 host_page_size;
++
++static struct reg_state regs_in, regs_out;
++
++static void guest_regs_across_exits(void)
 +{
-+	undef_seen = true;
-+	regs->pc += 4;
-+}
++	u64 *in = (u64 *)&regs_in, *out = (u64 *)&regs_out;
++	int i, j;
 +
-+static void brk_handler(struct ex_regs *regs)
-+{
-+	brk_pc = regs->pc;
-+	regs->pc += 4;
-+}
++	pkvm_guest_init();
 +
-+/* Access @expr must make the guest take an UNDEF (EC_UNKNOWN). */
-+#define GUEST_ASSERT_UNDEF(expr) do {	\
-+	undef_seen = false;		\
-+	expr;				\
-+	GUEST_ASSERT(undef_seen);	\
-+} while (0)
++	for (i = 0; i < NR_EXITS; i++) {
++		/* Different in every word and on every exit. */
++		for (j = 0; j < REG_WORDS; j++)
++			in[j] = 0x0101010101010101UL * (j + 1) ^ (u64)i << 32;
 +
-+/* @reg reads back @pattern with no UNDEF. */
-+#define GUEST_ASSERT_RW(reg, pattern) do {		\
-+	u64 __saved = read_sysreg_s(reg);		\
-+	undef_seen = false;				\
-+	write_sysreg_s(pattern, reg);			\
-+	GUEST_ASSERT_EQ(read_sysreg_s(reg), pattern);	\
-+	write_sysreg_s(__saved, reg);			\
-+	GUEST_ASSERT(!undef_seen);			\
-+} while (0)
++		switch (exit_kind) {
++		case EXIT_MMIO_WRITE:
++			REGS_ACROSS("str	x0, [%[arg]]", MMIO_IPA);
++			break;
++		case EXIT_MMIO_READ:
++			REGS_ACROSS("ldr	x0, [%[arg]]", MMIO_IPA);
++			GUEST_ASSERT_EQ(regs_out.x0, MMIO_READ_VAL);
++			break;
++		case EXIT_HVC:
++			REGS_ACROSS("mov	w0, #0x80000000\n hvc	#0", 0);
++			break;
++		case EXIT_SYSREG_EL2:
++			REGS_ACROSS("mrs	x0, id_aa64pfr0_el1", 0);
++			break;
++		case EXIT_SYSREG_HOST:
++			REGS_ACROSS("mrs	x0, clidr_el1", 0);
++			break;
++		case EXIT_S2_FAULT:
++			REGS_ACROSS("str	x0, [%[arg]]", FAULT_GPA + i * host_page_size);
++			break;
++		}
 +
-+static void assert_aarch32_id_raz(void)
-+{
-+	/* AArch32 is unsupported for protected guests: its ID block reads 0. */
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_PFR0_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_PFR1_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_DFR0_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_AFR0_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_MMFR0_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_MMFR1_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_MMFR2_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_MMFR3_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_ISAR0_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_ISAR1_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_ISAR2_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_ISAR3_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_ISAR4_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_ISAR5_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_MMFR4_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_ISAR6_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_MVFR0_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_MVFR1_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_MVFR2_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(sys_reg(3, 0, 0, 3, 3)), 0);	/* unallocated */
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_PFR2_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_DFR1_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_MMFR5_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(sys_reg(3, 0, 0, 3, 7)), 0);	/* unallocated */
-+}
-+
-+/* A zero DebugVer means EL2 hides self-hosted debug from the guest. */
-+static bool debug_exposed(void)
-+{
-+	return SYS_FIELD_GET(ID_AA64DFR0_EL1, DebugVer, read_sysreg_s(SYS_ID_AA64DFR0_EL1));
-+}
-+
-+static void assert_id_regs(void)
-+{
-+	u64 pfr0 = read_sysreg_s(SYS_ID_AA64PFR0_EL1);
-+	u64 dfr0 = read_sysreg_s(SYS_ID_AA64DFR0_EL1);
-+
-+	if (debug_exposed()) {
-+		u64 debugver = SYS_FIELD_GET(ID_AA64DFR0_EL1, DebugVer, dfr0);
-+		u64 brps = SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, dfr0);
-+
-+		/* Exposed debug: at most v8.8, and at least two breakpoints and two watchpoints. */
-+		GUEST_ASSERT_EQ(dfr0 & ~PVM_ID_AA64DFR0_DEBUG, PVM_ID_AA64DFR0_NI);
-+		GUEST_ASSERT(debugver >= ID_AA64DFR0_EL1_DebugVer_IMP);
-+		GUEST_ASSERT(debugver <= ID_AA64DFR0_EL1_DebugVer_V8P8);
-+		GUEST_ASSERT(brps >= 1);
-+		GUEST_ASSERT(SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, dfr0) >= 1);
-+		GUEST_ASSERT(SYS_FIELD_GET(ID_AA64DFR0_EL1, CTX_CMPs, dfr0) <= brps);
-+	} else {
-+		/* Debug and PMU are hidden: DFR0 has a fixed value, no breakpoints. */
-+		GUEST_ASSERT_EQ(dfr0, PVM_ID_AA64DFR0_NI);
++		for (j = 0; j < REG_WORDS; j++)
++			__GUEST_ASSERT(out[j] == in[j], "exit %d: %s%d is 0x%lx, not 0x%lx", i,
++				       j < 10 ? "x" : "v", j < 10 ? 19 + j : (j - 10) / 2,
++				       out[j], in[j]);
 +	}
 +
-+	/* With no vCPU features, SVE, ZFR0 and PtrAuth read 0. */
-+	GUEST_ASSERT_EQ(SYS_FIELD_GET(ID_AA64PFR0_EL1, SVE, pfr0), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_AA64ZFR0_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_AA64ISAR1_EL1) &
-+			(ID_AA64ISAR1_EL1_APA_MASK | ID_AA64ISAR1_EL1_API_MASK), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_AA64ISAR2_EL1) &
-+			(ID_AA64ISAR2_EL1_APA3_MASK | ID_AA64ISAR2_EL1_GPA3_MASK), 0);
-+
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_AA64DFR1_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_AA64AFR0_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_AA64AFR1_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_AA64SMFR0_EL1), 0);
-+	GUEST_ASSERT_EQ(SYS_FIELD_GET(ID_AA64PFR1_EL1, MTE, read_sysreg_s(SYS_ID_AA64PFR1_EL1)), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ID_AA64MMFR4_EL1), PVM_ID_AA64MMFR4_NI);
-+
-+	assert_aarch32_id_raz();
-+}
-+
-+static void assert_debug_raz_wi(void)
-+{
-+	/* Breakpoint/watchpoint 0, MDSCR and OS-lock regs are RAZ/WI, with no UNDEF. */
-+	undef_seen = false;
-+	write_sysreg_s(~0UL, SYS_DBGBVRn_EL1(0));
-+	write_sysreg_s(~0UL, SYS_DBGBCRn_EL1(0));
-+	write_sysreg_s(~0UL, SYS_DBGWVRn_EL1(0));
-+	write_sysreg_s(~0UL, SYS_DBGWCRn_EL1(0));
-+	write_sysreg_s(~0UL, SYS_MDSCR_EL1);
-+	write_sysreg_s(~0UL, SYS_OSLAR_EL1);
-+	write_sysreg_s(~0UL, SYS_OSDLR_EL1);
-+	isb();
-+
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_DBGBVRn_EL1(0)), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_DBGBCRn_EL1(0)), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_DBGWVRn_EL1(0)), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_DBGWCRn_EL1(0)), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_MDSCR_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_OSLSR_EL1), 0);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_OSDLR_EL1), 0);
-+	GUEST_ASSERT(!undef_seen);
-+
-+	/* Breakpoint/watchpoint indices above 0 are not implemented. */
-+	GUEST_ASSERT_UNDEF((void)read_sysreg_s(SYS_DBGBVRn_EL1(1)));
-+	GUEST_ASSERT_UNDEF((void)read_sysreg_s(SYS_DBGWVRn_EL1(1)));
-+}
-+
-+static void assert_debug_regs(void)
-+{
-+	u64 addr = (u64)&brk_insn;
-+
-+	/* Breakpoint/watchpoint 0 hold what the guest writes. */
-+	GUEST_ASSERT_RW(SYS_DBGBVRn_EL1(0), addr);
-+	GUEST_ASSERT_RW(SYS_DBGBCRn_EL1(0), DBGBCR_VAL);
-+	GUEST_ASSERT_RW(SYS_DBGWVRn_EL1(0), addr & ~7UL);
-+	GUEST_ASSERT_RW(SYS_DBGWCRn_EL1(0), DBGWCR_VAL);
-+
-+	/*
-+	 * MDSCR doesn't UNDEF. The OS lock is implemented. The OS double lock isn't,
-+	 * so OSDLR is RAZ/WI.
-+	 */
-+	undef_seen = false;
-+	write_sysreg_s(read_sysreg_s(SYS_MDSCR_EL1), SYS_MDSCR_EL1);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_OSLSR_EL1) & OSLSR_EL1_OSLM_MASK,
-+			OSLSR_EL1_OSLM_IMPLEMENTED);
-+	write_sysreg_s(~0UL, SYS_OSDLR_EL1);
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_OSDLR_EL1), 0);
-+	GUEST_ASSERT(!undef_seen);
-+}
-+
-+static void assert_undef_regs(void)
-+{
-+	/* The PMU is hidden, and its registers UNDEF. */
-+	GUEST_ASSERT_UNDEF((void)read_sysreg_s(SYS_PMCR_EL0));
-+	GUEST_ASSERT_UNDEF((void)read_sysreg_s(SYS_PMCNTENSET_EL0));
-+	GUEST_ASSERT_UNDEF((void)read_sysreg_s(SYS_PMUSERENR_EL0));
-+
-+	/* Limited-ordering region registers UNDEF. */
-+	GUEST_ASSERT_UNDEF((void)read_sysreg_s(SYS_LORID_EL1));
-+
-+	/* AMU and MTE are hidden, and so are the PtrAuth keys without the PtrAuth vCPU features. */
-+	GUEST_ASSERT_UNDEF((void)read_sysreg_s(SYS_AMCNTENSET0_EL0));
-+	GUEST_ASSERT_UNDEF((void)read_sysreg_s(SYS_GCR_EL1));
-+	GUEST_ASSERT_UNDEF((void)read_sysreg_s(SYS_APIAKEYLO_EL1));
-+
-+	/*
-+	 * Nor is SVE, so an SVE instruction UNDEFs even with CPACR_EL1.ZEN set. On a CPU
-+	 * with SME but no SVE, SMEN gates it instead, so set that too.
-+	 */
-+	write_sysreg(read_sysreg(cpacr_el1) | CPACR_EL1_ZEN_EL1EN | CPACR_EL1_SMEN_EL1EN,
-+		     cpacr_el1);
-+	isb();
-+	GUEST_ASSERT_UNDEF(asm volatile(".arch_extension sve\n rdvl x0, #1" : : : "x0"));
-+}
-+
-+static void assert_host_handled(void)
-+{
-+	/* Host-handled registers reach the guest with no UNDEF. */
-+	undef_seen = false;
-+	(void)read_sysreg_s(SYS_CTR_EL0);
-+	(void)read_sysreg_s(SYS_CLIDR_EL1);
-+	GUEST_ASSERT(!undef_seen);
-+}
-+
-+static void guest_baseline(void)
-+{
-+	pkvm_guest_init();
-+
-+	assert_id_regs();
-+	if (debug_exposed())
-+		assert_debug_regs();
-+	else
-+		assert_debug_raz_wi();
-+	assert_undef_regs();
-+	assert_host_handled();
-+
-+	asm volatile("brk_insn: brk #0");
-+	GUEST_ASSERT_EQ(brk_pc, (u64)&brk_insn);
-+
-+	/* EL2 emulates ICC_SRE_EL1 with a fixed value. */
-+	GUEST_ASSERT_EQ(read_sysreg_s(SYS_ICC_SRE_EL1),
-+			ICC_SRE_EL1_DIB | ICC_SRE_EL1_DFB | ICC_SRE_EL1_SRE);
-+
-+	GUEST_ASSERT_EQ(read_sysreg(mpidr_el1), MPIDR_VCPU0);
-+
 +	GUEST_DONE();
 +}
 +
-+/* The host implements one of QARMA5, an IMP DEF algorithm or QARMA3: any may appear. */
-+static void guest_ptrauth(void)
++static cpu_set_t host_cpus;
++
++/* Move this thread, and with it the vCPU's next run, to another of its CPUs. */
++static void migrate_thread(void)
 +{
-+	pkvm_guest_init();
-+	GUEST_ASSERT((read_sysreg_s(SYS_ID_AA64ISAR1_EL1) &
-+		      (ID_AA64ISAR1_EL1_APA_MASK | ID_AA64ISAR1_EL1_API_MASK)) |
-+		     (read_sysreg_s(SYS_ID_AA64ISAR2_EL1) &
-+		      (ID_AA64ISAR2_EL1_APA3_MASK | ID_AA64ISAR2_EL1_GPA3_MASK)));
-+	GUEST_DONE();
++	int cpu = sched_getcpu();
++
++	do
++		cpu = (cpu + 1) % CPU_SETSIZE;
++	while (!CPU_ISSET(cpu, &host_cpus));
++
++	pin_self_to_cpu(cpu);
++	TEST_ASSERT_EQ(sched_getcpu(), cpu);
 +}
 +
-+static void run_guest(u32 features, void *guest_code)
++static void run_regs_across_exits(struct kvm_vcpu *vcpu, bool migrate)
++{
++	struct kvm_run *run = vcpu->run;
++	u64 data = MMIO_READ_VAL;
++	struct ucall uc;
++
++	for (;;) {
++		vcpu_run(vcpu);
++
++		if (run->exit_reason == KVM_EXIT_MMIO && run->mmio.phys_addr == MMIO_IPA) {
++			if (!run->mmio.is_write)
++				memcpy(run->mmio.data, &data, sizeof(data));
++			if (migrate)
++				migrate_thread();
++			continue;
++		}
++
++		switch (get_ucall(vcpu, &uc)) {
++		case UCALL_DONE:
++			return;
++		case UCALL_ABORT:
++			REPORT_GUEST_ASSERT(uc);
++			break;
++		default:
++			TEST_FAIL("Unexpected exit: %s", exit_reason_str(run->exit_reason));
++		}
++	}
++}
++
++/* With @migrate, the vCPU moves to another host CPU at every MMIO exit. */
++static void test_regs_across_exits(enum exit_kind kind, bool migrate)
 +{
 +	struct kvm_vcpu *vcpu;
++	unsigned int npages;
 +	struct kvm_vm *vm;
 +
-+	vm = pkvm_vm_create(1, features, &vcpu);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ESR_ELx_EC_UNKNOWN, undef_handler);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ESR_ELx_EC_BRK64, brk_handler);
++	vm = pkvm_vm_create_with_one_vcpu(&vcpu, guest_regs_across_exits);
++	npages = NR_EXITS * getpagesize() / vm->page_size;
++	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, FAULT_GPA, FAULT_MEMSLOT, npages, 0);
++	virt_map(vm, FAULT_GPA, FAULT_GPA, npages);
++	virt_map(vm, MMIO_IPA, MMIO_IPA, 1);
++	write_guest_global(vm, exit_kind, kind);
++	write_guest_global(vm, host_page_size, getpagesize());
 +
-+	pkvm_vcpu_setup_boot(vcpu, guest_code);
-+	pkvm_run_loop(vcpu, NULL);
-+	kvm_vm_free(vm);
-+}
-+
-+/* The host filters capabilities per VM, so ask a protected VM. */
-+static bool pvm_has_cap(long cap)
-+{
-+	struct kvm_vm *vm = vm_create_barebones_type(KVM_VM_TYPE_ARM_PROTECTED);
-+	bool ret = vm_check_cap(vm, cap);
++	run_regs_across_exits(vcpu, migrate);
 +
 +	kvm_vm_free(vm);
-+	return ret;
 +}
 +
 +int main(void)
 +{
++	int kind;
++
 +	TEST_REQUIRE(pkvm_supported());
 +
 +	ksft_print_header();
-+	ksft_set_plan(2);
++	ksft_set_plan(1 + NR_EXIT_KINDS);
 +
-+	run_guest(0, guest_baseline);
-+	ksft_test_result_pass("baseline ID view and UNDEF matrix\n");
++	for (kind = 0; kind < NR_EXIT_KINDS; kind++) {
++		test_regs_across_exits(kind, false);
++		ksft_test_result_pass("x19-x28 and v0-v31 across %s\n", exit_kind_names[kind]);
++	}
 +
-+	if (pvm_has_cap(KVM_CAP_ARM_PTRAUTH_ADDRESS) && pvm_has_cap(KVM_CAP_ARM_PTRAUTH_GENERIC)) {
-+		run_guest(BIT(KVM_ARM_VCPU_PTRAUTH_ADDRESS) |
-+			  BIT(KVM_ARM_VCPU_PTRAUTH_GENERIC), guest_ptrauth);
-+		ksft_test_result_pass("PtrAuth ID delta\n");
++	TEST_ASSERT(!sched_getaffinity(0, sizeof(host_cpus), &host_cpus),
++		    "sched_getaffinity: errno %d", errno);
++	if (CPU_COUNT(&host_cpus) < 2) {
++		ksft_test_result_skip("x19-x28 and v0-v31 across host CPU migrations: one CPU\n");
 +	} else {
-+		ksft_test_result_skip("PtrAuth ID delta: PtrAuth unavailable\n");
++		test_regs_across_exits(EXIT_MMIO_WRITE, true);
++		TEST_ASSERT(!sched_setaffinity(0, sizeof(host_cpus), &host_cpus),
++			    "sched_setaffinity: errno %d", errno);
++		ksft_test_result_pass("x19-x28 and v0-v31 across host CPU migrations\n");
 +	}
 +
 +	ksft_finished();
