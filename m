@@ -1,77 +1,67 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.88
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=111.22.67.137
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793782248;
-	b=F8xaxpSanTX9xSM72qbDm8yzt6qv8Of2HW6lWyOgsKzkTszHapj39y+GM1PTBHKUBxFR
-	 8AHnAWjWwWMQRpSW9LPDzd4S8n/w4GlJeW3Wjofcc/EzwLmBVONv0bJTJSK2KYVZTmUqe
-	 cLCa5arGEL5deW8PoFzCaCwJAbdKc53BHD3i3OFWQyKv3g1ezfgBdUDE5jTUit/uXFWw8
-	 H+We37E/GLx8Ga+JEpVoXCA3H08i2DiwMs5GnthiJ++TRPw5+wcSqPvS/pvqkW2m0edJD
-	 PjE5k1MIRXjSpTYOwBGfff4gv9SgUrR/8Qutk0jruJaeePgpnC7evQDcXk2jersNo9Q==
+	t=1793785317;
+	b=Mx7CK0ZlmVjn8RgM0AfJohIHxbK4VvRPhFQEpxow1fSRxMz+KpH59sGqTI9gecAvDLqV
+	 4AmXM8gMeUGEly1NsA6N05LpiHPFSC1s6ckz1mn9LjAzCPIZW3HuCwZZhphYQ484dK4Mk
+	 d3xP+w556d47GKfCuW4pR9M1Yg4loiG3ldUAe0WbPiIo52N9D/Gqmsdw6x1Yasq/vSP1z
+	 jpQShdUkWDXhC1PZinkFLTtS/wJSHoC0G94IIcDsn4B7yzuOnaVkaNiz7kCc4aujFt9Z4
+	 k4JIEJqueqK/G3thnjsppej0vvMGchxFsV07biVzpC2G1pgwlRy3TDzpiEgiCWVjWQQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793782248;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
+	a=rsa-sha256; c=relaxed/relaxed; t=1793785317;
+	h=DMARC-Filter:DKIM-Signature:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:
+	 X-RM-TRANSID:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:X-RM-TRANSID:From:
+	 To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=YYtZXvG9+UdS+4Z9GxZSoWsbkG0GwWt2msV5s/Y8pAo=;
-	b=00oKfwhb/IiF6HTGWdxPWns+TXxCX4Dw0MG2g5ouhjwjQIXsxBTxYyXxJaSOEZgn7WvB
-	 YnsKOv6X2BZlcT5HXpxYu4XRkzRaHf2x8vUg2kr6wa1bgBAfPL6oSGzp/NE4sbbzZ4KcJ
-	 QK2XgJYUtSgOptrcJB7l/l+vogYi4/vvCH+xMXyPhwq2iHv4c5aM/Bt7UvH//0/LUi992
-	 /EsUw/0sP0KJ4aOnu6pZroCKNmsDKqlY3XjhRpquciXks+Zgf4CXrPADV1uBQKkfhXmm6
-	 73cbotDixTXZBP1S6El7XmhEY1WpjKj72k6kf4UyIJR2pd2idTZKzDT0pctjmGOkmeA==
+	bh=i9f4/D8qb9HDyCMKjqmdspRjwlPIs06U9VQOHDxE7bQ=;
+	b=EgsUx2m99/HJNe4nlquh/ESXhF4GMmHatd+gXKZ6SroGrmHeCEstsMDwmiu5ACHjN6OH
+	 SDy0PPgA2/tuh77QHN5rdgKcrieDGeCYVBbxq9gkd9qbnY2AOC/MWNvWv4K7qtm4yaa3S
+	 Xt0YrwJ+PNdlStwEsCOkOYmKpJpEvSH3q/eeWyOvN5kQlz6yRDNSrkUbCK4e7OkZoajsf
+	 XzHUk6AfW3ZsZFuuYqHDxT8yjwPRYcgpdKTkELzWewPLI/42FzJYr4u79J7f+8oFYrzDY
+	 KGk8TJjdUvYbY5XsKgAnfvsF5Tk/dM/5OGpxtSFQ8MVv+iaw0i2+7bhm6438BdYRpjg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="phcI9/rK";
-	arc=none smtp.remote-ip=91.218.175.88
-Received: from mta0.migadu.com (out-88.mta0.migadu.com [91.218.175.88])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76475606D80E
-	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 08:50:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 76475606D80E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	dmarc=pass header.from=cmss.chinamobile.com;
+	spf=pass smtp.mailfrom=cmss.chinamobile.com;
+	dkim=pass header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=zEAqlhug;
+	arc=none smtp.remote-ip=111.22.67.137
+Received: from cmccmta4.chinamobile.com (cmccmta4.chinamobile.com [111.22.67.137])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65598606A326
+	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 09:41:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 65598606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmss.chinamobile.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=phcI9/rK
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=Ia4ROUhNRdc6AFPTEZfdVXbpoKxOmfz2LXLKwxYl31Q=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793782245; v=1; x=1794387045;
- b=phcI9/rKxlOSpz5zlsSr4yNnVqAYZwezIzSGB3yDKYoTKTLeyRDJRVNPlVQgDjHWTrUCRfBQ
- MmHPJkztcGO+aTRitHsXqMgHolxmrL0g+GAsvq+XVEVmOKvwETHesP0OPve8WPOwOz5F7DVYvL8
- LLds8dZ/Y0uYZX9u6M9uAGA8=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 3647c177266f6c99;
-	Wed, 04 Nov 2026 08:50:44 +0000
-X-Mizu-Trace-ID: 3647c177266f6c99
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Quentin Perret <qperret@google.com>,
-	Fuad Tabba <tabba@google.com>,
+	dkim=pass (1024-bit key, unprotected) header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=zEAqlhug
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=cmss.chinamobile.com; s=default; l=0;
+	h=from:subject:message-id:to:cc:mime-version;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	b=zEAqlhugg/Erujm437DOximgHfbI6Uyp8Z8rNTW5DVEICar6aZpPbAqDOU8wXtYAdut9lOXnCdmFJ
+	 XRE9YNNTph8/AQhoi4A1PUglPuSsAHu/+3pY77WMcSLfO6a/DY4bFQO7NbF1upt7CwYyIBulbNs01L
+	 K/X1wEYDxKdCU0FA=
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
+	by rmmx-syy-dmz-app04-12004 (RichMail) with SMTP id 2ee46aeafde2c8e-3c6ec;
+	Wed, 04 Nov 2026 17:41:54 +0800 (CST)
+X-RM-TRANSID:2ee46aeafde2c8e-3c6ec
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from desktop-eb75daa8a6be458c-20260816004526035 (unknown[10.55.1.72])
+	by rmsmtp-syy-appsvr05-12005 (RichMail) with SMTP id 2ee56aeafde040e-1d94a;
+	Wed, 04 Nov 2026 17:41:54 +0800 (CST)
+X-RM-TRANSID:2ee56aeafde040e-1d94a
+From: zhangchujun <zhangchujun@cmss.chinamobile.com>
+To: oupton@kernel.org,
+	maz@kernel.org
+Cc: fuad.tabba@linux.dev,
 	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
 	kvm@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 16/16] KVM: arm64: selftests: Add pkvm_exceptions debug and SError test
-Date: Wed,  4 Nov 2026 08:48:42 +0000
-Message-ID: <20261104084842.132944-17-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261104084842.132944-1-fuad.tabba@linux.dev>
-References: <20261104084842.132944-1-fuad.tabba@linux.dev>
+	zhangchujun <zhangchujun@cmss.chinamobile.com>
+Subject: [PATCH] selftests/kvm: arm64: get-reg-list: fix format specifiers
+Date: Wed,  4 Nov 2026 17:41:46 +0800
+Message-ID: <20261104094147.2252-1-zhangchujun@cmss.chinamobile.com>
+X-Mailer: git-send-email 2.50.1.windows.1
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -83,302 +73,89 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-pKVM can hide self-hosted debug from a protected guest, which then reads
-ID_AA64DFR0_EL1.DebugVer as 0. A virtual SError the host injects has to
-be delivered by EL2, since the host can't see whether the guest has it
-masked.
+The core_id_to_str(), sve_id_to_str() and print_reg() functions
+print __u64 values (idx, n and masked id) with the %lld
+conversion, which expects a signed long long. Use %llu
+instead, matching the unsigned type of the arguments and
+silencing the -Wformat warnings.
 
-Verify that the guest's own handler takes a hardware breakpoint, a
-watchpoint and a single step, and that an injected SError is pending in
-ISR_EL1.A while PSTATE.A masks it and is taken once unmasked. The debug
-cases skip while ID_AA64DFR0_EL1.DebugVer is 0.
+Signed-off-by: zhangchujun <zhangchujun@cmss.chinamobile.com>
 
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/arm64/pkvm_exceptions.c     | 261 ++++++++++++++++++
- 2 files changed, 262 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/pkvm_exceptions.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 214f38e3f67a7..1045136aacc16 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -190,6 +190,7 @@ TEST_GEN_PROGS_arm64 += arm64/nv_pre_fault_memory_test
- TEST_GEN_PROGS_arm64 += arm64/external_aborts
- TEST_GEN_PROGS_arm64 += arm64/mmio_sign_ext
- TEST_GEN_PROGS_arm64 += arm64/page_fault_test
-+TEST_GEN_PROGS_arm64 += arm64/pkvm_exceptions
- TEST_GEN_PROGS_arm64 += arm64/pkvm_host_abi
- TEST_GEN_PROGS_arm64 += arm64/pkvm_id_regs
- TEST_GEN_PROGS_arm64 += arm64/pkvm_irq
-diff --git a/tools/testing/selftests/kvm/arm64/pkvm_exceptions.c b/tools/testing/selftests/kvm/arm64/pkvm_exceptions.c
-new file mode 100644
-index 0000000000000..f7f9b666dd089
---- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/pkvm_exceptions.c
-@@ -0,0 +1,261 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * pkvm_exceptions - debug exceptions and a virtual SError in a protected VM.
-+ *
-+ * Copyright (C) 2026 Google LLC
-+ * Author: Fuad Tabba <fuad.tabba@linux.dev>
-+ */
-+
-+#include "kvm_util.h"
-+#include "pkvm.h"
-+#include "processor.h"
-+#include "test_util.h"
-+
-+/* Debug register programming bits, as debug-exceptions.c has them. */
-+#define DBGBCR_LEN8	(0xff << 5)
-+#define DBGBCR_EXEC	(0x0 << 3)
-+#define DBGBCR_EL1	(0x1 << 1)
-+#define DBGBCR_E	(0x1 << 0)
-+
-+#define DBGWCR_LEN8	(0xff << 5)
-+#define DBGWCR_RD	(0x1 << 3)
-+#define DBGWCR_WR	(0x2 << 3)
-+#define DBGWCR_EL1	(0x1 << 1)
-+#define DBGWCR_E	(0x1 << 0)
-+
-+#define SPSR_SS		(1 << 21)
-+
-+#define NR_STEPS	3
-+
-+enum { CMD_INJECT_SERROR, CMD_CHECK_SERROR };
-+
-+extern unsigned char hw_bp, ss_start;
-+
-+static volatile u64 ex_pc, ex_addr;
-+static volatile u64 ss_addr[NR_STEPS + 1];
-+static volatile int ss_idx;
-+static volatile char write_data;
-+static volatile bool serror_taken;
-+
-+static bool debug_exposed;
-+
-+/* Masks debug on return so the breakpointed instruction runs. */
-+static void hw_bp_handler(struct ex_regs *regs)
-+{
-+	ex_pc = regs->pc;
-+	regs->pstate |= PSR_D_BIT;
-+}
-+
-+/* Records FAR, the accessed address, and masks debug on return so the access completes. */
-+static void wp_handler(struct ex_regs *regs)
-+{
-+	ex_pc = regs->pc;
-+	ex_addr = read_sysreg(far_el1);
-+	regs->pstate |= PSR_D_BIT;
-+}
-+
-+/* Records the stepped PC and sets SPSR.SS so that the next instruction is stepped too. */
-+static void ss_handler(struct ex_regs *regs)
-+{
-+	__GUEST_ASSERT(ss_idx <= NR_STEPS, "step %d past the stepped range", ss_idx);
-+	ss_addr[ss_idx++] = regs->pc;
-+	regs->pstate |= SPSR_SS;
-+}
-+
-+static void reset_debug_state(void)
-+{
-+	asm volatile("msr daifset, #8");
-+
-+	/* Clear the OS lock and double lock so debug exceptions are permitted. */
-+	write_sysreg(0, osdlr_el1);
-+	write_sysreg(0, oslar_el1);
-+	isb();
-+
-+	write_sysreg(0, mdscr_el1);
-+	write_sysreg(0, dbgbcr0_el1);
-+	write_sysreg(0, dbgbvr0_el1);
-+	write_sysreg(0, dbgwcr0_el1);
-+	write_sysreg(0, dbgwvr0_el1);
-+	isb();
-+
-+	ex_pc = 0;
-+	ex_addr = 0;
-+}
-+
-+/* A zero DebugVer means EL2 hides self-hosted debug, so the case has nothing to test. */
-+static bool guest_debug_exposed(void)
-+{
-+	bool exposed = SYS_FIELD_GET(ID_AA64DFR0_EL1, DebugVer, read_sysreg(id_aa64dfr0_el1));
-+
-+	GUEST_SYNC(exposed);
-+	return exposed;
-+}
-+
-+static void enable_monitor_debug(void)
-+{
-+	asm volatile("msr daifclr, #8");
-+	write_sysreg(read_sysreg(mdscr_el1) | MDSCR_EL1_KDE | MDSCR_EL1_MDE, mdscr_el1);
-+	isb();
-+}
-+
-+static void guest_hw_breakpoint(void)
-+{
-+	pkvm_guest_init();
-+	if (!guest_debug_exposed())
-+		GUEST_DONE();
-+
-+	reset_debug_state();
-+	write_sysreg(DBGBCR_LEN8 | DBGBCR_EXEC | DBGBCR_EL1 | DBGBCR_E, dbgbcr0_el1);
-+	write_sysreg((u64)&hw_bp, dbgbvr0_el1);
-+	enable_monitor_debug();
-+	asm volatile("hw_bp: nop");
-+	GUEST_ASSERT_EQ(ex_pc, (u64)&hw_bp);
-+
-+	reset_debug_state();
-+	GUEST_DONE();
-+}
-+
-+static void guest_watchpoint(void)
-+{
-+	pkvm_guest_init();
-+	if (!guest_debug_exposed())
-+		GUEST_DONE();
-+
-+	reset_debug_state();
-+	write_sysreg(DBGWCR_LEN8 | DBGWCR_RD | DBGWCR_WR | DBGWCR_EL1 | DBGWCR_E, dbgwcr0_el1);
-+	/*
-+	 * BAS = 0xff watches all eight bytes only from a doubleword-aligned DBGWVR.
-+	 * FAR still holds the byte's address.
-+	 */
-+	write_sysreg((u64)&write_data & ~7UL, dbgwvr0_el1);
-+	enable_monitor_debug();
-+	write_data = 'x';
-+	GUEST_ASSERT_EQ(write_data, 'x');
-+	GUEST_ASSERT_EQ(ex_addr, (u64)&write_data);
-+
-+	reset_debug_state();
-+	GUEST_DONE();
-+}
-+
-+static void guest_single_step(void)
-+{
-+	pkvm_guest_init();
-+	if (!guest_debug_exposed())
-+		GUEST_DONE();
-+
-+	reset_debug_state();
-+	write_sysreg(read_sysreg(mdscr_el1) | MDSCR_EL1_KDE | MDSCR_EL1_SS, mdscr_el1);
-+	isb();
-+	ss_idx = 0;
-+	/* Unmasking makes the step active-pending, so the first one is taken at ss_start. */
-+	asm volatile("msr daifclr, #8\n"
-+		     "ss_start:\n"
-+		     "mrs x0, esr_el1\n"
-+		     "add x0, x0, #1\n"
-+		     "msr daifset, #8\n"
-+		     : : : "x0");
-+	GUEST_ASSERT_EQ(ss_addr[0], (u64)&ss_start);
-+	GUEST_ASSERT_EQ(ss_addr[1], (u64)&ss_start + 4);
-+	GUEST_ASSERT_EQ(ss_addr[2], (u64)&ss_start + 8);
-+
-+	reset_debug_state();
-+	GUEST_DONE();
-+}
-+
-+static void serror_handler(struct ex_regs *regs)
-+{
-+	GUEST_ASSERT_EQ(ESR_ELx_EC(read_sysreg(esr_el1)), ESR_ELx_EC_SERROR);
-+	serror_taken = true;
-+}
-+
-+/*
-+ * The guest sees the injected SError in ISR_EL1.A while PSTATE.A masks it, and
-+ * takes it on unmasking. EL2 has to deliver it through HCR_EL2.VSE, because the
-+ * host can't read a protected guest's PSTATE.A for serror_is_masked().
-+ */
-+static void guest_serror(void)
-+{
-+	pkvm_guest_init();
-+
-+	GUEST_SYNC(CMD_INJECT_SERROR);
-+	GUEST_ASSERT(read_sysreg(isr_el1) & ISR_EL1_A);
-+	GUEST_ASSERT(!serror_taken);
-+
-+	local_serror_enable();
-+	isb();
-+	local_serror_disable();
-+
-+	GUEST_ASSERT(serror_taken);
-+	GUEST_SYNC(CMD_CHECK_SERROR);
-+	GUEST_DONE();
-+}
-+
-+static void serror_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
-+{
-+	struct kvm_vcpu_events events = {};
-+
-+	switch (uc->args[1]) {
-+	case CMD_INJECT_SERROR:
-+		events.exception.serror_pending = true;
-+		vcpu_events_set(vcpu, &events);
-+		memset(&events, 0, sizeof(events));
-+		vcpu_events_get(vcpu, &events);
-+		TEST_ASSERT(events.exception.serror_pending, "vSError not pending after injection");
-+		break;
-+	case CMD_CHECK_SERROR:
-+		vcpu_events_get(vcpu, &events);
-+		TEST_ASSERT(!events.exception.serror_pending, "vSError still pending once taken");
-+		break;
-+	}
-+}
-+
-+static void test_serror(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = pkvm_vm_create_with_one_vcpu(&vcpu, guest_serror);
-+	vm_install_exception_handler(vm, VECTOR_ERROR_CURRENT, serror_handler);
-+	pkvm_run_loop(vcpu, serror_sync);
-+	kvm_vm_free(vm);
-+}
-+
-+static void debug_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
-+{
-+	debug_exposed = uc->args[1];
-+}
-+
-+static void run_debug_guest(void *guest_code, int ec, handler_fn handler, const char *name)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = pkvm_vm_create_with_one_vcpu(&vcpu, guest_code);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ec, handler);
-+	pkvm_run_loop(vcpu, debug_sync);
-+	kvm_vm_free(vm);
-+
-+	if (debug_exposed)
-+		ksft_test_result_pass("%s\n", name);
-+	else
-+		ksft_test_result_skip("%s: self-hosted debug not exposed to protected guests\n",
-+				      name);
-+}
-+
-+int main(void)
-+{
-+	TEST_REQUIRE(pkvm_supported());
-+
-+	ksft_print_header();
-+	ksft_set_plan(4);
-+
-+	run_debug_guest(guest_hw_breakpoint, ESR_ELx_EC_BREAKPT_CUR, hw_bp_handler,
-+			"hardware breakpoint");
-+	run_debug_guest(guest_watchpoint, ESR_ELx_EC_WATCHPT_CUR, wp_handler, "watchpoint");
-+	run_debug_guest(guest_single_step, ESR_ELx_EC_SOFTSTP_CUR, ss_handler, "single step");
-+
-+	test_serror();
-+	ksft_test_result_pass("virtual SError taken on unmasking\n");
-+
-+	ksft_finished();
-+}
+diff --git a/tools/testing/selftests/kvm/arm64/get-reg-list.c b/tools/testing/selftests/kvm/arm64/get-reg-list.c
+index 912590f9b0c2..2b85189862e5 100644
+--- a/tools/testing/selftests/kvm/arm64/get-reg-list.c
++++ b/tools/testing/selftests/kvm/arm64/get-reg-list.c
+@@ -145,8 +145,8 @@ static const char *core_id_to_str(const char *prefix, __u64 id)
+ 	case KVM_REG_ARM_CORE_REG(regs.regs[0]) ...
+ 	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
+ 		idx = (core_off - KVM_REG_ARM_CORE_REG(regs.regs[0])) / CORE_REGS_XX_NR_WORDS;
+-		TEST_ASSERT(idx < 31, "%s: Unexpected regs.regs index: %lld", prefix, idx);
+-		return strdup_printf("KVM_REG_ARM_CORE_REG(regs.regs[%lld])", idx);
++		TEST_ASSERT(idx < 31, "%s: Unexpected regs.regs index: %llu", prefix, idx);
++		return strdup_printf("KVM_REG_ARM_CORE_REG(regs.regs[%llu])", idx);
+ 	case KVM_REG_ARM_CORE_REG(regs.sp):
+ 		return "KVM_REG_ARM_CORE_REG(regs.sp)";
+ 	case KVM_REG_ARM_CORE_REG(regs.pc):
+@@ -160,13 +160,13 @@ static const char *core_id_to_str(const char *prefix, __u64 id)
+ 	case KVM_REG_ARM_CORE_REG(spsr[0]) ...
+ 	     KVM_REG_ARM_CORE_REG(spsr[KVM_NR_SPSR - 1]):
+ 		idx = (core_off - KVM_REG_ARM_CORE_REG(spsr[0])) / CORE_SPSR_XX_NR_WORDS;
+-		TEST_ASSERT(idx < KVM_NR_SPSR, "%s: Unexpected spsr index: %lld", prefix, idx);
+-		return strdup_printf("KVM_REG_ARM_CORE_REG(spsr[%lld])", idx);
++		TEST_ASSERT(idx < KVM_NR_SPSR, "%s: Unexpected spsr index: %llu", prefix, idx);
++		return strdup_printf("KVM_REG_ARM_CORE_REG(spsr[%llu])", idx);
+ 	case KVM_REG_ARM_CORE_REG(fp_regs.vregs[0]) ...
+ 	     KVM_REG_ARM_CORE_REG(fp_regs.vregs[31]):
+ 		idx = (core_off - KVM_REG_ARM_CORE_REG(fp_regs.vregs[0])) / CORE_FPREGS_XX_NR_WORDS;
+-		TEST_ASSERT(idx < 32, "%s: Unexpected fp_regs.vregs index: %lld", prefix, idx);
+-		return strdup_printf("KVM_REG_ARM_CORE_REG(fp_regs.vregs[%lld])", idx);
++		TEST_ASSERT(idx < 32, "%s: Unexpected fp_regs.vregs index: %llu", prefix, idx);
++		return strdup_printf("KVM_REG_ARM_CORE_REG(fp_regs.vregs[%llu])", idx);
+ 	case KVM_REG_ARM_CORE_REG(fp_regs.fpsr):
+ 		return "KVM_REG_ARM_CORE_REG(fp_regs.fpsr)";
+ 	case KVM_REG_ARM_CORE_REG(fp_regs.fpcr):
+@@ -195,13 +195,13 @@ static const char *sve_id_to_str(const char *prefix, __u64 id)
+ 		n = (id >> 5) & (KVM_ARM64_SVE_NUM_ZREGS - 1);
+ 		TEST_ASSERT(id == KVM_REG_ARM64_SVE_ZREG(n, 0),
+ 			    "%s: Unexpected bits set in SVE ZREG id: 0x%llx", prefix, id);
+-		return strdup_printf("KVM_REG_ARM64_SVE_ZREG(%lld, 0)", n);
++		return strdup_printf("KVM_REG_ARM64_SVE_ZREG(%llu, 0)", n);
+ 	case KVM_REG_ARM64_SVE_PREG_BASE ...
+ 	     KVM_REG_ARM64_SVE_PREG_BASE + (1ULL << 5) * KVM_ARM64_SVE_NUM_PREGS - 1:
+ 		n = (id >> 5) & (KVM_ARM64_SVE_NUM_PREGS - 1);
+ 		TEST_ASSERT(id == KVM_REG_ARM64_SVE_PREG(n, 0),
+ 			    "%s: Unexpected bits set in SVE PREG id: 0x%llx", prefix, id);
+-		return strdup_printf("KVM_REG_ARM64_SVE_PREG(%lld, 0)", n);
++		return strdup_printf("KVM_REG_ARM64_SVE_PREG(%llu, 0)", n);
+ 	case KVM_REG_ARM64_SVE_FFR_BASE:
+ 		TEST_ASSERT(id == KVM_REG_ARM64_SVE_FFR(0),
+ 			    "%s: Unexpected bits set in SVE FFR id: 0x%llx", prefix, id);
+@@ -259,7 +259,7 @@ void print_reg(const char *prefix, __u64 id)
+ 	case KVM_REG_ARM_DEMUX:
+ 		TEST_ASSERT(!(id & ~(REG_MASK | KVM_REG_ARM_DEMUX_ID_MASK | KVM_REG_ARM_DEMUX_VAL_MASK)),
+ 			    "%s: Unexpected bits set in DEMUX reg id: 0x%llx", prefix, id);
+-		printf("\tKVM_REG_ARM64 | %s | KVM_REG_ARM_DEMUX | KVM_REG_ARM_DEMUX_ID_CCSIDR | %lld,\n",
++		printf("\tKVM_REG_ARM64 | %s | KVM_REG_ARM_DEMUX | KVM_REG_ARM_DEMUX_ID_CCSIDR | %llu,\n",
+ 		       reg_size, id & KVM_REG_ARM_DEMUX_VAL_MASK);
+ 		break;
+ 	case KVM_REG_ARM64_SYSREG:
+@@ -275,12 +275,12 @@ void print_reg(const char *prefix, __u64 id)
+ 	case KVM_REG_ARM_FW:
+ 		TEST_ASSERT(id == KVM_REG_ARM_FW_REG(id & 0xffff),
+ 			    "%s: Unexpected bits set in FW reg id: 0x%llx", prefix, id);
+-		printf("\tKVM_REG_ARM_FW_REG(%lld),\n", id & 0xffff);
++		printf("\tKVM_REG_ARM_FW_REG(%llu),\n", id & 0xffff);
+ 		break;
+ 	case KVM_REG_ARM_FW_FEAT_BMAP:
+ 		TEST_ASSERT(id == KVM_REG_ARM_FW_FEAT_BMAP_REG(id & 0xffff),
+ 			    "%s: Unexpected bits set in the bitmap feature FW reg id: 0x%llx", prefix, id);
+-		printf("\tKVM_REG_ARM_FW_FEAT_BMAP_REG(%lld),\n", id & 0xffff);
++		printf("\tKVM_REG_ARM_FW_FEAT_BMAP_REG(%llu),\n", id & 0xffff);
+ 		break;
+ 	case KVM_REG_ARM64_SVE:
+ 		printf("\t%s,\n", sve_id_to_str(prefix, id));
 -- 
-2.47.3
+2.50.1.windows.1
+
+
 
