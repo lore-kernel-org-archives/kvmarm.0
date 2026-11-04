@@ -1,104 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.216
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793792245;
-	b=0rX2fLyWcRuYhlvR66YPSMnBV4s1wrohuD6EfuLetQ0tGV8kjQzQaL6GGpuAc4ulrdbB
-	 EF9kyqLdUk0mgk3losYHPU+IbfV4uBZQIZmnHklVd5VU4V2sATmaGlmiEdv8b9CgT0+Bk
-	 /GEx3VzDxb7ehkr5z49AoJRssek8ZI7uheLlpFXnbrpN/RD006IrACDJfQUQJaR4aejRj
-	 t7IJ3Tno6jMTj+2dpWVt+k/GGuBw8Zd8A+iH6Mf31lNxycGP/tAjZQRd+5bIGEhGJF2+y
-	 TGkrl9cB6VoBwKM+ObiBxa4jdowd3Y6oCqzxxVwf+tBAjBuyElui5F07BwICNwGYmqg==
+	t=1793796296;
+	b=25ime8ArEkRw33+KtYXhKRKbbWWxoDJcJt0l6AXAJzcH+uGpnAkukix7AExiQoSUcMAZ
+	 QReyutsJFN0ZNRYBSeuZ+Q/PA1b6IGXa9AL1upo9cnMfWY3CHbGRIRTi4hPQjm3+SfegD
+	 m7yLW4EGlGUNDMtHhG1s6JWUKI0x0WxZtdiuyzM7BoT0uNM6v4aKVCNbsWMRK/mS4b41L
+	 4A7c0KcqD9kBxucnVMRrqNYF9WUiXduMWqAxubosyQI4012LTOBrdNA7ZjOE0Hl4bbBLI
+	 c8CEMh9nGV+jFYpN5O09rBtaAjnGYsqJo8NfhF01pEk6woDqI63R/JpdMnsih3vmbPw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793792245;
-	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
-	 X-Mimecast-MFC-AGG-ID:Received:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 X-Received:Received:Date:From:To:cc:Subject:In-Reply-To:Message-ID:
-	 References:MIME-Version:X-Mimecast-Spam-Score:X-Mimecast-MFC-PROC-ID:
-	 X-Mimecast-Originator:Content-Type;
-	bh=ozSGf2zyuVYYLVzmKkiurYsLvvrqYzVSGZ8tHSkd2EU=;
-	b=PxVEPbb2vM0YHaRRNSYWnWx6uKzTawHLS/7iKYIIqZu1BrkM9wBeRmL20UH7NV4WPnY9
-	 /Fzzk2fONXlkZxHin8IVDh0po1vQg7kNWxJdBBc8SWh0234ssvsMjs73cedneNwLhHGW1
-	 idbxBiwL8bZJ67WHcsZpOQk7k9YEuTjbM3V1aNzXrQAD0Tv42T4zrfNimApWWbTxyHxT9
-	 hzzV5j7ApV3LFE5jbQOLPktJgVxPrI+vdygFyXmoOYmkwAE0qio670h1b/m/BHLQE3s1n
-	 7gV6wqi8ZQ7FqIGMeCRT9SJRJsnCRYR2PHUh2GgwSr/Ct1HCH6XO2SRyGd0taIpSYHA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793796296;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=UcjFubjphnzFpUpHrLLrETqweYn/e3Sdi2+JtZw/B0I=;
+	b=A8WUkGXPchVG0//r5YJjujKkCaMRPkcPqopR9mmz54Fuzxp5RVB2CilxwdbXcAwULm/g
+	 2y3VhdV4jkY1fz5XjcfM27f9aq0dD8llW+UKs02QpgJtjT6aLxOl7Z3C5LhELQif6IODO
+	 P9g0I5Z4KAiO+wH7QYrZu6QN8nu14KK7ZWOha8tHp96SUycFdDZ9sw7oCZmb/Gjbof8Dr
+	 0e2KFS95JlLTStzOz3QYvMRe5NyE9PVnJdJADOGi/fXVIXIalRuIN6WfuRgI33/wYUHoP
+	 OEnomOJWhjMdALR/zwwHrX6qls8mc9NCYxrfiHbliYAtPHHc4GPNd6ETsbtBlifUP2w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=redhat.com;
-	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=gaBmgHR4;
-	arc=none smtp.remote-ip=170.10.129.124
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=V3DZfkWI;
+	arc=none smtp.remote-ip=91.218.175.216
+Received: from mta0.migadu.com (out-216.mta0.migadu.com [91.218.175.216])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31EAB606EE9B
-	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 11:37:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 31EAB606EE9B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 706BB606A31B
+	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 12:44:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 706BB606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=gaBmgHR4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1793792243;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ozSGf2zyuVYYLVzmKkiurYsLvvrqYzVSGZ8tHSkd2EU=;
-	b=gaBmgHR4BR5KhzzjedYykjxmp5nDN7co/1bCU/XsQdNXpGylT5z6TuJdOJovX9JFETJ2hA
-	7srHc3RDZnBORBpQSg8XIzy8aJqZW63WmXXxJifinADfNHVLH94TrCVBLltR5VfRi7U5fW
-	2+PvGYQGc2LRBen0zkH+NWF9s30KFQ4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-689-_Sx-MYMrNKSCOlX9UZhqCA-1; Wed, 04 Nov 2026 06:37:22 -0500
-X-MC-Unique: _Sx-MYMrNKSCOlX9UZhqCA-1
-X-Mimecast-MFC-AGG-ID: _Sx-MYMrNKSCOlX9UZhqCA_1793792241
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-48e011829easo393220f8f.3
-        for <kvmarm@lists.linux.dev>; Wed, 04 Nov 2026 03:37:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793792241; x=1794397041;
-        h=content-type:mime-version:references:message-id:in-reply-to:subject
-         :cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=ozSGf2zyuVYYLVzmKkiurYsLvvrqYzVSGZ8tHSkd2EU=;
-        b=yWyCpYpr6MqktXgy053sXvYl1UUG2fmSs5njdHS7HZyM7msrSq+v97t7XIuL+JngRt
-         r+FxALR41TQnUrkQLoc+xU0/Ao1DHxZfIYXy1Vf7ty9QSNTcuFnitG95dPHFQXEKo1OI
-         JF8qNZrgYRKvV4DFkW69h/OdPy8HIJ189UNf9O5aoTjGzu4Y2apjKQ1/FhrO+EIZZ2Tk
-         Ra/ga+rvB0H+fkwoQsRevxHfJiMNu4mceQdN6qPORRCcDDUF++dwL2byMXzR0p7XSrcn
-         OyG6sNi1RtwV5v5UxaYnBJWhM5nolPnxcQVYJ00eFdPc2nWo6kFRKSbII61syfALE/2W
-         cerA==
-X-Forwarded-Encrypted: i=1; AKwUvBxnhEH4bp44IfoM+HPWhnwswmlj97ptHMuNL/4GZGc72Z1UWcXoNbqSLLgsjrNGTJ2zwBeh2y8=@lists.linux.dev
-X-Gm-Message-State: APuU4Z/LSBQYQpRKqVg7AY0gL9YpHi17Odo7JJfC854iGS7t30de0NDO
-	S4yuRfugXusKoJY5mrR41DVM3s2azl4KKGKvO8Ybu6iP5lVrFWACyenl32/AM4QirzvMmBPpLxE
-	VIxIwz6FB6uitpizTAegTVrt7MwMdJNjtAmp1yxFysbd5NmjqSFlK0T7jFw==
-X-Gm-Gg: AYBFou3yJSGs5EB5wpJYzZM6/3+14/21v+5OCrGp6BQF0lJdGbpQTcyTuIamwH0/T46
-	kJF7rXNKhEtTY7+AlKH2D2QBI5jKhfhbKeBcWV0+Zxsaz5/ccnv6+nxoqMcFcccS2yhQIkGHiEi
-	MmRmb000bQL03q6YM/NC7NDO3y1GLOQ2ziNWNGg7/hVSodletyaVZE1j0W5H2BrPaIeFlJkxZqN
-	zGtVi4tQqzE57XoZhA2o+cv5wfco4fKPL+ZD1iQgc1Py+9R1UcJSqOVezlXSK6uHZzEpeEC/Ofd
-	ZfdloeKtdb60yx2ouaWOgNguaY8r6cnIlT8pjfmY0SRLk3inMIG+12S/jXAu1x/Ez6gqQ1Pp/GD
-	OmRsq4ziGnuMsZQX3DH42EybC7fb366SVUjzBE6x59KQAIUNR/BclgWXl11EtqkT+TsJfoFn0/l
-	t7xeC09zAtu1AlAqtbXIY90qA1JCV1sIZKtdR/lQ==
-X-Received: by 2002:a05:6000:260b:b0:48c:4553:790b with SMTP id ffacd0b85a97d-48e6e50075cmr31750658f8f.48.1793792240868;
-        Wed, 04 Nov 2026 03:37:20 -0800 (PST)
-X-Received: by 2002:a05:6000:260b:b0:48c:4553:790b with SMTP id ffacd0b85a97d-48e6e50075cmr31750621f8f.48.1793792240514;
-        Wed, 04 Nov 2026 03:37:20 -0800 (PST)
-Received: from seott-rh (p200300f6af1574019b2c5947d8ec139e.dip0.t-ipconnect.de. [2003:f6:af15:7401:9b2c:5947:d8ec:139e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48fece99d67sm3430641f8f.24.2026.11.04.03.37.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Nov 2026 03:37:20 -0800 (PST)
-Date: Wed, 4 Nov 2026 12:37:19 +0100 (CET)
-From: Sebastian Ott <seott@redhat.com>
-To: Mark Brown <broonie@kernel.org>
-cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-    Suzuki K Poulose <suzuki.poulose@arm.com>, 
-    Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-    Oliver Upton <oupton@kernel.org>, Ben Horgan <ben.horgan@arm.com>, 
-    linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-    kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-    linux-kernel@vger.kernel.org, "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Subject: Re: [PATCH v9 0/3] KVM: selftests: arm64: Improve diagnostics from
- set_id_regs
-In-Reply-To: <20261103-kvm-arm64-set-id-regs-aarch64-v9-0-ab32bc79fa9c@kernel.org>
-Message-ID: <7db30970-dc9c-702a-2f1a-f52c2e253494@redhat.com>
-References: <20261103-kvm-arm64-set-id-regs-aarch64-v9-0-ab32bc79fa9c@kernel.org>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=V3DZfkWI
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=pL42GIo48cBII9Atlc96cBdXylzrs2P95YUPiNb6rRA=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793796292; v=1; x=1794401092;
+ b=V3DZfkWIbPloGmUQ/qeDD6rSp4jbZu/KGxXnHYq7UlrPV5Q4kSA8MZgwpIxBJgOJpmBeDa4y
+ X8nvMFn1i8Aq4TmsqVPbsGFEAoQps7HmWM1tssK1c3p+a+fLgUpBi8jVf4kPvtN532zQvP/1IfW
+ 8JSqa9IcrKA31EVmJscmC+Yo=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id d939a9b5ae201b1c;
+	Wed, 04 Nov 2026 12:44:52 +0000
+X-Mizu-Trace-ID: d939a9b5ae201b1c
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH v2 0/2] KVM: arm64: Stop stage-2 teardown scaling with the IPA size
+Date: Wed,  4 Nov 2026 12:44:49 +0000
+Message-ID: <20261104124451.2148724-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -108,26 +75,55 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: f8FOgzex50xEd_LS49eZ5ibklprecOkpDP0mkrWUugs_1793792241
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, 3 Nov 2026, Mark Brown wrote:
-> While debugging issues related to aarch64 only systems I ran into
-> speedbumps due to the lack of detail in the results reported when the
-> guest register read and reset value preservation tests were run, they
-> generated an immediately fatal assert without indicating which register
-> was being tested. Update these tests to non-fatally report a standard
-> kselftest result per register, making it much easier to see what the
-> problem being reported is.
->
-> A similar issue exists with the validation of the individual bitfields
-> in registers due to the use of immediately fatal asserts. Update those
-> asserts to be standard kselftest reports.
->
-> Signed-off-by: Mark Brown <broonie@kernel.org>
+Hi folks,
 
-For the series:
-Reviewed-by: Sebastian Ott <sebott@redhat.com>
+Changes since v1 [1]:
+  - Run all teardown from stage2_destroy_range() (Oliver, Suzuki)
+  - Dropped the Fixes tags (Marc)
+  - Dropped the patch moving the teardown into kvm_vm_s2_ops
+  - Use gfn_to_gpa() for a mapping's address. (Vincent)
+
+Two patches that make stage-2 teardown take time proportional to what
+is mapped, rather than to the size of the IPA space as it has since
+4ddfab5436b6.
+
+Under QEMU TCG ('-cpu max', 16K pages with LPA2), destroying even an
+empty VM takes about 7 seconds in pKVM. Without pKVM it takes about 19
+seconds if the VM requests a 52-bit IPA (crosvm requests the host's
+limit). With the series, both take well under a second. I tested only
+under QEMU, since I don't have hardware with LPA2.
+
+The first has the page-table walk return where it stopped, so that the
+teardown steps over an invalid entry larger than a block-sized chunk in
+one go. The second has pKVM return where its next mapping starts.
+
+pKVM gives every VM the host's IPA limit. My series honoring
+KVM_VM_TYPE_ARM_IPA_SIZE in pKVM [2] doesn't change that for crosvm,
+which requests the limit.
+
+Based on Linux 7.4-rc1 (6628e7d4c6b25).
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20261103084742.1302597-1-fuad.tabba@linux.dev/
+[2] https://lore.kernel.org/all/20260917091826.2639205-1-fuad.tabba@linux.dev/
+
+Fuad Tabba (2):
+  KVM: arm64: Resume stage-2 teardown where the walk stopped
+  KVM: arm64: Resume a pKVM stage-2 teardown at the next mapping
+
+ arch/arm64/include/asm/kvm_pgtable.h |  8 ++++++--
+ arch/arm64/include/asm/kvm_pkvm.h    |  4 ++--
+ arch/arm64/kvm/hyp/pgtable.c         | 15 ++++++++++++---
+ arch/arm64/kvm/mmu.c                 |  4 ++--
+ arch/arm64/kvm/pkvm.c                | 12 +++++++++---
+ 5 files changed, 31 insertions(+), 12 deletions(-)
+
+
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+-- 
+2.47.3
 
