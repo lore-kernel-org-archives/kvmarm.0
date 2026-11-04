@@ -1,74 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.72
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.72
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793801191;
-	b=BouESWrIaAgbK6qbcAtBBPvbsybOSUoC5SLdFAu4eXdRq90/cQfK0O6AmBCweKSeCvSK
-	 Wt5QTfvUsC+d/b33R0hV6QvIyczQ9MgsAzuEJ6U5wZ/R2Q0RgDFHy5gfNVtgoUipoXazV
-	 dwwH5ZRkzEGSGv4A0aCwzaoeUqUAU9OUqnT198/vTu48DNrKpErP+hpDnHUR1F65nnGnM
-	 Z3myA/hKhNhJKqcl1ckOBoc14B2vL/8zJH7avn0XYy6njfeTewaVJeeR21bne0t6EAJes
-	 Jf3G6UC8OV5w0RPjAs148xgWQr/hzAyUV0vRtapM56aVMZKbobbf1iUNB7PJ0DEa4KQ==
+	t=1793801192;
+	b=sJ5lyRG4Vrj7cW1okw8ogAIZ1jM+/wyHKbXFBCoQTHpuStSrtdX+YBCRNKVtg3tpD7/f
+	 +Ml2x2BZYJ8V6ia5rJIyLNvyw6yM9aqefBwWWOWSuAxpIs/BoaYqGjxokc78IDN1Ggt8Q
+	 YNApuT9gcrpjROg6JF54HEd5soYubclhTJqrF8Bx8jCjNePUvQB44B3vhEmPN/4yUyd/N
+	 2S482zUV1K1C1dKBLLmj8uU8I4+00p89QcvpAuJhayFszCYGGEXHe+JKMqP/yFjEKxc1p
+	 BA2WCgq+MbzzkaIEv1i7/xZGrhyiw8oySY9lS0X1YDVJVchNQ3vGAfoX82Sg7vJ+rrw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793801191;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793801192;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
 	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
 	 Content-Type;
-	bh=Otbpqb7SJFabxtkE4DZe7Wt61LA99tGboOBEZyTX8RM=;
-	b=PkF6VYWTfd1lPRtJcBiunTg2GI3aRvlPOsrt64pHSXDlkEoUvDSmFv3aq3lzw75CQWHT
-	 1Ka0rMOk40vXOw2gz6jYlRD2Xcso2jutJqEJJtObdM+EqK9sAb0QX09b56EnjYomdtKmh
-	 PZDgPZPjm+0qx2qsk7NXGxlZ+/eErwqkZfRPdJ+spQVCZhsPCV1EbxROsgkqgCxljHj4I
-	 1VxH2tQ5NGmIlaE7mlQLOkJRz1ZnOmGY2kfEz4fSa2ixry5bMPkgsv+f1s8gmvdna53+A
-	 aU8iNwIx9ZqMRbTKmcI1i+LvRmXWUQ0yucNPRkRBErnUqwiREoH6gPermaHLNEeM0vA==
+	bh=MWbafvzSXIS+FuKJGheLyccmpIuKpJRwMov0QQ6M3pU=;
+	b=qCSRgoSYva7xKT0k5NVfM5y3bD5Z2N6GPsG3Ax2w0qb+eDoBiks1oh2rcSPTMTwl1rFD
+	 EiCkJM9dILK1XAy1+E/03j5CElCn/6qwwoqY3rD6X8WLcFVZk/jL41+0Eu5zpXarP2Qxn
+	 bPkmtfhMTEPrOQVmjjlCANc1j9chivar8zZrBkK1/y4mjkqn8mH2NphhP7tqXJykizwcj
+	 5ujk+BwSEquEnqfY7b9iMDRY6yf1YbNxVi/LnZdF8FlPWZJbAxhhPZcEzEphJWesIlKm9
+	 VDBJP13YzKvUKpoCTv+Yymr0RAJVny2NMGVTR5cgs0v5mOyZJ2go2CXtyN+CzEvCJWA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=mwZAieDn;
-	arc=none smtp.remote-ip=209.85.221.72
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=MV1VqCOM;
+	arc=none smtp.remote-ip=209.85.208.72
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com [209.85.208.72])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF043606A330
-	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 14:06:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BF043606A330
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB991606A336
+	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 14:06:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AB991606A336
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=mwZAieDn
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-48e0389d6f9so539086f8f.1
-        for <kvmarm@lists.linux.dev>; Wed, 04 Nov 2026 06:06:30 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=MV1VqCOM
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-6b1d43907c2so948870a12.0
+        for <kvmarm@lists.linux.dev>; Wed, 04 Nov 2026 06:06:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1793801189; x=1794405989; darn=lists.linux.dev;
+        d=google.com; s=20260707; t=1793801190; x=1794405990; darn=lists.linux.dev;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=Otbpqb7SJFabxtkE4DZe7Wt61LA99tGboOBEZyTX8RM=;
-        b=mwZAieDnBsl0uSZVdfL+tsRY2l/Cv55A+ptZRJUmVkNooa9Too15u7iIv8UpN7SnHw
-         xzbe++eLBRhfUzIO419f1cyn4oBOnFN00oEGN8b9wC/yu3hweBqoDEKM6b0jMGoXFEs6
-         RNUk97+L1HRjRD6Q/30c/m8hhW1YHA4mKi01mCmNatVtojCkIbOUNXNciPNt7rj1x4oE
-         PRCjEugDzS+Y5A6zy+kkT7mTUbnmQ0LjPeNN1Izuj695+KAw82G7OP7ukHlTxr4OB4nl
-         eAgEfnpllmreAUdiWqQMcqFY/RNz33zhQ+kRgi3/oSAB0S0IgJLrRgFl1xwHzRHL26Pi
-         09Tg==
+        bh=MWbafvzSXIS+FuKJGheLyccmpIuKpJRwMov0QQ6M3pU=;
+        b=MV1VqCOMSm0Zm0Ki5ieOiufXqI2k0dDw4FqfTkshxo1FddQPyavImEKzzxyAeWTAoa
+         VU76CL2reErAS+GEgdf/xq2bzNAHNgoNT6SCc+z3cjVugxG8hDjsxfZ9dpKOuSvhrU9T
+         gZHGemMcHTZ+Me39riWMm4do3VR+W+SxLMCjMdNruv+i2GKk9v9XYs2kyNe83+8g9MLZ
+         dKgCTR/Y7Hw2CPFScPAwK7puEt3ZAPfk6T5rht3DrpIDDaHD74z7Q6ydtU7VR76edbFu
+         vbJr02JRnhwW3ekZdfrGjNHe3VzD/34KIx9PqyWI4I7JOnRAoRL//08wtls+0BT+hoFg
+         hYNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793801189; x=1794405989;
+        d=1e100.net; s=20260707; t=1793801190; x=1794405990;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=Otbpqb7SJFabxtkE4DZe7Wt61LA99tGboOBEZyTX8RM=;
-        b=oZjfUd+dLk1/J8b+EIxIXVsIfj8UD7pKZ5EhDr3IL7ecGVRS7d7FynBSEDF1gZg81O
-         rNNaHuLffbVtWkhTM3BFeMqo6uPmzVzaKxNrPoHS8t/27+c9+QbuY/ymKY/brBFRZZZj
-         m+iRg9BrirpwlDAp+aHFXOrk+y1eadxQNaFJEhkinOCwzNs4J79CHsWzcsfl1vI+H/p1
-         QaKPNVeNL08NtavPl3FHUlFklIhCrop8VNccNxJnCbf30B7mKktlMkdjP1GxwwiTM5g1
-         xvoUBJydiX9sCLOutsQaCWVSY0kqNLpvg7S/yE7KjdsJfP0Pn14LDhj1Hu2f8BYKg+H1
-         ipEw==
-X-Forwarded-Encrypted: i=1; AKwUvBy+kLVDpjl8zJdwZy7Y8pDEkNcrJfjjQMH57OgaKlavmizHI3Ou6fAusHk+yhJqlku0CcduwIM=@lists.linux.dev
-X-Gm-Message-State: APuU4Z/BpDCjSABJXkK+a6BoYTrUf6bqkz7JnnwVypcCX6lASQRdt9b/
-	HDnj0j4QoFi8FKjUkV1wVa9TvKypjAIgtdgDcYAgTCBcRFqq4/PzArUQfvhdg1egFKA5Al7uktc
-	W+YNVO6RdirXrzxkdg8nMEg==
-X-Received: from wrbgf8.prod.google.com ([2002:a05:6000:27c8:b0:48e:267d:cb0b])
+        bh=MWbafvzSXIS+FuKJGheLyccmpIuKpJRwMov0QQ6M3pU=;
+        b=nebkirBPp454KM1zx7klJ8uTRdjFsLn5GdkHA0LxPyaBxw2mNjuO9AnCapYUitVM8f
+         BwBFY9NT6cXWICiZkTOCNCRiidjgLfXFSKHjG+HTmYI9bZ4SOlxHmXkp6bxVWzhXnQik
+         a3e1Qq8u+QlCqvJqGuENLfNOEHguhRsKfeJBwLRMr61qHL7VpHz1JEsCeuj6pbm3sw4T
+         KnCPM0t0wESY7FGpjWPH1HAd9Wjwqk2ez2MYSq7VvkbFiMcCmLhGiAcZK+2O+pLsH3KU
+         q1h39TOA32t6IMUSRQxE0CGLCnCRDaF/k5+3hZhUF/g5zikruJGW+qnVrFoBaUCwXZXw
+         yUAQ==
+X-Forwarded-Encrypted: i=1; AKwUvBxoW/xlBTaQF650FIPCtv7WTm4CW3YfGQ3tNB6112h6mNGCh+AsGg7ml+BG/X8sOtMULCbHgc8=@lists.linux.dev
+X-Gm-Message-State: APuU4Z9FCcsdj87Ys5tQgtX4eOHYGsQGENNnBbg5LOBASzquP+9/nTjZ
+	LHm1u2VWsf+lECnp/FLLvlOS9BfKM6+XbFKISmXZTmcu/hTEWrvA4wjlHCYWHJTMyfWQ8GEpMH+
+	CqteWHlwBuKspzlAAUGLD7Q==
+X-Received: from edbin4.prod.google.com ([2002:a05:6402:2084:b0:6b4:5df5:42f3])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6000:26c3:b0:490:c68e:5d5d with SMTP id ffacd0b85a97d-490c68e5e13mr937960f8f.49.1793801188873;
- Wed, 04 Nov 2026 06:06:28 -0800 (PST)
-Date: Wed,  4 Nov 2026 14:06:11 +0000
+ 2002:a05:6402:2346:b0:6ac:686f:91db with SMTP id 4fb4d7f45d1cf-6b4f7d3cdfdmr9122001a12.11.1793801189924;
+ Wed, 04 Nov 2026 06:06:29 -0800 (PST)
+Date: Wed,  4 Nov 2026 14:06:12 +0000
 In-Reply-To: <20261104140612.137869-1-vdonnefort@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,8 +81,8 @@ Precedence: list
 Mime-Version: 1.0
 References: <20261104140612.137869-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.56.0.455.g6c5a503b38-goog
-Message-ID: <20261104140612.137869-5-vdonnefort@google.com>
-Subject: [PATCH v2 4/5] KVM: arm64: Add guest_hvc hyp event
+Message-ID: <20261104140612.137869-6-vdonnefort@google.com>
+Subject: [PATCH v2 5/5] KVM: arm64: Add host_hvc hyp event
 From: Vincent Donnefort <vdonnefort@google.com>
 To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -92,85 +92,52 @@ Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
 	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Protected VMs issue HVCs that are fully handled by the hypervisor. This
-makes a failure hard to debug solely based on host information. Create a
-guest_hvc hypervisor event for hypervisor handled HVCs and log the
-return value, stored in x0.
+In a similar fashion to the guest_hvc hypervisor event, log hypervisor
+handled host HVCs with their return values, stored in x1.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 ---
  arch/arm64/include/asm/kvm_hypevents.h | 13 +++++++++++++
- arch/arm64/kvm/hyp/nvhe/pkvm.c         | 12 ++++++++++--
- 2 files changed, 23 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c     |  2 ++
+ 2 files changed, 15 insertions(+)
 
 diff --git a/arch/arm64/include/asm/kvm_hypevents.h b/arch/arm64/include/asm/kvm_hypevents.h
-index 7486d95455c5..63d98dd92cb0 100644
+index 63d98dd92cb0..9a240fa410ca 100644
 --- a/arch/arm64/include/asm/kvm_hypevents.h
 +++ b/arch/arm64/include/asm/kvm_hypevents.h
 @@ -66,6 +66,19 @@ HYP_EVENT(selftest,
  	RE_PRINTK("id=%llu", __entry->id)
  );
  
-+HYP_EVENT(guest_hvc,
-+	HE_PROTO(u32 id, u64 x0),
++HYP_EVENT(host_hvc,
++	HE_PROTO(u32 id, u64 x1),
 +	HE_STRUCT(
 +		he_field(u32, id)
-+		he_field(u64, x0)
++		he_field(u64, x1)
 +	),
 +	HE_ASSIGN(
 +		__entry->id = id;
-+		__entry->x0 = x0;
++		__entry->x1 = x1;
 +	),
-+	HE_PRINTK("id=0x%x x0=0x%llx", __entry->id, __entry->x0)
++	HE_PRINTK("id=0x%x x1=0x%llx", __entry->id, __entry->x1)
 +);
 +
- /*
-  * trace_hyp_printk() has too many specificities to be declared with HYP_EVENT().
-  * However, we can use a REMOTE_EVENT macro to automatically do the declaration
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index fc0475f0877d..df7bd34325de 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -11,6 +11,7 @@
- #include <linux/mm.h>
+ HYP_EVENT(guest_hvc,
+ 	HE_PROTO(u32 id, u64 x0),
+ 	HE_STRUCT(
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 28e0191e443f..1113cd828bd5 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -1642,6 +1642,8 @@ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
+ 	cpu_reg(host_ctxt, 0) = SMCCC_RET_SUCCESS;
+ 	hfn(host_ctxt);
  
- #include <asm/kvm_emulate.h>
-+#include <asm/kvm_hypevents.h>
- #include <asm/spectre.h>
- 
- #include <nvhe/alloc.h>
-@@ -1445,11 +1446,12 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
- 	struct pkvm_hyp_vcpu *hyp_vcpu = container_of(vcpu, struct pkvm_hyp_vcpu, vcpu);
- 	u64 val[4] = { SMCCC_RET_INVALID_PARAMETER };
-+	u32 fn = smccc_get_function(vcpu);
- 	bool handled = true;
- 	u32 feature;
- 	uuid_t uuid;
- 
--	switch (smccc_get_function(vcpu)) {
-+	switch (fn) {
- 	case ARM_SMCCC_VERSION_FUNC_ID:
- 		/* Nothing to be handled by the host. Go back to the guest. */
- 		val[0] = ARM_SMCCC_VERSION_1_1;
-@@ -1542,10 +1544,16 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
- 		pkvm_memunshare_call(val, vcpu);
- 		break;
- 	default:
--		return pkvm_handle_psci(hyp_vcpu);
-+		handled = pkvm_handle_psci(hyp_vcpu);
-+		goto out;
- 	}
- 
- 	if (handled)
- 		smccc_set_retval(vcpu, val[0], val[1], val[2], val[3]);
++	trace_host_hvc(KVM_HOST_SMCCC_ID(id), cpu_reg(host_ctxt, 1));
 +
-+out:
-+	if (handled)
-+		trace_guest_hvc(fn, vcpu_get_reg(vcpu, 0));
-+
- 	return handled;
- }
+ 	return;
+ inval:
+ 	cpu_reg(host_ctxt, 0) = SMCCC_RET_NOT_SUPPORTED;
 -- 
 2.56.0.455.g6c5a503b38-goog
 
