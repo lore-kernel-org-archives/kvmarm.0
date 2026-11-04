@@ -1,59 +1,58 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793738244;
-	b=aJ7ZYQTjUQ2leuMaZyQKwFdWrb99SjtVVS7O6Tz/CaMsGVGYYQDJCMj+t8LuW5lcaZu+
-	 2TVxj+ve6/JyAeMQ+fKqWiCyOwGr402Ylg4xoAAmVJwKa7VHFcc5KSYb4+VMEYet37lt3
-	 nYQe3PO9CRkInpJ3RNyfgXquarbE7kSn4ycMYfV+v7nHsiN5dlQBu3rSXLI6bGeUhkqls
-	 qNsJn+cVQiR5q+n9Aly2x4NsLjL3q7Q42hj2DkbEfCXxK7XNITffJCdkkeCUL02d6ze1T
-	 Y/eGKUpvuy3HCYpCMBIoOrRievqjf/7NwdDha7QubA3MNNtkjEym9jCnFYz9JH/2q5g==
+	t=1793759279;
+	b=nKoknaztcJN/XFJrqc2BpfU36GgsH61b2wBH2nzXfejTv9frrb2Dw0f0dHVNZqqsZSUH
+	 YGtQVuhF9SfYl831SIVsVFqn5qB9fU4nVW0Xk+i+4RRi7j0qevCZk0Q8DU+3rZjvDjy1k
+	 2Jc5eyUlJVKwJ/4cknQwqLsF1qBk6+W39rrunyP71J7cDcFj93zqoUi0xDuLfJvP7jiue
+	 T7OX8YcPBls5qn1McHjLwKTl6O4bfzjT8rMU+Eg5h/0da2KdVXYoSQvJwZJRhqb8hwZDb
+	 wghWljEBRm7gSu/MSO9JiTMWe7MnBAptJcc7asEUXuoxsT2TDmATd3YUE7B8hgU0s2Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793738244;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793759279;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=vWPeCnUz1sDUCuvHzgsNmQLP6HqKKH7oPoJSrsTWm8A=;
-	b=z3d3pdOmAGs64XbIe4IxhZVldykGAz+YwQrbCXqWZD56Lc46OJYTdjpJ9MgJ1M/kEM58
-	 8tQppJ+sT/uX7hheyr7J2T/lBP8Y2Oj63nX0BUALwX9pxE1xmomHwm4mK9oMgDJ36GF3+
-	 FYI5ggpsNtRo07DmRBPKTwiqfADY9xl8WgdAPyjKWDb53CzsmRkSaxy98anzhBlcmyrqW
-	 R/MmqBsgCjbaZ33P1cLN0aRZwTFvUrBpQis2Fc71PQ4CRLM1K3zJM9tpSwERmWJHcASs9
-	 10p6wo/YEGWun9W1RC/Vi2X6HbzpbG/oucTWAiG/SK2+lfNQosyefEVd/2GCnian7pQ==
+	bh=r4jCs72EuhtOBTKvGiR0+q5learbp+wZHBZt+KVXQMk=;
+	b=JxeASRK1eDSq9C+C2FzXEJ/QuzcLPUsq06T/ySXI58C0zcJsfQ1vNAK1+bv10ymkZkGF
+	 oZRamArU4el+iRQlgzTf9UHE3XlIMsAEf1uEz9FxkZz5Y7U/+eyy+6X3radLZf8jiyR2t
+	 cMQ58ybUFLJP3ctt7OERbMQCMt79Nxwy6Hmpb5b+LD2CxnAJlTQVuZhEoPDMZkSbdR7up
+	 ntlVYCmQmOYsEAmGzWfh69EF9D+xxgHXdJqpBKzT2QPlgam5HZbonvzC+ZHZq3XlIXv/C
+	 Lpm1w6oP38IJ/Kw+CJnYmD583EnVhSxJ8AXa62ufSEN5Ji6a2ovUonnXFi4d6fh7m4A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=WIwAUoRY;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="r/2/hGlZ";
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F4214606A324
-	for <kvmarm@lists.linux.dev>; Tue,  3 Nov 2026 20:37:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F4214606A324
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71B29606A326
+	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 02:27:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 71B29606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=WIwAUoRY
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=r/2/hGlZ
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 277021595;
-	Tue,  3 Nov 2026 12:37:19 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8DB311595;
+	Tue,  3 Nov 2026 18:27:47 -0800 (PST)
 Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 900353F628;
-	Tue,  3 Nov 2026 12:37:21 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6D03F3F632;
+	Tue,  3 Nov 2026 18:27:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793738242; bh=XNxs1q7RvEvtnhfmFbzH+UCtgdjM+7kwwuvH4wf38QM=;
+	t=1793759270; bh=uPS8PXWZrhiAbB8M6M7/D3ItbI2lV1sC9YDKdYIAV4c=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WIwAUoRYbdxoJrZAO4JhML2zcaHQrSFnQStEcdCxEEz3QsJYEAS3Xx5mxpTwxHrq8
-	 H/qwyh5aWqxrCkV+u4L9w3gADSoY9lDcJYkgeA4mwUXTEUcF38b216uxNICrkSVxH2
-	 6STMjkgsZkkQlNJ2J+tLf5WMqhwcZMK+FlhL4hCM=
-Date: Tue, 3 Nov 2026 20:37:07 +0000
+	b=r/2/hGlZGZPIceFJDaC63LXIj2sTcSmwr3B96efGXXwDfcXtRkeHNaU5jaNhWLx/C
+	 u9yV8/juuF3ET9+fS7JT5tEI95jMsTrBaOpdJlbE1Dp+8sefGoHc2x2N17+MyGdujG
+	 7/TjXjtQsK0ZH3Fc1+zG6SO71B3stct/6QaDtxCg=
+Date: Wed, 4 Nov 2026 02:27:39 +0000
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: Sascha Bischoff <sascha.bischoff@arm.com>, 
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
 	suzuki.poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, 
 	lpieralisi@kernel.org, timothy.hayes@arm.com, fuad.tabba@linux.dev
-Subject: Re: [PATCH v2 03/16] KVM: arm64: gic-v5: Share CoreSight ID register
- emulation
-Message-ID: <4lhdtngikzekvcvhkd4zknnnqdh7a3mih7i72smfzwsnnjcmfh@ri2clwyj4nqm>
+Subject: Re: [PATCH v2 06/16] KVM: arm64: gic-v5: Add ITS MMIO state emulation
+Message-ID: <avrdx6thdaqq3p52qra3obx6w3q5p7j7nxikep7lr6bzhu32dn@vzpnfdv53l67>
 References: <20261102194454.4086911-1-sascha.bischoff@arm.com>
- <20261102194454.4086911-4-sascha.bischoff@arm.com>
+ <20261102194454.4086911-7-sascha.bischoff@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -65,128 +64,271 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261102194454.4086911-4-sascha.bischoff@arm.com>
+In-Reply-To: <20261102194454.4086911-7-sascha.bischoff@arm.com>
 
-On Mon, Nov 02, 2026 at 07:44:41PM +0000, Sascha Bischoff wrote:
-> The GICv5 IRS and ITS expose the same CoreSight identification register
-> block. Move the register-value switch into a shared helper and describe
-> the contiguous ID register range with one register-region descriptor.
+Hi Sascha,
+
+On Mon, Nov 02, 2026 at 07:44:44PM +0000, Sascha Bischoff wrote:
+> In order to expose a virtual GICv5 ITS to the guest, KVM needs to
+> emulate the ITS CONFIG_FRAME and its translation-control registers.
+> Replace the placeholder ITS IODEV region with the GICv5 ITS register
+> layout and handlers for the architected MMIO state.
 > 
-> This keeps the IRS behaviour unchanged while giving the ITS MMIO
-> emulation a helper it can reuse when it is added in the following commit.
+> Provide read/write emulation for the ITS ID registers, IIDR, AIDR,
+> CR0, CR1, DT_BASER, DT_CFGR, DIDR, EIDR, invalidation registers,
+> READ_EVENT, GEN_EVENT, status registers, and the RAZ/WI MMIO
+> registers that KVM does not implement. Reuse the shared CoreSight
+> identification-register helper so the ITS reports the same component
+> identification values as the IRS.
+> 
+> At this stage the translation-triggering registers only record state.
+> Walking the guest's DT/ITT, generating READ_EVENT results, and
+> injecting GEN_EVENT LPIs are added by later commits.
 > 
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 > ---
->  arch/arm64/kvm/vgic/vgic-irs-v5.c  | 75 +++---------------------------
->  arch/arm64/kvm/vgic/vgic-v5.c      | 34 ++++++++++++++
->  arch/arm64/kvm/vgic/vgic.h         |  1 +
->  include/linux/irqchip/arm-gic-v5.h |  2 +
->  4 files changed, 44 insertions(+), 68 deletions(-)
+>  arch/arm64/kvm/vgic/vgic-its-v5.c | 415 +++++++++++++++++++++++++++++-
+>  include/kvm/arm_vgic.h            |  77 ++++++
+>  2 files changed, 490 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/vgic/vgic-irs-v5.c b/arch/arm64/kvm/vgic/vgic-irs-v5.c
-> index 8d0ad74ebc64a..d0ebed2e1663b 100644
-> --- a/arch/arm64/kvm/vgic/vgic-irs-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-irs-v5.c
-> @@ -520,38 +520,9 @@ static void vgic_v5_mmio_write_irs_ist(struct kvm_vcpu *vcpu, gpa_t addr,
->  static unsigned long vgic_v5_coresight_read(struct kvm_vcpu *vcpu,
->  					    gpa_t addr, unsigned int len)
+> diff --git a/arch/arm64/kvm/vgic/vgic-its-v5.c b/arch/arm64/kvm/vgic/vgic-its-v5.c
+> index 5790b029f09b6..f04161c315b78 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its-v5.c
+> @@ -6,19 +6,286 @@
+> +
+
+[...]
+
+> +static void vgic_v5_mmio_write_its_misc(struct kvm *kvm, void *dev, gpa_t addr,
+> +					unsigned int len, unsigned long val)
+> +{
+> +	struct vgic_v5_its *its = dev;
+> +	size_t offset = addr & (SZ_64K - 1);
+> +
+> +	guard(mutex)(&its->its_lock);
+> +
+> +	switch (offset) {
+> +	case GICV5_ITS_CR0:
+> +		its->enabled = FIELD_GET(GICV5_ITS_CR0_ITSEN, val);
+> +		return;
+> +	case GICV5_ITS_CR1:
+> +		its->cr1.sh = FIELD_GET(GICV5_ITS_CR1_SH, val);
+> +		its->cr1.oc = FIELD_GET(GICV5_ITS_CR1_OC, val);
+> +		its->cr1.ic = FIELD_GET(GICV5_ITS_CR1_IC, val);
+> +		its->cr1.dt_ra = FIELD_GET(GICV5_ITS_CR1_DT_RA, val);
+> +		its->cr1.itt_ra = FIELD_GET(GICV5_ITS_CR1_ITT_RA, val);
+> +		return;
+
+Should this change be ignored if its->enabled == 1?
+
+> +	default:
+> +		return;
+> +	}
+> +}
+> +
+
+[...]
+
+> +
+> +static void vgic_v5_mmio_write_its_dt_itt(struct kvm *kvm, void *dev,
+> +					  gpa_t addr, unsigned int len,
+> +					  unsigned long val)
+> +{
+> +	struct vgic_v5_its *its = dev;
+> +	size_t offset = addr & (SZ_64K - 1);
+> +
+> +	guard(mutex)(&its->its_lock);
+> +
+> +	switch (offset) {
+> +	case GICV5_ITS_DT_CFGR:
+> +		if (!its->enabled)
+> +			vgic_v5_write_its_dt_reg(its, offset, val);
+> +		return;
+> +	case GICV5_ITS_DT_BASER:
+> +	case GICV5_ITS_DT_BASER + 4:
+> +		if (!its->enabled) {
+> +			u64 baser = vgic_v5_read_its_dt_baser(its);
+> +
+> +			baser = update_64bit_reg(baser, offset & 4, len, val);
+> +			vgic_v5_write_its_dt_reg(its, GICV5_ITS_DT_BASER,
+> +						 baser);
+> +		}
+> +		return;
+> +	case GICV5_ITS_INV_DEVICER:
+> +		its->inv_devicer.l1 =
+> +			FIELD_GET(GICV5_ITS_INV_DEVICER_L1, val);
+> +		its->inv_devicer.event_id_bits =
+> +			FIELD_GET(GICV5_ITS_INV_DEVICER_EVENTID_BITS, val);
+> +		its->inv_devicer.i =
+> +			FIELD_GET(GICV5_ITS_INV_DEVICER_I, val);
+> +		return;
+> +	case GICV5_ITS_DIDR:
+> +	case GICV5_ITS_DIDR + 4:
+> +		if (offset & 4)
+> +			return;
+> +		its->didr.device_id = FIELD_GET(GICV5_ITS_DIDR_DEVICEID, val);
+> +		return;
+> +	case GICV5_ITS_EIDR:
+> +		its->eidr.event_id = FIELD_GET(GICV5_ITS_EIDR_EVENTID, val);
+> +		return;
+> +	case GICV5_ITS_INV_EVENTR:
+> +		its->inv_eventr.l1 =
+> +			FIELD_GET(GICV5_ITS_INV_EVENTR_L1, val);
+> +		its->inv_eventr.itt_l2sz =
+> +			FIELD_GET(GICV5_ITS_INV_EVENTR_ITT_L2SZ, val);
+> +		its->inv_eventr.i = FIELD_GET(GICV5_ITS_INV_EVENTR_I, val);
+> +		return;
+> +	case GICV5_ITS_SYNCR:
+> +	case GICV5_ITS_READ_EVENTR:
+> +		return;
+> +	case GICV5_ITS_GEN_EVENT_EIDR:
+> +		its->gen_event_eidr.event_id =
+> +			FIELD_GET(GICV5_ITS_GEN_EVENT_EIDR_EVENTID, val);
+> +		return;
+> +	case GICV5_ITS_GEN_EVENT_DIDR:
+> +	case GICV5_ITS_GEN_EVENT_DIDR + 4:
+> +		if (offset & 4)
+> +			return;
+> +		its->gen_event_didr.device_id =
+> +			FIELD_GET(GICV5_ITS_GEN_EVENT_DIDR_DEVICEID, val);
+> +		return;
+> +	case GICV5_ITS_GEN_EVENTR:
+> +		return;
+> +	default:
+> +		return;
+> +	}
+
+Aside from DT_CFGR and DT_BASER, shouldn't we also check its->enabled
+for all these registers before emulating the write?
+
+> +}
+> +
+>  static unsigned long vgic_v5_mmio_read_its_raz(struct kvm *kvm, void *dev,
+>  					       gpa_t addr, unsigned int len)
 >  {
-> -	const size_t offset = addr & (SZ_64K - 1);
-> +	u32 offset = addr & (SZ_64K - 1);
-
-nit: I think we can keep the const here?
-
->  
-> -	switch (offset) {
-> -	case GICV5_CORESIGHT_DEVARCH:
-> -		return GICV5_CORESIGHT_DEVARCH_VAL;
-> -	case GICV5_CORESIGHT_PIDR4:
-> -		return GICV5_CORESIGHT_PIDR4_JEP106_CONT;
-> -	case GICV5_CORESIGHT_PIDR5:
-> -		return GICV5_CORESIGHT_PIDR5_RES0;
-> -	case GICV5_CORESIGHT_PIDR6:
-> -		return GICV5_CORESIGHT_PIDR6_RES0;
-> -	case GICV5_CORESIGHT_PIDR7:
-> -		return GICV5_CORESIGHT_PIDR7_RES0;
-> -	case GICV5_CORESIGHT_PIDR0:
-> -		return GICV5_CORESIGHT_PIDR0_PART_0;
-> -	case GICV5_CORESIGHT_PIDR1:
-> -		return GICV5_CORESIGHT_PIDR1_DES_0_PART_1;
-> -	case GICV5_CORESIGHT_PIDR2:
-> -		return GICV5_CORESIGHT_PIDR2_DES_1;
-> -	case GICV5_CORESIGHT_PIDR3:
-> -		return GICV5_CORESIGHT_PIDR3_REVAND_CMOD;
-> -	case GICV5_CORESIGHT_CIDR0:
-> -		return GICV5_CORESIGHT_CIDR0_VAL;
-> -	case GICV5_CORESIGHT_CIDR1:
-> -		return GICV5_CORESIGHT_CIDR1_VAL;
-> -	case GICV5_CORESIGHT_CIDR2:
-> -		return GICV5_CORESIGHT_CIDR2_VAL;
-> -	case GICV5_CORESIGHT_CIDR3:
-> -		return GICV5_CORESIGHT_CIDR3_VAL;
-> -	default:
-> -		return 0;
-> -	}
-> +	return vgic_v5_handle_guest_coresight_idreg_read(offset);
+>  	return 0;
 >  }
 >  
->  static unsigned long vgic_v5_mmio_uaccess_read_irs_status(struct kvm_vcpu *vcpu,
-> @@ -903,45 +874,13 @@ static const struct vgic_register_region vgic_v5_irs_registers[] = {
->  				  vgic_mmio_read_raz, vgic_mmio_write_wi, 8,
->  				  VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+> +static unsigned long vgic_v5_its_coresight_read(struct kvm *kvm, void *dev,
+> +						gpa_t addr, unsigned int len)
+> +{
+> +	u32 offset = addr & (SZ_64K - 1);
+> +
+> +	return vgic_v5_handle_guest_coresight_idreg_read(offset);
+> +}
+> +
+>  static void vgic_v5_mmio_write_its_wi(struct kvm *kvm, void *dev, gpa_t addr,
+>  				      unsigned int len, unsigned long val)
+>  {
+> @@ -31,11 +298,153 @@ static void vgic_v5_mmio_write_its_wi(struct kvm *kvm, void *dev, gpa_t addr,
+>  	}
 >  
-> -	/* CoreSight identification registers */
-> +	/* Split the ranges so KVM_HAS_DEVICE_ATTR only reports actual registers. */
+>  static const struct vgic_register_region vgic_v5_its_registers[] = {
+> -	REGISTER_ITS_V5_DESC(0, vgic_v5_mmio_read_its_raz,
+> -			     vgic_v5_mmio_write_its_wi, KVM_VGIC_V5_ITS_SIZE,
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_IDR0, vgic_v5_mmio_read_its_misc,
+> +			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_IDR1, vgic_v5_mmio_read_its_misc,
+> +			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_IDR2, vgic_v5_mmio_read_its_misc,
+> +			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_IIDR, vgic_v5_mmio_read_its_misc,
+> +			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_AIDR, vgic_v5_mmio_read_its_misc,
+> +			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_CR0, vgic_v5_mmio_read_its_misc,
+> +			     vgic_v5_mmio_write_its_misc, 4, VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_CR1, vgic_v5_mmio_read_its_misc,
+> +			     vgic_v5_mmio_write_its_misc, 4, VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_DT_BASER,
+> +			     vgic_v5_mmio_read_its_dt_itt,
+> +			     vgic_v5_mmio_write_its_dt_itt, 8,
+> +			     VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_DT_CFGR,
+> +			     vgic_v5_mmio_read_its_dt_itt,
+> +			     vgic_v5_mmio_write_its_dt_itt, 4,
+> +			     VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_DIDR, vgic_v5_mmio_read_its_dt_itt,
+> +			     vgic_v5_mmio_write_its_dt_itt, 8,
+> +			     VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_EIDR, vgic_v5_mmio_read_its_dt_itt,
+> +			     vgic_v5_mmio_write_its_dt_itt, 4,
+> +			     VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_INV_EVENTR, vgic_v5_mmio_read_its_raz,
+> +			     vgic_v5_mmio_write_its_dt_itt, 4,
+> +			     VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_INV_DEVICER, vgic_v5_mmio_read_its_raz,
+> +			     vgic_v5_mmio_write_its_dt_itt, 4,
+> +			     VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_READ_EVENTR, vgic_v5_mmio_read_its_raz,
+> +			     vgic_v5_mmio_write_its_dt_itt, 4,
+> +			     VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_READ_EVENT_DATAR,
+> +			     vgic_v5_mmio_read_its_dt_itt,
+> +			     vgic_v5_mmio_write_its_wi, 8,
+> +			     VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_STATUSR, vgic_v5_mmio_read_its_dt_itt,
+> +			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_SYNCR, vgic_v5_mmio_read_its_raz,
+> +			     vgic_v5_mmio_write_its_dt_itt, 4,
+> +			     VGIC_ACCESS_32bit),
 
-Would "Split the CoreSight range into two to account for the gap
-between DEVARCH and PIDR/CIDR registers." be clearer?
+ITS_SYNCR is an 8-byte register. (Sashiko also flagged this)
+
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_SYNC_STATUSR,
+> +			     vgic_v5_mmio_read_its_dt_itt,
+> +			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_GEN_EVENT_DIDR,
+> +			     vgic_v5_mmio_read_its_dt_itt,
+> +			     vgic_v5_mmio_write_its_dt_itt, 8,
+> +			     VGIC_ACCESS_64bit | VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_GEN_EVENT_EIDR,
+> +			     vgic_v5_mmio_read_its_dt_itt,
+> +			     vgic_v5_mmio_write_its_dt_itt, 4,
+> +			     VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_GEN_EVENTR, vgic_v5_mmio_read_its_raz,
+> +			     vgic_v5_mmio_write_its_dt_itt, 4,
+> +			     VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_GEN_EVENT_STATUSR,
+> +			     vgic_v5_mmio_read_its_dt_itt,
+> +			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_MEC_IDR, vgic_v5_mmio_read_its_raz,
+> +			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_MEC_MECID_R, vgic_v5_mmio_read_its_raz,
+> +			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_MPAM_IDR, vgic_v5_mmio_read_its_raz,
+> +			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_MPAM_PARTID_R,
+> +			     vgic_v5_mmio_read_its_raz,
+> +			     vgic_v5_mmio_write_its_wi, 4, VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_SWERR_STATUSR, vgic_v5_mmio_read_its_raz,
+> +			     vgic_v5_mmio_write_its_wi, 8, VGIC_ACCESS_64bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_SWERR_SYNDROMER0,
+> +			     vgic_v5_mmio_read_its_raz,
+> +			     vgic_v5_mmio_write_its_wi, 8, VGIC_ACCESS_64bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_SWERR_SYNDROMER1,
+> +			     vgic_v5_mmio_read_its_raz,
+> +			     vgic_v5_mmio_write_its_wi, 8,
+> +			     VGIC_ACCESS_64bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_ITS_MPAM_PMGR, vgic_v5_mmio_read_its_raz,
+> +			     vgic_v5_mmio_write_its_wi, 8, VGIC_ACCESS_64bit),
+
+ITS_MPAM_PMGR is a 4-byte register.
 
 Thanks,
 Wei-Lin Chang
 
->  	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_DEVARCH,
-> -				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
-> -				  VGIC_ACCESS_32bit),
-> +				  vgic_v5_coresight_read, vgic_mmio_write_wi,
-> +				  4, VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_PIDR4,
-> -				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
-> -				  VGIC_ACCESS_32bit),
-> -	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_PIDR5,
-> -				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
-> -				  VGIC_ACCESS_32bit),
-> -	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_PIDR6,
-> -				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
-> -				  VGIC_ACCESS_32bit),
-> -	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_PIDR7,
-> -				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
-> -				  VGIC_ACCESS_32bit),
-> -	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_PIDR0,
-> -				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
-> -				  VGIC_ACCESS_32bit),
-> -	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_PIDR1,
-> -				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
-> -				  VGIC_ACCESS_32bit),
-> -	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_PIDR2,
-> -				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
-> -				  VGIC_ACCESS_32bit),
-> -	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_PIDR3,
-> -				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
-> -				  VGIC_ACCESS_32bit),
-> -	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_CIDR0,
-> -				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
-> -				  VGIC_ACCESS_32bit),
-> -	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_CIDR1,
-> -				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
-> -				  VGIC_ACCESS_32bit),
-> -	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_CIDR2,
-> -				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
-> -				  VGIC_ACCESS_32bit),
-> -	REGISTER_DESC_WITH_LENGTH(GICV5_CORESIGHT_CIDR3,
-> -				  vgic_v5_coresight_read, vgic_mmio_write_wi, 4,
-> +				  vgic_v5_coresight_read, vgic_mmio_write_wi,
-> +				  GICV5_CORESIGHT_PIDR_CIDR_SIZE,
->  				  VGIC_ACCESS_32bit),
+> +	/* Split the ranges so KVM_HAS_DEVICE_ATTR only reports actual registers. */
+> +	REGISTER_ITS_V5_DESC(GICV5_CORESIGHT_DEVARCH,
+> +			     vgic_v5_its_coresight_read,
+> +			     vgic_v5_mmio_write_its_wi, 4,
+> +			     VGIC_ACCESS_32bit),
+> +	REGISTER_ITS_V5_DESC(GICV5_CORESIGHT_PIDR4,
+> +			     vgic_v5_its_coresight_read,
+> +			     vgic_v5_mmio_write_its_wi,
+> +			     GICV5_CORESIGHT_PIDR_CIDR_SIZE,
+>  			     VGIC_ACCESS_32bit),
 >  };
 >  
 
