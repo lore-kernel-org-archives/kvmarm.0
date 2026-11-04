@@ -1,74 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.141
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.69
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793796296;
-	b=y6HiOSIaUeNOHtvGnh06rx7bqc+BI2a8TdYJYddmpaAiMMK2mlo5hL7W5TYoCRz7kqmh
-	 YpydZNIzxbW6hAB463LpBFwzbLieg54S9NoYpmXpFOoahQXVcSRiVGXwPMbh6MciBRQNE
-	 FHXJ2jA70YK6O8ffYHd7svMt+EiClgjMr+1gycEcws4LHOK/e7IVShN1COxbOBLXRjAJH
-	 pkmI5DslVkteYMOV7q92oH9I+NZ3Q2FvJTrTh2tVvu/SKnLkQGmkXmccW0hKW47eNcwOf
-	 9bLZw5NaWdxMsqAtgg8/oWU4mLE/x2vRGkk2p8nhNOudYIWkfX1QZhfczrTMPAntmpw==
+	t=1793801186;
+	b=tYajHQKBvQHlLoQMhAXrYM7ZOQ3mYkvEc8fq2GNzTrOWCsWGGmAXXwMy/TZCJKFk7Kg5
+	 Eh+1iJR0wu//XZrK0GDLsJw61ZYm/u/LeDVKCLHYlgIumjaP7j01r/d+kNEYFU78uxs7w
+	 9TCOxVXeAZ2FnSSpX6pU8hbvHCm+mlDaYJSvzRxFsfF14eJyTjfxxsIeV9WS/0ZeiCqXd
+	 l7NlI18g/rHyCRIR1KPG93sFuMcb6rFLqJdohImJg9MdwkFXJOmoqqo3SJPbiRakG4OYj
+	 MZYyLAF//d5VNy6pk9rMjOHkvr2OiimzB9h8P4xw2FFI4aHVej7nzTTbtITSruwUvIw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793796296;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=AOH3Su8TZJSoK9UPHpeuwIAfG494iGEabcz+aB8amog=;
-	b=UvCCE8peMG7vrVKju+6AR2CLwxEwgEwzFgwoHp4zTA8OXCR7PVYu7YaCeg+IP5aJCdoZ
-	 WY49pocW/OVh+b+2dKoitOoZqs7FXbuTmPtxqA12yjZUu/SP2+5WEbu92I8bpnHtXq0kb
-	 Wd6QJSfQMsc+nwsQrU9zqNRveU12PpYolvDeiDVfNiOp21D4u8AF/OeO8VBw84K1pP5vU
-	 MM9ea0X6hVOHgKqUsGQy4NA1lyaYA92dPyxOOiKcVACAkCRQFm5g8jfloySGFXnowHthj
-	 vl62ufR6MsE4S7BX2LbcN7cCeUyaIT/RkyL6Jl84bqvkIP+8Iw7TTbgH4iyEICJFyVQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793801186;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
+	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=N/SsdHu+Po4v4WPdkAdXaeFtGaJ5FCa56QFJpxcXNro=;
+	b=rIpweTPAoTcIAGSXURdBCjuaq0XB7nrLj8TAbozQMYjDwv6lKt/Nq8yZYyXZ4wH1x3oc
+	 lYK/zWxulABk/EZoi3X1lJp3fOgoKM3DMLakaFp6IbbnDs5v8eawV4EAaQiDN7fT0EZrE
+	 ile7LgtKvEc24hc5L73/dNJbc4emfRP6iYAf2Olq3oYxXUHZwGbdtKN+KutbCrE6rhR0t
+	 TYnH/fVFqIFkzRDkpe+TI5N1xGtpEue7V93iVS2XgFqsQjGfJf4W1FmFjK29fYS98SsU6
+	 F+MB1zTVt+/HNyFb4/0+fPKwIylW68ApvHEq8+DNCujbquqnUw60jaH82ewxVCBM2dA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QylGKXh7;
-	arc=none smtp.remote-ip=95.215.58.141
-Received: from mta1.migadu.com (out-141.mta1.migadu.com [95.215.58.141])
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=V16LjnbT;
+	arc=none smtp.remote-ip=209.85.128.69
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51FA606A332
-	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 12:44:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E51FA606A332
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36BCC606A31B
+	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 14:06:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 36BCC606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QylGKXh7
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=MxRHPNAABvoNmLp9OTJVcSokfGwwqtsziGyV/1PffQk=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793796293; v=1; x=1794401093;
- b=QylGKXh7uruaLMMEMoxZ64DR/6WRHSeRr9NW0qyTOuBE10TrPTF2dySKAaKqBH8OXK9T5lgW
- JuVyld+yb+3T7O/1JiDm1nj1jAxQHg1Yx+8Ir/sF6OYZ8nchI3kbHqN0Ed71GeYVXqwp3PGSJvU
- Px8botegn2j4AGcqtjnNkmgM=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id fec1c38f76d92ee4;
-	Wed, 04 Nov 2026 12:44:53 +0000
-X-Mizu-Trace-ID: fec1c38f76d92ee4
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v2 1/2] KVM: arm64: Resume stage-2 teardown where the walk stopped
-Date: Wed,  4 Nov 2026 12:44:50 +0000
-Message-ID: <20261104124451.2148724-2-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261104124451.2148724-1-fuad.tabba@linux.dev>
-References: <20261104124451.2148724-1-fuad.tabba@linux.dev>
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=V16LjnbT
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4994d67d0e3so5909465e9.2
+        for <kvmarm@lists.linux.dev>; Wed, 04 Nov 2026 06:06:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1793801184; x=1794405984; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=N/SsdHu+Po4v4WPdkAdXaeFtGaJ5FCa56QFJpxcXNro=;
+        b=V16LjnbTyFT/UXYwMwJ96tVbmWDl1T/RNhUfvAp0EQTpToFZRY5biPjQB5rzV9L2tA
+         H6Yen0y+S38titXRpcPnQBhfi2lVxTHF1UihCzxE4eVK2f/J7Subj3e110ZnOB22CeVH
+         wixj3KgNrKzWDK+kd4DQ0zzMI65KTRengtugzx4o/lFNDiR7Qug4JWsrI4vZPh8NG7ze
+         CUbJoSdDcr6HGQB49prgnkVBgte1TJkMAhtNu9casPtNTnaWjoAS3VwWe9V64mK56y/O
+         JkYTL30mJc7a1HyY+0dNCOW68VEXvo8/lSFS8q1yKap/6BdeGaNRsAWgEEU5FFVjRF4C
+         QABQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793801184; x=1794405984;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=N/SsdHu+Po4v4WPdkAdXaeFtGaJ5FCa56QFJpxcXNro=;
+        b=mSf7QoVtpDHuw5emvMZzG5M8b8VwARnO302Wmkh7Z8UENNCcBqNPnWPhCLrU4ZJd/5
+         49lG76xkreLT/jP3EvS8JIMqqns1/qcO6S4Vu3PhMinPkjYQ55l7r00Y5zaDAhDJYFMz
+         m0APHyMxdpwttBBTCK8Z3OVESRZ9CLpVbK3swAXZjpsiDREWYMKCDqKU87xTVYDFPcgo
+         2wDyzegH3eT84NDUNHH30OdAs+Ezmy18lHopIBgxCF0zJjd1uKgsVCfcCziRfa8tj21y
+         fsMsapV2digqM9qx/TbUiBAIZufyTXPq+jNP8jn8f+DHh3ugC/9xgZvLOnF+syLz+9GN
+         6Tkw==
+X-Forwarded-Encrypted: i=1; AKwUvBxT93bErgZYcIBFUDHqRe44FUg8JqqWW5yiGX0NY8n1Ox4MRI7LbGkdbHdR683xWrU4tGgB2vg=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+ZUzNW29Aaqm6bELU/LSahJ29yuGM9lZa9frzATyHwz+nLj6j7
+	2x19hALgsfvmxJmyPjKLJx2csEjDkMWVGAkhANmhTM3TNZtRRVPwtiMSr5aCRpO6gqAimcL933m
+	g6XcYNcVRJlVD16H7Ah1Yxg==
+X-Received: from wmpo23.prod.google.com ([2002:a05:600c:3397:b0:4a2:c25:d91a])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:354a:b0:4a3:5a55:f454 with SMTP id 5b1f17b1804b1-4ac17e10ac3mr382089215e9.19.1793801184306;
+ Wed, 04 Nov 2026 06:06:24 -0800 (PST)
+Date: Wed,  4 Nov 2026 14:06:07 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -77,147 +75,70 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.455.g6c5a503b38-goog
+Message-ID: <20261104140612.137869-1-vdonnefort@google.com>
+Subject: [PATCH v2 0/5] KVM: arm64: pkvm: Extend hypervisor entering tracing reasons
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	kernel-team@android.com, fuad.tabba@linux.dev, qperret@google.com, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Since commit 4ddfab5436b6 ("KVM: arm64: Reschedule as needed when
-destroying the stage-2 page-tables"), kvm_stage2_destroy() walks the
-IPA space one block-sized chunk at a time. The walker steps over an
-invalid entry in one go, but the next walk starts at the following
-chunk, so an invalid entry larger than a chunk is visited once for every
-chunk it covers. Destroying a VM with a 52-bit IPA then takes 2^27 walks
-with 16K pages (2^22 with 4K), however little it maps.
+This series makes the hyp_enter event more detailed by adding a "from="
+field and by using the ESR class when relevant. This is interesting for
+example to know when the guest has exited for an HVC.
 
-Have kvm_pgtable_stage2_destroy_range() return the address its walk
-reached, which kvm_pgtable_walk() doesn't expose, and resume from there.
-pkvm_pgtable_stage2_destroy_range() returns the end of its range, and
-EL2's kvm_pgtable_stage2_destroy() ignores the value.
+Speaking of HVCs, protected VMs issue an HVC to share memory with the
+host. Without this memory sharing, it is impossible to get logs. So if
+for any reason it fails, debugging is quite cumbersome. Add a specific
+guest_hvc event that will give even more details than hyp_enter
+provides.
 
-Suggested-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Suggested-by: Oliver Upton <oupton@kernel.org>
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- arch/arm64/include/asm/kvm_pgtable.h |  8 ++++++--
- arch/arm64/include/asm/kvm_pkvm.h    |  4 ++--
- arch/arm64/kvm/hyp/pgtable.c         | 15 ++++++++++++---
- arch/arm64/kvm/mmu.c                 |  4 ++--
- arch/arm64/kvm/pkvm.c                |  8 +++++---
- 5 files changed, 27 insertions(+), 12 deletions(-)
+Also, add a host_hvc event, so that the host gets similar coverage to a
+protected VM.
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 1c9c57cd6ae40..20b988e99e074 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -599,9 +599,13 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
-  *
-  * The page-table is assumed to be unreachable by any hardware walkers prior
-  * to freeing and therefore no TLB invalidation is performed.
-+ *
-+ * Return: the address the walk reached, which can be past @addr + @size
-+ * when the range ends within a block or an invalid entry, or @addr + @size
-+ * if the walk fails.
-  */
--void kvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
--					u64 addr, u64 size);
-+u64 kvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
-+				     u64 addr, u64 size);
- 
- /**
-  * kvm_pgtable_stage2_destroy_pgd() - Destroy the PGD of guest stage-2 page-table.
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index fd042d2b54624..731632aa24520 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -349,8 +349,8 @@ int __pkvm_handle_smccc_req(struct arm_smccc_res *res);
- 
- int pkvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
- 			     struct kvm_pgtable_mm_ops *mm_ops);
--void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
--					u64 addr, u64 size);
-+u64 pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
-+				      u64 addr, u64 size);
- void pkvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt);
- int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
- 			    enum kvm_pgtable_prot prot, void *mc,
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 9c83837b184d3..6bb1c0beb4dcc 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1653,16 +1653,25 @@ static int stage2_free_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 	}
- }
- 
--void kvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
--				       u64 addr, u64 size)
-+u64 kvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
-+				     u64 addr, u64 size)
- {
- 	struct kvm_pgtable_walker walker = {
- 		.cb	= stage2_free_walker,
- 		.flags	= KVM_PGTABLE_WALK_LEAF |
- 			  KVM_PGTABLE_WALK_TABLE_POST,
- 	};
-+	struct kvm_pgtable_walk_data data = {
-+		.walker	= &walker,
-+		.start	= addr,
-+		.addr	= addr,
-+		.end	= addr + size,
-+	};
- 
--	WARN_ON(kvm_pgtable_walk(pgt, addr, size, &walker));
-+	if (WARN_ON(_kvm_pgtable_walk(pgt, &data)))
-+		return addr + size;
-+
-+	return data.addr;
- }
- 
- void kvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt)
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 1db10d8d6db73..4f1adadeffb8b 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1011,8 +1011,8 @@ static void stage2_destroy_range(struct kvm_pgtable *pgt, phys_addr_t addr,
- 
- 	do {
- 		next = stage2_range_addr_end(addr, end);
--		KVM_PGT_FN(kvm_pgtable_stage2_destroy_range)(pgt, addr,
--							     next - addr);
-+		next = KVM_PGT_FN(kvm_pgtable_stage2_destroy_range)(pgt, addr, next - addr);
-+		next = min(next, end);
- 		if (next != end)
- 			cond_resched();
- 	} while (addr = next, addr != end);
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 016997288fd23..f21c3326dda68 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -499,14 +499,14 @@ static int __pkvm_pgtable_stage2_unshare(struct kvm_pgtable *pgt, u64 start, u64
- 	return 0;
- }
- 
--void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
--					u64 addr, u64 size)
-+u64 pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
-+				      u64 addr, u64 size)
- {
- 	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
- 	pkvm_handle_t handle = kvm->arch.pkvm.handle;
- 
- 	if (!handle)
--		return;
-+		return addr + size;
- 
- 	if (pkvm_hyp_vm_is_created(kvm) && !kvm->arch.pkvm.is_dying) {
- 		WARN_ON(kvm_call_hyp_nvhe(__pkvm_start_teardown_vm, handle));
-@@ -517,6 +517,8 @@ void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
- 		__pkvm_pgtable_stage2_reclaim(pgt, addr, addr + size);
- 	else
- 		__pkvm_pgtable_stage2_unshare(pgt, addr, addr + size);
-+
-+	return addr + size;
- }
- 
- void pkvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt)
+Changelog:
+
+v2:
+  * Add missing exception classes to kvm_arm_exception_class (Fuad)
+  * Split the HYP_REASON_PSCI -> HYP_REASON_ERET_HOST fix in
+    __kvm_host_psci_cpu_entry() into a separate patch.
+  * Add missing <asm/esr.h> (Fuad)
+  * Read ESR_EL2 only when hyp_enter is enabled (Fuad)
+  * Drop the handled field from guest_hvc and trace only
+    hypervisor-handled HVCs.
+  * Rename ret to x1 in host_hvc (Fuad) and val to x0 in guest_hvc.
+  * Log the SMCCC function ID in host_hvc instead of the host_hcall[]
+    index. (Fuad)
+  * remote_event_format_show() field alignment fixed
+    separately (https://lore.kernel.org/all/20261009132848.709379-1-vdonnefort@google.com/). (Fuad)
+  * Rebased on top of v7.4-rc1.
+
+v1 (https://lore.kernel.org/all/20261009084529.462577-1-vdonnefort@google.com/)
+
+Vincent Donnefort (5):
+  KVM: arm64: Add missing exception classes to kvm_arm_exception_class
+  KVM: arm64: Use HYP_REASON_ERET_HOST on trace_hyp_exit from
+    PSCI_CPU_ON
+  KVM: arm64: Add ESR class to the hyp_enter hyp event
+  KVM: arm64: Add guest_hvc hyp event
+  KVM: arm64: Add host_hvc hyp event
+
+ arch/arm64/include/asm/kvm_arm.h       | 13 +++---
+ arch/arm64/include/asm/kvm_hypevents.h | 55 ++++++++++++++++++++------
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c     |  9 ++---
+ arch/arm64/kvm/hyp/nvhe/pkvm.c         | 12 +++++-
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c   |  2 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c       |  6 ++-
+ arch/arm64/kvm/hyp_trace.c             | 52 ++++++++++++++++++------
+ 7 files changed, 111 insertions(+), 38 deletions(-)
+
+
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
 -- 
-2.47.3
+2.56.0.455.g6c5a503b38-goog
 
