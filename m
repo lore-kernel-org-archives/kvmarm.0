@@ -1,57 +1,64 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793815579;
-	b=YIn6GXn+25F4uGKEl9QNVOn+FPKJrqwzf3g9yj9xC+tU6+vKGKLf0B/xw3P0O37DlXAx
-	 5VKnOKLU2jFV/CdHtAhxaswdGVoaxWtH8aW4FXHh3mTKP+mGspC1YHvlgAceEdRkrpLuO
-	 pgMzD+Yh7NsYGJ4ynYnJAa/8SXoiK1/w8Aku9+i4hZYokZCx06hoEkG/C4hOrEnjdfZ9e
-	 FJzzePUxi/QpZaQ8aJzKBO1Z/CiBvEPYXglm+YHMoD3pNd+6xFmlbgTqaL6yROiyyf0fj
-	 Wty838JPLQ5sb73PJqWYMqV6RUC50tXGkPuPO/kjOe9zz5swQJ3u9cJwkhVnv/5J7Ug==
+	t=1793816862;
+	b=14j9fynTu/TRxrjHZvH7WWFVD8+l+246sIgDHHbqPAiF7uLhaUcBfHDOtViWvrxhoKES
+	 O/uaZKvSrIHhUPAwe59IQz52eSTJ5HMpsOYrvGqqp2vYwXFxMdx3d+CJ+K5PNmYRr9/BN
+	 Y7qGvoz5KCCeeDUYtdxzHYb3B2LK+kQNNaRYc5hkqmO26XyamcavmAhG2+6AYEYTb8Wg7
+	 0TjFdjPMXhttttSk4o8yDTAChtjl2vuIzotVgCj2zd6ETguaxMTN8Vj+Q0jng64qjZJhp
+	 RNk4aaTI37iqOWv+HcT6v83vC67yWERdr3hRamEKOzj4brLBiZXr753On6yd/ybvomQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793815579;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=BKcs+4/yEuxVnS2VouqR2WzhlLvVEKGo4vjTDXvNfG0=;
-	b=1vstN06z/PRaCKPDkTmmyeiJDRdYtduKLZkoiCnarFS/z5hHi00ac2rCh+dt8R4dqHM/
-	 qQ+yWXVIgICAmKS59hmnl6kMCH+8dPevdF/+N6cQrBj1NhaQkwhreyZsmzYN0Qn2zdb3R
-	 hppT/8GBDEsMdVXSU/h/uscBME83XdK5D3F/NkneHrOU7kYohfQhcCluHIARE/LATFOSI
-	 2A21nBOS9J4mn7Zg2bH3qK+goTpFi4+BWdFgvZQUfFDlcJJOdjsnbqVeI6Zd+VE3nO6Dz
-	 i5rg2jSCiuluZvjYcROPbbrBizAqGDZJ6v3fID9Z7wmLnd0bk/HlVC8wTC+zz6kNOSg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793816862;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
+	bh=Rz5+9rBZ11rvSb1aMAFDb3teQDHBLOGre5kK2wU24yU=;
+	b=KJt4RPA4H8jCyH0388fSxMaIAeB44C5WsvCLgsDge/9KkhrdZAN5REYVzk0qO7xFY5Kt
+	 /w0G7v17CFqWmLW8K80CWHOW2aYQvejS+UQJ/iwUtXgi+MlRhGpxrtCy1HN+C55zh9zqe
+	 bBkNCZ+Z8WHd7QjajKGbNRw3er3LO1zczAipLQkdrsMhwoE/AGrxEFse66TjRGtpCDM03
+	 Zx7taaUEu72xCRXKDFXKcW4ZmUje98cHqO+bdE8kpqciV99bfjsRJYtWP5bsbznu003Hb
+	 cZ5CV2ux4HKZcxJW5rXQJ6vKqHdeX7SloUEVGZ/Q2xbappfpgbmACbgDS6GLroGYdYg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TRjh1EW7;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189A2606A328;
-	Wed,  4 Nov 2026 18:06:19 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=QJqA7j1U;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2BE606A331
+	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 18:27:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BA2BE606A331
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TRjh1EW7
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 599191F000C1;
-	Wed,  4 Nov 2026 18:06:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793815578;
-	bh=BKcs+4/yEuxVnS2VouqR2WzhlLvVEKGo4vjTDXvNfG0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=TRjh1EW7SELcNJfvo8muQIl89zA8WNp5y+E/1UNt7WjdfWpTr2l0YsLmXukzDVdcb
-	 MtN2Cul5ftUHPOTHRrWXZz15d4519+/JX99BQ9EFBwDMa6Z/p/gA/7JD6TVOjZ/vBi
-	 OB2BFXWBdTOLqM3i58cTC7RkkGMn7JN3bmprsMKqcRE4sWc3gaCR5ux18JUu+f9BiO
-	 BCPYty2It/rmH4QXelFrEbogHGZF8Vt5TPltvlSpfWz7CqHpOWk6+r1T5T2x9a+Mth
-	 pJ5gQEHLZXIi9vb1beXsTVGfz4uej5iLeuj8/pO+5HwMB3yX/Yju+Mj/kKNoIeWGj2
-	 9/KBA+HcaF4xA==
-Date: Wed, 4 Nov 2026 18:06:12 +0000
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>, pbonzini@redhat.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, maz@kernel.org, oupton@kernel.org, 
-	suzuki.poulose@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	david@kernel.org, mark.rutland@arm.com, ackerleytng@google.com
-Subject: Re: [PATCH v2] KVM: Ignore MMU notifiers for guest_memfd-only
- memslots
-Message-ID: <autwsR83Ii-tRrqF@gremlin>
-References: <20260714160411.302386-1-alexandru.elisei@arm.com>
- <amPCdAswlk24Xilf@google.com>
- <anxAGkdyPYXBlS00@raptor>
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=QJqA7j1U
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 821171BB0;
+	Wed,  4 Nov 2026 10:27:36 -0800 (PST)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0A5B03F632;
+	Wed,  4 Nov 2026 10:27:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793816859; bh=Qbiq4ldPj2ZF9qQEwEyqmOBl3UJZY/6wX4dZHg8docY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=QJqA7j1UF0rsURkYrFytNvEeG66/0TVXGet+L1IQK29fkDhKf0opWUdgb82Lhxs79
+	 0JOcu8CyJZde4sZXIpycQ7vYwJfTBKZNZ/WAKK/uSIehq1PMkSHwgFNPKpX/agdJO3
+	 MdLFku7eVqqOVnXFX2gPMVFx7fcD2KKMEb2weUis=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Subject: Re: [PATCH v2 18/28] KVM: arm64: nv: Emulate CMOs via writable-clean translations as NOPs
+Date: Wed,  4 Nov 2026 18:27:35 +0000
+Message-ID: <aut5F2V0glbJv6ys@LeoBrasDK>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <autzno1eEpw4X-0I@kernel.org>
+References: <20261023205610.1044532-1-oupton@kernel.org> <20261023205610.1044532-19-oupton@kernel.org> <autJUntFMhCoqZeH@LeoBrasDK> <autp0cVkXwvSXPGC@kernel.org> <autrOLZWT-s4Ailc@LeoBrasDK> <autzno1eEpw4X-0I@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -63,83 +70,69 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <anxAGkdyPYXBlS00@raptor>
+Content-Transfer-Encoding: 8bit
 
-[updated David's email address to @kernel.org]
+On Wed, Nov 04, 2026 at 10:04:14AM -0800, Oliver Upton wrote:
+> On Wed, Nov 04, 2026 at 05:28:24PM +0000, Leonardo Bras wrote:
+> > > The writable-clean state is nonexistent when VTCR_EL2.HD=0 in the direct
+> > > permission model. So we have no way to construct a translation in the
+> > > stage-2 that satisfies our requirements.
+> > 
+> > Since other vcpus will have VTCR_EL2.HD=0, couldn't we enable it just for 
+> > the sake of processing this CMO?
+> > 
+> > I guess it would need to either decode the instruction or single-step this 
+> > vcpu just to make sure it does not write to the same page we just did mark 
+> > WC.
+> > 
+> > > 
+> > > The other way to do this would likely involve halting all vCPUs in the
+> > > VM and attempting to single-step which has a near 100% chance of blowing
+> > > up in our face.
+> > 
+> > Sorry, why all vCPUs?
+> > 
+> > I know for all vCPUs it would be terrible for performance, what else 
+> > do you mean by "blowing up in our face"? 
+> 
+> In order to make this work, you need to guarantee that there's no
+> concurrent updates to either the instruction itself of the stage-1
+> translation.
 
-On Wed, Aug 12, 2026 at 10:42:50AM +0100, Alexandru Elisei wrote:
-[ ... ]
-> On Fri, Jul 24, 2026 at 12:52:20PM -0700, Sean Christopherson wrote:
-> > It'll probably take me a few weeks to circle back to this, as I finally crawled
-> > out from underneath a pile of urgent and am just now getting back into review
-> > mode, but this is fairly high on my todo list, so with luck we might still squeeze
-> > this into 7.3.
+Oh, wait. We have to be worried about an instruciton changing while the 
+vcpu is running on them? wow
+(What would happen if the instruction changed while we were running?)
 
-Hey Sean,
+Well, stage1 changing could be prevented by some existing lock, but maybe 
+that's weird to access from kvm code.
 
-I wondered whether you'd had a chance to look at this?
+> 
+> The operations would be, approximately:
+> 
+>  - Take a stage-2 permission fault on the cache maintenance instruction.
+>    Walk the guest's stage-2 and find a translation in writable-clean
+>    state.
+> 
+>  - Pause the VM, re-enter the guest and single-step the instruction. If
+>    we take the debug exception then the guest must've changed the
+>    instruction. Go back to base state.
 
-After discussing this with Marc and Alex it is clear that this is really a
-blocker for Alex's SPE series, as we need a sensible means of ensuring
-that stage-2 mappings stay in place.
+Pausing the VM would be required so other vcpu treads do not access the 
+page we are trying to run CMO on, right? 
 
-So ideally would prefer to get something like this in in the next cycle,
-if you don't have any objections to it? :)
+> 
+>  - If we take another stage-2 permission fault for a cache maintenance
+>    instruction, temporarily promote the translation to RW in the shadow
+>    stage-2 and re-enter with single-step enabled.
+> 
+>  - Take the debug exception, invalidate the shadow stage-2 translation,
+>    disarm single-step, restart the VM.
+> 
+> The transient RW mappings seems ripe for pretty nasty bugs.
 
-If it'd be easier, I think a smaller version of the same patch would also
-give us what we need? I.e. your snippet from June with the page ageing part
-dropped, as below.
+Ah, right, other running vcpus could write to it while it's RW if we don't 
+pause the whole VM. Yeah, makes sense to me now, would be horrible.
 
-Thanks!
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index e7fc94e2910a..a6f37bdb0902 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -264,6 +264,7 @@ union kvm_mmu_notifier_arg {
- enum kvm_gfn_range_filter {
- 	KVM_FILTER_SHARED		= BIT(0),
- 	KVM_FILTER_PRIVATE		= BIT(1),
-+	KVM_FILTER_USERSPACE_MAPPINGS	= BIT(2),
- };
-
- struct kvm_gfn_range {
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index cf4cb586f140..6fc3b443c305 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -616,8 +616,13 @@ static __always_inline kvm_mn_ret_t kvm_handle_hva_range(struct kvm *kvm,
- 			/*
- 			 * HVA-based notifications aren't relevant to private
- 			 * mappings as they don't have a userspace mapping.
-+			 *
-+			 * Memslots where guest_memfd is the only memory
-+			 * provider can also safely ignore changes to the
-+			 * userspace mapping.
- 			 */
--			gfn_range.attr_filter = KVM_FILTER_SHARED;
-+			gfn_range.attr_filter = KVM_FILTER_SHARED |
-+						KVM_FILTER_USERSPACE_MAPPINGS;
-
- 			/*
- 			 * {gfn(page) | page intersects with [hva_start, hva_end)} =
-@@ -724,6 +729,17 @@ void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end)
- bool kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- {
- 	kvm_mmu_invalidate_range_add(kvm, range->start, range->end);
-+
-+	/*
-+	 * When reacting to changes in userspace mappings, don't unmap memslots
-+	 * that are guest_memfd-only, in which case KVM's MMU mappings are
-+	 * pulled directly from guest_memfd, i.e. don't depend on the userspace
-+	 * mappings.
-+	 */
-+	if (range->attr_filter & KVM_FILTER_USERSPACE_MAPPINGS &&
-+	    kvm_memslot_is_gmem_only(range->slot))
-+		return false;
-+
- 	return kvm_unmap_gfn_range(kvm, range);
- }
-
---
-Cheers, Lorenzo
+Thanks for helping me understand!
+Leo
