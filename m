@@ -1,89 +1,91 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=207.54.90.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=207.54.90.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793787032;
-	b=DQMEN389NVo/+YODg1jeZAfmEY/ZUsIXDEP5AWtxY3wpNxcx1LIno4xqgqcsY0PMIOvT
-	 GD3x09QInhj9hgacCkBVIIWM0GQrKMYnM1mx3DZpt81pHQIU3mqCFSrWgYfLDnA4w3F84
-	 UYqlyJBR3q7a/U9sjiOMcrrxXam2n1+vuZz3H9WwfuHSchKqCvHSzimM8KU6yAOvm/wLR
-	 VbZ9BkKAJTqaAKiSZDhNUuX7ZTAVtK9KC6eBI3exa8zKxnCMXm9niytJe39iGi2BtbMJa
-	 +Yz3YYuXA+Zl0nxlUFFmUMF9zYrcTZnVROPd9+8OwiQllO/F/bvJY8N5OU3pYHelIlQ==
+	t=1793787827;
+	b=MTYYdPnIoD9tqhmwszdEjZO2nmUD60LiDi/wJBZpKC/U4A1+icAZlTfCxQ3ISwX58Ft9
+	 7cIXc5vNlxVckmG1TvXjndB7npBJXToDjFR1xhvwZUo4NjXoxHBuQhwtXr8abmW3Cg2fW
+	 SFnHOiz8d8txCu6ZONeq1XZFRqOJsF9lfPi9KBTrP42YWa7ZfJy1CUS19OmsUzhUt0ave
+	 1eoVTyP23bQ/wBdtySTVIloA5s1Xo9iF7EWfAW0ZqXyD/xZH0WA5DNK/4lM0Ar5OJ5o88
+	 REnJHvN/eMzc2SAetQsPBlFB5sUyn5mUsHR0T7zGM7a4qg11XN1DfxjW7GinEoPxNLg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793787032;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793787827;
 	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
 	 X-IronPort-AV:X-IronPort-AV:Received:Received:Received:Received:Date:
 	 From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=iK1SoSRXvGm+gcMYygRdAKL4r2UZoigCfjdZJjBIYFo=;
-	b=sg2m1xWhz48yLgw8nGg53uegBrVKt6nFp+UsvIkHYEsWYR0BM03N3EkUJCtBD+mQmOLl
-	 6yKBqtUB7Kh1SKiU8PNNKjvxJcOghWiHYS3ZcS5Jk/2H+B5EIAXi3td6sheE0G32sSPQ7
-	 8LGSxbHf5i8JGC84V3Bqp+fw9boALseZjzlzPB0FsPSY78VgMCJ4sxSRtV91ofVrzu7hE
-	 hhvzMUnVt3hF0iyJQ9cKxsYsni6Ra7ALvOq6UJeXz4hFx1XtumiBV3e5ePMnnFgg9KTkN
-	 X3fmG9QamhJW8cCfA7SU6++jYTrMiWSbIRTe+rs99SLEQYgpuG6/KXbykp1zvH0iWbw==
+	bh=n4Ps0qSkWYG+d69oSo/IEmxe2Snl/v2IpZ6SrpXA0rw=;
+	b=z/GbHRZ6hWlcZZkN0yP66c79BiGBo4t5aHmXNLN85hcKTLEwhNMZC8Hd/aZLFWiY73jc
+	 dlDQOvzpCBhVwHGrAZZwzBFIZIytxoQmBaFPHZSLE+rgYQ6bRMmhuwiFeWB/4OreoaqFF
+	 pyEMNtWyOtrsyBuOUZr4yLxMgRelygxReSCZAX6ZDqDf6bKIMwAK6+HgslSZEPz+WLi4M
+	 9USKf5XycmjOGo3d5+I/3uA5m/Fk44yKh2ojvcD0yMpfY0yPccyHLm5UNuwfwSpH7pzOX
+	 bZTwFr/T9g2qIfD3ttSLfUYo5Z4wpOuhWVE3Y4D1pxI+k/oO9Eosr4+G8JWWwPiah0w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=fujitsu.com;
 	spf=pass smtp.mailfrom=fujitsu.com;
-	dkim=pass header.d=fujitsu.com header.i=@fujitsu.com header.a=rsa-sha256 header.s=fj2 header.b=FPD3k+WP;
-	arc=none smtp.remote-ip=207.54.90.48
-Received: from esa2.hc1455-7.c3s2.iphmx.com (esa2.hc1455-7.c3s2.iphmx.com [207.54.90.48])
+	dkim=pass header.d=fujitsu.com header.i=@fujitsu.com header.a=rsa-sha256 header.s=fj2 header.b=EVcWL1oD;
+	arc=none smtp.remote-ip=207.54.90.47
+Received: from esa1.hc1455-7.c3s2.iphmx.com (esa1.hc1455-7.c3s2.iphmx.com [207.54.90.47])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5685606A31B;
-	Wed,  4 Nov 2026 10:10:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A5685606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D9FA606EE9E;
+	Wed,  4 Nov 2026 10:23:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4D9FA606EE9E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=fujitsu.com header.i=@fujitsu.com header.a=rsa-sha256 header.s=fj2 header.b=FPD3k+WP
+	dkim=pass (2048-bit key, unprotected) header.d=fujitsu.com header.i=@fujitsu.com header.a=rsa-sha256 header.s=fj2 header.b=EVcWL1oD
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1793787038; x=1825323038;
+  t=1793787834; x=1825323834;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=id2vzE+xcY7nItlqYwJdzJh7OgqLKeLjWS+ogyye2uQ=;
-  b=FPD3k+WPbMzcQm82s1r0gmJBZFf5KGRG8x0e7CmknsQTw8CZfOCBgpMK
-   k+Hopm45mWBdfAVANvV3Gsdb6oXoqufOhQTL8PIDATSBZUtPT2/QHA0Q1
-   wb938nN+9RpenrSyicTl6g6vetmRLgM/w1BpJHh7VYjaeyrpxS0VrBrRJ
-   tnLZM69VnvIlqIKEuAUPr3Idi8sRB0QeCsYiX1Iru8MAAWlO0SqoBaZ4/
-   jWzX5rBB3xfdnAZ4LkYLRPr6M8d7bzxCug9Lw3FxhTAF/ZMHybebV0RNG
-   MwzwXkt1lZ/q14QJVhcHUN+lGe1wKhnWEwZOIADvUWvBS338eOquy5xdz
-   g==;
-X-CSE-ConnectionGUID: H+fmpQWPRYefn5wjHAm3Zw==
-X-CSE-MsgGUID: q/EGxBShSjCiMaxc03o4FQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11955"; a="260575454"
+  bh=NSpsS79pjRX5vqOjgAJTbb2PTGzrYCU3NoXWTJpFtPw=;
+  b=EVcWL1oDVOymQe6JjTHju7W9JkWfAQVZOOkeQ96RDhE1E1BBb5bG0jO2
+   K3e+8NdQfirvk0Gh1A8BrsLf06RPLCczociGIj4JeVYgv5dzZpHg3Ha46
+   gRxAoFPooK/UL/X+9IlzkAreozG0l8YZOdRgXkFwQuk5tuOmz24CbSbpb
+   6cE7ZhQCwqYL5xgXUQG5WHZ3ZeCeBy0o5geq5GwCEURiDSSjy4x4DqtJh
+   0K3rWU8poEF+2HghyQUUCwww1vSc5SO9/SdfCosx6mh6FI4eA6ftnXNfM
+   Jbg/fkaj0ThaD+FctCOnEnP14UZzH2/hpLUevPhj2yWAZFj/1ev2qmTmB
+   A==;
+X-CSE-ConnectionGUID: UTX1WSFbQoemdzvNS2/lfA==
+X-CSE-MsgGUID: bcw5kWJhQhydycJ4ndmXOA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11955"; a="260576447"
 X-IronPort-AV: E=Sophos;i="6.27,195,1786978800"; 
-   d="scan'208";a="260575454"
+   d="scan'208";a="260576447"
 Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
-  by esa2.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2026 19:10:30 +0900
-Received: from az2uksmgm3.o.css.fujitsu.com (unknown [10.151.22.200])
+  by esa1.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2026 19:23:47 +0900
+Received: from az2uksmgm4.o.css.fujitsu.com (unknown [10.151.22.201])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id E42151002BA8;
-	Wed,  4 Nov 2026 10:10:22 +0000 (UTC)
-Received: from az2uksmom2.o.css.fujitsu.com (unknown [10.151.22.203])
+	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id 56FCB820C25;
+	Wed,  4 Nov 2026 10:23:39 +0000 (UTC)
+Received: from az2uksmom4.o.css.fujitsu.com (unknown [10.151.22.204])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by az2uksmgm3.o.css.fujitsu.com (Postfix) with ESMTPS id 97E69C01831;
-	Wed,  4 Nov 2026 10:10:22 +0000 (UTC)
+	by az2uksmgm4.o.css.fujitsu.com (Postfix) with ESMTPS id 0D4471400365;
+	Wed,  4 Nov 2026 10:23:39 +0000 (UTC)
 Received: from FCCLS0092175.localdomain (unknown [10.9.61.160])
-	by az2uksmom2.o.css.fujitsu.com (Postfix) with SMTP id A75AB140010E;
-	Wed,  4 Nov 2026 10:10:18 +0000 (UTC)
-Date: Wed, 4 Nov 2026 19:10:17 +0900
+	by az2uksmom4.o.css.fujitsu.com (Postfix) with SMTP id 12AB04059A5;
+	Wed,  4 Nov 2026 10:23:30 +0000 (UTC)
+Date: Wed, 4 Nov 2026 19:23:29 +0900
 From: Kohei Enju <enju.kohei@fujitsu.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, cgroups@vger.kernel.org, linux-coco@lists.linux.dev, 
-	Marc Zyngier <maz@kernel.org>, Fuad Tabba <tabba@google.com>, Oliver Upton <oupton@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [RFC PATCH v1 1/2] KVM: arm64: CCA: Add support for configuring
- the Realm MEC policy
-Message-ID: <ausD4yiI7gSRFsqe@FCCLS0092175.localdomain>
-References: <20260724094120.166536-1-enju.kohei@fujitsu.com>
- <20260724094120.166536-2-enju.kohei@fujitsu.com>
- <46d78aa2-cacb-4efd-ae62-3026f5fe9b3f@arm.com>
- <amwrnJ1KhllC-gVu@FCCLS0092175.localdomain>
- <auio781Uu9Zzyq3i@FCCLS0092175.localdomain>
- <46c28259-086e-4948-8c00-183f9e62114a@arm.com>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
+	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>, 
+	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: Re: [PATCH 03/11] KVM: arm64: CCA: Check for RMI support at KVM init
+Message-ID: <ausEnXB1TE_moI0E@FCCLS0092175.localdomain>
+References: <20261102141304.126883-1-steven.price@arm.com>
+ <20261102141304.126883-4-steven.price@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -95,96 +97,70 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <46c28259-086e-4948-8c00-183f9e62114a@arm.com>
+In-Reply-To: <20261102141304.126883-4-steven.price@arm.com>
 
-On 11/02 15:57, Suzuki K Poulose wrote:
-> Hi Kohei,
-> 
-> On 02/11/2026 15:19, Kohei Enju wrote:
-> > Hi Suzuki,
-> > 
-> > I sent the message below off-list a few weeks ago, but I'm following up
-> > on-list in case it didn't reach you.
-> > 
-> > Since then, I've started reworking the series based on the
-> > kvm_device_attr approach you suggested, and I'm currently testing it
-> > against v23 of the CCA host support.
-> > 
-> > I'd still appreciate any feedback on the ABI direction, as well as
-> > whether you see any concerns with posting the RFC series while the host
-> > support is not yet upstream.
-> > 
-> > Thanks,
-> > Kohei
-> > 
-> > On Fri, Oct 9, 2026 at 03:15:23PM +0900, Kohei Enju wrote:
-> > > On 07/31 14:09, Kohei Enju wrote:
-> > > > On 07/29 12:47, Suzuki K Poulose wrote:
-> > > > > Hello
-> > > > > 
-> > > > > Thanks for sending the patch. Please find my comments inline below.
-> > > > > 
-> > > > > 
-> > > > > On 24/07/2026 10:40, Kohei Enju wrote:
-> > > > > > Introduce the KVM_ARM_RMI_CONFIG ioctl to allow userspace to configure
-> > > > > > Realm VM parameters before the Realm is created.
-> > > > > 
-> > > > > This approach is something we tried in the past. Another option is to
-> > > > > add these as kvm_device_attr for the KVM VM, under a new group, e.g.,
-> > > > > KVM_ARM_VM_RMI_CTRL and add the following attributes :
-> > > > > 
-> > > > > KVM_ARM_VM_RMI_CTRL_RPV 		-> Realm Personalization Value
-> > > > > KVM_ARM_VM_RMI_CTRL_MEASUREMENT_ALGO	-> Measuerment algo
-> > > > > KVM_ARM_VM_RMI_CTRL_MEC_PRIVATE		-> Private MEC Policy. By default to shared
-> > > > > ?
-> > > > 
-> > > > Hi Suzuki, thanks for suggesting another option. That looks good to me,
-> > > > and I'd be happy with either approach.
-> > > > Anyway I'd like to wait for feedback from the maintainers and other
-> > > > reviewers.
-> > > 
-> > > Hi Suzuki,
-> > > 
-> > > I'm thinking of respinning the MEC policy series as RFC v2, as you
-> > > mentioned in the Core Collective WG last month.
-> > > 
-> > > For the ABI, I'm planning to switch to the kvm_device_attr-based
-> > > approach you suggested instead of introducing a new VM ioctl. Before I
-> > > start reworking the series, do you have any concerns with that
-> > > direction?
-> 
-> ...
-> 
-> 
-> > > 
-> > > One other point is that the series still depends on the CCA host
-> > > support, which is not upstream yet. As a result, tools such as Sashiko
-> > > would likely be unable to identify the correct base tree and may not be
-> > > able to provide useful automated review feedback.
-> > > 
-> > > Personally, I think this is acceptable since the series is still RFC and
-> > > the primary goal is to get feedback on the ABI and overall design rather
-> > > than seeking integration at this stage. However, I am aware that posting
-> > > patches on top of non-upstream trees can sometimes be problematic from a
-> > > review perspective.
-> > > 
-> > > Do you have any concerns about posting an RFC series in this situation,
-> > > or would you prefer that I wait until the host support lands upstream?
-> 
-> It would be useful to have the RFC on the list to get an idea on shaping
-> the UABI. It may also be useful for people to verify the end-to-end
-> stack, including the remote attestation flow. (the branch we have is
-> ancient)
+Hi Steven,
 
-Thanks. I'll post RFC v2 soon, based on the following branch:
-  https://gitlab.arm.com/linux-arm/linux-cca
-  branch: cca-host-mm/v1/integration
-
+On 11/02 14:12, Steven Price wrote:
+> Check if the RMI support is sufficient for using in KVM. Specifically, we
+> will only support creating realm VMs when KVM is set to 'rmm' mode.
 > 
-> But nothing else, i.e, code correctness or functional reviews
-> etc (that rules out meaningful Sashiko reviews etc).
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>  arch/arm64/kvm/Kconfig | 1 +
+>  arch/arm64/kvm/rmi.c   | 4 +++-
+>  2 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index cecea0820e52..d067063a3686 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -34,6 +34,7 @@ menuconfig KVM
+>  	select GUEST_PERF_EVENTS if PERF_EVENTS
+>  	select KVM_GUEST_MEMFD
+>  	select KVM_GENERIC_PRE_FAULT_MEMORY
+> +	select ARM_RMM_RMI
+>  	help
+>  	  Support hosting virtualized guest machines.
+>  
+> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+> index 5ecc8b349869..9d118768550d 100644
+> --- a/arch/arm64/kvm/rmi.c
+> +++ b/arch/arm64/kvm/rmi.c
+> @@ -3,6 +3,7 @@
+>   * Copyright (C) 2023-2026 ARM Ltd.
+>   */
+>  
+> +#include <linux/arm-rmi-cmds.h>
+>  #include <linux/kvm_host.h>
+>  
+>  #include <asm/virt.h>
+> @@ -12,7 +13,8 @@ void kvm_init_rmi(void)
+>  	if (kvm_get_mode() != KVM_MODE_RMM)
+>  		return;
+>  
+> -	/* TODO: Check if the RMI is available */
+> +	if (!is_rmi_available())
+> +		return;
 
-Thanks for the clarification.
+From an admin/operator's perspective, kvm_rmi_is_available would
+silently remain FALSE in either of the following cases:
+- kvm-arm.mode=rmm is set, but RMI is not available for some reason.
+- RMI is available, but the admin forgot to set kvm-arm.mode=rmm.
+
+So I think it would be useful to emit diagnostic messages for these
+cases, for example:
+
+if (!is_rmi_available()) {
+    if (kvm_get_mode() == KVM_MODE_RMM)
+        pr_info("Realm VM support is disabled because RMI is not available\n");
+	return;
+}
+
+if (kvm_get_mode() != KVM_MODE_RMM) {
+    pr_info("Realm VM support is disabled. Use kvm-arm.mode=rmm to enable it\n");
+	return;
+}
 
 Thanks,
 Kohei
