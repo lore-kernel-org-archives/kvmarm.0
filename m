@@ -1,61 +1,56 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793820089;
-	b=PPE799OjSkSqr0J2/sDGYg80IhHyC1UwmjwEjpscavGq+WyymwbgPGV20CYI22IPXXMa
-	 UbUjmPc+irT/Kz0AKtKAPFTsqLFNu+H/3dgnB01aiIb5u3ofnwaTfbo+M88FZtQcsVS7q
-	 uIf111vzdgu5YPuKhyp3X7J93rmuuOIYYWnoyArtaQ2Q2+5iz1Cnnijtp0CMpk6XesyPJ
-	 2G8uCtxbY8UgdyoIyvJfVj/depI4DGfIlwc0YYacclpp5L7cwvpzfATAC5viZqjz7Q2DD
-	 e/FubdtGndtJIw+4/Efj6pIoMqSzZl4G2RipynJWtKajmU1NCfUrS5aiYrv5Ml/LbJQ==
+	t=1793821076;
+	b=BVZOfY7jIDU9ORHKqKTRh1H+YLPrwsTzfILvIzIvLrFCmFzOb3l/2meTy/Q5lDqldo7Q
+	 FSSCnVBBCzJpWPm8+Hy+t54ifewij5lpp7WMfzfcBkBPyfww40Pd9RYQUvXmo/0tov5lA
+	 d997ZHrZsbJCj01AaXIZBVGn9zN/pMMS7gbLqhWysGfwkNp8MyhFcHoJngV+QfqepdjX6
+	 Zw6uTH0oWcy9TAlZCE3XgcDd0l/DsKrBBDeFg4lFZopvhH4FRQZs3vA+/6uXQZN0D/lQP
+	 ZEJdGjoY+MEB7C1VU+UuCis8Yvi1mGN3jyYwqFjrjcGZ8CuWWzvXTnJeG8RlBWDwAdg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793820089;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=tAX4HgNSLVyfGqMeoGR2JTJI/aAgSQODe5n6oNoxl+w=;
-	b=Gw4zCa0FNHZCCNm9A6UJV0qYD149WV3giBoGu2lBEbqyie5bG4FO0vzJFhMWHjAgDEhJ
-	 kcl/OSuZhcMVS/jdHpqYke0k75GPvK4joNA8+/W4NGswiqJ69IMgZtris7JmXN7Wsdt4K
-	 b7+u8WW9mC93DJfaoADVQkIcYLcFh/A35UE0VhsO3ilOWLIkz53BfZVqlP3sXD9PsiDht
-	 nFCc1t98bkfmfDCpqHXqvqiP5HqOfYzEnYST7Vqji9oIU3VB33sqAzShZPm37EEMDFsc3
-	 XIFEWny7TNgRcKjzoTiyAJ/RQ3JP0iA8F+9qU/bfn6L0C5Nf2b/D/Tqve83sm/kprxw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793821076;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=QVysjEVRogPF+B3yzd6pfisjlcvHAyVumWQT5W125rY=;
+	b=LRV2aHq5d6oMY+PgdPj/UM4yaasz1FCv6TcU+LD18BDtV/cPNt2chB+0jVaWBbfJT7ey
+	 T1kdqPnFZsjc+yjVNvzYWNek2VwPxEGV2/T58HdNqqtMDpkUPgHfLqBewlExtxDl6NRGV
+	 LBCghdoOjUGb5anj3d66UAI9VvsgJRxJ9s2iuZ9e/fHCjWln4s82FJspz+sA7BnGTKZ3l
+	 dHZ1Zoz5wCwfZiq2uQ46UMn+vRCHPP7fClIwxod3z7Yhs1HR8XHq8OoY2BAz8kEoj1SqZ
+	 Rw1vTGfkQ4CHfVy84At3Bd5YJIIJ1dFcB/q4S4RR7l2iD3IJbpPQD2IhUXWDwwzC8oA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="CGskcyX/";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HBtDzDXB;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00287606AB3A;
-	Wed,  4 Nov 2026 19:21:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A931260B4C2C
+	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 19:37:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CGskcyX/
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FA9A1F00A17;
-	Wed,  4 Nov 2026 19:21:28 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HBtDzDXB
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A6CA1F0093A;
+	Wed,  4 Nov 2026 19:37:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793820088;
-	bh=tAX4HgNSLVyfGqMeoGR2JTJI/aAgSQODe5n6oNoxl+w=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=CGskcyX/JVyVC5kMbF7xt2LSGhzxfos8ra4Kk8I4rA5/ACl1tKTy1nU28XluUq8n+
-	 Lq0mauACkc6g98uZdVDxTbvCUgmcEvSw2qKQbSEmUzhkyh4/8KySTn0qpupA8pOgTT
-	 AvOHwlwb5Pcr1WsT5sqSFTFHOQXslKaPg0J0dmVdcTdCGxL5GOp5BPCe7bEmsN9TAz
-	 2Y0ezV30NSkXDw9iUySCih64t6FyCI47Zr0ZO8aopMYoFM9ppG3Na5at0yIlhcl1DZ
-	 9BDHcMPnXjFZ0c9ERS2L5FcQ+UtYSeoShqeHFjuYZVo2uCzU3e6NLt6tGkqjra/W3w
-	 UrBwDntS0KuoQ==
-From: Oliver Upton <oupton@kernel.org>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Oliver Upton <oupton@kernel.org>,
-	stable@vger.kernel.org
-Subject: [PATCH 8/8] KVM: arm64: Stop leaning on __kvm_inject_sea() for abort injection
-Date: Wed,  4 Nov 2026 11:21:24 -0800
-Message-ID: <20261104192124.3932743-9-oupton@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261104192124.3932743-1-oupton@kernel.org>
+	s=k20260515; t=1793821075;
+	bh=QVysjEVRogPF+B3yzd6pfisjlcvHAyVumWQT5W125rY=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=HBtDzDXBP0KRzJYiZn7wRkvZMckJAN761k0CFcivH6xpmesI76n1nUrk6ABAsdWO7
+	 Ek7sqm2CB6KqrHeGy0kvRitjhgKZ8DtMdAJMjIyPpB88a7eDcYIt1UTZKlpF3IKquY
+	 lj4dZAJoBM5HtVqdis4RJLaX+ttuH5ZaOcUq0qml1oKEGCTUbPk38BVeW8MdUBOb8H
+	 IIonoxBGI3f3/RBxzXQhnzsl9qTdxnpWcuN88zur9azBqPyncqcuc5QofGGo42HZmF
+	 ehN363AefG5SwO7FcPrvtwnTwOs8husyhVBv0rNUFHgasi2tiicRrUsUN4v25284KG
+	 k/MNZpPOC4uQg==
+Message-ID: <sashiko-outbox-197967@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 1/8] KVM: arm64: nv: Disallow KVM_CAP_ARM_MTE + FEAT_EL2
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Oliver Upton" <oupton@kernel.org>, kvmarm@lists.linux.dev
+Cc: "Marc Zyngier" <maz@kernel.org>
+In-Reply-To: <20261104192124.3932743-2-oupton@kernel.org>
 References: <20261104192124.3932743-1-oupton@kernel.org>
+ <20261104192124.3932743-2-oupton@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 04 Nov 2026 19:37:54 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -64,257 +59,96 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-KVM's handling of local abort injection is, politely stated, a giant
-fscking mess. At surface level, things look somewhat innocuous: inject
-an SEA and directly update ESR_EL1 with the correct FSC afterwards. But
-this is broken for a couple reasons.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] KVM: arm64: rejecting MTE with EL2 breaks set_id_regs selftest o=
+n NV+MTE hosts
+--
 
-For one, on implementations with FEAT_DoubleFault2 KVM may inject the
-SEA as an SError depending on the falue of SCTLR2_EL1.NMEA, meaning that
-the eventual non-SEA abort is incorrectly taken to the SError vector.
+commit 6863183ae448414619eb0267884e7d66bfaf521c
+Author: Oliver Upton <oupton@kernel.org>
 
-AArch32 is also quite bitrotted. No surprise. The FSR value is written
-to IFSR not DFSR, when a prefetch abort is injected. So while DFSR is
-aliased to ESR_EL1 architecturally, fixing up ESR_EL1.FSC after
-injection has no effect on IFSR.
+KVM: arm64: nv: Disallow KVM_CAP_ARM_MTE + FEAT_EL2
 
-Finally, injecting aborts into non-LPAE relics may use an invalid value
-for xFSC.FS, as KVM unconditionally uses the LPAE/VMSAv8-64 format.
+This commit updates kvm_vcpu_init_check_features() to return -EINVAL when
+KVM_ARM_VCPU_HAS_EL2 is requested on a VM that has KVM_CAP_ARM_MTE enabled.
 
-Fix the first two by tearing the whole mess, adding __kvm_inject_abort()
-for injecting non-SEA aborts which takes the desired FSC from the
-caller. Fix the third one by selecting a fault status value based on the
-LPAE-ness of the guest.
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 157bf4b812020..a750413c684be 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1793,13 +1793,15 @@ static int kvm_vcpu_init_check_features(struct kv=
+m_vcpu *vcpu,
+>  	    !test_bit(KVM_ARM_VCPU_PMU_V3, &features))
+>  		return -EINVAL;
+> =20
+> +	/* MTE is incompatible with AArch32 and nested virt */
+> +	if (kvm_has_mte(vcpu->kvm) &&
+> +	    (test_bit(KVM_ARM_VCPU_EL1_32BIT, &features) ||
+> +	     test_bit(KVM_ARM_VCPU_HAS_EL2, &features)))
+> +		return -EINVAL;
 
-Cc: stable@vger.kernel.org
-Fixes: fff97df2a0bd ("KVM: arm64: Route SEAs to the SError vector when EASE is set")
-Fixes: 2937aeec9dc5 ("KVM: arm64: Handle DABT caused by LS64* instructions on unsupported memory")
-Signed-off-by: Oliver Upton <oupton@kernel.org>
----
- arch/arm64/kvm/inject_fault.c | 133 +++++++++++++++++++---------------
- 1 file changed, 76 insertions(+), 57 deletions(-)
+[Severity: Medium]
+Does rejecting KVM_ARM_VCPU_HAS_EL2 when kvm_has_mte(vcpu->kvm) is true bre=
+ak
+the arm64 set_id_regs selftest on hosts that support both MTE and nested
+virtualization?
 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index aa2011cc0d5a..89c7890b8743 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -102,12 +102,32 @@ static bool effective_sctlr2_nmea(struct kvm_vcpu *vcpu)
- 	return __effective_sctlr2_bit(vcpu, SCTLR2_EL1_NMEA_SHIFT);
- }
- 
--static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr)
-+static void __inject_abt64(struct kvm_vcpu *vcpu, bool iabt, u32 iss, unsigned long addr)
- {
--	unsigned long cpsr = *vcpu_cpsr(vcpu);
--	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
--	u64 esr = 0, fsc;
--	int level;
-+	u64 esr;
-+	u8 ec;
-+
-+	if (vcpu_mode_priv(vcpu))
-+		ec = iabt ? ESR_ELx_EC_IABT_CUR : ESR_ELx_EC_DABT_CUR;
-+	else
-+		ec = iabt ? ESR_ELx_EC_IABT_LOW : ESR_ELx_EC_DABT_LOW;
-+
-+	esr = FIELD_PREP(ESR_ELx_EC_MASK, ec) | FIELD_PREP(ESR_ELx_ISS_MASK, iss) |
-+	      ESR_ELx_IL;
-+
-+	vcpu_write_sys_reg(vcpu, addr, exception_far_elx(vcpu));
-+	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
-+}
-+
-+static void inject_abt64(struct kvm_vcpu *vcpu, bool iabt, u32 iss, u64 addr)
-+{
-+	pend_sync_exception(vcpu);
-+	__inject_abt64(vcpu, iabt, iss, addr);
-+}
-+
-+static void inject_sea64(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
-+{
-+	u8 fsc;
- 
- 	/*
- 	 * If injecting an abort from a failed S1PTW, rewalk the S1 PTs to
-@@ -116,7 +136,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
- 	 */
- 	if (kvm_vcpu_abt_iss1tw(vcpu)) {
- 		u64 hpfar = kvm_vcpu_get_fault_ipa(vcpu);
--		int ret;
-+		int ret, level;
- 
- 		if (hpfar == INVALID_GPA)
- 			return;
-@@ -137,28 +157,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
- 	else
- 		pend_sync_exception(vcpu);
- 
--	/*
--	 * Build an {i,d}abort, depending on the level.
--	 * Report an external synchronous abort.
--	 */
--	esr |= ESR_ELx_IL;
--
--	/*
--	 * Here, the guest runs in AArch64 mode when in EL1. If we get
--	 * an AArch32 fault, it means we managed to trap an EL0 fault.
--	 */
--	if (is_aarch32 || (cpsr & PSR_MODE_MASK) == PSR_MODE_EL0t)
--		esr |= (ESR_ELx_EC_IABT_LOW << ESR_ELx_EC_SHIFT);
--	else
--		esr |= (ESR_ELx_EC_IABT_CUR << ESR_ELx_EC_SHIFT);
--
--	if (!is_iabt)
--		esr |= ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT;
--
--	esr |= fsc;
--
--	vcpu_write_sys_reg(vcpu, addr, exception_far_elx(vcpu));
--	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
-+	__inject_abt64(vcpu, iabt, fsc, addr);
- }
- 
- void kvm_inject_sync(struct kvm_vcpu *vcpu, u64 esr)
-@@ -174,31 +173,41 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
- 	kvm_inject_sync(vcpu, esr);
- }
- 
--#define DFSR_FSC_EXTABT_LPAE	0x10
--#define DFSR_FSC_EXTABT_nLPAE	0x08
--#define DFSR_LPAE		BIT(9)
--#define TTBCR_EAE		BIT(31)
-+#define DFSR_FS_4			BIT(10)
-+#define DFSR_FS_3_0			GENMASK(3, 0)
-+#define DFSR_FS_EXTABT_nLPAE		0x08
-+#define DFSR_FS_EXCL_ATOMIC_nLPAE	0x15
-+#define DFSR_FSC			GENMASK(5, 0)
-+#define DFSR_FSC_EXTABT_LPAE		0x10
-+#define DFSR_LPAE			BIT(9)
-+#define TTBCR_EAE			BIT(31)
- 
- static void inject_undef32(struct kvm_vcpu *vcpu)
- {
- 	kvm_pend_exception(vcpu, EXCEPT_AA32_UND);
- }
- 
-+static bool vcpu_trans_32bit_non_lpae(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu_el1_is_32bit(vcpu) && !(vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE);
-+}
-+
- /*
-  * Modelled after TakeDataAbortException() and TakePrefetchAbortException
-  * pseudocode.
-  */
--static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
-+static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u8 status, u32 addr)
- {
- 	u64 far;
- 	u32 fsr;
- 
--	/* Give the guest an IMPLEMENTATION DEFINED exception */
--	if (vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE) {
--		fsr = DFSR_LPAE | DFSR_FSC_EXTABT_LPAE;
-+	if (vcpu_trans_32bit_non_lpae(vcpu)) {
-+		/* Ensure status actually fits in DFSR.FS */
-+		KVM_BUG_ON(status > 0x1F, vcpu->kvm);
-+		fsr = FIELD_PREP(DFSR_FS_4, FIELD_GET(BIT(4), status)) |
-+		      FIELD_PREP(DFSR_FS_3_0, FIELD_GET(GENMASK(3, 0), status));
- 	} else {
--		/* no need to shuffle FS[4] into DFSR[10] as it's 0 */
--		fsr = DFSR_FSC_EXTABT_nLPAE;
-+		fsr = FIELD_PREP(DFSR_FSC, status) | DFSR_LPAE;
- 	}
- 
- 	far = vcpu_read_sys_reg(vcpu, FAR_EL1);
-@@ -218,12 +227,28 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
- 	vcpu_write_sys_reg(vcpu, far, FAR_EL1);
- }
- 
-+static void inject_sea32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
-+{
-+	if (vcpu_trans_32bit_non_lpae(vcpu))
-+		inject_abt32(vcpu, is_pabt, DFSR_FS_EXTABT_nLPAE, addr);
-+	else
-+		inject_abt32(vcpu, is_pabt, DFSR_FSC_EXTABT_LPAE, addr);
-+}
-+
- static void __kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
- {
- 	if (vcpu_el1_is_32bit(vcpu))
--		inject_abt32(vcpu, iabt, addr);
-+		inject_sea32(vcpu, iabt, addr);
- 	else
--		inject_abt64(vcpu, iabt, addr);
-+		inject_sea64(vcpu, iabt, addr);
-+}
-+
-+static void __kvm_inject_abort(struct kvm_vcpu *vcpu, bool iabt, u8 fsc, u64 addr)
-+{
-+	if (vcpu_el1_is_32bit(vcpu))
-+		inject_abt32(vcpu, iabt, fsc, addr);
-+	else
-+		inject_abt64(vcpu, iabt, fsc, addr);
- }
- 
- static bool kvm_sea_target_is_el2(struct kvm_vcpu *vcpu)
-@@ -270,28 +295,25 @@ static int kvm_inject_nested_excl_atomic(struct kvm_vcpu *vcpu, u64 addr)
-  */
- int kvm_inject_dabt_excl_atomic(struct kvm_vcpu *vcpu, u64 addr)
- {
--	u64 esr;
--
- 	if (is_nested_ctxt(vcpu) && (vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_EL2_VM))
- 		return kvm_inject_nested_excl_atomic(vcpu, addr);
- 
--	__kvm_inject_sea(vcpu, false, addr);
--	esr = vcpu_read_sys_reg(vcpu, exception_esr_elx(vcpu));
--	esr &= ~ESR_ELx_FSC;
--	esr |= ESR_ELx_FSC_EXCL_ATOMIC;
--	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
-+	if (vcpu_trans_32bit_non_lpae(vcpu))
-+		__kvm_inject_abort(vcpu, false, DFSR_FS_EXCL_ATOMIC_nLPAE, addr);
-+	else
-+		__kvm_inject_abort(vcpu, false, ESR_ELx_FSC_EXCL_ATOMIC, addr);
-+
- 	return 1;
- }
- 
- void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
- {
--	unsigned long addr, esr;
-+	bool iabt = kvm_vcpu_trap_is_iabt(vcpu);
-+	unsigned long addr;
- 
- 	addr  = kvm_vcpu_get_fault_ipa(vcpu);
- 	addr |= FAR_TO_FIPA_OFFSET(kvm_vcpu_get_hfar(vcpu));
- 
--	__kvm_inject_sea(vcpu, kvm_vcpu_trap_is_iabt(vcpu), addr);
--
- 	/*
- 	 * If AArch64 or LPAE, set FSC to 0 to indicate an Address
- 	 * Size Fault at level 0, as if exceeding PARange.
-@@ -299,13 +321,10 @@ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
- 	 * Non-LPAE guests will only get the external abort, as there
- 	 * is no way to describe the ASF.
- 	 */
--	if (vcpu_el1_is_32bit(vcpu) &&
--	    !(vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE))
--		return;
--
--	esr = vcpu_read_sys_reg(vcpu, exception_esr_elx(vcpu));
--	esr &= ~GENMASK_ULL(5, 0);
--	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
-+	if (vcpu_trans_32bit_non_lpae(vcpu))
-+		__kvm_inject_sea(vcpu, iabt, addr);
-+	else
-+		__kvm_inject_abort(vcpu, iabt, ESR_ELx_FSC_ADDRSZ, addr);
- }
- 
- /**
--- 
-2.47.3
+In tools/testing/selftests/kvm/arm64/set_id_regs.c, main() enables MTE and
+then creates a default vCPU:
 
+tools/testing/selftests/kvm/arm64/set_id_regs.c:main() {
+	...
+	test_wants_mte();
+
+	vm =3D vm_create(1);
+	vm_enable_cap(vm, KVM_CAP_ARM_WRITABLE_IMP_ID_REGS, 0);
+	vcpu =3D vm_vcpu_add(vm, 0, guest_code);
+	...
+}
+
+During vm_create(), kvm_arch_vm_post_create() in
+tools/testing/selftests/kvm/lib/arm64/processor.c enables KVM_CAP_ARM_MTE on
+the VM when request_mte is set:
+
+	if (request_mte && vm_check_cap(vm, KVM_CAP_ARM_MTE))
+		vm_enable_cap(vm, KVM_CAP_ARM_MTE, 0);
+
+Then during vm_vcpu_add() -> aarch64_vcpu_setup() ->
+kvm_get_default_vcpu_target(), the selftest library checks vm_supports_el2()
+and sets KVM_ARM_VCPU_HAS_EL2 by default on NV-capable hosts:
+
+tools/testing/selftests/kvm/lib/arm64/processor.c:vm_supports_el2() {
+	return vm_check_cap(vm, KVM_CAP_ARM_EL2) && vm->arch.has_gic;
+}
+
+tools/testing/selftests/kvm/lib/arm64/processor.c:kvm_get_default_vcpu_targ=
+et() {
+	...
+	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &preferred);
+	if (vm_supports_el2(vm))
+		preferred.features[0] |=3D BIT(KVM_ARM_VCPU_HAS_EL2);
+	...
+}
+
+Because kvm_vm_ioctl_check_extension() in arch/arm64/kvm/arm.c still reports
+KVM_CAP_ARM_EL2 as supported on a VM fd where KVM_CAP_ARM_MTE was enabled:
+
+	case KVM_CAP_ARM_EL2:
+		r =3D cpus_have_final_cap(ARM64_HAS_NESTED_VIRT);
+		break;
+
+and vm_supports_el2() does not check !request_mte, aarch64_vcpu_setup() pas=
+ses
+KVM_ARM_VCPU_HAS_EL2 to KVM_ARM_VCPU_INIT, which now fails with -EINVAL unl=
+ess
+the test is run with NV=3D0.
+
+Should kvm_vm_ioctl_check_extension() gate KVM_CAP_ARM_EL2 on
+!kvm_has_mte(kvm) (or vm_supports_el2() check !request_mte) so userspace and
+selftests do not request EL2 on MTE-enabled VMs?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261104192124.3932=
+743-1-oupton@kernel.org?part=3D1
