@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.223
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.141
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793796302;
-	b=b7/aUq10TQHeTOX4SDjJCfi6UplXKue0U8f1yXUIElh4Ufzpgwd1//Iwa/QDo9heANrA
-	 cR17TlRPDrnRW+8CrhauUsnAfjIdTbTHXF6Qmd2o820Ex0ovndTFIfnEYMpLDzF7dCflk
-	 8CyKqfw5VUEX+I9/QA9wVBL4xaAVpe1GLa8gvfnFzoLLQd/kYmoFxzJ4WW/Wfl00K4SWL
-	 ark2qxQaQU+P0g1hKEMP7OypahJzVR2fMIZy3A5o5YK1mCoJ6AlmtKhNXbHgydXbT9tHh
-	 tt4HrpkaMclOM1EhWUkQjFgAQ0STCkDNzKQSqo7/VoJP0JLIaFr6i6PY6bQSkWH2HKg==
+	t=1793796296;
+	b=y6HiOSIaUeNOHtvGnh06rx7bqc+BI2a8TdYJYddmpaAiMMK2mlo5hL7W5TYoCRz7kqmh
+	 YpydZNIzxbW6hAB463LpBFwzbLieg54S9NoYpmXpFOoahQXVcSRiVGXwPMbh6MciBRQNE
+	 FHXJ2jA70YK6O8ffYHd7svMt+EiClgjMr+1gycEcws4LHOK/e7IVShN1COxbOBLXRjAJH
+	 pkmI5DslVkteYMOV7q92oH9I+NZ3Q2FvJTrTh2tVvu/SKnLkQGmkXmccW0hKW47eNcwOf
+	 9bLZw5NaWdxMsqAtgg8/oWU4mLE/x2vRGkk2p8nhNOudYIWkfX1QZhfczrTMPAntmpw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793796302;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793796296;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=txtaZAcRMKdG/6PvTtOqQBPubj70UFKtaDsquMMzFvw=;
-	b=3jkBrF22/mRing3rbUsVUlhlAOn9uOX/RW0oqjMbDCQQuMhZwzfM80bUz5gv+tyRi4q5
-	 0C1AGCuZ19ap10t6/YrRItfVaQ5JcuV1Emyky6X3dNTK7/CvUpoBEAYWryPisVdqXsZw5
-	 KQRuB1ogM0rdZSSkKoZq0DQBu+/7cOIsRDMDM6KNqBpBXR047/xcH4sOxg6Mg8N1I4zA5
-	 zbUsCOSnnG1tSA3feFmnYXoS2r6XhS81WW7tV+cUdTl6KWXH1EszpVM0Q/DQIp5OTLBTs
-	 iXlfrwghl1UlMK4jZNMVK9WV0/S+kZWdirTQlTw4Rubu3SxBsjNzaSGqdH+HzbinfRA==
+	bh=AOH3Su8TZJSoK9UPHpeuwIAfG494iGEabcz+aB8amog=;
+	b=UvCCE8peMG7vrVKju+6AR2CLwxEwgEwzFgwoHp4zTA8OXCR7PVYu7YaCeg+IP5aJCdoZ
+	 WY49pocW/OVh+b+2dKoitOoZqs7FXbuTmPtxqA12yjZUu/SP2+5WEbu92I8bpnHtXq0kb
+	 Wd6QJSfQMsc+nwsQrU9zqNRveU12PpYolvDeiDVfNiOp21D4u8AF/OeO8VBw84K1pP5vU
+	 MM9ea0X6hVOHgKqUsGQy4NA1lyaYA92dPyxOOiKcVACAkCRQFm5g8jfloySGFXnowHthj
+	 vl62ufR6MsE4S7BX2LbcN7cCeUyaIT/RkyL6Jl84bqvkIP+8Iw7TTbgH4iyEICJFyVQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=LJ4IguBc;
-	arc=none smtp.remote-ip=91.218.175.223
-Received: from mta0.migadu.com (out-223.mta0.migadu.com [91.218.175.223])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QylGKXh7;
+	arc=none smtp.remote-ip=95.215.58.141
+Received: from mta1.migadu.com (out-141.mta1.migadu.com [95.215.58.141])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 203F2606A326
-	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 12:44:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 203F2606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51FA606A332
+	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 12:44:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E51FA606A332
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=LJ4IguBc
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QylGKXh7
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=QEva7TCaSMpCjlP1oVH5gOdE6FBEUp30xJbq+yDM/Y0=;
+DKIM-Signature: a=rsa-sha256; bh=MxRHPNAABvoNmLp9OTJVcSokfGwwqtsziGyV/1PffQk=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
  t=1793796293; v=1; x=1794401093;
- b=LJ4IguBc02zgkRjzp5f0Z2EurZt1jYdFb4ffyLRG9VK5ObfCDxQmBNZ2sUzTo8FIKWyfVdTu
- PQC4fr/4DSYkvOhK/Z4GINxzS/4ERWdXxAJYErs274q7t5B98uuUPLW14xLy7VgoRC04ty/bb/X
- XPfPZw8jc1nq4G1k6QrYdaVA=
+ b=QylGKXh7uruaLMMEMoxZ64DR/6WRHSeRr9NW0qyTOuBE10TrPTF2dySKAaKqBH8OXK9T5lgW
+ JuVyld+yb+3T7O/1JiDm1nj1jAxQHg1Yx+8Ir/sF6OYZ8nchI3kbHqN0Ed71GeYVXqwp3PGSJvU
+ Px8botegn2j4AGcqtjnNkmgM=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 05ef130eda10926c;
+Received: by smtp.migadu.com with ESMTPS id fec1c38f76d92ee4;
 	Wed, 04 Nov 2026 12:44:53 +0000
-X-Mizu-Trace-ID: 05ef130eda10926c
+X-Mizu-Trace-ID: fec1c38f76d92ee4
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -63,9 +63,9 @@ Cc: kvmarm@lists.linux.dev,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v2 2/2] KVM: arm64: Resume a pKVM stage-2 teardown at the next mapping
-Date: Wed,  4 Nov 2026 12:44:51 +0000
-Message-ID: <20261104124451.2148724-3-fuad.tabba@linux.dev>
+Subject: [PATCH v2 1/2] KVM: arm64: Resume stage-2 teardown where the walk stopped
+Date: Wed,  4 Nov 2026 12:44:50 +0000
+Message-ID: <20261104124451.2148724-2-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261104124451.2148724-1-fuad.tabba@linux.dev>
 References: <20261104124451.2148724-1-fuad.tabba@linux.dev>
@@ -80,49 +80,141 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-pKVM keeps a VM's stage-2 mappings in an interval tree, and
-pkvm_pgtable_stage2_destroy_range() releases the ones in its range.
-stage2_destroy_range() still calls it for every block-sized chunk of the
-IPA space. As pKVM gives every VM the host's IPA limit, a teardown with
-LPA2 makes 2^27 calls with 16K pages (2^22 with 4K), however little the
-VM maps.
+Since commit 4ddfab5436b6 ("KVM: arm64: Reschedule as needed when
+destroying the stage-2 page-tables"), kvm_stage2_destroy() walks the
+IPA space one block-sized chunk at a time. The walker steps over an
+invalid entry in one go, but the next walk starts at the following
+chunk, so an invalid entry larger than a chunk is visited once for every
+chunk it covers. Destroying a VM with a 52-bit IPA then takes 2^27 walks
+with 16K pages (2^22 with 4K), however little it maps.
 
-Return the address of the next mapping instead, or U64_MAX when none is
-left, so that the teardown skips the space between mappings. No mapping
-crosses a chunk boundary, as pKVM maps at most PMD_SIZE, so the next one
-starts at or above the end of the range. A VM without a handle doesn't
-have anything mapped, so return U64_MAX for it straight away.
+Have kvm_pgtable_stage2_destroy_range() return the address its walk
+reached, which kvm_pgtable_walk() doesn't expose, and resume from there.
+pkvm_pgtable_stage2_destroy_range() returns the end of its range, and
+EL2's kvm_pgtable_stage2_destroy() ignores the value.
 
+Suggested-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Suggested-by: Oliver Upton <oupton@kernel.org>
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/pkvm.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_pgtable.h |  8 ++++++--
+ arch/arm64/include/asm/kvm_pkvm.h    |  4 ++--
+ arch/arm64/kvm/hyp/pgtable.c         | 15 ++++++++++++---
+ arch/arm64/kvm/mmu.c                 |  4 ++--
+ arch/arm64/kvm/pkvm.c                |  8 +++++---
+ 5 files changed, 27 insertions(+), 12 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 1c9c57cd6ae40..20b988e99e074 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -599,9 +599,13 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
+  *
+  * The page-table is assumed to be unreachable by any hardware walkers prior
+  * to freeing and therefore no TLB invalidation is performed.
++ *
++ * Return: the address the walk reached, which can be past @addr + @size
++ * when the range ends within a block or an invalid entry, or @addr + @size
++ * if the walk fails.
+  */
+-void kvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
+-					u64 addr, u64 size);
++u64 kvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
++				     u64 addr, u64 size);
+ 
+ /**
+  * kvm_pgtable_stage2_destroy_pgd() - Destroy the PGD of guest stage-2 page-table.
+diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+index fd042d2b54624..731632aa24520 100644
+--- a/arch/arm64/include/asm/kvm_pkvm.h
++++ b/arch/arm64/include/asm/kvm_pkvm.h
+@@ -349,8 +349,8 @@ int __pkvm_handle_smccc_req(struct arm_smccc_res *res);
+ 
+ int pkvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+ 			     struct kvm_pgtable_mm_ops *mm_ops);
+-void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
+-					u64 addr, u64 size);
++u64 pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
++				      u64 addr, u64 size);
+ void pkvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt);
+ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
+ 			    enum kvm_pgtable_prot prot, void *mc,
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 9c83837b184d3..6bb1c0beb4dcc 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -1653,16 +1653,25 @@ static int stage2_free_walker(const struct kvm_pgtable_visit_ctx *ctx,
+ 	}
+ }
+ 
+-void kvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
+-				       u64 addr, u64 size)
++u64 kvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
++				     u64 addr, u64 size)
+ {
+ 	struct kvm_pgtable_walker walker = {
+ 		.cb	= stage2_free_walker,
+ 		.flags	= KVM_PGTABLE_WALK_LEAF |
+ 			  KVM_PGTABLE_WALK_TABLE_POST,
+ 	};
++	struct kvm_pgtable_walk_data data = {
++		.walker	= &walker,
++		.start	= addr,
++		.addr	= addr,
++		.end	= addr + size,
++	};
+ 
+-	WARN_ON(kvm_pgtable_walk(pgt, addr, size, &walker));
++	if (WARN_ON(_kvm_pgtable_walk(pgt, &data)))
++		return addr + size;
++
++	return data.addr;
+ }
+ 
+ void kvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt)
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 1db10d8d6db73..4f1adadeffb8b 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1011,8 +1011,8 @@ static void stage2_destroy_range(struct kvm_pgtable *pgt, phys_addr_t addr,
+ 
+ 	do {
+ 		next = stage2_range_addr_end(addr, end);
+-		KVM_PGT_FN(kvm_pgtable_stage2_destroy_range)(pgt, addr,
+-							     next - addr);
++		next = KVM_PGT_FN(kvm_pgtable_stage2_destroy_range)(pgt, addr, next - addr);
++		next = min(next, end);
+ 		if (next != end)
+ 			cond_resched();
+ 	} while (addr = next, addr != end);
 diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index f21c3326dda68..77315c83c61b3 100644
+index 016997288fd23..f21c3326dda68 100644
 --- a/arch/arm64/kvm/pkvm.c
 +++ b/arch/arm64/kvm/pkvm.c
-@@ -504,9 +504,10 @@ u64 pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
+@@ -499,14 +499,14 @@ static int __pkvm_pgtable_stage2_unshare(struct kvm_pgtable *pgt, u64 start, u64
+ 	return 0;
+ }
+ 
+-void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
+-					u64 addr, u64 size)
++u64 pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
++				      u64 addr, u64 size)
  {
  	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
  	pkvm_handle_t handle = kvm->arch.pkvm.handle;
-+	struct pkvm_mapping *mapping;
  
  	if (!handle)
--		return addr + size;
-+		return U64_MAX;
+-		return;
++		return addr + size;
  
  	if (pkvm_hyp_vm_is_created(kvm) && !kvm->arch.pkvm.is_dying) {
  		WARN_ON(kvm_call_hyp_nvhe(__pkvm_start_teardown_vm, handle));
-@@ -518,7 +519,10 @@ u64 pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
+@@ -517,6 +517,8 @@ void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
+ 		__pkvm_pgtable_stage2_reclaim(pgt, addr, addr + size);
  	else
  		__pkvm_pgtable_stage2_unshare(pgt, addr, addr + size);
- 
--	return addr + size;
-+	/* Mappings left by a failed release are still in the tree, so look past the range. */
-+	mapping = pkvm_mapping_iter_first(&pgt->pkvm_mappings, addr + size, U64_MAX);
 +
-+	return mapping ? gfn_to_gpa(mapping->gfn) : U64_MAX;
++	return addr + size;
  }
  
  void pkvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt)
