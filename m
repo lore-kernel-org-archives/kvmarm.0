@@ -1,70 +1,59 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793827521;
-	b=Sd7QkeHHiIWwukTw4R8snoajemDSCBfFLmrHbvLsp31U8DmoRGX387fBa5S5FKk/ZqYg
-	 gC4iSw6DQFHXkUA4yZ/XNdcHXfpnTbrJyriYUbDv89qce+S8mE4mIds56dG4Zw0rOoKXM
-	 9amhCIoQrYB2+acYMyRKI2L8pPLWDOPYmZ8ZQP4pIRi4zcN0GPqMEOZ5E5S8PAXjLll2Z
-	 CmUf56gJbx8HCPBtUAo3bHbl0i4TthYdHz0X1l43PZJFFdR2cKKhUaEvbO/ndzCTS0oAY
-	 N3YEFYokw6MNO8Gn6al6ikD1nwJGEDCP4alLkdVXT9L/NBobQFb7pTM2WXHquNr24iw==
+	t=1793832386;
+	b=pw7NMXtArlNwEa4Z/JaerP1jGxza8+C9PbOpj7xmslBbLCjr3kxX7UDyz5Oai8Iakzv2
+	 BYerAKfxj0UcdU+LMsXQtl5Ne2WCG6VN/O988uVdxXnGNUPrzWrkae23pBIJyEfqFvuj7
+	 V3NTYVMQ/aACLxQNF44hs1vZ5S/c7vVhiGV0LwNTPZqWBuDHC0MQjykGhXMJLyv9lBybs
+	 6qk2CSjurdx59ISax+mGCymCIK/nth/Hyj/OyyHqUurFfbsD34B6mmFk1kHLqQWr+XRc+
+	 dDIxM/sY11KzxRJMQ+PIDbL6aiuSOFh5w8/L7XAOcroe9ZwCG76eQ6bBoAuWX4/ANsg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793827521;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=+6Og+d5q4vSNXIn2vlsAgSTEs60/ZNjOZygcUkWgf08=;
-	b=aFCaEXhn7euRFJc3KT4FAePUjsvJPYKJo/CcYCklQ48Wr408Rrn04QmQ60Da9gJBhy51
-	 FVx90N6tjNsHRHzbt2TiCyKuC3f/aa5ZDHqlbycSIm+9n6zjGpuvmdeO6bE5FZCm8iHS3
-	 id8kLRyOPE0W2NnIMNN1Zr4rwqdnTC2L5gBJzZeROcGoqfE5Kqv+Dzsjb4dy4/qv5OKXv
-	 xb3qMSstvaXzhgdNW4/br5BoGrabZ8qXxsWAan1aGC0Q7gGWAdOWa4TR3NNHePO8AHwuo
-	 6iP+RSn2CWVdFt82NzWPqnI1TZLnu1VpOAbfGV3f80UQsE5lWwwzOw4dpFq2MpyVBTw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793832386;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=DMdL19ia1MseF42JJfTaNBjB6MPN2f0VB+2HLKGRGcw=;
+	b=ZbOXXxvkMFePx5GusEUoY8gYUEw9SZETtrSOsQ5RaKvdP+Cfe6YiZ0YTy8UNywQAb1jN
+	 FvFP7su4QBF70mP13YG0UcZTI6PgDB2D9Qxe5rLXP9uWnOhtazOap8I8sFRaMOCKRp9zr
+	 yu0Gpwar8vt+VGxpphmj2wyYyMbSkO9IDayf/sF1y7x1rOYpgsF+SST/2sqvAh33uph2S
+	 C7yK1CiwHNOCqRfJ4gDrTMngdWnKZUDsyAg0nRVPYHpqolnmwOQCDMcmOOPoHSIF/P9Ut
+	 8DaopbLrB+TQ3rcLsivC5hTnHN+yvhiKMpdHuNCuCmnMYJIuT6h4yCwu1nzG/8vEh8A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=F0fl+iCm;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=ac29vcO0;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEE5C606BA3B
-	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 21:25:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AEE5C606BA3B
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE47B606D804
+	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 22:46:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BE47B606D804
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=F0fl+iCm
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=ac29vcO0
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 806BD2F;
-	Wed,  4 Nov 2026 13:25:15 -0800 (PST)
-Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 40B3B3F632;
-	Wed,  4 Nov 2026 13:25:16 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6953C169C;
+	Wed,  4 Nov 2026 14:46:19 -0800 (PST)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D7D983F632;
+	Wed,  4 Nov 2026 14:46:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793827518; bh=G19VHiVImOj1mN5lRMMvKfMIGLvlEe3NRs5o+L0/QDc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=F0fl+iCmDgOtlN5Rp6yqct0DfN7yh+UR8e6lTCpQeUfpkpubkuL29vTjtjw8aUirC
-	 0kJLvbQjRIYtXzKwXOGOP1v94jxytHsyqvQuQr15c4uJny9/XQWalS6pq9DveRfd70
-	 y+3WpS01lzw4QJMMDuJCGZ3ds8A+/LnHmxNtF0aI=
+	t=1793832382; bh=gA3RjhcnUbX3FeD3ZQ9T2a1Q2l8A9c0Kc7zUbAxh5FE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ac29vcO02ijqYFN1QbLQkbGJ71LNaDm+oDI6B3SR0IYbRhaVs8PzsnE4o8GnYyfE7
+	 Rpm/vTICVO+eyFhZ0JE8nX1bzhcMf+LOt03/NZCT9XQgkrY2zaPpprrPsBSzTQYy1I
+	 5eW4Rf1jwXnU6KoNJawv2swSuQKfiYKaqiMxTrxw=
+Date: Wed, 4 Nov 2026 22:46:16 +0000
 From: Wei-Lin Chang <weilin.chang@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Cc: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	=?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>,
-	Eric Auger <eric.auger@redhat.com>,
-	Sascha Bischoff <sascha.bischoff@arm.com>,
-	Jackie Liu <liuyun01@kylinos.cn>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Wei-Lin Chang <weilin.chang@arm.com>
-Subject: [PATCH v1] KVM: arm64: vgic: Use new IRQ type helpers in vgic_try_get_irq_ref()
-Date: Wed,  4 Nov 2026 21:22:26 +0000
-Message-ID: <20261104212226.3662020-1-weilin.chang@arm.com>
-X-Mailer: git-send-email 2.43.0
+To: Sascha Bischoff <sascha.bischoff@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, 
+	lpieralisi@kernel.org, timothy.hayes@arm.com, fuad.tabba@linux.dev
+Subject: Re: [PATCH v2 08/16] KVM: arm64: gic-v5: Add ITS translation cache
+ maintenance
+Message-ID: <7sk6tikltw7bsrpes7p2hv2vufwua77xxfdbdmlpyas2pjyu5e@j42zu3b536t6>
+References: <20261102194454.4086911-1-sascha.bischoff@arm.com>
+ <20261102194454.4086911-9-sascha.bischoff@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -74,146 +63,232 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261102194454.4086911-9-sascha.bischoff@arm.com>
 
-Commit eb8bce08ecb1 ("KVM: arm64: gic: Introduce interrupt type
-helpers") introduced GICv3/v5-aware helpers to distinguish PPIs, SGIs,
-SPIs, and LPIs.
+On Mon, Nov 02, 2026 at 07:44:46PM +0000, Sascha Bischoff wrote:
+> Walking the guest DT and ITTs on every MSI or ITS event is unnecessary
+> once a DeviceID/EventID pair has been resolved. Add an XArray indexed
+> by the DeviceID/EventID pair to cache resolved translations as a
+> disposable acceleration structure, avoiding repeated walks of guest
+> memory.
+> 
+> Cache entries hold references to the resolved struct vgic_irq objects
+> stored in the VM-wide LPI xarray. Lookups use RCU to access entries in
+> interrupt context without taking a raw spinlock, and take an IRQ
+> reference before returning an entry to the caller. Cache eviction drops
+> the reference held by the cache and defers freeing the entry until RCU
+> readers have finished. This keeps the cache tied to the normal LPI
+> object lifetime instead of storing raw LPI numbers.
+> 
+> Invalidate cached translations when the table configuration or guest
+> invalidation commands make them stale. Changes to DT_BASER or DT_CFGR
+> drop the entire cache, while writes of unchanged values leave it intact.
+> INV_EVENTR removes either one event or the events covered by an L1 ITT
+> entry, and INV_DEVICER removes the translations covered by either an L2
+> DT entry or an L1 DT entry.
+> 
+> The cache is not part of any userspace ABI and is never authoritative:
+> entries can always be rebuilt from guest memory on the next lookup.
+> 
+> The vgic_irq objects for LPIs track valid translations rather than
+> mirror interrupt state. Mirroring that state would require querying
+> the GIC on every guest exit. Once direct injection is added, the
+> objects also record whether an LPI is mapped into the host ITT.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-its-v5.c | 219 ++++++++++++++++++++++++++++--
+>  include/kvm/arm_vgic.h            |   3 +
+>  2 files changed, 208 insertions(+), 14 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-its-v5.c b/arch/arm64/kvm/vgic/vgic-its-v5.c
+> index caa68c4680d02..9f4783b243221 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its-v5.c
+> @@ -4,6 +4,7 @@
+>   */
+>  
+>  #include <linux/kvm_host.h>
+> +#include <linux/rcupdate.h>
+>  #include <linux/slab.h>
+>  
+>  #include <asm/kvm_arm.h>
+> @@ -19,6 +20,153 @@
+>  #define VITS_V5_DEVICE_ID_BITS		16
+>  #define VITS_V5_EVENT_ID_BITS		16
+>  
+> +struct its_cache_translation_entry {
+> +	struct rcu_head rcu;
+> +	struct vgic_irq *irq;
+> +};
+> +
+> +/* Put EventID in the low bits so each device's events form one range. */
+> +static unsigned long its_cache_key(u32 device_id, u16 event_id)
+> +{
+> +	return ((unsigned long)device_id << VITS_V5_EVENT_ID_BITS) | event_id;
+> +}
+> +
+> +static void its_cache_drop_translation(struct kvm *kvm,
+> +				       struct its_cache_translation_entry *entry)
+> +{
+> +	struct vgic_irq *irq = entry->irq;
+> +
+> +	vgic_put_irq(kvm, irq);
+> +	/* An interrupt-context lookup may still be using the erased entry. */
+> +	kfree_rcu(entry, rcu);
+> +}
+> +
 
-However unlike vgic_put_irq(), vgic_try_get_irq_ref() wasn't updated and
-is still using irq->intid < VGIC_MIN_LPI to detect LPIs. Although vGICv5
-paths aren't referencing vgic_try_get_irq_ref() at the moment, let's
-still do the correct thing and use the new irq_is_lpi() to avoid future
-bugs.
+drop and erase sound very similar, would its_cache_release_entry() make
+this clearer?
 
-Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
----
-This caught my attention while looking at:
-https://lore.kernel.org/kvmarm/20261102194454.4086911-9-sascha.bischoff@arm.com/
-The ITS translation cache look up calls vgic_try_get_irq_ref().
-The logic irq->intid < VGIC_MIN_LPI is wrong for GICv5, but since GICv5
-vgic_irq->intid have the IRQ type encoded in the top bits the comparison
-yields correct results by coincidence.
+> +static void its_cache_erase_translation(struct vgic_v5_its *its,
+> +					unsigned long key)
+> +{
+> +	struct its_cache_translation_entry *entry;
+> +
+> +	entry = xa_erase(&its->translation_cache, key);
+> +	if (entry)
+> +		its_cache_drop_translation(its->dev->kvm, entry);
+> +}
+> +
+> +static void its_cache_erase_range(struct vgic_v5_its *its,
+> +				  unsigned long first, unsigned long last)
+> +{
+> +	struct its_cache_translation_entry *entry;
+> +	unsigned long key;
+> +
+> +	xa_for_each_range(&its->translation_cache, key, entry, first, last)
+> +		its_cache_erase_translation(its, key);
+> +}
+> +
+> +static void its_cache_erase_span(struct vgic_v5_its *its,
+> +				unsigned long key, unsigned int bits)
+> +{
+> +	unsigned long mask = (1UL << bits) - 1;
 
- arch/arm64/kvm/vgic/vgic-its.c | 6 +++---
- arch/arm64/kvm/vgic/vgic-v4.c  | 2 +-
- arch/arm64/kvm/vgic/vgic.c     | 8 ++++----
- arch/arm64/kvm/vgic/vgic.h     | 8 ++++----
- 4 files changed, 12 insertions(+), 12 deletions(-)
+nit:                         GENMASK(bits - 1, 0) ?
 
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 5ce485485a11..9d3dfb0e525e 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -111,7 +111,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
- 	 * check that we don't add a second list entry with the same LPI.
- 	 */
- 	oldirq = xa_load(&dist->lpi_xa, intid);
--	if (vgic_try_get_irq_ref(oldirq)) {
-+	if (vgic_try_get_irq_ref(kvm, oldirq)) {
- 		/* Someone was faster with adding this LPI, lets use that. */
- 		kfree(irq);
- 		irq = oldirq;
-@@ -560,7 +560,7 @@ static struct vgic_irq *vgic_its_check_cache(struct kvm *kvm, phys_addr_t db,
- 	rcu_read_lock();
- 
- 	irq = xa_load(&its->translation_cache, cache_key);
--	if (!vgic_try_get_irq_ref(irq))
-+	if (!vgic_try_get_irq_ref(kvm, irq))
- 		irq = NULL;
- 
- 	rcu_read_unlock();
-@@ -584,7 +584,7 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
- 	 * its_lock, as the ITE (and the reference it holds) cannot be freed.
- 	 */
- 	lockdep_assert_held(&its->its_lock);
--	vgic_get_irq_ref(irq);
-+	vgic_get_irq_ref(kvm, irq);
- 
- 	old = xa_store(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
- 
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index 1b7623f098e2..95b82a153134 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -524,7 +524,7 @@ static struct vgic_irq *__vgic_host_irq_get_vlpi(struct kvm *kvm, int host_irq)
- 		if (!irq->hw || irq->host_irq != host_irq)
- 			continue;
- 
--		if (!vgic_try_get_irq_ref(irq))
-+		if (!vgic_try_get_irq_ref(kvm, irq))
- 			return NULL;
- 
- 		return irq;
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index fe09ada32262..e1072b819245 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -71,7 +71,7 @@ static struct vgic_irq *vgic_get_lpi(struct kvm *kvm, u32 intid)
- 	rcu_read_lock();
- 
- 	irq = xa_load(&dist->lpi_xa, intid);
--	if (!vgic_try_get_irq_ref(irq))
-+	if (!vgic_try_get_irq_ref(kvm, irq))
- 		irq = NULL;
- 
- 	rcu_read_unlock();
-@@ -507,7 +507,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
- 	 * now in the ap_list. This is safe as the caller must already hold a
- 	 * reference on the irq.
- 	 */
--	vgic_get_irq_ref(irq);
-+	vgic_get_irq_ref(kvm, irq);
- 	list_add_tail(&irq->ap_list, &vcpu->arch.vgic_cpu.ap_list_head);
- 	irq->vcpu = vcpu;
- 
-@@ -817,7 +817,7 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
- 		 * This interrupt looks like it has to be migrated,
- 		 * make sure it is kept alive while locks are dropped.
- 		 */
--		vgic_get_irq_ref(irq);
-+		vgic_get_irq_ref(vcpu->kvm, irq);
- 
- 		raw_spin_unlock(&irq->irq_lock);
- 		raw_spin_unlock(&vgic_cpu->ap_list_lock);
-@@ -1049,7 +1049,7 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
- 			if (likely(vgic_target_oracle(irq) == vcpu)) {
- 				vgic_populate_lr(vcpu, irq, count++);
- 				if (count == kvm_vgic_global_state.nr_lr) {
--					vgic_get_irq_ref(irq);
-+					vgic_get_irq_ref(vcpu->kvm, irq);
- 					*host_data_ptr(last_lr_irq) = irq;
- 				}
- 			}
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 71c481ddd98d..fe7b508ce172 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -320,20 +320,20 @@ void vgic_v2_put(struct kvm_vcpu *vcpu);
- void vgic_v2_save_state(struct kvm_vcpu *vcpu);
- void vgic_v2_restore_state(struct kvm_vcpu *vcpu);
- 
--static inline bool vgic_try_get_irq_ref(struct vgic_irq *irq)
-+static inline bool vgic_try_get_irq_ref(struct kvm *kvm, struct vgic_irq *irq)
- {
- 	if (!irq)
- 		return false;
- 
--	if (irq->intid < VGIC_MIN_LPI)
-+	if (!irq_is_lpi(kvm, irq->intid))
- 		return true;
- 
- 	return refcount_inc_not_zero(&irq->refcount);
- }
- 
--static inline void vgic_get_irq_ref(struct vgic_irq *irq)
-+static inline void vgic_get_irq_ref(struct kvm *kvm, struct vgic_irq *irq)
- {
--	WARN_ON_ONCE(!vgic_try_get_irq_ref(irq));
-+	WARN_ON_ONCE(!vgic_try_get_irq_ref(kvm, irq));
- }
- 
- void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu);
--- 
-2.43.0
+> +	unsigned long first = key & ~mask;
+> +
+> +	its_cache_erase_range(its, first, first | mask);
+> +}
+> +
+> +static int its_cache_add_translation(struct kvm *kvm, struct vgic_v5_its *its,
+> +				     u32 device_id, u16 event_id,
+> +				     struct vgic_irq *irq)
+> +{
+> +	unsigned long key = its_cache_key(device_id, event_id);
+> +	struct its_cache_translation_entry *entry;
+> +	struct its_cache_translation_entry *old;
+> +
+> +	entry = kzalloc_obj(*entry, GFP_KERNEL_ACCOUNT);
+> +	if (!entry)
+> +		return -ENOMEM;
+> +
+> +	entry->irq = irq;
+> +
+> +	old = xa_store(&its->translation_cache, key, entry,
+> +		       GFP_KERNEL_ACCOUNT);
+> +	if (xa_is_err(old)) {
+> +		kfree(entry);
+> +		return xa_err(old);
+> +	}
+> +
+> +	if (old)
+> +		its_cache_drop_translation(kvm, old);
+> +
+> +	return 0;
+> +}
+> +
+> +static void its_cache_clear_translations(struct vgic_v5_its *its)
+> +{
+> +	struct its_cache_translation_entry *entry;
+> +	unsigned long key;
+> +
+> +	xa_for_each(&its->translation_cache, key, entry)
+> +		its_cache_erase_translation(its, key);
+> +}
+> +
+> +static int its_cache_look_up_translation(struct vgic_v5_its *its,
+> +					 u32 device_id, u16 event_id,
+> +					 struct vgic_irq **irq)
+> +{
+> +	unsigned long key = its_cache_key(device_id, event_id);
+> +	struct its_cache_translation_entry *entry;
+> +	int ret = -ENXIO;
+> +
+> +	rcu_read_lock();
+> +	entry = xa_load(&its->translation_cache, key);
+> +	if (entry && vgic_try_get_irq_ref(entry->irq)) {
+> +		*irq = entry->irq;
+> +		ret = 0;
+> +	}
+> +	rcu_read_unlock();
+> +
+> +	return ret;
+> +}
+> +
+> +static int its_cache_l2sz_bits(u8 l2sz)
+> +{
+> +	if (l2sz > GICV5_ITS_DT_ITT_CFGR_L2SZ_64k)
+> +		return -EINVAL;
+> +
+> +	/* L2SZ 0, 1, and 2 encode 4K, 16K, and 64K tables of 8-byte entries. */
+> +	return 9 + 2 * l2sz;
+> +}
+> +
+> +static void its_cache_handle_inv_devicer(struct vgic_v5_its *its)
+> +{
+> +	unsigned int bits = its->inv_devicer.event_id_bits;
+> +	int l2_bits;
+> +
+> +	if (its->inv_devicer.l1 && its->dt_cfgr.structure) {
+> +		l2_bits = its_cache_l2sz_bits(its->dt_cfgr.l2sz);
+> +		if (l2_bits < 0)
+> +			return;
+> +		/* An L1 DTE covers the L2 DT's devices and all their EventIDs. */
+> +		bits = l2_bits + VITS_V5_EVENT_ID_BITS;
+> +	} else if (bits > VITS_V5_EVENT_ID_BITS) {
+> +		bits = VITS_V5_EVENT_ID_BITS;
+> +	}
+> +
+> +	its_cache_erase_span(its, its_cache_key(its->didr.device_id, 0), bits);
+> +}
+> +
+> +static void its_cache_handle_inv_eventr(struct vgic_v5_its *its)
+> +{
+> +	int bits = 0;
+> +
+> +	if (its->inv_eventr.l1) {
+> +		/* An L1 ITTE covers the EventIDs in its L2 ITT. */
+> +		bits = its_cache_l2sz_bits(its->inv_eventr.itt_l2sz);
+> +		if (bits < 0)
+> +			return;
+> +	}
 
+For the ITT_L2SZ field in the spec there is:
+
+When programming a reserved value or an unsupported value, the ITS
+behavior is CONSTRAINED UNPREDICTABLE to any behavior which could be
+achieved by programming a valid and supported value.
+
+So I think we should still invalidate when a ITT_L2SZ is programmed to
+a reserved value, maybe just arbitrarily pick a defined value when this
+happens?
+
+Thanks,
+Wei-Lin Chang
+
+> +
+> +	its_cache_erase_span(its, its_cache_key(its->didr.device_id,
+> +						  its->eidr.event_id), bits);
+> +}
+> +
+>  static int parse_linear_dt(struct kvm *kvm, gpa_t dt_base, u32 device_id,
+>  			   gpa_t *itt_base, bool *two_level_itt,
+>  			   unsigned int *event_id_bits, unsigned int *itt_l2sz)
+
+[...]
