@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.122
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.30
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793782177;
-	b=xLM5SKcZ50gSgvMMtMTmDbYG4uJgf5HcO13O1AE7yJlOnLwfUqxVQM89sB0UD1IbmVqZ
-	 uKD5Bz8FxSal7ylmziRUZ3ptK2G1UC/zn+h9UVjOcYXeh1Rph+bpwuYvNqkyISykJqgi4
-	 aThp+1/uHOa7Xje6ZsN2r0V3sJ985+vG2xuc+9xF3bItzrn9Fx+bl/iYdjoxRJQdspILa
-	 tOZs0Ul1UTAi+4J8spFJmhrRPFqgwB+oGAQStP/Go+SpDk7zK5S5DH3qkg2XtY+NI4lZS
-	 +SAWlqCdk0S5Fd7DSaxhi0HFlJoRkt5IimThowd1rrgg5N79HvkLPCmUz9m6bSqt9Jw==
+	t=1793782178;
+	b=Ew0PnfwCCXDFN3NJIcqCrPgwKFscgAHwL8Q6mcQCoX0esP/1WL3NJgfIhDgTxrT1B+KX
+	 T/Qr7Gk+0dFo2zb2v4TZ/zBvu6ixgQREejfh+vNlkI60j2jq85pdgaA/2jxANNTzcjJu2
+	 QMFBKnWGxJIpVQUzhKKdLlMm6eGv5SMtJZ+yr+hFcMkAnqcFmsxlUzWDS66UJEJcxl4hn
+	 4BRr35F8gpFS4+IpGlPUoXnuBdJA1AZWlSO5uDFIV+SzkY5sba1Ojc98fnQ7Sp86TTbk6
+	 YCrzjC5Vfjw3zvXPYgQ8tlPTFWthF6D3Kh0IEPX3QO/MEwJ4wLQu9ksiX2SUAztntzw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793782177;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793782178;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=5nEohq54DTHtjKDRxbXCWmLIwsYbX8QtU1ILisebyEE=;
-	b=mPt8m98jgBiuvYoJtrE98zOrObR2aHBqPdsq9TI0EW0+8V/KeuZ0+p+0Wmtgsx4aQ6vX
-	 t6CaRW/UP6S1/RhAiwDTm6KPIIpYfzmjDyqBQ3T4eXzM28iDWajx2P5usx1QTwZNxfZCu
-	 dwnJ79deTzgBgqs7IQNjnPSI04O4FuI/dDdfukucBHpMEpcYcnSMCax1K2T4paVAMmeJ3
-	 zZnfXrVRPcqIy09lg1fEXxjc0UUmhVMESG4hmPiUKnl03/g3m5zziZeNd8s8JxmKPhkIP
-	 gKi4BEG6rO8Os/HMkrvQTb4yLHFCn61yeRc238iZ8bpPjZzE0X3gKKd//W0MQDQmXYQ==
+	bh=PtHDYady7phNq27ntokTbSRWYS9Lun+LGBxYvYPNZY8=;
+	b=Cz6MCpVstvYA+DraEMeqw3Ytk6V4XTnMmHVOUAOdhyBPVZuY53o0ocWjftGrb5/dxhtL
+	 oEApMVbB3oD2Oa6QtkGTaamcSaglU0KLkemmxNHoP1R58SKScgv5UY3MpxARGKZtjJs+x
+	 GsexEwkX9zEugG9xeOJqP2/h0mBnmumXTsfbYwbtKwwVxjCPTot8nuTWApphmh4pG+qY8
+	 OlRmCtVNurfNX9HqfsBvVCeLUAi2hue1JTlNnMxqmk0dYXND7RJGkn4l8aJViI+b/CXmZ
+	 Nl7gGG8T1bKuy9J/2FUayPGNyqG1Mbfo7g7cyKgj9AKmNBOXqxo5J4dT8pLu5j1oUqw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=iFbqIASI;
-	arc=none smtp.remote-ip=95.215.58.122
-Received: from mta1.migadu.com (out-122.mta1.migadu.com [95.215.58.122])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=una2nS2+;
+	arc=none smtp.remote-ip=91.218.175.30
+Received: from mta0.migadu.com (out-30.mta0.migadu.com [91.218.175.30])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB84606A33E
-	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 08:49:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0BB84606A33E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF50606D830
+	for <kvmarm@lists.linux.dev>; Wed,  4 Nov 2026 08:49:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ADF50606D830
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=iFbqIASI
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=una2nS2+
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=nMecQcwmd7MWhwJTb8i6ZTjYI9m66qrrgJfKuP/Yzpg=;
+DKIM-Signature: a=rsa-sha256; bh=ovcORW3DsB2JukpcYhWq0sTqhjhRqe8m4MhePuk/qqE=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793782173; v=1; x=1794386973;
- b=iFbqIASIHJPaxYg9TY1LsEZuOwQFqGYgho2P9HUMVfENCm9Omx/B1yxm6xg24KTgma/kiQvT
- mdcWHYzduR9nZEzgwSz2bY4bjYWNGXmXBLIPYcFnAz27ROa766d0jueO2qa0/DPeVQvRF/Txnuq
- q1Z/l8q0fgdFWK2fHak0UPP8=
+ t=1793782176; v=1; x=1794386976;
+ b=una2nS2+1gv+3N+rbpbDGbL279Vsom5ZP4Jh5HEjdvr7FsmnhCXSfblytjlUnlfIC9sEY8qT
+ yIpCEU6E3EUAF3keJijoSgtWp0XBqd3MBQ72qh0XbjbhEAEyeJXYHzonMVQnR1jxvstjZBAoETu
+ nGSNKxR4ZQnGHzaJy8AKufoM=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id a85e553b1b195363;
-	Wed, 04 Nov 2026 08:49:33 +0000
-X-Mizu-Trace-ID: a85e553b1b195363
+Received: by smtp.migadu.com with ESMTPS id 0db4956640b39e57;
+	Wed, 04 Nov 2026 08:49:35 +0000
+X-Mizu-Trace-ID: 0db4956640b39e57
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -66,9 +66,9 @@ Cc: Will Deacon <will@kernel.org>,
 	kvm@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 08/16] KVM: arm64: selftests: Add pkvm_psci multi-vCPU PSCI test
-Date: Wed,  4 Nov 2026 08:48:34 +0000
-Message-ID: <20261104084842.132944-9-fuad.tabba@linux.dev>
+Subject: [PATCH 09/16] KVM: arm64: selftests: Add pkvm_mem_share hypercall test
+Date: Wed,  4 Nov 2026 08:48:35 +0000
+Message-ID: <20261104084842.132944-10-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261104084842.132944-1-fuad.tabba@linux.dev>
 References: <20261104084842.132944-1-fuad.tabba@linux.dev>
@@ -83,673 +83,433 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-EL2 handles a protected guest's CPU_ON and CPU_OFF itself, so the host
-can't power on a vCPU the guest hasn't, or change where it boots. EL2
-also handles PSCI_VERSION and PSCI_FEATURES, and returns NOT_SUPPORTED
-for unknown calls. It forwards the rest to the host.
+A protected guest gives the host access to one of its pages with
+MEM_SHARE and takes it back with MEM_UNSHARE. The page is a host page,
+whose size HYP_MEMINFO returns. At teardown EL2 zeroes every page the
+guest hasn't left shared.
 
-Test CPU_ON, CPU_OFF, AFFINITY_INFO, PSCI_VERSION, PSCI_FEATURES,
-SYSTEM_OFF, SYSTEM_RESET and SYSTEM_RESET2. Also check that the host
-can't make a second vCPU runnable without a CPU_ON from the guest. Run
-the secondaries on their own threads to race CPU_ON against CPU_OFF and
-against another CPU_ON. EL2 marks a vCPU off at its CPU_OFF and returns
-to the host. Until the host powers that vCPU off, a CPU_ON of it returns
-ALREADY_ON.
+Exercise the three calls, the host's access to shared and private pages,
+and the zeroing. Also check that KVM_RUN fails with EIO on
+hugetlb-backed memory, that sharing an IPA outside every memslot makes
+the guest take an external abort, and that faults each requiring new
+stage-2 tables succeed.
 
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- tools/testing/selftests/kvm/arm64/pkvm_psci.c | 632 ++++++++++++++++++
- 2 files changed, 633 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/pkvm_psci.c
+ .../selftests/kvm/arm64/pkvm_mem_share.c      | 394 ++++++++++++++++++
+ 2 files changed, 395 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/arm64/pkvm_mem_share.c
 
 diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 42e530e0e573b..aa256fb66d226 100644
+index aa256fb66d226..88c1159cb3bf1 100644
 --- a/tools/testing/selftests/kvm/Makefile.kvm
 +++ b/tools/testing/selftests/kvm/Makefile.kvm
 @@ -191,6 +191,7 @@ TEST_GEN_PROGS_arm64 += arm64/external_aborts
  TEST_GEN_PROGS_arm64 += arm64/mmio_sign_ext
  TEST_GEN_PROGS_arm64 += arm64/page_fault_test
  TEST_GEN_PROGS_arm64 += arm64/pkvm_host_abi
-+TEST_GEN_PROGS_arm64 += arm64/pkvm_psci
++TEST_GEN_PROGS_arm64 += arm64/pkvm_mem_share
+ TEST_GEN_PROGS_arm64 += arm64/pkvm_psci
  TEST_GEN_PROGS_arm64 += arm64/psci_test
  TEST_GEN_PROGS_arm64 += arm64/sea_to_user
- TEST_GEN_PROGS_arm64 += arm64/set_id_regs
-diff --git a/tools/testing/selftests/kvm/arm64/pkvm_psci.c b/tools/testing/selftests/kvm/arm64/pkvm_psci.c
+diff --git a/tools/testing/selftests/kvm/arm64/pkvm_mem_share.c b/tools/testing/selftests/kvm/arm64/pkvm_mem_share.c
 new file mode 100644
-index 0000000000000..07a50af9c9ad9
+index 0000000000000..9a4e96fc8d046
 --- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/pkvm_psci.c
-@@ -0,0 +1,632 @@
++++ b/tools/testing/selftests/kvm/arm64/pkvm_mem_share.c
+@@ -0,0 +1,394 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * pkvm_psci - PSCI in a protected VM, including CPU_ON racing CPU_OFF and CPU_ON.
++ * pkvm_mem_share - MEM_SHARE, MEM_UNSHARE and HYP_MEMINFO, and EL2 zeroing a
++ * protected VM's private pages at teardown.
 + *
 + * Copyright (C) 2025 Google LLC
 + * Author: Fuad Tabba <fuad.tabba@linux.dev>
 + */
 +
-+#include <pthread.h>
++#include <errno.h>
++#include <setjmp.h>
++#include <signal.h>
++#include <stdio.h>
 +
-+#include <linux/bitfield.h>
-+#include <linux/psci.h>
-+#include <asm/barrier.h>
-+#include <asm/cputype.h>
++#include <linux/arm-smccc.h>
 +
-+#include "arch_timer.h"
 +#include "kvm_util.h"
 +#include "pkvm.h"
 +#include "processor.h"
 +#include "test_util.h"
 +
-+#define MAX_VCPUS	3
++/*
++ * A page here is a host page, the granule EL2 shares in. Set in the guest's
++ * copy by the host before the first run.
++ */
++static u64 granule;
 +
-+/* A well-formed MPIDR with no matching vCPU. */
-+#define BOGUS_MPIDR	0xf
++#define GUEST_MEMSLOT	(PKVM_IDMAP_MEMSLOT + 1)
++#define GPA_BASE	BIT_ULL(30)
++#define GVA_BASE	GPA_BASE
++#define GPA_PAGES	16
++#define GPA_SIZE	((size_t)GPA_PAGES * granule)
 +
-+/* The primary's GUEST_SYNC: the host runs the secondary, then resumes the primary. */
-+#define SYNC_RUN_SECONDARY	1
++/* Each case uses its own pages of the guest memslot. */
++#define P_SHARE			0
++#define P_SHARED_AT_TEARDOWN	1
 +
-+#define STRESS_BOOTS	50
-+#define ALT_BOOTS	50
-+#define HANDSHAKE_CYCLES	50
-+#define RACE_ROUNDS	10
++/* Recognizable value the host must still see in a page that isn't zeroed. */
++#define DIRTY_VAL		0x0badf00ddeadbeefUL
 +
-+#define WAIT_MS		30000
++/* An aligned IPA outside every memslot. */
++#define OUTSIDE_IPA		BIT_ULL(31)
 +
-+/* An identity-mapped page for the boot context the primary writes. */
-+#define ALT_MEMSLOT	(PKVM_IDMAP_MEMSLOT + 1)
-+#define ALT_CTX		BIT_ULL(30)
++/* What one last-level stage-2 table maps: 2M on a 4K host. */
++#define BLOCK_SIZE		(granule / 8 * granule)
 +
-+/* Set in the guest's copy by the host before the first run. */
-+static u64 boot_entry;
-+static u64 vcpu_mpidr[MAX_VCPUS];
-+static u64 vcpu_ctx[MAX_VCPUS];
++/* One page in each block of a memslot centered on 512G. */
++#define PRESSURE_MEMSLOT	(GUEST_MEMSLOT + 1)
++#define PRESSURE_PAGES		64
++#define PRESSURE_SIZE		((u64)PRESSURE_PAGES * BLOCK_SIZE)
++#define PRESSURE_GPA		(BIT_ULL(39) - PRESSURE_SIZE / 2)
++#define PRESSURE_GVA		BIT_ULL(32)
 +
-+static u32 boots;
-+static u64 expected_ctx;
-+static u64 booted_ctx;
-+static u32 go_off;
++/* Commands that act on a page take its index. */
++enum guest_cmd {
++	CMD_HOST_INC_SHARED = 1,
++	CMD_HOST_ACCESS_PRIVATE,
++};
 +
-+static u32 race_ready;
-+static u32 race_go;
-+static u32 race_done;
-+static unsigned long race_ret[2];
++#define HOST_CMD(cmd, idx)	GUEST_SYNC_ARGS(cmd, idx, 0, 0, 0)
 +
-+#define wait_until(cond)							\
-+do {										\
-+	u64 __end = timer_get_cntct(VIRTUAL) + msec_to_cycles(WAIT_MS);	\
-+										\
-+	while (!(cond))								\
-+		__GUEST_ASSERT(timer_get_cntct(VIRTUAL) < __end,		\
-+			       "timed out waiting for %s", #cond);		\
-+} while (0)
-+
-+static unsigned long __psci_cpu_on(u64 mpidr, u64 entry, u64 ctx)
++static u64 page_ipa(int idx)
 +{
-+	return pkvm_hvc(PSCI_0_2_FN64_CPU_ON, mpidr, entry, ctx);
++	return GPA_BASE + (u64)idx * granule;
 +}
 +
-+static unsigned long psci_cpu_on(int id)
++static volatile u64 *page_va(int idx)
 +{
-+	return __psci_cpu_on(vcpu_mpidr[id], boot_entry, vcpu_ctx[id]);
++	return (volatile u64 *)(GVA_BASE + (u64)idx * granule);
 +}
 +
-+static unsigned long psci_affinity_info(int id)
++static unsigned long hvc_share(u64 ipa, u64 arg2, u64 arg3)
 +{
-+	return pkvm_hvc(PSCI_0_2_FN64_AFFINITY_INFO, vcpu_mpidr[id], 0, 0);
++	return pkvm_hvc(ARM_SMCCC_VENDOR_HYP_KVM_MEM_SHARE_FUNC_ID, ipa, arg2, arg3);
 +}
 +
-+static void psci_cpu_off(void)
++static unsigned long hvc_unshare(u64 ipa, u64 arg2, u64 arg3)
 +{
-+	pkvm_hvc(PSCI_0_2_FN_CPU_OFF, 0, 0, 0);
-+	GUEST_ASSERT(0);
++	return pkvm_hvc(ARM_SMCCC_VENDOR_HYP_KVM_MEM_UNSHARE_FUNC_ID, ipa, arg2, arg3);
 +}
 +
-+static void guest_primary(void)
++static void test_meminfo(void)
++{
++	u32 meminfo = ARM_SMCCC_VENDOR_HYP_KVM_HYP_MEMINFO_FUNC_ID;
++
++	GUEST_ASSERT_EQ(pkvm_hvc(meminfo, 0, 0, 0), granule);
++
++	GUEST_ASSERT_EQ(pkvm_hvc(meminfo, 1, 0, 0), SMCCC_RET_INVALID_PARAMETER);
++	GUEST_ASSERT_EQ(pkvm_hvc(meminfo, 0, 1, 0), SMCCC_RET_INVALID_PARAMETER);
++	GUEST_ASSERT_EQ(pkvm_hvc(meminfo, 0, 0, 1), SMCCC_RET_INVALID_PARAMETER);
++}
++
++static void test_arg_validation(void)
++{
++	u64 ipa = page_ipa(P_SHARE);
++
++	/* Non-zero arg2 or arg3, and an unaligned IPA, are rejected before any page walk. */
++	GUEST_ASSERT_EQ(hvc_share(ipa, 1, 0), SMCCC_RET_INVALID_PARAMETER);
++	GUEST_ASSERT_EQ(hvc_share(ipa, 0, 1), SMCCC_RET_INVALID_PARAMETER);
++	GUEST_ASSERT_EQ(hvc_share(ipa + 0x80, 0, 0), SMCCC_RET_INVALID_PARAMETER);
++	GUEST_ASSERT_EQ(hvc_unshare(ipa, 1, 0), SMCCC_RET_INVALID_PARAMETER);
++	GUEST_ASSERT_EQ(hvc_unshare(ipa, 0, 1), SMCCC_RET_INVALID_PARAMETER);
++	GUEST_ASSERT_EQ(hvc_unshare(ipa + 0x80, 0, 0), SMCCC_RET_INVALID_PARAMETER);
++}
++
++static void test_share_unshare(void)
++{
++	volatile u64 *val = page_va(P_SHARE);
++	u64 ipa = page_ipa(P_SHARE);
++
++	*val = 42;
++
++	HOST_CMD(CMD_HOST_ACCESS_PRIVATE, P_SHARE);
++	GUEST_ASSERT_EQ(*val, 42);
++
++	GUEST_ASSERT_EQ(hvc_share(ipa, 0, 0), SMCCC_RET_SUCCESS);
++	GUEST_ASSERT_EQ(hvc_share(ipa, 0, 0), SMCCC_RET_INVALID_PARAMETER);
++
++	HOST_CMD(CMD_HOST_INC_SHARED, P_SHARE);
++	GUEST_ASSERT_EQ(*val, 43);
++
++	GUEST_ASSERT_EQ(hvc_unshare(ipa, 0, 0), SMCCC_RET_SUCCESS);
++	GUEST_ASSERT_EQ(hvc_unshare(ipa, 0, 0), SMCCC_RET_INVALID_PARAMETER);
++
++	HOST_CMD(CMD_HOST_ACCESS_PRIVATE, P_SHARE);
++	GUEST_ASSERT_EQ(*val, 43);
++}
++
++/* Dirty every page, so that a page that reads 0 after teardown is one EL2 zeroed. */
++static void guest_dirty_region(void)
++{
++	volatile u64 *p = (volatile u64 *)GVA_BASE;
++	size_t i;
++
++	for (i = 0; i < GPA_SIZE / sizeof(*p); i++)
++		p[i] = DIRTY_VAL;
++}
++
++static void guest_code(void)
 +{
 +	pkvm_guest_init();
 +
-+	GUEST_ASSERT_EQ(pkvm_hvc(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0), PSCI_VERSION(1, 1));
-+	GUEST_ASSERT_EQ(pkvm_hvc(PSCI_1_0_FN_PSCI_FEATURES, PSCI_0_2_FN64_CPU_ON, 0, 0),
-+			PSCI_RET_SUCCESS);
-+	GUEST_ASSERT_EQ(pkvm_hvc(PSCI_1_0_FN_PSCI_FEATURES, PSCI_0_2_FN_MIGRATE, 0, 0),
-+			PSCI_RET_NOT_SUPPORTED);
++	test_meminfo();
++	test_arg_validation();
++	test_share_unshare();
 +
-+	GUEST_ASSERT_EQ(psci_affinity_info(1), PSCI_0_2_AFFINITY_LEVEL_OFF);
-+	GUEST_ASSERT_EQ(psci_cpu_on(1), PSCI_RET_SUCCESS);
++	guest_dirty_region();
 +
-+	/* The host handles AFFINITY_INFO, and returns ON for a CPU_ON target. */
-+	GUEST_ASSERT_EQ(psci_affinity_info(1), PSCI_0_2_AFFINITY_LEVEL_ON);
-+	GUEST_ASSERT_EQ(psci_cpu_on(1), PSCI_RET_ON_PENDING);
-+
-+	GUEST_SYNC(SYNC_RUN_SECONDARY);
-+
-+	GUEST_ASSERT_EQ(psci_affinity_info(1), PSCI_0_2_AFFINITY_LEVEL_ON);
-+	GUEST_ASSERT_EQ(psci_cpu_on(1), PSCI_RET_ALREADY_ON);
-+
-+	GUEST_ASSERT_EQ(__psci_cpu_on(BOGUS_MPIDR, boot_entry, 0), PSCI_RET_INVALID_PARAMS);
++	/* Teardown doesn't zero a page the guest left shared. */
++	GUEST_ASSERT_EQ(hvc_share(page_ipa(P_SHARED_AT_TEARDOWN), 0, 0), SMCCC_RET_SUCCESS);
 +
 +	GUEST_DONE();
 +}
 +
-+/* The primary's pkvm_guest_init() set up ucall for the whole VM. */
-+static void guest_secondary(void)
++static void expect_sea_handler(struct ex_regs *regs)
 +{
++	u64 esr = read_sysreg(esr_el1);
++
++	GUEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_CUR);
++	GUEST_ASSERT_EQ(esr & ESR_ELx_FSC_TYPE, ESR_ELx_FSC_EXTABT);
++
 +	GUEST_DONE();
 +}
 +
-+static void guest_cpu_on_unregistered(void)
++static void guest_share_outside(void)
 +{
 +	pkvm_guest_init();
-+	GUEST_ASSERT_EQ(psci_cpu_on(1), PSCI_RET_INVALID_PARAMS);
++
++	hvc_share(OUTSIDE_IPA, 0, 0);
++	GUEST_FAIL("MEM_SHARE of an IPA outside every memslot returned to the guest");
++}
++
++/*
++ * Each fault requires a new stage-2 last-level table, and the first one above
++ * 512G a new table at every level below the root.
++ */
++static void guest_memcache_pressure(void)
++{
++	volatile u64 *p = (volatile u64 *)PRESSURE_GVA;
++	int i;
++
++	pkvm_guest_init();
++
++	for (i = 0; i < PRESSURE_PAGES; i++)
++		p[i * granule / sizeof(*p)] = i + 1;
++	for (i = 0; i < PRESSURE_PAGES; i++)
++		GUEST_ASSERT_EQ(p[i * granule / sizeof(*p)], i + 1);
++
 +	GUEST_DONE();
 +}
 +
-+static void guest_boot_and_done(void)
++static void guest_touch_one_page(void)
 +{
 +	pkvm_guest_init();
++
++	*page_va(0) = 1;
++
 +	GUEST_DONE();
 +}
 +
-+static void guest_system_off(void)
++static sigjmp_buf sigsegv_jmpbuf;
++static volatile void *sigsegv_expected;
++
++/* The test maps the guest memslot itself, so it can read the memory after the VM is freed. */
++static u64 *guest_mem;
++
++static u64 *host_page(int idx)
 +{
-+	pkvm_hvc(PSCI_0_2_FN_SYSTEM_OFF, 0, 0, 0);
-+	GUEST_ASSERT(0);
++	return guest_mem + (size_t)idx * granule / sizeof(*guest_mem);
 +}
 +
-+static void guest_system_reset(void)
++static void sigsegv_handler(int sig, siginfo_t *si, void *ctx)
 +{
-+	pkvm_hvc(PSCI_0_2_FN_SYSTEM_RESET, 0, 0, 0);
-+	GUEST_ASSERT(0);
++	TEST_ASSERT(si->si_addr == sigsegv_expected,
++		    "SIGSEGV at %p, expected %p", si->si_addr, sigsegv_expected);
++	siglongjmp(sigsegv_jmpbuf, 1);
 +}
 +
-+static void guest_system_reset2_smc32(void)
++static void host_access_private(int idx)
 +{
-+	pkvm_hvc(PSCI_1_1_FN_SYSTEM_RESET2, PSCI_1_1_RESET_TYPE_SYSTEM_WARM_RESET, 0, 0);
-+	GUEST_ASSERT(0);
++	struct sigaction old, sa = {
++		.sa_sigaction	= sigsegv_handler,
++		.sa_flags	= SA_SIGINFO,
++	};
++	volatile u64 *p = host_page(idx);
++	bool faulted = false;
++
++	sigsegv_expected = (void *)p;
++	sigaction(SIGSEGV, &sa, &old);
++	if (sigsetjmp(sigsegv_jmpbuf, 1) == 0)
++		(*p)++;
++	else
++		faulted = true;
++	sigaction(SIGSEGV, &old, NULL);
++
++	TEST_ASSERT(faulted, "Host accessed private guest memory without faulting");
 +}
 +
-+static void guest_system_reset2_smc64(void)
++static void on_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
 +{
-+	pkvm_hvc(PSCI_1_1_FN64_SYSTEM_RESET2, PSCI_1_1_RESET_TYPE_SYSTEM_WARM_RESET, 0, 0);
-+	GUEST_ASSERT(0);
-+}
++	u64 *p = host_page(uc->args[2]);
 +
-+static void guest_stress_primary(void)
-+{
-+	unsigned long successes = 0;
-+
-+	pkvm_guest_init();
-+	while (READ_ONCE(boots) < STRESS_BOOTS) {
-+		unsigned long ret = psci_cpu_on(1);
-+
-+		__GUEST_ASSERT(ret == PSCI_RET_SUCCESS || ret == PSCI_RET_ALREADY_ON ||
-+			       ret == PSCI_RET_ON_PENDING, "CPU_ON 0x%lx", ret);
-+		successes += ret == PSCI_RET_SUCCESS;
++	switch (uc->args[1]) {
++	case CMD_HOST_INC_SHARED:
++		(*p)++;
++		break;
++	case CMD_HOST_ACCESS_PRIVATE:
++		host_access_private(uc->args[2]);
++		break;
++	default:
++		TEST_FAIL("Unexpected guest command %lu", uc->args[1]);
 +	}
-+
-+	/*
-+	 * SUCCESS means the secondary ran. The last boot has completed and the
-+	 * secondary stays on after it, so no CPU_ON and no boot is in flight.
-+	 */
-+	GUEST_ASSERT_EQ(successes, STRESS_BOOTS);
-+	GUEST_DONE();
 +}
 +
-+static void guest_stress_secondary(void)
++static void assert_page(int idx, u64 val)
 +{
-+	u32 k = READ_ONCE(boots) + 1;
++	u64 *p = host_page(idx);
++	size_t i;
 +
-+	WRITE_ONCE(boots, k);
-+	if (k == STRESS_BOOTS)
-+		GUEST_DONE();
-+	psci_cpu_off();
++	for (i = 0; i < granule / sizeof(*p); i++)
++		TEST_ASSERT(p[i] == val, "Guest page %d holds 0x%lx, not 0x%lx, after teardown",
++			    idx, p[i], val);
 +}
 +
-+static void alt_boot(u64 ctx)
++static void test_run(void)
 +{
-+	u32 k = READ_ONCE(boots) + 1;
-+
-+	GUEST_ASSERT_EQ(ctx, READ_ONCE(expected_ctx));
-+	WRITE_ONCE(booted_ctx, ctx);
-+	/* Publishes booted_ctx, and the primary changes expected_ctx only once it sees this. */
-+	smp_store_release(&boots, k);
-+	if (k == ALT_BOOTS)
-+		GUEST_DONE();
-+	psci_cpu_off();
-+}
-+
-+static void guest_alt_secondary_host_ctx(void)
-+{
-+	alt_boot(vcpu_ctx[1]);
-+}
-+
-+static void guest_alt_secondary_guest_ctx(void)
-+{
-+	alt_boot(ALT_CTX);
-+}
-+
-+static void clean_to_poc(void *p, size_t size)
-+{
-+	u64 line = 4UL << SYS_FIELD_GET(CTR_EL0, DminLine, read_sysreg(ctr_el0));
-+	u64 addr;
-+
-+	for (addr = (u64)p & ~(line - 1); addr < (u64)p + size; addr += line)
-+		asm volatile("dc cvac, %0" : : "r"(addr) : "memory");
-+	dsb(sy);
-+}
-+
-+static void guest_alt_primary(void)
-+{
-+	struct pvm_boot_args *alt = (struct pvm_boot_args *)ALT_CTX;
-+	bool guest_ctx = true;
-+	unsigned long ret;
-+	u64 ctx;
-+	u32 k;
-+
-+	pkvm_guest_init();
-+
-+	/* The trampoline reads the context with the MMU off. */
-+	*alt = *(struct pvm_boot_args *)vcpu_ctx[1];
-+	alt->jump_tgt = (u64)guest_alt_secondary_guest_ctx;
-+	clean_to_poc(alt, sizeof(*alt));
-+
-+	for (k = 1; k <= ALT_BOOTS; k++) {
-+		/*
-+		 * CPU_ON returns ALREADY_ON until the host has powered the secondary off.
-+		 * Each attempt passes the other context, so a boot from the previous attempt's
-+		 * context fails alt_boot()'s check.
-+		 */
-+		do {
-+			guest_ctx = !guest_ctx;
-+			ctx = guest_ctx ? ALT_CTX : vcpu_ctx[1];
-+			WRITE_ONCE(expected_ctx, ctx);
-+			ret = __psci_cpu_on(vcpu_mpidr[1], boot_entry, ctx);
-+			__GUEST_ASSERT(ret == PSCI_RET_SUCCESS || ret == PSCI_RET_ALREADY_ON,
-+				       "CPU_ON 0x%lx", ret);
-+		} while (ret != PSCI_RET_SUCCESS);
-+
-+		/* Only the primary powers the secondary on, so no other boot is in flight. */
-+		wait_until(smp_load_acquire(&boots) >= k);
-+		GUEST_ASSERT_EQ(READ_ONCE(boots), k);
-+		GUEST_ASSERT_EQ(READ_ONCE(booted_ctx), ctx);
-+	}
-+
-+	GUEST_DONE();
-+}
-+
-+static void guest_handshake_secondary(void)
-+{
-+	u32 k = READ_ONCE(boots) + 1;
-+
-+	WRITE_ONCE(boots, k);
-+	if (k > HANDSHAKE_CYCLES)
-+		GUEST_DONE();
-+	wait_until(READ_ONCE(go_off) == k);
-+	psci_cpu_off();
-+}
-+
-+/* The secondary is ON until it has called CPU_OFF. */
-+static bool is_off(int id)
-+{
-+	unsigned long ret = psci_affinity_info(id);
-+
-+	__GUEST_ASSERT(ret == PSCI_0_2_AFFINITY_LEVEL_ON || ret == PSCI_0_2_AFFINITY_LEVEL_OFF,
-+		       "AFFINITY_INFO 0x%lx", ret);
-+	return ret == PSCI_0_2_AFFINITY_LEVEL_OFF;
-+}
-+
-+static void guest_handshake_primary(void)
-+{
-+	u32 k;
-+
-+	pkvm_guest_init();
-+
-+	for (k = 1; k <= HANDSHAKE_CYCLES; k++) {
-+		GUEST_ASSERT_EQ(psci_cpu_on(1), PSCI_RET_SUCCESS);
-+
-+		/* The secondary has booted and waits for go_off, so it is still ON. */
-+		wait_until(READ_ONCE(boots) >= k);
-+		GUEST_ASSERT_EQ(psci_affinity_info(1), PSCI_0_2_AFFINITY_LEVEL_ON);
-+
-+		WRITE_ONCE(go_off, k);
-+
-+		/* It is OFF and only the primary powers it on, so no boot is in flight. */
-+		wait_until(is_off(1));
-+		GUEST_ASSERT_EQ(READ_ONCE(boots), k);
-+	}
-+
-+	/* One more boot lets the secondary finish instead of powering off. */
-+	GUEST_ASSERT_EQ(psci_cpu_on(1), PSCI_RET_SUCCESS);
-+	GUEST_DONE();
-+}
-+
-+static void guest_race_caller(void)
-+{
-+	WRITE_ONCE(race_ready, 1);
-+	wait_until(READ_ONCE(race_go));
-+	race_ret[1] = psci_cpu_on(2);
-+	/* Publishes race_ret[1] to the primary. */
-+	smp_store_release(&race_done, 1);
-+	GUEST_DONE();
-+}
-+
-+/* No CPU_OFF: a target that powered off would let the loser win too. */
-+static void guest_race_target(void)
-+{
-+	WRITE_ONCE(boots, READ_ONCE(boots) + 1);
-+	GUEST_DONE();
-+}
-+
-+static void guest_race_primary(void)
-+{
-+	unsigned long loser;
-+	int winner;
-+
-+	pkvm_guest_init();
-+
-+	/* vCPU 1 has never been on, and the primary is its only caller. */
-+	GUEST_ASSERT_EQ(psci_cpu_on(1), PSCI_RET_SUCCESS);
-+	wait_until(READ_ONCE(race_ready));
-+
-+	WRITE_ONCE(race_go, 1);
-+	race_ret[0] = psci_cpu_on(2);
-+
-+	/* Both callers have returned, and vCPU 2 has booted and stays on. */
-+	wait_until(smp_load_acquire(&race_done));
-+	wait_until(READ_ONCE(boots));
-+	GUEST_ASSERT_EQ(READ_ONCE(boots), 1);
-+
-+	winner = race_ret[0] == PSCI_RET_SUCCESS ? 0 : 1;
-+	loser = race_ret[!winner];
-+	GUEST_ASSERT_EQ(race_ret[winner], PSCI_RET_SUCCESS);
-+	__GUEST_ASSERT(loser == PSCI_RET_ON_PENDING || loser == PSCI_RET_ALREADY_ON,
-+		       "losing CPU_ON 0x%lx", loser);
-+
-+	GUEST_SYNC(loser);
-+	GUEST_DONE();
-+}
-+
-+static struct kvm_vcpu *secondary_vcpu;
-+static u64 sync_arg;
-+
-+static void run_secondary_on_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
-+{
-+	if (uc->args[1] == SYNC_RUN_SECONDARY)
-+		pkvm_run_loop(secondary_vcpu, NULL);
-+}
-+
-+static void wire_target(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
-+{
-+	u64 mpidr = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MPIDR_EL1));
-+
-+	write_guest_global(vm, vcpu_mpidr[vcpu->id], mpidr & MPIDR_HWID_BITMASK);
-+	write_guest_global(vm, boot_entry, pkvm_idmap_gpa(vm));
-+}
-+
-+static void wire_secondary(struct kvm_vm *vm, struct kvm_vcpu *vcpu, void *guest_code)
-+{
-+	gpa_t ctx;
-+
-+	wire_target(vm, vcpu);
-+	ctx = pkvm_vcpu_setup_boot_secondary(vcpu, guest_code);
-+	write_guest_global(vm, vcpu_ctx[vcpu->id], ctx);
-+}
-+
-+static void test_protocol(void)
-+{
-+	struct kvm_vcpu *vcpus[2];
++	const char *name = "share/unshare, and teardown zeroing";
++	struct kvm_vcpu *vcpu;
 +	struct kvm_vm *vm;
++	int i;
 +
-+	vm = pkvm_vm_create(2, 0, vcpus);
-+	secondary_vcpu = vcpus[1];
++	vm = pkvm_vm_create_with_one_vcpu(&vcpu, guest_code);
++	guest_mem = kvm_mmap(GPA_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1);
++	vm_set_user_memory_region2(vm, GUEST_MEMSLOT, 0, GPA_BASE, GPA_SIZE, guest_mem, -1, 0);
++	virt_map(vm, GVA_BASE, GPA_BASE, GPA_SIZE / vm->page_size);
++	write_guest_global(vm, granule, granule);
 +
-+	pkvm_vcpu_setup_boot(vcpus[0], guest_primary);
-+	wire_secondary(vm, vcpus[1], guest_secondary);
-+
-+	pkvm_run_loop(vcpus[0], run_secondary_on_sync);
-+
++	pkvm_run_loop(vcpu, on_sync);
 +	kvm_vm_free(vm);
++
++	for (i = 0; i < GPA_PAGES; i++)
++		assert_page(i, i == P_SHARED_AT_TEARDOWN ? DIRTY_VAL : 0);
++	kvm_munmap(guest_mem, GPA_SIZE);
++
++	ksft_test_result_pass("%s\n", name);
 +}
 +
-+/* vCPU 1 exists but never runs, so EL2 never creates its hyp vCPU. */
-+static void test_cpu_on_unregistered(void)
-+{
-+	struct kvm_vcpu *vcpus[2];
-+	struct kvm_vm *vm;
-+
-+	vm = pkvm_vm_create(2, 0, vcpus);
-+
-+	pkvm_vcpu_setup_boot(vcpus[0], guest_cpu_on_unregistered);
-+	wire_target(vm, vcpus[1]);
-+
-+	pkvm_run_loop(vcpus[0], NULL);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static void assert_system_event(void *guest_code, u32 type, u64 flags)
++/*
++ * EL2 turns the share into a stage-2 translation fault on the IPA with ISV clear.
++ * The host finds no memslot for the IPA and injects an external abort.
++ */
++static void test_share_outside_memslot(void)
 +{
 +	struct kvm_vcpu *vcpu;
-+	struct kvm_run *run;
 +	struct kvm_vm *vm;
 +
-+	vm = pkvm_vm_create(1, 0, &vcpu);
-+	pkvm_vcpu_setup_boot(vcpu, guest_code);
++	vm = pkvm_vm_create_with_one_vcpu(&vcpu, guest_share_outside);
++	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ESR_ELx_EC_DABT_CUR, expect_sea_handler);
 +
-+	run = vcpu->run;
-+	vcpu_run(vcpu);
-+
-+	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_SYSTEM_EVENT);
-+	TEST_ASSERT_EQ(run->system_event.type, type);
-+	TEST_ASSERT_EQ(run->system_event.data[0], flags);
-+
++	pkvm_run_loop(vcpu, NULL);
 +	kvm_vm_free(vm);
++
++	ksft_test_result_pass("share of an IPA outside every memslot takes an external abort\n");
 +}
 +
-+/* Only one vCPU may be RUNNABLE when EL2 creates its hyp vCPU: the primary. */
-+static void assert_second_runnable_rejected(struct kvm_vcpu *vcpu)
++static void test_memcache_pressure(void)
 +{
-+	int ret = _vcpu_run(vcpu);
-+
-+	TEST_ASSERT(ret == -1 && errno == EINVAL,
-+		    "second RUNNABLE vCPU: expected -1/EINVAL, got %d/%d", ret, errno);
-+}
-+
-+static void test_forged_runnable(void)
-+{
-+	struct kvm_mp_state mps = { .mp_state = KVM_MP_STATE_RUNNABLE };
-+	struct kvm_vcpu *vcpus[2];
++	const char *name = "faults that each require new stage-2 tables";
++	struct kvm_vcpu *vcpu;
 +	struct kvm_vm *vm;
++	void *mem;
++	int i;
 +
-+	vm = pkvm_vm_create(2, 0, vcpus);
-+	pkvm_vcpu_setup_boot(vcpus[0], guest_boot_and_done);
-+	pkvm_run_loop(vcpus[0], NULL);
++	vm = pkvm_vm_create_with_one_vcpu(&vcpu, guest_memcache_pressure);
 +
-+	vcpu_mp_state_set(vcpus[1], &mps);
-+	assert_second_runnable_rejected(vcpus[1]);
++	/* 32G on a 64K host, of which the guest touches one page per block. */
++	mem = kvm_mmap(PRESSURE_SIZE, PROT_READ | PROT_WRITE,
++		       MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1);
++	vm_set_user_memory_region2(vm, PRESSURE_MEMSLOT, 0, PRESSURE_GPA, PRESSURE_SIZE,
++				   mem, -1, 0);
++	for (i = 0; i < PRESSURE_PAGES; i++)
++		virt_pg_map(vm, PRESSURE_GVA + i * granule, PRESSURE_GPA + i * BLOCK_SIZE);
++	write_guest_global(vm, granule, granule);
 +
++	pkvm_run_loop(vcpu, NULL);
 +	kvm_vm_free(vm);
++	kvm_munmap(mem, PRESSURE_SIZE);
++
++	ksft_test_result_pass("%s\n", name);
 +}
 +
-+static void test_second_primary(void)
++static unsigned long hugetlb_free_pages(void)
 +{
-+	struct kvm_vcpu *vcpus[2];
-+	struct kvm_vcpu_init init;
-+	struct kvm_vm *vm;
++	unsigned long nr = 0;
++	char line[64];
++	FILE *f;
 +
-+	vm = pkvm_vm_create(2, 0, vcpus);
-+	pkvm_vcpu_setup_boot(vcpus[0], guest_boot_and_done);
-+	pkvm_run_loop(vcpus[0], NULL);
++	f = fopen("/proc/meminfo", "r");
++	TEST_ASSERT(f, "fopen /proc/meminfo");
 +
-+	/* Re-INIT without POWER_OFF also leaves the vCPU RUNNABLE. */
-+	kvm_get_default_vcpu_target(vm, &init);
-+	init.features[0] |= BIT(KVM_ARM_VCPU_PSCI_0_2);
-+	vcpu_ioctl(vcpus[1], KVM_ARM_VCPU_INIT, &init);
-+	assert_second_runnable_rejected(vcpus[1]);
++	while (fgets(line, sizeof(line), f)) {
++		if (sscanf(line, "HugePages_Free: %lu", &nr) == 1)
++			break;
++	}
++	fclose(f);
 +
-+	kvm_vm_free(vm);
++	return nr;
 +}
 +
-+/* Once EL2 holds a secondary's hyp vCPU off, the host rejects powering it on. */
-+static void test_run_gate_off(void)
++/* Hugetlb pages aren't swap-backed, so the first fault on them fails. */
++static void test_hugetlb_refused(const char *name)
 +{
-+	struct kvm_mp_state mps = { .mp_state = KVM_MP_STATE_RUNNABLE };
-+	struct kvm_vcpu *vcpus[2];
++	struct kvm_vcpu *vcpu;
 +	struct kvm_vm *vm;
++	u64 npages;
 +	int ret;
 +
-+	vm = pkvm_vm_create(2, 0, vcpus);
++	vm = pkvm_vm_create_with_one_vcpu(&vcpu, guest_touch_one_page);
++	npages = get_backing_src_pagesz(VM_MEM_SRC_ANONYMOUS_HUGETLB) / vm->page_size;
++	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS_HUGETLB, GPA_BASE, GUEST_MEMSLOT,
++				    npages, 0);
++	virt_map(vm, GVA_BASE, GPA_BASE, 1);
 +
-+	pkvm_vcpu_setup_boot_secondary(vcpus[1], guest_boot_and_done);
-+
-+	ret = __vcpu_ioctl(vcpus[1], KVM_SET_MP_STATE, &mps);
-+	TEST_ASSERT(ret == -1 && errno == EPERM,
-+		    "forged RUNNABLE: expected -1/EPERM, got %d/%d", ret, errno);
-+	mps.mp_state = KVM_MP_STATE_SUSPENDED;
-+	ret = __vcpu_ioctl(vcpus[1], KVM_SET_MP_STATE, &mps);
-+	TEST_ASSERT(ret == -1 && errno == EPERM,
-+		    "forged SUSPENDED: expected -1/EPERM, got %d/%d", ret, errno);
++	ret = _vcpu_run(vcpu);
++	TEST_ASSERT(ret == -1 && errno == EIO,
++		    "hugetlb-backed memslot: KVM_RUN rc %d errno %d", ret, errno);
 +
 +	kvm_vm_free(vm);
-+}
 +
-+static void *vcpu_thread(void *vcpu)
-+{
-+	pkvm_run_loop(vcpu, NULL);
-+	return NULL;
-+}
-+
-+static void record_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
-+{
-+	sync_arg = uc->args[1];
-+}
-+
-+/* The secondary runs on its own thread, so a CPU_ON can race its CPU_OFF. */
-+static void run_threaded(struct kvm_vcpu *vcpus[])
-+{
-+	pthread_t thread;
-+
-+	pthread_create(&thread, NULL, vcpu_thread, vcpus[1]);
-+	pkvm_run_loop(vcpus[0], record_sync);
-+	pthread_join(thread, NULL);
-+}
-+
-+static void test_stress(void)
-+{
-+	struct kvm_vcpu *vcpus[2];
-+	struct kvm_vm *vm;
-+
-+	vm = pkvm_vm_create(2, 0, vcpus);
-+
-+	pkvm_vcpu_setup_boot(vcpus[0], guest_stress_primary);
-+	wire_secondary(vm, vcpus[1], guest_stress_secondary);
-+
-+	run_threaded(vcpus);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static void test_alternating_ctx(void)
-+{
-+	struct kvm_vcpu *vcpus[2];
-+	struct kvm_vm *vm;
-+
-+	vm = pkvm_vm_create(2, 0, vcpus);
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, ALT_CTX, ALT_MEMSLOT,
-+				    vm_adjust_num_guest_pages(vm->mode, 1), 0);
-+	virt_map(vm, ALT_CTX, ALT_CTX, 1);
-+
-+	pkvm_vcpu_setup_boot(vcpus[0], guest_alt_primary);
-+	wire_secondary(vm, vcpus[1], guest_alt_secondary_host_ctx);
-+
-+	run_threaded(vcpus);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static void test_handshake(void)
-+{
-+	struct kvm_vcpu *vcpus[2];
-+	struct kvm_vm *vm;
-+
-+	vm = pkvm_vm_create(2, 0, vcpus);
-+
-+	pkvm_vcpu_setup_boot(vcpus[0], guest_handshake_primary);
-+	wire_secondary(vm, vcpus[1], guest_handshake_secondary);
-+
-+	run_threaded(vcpus);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+/* Returns the number of rounds whose loser got ON_PENDING: its CPU_ON overlapped the winner's. */
-+static int test_concurrent_cpu_on(void)
-+{
-+	int i, on_pending = 0;
-+
-+	for (i = 0; i < RACE_ROUNDS; i++) {
-+		struct kvm_vcpu *vcpus[3];
-+		pthread_t target;
-+		struct kvm_vm *vm;
-+
-+		vm = pkvm_vm_create(3, 0, vcpus);
-+
-+		pkvm_vcpu_setup_boot(vcpus[0], guest_race_primary);
-+		wire_secondary(vm, vcpus[1], guest_race_caller);
-+		wire_secondary(vm, vcpus[2], guest_race_target);
-+
-+		pthread_create(&target, NULL, vcpu_thread, vcpus[2]);
-+		run_threaded(vcpus);
-+		pthread_join(target, NULL);
-+
-+		kvm_vm_free(vm);
-+
-+		on_pending += sync_arg == PSCI_RET_ON_PENDING;
-+	}
-+
-+	return on_pending;
++	ksft_test_result_pass("%s\n", name);
 +}
 +
 +int main(void)
 +{
-+	int on_pending;
++	const char *hugetlb = "hugetlb memory rejected for a protected VM";
 +
 +	TEST_REQUIRE(pkvm_supported());
++	granule = getpagesize();
 +
 +	ksft_print_header();
-+	ksft_set_plan(13);
++	ksft_set_plan(4);
 +
-+	test_protocol();
-+	ksft_test_result_pass("PSCI protocol and CPU_ON boot\n");
-+	test_cpu_on_unregistered();
-+	ksft_test_result_pass("CPU_ON of a vCPU with no hyp vCPU\n");
-+	assert_system_event(guest_system_off, KVM_SYSTEM_EVENT_SHUTDOWN, 0);
-+	ksft_test_result_pass("SYSTEM_OFF\n");
-+	assert_system_event(guest_system_reset, KVM_SYSTEM_EVENT_RESET, 0);
-+	ksft_test_result_pass("SYSTEM_RESET\n");
-+	assert_system_event(guest_system_reset2_smc32, KVM_SYSTEM_EVENT_RESET,
-+			    KVM_SYSTEM_EVENT_RESET_FLAG_PSCI_RESET2);
-+	ksft_test_result_pass("SYSTEM_RESET2 (SMC32)\n");
-+	assert_system_event(guest_system_reset2_smc64, KVM_SYSTEM_EVENT_RESET,
-+			    KVM_SYSTEM_EVENT_RESET_FLAG_PSCI_RESET2);
-+	ksft_test_result_pass("SYSTEM_RESET2 (SMC64)\n");
-+	test_forged_runnable();
-+	ksft_test_result_pass("forged RUNNABLE rejected at hyp vCPU creation\n");
-+	test_second_primary();
-+	ksft_test_result_pass("second RUNNABLE vCPU rejected\n");
-+	test_run_gate_off();
-+	ksft_test_result_pass("forged RUNNABLE and SUSPENDED of an OFF vCPU rejected\n");
-+	test_stress();
-+	ksft_test_result_pass("CPU_ON/CPU_OFF race: %d boots\n", STRESS_BOOTS);
-+	test_alternating_ctx();
-+	ksft_test_result_pass("CPU_ON alternating context: %d boots\n", ALT_BOOTS);
-+	test_handshake();
-+	ksft_test_result_pass("CPU_OFF/CPU_ON handshake: %d cycles\n", HANDSHAKE_CYCLES);
-+	on_pending = test_concurrent_cpu_on();
-+	ksft_test_result_pass("concurrent CPU_ON: one winner in %d rounds, %d ON_PENDING losers\n",
-+			      RACE_ROUNDS, on_pending);
++	test_run();
++
++	if (hugetlb_free_pages())
++		test_hugetlb_refused(hugetlb);
++	else
++		ksft_test_result_skip("%s: no hugetlb pages free\n", hugetlb);
++
++	test_share_outside_memslot();
++	test_memcache_pressure();
 +
 +	ksft_finished();
 +}
