@@ -1,80 +1,79 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793919589;
-	b=K/a15MYGZi754FarcVzHkuMuvAbu/D6kD4657TMQFc+/B3C7Cs3km5IGGtEaGwwRAgYa
-	 2HlLhfqg6mpoVxkiBkfbl1ouogOe60kqNlMqVbZCP+IFR1b+PWExYwI0BeYEfP5Dj5ZLp
-	 Q6xPKZjnH1g+/Exo7RH+SIudr48r21nulBcd4XwjNsVuNNNUxnewyPKmXcj3xOX/fPL/T
-	 ou7poaAn5L7F3f318wMeGOIVPONBsiueGENgv+wJk+t+kwRYan2rfNCSVARUZQQI0466i
-	 A65weZik7PGgT6+yxiUk7zdSLCxWLD0+wbDhrZiJ4z8zdUar+O62Hkg5DZMNZqSj/ew==
+	t=1793919590;
+	b=yu2xsP3TO0HQXpdmIsZ99DmvxYJ3tTgIf8v0d19uZGIdTzBnprrXTGNxBRpiYUPb986Q
+	 VIjDAafdJH6nGEn7E3Nmg50LSHgXiTaS0PWU6IRanrs6zBEoKMH13eC+yilRav47BWJqj
+	 BRJlqm8vGEl/N8D5e9Pfbno82rJQI09cxJh7LQ+S0nCv5IZ5A5axf/jJnJkIH4fc8Og1s
+	 SuEBG2M1o5ePjckmdA8HlU/0Yv3efr1boeTb4TBdsxevY6PmbsackMXVYbzR08TRg45m7
+	 AHrpEqI6pNpPvPPUKwVyOQuLcTj6LifnYXNeBendWsMOKd2BmYWFcHareGhnldpJkrg==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793919589;
-	h=Received:DKIM-Signature:Received:From:Subject:Date:Message-Id:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
-	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
-	 X-Endpoint-Received:X-Original-From:Reply-To;
-	bh=WdrkeWA5q5NZPAjfL6pBJnTm0PpgBinSg9ZwIQcwiok=;
-	b=gJFa6d1DvzoBqM5p2vT/cNgE5nplP6hDzUl/5RgWGoSo/oAsp6oEJVLZ4ciU28TxYaz5
-	 WW7lJ05OQfcMKOro0H4G/DeiyCwK1JS75XHWOflwcs30IZ6WwsKCurC7XufRlL9CoIzs/
-	 fb5Kd7FGSW+nKSs58hiJyl3rSOWvhg9exXysrKHM7aPsAfHZSXpNCecPXDBuFjCHxQbEG
-	 BRKsO+iIZrhbIryimizDWK1CKftgX9eNU+kbRO5ZKdhQunH1Y3t01kZNEj9GZBTS5NbkK
-	 9q5XlgXGXVngrAUX975S3ZCFF+qfFKdiL6l7NI0eSshDHEyqVfFv6CFyrU57gu7s5eA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793919590;
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=clOx71cOsA26RUdAeVKpCY0AdtjlbFGk/TTkJ7LEcnk=;
+	b=OgZT+QL9OHO7C/JxeEzDrUP+kroQ2kHRSGY7OK1tkXcnV6rtnaGKEQOliosZfi0XIsHz
+	 X+m5rdTaNlN+RlHcWTijhcu7PC1ljDevE2WbweVvwLvc34ckPb6xyy4cJJuOE0A3iZr8P
+	 Dd+HmKk850fe2DL358vo+TxzW+B76s7Onm21ykc2hPy7aYbrAheq/e5lN7fCQWpGacU6Y
+	 UThNmX0VRCY6gn9oWUS0M3n+p4t4Fky2kWZBe5rOQaxYFV941hZZI31cNTnSTPcLToAgj
+	 hkxUYuqkyyqzWCxsnbUcdQbizfIZwtn2ofWinyrhbreBo0Pv/8pvdfQPYd2DpP9RiOg==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GMwS3fBk;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=meOAyAez;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FBD3606A328;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5320606A31B;
 	Thu,  5 Nov 2026 22:59:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GMwS3fBk
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=meOAyAez
 Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
 ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
 	t=1793919589;
-	b=c9NqO4TLKq8l8MlIVHnPqbEdRZp+Jw29wdoJpCzGZ7UujRxvDLRGrr/pjlKadlkkh3Ce
-	 9tTjYcH9Qo4viqI52ytB/ex1Lx3JmaJ3LOzW9MzvK1PvA1j/kTJP+Ju+lrsPFiXrvfisC
-	 zpvfDxlVPJo3NWDCdaF0+MOwP3ucct3DcVHI/Y1gvUO9qdIzXLthwNR6u0Dg/z/SMrIJb
-	 QYilag3/xl7QiyDT3P6+UkDVFlsDt8rVirwr48nNiFLu2WQSwti2fCNBrEprZ86zBN9Ac
-	 1vfdJH3C69dIAJx7WANfUvE0q4g7L1cgtSThjSV3xBKp2HQOB39pqipCXVjr+ZgO6fA==
+	b=R2S0E9Iq+vIORcZmlBkeeAUqgsrIod7bzg94Ojw3Vrul79CZn37Z4Ri6IRDDQJ4mW+fD
+	 /xsWMPsuuy5XhXZ4/R4xoZYJBKXsoywD9hNiw1j37woUtBFD3x2l3g5SfgFpiE/oiDAcu
+	 qMW8dqyB/ur5OW/jKJNtoNNKsQRdEtgyqqO0empAY7UMpx07MW/32JJlAEDzdRNxq93tr
+	 VFXoYQB3FJZLkPIpJgZwWFDmea4Sya2z1/6ckthN1bhkxnmy6viFDWQw1BjP7ERNeUrYw
+	 rnZe2UsxETOknoMIU9g9jV2ViN10Al6bfayIP5m73ULZuHxsLTL9WUj1n5ofC/NLfeQ==
 ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
 	c=relaxed/relaxed; t=1793919589;
-	h=DKIM-Signature:Received:From:Subject:Date:Message-Id:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
-	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To;
-	bh=WdrkeWA5q5NZPAjfL6pBJnTm0PpgBinSg9ZwIQcwiok=;
-	b=Fd/+r7gNgqW5CdYXwsZ7Ph2X/F0EHLCdXoBBp/vJuiCg1iKBKdWaemsKUoV1NiJeZtju
-	 UeQCq/R/7Lbj+H5aRpgPu5dH2LuVylLzgRQSfgGPDSp/DEydJT0Pt3B/DacVIwJzOagZt
-	 qs+akDh/PhAmQhnEsJeFTJTCqcP6D1+RNPuLvG6+oXmwN9m7dB+hDRqgMM1ivGvYujfYV
-	 xyqq/fyROxtcYb2W+hdPcUFM57HHfchQCqeqPDYkvYdP7inILwPVNh160vEEx1syuKFfp
-	 u09gYwfTSc3geo1SaZrburRsEWnZQCR/rI8onqNT+itGo+I7SUQJjwTT7wqRLHB97hA==
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=clOx71cOsA26RUdAeVKpCY0AdtjlbFGk/TTkJ7LEcnk=;
+	b=CajpFD5xP5UdeIOltXmOUAQI4n4cnoBkETgxCjhYF5EQ7YkFd02OTfBpu5hn9dZ6nJpM
+	 36arLfd10/Cs00mG3YSfq8aYIS4RjQXjcU9DmLmyz+XDl1eeluW7W1YtiESmkgneaZtze
+	 n/Wj9DNcZl6ow5OEzR1rPuUgT3djq64trlx4bRGvpYOUyI9b6pl45GbeFhTPC1mdvuNwh
+	 ES0cdsXkdkmwwnA217PFd/tBNN9IwfrGuYx44mV1IxTyb0CNrHIeVhZZzyhKxbdXW/Wdh
+	 2CiQgFIKIrYroacOpc4wbh5hD+ttkGM3uXH078LlPTirbrxdiu7BKAh7cI6ZjmR/t2g==
 ARC-Authentication-Results: i=1; smtp.kernel.org; 
 	arc=none smtp.remote-ip=100.80.115.77
 Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id 734191F008A2;
+	by smtp.kernel.org (Postfix) with ESMTPS id 7F7C71F008A3;
 	Thu,  5 Nov 2026 22:59:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1793919589;
-	bh=WdrkeWA5q5NZPAjfL6pBJnTm0PpgBinSg9ZwIQcwiok=;
-	h=From:Subject:Date:To:Cc:Reply-To;
-	b=GMwS3fBkn+OeUvvKnPShuxiZ22PTxPS1f8st6c77zZ6JFMfiYLVby47fsqjjEY7Zh
-	 PFT0xp0SqIoloSneDaRID4E0sfIVG5+HIT330tABYzGzLGoKVKSRm6VH4Lipr/vTQr
-	 nLugk0fF16Bw1OIcqaQQeFjqoWOdP9rmai2bYHI3N6/QiD/os/W9Po0sD9xP7qLIet
-	 TcEwrFCkOs+nJitSMMBbApV4fwlUZjeSmJX3O3THj269prBuR39jdwPXlWmksRPRC2
-	 KVvpr42SboHsFPuzSnrYe6fr11yW/0DJ5Xq42p13mtOX30Q7eFXpr4vLn4nE93QX1f
-	 9T+f6FVpXp7/Q==
+	bh=clOx71cOsA26RUdAeVKpCY0AdtjlbFGk/TTkJ7LEcnk=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
+	b=meOAyAezF4UnXUQ8FX/tw7PM1C0pMN5pu/804Yj00OYsGJioM+yrM1YiMhIvOoyW1
+	 TC0RV5RUxDnjLcCv1u0D46aevoVe4W8yrVS5fYW5yMePCo1cRBT26uQDjEzVIjcgw8
+	 i2G54oUHf33CLldExJNNYmuvDFP1SUuArrnCCdULgE/gLxT/6CsnF8OCmFkA2FTBu7
+	 u78r10nG4WBoo57mO7AXohNGfVA1mhoYQv0/OA+6X3FPsYHT2QehE/+p5TOZIs9EFo
+	 cGGmkhj1aKsbD1XRnknXcIOznNz3aMr9pcucWGp3z47KOSIUIM74HKWOk+kmz0XSGp
+	 f5RxRAaqLJrOA==
 Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id C5E3A45AD3;
-	Thu,  5 Nov 2026 22:59:47 +0000 (UTC)
+	by lkml.kernel.org (Postfix) with ESMTP id 0A3D545ADB;
+	Thu,  5 Nov 2026 22:59:48 +0000 (UTC)
 From: Xuheng Li via B4 Relay <devnull+xuheng.cs.columbia.edu@kernel.org>
-Subject: [PATCH v2 0/3] KVM: arm64: Fix the hyp pool size on large
- machines, plus two hardening patches
-Date: Thu, 05 Nov 2026 22:59:47 +0000
-Message-Id: <20261105-hyp-pool-and-map-v2-0-44a6ca90190b@cs.columbia.edu>
+Date: Thu, 05 Nov 2026 22:59:50 +0000
+Subject: [PATCH v2 3/3] KVM: arm64: Don't replace a valid hyp block mapping
+ with a table
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -85,12 +84,9 @@ List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/32NQQqDMBBFryKz7khGiNaueo/iIjHTOqAmJFUq4
- t2beoAu34P//g6Jo3CCW7FD5FWS+DlDdSmgH8z8YhSXGSpV1URK47AFDN6PaGaHkwloNTeWW0P
- UEuRZiPyUz5l8dJkHSW8ft/NhpZ/9E1sJFTa6tla7K6u6ufep7P24TFZMyW6B7jiOLz0pGeS2A
- AAA
-X-Change-ID: 20261105-hyp-pool-and-map-b5e7be9a1191
+Message-Id: <20261105-hyp-pool-and-map-v2-3-44a6ca90190b@cs.columbia.edu>
+References: <20261105-hyp-pool-and-map-v2-0-44a6ca90190b@cs.columbia.edu>
+In-Reply-To: <20261105-hyp-pool-and-map-v2-0-44a6ca90190b@cs.columbia.edu>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
 Cc: Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>, 
  Catalin Marinas <catalin.marinas@arm.com>, 
@@ -99,64 +95,61 @@ Cc: Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>,
  Suzuki K Poulose <suzuki.poulose@arm.com>, 
  Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Xuheng Li <xuheng@cs.columbia.edu>, stable@vger.kernel.org
+ Xuheng Li <xuheng@cs.columbia.edu>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1793919587; l=1934;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1793919587; l=1509;
  i=xuheng@cs.columbia.edu; s=20261028; h=from:subject:message-id;
- bh=CAOlYbJH00SZ0i+KHyNqqm2Di8dpY/YNVVprTboRUdo=;
- b=c1X/nyAlwsURpe72dwNz4wB9yo7f6Xx60mT0l5jS7LojUn/cgTuWMddWKw/TsCvXlYu41zll8
- XqC4R8vzMtCCkFzXTCd4CKrg+/ZfCIGYmt4qkNKIPTZebWkZn+MPamQ
+ bh=UqwLIs4gUAaU1DFo5IEMy2L+DohqOBeFqpV1fxyeXnM=;
+ b=RGzjFUFx7mvUIxn1cSt9bemQ3coav41Jf/AuM4uYqwKDJjEzN3YdwgHqcNpkqvnnDS+kutDeY
+ JJhDKLlWAyND6RJDqKJZlv2eRaJwba8TAQr8lXVDGdwnBf1j3Tf4wMi
 X-Developer-Key: i=xuheng@cs.columbia.edu; a=ed25519;
  pk=L1HVV+goqxYmEMO/OXakL6uf9isSpgk2QrLlFqyZ2Qs=
 X-Endpoint-Received: by B4 Relay for xuheng@cs.columbia.edu/20261028 with
  auth_id=1349
 X-Original-From: Xuheng Li <xuheng@cs.columbia.edu>
 Reply-To: xuheng@cs.columbia.edu
+Content-Transfer-Encoding: 7bit
 
-Three changes for issues we found in pKVM as part of our research
-project.
+From: Xuheng Li <xuheng@cs.columbia.edu>
 
-Patch 1 fixes 32-bit size computations in hyp_early_alloc_contig()
-and hyp_pool_init().  The hyp page-table and host stage-2 regions reach
-4 GiB on machines with about 2 TiB of RAM; the early allocator then
-carves them too small, so the two pools overlap and can hand out the
-same page twice.
+When kvm_pgtable_hyp_map() is asked to map part of a range that a valid
+block mapping already covers, hyp_map_walker_try_leaf() declines, as the
+request cannot be a leaf at the block's level.  hyp_map_walker() then
+allocates a zeroed table and stores it over the valid block entry.  The
+walk descends into the new table and maps the requested pages, but the
+rest of the block is now unmapped, and the valid block was replaced
+without break-before-make.
 
-Patch 2 checks the host stage-2 PGD allocation for NULL before using
-it.  With patch 1 applied that allocation cannot fail, so this only
-turns a mis-sized pool into a clean -ENOMEM instead of a hyp panic.
-
-Patch 3 makes hyp_map_walker() refuse to replace a valid block mapping
-with a table, which would skip break-before-make and unmap the rest of
-the block.  Nothing in mainline maps into an existing hyp block, so this
-is hardening; Android's interface for EL2 modules to map pages can reach
-it.
+No in-tree caller maps into an existing hyp block mapping today, so this
+cannot be triggered in mainline.  Fail such a request with -EEXIST
+instead, so that a future caller gets an error rather than silently
+losing the rest of the block.
 
 Signed-off-by: Xuheng Li <xuheng@cs.columbia.edu>
 ---
-Changes in v2:
-- Patch 1: also fix the same overflow in hyp_early_alloc_contig(), which
-  makes hpool and host_s2_pool overlap (reported by the Sashiko review of
-  v1); describe that in the commit message and add its Fixes: tag.
-- Link to v1: https://lore.kernel.org/r/20261105-hyp-pool-and-map-v1-0-756bb5d8e067@cs.columbia.edu
+ arch/arm64/kvm/hyp/pgtable.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
----
-Xuheng Li (3):
-      KVM: arm64: Compute hyp early-allocation and pool sizes in 64 bits
-      KVM: arm64: Check the host stage-2 PGD allocation for NULL
-      KVM: arm64: Don't replace a valid hyp block mapping with a table
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 9c83837b1..4c731b101 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -434,6 +434,13 @@ static int hyp_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
+ 	if (WARN_ON(ctx->level == KVM_PGTABLE_LAST_LEVEL))
+ 		return -EINVAL;
+ 
++	/*
++	 * Replacing a valid block with a table would need break-before-make,
++	 * and the new table would leave the rest of the block unmapped.
++	 */
++	if (WARN_ON(kvm_pte_valid(ctx->old)))
++		return -EEXIST;
++
+ 	childp = (kvm_pte_t *)mm_ops->zalloc_page(NULL);
+ 	if (!childp)
+ 		return -ENOMEM;
 
- arch/arm64/kvm/hyp/nvhe/early_alloc.c | 2 +-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 3 +++
- arch/arm64/kvm/hyp/nvhe/page_alloc.c  | 6 +++---
- arch/arm64/kvm/hyp/pgtable.c          | 7 +++++++
- 4 files changed, 14 insertions(+), 4 deletions(-)
----
-base-commit: 05441d697f7f9a927264f4058cbbc6a03dfcac9d
-change-id: 20261105-hyp-pool-and-map-b5e7be9a1191
-
-Best regards,
 -- 
-Xuheng Li <xuheng@cs.columbia.edu>
+2.53.0
 
 
