@@ -1,102 +1,73 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.169
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793871928;
-	b=qYDqafUTLwLukGI30WEvH2RsoXNKvG5Zb6GGcFh0JuGYhiEbdWRYAz0Yn4g30BJeLQAJ
-	 fjNg18uH/uU8ZnylFbkomRqI7oO2Yy0ktwCzSuMisSL5FLnAnFAwu7zCEQ284Sphwlb0K
-	 gXBCGcwvt79AmZoJ26jNSUFzPh//sazxYshAm6APXS7R0wOsGPw3mEajV09rW3/ZnpViG
-	 dH8D85+iLWtMTTW3tFVcfvBmwaO2mmoDYyXJaeEXuiTu7vFy3dDJd6dF0CIEX8+90h3hd
-	 m727V6vUTT18u1zM+IdkSLRSXUmxxOW6dPNH+ZKQCXj6BKSevJNMFC+hFu7YJjGTpzw==
+	t=1793876460;
+	b=iI8mJgHg5K2oPVqwf4Sm/w6A2QkpTL6oCFN1bJMFMnIyQDBiUqkNaepQXrS8IUL+H3Yv
+	 DyMNdNjdmlVKCxN8Fr7aXG6f2uWyn1r43JWgbmEft7u1e6DzBU6tUh2XJlZoU9FKVhIC0
+	 rDBqR2T+tpD4buIPrrJnCmRumVHGHAm8GUt4oJG+4ztIakuVzWWW8UJRE5ytubp/k90bl
+	 bCfCB7DAFEn97BDOUMNYal7XgSWkMOgZC0Qh/G4PnPsixGium6zFWuudK/zADd6ozahM0
+	 E/2/2rqt/9IH1iRJkKfBHKZPeNF/QVJZ8xfYt/FpXtDsVmEPuaOzUrmfEWOXIFGsDOQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793871928;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=hI6E0pWdIjYridUcVEtGitpYPVkZ0Czh5YzRDUq6aT8=;
-	b=z7UkdeVPMDnrEGKB3/Knl8uqNO8mnvcje2ZeSmJMfXWNZhKmTvbj+CNAHEd4dpWxi/l7
-	 oxqHZ/TP+879URm1VZK2hoUWO0HjPAnganhOBaSAf5P2/vWFcVaHDmt+7cGouHVWaJux0
-	 md70LmXy3iMzhbpfbB7nPkP+OOh6cUVix+Scjww6EeIRSNR2K/IHQFrSEQ6tqM64W15KL
-	 1fXVRqXh3cMxrZdu0Mxj62ILXYzJ6sMUnpFAiYHT+uyYTeVJmcoQ4In51qUAnql3O6vtK
-	 X21gn9VC9DLHtgQKkU9WrGWfBiwyETnAh0y+MCJJXT2qvC7qwa3cNPwapiRS+DEhRew==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793876460;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=hu/VCXv0pK0QVa21PPH8FfuyU2lKhIQq9BLyUFz++I8=;
+	b=TxpkNnmNC0+cm+/4/jdSDm/mkl5SBXfaDDblXVNGyWhwhf74AYa/LagMRV1/hLzoXSkp
+	 yG6XXF3euNktIKq3BUp70qmqBqyWlXRHBvGST2WnewAsPmdtI7AicfEq7anJzHf4GJrXg
+	 wQcIXKerOXC8MQ/Izi+80LMuNxZeyctnaBkEb2C0qTHWCqhtYdQgrMWLGWkAKZQrQxnGA
+	 F8kMl2cVXSdT5H12Dt7xHTJQlmrMzAAPzj7APSRdjBgxILSdAj3xcDtCR7ua4IbJPUaLv
+	 iNEqA4H1GgB4kSTlPokGVD/1DT37Z/BzLHA3c04xBzvZKBn9CeqAGVpDkJMemycwxYw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=LHOXFIlr;
-	arc=none smtp.remote-ip=209.85.221.41
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=pYFNCO5R;
+	arc=none smtp.remote-ip=91.218.175.169
+Received: from mta0.migadu.com (out-169.mta0.migadu.com [91.218.175.169])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02EEF606A326
-	for <kvmarm@lists.linux.dev>; Thu,  5 Nov 2026 09:45:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 02EEF606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95ABF606A31B
+	for <kvmarm@lists.linux.dev>; Thu,  5 Nov 2026 11:00:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 95ABF606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=LHOXFIlr
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-48fd2e38825so1111108f8f.2
-        for <kvmarm@lists.linux.dev>; Thu, 05 Nov 2026 01:45:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1793871925; x=1794476725; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=hI6E0pWdIjYridUcVEtGitpYPVkZ0Czh5YzRDUq6aT8=;
-        b=LHOXFIlrh30/DqJx/PKINA30gRtrbMjTxhMxjY7GD6vwaruau/jsZWiccQbRUCw27Z
-         jowwuO2fsXgLttUKlRwsTmmifXmqbG1EpOQhJR4zuvLy6nOkkeyT2fynw4aUB5zhM379
-         0MpbyaPqaNGAQI5N5Q6PpnHO+uZyTsm++ee5oc30Twthqs/MlhvJeAY5b78QS1nNoLvj
-         58gpamd3GvLcfSWOuVWfPNgi6QhRkC3al3ZIGPYIFzCQK+T6ggiAFqEQkVEJZi8EaoET
-         lMK17jTnDZFs5jUhIavsWtTAXxWUZROgX9NplSFkIdQyHRZfB8Wd+FqUd6mQSYD2hLch
-         Qp0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793871925; x=1794476725;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=hI6E0pWdIjYridUcVEtGitpYPVkZ0Czh5YzRDUq6aT8=;
-        b=kAqm/8Npg3jyQqO7XI7Fl01hvCMAW/BliBElxwho3JoAYgwoC0+UwfusX4vlwRfNZW
-         +M+UbE4yaXnMpGaaH7qs87yexb5OI5K8f5Y5jg47dYs4Onj5tpQUHnaYDWN50mt8y6fr
-         iZfLikOD87lA8pgZXIuB3FcLd/LNPPZut9UjtOWWNQn+SZU4UxbRXZkSkP6ZsRIU0+5I
-         mfOIggUVokHqiUNf8mBVkVfJXlS4PaZdE9rPVhworRejWKRC2Nz+Kv59iMXHJTpdhK6t
-         aaxkytqohoyz8pq1TM/J4IJjyfruQK8VqsCC9er2/belbpATS1/f8SSquKDbEVdXsqby
-         Kpow==
-X-Forwarded-Encrypted: i=1; AKwUvBw322p5XnB5kGgZiwkiMLsN4XBBQ0+a72QtPURZ8oob+1qn5u687QPxlxTondgoVvBUyxkZIAM=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9rd2lGThL7wUwUm7P74d5WBVEOo5y7MX0dlnmaqr796SAOW3k+
-	aXUhMflzscNXYvOdSEXS9W0KktoU8AosV1ih0Y2FfFlcrBcDxigH8P59eCNh2l1ydw==
-X-Gm-Gg: AYBFou2i6+mBiaRTNCkHFrDuZPCZuUtG4aJgzmok2HVr3AxTIQ2fON2zJU+yPneE3Bu
-	2UzLiLdEi8N+KI++BLH8KAGo68daOeHueK/x2z0geerDtFemjh4LzqE1gvrb+wzQXH77RuWma6F
-	7w7YUpRnXltRVZKiCuhZSgiEBruO9LGPBrAvd07+PpbQnwU9YgToFpri3BW/4dk68497At1t+6U
-	K6bcjsxe5Fw73qr96I35fFuctPvepQM9i3OR3oE9t2GDompbKx0WWa+dpX2FUz3yhDJVo6TOEWk
-	oADB30Dm3zz4ZgHGg4rzxRvApjZDgrFLyA+lRSrZt78iSoon18XpnT96hSfJhi/fZiwpKidfhAQ
-	ZWta5mD+hZh7zx/NaWI+VQokObbnHEpSpMAJK2ft1vnt90SB9Ks0CLPsdGUbkdbuT+OGcbaDpd1
-	U5s4h/saD+YxcCR/F6A8gc16s4Wj+37KM0UUD181f5JOVofsFhQRhwPyOpIQW16Zll7J4nQK9p9
-	DcITLuT/QFpu03WXBOPbfP3M9rcmYtPRiwfyeN9GuKyaUXIQruBKHQ8sftJMx0Q2SXGr2gyNUnL
-	bLbPiZbvX7b57+Y2IaH7iAUfDwmNbC2xFVTLcQGJw2u4om4uSbOVPoIK/DMIx15l
-X-Received: by 2002:a05:6000:1842:b0:48e:3cec:b852 with SMTP id ffacd0b85a97d-48e6e500962mr42464044f8f.40.1793871924816;
-        Thu, 05 Nov 2026 01:45:24 -0800 (PST)
-Received: from google.com (0.182.34.34.bc.googleusercontent.com. [34.34.182.0])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48fece998absm9721233f8f.22.2026.11.05.01.45.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Nov 2026 01:45:24 -0800 (PST)
-Date: Thu, 5 Nov 2026 09:45:20 +0000
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=pYFNCO5R
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=oNPULxolfeqGA8zrrmcWP4Y839okpyulp0cDosAwCuY=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793876456; v=1; x=1794481256;
+ b=pYFNCO5ReUUb9bCeJh5k8Bha0VGFUNkzsI6W94p8DZtvb3jItrNzFYdis6QmrRZeXTPxBVVA
+ rv5NwalCekzo2akHMoO+hdQMpOMI6rA72isnBFz6bY8Wg0eTBLFOqdE4Bbypt4xiEedTIMt7j2J
+ 4RabLKy843sMm9ww4zCMmWGc=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id a394ecf1d1f2d65a;
+	Thu, 05 Nov 2026 11:00:56 +0000
+X-Mizu-Trace-ID: a394ecf1d1f2d65a
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Oliver Upton <oupton@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v2 2/2] KVM: arm64: Resume a pKVM stage-2 teardown at the
- next mapping
-Message-ID: <auxQMCboC9bhfW7h@google.com>
-References: <20261104124451.2148724-1-fuad.tabba@linux.dev>
- <20261104124451.2148724-3-fuad.tabba@linux.dev>
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Yuchao Zhang <ndaugoing@gmail.com>,
+	Fuad Tabba <tabba@google.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/3] KVM: arm64: vgic: Drop stale LPI pending state
+Date: Thu,  5 Nov 2026 11:00:47 +0000
+Message-ID: <20261105110050.1244525-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -106,71 +77,65 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261104124451.2148724-3-fuad.tabba@linux.dev>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 04, 2026 at 12:44:51PM +0000, Fuad Tabba wrote:
-> pKVM keeps a VM's stage-2 mappings in an interval tree, and
-> pkvm_pgtable_stage2_destroy_range() releases the ones in its range.
-> stage2_destroy_range() still calls it for every block-sized chunk of the
-> IPA space. As pKVM gives every VM the host's IPA limit, a teardown with
-> LPA2 makes 2^27 calls with 16K pages (2^22 with 4K), however little the
-> VM maps.
-> 
-> Return the address of the next mapping instead, or U64_MAX when none is
-> left, so that the teardown skips the space between mappings. No mapping
-> crosses a chunk boundary, as pKVM maps at most PMD_SIZE, so the next one
-> starts at or above the end of the range. A VM without a handle doesn't
-> have anything mapped, so return U64_MAX for it straight away.
-> 
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->  arch/arm64/kvm/pkvm.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> index f21c3326dda68..77315c83c61b3 100644
-> --- a/arch/arm64/kvm/pkvm.c
-> +++ b/arch/arm64/kvm/pkvm.c
-> @@ -504,9 +504,10 @@ u64 pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
->  {
->  	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
->  	pkvm_handle_t handle = kvm->arch.pkvm.handle;
-> +	struct pkvm_mapping *mapping;
->  
->  	if (!handle)
-> -		return addr + size;
-> +		return U64_MAX;
->  
->  	if (pkvm_hyp_vm_is_created(kvm) && !kvm->arch.pkvm.is_dying) {
->  		WARN_ON(kvm_call_hyp_nvhe(__pkvm_start_teardown_vm, handle));
-> @@ -518,7 +519,10 @@ u64 pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
->  	else
->  		__pkvm_pgtable_stage2_unshare(pgt, addr, addr + size);
->  
-> -	return addr + size;
-> +	/* Mappings left by a failed release are still in the tree, so look past the range. */
+Hi folks,
 
-Hum, not sure I understand that comment. Which release are we talking about? The
-_reclaim or _unshare? If yes, we don't propagate the error and WARN if any of
-them fails. So we don't expect any failure here and I'd say there's nothing
-special to do?
+The GIC just keeps on giving. Three follow-ups to my LPI fixes for
+redistributors with LPIs disabled [1], to fix pre-existing bugs Sashiko
+found.
 
-Additionally, in any case, iter_first(addr + size) seems like the right thing to
-do and is self-explanatory.
+The first drops the pending state of every LPI targeting a
+redistributor when the guest disables its LPIs, not just of those on
+the AP list, so a re-enable with GICR_PENDBASER.PTZ set doesn't bring
+any of them back. Linux never sets PTZ.
 
-> +	mapping = pkvm_mapping_iter_first(&pgt->pkvm_mappings, addr + size, U64_MAX);
-> +
-> +	return mapping ? gfn_to_gpa(mapping->gfn) : U64_MAX;
->  }
->  
->  void pkvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt)
-> -- 
-> 2.47.3
-> 
+The second stops the pending-table save from writing to the table of a
+redistributor while its LPIs are disabled.
 
-Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+The third stops KVM reading the pending table when mapping an LPI, so
+that mapping a discarded LPI's INTID again doesn't make it pending a
+second time. A Linux guest can hit that after its VMM pauses and
+resumes it. It also drops the copy that patch 2 of [1] takes, which is
+why it comes after the second. An LPI mapped after its redistributor
+enabled LPIs no longer takes a bit the guest wrote into the table
+before the enable. Keeping that needs a per-redistributor record of
+the pending state of unmapped INTIDs. I can add it on top if you think
+it's worth it.
 
+A pending LPI that MOVI moves onto a redistributor with LPIs disabled,
+or that a device signals there through a translation cached before the
+move, can still be taken once after a PTZ-set enable. The architecture
+lets KVM drop it, but that's pending state moved or raised onto a
+redistributor with LPIs disabled, not state the guest gave up. I've
+left it alone, but can fix it on top if you think it's worth it.
+
+Reproducers for all three fail on kvmarm/fixes and pass with the
+series. I'll fold them into vgic_lpi_stress separately.
+
+Based on kvmarm/fixes (181a701fc14d3), which has [1].
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20261026092802.2636798-1-fuad.tabba@linux.dev/
+
+Fuad Tabba (3):
+  KVM: arm64: vgic: Drop the pending state of all LPIs when disabling
+    LPIs
+  KVM: arm64: vgic-v3: Don't save pending tables with LPIs disabled
+  KVM: arm64: vgic-its: Don't read the pending table when mapping an LPI
+
+ .../virt/kvm/devices/arm-vgic-v3.rst          |  1 +
+ arch/arm64/kvm/vgic/vgic-its.c                | 33 ++++++++----
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c            | 13 ++---
+ arch/arm64/kvm/vgic/vgic-v3.c                 | 50 ++-----------------
+ arch/arm64/kvm/vgic/vgic.c                    | 16 +++++-
+ arch/arm64/kvm/vgic/vgic.h                    |  1 -
+ 6 files changed, 49 insertions(+), 65 deletions(-)
+
+
+base-commit: 181a701fc14d3d468c603b5ecfb9f12115c5fb72
 -- 
-Vincent
+2.47.3
+
