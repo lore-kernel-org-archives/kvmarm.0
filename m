@@ -1,114 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.52.25
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793919922;
-	b=pxVwm64aiKq/7p5dcrDcQTc9FfNJHkVAF7ebIHxoSnIn4MN8vfTqT78MwHD1xokf3DeG
-	 2hV9c2KXXM37lGsxfO6M0CTkgU02Qa6fXrns1XnIjHS2fzXiX8J0+oEuB29tULgB2rVm4
-	 bn76U2ubJeYuD0Al9Rg6rkCY7SJizeio03BP6eSEdkUn43eUWHdYHmVQRwwaHD4RQLcXO
-	 Xz5WUIGAnz8CRX0dKe0pUUAe1xVuAMeCxvcSKks01GUXcTHwfzecLRL9KRwPfbq4HzTKX
-	 2z8HqJf3N0bOM9sOKAqCOGUaufT9wAnCZCJR9d2zpA1x2QnVuPVkxeWDQOf5FGA6ZUg==
+	t=1793921697;
+	b=NloNE0gmKhsH8QQvfzn/9itEBkPzRHqsJosp0oac7fZfabEBf2+D3RIzvTbY3BauJMkV
+	 Ymw5/G7hUi26PcaiZSMWetsYrPCxVf5HaFPrzHqVQ3czb6TbQix82P/UxmvB3iBSHKEb4
+	 vrqd+pWZIH8pWLdty5f5r44P20d4RLs6Nehfknyr7eD1pfCcgrb+AT6w7WwXBIV/ierk2
+	 H8ZZ2IQY+EsyiD+FrZxxhdmm6wRzgV07kuBE1ihSv4Z40Pj6+BLwD3Vw25JvytnzH1gsd
+	 gk31gSNQthfwO9tW82tKo3cikFCDLNI0ES26zA1d4a0YSj7Qz5vJo23LAcRjVMYmeQA==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793919922;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:
-	 X-MS-Exchange-Authentication-Results:Received-SPF:Received:Received:
-	 Received:Received:Date:From:To:CC:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
-	 X-NV-OnPremToCloud:X-EOPAttributedMessage:X-MS-PublicTrafficType:
-	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
-	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
-	 X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-Id:
-	 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=7fxv+Mgc4jzx/ARU/ADxbdsbHp6BAtARa07JZS/UXRc=;
-	b=cuRF1XL3hZO9m+OVHJBxJ4ICilpbcmEdZYZyVs01EnxLXwqy75+7Yft3C52UccxVvIwH
-	 Hwy88APLcWSo+5pBDe5IjiUJEU97lgAYDA6L8QKs/XFtMFHIj9niXwE8cq3udkJNA9JGK
-	 soHrnCG77/wWp9ceuBSqcS7/czPZt9N7MWXePUHb/prezh8NGkgy1kztfRDZOXER0y92O
-	 VErmx4MxPkUVDokj8RFIb1FTSZI+TrZyKffXf6dg4sEdF7Qn/d2KmuvdxIg2ot2wBTnVP
-	 IsRzUQlfDVtD4pojMKB+gR07zi/GHhrAerhY/q5GJYps+CdihySfcSa64uUWuL1F2qQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793921697;
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=uW24Oo6SzxhmQfdFBJWhZnZ3z5QiPA441Ft/BalVdAE=;
+	b=mUnDyGAa9J1T99oU9dZd+EN1re7Xgj5MvL64g2YyOa+mxwzCQ+EZfAwAvrwv1nCU7GEl
+	 xqlZVLNBUiiGC1EMaPFzCugEv2H3/aWFbVOfXzpCFwWw91p7JHiiKPj6TWHYYM544Ms16
+	 Dk5kw9mzY2njYDgVW43RwlUzKmgX3PHkEP2kTqinPpGmmHEjbfuH/+6bAGsNSuUzld4dP
+	 xnRESugRAydWzZl38cAX8GcyfqIqyFVgIuBhgbDCdn+EAZCPtOUc2WNLwYL4RFyj6gWD8
+	 p2vkYyVQkPJM4y9wuIKlT8Su9G+SEGOKsG4c8/1n4rP/N2iVf2XuaLglJ/bg1/J5m+Q==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=nvidia.com;
-	spf=fail smtp.mailfrom=nvidia.com;
-	dkim=pass header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=k8rEVzNX;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.52.25
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011025.outbound.protection.outlook.com [52.101.52.25])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UzgDizeQ;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235E0606D801;
-	Thu,  5 Nov 2026 23:05:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 235E0606D801
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97492606A31B;
+	Thu,  5 Nov 2026 23:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=k8rEVzNX
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=IjKxUpK8/Mj9fIczcbipIPoVdJzCRXdOHR5XUdSMEpXxSFeXu1uMFphE/5dlBY8MmWuhKK+APbZSzQ5tJTy4DM+88bt2v7zWJa682mXXRSv4m8KW0OnCfs9hJ9UKSbIt/Uh7KUNdKulb/0wGJAaXZ2ysW19XJF3qZeNCfqSxeIbxpdXd0F7R7hS1GUAZipxFw4WEKDLadAXwbKJgWyMFmcuGquCog3tXcVxy6x3Vnke+C2Z8HZt7CK+uA8ofu/vA0oBQ/ql4lFBcH6Qg4L5F6uwaG3L02kyR6gxJcE+/ifpbap4OVYRDl39+Bm/yx0K2EE1t321MsVVYtMZ1PunHfA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7fxv+Mgc4jzx/ARU/ADxbdsbHp6BAtARa07JZS/UXRc=;
- b=CfEaUbICV0NszAGkS5PxqDt4JvcNCFlqWVZsPzUmIDieCKbB+8OmkfHn5Cph6qbTNdjHTDfYhsFl2WpgjyTE0KcGLIZ4wGjSBL47Ym4a3yFOLjQueHO4KZEY11LLpJWtqiZbbpJT9eEsxmF/f+Vzkxa0u7fupSG1dI0vSHIs5hNVDZgrWS78e5vMoyhjStbRXHKBs9/TvfSqXLZxJ5dRZbnNHz+8brptjYi6mdppMO2eKZ3b13H3Iyol3xZ/ihAyo1Vfi0e1cpH5Jmm/+cSuvBcRip8ADq+XhyUTmSySAhGyWTUl5w4MmCnZYN9/CftwalHyqBnghTY7j9CIZCkCVQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7fxv+Mgc4jzx/ARU/ADxbdsbHp6BAtARa07JZS/UXRc=;
- b=k8rEVzNXtnitzzpEXJttbzPIvJ2/gtHB5U4r/vTpWQJK9zQDDJ9hFDDN87jgqbDGFhfBPwEHUbgEtsw3dREVZ0/i1b3RB/TDjre86yGdU9fo00+lqXU4ZNsztbA8CT2vp5ATIbnuxDqf6NzIXcLojoGOfzJvKI1jQgQq5BJYFjRYysg8ZjPjT5EgmnI9vU3xb8nn6bP5DpLMeQxS1lpS877z+KuGHfOd7dSxbxE6ukmkOVzJHm119XXt1RK8BkLr5x0uJaXzVGDww0JB823bz8jUB5kHDHxe11u0gnCM/0Tjogd6Lev5H4vf4GFA1TxIGyL1e1hgp/z3DV8i77SUyw==
-Received: from PH8PR07CA0037.namprd07.prod.outlook.com (2603:10b6:510:2cf::17)
- by LV2PR12MB999096.namprd12.prod.outlook.com (2603:10b6:408:353::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.569.12; Thu, 5 Nov
- 2026 23:05:17 +0000
-Received: from PH5PEPF0000002B.namprd04.prod.outlook.com
- (2603:10b6:510:2cf:cafe::17) by PH8PR07CA0037.outlook.office365.com
- (2603:10b6:510:2cf::17) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.592.10 via Frontend Transport; Thu, 5
- Nov 2026 23:05:16 +0000
-X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
- is 216.228.117.161) smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- PH5PEPF0000002B.mail.protection.outlook.com (10.167.243.5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.615.4 via Frontend Transport; Thu, 5 Nov 2026 23:05:16 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56; Thu, 5 Nov
- 2026 15:05:00 -0800
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56; Thu, 5 Nov
- 2026 15:04:59 -0800
-Received: from nvidia.com (10.127.8.13) by mail.nvidia.com (10.129.68.8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56 via Frontend
- Transport; Thu, 5 Nov 2026 15:04:55 -0800
-Date: Thu, 5 Nov 2026 15:04:52 -0800
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: Mostafa Saleh <smostafa@google.com>
-CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>, <iommu@lists.linux.dev>, <catalin.marinas@arm.com>,
-	<will@kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
-	<joro@8bytes.org>, <jgg@ziepe.ca>, <mark.rutland@arm.com>,
-	<qperret@google.com>, <tabba@google.com>, <vdonnefort@google.com>
-Subject: Re: [PATCH v9 13/25] iommu/arm-smmu-v3-kvm: Add MMIO emulation
-Message-ID: <au0LlPl2xwJvtfCu@nvidia.com>
-References: <20261015200903.2735565-1-smostafa@google.com>
- <20261015200903.2735565-14-smostafa@google.com>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UzgDizeQ
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1793921696;
+	b=Jc3VnRNug1FfZnUV1rT6TvzHuqCy59Ln8BraD9M8FOa6XXDBBQaP4h6iKnL/hGGrdQ5K
+	 SwgdbkDoqElTxBXj+vBA26hnrgnx0wMOrCOeT0SDrIrJWswc8eOAcWTISNlUEAG0p8Uv0
+	 ezORHvJNIpyBQhO2o1yejhnJmFQRwxY1POvdP7oHyGbGjENnB25DPvWnzOgeFuJ+JmhQ6
+	 gaKaB63Hux840YDqFN10pd2nbf0GkJNAbfiXhYhb6QrPYW5dsHwkodWKchhaj1hiCrhpI
+	 Z2QtM6F42nnU5T42DKztidvKysc+/DmOXvW+sphgRNLVUArPG8sisUy/WuCJhxqoOYg==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1793921696;
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=uW24Oo6SzxhmQfdFBJWhZnZ3z5QiPA441Ft/BalVdAE=;
+	b=icxuiiw4wxZUWJt+pwgOATnxZzwptozXPpwEwoMt43cmqld+iTDLjkeh2zNCNdOWZpYe
+	 Q+iLb2JvvmLlQXtPgKFdjm38+IpqSx/2iQAhOdsBQwl+a9fgICp4YqkIB3/hbgKiPbrOk
+	 K2SziBTYxIPb5dSRR2g9Vpqf0k0KMEu4LiktoWbz+aS7SypKNFUk+g3FsZ0QM1ZftGJ74
+	 SHzD8PUxYOiSQc+BEtLu1teJRtbWkFSit/HeEdA0SxM9FilwE8khiurp7kFd0N9cwzbTk
+	 S52RzLGoMeTPnvj6OXgOz6FJGpgKHcGJq3YEBPX6ZaTveZUgiU0KcFWb7Y1Z5NdCgwQ==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.kernel.org (Postfix) with ESMTPS id 789611F0089F;
+	Thu,  5 Nov 2026 23:34:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793921696;
+	bh=uW24Oo6SzxhmQfdFBJWhZnZ3z5QiPA441Ft/BalVdAE=;
+	h=From:Date:Subject:To:Cc:Reply-To;
+	b=UzgDizeQYbDUaC3v4t2iVebuTaQGdRjO/KFU4nH/F7naRQgpDUhML41q/rFt6s4bc
+	 +S3lvegkxz6sCDTIG7Ptks+ge3+Rqid0Y648Vbay2baW7jZJM3iuffQ1iyX2ozWhRR
+	 5wkn1qp/GY0oEdXclb116u+X8bvGfGLkPaUgwhEGZwbXaR3D14nwrAfcuqy7W5yrUg
+	 5G9odG9u6SFkiCxJ+5A0syXeWrQjJ6SYULLgAQaNo2pTvVHzFAZtt842myaHyJYZfh
+	 bB+g4iEpIt+m0+TqwOxHkep2p0kPVAU5W4OaV2yGkRwleCWoV8c9sftzbAztbCUAAb
+	 2bu8V+TwXHe3w==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id CDEF645AEA;
+	Thu,  5 Nov 2026 23:34:54 +0000 (UTC)
+From: Xuheng Li via B4 Relay <devnull+xuheng.cs.columbia.edu@kernel.org>
+Date: Thu, 05 Nov 2026 23:34:55 +0000
+Subject: [PATCH RFC] KVM: arm64: Document that overlapping MEM_SHARE and
+ MEM_UNSHARE are unordered
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -118,95 +83,110 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20261015200903.2735565-14-smostafa@google.com>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH5PEPF0000002B:EE_|LV2PR12MB999096:EE_
-X-MS-Office365-Filtering-Correlation-Id: 578f56c2-5365-403d-cac9-08df3b9141bb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700016|23010399003|376014|7416014|1800799024|22082099003|10067099003|18002099003|4143699003|11063799006|56012099006|261009223027099003|261021135927099003;
-X-Microsoft-Antispam-Message-Info:
-	J3BJQwZXmp3qLORK6ij2/p4udviYzYAFoaCnW0vlNys0Apwa//s1XqDXHyOZdTDb1L+I675T1La1FRwz8B2+pYoo6SsevFRNleKlFFQCGVjmLIXqbHNevQ7SjbLo5uOn7YDjdT7CdsOlpAJ98zUGzqPBSpvbAo9j34GIO0UDZanmN4HSxLfn2/gC0kgMoe8Ewk0TaURqgE/cA/5jwm73TZlZPcFgzMSL9j7/53A60tEQ3nEH419lKmOt4aqeGFKv3mO5U0Ql7RvjNOZrufg7TCQ1Ne6lXIofzCruUj5kLPeY2Sq81talY/119J/YDQJ60/gJhvyVec4ZFlOptAlmo5EFxSM2Ig/TSqJ7UmJegSjxG48deMO/m69j4AK8otz5g/yjCOUVKvILFL5UoJn0BSzhPukfK6JgwUTqFBq28eYVmaW6MBEdfwnV8kmMbGVWOS4TZOfVuNzG+INFRqVRXsAbr3vEQ+xC8C7ELTVm1jvypKL4dwoGMBI0C37jAWHgxUfpcHgqseTpFWFZUcbLa/exxlseJf3KgkxbtBu1CSiK89HUUjmKdKMNJwXvjJjCs0sGqRbMG1VDc4teSAHvFqjNvUlpRNqu1TW/Jo/u+aJDpep0wy6r/Nrx2KZmaOukPdDt4Epg2EngEo8q56FRvKtEta+z7wRcYday17jB/QuwA7s58KxfZuiS4UOm24qyeROhdQxyZeHSL9rTUaSNtg==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(23010399003)(376014)(7416014)(1800799024)(22082099003)(10067099003)(18002099003)(4143699003)(11063799006)(56012099006)(261009223027099003)(261021135927099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	2mJn4icKzoiLt2T4GtEcX0V8ojcj8D2xg8OOYkV6kEVxNk7mk5n1vCChONov3rjYKQ9p6+ZskSwDdX2Z7ddeakJaFQRvDZxuuqhsp80PY1XaIEXN+DOTaPL2c7bl08dva2A0ouavso+Xqy22icQq+oPrheli2lqaej19wEjyUUv8uYLyut29hhHTFTYZHjaOKt4THDLJOsmBnlxE/3QDzbveaEeC5eYGRbuivywQyHasHpxlj0FlCiJMK+qH+Wf8VizmC5aR2sHYuFpmqm/B8gjTqkwbEtucgETuzJCOHYWASDY/pHfnp99San0CrjeMYzpE9ufQo+o6xrOfTsA1y+yai2ofpE6xc5VsPCWwL8hjHIHEZVQn3xewWQFKEdA2ZmZGVWWWRkZIVSBG3f+GVmxp14RAJZhv6C4/CcstpbbfP3ufdTOHotzw4ZxKbckD
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2026 23:05:16.8059
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 578f56c2-5365-403d-cac9-08df3b9141bb
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	PH5PEPF0000002B.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB999096
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <20261105-mem-share-unshare-v1-1-e4c7d12d5d1d@cs.columbia.edu>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzNDQwNT3dzUXN3ijMSiVN3SPAhtYWSSbGSWbJScYpCkBNRXUJSallkBNjN
+ aKcjNWSm2thYALP9kbWgAAAA=
+X-Change-ID: 20261105-mem-share-unshare-824c26c2cd0b
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>, 
+ Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+ linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Xuheng Li <xuheng@cs.columbia.edu>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1793921694; l=3950;
+ i=xuheng@cs.columbia.edu; s=20261028; h=from:subject:message-id;
+ bh=OzLNUOC4vto8JqdWrzx35j81FrnSzjGjA2GXE09YggQ=;
+ b=HUDjW/ZmysBcCBXniSKFPhnOhTavoITcJ1jjduOTg6SJw1V4bsVs6djzi+v4ELA5KYPjC9do7
+ QBWylx+J0kMAZ4tYY1lgRngualFHsjiqY6MtYKLtE3nDpZwes4PjOHQ
+X-Developer-Key: i=xuheng@cs.columbia.edu; a=ed25519;
+ pk=L1HVV+goqxYmEMO/OXakL6uf9isSpgk2QrLlFqyZ2Qs=
+X-Endpoint-Received: by B4 Relay for xuheng@cs.columbia.edu/20261028 with
+ auth_id=1349
+X-Original-From: Xuheng Li <xuheng@cs.columbia.edu>
+Reply-To: xuheng@cs.columbia.edu
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 15, 2026 at 08:08:44PM +0000, Mostafa Saleh wrote:
-> +static bool smmu_dabt_device(struct hyp_arm_smmu_v3_device *smmu,
-> +			     struct user_pt_regs *regs,
-> +			     u64 esr, u32 off)
-> +{
-> +	bool is_write = esr & ESR_ELx_WNR;
-> +	unsigned int len = BIT((esr & ESR_ELx_SAS) >> ESR_ELx_SAS_SHIFT);
-> +	int rd = (esr & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
-> +	const u64 read_write = -1ULL;
-> +	const u64 no_access = 0;
-> +	u64 mask = no_access;
-> +	const u64 read_only = is_write ? no_access : read_write;
-> +	bool is_xzr = (rd == 31);
-> +	u64 val = is_xzr ? 0 : regs->regs[rd];
-> +
-> +	switch (off) {
-> +	case ARM_SMMU_IDR0:
-> +		if (len != sizeof(u32))
-> +			break;
+From: Xuheng Li <xuheng@cs.columbia.edu>
 
-Maybe add a small helper to list all 64-bit registers:
+The pKVM guest interface does not say what happens when a protected
+guest issues MEM_SHARE and MEM_UNSHARE for the same page concurrently,
+for example on two vCPUs.  The two calls are not ordered: a MEM_SHARE
+that has not returned yet may take effect after a MEM_UNSHARE of the
+same page has returned, and leave the page shared although the vCPU
+that unshared it saw SUCCESS.
 
-static unsigned int smmu_reg_width(u32 off)
-{
-        switch (off) {
-        case ARM_SMMU_CMDQ_BASE:
-        case ARM_SMMU_STRTAB_BASE:
-        case ARM_SMMU_EVTQ_BASE:
-        case ARM_SMMU_PRIQ_BASE:
-        case ARM_SMMU_EVTQ_IRQ_CFG0:
-        case ARM_SMMU_PRIQ_IRQ_CFG0:
-        case ARM_SMMU_GERROR_IRQ_CFG0:
-                return sizeof(u64);
-        default:
-                return sizeof(u32);
-        }
-}
+  vCPU A                         vCPU B
+  ------                         ------
+  MEM_SHARE(P) issued ...
+                                 MEM_SHARE(P)    -> SUCCESS
+                                 MEM_UNSHARE(P)  -> SUCCESS
+                                 write private data to P
+  ... MEM_SHARE(P) takes effect  -> SUCCESS: P is shared again
 
-Then it'd be tighter by testing the width once, prior to switch (off)?
+How long a share can stay pending is up to the host.  When the page is
+not yet mapped in the guest's stage-2, pkvm_memshare_call() turns the
+call into a data abort for the host (__pkvm_memshare_page_req()),
+rewinds the guest's PC and exits; the share is performed from scratch
+only when the host runs the vCPU again, with no record of the suspended
+call and no lock held across it.  So the host can make vCPU A's share
+complete after vCPU B's unshare, and read what B wrote to P.
 
-> +	/* Allowed RO 32 bit registers. */
-> +	case ARM_SMMU_IIDR:
-> +	case ARM_SMMU_IDR5:
-> +	case ARM_SMMU_IDR3:
-> +	case ARM_SMMU_IDR1:
-> +	case ARM_SMMU_IRQ_CTRLACK:
-> +	case ARM_SMMU_GERROR:
-> +		if (len != sizeof(u32))
-> +			break;
-> +		mask = read_only;
-> +		break;
-> +	}
-> +
-> +	if (WARN_ON(!mask))
-> +		goto out_ret;
+Document that such calls are unordered, so that a guest knows it must
+wait for all its shares of a region to return before treating the
+region as private.
 
-Your cover letter mentions "WARNs are fatal in the hypervisor".
+Signed-off-by: Xuheng Li <xuheng@cs.columbia.edu>
+---
+We noticed this while studying pKVM's guest memory-sharing interface as
+part of our research project, and are not sure whether documenting it is
+the right answer.
 
-Is this WARN_ON fatal?
+A guest racing MEM_SHARE and MEM_UNSHARE of the same page on two vCPUs
+is arguably asking for trouble, and Linux guests don't do it today.  But
+nothing in the interface tells a guest when a page is private again,
+and because a share of an unmapped page is suspended until the host
+runs the vCPU again, the host controls how long the window stays open.
+The alternative to this documentation change would be to record a
+suspended MEM_SHARE (for example in the hyp vCPU) so that a later
+MEM_UNSHARE of the same page cancels it, or to fail the unshare while a
+share of that page is pending.  We'd be happy to work on either if you
+prefer a code change.
+---
+ Documentation/virt/kvm/arm/hypercalls.rst | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Nicolin
+diff --git a/Documentation/virt/kvm/arm/hypercalls.rst b/Documentation/virt/kvm/arm/hypercalls.rst
+index 7400a89aa..ad7082da1 100644
+--- a/Documentation/virt/kvm/arm/hypercalls.rst
++++ b/Documentation/virt/kvm/arm/hypercalls.rst
+@@ -99,6 +99,16 @@ Revoke access permission from the KVM host to a memory region previously shared
+ with ``ARM_SMCCC_KVM_FUNC_MEM_SHARE``. The size of the region is equal to the
+ memory protection granule advertised by ``ARM_SMCCC_KVM_FUNC_HYP_MEMINFO``.
+ 
++Calls to ``ARM_SMCCC_KVM_FUNC_MEM_SHARE`` and ``ARM_SMCCC_KVM_FUNC_MEM_UNSHARE``
++for the same region that overlap in time, for example on different vCPUs, are
++not ordered with respect to each other: a share that has not yet returned may
++take effect after an unshare of the region has returned, leaving the region
++shared. A share of a region that is not yet mapped is restarted after the host
++has mapped it, so such a share can remain pending for as long as the host
++delays the vCPU. A guest must therefore not treat a region as private again
++until every ``ARM_SMCCC_KVM_FUNC_MEM_SHARE`` it issued for the region has
++returned.
++
+ +---------------------+-------------------------------------------------------------+
+ | Presence:           | Optional; pKVM protected guests only.                       |
+ +---------------------+-------------------------------------------------------------+
+
+---
+base-commit: 05441d697f7f9a927264f4058cbbc6a03dfcac9d
+change-id: 20261105-mem-share-unshare-824c26c2cd0b
+
+Best regards,
+-- 
+Xuheng Li <xuheng@cs.columbia.edu>
+
+
