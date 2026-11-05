@@ -1,79 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793921697;
-	b=NloNE0gmKhsH8QQvfzn/9itEBkPzRHqsJosp0oac7fZfabEBf2+D3RIzvTbY3BauJMkV
-	 Ymw5/G7hUi26PcaiZSMWetsYrPCxVf5HaFPrzHqVQ3czb6TbQix82P/UxmvB3iBSHKEb4
-	 vrqd+pWZIH8pWLdty5f5r44P20d4RLs6Nehfknyr7eD1pfCcgrb+AT6w7WwXBIV/ierk2
-	 H8ZZ2IQY+EsyiD+FrZxxhdmm6wRzgV07kuBE1ihSv4Z40Pj6+BLwD3Vw25JvytnzH1gsd
-	 gk31gSNQthfwO9tW82tKo3cikFCDLNI0ES26zA1d4a0YSj7Qz5vJo23LAcRjVMYmeQA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793921697;
-	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=uW24Oo6SzxhmQfdFBJWhZnZ3z5QiPA441Ft/BalVdAE=;
-	b=mUnDyGAa9J1T99oU9dZd+EN1re7Xgj5MvL64g2YyOa+mxwzCQ+EZfAwAvrwv1nCU7GEl
-	 xqlZVLNBUiiGC1EMaPFzCugEv2H3/aWFbVOfXzpCFwWw91p7JHiiKPj6TWHYYM544Ms16
-	 Dk5kw9mzY2njYDgVW43RwlUzKmgX3PHkEP2kTqinPpGmmHEjbfuH/+6bAGsNSuUzld4dP
-	 xnRESugRAydWzZl38cAX8GcyfqIqyFVgIuBhgbDCdn+EAZCPtOUc2WNLwYL4RFyj6gWD8
-	 p2vkYyVQkPJM4y9wuIKlT8Su9G+SEGOKsG4c8/1n4rP/N2iVf2XuaLglJ/bg1/J5m+Q==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UzgDizeQ;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793922095;
+	b=V17OqKCUw3YsYCGGYTgB8p9sgju0+FFA6D38pm03LMCkhCaZMN2GbqjFFXF6XgEYAMvS
+	 N7hQhfYrM2mgUCreGWsWx0fUVVsEllZiuY0RKsmfA+P2pnW993A4tluLfPhKETywtU9Qq
+	 Ut/wSwswKEV/+YsOW9TCCnnHB6Vf615ZjUMCR9PPEqXBTVj0uhXM33tKyVBvM7lcDeCE0
+	 Sid5xqNPoX3HMf0lA40ulPb+X/nIC5bMvXxOrnl1JBVahy9cykYR4GRro9Bp8nqwOoctY
+	 3txup25mg/3g7IFfDsumql601FX8cMjY4nlT6M9YN+jd7KOYqfeBuCEvbSXosIwJmcw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793922095;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=WYbhLKxHN01P51zEe2mBVQqMbcchWHUsW1p+VEoLFJo=;
+	b=H6ncw8KljJBx8E1igTgcUBgkarycL+nGyX1LFejpgX03J9dSG1Dy1F8ZXWP7Bc7U4KCY
+	 HOqakTKNMDXtVLJ+WarX2/cLAEBKvnqfQDkJ05ZIYmix2GpA7biIOB8a7Pef0OiNysW3f
+	 MOtmK6KOtImzKjdpl7fyjAYAXlG//6LO5KSUD6bqfONmbfROkNGadq7fz9BmTZVRwXPep
+	 7pvfzMTHg4pXXG7J0KnqfffA6K51Ten8amHWEM4ZqEvyKX7CZ+k0oClFtuwGUuOyLZuXu
+	 cg0zMdVasn9dJ3SMdoevk36hVr4+DnUDCmywRhYDY/auBkWhfqRVKPmOokDwWjluCVw==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kVEru8Us;
+	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97492606A31B;
-	Thu,  5 Nov 2026 23:34:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72E5606A326
+	for <kvmarm@lists.linux.dev>; Thu,  5 Nov 2026 23:41:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UzgDizeQ
-Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
-ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1793921696;
-	b=Jc3VnRNug1FfZnUV1rT6TvzHuqCy59Ln8BraD9M8FOa6XXDBBQaP4h6iKnL/hGGrdQ5K
-	 SwgdbkDoqElTxBXj+vBA26hnrgnx0wMOrCOeT0SDrIrJWswc8eOAcWTISNlUEAG0p8Uv0
-	 ezORHvJNIpyBQhO2o1yejhnJmFQRwxY1POvdP7oHyGbGjENnB25DPvWnzOgeFuJ+JmhQ6
-	 gaKaB63Hux840YDqFN10pd2nbf0GkJNAbfiXhYhb6QrPYW5dsHwkodWKchhaj1hiCrhpI
-	 Z2QtM6F42nnU5T42DKztidvKysc+/DmOXvW+sphgRNLVUArPG8sisUy/WuCJhxqoOYg==
-ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1793921696;
-	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
-	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=uW24Oo6SzxhmQfdFBJWhZnZ3z5QiPA441Ft/BalVdAE=;
-	b=icxuiiw4wxZUWJt+pwgOATnxZzwptozXPpwEwoMt43cmqld+iTDLjkeh2zNCNdOWZpYe
-	 Q+iLb2JvvmLlQXtPgKFdjm38+IpqSx/2iQAhOdsBQwl+a9fgICp4YqkIB3/hbgKiPbrOk
-	 K2SziBTYxIPb5dSRR2g9Vpqf0k0KMEu4LiktoWbz+aS7SypKNFUk+g3FsZ0QM1ZftGJ74
-	 SHzD8PUxYOiSQc+BEtLu1teJRtbWkFSit/HeEdA0SxM9FilwE8khiurp7kFd0N9cwzbTk
-	 S52RzLGoMeTPnvj6OXgOz6FJGpgKHcGJq3YEBPX6ZaTveZUgiU0KcFWb7Y1Z5NdCgwQ==
-ARC-Authentication-Results: i=1; smtp.kernel.org; 
-	arc=none smtp.remote-ip=100.80.115.77
-Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id 789611F0089F;
-	Thu,  5 Nov 2026 23:34:55 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kVEru8Us
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D5711F0089F;
+	Thu,  5 Nov 2026 23:41:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793921696;
-	bh=uW24Oo6SzxhmQfdFBJWhZnZ3z5QiPA441Ft/BalVdAE=;
-	h=From:Date:Subject:To:Cc:Reply-To;
-	b=UzgDizeQYbDUaC3v4t2iVebuTaQGdRjO/KFU4nH/F7naRQgpDUhML41q/rFt6s4bc
-	 +S3lvegkxz6sCDTIG7Ptks+ge3+Rqid0Y648Vbay2baW7jZJM3iuffQ1iyX2ozWhRR
-	 5wkn1qp/GY0oEdXclb116u+X8bvGfGLkPaUgwhEGZwbXaR3D14nwrAfcuqy7W5yrUg
-	 5G9odG9u6SFkiCxJ+5A0syXeWrQjJ6SYULLgAQaNo2pTvVHzFAZtt842myaHyJYZfh
-	 bB+g4iEpIt+m0+TqwOxHkep2p0kPVAU5W4OaV2yGkRwleCWoV8c9sftzbAztbCUAAb
-	 2bu8V+TwXHe3w==
-Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id CDEF645AEA;
-	Thu,  5 Nov 2026 23:34:54 +0000 (UTC)
-From: Xuheng Li via B4 Relay <devnull+xuheng.cs.columbia.edu@kernel.org>
-Date: Thu, 05 Nov 2026 23:34:55 +0000
-Subject: [PATCH RFC] KVM: arm64: Document that overlapping MEM_SHARE and
+	s=k20260515; t=1793922094;
+	bh=WYbhLKxHN01P51zEe2mBVQqMbcchWHUsW1p+VEoLFJo=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=kVEru8Usw35MhKQZk5G8W4o6JyroV2SEh0wc1rvbPb7ZHweSxHCqAH8pTUzXeYIQZ
+	 zJ/Gf4pkDlLH4rDVHZj1Wurk/P4jl7HWN/jIkPJEd1MjNV7aCcceq5fspQsXG5AbwS
+	 +WD1fpB2f9UFU0wHAlLy6mhY4ySOXKdUSZJipN5a+cNqqiF3DxZi7VkY6IxMeEjMq2
+	 YcPEosUOJnRjKSnLhw6m6OzGJv4VS4e+3VMSMzmWfo/PC3v+Zd8aty+bot0/q2nudq
+	 8zSj2XS1i5W+07QMUY668hjUmj7jOMiS7XBa54uiMT3zK2aIcqztnJuRKVkQV9vppF
+	 DeWsH2MNhtLvA==
+Message-ID: <sashiko-outbox-200389@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH RFC] KVM: arm64: Document that overlapping MEM_SHARE and
  MEM_UNSHARE are unordered
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Xuheng Li" <xuheng@cs.columbia.edu>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <20261105-mem-share-unshare-v1-1-e4c7d12d5d1d@cs.columbia.edu>
+References: <20261105-mem-share-unshare-v1-1-e4c7d12d5d1d@cs.columbia.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 05 Nov 2026 23:41:34 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -82,111 +60,92 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261105-mem-share-unshare-v1-1-e4c7d12d5d1d@cs.columbia.edu>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIzNDQwNT3dzUXN3ijMSiVN3SPAhtYWSSbGSWbJScYpCkBNRXUJSallkBNjN
- aKcjNWSm2thYALP9kbWgAAAA=
-X-Change-ID: 20261105-mem-share-unshare-824c26c2cd0b
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
-Cc: Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>, 
- Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Xuheng Li <xuheng@cs.columbia.edu>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1793921694; l=3950;
- i=xuheng@cs.columbia.edu; s=20261028; h=from:subject:message-id;
- bh=OzLNUOC4vto8JqdWrzx35j81FrnSzjGjA2GXE09YggQ=;
- b=HUDjW/ZmysBcCBXniSKFPhnOhTavoITcJ1jjduOTg6SJw1V4bsVs6djzi+v4ELA5KYPjC9do7
- QBWylx+J0kMAZ4tYY1lgRngualFHsjiqY6MtYKLtE3nDpZwes4PjOHQ
-X-Developer-Key: i=xuheng@cs.columbia.edu; a=ed25519;
- pk=L1HVV+goqxYmEMO/OXakL6uf9isSpgk2QrLlFqyZ2Qs=
-X-Endpoint-Received: by B4 Relay for xuheng@cs.columbia.edu/20261028 with
- auth_id=1349
-X-Original-From: Xuheng Li <xuheng@cs.columbia.edu>
-Reply-To: xuheng@cs.columbia.edu
-Content-Transfer-Encoding: 7bit
 
-From: Xuheng Li <xuheng@cs.columbia.edu>
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] KVM: arm64: hypercall doc gives insufficient condition for priva=
+te region
+--
 
-The pKVM guest interface does not say what happens when a protected
-guest issues MEM_SHARE and MEM_UNSHARE for the same page concurrently,
-for example on two vCPUs.  The two calls are not ordered: a MEM_SHARE
-that has not returned yet may take effect after a MEM_UNSHARE of the
-same page has returned, and leave the page shared although the vCPU
-that unshared it saw SUCCESS.
+commit 39c34714b27ef8c9e3ad559a667906cddd707b8b
+Author: Xuheng Li <xuheng@cs.columbia.edu>
 
-  vCPU A                         vCPU B
-  ------                         ------
-  MEM_SHARE(P) issued ...
-                                 MEM_SHARE(P)    -> SUCCESS
-                                 MEM_UNSHARE(P)  -> SUCCESS
-                                 write private data to P
-  ... MEM_SHARE(P) takes effect  -> SUCCESS: P is shared again
+KVM: arm64: Document that overlapping MEM_SHARE and MEM_UNSHARE are unorder=
+ed
 
-How long a share can stay pending is up to the host.  When the page is
-not yet mapped in the guest's stage-2, pkvm_memshare_call() turns the
-call into a data abort for the host (__pkvm_memshare_page_req()),
-rewinds the guest's PC and exits; the share is performed from scratch
-only when the host runs the vCPU again, with no record of the suspended
-call and no lock held across it.  So the host can make vCPU A's share
-complete after vCPU B's unshare, and read what B wrote to P.
+This commit documents in Documentation/virt/kvm/arm/hypercalls.rst that
+overlapping calls to ARM_SMCCC_KVM_FUNC_MEM_SHARE and
+ARM_SMCCC_KVM_FUNC_MEM_UNSHARE for the same memory region are unordered with
+respect to each other.
 
-Document that such calls are unordered, so that a guest knows it must
-wait for all its shares of a region to return before treating the
-region as private.
+> diff --git a/Documentation/virt/kvm/arm/hypercalls.rst b/Documentation/vi=
+rt/kvm/arm/hypercalls.rst
+> index 7400a89aabf88..ad7082da1b9fc 100644
+> --- a/Documentation/virt/kvm/arm/hypercalls.rst
+> +++ b/Documentation/virt/kvm/arm/hypercalls.rst
+> @@ -99,6 +99,16 @@ Revoke access permission from the KVM host to a memory=
+ region previously shared
+>  with ``ARM_SMCCC_KVM_FUNC_MEM_SHARE``. The size of the region is equal t=
+o the
+>  memory protection granule advertised by ``ARM_SMCCC_KVM_FUNC_HYP_MEMINFO=
+``.
+> =20
+> +Calls to ``ARM_SMCCC_KVM_FUNC_MEM_SHARE`` and ``ARM_SMCCC_KVM_FUNC_MEM_U=
+NSHARE``
+> +for the same region that overlap in time, for example on different vCPUs=
+, are
+> +not ordered with respect to each other: a share that has not yet returne=
+d may
+> +take effect after an unshare of the region has returned, leaving the reg=
+ion
+> +shared. A share of a region that is not yet mapped is restarted after th=
+e host
+> +has mapped it, so such a share can remain pending for as long as the host
+> +delays the vCPU. A guest must therefore not treat a region as private ag=
+ain
+> +until every ``ARM_SMCCC_KVM_FUNC_MEM_SHARE`` it issued for the region has
+> +returned.
 
-Signed-off-by: Xuheng Li <xuheng@cs.columbia.edu>
----
-We noticed this while studying pKVM's guest memory-sharing interface as
-part of our research project, and are not sure whether documenting it is
-the right answer.
+[Severity: Medium]
+Is waiting until every issued ARM_SMCCC_KVM_FUNC_MEM_SHARE has returned
+sufficient for a guest to treat the region as private again?
 
-A guest racing MEM_SHARE and MEM_UNSHARE of the same page on two vCPUs
-is arguably asking for trouble, and Linux guests don't do it today.  But
-nothing in the interface tells a guest when a page is private again,
-and because a share of an unmapped page is suspended until the host
-runs the vCPU again, the host controls how long the window stays open.
-The alternative to this documentation change would be to record a
-suspended MEM_SHARE (for example in the hyp vCPU) so that a later
-MEM_UNSHARE of the same page cancels it, or to fail the unshare while a
-share of that page is pending.  We'd be happy to work on either if you
-prefer a code change.
----
- Documentation/virt/kvm/arm/hypercalls.rst | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+In the race described by the commit message, if vCPU A issues
+ARM_SMCCC_KVM_FUNC_MEM_SHARE while the page is unmapped at stage-2, and vCP=
+U B
+issues ARM_SMCCC_KVM_FUNC_MEM_SHARE followed by
+ARM_SMCCC_KVM_FUNC_MEM_UNSHARE, vCPU B's __pkvm_guest_unshare_host() returns
+the page state to PKVM_PAGE_OWNED in the guest stage-2 and PKVM_NOPAGE in t=
+he
+host stage-2.
 
-diff --git a/Documentation/virt/kvm/arm/hypercalls.rst b/Documentation/virt/kvm/arm/hypercalls.rst
-index 7400a89aa..ad7082da1 100644
---- a/Documentation/virt/kvm/arm/hypercalls.rst
-+++ b/Documentation/virt/kvm/arm/hypercalls.rst
-@@ -99,6 +99,16 @@ Revoke access permission from the KVM host to a memory region previously shared
- with ``ARM_SMCCC_KVM_FUNC_MEM_SHARE``. The size of the region is equal to the
- memory protection granule advertised by ``ARM_SMCCC_KVM_FUNC_HYP_MEMINFO``.
- 
-+Calls to ``ARM_SMCCC_KVM_FUNC_MEM_SHARE`` and ``ARM_SMCCC_KVM_FUNC_MEM_UNSHARE``
-+for the same region that overlap in time, for example on different vCPUs, are
-+not ordered with respect to each other: a share that has not yet returned may
-+take effect after an unshare of the region has returned, leaving the region
-+shared. A share of a region that is not yet mapped is restarted after the host
-+has mapped it, so such a share can remain pending for as long as the host
-+delays the vCPU. A guest must therefore not treat a region as private again
-+until every ``ARM_SMCCC_KVM_FUNC_MEM_SHARE`` it issued for the region has
-+returned.
-+
- +---------------------+-------------------------------------------------------------+
- | Presence:           | Optional; pKVM protected guests only.                       |
- +---------------------+-------------------------------------------------------------+
+When vCPU A's pending ARM_SMCCC_KVM_FUNC_MEM_SHARE subsequently runs,
+arch/arm64/kvm/hyp/nvhe/mem_protect.c:__pkvm_guest_share_host() sees the pa=
+ge
+back in PKVM_PAGE_OWNED state and shares it again:
 
----
-base-commit: 05441d697f7f9a927264f4058cbbc6a03dfcac9d
-change-id: 20261105-mem-share-unshare-824c26c2cd0b
+	if (pkvm_getstate(kvm_pgtable_stage2_pte_prot(pte)) !=3D PKVM_PAGE_OWNED)
+		goto unlock;
+	if (__host_check_page_state_range(phys, PAGE_SIZE, PKVM_NOPAGE))
+		goto unlock;
 
-Best regards,
--- 
-Xuheng Li <xuheng@cs.columbia.edu>
+	ret =3D 0;
+	WARN_ON(kvm_pgtable_stage2_map(&vm->pgt, ipa, PAGE_SIZE, phys,
+				       pkvm_mkstate(KVM_PGTABLE_PROT_RWX, PKVM_PAGE_SHARED_OWNED),
+				       &vcpu->vcpu.arch.stage2_mc, 0));
+	WARN_ON(__host_set_page_state_range(phys, PAGE_SIZE, PKVM_PAGE_SHARED_BORR=
+OWED));
 
+Once vCPU A's call returns, every ARM_SMCCC_KVM_FUNC_MEM_SHARE issued for t=
+he
+region has returned, satisfying the documented condition, yet the region is
+still shared with the host rather than private.
 
+Should the documentation instead state that every prior
+ARM_SMCCC_KVM_FUNC_MEM_SHARE for a region must have returned before issuing
+ARM_SMCCC_KVM_FUNC_MEM_UNSHARE for the guest to treat the region as private
+once the unshare succeeds?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261105-mem-share-=
+unshare-v1-1-e4c7d12d5d1d@cs.columbia.edu?part=3D1
