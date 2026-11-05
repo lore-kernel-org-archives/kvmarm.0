@@ -1,62 +1,95 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.73
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793894778;
-	b=b6D1gbO5zyOsIs0IhSOTvA/te61uuViT+0O09GRWMN6pB/H7DFKRG1O+D9hdJ7MY6xRC
-	 r4lEeu5NUbOqSk+Cvz8OnYZqKC12XeLrlD0p+lGMJTEpP1f1Nj3MwYviGr4Vb421mrzFd
-	 KZl8+8UcnVqohhno7NlvAGL8XLQajqK8ewr6huPrRArTetWEh4CrYXC0Yoq59w0M+ilEI
-	 UjbqjlbIFQ1MiyhHWwS295EtxeEGyE3zuZBivRKwyi/Rmge5x7F6HlZHfTtIcR0tJ3cTH
-	 GukFLe9lVb4yFNHdg8PYoMb2+rMwDE8tR6ScBAGIEA/eaNp74Am1IU0cAtyGd2Eg+yg==
+	t=1793895606;
+	b=yS83vGExj1f6D+OFVD24ZZSMDaJXSiL/sxMtMfFHFmQG+A5gHRxJggEPB5leux3h0L0c
+	 f6NpKZ0gHzeZ6B/pTW6zV3nrH5x93sDsk9Nh55oc2jMB3oOZmZQ9UvIV8TcNW7LQZ5OhP
+	 A3FAjL7lAl/KWyremZVCP/T3PAm68PaiFqyRNZ5t2hJLV2Ik2MeetN8WmQwslgICvTsJe
+	 9itQI8BsoedbX87AsASMxDzJK8nAXFtvqUpNC+7vsD2MUmy6kpqXNEzOXSgG0EfI86zSH
+	 o3465t8FALqIogHcOKk1RC7UbyVLaLovZ98mWfUyuUy2BnREMsUX2UQqrZAdLI5rexg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793894778;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=/cWlRZ8SCFwTMb55OqToMLGSlbLAYefJerAulPP2VEQ=;
-	b=aNgv4BdhL95n0c8Mczs9qaOsBe+xGPyDnNNaBqHD1AspgV7Cs0STum4akQABZDrhh/gm
-	 pPls7RixR3xM2MovhWoQ5IHC0luTSKNBE9zZKOKyT9fZ01h30GBDizkZmIYan15Pbjdq4
-	 wKK9Fkubys2dI/sg/i+sf7OUvqa3e757VN1K9BIFfDbBy3ESkji7/BEj7HeXJc1LZEiz3
-	 XxO56yATQpXMnOVwxANS/R8BItuqqnObU0BkLWprt1Nk00L6vadITXA4+urj7kOhNBKN/
-	 9Kaar9aFoVUk39O0R/4RYJEd/hP70Xa0yNfu/nNTrwj8do7oTTX0+dFzjCd1BQBHhlw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793895606;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=rAfgYJb3CU0ZmVV1RZG4jgQB2Ko2DnWepqbK4ErMKrU=;
+	b=3GkYYkg/i4pQHwv2uWrEhahb+DzJB6niyw4KzkKfii28PTnCpF2mV/t68KiLSqgpfZj6
+	 onz5kn5zKCXKgv2g8gMkzpVDPt/1A0bKA3Du2p85lPZyIdU+xiQGuhWMmWwyAOtZXb1no
+	 jm1dsG6QePiA6IJV9wL9vF0iBiXMdSPF8y3MQ2qaWvPTGhUMlZOKbCMnLmk3v7uLduInm
+	 qNkaQA1k8/6Q1ZVIwoGZEOjRPv2a5OnQqbFTl86C7zTVbDUqR1Hmu+0xVbK4WqeqprOfy
+	 /N9RHkx1uwtsPi1pto9MROoVMma7k3cyoM6PfjgK7nyGjzUo5saEiZiQ4e5L8FlagrA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Pn7Wglhq;
-	arc=none smtp.remote-ip=95.215.58.73
-Received: from mta1.migadu.com (out-73.mta1.migadu.com [95.215.58.73])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kqGX0Qru;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF1E9606A33A
-	for <kvmarm@lists.linux.dev>; Thu,  5 Nov 2026 16:06:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AF1E9606A33A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C6A606A33F;
+	Thu,  5 Nov 2026 16:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Pn7Wglhq
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=q1Jd3oCj3wElY/Ramn8yIWwh5Mzi3hHTvnQWrqt1nCM=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793894774; v=1; x=1794499574;
- b=Pn7WglhqBntRYHjdsQbqRKyn7lHBPxai6iNEYbabp74BJ0buTkHTvlcRsdFYufNFUBCZ07ha
- gR0aM2pCLAKCkT4oXTKrbWA3gGB8l4Ctz7xVtC/wLRmglYS4m3MlkAfjemeI+wYcI1vKCkv1N1W
- CeNntVi3a8pq/wDVMBt6LV5s=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 3f6b86095d41b2ad;
-	Thu, 05 Nov 2026 16:06:14 +0000
-X-Mizu-Trace-ID: 3f6b86095d41b2ad
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5bff701efa5so8055e87.0
-        for <kvmarm@lists.linux.dev>; Thu, 05 Nov 2026 08:06:09 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AKwUvBzOc3q7RDwWUZSnsLn89whaRdY6AN7PrvE7CymA3RyMFvscaPtW8VcpN3bEGCNivQQKsbjIzQ8=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9DlAfkE48PMZMvQxV6nEU64iKZHgMoAHkXmdZooYCQOnvJmKnA
-	PC7M4iWD3wn+eQxKZRSE+rmHsMD160pe7xsg6rWEs97XJr3GEZpR6J3GMZyXNvjEx0VSt9nmxM1
-	SFIwmhklJnVMz5yrN2F4oit2gmtHao5cYkOpaRd8J
-X-Received: by 2002:a05:6512:6ce:b0:5bf:bec9:aaed with SMTP id
- 2adb3069b0e04-5bffabc3e5emr166519e87.8.1793894769045; Thu, 05 Nov 2026
- 08:06:09 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kqGX0Qru
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B740A1F0093A;
+	Thu,  5 Nov 2026 16:20:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793895605;
+	bh=rAfgYJb3CU0ZmVV1RZG4jgQB2Ko2DnWepqbK4ErMKrU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=kqGX0Qru58U+OHeadfWAMb6N1IIP8ucW5R79h/yfRES/lFapRAfnom+jxQL2+D3KV
+	 3VQbn8o338D9ZOjUnPRfSX9vx3or6dxyvJDRfb8uWtUPdtBR1YkqA8RDo+wLHUnYhD
+	 SNKeQKf9n/HutLT2t0XYRKog0ysFPvZ1lye/wN0HCNBMvjQH3Fs6cJxkrYv8hOlO2P
+	 fawYH0KgT3QqQvH5C6FRD45wGODhb3YMbpl9C6RamZcNoZb9DyM32ieGHf6D7TfVFm
+	 AcKZwanrXLScxtreb6moYqjqIjr8iAVyG8uq0LOftKSGgBAYij0D4VGSlvcplT2XAz
+	 3CU89qOPiF6Ow==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xP0C3-0000000BiuJ-000O;
+	Thu, 05 Nov 2026 16:20:03 +0000
+Date: Thu, 05 Nov 2026 16:20:01 +0000
+Message-ID: <86zevn1c9a.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+Cc: linux-coco@lists.linux.dev,	Andrew Morton <akpm@linux-foundation.org>,
+	Baoquan He <baoquan.he@linux.dev>,	Mike Rapoport <rppt@kernel.org>,	Pasha
+ Tatashin <pasha.tatashin@soleen.com>,	Pratyush Yadav <pratyush@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,	Christian =?UTF-8?B?S8O2bmln?=
+ <christian.koenig@amd.com>,	Jason Gunthorpe <jgg@ziepe.ca>,	Joerg Roedel
+ <joro@8bytes.org>,	Marek Szyprowski <m.szyprowski@samsung.com>,	Robin
+ Murphy <robin.murphy@arm.com>,	Steven Price <steven.price@arm.com>,	Sumit
+ Semwal <sumit.semwal@linaro.org>,	Suzuki K Poulose
+ <suzuki.poulose@arm.com>,	Thomas Gleixner <tglx@kernel.org>,	Will Deacon
+ <will@kernel.org>,	Russell King <linux@armlinux.org.uk>,	Benjamin Gaignard
+ <benjamin.gaignard@collabora.com>,	Brian Starkey <Brian.Starkey@arm.com>,
+	John Stultz <jstultz@google.com>,	Mark Rutland <mark.rutland@arm.com>,	Radu
+ Rendec <radu@rendec.net>,	"T.J. Mercier" <tjmercier@google.com>,	Madhavan
+ Srinivasan <maddy@linux.ibm.com>,	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,	Christophe Leroy <chleroy@kernel.org>,
+	Ritesh Harjani <ritesh.list@gmail.com>,	Shrikanth Hegde
+ <sshegde@linux.ibm.com>,	Alexander Gordeev <agordeev@linux.ibm.com>,	Gerald
+ Schaefer <gerald.schaefer@linux.ibm.com>,	Heiko Carstens
+ <hca@linux.ibm.com>,	Vasily Gorbik <gor@linux.ibm.com>,	Christian
+ Borntraeger <borntraeger@linux.ibm.com>,	Sven Schnelle
+ <svens@linux.ibm.com>,	Ingo Molnar <mingo@redhat.com>,	Borislav Petkov
+ <bp@alien8.de>,	Dave Hansen <dave.hansen@linux.intel.com>,	x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>,	Kiryl Shutsemau <kas@kernel.org>,	Rick
+ Edgecombe <rick.p.edgecombe@intel.com>,	"K . Y . Srinivasan"
+ <kys@microsoft.com>,	Haiyang Zhang <haiyangz@microsoft.com>,	Wei Liu
+ <wei.liu@kernel.org>,	Dexuan Cui <decui@microsoft.com>,	Long Li
+ <longli@microsoft.com>,	Paolo Bonzini <pbonzini@redhat.com>,	Vitaly
+ Kuznetsov <vkuznets@redhat.com>,	Andy Lutomirski <luto@kernel.org>,	Peter
+ Zijlstra <peterz@infradead.org>,	dri-devel@lists.freedesktop.org,
+	iommu@lists.linux.dev,	linaro-mm-sig@lists.linaro.org,
+	linux-arm-kernel@lists.infradead.org,	linux-media@vger.kernel.org,
+	linux-mm@kvack.org,	kvmarm@lists.linux.dev,	patches@lists.linux.dev
+Subject: Re: [PATCH v9 14/14] irqchip/gic-v3-its: Preallocate VPE L1 tables
+In-Reply-To: <20261104164555.3555725-15-aneesh.kumar@kernel.org>
+References: <20261104164555.3555725-1-aneesh.kumar@kernel.org>
+	<20261104164555.3555725-15-aneesh.kumar@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -65,53 +98,39 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-References: <20261105110050.1244525-1-fuad.tabba@linux.dev> <861p8z2s5w.wl-maz@kernel.org>
-In-Reply-To: <861p8z2s5w.wl-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 5 Nov 2026 16:05:32 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTyEOfDf4ynYuGz1ejE3s6R2syP4=zZMcq1oKAqFfDxCNA@mail.gmail.com>
-X-Gm-Features: AclHuK9sqVJFjm0gw0BfO1w3RU0O4-fEP04HRvITK947bPe5QzS5BG9idCL7ftg
-Message-ID: <CA+EHjTyEOfDf4ynYuGz1ejE3s6R2syP4=zZMcq1oKAqFfDxCNA@mail.gmail.com>
-Subject: Re: [PATCH 0/3] KVM: arm64: vgic: Drop stale LPI pending state
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@redhat.com>, 
-	Yuchao Zhang <ndaugoing@gmail.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: aneesh.kumar@kernel.org, linux-coco@lists.linux.dev, akpm@linux-foundation.org, baoquan.he@linux.dev, rppt@kernel.org, pasha.tatashin@soleen.com, pratyush@kernel.org, catalin.marinas@arm.com, christian.koenig@amd.com, jgg@ziepe.ca, joro@8bytes.org, m.szyprowski@samsung.com, robin.murphy@arm.com, steven.price@arm.com, sumit.semwal@linaro.org, suzuki.poulose@arm.com, tglx@kernel.org, will@kernel.org, linux@armlinux.org.uk, benjamin.gaignard@collabora.com, Brian.Starkey@arm.com, jstultz@google.com, mark.rutland@arm.com, radu@rendec.net, tjmercier@google.com, maddy@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com, chleroy@kernel.org, ritesh.list@gmail.com, sshegde@linux.ibm.com, agordeev@linux.ibm.com, gerald.schaefer@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com, mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, kas@kernel.org, rick.p.edgecombe@intel.com, kys@microsoft.
+ com, haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com, longli@microsoft.com, pbonzini@redhat.com, vkuznets@redhat.com, luto@kernel.org, peterz@infradead.org, dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, linaro-mm-sig@lists.linaro.org, linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev, patches@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 5 Nov 2026 at 15:51, Marc Zyngier <maz@kernel.org> wrote:
->
-> On Thu, 05 Nov 2026 11:00:47 +0000,
-> Fuad Tabba <fuad.tabba@linux.dev> wrote:
-> >
-> > Hi folks,
-> >
-> > The GIC just keeps on giving. Three follow-ups to my LPI fixes for
-> > redistributors with LPIs disabled [1], to fix pre-existing bugs Sashiko
-> > found.
->
-> Can you *please* come up with a full series rather than this constant
-> "here's another set of patches" that address the same thing, one
-> pothole at a time?
->
-> I'm now really tempted to drop all the patches I have queued on this
-> so far, and wait for the "one true series".
+On Wed, 04 Nov 2026 16:45:55 +0000,
+"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
+> 
+> VPE L1 tables are allocated from the CPU-starting callback, where sleeping is
+> not allowed.  Remove the page allocation from this atomic path.
+> 
+> Use a blocking allocation for the boot CPU and record the resulting table
+> order.  Allocate a page of that order from the sleepable CPU hotplug prepare
+> stage for each secondary CPU.  Consume the preallocated page only when the CPU
+> cannot inherit an existing redistributor or ITS table.
+> 
+> Reclaim unused preallocations after the CPU reaches the online state, and from
+> the prepare-state teardown when CPU bring-up aborts.
 
-Sorry about that. Every time I think I'm done with it, Sashiko pokes more holes!
+No. The way to do it is to move the ITS probing out of the
+non-sleepable CPU hotplug path.
 
-I'll sit on this a bit more, make sure all the gaps are closed,
-Sashiko it locally, before I respin.
+I proposed a potential hack at [1] (which I find far more palatable
+than this proposal), but the real fix is to probe the ITSs as
+devices. Putting even more ugly hacks on top of the existing PoS
+driver is definitely not an acceptable outcome.
 
-Cheers,
-/fuad
+	M.
 
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+[1] https://lore.kernel.org/all/86tswrkrh4.wl-maz@kernel.org/
+
+-- 
+Without deviation from the norm, progress is not possible.
