@@ -1,114 +1,78 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.52.35
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793914583;
-	b=gfSgRFl4mmgkVazHCBVaTxdYPTmRPxDRRN7wLf6kCc7KmoVV7rRAe8ohPZaWxY97zKIg
-	 o+kKFJeIWgtqaKP96IPeSnsqvCBk001IbCwxJhLHhPXO8iZGEdF7FMP/pUMJkDlgw/x7u
-	 op7bKH1hsJXB2V08pG4VTPmgTGuVI8UOpjRtNBPXyzwouFAg1239pgXN0tQ9Bymi+x+cl
-	 VpZ0qG8AorBsZ7AA+W/K8TgWCtbXYug5tiaF/wlDmgBEpbLFf4483AwsjAb1d8QvH/GCx
-	 3GOlYMPl42yrCIjN6XgGOhiaV+7J58UPCgmMJkBcGO1Er8D7ujzx8hgz9RLE1M2H0/g==
+	t=1793917731;
+	b=vNAc8Qf2uzvOWY1dA2ikryxR7LyY+fxwr5ZVmFKyCKj1QkgLOzdzOFOVNClNphNJWiKc
+	 hqFOYegGjg5xseYv7OlijyJ6X5kQlWmLbTHBOtWWyt4DSzqPC4z37LjOaTdjSskNVEMHZ
+	 XvDVnHj4YdvsfW+6iwUTPcJ9D87qdWtpBb5VmnIWoCIwOmADVbzIYUMP0tMfbb9IpjUv+
+	 h8ApLoj5U9sE2ioUUgXIkFEstq1FequbLoiyzMbWI+/hVoj/+v7N+3xRXf7gCQmlOnP6o
+	 crb8O4dyHmXbPRIlt4ZwJDH8u5x47W/K3tfnkXBirK/JM3ihA20F9NUvGKm0B/cDeqw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793914583;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:
-	 X-MS-Exchange-Authentication-Results:Received-SPF:Received:Received:
-	 Received:Received:Date:From:To:CC:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
-	 X-NV-OnPremToCloud:X-EOPAttributedMessage:X-MS-PublicTrafficType:
-	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
-	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
-	 X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-Id:
-	 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=ffOlhY0edizRkUbuvKbot2I8Et1phstXhLA9S0EOflE=;
-	b=mZ0DXtpCceMijHFRhzrr8ikopYM/4zfk6lecoVYUzBVsnXnw63bUXzkQPbuZW5RRX2Ov
-	 Kj3QWuvCv1Yzvvs9GLcIsSKJg0pEcX2E/YnNIw6l9Hef/pmgMUPsIKMGJSDaKrQa69dht
-	 DDjrv3Rg8yYhXu7Rkn0qyRqNEB0UOhxrfgAMTIxNpvuim2LxJq9bN+NYlKfUm89DOgDmK
-	 UckGBgE/E/yrIaanEcofkjKio2JCVTRg4OfWxj/jUKlzl0AKu5ZGfA7W4jSLPQNQDFPVl
-	 YsyU0Tio81VEqBu18gqu+2ExLfQBAFtt68gyOLM2FNhiVHkZUakhZ5QZg9n4NVHLPFA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793917731;
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=XHsHQOEJb3CJGb0dyhyAhjJ4f3CKAMOllBH9b+JYEWs=;
+	b=J9lnB0skoG+G5P+wMdr/b/W5sS+KWIGkdgPq/QxwSbUW8Kl9oITPh7s8jCqHUnh0U/Ja
+	 s50d83UYykVK5dqiphSs4OuiHIH1fvmW9oLDUNl7gmDzRVaaQN9tmTMm0T2ofpYQc/0IL
+	 bON0C/yVJdzvGbuHx8opXiu50x0abe/DnlVmqQCq4+kLwSYqRRtk65WUNKpqwO/oYs0Da
+	 xyZqEAMUydQmWeGjXJhfb2pbwOujGPE4EuWPlzs+ZgVc6n0osteALjrzzb0RmzYkLr9W+
+	 O8fyB6GWkHgFRwevSnuk7CWfIWpkSBe8JJFEmFA1KdotVqu/OzCk/ePEQR/a48GovWg==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=nvidia.com;
-	spf=fail smtp.mailfrom=nvidia.com;
-	dkim=pass header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=hi+59SID;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.52.35
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011035.outbound.protection.outlook.com [52.101.52.35])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RjKWZGml;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819AC606A32C;
-	Thu,  5 Nov 2026 21:36:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 819AC606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 765B9606A31B;
+	Thu,  5 Nov 2026 22:28:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=hi+59SID
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nQbDj7HLXMffh8GDuEoJdvftxmuLovJKw+IRCo0h22M2zWsJkDmEnVL7rCssKmpYdq8bcfAfxNItWNYaPZo2S9w1smKqJIQh8vx9R6cjbfvFThDOVOGOfdLAw+Y2YgKeMlJQPCPUmTDY6OrZUll/Z64dV3rg6pwWxMlicE/LCebVIWCu53KWSIxlmXLeHiu9qHODeGCmVIULm1hF3HchEAZbBIazdegC2LRe8Fsi7XL1U3HzC4CmspmFGoffArVyDvmjsL/Wd9BYdD2FK/el1owEy5a0h1AlPKRG6AN83U9qXr8OeILitLuga3ghg2I64asDKWpzbRf/L9CN+nT4Ew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ffOlhY0edizRkUbuvKbot2I8Et1phstXhLA9S0EOflE=;
- b=Fr5NqPGiQ6C5JvibE5GHuqvC/7NeZYHN38upjk7Hl+nC+eNeyOnhX4wmFuz+XKAL+KZbQmDB+GF02Hr0MCxn/hVKJou+kyCqYhdiyxcdeeMVnM0o36myF6lEstoKPoD2RYmuRVklrHmW7qjtPusCD+6808XosDwiGRkDZ4JqaXHXqRzzCAhgLTwrWCaPNWFSwgjGU/UFCVfE8s68LOOvrJ7LxAOe7x4HgHRvmmXjFfyTGuqeXUt/pCwvTx0zVdESSAgmuWtWvJLsr83ruCT1pjLVRCgmD06SP4QcOD1bhtzuOe6njx7669bCGuLfDswYI/RaaCqeLMFtVOTl8/C7tg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ffOlhY0edizRkUbuvKbot2I8Et1phstXhLA9S0EOflE=;
- b=hi+59SIDmMv4wWRbo++FEeAaSx6TbVi1L4bRe4zChiyTaSbaGsGmSrq9FseO9NZP6KbxGqKrhq6+44gDyphdkXi/vmd1mr+DUFQcWisecJ9+1EizxFNs1iX5PPgPDzMS+Hfnj0q84YOD4xsyi/BQ4G0sBU6M4706ci+NTkKQX40zJdqjWUOyR18pbllCr2W3kK2d5tLkQ6JN1Dl5Vt9ukf3fve5GGzvtn2f8To3WmTQWS3iOvd5yNvLdsDXeJPDOrhXUAuvlaBxLPKhL3P9toToCObVCyfgASWwNe0hU7nEEsNflE/w+4GoCOrl9HYS3hzD3GuUQcEPYYmg+ayLAvQ==
-Received: from CH0PR03CA0073.namprd03.prod.outlook.com (2603:10b6:610:cc::18)
- by CH3PR12MB297944.namprd12.prod.outlook.com (2603:10b6:610:367::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.592.10; Thu, 5 Nov
- 2026 21:36:14 +0000
-Received: from CH2PEPF000166BD.namprd04.prod.outlook.com
- (2603:10b6:610:cc:cafe::aa) by CH0PR03CA0073.outlook.office365.com
- (2603:10b6:610:cc::18) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.592.10 via Frontend Transport; Thu, 5
- Nov 2026 21:36:14 +0000
-X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
- is 216.228.117.160) smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CH2PEPF000166BD.mail.protection.outlook.com (10.167.252.7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.615.4 via Frontend Transport; Thu, 5 Nov 2026 21:36:14 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56; Thu, 5 Nov
- 2026 13:35:53 -0800
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56; Thu, 5 Nov
- 2026 13:35:52 -0800
-Received: from nvidia.com (10.127.8.13) by mail.nvidia.com (10.129.68.6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56 via Frontend
- Transport; Thu, 5 Nov 2026 13:35:48 -0800
-Date: Thu, 5 Nov 2026 13:35:45 -0800
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: Mostafa Saleh <smostafa@google.com>
-CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>, <iommu@lists.linux.dev>, <catalin.marinas@arm.com>,
-	<will@kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
-	<joro@8bytes.org>, <jgg@ziepe.ca>, <mark.rutland@arm.com>,
-	<qperret@google.com>, <tabba@google.com>, <vdonnefort@google.com>
-Subject: Re: [PATCH v9 12/25] iommu/arm-smmu-v3-kvm: Probe SMMU HW
-Message-ID: <auz2sUAFRdzFjtxT@nvidia.com>
-References: <20261015200903.2735565-1-smostafa@google.com>
- <20261015200903.2735565-13-smostafa@google.com>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RjKWZGml
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1793917731;
+	b=pB3M06+QiiBeEGiyeR5Jn33gSExURVpZBeX7HOXNqKyOVe7fdo1/swx+8EvtXzYU0fMZ
+	 RPs7o1kStKXrBYbCoxqHibOhmMMVHrvgn+xXZ9C1pKA/M4iQfvFrdQ1zzgDGcCyKFt/gj
+	 eFzo6xYZxlSjismiFgnJ0kOSjvax9OJUEoNA6zb1Fuoq6/260JAoHkcIS1hOsnJjqcffQ
+	 IGFjle8jxD7hZhAr2dJ9siCMjMDox499S7S6x0oMHVuyW3r7i0T9VdCq56BZU11TyiyXl
+	 VZnl1Fh9tGvRvhBAGJ4bf99px3gIXMhib+IZuNNw3mffbavHi0mQgi1PRCyGFGWbMFg==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1793917731;
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=XHsHQOEJb3CJGb0dyhyAhjJ4f3CKAMOllBH9b+JYEWs=;
+	b=T2JUXqa6NSVrDCMs8GKL+vLJESHV3vJu6IAtEClspeJi8rLBPVUyBb/vgEm56iu/9Omo
+	 YIishrvFslDoPSC1B4ZMyYaGuKPOjvaPLqIiLrfN68svbiNXsIGaDap1BO60Lqochv4f9
+	 GWgaVPU4wjf6OmC3hUYx0s/+jYE8kQxe3lj1f2c6wdCcprzdOcCCA5pXspjulvVkc6OWz
+	 ZEupO2TZIQEHmo/Jw1S7zWOg5bLSsqj9F8UrhBJPrub1rci8YJIhP7kdYW7xLz/nsmVqk
+	 aamcXS22gCqQ8Ja3JyyY2Fb6/106ll/8HcBMczPQNsszBiQt1W3sSXyOp+G7YWJEtpQ==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.kernel.org (Postfix) with ESMTPS id 7165A1F008A1;
+	Thu,  5 Nov 2026 22:28:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793917731;
+	bh=XHsHQOEJb3CJGb0dyhyAhjJ4f3CKAMOllBH9b+JYEWs=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
+	b=RjKWZGmlKrkzq450SX3vBuNoStwEzyEJa7btx9vhw5GoVr7ZW6sArUgonrgnplzNR
+	 Mz3xQvRaDZOum07DuyAyBLk9sgR0lTdU7JhP5yeUlCvq34d+rUh1M4yU91kJnvhkyI
+	 8HOWyX4ueCELFX1/kr7bgsVvgESFbFS4lX7ogD56RSHoPRn/Pm512k6Wtk5+l+ClNq
+	 d8MMXWq9M+BYS0RtqPidvJReV13wkxwlBSjEU56o9cH0/Trxm1CFDUGd/dCUnjZGTL
+	 AxzGkZrtuXuUxMk4qxXrcDlY9SI4aLhKtgxpfzNb0XCP2cl2E66KENBj1/gQa6sDIJ
+	 cYUQyxedsWM2g==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id EA29841E10;
+	Thu,  5 Nov 2026 22:28:49 +0000 (UTC)
+From: Xuheng Li via B4 Relay <devnull+xuheng.cs.columbia.edu@kernel.org>
+Date: Thu, 05 Nov 2026 22:28:50 +0000
+Subject: [PATCH 1/3] KVM: arm64: Compute the hyp pool size in 64 bits
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -118,48 +82,101 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20261015200903.2735565-13-smostafa@google.com>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF000166BD:EE_|CH3PR12MB297944:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4da32274-ecdb-49d2-411e-08df3b84d19a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|82310400026|23010399003|376014|7416014|1800799024|10067099003|18002099003|6133799003|22082099003|11063799006|56012099006|4143699003|261028144727099003|261026140227099003|261022105027099003|261021121427099003|261021135927099003|261102123227099003|261026121527099003;
-X-Microsoft-Antispam-Message-Info:
-	6lnr4Ir1dUlZlPcKI9YKXiiRWdG1Bmr/pZm4gG4j1kybgJB9tDCD2pqqjcFKCOHz3YJipxmAV4Mhu/AmKPwacMEJG9r3MKbmECaoKb9LtGYXbCAW9fMuVEOD2aat8AtaaWm5DxaNze5rkzEVGuKnbcvqp9Pxxx2z1KysMAKdtjLgXfo3YtpY/qrArAc0sDwVxhkg2INucPmFJDUxtTr7NTOJdSsHMze4nhQchI0JcrGuqiMDfL7w5EQ0yUaNiHCG7dIDM7A1pcNwZ6RcZJqr7HZuiqvjVE8qoT/D10IeLqovZKHTwLfjwqNdIya8gVUdXU411afgfY0wTJzN/1ZS2Pmb1fh8r+4YEwjW1XjWVrIJWIvv97FGQU13m6eP9aZyXf4GklD/PKlO+bs+Ewt6Q2dN2ZTKOqziu8l93DeiotzZDC38NElzatWFLwseTwiz/KiHe4jKmdHZjk9Z79CTxEn9gPRSEvXLakJPxrZpQOf3EOb8n2T9LCXlcak8upnTohupzfw1XyHDHKJviQlwMlntOkH1ixDQYVjsaDQgqUFlN25TFvMkolbOZvc+415ZfUdWsRBmX3elgoFDX0d+2xm3Rstf2ylZ7V+xSnAvrARVouONkhDzTSwyJItmIiBCXcTaLfo4rUEjP9eJv4jD+6tO2V/PcHftxZTBupI5reepMSys5UTfQH8HakCWFe8G+5Nd3J2hsyLvkQaB4tjmhQ==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(82310400026)(23010399003)(376014)(7416014)(1800799024)(10067099003)(18002099003)(6133799003)(22082099003)(11063799006)(56012099006)(4143699003)(261028144727099003)(261026140227099003)(261022105027099003)(261021121427099003)(261021135927099003)(261102123227099003)(261026121527099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	n9rDfx0oqXveyXfkdKmC4BPKMnn4Tuc52bqgE+XD90SD0Iilx4SUK/cf4opBWULhgUL7d4qV+FLcjPzwV/x4Ik6lgddaqcTf1R4Jqzmkjyp7A+vEa8bmWxuY8JO7tOcSuyXR56gW+p1CZNKzQQgnFT8lSNamGthlY62xtFAuhMkMYATzS2v6P/NeIwJt7xR1ao+/FRLMYxwTBCrVNoCeHp3KNvzJuvvIAt1RtkCSQM0OP4AKRb9yt0JyIKBbxBrVR6gG0gIqOjocwxcnXdeSLosIyAEtkROIRzTQeI3fwIlsuBzTyA6fEVQDpvaCYoemNCKm4Y5c89sbHtkbS6uyjEJ1/3o/xXKjt7zQ9rzmzdK4rwdvK4ijHlz6ToV6tnY6VytsK3ZU7qO+Asgofmgm8PPQHEmLhmKkX5bfazpuqNAHNs1zF+92RKhqgPXmAqEE
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2026 21:36:14.7129
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4da32274-ecdb-49d2-411e-08df3b84d19a
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF000166BD.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB297944
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <20261105-hyp-pool-and-map-v1-1-756bb5d8e067@cs.columbia.edu>
+References: <20261105-hyp-pool-and-map-v1-0-756bb5d8e067@cs.columbia.edu>
+In-Reply-To: <20261105-hyp-pool-and-map-v1-0-756bb5d8e067@cs.columbia.edu>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
+Cc: Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>, 
+ Catalin Marinas <catalin.marinas@arm.com>, 
+ Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ Xuheng Li <xuheng@cs.columbia.edu>, stable@vger.kernel.org
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1793917729; l=2873;
+ i=xuheng@cs.columbia.edu; s=20261028; h=from:subject:message-id;
+ bh=UxuVgBjPBETyOHIqHbEHAWaoxXnBBnvVmnBeY1ybafA=;
+ b=j9yH+aaCv6O2qR5kWkR35pr2U+iHzJ4e49Ta/xuKRt8WMXlEXE3VrDsW3x/tw1Ag3OsxxiFMq
+ s0jXWQBw68lBQs2POH+PpP/WYzowh9qbNa32gIpdjHLnA3+Krye1ZQ8
+X-Developer-Key: i=xuheng@cs.columbia.edu; a=ed25519;
+ pk=L1HVV+goqxYmEMO/OXakL6uf9isSpgk2QrLlFqyZ2Qs=
+X-Endpoint-Received: by B4 Relay for xuheng@cs.columbia.edu/20261028 with
+ auth_id=1349
+X-Original-From: Xuheng Li <xuheng@cs.columbia.edu>
+Reply-To: xuheng@cs.columbia.edu
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 15, 2026 at 08:08:43PM +0000, Mostafa Saleh wrote:
-> Probe the SMMU features from the IDR registers with the functions shared
-> with the kernel driver. SubstreamID bits and queue sizes are not needed
-> here: CDs are not shadowed and the command queue is set up later.
-> 
-> The hypervisor requires two things the kernel driver does not:
-> - Coherent table walks, reported by both firmware and IDR0.COHACC, as
->   it does no cache maintenance on its tables.
-> - Nested translation, as the host keeps stage-1 and the hypervisor adds
->   stage-2.
-> 
-> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+From: Xuheng Li <xuheng@cs.columbia.edu>
+
+hyp_pool_init() takes the pool size as an unsigned int number of pages
+and computes the size in bytes as nr_pages << PAGE_SHIFT, in 32 bits.
+For a pool of 4 GiB or more (nr_pages >= 2^20 with 4 KiB pages) the
+shift overflows, and both pool->range_end and pool->max_order are
+derived from the truncated size.
+
+The two large pools are sized from the amount of memory:
+hyp_s1_pgtable_pages() for hpool and host_s2_pgtable_pages() for
+host_s2_pool both provision page-granular tables for all of memory,
+about one page per 2 MiB of RAM, so they reach 4 GiB on a machine with
+about 2 TiB of RAM.  Arm systems of that size exist, for example AWS
+Graviton4 x8g.metal-48xl instances (3 TiB) and Ampere Altra Max
+servers (up to 4 TiB per socket).
+
+With a truncated range_end, most of the pool lies outside
+[range_start, range_end), so __hyp_attach_page() treats those pages as
+external order-0 pages that never coalesce, and the pool cannot satisfy
+multi-page allocations.  What that does depends on the host's IPA size,
+since the only multi-page allocation from these pools is the host
+stage-2 PGD in host_s2_zalloc_pages_exact():
+
+ - With a 44- or 48-bit PARange the PGD is a single page.  pKVM boots,
+   but both pools run with a wrong range and maximum order, and any
+   later multi-page allocation from them would fail.
+
+ - With a 42-bit PARange the PGD is eight concatenated level-1 tables.
+   Its allocation fails, and host_s2_zalloc_pages_exact() calls
+   hyp_split_page() on the result before checking it for NULL, so pKVM
+   initialisation operates on a bogus struct hyp_page instead of failing
+   with -ENOMEM.
+
+Compute the size in 64 bits.
+
+Fixes: 8e17c66249e9 ("KVM: arm64: Introduce a Hyp buddy page allocator")
+Cc: stable@vger.kernel.org
+Signed-off-by: Xuheng Li <xuheng@cs.columbia.edu>
+---
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+index 57f86aa0f..e7c10d2f7 100644
+--- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
++++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+@@ -233,16 +233,16 @@ int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
+ 		  unsigned int reserved_pages)
+ {
+ 	phys_addr_t phys = hyp_pfn_to_phys(pfn);
++	u64 size = (u64)nr_pages << PAGE_SHIFT;
+ 	struct hyp_page *p;
+ 	int i;
  
-Reviewed-by: Nicolin Chen <nicolinc@nvidia.com>
+ 	hyp_spin_lock_init(&pool->lock);
+-	pool->max_order = min(MAX_PAGE_ORDER,
+-			      get_order(nr_pages << PAGE_SHIFT));
++	pool->max_order = min(MAX_PAGE_ORDER, get_order(size));
+ 	for (i = 0; i <= pool->max_order; i++)
+ 		INIT_LIST_HEAD(&pool->free_area[i]);
+ 	pool->range_start = phys;
+-	pool->range_end = phys + (nr_pages << PAGE_SHIFT);
++	pool->range_end = phys + size;
+ 
+ 	/* Init the vmemmap portion */
+ 	p = hyp_phys_to_page(phys);
+
+-- 
+2.53.0
+
+
