@@ -1,48 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793897574;
-	b=5EAje8vLvsF80merqLJZ4VVhM4o/b0cmbLMY16ntyqIAqP0UGAyawqaGSDvOW9In0WuI
-	 mVNY2ns6sxXFrnhhutRophV6bFp2kLK92DowCZpnYamgUnpxP51Z8HUhYVZQStCZeOwfj
-	 dVBSUqpIFtIASwzCgxd+zAUp0UFbjz58fDrU6eGOYrtr3WubKrnG5/PYNmZG9ImCZDiai
-	 1hVxACZp2CpJ1VR+oNUkLw1Pg3tUjKPwYUQqPS7VwQE838DYuxAM/LOwzEPVSDB16uXhp
-	 iEPHnNTc1GFg2XH/JUlzOPBwK9hqm0Rl/XXjl2n9RhC2JxthHT3HVB3av5eu+THxSfw==
+	t=1793897576;
+	b=pSIcKPSq+c8cHgcGLz1kB7ALM3mTHiPdpv039Pk/dqDi1PV4uSt0pUwzAyne7SZU6ueV
+	 RaVYr7y74kqHVnetfUOcsFh5DnBA7ylULV2i0ikeB8IhMYDftQnb9mbsitmIxbVbRW757
+	 wfAQKTOd9fRidMBNRhcNYtdRS7OTfUAe1AjjiZOCOpQn0RhQEwR+3isgDG0OIhaewSDvu
+	 yZkZwIowJJU6hSHbta4mhIE9zu+DukvaJjGX+gZnHYeU2W0BCEfFY1okdjDAP1QnRnFna
+	 2NErUsXG99XZxe/tmzTgmNiIvko0c0GOGnNIBGniMe4uP/dTgaRm7WR7rLAuU5pQt6A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793897574;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793897576;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=w/YTY8Qo0Zgoo2NfvapWx8uwEG48gJ3/0t1KofHUSvY=;
-	b=G4dIwZLAdNoBupi1h7sbgySd5PgdukdnhgXucqfajJYHjvTz5tEqiKIl5LW3nZRELUvl
-	 Nu4HTADv0WCI3F8z2mGIyRwB8M9LjSmPgvIm9q8Nh5TZ+xDoqpEya88MwdtHWlc6gwFfy
-	 E4TTOUQwqW7VzT627/TnunrZKFZt441pYJIOVPt4t/r8a7+WMB+mIlzbngN41NE3L4GBZ
-	 H7Z2Nah8YiganfUQvkVDC8i+fa7ZASAln39PVcMI9j9Hj1I7q+lIHhEFEklcOClwzE+xM
-	 Olao9Cx5hPUuO92k/tqySOXXjvG9qzB69C1DNM+VZI0+UEX2Ssde1EwVOKCRlsjtl5A==
+	bh=fRI/DkZV6dbTTbjQAyrbGlNtpsebatRCDLQei6fHCk4=;
+	b=QFXgLS8MvVs9ssTI0Sp/9nt4HF8UCbqZi0p+alfJuqvJ8C2si7iLh4eJD1Dd+X2mOePa
+	 3RpPlruRbgP7K5871zTwM07usrfzw5Ssvkd9TG5IbuQrtzpeSm2GJIANcMx3QOgLYVCp+
+	 35kj8tfZIZQPz3rqjbJA2cvl485xvLL54mZq65doqEBiVHbJyd/RNuJU/+twlZeZk0YI4
+	 GPf0wJ9zO0xXULOssfrksp8hrYM3UHR1TiHFGUeVjsFJAFvBs4fKE4AVk1JiZiVp8RvO9
+	 T2GZrAeIw3Oqq4dYYQeTnfWcPlwq/AX5VUDv4+VoH1TThpRONz55adw2aTU/vltEgUg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=e+FQOIfN;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IsAXF6eo;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141E8606D827
-	for <kvmarm@lists.linux.dev>; Thu,  5 Nov 2026 16:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A0DA606A332
+	for <kvmarm@lists.linux.dev>; Thu,  5 Nov 2026 16:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=e+FQOIfN
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E78131F000C1;
-	Thu,  5 Nov 2026 16:52:48 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IsAXF6eo
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 256CF1F00A1A;
+	Thu,  5 Nov 2026 16:52:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793897573;
-	bh=w/YTY8Qo0Zgoo2NfvapWx8uwEG48gJ3/0t1KofHUSvY=;
+	s=k20260515; t=1793897576;
+	bh=fRI/DkZV6dbTTbjQAyrbGlNtpsebatRCDLQei6fHCk4=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=e+FQOIfNYc9wA2g3UCHvH9NgrcOuRcaEGDzbgAv1EgOtmrRJPSTLBvFWZ4/FpJD9W
-	 15AaYXrjwrrIpdWszwLaHSgP0IXU4dOJPmQRRLugdqcsOFH2GeRuDWFj4MjhUnBoFp
-	 4Rzs/MfQKLEVOfF4GjK9p5j1nvikqWdTzXny56BY2WP5ZbDBEjhwGWJKh1x+rGL6ds
-	 KziVI0OEAA3uFY2MyCXCxryvNf3Xye1hcZiGd3E6GHX/hxDJr6irTkKG3bcd3HJMf/
-	 asEvxYDhlE469H/oqIzFUy8r+vtIfVfmwvIbI2SxLRDvqAkwSW/6x23nYBVWbcgDlf
-	 sFVJw80vCBp+w==
-Message-ID: <sashiko-outbox-199546@kernel.org>
+	b=IsAXF6eoe4byQi/jxkSLQ8vVNL3PhxAWWzz4O5zLWDSKw/jIGom0f4FJ9ghfsvvwC
+	 WL+5W+X59istuuNxTponFzlP3Yx1ptNXMdoSBfYLkdUBNcrz1ch8zYXc2kRQSuS4Up
+	 UfAsHSvbKGR+llQ5roqFl9UI3++mGNcsq76NctSJT3wP+J57nrttbAy04v96epctyn
+	 rjj/Gamt0UErYYNYxKokOdi2ms9BxSgsiUDzVcNmhaxsFkxkT9p2EWLp79THqqpF8/
+	 c892/8Q9SDNr1X80xCLN3R7w8ePLGxaz+8vBRz5oL+QJlRryLSjD7vhGKToilEH7Ug
+	 vLJuJ1VLhIiLA==
+Message-ID: <sashiko-outbox-199552@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v9 08/14] swiotlb: Align shared IO TLB pools to the
- shared granule size
+Subject: Re: [PATCH v9 14/14] irqchip/gic-v3-its: Preallocate VPE L1 tables
 Reply-To: sashiko-reviews@lists.linux.dev
 To: =?utf-8?b?QW5lZXNoIEt1bWFyIEsuViAoQXJtKQ==?= <aneesh.kumar@kernel.org>
 Cc: "Andrew Morton" <akpm@linux-foundation.org>, "Baoquan He" <baoquan.he@linux.dev>, "Mike
@@ -71,12 +70,12 @@ Cc: "Andrew Morton" <akpm@linux-foundation.org>, "Baoquan He" <baoquan.he@linux.
  Bonzini" <pbonzini@redhat.com>, "Vitaly Kuznetsov" <vkuznets@redhat.com>, "Andy
  Lutomirski" <luto@kernel.org>, "Peter Zijlstra" <peterz@infradead.org>, dri-devel@lists.freedesktop.org, linux-mm@kvack.org, kvmarm@lists.linux.dev, "Oliver
  Upton" <oupton@kernel.org>, media-ci@linuxtv.org
-In-Reply-To: <20261104164555.3555725-9-aneesh.kumar@kernel.org>
+In-Reply-To: <20261104164555.3555725-15-aneesh.kumar@kernel.org>
 References: <20261104164555.3555725-1-aneesh.kumar@kernel.org>
- <20261104164555.3555725-9-aneesh.kumar@kernel.org>
+ <20261104164555.3555725-15-aneesh.kumar@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 05 Nov 2026 16:52:48 +0000
+Date: Thu, 05 Nov 2026 16:52:53 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -86,73 +85,122 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [Low] swiotlb: premature linux/set_memory.h removal breaks restricted poo=
-l build
+- [High] irqchip/gic-v3-its: order mismatch in allocate_vpe_l1_table() on I=
+TS inherit
+- [Medium] irqchip/gic-v3-its: memory leak of vpe_table_mask in allocate_vp=
+e_l1_table()
 --
 
-commit 604798053e9de98cc147fbbd212cc3b2c9896b0e
+commit d29e0b57c45efd854666ff7af1f84a27011e992c
 Author: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 
-swiotlb: Align shared IO TLB pools to the shared granule size
+irqchip/gic-v3-its: Preallocate VPE L1 tables
 
-This commit aligns and sizes the SWIOTLB pool allocations to the common CoCo
-shared granule size and replaces the default and dynamic pool set_memory_*()
-calls with cc_make_shared() and cc_make_private().
+This commit removes the GFP_ATOMIC VPE L1 table page allocation from the
+CPU-starting callback by using a blocking allocation on the boot CPU,
+recording the table order, and preallocating pages for secondary CPUs in the
+sleepable CPU hotplug prepare stage.
 
-> diff --git a/kernel/dma/swiotlb.c b/kernel/dma/swiotlb.c
-> index 2c57b49ac7c06..36fbec2241e4d 100644
-> --- a/kernel/dma/swiotlb.c
-> +++ b/kernel/dma/swiotlb.c
-> @@ -22,6 +22,7 @@
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v=
+3-its.c
+> index 9ad66253ab166..5628f497d389d 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+
+[ ... ]
+
+> @@ -2990,7 +3014,16 @@ static int allocate_vpe_l1_table(void)
 > =20
->  #include <linux/cache.h>
->  #include <linux/cc_platform.h>
-> +#include <linux/cc_shared.h>
->  #include <linux/ctype.h>
->  #include <linux/debugfs.h>
->  #include <linux/dma-direct.h>
-> @@ -38,7 +39,6 @@
->  #include <linux/pfn.h>
->  #include <linux/rculist.h>
->  #include <linux/scatterlist.h>
-> -#include <linux/set_memory.h>
+>  	pr_debug("np =3D %d, npg =3D %lld, psz =3D %d, epp =3D %d, esz =3D %d\n=
+",
+>  		 np, npg, psz, epp, esz);
+> -	page =3D its_alloc_pages(GFP_ATOMIC | __GFP_ZERO, get_order(np * PAGE_S=
+IZE));
+> +	order =3D get_order(np * PAGE_SIZE);
+> +	if (use_prealloc) {
+> +		if (WARN_ON_ONCE(order !=3D vpe_l1_prealloc_order))
+> +			return -EINVAL;
+> +
+> +		page =3D gic_data_rdist()->vpe_l1_prealloc;
+> +		gic_data_rdist()->vpe_l1_prealloc =3D NULL;
+> +	} else {
+> +		page =3D its_alloc_pages(GFP_KERNEL | __GFP_ZERO, order);
+> +	}
+>  	if (!page)
+>  		return -ENOMEM;
 
-[Severity: Low]
-Does removing linux/set_memory.h in this commit break the build when
-CONFIG_DMA_RESTRICTED_POOL is enabled?
+[Severity: Medium]
+Does this leak gic_data_rdist()->vpe_table_mask on these error returns?
 
-At this commit, rmem_swiotlb_device_init() in kernel/dma/swiotlb.c still
-calls set_memory_decrypted() directly:
+Earlier in allocate_vpe_l1_table(), when inherit_vpe_l1_table_from_rd() does
+not find an existing table to inherit, vpe_table_mask is allocated:
 
-kernel/dma/swiotlb.c:rmem_swiotlb_device_init() {
-	...
-		if (cc_platform_has(CC_ATTR_MEM_ENCRYPT)) {
-			int ret;
+	gic_data_rdist()->vpe_table_mask =3D kzalloc_obj(cpumask_t, GFP_ATOMIC);
+	if (!gic_data_rdist()->vpe_table_mask)
+		return -ENOMEM;
 
-			mem->cc_shared =3D true;
-			ret =3D set_memory_decrypted((unsigned long)phys_to_virt(rmem->base),
-						   rmem->size >> PAGE_SHIFT);
-	...
-}
+If inherit_vpe_l1_table_from_its() also does not find a table to inherit and
+allocate_vpe_l1_table() subsequently fails because order !=3D
+vpe_l1_prealloc_order or page is NULL, it returns -EINVAL or -ENOMEM without
+freeing gic_data_rdist()->vpe_table_mask or clearing the pointer.
 
-That caller is not converted to cc_make_shared() until the subsequent commit
-("swiotlb: Reject misaligned restricted DMA pools for CoCo guests").
+> @@ -3007,6 +3040,9 @@ static int allocate_vpe_l1_table(void)
+>  	val |=3D GICR_VPROPBASER_4_1_VALID;
+> =20
+>  out:
+> +	if (!use_prealloc)
+> +		vpe_l1_prealloc_order =3D vpe_l1_table_order(val);
 
-Because none of the remaining headers included in kernel/dma/swiotlb.c pull=
- in
-linux/set_memory.h, architectures without CONFIG_ARCH_HAS_MEM_ENCRYPT lose =
-the
-static inline stub for set_memory_decrypted() from include/linux/set_memory=
-.h,
-and x86 with CONFIG_ARCH_HAS_MEM_ENCRYPT=3Dy loses its declaration from
-arch/x86/include/asm/set_memory.h, resulting in an implicit function
-declaration error during git bisect.
+[Severity: High]
+Can vpe_l1_prealloc_order mismatch the order computed for a secondary CPU w=
+hen
+the boot CPU inherits its VPE table from an ITS?
 
-Should the removal of linux/set_memory.h be deferred to the next patch where
-rmem_swiotlb_device_init() is converted to cc_make_shared()?
+On the boot CPU, gic_init_bases() -> its_cpu_init(false) ->
+its_cpu_init_lpis(false) -> allocate_vpe_l1_table(false) calls
+inherit_vpe_l1_table_from_its():
+
+	val =3D inherit_vpe_l1_table_from_its();
+	if (val & GICR_VPROPBASER_4_1_VALID)
+		goto out;
+
+When the boot CPU redistributor shares a VPE table with an ITS in its affin=
+ity
+domain, this jumps to out: without probing GICR_VPROPBASER, and
+vpe_l1_prealloc_order is computed from the inherited GITS_BASER2 value.
+
+However, the ITS VPE table is sized by its_parse_indirect_baser(), which on=
+ly
+switches to a two-level indirect table when the flat table exceeds two GIC
+pages and GITS_BASER_INDIRECT is supported:
+
+	/* No need to enable Indirection if memory requirement < (psz*2)bytes */
+	if ((esz << ids) > (psz * 2)) {
+
+By contrast, when a secondary CPU in another affinity domain cannot inherit
+from a redistributor or an ITS, allocate_vpe_l1_table(true) probes
+GICR_VPROPBASER on the redistributor and enables indirection whenever the f=
+lat
+table exceeds a single GIC page:
+
+	if (epp < ITS_MAX_VPEID) {
+		int nl2;
+
+		val |=3D GICR_VPROPBASER_4_1_INDIRECT;
+
+For example, when the flat table is 2 * psz (or when GITS_BASER2 uses a flat
+table or a different probed page size than GICR_VPROPBASER), the inherited =
+ITS
+table order is get_order(2 * psz) while the secondary redistributor L1 table
+order is get_order(psz).
+
+When that secondary CPU comes online, wouldn't allocate_vpe_l1_table(true) =
+hit
+WARN_ON_ONCE(order !=3D vpe_l1_prealloc_order), return -EINVAL, and cause
+its_cpu_init_lpis() to disable GICv4 support?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261104164555.3555=
-725-1-aneesh.kumar@kernel.org?part=3D8
+725-1-aneesh.kumar@kernel.org?part=3D14
