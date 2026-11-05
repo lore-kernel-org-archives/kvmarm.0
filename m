@@ -1,76 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.139
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.55
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793865377;
-	b=icFUvAXtYjO6MVWRXB8aqnzo8WBhKqc1lFnBHUJP3GabQXiLTyD7/7oAgesI5t30vw0w
-	 qdaqVntnpPf8ETN5oZILlS1QVSPSDuCc1Vx1NylPTleZnC0mVAnPRLwTczb6A5b24eD8M
-	 xwl1RDv7B8CsOjoDK2mhDhqpcvE7Kh+6CABrs0OdLOxxAhFTmw0+r78jjxwwAcldOuJj2
-	 nzLj4UUuMNa+hGd2MxVPa+mzSgk9BwK5rCu7osjTxBGmtxzAfsSj+vAdyX1h54JyDytv/
-	 OJZVI3o5q5KHuc083XvGn/D2DtG7EvbzB/GLTGkSRC4IoXV36xLCypxuQL+KqTC8jgg==
+	t=1793866089;
+	b=xg1oW8AAbkz/h8Gf03+OrBiwLSGyXXJbvhFJCAylna26m6rsIozZcQxjj9ctAoT7NqI7
+	 FrNXVjBM+rb51iP4p9HOrf3W6VWH4QyGg1QrE0Be9+b4ugbmTe4hgnboUISXzp9HDcQA2
+	 udLvJamezv7aGkvb2+wZX1cTLCO3ttEuZo/z2NtnuYjsPHM3CWRzvtmg0iHCbRvhuNvCI
+	 TPvd8dqYqp0WpxsvXTU1HbweWXJcknZ8tBquvmHmxbhb32nwsntQ4VtjBl7KPBSNHxbzY
+	 MT4Nc/1bR9zck9SYCEnBCZFqxIssDiTrRIb+uBay+O6vyEhuW1UHp+PPnGUn7tTuneg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793865377;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793866089;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=xAxX/hOOVgl9MP4qMrRYqYmI6pYWtxVRbAVic/Kn+0I=;
-	b=Q3HsasK/hishHoeoLCyJISeO+ybLBq7xahJe+mH+4k7fOh/r+LV7QaMN97X4IONFzOsx
-	 BaTsnZSrBjWMVHK18D0K/RxmaS44UM/PqfMNuH2173ic19Cch9YERQn0P+9iZmTg6O91I
-	 73VfVKKekjQpuyCok2q4plm6BZZfurOqpFRJx5e8o3XvD+R0OEfbg7iboVX3XgkE7rjQ4
-	 06VLa0jr7koe52ox+uaAFLV7Xpk22S+4UGjKCy+J00YNHBgqtZEuTE8kNOQ3s0YzYaw4a
-	 +KHygATvomf6hXCUMJ1FDldQJ6hiiHsnISDR07CN1c3IJ5MVZ22DQCi+vhNYvLIeB3w==
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=slAjwWQDYVO39KamLXHsue/lfUEBTiuulu/3jpX05gc=;
+	b=vFz+wIXE1TNFqbYgpKAjTkjHFDskISGNer2BK+Zk9j78ZYFjGlwdGcJ6pvGE4OyFkcEl
+	 qeMp+AuMiqJRvqpuIoKKsfPpOFWI/uxLyyPvPNBEFnBrwdNZGsN0jHZ4pn4rehX8oP4p+
+	 juAt2ozZjhU6kf9oKT0eRvxtWQGP4ZzElejuURgleccwmqd1647xCRsbxMDQHMgqTwcWV
+	 eNRG6+Skg2C7dQJ5T9OlrWxLW3GWY3QXS0ObEbVMaNhnB6+5Q0M8WlHyFThpmom006Y+P
+	 o8nOjWod6Wt2E/I6MGZ4b37SOBNrBfBGOy0QPLaVli9vX/gNkGs5ZShJnSsx2AoMt4A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=MbMaG9T5;
-	arc=none smtp.remote-ip=95.215.58.139
-Received: from mta1.migadu.com (out-139.mta1.migadu.com [95.215.58.139])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="QR/ysJBv";
+	arc=none smtp.remote-ip=95.215.58.55
+Received: from mta1.migadu.com (out-55.mta1.migadu.com [95.215.58.55])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F336606A339
-	for <kvmarm@lists.linux.dev>; Thu,  5 Nov 2026 07:56:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7F336606A339
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C079606A32C
+	for <kvmarm@lists.linux.dev>; Thu,  5 Nov 2026 08:08:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4C079606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=MbMaG9T5
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QR/ysJBv
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=qVD1PACKjTczzGaztvFKYuRGh7H3JFoR6xRbscqjfaA=;
+DKIM-Signature: a=rsa-sha256; bh=5dNzhcTaPSPAHoNbodXyj+zv2hdRrCEJXr1Y2dhrWX8=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793865373; v=1; x=1794470173;
- b=MbMaG9T5UXK30o8GXml7xw621m+pew8SJ24tmEZAQ9lcD/0xMidgs8V7BCqGrIy7eWJ6+Dsf
- euApyX5L0zFg9K1CYK17dEjPSwcq1MHcDogUkgKs7Imt2GEreaH6fxgMt5N4efECoqTGJjbj0Lx
- xMm1nrEeIY1Guhbt4rWE1JO8=
+ t=1793866086; v=1; x=1794470886;
+ b=QR/ysJBvl+GJUPglNTkM/A6Z59ex+vCXeglEdffePj1QVKtsCiB1QoXap51GWfQ59mC3JGVk
+ efi0mTPVzaLQU/qpgA1PGp79vKCvudR4xl+jVA+j7qLIrYqVcwuJAYwRBwDgEDvoVn4dVM0aGwH
+ 7lx6AfxZbzVT09HtZOTl5UWA=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 556cd0a12ca46ba7;
-	Thu, 05 Nov 2026 07:56:13 +0000
-X-Mizu-Trace-ID: 556cd0a12ca46ba7
+Received: by smtp.migadu.com with ESMTPS id f36153c12708478f;
+	Thu, 05 Nov 2026 08:08:05 +0000
+X-Mizu-Trace-ID: f36153c12708478f
 X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Quentin Perret <qperret@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Martijn Bogaard <martijnbogaard@google.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Fuad Tabba <tabba@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/3] KVM: arm64: Align the pKVM selftest VM's stage-2 PGD
-Date: Thu,  5 Nov 2026 07:56:05 +0000
-Message-ID: <20261105075606.367005-3-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261105075606.367005-1-fuad.tabba@linux.dev>
-References: <20261105075606.367005-1-fuad.tabba@linux.dev>
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5be58ad9600so5849e87.0
+        for <kvmarm@lists.linux.dev>; Thu, 05 Nov 2026 00:08:01 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AKwUvBxwXWPA007Y3iPLw4btHz0md75qUIvcq4REpFA49bl8dNvDz6JKswewcYLvMCAP2rU880cYu88=@lists.linux.dev
+X-Gm-Message-State: APuU4Z8tfy6J1cx9nUxAbKKyMw8fYMrNgzULVJDTLIJ6mz9sf1IbohSC
+	D6zZVJpSJggvG+NRhMkBbgwj3uMCoaV6fpb5gNRWLo1EphhftTIPNGTfppBKe9AiEIs+d1N126T
+	rLdJfMtASDcOmu/GfIfnrTQAsBfRVWUkKpzq0uCfh
+X-Received: by 2002:a05:6512:3e02:b0:5bf:f0fb:2c9c with SMTP id
+ 2adb3069b0e04-5bffb1dc195mr77268e87.5.1793866080846; Thu, 05 Nov 2026
+ 00:08:00 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -80,50 +66,40 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261104124451.2148724-1-fuad.tabba@linux.dev>
+ <20261104124451.2148724-2-fuad.tabba@linux.dev> <aut5t605onnuBWfk@kernel.org>
+In-Reply-To: <aut5t605onnuBWfk@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Thu, 5 Nov 2026 08:07:24 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTzEa-VZZ7TffdR0dY=92-iqX68yWkPR1zz7uzEX+c+f3A@mail.gmail.com>
+X-Gm-Features: AclHuK__AB0z6apl_Wv0YuqPm4x2AvnN93O1z8V4Fr2KgOylyOBS-uUCz6gu5jo
+Message-ID: <CA+EHjTzEa-VZZ7TffdR0dY=92-iqX68yWkPR1zz7uzEX+c+f3A@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] KVM: arm64: Resume stage-2 teardown where the walk stopped
+To: Oliver Upton <oupton@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-With CONFIG_NVHE_EL2_DEBUG, pKVM init sets up a selftest VM whose PGD is
-the start of its 32-page block. That block is the first allocation out
-of the hyp reserve, which falls back to page alignment when its
-PMD-aligned allocation fails (512M on a 64K host).
+On Wed, 4 Nov 2026 at 18:30, Oliver Upton <oupton@kernel.org> wrote:
+>
+> Hi Fuad,
+>
+> On Wed, Nov 04, 2026 at 12:44:50PM +0000, Fuad Tabba wrote:
+> > +u64 kvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
+> > +                                  u64 addr, u64 size)
+>
+> Returning a signed value here would be a good idea so you can percolate
+> walk failures back up to the caller. Since that WARN_ON() below may as
+> well be a BUG_ON() in hyp code.
 
-A PGD of concatenated tables must be naturally aligned, or the VM's pool
-never coalesces it into a block hyp_alloc_pages() can return. So when
-the reserve isn't aligned to the PGD's size, the allocation in
-guest_s2_zalloc_pages_exact() fails and pKVM init panics. A 64K host
-with a 44-bit PA has a four-page PGD, and on a 1G QEMU VM the reserve
-landed at 0x7fae0000.
+Ack.
 
-Take the aligned pages inside the block instead. The pages either side
-of it go to the memcache and the pool. The PGD is at most 16 pages, so
-it always fits.
+> Otherwise, rest looks good.
 
-Fixes: 48d5645072930 ("KVM: arm64: Extend pKVM selftest for np-guests")
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- arch/arm64/kvm/hyp/nvhe/pkvm.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 03e530e15b4a2..820baf9ff74a2 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -847,10 +847,14 @@ struct pkvm_hyp_vcpu *init_selftest_vm(void *virt)
- {
- 	struct hyp_page *p = hyp_virt_to_page(virt);
- 	unsigned long min_pages, seeded = 0;
-+	void *pgd;
- 	int i;
- 
- 	selftest_vm.kvm.arch.mmu.vtcr = host_mmu.arch.mmu.vtcr;
--	WARN_ON(kvm_guest_prepare_stage2(&selftest_vm, virt));
-+
-+	/* A concatenated PGD must be naturally aligned for the pool to coalesce it. */
-+	pgd = PTR_ALIGN(virt, kvm_pgtable_stage2_pgd_size(selftest_vm.kvm.arch.mmu.vtcr));
-+	WARN_ON(kvm_guest_prepare_stage2(&selftest_vm, pgd));
- 
- 	/*
- 	 * Mirror pkvm_refill_memcache() for the share/donate pre-checks;
--- 
-2.47.3
-
+Thanks Oliver!
+/fuad
