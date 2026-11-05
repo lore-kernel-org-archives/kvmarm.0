@@ -1,49 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793897403;
-	b=rRs8Kjvz6AiTl+8c5JJI9HyP4yev/1ziV6TDTJPmP1pxZd8Ijw9czQ4ooB02MHPYwBmC
-	 t3pRHVs/a5gmKGtZu/jFDm3TO5tCdDy2OFEFZ1/gxiMA2hwv+zXdta90LxV6xlTwPUyPH
-	 9FZQgypSeBQ5Ect4FZNIIOIoT57hoK59pzt8z/evYUFUIBuEYDqe6OLSu5uvNUuE4DO0u
-	 OeQKi39lsNEW9CllibWsRNEZO6kDxlvczl5bzu08EPsQs9scWaDRCkk0bEy/4rBW1lhrp
-	 m1yCx9uTl4d0+FZxLMT8dybgGGq7SwsTsz4wKecMQ0BvB8iRNfGazbOQ3uT2UiYkF6g==
+	t=1793897522;
+	b=PpHXfQ/noBG/8ICZHAUs2WmADeRo4iFB83bWLEsRpz6n/IZZpQmAiHfUnCWysjN57hsa
+	 z6n9hp/FVTpvBu4I3OC3LEqrD4kYsm9s4B2ZlS2KBSEnBoTXtouiecVnHXNSPj/mqi6rr
+	 mchtcyU4jTU9NAA4xNI9UwsUA4jfSSU+tDVg6kjQVCh4/280ogWP/UtDWVNVyZs/HSWIa
+	 5/i15TX3klGp750r9o+AdCDEGgzW6QMabJ8jS033JHwDumsGKuvbUrsIcfZQ/n4l1M6bx
+	 4S4wJVzZuAgEmT2Tbg6OIt/ie1qBqkrWY5UBjuHucNJRvnnf79bx1mLCsqLp0mUZ/hA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793897403;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
-	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=bnhkiMQgKoBcevjL3lDyt/7tu4k+aU/usctlsx52gYc=;
-	b=KBIUwbhrYtQMlB3Iz4AeWEFKrRJQK16S/PAw0tsXfTbcPjPsFqfB2ipxKYnWIHO+tPsf
-	 as1rfAe/LaNMrCMuwLAYSToBD1tk+Mc0RIdVi3Zzkh1aK4zZ5crrXiGE8FU0QbAudW4Pu
-	 60If5iEDGN4PNnxVUh/Q5CN/CFdH6Onaac/djM1cS5jEGNIA49iMQN5P0AmoVquJA8J8M
-	 kTYojW8rwVYDEUHe5KpuKg/IbY3C+dtwHEe6usGpZt7VpL8N2pd2fQL6Ktou+FSGmVBYv
-	 515fYP1Z2wtmO1YOVd4C3zCYlya8U5fUdxuDhd/xUc5UglvUSZ47o8pta5HBKoicDnQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793897522;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=3dCADcgaA1jIVzURXy3sRrPfhp4fyMV+LhaMMwvBEQw=;
+	b=EJ8cbZIPdNXDdMKMfs0jC9dSMLsdZDij67x1HmzMEauJKC9pcD48wWQ+ua4WgYjzTJL+
+	 uT3uKa+0szzunyd9V1t6HsqSvVb5bkXFyequYNrRA3v8EgnaHGAQ/unPqnMGjTHMV3+TT
+	 ioxThyOSYwdMed1KOOdLSezPiW6OI2AaJLVL6Xkbb7NUtXMSp3I1KJtcQfrkLqorIOo9h
+	 iFaT5JUgFZobmlnd9BfUlMIaitR8w8Cwel4eAW/ZOWrZv9h13jjVOMjGRoUMut9FgFPXO
+	 ngLlz7DfSFuo2+HkyQ7RuQc5Ojtzsvq7q8HqtUcQpu4oMoO0KpOG+T2J0uSckfSaEBQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=WbSTd5yT;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4C8B606A32C;
-	Thu,  5 Nov 2026 16:50:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C4C8B606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NqfhD32d;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0D7606A328;
+	Thu,  5 Nov 2026 16:52:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=WbSTd5yT
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B5C8C1682;
-	Thu,  5 Nov 2026 08:49:57 -0800 (PST)
-Received: from [10.0.128.250] (e122027.cambridge.arm.com [10.0.128.250])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1E7AB3F632;
-	Thu,  5 Nov 2026 08:49:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793897400; bh=B7sdCE0FL01Nwo4nHRQePFyUNDfvN2vdiE6ATBsLM9o=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=WbSTd5yTxR9Dy7rvQIrfkn2me2Z3rdvbUgvkwJGBnQg26rUQL6+U5r1u1Bs1CIH9O
-	 8Gu9wGlwVbrTmnPFEttM2th5Ng84iPx/ruUscbYLdVvmeJfZF6a/C77fSZtUZ0FJG9
-	 UEMv3FmuL8Cw+6+4YjjHJiwue0pX8FOU7S+NneeY=
-Message-ID: <0d8b56d9-2eb2-41b3-adc5-6457f1eafe0e@arm.com>
-Date: Thu, 5 Nov 2026 16:49:47 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NqfhD32d
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D87761F000C1;
+	Thu,  5 Nov 2026 16:51:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793897521;
+	bh=3dCADcgaA1jIVzURXy3sRrPfhp4fyMV+LhaMMwvBEQw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=NqfhD32dCFfrw2csPCJ6yGKDGHdP+sCPkT6q1r/bS6MIIgVQMKkHfW4300nYbI382
+	 CYBZ0u/fxhLo00Y7apBct++/jVWc3TTPnu3+EkPFd+tKxdWZcK24Ap/J+QDLfkgyiH
+	 BrjeKHwIcN+lutEnp7Xpw5YHdP46PbCpaiF/tqZ2cVWbCQCToM+5mn/uoQ8b8aS+Xe
+	 wiU4UfZ8fqYQAl79bN3QP7DOz+NiMQ5OVan5MaC8LTyjQ22SCrzmZ5VuTutHOTEfSu
+	 K+y7784JvFi0ARKfu7S8eTt+fEzvaaFB9joWyJ5skwnSjvxorj7L8QpLTW2EyNvBtl
+	 BWwD0oF9eD3fA==
+Date: Thu, 5 Nov 2026 16:51:56 +0000
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, 
+	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	will@kernel.org, mark.rutland@arm.com, linux-perf-users@vger.kernel.org, 
+	catalin.marinas@arm.com, james.clark@linaro.org
+Subject: Re: [RFC PATCH v7 24/28] arm64: errata: Don't enable guest buffer if
+ misprogrammed
+Message-ID: <auypUBq_eddze2zu@gremlin>
+References: <20260903160623.315525-1-alexandru.elisei@arm.com>
+ <20260903160623.315525-25-alexandru.elisei@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,529 +61,381 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 08/11] KVM: arm64: CCA: Add Realm RTT mapping and
- invalidation helpers
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>
-References: <20261102141304.126883-1-steven.price@arm.com>
- <20261102141304.126883-9-steven.price@arm.com>
- <1c2f2596-4b55-4fa1-a215-8c1099d4c1a2@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <1c2f2596-4b55-4fa1-a215-8c1099d4c1a2@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260903160623.315525-25-alexandru.elisei@arm.com>
 
-On 04/11/2026 18:59, Suzuki K Poulose wrote:
-> Hi Steven
-> 
-> On 02/11/2026 14:12, Steven Price wrote:
->> Add the RMI RTT creation and unmap helpers needed by CCA Realm stage-2
->> memory operations. REC exit handling and guest requested RIPAS changes
->> follow in the vCPU series.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>   arch/arm64/include/asm/kvm_rmi.h |  14 ++
->>   arch/arm64/kvm/rmi.c             | 346 +++++++++++++++++++++++++++++++
->>   2 files changed, 360 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/
->> asm/kvm_rmi.h
->> index 58d825e40bdf..72a9449f00d7 100644
->> --- a/arch/arm64/include/asm/kvm_rmi.h
->> +++ b/arch/arm64/include/asm/kvm_rmi.h
->> @@ -81,6 +81,20 @@ int kvm_init_realm(struct kvm *kvm);
->>   void kvm_destroy_realm(struct kvm *kvm);
->>   int kvm_realm_teardown_stage2(struct kvm *kvm);
->>   +enum kvm_gfn_range_filter;
->> +
->> +void kvm_realm_unmap_range_filter(struct kvm *kvm,
->> +                  unsigned long ipa,
->> +                  unsigned long size,
->> +                  bool may_block,
->> +                  enum kvm_gfn_range_filter attr_filter);
->> +
->> +void kvm_realm_unmap_range(struct kvm *kvm,
->> +               unsigned long ipa,
->> +               unsigned long size,
->> +               bool unmap_private,
->> +               bool may_block);
-> 
-> This can be removed now in favor of the one above ?
+On Thu, Sep 03, 2026 at 05:06:19PM +0100, Alexandru Elisei wrote:
+> When PMBPTR_EL1 is programmed to be equal to or greater than
+> PMBLIMITR_EL1.Limit, SPE is enabled and PMBSR_EL1.S is zero, the CPU might
+> deadlock.
+>
+> This doesn't affect correctly written software, like the SPE driver, but a
+> buggy KVM guest might trigger the erratum. The workaround for KVM is not to
+> enable the hardware buffer, and, as a consequence, profiling. According
+> to ARM DDI0487M.c, rule R_PGGHS, this is one of the acceptable
+> behaviours when the buffer is misprogrammed.
 
-Indeed it seems all usage of it has gone - thanks for spotting.
+What about buffer management events? Will the guest not see anything + then
+not know why?
 
->> +
->>   static inline bool kvm_realm_is_private_address(struct realm *realm,
->>                           unsigned long addr)
->>   {
->> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
->> index f190143b33ba..1066f767f85d 100644
->> --- a/arch/arm64/kvm/rmi.c
->> +++ b/arch/arm64/kvm/rmi.c
->> @@ -34,6 +34,83 @@ static int get_start_level(struct realm *realm)
->>       return 4 - stage2_pgtable_levels(realm->ia_bits);
->>   }
->>   +static int find_map_level(struct realm *realm,
->> +              unsigned long start,
->> +              unsigned long end)
->> +{
->> +    int level = KVM_PGTABLE_LAST_LEVEL;
->> +
->> +    while (level > get_start_level(realm)) {
->> +        unsigned long map_size = rmi_rtt_level_mapsize(level - 1);
->> +
->> +        if (!IS_ALIGNED(start, map_size) ||
->> +            (start + map_size) > end)
->> +            break;
->> +
->> +        level--;
->> +    }
->> +
->> +    return level;
->> +}
->> +
->> +static unsigned long rmi_range_entry_size(int rmi_size)
-> 
-> I am wondering if we should move rmi_addr_block_size_to_bytes() from
-> drivers/firmware/arm_rmm/rmi.c to include/linux/arm-rmi-cmds.h and
-> allow the consumers to deal with the address range entries.
+Maybe worth raising an event for that, though perhaps reasonable not to,
+worth saying here what the trade-off is though.
 
-Yep, seem reasonable.
+>
+> Several parts are affected:
+>
+> * ARM Neoverse-N1 (MP050), SDEN v35, erratum 1978083
+>   https://support.arm.com/documentation/SDEN-885747/35-0
+> * ARM Neoverse-V1 (MP076), SDEN v23, erratum 1978082
+>   https://support.arm.com/documentation/SDEN-1401781/23-0
+> * ARM Cortex-X1 (MP077), SDEN v25, erratum 2004055
+>   https://support.arm.com/documentation/SDEN-1401782/25-0
+> * ARM Cortex-X1C (MP136), SDEN v20, erratum 2004056
+>   https://support.arm.com/documentation/SDEN-1707914/20-0
+> * ARM Cortex-A78 (MP102), SDEN v25, erratum 2004055
+>   https://support.arm.com/documentation/SDEN-1401784/25-0
+> * ARM Cortex-A78AE (MP105), SDEN v22, erratum 2004059
+>   https://support.arm.com/documentation/SDEN-1707912/22-0
+> * ARM Cortex-A78C (MP138), SDEN v20, erratum 2004056
+>   https://support.arm.com/documentation/SDEN-1707916/20-0
+>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
->> +{
->> +    if (WARN_ON(rmi_size > KVM_PGTABLE_LAST_LEVEL))
->> +        return 0;
->> +
->> +    return kvm_granule_size(KVM_PGTABLE_LAST_LEVEL - rmi_size);
->> +}
->> +
->> +static int undelegate_range_desc(unsigned long desc)
->> +{
->> +    unsigned long size =
->> rmi_range_entry_size(RMI_ADDR_RANGE_BLOCK_SIZE(desc));
->> +    unsigned long count = RMI_ADDR_RANGE_COUNT(desc);
->> +    unsigned long addr = RMI_ADDR_RANGE_ADDR(desc);
->> +    unsigned long state = RMI_ADDR_RANGE_STATE(desc);
->> +
->> +    if (state == RMI_OP_MEM_UNDELEGATED)
->> +        return 0;
->> +
->> +    if (size * count == 0)
->> +        return 0;
->> +
->> +    return rmi_undelegate_range(addr, size * count);
->> +}
->> +
->> +static phys_addr_t alloc_delegated_granule(struct
->> kvm_mmu_memory_cache *mc)
->> +{
->> +    phys_addr_t phys;
->> +    void *virt;
->> +
->> +    if (mc) {
->> +        virt = kvm_mmu_memory_cache_alloc(mc);
->> +    } else {
->> +        virt = (void *)__get_free_page(GFP_ATOMIC | __GFP_ZERO |
->> +                           __GFP_ACCOUNT);
->> +    }
->> +
->> +    if (!virt)
->> +        return PHYS_ADDR_MAX;
->> +
->> +    phys = virt_to_phys(virt);
->> +    if (rmi_delegate_page(phys)) {
->> +        free_page((unsigned long)virt);
->> +        return PHYS_ADDR_MAX;
->> +    }
->> +
->> +    return phys;
->> +}
->> +
->> +static phys_addr_t alloc_rtt(struct kvm_mmu_memory_cache *mc)
->> +{
->> +    phys_addr_t phys = alloc_delegated_granule(mc);
->> +
->> +    if (phys != PHYS_ADDR_MAX)
->> +        kvm_account_pgtable_pages(phys_to_virt(phys), 1);
->> +
->> +    return phys;
->> +}
->> +
->>   static void free_rtt(phys_addr_t phys)
->>   {
->>       if (rmi_free_delegated_page(phys))
->> @@ -42,6 +119,32 @@ static void free_rtt(phys_addr_t phys)
->>       kvm_account_pgtable_pages(phys_to_virt(phys), -1);
->>   }
->>   +static long realm_rtt_create(struct realm *realm,
->> +                 unsigned long addr,
->> +                 int level,
->> +                 phys_addr_t phys)
->> +{
->> +    addr = ALIGN_DOWN(addr, rmi_rtt_level_mapsize(level - 1));
-> 
-> As pointed out in the other patch, this could now be replaced with
-> kvm_granule_size().
+In general I think we can radically simplify the code + remove the
+arm_spe_pmu->has_workaround_2004055 and kvm_vcpu_spe->buffer_misprogrammed
+fields, and just figure this out programatically:
 
-Ack.
+	static bool __kvm_spe_buffer_misprogrammed(u64 pmblimitr, u64 pmbptr)
+	{
+		if (!cpus_have_final_cap(ARM64_WORKAROUND_2004055))
+			return false;
 
-> 
->> +    return rmi_rtt_create(virt_to_phys(realm->rd), phys, addr, level);
-> 
-> Does it make sense to save "rd_phys" as we tend to use the physical
-> address more than the virt and we end up converting it all the time ?
+		return pmbptr >= (pmblimitr & PMBLIMITR_EL1_LIMIT);
+	}
 
-Yes that's an improvement.
 
->> +}
->> +
->> +static long realm_rtt_fold(struct realm *realm,
->> +               unsigned long addr,
->> +               int level,
->> +               phys_addr_t *rtt_granule)
->> +{
->> +    unsigned long out_rtt;
->> +    long ret;
->> +
->> +    addr = ALIGN_DOWN(addr, rmi_rtt_level_mapsize(level - 1));
->> +    ret = rmi_rtt_fold(virt_to_phys(realm->rd), addr, level, &out_rtt);
->> +
->> +    if (rtt_granule)
->> +        *rtt_granule = out_rtt;
->> +
->> +    return ret;
->> +}
->> +
->>   /*
->>    * realm_rtt_destroy - Destroy an RTT at @level for @addr.
->>    *
->> @@ -65,6 +168,43 @@ static long realm_rtt_destroy(struct realm *realm,
->> unsigned long addr,
->>       return ret;
->>   }
->>   +static int realm_create_rtt_levels(struct realm *realm,
->> +                   unsigned long ipa,
->> +                   int level,
->> +                   int max_level,
->> +                   struct kvm_mmu_memory_cache *mc)
->> +{
->> +    while (level++ < max_level) {
->> +        phys_addr_t rtt = alloc_rtt(mc);
->> +        long ret;
->> +
->> +        if (rtt == PHYS_ADDR_MAX)
->> +            return -ENOMEM;
->> +
->> +        ret = realm_rtt_create(realm, ipa, level, rtt);
->> +        if (ret < 0) {
->> +            free_rtt(rtt);
->> +            return ret;
->> +        }
->> +
->> +        if (RMI_RESULT_STATUS(ret) == RMI_ERROR_RTT &&
->> +            RMI_RESULT_DATA_LEVEL(ret) == level - 1) {
->> +            /* The RTT already exists, continue */
->> +            free_rtt(rtt);
-> 
-> nit: We seem to be releasing the rtt (undelegating it and
-> freeing a page) only to be reallocated later (and re-delegated). We
-> could optimise this a little bit and may be reuse it for the next
-> iteration ?
-> (I understand this is rather a corner case)
+Then call this from __kvm_spe_profiling_buffer_enabled(), like:
 
-Sure.
+static bool __kvm_spe_profiling_buffer_enabled(u64 pmblimitr, u64 pmbsr,
+					       u64 pmbptr)
+{
+	if (!FIELD_GET(PMBLIMITR_EL1_E, pmblimitr) ||
+	    FIELD_GET(PMBSR_EL1_S, pmbsr))
+		return false;
 
->> +            continue;
->> +        }
->> +
->> +        if (ret) {
->> +            WARN(1, "Failed to create RTT at level %d: %ld\n",
->> +                 level, ret);
->> +            free_rtt(rtt);
->> +            return -ENXIO;
->> +        }
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->>   static int realm_tear_down_rtt_level(struct realm *realm, int level,
->>                        unsigned long start, unsigned long end)
->>   {
->> @@ -161,6 +301,64 @@ static int realm_tear_down_rtt_range(struct realm
->> *realm,
->>                        start, end);
->>   }
->>   +/*
->> + * Returns 0 on successful fold, a negative value on error, a
->> positive value if
->> + * we were not able to fold all tables at this level.
->> + */
->> +static int realm_fold_rtt_level(struct realm *realm, int level,
->> +                unsigned long start, unsigned long end)
->> +{
->> +    int not_folded = 0;
->> +    ssize_t map_size;
->> +    unsigned long addr, next_addr;
->> +
->> +    if (WARN_ON(level > KVM_PGTABLE_LAST_LEVEL))
->> +        return -EINVAL;
->> +
->> +    map_size = rmi_rtt_level_mapsize(level - 1);
->> +
->> +    for (addr = start; addr < end; addr = next_addr) {
->> +        phys_addr_t rtt_granule;
->> +        long ret;
->> +        unsigned long align_addr = ALIGN(addr, map_size);
->> +
->> +        next_addr = ALIGN(addr + 1, map_size);
->> +
->> +        ret = realm_rtt_fold(realm, align_addr, level, &rtt_granule);
->> +        if (ret < 0)
->> +            return ret;
->> +
->> +        switch (RMI_RESULT_STATUS(ret)) {
->> +        case RMI_SUCCESS:
->> +            free_rtt(rtt_granule);
->> +            break;
->> +        case RMI_ERROR_RTT:
->> +            if (level == KVM_PGTABLE_LAST_LEVEL ||
-> 
-> 
->> +                RMI_RESULT_DATA_LEVEL(ret) < level) {
-> 
-> Should this be RMI_RESULT_DATA_LEVEL(ret) == level ?
-> 
-> Additionally if the walk terminated at a shallow level, i.e.,
-> RMI_RESULT_DATA_LEVEL(ret) < level), then we don't have to conclude
-> that the table was NOT folded. In effect, the table is actually folded
-> at level above.
-> 
-> Also, we could move the next_addr in this case skip to the addr
-> past to ALIGN(addr + 1, kvm_granule_size(RMI_RESULT_DATA_LEVEL(ret) - 1))
+	return !__kvm_spe_buffer_misprogrammed(pmblimitr, pmbptr);
+}
 
-Yep, good point.
+With pmbptr passed as ctxt_sys_reg(guest_ctxt, PMBPTR_EL1).
 
-> 
->> +                not_folded++;
->> +                break;
->> +            }
->> +            /* Recurse a level deeper */
->> +            ret = realm_fold_rtt_level(realm,
->> +                           level + 1,
->> +                           addr,
->> +                           next_addr);
->> +            if (ret < 0) {
->> +                return ret;
->> +            } else if (ret == 0) {
->> +                /* Try again at this level */
->> +                next_addr = addr;
->> +            }
->> +            break;
->> +        default:
->> +            WARN_ON(1);
->> +            return -ENXIO;
->> +        }
->> +    }
->> +
->> +    return not_folded;
->> +}
->> +
->>   static int realm_destroy_rtts(struct kvm *kvm)
->>   {
->>       struct realm *realm = &kvm->arch.realm;
->> @@ -196,6 +394,154 @@ int kvm_realm_teardown_stage2(struct kvm *kvm)
->>       return 0;
->>   }
->>   +static void realm_unmap_shared_range(struct kvm *kvm,
->> +                     unsigned long start,
->> +                     unsigned long end,
->> +                     bool may_block)
->> +{
->> +    struct realm *realm = &kvm->arch.realm;
->> +    unsigned long rd = virt_to_phys(realm->rd);
->> +    unsigned long next_addr, addr;
->> +    unsigned long shared_bit = BIT(realm->ia_bits - 1);
->> +
->> +    if (start >= end)
->> +        return;
->> +
->> +    /*
->> +     * Callers may pass either an IPA range or its shared alias. Add the
->> +     * shared bit only for the former. Use addition so an exclusive
->> end at
->> +     * shared_bit advances to the end of the IPA space.
->> +     */
->> +    if (start < shared_bit) {
->> +        start += shared_bit;
->> +        end += shared_bit;
->> +    }
->> +
->> +    for (addr = start; addr < end; addr = next_addr) {
->> +        long ret;
->> +
->> +        ret = rmi_rtt_unprot_unmap(rd, addr, end, RMI_ADDR_TYPE_NONE,
->> +                       0, &next_addr, NULL, NULL);
->> +        if (WARN_ON(ret < 0))
->> +            return;
->> +
->> +        switch (RMI_RESULT_STATUS(ret)) {
->> +        case RMI_SUCCESS:
->> +            break;
->> +        case RMI_ERROR_RTT: {
->> +            int err_level = RMI_RESULT_DATA_LEVEL(ret);
->> +            int level = find_map_level(realm, addr, end);
->> +
->> +            if (err_level >= level) {
->> +                /* Nothing present, so skip */
->> +                next_addr = addr + rmi_rtt_level_mapsize(err_level);
->> +                break;
->> +            }
->> +
->> +            ret = realm_create_rtt_levels(realm, addr, err_level,
->> +                              level, NULL);
->> +            if (WARN_ON(ret))
->> +                return;
->> +            /* Retry with the RTT levels in place */
->> +            next_addr = addr;
->> +            break;
->> +        }
->> +        default:
->> +            WARN_ON(1);
->> +            return;
->> +        }
->> +
->> +        if (may_block)
->> +            cond_resched_rwlock_write(&kvm->mmu_lock);
->> +    }
->> +
->> +    realm_fold_rtt_level(realm, get_start_level(realm) + 1,
->> +                 start, end);
->> +}
->> +
->> +static void realm_unmap_private_range(struct kvm *kvm,
->> +                      unsigned long start,
->> +                      unsigned long end,
->> +                      bool may_block)
->> +{
->> +    struct realm *realm = &kvm->arch.realm;
->> +    unsigned long rd = virt_to_phys(realm->rd);
->> +    unsigned long next_addr, addr;
->> +    long ret;
->> +
->> +    for (addr = start; addr < end; addr = next_addr) {
->> +        unsigned long out_range;
->> +        unsigned long flags = RMI_ADDR_TYPE_SINGLE;
->> +        /* TODO: Optimise using RMI_ADDR_TYPE_LIST */
->> +
->> +retry:
->> +        ret = rmi_rtt_data_unmap(rd, addr, end, flags, 0,
->> +                     &next_addr, &out_range, NULL);
->> +        if (WARN_ON(ret < 0))
->> +            return;
->> +
->> +        if (RMI_RESULT_STATUS(ret) == RMI_ERROR_RTT) {
->> +            phys_addr_t rtt;
->> +
-> 
-> 
->> +            if (next_addr > addr)
->> +                continue; /* UNASSIGNED */
-> 
-> This is no longer valid. out_top (next_addr in our case) is only valid
-> when ret == RMI_SUCCESS. Please drop. See VTKMV.
+> ---
+>  Documentation/arch/arm64/silicon-errata.rst | 14 +++++++++++
+>  arch/arm64/Kconfig                          | 25 ++++++++++++++++++++
+>  arch/arm64/include/asm/kvm_spe.h            |  1 +
+>  arch/arm64/kernel/cpu_errata.c              | 26 +++++++++++++++++++++
+>  arch/arm64/kvm/hyp/vhe/spe-sr.c             |  6 +++--
+>  arch/arm64/kvm/spe.c                        | 22 +++++++++++++++++
+>  arch/arm64/tools/cpucaps                    |  1 +
+>  drivers/perf/arm_spe_pmu.c                  |  3 +++
+>  include/linux/perf/arm_spe_pmu.h            |  1 +
+>  9 files changed, 97 insertions(+), 2 deletions(-)
+>
+> diff --git a/Documentation/arch/arm64/silicon-errata.rst b/Documentation/arch/arm64/silicon-errata.rst
+> index a29f8fbc16a8..a5477cae7d70 100644
+> --- a/Documentation/arch/arm64/silicon-errata.rst
+> +++ b/Documentation/arch/arm64/silicon-errata.rst
+> @@ -151,10 +151,14 @@ stable kernels.
+>  +----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Cortex-A78      | #3031174        | ARM64_ERRATUM_3023823       |
+>  +----------------+-----------------+-----------------+-----------------------------+
+> +| ARM            | Cortex-A78      | #2004055        | ARM64_ERRATUM_2004055       |
+> ++----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Cortex-A78AE    | #4193793        | ARM64_ERRATUM_4118414       |
+>  +----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Cortex-A78AE    | #3031175        | ARM64_ERRATUM_3023823       |
+>  +----------------+-----------------+-----------------+-----------------------------+
+> +| ARM            | Cortex-A78AE    | #2004059        | ARM64_ERRATUM_2004055       |
+> ++----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Cortex-A78C     | #3324346,       | ARM64_ERRATUM_3194386       |
+>  |                |                 | #3324347        |                             |
+>  +----------------+-----------------+-----------------+-----------------------------+
+> @@ -163,6 +167,8 @@ stable kernels.
+>  | ARM            | Cortex-A78C     | #3031176,       | ARM64_ERRATUM_3023823       |
+>  |                |                 | #3031177        |                             |
+>  +----------------+-----------------+-----------------+-----------------------------+
+> +| ARM            | Cortex-A78C     | #2004056        | ARM64_ERRATUM_2004055       |
+> ++----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Cortex-A710     | #2119858        | ARM64_ERRATUM_2119858       |
+>  +----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Cortex-A710     | #2054223        | ARM64_ERRATUM_2054223       |
+> @@ -189,12 +195,16 @@ stable kernels.
+>  +----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Cortex-X1       | #3031174        | ARM64_ERRATUM_3023823       |
+>  +----------------+-----------------+-----------------+-----------------------------+
+> +| ARM            | Cortex-X1       | #2004055        | ARM64_ERRATUM_2004055       |
+> ++----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Cortex-X1C      | #3324346        | ARM64_ERRATUM_3194386       |
+>  +----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Cortex-X1C      | #4193792        | ARM64_ERRATUM_4118414       |
+>  +----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Cortex-X1C      | #3031176        | ARM64_ERRATUM_3023823       |
+>  +----------------+-----------------+-----------------+-----------------------------+
+> +| ARM            | Cortex-X1C      | #2004056        | ARM64_ERRATUM_2004055       |
+> ++----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Cortex-X2       | #2119858        | ARM64_ERRATUM_2119858       |
+>  +----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Cortex-X2       | #2224489        | ARM64_ERRATUM_2224489       |
+> @@ -233,6 +243,8 @@ stable kernels.
+>  +----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Neoverse-N1     | #3023823        | ARM64_ERRATUM_3023823       |
+>  +----------------+-----------------+-----------------+-----------------------------+
+> +| ARM            | Neoverse-N1     | #1978083        | ARM64_ERRATUM_2004055       |
+> ++----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Neoverse-N2     | #2139208        | ARM64_ERRATUM_2139208       |
+>  +----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Neoverse-N2     | #2067961        | ARM64_ERRATUM_2067961       |
+> @@ -255,6 +267,8 @@ stable kernels.
+>  +----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Neoverse-V1     | #3028884        | ARM64_ERRATUM_3023823       |
+>  +----------------+-----------------+-----------------+-----------------------------+
+> +| ARM            | Neoverse-V1     | #1978082        | ARM64_ERRATUM_2004055       |
+> ++----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Neoverse-V2     | #3324336        | ARM64_ERRATUM_3194386       |
+>  +----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Neoverse-V2     | #4193787        | ARM64_ERRATUM_4118414       |
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index ca6759d16d27..d9b27ee90ab5 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -1494,6 +1494,31 @@ config ARM64_ERRATUM_3023823
+>
+>  	  If unsure, say Y.
+>
+> +config ARM64_ERRATUM_2004055
+> +	bool "Incorrect programming of PMBPTR_EL1 might result in a deadlock"
+> +	depends on KVM_ARM_SPE
+> +	default y
+> +	help
+> +	  This option adds a workaround for the following errata:
+> +
+> +	  * ARM Neoverse-N1 erratum 1978083
+> +	  * ARM Neoverse-V1 erratum 1978082
+> +	  * ARM Cortex-X1 erratum 2004055
+> +	  * ARM Cortex-X1C erratum 2004056
+> +	  * ARM Cortex-A78 erratum 2004055
+> +	  * ARM Cortex-A78AE erratum 2004059
+> +	  * ARM Cortex-A78C errata 2004056
 
-Sashiko pointed that out too.
+NIT: errata -> erratum :)
 
->> +
->> +            rtt = alloc_rtt(NULL);
->> +            if (WARN_ON(rtt == PHYS_ADDR_MAX))
->> +                return;
->> +            ret = realm_rtt_create(realm, addr,
->> +                           RMI_RESULT_DATA_LEVEL(ret) + 1, rtt);
->> +            if (WARN_ON(ret)) {
->> +                free_rtt(rtt);
->> +                return;
->> +            }
->> +            goto retry;
->> +        } else if (WARN_ON(ret)) {
->> +            continue;
->> +        }
->> +
->> +        ret = undelegate_range_desc(out_range);
->> +        if (WARN_ON(ret))
->> +            break;
->> +
->> +        if (may_block)
->> +            cond_resched_rwlock_write(&kvm->mmu_lock);
->> +    }
->> +
->> +    realm_fold_rtt_level(realm, get_start_level(realm) + 1,
->> +                 start, end);
->> +}
->> +
->> +void kvm_realm_unmap_range_filter(struct kvm *kvm, unsigned long start,
->> +                  unsigned long size, bool may_block,
->> +                  enum kvm_gfn_range_filter attr_filter)
->> +{
->> +    unsigned long end = start + size;
->> +    struct realm *realm = &kvm->arch.realm;
->> +
->> +    if (!kvm_realm_is_created(kvm))
->> +        return;
->> +
->> +    end = min(BIT(realm->ia_bits - 1), end);
->> +
->> +    if (attr_filter & KVM_FILTER_SHARED)
->> +        realm_unmap_shared_range(kvm, start, end, may_block);
->> +    if (attr_filter & KVM_FILTER_PRIVATE)
->> +        realm_unmap_private_range(kvm, start, end, may_block);
->> +}
->> +
-> 
-> ---8>---
->> +void kvm_realm_unmap_range(struct kvm *kvm, unsigned long start,
->> +               unsigned long size, bool unmap_private,
->> +               bool may_block)
->> +{
->> +    enum kvm_gfn_range_filter attr_filter = KVM_FILTER_SHARED;
->> +
->> +    if (unmap_private)
->> +        attr_filter |= KVM_FILTER_PRIVATE;
->> +
->> +    kvm_realm_unmap_range_filter(kvm, start, size, may_block,
->> attr_filter);
->> +}
->> +
-> 
-> ---8<---
-> 
-> No longer needed ?
+> +
+> +	  When PMBPTR_EL1 is programmed to be equal to or greater than
+> +	  PMBLIMITR_EL1.Limit, SPE is enabled and PMBSR_EL1.S is zero, the CPU
+> +	  might deadlock.
+> +
+> +	  The work around is for KVM to behave as if profiling is disabled when
+> +	  the buffer is enabled, PMSBSR_EL1.S is zero and
+> +	  PMBPTR_EL1.PTR >= PMBLIMITR_EL1.Limit.
+> +
+> +	  If unsure, say Y.
+> +
+>  endmenu # "ARM errata workarounds via the alternatives framework"
+>
+>  choice
+> diff --git a/arch/arm64/include/asm/kvm_spe.h b/arch/arm64/include/asm/kvm_spe.h
+> index 385b1157e578..88f8b1bb6864 100644
+> --- a/arch/arm64/include/asm/kvm_spe.h
+> +++ b/arch/arm64/include/asm/kvm_spe.h
+> @@ -23,6 +23,7 @@ struct kvm_vcpu_spe {
+>  	int irq_num;		/* Buffer management interrupt number */
+>  	bool initialized;	/* SPE initialized for the VCPU */
+>  	bool irq_level;		/* Virtual buffer management interrupt level */
+> +	bool buffer_misprogrammed;
 
-Indeed - I'll drop this.
+Obviously with the simplification this can be removed.
 
-Thanks,
-Steve
+>  };
+>
+>  bool kvm_supports_spe(void);
+> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+> index ab0558fbd5b2..0b9620893763 100644
+> --- a/arch/arm64/kernel/cpu_errata.c
+> +++ b/arch/arm64/kernel/cpu_errata.c
+> @@ -648,6 +648,25 @@ static const struct midr_range erratum_3023823_list[] = {
+>  };
+>  #endif
+>
+> +#ifdef CONFIG_ARM64_ERRATUM_2004055
+> +static const struct midr_range erratum_2004055_list[] = {
+> +	MIDR_ALL_VERSIONS(MIDR_NEOVERSE_N1),
+> +	/* Neoverse-V1 r0p0 to r1p1 */
+> +	MIDR_RANGE(MIDR_NEOVERSE_V1, 0, 0, 1, 1),
+> +	/* Cortex-X1 r0p0 to r1p1 */
+> +	MIDR_RANGE(MIDR_CORTEX_X1, 0, 0, 1, 1),
+> +	/* Cortex-X1 r0p0 */
 
->>   void kvm_destroy_realm(struct kvm *kvm)
->>   {
->>       struct realm *realm = &kvm->arch.realm;
-> 
-> Suzuki
+NIT: shouldn't this be Cortex-X1C?
 
+> +	MIDR_REV(MIDR_CORTEX_X1C, 0, 0),
+> +	/* Cortex-A78 r0p0 to r1p1 */
+> +	MIDR_RANGE(MIDR_CORTEX_A78, 0, 0, 1, 1),
+> +	/* Cortex-A78 r0p0 to r1p1 */
+
+Also here should be A78AE I think?
+
+> +	MIDR_RANGE(MIDR_CORTEX_A78AE, 0, 0, 0, 1),
+> +	/* Cortex-A78C r0p0 */
+> +	MIDR_REV(MIDR_CORTEX_A78C, 0, 0),
+> +	{},
+> +};
+> +#endif
+> +
+>  #ifdef CONFIG_AMPERE_ERRATUM_AC03_CPU_38
+>  static const struct midr_range erratum_ac03_cpu_38_list[] = {
+>  	MIDR_ALL_VERSIONS(MIDR_AMPERE1),
+> @@ -1012,6 +1031,13 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
+>  		ERRATA_MIDR_RANGE_LIST(erratum_3023823_list),
+>  	},
+>  #endif
+> +#ifdef CONFIG_ARM64_ERRATUM_2004055
+> +	{
+> +		.desc = "Incorrect programming of PMBPTR_EL1 leads to deadlock",
+
+The other entries are of the form 'ARM erratum xxx', shouldn't this follow
+that convention?
+
+> +		.capability = ARM64_WORKAROUND_2004055,
+> +		ERRATA_MIDR_RANGE_LIST(erratum_2004055_list),
+> +	},
+> +#endif
+>  #ifdef CONFIG_ARM64_WORKAROUND_SPECULATIVE_UNPRIV_LOAD
+>  	{
+>  		.desc = "ARM errata 2966298, 3117295",
+> diff --git a/arch/arm64/kvm/hyp/vhe/spe-sr.c b/arch/arm64/kvm/hyp/vhe/spe-sr.c
+> index df35025db19a..ec991f4cc348 100644
+> --- a/arch/arm64/kvm/hyp/vhe/spe-sr.c
+> +++ b/arch/arm64/kvm/hyp/vhe/spe-sr.c
+> @@ -112,7 +112,8 @@ void __kvm_spe_restore_guest_state_vhe(struct kvm_vcpu *vcpu, struct kvm_cpu_con
+>
+>  	pmbsr = ctxt_sys_reg(guest_ctxt, PMBSR_EL1);
+>  	pmblimitr = ctxt_sys_reg(guest_ctxt, PMBLIMITR_EL1);
+> -	if (__kvm_spe_profiling_buffer_enabled(pmblimitr, pmbsr)) {
+> +	if (__kvm_spe_profiling_buffer_enabled(pmblimitr, pmbsr) &&
+> +	    !vcpu->arch.vcpu_spe.buffer_misprogrammed) {
+
+With the simplification this can go also.
+
+>  		write_sysreg_s(ctxt_sys_reg(guest_ctxt, PMBPTR_EL1), SYS_PMBPTR_EL1);
+>  		isb();
+>  		write_sysreg_s(pmblimitr, SYS_PMBLIMITR_EL1);
+> @@ -150,7 +151,8 @@ void __kvm_spe_save_guest_state_vhe(struct kvm_vcpu *vcpu, struct kvm_cpu_contex
+>  	 * Update PMBPTR_EL1 and PMBSR_EL1 only if profiling was enabled
+>  	 * when the guest state was resumed.
+>  	 */
+> -	if (__kvm_spe_profiling_buffer_enabled(pmblimitr, pmbsr)) {
+> +	if (__kvm_spe_profiling_buffer_enabled(pmblimitr, pmbsr) &&
+> +	    !vcpu->arch.vcpu_spe.buffer_misprogrammed) {
+
+With the simplification this can go also.
+
+>  		psb_csync();
+>  		dsb(nsh);
+>  		write_sysreg_s(0, SYS_PMBLIMITR_EL1);
+> diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
+> index 3e82edc8be85..ef138562f939 100644
+> --- a/arch/arm64/kvm/spe.c
+> +++ b/arch/arm64/kvm/spe.c
+> @@ -170,6 +170,25 @@ u64 kvm_spe_reset_sysreg(struct kvm_vcpu *vcpu, int reg)
+>  	return 0;
+>  }
+>
+> +static void kvm_spe_apply_workaround_2004055(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 pmblimitr_el1 = __vcpu_sys_reg(vcpu, PMBLIMITR_EL1);
+> +	u64 pmbsr_el1 = __vcpu_sys_reg(vcpu, PMBSR_EL1);
+> +	u64 ptr, limit;
+> +
+> +	if (FIELD_GET(PMBSR_EL1_S, pmbsr_el1) ||
+> +	    !FIELD_GET(PMBLIMITR_EL1_E, pmblimitr_el1))
+> +		return;
+> +
+> +	ptr = FIELD_GET(PMBPTR_EL1_PTR, __vcpu_sys_reg(vcpu, PMBPTR_EL1));
+> +	limit = FIELD_GET(PMBLIMITR_EL1_LIMIT, pmblimitr_el1) << 12;
+> +
+> +	if (ptr >= limit)
+> +		vcpu->arch.vcpu_spe.buffer_misprogrammed = true;
+> +	else
+> +		vcpu->arch.vcpu_spe.buffer_misprogrammed = false;
+> +}
+
+With the suggestion above, this can be removed.
+
+> +
+>  bool kvm_spe_write_sysreg(struct kvm_vcpu *vcpu, int reg, u64 val)
+>  {
+>  	struct kvm_spe *kvm_spe = &vcpu->kvm->arch.kvm_spe;
+> @@ -186,6 +205,9 @@ bool kvm_spe_write_sysreg(struct kvm_vcpu *vcpu, int reg, u64 val)
+>  		WARN_ON_ONCE("unexpected trap");
+>  	}
+>
+> +	if (unlikely(kvm_spe->spe_pmu->has_workaround_2004055))
+> +		kvm_spe_apply_workaround_2004055(vcpu);
+
+Similarly this too :)
+
+> +
+>  	if (reg == PMBSR_EL1) {
+>  		val = __vcpu_sys_reg(vcpu, PMBSR_EL1);
+>  		kvm_spe_update_irq_level(vcpu, FIELD_GET(PMBSR_EL1_S, val));
+> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+> index 5f997851b6d7..e001a6ea5564 100644
+> --- a/arch/arm64/tools/cpucaps
+> +++ b/arch/arm64/tools/cpucaps
+> @@ -133,3 +133,4 @@ WORKAROUND_SPECULATIVE_AT
+>  WORKAROUND_SPECULATIVE_SSBS
+>  WORKAROUND_SPECULATIVE_UNPRIV_LOAD
+>  WORKAROUND_3023823
+> +WORKAROUND_2004055
+
+This is out of order with surrounding entries.
+
+> diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
+> index 928ea94f2ed6..bca8cd3bca16 100644
+> --- a/drivers/perf/arm_spe_pmu.c
+> +++ b/drivers/perf/arm_spe_pmu.c
+> @@ -1201,6 +1201,9 @@ static void __arm_spe_pmu_dev_probe(void *info)
+>  	if (this_cpu_has_cap(ARM64_WORKAROUND_3023823))
+>  		spe_pmu->has_workaround_3023823 = true;
+>
+> +	if (this_cpu_has_cap(ARM64_WORKAROUND_2004055))
+> +		spe_pmu->has_workaround_2004055 = true;
+> +
+
+Obviously this can be removed with the simplification...
+
+>  	dev_info(dev,
+>  		 "probed SPEv1.%d for CPUs %*pbl [max_record_sz %u, align %u, features 0x%llx]\n",
+>  		 spe_pmu->pmsver - 1, cpumask_pr_args(&spe_pmu->supported_cpus),
+> diff --git a/include/linux/perf/arm_spe_pmu.h b/include/linux/perf/arm_spe_pmu.h
+> index edf58c51fb94..d5c510ebf785 100644
+> --- a/include/linux/perf/arm_spe_pmu.h
+> +++ b/include/linux/perf/arm_spe_pmu.h
+> @@ -46,6 +46,7 @@ struct arm_spe_pmu {
+>  	u16					align;
+>  	struct perf_output_handle __percpu	*handle;
+>  	bool					has_workaround_3023823;
+> +	bool					has_workaround_2004055;
+
+...and this :)
+
+>  };
+>
+>  #define to_spe_pmu(p) (container_of(p, struct arm_spe_pmu, pmu))
+> --
+> 2.43.0
+>
+>
+
+--
+Cheers, Lorenzo
