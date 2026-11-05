@@ -1,62 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.55
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793866089;
-	b=xg1oW8AAbkz/h8Gf03+OrBiwLSGyXXJbvhFJCAylna26m6rsIozZcQxjj9ctAoT7NqI7
-	 FrNXVjBM+rb51iP4p9HOrf3W6VWH4QyGg1QrE0Be9+b4ugbmTe4hgnboUISXzp9HDcQA2
-	 udLvJamezv7aGkvb2+wZX1cTLCO3ttEuZo/z2NtnuYjsPHM3CWRzvtmg0iHCbRvhuNvCI
-	 TPvd8dqYqp0WpxsvXTU1HbweWXJcknZ8tBquvmHmxbhb32nwsntQ4VtjBl7KPBSNHxbzY
-	 MT4Nc/1bR9zck9SYCEnBCZFqxIssDiTrRIb+uBay+O6vyEhuW1UHp+PPnGUn7tTuneg==
+	t=1793866317;
+	b=uqzdhAUMCqEuwDUpVvvoJdLA0TrNX7Wr7QI57soTRva6Og9X8KJgy1lSnIAeVi4CkDH2
+	 RLiC0AT22pZYagcuUO7EoCY1TAuAFplwVtNPs9f9w7El49z8H6Q0VsBXyujtX5nqj5Dzf
+	 6X5BeoclPCk3wtHxR/ZRZf+6uJl/JVbg6LSo2Z67Eq5QWxhYxeK+HZn0eurhHhQ+RfDcn
+	 UFe3XklqbQLcwtm5d74jlD+arGiGGxPRpfcgFPAJtjzGiFEyDi5NfeqarbX3JAm9qnuCi
+	 6TsEAELggYv4vs4BoXTdFyNyJpQLfQjOCyXG56E6765WHc8jcw1mMiiTtLisBUPc3iQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793866089;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=slAjwWQDYVO39KamLXHsue/lfUEBTiuulu/3jpX05gc=;
-	b=vFz+wIXE1TNFqbYgpKAjTkjHFDskISGNer2BK+Zk9j78ZYFjGlwdGcJ6pvGE4OyFkcEl
-	 qeMp+AuMiqJRvqpuIoKKsfPpOFWI/uxLyyPvPNBEFnBrwdNZGsN0jHZ4pn4rehX8oP4p+
-	 juAt2ozZjhU6kf9oKT0eRvxtWQGP4ZzElejuURgleccwmqd1647xCRsbxMDQHMgqTwcWV
-	 eNRG6+Skg2C7dQJ5T9OlrWxLW3GWY3QXS0ObEbVMaNhnB6+5Q0M8WlHyFThpmom006Y+P
-	 o8nOjWod6Wt2E/I6MGZ4b37SOBNrBfBGOy0QPLaVli9vX/gNkGs5ZShJnSsx2AoMt4A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793866317;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=styLRX5Tlyc6QLwhRxfUq/pKF2silx9bLaMIeBuLar0=;
+	b=BPeqw8mqd3DqSX/mUtTWYhOjec0AgVGZexGzGFlaInwv7JkxNA88EYv11j2PkjUPir/x
+	 3NByzln6zbucuFy2kogljwkW1/KH3Bdl7UKS/mIMS8jXAdWfVjkD95hWrMm754uNxm+Qv
+	 waLDeoo/fp30jKpJ45DiJoGFcKw5Nq6/WCHZrx7scEiG9v3wN3rzMpf6GkOY3euIQz0bo
+	 /HC/cznUIBPk/cP1uj6F4Lq2NuwOBcv7gDZviNabFosz1hcyPk/PNq0u0PfJUUnpcW4Fc
+	 Dgf9/qC+9ON0QUMXxCQiXleQpFBcfOWtcgbpguvKU8rfRcPLWTddn9mdeWhOVTM5vpA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="QR/ysJBv";
-	arc=none smtp.remote-ip=95.215.58.55
-Received: from mta1.migadu.com (out-55.mta1.migadu.com [95.215.58.55])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jquJxf1n;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C079606A32C
-	for <kvmarm@lists.linux.dev>; Thu,  5 Nov 2026 08:08:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4C079606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55081606A326
+	for <kvmarm@lists.linux.dev>; Thu,  5 Nov 2026 08:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QR/ysJBv
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=5dNzhcTaPSPAHoNbodXyj+zv2hdRrCEJXr1Y2dhrWX8=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793866086; v=1; x=1794470886;
- b=QR/ysJBvl+GJUPglNTkM/A6Z59ex+vCXeglEdffePj1QVKtsCiB1QoXap51GWfQ59mC3JGVk
- efi0mTPVzaLQU/qpgA1PGp79vKCvudR4xl+jVA+j7qLIrYqVcwuJAYwRBwDgEDvoVn4dVM0aGwH
- 7lx6AfxZbzVT09HtZOTl5UWA=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id f36153c12708478f;
-	Thu, 05 Nov 2026 08:08:05 +0000
-X-Mizu-Trace-ID: f36153c12708478f
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5be58ad9600so5849e87.0
-        for <kvmarm@lists.linux.dev>; Thu, 05 Nov 2026 00:08:01 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AKwUvBxwXWPA007Y3iPLw4btHz0md75qUIvcq4REpFA49bl8dNvDz6JKswewcYLvMCAP2rU880cYu88=@lists.linux.dev
-X-Gm-Message-State: APuU4Z8tfy6J1cx9nUxAbKKyMw8fYMrNgzULVJDTLIJ6mz9sf1IbohSC
-	D6zZVJpSJggvG+NRhMkBbgwj3uMCoaV6fpb5gNRWLo1EphhftTIPNGTfppBKe9AiEIs+d1N126T
-	rLdJfMtASDcOmu/GfIfnrTQAsBfRVWUkKpzq0uCfh
-X-Received: by 2002:a05:6512:3e02:b0:5bf:f0fb:2c9c with SMTP id
- 2adb3069b0e04-5bffb1dc195mr77268e87.5.1793866080846; Thu, 05 Nov 2026
- 00:08:00 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jquJxf1n
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13D261F000C1;
+	Thu,  5 Nov 2026 08:11:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793866317;
+	bh=styLRX5Tlyc6QLwhRxfUq/pKF2silx9bLaMIeBuLar0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=jquJxf1nWsdCVbu6kqO0jWa0Vh0LWbTRxYqgU7ITAgKTOfZeEfNmtgtYYEkaZZ4uD
+	 2WvIjzcu4wtRaL8TZJLacPVg400ki4AR2oVOBgfV2d8qGejnGtSuOMldq/kDRGf7Rv
+	 0DvA8HIUuaJWjwYQIoci/GRvbhMBKjhGYA55UAxsgar23ekFi6OLXebqN4Uu11D+rm
+	 wrhr15DcT//iAS1zAvL2tf3tklTqw3mmIOmO6awco8nP6LqR/fO4hIjUXAC6qqtfZJ
+	 UGQMq681QMeg0cw8aa2GH7CEYuwKXIySc7JXHsPLnpHjv+pw2y8Do9VyUm9pu2EbMt
+	 cQok3VhMgwXSg==
+Date: Thu, 5 Nov 2026 00:11:55 -0800
+From: Oliver Upton <oupton@kernel.org>
+To: Leonardo Bras <leo.bras@arm.com>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Subject: Re: [PATCH v2 18/28] KVM: arm64: nv: Emulate CMOs via writable-clean
+ translations as NOPs
+Message-ID: <auw6S0iWLDqYYhdK@kernel.org>
+References: <20261023205610.1044532-1-oupton@kernel.org>
+ <20261023205610.1044532-19-oupton@kernel.org>
+ <autJUntFMhCoqZeH@LeoBrasDK>
+ <autp0cVkXwvSXPGC@kernel.org>
+ <autrOLZWT-s4Ailc@LeoBrasDK>
+ <autzno1eEpw4X-0I@kernel.org>
+ <aut5F2V0glbJv6ys@LeoBrasDK>
+ <aut5UKnP5BREpTNU@LeoBrasDK>
+ <aut6S_jvr_ZLbDoi@LeoBrasDK>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,40 +70,44 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261104124451.2148724-1-fuad.tabba@linux.dev>
- <20261104124451.2148724-2-fuad.tabba@linux.dev> <aut5t605onnuBWfk@kernel.org>
-In-Reply-To: <aut5t605onnuBWfk@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Thu, 5 Nov 2026 08:07:24 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTzEa-VZZ7TffdR0dY=92-iqX68yWkPR1zz7uzEX+c+f3A@mail.gmail.com>
-X-Gm-Features: AclHuK__AB0z6apl_Wv0YuqPm4x2AvnN93O1z8V4Fr2KgOylyOBS-uUCz6gu5jo
-Message-ID: <CA+EHjTzEa-VZZ7TffdR0dY=92-iqX68yWkPR1zz7uzEX+c+f3A@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] KVM: arm64: Resume stage-2 teardown where the walk stopped
-To: Oliver Upton <oupton@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Vincent Donnefort <vdonnefort@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aut6S_jvr_ZLbDoi@LeoBrasDK>
 
-On Wed, 4 Nov 2026 at 18:30, Oliver Upton <oupton@kernel.org> wrote:
->
-> Hi Fuad,
->
-> On Wed, Nov 04, 2026 at 12:44:50PM +0000, Fuad Tabba wrote:
-> > +u64 kvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
-> > +                                  u64 addr, u64 size)
->
-> Returning a signed value here would be a good idea so you can percolate
-> walk failures back up to the caller. Since that WARN_ON() below may as
-> well be a BUG_ON() in hyp code.
+On Wed, Nov 04, 2026 at 06:32:43PM +0000, Leonardo Bras wrote:
+> > > > The operations would be, approximately:
+> > > > 
+> > > >  - Take a stage-2 permission fault on the cache maintenance instruction.
+> > > >    Walk the guest's stage-2 and find a translation in writable-clean
+> > > >    state.
+> > > > 
+> > > >  - Pause the VM, re-enter the guest and single-step the instruction. If
+> > > >    we take the debug exception then the guest must've changed the
+> > > >    instruction. Go back to base state.
+> > > 
+> > > Pausing the VM would be required so other vcpu treads do not access the 
+> > > page we are trying to run CMO on, right? 
 
-Ack.
+Messing with the data side is fine, the concern is with the page the
+instruction sits in.
 
-> Otherwise, rest looks good.
+> > > > 
+> > > >  - If we take another stage-2 permission fault for a cache maintenance
+> > > >    instruction, temporarily promote the translation to RW in the shadow
+> > > >    stage-2 and re-enter with single-step enabled.
+> 
+> But what if instead of RW we made it WC, and enabled Hardware HAFDBS just 
+> in this cpu?
+> 
+> Other CPUs with HAFDBS=off would fault on write, and we could block them 
+> there. 
+> 
+> (We would have to serialize those accesses, though, as multiple vcpus could 
+> use the same strategy at the same time)
 
-Thanks Oliver!
-/fuad
+That would do what we want, just the idea of maintaining some state
+machine across multiple guest exits feels pretty gnarly. Trap + emulate
+is the way to go if we can't NOP the CMO.
+
+Thanks,
+Oliver
