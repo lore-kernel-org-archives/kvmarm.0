@@ -1,74 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.139
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793883927;
-	b=VACKN5ZW7ytWSc1a35i/xTEdI7eKSGrcRerMQ0bzMdtPPLxDVyIrvbDbhQhQCeVdqNYd
-	 a2PBXPOAe9Pcqq2FRLZAVchYYqdhQiQSWKDKUxQk3XPGWXQeBW9Qmu2z3kq7+TFZzEAn2
-	 XGwFNty/Ba8u2+9pHgS0e7oIDXsTi67Krl8SE9O8ZtMbcT9uh0dH2npDecwfkzBoo9FN3
-	 Yzd+MKmpdHnOnBc5sNCr59sfYIBnK1w1/m3Wb0Bod3CljruA7Gf/D4Tkm8J1gRkhNW/Et
-	 BigKpT0ydNo35ilV44isQ1kI31i+LP6Ja8nZ19XfafSPgtzqFLaVlok/yNgFUsONQcA==
+	t=1793885656;
+	b=Jmc1hZqdzVhY0MEllHA9dE0DU97aBuPEECT85iBF6sXCnXKASzOscHO2IDyuXPqKC2CV
+	 1/+bqGSe5Z2QKbxO4JMScaRu105Cyz2HDAnsJXz15YrGYoLWFyXa03OQki0xG9xXaHaxP
+	 nkezloNgNC25HXKSr/wkXFDqaH9gaDV7AHWRaHH0VN+Ai0sIABCz3+7a0GqeNWMe6RH9E
+	 /WhsO+Bu+57nZwjzfQQd8tcMDQJxRCj7dSrw5T6YCch8EsZsFwXZaBpAAm9onuF+ZNsnQ
+	 gX+c3DZUakzJKLfc4SGSiQEgv6zS2OJTpK1rDtgVaGB7+nxnMma62ozXEvcC6jUi2ng==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793883927;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=U1YPN3OgBZ6MC41gzP1YSCgDTdcndw5WoSOxyRkhuTE=;
-	b=EkDy34iSBlgkNareu9eQM5Y6tO7jl5RjFiIwij9yremNB623HleWRNdV1lvdPp/6lwba
-	 y7DvnmQ2uoDRnkwGyXmS9hHIc4iPOyelHVjzhzA8gNBVS0d/oCotGk5WPmuaBHatIyR/K
-	 CVhYBt6l9XbhE/tmoPnbD2TDfXXD5vBD1dkBE8W2+hbhHO4/8h9K4clRfmfSuNNf/eao8
-	 1yOa0pl+cVI8wGmdUVnvMyP16qiqpSHIMSCQDjXYZ5r7WvOADSyatBR2THEzTRTe6A8u4
-	 bx1Il620Prn7/t4V5Y5GEK82qczGrH4yfqe/jEfCrpNU4tDGZa8lAwPNBxiiCNVQX+w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793885656;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=xtG6fIgcVTzyv91/g3gp13PkyR5FUez629otMerYOAs=;
+	b=0yS2Q/lAgppFkMakq3dFCD7YCFBBNZKpGSUqRRcYuP2tIv+1CLhMvk+v3YQQAPfvan3T
+	 Mvw6KPDWp5rXLH3bTzL6TL5SCPPqrEkF5HJZZOqaZfsGtElj8JFH9Y6xqQEeU/Y8ds8uK
+	 4IYSChXj/LjnNSGyQUh7nNdZSr5cdGAi4HPhzvI99/PM00uLTEW6icfqizRRm6ssWuII+
+	 USkq+wLuEYIZly8gYsbFm50rWQzXK837ewXmo4j/eJKe5qlGBlJdTJimA/7PdLhZUMAPF
+	 uzdPjQcjF77LK2dYQcNnw7ziNVvE4ay06m6ZUx3pRHdGabvozrb+M+Tu6nHAsuRo5kw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=cXqu3Qe8;
-	arc=none smtp.remote-ip=95.215.58.139
-Received: from mta1.migadu.com (out-139.mta1.migadu.com [95.215.58.139])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F850606D807
-	for <kvmarm@lists.linux.dev>; Thu,  5 Nov 2026 13:05:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4F850606D807
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=AJAD0adZ;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8FA606A329
+	for <kvmarm@lists.linux.dev>; Thu,  5 Nov 2026 13:34:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9B8FA606A329
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=cXqu3Qe8
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=IAD0JHK5u0AjR1SS9NS5jBII24VCj84wL7W/E6MbcFQ=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793883924; v=1; x=1794488724;
- b=cXqu3Qe8dxF1bgYAdO4vcQt1eL4M7qpY6hic36BzFVEzq4v7OYmAduvOVyN9DNbe/tS7G4F5
- KPEqWQ3AXRptH9iJyPVPBPOu2iO0EZR5vTio2OmvqPUmvbZXSH1KbrxoDw0mv9PbuiLTRmRizKe
- TDyB58FnCCFNbv4DEZfeZm24=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 981a1b1030f162c4;
-	Thu, 05 Nov 2026 13:05:23 +0000
-X-Mizu-Trace-ID: 981a1b1030f162c4
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=AJAD0adZ
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D4776152B;
+	Thu,  5 Nov 2026 05:34:11 -0800 (PST)
+Received: from e143914.arm.com (e143914.arm.com [10.2.213.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4A10D3F628;
+	Thu,  5 Nov 2026 05:34:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793885654; bh=l14vhx5E/VbDt8tx/DC7VJgj77lpt87vUA3lRCAIukc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AJAD0adZM+HCYJxY7MSwwM7ewupYaBK7MHtAFWoJGwaLsy9a2Z3j0hqOYyLCD7h9l
+	 uZQcELPuN4SgmB/pGNNyGyoik9JIl7sAoIqln4XYNWCG+mWzdqV5Zl3w/eOB4igDB/
+	 a7d1AJeMDvSeVAgYKmR7bolgYmyGdI2IYsVoMx3k=
+Date: Thu, 5 Nov 2026 13:34:09 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>, Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	kvm@vger.kernel.org,
+	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] KVM: arm64: Allow protected VMs to use SVE
-Date: Thu,  5 Nov 2026 13:04:56 +0000
-Message-ID: <20261105130456.1617185-5-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261105130456.1617185-1-fuad.tabba@linux.dev>
-References: <20261105130456.1617185-1-fuad.tabba@linux.dev>
+Subject: Re: [PATCH 05/16] KVM: arm64: selftests: Add protected-VM boot
+ trampoline
+Message-ID: <auyF0ePpUlJKZgNo@e143914.arm.com>
+References: <20261104084842.132944-1-fuad.tabba@linux.dev>
+ <20261104084842.132944-6-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -78,83 +70,168 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261104084842.132944-6-fuad.tabba@linux.dev>
 
-Now that EL2 owns a protected vCPU's SVE state and advertises
-ID_AA64ZFR0_EL1, allow KVM_CAP_ARM_SVE for a protected VM, which lets
-KVM_ARM_VCPU_INIT take KVM_ARM_VCPU_SVE.
+On Wed, Nov 04, 2026 at 08:48:31AM +0000, Fuad Tabba wrote:
+> EL2 takes only PC and X0 from the host when it boots a protected vCPU,
+> and resets everything else. So the registers the selftest library sets
+> before the first run never reach the guest.
+> 
+> Boot a protected guest through a trampoline that restores X0-X7, seven
+> EL1 system registers and the stack pointer from a block X0 points to,
+> then enables the MMU and branches to the guest's entry point.
+> 
+> Co-developed-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 
-A protected guest's SVE access trap injects an UNDEF. An SVE
-instruction takes the SVE trap rather than the FP one, so a guest whose
-first vector instruction is an SVE one would get an UNDEF instead of
-the lazy FP switch. Handle the SVE trap as the FP trap is:
-kvm_handle_pvm_fpsimd() switches the state for a vCPU with SVE and
-still injects the UNDEF for one without.
+Similar idea to the 'realm-boot' I added, and mentioned previously. I
+think it should work for Realms too.
 
-Update the documentation to match.
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- Documentation/virt/kvm/arm/pkvm.rst | 6 +++---
- arch/arm64/include/asm/kvm_pkvm.h   | 1 +
- arch/arm64/kvm/hyp/nvhe/switch.c    | 1 +
- arch/arm64/kvm/hyp/nvhe/sys_regs.c  | 2 --
- 4 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/Documentation/virt/kvm/arm/pkvm.rst b/Documentation/virt/kvm/arm/pkvm.rst
-index b75bb8ad6f26d..163aa01ac5067 100644
---- a/Documentation/virt/kvm/arm/pkvm.rst
-+++ b/Documentation/virt/kvm/arm/pkvm.rst
-@@ -134,9 +134,9 @@ A protected VM boots from a single primary vCPU. Before the first
- * Set the primary vCPU's boot state with ``KVM_SET_ONE_REG``: the kernel
-   entry address in ``PC`` and the DTB pointer in ``x0``.
- 
--``PC`` and ``x0`` are the only registers EL2 takes from the host. Other
--pre-run writes are accepted, but the guest starts from the state the
--hypervisor resets it to.
-+``PC``, ``x0`` and the SVE vector lengths (``KVM_REG_ARM64_SVE_VLS``) are
-+the only registers EL2 takes from the host. Other pre-run writes are
-+accepted, but the guest starts from the state the hypervisor resets it to.
- 
- Secondary vCPUs are started by the guest itself through PSCI ``CPU_ON``
- (see `Power state`_), which supplies their entry point and context ID.
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index fd042d2b54624..5f1b3308b42e1 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -40,6 +40,7 @@ static inline bool kvm_pkvm_ext_allowed(struct kvm *kvm, long ext)
- 	case KVM_CAP_MAX_VCPU_ID:
- 	case KVM_CAP_MSI_DEVID:
- 	case KVM_CAP_ARM_VM_IPA_SIZE:
-+	case KVM_CAP_ARM_SVE:
- 	case KVM_CAP_ARM_PTRAUTH_ADDRESS:
- 	case KVM_CAP_ARM_PTRAUTH_GENERIC:
- 	case KVM_CAP_ONE_REG:
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 89fb9dd351ad5..0626f4203ba6d 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -230,6 +230,7 @@ static const exit_handler_fn pvm_exit_handlers[] = {
- 	[ESR_ELx_EC_WFx]		= kvm_handle_pvm_wfx,
- 	[ESR_ELx_EC_HVC64]		= kvm_handle_pvm_hvc64,
- 	[ESR_ELx_EC_SYS64]		= kvm_handle_pvm_sys64,
-+	[ESR_ELx_EC_SVE]		= kvm_handle_pvm_fpsimd,
- 	[ESR_ELx_EC_FP_ASIMD]		= kvm_handle_pvm_fpsimd,
- 	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
- 	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index e6bbc897cd7b1..0ddddf957f5ab 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -502,8 +502,6 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
- 	ID_UNALLOCATED(7,6),
- 	ID_UNALLOCATED(7,7),
- 
--	/* Scalable Vector Registers are restricted. */
--
- 	HOST_HANDLED(SYS_ICC_PMR_EL1),
- 
- 	RAZ_WI(SYS_ERRIDR_EL1),
--- 
-2.47.3
-
+> ---
+>  tools/testing/selftests/kvm/Makefile.kvm      |  1 +
+>  .../selftests/kvm/include/arm64/pkvm.h        | 50 ++++++++++++++++
+>  .../selftests/kvm/lib/arm64/pvm-entry.S       | 58 +++++++++++++++++++
+>  3 files changed, 109 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/include/arm64/pkvm.h
+>  create mode 100644 tools/testing/selftests/kvm/lib/arm64/pvm-entry.S
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+> index 17a4256e90819..c254e82f9a786 100644
+> --- a/tools/testing/selftests/kvm/Makefile.kvm
+> +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> @@ -35,6 +35,7 @@ LIBKVM_arm64 += lib/arm64/gic_v3.c
+>  LIBKVM_arm64 += lib/arm64/gic_v3_its.c
+>  LIBKVM_arm64 += lib/arm64/handlers.S
+>  LIBKVM_arm64 += lib/arm64/processor.c
+> +LIBKVM_arm64 += lib/arm64/pvm-entry.S
+>  LIBKVM_arm64 += lib/arm64/spinlock.c
+>  LIBKVM_arm64 += lib/arm64/ucall.c
+>  LIBKVM_arm64 += lib/arm64/vgic.c
+> diff --git a/tools/testing/selftests/kvm/include/arm64/pkvm.h b/tools/testing/selftests/kvm/include/arm64/pkvm.h
+> new file mode 100644
+> index 0000000000000..6ef769b8ff977
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/include/arm64/pkvm.h
+> @@ -0,0 +1,50 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2025 Google LLC
+> + * Author: Fuad Tabba <fuad.tabba@linux.dev>
+> + * Author: Will Deacon <will@kernel.org>
+> + */
+> +
+> +#ifndef SELFTEST_KVM_ARM64_PKVM_H
+> +#define SELFTEST_KVM_ARM64_PKVM_H
+> +
+> +#ifndef __ASSEMBLER__
+> +/*
+> + * Register state the boot trampoline (pvm-entry.S) restores. Only PC and X0
+> + * survive to a protected guest's first run, so X0 points at this block.
+> + */
+> +struct pvm_boot_args {
+> +	u64	jump_tgt;
+> +
+> +	u64	regs[8];
+> +	u64	cpacr_el1;
+> +	u64	sctlr_el1;
+> +	u64	tcr_el1;
+> +	u64	mair_el1;
+> +	u64	ttbr0_el1;
+> +	u64	vbar_el1;
+> +
+> +	u64	tpidr_el1;
+> +	u64	sp_el1;
+> +};
+> +#endif
+> +
+> +#define PVM_BOOT_ARGS_OFF_JUMP_TGT	0
+> +#define PVM_BOOT_ARGS_OFF_X0		(PVM_BOOT_ARGS_OFF_JUMP_TGT + 8)
+> +#define PVM_BOOT_ARGS_OFF_X1		(PVM_BOOT_ARGS_OFF_X0 + 8)
+> +#define PVM_BOOT_ARGS_OFF_X2		(PVM_BOOT_ARGS_OFF_X1 + 8)
+> +#define PVM_BOOT_ARGS_OFF_X3		(PVM_BOOT_ARGS_OFF_X2 + 8)
+> +#define PVM_BOOT_ARGS_OFF_X4		(PVM_BOOT_ARGS_OFF_X3 + 8)
+> +#define PVM_BOOT_ARGS_OFF_X5		(PVM_BOOT_ARGS_OFF_X4 + 8)
+> +#define PVM_BOOT_ARGS_OFF_X6		(PVM_BOOT_ARGS_OFF_X5 + 8)
+> +#define PVM_BOOT_ARGS_OFF_X7		(PVM_BOOT_ARGS_OFF_X6 + 8)
+> +#define PVM_BOOT_ARGS_OFF_CPACR_EL1	(PVM_BOOT_ARGS_OFF_X7 + 8)
+> +#define PVM_BOOT_ARGS_OFF_SCTLR_EL1	(PVM_BOOT_ARGS_OFF_CPACR_EL1 + 8)
+> +#define PVM_BOOT_ARGS_OFF_TCR_EL1	(PVM_BOOT_ARGS_OFF_SCTLR_EL1 + 8)
+> +#define PVM_BOOT_ARGS_OFF_MAIR_EL1	(PVM_BOOT_ARGS_OFF_TCR_EL1 + 8)
+> +#define PVM_BOOT_ARGS_OFF_TTBR0_EL1	(PVM_BOOT_ARGS_OFF_MAIR_EL1 + 8)
+> +#define PVM_BOOT_ARGS_OFF_VBAR_EL1	(PVM_BOOT_ARGS_OFF_TTBR0_EL1 + 8)
+> +#define PVM_BOOT_ARGS_OFF_TPIDR_EL1	(PVM_BOOT_ARGS_OFF_VBAR_EL1 + 8)
+> +#define PVM_BOOT_ARGS_OFF_SP_EL1	(PVM_BOOT_ARGS_OFF_TPIDR_EL1 + 8)
+> +
+> +#endif /* SELFTEST_KVM_ARM64_PKVM_H */
+> diff --git a/tools/testing/selftests/kvm/lib/arm64/pvm-entry.S b/tools/testing/selftests/kvm/lib/arm64/pvm-entry.S
+> new file mode 100644
+> index 0000000000000..a0974cde78da6
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/lib/arm64/pvm-entry.S
+> @@ -0,0 +1,58 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2025 Google LLC
+> + * Author: Fuad Tabba <fuad.tabba@linux.dev>
+> + * Author: Will Deacon <will@kernel.org>
+> + */
+> +
+> +#include "pkvm.h"
+> +
+> +	.text
+> +	.balign 16
+> +	.globl	pvm_entry_start
+> +pvm_entry_start:
+> +	mov	x30, x0
+> +
+> +	ldr	x0, [x30, #PVM_BOOT_ARGS_OFF_X0]
+> +	ldr	x1, [x30, #PVM_BOOT_ARGS_OFF_X1]
+> +	ldr	x2, [x30, #PVM_BOOT_ARGS_OFF_X2]
+> +	ldr	x3, [x30, #PVM_BOOT_ARGS_OFF_X3]
+> +	ldr	x4, [x30, #PVM_BOOT_ARGS_OFF_X4]
+> +	ldr	x5, [x30, #PVM_BOOT_ARGS_OFF_X5]
+> +	ldr	x6, [x30, #PVM_BOOT_ARGS_OFF_X6]
+> +	ldr	x7, [x30, #PVM_BOOT_ARGS_OFF_X7]
+> +
+> +	ldr	x8, [x30, #PVM_BOOT_ARGS_OFF_JUMP_TGT]
+> +
+> +	ldr	x9, [x30, #PVM_BOOT_ARGS_OFF_CPACR_EL1]
+> +	msr	cpacr_el1, x9
+> +
+> +	ldr	x9, [x30, #PVM_BOOT_ARGS_OFF_TCR_EL1]
+> +	msr	tcr_el1, x9
+> +
+> +	ldr	x9, [x30, #PVM_BOOT_ARGS_OFF_MAIR_EL1]
+> +	msr	mair_el1, x9
+> +
+> +	ldr	x9, [x30, #PVM_BOOT_ARGS_OFF_TTBR0_EL1]
+> +	msr	ttbr0_el1, x9
+> +
+> +	ldr	x9, [x30, #PVM_BOOT_ARGS_OFF_VBAR_EL1]
+> +	msr	vbar_el1, x9
+> +
+> +	ldr	x9, [x30, #PVM_BOOT_ARGS_OFF_TPIDR_EL1]
+> +	msr	tpidr_el1, x9
+> +
+> +	ldr	x9, [x30, #PVM_BOOT_ARGS_OFF_SP_EL1]
+> +	mov	sp, x9
+> +
+> +	/* No stale TLB entries, and the writes above in effect, before the MMU is on. */
+> +	tlbi	vmalle1
+> +	dsb	nsh
+> +	isb
+> +	ldr	x9, [x30, #PVM_BOOT_ARGS_OFF_SCTLR_EL1]
+> +	msr	sctlr_el1, x9
+> +	isb
+> +
+> +	br	x8
+> +	.globl	pvm_entry_end
+> +pvm_entry_end:
+> -- 
+> 2.47.3
+> 
