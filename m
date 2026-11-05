@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793880903;
-	b=pGu1QfVCEaBEd7mhGegFAQADDWRLejNczxNxTQ/Tp6RCWVBAQyCcWShnxWsbAdUzbUZm
-	 j74jxk5OyeMZth5ZbfxV4LL1tN8te63QWFrXkP0ivrz94vfTXDLMgqnmT5O7BZlXbIi/s
-	 DAzCIokkBD2r33Fbzl+leSIDaRy0uQ4adcXozL+qzK0U20KvBeAtVfmi4gIU2ZpNXDvSh
-	 BmE5V1rOYoJ7EUMSf0IrykMojMHtbBeH/IsSH4ZHghjat8ZUnz0EldDx1LMPOhAy3QA3I
-	 nSooSkIiZQ3wpO20tQNutoqzvi2BAwfKefYMdNMfDQdUrzithjTE/Icjlu6MQQGnwXA==
+	t=1793880909;
+	b=uPWnTOVn/z4lZ+0GeezocSfXMIUtv7yDG705EJ2jlcDNAPZ+ejpb7ej2u4Ow65fla5Yo
+	 pUgykc/T+JwbHMjukQc/hGGcflPLn8gZOuQWcQD5Dt8zHCy5pKJ5rTzQcXb2EqWbS1r4p
+	 N1hRlZekN0ZEczUhsyckOd5/YGa98vhA7DbNqsLbzq2Hmk6qIpVV19n50aODKUES38pSM
+	 nc8GB4Qoya0XGWjLyd9lIMw+pbLWEGK7OrAveL4SRDtQx7enMNJ8kJUd9aoAR8tKf8M1j
+	 /jRqH2jn7BJVI0gdkN37iL7aghmQhi8LqwnbuhMRfOxLbYqlRRQ43VALSSP5+GZy1fg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793880903;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793880909;
 	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
 	 X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=gvu63V7M7umrgDXBMaR7yNvzMp7zi7dv7vshULv5LKg=;
-	b=MWdwaUS4pNS+w/IgTHOwglOfGtue4ANgWuvjR7m9DV0oKasfOaugPbV76FrcMU3PKkcV
-	 OLcqkKvg233zuxEIzQOgfo+CfCbzURrVFybzzz91YJtBQfBhREEuK5XJtEb6Kp6g+NodH
-	 3WQCADRCUT9nbrLcyy4xiR+b+5GwVyjbXMbfHptkpVKrIIq5zWB3Ysg9GOT62WUGGOHeR
-	 O+WPaqDp0Kr7uTHtur0jxt4QMxP8XdqjeRIswr5LCR3ZSFCI+J+9xv5fw9DBf2rG83gtE
-	 JIao30XJdrKmdyaJhSIU+s0ikyJ+CIqLWo4lJkNBZvRyFab1EGnGC/N2EklfvuPs/ZQ==
+	bh=EjHHerbQtH8PkJVTm5A4n/paGtt5ATnY9+Koe88/4LE=;
+	b=4UQLTIga0vONSU6f3Z05ZQ/bXxkGvekiJXamLVoIISQJAHIuRiWzDEdu88Yx7/+KxPwv
+	 OWd7K7tDmUcTIjMwJWyIm9bW/E/cppVPci6QkdPmS1bx47oIZCKudVoGbcpeHnaucJRGH
+	 I7P56bp8nJJvSvBbxh5qg1MEKFVcQBV+cBTSQiGODS9mXtzO0pb6CWWIaNiQxbP/hHT7b
+	 N4Ea+FNjQUW9JSzZvlcsdP6feXL10gOZDkamoKlhcAcdO390Oc9oOSm3gxIUBkFB0dFGf
+	 HHVtEn2mFr/0JTbo4O8qDiIWA5V+7+4wTq/d03MtiTm2q0MELpzy9EtpiZaTB84w85g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HET13OAy;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mA8OGImI;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34165606D814;
-	Thu,  5 Nov 2026 12:15:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F3A606A331;
+	Thu,  5 Nov 2026 12:15:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HET13OAy
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 487341F00919;
-	Thu,  5 Nov 2026 12:15:00 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mA8OGImI
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B0E11F00A02;
+	Thu,  5 Nov 2026 12:15:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793880902;
-	bh=gvu63V7M7umrgDXBMaR7yNvzMp7zi7dv7vshULv5LKg=;
+	s=k20260515; t=1793880908;
+	bh=EjHHerbQtH8PkJVTm5A4n/paGtt5ATnY9+Koe88/4LE=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=HET13OAy3FUdTTo+2EzEyE3RfiUN0e+t0GHlqQm9HJ107JUgX63LRFE8riBZWBLD1
-	 BAEbfqTrpAaFsD7PWYTgCvOaTpU9EfEqALcG65bmOd4B8byXRssb7hfMeq9ejKE4ci
-	 s88WorSvUKWKiQSOln2j3u/Ls3cP7K0VRQU4WPpmn88AZ5p2f36b9oQnyeHL+99CCU
-	 SPjskO+97HsWTagEYlgTfAGcS09ynBh5+z5xzDMEeTVLx25BseBcBAABB4criekHK5
-	 R3bDitpl6ryr9XZDjaLmboiiUG3Yz9irI1WuvdIhXyVPOVoH5WOUE114uecnsBUVW9
-	 UbjOeaIXx8hjA==
+	b=mA8OGImIAM2oSGIP6F5xMkpDWUGpMztlncn928slbRyyhHGiBi/3BaNJRuXq1Y/Cb
+	 +GEX6MG5wvXI8aWsGMw4fevZeZdXBTz8CZUp894GolHb3rHvMRsVDmy+JJkMGuWgtW
+	 v9/LchHxd26rFXUQ5+O8apewCW34AGL2TqroGTZDw0tz0KNGJUKyUAuede4TIaGCGV
+	 E7Q2sWoRDtDSDNPcacMmJegj8QcxOvzkMd+7akCRkYbkeA+IhKX1Llkmy8GLVEQPkM
+	 O/riGsnRp3QtG9sc2QGQcYq4GlDGaZYiUZUVzZsoJL5eSu2Nyr2N8lT3G+0witrb1L
+	 4XlwTsCh0xUjQ==
 From: Mark Brown <broonie@kernel.org>
-Date: Thu, 05 Nov 2026 11:47:19 +0000
-Subject: [PATCH v10 1/3] KVM: selftests: arm64: Report set_id_reg reads of
- test registers as tests
+Date: Thu, 05 Nov 2026 11:47:21 +0000
+Subject: [PATCH v10 3/3] KVM: selftests: arm64: Make set_id_regs bitfield
+ validity checks non-fatal
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -55,7 +55,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261105-kvm-arm64-set-id-regs-aarch64-v10-1-d5a6aba69d19@kernel.org>
+Message-Id: <20261105-kvm-arm64-set-id-regs-aarch64-v10-3-d5a6aba69d19@kernel.org>
 References: <20261105-kvm-arm64-set-id-regs-aarch64-v10-0-d5a6aba69d19@kernel.org>
 In-Reply-To: <20261105-kvm-arm64-set-id-regs-aarch64-v10-0-d5a6aba69d19@kernel.org>
 To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
@@ -68,179 +68,144 @@ Cc: Ben Horgan <ben.horgan@arm.com>, linux-arm-kernel@lists.infradead.org,
  Mark Brown <broonie@kernel.org>, "Lorenzo Stoakes (ARM)" <ljs@kernel.org>, 
  Sebastian Ott <sebott@redhat.com>
 X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5737; i=broonie@kernel.org;
- h=from:subject:message-id; bh=hAmt2QTBd6TcJcaAcp6zUczcT8F3PROgm10FL3FF92M=;
- b=owGbwMvMwCWm/754w+YLFp2Mp9WSGLLeFNu/N1cWC/M74L92we/c2iqT5mbd0r+zrUqXWpTKn
- vGR2Lu6o5SFQYyLQVZMkSUui/tlfcnrNXwHF7bBzGFlAhnCwMUpABPJm8bwPyO7Niyu+s2Mdaa/
- A9eWrbm4rODznYP+Jy68r1e+8vZzzmZGhoOq8tydXHE/Jv3dcDGYZ32fsyiT4zLG2zt8rVqeV1Y
- UsQAA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4751; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=sCUDXK5zt6Sullbao2LmXhfh5JZy+wCGZCip8JVi8Mo=;
+ b=owGbwMvMwCWm/754w+YLFp2Mp9WSGLLeFNv3bWz8fi7ymNTlDDbb398jIkX+MRu+WKO++IRtw
+ obI3z5hHaUsDGJcDLJiiixxWdwv60ter+E7uLANZg4rE8gQBi5OAZjIdCmGP9x98gumb0799vhh
+ v8CKitCpDMuT0szuqHd8fvhRIIPFfhMjw4GZbDNzTgqIftv2q1ieO37lqa8LbuxczDSdX8zFLum
+ 5OwsA
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-Currently when we run guest code to validate that the values we wrote to
-the registers are seen by the guest we assert that these values match using
-a KVM selftests level assert, resulting in unclear diagnostics if the test
-fails. Replace this assert with reporting a kselftest test per register.
+Currently when set_id_regs encounters a problem checking validation of
+writes to feature registers it uses an immediately fatal assert to report
+the problem. This is not idiomatic for kselftest, and it is also not great
+for usability. The affected bitfield is not clearly reported and further
+tests do not have their results reported.
 
-In order to support getting the names of the registers we repaint the array
-of ID_ registers to store the names and open code the rest.
+Switch to using standard kselftest result reporting for the asserts we
+do, these are non-fatal asserts so allow the program to continue and the
+test names include the affected field.
 
 Reviewed-by: Ben Horgan <ben.horgan@arm.com>
 Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 Reviewed-by: Sebastian Ott <sebott@redhat.com>
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- tools/testing/selftests/kvm/arm64/set_id_regs.c | 83 +++++++++++++++++++------
- 1 file changed, 64 insertions(+), 19 deletions(-)
+ tools/testing/selftests/kvm/arm64/set_id_regs.c | 52 +++++++++++++++++--------
+ 1 file changed, 35 insertions(+), 17 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index 1d2cc25cb3f4..ef833ab3e6ce 100644
+index 69aebb3a28f4..8c484db65484 100644
 --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
 +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -44,6 +44,7 @@ struct reg_ftr_bits {
- };
- 
- struct test_feature_reg {
-+	const char *name;
- 	u32 reg;
- 	const struct reg_ftr_bits *ftr_bits;
- };
-@@ -228,30 +229,32 @@ static const struct reg_ftr_bits ftr_id_aa64zfr0_el1[] = {
- 
- #define TEST_REG(id, table)			\
- 	{					\
--		.reg = id,			\
-+		.name = #id,			\
-+		.reg = SYS_ ## id,		\
- 		.ftr_bits = &((table)[0]),	\
- 	}
- 
- static struct test_feature_reg test_regs[] = {
--	TEST_REG(SYS_ID_AA64DFR0_EL1, ftr_id_aa64dfr0_el1),
--	TEST_REG(SYS_ID_DFR0_EL1, ftr_id_dfr0_el1),
--	TEST_REG(SYS_ID_AA64ISAR0_EL1, ftr_id_aa64isar0_el1),
--	TEST_REG(SYS_ID_AA64ISAR1_EL1, ftr_id_aa64isar1_el1),
--	TEST_REG(SYS_ID_AA64ISAR2_EL1, ftr_id_aa64isar2_el1),
--	TEST_REG(SYS_ID_AA64ISAR3_EL1, ftr_id_aa64isar3_el1),
--	TEST_REG(SYS_ID_AA64PFR0_EL1, ftr_id_aa64pfr0_el1),
--	TEST_REG(SYS_ID_AA64PFR1_EL1, ftr_id_aa64pfr1_el1),
--	TEST_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0_el1),
--	TEST_REG(SYS_ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1_el1),
--	TEST_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2_el1),
--	TEST_REG(SYS_ID_AA64MMFR3_EL1, ftr_id_aa64mmfr3_el1),
--	TEST_REG(SYS_ID_AA64ZFR0_EL1, ftr_id_aa64zfr0_el1),
-+	TEST_REG(ID_AA64DFR0_EL1, ftr_id_aa64dfr0_el1),
-+	TEST_REG(ID_DFR0_EL1, ftr_id_dfr0_el1),
-+	TEST_REG(ID_AA64ISAR0_EL1, ftr_id_aa64isar0_el1),
-+	TEST_REG(ID_AA64ISAR1_EL1, ftr_id_aa64isar1_el1),
-+	TEST_REG(ID_AA64ISAR2_EL1, ftr_id_aa64isar2_el1),
-+	TEST_REG(ID_AA64ISAR3_EL1, ftr_id_aa64isar3_el1),
-+	TEST_REG(ID_AA64PFR0_EL1, ftr_id_aa64pfr0_el1),
-+	TEST_REG(ID_AA64PFR1_EL1, ftr_id_aa64pfr1_el1),
-+	TEST_REG(ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0_el1),
-+	TEST_REG(ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1_el1),
-+	TEST_REG(ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2_el1),
-+	TEST_REG(ID_AA64MMFR3_EL1, ftr_id_aa64mmfr3_el1),
-+	TEST_REG(ID_AA64ZFR0_EL1, ftr_id_aa64zfr0_el1),
- };
- 
- #define GUEST_REG_SYNC(id) GUEST_SYNC_ARGS(0, id, read_sysreg_s(id), 0, 0);
- 
- static void guest_code(void)
- {
-+	/* Registers in test_regs array */
- 	GUEST_REG_SYNC(SYS_ID_AA64DFR0_EL1);
- 	GUEST_REG_SYNC(SYS_ID_DFR0_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64ISAR0_EL1);
-@@ -265,6 +268,8 @@ static void guest_code(void)
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR2_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64MMFR3_EL1);
- 	GUEST_REG_SYNC(SYS_ID_AA64ZFR0_EL1);
-+
-+	/* Additional registers counted in NUM_EXTRA_REGS */
- 	GUEST_REG_SYNC(SYS_MPIDR_EL1);
- 	GUEST_REG_SYNC(SYS_CLIDR_EL1);
- 	GUEST_REG_SYNC(SYS_CTR_EL0);
-@@ -275,6 +280,35 @@ static void guest_code(void)
- 	GUEST_DONE();
+@@ -417,12 +417,14 @@ u64 get_invalid_value(const struct reg_ftr_bits *ftr_bits, u64 ftr)
+ 	return ftr;
  }
  
-+#define NUM_EXTRA_REGS 6
-+#define GUEST_READ_TEST (ARRAY_SIZE(test_regs) + NUM_EXTRA_REGS)
-+
-+static const char *get_reg_name(u64 id)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_regs); i++)
-+		if (test_regs[i].reg == id)
-+			return test_regs[i].name;
-+
-+	switch (id) {
-+	case SYS_MPIDR_EL1:
-+		return "MPIDR_EL1";
-+	case SYS_CLIDR_EL1:
-+		return "CLIDR_EL1";
-+	case SYS_CTR_EL0:
-+		return "CTR_EL0";
-+	case SYS_MIDR_EL1:
-+		return "MIDR_EL1";
-+	case SYS_REVIDR_EL1:
-+		return "REVIDR_EL1";
-+	case SYS_AIDR_EL1:
-+		return "AIDR_EL1";
-+	default:
-+		TEST_FAIL("Unknown register");
-+	}
-+}
-+
- /* Return a safe value to a given ftr_bits an ftr value */
- u64 get_safe_value(const struct reg_ftr_bits *ftr_bits, u64 ftr)
+-static u64 test_reg_set_success(struct kvm_vcpu *vcpu, u64 reg,
+-				const struct reg_ftr_bits *ftr_bits)
++static void test_reg_set_success(struct kvm_vcpu *vcpu, u64 reg,
++				 const struct reg_ftr_bits *ftr_bits)
  {
-@@ -675,7 +709,8 @@ static void test_guest_reg_read(struct kvm_vcpu *vcpu)
- 	struct ucall uc;
+ 	u8 shift = ftr_bits->shift;
+ 	u64 mask = ftr_bits->mask;
+ 	u64 val, new_val, ftr;
++	bool pass;
++	int ret;
  
- 	while (!done) {
--		u64 val;
-+		u64 reg_id, expected_val, guest_val;
-+		bool match;
+ 	val = vcpu_get_reg(vcpu, reg);
+ 	ftr = (val & mask) >> shift;
+@@ -433,11 +435,17 @@ static u64 test_reg_set_success(struct kvm_vcpu *vcpu, u64 reg,
+ 	val &= ~mask;
+ 	val |= ftr;
  
- 		vcpu_run(vcpu);
+-	vcpu_set_reg(vcpu, reg, val);
+-	new_val = vcpu_get_reg(vcpu, reg);
+-	TEST_ASSERT_EQ(new_val, val);
+-
+-	return new_val;
++	ret = __vcpu_set_reg(vcpu, reg, val);
++	if (ret == 0) {
++		new_val = vcpu_get_reg(vcpu, reg);
++		pass = new_val == val;
++		if (!pass)
++			ksft_print_msg("%lx != %lx\n", new_val, val);
++	} else {
++		ksft_print_msg("Write of 0x%lx failed: %d\n", val, ret);
++		pass = false;
++	}
++	ksft_test_result(pass, "%s valid write succeeded\n", ftr_bits->name);
+ }
  
-@@ -684,11 +719,21 @@ static void test_guest_reg_read(struct kvm_vcpu *vcpu)
- 			REPORT_GUEST_ASSERT(uc);
- 			break;
- 		case UCALL_SYNC:
--			val = test_reg_vals[encoding_to_range_idx(uc.args[2])];
--			val = reset_mutable_bits(uc.args[2], val);
-+			reg_id = uc.args[2];
-+
-+			expected_val = test_reg_vals[encoding_to_range_idx(reg_id)];
-+			expected_val = reset_mutable_bits(reg_id, expected_val);
+ static void test_reg_set_fail(struct kvm_vcpu *vcpu, u64 reg,
+@@ -447,6 +455,7 @@ static void test_reg_set_fail(struct kvm_vcpu *vcpu, u64 reg,
+ 	u64 mask = ftr_bits->mask;
+ 	u64 val, old_val, ftr;
+ 	int r;
++	bool match;
  
- 			/* Make sure the written values are seen by guest */
--			TEST_ASSERT_EQ(val, reset_mutable_bits(uc.args[2], uc.args[3]));
-+			guest_val = reset_mutable_bits(reg_id, uc.args[3]);
-+
-+			match = expected_val == guest_val;
-+			if (!match)
-+				ksft_print_msg("%lx != %lx\n",
-+					       expected_val, guest_val);
-+			ksft_test_result(match,
-+					 "%s value seen in guest\n",
-+					 get_reg_name(reg_id));
- 			break;
- 		case UCALL_DONE:
- 			done = true;
-@@ -941,7 +986,7 @@ int main(void)
+ 	val = vcpu_get_reg(vcpu, reg);
+ 	ftr = (val & mask) >> shift;
+@@ -459,11 +468,19 @@ static void test_reg_set_fail(struct kvm_vcpu *vcpu, u64 reg,
+ 	val |= ftr;
  
- 	ksft_print_header();
+ 	r = __vcpu_set_reg(vcpu, reg, val);
+-	TEST_ASSERT(r < 0 && errno == EINVAL,
+-		    "Unexpected KVM_SET_ONE_REG error: r=%d, errno=%d", r, errno);
++	if (r >= 0 || errno != EINVAL) {
++		ksft_print_msg("Unexpected KVM_SET_ONE_REG error: r=%d, errno=%d (%s)\n",
++			       r, errno, strerror(errno));
++		ksft_test_result_fail("%s invalid write rejected\n",
++				      ftr_bits->name);
++		return;
++	}
  
--	test_cnt = 4 + MPAM_IDREG_TEST + MTE_IDREG_TEST;
-+	test_cnt = 4 + MPAM_IDREG_TEST + MTE_IDREG_TEST + GUEST_READ_TEST;
+ 	val = vcpu_get_reg(vcpu, reg);
+-	TEST_ASSERT_EQ(val, old_val);
++	match = val == old_val;
++	if (!match)
++		ksft_print_msg("%lx != %lx\n", val, old_val);
++	ksft_test_result(match, "%s invalid write rejected\n", ftr_bits->name);
+ }
+ 
+ static u64 test_reg_vals[KVM_ARM_FEATURE_ID_RANGE_SIZE];
+@@ -503,7 +520,11 @@ static void test_vm_ftr_id_regs(struct kvm_vcpu *vcpu, bool aarch64_only)
+ 		for (int j = 0;  ftr_bits[j].type != FTR_END; j++) {
+ 			/* Skip aarch32 reg on aarch64 only system, since they are RAZ/WI. */
+ 			if (aarch64_only && sys_reg_CRm(reg_id) < 4) {
+-				ksft_test_result_skip("%s on AARCH64 only system\n",
++				ksft_print_msg("%s on AARCH64 only system\n",
++					       ftr_bits[j].name);
++				ksft_test_result_skip("%s invalid write rejected\n",
++						      ftr_bits[j].name);
++				ksft_test_result_skip("%s valid write succeeded\n",
+ 						      ftr_bits[j].name);
+ 				continue;
+ 			}
+@@ -512,11 +533,8 @@ static void test_vm_ftr_id_regs(struct kvm_vcpu *vcpu, bool aarch64_only)
+ 			TEST_ASSERT_EQ(masks[idx] & ftr_bits[j].mask, ftr_bits[j].mask);
+ 
+ 			test_reg_set_fail(vcpu, reg, &ftr_bits[j]);
+-
+-			test_reg_vals[idx] = test_reg_set_success(vcpu, reg,
+-								  &ftr_bits[j]);
+-
+-			ksft_test_result_pass("%s\n", ftr_bits[j].name);
++			test_reg_set_success(vcpu, reg, &ftr_bits[j]);
++			test_reg_vals[idx] = vcpu_get_reg(vcpu, reg);
+ 		}
+ 	}
+ }
+@@ -996,7 +1014,7 @@ int main(void)
+ 		ID_REG_RESET_UNCHANGED_TEST;
  	for (i = 0; i < ARRAY_SIZE(test_regs); i++)
  		for (j = 0; test_regs[i].ftr_bits[j].type != FTR_END; j++)
- 			test_cnt++;
+-			test_cnt++;
++			test_cnt += 2;
+ 
+ 	ksft_set_plan(test_cnt);
+ 
 
 -- 
 2.47.3
