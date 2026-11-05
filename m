@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.201
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793876461;
-	b=2jUO7Udy+tXPBDK1Dx8s/AgmANeNXCxl9g945nNlBPjMQ16BYMV+r19//1ZYbEtFcZG/
-	 H4mLz/gcn+L/uPIT5b2HiyF6o2RPgSUyceEPVI26pPcQQfyzKZiR8E7SltAZJCRRpRfyl
-	 GzZP04LhlUHWlM5fbaFBhFatOC/LTqy/q2N9T+SLNexnCLmwrF5SLpz1yUKb2QeRx9Ls4
-	 HSVcHlrCKuZyO0q88nGFoFNldVPiBDd6I/quAyzehxhQBC00an8VqpTC+f72xIRLTbAQL
-	 gEJrAoAf0iO9o/IZOIfXtQk8N7K+03iZ+/lXeQDY227Rjkopimn18L+5y/CGqdkUYWw==
+	t=1793876465;
+	b=XftcJGe7oJk/LI70nQotstBysmu/XLe3GRmFwtbgVaBfyyw7lVT8pbtJoiryvINaW2s2
+	 wxWll9+6IJqaDYiDgn1/Nvj2zy2/pYT4KIa7hMRJTRM5q0srM+wJuP0ljuEAF7JuhDMPt
+	 KB+d/+ltCz1gHAMGK4EuMbZMFqOmJ7dNQpc4RlQI7pvM/WVLVbrC2n40XzjBN8s5oFenJ
+	 JVWOJjrehJekiMnk2Omjndrn5Jet38t40NQJl6elglOrW5PyIbI9I7lDNWbgUrKq3vi0g
+	 WZsZXnklu+piNI0b3wCRUAqwp9cQZc05j58v6Ha713D9Q8uogQNFBvcTiGNxbdZn3yQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793876461;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793876465;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=rvaFmtyNDISQsoxMWBFpDY8CKig5NLHO//X6oykgI60=;
-	b=1Uj6H3kTpqeYwOK1sZIG1xcs+s2fNcaFD1lysPVShkRa4ItYFNzvgy0FkJuO6Eg8yobA
-	 16F/8f4oI5QVUrVQ9aV3xRbvVdN15TNJ+VneEwxAwyeNlSKACNb5zJS39SBgRV2EdP3dF
-	 z68lQT6Px2jwDUZbwq6S4GctsTnNRhPOV46DOwD53454aQZiyWB6LRbjV+tVBAL+KgWha
-	 ryBSnC462Ub58Krn2eT7vQ+Wl7tAD52To1Z/0mtH6I0z4hoNNCeIiEMEhmvCcHx9XXDf5
-	 taPT66Ja8XWj6Cbj7sYLcFw0vRdJjSCfvWeee8HJhPt0o6m1QNCGx0LDyLUiXEKRFWA==
+	bh=Zth+ioNeco6Y26/nGtuUwgodoU7stROkCOLzqhbMwj8=;
+	b=1kaZVmMYM/3gpVaTURtRo7TnU4GwQyquv7csmo5/pvUtRs3k7aH7SgjAmN2M6KWAofxQ
+	 rJQqbNsgCXCI1FIs6uwLNFyuyt7Nq8oIMiKJxKx5HiqrkWBvvOomQeTIK6lCEemQEgOT9
+	 BmjDDpxA4OGqof1rMM6GnA0apPbVCwhDGUDheSoHofQxi1kj2uLVCdI0gvPEiipJGk+0S
+	 H+k2BS9r7wP75FFxXcwSaDQSCAA7pyk06QU82cO27P9mAlQ9jj1Ikdzb2ulbr97dJa7KD
+	 lMheXOCgHfStouwieaSmhkD0JLqnO0L5Fwg7CvT7KHx2Z4T60yKWGGT/oTDwHsqCtnQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=vIrFY6We;
-	arc=none smtp.remote-ip=91.218.175.174
-Received: from mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=bkbXfAYz;
+	arc=none smtp.remote-ip=95.215.58.201
+Received: from mta1.migadu.com (out-201.mta1.migadu.com [95.215.58.201])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DBD3606A32F
-	for <kvmarm@lists.linux.dev>; Thu,  5 Nov 2026 11:00:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6DBD3606A32F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA70606A33F
+	for <kvmarm@lists.linux.dev>; Thu,  5 Nov 2026 11:01:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CFA70606A33F
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=vIrFY6We
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=bkbXfAYz
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=NyEGJoxXLgzBuQGYRabpnuVYOlu6XTCpsnZS7w1lcug=;
+DKIM-Signature: a=rsa-sha256; bh=etVrSQDuUpX2EwqNodnkS74XlA/kEpDepAAYv3ksNZ0=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793876458; v=1; x=1794481258;
- b=vIrFY6WeE9WW0HJWQx9rBXqXQNSdxsKhOXDMFmBTNEXy8U9imBwQJnQtc2KIP9G6rQVZE2qF
- RptMNnBmU1d/2aZsQAHwNJylcGlk9FG3Wkl2J4hFsYIqYeOuqImALXcJEel5Kb7ABLAFdXf9Cos
- Gu8ued5W8kzL9C5W2qhqaYTw=
+ t=1793876462; v=1; x=1794481262;
+ b=bkbXfAYzV5yJpZWt0hYSc5BCd/jJ1UJOzPAfuYCIm9gOLGemof5NbmkoLWEfULSDiYg8qqQ2
+ ES+eFkpjeK0cQ+m0M5LUeufY2I+2gHNigXmfJntkxIji9JNGA/SnbR4CnG47ICmt1SaFkvW9LIe
+ TwLIuyz53DGOrTapy7aH4Hz0=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id e5683ee50ff6c947;
-	Thu, 05 Nov 2026 11:00:58 +0000
-X-Mizu-Trace-ID: e5683ee50ff6c947
+Received: by smtp.migadu.com with ESMTPS id 82aeebc9bf92e3fc;
+	Thu, 05 Nov 2026 11:01:02 +0000
+X-Mizu-Trace-ID: 82aeebc9bf92e3fc
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Oliver Upton <oupton@kernel.org>,
@@ -65,9 +65,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] KVM: arm64: vgic: Drop the pending state of all LPIs when disabling LPIs
-Date: Thu,  5 Nov 2026 11:00:48 +0000
-Message-ID: <20261105110050.1244525-2-fuad.tabba@linux.dev>
+Subject: [PATCH 2/3] KVM: arm64: vgic-v3: Don't save pending tables with LPIs disabled
+Date: Thu,  5 Nov 2026 11:00:49 +0000
+Message-ID: <20261105110050.1244525-3-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261105110050.1244525-1-fuad.tabba@linux.dev>
 References: <20261105110050.1244525-1-fuad.tabba@linux.dev>
@@ -82,105 +82,54 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When the guest clears GICR_CTLR.EnableLPIs, vgic_flush_pending_lpis()
-retires the LPIs on the vCPU's AP list. However, an LPI disabled in the
-configuration table can be pending without being on that list. An LPI
-moved to the vCPU by MOVI can also still be in another vCPU's LRs,
-which pausing the vCPU doesn't fold back. These LPIs stay pending, and
-the guest takes them even after re-enabling LPIs with
-GICR_PENDBASER.PTZ set.
+KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES writes each LPI's pending state
+into its redistributor's pending table, clearing the bit of an LPI that
+isn't pending. However, once a redistributor has LPIs disabled and RWP
+reads 0, "there are no further accesses by the GIC to the LPI Pending
+table" (IHI 0069H.b, 5.1.2) until enabling LPIs reads it. A bit the
+guest sets there is cleared by the next save, which QEMU runs whenever
+it stops the VM, and the guest never takes the LPI.
 
-Halt the guest rather than the vCPU, so that no vCPU can fold such an
-LPI back from its LRs after the flush. Have the flush clear the pending
-state of every LPI targeting the vCPU. A forwarded vLPI's pending state
-is in its vPE's pending table, which the flush doesn't clear.
+Skip the LPIs of a redistributor with LPIs disabled, and document it.
+On GICv4.1 this drops the state of a forwarded vLPI there, which the
+disable is allowed to lose: "There is no guarantee that clearing
+GICR_CTLR.EnableLPIs causes the LPI Pending table to be updated in
+memory" (5.1.2).
 
-Invalidate the translation cache before the flush. Only an MSI racing
-with the disable can then make an LPI pending, or cache its translation
-for later ones.
-
-Fixes: 0e4e82f154e38 ("KVM: arm64: vgic-its: Enable ITS emulation as a virtual MSI controller")
+Fixes: 280771252c1ba ("KVM: arm64: vgic-v3: KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES")
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/vgic/vgic-mmio-v3.c | 13 +++++++------
- arch/arm64/kvm/vgic/vgic.c         | 16 +++++++++++++++-
- 2 files changed, 22 insertions(+), 7 deletions(-)
+ Documentation/virt/kvm/devices/arm-vgic-v3.rst | 1 +
+ arch/arm64/kvm/vgic/vgic-v3.c                  | 4 +++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index 02292f8e0b431..93024879ed3b3 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -298,14 +298,15 @@ static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
- 		/*
- 		 * Yes, disabling LPIs is painful, since it can be done from
- 		 * a *remote* vcpu! So let's not take any chance, and make
--		 * sure that the target vCPU has written their LRs back to the
-+		 * sure that every vCPU has written their LRs back to the
- 		 * irq structures, and release any reference they would have.
--		 * Pause it before its LPIs read as disabled, so that the exit's
--		 * prune leaves them for vgic_flush_pending_lpis() to retire.
-+		 * Halt them before the LPIs read as disabled, so that none can
-+		 * fold an LPI back from its LRs after vgic_flush_pending_lpis()
-+		 * has cleared it.
- 		 *
- 		 * If it hurts, don't do it.
- 		 */
--		kvm_pause_vcpu(vcpu);
-+		kvm_arm_halt_guest(vcpu->kvm);
+diff --git a/Documentation/virt/kvm/devices/arm-vgic-v3.rst b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
+index 5395ee66fc324..c878d3f728858 100644
+--- a/Documentation/virt/kvm/devices/arm-vgic-v3.rst
++++ b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
+@@ -308,6 +308,7 @@ Groups:
+       save all LPI pending bits into guest RAM pending tables.
  
- 		/*
- 		 * Don't disable if RWP is set, as there already an
-@@ -315,12 +316,12 @@ static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
- 					      GICR_CTLR_ENABLE_LPIS,
- 					      GICR_CTLR_RWP);
- 		if (ctlr == GICR_CTLR_ENABLE_LPIS) {
--			vgic_flush_pending_lpis(vcpu);
- 			vgic_its_invalidate_all_caches(vcpu->kvm);
-+			vgic_flush_pending_lpis(vcpu);
- 			atomic_set_release(&vgic_cpu->ctlr, 0);
- 		}
+       The first kB of the pending table is not altered by this operation.
++      Neither is the pending table of a redistributor with LPIs disabled.
  
--		kvm_resume_vcpu(vcpu);
-+		kvm_arm_resume_guest(vcpu->kvm);
- 	} else {
- 		ctlr = atomic_cmpxchg_acquire(&vgic_cpu->ctlr, 0,
- 					      GICR_CTLR_ENABLE_LPIS);
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index fe09ada322625..a99570538f104 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -207,9 +207,10 @@ static void vgic_release_deleted_lpis(struct kvm *kvm)
- void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
- 	struct vgic_irq *irq, *tmp;
-+	unsigned long intid, flags;
- 	bool deleted = false;
--	unsigned long flags;
+   Errors:
  
- 	raw_spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 65b77fb35be37..9bbf11ddba92e 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -625,7 +625,9 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+ 			continue;
  
-@@ -228,6 +229,19 @@ void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu)
- 
- 	if (deleted)
- 		vgic_release_deleted_lpis(vcpu->kvm);
+ 		vcpu = irq->target_vcpu;
+-		if (!vcpu)
 +
-+	/* Disabled LPIs and LPIs MOVI'd here can be pending off this AP list. */
-+	xa_for_each(&dist->lpi_xa, intid, irq) {
-+		irq = vgic_get_irq(vcpu->kvm, intid);
-+		if (!irq)
-+			continue;
-+
-+		raw_spin_lock_irqsave(&irq->irq_lock, flags);
-+		if (irq->target_vcpu == vcpu)
-+			irq->pending_latch = false;
-+		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-+		vgic_put_irq(vcpu->kvm, irq);
-+	}
- }
++		/* While LPIs are disabled, the pending table is the guest's. */
++		if (!vcpu || !vgic_lpis_enabled(vcpu))
+ 			goto put_irq;
  
- void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending)
+ 		pendbase = GICR_PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
 -- 
 2.47.3
 
