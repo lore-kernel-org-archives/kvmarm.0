@@ -1,114 +1,59 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.43.23
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793995025;
-	b=K1LC+QbHhcBVg3lAyxu9Y/vqDBYoyCjF/tPBcpBfega0muh5eMw4e7SDvEENh+fvjefP
-	 ft8OI4Ums12VnT3CS+yZhVLlbDqRQLgircPDIaUCqX/bB+dDZp7a0CgXn0vGFeqefQDsU
-	 gffd5IAnM1dG9qHmwBwqZCmc8+ix4ux0PX3ysTnh1iNL7YB++wkKnsL4xHRxZHOLXusbA
-	 UXOWkrDzTPupPTqwv+jgPQXNNXvSD/Tqv8gn4EmBfs/vGYAvjex+dX5WoKz5ja2B79Dff
-	 w81blm9VWAJhogTk+Uweu8NpjaGWmhCWnhvBsS3789KNHXx141wog17KDXyqf6c+xmg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793995025;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:
-	 X-MS-Exchange-Authentication-Results:Received-SPF:Received:Received:
-	 Received:Received:Date:From:To:CC:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
-	 X-NV-OnPremToCloud:X-EOPAttributedMessage:X-MS-PublicTrafficType:
-	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
-	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
-	 X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-Id:
-	 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=U35EW0rSQqovkhDvCT99KqBJ/0CFSW02gIsNnYH55/I=;
-	b=P1HcC9VSlJsEmoyIDtXEmCyRiJ6NVB3Nsx/CpWbtqjX+zzQJQu8PruQuDUSbmmhA8HH5
-	 dnLllYSwplLsmjBAcaEuT3ijvC1UGc2e7BCDrnrU2M6V4ZC+aby5ogLf/70VivHpMCkQH
-	 lO7eXW3yt53P+QcXdSCc1oE3zk6l1l+LASlEpsNdSHuhPzUQp+j/6PyKXOubjOfrwbl0N
-	 5F6iYrif8tbk6E13rW5g20cPfFCZ3XrW1VHdegX2l/edWT4xJL579ygrdWiHNuvhwESqX
-	 M/PimRfwudTrbaARnei361HUIEN6pNDoGiSEATrXKXc7PMEnURBanv8epOJZjrkQ1AA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=nvidia.com;
-	spf=fail smtp.mailfrom=nvidia.com;
-	dkim=pass header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=R4jv5pRl;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.43.23
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012023.outbound.protection.outlook.com [52.101.43.23])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793995844;
+	b=5AYlR56K3zxnEeR0MEyeRub2ja5A0ZPGwzyKJCrZQPXgJwe1yu6KdjtUN6xB6UxiAwed
+	 MydOzS/6bEJkDxVcrJswYKVqj3N9gCn1VfKDLrnGMln5iUoBZ48WlOI5OxSB/rIX4UDF0
+	 F9l5lrAOulPWj11rOM1bZcJFFnb1EkwmojTa2Ao8gZSqn9f4vxAYM0I2I2pr+Aq6BU28d
+	 Et+3hrbGz4JiLsA2Cd1wj18GPTwa257Sw9E8rP6n3ozi4niYj5Fog/doFYV1ro49rmQ7v
+	 OT9OCoBB1KINuFOPdAR1h2hJhpetoQ3vpCHym5gZ3Am1ABgbkF7bDk7iEa/RtyLjWdg==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793995844;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=dK5ikpJ3Ehrl8Rpf2JL5Uz3SzaBhmdsRWWT52oRBwxk=;
+	b=ici9+Qw1siLc4B9uTFNVQ2qg1qw8l1AE3nR8Qww7NXBpLDXfy9g7RacYu9Dbcs4ik0ab
+	 f72KeSmAG70ExAEXBvXQr/uIGk89NssYBKkQpQrZDoq66pqx6ZrV6eWD/24QcDcFtod+f
+	 Ulmt/25pwTdL2UA8uMYhNhxkx0wR9axSpIUci4PGbNhgwrIrhE0FVUBeJjx6cASK1mCOj
+	 eLNn+lTyrAjDc405XcCjoX3mgFBPGtycKqkqdnpJIArzMR1joeX9B7lGRNPHZxA6CLPjP
+	 O3TlrbKJqsLOn/Hi5KIVtLXRbdTec/tKAozbIzHBL7wL/Ebd6v8TMH01SeJgJBxzdig==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gpoGGTj+;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79765606A32C;
-	Fri,  6 Nov 2026 19:57:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 79765606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCFD3606A329;
+	Fri,  6 Nov 2026 20:10:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=R4jv5pRl
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ikXVkU4pelTiyCuvVzIon9Zc+dasTt/tzaOAaNTchA2P2gXCPTYPUbZC8pga/eHv+DJ5gHVt3dmzdqKAFGl8fqlGlTR6qJvYsmg07sBtAd6TGQCsQRE4ijKVeXEshiqytUbosghCE1hMe819HeEfCnlYU4BnR2Hzx3mc3eScWBpOPMZi74jDYDQJi3gXHaHBAJjF0kcmIZ1Y8QpUaDc9t8neR6JjMRfw/vuUOZGnwDn57SjfCQft/CoTeg6in4Vrey5yq02ONSp12MzKlHmu4/kp3Of6l+lUbpsX1DV1Z7t01Worhwba97hpGmECtD7BnCOLiBrF0s118jGbcc3MVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=U35EW0rSQqovkhDvCT99KqBJ/0CFSW02gIsNnYH55/I=;
- b=C0WugisHQj/FsEnZX/1N3Om0ookOy+enKELzIcHeJ/99PlMyxVc09ewJ3C5F6+rx5V0nrQPXQ7i4XTclT0e4PdMoQqe+0ozoyZfHYsz+TUHQ+xQWSZSI6ylF4KeGvYm+AzGBZ6Tw/laHD86u8LATdJEcnYN9I0tSrW71nZYg5FTNpZqPSHnjLVkiyzimy7YYQR/XenogbKTlHrBqZYMJ0GsTFTDnSaYmx+uaXVZtdKGpe2i3n4iD4U/BS+2Qmh8P6HxWmH3D2ZIplud+ymjhqZX5ktqFrYIl9Og4mK+dpDSlPC+FV3ZnePLexbGguwZ6ilokq2IWtrIFvIgzl/Bo2A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=U35EW0rSQqovkhDvCT99KqBJ/0CFSW02gIsNnYH55/I=;
- b=R4jv5pRl7/XB6Vpmi9P0w0YtQvjukTnpIk3bkJfEgSrhBayPzmSFZ9XD84HIeEic0KmSJ8ihAMkgQpBcjmJchnKztdYDwuAKnfDzftJSLRE9IzhsRyVO8XBaBdCPrhcbymqarjK/Ei3fjD5wh6eW9Sv0UJuRN7kJOrTwWJoOWEnm2UnSoGJHYcst7MvrTEAJQP+R44pn4Otk5EnIpwdqiVzLNJcCPEgIna7ZbnMLuz7hgT+Ct09pHHXvB29msX7a/zJZubPgLoezObnxYZ6gn0CDMsOKzKO1/orPc7YhabiKuRJLDxhTR7snwh/F3d/+2mmws4C5HlSsJozzxpCblA==
-Received: from MN0PR04CA0010.namprd04.prod.outlook.com (2603:10b6:208:52d::25)
- by LV3PR12MB9329.namprd12.prod.outlook.com (2603:10b6:408:21c::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.592.10; Fri, 6 Nov
- 2026 19:56:59 +0000
-Received: from BN7PEPF000000A4.namprd05.prod.outlook.com
- (2603:10b6:208:52d:cafe::2b) by MN0PR04CA0010.outlook.office365.com
- (2603:10b6:208:52d::25) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.592.11 via Frontend Transport; Fri, 6
- Nov 2026 19:56:59 +0000
-X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
- is 216.228.118.232) smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- BN7PEPF000000A4.mail.protection.outlook.com (10.167.245.228) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.615.4 via Frontend Transport; Fri, 6 Nov 2026 19:56:59 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56; Fri, 6 Nov
- 2026 11:56:40 -0800
-Received: from drhqmail203.nvidia.com (10.126.190.182) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.56; Fri, 6 Nov 2026 11:56:40 -0800
-Received: from nvidia.com (10.127.8.13) by mail.nvidia.com (10.126.190.182)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56 via Frontend
- Transport; Fri, 6 Nov 2026 11:56:36 -0800
-Date: Fri, 6 Nov 2026 11:56:34 -0800
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: Mostafa Saleh <smostafa@google.com>
-CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>, <iommu@lists.linux.dev>, <catalin.marinas@arm.com>,
-	<will@kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
-	<joro@8bytes.org>, <jgg@ziepe.ca>, <mark.rutland@arm.com>,
-	<qperret@google.com>, <tabba@google.com>, <vdonnefort@google.com>
-Subject: Re: [PATCH v9 13/25] iommu/arm-smmu-v3-kvm: Add MMIO emulation
-Message-ID: <au4w8nvPQ3xv7igC@nvidia.com>
-References: <20261015200903.2735565-1-smostafa@google.com>
- <20261015200903.2735565-14-smostafa@google.com>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gpoGGTj+
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 269D61F008A4;
+	Fri,  6 Nov 2026 20:10:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793995843;
+	bh=dK5ikpJ3Ehrl8Rpf2JL5Uz3SzaBhmdsRWWT52oRBwxk=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=gpoGGTj+X210gjCvfLOFwO/Iu6uUvimZwSAm0MJ3ajRw5rwbpWnnf+fjE94qKKDos
+	 aoiDbhLWI45RLjp1zh6McPEyEoUVDfT9CaMTA/JXucN8UBxsYlmCG1BW2EBK4kyzwa
+	 Zh8/Au7C1J7wBF7nNAsbzDQduQwphJphhfj8r0Ske0TX6cePFfmyB7kbL0QhXe6aWc
+	 eEoZE7++PG2iwTSGP6g3vCT2bvtCHNuPyp1jrSs5X+9kRV2S+xsJ8OyoVA//UN18jf
+	 YpEfx9eBT28afvxNYzBWQ7PMVsAQ3O7SPTM2Eloodc2FTqsrb2PhmwSZy/SxvmsrBA
+	 EKWIuvrfgm5XQ==
+Message-ID: <sashiko-outbox-202185@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v3 20/23] KVM: s390: arm64: Finalize page fault handling
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Steffen Eiden" <seiden@linux.ibm.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-s390@vger.kernel.org, "Oliver
+ Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, "Heiko
+ Carstens" <hca@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>, "Alexander
+ Gordeev" <agordeev@linux.ibm.com>, "Christian Borntraeger" <borntraeger@linux.ibm.com>
+In-Reply-To: <20261106-sysreg-v3-20-75e95980fb10@linux.ibm.com>
+References: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
+ <20261106-sysreg-v3-20-75e95980fb10@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 06 Nov 2026 20:10:42 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -117,63 +62,101 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20261015200903.2735565-14-smostafa@google.com>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN7PEPF000000A4:EE_|LV3PR12MB9329:EE_
-X-MS-Office365-Filtering-Correlation-Id: 88b9b6ab-1ac1-4e33-2489-08df3c401e57
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|1800799024|376014|7416014|82310400026|36860700016|11063799006|4143699003|56012099006|261021135927099003|10067099003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	NGd7ColiLtfxhddNNHNF/GgIuJNvkw/2e/y+JAO6xK/eODaLa0qfahYBNxhIkn9teuq804SnnjP0QC24kPjbznTAnDdgc4VrceNn5VFTF/a6WAZy4Ilq7aCiN60cIAP54wkHI92elF0J/3nRDsHv1fdeSYK4/fFEpakfpPaU1e2nOOdY7BBd4qUVMSO++IAbnW8SXprXlwwsfxLZO36e6MCzEW0aa8ymLDohR8o1N4h4VcJr/xRDTQOQnlMRNE2MbVVTCQ5UFc3H1ZPXZGfHs/CEfBzRE1xPABVG6Ke0Fw+ozkPzuGtImK6eZCW32F7HfjbhIPnUWyDgt9NUMgT9/tRckygznuOnGiKVECVQkYawNvZaNTWaX7VGgEFVRzNA/XdCcm/9e7PfWRKsjfPwLHtpWRYCuAQ9NUrEPQ6KSEoxr+IaYDOE0vPNxvgEcmUSSPfs8F1KKJpMsL51NYTRjWYyrVVdnWD4kgEDtgvPrRDIUS5w7qgugVmSJkEtcnVir53fixZFWKKXIu6ziDRhlFhcZPwihqif1m5QszV5V45UmjhaQNJHA4VsoRWebi2xVkExWEW06AIb/ffDXynWWzOr83+Z4dNu7+VL3Q+Wk5nsNk1NEKtKfQ9RxUKPp1T/epDwUeAvzCZdkMXopbXZZo1RYhrPaEDLpxchjK80TLd0C0vGI0Rk7khrLfzhmod+XkKdVqIzOxm9RpsNeGWTbg==
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(376014)(7416014)(82310400026)(36860700016)(11063799006)(4143699003)(56012099006)(261021135927099003)(10067099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	KNa9lc+h20sWwkDhVsfyLKMPR+JMOzkw8tmiaFELwOEls32zM1uVneXgn9DNctdkHYp9f+xzY/JqO4tua2CiuNZzbHSFUzkqMt3HthGrOz1uSI0rD0qalTyX3/LxBv77Jm5ZqdC7q9cIWTfJCFHkfqRlCbpSTeZrUjliL5t3RNB9vStnz7WGWKd5LuKgs/bBhs5dUWzJ0nUmdU907cBSHKy/4wGTQZ4NWicSUL1s02D5gUs2JlSTMjMjWmm/Ut28KvZKkjDvAXJIfOZAMVqhulHFaf1RaVDBQpdda3bj3ZkeRx+bF0pjapgTSY19jXQwp/Z9bSXeQqynGeUFBpvMns8l9mFFdq9kbWnGHFwZVCqYDc40IjekQpFoPGBVxQjYIW3KI14FRcCuFGi6+5P/vBNxTqIT9tGt7QtEZXrZwimyhJYE5Hiq2FJeluAAVIKn
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2026 19:56:59.2655
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 88b9b6ab-1ac1-4e33-2489-08df3c401e57
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN7PEPF000000A4.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9329
 
-On Thu, Oct 15, 2026 at 08:08:44PM +0000, Mostafa Saleh wrote:
-> +static bool smmu_dabt_handler(struct user_pt_regs *regs, u64 esr, u64 addr)
-> +{
-> +	struct hyp_arm_smmu_v3_device *smmu;
-> +	bool ret;
-> +
-> +	for_each_smmu(smmu) {
-> +		if (addr < smmu->mmio_addr || addr >= smmu->mmio_addr + smmu->mmio_size)
-> +			continue;
-> +		hyp_spin_lock(&smmu->lock);
-> +		ret = smmu_dabt_device(smmu, regs, esr, addr - smmu->mmio_addr);
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue to consider:
+- [Medium] KVM: s390: arm64: preemptible smp_processor_id() in fault
+  injection
+--
 
-Going through the followup patches, I found this smmu_dabt_device
-gets really too big. Perhaps it can be bisect to read and write at
-least? Something like:
+commit 2432a7ede0d5feb054800e41b623b3e845ffe9c3
+Author: Steffen Eiden <seiden@linux.ibm.com>
 
-static bool smmu_mmio_handler(smmu, regs, esr, off)
-{
-        /* decode ESR: len, rd, xzr; width check */
-        if (is_write)
-                return smmu_mmio_write_handler(smmu, off, len, val);
-        val = smmu_mmio_read_handler(smmu, off, len);
-        if (!is_xzr)
-                regs->regs[rd] = val;
-        return true;
+KVM: s390: arm64: Finalize page fault handling
+
+This commit replaces temporary -ENOEXEC returns in the arm64-on-s390 page
+fault handler with address size fault and synchronous external abort
+injection into the guest, and bounds the guest address limit and
+ID_AA64MMFR0_EL1.PARANGE against the supported physical address range.
+
+> diff --git a/arch/s390/kvm/arm64/mmu.c b/arch/s390/kvm/arm64/mmu.c
+> index 31e0d036896f1..7a6f6ba326c13 100644
+> --- a/arch/s390/kvm/arm64/mmu.c
+> +++ b/arch/s390/kvm/arm64/mmu.c
+[ ... ]
+> @@ -32,12 +33,14 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, gpa_=
+t fault_ipa,
+>  	ret =3D kvm_s390_faultin_gfn(vcpu, NULL, &f);
+>  	if (ret <=3D 0)
+>  		return ret;
+> -	if (ret =3D=3D PGM_ADDRESSING)
+> +	if (ret =3D=3D PGM_ADDRESSING) {
+>  		/*
+> -		 * Without the relevant sysregs we cannot do anything for now.
+> -		 * Go back to userspace with an error. TODO sysreg handling
+> +		 * There is no page with the requested address. Inject size fault
+> +		 * which is the closest arm match to PGM-addressing
+>  		 */
+> -		return -ENOEXEC;
+> +		kvm_inject_size_fault(vcpu);
+> +		return 1;
+> +	}
+>  	KVM_BUG_ON(ret, vcpu->kvm);
+>  	return -EINVAL;
+>  }
+[ ... ]
+> @@ -98,16 +130,17 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  	}
+> =20
+>  	if (translation) {
+> -		/*
+> -		 * For both cases:
+> -		 * Without the relevant sysregs we cannot do anything for now.
+> -		 * Go back to userspace with an error. TODO sysreg handling
+> -		 */
+> -		if (fault_ipa >=3D BIT_ULL(get_kvm_ipa_limit()))
+> -			return -ENOEXEC;
+> +		/* Beyond the PA range programmed for the guest */
+> +		if (fault_ipa >=3D kvm_get_pa_address(vcpu->kvm)) {
+> +			kvm_inject_size_fault(vcpu);
+> +			return 1;
+> +		}
+> =20
+> -		if (fault_ipa >=3D vcpu->kvm->arch.guest_phys_size)
+> -			return -ENOEXEC;
+> +		/* Falls between the IPA range and the PA range? */
+> +		if (fault_ipa >=3D vcpu->kvm->arch.guest_phys_size) {
+> +			fault_ipa |=3D FAR_TO_FIPA_OFFSET(kvm_vcpu_get_hfar(vcpu));
+> +			return kvm_inject_sea(vcpu, is_iabt, fault_ipa);
+> +		}
+>  	}
+
+[Severity: Medium]
+Can calling kvm_inject_size_fault() and kvm_inject_sea() (as well as
+kvm_inject_sea_iabt() and kvm_inject_sea_dabt() below) from
+kvm_handle_guest_abort() invoke smp_processor_id() in preemptible context?
+
+kvm_arch_vcpu_ioctl_run() calls handle_exit() -> kvm_handle_guest_abort()
+with both interrupts and preemption enabled while the vCPU is loaded
+(vcpu->cpu !=3D -1).  The fault injection helpers access FAR_EL1 and ESR_EL1
+through vcpu_read_sys_reg() and vcpu_write_sys_reg(), which expand to
+_vcpu_read_sys_reg() and _vcpu_write_sys_reg():
+
+arch/s390/include/asm/kvm_host_arm64.h:_vcpu_write_sys_reg() {
+	({	BUILD_BUG_ON(!__builtin_constant_p((R))); \
+		KVM_BUG_ON(vcpu_is_loaded(C) && smp_processor_id() !=3D (C)->cpu, (C)->kv=
+m); \
+		(vcpu_is_loaded(C)) \
+			? __vcpu_write_sr((C), (V), (R), 0) \
+			: __vcpu_write_sr((C), (V), (R), SASR_FLAG_INITIALIZED); })
 }
 
-Nicolin
+When a guest faults on an address above its IPA or PA range, this triggers
+a debug_smp_processor_id() warning under CONFIG_DEBUG_PREEMPT=3Dy, and if
+the vCPU thread is preempted and migrated to another CPU between reading
+vcpu->cpu and smp_processor_id() (where kvm_sched_out() / kvm_sched_in()
+update vcpu->cpu), KVM_BUG_ON() fires and marks the VM bugged.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261106-sysreg-v3-=
+0-75e95980fb10@linux.ibm.com?part=3D20
