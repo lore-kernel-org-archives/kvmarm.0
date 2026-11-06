@@ -1,59 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.207
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793975758;
-	b=R1HU8Xo35sxGjaGAayQLar5oe8uuCKSjXnN/zK7JUuHENSBWVDVcU8eoj1IfhBE1aHSp
-	 c5LfjZZ+LO3KAX0ABSIA7oXarmliTnL+55XXt42r/Wbcm9WBUuS+WEL0iN762NJQYYTK6
-	 IRVpcSepXyyHNEkYefvw+3X3q10LW0PFG0U+wrf/F8tf4gWtv3T9JWUXPbo9mSkC43ej1
-	 f0KMKEjK9FH+zjmD0MByBmttIMunaJsfJwNIJ1WAyK/mQQbJ2cNGAKle+JzkajNTF28OE
-	 30gYG5bYBlTRcgb2b6GUoc2JG6174RMkruKcZStjvddEuuSIkCSCqYVnrttKWxQ+ejg==
+	t=1793976128;
+	b=o8Ws7yQJ7H4TaoEXR3Ak6DaSCROxx9ejPBItqUMj1mHca4TPFQYsZJE7ci5JvaPbmIMS
+	 vYg1BpW3EcUEgtdxygnkHzJp0SlFHD9XOLTE3Qv1WZ6T2USBsQfN7o9ftN51mzIXWv6VL
+	 3kzHvSN0lc281+SgctIvzEKGgADxPLRAQrQX8jdWbHl9gAe0GnfabXkmnbmQS0BXzBKZE
+	 rZkGjVYb/9K4SV7AJmnmlwwZ31zT0c8yFYM9HcK2tD/CqXsMyhEpegvq6zi4uJF2jaOFl
+	 NwTt9+anQyjOdP6oJ9SAdlSmgvPTYI6HVNqMHlXKSDKIN7db7A+QrpMOty9Iaexqg8A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793975758;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=9ne3EpNoMJHND53sLVjB8iHYRzBbI+NXjoTQbJvnLE4=;
-	b=P/ZYAdltopKPZ0D3FJOL54pxkJafHCHxzCI5xfs6axJZYSHQExHSF2BpkMKirwilO8wQ
-	 kSiMqiSIuHLH7lXzqeMBid0fsGc0uxdgF/ZOwuOqQwoAI1hf1MwijR1DTqYvJaoSsaLNN
-	 lMVlhOslt1kCkwh4SkC4FNQHq7JmnSspo2kNWNE4rx3M2Xjqfi+JiAUV+jJWVfR0M8yZw
-	 YnFaMC1v1rWg8FYdWq2E4UWf0ms7M2lAXMG3gQeZ2o75NfLIGuYSZPEONBjcWuY+tYrST
-	 ge5Dsz+UVWpjSMyB08c4LhslSbV8FuM8X7EhmFhWE4mZU9azpABYXwWWcFnpcJnBRsA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793976128;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=dPrT1d3tfAdRZHoFdKvhwwCCJALbTuZcl0ma0HWZQHQ=;
+	b=VyGodivQrvBPd9TSRKbU6matx8c1uoehl52VWRv0PIEZstRWUoAYRK4+zLKzmyYL8dJm
+	 29ARuQQZ64QRf053wfdR3E+FZm+Qs/9+yjhzsK5K77pTlfR4p9v1FHcbqq51+t/I29rcc
+	 8B27Gkrd2p0oReCmqMhZZO9slfsSW1NWQAaItanOv95pZc5QtTcDFohpIWH3iSAfZSMdF
+	 rzLbyyQLEM453yIlw9Jj7/fLzqVO4yy/PdoQCF+yWeuDwhO9Qi836ytCBqflZ3b3QFifL
+	 ozceQGrvumiMwJnaOPdj54OVMAZflXZzXw9PY7DODu5l7I9jC9NXoM+b/ScQQNjVV3Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	arc=none smtp.remote-ip=95.215.58.207
-Received: from mta1.migadu.com (out-207.mta1.migadu.com [95.215.58.207])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55B6606A329
-	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 14:35:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C55B6606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=9ne3EpNoMJHND53sLVjB8iHYRzBbI+NXjoTQbJvnLE4=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793975750; v=1; x=1794580550;
- b=UOiPmKzsKQcEoSPab25f5vJkH7dcWsq7wjBs4xvttqDa/K0UZDvXV1tvNDDpyrEapsPODfem
- eb7MlsyRPvfiIwkM+D7IBGvFdT5VqdSRRDL7Jkso6nhj5uKXIfNtpCr0/7Q+QQKG1Tt25vSrVoV
- nKN3OaB0O5BDwOmWtx1DNtkk=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id eafd98a6238733ca;
-	Fri, 06 Nov 2026 14:35:32 +0000
-X-Mizu-Trace-ID: eafd98a6238733ca
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5bfca2a2af4so69e87.1
-        for <kvmarm@lists.linux.dev>; Fri, 06 Nov 2026 06:35:32 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AKwUvBxUQoivvEmdBN4iRkR5vlV1cYUcC8ih+5fszAvch3MRf06SOknS9ySitzpg6zL5Dj6zSBqg2Ig=@lists.linux.dev
-X-Gm-Message-State: APuU4Z/OW77verYxeuIUWwxSVlxf/TL66Q1llY0nYueTIsmj13siKpHu
-	qPBSH1iASpM+Vd5FAvkGGkUb76vUY090XNzvYhWpRz//KRag0oMDCSjwFLsXZuiSFTdrOp4XoyP
-	fKIfqKy3e3/pU8ntrThV5ajgnFS+uqP1+DqpAG+CI
-X-Received: by 2002:a05:6512:4019:b0:5c0:50:ff89 with SMTP id
- 2adb3069b0e04-5c0071d689fmr69373e87.14.1793975731712; Fri, 06 Nov 2026
- 06:35:31 -0800 (PST)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="B/mbpzSL";
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 838EC606A32E;
+	Fri,  6 Nov 2026 14:42:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 838EC606A32E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=B/mbpzSL
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BFBD31682;
+	Fri,  6 Nov 2026 06:42:03 -0800 (PST)
+Received: from [10.2.197.99] (ewhatever.cambridge.arm.com [10.2.197.99])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C297A3F673;
+	Fri,  6 Nov 2026 06:41:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793976126; bh=RROBsGVNy+Oakstf6DXz+xH01uQZXz9GOkcgQ0meiw4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=B/mbpzSLUIxkLsvdYEgUGs2NsLPfEoaHIS2u4uoKA+TM6l8BAPmmaFFiWCiMC/+zG
+	 RnZu7A5UIYQ7u/AWqfgGaXvhX9c5DxYbnRdfhdakUjLrptQLm8mu5OPAnNzPX6lE/G
+	 B3q1sAgPLmHroCXLRJ29Lu6hp0qwTMoNkNoh4n1Q=
+Message-ID: <2e448ac1-7b4f-4d45-90db-dfe9dc5ad329@arm.com>
+Date: Fri, 6 Nov 2026 14:41:57 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -63,44 +53,78 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261105-hyp-pool-and-map-v2-0-44a6ca90190b@cs.columbia.edu>
- <20261105-hyp-pool-and-map-v2-3-44a6ca90190b@cs.columbia.edu>
- <CA+EHjTx-X_2DaO6Yt-AHsP55SFWjz_EYxEr-TB9WSN-ZT+d3FQ@mail.gmail.com> <CAPOPQMB6eU0MYNewcq8HKsEMchwY-X3aT0Km9uULBappFWZcjQ@mail.gmail.com>
-In-Reply-To: <CAPOPQMB6eU0MYNewcq8HKsEMchwY-X3aT0Km9uULBappFWZcjQ@mail.gmail.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Fri, 6 Nov 2026 14:34:55 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTz-R016BwhcptZ3xVQe+a8C7au6ZL8jwZANdTf=cXRZHQ@mail.gmail.com>
-X-Gm-Features: AclHuK_pCYkO0OW5l_wmtgWxAs8e930i-uFO6iYlwOczI7StHxm9o788PZxd9Ls
-Message-ID: <CA+EHjTz-R016BwhcptZ3xVQe+a8C7au6ZL8jwZANdTf=cXRZHQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] KVM: arm64: Don't replace a valid hyp block
- mapping with a table
-To: Xuheng Li <xuheng@cs.columbia.edu>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 01/14] mm: Add an allocator for CoCo shared memory
+To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+ linux-coco@lists.linux.dev
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ Baoquan He <baoquan.he@linux.dev>, Mike Rapoport <rppt@kernel.org>,
+ Pasha Tatashin <pasha.tatashin@soleen.com>,
+ Pratyush Yadav <pratyush@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Joerg Roedel <joro@8bytes.org>,
+ Marc Zyngier <maz@kernel.org>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Robin Murphy <robin.murphy@arm.com>, Steven Price <steven.price@arm.com>,
+ Sumit Semwal <sumit.semwal@linaro.org>, Thomas Gleixner <tglx@kernel.org>,
+ Will Deacon <will@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ Benjamin Gaignard <benjamin.gaignard@collabora.com>,
+ Brian Starkey <Brian.Starkey@arm.com>, John Stultz <jstultz@google.com>,
+ Mark Rutland <mark.rutland@arm.com>, Radu Rendec <radu@rendec.net>,
+ "T.J. Mercier" <tjmercier@google.com>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <chleroy@kernel.org>, Ritesh Harjani
+ <ritesh.list@gmail.com>, Shrikanth Hegde <sshegde@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+ Kiryl Shutsemau <kas@kernel.org>, Rick Edgecombe
+ <rick.p.edgecombe@intel.com>, "K . Y . Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+ linaro-mm-sig@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
+ linux-media@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev,
+ patches@lists.linux.dev
+References: <20261104164555.3555725-1-aneesh.kumar@kernel.org>
+ <20261104164555.3555725-2-aneesh.kumar@kernel.org>
+Content-Language: en-US
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20261104164555.3555725-2-aneesh.kumar@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, 6 Nov 2026 at 14:34, Xuheng Li <xuheng@cs.columbia.edu> wrote:
->
-> Hi Fuad,
->
-> On Fri, Nov 06, 2026 at 12:03:29PM +0000, Fuad Tabba wrote:
-> > Could you mention in the message that the WARN_ON() is fatal at EL2,
-> > so a caller there gets a hyp panic rather than -EEXIST?
-> > kvm_pgtable_hyp_map() is already documented as rejecting such a
-> > mapping "with an error and a WARN()", which is a better reason than a
-> > future caller.
->
-> Thanks. I'll reword the message to say that the WARN_ON() is fatal at
-> EL2, and point to kvm_pgtable_hyp_map()'s documented "error and a
-> WARN()" instead of a future caller. With patches 1 and 2 dropped, I'll
-> resend this one on its own once reviews have settled.
+On 04/11/2026 16:45, Aneesh Kumar K.V (Arm) wrote:
+> Confidential-computing guests may require memory shared with the host to
+> be aligned and transitioned in units larger than PAGE_SIZE. Several DMA
+> users need struct page-backed allocations satisfying these requirements.
+> Provide a common allocator instead of requiring each user to open-code
+> this sequence.
+> 
+> Add alloc_cc_shared_pages() and its node-aware variant. The allocator
+> rounds the requested size to the architecture's shared granule,
+> allocates suitably aligned contiguous pages and transitions the
+> complete range to shared state. It also preserves the caller's GFP
+> policy.
+> 
+> A private-to-shared transition may alter memory contents. Mask
+> __GFP_ZERO from the underlying allocation and when requested, clear the
+> complete transitioned range after cc_make_shared() succeeds.
 
-Actually, like Vincent pointed out, why the WARN_ON(). The caller can
-just handle the error.
+This is not true for pKVM though. It is the other way around. i.e,
+pages must be cleared before transition (e.g., from private to shared)
+to make sure the contents don't leak into the host.
 
-Cheers,
-/fuad
+Do we need to handle such cases with a pre_conversion and 
+post_conversion hook ?
+
+Cheers
+Suzuki
+
