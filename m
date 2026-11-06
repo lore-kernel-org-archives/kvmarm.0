@@ -1,82 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.158.5
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793981334;
-	b=h9qNpxcLKPrn9ALBCb9lHT9q9XQV+2FM0GztVNAdtrlTgTUJ1eezEyqXH+RAkctq9Cab
-	 yzD+91IsTJYHHSH6WxS34w7KBxfE1aeE3ceztp5x9mt2EwEj/sSM7jiN1c0p2ksbPNomf
-	 BLy7kfJxCeL6GqlkIbc/OjYWgzA/5EbAFfwwamUIaHhRGGj6x+cnjGPzW+J6U17FtSZhy
-	 zKjnav/nv9RTFdJX6FnARg/Ob87SVe3sVZv7e1PjXh2xN7LRLxCBaMho6ESw0xApR1Jhf
-	 1biIAGeE5/WLViYktJ5iebMTF/3TNppDo8LD0Xq3BxitIfnhwLZxK9tCUM4mjixNGvA==
+	t=1793981335;
+	b=BcOfVjuJwFTrOGl8gWyWdeFj5yILbrXtEw9EfmRs09/anzprYyq6iZTIRdzDGJ+1SqHz
+	 RtC4ASYVtVee48lDKqWeKhUanQ3kXnj5ZegBFIMutqH+YrywS7MUuHrrARl/LIGCsWc06
+	 oI/L/xZ+bpVNz8mcAMpdfx4HTeue2te5AUw/cnn8mNMuAHMWSzzA1VhCL/NIrYEFUjAUn
+	 VpKgigzrYR3W0NgnqkuPALFoI60nAmIJR6OTOrOYocClvS4jy17T/ISTlmQ3MKXdu+1xq
+	 fOGdiX8IpBPZYhO4RE2B4sFkK3hyd1H3MRR8wpkLrrcwveVZtiVhY6KozesKBWC0oYA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793981334;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793981335;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
 	 Received:Received:Received:Received:From:Date:Subject:MIME-Version:
 	 Content-Type:Content-Transfer-Encoding:Message-Id:References:
-	 In-Reply-To:To:Cc:X-Mailer:X-TM-AS-GCONF:X-Authority-Analysis:
-	 X-Proofpoint-GUID:X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Info:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Virus-Version:
-	 X-Proofpoint-Spam-Details;
-	bh=4CRB45o87B1y6cGu+sB4g7GznXFnvc9TXSYvLCMuNzE=;
-	b=ZP0B/Ykj+z8PoZml9zx/+phRjOhQtgTFEuAQLB3Pfaj0rxd34i/MkiJkOrX4781Ls0fJ
-	 4aVQtsfrZgRo20nthZa/KUgyepkDrkEI8UbjZnPe8Xu7MSqYK/lzXMsGY7yT3t22tnI54
-	 FziZGTz6wDrlYASkJjBlUis28f8/39smJZ7GI5tpIuB4KxW2IWOajAx1MNo8RUkKtu0XQ
-	 Tv9F0TlSCk+otb17Ef0JdcqNo9s7ZywjPFbhu4Sdw+5rOBGmX56GnsJLjjpNyclY0K2ZA
-	 qbC4WExbnjDrFMFF/ZPy9uPidPP50NmXj9bEhkXmrVZoLTeH6js8sRb7jEyqJi4vkeg==
+	 In-Reply-To:To:Cc:X-Mailer:X-TM-AS-GCONF:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-GUID:X-Proofpoint-Spam-Details-Enc:
+	 X-Proofpoint-ORIG-GUID:X-Authority-Analysis:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=01XaVDFyHS1v8Vm6tncXokfJcSWetYXwjrAXCkBdHNU=;
+	b=cxqJ1c5Dh56zP92B8wNHy+6hmotduCCRXT41OrkxBhzS9jbS2bBlXoW7IvmAfy9eWkZn
+	 4vKJzXzbsaKWmK6NTj3zD7ALCMmw0/o+1YcnDI2s/Z3Z9z9dEzWbtvJ4wz/vnzjgV4NH2
+	 D+PnkjFM8H+06mEv2b6rY4EPuf8xftNcxix+DFgDExlAlK0jbrdJNJ14Yeo0kuUKEJbW/
+	 v0GYVdJsYgcSHIbpBu+pO7VJnKwIyVmUnKkHtYtA62Y2P0jSkCLQ//J3sXfL+WkUcui3C
+	 F1gVSeVdyifxgXyOfe1WGTBcSn4859EGy2rIDo8i/bwY7mIuh6B41iap8/czP7+TDFQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.ibm.com;
 	spf=pass smtp.mailfrom=linux.ibm.com;
-	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b="i/OWvNdw";
-	arc=none smtp.remote-ip=148.163.156.1
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=K1CJ+gHP;
+	arc=none smtp.remote-ip=148.163.158.5
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC635606D81C
-	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 16:08:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BC635606D81C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2A4606A337
+	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 16:08:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8F2A4606A337
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=i/OWvNdw
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A6FEJon1095102;
-	Fri, 6 Nov 2026 16:08:28 GMT
+	dkim=pass (2048-bit key, unprotected) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=K1CJ+gHP
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A6FEC742656391;
+	Fri, 6 Nov 2026 16:08:23 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=4CRB45
-	o87B1y6cGu+sB4g7GznXFnvc9TXSYvLCMuNzE=; b=i/OWvNdwLQoxolw0x+kxBo
-	BJJorq0xrZc707ltGuNzqSeyj8wlQizuMswYsnQPgrgShSivdB48aOIzBuYolKS9
-	zbxWahFlW6AkVnk+bRAUrm2LLkiaLIs1c3OJqFeJmghpGracGmLELzO6tST/7wHe
-	C7ZKTFJPX4K/UEsRjIRSqCKHW9qy1200TCLPUDOjNUAaqoFe6zN62lEG2t3DCJmK
-	f4DJfXoViD8P/I/X4ar1GZ+S0Yjs7QimWUBPDlLCB6yWI9WMxQMi3KDOyfsFzX/V
-	0WNE11MFiEpFr09hX4elKiNEBS+5UN6P9i6bzUY1bESfygBXcgSGy7BZ+mHpCtLg
+	:message-id:mime-version:references:subject:to; s=pp1; bh=01XaVD
+	FyHS1v8Vm6tncXokfJcSWetYXwjrAXCkBdHNU=; b=K1CJ+gHPzC9cSTKfFSPqgG
+	AIWc4+jFWObHaWpIjjKcn20tlCmaLcKQ+2pJL3pNo40B7C9fJmuf90GVxaTMYxZt
+	T2tzvTMJduXXG+pCU5iOtBzH2gUjbulAhTyMdt8dJNYZr5ornl/pFjIgCJdPT/XS
+	6YrEK14bZIg2L1upcKi+NQvSnXLonti+mVPw17ADLu18FOF9U/6QfhEOwVxXi3ba
+	5OAmYZH/j9s6UYC5P5Aw2UINxEYraLi1t5F59VWn4Z0vUO7LUc3zOwbAPeVrXU9Y
+	zk/UlIHV3rYmImHIfZiYC57E+Rs4QciOKpu6n9rBJxTbaoLaJeUTXL7tV5QokJwA
 	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4hs3rawj0g-1
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4hs3rc5etj-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 06 Nov 2026 16:08:28 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A6FKCoL3577989;
-	Fri, 6 Nov 2026 16:08:27 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4hqv1v871y-1
+	Fri, 06 Nov 2026 16:08:22 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A6F4s403584917;
+	Fri, 6 Nov 2026 16:08:22 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4hrka724bc-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 06 Nov 2026 16:08:27 +0000 (GMT)
+	Fri, 06 Nov 2026 16:08:22 +0000 (GMT)
 Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6A6G8I2v49283430
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6A6G8Hvq30278042
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Fri, 6 Nov 2026 16:08:18 GMT
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 07D4320040;
-	Fri,  6 Nov 2026 16:08:18 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9C3DD2006A;
+	by IMSVA (Postfix) with ESMTP id 379F32004F;
 	Fri,  6 Nov 2026 16:08:17 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C4DA72004B;
+	Fri,  6 Nov 2026 16:08:16 +0000 (GMT)
 Received: from a46lp73.lnxne.boe (unknown [9.87.84.240])
 	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  6 Nov 2026 16:08:17 +0000 (GMT)
+	Fri,  6 Nov 2026 16:08:16 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
-Date: Fri, 06 Nov 2026 17:07:43 +0100
-Subject: [PATCH v3 10/23] s390: Add range check asm macro
+Date: Fri, 06 Nov 2026 17:07:41 +0100
+Subject: [PATCH v3 08/23] KVM: arm64: Share system register code with s390
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -88,7 +88,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261106-sysreg-v3-10-75e95980fb10@linux.ibm.com>
+Message-Id: <20261106-sysreg-v3-8-75e95980fb10@linux.ibm.com>
 References: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
 In-Reply-To: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
@@ -114,106 +114,284 @@ To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
         Arnd Bergmann <arnd@arndb.de>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>,
-        Jens Remus <jremus@linux.ibm.com>
+        linux-s390@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>
 X-Mailer: b4 0.14.3
 X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=QYDzLcbv c=1 sm=1 tr=0 ts=6aedfb7c cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA2MDA2MiBTYWx0ZWRfX7u9GWPzLxfpP
+ TLKJBYzLwAxlrxNDD6P+cOKIYMeKrBxZ84eB763ScuylvSyqXCk/7/LveFo3SNe0vxjIuNGHIHn
+ UdBq0uzQcoqzIhIo1OR/Jpheoa8xXJU=
+X-Proofpoint-GUID: b_3lSkkcRwIkuydlZjWET0az5WVzQ8TE
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA2MDA2MiBTYWx0ZWRfX0WOnDBCutLWh
+ Yl57gK3I1sdCIdoNRXaq0NcMoq5GcMcMwTbx/3KJ+F+wsSfed89KQjtPyunvj9DSiq8Kxo4madm
+ 0DMXVGZkmxEOE6cwSlevEHbs1Ui/eVBv0w8X5kLpUjV8IV2QFn92MV7W0+vBmt8E4qoH4ufjPaj
+ 1kux5SrPZcW0acFpsfz3XJa2GnSdyKfe12kuNZpdfphmMuOA4wRPXWXAirdQnyHPrhBWf4DGgNI
+ mPs/WWXpe1ARHMda1Yew50B1afthYYJx8LlU4pabWw6z2GAbhBTeQwkcBuqa5Ph9LL1pDme6uBB
+ JfKmg879Aqlj5eN3lMCKxbKxnct+WLKhrdm0j1r/epP5wko8dAqbRCzIRKcTOrU5Dc/tPiBm+0N
+ QOZcPNt6rvsvK3KADhB08SWDscmKZeAw6IVXZCIdPuj3h17CbDB2H/BIgAHzDXBrb4diw8pZcGR
+ ymx7MYCnRYLo8jUcINQ==
+X-Proofpoint-ORIG-GUID: b_3lSkkcRwIkuydlZjWET0az5WVzQ8TE
+X-Authority-Analysis: v=2.4 cv=CY+dd7rl c=1 sm=1 tr=0 ts=6aedfb76 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
  a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8
- a=Hoxe6d4Xkq5xC5L4oCMA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: O86VXZeJplvG5pQV7GWOTTNlEFrwTkH9
-X-Proofpoint-ORIG-GUID: O86VXZeJplvG5pQV7GWOTTNlEFrwTkH9
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA2MDA2MiBTYWx0ZWRfX+rIkcwvVICcG
- MmnOTwlLClupEcx/fqG6cu2/FF+vTHLyoe4Pf6/3LVdScQhlPMjgOBOOiteUHSHr2vS6Uv8khIA
- rSOz5lEErX68Cp0rwIVv0Y9Q5EhMVYA=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA2MDA2MiBTYWx0ZWRfX7h+sjArM/dLd
- +B7bCUGm1pawE3eVBEJ2r/L0FUV/dsaJXTakwBIrhHvLHaMoJPlrA6bOr+1+Xy0V680COXre4mS
- StcJzoN6RMaR0B0r0jD5nzZ/KGFhk82rxznWdMmDvjyUW/DUrzbJVFyNKF/8PcfOC1u+81ye0A3
- o0MjGnvt4DTlDYMCpVF1yeihjSP3qjr1H6b6XceKkk2dIMP1MNJEqqCo6exc5F/XVBmnvskjpmC
- iU630pZ7pkiaQS5Z3nqKQ07kGdpyTgyncI3IdHQlItIMPLTynXernKSz2rfCdYUfpLTICbOTCpl
- WafjsPfe4xJK+DhXafPGsrZwzx075olWeD542bfYf7LaEHZdYQvClN2V+czQ8LwIKX/nuuna7J3
- 12S4xlj9UJpIQlU9C0uDW20XL7KLpJgGRywFZdN6o/NX8V1PP0naWvmXvdOEbUQBLYjJYs0xgvs
- tvem/afzLK2NiaaO+dw==
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VnNF1IyMAAAA:8
+ a=Ta4cUnT-blxcx9JQKIoA:9 a=QEXdDO2ut3YA:10
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
  definitions=2026-11-06_05,2026-11-06_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 adultscore=0 clxscore=1015 impostorscore=0 suspectscore=0
- lowpriorityscore=0 priorityscore=1501 bulkscore=0 malwarescore=0 phishscore=0
+ priorityscore=1501 suspectscore=0 bulkscore=0 phishscore=0 impostorscore=0
+ malwarescore=0 lowpriorityscore=0 spamscore=0 clxscore=1015 adultscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611060062
 
-The range check macro turns cryptic assembler errors into an easy to
-understand error if e.g. someone mistypes an input value in an asm
-macro.
+Mark functions that s390 can use to implement system registers for arm
+on s390 guests as shared functions. The new shared functionality covers
+system register infrastructure for KVM, Pointer auth checks and
+shareable parts of the SVE register API. In order to reduce the number
+of shared sections more code than s390 requires is shared. This is no
+problem as for the shared code unused function checking is disabled.
 
-Add an asm macro that verifies that a given input value is in a specific
-range. Add macros which check for ranges often used when creating
-instructions. While at it, add a range check for the register numbers in
-the GR_NUM and VX_NUM macro.
-
-Co-developed-by: Jens Remus <jremus@linux.ibm.com>
-Signed-off-by: Jens Remus <jremus@linux.ibm.com>
+Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
+Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/s390/include/asm/insn-common-asm.h | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ arch/arm64/kvm/arm.c      |  3 +++
+ arch/arm64/kvm/guest.c    | 11 +++++++----
+ arch/arm64/kvm/sys_regs.c | 27 +++++++++++++++++++++++++++
+ 3 files changed, 37 insertions(+), 4 deletions(-)
 
-diff --git a/arch/s390/include/asm/insn-common-asm.h b/arch/s390/include/asm/insn-common-asm.h
-index fd9b3cacb7c5..f3f10f2c92bb 100644
---- a/arch/s390/include/asm/insn-common-asm.h
-+++ b/arch/s390/include/asm/insn-common-asm.h
-@@ -9,6 +9,32 @@
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 157bf4b81202..d83df5ff68f4 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -366,6 +366,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 	kvm_arm_teardown_hypercalls(kvm);
+ }
  
- #ifdef __ASSEMBLER__
++#if ARM64_S390_COMMON == 1
+ static bool kvm_has_full_ptr_auth(void)
+ {
+ 	bool apa, gpa, api, gpi, apa3, gpa3;
+@@ -400,6 +401,8 @@ static bool kvm_has_full_ptr_auth(void)
+ 		(apa + api + apa3) == 1);
+ }
  
-+.macro	RANGECHECK	min max val
-+	.if (\val < \min) || (\val > \max)
-+	.error "operand out of range (\val is not between \min and \max)"
-+	.endif
-+.endm
++#endif /* ARM64_S390_COMMON == 1 */
 +
-+.macro	ASSERT_U16	val
-+	RANGECHECK 0, 65535, \val
-+.endm
+ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ {
+ 	int r;
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 878ea4500c5c..26ec4751e17e 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -307,12 +307,12 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 	return err;
+ }
+ 
+-#endif /* ARM64_S390_COMMON == 1 */
+-
+ #define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
+ #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
+ #define vq_present(vqs, vq) (!!((vqs)[vq_word(vq)] & vq_mask(vq)))
+ 
++#endif /* ARM64_S390_COMMON == 1 */
 +
-+.macro	ASSERT_S16	val
-+	RANGECHECK -32768, 32767, \val
-+.endm
-+
-+.macro	ASSERT_U8	val
-+	RANGECHECK 0, 255, \val
-+.endm
-+
-+.macro	ASSERT_U4	val
-+	RANGECHECK 0, 15, \val
-+.endm
-+
-+.macro	ASSERT_U5	val
-+	RANGECHECK 0, 31, \val
-+.endm
+ static int get_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ {
+ 	unsigned int max_vq, vq;
+@@ -383,6 +383,7 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 	return 0;
+ }
+ 
++#if ARM64_S390_COMMON == 1
+ #define SVE_REG_SLICE_SHIFT	0
+ #define SVE_REG_SLICE_BITS	5
+ #define SVE_REG_ID_SHIFT	(SVE_REG_SLICE_SHIFT + SVE_REG_SLICE_BITS)
+@@ -399,6 +400,8 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ #define KVM_SVE_ZREG_SIZE KVM_REG_SIZE(KVM_REG_ARM64_SVE_ZREG(0, 0))
+ #define KVM_SVE_PREG_SIZE KVM_REG_SIZE(KVM_REG_ARM64_SVE_PREG(0, 0))
+ 
++#endif /* ARM64_S390_COMMON == 1 */
 +
  /*
-  * GR_NUM - Retrieve general-purpose register number
-  *
-@@ -24,6 +50,7 @@
- 	.endr
- 	.if \opd == 255
- 		\opd = \gr
-+		ASSERT_U4	\opd
- 	.endif
- .endm
+  * Number of register slices required to cover each whole SVE register.
+  * NOTE: Only the first slice every exists, for now.
+@@ -595,8 +598,6 @@ static unsigned long num_core_regs(const struct kvm_vcpu *vcpu)
+ 	return copy_core_reg_indices(vcpu, NULL);
+ }
  
-@@ -46,6 +73,7 @@
- 	.endr
- 	.if \opd == 255
- 		\opd = \vxr
-+		ASSERT_U5	\opd
- 	.endif
- .endm
+-#endif /* ARM64_S390_COMMON == 1 */
+-
+ static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
+ {
+ 	const unsigned int slices = vcpu_sve_slices(vcpu);
+@@ -658,6 +659,8 @@ static int copy_sve_reg_indices(const struct kvm_vcpu *vcpu,
+ 	return num_regs;
+ }
  
++#endif /* ARM64_S390_COMMON == 1 */
++
+ /**
+  * kvm_arm_num_regs - how many registers do we present via KVM_GET_ONE_REG
+  * @vcpu: the vCPU pointer
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index e71c1b169b49..fa1ed13daeb9 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -45,6 +45,7 @@
+  * 64bit interface.
+  */
+ 
++#if ARM64_S390_COMMON == 1
+ static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
+ static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 		      u64 val);
+@@ -82,6 +83,8 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
+ 			"sys_reg write to read-only register");
+ }
+ 
++#endif /* ARM64_S390_COMMON == 1 */
++
+ enum sr_loc_attr {
+ 	SR_LOC_MEMORY	= 0,	  /* Register definitely in memory */
+ 	SR_LOC_LOADED	= BIT(0), /* Register on CPU, unless it cannot */
+@@ -428,6 +431,7 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, enum vcpu_sysreg reg)
+ 	__vcpu_assign_sys_reg(vcpu, reg, val);
+ }
+ 
++#if ARM64_S390_COMMON == 1
+ /* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_CCSIDR */
+ #define CSSELR_MAX 14
+ 
+@@ -533,6 +537,8 @@ static bool access_rw(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
+ 
++#endif /* ARM64_S390_COMMON == 1 */
++
+ /*
+  * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
+  */
+@@ -800,6 +806,7 @@ static bool access_gicv5_ppi_enabler(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
+ 
++#if ARM64_S390_COMMON == 1
+ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
+ 			struct sys_reg_params *p,
+ 			const struct sys_reg_desc *r)
+@@ -853,6 +860,8 @@ static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
+ 
++#endif /* ARM64_S390_COMMON == 1 */
++
+ static int set_oslsr_el1(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 			 u64 val)
+ {
+@@ -1012,6 +1021,7 @@ static u64 reset_actlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	return actlr;
+ }
+ 
++#if ARM64_S390_COMMON == 1
+ static u64 reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ {
+ 	u64 mpidr = kvm_calculate_mpidr(vcpu);
+@@ -1020,6 +1030,8 @@ static u64 reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	return mpidr;
+ }
+ 
++#endif /* ARM64_S390_COMMON == 1 */
++
+ static unsigned int hidden_visibility(const struct kvm_vcpu *vcpu,
+ 				      const struct sys_reg_desc *r)
+ {
+@@ -1589,6 +1601,7 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+ #define AMU_AMEVCNTR1_EL0(n) { SYS_DESC(SYS_AMEVCNTR1_EL0(n)), undef_access }
+ #define AMU_AMEVTYPER1_EL0(n) { SYS_DESC(SYS_AMEVTYPER1_EL0(n)), undef_access }
+ 
++#if ARM64_S390_COMMON == 1
+ static unsigned int ptrauth_visibility(const struct kvm_vcpu *vcpu,
+ 			const struct sys_reg_desc *rd)
+ {
+@@ -1609,6 +1622,8 @@ static unsigned int ptrauth_visibility(const struct kvm_vcpu *vcpu,
+ 	__PTRAUTH_KEY(k ## KEYLO_EL1),					\
+ 	__PTRAUTH_KEY(k ## KEYHI_EL1)
+ 
++#endif /* ARM64_S390_COMMON == 1 */
++
+ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+ 			      struct sys_reg_params *p,
+ 			      const struct sys_reg_desc *r)
+@@ -1906,6 +1921,7 @@ static int arm64_check_features(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
+ 
++#if ARM64_S390_COMMON == 1
+ static u8 pmuver_to_perfmon(u8 pmuver)
+ {
+ 	switch (pmuver) {
+@@ -2840,6 +2856,8 @@ static bool bad_redir_trap(struct kvm_vcpu *vcpu,
+ 	.val = 0,				\
+ }
+ 
++#endif /* ARM64_S390_COMMON == 1 */
++
+ static bool access_sp_el1(struct kvm_vcpu *vcpu,
+ 			  struct sys_reg_params *p,
+ 			  const struct sys_reg_desc *r)
+@@ -3212,6 +3230,7 @@ static void init_imp_id_regs(void)
+ 	boot_cpu_aidr_val = read_sysreg(aidr_el1);
+ }
+ 
++#if ARM64_S390_COMMON == 1
+ static u64 reset_imp_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ {
+ 	switch (reg_to_encoding(r)) {
+@@ -3269,6 +3288,8 @@ static int set_imp_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+ 	.val = mask,					\
+ 	}
+ 
++#endif /* ARM64_S390_COMMON == 1 */
++
+ static u64 reset_mdcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ {
+ 	__vcpu_assign_sys_reg(vcpu, r->reg, vcpu->kvm->arch.nr_pmu_counters);
+@@ -4833,6 +4854,7 @@ static const struct sys_reg_desc cp15_64_regs[] = {
+ 	{ SYS_DESC(SYS_AARCH32_CNTVCTSS),     access_arch_timer },
+ };
+ 
++#if ARM64_S390_COMMON == 1
+ static bool check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
+ 			       bool reset_check)
+ {
+@@ -4882,6 +4904,8 @@ static void perform_access(struct kvm_vcpu *vcpu,
+ 		kvm_incr_pc(vcpu);
+ }
+ 
++#endif /* ARM64_S390_COMMON == 1 */
++
+ int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu)
+ {
+ 	kvm_inject_undefined(vcpu);
+@@ -5416,6 +5440,7 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
+ 	return 1;
+ }
+ 
++#if ARM64_S390_COMMON == 1
+ static void reset_vm_ftr_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *reg)
+ {
+ 	u32 id = reg_to_encoding(reg);
+@@ -5757,6 +5782,8 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+ 	return write_demux_regids(uindices);
+ }
+ 
++#endif /* ARM64_S390_COMMON == 1 */
++
+ #define KVM_ARM_FEATURE_ID_RANGE_INDEX(r)			\
+ 	KVM_ARM_FEATURE_ID_RANGE_IDX(sys_reg_Op0(r),		\
+ 		sys_reg_Op1(r),					\
 
 -- 
 2.56.0
