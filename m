@@ -1,49 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.146
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793979274;
-	b=sXQ0qxAPg+aXB40wMUK8lFr4grGwUUmjzXZ+wlKLPoSahkbTSM7xwxaLsVRh/U+F81Vy
-	 GOI4cDvqw8bRz4zqWl8NyHkpE+ufQEAtntmhh9FXEKiHWlC7OthueMWyVFo+tOele9Y3S
-	 ifYzMuvN2U4wqgyPZbrmXh6LFb0TwHAzkHoMktRq6KYGIT9LD9msHTDChoAEN4o441WRi
-	 sGyuCuhibkjPh6yKsUzPPGvwiIKoJ/Nq6NJM9vIspKSHMtiMVz8cwXY5N5o2nsL9W1FNf
-	 HdVmm7ygbYDyUZB3FPrcEWEJxoYq3lVkakyoXn3ph+fo61tZ/r07QHHuwEX44VXSM8Q==
+	t=1793979390;
+	b=E5tHq04k8vZXeSN1R4DGg1dQcpUMQxQjrl2Rh7/DW0hlpBv6GMgy7kg0QH2A5Tzs0Oer
+	 Xq61LwouKKwtxP4e1y4vY5m+7cvsDN1Ux9Se9p+X6V9qVZHVYfi9aGWDR4KfC66uUWQMh
+	 iXB1ulNg+V/EBG/xU43ZUUuiynIuGX8MyVLLr79HS9aKCj7YM1HywidoGq+4rnCueUNLV
+	 aJSnHAGt3gr/R0yGaVBivKvfrr3dJgW3gmGucG367beQbPqaGTXwxStmiI3rXZmLW5XId
+	 81fzNisTEWbJoovOvgZBhwgjnd7WsQZLqtyTslflFhT0I2mxNEp1PSAZBrMknRL9IbA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793979274;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=Uj6b08bxBrGPMBQHtFI05sMh6Xoy8ejNAgMPUPWV1BQ=;
-	b=b+AMX1GtUVMEl+CkEwK7CSLIUbt6rstJG9wUkvCmwIp6KXPOQUTDcnB1DbLE7PE7gAbQ
-	 h/j//j43wLtxoDsZrKJLPXCd8Vdu5GfprKfp1Lf2T2nX+MVkAhY+VoY/eCYkfl/QzjJ+j
-	 /4dGxOTjf8ageztAwskyFebFzOIHUveELyO5g1eC7ofiX3h9RTXpl3ZG4weHnL5XPMlsd
-	 /XmKZ9kwChwtss8ASndwT5FYUc6OJNsqY6p/+8mFrb2Cx8cHDYNZZD2N8BtqnwHLQAQhu
-	 9fy752m84rWRZ26gcgrN2UA3TdSTeCgPuRoPpFciJC2HElrP+NyfaQ6MwPZSYCBGzBQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793979390;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=ofV2qVpqrfBMyd1/zLMm6/WPtcgEV4myUPpyNdz12kw=;
+	b=L2+TettnGGEqJ4Of4NIsA35qsxUwmEn/x/+pg+t77pDg40ZbQYYyGQZJ9CYvxwbnF4Hg
+	 bhWTLEMOAhXNuMgsIbrUheA9Qwd0i2B0+3Louoi0PKZcA+szDY4mB5aWU5N7U4w2S4Cz/
+	 eGNnIUhH8m4WBsZDwavpIaZyfiyq7MkW9hIA6kukTXY6a1vwNcsQR4wtjZt/rxlkbkzkd
+	 64K3ypq8la4SRiYmgJYsMYUNhr6sdZrXtsKHIDt15Y6sRgd9NZDD1ngS++IaFnXyaKgNo
+	 FBF0FSq1h7kPLwL9DcexXfjTJWlHlvQGl1WBF6rZ1uj8ASQ/takGJIKK0DKr+3PCMwg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=HoIuxL1I;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C312606A329;
-	Fri,  6 Nov 2026 15:34:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2C312606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Y+ng2dEd;
+	arc=none smtp.remote-ip=95.215.58.146
+Received: from mta1.migadu.com (out-146.mta1.migadu.com [95.215.58.146])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DABD606A33A
+	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 15:36:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4DABD606A33A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=HoIuxL1I
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1F8F71650;
-	Fri,  6 Nov 2026 07:34:30 -0800 (PST)
-Received: from [10.2.197.99] (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2B6803F632;
-	Fri,  6 Nov 2026 07:34:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793979273; bh=kbtuYZHukFIc3XIsRQp6dsFZOem1VpVxmEcgHFZmqd0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=HoIuxL1ItDLUGlcavjNXD/JxrmPk3WBhtY7TT2qM8F45c/7Q3yyjSI+pQ153K1fb0
-	 YXClJGmCHDlVOTNxhr9aTezROBBizZumSyroGckV652hcFVqpuVFnjin2TJWlbTvqZ
-	 Bx38XYVnikraEyti5l13jjcvEmncaKF99Gps4Xng=
-Message-ID: <397b7702-ae85-472b-909e-05b3c4135c61@arm.com>
-Date: Fri, 6 Nov 2026 15:34:23 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Y+ng2dEd
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=ofV2qVpqrfBMyd1/zLMm6/WPtcgEV4myUPpyNdz12kw=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793979387; v=1; x=1794584187;
+ b=Y+ng2dEdi+zky1s1Z1rLDGIGS++Hq+vKQzVnVV3Bm7feiPr8ZGdEVZLuhGimil0MsxeWJdku
+ Wv8tzSO6ymkaR2N6WAWSeB+tJL2H2bE8EjQI59BI4tuYJoXNOvchg1zOnOcmtfqtnen4V3tmW5z
+ gLZx9KfuxZJeOA7j0GJZGBC4=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 9823a6152f062be6;
+	Fri, 06 Nov 2026 15:36:27 +0000
+X-Mizu-Trace-ID: 9823a6152f062be6
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5bfca2a2af4so814e87.1
+        for <kvmarm@lists.linux.dev>; Fri, 06 Nov 2026 07:36:23 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AKwUvBy7RpDd1X4aIPCANP9bJoHoChefsFNeJlJdMLeeJusiCq4AU41t1TT8zVqJ4kgmjD2F8YtKHSI=@lists.linux.dev
+X-Gm-Message-State: APuU4Z88dYqt32hnxc1gcklwtzR5aOpsA5aeEA3Q06f0XVurJUZG5IGa
+	HfLShdLw0LPqN5mbV0WQi4v3+xnNSkfUY2i0wo85F+Mv7dvbEHffxcXRGmV/Ng6LiIUdTFaaefI
+	IBaMbwmbvMTIK1MutRcxxXHvx2+JRhZ7am0VYK1E/
+X-Received: by 2002:a05:6512:1056:b0:5bf:f81a:f24e with SMTP id
+ 2adb3069b0e04-5c00a413bc5mr6933e87.10.1793979382196; Fri, 06 Nov 2026
+ 07:36:22 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,89 +66,46 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 01/14] mm: Add an allocator for CoCo shared memory
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, linux-coco@lists.linux.dev
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Baoquan He <baoquan.he@linux.dev>, Mike Rapoport <rppt@kernel.org>,
- Pasha Tatashin <pasha.tatashin@soleen.com>,
- Pratyush Yadav <pratyush@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Joerg Roedel <joro@8bytes.org>,
- Marc Zyngier <maz@kernel.org>, Marek Szyprowski <m.szyprowski@samsung.com>,
- Robin Murphy <robin.murphy@arm.com>, Steven Price <steven.price@arm.com>,
- Sumit Semwal <sumit.semwal@linaro.org>, Thomas Gleixner <tglx@kernel.org>,
- Will Deacon <will@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Benjamin Gaignard <benjamin.gaignard@collabora.com>,
- Brian Starkey <Brian.Starkey@arm.com>, John Stultz <jstultz@google.com>,
- Mark Rutland <mark.rutland@arm.com>, Radu Rendec <radu@rendec.net>,
- "T.J. Mercier" <tjmercier@google.com>,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- Christophe Leroy <chleroy@kernel.org>, Ritesh Harjani
- <ritesh.list@gmail.com>, Shrikanth Hegde <sshegde@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
- Kiryl Shutsemau <kas@kernel.org>, Rick Edgecombe
- <rick.p.edgecombe@intel.com>, "K . Y . Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
- linaro-mm-sig@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
- linux-media@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev,
- patches@lists.linux.dev
-References: <20261104164555.3555725-1-aneesh.kumar@kernel.org>
- <20261104164555.3555725-2-aneesh.kumar@kernel.org>
- <2e448ac1-7b4f-4d45-90db-dfe9dc5ad329@arm.com> <yq5ald76ou4m.fsf@kernel.org>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <yq5ald76ou4m.fsf@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20261104084842.132944-1-fuad.tabba@linux.dev> <20261104084842.132944-7-fuad.tabba@linux.dev>
+ <au3pNFOMeIx2X4Dp@e143914.arm.com>
+In-Reply-To: <au3pNFOMeIx2X4Dp@e143914.arm.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Fri, 6 Nov 2026 15:35:45 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTwMv8NZvTy2cVtGRLoHxABZiv7yYUdRBHE69ieFUxoRXQ@mail.gmail.com>
+X-Gm-Features: AclHuK_ZZQXxaDxpRQHq7T9rnG0s3OxixfWJ81iGmmqdPNJp-0OMdSXL2rZvnds
+Message-ID: <CA+EHjTwMv8NZvTy2cVtGRLoHxABZiv7yYUdRBHE69ieFUxoRXQ@mail.gmail.com>
+Subject: Re: [PATCH 06/16] KVM: arm64: selftests: Add protected-VM library helpers
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Will Deacon <will@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Vincent Donnefort <vdonnefort@google.com>, 
+	Quentin Perret <qperret@google.com>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 06/11/2026 15:30, Aneesh Kumar K.V wrote:
-> Suzuki K Poulose <suzuki.poulose@arm.com> writes:
-> 
->> On 04/11/2026 16:45, Aneesh Kumar K.V (Arm) wrote:
->>> Confidential-computing guests may require memory shared with the host to
->>> be aligned and transitioned in units larger than PAGE_SIZE. Several DMA
->>> users need struct page-backed allocations satisfying these requirements.
->>> Provide a common allocator instead of requiring each user to open-code
->>> this sequence.
->>>
->>> Add alloc_cc_shared_pages() and its node-aware variant. The allocator
->>> rounds the requested size to the architecture's shared granule,
->>> allocates suitably aligned contiguous pages and transitions the
->>> complete range to shared state. It also preserves the caller's GFP
->>> policy.
->>>
->>> A private-to-shared transition may alter memory contents. Mask
->>> __GFP_ZERO from the underlying allocation and when requested, clear the
->>> complete transitioned range after cc_make_shared() succeeds.
->>
->> This is not true for pKVM though. It is the other way around. i.e,
->> pages must be cleared before transition (e.g., from private to shared)
->> to make sure the contents don't leak into the host.
->>
->> Do we need to handle such cases with a pre_conversion and
->> post_conversion hook ?
->>
-> 
-> Patch 2 does something similar.
+On Fri, 6 Nov 2026 at 14:50, Joey Gouly <joey.gouly@arm.com> wrote:
+[...]
+> One minor thing below, that could be addressed or not.
+>
+> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
-Ah, yes! Thanks
+Thanks!
 
-Cheers
-Suzuki
+[...]
 
-> 
-> -aneesh
+> > +void pkvm_run_loop(struct kvm_vcpu *vcpu, void (*on_sync)(struct kvm_vcpu *vcpu, struct ucall *uc));
+> > +size_t pkvm_host_locked_vm(void);
+> > +
+>
+> Could add a comment here:
+>
+> // Called from the guest
+>
+> As you have those 'Call' / contract comments above.
 
+Ack.
+
+Cheers,
+/fuad
