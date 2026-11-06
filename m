@@ -1,60 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793982882;
-	b=vkMF30KpOh7cJwmrV4ExaBvc/mKqaqF8NNt3kktGbn1AHib2NPuBkhbydkwWrAU0IPFc
-	 YMf0JUBs7faFntQoLkJL7Tvp7NCH2r6iIf/E58wHLI6OWRlveamNiXN0UPrWK9xUuamHG
-	 JiGSm8ttLItpEgxt62/PGkfWKvyeEl2od3M7PG8V0/d+65zh+t6LOWKZJdKrL2XzbYmfq
-	 eLBOmQB+IGrmfTM54/dUc5hSSX1sU5oQT4qeRe23oNWFzBUHVZOrse11yZzUhlOgn/tJq
-	 pn0nobOxncqHErOWYKoajKE4+TUOe6xNlupALdJ5815A2295QOrR4ziaf5KmxGwvS8Q==
+	t=1793983250;
+	b=jpRz9IJxF9Ch2qo33pRrcHOFccEqLjACWsJgwHAZTh4vWPueSkJohPxj3WfdwHPmXVBF
+	 5otku1+D2XT+mSXLKUOh4oa24LAdFU9P1Yu0h+VMOykxgUpeXa9uZfX8EMAqLhzFc5e1k
+	 EEXb3KYRA5/v86Rrvi0Q4WUDbiUHVv0hr0X0FX1NmvUh6VtyJBvv2DSnXKSlLX2UtPFeF
+	 aNVCc0PrxoDf1eJB2HBy6A+Y5okpTIX0gXAmKZOAM1fOerVe0gCEXDzyfBezQoR00OiQZ
+	 +UGx+EIda6PdbfhHLHTwHcToi1Cm+yotxOG0IgZxYryHuR0jeYQnrX5mri01XRfhpUw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793982882;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=Cp+tZVOrkmD7nG2RhQ6YN+Z0lOkuIfJ+qQn8uFGND2c=;
-	b=RBFvRJU7S+4it8sR7dLk7eu8BmWRWKa1FhGJF4H2VDpIFeMK04XaPVTcwqukhnn9zQCC
-	 GjWF2Stc1tLjjYwQINOdL1xSNSoM7Lvf0b0ddIZwggbTpRQMMnP1zDYWI20MwUBbAZ8gt
-	 z58udOEMkY5YUr3AGUq3RqM9GaJuq1InnP7+xgBM+aCr6JIlQu0qzLZ2MlA+1uRGzh0M2
-	 upn6vSUlW+zRTH0u21/7JH017sOjw5b7fAP6PHOr+cr0RxGaEiz+7rsdkpFW98ASXpeAk
-	 vNDedjW2sr+COnmu9isEZY1GnEYcVaZXaL0shersyxaXHLwZFhbeBtdUXv8eQ6R1Q+g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793983250;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:From:To:Cc:References:
+	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=9IIEYk7YBZeshSLM0PoZroS+Zb4rz7EQkxpB2vSxCzc=;
+	b=WdcQFboZdd90huc6MAsqmr3gdWqKyQtOiwyHDVat/sa7ZFuhQDHsDYTKi+yp0K6i7aXT
+	 suCNq+ixYiGoH7L28JBpP/cs2ZkskLl+xWiajgsfj/mypN3hz9tlLi6N1fPv72MLxUsWE
+	 bTylsapKFY6Q9DAXIPnHBci6Domu5DLoKl2daQ1Y9gUNNfyeNeNl3MufQNymji8WvTP7i
+	 i2kq7XluvBK/KJwGARaATzKk0LygP+FhUNwVccEVvwJr29mVjy/9zQ30BGBAfgUiOgG/p
+	 PC2n1hg8o/vcC++zGU1/W+sMT/2vk8jyd6qgpL0ulVRWWA4x8mKjuZ3HU8PDE3fgEXg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EHANWA66;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6846D606A338;
-	Fri,  6 Nov 2026 16:34:42 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=izE986vy;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51F2D606A329;
+	Fri,  6 Nov 2026 16:40:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 51F2D606A329
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EHANWA66
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 728A71F008BC;
-	Fri,  6 Nov 2026 16:34:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793982882;
-	bh=Cp+tZVOrkmD7nG2RhQ6YN+Z0lOkuIfJ+qQn8uFGND2c=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=EHANWA66ONkLPMq3+7IOO+507vY2TicQubzfBZAMq1QAD945Nrxeb08V/q98v/99K
-	 qkoCCgYy1dnzSfK1GolMPt1pvCJ5teZq7K+gFrQ72n0oNFjR1rB1V/Mk7nE6E5IitI
-	 7RTScJG7oqTyU7y+1h4V3Ojx0KqsIiARMPXVJ3gw62QajcVtWelM/ydUFf/g5mmNNK
-	 vV4T7V2eIwaQCwuXkx1mqnmImGU3TZi9ezc6nP7Cp8Ozge4jwEsica42PICwOa/eNK
-	 gS6dqm/Ov92ckqUHOEUcajS4xxXCN+IhaTIi+aCLM6hHDMPia8+YT7PjG2/2WIzO7Z
-	 o71mIuLmwMA6g==
-Message-ID: <sashiko-outbox-201828@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 03/23] arm64: sysreg: Convert OSLSR to automatic
- register generation
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Steffen Eiden" <seiden@linux.ibm.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-s390@vger.kernel.org, "Oliver
- Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, "Heiko
- Carstens" <hca@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>, "Alexander
- Gordeev" <agordeev@linux.ibm.com>, "Christian Borntraeger" <borntraeger@linux.ibm.com>
-In-Reply-To: <20261106-sysreg-v3-3-75e95980fb10@linux.ibm.com>
-References: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
- <20261106-sysreg-v3-3-75e95980fb10@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Nov 2026 16:34:41 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=izE986vy
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 766E01595;
+	Fri,  6 Nov 2026 08:40:45 -0800 (PST)
+Received: from [10.2.197.99] (ewhatever.cambridge.arm.com [10.2.197.99])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 13D863F673;
+	Fri,  6 Nov 2026 08:40:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793983248; bh=ADNoIliO7uObwSND37J76qZqTaSAog/LObwgBbJ0hrE=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=izE986vyY0q3Pt8OzbVRSsX+gj1YMLu1KTdyxaBfirRrJdU/zpJYFe7HbUC+GKIAa
+	 PnRjK0I2uAaRUtfjnoncQW3+3Tk8RT6ft1ZSlUX+IYQYiE1Wi49dk+5Ei/EpX2Xt74
+	 I6Dh6W48YANBmzAaKmgyN7nkpTD/adhBrHrDiFGY=
+Message-ID: <80a956c7-b2b2-411e-99c7-d703c92f3c34@arm.com>
+Date: Fri, 6 Nov 2026 16:40:45 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -63,53 +52,385 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 09/11] KVM: arm64: CCA: Prevent memslot modifications
+ after Realm creation
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+To: Steven Price <steven.price@arm.com>, sashiko-reviews@lists.linux.dev,
+ kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Ackerley Tng <ackerleytng@google.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20261102141304.126883-1-steven.price@arm.com>
+ <20261102141304.126883-10-steven.price@arm.com>
+ <sashiko-outbox-193708@kernel.org>
+ <9489ebe7-4c75-4229-811e-3f618028d367@arm.com>
+ <a2dfb2ad-7c52-43e1-8b77-cacb2fa00c05@arm.com>
+ <0d5a4b59-f38c-4c1d-a59e-202e7efb4b54@arm.com>
+Content-Language: en-US
+In-Reply-To: <0d5a4b59-f38c-4c1d-a59e-202e7efb4b54@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Medium] arm64: sysreg: OSLSR_EL1_OSLK redefinition in tools/ sysreg.h
-  breaks perf
---
 
-commit 33e9aa857b4dfa390c27f99a1a44127d7465fe7b
-Author: Steffen Eiden <seiden@linux.ibm.com>
 
-arm64: sysreg: Convert OSLSR to automatic register generation
+On 05/11/2026 17:31, Suzuki K Poulose wrote:
+> 
+> 
+> On 05/11/2026 15:06, Suzuki K Poulose wrote:
+>> On 04/11/2026 11:15, Steven Price wrote:
+>>> On 02/11/2026 15:50, sashiko-bot@kernel.org wrote:
+>>>> Thank you for your contribution! Sashiko AI review found 1 potential 
+>>>> issue(s) to consider:
+>>>> - [High] KVM: arm64: CCA: guest_memfd memslot delete rejected after 
+>>>> Stage-2 unmap
+>>>> -- 
+>>>>
+>>>> commit 5106402397c36eec1e5fa59a5bb2c5adf4ee2aa8
+>>>> Author: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>>
+>>>> KVM: arm64: CCA: Prevent memslot modifications after Realm creation
+>>>>
+>>>> This commit updates kvm_arch_prepare_memory_region() to disallow 
+>>>> creating,
+>>>> modifying, or deleting guest_memfd-backed memslots once a Realm has 
+>>>> been
+>>>> created.
+>>>>
+>>>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>>>> index 51fda7b2ff7f3..eb8c5f9e9791d 100644
+>>>>> --- a/arch/arm64/kvm/mmu.c
+>>>>> +++ b/arch/arm64/kvm/mmu.c
+>>>>> @@ -2862,13 +2862,28 @@ int kvm_arch_prepare_memory_region(struct 
+>>>>> kvm *kvm,
+>>>>>           (new->flags & (KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY)))
+>>>>>           return -EPERM;
+>>>>> -    if (kvm->arch.vm_flavor == VM_PROTECTED_PKVM) {
+>>>>> +    switch (kvm->arch.vm_flavor) {
+>>>>> +    case VM_PROTECTED_PKVM:
+>>>>>           /* Cannot modify memslots once a pVM has run. */
+>>>>>           if (pkvm_hyp_vm_is_created(kvm) &&
+>>>>> -            (change == KVM_MR_DELETE || change == KVM_MR_MOVE)) {
+>>>>> +            (change == KVM_MR_DELETE || change == KVM_MR_MOVE))
+>>>>>               return -EPERM;
+>>>>> -        }
+>>>>> +        break;
+>>>>> +    case VM_REALM:
+>>>>> +        /*
+>>>>> +         * Once the Realm is created, we cannot modify any slots that
+>>>>> +         * could be providing private memory. i.e., guest_memfd 
+>>>>> backed
+>>>>> +         * slots.
+>>>>> +         * TODO: Handle trusted device private memory slots
+>>>>> +         */
+>>>>> +        if (!kvm_realm_is_created(kvm))
+>>>>> +            break;
+>>>>> +        if (kvm_slot_has_gmem(old) || kvm_slot_has_gmem(new))
+>>>>> +            return -EPERM;
+>>>>
+>>>> [Severity: High]
+>>>> Does checking kvm_slot_has_gmem(old) in 
+>>>> kvm_arch_prepare_memory_region() run
+>>>> too late to prevent Stage-2 unmapping when deleting a guest_memfd- 
+>>>> backed
+>>>> memslot on a created Realm?
+>>>>
+>>>> In virt/kvm/kvm_main.c:kvm_set_memory_region(), non-delete changes
+>>>> (KVM_MR_MOVE and KVM_MR_FLAGS_ONLY) on KVM_MEM_GUEST_MEMFD memslots are
+>>>> already rejected upfront with -EINVAL, so kvm_slot_has_gmem(old) is 
+>>>> reached
+>>>> here when change == KVM_MR_DELETE.
+>>>>
+>>>> However, in virt/kvm/kvm_main.c:kvm_set_memslot(), KVM invalidates and
+>>>> flushes the old memslot before calling kvm_prepare_memory_region():
+>>>>
+>>>> virt/kvm/kvm_main.c:kvm_set_memslot() {
+>>>>     if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
+>>>>         invalid_slot = kzalloc_obj(*invalid_slot, GFP_KERNEL_ACCOUNT);
+>>>>         if (!invalid_slot) {
+>>>>             mutex_unlock(&kvm->slots_arch_lock);
+>>>>             return -ENOMEM;
+>>>>         }
+>>>>         kvm_invalidate_memslot(kvm, old, invalid_slot);
+>>>>     }
+>>>>
+>>>>     r = kvm_prepare_memory_region(kvm, old, new, change);
+>>>>     if (r)
+>>>>         goto err;
+>>>> }
+>>>>
+>>>> kvm_invalidate_memslot() marks the active slot as 
+>>>> KVM_MEMSLOT_INVALID and
+>>>> calls arch/arm64/kvm/mmu.c:kvm_arch_flush_shadow_memslot():
+>>>>
+>>>> arch/arm64/kvm/mmu.c:kvm_arch_flush_shadow_memslot() {
+>>>>     write_lock(&kvm->mmu_lock);
+>>>>     kvm_stage2_unmap_range(&kvm->arch.mmu, gpa, size, true);
+>>>>     kvm_nested_unmap_cipa_range(kvm, gpa, size, true);
+>>>>     write_unlock(&kvm->mmu_lock);
+>>>> }
+>>>>
+>>>> For a Realm VM, kvm_stage2_unmap_range() invokes
+>>>> arch/arm64/kvm/rmi.c:kvm_realm_unmap_range_filter() with
+>>>> KVM_FILTER_PRIVATE | KVM_FILTER_SHARED:
+>>>>
+>>>> arch/arm64/kvm/rmi.c:kvm_realm_unmap_range_filter() {
+>>>>     if (attr_filter & KVM_FILTER_SHARED)
+>>>>         realm_unmap_shared_range(kvm, start, end, may_block);
+>>>>     if (attr_filter & KVM_FILTER_PRIVATE)
+>>>>         realm_unmap_private_range(kvm, start, end, may_block);
+>>>> }
+>>>>
+>>>> By the time kvm_arch_prepare_memory_region() returns -EPERM and
+>>>> kvm_set_memslot() restores the old memslot in the error path, hasn't
+>>>> realm_unmap_private_range() already unmapped and undelegated the 
+>>>> Realm's
+>>>> private Stage-2 DATA granules across the memslot's GPA range?
+>>>>
+>>>
+>>> I think this should be fixable by checking in
+>>> kvm_arch_flush_shadow_memslot() and preserving the stage-2 mappings by
+>>> returning early. kvm_arch_prepare_memory_region() will then reject the
+>>> operation but the mappings will still be in place.
+>>
+>> Or is the better fix to delay the kvm_invalidate_memslot() after 
+>> kvm_prepare_memory_region() ? i.e., if we the KVM backend doesn't
+>> approve the change, why do invalidate the slot ? For most of the CoCo
+>> VMs, this would be disastrous.
+> 
+> 
+> Ignore this, driver for CCA is doing the wrong thing. Instead of
+> flushing (which is a NOP for CCA), we were removing the mapping.
 
-This commit converts OSLSR_EL1 to automatic system register generation in
-arch/arm64/tools/sysreg and renames OSLSR_EL1_OSLM_IMPLEMENTED to
-OSLSR_EL1_OSLM_IMP.
+Well, I got it confused with arm64 calling stage2_flush_memslot()
+(called for flushing the dcache for a memory slot) with
+kvm_arch_flush_shadow_memslot() (unmapping a memslot from the guest).
 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sys=
-reg.h
-> index e3b60ee030230..2ec9ba9cd896f 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -186,11 +186,13 @@
->  #define SYS_DBGWCRn_EL1(n)		sys_reg(2, 0, 0, n, 7)
->  #define SYS_MDRAR_EL1			sys_reg(2, 0, 1, 0, 0)
-> =20
-> -#define SYS_OSLSR_EL1			sys_reg(2, 0, 1, 1, 4)
-> -#define OSLSR_EL1_OSLM_MASK		(BIT(3) | BIT(0))
-> -#define OSLSR_EL1_OSLM_NI		0
-> -#define OSLSR_EL1_OSLM_IMPLEMENTED	BIT(3)
-> -#define OSLSR_EL1_OSLK			BIT(1)
-> +#define OSLSR_EL1_OSLM_MASK (OSLSR_EL1_OSLM0_MASK | OSLSR_EL1_OSLM1_MASK)
-> +#define OSLSR_EL1_OSLM_NI						\
-> +	((OSLSR_EL1_OSLM1_NI << OSLSR_EL1_OSLM1_SHIFT) |		\
-> +	(OSLSR_EL1_OSLM0_VAL_0 << OSLSR_EL1_OSLM0_SHIFT))
-> +#define OSLSR_EL1_OSLM_IMP						\
-> +	((OSLSR_EL1_OSLM1_IMP << OSLSR_EL1_OSLM1_SHIFT) |		\
-> +	(OSLSR_EL1_OSLM0_VAL_0 << OSLSR_EL1_OSLM0_SHIFT))
+We do have a problem with the memslot code ordering. For all VMs, on a
+memslot deletion, we first invalidate the memslot and then run the
+"prepare" hook for the architecture, which could reject a DELETE. This
+is particularly an issue for the Coco VMs, if they want to reject
+deletion of memslots while the VM is active ( e.g., Realm and pKVM),
+unless the VM prevents the stage2 modification (e.g., pKVM ignores
+stage2 unmap requests). Even there, the pKVM may keep the memory mapped
+when the memslot is deleted. But the page pinning keeps the pages in
+tact.
 
-[Severity: Medium]
-Should tools/arch/arm64/include/asm/sysreg.h receive the same update?
+Something like the following could work:
 
-The tools build generates its own asm/sysreg-defs.h from
-arch/arm64/tools/sysreg, which now defines OSLSR_EL1_OSLK as GENMASK(1, 1).
-Because tools/arch/arm64/include/asm/sysreg.h includes asm/sysreg-defs.h and
-still defines OSLSR_EL1_OSLK as BIT(1), building tools/perf fails under
--Werror with a macro redefinition error.
+---8>---
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261106-sysreg-v3-=
-0-75e95980fb10@linux.ibm.com?part=3D3
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Date: Fri, 6 Nov 2026 16:31:15 +0000
+Subject: [PATCH] KVM: Allow architectures to reject memslot changes before
+  invalidation
+
+Architectures may need to reject deletion of a memory slot without
+changing the guest's memory mappings. Currently, KVM invalidates the slot
+and calls kvm_arch_flush_shadow_memslot() before
+kvm_arch_prepare_memory_region() can reject the request. On arm64, this
+unmaps the slot from stage-2. Restoring the old memslot on failure does not
+restore those mappings, so even a rejected deletion has side effects.
+
+Add kvm_arch_validate_memory_region() and invoke it before invalidating
+the slot, with slots_lock and slots_arch_lock held. The hook performs
+validation only, allowing architectures to reject a request without
+changing the memslot or its mappings. Provide a weak no-op implementation
+for architectures that do not need early validation.
+
+Move arm64's protected VM checks into the new hook so that unsupported
+deletions and moves are rejected before stage-2 unmapping. Keep resource
+preparation after invalidation, since invalidation drops slots_arch_lock
+and allows concurrent updates to architecture-specific memslot metadata.
+
+Assisted-by: LLM
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+---
+  arch/arm64/kvm/mmu.c     | 22 ++++++++++++++++------
+  arch/arm64/kvm/pkvm.c    |  2 +-
+  include/linux/kvm_host.h |  4 ++++
+  virt/kvm/kvm_main.c      | 33 ++++++++++++++++++++++++++-------
+  4 files changed, 47 insertions(+), 14 deletions(-)
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 1db10d8d6db7..c3469551fe3c 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -2806,13 +2806,12 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+  	}
+  }
+
+-int kvm_arch_prepare_memory_region(struct kvm *kvm,
+-				   const struct kvm_memory_slot *old,
+-				   struct kvm_memory_slot *new,
+-				   enum kvm_mr_change change)
++int kvm_arch_validate_memory_region(struct kvm *kvm,
++				    const struct kvm_memory_slot *old,
++				    const struct kvm_memory_slot *new,
++				    enum kvm_mr_change change)
+  {
+-	hva_t hva, reg_end;
+-	int ret = 0;
++	lockdep_assert_held(&kvm->slots_lock);
+
+  	if (kvm_vm_is_protected(kvm)) {
+  		/* Cannot modify memslots once a pVM has run. */
+@@ -2827,6 +2826,17 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+  		}
+  	}
+
++	return 0;
++}
++
++int kvm_arch_prepare_memory_region(struct kvm *kvm,
++				   const struct kvm_memory_slot *old,
++				   struct kvm_memory_slot *new,
++				   enum kvm_mr_change change)
++{
++	hva_t hva, reg_end;
++	int ret = 0;
++
+  	if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
+  			change != KVM_MR_FLAGS_ONLY)
+  		return 0;
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 016997288fd2..552a40871ab1 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -262,7 +262,7 @@ int pkvm_create_hyp_vm(struct kvm *kvm)
+  	int ret = 0;
+
+  	/*
+-	 * Synchronise with kvm_arch_prepare_memory_region(), as we
++	 * Synchronise with kvm_arch_validate_memory_region(), as we
+  	 * prevent memslot modifications on a pVM that has been run.
+  	 */
+  	mutex_lock(&kvm->slots_lock);
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index e7fc94e2910a..310afcaf7021 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1255,6 +1255,10 @@ int kvm_set_internal_memslot(struct kvm *kvm,
+  			     const struct kvm_userspace_memory_region2 *mem);
+  void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot);
+  void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen);
++int kvm_arch_validate_memory_region(struct kvm *kvm,
++				    const struct kvm_memory_slot *old,
++				    const struct kvm_memory_slot *new,
++				    enum kvm_mr_change change);
+  int kvm_arch_prepare_memory_region(struct kvm *kvm,
+  				const struct kvm_memory_slot *old,
+  				struct kvm_memory_slot *new,
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index cf4cb586f140..3ef370d71818 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1682,6 +1682,20 @@ static void kvm_swap_active_memslots(struct kvm 
+*kvm, int as_id)
+  	slots->generation = gen;
+  }
+
++/*
++ * Validate a memslot change before invalidation, which may 
+irreversibly reclaim
++ * private guest memory. Called with slots_lock and slots_arch_lock held.
++ * Implementations must not modify memslot state or allocate resources; 
+leave
++ * those operations to kvm_arch_prepare_memory_region().
++ */
++__weak int kvm_arch_validate_memory_region(struct kvm *kvm,
++					   const struct kvm_memory_slot *old,
++					   const struct kvm_memory_slot *new,
++					   enum kvm_mr_change change)
++{
++	return 0;
++}
++
+  static int kvm_prepare_memory_region(struct kvm *kvm,
+  				     const struct kvm_memory_slot *old,
+  				     struct kvm_memory_slot *new,
+@@ -1934,6 +1948,10 @@ static int kvm_set_memslot(struct kvm *kvm,
+  	 */
+  	mutex_lock(&kvm->slots_arch_lock);
+
++	r = kvm_arch_validate_memory_region(kvm, old, new, change);
++	if (r)
++		goto unlock_err;
++
+  	/*
+  	 * Invalidate the old slot if it's being deleted or moved.  This is
+  	 * done prior to actually deleting/moving the memslot to allow vCPUs to
+@@ -1950,22 +1968,22 @@ static int kvm_set_memslot(struct kvm *kvm,
+  	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
+  		invalid_slot = kzalloc_obj(*invalid_slot, GFP_KERNEL_ACCOUNT);
+  		if (!invalid_slot) {
+-			mutex_unlock(&kvm->slots_arch_lock);
+-			return -ENOMEM;
++			r = -ENOMEM;
++			goto unlock_err;
+  		}
+  		kvm_invalidate_memslot(kvm, old, invalid_slot);
+  	}
+
+  	r = kvm_prepare_memory_region(kvm, old, new, change);
+  	if (r)
+-		goto err;
++		goto revert_slot;
+
+  	if (change == KVM_MR_CREATE && (new->flags & KVM_MEM_GUEST_MEMFD)) {
+  		r = kvm_gmem_commit_memory_region(kvm, new);
+  		if (r) {
+  			kvm_arch_free_memslot(kvm, new);
+  			kvm_destroy_dirty_bitmap(new);
+-			goto err;
++			goto unlock_err;
+  		}
+  	}
+
+@@ -2000,7 +2018,7 @@ static int kvm_set_memslot(struct kvm *kvm,
+
+  	return 0;
+
+-err:
++revert_slot:
+  	/*
+  	 * For DELETE/MOVE, revert the above INVALID change.  No modifications
+  	 * required since the original slot was preserved in the inactive slots.
+@@ -2009,9 +2027,10 @@ static int kvm_set_memslot(struct kvm *kvm,
+  	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
+  		kvm_activate_memslot(kvm, invalid_slot, old);
+  		kfree(invalid_slot);
+-	} else {
+-		mutex_unlock(&kvm->slots_arch_lock);
++		return r;
+  	}
++unlock_err:
++	mutex_unlock(&kvm->slots_arch_lock);
+  	return r;
+  }
+
+-- 
+2.43.0
+
+
+
+
+
+
+
+> 
+> 
+> Cheers
+> Suzuki
+> 
+>>
+>> Suzuki
+>>
+>>
+>>
+>>>
+>>> Steve
+>>
+> 
+
