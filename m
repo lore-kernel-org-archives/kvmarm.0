@@ -1,72 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.70
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793986082;
-	b=JUsEk3xHFiwrIAkhFuDXNAlo+pS9GFEmwW6jeOQkO19kgm7HrtKL+bAlTS23I4D3Ik+h
-	 0FGVFSS0ncH0/Wp49DY2asonkfW/RKWQ+5Cwnn3NDi1leRol+klsvt9ZA848wWM7VodOC
-	 Gz/oKI2Zf/iTptGVCIU3C13EOGaEZVOtf7/acAaIjT7zrVbxkNU38I57zk74Q38An3YCJ
-	 MEkqPT8eZfqcB1lXG9atz2CalgZY2C/QYlpz06hJab2W3zUX2Qt2zuMRZDAC6jrFfAvGN
-	 ZdkAYR5N8KwoYxiDQDlhXEOgzqS2j2SvX5EbHE2d/vcMTyfC4d4nKw1pIs2VbaEu0JA==
+	t=1793986265;
+	b=zc1mHXg2F5aaGwdc2ipCu9K87qkI9XOlRCyQsfvFcyw2Gk7mKMZNwhs0Xr2FXO+YOxxP
+	 wGfCxTtVCIQjbo5i/Bl57Sllo/6uw/gKM4je85PGnlKVSk7uQDzEySijJs++5iI6APQDR
+	 Z4PH7itj6LHgVeFw/P8hsTSlampJPONBW3Lq/qlGwaKcHIiv68e9T7aZ5rMCdY2L/M6L1
+	 awJBinxdTBvWKeq5lKU3D0OeKas4a5V5oIvw/egBEfVSI/333tWoAPn9xSNkA5vBdituv
+	 5uPZ15QIupwk3yS3b6A7AlZoHAQ24Fbwh7mUJF9wS6cygmyII4HdGxOOfa3+ifrDyGw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793986082;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
-	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
-	bh=MLkiO5+iQTmH9kwercp9zyxtA2cVUMT1WfXqJlOm5MI=;
-	b=c1xAmizZsxKYAzvdgqrD4Nir6LgJReKnWpmQBn4WVZPdewI/o10QdeIp+FWtIssvkyyM
-	 cOn0B/k/z3bgb25RHyD24e0FKc+fsSCUhfAkK884QkOUq/xHbxnFzJak1J10Z+wf5K/FE
-	 WEgRTZ6/zlIMo2Cvy0yFiWKLaJ6gmdIEdoEsTu81Ura3tJKN1nWw/Q/k5jJRCEZ3jFlFI
-	 /CrKYwnCAOluFEo9C1oX9YQgKcI8pIAYuGyAnREoWcpDnXZBbVD+sYYIc/R4JNP7S7lBa
-	 UgFUdxu0AeBJ1o5v7xdfQCzhb7y0uzxJhG15A+uJAQcSAX0krHuGIN94VPNttiniK8Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793986265;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=DvB/NSTRWHctYgSGHMnqKMiOEFeIanrZ2eV+45nlL00=;
+	b=sD5alsB5Ry6qhKnpCyXkIkuiyn1MR3sg9a+xN2GsDdiI1KuddK5C3dYt6n23dRVpZ7mB
+	 aCidd42+KoQZBwt250i3VuF69hl3qyst2LUmrEElgF3g/76yFz3oX0aD2+LQefVaVWO5F
+	 Ma7QKS+xbURZ4wIb1CF+LPeJtQalR0nys2vhbqhgg6K1u9VJz8KdgIxupesMYkYNctrMN
+	 5OWTzAosgLJ0rbAlqpdOGRKuv3c48zJc2PK9bLkVjML5E0vdHuDRwZ/rGieWw2N1mid+F
+	 Tr1G02oegu6bk2yHkWcrkQ97OiMvyeaVbyYkHtmz7pBtDLCtt2fjZZ3kVsjmjoZw1pg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b="Rf/0usiv";
-	arc=none smtp.remote-ip=209.85.218.70
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com [209.85.218.70])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3790A606A326
-	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 17:28:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3790A606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=qGZtCr8q;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1E1606A33B
+	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 17:31:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1D1E1606A33B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Rf/0usiv
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-c3613c35145so112341666b.3
-        for <kvmarm@lists.linux.dev>; Fri, 06 Nov 2026 09:28:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1793986080; x=1794590880; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=MLkiO5+iQTmH9kwercp9zyxtA2cVUMT1WfXqJlOm5MI=;
-        b=Rf/0usivPWSNkjcTIHQN/mK9XAjiBM5MY9EqxYUNtPWbyZf6ah3ukycc0dUrIjnDr3
-         p8VMdHQ9Ki39pKr8aFRsn1SQCbVgZUGEZocNFNEwzXmrUsJfokBoX3VVjyvAZRFnTtfB
-         a3CVGC0HG4in/TWVojkMwQ1LKgWubGtLxFZzdFUHKhxeZrCuXgnZmuwpZODbfhfWUcPO
-         GVU+4UVWuVRO/PYLHrJ7A0wC6N4v1SQ4TuuQ0A7KEJPzvuPpz0FGAjXNWPU38eGQVbs1
-         3SzR3n1lWfL0x9wifej/Dq72YuMLdBgh2sSo1V1Cjt+nQxbzFjD0VfLZuI9VHO2WqJpz
-         9jOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793986080; x=1794590880;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=MLkiO5+iQTmH9kwercp9zyxtA2cVUMT1WfXqJlOm5MI=;
-        b=lqOhUCqMhY9orta6ngwPW8rpSx0ROF5PsEO+6gr2P+/o8w+1ftPG6Essx+PAwbEEw6
-         /cpvuB6Xh1MM3XiuCwWHAzZH9Ux9yCVdbEd6hL5Peux5TpUDRVS7YHGNsDETBJT3vsF8
-         o1e138Ms1BgsqAySymP+n5XQFC10um+TIMneYj+dv6tTm/88cHSr6TRxXUcb09d5aD0Z
-         ELINnhPGrIlY3jMfcu0Lo/5V/02NCMNVie4wk3rpaSGElVRs3OjzgoYqgGLpuFG0GyGf
-         Ja9JEJ+N44IrXwSg1sHJLMSadcSHpcR0EqKXf72uVpEtF9+Pa1LNB2GOjmjP926WBZ3M
-         sxnA==
-X-Forwarded-Encrypted: i=1; AL+hErFaS/brIxwHziHHuRbinVsAlJDQc/8NMOI9ANBpIOAlbVPXVwH+QcGkZe06jD/UHhRWkYuGj5Y=@lists.linux.dev
-X-Gm-Message-State: APuU4Z8/mi1Zj3skY1VXO46XgalqET3FtzhaQh0HWBpuf4eYlZjr8Gwl
-	kC0sUQxlHydhm4UKWEFSlsVAlcTzOOk1kdY9YAjYpNpZ/xUICnCb44LVdhUrZosiZRX4OGdQy6e
-	oFqcbhoDiRmMUSg==
-X-Received: from edzd18.prod.google.com ([2002:a05:6402:8d2:b0:6b4:6266:6380])
- (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6402:5191:b0:6b4:641:baed with SMTP id 4fb4d7f45d1cf-6b59783b40amr2200349a12.30.1793986080211;
- Fri, 06 Nov 2026 09:28:00 -0800 (PST)
-Date: Fri,  6 Nov 2026 17:27:49 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=qGZtCr8q
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 39B301477;
+	Fri,  6 Nov 2026 09:31:01 -0800 (PST)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AD92D3F632;
+	Fri,  6 Nov 2026 09:31:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793986264; bh=uGjcqxsFAa1PpRux+TU0WhwxYXruTbWWPPAjVo8xuTk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qGZtCr8qpDPq8LB9x/N+brISMKQCVtEvoxzkLxiKLHWRupNuPBVtGAvHMywX+ZaNF
+	 9S1hDtPNyJaLsmcqg6AamsxZe2Ozq5g3/CM7/DFvkqrvZL+cB1moL0B9bliZ/shOKe
+	 OWAuS/azTMqxuxJqKi59WPKaSKq4Lt7U2D7SZkTI=
+Date: Fri, 6 Nov 2026 17:30:57 +0000
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Mark Brown <broonie@kernel.org>, Oliver Upton <oupton@kernel.org>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Fuad Tabba <fuad.tabba@linux.dev>, Aishwarya.TCV@arm.com
+Subject: Re: [PATCH v3 4/5] KVM: arm64: Convert TCR_EL2 to config-driven
+ sanitisation
+Message-ID: <3pof5ftjdhngkbwn3ixnlynryabl67gfhwrfr54xnizo3iytwi@cicn7hku5i74>
+References: <20261029223732.103785-1-oupton@kernel.org>
+ <20261029223732.103785-5-oupton@kernel.org>
+ <5e8a61c2-24ff-46a1-819f-94fcd91c9688@sirena.org.uk>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -75,101 +63,76 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.56.0.455.g6c5a503b38-goog
-Message-ID: <20261106172750.2678873-1-smostafa@google.com>
-Subject: [PATCH v3] KVM: arm64: Use consistent type for pool size
-From: Mostafa Saleh <smostafa@google.com>
-To: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oupton@kernel.org, seiden@linux.ibm.com, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, vdonnefort@google.com, 
-	tabba@google.com, xuheng@cs.columbia.edu, Mostafa Saleh <smostafa@google.com>, 
-	Fuad Tabba <fuad.tabba@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5e8a61c2-24ff-46a1-819f-94fcd91c9688@sirena.org.uk>
 
-All the pool sizes in the hypervisor are "unsigned long" but when
-they get passed to hyp_early_alloc_contig() or hyp_pool_init() they get
-truncated to 32-bits.
+On Fri, Nov 06, 2026 at 11:34:47AM +0000, Mark Brown wrote:
+> On Thu, Oct 29, 2026 at 03:37:31PM -0700, Oliver Upton wrote:
+> > From: Wei-Lin Chang <weilin.chang@arm.com>
+> > 
+> > Feature dependencies of the fields in TCR_EL2 are extracted from
+> > Registers.json of the BSD licenced AARCHMRS
+> > (AARCHMRS_OPENSOURCE_A_profile_FAT-2026-06).
+> > 
+> > Places where we slightly deviate from the above:
+> > 
+> >  - Stick to the ARM ARM M.c requirement for TCR_EL2.TCMA*, which only
+> >    depends on FEAT_MTE2. This avoids updating ID_AA64PFR2_EL1 with new
+> >    VMTE* definitions that we don't know the meaning of, as they aren't
+> >    present in the ARM ARM yet.
+> > 
+> >  - Ignore TCR_EL2.DS's requirement of needing the effective value of
+> >    TCR2_EL2.D128 be 0. This requires runtime detection of TCR2_EL2.D128
+> >    and we don't have D128 support yet.
+> > 
+> >  - TCR_EL2.AS is dependent on FEAT_ASID16, this information is missing
+> >    from the json.
+> 
+> I'm seeing a regression in -next for the pre_fault_memory_test selftest
+> when run on qemu with EL2 and NV enabled which bisects to this commit in
+> -next:
+> 
+> # selftests: kvm: pre_fault_memory_test
+> <47>[ 1358.708301] systemd-journald[75]: Sent WATCHDOG=1 notification.
+> # Random seed: 0xe322a57
+> # Testing guest mode: PA-bits:52,  VA-bits:48,  4K pages
+> # Testing memory backing src type: anonymous
+> #
+> # ==== Test Assertion Failure ====
+> #   pre_fault_memory_test.c:260: false
+> #   pid=1888 tid=1888 errno=2 - No such file or directory
+> # sh: 1: addr2line: not found
+> #   Unknown ucall 0x0.
+> not ok 48 selftests: kvm: pre_fault_memory_test # exit=254
+> 
+> The NV pre fault test appears to run fine in the same run, and the test
+> passes when run on the same qemu version in vanilla VHE mode.
+> 
+> Full log:
+> 
+>   https://lava.sirena.org.uk/scheduler/job/196379#L2476
+> 
 
-That is not a big problem at the moment as to overflow this we need
-4G bytes of carveout (2 TB of host or guest system memory).
+The selftests are running vCPUs in vEL2 with 52-bit page tables it seems
+like. NV doesn't support 52-bit and this commit enforces that by forcing
+vCPU TCR_EL2.DS (hardware TCR_EL1.DS) to 0, so bad things happen.
 
-However when new users are added (as IOMMU) it is hard to reason
-about the carveout size anymore.
+aarch64_get_supported_page_sizes() asks KVM for the preferred target,
+which does not include KVM_ARM_VCPU_HAS_EL2. Without
+KVM_ARM_VCPU_HAS_EL2, 52bit ipa is permitted if the host supports it.
 
-Fixes: e75960408723 ("KVM: arm64: Introduce an early Hyp page allocator")
-Fixes: 8e17c66249e9 ("KVM: arm64: Introduce a Hyp buddy page allocator")
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-Acked-by: Will Deacon <will@kernel.org>
-Signed-off-by: Mostafa Saleh <smostafa@google.com>
----
- arch/arm64/kvm/hyp/include/nvhe/early_alloc.h | 2 +-
- arch/arm64/kvm/hyp/include/nvhe/gfp.h         | 4 ++--
- arch/arm64/kvm/hyp/nvhe/early_alloc.c         | 2 +-
- arch/arm64/kvm/hyp/nvhe/page_alloc.c          | 6 +++---
- 4 files changed, 7 insertions(+), 7 deletions(-)
+Then with 52-bit PA deemed supported, the selftest builds page tables
+with the 52-bit format for that case.
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/early_alloc.h b/arch/arm64/kvm/hyp/include/nvhe/early_alloc.h
-index dc61aaa56f31..462883c4e325 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/early_alloc.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/early_alloc.h
-@@ -7,7 +7,7 @@
- void hyp_early_alloc_init(void *virt, unsigned long size);
- unsigned long hyp_early_alloc_nr_used_pages(void);
- void *hyp_early_alloc_page(void *arg);
--void *hyp_early_alloc_contig(unsigned int nr_pages);
-+void *hyp_early_alloc_contig(unsigned long nr_pages);
- 
- extern struct kvm_pgtable_mm_ops hyp_early_alloc_mm_ops;
- 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/gfp.h b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
-index 3766333bace9..3a428dc40b14 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/gfp.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
-@@ -29,6 +29,6 @@ void hyp_get_page(struct hyp_pool *pool, void *addr);
- void hyp_put_page(struct hyp_pool *pool, void *addr);
- 
- /* Used pages cannot be freed */
--int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
--		  unsigned int reserved_pages);
-+int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned long nr_pages,
-+		  unsigned long reserved_pages);
- #endif /* __KVM_HYP_GFP_H */
-diff --git a/arch/arm64/kvm/hyp/nvhe/early_alloc.c b/arch/arm64/kvm/hyp/nvhe/early_alloc.c
-index 00de04153cc6..9fef0c7d2185 100644
---- a/arch/arm64/kvm/hyp/nvhe/early_alloc.c
-+++ b/arch/arm64/kvm/hyp/nvhe/early_alloc.c
-@@ -21,7 +21,7 @@ unsigned long hyp_early_alloc_nr_used_pages(void)
- 	return (cur - base) >> PAGE_SHIFT;
- }
- 
--void *hyp_early_alloc_contig(unsigned int nr_pages)
-+void *hyp_early_alloc_contig(unsigned long nr_pages)
- {
- 	unsigned long size = (nr_pages << PAGE_SHIFT);
- 	void *ret = (void *)cur;
-diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-index 57f86aa0f82f..51460d420c94 100644
---- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-+++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-@@ -229,12 +229,12 @@ void *hyp_alloc_pages(struct hyp_pool *pool, u8 order)
- 	return hyp_page_to_virt(p);
- }
- 
--int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
--		  unsigned int reserved_pages)
-+int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned long nr_pages,
-+		  unsigned long reserved_pages)
- {
- 	phys_addr_t phys = hyp_pfn_to_phys(pfn);
- 	struct hyp_page *p;
--	int i;
-+	unsigned long i;
- 
- 	hyp_spin_lock_init(&pool->lock);
- 	pool->max_order = min(MAX_PAGE_ORDER,
--- 
-2.56.0.455.g6c5a503b38-goog
+Then when creating the actual vCPU to run, kvm_get_default_vcpu_target()
+includes KVM_ARM_VCPU_HAS_EL2.
 
+One potential solution is make vm_supports_el2() return false when
+vm->pa_bits > 48.
+
+Thanks,
+Wei-Lin Chang
+
+[...]
