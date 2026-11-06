@@ -1,60 +1,103 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.52
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793987113;
-	b=qs6JqVL2izV0hdj21S2j81W7BI1wzKFjx7jt5KxxPmZn0WGhxrDRqtttsojhjleWbrXy
-	 cUlKYgyXt45Vypp/lhBAOmjrbtnMGcmwdFgKrcJnbYKddSk2yf6ogaQ927Vk5TUyR2mYO
-	 kOGqdqio7pyQMoVks/dzL7m9YDQCe4CstZlpD/sU/TyXTXo2GNdpgTF71u0l0Ou3QSeHJ
-	 siu+xCBWvunnsICpiBbXj8sh3XNM3yQ90b954U3YoTzWfIUtOCQeJDYGXyEHImZtqhgbx
-	 crtxUfv+YVf4fmhrLpmCAH7O09IV66GrF5sw2e0gAdJfCo343WGlA5MHtbu1tNbH0dw==
+	t=1793987511;
+	b=wWbXAL66CbDtJbp/l7MWUy5BMOCQAtfPVoqTtJ3nF1txKvHjN6RiHVb8G9Ferqh6HZo6
+	 QuINPBi+BdO9dgc3QN8K+KvOwnGZussVN+UqgaLV1SohnnCClcv/zxO5TnRHsCABfsrql
+	 bHsVGOxZnmjI4vu7+aLbiTbPCNIkLgxx9Iz9wm+WdX//eFWek6Ah0T4cF6kmS+hdXEotg
+	 aCDmun9rrvxUkSUWYylnHxhGFFHuTkKzKvKK7SbuwM+Y+F1oZpZVTFwftIkovFa0P8hr5
+	 09URREdZoDHz0x5IsAGs1b9yD1NKpBMcKWBLL3kqk34CLBqGGdnZ5Z2psAoDXnt00XQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793987113;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=xp0OQbCL2sJOSaJbxnDT2s8b4hQsI5rqREveuXAdz7o=;
-	b=ehWN0Sd6r5ueUQDMrLqV1WcCvNzUgB5gFy+Tm/iW90j1YjJjEZrcYPTt2AlfH8wCRtyh
-	 604QDDiEDV0egxIvUBV3ARtt+DH02URshwNDoEWumZIqsnO+Rxrxi6ywUjTebAm1YAIlR
-	 EZUplJCF9ULoSnMqLK4woQo1NQ8FE/eFe6eQSLuv7mHmce0n7kS5GMvUvY5Whea3LUqQj
-	 6NkXBPtlfETJX/QXBawhwg9H5Vf3qZRwJx1onEqjZdQuzglatSL6IuLM8bobrMSEkxk9t
-	 LjrWE77l3kSpDX8S8wYMH/uMoOOB6ZFVbF6AHM6gNIA/NWy5IwCFSAOOnNhOljTwALw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793987511;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=6WEB/QmqGNShWN2WfpdxFDs5dt086xZeyrUN/pg7o0I=;
+	b=4+X8OORt64SGzU3WyUIj/0IjkvVl8nYX3qrurehb88RJwDJgJrzhCsjWWq84DG2iKFuz
+	 Q8lT1K4WlHTfOH013uV6bPgoz989+t0SoiUl6iRQ662D8LrxDSwU2tLYmtE8Z0ovFRu74
+	 ihuI3552klvE/l9E7xzdXuQsYzVE/ClPn3IieYjRfkbdaGsc5TgkL6EAIjoXdedvDMn67
+	 GbTIuxio8zNm/gSMjlIqfjh6zgsV6OujbZWf6HsRnpwRkS42JjB8FRu/Gc41gFA3a55YP
+	 /9S02eawLJbdYku4Hl2Ig1m17yOSZxlh1H80hpJALjF9EbXTutbiLwD/2czL2lzi8Qg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eINJokh1;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=ZCZvSazI;
+	arc=none smtp.remote-ip=209.85.128.52
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F98606A326
-	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 17:45:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D43606A326
+	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 17:51:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 20D43606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eINJokh1
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64BD21F0089F;
-	Fri,  6 Nov 2026 17:45:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793987113;
-	bh=xp0OQbCL2sJOSaJbxnDT2s8b4hQsI5rqREveuXAdz7o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=eINJokh1DW0Puh8DZWKlpAMnLFnUUgvJwE9J1cCCZCmOMPt729ghCPayYLhsmiLvn
-	 EvrMmoO2GJ5ykJVq5TtA6phYkTYJ8nkVUlQ8c5aFkk+DaPzC8Rygt/M7vWzigfML8e
-	 pAXu5QxI5AIsIar8gVgC5OSumSm3iEwii0dTrWuvCYibkxfBcn3ruQ3B+r/HTb6T8W
-	 aMeMwBAJLHyn4eWR9wqGvDV67/MMj1bu6Sx8nPiKAQKvFAp9AfYKF79DsAByL+A5HD
-	 W9v5S0//OqMSokMW+974ZGg4D3UIr+vCPR/msAco2dJHT3bTnU1ALDwCjgIH8gY9Dx
-	 25KUiOXh5gSEg==
-Date: Fri, 6 Nov 2026 09:45:12 -0800
-From: Oliver Upton <oupton@kernel.org>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=ZCZvSazI
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4a215e64962so10758755e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 06 Nov 2026 09:51:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1793987509; x=1794592309; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=6WEB/QmqGNShWN2WfpdxFDs5dt086xZeyrUN/pg7o0I=;
+        b=ZCZvSazIt7kr5pUEM2S9/0skq39RU8Q8JT6FZvHvpBeAV/9REfumF5CA44Pwfv3J9U
+         8pZ/G6ofKjKtB5+I7CJQWWNkCFFBCCy++Hi1jUkamD6h7/2Ga7O6FGhr6ipISjsLPhN+
+         xt8b8myXjHQzRv5nPCRIBX7VAJCnCSgfCQIi9dVYxso2unTi5RhLFDW5juXmTfirCltE
+         EPsfghmnMlC7MgQcM4rFoLv6gRbKXiJlU9CTUWyPurwCzX7Vtj/4793boWcJ4NiKEX+D
+         zg+ue+cakr8MwKK1lRExaZqqs2mXewHdF8SSs9QhVf35LM+Y1gfo5IG+U/G4GC19qJw0
+         J+kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793987509; x=1794592309;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=6WEB/QmqGNShWN2WfpdxFDs5dt086xZeyrUN/pg7o0I=;
+        b=MVNxSyzcHDfjyGmOkiHWrKchHEBBKdc4qQ7lCJQ06y9GLOSRompb1tbMTvItcjDY6i
+         aT6lalkGu+1vkot9SWAuvpljHCEGCDOux3N+nontHa+IY1mhhSuR9Kik3GB9cmCV08Rj
+         OpOj7zOzH3dNH/3lJuD3azwK7xZRLzkANq7v2jzZpyOlWN1ZgufSkUjqYyeT1y/In7Im
+         tDBWy3fXPYHEtSkf/hilD2fUd19GIz3M5uwLbS7+kZckjqS5RAJ3LrvW+1bbThVvgN2n
+         s3OMvLxelbIOjvvADhn/hdM3xKlweEPeFwdzXcjiirqCeB+MHwLtSJZ7Qx0cXGlDgPpI
+         /5nQ==
+X-Forwarded-Encrypted: i=1; AKwUvBz0sfNZrg7ebwhmBaAZS2ICmY3DIq/n2HfCWgvCen+VIRGyXpz9JF7q9pwqlkIfbiNb2YyGmkg=@lists.linux.dev
+X-Gm-Message-State: APuU4Z8ftkLKCMKzJpT/U54lf7YjA3+CcbZ3epxmAsIA84EKYAxYZFY1
+	Lw0xw9AkGv9vNCvJWbK1baFyQPUFkTDF9gE9Ic6X9e8gIKcsihmrpxHKOYdt1dehvg==
+X-Gm-Gg: AYBFou3Uv123zhY8tU8lfRAUHDjR4qu9otU7lJq+M0u6ZfbyJHIEBYBdKpxMw8qawYE
+	+EvBW0pRMcB2YgKXq84lQcM82UTWtA3kGmgim2wNvU0W1ZaIMYdcbf6VYwo9M/riBvD8Ewt3xX2
+	dzsja9L6T2pdVIaEnMGUqsMLHkuoBvxkNOlJW7o3yvp8QtU+C5ARZXaW/6LnhjyWud8ldL5QiM8
+	wnAgVByd8hYxx/rrytPkEcModVuTDu8tl9J1rfiIbC/+yLZDTApaGFfjMc8UFKfSN7RB8UbV0f4
+	cqogi0TW+ja2XurEZLGlwFjbYhGFkb0anZEArt5FFfeaD5dVBhjre2rUpgJsz308YgKXdoWk/FP
+	UkHoSeL03RG+TXrmf3TtraF0qw2DqHBxNDwxH1pJiC4G4zXTI/0IKrXQCrW9f85HY5yGXWz+GWk
+	Drx1pazsbHIr/kwHOoCmLEben1HnuP/51PJrCxRBTh3ru0IwzH/V/P4PKNIr8sosG3IZ7cUtB75
+	/4VmmHgg87FpB06vRYgsM/LrSlKfnwzTCuuIgP90Be/os5LdVIB2uU/c/aPqO3rd9xMIM3gxEtT
+	rbmjksRf0g0K9DGEwiPayyjF/uC0EeJwR6UNSs2vxuAJcfzyn8XHMBDvbr+fZen/kyZSSa5DI69
+	wz2/muJeC2Q==
+X-Received: by 2002:a05:600c:620c:b0:4a1:813f:2a60 with SMTP id 5b1f17b1804b1-4b6dea6881fmr58086205e9.11.1793987509034;
+        Fri, 06 Nov 2026 09:51:49 -0800 (PST)
+Received: from google.com (0.182.34.34.bc.googleusercontent.com. [34.34.182.0])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4b76cbd082dsm7811725e9.1.2026.11.06.09.51.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Nov 2026 09:51:48 -0800 (PST)
+Date: Fri, 6 Nov 2026 17:51:44 +0000
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>, Aishwarya.TCV@arm.com
-Subject: Re: [PATCH v3 4/5] KVM: arm64: Convert TCR_EL2 to config-driven
- sanitisation
-Message-ID: <au4SKGsAAdsPm9SD@kernel.org>
-References: <20261029223732.103785-1-oupton@kernel.org>
- <20261029223732.103785-5-oupton@kernel.org>
- <5e8a61c2-24ff-46a1-819f-94fcd91c9688@sirena.org.uk>
- <3pof5ftjdhngkbwn3ixnlynryabl67gfhwrfr54xnizo3iytwi@cicn7hku5i74>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/4] KVM: arm64: Allocate a protected vCPU's SVE state at
+ EL2
+Message-ID: <au4TsO50x7BcFYpi@google.com>
+References: <20261105130456.1617185-1-fuad.tabba@linux.dev>
+ <20261105130456.1617185-3-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,81 +109,49 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3pof5ftjdhngkbwn3ixnlynryabl67gfhwrfr54xnizo3iytwi@cicn7hku5i74>
+In-Reply-To: <20261105130456.1617185-3-fuad.tabba@linux.dev>
 
-Hi,
+> @@ -1243,6 +1253,9 @@ int pkvm_reset_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+>  			    PSCI_0_2_AFFINITY_LEVEL_ON) != PSCI_0_2_AFFINITY_LEVEL_ON_PENDING)
+>  		return -ECANCELED;
+>  
+> +	if (vcpu_has_sve(&hyp_vcpu->vcpu))
+> +		memset(hyp_vcpu->vcpu.arch.sve_state, 0, vcpu_sve_state_size(&hyp_vcpu->vcpu));
+> +
 
-On Fri, Nov 06, 2026 at 05:30:57PM +0000, Wei-Lin Chang wrote:
-> On Fri, Nov 06, 2026 at 11:34:47AM +0000, Mark Brown wrote:
-> > On Thu, Oct 29, 2026 at 03:37:31PM -0700, Oliver Upton wrote:
-> > > From: Wei-Lin Chang <weilin.chang@arm.com>
-> > > 
-> > > Feature dependencies of the fields in TCR_EL2 are extracted from
-> > > Registers.json of the BSD licenced AARCHMRS
-> > > (AARCHMRS_OPENSOURCE_A_profile_FAT-2026-06).
-> > > 
-> > > Places where we slightly deviate from the above:
-> > > 
-> > >  - Stick to the ARM ARM M.c requirement for TCR_EL2.TCMA*, which only
-> > >    depends on FEAT_MTE2. This avoids updating ID_AA64PFR2_EL1 with new
-> > >    VMTE* definitions that we don't know the meaning of, as they aren't
-> > >    present in the ARM ARM yet.
-> > > 
-> > >  - Ignore TCR_EL2.DS's requirement of needing the effective value of
-> > >    TCR2_EL2.D128 be 0. This requires runtime detection of TCR2_EL2.D128
-> > >    and we don't have D128 support yet.
-> > > 
-> > >  - TCR_EL2.AS is dependent on FEAT_ASID16, this information is missing
-> > >    from the json.
-> > 
-> > I'm seeing a regression in -next for the pre_fault_memory_test selftest
-> > when run on qemu with EL2 and NV enabled which bisects to this commit in
-> > -next:
+Why wasn't this line around before?
 
-Thanks for reporting this Mark. Next time can you also include the QEMU
-command line that reproduces the issue?
-
-> > # selftests: kvm: pre_fault_memory_test
-> > <47>[ 1358.708301] systemd-journald[75]: Sent WATCHDOG=1 notification.
-> > # Random seed: 0xe322a57
-> > # Testing guest mode: PA-bits:52,  VA-bits:48,  4K pages
-> > # Testing memory backing src type: anonymous
-> > #
-> > # ==== Test Assertion Failure ====
-> > #   pre_fault_memory_test.c:260: false
-> > #   pid=1888 tid=1888 errno=2 - No such file or directory
-> > # sh: 1: addr2line: not found
-> > #   Unknown ucall 0x0.
-> > not ok 48 selftests: kvm: pre_fault_memory_test # exit=254
-> > 
-> > The NV pre fault test appears to run fine in the same run, and the test
-> > passes when run on the same qemu version in vanilla VHE mode.
-> > 
-> > Full log:
-> > 
-> >   https://lava.sirena.org.uk/scheduler/job/196379#L2476
-> > 
+>  	kvm_reset_vcpu_core(&hyp_vcpu->vcpu);
+>  	kvm_reset_pvm_sys_regs(&hyp_vcpu->vcpu);
+>  
+> diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> index 32e82653ebf7e..06ea91415ad8b 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> @@ -570,6 +570,7 @@ static const struct sys_reg_desc_reset pvm_sys_reg_reset_vals[] = {
+>  	RESET_UNKNOWN(MAIR_EL1),
+>  	RESET_ZERO(AMAIR_EL1),
+>  	RESET_ZERO(MDSCR_EL1),
+> +	RESET_ZERO(ZCR_EL1),
+>  	RESET_ZERO(CNTV_CTL_EL0),
+>  	RESET_UNKNOWN(TTBR0_EL1),
+>  	RESET_UNKNOWN(TTBR1_EL1),
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 10eb7249aa9e8..aaaa1b8634ba4 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -52,6 +52,8 @@ int __init kvm_arm_init_sve(void)
+>  		if (WARN_ON(kvm_sve_max_vl > VL_ARCH_MAX))
+>  			kvm_sve_max_vl = VL_ARCH_MAX;
+>  
+> +		kvm_nvhe_sym(kvm_sve_max_vl) = kvm_sve_max_vl;
+> +
+>  		/*
+>  		 * Don't even try to make use of vector lengths that
+>  		 * aren't available on all CPUs, for now:
+> -- 
+> 2.47.3
 > 
-> The selftests are running vCPUs in vEL2 with 52-bit page tables it seems
-> like. NV doesn't support 52-bit and this commit enforces that by forcing
-> vCPU TCR_EL2.DS (hardware TCR_EL1.DS) to 0, so bad things happen.
-> 
-> aarch64_get_supported_page_sizes() asks KVM for the preferred target,
-> which does not include KVM_ARM_VCPU_HAS_EL2. Without
-> KVM_ARM_VCPU_HAS_EL2, 52bit ipa is permitted if the host supports it.
-> 
-> Then with 52-bit PA deemed supported, the selftest builds page tables
-> with the 52-bit format for that case.
-> 
-> Then when creating the actual vCPU to run, kvm_get_default_vcpu_target()
-> includes KVM_ARM_VCPU_HAS_EL2.
-> 
-> One potential solution is make vm_supports_el2() return false when
-> vm->pa_bits > 48.
 
-Bit of a hack but gets the job done, do you have time to send a patch?
-I'm sure we'll get around to doing LPA2 long before anything useful
-actually shows up anyway.
-
-Thanks,
-Oliver
+-- 
+Vincent
