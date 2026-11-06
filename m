@@ -1,110 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.158.5
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793979951;
-	b=cmHwUTXFa2g8OX3Zcd8QWfCHvP8Q8vctzDmY1w+kKO0UZDC71KDh9E1IYcRcjfGhbhwd
-	 yQi01ayzohLMYQSyykjlvZ/Ovp5B+y0M6RUWw5SlE5HW/0ZyJVvA2AyjqXWdE5JFjs5MO
-	 ELINClAgEFoWKmbOQZzSd3HXUX6yY9chdzRXlDDwBDbULlQHBkWCnojQeinTXRMaPxd8c
-	 RRLLmuxZI3UlOlk0qiWal6B7VHeRJE2U90hcZvamfWsGArm2eMxNaUvfXwl5L1BqLMtaD
-	 Iq0Ag+ZL17XZawGZGpUOnnYoNiBCG1VUYX8a0rBmEZfS8dGRkgm0MFCIt+uKEYghfIg==
+	t=1793981321;
+	b=mwpVkR/6Ke8u9JdQVClGPk5bLJPi0D6AgrN0qx6Fisxoi+nauHZZlBQ6hLoMJAe2EG7t
+	 MMlfF80+mRB+hl9ldF6O5V9cJL60R9uHXwxWkYE09lMts3yy2GqRm2lNHxjAx2oe2Gnir
+	 YMtIfVD+3pEz1p4ZBeULZ/6wXPGQC+ncpuvJ2ifC+S8GjBjYInI6H+gd3qHwSeDl/6Yl9
+	 i7MyRDPRMZf/5epO70aselbSHobCS5fMqMl998K9lNcckDsCmjoccoxKP8jAKeXA6rCVn
+	 /EPgtb1zSP4Vp6wiAJ2X1F1DtYv1HsjvKaVd6ztXJPrgDQnCEH6I+dmYYoyW1rvRmog==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793979951;
-	h=Received:DKIM-Signature:X-Mailer:From:To:Cc:Subject:In-Reply-To:
-	 References:Date:Message-ID:MIME-Version:Content-Type;
-	bh=Sf7jpXPq+wp6SBfVuD5VhfW8K2K7PrL3pzRu30lk/Qs=;
-	b=t27Nu6A4dSRstJ2ekZeqCVyEvHldmsoFWbvoTg7/G1cQWZGlYU1LJ20ysML27/six1kx
-	 p8Z1G2xe7BkCvfOLYLaWEsdk7W5T+HtJFcMGWUhwvrwtdqyupVSJCE+DVZiKCQOAFRN+K
-	 d7lgcsa39gU1hGl/rgR5bgxOiCVQ9LlmgUD3Vk/NcQDtFhAuXfkvKbsyqxpb/NQV+5WJF
-	 zB0XxL8C7Jf8jIC10FnLpX+lLjTebst3AlGcfyI7punLCOse6ayCubasqmWdKZTp9JfH8
-	 itDVk1eemmDQN7dB09x3WJ/oVB0PElknFKRSKQFx5i62ZB3bTZc2aBfBMxzRPw+QawQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793981321;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
+	 Received:Received:Received:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:Message-Id:References:
+	 In-Reply-To:To:Cc:X-Mailer:X-TM-AS-GCONF:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-GUID:X-Proofpoint-Spam-Details-Enc:
+	 X-Proofpoint-ORIG-GUID:X-Authority-Analysis:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=aljBCf9/MmrTLX/Ccg8ZLrEoj6cKNfroAB+y0foXNJE=;
+	b=Zwc1tVhxq5mK0sHM3Kdm9dn0ZF9yMPJhn4EDMRDSxTxL8dHUn1PeJ1JIR1MaCNPM0Jtb
+	 ijae88z2e8GrX8gNZK1GJDWkHl+JsLITmStla8bcBxjEKX521fEaW2r7rY6wW67HahjI0
+	 W7cqekcOKGrCqABUc2vYgC+VwT0n9nH08Ai53i1A/Ni7MbuU0G/kMIcXRuLH2oeVf2lYT
+	 5y1CpwFKhJzN4d6SP4CExcxwPpXhlSSOQ7h1XANl6GHxSUhCQzhDPgy4PKAzTlLHZ6QCS
+	 yTeVHBHWIByZ0LZfUv4XhkpsIfKwKP7WrFO1vFbLs3lneJ8gy28izz/LqV5gb2bbUew==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NHfHZnPS;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=linux.ibm.com;
+	spf=pass smtp.mailfrom=linux.ibm.com;
+	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=i1584vgL;
+	arc=none smtp.remote-ip=148.163.158.5
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F30606A329;
-	Fri,  6 Nov 2026 15:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B048606A326
+	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 16:08:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9B048606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NHfHZnPS
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC1B21F008A1;
-	Fri,  6 Nov 2026 15:45:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793979950;
-	bh=Sf7jpXPq+wp6SBfVuD5VhfW8K2K7PrL3pzRu30lk/Qs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=NHfHZnPSDSHLthC28xmc7Tynk3g3EuBVtAtF3YePrjls2avEgiFGihXMqKalL6SYK
-	 SeJfbKbhS1SHWhGP9tCN6jALT7jREvu0x9m17dhcE0oLL42alVk0H4Ve6UWnQsZ17V
-	 pOd3zRki1UcQZ29EAFK0E5v9T4pzWtOa2Z1QlBdeIUapAvd2pzBNLlIfkVE6aLRurr
-	 uq5rcOkbHr9280TJ3ts+7TSC30ovRao2lHyLtEiO9tHldNoUeF0owFJmmy9pFG8jCG
-	 5cQRmxsKh588fJfaFewhWE1XgoaoMSVyjoOt6yV+WAzO5GfLn/FYQd7wPywABOqUIP
-	 iCRRMFk+OTbyQ==
-X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-coco@lists.linux.dev,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Baoquan He <baoquan.he@linux.dev>,
-	Mike Rapoport <rppt@kernel.org>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Pratyush Yadav <pratyush@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian =?utf-8?Q?K=C3=B6nig?= <christian.koenig@amd.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Joerg Roedel <joro@8bytes.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Benjamin Gaignard <benjamin.gaignard@collabora.com>,
-	Brian Starkey <Brian.Starkey@arm.com>,
-	John Stultz <jstultz@google.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Radu Rendec <radu@rendec.net>,
-	"T.J. Mercier" <tjmercier@google.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <chleroy@kernel.org>,
-	Ritesh Harjani <ritesh.list@gmail.com>,
-	Shrikanth Hegde <sshegde@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Kiryl Shutsemau <kas@kernel.org>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	"K . Y . Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	linaro-mm-sig@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org,
-	kvmarm@lists.linux.dev, patches@lists.linux.dev
-Subject: Re: [PATCH v9 14/14] irqchip/gic-v3-its: Preallocate VPE L1 tables
-In-Reply-To: <86zevn1c9a.wl-maz@kernel.org>
-References: <20261104164555.3555725-1-aneesh.kumar@kernel.org>
- <20261104164555.3555725-15-aneesh.kumar@kernel.org>
- <86zevn1c9a.wl-maz@kernel.org>
-Date: Fri, 06 Nov 2026 21:15:29 +0530
-Message-ID: <yq5ah5huoteu.fsf@kernel.org>
+	dkim=pass (2048-bit key, unprotected) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=i1584vgL
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A6FEKhB2656491;
+	Fri, 6 Nov 2026 16:08:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=aljBCf
+	9/MmrTLX/Ccg8ZLrEoj6cKNfroAB+y0foXNJE=; b=i1584vgLDNnIsuCIFXD2fo
+	1wZMi6H3d/AYRxHZbqExqi4xCW8XmahpJogKPOBVB8lG01z2XU5zte0L+SbfQv9g
+	fH6eZ2gcA//akwPwWzi+sD6FPgt1UXwLelb1uJVicjz7JFB34PHIbbCFyqYn4BYf
+	N+NDzdlkzjxrLmUJ5aUTf/ivCwWb4pxsVGPo5/Ll61CumHHLqIR3zS1E6O2P23qr
+	0XWRYA8VV/etp6idk8MWXLB+rrrfPOie5EPXU+VyEhXD+MUMFQkqUUpUt5O1VVIp
+	65eka0M+8xdIs16A63FJ0lYhgcZgw8Nkyi4hov7zM413l2H7qS3SJW3ASntYBTXw
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4hs3rc5esv-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 06 Nov 2026 16:08:19 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A6F4xUJ2390175;
+	Fri, 6 Nov 2026 16:08:18 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4hs7h13wds-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Nov 2026 16:08:18 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6A6G8Fd652494794
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 6 Nov 2026 16:08:15 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 265922004B;
+	Fri,  6 Nov 2026 16:08:15 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BDCD22005A;
+	Fri,  6 Nov 2026 16:08:14 +0000 (GMT)
+Received: from a46lp73.lnxne.boe (unknown [9.87.84.240])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  6 Nov 2026 16:08:14 +0000 (GMT)
+From: Steffen Eiden <seiden@linux.ibm.com>
+Date: Fri, 06 Nov 2026 17:07:36 +0100
+Subject: [PATCH v3 03/23] arm64: sysreg: Convert OSLSR to automatic
+ register generation
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -114,42 +87,143 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261106-sysreg-v3-3-75e95980fb10@linux.ibm.com>
+References: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
+In-Reply-To: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+        Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Friedrich Welter <fritz@linux.ibm.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>
+X-Mailer: b4 0.14.3
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA2MDA2MiBTYWx0ZWRfXx7H/w9GaMmvC
+ wgKjs+HR7dhAyHENO+GdQFOat5SREYxDz9O5rPqdwCgFNuFUGnlTCdSg1r80ZsnRxznEj0twbYp
+ cko3wZaAtPcfzs/r952L+3LIi8VcZB0=
+X-Proofpoint-GUID: xFcc7uGqZ-HYK0UJbpgCHve9C9pcjYKs
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA2MDA2MiBTYWx0ZWRfX5jg/b7IN7rGs
+ faYNdYhVC4YQCKnxMBn23kpjHTub3g22+J2QL3X5MXWz3VneOJapiOCQV7lNc6QFOo4/Ph1tzbP
+ 9cbD5+7a5ucrgFm4PfxPCgT9C8CfFtl3YEJpYtWofPffVMPOYXBR/orXBsTzhGd1LOk3ZtJXGXc
+ 5PE62NwDej8l2gKLUlfqa8Zre3LB4F4zM1dCGTFjd7iby1L1agu+jycE+fQxbf6hBZB7IRgluL7
+ SQEQhaLXlZUu7mHf8Ru+1UChX4cwPJIHSd9KQMeu3s5nm1hqfJKiraSPjUOzU6ZtOmpg9eLNJDr
+ Q8IZRYU9+elZBg5Rm95mmlBsWIvhv5ghtEOWW2u65BedwPyxmgAVA7jv7bzYOXLEcbL4iuCH3Xr
+ Han6K9p2CgVLctxtkwaixMe+Dx9xc/STC4bwTGAchGxxzDMPm41CUfjgBc6FAm0cbXCgR2V82wY
+ KsizHyymRZh6vmhxXFA==
+X-Proofpoint-ORIG-GUID: xFcc7uGqZ-HYK0UJbpgCHve9C9pcjYKs
+X-Authority-Analysis: v=2.4 cv=CY+dd7rl c=1 sm=1 tr=0 ts=6aedfb73 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VnNF1IyMAAAA:8
+ a=uoKN2WSkVIwsLX3wBB8A:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-06_05,2026-11-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 suspectscore=0 bulkscore=0 phishscore=0 impostorscore=0
+ malwarescore=0 lowpriorityscore=0 spamscore=0 clxscore=1015 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611060062
 
-Marc Zyngier <maz@kernel.org> writes:
+Convert OSLSR to automatic register generation as per DDI0601. As
+OSLSR_OLSM is a composite field using bit 0 and bit 3 the combined
+values are still defined manually. While at it rename
+OSLSR_EL1_OSLM_IMPLEMENTED to OSLSR_EL1_OSLM_IMP to be consistent with
+the rest of the system register values.
 
-> On Wed, 04 Nov 2026 16:45:55 +0000,
-> "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
->> 
->> VPE L1 tables are allocated from the CPU-starting callback, where sleeping is
->> not allowed.  Remove the page allocation from this atomic path.
->> 
->> Use a blocking allocation for the boot CPU and record the resulting table
->> order.  Allocate a page of that order from the sleepable CPU hotplug prepare
->> stage for each secondary CPU.  Consume the preallocated page only when the CPU
->> cannot inherit an existing redistributor or ITS table.
->> 
->> Reclaim unused preallocations after the CPU reaches the online state, and from
->> the prepare-state teardown when CPU bring-up aborts.
->
-> No. The way to do it is to move the ITS probing out of the
-> non-sleepable CPU hotplug path.
->
-> I proposed a potential hack at [1] (which I find far more palatable
-> than this proposal), but the real fix is to probe the ITSs as
-> devices.
->
+No functional changes.
 
-Could you share a bit more detail on what you have in mind?
+Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
+Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
+Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+---
+ arch/arm64/include/asm/sysreg.h | 12 +++++++-----
+ arch/arm64/kvm/sys_regs.c       |  2 +-
+ arch/arm64/tools/sysreg         | 14 ++++++++++++++
+ 3 files changed, 22 insertions(+), 6 deletions(-)
 
-Are you suggesting that we create a platform device for each ITS and
-initialize it through the driver's probe callback, while the rest of the
-GIC initialization stays in the existing early boot path?
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index e3b60ee03023..2ec9ba9cd896 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -186,11 +186,13 @@
+ #define SYS_DBGWCRn_EL1(n)		sys_reg(2, 0, 0, n, 7)
+ #define SYS_MDRAR_EL1			sys_reg(2, 0, 1, 0, 0)
+ 
+-#define SYS_OSLSR_EL1			sys_reg(2, 0, 1, 1, 4)
+-#define OSLSR_EL1_OSLM_MASK		(BIT(3) | BIT(0))
+-#define OSLSR_EL1_OSLM_NI		0
+-#define OSLSR_EL1_OSLM_IMPLEMENTED	BIT(3)
+-#define OSLSR_EL1_OSLK			BIT(1)
++#define OSLSR_EL1_OSLM_MASK (OSLSR_EL1_OSLM0_MASK | OSLSR_EL1_OSLM1_MASK)
++#define OSLSR_EL1_OSLM_NI						\
++	((OSLSR_EL1_OSLM1_NI << OSLSR_EL1_OSLM1_SHIFT) |		\
++	(OSLSR_EL1_OSLM0_VAL_0 << OSLSR_EL1_OSLM0_SHIFT))
++#define OSLSR_EL1_OSLM_IMP						\
++	((OSLSR_EL1_OSLM1_IMP << OSLSR_EL1_OSLM1_SHIFT) |		\
++	(OSLSR_EL1_OSLM0_VAL_0 << OSLSR_EL1_OSLM0_SHIFT))
+ 
+ #define SYS_OSDLR_EL1			sys_reg(2, 0, 1, 3, 4)
+ #define SYS_DBGPRCR_EL1			sys_reg(2, 0, 1, 4, 4)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 2b28b929f9f3..8c91de6a4097 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3309,7 +3309,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_MDRAR_EL1), trap_raz_wi },
+ 	{ SYS_DESC(SYS_OSLAR_EL1), trap_oslar_el1 },
+ 	{ SYS_DESC(SYS_OSLSR_EL1), trap_oslsr_el1, reset_val, OSLSR_EL1,
+-		OSLSR_EL1_OSLM_IMPLEMENTED, .set_user = set_oslsr_el1, },
++		OSLSR_EL1_OSLM_IMP, .set_user = set_oslsr_el1, },
+ 	{ SYS_DESC(SYS_OSDLR_EL1), trap_raz_wi },
+ 	{ SYS_DESC(SYS_DBGPRCR_EL1), trap_raz_wi },
+ 	{ SYS_DESC(SYS_DBGCLAIMSET_EL1), trap_raz_wi },
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 997c62ab72e6..5d38f115bac1 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -122,6 +122,20 @@ Res0	63:1
+ Field	0	OSLK
+ EndSysreg
+ 
++Sysreg	OSLSR_EL1	2	0	1	1	4
++Res0	63:4
++UnsignedEnum	3	OSLM1
++	 0b0	NI
++	 0b1	IMP
++EndEnum
++UnsignedEnum	2	nTT
++EndEnum
++Field	1	OSLK
++UnsignedEnum	0	OSLM0
++	 0b0	VAL_0
++EndEnum
++EndSysreg
++
+ Sysreg	SPMACCESSR_EL1	2	0	9	13	3
+ UnsignedEnum	63:62	P31
+ 	0b00	TRAP_RW
 
-Would that mean the main GIC is operational during early boot, while
-ITS-dependent features, such as MSI delivery and direct injection, become
-available after the ITS devices probe?
+-- 
+2.56.0
 
-Is that the split you have in mind?
-
--aneesh
