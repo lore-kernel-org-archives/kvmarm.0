@@ -1,58 +1,58 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.217
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793955740;
-	b=22h6gZFwMjwJPnDDKNsVrtG+HiMSm5tMnPdadZaU8mzA3JNvrKIEmpHBzUcvrD6oqDeb
-	 YRKoLASo7i39oQVUtRsDvoaex/hrBV7PjjnaCgYK+/bsuycPSbp5Nve8AtCho2vQHNGAc
-	 OeVh1ASXMff40waVBlG0bOO1Kz9K2f5XpNikjuiZhRwaXWhOb3qlOwHrp1HAjGKnt9+7H
-	 ha9nAjeIIJ6fdIKD/Cc8SrIDwUdMQGcPYbObFYDtO4RlXPzAsu6wGqSP1dDSH+YjXOj4D
-	 enBuupCOnFeOlu6d2p6L6y0HjQXZMsaNI45MGfUlPIP1OuHOf7tIm7a5rdlS39I7UdA==
+	t=1793958276;
+	b=Gm4Vu30VPQ1wrCa+C9GlGQ5LCt2gHOLwT1kHRVOvtgGkvEVvhiJ6tbXlnYTqC8xp7kLa
+	 m/mMrtSF0S7EdqKLNRKmpIA/EZoV4CbNCceuCldTizLhqX5mgXnrfu0VUMBgBRW+PfpAA
+	 3QSomw4pH9KXtQWq+xJOaKl2Z1js+dK1V+84AN7/lu/80cKsvcrPR2OQaHBjWRONMzS96
+	 Tt29GxoLik3AlaDc4FVKBB67iP0tlsf8P9+FXukHhoONI8zC5isB3VhCqB/bP/fy4OSad
+	 4M0ZBUW6pK9tNgY8DKzsqC8UhuHcasQZlFinbdp09WL0raPi8guWuK/B0TLSoE94azQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793955740;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793958276;
 	h=DMARC-Filter:dkim-signature:Received:Received:Received:Message-ID:
 	 Date:MIME-Version:User-Agent:Subject:To:CC:References:From:
 	 In-Reply-To:Content-Type:Content-Transfer-Encoding:X-Originating-IP:
 	 X-ClientProxiedBy;
-	bh=IZO9hHewpI1vF88rTpwvcS4eIwOhB3E4KR10OH18Zcs=;
-	b=0W2gQXw6z/dWqripaYPmrpRmzKKEqbOPSlKU7RU3/cyLY1rhmvlu1RuvOG6OfoZuW5Ie
-	 0fLCfz1San62uSbGomEGoEtxA9RVS6QS8OVZLRd94JoTg8eIDC4duVSUKunu8Cp9ldRWD
-	 C3AQNCeNZWXSYdpGV8jBpAjh2qKt+m3+FQeXAAtFyRSWkTs7sJSH6qmfJNwOJc9f0hvbl
-	 Rrn/3DztmGBKCnpRcz7KsVZyzw1mgeOz34B2flxe7NOQM2VwrG55ZZg4Q+Ugx4jf7QhNF
-	 biuvFtPGWy9ts+1WRQ4trMa5CmtcK8rJq/nX0RbbzcH0QeAyXz/8vkhYSeWmIGJPM1g==
+	bh=3x30TCVHI6HA+CeHvlHb/+H3RtIDMYmugjilEli4TFo=;
+	b=VcYH4brjovbqCYh+No/ryo8jzNqKEutzIMwrj/MiBHG3HjwncROPJzse85OpZ1SGWWMR
+	 o8WRpMd8onBhZ3xd+tqB2qAhTpvF8TX4pXifGvC5Jd385guJZ+RN8Qn0bGwgppP6tG2QP
+	 F12hpax01fdMZhHGpFsQpL8y+Au25labjUxWWcqr2kSspnmfMIGqwYqMb8Gw1/aGsRI01
+	 sCz7MsTVRzlqVewE20YCzm0DxJ96bxrQRyAK4zg1uA3Cnn7yOoY7/UI7Ya/0QwTf3yFYa
+	 PLrasCC0H2zXUOL1k3SwoklyylFfjxm983h8dzJuVCbgbOULAlzLpjS2rqfk4lVXt9w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=huawei.com;
 	spf=pass smtp.mailfrom=huawei.com;
-	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=hjRU7vzd;
+	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=gAIJS6Ha;
 	arc=none smtp.remote-ip=113.46.200.217
 Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E519606A328
-	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 09:02:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6E519606A328
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7624A606A338
+	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 09:44:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7624A606A338
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=hjRU7vzd
+	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=gAIJS6Ha
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=IZO9hHewpI1vF88rTpwvcS4eIwOhB3E4KR10OH18Zcs=;
-	b=hjRU7vzdg/I2Nu9I0mN5sdbYT0kFey2K901ZDMBOjEImYw2ZNl0YCPz2n08l6gN5gzgjTEDT3
-	UiWdRSGdcbRhhJ9fuEMPeptb2aUqQ3ozspnVmQbHxAY4Ba+SCZepn1a1YX+RspQ6suiHa9Yi8uf
-	CMPGrMQwBtz8FudL0/tAjF4=
+	bh=3x30TCVHI6HA+CeHvlHb/+H3RtIDMYmugjilEli4TFo=;
+	b=gAIJS6HaMixK13xBJxngCizzqXaVwAQAylIRB1e8UBqkX8JYSzj7oCVsGuI+kD0FtyWqrZCeO
+	SRzsBCWQ6s7XTmyTWAmwPM+7+5Py8e2Lb/uMdsEta20vaiUGFwE64ocIONy5XOZzbTgI29bU1q2
+	5fnLV0zl5K5XePyypLSDHUI=
 Received: from mail.maildlp.com (unknown [172.19.162.223])
-	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4jLY843ZlNzcb3y;
-	Fri,  6 Nov 2026 17:01:40 +0800 (CST)
+	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4jLZ4w0RgBzcb0q;
+	Fri,  6 Nov 2026 17:44:00 +0800 (CST)
 Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id D977A40561;
-	Fri,  6 Nov 2026 17:02:10 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 76A0540577;
+	Fri,  6 Nov 2026 17:44:30 +0800 (CST)
 Received: from [10.67.120.103] (10.67.120.103) by
  kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Fri, 6 Nov 2026 17:02:09 +0800
-Message-ID: <75b0ebcb-023a-4889-98b1-bf1d8b6327dd@huawei.com>
-Date: Fri, 6 Nov 2026 17:02:09 +0800
+ 15.2.2562.45; Fri, 6 Nov 2026 17:44:29 +0800
+Message-ID: <3bc53520-0d1c-4fdf-88f3-d88295aa8a75@huawei.com>
+Date: Fri, 6 Nov 2026 17:44:28 +0800
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -63,7 +63,7 @@ List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 08/15] KVM: arm64: Flush the HDBSS buffer on VM exit
+Subject: Re: [PATCH v5 09/15] KVM: arm64: Handle HDBSS faults
 To: Leonardo Bras <leo.bras@arm.com>
 CC: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
 	<will@kernel.org>, <corbet@lwn.net>, <pbonzini@redhat.com>,
@@ -77,154 +77,147 @@ CC: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
 	<seanjc@google.com>, <rdunlap@infradead.org>, <linux-doc@vger.kernel.org>,
 	<linux-kselftest@vger.kernel.org>, <skhan@linuxfoundation.org>
 References: <20260929103655.85107-1-zhengtian10@huawei.com>
- <20260929103655.85107-9-zhengtian10@huawei.com> <auDpyRNpeDNzIk3W@LeoBrasDK>
- <5bbd0d3b-1026-43f3-bc45-245472603144@huawei.com>
- <auTLOIafIq4cjRho@LeoBrasDK>
+ <20260929103655.85107-10-zhengtian10@huawei.com> <auifWrY1u72afXfJ@LeoBrasDK>
 From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <auTLOIafIq4cjRho@LeoBrasDK>
+In-Reply-To: <auifWrY1u72afXfJ@LeoBrasDK>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
  kwepemr100010.china.huawei.com (7.202.195.125)
 
 
 
-On 10/31/2026 12:52 AM, Leonardo Bras wrote:
-> On Fri, Oct 30, 2026 at 12:57:06PM +0800, Tian Zheng wrote:
+On 11/2/2026 10:34 PM, Leonardo Bras wrote:
+> On Tue, Sep 29, 2026 at 06:36:49PM +0800, Tian Zheng wrote:
+>> From: Eillon <yezhenyu2@huawei.com>
 >>
+>> Once the buffer is full, hardware stops promoting writable-clean
+>> descriptors and raises a stage-2 Permission fault with
+>> ESR_EL2.ISS2.HDBSSF instead. Failed HDBSS accesses, such as external
+>> aborts and granule protection faults, are reported the same way.
 >>
->> On 10/28/2026 2:13 AM, Leonardo Bras wrote:
->>> On Tue, Sep 29, 2026 at 06:36:48PM +0800, Tian Zheng wrote:
->>>> From: Eillon <yezhenyu2@huawei.com>
->>>>
->>>> HDBSS entries accumulate in the per-vCPU buffer while the guest runs,
->>>> and must be drained into the dirty bitmap or dirty ring before
->>>> userspace can observe them.
->>>>
->>>> Drain the buffer at a single point: kvm_arch_vcpu_ioctl_run() flushes
->>>> it on every VM exit, before the exit reason is handled. Flushing
->>>> inside the run loop keeps the dirty-ring feedback timely: when a flush
->>>> pushes the ring past its soft limit, kvm_dirty_ring_push() raises
->>>> KVM_REQ_DIRTY_RING_SOFT_FULL, which check_vcpu_requests() observes at
->>>> the top of the next loop iteration, so the vCPU exits to userspace for
->>>> the harvest before re-entering the guest.
->>>>
->>>> kvm_arch_sync_dirty_log() relies on the exit path to flush: it kicks
->>>> vCPUs out of guest mode, and the GET/CLEAR protocol tolerates
->>>> concurrent bitmap writes, so the snapshot is complete without extra
->>>> synchronization.
->>>>
->>>> Signed-off-by: Eillon <yezhenyu2@huawei.com>
->>>> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
->>>> ---
->>>>    arch/arm64/include/asm/kvm_dirty_bit.h | 15 +++++++++
->>>>    arch/arm64/kvm/arm.c                   | 20 ++++++++++++
->>>>    arch/arm64/kvm/dirty_bit.c             | 45 ++++++++++++++++++++++++++
->>>>    3 files changed, 80 insertions(+)
->>>>
->>>> diff --git a/arch/arm64/include/asm/kvm_dirty_bit.h b/arch/arm64/include/asm/kvm_dirty_bit.h
->>>> index fe703f02626b..d828e6b43fe9 100644
->>>> --- a/arch/arm64/include/asm/kvm_dirty_bit.h
->>>> +++ b/arch/arm64/include/asm/kvm_dirty_bit.h
->>>> @@ -13,6 +13,9 @@
->>>>    #include <asm/sysreg.h>
->>>>    #include <linux/sizes.h>
->>>>
->>>> +#define HDBSS_ENTRY_VALID	BIT(0)
->>>> +#define HDBSS_ENTRY_IPA	GENMASK_ULL(55, 12)
->>>> +
->>>>    #define KVM_ARM_HDBSS_DEFAULT_SIZE  PAGE_SIZE
->>>>    #define KVM_ARM_HDBSS_MAX_SIZE      SZ_2M
->>>>
->>>> @@ -22,7 +25,19 @@ static inline u32 kvm_hdbss_buffer_size(struct kvm *kvm)
->>>>    	return kvm->arch.hdbss_buffer_size ?: KVM_ARM_HDBSS_DEFAULT_SIZE;
->>>>    }
->>>>
->>>> +static inline bool kvm_hdbss_enabled(struct kvm *kvm)
->>>> +{
->>>> +	return kvm->arch.mmu.vtcr & VTCR_EL2_HDBSS;
->>>> +}
->>>> +
->>>> +static inline bool vcpu_hdbss_enabled(struct kvm_vcpu *vcpu)
->>>> +{
->>>> +	return vcpu->arch.hw_mmu &&
->>>> +		(vcpu->arch.hw_mmu->vtcr & VTCR_EL2_HDBSS);
->>>> +}
->>>> +
->>>
->>> IIUC, arch.mmu is always the canonical s2_mmu, while hw_mmu can be the
->>> nested s2_mmu, if enabled.
->>>
->>> Was that your intend here?
->>> If not, we could use only kvm* version, which can be called with vcpu->kvm.
->>>
->>> If it was, then I would like to understand the logic here, as IIUC the
->>> buffer is accessible only for the non-nested guest, as it's
->>> allocated in a per-vcpu structure. (vcpu->arch)
->>>
+>> Dispatch from kvm_handle_guest_abort() via the new esr_iss2_is_hdbssf()
+>> helper. FSC == OK means the exit path already flushed, so resume the
+>> guest; any other FSC is an error - clear it and report -EFAULT.
 >>
->> Hi leo,
+>> Signed-off-by: Eillon <yezhenyu2@huawei.com>
+>> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+>> ---
+>>   arch/arm64/include/asm/esr.h           |  5 +++++
+>>   arch/arm64/include/asm/kvm_dirty_bit.h |  1 +
+>>   arch/arm64/kvm/dirty_bit.c             | 29 ++++++++++++++++++++++++++
+>>   arch/arm64/kvm/mmu.c                   |  4 ++++
+>>   4 files changed, 39 insertions(+)
 >>
->> Yes, that was the intent. The shadow MMU never carries VTCR_EL2.HDBSS,
->> so the flush is naturally skipped when running nested.
-> 
-> Ah, right. If we always test the kvm one, we may enable it for the nested
-> guest, which is undesired.
-> 
-> [...]
+>> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+>> index f816f5d77f1a..4b3ccd407faa 100644
+>> --- a/arch/arm64/include/asm/esr.h
+>> +++ b/arch/arm64/include/asm/esr.h
+>> @@ -437,6 +437,11 @@
+>>   #ifndef __ASSEMBLER__
+>>   #include <asm/types.h>
 >>
->>>
->>>> @@ -2017,7 +2025,19 @@ long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
->>>>
->>>>    void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
->>>>    {
->>>> +	unsigned long i;
->>>> +	struct kvm_vcpu *vcpu;
->>>>
->>>> +	if (!kvm_hdbss_enabled(kvm))
->>>> +		return;
->>>> +
-> 
-> And then here you check for the L1 VM because during migration the host
-> could have dirtied memory, and you want to track that as well.
-> 
-> Makes sense
-> 
->>>> +	/*
->>>> +	 * The buffer is drained on every VM exit, so kicking running
->>>> +	 * vCPUs is enough to flush them; the dirty-log GET/CLEAR
->>>> +	 * protocol tolerates bits set concurrently with the snapshot.
->>>> +	 */
->>>> +	kvm_for_each_vcpu(i, vcpu, kvm)
->>>> +		kvm_vcpu_kick(vcpu);
->>>>    }
->>>>
->>>>    static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
->>>> diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
->>>> index f9aeb9f34ad0..be0d12555c84 100644
->>>> --- a/arch/arm64/kvm/dirty_bit.c
->>>> +++ b/arch/arm64/kvm/dirty_bit.c
->>>> @@ -13,6 +13,7 @@
->>>>    #include <linux/kconfig.h>
->>>>    #include <linux/log2.h>
->>>>    #include <linux/mm.h>
->>>> +#include <linux/srcu.h>
->>>>
->>>
->>> Out of curiosity, could you please explain you reasoning on selecting srcu
->>> as locking here?
->>>
->>> (Like, what are you protecting against, and why srcu is a good choice)
->>>
+>> +static inline bool esr_iss2_is_hdbssf(unsigned long esr)
+>> +{
+>> +	return !!(ESR_ELx_ISS2(esr) & ESR_ELx_HDBSSF);
+>> +}
+>> +
+>>   static inline unsigned long esr_brk_comment(unsigned long esr)
+>>   {
+>>   	return esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
+>> diff --git a/arch/arm64/include/asm/kvm_dirty_bit.h b/arch/arm64/include/asm/kvm_dirty_bit.h
+>> index d828e6b43fe9..eb2039820777 100644
+>> --- a/arch/arm64/include/asm/kvm_dirty_bit.h
+>> +++ b/arch/arm64/include/asm/kvm_dirty_bit.h
+>> @@ -39,5 +39,6 @@ static inline bool vcpu_hdbss_enabled(struct kvm_vcpu *vcpu)
+>>   int kvm_arm_vcpu_alloc_hdbss(struct kvm_vcpu *vcpu);
+>>   void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu);
+>>   void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu);
+>> +int kvm_handle_hdbss_fault(struct kvm_vcpu *vcpu);
 >>
->> kvm_vcpu_mark_page_dirty() resolves the memslot under SRCU
->> (kvm_vcpu_gfn_to_memslot), and the flush loop calls it for each entry,
->> so the whole loop needs the read lock held.
+>>   #endif /* __ARM64_KVM_DIRTY_BIT_H__ */
+>> diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
+>> index be0d12555c84..893a8c4248bc 100644
+>> --- a/arch/arm64/kvm/dirty_bit.c
+>> +++ b/arch/arm64/kvm/dirty_bit.c
+>> @@ -98,3 +98,32 @@ void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu)
+>>   	vcpu->arch.hdbss.hdbssprod_el2 = prod;
+>>   	isb();
+>>   }
+>> +
+>> +int kvm_handle_hdbss_fault(struct kvm_vcpu *vcpu)
+>> +{
+>> +	u64 prod;
+>> +	u64 fsc;
+>> +
+>> +	if (WARN_ON_ONCE(!system_supports_hdbss()))
+>> +		return -EFAULT;
+>> +
+>> +	if (WARN_ON_ONCE(!vcpu_hdbss_enabled(vcpu)))
+>> +		return -EFAULT;
+>> +
+>> +	prod = read_sysreg_s(SYS_HDBSSPROD_EL2);
+>> +	fsc = FIELD_GET(HDBSSPROD_EL2_FSC_MASK, prod);
+>> +
+>> +	if (fsc == HDBSSPROD_EL2_FSC_OK)
+>> +		/* Buffer full: the exit path drained it before handle_exit. */
+>> +		return 1;
+>> +
+>> +	if (fsc != HDBSSPROD_EL2_FSC_ExternalAbort &&
+>> +	    fsc != HDBSSPROD_EL2_FSC_GPF)
+>> +		WARN_ONCE(1,
+>> +			  "Unexpected HDBSS fault type, FSC: 0x%llx (prod=0x%llx, vcpu=%d)\n",
+>> +			  fsc, prod, vcpu->vcpu_id);
 > 
-> Oh, right, it's just about getting the memslot... now I see it :)
+> Any reason for using if() before warn_once, given the first parameter is a
+> condition? I mean, why not use, instead:
+> 
+> +	WARN_ONCE(fsc != HDBSSPROD_EL2_FSC_ExternalAbort &&
+> +		  fsc != HDBSSPROD_EL2_FSC_GPF,
+> +		  "Unexpected HDBSS fault type, FSC: 0x%llx (prod=0x%llx, vcpu=%d)\n",
+> +		  fsc, prod, vcpu->vcpu_id);
+> 
+
+Right, this is a syntax style closer to the Linux kernel. I will modify
+it.
+
+>> +
+>> +	/* Clear FSC so hardware dirty state updates can resume. */
+>> +	write_sysreg_s(prod & ~HDBSSPROD_EL2_FSC_MASK, SYS_HDBSSPROD_EL2);
+>> +	return -EFAULT;
+>> +}
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 85a98d2c23a9..7bf82d65041c 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -15,6 +15,7 @@
+>>   #include <asm/pgalloc.h>
+>>   #include <asm/cacheflush.h>
+>>   #include <asm/kvm_arm.h>
+>> +#include <asm/kvm_dirty_bit.h>
+>>   #include <asm/kvm_mmu.h>
+>>   #include <asm/kvm_pgtable.h>
+>>   #include <asm/kvm_pkvm.h>
+>> @@ -2315,6 +2316,9 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>>
+>>   	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+>>
+>> +	if (esr_iss2_is_hdbssf(esr))
+>> +		return kvm_handle_hdbss_fault(vcpu);
+>> +
+>>   	if (esr_fsc_is_translation_fault(esr)) {
+>>   		/* Beyond sanitised PARange (which is the IPA limit) */
+>>   		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
+> 
+> I did not get the criteria used to positioning it here:
+> Why placed before is_abt, if not using the result before returning?
+> What is the rationale to putting it here?
 > 
 > Thanks!
 > Leo
 
-Awesome!
+Ah, I'm sorry, there's no particular reason. I'll move it so it's placed
+before is_abt.
 
+Thanks!
+Tian
