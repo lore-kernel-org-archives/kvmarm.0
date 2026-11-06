@@ -1,75 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793984249;
-	b=EeJ8HjR+/FOL3IGAO2fgMYDaUErlYb9xHK8RLNOjJC2On2QAPrkwtWdt1vb6Ejg6Ykau
-	 kwtOJdpk5TzSaujypepZtqSsd9Ygxeo0pTYSqZvBBiB2JVrPL1ZoDVBOkywmSeRDZk3dH
-	 b4/riUJj0vAKxZn037ojCnPQo4/iVIC5BYrPCcrlPpGYP/GhiO+ebAbBmqv/79Yr0QnMB
-	 5MSOnrNbT/Bo29pJeS40t3u7N74bfTj3dDFbJX/8zhWbXo16Zz+IkWPIFTJm6c9fAWbPo
-	 OTIb5LosdC4NCp6dCbZ8IcCHDbrigmuIoM4zJHPKzN30bLiVGRjcwisbmZ54TC12FUg==
+	t=1793984287;
+	b=p87GnCIwoblWd7kx46peizT8/5mnitTK47h8ak7s+NZ03pxxZYlOQcuw/6oApzpYrX32
+	 aoV3EZcav4QEQLVz4gjCd1NuuznQfBy/q/20A0S1HZ5NJWQKDZ10RgkTvUPF2q6bfDgGH
+	 ZPmWg9QkrbiFB6bn7kvYdyOq0XK+CJfHPUUuqWJ2V2gWEzSG5YSYajXib/Hz/Cun+OmHq
+	 AJb03hg5pKPAdk0GLdnbutDZZ1JNEFS3hqlcn98Rj5DV4S2KGKe0t/7EHetYV4v+8Us/8
+	 4OCSGN2EmAd3m/WGpJKfkluOvlZP8MhSCHMPhC78JyFBqH/T6lkcy/SCWcosCm/JQ9Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793984249;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=0GkE8hZIJYtd3UHUB9YTMTqSfhEImKLinoLGGzd5XkM=;
-	b=eI5wB/440/wfuFJYzL58Fo5R+rzKClCnSH+sdsUkalYsVSt5YBbom47avu4Hs9JXk2ur
-	 z4cxocE8E3jl5UYzB0Puq8K3wHXVO+71hWTH6QJK90Q18ZzxFAl00UKP7bNMWbTYlsUtz
-	 2mlRVoV5pLdfK2Eb3BvJAvXmMY+o0y2rv64KuhkQUrUVCd4aMkrgeJTqooZKcYSie/FGx
-	 0rr0FFAymayTLYxoqQO8my/kgDGn4O8MGwTJVHvSurMRFIQI40uazCp/kQS5FlCkhUszn
-	 CoJAzvxm9GfatixzOqftn8llX8ffDfsLMOAWPNHHIheOJBpWw38SCCyHtUuIoDwKFvw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793984287;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=drIAGdN6syBZttzw4rRm9YSIRB8yXAVXMEUUr3NJrr0=;
+	b=dQvjmwTJ/OyJRnPvdegjFDNXJnu4XbKB0oukvftS/cmnOn6+72Y1FxcXAOFN2QCvvXMx
+	 62SEluFmKHkLr0ZzxFP4CIiicrTj/Cd060WaKq5mLLALD2c6wGgkk2DemJWkX3lowVbyx
+	 rnSGgUg192ZjTmg+pEu/ZG0z99bm0m/R2FZLiTd/jzbxnGhiQaUbS7Tf5I3EPwCRthZkU
+	 IUyguH7dNWKkXZN7mhDvFOqu3FkQmTWJAEin9X2/mwGSbi4kyNlxummqY0/Lzw3v2+6zm
+	 k/kvEmnGKHsBW0eh2KUFghiD9F7OA6AYGJybdI588vSwuAVkX7PK63gmFM18QucK8Hg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NCdGM8rw;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WHkLTiSX;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ACA2606A326;
-	Fri,  6 Nov 2026 16:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F113606A32E;
+	Fri,  6 Nov 2026 16:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NCdGM8rw
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A9C11F0089F;
-	Fri,  6 Nov 2026 16:57:28 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WHkLTiSX
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07D021F008A2;
+	Fri,  6 Nov 2026 16:58:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793984248;
-	bh=0GkE8hZIJYtd3UHUB9YTMTqSfhEImKLinoLGGzd5XkM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=NCdGM8rwN5bCNZ6rWdVxDrw9mInGo/n3xAuqFE5kst2Q9pV8Pxq6AgwKmPDqem4XK
-	 KlTApBAXNvPKpIuk7Dp0jcuGjSnQYAut++TKz/rGLVu22G1U9HHPqSFhMABL5fX3v6
-	 ubrOEiJCCT5mDGt2a+HCJjnGll4dB+Dj+trUGB8ybQyiaWYiRGDErq8yTWcKfQ51wa
-	 CjwhWQBNkXc2V4aWq8WXZO34/HGawc+tqMuSSEmq+oVCMK8/xnEbRIMU6etL+6a81L
-	 LKKDTjL6RKDIVBLjZ7H+irbg+1mndAq+FQiGkxz7CFp/VxVAXr1cKcKs6+mIJj7qIo
-	 qF585rUxNhVRQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xPNFm-0000000CHU4-09ZA;
-	Fri, 06 Nov 2026 16:57:26 +0000
-Date: Fri, 06 Nov 2026 16:57:25 +0000
-Message-ID: <86y0b528zu.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RESEND v4 0/3] Optimize S2 hugepage splitting, introduce skip-level flags
-In-Reply-To: <20261106161240.1345126-1-leo.bras@arm.com>
-References: <20261106161240.1345126-1-leo.bras@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1793984287;
+	bh=drIAGdN6syBZttzw4rRm9YSIRB8yXAVXMEUUr3NJrr0=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=WHkLTiSX2k72ZGTjIUncGmqE/LpKbXAkpQkreRunHYfvBKSIB4ghJMQ8D9LNAxPgf
+	 JQT5kfd/JVfmxzn0rXHetL8kD+e3AxHimuMUuJGE3c7VqmpgEzRIFKgBE7v8NRoDXy
+	 EK06rozXsz9X36souXjs3fWyJll84Bq+lQEbNz3nO36BrTQ7zfrJCy1w0ugzzRt/JK
+	 l2bb4n4P5cqvK37vIii9/KZTiQ6S9U5NUvHGHjvvJL+dg/MQpBe5nN9HFoRksBzG+W
+	 OBdRgMlfbW6Q++pAF71DKoPjyCI2mLbtQE+ZpED1toRAf5Mqk01A2EtZ2quTOf0oQS
+	 oLVW0ExqQa1zQ==
+Message-ID: <sashiko-outbox-201877@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v3 05/23] arm64: Share system register related headers
+ and functions with s390
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Steffen Eiden" <seiden@linux.ibm.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-s390@vger.kernel.org, "Oliver
+ Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, "Heiko
+ Carstens" <hca@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>, "Alexander
+ Gordeev" <agordeev@linux.ibm.com>, "Christian Borntraeger" <borntraeger@linux.ibm.com>
+In-Reply-To: <20261106-sysreg-v3-5-75e95980fb10@linux.ibm.com>
+References: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
+ <20261106-sysreg-v3-5-75e95980fb10@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 06 Nov 2026 16:58:06 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -78,26 +63,53 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: leo.bras@arm.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, rananta@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 06 Nov 2026 16:12:35 +0000,
-Leonardo Bras <leo.bras@arm.com> wrote:
-> 
-> 
-> While playing with dirty-bit tracking, I decided to take a look on how page
-> splitting works. Found out all entries are walked, even though we don't need
-> to walk the level-3 entries, as they don't need to be split. 
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue to consider:
+- [High] arm64: cache.h: -Wundef build failure in vdso32 on
+  ARM64_S390_COMMON
+--
 
-What's the point of this "RESEND"? Anything different from what you
-sent on Sept 30th? Since it is still numbered v4, I assume nothing has
-changed...
+commit fc7c54ef2eb921844dfa6922455b5c6e7c8095c4
+Author: Steffen Eiden <seiden@linux.ibm.com>
 
-	M.
+arm64: Share system register related headers and functions with s390
 
--- 
-Without deviation from the norm, progress is not possible.
+This commit marks arm64 system register, CPU identification, exception
+emulation, and mitigation definitions as shared with s390.
+
+> diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cach=
+e.h
+> index 10a7ffadee3da..ee3078c687687 100644
+> --- a/arch/arm64/include/asm/cache.h
+> +++ b/arch/arm64/include/asm/cache.h
+> @@ -8,6 +8,7 @@
+>  #define L1_CACHE_SHIFT		(6)
+>  #define L1_CACHE_BYTES		(1 << L1_CACHE_SHIFT)
+> =20
+> +#if ARM64_S390_COMMON =3D=3D 1
+>  #define CLIDR_LOUU_SHIFT	27
+>  #define CLIDR_LOC_SHIFT		24
+>  #define CLIDR_LOUIS_SHIFT	21
+> @@ -25,6 +26,8 @@
+>  /* Ttypen, bits [2(n - 1) + 34 : 2(n - 1) + 33], for n =3D 1 to 7 */
+>  #define CLIDR_TTYPE_SHIFT(level)	(2 * ((level) - 1) + CLIDR_EL1_Ttypen_S=
+HIFT)
+> =20
+> +#endif /* ARM64_S390_COMMON =3D=3D 1 */
+
+[Severity: High]
+Does evaluating ARM64_S390_COMMON outside the !defined(BUILD_VDSO) guard
+break the 32-bit compat vDSO build with -Wundef?
+
+arch/arm64/kernel/vdso32/Makefile sets VDSO_CPPFLAGS from scratch without
+inheriting KBUILD_CPPFLAGS (where -DARM64_S390_COMMON=3D1 is defined) while
+enabling -Wundef in VDSO_CFLAGS.  When arch/arm64/kernel/vdso32/vgettimeofd=
+ay.c
+includes asm/cache.h via vdso/datapage.h -> vdso/cache.h, ARM64_S390_COMMON
+is undefined, causing a -Wundef warning and a build regression when
+CONFIG_COMPAT_VDSO=3Dy and CONFIG_WERROR=3Dy.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261106-sysreg-v3-=
+0-75e95980fb10@linux.ibm.com?part=3D5
