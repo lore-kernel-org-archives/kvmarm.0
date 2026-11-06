@@ -1,108 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.135.74
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793985490;
-	b=YodtiLeLhd0BOIHIyuM/Rr65HCle6ePpzs0wefanSIzeV6BD6ScEwLT5VNvKYxMhWvIV
-	 VA9SCHGFAQNLYlLs00zBqNiIfQ7K1c8WBa2jzmGbaTLXEvdi+W/dtitgQYIcX24tUMABA
-	 ZOGMBS0K3asd9z+NzhM1AJrguqcNM8i5AyNyyONub8fz2tRSA3jy+CkKZuev8ROhuHF5X
-	 8rbGa3/AnfWrw0UTUtHw/QSsbH384NYdE/9xVbaxpGWUPXLi6AgX1J+IOxZbzlsJV8S9D
-	 A8yFHJCryaorjktNVLJQPbSU4GEd5CKcO8CiBj1W9XfkWMYP/HX+7Rugjgff0C62Pvg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793985490;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
-	 X-Google-DKIM-Signature:X-Forwarded-Encrypted:X-Gm-Message-State:
-	 X-Gm-Gg:X-Received:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:Content-Type:
-	 X-Proofpoint-GUID:X-Proofpoint-ORIG-GUID:X-Authority-Analysis:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Spam-Info:
-	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=T59m8WXKnLMZksH0X3OIVWtfvJ0HewjqtyBEFa8ziT4=;
-	b=kzWKTeRE/sOWH2wuDRxXKWiTQu0nJv+XqffRKCM5pKzUuIqJIM55cdvtZDhZLqSCuOQd
-	 8h7wMK1LLMgWgIrQXxIsfaXC1gIOYhlT3L+Zt+VBqZzWNKIaP+2zCfk05PY5bL1hpg6EE
-	 GkuPfbBOjOAK0W+rUl6II3Ibudqtdq7nOvuID+h5hgAV6H+FFY+ZX5wdfu/QycOv48RKi
-	 ctBIjzYXVJSwLpd5nDWdXZdstGZ38BkhmXnovj7gp5DYO5BK2gFi87R99V4t1Vdv1DrnI
-	 qFi58fp5tVsxi81BRE0zTY/JT2IYvPH0vQAzGhlN3nx5twRmc2cs7RNyLcyLrmevv4g==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=cs.columbia.edu;
-	spf=pass smtp.mailfrom=columbia.edu;
-	dkim=pass header.d=columbia.edu header.i=@columbia.edu header.a=rsa-sha256 header.s=pps01 header.b=kHuByDj0;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.135.74
-Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793985487;
+	b=qbjh/7fYXGLzJsZ80sAad0qr7JN3gN2+1hLElXkjOy+to9VpKgpRxIq3/HOIbQZURWGP
+	 GVhvNM+heiNEcmpoCEwi5wZrm4s78prWKSfC0bjQ5pXfaFd2s2tgYjwKk6l4iz5jUrKh1
+	 kgPuSGsT7KcHPoeE5AcyTQmZdqJIRLciyhSHRn8ZiZXqiDCpNnc+avuAq2dknzZjXe7yu
+	 zz2rI5fta7KtuDd3tumFU8hBilHbUU4ik590f5PJ7ors4j10nSfNc/cbZ8jsq70RjDjfw
+	 v603twmqnxPaqZUD06U662YkGiqIAYQRbQM9PXMDUlDQLNbWvFhnPilqKmSKtyZHXtQ==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793985487;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=xMAGa3S8aYyHIE/94f8xfinpQSCHE0yPXUnRRCP8Qww=;
+	b=WEakt97o5oRrWaOVQ8reXalazB4KQTL/yKG4eSf1A0300NnGl99t9GCJzZmdMn90s8K1
+	 5hS2d8VSx6F68MivfPGJgp+d54gRnjwKRv/cLvPKMcdOcoAjVGwh4eDxQbEDfJUZoqWG2
+	 0lER4R4zd+qU/gGTn5+tFLjp3hI8I+ciauNfRPbfEImS7Ka4SV1+Kp/27VGk7baDCqwy+
+	 k/seuE4O+nnVkyU40DH0n3XXbStnsu6DyMJA+8gAvBSJrItT91lQF0I8kEwnXwbYr6wMf
+	 xiAa5UNDqTjZVu+36ySwstHkDaM6qPY6Rhm2QMFNbOqnhph7q3gXQYNl9KLDg/47XGQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="Q/TCih5o";
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45575606A339
-	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 17:18:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 45575606A339
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.columbia.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5D7606A326;
+	Fri,  6 Nov 2026 17:18:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=columbia.edu header.i=@columbia.edu header.a=rsa-sha256 header.s=pps01 header.b=kHuByDj0
-Received: from pps.filterd (m0167071.ppops.net [127.0.0.1])
-	by mx0a-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A6Fh5ka2167501
-	for <kvmarm@lists.linux.dev>; Fri, 6 Nov 2026 12:18:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pps01; bh=T59m8WXKnLMZksH0X3OIVWtfvJ0H
-	ewjqtyBEFa8ziT4=; b=kHuByDj0/YKHgTsrNhhmedA/FP7mqZGT62dRvXg9HauW
-	gMDXV8u3jnw8J/ppSffjbBmhjR9FkIx0Xom/frHFEyHtVSi1goB/BSTlcqSchrXC
-	6jMvdcldqNdUbPu4DAvgWToTSzCJIPBYi+yPI8++eJ8IRtKJHiwN1Y6gWUIte5lF
-	BfJHkIRFyabKynbxbjYeeY9H/1oBQzjRcLJPSH0t2CufgkrzCB7oIsjcrnSYipOG
-	QclCid9TTrSlHujzXSwdlDiU+Lm9V/LvMw49Na9FygTqG/Bx3dvgIbTx6lYXwR7W
-	GHipks+eota340S1R1pnBuF0brvaw4Af8cV6C2dwvg==
-Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com [209.85.128.198])
-	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 4hs3pdd2wm-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <kvmarm@lists.linux.dev>; Fri, 06 Nov 2026 12:18:08 -0500 (EST)
-Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-8b12b209c4dso9214097b3.2
-        for <kvmarm@lists.linux.dev>; Fri, 06 Nov 2026 09:18:08 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1793985487; cv=none;
-        d=google.com; s=arc-20260327;
-        b=FQXWGOGQ7U5e1Wi6UtM9bjmMBe7QKhUuGLIebO3CX0gX9KENuSzrKdDIYf0o3n2tGI
-         vqoYVyoN7ah4G8pX6qs9mvHBqBvoKPiANlYMHZQL6T22stIUWW3XoSW2N4TeukbxJLPw
-         HxDODnThyF/WA1Rop4TmUJXsRG8tAfwHkwHbL7fuRYys/SuTNc4tY383wptVLcfq/CqP
-         lBCILx3NnpZQ6wMG7NmHQPWwxsz/J1kz1SGHDL2hju5gmlKPdjff3TP0ULMbafVimqiK
-         Zf7yMm8kAeLGPQ8/xqLZZ9vHjAlkR+F5GFw8WBbzgCPpLVM/76H4gQe63xXzLKByGklt
-         dDFw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version;
-        bh=T59m8WXKnLMZksH0X3OIVWtfvJ0HewjqtyBEFa8ziT4=;
-        fh=ZeJWMfXociS4zFa58W1qywW2VS0QZ5mXhO6SVXb1v64=;
-        b=nt/U2YydFDyy43faIfaTi7/01z2VQDHB7kdJhyYmhLMu3ony+xu17JNCU/tLM+UGcU
-         +0udiWvYm4ccQ5NoH//5OIS5B9pgfTvslwSkfPOBBjCE6tYxSF7o00fAoXdthLMhnkMT
-         VmRroGNkOpwD267dmXJjX9l3Mu1KScfgpungfUFiYhjW8Nlzpdqhe1wpBu9peRZmtK/R
-         z9RJIFnrPoACvl5bAFKClFUlS8beWL1N87nEKNGxeKxpEcanYT/HzzYZ6Rn9a4WENZK7
-         5548QOEWsjoyi8sMmxBiFfNuhQnf7QHGNC7m0AVwAQc07FFXjRE7QDHGVRQPjTjHOmKS
-         bMcA==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793985487; x=1794590287;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=T59m8WXKnLMZksH0X3OIVWtfvJ0HewjqtyBEFa8ziT4=;
-        b=Wza9kLNGdKaYlCf5VAcJIumnmB/X1ykzMalIzBvjWNNoLY/IgPZEFEEytKlBadQj5I
-         kA2rkvzKRW1hGE0VXP0xe7kOOCTB03gfQkkIfISvIPXLIMykHgJasI6Ov3u1TdXPrd71
-         TNXm8hR/V7iG50zURgyYBj9ZnjNrJkFlWkDuSy4HXKBkN1xTCQnW9EsADtpRKhh5YypK
-         naPk2RK/Muui15oTsduFfR/LjB4mBtF/O0BK6mj5/HFXpEz6XMOz679eiJnBVH9vVLFc
-         uRSz4gQbWRix8h7E8Vunlqtm+UAyEfY6TuX64GlQ/TLN0JceGZi2MBKU9++J7rOHJQu+
-         lnTw==
-X-Forwarded-Encrypted: i=1; AL+hErGfvKpZYZkkg50Bd2MlWf2u3qhoD791EjTTwIMvx2QoEv2BgXtC4/fCPkIa2f8vO34KaMzJ+iU=@lists.linux.dev
-X-Gm-Message-State: APuU4Z90SQaez4eQw6lA8VoaAeFOuB/2T0Cqy1/dg2v9GGDMtSkrRwtS
-	OZAqMo6hDQ1tvO77V6Da0RyVfba80LLKIcHPKHMZYiNdhHvhc0EddlD7CyR6tazbEBsLQv0tIbo
-	jYmBdOO2bC6yKz8A2SvlPx4/Uiax+Qm4bBJq+Db43rj5BNP06z4nFi9xPx4yklyVNHKBZwNvJud
-	u6XhGNeVLKtNMBCkJqPaUMc1st5heu
-X-Gm-Gg: AYBFou3RvYZbpd4kRbD2MNtZIAOMjrjcmm/6QRkwm8sxcjaPOzif1kBy3c+lZa0cc0b
-	Fcqt51u89TtEkubqfyCwSbwKT1WuMBZY1mrivm38d7O04MIKx3/1LnzYaBuNUm621tN8z33m+Wo
-	RoOXsuUsLQyUmRM5Jd5SpfibNIpSt5tsqf8tkrnIef5HVpQGR0WMC2AxBKon4g5mZbhXSKHCpsM
-	lvB/yhSV778TCyZJ0A3+lwzB0xFrFjwP2GlajefNIYUyaMB8faDRTXQyFey0PCbn/edLJjBgShK
-	hB+8lynlGgcvANoEvP8DXeyhHQ++xp4npw==
-X-Received: by 2002:a05:690c:38b:b0:8a9:e801:231c with SMTP id 00721157ae682-8b3418de960mr15159357b3.20.1793985487309;
-        Fri, 06 Nov 2026 09:18:07 -0800 (PST)
-X-Received: by 2002:a05:690c:38b:b0:8a9:e801:231c with SMTP id
- 00721157ae682-8b3418de960mr15159067b3.20.1793985486807; Fri, 06 Nov 2026
- 09:18:06 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Q/TCih5o
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 105C41F008A1;
+	Fri,  6 Nov 2026 17:18:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793985486;
+	bh=xMAGa3S8aYyHIE/94f8xfinpQSCHE0yPXUnRRCP8Qww=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=Q/TCih5oYWiGwtP04gvJW2Sj8pl0muq1PQKRakZ1TE5pfgP9oDseRS0IAjjOKCjIS
+	 l2YfNJwmP1jJlWZ+Q4Jtyaox7AleNX/d2VdyHsTghXlYUlg3vjb4U3+PJBrUNCvL4d
+	 jAlVRDl2PHVtlwGeF524qZCwLc2Tb1RXJ8O50LgbI3wfKXVhMrSnUvGouHZTvEs/lP
+	 y8UXXlboBuxSC2GPoQSxllU1KCiJDR5jz0pTBuSqgf6ZRT3UevMPEHhCGqe1DvGKsx
+	 bXNhQDlFxe9R6WgI8s+gGkfCDMkOI9MRhGFhHZdv6PWash+kFt1Szm2PLrv7Vyu2YS
+	 n8OwVXWvm050g==
+Message-ID: <sashiko-outbox-201908@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v3 08/23] KVM: arm64: Share system register code with
+ s390
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Steffen Eiden" <seiden@linux.ibm.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-s390@vger.kernel.org, "Oliver
+ Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, "Heiko
+ Carstens" <hca@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>, "Alexander
+ Gordeev" <agordeev@linux.ibm.com>, "Christian Borntraeger" <borntraeger@linux.ibm.com>
+In-Reply-To: <20261106-sysreg-v3-8-75e95980fb10@linux.ibm.com>
+References: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
+ <20261106-sysreg-v3-8-75e95980fb10@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 06 Nov 2026 17:18:05 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -111,69 +63,114 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-References: <20261105-hyp-pool-and-map-v2-0-44a6ca90190b@cs.columbia.edu>
- <20261105-hyp-pool-and-map-v2-3-44a6ca90190b@cs.columbia.edu>
- <CA+EHjTx-X_2DaO6Yt-AHsP55SFWjz_EYxEr-TB9WSN-ZT+d3FQ@mail.gmail.com>
- <CAPOPQMB6eU0MYNewcq8HKsEMchwY-X3aT0Km9uULBappFWZcjQ@mail.gmail.com> <CA+EHjTz-R016BwhcptZ3xVQe+a8C7au6ZL8jwZANdTf=cXRZHQ@mail.gmail.com>
-In-Reply-To: <CA+EHjTz-R016BwhcptZ3xVQe+a8C7au6ZL8jwZANdTf=cXRZHQ@mail.gmail.com>
-From: Xuheng Li <xuheng@cs.columbia.edu>
-Date: Fri, 6 Nov 2026 17:17:54 +0000
-X-Gm-Features: AclHuK_9svrT6wKNkNHEsIMr6l5W7zWgD8S3IUtPesXe8MFok8Z1sXe3kPtMyT8
-Message-ID: <CAPOPQMCQfYWRDRvo4PPFW0RAyqNmns6TqS+QYE3-5SM_NFRMQQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] KVM: arm64: Don't replace a valid hyp block
- mapping with a table
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-        Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>, Joey Gouly <joey.gouly@arm.com>,
-        Steffen Eiden <seiden@linux.ibm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        vdonnefort@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Proofpoint-GUID: f37hN0StRnZeBM4fLTwkELHewzoLYESR
-X-Proofpoint-ORIG-GUID: f37hN0StRnZeBM4fLTwkELHewzoLYESR
-X-Authority-Analysis: v=2.4 cv=auUnmiZV c=1 sm=1 tr=0 ts=6aee0bd0 cx=c_pps
- a=g1v0Z557R90hA0UpD/5Yag==:117 a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=79PYxaXUQd1wl-QFWJnA:22
- a=uYC8CqauRjbKsmU2jI4A:9 a=QEXdDO2ut3YA:10 a=MFSWADHSvvjO3QEy5MdX:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA2MDA2OCBTYWx0ZWRfX5PCB/3bQsjYq
- rNwuW0DyIlI+RerhKCbFRyjD+7gfee65aU0CzisTP+UqoBZwtG71JnKAh5K0ORVZ0ZOVGQDa7aI
- gVltbcRaPk0rTUlNOQYCmYiyYbWftocnNsONfo5PE0zqrocSIPTx565EhTYP2OKzDvDpraVcvXL
- 8P6zCrQ/IObQ1qjCUD1Jjv6ENY1RFr8u4Z6Sd2AXPrhfHFvpYB6Tc2Rp32ybD8EtCC/xWbl4HaK
- NJpOxpHtTau+LvguKbFnhNR8WU3ZscoapQZWeicHqzAOaspyoT/xJ+HkHjIGYrM1IMo10LBUbBJ
- +bry6pRtLz49vLbJ29bEvdwk1bH9jnh5cn4r1oevjx8FWBFUk2nNC+vK3/W2ZHqTCeDnm6U/hGb
- mOG2KfCGPtdxNDw31PnYw+jfbtuwc1ubV1UCrIKe67y/4rC/8cKimLnlYioBtysZswQ8bfwFysz
- h5LrWpczwb67HQ21bLQ==
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA2MDA2OCBTYWx0ZWRfX2vdOXIziwJAu
- usvWPI36JHnD4NB/oTJEe7QA1NCUQwRu/PkPXVH/FKwz6JsS6+garjXSLm2elTO6P3VG0oPuiv8
- H9/t8Sc+4DgDSxSUseTRJsJzH8ZrEDL5NvQwc+mbupXYJzeWIsq7
-X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11958
- signatures=596817
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 malwarescore=0 bulkscore=10 suspectscore=0 phishscore=0
- priorityscore=1501 impostorscore=10 spamscore=0 lowpriorityscore=10
- clxscore=1015 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2611040001
- definitions=main-2611060068
 
-Hi Fuad, Vincent,
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue to consider:
+- [Medium] KVM: arm64: piecemeal sys_regs.c sharing and mixed PAuth/SVE
+  changes
+--
 
-On Fri, Nov 06, 2026 at 02:34:55PM +0000, Fuad Tabba wrote:
-> Actually, like Vincent pointed out, why the WARN_ON(). The caller can
-> just handle the error.
+commit 0c97a3ae40885547f256dfa51f22f3c444581c17
+Author: Steffen Eiden <seiden@linux.ibm.com>
 
-Makes sense, I'll drop the WARN_ON() and just return -EEXIST.
+KVM: arm64: Share system register code with s390
 
-One thing I noticed: the kernel-doc of kvm_pgtable_hyp_map() says that
-a mapping over an existing one is "rejected with an error and a
-WARN()", and the leaf case in hyp_map_walker_try_leaf() still warns.
-Without the WARN_ON(), the comment would no longer match this case.
-By the same reasoning, should the leaf case's WARN_ON() go too, in a
-separate patch, with the comment reduced to "rejected with an error"?
+This commit wraps selected pointer authentication, SVE, and system register
+helpers in arch/arm64/kvm/ with ARM64_S390_COMMON guards so they can be
+compiled into s390 KVM.
 
-Thanks,
-Xuheng
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 157bf4b812020..d83df5ff68f4a 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -366,6 +366,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+>  	kvm_arm_teardown_hypercalls(kvm);
+>  }
+> =20
+> +#if ARM64_S390_COMMON =3D=3D 1
+>  static bool kvm_has_full_ptr_auth(void)
+>  {
+>  	bool apa, gpa, api, gpi, apa3, gpa3;
+> @@ -400,6 +401,8 @@ static bool kvm_has_full_ptr_auth(void)
+>  		(apa + api + apa3) =3D=3D 1);
+>  }
+> =20
+> +#endif /* ARM64_S390_COMMON =3D=3D 1 */
+> +
+>  int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  {
+>  	int r;
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 878ea4500c5c5..26ec4751e17e2 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -307,12 +307,12 @@ static int set_core_reg(struct kvm_vcpu *vcpu, cons=
+t struct kvm_one_reg *reg)
+>  	return err;
+>  }
+> =20
+> -#endif /* ARM64_S390_COMMON =3D=3D 1 */
+> -
+>  #define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
+>  #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
+>  #define vq_present(vqs, vq) (!!((vqs)[vq_word(vq)] & vq_mask(vq)))
+> =20
+> +#endif /* ARM64_S390_COMMON =3D=3D 1 */
+
+[ ... ]
+
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index e71c1b169b491..fa1ed13daeb92 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+
+[ ... ]
+
+> @@ -3269,6 +3288,8 @@ static int set_imp_id_reg(struct kvm_vcpu *vcpu, co=
+nst struct sys_reg_desc *r,
+>  	.val =3D mask,					\
+>  	}
+> =20
+> +#endif /* ARM64_S390_COMMON =3D=3D 1 */
+> +
+>  static u64 reset_mdcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *=
+r)
+>  {
+>  	__vcpu_assign_sys_reg(vcpu, r->reg, vcpu->kvm->arch.nr_pmu_counters);
+
+[ ... ]
+
+> @@ -5416,6 +5440,7 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
+>  	return 1;
+>  }
+> =20
+> +#if ARM64_S390_COMMON =3D=3D 1
+>  static void reset_vm_ftr_id_reg(struct kvm_vcpu *vcpu, const struct sys_=
+reg_desc *reg)
+>  {
+>  	u32 id =3D reg_to_encoding(reg);
+
+[Severity: Medium]
+As reported by Marc Zyngier on v2 [1], why does this patch cherry-pick
+isolated helper blocks from arch/arm64/kvm/sys_regs.c instead of sharing the
+architectural system register code and sys_reg_descs[] table as a whole?
+
+Leaving sys_reg_descs[], kvm_reset_sys_regs(), kvm_handle_sys_reg(), and
+arm64_check_features() unshared causes commit "KVM: s390: arm64: Implement
+arm sysreg managing infrastructure" to duplicate the architectural system
+register table and core handling logic in arch/s390/kvm/arm64/sys_regs.c,
+which risks the two implementations diverging over time. Abstracting the
+underlying vCPU state accessors would allow reusing sys_regs.c and its
+descriptor tables directly.
+
+In addition, this commit bundles pointer authentication capability sharing =
+in
+arch/arm64/kvm/arm.c and SVE helper sharing in arch/arm64/kvm/guest.c into
+the same patch as the system register changes, rather than splitting them to
+match the corresponding s390 feature patches.
+
+[1] https://lore.kernel.org/r/87o6ehmkzz.wl-maz@kernel.org
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261106-sysreg-v3-=
+0-75e95980fb10@linux.ibm.com?part=3D8
