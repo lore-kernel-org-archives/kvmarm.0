@@ -1,66 +1,85 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793976635;
-	b=z+SmPZVeyAp0Sr3xPswku8QSo5ckkPDgkoJ+MlHt0WPXlX3wD0TvUtUEgk+ti4Jm5//0
-	 rDKaIJtO7yCbIlIRysSp8jvfWKgYvR5ow5V+v7Y4YuyOnrYdshaX6AME9pcNWva69lq8b
-	 xvMMX/GUfvo1lKxCkTQ2o2SBPcVQPapvx6rxVyb6+R3CY/J2J5X4013xorW0TZv3ZLrdV
-	 3vrT80RPxkaKRn8nC8CCLbeXdhTd8cYuqmzLzrxMhUy+odCSdjgwVInAckFkddTt5AwbA
-	 yXFXk8PKBSRCTYVJAHuihMTFIqmghic3mSngRG47+NUqVUsnNRFmunuEtbE7A593bcQ==
+	t=1793978503;
+	b=Dg2ucZgTVneAIeRqILxCWcgweCN8UaHuDQeov5ujtrR4w0r1apajfZ8xYkwYsJYbsuqc
+	 QVRp1A6LnH3UnO9HExUuL5XGdBBiRAsBdMRY20hKHqz02BDLwuq9a7UDwNct50QcBbelE
+	 x4gxv6f+YhbpFxl1wlTh3JgDSUQydl358jC6Sqpy/5JqtI3wq60nxQfSWi/KTmRerFrAG
+	 7wQ2pne8p9DZnMIPwZU5Fy/4nVqMgRcMwykaKG39BRsRZXb5mD6hHBuWX4KXtYcnsbL47
+	 sZStaSVgq9dMDwvK45eBbmjYQgEn5k4rD0MUlQOb2OBaTOe+0KOZq3HNk2tswwJrRRg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793976635;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=ps2TrxaS79teMaF6BMN9ujQO14w0v7Yx37uvkE9xR3M=;
-	b=NTmIGOM9Y/VRlgVxsRcHt9YHgmFfT91BgyU+KmkeKwBZf8RnJATFL3Y6H5lWehvlRjJH
-	 wm3V6JOl/5D0lUjmWqJspVyKfARJIlJzVyEOeYZYh7/OB+Z3CXavu2vhXkdkjUn+ep+7m
-	 vF0a9HftEpS1Xw1HSbH5vcYeCZYBON+k/ue+gcV4PnI5KQ30DVheK3m4QnPHCcYsxsRiP
-	 KYchLhvEfC0++K2MJsF3mgSDwlS+YepYG0qSkHvGHEpIK3MvkNAsNw7qAI9+5hhyJ4Il0
-	 k0p83GHLwmReGhEjS6QymtxaG8J0hrTUBhVCqx2PESXeBXJSd+U1FLIaIVZtUCjRnsA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793978503;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
+	bh=QlAJRLst9AJbwfYrhiuAcYHXrk5kiqZZ598/4vkmUAs=;
+	b=d6NN8fVMT7muTbPGjEN7IuD4+arWtHQNodPFw2b0RLGnxOdPNGYpoVskdrNdFWWmtHwP
+	 XkInWSkmK3Fm2yT39R/1DcpNBLpsRUKGWlSdkk3DzGoAUkQ0J7fOSck2QDvPTglUOVVKf
+	 yKm9aD+siIToxVmerCkUVScXA2UVKznEvkzXmJXZc8ev59bUNxZ/7wzd2sGpYxoTOOAV5
+	 u0Q0/gZ7Ohz1MQq7DCb2hYSjP6Paj+kXdL9246Eqz6Z9PGJLkduQCsaXAijs9+nY85IsI
+	 6ckUPMBCpFJ5yxTTfCLv2Suhrnn1zkA+CW/mq2QQmAglzH2OLHc9QJ2nhNbq4NIYNKA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=ZOAtWOJl;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=F0RruXBz;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1B8E606A32E
-	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 14:50:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C1B8E606A32E
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9CE7606D803
+	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 15:21:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E9CE7606D803
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=ZOAtWOJl
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=F0RruXBz
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C544D1682;
-	Fri,  6 Nov 2026 06:50:30 -0800 (PST)
-Received: from e143914.arm.com (e143914.arm.com [10.2.213.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 193893F673;
-	Fri,  6 Nov 2026 06:50:30 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 13A2014BF;
+	Fri,  6 Nov 2026 07:21:39 -0800 (PST)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B4D43F628;
+	Fri,  6 Nov 2026 07:21:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793976633; bh=wKkogkZawpShyolCOJBuV47t0bn62Bkew3r0Q9oxyR0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZOAtWOJlpTNtCuKtz66tt08d64iCeQfuEVwIVQC7lWcy737XIP56yq9xE1VpqFc/1
-	 C4f/acfNLamRSFf6rxWaR1arLqLMqkDUEoEPn6IBgdHR07oOuA5ST4hKDOHngOICHF
-	 oGmx4g4KgybXJBx/CbAb8wRYsNEcTZaAQH36Amhg=
-Date: Fri, 6 Nov 2026 14:50:28 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shuah Khan <shuah@kernel.org>, Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 06/16] KVM: arm64: selftests: Add protected-VM library
- helpers
-Message-ID: <au3pNFOMeIx2X4Dp@e143914.arm.com>
-References: <20261104084842.132944-1-fuad.tabba@linux.dev>
- <20261104084842.132944-7-fuad.tabba@linux.dev>
+	t=1793978502; bh=Iwz4s79vORMlYnpLiY8KAQnEt0Hrm46DNVXQpjoy090=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=F0RruXBzTZJNsivcNgD/k0rJtVLF4dj6Mu+wOS+gR2L2sR1V6FmZyqLXF3ROdeNwk
+	 vKRjBNJ57EXk8cfW1LFJa5ZkqXnxlBVANULfxXjatVoaU7QMH42OwVvjMzEP1mAdYN
+	 arHGHUemcV/jmvh6lTbk7nxcbmjR06nPG0TrTw2s=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	maz@kernel.org,
+	oupton@kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	corbet@lwn.net,
+	pbonzini@redhat.com,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	yangjinqian1@huawei.com,
+	caijian11@h-partners.com,
+	liuyonglong@huawei.com,
+	tangchengchang@huawei.com,
+	yezhenyu2@huawei.com,
+	yubihong@huawei.com,
+	linuxarm@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	fuad.tabba@linux.dev,
+	mark.rutland@arm.com,
+	seanjc@google.com,
+	rdunlap@infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	skhan@linuxfoundation.org
+Subject: Re: [PATCH v5 07/15] KVM: arm64: Add HDBSS per-vCPU buffer management
+Date: Fri,  6 Nov 2026 15:21:30 +0000
+Message-ID: <au3wekPW4sPUUVGm@LeoBrasDK>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <c80e143e-f899-4b86-94ad-f575c869d72b@huawei.com>
+References: <20260929103655.85107-1-zhengtian10@huawei.com> <20260929103655.85107-8-zhengtian10@huawei.com> <at-bm_p_MHU3GmYn@LeoBrasDK> <6e2d5b81-1ae9-476e-897c-f6dc7079565c@huawei.com> <auSuAAmzoND1sy4c@LeoBrasDK> <c80e143e-f899-4b86-94ad-f575c869d72b@huawei.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -72,350 +91,456 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261104084842.132944-7-fuad.tabba@linux.dev>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 04, 2026 at 08:48:32AM +0000, Fuad Tabba wrote:
-> A protected-VM test has to create the VM with the protected type and the
-> PSCI 0.2 vCPU feature, boot each vCPU through the trampoline from an
-> identity-mapped page, and have the guest share the ucall pool before its
-> first ucall. Secondaries start powered off for the guest to boot with
-> CPU_ON. A vCPU becomes a valid CPU_ON target only at its first KVM_RUN.
+On Fri, Nov 06, 2026 at 04:49:49PM +0800, Tian Zheng wrote:
 > 
-> Add lib/arm64/pkvm.c to do this for the tests.
-> pkvm_vcpu_setup_boot_secondary() runs a secondary once with
-> immediate_exit set, so that it becomes a CPU_ON target. The library also
-> has a run loop, an SMCCC call for the guest, and a reader of the
-> process's locked-memory count. The host adds a protected VM's pinned
-> pages to that count. No capability advertises pKVM, so pkvm_supported()
-> tries to create a protected VM.
 > 
-> Co-developed-by: Will Deacon <will@kernel.org>
-> Signed-off-by: Will Deacon <will@kernel.org>
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-
-One minor thing below, that could be addressed or not.
-
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-
-> ---
->  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
->  .../selftests/kvm/include/arm64/pkvm.h        |  24 ++
->  tools/testing/selftests/kvm/lib/arm64/pkvm.c  | 245 ++++++++++++++++++
->  3 files changed, 270 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/lib/arm64/pkvm.c
+> On 10/30/2026 10:47 PM, Leonardo Bras wrote:
+> > On Fri, Oct 30, 2026 at 11:47:20AM +0800, Tian Zheng wrote:
+> > > 
+> > > 
+> > > On 10/27/2026 2:27 AM, Leonardo Bras wrote:
+> > > > On Tue, Sep 29, 2026 at 06:36:47PM +0800, Tian Zheng wrote:
+> > > > > From: Eillon <yezhenyu2@huawei.com>
+> > > > > 
+> > > > > Each vCPU owns an HDBSS buffer, described by HDBSSBR_EL2 (base
+> > > > > address and encoded size) and advanced by HDBSSPROD_EL2 as hardware
+> > > > > appends entries. Tie the buffer lifetime to the vCPU: allocate at
+> > > > > vCPU creation, free at destruction. The buffer is allocated zeroed,
+> > > > > so a stale producer index can only ever observe invalid entries.
+> > > > > 
+> > > > > Registers are programmed whenever the vCPU owns a buffer, regardless
+> > > > > of whether HDBSS is enabled. The feature can be turned on
+> > > > > mid-KVM_RUN, and hardware dirty-state updates write to
+> > > > > HDBSSBR_EL2.BADDR without any fault, so the registers must already
+> > > > > be in place by then. HDBSSPROD_EL2 is preserved across context
+> > > > > switches and vCPU migration.
+> > > > > 
+> > > > > Two details: the buddy order is kept separate from the HDBSSBR_EL2.SZ
+> > > > > encoding, since the two only coincide on 4KB pages; and kvm_share_hyp()
+> > > > > is unwound in kvm_arch_vcpu_create() when the HDBSS allocation fails.
+> > > > 
+> > > > Out of curiosity: why can't we allocate the buffers when dirty-tracking
+> > > > starts? (and free them when it stops)
+> > > > 
+> > > > Since we have to request the vcpus to guest_exit, and enable
+> > > > VTCR_EL2{HA,HD,HDBSS}, we could as well allocate the buffers and set the
+> > > > HDBSSBR_EL2.BADDR. In case the buffer allocation fails, we could just not
+> > > > enable HDBSS, maybe.
+> > > > 
+> > > > Buffer allocation could happen before the VCPU request, for every vcpu, or
+> > > > during the vcpu request, so every vcpu allocates it's own buffer.
+> > > > 
+> > > > Am I missing something, or is it just to make things easier?
+> > > > 
+> > > 
+> > > Hi loe,
+> > > 
+> > > Yes, allocating the buffers at vCPU creation does make things simpler.
+> > > 
+> > > I'd rather follow the x86 PML and dirty ring scheme: allocate at vCPU
+> > > creation. This avoids partial enablement when an allocation fails mid-
+> > > broadcast, the use-after-free window when freeing at logging stop, and
+> > > naturally handles vCPU hotplug during logging.
+> > 
+> > Ah, I see.
+> > Well, the problem of partial enablement is gone if the requester tries to
+> > allocate all buffers for all vcpus, before requesting the vcpus to enable HDBSS.
+> > If one of them fails, then just don't request the vcpus to enable :)
+> > 
+> > As for the use after free: you can free the buffer at the vcpu request to
+> > disable the feature, making sure it's not using it when you free the
+> > buffer.
+> > 
+> > I agree that allocating at the creation of a vcpu is easier, but this can
+> > receive pushback as a VM will have to carry this buffers for it's whole
+> > lifetime, even though it may never use it.
+> > 
+> > I suggest we try allocating at vcpu creation should only if dirty-tracking
+> > is already happening, so we can enable the feature on the new vcpu.
+> > 
+> > I agree that x86 may have chosen to do that for a reason, but if we don't
+> > know the reason, or if it's not compelling for us, maybe we can just try
+> > doing something better.
+> > 
 > 
-> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-> index c254e82f9a786..e173a9adad3f2 100644
-> --- a/tools/testing/selftests/kvm/Makefile.kvm
-> +++ b/tools/testing/selftests/kvm/Makefile.kvm
-> @@ -34,6 +34,7 @@ LIBKVM_arm64 += lib/arm64/gic.c
->  LIBKVM_arm64 += lib/arm64/gic_v3.c
->  LIBKVM_arm64 += lib/arm64/gic_v3_its.c
->  LIBKVM_arm64 += lib/arm64/handlers.S
-> +LIBKVM_arm64 += lib/arm64/pkvm.c
->  LIBKVM_arm64 += lib/arm64/processor.c
->  LIBKVM_arm64 += lib/arm64/pvm-entry.S
->  LIBKVM_arm64 += lib/arm64/spinlock.c
-> diff --git a/tools/testing/selftests/kvm/include/arm64/pkvm.h b/tools/testing/selftests/kvm/include/arm64/pkvm.h
-> index 6ef769b8ff977..413c7ac4a9f16 100644
-> --- a/tools/testing/selftests/kvm/include/arm64/pkvm.h
-> +++ b/tools/testing/selftests/kvm/include/arm64/pkvm.h
-> @@ -9,6 +9,9 @@
->  #define SELFTEST_KVM_ARM64_PKVM_H
->  
->  #ifndef __ASSEMBLER__
-> +#include "kvm_util.h"
-> +#include "ucall_common.h"
-> +
->  /*
->   * Register state the boot trampoline (pvm-entry.S) restores. Only PC and X0
->   * survive to a protected guest's first run, so X0 points at this block.
-> @@ -27,6 +30,27 @@ struct pvm_boot_args {
->  	u64	tpidr_el1;
->  	u64	sp_el1;
->  };
-> +
-> +/* Memslot of the trampoline's page. Test memslots start above it. */
-> +#define PKVM_IDMAP_MEMSLOT	1
-> +
-> +bool pkvm_supported(void);
-> +struct kvm_vm *pkvm_vm_create(unsigned int nr_vcpus, u32 features, struct kvm_vcpu *vcpus[]);
-> +struct kvm_vm *pkvm_vm_create_with_one_vcpu(struct kvm_vcpu **vcpu, void *guest_code);
-> +
-> +/* Call after all register setup: later register writes don't reach the guest. */
-> +void pkvm_vcpu_setup_boot(struct kvm_vcpu *vcpu, void *guest_code);
-> +
-> +/* Call before the primary's first run. */
-> +gpa_t pkvm_vcpu_setup_boot_secondary(struct kvm_vcpu *vcpu, void *guest_code);
-> +gpa_t pkvm_idmap_gpa(struct kvm_vm *vm);
-> +
-> +void pkvm_run_loop(struct kvm_vcpu *vcpu, void (*on_sync)(struct kvm_vcpu *vcpu, struct ucall *uc));
-> +size_t pkvm_host_locked_vm(void);
-> +
-
-Could add a comment here:
-
-// Called from the guest
-
-As you have those 'Call' / contract comments above.
-
-> +unsigned long pkvm_hvc(u32 func, u64 arg0, u64 arg1, u64 arg2);
-> +
-> +void pkvm_guest_init(void);
->  #endif
->  
->  #define PVM_BOOT_ARGS_OFF_JUMP_TGT	0
-> diff --git a/tools/testing/selftests/kvm/lib/arm64/pkvm.c b/tools/testing/selftests/kvm/lib/arm64/pkvm.c
-> new file mode 100644
-> index 0000000000000..f2d4cf48966e8
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/lib/arm64/pkvm.c
-> @@ -0,0 +1,245 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Protected-VM support for the arm64 KVM selftest library.
-> + *
-> + * Copyright (C) 2025 Google LLC
-> + * Author: Fuad Tabba <fuad.tabba@linux.dev>
-> + * Author: Will Deacon <will@kernel.org>
-> + */
-> +
-> +#include <errno.h>
-> +
-> +#include <linux/arm-smccc.h>
-> +#include <linux/kernel.h>
-> +
-> +#include "kvm_util.h"
-> +#include "pkvm.h"
-> +#include "processor.h"
-> +#include "ucall_common.h"
-> +
-> +/* Set in the guest's copy only, by pkvm_vm_create(). */
-> +static gpa_t pkvm_ucall_pool_gpa;
-> +static size_t pkvm_ucall_pool_size;
-> +
-> +extern char pvm_entry_start[], pvm_entry_end[];
-> +
-> +#define ASSERT_BOOT_ARGS_OFF(field, off)				\
-> +	static_assert(offsetof(struct pvm_boot_args, field) == PVM_BOOT_ARGS_OFF_##off, #off)
-> +
-> +ASSERT_BOOT_ARGS_OFF(jump_tgt, JUMP_TGT);
-> +ASSERT_BOOT_ARGS_OFF(regs[0], X0);
-> +ASSERT_BOOT_ARGS_OFF(regs[1], X1);
-> +ASSERT_BOOT_ARGS_OFF(regs[2], X2);
-> +ASSERT_BOOT_ARGS_OFF(regs[3], X3);
-> +ASSERT_BOOT_ARGS_OFF(regs[4], X4);
-> +ASSERT_BOOT_ARGS_OFF(regs[5], X5);
-> +ASSERT_BOOT_ARGS_OFF(regs[6], X6);
-> +ASSERT_BOOT_ARGS_OFF(regs[7], X7);
-> +ASSERT_BOOT_ARGS_OFF(cpacr_el1, CPACR_EL1);
-> +ASSERT_BOOT_ARGS_OFF(sctlr_el1, SCTLR_EL1);
-> +ASSERT_BOOT_ARGS_OFF(tcr_el1, TCR_EL1);
-> +ASSERT_BOOT_ARGS_OFF(mair_el1, MAIR_EL1);
-> +ASSERT_BOOT_ARGS_OFF(ttbr0_el1, TTBR0_EL1);
-> +ASSERT_BOOT_ARGS_OFF(vbar_el1, VBAR_EL1);
-> +ASSERT_BOOT_ARGS_OFF(tpidr_el1, TPIDR_EL1);
-> +ASSERT_BOOT_ARGS_OFF(sp_el1, SP_EL1);
-> +
-> +unsigned long pkvm_hvc(u32 func, u64 arg0, u64 arg1, u64 arg2)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	smccc_hvc(func, arg0, arg1, arg2, 0, 0, 0, 0, &res);
-> +	return res.a0;
-> +}
-> +
-> +/* Shares whole granules, so pages next to the pool are shared with it. */
-> +void pkvm_guest_init(void)
-> +{
-> +	u64 granule = pkvm_hvc(ARM_SMCCC_VENDOR_HYP_KVM_HYP_MEMINFO_FUNC_ID, 0, 0, 0);
-> +	gpa_t end = pkvm_ucall_pool_gpa + pkvm_ucall_pool_size;
-> +	gpa_t gpa;
-> +
-> +	for (gpa = pkvm_ucall_pool_gpa & ~(granule - 1); gpa < end; gpa += granule)
-> +		GUEST_ASSERT_EQ(pkvm_hvc(ARM_SMCCC_VENDOR_HYP_KVM_MEM_SHARE_FUNC_ID, gpa, 0, 0), 0);
-> +}
-> +
-> +bool pkvm_supported(void)
-> +{
-> +	int kvm_fd, vm_fd;
-> +
-> +	kvm_fd = open_kvm_dev_path_or_exit();
-> +	vm_fd = __kvm_ioctl(kvm_fd, KVM_CREATE_VM, (void *)KVM_VM_TYPE_ARM_PROTECTED);
-> +
-> +	if (vm_fd >= 0)
-> +		close(vm_fd);
-> +	close(kvm_fd);
-> +
-> +	return vm_fd >= 0;
-> +}
-> +
-> +/*
-> + * The trampoline turns the MMU on, so it runs from an identity-mapped page:
-> + * the first guest page of a host page at the top of the IPA space.
-> + */
-> +gpa_t pkvm_idmap_gpa(struct kvm_vm *vm)
-> +{
-> +	unsigned int npages = vm_adjust_num_guest_pages(vm->mode, 1);
-> +
-> +	return (vm_compute_max_gfn(vm) + 1 - npages) * vm->page_size;
-> +}
-> +
-> +struct kvm_vm *pkvm_vm_create(unsigned int nr_vcpus, u32 features, struct kvm_vcpu *vcpus[])
-> +{
-> +	struct vm_shape shape = VM_SHAPE_DEFAULT;
-> +	struct kvm_vm *vm;
-> +	gpa_t idmap_gpa;
-> +	unsigned int i;
-> +
-> +	TEST_ASSERT(pvm_entry_end - pvm_entry_start +
-> +		    nr_vcpus * sizeof(struct pvm_boot_args) <= MIN_PAGE_SIZE,
-> +		    "trampoline and %u boot-args blocks overflow the idmap page", nr_vcpus);
-> +
-> +	shape.type = KVM_VM_TYPE_ARM_PROTECTED;
-> +	vm = __vm_create(shape, nr_vcpus, 0);
-> +
-> +	for (i = 0; i < nr_vcpus; i++) {
-> +		struct kvm_vcpu_init init;
-> +
-> +		kvm_get_default_vcpu_target(vm, &init);
-> +		init.features[0] |= features | BIT(KVM_ARM_VCPU_PSCI_0_2);
-> +		if (i > 0)
-> +			init.features[0] |= BIT(KVM_ARM_VCPU_POWER_OFF);
-> +
-> +		vcpus[i] = aarch64_vcpu_add(vm, i, &init, NULL);
-> +	}
-> +	kvm_arch_vm_finalize_vcpus(vm);
-> +
-> +	idmap_gpa = pkvm_idmap_gpa(vm);
-> +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, idmap_gpa, PKVM_IDMAP_MEMSLOT,
-> +				    vm_adjust_num_guest_pages(vm->mode, 1), 0);
-> +	memcpy(addr_gpa2hva(vm, idmap_gpa), pvm_entry_start, pvm_entry_end - pvm_entry_start);
-> +	virt_map(vm, idmap_gpa, idmap_gpa, 1);
-> +
-> +	vm_init_descriptor_tables(vm);
-> +	for (i = 0; i < nr_vcpus; i++) {
-> +		vcpu_set_reg(vcpus[i], ARM64_CORE_REG(regs.pc), idmap_gpa);
-> +		vcpu_init_descriptor_tables(vcpus[i]);
-> +	}
-> +
-> +	write_guest_global(vm, pkvm_ucall_pool_gpa, get_ucall_pool_gpa(vm));
-> +	write_guest_global(vm, pkvm_ucall_pool_size,
-> +			   ucall_nr_pages_required(vm->page_size) * vm->page_size);
-> +
-> +	return vm;
-> +}
-> +
-> +/* Every block must be written before the primary's first run, when the host donates the page. */
-> +static gpa_t pkvm_boot_args_gpa(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_vm *vm = vcpu->vm;
-> +
-> +	return pkvm_idmap_gpa(vm) + vm->page_size - (vcpu->id + 1) * sizeof(struct pvm_boot_args);
-> +}
-> +
-> +static void pkvm_snapshot_boot_args(struct kvm_vcpu *vcpu, void *guest_code)
-> +{
-> +	struct pvm_boot_args *args = addr_gpa2hva(vcpu->vm, pkvm_boot_args_gpa(vcpu));
-> +	int i;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(args->regs); i++)
-> +		args->regs[i] = vcpu_get_reg(vcpu, ARM64_CORE_REG(regs.regs[i]));
-> +
-> +	args->jump_tgt  = (u64)guest_code;
-> +	args->cpacr_el1 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_CPACR_EL1));
-> +	args->sctlr_el1 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL1));
-> +	args->tcr_el1   = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL1));
-> +	args->mair_el1  = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MAIR_EL1));
-> +	args->ttbr0_el1 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TTBR0_EL1));
-> +	args->vbar_el1  = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VBAR_EL1));
-> +	args->tpidr_el1 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TPIDR_EL1));
-> +	args->sp_el1    = vcpu_get_reg(vcpu, ARM64_CORE_REG(sp_el1));
-> +}
-> +
-> +void pkvm_vcpu_setup_boot(struct kvm_vcpu *vcpu, void *guest_code)
-> +{
-> +	pkvm_snapshot_boot_args(vcpu, guest_code);
-> +	vcpu_set_reg(vcpu, ARM64_CORE_REG(regs.regs[0]), pkvm_boot_args_gpa(vcpu));
-> +}
-> +
-> +gpa_t pkvm_vcpu_setup_boot_secondary(struct kvm_vcpu *vcpu, void *guest_code)
-> +{
-> +	int ret;
-> +
-> +	pkvm_snapshot_boot_args(vcpu, guest_code);
-> +
-> +	/*
-> +	 * A guest's CPU_ON requires the target's hyp vCPU, which KVM_RUN creates.
-> +	 * With immediate_exit set, KVM_RUN returns before the vCPU runs.
-> +	 */
-> +	vcpu->run->immediate_exit = 1;
-> +	ret = __vcpu_run(vcpu);
-> +	vcpu->run->immediate_exit = 0;
-> +	TEST_ASSERT(ret == -1 && errno == EINTR,
-> +		    "secondary hyp-vCPU registration: rc %d errno %d", ret, errno);
-> +
-> +	return pkvm_boot_args_gpa(vcpu);
-> +}
-> +
-> +struct kvm_vm *pkvm_vm_create_with_one_vcpu(struct kvm_vcpu **vcpu, void *guest_code)
-> +{
-> +	struct kvm_vm *vm = pkvm_vm_create(1, 0, vcpu);
-> +
-> +	pkvm_vcpu_setup_boot(*vcpu, guest_code);
-> +	return vm;
-> +}
-> +
-> +void pkvm_run_loop(struct kvm_vcpu *vcpu, void (*on_sync)(struct kvm_vcpu *vcpu, struct ucall *uc))
-> +{
-> +	bool done = false;
-> +	struct ucall uc;
-> +
-> +	while (!done) {
-> +		u64 cmd;
-> +
-> +		vcpu_run(vcpu);
-> +
-> +		switch (cmd = get_ucall(vcpu, &uc)) {
-> +		case UCALL_SYNC:
-> +			if (on_sync)
-> +				on_sync(vcpu, &uc);
-> +			break;
-> +		case UCALL_DONE:
-> +			done = true;
-> +			break;
-> +		case UCALL_ABORT:
-> +			REPORT_GUEST_ASSERT(uc);
-> +			break;
-> +		case UCALL_PRINTF:
-> +			REPORT_GUEST_PRINTF(uc);
-> +			break;
-> +		default:
-> +			TEST_FAIL("Unexpected guest exit: ucall %lu, arg %lu", cmd, uc.args[1]);
-> +		}
-> +	}
-> +}
-> +
-> +/* Bytes the current process has locked, per RLIMIT_MEMLOCK accounting. */
-> +size_t pkvm_host_locked_vm(void)
-> +{
-> +	size_t size = 0, locked_kb = 0;
-> +	char *line = NULL;
-> +	FILE *f;
-> +
-> +	f = fopen("/proc/self/status", "r");
-> +	TEST_ASSERT(f, "fopen /proc/self/status");
-> +
-> +	while (getline(&line, &size, f) > 0) {
-> +		if (sscanf(line, "VmLck:\t%zu kB", &locked_kb) == 1)
-> +			break;
-> +	}
-> +
-> +	free(line);
-> +	fclose(f);
-> +
-> +	return locked_kb << 10;
-> +}
-> -- 
-> 2.47.3
+> Hi Leo,
 > 
+> Thanks for giving this suggestion. I think it's useful. x86's PML only
+> occupies 4KB per vCPU, so its memory overhead is controllable. But ours
+> can occupy up to 2MB, which is wasteful.
+> 
+> Therefore, we keep allocating the HDBSS buffer when creating a vCPU if
+> HDBSS is enabled (this is for vCPU hotplug). For normal vCPUs, we keep
+> allocating HDBSS buffers when enabling HDBSS, and destroy them when
+> disabling HDBSS or destroying the vCPU.
+> 
+> I think it works and can save memory. What do you think about this?
+
+Yeap, that's what I suggested :)
+
+> 
+> > > 
+> > > > > 
+> > > > > Signed-off-by: Eillon <yezhenyu2@huawei.com>
+> > > > > Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+> > > > > ---
+> > > > >    arch/arm64/include/asm/kvm_dirty_bit.h | 28 +++++++++++++
+> > > > >    arch/arm64/include/asm/kvm_host.h      | 13 ++++++
+> > > > >    arch/arm64/include/asm/sysreg.h        |  9 +++++
+> > > > >    arch/arm64/kvm/Makefile                |  1 +
+> > > > >    arch/arm64/kvm/arm.c                   | 14 ++++++-
+> > > > >    arch/arm64/kvm/dirty_bit.c             | 55 ++++++++++++++++++++++++++
+> > > > >    arch/arm64/kvm/hyp/vhe/switch.c        | 17 ++++++++
+> > > > >    arch/arm64/kvm/reset.c                 |  3 ++
+> > > > >    8 files changed, 138 insertions(+), 2 deletions(-)
+> > > > >    create mode 100644 arch/arm64/include/asm/kvm_dirty_bit.h
+> > > > >    create mode 100644 arch/arm64/kvm/dirty_bit.c
+> > > > > 
+> > > > > diff --git a/arch/arm64/include/asm/kvm_dirty_bit.h b/arch/arm64/include/asm/kvm_dirty_bit.h
+> > > > > new file mode 100644
+> > > > > index 000000000000..fe703f02626b
+> > > > > --- /dev/null
+> > > > > +++ b/arch/arm64/include/asm/kvm_dirty_bit.h
+> > > > > @@ -0,0 +1,28 @@
+> > > > > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > > > > +/*
+> > > > > + * Per-vCPU buffer management for HDBSS-based dirty page tracking.
+> > > > > + *
+> > > > > + * Copyright (C) 2026 Huawei Technologies Co., Ltd
+> > > > > + * Author: Tian Zheng <zhengtian10@huawei.com>
+> > > > > + */
+> > > > > +
+> > > > > +#ifndef __ARM64_KVM_DIRTY_BIT_H__
+> > > > > +#define __ARM64_KVM_DIRTY_BIT_H__
+> > > > > +
+> > > > > +#include <asm/kvm_pgtable.h>
+> > > > > +#include <asm/sysreg.h>
+> > > > > +#include <linux/sizes.h>
+> > > > > +
+> > > > > +#define KVM_ARM_HDBSS_DEFAULT_SIZE  PAGE_SIZE
+> > > > > +#define KVM_ARM_HDBSS_MAX_SIZE      SZ_2M
+> > > > > +
+> > > > > +/* 0 means unconfigured, fall back to one page per vCPU. */
+> > > > > +static inline u32 kvm_hdbss_buffer_size(struct kvm *kvm)
+> > > > > +{
+> > > > > +	return kvm->arch.hdbss_buffer_size ?: KVM_ARM_HDBSS_DEFAULT_SIZE;
+> > > > > +}
+> > > > 
+> > > > Why not set arch.hdbss_buffer_size to KVM_ARM_HDBSS_DEFAULT_SIZE at start,
+> > > > instead of testing it here like this?
+> > > > 
+> > > 
+> > > The size is set by userspace via ioctl, and we don't allow it to
+> > > be set twice:
+> > > 
+> > > ```
+> > > if (kvm->created_vcpus) {
+> > > 	r = -EINVAL;
+> > > } else if (kvm->arch.hdbss_buffer_size) {
+> > > 	r = -EBUSY;
+> > > } else {
+> > > 	kvm->arch.hdbss_buffer_size = size;
+> > > }
+> > > ```
+> > > 
+> > > If we pre-fill the default at VM creation, hdbss_buffer_size is
+> > > always non-zero and the -EBUSY branch would reject every attempt
+> > > to set a size. The same 0 sentinel also gates the dirty-ring
+> > > enable (a configured size conflicts with the ring), so it has to
+> > > mean "not configured".
+> > > 
+> > 
+> > It looks like there is a reason for us not to set the size more than
+> > once. I have not figured it yet, do you mind sharing?
+> > 
+> > I ask because effectively what we are having here is the same effect:
+> > kvm_hdbss_buffer_size() may return two different values depending on the
+> > IOCTL being ran or not. So for it's users does it look like the expected
+> > value changed mid way.
+> > 
+> > What I am trying to understand: is it safe for us to change the perceived
+> > value once? (default -> whatever the user sets) In which scenario is it
+> > safe?
+> > 
+> > In that case, can't we just allow that change to happen in that scenario,
+> > instead of having a proxy function to return the ring size?
+> > 
+> > 
+> 
+> The size affects the dirty-ring reservation: when the ring is enabled, it
+> reserves entries for the HDBSS buffer. Once the ring is allocated with that
+> reservation, changing the HDBSS size would make the two inconsistent, and
+> matching them dynamically isn't practical.
+> 
+
+Right, if it's just that, let's allow the buffer size to be set as long as 
+no buffer is allocated then. I mean, not allowed to change buffer size if 
+dirty-tracking is on. 
+
+> In practice a larger buffer doesn't provide much benefit either: the buffer
+> is flushed on every VM exit, so it rarely fills up.
+
+It depends very much on the workload running in the VM, some VMs can 
+benefit of larger buffers. If the workload is having very intensive memory 
+activity, having a 2MB buffer instead of a 4k buffer means taking up to 
+512x less faults.
+
+> Setting it once, before
+> the ring is allocated, is the simplest correct option.
+
+Before the buffer is allocated: fully agree.
+
+My point is that it looks weird to have a "can only be set once" scenario.
+I suggest we try the "only set the buffers are allocated, or in process of 
+being allocated".
+
+Which, in the scenario above discussed, could be anytime dirty-tracking is 
+disabled.
+
+On the other hand, if your strategy for dirty-ring is to have the number of 
+buffer entries being reserved in kvm's dirty-ring array, then we have (for 
+dirty-ring) to disable setting the size once we allocate the dirty-ring 
+buffer, which happens when we create the first vcpu, IIRC.
+
+> 
+> > > > > +
+> > > > > +int kvm_arm_vcpu_alloc_hdbss(struct kvm_vcpu *vcpu);
+> > > > > +void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu);
+> > > > > +
+> > > > > +#endif /* __ARM64_KVM_DIRTY_BIT_H__ */
+> > > > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > > > index 86a4d6e50934..c8fc29f3db75 100644
+> > > > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > > > @@ -425,6 +425,9 @@ struct kvm_arch {
+> > > > >    	 */
+> > > > >    	struct kvm_protected_vm pkvm;
+> > > > > 
+> > > > > +	/* HDBSS: per-VM buffer size in bytes (0 = not configured, use default) */
+> > > > > +	u32 hdbss_buffer_size;
+> > > > > +
+> > > > >    #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
+> > > > >    	/* Nested virtualization info */
+> > > > >    	struct dentry *debugfs_nv_dentry;
+> > > > > @@ -844,6 +847,13 @@ struct vcpu_reset_state {
+> > > > >    	bool		reset;
+> > > > >    };
+> > > > > 
+> > > > > +struct vcpu_hdbss_state {
+> > > > > +	struct page *hdbss_pg;		/* HDBSS buffer */
+> > > > > +	u64 hdbssbr_el2;		/* programmed into the CPU on load */
+> > > > > +	u64 hdbssprod_el2;		/* producer index, saved on put */
+> > > > > +	unsigned int buddy_order;	/* allocation order for __free_pages() */
+> > > > > +};
+> > > > > +
+> > > > >    struct vncr_tlb;
+> > > > > 
+> > > > >    struct kvm_vcpu_arch {
+> > > > > @@ -951,6 +961,9 @@ struct kvm_vcpu_arch {
+> > > > > 
+> > > > >    	/* Hyp-readable copy of kvm_vcpu::pid */
+> > > > >    	pid_t pid;
+> > > > > +
+> > > > > +	/* HDBSS buffer state */
+> > > > > +	struct vcpu_hdbss_state hdbss;
+> > > > >    };
+> > > > > 
+> > > > >    /*
+> > > > > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > > > > index 7aa08d59d494..7c71560b57e4 100644
+> > > > > --- a/arch/arm64/include/asm/sysreg.h
+> > > > > +++ b/arch/arm64/include/asm/sysreg.h
+> > > > > @@ -1039,6 +1039,15 @@
+> > > > > 
+> > > > >    #define GCS_CAP(x)	((((unsigned long)x) & GCS_CAP_ADDR_MASK) | \
+> > > > >    					       GCS_CAP_VALID_TOKEN)
+> > > > > +
+> > > > > +/*
+> > > > > + * Definitions for the HDBSS feature
+> > > > > + */
+> > > > > +#define HDBSSBR_EL2(baddr, sz)	(((baddr) & HDBSSBR_EL2_BADDR_MASK) | \
+> > > > > +				 FIELD_PREP(HDBSSBR_EL2_SZ_MASK, sz))
+> > > > > +
+> > > > > +#define HDBSSPROD_IDX(prod)	FIELD_GET(HDBSSPROD_EL2_INDEX_MASK, prod)
+> > > > > +
+> > > > >    /*
+> > > > >     * Definitions for GICv5 instructions
+> > > > >     */
+> > > > > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> > > > > index 59612d2f277c..ec2749af64fa 100644
+> > > > > --- a/arch/arm64/kvm/Makefile
+> > > > > +++ b/arch/arm64/kvm/Makefile
+> > > > > @@ -18,6 +18,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+> > > > >    	 guest.o debug.o reset.o sys_regs.o stacktrace.o \
+> > > > >    	 vgic-sys-reg-v3.o fpsimd.o pkvm.o \
+> > > > >    	 arch_timer.o trng.o vmid.o emulate-nested.o nested.o at.o \
+> > > > > +	 dirty_bit.o \
+> > > > >    	 vgic/vgic.o vgic/vgic-init.o \
+> > > > >    	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
+> > > > >    	 vgic/vgic-v3.o vgic/vgic-v4.o \
+> > > > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > > > index d9ad765943d9..5ea4ac26995e 100644
+> > > > > --- a/arch/arm64/kvm/arm.c
+> > > > > +++ b/arch/arm64/kvm/arm.c
+> > > > > @@ -36,6 +36,7 @@
+> > > > >    #include <asm/virt.h>
+> > > > >    #include <asm/kvm_arm.h>
+> > > > >    #include <asm/kvm_asm.h>
+> > > > > +#include <asm/kvm_dirty_bit.h>
+> > > > >    #include <asm/kvm_emulate.h>
+> > > > >    #include <asm/kvm_hyp.h>
+> > > > >    #include <asm/kvm_mmu.h>
+> > > > > @@ -580,10 +581,19 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+> > > > >    	}
+> > > > > 
+> > > > >    	err = kvm_share_hyp(vcpu, vcpu + 1);
+> > > > > -	if (err)
+> > > > > +	if (err) {
+> > > > >    		kvm_vgic_vcpu_destroy(vcpu);
+> > > > > +		return err;
+> > > > > +	}
+> > > > > 
+> > > > > -	return err;
+> > > > > +	err = kvm_arm_vcpu_alloc_hdbss(vcpu);
+> > > > > +	if (err) {
+> > > > > +		kvm_unshare_hyp(vcpu, vcpu + 1);
+> > > > > +		kvm_vgic_vcpu_destroy(vcpu);
+> > > > > +		return err;
+> > > > > +	}
+> > > > > +
+> > > > > +	return 0;
+> > > > >    }
+> > > > > 
+> > > > >    void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+> > > > > diff --git a/arch/arm64/kvm/dirty_bit.c b/arch/arm64/kvm/dirty_bit.c
+> > > > > new file mode 100644
+> > > > > index 000000000000..f9aeb9f34ad0
+> > > > > --- /dev/null
+> > > > > +++ b/arch/arm64/kvm/dirty_bit.c
+> > > > > @@ -0,0 +1,55 @@
+> > > > > +// SPDX-License-Identifier: GPL-2.0-only
+> > > > > +/*
+> > > > > + * Per-vCPU HDBSS buffer management.
+> > > > > + *
+> > > > > + * Copyright (C) 2026 Huawei Technologies Co., Ltd
+> > > > > + * Author: Tian Zheng <zhengtian10@huawei.com>
+> > > > > + */
+> > > > > +
+> > > > > +#include <asm/kvm_dirty_bit.h>
+> > > > > +#include <asm/kvm_mmu.h>
+> > > > > +#include <asm/sysreg.h>
+> > > > > +#include <linux/gfp.h>
+> > > > > +#include <linux/kconfig.h>
+> > > > > +#include <linux/log2.h>
+> > > > > +#include <linux/mm.h>
+> > > > > +
+> > > > > +int kvm_arm_vcpu_alloc_hdbss(struct kvm_vcpu *vcpu)
+> > > > > +{
+> > > > > +	struct page *hdbss_pg;
+> > > > > +	u32 size;
+> > > > > +	unsigned int buddy_order;
+> > > > > +	u32 sz_encoded;
+> > > > > +
+> > > > > +	if (vcpu->arch.hdbss.hdbss_pg || !system_supports_hdbss())
+> > > > > +		return 0;
+> > > > > +
+> > > > > +	size = kvm_hdbss_buffer_size(vcpu->kvm);
+> > > > > +
+> > > > > +	buddy_order = get_order(size);
+> > > > > +	sz_encoded = ilog2(size) - 12;
+> > > > > +
+> > > > > +	hdbss_pg = alloc_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO, buddy_order);
+> > > > > +	if (!hdbss_pg)
+> > > > > +		return -ENOMEM;
+> > > > > +
+> > > > > +	vcpu->arch.hdbss = (struct vcpu_hdbss_state) {
+> > > > > +		.hdbss_pg = hdbss_pg,
+> > > > > +		.hdbssbr_el2 = HDBSSBR_EL2(page_to_phys(hdbss_pg), sz_encoded),
+> > > > > +		.hdbssprod_el2 = 0,
+> > > > > +		.buddy_order = buddy_order,
+> > > > > +	};
+> > > > > +
+> > > > > +	return 0;
+> > > > > +}
+> > > > > +
+> > > > > +void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu)
+> > > > > +{
+> > > > > +	if (!vcpu->arch.hdbss.hdbss_pg)
+> > > > > +		return;
+> > > > > +
+> > > > > +	__free_pages(vcpu->arch.hdbss.hdbss_pg, vcpu->arch.hdbss.buddy_order);
+> > > > > +
+> > > > > +	vcpu->arch.hdbss.hdbss_pg = NULL;
+> > > > > +	vcpu->arch.hdbss.hdbssbr_el2 = 0;
+> > > > > +}
+> > > > > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > > > > index 7875911c0506..922fc9260e11 100644
+> > > > > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > > > > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > > > > @@ -19,6 +19,7 @@
+> > > > >    #include <asm/cpufeature.h>
+> > > > >    #include <asm/kprobes.h>
+> > > > >    #include <asm/kvm_asm.h>
+> > > > > +#include <asm/kvm_dirty_bit.h>
+> > > > >    #include <asm/kvm_emulate.h>
+> > > > >    #include <asm/kvm_hyp.h>
+> > > > >    #include <asm/kvm_mmu.h>
+> > > > > @@ -219,6 +220,17 @@ static void __vcpu_put_deactivate_traps(struct kvm_vcpu *vcpu)
+> > > > >    	local_irq_restore(flags);
+> > > > >    }
+> > > > > 
+> > > > > +static void __load_hdbss(struct kvm_vcpu *vcpu)
+> > > > > +{
+> > > > > +	if (!vcpu->arch.hdbss.hdbss_pg)
+> > > > > +		return;
+> > > > > +
+> > > > > +	write_sysreg_s(vcpu->arch.hdbss.hdbssbr_el2, SYS_HDBSSBR_EL2);
+> > > > > +	write_sysreg_s(vcpu->arch.hdbss.hdbssprod_el2, SYS_HDBSSPROD_EL2);
+> > > > > +
+> > > > > +	isb();
+> > > > > +}
+> > > > > +
+> > > > >    void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu)
+> > > > >    {
+> > > > >    	host_data_ptr(host_ctxt)->__hyp_running_vcpu = vcpu;
+> > > > > @@ -226,10 +238,15 @@ void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu)
+> > > > >    	__vcpu_load_switch_sysregs(vcpu);
+> > > > >    	__vcpu_load_activate_traps(vcpu);
+> > > > >    	__load_stage2(vcpu->arch.hw_mmu);
+> > > > > +	__load_hdbss(vcpu);
+> > > > >    }
+> > > > > 
+> > > > >    void kvm_vcpu_put_vhe(struct kvm_vcpu *vcpu)
+> > > > >    {
+> > > > > +	/* Saved under the same ownership condition as __load_hdbss(). */
+> > > > > +	if (vcpu->arch.hdbss.hdbss_pg)
+> > > > > +		vcpu->arch.hdbss.hdbssprod_el2 = read_sysreg_s(SYS_HDBSSPROD_EL2);
+> > > > 
+> > > > Above suggestion would need you to reload HDBSSBR_EL2 as well.
+> > > > 
+> > > 
+> > > Right, that reload is part of the ordering obligation above.
+> > > 
+> > > I think keeping the allocation at vCPU creation is simpler, but
+> > > let me know what you think.
+> > > 
+> > 
+> > I fully agree it's simpler, but we have to carry those per-cpu buffers
+> > (that can go up to 2M each) for the whole life of the VM, which can be a
+> > lot on a big VM.
+> > 
+> > That being said, I'm not against it. But I think we should resort to it
+> > only if we have a compelling reason not to allocate/free on demand.
+> > 
+> > What do you think?
+> > 
+> > Thanks!
+> > Leo
+> 
+> Yes, I agree. My answer is the same as the one below.
+> 
+
+Awesome, thanks for the discussion!
+Leo
