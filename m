@@ -1,85 +1,110 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793979462;
-	b=W+i4I5qITBbnfpBX016W3KAzFsT2/I9fDZc5D8Y/4sFGuEn+JQdcWco31VWp57swXnBn
-	 JCqrMar83+bKy7vXSviFnP3qgubIei1Ka/mFAoTAHSkoGhX5/Ka1J993FiIdq7zv2DBld
-	 uVXeuXJfHOpL7WZLPs26I5iqjnuAVxWCVvjMcrVLh3Iq7JqL5M/8eiekYb0zUDxtFgVqL
-	 1DwsrBqFPsq20QBqEJisaETsqpZgdJTAfh0MTz83mPqoJlXJQhg4mwkgsJFKTCb7/bmdV
-	 9Tlj2FmqJoV6tP6RXnmy0Rf1m/mJoIdgD9A7HmbvtNbE266sI94gLcHt9hkHl+2UP3A==
+	t=1793979951;
+	b=cmHwUTXFa2g8OX3Zcd8QWfCHvP8Q8vctzDmY1w+kKO0UZDC71KDh9E1IYcRcjfGhbhwd
+	 yQi01ayzohLMYQSyykjlvZ/Ovp5B+y0M6RUWw5SlE5HW/0ZyJVvA2AyjqXWdE5JFjs5MO
+	 ELINClAgEFoWKmbOQZzSd3HXUX6yY9chdzRXlDDwBDbULlQHBkWCnojQeinTXRMaPxd8c
+	 RRLLmuxZI3UlOlk0qiWal6B7VHeRJE2U90hcZvamfWsGArm2eMxNaUvfXwl5L1BqLMtaD
+	 Iq0Ag+ZL17XZawGZGpUOnnYoNiBCG1VUYX8a0rBmEZfS8dGRkgm0MFCIt+uKEYghfIg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793979462;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
-	bh=HuObySZLDxE9+LLAkaqrBSP5vceAa33bCHj1KNG2i7A=;
-	b=JWcH6wqDZ/NzCC25165e/E6cuju2o7qgVSfKAN/boc71EuLuFeZ4yoCC30AZ1IYP7VUb
-	 HEB4scrPTeHze/A21bpSdM6krpmQYsjBy5S5CycvyAqwMUF2FcyVJaDLKJLrM1zZ7qxKV
-	 PawYcSQtAyd68Vlj3eO6UG44zAagINJrKpv+2vjzuzCLzwtuvti19N0ke/e36SESYB9PN
-	 i+iaKxlVewH6buzVNjWdVxOQhvYQyxwZ/81n4pYZT5Fa7upTl6+d6wE9DPJX00wyAV4o4
-	 KRlmldXMWY2nLGG8pa5KC2vXamtl9COYy/0FnSrpjQtZ1dScy8vw9n/j3dWgo8F71qA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793979951;
+	h=Received:DKIM-Signature:X-Mailer:From:To:Cc:Subject:In-Reply-To:
+	 References:Date:Message-ID:MIME-Version:Content-Type;
+	bh=Sf7jpXPq+wp6SBfVuD5VhfW8K2K7PrL3pzRu30lk/Qs=;
+	b=t27Nu6A4dSRstJ2ekZeqCVyEvHldmsoFWbvoTg7/G1cQWZGlYU1LJ20ysML27/six1kx
+	 p8Z1G2xe7BkCvfOLYLaWEsdk7W5T+HtJFcMGWUhwvrwtdqyupVSJCE+DVZiKCQOAFRN+K
+	 d7lgcsa39gU1hGl/rgR5bgxOiCVQ9LlmgUD3Vk/NcQDtFhAuXfkvKbsyqxpb/NQV+5WJF
+	 zB0XxL8C7Jf8jIC10FnLpX+lLjTebst3AlGcfyI7punLCOse6ayCubasqmWdKZTp9JfH8
+	 itDVk1eemmDQN7dB09x3WJ/oVB0PElknFKRSKQFx5i62ZB3bTZc2aBfBMxzRPw+QawQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=llAlWz7x;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 094EF606D821
-	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 15:37:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 094EF606D821
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NHfHZnPS;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F30606A329;
+	Fri,  6 Nov 2026 15:45:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=llAlWz7x
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 475C81650;
-	Fri,  6 Nov 2026 07:37:38 -0800 (PST)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 113BC3F632;
-	Fri,  6 Nov 2026 07:37:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793979461; bh=qXWXkuBVBxZ9xT4eUDdfxaF2UuiBGoMjIIlVYYrkttg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=llAlWz7xlnBHxmmVTz87IEUBT+U3kyH9YObDETp6fosKhKB5oJhxN2dhuPXDLEEsX
-	 DVL7yW5Oevy7iKyPxCGohG1kCXByNMZVwjct//ZIvQOmSyP2HF+mq413aZkhu0GgXL
-	 wbI2QCexMI+/E09pwLD219X0IgawLZpU1REqS810=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	maz@kernel.org,
-	oupton@kernel.org,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	corbet@lwn.net,
-	pbonzini@redhat.com,
-	yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com,
-	yangjinqian1@huawei.com,
-	caijian11@h-partners.com,
-	liuyonglong@huawei.com,
-	tangchengchang@huawei.com,
-	yezhenyu2@huawei.com,
-	yubihong@huawei.com,
-	linuxarm@huawei.com,
-	joey.gouly@arm.com,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NHfHZnPS
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC1B21F008A1;
+	Fri,  6 Nov 2026 15:45:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793979950;
+	bh=Sf7jpXPq+wp6SBfVuD5VhfW8K2K7PrL3pzRu30lk/Qs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=NHfHZnPSDSHLthC28xmc7Tynk3g3EuBVtAtF3YePrjls2avEgiFGihXMqKalL6SYK
+	 SeJfbKbhS1SHWhGP9tCN6jALT7jREvu0x9m17dhcE0oLL42alVk0H4Ve6UWnQsZ17V
+	 pOd3zRki1UcQZ29EAFK0E5v9T4pzWtOa2Z1QlBdeIUapAvd2pzBNLlIfkVE6aLRurr
+	 uq5rcOkbHr9280TJ3ts+7TSC30ovRao2lHyLtEiO9tHldNoUeF0owFJmmy9pFG8jCG
+	 5cQRmxsKh588fJfaFewhWE1XgoaoMSVyjoOt6yV+WAzO5GfLn/FYQd7wPywABOqUIP
+	 iCRRMFk+OTbyQ==
+X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-coco@lists.linux.dev,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Baoquan He <baoquan.he@linux.dev>,
+	Mike Rapoport <rppt@kernel.org>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Pratyush Yadav <pratyush@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christian =?utf-8?Q?K=C3=B6nig?= <christian.koenig@amd.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Joerg Roedel <joro@8bytes.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Benjamin Gaignard <benjamin.gaignard@collabora.com>,
+	Brian Starkey <Brian.Starkey@arm.com>,
+	John Stultz <jstultz@google.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Radu Rendec <radu@rendec.net>,
+	"T.J. Mercier" <tjmercier@google.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <chleroy@kernel.org>,
+	Ritesh Harjani <ritesh.list@gmail.com>,
+	Shrikanth Hegde <sshegde@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Kiryl Shutsemau <kas@kernel.org>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	"K . Y . Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+	linaro-mm-sig@lists.linaro.org,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	fuad.tabba@linux.dev,
-	mark.rutland@arm.com,
-	seanjc@google.com,
-	rdunlap@infradead.org,
-	linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	skhan@linuxfoundation.org
-Subject: Re: [PATCH v5 13/15] KVM: arm64: Add HDBSS buffer size ioctl for dirty-bitmap mode
-Date: Fri,  6 Nov 2026 15:37:33 +0000
-Message-ID: <au30PSHX_UBIIx_Y@LeoBrasDK>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <5a096cca-713a-4449-83dc-c763dc06c085@huawei.com>
-References: <20260929103655.85107-1-zhengtian10@huawei.com> <20260929103655.85107-14-zhengtian10@huawei.com> <auioRICO9Frhk-zT@LeoBrasDK> <5a096cca-713a-4449-83dc-c763dc06c085@huawei.com>
+	linux-media@vger.kernel.org, linux-mm@kvack.org,
+	kvmarm@lists.linux.dev, patches@lists.linux.dev
+Subject: Re: [PATCH v9 14/14] irqchip/gic-v3-its: Preallocate VPE L1 tables
+In-Reply-To: <86zevn1c9a.wl-maz@kernel.org>
+References: <20261104164555.3555725-1-aneesh.kumar@kernel.org>
+ <20261104164555.3555725-15-aneesh.kumar@kernel.org>
+ <86zevn1c9a.wl-maz@kernel.org>
+Date: Fri, 06 Nov 2026 21:15:29 +0530
+Message-ID: <yq5ah5huoteu.fsf@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -89,107 +114,42 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Fri, Nov 06, 2026 at 06:27:27PM +0800, Tian Zheng wrote:
-> 
-> 
-> On 11/2/2026 11:12 PM, Leonardo Bras wrote:
-> > On Tue, Sep 29, 2026 at 06:36:53PM +0800, Tian Zheng wrote:
-> > > In dirty-bitmap mode, a larger HDBSS buffer lets the guest dirty more
-> > > pages between VM exits, at the cost of memory. The default of one page
-> > > per vCPU is a reasonable starting point, so allow userspace to opt
-> > > into a larger buffer via KVM_CAP_ARM_HDBSS_BUFFER_SIZE.
-> > > 
-> > > The size is specified in bytes through KVM_ENABLE_CAP and must be a
-> > > power of two in [PAGE_SIZE, SZ_2M]: the upper bound is the largest
-> > > HDBSSBR_EL2.SZ encoding, and the power-of-two requirement matches the
-> > > buddy allocator. It must be set before any vCPU is created: -EINVAL
-> > > after vCPUs exist, -EBUSY if already set.
-> > > 
-> > > The capability is rejected in dirty-ring mode, where the size is
-> > > pinned by kvm_arch_dirty_ring_size_updated().
-> > > 
-> > > KVM_CHECK_EXTENSION returns the configured size for a VM, or SZ_2M
-> > > when queried globally with a NULL kvm.
-> > > 
-> > > Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
-> > > ---
-> > >   arch/arm64/kvm/arm.c     | 34 ++++++++++++++++++++++++++++++++++
-> > >   include/uapi/linux/kvm.h |  1 +
-> > >   2 files changed, 35 insertions(+)
-> > > 
-> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > index 5a7046acb62e..eadbf3a88d31 100644
-> > > --- a/arch/arm64/kvm/arm.c
-> > > +++ b/arch/arm64/kvm/arm.c
-> > > @@ -19,6 +19,7 @@
-> > >   #include <linux/kvm.h>
-> > >   #include <linux/kvm_irqfd.h>
-> > >   #include <linux/irqbypass.h>
-> > > +#include <linux/log2.h>
-> > >   #include <linux/sched/stat.h>
-> > >   #include <linux/psci.h>
-> > >   #include <trace/events/kvm.h>
-> > > @@ -203,6 +204,31 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> > >   		r = 0;
-> > >   		set_bit(KVM_ARCH_FLAG_EXIT_SEA, &kvm->arch.flags);
-> > >   		break;
-> > > +	case KVM_CAP_ARM_HDBSS_BUFFER_SIZE: {
-> > > +		u64 size = cap->args[0];
-> > > +
-> > > +		if (!system_supports_hdbss())
-> > > +			break;
-> > > +		if (kvm->dirty_ring_size)
-> > > +			break;
-> > > +		if (size < KVM_ARM_HDBSS_DEFAULT_SIZE ||
-> > > +		    size > KVM_ARM_HDBSS_MAX_SIZE)
-> > > +			break;
-> > > +		if (!is_power_of_2(size))
-> > > +			break;
-> > > +
-> > > +		mutex_lock(&kvm->lock);
-> > > +		if (kvm->created_vcpus) {
-> > > +			r = -EINVAL;
-> > > +		} else if (kvm->arch.hdbss_buffer_size) {
-> > > +			r = -EBUSY;
-> > > +		} else {
-> > > +			kvm->arch.hdbss_buffer_size = size;
-> > > +			r = 0;
-> > > +		}
-> > > +		mutex_unlock(&kvm->lock);
-> > > +		break;
-> > > +	}
-> > >   	default:
-> > >   		break;
-> > >   	}
-> > > @@ -500,6 +526,14 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> > >   		else
-> > >   			r = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
-> > >   		break;
-> > > +	case KVM_CAP_ARM_HDBSS_BUFFER_SIZE:
-> > > +		if (!system_supports_hdbss())
-> > > +			r = 0;
-> > > +		else if (kvm)
-> > > +			r = kvm->arch.hdbss_buffer_size ?: KVM_ARM_HDBSS_DEFAULT_SIZE;
-> > 
-> > This whole thing of allowing hdbss_buf_size to be set only once makes
-> > everything more complex. Why do we have this limitation again?
-> > 
-> > I mean, if we want to restrict size changes after the first hdbss buffer
-> > gets allocated, it makes sense, other than that, I would like to understand
-> > the reason for that.
-> > 
-> > Thanks!
-> > Leo
-> 
-> Hi Leo,
-> 
-> You're right, I re-examined the whole flow and the "set once"
-> restriction isn't actually needed. I'll remove it.
-> 
+Marc Zyngier <maz@kernel.org> writes:
 
-Awesome, thanks!
-Leo
+> On Wed, 04 Nov 2026 16:45:55 +0000,
+> "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
+>> 
+>> VPE L1 tables are allocated from the CPU-starting callback, where sleeping is
+>> not allowed.  Remove the page allocation from this atomic path.
+>> 
+>> Use a blocking allocation for the boot CPU and record the resulting table
+>> order.  Allocate a page of that order from the sleepable CPU hotplug prepare
+>> stage for each secondary CPU.  Consume the preallocated page only when the CPU
+>> cannot inherit an existing redistributor or ITS table.
+>> 
+>> Reclaim unused preallocations after the CPU reaches the online state, and from
+>> the prepare-state teardown when CPU bring-up aborts.
+>
+> No. The way to do it is to move the ITS probing out of the
+> non-sleepable CPU hotplug path.
+>
+> I proposed a potential hack at [1] (which I find far more palatable
+> than this proposal), but the real fix is to probe the ITSs as
+> devices.
+>
+
+Could you share a bit more detail on what you have in mind?
+
+Are you suggesting that we create a platform device for each ITS and
+initialize it through the driver's probe callback, while the rest of the
+GIC initialization stays in the existing early boot path?
+
+Would that mean the main GIC is operational during early boot, while
+ITS-dependent features, such as MSI delivery and direct injection, become
+available after the ITS devices probe?
+
+Is that the split you have in mind?
+
+-aneesh
