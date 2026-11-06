@@ -1,114 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.93.196.11
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793992136;
-	b=sG5gqyy83UrOPtAAomGfq3p4ziwqGFZc3bA6SF+r2sQxjHSyz2NTvSCKjLQM+pIOKBzi
-	 O6+tfTjwyGHJmze7BFOzDyzBnoY5/OErY2v4hJWwxYCvbIry3Ei2pEXEkuNCK8vIs0tMN
-	 rTTPBu7Jqot5W6dbTBi20Bmz3Ouvdw5i+PJMayEtYEsRfR2EJjN1+WPI+xcpZznPN52v0
-	 ldXFAXIbBjh8Uoocau7aXRvMps8P5APKwZfzu7hHpYZNS9WsWMgBdF+dgtJsVadXiuJjw
-	 u7GEqJRmFlIyhHsa0Hl8YrjW7Vkmt6bMeZyz/ROcUnFyhd3IIcvfpBNT+qpa8nSogKw==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793992136;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:
-	 X-MS-Exchange-Authentication-Results:Received-SPF:Received:Received:
-	 Received:Received:Date:From:To:CC:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
-	 X-NV-OnPremToCloud:X-EOPAttributedMessage:X-MS-PublicTrafficType:
-	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
-	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
-	 X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-Id:
-	 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=Dfz06uyEH0WMW48I0eiFiHa5o/v99I/A9YzZqqFlVAg=;
-	b=zJ2QFGxHMak5mnU3EcxGYuGz0eXNx4eQDztlu3oUr0opt4/o5iME9Z/26QQ02EyjJboj
-	 E6XdtyeqA/yahjfPRmLZoPOTJU31GOOyTYLLNKxQKpu+MGc94BrrH7m0obik9lfckWDR6
-	 1kWN8v1G2aXteTGlGHlDUG6gwCJJRnTMStIeezyAkDrKePXsSJArRdOLm7vKApBZ8kpuz
-	 e0uPFwXT1N7a37TasLm5RtSfKmabN2/ioBVEIw6ADHN7JvLyb4RoI978G9XTvDXf9hYNa
-	 B0F8qWRHPKRl28t7+lndj0Ci3vdfLh3qhTFQwx8aTKjcjmGLMt+SG6qSatOAXsoYl/Q==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=nvidia.com;
-	spf=fail smtp.mailfrom=nvidia.com;
-	dkim=pass header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=mGbbdJDI;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=40.93.196.11
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013011.outbound.protection.outlook.com [40.93.196.11])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793992690;
+	b=FezwioOFEtlZxOjLPj2DT1v15B3M5QIOM0tGfkwDXOk3nmkzI8zYxznW64FMuhfzOiKI
+	 czpT9y7ahXJ6qvGHdYRwGlRxkua06f3t/3jQZ0AvFCI9DoCYFSilQCJycdeQ1cf4GqRkD
+	 Ko/lS4UY+Pxf9/2ppHi5angtqibZiBp9RwVmO2t/Lmq/6+SaZ/s8rnp3nzOiREY9Xs4I4
+	 QAomFJJY3zpXo2T0nb8h40QSerfPOMyLmqxEhPUSmIGNG0Fb8lvt9G31pXrDYs3ff3ka+
+	 Rcd8DSZCe+UKlsKP4Y0lM3jVF4IpBMMEplJCwb8rZXgkmU7+X43kG6/UIEq/w1pX7Tg==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793992690;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=O/WfF4q72VW53Alr6ZZ5MsjjzWOgUG4myB6F5vL1jRY=;
+	b=pht/6d9U3jOh3mEruNvrsZPEhqPTXnvOdIVAxlLEHWj2bV6nXUCHaSxzvkdyxU9pzAHZ
+	 67FfsZCrRLGXenQwhmBxa6uBjd99KDKJerr+yHLKNJkiA54COmTwANLZjRFXEkxv4FGga
+	 p5C+9bwb0O2V8UkVB3sOcQ2u9i3Th1lY1mdffL0aPkypL7SxzXblz0pl3Abj3I9zyi/w3
+	 WlM+vMQydssl2nhK4qLYofyDnqEBEfNQ7UDBZOwXvlbT8m5uQfilIUDSaBaT6Mmqb5Xbp
+	 HdWFMcjVEL9TFTWXDZ/N20ZpvUVKfP57iXi4iJ1lueqAKW/BXBbhZ4RZyedTNOk9v1g==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WW1un0yS;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC0BB606A329;
-	Fri,  6 Nov 2026 19:08:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CC0BB606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03BC5606A326;
+	Fri,  6 Nov 2026 19:18:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=mGbbdJDI
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Qicz+A0lsFUujQmktGTPH+o6pnp4VxQfrOOGu3L5ttfr9otMlmn1djeXGYuUU8OsQsVHVJRV47XXpn3BKlDiXbZIdkI8fJJcSxhOrxHKs/Pw2mwoJ5kQ2EHfZtj0ZJuUU8drvYDUMxYIImtnIpcKRnQqKfxqYjq524bDr+Ni/McIvq5DifLY8vIZ6vJIgaxnpl6/1tp34ZYwzDKSLGgYLTYavO6UZSM9MWv4dbvh8aS2czxEPGDJXqdurJ0aAPkS3R+9ZSPWeBcOFSSONrxYpxkJIpMhIW9WuVIakxuXmVot7mGPppVvgzFEo61Y4dLchm6HbhG9fYC7e7sY/pCuAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Dfz06uyEH0WMW48I0eiFiHa5o/v99I/A9YzZqqFlVAg=;
- b=dLGcYQO25xarGp8U69sC7tdtNzJOCP8SyX0hl5ArJmGvRc/GBwN4UHdgow/DLr5FiCLnGnpe8+OAvZ4pRKHMNyrB81D9a+du5JeNyn9SSQPL0ifSqg5BRrvmTSl1akoB6CM8R9yFYX7J5XVH2xRzNW69YqMfk0NkCPSB+2QkCGVejBWJZ4SiIWYj9wqm0UpUjpwEb4Mu1tPopePiI9YD8qX2VU13n/Xb5VS5k64iS6+7Lhv+ePJ6wg+dC3cgMOlRXbe42lr0rp1S/JrbAE627HikT7vkKgYpUENam9B5fQeQgpF+So93wBurd086GGFOX6nNkjkD9QRbO2gRQ6vDXA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Dfz06uyEH0WMW48I0eiFiHa5o/v99I/A9YzZqqFlVAg=;
- b=mGbbdJDI0DsICsR5cqbqcn1R2WPeae/INCa5MhrDULPJXb55ORoGvIZEQYuaFmSadCvo+mnUsQMm6VQ1/U42heT61/PCqjNGc06j3omiOGUH4R1DnRHtjjNbavmtpypGsBXqAGL+oWZdVezwcY3J5tlOLoAEhM86PN1+EfcK3FA8ULiNqzyoxDmIEu4RjWPy0kS9hpJHS0R2IX1/aMcquSskkrN0r87Uvb/ZrKh6t8vDEbXyfnnoJ05LmNwU/zb3YhWdpATPKjKrTIg/P0uB6FBo6R8tymeLmLhjaTVMwrVxuCroHtvoUOY+0ql9TkFjYEhCILXJWJPimDiibdLsjA==
-Received: from SJ0PR13CA0126.namprd13.prod.outlook.com (2603:10b6:a03:2c6::11)
- by CH1PPF5EBD457EF.namprd12.prod.outlook.com (2603:10b6:61f:fc00::610) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.569.12; Fri, 6 Nov
- 2026 19:08:50 +0000
-Received: from CO1PEPF00018862.namprd02.prod.outlook.com
- (2603:10b6:a03:2c6:cafe::3c) by SJ0PR13CA0126.outlook.office365.com
- (2603:10b6:a03:2c6::11) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.615.5 via Frontend Transport; Fri, 6
- Nov 2026 19:08:49 +0000
-X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
- is 216.228.117.161) smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CO1PEPF00018862.mail.protection.outlook.com (10.167.249.251) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.615.4 via Frontend Transport; Fri, 6 Nov 2026 19:08:49 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56; Fri, 6 Nov
- 2026 11:08:30 -0800
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56; Fri, 6 Nov
- 2026 11:08:29 -0800
-Received: from nvidia.com (10.127.8.13) by mail.nvidia.com (10.129.68.10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56 via Frontend
- Transport; Fri, 6 Nov 2026 11:08:26 -0800
-Date: Fri, 6 Nov 2026 11:08:23 -0800
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: Mostafa Saleh <smostafa@google.com>
-CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>, <iommu@lists.linux.dev>, <catalin.marinas@arm.com>,
-	<will@kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
-	<joro@8bytes.org>, <jgg@ziepe.ca>, <mark.rutland@arm.com>,
-	<qperret@google.com>, <tabba@google.com>, <vdonnefort@google.com>
-Subject: Re: [PATCH v9 16/25] iommu/arm-smmu-v3-kvm: Emulate CMDQ for host
-Message-ID: <au4lp8sAnWm3/Sw5@nvidia.com>
-References: <20261015200903.2735565-1-smostafa@google.com>
- <20261015200903.2735565-17-smostafa@google.com>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WW1un0yS
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11FEE1F0089F;
+	Fri,  6 Nov 2026 19:18:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793992689;
+	bh=O/WfF4q72VW53Alr6ZZ5MsjjzWOgUG4myB6F5vL1jRY=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=WW1un0yS9x1HulQr4vhmunOUmTq/qcZxQkKi9siMIZrJ7TeKPyjK4/M5/khz8LJx0
+	 v6ADWulqh6UKjtrIWOhf9WKplQhNdrGzE1sIhowPETQ13DqzNFfTky+eRMTOrqXwwC
+	 paubLhn7uwC5VNpTOBpdqLvfOv968RYZB9ID0jgKU5nb/S8kHz4O5ylOhHAU751wIO
+	 XgtVKQEiWNYeH2UgKULUZOSOCFkxjvjdABmXa1ZAaO19QpeayWtvmVNj6PzfqPTJKu
+	 3mUMH1aZQMEasncdJyWfBSPI0wHkitna/OoIVi3S7bd6ZcC4snyP2r/L870C6xFOhe
+	 d+4vyCufdHMXg==
+Message-ID: <sashiko-outbox-202145@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v3 17/23] KVM: s390: arm64: Integrate sysreg into the
+ host
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Steffen Eiden" <seiden@linux.ibm.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-s390@vger.kernel.org, "Oliver
+ Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, "Heiko
+ Carstens" <hca@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>, "Alexander
+ Gordeev" <agordeev@linux.ibm.com>, "Christian Borntraeger" <borntraeger@linux.ibm.com>
+In-Reply-To: <20261106-sysreg-v3-17-75e95980fb10@linux.ibm.com>
+References: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
+ <20261106-sysreg-v3-17-75e95980fb10@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 06 Nov 2026 19:18:08 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -117,65 +63,125 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20261015200903.2735565-17-smostafa@google.com>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF00018862:EE_|CH1PPF5EBD457EF:EE_
-X-MS-Office365-Filtering-Correlation-Id: b7806c83-bf3d-48d2-9690-08df3c3963eb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|36860700016|82310400026|1800799024|23010399003|10067099003|22082099003|18002099003|261102123227099003|3023799007|56012099006|4143699003|261022075727099003|261021121427099003|11063799006|261021135927099003;
-X-Microsoft-Antispam-Message-Info:
-	VP9Pfj37HmicBiONQto109CWNu33yKdt17W915Dxh6ZsHQt6f9DonCWTbv+7eqFfdziDKzieLJ6APRcKKsmaJs6WwrjeYTnXDIu73mX/zV35cmK9s/D6okNJHMegSxe87QMqSSwBQ30PTblWsLYy8/A34ZsTGYBGLzHbxgcKEB9ZEZb/fmH/kIS04+Q23RXkpRmjgx4U4h32R/+rSRrH/GnvukaN66VTi3cJBgoDPRn8GwOfwwKIG/DhiACBhsVouFuauAeoNzC8rCsXT/K5lhdblD0tVUPYoi5gMQJYrL0/B9wM1pEGPzzAMr5XrXgYrDP0jhrDls9Wv+nwH7gGlO+WJc1dRivubkEfpgjmMAtPbDVFVXjKjtWcsghKd3qDnc3JaDlhatiUU+rpLNhhF2P0C/QCFWYErRbSmBRttfOKB5FVGm/S6y47oebOHqSJFAZmCgrVbHVxrTrh8+L0tQwEeRK0ahnXQ4poOr+RNS/ZKHB6kO9YUp/GQMCmXdls/HJFdN0Q//g2eq9rYr9Ov1sqWMzERT3udzwzjaJsqyHuGTuIkSjgS/cL4IOYmRWJPyBm30QVjNcbZ6Ud/PpbMDHrXxf2AntxXWlPO6sVxmGAcApRnaAl/mps9AufYNWKbId4N3E2uxHZ862kL37ygg4NtGGMgiVVZGA5qvj3oPm6FE6xGz6xWHYDXCzKqlp4sehFuuYyufHLeNlT4r1Rjg==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(36860700016)(82310400026)(1800799024)(23010399003)(10067099003)(22082099003)(18002099003)(261102123227099003)(3023799007)(56012099006)(4143699003)(261022075727099003)(261021121427099003)(11063799006)(261021135927099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	K3CC555CfZAZ1lr1l43Xf0v7fmiImH1xAbfqwCVNU66NswQirp7zMMXE1TZ2zREcZt+76MDn1zw4/hCk5licsVk39CI6+pJkp5kGgsaiuDil4SVG1E4KF6o5RfpehFbVUAjyrKnfe1xbqMTFsyN2hsvDjiWuEOmVaBJC/WdjEVD4tmz/DCcDbi2VsI2+3M2TXwyfMfRiHd7q108DUl6Zxipuw5Z7vfvCVIa16l2jsl9f0LJpmYtnspuCHQAUfZ+k2HjK3gfRUQZh4XWtqUM568RJ2g3b21Q+RF5BDCRDmJC2yOQzajrT1UfNOS8NjKIWODbau01yF8JD73zwd0edYmFuebO8ZX4PzTrb/uzlMWMtyJ3gNNStqOpyYgqpt5M0uGioSLrD4xSGwosJLRK0+yFRJJICmw7FqwJKEoeaNIHqyF/shky7BeIEM1WQJueU
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2026 19:08:49.6095
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b7806c83-bf3d-48d2-9690-08df3c3963eb
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF00018862.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH1PPF5EBD457EF
 
-On Thu, Oct 15, 2026 at 08:08:47PM +0000, Mostafa Saleh wrote:
-> @@ -385,18 +482,51 @@ static bool smmu_dabt_device(struct hyp_arm_smmu_v3_device *smmu,
->  		 */
->  		mask = read_only & ~(IDR0_S2P | IDR0_VMID16 | IDR0_MSI | IDR0_HYP | IDR0_ATS);
->  		break;
-> -	/* Passthrough the register access for bisectability, handled later */
->  	case ARM_SMMU_CMDQ_BASE:
-> +		/*
-> +		 * Although allowed to use smaller size, we rely on the SMMUv3 driver
-> +		 * using 64-bit store instruction for simplicity.
-> +		 */
-> +		if (len != sizeof(u64))
-> +			break;
->  		if (is_write) {
->  			/* Not allowed by the architecture */
->  			if (is_cmdq_enabled(smmu))
+Thank you for your contribution! Sashiko AI review found 3 potential
+issues to consider:
+- [Medium] KVM: s390: arm64: hcrx_el2 not updated after finalizing ID
+  regs
+- [Medium] KVM: s390: arm64: preemptible smp_processor_id() in
+  kvm_handle_sys_reg()
+- [Medium] KVM: s390: arm64: missing reset of ctxt.elr_el1, spsr_el1,
+  and sp_el1
+--
 
-The spec says the register is RO when CMDQEN=0. So, maybe it should
-be allowed by just ignoring the write?
+commit 0aa20b7c35188a2ab3cdf479482a3360763c4252
+Author: Steffen Eiden <seiden@linux.ibm.com>
 
->  	case ARM_SMMU_CMDQ_CONS:
-> +		if (len != sizeof(u32))
-> +			break;
-> +		if (is_write) {
-> +			if (WARN_ON(is_cmdq_enabled(smmu)))
-> +				break;
+KVM: s390: arm64: Integrate sysreg into the host
 
-Ditto
+This commit integrates the arm64 system register management infrastructure
+into the s390 host by initializing and resetting system registers on vCPU
+creation and reset, finalizing them on the first vCPU run, handling
+ESR_ELx_EC_SYS64 exits, and exposing them via KVM_CAP_ONE_REG.
 
-Nicolin
+> diff --git a/arch/s390/kvm/arm64/arm.c b/arch/s390/kvm/arm64/arm.c
+> index ba6235629c7d9..62fd71af8968c 100644
+> --- a/arch/s390/kvm/arm64/arm.c
+> +++ b/arch/s390/kvm/arm64/arm.c
+
+[ ... ]
+
+> @@ -271,6 +280,10 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vc=
+pu)
+>  	if (likely(READ_ONCE(vcpu->pid)))
+>  		return 0;
+> =20
+> +	ret =3D kvm_vcpu_finalize_sys_regs(vcpu);
+> +	if (ret)
+> +		return ret;
+> +
+>  	scoped_guard(mutex, &kvm->arch.config_lock)
+>  		set_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags);
+> =20
+
+[Severity: Medium]
+Should kvm_arch_vcpu_run_pid_change() recompute vcpu->arch.hcrx_el2 (for
+example via vcpu_reset_hcrx()) after finalizing ID registers?
+
+vcpu_reset_hcrx() sets HCRX_EL2_MSCEn from ID_AA64ISAR2_EL1 during
+kvm_reset_vcpu() at KVM_ARM_VCPU_INIT time.  Because KVM_SET_ONE_REG is
+only permitted after KVM_ARM_VCPU_INIT, if userspace clears FEAT_MOPS in
+SYS_ID_AA64ISAR2_EL1 before the first KVM_RUN, vcpu->arch.hcrx_el2 retains
+the stale HCRX_EL2_MSCEn bit and kvm_arch_vcpu_ioctl_run() leaves MOPS
+instructions enabled in hardware for the guest.
+
+[ ... ]
+
+> diff --git a/arch/s390/kvm/arm64/handle_exit.c b/arch/s390/kvm/arm64/hand=
+le_exit.c
+> index e0c7773c2165d..1653163ed6d65 100644
+> --- a/arch/s390/kvm/arm64/handle_exit.c
+> +++ b/arch/s390/kvm/arm64/handle_exit.c
+> @@ -62,6 +62,7 @@ static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu)
+>  static exit_handle_fn arm_exit_handlers[] =3D {
+>  	[0 ... ESR_ELx_EC_MAX]	=3D kvm_handle_unknown_ec,
+>  	[ESR_ELx_EC_HVC64]	=3D handle_hvc,
+> +	[ESR_ELx_EC_SYS64]	=3D kvm_handle_sys_reg,
+>  	[ESR_ELx_EC_IABT_LOW]	=3D kvm_handle_guest_abort,
+>  	[ESR_ELx_EC_DABT_LOW]	=3D kvm_handle_guest_abort,
+>  };
+
+[Severity: Medium]
+Does calling kvm_handle_sys_reg() from handle_exit() invoke
+_vcpu_read_sys_reg() and _vcpu_write_sys_reg() in preemptible context while
+the vCPU is loaded?
+
+In kvm_arch_vcpu_ioctl_run(), handle_exit() runs after local_irq_enable()
+with preemption enabled and vcpu_is_loaded(vcpu) true.  When a guest traps
+on a save-area system register such as OSLSR_EL1 or SCXTNUM_EL0/EL1,
+kvm_handle_sys_reg() -> perform_access() calls vcpu_read_sys_reg() or
+vcpu_write_sys_reg():
+
+arch/s390/include/asm/kvm_host_arm64.h:_vcpu_read_sys_reg()
+	KVM_BUG_ON(vcpu_is_loaded(C) && smp_processor_id() !=3D (C)->cpu, (C)->kvm=
+);
+
+Under CONFIG_DEBUG_PREEMPT=3Dy this triggers a "using smp_processor_id() in
+preemptible code" splat, and if the vCPU thread is preempted and migrated
+between smp_processor_id() and reading (C)->cpu, KVM_BUG_ON() fires and
+terminates the VM.
+
+> diff --git a/arch/s390/kvm/arm64/reset.c b/arch/s390/kvm/arm64/reset.c
+> index e4cdce1dbf9d2..0339901f5fd08 100644
+> --- a/arch/s390/kvm/arm64/reset.c
+> +++ b/arch/s390/kvm/arm64/reset.c
+
+[ ... ]
+
+> @@ -43,9 +80,14 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  		vcpu_put(vcpu);
+> =20
+>  	kvm_reset_vcpu_core(vcpu);
+> +	kvm_reset_sys_regs(vcpu);
+> =20
+>  	/* Reset special registers */
+>  	vcpu_reset_hcr(vcpu);
+> +	vcpu_reset_hcrx(vcpu);
+> +	vcpu_reset_cptr(vcpu);
+> +	vcpu_reset_cnthctl(vcpu);
+> +	vcpu_reset_icc(vcpu);
+
+[Severity: Medium]
+Does kvm_reset_vcpu() leave vcpu->arch.ctxt.elr_el1,
+vcpu->arch.ctxt.spsr_el1, and vcpu->arch.sae_block.sp_el1 unreset when a
+vCPU is reset after running?
+
+Neither kvm_reset_vcpu_core() nor kvm_reset_sys_regs() resets those fields
+because sys_reg_descs[] has no entries for ELR_EL1, SPSR_EL1, or SP_EL1.
+On the next guest entry after a vCPU reset, kvm_arch_vcpu_ioctl_run()
+writes the stale ctxt.elr_el1 and ctxt.spsr_el1 values back into
+SYS_ELR_EL1 and SYS_SPSR_EL1 in the hardware save area.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261106-sysreg-v3-=
+0-75e95980fb10@linux.ibm.com?part=3D17
