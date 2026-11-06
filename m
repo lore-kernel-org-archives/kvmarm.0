@@ -1,75 +1,104 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.135
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793971811;
-	b=3t/ty0dWhFzE/g2LCVbJRH/xbBemk8ZciLWM6pcenZNFZXrp50Tfrfb6wvnv9rgcw7Yq
-	 fcAtOTFo+hGfD+WA86ED+o1V75LH+EeoauD9QN2wNzxpDM9P8twTvfSyZaIcWU0wtbWtg
-	 pG4wqhglCc5mjceWhirvWTG/WNmJX0Ytwf9AAVM3IxYKRCDh9O8zH8MI/LtPtYmyvH+4w
-	 qVhz1SlY00viEwg1qCLJXGyLV/nHcfMIBR+dAYUia1uXLKdvezeMPF35fcB2AWVb22HuH
-	 n+P5m4prrCmrA2aOjIL6mPdfIvZ8KEzG1+P3JyJMt1uzZ8PblV7oyavXEsBhN+NiaGQ==
+	t=1793973777;
+	b=sODKXiSlfZZcBmWuExsrf7+GYQecFqlkpmdFjAeKazAosnGz7NVxFyR2/vRhHFLyoIvt
+	 ihoTNVpFKLDvXV8opkQVfls2dB/rrgYwrODWAqI7tTXIu+6bz5Ce/ObI6cuTNteHZOBtd
+	 mOdeJA4nOa4IEORLE79Kr/GmDy137WtV8L9K0kCYWqUY372DKGdgXC4QfNHiNJLpArbk0
+	 Z8eBKeq1oC5iXDV3gNm367xSc4ii8P5PJa4Uyk6nGA+rSpx0hGN+VUN86gYhE1V8HpWdp
+	 Q2dDJ0/Hr+5y5ubYnX7dxNGlWjnLsc9GFHgF5x5IsCf+6hCt9vsj9V/QmsZJcvINeUg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793971811;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=e/3XraEN+4mKAfyytUe7hFO8nk3KHRIKouz+zhkXDN0=;
-	b=eng9i9wM+6gD80puHhxS2pz1F7LaXAghJgd/5RQdjSuxRuzDNXAEbUTULzHf4MoF+6Ks
-	 zvipUOmraiKUssDCwVqb8TCp3rCpUVa2W4w872z+v7SUtHX7Qr6JENiUAEaJlcQJYA4pH
-	 nVjxhcLWueVlYFCFnIDKb5wH+KB1mCK6MhtUeYYQiozrUrB9A4UZgtPTVMUd0fodd20sL
-	 8Sww5Cet6SsIBVzKxwm7EoSNcxisoZKglip+2Q0/NaLNsUkCy1mW0VQ7MoFnodhEjkFa1
-	 IdMnRFJI8gcuY/1EM7CpiNijeCvfKnNDwz8iRhM/Ye+tmiqkV1Nu6FmG05STugQ1n5g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793973777;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=mEgL0gkNdxC67fiPUJ6BbKjfka4sqNTfVjccvIe0kTw=;
+	b=g9bhyLw6hCWanS7xl3MtSINI4sinbj8iZYEC6TsOmIiZaFwPl+hwZQdtOBdApQ8B30Er
+	 ek86m8QKB6j4bH58KUHvnuyK6a3O+CWjio65uFtbffrtg/tH6SSS2wJ4DIyESlTjof19E
+	 ccCLQ+Wcae/cJnFupOj/a23nIT+6mTPo10PvssmD+FZx2SyB+c5A0FFh3PXonB65V2t3k
+	 gNCwNV/jicUeJZJR/40Yg0V0wPX8vBBGI6nca3K7cHP2WTJcBe96vYzrrWl8Hc12QInOX
+	 j0s2mf+jiPvHscG+BJdFw0/HFvjkcs37xX4xj5Gg+Jw2SUuGNNGCYYOHj/Yj2jXatVA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=XN36poyH;
-	arc=none smtp.remote-ip=95.215.58.135
-Received: from mta1.migadu.com (out-135.mta1.migadu.com [95.215.58.135])
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Gc8RW9Oy;
+	arc=none smtp.remote-ip=209.85.128.48
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91288606A33D
-	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 13:30:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 91288606A33D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD95606A32E
+	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 14:02:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5BD95606A32E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=XN36poyH
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=n4Vsow1U4/zPQT8BxxJgvfPhA9r/J78hKay9DbA/hws=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793971808; v=1; x=1794576608;
- b=XN36poyHustH0MlLVgJjXZJY36PK5Gt1ynzAroBdRznA0OKgtvf3zjkFWf42BQx8BDrA+Lrs
- Ow9mVDR8pw8AytTAbYHfi+CytMkJvgYEMza3tUep7pUU++ky2ddpoxZXJC4pPZLlsdVWsFznv/A
- rkFpCDxVanGpoRtHkiItslXo=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id f286758a8028908b;
-	Fri, 06 Nov 2026 13:30:08 +0000
-X-Mizu-Trace-ID: f286758a8028908b
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Gc8RW9Oy
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4a206f0b95bso34865e9.0
+        for <kvmarm@lists.linux.dev>; Fri, 06 Nov 2026 06:02:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1793973776; x=1794578576; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=mEgL0gkNdxC67fiPUJ6BbKjfka4sqNTfVjccvIe0kTw=;
+        b=Gc8RW9OyajQuiTOWBh3NACtrzH46A0ZJlkjoJ+kPYkrjWY7zZvjz1qzff3y3dX0udg
+         JjF1zhuTCJOpg1KB4r3/Fg1oRGDu3MZRlXfn/ENgjALnhvFLpJkD4oyZ5P0wCgJkmanb
+         5YrksqZr9BKJo98VylwvxugsHrnHvSihsj5+SIwYeRh8VTDEjZztG15SE3fKubf9adAd
+         P6FxVqhwb9DN74n3Ku1bs/+PvrOzyEQx03fPlRTjFvpraVq0lXlYu7m9P37/nTYv5ev/
+         Hb9aQGdgx72KTb1Py9HL9UTpwcvACU3pYutaTFMai8qCa3lAJXB9tcJ1XfMKYhBACPR2
+         iYYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793973776; x=1794578576;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=mEgL0gkNdxC67fiPUJ6BbKjfka4sqNTfVjccvIe0kTw=;
+        b=DQi9wCwoCgvJhQFkaIMTlGEl3xSzkDme9hityIG7LuVMFW1ulAq27CFQ4aIvK3j02Q
+         G7Lobl6M759e4P3jG2Z4fG8qdDakjQt7L4dfCA00WU2pBorCASwW8tn//zsCXfgyycF/
+         CzEJ1BbCBPanFv+Hc1jNjboxzEwgonF8PjZP1RjqgPH1VroHD/GL+lzLDekmyPHZHgUk
+         dqzLhqWeXXcIRXbLF3Lge+kjc9t1mYs2G2MKRuMATGgLzgaC1n1taEF9abyCA9NiI5G2
+         NPw0zSJKSr0/2UsYst4JQiKk5JTrL5JFAgdjZKhED56DhKggFw+jWKva2oszInlM4eI6
+         dTSQ==
+X-Forwarded-Encrypted: i=1; AKwUvBydMuOitBIEFQfOW3KB+XYIFDxyqqhQmyNDnzpa8C42E0mUVtOHNl5Qj5+m9O12u4LXY9xHQZM=@lists.linux.dev
+X-Gm-Message-State: APuU4Z8+rPDC3OYDzMWjTSQMiSCBBJ+nTDe7ync1YhT1Q21v5ZWqa7Qf
+	dOE1BoCTm7FO8AYfr13NrRL3MaFSXRNL9ON6qktcxLKVfbcgYWg3Ojj2VlMouFEmrw==
+X-Gm-Gg: AYBFou1m0DsFjYICVUblH91CVJrb1MTdXsbADNpeAMY74eh1Tb7/7WNJsPcOovdoBtU
+	vHtZ59g+U6mFn3Ctw3qkwS1lyzQUX5GfnJqKPC9wL/zuQkRMzQzMmc1siFYDS9UHmhKfai3cACR
+	OuW3Xdl+NcNneNOntfy/IUC47ZiOc1qD9//NQB7kzMvlWqUQgv+FfMevM0pAS37yyw/xh5P+Y9P
+	LHBs2X8FRXG1LE1u6K8HDI8sgIOOqBKKLA4zSEAegFPbBya0YWFcGpujL6wQHAKszdD1dRcR9rw
+	d0s7UlByLzbWIqceYf2uJ8P+RmZ6bKf/b5qvKc5IAPfY2sylOsltAvu/G+VXeAiIeOUca/vHvkK
+	SX4IepbQLQLTQtO5EeBte0XwbFoK/oJwkFLfJEl27IEUijnhabxGqnUQKmsuqrNheyoiTGCU7mg
+	zoZZSe/miXhVDQTKzd+6No74qr9s3fY2XDGlsvuuLIPKHxDGbhlb+3Am4qsjqv+Mt94PgzQSJut
+	OlKAfjYq3c3ajmSr4TUsPf+ZOzOGv0P/V2huJ1fNGZUx4yfI3QrAUtIy8tw7xPLxF1AswhGVBn2
+	unM906odBcnqzHFEZZPM05CZLbZVz4dxtPeD0EH9UOeuBF4=
+X-Received: by 2002:a05:600c:8a17:10b0:4aa:7270:60f with SMTP id 5b1f17b1804b1-4b743f9f46fmr464815e9.1.1793973775119;
+        Fri, 06 Nov 2026 06:02:55 -0800 (PST)
+Received: from google.com ([35.189.193.160])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-492d3d609b1sm3724515f8f.8.2026.11.06.06.02.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Nov 2026 06:02:54 -0800 (PST)
+Date: Fri, 6 Nov 2026 14:02:40 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: xuheng@cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Fuad Tabba <tabba@google.com>
-Subject: [PATCH v3 2/2] KVM: arm64: Resume a pKVM stage-2 teardown at the next mapping
-Date: Fri,  6 Nov 2026 13:30:00 +0000
-Message-ID: <20261106133000.453240-3-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261106133000.453240-1-fuad.tabba@linux.dev>
-References: <20261106133000.453240-1-fuad.tabba@linux.dev>
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] KVM: arm64: Compute hyp early-allocation and pool
+ sizes in 64 bits
+Message-ID: <au3eALuLVKZ1WXhp@google.com>
+References: <20261105-hyp-pool-and-map-v2-0-44a6ca90190b@cs.columbia.edu>
+ <20261105-hyp-pool-and-map-v2-1-44a6ca90190b@cs.columbia.edu>
+ <CA+EHjTxXpA6sCrSmwRJBA=YKGfNP4zs-THhheRHTaq2BfYY-Lw@mail.gmail.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -79,55 +108,61 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTxXpA6sCrSmwRJBA=YKGfNP4zs-THhheRHTaq2BfYY-Lw@mail.gmail.com>
 
-pKVM keeps a VM's stage-2 mappings in an interval tree, and
-pkvm_pgtable_stage2_destroy_range() releases the ones in its range.
-stage2_destroy_range() still calls it for every block-sized chunk of the
-IPA space. As pKVM gives every VM the host's IPA limit, a teardown with
-LPA2 makes 2^27 calls with 16K pages (2^22 with 4K), however little the
-VM maps.
+On Fri, Nov 06, 2026 at 11:31:57AM +0000, Fuad Tabba wrote:
+> Hi Xuheng,
+> 
+> On Thu, 05 Nov 2026 22:59:48 +0000, Xuheng Li <xuheng@cs.columbia.edu> wrote:
+> > hyp_early_alloc_contig() and hyp_pool_init() both take a page count as
+> > an unsigned int and compute the size in bytes as nr_pages << PAGE_SHIFT
+> > in 32 bits.  For 4 GiB or more (nr_pages >= 2^20 with 4 KiB pages) the
+> > shift overflows.
+> 
+> Mostafa (Cc'd) posted a fix for the same truncation in July [1],
+> widening the parameters to unsigned long instead. Would you be OK
+> picking up his patch for v3, keeping him as the author and your
+> description and tags?
+> 
 
-Return the address of the next mapping instead, or S64_MAX when none is
-left (U64_MAX would read as an error), so that the teardown skips the
-space between mappings. No mapping crosses a chunk boundary, as pKVM
-maps at most PMD_SIZE, so the next one starts at or above the end of the
-range. A VM without a handle doesn't have anything mapped, so return
-S64_MAX for it straight away.
+I was preparing v3 anyway, I can post it today.
 
-Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- arch/arm64/kvm/pkvm.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Thanks,
+Mostafa
 
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index d0a6308008512..ef36875e25610 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -504,9 +504,10 @@ s64 pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
- {
- 	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
- 	pkvm_handle_t handle = kvm->arch.pkvm.handle;
-+	struct pkvm_mapping *mapping;
- 
- 	if (!handle)
--		return addr + size;
-+		return S64_MAX;
- 
- 	if (pkvm_hyp_vm_is_created(kvm) && !kvm->arch.pkvm.is_dying) {
- 		WARN_ON(kvm_call_hyp_nvhe(__pkvm_start_teardown_vm, handle));
-@@ -518,7 +519,9 @@ s64 pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
- 	else
- 		__pkvm_pgtable_stage2_unshare(pgt, addr, addr + size);
- 
--	return addr + size;
-+	mapping = pkvm_mapping_iter_first(&pgt->pkvm_mappings, addr + size, U64_MAX);
-+
-+	return mapping ? gfn_to_gpa(mapping->gfn) : S64_MAX;
- }
- 
- void pkvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt)
--- 
-2.47.3
-
+> > Two of the regions that pKVM carves out at boot are sized from the
+> > amount of memory: hyp_s1_pgtable_pages() for the hyp page tables (hpool)
+> > and host_s2_pgtable_pages() for the host stage-2 pool both provision
+> > page-granular tables for all of memory, about one page per 2 MiB of
+> > RAM, so they reach 4 GiB on a machine with about 2 TiB of RAM.  Arm
+> > systems of that size exist, for example AWS Graviton4 x8g.metal-48xl
+> > instances (3 TiB) and Ampere Altra Max servers (up to 4 TiB per
+> > socket).
+> 
+> Could you also list the hyp vmemmap here? It's sized the same way and
+> overflows at 2 TiB too.
+> 
+> > On such a machine, divide_memory_pool() gets a truncated hyp page-table
+> > region from hyp_early_alloc_contig(), so the host stage-2 region and the
+> > FF-A proxy pages that follow it start inside the range that hpool will
+> > own.  hyp_pool_init() then attaches all nr_pages pages of each pool to
+> > its free lists, so hpool and host_s2_pool share pages and the same page
+> > can be handed out twice, for example as a hyp stage-1 table and as a
+> > host stage-2 table.  hyp_pool_init() also derives range_end and
+> > max_order from the truncated size, so most of each pool is treated as
+> > external order-0 pages; on a host whose IPA size makes the host stage-2
+> > PGD a multi-page allocation (for example a 42-bit PARange), that
+> > allocation fails and host_s2_zalloc_pages_exact() uses the NULL result.
+> 
+> Could you describe here what actually happens? I think pKVM init fails
+> before any page is handed out twice. Just below 2 TiB, hyp_pool_init()
+> for host_s2_pool hits the BUG_ON() in hyp_set_page_refcounted() on
+> hpool's page-table pages, and from 2 TiB up hyp_back_vmemmap() zeroes
+> the new hyp page tables while they're being built.
+> 
+> Cheers,
+> /fuad
+> 
+> [1] https://lore.kernel.org/all/20260715150125.2798116-1-smostafa@google.com/
