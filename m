@@ -1,66 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.88
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793962950;
-	b=lBqyN1Q4hwy02MlUe5byED2oJfnozsqH3XphoJEyMLTIn7Iz0et5w0iWSuV6Fm7xG664
-	 ijWH5MKX2f0c740FxwlrOY/DKxOSSAhHdB4kIzwjHLwo0gUM4jRdT/dCtKQXJ6PFYUiTk
-	 5k1phjyNQl/xpfSQfewnGg53b6XZNXQzx51jC6QrIsTkaCI4ymwQSgjjCUrKJ6AawW8gM
-	 VFQ5llwm2KpSkpIFPVeah/wG4CDCw5Om27MWYnPEc2uDymfPPlzt+CAJsVqkT3gfrDgx/
-	 7kf/jkOpd1N9nL0kJKSGTdrhiTEZ2LY/lursdeLlzMsQuWR5mtYUaPVigEu/Oks5GYg==
+	t=1793964760;
+	b=sWNdcenoQ+v9PUkwZVLmJr2vqhxGKq2e0fn7O2gB9tCneCQrMElPDuI5I3LEFiJRVocg
+	 EhMXkNbHMsgkuaJAvCJhRZjHXTbZrWGwyeyUl65n/cHi3KcltvRuCcD4E9grxDzFLSttj
+	 Y6hubmmEQ50N/rhQq+TphvQZnYbAKH/g8U+C3rslhg0QB703vR95mpThyFVoKnGTpxkEi
+	 4tfNvMvM1tP2ZYa5vrLY8+P/Uu+nGO+7FWCe57HAj9jgN9DIHxvy+ABGCo7v9iNjWLeyy
+	 SpoTpp7wXthU7QefNlkCztsYRkcS0S8tQkJhNs237HmjCH+7uq+Cq5JL8OeKhSNW4Og==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793962950;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To;
-	bh=1EX2YTA7N1m8201rWClNkOLoSBkj+pXHUt+FjNqM5s4=;
-	b=ranbfSl9uxP8mmSHwRUj04P+MrUDGYn/2ROY6TEor1NvX0uJeeXB3Psnda8gY41xlfkk
-	 DQAre4zPvqanrsn5gFykAtErTtSs6BaKO8tpZ18RDYHXoOrzrKsjTy9yo8n5kwdctE7sy
-	 dEa6eo5z4qhZZHYs497Ux7IKe9+QO+x0AnvGn7cMgJ5ME0Kcr86t+OQDuswWsFZTIwmz7
-	 LUcyf8IpgqsSBmv/Emb2OyHNtdToDECzkv1669EC2z114ywTdgcZGG2oDqXbvTe9nvEaP
-	 XJcZsRTqdKIPq6cztKQZel9WAH0MQRV3xfb7bQQoxV3FzmjsJBcZb67TRqFQ2NtOLHg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793964760;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=VwYktvc9ZuSAG/AWyoWRNsgxr2Z6jBVkd5OucG0+82I=;
+	b=D93nEXHAefZ2KeUORoytpc9vJA8Wszis8Ylw7zDtQ8wkPUnGq4qJKZBnZuP0WIkilnsr
+	 mAv/ZgpF/kHW3vhj3B/YSyTwsRywIYlkyfu1/rfQhsdcxnM294GEzkSEvJ0HciTiBYw2N
+	 GPJB9ge+2MxLp4IY7Vk5aoj9SKIiYsLuFkpfp3vLvj7mmBt/1xGlZ5c23X9iRNQiL/T0i
+	 2greBVIMAqbYxvaDmeIWDEL2f7zmwPXqckxyj4K2iW5G8fH99Gxy3Bnvp5+8uaVXUAoT9
+	 7dafA+QrYXX0RtjaRTXVVF+nnRrJMevpO+oW5V0K01aRwV33kEYzeRrqj+occyZC6ig==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=IXdLbkhB;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8205C606A32C
-	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 11:02:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8205C606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=BYCHZ8gS;
+	arc=none smtp.remote-ip=91.218.175.88
+Received: from mta0.migadu.com (out-88.mta0.migadu.com [91.218.175.88])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7DB3606A914
+	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 11:32:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C7DB3606A914
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=IXdLbkhB
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 858CB1650;
-	Fri,  6 Nov 2026 03:02:25 -0800 (PST)
-Received: from e142392.arm.com (e142392.arm.com [10.2.213.23])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C208D3F673;
-	Fri,  6 Nov 2026 03:02:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793962948; bh=vViXHVIoIW/K//DPywNrgxXC6rqNmWDghWNtpvorf90=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IXdLbkhBeUk/3GjTjz8gzknsqr/4kj0JpHND7lmwR/llHNS/s8WDy/vGxCwPqCAUv
-	 qNSnIjh162159EV7AtA2tqB2EiVb3NrdpSDa2Z4HJaWSxTxCMynmutIanTjxBGP7/h
-	 t3OQ1zlrwiTXg3/kQLIYdW3r0WTMGfjLEdp9E2i4=
-Date: Fri, 6 Nov 2026 11:02:17 +0000
-From: Kristina =?utf-8?Q?Mart=C5=A1enko?= <kristina.martsenko@arm.com>
-To: Linu Cherian <linu.cherian@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-acpi@vger.kernel.org, 
-	kvmarm@lists.linux.dev, linux-efi@vger.kernel.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	David Hildenbrand <david@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, 
-	Anshuman Khandual <anshuman.khandual@arm.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, 
-	Hanjun Guo <guohanjun@huawei.com>, Sudeep Holla <sudeep.holla@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Subject: Re: [RFC 00/12] arm64: Add support for TLBI domains
-Message-ID: <r7vnudhgumcjrhoo7iiv2nckxhhoax6k2d2xlquehfzv3f3dyk@idottvqbcjtr>
-References: <20261001110655.461473-1-kristina.martsenko@arm.com>
- <upkds2ymzuztqvxxuysm62lxcdv5oa3ji6xrxbnz3yt3vntbp6@rw54ndtnpz3y>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=BYCHZ8gS
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=zs6GksGR9IOQ4D/rhKg8wscXt05dWTxmDSpfW/B3uBQ=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793964756; v=1; x=1794569556;
+ b=BYCHZ8gSkAvIfy4rMcjzK0zhsJmLM7d04txNPYABat7HWbaH7nKFPQJrCabhcAtfIXdOMCaE
+ H9Jkwv1CUIySjlq6wps/NVstouwMXmfLQGDKjzj97BqpKOac2slr0IsntW7OzksoX6ijUqFK4NL
+ jCPrvTrKRRdSUh/2ZvrtObUQ=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id ce7d2cbda95ac551;
+	Fri, 06 Nov 2026 11:32:36 +0000
+X-Mizu-Trace-ID: ce7d2cbda95ac551
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5bfca2a2af4so2786e87.1
+        for <kvmarm@lists.linux.dev>; Fri, 06 Nov 2026 03:32:35 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AKwUvBzQLN934VlpgdbEGALWysixPpyW1TEApXbov05Xb0ii5T/p7nfIaV9+G7D4wulhhN0383FCDgA=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+3H9afjELk8JWnvz/7DUNFXPhHHXt81F09sZ6xNCchi/H9gfQe
+	NNjPwmGq7rI5voXwkccstfmD6aqk/BXlZOG3balXp7Kbpky+pthb3bvNTPCLRKQh/+jLKmbHM0n
+	oR6sUUisdIBkV1zDjwB+hTD5mMtMZ5CTvzW05HVB1
+X-Received: by 2002:a05:6512:3c84:b0:5c0:1b9:2de8 with SMTP id
+ 2adb3069b0e04-5c006378923mr59625e87.0.1793964754169; Fri, 06 Nov 2026
+ 03:32:34 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -70,77 +66,69 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <upkds2ymzuztqvxxuysm62lxcdv5oa3ji6xrxbnz3yt3vntbp6@rw54ndtnpz3y>
+References: <20261105-hyp-pool-and-map-v2-0-44a6ca90190b@cs.columbia.edu> <20261105-hyp-pool-and-map-v2-1-44a6ca90190b@cs.columbia.edu>
+In-Reply-To: <20261105-hyp-pool-and-map-v2-1-44a6ca90190b@cs.columbia.edu>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Fri, 6 Nov 2026 11:31:57 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTxXpA6sCrSmwRJBA=YKGfNP4zs-THhheRHTaq2BfYY-Lw@mail.gmail.com>
+X-Gm-Features: AclHuK9gc8zZSVttdzXS2GHVj1w7PkDDqC-dBzIEQ_RXvW813sjnQFEQOIIR5dE
+Message-ID: <CA+EHjTxXpA6sCrSmwRJBA=YKGfNP4zs-THhheRHTaq2BfYY-Lw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] KVM: arm64: Compute hyp early-allocation and pool
+ sizes in 64 bits
+To: xuheng@cs.columbia.edu
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org, Mostafa Saleh <smostafa@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Oct 29, 2026 at 05:36:47PM +0530, Linu Cherian wrote:
-> Hi Kristina,
-> 
-> On Thu, Oct 01, 2026 at 12:06:43PM +0100, Kristina Martšenko wrote:
-> > Hi,
-> > 
-> > This series allows the kernel to use TLBI domains. TLBI domains (FEAT_TLBID) is
-> > an Arm architecture feature that enables a TLB invalidation to target a subset
-> > of CPUs instead of the whole system. It can improve performance on systems with
-> > many CPUs. TLBID is not yet part of the Arm Architecture Reference Manual but
-> > some of it is described in the latest XML [1].
-> > 
-> > The goal of this series is to send TLBI commands only to the CPUs where a
-> > process has run (i.e. where its page tables have been installed). The last
-> 
-> Lets say if we have a TLB domain of 8 cpus and a process has ran on only
-> one cpu, dont we end up broadcasting to all cpus in the domain as the 
-> granularity is at the domain level ?
-> If thats true, would be good to make that clear.
+Hi Xuheng,
 
-Yes that’s true. Linux can’t change the domains and the smallest domain
-can contain 8 (or more) CPUs. I’ll add a note about it in the cover
-letter to make it clear.
+On Thu, 05 Nov 2026 22:59:48 +0000, Xuheng Li <xuheng@cs.columbia.edu> wrote:
+> hyp_early_alloc_contig() and hyp_pool_init() both take a page count as
+> an unsigned int and compute the size in bytes as nr_pages << PAGE_SHIFT
+> in 32 bits.  For 4 GiB or more (nr_pages >= 2^20 with 4 KiB pages) the
+> shift overflows.
 
-> > patch explains a bit about how it works. This is an RFC since I'm not familiar
-> > with the kernel's TLB/mm code and I'd like feedback on whether the general
-> > approach is correct.
-> > 
-> > A few notes and open questions:
-> > 
-> >   * Domains are described in a new "TLBI" ACPI table. This is not yet part of
-> >     the ACPI specification. There was an initial proposal [2] but this series
-> >     uses a newer WIP version of the table that aims to be published by the end
-> >     of the year.
-> > 
-> >   * There is currently no device tree binding since the feature is mainly meant
-> >     for server-class systems.
-> > 
-> >   * It's also possible to use TLBI domains to limit a KVM guest's TLB
-> >     invalidations to CPUs where the guest has run. I'll try to include that in
-> >     the next version. This series only disables domains for guests.
-> > 
-> >   * With this series a long-running process may eventually run on all CPUs and
-> >     just issue broadcast TLBIs. It may be worth periodically reducing the set
-> >     of CPUs but it's not clear when.
-> 
-> Do you have some thoughts on how we could reduce the set of cpus, to avoid
-> cross domain scheduling ? 
-> IIUC, this should me more of a scheduling decision with domain awareness. 
+Mostafa (Cc'd) posted a fix for the same truncation in July [1],
+widening the parameters to unsigned long instead. Would you be OK
+picking up his patch for v3, keeping him as the author and your
+description and tags?
 
-Sorry, the wording is unclear here. This is not about reducing the set
-of CPUs that a process runs on, it’s about optimizing the domain bitmap
-of a process such that it only contains CPUs that the process is active
-on. Currently we only remove domains from the bitmap but never put them
-back, even if the process is no longer running on a given CPU and its
-TLB has been flushed. So we may end up removing all domains except the
-broadcast-all domain.
+> Two of the regions that pKVM carves out at boot are sized from the
+> amount of memory: hyp_s1_pgtable_pages() for the hyp page tables (hpool)
+> and host_s2_pgtable_pages() for the host stage-2 pool both provision
+> page-granular tables for all of memory, about one page per 2 MiB of
+> RAM, so they reach 4 GiB on a machine with about 2 TiB of RAM.  Arm
+> systems of that size exist, for example AWS Graviton4 x8g.metal-48xl
+> instances (3 TiB) and Ampere Altra Max servers (up to 4 TiB per
+> socket).
 
-This isn’t trying to avoid cross-domain scheduling or to change
-scheduling at all.
+Could you also list the hyp vmemmap here? It's sized the same way and
+overflows at 2 TiB too.
 
-Also, having thought about it some more, I’m not sure if this series
-should try to optimize the domain bitmap at all, since it will require
-synchronizing with the domain update in switch_mm(), which will add
-overhead and needs to be benchmarked on TLBID hardware first (which we
-don’t have yet).
+> On such a machine, divide_memory_pool() gets a truncated hyp page-table
+> region from hyp_early_alloc_contig(), so the host stage-2 region and the
+> FF-A proxy pages that follow it start inside the range that hpool will
+> own.  hyp_pool_init() then attaches all nr_pages pages of each pool to
+> its free lists, so hpool and host_s2_pool share pages and the same page
+> can be handed out twice, for example as a hyp stage-1 table and as a
+> host stage-2 table.  hyp_pool_init() also derives range_end and
+> max_order from the truncated size, so most of each pool is treated as
+> external order-0 pages; on a host whose IPA size makes the host stage-2
+> PGD a multi-page allocation (for example a 42-bit PARange), that
+> allocation fails and host_s2_zalloc_pages_exact() uses the NULL result.
 
-Thanks,
-Kristina
+Could you describe here what actually happens? I think pKVM init fails
+before any page is handed out twice. Just below 2 TiB, hyp_pool_init()
+for host_s2_pool hits the BUG_ON() in hyp_set_page_refcounted() on
+hpool's page-table pages, and from 2 TiB up hyp_back_vmemmap() zeroes
+the new hyp page tables while they're being built.
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20260715150125.2798116-1-smostafa@google.com/
