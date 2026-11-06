@@ -1,49 +1,104 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793974956;
-	b=z2CppHEPpR+nvAAUsgEhFm4bOzOXzOFH/7BeSW3ZKpR2AMTheShN1rBMov+63FNV97IV
-	 wqwBaAdX2+M3LjPmQfgcDayYyR5AoSwNaUGJEXOzAV9n/JbGPnWAn6EduyiaqTpLLzxa1
-	 sHpgYJlYgqvQuA6DPRvkJJzwOGqgv/5bFJtgRF7CR8Y1LNt5l8r3GVNUnyKFhZDIuHiV+
-	 if9Gud1G/O5uM2L73BxauruSIQvLXsCt3/AG+bVsefYxXZTcKgVR0tTUN6gZCy5h9kbYe
-	 /KI/rxTen34MbkQSztqFXT0r5zpKl8B0XhfyGnY6xXLxNQqLTM+hafEr15bAegttMqA==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793974956;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=fTcrCWxsZHIriDZWkvIqlif7JUYF9Ion4vAVQflrPbU=;
-	b=dZrj8ZL/4I5AC7C7E76PekN5E1ZU3/fhn422bxjThhX9SB4JPTDUTbf2GyCWzZoai1sL
-	 wV9ZdrM+PeA1pszbLi/WK5xoc4DIRHmN0cmsLXc3icDnfgWglmwJ9r/e0MAQG4sT7VbOb
-	 VziV6MGBafCD4W3br5nJH9Fr/1A70AJLTQmOgroYr2KUmK0L9C1uYmcEMy2IhX0SmayCX
-	 tddMRwcd6GKHpl19jXNK+druDmcSj5AozpBJ7spCpCZaPhx797B/Qqo/zSLcjwMVV33FC
-	 bd0k/5SPDG+v+7bxo1RgofOg2xvmhPpDogSCPaPV4xqytrZplSkDQzX+tNsW+7GAeUA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=AzhrJoGR;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC042606A32E;
-	Fri,  6 Nov 2026 14:22:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BC042606A32E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=AzhrJoGR
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A4C481650;
-	Fri,  6 Nov 2026 06:22:30 -0800 (PST)
-Received: from [10.2.197.99] (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CB6D93F673;
-	Fri,  6 Nov 2026 06:22:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793974953; bh=22RVcKJoZ5NKv3XgoNQ8sUIaq6jPGe49X9aSwuY2zBc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=AzhrJoGR50jH4UI7p6E6V6JBsJGQJm7me4fObInq/JDMEgpaHqZNQporI5hUGwHp6
-	 b0+Io29IXVu1Flqep4AA+q0a0PcTOEg1uQ9KPfHrPIO/OFTKcSnEawMDagq1wqXJC0
-	 mP8tjhvkpxKtGKpK4MAHr2wmrZUPTpPRS2+NI1Uc=
-Message-ID: <ae4f4bb4-4e72-47ac-8b91-d275484c22a8@arm.com>
-Date: Fri, 6 Nov 2026 14:22:31 +0000
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.139.74
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1793975479;
+	b=DtAXvk4xM6nMiO5XG6gd6/FkwekpXCBGyMijivlJuXAANnuDufaOWhJIZ/S8cM09vQta
+	 ktlYH1MLhZlh9DXJUGN8nzJ62nqmjBWnq/MLRKu+mX7dt75IQE0EF2rxhzt6Eo5R6lO/X
+	 SDkh1fnC4xo78b2KgDhtt1pbvZ1Xhd5iBgYDSxhEL0xy96zxbhIXvGN36uJCmKgxept78
+	 /srHemWEVtbsSJ2BWmYKWZoVj+hBE/B0Xum6vzGWfiL+vn4yQdoPdqNebnydy7Ard9IH4
+	 Iday3Ms4xMYGdWnPG6dZg/JBC85vfVc9xCEMsyhgQkkRRnu1OV8cICSuOZ8YXqMF4Qg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793975479;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 X-Google-DKIM-Signature:X-Forwarded-Encrypted:X-Gm-Message-State:
+	 X-Gm-Gg:X-Received:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:Content-Type:
+	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Details-Enc:
+	 X-Proofpoint-Spam-Info:X-Authority-Analysis:X-Proofpoint-GUID:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=3R6UvoeFxFCY/Ej/MVx8n6FebbxoQvB9tmIs9Jv63a0=;
+	b=wyM345RNKBRoQ3wNnpNs0oYtGuEeXn36WuTUz6gBmKEsKrJrN87Zr073P5wTA90bAwqu
+	 +83JcQvAKE7ApSYmHrajV6ZE27/hbPXDZoARq1Tl08UKgbI0vwAApDhO3IDV0A9eNpXdm
+	 OW68TQIRk9jU9gqLhsKrrFs5q3gtRdddNPX4myx87kmqcxhtF9O+opRWvNWFaA5t5IREz
+	 rZSG4jtpM9YcFmeFFhSorO/bfzvrItFpm9MrGSBhWS2qO1uMeNsvWZaQ/NgfEwTRSkBxY
+	 CgUxfBKjhhrk/P7vmrWLOsGCmlePguYb4njYnpbdbtdgZEPs11iHiQfj2Sc9HfTGdWw==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=cs.columbia.edu;
+	spf=pass smtp.mailfrom=columbia.edu;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.139.74
+Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5F9606A32C
+	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 14:31:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BB5F9606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.columbia.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
+Received: from pps.filterd (m0499198.ppops.net [127.0.0.1])
+	by mx0b-00364e01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A6DckZk2279178
+	for <kvmarm@lists.linux.dev>; Fri, 6 Nov 2026 09:31:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pps01; bh=3R6UvoeFxFCY/Ej/MVx8n6Febbxo
+	QvB9tmIs9Jv63a0=; b=A4sAs1iZWsz+Xe7qnrcwmJHgmp9ac6ZISDzRGcUUFnCN
+	1ekY1+GBrHwdfo7muahziFncvTiS/aUUFn2amuxZiTcQZ8sUYT/X3aGJdFrVwJ7N
+	ztRtKQb/UAIh0oaaVRq7EQGLhUIwUmhcnE3osWp+9zM6x8ml2TKjNmWQFhPkhzom
+	rJVbJu82Q+D4UyVTl2gjddviOfvQPXT89j2egh3xYtXn8ZA+EIaEtbW8iKfV9PMf
+	aS8+KV5ROBTDRUiw7HAIJki/hMzI9AeVYLas3NK/J9IpLwhgUEgzOQ/xfgSS+6t0
+	jWMtkZ5osacwLaefXZggMa9T/on6PKYxogYgRcB2FA==
+Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com [209.85.128.198])
+	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 4hs3pcbd5x-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <kvmarm@lists.linux.dev>; Fri, 06 Nov 2026 09:31:14 -0500 (EST)
+Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-8b0d978e4faso8430857b3.0
+        for <kvmarm@lists.linux.dev>; Fri, 06 Nov 2026 06:31:14 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1793975474; cv=none;
+        d=google.com; s=arc-20260327;
+        b=YnD2CBYFuY4ZBqpSRvWstztEP1JWh3BNsJ6MdoL6Mm9MEUTN5i3HsBRpA6zcwAnBuz
+         7gDsGMVlbY3T4vuufMNbD1Irwx8TNrUPjW3kSULyfZmCBdJFlprdya7FEN68H40wct8r
+         14jh/oh5Tu+Jw7fGmVP3aBIgUxBHh3kFB/TqzelwRbqzUbJ50Pf/bAlJFN9hyKedWcDy
+         S4kFeM4AwAz6ooE9lx1sr4ANgLekthTeWk2tDYomsuBpweQOU9mfX+ucO8u4KmVs9YAJ
+         2vixtEiujCP4CVz3XPbf/9/nXeWLhM8SHbaVTMKVRBoj4A9O0YshZcK0pCaet1YLwEK4
+         M/4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version;
+        bh=3R6UvoeFxFCY/Ej/MVx8n6FebbxoQvB9tmIs9Jv63a0=;
+        fh=yshuNsd5UH4jU13KJ7pjdjW14fkAnfgtFGSMw3ENnd0=;
+        b=Xy/cjO3uVCXtTB0zcYAF0fw64RZkY/RrO0Wrl4aMOiUG0GultXqTGUNFm50Nv66683
+         ujMzPDY54vueK4Zi6GiRnWSaOtBS3ECJyEIVbYgUy8nOCtT7BUqIZnFp9zjKNy/Pthj/
+         pKKvPTsm+FItoIgDpj1nrfKEC1F8p8LSURP7bHf6Y4Egk8Plag8azdXwTwxjpHu50ydm
+         GRyT1P+IS3TtffVI8ePJPfRBymG/2+x9NHVo6XctFGoMulxPLeTzYQ9VBlHaSXw1fCmi
+         vIFUtMHXMn0Fu94da18+c9W+KXtyDkg8RwRrp3FDXqbbcvj8ee6TdIDdt/dgQNUra7+9
+         bbsw==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793975474; x=1794580274;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=3R6UvoeFxFCY/Ej/MVx8n6FebbxoQvB9tmIs9Jv63a0=;
+        b=ftJy8ePEuHRMfMbYQNqQPDgP/3qTP93+/X508SPxQBlcMsJm/XXS8z03EOWmR4PqEf
+         0XZfwV+Kf1OwaQmXLkY44oC/UDaCnElHta408sg9V/YfaBAVgEzLTWqX4b4WK8VTNXUq
+         /UtSN8HgcKql72nw1DhpVYjzf3sRGxwI0GZNu3fP5WK9yssMZ/iCTbcHAsr5nratIoOF
+         HZhAzNYtg/GIGmWkOTVWoKBn+4A88sOSUC8MEjhnFqtNb/GKqrg2cDflYePna2GgrJW1
+         4f8j+T071gpDEutGXk+cuEWiUzRNZX4hzhoYm8iCcmHwDvUzCVFtGfUNfSp0NxHUfK0j
+         1rFA==
+X-Forwarded-Encrypted: i=1; AL+hErFpCjr6X7Qfp9NSD9leboRexfEsIu/gGNahtqnFiIFJbugW/DVNI2gMrFva0DahmoJeMHhP270=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/WBtzWZVgtDuEPV9EbNJ0aVAlwd1i8Bos5VNYVVrQKgl/XviJL
+	SH0tKKaS/V/oX/cC4/gqnNvCxgY9U4vRLFRmmTy0koWFGcDBajYePVFF5eOseZH1M0sMhzHXXmI
+	W1RmHRkE1qlST/0bWYXHj41kRX3wuaikHQgD/KTHeRdHlxHwkgR8mhDo9/kwhgDphxUR7jlsAF9
+	3bypTDFXJIQJ9CL6NEZln4oGIUIavG
+X-Gm-Gg: AYBFou1r0xHtEDxynv3NB1S/Qro+Cm3M0HO5TU7Z59HFwl8d5SndTOYNQe8pbWLwIG9
+	/PJKvyeCAf9bMPrTdt9We+1m3Mzj+gax5trLQaQ8BeWPEnV4i29pG8jqJyYWOLlBHZJm5HqlGRA
+	8XICPaocCajSCAdM8tdSeJPTu/Nla6xj4EIOQ+PBl4/MjR85C3qPgNdkNTLI8hgzsLFdF4/BBsT
+	0C4YI44WB2TXFtFZvKH/zwCs1Pj75Scclyru7hj0oVkJzq5enVQ
+X-Received: by 2002:a05:690c:8e0d:b0:8a4:aeb2:acfa with SMTP id 00721157ae682-8b341b2eb3fmr12003387b3.54.1793975474012;
+        Fri, 06 Nov 2026 06:31:14 -0800 (PST)
+X-Received: by 2002:a05:690c:8e0d:b0:8a4:aeb2:acfa with SMTP id
+ 00721157ae682-8b341b2eb3fmr12003307b3.54.1793975473710; Fri, 06 Nov 2026
+ 06:31:13 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,304 +108,65 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 11/11] KVM: arm64: CCA: Add Realm stage-2 MMU operations
-To: sashiko-reviews@lists.linux.dev, Steven Price <steven.price@arm.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
-References: <20261102141304.126883-1-steven.price@arm.com>
- <20261102141304.126883-12-steven.price@arm.com>
- <sashiko-outbox-193812@kernel.org>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <sashiko-outbox-193812@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20261105-hyp-pool-and-map-v2-0-44a6ca90190b@cs.columbia.edu>
+ <20261105-hyp-pool-and-map-v2-1-44a6ca90190b@cs.columbia.edu>
+ <CA+EHjTxXpA6sCrSmwRJBA=YKGfNP4zs-THhheRHTaq2BfYY-Lw@mail.gmail.com> <au3eALuLVKZ1WXhp@google.com>
+In-Reply-To: <au3eALuLVKZ1WXhp@google.com>
+From: Xuheng Li <xuheng@cs.columbia.edu>
+Date: Fri, 6 Nov 2026 14:31:02 +0000
+X-Gm-Features: AclHuK-uSTIad-lvfbjp5wOphNsNX579YiHzXoYmvUtAiDrC6RcBzvikndjQbQU
+Message-ID: <CAPOPQMDz32WrE8K0BDVLKbPc_Owx9izjQ+xPsJEJ2Cwy+BNi7Q@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] KVM: arm64: Compute hyp early-allocation and pool
+ sizes in 64 bits
+To: Mostafa Saleh <smostafa@google.com>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oupton@kernel.org>, Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>, Joey Gouly <joey.gouly@arm.com>,
+        Steffen Eiden <seiden@linux.ibm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Proofpoint-ORIG-GUID: wN7AJGtJCOtwHTTZA04_9lGbno7CGWBy
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA2MDA1NyBTYWx0ZWRfX4gcS9VDwimWh
+ WzT+Mq1viVQ8wwhNIgxaKbyiWYCKm0ha9eK79AkBgaW++ZuV7ziHeJOaNFudADlgWYvwYQbqZRc
+ fho48hEpBQmsCaAZt7sV0ks3qhBPpDA+bU+knM7dJ7SgYNxp3ynaMJNyg3AOSpTNzBZfI02GyX5
+ dwR0iPbqhhZeYszZsYM1SIlICNNuIMpjidm/XGMxdv2uYptRnTO2kkopd6DKbqdwu8HmTYCu5IU
+ 0USFGHOcjrzxZg47PQF64J8AZh00wMYbDBvnGMT6NXQlvFgUQg9tqMDhcPuMHgVFvSlPku0FDQD
+ qmy6+fg6AfsIiQ4ZqO2ASGJmW3jk4yVllEAyG+F3+PaqHRPjf7u1mlHd8fhA5haXFIIFHSkC3X6
+ ftzWGcCXno6lyO8nY0JhfYej5Bda0swFCNRN6NmYSwX6mX31KjeAAyRwzh7x6K4YJhnsDtckkz8
+ UQbq7ae4nSNbtQ1dqVw==
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA2MDA1NyBTYWx0ZWRfX98GG7C9ePIhV
+ yl0lV7Uwa7o3sCjX8yyW1xiKnc5tFQH2/PMIU6Fag5p8t9cPDyfQ0DmPHFVnlBWX9GSHVbX1zuW
+ plIOSeEjp1NGEObCQZ4gJqy4ICjWIf+Y5MFN99erkyeyb0CORJHf
+X-Authority-Analysis: v=2.4 cv=V5PoQuni c=1 sm=1 tr=0 ts=6aede4b2 cx=c_pps
+ a=g1v0Z557R90hA0UpD/5Yag==:117 a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Da8U98TiO7q1upZEImrf:22 a=BpGzv1V74M3SfeTrGa8v:22
+ a=qqJXGgh0nGIGBJ8XPqMA:9 a=QEXdDO2ut3YA:10 a=MFSWADHSvvjO3QEy5MdX:22
+X-Proofpoint-GUID: wN7AJGtJCOtwHTTZA04_9lGbno7CGWBy
+X-Proofpoint-Virus-Version: vendor=nai engine=6900 definitions=11957
+ signatures=596817
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 spamscore=0 lowpriorityscore=10 clxscore=1011 priorityscore=1501
+ malwarescore=0 bulkscore=10 suspectscore=0 impostorscore=10 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611060057
 
-On 02/11/2026 17:12, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 7 potential issue(s) to consider:
-> - [Critical] KVM: arm64: read_lock() used instead of write_lock() in kvm_fault_lock()
-> - [Critical] KVM: arm64: unaligned PFN and empty memcache on Realm permission faults
-> - [High] KVM: arm64: uninitialized next_addr in realm_unmap_private_range()
-> - [High] KVM: arm64: page accounting after page free in free_rtt()
-> - [High] KVM: arm64: stage-2 PGD leak in kvm_uninit_stage2_mmu() for Realms
-> - [High] KVM: arm64: leaked delegated pages on error in realm_map_protected()
-> - [High] KVM: arm64: uninitialized out_top and positive error in realm_map_non_secure()
-> --
-> 
-> commit c7041c45fed830c50c8f37ff21d6036da29c1302
-> Author: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
-> KVM: arm64: CCA: Add Realm stage-2 MMU operations
-> 
-> This commit defines and registers realm_vm_s2_ops for VM_REALM, routing
-> stage-2 unmapping through kvm_realm_unmap_range_filter() and stage-2 memory
-> aborts through kvm_vm_mem_abort(). It also provides no-op TLB flush and GFN
-> aging callbacks since the RMM manages stage-2 TLB invalidation and does not
-> support stage-2 access flags.
-> 
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index 20aedbe6ec072..bb33c07569e3b 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
-> 
-> [ ... ]
+Hi Mostafa, Fuad,
 
-...
+On Fri, Nov 06, 2026 at 02:02:40PM +0000, Mostafa Saleh wrote:
+> I was preparing v3 anyway, I can post it today.
 
-> 
-> [Severity: High]
-> In the same unmap path, when realm_unmap_shared_range() or
-> realm_unmap_private_range() folds RTT levels via
-> realm_fold_rtt_level()->free_rtt(), does free_rtt() access the page after it
-> has already been freed?
-> 
-> In arch/arm64/kvm/rmi.c:
-> 
-> static void free_rtt(phys_addr_t phys)
-> {
-> 	if (rmi_free_delegated_page(phys))
-> 		return;
-> 
-> 	kvm_account_pgtable_pages(phys_to_virt(phys), -1);
-> }
-> 
-> And in drivers/firmware/arm_rmm/rmi.c:
-> 
-> int rmi_free_delegated_page(phys_addr_t phys)
-> {
-> 	if (WARN_ON_ONCE(rmi_undelegate_page(phys))) {
-> 		/* Undelegate failed: leak the page */
-> 		return -EBUSY;
-> 	}
-> 
-> 	free_page((unsigned long)phys_to_virt(phys));
-> 
-> 	return 0;
-> }
-> 
-> Because rmi_free_delegated_page() calls free_page() first (which uncharges the
-> folio and clears its memcg association before returning the page to the
-> allocator), calling kvm_account_pgtable_pages() afterwards touches a freed
-> page and fails to decrement NR_SECONDARY_PAGETABLE on the original memcg.
-> Should kvm_account_pgtable_pages(phys_to_virt(phys), -1) be called before
-> free_page() (or before rmi_free_delegated_page())?
-> 
-> [ ... ]
-> 
->> @@ -3291,6 +3313,15 @@ static const struct kvm_vm_s2_ops kvm_default_vm_s2_ops = {
->>   	.vm_mem_abort			= kvm_vm_mem_abort,
->>   };
->>   
->> +static const struct kvm_vm_s2_ops realm_vm_s2_ops = {
->> +	.vm_flush_remote_tlbs		= realm_flush_remote_tlbs,
->> +	.vm_flush_remote_tlbs_range	= realm_flush_remote_tlbs_range,
->> +	.vm_age_gfn			= no_age_gfn,
->> +	.vm_test_age_gfn		= no_age_gfn,
->> +	.vm_stage2_unmap_range		= realm_stage2_unmap_range,
->> +	.vm_mem_abort			= kvm_vm_mem_abort,
-> 
-> [Severity: Critical]
-> When kvm_vm_mem_abort() handles stage-2 faults for a Realm VM via
-> gmem_abort() or user_mem_abort()->kvm_s2_fault_map(), it acquires
-> kvm->mmu_lock using kvm_fault_lock(kvm). Does kvm_fault_lock() take a read
-> lock instead of a write lock for Realm VMs?
-> 
-> In arch/arm64/include/asm/kvm_mmu.h:
-> 
-> static inline void kvm_fault_lock(struct kvm *kvm)
-> {
-> 	if (is_protected_kvm_enabled())
-> 		write_lock(&kvm->mmu_lock);
-> 	else
-> 		read_lock(&kvm->mmu_lock);
-> }
+Thanks Mostafa, and thanks Fuad for the pointer and the correction.
+I'll drop my patch 1 in favour of Mostafa's updated patch. Fuad's
+description of what happens (pKVM init failing at the BUG_ON() in
+hyp_set_page_refcounted() just below 2 TiB, and in hyp_back_vmemmap()
+from 2 TiB up) is more accurate than mine, and the hyp vmemmap
+overflows the same way. Mostafa, feel free to reuse any of my commit
+message.
 
-We could change that to
-
-	if (kvm_vm_hyp_is_distrusting(kvm))
-		write_lock()
-	else
-		read_lock();
-
-
-> [Severity: Critical]
-> In kvm_vm_mem_abort()->user_mem_abort()->kvm_s2_fault_map(), how are stage-2
-> permission faults on shared IPAs handled for Realm VMs?
-> 
-> First, in user_mem_abort():
-> 
-> 	memcache = get_mmu_memcache(s2fd->vcpu);
-> 	if (!perm_fault || memslot_is_logging(s2fd->memslot) ||
-> 	    is_protected_kvm_enabled()) {
-> 		ret = topup_mmu_memcache(s2fd->mmu, memcache);
-> 		if (ret)
-> 			return ret;
-> 	}
-> 
-> Because is_protected_kvm_enabled() is false for Realm VMs, memcache is not
-> topped up on permission faults, even though realm_map_non_secure() unmaps and
-> folds the existing RTT entry via realm_unmap_shared_range() and then allocates
-> RTTs from memcache via realm_create_rtt_levels().
-> 
-> Second, in kvm_s2_fault_map():
-> 
-> 	if (mapping_size == PAGE_SIZE && s2vi->max_map_size != PAGE_SIZE) {
-> 		if (perm_fault_granule > PAGE_SIZE) {
-> 			mapping_size = perm_fault_granule;
-> 		} else {
-> 			mapping_size = transparent_hugepage_adjust(s2fd, &pfn, &gfn);
-> 			if (mapping_size < 0) {
-> 				ret = mapping_size;
-> 				goto out_unlock;
-> 			}
-> 		}
-> 		canonical_ipa = ALIGN_DOWN(canonical_ipa, mapping_size);
-> 	}
-> 
-> 	if (!perm_fault_granule && !s2vi->map_non_cacheable && kvm_has_mte(kvm))
-> 		sanitise_mte_tags(kvm, pfn, mapping_size);
-> 
-> 	if (kvm_vm_is_realm(kvm)) {
-> 		ret = realm_map_ipa(kvm, s2fd->fault_ipa, pfn, mapping_size,
-> 				    prot, memcache);
-> 
-> When perm_fault_granule > PAGE_SIZE on a THP VMA (where s2vi->vma_pagesize is
-> PAGE_SIZE), kvm_s2_fault_map() sets mapping_size = perm_fault_granule without
-> calling transparent_hugepage_adjust() to verify that the host VMA is still
-> backed by a huge page (for example, if a write fault split the THP via CoW) or
-> to align pfn down to mapping_size. For normal VMs this is safe because
-> kvm_pgtable_stage2_relax_perms() does not use pfn, but for a Realm VM
-
-I see, the cheaper option for us is to figure out the real granularity
-at the host (rather than fixing up permissions at the *current* mapped
-level). So I think it is better to adjust the pfn here locally.
-
-
-> realm_map_ipa() aligns fault_ipa down to mapping_size while mapping from the
-> unaligned 4KB pfn for mapping_size bytes. Can this map adjacent host physical
-> pages beyond the end of the folio (or from a split THP) into the Realm guest?
-> 
-> [Severity: High]
-> When kvm_vm_mem_abort() calls realm_map_ipa()->realm_map_protected(), can the
-> err_undelegate path fail to undelegate the remaining unmapped pages if an
-> error occurs after part of the range was already mapped?
-> 
-> In arch/arm64/kvm/rmi.c:
-> 
-> err_undelegate:
-> 	realm_unmap_private_range(kvm, base_ipa, ipa, true);
-> 	/* A range which cannot be undelegated remains owned by the RMM. */
-> 	WARN_ON(rmi_undelegate_range(base_phys, map_size));
-> 	return ret < 0 ? ret : -ENXIO;
-> 
-> If the loop mapped [base_ipa, ipa) before failing, realm_unmap_private_range()
-> unmaps [base_ipa, ipa) and undelegates [base_phys, phys). Calling
-> rmi_undelegate_range(base_phys, map_size) then starts at base_phys, which is
-> already undelegated, so rmi_granule_range_undelegate() fails on the first page
-> and aborts the loop, triggering the WARN_ON and leaving [phys,
-> base_phys + map_size) permanently delegated. Should this call
-> rmi_undelegate_range(phys, ipa_top - ipa) instead?
-
-This is not true. RMI_GRANULE_UNDELEGATE() skips the granules that are
-alreay UNDELEGATED. See "state" condition.
-
-
-> 
-> [Severity: High]
-> In kvm_vm_mem_abort()->...->realm_map_ipa()->realm_map_non_secure(), what
-> happens if rmi_rtt_unprot_map() returns a positive RMI error code?
-> 
-> In arch/arm64/kvm/rmi.c:
-> 
-> 		if (RMI_RESULT_STATUS(ret) == RMI_ERROR_RTT) {
-> 			...
-> 			ret = realm_create_rtt_levels(realm, ipa, level,
-> 						      req_level,
-> 						      memcache);
-> 			if (ret)
-> 				return ret;
-> 
-> 			ret = rmi_rtt_unprot_map(rd, ipa, ipa_top, flags,
-> 						 range_desc, &out_top);
-> 			if (ret < 0)
-> 				return ret;
-> 		}
-> 
-> 		if (ret && RMI_RESULT_STATUS(ret) != RMI_ERROR_RTT)
-> 			return ret;
-> 
-> 		phys += out_top - ipa;
-> 		ipa = out_top;
-> 
-> If the retry of rmi_rtt_unprot_map() after realm_create_rtt_levels() returns
-> RMI_ERROR_RTT, out_top is never written by rmi_rtt_unprot_map(), and execution
-> falls through to phys += out_top - ipa; ipa = out_top; using an uninitialized
-> out_top. And if rmi_rtt_unprot_map() returns any other positive RMI status
-> code, realm_map_non_secure() returns that positive value up through
-> kvm_vm_mem_abort() to kvm_handle_guest_abort(), which treats positive return
-> values as a successfully handled fault and re-enters the guest.
-
-Yep, that is correct, we need to fix this.
-
-> 
->> +};
->> +
->>   #define KVM_VM_S2_OPS(flavor, ops)		\
->>   		[flavor] = &(ops)
->>   
->> @@ -3299,7 +3330,7 @@ static const struct kvm_vm_s2_ops *arm64_vm_s2_ops[] = {
->>   	KVM_VM_S2_OPS(VM_NVHE, kvm_default_vm_s2_ops),
->>   	KVM_VM_S2_OPS(VM_PKVM, pkvm_vm_s2_ops),
->>   	KVM_VM_S2_OPS(VM_PROTECTED_PKVM, protected_pkvm_vm_s2_ops),
->> -	[VM_REALM] = NULL,
->> +	KVM_VM_S2_OPS(VM_REALM, realm_vm_s2_ops),
-> 
-> [Severity: High]
-> Now that arm64_vm_s2_ops[VM_REALM] is populated, kvm_init_stage2_mmu()
-> succeeds for Realm VMs and allocates mmu->pgt, its PGD pages, and
-> mmu->last_vcpu_ran. Does kvm_uninit_stage2_mmu() leak those allocations if
-> kvm_arch_init_vm() fails at err_uninit_mmu or if the VM is destroyed before
-> the Realm is created?
-> 
-> In arch/arm64/kvm/mmu.c:
-> 
-> void kvm_uninit_stage2_mmu(struct kvm *kvm)
-> {
-> 	if (kvm_vm_is_realm(kvm))
-> 		kvm_realm_uninit_stage2(&kvm->arch.mmu);
-> 	else
-> 		kvm_free_stage2_pgd(&kvm->arch.mmu);
-> 	kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
-> }
-> 
-> And in arch/arm64/kvm/rmi.c:
-> 
-> void kvm_destroy_realm(struct kvm *kvm)
-> {
-> 	struct realm *realm = &kvm->arch.realm;
-> 	int i;
-> 
-> 	if (!kvm_realm_is_created(kvm)) {
-> 		kfree(realm->sro);
-> 		realm->sro = NULL;
-> 		return;
-> 	}
-> 	...
-> 	kvm_free_stage2_pgd(&kvm->arch.mmu);
-> }
-> 
-> When realm->state is REALM_STATE_NONE, kvm_realm_uninit_stage2() is a no-op
-> and kvm_destroy_realm() returns early before calling
-> kvm_free_stage2_pgd(&kvm->arch.mmu) (or is not called at all on the
-> err_uninit_mmu failure path of kvm_arch_init_vm()), leaving mmu->pgt, the
-> stage-2 PGD pages, and mmu->last_vcpu_ran allocated.
-
-I think we have already discussed in a previous patch and will be addressed.
-
-
-Cheers
-Suzuki
-
-> 
-
+Thanks,
+Xuheng
