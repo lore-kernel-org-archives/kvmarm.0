@@ -1,62 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.88
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793964760;
-	b=sWNdcenoQ+v9PUkwZVLmJr2vqhxGKq2e0fn7O2gB9tCneCQrMElPDuI5I3LEFiJRVocg
-	 EhMXkNbHMsgkuaJAvCJhRZjHXTbZrWGwyeyUl65n/cHi3KcltvRuCcD4E9grxDzFLSttj
-	 Y6hubmmEQ50N/rhQq+TphvQZnYbAKH/g8U+C3rslhg0QB703vR95mpThyFVoKnGTpxkEi
-	 4tfNvMvM1tP2ZYa5vrLY8+P/Uu+nGO+7FWCe57HAj9jgN9DIHxvy+ABGCo7v9iNjWLeyy
-	 SpoTpp7wXthU7QefNlkCztsYRkcS0S8tQkJhNs237HmjCH+7uq+Cq5JL8OeKhSNW4Og==
+	t=1793964897;
+	b=hOp2vSHUBpKYMxEBytsGDozUTtjHCBrEgACW2lufXW2xuTkwWQ8Gpt1oktu7CMNX2B7o
+	 u1D+wdpbEjnR6zZHcobUcJsK1pjn5U3vFPnEsbC6M9NOW00BoKvz/tqrEkw4xML1aAE8w
+	 ZGXxf8PRIzujHJ70ricnKOU+56Tq5UzsqaPix8wmiHeCMRlhonbV/gUYJuP3dRUmVHShU
+	 MpLo7c1QfTSBMg+e+lqh/cExGqLIU+EZUssYwrfm0koJYtNiW0sYVDKJotskM7sO/Jz3P
+	 9/+HigKEJqVJ1rlBMKS39IYFDgma6GRdMhysrtc8R+tlpfV1GpbNI/G36JUCmhI7RdA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793964760;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=VwYktvc9ZuSAG/AWyoWRNsgxr2Z6jBVkd5OucG0+82I=;
-	b=D93nEXHAefZ2KeUORoytpc9vJA8Wszis8Ylw7zDtQ8wkPUnGq4qJKZBnZuP0WIkilnsr
-	 mAv/ZgpF/kHW3vhj3B/YSyTwsRywIYlkyfu1/rfQhsdcxnM294GEzkSEvJ0HciTiBYw2N
-	 GPJB9ge+2MxLp4IY7Vk5aoj9SKIiYsLuFkpfp3vLvj7mmBt/1xGlZ5c23X9iRNQiL/T0i
-	 2greBVIMAqbYxvaDmeIWDEL2f7zmwPXqckxyj4K2iW5G8fH99Gxy3Bnvp5+8uaVXUAoT9
-	 7dafA+QrYXX0RtjaRTXVVF+nnRrJMevpO+oW5V0K01aRwV33kEYzeRrqj+occyZC6ig==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793964897;
+	h=Received:DKIM-Signature:Received:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
+	 X-Cookie;
+	bh=Gf9gD5fRD5pl+7Q+o6m2T83pqPAdlS2BRDBwZ+qU6Rk=;
+	b=BmQ+ADECIify1fNnRBJ8mxPhaPJwhgrNHBdaxjZCD5BkSMTNnCjf6S4WjX4iP3FHxxcY
+	 QgxWgyQ7Pc9CNd3KryzFAsl4dxAPuIeLoherJbUGf6rLlPsO4acbvTMjxWsMj9ZQgKkDn
+	 mq4HkR4ooYzrw+vGN2RI4ZONqYveQiqLLCK/mmRxFBuSA8D71ZvQBnQy4xROnHVZlddxz
+	 3GzdTw/TINYUy4Tuo/KQGXHnMRILfTbQokrIn3TeUGcn3AetkcNrlqmNcWND3oX74EgSX
+	 1On7IBKXT5ddQAfMEAzoS8RTkUI85y9biXUWLsYSy7XYrtc0MYTGhes6EItMUy/GlBw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=BYCHZ8gS;
-	arc=none smtp.remote-ip=91.218.175.88
-Received: from mta0.migadu.com (out-88.mta0.migadu.com [91.218.175.88])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Y4V30aWQ;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7DB3606A914
-	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 11:32:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C7DB3606A914
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C15B0606D80B
+	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 11:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=BYCHZ8gS
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=zs6GksGR9IOQ4D/rhKg8wscXt05dWTxmDSpfW/B3uBQ=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793964756; v=1; x=1794569556;
- b=BYCHZ8gSkAvIfy4rMcjzK0zhsJmLM7d04txNPYABat7HWbaH7nKFPQJrCabhcAtfIXdOMCaE
- H9Jkwv1CUIySjlq6wps/NVstouwMXmfLQGDKjzj97BqpKOac2slr0IsntW7OzksoX6ijUqFK4NL
- jCPrvTrKRRdSUh/2ZvrtObUQ=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id ce7d2cbda95ac551;
-	Fri, 06 Nov 2026 11:32:36 +0000
-X-Mizu-Trace-ID: ce7d2cbda95ac551
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5bfca2a2af4so2786e87.1
-        for <kvmarm@lists.linux.dev>; Fri, 06 Nov 2026 03:32:35 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AKwUvBzQLN934VlpgdbEGALWysixPpyW1TEApXbov05Xb0ii5T/p7nfIaV9+G7D4wulhhN0383FCDgA=@lists.linux.dev
-X-Gm-Message-State: APuU4Z+3H9afjELk8JWnvz/7DUNFXPhHHXt81F09sZ6xNCchi/H9gfQe
-	NNjPwmGq7rI5voXwkccstfmD6aqk/BXlZOG3balXp7Kbpky+pthb3bvNTPCLRKQh/+jLKmbHM0n
-	oR6sUUisdIBkV1zDjwB+hTD5mMtMZ5CTvzW05HVB1
-X-Received: by 2002:a05:6512:3c84:b0:5c0:1b9:2de8 with SMTP id
- 2adb3069b0e04-5c006378923mr59625e87.0.1793964754169; Fri, 06 Nov 2026
- 03:32:34 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Y4V30aWQ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CC3C1F008A1;
+	Fri,  6 Nov 2026 11:34:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793964896;
+	bh=Gf9gD5fRD5pl+7Q+o6m2T83pqPAdlS2BRDBwZ+qU6Rk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Y4V30aWQj+kSrMyULbf2efgo68gVJPyWP7RsPwoEuXCL6tkaGc2OhRYNepNtM+Fd3
+	 VZJ29fUWQCdmVO9rTlBie3BnR/p12SQawExnQ0M6R3nno9Kndm1MtBJYHgZtxLL/v1
+	 9vU3nXQTBVu6x/+HMk3/q5M0Y6+wj1VJymU6jLQVOHT99QAHuFRLLtiw4dn5pLIyEG
+	 hN83e15niAyg4luYMKcEWoT+2UPktzDMQMBhuok/hCXA2Gp8nS6nCjG7gAN04/ETr/
+	 lmUa4jKesDpHet2FXy8LoL2csWkMhraso/CwEsbWWRPrsqi6lifUPkRS1ry0USUX2P
+	 y+MVNN0QFIKKw==
+Received: by traversing.sirena.org.uk (Postfix, from userid 1000)
+	id 7E26C27E89F1; Fri, 06 Nov 2026 11:34:47 +0000 (GMT)
+Date: Fri, 6 Nov 2026 11:34:47 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Oliver Upton <oupton@kernel.org>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>, Aishwarya.TCV@arm.com
+Subject: Re: [PATCH v3 4/5] KVM: arm64: Convert TCR_EL2 to config-driven
+ sanitisation
+Message-ID: <5e8a61c2-24ff-46a1-819f-94fcd91c9688@sirena.org.uk>
+References: <20261029223732.103785-1-oupton@kernel.org>
+ <20261029223732.103785-5-oupton@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,69 +66,148 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261105-hyp-pool-and-map-v2-0-44a6ca90190b@cs.columbia.edu> <20261105-hyp-pool-and-map-v2-1-44a6ca90190b@cs.columbia.edu>
-In-Reply-To: <20261105-hyp-pool-and-map-v2-1-44a6ca90190b@cs.columbia.edu>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Fri, 6 Nov 2026 11:31:57 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTxXpA6sCrSmwRJBA=YKGfNP4zs-THhheRHTaq2BfYY-Lw@mail.gmail.com>
-X-Gm-Features: AclHuK9gc8zZSVttdzXS2GHVj1w7PkDDqC-dBzIEQ_RXvW813sjnQFEQOIIR5dE
-Message-ID: <CA+EHjTxXpA6sCrSmwRJBA=YKGfNP4zs-THhheRHTaq2BfYY-Lw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] KVM: arm64: Compute hyp early-allocation and pool
- sizes in 64 bits
-To: xuheng@cs.columbia.edu
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org, Mostafa Saleh <smostafa@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Q+tSDECOZioM9ODW"
+Content-Disposition: inline
+In-Reply-To: <20261029223732.103785-5-oupton@kernel.org>
+X-Cookie: Have a nice diurnal anomaly.
 
-Hi Xuheng,
 
-On Thu, 05 Nov 2026 22:59:48 +0000, Xuheng Li <xuheng@cs.columbia.edu> wrote:
-> hyp_early_alloc_contig() and hyp_pool_init() both take a page count as
-> an unsigned int and compute the size in bytes as nr_pages << PAGE_SHIFT
-> in 32 bits.  For 4 GiB or more (nr_pages >= 2^20 with 4 KiB pages) the
-> shift overflows.
+--Q+tSDECOZioM9ODW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Mostafa (Cc'd) posted a fix for the same truncation in July [1],
-widening the parameters to unsigned long instead. Would you be OK
-picking up his patch for v3, keeping him as the author and your
-description and tags?
+On Thu, Oct 29, 2026 at 03:37:31PM -0700, Oliver Upton wrote:
+> From: Wei-Lin Chang <weilin.chang@arm.com>
+>=20
+> Feature dependencies of the fields in TCR_EL2 are extracted from
+> Registers.json of the BSD licenced AARCHMRS
+> (AARCHMRS_OPENSOURCE_A_profile_FAT-2026-06).
+>=20
+> Places where we slightly deviate from the above:
+>=20
+>  - Stick to the ARM ARM M.c requirement for TCR_EL2.TCMA*, which only
+>    depends on FEAT_MTE2. This avoids updating ID_AA64PFR2_EL1 with new
+>    VMTE* definitions that we don't know the meaning of, as they aren't
+>    present in the ARM ARM yet.
+>=20
+>  - Ignore TCR_EL2.DS's requirement of needing the effective value of
+>    TCR2_EL2.D128 be 0. This requires runtime detection of TCR2_EL2.D128
+>    and we don't have D128 support yet.
+>=20
+>  - TCR_EL2.AS is dependent on FEAT_ASID16, this information is missing
+>    from the json.
 
-> Two of the regions that pKVM carves out at boot are sized from the
-> amount of memory: hyp_s1_pgtable_pages() for the hyp page tables (hpool)
-> and host_s2_pgtable_pages() for the host stage-2 pool both provision
-> page-granular tables for all of memory, about one page per 2 MiB of
-> RAM, so they reach 4 GiB on a machine with about 2 TiB of RAM.  Arm
-> systems of that size exist, for example AWS Graviton4 x8g.metal-48xl
-> instances (3 TiB) and Ampere Altra Max servers (up to 4 TiB per
-> socket).
+I'm seeing a regression in -next for the pre_fault_memory_test selftest
+when run on qemu with EL2 and NV enabled which bisects to this commit in
+-next:
 
-Could you also list the hyp vmemmap here? It's sized the same way and
-overflows at 2 TiB too.
+# selftests: kvm: pre_fault_memory_test
+<47>[ 1358.708301] systemd-journald[75]: Sent WATCHDOG=3D1 notification.
+# Random seed: 0xe322a57
+# Testing guest mode: PA-bits:52,  VA-bits:48,  4K pages
+# Testing memory backing src type: anonymous
+#
+# =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
+#   pre_fault_memory_test.c:260: false
+#   pid=3D1888 tid=3D1888 errno=3D2 - No such file or directory
+# sh: 1: addr2line: not found
+#   Unknown ucall 0x0.
+not ok 48 selftests: kvm: pre_fault_memory_test # exit=3D254
 
-> On such a machine, divide_memory_pool() gets a truncated hyp page-table
-> region from hyp_early_alloc_contig(), so the host stage-2 region and the
-> FF-A proxy pages that follow it start inside the range that hpool will
-> own.  hyp_pool_init() then attaches all nr_pages pages of each pool to
-> its free lists, so hpool and host_s2_pool share pages and the same page
-> can be handed out twice, for example as a hyp stage-1 table and as a
-> host stage-2 table.  hyp_pool_init() also derives range_end and
-> max_order from the truncated size, so most of each pool is treated as
-> external order-0 pages; on a host whose IPA size makes the host stage-2
-> PGD a multi-page allocation (for example a 42-bit PARange), that
-> allocation fails and host_s2_zalloc_pages_exact() uses the NULL result.
+The NV pre fault test appears to run fine in the same run, and the test
+passes when run on the same qemu version in vanilla VHE mode.
 
-Could you describe here what actually happens? I think pKVM init fails
-before any page is handed out twice. Just below 2 TiB, hyp_pool_init()
-for host_s2_pool hits the BUG_ON() in hyp_set_page_refcounted() on
-hpool's page-table pages, and from 2 TiB up hyp_back_vmemmap() zeroes
-the new hyp page tables while they're being built.
+Full log:
 
-Cheers,
-/fuad
+  https://lava.sirena.org.uk/scheduler/job/196379#L2476
 
-[1] https://lore.kernel.org/all/20260715150125.2798116-1-smostafa@google.com/
+bisect log:
+
+# bad: [39ee95e368c911fdd4d896d9e30dc39e03655533] Merge branch 'for-linux-n=
+ext-fixes' of https://gitlab.freedesktop.org/drm/misc/kernel.git
+# good: [05441d697f7f9a927264f4058cbbc6a03dfcac9d] Merge tag 'cocci-7.4-rc1=
+' of git://git.kernel.org/pub/scm/linux/kernel/git/jlawall/linux
+# good: [5b4696e0bfc358619adaeab25ad35b4979af8331] ocfs2: cache the mount c=
+ontext for dentry lock callbacks
+# good: [81755e75f86c490bc9296f6cec0cd221edecaa27] KVM: arm64: Reset TCR_EL=
+2 according to guest's E2H mode
+# good: [b5d08dcf25e7a22a7f52d9806c6c6db0c3354a0b] KVM: arm64: selftests: T=
+est MOVI and MOVALL on a pending LPI
+# good: [2942baff3a951e0805d0ce9608f318e21c7e3744] arm64: sysreg: Add TCR_E=
+L2 to sysreg infrastructure
+# good: [126429e2f503ade63502978beb0c519066442250] ocfs2: stop recovery bef=
+ore shutting down local allocators
+git bisect start '39ee95e368c911fdd4d896d9e30dc39e03655533' '05441d697f7f9a=
+927264f4058cbbc6a03dfcac9d' '5b4696e0bfc358619adaeab25ad35b4979af8331' '817=
+55e75f86c490bc9296f6cec0cd221edecaa27' 'b5d08dcf25e7a22a7f52d9806c6c6db0c33=
+54a0b' '2942baff3a951e0805d0ce9608f318e21c7e3744' '126429e2f503ade63502978b=
+eb0c519066442250'
+# test job: [5b4696e0bfc358619adaeab25ad35b4979af8331] https://lava.sirena.=
+org.uk/scheduler/job/190826
+# test job: [81755e75f86c490bc9296f6cec0cd221edecaa27] https://lava.sirena.=
+org.uk/scheduler/job/196795
+# test job: [b5d08dcf25e7a22a7f52d9806c6c6db0c3354a0b] https://lava.sirena.=
+org.uk/scheduler/job/194830
+# test job: [2942baff3a951e0805d0ce9608f318e21c7e3744] https://lava.sirena.=
+org.uk/scheduler/job/196614
+# test job: [126429e2f503ade63502978beb0c519066442250] https://lava.sirena.=
+org.uk/scheduler/job/190308
+# test job: [39ee95e368c911fdd4d896d9e30dc39e03655533] https://lava.sirena.=
+org.uk/scheduler/job/198582
+# bad: [39ee95e368c911fdd4d896d9e30dc39e03655533] Merge branch 'for-linux-n=
+ext-fixes' of https://gitlab.freedesktop.org/drm/misc/kernel.git
+git bisect bad 39ee95e368c911fdd4d896d9e30dc39e03655533
+# test job: [cbf47fe57a568f178ac55176d98a13caba1d8598] https://lava.sirena.=
+org.uk/scheduler/job/195738
+# bad: [cbf47fe57a568f178ac55176d98a13caba1d8598] KVM: arm64: Clear the who=
+le hugetlb folio when sanitising MTE tags
+git bisect bad cbf47fe57a568f178ac55176d98a13caba1d8598
+# test job: [f86c6685ac5cf60f80478c006a521aef122a9517] https://lava.sirena.=
+org.uk/scheduler/job/194120
+# bad: [f86c6685ac5cf60f80478c006a521aef122a9517] Merge branch kvm-arm64/mm=
+u-fixes-7.4-1 into kvmarm-master/fixes
+git bisect bad f86c6685ac5cf60f80478c006a521aef122a9517
+# test job: [388faffbd371fd367d39535ad2aa07fbbd745c08] https://lava.sirena.=
+org.uk/scheduler/job/196379
+# bad: [388faffbd371fd367d39535ad2aa07fbbd745c08] KVM: arm64: Convert TCR_E=
+L2 to config-driven sanitisation
+git bisect bad 388faffbd371fd367d39535ad2aa07fbbd745c08
+# first bad commit: [388faffbd371fd367d39535ad2aa07fbbd745c08] KVM: arm64: =
+Convert TCR_EL2 to config-driven sanitisation
+# test job: [62b9e1f75a3c39cfc38b3950bbad017ac5f95bcc] https://lava.sirena.=
+org.uk/scheduler/job/199296
+# bad: [62b9e1f75a3c39cfc38b3950bbad017ac5f95bcc] KVM: arm64: Clear the who=
+le hugetlb folio when storing MTE tags
+git bisect bad 62b9e1f75a3c39cfc38b3950bbad017ac5f95bcc
+# test job: [0e24f9db2ebedc271add0c5dbf2821b8f8a0ab06] https://lava.sirena.=
+org.uk/scheduler/job/199765
+# bad: [0e24f9db2ebedc271add0c5dbf2821b8f8a0ab06] KVM: arm64: Add an ISB af=
+ter mapping a hyp fixmap slot
+git bisect bad 0e24f9db2ebedc271add0c5dbf2821b8f8a0ab06
+# test job: [361564a8d4305100ee4140ff7b345d1bf2c1a1b2] https://lava.sirena.=
+org.uk/scheduler/job/200104
+# bad: [361564a8d4305100ee4140ff7b345d1bf2c1a1b2] KVM: arm64: nv: Correctly=
+ compute the effective TCR_EL1 for nVHE TCR_EL2
+git bisect bad 361564a8d4305100ee4140ff7b345d1bf2c1a1b2
+# test job: [388faffbd371fd367d39535ad2aa07fbbd745c08] https://lava.sirena.=
+org.uk/scheduler/job/196379
+# bad: [388faffbd371fd367d39535ad2aa07fbbd745c08] KVM: arm64: Convert TCR_E=
+L2 to config-driven sanitisation
+git bisect bad 388faffbd371fd367d39535ad2aa07fbbd745c08
+# first bad commit: [388faffbd371fd367d39535ad2aa07fbbd745c08] KVM: arm64: =
+Convert TCR_EL2 to config-driven sanitisation
+
+--Q+tSDECOZioM9ODW
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQReagvpf3TrrA7BoYYv73Ows9A4iQUCau27VwAKCRAv73Ows9A4
+iRzOAP42fbJOeL2JgLldR3yOcQk2vlJFl9o7dPY+rOMfa5MtEQEAng8Vfo0XGQqI
+ruDRjjIihEtDms/tKYHXHu/mzbsJBAQ=
+=8ggV
+-----END PGP SIGNATURE-----
+
+--Q+tSDECOZioM9ODW--
