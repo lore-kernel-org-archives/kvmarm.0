@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1793989921;
-	b=ndD9ch1LEhCqGiqkznvhfDVEbt6vh3cGAiTc02NLx4L1ZH9XIZtGCfEI6C8oFaNgwsT5
-	 hv9Up4ewvjtgGr7N20P45I81TlaWcoXWhvyT4olR8eF/jtsY4ty95kE/4WyP4XorYiCSK
-	 Pqnxw2KeCgo1FAF7rhZAde/YG1bszeJSH15vD0BbAMpSq9pdMJY+WEK1B4QyK76mQ+YmI
-	 /dx940WDJ179DWcYuuyQwfrTw/bNuRooWhBb8ZXPNpluWY4JTmqfn7LHAW01XOQAqb5kW
-	 qEttRuSE9W0J4L4VI2OkSBnVsqV2bhxfF/LtAFBvHv4z35/ixH715AY+ybc0K+9x4Ag==
+	b=X7SqxHQaXEmQxyHNt5RLVbX+Z1FCrOpStDQ2Uca++vin2AntxpEWd+jKVoeGI2kazKcN
+	 vpF+KpJzWZeVGgjFhnsVDkDFnA/C5T899j1OxKQViD+sZ6nQ6wA1Np6rmH9k1hNtqk0is
+	 ctI2y7u7OOIwuDdRzvBJxOVU28huwO7jhb7AEm5KLFFthbJl599zp4XLip01EcqPUHdEl
+	 uJO2Jr8/+ogGcpUfWrrtzw0ahWGSCI0Ho/th/g0bq4tFW+zq9nogRP9e7EzbvU2w0KWjm
+	 Sl/IUUTwwOMjO43IsH4ADabhKQa0AYUtg5jmBIQbTu7O0OaGMyDHILbhNibxp/lpkBw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1793989921;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=HmaZ4Psp27d2G47+NkoABJyAh37GpTuzTWDBQEHhSPE=;
-	b=wSfAqiDvXm8wHT26lFKbWP4lOS58ekvoc1dngkPOqrFQC2090wsDN56RV9hnaYSspgnD
-	 Ii0322G4iEaRmo5h5sr/aFhSVUcjCdNxl2B4Fi7BMLE3q81n8KfEXYmo1KAHeT0fkyAD+
-	 zWmOgCtMHfDoS9BDNlun2fWHrGAyYsKELVapj+ef/A5/SmBXJSYsJQ4wvDIrBj+89aE0U
-	 uSKALhWvsWFiTgnayKMNhyDAKqGH9d1xFFtgVXKcTIiMgXdY3GJ8dOxZtHYax1G4Ad4wF
-	 g9gca9ukEy8xuu7XBbGFHvvq8aPacRz89pzMY0i6DCbStZmkE8hMZ0MctSUp1JNWDOA==
+	bh=FAE94lWpgWKKeCb67HBpGAQrF4M07C/IUhlefBjBE3g=;
+	b=JaoLK7auJV1Z7m3ujjtMLb/GplyBqjgYw+CEFAH/T1TIO0L8Cj/zN0655VwXASwlMiiQ
+	 qPOA8KlDh226m6Yb2/XypIYa3nnBBlpkckEABig+L9/rqWLF8q3LZRWMFxXhv0eWsVbx3
+	 QSz3ufdd5PfB6cph2fLg3UqJKL7KMciUGn/JoedSSqSCQMWLAw7SaP8jXy6KQtjPYKgVd
+	 f733oCRNO8VuSzEXde9+bOCsUuF+JQDxKxPoWjIoUmyEf9WBp+nv7Qxz/L5pHwpU6ixOV
+	 8j2PJc9UOqXt0XXYlBJ/cBLg0Qnvqt4afZ4TjNl9PzL8x/AFUTlaGE2oahnO7BhxSGg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QJ+BJuL6;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VKv9DKK6;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A5C606A329;
-	Fri,  6 Nov 2026 18:32:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907B2606A32C
+	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 18:32:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QJ+BJuL6
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D2431F008A3;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VKv9DKK6
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AC3F1F008A6;
 	Fri,  6 Nov 2026 18:32:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1793989921;
-	bh=HmaZ4Psp27d2G47+NkoABJyAh37GpTuzTWDBQEHhSPE=;
+	bh=FAE94lWpgWKKeCb67HBpGAQrF4M07C/IUhlefBjBE3g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=QJ+BJuL6h+sj+cemaml6/z9FJazHbjqxX5efdm2kcTBuK4xPuyUnFUvre4lrUrNZU
-	 TNp1tOF3PmDY+2dlGpZSipw5C9qOAIPjGA3aZT6M+5OKlEYvpzs0MkvwrXr5IjWnPr
-	 HWBLB0qLpNcALDWpOMdE9qYyhtCUdtCS0l5vKOA0m6t/M7zAEOmHQJY8C0hoFmo9/v
-	 2xo+88G78ZttpQ24629c5CQatVEt7D2lErAmICBWPcrltvhJX3tFpvh9QKXab9HwJj
-	 bDvt2TyaoXv9JAPMekT1OubdB7NUMxi7JdOLHGRiPplqoKyyMPo4en0MYXuRGvgEe3
-	 dHmes0gydTiHQ==
+	b=VKv9DKK61wYY6qQCS//ordwfv4tC2qUKctIvtDLhsxwo/9LJnf7i9k8frWnTKTv90
+	 Jqb1NEqKPp53jnr2N7MAdrw0deFH2SoTug1o3+JWBQMIJGYj9sm4qgAI7H3x/EZWDF
+	 WYBiBTqUCZRbzHyPAaPR4y1DDJ7Mxn/icBB2F5dJmlqtRCE1FTBkyuPX3H4e+xs/D/
+	 /mA0+HO1AN5n9AZmF3/91Ie5+k5eNqxJjTpSGXKq7Jepkd2GLYLOjqjV7JjzDcYJ8f
+	 T3fXJMbUOwz02pu0oaqluWnE5Qw1Z5aN6CFDMCp+319kCyhBJ82A3hGNycUys9tzys
+	 hJFXsdYJkKs5w==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -49,10 +49,10 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Fuad Tabba <fuad.tabba@linux.dev>,
 	Oliver Upton <oupton@kernel.org>,
-	stable@vger.kernel.org
-Subject: [PATCH v2 1/8] KVM: arm64: nv: Disallow KVM_CAP_ARM_MTE + FEAT_EL2
-Date: Fri,  6 Nov 2026 10:31:47 -0800
-Message-ID: <20261106183154.3590825-2-oupton@kernel.org>
+	Leonardo Bras <leo.bras@arm.com>
+Subject: [PATCH v2 2/8] KVM: arm64: nv: Add CGT description for FEAT_PoPS instructions
+Date: Fri,  6 Nov 2026 10:31:48 -0800
+Message-ID: <20261106183154.3590825-3-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261106183154.3590825-1-oupton@kernel.org>
 References: <20261106183154.3590825-1-oupton@kernel.org>
@@ -67,71 +67,29 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-KVM's nested implementation already hides FEAT_MTE and its laundry list
-of derivatives from an NV guest. While good, this is insonsistent with
-the UAPI which does not explicitly prevent the combination of MTE and
-NV.
+The DC CIVAPS and DC CIGDVAPS instructions are both affected by
+HCR_EL2.TPCP. Add the missing CGT descriptors.
 
-Bite the bullet and refuse to create a nested VM if KVM_CAP_ARM_MTE has
-been enabled.
-
-Cc: stable@vger.kernel.org
 Fixes: a7484c80e5ca ("KVM: arm64: Allow userspace to request KVM_ARM_VCPU_EL2*")
+Reviewed-by: Leonardo Bras <leo.bras@arm.com>
 Signed-off-by: Oliver Upton <oupton@kernel.org>
 ---
- Documentation/virt/kvm/api.rst |  1 +
- arch/arm64/kvm/arm.c           | 16 +++++++++++-----
- 2 files changed, 12 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/emulate-nested.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index e95c9cda085d..4ce4166d415f 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -3602,6 +3602,7 @@ Possible features:
- 	- KVM_ARM_VCPU_HAS_EL2: Enable Nested Virtualisation support,
- 	  booting the guest from EL2 instead of EL1.
- 	  Depends on KVM_CAP_ARM_EL2.
-+          Cannot be enabled if KVM_CAP_ARM_MTE has been enabled for the VM.
- 	  The VM is running with HCR_EL2.E2H being RES1 (VHE) unless
- 	  KVM_ARM_VCPU_HAS_EL2_E2H0 is also set.
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 157bf4b81202..4108ff30830c 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -480,7 +480,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = cpus_have_final_cap(ARM64_HAS_32BIT_EL1);
- 		break;
- 	case KVM_CAP_ARM_EL2:
--		r = cpus_have_final_cap(ARM64_HAS_NESTED_VIRT);
-+		/* Nested virt is incompatible with MTE */
-+		if (kvm && kvm_has_mte(kvm))
-+			r = 0;
-+		else
-+			r = cpus_have_final_cap(ARM64_HAS_NESTED_VIRT);
- 		break;
- 	case KVM_CAP_ARM_EL2_E2H0:
- 		r = cpus_have_final_cap(ARM64_HAS_HCR_NV1);
-@@ -1793,13 +1797,15 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
- 	    !test_bit(KVM_ARM_VCPU_PMU_V3, &features))
- 		return -EINVAL;
- 
-+	/* MTE is incompatible with AArch32 and nested virt */
-+	if (kvm_has_mte(vcpu->kvm) &&
-+	    (test_bit(KVM_ARM_VCPU_EL1_32BIT, &features) ||
-+	     test_bit(KVM_ARM_VCPU_HAS_EL2, &features)))
-+		return -EINVAL;
-+
- 	if (!test_bit(KVM_ARM_VCPU_EL1_32BIT, &features))
- 		return 0;
- 
--	/* MTE is incompatible with AArch32 */
--	if (kvm_has_mte(vcpu->kvm))
--		return -EINVAL;
--
- 	/* NV is incompatible with AArch32 */
- 	if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features))
- 		return -EINVAL;
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 2bec81668361..d04ac5203454 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -747,6 +747,8 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+ 	SR_TRAP(SYS_DC_CGDVAP,		CGT_HCR_TPC),
+ 	SR_TRAP(SYS_DC_CGVADP,		CGT_HCR_TPC),
+ 	SR_TRAP(SYS_DC_CGDVADP,		CGT_HCR_TPC),
++	SR_TRAP(SYS_DC_CIVAPS,		CGT_HCR_TPC),
++	SR_TRAP(SYS_DC_CIGDVAPS,	CGT_HCR_TPC),
+ 	SR_TRAP(SYS_IC_IVAU,		CGT_HCR_TPU_TOCU),
+ 	SR_TRAP(SYS_IC_IALLU,		CGT_HCR_TPU_TOCU),
+ 	SR_TRAP(SYS_IC_IALLUIS,		CGT_HCR_TPU_TICAB),
 -- 
 2.47.3
 
