@@ -1,60 +1,114 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793994657;
-	b=GjX2RQPKkUjrwsK/CzwUIbGGKPvF2qx3sPECTLxnIuJHfkVD8JsQTMfnzyTOf2GUQzlE
-	 PKls+8fLmLRRxjgC/PSliBbNzPc79QJPufcJvzVzK0yc/DhafX4WhufRQw2KaMwmd5NuN
-	 V+evPakxnEbFVILgDRqIfflrfod05Ye6D+vca/ABAThxtD+E1eG38eREObA4f5EAVPFns
-	 CrzCl8RYc57AedE1tz52BjG5OVRZpDYiEAt8voGgaOpfmN67Y4SGBSmxHsAyezzHuv3tB
-	 1XSCK9cyX+mgJqQg/8NmkR010vLtcZEx+7HrURcU8UNTXO22oNYPUMJz4TiAaPA7Qdg==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793994657;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=J+pizboib7QvoI9axwYZyyy7vwdfW+PSuP4oklTDdq8=;
-	b=MqaCqDTt+/gqCSJ7TolPndgQmAJnB/nvocjIlHrnKWbzBNNyVsCA4kWdutouvThXZyMz
-	 XHYa2VYJVdod7QtWcz/62H7HAi4vmB5mBRj+DOUKf9N1SGvQKBUTCpe476pTAupqCojby
-	 EWbr0/rEjSDWceGNzaF1yGcZvRj+9DtCEamTxjA1711zAHKQEWtlx/1BGvrkdcQi7b5/Z
-	 LzY1qSRek3YTUAsIV6EOM+kC3+qkcGCxwVTwcRjSUZMdaRyY8JhwQZPKWofO5R+9n53XU
-	 RavmvDoAZlxJQ7e3xD8i8eqzlIT5tb2Lex62d7Fwu0gtaoW0ha7jIH841ZOgHa6uZlQ==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JI7Fjp79;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.43.23
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1793995025;
+	b=K1LC+QbHhcBVg3lAyxu9Y/vqDBYoyCjF/tPBcpBfega0muh5eMw4e7SDvEENh+fvjefP
+	 ft8OI4Ums12VnT3CS+yZhVLlbDqRQLgircPDIaUCqX/bB+dDZp7a0CgXn0vGFeqefQDsU
+	 gffd5IAnM1dG9qHmwBwqZCmc8+ix4ux0PX3ysTnh1iNL7YB++wkKnsL4xHRxZHOLXusbA
+	 UXOWkrDzTPupPTqwv+jgPQXNNXvSD/Tqv8gn4EmBfs/vGYAvjex+dX5WoKz5ja2B79Dff
+	 w81blm9VWAJhogTk+Uweu8NpjaGWmhCWnhvBsS3789KNHXx141wog17KDXyqf6c+xmg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793995025;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:
+	 X-MS-Exchange-Authentication-Results:Received-SPF:Received:Received:
+	 Received:Received:Date:From:To:CC:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
+	 X-NV-OnPremToCloud:X-EOPAttributedMessage:X-MS-PublicTrafficType:
+	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
+	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
+	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
+	 X-Forefront-Antispam-Report:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-Id:
+	 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp:
+	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
+	bh=U35EW0rSQqovkhDvCT99KqBJ/0CFSW02gIsNnYH55/I=;
+	b=P1HcC9VSlJsEmoyIDtXEmCyRiJ6NVB3Nsx/CpWbtqjX+zzQJQu8PruQuDUSbmmhA8HH5
+	 dnLllYSwplLsmjBAcaEuT3ijvC1UGc2e7BCDrnrU2M6V4ZC+aby5ogLf/70VivHpMCkQH
+	 lO7eXW3yt53P+QcXdSCc1oE3zk6l1l+LASlEpsNdSHuhPzUQp+j/6PyKXOubjOfrwbl0N
+	 5F6iYrif8tbk6E13rW5g20cPfFCZ3XrW1VHdegX2l/edWT4xJL579ygrdWiHNuvhwESqX
+	 M/PimRfwudTrbaARnei361HUIEN6pNDoGiSEATrXKXc7PMEnURBanv8epOJZjrkQ1AA==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=nvidia.com;
+	spf=fail smtp.mailfrom=nvidia.com;
+	dkim=pass header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=R4jv5pRl;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.43.23
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012023.outbound.protection.outlook.com [52.101.43.23])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A4F606A329;
-	Fri,  6 Nov 2026 19:50:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79765606A32C;
+	Fri,  6 Nov 2026 19:57:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 79765606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JI7Fjp79
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 976BB1F008A2;
-	Fri,  6 Nov 2026 19:50:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793994657;
-	bh=J+pizboib7QvoI9axwYZyyy7vwdfW+PSuP4oklTDdq8=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=JI7Fjp79diyOgJGyEAlLvuBvkivUlChN4pI2c5NNLdEo/rS1rwWpe9CAWw9XfHviG
-	 NXVlbshfWouovcnaNA0pYkpRCS2RSimV89VqY7SsQpNWGeXSEd6AIe2VpF5fC90MHd
-	 W5B05QbSu3stzD3Mcg6PpiXFw0arGQs25PNnTS7LrYYSwzpEkihGVWgDZBK6CoZ2iM
-	 0oEfcT3QCxt6qj+7rI+1TY6D3ns2uEznFvSddjTJOlAVnI68nR6YQSqdHt3tw2HoV0
-	 xK2DJS+eFJf3cWXXev9N4nfDlZVy8bF8pxlWtG/FgFKQDO9UpmemSS/9Fd+8uOlhGf
-	 kOHP4tGdwjhBw==
-Message-ID: <sashiko-outbox-202177@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 19/23] KVM: s390: arm64: Implement exception
- injection
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Steffen Eiden" <seiden@linux.ibm.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-s390@vger.kernel.org, "Oliver
- Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>, "Heiko
- Carstens" <hca@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>, "Alexander
- Gordeev" <agordeev@linux.ibm.com>, "Christian Borntraeger" <borntraeger@linux.ibm.com>
-In-Reply-To: <20261106-sysreg-v3-19-75e95980fb10@linux.ibm.com>
-References: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
- <20261106-sysreg-v3-19-75e95980fb10@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Nov 2026 19:50:56 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=R4jv5pRl
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ikXVkU4pelTiyCuvVzIon9Zc+dasTt/tzaOAaNTchA2P2gXCPTYPUbZC8pga/eHv+DJ5gHVt3dmzdqKAFGl8fqlGlTR6qJvYsmg07sBtAd6TGQCsQRE4ijKVeXEshiqytUbosghCE1hMe819HeEfCnlYU4BnR2Hzx3mc3eScWBpOPMZi74jDYDQJi3gXHaHBAJjF0kcmIZ1Y8QpUaDc9t8neR6JjMRfw/vuUOZGnwDn57SjfCQft/CoTeg6in4Vrey5yq02ONSp12MzKlHmu4/kp3Of6l+lUbpsX1DV1Z7t01Worhwba97hpGmECtD7BnCOLiBrF0s118jGbcc3MVA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=U35EW0rSQqovkhDvCT99KqBJ/0CFSW02gIsNnYH55/I=;
+ b=C0WugisHQj/FsEnZX/1N3Om0ookOy+enKELzIcHeJ/99PlMyxVc09ewJ3C5F6+rx5V0nrQPXQ7i4XTclT0e4PdMoQqe+0ozoyZfHYsz+TUHQ+xQWSZSI6ylF4KeGvYm+AzGBZ6Tw/laHD86u8LATdJEcnYN9I0tSrW71nZYg5FTNpZqPSHnjLVkiyzimy7YYQR/XenogbKTlHrBqZYMJ0GsTFTDnSaYmx+uaXVZtdKGpe2i3n4iD4U/BS+2Qmh8P6HxWmH3D2ZIplud+ymjhqZX5ktqFrYIl9Og4mK+dpDSlPC+FV3ZnePLexbGguwZ6ilokq2IWtrIFvIgzl/Bo2A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=U35EW0rSQqovkhDvCT99KqBJ/0CFSW02gIsNnYH55/I=;
+ b=R4jv5pRl7/XB6Vpmi9P0w0YtQvjukTnpIk3bkJfEgSrhBayPzmSFZ9XD84HIeEic0KmSJ8ihAMkgQpBcjmJchnKztdYDwuAKnfDzftJSLRE9IzhsRyVO8XBaBdCPrhcbymqarjK/Ei3fjD5wh6eW9Sv0UJuRN7kJOrTwWJoOWEnm2UnSoGJHYcst7MvrTEAJQP+R44pn4Otk5EnIpwdqiVzLNJcCPEgIna7ZbnMLuz7hgT+Ct09pHHXvB29msX7a/zJZubPgLoezObnxYZ6gn0CDMsOKzKO1/orPc7YhabiKuRJLDxhTR7snwh/F3d/+2mmws4C5HlSsJozzxpCblA==
+Received: from MN0PR04CA0010.namprd04.prod.outlook.com (2603:10b6:208:52d::25)
+ by LV3PR12MB9329.namprd12.prod.outlook.com (2603:10b6:408:21c::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.592.10; Fri, 6 Nov
+ 2026 19:56:59 +0000
+Received: from BN7PEPF000000A4.namprd05.prod.outlook.com
+ (2603:10b6:208:52d:cafe::2b) by MN0PR04CA0010.outlook.office365.com
+ (2603:10b6:208:52d::25) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.592.11 via Frontend Transport; Fri, 6
+ Nov 2026 19:56:59 +0000
+X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
+ is 216.228.118.232) smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ BN7PEPF000000A4.mail.protection.outlook.com (10.167.245.228) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.615.4 via Frontend Transport; Fri, 6 Nov 2026 19:56:59 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56; Fri, 6 Nov
+ 2026 11:56:40 -0800
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.56; Fri, 6 Nov 2026 11:56:40 -0800
+Received: from nvidia.com (10.127.8.13) by mail.nvidia.com (10.126.190.182)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56 via Frontend
+ Transport; Fri, 6 Nov 2026 11:56:36 -0800
+Date: Fri, 6 Nov 2026 11:56:34 -0800
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: Mostafa Saleh <smostafa@google.com>
+CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>, <iommu@lists.linux.dev>, <catalin.marinas@arm.com>,
+	<will@kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>,
+	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
+	<joro@8bytes.org>, <jgg@ziepe.ca>, <mark.rutland@arm.com>,
+	<qperret@google.com>, <tabba@google.com>, <vdonnefort@google.com>
+Subject: Re: [PATCH v9 13/25] iommu/arm-smmu-v3-kvm: Add MMIO emulation
+Message-ID: <au4w8nvPQ3xv7igC@nvidia.com>
+References: <20261015200903.2735565-1-smostafa@google.com>
+ <20261015200903.2735565-14-smostafa@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -63,108 +117,63 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20261015200903.2735565-14-smostafa@google.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN7PEPF000000A4:EE_|LV3PR12MB9329:EE_
+X-MS-Office365-Filtering-Correlation-Id: 88b9b6ab-1ac1-4e33-2489-08df3c401e57
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|23010399003|1800799024|376014|7416014|82310400026|36860700016|11063799006|4143699003|56012099006|261021135927099003|10067099003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	NGd7ColiLtfxhddNNHNF/GgIuJNvkw/2e/y+JAO6xK/eODaLa0qfahYBNxhIkn9teuq804SnnjP0QC24kPjbznTAnDdgc4VrceNn5VFTF/a6WAZy4Ilq7aCiN60cIAP54wkHI92elF0J/3nRDsHv1fdeSYK4/fFEpakfpPaU1e2nOOdY7BBd4qUVMSO++IAbnW8SXprXlwwsfxLZO36e6MCzEW0aa8ymLDohR8o1N4h4VcJr/xRDTQOQnlMRNE2MbVVTCQ5UFc3H1ZPXZGfHs/CEfBzRE1xPABVG6Ke0Fw+ozkPzuGtImK6eZCW32F7HfjbhIPnUWyDgt9NUMgT9/tRckygznuOnGiKVECVQkYawNvZaNTWaX7VGgEFVRzNA/XdCcm/9e7PfWRKsjfPwLHtpWRYCuAQ9NUrEPQ6KSEoxr+IaYDOE0vPNxvgEcmUSSPfs8F1KKJpMsL51NYTRjWYyrVVdnWD4kgEDtgvPrRDIUS5w7qgugVmSJkEtcnVir53fixZFWKKXIu6ziDRhlFhcZPwihqif1m5QszV5V45UmjhaQNJHA4VsoRWebi2xVkExWEW06AIb/ffDXynWWzOr83+Z4dNu7+VL3Q+Wk5nsNk1NEKtKfQ9RxUKPp1T/epDwUeAvzCZdkMXopbXZZo1RYhrPaEDLpxchjK80TLd0C0vGI0Rk7khrLfzhmod+XkKdVqIzOxm9RpsNeGWTbg==
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(376014)(7416014)(82310400026)(36860700016)(11063799006)(4143699003)(56012099006)(261021135927099003)(10067099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	KNa9lc+h20sWwkDhVsfyLKMPR+JMOzkw8tmiaFELwOEls32zM1uVneXgn9DNctdkHYp9f+xzY/JqO4tua2CiuNZzbHSFUzkqMt3HthGrOz1uSI0rD0qalTyX3/LxBv77Jm5ZqdC7q9cIWTfJCFHkfqRlCbpSTeZrUjliL5t3RNB9vStnz7WGWKd5LuKgs/bBhs5dUWzJ0nUmdU907cBSHKy/4wGTQZ4NWicSUL1s02D5gUs2JlSTMjMjWmm/Ut28KvZKkjDvAXJIfOZAMVqhulHFaf1RaVDBQpdda3bj3ZkeRx+bF0pjapgTSY19jXQwp/Z9bSXeQqynGeUFBpvMns8l9mFFdq9kbWnGHFwZVCqYDc40IjekQpFoPGBVxQjYIW3KI14FRcCuFGi6+5P/vBNxTqIT9tGt7QtEZXrZwimyhJYE5Hiq2FJeluAAVIKn
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2026 19:56:59.2655
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 88b9b6ab-1ac1-4e33-2489-08df3c401e57
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN7PEPF000000A4.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9329
 
-Thank you for your contribution! Sashiko AI review found 2 potential
-issues to consider:
-- [High] KVM: s390: arm64: preemptible smp_processor_id() and migration
-  race in sysreg access
-- [Medium] KVM: s390: arm64: unsigned gltl overflow in inject_abt64()
---
-
-commit 9004b39a5f6b970883241ce75cb94bfa9bdd2fe1
-Author: Steffen Eiden <seiden@linux.ibm.com>
-
-KVM: s390: arm64: Implement exception injection
-
-This commit adds guest exception entry and fault injection support for
-arm64 guests running under KVM on s390.
-
-> diff --git a/arch/s390/kvm/arm64/arm.c b/arch/s390/kvm/arm64/arm.c
-> index 4de0f17052cb8..91e9f4a75ce73 100644
-> --- a/arch/s390/kvm/arm64/arm.c
-> +++ b/arch/s390/kvm/arm64/arm.c
-[ ... ]
-> @@ -511,8 +503,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-> =20
->  	kvm_sigset_deactivate(vcpu);
->  out:
-> -	if (unlikely(vcpu_get_flag(vcpu, INCREMENT_PC)))
-> -		adjust_pc(vcpu);
-> +	if (unlikely(vcpu_get_flag(vcpu, PENDING_EXCEPTION) ||
-> +		     vcpu_get_flag(vcpu, INCREMENT_PC)))
-> +		kvm_adjust_pc(vcpu);
-
-[Severity: High]
-Does accessing save-area registers with preemption enabled here and during
-handle_exit() trigger a debug_smp_processor_id() splat and race with host
-CPU migration?
-
-At the out label (before vcpu_put()) and inside handle_exit(), the vCPU is
-loaded (vcpu_is_loaded(vcpu) is true) while IRQs and preemption are
-enabled.  When an exception is injected (for example via
-kvm_inject_undefined() -> kvm_inject_sync() or inject_abt64()) or
-delivered here via kvm_adjust_pc() -> kvm_inject_exception() ->
-enter_exception64(), vcpu_read_sys_reg() and vcpu_write_sys_reg() access
-VBAR_EL1, SCTLR_EL1, FAR_EL1, and ESR_EL1 through _vcpu_read_sys_reg() and
-_vcpu_write_sys_reg():
-
-arch/s390/include/asm/kvm_host_arm64.h:_vcpu_read_sys_reg()
-	KVM_BUG_ON(vcpu_is_loaded(C) && smp_processor_id() !=3D (C)->cpu, (C)->kvm=
-);
-
-Calling smp_processor_id() in preemptible context triggers a BUG splat
-when CONFIG_DEBUG_PREEMPT is enabled, and if the vCPU task is preempted
-and migrated between reading smp_processor_id() and reading vcpu->cpu,
-KVM_BUG_ON() fires and terminates the VM:
-
-CPU0                              CPU1
-handle_exit() / kvm_adjust_pc()
-  vcpu_read_sys_reg(vcpu, VBAR_EL1)
-    smp_processor_id() -> 0
-  <preempted and migrated>
-                                  kvm_sched_in()
-                                    kvm_arch_vcpu_load(vcpu, 1)
-                                      vcpu->cpu =3D 1
-                                  vcpu->cpu -> 1 !=3D 0
-                                  KVM_BUG_ON()  <-- kills VM
-
-> diff --git a/arch/s390/kvm/arm64/inject_fault.c b/arch/s390/kvm/arm64/inj=
-ect_fault.c
-> index 425dbeaa421c6..33f40c5188c98 100644
-> --- a/arch/s390/kvm/arm64/inject_fault.c
-> +++ b/arch/s390/kvm/arm64/inject_fault.c
-> @@ -2,6 +2,38 @@
-> =20
->  #include <arm64/kvm_emulate.h>
-> =20
-> +static void pend_sync_exception(struct kvm_vcpu *vcpu)
+On Thu, Oct 15, 2026 at 08:08:44PM +0000, Mostafa Saleh wrote:
+> +static bool smmu_dabt_handler(struct user_pt_regs *regs, u64 esr, u64 addr)
 > +{
-> +	kvm_pend_exception(vcpu, EXCEPT_AA64_EL1_SYNC);
-> +}
+> +	struct hyp_arm_smmu_v3_device *smmu;
+> +	bool ret;
 > +
-> +static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned l=
-ong addr)
-> +{
-> +	unsigned long cpsr =3D *vcpu_cpsr(vcpu);
-> +	bool is_aarch32 =3D vcpu_mode_is_32bit(vcpu);
-> +	u64 esr =3D 0;
-> +
-> +	if (kvm_vcpu_abt_iss1tw(vcpu))
-> +		esr |=3D ESR_ELx_FSC_SEA_TTW(kvm_vcpu_abt_gltl(vcpu));
-> +	else
-> +		esr |=3D ESR_ELx_FSC_EXTABT;
+> +	for_each_smmu(smmu) {
+> +		if (addr < smmu->mmio_addr || addr >= smmu->mmio_addr + smmu->mmio_size)
+> +			continue;
+> +		hyp_spin_lock(&smmu->lock);
+> +		ret = smmu_dabt_device(smmu, regs, esr, addr - smmu->mmio_addr);
 
-[Severity: Medium]
-Can ESR_ELx_FSC_SEA_TTW(kvm_vcpu_abt_gltl(vcpu)) overflow the 6-bit FSC
-field into bit 8 of ESR_EL1 on a level -1 translation table walk?
+Going through the followup patches, I found this smmu_dabt_device
+gets really too big. Perhaps it can be bisect to read and write at
+least? Something like:
 
-vcpu->arch.sae_block.hai.gltl is declared as u8, so kvm_vcpu_abt_gltl()
-zero-extends a two's-complement -1 (0xff) to 255 instead of -1.
-ESR_ELx_FSC_SEA_TTW(255) then evaluates to 0x113 (0x14 + 255), which sets
-bit 8 (ESR_ELx_CM for data aborts or a RES0 bit for instruction aborts) in
-esr, and kvm_inject_size_fault() only masks off GENMASK_ULL(5, 0)
-afterwards.
+static bool smmu_mmio_handler(smmu, regs, esr, off)
+{
+        /* decode ESR: len, rd, xzr; width check */
+        if (is_write)
+                return smmu_mmio_write_handler(smmu, off, len, val);
+        val = smmu_mmio_read_handler(smmu, off, len);
+        if (!is_xzr)
+                regs->regs[rd] = val;
+        return true;
+}
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261106-sysreg-v3-=
-0-75e95980fb10@linux.ibm.com?part=3D19
+Nicolin
