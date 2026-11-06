@@ -1,83 +1,83 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.156.1
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1793981322;
-	b=KD0JpJXTwGnBD9B7aPhUZDrGu66vF+1WrhoaWATvJS87VhZQ//zhQTyU2gk+EJPw7TKr
-	 bwRdKH4ymSySDdILvSycSQZLUIyizJVnIBny2qnhbBlUdpQ7h0/S28dshhQddNf7jhd6O
-	 4lB9YloKeMOAe4Ih5NypgsxGkO8c0xXZsPR2FLvGG3niFVNqC3mtB3y48XFx1F7RaKmd2
-	 ty2kikvatV0+i0wJR+ri1Kt+DkPhWk78u84yxZxcp6rPxzO+y17ea8Fz5f543afr3i0S1
-	 B4ah+lfVRetxeTgAMdKPr7HG20KsVLF0Y455oZqXMk1EtDOehxK5Z5Amwsx5P/iMNtQ==
+	b=dbh3hzSquxJ421Btm/mfl26bAk2QArDgauufB1OKrDqNWe1PoR6g3fKZVhqbhYXIkw7R
+	 qu+na0eijTwLZ8njLHQGVmrrOfuC/3TJPiIfu0nzcrrUsiiV2T0hHoL3232nf4iAAiZtf
+	 ncwU4PBNRplEz/IgV1NooY6l6Bp86vXluyfSBrRcLP8STVI+kCJLVU3AUI1Pguykx9rRm
+	 N1XNRkpz9lawtTawFjsJRIcrLBWCx1pCpgIGyaERwUhkZ/IUKx64JBtK5TAyWaNEOTMLo
+	 scsPSBE0UpfyVbxvNZ+7MZjJA4wdTzGptdorcHgK1/pwJ6jlXXp9Llvdz2lw90aWKAA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1793981322;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
 	 Received:Received:Received:Received:From:Date:Subject:MIME-Version:
 	 Content-Type:Content-Transfer-Encoding:Message-Id:References:
-	 In-Reply-To:To:Cc:X-Mailer:X-TM-AS-GCONF:X-Proofpoint-ORIG-GUID:
-	 X-Authority-Analysis:X-Proofpoint-GUID:X-Proofpoint-Spam-Details-Enc:
-	 X-Proofpoint-Spam-Info:X-Proofpoint-Virus-Version:
+	 In-Reply-To:To:Cc:X-Mailer:X-TM-AS-GCONF:X-Authority-Analysis:
+	 X-Proofpoint-GUID:X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Virus-Version:
 	 X-Proofpoint-Spam-Details;
-	bh=IrWQ8uyRNpiuUgwIHv/xG8dMDSEjnpkf5UrJq74oLLM=;
-	b=HyyhtHTZlvT3GcLdKL475oYSAHMLXjPoIaBjPM2LheN9GBT8/dwUXysv3+twDRaom8/m
-	 VIndwMuW42YeUOOU/sUPTjCmEQ+Y9o3EortUHaK/1V6+MZsJ5WT8JgpymACeGQZN/pajS
-	 G8cONjbyneRv4hpf68H6/0i44OsHlg0KcgPeRBkeo5hvvRmIqIILkohp/popEO/9zmZ7S
-	 9hXLFWlj2wQDuJAKYq+1qXuax0Ix81da1GokKxQI5UUag76qxmHdMuRlBIZq+l74S++Zl
-	 epC6dv59+AkpVwVLPmpgfcDpDxGvinoHozr+Y/9VHnIVXd0ug4UiEdOGxQAI1eg/ZWQ==
+	bh=W127d2adflmjvt3WWavZucVr9TwbuK1rER800FERqDo=;
+	b=J5ehlUjKgt1FAsYtQ+LdMnZtdN9ZVLnVRIBf0EoPef/esnHNyy4EW7VrNFpLAT9IOUe+
+	 l11SgTDBDpNFNcWZcJUj2WfKknuFaSZjI13txIxVWwJC7x6LxCF57CIFTVG5BR15kceyg
+	 vsQ4vrCyd8r/gUeMp51j/FaYOIiqqKw4N0ZtqxByoPfvLhQrGRlWix/OhVIDrind0iFoS
+	 Z0oGeG++8wixy0VRoDJi33a1QfqsRrpcJlVCo76EG7u4b1NA7gqXBbCBK2cMYKuZJPyeT
+	 4MAlPxLkKVZ3baAyxcyQKrDlKSG6E4cBJd7tzeWTx9XhwtkNFER6OETZGlvwT4KM8tA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.ibm.com;
 	spf=pass smtp.mailfrom=linux.ibm.com;
-	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=gS8sw9Wa;
+	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=ai74M2c+;
 	arc=none smtp.remote-ip=148.163.156.1
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E5C606A32E
-	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 16:08:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C5E5C606A32E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9915606A329
+	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 16:08:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D9915606A329
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=gS8sw9Wa
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A6FEEud2936029;
-	Fri, 6 Nov 2026 16:08:20 GMT
+	dkim=pass (2048-bit key, unprotected) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=ai74M2c+
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A6FEAPk1094572;
+	Fri, 6 Nov 2026 16:08:21 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=IrWQ8u
-	yRNpiuUgwIHv/xG8dMDSEjnpkf5UrJq74oLLM=; b=gS8sw9Wa9BfYd08n8DTEbD
-	XBD6xQxut0Tm0+QFg8a3hjC+3XZJQCWIj0jp5rH4t4eGJ0DOh/NAHszVLeedyr8V
-	6sLi1+3q1FyZoxMA8LMDFDnexPRAr7w0y8f/2cKSPAnwIZ3f061IKPFbFmYCa9my
-	r6Qxo0Y0LnQl1apyyF9jqP+BCMyIsce8aqRYOCs3epxdJhzg4osV/6Lb5T9VuZUA
-	6Qa8cmLLozN2m4uvED2DwhcYzrJhZDYFByh8WaBSahfWF3hPesovj7RladGsHqqk
-	duUAObWQ8YZtb89xnroSUEH857Obquzwr3aa8cSINuORK3cO3R5yMQC0/1TaOExA
+	:message-id:mime-version:references:subject:to; s=pp1; bh=W127d2
+	adflmjvt3WWavZucVr9TwbuK1rER800FERqDo=; b=ai74M2c+4gU6e6QH8W5V6z
+	G0Togt0SHtIMqwNEq9C0gVBmoAzc5yiwVkWMRwKvlUwuH2P+Z6/v4LW1VbISxxQq
+	O4Il+m7pZeDXQeA5fFM7066MH9tDf/E0vtpeBc+1tim1xBZD4iO4Rj24yyb+oRwA
+	dDecooXIkp+ua5ZjBK5HHtQUnjYCd9u8YhwlvcNIxUURH8o2ce0gtT8CkD3xZ5HK
+	eOjysexAaqR618eET1eFy9fFIs6lYJwwHeMxKU1e61jD4Od3kYm/qBQ0+h7rRCoC
+	HlhhV69DNyi8momXR3J53MrYKzf9r2vXoHDQrppjBxtLRriirT5DWCHxUhz04e/w
 	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4hs3rcdhet-1
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4hs3rawhyq-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 06 Nov 2026 16:08:19 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A6FK7xv3577902;
-	Fri, 6 Nov 2026 16:08:18 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4hqv1v870k-1
+	Fri, 06 Nov 2026 16:08:21 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A6F4vHX3617207;
+	Fri, 6 Nov 2026 16:08:20 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4hrdd7ukc0-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 06 Nov 2026 16:08:18 +0000 (GMT)
+	Fri, 06 Nov 2026 16:08:20 +0000 (GMT)
 Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6A6G8EZ735389860
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6A6G8Gur47579590
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 6 Nov 2026 16:08:14 GMT
+	Fri, 6 Nov 2026 16:08:16 GMT
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B9DC92004F;
-	Fri,  6 Nov 2026 16:08:14 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 5FFAF20040;
+	Fri,  6 Nov 2026 16:08:16 +0000 (GMT)
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5889C2004B;
-	Fri,  6 Nov 2026 16:08:14 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 03FC42005A;
+	Fri,  6 Nov 2026 16:08:16 +0000 (GMT)
 Received: from a46lp73.lnxne.boe (unknown [9.87.84.240])
 	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  6 Nov 2026 16:08:14 +0000 (GMT)
+	Fri,  6 Nov 2026 16:08:15 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
-Date: Fri, 06 Nov 2026 17:07:35 +0100
-Subject: [PATCH v3 02/23] KVM: arm64: Extract number of sys_reg_desc into a
- constant
+Date: Fri, 06 Nov 2026 17:07:39 +0100
+Subject: [PATCH v3 06/23] KVM: s390: arm64: Prepare for sharing arm64 SVE
+ and ftr-reg code
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -89,7 +89,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261106-sysreg-v3-2-75e95980fb10@linux.ibm.com>
+Message-Id: <20261106-sysreg-v3-6-75e95980fb10@linux.ibm.com>
 References: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
 In-Reply-To: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
@@ -118,44 +118,36 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
         linux-s390@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>
 X-Mailer: b4 0.14.3
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: okE7hTDatj3n1WZfogT40Zd1Y7MAF8xp
-X-Authority-Analysis: v=2.4 cv=A635rKWG c=1 sm=1 tr=0 ts=6aedfb73 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+X-Authority-Analysis: v=2.4 cv=QYDzLcbv c=1 sm=1 tr=0 ts=6aedfb75 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
  a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
- a=cPKN5jb6Pdq7kSXABbwA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: okE7hTDatj3n1WZfogT40Zd1Y7MAF8xp
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA2MDA2MiBTYWx0ZWRfX5OUXNknPa1yT
- PYi4gahsDzI3H5QhTYRjRp1Z6le/XUUYgJZJMMdjh/vNzlD2uROGkaQTE5dlc+R7S2fHGlPFph2
- 9TFCHSYelbppSkotpNJCSkrl08O6+sHwUpflo9xmZM7+jnRazWTs+Ew3ybHTvYp7wrNJZ6xOjqr
- abMbTXfXva809pF7qYNFx1Hv6/c+Qm82/XxPPTQomlx+eUPwhKocjNS24tdOFwvsc4jqt6nIqwG
- cuh+aVsMXAj7m2NTEKnz4z+eDKUUxgoCW+3l8UDPYZcBeCy4vslROF733JOP57qDBQGWzzHkUE4
- DE3hV+Ly/12T/1C0pPTw4tqj8sm4FbH5GTX2Mi9i0w7WqWEwx/X3KoQ81L+zym4t3GgO2lTeEa/
- aQzTkjpYQ2b757C2pK5BmXqL/VtAU01gD/6q10Ly3+5OPpRCLXPNrbBuo6TrHjk/XU4gThe1ZfO
- BimHVFdzRufJIz/Y1sw==
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA2MDA2MiBTYWx0ZWRfX/oR6f3OGjERy
- hJlSRmiMUQMGwEJdcWPXBmY1XZ0tsmnVp2gcNi7a7gFq71/5H/oFdzu64vsuIaUArHfUgeNx2m1
- cqeF9iwXS29qR/YLH33qQwDb8LMUsKo=
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8
+ a=6ud2rAkrWTPY0GCDnFoA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: 9fyAJ52TrLGHCQDehdYavzsUJGtEwYpq
+X-Proofpoint-ORIG-GUID: 9fyAJ52TrLGHCQDehdYavzsUJGtEwYpq
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA2MDA2MiBTYWx0ZWRfXwoCa7takuaX0
+ zhk77HMKKmIq0whq5sF8gsi1FcjgsP25TQov/zaCk8W7DhZd2ydmpFdIbiKF8M+B8WPriknYjX/
+ a01Lp04mSnrTJXx44A4rqm49grtMg/4=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA2MDA2MiBTYWx0ZWRfX+jvDCirEzeOj
+ bw7xbJbAPKhX6EWmqH9h46MNwnqPSEfZ7uhW+xWut916BADkjZCkR4k4cM373r0Q4B6jqtyiqdJ
+ e5k50Q3UCZMfLpFQ0D3Txqvi7W7t88L30Vkbr5Zl0D/ZEl6hyKAnS1TDM0AHi2jc5s7Z24/A13Q
+ Qy1kTAVR/taIKzuLLRozY82HQO4Ib/gqZyrYpbRD/MZHt4YA/DZk3iSoopYEj02Y7L9h/FC+L6Q
+ Aw8n0I/eMwneN3P9c4tsieu5Pbeh66DZ7Pu2fUwqe4w5tg0QJ2KZJECG99yRJeaqcn3TLyn0LbN
+ U0Gqve0AlT7aFjayv9d/7PxED9YKReJwQXN7wqeKvRZOPBC+mm8mZDRK/U8oxY2aOAlrbDNBsPL
+ /HhBLwq1SuEPa31KtEH+TT93oAebpZ8SzMciKv+6oZDQdgdleqxrJ1ANo8HYL1kDS5xeNGUfvNR
+ LxlYmIWWs1uE5Up2INA==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
  definitions=2026-11-06_05,2026-11-06_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 priorityscore=1501 impostorscore=0 phishscore=0 spamscore=0
- malwarescore=0 adultscore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0
+ spamscore=0 adultscore=0 clxscore=1015 impostorscore=0 suspectscore=0
+ lowpriorityscore=0 priorityscore=1501 bulkscore=0 malwarescore=0 phishscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611060062
 
-Define the constant `num_sys_reg_descs` which stores the number of
-elements in the sys_reg_descs array. Replace all occurrences of
-ARRAY_SIZE(sys_reg_descs) with the new constant.
-
-This refactoring eases the integration of handling system registers for
-arm on s390. s390 needs code from the shared code to define the
-sys_reg_descs. But also the shared code needs the definition of the
-sys_reg_array and we cannot forward declare arrays and use their size
-before it is properly defined. This patch solves this chicken or egg
-problem. For the time being s390 cannot process the full arm64 defined
-sys_reg_descs array.
+Add required SVE and feature-register definitions to the arm64 on s390
+host code. The definitions are required to be able to build shared SVE
+related code.
 
 No functional changes.
 
@@ -163,116 +155,47 @@ Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
 Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/arm64/kvm/sys_regs.c | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+ arch/s390/kvm/arm64/arm.c   | 2 ++
+ arch/s390/kvm/arm64/guest.c | 6 ++++++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 0f0b0495b710..2b28b929f9f3 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -3976,6 +3976,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
- };
+diff --git a/arch/s390/kvm/arm64/arm.c b/arch/s390/kvm/arm64/arm.c
+index bd9d85235f43..29d3add0bbda 100644
+--- a/arch/s390/kvm/arm64/arm.c
++++ b/arch/s390/kvm/arm64/arm.c
+@@ -8,6 +8,7 @@
+ #include <linux/kvm_host.h>
+ #include <linux/cleanup.h>
+ #include <linux/fpu.h>
++#include <linux/bitfield.h>
  
-+static const size_t num_sys_reg_descs = ARRAY_SIZE(sys_reg_descs);
+ #include <asm/access-regs.h>
+ 
+@@ -24,6 +25,7 @@
+ #include "trace.h"
+ 
+ static unsigned long system_supported_vcpu_features(struct kvm_vcpu *vcpu);
++#define read_sanitised_ftr_reg(_id) 0
+ 
+ #define __INCL_GEN_ARM_FILE
+ #include "generated/arm.inc"
+diff --git a/arch/s390/kvm/arm64/guest.c b/arch/s390/kvm/arm64/guest.c
+index 4ea6fe2c270d..8b5ee9e79a4f 100644
+--- a/arch/s390/kvm/arm64/guest.c
++++ b/arch/s390/kvm/arm64/guest.c
+@@ -5,6 +5,12 @@
+ #include <arm64/kvm_emulate.h>
+ #include <arm64/kvm_nested.h>
+ 
++#define SVE_VQ_MIN	__SVE_VQ_MIN
++#define SVE_NUM_ZREGS	KVM_ARM64_SVE_NUM_ZREGS
++#define SVE_NUM_PREGS	KVM_ARM64_SVE_NUM_PREGS
 +
- static bool handle_at_s1e01(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			    const struct sys_reg_desc *r)
- {
-@@ -5187,7 +5189,7 @@ static bool emulate_sys_reg(struct kvm_vcpu *vcpu,
- {
- 	const struct sys_reg_desc *r;
- 
--	r = find_reg(params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-+	r = find_reg(params, sys_reg_descs, num_sys_reg_descs);
- 	if (likely(r)) {
- 		perform_access(vcpu, params, r);
- 		return true;
-@@ -5205,7 +5207,7 @@ static const struct sys_reg_desc *idregs_debug_find(struct kvm *kvm, loff_t pos)
- {
- 	unsigned long i, idreg_idx = 0;
- 
--	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-+	for (i = 0; i < num_sys_reg_descs; i++) {
- 		const struct sys_reg_desc *r = &sys_reg_descs[i];
- 
- 		if (!is_vm_ftr_id_reg(reg_to_encoding(r)))
-@@ -5268,7 +5270,7 @@ static const struct sys_reg_desc *sr_resx_find(struct kvm *kvm, loff_t pos)
- {
- 	unsigned long i, sr_idx = 0;
- 
--	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-+	for (i = 0; i < num_sys_reg_descs; i++) {
- 		const struct sys_reg_desc *r = &sys_reg_descs[i];
- 
- 		if (r->reg < __SANITISED_REG_START__)
-@@ -5370,7 +5372,7 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
- 	struct kvm *kvm = vcpu->kvm;
- 	unsigned long i;
- 
--	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-+	for (i = 0; i < num_sys_reg_descs; i++) {
- 		const struct sys_reg_desc *r = &sys_reg_descs[i];
- 
- 		if (!r->reset)
-@@ -5594,8 +5596,8 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
- 	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
- 		return demux_c15_get(vcpu, reg->id, uaddr);
- 
--	return kvm_sys_reg_get_user(vcpu, reg,
--				    sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-+	return kvm_sys_reg_get_user(vcpu, reg, sys_reg_descs,
-+				    num_sys_reg_descs);
- }
- 
- int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
-@@ -5634,8 +5636,8 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
- 	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
- 		return demux_c15_set(vcpu, reg->id, uaddr);
- 
--	return kvm_sys_reg_set_user(vcpu, reg,
--				    sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-+	return kvm_sys_reg_set_user(vcpu, reg, sys_reg_descs,
-+				    num_sys_reg_descs);
- }
- 
- static unsigned int num_demux_regs(void)
-@@ -5723,7 +5725,7 @@ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
- 	int err;
- 
- 	i2 = sys_reg_descs;
--	end2 = sys_reg_descs + ARRAY_SIZE(sys_reg_descs);
-+	end2 = sys_reg_descs + num_sys_reg_descs;
- 
- 	while (i2 != end2) {
- 		err = walk_one_sys_reg(vcpu, i2++, &uind, &total);
-@@ -5772,7 +5774,7 @@ int kvm_vm_ioctl_get_reg_writable_masks(struct kvm *kvm, struct reg_mask_range *
- 	if (clear_user(masks, KVM_ARM_FEATURE_ID_RANGE_SIZE * sizeof(__u64)))
- 		return -EFAULT;
- 
--	for (int i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-+	for (int i = 0; i < num_sys_reg_descs; i++) {
- 		const struct sys_reg_desc *reg = &sys_reg_descs[i];
- 		u32 encoding = reg_to_encoding(reg);
- 		u64 val;
-@@ -5957,7 +5959,7 @@ int __init kvm_sys_reg_table_init(void)
- 	int ret = 0;
- 
- 	/* Make sure tables are unique and in order. */
--	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), true);
-+	valid &= check_sysreg_table(sys_reg_descs, num_sys_reg_descs, true);
- 	valid &= check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), false);
- 	valid &= check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), false);
- 	valid &= check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), false);
-@@ -5980,7 +5982,7 @@ int __init kvm_sys_reg_table_init(void)
- 
- 	check_feature_map();
- 
--	for (i = 0; !ret && i < ARRAY_SIZE(sys_reg_descs); i++)
-+	for (i = 0; !ret && i < num_sys_reg_descs; i++)
- 		ret = populate_sysreg_config(sys_reg_descs + i, i);
- 
- 	for (i = 0; !ret && i < ARRAY_SIZE(sys_insn_descs); i++)
++#define vcpu_sve_slices(_vcpu) 1
++
+ #define __INCL_GEN_ARM_FILE
+ #include "generated/guest.inc"
+ #undef __INCL_GEN_ARM_FILE
 
 -- 
 2.56.0
