@@ -1,55 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.222
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793962726;
-	b=fpy/i6WuRyq8FICX0FhxT6hMtsp04NxLh9e0tZfV5KSSEBGwC8Q3AI93W+Jx1pUk+gvK
-	 NW1FlWH/elnk6fEK9Hl6oQLMOsvIPlDHP7zpW2PpuiCD0LyZiwwaPVO3NKkFFYOZ1IPpX
-	 kl5EL1hcwUlq1Y6vqwY+aiBb6koyeYexiNXhHP4YgpKr5a1bS/CIWojnshEClx96xRKcj
-	 FgFgO6+iMumyCjmC+A0cILl+3GLaLw3sO72rmgC/osqIZ9naKMPMvxj3Z/PMXMbYjPAg8
-	 sBNQbhakJ06BEX6gWHwR/p8YE2EcStMD+dgHzQF8XfAF4DAPJTgGpIzNv4H1sK1whGQ==
+	t=1793962950;
+	b=lBqyN1Q4hwy02MlUe5byED2oJfnozsqH3XphoJEyMLTIn7Iz0et5w0iWSuV6Fm7xG664
+	 ijWH5MKX2f0c740FxwlrOY/DKxOSSAhHdB4kIzwjHLwo0gUM4jRdT/dCtKQXJ6PFYUiTk
+	 5k1phjyNQl/xpfSQfewnGg53b6XZNXQzx51jC6QrIsTkaCI4ymwQSgjjCUrKJ6AawW8gM
+	 VFQ5llwm2KpSkpIFPVeah/wG4CDCw5Om27MWYnPEc2uDymfPPlzt+CAJsVqkT3gfrDgx/
+	 7kf/jkOpd1N9nL0kJKSGTdrhiTEZ2LY/lursdeLlzMsQuWR5mtYUaPVigEu/Oks5GYg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793962726;
-	h=DMARC-Filter:dkim-signature:Received:Received:Received:Message-ID:
-	 Date:MIME-Version:User-Agent:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type:Content-Transfer-Encoding:X-Originating-IP:
-	 X-ClientProxiedBy;
-	bh=sLxoX/xGM4YEFLDgABxSGGVYnv6fei/9Pdkk4WOrexg=;
-	b=Rt83+Ah6JPmnpBbWk/VPDKKVs+rIhN+hoGXfa1MuqxLOCXTVs/nBMIKj4HUG65zLO6e1
-	 CmoLwLiCmCYTxY8t/SfJvhwsL7eGWiRN1FVpacAh9t10lwrkKPQJbCfdQyJPHD2H939Q6
-	 4Ophc0x1vTKF/te/BC7SxIkT8GWl3E2H5hUq7fhsnN2r0V2Vgn45mTXLi1Q04/T0cQqMZ
-	 EGu0QVph9vqUfAmnsucIfA8gowrAamIPyvPs89JRligdCtY16V/kfZQeQ9pMkF79q8++C
-	 Cbj7mzkkXZ4vAWAHgLx5Kdd9Op3qhhsREwHhLKPFSxw+jIueObml4JaVAmsy8OdKguA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793962950;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To;
+	bh=1EX2YTA7N1m8201rWClNkOLoSBkj+pXHUt+FjNqM5s4=;
+	b=ranbfSl9uxP8mmSHwRUj04P+MrUDGYn/2ROY6TEor1NvX0uJeeXB3Psnda8gY41xlfkk
+	 DQAre4zPvqanrsn5gFykAtErTtSs6BaKO8tpZ18RDYHXoOrzrKsjTy9yo8n5kwdctE7sy
+	 dEa6eo5z4qhZZHYs497Ux7IKe9+QO+x0AnvGn7cMgJ5ME0Kcr86t+OQDuswWsFZTIwmz7
+	 LUcyf8IpgqsSBmv/Emb2OyHNtdToDECzkv1669EC2z114ywTdgcZGG2oDqXbvTe9nvEaP
+	 XJcZsRTqdKIPq6cztKQZel9WAH0MQRV3xfb7bQQoxV3FzmjsJBcZb67TRqFQ2NtOLHg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=huawei.com;
-	spf=pass smtp.mailfrom=huawei.com;
-	arc=none smtp.remote-ip=113.46.200.222
-Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2B7606A329
-	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 10:58:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CD2B7606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=sLxoX/xGM4YEFLDgABxSGGVYnv6fei/9Pdkk4WOrexg=;
-	b=HfddygcsmSFjZ7r1uF9l62jBa/RqnD9fLiGkNdpef7L/WUg7dn1oZ6A8fS0gGE6RJVeZqy4NK
-	mmjftzTjVFOkwAihzKUwb4iwmzsk0o75bt7+FF1O5P2jkjRmRbtdrG2NCBuTeJozhCN6wvW3vKF
-	3ZQvflsXM3ZZtMUJ3H2dXyU=
-Received: from mail.maildlp.com (unknown [172.19.162.92])
-	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4jLbkl2XsRzLlrZ;
-	Fri,  6 Nov 2026 18:58:23 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 74BC140565;
-	Fri,  6 Nov 2026 18:58:35 +0800 (CST)
-Received: from [10.67.120.103] (10.67.120.103) by
- kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Fri, 6 Nov 2026 18:58:34 +0800
-Message-ID: <dea2458f-067a-4712-87ca-c56abf69aadb@huawei.com>
-Date: Fri, 6 Nov 2026 18:58:33 +0800
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=IXdLbkhB;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8205C606A32C
+	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 11:02:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8205C606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=IXdLbkhB
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 858CB1650;
+	Fri,  6 Nov 2026 03:02:25 -0800 (PST)
+Received: from e142392.arm.com (e142392.arm.com [10.2.213.23])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C208D3F673;
+	Fri,  6 Nov 2026 03:02:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793962948; bh=vViXHVIoIW/K//DPywNrgxXC6rqNmWDghWNtpvorf90=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IXdLbkhBeUk/3GjTjz8gzknsqr/4kj0JpHND7lmwR/llHNS/s8WDy/vGxCwPqCAUv
+	 qNSnIjh162159EV7AtA2tqB2EiVb3NrdpSDa2Z4HJaWSxTxCMynmutIanTjxBGP7/h
+	 t3OQ1zlrwiTXg3/kQLIYdW3r0WTMGfjLEdp9E2i4=
+Date: Fri, 6 Nov 2026 11:02:17 +0000
+From: Kristina =?utf-8?Q?Mart=C5=A1enko?= <kristina.martsenko@arm.com>
+To: Linu Cherian <linu.cherian@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-acpi@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-efi@vger.kernel.org, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+	David Hildenbrand <david@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, 
+	Anshuman Khandual <anshuman.khandual@arm.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, 
+	Hanjun Guo <guohanjun@huawei.com>, Sudeep Holla <sudeep.holla@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Subject: Re: [RFC 00/12] arm64: Add support for TLBI domains
+Message-ID: <r7vnudhgumcjrhoo7iiv2nckxhhoax6k2d2xlquehfzv3f3dyk@idottvqbcjtr>
+References: <20261001110655.461473-1-kristina.martsenko@arm.com>
+ <upkds2ymzuztqvxxuysm62lxcdv5oa3ji6xrxbnz3yt3vntbp6@rw54ndtnpz3y>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -59,83 +70,77 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 11/15] KVM: arm64: Reserve dirty ring space for the
- HDBSS buffer
-To: Leonardo Bras <leo.bras@arm.com>
-CC: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
-	<will@kernel.org>, <corbet@lwn.net>, <pbonzini@redhat.com>,
-	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <yangjinqian1@huawei.com>,
-	<caijian11@h-partners.com>, <liuyonglong@huawei.com>,
-	<tangchengchang@huawei.com>, <yezhenyu2@huawei.com>, <yubihong@huawei.com>,
-	<linuxarm@huawei.com>, <joey.gouly@arm.com>, <kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <seiden@linux.ibm.com>,
-	<suzuki.poulose@arm.com>, <fuad.tabba@linux.dev>, <mark.rutland@arm.com>,
-	<seanjc@google.com>, <rdunlap@infradead.org>, <linux-doc@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <skhan@linuxfoundation.org>
-References: <20260929103655.85107-1-zhengtian10@huawei.com>
- <20260929103655.85107-12-zhengtian10@huawei.com> <auikG0clmr19sAjh@LeoBrasDK>
-From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <auikG0clmr19sAjh@LeoBrasDK>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <upkds2ymzuztqvxxuysm62lxcdv5oa3ji6xrxbnz3yt3vntbp6@rw54ndtnpz3y>
 
-
-
-On 11/2/2026 10:54 PM, Leonardo Bras wrote:
-> On Tue, Sep 29, 2026 at 06:36:51PM +0800, Tian Zheng wrote:
->> The dirty ring reserves room for CPU-side dirty buffers via
->> kvm_cpu_dirty_log_size(). Report the HDBSS buffer entry count
->> through it, so a full buffer flush always fits in the ring.
->>
->> Pin the HDBSS buffer size to PAGE_SIZE when dirty-ring is enabled,
->> via kvm_arch_dirty_ring_size_updated(): a larger buffer only
->> shrinks the soft_limit and forces more frequent userspace drains.
->>
->> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
->> ---
->>   arch/arm64/kvm/arm.c | 8 ++++++++
->>   arch/arm64/kvm/mmu.c | 8 ++++++++
->>   2 files changed, 16 insertions(+)
->>
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 9d7bdece149a..5a7046acb62e 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -215,6 +215,14 @@ static int kvm_arm_default_max_vcpus(void)
->>   	return vgic_present ? kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
->>   }
->>
->> +void kvm_arch_dirty_ring_size_updated(struct kvm *kvm)
->> +{
->> +	if (!system_supports_hdbss())
->> +		return;
->> +
->> +	kvm->arch.hdbss_buffer_size = KVM_ARM_HDBSS_DEFAULT_SIZE;
->> +}
->> +
+On Thu, Oct 29, 2026 at 05:36:47PM +0530, Linu Cherian wrote:
+> Hi Kristina,
 > 
-> On the same subject as a previous patch:
-> I don't think this is the best approach, on top of adding a new weak
-> function to take care.
+> On Thu, Oct 01, 2026 at 12:06:43PM +0100, Kristina Martšenko wrote:
+> > Hi,
+> > 
+> > This series allows the kernel to use TLBI domains. TLBI domains (FEAT_TLBID) is
+> > an Arm architecture feature that enables a TLB invalidation to target a subset
+> > of CPUs instead of the whole system. It can improve performance on systems with
+> > many CPUs. TLBID is not yet part of the Arm Architecture Reference Manual but
+> > some of it is described in the latest XML [1].
+> > 
+> > The goal of this series is to send TLBI commands only to the CPUs where a
+> > process has run (i.e. where its page tables have been installed). The last
 > 
-> Maybe during the dirty-ring allocation, on vcpu creation, we could take
-> into account the requested dirty-ring size, and just allocate the HDBSS
-> buffer taking that into account. That would make it simpler, don't you
-> agree?
+> Lets say if we have a TLB domain of 8 cpus and a process has ran on only
+> one cpu, dont we end up broadcasting to all cpus in the domain as the 
+> granularity is at the domain level ?
+> If thats true, would be good to make that clear.
+
+Yes that’s true. Linux can’t change the domains and the smallest domain
+can contain 8 (or more) CPUs. I’ll add a note about it in the cover
+letter to make it clear.
+
+> > patch explains a bit about how it works. This is an RFC since I'm not familiar
+> > with the kernel's TLB/mm code and I'd like feedback on whether the general
+> > approach is correct.
+> > 
+> > A few notes and open questions:
+> > 
+> >   * Domains are described in a new "TLBI" ACPI table. This is not yet part of
+> >     the ACPI specification. There was an initial proposal [2] but this series
+> >     uses a newer WIP version of the table that aims to be published by the end
+> >     of the year.
+> > 
+> >   * There is currently no device tree binding since the feature is mainly meant
+> >     for server-class systems.
+> > 
+> >   * It's also possible to use TLBI domains to limit a KVM guest's TLB
+> >     invalidations to CPUs where the guest has run. I'll try to include that in
+> >     the next version. This series only disables domains for guests.
+> > 
+> >   * With this series a long-running process may eventually run on all CPUs and
+> >     just issue broadcast TLBIs. It may be worth periodically reducing the set
+> >     of CPUs but it's not clear when.
 > 
-> Thanks!
-> Leo
+> Do you have some thoughts on how we could reduce the set of cpus, to avoid
+> cross domain scheduling ? 
+> IIUC, this should me more of a scheduling decision with domain awareness. 
 
-Hi Leo,
+Sorry, the wording is unclear here. This is not about reducing the set
+of CPUs that a process runs on, it’s about optimizing the domain bitmap
+of a process such that it only contains CPUs that the process is active
+on. Currently we only remove domains from the bitmap but never put them
+back, even if the process is no longer running on a given CPU and its
+TLB has been flushed. So we may end up removing all domains except the
+broadcast-all domain.
 
-Same answer as I explained in [1]. Anyway, I'll remove this function.
+This isn’t trying to avoid cross-domain scheduling or to change
+scheduling at all.
 
-[1] 
-https://lore.kernel.org/all/afcbf19b-bd13-4afc-ab56-8bc50c793e50@huawei.com/
+Also, having thought about it some more, I’m not sure if this series
+should try to optimize the domain bitmap at all, since it will require
+synchronizing with the domain update in switch_mm(), which will add
+overhead and needs to be benchmarked on TLBID hardware first (which we
+don’t have yet).
 
 Thanks,
-Tian
+Kristina
