@@ -1,62 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.80
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793966649;
-	b=Mc5ykSa1U0aRPmnnSZfWZXnat/qUEQvs0+fBs5UREoHs9//qTBO2Trxy/ypbHeM2CwHa
-	 oKAeDAuKCZZcGUdfBcNNBG+G/90BeiPSkhtS23lChDfYD8G9k9DoAu7FoAXPiQrbrEFEb
-	 dg5qQyNxe+sZv1OphlndtPfTFR32K+yTwfGJAlerKjilqxMzSVkQFykLw8OUhVEEWroVy
-	 AyRCxS8Vk8ELhlALLGEkrbqoahN/OTfec0iscADi8SKmVGgbH8RIuWRVnNC+eLX2PwOEr
-	 4etF+KBfKkqQHOsj7axPKNd/rxu99FHC1DtkYKfI4wrdd0L1w7mGR5MPDbcy8IyvSVQ==
+	t=1793966691;
+	b=eCWOiVVTDt6yCLgqi3k3ZpiJQVToMgrK8XElg+UIh8oUOi+krpgF8v9exDNk/e8lDFoY
+	 2VYEpwI0QRu4/aleHARR2lCTp6sRmBXijvXm3pTMrwaAwuB8wL2ltGMgqxezu+T20Mreo
+	 /A5Lb9Fm1elhw9iLms7pvLbxl2qdIo9VubyFLFEPHltuurmuWQRPBWYtv1SQf95xLjKIM
+	 Tp6vfY56RdqU3XJdmBB32cMCaTbCZ1dHaGH7KcyoZgMDBZ2Ct0tIfuaqDtH83MdUq86or
+	 hwuuL7YhNrw8U3Uh2NmPrYY9RjZp9fFMnrf6R8gJxNdQpfyNFUinBDhi2ND1WS87CqQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793966649;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=z2fWxPIivUBhMftF8Gk1vKGE8eRaXMmvpg6wPiGqf2I=;
-	b=k3KbeTgPDpGCV3cBD3Riuvn/ROJe65RU5QwUx+2q8aYYH3Iyqy8c9/KHIIhd7kO8LWBK
-	 eXaEamT1dMrMaeJYh6FAv5EKqA55pG2PbnYYL1HSZIFQ5CY71yRCuUJeCsmL0rHzMsvbN
-	 bfLTvFU18gp3ZcUigcv7WBGVa8XbCLNcoZMdYpwRfHKoKje9esnXK3QuDXqNxogiSnXb2
-	 GsxWSmlpsSI790ODjHBBg8Kw1y+iX/VBZa6gtCoN1sHD/PWBn1RIO5xBEbiaTuIC3Cb9J
-	 pVNYT6tnqD24TuKPIBs/zmPFo8Ckupq2BfV4ywen0kdAScNmXHKG3YKq/x3XBU8mpXg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793966691;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
+	bh=ohw14vtNVpaw39MdfleV/FhLdxvIV9Kq8xUs5QaqRDg=;
+	b=mS3zXxtBQPO7Od+zxWinWdm30iBXcjei+0Fsc4AVqZxqkpqCPAIATsfL6bUaYI79akGs
+	 NoHX7FDUgp266dKIClD3JYiwZDKbLPZo4WLer7ZPHJTWgqKK0q4ZXcup9LUYCtKqAvcFW
+	 1jsdXmmnmzocs+eSnrted4ZwJvCcJMQFHf8+QKE7xZxKAJYjPZf7gWVlcJ8jWnpteXyOf
+	 hjuR2qaivQ4q32N6LpJ3g7fukAfJL2HJlxWtmgqooTo84GNyGKUyqahWhZPmvEQPx6neG
+	 RVvX806kqDIgV8YzxlBnbf34yyfH031eEaDBULC5d56ZfjN5+ClbI237tMosMF5enaA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=nekQqXgK;
-	arc=none smtp.remote-ip=91.218.175.80
-Received: from mta0.migadu.com (out-80.mta0.migadu.com [91.218.175.80])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 822BF606A33C
-	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 12:04:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 822BF606A33C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=ldB0NtAV;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC0DD606D81B
+	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 12:04:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EC0DD606D81B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=nekQqXgK
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=rj2O/1Kb6OAaGvUDXfJ6mwWrzDMaFwYbI8RyxwywtBQ=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793966646; v=1; x=1794571446;
- b=nekQqXgKCxkjsjQHV7dWIGVkBywacPlx9dqsf7JHYoqCVMHwjFpbGjsWP93zDVJH5IEBismm
- FnuwI6IZ/hvwAgjHYbmOOyqj+7iSN8bkFH6y+/guvXAyFIzHeKbGLD/BeuCg5lzGiQdRCeylYhd
- Kh7WiP6RV4tXt+/y/xuCjkBM=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 5260556b8edc27b8;
-	Fri, 06 Nov 2026 12:04:06 +0000
-X-Mizu-Trace-ID: 5260556b8edc27b8
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5bff701efa5so3356e87.0
-        for <kvmarm@lists.linux.dev>; Fri, 06 Nov 2026 04:04:06 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AKwUvBzKhHkaR38Y/bkzROqJLdx+Xubq1XMnjM2sRgX3JopL5jD1fAVJdYASMhOsiGqIU0eiHx+Lc1g=@lists.linux.dev
-X-Gm-Message-State: APuU4Z+Y8TMXb0cBhC31nWJk5lIIFFOyQn2IhTN6xKU+3TT9PVuUlmSk
-	ZhOKQ3yi6ZunEtxK4TqotCmkcuIfsmUPjUsjGevm0H3RL/eLM6ESoQh/kh9eDZR87/5/svwfDIv
-	EUFTere2E0nG212wqMjLbQPCDqLxUsQ3VuxhJpw5W
-X-Received: by 2002:ac2:4f13:0:b0:5bf:f1ea:16cb with SMTP id
- 2adb3069b0e04-5c00641eea8mr72074e87.4.1793966645378; Fri, 06 Nov 2026
- 04:04:05 -0800 (PST)
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=ldB0NtAV
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0AD421650;
+	Fri,  6 Nov 2026 04:04:47 -0800 (PST)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 80A033F673;
+	Fri,  6 Nov 2026 04:04:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1793966690; bh=Zk/2kelxGIV5QGQC43f9+FkeyB8IVun3MQkt4kAhXew=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ldB0NtAV2HVZnAg2jAEn+stYKx+gAkfesFtazHTN2zlnLvpRzjaG4ep0uDtF9IOBV
+	 jjBom9QwOUlIrdLnEMGo3ZfaDpap1h8TCmN5qVfsjPNvk6U5DLKBj2ZYEaWPSFWvic
+	 poo7mVDjHXiGApAzxgxtVbYj+omuROC9n/KaBclw=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	maz@kernel.org,
+	oupton@kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	corbet@lwn.net,
+	pbonzini@redhat.com,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	yangjinqian1@huawei.com,
+	caijian11@h-partners.com,
+	liuyonglong@huawei.com,
+	tangchengchang@huawei.com,
+	yezhenyu2@huawei.com,
+	yubihong@huawei.com,
+	linuxarm@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	fuad.tabba@linux.dev,
+	mark.rutland@arm.com,
+	seanjc@google.com,
+	rdunlap@infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	skhan@linuxfoundation.org
+Subject: Re: [PATCH v5 05/15] KVM: arm64: Harvest stage-2 dirty state into the host folio account
+Date: Fri,  6 Nov 2026 12:04:29 +0000
+Message-ID: <au3CTZBpfN0VtO3_@LeoBrasDK>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <6e6fb626-d3d4-46f7-93ac-94e3d243eb69@huawei.com>
+References: <20260929103655.85107-1-zhengtian10@huawei.com> <20260929103655.85107-6-zhengtian10@huawei.com> <at-WceRKAVM2kEnI@LeoBrasDK> <009b13c6-f618-43fe-8a56-8519d31b239b@huawei.com> <auSMkdEhLI7k8QbV@LeoBrasDK> <6e6fb626-d3d4-46f7-93ac-94e3d243eb69@huawei.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,41 +89,108 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261105-hyp-pool-and-map-v2-0-44a6ca90190b@cs.columbia.edu> <20261105-hyp-pool-and-map-v2-3-44a6ca90190b@cs.columbia.edu>
-In-Reply-To: <20261105-hyp-pool-and-map-v2-3-44a6ca90190b@cs.columbia.edu>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Fri, 6 Nov 2026 12:03:29 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTx-X_2DaO6Yt-AHsP55SFWjz_EYxEr-TB9WSN-ZT+d3FQ@mail.gmail.com>
-X-Gm-Features: AclHuK9hNEpLkAP5NVJokscwbXhyIypQ1gKGYucY4gZvymjkk3c1yRLXlhMVEq0
-Message-ID: <CA+EHjTx-X_2DaO6Yt-AHsP55SFWjz_EYxEr-TB9WSN-ZT+d3FQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] KVM: arm64: Don't replace a valid hyp block
- mapping with a table
-To: xuheng@cs.columbia.edu
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Hi Xuheng,
+On Fri, Nov 06, 2026 at 11:16:33AM +0800, Tian Zheng wrote:
+> 
+> 
+> On 10/30/2026 8:24 PM, Leonardo Bras wrote:
+> > On Thu, Oct 29, 2026 at 10:02:10PM +0800, Tian Zheng wrote:
+> > > 
+> > > 
+> > > On 10/27/2026 2:05 AM, Leonardo Bras wrote:
+> > > > Hi Tian,
+> > > > Sorry for the delay in reviewing...
+> > > > 
+> > > > On Tue, Sep 29, 2026 at 06:36:45PM +0800, Tian Zheng wrote:
+> > > > > With VTCR_EL2.HD set, hardware promotes writable-clean descriptors to
+> > > > > writable-dirty without any VM exit, and the only record of the write
+> > > > > is the S2AP[1] bit in the stage-2 PTE. The write never passed through
+> > > > > the host stage-1, and no unmap path reads the bit, so the record dies
+> > > > > with the PTE and reclaim may discard written guest data (silent
+> > > > > corruption).
+> > > > 
+> > > > Sorry, I didn't get what you are trying to achieve here.
+> > > > 
+> > > > On your patch, I see you marking backing pages dirty at wrprotect and unmap
+> > > > walkers, and it's very confusing to me on why you are doing this.
+> > > > 
+> > > > IIUC, what you are trying to do is make sure a page does not lose it's
+> > > > contents in case it is reclaimed by the OS.
+> > > > 
+> > > > IIUC, when a page is reclaimed, it will unmap the S2 PTE, and save it's
+> > > > contents to swap, so when the guest read or write to that page will cause
+> > > > it to fault.
+> > > > 
+> > > > The page can never be just unmaped, as if there was a single write to it,
+> > > > the backing pages should be writable, and the contents need to be saved
+> > > > somewhere.
+> > > > 
+> > > > So, if I was able to understand your suggestion, we don't need to worry
+> > > > about this, and this patch wouldn't be necessary.
+> > > > 
+> > > > Did you hit this issue?
+> > > > Can you please expand on your issue, if I could not describe it above?
+> > > > 
+> > > > Thanks!
+> > > > Leo
+> > > 
+> > > Hi Leo,
+> > > 
+> > > Thanks for the review. I haven't hit this in practice, and based on your
+> > > analysis the patch doesn't look necessary.
+> > > 
+> > > Reclaim only writes back folios whose PG_dirty flag is set; a clean
+> > > folio is simply freed. A stage-2 write never touches the host
+> > > stage-1, so the folio depends entirely on kvm_release_faultin_page()
+> > > at fault-in to be marked as dirty; without it, the page stays clean from
+> > > the host's perspective and reclaim drops the data.
+> > > 
+> > 
+> > Oh, okay. IIUC it will be enough if PG_dirty flag is set once, right?
+> > 
+> > While on HAFDBS/HDBSS we will skip the fault for marking them dirty again,
+> > we always take the first fault for every PTE (or prefault them), so
+> > PG_dirty should always be set once the page is first wroten to.
+> > 
+> > 
+> > > Your **RFC v1** patch 2 changed that marking from writable to dirty:
+> > > 
+> > > ```
+> > > - kvm_release_faultin_page(kvm, s2vi->page, !!ret, writable);
+> > > + kvm_release_faultin_page(kvm, s2vi->page, !!ret, dirty);
+> > > ```
+> > > 
+> > > During logging, a read fault maps the page as WC: the folio is not
+> > > marked PG_dirty in kvm_s2_fault_map() and hardware promotes the PTE to
+> > > WD on write without any fault, so reclaim frees the page without saving
+> > > it (the folio was treated as clean).
+> > 
+> > Ah, I see your point.
+> > During dirty-tracking guest reads a page, then HAFDBS promotes it to
+> > writable without marking it as dirty. Good catch!
+> > 
+> > But wouldn't a simpler solution be to change the conditions in the fault
+> > handler, so that it indeed marks it as dirty if dirty-tracking is on, even
+> > if it's just a read fault?
+> > 
+> > Thanks!
+> > Leo
+> > 
+> Hi Leo,
+> 
+> Yes, that's exactly the simpler fix, and it's what I already did in
+> HDBSS v5 patch 2 — the folio is marked dirty for any write-permitting
+> mapping, so a read fault on a tracked memslot also marks it.
+> 
+> Since patch 2 covers this, patch 5 isn't needed. I'll drop it in the next
+> version.
+> 
+> Thanks,
+> Tian
+> 
 
-On Thu, 05 Nov 2026 22:59:50 +0000, Xuheng Li <xuheng@cs.columbia.edu> wrote:
-[...]
-> No in-tree caller maps into an existing hyp block mapping today, so this
-> cannot be triggered in mainline.  Fail such a request with -EEXIST
-> instead, so that a future caller gets an error rather than silently
-> losing the rest of the block.
-
-Could you mention in the message that the WARN_ON() is fatal at EL2,
-so a caller there gets a hyp panic rather than -EEXIST?
-kvm_pgtable_hyp_map() is already documented as rejecting such a
-mapping "with an error and a WARN()", which is a better reason than a
-future caller.
-
-Also, please don't respin series so fast. Give us time to digest the
-series first :)
-
-Cheers,
-/fuad
+Awesome, thanks!
+Leo
