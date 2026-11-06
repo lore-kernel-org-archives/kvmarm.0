@@ -1,82 +1,82 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.156.1
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793981333;
-	b=IgHJLkl138luBCcg7ruZcbL5wC0bWfXrPyVO/eqYbPImNXPzM8OcLicxO7ksFCZz6FdG
-	 n2wD4zPJxG3nNTzOfg2s9xRQe6nT+ovWyXHnE26YDM/CzwdeR49RcfF7c1ELE0qgeGwSI
-	 SlB/EcvL5m1x3ShGYS7XrISaYjCgRQ/e9BerJIJzUYgj//JOPXGbrtO4XJ122/whFM/Pc
-	 ZJEnxjUzWq0iRLtmfziWkHwYLY+b/1IAWT/McjN6yWoOj3e96BJgdhadMDkVCRf5ybnCI
-	 fSnpsz382VlwprEHrjPlqfppT7ZwHfV/SqM3tqQk2quNzUxZz2I+9vmosB6Iu4fPQZQ==
+	t=1793981334;
+	b=h9qNpxcLKPrn9ALBCb9lHT9q9XQV+2FM0GztVNAdtrlTgTUJ1eezEyqXH+RAkctq9Cab
+	 yzD+91IsTJYHHSH6WxS34w7KBxfE1aeE3ceztp5x9mt2EwEj/sSM7jiN1c0p2ksbPNomf
+	 BLy7kfJxCeL6GqlkIbc/OjYWgzA/5EbAFfwwamUIaHhRGGj6x+cnjGPzW+J6U17FtSZhy
+	 zKjnav/nv9RTFdJX6FnARg/Ob87SVe3sVZv7e1PjXh2xN7LRLxCBaMho6ESw0xApR1Jhf
+	 1biIAGeE5/WLViYktJ5iebMTF/3TNppDo8LD0Xq3BxitIfnhwLZxK9tCUM4mjixNGvA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793981333;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793981334;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
 	 Received:Received:Received:Received:From:Date:Subject:MIME-Version:
 	 Content-Type:Content-Transfer-Encoding:Message-Id:References:
-	 In-Reply-To:To:Cc:X-Mailer:X-TM-AS-GCONF:X-Proofpoint-ORIG-GUID:
-	 X-Authority-Analysis:X-Proofpoint-GUID:X-Proofpoint-Spam-Details-Enc:
-	 X-Proofpoint-Spam-Info:X-Proofpoint-Virus-Version:
+	 In-Reply-To:To:Cc:X-Mailer:X-TM-AS-GCONF:X-Authority-Analysis:
+	 X-Proofpoint-GUID:X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Virus-Version:
 	 X-Proofpoint-Spam-Details;
-	bh=dWgwJYW4tPhnJbqp7uT6/iL8mSoy6IIsneojKqkuyMA=;
-	b=dSkPwRlNfIDc9HlV7/D/t5QlLl9+zjIXKJJZt+TahXmagtk5+wMfijjnb7qKmWw8VAya
-	 ByzdQ9jsKqCE6qNVEz/N8Kv8uvRO8ymr8/z4SUPYwPcqES/pmhCjFPV6SuJivVUfJLgde
-	 v1h1FWF7lwR+1WsQpINxXBdFJKgekNBTaGzpTvioQEs9YbpOorBEzC+5YsfXh0Wz+3/8v
-	 74EuijETYv2740uekmfaOfnSuSKKEpAjdaMiRju6KBv40IuE7lLO09/iyJkOuGSL1dxeY
-	 nv6p5Qb0aNCOt/3nZdGdkMzu2K+IMRjS7jTd5PDztGEBQH2MOfKzJz8IW9Fau7fiilQ==
+	bh=4CRB45o87B1y6cGu+sB4g7GznXFnvc9TXSYvLCMuNzE=;
+	b=ZP0B/Ykj+z8PoZml9zx/+phRjOhQtgTFEuAQLB3Pfaj0rxd34i/MkiJkOrX4781Ls0fJ
+	 4aVQtsfrZgRo20nthZa/KUgyepkDrkEI8UbjZnPe8Xu7MSqYK/lzXMsGY7yT3t22tnI54
+	 FziZGTz6wDrlYASkJjBlUis28f8/39smJZ7GI5tpIuB4KxW2IWOajAx1MNo8RUkKtu0XQ
+	 Tv9F0TlSCk+otb17Ef0JdcqNo9s7ZywjPFbhu4Sdw+5rOBGmX56GnsJLjjpNyclY0K2ZA
+	 qbC4WExbnjDrFMFF/ZPy9uPidPP50NmXj9bEhkXmrVZoLTeH6js8sRb7jEyqJi4vkeg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.ibm.com;
 	spf=pass smtp.mailfrom=linux.ibm.com;
-	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=cRdAveco;
+	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b="i/OWvNdw";
 	arc=none smtp.remote-ip=148.163.156.1
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8F0606D80F
-	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 16:08:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3A8F0606D80F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC635606D81C
+	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 16:08:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BC635606D81C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=cRdAveco
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A6FEj0s2936575;
-	Fri, 6 Nov 2026 16:08:23 GMT
+	dkim=pass (2048-bit key, unprotected) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=i/OWvNdw
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A6FEJon1095102;
+	Fri, 6 Nov 2026 16:08:28 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=dWgwJY
-	W4tPhnJbqp7uT6/iL8mSoy6IIsneojKqkuyMA=; b=cRdAvecoQJvb/fBNuPg1VE
-	PaqYxdjuk7rSICEFnkkdFjdX28WIAsM8qplhuN/g3LnJgggBSdiYsXHDismtcluC
-	zffGdMDuq5hS6Wpb8XrNyWRIKvRE6BisuJ7Kfo6omg6taDO1OBwSIiLFY9UDtQFq
-	u0wRlxHTLSe4zIAFzKx0iFOkldJ1HMMWv/XjXDadZeRvxdLzN01MB3thx9Ryo1Oo
-	eiYrO6XcQs5VklBpQP4U4cUczrt/osm+pcdPscpaKmtX92nlRBBCvwiKm9nMdtmL
-	brQ4Q47aJ1muouhvtnqrMBiBpL2Fyr7UbeB1ypn87juYol7DafCCWenhnNj9ZHgw
+	:message-id:mime-version:references:subject:to; s=pp1; bh=4CRB45
+	o87B1y6cGu+sB4g7GznXFnvc9TXSYvLCMuNzE=; b=i/OWvNdwLQoxolw0x+kxBo
+	BJJorq0xrZc707ltGuNzqSeyj8wlQizuMswYsnQPgrgShSivdB48aOIzBuYolKS9
+	zbxWahFlW6AkVnk+bRAUrm2LLkiaLIs1c3OJqFeJmghpGracGmLELzO6tST/7wHe
+	C7ZKTFJPX4K/UEsRjIRSqCKHW9qy1200TCLPUDOjNUAaqoFe6zN62lEG2t3DCJmK
+	f4DJfXoViD8P/I/X4ar1GZ+S0Yjs7QimWUBPDlLCB6yWI9WMxQMi3KDOyfsFzX/V
+	0WNE11MFiEpFr09hX4elKiNEBS+5UN6P9i6bzUY1bESfygBXcgSGy7BZ+mHpCtLg
 	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4hs3rcdhfk-1
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4hs3rawj0g-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 06 Nov 2026 16:08:23 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A6F4rX82390066;
-	Fri, 6 Nov 2026 16:08:22 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4hs7h13we9-1
+	Fri, 06 Nov 2026 16:08:28 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A6FKCoL3577989;
+	Fri, 6 Nov 2026 16:08:27 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4hqv1v871y-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 06 Nov 2026 16:08:21 +0000 (GMT)
+	Fri, 06 Nov 2026 16:08:27 +0000 (GMT)
 Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6A6G8HOL25821486
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6A6G8I2v49283430
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 6 Nov 2026 16:08:17 GMT
+	Fri, 6 Nov 2026 16:08:18 GMT
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 97A582004B;
-	Fri,  6 Nov 2026 16:08:17 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 07D4320040;
+	Fri,  6 Nov 2026 16:08:18 +0000 (GMT)
 Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3B9A220063;
+	by IMSVA (Postfix) with ESMTP id 9C3DD2006A;
 	Fri,  6 Nov 2026 16:08:17 +0000 (GMT)
 Received: from a46lp73.lnxne.boe (unknown [9.87.84.240])
 	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
 	Fri,  6 Nov 2026 16:08:17 +0000 (GMT)
 From: Steffen Eiden <seiden@linux.ibm.com>
-Date: Fri, 06 Nov 2026 17:07:42 +0100
-Subject: [PATCH v3 09/23] s390: tools: Share arm64/kvm headers
+Date: Fri, 06 Nov 2026 17:07:43 +0100
+Subject: [PATCH v3 10/23] s390: Add range check asm macro
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -88,7 +88,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261106-sysreg-v3-9-75e95980fb10@linux.ibm.com>
+Message-Id: <20261106-sysreg-v3-10-75e95980fb10@linux.ibm.com>
 References: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
 In-Reply-To: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
@@ -114,75 +114,106 @@ To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
         Arnd Bergmann <arnd@arndb.de>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>
+        linux-s390@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>,
+        Jens Remus <jremus@linux.ibm.com>
 X-Mailer: b4 0.14.3
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 9lFL0Al8kRf0xXqWT2D7cmZh22WXLVZ9
-X-Authority-Analysis: v=2.4 cv=A635rKWG c=1 sm=1 tr=0 ts=6aedfb77 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+X-Authority-Analysis: v=2.4 cv=QYDzLcbv c=1 sm=1 tr=0 ts=6aedfb7c cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
  a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
- a=JnuShpNMQp8jTc-98rsA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: 9lFL0Al8kRf0xXqWT2D7cmZh22WXLVZ9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA2MDA2MiBTYWx0ZWRfX5+ICAKsTkQVq
- rjztcZAMRPHVmTvhJzQtfE3/augRBLRzsrGNq21n/JvhtjnLPHugkIPzo5kQzVhvXR4FleApvy3
- 4CR5rMODWvh/LsqeeNwFGkIvKv1ZsDGSjMVQ4OYX0Z3kFw5GCmvrYbGArNb6uqhw/oSndfK7aEB
- mx7lr3gUZbiNmb44fikF9X7NxEs5gINYGUAvvdcgd9h/v1CCqEnzDzJ+bJBtb2DqnLuCmdPibtA
- CVUo9kCjfr9Y1m+YwSBLJPMmIij24u1a42BaxhpEJrMpg5x+KkT46xpb9WoMwc8xAgxR54CaM8p
- 3h9XHfkIqsYbU6uLnUQYuwFYJ9nr9dvAyYT8eo9ctx8SHllPpQRq5t3D0fIUBj+HiQoLUx/ZgKa
- 0e8yIXs+S8qEaLkPUnj64TPVutotMXTVj40b/9znlamJLp8qhkSpv108Efd1/9+f3w2gyp38YhQ
- pQwkQ0MQ6FTu2IIBwHA==
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA2MDA2MiBTYWx0ZWRfX+hTRKzNYwRbk
- WZAibP8w1o4HKfClC2A+MOFRZP296SVdc8kkvd2XA5Im6yRic17BYBAq7T2s4+rtDtRcHFpqGh5
- PzkAc0DJ2hA3Nf1DbFmLKYyn+FuYwH4=
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8
+ a=Hoxe6d4Xkq5xC5L4oCMA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: O86VXZeJplvG5pQV7GWOTTNlEFrwTkH9
+X-Proofpoint-ORIG-GUID: O86VXZeJplvG5pQV7GWOTTNlEFrwTkH9
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA2MDA2MiBTYWx0ZWRfX+rIkcwvVICcG
+ MmnOTwlLClupEcx/fqG6cu2/FF+vTHLyoe4Pf6/3LVdScQhlPMjgOBOOiteUHSHr2vS6Uv8khIA
+ rSOz5lEErX68Cp0rwIVv0Y9Q5EhMVYA=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA2MDA2MiBTYWx0ZWRfX7h+sjArM/dLd
+ +B7bCUGm1pawE3eVBEJ2r/L0FUV/dsaJXTakwBIrhHvLHaMoJPlrA6bOr+1+Xy0V680COXre4mS
+ StcJzoN6RMaR0B0r0jD5nzZ/KGFhk82rxznWdMmDvjyUW/DUrzbJVFyNKF/8PcfOC1u+81ye0A3
+ o0MjGnvt4DTlDYMCpVF1yeihjSP3qjr1H6b6XceKkk2dIMP1MNJEqqCo6exc5F/XVBmnvskjpmC
+ iU630pZ7pkiaQS5Z3nqKQ07kGdpyTgyncI3IdHQlItIMPLTynXernKSz2rfCdYUfpLTICbOTCpl
+ WafjsPfe4xJK+DhXafPGsrZwzx075olWeD542bfYf7LaEHZdYQvClN2V+czQ8LwIKX/nuuna7J3
+ 12S4xlj9UJpIQlU9C0uDW20XL7KLpJgGRywFZdN6o/NX8V1PP0naWvmXvdOEbUQBLYjJYs0xgvs
+ tvem/afzLK2NiaaO+dw==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
  definitions=2026-11-06_05,2026-11-06_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 priorityscore=1501 impostorscore=0 phishscore=0 spamscore=0
- malwarescore=0 adultscore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0
+ spamscore=0 adultscore=0 clxscore=1015 impostorscore=0 suspectscore=0
+ lowpriorityscore=0 priorityscore=1501 bulkscore=0 malwarescore=0 phishscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611060062
 
-In addition to sharing headers in arch/arm64/include/{asm, uapi/asm}
-also allow to share headers in arch/arm64/kvm which provide local KVM
-definitions.
+The range check macro turns cryptic assembler errors into an easy to
+understand error if e.g. someone mistypes an input value in an asm
+macro.
 
-Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
-Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
+Add an asm macro that verifies that a given input value is in a specific
+range. Add macros which check for ranges often used when creating
+instructions. While at it, add a range check for the register numbers in
+the GR_NUM and VX_NUM macro.
+
+Co-developed-by: Jens Remus <jremus@linux.ibm.com>
+Signed-off-by: Jens Remus <jremus@linux.ibm.com>
 Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/s390/tools/Makefile.arm64h | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ arch/s390/include/asm/insn-common-asm.h | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/arch/s390/tools/Makefile.arm64h b/arch/s390/tools/Makefile.arm64h
-index f3f8e9d9bdd8..88dcce26179c 100644
---- a/arch/s390/tools/Makefile.arm64h
-+++ b/arch/s390/tools/Makefile.arm64h
-@@ -7,10 +7,11 @@ arm64api := $(objtree)/arch/$(ARCH)/include/generated/arm64
- arm64uapi := $(objtree)/arch/$(ARCH)/include/generated/uapi/arm64
+diff --git a/arch/s390/include/asm/insn-common-asm.h b/arch/s390/include/asm/insn-common-asm.h
+index fd9b3cacb7c5..f3f10f2c92bb 100644
+--- a/arch/s390/include/asm/insn-common-asm.h
++++ b/arch/s390/include/asm/insn-common-asm.h
+@@ -9,6 +9,32 @@
  
- # List of ARM64 headers to share with s390 KVM
--# Format: [uapi:]header.h or header-gen.h
-+# Format: [uapi:|kvm:]header.h or header-gen.h
- #
- # * header.h - from arch/arm64/include/asm/ to arm64/
- # * uapi:header.h - from arch/arm64/include/uapi/asm/ to uapi/arm64/
-+# * kvm:header.h - from arch/arm64/kvm/ to arm64/
- # * header-gen.h - generated as header-gen.h from ARM64 header header.h
- # If a header contains partial markers (#if ARM64_S390_COMMON == 1) only this part will be copied.
- # If the file does not contain any markers the whole file will be copied.
-@@ -36,7 +37,9 @@ arm64-type = $(firstword $(subst :, ,$(1)))
- arm64-base = $(or $(word 2,$(subst :, ,$(1))),$(1))
- arm64-src-base = $(patsubst %-gen.h,%.h,$(call arm64-base,$(1)))
+ #ifdef __ASSEMBLER__
  
--arm64-src = $(srctree)/arch/arm64/include/$(if $(filter uapi,$(call arm64-type,$(1))),uapi/)asm/$(call arm64-src-base,$(1))
-+arm64-src = $(if $(filter kvm,$(call arm64-type,$(1))),\
-+		$(srctree)/arch/arm64/kvm/$(call arm64-src-base,$(1)),\
-+		$(srctree)/arch/arm64/include/$(if $(filter uapi,$(call arm64-type,$(1))),uapi/)asm/$(call arm64-src-base,$(1)))
- arm64-dst = $(if $(filter uapi,$(call arm64-type,$(1))),$(arm64uapi),$(arm64api))/$(call arm64-base,$(1))
++.macro	RANGECHECK	min max val
++	.if (\val < \min) || (\val > \max)
++	.error "operand out of range (\val is not between \min and \max)"
++	.endif
++.endm
++
++.macro	ASSERT_U16	val
++	RANGECHECK 0, 65535, \val
++.endm
++
++.macro	ASSERT_S16	val
++	RANGECHECK -32768, 32767, \val
++.endm
++
++.macro	ASSERT_U8	val
++	RANGECHECK 0, 255, \val
++.endm
++
++.macro	ASSERT_U4	val
++	RANGECHECK 0, 15, \val
++.endm
++
++.macro	ASSERT_U5	val
++	RANGECHECK 0, 31, \val
++.endm
++
+ /*
+  * GR_NUM - Retrieve general-purpose register number
+  *
+@@ -24,6 +50,7 @@
+ 	.endr
+ 	.if \opd == 255
+ 		\opd = \gr
++		ASSERT_U4	\opd
+ 	.endif
+ .endm
  
- $(foreach hdr,$(ARM64_SHARED_HEADERS),\
+@@ -46,6 +73,7 @@
+ 	.endr
+ 	.if \opd == 255
+ 		\opd = \vxr
++		ASSERT_U5	\opd
+ 	.endif
+ .endm
+ 
 
 -- 
 2.56.0
