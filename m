@@ -1,114 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.93.196.48
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793930402;
-	b=aZ7AlVtLcREe8x6zreGMjptvaqKU/s4Qlo00lFVkD6h7dM7mfOIKhgTgOhsRKjMHlOd8
-	 J7XPZH5BKGguT/bmhrv4CZEeW01OVuj6QYPsA3xOGjUDsmj05QJw4lP+fpiK5xfQOs+hb
-	 KK/7bxYWV+bVBebTRkILSLggL46eHQW2FbGTPuiwZQIBOMB/PQNQi/4W7IHNYsKyHcVxO
-	 svRpfrlOEl9RYxsEudxzw2jC+4YlejoAQEqfiUBWY7MHvmEbic8QS6xY/hepV3PLAHpAJ
-	 SxMA3uHeaxQbkph0wvS4mpyEkgVBIl611U3mGoizWl8QUmAA0UltH0NqgDZ60qWOHRg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793930402;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:
-	 X-MS-Exchange-Authentication-Results:Received-SPF:Received:Received:
-	 Received:Received:Date:From:To:CC:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
-	 X-NV-OnPremToCloud:X-EOPAttributedMessage:X-MS-PublicTrafficType:
-	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
-	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
-	 X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-Id:
-	 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=pBCmbB56HG0OQbXafOMe6N5v2lO3ZaxDV6W3RM014PU=;
-	b=AfXYbkXeutDWrV05lAW+UeZi90wztB2OXK1xEeRzN4hDI7gsX5VFbXU/5gP+95scGYAH
-	 edM3h3yxc5rWYGbVUeeOan+KULR59kYxmPZ36weOEUtBrkwJyhtzb3jm3cbz+biZTBIb7
-	 zU3dYg1ndrKrYgoQHI9P96TaRy0ZJ4ZPpDTIEI66N1JzcLVdD3YxuhyvZ5vyRVD8wAGin
-	 FamjMgCdaqzpYRtUnsoyHujaYG4mgyQf7v+OfWIBspQQGTiShoc5RM72qu27w0c/N0PzB
-	 0/1ahDbUKQsKNnlO6RiBYfC+rY9/RXo0rrHc5TtqVcQIne9ojJHqtc9s+Z6CjNUi4Aw==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=nvidia.com;
-	spf=fail smtp.mailfrom=nvidia.com;
-	dkim=pass header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=nnsbshMM;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=40.93.196.48
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013048.outbound.protection.outlook.com [40.93.196.48])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.220
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793935006;
+	b=dFmU7mP+hcT+lywihymd5djkeZ6h+g3pfLA57z3b8ZwAKD7/hvzJfAHsrHV4kpT3DVwy
+	 f3R2Px8LGt6RXVIjgEIZIRxVthZME/nhy/9sM1FONgg5rN7dbj323bpzH8hbokRjBQFb9
+	 UB/t8R7r/mW9kYr/xvttvKXxG3TEJRFWsbMsPS4ZLWJA7oc56hPX0xSIAE8r7fbPZL7yx
+	 0IUOOuItWyxXsnvca5kh1I3B4pYCyL2i7kULGzPjNcV6Iw3pmxMYpTLY2QwwGQTRIIttK
+	 f1iZAUBM1msHxZ/zNLrvga7Lc24+hcALI9pilN4oLsKMyJIwaMpDvp8hclqJnHPGu2w==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793935006;
+	h=DMARC-Filter:dkim-signature:Received:Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type:Content-Transfer-Encoding:X-Originating-IP:
+	 X-ClientProxiedBy;
+	bh=ErgEQ0Ns6+rcrsITsiCH+rdm0302iBOiS8IkFodZXU4=;
+	b=tMLNRl/DLbEsBBKFUfmQZZkHkQ2JWz5VLug3aehfNeJ3Ku9h6mUB2eqBk12ctViIYHKd
+	 MfDCzjCkesS26Jt+SidkNwzw+2f1/ZyG9PReGf3Xmqrtzy3Pp0vgUwD/yiEfhGFZpCzkw
+	 FmI6G81lga/zw3xCMZ+zKTAlBi8PGI2R0gdY0V5rRYZfBT8HDV9LJqdiP/PcmNlrRI5Jl
+	 fGJJtnNq1wiRR7PFfPJ6oAPBRT1rPfT33rJooXvEurHKyIbDJbxrQ4Jp+mz4MBKPOU87U
+	 JFHPvIvPvfyBr/+KwKYQ5NW8vZoFgHfipi3WKlmRCKM4ESLVyDby9MmCwxjHeV0wpow==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=huawei.com;
+	spf=pass smtp.mailfrom=huawei.com;
+	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=iDmH0EN4;
+	arc=none smtp.remote-ip=113.46.200.220
+Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D6F5606A326;
-	Fri,  6 Nov 2026 02:00:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2D6F5606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EBD7606A339
+	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 03:16:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2EBD7606A339
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=nnsbshMM
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CILnP3EH/Rold47Qkq87NoqiTjl5oKS8KvNe61EkIRXzphHCBXBTYC81FoAwaSrV2PTBlIuj0M9SJ6a/rX98wUv7J6X5TkmE4YN5dKFAnP9MZd5TdL6a+gvfSODTPBw/MqpGUnrNlVoaKX9i5hgMbRGQ3LbKoLQzGGMv9NEa/r+4lpUgpCPxjCJDOfwJ0YSsGnLsEQQ/laydgNSStzWowe2Qo6M/zDC+QoHuxbqzfIAcbzwx/VKaLQ2PSVfRHSuJORKeSZvvcz/U1GVkIg/DfJNz+D/B3kMdpijQhFnBAUerqu1/b9yh0XPWhrzDYoUTj4rKcktbcheV7PO/e4iVXA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pBCmbB56HG0OQbXafOMe6N5v2lO3ZaxDV6W3RM014PU=;
- b=p1rhqHGp6bD7yDpBTl9lrpsHwftDv0hqffXcxVnOvyYCto2sAaajZ8KP/Z7vqybKkj8RiIq3TSw+O5Bc6u9p/lS87xoaL1vBjHDKEofTmz3kAjA8pIF4KU6hF96+GQ8KCZA05GxAv39W2xMPQwFNl6H9zyH9rj86fpFYZ37yuIeFIQYEMCxWLmsvD8RFeYtiwSdJZFEE+sdt2RSu88BRwkjII8G6Cc2oNg9dKXQ/Yblw5SgExOUVy35s5qS/2vC0Wnblxgrnu/3HnkaerbRoaEKPyvSdvJqkJTAs0Iw+9VWd/dK/IGrWAu5O3jq9izvP8T80gx0z/B6yb9rnciM8ug==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pBCmbB56HG0OQbXafOMe6N5v2lO3ZaxDV6W3RM014PU=;
- b=nnsbshMMXmpzPiK1KjMuLSmy95wgn5h80l5dNPGmmJyZLWwNXjn50OJhcAA9GaFJoZly73LmgTOW7EwnWS1fQdSdwek04VD43LOvxJKGefjUmr+0pwRbRJYiuyk7RgLvUkEuXt7191ZO7DjggiGZyqDrSIbe91sO0dudVvS6gMyr+KYCBxThCQJLYB+FuiJvYPEzVm4aqsxXoY2MbKDSMUkYMwl/3/uTGFyDF8IJ5RrYvHeccx6qSP4pU4gR6wkPQhmgkzj28PfCszz7vQzQrkGJNR+VT/bOvT4iYFkNRtNUWkskoHS6ZUFa2VI1wthVg5S1JuSmIaxjWEgac24ZYg==
-Received: from SJ0PR13CA0171.namprd13.prod.outlook.com (2603:10b6:a03:2c7::26)
- by DS7PR12MB5888.namprd12.prod.outlook.com (2603:10b6:8:7b::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.569.12; Fri, 6 Nov
- 2026 01:59:51 +0000
-Received: from BY1PEPF000264B2.namprd02.prod.outlook.com
- (2603:10b6:a03:2c7:cafe::8c) by SJ0PR13CA0171.outlook.office365.com
- (2603:10b6:a03:2c7::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.615.4 via Frontend Transport; Fri, 6
- Nov 2026 01:59:51 +0000
-X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
- is 216.228.118.233) smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- BY1PEPF000264B2.mail.protection.outlook.com (10.167.242.118) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.615.4 via Frontend Transport; Fri, 6 Nov 2026 01:59:51 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56; Thu, 5 Nov
- 2026 17:59:39 -0800
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=iDmH0EN4
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=ErgEQ0Ns6+rcrsITsiCH+rdm0302iBOiS8IkFodZXU4=;
+	b=iDmH0EN4KaCXipjoVKe9dplNElfKEF7HgYj73b4dQV/KmWfbmC/dGbNyQKPX/jEGKUVDhLOcH
+	U6s5h8YRl4yXnB4HClWs82BZEpHLsF9gA//ivG77NkFDUNY0vGYjj4c9RYoTWmS08lK/KuhUlMN
+	bXs7XmU7cs3LK1LARmr6OE0=
+Received: from mail.maildlp.com (unknown [172.19.163.104])
+	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4jLPTw3G5xz12LG1;
+	Fri,  6 Nov 2026 11:16:36 +0800 (CST)
+Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
+	by mail.maildlp.com (Postfix) with ESMTPS id 99A114056E;
+	Fri,  6 Nov 2026 11:16:34 +0800 (CST)
+Received: from [10.67.120.103] (10.67.120.103) by
+ kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.56; Thu, 5 Nov 2026 17:59:39 -0800
-Received: from nvidia.com (10.127.8.13) by mail.nvidia.com (10.126.190.180)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56 via Frontend
- Transport; Thu, 5 Nov 2026 17:59:35 -0800
-Date: Thu, 5 Nov 2026 17:59:33 -0800
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: Mostafa Saleh <smostafa@google.com>
-CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>, <iommu@lists.linux.dev>, <catalin.marinas@arm.com>,
-	<will@kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
-	<joro@8bytes.org>, <jgg@ziepe.ca>, <mark.rutland@arm.com>,
-	<qperret@google.com>, <tabba@google.com>, <vdonnefort@google.com>
-Subject: Re: [PATCH v9 14/25] iommu/arm-smmu-v3-kvm: Shadow the command queue
-Message-ID: <au00hT6fsY10WJ9J@nvidia.com>
-References: <20261015200903.2735565-1-smostafa@google.com>
- <20261015200903.2735565-15-smostafa@google.com>
+ 15.2.2562.45; Fri, 6 Nov 2026 11:16:33 +0800
+Message-ID: <6e6fb626-d3d4-46f7-93ac-94e3d243eb69@huawei.com>
+Date: Fri, 6 Nov 2026 11:16:33 +0800
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -118,62 +62,151 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20261015200903.2735565-15-smostafa@google.com>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BY1PEPF000264B2:EE_|DS7PR12MB5888:EE_
-X-MS-Office365-Filtering-Correlation-Id: 18169622-b214-410a-0a8f-08df3ba9a53a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|82310400026|7416014|376014|23010399003|1800799024|22082099003|10067099003|18002099003|261102123227099003|3023799007|4143699003|261021121427099003|11063799006|56012099006|261021135927099003|261009223027099003|261026121527099003;
-X-Microsoft-Antispam-Message-Info:
-	0DKOMzd5W9ne+P/P3dDLqmQ8NQW1+S+iI6e23VnjhCK5Epd++bNUlrShuPxaPBRszKRdxyOxAzLhV4dcruvVh252tJXtInqASOuAptYbHTx7S6KuEnIR1sRWefmdYcJAe6b04P0wGbqxfPpme3/4xCuaDbikub4LSYTRWEsw9I6LUQdG4lookVO0HwqhCwD2i3fChDiqwZun1MnT4hAYw3sHcnwzQYh1XlncQXiIJ1JzRfeuP3mHsqD2f4DI7zhUokEy0SkgWBiAudnQmY/UAwWRLzxLtGtxDVaCN9Pqvzy4R8bWZ6LhnwLoeDHcyklKlr1LUE6V44XhKSuxRC6wlbRumUamB3oY+8QkbQzb3+GEvLUb56mgwtFdUNszRWYWbNYKFzzLe9bw4gSCJpbZVi7rgmlbXFSvaUjU/GHDhdyyviXb0GYSMCtx2KiOcDZgHL6HAFquu4ZPYoMx+7jNe7qNl2JXNQGHXN4VEF3EpU4V56GwaTh9dmz7OB+DPnlwkSGvlX4x1Xjxtf9AF2n8lWYZykzYHH8FSRf68IVy8y2h7Ov9eYLTV0grDHPNZhj85P5AdOyMMY3YTK/1jh/r7goUNcie+bq5d4cZfPcjday78hb2i2TpERIt7OSoSlPqFlDkv+SfNKyI7qWACL2UZ5wz8SAuyQPsw9CNpEaUQnH4rUBV0og0hcNgWepeCSVzfk4CWWQGKzfh3o+cpcBFEQ==
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(82310400026)(7416014)(376014)(23010399003)(1800799024)(22082099003)(10067099003)(18002099003)(261102123227099003)(3023799007)(4143699003)(261021121427099003)(11063799006)(56012099006)(261021135927099003)(261009223027099003)(261026121527099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	HYCwlIpzowj5y40dbC+O5SUgnP5H94Ub8uASDRdhSOssukAVmErKRAt1iJX8ZEGjEz1E1i0XqRbToQd0mC6bCw+w5uNLsrhClrhM+g28Gr/RhaMnU7zx8XweFVy3ratQEH/uusFT6HESfaGIzkne03smw96/gHPZoIW90kyUgOfc1aHCS5BWkUf15GiKojASYTBro2T5HHOJDGRQs6YouKObJAQ/ZU1enAteGE8y9mNGYpxY3kLPG/b1FOcSRb+RDZPhptptsBP7veZtM6srFCAvrMAXaABD+OEwjQkQdYj0fFiHzCFwr9mwpNs1GdgSC2qQeBiZ/hi6Ueno+fHqe1LCXxupisbelijCo8KV2JotxUFnBFNBogX8EIdq0AuczTSLWl4BVo9zonXCWkTgFCi52EY8L4e0eCX/peIumcEh6BNSCnkhyhdur4OVNsmo
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2026 01:59:51.7232
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 18169622-b214-410a-0a8f-08df3ba9a53a
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BY1PEPF000264B2.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5888
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 05/15] KVM: arm64: Harvest stage-2 dirty state into the
+ host folio account
+To: Leonardo Bras <leo.bras@arm.com>
+CC: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
+	<will@kernel.org>, <corbet@lwn.net>, <pbonzini@redhat.com>,
+	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <yangjinqian1@huawei.com>,
+	<caijian11@h-partners.com>, <liuyonglong@huawei.com>,
+	<tangchengchang@huawei.com>, <yezhenyu2@huawei.com>, <yubihong@huawei.com>,
+	<linuxarm@huawei.com>, <joey.gouly@arm.com>, <kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <seiden@linux.ibm.com>,
+	<suzuki.poulose@arm.com>, <fuad.tabba@linux.dev>, <mark.rutland@arm.com>,
+	<seanjc@google.com>, <rdunlap@infradead.org>, <linux-doc@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <skhan@linuxfoundation.org>
+References: <20260929103655.85107-1-zhengtian10@huawei.com>
+ <20260929103655.85107-6-zhengtian10@huawei.com> <at-WceRKAVM2kEnI@LeoBrasDK>
+ <009b13c6-f618-43fe-8a56-8519d31b239b@huawei.com>
+ <auSMkdEhLI7k8QbV@LeoBrasDK>
+From: Tian Zheng <zhengtian10@huawei.com>
+In-Reply-To: <auSMkdEhLI7k8QbV@LeoBrasDK>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemr100010.china.huawei.com (7.202.195.125)
 
-One more thing:
 
-On Thu, Oct 15, 2026 at 08:08:45PM +0000, Mostafa Saleh wrote:
-> +/*
-> + * The kernel part of the driver allocates and zeroes the shadow cmdq. Take
-> + * ownership of it and program it into the hardware.
-> + */
-> +static int smmu_init_cmdq(struct hyp_arm_smmu_v3_device *smmu)
-> +{
-> +	size_t cmdq_nr_pages;
-> +	int ret;
-> +
-> +	smmu->cmdq.llq.max_n_shift = min(smmu->cmdq.llq.max_n_shift, smmu->cmdq_max_shift);
 
-Given this is the cmdq used to run commands eventually..
+On 10/30/2026 8:24 PM, Leonardo Bras wrote:
+> On Thu, Oct 29, 2026 at 10:02:10PM +0800, Tian Zheng wrote:
+>>
+>>
+>> On 10/27/2026 2:05 AM, Leonardo Bras wrote:
+>>> Hi Tian,
+>>> Sorry for the delay in reviewing...
+>>>
+>>> On Tue, Sep 29, 2026 at 06:36:45PM +0800, Tian Zheng wrote:
+>>>> With VTCR_EL2.HD set, hardware promotes writable-clean descriptors to
+>>>> writable-dirty without any VM exit, and the only record of the write
+>>>> is the S2AP[1] bit in the stage-2 PTE. The write never passed through
+>>>> the host stage-1, and no unmap path reads the bit, so the record dies
+>>>> with the PTE and reclaim may discard written guest data (silent
+>>>> corruption).
+>>>
+>>> Sorry, I didn't get what you are trying to achieve here.
+>>>
+>>> On your patch, I see you marking backing pages dirty at wrprotect and unmap
+>>> walkers, and it's very confusing to me on why you are doing this.
+>>>
+>>> IIUC, what you are trying to do is make sure a page does not lose it's
+>>> contents in case it is reclaimed by the OS.
+>>>
+>>> IIUC, when a page is reclaimed, it will unmap the S2 PTE, and save it's
+>>> contents to swap, so when the guest read or write to that page will cause
+>>> it to fault.
+>>>
+>>> The page can never be just unmaped, as if there was a single write to it,
+>>> the backing pages should be writable, and the contents need to be saved
+>>> somewhere.
+>>>
+>>> So, if I was able to understand your suggestion, we don't need to worry
+>>> about this, and this patch wouldn't be necessary.
+>>>
+>>> Did you hit this issue?
+>>> Can you please expand on your issue, if I could not describe it above?
+>>>
+>>> Thanks!
+>>> Leo
+>>
+>> Hi Leo,
+>>
+>> Thanks for the review. I haven't hit this in practice, and based on your
+>> analysis the patch doesn't look necessary.
+>>
+>> Reclaim only writes back folios whose PG_dirty flag is set; a clean
+>> folio is simply freed. A stage-2 write never touches the host
+>> stage-1, so the folio depends entirely on kvm_release_faultin_page()
+>> at fault-in to be marked as dirty; without it, the page stays clean from
+>> the host's perspective and reclaim drops the data.
+>>
+> 
+> Oh, okay. IIUC it will be enough if PG_dirty flag is set once, right?
+> 
+> While on HAFDBS/HDBSS we will skip the fault for marking them dirty again,
+> we always take the first fault for every PTE (or prefault them), so
+> PG_dirty should always be set once the page is first wroten to.
+> 
+> 
+>> Your **RFC v1** patch 2 changed that marking from writable to dirty:
+>>
+>> ```
+>> - kvm_release_faultin_page(kvm, s2vi->page, !!ret, writable);
+>> + kvm_release_faultin_page(kvm, s2vi->page, !!ret, dirty);
+>> ```
+>>
+>> During logging, a read fault maps the page as WC: the folio is not
+>> marked PG_dirty in kvm_s2_fault_map() and hardware promotes the PTE to
+>> WD on write without any fault, so reclaim frees the page without saving
+>> it (the folio was treated as clean).
+> 
+> Ah, I see your point.
+> During dirty-tracking guest reads a page, then HAFDBS promotes it to
+> writable without marking it as dirty. Good catch!
+> 
+> But wouldn't a simpler solution be to change the conditions in the fault
+> handler, so that it indeed marks it as dirty if dirty-tracking is on, even
+> if it's just a read fault?
+> 
+> Thanks!
+> Leo
+> 
+Hi Leo,
 
-> +static void smmu_emulate_cmdq_enable(struct hyp_arm_smmu_v3_device *smmu)
-> +{
-> +	u32 shift = smmu->cmdq_host.q_base & Q_BASE_LOG2SIZE;
-> +
-> +	smmu->cmdq_host.llq.max_n_shift = min(shift, smmu->cmdq_max_shift);
+Yes, that's exactly the simpler fix, and it's what I already did in
+HDBSS v5 patch 2 — the folio is marked dirty for any write-permitting
+mapping, so a read fault on a tracked memslot also marks it.
 
-.. should this be min(shift, smmu->cmdq.llq.max_n_shift)?
+Since patch 2 covers this, patch 5 isn't needed. I'll drop it in the 
+next version.
 
-Otherwise, a buggy guest SW might setup a larger queue and number
-of commands?
+Thanks,
+Tian
 
-Nicolin
+>>
+>> Therefore, **HDBSS v5** patch 2 reverted to marking the folio for any
+>> write-permitting mapping:
+>>
+>> ```
+>> kvm_release_faultin_page(kvm, s2vi->page, !!ret, writable);
+>> ```
+>>
+>> Together with the v5 scheme, this makes patch 5 unnecessary:
+>>
+>> - kvm_s2_fault_compute_prot: always set PROT_W when map_writable
+>> - stage2_set_prot_attr: PROT_W -> DBM unconditionally
+>>
+>>
+>> ---------
+>>
+>> On a related note, I'd like to discuss the next version of the DBM
+>> scheme, following Oliver's suggestion [1].
+> 
+> Just as a note for future readers: on another thread we agreed to wait for
+> the discussion to reach a point we are all happy before rebasing
+> everything.
+
+
+
