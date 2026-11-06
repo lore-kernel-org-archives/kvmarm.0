@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793939394;
-	b=gIbmLtPUVy8criAQrs9w+7ynyTh1p78HtG7DJJ0JsTIui5p152toEhzIv9BEHRon05vA
-	 tAB+c8ItFSing8Gcfu6y+9MPCUB94/mvvzlyiftyIgaj9pEKJ283Zoe1SGOdcbo8A3PZu
-	 90kLhu//RrjJhkEhz5cV8vHAKFQke9ejugem9eIbQI4xtq6s21fRBw9rUYaeITO5G95CD
-	 ZYtYoJD3OdqYEw/yGh2B9lMxPIVQctJc3SKCdAmVhvxmUbf50KTTYN0/9XOMlmLdromKB
-	 ju9DdPB5wEW0HAOgOe6hl2zjFtq39bog2OCbFQRkwVmTRB9AJE6ytQDVWjNl+fNVuYg==
+	t=1793941236;
+	b=Hqd3u3DvDwvMtG3M5kGKMXGcP5CfVDzV6uIUYXmdsazDYk37OhyFb4j7thiyiA7infv5
+	 Qvm6lsWKWJAgHjciV9wJDdGHCOWygF95B3eZ/6ZbhBVQrfWY4bJ53+UBHKhnbhG/zxafG
+	 XotEy3NHwCG5DgqK2XuczxDHrziSaW5vVtsJHSAhjmqegI2IgUKJtjJK5JdYELWrz4tgL
+	 MtmPsnmROgsd4QITgjzbagME5WMAIJ6+NVfC1mUFwYHLZ5g5S6O69r68JKSH238KaEi5e
+	 LqfUShn52bVpEYtSMhNwMhbciTpBsT57BUalulnlJ0QovgltUNPGaoaHHolZ9s8iBHw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793939394;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793941236;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=QGCPiCqkjBkaHcHiJL1zla81wyPx1mdvA2MzlmPUBlg=;
-	b=Wq9mLClnp1dzRA7ouwfj9G/65wUVaIQSTWCY4bGApXqLogdF9LR8CQpyCM6cixaXRvlL
-	 DqJxp2aUkFCeQ4hX8orK5rI9O2oaSjumJJ0UCtKbe7WNMk8vmylbp5QWXFHeg5ZyUFcNA
-	 rU0wX6+1EEa604tMJ7XMVqrbu/M6m8XuFo6I7I/JUIsNG3cjdLCbmgajVtg2cqb3T0s9y
-	 jaYRWAOOhArKywTJUG//G/54lcjs15qXm11Z7dcNTP/BT6y974kueZFsGJtSaYoaHj7pv
-	 ZThu6qP3tQKBaxCo3uq1FoCvZYYsCnMa6SfF+Do2pI1AeL02nabMEqSvNkBYswbUDGg==
+	bh=aNmrX4MC6Bh9Qcr+fK7YisQgvLZ4xp/IcO3qvAuBaEA=;
+	b=k2j2p2sF4EzoYoL0QiceVP1q8V5pL/cQ9v9pe3ilwGUW7kuak9G1PtVa7Pl0P2ihYRfU
+	 +jb7nhpgH8cq3po+PYsL2wAOWoJPkS50thTY0/Ga5pIVt5txAL7qzAiZrpfVspQh3mWHd
+	 pOUmy4WRY00fXxSCGFO9xCCSY886tcFLGJFLlNbvxtSN0JTB6fWd7y453g6CqxSbqNGjq
+	 A/mYjfq9AOnPIksBE6RuBMEFVh4LRzjyk9KcoE4HvLcX3axqkdaZ+2Tnh6L6VD/voV/3a
+	 xbNbK6U6sXn9hkJqZPz7SIHJdHavzioLQg+MGbLcA4nNLWhKj4mPhkLRlXsjGbVZQ1w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=sjSFEuOq;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=KaxjhaO4;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FE5F606A31B
-	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 04:29:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9FE5F606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99C51606A328
+	for <kvmarm@lists.linux.dev>; Fri,  6 Nov 2026 05:00:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 99C51606A328
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=sjSFEuOq
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=KaxjhaO4
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8C81F1684;
-	Thu,  5 Nov 2026 20:29:48 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8FB591650;
+	Thu,  5 Nov 2026 21:00:25 -0800 (PST)
 Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 408D33F673;
-	Thu,  5 Nov 2026 20:29:40 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3957E3F673;
+	Thu,  5 Nov 2026 21:00:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1793939391; bh=Hh3IBRBXYWZYcWrW4B7lncFfAlY/7ljbqAzgjoX9vzU=;
+	t=1793941228; bh=zoGeXWJG/zjj6ruzBbMLK2JJ8stAX3zjnqmT8z1h3wk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sjSFEuOqVikrkZpdmRfo8CPj65lCDGOY2G7296cdtoPWQVgMrDIJZJPWeN6jA6amn
-	 nYVsgP0x15rSmDS+9CXSFfE0+KkVcPCfwvuVvQ9OG3bJgtkN+SmqgZWYs9QT720/XI
-	 3puSkJKyLM2rRNeNlpxf5btqf0JxNdC5s7As8kZM=
-Date: Fri, 6 Nov 2026 04:29:26 +0000
+	b=KaxjhaO4zLWXGCtZ1XhvYm2z/F12nQaoh6L/amZKDbkfaUIpYg0A7vGGZGzK0Mr9m
+	 /0Jttb63Rk+mKMHqyzsR+9wWlsamwgLP3JnBp1KvEeUWSPh9bSqYT6MLHptIxGfLec
+	 hsZfEr+enxuk6yGmzT1JJzOUfNBKWEaJX2M6ece4=
+Date: Fri, 6 Nov 2026 05:00:07 +0000
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: Sascha Bischoff <sascha.bischoff@arm.com>, 
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
@@ -51,7 +51,7 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
 	lpieralisi@kernel.org, timothy.hayes@arm.com, fuad.tabba@linux.dev
 Subject: Re: [PATCH v2 10/16] KVM: arm64: gic-v5: Add ITS userspace register
  access
-Message-ID: <aft27lm35sx4lywm57yfsy6pgsjrfoviiwi6xlkmhzq3v5jnwb@37vchfucxhdc>
+Message-ID: <tjeu7wiqhbgo3zukxjupht5jsjg7hjqgnkpivekvem3w5p4ivy@s66rdsewuqw7>
 References: <20261102194454.4086911-1-sascha.bischoff@arm.com>
  <20261102194454.4086911-11-sascha.bischoff@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -132,6 +132,14 @@ On Mon, Nov 02, 2026 at 07:44:48PM +0000, Sascha Bischoff wrote:
 > +			return -EINVAL;
 > +
 > +		its->idr0.pa_range = FIELD_GET(GICV5_ITS_IDR0_PA_RANGE, val);
+
+In addition to what Sashiko said, a pa_range change can also affect the
+translation table walk, so I believe we should also invalidate the cache
+here.
+
+Thanks,
+Wei-Lin Chang
+
 > +		its->idr0.its_id = FIELD_GET(GICV5_ITS_IDR0_ITSID, val);
 > +		return 0;
 > +	case GICV5_ITS_IDR1:
@@ -156,13 +164,6 @@ On Mon, Nov 02, 2026 at 07:44:48PM +0000, Sascha Bischoff wrote:
 > +		its->idr1.dt_levels = !!(val & GICV5_ITS_IDR1_DT_LEVELS);
 > +		its->idr1.itt_levels = !!(val & GICV5_ITS_IDR1_ITT_LEVELS);
 > +		its->idr1.l2sz = FIELD_GET(GICV5_ITS_IDR1_L2SZ, val);
-
-I think l2sz should be set to 0 if both dt_levels and itt_levels are 0,
-because a res0 read-only field should read as 0.
-
-Thanks,
-Wei-Lin Chang
-
 > +		return 0;
 > +	case GICV5_ITS_IDR2:
 > +		if ((val & ~GICV5_ITS_IDR2_EVENTID_BITS) ||
