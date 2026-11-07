@@ -1,54 +1,109 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.156.1
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794000651;
-	b=gRKPiHVW+RRSr3WKDmKWkGJLCCwEqDuNsMvCf4i9G14jsVrmnL8JyQJp5ki5HK7Bzs9l
-	 3+7I0Hgqn1g18YGv5HGEdqMiGBFFAygbVaEfuIP/ptEeVNEsRaq/YGh/bD2BqmDpB1qJp
-	 Xj+OB8bfh2Yj8tGbaI4Qwcdm+gOMmlT005nkciggOU6O103D6mJdUGEQmnxjvkMHCaL2p
-	 5mCCy0DW7rEeKtVFB5RAT5Vk+T1ySLq1+BCN16HDgj5ZvcZGNMtGul0P1RzC5spDADMdH
-	 BkN8sABnjn4h69a+TLlsfotEtLdi38MNXsqn7F8PMtX9MKZcW6CVuQwxPiq5g37NOWw==
+	t=1794060529;
+	b=QJNWyCEjH0OPQPJUrDw3M1OdTWK4XAmCqDVU6IOG165ykF7hap1IApS/ltZ8lwMIdZMF
+	 fgTiqV8ARnIMuP0/d1JrBlcrZTPbGwIbNv1f+w/jN1c/Wv12rfWQGjxlLbyLjYVTwqMvh
+	 FLOV5RqmZlq9Q//CQt04jLBgGRZTmDh7LFOkOHcsN3cdERGJEfdJgfY5MPNEbpO93wUR/
+	 PG/Htf5V0aatvVqEg3Z/8OEMvEYB8msGMqBxvcmb/KwGBB9sXRFIEdRMvjvYgIvdT4qjl
+	 AdjLySxHtQuusnTbSPoBblnnI2Afbdu8FdUYbMLJGngR7O3zvwrsl/QtHYQX6A7Oulw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794000651;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=78M0zrQN/RKEdSRK6OCH+d/aWaVmSInC9noJ9fmrXic=;
-	b=uqwK7GOR7aYpFu2ZAbIRmyQMmF+nZBikhZaPTD7P9BRe2nZQgnQmAsSgye6bOdkpXo9t
-	 jbslPGt5fJd7ByW0wt+uZXyXzwEltQzjwdsGiZD5s6AGODS4CQy+XlXHJLtTvxryk6q+A
-	 P6svhi2nAqxLlY2EC2BttRyUAkY/I0Qi050gzEZB8qM76y1pLMXXfe/IJJldGummsAPRK
-	 wU5COYeEInzxU8FcNxTwDZLbDpYwdMQH5TMfyUmECAGn8/+bcgMgbZ59nl5wvp8iT8ceo
-	 oLCSDHOOggxY7kfGhrr0rQdf5jF6B8s7NG0FaOy0FU27YOCsM7LNj9ixuYKBV48RYFw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794060529;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
+	 Received:Received:Received:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To:X-TM-AS-GCONF:X-Proofpoint-Spam-Details-Enc:
+	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Info:X-Authority-Analysis:
+	 X-Proofpoint-GUID:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=ZQRDYuH2JVJMipJTF1ZpATp6Z5EQ/FZ1YThiVxgQw+o=;
+	b=yw1WlCsKclCF1JvVv2X9rbhmE0098j3VlU+bBtQ03lwBcbJCrd5qtoG46I44mtdeXqgT
+	 pyVEW+eQdxzfm3tUKRbm33SypNSVxh7scqSjRpi/Pme5CKXdSZICDbavotSrLcF0KNuf/
+	 DXdSLg4rl67qUYchaxV387sJZZK1xHmn75eiXJ+PBR30utXLMoCZbcCe7l32J2oQ0Tgqj
+	 35sy8KCDfkgrK1aq4gf52AOjBBKCHEOkOPoXDUFSfaJ8del4F5XqMek8hhVny3h3P/JKH
+	 +E+ZbkuOAlO6HzP9Y2wBDZjXJyh/v9nx96YynHYCN+rRn5R+JbuKd4jV5py5hJTRhlQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PcT7Yd6C;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=linux.ibm.com;
+	spf=pass smtp.mailfrom=linux.ibm.com;
+	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=SlJiiYr7;
+	arc=none smtp.remote-ip=148.163.156.1
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3FF606A326;
-	Fri,  6 Nov 2026 21:30:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D32606A326
+	for <kvmarm@lists.linux.dev>; Sat,  7 Nov 2026 14:08:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C4D32606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PcT7Yd6C
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07C341F0089F;
-	Fri,  6 Nov 2026 21:30:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794000651;
-	bh=78M0zrQN/RKEdSRK6OCH+d/aWaVmSInC9noJ9fmrXic=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=PcT7Yd6C7pVaiTAbNk1xDLmne8b05Xa/cipXiW5cKizpmjkF8uk36vMmF5HpW0CdL
-	 dLC7hjPx7aIloMlLA76aKVG2HmBTP+1Wdag84B3HLYcK58NiBjgkkOLElVj5Q8/LiH
-	 lSj8ua5j+cZ7vJPxwVofcbhsS5yFzB07MDV8SvrVM/22ses78wF+WKKE2OPiC7GYOP
-	 xAN3hLiiF6J68PJCuwXfxU/vdqjpoetaT6cmHUGeZHEsITB/ToOftpj0bVSFEABvyD
-	 g2VNx1ouCSWm0LZR4Ulh6bpSKFSIntO02xcIi9Fwa2AAGqx+KvRjwVlxudMHLvT1OR
-	 9Wv2w/GMrRLfA==
-Date: Fri, 6 Nov 2026 13:30:49 -0800
-From: Oliver Upton <oupton@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 6/8] KVM: arm64: Add sys_reg_descs for remaining MTE
- CMO instructions
-Message-ID: <au5HCZ4Ygasx-qKi@kernel.org>
-References: <20261106183154.3590825-1-oupton@kernel.org>
- <20261106183154.3590825-7-oupton@kernel.org>
- <sashiko-outbox-202094@kernel.org>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=SlJiiYr7
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A7CEV7S4064173;
+	Sat, 7 Nov 2026 14:08:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=ZQRDYuH2JVJMipJTF1ZpATp6Z5EQ/F
+	Z1YThiVxgQw+o=; b=SlJiiYr7hX+EVQ3dZK7oSeJODkpwqM7OkNHQUgvNZ+5zZd
+	+nlpdsndnpnTUZj/gMP2ixGMonhWHd0hD3wVl87BImGzB9UOMoYckCjd9/cifl1x
+	IOv121nDKnUsFsbOToYTdvgAExYvwRQ34EYE9u7JGgDLySWZOdzbLKLLILvcQNxC
+	nM4Z5bv4njUzs3ydxn1buiIbobjrg8Sw7uEQtTb36mMj7eIWFRe08BEuaTPKQ0R2
+	b/uA7EMs19+4ZXskO9JNTO36VaDqW1mOKNXaLXCawSgxVrvm8c4Y7YZlhS60g6aV
+	xhiAZEghP3UyyS6L3Vd7eI+eo55Z7xRdugUpiOEw==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4hsunsjdfe-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Sat, 07 Nov 2026 14:08:27 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6A7C4xWw3992538;
+	Sat, 7 Nov 2026 14:08:26 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4hs7h1b3xq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 07 Nov 2026 14:08:26 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6A7E8M5Y29098370
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 7 Nov 2026 14:08:22 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 65AAF20043;
+	Sat,  7 Nov 2026 14:08:22 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 40B3420040;
+	Sat,  7 Nov 2026 14:08:22 +0000 (GMT)
+Received: from localhost (unknown [9.111.22.167])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Sat,  7 Nov 2026 14:08:22 +0000 (GMT)
+Date: Sat, 7 Nov 2026 15:08:28 +0100
+From: Andreas Grapentin <gra@linux.ibm.com>
+To: Steffen Eiden <seiden@linux.ibm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+        Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Friedrich Welter <fritz@linux.ibm.com>,
+        Gautam Gala <ggala@linux.ibm.com>,
+        Hariharan Mari <hari55@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>,
+        Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>, Paolo Bonzini <pbonzini@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH v3 16/23] KVM: s390: arm64: Implement arm sysreg managing
+ infrastructure
+Message-ID: <au8wJDGsi-6SBVt-@li-d8547bcc-2d90-11b2-a85c-a70f2a37009a.ibm.com>
+References: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
+ <20261106-sysreg-v3-16-75e95980fb10@linux.ibm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -60,61 +115,75 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <sashiko-outbox-202094@kernel.org>
+In-Reply-To: <20261106-sysreg-v3-16-75e95980fb10@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA3MDA1NCBTYWx0ZWRfX1nXHMt0dKqPw
+ 6dAIAC0vw8kH7ekYS9IDmMR2jHKMYhppsDoCGru/3agVnKRtW7L3EWqCg3KEcRrEY5A1crosFKs
+ KXnBIpsM1un5BwPI243k9G9BIODtbaZfYF8Ahxcaj+Md5/AM0Qp4WiXY6pMqiC9lnHMfIdUDKoq
+ QMQOaNhBzxu9+cfEwj7maEmljAcowThjWrTgs/thBU/aFx1ssp4XDhSCIJ/nygvQtgEsD52QK0r
+ LGipX4j+kzKxxIvRkidYHcgEXTgUcpfzLogIDtyGFhpigmIpClhc19MKiKXA7uiHX4Y5+9aM2ks
+ H/09u0Ti2v8g7aeytx6t1JXTrWyOVUsdZBcmDa/r57W5jbEf5sHme95ZslI6dgQDPgIwiAKmh4F
+ vdwdlxkP6ms0hCtFbu9J7dH+tCdgnsxsdM0i+5sREMe8n/eGBOhkVr54QtFToShlN8f4ynNwunh
+ lonMmdFezS7rbBDRCyw==
+X-Proofpoint-ORIG-GUID: 5g6zsN_264zgD7K1qBmX3_vWI_0WPof2
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA3MDA1NCBTYWx0ZWRfX0a/ttAfB2y3a
+ UvqnqLvaLuqtseJ8jST+2O++lIhBL1ZOYRLoNcF4BBtByqTShd1XayujAlZNwYfgiGlwkrSvwnF
+ rUBjfb7jerEXN0NjQv7u3pmAIYYSK2o=
+X-Authority-Analysis: v=2.4 cv=euZKXYpX c=1 sm=1 tr=0 ts=6aef30db cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=kj9zAlcOel0A:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=jn5G6UVzRa4Rqx-XZ48A:9
+ a=CjuIK1q_8ugA:10
+X-Proofpoint-GUID: 5g6zsN_264zgD7K1qBmX3_vWI_0WPof2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-07_04,2026-11-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 clxscore=1011 suspectscore=0 spamscore=0 priorityscore=1501
+ lowpriorityscore=0 bulkscore=0 impostorscore=0 adultscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611070054
 
-On Fri, Nov 06, 2026 at 06:45:39PM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential
-> issue to consider:
-> - [Low] KVM: arm64: possible missing MTE_CMO_INSN entries for DC GVA and
->   DC GZVA
-> --
-> 
-> commit c80fdbddf913183cac8f63dfc60ce6f48445eafa
-> Author: Oliver Upton <oupton@kernel.org>
-> 
-> KVM: arm64: Add sys_reg_descs for remaining MTE CMO instructions
-> 
-> This commit adds MTE_CMO_INSN descriptors with mte_visibility to
-> sys_insn_descs[] for MTE cache maintenance instructions trapped by
-> HCR_EL2.TPCP so that they inject an UNDEFINED exception when MTE is not
-> enabled for the VM.
-> 
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index b456354713443..7f7a197a9ad6b 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> [ ... ]
-> > @@ -4394,6 +4403,15 @@ static struct sys_reg_desc sys_insn_descs[] = {
-> >  	SYS_INSN(TLBI_VALE1NXS, handle_tlbi_el1),
-> >  	SYS_INSN(TLBI_VAALE1NXS, handle_tlbi_el1),
-> >  
-> > +	MTE_CMO_INSN(DC_CGVAC, bad_cmo_trap),
-> > +	MTE_CMO_INSN(DC_CGDVAC, bad_cmo_trap),
-> > +	MTE_CMO_INSN(DC_CGVAP, bad_cmo_trap),
-> > +	MTE_CMO_INSN(DC_CGDVAP, bad_cmo_trap),
-> > +	MTE_CMO_INSN(DC_CGVADP, bad_cmo_trap),
-> > +	MTE_CMO_INSN(DC_CGDVADP, bad_cmo_trap),
-> > +	MTE_CMO_INSN(DC_CIGVAC, bad_cmo_trap),
-> > +	MTE_CMO_INSN(DC_CIGDVAC, bad_cmo_trap),
-> 
-> [Severity: Low]
-> This question rests on an architecture detail that could not be confirmed
-> from the kernel source: can SYS_DC_GVA and SYS_DC_GZVA trap to EL2 via
-> HCR_EL2.TDZ or HFGITR_EL2.DCZVA when MTE is not enabled for the VM?
-> 
-> If so, encoding_to_cgt[] maps both instructions to CGT_HCR_TDZ and
-> encoding_to_fgt[] maps them to HFGITR_EL2.DCZVA, which is marked NEVER_FGU
-> in config.c because the trap bit is shared with SYS_DC_ZVA.  Without
-> MTE_CMO_INSN entries for SYS_DC_GVA and SYS_DC_GZVA in sys_insn_descs[],
-> triage_sysreg_trap() has neither an FGU bit nor a visibility() callback to
-> filter them, and will forward traps from a nested guest to L1 when L1 sets
-> HCR_EL2.TDZ or HFGITR_EL2.DCZVA instead of injecting an UNDEFINED
-> exception.
+On Nov 06 26, Steffen Eiden wrote:
+> +/**
+> + * _vcpu_read_sys_reg() - read a guest sysreg with easr
+> + * @C: vcpu to read from; if loaded, may only be called from its own thread
+> + * @R: sysreg id; must be readable by easr; must be compile time constant
+> + *
+> + *   if SYSREGS_ON_CPU: proceed with flags = 0
+> + *   otherwise:         proceed with flags = EASR_FLAG_SA
+> + *
+> + */
+> +#define _vcpu_read_sys_reg(C, R) \
+> +	({	BUILD_BUG_ON(!__builtin_constant_p((R))); \
+> +		KVM_BUG_ON(vcpu_is_loaded(C) && smp_processor_id() != (C)->cpu, (C)->kvm); \
 
-Urgh, I'm starting to get the sense that we should pursue a generalized
-solution. This relies on adding a subtle detail to KVM's trap behavior
-when what we're trying to do already has a direct description in the
-architecture...
+ah, this slipped through. the condition checked here was supposed to be:
 
-Thanks,
-Oliver
+    vcpu_is_loaded(C) && kvm_get_running_vcpu() == (C)
+
+same for _vcpu_write_sys_reg below.
+
+> +		(vcpu_is_loaded(C)) \
+> +			? __vcpu_read_sr((C), (R), 0) \
+> +			: __vcpu_read_sr((C), (R), EASR_FLAG_SA); })
+> +
+> +/**
+> + * _vcpu_write_sys_reg() - write a guest sysreg with sasr
+> + *
+> + * @C: vcpu to write to; if loaded, may only be called from its own thread
+> + * @V: value to write
+> + * @R: sysreg id; must be writable by sasr; must be compile time constant
+> +
+> + *   if SYSREGS_ON_CPU: proceed with flags = 0
+> + *   otherwise:         proceed with flags = SASR_FLAG_INITIALIZED
+> + */
+> +#define _vcpu_write_sys_reg(C, V, R) \
+> +	({	BUILD_BUG_ON(!__builtin_constant_p((R))); \
+> +		KVM_BUG_ON(vcpu_is_loaded(C) && smp_processor_id() != (C)->cpu, (C)->kvm); \
+> +		(vcpu_is_loaded(C)) \
+> +			? __vcpu_write_sr((C), (V), (R), 0) \
+> +			: __vcpu_write_sr((C), (V), (R), SASR_FLAG_INITIALIZED); })
+> +
+> -- 
+> 2.56.0
