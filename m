@@ -1,69 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.189
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794227837;
-	b=fP+fvFq75V2837RJcHwKTnNqqeDvx8jhsMdmpjImdUmxxXzVl6lUYjXki/Q/ygQnt/uz
-	 nX/vDdfjCZBpjdXOQKoW2tfHIEyJF8jXUKNPwMj20JR/Yc5nD6Hez+txhJ5ZdpNU9zvpN
-	 KTOBY+pPVpJSB3qop//1lAGTyIDCdD1gF9OMAE1+pnqZgnWWY9pUdHPIO+My2rNO11u0z
-	 RYG9vlJK35eWeQECVq99ByqCBtCip1cyRO+tveYVKDEvcG8+3on6+rQRPWt75H0ewrvJP
-	 C19nGsKIOhvqLpp7j5yevD+RXCesigTSAc9GiABfaoBc3gH7Xr90fuvAOVaMDdDs0aA==
+	t=1794229949;
+	b=VX4YZGWlbOgK1p+71G0U8EOkhfjn5SPhTYTaoFDBftmtebGRB6rMBWCAqU58G7bs1UK3
+	 b80bkPX+ZuLta0YSqYgtRNgm7LirtUJNoESXcnNxLn8ccKKfPVdonibmmxeYeG91V2eCu
+	 HV9Tqsnsu4hLGqNNNVEKgDOaiMSEmtAKC4t+LkeDwyJhapo9eSjV77FDdglCNaoPfnIch
+	 KRD3xKtcPm1Wksw8/DwmflCa3U/MgxVXIXasJ2JCJ5whyDocQ1W6geGMEY6vSqhpk62TL
+	 +2nCTdu+epvXBLu1Ik3Txr7gNh5VRhD07jDljP3WlVAfvQS9RW8iPL5xjPXjDRl36vw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794227837;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
-	bh=4M2Ug6+sc3RFSzmdaYcK0tVL/sc44GoFVdqmCKfk9+E=;
-	b=vG5+jD0eLk1f08TBHg3lKZJnaBP4uuIQFL1sR3UQJI1EPRbS7nIMS11Wu4eMHb41NWjJ
-	 z3Xl2OnFxSH3r6ZZFfjZFB1hLarInsWsxy33cMA/0Lg+Fv0civA3wtd/GXyARUaEli9sU
-	 3bHrnd0gTpXwDaGYNvapQ7EH1aCbATUsE5QAzADtRst/WDkuKwOIILWjQP4kPIpI8HwFb
-	 cYsa9WCiIaq9Q7Bk6R1po9Zda9KWo8a0IrEeJNrN43etGlbnomU1CEj9CXdqDx/z35JgC
-	 lynq1uYfSX3zQL1SNwuj76lRfLnqWO11Pr7KMt3C+uf9NBWXVi/0TKkW/8JTMpVDoaA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794229949;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=VcGX3S/ok2ofcwS3uJdO8rQXnNkquiVnumUqc1g1VFE=;
+	b=cVRYJIoWXaqeTP9a7h7L2BNZy1FSYb56GH0vBYsLjtuDG16jy+K4gSDI4q22dL01HHI7
+	 XuF2coe5OdUiy6R0M22Cj+DvdOaBHdYNqoaWIVDan9z0m8B+4Ybtemdr/UOPP/LBfWlrW
+	 pVPA0VUZ4wsItQBw/fGTEGg6YLtzDEhcsuoB6xyIRE/UBVGs3aHOdWLrnWLlSdu70rXRK
+	 oADKqjmTwewJES5VKeLxmoZ0CWUz6UmRcfgmSVQR1QvG3YDdVOZxfyVgMgibUTmEoTZ0H
+	 5BcgHhOLAwQorsfwUrNy34fUOCw/DVY7VpkBV0ZcmuJl/z7ZVLrCMbLWakPxL/cyoJg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="rDSi/ksB";
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3CE8606A322
-	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 12:37:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A3CE8606A322
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=TAPWF1vE;
+	arc=none smtp.remote-ip=91.218.175.189
+Received: from mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09361606A322
+	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 13:12:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 09361606A322
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=rDSi/ksB
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E34681576;
-	Mon,  9 Nov 2026 04:37:12 -0800 (PST)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 143713F632;
-	Mon,  9 Nov 2026 04:37:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794227835; bh=bbU8vjk3/U/uslDQYyD+xxGnVcFZAPPAtmds4JD+P4M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rDSi/ksBFxCLASk9AcTB0iEcKrNeruGI3aeDjEnni3Ll2nyX78bS/2RQUsOeLiogC
-	 6noVyfuAVurAtfJkSiWzuTr/kuvNwafUx09qib8u4b/a/bB3NU/fJy4Gr79EEGdZBd
-	 zd34niL1ZGlio//dyJ34QCEDhf3hjFI6ISrNJReQ=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RESEND v4 1/3] KVM: arm64: Avoid re-testing walk_continue
-Date: Mon,  9 Nov 2026 12:37:11 +0000
-Message-ID: <avG-dw9Pa_94CxA6@LeoBrasDK>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <1639d961-1092-4a47-8825-55c1647a115b@arm.com>
-References: <20261106161240.1345126-1-leo.bras@arm.com> <20261106161240.1345126-2-leo.bras@arm.com> <1639d961-1092-4a47-8825-55c1647a115b@arm.com>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=TAPWF1vE
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=9ZfmGyDfW24qGm7656Xt3E7F30kmlnVfQdHu0DS+Udo=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1794229947; v=1; x=1794834747;
+ b=TAPWF1vE23T/rmSuzIaKjZULYiIASkCK5Il444WSwHX1hqQzfwlJhqS5SOswi9ALc/i1sO8y
+ ZnQjxzIBeC54/HBDUrH2Dg5svQIEK8hfSoJEJRDclhZnrArh5V1IR9OsfarHkaGQhdwSyh8ToWL
+ Oth2Wsq7bTs9vnwi8RsBOiTA=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 7d0f6bbc84b1c2d6;
+	Mon, 09 Nov 2026 13:12:27 +0000
+X-Mizu-Trace-ID: 7d0f6bbc84b1c2d6
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5c144eb2f43so3407e87.1
+        for <kvmarm@lists.linux.dev>; Mon, 09 Nov 2026 05:12:26 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErHmnpS9bRK0vgva4Z+KanXmlwpSjEy0Cl8ZLjutS77eDWM/T2pel9kYdaHs6suDFcE7V/ntKjs=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/6kQFHY9y0N4Wd6tASpL4phmMPmzSiI9rMrJxCYyMV77PM8WHi
+	T8a8Q9PQgNJ2/NmGTaWqk16CgbE/fbVUsyhCDW1F2/tNh5+iGOSS2xwmQyJVicYRQDV7edddiFa
+	oZjA5dbGrIHggdJXt8SM/tKh53a8SAZRGnvvKKiM2
+X-Received: by 2002:a05:6512:1109:b0:5bf:c3e1:532b with SMTP id
+ 2adb3069b0e04-5c00b60a427mr195461e87.5.1794229945777; Mon, 09 Nov 2026
+ 05:12:25 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -73,28 +66,53 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+References: <20261102141304.126883-1-steven.price@arm.com> <20261102141304.126883-11-steven.price@arm.com>
+ <fa0ee5a1-4c49-4c1f-bfbb-c270dc4b6301@arm.com> <CA+EHjTy970AWnhYoZ5OqxQ8ojCAELeejw60y2NmpDsM_ZMdu4Q@mail.gmail.com>
+ <06e52c9c-9026-4279-b8c0-53a54a667dad@arm.com>
+In-Reply-To: <06e52c9c-9026-4279-b8c0-53a54a667dad@arm.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 9 Nov 2026 13:11:49 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTzJ1O8=q0rL5CkLKN3CBDr=TkujEw_M-W0H=BJfmrTEzg@mail.gmail.com>
+X-Gm-Features: AclHuK9lv_i4f5zskQj2LbWryVS8Q4D5sdKCijE4VdtfsoeeW5x-cT5K6pQCDgo
+Message-ID: <CA+EHjTzJ1O8=q0rL5CkLKN3CBDr=TkujEw_M-W0H=BJfmrTEzg@mail.gmail.com>
+Subject: Re: [PATCH 10/11] KVM: arm64: CCA: Support runtime faulting of memory
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
+	linux-coco@lists.linux.dev, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
+	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>, 
+	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com, 
+	Lorenzo Pieralisi <lpieralisi@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Nov 06, 2026 at 04:59:05PM +0000, Suzuki K Poulose wrote:
-> On 06/11/2026 16:12, Leonardo Bras wrote:
-> > __kvm_pgtable_visit() performs a bunch of calls to
-> > kvm_pgtable_walk_continue() to find out whether the walk can continue
-> > further, and if not, 'goto out', which retests the possibility of
-> > continuing the walk before exiting.
-> > 
-> > Given that it's testing the same ret variable again, there is no reason
-> > the result of kvm_pgtable_walk_continue() would have changed since the
-> > previous check. So turn this goto into an early return, simplifying the
-> > code and paving the way for further rework."
-> 
-> Looks sensible to me.
-> 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
-> 
+Hi Suzuki,
 
+On Mon, 09 Nov 2026 11:35:31 +0000, Suzuki K Poulose
+<suzuki.poulose@arm.com> wrote:
+[...]
+>> applies as is. Only how the expected state is computed differs: for a
+>> pVM it comes from the per-page share state rather than an IPA bit.
+>
+> When you say, per-page, you mean per-IPA or per "backing page" ? i.e.,
+> can pKVM do something like :
+>
+>     kvm_ipa_is_private(kvm, ipa) ?
+>
+> (similar to Realm) or does it need the struct page backing the "ipa" ?
 
-Thanks Suzuki!
-Leo
+Per IPA, so kvm_ipa_is_private(kvm, ipa) would work for pKVM too. A
+pVM's page is private unless the guest has shared it, and that state
+is in its stage-2 PTE at EL2, not in the struct page. The host kernel
+doesn't have a copy today, since EL2 handles the share and unshare
+hypercalls and the new state is only at EL2, so the pKVM side of the
+check, a hypercall or a host-side mirror, is part of pKVM's
+guest_memfd support when that lands.
+
+Cheers,
+/fuad
