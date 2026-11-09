@@ -1,50 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.157
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794213130;
-	b=A/VHAakRiEKmhz6PVmqOCsuhC5oXjJrWFP6VamuG5R5yGAthcoikt0h20mQRueg3k0rJ
-	 gtTrprUdy0PE7JD2+YQylGM8/mzz30zxo5S5OIvtGZbG4myXoHvsFnfBaGyMXXaEWY7zx
-	 Uu6lCJF+qxs4ojaIXJCEFwneKJfwUncmG9t8m8m4g+H92Jgq92b9teALonndj411ry5fT
-	 ECt6ObGVI6DJ8gb6hGZUpCUclMRqOb6Cng7nEBiT7k5t5kWtwcpW1sNyLU3MwgTSOTsvw
-	 3txjae10QZUKUi4uEu4ISUJAAwnYDgd5JsFrHVf5EAmaarBuBJ07rOTLHLNzXW39wgA==
+	t=1794213131;
+	b=zdoJxpHHhJ96jcCMpb5x+1jseyRlU2FVNCnit6kL4EPQOi90gd2BB165zt+xRHfoDeXP
+	 RMDVSgdnhFOvfvRcENqvp4TrlXmSJMzM1ygXE9WQ1Kn9R4KkQxJ1bYn/Q/a0CQsexn0Dq
+	 5Ipbpi3LAYTzZM3WYyiblHOmGqHbEZ+9Hh6DGi/1xAQ+mA+e65v44SXDZS6L5CKFdC/Ln
+	 lQJEx7rB1hXDc3NeOH29s8p3Oo+OyFej/fQtNqkXszN3SvMAG187YtNQHmGuWIf5pb46t
+	 r8qqG9ySAycjwjRgNnc6G1GmlujUYJKWDkhEiN0g6uTgU6dGlwu6GNG8ZolqwlPQx3A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794213130;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794213131;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=XjEaU5iZiIoWZWXI3lEp1cSCckG214xKlxFgGMZy1WQ=;
-	b=YzoEgqou3g5ncCX7+XJnMfrHd7e4ldrF6svW8fRcQi4tLGnE2H5lC+1nSuZVClmQpi/c
-	 5juqHmZAlfaK8X8YNRw38dAJxu4/zvcsMA5oRasjujwbVmkdYeD8CrCB3Xl9ql3ZAqCTv
-	 w1ppWvQRC2xrT/4rbRm7bVcT5l+VSPQyUHm6KFOGsarHysLNBVJkJOJWFT+xBoSXUzajK
-	 HMuRRXWExuSajfwviNjRsiGY6I79eTFdFD3s18AAsHjzY1z6eQlLFM79HV0IjDETiBaug
-	 +sG5IbEZLsfd4aD5S7cSIxDpL6TW2Z9Q2tT5XtWij144O0YLMTUlqf8J6b1gHS4mq1Q==
+	 X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=yYnRMu74QSYMFyFnZroW2XAIK+45426ADoRmFNwN2fU=;
+	b=NGft5ZHD+UbP/B1JgAtcO/3bcLRnkvIqfX/9uT2fBevqp1MI/u5aqz56VGQzLi9QVWYJ
+	 kMIYh9ZIvu0vbDIzKr3HgwIbeI1SrQ1RtCZ+9r4cR++jbhuegZiA7FJmUmXgBrtW2eLrs
+	 1HkxKoNF8rM4WsPJLvHVoCk+JZh2UmoWuqyr2MKUXrVgti920RdOWyllCk/up/joX2PKw
+	 /aUmOL1B34d5SiPmAstxY6Jz5OmLloKyghgAI1zJcj6Tdzj3eoDYzhxOaO73961epikMX
+	 txKgELwcgl/eekKn0DILjcuDyAsOJaqBV6P83O8xUHHWigk1Ex1jh5/VEILNEjZTzLg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="a/VVEDZ2";
-	arc=none smtp.remote-ip=91.218.175.157
-Received: from mta0.migadu.com (out-157.mta0.migadu.com [91.218.175.157])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="H/lVnO8m";
+	arc=none smtp.remote-ip=95.215.58.133
+Received: from mta1.migadu.com (out-133.mta1.migadu.com [95.215.58.133])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF41606A322
-	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 08:32:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3AF41606A322
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECFFF606A33A
+	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 08:32:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ECFFF606A33A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=a/VVEDZ2
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=H/lVnO8m
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=jOYOI4w8TbsJs0zAnXNNJjeqeD+Qjc1ew2XDbtbhPHw=;
+DKIM-Signature: a=rsa-sha256; bh=scB/wdNHn77rOn8XuOwegyz93L7MG0cBY5PFUM4ImWI=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794213125; v=1; x=1794817925;
- b=a/VVEDZ2Ix9/H1yhrbaHu+Si2FsbyKGLGYbK4OeWf1L1x64SlHnSwR8v+ZHhe03BZYNwwV4U
- myQQb8NSOiu62kVPCTBEvAH3BoHk5dIdEt/j4swG0ag6JCoW46D+Obz/+H3kO5XFU2hwrk6L+gx
- sHSpbVBchMdJPiIR0aw0iSNw=
+ t=1794213129; v=1; x=1794817929;
+ b=H/lVnO8m1Sac2706uznVDfJOOjMcv/TmwFyofUliBSPJ5Tn6PI4gU4Lw1OieEKT7RcipLwgC
+ STjm5Ps4uZTYyr21dBIUCj+xeC7gwuqB6w09bq/kZfOzVK0EXe4WCagGd4YVFtVWoDp0fF/H6YJ
+ sm1s9PxO5nTj/GI69vomk4Ys=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id b213c8f6249ab49b;
-	Mon, 09 Nov 2026 08:32:05 +0000
-X-Mizu-Trace-ID: b213c8f6249ab49b
+Received: by smtp.migadu.com with ESMTPS id 8251e993a8e30812;
+	Mon, 09 Nov 2026 08:32:08 +0000
+X-Mizu-Trace-ID: 8251e993a8e30812
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -62,10 +63,12 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 00/16] KVM: arm64: Support debug, SVE, MOPS, PIE/POE, FPMR and more in protected VMs
-Date: Mon,  9 Nov 2026 08:31:49 +0000
-Message-ID: <20261109083205.806619-1-fuad.tabba@linux.dev>
+Subject: [PATCH 02/16] KVM: arm64: Remove redundant kern_hyp_va() calls from the pKVM FP sync
+Date: Mon,  9 Nov 2026 08:31:51 +0000
+Message-ID: <20261109083205.806619-3-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261109083205.806619-1-fuad.tabba@linux.dev>
+References: <20261109083205.806619-1-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -77,74 +80,45 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi folks,
+With pKVM, EL2 saves a guest's FP and SVE state on exit into the hyp
+vCPU, whose kvm is the hyp VM's and whose sve_state is already a hyp
+address. kern_hyp_va() returns both unchanged.
 
-With most of the groundwork now merged, bringing protected VMs up to
-the features we support for them in Android turns out not to be a big
-series. So this folds self-hosted debug [1] and SVE [2], which I posted
-separately last week, into one series with the rest. Both are small,
-and keeping them apart would only leave a few conflicts where they add
-neighbouring lines to the pVM ID-register code. The debug and SVE
-patches are unchanged from those postings.
+Remove the two calls, in fpsimd_sve_sync() and __hyp_sve_save_guest().
+The one in __hyp_sve_restore_guest() stays, as nVHE without pKVM reaches
+it with the host's pointer.
 
-  01:     Self-hosted debug.
-  02-05:  SVE, with EL2 owning a protected vCPU's SVE state.
-  06-07:  Compute a protected vCPU's fine-grained traps at EL2.
-  08-16:  Advertise TCR2, SCTLR2, S1PIE, S1POE, MOPS, FPMR and the
-          features EL2 already handles for non-protected guests.
+No functional change intended.
 
-Tested on QEMU, in hVHE and nVHE, and on FVP for S1POE and the fields
-QEMU doesn't model (CLRBHB, RPRFM, ECBHB, LSFE, LSUI, HAFT, ETS3 and
-F16MM). v2 of the pKVM selftests series [3] will cover debug, SVE,
-MOPS, PIE, POE and FPMR.
+Tested-by: Vincent Donnefort <vdonnefort@google.com>
+Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Based on Linux 7.4-rc1 (6628e7d4c6b25); it also applies to 7.4-rc2
-(7475ea8b58616).
-
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/20261102093950.2922035-1-fuad.tabba@linux.dev/
-[2] https://lore.kernel.org/all/20261105130456.1617185-1-fuad.tabba@linux.dev/
-[3] https://lore.kernel.org/all/20261104084842.132944-1-fuad.tabba@linux.dev/
-
-Fuad Tabba (16):
-  KVM: arm64: Add support for self-hosted debug in protected guests
-  KVM: arm64: Remove redundant kern_hyp_va() calls from the pKVM FP sync
-  KVM: arm64: Allocate a protected vCPU's SVE state at EL2
-  KVM: arm64: Advertise ID_AA64ZFR0_EL1 to protected VMs
-  KVM: arm64: Allow protected VMs to use SVE
-  KVM: arm64: Move the VM's FGU initialisation into config.c
-  KVM: arm64: Compute a protected vCPU's fine-grained traps at EL2
-  KVM: arm64: Advertise TCR2, SCTLR2, S1PIE and S1POE to protected VMs
-  KVM: arm64: Advertise MOPS to protected VMs
-  KVM: arm64: Advertise FPMR to protected VMs
-  KVM: arm64: Advertise HBC, CLRBHB, RPRFM, CSSC and LUT to protected
-    VMs
-  KVM: arm64: Advertise FAMINMAX, LSFE, LSUI and FPRCVT to protected VMs
-  KVM: arm64: Advertise AFP and RPRES to protected VMs
-  KVM: arm64: Advertise ECBHB, TIDCP1, TTST and LVA to protected VMs
-  KVM: arm64: Advertise FP8 and F16MM to protected VMs
-  KVM: arm64: Advertise ECV, HAFT and ETS3 to protected VMs
-
- Documentation/virt/kvm/arm/pkvm.rst    |  13 +-
- arch/arm64/include/asm/kvm_host.h      |   2 +-
- arch/arm64/include/asm/kvm_hyp.h       |   6 +
- arch/arm64/include/asm/kvm_pkvm.h      |   1 +
- arch/arm64/kvm/arm.c                   |   5 +
- arch/arm64/kvm/config.c                |  32 ++-
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |   1 +
- arch/arm64/kvm/hyp/nvhe/Makefile       |   1 +
- arch/arm64/kvm/hyp/nvhe/hyp-main.c     |   6 +-
- arch/arm64/kvm/hyp/nvhe/pkvm.c         |  51 ++--
- arch/arm64/kvm/hyp/nvhe/switch.c       |   1 +
- arch/arm64/kvm/hyp/nvhe/sys_regs.c     | 349 +++++++++++++++++++++++--
- arch/arm64/kvm/reset.c                 |   2 +
- arch/arm64/kvm/sys_regs.c              |  17 +-
- 14 files changed, 413 insertions(+), 74 deletions(-)
-
-
-base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 9958ca6d7b0a2..57c3f7a2d4b14 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -482,7 +482,7 @@ static void __hyp_sve_save_guest(struct kvm_vcpu *vcpu)
+ 	 * on the VL, so use a consistent (i.e., the maximum) guest VL.
+ 	 */
+ 	sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1, SYS_ZCR_EL2);
+-	sve_save_state(kern_hyp_va(vcpu->arch.sve_state), true);
++	sve_save_state(vcpu->arch.sve_state, true);
+ 	fpsimd_save_common(&vcpu->arch.ctxt.fp_regs);
+ 	write_sysreg_s(sve_vq_from_vl(kvm_host_sve_max_vl) - 1, SYS_ZCR_EL2);
+ }
+@@ -531,7 +531,7 @@ static void fpsimd_sve_sync(struct kvm_vcpu *vcpu)
+ 	else
+ 		fpsimd_save_state(&vcpu->arch.ctxt.fp_regs);
+ 
+-	has_fpmr = kvm_has_fpmr(kern_hyp_va(vcpu->kvm));
++	has_fpmr = kvm_has_fpmr(vcpu->kvm);
+ 	if (has_fpmr)
+ 		__vcpu_assign_sys_reg(vcpu, FPMR, read_sysreg_s(SYS_FPMR));
+ 
 -- 
 2.47.3
 
