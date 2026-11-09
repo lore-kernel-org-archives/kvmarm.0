@@ -1,99 +1,69 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.226
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794222376;
-	b=E3DWJ+hEgNmkFpFT3dZ3Y7RODeTTInmJck8yk3X/F2prSFNgJKPCzUMl0msSD7RE5WCO
-	 9Xv1YbUo9Gg9jZkZMvMCbb2aJbyaUYSow3wp19QkrVp2R4soU6ctEs7yXPos3BkNyTYXx
-	 T/hpXL8Dss70aT8r75KEucsYDQ3jZ3xfrVxisteu3eWXeJDsVdNdtAib2f+Rfa7unovQj
-	 go2pOUl3lcAp2yHNJG6pCVu75dNRPGKx2T2shqYzKRHgX+TEubD7UCqBqWnDmWP3LV5EJ
-	 sl4DFN1rXZq0xWSh35qPMl9IikvhyLk9cxvnNwWTS13UPTQEyjv1w/hffy/Z1vttqrA==
+	t=1794223226;
+	b=icsHXCV9gnYaJwLy2T03wfkCLwx0Of1oRBSEghwsWPVcdxLoE7DlaWKMn06SmUpuqFMz
+	 RqcMzlSWs82wxsYAds3+AF+kaF/mk3S0eEqtXvNUGDJ89icTzGsyWgcVqTlRubhWF9dqg
+	 zFNczmuPDVn/Fmgbr/PPr0fsQCuKKnhte+jXEqRQ3w6QZc9CZSDGqwwnzJ0bTfpcR8n0a
+	 ZeM/oRhwv2cWYmb/DpE5pRLkTdTO4sPKHNSdgSVGFChaAD5XZle/3sAOM8TpM9tU9NQ7B
+	 9JTyECFxMFrblqXcPED3cKCnOqB6GFdXnrfvGFSg4AlYKAvgcGBeJU9LIDtq5r7Gx9g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794222376;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=d8vRIIYl392fLQltvVGdYCiU5psYi3L4CF/tseUFWuI=;
-	b=c6WszuqKQW4ig7lWypO/81jiUAi6AuZqa/XfrDSwn1K4Hfn3d73zOqlB0TbDmxZJ/ukm
-	 JyYeqw9gsXBvXEorba63JEMU3it8yrdFgnfn3E5Yqpg8jzVDTu02Gi6my+TqgOhCXQ+VD
-	 z4jNSufQsJVLeJ1o/mXViJFffwZw0JItyKXrIsZzImuah3rzrGp4qfNGDsX01AOIzXiKs
-	 kVfRWUr4OwY/bWgJJtjZdfkodREkRiRITljKbNELUALizZQ7nc3kr7uZM/6kcW9rs4H4c
-	 Nzrgx4nOhnhQsPfjd+EWIaoED9jhG8NSZ7NOaaFtebNteEcoPGO8Drmc7axUnsw47gw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794223226;
+	h=DMARC-Filter:dkim-signature:Received:Received:Received:From:To:CC:
+	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
+	 X-ClientProxiedBy;
+	bh=+Lu9vavZpewMGIe7sT0xaOfi/XcEQNMU46Rb1px6xaQ=;
+	b=mPHteT6JqwRBNDST4abC7m7A0xD5o8hVfk4hYeVImqSgqVPvPdfyXaF+Cix5z5AFZQAJ
+	 3hodXjU/SUq5pGk6sRg4IbhXYjq1x7DcjSM/IdtsqFHF8lYz/BFF3m/U739bBxtwMP3fo
+	 4LZD2VjVBpn60Klh08p6elEOLB1tHwLzY3Cig9pVq0BUdyx6NOWhHXnSOtJasbY7Xc13I
+	 x/CIWRfZRpfpCeEfqL/8v8xElpeaDlr/3oCizu+CvwWxTj/0T1Jqs1UdUJ3A8ZSYJNpFA
+	 K59eOUNXm5k7RFe2t38Sr3YzXtXSCGINCVUY/UYSj78FhXx62y4H0FAD+VRfBxcipxA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=LFhukCQU;
-	arc=none smtp.remote-ip=209.85.128.53
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=huawei.com;
+	spf=pass smtp.mailfrom=huawei.com;
+	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=ji8tEq2k;
+	arc=none smtp.remote-ip=113.46.200.226
+Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B7B606A333
-	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 11:06:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 76B7B606A333
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C437606A31C
+	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 11:20:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6C437606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=LFhukCQU
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4b6266b5bc4so22865e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 09 Nov 2026 03:06:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794222375; x=1794827175; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=d8vRIIYl392fLQltvVGdYCiU5psYi3L4CF/tseUFWuI=;
-        b=LFhukCQUomrlCiEY7J8HM+MWMGjlTYs6uGCCNa8fCYmmkaxb3AcxUk1a9pR6KuY8bD
-         UZg2zNavVdnqn0J6EzY0Ld1WLKBAJa9CANpz/VsKA5wBEKM3UZa/rLUQ8OHXQMiW7W6n
-         KcQ9q+6sum7QEC4uf+TRKQHGVgr09bqsetl8p04kZSf+DKphXbcM4Qd9CTB2fbO0lGWq
-         n80P5zAts4k6aSPPtG35MW8Mof8m/Ue84MYLg/ei3dzUPweXUI8VTBBV7Ec2KSHmT2f+
-         5BjH52HdFSFmneAoCNEdxp6dKxlDMOJ9sSrkXsyg2/tkJUN5sZb1SyIACjcKjm0qub+m
-         op5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794222375; x=1794827175;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=d8vRIIYl392fLQltvVGdYCiU5psYi3L4CF/tseUFWuI=;
-        b=ybuQFkSyGImMdLauzYy+7BXgLFhNWzaZTZ11tW7F07tVJeVJuYhdtqsSQC4uAkM9UG
-         j30Sc7NdISXpXG4Wq8hndKUoxhMaID1lBG+/M03+X3nkz1MyXaPt2Dte0gtuxZWkeFiX
-         jpB+sSwLiNl74m9Hq/4db4gEHehQ6b+/K/sguvRoiuvqZIG4PxjV8XviGeD8htOjTCKd
-         UOHvqag0V8zwJhi+IXNyWH57c1Au2IH1fZ/pLM+aKWcySDaFBgzzVJh883PvqXSYlprl
-         h9d5Mr0+Mu6+WyGAoPJxEXRa0F1rHK6Xd2Xkle7MuIsrjPyU22SJVmrQrvHnke1vI5Vz
-         9wXQ==
-X-Forwarded-Encrypted: i=1; AL+hErGTL9wCkyPefNDL99mkONX+y7IDwEl7OVmnwnPLt5+tBbAJr1v+q0E2pLb9G1cuZm71CGGRZag=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9Mg7FLv10a5QDpRS84RgtEaWyE0TbntSheIhtW/LXaDIFZXFxa
-	tEAZfN1YV/MMo65VSRYlK3rISUs0Kvk82OVzmU5voxJNctmCXWEszsXqtW7/RRusFA==
-X-Gm-Gg: AYBFou032JzJDhqgw+jREeG14T7DooYHWBW7z78CBIWesG7pnENJpZQtW6+8Z3CWPOi
-	IXSP0fdXykTzl/RWdUZ+RilLfCjUeUcyisp9ULPJLUzP5xKbnH7v7SGbJxtv2m3L1dLyKRHfG2c
-	sOXg+lcB6xE3zZr9srBb0VERMRikPS/TohPhBOFxOTaX7UTufWefL0tw3Q1z7bHwQpLTv6603Lo
-	y/jO4JkddiL5cWfV69y/FfPfbau51GMPoK3PTPKCQbpgHi8pGKJrKxGIeqYRGXoyvtWqIheKpUL
-	YbapxZOJEzPBtydWrwvMiuiziG8ardYXa+7yiKoy61tLdwytPpKgR99j08tcRFc9ulXfOKyDb5S
-	MVi+YpbR3c60M5PEpTbw83KNp6NsnXSHAKI62J/r1qG71TH9xDBAsyLw+l6z2B+Xt6eHzSj8MK8
-	Sv63Y55ynpFXS8OZUmoSTENVdsw0N2qsmH9ARMnYafv1HDbTTktzogaYBVi9YeBrV+xQjtU5lFm
-	mXc293myE0Q7lty4QAjqkKLxB9w9DjVSXuuOFXQitxZU0ZeeKUgdwILQokfK5oMPOB3JHBKtrI8
-	aWLeiChNfaTUSUcDurB3ElMT67uaFXpg9jdEjW0G/TH2FNeHJQma6HL+Hb+rq2EEXtZRhw==
-X-Received: by 2002:a05:600d:640f:10b0:4a2:1912:6687 with SMTP id 5b1f17b1804b1-4b8aec1d290mr1382195e9.2.1794222374432;
-        Mon, 09 Nov 2026 03:06:14 -0800 (PST)
-Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-496c89d8630sm4422045f8f.15.2026.11.09.03.06.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Nov 2026 03:06:13 -0800 (PST)
-Date: Mon, 9 Nov 2026 11:06:09 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Nicolin Chen <nicolinc@nvidia.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
-	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, joro@8bytes.org, jgg@ziepe.ca,
-	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
-	vdonnefort@google.com
-Subject: Re: [PATCH v9 13/25] iommu/arm-smmu-v3-kvm: Add MMIO emulation
-Message-ID: <avGpIXoiLzncL29t@google.com>
-References: <20261015200903.2735565-1-smostafa@google.com>
- <20261015200903.2735565-14-smostafa@google.com>
- <au4w8nvPQ3xv7igC@nvidia.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=ji8tEq2k
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=+Lu9vavZpewMGIe7sT0xaOfi/XcEQNMU46Rb1px6xaQ=;
+	b=ji8tEq2kl3yMJVCyXuhKV5kQUxqmdEtqB/WIbQEDENZlGB1aLIwIZBLhAPbSEpXEvp1e4QHlJ
+	YvvoTfgf8BOy9tyg9DyfdNGYiGTBmljLSMJ9WjKEpdzit6YKOm7Kdn5xDVg6mlKrZjdqrWGOkKQ
+	ZiXwFxNoiRHc3vRPapN22mI=
+Received: from mail.maildlp.com (unknown [172.19.163.214])
+	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4jNS4W0r7wzKm76;
+	Mon,  9 Nov 2026 19:20:11 +0800 (CST)
+Received: from kwepemk300013.china.huawei.com (unknown [7.202.194.231])
+	by mail.maildlp.com (Postfix) with ESMTPS id E49AD4056C;
+	Mon,  9 Nov 2026 19:20:19 +0800 (CST)
+Received: from huawei.com (10.50.163.32) by kwepemk300013.china.huawei.com
+ (7.202.194.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Mon, 9 Nov
+ 2026 19:20:19 +0800
+From: Jinqian Yang <yangjinqian1@huawei.com>
+To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>
+CC: <maz@kernel.org>, <oupton@kernel.org>, <fuad.tabba@linux.dev>,
+	<yuzenghui@huawei.com>, <joey.gouly@arm.com>, <seiden@linux.ibm.com>,
+	<suzuki.poulose@arm.com>, <yangjinqian1@huawei.com>,
+	<liuyonglong@huawei.com>, <wangzhou1@hisilicon.com>,
+	<prime.zeng@hisilicon.com>, <tangchengchang@huawei.com>,
+	<zhengtian10@huawei.com>, <linuxarm@huawei.com>, <liujian222@huawei.com>
+Subject: [PATCH] KVM: arm64: Register irq_bypass consumers only with GICv4
+Date: Mon, 9 Nov 2026 19:20:18 +0800
+Message-ID: <20261109112018.241298-1-yangjinqian1@huawei.com>
+X-Mailer: git-send-email 2.33.0
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -103,43 +73,45 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <au4w8nvPQ3xv7igC@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemk300013.china.huawei.com (7.202.194.231)
 
-On Fri, Nov 06, 2026 at 11:56:34AM -0800, Nicolin Chen wrote:
-> On Thu, Oct 15, 2026 at 08:08:44PM +0000, Mostafa Saleh wrote:
-> > +static bool smmu_dabt_handler(struct user_pt_regs *regs, u64 esr, u64 addr)
-> > +{
-> > +	struct hyp_arm_smmu_v3_device *smmu;
-> > +	bool ret;
-> > +
-> > +	for_each_smmu(smmu) {
-> > +		if (addr < smmu->mmio_addr || addr >= smmu->mmio_addr + smmu->mmio_size)
-> > +			continue;
-> > +		hyp_spin_lock(&smmu->lock);
-> > +		ret = smmu_dabt_device(smmu, regs, esr, addr - smmu->mmio_addr);
-> 
-> Going through the followup patches, I found this smmu_dabt_device
-> gets really too big. Perhaps it can be bisect to read and write at
-> least? Something like:
-> 
-> static bool smmu_mmio_handler(smmu, regs, esr, off)
-> {
->         /* decode ESR: len, rd, xzr; width check */
->         if (is_write)
->                 return smmu_mmio_write_handler(smmu, off, len, val);
->         val = smmu_mmio_read_handler(smmu, off, len);
->         if (!is_xzr)
->                 regs->regs[rd] = val;
->         return true;
-> }
+kvm_arch_has_irq_bypass() on arm64 returns true unconditionally, so
+every irqfd assignment registers an irq_bypass consumer even when the
+hardware cannot perform GICv4 direct MSI forwarding. In that case
+kvm_vgic_v4_set_forwarding() bails out at its very first check, since
+vgic_supports_direct_msis() is false without has_gicv4, and the
+registration becomes pure overhead: every KVM_IRQFD ioctl takes the
+global irq_bypass mutex, which becomes a contention point when many
+VMs boot concurrently.
 
-Yes, I was wondering about the size of the dabt handler also.
-I will try this, but that will propably won't cut the size in half.
+Gate the registration on kvm_vgic_global_state.has_gicv4, the way x86
+gates on enable_device_posted_irqs. Functionally this is a no-op:
+without GICv4 the consumer registration never did anything beyond
+acquiring the lock.  On a GICv3-only host booting 100 microVMs
+concurrently this cuts the average boot time by ~5 ms, matching the
+gain observed with CONFIG_HAVE_KVM_IRQ_BYPASS=n.
 
-Thanks,
-Mostafa
+Signed-off-by: Jinqian Yang <yangjinqian1@huawei.com>
+---
+ arch/arm64/include/asm/kvm_host.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 
-> Nicolin
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 97332ffcb130..785d57388032 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1744,7 +1744,7 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
+ 
+ static inline bool kvm_arch_has_irq_bypass(void)
+ {
+-	return true;
++	return kvm_vgic_global_state.has_gicv4;
+ }
+ 
+ void kvm_idregs_enforce_dependencies(struct kvm *kvm);
+-- 
+2.33.0
+
