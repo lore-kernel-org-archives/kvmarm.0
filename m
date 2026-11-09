@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.217
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794214175;
-	b=XSYi3SISy2ATjo5xY3YHtjx5VyouKkuFtEHO/y4Zwl6+r6zzyrGwiSLByt0P2sTQmHd9
-	 fr3VKwDJAaany3ESiSmTixIJ8p5Rr7APkqcHKCEygLRyyCYJVGuc/tGx03UNR2U6QGury
-	 KNwBUyaWM7hhmViLYLwcbsXo2bKaUPmkMHd4rQllC+aBjNcaDzKWYKYqLd7BUC+rHeLqt
-	 MFxlZiOlf3+PnQfetsKGcROcR9HfLeDyeeUrsq60Gv2UnQdBnEDL8WkLUNhEOEbKZbIOP
-	 VQi5wjzPftoTihQWaxwxL1mIoaUAKbkERpe+M9qdL34/n8a0KN7IJBHk1AHU9hTv7HA==
+	t=1794214176;
+	b=4M8nyKgPCWXMgrRlzStPTvnrg0ExsXPGkXLeOgY6YRXJWhjg8BlWSdV25IXeB2QFplKd
+	 d+3UubXScMg83WmVHjUnH18noX9Y8+es895uVM7i+yCVB73Tu6Synx1KuSLqc9B0fNShI
+	 Hb3K1DsmMshEQV3FxznoAyyecj0eYaUy3tmnwsi4BtkJZ79d/iFbpXRSlNb/zYAbfJnJ1
+	 jGc3JhLmVN/whr6eyLyN94ENlWJJ/yQYyTtUtf4jKByCPrR8JLyKk2uthOKLcvHkxFhUl
+	 AskChvvNnZZ1fbbhORGrnSCLFyZmmUg35fMc/00IVa8y6tFYQXNgK/nPmmtjjmQ5YGQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794214175;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794214176;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=PtHDYady7phNq27ntokTbSRWYS9Lun+LGBxYvYPNZY8=;
-	b=5YOuHD4YMrJi8y/QRmpmEVCs/tDcPxLCb4kJtjI5iG/gLk9lbEvkVbhRD+D6qJ3mizvP
-	 9Bcgx1M7leWFeY5we6LZbIEVQv2SI8YlejSYw3eBIdkyO7sVasR7E7aiJEn9fUGSbq0Qr
-	 sFY6p+1V8sD0oGQsnag4S6VC1j/j042DtM/0q/3OL6YHTUOXfSrfFyVLPTNCwgh6g/ySm
-	 NGnxnv7Frlraspjdca+HRTGQci+3h1oJSZs4CwH59KWje1wMf+kL/R7JWnijTbkUfx96f
-	 bmfjnnyA+9Gkw3HGycIdz97+bg7gpH4abrzKu/2aOhUsjtde8YJNQVnALILq61Tc3/Q==
+	bh=ZqLRHECtu1IbyfmzqydS0xcErU/tndix94XGkirfv30=;
+	b=danbQ+jHJeDw87zeJNB7W2Oqvm3hMD4/Rj+XY501YAApbLOzZe73dwiX3Id7fhuHyETS
+	 ibOYmolTZ2cxvIQdCdbjJQeIABNCdeFjjMKC+4eOLwbv8y6d4gyDDicgkNQwIKOWs0aax
+	 Jm5MRWqnuryztd+1vLlwMRe6xxL5TbzUgsiiF5IymS3+1v+Mjm/4H2WkJyDmyKQjZbdQS
+	 ae3UTt55imcM6H0YSp/Qth8SOHsbqfkuDHrd2JkcFj9ijnmBJvOhcy+yh0Ym1hm6GDvUk
+	 pFQ5nwWg3KvrPODCr63WVeADLgo1xh/p1Jzn2PgX3b6ZEO/ZW+dc7YKkP3ZiBQKE9YA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=IaOhcNEV;
-	arc=none smtp.remote-ip=95.215.58.217
-Received: from mta1.migadu.com (out-217.mta1.migadu.com [95.215.58.217])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=NQxKjYUn;
+	arc=none smtp.remote-ip=91.218.175.50
+Received: from mta0.migadu.com (out-50.mta0.migadu.com [91.218.175.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3FE606A332
-	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 08:49:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AC3FE606A332
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8185606A332
+	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 08:49:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C8185606A332
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=IaOhcNEV
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=NQxKjYUn
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=ovcORW3DsB2JukpcYhWq0sTqhjhRqe8m4MhePuk/qqE=;
+DKIM-Signature: a=rsa-sha256; bh=f+5i3cnibFXJG4SEb8GtpTgqVNwtOWpsHcWaN7rrewI=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794214173; v=1; x=1794818973;
- b=IaOhcNEVbXajw44iBVdsXJnOT7pDf7QqB9hgcYyslWk2I94wMn4unXDwh2lfPuNTru7VfSLl
- epHa5etOrNigbUaGHK7O2UGJwKGaGfclhM7AQfayV5IR+/T4PHJqI5jSFv4+7/+ylUK/nrXptlx
- 9W+tPzhutMFSSS6HtRI2dApQ=
+ t=1794214174; v=1; x=1794818974;
+ b=NQxKjYUnckKOknKJv2m0bxjLW1paI30H4PpVhZOlbVKCoe30d4MJL3e3zuK8zbdv6ixF28T2
+ 4e43uyoR1iyzUv+6YPUlljOMwu88HhQYwmOuYvCo2TXDOSsijIPyIlPLrhRY/Ba8Q1Xk4lQ2kQ4
+ Rneo6d6edZmqTUsmGqwqgTZg=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 6eeedc8a73996927;
-	Mon, 09 Nov 2026 08:49:32 +0000
-X-Mizu-Trace-ID: 6eeedc8a73996927
+Received: by smtp.migadu.com with ESMTPS id c6b98e3bab36c25f;
+	Mon, 09 Nov 2026 08:49:33 +0000
+X-Mizu-Trace-ID: c6b98e3bab36c25f
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -68,9 +68,9 @@ Cc: Will Deacon <will@kernel.org>,
 	kvm@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 10/19] KVM: arm64: selftests: Add pkvm_mem_share hypercall test
-Date: Mon,  9 Nov 2026 08:48:45 +0000
-Message-ID: <20261109084854.840576-11-fuad.tabba@linux.dev>
+Subject: [PATCH v2 11/19] KVM: arm64: selftests: Add pkvm_smccc hypercall test
+Date: Mon,  9 Nov 2026 08:48:46 +0000
+Message-ID: <20261109084854.840576-12-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261109084854.840576-1-fuad.tabba@linux.dev>
 References: <20261109084854.840576-1-fuad.tabba@linux.dev>
@@ -85,433 +85,153 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A protected guest gives the host access to one of its pages with
-MEM_SHARE and takes it back with MEM_UNSHARE. The page is a host page,
-whose size HYP_MEMINFO returns. At teardown EL2 zeroes every page the
-guest hasn't left shared.
+EL2 handles a protected guest's SMCCC calls other than PSCI rather than
+forwarding them to the host. The vendor-hyp feature bitmap advertises
+only FEATURES and the three memory calls.
 
-Exercise the three calls, the host's access to shared and private pages,
-and the zeroing. Also check that KVM_RUN fails with EIO on
-hugetlb-backed memory, that sharing an IPA outside every memslot makes
-the guest take an external abort, and that faults each requiring new
-stage-2 tables succeed.
+Check SMCCC_VERSION, the vendor-hyp UID and feature bitmap, that the
+calls EL2 doesn't implement (FF-A, TRNG, an unknown function) return
+NOT_SUPPORTED, and that an SMC makes the guest take an UNDEF.
 
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/arm64/pkvm_mem_share.c      | 394 ++++++++++++++++++
- 2 files changed, 395 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/pkvm_mem_share.c
+ .../testing/selftests/kvm/arm64/pkvm_smccc.c  | 117 ++++++++++++++++++
+ 2 files changed, 118 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/arm64/pkvm_smccc.c
 
 diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index aa256fb66d226..88c1159cb3bf1 100644
+index 88c1159cb3bf1..6bb436bd36205 100644
 --- a/tools/testing/selftests/kvm/Makefile.kvm
 +++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -191,6 +191,7 @@ TEST_GEN_PROGS_arm64 += arm64/external_aborts
- TEST_GEN_PROGS_arm64 += arm64/mmio_sign_ext
- TEST_GEN_PROGS_arm64 += arm64/page_fault_test
+@@ -193,6 +193,7 @@ TEST_GEN_PROGS_arm64 += arm64/page_fault_test
  TEST_GEN_PROGS_arm64 += arm64/pkvm_host_abi
-+TEST_GEN_PROGS_arm64 += arm64/pkvm_mem_share
+ TEST_GEN_PROGS_arm64 += arm64/pkvm_mem_share
  TEST_GEN_PROGS_arm64 += arm64/pkvm_psci
++TEST_GEN_PROGS_arm64 += arm64/pkvm_smccc
  TEST_GEN_PROGS_arm64 += arm64/psci_test
  TEST_GEN_PROGS_arm64 += arm64/sea_to_user
-diff --git a/tools/testing/selftests/kvm/arm64/pkvm_mem_share.c b/tools/testing/selftests/kvm/arm64/pkvm_mem_share.c
+ TEST_GEN_PROGS_arm64 += arm64/set_id_regs
+diff --git a/tools/testing/selftests/kvm/arm64/pkvm_smccc.c b/tools/testing/selftests/kvm/arm64/pkvm_smccc.c
 new file mode 100644
-index 0000000000000..9a4e96fc8d046
+index 0000000000000..64bfa12b26824
 --- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/pkvm_mem_share.c
-@@ -0,0 +1,394 @@
++++ b/tools/testing/selftests/kvm/arm64/pkvm_smccc.c
+@@ -0,0 +1,117 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * pkvm_mem_share - MEM_SHARE, MEM_UNSHARE and HYP_MEMINFO, and EL2 zeroing a
-+ * protected VM's private pages at teardown.
++ * pkvm_smccc - the SMCCC calls EL2 handles for a protected VM, and its SMC.
 + *
 + * Copyright (C) 2025 Google LLC
 + * Author: Fuad Tabba <fuad.tabba@linux.dev>
 + */
 +
-+#include <errno.h>
-+#include <setjmp.h>
-+#include <signal.h>
-+#include <stdio.h>
-+
 +#include <linux/arm-smccc.h>
++#include <linux/bits.h>
 +
 +#include "kvm_util.h"
 +#include "pkvm.h"
 +#include "processor.h"
 +#include "test_util.h"
 +
-+/*
-+ * A page here is a host page, the granule EL2 shares in. Set in the guest's
-+ * copy by the host before the first run.
-+ */
-+static u64 granule;
++/* KVM UID 28b46fb6-2ec5-11e9-a9ca-4b564d003a74, as four SMCCC result regs. */
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
 +
-+#define GUEST_MEMSLOT	(PKVM_IDMAP_MEMSLOT + 1)
-+#define GPA_BASE	BIT_ULL(30)
-+#define GVA_BASE	GPA_BASE
-+#define GPA_PAGES	16
-+#define GPA_SIZE	((size_t)GPA_PAGES * granule)
++/* The vendor-hyp feature bitmap EL2 advertises to protected guests. */
++#define KVM_FEATURES (					\
++	BIT(ARM_SMCCC_KVM_FUNC_FEATURES) |		\
++	BIT(ARM_SMCCC_KVM_FUNC_HYP_MEMINFO) |		\
++	BIT(ARM_SMCCC_KVM_FUNC_MEM_SHARE) |		\
++	BIT(ARM_SMCCC_KVM_FUNC_MEM_UNSHARE))
 +
-+/* Each case uses its own pages of the guest memslot. */
-+#define P_SHARE			0
-+#define P_SHARED_AT_TEARDOWN	1
++#define FFA_VERSION_FUNC_ID						\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL, ARM_SMCCC_SMC_32,	\
++			   ARM_SMCCC_OWNER_STANDARD, 0x63)
 +
-+/* Recognizable value the host must still see in a page that isn't zeroed. */
-+#define DIRTY_VAL		0x0badf00ddeadbeefUL
++/* An unallocated vendor-hyp function id. */
++#define UNKNOWN_FUNC_ID							\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL, ARM_SMCCC_SMC_64,	\
++			   ARM_SMCCC_OWNER_VENDOR_HYP, 30)
 +
-+/* An aligned IPA outside every memslot. */
-+#define OUTSIDE_IPA		BIT_ULL(31)
++extern unsigned char smc_insn;
 +
-+/* What one last-level stage-2 table maps: 2M on a 4K host. */
-+#define BLOCK_SIZE		(granule / 8 * granule)
-+
-+/* One page in each block of a memslot centered on 512G. */
-+#define PRESSURE_MEMSLOT	(GUEST_MEMSLOT + 1)
-+#define PRESSURE_PAGES		64
-+#define PRESSURE_SIZE		((u64)PRESSURE_PAGES * BLOCK_SIZE)
-+#define PRESSURE_GPA		(BIT_ULL(39) - PRESSURE_SIZE / 2)
-+#define PRESSURE_GVA		BIT_ULL(32)
-+
-+/* Commands that act on a page take its index. */
-+enum guest_cmd {
-+	CMD_HOST_INC_SHARED = 1,
-+	CMD_HOST_ACCESS_PRIVATE,
-+};
-+
-+#define HOST_CMD(cmd, idx)	GUEST_SYNC_ARGS(cmd, idx, 0, 0, 0)
-+
-+static u64 page_ipa(int idx)
-+{
-+	return GPA_BASE + (u64)idx * granule;
-+}
-+
-+static volatile u64 *page_va(int idx)
-+{
-+	return (volatile u64 *)(GVA_BASE + (u64)idx * granule);
-+}
-+
-+static unsigned long hvc_share(u64 ipa, u64 arg2, u64 arg3)
-+{
-+	return pkvm_hvc(ARM_SMCCC_VENDOR_HYP_KVM_MEM_SHARE_FUNC_ID, ipa, arg2, arg3);
-+}
-+
-+static unsigned long hvc_unshare(u64 ipa, u64 arg2, u64 arg3)
-+{
-+	return pkvm_hvc(ARM_SMCCC_VENDOR_HYP_KVM_MEM_UNSHARE_FUNC_ID, ipa, arg2, arg3);
-+}
-+
-+static void test_meminfo(void)
-+{
-+	u32 meminfo = ARM_SMCCC_VENDOR_HYP_KVM_HYP_MEMINFO_FUNC_ID;
-+
-+	GUEST_ASSERT_EQ(pkvm_hvc(meminfo, 0, 0, 0), granule);
-+
-+	GUEST_ASSERT_EQ(pkvm_hvc(meminfo, 1, 0, 0), SMCCC_RET_INVALID_PARAMETER);
-+	GUEST_ASSERT_EQ(pkvm_hvc(meminfo, 0, 1, 0), SMCCC_RET_INVALID_PARAMETER);
-+	GUEST_ASSERT_EQ(pkvm_hvc(meminfo, 0, 0, 1), SMCCC_RET_INVALID_PARAMETER);
-+}
-+
-+static void test_arg_validation(void)
-+{
-+	u64 ipa = page_ipa(P_SHARE);
-+
-+	/* Non-zero arg2 or arg3, and an unaligned IPA, are rejected before any page walk. */
-+	GUEST_ASSERT_EQ(hvc_share(ipa, 1, 0), SMCCC_RET_INVALID_PARAMETER);
-+	GUEST_ASSERT_EQ(hvc_share(ipa, 0, 1), SMCCC_RET_INVALID_PARAMETER);
-+	GUEST_ASSERT_EQ(hvc_share(ipa + 0x80, 0, 0), SMCCC_RET_INVALID_PARAMETER);
-+	GUEST_ASSERT_EQ(hvc_unshare(ipa, 1, 0), SMCCC_RET_INVALID_PARAMETER);
-+	GUEST_ASSERT_EQ(hvc_unshare(ipa, 0, 1), SMCCC_RET_INVALID_PARAMETER);
-+	GUEST_ASSERT_EQ(hvc_unshare(ipa + 0x80, 0, 0), SMCCC_RET_INVALID_PARAMETER);
-+}
-+
-+static void test_share_unshare(void)
-+{
-+	volatile u64 *val = page_va(P_SHARE);
-+	u64 ipa = page_ipa(P_SHARE);
-+
-+	*val = 42;
-+
-+	HOST_CMD(CMD_HOST_ACCESS_PRIVATE, P_SHARE);
-+	GUEST_ASSERT_EQ(*val, 42);
-+
-+	GUEST_ASSERT_EQ(hvc_share(ipa, 0, 0), SMCCC_RET_SUCCESS);
-+	GUEST_ASSERT_EQ(hvc_share(ipa, 0, 0), SMCCC_RET_INVALID_PARAMETER);
-+
-+	HOST_CMD(CMD_HOST_INC_SHARED, P_SHARE);
-+	GUEST_ASSERT_EQ(*val, 43);
-+
-+	GUEST_ASSERT_EQ(hvc_unshare(ipa, 0, 0), SMCCC_RET_SUCCESS);
-+	GUEST_ASSERT_EQ(hvc_unshare(ipa, 0, 0), SMCCC_RET_INVALID_PARAMETER);
-+
-+	HOST_CMD(CMD_HOST_ACCESS_PRIVATE, P_SHARE);
-+	GUEST_ASSERT_EQ(*val, 43);
-+}
-+
-+/* Dirty every page, so that a page that reads 0 after teardown is one EL2 zeroed. */
-+static void guest_dirty_region(void)
-+{
-+	volatile u64 *p = (volatile u64 *)GVA_BASE;
-+	size_t i;
-+
-+	for (i = 0; i < GPA_SIZE / sizeof(*p); i++)
-+		p[i] = DIRTY_VAL;
-+}
++static volatile u64 undef_pc;
 +
 +static void guest_code(void)
 +{
++	struct arm_smccc_res res;
++	unsigned long ret;
++
 +	pkvm_guest_init();
 +
-+	test_meminfo();
-+	test_arg_validation();
-+	test_share_unshare();
++	/* The vendor-hyp calls require SMCCC 1.1. */
++	ret = pkvm_hvc(ARM_SMCCC_VERSION_FUNC_ID, 0, 0, 0);
++	__GUEST_ASSERT((s32)ret >= ARM_SMCCC_VERSION_1_1, "SMCCC_VERSION 0x%lx", ret);
 +
-+	guest_dirty_region();
++	smccc_hvc(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, 0, 0, 0, 0, 0, 0, 0, &res);
++	GUEST_ASSERT_EQ(res.a0, ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0);
++	GUEST_ASSERT_EQ(res.a1, ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1);
++	GUEST_ASSERT_EQ(res.a2, ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2);
++	GUEST_ASSERT_EQ(res.a3, ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3);
 +
-+	/* Teardown doesn't zero a page the guest left shared. */
-+	GUEST_ASSERT_EQ(hvc_share(page_ipa(P_SHARED_AT_TEARDOWN), 0, 0), SMCCC_RET_SUCCESS);
++	ret = pkvm_hvc(ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID, 0, 0, 0);
++	GUEST_ASSERT_EQ(ret, KVM_FEATURES);
++
++	/* EL2 returns NOT_SUPPORTED for a call it doesn't implement, rather than forward it. */
++	GUEST_ASSERT_EQ(pkvm_hvc(FFA_VERSION_FUNC_ID, 0, 0, 0), SMCCC_RET_NOT_SUPPORTED);
++	GUEST_ASSERT_EQ(pkvm_hvc(ARM_SMCCC_TRNG_VERSION, 0, 0, 0), SMCCC_RET_NOT_SUPPORTED);
++	GUEST_ASSERT_EQ(pkvm_hvc(UNKNOWN_FUNC_ID, 0, 0, 0), SMCCC_RET_NOT_SUPPORTED);
 +
 +	GUEST_DONE();
 +}
 +
-+static void expect_sea_handler(struct ex_regs *regs)
++static void undef_handler(struct ex_regs *regs)
 +{
-+	u64 esr = read_sysreg(esr_el1);
-+
-+	GUEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_CUR);
-+	GUEST_ASSERT_EQ(esr & ESR_ELx_FSC_TYPE, ESR_ELx_FSC_EXTABT);
-+
-+	GUEST_DONE();
++	undef_pc = regs->pc;
++	regs->pc += 4;
 +}
 +
-+static void guest_share_outside(void)
++/* EL2 injects an UNDEF for a protected guest's SMC. */
++static void guest_smc(void)
 +{
 +	pkvm_guest_init();
 +
-+	hvc_share(OUTSIDE_IPA, 0, 0);
-+	GUEST_FAIL("MEM_SHARE of an IPA outside every memslot returned to the guest");
-+}
++	{
++		register u64 x0 asm("x0") = ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID;
 +
-+/*
-+ * Each fault requires a new stage-2 last-level table, and the first one above
-+ * 512G a new table at every level below the root.
-+ */
-+static void guest_memcache_pressure(void)
-+{
-+	volatile u64 *p = (volatile u64 *)PRESSURE_GVA;
-+	int i;
-+
-+	pkvm_guest_init();
-+
-+	for (i = 0; i < PRESSURE_PAGES; i++)
-+		p[i * granule / sizeof(*p)] = i + 1;
-+	for (i = 0; i < PRESSURE_PAGES; i++)
-+		GUEST_ASSERT_EQ(p[i * granule / sizeof(*p)], i + 1);
-+
-+	GUEST_DONE();
-+}
-+
-+static void guest_touch_one_page(void)
-+{
-+	pkvm_guest_init();
-+
-+	*page_va(0) = 1;
-+
-+	GUEST_DONE();
-+}
-+
-+static sigjmp_buf sigsegv_jmpbuf;
-+static volatile void *sigsegv_expected;
-+
-+/* The test maps the guest memslot itself, so it can read the memory after the VM is freed. */
-+static u64 *guest_mem;
-+
-+static u64 *host_page(int idx)
-+{
-+	return guest_mem + (size_t)idx * granule / sizeof(*guest_mem);
-+}
-+
-+static void sigsegv_handler(int sig, siginfo_t *si, void *ctx)
-+{
-+	TEST_ASSERT(si->si_addr == sigsegv_expected,
-+		    "SIGSEGV at %p, expected %p", si->si_addr, sigsegv_expected);
-+	siglongjmp(sigsegv_jmpbuf, 1);
-+}
-+
-+static void host_access_private(int idx)
-+{
-+	struct sigaction old, sa = {
-+		.sa_sigaction	= sigsegv_handler,
-+		.sa_flags	= SA_SIGINFO,
-+	};
-+	volatile u64 *p = host_page(idx);
-+	bool faulted = false;
-+
-+	sigsegv_expected = (void *)p;
-+	sigaction(SIGSEGV, &sa, &old);
-+	if (sigsetjmp(sigsegv_jmpbuf, 1) == 0)
-+		(*p)++;
-+	else
-+		faulted = true;
-+	sigaction(SIGSEGV, &old, NULL);
-+
-+	TEST_ASSERT(faulted, "Host accessed private guest memory without faulting");
-+}
-+
-+static void on_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
-+{
-+	u64 *p = host_page(uc->args[2]);
-+
-+	switch (uc->args[1]) {
-+	case CMD_HOST_INC_SHARED:
-+		(*p)++;
-+		break;
-+	case CMD_HOST_ACCESS_PRIVATE:
-+		host_access_private(uc->args[2]);
-+		break;
-+	default:
-+		TEST_FAIL("Unexpected guest command %lu", uc->args[1]);
++		asm volatile("smc_insn: smc #0" : "+r"(x0) : : "memory");
 +	}
++	GUEST_ASSERT_EQ(undef_pc, (u64)&smc_insn);
++	GUEST_DONE();
 +}
 +
-+static void assert_page(int idx, u64 val)
++static void run_guest(void *guest_code, bool smc)
 +{
-+	u64 *p = host_page(idx);
-+	size_t i;
-+
-+	for (i = 0; i < granule / sizeof(*p); i++)
-+		TEST_ASSERT(p[i] == val, "Guest page %d holds 0x%lx, not 0x%lx, after teardown",
-+			    idx, p[i], val);
-+}
-+
-+static void test_run(void)
-+{
-+	const char *name = "share/unshare, and teardown zeroing";
 +	struct kvm_vcpu *vcpu;
 +	struct kvm_vm *vm;
-+	int i;
 +
 +	vm = pkvm_vm_create_with_one_vcpu(&vcpu, guest_code);
-+	guest_mem = kvm_mmap(GPA_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1);
-+	vm_set_user_memory_region2(vm, GUEST_MEMSLOT, 0, GPA_BASE, GPA_SIZE, guest_mem, -1, 0);
-+	virt_map(vm, GVA_BASE, GPA_BASE, GPA_SIZE / vm->page_size);
-+	write_guest_global(vm, granule, granule);
-+
-+	pkvm_run_loop(vcpu, on_sync);
-+	kvm_vm_free(vm);
-+
-+	for (i = 0; i < GPA_PAGES; i++)
-+		assert_page(i, i == P_SHARED_AT_TEARDOWN ? DIRTY_VAL : 0);
-+	kvm_munmap(guest_mem, GPA_SIZE);
-+
-+	ksft_test_result_pass("%s\n", name);
-+}
-+
-+/*
-+ * EL2 turns the share into a stage-2 translation fault on the IPA with ISV clear.
-+ * The host finds no memslot for the IPA and injects an external abort.
-+ */
-+static void test_share_outside_memslot(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = pkvm_vm_create_with_one_vcpu(&vcpu, guest_share_outside);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ESR_ELx_EC_DABT_CUR, expect_sea_handler);
-+
++	if (smc)
++		vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ESR_ELx_EC_UNKNOWN, undef_handler);
 +	pkvm_run_loop(vcpu, NULL);
 +	kvm_vm_free(vm);
-+
-+	ksft_test_result_pass("share of an IPA outside every memslot takes an external abort\n");
-+}
-+
-+static void test_memcache_pressure(void)
-+{
-+	const char *name = "faults that each require new stage-2 tables";
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	void *mem;
-+	int i;
-+
-+	vm = pkvm_vm_create_with_one_vcpu(&vcpu, guest_memcache_pressure);
-+
-+	/* 32G on a 64K host, of which the guest touches one page per block. */
-+	mem = kvm_mmap(PRESSURE_SIZE, PROT_READ | PROT_WRITE,
-+		       MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1);
-+	vm_set_user_memory_region2(vm, PRESSURE_MEMSLOT, 0, PRESSURE_GPA, PRESSURE_SIZE,
-+				   mem, -1, 0);
-+	for (i = 0; i < PRESSURE_PAGES; i++)
-+		virt_pg_map(vm, PRESSURE_GVA + i * granule, PRESSURE_GPA + i * BLOCK_SIZE);
-+	write_guest_global(vm, granule, granule);
-+
-+	pkvm_run_loop(vcpu, NULL);
-+	kvm_vm_free(vm);
-+	kvm_munmap(mem, PRESSURE_SIZE);
-+
-+	ksft_test_result_pass("%s\n", name);
-+}
-+
-+static unsigned long hugetlb_free_pages(void)
-+{
-+	unsigned long nr = 0;
-+	char line[64];
-+	FILE *f;
-+
-+	f = fopen("/proc/meminfo", "r");
-+	TEST_ASSERT(f, "fopen /proc/meminfo");
-+
-+	while (fgets(line, sizeof(line), f)) {
-+		if (sscanf(line, "HugePages_Free: %lu", &nr) == 1)
-+			break;
-+	}
-+	fclose(f);
-+
-+	return nr;
-+}
-+
-+/* Hugetlb pages aren't swap-backed, so the first fault on them fails. */
-+static void test_hugetlb_refused(const char *name)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	u64 npages;
-+	int ret;
-+
-+	vm = pkvm_vm_create_with_one_vcpu(&vcpu, guest_touch_one_page);
-+	npages = get_backing_src_pagesz(VM_MEM_SRC_ANONYMOUS_HUGETLB) / vm->page_size;
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS_HUGETLB, GPA_BASE, GUEST_MEMSLOT,
-+				    npages, 0);
-+	virt_map(vm, GVA_BASE, GPA_BASE, 1);
-+
-+	ret = _vcpu_run(vcpu);
-+	TEST_ASSERT(ret == -1 && errno == EIO,
-+		    "hugetlb-backed memslot: KVM_RUN rc %d errno %d", ret, errno);
-+
-+	kvm_vm_free(vm);
-+
-+	ksft_test_result_pass("%s\n", name);
 +}
 +
 +int main(void)
 +{
-+	const char *hugetlb = "hugetlb memory rejected for a protected VM";
-+
 +	TEST_REQUIRE(pkvm_supported());
-+	granule = getpagesize();
 +
 +	ksft_print_header();
-+	ksft_set_plan(4);
++	ksft_set_plan(2);
 +
-+	test_run();
++	run_guest(guest_code, false);
++	ksft_test_result_pass("SMCCC surface\n");
 +
-+	if (hugetlb_free_pages())
-+		test_hugetlb_refused(hugetlb);
-+	else
-+		ksft_test_result_skip("%s: no hugetlb pages free\n", hugetlb);
-+
-+	test_share_outside_memslot();
-+	test_memcache_pressure();
++	run_guest(guest_smc, true);
++	ksft_test_result_pass("SMC takes an UNDEF\n");
 +
 +	ksft_finished();
 +}
