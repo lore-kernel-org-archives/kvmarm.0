@@ -1,79 +1,79 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
 	t=1794262416;
-	b=P4b8tz65nQ8Su3iL9EfXaP9HGtVRb3PNKzqqQnWNHegmlgMOfrSU9eLe5u5YSacESlns
-	 ZOq6mLHfgya2VMxdkf42PzcxHqRxRj6IJxyeDQWQt8SDvGWJmlYN2vxmbRXrW7m1P2iVu
-	 YOqAN5tNZwZdB5HQpcVaJW8n1Baxap8wRk7Oycyy34GAWI2PAtjiDt6AmsWP79j1bzd/3
-	 +0PExDQm+kVGbP7iie/ZgHomEo0/uNrHP5sZCDUqaxfpcdcdAT1bW35A2xFB/AaPSVB3F
-	 zmfDakn55tFbx1bfpSH8EDjsl9es6c+Y3pv++siS+tyxwb95HdWcDdFN6Eg3V1JxCUw==
+	b=bm0OPK0MlMLZC6LsOOBgqYzetmeVaMbe3We1wpJxGNJLAoS7/qvbGu0PIKiX6mOecjbS
+	 ab6cg/LZSpl02xMV32RlCwZW/bto5d1cAW+00En8sOYwCZJGS53Z9BvwiGZhkkcSAStZj
+	 xHewISsmnkp5ZwGGrc/P5UDW3yYP+v4d5iiMEHTRtTh/zD0F1+8/DEX9P9mSTkdJCdB8Q
+	 lazuS371WFJoiKsA8e+94xqq1GJrbE5AvAlU7SubOdfFnI9roHAiirl3gfdB5QVPbGEBO
+	 y3lK7BxOVqmGKDaIdPiti6hhzh3k+yctHOw7ZUo0+HTjk539NmKXPJY5/eCl2movGlw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794262416;
 	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
 	 Content-Type:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
 	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
 	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=zMpIc7KG/FgM26D6oZ4QsYgjHL/cVuDmS1tSg0YoPmc=;
-	b=iM1TF+wtbTUe3Tfog1r0YAf3bt5tYFZ10eHZA/rglp694PpWlbsC27nj1uzd9hQds2o6
-	 EL2ve74X3XROW4Z6DGUzKUCQOzdb6Sadexrj4+WslGc8xvqGs1meP1o8a85La2CvDqWqk
-	 S1UDjytxWk6xxlFDKTSTM0iFmEdQ0QM8pHzwnXzHTEExdMHAvh2mawnYYjDuCaagq+G9A
-	 HDx8AGo8vs9GHmOWuxqkTlirS0EEkKTd7A1RUDenbemmWyXcz08O/ozZxmAcoqWEzzp4Y
-	 9Xhi+UzdFGzsnAIyXjvdGrpSqgiuNSCtn/VVbX96iIy2cAh/53bJ7egtzDunULdj/oQ==
+	bh=jhFE0fyWih8XquU98lCv3a5jbkEdSuXJStfnMSMVAkI=;
+	b=QpP1KoPo7R4Fydq+XjEC2dP+cMJLLwyIeqDcLo1f306Avd68v4aimqVjBTlIjAxNa4o8
+	 1Ehj/zzN8CqLrIAt8z3TTfh24YIWk8G/Tq01AQGfBJ4p+zcNeeAreRzrd9z/oNA0I4mcp
+	 xWVGmQH4DJ8qll+99ay3i2WNOVfHCvHip3pplOQrRzF4671nA8MDIh9nLqNWReOxZv1wU
+	 YbsRsCZJK4gNX4UEgNsIzL65tMUYA/qrSwAC6S/q+yaatnXjotAPFSfp8X2duXiYenrs3
+	 GqFqekhfX4lRW9e90lL4ca5Bt0nIz6xLBTupV0FTXqt5fKKGLBUuuYDEGj5i+/zLs6g==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DfS0M4+Y;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZE388eIU;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16CA606A325;
-	Mon,  9 Nov 2026 22:13:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C049606A331;
+	Mon,  9 Nov 2026 22:13:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DfS0M4+Y
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZE388eIU
 Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
 ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1794262415;
-	b=pHi84+L54K1Vq4xh+7zc6Z/zTosjXuFBfxduY4GlA03THOSs9Qao2OX18LfcZjBOt1Yh
-	 0AE6xShkA69UsvXDt5Gr/Tim2KRMES7SEDl1cz5VylfdHEYtVHp8bpg3oWikvZXdnS8gS
-	 bw/6t1X5RXuiQS9ZaxhdLq17lj4GSxm/Wuzhi8uGcPQ27eh1Km+p24tCXyQJvYsqnlZ1x
-	 ZwyU+vasbjXBbyg9KYuHa0JmJeQnr8GJqrx7idVABdNsGJ7x4cFZ0kQYBapVd1U5arvRc
-	 uuXiC55H8TnGxEz2C6pSRDZxq5Cdqou+/EkZeUumHsma0/cYz4YNnesvZnJDwZxE3zQ==
+	t=1794262416;
+	b=kbemRZGnzsB6KIY/WDl4UEH9393reAUy6owXHx4G7dinSpO3szc9jRljYSSYP764sNYB
+	 0ix0UOJY8PqMAT24a9FXmzJ8AuBVgWGaiEANhVGLNwzdx/dqf4iJMbw9/AHeE0Qj+WpQx
+	 kHJVmJWAUaOo1oG9pQgc5oEd7WG1160ZbrKdfROfqvy/9EuGZ0SYVSvqYUIx2lmbwbMai
+	 +gwVBW277UHsZJ6RoNwgByDyfeF765BhtpeoSY9kP+jB135GlZXC2nTqmmVFWyDVgwDJa
+	 oHS+uRn/M2FeHQ1YLWY2PVtl2YIXO/3eLkANsNXqat6RcAIyyVZR3xaVxcrIMLMl20A==
 ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1794262415;
+	c=relaxed/relaxed; t=1794262416;
 	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
 	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
 	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
 	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=zMpIc7KG/FgM26D6oZ4QsYgjHL/cVuDmS1tSg0YoPmc=;
-	b=hch1pQtPaUevVdJ7SfyCjP4fF/BSL+s4eNQYZkHkuRshVWXXYI28RI6Y7acAMtMGa+y7
-	 Pjh3Ruucb2EIWYf6X0eooQEbjPFyPQYNGNq/qNzpy/WNvifLHtT+TgSUGlyaPNODlJPA8
-	 5xyUPNvoroeFKLoq+Of/RihR3m+0Md9afZzeH78VfyRKADXJhZtzTaf6kvvy0JYFbn4XK
-	 eeIwYZT7rnFZ8glRX1dtJtv46F5D0ZH2NpvySqsLFKOuGeQJRmGknmbPgyrLzSw0FpT8v
-	 1Na0NsfXbYnwuQIY51JIo8nrsZixE0uzPkBoeL07gn0e+CXUeMMgt5SuOEWM4SuVTcw==
+	bh=jhFE0fyWih8XquU98lCv3a5jbkEdSuXJStfnMSMVAkI=;
+	b=AbQXqUuugKDnGB8pq8/K4qfMZo/U0OG2gnX2OQ9YTMOaEnRfyY+XmLuX+zs9Ajk7lKTb
+	 Jq5T45HkZ7lrN8vrPUTZXk8dxYZqNREfMpN/y1TEKKKUXzZpNGUrK7jgYhr8S3XChVSSc
+	 tYJ6OG8+6xxEOEbFmj7psd6QLdZyNbjJuVsIWMxHFN0MmaubqEqrDyWe9R+7hLwm52D50
+	 K0g4CmhOw33HGkafGZZRplZolMyQITWr+t1M6kCcAk5JyntmZXKEgU/iQFf0qW8Mey4p4
+	 dMFw06zW75VgPgIFr401dxwGMtSWzZQPSx9lEyJNMYrpesB9njrk24Sf6w9F0vqN0WA==
 ARC-Authentication-Results: i=1; smtp.kernel.org; 
 	arc=none smtp.remote-ip=100.80.115.77
 Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id E04ED1F0089F;
-	Mon,  9 Nov 2026 22:13:34 +0000 (UTC)
+	by smtp.kernel.org (Postfix) with ESMTPS id B4C5C1F008A2;
+	Mon,  9 Nov 2026 22:13:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794262415;
-	bh=zMpIc7KG/FgM26D6oZ4QsYgjHL/cVuDmS1tSg0YoPmc=;
+	s=k20260515; t=1794262416;
+	bh=jhFE0fyWih8XquU98lCv3a5jbkEdSuXJStfnMSMVAkI=;
 	h=From:Date:Subject:To:Cc:Reply-To;
-	b=DfS0M4+Y96JLRXbiiIVBdrdhXkBMom5jOJNYVs1CoAgDRtXwW0R548L8MtmegXFRV
-	 cnMFlZS7budk8xx3liy5LhO35ZWtb/p2in97zuOa/SDdmsOCer21XmwWk13cDsFYBc
-	 X3nSVez1GZeKV/g2y22L98M0AP9Nx2fGnO+fnYzsc0sDHwCMBkq1v62iN7ipzK+yeS
-	 BCqjkUUb5YYksCOS+P37B572+A5eBhMo9ayObk/rk8vGezwknoovpNuPJC0rev5LJG
-	 m6rGGkXo240S8qtW2lPFa0VOZ2uCwnBYN4M4BMpongm/ns8c+pkAF6hu9CNVbCeQQv
-	 03IkJyEZEElmQ==
+	b=ZE388eIUmmFDudEmsmxj+iDze7gvRe1X0GjIIMqFKO8+tENmhBCARYaOPs8QpdA2B
+	 3hNbIuS4TdQLCxyY+vWafQVNvS88lsqQDC7N/F8tVK8hQgMRy4ao6MlRuxKimdQ56z
+	 1/qkvCRRE+B8WNloRPX+H66s3aVsWxXUwjvZ9l3CBP42eZicrJEEeqNG0ji/jrRGKY
+	 BeVUIwkxPHMBdrjU6hqiVcBJ3JSaAlOloal2+vsWy0uj6BhQi8QuCQURgj7AwRtar4
+	 20H6wWP0PEi7eNF1qCEhTJaM9L4dzh43W5Y8APbpVu7FhEhVvOsN/ApMFvtBW5I3Rp
+	 KkbYbwcE92mhw==
 Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 3B78E48690;
-	Mon,  9 Nov 2026 22:13:34 +0000 (UTC)
+	by lkml.kernel.org (Postfix) with ESMTP id 3C77A486AA;
+	Mon,  9 Nov 2026 22:13:35 +0000 (UTC)
 From: Xuheng Li via B4 Relay <devnull+xuheng.cs.columbia.edu@kernel.org>
-Date: Mon, 09 Nov 2026 22:13:35 +0000
-Subject: [PATCH v3] KVM: arm64: Don't replace a valid hyp block mapping
- with a table
+Date: Mon, 09 Nov 2026 22:13:36 +0000
+Subject: [PATCH v2] KVM: arm64: Order a later pinner's accesses after the
+ hyp mapping
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -84,28 +84,26 @@ List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261109-hyp-block-map-v3-1-bd70e67eb0bf@cs.columbia.edu>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyjHUUlJIzE
- vPSU3UzU4B8JSMDIzNDQwNL3YzKAt2knPzkbN3cxAJdg2RDyzSLVEsTI5MkJaCegqLUtMwKsHn
- RsbW1AAtSsWxfAAAA
-X-Change-ID: 20261109-hyp-block-map-0c19f8e9424b
+Message-Id: <20261109-pin-barrier-v2-1-64ca73cae5e3@cs.columbia.edu>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/22MQQ6CMBAAv0L2bEm3ihZO/sNwaMtWNtFCWmk0h
+ L9bOXucSWZWSBSZEnTVCpEyJ55CAXWowI0m3EnwUBiUVGdE2YiZg7AmliiKRnt1VK1rUSsoxRz
+ J83u/3frCI6fXFD/7POPP/v9kFCjkiaxH1HhpzNWl2k2P5WnZ1DQs0G/b9gUSPyAurAAAAA==
+X-Change-ID: 20261105-pin-barrier-58f2329c9182
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
-Cc: Vincent Donnefort <vdonnefort@google.com>, 
- Fuad Tabba <fuad.tabba@linux.dev>, Quentin Perret <qperret@google.com>, 
- Will Deacon <will@kernel.org>, Mostafa Saleh <smostafa@google.com>, 
+Cc: Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>, 
  Catalin Marinas <catalin.marinas@arm.com>, 
- Mark Rutland <mark.rutland@arm.com>, Joey Gouly <joey.gouly@arm.com>, 
- Steffen Eiden <seiden@linux.ibm.com>, 
+ Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
  Suzuki K Poulose <suzuki.poulose@arm.com>, 
  Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Xuheng Li <xuheng@cs.columbia.edu>
+ stable@vger.kernel.org, Xuheng Li <xuheng@cs.columbia.edu>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1794262414; l=3910;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1794262415; l=5667;
  i=xuheng@cs.columbia.edu; s=20261028; h=from:subject:message-id;
- bh=RIFjoI85KP24Rv3faoa4T6ksq6aQB6AW6n6O+fZ4Jw8=;
- b=j9SVzqCiLPkNYh1JWfLZitE9GNR+YyVV3Ivtx30mdQziJtNsmwtvPjrAxpTl0xi4hvgf6t9DV
- V55yyGreT2AB+KHnSiw9xKu79OZs9NymAKLF9eebBOAkIIPPYE1xU6K
+ bh=fuEJKXd7OZH045MEhiyU1s2rzbiFjb8ltiEtBO6sALo=;
+ b=V618ePRfwdZZAW0Pe+S4sb9++ANEHkXDx1Ax0HhTJq2uWt5VDvp2qki7W/rqYoREcrssbVTdH
+ 7CRRVgGJ3JsDX7FqfVtXtz0282zcW+t5AkqW6SFLLdg9BlruAhnkscu
 X-Developer-Key: i=xuheng@cs.columbia.edu; a=ed25519;
  pk=L1HVV+goqxYmEMO/OXakL6uf9isSpgk2QrLlFqyZ2Qs=
 X-Endpoint-Received: by B4 Relay for xuheng@cs.columbia.edu/20261028 with
@@ -116,93 +114,141 @@ Content-Transfer-Encoding: 7bit
 
 From: Xuheng Li <xuheng@cs.columbia.edu>
 
-When kvm_pgtable_hyp_map() is asked to map part of a range that a valid
-block mapping already covers, hyp_map_walker_try_leaf() declines, as the
-request cannot be a leaf at the block's level.  hyp_map_walker() then
-allocates a zeroed table and stores it over the valid block entry.  The
-walk descends into the new table and maps the requested pages, but the
-rest of the block is now unmapped, and the valid block was replaced
-without break-before-make.
+Since commit 48d848882395 ("KVM: arm64: Defer EL2 stage-1 mapping on
+share"), hyp_pin_shared_mem() maps a shared page into the hypervisor's
+stage-1 only when its refcount goes from 0 to 1.  The CPU that maps it
+runs dsb(ishst); isb() in kvm_pgtable_hyp_map(), which orders that CPU's
+own accesses.  A CPU that pins the page later sees refcount >= 1, maps
+nothing and runs no barrier.  It then accesses the page through an
+address it computed before taking the locks, so nothing orders its
+translation after the other CPU's PTE write.  The access can use a
+translation performed while the entry was still invalid, and fault.
 
-No in-tree caller maps into an existing hyp block mapping today, so this
-cannot be triggered in mainline.  Fail such a request with -EEXIST
-instead, so that a future caller gets an error rather than silently
-losing the rest of the block.
+A host can do this with any pinning hypercall by passing the same page
+from two CPUs, for example __pkvm_init_vm() with the same struct kvm:
 
-The same check now catches a conflicting remap of an existing leaf, so
-drop the WARN_ON() from hyp_map_walker_try_leaf(): every caller checks
-the error, and a WARN is fatal at EL2.  Do the check before the
-last-level WARN_ON(), which is kept for internal errors, and update the
-kernel-doc of kvm_pgtable_hyp_map() to match.
+  CPU A                                CPU B
+  -----                                -----
+                                       host_kvm = kern_hyp_va_host(x1)
+                                       (host_kvm may be translated now,
+                                        while its entry is invalid)
+  __pkvm_init_vm(host_kvm)
+   hyp_pin_shared_mem()
+    host/hyp locks
+    refcount 0 -> 1
+    pkvm_create_mappings_locked()
+     kvm_pgtable_hyp_map()
+      write the valid PTE
+      dsb(ishst); isb()   <- CPU A only
+    unlock
+                                       __pkvm_init_vm(host_kvm)
+                                        hyp_pin_shared_mem()
+                                         host/hyp locks
+                                         refcount 1 -> 2: no mapping,
+                                         no barrier
+                                         unlock
+                                        READ_ONCE(host_kvm->created_vcpus)
+                                         uses the old translation:
+                                         translation fault -> hyp_panic()
 
+A well-behaved host can hit this too.  Since commit cf533b4d3630 ("KVM:
+arm64: Validate the host vCPU's VM before reading it under pKVM"),
+injecting an exception into a host vCPU that isn't loaded pins its
+struct kvm to read the VM's MTE flag.  On an MTE-capable host, two vCPUs
+of one VM that do this at the same time from __kvm_adjust_pc() take the
+same path as CPU B above.
+
+The lock hand-off orders CPU B's loads and stores after CPU A's PTE
+write, but not its translation table walks.  Arm's herd7 model with
+-variant vmsa allows the fault for this shape: a mapping made and
+completed with DSB; ISB on one CPU, handed over through a
+release/acquire, then used on another CPU through an address it already
+held.  It forbids the fault once the second CPU runs DSB; ISB after the
+acquire.
+
+Make every successful pin end with dsb(ish); isb(), so that the pinning
+CPU's later accesses through the range are ordered after the mapping,
+whichever pin installed it.
+
+Fixes: 48d848882395 ("KVM: arm64: Defer EL2 stage-1 mapping on share")
+Cc: stable@vger.kernel.org
+Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
 Signed-off-by: Xuheng Li <xuheng@cs.columbia.edu>
 ---
-This is patch 3/3 of v2, sent alone: 1/3 is superseded by Mostafa's
-"KVM: arm64: Use consistent type for pool size" [1], and 2/3 is dropped.
+The fault was found with herd7 (herdtools7 7.58+1) and Arm's AArch64
+model with -variant vmsa,fatal.  The test reduces the host/hyp locks to
+an acquire of CPU A's release and the pin to its refcount check:
 
-With the WARN_ON() gone from hyp_map_walker_try_leaf(), a conflicting
-remap through the EL1 path (__create_hyp_mappings()) also returns
--EEXIST without a warning, where it used to warn and return -EINVAL.
+AArch64 pin-maps-nothing
+{
+pte_x=(valid:0);
+0:X2=pte_x; 0:X1=(oa:phy_y);
+y=1;
+pte_z=(af:1,db:1); pte_r=(af:1,db:1);
+0:X8=z; 1:X8=z;
+0:X9=r; 1:X9=r;
+1:X3=x;
+}
+ P0               | P1                ;
+ MOV W5,#1        | LDAR W7,[X8]      ;
+ STR W5,[X9]      | LDR W5,[X9]       ;
+ STLR X1,[X2]     | ADD W5,W5,#1      ;
+ DSB ISHST        | STR W5,[X9]       ;
+ ISB              | CMP W5,#1         ;
+ MOV W7,#1        | B.EQ LMAP         ;
+ STLR W7,[X8]     | MOV W6,#2         ;
+                  | STLR W6,[X8]      ;
+                  | L0: LDR W4,[X3]   ;
+                  | LMAP:             ;
+exists (1:X7=1 /\ 1:X5=2 /\ fault(P1:L0,x))
 
-[1] https://lore.kernel.org/r/20261106172750.2678873-1-smostafa@google.com
+P0 is the pin that maps x (refcount 0 -> 1, PTE store, dsb(ishst);
+isb(), unlock).  P1 takes the lock after P0's unlock, sees refcount 2,
+maps nothing, and then loads through the address it already held in X3.
+
+  $ herd7 -variant vmsa,fatal pin-maps-nothing.litmus
+  ...
+  1:X5=2; 1:X7=1; Fault(P1:L0,x,D-MMU:Translation);
+  ...
+  Observation pin-maps-nothing Sometimes 1 7
+
+With DSB ISH; ISB on P1 after its acquire and before L0, as this patch
+adds, the result is Never (0 6).  It is also Never with
+-variant vmsa,fatal,ets2, i.e. on CPUs with FEAT_ETS2.
 ---
-Changes in v3:
-- Drop the WARN_ON() from the new check and from
-  hyp_map_walker_try_leaf(), and update the kernel-doc of
-  kvm_pgtable_hyp_map() (Vincent, Fuad).
-- Do the check before the last-level WARN_ON(), so that a conflicting
-  page-level mapping returns -EEXIST instead of reaching it.
-- Link to v2: https://lore.kernel.org/r/20261105-hyp-pool-and-map-v2-3-44a6ca90190b@cs.columbia.edu
+Changes in v2:
+- Add a case that a well-behaved host can hit, from __kvm_adjust_pc()
+  (Fuad).
+- Collect Fuad's Reviewed-by.
+- Rebase onto v7.4-rc2.
+- Link to v1: https://lore.kernel.org/r/20261105-pin-barrier-v1-1-04ebf118175a@cs.columbia.edu
 ---
- arch/arm64/include/asm/kvm_pgtable.h |  2 +-
- arch/arm64/kvm/hyp/pgtable.c         | 10 +++++++++-
- 2 files changed, 10 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 1c9c57cd6..6d6ed8596 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -508,7 +508,7 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt);
-  * If device attributes are not explicitly requested in @prot, then the
-  * mapping will be normal, cacheable. Attempts to install a new mapping
-  * for a virtual address that is already mapped will be rejected with an
-- * error and a WARN().
-+ * error.
-  *
-  * Return: 0 on success, negative error code on failure.
-  */
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 9c83837b1..94a59f29a 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -414,7 +414,7 @@ static bool hyp_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- 		return true;
- 	if (!kvm_pte_valid(ctx->old))
- 		ctx->mm_ops->get_page(ctx->ptep);
--	else if (WARN_ON((ctx->old ^ new) & ~KVM_PTE_LEAF_ATTR_HI_SW))
-+	else if ((ctx->old ^ new) & ~KVM_PTE_LEAF_ATTR_HI_SW)
- 		return false;
- 
- 	smp_store_release(ctx->ptep, new);
-@@ -431,6 +431,14 @@ static int hyp_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 	if (hyp_map_walker_try_leaf(ctx, data))
- 		return 0;
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index d4c332a91..5cb1a1e1f 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -1210,6 +1210,14 @@ int hyp_pin_shared_mem(void *from, void *to)
+ 							    PAGE_HYP));
+ 	}
  
 +	/*
-+	 * A valid entry here is a leaf that conflicts with the request.
-+	 * Replacing a block with a table would need break-before-make, and
-+	 * would leave the rest of the block unmapped.
++	 * Only the first pin of a page maps it, and that CPU's barriers order
++	 * only its own accesses. Order this CPU's accesses through the range
++	 * after the mapping, whichever pin made it.
 +	 */
-+	if (kvm_pte_valid(ctx->old))
-+		return -EEXIST;
++	dsb(ish);
++	isb();
 +
- 	if (WARN_ON(ctx->level == KVM_PGTABLE_LAST_LEVEL))
- 		return -EINVAL;
- 
+ unlock:
+ 	hyp_unlock_component();
+ 	host_unlock_component();
 
 ---
 base-commit: 7475ea8b58616b33c04afb976cf0fbaad9dd63fb
-change-id: 20261109-hyp-block-map-0c19f8e9424b
+change-id: 20261105-pin-barrier-58f2329c9182
 
 Best regards,
 -- 
