@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.68
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.38
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794214180;
-	b=TToxn66eH6D3v7RxC4umwtp17lxyfjZONVj9Fip130fVNZtAFEfcj0Ck43EK6dObr6jn
-	 433mxb9oOjlXhLwti44gw1ymo83W/xFFgtbUE9iF8fwT4TKUvvjen2ubF05adbNfYHbZF
-	 3BexbsCITegnMUViW/yU+ngwYezAY4XavVtsFFgOEY+VLfcOjTsqKG35twpLPWQYJaoyR
-	 rp2EX4i3zp0zB11EJAS7gLzSyQWb5Ux+sd4l5Hw60Cg+Jsw8+2br+NCh0wpBs3jcScD5/
-	 Lm5bUNog+Cko6aLuD6LadYCQg0zy3O2uyvF2iYSOZn18yav4MYi8YR8LGTwEp919eBg==
+	t=1794214196;
+	b=PT6Awox49mRoc6rFKdiCLtqow8VoeAFUucy66HCb3yjtSB0sAbBdKiWiBydgggKmkMAk
+	 PPD87vV1R0bng3WNK+rOfv4YtTRHvVjifT1iiCTxGAUNDGhMbT93f/G5uP56tO9z6+ugS
+	 FeJf7B0o7mK8uyvGRqMxLg42QGLd10Z3r28PKKQH8LBmYSkVND7fmIgxu8ycG9D/Aayes
+	 Jdd+U2iBtYfylq2Cf4sN7Yw6XUf/DZKsk7XgX2Fi2OYgRuPUJh4Emda0XCpFpxcxZMHwi
+	 pudiUfYcIPtwDK62AtoD7VIT8H2SxCc4NTMpJcKdhmqVXRoSI8ijRSTl8BkzmwmgSrA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794214180;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794214196;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=uWThlNDxx8k9coc2dZrQvIwrgPoJzUnjIpsnGUgbQxc=;
-	b=EppmwEPDby5QoK3uotcf+UmAIuTJu4iuQm8qLkOEHH+9M6EOgrN6vmnIIBHQSklT7b8n
-	 RQwJpkxXKNtpDFT5ft74wufQlrrOiN8rh/Zav2hIPyls7leM5TVwc1J705A0vu+9iOyke
-	 3ddH5vhurCML0hZppc3Lf1uOeqF1/yeyIP1iLCW3eFkWOm1YWS4crFJ7BFSGJlPNcB6dq
-	 qYB6yAK9SMX+MRIXA8Ti8X6QbE/UK9byJtyjVmEQDFadvcoc8viZh7XFEkfw01Tn5p6l8
-	 GuuPIi52vEzBMft4lx2KzuxNicjuBZH2lzBbymiCWrYFnBgfqwWinFdJKgDteEqSLEg==
+	bh=/IWC4Ezrv13mnRLgYAS+OGpQRhiZxP+CWXUuP5MxY5k=;
+	b=0O1vky3aHPGmr1preP9qWQKFyDHjtq9uPdgZNyrYd/qY7gg+6IsLufUjzBDCmcK2KPe1
+	 4Uy46vvGZ1MiJXbKsFUd0cuQFlKBb7IZatYRDmSZILPGj/aJ6Wg013iJFzMfHFaa/MgVE
+	 xhsZaKwCvDJTXlzUs8oC8Xf/ImTADwDZnLwYmcem2r18mzIkeTgHpOhB6fqQMENEHLPXN
+	 qfGe3EYjt9+b8DEWXi0naZ5eNS37LMv8C5mQPqSCSbglf/v6kbeauI5S3ztGlXscN9WnY
+	 dm8ngWTmAreZh/fBcmsNv5wQgWnnRDioUxSfoz8pl9Go6JqzL/fGmz1aVTqBfMXBsNw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=cJxh6rnL;
-	arc=none smtp.remote-ip=91.218.175.68
-Received: from mta0.migadu.com (out-68.mta0.migadu.com [91.218.175.68])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=p2blvFPa;
+	arc=none smtp.remote-ip=95.215.58.38
+Received: from mta1.migadu.com (out-38.mta1.migadu.com [95.215.58.38])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E256B60A2604
-	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 08:49:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E256B60A2604
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF105606EEB5
+	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 08:49:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BF105606EEB5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=cJxh6rnL
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=p2blvFPa
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=tieCJB5xPHFID0PWIkTmfQAHSOPwOh5HA6tVxBq05s0=;
+DKIM-Signature: a=rsa-sha256; bh=skF3Q2kCAVK6QTvon75TdZ0hQ5efPIx2rz2Mq7wxPjQ=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794214178; v=1; x=1794818978;
- b=cJxh6rnLXbxCuZPqeeBmne21czp+pycWMjO0JRGvpH6KqJB+PFnvqTX8giIRVm/+DKCn3PR0
- STh/LXHDuWfcyuZgmU4tR0QKv68PXP1N748qHX3nsQC3d6J+uEU3BA1yxbpyV9VDHCnl+69UENT
- sWp1j76O+mDnUvM24J3XKB7U=
+ t=1794214193; v=1; x=1794818993;
+ b=p2blvFPas2dHVup8gOoWIvdycqKygalVMSGl9x3nfg60jvl38GtLQo+TqjklTn8BDJgnJuIq
+ 3V0a3/4tRARL3wVhhaBETVeTWZqJ1siU7d0WtIsi8hmOqg5H2wS+rt+3PrpTSkdn1uBAXJHP6vt
+ wyjFqHmZPjn9d4s/T6YKLzXA=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 7e8d9e8db2fd6fbd;
-	Mon, 09 Nov 2026 08:49:37 +0000
-X-Mizu-Trace-ID: 7e8d9e8db2fd6fbd
+Received: by smtp.migadu.com with ESMTPS id 3788735acdf328b4;
+	Mon, 09 Nov 2026 08:49:53 +0000
+X-Mizu-Trace-ID: 3788735acdf328b4
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -68,9 +68,9 @@ Cc: Will Deacon <will@kernel.org>,
 	kvm@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 14/19] KVM: arm64: selftests: Add pkvm_irq interrupt test
-Date: Mon,  9 Nov 2026 08:48:49 +0000
-Message-ID: <20261109084854.840576-15-fuad.tabba@linux.dev>
+Subject: [PATCH v2 15/19] KVM: arm64: selftests: Add pkvm_isolation host-access test
+Date: Mon,  9 Nov 2026 08:48:50 +0000
+Message-ID: <20261109084854.840576-16-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261109084854.840576-1-fuad.tabba@linux.dev>
 References: <20261109084854.840576-1-fuad.tabba@linux.dev>
@@ -85,305 +85,262 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The host emulates a protected guest's vGIC, so EL2 copies the list
-registers to and from the host each time the host runs the vCPU. EL2
-also keeps its own copy of the guest's virtual timer state, which the
-host can't change.
+The host keeps its userspace mapping of a protected guest's memory, but
+can't reach the data through it. The host kernel's copy_to_user() and
+copy_from_user() on that mapping fail. If the host kernel pins a page
+and accesses it through its own mapping, as process_vm_readv() does,
+EL2 zeroes and reclaims the page, and the guest loses it.
 
-Check that the virtual timer's PPI arrives exactly once, with CVAL and
-CTL kept across exits, that SGIs pass between two vCPUs, and that the
-timer wakes a vCPU in WFI.
+Test each of these, that MADV_DONTNEED and munmap() leave the guest's
+pages pinned and accounted, and that a normal VM's fault on them fails.
 
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- tools/testing/selftests/kvm/Makefile.kvm     |   1 +
- tools/testing/selftests/kvm/arm64/pkvm_irq.c | 268 +++++++++++++++++++
- 2 files changed, 269 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/pkvm_irq.c
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/arm64/pkvm_isolation.c      | 225 ++++++++++++++++++
+ 2 files changed, 226 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/arm64/pkvm_isolation.c
 
 diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 1e40e793aa6f3..13998964facd5 100644
+index 13998964facd5..68bdd01f62270 100644
 --- a/tools/testing/selftests/kvm/Makefile.kvm
 +++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -192,6 +192,7 @@ TEST_GEN_PROGS_arm64 += arm64/mmio_sign_ext
- TEST_GEN_PROGS_arm64 += arm64/page_fault_test
+@@ -193,6 +193,7 @@ TEST_GEN_PROGS_arm64 += arm64/page_fault_test
  TEST_GEN_PROGS_arm64 += arm64/pkvm_host_abi
  TEST_GEN_PROGS_arm64 += arm64/pkvm_id_regs
-+TEST_GEN_PROGS_arm64 += arm64/pkvm_irq
+ TEST_GEN_PROGS_arm64 += arm64/pkvm_irq
++TEST_GEN_PROGS_arm64 += arm64/pkvm_isolation
  TEST_GEN_PROGS_arm64 += arm64/pkvm_mem_share
  TEST_GEN_PROGS_arm64 += arm64/pkvm_psci
  TEST_GEN_PROGS_arm64 += arm64/pkvm_smccc
-diff --git a/tools/testing/selftests/kvm/arm64/pkvm_irq.c b/tools/testing/selftests/kvm/arm64/pkvm_irq.c
+diff --git a/tools/testing/selftests/kvm/arm64/pkvm_isolation.c b/tools/testing/selftests/kvm/arm64/pkvm_isolation.c
 new file mode 100644
-index 0000000000000..f92fa6f0de8de
+index 0000000000000..f083d0434238a
 --- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/pkvm_irq.c
-@@ -0,0 +1,268 @@
++++ b/tools/testing/selftests/kvm/arm64/pkvm_isolation.c
+@@ -0,0 +1,225 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * pkvm_irq - the virtual timer's PPI and SGIs in a protected VM.
++ * pkvm_isolation - what the host can and can't do with a protected VM's memory.
 + *
 + * Copyright (C) 2026 Google LLC
 + * Author: Fuad Tabba <fuad.tabba@linux.dev>
 + */
 +
-+#include <pthread.h>
++#include <errno.h>
++#include <sys/mman.h>
++#include <sys/uio.h>
++#include <unistd.h>
 +
-+#include <linux/bitfield.h>
-+#include <linux/psci.h>
-+#include <asm/cputype.h>
-+
-+#include "arch_timer.h"
-+#include "gic.h"
-+#include "gic_v3.h"
 +#include "kvm_util.h"
 +#include "pkvm.h"
 +#include "processor.h"
 +#include "test_util.h"
 +
-+#define TIMER_MS	10
-+#define WAIT_MS		30000
-+#define NR_EXITS	16
-+#define SGI_ROUNDS	16
++#define DATA_MEMSLOT	(PKVM_IDMAP_MEMSLOT + 1)
++#define DATA_GPA	BIT_ULL(30)
++#define DATA_PAGES	16
++#define DATA_SIZE	((size_t)DATA_PAGES * MIN_PAGE_SIZE)
 +
-+#define SGI_PING	1
-+#define SGI_PONG	2
++#define GUEST_VAL	0x0badf00ddeadbeefUL
++#define HOST_VAL	0x0123456789abcdefUL
 +
-+/* Set in the guest's copy by the host before the first run. */
-+static u32 vtimer_irq;
-+static u64 boot_entry;
-+static u64 vcpu_mpidr[2];
-+static u64 vcpu_ctx[2];
-+
-+static u32 irqs[2];
-+static u32 last_intid[2];
-+static u32 ready;
-+
-+#define wait_until(cond)							\
-+do {										\
-+	u64 __end = timer_get_cntct(VIRTUAL) + msec_to_cycles(WAIT_MS);	\
-+										\
-+	while (!(cond))								\
-+		__GUEST_ASSERT(timer_get_cntct(VIRTUAL) < __end,		\
-+			       "timed out waiting for %s", #cond);		\
-+} while (0)
-+
-+static void guest_irq_handler(struct ex_regs *regs)
++static volatile u64 *page_va(int idx)
 +{
-+	u32 intid = gic_get_and_ack_irq();
-+	u32 cpu = guest_get_vcpuid();
-+
-+	if (intid == IAR_SPURIOUS)
-+		return;
-+
-+	if (intid == vtimer_irq) {
-+		__GUEST_ASSERT(timer_get_ctl(VIRTUAL) & CTL_ISTATUS, "CNTV_CTL 0x%x",
-+			       timer_get_ctl(VIRTUAL));
-+		GUEST_ASSERT(timer_get_cntct(VIRTUAL) >= timer_get_cval(VIRTUAL));
-+		/* Mask the timer before the EOI, or its level-sensitive PPI is taken again. */
-+		timer_set_ctl(VIRTUAL, CTL_IMASK);
-+	}
-+
-+	WRITE_ONCE(last_intid[cpu], intid);
-+	gic_set_eoi(intid);
-+	WRITE_ONCE(irqs[cpu], irqs[cpu] + 1);
++	return (volatile u64 *)(DATA_GPA + (u64)idx * MIN_PAGE_SIZE);
 +}
 +
-+static void guest_irq_init(unsigned int nr_cpus)
++/* The host acts on the guest's memory at the sync, then the guest checks it. */
++static void guest_code(void)
 +{
-+	local_irq_disable();
-+	pkvm_guest_init();
-+	gic_init(GIC_V3, nr_cpus);
-+}
-+
-+static u64 start_vtimer(void)
-+{
-+	u64 cval = timer_get_cntct(VIRTUAL) + msec_to_cycles(TIMER_MS);
-+
-+	gic_irq_enable(vtimer_irq);
-+	timer_set_cval(VIRTUAL, cval);
-+	timer_set_ctl(VIRTUAL, CTL_ENABLE);
-+	return cval;
-+}
-+
-+static void guest_vtimer(void)
-+{
-+	u64 cval;
 +	int i;
 +
-+	guest_irq_init(1);
-+	cval = start_vtimer();
++	pkvm_guest_init();
 +
-+	/* Exits before the timer fires, then with its interrupt pending but masked. */
-+	for (i = 0; i < NR_EXITS; i++)
-+		GUEST_SYNC(i);
-+	wait_until(timer_get_ctl(VIRTUAL) & CTL_ISTATUS);
-+	for (i = 0; i < NR_EXITS; i++)
-+		GUEST_SYNC(i);
++	for (i = 0; i < DATA_PAGES; i++)
++		*page_va(i) = GUEST_VAL + i;
 +
-+	GUEST_ASSERT_EQ(timer_get_cval(VIRTUAL), cval);
-+	GUEST_ASSERT_EQ(timer_get_ctl(VIRTUAL), CTL_ENABLE | CTL_ISTATUS);
-+	GUEST_ASSERT_EQ(READ_ONCE(irqs[0]), 0);
++	GUEST_SYNC(0);
 +
-+	local_irq_enable();
-+	wait_until(READ_ONCE(irqs[0]));
-+
-+	/* The EOI must reach the host, or it presents the interrupt again. */
-+	for (i = 0; i < NR_EXITS; i++)
-+		GUEST_SYNC(i);
-+	local_irq_disable();
-+
-+	GUEST_ASSERT_EQ(READ_ONCE(irqs[0]), 1);
-+	GUEST_ASSERT_EQ(READ_ONCE(last_intid[0]), vtimer_irq);
-+	GUEST_DONE();
-+}
-+
-+static void send_sgi(int id, u32 intid)
-+{
-+	u64 mpidr = vcpu_mpidr[id];
-+
-+	/* The target reads this vCPU's counters once it has taken the SGI. */
-+	dsb(ishst);
-+	write_sysreg_s(FIELD_PREP(ICC_SGI1R_SGI_ID_MASK, intid) |
-+		       FIELD_PREP(ICC_SGI1R_AFFINITY_1_MASK, MPIDR_AFFINITY_LEVEL(mpidr, 1)) |
-+		       FIELD_PREP(ICC_SGI1R_TARGET_LIST_MASK, BIT(MPIDR_AFFINITY_LEVEL(mpidr, 0))),
-+		       SYS_ICC_SGI1R_EL1);
-+	isb();
-+}
-+
-+static void guest_sgi_primary(void)
-+{
-+	u32 k;
-+
-+	guest_irq_init(2);
-+	gic_irq_enable(SGI_PONG);
-+
-+	GUEST_ASSERT_EQ(pkvm_hvc(PSCI_0_2_FN64_CPU_ON, vcpu_mpidr[1], boot_entry, vcpu_ctx[1]),
-+			PSCI_RET_SUCCESS);
-+	wait_until(READ_ONCE(ready));
-+
-+	local_irq_enable();
-+	for (k = 1; k <= SGI_ROUNDS; k++) {
-+		send_sgi(1, SGI_PING);
-+
-+		/* vCPU 1 sends PONG only once it has taken PING, so neither is in flight. */
-+		wait_until(READ_ONCE(irqs[0]) >= k);
-+		GUEST_ASSERT_EQ(READ_ONCE(irqs[0]), k);
-+		GUEST_ASSERT_EQ(READ_ONCE(irqs[1]), k);
-+		GUEST_ASSERT_EQ(READ_ONCE(last_intid[0]), SGI_PONG);
-+		GUEST_ASSERT_EQ(READ_ONCE(last_intid[1]), SGI_PING);
-+	}
-+	local_irq_disable();
++	for (i = 0; i < DATA_PAGES; i++)
++		GUEST_ASSERT_EQ(*page_va(i), GUEST_VAL + i);
 +
 +	GUEST_DONE();
 +}
 +
-+/* The primary's guest_irq_init() set up ucall and the distributor. */
-+static void guest_sgi_secondary(void)
++static void guest_np_read(void)
 +{
-+	u32 k;
-+
-+	gic_init(GIC_V3, 2);
-+	gic_irq_enable(SGI_PING);
-+	local_irq_enable();
-+	WRITE_ONCE(ready, 1);
-+
-+	for (k = 1; k <= SGI_ROUNDS; k++) {
-+		wait_until(READ_ONCE(irqs[1]) >= k);
-+		send_sgi(0, SGI_PONG);
-+	}
-+	local_irq_disable();
-+
++	*page_va(0);
 +	GUEST_DONE();
 +}
 +
-+static void guest_wfi(void)
++/* The host kernel's copy to or from private memory faults, and the uaccess fixup fails it. */
++static void host_write_from_private(void *hva)
 +{
-+	guest_irq_init(1);
-+	start_vtimer();
++	ssize_t ret;
++	int fds[2];
 +
-+	/* WFI can complete before the timer fires, so wait in it until the handler has run. */
-+	while (!READ_ONCE(irqs[0])) {
-+		wfi();
-+		local_irq_enable();
-+		isb(); /* handle IRQ */
-+		local_irq_disable();
-+	}
++	TEST_ASSERT(!pipe(fds), "pipe: errno %d", errno);
 +
-+	GUEST_ASSERT_EQ(READ_ONCE(irqs[0]), 1);
-+	GUEST_ASSERT_EQ(READ_ONCE(last_intid[0]), vtimer_irq);
-+	GUEST_DONE();
++	ret = write(fds[1], hva, MIN_PAGE_SIZE);
++	TEST_ASSERT(ret == -1 && errno == EFAULT,
++		    "write() from private memory: rc %zd errno %d", ret, errno);
++
++	close(fds[0]);
++	close(fds[1]);
 +}
 +
-+static void irq_vm_setup(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
++static void host_read_into_private(void *hva)
 +{
-+	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT, guest_irq_handler);
-+	write_guest_global(vm, vtimer_irq, vcpu_get_vtimer_irq(vcpu));
++	u64 val = HOST_VAL;
++	ssize_t ret;
++	int fds[2];
++
++	TEST_ASSERT(!pipe(fds), "pipe: errno %d", errno);
++	TEST_ASSERT_EQ(write(fds[1], &val, sizeof(val)), sizeof(val));
++
++	ret = read(fds[0], hva, sizeof(val));
++	TEST_ASSERT(ret == -1 && errno == EFAULT,
++		    "read() into private memory: rc %zd errno %d", ret, errno);
++
++	close(fds[0]);
++	close(fds[1]);
 +}
 +
-+static void test_one_vcpu(void *guest_code)
++/* The host's long-term pins keep the guest's pages and their locked-memory accounting. */
++static void host_dontneed(void *hva)
++{
++	size_t locked = pkvm_host_locked_vm();
++
++	kvm_madvise(hva, DATA_SIZE, MADV_DONTNEED);
++	TEST_ASSERT_EQ(pkvm_host_locked_vm(), locked);
++
++	/* The host's mapping now has a new page, which the guest doesn't see. */
++	TEST_ASSERT_EQ(*(u64 *)hva, 0);
++	*(u64 *)hva = HOST_VAL;
++}
++
++static void host_munmap(void *hva)
++{
++	size_t locked = pkvm_host_locked_vm();
++
++	kvm_munmap(hva, DATA_SIZE);
++	TEST_ASSERT_EQ(pkvm_host_locked_vm(), locked);
++}
++
++/* A normal VM's fault on private memory fails, and the protected guest keeps its data. */
++static void host_np_vm_on_private(void *hva)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	int ret;
++
++	vm = vm_create_with_one_vcpu(&vcpu, guest_np_read);
++	vm_set_user_memory_region(vm, DATA_MEMSLOT, 0, DATA_GPA, getpagesize(), hva);
++	virt_map(vm, DATA_GPA, DATA_GPA, 1);
++
++	ret = _vcpu_run(vcpu);
++	TEST_ASSERT(ret == -1 && errno == EPERM,
++		    "normal VM's fault on private memory: rc %d errno %d", ret, errno);
++
++	kvm_vm_free(vm);
++}
++
++static void (*host_action)(void *hva);
++
++static void on_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
++{
++	host_action(addr_gpa2hva(vcpu->vm, DATA_GPA));
++}
++
++static struct kvm_vm *vm_create_with_data(struct kvm_vcpu **vcpu)
++{
++	struct kvm_vm *vm = pkvm_vm_create_with_one_vcpu(vcpu, guest_code);
++
++	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, DATA_GPA, DATA_MEMSLOT,
++				    DATA_PAGES, 0);
++	virt_map(vm, DATA_GPA, DATA_GPA, DATA_PAGES);
++	return vm;
++}
++
++static void test_host_access(void (*action)(void *hva), const char *name)
 +{
 +	struct kvm_vcpu *vcpu;
 +	struct kvm_vm *vm;
 +
-+	vm = pkvm_vm_create_with_one_vcpu(&vcpu, guest_code);
-+	irq_vm_setup(vm, vcpu);
++	vm = vm_create_with_data(&vcpu);
 +
-+	pkvm_run_loop(vcpu, NULL);
++	host_action = action;
++	pkvm_run_loop(vcpu, on_sync);
 +
 +	kvm_vm_free(vm);
++	TEST_ASSERT_EQ(pkvm_host_locked_vm(), 0);
++
++	ksft_test_result_pass("%s\n", name);
 +}
 +
-+static void wire_mpidr(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
++/*
++ * The host never reads the guest's data: a kernel copy from private memory
++ * reads zeros, and the guest's next access to the page fails.
++ */
++static void test_process_vm_readv(void)
 +{
-+	u64 mpidr = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_MPIDR_EL1));
-+
-+	write_guest_global(vm, vcpu_mpidr[vcpu->id], mpidr & MPIDR_HWID_BITMASK);
-+}
-+
-+static void *vcpu_thread(void *vcpu)
-+{
-+	pkvm_run_loop(vcpu, NULL);
-+	return NULL;
-+}
-+
-+static void test_sgi(void)
-+{
-+	struct kvm_vcpu *vcpus[2];
-+	pthread_t thread;
++	u64 buf[2] = { HOST_VAL, HOST_VAL };
++	struct iovec local = { .iov_base = buf, .iov_len = sizeof(buf) };
++	struct kvm_vcpu *vcpu;
++	struct iovec remote;
 +	struct kvm_vm *vm;
-+	gpa_t ctx;
++	struct ucall uc;
++	ssize_t ret;
++	int i;
 +
-+	vm = pkvm_vm_create(2, 0, vcpus);
-+	irq_vm_setup(vm, vcpus[0]);
++	vm = vm_create_with_data(&vcpu);
++	vcpu_run(vcpu);
++	TEST_ASSERT_EQ(get_ucall(vcpu, &uc), UCALL_SYNC);
 +
-+	pkvm_vcpu_setup_boot(vcpus[0], guest_sgi_primary);
-+	wire_mpidr(vm, vcpus[0]);
-+	wire_mpidr(vm, vcpus[1]);
-+	write_guest_global(vm, boot_entry, pkvm_idmap_gpa(vm));
-+	ctx = pkvm_vcpu_setup_boot_secondary(vcpus[1], guest_sgi_secondary);
-+	write_guest_global(vm, vcpu_ctx[1], ctx);
++	remote = (struct iovec){ .iov_base = addr_gpa2hva(vm, DATA_GPA), .iov_len = sizeof(buf) };
++	ret = process_vm_readv(getpid(), &local, 1, &remote, 1, 0);
++	TEST_ASSERT_EQ(ret, sizeof(buf));
++	for (i = 0; i < ARRAY_SIZE(buf); i++)
++		TEST_ASSERT(!buf[i], "process_vm_readv() of private memory read 0x%lx", buf[i]);
 +
-+	pthread_create(&thread, NULL, vcpu_thread, vcpus[1]);
-+	pkvm_run_loop(vcpus[0], NULL);
-+	pthread_join(thread, NULL);
++	/* The guest's next access is its read of that page. */
++	ret = _vcpu_run(vcpu);
++	TEST_ASSERT(ret == -1 && errno == EFAULT,
++		    "guest access after process_vm_readv(): rc %zd errno %d", ret, errno);
 +
 +	kvm_vm_free(vm);
++	TEST_ASSERT_EQ(pkvm_host_locked_vm(), 0);
++
++	ksft_test_result_pass("process_vm_readv() of private memory reads no guest data\n");
 +}
++
++static const struct {
++	void (*action)(void *hva);
++	const char *name;
++} host_accesses[] = {
++	{ host_write_from_private, "write() from private memory fails with EFAULT" },
++	{ host_read_into_private, "read() into private memory fails with EFAULT" },
++	{ host_dontneed, "MADV_DONTNEED of private memory leaves the guest's data" },
++	{ host_munmap, "munmap() of private memory leaves the guest's data" },
++};
 +
 +int main(void)
 +{
++	const char *np_vm = "a normal VM's fault on private memory fails with EPERM";
++	int i;
++
 +	TEST_REQUIRE(pkvm_supported());
 +
 +	ksft_print_header();
-+	ksft_set_plan(3);
++	ksft_set_plan(ARRAY_SIZE(host_accesses) + 2);
 +
-+	test_one_vcpu(guest_vtimer);
-+	ksft_test_result_pass("virtual timer PPI across exits\n");
-+	test_sgi();
-+	ksft_test_result_pass("SGIs between two vCPUs: %d rounds\n", SGI_ROUNDS);
-+	test_one_vcpu(guest_wfi);
-+	ksft_test_result_pass("the virtual timer wakes a vCPU waiting in WFI\n");
++	for (i = 0; i < ARRAY_SIZE(host_accesses); i++)
++		test_host_access(host_accesses[i].action, host_accesses[i].name);
++
++	test_process_vm_readv();
++
++	test_host_access(host_np_vm_on_private, np_vm);
 +
 +	ksft_finished();
 +}
