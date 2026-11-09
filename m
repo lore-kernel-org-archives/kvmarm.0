@@ -1,100 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.42
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794210080;
-	b=rRdlLTTIIRpAAXvzMpEFSAAwIyVfvUSO9MMvVeeuIUhhJXRzsZ6jnRws3IOBCR/lXx/i
-	 rkfSjB6e0ySgtxoV6GevWO/j0aU1tE0k8Ld9HbVX4CNJHgYUs5J3c95l5BJaYInAzmtWM
-	 V2uoQaXYJdh5E9RXC5rk/R/qDbJgAeYZM+2pZ8Ls8yq/rlXzvYFuzt6UVJQp4uKtkcIVu
-	 kaHI1GVpBuIu4OC7iPdvw8mNB2DOqSbVRG66DjCFgoYCi3odmoxwihiWjO3mD4L5av+KX
-	 +Kk0Vj+HZHz2T9OGGJrGMxmqCv/5eETOb8453OkV6XKBrVMUJihQ+0EZ1u2oE343wpg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794210080;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type;
-	bh=3/KauWaXYG3OmrhCNO3AADgebVTxE9yJqLBY2sG9Sb0=;
-	b=u9L/GceEWuK5wcLFlQFKU5yD/LrfRaA6CWvmbcmEH6THSJAK/wn9dG8Y4YVOLLC4XBnq
-	 YRB32SFZxYUfB9JN8OxB3DnQzGqHP1Oms/qtJhDGjgvUWyogjmVzE+LwKiIBcM5LAXpE/
-	 v0sfJupRapYLaHpBleI7UfXeUQMeO0+PWdBmztHuZqaZEdnxW/qYok5BQe/SIEyVUNsfc
-	 3ySPyTGkLZ5ewmuZcgin/p5l2vGYLDD02i7vYPN3MQXOv6ixaCjyYu2wE6s0BpGwvvVc/
-	 XhQhrGM74tdWohvWr5gRLzOTF3DW7GmlQbyNQ+RmbGyidRiJfsk8U6HU0is8oRQqEdw==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=HeEDTS3j;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.42
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.157
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794213130;
+	b=A/VHAakRiEKmhz6PVmqOCsuhC5oXjJrWFP6VamuG5R5yGAthcoikt0h20mQRueg3k0rJ
+	 gtTrprUdy0PE7JD2+YQylGM8/mzz30zxo5S5OIvtGZbG4myXoHvsFnfBaGyMXXaEWY7zx
+	 Uu6lCJF+qxs4ojaIXJCEFwneKJfwUncmG9t8m8m4g+H92Jgq92b9teALonndj411ry5fT
+	 ECt6ObGVI6DJ8gb6hGZUpCUclMRqOb6Cng7nEBiT7k5t5kWtwcpW1sNyLU3MwgTSOTsvw
+	 3txjae10QZUKUi4uEu4ISUJAAwnYDgd5JsFrHVf5EAmaarBuBJ07rOTLHLNzXW39wgA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794213130;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=XjEaU5iZiIoWZWXI3lEp1cSCckG214xKlxFgGMZy1WQ=;
+	b=YzoEgqou3g5ncCX7+XJnMfrHd7e4ldrF6svW8fRcQi4tLGnE2H5lC+1nSuZVClmQpi/c
+	 5juqHmZAlfaK8X8YNRw38dAJxu4/zvcsMA5oRasjujwbVmkdYeD8CrCB3Xl9ql3ZAqCTv
+	 w1ppWvQRC2xrT/4rbRm7bVcT5l+VSPQyUHm6KFOGsarHysLNBVJkJOJWFT+xBoSXUzajK
+	 HMuRRXWExuSajfwviNjRsiGY6I79eTFdFD3s18AAsHjzY1z6eQlLFM79HV0IjDETiBaug
+	 +sG5IbEZLsfd4aD5S7cSIxDpL6TW2Z9Q2tT5XtWij144O0YLMTUlqf8J6b1gHS4mq1Q==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="a/VVEDZ2";
+	arc=none smtp.remote-ip=91.218.175.157
+Received: from mta0.migadu.com (out-157.mta0.migadu.com [91.218.175.157])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1482A606A322
-	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 07:41:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1482A606A322
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF41606A322
+	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 08:32:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3AF41606A322
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=HeEDTS3j
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5c14bc5a743so2889e87.0
-        for <kvmarm@lists.linux.dev>; Sun, 08 Nov 2026 23:41:19 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1794210078; cv=none;
-        d=google.com; s=arc-20260327;
-        b=k+KHto7k0JPAuhxFNjNeu+SLiSlGlT9RLxNNIlucN2ABcQw3SNnAK5l7Bqq8gz6bxQ
-         ORsgru8eqkQ9t1mBUI8Ur3RpjsRgTBQ/dgtKvTwKHRd+ATiawbHTS5WhZZhmw94DR+HR
-         V7XEvLBZBwWLHFIgIhXT8Tu6FNGloioMeNvRI4jjENuSQTWhzdadJZCbuGloVUYpbCw3
-         6zJQ/0q2gkDwn57MoWsE8uyA7jjLX8AvKhaECCTW17R7R2fmKE36yvnWdnqve6j27hTB
-         qfep9R5bV717OKF4LPBQyoskeuKVuew0nhF31W1i5Cc2K29mX6DhLf55//BSIkaHDwoE
-         jPRg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=3/KauWaXYG3OmrhCNO3AADgebVTxE9yJqLBY2sG9Sb0=;
-        fh=zm1fN8pvqazPGDLrc4obrXQY8yoMljJhuvEwliEymjg=;
-        b=FwJLbnA62n8/iY6AXdgiOkBhEbOc3TcDAqgcpsatii2Q6DMiDVA4G7UxruTE15eQPS
-         yL1PS9pkW/9zbOfagnb6K4pkJOT9SYQoILjOA6RlgZfG6M6L32JyrqETxAgfso4JoUJk
-         i8TALd5+/Vw91fny383vWp+bv5AnN06JDWNzYLb4vA1Z9WVRoWkXG+ExnPU1usiPD4lC
-         +gPLKm7bxlcWdL0I0iEIr59cfiBhVx7J4YnT0rzeKLTd6IPjd7Ryh0S7EEki6CEHFWZw
-         a9TKC6SU3jjnLgmUGup1fjBTholiJXCx9pzX4kEOxwzaFLoQbA/hFV5jfckpZ96iD/MR
-         YJnw==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794210078; x=1794814878; darn=lists.linux.dev;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=3/KauWaXYG3OmrhCNO3AADgebVTxE9yJqLBY2sG9Sb0=;
-        b=HeEDTS3jKC0VEYSnams1BIV+UpZ/ty/+2FSDqf7rTCxMSqdqwygQr0SQfzQ/wkJ4jF
-         y2x8OYuaSyNco4aiiuYtgB30jZQ05deATdmnT8Kv1yO53HoI05ry7r0rVspYtbNxFMcU
-         AHUGY3a9R8CumfUlSrNG1xIGFtJUVyJZAftplNOmjbda4JXrwtkFt9UdjyUatb49hL1x
-         0To7kP50yVNksae6nbgQnbT6amzdHEs5ch0R0MwXdTFWMpJoS6lqKJWrUkVeBdMyLqml
-         qsKaD0fYs+ZH6xOfBF8paWH673R2QKcHFcvhgDOEY23oE2TUEJOPKTCe6RINIpvO5QdX
-         u7qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794210078; x=1794814878;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=3/KauWaXYG3OmrhCNO3AADgebVTxE9yJqLBY2sG9Sb0=;
-        b=thM1Xm4/v51A+tjs46ySzbtf10UFYK5L/fO1sih6/eY8Ksvp9+2N1lalDnYz6ghIWe
-         uSFnWQM9NZfHGzxWsgAMgDj1tSxoq9gsOOU5ac7JavlvJC0FhtEbhoZ4n3vlKkbh3zeJ
-         RfOT5Lj8xPNKz5WpF5UyUMvXNP34j+rw1tzUBYEN3nAyYCq6vjucX1QFx7nuqaapbYpT
-         AKvFj76eVd1arUWSDlKoCagMwGI5CLkFertUlKg3BgT7f1KbDv8F4zmz8B8Br/jPrbCR
-         VSOvKbJylz5RS1+yH1vgN6Oq0AbPbL0tETvKIctH2YHq8UZwj/ikNVo6r50XWaP1ngfU
-         Ccrg==
-X-Forwarded-Encrypted: i=1; AL+hErHLLT/Dhb/7SKbXx7F9vAPQTvophKLCaqJpefZIBNDvTQgmKRgRsn74bI5b+HjVaxvHUH79JDY=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9621km6VJO4WnCR8Qa/Y8WkxU++idIKBhuMplANVVmr9/CpkKw
-	sQ7uQRlX9WiXruXcAOGtbnNCmYgPqmE1UHJ976qOxxSSuJlsooylhkLHBQTLST920WBhW2iIzqr
-	HNjhxAYECN+ct8aMA3vK532smszG5SRwVcxM/HjxM
-X-Gm-Gg: AYBFou2Qw8U8omGx5lW2ZDxzWWqg+wRIAp4RegrH0nGBZ4bquRp7K4s5i5a9TA+jBsQ
-	b8QBmND0mBFpFzAKlPXZIjK7ZX4pgpNEWOlumAmuV2svp+NXc0ujorIQRamDsbrvI11P8gUFYBe
-	SERf3Rvpbwl0TsLNYllhWk+jN2Bn4CBK7gHhA3Qfj1Fz8iVP+Lr/flJzPssF6OUxNfvHa0YWYBW
-	p+EKodm1jucLSpgitbU19VwYuSRLvgglBDZ9OIRNelkNKv4Ig/C+xEnWWddO212qmKnj4zyl/9I
-	gfFc+/ABOunFncKkClMKF0mWfomYW+dOTeaFikPBlAoqFbxFp/HiHjWQZk+iOuNgy40sGeyOuxu
-	H1ZDwUZJIz1Yv29SBzmWHIFWblBrHJ6qrq56sG17pUHkCYGEnqbLEQt7rwbvpFXpKmQk4x8hbR9
-	CBrXKeOTTF9GAd4rOQ0+VsNDkVPw==
-X-Received: by 2002:ac2:4bcb:0:b0:5c1:53b5:2029 with SMTP id
- 2adb3069b0e04-5c153b5217fmr3411e87.15.1794210077813; Sun, 08 Nov 2026
- 23:41:17 -0800 (PST)
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=a/VVEDZ2
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=jOYOI4w8TbsJs0zAnXNNJjeqeD+Qjc1ew2XDbtbhPHw=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1794213125; v=1; x=1794817925;
+ b=a/VVEDZ2Ix9/H1yhrbaHu+Si2FsbyKGLGYbK4OeWf1L1x64SlHnSwR8v+ZHhe03BZYNwwV4U
+ myQQb8NSOiu62kVPCTBEvAH3BoHk5dIdEt/j4swG0ag6JCoW46D+Obz/+H3kO5XFU2hwrk6L+gx
+ sHSpbVBchMdJPiIR0aw0iSNw=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id b213c8f6249ab49b;
+	Mon, 09 Nov 2026 08:32:05 +0000
+X-Mizu-Trace-ID: b213c8f6249ab49b
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Fuad Tabba <tabba@google.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 00/16] KVM: arm64: Support debug, SVE, MOPS, PIE/POE, FPMR and more in protected VMs
+Date: Mon,  9 Nov 2026 08:31:49 +0000
+Message-ID: <20261109083205.806619-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -104,67 +75,76 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261102141304.126883-1-steven.price@arm.com> <20261102141304.126883-11-steven.price@arm.com>
- <fa0ee5a1-4c49-4c1f-bfbb-c270dc4b6301@arm.com>
-In-Reply-To: <fa0ee5a1-4c49-4c1f-bfbb-c270dc4b6301@arm.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 9 Nov 2026 07:40:41 +0000
-X-Gm-Features: AclHuK87iuKTvXEWJaczVerdWgxPEZxpPBN7O-wc8AIa5Wl9vz0b6-1H_UF4Qbg
-Message-ID: <CA+EHjTy970AWnhYoZ5OqxQ8ojCAELeejw60y2NmpDsM_ZMdu4Q@mail.gmail.com>
-Subject: Re: [PATCH 10/11] KVM: arm64: CCA: Support runtime faulting of memory
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
-	James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
-	linux-coco@lists.linux.dev, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
-	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>, 
-	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com, 
-	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Suzuki, Steve,
+Hi folks,
 
-On Thu, 05 Nov 2026 17:30:16 +0000, Suzuki K Poulose
-<suzuki.poulose@arm.com> wrote:
-[...]
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-[...]
-> > @@ -1816,13 +1828,28 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd,
-> >         /* Pairs with the smp_wmb() in kvm_mmu_invalidate_end(). */
-> >         smp_rmb();
-> >
-> > +        if (kvm_vm_is_realm(kvm)) {
-> > +                is_realm_private = kvm_realm_is_private_address(&kvm->arch.realm,
-> > +                                                                s2fd->fault_ipa);
-> > +
-> > +                if (is_realm_private != kvm_gmem_is_private_gfn(kvm, canonical_gfn)) {
-[...]
-> I am wondering there is a way to make it a bit more generic. The issue
-> is, only Realm has private memory with guest_memfd for now. Don't know
-> the pKVM plans for it.
+With most of the groundwork now merged, bringing protected VMs up to
+the features we support for them in Android turns out not to be a big
+series. So this folds self-hosted debug [1] and SVE [2], which I posted
+separately last week, into one series with the rest. Both are small,
+and keeping them apart would only leave a few conflicts where they add
+neighbouring lines to the pVM ID-register code. The debug and SVE
+patches are unchanged from those postings.
 
-The plan is for protected pKVM VMs to be backed by guest_memfd too,
-which would also hold each page's private/shared state [1]. So
-kvm_arch_has_private_mem() will be true for them, and this comparison
-applies as is. Only how the expected state is computed differs: for a
-pVM it comes from the per-page share state rather than an IPA bit.
+  01:     Self-hosted debug.
+  02-05:  SVE, with EL2 owning a protected vCPU's SVE state.
+  06-07:  Compute a protected vCPU's fine-grained traps at EL2.
+  08-16:  Advertise TCR2, SCTLR2, S1PIE, S1POE, MOPS, FPMR and the
+          features EL2 already handles for non-protected guests.
 
-Steve, could you gate the guest_memfd checks on
-kvm_arch_has_private_mem(kvm) rather than kvm_vm_is_realm(), this one
-and the memslot check you proposed for 02/11? Only the
-kvm_realm_is_private_address() and realm_map_ipa() calls are
-realm-specific, and they could be VM_REALM cases of a switch on
-vm_flavor, as Marc asked for on the v21 memslot check [2]. The macro
-would then only widen to protected VMs when pKVM's guest_memfd support
-lands.
+Tested on QEMU, in hVHE and nVHE, and on FVP for S1POE and the fields
+QEMU doesn't model (CLRBHB, RPRFM, ECBHB, LSFE, LSUI, HAFT, ETS3 and
+F16MM). v2 of the pKVM selftests series [3] will cover debug, SVE,
+MOPS, PIE, POE and FPMR.
+
+Based on Linux 7.4-rc1 (6628e7d4c6b25); it also applies to 7.4-rc2
+(7475ea8b58616).
 
 Cheers,
 /fuad
 
-[1] https://lore.kernel.org/all/CA+EHjTz+WgXEW5RTxXf4oGeEb1Tsm5Ha4nOc4S1jBcp7jxP4+A@mail.gmail.com/
-[2] https://lore.kernel.org/all/86mrsw2jrn.wl-maz@kernel.org/
+[1] https://lore.kernel.org/all/20261102093950.2922035-1-fuad.tabba@linux.dev/
+[2] https://lore.kernel.org/all/20261105130456.1617185-1-fuad.tabba@linux.dev/
+[3] https://lore.kernel.org/all/20261104084842.132944-1-fuad.tabba@linux.dev/
+
+Fuad Tabba (16):
+  KVM: arm64: Add support for self-hosted debug in protected guests
+  KVM: arm64: Remove redundant kern_hyp_va() calls from the pKVM FP sync
+  KVM: arm64: Allocate a protected vCPU's SVE state at EL2
+  KVM: arm64: Advertise ID_AA64ZFR0_EL1 to protected VMs
+  KVM: arm64: Allow protected VMs to use SVE
+  KVM: arm64: Move the VM's FGU initialisation into config.c
+  KVM: arm64: Compute a protected vCPU's fine-grained traps at EL2
+  KVM: arm64: Advertise TCR2, SCTLR2, S1PIE and S1POE to protected VMs
+  KVM: arm64: Advertise MOPS to protected VMs
+  KVM: arm64: Advertise FPMR to protected VMs
+  KVM: arm64: Advertise HBC, CLRBHB, RPRFM, CSSC and LUT to protected
+    VMs
+  KVM: arm64: Advertise FAMINMAX, LSFE, LSUI and FPRCVT to protected VMs
+  KVM: arm64: Advertise AFP and RPRES to protected VMs
+  KVM: arm64: Advertise ECBHB, TIDCP1, TTST and LVA to protected VMs
+  KVM: arm64: Advertise FP8 and F16MM to protected VMs
+  KVM: arm64: Advertise ECV, HAFT and ETS3 to protected VMs
+
+ Documentation/virt/kvm/arm/pkvm.rst    |  13 +-
+ arch/arm64/include/asm/kvm_host.h      |   2 +-
+ arch/arm64/include/asm/kvm_hyp.h       |   6 +
+ arch/arm64/include/asm/kvm_pkvm.h      |   1 +
+ arch/arm64/kvm/arm.c                   |   5 +
+ arch/arm64/kvm/config.c                |  32 ++-
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h |   1 +
+ arch/arm64/kvm/hyp/nvhe/Makefile       |   1 +
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c     |   6 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c         |  51 ++--
+ arch/arm64/kvm/hyp/nvhe/switch.c       |   1 +
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c     | 349 +++++++++++++++++++++++--
+ arch/arm64/kvm/reset.c                 |   2 +
+ arch/arm64/kvm/sys_regs.c              |  17 +-
+ 14 files changed, 413 insertions(+), 74 deletions(-)
+
+
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+-- 
+2.47.3
+
