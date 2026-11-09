@@ -1,85 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.44
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794221275;
-	b=4eKTSYgl5rKyMrvzyY5x9J2fYPgMhMJ+5IwYRLb7bofzg1K9QcTEtBLWoaTWfzpxV16M
-	 Ww6PVkPBri807jM1QPxhy62Ee0aD0137yoGp/FPl31whinkgnGnMHvWKHVZkRHhZmIYI/
-	 extYX8C2gBF7YElB2HoFQhDbZrtXA2vj0mqTgzl5S2uiBzMOVEnSTJHS5nea9hU//Bjs+
-	 80tDq/RmxkAKFDybEBHdlNutPcvkGh98f+WBLwjHciwD5eEY3GzQvPj5GtJiDsmk0t3Lo
-	 WaFBngLShmTg3bhzrbYsDVdqvHm/gso+M2hbwwJrGKmXfUfpxxy7J4BzusQepArqn7Q==
+	t=1794221778;
+	b=UY94sV8M1N1ho45QIIOixHcmO5D6GRJ5zxByu+cZKa1iqmbjF6Gr2YAR+GSuJBULp6XQ
+	 06gh/xr2O0yf1QbOrbWD0hArXQg1gLoV9xY/xcx0tV1R+9cVfkn5Lqw5rv17YjlYmJebJ
+	 unc0K7+2ysLugaweIq7bcCe0z95PuB2cmeZWvMbhCHSFIYMg0fzGcaacMx/SIwO1XdnA9
+	 NlU/uCX4v4z5oMl4xyVlFCRTd8p/IuRnvs00PzTPHHBBqj+hFFjcAwdQYhNMMKZ+M7FFm
+	 d4G3K35sDCyIx/MRiLb76+RAbjf/iC5pphYP8QurmKV9Y9KGYQoX2kkGBuLdBS10DwQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794221275;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794221778;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
 	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=Wzi6KrhT88vehfKY7qgpQ1+JN6+5jlpjxZmv28MWhTQ=;
-	b=HQFyrGK7nLtoKFbMb2LGTEjr20poePzFwr0ieF1FAyMy9NFzU31px5P5V4bn+ZuCkRzs
-	 3sLM4dYiYt0wbPcPDJjncOeWyeQwytAA3DlQTfus+izfGEzx51y1/8wc5C5fFnkNL2smd
-	 6lTwtcFrTmNZGZvuvqR7Z93GF0J3YvsqE1pM/8knxIcOHBlXPtcryxY+3M/ZJWvQDDe0P
-	 CzCYFXyphYesioDoJf8UtFipDGLx8IlBRbqZuZSoAFVNJf4ag8kIfNZA+Ik42ppq8cf98
-	 Zsv2+iwlmgedGpRXsggUcYj9jce7wHzp3D7HBo4TLt7BqJWJwPNpzaLIRejMRDTbliA==
+	bh=9ORalyFXe7qdK/R0lBn9ynib3IYyaexwVRCwyl06+yA=;
+	b=1Hjcm2xZZfSM3Afkemtd9ep1ZuJMZA3nJbUEs9sjd8JZcjjVZ/GqsJ1nxzv8nW5jyAF1
+	 IZN5/VsFlrIcR/rD/1Pi+t/LBScCI98eSdxX/4wpNMbbyCOLufV0UO2F8vn9F5hY1A65B
+	 ZkDZN+xUuo4hdHTrdmghKw5KhGOFEG5apZfzwkOzPD79p+EVSxv2S74PwLviVVtW09pk5
+	 WVFNtvpNZA8Qhmn4iF0zXN2KW2MKfhVnWZjTXRTO4jqM/egAwSNT3zN34YjlquRB5z4hQ
+	 AhH7n87tozNpuTQEYbz2LBhnnTQ1kiD1ggkbPE+Grb2duZ2hcmn6LS4D4E+ttnQG8dA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=lvhMgIv5;
-	arc=none smtp.remote-ip=209.85.128.53
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b="QdBcUW/x";
+	arc=none smtp.remote-ip=209.85.128.44
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3B03606A322
-	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 10:47:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A3B03606A322
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D41606A332
+	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 10:56:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 49D41606A332
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=lvhMgIv5
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4a018493d57so23215e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 09 Nov 2026 02:47:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=QdBcUW/x
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4b6266b5bc4so22285e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 09 Nov 2026 02:56:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794221273; x=1794826073; darn=lists.linux.dev;
+        d=google.com; s=20260707; t=1794221777; x=1794826577; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=Wzi6KrhT88vehfKY7qgpQ1+JN6+5jlpjxZmv28MWhTQ=;
-        b=lvhMgIv58U7ffRHDCt/oCi3qU15SiX0HvooEudCydM5Z8TFMwsmp9sZ3kiS7XAdttt
-         +1V+tbGCE8hSrrFJ45OClPuiNnUt7QcoRb7ThfabT+Th3f2OLdTYF2Sya/SABjB98ABy
-         ALoXSziBO5COtMTb9y3Tz05Y/ANN1WVn4PCJyg7QtH+CnvPVhcrTxKxnQ1ORUNGo76Jq
-         Hxnpl7Xm1pzVfQAOZPIHRsjVhokywRxX3/SERkf6WvduDijnpxMY7iJin+Mnj+OsROUU
-         dTkVaND9A3E2pIs8JbvArDDzBP3BcZu1Z91KcjxNVhroUfNTnRrH3EYtwggsMfW9PKfY
-         QTSg==
+        bh=9ORalyFXe7qdK/R0lBn9ynib3IYyaexwVRCwyl06+yA=;
+        b=QdBcUW/xHQo9de8RJsUQY5xAsRnd9iS5cR+3J1+REeXuSS/axGtTjCly1cmmPpU/L3
+         Fe+/S4eC5le4q1rQrq2Hjcq1dIIWRiyYCor6fTsX8RSoXehi1r3PljjVaMY//r38JwbQ
+         ZMNJmMgkPGt408IG2lrpB5ILuR7So7sRGyP0x/eSd2NnZP6+6OTYHP7c6eqAAZu8YKzl
+         n7y7W0zp9vpKZ4lrRsr9RAiK16uziUb6SSkJ1zqjluTk9oNETUhW+OpHkC3Ig9VcX6Co
+         VYoiGujcIQVopUpmK5u215XZOmRVJBcLndvSKJKH9czWM280g0NkhtGJM+zuI0uS1c/v
+         TQXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794221273; x=1794826073;
+        d=1e100.net; s=20260707; t=1794221777; x=1794826577;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=Wzi6KrhT88vehfKY7qgpQ1+JN6+5jlpjxZmv28MWhTQ=;
-        b=Lb/HGRdiKhMIx44QTatyqoDb8NJ7xDGcIGo6UVt1d5tTBn+piddrRjo8k9I9P4sgBP
-         tYu7BmOQby5iKOxUAoDXP9yGpOjd8e72Uu99sZ2gQOQQ5uWJSOZlXwOhnWEaek9nSrI2
-         1G/EJ8hx4/r5P6qOppZxanJ+UOM28cG+3nEyStzM/kj6RR+L5SJxqn7/OVR1leijF/Dt
-         mncqKsrovhzpwrfgXs410HVrYjscYl9Y6e1j0mCAnOu84LJpaA/le4Ni/VtWPGIZ/MAR
-         2CkvYxD8RbFVpdDCTyyj3iQsNs1sagFr9Hpb399w/dzMDwdKbELnPVZYVhX+b7+cLgfo
-         w/7g==
-X-Forwarded-Encrypted: i=1; AL+hErFoqqRS5LMepI9Beve2Xr54xudoFdVMsDb0t55CMCyjy+d6uSggZwcWkzHRsmvur+7JLaE+L88=@lists.linux.dev
-X-Gm-Message-State: APuU4Z+m5Kdp7Z0/qXnjPJNnP5kFy5uUym5iXHgyXDXenXabsXvK14rH
-	xrcsm7pS/troQttMKe55Oa13VUEo6hxAfBDjFp5JY3q//89PF+0y5v8wCNriad3XTw==
-X-Gm-Gg: AYBFou0P+8XVekDTb2ugvMlebM/1ukAsUsBtMAiAXyMJtKt25Taoqo22CdAh8fUU1OD
-	+0yO0U8G2+LdaFjmsp6LK2DNua25sqRY952Ua6IXsE53WTK4iL9YuXVceZNKqNIS+z+uAatZ2dQ
-	2oJTx0TxMbeNsLe6cdXnrI0CqaUiGpuPDsioCsMA+enFC613pcv/Rg6lfltQ5Ijeb1kCdaS/pUF
-	M3rMzDRP7zHZlOxKf4kix2YoMP63CUXeprSeQPiPuavasU/o9MISDAP7w5H9+hohuK2Tlwy/4Nx
-	jPAvySGWzYmlWKHNLI6UUXJXgiP3367MW8QWwZsfjVp6Wsk4V3EsBCE/KLXqMSOOx+dXG7MGEtR
-	ShEAhV5BB5qvvcWTwN4MJbwVNGq5lHU1Xf4QLR1A3q4TQDiU3SA0WWFDu/5p3fDLpYHhFvzcHTO
-	2zYgnnB6BezDB3ViI1ozM2DRu1Fo5Ndzq6XiqRJmAEfbH21q9bG7UwB83rd7d1fWW11rt5tLXMB
-	hzkLatAXU/jcOod2f8kpxTvoximOEGnsIi0rqQlZpsAiHaQUeTwb32Iq5yzcsgYxVmqU1RuXxPA
-	+WSexzYaRKRYparyi9UdxNj9iHaQM+6Kup8EqF3s55fLQT7uaqe3IMzShRWTx/7AxW6oxA==
-X-Received: by 2002:a05:600c:2d91:b0:4a1:d373:5759 with SMTP id 5b1f17b1804b1-4b8b04d3e52mr1256155e9.8.1794221272587;
-        Mon, 09 Nov 2026 02:47:52 -0800 (PST)
+        bh=9ORalyFXe7qdK/R0lBn9ynib3IYyaexwVRCwyl06+yA=;
+        b=eaepEC1bRNXcwf7Xxnz7tMGKspD7lfZhXOOtdfiRXIMPm2QTbPlGkGmHuhXy/YlBDW
+         muUTCCltW/7AVimYav2yRjJy7GidtR2KESFhWMaacDZqCsrxyusZ3eMt++Kv8egQp8CE
+         XSt94OYeqCODAN2pH+iYXqGorTuLd4lyanOqHOQJPA5CAYaCeV1EyYykSVCqwcS74OOW
+         fL+dvkOWbu1Irk3MFlQQ6rOEEi9aUWW24VxoGsShG5YBmIZ43ICdmzrzXZS3gft+WqQC
+         58H71zYYYAscDMiarWrpg8rKUXou8396agjoGODkVMKJvkXGTj0fF9XAwujfp955Bop8
+         2rTQ==
+X-Forwarded-Encrypted: i=1; AL+hErECHKgUH7HzDIy6l4pQbb2pVPXHmYLlIzyRf2vQIF/0ZJHLB3EnTAo7NnwiSxFHPnpds8pfEnc=@lists.linux.dev
+X-Gm-Message-State: APuU4Z9BULYlF/RTGpfvV7JCU99jz2bx8Rwm16IhAuOtlc1Ma+bJ2sXA
+	TYeTqx5mJjn0BwKCvIRZQ0WhE1nQ6ksIBW1Xoxqm0+XqU9jJv7kbm6rp5AIQgB85FA==
+X-Gm-Gg: AYBFou0BqduJ8Q0iBPvoy2VEokFhypTpqH355x37l9VFBO1TDVcoQjJj47pGy02avYg
+	JH+v2wyyVAWUZnlyrYQvjQwzzhQ0LZwyVe4cxzCWB9o1V0HRxqkSyJeZoTGj99eDCg8/hwpBppZ
+	Y6NFNQeiVcsJ9RFGbLT/mUCC3LBQcZiizGqJldoR9wvEcMqduoDP8YyOdg4h1hWWdBqMCOEmISJ
+	fUKdCKNqjVrKp6vDYA3/31hLzKC2L6WoLGHonot4O7mUCIHf3cILygXJb7VZby3lbt2y5oJbZGN
+	y8NXEa9kGUt2ZrAUZg9mCJjH27TO5rzkJJSoy6qxF6Nmnd1fkqKzpMBQFYp9kXNOyaDnucfN5aY
+	fcby1g4QKtk/rNCPiqxAinnY/qIVQJt5ZTwcAP2FMs28RU/pxscatEykgfYsaqtOxMgL+GBrLjX
+	xq/akdPtkvx1igHgwuI+9YMJvYvDFACmvyPw13kqIJUfV3/Ycs+p9CTHn+Es4QY8opJG8XTSE/G
+	NLT3U1aRGGpTXRYGWv3Iob+tVBwRoYgbPLWoyOCUnBtTEQKZ2RoM1LtEsEhMDvf3hdZGHUevxfY
+	hwUjrkG1Sk+OcVntDP/f1necYQyxLl0/4PObFFPA0WkbFoL5AYVv9QwXEWLbkJCoRr9V3g==
+X-Received: by 2002:a05:600c:492f:b0:4a1:e384:5e12 with SMTP id 5b1f17b1804b1-4b8b04d4155mr845705e9.7.1794221775967;
+        Mon, 09 Nov 2026 02:56:15 -0800 (PST)
 Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4b90f1117fasm149512245e9.13.2026.11.09.02.47.51
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4b7da62edb4sm270902255e9.1.2026.11.09.02.56.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Nov 2026 02:47:51 -0800 (PST)
-Date: Mon, 9 Nov 2026 10:47:46 +0000
+        Mon, 09 Nov 2026 02:56:14 -0800 (PST)
+Date: Mon, 9 Nov 2026 10:56:10 +0000
 From: Mostafa Saleh <smostafa@google.com>
 To: Nicolin Chen <nicolinc@nvidia.com>
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -89,11 +89,11 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	yuzenghui@huawei.com, joro@8bytes.org, jgg@ziepe.ca,
 	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
 	vdonnefort@google.com
-Subject: Re: [PATCH v9 11/25] iommu/arm-smmu-v3-kvm: Add the kernel driver
-Message-ID: <avGk0ilyJh3obmKx@google.com>
+Subject: Re: [PATCH v9 13/25] iommu/arm-smmu-v3-kvm: Add MMIO emulation
+Message-ID: <avGmyuYdheMJdLik@google.com>
 References: <20261015200903.2735565-1-smostafa@google.com>
- <20261015200903.2735565-12-smostafa@google.com>
- <auzvygiGRTWgJXzF@nvidia.com>
+ <20261015200903.2735565-14-smostafa@google.com>
+ <au0LlPl2xwJvtfCu@nvidia.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -105,60 +105,83 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <auzvygiGRTWgJXzF@nvidia.com>
+In-Reply-To: <au0LlPl2xwJvtfCu@nvidia.com>
 
-On Thu, Nov 05, 2026 at 01:06:18PM -0800, Nicolin Chen wrote:
-> On Thu, Oct 15, 2026 at 08:08:42PM +0000, Mostafa Saleh wrote:
-> > +static struct platform_driver smmuv3_nesting_driver;
-> > +static int __init smmuv3_nesting_probe(struct platform_device *pdev)
-> 
-> Could it use a different naming than "nesting"?
-> 
-> "Nesting" is widely used in iommufd path for nested translation.
-> 
-> Here, it could be smmuv3_pkvm_driver?
-
-Sure, pkvm/hyp works.
-
-> 
-> > diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> > +#ifdef CONFIG_ARM_SMMU_V3_PKVM
-> > +/*
-> > + * Two devices are involved: the aux device bound to this driver, and the
-> > + * physical platform device bound to the pKVM init driver, which only uses it
-> > + * for discovery. This driver keeps using the platform device, as it carries
-> > + * the fwnode the IOMMU core and consumers link to, the DMA configuration and
-> > + * the IRQs.
-> 
-> It would be nicer to have a diagram or so to show the co-relationship
-> among different devices and drivers.
-> 
-> I assume the regular arm-smmu-v3 driver is a part of the picture too,
-> when the pkvm driver binding fails?
-> 
-
-I can add some ASCII diagram.
-If pKVM driver fails, no aux devices are created and the main driver
-probes the platform SMMUv3 devices as usual.
-
-> > +static struct auxiliary_driver arm_smmu_driver_emu = {
-> > +	.driver = {
-> > +		.suppress_bind_attrs = true,
-> > +	},
-> > +	.name = "arm-smmu-v3-emu",
-> > +	.id_table = arm_smmu_aux_table,
-> > +	.probe = arm_smmu_device_probe_emu,
-> > +	.remove = arm_smmu_device_remove_emu,
-> > +	.shutdown = arm_smmu_device_shutdown_emu,
-> > +};
+On Thu, Nov 05, 2026 at 03:04:52PM -0800, Nicolin Chen wrote:
+> On Thu, Oct 15, 2026 at 08:08:44PM +0000, Mostafa Saleh wrote:
+> > +static bool smmu_dabt_device(struct hyp_arm_smmu_v3_device *smmu,
+> > +			     struct user_pt_regs *regs,
+> > +			     u64 esr, u32 off)
+> > +{
+> > +	bool is_write = esr & ESR_ELx_WNR;
+> > +	unsigned int len = BIT((esr & ESR_ELx_SAS) >> ESR_ELx_SAS_SHIFT);
+> > +	int rd = (esr & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
+> > +	const u64 read_write = -1ULL;
+> > +	const u64 no_access = 0;
+> > +	u64 mask = no_access;
+> > +	const u64 read_only = is_write ? no_access : read_write;
+> > +	bool is_xzr = (rd == 31);
+> > +	u64 val = is_xzr ? 0 : regs->regs[rd];
 > > +
-> > +module_auxiliary_driver(arm_smmu_driver_emu);
-> > +#endif
+> > +	switch (off) {
+> > +	case ARM_SMMU_IDR0:
+> > +		if (len != sizeof(u32))
+> > +			break;
 > 
-> Nit:
-> #endif /* CONFIG_ARM_SMMU_V3_PKVM */
+> Maybe add a small helper to list all 64-bit registers:
+> 
+> static unsigned int smmu_reg_width(u32 off)
+> {
+>         switch (off) {
+>         case ARM_SMMU_CMDQ_BASE:
+>         case ARM_SMMU_STRTAB_BASE:
+>         case ARM_SMMU_EVTQ_BASE:
+>         case ARM_SMMU_PRIQ_BASE:
+>         case ARM_SMMU_EVTQ_IRQ_CFG0:
+>         case ARM_SMMU_PRIQ_IRQ_CFG0:
+>         case ARM_SMMU_GERROR_IRQ_CFG0:
+>                 return sizeof(u64);
+>         default:
+>                 return sizeof(u32);
+>         }
+> }
+> 
+> Then it'd be tighter by testing the width once, prior to switch (off)?
 
-Will fix it.
+Makes sense, I will try that.
+
+> 
+> > +	/* Allowed RO 32 bit registers. */
+> > +	case ARM_SMMU_IIDR:
+> > +	case ARM_SMMU_IDR5:
+> > +	case ARM_SMMU_IDR3:
+> > +	case ARM_SMMU_IDR1:
+> > +	case ARM_SMMU_IRQ_CTRLACK:
+> > +	case ARM_SMMU_GERROR:
+> > +		if (len != sizeof(u32))
+> > +			break;
+> > +		mask = read_only;
+> > +		break;
+> > +	}
+> > +
+> > +	if (WARN_ON(!mask))
+> > +		goto out_ret;
+> 
+> Your cover letter mentions "WARNs are fatal in the hypervisor".
+> 
+> Is this WARN_ON fatal?
+
+Yes. This is reached if the host does something not emulated:
+1) A bug (writing to a RO register, writing STRTAB if SMMU is
+   enabled...)
+2) New arch feature not supported.
+
+In that case, I'd rather panic here and fix the driver instead of
+ignoring it which will manifest in a harder to debug symptoms later.
+
+Also, this driver only handles the Linux host kernel (which must
+be built-in in this config) so we can assume how the emulated driver
+works and what features it use.
 
 Thanks,
 Mostafa
