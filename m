@@ -1,58 +1,99 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.220
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.53
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794218589;
-	b=Z7Srp8nHUfYh4w+QdBADAKWzbHzbnYx4bRyAWDhiCEB3f1iaHEc3Dl8vXxSD7N+c2Wqa
-	 FgBVVGUt5g0n0740aensqVl1U5ylC8kUWzVSqcSx+LCiNxGMQ+9ld5mHjWHIdBltNsNdA
-	 YV7sTEbQmARO3BzmGy7ZAnrDrsaP93eU14/GeJYQW2n5Gyi6rEg6xjw3kmzOFUlj4r+S6
-	 q8/1uej04+StgQRjoDh3xBZYW7hNctCEWtQBnENw3v4I3+RzqHc48HX0N5F2ULCttpb1H
-	 XMLV+g4NSdVnIEcqyCqqHlykX4MvaAXXKNDebaNLEn8ihL04vTHE+7F666F9eKhC9cA==
+	t=1794221275;
+	b=4eKTSYgl5rKyMrvzyY5x9J2fYPgMhMJ+5IwYRLb7bofzg1K9QcTEtBLWoaTWfzpxV16M
+	 Ww6PVkPBri807jM1QPxhy62Ee0aD0137yoGp/FPl31whinkgnGnMHvWKHVZkRHhZmIYI/
+	 extYX8C2gBF7YElB2HoFQhDbZrtXA2vj0mqTgzl5S2uiBzMOVEnSTJHS5nea9hU//Bjs+
+	 80tDq/RmxkAKFDybEBHdlNutPcvkGh98f+WBLwjHciwD5eEY3GzQvPj5GtJiDsmk0t3Lo
+	 WaFBngLShmTg3bhzrbYsDVdqvHm/gso+M2hbwwJrGKmXfUfpxxy7J4BzusQepArqn7Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794218589;
-	h=DMARC-Filter:dkim-signature:Received:Received:Received:Message-ID:
-	 Date:MIME-Version:User-Agent:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type:Content-Transfer-Encoding:X-Originating-IP:
-	 X-ClientProxiedBy;
-	bh=iX4fPWJ3wrDyEYnWwThFMw7+RnX+XZ2JJyz/prHQrn8=;
-	b=smldu8Z3t3Q0r3mW+S7V/Nx/cgxWH9tuW+V5KLAyFnMhPy1UqbFIUNlOYWzH0cTt6PoE
-	 Vra5pxU+CF9DgPqCcFdOImozIc0U9JtbEIp3+oCPhM2TS4taPBAFPs589I23eDbuWes7R
-	 6MPUNlRweKlZpi5uZ8wGwxYR/FHNNqb/AOG6bOOOYeTcTof9Ms4L9PnMYG4H/IBPE39kJ
-	 SWM57HW1ZkElLGbh4ejscSod3Q8aW2zvfw8YhxwNemS4kjnUeoB3vEhkcso/F1G6GClCe
-	 goMClcxaxws5PJot9zSwstEABqm9N3t1GvHdQgwGvAYDMMrAbyOoARk57JDSZIOh44g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794221275;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=Wzi6KrhT88vehfKY7qgpQ1+JN6+5jlpjxZmv28MWhTQ=;
+	b=HQFyrGK7nLtoKFbMb2LGTEjr20poePzFwr0ieF1FAyMy9NFzU31px5P5V4bn+ZuCkRzs
+	 3sLM4dYiYt0wbPcPDJjncOeWyeQwytAA3DlQTfus+izfGEzx51y1/8wc5C5fFnkNL2smd
+	 6lTwtcFrTmNZGZvuvqR7Z93GF0J3YvsqE1pM/8knxIcOHBlXPtcryxY+3M/ZJWvQDDe0P
+	 CzCYFXyphYesioDoJf8UtFipDGLx8IlBRbqZuZSoAFVNJf4ag8kIfNZA+Ik42ppq8cf98
+	 Zsv2+iwlmgedGpRXsggUcYj9jce7wHzp3D7HBo4TLt7BqJWJwPNpzaLIRejMRDTbliA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=huawei.com;
-	spf=pass smtp.mailfrom=huawei.com;
-	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=ljy90uPK;
-	arc=none smtp.remote-ip=113.46.200.220
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=lvhMgIv5;
+	arc=none smtp.remote-ip=209.85.128.53
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5828606A321;
-	Mon,  9 Nov 2026 10:03:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E5828606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3B03606A322
+	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 10:47:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A3B03606A322
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=ljy90uPK
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=iX4fPWJ3wrDyEYnWwThFMw7+RnX+XZ2JJyz/prHQrn8=;
-	b=ljy90uPKntm7T55bKR3e4cTetba6+gNcSADhPBlPJqqUlK7aWTFeelD/3OaOSBVmAkGvCO9L/
-	S5bidux3AxJcc11fWhgnNND5o7tbByvTtUuR9dIC8OhTmLApFdJRoHezovu5FF6S86uKo81xSuu
-	CUWpgIkXQPprGDDzw9yw5Us=
-Received: from mail.maildlp.com (unknown [172.19.163.104])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4jNQMb5DDYz12LCl;
-	Mon,  9 Nov 2026 18:03:07 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 00BDF4057F;
-	Mon,  9 Nov 2026 18:03:04 +0800 (CST)
-Received: from [10.67.120.103] (10.67.120.103) by
- kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Mon, 9 Nov 2026 18:03:03 +0800
-Message-ID: <494abfd0-b19b-4ef3-a035-d21626828a6a@huawei.com>
-Date: Mon, 9 Nov 2026 18:03:03 +0800
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=lvhMgIv5
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4a018493d57so23215e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 09 Nov 2026 02:47:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1794221273; x=1794826073; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=Wzi6KrhT88vehfKY7qgpQ1+JN6+5jlpjxZmv28MWhTQ=;
+        b=lvhMgIv58U7ffRHDCt/oCi3qU15SiX0HvooEudCydM5Z8TFMwsmp9sZ3kiS7XAdttt
+         +1V+tbGCE8hSrrFJ45OClPuiNnUt7QcoRb7ThfabT+Th3f2OLdTYF2Sya/SABjB98ABy
+         ALoXSziBO5COtMTb9y3Tz05Y/ANN1WVn4PCJyg7QtH+CnvPVhcrTxKxnQ1ORUNGo76Jq
+         Hxnpl7Xm1pzVfQAOZPIHRsjVhokywRxX3/SERkf6WvduDijnpxMY7iJin+Mnj+OsROUU
+         dTkVaND9A3E2pIs8JbvArDDzBP3BcZu1Z91KcjxNVhroUfNTnRrH3EYtwggsMfW9PKfY
+         QTSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794221273; x=1794826073;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Wzi6KrhT88vehfKY7qgpQ1+JN6+5jlpjxZmv28MWhTQ=;
+        b=Lb/HGRdiKhMIx44QTatyqoDb8NJ7xDGcIGo6UVt1d5tTBn+piddrRjo8k9I9P4sgBP
+         tYu7BmOQby5iKOxUAoDXP9yGpOjd8e72Uu99sZ2gQOQQ5uWJSOZlXwOhnWEaek9nSrI2
+         1G/EJ8hx4/r5P6qOppZxanJ+UOM28cG+3nEyStzM/kj6RR+L5SJxqn7/OVR1leijF/Dt
+         mncqKsrovhzpwrfgXs410HVrYjscYl9Y6e1j0mCAnOu84LJpaA/le4Ni/VtWPGIZ/MAR
+         2CkvYxD8RbFVpdDCTyyj3iQsNs1sagFr9Hpb399w/dzMDwdKbELnPVZYVhX+b7+cLgfo
+         w/7g==
+X-Forwarded-Encrypted: i=1; AL+hErFoqqRS5LMepI9Beve2Xr54xudoFdVMsDb0t55CMCyjy+d6uSggZwcWkzHRsmvur+7JLaE+L88=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+m5Kdp7Z0/qXnjPJNnP5kFy5uUym5iXHgyXDXenXabsXvK14rH
+	xrcsm7pS/troQttMKe55Oa13VUEo6hxAfBDjFp5JY3q//89PF+0y5v8wCNriad3XTw==
+X-Gm-Gg: AYBFou0P+8XVekDTb2ugvMlebM/1ukAsUsBtMAiAXyMJtKt25Taoqo22CdAh8fUU1OD
+	+0yO0U8G2+LdaFjmsp6LK2DNua25sqRY952Ua6IXsE53WTK4iL9YuXVceZNKqNIS+z+uAatZ2dQ
+	2oJTx0TxMbeNsLe6cdXnrI0CqaUiGpuPDsioCsMA+enFC613pcv/Rg6lfltQ5Ijeb1kCdaS/pUF
+	M3rMzDRP7zHZlOxKf4kix2YoMP63CUXeprSeQPiPuavasU/o9MISDAP7w5H9+hohuK2Tlwy/4Nx
+	jPAvySGWzYmlWKHNLI6UUXJXgiP3367MW8QWwZsfjVp6Wsk4V3EsBCE/KLXqMSOOx+dXG7MGEtR
+	ShEAhV5BB5qvvcWTwN4MJbwVNGq5lHU1Xf4QLR1A3q4TQDiU3SA0WWFDu/5p3fDLpYHhFvzcHTO
+	2zYgnnB6BezDB3ViI1ozM2DRu1Fo5Ndzq6XiqRJmAEfbH21q9bG7UwB83rd7d1fWW11rt5tLXMB
+	hzkLatAXU/jcOod2f8kpxTvoximOEGnsIi0rqQlZpsAiHaQUeTwb32Iq5yzcsgYxVmqU1RuXxPA
+	+WSexzYaRKRYparyi9UdxNj9iHaQM+6Kup8EqF3s55fLQT7uaqe3IMzShRWTx/7AxW6oxA==
+X-Received: by 2002:a05:600c:2d91:b0:4a1:d373:5759 with SMTP id 5b1f17b1804b1-4b8b04d3e52mr1256155e9.8.1794221272587;
+        Mon, 09 Nov 2026 02:47:52 -0800 (PST)
+Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4b90f1117fasm149512245e9.13.2026.11.09.02.47.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Nov 2026 02:47:51 -0800 (PST)
+Date: Mon, 9 Nov 2026 10:47:46 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Nicolin Chen <nicolinc@nvidia.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joro@8bytes.org, jgg@ziepe.ca,
+	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
+	vdonnefort@google.com
+Subject: Re: [PATCH v9 11/25] iommu/arm-smmu-v3-kvm: Add the kernel driver
+Message-ID: <avGk0ilyJh3obmKx@google.com>
+References: <20261015200903.2735565-1-smostafa@google.com>
+ <20261015200903.2735565-12-smostafa@google.com>
+ <auzvygiGRTWgJXzF@nvidia.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -62,110 +103,65 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 11/15] KVM: arm64: Reserve dirty ring space for the
- HDBSS buffer
-To: <sashiko-reviews@lists.linux.dev>, Leonardo Bras <leo.bras@arm.com>
-CC: <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>, Marc Zyngier
-	<maz@kernel.org>, Oliver Upton <oupton@kernel.org>, liuyonglong
-	<liuyonglong@huawei.com>
-References: <20260929103655.85107-1-zhengtian10@huawei.com>
- <20260929103655.85107-12-zhengtian10@huawei.com>
- <20260929110035.71FB41F000FF@smtp.kernel.org>
-From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <20260929110035.71FB41F000FF@smtp.kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <auzvygiGRTWgJXzF@nvidia.com>
 
+On Thu, Nov 05, 2026 at 01:06:18PM -0800, Nicolin Chen wrote:
+> On Thu, Oct 15, 2026 at 08:08:42PM +0000, Mostafa Saleh wrote:
+> > +static struct platform_driver smmuv3_nesting_driver;
+> > +static int __init smmuv3_nesting_probe(struct platform_device *pdev)
+> 
+> Could it use a different naming than "nesting"?
+> 
+> "Nesting" is widely used in iommufd path for nested translation.
+> 
+> Here, it could be smmuv3_pkvm_driver?
 
+Sure, pkvm/hyp works.
 
-On 9/29/2026 7:00 PM, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] arm64: kvm: UAPI breakage for dirty ring size on 64KB page systems
-> --
 > 
-> commit 38dde0ab2f10c37402c620c7b1328624808205ad
-> Author: Tian Zheng <zhengtian10@huawei.com>
+> > diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> > +#ifdef CONFIG_ARM_SMMU_V3_PKVM
+> > +/*
+> > + * Two devices are involved: the aux device bound to this driver, and the
+> > + * physical platform device bound to the pKVM init driver, which only uses it
+> > + * for discovery. This driver keeps using the platform device, as it carries
+> > + * the fwnode the IOMMU core and consumers link to, the DMA configuration and
+> > + * the IRQs.
 > 
-> KVM: arm64: Reserve dirty ring space for the HDBSS buffer
+> It would be nicer to have a diagram or so to show the co-relationship
+> among different devices and drivers.
 > 
-> This commit reserves space in the dirty ring for CPU-side dirty buffers by
-> implementing kvm_cpu_dirty_log_size(). It also pins the HDBSS buffer size to
-> PAGE_SIZE when the dirty ring is enabled.
-> 
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index 7bf82d65041c8..c1e09ba98d48a 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
-> [ ... ]
->> @@ -2841,3 +2841,11 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
->>   
->>   	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
->>   }
->> +
->> +int kvm_cpu_dirty_log_size(struct kvm *kvm)
->> +{
->> +	if (!system_supports_hdbss())
->> +		return 0;
->> +
->> +	return kvm_hdbss_buffer_size(kvm) / sizeof(u64);
->> +}
-> 
-> [Severity: High]
-> Does this calculation break the UAPI for standard dirty ring size requests on
-> 64KB page systems?
-> 
-> Since KVM_ARM_HDBSS_DEFAULT_SIZE is tied to PAGE_SIZE, this calculation scales
-> with the system page size. On a 64KB page system, kvm_hdbss_buffer_size() yields
-> 65536 bytes, returning 8192 reserved entries (65536 / 8).
-> 
-> When a userspace process requests a standard dirty ring size of 65536 bytes
-> (64KB) via KVM_ENABLE_CAP for KVM_CAP_DIRTY_LOG_RING, it seems the ioctl will
-> now fail:
-> 
-> virt/kvm/kvm_main.c:kvm_vm_ioctl_enable_cap() {
->      ...
-> 	if (size < kvm_dirty_ring_get_rsvd_entries(kvm) *
-> 	    sizeof(struct kvm_dirty_gfn) || size < PAGE_SIZE)
-> 		return -EINVAL;
->      ...
-> }
-> 
-> Because (8192 + 64) * 16 = 132096 bytes is greater than the requested 65536
-> bytes, the ioctl rejects previously valid userspace configurations with -EINVAL,
-> which would cause QEMU and other VMMs to fail to start VMs.
-> 
-> Could this buffer size be decoupled from PAGE_SIZE to avoid the entry inflation
-> and ABI breakage on 64KB page systems?
+> I assume the regular arm-smmu-v3 driver is a part of the picture too,
+> when the pkvm driver binding fails?
 > 
 
-You were right, this is a real UAPI break on 64KB-page kernels. The
-PAGE_SIZE default made the ring reservation scale with the kernel page
-size, so a standard 64KB ring request got rejected there.
+I can add some ASCII diagram.
+If pKVM driver fails, no aux devices are created and the main driver
+probes the platform SMMUv3 devices as usual.
 
-Leo, the PAGE_SIZE default goes back to your suggestion in the v4
-discussion at [1]:
+> > +static struct auxiliary_driver arm_smmu_driver_emu = {
+> > +	.driver = {
+> > +		.suppress_bind_attrs = true,
+> > +	},
+> > +	.name = "arm-smmu-v3-emu",
+> > +	.id_table = arm_smmu_aux_table,
+> > +	.probe = arm_smmu_device_probe_emu,
+> > +	.remove = arm_smmu_device_remove_emu,
+> > +	.shutdown = arm_smmu_device_shutdown_emu,
+> > +};
+> > +
+> > +module_auxiliary_driver(arm_smmu_driver_emu);
+> > +#endif
+> 
+> Nit:
+> #endif /* CONFIG_ARM_SMMU_V3_PKVM */
 
- > That means 512 entries in 4kB pagesize, an 8K entries in 64kB
-pagesize.
-
- > I mean, yes, maybe we could allocate a 64k page, and set SZ=4K in
-HDBSSBR, but that would be a waste of memory, right?
-
-If we keep PAGE_SIZE, the ring ABI stays broken on larger-page kernels,
-since the reservation keeps scaling with the page size. With SZ_4K there
-is still some breakage, the smallest ring sizes (4KB and 8KB), but that
-is the smallest scope we can get, because 4KB is the smallest buffer the
-hardware can encode. Defaulting to SZ_4K also brings our ring
-requirements in line with x86, where PML reserves the same fixed 576
-entries.
-
-Do you think we should default to SZ_4K and accept the page waste you
-pointed out, or keep PAGE_SIZE?
-
-[1] https://lore.kernel.org/all/amocrs9ZiCi7uErp@LeoBrasDK/
+Will fix it.
 
 Thanks,
-Tian
+Mostafa
+
+> 
+> Nicolin
