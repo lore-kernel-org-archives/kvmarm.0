@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.250
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.3
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794213168;
-	b=y/V7iopYswy2gc5Vejd9eRwEwkmvS91+H+U3ZDCh3cauObamSOYi2Vc715W/iEJfETiz
-	 AnjtNBdfImX3WOAHUkNd8USU29/pMKOkfJrDa4cR0P6l0NGND+oVF0Efjcwrxy/mAbmmW
-	 nTU4gW+XCT8oWOWHjDWYo/Hgdh2kOpHUW7PgkNPaGk0RaGaBw2Vlcp1u5TzjAUCGOdXhR
-	 eAB2MREbjlKeABHXdprNv8AGINbGZUBpAcjqSoUyh0PR+psnSjacZQUN8gP1Axu7KPZBf
-	 wSCyeg7uJXD7zIooQBHqUZZWjwiVGpMQUGsEBWZEQA7jz/WQ0Ri4E3IDEoOLKOvtmGg==
+	t=1794213169;
+	b=CP5Ke6quE7rKAOunzAYwfj3//wNlqZ7L1C7MiuI4oDtNiAJQIE7gE1wJsPqxQZ4oCp0X
+	 y81sdtP2OiJ1l9NAJRy9foCaUbcN0041+/UBk2djoCQDKD/5NX7J7GOMqI2HCxHQEy8gb
+	 MUlDprvIoHwQobjywA5j/EZFMCrKeSPJg1fbHYAFZ9/eavGayYRmpNqfWQRTw+MQ4W/hz
+	 6iyykQ6UafxFh/JR6awZbf5jJSSCrWCzDFiq06ZpTbKh2Qh8ZbkJMyeP3/+9EKQ5zE12f
+	 u2mHg5/Mgjn0DgYjgdztTq37rVX6LUhArRvBPu4ZaeDl0lAqM6/XcEqBQc7+o5xw9jQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794213168;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794213169;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=bo1WlELU8ik+Rr+Abdwa067G5JksNkxTfxKiETgF/pA=;
-	b=3AguTd5Z8MJVxadHzjeg+8slXa+RyiixixJtaWbk3+B/xAyJFShaqny7QQU2ZA0RnE6r
-	 trBelEETbVYLlBjYfqFRCCBrjSKtyuC73QsiuT9YcOUQOulIZ3BvN8wqQKVewG+JRTBvg
-	 fqKew3+FiJqGryS/k7hut0Fx7Cdm+RZ1s0/8IPwFnq//ds+FlN1Ux/Sv3QLUO8tsQp2th
-	 nfo8ShKiBA/AW4qX4XkM1XeMJ4uOa4/rJJRcegU17zOoUE46SHqvjTqu9/+wPn4u7Imyx
-	 szPHHaHBg/6wFCDrVwxhjpoDP3yk8V1AbXomF5IFHW9tF0lJl3+KimjtW5oxiwhS9eQ==
+	bh=Ut9Nym0C5U+5iZecBoNIMpMDQzMmxDB90w5AyEXvzQ0=;
+	b=gvXolwn3Iq2c8Przai0pYYPWZsZ8rb5Qzb6nr3sJv8ljsONe3tqQl1+2OYCdBTRyA/Ol
+	 rXIU6SgYKR9tQuMMj/PcquYSq+JfIKlX62E3j/Y7eMMj3yNnDByjQVM/5XyyUw9LbCCs9
+	 leBJWN46VLY4eYUsGvCSD7jqlSqF6FYUFzgig2SziEiJ+KHmw5fKaoVX4S2F2ZhQej4k0
+	 489PqrAuTxy6UUx7FI7luR4EzDKDFizNIpRKppeGvw36+pMU4LMaf09dSiZdyLLdLo09Q
+	 P6utPqmJ6D7WkbmuEHRoIJUtxbpktfVQYdQOE74j52pyLbruTNKFQaDLEVxTYCvnAZg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=S9jMCK95;
-	arc=none smtp.remote-ip=95.215.58.250
-Received: from mta1.migadu.com (out-250.mta1.migadu.com [95.215.58.250])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="MGip1yh/";
+	arc=none smtp.remote-ip=95.215.58.3
+Received: from mta1.migadu.com (out-3.mta1.migadu.com [95.215.58.3])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B623B606EE94
-	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 08:32:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B623B606EE94
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4486082BD5
+	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 08:32:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4A4486082BD5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=S9jMCK95
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=MGip1yh/
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=W7dlvw4NdcdYKD2+I77uCjjseY0CwzVUAyYBCfePwsI=;
+DKIM-Signature: a=rsa-sha256; bh=PSYHOaV+7+K1ZX7ZkDN48fB/sJAUPij7DWY83+YiVG4=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794213166; v=1; x=1794817966;
- b=S9jMCK95QtcoMLf+7bXj5kUxvWLP+RKC3Y6fSEZhcv58cQDtKU+0kt+GkJkWHatYSbGK6KJg
- IlMykHYdMLqNAxO8qrnGq2hAky39aOsP1i4a8dvo1yfJClM/VQTaVgrJVJY2tDxyGad1qRxefYG
- LQn5WdLi51Kxu1L9Zo+JDv4k=
+ t=1794213167; v=1; x=1794817967;
+ b=MGip1yh/CT47MbTuFklWtwk+2wVglhpOYoUuqDH6Pgc6pK0WVJZ7yDLlZYaYAF/+MMQL1r6d
+ Xn/YeS5Tuaj1jc77YAMB7ZkYaMci6fmM6pVz54CujLzigCdIMsiKJc6K8u5m1IXbqd9HEkc/eXt
+ 0sIb1gbqEcOP7RPwUuVIhTwQ=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 909104da5cd6237e;
-	Mon, 09 Nov 2026 08:32:45 +0000
-X-Mizu-Trace-ID: 909104da5cd6237e
+Received: by smtp.migadu.com with ESMTPS id f12ea6fb60e66e67;
+	Mon, 09 Nov 2026 08:32:47 +0000
+X-Mizu-Trace-ID: f12ea6fb60e66e67
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -63,9 +63,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 13/16] KVM: arm64: Advertise AFP and RPRES to protected VMs
-Date: Mon,  9 Nov 2026 08:32:02 +0000
-Message-ID: <20261109083205.806619-14-fuad.tabba@linux.dev>
+Subject: [PATCH 14/16] KVM: arm64: Advertise ECBHB, TIDCP1, TTST and LVA to protected VMs
+Date: Mon,  9 Nov 2026 08:32:03 +0000
+Message-ID: <20261109083205.806619-15-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261109083205.806619-1-fuad.tabba@linux.dev>
 References: <20261109083205.806619-1-fuad.tabba@linux.dev>
@@ -80,34 +80,38 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Advertise FEAT_AFP and FEAT_RPRES to protected VMs. Both are controlled
-through FPCR, which EL2 switches with the rest of the FP state.
+Advertise FEAT_ECBHB, FEAT_TIDCP1, FEAT_TTST and FEAT_LVA to protected
+VMs, capping VARange at LVA, since LVA3 requires FEAT_D128. TIDCP1's
+control, SCTLR_EL1.TIDCP, is switched with the rest of SCTLR_EL1.
 
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/hyp/nvhe/sys_regs.c | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 73ef47a8e687b..08805c7e4e5a7 100644
+index 08805c7e4e5a7..8e9283dae3484 100644
 --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
 +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -169,6 +169,7 @@ static const struct pvm_ftr_bits pvmid_aa64mmfr1[] = {
- 	MAX_FEAT(ID_AA64MMFR1_EL1, PAN, PAN3),
+@@ -170,7 +170,9 @@ static const struct pvm_ftr_bits pvmid_aa64mmfr1[] = {
  	MAX_FEAT(ID_AA64MMFR1_EL1, SpecSEI, IMP),
  	MAX_FEAT(ID_AA64MMFR1_EL1, ETS, IMP),
-+	MAX_FEAT(ID_AA64MMFR1_EL1, AFP, IMP),
+ 	MAX_FEAT(ID_AA64MMFR1_EL1, AFP, IMP),
++	MAX_FEAT(ID_AA64MMFR1_EL1, TIDCP1, IMP),
  	MAX_FEAT(ID_AA64MMFR1_EL1, CMOW, IMP),
++	MAX_FEAT(ID_AA64MMFR1_EL1, ECBHB, IMP),
  	FEAT_END
  };
-@@ -212,6 +213,7 @@ static const struct pvm_ftr_bits pvmid_aa64isar1[] = {
- };
  
- static const struct pvm_ftr_bits pvmid_aa64isar2[] = {
-+	MAX_FEAT(ID_AA64ISAR2_EL1, RPRES, IMP),
- 	MAX_FEAT_FUNC(ID_AA64ISAR2_EL1, GPA3, IMP, vm_has_ptrauth),
- 	MAX_FEAT_FUNC(ID_AA64ISAR2_EL1, APA3, PAuth, vm_has_ptrauth),
- 	MAX_FEAT(ID_AA64ISAR2_EL1, MOPS, IMP),
+@@ -178,6 +180,8 @@ static const struct pvm_ftr_bits pvmid_aa64mmfr2[] = {
+ 	MAX_FEAT(ID_AA64MMFR2_EL1, CnP, IMP),
+ 	MAX_FEAT(ID_AA64MMFR2_EL1, UAO, IMP),
+ 	MAX_FEAT(ID_AA64MMFR2_EL1, IESB, IMP),
++	MAX_FEAT(ID_AA64MMFR2_EL1, VARange, 52),
++	MAX_FEAT_ENUM(ID_AA64MMFR2_EL1, ST, 48_47),
+ 	MAX_FEAT(ID_AA64MMFR2_EL1, AT, IMP),
+ 	MAX_FEAT(ID_AA64MMFR2_EL1, IDS, IMP),
+ 	MAX_FEAT(ID_AA64MMFR2_EL1, TTL, IMP),
 -- 
 2.47.3
 
