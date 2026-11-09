@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.38
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794214196;
-	b=PT6Awox49mRoc6rFKdiCLtqow8VoeAFUucy66HCb3yjtSB0sAbBdKiWiBydgggKmkMAk
-	 PPD87vV1R0bng3WNK+rOfv4YtTRHvVjifT1iiCTxGAUNDGhMbT93f/G5uP56tO9z6+ugS
-	 FeJf7B0o7mK8uyvGRqMxLg42QGLd10Z3r28PKKQH8LBmYSkVND7fmIgxu8ycG9D/Aayes
-	 Jdd+U2iBtYfylq2Cf4sN7Yw6XUf/DZKsk7XgX2Fi2OYgRuPUJh4Emda0XCpFpxcxZMHwi
-	 pudiUfYcIPtwDK62AtoD7VIT8H2SxCc4NTMpJcKdhmqVXRoSI8ijRSTl8BkzmwmgSrA==
+	t=1794214197;
+	b=3QsV+yo4k8/jqOQ77iCyTLVxh/W9vRUvItrSGwD5h/6ITtPfnLvnRlxznIDlECXlsfvQ
+	 UqvYrJMmRCzOJFCyJSS0HnhYyV8LzGWzgS90ktFGs1DygcdmgRMRFwLPVmJFvvGu6lsd7
+	 ViqM9NZ/akrKwqz8GMM7Z2m02LcOyxAtuK62xQuLhIm44YFc/03j2oHiMGYENRBbnGoPR
+	 3B/llMTVTlbDNvngOf5eiGjt+9+Y2rfLT8yDIvK7k/2+tLj/ommSkpbU0ouoJse29hl8i
+	 Ysyh6L4k0LaGyO5Yj/HoMw/hTYH9VwZZc07ASDMY0TwpkZnTLvWR2TGfQ1ZieeVn9MA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794214196;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794214197;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=/IWC4Ezrv13mnRLgYAS+OGpQRhiZxP+CWXUuP5MxY5k=;
-	b=0O1vky3aHPGmr1preP9qWQKFyDHjtq9uPdgZNyrYd/qY7gg+6IsLufUjzBDCmcK2KPe1
-	 4Uy46vvGZ1MiJXbKsFUd0cuQFlKBb7IZatYRDmSZILPGj/aJ6Wg013iJFzMfHFaa/MgVE
-	 xhsZaKwCvDJTXlzUs8oC8Xf/ImTADwDZnLwYmcem2r18mzIkeTgHpOhB6fqQMENEHLPXN
-	 qfGe3EYjt9+b8DEWXi0naZ5eNS37LMv8C5mQPqSCSbglf/v6kbeauI5S3ztGlXscN9WnY
-	 dm8ngWTmAreZh/fBcmsNv5wQgWnnRDioUxSfoz8pl9Go6JqzL/fGmz1aVTqBfMXBsNw==
+	bh=U2XBWSBfcfQCqve1wrsykzKjay5QUHR6JzVkYSHce1U=;
+	b=K4wsOQcDrqh25+HjBR1WUcxRO5GB4usGIMG84swPFmzklt+FgBF/0502M7NhkWPj/MOk
+	 p1zFJgOmbeteELpmtdSvNv1eKutWnBCyjH7Llb0hTBzQXzOcIAJ6LhKI3oGppF10Ge0yG
+	 qcrby8OzelG5078Sz72bQv2du+byYe6MDU2j0H1KHg3OuUSXMnmvfD6TYtXE8C6qIbwOC
+	 2PGVrfY6uy/scnnbTqK4yVhxpplwhlUiA5Q1xRnAnYFqTXepXFTHn0u8PSTsZ9oFiNvD0
+	 RbpvBDZftgzP3/DAGa4we+wLQeElHFi+LLn103XBcTFeTeVqwXBDsNLpTwB5QTXyEXQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=p2blvFPa;
-	arc=none smtp.remote-ip=95.215.58.38
-Received: from mta1.migadu.com (out-38.mta1.migadu.com [95.215.58.38])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="rs8ZZ/2Y";
+	arc=none smtp.remote-ip=95.215.58.49
+Received: from mta1.migadu.com (out-49.mta1.migadu.com [95.215.58.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF105606EEB5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F36608362A
 	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 08:49:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BF105606EEB5
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E1F36608362A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=p2blvFPa
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=rs8ZZ/2Y
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=skF3Q2kCAVK6QTvon75TdZ0hQ5efPIx2rz2Mq7wxPjQ=;
+DKIM-Signature: a=rsa-sha256; bh=p3Len8xL7Q9ENP4Ztv32/RbG11wP2iP1K8oXCC/ZeVA=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794214193; v=1; x=1794818993;
- b=p2blvFPas2dHVup8gOoWIvdycqKygalVMSGl9x3nfg60jvl38GtLQo+TqjklTn8BDJgnJuIq
- 3V0a3/4tRARL3wVhhaBETVeTWZqJ1siU7d0WtIsi8hmOqg5H2wS+rt+3PrpTSkdn1uBAXJHP6vt
- wyjFqHmZPjn9d4s/T6YKLzXA=
+ t=1794214194; v=1; x=1794818994;
+ b=rs8ZZ/2Y2aQw3Ulb9IQ9MKan7q+A+77pB/hj9cOBdr75eX1AOQjGLOvfzYU8xLEizUkxZBrc
+ Hg7yGDfeLMaeveOBP2aMZyli+jJ8WSRPxTi7ugf7hYFNwuEMStYCd8lnLkfW8PH9Im9/sJn0Ol9
+ aCBjBDihCYgnJRLNL7EsPWto=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 3788735acdf328b4;
+Received: by smtp.migadu.com with ESMTPS id 410a3ad52a9fa7ba;
 	Mon, 09 Nov 2026 08:49:53 +0000
-X-Mizu-Trace-ID: 3788735acdf328b4
+X-Mizu-Trace-ID: 410a3ad52a9fa7ba
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -68,9 +68,9 @@ Cc: Will Deacon <will@kernel.org>,
 	kvm@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 15/19] KVM: arm64: selftests: Add pkvm_isolation host-access test
-Date: Mon,  9 Nov 2026 08:48:50 +0000
-Message-ID: <20261109084854.840576-16-fuad.tabba@linux.dev>
+Subject: [PATCH v2 16/19] KVM: arm64: selftests: Add pkvm_lifecycle teardown test
+Date: Mon,  9 Nov 2026 08:48:51 +0000
+Message-ID: <20261109084854.840576-17-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261109084854.840576-1-fuad.tabba@linux.dev>
 References: <20261109084854.840576-1-fuad.tabba@linux.dev>
@@ -85,263 +85,148 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The host keeps its userspace mapping of a protected guest's memory, but
-can't reach the data through it. The host kernel's copy_to_user() and
-copy_from_user() on that mapping fail. If the host kernel pins a page
-and accesses it through its own mapping, as process_vm_readv() does,
-EL2 zeroes and reclaims the page, and the guest loses it.
+Each protected VM holds an entry in EL2's table of KVM_MAX_PVMS (255)
+VMs until teardown has reclaimed its pages, so if teardown leaks
+entries, KVM_CREATE_VM eventually fails.
 
-Test each of these, that MADV_DONTNEED and munmap() leave the guest's
-pages pinned and accounted, and that a normal VM's fault on them fails.
+Create, run and free twice that many VMs, four alive at once and freed
+in random order. Check that each VM's memory survives the others'
+teardown, and that freeing a VM drops the process's locked memory by
+what its runs added.
 
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/arm64/pkvm_isolation.c      | 225 ++++++++++++++++++
- 2 files changed, 226 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/pkvm_isolation.c
+ .../selftests/kvm/arm64/pkvm_lifecycle.c      | 110 ++++++++++++++++++
+ 2 files changed, 111 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/arm64/pkvm_lifecycle.c
 
 diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 13998964facd5..68bdd01f62270 100644
+index 68bdd01f62270..214f38e3f67a7 100644
 --- a/tools/testing/selftests/kvm/Makefile.kvm
 +++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -193,6 +193,7 @@ TEST_GEN_PROGS_arm64 += arm64/page_fault_test
- TEST_GEN_PROGS_arm64 += arm64/pkvm_host_abi
+@@ -194,6 +194,7 @@ TEST_GEN_PROGS_arm64 += arm64/pkvm_host_abi
  TEST_GEN_PROGS_arm64 += arm64/pkvm_id_regs
  TEST_GEN_PROGS_arm64 += arm64/pkvm_irq
-+TEST_GEN_PROGS_arm64 += arm64/pkvm_isolation
+ TEST_GEN_PROGS_arm64 += arm64/pkvm_isolation
++TEST_GEN_PROGS_arm64 += arm64/pkvm_lifecycle
  TEST_GEN_PROGS_arm64 += arm64/pkvm_mem_share
  TEST_GEN_PROGS_arm64 += arm64/pkvm_psci
  TEST_GEN_PROGS_arm64 += arm64/pkvm_smccc
-diff --git a/tools/testing/selftests/kvm/arm64/pkvm_isolation.c b/tools/testing/selftests/kvm/arm64/pkvm_isolation.c
+diff --git a/tools/testing/selftests/kvm/arm64/pkvm_lifecycle.c b/tools/testing/selftests/kvm/arm64/pkvm_lifecycle.c
 new file mode 100644
-index 0000000000000..f083d0434238a
+index 0000000000000..0ee475799abc5
 --- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/pkvm_isolation.c
-@@ -0,0 +1,225 @@
++++ b/tools/testing/selftests/kvm/arm64/pkvm_lifecycle.c
+@@ -0,0 +1,110 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * pkvm_isolation - what the host can and can't do with a protected VM's memory.
++ * pkvm_lifecycle - more protected VMs than EL2's VM table holds, freed out of order.
 + *
 + * Copyright (C) 2026 Google LLC
 + * Author: Fuad Tabba <fuad.tabba@linux.dev>
 + */
 +
-+#include <errno.h>
-+#include <sys/mman.h>
-+#include <sys/uio.h>
-+#include <unistd.h>
++#include <stdlib.h>
 +
 +#include "kvm_util.h"
 +#include "pkvm.h"
 +#include "processor.h"
 +#include "test_util.h"
 +
-+#define DATA_MEMSLOT	(PKVM_IDMAP_MEMSLOT + 1)
-+#define DATA_GPA	BIT_ULL(30)
-+#define DATA_PAGES	16
-+#define DATA_SIZE	((size_t)DATA_PAGES * MIN_PAGE_SIZE)
++/* EL2's VM table has KVM_MAX_PVMS entries, and a VM holds one until it's freed. */
++#define VM_TABLE_SIZE	255
++/* Enough that leaking the entry of one VM in two fills the table. */
++#define NR_VMS		(2 * VM_TABLE_SIZE)
++#define NR_ALIVE	4
 +
-+#define GUEST_VAL	0x0badf00ddeadbeefUL
-+#define HOST_VAL	0x0123456789abcdefUL
++struct pvm {
++	struct kvm_vm *vm;
++	struct kvm_vcpu *vcpu;
++	u64 tag;
++	size_t locked;
++};
 +
-+static volatile u64 *page_va(int idx)
-+{
-+	return (volatile u64 *)(DATA_GPA + (u64)idx * MIN_PAGE_SIZE);
-+}
++/* Set in the guest's copy by the host before the first run. */
++static u64 tag;
 +
-+/* The host acts on the guest's memory at the sync, then the guest checks it. */
 +static void guest_code(void)
 +{
-+	int i;
-+
 +	pkvm_guest_init();
-+
-+	for (i = 0; i < DATA_PAGES; i++)
-+		*page_va(i) = GUEST_VAL + i;
-+
-+	GUEST_SYNC(0);
-+
-+	for (i = 0; i < DATA_PAGES; i++)
-+		GUEST_ASSERT_EQ(*page_va(i), GUEST_VAL + i);
-+
-+	GUEST_DONE();
++	for (;;)
++		GUEST_SYNC(READ_ONCE(tag));
 +}
 +
-+static void guest_np_read(void)
-+{
-+	*page_va(0);
-+	GUEST_DONE();
-+}
-+
-+/* The host kernel's copy to or from private memory faults, and the uaccess fixup fails it. */
-+static void host_write_from_private(void *hva)
-+{
-+	ssize_t ret;
-+	int fds[2];
-+
-+	TEST_ASSERT(!pipe(fds), "pipe: errno %d", errno);
-+
-+	ret = write(fds[1], hva, MIN_PAGE_SIZE);
-+	TEST_ASSERT(ret == -1 && errno == EFAULT,
-+		    "write() from private memory: rc %zd errno %d", ret, errno);
-+
-+	close(fds[0]);
-+	close(fds[1]);
-+}
-+
-+static void host_read_into_private(void *hva)
-+{
-+	u64 val = HOST_VAL;
-+	ssize_t ret;
-+	int fds[2];
-+
-+	TEST_ASSERT(!pipe(fds), "pipe: errno %d", errno);
-+	TEST_ASSERT_EQ(write(fds[1], &val, sizeof(val)), sizeof(val));
-+
-+	ret = read(fds[0], hva, sizeof(val));
-+	TEST_ASSERT(ret == -1 && errno == EFAULT,
-+		    "read() into private memory: rc %zd errno %d", ret, errno);
-+
-+	close(fds[0]);
-+	close(fds[1]);
-+}
-+
-+/* The host's long-term pins keep the guest's pages and their locked-memory accounting. */
-+static void host_dontneed(void *hva)
++/* The tag comes from the guest's own memory, so the VM must survive the others' teardown. */
++static void run_vm(struct pvm *p)
 +{
 +	size_t locked = pkvm_host_locked_vm();
-+
-+	kvm_madvise(hva, DATA_SIZE, MADV_DONTNEED);
-+	TEST_ASSERT_EQ(pkvm_host_locked_vm(), locked);
-+
-+	/* The host's mapping now has a new page, which the guest doesn't see. */
-+	TEST_ASSERT_EQ(*(u64 *)hva, 0);
-+	*(u64 *)hva = HOST_VAL;
-+}
-+
-+static void host_munmap(void *hva)
-+{
-+	size_t locked = pkvm_host_locked_vm();
-+
-+	kvm_munmap(hva, DATA_SIZE);
-+	TEST_ASSERT_EQ(pkvm_host_locked_vm(), locked);
-+}
-+
-+/* A normal VM's fault on private memory fails, and the protected guest keeps its data. */
-+static void host_np_vm_on_private(void *hva)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	int ret;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_np_read);
-+	vm_set_user_memory_region(vm, DATA_MEMSLOT, 0, DATA_GPA, getpagesize(), hva);
-+	virt_map(vm, DATA_GPA, DATA_GPA, 1);
-+
-+	ret = _vcpu_run(vcpu);
-+	TEST_ASSERT(ret == -1 && errno == EPERM,
-+		    "normal VM's fault on private memory: rc %d errno %d", ret, errno);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static void (*host_action)(void *hva);
-+
-+static void on_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
-+{
-+	host_action(addr_gpa2hva(vcpu->vm, DATA_GPA));
-+}
-+
-+static struct kvm_vm *vm_create_with_data(struct kvm_vcpu **vcpu)
-+{
-+	struct kvm_vm *vm = pkvm_vm_create_with_one_vcpu(vcpu, guest_code);
-+
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, DATA_GPA, DATA_MEMSLOT,
-+				    DATA_PAGES, 0);
-+	virt_map(vm, DATA_GPA, DATA_GPA, DATA_PAGES);
-+	return vm;
-+}
-+
-+static void test_host_access(void (*action)(void *hva), const char *name)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = vm_create_with_data(&vcpu);
-+
-+	host_action = action;
-+	pkvm_run_loop(vcpu, on_sync);
-+
-+	kvm_vm_free(vm);
-+	TEST_ASSERT_EQ(pkvm_host_locked_vm(), 0);
-+
-+	ksft_test_result_pass("%s\n", name);
-+}
-+
-+/*
-+ * The host never reads the guest's data: a kernel copy from private memory
-+ * reads zeros, and the guest's next access to the page fails.
-+ */
-+static void test_process_vm_readv(void)
-+{
-+	u64 buf[2] = { HOST_VAL, HOST_VAL };
-+	struct iovec local = { .iov_base = buf, .iov_len = sizeof(buf) };
-+	struct kvm_vcpu *vcpu;
-+	struct iovec remote;
-+	struct kvm_vm *vm;
 +	struct ucall uc;
-+	ssize_t ret;
-+	int i;
++	u64 cmd;
 +
-+	vm = vm_create_with_data(&vcpu);
-+	vcpu_run(vcpu);
-+	TEST_ASSERT_EQ(get_ucall(vcpu, &uc), UCALL_SYNC);
++	vcpu_run(p->vcpu);
 +
-+	remote = (struct iovec){ .iov_base = addr_gpa2hva(vm, DATA_GPA), .iov_len = sizeof(buf) };
-+	ret = process_vm_readv(getpid(), &local, 1, &remote, 1, 0);
-+	TEST_ASSERT_EQ(ret, sizeof(buf));
-+	for (i = 0; i < ARRAY_SIZE(buf); i++)
-+		TEST_ASSERT(!buf[i], "process_vm_readv() of private memory read 0x%lx", buf[i]);
++	switch (cmd = get_ucall(p->vcpu, &uc)) {
++	case UCALL_SYNC:
++		break;
++	case UCALL_ABORT:
++		REPORT_GUEST_ASSERT(uc);
++		break;
++	default:
++		TEST_FAIL("Unexpected guest exit: ucall %lu", cmd);
++	}
++	TEST_ASSERT_EQ(uc.args[1], p->tag);
 +
-+	/* The guest's next access is its read of that page. */
-+	ret = _vcpu_run(vcpu);
-+	TEST_ASSERT(ret == -1 && errno == EFAULT,
-+		    "guest access after process_vm_readv(): rc %zd errno %d", ret, errno);
-+
-+	kvm_vm_free(vm);
-+	TEST_ASSERT_EQ(pkvm_host_locked_vm(), 0);
-+
-+	ksft_test_result_pass("process_vm_readv() of private memory reads no guest data\n");
++	p->locked += pkvm_host_locked_vm() - locked;
 +}
 +
-+static const struct {
-+	void (*action)(void *hva);
-+	const char *name;
-+} host_accesses[] = {
-+	{ host_write_from_private, "write() from private memory fails with EFAULT" },
-+	{ host_read_into_private, "read() into private memory fails with EFAULT" },
-+	{ host_dontneed, "MADV_DONTNEED of private memory leaves the guest's data" },
-+	{ host_munmap, "munmap() of private memory leaves the guest's data" },
-+};
++static void create_vm(struct pvm *p, u64 tag_val)
++{
++	p->vm = pkvm_vm_create_with_one_vcpu(&p->vcpu, guest_code);
++	p->tag = tag_val;
++	p->locked = 0;
++	write_guest_global(p->vm, tag, tag_val);
++
++	run_vm(p);
++	TEST_ASSERT(p->locked, "VM %lu pinned no memory", tag_val);
++}
++
++static void free_vm(struct pvm *p)
++{
++	size_t locked = pkvm_host_locked_vm();
++
++	kvm_vm_free(p->vm);
++	TEST_ASSERT_EQ(locked - pkvm_host_locked_vm(), p->locked);
++}
 +
 +int main(void)
 +{
-+	const char *np_vm = "a normal VM's fault on private memory fails with EPERM";
-+	int i;
++	struct pvm vms[NR_ALIVE];
++	int i, j;
 +
 +	TEST_REQUIRE(pkvm_supported());
 +
 +	ksft_print_header();
-+	ksft_set_plan(ARRAY_SIZE(host_accesses) + 2);
++	ksft_set_plan(1);
 +
-+	for (i = 0; i < ARRAY_SIZE(host_accesses); i++)
-+		test_host_access(host_accesses[i].action, host_accesses[i].name);
++	for (i = 0; i < NR_ALIVE; i++)
++		create_vm(&vms[i], i + 1);
 +
-+	test_process_vm_readv();
++	for (; i < NR_VMS; i++) {
++		struct pvm *victim = &vms[random() % NR_ALIVE];
 +
-+	test_host_access(host_np_vm_on_private, np_vm);
++		for (j = 0; j < NR_ALIVE; j++)
++			run_vm(&vms[j]);
 +
++		free_vm(victim);
++		create_vm(victim, i + 1);
++	}
++
++	for (j = 0; j < NR_ALIVE; j++)
++		free_vm(&vms[j]);
++
++	ksft_test_result_pass("%d VMs, %d alive at once, freed in random order\n",
++			      NR_VMS, NR_ALIVE);
 +	ksft_finished();
 +}
 -- 
