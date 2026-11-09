@@ -1,64 +1,62 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794246909;
-	b=RvQtX2qAItgh9Uds5suZf0vOOn/hNG4IPPX8r+t1VJNvIpnEoxvUgjioYyYQk3sWEBPZ
-	 nhZZPFN1hlU3I/CqdArTKmQ0TG5yHwwAwyuizx1fOGkjr31wREzfRC5IhFKBM7Ith144y
-	 tkJoEsXXg4NDpl3BJt52Y6MIPehdmUoc1tF6PqH0jxybaT8r0i6eq+Qf/0W+RKGZYSNn3
-	 JHhIgsUUPUI/MdO7vyX4bFEkHw6aQniMLklLWx5ZRXaPUo5RtTv/DiuVuaXVLrJzDVIyI
-	 m2hIriam9qhBwtR9mgXSKC9Mu7IZ4fc3hmOHazFGPZhjlH6t8QY/0N9Yo7D/Gu6dwgw==
+	t=1794247643;
+	b=mPgxfAUUQ0UDzcUTNlSeG1V8KoVPLCQLs1SHdpBjaV7eqcDzlA9pdQLaggJVnEzL39ty
+	 B/yqrCpPQ7HtHgy/LjW3FHF4hgtj7wYtYG38ReQOokqOoP3wR/SCvrUOGvik3EemTKaSt
+	 aPRn7E5DTuzZld382ftsfm/sVPASSFj9adAe+LVxXxtHrphOwpmgCbDq3CGo8TjZStrKy
+	 b48JyCMcb0o7SswuLwImmlJzlPdojXYudbmKbtaWa7shaQNjCthW07bs1c5i+lLGR9Cte
+	 mXBhjSnXzJUdPnQX8KkTVTeHuVGHsWvrSorVNwVEeZ1RD8wLrAg7bqiSWNJJy5+TR5g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794246909;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794247643;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
-	bh=11RwpAZYJzurasS+fKAO94FekstS9vjJMnTCvuVMOaQ=;
-	b=BWUEGwSnYIZY2yQ3DX2kbsHnzszVkUmylVxOAjRMdQzE1uJZkWSc97dbVrc2axlt7UqQ
-	 gQDOcn3n38P/zkBrU6drk9WyeQxUbyF92HSZJzlVDoMwjppJVHMkovVhuUOQEENL7If+0
-	 hRcmm+VP1vyufMH0WMO6zGBq4eV4yiqaUlkypp4/FgB7yYVy7d6asvboml9LVwCY2vO00
-	 t+vzPQRfvn4pIUTkd++2QjVm1kki7bw8cIkjDTllUUVugnkAnna85LkB9QBW6LzftOiFk
-	 rHtzAJ8m7tHZb59zIpsRWHS/hKEhwMzVwzjwp3ZT9ici6Lc+s/tCPBrVcYbL3Fm+5Yw==
+	bh=9SX+jH/mGjt4SuPHBiqFjWciDYJaR9hX+EeARBcc/oU=;
+	b=i6ulLB15XiZdPczjHvKystO4Qh9eXof0AFfBfvF5Up1incCnsl4wNus7ARESOlWHvTlL
+	 oigQtOR+1HA96uqhW3iJNX3UPn49kOkxCDeaU6/yB9xj8Os9k8kh1Otu1O3I2kjQk01B6
+	 ImCbAWh8M9nmmVOcNbWs6aqlWShhkhv+E8U8Ks23t7md4ggyV+WJjTgTelm/5y/rsw1un
+	 gCTa3wB7RCKnT637DoEb8FPxiYRyaZFn0rmx+bLyTGieXEBmVV8MI6zakP3pkojhIhFjZ
+	 Enibk1FlmxExSQyMtG53j6C3qsOMnAjZdHvKQEHfYIv/wt5yygRqbh1QHseXnnPjKDQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=qdxtKsot;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=qP+j2+Ou;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A954B606A31C
-	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 17:55:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A954B606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65EEC606A32A;
+	Mon,  9 Nov 2026 18:07:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 65EEC606A32A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=qdxtKsot
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=qP+j2+Ou
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C8CC31476;
-	Mon,  9 Nov 2026 09:55:04 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A57AC1476;
+	Mon,  9 Nov 2026 10:07:18 -0800 (PST)
 Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 41C663F673;
-	Mon,  9 Nov 2026 09:55:06 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5F0173F85F;
+	Mon,  9 Nov 2026 10:07:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794246907; bh=0GMmn7UJMXQFZPaeSU5PYk8MQyWUFZy+AlN4LNHq+jw=;
+	t=1794247641; bh=sg6g4W54QBZxZYKEgqRqF44StZN9salD9l+AhfoCf24=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qdxtKsotnhIrOLdovee5Ji0hbo8gTPSG3VUG7ZR7x4hOfPC0eDkaSo0SZ/aaJ2UMI
-	 AIZoaju5IUHl3hqCKYqfTbqW2f1kCdDJwJWur3HrydFJtTX0xKhCNVCqnma0RbLcNE
-	 TlQ1ms62j/RmiJw8PWSRE5qPnd97wmji+pyr75d0=
+	b=qP+j2+OuqLKE4Lm1XPuvDQfifQzUJQrjIkKWp7O+3YIWfTLRRKALZBcqMBJBQ4pVj
+	 UnRfSf2OfKmjhmX5moUFLtpmbRdwBu9Jh1YNNCvkMCNM20pc19zX+JUhymaFR6y48Q
+	 ODg7QF+BE2r+iUQBNRqwepfxrL0MrxFWU9EBIJ9Y=
 From: Leonardo Bras <leo.bras@arm.com>
-To: Oliver Upton <oupton@kernel.org>
+To: Tian Zheng <zhengtian10@huawei.com>
 Cc: Leonardo Bras <leo.bras@arm.com>,
+	sashiko-reviews@lists.linux.dev,
 	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
 	Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>
-Subject: Re: [PATCH 6/8] KVM: arm64: Add sys_reg_descs for remaining MTE CMO instructions
-Date: Mon,  9 Nov 2026 17:55:03 +0000
-Message-ID: <avII94Pr7Cm0UPvF@LeoBrasDK>
+	Oliver Upton <oupton@kernel.org>,
+	liuyonglong <liuyonglong@huawei.com>
+Subject: Re: [PATCH v5 11/15] KVM: arm64: Reserve dirty ring space for the HDBSS buffer
+Date: Mon,  9 Nov 2026 18:07:17 +0000
+Message-ID: <avIL1UFsFmQFXwew@LeoBrasDK>
 X-Mailer: git-send-email 2.56.0
-In-Reply-To: <avIHZW07QmWnl4m9@kernel.org>
-References: <20261104192124.3932743-1-oupton@kernel.org> <20261104192124.3932743-7-oupton@kernel.org> <avICtPQtRH108ILM@LeoBrasDK> <avIHZW07QmWnl4m9@kernel.org>
+In-Reply-To: <494abfd0-b19b-4ef3-a035-d21626828a6a@huawei.com>
+References: <20260929103655.85107-1-zhengtian10@huawei.com> <20260929103655.85107-12-zhengtian10@huawei.com> <20260929110035.71FB41F000FF@smtp.kernel.org> <494abfd0-b19b-4ef3-a035-d21626828a6a@huawei.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -72,42 +70,101 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 09, 2026 at 09:48:21AM -0800, Oliver Upton wrote:
-> On Mon, Nov 09, 2026 at 05:28:20PM +0000, Leonardo Bras wrote:
-> > On Wed, Nov 04, 2026 at 11:21:22AM -0800, Oliver Upton wrote:
-> > > Filtering unsupported cache maintenance instructions from a guest relies
-> > > on either having a suitable FGU bit for the feature or a descriptor with
-> > > a visibility() hook.
-> > > 
-> > > MTE CMO instructions can be trapped by HCR_EL2.TPCP and lack a suitable
-> > > FGU. Add descriptors for the CMO instructions that UNDEF if MTE isn't
-> > > implemented for the VM.
-> > > 
+On Mon, Nov 09, 2026 at 06:03:03PM +0800, Tian Zheng wrote:
+> 
+> 
+> On 9/29/2026 7:00 PM, sashiko-bot@kernel.org wrote:
+> > Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> > - [High] arm64: kvm: UAPI breakage for dirty ring size on 64KB page systems
+> > --
 > > 
-> > I think I get the idea of using MTE_CMO_INSN(): having the visibility test 
-> > for MTE defined in the previous patch, which makes sense with the above 
-> > commit message: if !mte -> hidden, then on access it injects undefined.
+> > commit 38dde0ab2f10c37402c620c7b1328624808205ad
+> > Author: Tian Zheng <zhengtian10@huawei.com>
 > > 
-> > Please help me understand the other way: if we have mte, then it calls the 
-> > 'access' callback, which is bad_cmo_trap(), which also inject undefined. 
-> > What is the goal here?
+> > KVM: arm64: Reserve dirty ring space for the HDBSS buffer
+> > 
+> > This commit reserves space in the dirty ring for CPU-side dirty buffers by
+> > implementing kvm_cpu_dirty_log_size(). It also pins the HDBSS buffer size to
+> > PAGE_SIZE when the dirty ring is enabled.
+> > 
+> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > index 7bf82d65041c8..c1e09ba98d48a 100644
+> > > --- a/arch/arm64/kvm/mmu.c
+> > > +++ b/arch/arm64/kvm/mmu.c
+> > [ ... ]
+> > > @@ -2841,3 +2841,11 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
+> > >   	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
+> > >   }
+> > > +
+> > > +int kvm_cpu_dirty_log_size(struct kvm *kvm)
+> > > +{
+> > > +	if (!system_supports_hdbss())
+> > > +		return 0;
+> > > +
+> > > +	return kvm_hdbss_buffer_size(kvm) / sizeof(u64);
+> > > +}
+> > 
+> > [Severity: High]
+> > Does this calculation break the UAPI for standard dirty ring size requests on
+> > 64KB page systems?
+> > 
+> > Since KVM_ARM_HDBSS_DEFAULT_SIZE is tied to PAGE_SIZE, this calculation scales
+> > with the system page size. On a 64KB page system, kvm_hdbss_buffer_size() yields
+> > 65536 bytes, returning 8192 reserved entries (65536 / 8).
+> > 
+> > When a userspace process requests a standard dirty ring size of 65536 bytes
+> > (64KB) via KVM_ENABLE_CAP for KVM_CAP_DIRTY_LOG_RING, it seems the ioctl will
+> > now fail:
+> > 
+> > virt/kvm/kvm_main.c:kvm_vm_ioctl_enable_cap() {
+> >      ...
+> > 	if (size < kvm_dirty_ring_get_rsvd_entries(kvm) *
+> > 	    sizeof(struct kvm_dirty_gfn) || size < PAGE_SIZE)
+> > 		return -EINVAL;
+> >      ...
+> > }
+> > 
+> > Because (8192 + 64) * 16 = 132096 bytes is greater than the requested 65536
+> > bytes, the ioctl rejects previously valid userspace configurations with -EINVAL,
+> > which would cause QEMU and other VMMs to fail to start VMs.
+> > 
+> > Could this buffer size be decoupled from PAGE_SIZE to avoid the entry inflation
+> > and ABI breakage on 64KB page systems?
+> > 
 > 
-> This is consistent with how we handle other unexpected traps, such as
-> registers that redirect into the VNCR. If we take a trap for one of
-> these instructions then either we UNDEF it early in triage or redirect
-> the trap to the L1 hypervisor.
+> You were right, this is a real UAPI break on 64KB-page kernels. The
+> PAGE_SIZE default made the ring reservation scale with the kernel page
+> size, so a standard 64KB ring request got rejected there.
 > 
-> Under no circumstance do we expect to handle the trap locally, i.e.
-> reach the ->access() function.
+> Leo, the PAGE_SIZE default goes back to your suggestion in the v4
+> discussion at [1]:
 > 
-> Thanks,
-> Oliver
->  
+> > That means 512 entries in 4kB pagesize, an 8K entries in 64kB
+> pagesize.
+> 
+> > I mean, yes, maybe we could allocate a 64k page, and set SZ=4K in
+> HDBSSBR, but that would be a waste of memory, right?
+> 
+> If we keep PAGE_SIZE, the ring ABI stays broken on larger-page kernels,
+> since the reservation keeps scaling with the page size. With SZ_4K there
+> is still some breakage, the smallest ring sizes (4KB and 8KB), but that
+> is the smallest scope we can get, because 4KB is the smallest buffer the
+> hardware can encode. Defaulting to SZ_4K also brings our ring
+> requirements in line with x86, where PML reserves the same fixed 576
+> entries.
+> 
+> Do you think we should default to SZ_4K and accept the page waste you
+> pointed out, or keep PAGE_SIZE?
+> 
 
-Ah, I see your point there :)
+Maybe we should rethink the way of handling this, and maybe reserved 
+entries is not the way out. 
 
-FWIW:
-Reviewed-by: Leonardo Bras <leo.bras@arm.com>
+(It was for x86, but it's a very different architecture, as I mentioned 
+before)
+
+Another approach could be to those reserved pages to not be counted in the 
+ring size limit, but that could become really messy.
 
 Thanks!
 Leo
