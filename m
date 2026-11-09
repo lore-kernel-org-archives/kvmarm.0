@@ -1,99 +1,69 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794225719;
-	b=vN4vpEDB5hktLTF0ISILmo+uPlbmj0upKwIjDt1MG93WJsnOA7COUeFYQb019L0yHt2Z
-	 HFX6AdYUPMsYbLIt7dshxOwQy64fBd2DXiZLS1bhVOrMvORmOjN1HiGp5XwwVabWKDiTq
-	 5WSAieqd66Wsr8gvo7TGCh9cKQjODQVKCa8xuuBGR4cO6E3JFMqQHjE0wsI+mVOvQANlq
-	 zIDgrIugsVo1Whm8AZQ+/9UJcVkPwl3l7BscW69F2OiDKYsVOHeRSv+tfJ0A6iLzwP8Ri
-	 1VvRLBuTePc4Ggkcg+OiFjMKfzrRZkNvAwsDAv5jOxoLJt/jTsGoHxvb64s+ZnIYanQ==
+	t=1794227810;
+	b=eOBlFsvO36IkU0CBKBnH98O/x7uo9CLbIzxRsBrjEm58WMSNTrWTw2bgtRt1Z4OyBZkh
+	 cNv3XX7/M95u31tkHsoxlUE9G/7uHLq1I6oXAjmYzVBYijMLBi2j+Rqp4CodfwFyrB5Zx
+	 /oiVMMCIcVsXaeSXr8owCxSWfem92QzlFrFloTP3MycHmfZq7fJ0M7Q9CbKXowM2MzCdi
+	 5nAHfeWViqAmO62wMzhmsHA5JxUOEaSqUy/Vv0QGhlyF0rQMLIYtFTzD0+QKH9hVC6s16
+	 Yw48ou6zWaXAHhJ8ZJ2TGJyowdB0LVTrQbMCEkDm+T9mr7sfgDsS4jcFBTd9NLWecIw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794225719;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=szgQb0dY5ZnhzHxi0dDY7s5APqPVFKBR+bd+pkS5brY=;
-	b=oKMpbgh7MMYxs92rCRzIzWyjfDfbR5ttOxTDhCHPO7znwNOc7qI1rpKN4kZIl+NxVvEB
-	 IcrjdwiVvO3wlzEb7b16PjI7mMo/G15EPPea78aHLnUYk5F0NVTCnnnPy2mm0Lmqaqubh
-	 8hAl/Mf6/ELwEUvrFaZOmTrhTJuBOPdkYp32aFoI2new6KHfH7qmHDzCFxiClJvJ2A4tC
-	 QDWhirSXs8QBnHnGgeXzKXw9oxgHAnMi4ibjEPd/Fp0iMnsN8CIBIBs3KULkFsvfM60hx
-	 tq7yLQZR1Ghr34oO0VKsIrfXZyY7FjCSDC3S22xYg4tp+CbUM1hKm9TTy7mHCvK8YJQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794227810;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
+	bh=7ehu9uwlN6f/BG1RO8PBmrITOSCd6PjFswkCZHpoDnw=;
+	b=gh7TRUou6LZAxY4P9bBqELJxDOE3MRcGwCoaxMjtyOKe+betTnkI0AfsCEXH1tHnb4ZY
+	 P3akPef8csPRt1yclYM2eLD76IPFJd4v1U9cHTOe73rMD+naUWuoiWT1RlTE73/vzzsJ+
+	 hBsj41CAowWpMXCcsv8AirH9R30zmLMd77lC6TkD1EfUPFpeXwC92L3aIcX3N8qMDaRq3
+	 zCU3vCx+LVtedOxYAamfehcRf4uJieCoiZyduVbiYp3vWVKN1cnKArmxSUvPjPEV+hmYV
+	 EEjxIBs3GNLV68808C5Pt3JvNq0MZdbCLt+b+XzdqPuLXcX17+cb0k7oaoAWG9RuxSg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=BqRRyPiI;
-	arc=none smtp.remote-ip=209.85.128.41
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A08606A322
-	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 12:01:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 62A08606A322
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=uFt9q5Em;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18CD0606A323
+	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 12:36:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 18CD0606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=BqRRyPiI
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4a206f0b95bso32225e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 09 Nov 2026 04:01:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794225718; x=1794830518; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=szgQb0dY5ZnhzHxi0dDY7s5APqPVFKBR+bd+pkS5brY=;
-        b=BqRRyPiIWei3DcDNGeeqWshIPB8zgfm2M+/g33eQEK19oD1Pe80oQibQp7rmNnF6yQ
-         pygu5tf313rllBWZzOn259sxaIncw85GaviGyGvmMhg6o9Ss8Qr94IOLSvl5mcb/wmTl
-         bVjkOsgVhY0vbuyw2loCeZfDXch8vCLF2OHaev9KDndgngj1W7atAoIuYW2GPyQKhaZw
-         JBBfjcaLvyojsk+GqUf1X/oPNX5QPFxRSp6mbmoaVHhaLK5Bh73t/9W/uWLLMQJ+39KO
-         Erd6i7vhxrHdDJVz/Bax5lkiKin72q6UPrrJ3yZoezfweXgi2zViP0dNfKRXhk4JZEM0
-         Z3sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794225718; x=1794830518;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=szgQb0dY5ZnhzHxi0dDY7s5APqPVFKBR+bd+pkS5brY=;
-        b=lsuYKI3AmgAsggoCxM97P8EujKH9tSNWF1+//eNWfEhme489cuLrSTIWNlL2myAkfh
-         KVLYs147reTYYdmd82ggjNdlBPcy4PX4cFa8GXkdFmetQWR+RKTL25Ed+SHu53gfK3Ez
-         JtDziLDchu8OeYCbbubnPWFTKJ6MYTA7aRwyDuU621g6ySnHmPP8f7e1cDmFcHGsbc6g
-         jHA1uS1HfMTCULNkqn6rLyTnANoRHenzO3RBC/ZVwPWaKTVE4/8lrxr6NC2g7VJzJb46
-         pbHEVV04X3t1REdYjzzdMZox097y6ZC/arN2LzLgJNnz3Mcdj4NkGiBrd1eoiFNk33Cn
-         xcMQ==
-X-Forwarded-Encrypted: i=1; AL+hErER/9m8+mZSfEPeBxh8O2r2uFH1HJupuNTTHG80tceNXkMgGHf9w6+Dzx15zqZiixcfHC4DcN4=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9pomSbGVRLetvTVnx0FuraFdXK/RZnoIJZ/3QBaoorPegg/NmW
-	QwqERWPNlEgP6K2H3vf05iqC71CNU58jjRWm/RFMzbU9m8TZvRVKy7WjmBsKUj3RDA==
-X-Gm-Gg: AYBFou3a2OHNYwxNM+ZsDEsR2eibeguN9Wu2oPetuCnXduaWiM4dRkgzQjPrKkIxakD
-	AUI0UGALzs0UyvsE5HryxkCnjqfA1qaP44n1no/c3GUojN0GibTzankxXjLOy4m3XaHLY95sYG0
-	d+IpEhCY+eM1lfI+Evm3OSgWiXK/pprP/swGMzrvYWxi0cNPr7PtmmvVGGnl9ZbcfC8SXKStYaB
-	X8BQOwe1f0DWbiTLq3frBb0wo2BRQDAM1K3VO5vXFpkG+zExxQURqM2OY/wXO++W8cSMfRLLmjv
-	CRwogRhAfx99KhpbAEB0tGzVIS/PzCzE40FRcz6eOftfxRyCRt1aXA8odME5uHJYVqfxUgRHLYp
-	y9h2TG0j7BPUqfNOCDa7fXANN9ThbhhXoY1sieJMH+EtBRUmhNw1F5MeeQq8t15HHpiQRVQ9R9c
-	8ktXqwo2eMriyvhfmngqce/srqptSMzxBPyIQsQeZnXd265K2h5m9Ji8f7/hMP+3CiQdkPZKIex
-	T8gHdJKU1R5FZb/jZ9wbNhQbQ7hldrL9w+AGTmIuCvlo4PRhJeNQFA5fksjvlNKnxR8VvkDU0tA
-	IxcSGLo0k55FVbzi5dvqGjZ1mDFG+9zsju4j+SuLIVLRBQlPbjs/Mz3Y4TNgfDCVrEG2mQ==
-X-Received: by 2002:a05:600c:c055:b0:4a2:bd1:a80a with SMTP id 5b1f17b1804b1-4b811e398ffmr1476265e9.2.1794225717416;
-        Mon, 09 Nov 2026 04:01:57 -0800 (PST)
-Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4967003fefbsm5468334f8f.13.2026.11.09.04.01.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Nov 2026 04:01:55 -0800 (PST)
-Date: Mon, 9 Nov 2026 12:01:48 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Nicolin Chen <nicolinc@nvidia.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
-	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, joro@8bytes.org, jgg@ziepe.ca,
-	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
-	vdonnefort@google.com
-Subject: Re: [PATCH v9 17/25] iommu/arm-smmu-v3-kvm: Shadow stream table
-Message-ID: <avG2LCJVZIyhWQSG@google.com>
-References: <20261015200903.2735565-1-smostafa@google.com>
- <20261015200903.2735565-18-smostafa@google.com>
- <au4uTxliZFv12Bqn@nvidia.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=uFt9q5Em
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 217B11476;
+	Mon,  9 Nov 2026 04:36:46 -0800 (PST)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E073D3F632;
+	Mon,  9 Nov 2026 04:36:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1794227809; bh=UBP2ZQMotIV6KdGg51IlwlZyPK5SoCkTkNpFStNN7gk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=uFt9q5EmP8uuPALMSgfayO0dNqoORyBCQdhiZe3CK0taECNUwQhxIWqLhzLTBPWgM
+	 3jgBDN+oV0RLIwow4mH1pcauwWkxyN9pTumuGwFJQrHNgzFw2E3SNVtPux6ES3mZob
+	 02X8lK7uRyzbzi2r9wT5O5j+O+467vIwcDH+vhds=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RESEND v4 0/3] Optimize S2 hugepage splitting, introduce skip-level flags
+Date: Mon,  9 Nov 2026 12:36:41 +0000
+Message-ID: <avG-WdfUaCalKdZU@LeoBrasDK>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <86y0b528zu.wl-maz@kernel.org>
+References: <20261106161240.1345126-1-leo.bras@arm.com> <86y0b528zu.wl-maz@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -105,74 +75,28 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <au4uTxliZFv12Bqn@nvidia.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 06, 2026 at 11:45:19AM -0800, Nicolin Chen wrote:
-> On Thu, Oct 15, 2026 at 08:08:48PM +0000, Mostafa Saleh wrote:
-> > @@ -538,6 +655,7 @@ static bool smmu_dabt_device(struct hyp_arm_smmu_v3_device *smmu,
-> >  
-> >  		if (is_write) {
-> >  			bool last_cmdq_en = is_cmdq_enabled(smmu);
-> > +			bool last_smmu_en = is_smmu_enabled(smmu);
+On Fri, Nov 06, 2026 at 04:57:25PM +0000, Marc Zyngier wrote:
+> On Fri, 06 Nov 2026 16:12:35 +0000,
+> Leonardo Bras <leo.bras@arm.com> wrote:
+> > 
+> > 
+> > While playing with dirty-bit tracking, I decided to take a look on how page
+> > splitting works. Found out all entries are walked, even though we don't need
+> > to walk the level-3 entries, as they don't need to be split. 
 > 
-> It'd read better with smmu_was_enabled and smmu_is_enabled.
+> What's the point of this "RESEND"? Anything different from what you
+> sent on Sept 30th? Since it is still numbered v4, I assume nothing has
+> changed...
 > 
 
-Sure, will update them.
+Hi Marc, 
 
-> > diff --git a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.h b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.h
-> > index 3903ae358555..31ab7a0335a8 100644
-> > --- a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.h
-> > +++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3-hyp.h
-> > @@ -27,6 +27,12 @@
-> >   * @cmdq_host:		Host view of the CMDQ, only q_base, base_dma and llq used
-> >   * @cmdq_max_shift:	Max shift for the CMDQ probed from HW
-> >   * @cr0:		Last value of CR0
-> > + * @host_ste_cfg:	Host stream table config
-> > + * @host_ste_base:	Host stream table base
-> > + * @strtab_cfg:		Stream table config as seen by HW
-> > + * @strtab_dma:		Physical address of the shadow stream table
-> > + * @strtab_size:	Size of the shadow stream table
-> > + *
-> >   * @mmio_addr, @mmio_size and ARM_SMMU_FEAT_COHERENCY are filled by the host
-> >   * before de-privilege, the rest by the hypervisor driver.
-> >   */
-> > @@ -50,6 +56,11 @@ struct hyp_arm_smmu_v3_device {
-> >  	struct arm_smmu_queue	cmdq_host;
-> >  	u32			cmdq_max_shift;
-> >  	u32			cr0;
-> > +	dma_addr_t		strtab_dma;
-> > +	size_t			strtab_size;
-> > +	u64			host_ste_cfg;
-> > +	u64			host_ste_base;
-> > +	struct arm_smmu_strtab_cfg strtab_cfg;
-> 
-> The order is different here than the kdocs.
-> 
-> Also, it might be cleaner to group host/shadow/hw stuff separately:
-> 
-> struct hyp_arm_smmu_v3_device {
-> 	...
-> 	struct hyp_arm_smmu_v3_device_host host;
-> 	struct hyp_arm_smmu_v3_device_shadow shadow;
-> 	struct hyp_arm_smmu_v3_device_hw hw;
-> 	// Or
-> 	struct {
-> 		...
-> 	} shadow;
-> 	struct {
-> 		...
-> 	} host;
-> 	struct {
-> 		...
-> 	} hw;
-> 	...
-> };
+That's correct, nothing changed since the previous version.
+Since it got no feedback since Sept 30th, I decided to resend it in order 
+to maybe get some further reviewing.
 
-That looks better, thanks! I will try it in the next version.
+Thanks!
+Leo
 
-Thanks,
-Mostafa
-
-> 
-> Nicolin
