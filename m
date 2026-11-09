@@ -1,64 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794243845;
-	b=WalxYGoztyDK8AaqaI8aykz8j01BB5huBJUpicqBZYmCVQcyw+vtbW0pUNt5vs5W9r8U
-	 HzV0BP39KrPHG9Mf84DKPLgtmZMdax86yh8mjlN63PvmFw46gYnzffbmhaOST4FyKo8Tr
-	 5k+T//MjQDR95PO/cxwNTE4pselVum8p87rf0zivDHK1b/vS4FykWrxiI1G3DTCAYWBoQ
-	 bmMkJ5L+9bEkIIkjmaAJFFGoxe+5/iBcYrGdLddVMU+o5MjJlKjG+EETSAGUWFgHAkahP
-	 mKCHGtHTA2c+uETHkGnrpqNuFDwwAjSjyQCW76sXGKbDW5yBU5mX5eXZB5MK5eRQX+Q==
+	t=1794243882;
+	b=GCTO7d8YY3p302HSUpGjcNif076jNv9+8yCz3OKawzf01/Wv+k5sGFcXUPMdn4V4r/vS
+	 Ca0ZkA82+CR5V29iBjptiJ2amHDLQLMxEGiG7KbHELO2LyTE5xcukEL7YAj22JvnzB4TW
+	 WfkXW/SsgpJ0Mb3STjQL2RY3IRLn+Nl2QTJnk6VrFZtJeKR0/bWhzu4i95NqtMfAMfPN/
+	 4k6mWf7rfvaSd6REl1BMQj/p0/K13tFbfxLj92qam/Hdy4TNIXwR1gWRxCrxjfZg8Vh9J
+	 sfLKGuwMpSVzJECC7xp7RyupDk5eR/Wv+8ttAOwZcw6o07csUH0z503+EuxoluqMykg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794243845;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
-	bh=0EWvuGDjpdzfrT48VxmbWbJfJ7psCITFWwBtNzuBTDo=;
-	b=dhmfTdhRdMFqJ0GclwaYNxt6CAVZEP2WHDjq26zMMQ7v4bHqXjv5sZZvGLgWLAmLropn
-	 A1DUxij2cMa+B1rmYXJnrgOnRo7Q7zoqeg27nvALF3Vnhvm+Hf5DOhTz9YgDWzIZJl66v
-	 CVQdBp6IYWDBlqsDYFR2gpmfMLgB8ps4kfyrr6A9KOSA+f32sjQvq5vDGWhC1vtC5E75m
-	 yUptrKpbPQ7JKcBdmZ0EGUiQM3UCsWvGTRxlcTaWFzBaueXPHegOSe250lcL8QAJi/CGy
-	 nqabPiOxwu/IDXpkzguWFbQ2KhOMyIU63ljsscndtBXKhScTl6fW31MjcngqqRhA0rQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794243882;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=+odsCpg7jpRsaCQXSZZ4yxoA+q2K8SnFUpM1JNTaGdM=;
+	b=lIjAKru5SGVbLsfdFfaVYEtWd/BlZGLJ4dAtW/cQU6jbXfiKmfsSxqU8bnPB/6L554fu
+	 eTJ+iqSw+/hS19+DqgDuA6YQDtM6lrmEcrxexycuSQflma2uY/pleoNitT6plR825Zg2T
+	 C+co9r90BQXupSEdVcYC/jaYNlHMiJy/wFnWYXuHgrXdPXOl7yM/sYbwneiPC6GSL9JyG
+	 ecSt8zu5bM0WQQvFvfLbfDdBckx8Slm2eZOVQAy4TNtuZHAd4GaXvjHxO7w1tLB1OBo9v
+	 JuXQy4Bc66wYjl0k7Bl+cEXrkSPGO9DppmO/qF92cdP7rgDvHJ4UVqvdCdeNEQDqGfg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=hXzBIQVq;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 641CC606A31C
-	for <kvmarm@lists.linux.dev>; Mon,  9 Nov 2026 17:04:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 641CC606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FODMQ6HF;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAFC6606A339;
+	Mon,  9 Nov 2026 17:04:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=hXzBIQVq
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A03D1477;
-	Mon,  9 Nov 2026 09:03:59 -0800 (PST)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 013B03F632;
-	Mon,  9 Nov 2026 09:04:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794243842; bh=WkYL04xaYS7b8Z+q+VC+SEHKe0pWirqoeIlkkhpf1d4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hXzBIQVqh+iLTHEXQkeAPzr/lBlPBZHqm2tMqYhZxGxQsEQSj4Ke+SPiLh6CILfhO
-	 VESPblvkgDpkSkcyo9A53eUffklTwLq5saQdc3vQ3PNJlcf2HaWuD3qmdGrQl5HnEF
-	 dJREHMtW9rh9h4t2NZZAK08G5Zl9MTNzQ+0drcVs=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>
-Subject: Re: [PATCH 5/8] KVM: arm64: Use ->visibility() to filter MTE CMO instructions
-Date: Mon,  9 Nov 2026 17:03:58 +0000
-Message-ID: <avH8_i8njhPKjzue@LeoBrasDK>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261104192124.3932743-6-oupton@kernel.org>
-References: <20261104192124.3932743-1-oupton@kernel.org> <20261104192124.3932743-6-oupton@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FODMQ6HF
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62A7D1F008A1;
+	Mon,  9 Nov 2026 17:04:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794243881;
+	bh=+odsCpg7jpRsaCQXSZZ4yxoA+q2K8SnFUpM1JNTaGdM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=FODMQ6HFrJPYbAiPnyWZS0/BhpGp22hllkW0FNfkoaK5CcC043UUfohcKcPk1gp16
+	 +9rUSS5AA4O8P+dEykIPa8fswmqGJ0vYl2zVPKtNbC1dNy1YVwUbtIWWghnDLkPv4H
+	 pfEuNOOx7qWMEfr3GxEDV18r56z+KZxWptqV+Z2+Ei9UoN4dbxPH9IMVswH7Fcd9ST
+	 0kAiW09cm9cSKYdVE6hlg0yi5Uu18PRtwm/TOXAHJEMGfMP2/T5bBWkDZaG2hYpECf
+	 JMe7NL5gOG3nRzUWGmhVvmYoVpBL3PYjuULhStALMsZ/6RHe4Yfzy1/B7YEbUsb+YW
+	 e4jLSkMwebdeA==
+Date: Mon, 9 Nov 2026 09:04:40 -0800
+From: Oliver Upton <oupton@kernel.org>
+To: Jinqian Yang <yangjinqian1@huawei.com>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, maz@kernel.org, fuad.tabba@linux.dev,
+	yuzenghui@huawei.com, joey.gouly@arm.com, seiden@linux.ibm.com,
+	suzuki.poulose@arm.com, liuyonglong@huawei.com,
+	wangzhou1@hisilicon.com, prime.zeng@hisilicon.com,
+	tangchengchang@huawei.com, zhengtian10@huawei.com,
+	linuxarm@huawei.com, liujian222@huawei.com
+Subject: Re: [PATCH] KVM: arm64: Register irq_bypass consumers only with GICv4
+Message-ID: <avH9KJ99im5Z2wEb@kernel.org>
+References: <20261109112018.241298-1-yangjinqian1@huawei.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -70,95 +63,47 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20261109112018.241298-1-yangjinqian1@huawei.com>
 
-On Wed, Nov 04, 2026 at 11:21:21AM -0800, Oliver Upton wrote:
-> More descriptors for MTE CMO instructions are on the way; prepare by
-> using sys_reg_desc::visibility() to hide instructions when MTE isn't
-> implemented.
+Hi,
+
+On Mon, Nov 09, 2026 at 07:20:18PM +0800, Jinqian Yang wrote:
+> kvm_arch_has_irq_bypass() on arm64 returns true unconditionally, so
+> every irqfd assignment registers an irq_bypass consumer even when the
+> hardware cannot perform GICv4 direct MSI forwarding. In that case
+> kvm_vgic_v4_set_forwarding() bails out at its very first check, since
+> vgic_supports_direct_msis() is false without has_gicv4, and the
+> registration becomes pure overhead: every KVM_IRQFD ioctl takes the
+> global irq_bypass mutex, which becomes a contention point when many
+> VMs boot concurrently.
 > 
-> Signed-off-by: Oliver Upton <oupton@kernel.org>
+> Gate the registration on kvm_vgic_global_state.has_gicv4, the way x86
+> gates on enable_device_posted_irqs. Functionally this is a no-op:
+> without GICv4 the consumer registration never did anything beyond
+> acquiring the lock.  On a GICv3-only host booting 100 microVMs
+> concurrently this cuts the average boot time by ~5 ms, matching the
+> gain observed with CONFIG_HAVE_KVM_IRQ_BYPASS=n.
+> 
+> Signed-off-by: Jinqian Yang <yangjinqian1@huawei.com>
 > ---
->  arch/arm64/kvm/sys_regs.c | 30 +++++++++++++-----------------
->  1 file changed, 13 insertions(+), 17 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 0b21b454242c..b45635471344 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -556,17 +556,6 @@ static bool access_dcsw(struct kvm_vcpu *vcpu,
->  	return true;
->  }
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 97332ffcb130..785d57388032 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1744,7 +1744,7 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
 >  
-> -static bool access_dcgsw(struct kvm_vcpu *vcpu,
-> -			 struct sys_reg_params *p,
-> -			 const struct sys_reg_desc *r)
-> -{
-> -	if (!kvm_has_mte(vcpu->kvm))
-> -		return undef_access(vcpu, p, r);
-> -
-> -	/* Treat MTE S/W ops as we treat the classic ones: with contempt */
-> -	return access_dcsw(vcpu, p, r);
-> -}
-> -
->  static void get_access_mask(const struct sys_reg_desc *r, u64 *mask, u64 *shift)
+>  static inline bool kvm_arch_has_irq_bypass(void)
 >  {
->  	switch (r->aarch32_map) {
-> @@ -4306,10 +4295,17 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  		.access = (access_fn),					\
->  	}
->  
-> +#define MTE_CMO_INSN(insn, access_fn)					\
-> +	{								\
-> +		SYS_DESC(SYS_##insn),					\
-> +		.access	= (access_fn),					\
-> +		.visibility = mte_visibility,				\
-> +	}
-> +
->  static struct sys_reg_desc sys_insn_descs[] = {
->  	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
-> -	{ SYS_DESC(SYS_DC_IGSW), access_dcgsw },
-> -	{ SYS_DESC(SYS_DC_IGDSW), access_dcgsw },
-> +	MTE_CMO_INSN(DC_IGSW, access_dcsw),
-> +	MTE_CMO_INSN(DC_IGDSW, access_dcsw),
->  
->  	SYS_INSN(AT_S1E1R, handle_at_s1e01),
->  	SYS_INSN(AT_S1E1W, handle_at_s1e01),
-> @@ -4320,11 +4316,11 @@ static struct sys_reg_desc sys_insn_descs[] = {
->  	SYS_INSN(AT_S1E1A, handle_at_s1e01),
->  
->  	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
-> -	{ SYS_DESC(SYS_DC_CGSW), access_dcgsw },
-> -	{ SYS_DESC(SYS_DC_CGDSW), access_dcgsw },
-> +	MTE_CMO_INSN(DC_CGSW, access_dcsw),
-> +	MTE_CMO_INSN(DC_CGDSW, access_dcsw),
->  	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
-> -	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
-> -	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
-> +	MTE_CMO_INSN(DC_CIGSW, access_dcsw),
-> +	MTE_CMO_INSN(DC_CIGDSW, access_dcsw),
->  
->  	SYS_INSN(TLBI_VMALLE1OS, handle_tlbi_el1),
->  	SYS_INSN(TLBI_VAE1OS, handle_tlbi_el1),
-> -- 
-> 2.47.3
-> 
+> -	return true;
+> +	return kvm_vgic_global_state.has_gicv4;
+>  }
 
+This should just take a pointer on struct kvm then use
+vgic_supports_direct_msis() since having an initialized irqchip is a
+precondition of kvm_irqfd_assign().
 
-I understand the MTE_CMO_INSN to be just about making this sys_insn_descs[] 
-easier to read. I also noticed you changed access_dcgsw() to access_dcsw() 
-when you removed the function. 
-
-The difference between the 2 is that access_dcgsw() checks for MTE before 
-returning access_dcsw().
-
-Since you now added .visibility = mte_visibility, which just returns 
-REG_HIDDEN if !kvm_has_mte() it makes sense that access_dcgsw() became 
-unnecessary.
-
-
-FWIW:
-Reviewed-by: Leonardo Bras <leo.bras@arm.com>
-
-Thanks!
-Leo
+Thanks,
+Oliver
