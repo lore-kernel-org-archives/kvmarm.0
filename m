@@ -1,84 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.175
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.173
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794315405;
-	b=BiWoGQzbWVioDKG4n0zhqQKu0j+F3VA4VtKOUqR75e3DdJ0cLDooShvIlpG7CP0PNkOA
-	 l4660XnCTLZ0T6NbMT9e7Tzd+POPoF2uwY3U/hrnyG3thMP87cqxouYIJKhclU3NKWLON
-	 P345AW2PP4q/CJV0Av2c1ndhuhhuTZlm15z6tzfJf9+/ZkwWf+6ooiV6Ht9e+ob8Uc9Nd
-	 Z2BXBXC5eIbbTXguqEl+awSyEEJ+qL2FmPiYe+4m2n/sTOvMPcfh9wY8rrDdz96wg+0CV
-	 x0WPCJB20oRO48akTCU6jCFFDHWqwiCAwWnR5QKm1t5FqSmBqq9K+di8nrI9H9Wot8w==
+	t=1794316236;
+	b=VtsVnIDcpSlcD8aKpkj+hMhlTGdFStRsUjs5dxGXdpe6JPnNnQgPnZ6WmKOPrMyBWeNw
+	 KbajEzy3fkorJq1tstHPGUatSUcAco9HwUikPYUTV7qPS0x87/h0iTVAeuwVMnkSF+lzx
+	 nShbrclng6tsoDWfM01+uBgKsl38qtzsS11ALjRYG0Jb1ksiC6aZfcxDOuNWycWxpKYQz
+	 ffTMkKuNyDXtfCoaFPm485oPOQFznee9OuatcAhF3p2NpXVxOodcorigfVsmeRuETiK5T
+	 2pHstJc81dVvyerZTGR3+XZgjljshYQMgZGzmKK5iYpTQGdjdGkhEjQ2f9Xb3rDJYaw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794315405;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794316236;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Mime-Version:
-	 Content-Transfer-Encoding:Content-Type:Date:Message-Id:Cc:Subject:
-	 From:To:X-Mailer:References:In-Reply-To;
-	bh=K4NCnFvaGrDIOTRc5HujFwwUmTQ2N/bdVeWHbEi7j9U=;
-	b=ohpiswKyzEHoBZaorji3f+ljuzW8zS+tWM51B+4qDEJR0OvsyJ2cUCpARlwu4ZIgccb7
-	 bk0p8jBOkJkKVCTJVRtOguoJyPq5IGpeI43BxG6QltMwqflSsAsIXTJZHJHIV2yduEsgt
-	 lWQ5ujLwHPNHzUBj9xXOXTG4HHWAMPbWPn7lKivCMwjaT4NGdHv+6eZXMUwemKgiFZR+7
-	 lvhQDfUEr23HyCEgHRhwVv8P4FQbguGieaGIqjdbGggI90Cb3FVmRj/AoEjC/V/k1+cfH
-	 siin+Pkok3dUPIC7Uk5uhuy4XHfDW/cGDmUdX0SylfmHMilhpJD/m1nMnvTa6CZT0oQ==
+	 Content-Transfer-Encoding:Content-Type:Date:Message-Id:To:Cc:Subject:
+	 From:X-Mailer:References:In-Reply-To;
+	bh=XQDfTOBLyQYKItk/7IbkqTdv3CPMUC9LzGhAb3DHHto=;
+	b=WQUGkZ0k8UoohVlNw1/WPXIDu2K6yw891KEEkXCcxyJywafRUCSSgSdZnMjgGSn77JVr
+	 V+94tFHeKDAtdhDaEzUYEXRGnw67qqzUGgEoaPpe/+0WmRitU3dHM4OJVMyPEGLJO8YIF
+	 YyH7qLrXeQs2hmbAJjy1oiU+aEQys8lTzdaLtjwkjnZf9H4hncFPWBRPfs7haTd+fko5U
+	 DmEoh8trg4IpyWCZeLnarY46IwYV5VKn5jn0ojElubKiBBLhcWRQxYYBcT4czLyS1t3PX
+	 yH8QCKfvoZsYT2PNZXIK4jbNuDHDKRyrwtzYkhoL9mXribQFflWtSyTKpkISAETHLqg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=soleen.com;
 	spf=pass smtp.mailfrom=soleen.com;
-	dkim=pass header.d=soleen.com header.i=@soleen.com header.a=rsa-sha256 header.s=google header.b=Mr43be9E;
-	arc=none smtp.remote-ip=209.85.221.175
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+	dkim=pass header.d=soleen.com header.i=@soleen.com header.a=rsa-sha256 header.s=google header.b=iAhxMzaL;
+	arc=none smtp.remote-ip=209.85.221.173
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7073606D5D8
-	for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 12:56:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C7073606D5D8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C73F360A2622
+	for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 13:10:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C73F360A2622
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soleen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.a=rsa-sha256 header.s=google header.b=Mr43be9E
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-5ec690faf85so641849e0c.0
-        for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 04:56:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.a=rsa-sha256 header.s=google header.b=iAhxMzaL
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-5edf97136aaso975516e0c.2
+        for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 05:10:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=soleen.com; s=google; t=1794315404; x=1794920204; darn=lists.linux.dev;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
+        d=soleen.com; s=google; t=1794316235; x=1794921035; darn=lists.linux.dev;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
          :content-type:content-transfer-encoding:mime-version:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=K4NCnFvaGrDIOTRc5HujFwwUmTQ2N/bdVeWHbEi7j9U=;
-        b=Mr43be9EsfFtFsroD15Ke63LQ/yunxEMqGIcWHjVaQHMg8jIBYScQddNnd+JADjjuL
-         cDiZ5VfDLPicYN2UBAHAyb1z+ls/E6w3UGktBUMpe8+zICxd+DTCVIvRIGEPIMWqnJ+q
-         b56WHLHfc+E61flB7eCWtd0JzL4VNoibvzUhGMypIeZN2g+Qs8KWRMeiIiCcwS1xzpJ1
-         gx/3kiM5N8C/1s6PhEeldKWvmHWN3zGPm9hwducMFE+ZzKadh8bdd+O9UYzVRZfsC63f
-         GMrhKNUf4ErJRlom4u+WBhbJj2MnBl+d9BM3ubHlAIG/p4/ieyWloqXCfa6PCSpdyNd9
-         ZPww==
+        bh=XQDfTOBLyQYKItk/7IbkqTdv3CPMUC9LzGhAb3DHHto=;
+        b=iAhxMzaLpdEuybRJjziOORENwCKMDeoGq+H6/vivAEJZucvcsyDQsO6N5tlp9u/ObM
+         mlq/Vlv09FrZBhUv4VEhCQkAdcpYcgWsd/7MkDEMr+UIF5ynKhMSDdgSy0mr6Hx0zn0U
+         t2AAzDNp86/m7A4QC8xdj6IUbXg+SG5RsqXywD8O0apBNm2E8d5uwQBKRis8jvnan2/k
+         3hk52ANEtlaVS+U3qrkCmSb8rAtw/9wX3NV46c3hDeT3T0V5r2dyuPsbb2xl6NvVPhCY
+         prOXd/7Q7L1l7BWWj1Rf2ZWf1G/BZJnThB/Ha0vpN5fdLCZXzyW1sdLHkLL2L9kA7+xV
+         8pWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794315404; x=1794920204;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
+        d=1e100.net; s=20260707; t=1794316235; x=1794921035;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
          :content-type:content-transfer-encoding:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=K4NCnFvaGrDIOTRc5HujFwwUmTQ2N/bdVeWHbEi7j9U=;
-        b=JzrW3i9OQ1HdBQS/bjnVHS1OTHPZ5UJQtGYH1KOKjWqc9JYEaS1E32FaJW2qiG5JGF
-         T6ZWnm9sEYnbujDCHu5O2IRRudfuCvWtgznMUS/KyRhy/MKFnUc7fJkSxD6eRdfMZs8J
-         VJoFwm+iUS/gJc85DYcrsm46RBe+CqeSrJuyrBvoYkn+CSG4ZzamyN8As0YYIEpcsOx/
-         xFRmqMWZtRbOJCoWb2+a5RpyYDPdbfJPBK1bP3J8kU/CaU713OZWKcaQT2MdMag30P08
-         Y8XD44Y62TDFnrQ4gDeAk5xgg8iHLs9HWi6zwY3NTwh9POrY0BICdOFS0vInWo/pWqQQ
-         yRTw==
-X-Gm-Message-State: APuU4Z/9YLwXcwn01LayiI+Rogsi2EZp/uBsgaUgivSFwXYDquMgsSxE
-	+FL/R9mXVPk6R431GJTz1qCPI7LfT7HZdfUf/l0fxDmE/Pa1i7tTLqlobziPzIQ/RO0=
-X-Gm-Gg: AYBFou20BolUmkZrWR0WPdDH+EIPdcTJ0uI6aEbD7TTT2ZS9bfEV8ZAYf0yAbp9rsjR
-	P0rlBT/RdKVqO5frLXk3c2hXTC+2lyUWodkk3n4tvh+pMTFiS19oM2I9mYhBrxWHE49G1LHZoYh
-	DFf2Duxd/BxWBmqoVPaYA5njd4+HBYwhE7O1cW+pVDEYRBLiVWO8dGGS/qIollXMYOnPcqkd13h
-	nZ6u2TbRyR7l8i+Kk5G/G09dCFLOpfE/yUJSj2M3piL/TVA3Y9LM5kfUhnq3FUkrH/UdDxOyj0B
-	wy/iaIQB0yNniPh1wEmLIu+DAdmx6tolxnWcPGJwrjG7UvV4GTUQjCsWtCGvize4cAo5Kj2uyAB
-	hRfZDo2SI7Md87YXRcsU3usiZvIgRxCn4hyNyTLqsLoTrOidNWW5J2CYHsXKD0S1t5cnsN+6OI/
-	D64uhRedcE0OxDQrfWnSV9OExipc9zcgeKOaxbJLUimRLZ+adXTmLs+X71NTdu0JaH9+nrQsC94
-	lmnOtTNlW/4e2iBzWyhHuRcWIISVnStcfLxDT3SdODVUA/hdhtfN+QtSoM7NugRFr5YcAQCOO3Z
-	WGCWjHFYz3dA1Llo1t49Efhr/qZtO1UyKZb2bGjuwpSF3brBK22Ov7MDCkJIqcfpI4ZhjePzce8
-	+r1AAJy1SfDvYXHzqp9+k3cuN3Dt2xj0Luy7qzg4yfiyHDLl9Oufe
-X-Received: by 2002:a05:6122:3407:b0:5ec:3e18:a8da with SMTP id 71dfb90a1353d-5ee0d14a2e5mr823009e0c.17.1794315403552;
-        Tue, 10 Nov 2026 04:56:43 -0800 (PST)
+        bh=XQDfTOBLyQYKItk/7IbkqTdv3CPMUC9LzGhAb3DHHto=;
+        b=2v7bW3Z4Qb3DQAmDvDl3Zbv6CyaaBERmvAgF9gykiRn1tpM/z1uK82d/qaNjdVwNAi
+         w+dkoUo7+1sddbD8T/X3BceFhKF9R0NDxkgiG3iec/JGthEBlWj6/DR+KDUB4z4smPiF
+         0R45o4GGn6YC0VpsWWp+rSC+WVFqR5JVCj0dchWIL8o5FJV/XRbgUADPGGDXSBAxbrho
+         q7YrX3G0hwQNcCsO5j4M+nYfyy5KW1CeXPEeSWJQWRngVBkDvnQ3L7Y8IF3nD7+YCXCs
+         Z5WLkJkJykXb1o3fouyWBA+ATF43Y+Jl2oR/Emp2VjqedBnWZWY3pUrSXNL7OpyGjZeu
+         QVrA==
+X-Gm-Message-State: APuU4Z8mCM2DUMdBnPPwYDI8YzPmtZv5537JhOxJpNn5IzyjGYn1GjDt
+	bp+8UCBeIBmJvseQzL3SmW3T6ruwtKHE7Tq2l5rjmITEYf1U0qIsOABSNd/K3ALGRFE=
+X-Gm-Gg: AYBFou0gLBG+rg2ETFrzTUWY5rlTOm8mtGDDDKZ+L8sSli+jcqrBP8UyMslLQNyFEjH
+	ymk4NlaVl733d+ZHu0KArmUORP2zIbb37w8ZMOPvoeahmOHSTL0N1VqRLdf27TcMqMid4V37VDP
+	IgZ+8Frr6L/foel4sl9l7mdeRaWvOVZqc776NrtnTWByRUZjd2UvYbUnZWHeYGD7ZKQdBqEu3Wp
+	73gJaxiJ/z2/7ELQwBNZeJ14/IRVPirRXdhq2t1VlGpuwyRBiSXqdDAEWbeZaBEbhFpo/CpF42l
+	X2BKs9zplsUld3Yk73am4u5UDsv1Bdh3wH0IEQRxGzfWWGxxvWdgBwJql/teOf7RzDZG87x0kXA
+	sfc5YeMu9Txd2lquOgqixxqn/wZyvf4nEGhUjJOofBfIUmI5uv4Qkc99Spc9pbzveuzo3sMXFub
+	PEl3UFtkT90fgECQ+vbvcVmZNbtOdpSOw0I4ChYKReAgVWM6+wXU2H+FuPHcdNFQl0eRZOsb70O
+	I2tSjDRkA+G/y2SRYXbjiYT7GvvaI3RfJyyLIivatTGUUqEfQA5q4ILA0IM4MGS6oZYnbDJ5vTt
+	+XABQQsB8wEhbvs93iZeXDGi0V1M9nnkATcIKIzpaduSip13LrvWA8pPEiIizj5bb7lLvDYirSL
+	TxQf/f8nT5qj3OrDKFP1RaX3ZEaa4R3Q=
+X-Received: by 2002:a05:6122:222a:b0:5c7:fbb5:6ea0 with SMTP id 71dfb90a1353d-5ee0d068066mr932090e0c.4.1794316234604;
+        Tue, 10 Nov 2026 05:10:34 -0800 (PST)
 Received: from localhost (64.167.245.35.bc.googleusercontent.com. [35.245.167.64])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee0c5b2233sm1547234e0c.10.2026.11.10.04.56.42
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-99c20081409sm1695863241.8.2026.11.10.05.10.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Nov 2026 04:56:42 -0800 (PST)
+        Tue, 10 Nov 2026 05:10:33 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -90,16 +90,8 @@ Precedence: list
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Tue, 10 Nov 2026 07:56:41 -0500
-Message-Id: <DMRJQ42LR1D3.1GZKU9EX48KZU@soleen.com>
-Cc: <kvmarm@lists.linux.dev>, <linux-pci@vger.kernel.org>, "Pratyush Yadav"
- <pratyush@kernel.org>, <kexec@lists.infradead.org>, <kvm@vger.kernel.org>,
- <iommu@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
- <skhawaja@google.com>, <sagis@google.com>, <linux-arch@vger.kernel.org>,
- <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 01/19] liveupdate, kho: Remove __packed from KHO, LUO
- and memfd ABI structures
-From: "Pasha Tatashin" <pasha.tatashin@soleen.com>
+Date: Tue, 10 Nov 2026 08:10:32 -0500
+Message-Id: <DMRK0PU0VCN3.15F59WLOQ05P4@soleen.com>
 To: "Tarun Sahu" <tarunsahu@google.com>, "Pasha Tatashin"
  <pasha.tatashin@soleen.com>, "Mike Rapoport" <rppt@kernel.org>,
  <robin.murphy@arm.com>, <maz@kernel.org>, <will@kernel.org>, "David
@@ -109,229 +101,235 @@ To: "Tarun Sahu" <tarunsahu@google.com>, "Pasha Tatashin"
  Helgaas" <bhelgaas@google.com>, <oupton@kernel.org>, <alex@shazbot.org>,
  <gle.com@google.com>, <pbonzini@redhat.com>, "Andrew Morton"
  <akpm@linux-foundation.org>, <kevin.tian@intel.com>, <joro@8bytes.org>
+Cc: <kvmarm@lists.linux.dev>, <linux-pci@vger.kernel.org>, "Pratyush Yadav"
+ <pratyush@kernel.org>, <kexec@lists.infradead.org>, <kvm@vger.kernel.org>,
+ <iommu@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+ <skhawaja@google.com>, <sagis@google.com>, <linux-arch@vger.kernel.org>,
+ <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v4 02/19] kho: block: Record the entry size in the block
+ header
+From: "Pasha Tatashin" <pasha.tatashin@soleen.com>
 X-Mailer: aerc 0.22.0-39-g5d7784875be2
 References: <20261110050202.529473-1-tarunsahu@google.com>
- <20261110050202.529473-2-tarunsahu@google.com>
-In-Reply-To: <20261110050202.529473-2-tarunsahu@google.com>
+ <20261110050202.529473-3-tarunsahu@google.com>
+In-Reply-To: <20261110050202.529473-3-tarunsahu@google.com>
 
 On Tue Nov 10, 2026 at 12:01 AM EST, Tarun Sahu wrote:
-> All structures in include/linux/kho/abi/block.h (struct
-> kho_block_header_ser), include/linux/kho/abi/luo.h (struct luo_ser,
-> struct luo_file_ser, struct luo_file_set_ser, struct luo_session_ser,
-> struct luo_flb_header_ser, struct luo_flb_ser) and
-> include/linux/kho/abi/memfd.h (struct memfd_luo_folio_ser, struct
-> memfd_luo_ser) have naturally aligned fields on 64-bit architectures,
-> with no padding holes between fields or tail padding. Assert both the
-> structure size and 8-byte alignment under CONFIG_64BIT at compile time.
-> Any future unaligned field addition should come with reserved field to
-> keep the structure aligned.
-
-Just state:
-
-Remove __packed, as it may break natural alignment. Instead, ensure that=20
-all padding holes are explicitly covered by reserved or similar fields,=20
-as is already done for KHO/LUO serialized data, so no functional changes=20
-are intended by this change.
-
+> Subsystems using the KHO Serialization Blocks framework currently do
+> not record the serialized entry size in the block header. The entry size
+> is only known to individual callers, which must track and store it in an
+> owning serialized data structure. If a newer source kernel adds fields
+> to an entry, the changed entry size breaks the stride when an older
+> target kernel iterates over blocks.
 >
+> Add an entry_size field to struct kho_block_header_ser. On the outgoing
+> side, record bs->entry_size into every block header during allocation.
+> During restoration, derive the entry stride directly from the block
+> header instead of relying on caller-supplied dimensions. The
+> kho_block_set_init() interface remains unchanged. A zero entry size,
+> or one that differs between blocks of a set, is rejected during
+> restoration.
+>
+> This change modifies the serialized layout of struct kho_block_header_ser
+> and shifts the offset of serialized entries within preserved blocks.
+> Bump KHO_FDT_COMPATIBLE from kho-v4 to kho-v5 so that pre-v5 and post-v5
+> kernels cleanly reject mismatched handover state during boot. Also
+> update the stale compatible string example in the documentation.
+>
+> Suggested-by: Pratyush Yadav <pratyush@kernel.org>
 > Signed-off-by: Tarun Sahu <tarunsahu@google.com>
 > ---
->  include/linux/kho/abi/block.h | 10 +++++++--
->  include/linux/kho/abi/luo.h   | 38 +++++++++++++++++++++++++++++------
->  include/linux/kho/abi/memfd.h | 16 ++++++++++++---
->  3 files changed, 53 insertions(+), 11 deletions(-)
+>  include/linux/kho/abi/block.h          | 10 ++++----
+>  include/linux/kho/abi/kexec_handover.h |  6 ++---
+>  kernel/liveupdate/kho_block.c          | 32 +++++++++++++++++++++++---
+>  3 files changed, 38 insertions(+), 10 deletions(-)
 >
 > diff --git a/include/linux/kho/abi/block.h b/include/linux/kho/abi/block.=
 h
-> index d06d64b963be..36bdbaf9b3b8 100644
+> index 36bdbaf9b3b8..a40b0906c821 100644
 > --- a/include/linux/kho/abi/block.h
 > +++ b/include/linux/kho/abi/block.h
-> @@ -12,7 +12,7 @@
->   * pre-update kernel to a post-update kernel.
->   *
->   * This interface is a contract. Any modification to the structure field=
-s,
-> - * compatible strings, or the layout of the `__packed` serialization
-> + * compatible strings, or the layout of the serialization
->   * structures defined here constitutes a breaking change. Such changes r=
-equire
->   * incrementing the version number in the `KHO_FDT_COMPATIBLE` string to
->   * prevent a new kernel from misinterpreting data from an old kernel.
-> @@ -26,6 +26,8 @@
->  #define _LINUX_KHO_ABI_BLOCK_H
-> =20
->  #include <asm/page.h>
-> +#include <linux/build_bug.h>
-> +#include <linux/kconfig.h>
->  #include <linux/types.h>
+> @@ -40,9 +40,10 @@
 > =20
 >  /**
-> @@ -49,6 +51,10 @@
+>   * struct kho_block_header_ser - Header for the serialized data block.
+> - * @next:  Physical address of the next struct kho_block_header_ser.
+> - * @count: The number of entries that immediately follow this header in =
+the
+> - *         memory block.
+> + * @next:       Physical address of the next struct kho_block_header_ser=
+.
+> + * @count:      The number of entries that immediately follow this heade=
+r in the
+> + *              memory block.
+> + * @entry_size: The size in bytes of each serialized entry in the block.
+>   *
+>   * This structure is located at the beginning of a block of physical mem=
+ory
+>   * preserved across a kexec. It provides the necessary metadata to inter=
+pret
+> @@ -51,9 +52,10 @@
 >  struct kho_block_header_ser {
 >  	u64 next;
 >  	u64 count;
-> -} __packed;
-> +};
-> +
-> +static_assert(sizeof(struct kho_block_header_ser) =3D=3D 16);
-> +static_assert(!IS_ENABLED(CONFIG_64BIT) ||
-> +	      __alignof__(struct kho_block_header_ser) =3D=3D 8);
+> +	u64 entry_size;
+>  };
 > =20
->  #endif /* _LINUX_KHO_ABI_BLOCK_H */
-> diff --git a/include/linux/kho/abi/luo.h b/include/linux/kho/abi/luo.h
-> index 288076de6d4a..721949374fa1 100644
-> --- a/include/linux/kho/abi/luo.h
-> +++ b/include/linux/kho/abi/luo.h
-> @@ -58,6 +58,8 @@
->  #define _LINUX_KHO_ABI_LUO_H
-> =20
->  #include <linux/align.h>
-> +#include <linux/build_bug.h>
-> +#include <linux/kconfig.h>
->  #include <linux/kho/abi/block.h>
->  #include <uapi/linux/liveupdate.h>
-> =20
-> @@ -82,7 +84,11 @@ struct luo_ser {
->  	u64 liveupdate_num;
->  	u64 sessions_pa;
->  	u64 flbs_pa;
-> -} __packed;
-> +};
-> +
-> +static_assert(sizeof(struct luo_ser) =3D=3D 32);
-> +static_assert(!IS_ENABLED(CONFIG_64BIT) ||
-> +	      __alignof__(struct luo_ser) =3D=3D 8);
+> -static_assert(sizeof(struct kho_block_header_ser) =3D=3D 16);
+> +static_assert(sizeof(struct kho_block_header_ser) =3D=3D 24);
+>  static_assert(!IS_ENABLED(CONFIG_64BIT) ||
+>  	      __alignof__(struct kho_block_header_ser) =3D=3D 8);
 
-Please remove the two assertions above throughout this patch, as they=20
-are replaced later in the series. In general, introducing add -> remove=20
--> add churn across a patch series is discouraged, as it indicates a=20
-lack of planning.
+The above change goes away once my comment on the previous patch=20
+is addressed.
 
 > =20
->  #define LIVEUPDATE_HNDL_COMPAT_LENGTH	48
-> =20
-> @@ -98,7 +104,11 @@ struct luo_file_ser {
->  	char compatible[LIVEUPDATE_HNDL_COMPAT_LENGTH];
->  	u64 data;
->  	u64 token;
-> -} __packed;
-> +};
-> +
-> +static_assert(sizeof(struct luo_file_ser) =3D=3D 64);
-> +static_assert(!IS_ENABLED(CONFIG_64BIT) ||
-> +	      __alignof__(struct luo_file_ser) =3D=3D 8);
-> =20
->  /**
->   * struct luo_file_set_ser - Represents the serialized metadata for file=
- set
-> @@ -113,7 +123,11 @@ struct luo_file_ser {
->  struct luo_file_set_ser {
->  	u64 files;
->  	u64 count;
-> -} __packed;
-> +};
-> +
-> +static_assert(sizeof(struct luo_file_set_ser) =3D=3D 16);
-> +static_assert(!IS_ENABLED(CONFIG_64BIT) ||
-> +	      __alignof__(struct luo_file_set_ser) =3D=3D 8);
-> =20
->  /**
->   * struct luo_session_ser - Represents the serialized metadata for a LUO=
- session.
-> @@ -131,7 +145,11 @@ struct luo_file_set_ser {
->  struct luo_session_ser {
->  	char name[LIVEUPDATE_SESSION_NAME_LENGTH];
->  	struct luo_file_set_ser file_set_ser;
-> -} __packed;
-> +};
-> +
-> +static_assert(sizeof(struct luo_session_ser) =3D=3D 80);
-> +static_assert(!IS_ENABLED(CONFIG_64BIT) ||
-> +	      __alignof__(struct luo_session_ser) =3D=3D 8);
-> =20
->  /* The max size is set so it can be reliably used during in serializatio=
-n */
->  #define LIVEUPDATE_FLB_COMPAT_LENGTH	48
-> @@ -152,7 +170,11 @@ struct luo_session_ser {
->  struct luo_flb_header_ser {
->  	u64 pgcnt;
->  	u64 count;
-> -} __packed;
-> +};
-> +
-> +static_assert(sizeof(struct luo_flb_header_ser) =3D=3D 16);
-> +static_assert(!IS_ENABLED(CONFIG_64BIT) ||
-> +	      __alignof__(struct luo_flb_header_ser) =3D=3D 8);
-> =20
->  /**
->   * struct luo_flb_ser - Represents the serialized state of a single FLB =
-object.
-> @@ -175,7 +197,11 @@ struct luo_flb_ser {
->  	char name[LIVEUPDATE_FLB_COMPAT_LENGTH];
->  	u64 data;
->  	u64 count;
-> -} __packed;
-> +};
-> +
-> +static_assert(sizeof(struct luo_flb_ser) =3D=3D 64);
-> +static_assert(!IS_ENABLED(CONFIG_64BIT) ||
-> +	      __alignof__(struct luo_flb_ser) =3D=3D 8);
-> =20
->  /* Kernel Live Update Test ABI */
->  #ifdef CONFIG_LIVEUPDATE_TEST
-> diff --git a/include/linux/kho/abi/memfd.h b/include/linux/kho/abi/memfd.=
-h
-> index 08b10fea2afc..376a724a1d8c 100644
-> --- a/include/linux/kho/abi/memfd.h
-> +++ b/include/linux/kho/abi/memfd.h
-> @@ -11,6 +11,8 @@
->  #ifndef _LINUX_KHO_ABI_MEMFD_H
->  #define _LINUX_KHO_ABI_MEMFD_H
-> =20
-> +#include <linux/build_bug.h>
-> +#include <linux/kconfig.h>
->  #include <linux/types.h>
->  #include <linux/kho/abi/kexec_handover.h>
-> =20
-> @@ -20,7 +22,7 @@
->   * memfd uses the ABI defined below for preserving its state across a ke=
-xec
->   * reboot using the LUO.
+> diff --git a/include/linux/kho/abi/kexec_handover.h b/include/linux/kho/a=
+bi/kexec_handover.h
+> index 2f4fb9c63942..6f12f5037ea5 100644
+> --- a/include/linux/kho/abi/kexec_handover.h
+> +++ b/include/linux/kho/abi/kexec_handover.h
+> @@ -41,7 +41,7 @@
+>   *   restore the preserved data.::
 >   *
-> - * The state is serialized into a packed structure `struct memfd_luo_ser=
-`
-> + * The state is serialized into `struct memfd_luo_ser`
->   * which is handed over to the next kernel via the KHO mechanism.
+>   *     / {
+> - *         compatible =3D "kho-v3";
+> + *         compatible =3D "kho-v5";
 >   *
->   * This interface is a contract. Any modification to the structure layou=
-t
-> @@ -54,7 +56,11 @@ struct memfd_luo_folio_ser {
->  	u64 pfn:52;
->  	u64 flags:12;
->  	u64 index;
-> -} __packed;
-> +};
-> +
-> +static_assert(sizeof(struct memfd_luo_folio_ser) =3D=3D 16);
-> +static_assert(!IS_ENABLED(CONFIG_64BIT) ||
-> +	      __alignof__(struct memfd_luo_folio_ser) =3D=3D 8);
+>   *         preserved-memory-map =3D <0x...>;
+>   *
+> @@ -62,7 +62,7 @@
+>   *     };
+>   *
+>   *   Root KHO Node (/):
+> - *     - compatible: "kho-v3"
+> + *     - compatible: "kho-v5"
+
+These are just examples, don't update them.
+
+>   *
+>   *       Identifies the overall KHO ABI version.
+>   *
+> @@ -90,7 +90,7 @@
+>   */
 > =20
->  /*
->   * The set of seals this version supports preserving. If support for any=
- new
-> @@ -85,7 +91,11 @@ struct memfd_luo_ser {
->  	u32 flags;
->  	u64 nr_folios;
->  	struct kho_vmalloc folios;
-> -} __packed;
-> +};
-> +
-> +static_assert(sizeof(struct memfd_luo_ser) =3D=3D 48);
-> +static_assert(!IS_ENABLED(CONFIG_64BIT) ||
-> +	      __alignof__(struct memfd_luo_ser) =3D=3D 8);
+>  /* The compatible string for the KHO FDT root node. */
+> -#define KHO_FDT_COMPATIBLE "kho-v4"
+> +#define KHO_FDT_COMPATIBLE "kho-v5"
 > =20
->  /* The compatibility string for memfd file handler */
->  #define MEMFD_LUO_FH_COMPATIBLE	"memfd-v2"
+>  /* The FDT property for the preserved memory map. */
+>  #define KHO_FDT_MEMORY_MAP_PROP_NAME "preserved-memory-map"
+> diff --git a/kernel/liveupdate/kho_block.c b/kernel/liveupdate/kho_block.=
+c
+> index 0d2a342ef422..9b148009085e 100644
+> --- a/kernel/liveupdate/kho_block.c
+> +++ b/kernel/liveupdate/kho_block.c
+> @@ -16,6 +16,12 @@
+>   * array of serialized entries. Multiple blocks are linked together via =
+a
+>   * physical pointer in the header, forming a linked list that can be eas=
+ily
+>   * traversed in both the current and the next kernel.
+> + *
+> + * Each block header also records the size of its entries. A newer kerne=
+l may
+
+"newer kernel" does not make sense in the documentation comment, as any=20
+kernel can do that. I would suggest "outgoing kernel." By the way, in=20
+this series you use the terms "source" and "destination" kernel, whereas=20
+traditionally we have used "outgoing" and "incoming." While both=20
+conventions work, it would be preferable to maintain consistency.
+
+> + * append fields to an entry, so the kernel that writes a block and the =
+kernel
+> + * that reads it can use different entry sizes. The reader steps through=
+ the
+> + * entries with the recorded size, so every entry is found, and it does =
+not read
+> + * beyond the recorded size of an entry.
+>   */
+> =20
+>  #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> @@ -110,6 +116,8 @@ static int kho_block_set_grow_one(struct kho_block_se=
+t *bs)
+>  	if (IS_ERR(ser))
+>  		return PTR_ERR(ser);
+> =20
+> +	ser->entry_size =3D bs->entry_size;
+> +
+>  	err =3D kho_block_add(bs, ser);
+>  	if (err) {
+>  		kho_block_free_ser(bs, ser);
+> @@ -242,7 +250,8 @@ static bool kho_block_set_is_cyclic(struct kho_block_=
+set *bs)
+>   *
+>   * Restores a serialized block set from a given physical address. The ca=
+ller is
+>   * responsible for ensuring that the block set @bs has been allocated an=
+d
+> - * initialized prior to calling this function.
+> + * initialized prior to calling this function. The entry size and the nu=
+mber
+> + * of entries per block are taken from the restored block headers.
+>   *
+>   * Return: 0 on success, or a negative errno on failure.
+>   */
+> @@ -250,6 +259,7 @@ int kho_block_set_restore(struct kho_block_set *bs, u=
+64 head_pa)
+>  {
+>  	struct kho_block_header_ser *ser;
+>  	u64 next_pa =3D head_pa;
+> +	u64 entry_size =3D 0;
+>  	int err;
+> =20
+>  	/* Restored block sets use size from the previous kernel */
+> @@ -264,8 +274,21 @@ int kho_block_set_restore(struct kho_block_set *bs, =
+u64 head_pa)
+>  	}
+> =20
+>  	while (next_pa) {
+> +		u64 capacity;
+> +
+>  		ser =3D phys_to_virt(next_pa);
+> -		if (!ser->count || ser->count > bs->count_per_block) {
+> +		if (!ser->entry_size || (entry_size && ser->entry_size !=3D entry_size=
+)) {
+> +			pr_warn("Block contains invalid entry size: %llu\n",
+> +				ser->entry_size);
+> +			err =3D -EINVAL;
+> +			goto err_destroy;
+> +		}
+> +		entry_size =3D ser->entry_size;
+> +		bs->entry_size =3D entry_size;
+> +		capacity =3D (KHO_BLOCK_SIZE - sizeof(*ser)) / bs->entry_size;
+> +		bs->count_per_block =3D capacity;
+> +
+> +		if (!ser->count || ser->count > capacity) {
+>  			pr_warn("Block contains invalid entry count: %llu\n",
+>  				ser->count);
+>  			err =3D -EINVAL;
+> @@ -370,7 +393,10 @@ void *kho_block_set_it_reserve_entry(struct kho_bloc=
+k_set_it *it)
+>   * @it: The block iterator.
+>   *
+>   * Iterates through previously written entries during state deserializat=
+ion,
+> - * respecting the actual count stored in each block's header.
+> + * respecting the actual count stored in each block's header. Entries ar=
+e
+> + * spaced by the entry size recorded by the kernel that wrote them, whic=
+h can
+> + * be smaller or larger than the caller's structure. Fields beyond that =
+size
+> + * are not present in the entry.
+>   *
+>   * Return: A pointer to the next serialized entry, or NULL if all serial=
+ized
+>   * entries have been read.
+
+
+
+
 
 --=20
 Pasha
