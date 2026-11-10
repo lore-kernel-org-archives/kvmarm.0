@@ -1,76 +1,91 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.149
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=139.138.36.225
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794308854;
-	b=vQyZW36V+93vd54VsI21nW0GdGzskDiRXza2lFDnf2UwrXQnXh3/90zuYtRyDGCkm/6s
-	 hvApoR1tupyIIJGLEbWNr776mqL9fHjFcGEaj05h1/jcPVt7d2U4HP1LsVw1HP+luGX3N
-	 OBokGRDH5BGQBbXCtg0jYd+YQXIiueq9l/gOmg0m73d9D/a623XcivRfjaeRVzO1QqNcI
-	 G/4kArJBaDCiMCONzrsHkXEoS6knOZ5GVkEDkeY3fA4GEMEn4LWy7rzpnfGbWdQMc3vcC
-	 YxHPr3UhEwRFqzUYjqh/9Jh11hzurcBBB3fVW0N6XnSHc/C4FTnIm8tGIPWhFx60ttg==
+	t=1794310979;
+	b=WrJGrLBDgFA30RTdAgZS9xfUm3l4ZjPHysFVr7HifoPoMbRV5AyCjaoNV1noSmxvYqpw
+	 TgRvmn8690YVhZu4vMZ7Qg1lJ5YbB3tHG2BbEL/P64EZ9m2NAagXWwkjt9tsjIsdIjQ06
+	 zCPcVVCcD3c+3pBk62Zykp+yvZkby27JB+FRAiqC+zvFtdeCboSsTfje1g02/EoXBX5ic
+	 MbMUS9N62Z5KL5Ll4UkJI+RGAEGC3hMTWYhzsIePQQZvv5+HukRmCi5ClWTkMJcm8uQUR
+	 1vwl6LNwaHJCIo0JPNc03VfTPrV4Q2vVtIaliiqVqAoe5nQxfGWJw8ta5wgZduX9KAg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794308854;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=sDPsGKf/VHOUS0puZRKQwRQtzDRWIoWykff0y+QcUd4=;
-	b=dRvfaz0Q969wDYqlORridjcbBG/oCTA64iyIx3ounqRLFSOyYW2yY7bRea4X4yOSFJPA
-	 2FmOievyMhs/scGrBhzBHAxHU59BU3jfrEIuWl9vf50amuolRu16CTDiey2+2GJ7M9UAA
-	 9qQMGhM957DC30cdYUzHdThU9CjNj0KioQ4T0il+VYp1VO70+Z4n7Ty8mreUAyTTsufpR
-	 a8SIAwyUVoCybWwBZJgJzj9edG36Xkq+hhqmh+YFtH4m2aLHN0LnGzD59gNkUNgouAFcK
-	 CNgjuC/MKJdhOYzlJveBayXW8y1OD33s+DgCROeVnMoLI7z1CcfiaRSG8COXAFwrDaQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794310979;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:Received:Received:Received:Date:
+	 From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=UDfjj6f+4UQA+nIrJmQDTbohlU8B0SuA2IAGCHYP12U=;
+	b=3pgpf2yu0acY3CtDswj5ZvG/lcvpRyeGZZnSJ56u4H320bDfW07j/OwdEQvYfaAkHXUY
+	 waqTbvwLVQUfKOKm9RIshaQ0QevUd7n3DZgvg0WXMOQ/MjZv1vhM6/61H0wHNmn8vgFhQ
+	 rfrfbFkHs+hdTvTCeNMoaMTlTKjMUc22Ji9GL2IFzfjf7OEnQ8ihjOJnCwRGzoMDBpDKj
+	 HZ3uBrD1zHYCs6FevBWgRqv6XffT7gPbjkTe4Q1sKfJ0UqhqBS81kHSosqgdZsKVHdT0A
+	 eP7lbqEzqx+D+F0PaDs2lDldw5dDnIfIsWPkwsXWYUfHMQBMC4YyWZlnn+sVMZHasEA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=mmnGMscn;
-	arc=none smtp.remote-ip=91.218.175.149
-Received: from mta0.migadu.com (out-149.mta0.migadu.com [91.218.175.149])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=fujitsu.com;
+	spf=pass smtp.mailfrom=fujitsu.com;
+	dkim=pass header.d=fujitsu.com header.i=@fujitsu.com header.a=rsa-sha256 header.s=fj2 header.b=EtPhqJ26;
+	arc=none smtp.remote-ip=139.138.36.225
+Received: from esa10.hc1455-7.c3s2.iphmx.com (esa10.hc1455-7.c3s2.iphmx.com [139.138.36.225])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B627606A335
-	for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 11:07:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8B627606A335
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49475606A326;
+	Tue, 10 Nov 2026 11:42:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 49475606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=mmnGMscn
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=wriFOBuWpa9rzFZvu7jWs3HxgvPj7gVRqFrspNzYI9Y=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794308851; v=1; x=1794913651;
- b=mmnGMscnQKYXdSc+pcqmcMmSIPqWkCGejIFXNdogntlH3pO7Z595rnGNcCftoy2+aVnpyM97
- 4UGHpbPYUOUUry2ZPqnmwJnGBEsG1MQgAhfvAWjWAPw+J7VPaB5YDWK3znxZ26Q0bMYb5mUAaP1
- J+hskfdxFzlwvU7WqAZKE1Yw=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 084a61cce26cb8b6;
-	Tue, 10 Nov 2026 11:07:31 +0000
-X-Mizu-Trace-ID: 084a61cce26cb8b6
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	kvmarm@lists.linux.dev,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>
-Subject: [PATCH 2/2] KVM: selftests: Test KVM_PRE_FAULT_MEMORY against a full dirty ring
-Date: Tue, 10 Nov 2026 11:07:24 +0000
-Message-ID: <20261110110724.3614412-3-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261110110724.3614412-1-fuad.tabba@linux.dev>
-References: <20261110110724.3614412-1-fuad.tabba@linux.dev>
+	dkim=pass (2048-bit key, unprotected) header.d=fujitsu.com header.i=@fujitsu.com header.a=rsa-sha256 header.s=fj2 header.b=EtPhqJ26
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1794310986; x=1825846986;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=D3SLBgY9fe7hrDb5SERRAgjehrb+Hk8BhBruccWqiF8=;
+  b=EtPhqJ262woSGcP1G7/lceHwE1UpToCiYvh+SgTpKISUI7Gezr+NWn3P
+   pTf3LW0GPEwS3fnqh+amdurhDflw+SZbpu8+Cc4qYEjGv5prFGe7E8McI
+   eNg/XQBsEtlXT2HosP0rMlvcvG966X3GZ/u2m2cVPXuBbFahv6JnBWv7y
+   pJr0UYgmIgdAslmxhoauFCcjyCQggEcZ/dL+RpR0GhGO/UUsT0727qRyo
+   0HtgZGh7gp/IWHvprmjisp/jPdJ4JGMW1684AlV6tb0NVEAQbWTzPZwfy
+   fdQErQElxQVBca9/kkoV+zee7wWiASisEl6y/g3iNyseE/IeU5PK89gmD
+   A==;
+X-CSE-ConnectionGUID: oV036majSnyRta+OIg9ccA==
+X-CSE-MsgGUID: hlRtqgfCSZSIHnOrrTZwFg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11961"; a="247475807"
+X-IronPort-AV: E=Sophos;i="6.27,205,1786978800"; 
+   d="scan'208";a="247475807"
+Received: from gmgwnl01.global.fujitsu.com (HELO mgmgwnl01.global.fujitsu.com) ([52.143.17.124])
+  by esa10.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2026 20:42:58 +0900
+Received: from az2nlsmgm2.o.css.fujitsu.com (unknown [10.150.26.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mgmgwnl01.global.fujitsu.com (Postfix) with ESMTPS id 1AFC84274;
+	Tue, 10 Nov 2026 11:42:51 +0000 (UTC)
+Received: from az2nlsmom1.o.css.fujitsu.com (unknown [10.150.26.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2nlsmgm2.o.css.fujitsu.com (Postfix) with ESMTPS id C5F721C00101;
+	Tue, 10 Nov 2026 11:42:50 +0000 (UTC)
+Received: from FCCLS0092175.localdomain (unknown [10.9.61.34])
+	by az2nlsmom1.o.css.fujitsu.com (Postfix) with SMTP id 6AF96829EC7;
+	Tue, 10 Nov 2026 11:42:40 +0000 (UTC)
+Date: Tue, 10 Nov 2026 20:42:38 +0900
+From: Kohei Enju <enju.kohei@fujitsu.com>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
+	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>, 
+	Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com, Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: Re: [PATCH 02/11] KVM: arm64: CCA: Introduce Realms
+Message-ID: <avL9kNR2mGmqmcA9@FCCLS0092175.localdomain>
+References: <20261102141304.126883-1-steven.price@arm.com>
+ <20261102141304.126883-3-steven.price@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -80,136 +95,209 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20261102141304.126883-3-steven.price@arm.com>
 
-Pre-fault more populated, dirty-logged pages than the vCPU's dirty ring
-holds, and check that each call stops before the ring overflows, that a
-retry returns ENOSPC without progress, and that the harvested entries
-are the pages in order. A read pre-fault can map a page read-only, or
-access-tracked on x86 without EPT A/D bits, so skip the case if
-pre-faulting dirties nothing.
+Hi Steve,
 
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- .../selftests/kvm/pre_fault_memory_test.c     | 85 +++++++++++++++++++
- 1 file changed, 85 insertions(+)
+On 11/02 14:12, Steven Price wrote:
+> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+> 
+> Add foundational work for supporting Realms.
+>  - Add a new VM flavor.
+>  - At KVM init, check if the KVM can support Realms (though not functional
+>    yet) and will be advertised by static key kvm_rmi_is_available. This
+>    will be turned on in a later patch, once we have all the bits and
+>    pieces ready. For now check if we are blessed with KVM_MODE_RMM.
+>  - Add realm specific tracking in kvm_arch. Since Realm and protected pKVM
+>    states are mutually exclusive, move them into a union.
+>  - Also adjust the memslot preparation checks to reflect the changes.
+> 
+> Please note that we cannot create Realm VMs yet. This requires further
+> changes to the UABI and core RMI driver support, which will come later.
+> 
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h   | 16 +++++++
+>  arch/arm64/include/asm/kvm_host.h      | 57 +++++++++++++++++-------
+>  arch/arm64/include/asm/kvm_rmi.h       | 61 ++++++++++++++++++++++++++
+>  arch/arm64/include/asm/virt.h          |  1 +
+>  arch/arm64/kvm/Makefile                |  2 +-
+>  arch/arm64/kvm/arm.c                   | 24 ++++++++--
+>  arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  2 +-
+>  arch/arm64/kvm/hyp/nvhe/switch.c       |  4 +-
+>  arch/arm64/kvm/hyp/nvhe/timer-sr.c     |  2 +-
+>  arch/arm64/kvm/mmu.c                   | 13 +++---
+>  arch/arm64/kvm/rmi.c                   | 18 ++++++++
+>  11 files changed, 169 insertions(+), 31 deletions(-)
+>  create mode 100644 arch/arm64/include/asm/kvm_rmi.h
+>  create mode 100644 arch/arm64/kvm/rmi.c
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 334211b8b2ee..32021bdf2610 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -831,4 +831,20 @@ static inline void kvm_reset_vcpu_psci(struct kvm_vcpu *vcpu,
+>  	vcpu_set_reg(vcpu, 0, reset_state->r0);
+>  }
+>  
+> +static inline enum realm_state kvm_realm_state(struct kvm *kvm)
+> +{
+> +	return READ_ONCE(kvm->arch.realm.state);
+> +}
+> +
+> +static inline void kvm_set_realm_state(struct kvm *kvm,
+> +				       enum realm_state new_state)
+> +{
+> +	WRITE_ONCE(kvm->arch.realm.state, new_state);
+> +}
+> +
+> +static inline bool kvm_realm_is_created(struct kvm *kvm)
+> +{
+> +	return kvm_vm_is_realm(kvm) && kvm_realm_state(kvm) != REALM_STATE_NONE;
+> +}
+> +
+>  #endif /* __ARM64_KVM_EMULATE_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index ccd2dc8f73c3..7d0222047ca1 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -29,6 +29,7 @@
+>  #include <asm/kvm.h>
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_hcall.h>
+> +#include <asm/kvm_rmi.h>
+>  #include <asm/vncr_mapping.h>
+>  
+>  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+> @@ -48,6 +49,13 @@
+>  #define KVM_VCPU_MAX_FEATURES 10
+>  #define KVM_VCPU_VALID_FEATURES	(BIT(KVM_VCPU_MAX_FEATURES) - 1)
+>  
+> +#define KVM_REALM_VCPU_VALID_FEATURES			\
+> +	(BIT(KVM_ARM_VCPU_POWER_OFF)		|	\
+> +	 BIT(KVM_ARM_VCPU_PSCI_0_2)		|	\
+> +	 BIT(KVM_ARM_VCPU_PTRAUTH_ADDRESS)	|	\
+> +	 BIT(KVM_ARM_VCPU_SVE)			|	\
+> +	 BIT(KVM_ARM_VCPU_PTRAUTH_GENERIC))
+> +
+>  #define KVM_REQ_SLEEP \
+>  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>  #define KVM_REQ_IRQ_PENDING		KVM_ARCH_REQ(1)
+> @@ -409,6 +417,7 @@ enum kvm_arm_vm_flavor {
+>  	VM_PKVM,		/* Normal guests on pKVM */
+>  	MARKER(__VM_PROTECTED),
+>  	VM_PROTECTED_PKVM,	/* Protected VM */
+> +	VM_REALM,		/* CCA */
+>  	VM_FLAVOR_MAX
+>  };
+>  
+> @@ -502,11 +511,14 @@ struct kvm_arch {
+>  	/* Count the number of VNCR_EL2 TLBs */
+>  	atomic_t vncr_tlb_count;
+>  
+> -	/*
+> -	 * For an untrusted host VM, 'pkvm.handle' is used to lookup
+> -	 * the associated pKVM instance in the hypervisor.
+> -	 */
+> -	struct kvm_protected_vm pkvm;
+> +	union {
+> +		/*
+> +		 * For an untrusted host VM, 'pkvm.handle' is used to lookup
+> +		 * the associated pKVM instance in the hypervisor.
+> +		 */
+> +		struct kvm_protected_vm pkvm;
+> +		struct realm realm;
+> +	};
+>  
+>  #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
+>  	/* Nested virtualization info */
+> @@ -1572,30 +1584,43 @@ struct kvm *kvm_arch_alloc_vm(void);
+>  
+>  #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+>  
+> -#ifdef __KVM_NVHE_HYPERVISOR__
+> +#define kvm_vm_is_protected(kvm)	((kvm)->arch.vm_flavor >= __VM_PROTECTED)
+>  
+> -#define kvm_vm_is_protected(kvm)			\
+> -	(is_protected_kvm_enabled() && ((kvm)->arch.vm_flavor == VM_PROTECTED_PKVM))
+> +#ifdef __KVM_NVHE_HYPERVISOR__
+>  /*
+>   * Accessing vcpu->kvm from nVHE hyp stub is tricky, as we need to convert the
+>   * pointer to the hyp VA. With pKVM, the nVHE code runs with the hyp_vcpu,
+> - * which is populated correctly and is gated on is_protected_kvm_enabled().
+> + * which is populated correctly. Always vcpu_is_protected_pkvm(), which is
+> + * gated on is_protected_kvm_enabled().
+> + */
+> +#define vcpu_is_protected(vcpu)		BUILD_BUG_ON(1)
+> +#else
+> +#define vcpu_is_protected(vcpu)		kvm_vm_is_protected((vcpu)->kvm)
+> +#endif
+> +
+> +#define kvm_vm_is_protected_pkvm(kvm)					\
+> +	(is_protected_kvm_enabled() && ((kvm)->arch.vm_flavor == VM_PROTECTED_PKVM))
+> +
+> +/*
+> + * Rely on is_protected_kvm_enabled() check in kvm_vm_is_protected_pkvm() to
+> + * make sure the vcpu->kvm is always valid VA in the context
+>   */
+> -#define vcpu_is_protected(vcpu)						\
+> +#define vcpu_is_protected_pkvm(vcpu)					\
+>  	({								\
+>  		struct kvm *__kvm = READ_ONCE((vcpu)->kvm);		\
+>  									\
+> -		(__kvm && kvm_vm_is_protected(__kvm));			\
+> +		(__kvm && kvm_vm_is_protected_pkvm(__kvm));		\
+>  	})
 
-diff --git a/tools/testing/selftests/kvm/pre_fault_memory_test.c b/tools/testing/selftests/kvm/pre_fault_memory_test.c
-index 3082fe09b95fa..18fc1d69acbf0 100644
---- a/tools/testing/selftests/kvm/pre_fault_memory_test.c
-+++ b/tools/testing/selftests/kvm/pre_fault_memory_test.c
-@@ -5,6 +5,7 @@
-  * Author:
-  * Isaku Yamahata <isaku.yamahata at gmail.com>
-  */
-+#include <asm/barrier.h>
- #include <linux/sizes.h>
- 
- #include <test_util.h>
-@@ -17,6 +18,8 @@
- /* Arbitrarily chosen values */
- #define TEST_BASE_SIZE		SZ_2M
- #define TEST_SLOT		10
-+/* Large enough for the entries every architecture reserves. */
-+#define TEST_RING_SIZE		SZ_64K
- 
- /* Storage of test info to share with guest code */
- struct test_config {
-@@ -281,6 +284,87 @@ static void test_pre_fault_memory(unsigned long vm_type, enum vm_mem_backing_src
- 	for_each_guest_mode(__test_pre_fault_memory, &p);
- }
- 
-+/*
-+ * Pre-fault more dirty-logged pages than the ring holds: each call has to stop
-+ * before the ring overflows, and no entry may be lost.
-+ */
-+static void test_pre_fault_dirty_ring(void)
-+{
-+	const u64 entries = TEST_RING_SIZE / sizeof(struct kvm_dirty_gfn);
-+	const u64 npages = entries + entries / 4;
-+	struct kvm_pre_fault_memory range, left;
-+	struct kvm_dirty_gfn *gfns, *cur;
-+	u64 harvested = 0, n, size;
-+	struct kvm_vcpu *vcpu;
-+	int ret, stops = 0;
-+	struct kvm_vm *vm;
-+	u32 fetch = 0;
-+	gpa_t gpa;
-+
-+	if (!kvm_has_cap(KVM_CAP_DIRTY_LOG_RING) && !kvm_has_cap(KVM_CAP_DIRTY_LOG_RING_ACQ_REL)) {
-+		pr_info("Skipping the dirty ring test: no dirty ring\n");
-+		return;
-+	}
-+
-+	vm = vm_create(1);
-+	vm_enable_dirty_ring(vm, TEST_RING_SIZE);
-+	vcpu = vm_vcpu_add(vm, 0, NULL);
-+	gfns = vcpu_map_dirty_ring(vcpu);
-+
-+	size = npages * vm->page_size;
-+	gpa = align_down(vm->max_gfn * vm->page_size - size, SZ_2M);
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, gpa, TEST_SLOT, npages,
-+				    KVM_MEM_LOG_DIRTY_PAGES);
-+
-+	/* Populate the pages, so that pre-faulting can map them writable. */
-+	memset(addr_gpa2hva(vm, gpa), 1, size);
-+
-+	range = (struct kvm_pre_fault_memory) { .gpa = gpa, .size = size };
-+	while (range.size) {
-+		vcpu_ioctl(vcpu, KVM_PRE_FAULT_MEMORY, &range);
-+
-+		if (range.size) {
-+			left = range;
-+			ret = __vcpu_ioctl(vcpu, KVM_PRE_FAULT_MEMORY, &range);
-+			TEST_ASSERT_VM_VCPU_IOCTL(ret == -1 && errno == ENOSPC,
-+						  KVM_PRE_FAULT_MEMORY, ret, vm);
-+			TEST_ASSERT(range.gpa == left.gpa && range.size == left.size,
-+				    "KVM_PRE_FAULT_MEMORY made progress on a full ring");
-+			stops++;
-+		}
-+
-+		for (n = 0; ; n++) {
-+			cur = &gfns[fetch % entries];
-+			if (smp_load_acquire(&cur->flags) != KVM_DIRTY_GFN_F_DIRTY)
-+				break;
-+
-+			TEST_ASSERT(cur->slot == TEST_SLOT && cur->offset == harvested + n,
-+				    "Ring entry %u: slot %u offset 0x%llx, expected slot %u offset 0x%lx",
-+				    fetch, cur->slot, cur->offset, TEST_SLOT, harvested + n);
-+			smp_store_release(&cur->flags, KVM_DIRTY_GFN_F_RESET);
-+			fetch++;
-+		}
-+
-+		/* A read pre-fault can map a page read-only, or access-tracked on x86. */
-+		if (!n && !harvested && !range.size) {
-+			pr_info("Skipping the dirty ring test: pre-faulting dirtied no pages\n");
-+			kvm_vm_free(vm);
-+			return;
-+		}
-+		TEST_ASSERT(n, "KVM_PRE_FAULT_MEMORY pushed nothing to the ring");
-+		TEST_ASSERT(kvm_vm_reset_dirty_ring(vm) == n,
-+			    "KVM_RESET_DIRTY_RINGS didn't reset %lu entries", n);
-+		harvested += n;
-+	}
-+
-+	TEST_ASSERT(harvested == npages, "%lu ring entries for %lu pages", harvested, npages);
-+	TEST_ASSERT(stops, "KVM_PRE_FAULT_MEMORY never stopped for a %lu-entry ring", entries);
-+	pr_info("Pre-faulted %lu pages through a %lu-entry ring, stopping %d times\n",
-+		npages, entries, stops);
-+
-+	kvm_vm_free(vm);
-+}
-+
- static void help(char *name)
+I've tested the integration branch and found that the secondary CPU
+bring-up fails:
+    [    1.426502] smp: Bringing up secondary CPUs ...
+    [    9.194442] CPU1: failed to come online
+    [    9.194558] CPU1: failed in unknown state : 0x0
+    [    9.197714] smp: Brought up 1 node, 1 CPU
+    [    9.197775] SMP: Total of 1 processors activated.
+
+It seems that this patch missed replacing a use of
+vcpu_is_protected() introduced by the following commit:
+
+    25d726dddc23 ("KVM: arm64: Reject host power-on of a vCPU that EL2 holds powered off")
+
+The following diff fixes the issue for me. Also, though not included in
+the diff, I think vcpu_is_protected() in __pkvm_create_hyp_vcpu() should
+be replaced with vcpu_is_protected_pkvm() as well.
+
+Thanks,
+Kohei
+
+---8<---
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 522a837637fe..be676c13e219 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -960,7 +960,8 @@ static void __kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu, u32 mp_state)
+ /* The guest's own CPU_OFF: EL2 has already powered the vCPU off. */
+ void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
  {
- 	puts("");
-@@ -320,5 +404,6 @@ int main(int argc, char *argv[])
- 	test_pre_fault_memory(KVM_X86_SW_PROTECTED_VM, backing, false);
- 	test_pre_fault_memory(KVM_X86_SW_PROTECTED_VM, backing, true);
- #endif
-+	test_pre_fault_dirty_ring();
- 	return 0;
- }
--- 
-2.47.3
+-       u32 mp_state = vcpu_is_protected(vcpu) ? KVM_MP_STATE_UNINITIALIZED : KVM_MP_STATE_STOPPED;
++       u32 mp_state = vcpu_is_protected_pkvm(vcpu) ?
++                      KVM_MP_STATE_UNINITIALIZED : KVM_MP_STATE_STOPPED;
+
+        spin_lock(&vcpu->arch.mp_state_lock);
+        __kvm_arm_vcpu_power_off(vcpu, mp_state);
+diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+index b01f8d44033f..6674e8d6ff4c 100644
+--- a/arch/arm64/kvm/psci.c
++++ b/arch/arm64/kvm/psci.c
+@@ -68,7 +68,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+         * STOPPED before that is the VMM's pause.
+         */
+        if (!kvm_arm_vcpu_stopped(vcpu) ||
+-           (vcpu_is_protected(vcpu) && !kvm_pkvm_vcpu_is_powered_off(vcpu))) {
++           (vcpu_is_protected_pkvm(vcpu) && !kvm_pkvm_vcpu_is_powered_off(vcpu))) {
+                if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
+                        ret = PSCI_RET_ALREADY_ON;
+                else
 
