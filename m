@@ -1,79 +1,116 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.57.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794262416;
-	b=bm0OPK0MlMLZC6LsOOBgqYzetmeVaMbe3We1wpJxGNJLAoS7/qvbGu0PIKiX6mOecjbS
-	 ab6cg/LZSpl02xMV32RlCwZW/bto5d1cAW+00En8sOYwCZJGS53Z9BvwiGZhkkcSAStZj
-	 xHewISsmnkp5ZwGGrc/P5UDW3yYP+v4d5iiMEHTRtTh/zD0F1+8/DEX9P9mSTkdJCdB8Q
-	 lazuS371WFJoiKsA8e+94xqq1GJrbE5AvAlU7SubOdfFnI9roHAiirl3gfdB5QVPbGEBO
-	 y3lK7BxOVqmGKDaIdPiti6hhzh3k+yctHOw7ZUo0+HTjk539NmKXPJY5/eCl2movGlw==
+	t=1794269841;
+	b=bJs2+kiVRVMkEg4g54QkTYxlIIpjjXz3kKrWh8BxR/Wt5b9uZnEXyXnW0EFkf0NQsqkU
+	 kCTgPsx9XAi5V4u289TTSyEuCuScynBh7r7lv0O8fLxOecIYv4sLFvf+ldI+m0VOvaW6G
+	 6aHfjU0/M3Xk2vhDN3YvvtW6vwRrWu3iBu6bY9wqrJC+krlcJzY3okFVzD/0itrRjAdKh
+	 WdnR878p8245RkcUzSyM9RTlg1PYbYrIq14H/musYiNR+3M7OYf5EayvVTBwMNKJ1IsbE
+	 yM+uLQ7GMdxC2Vhv6/uY56kg3S93gnB/aZ6oq/MZJEMrR4t2D5XIudU9j2q4OMwZi8w==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794262416;
-	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=jhFE0fyWih8XquU98lCv3a5jbkEdSuXJStfnMSMVAkI=;
-	b=QpP1KoPo7R4Fydq+XjEC2dP+cMJLLwyIeqDcLo1f306Avd68v4aimqVjBTlIjAxNa4o8
-	 1Ehj/zzN8CqLrIAt8z3TTfh24YIWk8G/Tq01AQGfBJ4p+zcNeeAreRzrd9z/oNA0I4mcp
-	 xWVGmQH4DJ8qll+99ay3i2WNOVfHCvHip3pplOQrRzF4671nA8MDIh9nLqNWReOxZv1wU
-	 YbsRsCZJK4gNX4UEgNsIzL65tMUYA/qrSwAC6S/q+yaatnXjotAPFSfp8X2duXiYenrs3
-	 GqFqekhfX4lRW9e90lL4ca5Bt0nIz6xLBTupV0FTXqt5fKKGLBUuuYDEGj5i+/zLs6g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794269841;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:
+	 X-MS-Exchange-Authentication-Results:Received-SPF:Received:Received:
+	 Received:Received:Date:From:To:CC:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
+	 X-NV-OnPremToCloud:X-EOPAttributedMessage:X-MS-PublicTrafficType:
+	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
+	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
+	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
+	 X-Forefront-Antispam-Report:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-Id:
+	 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp:
+	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
+	bh=RJ36JhmwCAUCGImNmtkvC2/pUrrSeH9vb42BEBLFWFU=;
+	b=csiHsBlyQA8Fl5HcY/XWC9LLJ3ivYAC+wh/mH8RzNkwSjZiyRTkmqnTsZG9oNNyQEl+b
+	 mMrkTFeAPrp5NV1hMEE9zd3yDfoabPbOplOKaYsy1HTT0TOVvQxFQvCWk4Pesaxm3gvkA
+	 O2ASfg+Tj5zMIHysGLFHG3NI+RJiTSsqIIx4WR+UfIimVr36OfOizjsUcOahTaD9xP9gw
+	 P7ZVgcBUVyyq0LYb/vQFEf7T1UUtm8kAbnlk3JOBYhXDwb9UH4LxLgibQ6Cd3NcjS7bRU
+	 QBTcMSCzXe+WARQlfXprGLGJppp8l1wGDRyrg4tDVMWaJP7JAH+UH+c+qrIcFh1U4jQ==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZE388eIU;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=nvidia.com;
+	spf=fail smtp.mailfrom=nvidia.com;
+	dkim=pass header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=Tu3dGBVQ;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.57.18
+Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011018.outbound.protection.outlook.com [52.101.57.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C049606A331;
-	Mon,  9 Nov 2026 22:13:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5BC606A333;
+	Tue, 10 Nov 2026 00:17:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7B5BC606A333
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZE388eIU
-Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
-ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1794262416;
-	b=kbemRZGnzsB6KIY/WDl4UEH9393reAUy6owXHx4G7dinSpO3szc9jRljYSSYP764sNYB
-	 0ix0UOJY8PqMAT24a9FXmzJ8AuBVgWGaiEANhVGLNwzdx/dqf4iJMbw9/AHeE0Qj+WpQx
-	 kHJVmJWAUaOo1oG9pQgc5oEd7WG1160ZbrKdfROfqvy/9EuGZ0SYVSvqYUIx2lmbwbMai
-	 +gwVBW277UHsZJ6RoNwgByDyfeF765BhtpeoSY9kP+jB135GlZXC2nTqmmVFWyDVgwDJa
-	 oHS+uRn/M2FeHQ1YLWY2PVtl2YIXO/3eLkANsNXqat6RcAIyyVZR3xaVxcrIMLMl20A==
-ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1794262416;
-	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
-	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=jhFE0fyWih8XquU98lCv3a5jbkEdSuXJStfnMSMVAkI=;
-	b=AbQXqUuugKDnGB8pq8/K4qfMZo/U0OG2gnX2OQ9YTMOaEnRfyY+XmLuX+zs9Ajk7lKTb
-	 Jq5T45HkZ7lrN8vrPUTZXk8dxYZqNREfMpN/y1TEKKKUXzZpNGUrK7jgYhr8S3XChVSSc
-	 tYJ6OG8+6xxEOEbFmj7psd6QLdZyNbjJuVsIWMxHFN0MmaubqEqrDyWe9R+7hLwm52D50
-	 K0g4CmhOw33HGkafGZZRplZolMyQITWr+t1M6kCcAk5JyntmZXKEgU/iQFf0qW8Mey4p4
-	 dMFw06zW75VgPgIFr401dxwGMtSWzZQPSx9lEyJNMYrpesB9njrk24Sf6w9F0vqN0WA==
-ARC-Authentication-Results: i=1; smtp.kernel.org; 
-	arc=none smtp.remote-ip=100.80.115.77
-Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id B4C5C1F008A2;
-	Mon,  9 Nov 2026 22:13:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794262416;
-	bh=jhFE0fyWih8XquU98lCv3a5jbkEdSuXJStfnMSMVAkI=;
-	h=From:Date:Subject:To:Cc:Reply-To;
-	b=ZE388eIUmmFDudEmsmxj+iDze7gvRe1X0GjIIMqFKO8+tENmhBCARYaOPs8QpdA2B
-	 3hNbIuS4TdQLCxyY+vWafQVNvS88lsqQDC7N/F8tVK8hQgMRy4ao6MlRuxKimdQ56z
-	 1/qkvCRRE+B8WNloRPX+H66s3aVsWxXUwjvZ9l3CBP42eZicrJEEeqNG0ji/jrRGKY
-	 BeVUIwkxPHMBdrjU6hqiVcBJ3JSaAlOloal2+vsWy0uj6BhQi8QuCQURgj7AwRtar4
-	 20H6wWP0PEi7eNF1qCEhTJaM9L4dzh43W5Y8APbpVu7FhEhVvOsN/ApMFvtBW5I3Rp
-	 KkbYbwcE92mhw==
-Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 3C77A486AA;
-	Mon,  9 Nov 2026 22:13:35 +0000 (UTC)
-From: Xuheng Li via B4 Relay <devnull+xuheng.cs.columbia.edu@kernel.org>
-Date: Mon, 09 Nov 2026 22:13:36 +0000
-Subject: [PATCH v2] KVM: arm64: Order a later pinner's accesses after the
- hyp mapping
+	dkim=pass (2048-bit key, unprotected) header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=Tu3dGBVQ
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=roxaZgc9k47bExUmqxsSAGoe9/iYNAoi7milX1hCi6wBkEV5LofY5XXQKtVs3Y4ENDqNmy3Se2XYXf6JsgaMJp/a6ilywJYpsP9KtxhPbf4aqBcykvbzwB4PhV0AL/3Z/yPJp4HTU82iEdtYuX03KTRsfZ7vUbKuL98/g3M2tEzyd0uWeivOyuwUVe0o2Skvqx2+14/dEzwa2WONPpo6HY+XExaKMDAOHJAowsANrlM7SPBWLAW0IF+Yg1J3C1CxPBicJkZTQkriNYSIPSVPjJLpFj0g10K7+oa1+EinwXo1Y4/c5Q1kBuYXIdCCabnaX0OKXe+zl/cSbyFQmmRhHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RJ36JhmwCAUCGImNmtkvC2/pUrrSeH9vb42BEBLFWFU=;
+ b=vFAJTSRX7Wn6B5iOId8vVKafysZxJ9u7BRNI6EUCo8zgfZnB9TTsHvVNa0jH7VgM5Qhf2nNB30T6VKl8CY2UgwhrD8x73nYAVR+JC5Bqx7ioNvbepc7CRic1q1XBc2zaL/DPoUCJ3t0QUD8y1MfezlnuvbZ5FV1wLl9Q3xrYOZ6XXdTplVpmYy6faRhQ+XkTPmG7abddi9eSUogNNsJKLe3vvclxxArNN5WvdjucEfQ618T3f+7Tg8VDPlZEXl2csx7b3Mi91sW9o2llOtz+N0cy+tOJffaSy3xnqCMVLz/lb0eiLpTLwXXO8Qe+TxyV2smkqEVe+T91oBYKDafwLg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RJ36JhmwCAUCGImNmtkvC2/pUrrSeH9vb42BEBLFWFU=;
+ b=Tu3dGBVQ21tYrLHRxi5n3RqISNEp80umU7v3U5OwPd3bCK67uz/zVdDYl35GnT35WoQ03PhBKF4yq5BlwWJnXyVOoENUAczHtRClZu0OxtLrf7ENGBq1RuxgVLT5RJ0Xfjp8eHsn8G4QzEvEwFok92CXVVCnZCLU6IERomTeueqO1tqpV9VOfkItAGJ4LHykV3KCyjte7Sl5VUMcR1alF06w6VDAFzsRL6oL4Qv/pNZwNTFxdqw4BaVe9YVMgd38WCDS7CSOE/VCXZSGYusjOp/3Fy1yOI2+BfAwhVKOAjtcBaS9xFZPa8Jbx1w/q2Tckg0ALGG9kDi3wXNAhqxp9g==
+Received: from BN1PR14CA0010.namprd14.prod.outlook.com (2603:10b6:408:e3::15)
+ by MN0PR12MB6344.namprd12.prod.outlook.com (2603:10b6:208:3d3::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.592.12; Tue, 10 Nov
+ 2026 00:17:14 +0000
+Received: from BN2PEPF0000A894.namprd04.prod.outlook.com
+ (2603:10b6:408:e3:cafe::45) by BN1PR14CA0010.outlook.office365.com
+ (2603:10b6:408:e3::15) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.592.12 via Frontend Transport; Tue,
+ 10 Nov 2026 00:17:14 +0000
+X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
+ is 216.228.117.161) smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN2PEPF0000A894.mail.protection.outlook.com (10.167.248.186) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.615.4 via Frontend Transport; Tue, 10 Nov 2026 00:17:14 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56; Mon, 9 Nov
+ 2026 16:16:58 -0800
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56; Mon, 9 Nov
+ 2026 16:16:57 -0800
+Received: from nvidia.com (10.127.8.9) by mail.nvidia.com (10.129.68.7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56 via Frontend
+ Transport; Mon, 9 Nov 2026 16:16:55 -0800
+Date: Mon, 9 Nov 2026 16:16:53 -0800
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: Mostafa Saleh <smostafa@google.com>
+CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>, <iommu@lists.linux.dev>, <catalin.marinas@arm.com>,
+	<will@kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>,
+	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
+	<joro@8bytes.org>, <jgg@ziepe.ca>, <mark.rutland@arm.com>,
+	<qperret@google.com>, <tabba@google.com>, <vdonnefort@google.com>
+Subject: Re: [PATCH v9 11/25] iommu/arm-smmu-v3-kvm: Add the kernel driver
+Message-ID: <avJidXM9yQOX4VBJ@nvidia.com>
+References: <20261015200903.2735565-1-smostafa@google.com>
+ <20261015200903.2735565-12-smostafa@google.com>
+ <auzvygiGRTWgJXzF@nvidia.com>
+ <avGk0ilyJh3obmKx@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -83,175 +120,65 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261109-pin-barrier-v2-1-64ca73cae5e3@cs.columbia.edu>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/22MQQ6CMBAAv0L2bEm3ihZO/sNwaMtWNtFCWmk0h
- L9bOXucSWZWSBSZEnTVCpEyJ55CAXWowI0m3EnwUBiUVGdE2YiZg7AmliiKRnt1VK1rUSsoxRz
- J83u/3frCI6fXFD/7POPP/v9kFCjkiaxH1HhpzNWl2k2P5WnZ1DQs0G/b9gUSPyAurAAAAA==
-X-Change-ID: 20261105-pin-barrier-58f2329c9182
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
-Cc: Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>, 
- Catalin Marinas <catalin.marinas@arm.com>, 
- Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
- Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org, Xuheng Li <xuheng@cs.columbia.edu>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1794262415; l=5667;
- i=xuheng@cs.columbia.edu; s=20261028; h=from:subject:message-id;
- bh=fuEJKXd7OZH045MEhiyU1s2rzbiFjb8ltiEtBO6sALo=;
- b=V618ePRfwdZZAW0Pe+S4sb9++ANEHkXDx1Ax0HhTJq2uWt5VDvp2qki7W/rqYoREcrssbVTdH
- 7CRRVgGJ3JsDX7FqfVtXtz0282zcW+t5AkqW6SFLLdg9BlruAhnkscu
-X-Developer-Key: i=xuheng@cs.columbia.edu; a=ed25519;
- pk=L1HVV+goqxYmEMO/OXakL6uf9isSpgk2QrLlFqyZ2Qs=
-X-Endpoint-Received: by B4 Relay for xuheng@cs.columbia.edu/20261028 with
- auth_id=1349
-X-Original-From: Xuheng Li <xuheng@cs.columbia.edu>
-Reply-To: xuheng@cs.columbia.edu
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <avGk0ilyJh3obmKx@google.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF0000A894:EE_|MN0PR12MB6344:EE_
+X-MS-Office365-Filtering-Correlation-Id: 052168f3-9c1b-47cf-e8bc-08df3ebff909
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|376014|7416014|23010399003|36860700016|261028144727099003|10067099003|11063799006|4143699003|56012099006|261021121427099003|261022075727099003|261022105027099003|261021135927099003|261009223027099003|261026140227099003|261102123227099003|261026121527099003|22082099003|18002099003|6133799003;
+X-Microsoft-Antispam-Message-Info:
+	3Q4cIg2JIJ84/HScjow2VXcMI1uuyQ543+nYiY9qwwBDx/7gKhWFTfdYEcWEi3YhGLcmfMEmT6ZyJaj3zW1CZPfjHm16XaJj6RZlFOujV8fxPO7oTGwmpYOmMV6hZj1ueUi1+k9WDQvvAQKqc2KSMUfRiTlyTBZ+Cu5PdA2mPouf83JQPf3Ep9LZaZloJTItylVnTWVNFNxDpwkRpJ0h1C8aBKvEhIS4M8WrkqTe09JUnYV2gE0dx0zTSoUkqyuc20jnJEajZkWn4jFX/Eo+GODIqJi5nr/KG2D+DPUNayEdTEvZBZsvTxbil1IwGWqW2OE+TdcUtyc9JcWIBkz6r8p5VSZCt17THz52H+5/sv8a7HmXtwkLT8AqPC39s1lMVQqHcApSnIMFqTvYsYofrQtt0gws68HbJl4Yt8IpsTWvfvTMi22PM7kXy65CDhSFd6b8EM7tarA0uE2wlz2Jqx7GecbjwsFy/Z+02Ep/HsxsOaqBf9HBdqEU6lCOv/jpu4o2wXGtW+gfajNF+jfaoyRcIzOAC+fE0curF8Z6kNHnBp+RTdImd2Vuh6I5ZsZjyVoHf/vz/fnQViE6sP4T7dElhWVDYrAx47l5S0cV7z2r+AWEn3MqkcdCD6xChggZkuDecPyYhMDxBPCeJ6gl2aiEUIm05KAyWsZOjqI42z/0C6r6g2/3CZmhcmgnAx4sntqeBm8fRhT+esL9tBSM4Q==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(7416014)(23010399003)(36860700016)(261028144727099003)(10067099003)(11063799006)(4143699003)(56012099006)(261021121427099003)(261022075727099003)(261022105027099003)(261021135927099003)(261009223027099003)(261026140227099003)(261102123227099003)(261026121527099003)(22082099003)(18002099003)(6133799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	ZCTX0zLr47gHJcPHYTwZqvSZ0cSODxq0DwoEbbyvD2bctkLclvoFCmT5QzhtujTz/vMetUFJGHaD02jHzdA/sg9fAsTq45eLyWU7RKbtBfBM0+DjFNXRwEVk8KQU0krwKglVHE0UzToxZQ0MGY1glUVCKGktpOcf2EmnC/YcHhaMpatxg5bY8KT9K2KUDmZGDj5sJU9z0w8uR1zDdhW/d+pPWTqet+ugCN7oOt/3JDFGDO5L4EDQg9jyaadWwN36sjXVqifw26BAi4lkdiD1DtEhSjbUEcFuAkRx3NHDEF2L6zNiFDH+1ZaJPUlL5TuKuWcwW5bw8537vn3nivN/i6eXiZabc2bTXqEWIrqbtCotKZX5ZQrrg/oPiUMihDxgqUkZrVY0ZRUyyDekix9E7UEfPgbU1Rm0GAOvR6HueyX6Wcgl9dstC45jIJbzPu7m
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Nov 2026 00:17:14.5815
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 052168f3-9c1b-47cf-e8bc-08df3ebff909
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF0000A894.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6344
 
-From: Xuheng Li <xuheng@cs.columbia.edu>
+On Mon, Nov 09, 2026 at 10:47:46AM +0000, Mostafa Saleh wrote:
+> On Thu, Nov 05, 2026 at 01:06:18PM -0800, Nicolin Chen wrote:
+> > On Thu, Oct 15, 2026 at 08:08:42PM +0000, Mostafa Saleh wrote:
+> > > diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> > > +#ifdef CONFIG_ARM_SMMU_V3_PKVM
+> > > +/*
+> > > + * Two devices are involved: the aux device bound to this driver, and the
+> > > + * physical platform device bound to the pKVM init driver, which only uses it
+> > > + * for discovery. This driver keeps using the platform device, as it carries
+> > > + * the fwnode the IOMMU core and consumers link to, the DMA configuration and
+> > > + * the IRQs.
+> > 
+> > It would be nicer to have a diagram or so to show the co-relationship
+> > among different devices and drivers.
+> > 
+> > I assume the regular arm-smmu-v3 driver is a part of the picture too,
+> > when the pkvm driver binding fails?
+> > 
+> 
+> I can add some ASCII diagram.
+> If pKVM driver fails, no aux devices are created and the main driver
+> probes the platform SMMUv3 devices as usual.
 
-Since commit 48d848882395 ("KVM: arm64: Defer EL2 stage-1 mapping on
-share"), hyp_pin_shared_mem() maps a shared page into the hypervisor's
-stage-1 only when its refcount goes from 0 to 1.  The CPU that maps it
-runs dsb(ishst); isb() in kvm_pgtable_hyp_map(), which orders that CPU's
-own accesses.  A CPU that pins the page later sees refcount >= 1, maps
-nothing and runs no barrier.  It then accesses the page through an
-address it computed before taking the locks, so nothing orders its
-translation after the other CPU's PTE write.  The access can use a
-translation performed while the entry was still invalid, and fault.
+I didn't check closely, but would it be safe to do so?
 
-A host can do this with any pinning hypercall by passing the same page
-from two CPUs, for example __pkvm_init_vm() with the same struct kvm:
+Is pkvm aware of the missing SMMU device and handling it properly?
 
-  CPU A                                CPU B
-  -----                                -----
-                                       host_kvm = kern_hyp_va_host(x1)
-                                       (host_kvm may be translated now,
-                                        while its entry is invalid)
-  __pkvm_init_vm(host_kvm)
-   hyp_pin_shared_mem()
-    host/hyp locks
-    refcount 0 -> 1
-    pkvm_create_mappings_locked()
-     kvm_pgtable_hyp_map()
-      write the valid PTE
-      dsb(ishst); isb()   <- CPU A only
-    unlock
-                                       __pkvm_init_vm(host_kvm)
-                                        hyp_pin_shared_mem()
-                                         host/hyp locks
-                                         refcount 1 -> 2: no mapping,
-                                         no barrier
-                                         unlock
-                                        READ_ONCE(host_kvm->created_vcpus)
-                                         uses the old translation:
-                                         translation fault -> hyp_panic()
+When pkvm is enabled and the SMMU device is supposed to be a pkvm
+device, should it not fall back to the main driver?
 
-A well-behaved host can hit this too.  Since commit cf533b4d3630 ("KVM:
-arm64: Validate the host vCPU's VM before reading it under pKVM"),
-injecting an exception into a host vCPU that isn't loaded pins its
-struct kvm to read the VM's MTE flag.  On an MTE-capable host, two vCPUs
-of one VM that do this at the same time from __kvm_adjust_pc() take the
-same path as CPU B above.
-
-The lock hand-off orders CPU B's loads and stores after CPU A's PTE
-write, but not its translation table walks.  Arm's herd7 model with
--variant vmsa allows the fault for this shape: a mapping made and
-completed with DSB; ISB on one CPU, handed over through a
-release/acquire, then used on another CPU through an address it already
-held.  It forbids the fault once the second CPU runs DSB; ISB after the
-acquire.
-
-Make every successful pin end with dsb(ish); isb(), so that the pinning
-CPU's later accesses through the range are ordered after the mapping,
-whichever pin installed it.
-
-Fixes: 48d848882395 ("KVM: arm64: Defer EL2 stage-1 mapping on share")
-Cc: stable@vger.kernel.org
-Reviewed-by: Fuad Tabba <fuad.tabba@linux.dev>
-Signed-off-by: Xuheng Li <xuheng@cs.columbia.edu>
----
-The fault was found with herd7 (herdtools7 7.58+1) and Arm's AArch64
-model with -variant vmsa,fatal.  The test reduces the host/hyp locks to
-an acquire of CPU A's release and the pin to its refcount check:
-
-AArch64 pin-maps-nothing
-{
-pte_x=(valid:0);
-0:X2=pte_x; 0:X1=(oa:phy_y);
-y=1;
-pte_z=(af:1,db:1); pte_r=(af:1,db:1);
-0:X8=z; 1:X8=z;
-0:X9=r; 1:X9=r;
-1:X3=x;
-}
- P0               | P1                ;
- MOV W5,#1        | LDAR W7,[X8]      ;
- STR W5,[X9]      | LDR W5,[X9]       ;
- STLR X1,[X2]     | ADD W5,W5,#1      ;
- DSB ISHST        | STR W5,[X9]       ;
- ISB              | CMP W5,#1         ;
- MOV W7,#1        | B.EQ LMAP         ;
- STLR W7,[X8]     | MOV W6,#2         ;
-                  | STLR W6,[X8]      ;
-                  | L0: LDR W4,[X3]   ;
-                  | LMAP:             ;
-exists (1:X7=1 /\ 1:X5=2 /\ fault(P1:L0,x))
-
-P0 is the pin that maps x (refcount 0 -> 1, PTE store, dsb(ishst);
-isb(), unlock).  P1 takes the lock after P0's unlock, sees refcount 2,
-maps nothing, and then loads through the address it already held in X3.
-
-  $ herd7 -variant vmsa,fatal pin-maps-nothing.litmus
-  ...
-  1:X5=2; 1:X7=1; Fault(P1:L0,x,D-MMU:Translation);
-  ...
-  Observation pin-maps-nothing Sometimes 1 7
-
-With DSB ISH; ISB on P1 after its acquire and before L0, as this patch
-adds, the result is Never (0 6).  It is also Never with
--variant vmsa,fatal,ets2, i.e. on CPUs with FEAT_ETS2.
----
-Changes in v2:
-- Add a case that a well-behaved host can hit, from __kvm_adjust_pc()
-  (Fuad).
-- Collect Fuad's Reviewed-by.
-- Rebase onto v7.4-rc2.
-- Link to v1: https://lore.kernel.org/r/20261105-pin-barrier-v1-1-04ebf118175a@cs.columbia.edu
----
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index d4c332a91..5cb1a1e1f 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -1210,6 +1210,14 @@ int hyp_pin_shared_mem(void *from, void *to)
- 							    PAGE_HYP));
- 	}
- 
-+	/*
-+	 * Only the first pin of a page maps it, and that CPU's barriers order
-+	 * only its own accesses. Order this CPU's accesses through the range
-+	 * after the mapping, whichever pin made it.
-+	 */
-+	dsb(ish);
-+	isb();
-+
- unlock:
- 	hyp_unlock_component();
- 	host_unlock_component();
-
----
-base-commit: 7475ea8b58616b33c04afb976cf0fbaad9dd63fb
-change-id: 20261105-pin-barrier-58f2329c9182
-
-Best regards,
--- 
-Xuheng Li <xuheng@cs.columbia.edu>
-
-
+Nicolin
