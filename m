@@ -1,62 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.78
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794325069;
-	b=jrhQx59iBzCgNeM5DrzzpYE2riqi7h8X1f//+m+g3qKXplP84KfqI0CFdhZaVFJ8a/zD
-	 WGxRdZbXAAG9xqmhH81OTNTlywr3/vJL2ofEBjWrbfWdCAGUwyaEsACLw7rdXzYwTlyHd
-	 Uu2pYoil0oP0YG0EoOshB3q9M28iA3Ct0aO6MTAJNxTZRyIdBLgrmad1TLZWp4qYi37GL
-	 K4GqHX5d8mUkYWRSMriTRWHfTdoba9nAvPTBPJ3CxsRa/RnFVjA+Gk/s/sLo9rvuMSDCb
-	 fep8BPj9mwPYeAbJKgmwGWnALfhGbCc2SGbJmOV53h/BUZEMbO2+AULh6pj0IW5/s1g==
+	t=1794325564;
+	b=NgtIwUuJQLg37BpGE6jEoWgQ6kw9tg5UhHq9mAUXH70A5HzAB+obE3UJKvvT/I+nJJKU
+	 /r85Xm030Puowtc2csAtnq9Toh0/8anA975bAtBTvBaIZKD9n+MELSlGEC7xEUGTERgba
+	 Sz8SY5H0WAcDWBVomyiDXYo9tpRgX8FykS5eq2gasMJnvvE/Oj5nkpBJqS8aKyTcek5Hd
+	 6skuX5oFVxMm2jQ+Pp5qUihA26an3mo9dIv1LDQxgYWFF7pCA0zNJWkVlV2GZ+NCmRLTT
+	 jH3oMnSEQ2dXV48fjYPC/KVyQxmAE/LPWdHdXMWHy6buloGDoI3Rs0F7GwL2vSPLWZg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794325069;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=ogFCUAuBZLZXOutM4r4leQllES0UKlFJyoU3ZQqHWYw=;
-	b=au8QPU3zVQMSFTuL8poweZlMhsIaUbkYvYsFkOkjiGbazLrtFAMj0k+YZm3MoAD77Kbq
-	 Qn3IPPCQlM2Ke5bfkBUUmEF3N2AKa6OywnlKkrvM9+GqgeJzUG0oFcEoMeJ7NA5TQNeDQ
-	 Iq1+rQ2bOU3tVLCbEjZo/8GXI2OJ4LdUgi2YVoFFxbKlB9e0oB7aGh0PNI893amGaCaZn
-	 5h2jkRjjvnDpzA5QvrlJmPmVyrGYzewEe7Fggyfy9KgCH4PI3i4s0RrFLgD227ew1copI
-	 r2zrTB9heuuti4b33Ue0JwTiXy8pnro5o/1v09kezQ7ZH4TO3nPGRYbqaCN6++ZK1Gw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794325564;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:From:To:Cc:References:
+	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=lvkJCeuy3a/KY5dr6gIVwmruU5aVYEprW8n3HZixyDo=;
+	b=ABum0jgO4j6bgqkrYI1psKE1pe5MiW8ZZu9Uk6aLqO+PTS1XBn29py5muq+kX9CbYyHi
+	 u75fKZK3IbsGqy2VA/zknaLa6K+yu6dZMVxWTZzoAYyqveXz02Y3a0bWNiWBiPmD5Ae8L
+	 bbYuW7aKs3d+Rd6OCq6PsAv3LqrLlo4MEx6MYAMyGB/t4BkT3SIp8MghWbjHrMyR1RR6R
+	 fDLjchYKMYHZFqvPL+//AO63cRAlO5ax+B+nrw8pOR+GjaK1ACzbpiJoseySHbkDaPG1S
+	 2MDdV6/5DgaInYLOr+c/YynmnGzOz+k2IFWeQ2KmPykGe9pGC/AaXtp222IkJuPFMZg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="T+RyF/xi";
-	arc=none smtp.remote-ip=95.215.58.78
-Received: from mta1.migadu.com (out-78.mta1.migadu.com [95.215.58.78])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B74F9606A31C
-	for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 15:37:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B74F9606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=UlOoB3pU;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70D58606AB54
+	for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 15:46:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 70D58606AB54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=T+RyF/xi
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=OU2BxWs+fl9KwiOZrZ7MCmCnoYNRzpKdLi98U8rTU+I=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794325065; v=1; x=1794929865;
- b=T+RyF/xiJNfitUzGToNwwGoS2vfVxbBbQKNi7GBQFiaZ+2liDWYIAeCr+sM6TqBw1A+9vTm+
- SNS+tkTzEc4o+SYY9SQFlzS1UApU51m5udn1Fan+K/hCVThKJDN3zvoCvfw7AcWdHVM1VBwC+lT
- wz9MDmTMy//pfyhozofEk9dE=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 5ef8afedca299457;
-	Tue, 10 Nov 2026 15:37:45 +0000
-X-Mizu-Trace-ID: 5ef8afedca299457
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5c14bc5a743so10936e87.0
-        for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 07:37:43 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErGtBfwffB1DujhhnnkELIG/JoforvSf4FNudmr3ovn/MZHdwv1m1W2rtuwbtM4TsTSrrcQqjoE=@lists.linux.dev
-X-Gm-Message-State: APuU4Z94n6gxdUD/zzyibqrGVX/043/FZyoDZWAd3opTqmZcQC1QgM2o
-	2BkwYhKrF7xGZUEQoAWkLB/x2B6kB525cekraes1puiq65B4gM39FAP58L3J0BvJHf1xuxyaaQP
-	YxlXzEvsai+PUh1nqbc7MBhI/hw1INd3OebzoR5aq
-X-Received: by 2002:a05:6512:1052:b0:5c0:7c6e:4559 with SMTP id
- 2adb3069b0e04-5c157db2ba2mr143661e87.9.1794325062152; Tue, 10 Nov 2026
- 07:37:42 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=UlOoB3pU
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C4A9F1477;
+	Tue, 10 Nov 2026 07:45:59 -0800 (PST)
+Received: from [10.0.154.42] (e121487-lin.cambridge.arm.com [10.0.154.42])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D9A813F85F;
+	Tue, 10 Nov 2026 07:46:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1794325562; bh=uEBdDPO7syiTjatoW7Nc/1vZxRkrOCdYaIwx8bMhOMA=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=UlOoB3pUAme+6uL1VRZOc92FCVKw2Kb0z7mWqOKKnLO3sorCh8/7eNJH/TdjJycpz
+	 fyeUUJLMpdwHe6gqy9WZqlYa2exG2HaOQtsA3Ww7jjQX2KeEOtrHRfMgyT7c2J9fcb
+	 abPWUdlJypkHY2Xqt2umvhNxMz1+0uBU44RsZfLU=
+Message-ID: <b33b0ca9-0134-4dad-aceb-8c9cb4ada9a2@arm.com>
+Date: Tue, 10 Nov 2026 15:45:58 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,109 +53,65 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261110110724.3614412-1-fuad.tabba@linux.dev>
- <20261110110724.3614412-3-fuad.tabba@linux.dev> <avMoubwqgXbpflwM@gremlin>
-In-Reply-To: <avMoubwqgXbpflwM@gremlin>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Tue, 10 Nov 2026 15:37:05 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTxT_9NghyLSZmOOi_oQboQw-g+6z9WxwaF=-7RdaGbMNw@mail.gmail.com>
-X-Gm-Features: AclHuK9GxiFUgfn5RkRxiSl8D-ZsDGIbAcDrgyXgHWZ0Aza6Wilt0GEOkKm-eWo
-Message-ID: <CA+EHjTxT_9NghyLSZmOOi_oQboQw-g+6z9WxwaF=-7RdaGbMNw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: selftests: Test KVM_PRE_FAULT_MEMORY against a
- full dirty ring
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, 
-	Wei-Lin Chang <weilin.chang@arm.com>, Will Deacon <will@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH kvmtool v3 13/21] arm64: Describe the GICv5 IRS in the DT
+From: Vladimir Murzin <vladimir.murzin@arm.com>
+To: Sascha Bischoff <sascha.bischoff@arm.com>, will@kernel.org,
+ julien.thierry.kdev@gmail.com
+Cc: maz@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ timothy.hayes@arm.com, Peter Maydell <peter.maydell@linaro.org>
+References: <20261016153939.913764-1-sascha.bischoff@arm.com>
+ <20261016153939.913764-14-sascha.bischoff@arm.com>
+ <412dc63b-df1f-4748-8235-542ecfc23894@arm.com>
+ <a9f3e466-ab2b-4c98-a237-d8bd6810e06c@arm.com>
+ <a991250c-946b-456f-bf61-f1ab536365bf@arm.com>
+Content-Language: en-GB
+In-Reply-To: <a991250c-946b-456f-bf61-f1ab536365bf@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Lorenzo,
+Hi Sascha,
 
-On Tue, 10 Nov 2026 14:38:27 +0000, "Lorenzo Stoakes (ARM)"
-<ljs@kernel.org> wrote:
-> On Tue, Nov 10, 2026 at 11:07:24AM +0000, Fuad Tabba wrote:
-> > Pre-fault more populated, dirty-logged pages than the vCPU's dirty ring
-> > holds, and check that each call stops before the ring overflows, that a
-> > retry returns ENOSPC without progress, and that the harvested entries
-> > are the pages in order. A read pre-fault can map a page read-only, or
->
-> Are we asserting an invariant that prefaulting happens in address order
-> here?  Is that explicitly presumed in the prefault API, or just how it
-> happens to pan out?
->
-> I wonder if we might decide for whatever reason in future to do things
-> differently there. Bit nitty I know, but wonder if it's asserting an
-> implementation detail?
+On 11/10/26 14:57, Vladimir Murzin wrote:
+> Hi Sascha,
+> 
+> On 11/2/26 20:51, Sascha Bischoff wrote:
+>> On 26/10/2026 13:03, Vladimir Murzin wrote:
+>>> On 10/16/26 16:39, Sascha Bischoff wrote:
+>>>> Describe the IRS CONFIG and SETLPI frames and associate each CPU
+>>>> phandle with its IAFFID. This lets the guest discover and configure
+>>>> the IRS for shared interrupts.
+>> Hi Vladimir,
+>>
+>>> Out of curiosity why do we expose SETLPI frame to a guest?
+>> Frankly, in case we want to make use of it one day. The intent for the SETLPI frame is that is allows the injection of LPIs by a device without an ITS being present. Effectively, it gives MSI support without translation.
+>>
+>> Rather than writing an EventID/DeviceID pair to the ITS_TRANSLATE_FRAME (specifically the ITS_TRANSLATER or ITS_RL_TRANSLATER) and having the (virtual) ITS translate them using the Device- and Interrupt-Translation-Tables, an implementation that includes the SETLPI_FRAME allows a device to directly write the LPI to make pending.
+>>
+>> This isn't something intended for use on the physical side, so we don't strictly expect any physical implementations to include the SETLPI_FRAME (famous last words?). However, it is something that an emulated GICv5 implementation can go and do if it doesn't want the complexity of emulating an ITS.
+>>
+>> When initially prototyping the GICv5 support, I did have a SETLPI driver that tested this mechanism, as software buy-in is also required for this to work. Instead of programming the DT/ITT with the translation, it just gives the device the desired LPI as the "event" instead.
+>>
+>> Does that answer your question?
+>>
+> 
+> Yes, I was mostly wondering if we are going to have any user for that, but
+> now I realised that it could be user (selftest and/or kvm-unit-test) which
+> make sure that SETLPI stays unimplemented :D
+> 
 
-Yes, the API doesn't guarantee an order. I'll assert that every page
-is reported exactly once instead.
+Just checking, are we permitted to expose SETLPI frame with IRS_IDR0.SETLPI set to 0
+(IIUC it is what KVM currently sets)?
 
-[...]
-> > diff --git a/tools/testing/selftests/kvm/pre_fault_memory_test.c b/tools/testing/selftests/kvm/pre_fault_memory_test.c
-[...]
-> > +static void test_pre_fault_dirty_ring(void)
-[...]
-> > +    /* Populate the pages, so that pre-faulting can map them writable. */
->
-> Reviewed below, but I wonder how x86 could then read fault these?
+Thanks
+Vladimir
 
-KVM_PRE_FAULT_MEMORY is defined as a read fault, but x86 maps the page
-writable when the host page is, and marks it dirty, unless it falls
-back to access tracking (below). Populating the pages makes sure they
-aren't backed by the zero page.
+> Cheers
+> Vladimir
+> 
+>>> Thanks
+>>> Vladimir
+>> Thanks,
+>> Sascha
+> 
 
-[...]
-> > +    while (range.size) {
->
-> NIT: n could be scoped to this block instead.
-
-Will do.
-
-[...]
-> > +        for (n = 0; ; n++) {
->
-> Could this loop forever if cur->flags always == KVM_DIRTY_GFN_F_DIRTY? Or
-> is that guaranteed not to be the case?
-
-It can't. Every harvested entry is set to KVM_DIRTY_GFN_F_RESET and
-stays that way until KVM_RESET_DIRTY_RINGS, which runs after the loop,
-so one pass stops after at most a full ring.
-
-> > +            cur = &gfns[fetch % entries];
-> > +            if (smp_load_acquire(&cur->flags) != KVM_DIRTY_GFN_F_DIRTY)
->
-> Is this and the below release paired with equivalent stuff in the dirty ring code?
-
-Yes, the acquire pairs with the smp_wmb() in kvm_dirty_ring_push()
-ahead of the flag store, and the release with the smp_load_acquire()
-in kvm_dirty_gfn_harvested(). dirty_log_test does the same.
-
-[...]
-> > +        /* A read pre-fault can map a page read-only, or access-tracked on x86. */
->
-> Hmm under what circumstances would that happen? Is there no way to ensure pages
-> are dirtied by prefaulting? I imagine not though!
-
-No, it's up to the architecture. arm64 maps a read fault read-only
-while the slot is logged with a bitmap, and x86 with EPT but no A/D
-bits maps it access-tracked. Neither pushes anything to the ring.
-
-> > +        if (!n && !harvested && !range.size) {
->
-> Hmm, so !n && (harvested || range_size) will pass this, but then you assert
-> n immediately below, so it seems like n is an unconditional requirement.
->
-> So I wonder whether this should just be !n in this conditional or maybe the
-> assert afterwards should be dropped?
-
-The skip is for when pre-faulting dirties nothing at all: the first
-call maps the whole range without pushing a single entry, so there's
-nothing to test. Any other empty harvest is a bug, which the assert
-reports, so I'd rather keep both as they are.
-
-Cheers,
-/fuad
