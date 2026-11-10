@@ -1,58 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.222
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.70
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794278106;
-	b=ZzRSdKPje9UmrvlbD0yVr6P7kTGLccJDuPiHA1B9b6vHCnME93320COQQQc1aaNW7DN1
-	 etp77T3pTTYWqui9YfQVFkrXmGaSFkBS20FEjERxbtwjl6ptl3PlxlGrh000H8riJY61m
-	 QsSRTcBqGr/Tabfm2giKyy8q85UCUaL+t7mLIfqjSmM2QaKlqKynfshWnJYjpqwGppUk1
-	 yzYXnMheKAKWiislGNHZ/Awgbm3KE+eZC0u5ZUkGDY8BrPmgex8lPrZxEs8rxhfI0tgcg
-	 sj/4Bz0xfU+fbXgo9t2k7lE024eat1VwQcFIFd/0BnqNbeNew42I1Fl1wJwTpGZfLGA==
+	t=1794286928;
+	b=fK9lfr3KIqKmMUTVQmu+zJjzqPgIzULZOgbI0Z+PDTsUwwEiJOvMlLZuEumj/ci2+kXR
+	 oIeIpwTcdlfrhye5S/tfH6WvPDubE6tU9Kq387LCeBYrQwgm5bbl8cV975DwhBU4Hzq8J
+	 c6yajNR2hpeLaHztsi9GHUVxQb49CjaAio+Q5619Qr/HBCTEDtFmFUMDfo+E+Hva52dcg
+	 sYvrcmez7iC3mdtwDgShaiSuOGeSyevOWPXd/ahJy81WDIvX1qCYsqAZIav44tncEYim0
+	 uA81D/89G0AzouiTK8ZTWsGNdfuw+L+xwKmz9nU1Mf3qbnkIfzy3s3lkfsc8Nu8WgBw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794278106;
-	h=DMARC-Filter:dkim-signature:Received:Received:Received:Message-ID:
-	 Date:MIME-Version:User-Agent:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type:Content-Transfer-Encoding:X-Originating-IP:
-	 X-ClientProxiedBy;
-	bh=OJz1PFC5Hvp1agKJPLjYVAFN6KgFiQRbshJC7NAO0g0=;
-	b=KTo5gHW4c01Z9Kbx+p60kSCnIeqlbKbJ2L3WTQrFD1wfzc4Ab2Qc0rBTVfjYjT2hEQMb
-	 YRNBsdUGX0kcOD7aKa2+jvUMhotHE7mwUvki+aA153ucWvoK3vjPSKvv6YHnZdRt4vl9S
-	 52wc4sTl4GUjTkE0ylGpzYzkU2xho7TJHWYcYBlQ5rWidC6AVg3LKj/m/RfpbbWA9tXJm
-	 h23lijvMj5K4Pc/3b+dxECoVGwbyB0FynSZWuBD2w9ZkzEwZs5Fgn2v84XRtPsOstOf6D
-	 X5CHn8EPdmBB1hpFmRodEYc+CjpIvv3salZaEWwZ54qpJ8aveQuh0Tn9mDAzK2c8MXg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794286928;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Received:Date:Mime-Version:X-Mailer:Message-ID:
+	 Subject:From:To:Cc:Content-Type;
+	bh=c0rc/quhwxN60DpjROoJEjycH9qA4Mz3L7opctQFNIY=;
+	b=MooRgIpkW0FVBv/GeuR9Bij8U+bhyF4aiWZW/dRYdkzb9uByKyahBz0cMZ0d0bHRztXc
+	 uXWiIQWyTTX49zzfQJidU96atgebL5zyEG19K+28hh4en+eiQj/PCYy0BKutZTcik2G0w
+	 lv6+4rOkoFQSKANrHNRrlhV7cQwgKFXJBE3Aw/vKCjuTVKKE2L/gbYO/Y9jjfAKHg2a/t
+	 7/cCYiGQkiZmV0BRG7wj/Oq7DJTYKska8s3gepNszYEB+Sq69p3XBbZ3uInfGnrZA856R
+	 OtuDZ5w6Hw2y2MmRN+TRA+VBgcz0JBzHVtpklWPtuWpwTQWDKwapQgrBw8cIc+IfhgQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=huawei.com;
-	spf=pass smtp.mailfrom=huawei.com;
-	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=Rj+4iHia;
-	arc=none smtp.remote-ip=113.46.200.222
-Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=i1JhkL6N;
+	arc=none smtp.remote-ip=209.85.218.70
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com [209.85.218.70])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDC72606A31C
-	for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 02:35:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BDC72606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E477606A31C
+	for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 05:02:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3E477606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=Rj+4iHia
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=OJz1PFC5Hvp1agKJPLjYVAFN6KgFiQRbshJC7NAO0g0=;
-	b=Rj+4iHia4kZRFM6MB8HNVe6nf0BrxS6N+TJT4BUKozw0XpLSc0QgaWKe0sHZmVhAR8oPpH4Ml
-	UiKCmDApEhdtQuCAw4uv+823pwkmZ6D4ek1sGHh0k8yOC6FJRtvRKfcCZKGtK3WRrbguAA6hv+n
-	ZcUcUm2nFb+qWQE/oKze5C4=
-Received: from mail.maildlp.com (unknown [172.19.162.92])
-	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4jNrMh3vGBzLlvc;
-	Tue, 10 Nov 2026 10:34:40 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id ED37E40565;
-	Tue, 10 Nov 2026 10:34:54 +0800 (CST)
-Received: from [10.67.120.103] (10.67.120.103) by
- kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Tue, 10 Nov 2026 10:34:54 +0800
-Message-ID: <34445bde-eb52-4334-a4e1-f0e61beb9001@huawei.com>
-Date: Tue, 10 Nov 2026 10:34:53 +0800
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=i1JhkL6N
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-c4048584447so134541466b.1
+        for <kvmarm@lists.linux.dev>; Mon, 09 Nov 2026 21:02:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1794286926; x=1794891726; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=c0rc/quhwxN60DpjROoJEjycH9qA4Mz3L7opctQFNIY=;
+        b=i1JhkL6N0sGZy1OzqrAJ6/d9TFZC4fZKPh3qx7neDlMDSQep0sLYUR0u/nMYXPHnVf
+         r9h6dKGkd/2VkflKrsfV23IyEUqsbhNAK0hZhUz6e97phb9dK1t4+orrpqx0f2Sy/EVK
+         p9r9BR+IaiYN/SPi9XPXfemCt3ADQBuST0VeR1YKHYTot4ri82ht3tl4uUj6gdaPJr3W
+         79AvgCcxuxrKqNjgnUhL/yxFnzYnZG2MEIfKHZbVU9r3XXu0MjyyRlI/WdHEhLyF854Q
+         JBQ12XNxSuAqpxxIY19ukAIe5ifXshlr2THtNQQS0ktLD/2LTAnSUFVgo2th1EaIPm/C
+         we9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794286926; x=1794891726;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=c0rc/quhwxN60DpjROoJEjycH9qA4Mz3L7opctQFNIY=;
+        b=0hNkWGNgr6fMY1S98T+M29jUJkIYn1IAhWEjuLpL4XcEXPMmr5KWPrBMumBuD235MY
+         fj9p4nJPw3xCEhvTVBYCaTtKxDcQuRQuX4Ri2AVu7lv7fBnPQb8ml6cTfX7HkLK0opSf
+         GtWfI1a9Z09/tF9gBn2vsBoscBSppaoeaZPgWYnuED/Dk+P2pixeWbj+9LvO+g4bYFMo
+         sYnppfzQXQS6phTEOI9LC1mRF1JcPvugV7QctG74SrHvU8Q0hQF4VYmdnzr42PvwSDoI
+         lNcpnDtOxoqcS2mmO8JrG5puh44R+LDuWPWSeqBD0omVOJpkckU4FxbfvIkkpnJfHCR9
+         +ZeQ==
+X-Gm-Message-State: APuU4Z/nrMVQIeaBWAhj35QEKViB1E7+/yTjfnSwzrCjYBpOOp720wiK
+	caT3Gkyvtlt4I/OXY5fopJ8gOtoO5gr+8U2f7C3D/EgBtddRbLd4OYxrlJmCiqRde3tvM1jLWER
+	XRQGifjJfVLolc5OpYA==
+X-Received: from ejai3.prod.google.com ([2002:a17:906:1143:b0:c3f:6b4b:bcf8])
+ (user=tarunsahu job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:906:f58d:b0:c41:7e99:c6c2 with SMTP id a640c23a62f3a-c5049656cbamr129203766b.44.1794286925434;
+ Mon, 09 Nov 2026 21:02:05 -0800 (PST)
+Date: Tue, 10 Nov 2026 05:01:43 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -61,354 +74,208 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 2/5] KVM: arm64: Add KVM_PGTABLE_PROT_DIRTY
-To: Leonardo Bras <leo.bras@arm.com>
-CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Fuad
- Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Steffen Eiden
-	<seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
-	<yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, Will
- Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Raghavendra
- Rao Ananta <rananta@google.com>, liuyonglong <liuyonglong@huawei.com>,
-	"tangchengchang@huawei.com" <tangchengchang@huawei.com>, Zhou Wang
-	<wangzhou1@hisilicon.com>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <linux-kernel@vger.kernel.org>
-References: <20260901171558.2674031-1-leo.bras@arm.com>
- <20260901171558.2674031-3-leo.bras@arm.com>
- <1f27bca8-5277-457e-87a9-784e130e53a1@huawei.com>
- <avIQ-ZeVJWyETEb_@LeoBrasDK>
-From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <avIQ-ZeVJWyETEb_@LeoBrasDK>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.506.g506a7eabc5-goog
+Message-ID: <20261110050202.529473-1-tarunsahu@google.com>
+Subject: [PATCH v4 00/19] kho, liveupdate: Add feature header for fine-grained
+ ABI compatibility
+From: Tarun Sahu <tarunsahu@google.com>
+To: Pasha Tatashin <pasha.tatashin@soleen.com>, Mike Rapoport <rppt@kernel.org>, robin.murphy@arm.com, 
+	maz@kernel.org, will@kernel.org, David Matlack <dmatlack@google.com>, 
+	Alexander Graf <graf@amazon.com>, seanjc@google.com, jgg@nvidia.com, loganodell@google.com, 
+	arnd@arndb.de, dwmw2@infradead.org, baolu.lu@linux.intel.com, 
+	Bjorn Helgaas <bhelgaas@google.com>, oupton@kernel.org, alex@shazbot.org, 
+	gle.com@google.com, pbonzini@redhat.com, 
+	Andrew Morton <akpm@linux-foundation.org>, kevin.tian@intel.com, joro@8bytes.org
+Cc: kvmarm@lists.linux.dev, linux-pci@vger.kernel.org, 
+	Pratyush Yadav <pratyush@kernel.org>, kexec@lists.infradead.org, kvm@vger.kernel.org, 
+	iommu@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	skhawaja@google.com, sagis@google.com, linux-arch@vger.kernel.org, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	Tarun Sahu <tarunsahu@google.com>
+Content-Type: text/plain; charset="UTF-8"
+
+This v4 of feature flags support for LUO and KHO is no longer an RFC.
+This has gone through multiple design changes over the past few months,
+and I thank everyone for providing their suggestions and reviewing it
+promptly. Below I talk briefly about the evolution of this series to set
+context and try to make it easy for everyone to review.
+
+Initially, Logan proposed the feature flags in RFC v1 [1], which tried
+to solve the problem of dependency on the compatible string. Feature
+flags introduced finer-grained compatibility. This series had three
+fields: active, supported, and required. The number of flags was limited
+and didn't have flexibility, which reduced the complexity of the patch,
+but put a limitation on the extensibility of the features.
+
+After LPC and a few design discussions, I proposed RFC v2 [2], which
+changed the flags to optional and required and converted the encoding to
+2 bits per feature instead of having two separate variables. But This still
+has the number of flags limited and fixed the feature header size to
+128 bytes. Though each serialized structure is being allocated in
+multiples of PAGE_SIZE (folio order = 0, 1, 2...), where 128 bytes is
+not a problem, it still carries two fundamental issues: limited feature
+flags, and a fixed 128-byte memory overhead for each preserved file. In
+the future, as there are plans for moving to KHO slab, the allocation
+for serialized structures can be significantly reduced and this 128-byte
+size will be a problem again.
+
+Based on the RFC v2 discussion, this v4 (v3 [3] was intentionally ignored)
+moves to extensible feature flags with a variable-length flags[] array,
+avoiding the fixed 128-byte overhead and feature-count limit.
+
+Along with this, as discussed on RFC v2, v4 uses separate bit ranges for
+required and optional flags (1 bit per feature). It builds on the
+consideration that a feature in its lifetime will either be required or
+optional; it can't be toggled into the other. In the future, if such a
+need arises, a new feature flag can be introduced to replicate the
+feature as optional or required, opposite to its ancestor flag.
+
+This new layout and encoding in memory is as follows:
+
+struct kho_ser_hdr {
+	u32 size;
+	u16 nr_required;
+	u16 nr_optional;
+	u64 flags[];
+}
+
+where,
+	flags[i] = (BIT_MAP(optional_features) << nr_required) |
+		   BIT_MAP(required_features)
+
+This series introduces the feature header in the KHO subsystem, and it
+is used by serialized structures across KHO and LUO. A few of the
+serialized structures embed other serialized structures directly. To
+keep the relative offsets of fields to be same across kernels, we cannot
+have an embedded serialized structure's size changed; otherwise, direct
+casting will not be possible. To solve this, this series converts those
+embedded structures to KHOSER_PTR, which points to the memory just after
+the parent serialized structure, and allocation and preservation happen
+for the total memory (parent_ser_size + embedded_ser_size).
+
+<Iamparent>_ser {
+	u64 a;
+	u64 b;
+	struct <Iamembedded>_ser e_ser;
+	u64 d;
+}
+	CONVERTS TO ===>
+
+<Iamparent>_ser {
+	u64 a;
+	u64 b;
+	DECLARE_KHOSER_PTR(e_ser, <Iamembedded>_ser);
+	u64 d;
+}
+
+There are only two such instances: kho_vmalloc and luo_file_set_ser.
+
+This series introduces kho_ser_hdr for the following structures:
+
+  - struct kho_kexec_metadata
+  - struct kho_vmalloc
+  - struct kho_block_header_ser
+  - struct luo_ser
+  - struct luo_session_ser
+  - struct luo_file_set_ser
+  - struct luo_file_ser
+  - struct luo_flb_header_ser
+  - struct luo_flb_ser
+  - struct pci_ser
+  - struct pci_dev_ser
+  - struct memfd_luo_ser
+  - struct memfd_luo_folio_ser
+
+If you notice, this also includes the PCI ser structures. PCI LUO
+support is merged in liveupdate/next, and this series is developed on
+top of it.
+
+Each serialized structure is preceded in memory by struct kho_ser_hdr
+and registered via DECLARE_KHO_SER(name, payload_size, nr_required,
+nr_optional). Both struct kho_kexec_metadata and struct pci_dev_ser are
+explicitly marked with __aligned(8) because their largest member is a
+32-bit integer, and 8-byte alignment is required by DECLARE_KHO_SER() so
+trailing feature payloads remain 8-byte aligned across 32-bit and 64-bit
+kernels.
+
+Also, Introduce DECLARE_KHO_SER_HDR(ser_name, fhdr) which is just the
+wrapper for struct kho_ser_hdr fhdr, This makes it clear
+To which ser_name, this fhdr belongs to.
 
 
+Series structure:
+  - Patch 1 removes __packed from KHO, LUO, and memfd ABI structures and
+    asserts their natural size and 8-byte alignment under CONFIG_64BIT.
+  - Patch 2 records entry_size in struct kho_block_header_ser so the
+    incoming kernel derives the entry stride from the block header.
+  - Patch 3 converts callers that embedded struct kho_vmalloc by value
+    (memfd_luo and test_kho) to reference it via DECLARE_KHOSER_PTR so
+    struct kho_vmalloc can grow independently.
+  - Patch 4 converts struct luo_session_ser to reference
+    struct luo_file_set_ser via DECLARE_KHOSER_PTR instead of embedding
+    it by value so both structures can grow independently.
+  - Patch 5 introduces struct kho_ser_hdr, DECLARE_KHO_SER(),
+    DECLARE_KHO_SER_HDR(), and the serialization/validation helpers in
+    include/linux/kho/abi/feature.h.
+  - Patches 6-18 add the feature header to each of the 13 KHO, LUO, PCI,
+    and memfd serialized structures in independent patches.
+  - Patch 19 adds a KUnit test suite (kho_feature) covering the feature
+    header helpers.
 
-On 11/10/2026 2:29 AM, Leonardo Bras wrote:
-> On Mon, Nov 09, 2026 at 10:27:36AM +0800, Tian Zheng wrote:
->>
->>
->> On 9/2/2026 1:15 AM, Leonardo Bras wrote:
->>> Second step of changing the encoding for the Stage2 PTE descriptor,
->>> introduce the concept of dirty page, so we can have a writable but not
->>> dirty (WC) page, and a writable and dirty (WD) page.
->>>
->>> In order to do so, evaluate uses in a per-case basis, and figure what
->>> concept was important in each case (being dirty, or writable).
->>>
->>> Signed-off-by: Leonardo Bras <leo.bras@arm.com>
->>> ---
->>>    arch/arm64/include/asm/kvm_pgtable.h |  9 ++++++---
->>>    arch/arm64/kvm/hyp/pgtable.c         | 23 +++++++++++++++++------
->>>    arch/arm64/kvm/mmu.c                 | 27 ++++++++++++++++-----------
->>>    arch/arm64/kvm/ptdump.c              |  6 ++++++
->>>    4 files changed, 45 insertions(+), 20 deletions(-)
->>>
->>> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
->>> index 37baa86d6fd8..379031c74cbc 100644
->>> --- a/arch/arm64/include/asm/kvm_pgtable.h
->>> +++ b/arch/arm64/include/asm/kvm_pgtable.h
->>> @@ -258,45 +258,48 @@ enum kvm_pgtable_stage2_flags {
->>>    	KVM_PGTABLE_S2_AS_S1			= BIT(1),
->>>    };
->>>    /**
->>>     * enum kvm_pgtable_prot - Page-table permissions and attributes.
->>>     * @KVM_PGTABLE_PROT_UX:	Unprivileged execute permission.
->>>     * @KVM_PGTABLE_PROT_PX:	Privileged execute permission.
->>>     * @KVM_PGTABLE_PROT_X:		Privileged and unprivileged execute permission.
->>>     * @KVM_PGTABLE_PROT_W:		Write permission.
->>>     * @KVM_PGTABLE_PROT_R:		Read permission.
->>> + * @KVM_PGTABLE_PROT_DIRTY:	Dirty attribute.
->>>     * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
->>>     * @KVM_PGTABLE_PROT_NORMAL_NC:	Normal noncacheable attributes.
->>>     * @KVM_PGTABLE_PROT_SW0:	Software bit 0.
->>>     * @KVM_PGTABLE_PROT_SW1:	Software bit 1.
->>>     * @KVM_PGTABLE_PROT_SW2:	Software bit 2.
->>>     * @KVM_PGTABLE_PROT_SW3:	Software bit 3.
->>>     */
->>>    enum kvm_pgtable_prot {
->>>    	KVM_PGTABLE_PROT_PX			= BIT(0),
->>>    	KVM_PGTABLE_PROT_UX			= BIT(1),
->>>    	KVM_PGTABLE_PROT_X			= KVM_PGTABLE_PROT_PX	|
->>>    						  KVM_PGTABLE_PROT_UX,
->>>    	KVM_PGTABLE_PROT_W			= BIT(2),
->>>    	KVM_PGTABLE_PROT_R			= BIT(3),
->>> +	KVM_PGTABLE_PROT_DIRTY			= BIT(4),
->>> -	KVM_PGTABLE_PROT_DEVICE			= BIT(4),
->>> -	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(5),
->>> +	KVM_PGTABLE_PROT_DEVICE			= BIT(5),
->>> +	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(6),
->>>    	KVM_PGTABLE_PROT_SW0			= BIT(55),
->>>    	KVM_PGTABLE_PROT_SW1			= BIT(56),
->>>    	KVM_PGTABLE_PROT_SW2			= BIT(57),
->>>    	KVM_PGTABLE_PROT_SW3			= BIT(58),
->>>    };
->>> -#define KVM_PGTABLE_PROT_RW	(KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_W)
->>> +#define KVM_PGTABLE_PROT_RW	(KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_W | \
->>> +				 KVM_PGTABLE_PROT_DIRTY)
->>>    #define KVM_PGTABLE_PROT_RWX	(KVM_PGTABLE_PROT_RW | KVM_PGTABLE_PROT_X)
->>>    #define PKVM_HOST_MEM_PROT	KVM_PGTABLE_PROT_RWX
->>>    #define PKVM_HOST_MMIO_PROT	KVM_PGTABLE_PROT_RW
->>>    #define PAGE_HYP		KVM_PGTABLE_PROT_RW
->>>    #define PAGE_HYP_EXEC		(KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_X)
->>>    #define PAGE_HYP_RO		(KVM_PGTABLE_PROT_R)
->>>    #define PAGE_HYP_DEVICE		(PAGE_HYP | KVM_PGTABLE_PROT_DEVICE)
->>> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
->>> index ca49f1bd7c34..2ff33d3e371e 100644
->>> --- a/arch/arm64/kvm/hyp/pgtable.c
->>> +++ b/arch/arm64/kvm/hyp/pgtable.c
->>> @@ -724,22 +724,26 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
->>>    		attr = KVM_S2_MEMATTR(pgt, NORMAL);
->>>    	}
->>>    	r = stage2_set_xn_attr(prot, &attr);
->>>    	if (r)
->>>    		return r;
->>>    	if (prot & KVM_PGTABLE_PROT_R)
->>>    		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
->>> -	if (prot & KVM_PGTABLE_PROT_W)
->>> -		attr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM | KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
->>> +	if (prot & KVM_PGTABLE_PROT_W) {
->>> +		attr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
->>> +
->>> +		if (prot & KVM_PGTABLE_PROT_DIRTY)
->>> +			attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
->>> +	}
->>>    	if (!kvm_lpa2_is_enabled())
->>>    		attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
->>>    	attr |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
->>>    	attr |= prot & KVM_PTE_LEAF_ATTR_HI_SW;
->>>    	*ptep = attr;
->>>    	return 0;
->>> @@ -747,23 +751,27 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
->>>    enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(kvm_pte_t pte)
->>>    {
->>>    	enum kvm_pgtable_prot prot = pte & KVM_PTE_LEAF_ATTR_HI_SW;
->>>    	if (!kvm_pte_valid(pte))
->>>    		return prot;
->>>    	if (pte & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R)
->>>    		prot |= KVM_PGTABLE_PROT_R;
->>> -	if (pte & KVM_PTE_LEAF_ATTR_HI_S2_DBM)
->>> +	if (pte & KVM_PTE_LEAF_ATTR_HI_S2_DBM) {
->>>    		prot |= KVM_PGTABLE_PROT_W;
->>> +		if (pte & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W)
->>> +			prot |= KVM_PGTABLE_PROT_DIRTY;
->>> +	}
->>> +
->>>    	switch (FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, pte)) {
->>>    	case 0b00:
->>>    		prot |= KVM_PGTABLE_PROT_PX | KVM_PGTABLE_PROT_UX;
->>>    		break;
->>>    	case 0b01:
->>>    		prot |= KVM_PGTABLE_PROT_UX;
->>>    		break;
->>>    	case 0b11:
->>>    		prot |= KVM_PGTABLE_PROT_PX;
->>>    		break;
->>> @@ -1282,21 +1290,20 @@ static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
->>>    		*orig_pte = data.pte;
->>>    	if (level)
->>>    		*level = data.level;
->>>    	return 0;
->>>    }
->>>    int kvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
->>>    {
->>>    	return stage2_update_leaf_attrs(pgt, addr, size, 0,
->>> -					KVM_PTE_LEAF_ATTR_HI_S2_DBM |
->>>    					KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
->>>    					NULL, NULL,
->>>    					KVM_PGTABLE_WALK_IGNORE_EAGAIN);
->>>    }
->>>    void kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr,
->>>    				enum kvm_pgtable_walk_flags flags)
->>>    {
->>>    	int ret;
->>> @@ -1362,22 +1369,26 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
->>>    	kvm_pte_t xn = 0, set = 0, clr = 0;
->>>    	s8 level;
->>>    	int ret;
->>>    	if (prot & KVM_PTE_LEAF_ATTR_HI_SW)
->>>    		return -EINVAL;
->>>    	if (prot & KVM_PGTABLE_PROT_R)
->>>    		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
->>> -	if (prot & KVM_PGTABLE_PROT_W)
->>> -		set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM | KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
->>> +	if (prot & KVM_PGTABLE_PROT_W) {
->>> +		set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
->>> +
->>> +		if (prot & KVM_PGTABLE_PROT_DIRTY)
->>> +			set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
->>> +	}
->>>
->>>    	if (prot & KVM_PGTABLE_PROT_X) {
->>>    		ret = stage2_set_xn_attr(prot, &xn);
->>>    		if (ret)
->>>    			return ret;
->>>    		set |= xn & KVM_PTE_LEAF_ATTR_HI_S2_XN;
->>>    		clr |= ~xn & KVM_PTE_LEAF_ATTR_HI_S2_XN;
->>>    	}
->>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->>> index 9ba86450fe4a..9d4f70430bbe 100644
->>> --- a/arch/arm64/kvm/mmu.c
->>> +++ b/arch/arm64/kvm/mmu.c
->>> @@ -1205,21 +1205,23 @@ int topup_hyp_memcache(struct kvm_hyp_memcache *mc, unsigned long min_pages)
->>>    int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
->>>    			  phys_addr_t pa, unsigned long size, bool writable)
->>>    {
->>>    	phys_addr_t addr;
->>>    	int ret = 0;
->>>    	struct kvm_mmu_memory_cache cache = { .gfp_zero = __GFP_ZERO };
->>>    	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
->>>    	struct kvm_pgtable *pgt = mmu->pgt;
->>>    	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
->>>    				     KVM_PGTABLE_PROT_R |
->>> -				     (writable ? KVM_PGTABLE_PROT_W : 0);
->>> +				     (writable ?
->>> +				      (KVM_PGTABLE_PROT_W | KVM_PGTABLE_PROT_DIRTY) :
->>> +				      0);
->>>    	if (is_protected_kvm_enabled())
->>>    		return -EPERM;
->>>    	size += offset_in_page(guest_ipa);
->>>    	guest_ipa &= PAGE_MASK;
->>>    	for (addr = guest_ipa; addr < guest_ipa + size; addr += PAGE_SIZE) {
->>>    		ret = kvm_mmu_topup_memory_cache(&cache,
->>>    						 kvm_mmu_cache_min_pages(mmu));
->>> @@ -1571,21 +1573,21 @@ static int topup_mmu_memcache(struct kvm_vcpu *vcpu, void *memcache)
->>>     *
->>>     * Also encode the level of the original translation in the SW bits of the leaf
->>>     * entry as a proxy for the span of that translation. This will be retrieved on
->>>     * TLB invalidation from the guest and used to limit the invalidation scope if a
->>>     * TTL hint or a range isn't provided.
->>>     */
->>>    static enum kvm_pgtable_prot adjust_nested_fault_perms(struct kvm_s2_trans *nested,
->>>    						       enum kvm_pgtable_prot prot)
->>>    {
->>>    	if (!kvm_s2_trans_writable(nested))
->>> -		prot &= ~KVM_PGTABLE_PROT_W;
->>> +		prot &= ~(KVM_PGTABLE_PROT_W | KVM_PGTABLE_PROT_DIRTY);
->>>    	if (!kvm_s2_trans_readable(nested))
->>>    		prot &= ~KVM_PGTABLE_PROT_R;
->>>    	return prot | kvm_encode_nested_level(nested);
->>>    }
->>>    static enum kvm_pgtable_prot adjust_nested_exec_perms(struct kvm *kvm,
->>>    						      struct kvm_s2_trans *nested,
->>>    						      enum kvm_pgtable_prot prot)
->>>    {
->>> @@ -1642,21 +1644,21 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
->>>    	smp_rmb();
->>>    	ret = kvm_gmem_get_pfn(kvm, s2fd->memslot, gfn, &pfn, &page, NULL);
->>>    	if (ret) {
->>>    		kvm_prepare_memory_fault_exit(s2fd->vcpu, s2fd->fault_ipa, PAGE_SIZE,
->>>    					      write_fault, exec_fault, false);
->>>    		return ret;
->>>    	}
->>>    	if (!(s2fd->memslot->flags & KVM_MEM_READONLY))
->>> -		prot |= KVM_PGTABLE_PROT_W;
->>> +		prot |= KVM_PGTABLE_PROT_W | KVM_PGTABLE_PROT_DIRTY;
->>>    	if (s2fd->nested)
->>>    		prot = adjust_nested_fault_perms(s2fd->nested, prot);
->>>    	if (exec_fault || cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
->>>    		prot |= KVM_PGTABLE_PROT_X;
->>>    	if (s2fd->nested)
->>>    		prot = adjust_nested_exec_perms(kvm, s2fd->nested, prot);
->>> @@ -1674,24 +1676,24 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd)
->>>    		prot &= ~KVM_NV_GUEST_MAP_SZ;
->>>    		ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, s2fd->fault_ipa,
->>>    								 prot, flags);
->>>    	} else {
->>>    		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, s2fd->fault_ipa, PAGE_SIZE,
->>>    							 __pfn_to_phys(pfn), prot,
->>>    							 memcache, flags);
->>>    	}
->>>    out_unlock:
->>> -	kvm_release_faultin_page(kvm, page, !!ret, prot & KVM_PGTABLE_PROT_W);
->>> +	kvm_release_faultin_page(kvm, page, !!ret, prot & KVM_PGTABLE_PROT_DIRTY);
->>>    	kvm_fault_unlock(kvm);
->>> -	if ((prot & KVM_PGTABLE_PROT_W) && !ret)
->>> +	if ((prot & KVM_PGTABLE_PROT_DIRTY) && !ret)
->>>    		mark_page_dirty_in_slot(kvm, s2fd->memslot, gfn);
->>>    	return ret != -EAGAIN ? ret : 0;
->>>    }
->>>    struct kvm_s2_fault_vma_info {
->>>    	unsigned long	mmu_seq;
->>>    	long		vma_pagesize;
->>>    	vm_flags_t	vm_flags;
->>>    	unsigned long	max_map_size;
->>> @@ -1977,25 +1979,28 @@ static int kvm_s2_fault_compute_prot(const struct kvm_s2_fault_desc *s2fd,
->>>    	 * and trigger the exception here. Since the memslot is valid, inject
->>>    	 * the fault back to the guest.
->>>    	 */
->>>    	if (esr_fsc_is_excl_atomic_fault(kvm_vcpu_get_esr(s2fd->vcpu))) {
->>>    		kvm_inject_dabt_excl_atomic(s2fd->vcpu, kvm_vcpu_get_hfar(s2fd->vcpu));
->>>    		return 1;
->>>    	}
->>>    	*prot = KVM_PGTABLE_PROT_R;
->>> -	if (s2vi->map_writable && (s2vi->device ||
->>> -				   !memslot_is_logging(s2fd->memslot) ||
->>> -				   kvm_is_write_fault(s2fd->vcpu)))
->>> +	if (s2vi->map_writable) {
->>>    		*prot |= KVM_PGTABLE_PROT_W;
->>> +		if (s2vi->device || !memslot_is_logging(s2fd->memslot) ||
->>> +		    kvm_is_write_fault(s2fd->vcpu))
->>> +			*prot |= KVM_PGTABLE_PROT_DIRTY;
->>> +	}
->>> +
->>
->>
->> Hi Leo,
->>
->> After reviewing this patch again, I found an issue with the current
->> scheme: for a read fault in a logging memslot, we deliberately install
->> the page writable-clean so hardware can promote it later. That breaks
->> MAP_PRIVATE (COW) memory, which requires a write fault -> FOLL_WRITE ->
->> host COW copy, so a read fault must map RO. Otherwise the guest's later
->> write no longer faults and COW is skipped.
->>
->> In our sandbox tests, the re-fault storm caused concurrent_resume to
->> trigger about 1.57x more faults (784K vs 500K) and about 8x longer wall
->> time (~688ms vs 85ms).
->>
->> To fix it, we should restore the writable gate:
->>
->> ```c
->> if (s2vi->map_writable && (s2vi->device ||
->>                             !memslot_is_logging(s2fd->memslot) ||
->>                             kvm_is_write_fault(s2fd->vcpu))) {
->> 	*prot |= KVM_PGTABLE_PROT_W;
->>
->> 	if (... keep DIRTY logic ...)
->> 		*prot |= KVM_PGTABLE_PROT_DIRTY;
->> }
->> ```
->>
->> Read faults in a logging memslot stay RO; only the first write fault
->> installs writable, so COW breaks normally.
->>
->> What do you think?
-> 
-> The page has to be !dirty at S2 on a read at dirty_tracking, so we don't
-> miss a write. That being said,we can have a read-only (or WC) S2 mapping on
-> a writable host page.
-> 
-> So on this scenario of marking a page WC on a read fault while
-> dirty-tracking, we can just mark the host page writable.
-> 
-> What do you think?
-> 
-> (Also, keep in mind a lot of this will change with the next versions of the
-> PTE encoding patchset, maybe we should worry on refactoring that later)
-> 
-> 
-> Thanks!
-> Leo
+[1] https://lore.kernel.org/all/20260903023452.721732-1-loganodell@google.com/
+[2] https://lore.kernel.org/all/20261021152527.375070-1-tarunsahu@google.com/
+[3] https://lore.kernel.org/all/20261026174217.603114-1-tarunsahu@google.com/
 
-Hi Leo,
+Tarun Sahu (19):
+  liveupdate, kho: Remove __packed from KHO, LUO and memfd ABI
+    structures
+  kho: block: Record the entry size in the block header
+  kho, memfd_luo: Reference struct kho_vmalloc via serialized pointer
+  liveupdate: Reference struct luo_file_set_ser via serialized pointer
+  kho: Add feature header for fine-grained ABI compatibility
+  kho: kexec_metadata: Add the feature header
+  kho: vmalloc: Add the feature header
+  kho: block: Add the feature header to blocks
+  liveupdate: Add feature header to struct luo_ser
+  liveupdate: Add feature header to struct luo_session_ser
+  liveupdate: Add feature header to struct luo_file_set_ser
+  liveupdate: Add feature header to struct luo_file_ser
+  liveupdate: Add feature header to struct luo_flb_header_ser
+  liveupdate: Add feature header to struct luo_flb_ser
+  PCI: liveupdate: Add feature header to struct pci_ser
+  PCI: liveupdate: Add feature header to struct pci_dev_ser
+  mm: memfd_luo: Add feature header to struct memfd_luo_ser
+  mm: memfd_luo: Add feature header to struct memfd_luo_folio_ser
+  kho: Add KUnit test for the feature header helpers
 
-Agreed on both points, and we can work out the specifics when designing
-the next version's scheme.
+ MAINTAINERS                            |   1 +
+ drivers/pci/liveupdate.c               |  99 +++----
+ include/linux/kexec_handover.h         |  15 +-
+ include/linux/kho/abi/block.h          |  21 +-
+ include/linux/kho/abi/feature.h        | 372 +++++++++++++++++++++++++
+ include/linux/kho/abi/kexec_handover.h |  11 +-
+ include/linux/kho/abi/kexec_metadata.h |  17 +-
+ include/linux/kho/abi/luo.h            | 102 ++++---
+ include/linux/kho/abi/memfd.h          |  27 +-
+ include/linux/kho/abi/pci.h            |  66 ++---
+ include/linux/kho_block.h              |   8 +-
+ kernel/liveupdate/kexec_handover.c     |  98 ++++---
+ kernel/liveupdate/kho_block.c          | 172 +++++++++---
+ kernel/liveupdate/luo_core.c           |  43 +--
+ kernel/liveupdate/luo_file.c           |  58 ++--
+ kernel/liveupdate/luo_flb.c            |  69 +++--
+ kernel/liveupdate/luo_internal.h       |   9 +-
+ kernel/liveupdate/luo_session.c        |  55 +++-
+ lib/Kconfig.debug                      |  13 +
+ lib/test_kho.c                         |  38 ++-
+ lib/tests/Makefile                     |   1 +
+ lib/tests/kho_feature_kunit.c          | 184 ++++++++++++
+ mm/memfd_luo.c                         | 183 ++++++++----
+ 23 files changed, 1271 insertions(+), 391 deletions(-)
+ create mode 100644 include/linux/kho/abi/feature.h
+ create mode 100644 lib/tests/kho_feature_kunit.c
 
-Thanks,
-Tian
+-- 
+2.56.0.506.g506a7eabc5-goog
 
