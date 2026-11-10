@@ -1,49 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.198
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794325564;
-	b=NgtIwUuJQLg37BpGE6jEoWgQ6kw9tg5UhHq9mAUXH70A5HzAB+obE3UJKvvT/I+nJJKU
-	 /r85Xm030Puowtc2csAtnq9Toh0/8anA975bAtBTvBaIZKD9n+MELSlGEC7xEUGTERgba
-	 Sz8SY5H0WAcDWBVomyiDXYo9tpRgX8FykS5eq2gasMJnvvE/Oj5nkpBJqS8aKyTcek5Hd
-	 6skuX5oFVxMm2jQ+Pp5qUihA26an3mo9dIv1LDQxgYWFF7pCA0zNJWkVlV2GZ+NCmRLTT
-	 jH3oMnSEQ2dXV48fjYPC/KVyQxmAE/LPWdHdXMWHy6buloGDoI3Rs0F7GwL2vSPLWZg==
+	t=1794325720;
+	b=cLIHCgbWvG9zS4hfsAUNBpaGmKNAIAdR+/AxpcO7dPS56aNDGQvtVr3QwmhFFrWuLKkT
+	 vi6E3hhcz72UzDvmEg28x2UNUf0lctBP2Cv6l0XeuX++QND9gIbKP7LjDPpv0oM0TFLW6
+	 6b2ATgqFDejB/IlLN7xPIUvE8MTslkBVSRlz69S0Yi32Tr9RnetCimEVI9fT2/p8X8BxJ
+	 CIZ7tEfj7Uh4CpwtLXRZOFft0T9E619FBgmKSqCv/i3dRROoPgdaJzGdoxrZ7Cwu12BGi
+	 nKyA6nrGRBRh7TyNDjq+7MhxC4m1jHQcJu6Kf5ixZubfoqoc0v9TLP0x7AFyp7Duf7A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794325564;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:From:To:Cc:References:
-	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=lvkJCeuy3a/KY5dr6gIVwmruU5aVYEprW8n3HZixyDo=;
-	b=ABum0jgO4j6bgqkrYI1psKE1pe5MiW8ZZu9Uk6aLqO+PTS1XBn29py5muq+kX9CbYyHi
-	 u75fKZK3IbsGqy2VA/zknaLa6K+yu6dZMVxWTZzoAYyqveXz02Y3a0bWNiWBiPmD5Ae8L
-	 bbYuW7aKs3d+Rd6OCq6PsAv3LqrLlo4MEx6MYAMyGB/t4BkT3SIp8MghWbjHrMyR1RR6R
-	 fDLjchYKMYHZFqvPL+//AO63cRAlO5ax+B+nrw8pOR+GjaK1ACzbpiJoseySHbkDaPG1S
-	 2MDdV6/5DgaInYLOr+c/YynmnGzOz+k2IFWeQ2KmPykGe9pGC/AaXtp222IkJuPFMZg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794325720;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
+	 Mime-Version:References:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=6krrngdHCsjiOW3bLfxtRylPnkwePlq//L1F5r6HtXs=;
+	b=nBq6mtWSqUoFdWdyE6hHvNCn8Sp8TCljj2crwR+fUPEhOUvSgMkVAstSc3mvq0e7I+HI
+	 95LzI9D2Q8vG8h2ysF9xbgNiDrm8lityczrJfLd/UleW2OoSVNhW8hm18U2i00zMtAuy6
+	 kRdBrp3gAfdA1AEaIGseerchN/r1yEKE+IRFNYfV3F6U3VPyIf5HH+tDmxatM3OdgpcnF
+	 oxbz/a9evmGI/r/zxhywDUj33bVeKzpjvsx2AztZHQe9ruKVEmP+DF3Oj/gDsaSyPRlud
+	 TpfL1jN/20sxYQk6Lyedpb6aU4FW1hSjbjoZpA1rnUBcCh6On6qIfyZ7f2qBW667kfw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=UlOoB3pU;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70D58606AB54
-	for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 15:46:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 70D58606AB54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=pvUYjzCQ;
+	arc=none smtp.remote-ip=209.85.214.198
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434FD60A2613
+	for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 15:48:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 434FD60A2613
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=UlOoB3pU
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C4A9F1477;
-	Tue, 10 Nov 2026 07:45:59 -0800 (PST)
-Received: from [10.0.154.42] (e121487-lin.cambridge.arm.com [10.0.154.42])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D9A813F85F;
-	Tue, 10 Nov 2026 07:46:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794325562; bh=uEBdDPO7syiTjatoW7Nc/1vZxRkrOCdYaIwx8bMhOMA=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=UlOoB3pUAme+6uL1VRZOc92FCVKw2Kb0z7mWqOKKnLO3sorCh8/7eNJH/TdjJycpz
-	 fyeUUJLMpdwHe6gqy9WZqlYa2exG2HaOQtsA3Ww7jjQX2KeEOtrHRfMgyT7c2J9fcb
-	 abPWUdlJypkHY2Xqt2umvhNxMz1+0uBU44RsZfLU=
-Message-ID: <b33b0ca9-0134-4dad-aceb-8c9cb4ada9a2@arm.com>
-Date: Tue, 10 Nov 2026 15:45:58 +0000
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=pvUYjzCQ
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2eb5375cd68so19253415ad.0
+        for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 07:48:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1794325719; x=1794930519; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=6krrngdHCsjiOW3bLfxtRylPnkwePlq//L1F5r6HtXs=;
+        b=pvUYjzCQPTFjpozL+CSqvUHt/pyrc2LRg840vydF7IaPkA4/f9VcgITAN/MPrfaauY
+         I3mGFRNcRF4PB1UUG6f71vfg9a3fS2XhSczPoAqLGrZnw+9PpSnu9D0kh3y9glkYFWC8
+         2jZI7Kywzo3H8ogKhKjpBOpPTCgKrrs1nZBBbaFHWsz3RMFGMXRcMxbpAZE43lmXIxRC
+         DmVkwMCAzcAK7Lt+vbdJc/3B8tGXrdtfWNyyFd7niZdQTHBVVththpcBju90ejUmO+TD
+         FuqMqS0cPi4lWPeyqwqropW6ENJlF1FE7lfU+umgmvfJz8N/AoGGPcL2xpEkIA0ov7M/
+         8ctw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794325719; x=1794930519;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=6krrngdHCsjiOW3bLfxtRylPnkwePlq//L1F5r6HtXs=;
+        b=RrvvK1o61HOcLhcKeILQPS+DpS6uXFqyn2vTAfuJ/Weu1IfccyMlRS+Yylz/rgFJGo
+         i5+F32Iv0PBq/d9yp03Pg2vJB9p3tokYR17D2VMzwCp2zz0J/otMRYMJiIOpifgkduyp
+         HtildmuV5v6wCCXOvvoF2+sLdpKqKr4pk6jTEWI5Rwi3iAS8FiUBU4FxuTTPC+IqJ4NI
+         cG9lhpXrKOZsGhTu2wFHDCllmzjccOl6f1b+z0bR6F10+J2YnLLHWZuD+Ytw/0sEDUDX
+         JGBMZSZ3/aSxwd4Fji8givErFC6kbf6StERWqWM8NbyEXGvKN+fmSfN+Nsw6k/kVUdm2
+         aMCQ==
+X-Forwarded-Encrypted: i=1; AL+hErEbZW6dxRPy/sPMu3uSmz1J3S0EX6wVsSSQV/9pWzMqlUVOeivEadar6lPxnChi/K5yemv18do=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/CQftEsguJj1nt3Hi5vsca9C98A0T13nj8o+f73PO+LyCAF8rp
+	cSddSRaCW1l5E1HgkNzOaxFRBp1j37YSCRKL7BB+E/bWtrOdeZxMwosA0LNt28thfwPdmVeiTKW
+	JWCBs6A==
+X-Received: from plzu6.prod.google.com ([2002:a17:902:82c6:b0:2eb:809:b8ac])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d547:b0:2ed:218:6043
+ with SMTP id d9443c01a7336-2edb93052e6mr23931165ad.59.1794325718280; Tue, 10
+ Nov 2026 07:48:38 -0800 (PST)
+Date: Tue, 10 Nov 2026 07:48:37 -0800
+In-Reply-To: <20261110110724.3614412-2-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -52,66 +77,70 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kvmtool v3 13/21] arm64: Describe the GICv5 IRS in the DT
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-To: Sascha Bischoff <sascha.bischoff@arm.com>, will@kernel.org,
- julien.thierry.kdev@gmail.com
-Cc: maz@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- timothy.hayes@arm.com, Peter Maydell <peter.maydell@linaro.org>
-References: <20261016153939.913764-1-sascha.bischoff@arm.com>
- <20261016153939.913764-14-sascha.bischoff@arm.com>
- <412dc63b-df1f-4748-8235-542ecfc23894@arm.com>
- <a9f3e466-ab2b-4c98-a237-d8bd6810e06c@arm.com>
- <a991250c-946b-456f-bf61-f1ab536365bf@arm.com>
-Content-Language: en-GB
-In-Reply-To: <a991250c-946b-456f-bf61-f1ab536365bf@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20261110110724.3614412-1-fuad.tabba@linux.dev> <20261110110724.3614412-2-fuad.tabba@linux.dev>
+Message-ID: <avM81YcTBTJ8zCMX@seanjc-mac.roam.internal>
+Subject: Re: [PATCH 1/2] KVM: Stop KVM_PRE_FAULT_MEMORY when the vCPU's dirty
+ ring is full
+From: Sean Christopherson <seanjc@google.com>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Lorenzo Stoakes <ljs@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, 
+	Wei-Lin Chang <weilin.chang@arm.com>, Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Sascha,
+On Tue, Nov 10, 2026, Fuad Tabba wrote:
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index cf4cb586f1407..da1b76ceb65e3 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4461,6 +4461,12 @@ static int kvm_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+>  			break;
+>  		}
+>  
+> +		/* Like KVM_RUN: only the iteration crossing the soft limit uses the reserve. */
 
-On 11/10/26 14:57, Vladimir Murzin wrote:
-> Hi Sascha,
+Please don't include AI comments verbatim.
+
+> +		if (vcpu->kvm->dirty_ring_size && kvm_dirty_ring_soft_full(&vcpu->dirty_ring)) {
+
+Eh, I vote to just use kvm_dirty_ring_check_request(), I don't see any harm in
+clobbering vcpu->run->exit_reason.
+
+Side topic, kvm_dirty_ring_check_request() is rather confusing (clears and then
+re-sets the requests).  AFAICT, it can be this instead:
+
+	lockdep_assert_held(vcpu->mutex);
+
+	/*
+	 * The vCPU isn't runnable when the dirty ring becomes soft full.  Keep
+	 * the requests set until the dirty pages are harvested and the dirty
+	 * ring is reset by userspace.  Note, checking if the ring is soft-full
+	 * can get a false positive, but not a false negative, because only the
+	 * vCPU can add entries to the ring, and its mutex is held.
+	 */
+	if (kvm_test_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu) &&
+	    kvm_dirty_ring_soft_full(&vcpu->dirty_ring)) {
+		vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
+		trace_kvm_dirty_ring_exit(vcpu);
+		return true;
+	}
+
+	kvm_clear_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu);
+	return false;
+
+> +			r = -ENOSPC;
+> +			break;
+> +		}
+> +
+>  		r = kvm_arch_vcpu_pre_fault_memory(vcpu, range);
+>  		if (WARN_ON_ONCE(r == 0 || r == -EIO))
+>  			break;
+> -- 
+> 2.47.3
 > 
-> On 11/2/26 20:51, Sascha Bischoff wrote:
->> On 26/10/2026 13:03, Vladimir Murzin wrote:
->>> On 10/16/26 16:39, Sascha Bischoff wrote:
->>>> Describe the IRS CONFIG and SETLPI frames and associate each CPU
->>>> phandle with its IAFFID. This lets the guest discover and configure
->>>> the IRS for shared interrupts.
->> Hi Vladimir,
->>
->>> Out of curiosity why do we expose SETLPI frame to a guest?
->> Frankly, in case we want to make use of it one day. The intent for the SETLPI frame is that is allows the injection of LPIs by a device without an ITS being present. Effectively, it gives MSI support without translation.
->>
->> Rather than writing an EventID/DeviceID pair to the ITS_TRANSLATE_FRAME (specifically the ITS_TRANSLATER or ITS_RL_TRANSLATER) and having the (virtual) ITS translate them using the Device- and Interrupt-Translation-Tables, an implementation that includes the SETLPI_FRAME allows a device to directly write the LPI to make pending.
->>
->> This isn't something intended for use on the physical side, so we don't strictly expect any physical implementations to include the SETLPI_FRAME (famous last words?). However, it is something that an emulated GICv5 implementation can go and do if it doesn't want the complexity of emulating an ITS.
->>
->> When initially prototyping the GICv5 support, I did have a SETLPI driver that tested this mechanism, as software buy-in is also required for this to work. Instead of programming the DT/ITT with the translation, it just gives the device the desired LPI as the "event" instead.
->>
->> Does that answer your question?
->>
-> 
-> Yes, I was mostly wondering if we are going to have any user for that, but
-> now I realised that it could be user (selftest and/or kvm-unit-test) which
-> make sure that SETLPI stays unimplemented :D
-> 
-
-Just checking, are we permitted to expose SETLPI frame with IRS_IDR0.SETLPI set to 0
-(IIUC it is what KVM currently sets)?
-
-Thanks
-Vladimir
-
-> Cheers
-> Vladimir
-> 
->>> Thanks
->>> Vladimir
->> Thanks,
->> Sascha
-> 
-
