@@ -1,84 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.171
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794314920;
-	b=MazGQCsLvcEvitz0/oGLN1/D5VEfJkIMXEK/RLgjLp/eWnqV0iBU9zyfe/qMsddR3HFn
-	 JKxREAlPWxGlw+Z/jlw7jwa58Tu9Xh88QuPbfw1DxAsHOpeNhSBhQla0tzq8ZGwG+0Pa7
-	 7aF0USoR1XkNBWCY+Q3Sb4xuAqSc+PVOwHx+MRGWMiAKJKDPmAf/bJO0rZgWE78W6zAUa
-	 iAX374oZXsqvtCrPmPxe1/VcROFKUzm+MeSTmtYtqXIGrf7FWC32G1tRVZhGswK7wTQIr
-	 5+VxR8U8SwyCkzozIhKa406pPLBYPVYfPVmwuuBKn3xJ2jmH2zD6aMXEYrjLTGT3NPA==
+	t=1794314960;
+	b=QInRCRh04ZXG9a9emsRKDQhytMRm4O118XAxE4XW5GoJMQZ4bWA4p+TA8uuOl9rFbbNK
+	 INQoQxp16M4J0KrZ1pgmrKK9qU+gvPfzPvcdilhjpcUXAJez41bTBnMh6Z3YzFBSlHvK+
+	 KI4+pdicb9uxlLOaVowtFiw6LlrZeKVYOev2lrGGS0bQfLwF/L+kePGWpEJ/ZkHzvh3NB
+	 iz/LYFPu31U1klKqiJJASLFoKsxIU351tnIWBsYmVkpS4twg7kt4xJ2Y0aoNqbarEUlet
+	 jDCmuzFQJSFzoydHoPN72hp+q5SSatcK3yhJuWVxEjz7QeE2JxAZ5ZsjyXUIzwMWYXQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794314920;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Mime-Version:
-	 Content-Transfer-Encoding:Content-Type:Date:Message-Id:Subject:From:
-	 To:Cc:X-Mailer:References:In-Reply-To;
-	bh=ZGhJU+UzWHjWLO2uCHz/PaJEOnJdiVDGFcBGvFMPQDM=;
-	b=idwH46DRyBU8vvX+wHSBRdjkRx5KLFwQn/qQB0je0cIr67VZJhNbrSemcVzvFo47y46p
-	 EHXYJjNZhgrBPv5TGvf241M2KE+jxrOrwEdj/ewu6kaQjfOKG+ZwbGlOz7GxhTewTg6Fk
-	 ZDOMiGyXysla0r97sHKaMzgSxpPzdEuDh4pbURShjPX6Xi1LuPMR2qNONp/fOyEuyeSBz
-	 Px6JVjmLB4o7uQfcOz3UBKS7ySB5nQuccGwpAze9EZVw65QWU1rDFRdJwOL/KE03aHU0D
-	 +WVJNJhVMdXD5YFRSu84dGn+51DCEm3VVzbR/c2gInri0un0eXyh/ogVzN6xv6pnrOg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794314960;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
+	bh=CbaK/OiLsBp24ctmmqfxEDeKLJHZS6Yzb8a5ARPuJDc=;
+	b=pmtbRa9MxqCmhYy8DL34oHqGpMlMHJCM0D8VogslEEp2OKVj8blGfYlBEpdXPD9tXnet
+	 QHpT8sd3cxQyKi9Aqt5UKjG9ydd1vlx52sUgL4vGPejwN4591Q74qd85LV3QsZGgKuDb6
+	 n1BMKCWICEaXGCm2HbZHfFLYQP3I+8B38Tr/1NSJs6s11FgHSiX6eOFDU/v+Q9lF4r44F
+	 lwCoXCHMAncuSQ8PhX7BIgkEL+RS20b3k+4S/WLeaNjFv8EdvncdzG12g4Kj5igr6Xu7y
+	 EOmkdiXuddbxYPlSZ5dzoNW8HlQa6x4/B/+6PYsq3inxFeFP+/29A5LRATOjVJrJLcw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=soleen.com;
-	spf=pass smtp.mailfrom=soleen.com;
-	dkim=pass header.d=soleen.com header.i=@soleen.com header.a=rsa-sha256 header.s=google header.b=clbGGEAN;
-	arc=none smtp.remote-ip=209.85.221.171
-Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC0D606A33E
-	for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 12:48:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6AC0D606A33E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soleen.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soleen.com
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="FW4jWPq/";
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99D08606A338
+	for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 12:49:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 99D08606A338
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.a=rsa-sha256 header.s=google header.b=clbGGEAN
-Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-5c9e7731b34so1394625e0c.2
-        for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 04:48:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=soleen.com; s=google; t=1794314918; x=1794919718; darn=lists.linux.dev;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-type:content-transfer-encoding:mime-version:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=ZGhJU+UzWHjWLO2uCHz/PaJEOnJdiVDGFcBGvFMPQDM=;
-        b=clbGGEANfZAEWJXD1/XDNlzWqbb4YGqFw7DHTl1slJ/9ueE7tnmhYfciKjMvuCAbAm
-         ubLJ2R0HGk4vHtEfyZJlbOiapWAUeTenHGWTHXV31rXlQCFAz1SxIdyQ6JL7vnS84gp2
-         AY1tuitH4Srgp3frc9nKNSwSRkZeBObroFsbJXrfr8MgbMEL7E7DoXduu3Hw0JjTeP+V
-         3lvf4fOMLVaA68oxzv7zDwHm9YEkpmFTt2FcNEeG9L2mg0q5w6tRBv9n0O0/ukrMcEAK
-         HNauf1lTDjtwQYt2YRETDJsHlkHV7kxhTb1imqCNM8eA4avwYCa9ub/rAC+pDvf1iO+S
-         l0kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794314918; x=1794919718;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-type:content-transfer-encoding:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ZGhJU+UzWHjWLO2uCHz/PaJEOnJdiVDGFcBGvFMPQDM=;
-        b=yd+gK3n/8RR6wJ4hIKFaC0/FDX1MXPiwQus7Svi9L4aZ9GX5oOz0zenxKQrAewTCPF
-         VlsdxSpacrwoDol8psfJGlbZ/55hely/PW3ByATLKEvWZ3P2cIfhwC4N9EM2nvZnWW5I
-         /kfS60pKpAUVF9O7FNkVeFR5m0a6bD3y+R4nzGfV6mLBe0rbnaW7v/XfLb2qDSSSpQms
-         EKG1pIOr2nC4C8evVPqGVrxTo7Vpfemyhh5gxdNu9JXfDf3ZwZHASrGt/L7o3XcT4EIf
-         XjJWTiSXXy4kaHMW4UVOFEu9zJrgEyTjiksXb+c5EzAUq+kxcJSugAEeH8681+l352L3
-         cibA==
-X-Gm-Message-State: APuU4Z/y8guSiS7gn2xfTwpUzTC+E9Qb40jXbR37yo+QPFXczihKw2gf
-	CljfX7VXKLOOozzsS2S9ukwJnVoYqwggDlDlv1IF2PfNiqJZ7UV0sE5G7VmDP1q7ymI=
-X-Gm-Gg: AYBFou1Ht64cE49KecrVIayh2cNghX+0GZM5VmuuBumnpVcVVzJ3Zyy6h0zm0yKgAb2
-	zHeGqvMFRe3iOCfOfprkfNG/q7bBWZSXQrU0A0n0FmKzFj65iaRzke5EF/MidN9gXpUZJCUVh5U
-	ZolD73TA5XF1AYTDptLE6moCHpE7CHWKW8hcEMi0UlLB9hSrhPQl38WcfF0vNxn4ZsUo3YS+q7e
-	wDh3PZbfQMgnbE9sOy6vTmUc8UqKA2pJuLnXzIvX6CHuNRSxZgYdBzALkiq5ekEdm+m+JrhauBb
-	aA9AiVwHXBwYGbdTAM+jzyIXNnW4b1bkvcDbYnXDDJQEWqIqcT8MqBqh2ggB/JmRQ1a/QjniWkY
-	yjzWXUcdaVs5TnFMzwcQupILPRH8do2yYkWUzcPcroqzsxPcvAWFgTwQ8tOjWlWQ9SyZLHO0tGi
-	wEfxxJHSh402FMa8jCZLvdSXklARJDBWpctEaqZg5DSIC/UN4T7xdsBk4sdHWlKGv7XsKd8nMiR
-	LEAfUyY/3gutlUSQZsWTVAQIAGi6XgesOpeRTPWJ18snes9RCXRuNC0BHzuvUDNgGtZzLVE/sNv
-	EoI64bBQgj6+YmEc3/n27Fg/CXw0R8tKlWUgGlu6k8zAZ745rBBrT/LqzK11zI2IFxfvEvMBDMF
-	LssQnDo8K49o051S388dFlypWRwvEKW4k0VCdK73tIIeAz1zfQs9r
-X-Received: by 2002:a05:6122:32ce:b0:5ea:b972:1403 with SMTP id 71dfb90a1353d-5ee0cf152b1mr755444e0c.3.1794314918133;
-        Tue, 10 Nov 2026 04:48:38 -0800 (PST)
-Received: from localhost (64.167.245.35.bc.googleusercontent.com. [35.245.167.64])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5ee0c5fd00esm1555554e0c.16.2026.11.10.04.48.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Nov 2026 04:48:37 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=FW4jWPq/
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C64A514BF;
+	Tue, 10 Nov 2026 04:49:14 -0800 (PST)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8EE773F85F;
+	Tue, 10 Nov 2026 04:49:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1794314957; bh=P5lO3LRwfz3Xx9spMdnYq5HZgom/q8jT5u8waDgtbsc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=FW4jWPq/tfDZxBG7gTvwO6Saghy4qPGyV+hze///XZNsFLtYaK5wj2gUsAQ3b/1gh
+	 T6W5B9h4lNu/oIbpkFS2CPsomzXXZPsB1rdaGrB44ze6FvmHsifyDOH/BV74iyXiQD
+	 /n5r91Z2/5jv4DVU8iWFUs+t19uEOqOgbofPVNlY=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	maz@kernel.org,
+	oupton@kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	corbet@lwn.net,
+	pbonzini@redhat.com,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	yangjinqian1@huawei.com,
+	caijian11@h-partners.com,
+	liuyonglong@huawei.com,
+	tangchengchang@huawei.com,
+	yezhenyu2@huawei.com,
+	yubihong@huawei.com,
+	linuxarm@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	fuad.tabba@linux.dev,
+	mark.rutland@arm.com,
+	seanjc@google.com,
+	rdunlap@infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	skhan@linuxfoundation.org
+Subject: Re: [PATCH v5 11/15] KVM: arm64: Reserve dirty ring space for the HDBSS buffer
+Date: Tue, 10 Nov 2026 12:49:07 +0000
+Message-ID: <avMSw3LLDIFT3kSR@LeoBrasDK>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <90775cb3-84ab-4690-a252-1ac41488118f@huawei.com>
+References: <20260929103655.85107-1-zhengtian10@huawei.com> <20260929103655.85107-12-zhengtian10@huawei.com> <auikG0clmr19sAjh@LeoBrasDK> <afcbf19b-bd13-4afc-ab56-8bc50c793e50@huawei.com> <au30DqzWIFny1tpr@LeoBrasDK> <d81243e3-d790-4ee8-9b28-36d35591ee77@huawei.com> <avIOZTvQF-1sxs2p@LeoBrasDK> <90775cb3-84ab-4690-a252-1ac41488118f@huawei.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -87,225 +88,229 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 10 Nov 2026 07:48:36 -0500
-Message-Id: <DMRJJX2ZSYQT.2U1TTBGE7R4RA@soleen.com>
-Subject: Re: [PATCH v4 00/19] kho, liveupdate: Add feature header for
- fine-grained ABI compatibility
-From: "Pasha Tatashin" <pasha.tatashin@soleen.com>
-To: "Tarun Sahu" <tarunsahu@google.com>, "Pasha Tatashin"
- <pasha.tatashin@soleen.com>, "Mike Rapoport" <rppt@kernel.org>,
- <robin.murphy@arm.com>, <maz@kernel.org>, <will@kernel.org>, "David
- Matlack" <dmatlack@google.com>, "Alexander Graf" <graf@amazon.com>,
- <seanjc@google.com>, <jgg@nvidia.com>, <loganodell@google.com>,
- <arnd@arndb.de>, <dwmw2@infradead.org>, <baolu.lu@linux.intel.com>, "Bjorn
- Helgaas" <bhelgaas@google.com>, <oupton@kernel.org>, <alex@shazbot.org>,
- <gle.com@google.com>, <pbonzini@redhat.com>, "Andrew Morton"
- <akpm@linux-foundation.org>, <kevin.tian@intel.com>, <joro@8bytes.org>
-Cc: <kvmarm@lists.linux.dev>, <linux-pci@vger.kernel.org>, "Pratyush Yadav"
- <pratyush@kernel.org>, <kexec@lists.infradead.org>, <kvm@vger.kernel.org>,
- <iommu@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
- <skhawaja@google.com>, <sagis@google.com>, <linux-arch@vger.kernel.org>,
- <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>
-X-Mailer: aerc 0.22.0-39-g5d7784875be2
-References: <20261110050202.529473-1-tarunsahu@google.com>
-In-Reply-To: <20261110050202.529473-1-tarunsahu@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On Tue Nov 10, 2026 at 12:01 AM EST, Tarun Sahu wrote:
-> This v4 of feature flags support for LUO and KHO is no longer an RFC.
-> This has gone through multiple design changes over the past few months,
-> and I thank everyone for providing their suggestions and reviewing it
-> promptly. Below I talk briefly about the evolution of this series to set
-> context and try to make it easy for everyone to review.
->
-> Initially, Logan proposed the feature flags in RFC v1 [1], which tried
-> to solve the problem of dependency on the compatible string. Feature
-> flags introduced finer-grained compatibility. This series had three
-> fields: active, supported, and required. The number of flags was limited
-> and didn't have flexibility, which reduced the complexity of the patch,
-> but put a limitation on the extensibility of the features.
->
-> After LPC and a few design discussions, I proposed RFC v2 [2], which
-> changed the flags to optional and required and converted the encoding to
-> 2 bits per feature instead of having two separate variables. But This sti=
-ll
-> has the number of flags limited and fixed the feature header size to
-> 128 bytes. Though each serialized structure is being allocated in
-> multiples of PAGE_SIZE (folio order =3D 0, 1, 2...), where 128 bytes is
-> not a problem, it still carries two fundamental issues: limited feature
-> flags, and a fixed 128-byte memory overhead for each preserved file. In
-> the future, as there are plans for moving to KHO slab, the allocation
-> for serialized structures can be significantly reduced and this 128-byte
-> size will be a problem again.
->
-> Based on the RFC v2 discussion, this v4 (v3 [3] was intentionally ignored=
-)
-> moves to extensible feature flags with a variable-length flags[] array,
-> avoiding the fixed 128-byte overhead and feature-count limit.
->
-> Along with this, as discussed on RFC v2, v4 uses separate bit ranges for
-> required and optional flags (1 bit per feature). It builds on the
-> consideration that a feature in its lifetime will either be required or
-> optional; it can't be toggled into the other. In the future, if such a
-> need arises, a new feature flag can be introduced to replicate the
-> feature as optional or required, opposite to its ancestor flag.
->
-> This new layout and encoding in memory is as follows:
->
-> struct kho_ser_hdr {
-> 	u32 size;
-> 	u16 nr_required;
-> 	u16 nr_optional;
-> 	u64 flags[];
-> }
->
-> where,
-> 	flags[i] =3D (BIT_MAP(optional_features) << nr_required) |
-> 		   BIT_MAP(required_features)
->
-> This series introduces the feature header in the KHO subsystem, and it
-> is used by serialized structures across KHO and LUO. A few of the
-> serialized structures embed other serialized structures directly. To
-> keep the relative offsets of fields to be same across kernels, we cannot
-> have an embedded serialized structure's size changed; otherwise, direct
-> casting will not be possible. To solve this, this series converts those
-> embedded structures to KHOSER_PTR, which points to the memory just after
-> the parent serialized structure, and allocation and preservation happen
-> for the total memory (parent_ser_size + embedded_ser_size).
->
-> <Iamparent>_ser {
-> 	u64 a;
-> 	u64 b;
-> 	struct <Iamembedded>_ser e_ser;
-> 	u64 d;
-> }
-> 	CONVERTS TO =3D=3D=3D>
->
-> <Iamparent>_ser {
-> 	u64 a;
-> 	u64 b;
-> 	DECLARE_KHOSER_PTR(e_ser, <Iamembedded>_ser);
-> 	u64 d;
-> }
->
-> There are only two such instances: kho_vmalloc and luo_file_set_ser.
->
-> This series introduces kho_ser_hdr for the following structures:
->
->   - struct kho_kexec_metadata
->   - struct kho_vmalloc
->   - struct kho_block_header_ser
->   - struct luo_ser
->   - struct luo_session_ser
->   - struct luo_file_set_ser
->   - struct luo_file_ser
->   - struct luo_flb_header_ser
->   - struct luo_flb_ser
->   - struct pci_ser
->   - struct pci_dev_ser
->   - struct memfd_luo_ser
->   - struct memfd_luo_folio_ser
->
-> If you notice, this also includes the PCI ser structures. PCI LUO
-> support is merged in liveupdate/next, and this series is developed on
-> top of it.
->
-> Each serialized structure is preceded in memory by struct kho_ser_hdr
-> and registered via DECLARE_KHO_SER(name, payload_size, nr_required,
-> nr_optional). Both struct kho_kexec_metadata and struct pci_dev_ser are
-> explicitly marked with __aligned(8) because their largest member is a
-> 32-bit integer, and 8-byte alignment is required by DECLARE_KHO_SER() so
+On Tue, Nov 10, 2026 at 04:54:30PM +0800, Tian Zheng wrote:
+> 
+> 
+> On 11/10/2026 2:18 AM, Leonardo Bras wrote:
+> > On Mon, Nov 09, 2026 at 12:00:52PM +0800, Tian Zheng wrote:
+> > > 
+> > > 
+> > > On 11/6/2026 11:36 PM, Leonardo Bras wrote:
+> > > > On Fri, Nov 06, 2026 at 06:36:04PM +0800, Tian Zheng wrote:
+> > > > > 
+> > > > > 
+> > > > > On 11/2/2026 10:54 PM, Leonardo Bras wrote:
+> > > > > > On Tue, Sep 29, 2026 at 06:36:51PM +0800, Tian Zheng wrote:
+> > > > > > > The dirty ring reserves room for CPU-side dirty buffers via
+> > > > > > > kvm_cpu_dirty_log_size(). Report the HDBSS buffer entry count
+> > > > > > > through it, so a full buffer flush always fits in the ring.
+> > > > > > > 
+> > > > > > > Pin the HDBSS buffer size to PAGE_SIZE when dirty-ring is enabled,
+> > > > > > > via kvm_arch_dirty_ring_size_updated(): a larger buffer only
+> > > > > > > shrinks the soft_limit and forces more frequent userspace drains.
+> > > > > > > 
+> > > > > > > Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+> > > > > > > ---
+> > > > > > >     arch/arm64/kvm/arm.c | 8 ++++++++
+> > > > > > >     arch/arm64/kvm/mmu.c | 8 ++++++++
+> > > > > > >     2 files changed, 16 insertions(+)
+> > > > > > > 
+> > > > > > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > > > > > index 9d7bdece149a..5a7046acb62e 100644
+> > > > > > > --- a/arch/arm64/kvm/arm.c
+> > > > > > > +++ b/arch/arm64/kvm/arm.c
+> > > > > > > @@ -215,6 +215,14 @@ static int kvm_arm_default_max_vcpus(void)
+> > > > > > >     	return vgic_present ? kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
+> > > > > > >     }
+> > > > > > > 
+> > > > > > > +void kvm_arch_dirty_ring_size_updated(struct kvm *kvm)
+> > > > > > > +{
+> > > > > > > +	if (!system_supports_hdbss())
+> > > > > > > +		return;
+> > > > > > > +
+> > > > > > > +	kvm->arch.hdbss_buffer_size = KVM_ARM_HDBSS_DEFAULT_SIZE;
+> > > > > > > +}
+> > > > > > > +
+> > > > > > 
+> > > > > > On the same subject as a previous patch:
+> > > > > > I don't think this is the best approach, on top of adding a new weak
+> > > > > > function to take care.
+> > > > > > 
+> > > > > > Maybe during the dirty-ring allocation, on vcpu creation, we could take
+> > > > > > into account the requested dirty-ring size, and just allocate the HDBSS
+> > > > > > buffer taking that into account. That would make it simpler, don't you
+> > > > > > agree?
+> > > > > > 
+> > > > > > Thanks!
+> > > > > > Leo
+> > > > > 
+> > > > > Hi Leo,
+> > > > > 
+> > > > > The "set once" guard we're discussing comes from the patch that adds the
+> > > > > ioctl, and it isn't really needed. We discussed this earlier [1]: we can
+> > > > > just initialize hdbss_buffer_size to PAGE_SIZE at VM creation and let
+> > > > > the ring reservation use it directly. **That also means
+> > > > > kvm_arch_dirty_ring_size_updated() can be removed.** Thanks for your
+> > > > > suggestion.
+> > > > 
+> > > > :)
+> > > > 
+> > > > > 
+> > > > > As for why PAGE_SIZE is the right value in ring mode: the HDBSS buffer
+> > > > > is flushed on every VM exit, so a larger buffer doesn't reduce the flush
+> > > > > frequency. It only inflates the ring reservation (64 + size/
+> > > > > sizeof(u64)), which shrinks the soft_limit and forces more frequent
+> > > > > exits to userspace for the ring to be drained. Draining the dirty ring
+> > > > > from QEMU is more expensive than draining the HDBSS buffer from the
+> > > > > kernel, so the smallest buffer gives the best performance. In this mode,
+> > > > > a larger buffer provides no benefit to users.
+> > > > 
+> > > > Humm, if properly dimensioned larger buffers would be benefitial for
+> > > > memory-intensive workloads, unless they are guest_exiting for other
+> > > > reasons in the meantime.
+> > > > 
+> > > 
+> > > Agreed, and the workload I tested is on the "unless" side. The guest
+> > > exits constantly for other reasons, so the larger buffer never got a
+> > > chance to pay off, and only cost ring capacity.
+> > > 
+> > > > > 
+> > > > > In my tests, I also saw performance degrade when more space is reserved.
+> > > > > 
+> > > > 
+> > > > Humm, what kind of workloads did you test?
+> > > > Did you have the chance to monitor what were the reasons for VM exiting?
+> > > > 
+> > > 
+> > > For the workload question, it's a Redis server in the guest under redis-
+> > > benchmark (SET-only, 2KB values, 1M keys, 100M requests). The traffic is
+> > > network-driven, so the guest exits constantly to service requests. The
+> > > HDBSS buffer only accumulates entries between two exits and is flushed
+> > > on every exit, so it rarely fills regardless of size. A larger buffer
+> > > only inflated the ring reservation, which shrinks the soft_limit and
+> > > makes the ring-full exit and userspace drain fire more often.
+> > > 
+> > > > I am not saying this is mandatory for the HDBSS implementation, but the
+> > > > whole idea of letting the user choose their own HDBSS buffer size is
+> > > > because different workloads may benefit from different buffer sizes: if a
+> > > > VM writes a lot to new memory, and exits very little for other reasons,
+> > > > then a larger buffer will cause the VM to guest_exit much less often.
+> > > > 
+> > > > Does that make sense?
+> > > > 
+> > > > Thanks!
+> > > > Leo
+> > > 
+> > > It does make sense. That's exactly the workload where a larger buffer
+> > > pays off, and the next version no longer gets in its way. The two ioctls
+> > > are no longer mutually exclusive.
+> > > 
+> > > The only coupling left is the reservation. hdbss_buffer_size starts at
+> > > SZ_4K at VM creation, so a ring enabled right away reserves for the
+> > > default buffer (64 + 512 entries), and the minimum ring size accepted is
+> > > unchanged from v5. KVM_CAP_ARM_HDBSS_BUFFER_SIZE is the gate. When the
+> > > ring is already enabled, a size is accepted only if its reservation
+> > > still fits in the ring, otherwise -EINVAL. In the other order, ring-
+> > > enable validation rejects a ring too small for the configured size.
+> > 
+> > I don't think this is needed. If using dirtyring, we don't need to allow
+> > user to set hdbss size: HDBSS size should be sized according to the
+> > dirty-ring dimensions, that are set by userspace before the first vcpu is
+> > created.
+> > 
+> > 
+> > > So SZ_4K is just the conservative default for guests that exit often.
+> > > Anything larger, within what the ring can reserve, is up to the user.
+> > > 
+> > > Does this work for you?
+> > 
+> > I still think we should do PAGE_SIZE for dirty-bitmap. Dirty ring should do
+> > based on the dirty-ring size, and maybe review the use of reserved
+> > entries, or it's accounting.
+> > 
+> > What do you think?
+> > 
+> > Thanks!
+> > Leo
+> 
+> Hi Leo,
+> 
+> Thanks for your review. It does make sense!
+> 
+> I agree that dirty-bitmap mode will keep PAGE_SIZE as the default, and
+> in that mode the ioctl stays available for a larger buffer.
+> 
+> In ring mode we will drop the ioctl, the two remain mutually exclusive,
+> and the buffer will be derived from the ring size userspace configured
+> before the first vCPU is created:
+> 
+> ```
+> hdbss_buffer = clamp_t(unsigned long,
+>                        rounddown_pow_of_two(ring_size / 16),
+>                        SZ_4K, KVM_ARM_HDBSS_MAX_SIZE);
+> ```
+> 
 
-I do not believe we need __aligned(8), because the struct immediately=20
-follows the newly introduced kho_ser_hdr, which is 8-byte aligned.=20
-However, we should verify that the combined size (header + payload)=20
-is 8-byte aligned.
+Are you allocating 1/16th of the ring size in bytes as an hdbss buffer?
+That's confusing. I recommend we rather have something like:
 
-> trailing feature payloads remain 8-byte aligned across 32-bit and 64-bit
-> kernels.
->
-> Also, Introduce DECLARE_KHO_SER_HDR(ser_name, fhdr) which is just the
-> wrapper for struct kho_ser_hdr fhdr, This makes it clear
-> To which ser_name, this fhdr belongs to.
->
->
-> Series structure:
->   - Patch 1 removes __packed from KHO, LUO, and memfd ABI structures and
->     asserts their natural size and 8-byte alignment under CONFIG_64BIT.
->   - Patch 2 records entry_size in struct kho_block_header_ser so the
->     incoming kernel derives the entry stride from the block header.
->   - Patch 3 converts callers that embedded struct kho_vmalloc by value
->     (memfd_luo and test_kho) to reference it via DECLARE_KHOSER_PTR so
->     struct kho_vmalloc can grow independently.
->   - Patch 4 converts struct luo_session_ser to reference
->     struct luo_file_set_ser via DECLARE_KHOSER_PTR instead of embedding
->     it by value so both structures can grow independently.
->   - Patch 5 introduces struct kho_ser_hdr, DECLARE_KHO_SER(),
->     DECLARE_KHO_SER_HDR(), and the serialization/validation helpers in
->     include/linux/kho/abi/feature.h.
->   - Patches 6-18 add the feature header to each of the 13 KHO, LUO, PCI,
->     and memfd serialized structures in independent patches.
->   - Patch 19 adds a KUnit test suite (kho_feature) covering the feature
->     header helpers.
->
-> [1] https://lore.kernel.org/all/20260903023452.721732-1-loganodell@google=
-.com/
-> [2] https://lore.kernel.org/all/20261021152527.375070-1-tarunsahu@google.=
-com/
-> [3] https://lore.kernel.org/all/20261026174217.603114-1-tarunsahu@google.=
-com/
->
-> Tarun Sahu (19):
->   liveupdate, kho: Remove __packed from KHO, LUO and memfd ABI
->     structures
->   kho: block: Record the entry size in the block header
->   kho, memfd_luo: Reference struct kho_vmalloc via serialized pointer
->   liveupdate: Reference struct luo_file_set_ser via serialized pointer
->   kho: Add feature header for fine-grained ABI compatibility
->   kho: kexec_metadata: Add the feature header
->   kho: vmalloc: Add the feature header
->   kho: block: Add the feature header to blocks
->   liveupdate: Add feature header to struct luo_ser
->   liveupdate: Add feature header to struct luo_session_ser
->   liveupdate: Add feature header to struct luo_file_set_ser
->   liveupdate: Add feature header to struct luo_file_ser
->   liveupdate: Add feature header to struct luo_flb_header_ser
->   liveupdate: Add feature header to struct luo_flb_ser
->   PCI: liveupdate: Add feature header to struct pci_ser
->   PCI: liveupdate: Add feature header to struct pci_dev_ser
->   mm: memfd_luo: Add feature header to struct memfd_luo_ser
->   mm: memfd_luo: Add feature header to struct memfd_luo_folio_ser
->   kho: Add KUnit test for the feature header helpers
->
->  MAINTAINERS                            |   1 +
->  drivers/pci/liveupdate.c               |  99 +++----
->  include/linux/kexec_handover.h         |  15 +-
->  include/linux/kho/abi/block.h          |  21 +-
->  include/linux/kho/abi/feature.h        | 372 +++++++++++++++++++++++++
->  include/linux/kho/abi/kexec_handover.h |  11 +-
->  include/linux/kho/abi/kexec_metadata.h |  17 +-
->  include/linux/kho/abi/luo.h            | 102 ++++---
->  include/linux/kho/abi/memfd.h          |  27 +-
->  include/linux/kho/abi/pci.h            |  66 ++---
->  include/linux/kho_block.h              |   8 +-
->  kernel/liveupdate/kexec_handover.c     |  98 ++++---
->  kernel/liveupdate/kho_block.c          | 172 +++++++++---
->  kernel/liveupdate/luo_core.c           |  43 +--
->  kernel/liveupdate/luo_file.c           |  58 ++--
->  kernel/liveupdate/luo_flb.c            |  69 +++--
->  kernel/liveupdate/luo_internal.h       |   9 +-
->  kernel/liveupdate/luo_session.c        |  55 +++-
->  lib/Kconfig.debug                      |  13 +
->  lib/test_kho.c                         |  38 ++-
->  lib/tests/Makefile                     |   1 +
->  lib/tests/kho_feature_kunit.c          | 184 ++++++++++++
->  mm/memfd_luo.c                         | 183 ++++++++----
->  23 files changed, 1271 insertions(+), 391 deletions(-)
->  create mode 100644 include/linux/kho/abi/feature.h
->  create mode 100644 lib/tests/kho_feature_kunit.c
+ring_entries = ring_size / sizeof(struct kvm_dirty_gfn);
+hdbss_entries = ring_entries / 2; // Or any number we decide to use here.
+hdbss_buf_size = hdbss_entries * sizeof(hdbss_buf_entry);
 
---=20
-Pasha
+Then we do 
+hdbss_buf_size = clamp_t(unsigned long,
+                         rounddown_pow_of_two(hdbss_buf_size),
+                         SZ_4K, KVM_ARM_HDBSS_MAX_SIZE);
+
+So it's clear what is what here. 
+Just dividing by 16 above can be confusing to whoever is reading the code.
+
+
+> A buffer entry is 8 bytes and a ring entry is 16 bytes, so:
+> 
+> ```
+> buffer entries = buffer_size / 8
+> ring entries   = ring_size / 16
+> ```
+
+Remember to use the sizeof instead of fixed numbers.
+
+> 
+> This means ring_size / 16 reserves at most one eighth of the ring
+> entries for the HDBSS buffer. That keeps the usable ring above 85% while
+> the buffer still grows with the configured ring size, and the result is
+> independent of the kernel page size, with SZ_4K as the only minimum.
+
+Yeah, remember that if you are dealing with the ringbuffer like this, an 
+user can request a 4k ringbuffer and we just won't be able to use hdbss, as 
+it means 4k/16 entries, and hdbss has the minimum of 4k/8.
+
+As I mentioned, maybe this approach of reserved entries is not the right 
+way of dealing with it in arm64.
+
+> 
+> One eighth is the ratio that looks reasonable to me so far. What do you
+> think?
+> 
+
+I see no reason why it could not be higher than that. It all depends on how 
+you want to deal with the full buffer in the future patchset. If hdbss 
+buffer is full, it has to exit and drain to the dirtyring. The guarantee 
+you seek with reserved entries is that all hdbss entries fit in the 
+dirty-ring.
+
+As long as the user is required to drain entries until the dirty-ring is 
+not 'full' anymore, we could easily work with dirty-ring having twice as 
+many entries as the hdbss buffer.
+
+How does it sound?
+
+Thanks!
+Leo
 
