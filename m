@@ -1,91 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.44
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794329236;
-	b=DIWLzB6n1ZK7IVVOTHj8dJJAb9SfUEevFWDouAoFU0E3UPkZKyecb+278CIgnqpzP4GB
-	 jgSyYnlAJ3HCgRxCP/Ei/bAkSxf2OS2N0sVOQAq/Op5R046id84Oajx1DUGz/W2gG2R2H
-	 Gb7ZtVWIup8VYnkGrn8MZaiXl4RQO3EIU89OnoC9TW7NvFGe/OtFrjPL8ol4/XVwBL4Y/
-	 iq3GrpCjGbh6JhHT0Oly3GS/9Ah5+Ax3LQnlYtpEUQSP6B1MzG636U9FEfxeDQnngyqRl
-	 9nqgtuMC8rX4C7dmPejQyxc1E2fbO2D1JeKB48ekYpeeEC1RhoOpluacKSXMlCL443A==
+	t=1794329240;
+	b=0P0t3AixQT6gCZZRBODU7iy62gQdeaFXmhPXjBBXpGMDIbVW0WF4oqJe6dbrnAj43TqF
+	 nGh9j31+7HGUcPSs48C5EL62fneDNP3HspulZTwKZGZPGp4UfxyJ63zIoDIzPM2eIp55+
+	 Oz5jtYos6AM2UWKDrGnPCZr33bRX6soFd6poqBzedrWQcfZz0QQ8TMiIkh3Trq43nJVQv
+	 i9hAByImfqJDRB2UWB2v3ohOaYLw1NENfw0c/ND1rDH26OgdsqOhE2C4e07Uny23EAubF
+	 i3QjpeW1LTh70ylCSm4IVitLyz2Pu13BzbqBmNRgzxCNg+kmPWgVSYBYOlvxZyyOj3A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794329236;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794329240;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=WT6C7Hu6Q9Eo/dM1QL4EzHwS0urSyLblqYy3glwBl5U=;
-	b=pcmLZxBSnFquXDAS9i3ypAKanfm4B07GWBK8+8YkTVONlp9GlxIGKVYfoN+WNMDqJBlx
-	 +S6RVrZ/H3EInD/W+csbYgdLI5cd+CCEQXbuZnq2tZjUa7AgfqHco/ODvNDLxo7Z2+VDj
-	 L5hr74plW46uT7qiRXvJZhhIpuFE5RI+zYasLl02XAl3cINuLsGe5+hwVBLV6rZ2jJwfJ
-	 lwKxwN/c5wLjxfD952rjdvopgBVBavAo7aUoFD9p9zSh/Eukjs7zfnUwnsuABDlyiTxhS
-	 MmJ6s/E1D9DP2pZiiIZ5it05Kofn9OTBOBtjhhoWNSnh6SRhHgDwH4UfF7KhPoJW/aA==
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=dCfP6OhX1xgWnjMEw/Fwz/hUIMTroe2e1vks4lC1ucM=;
+	b=OBRJ6z+PEhpocPfDxfOpCJtWdQH7gG/BQHMrIL7FSzj8EIafiYBj8spQHrVSC6fNe4if
+	 /FubeNuF6QepyoUEuZFv6HGFWLqShBNbrxqdoyD6zE+yRnWJUhn7X4Ir/JCDFIeDtR4bc
+	 9EvVd8Oi03Di5gYzZZpnBFLlppzXJ+bKCXli0u9y4a9XRDhMpSJWU9bmR4mGpUJCpFXDA
+	 gwxmYTkU8wx8kmhEgDD3rHks0n513EMdFs+ZxmeuamNYQ1yrOW2PQJMBR+1J1BymaX9Jj
+	 YcX0TBNGuXY6a0tidJhk+mWhMVIpbBNQyMtEjFJUpCu9SoZ2RJQYMQfMOPp3K0VCJWQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WY5ToL7y;
-	arc=none smtp.remote-ip=209.85.128.47
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=xjeHzfiM;
+	arc=none smtp.remote-ip=209.85.128.44
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B285606A334
-	for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 16:47:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3B285606A334
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76418606A32A
+	for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 16:47:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 76418606A32A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WY5ToL7y
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4a20a37703bso16467395e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 08:47:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=xjeHzfiM
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4a5087a5348so19574225e9.0
+        for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 08:47:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794329234; x=1794934034; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=WT6C7Hu6Q9Eo/dM1QL4EzHwS0urSyLblqYy3glwBl5U=;
-        b=WY5ToL7yQdUHX8Ab37xmVm0vS6bJghds7MCMvypysUb4G6dtmapzP272h/Tq/ravkr
-         vpxjUSL4e19SJuDDdHH3omzneNNfKYS/weWKoTNRpzQ3sG54FqOvHAMRDqCeSCYdgqGU
-         Ylr0imW42kzkHT9ymD94LIZa1iH4FyChSe8cLr+NW97r/gRg6NliPSBPDD+nzrPR/6Tk
-         /kB3bYT1IwjvGlXgO2xHSyKSY+UgoKClmQUQeePMuKNheoj8Mb1Kt4tX+Fq18bUi+sit
-         zGD5DqOA/V9iSXS4A9Gi0TzgRljmvOf9t1xzFn9ux5YLbz5GnWZw6nBCUtIWgPwnyPFG
-         G6kQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794329234; x=1794934034;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20260707; t=1794329239; x=1794934039; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=WT6C7Hu6Q9Eo/dM1QL4EzHwS0urSyLblqYy3glwBl5U=;
-        b=hqcpCmSFs68ruOtcyYbw/Syt+L8SqRKXwKXO0+vau2zEyA+6/K4AJQq/9aOdLUAc3Y
-         vbkesU6IlLW3yBfiqZmOJ8AUSewULXEQ3Bo4XD1gmOR7bsLBAb4TnEX8/vRoTNuIUYV8
-         ItcGfDrnDuSordlXVkNDzV2jMSGkxXnO3KR9xAuseLNEwElnF9fmsUhSw4mwen+Q22bp
-         fkiMYDNj+LFhwkLwQd8WwaEqU+Uwiogy1FHsf2wktsvX7hrMMZWyDaOZ6L0p1Nv6TWps
-         Bfiz8eSAVOKch2MoZLVGUvfqOLGqnqz7VrVPKORpgkKOs0eab/Zn50YFoO/MlLk1qljR
-         aFbg==
-X-Forwarded-Encrypted: i=1; AL+hErHtRNPKmzmx8pVKuyxEzFdRjtTcdmlmZcw8E5KIQVeNdGDSR7efVi6vRLBbOkxkkAgMINR65pQ=@lists.linux.dev
-X-Gm-Message-State: APuU4Z+jivKH0fVTtAjaqUbaavSw4PNljjU2+EH1b05nmVByi0p95/JL
-	wvw9r3FuPtH5u3rgZ2JU+iQ7MHinnWD44daHBS87PDaioI8zMkmeMfQU
-X-Gm-Gg: AYBFou2ViUu64CkbZQjUbFHjZoPUMCamKzXVzcZ5DRtG0wXOdiH8X8rySdE+KSgKgQ6
-	gTvzwmDL06vlw4Ue3kd3m/q50RSq8ZWoOnZO0hBOet8N2TugTb3wWPnKDSZ7tSOjFe0I6o6AVuD
-	krziQ4C1R+r90al0TGNxdpTmEXdRoNeZ4AqEpFA+eVoj+84jkf3ulpbiroh4FenXF9k0r1/Jkkx
-	6n2D5R2hsXsGvctOHyJEXvSgCxkMRXwQEDzOAngoJQ312vs8FH2+2HtOAD9gjBD8cPMCAMA4nvK
-	N7YArbe/2rc0NOyw6c6JwqQdyZikk1DrAeMqDfTHhR5jaNU9sAhs1DaXYzkzNNoaJkqgA8kZgju
-	OjIEklW4VZmuDgVMDjb9fhPTCe1vtcU9H5shqG6K8p6w8M8Mb1D/YNnMxe36SRXa6tvg59iPuYL
-	IU+UQH+qQpStC2ilAugaEer2Lt0jdhzl2VzhFI0DIUay87ZHZooj/qUyFAIkV+xhIMy7JLhTvZ+
-	lAgojNp84CTJSKYZOOjWMXK3B+BZhpKWY6oWs9FkPaZUAZCNlX9vbNeEhCLJqlyC7i2ZbYUkKDs
-	10uRT4tNkoRcAYzknJg9Q3Xmyk5K76X8+r7LzYH9hEqhtH40d4UcgjtdHjtWhT49AV3qI5gh7pm
-	LwEqDUievsmtf20gt9gAqKurk
-X-Received: by 2002:a05:600c:4e8a:b0:4a2:fd2:985d with SMTP id 5b1f17b1804b1-4ba02345745mr59161225e9.12.1794329234174;
-        Tue, 10 Nov 2026 08:47:14 -0800 (PST)
+        bh=dCfP6OhX1xgWnjMEw/Fwz/hUIMTroe2e1vks4lC1ucM=;
+        b=xjeHzfiMwft+X3JM3amB6HbUgeuQbx1vBRBrCUM4TmtnYaei3YAOopk48mtVz994P4
+         hJ6KzhI8x3BFl5MTO/hfjtEsPsR4J2d1RThGq+ThaK0+2dOroaPqpoky/yJn+yILW9QK
+         LW3aMr7tZdcQ3cztnfTn2G2P2DC0Pu/Vk8UcqGWQrlosjtK6rrTZWaGL/Hky0yTYsAsJ
+         xbtseLYZDFEIDe0Ld4TCv6B5dEu+BJIJX/jFGNujsYWt1PiUJEaGC7SPGaHcr+isvQAO
+         1wE1i012hSIDOHCPEQTuN4ih/FUYSTfMqNlefZD+7gR/66IVdbGlxu1gfkkhXPtzqlxS
+         /ymQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794329239; x=1794934039;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=dCfP6OhX1xgWnjMEw/Fwz/hUIMTroe2e1vks4lC1ucM=;
+        b=MSGUS1rX9iJkUj3lH5xLNsZl9//uLi/yw6+AABjkvg87OZ70cv3UKCfiqO+t/d3E8c
+         VYHr74mR9eDYoXTB5f/0x+zRgP6ROBsnuTf1b8soaefdRFw6ID+AU7iA3/kmn+LJtycu
+         MO8sBWuNkAagAJ7tNZ21Orhy5pFUF5zACpbWWl0P4gn4Oi7zlweI5v7dJl/7LgOAilsJ
+         ZJeyATHaS6smK8aUtupX4lhx/2lBHI+O7rXtXfUS7d22iZKwSyEgyjUNnjYKzzC3fDdL
+         022BSZgxpX6psqpiQaRCBov98s+FOIJxegLeFdCvd76pjSZuu/NcmkSgQiQ+T/3fkrgq
+         RlMw==
+X-Forwarded-Encrypted: i=1; AL+hErGlUUlOpVdcjf3usa/VXRSvQzLYWPgMwZHpUMHMHU9Wx0Mw1obnhfB+THz9vYw/DHHw+9ouvfQ=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+tKEbl+GgQq4yc2ZPIp7T2Qqh9UmG4FvPEdbTZQAFwajIw9ZM2
+	3IB7+nebExSvvv9GHhz2rQtBY2F9tU9BrItazTdH2dTv9VUlMrTv4wex
+X-Gm-Gg: AYBFou3lrU+loeznkE/PE6KXdyOeYoO2MozEUJuy1hoKz/BvJ0KGRcfhNLV87cagI33
+	EmzNyjffnrV8hJiVAKAljtXLvaG/1TMfliP4d0yJRQyH7+FVStEBPPupOKLhS9yLJ+S38LkgWnj
+	fdAQJzatyeXNebhpNB1itGDfIrR6oG4/wlQwYAr1sZlFqt7VOKJE3cBZkB9rPbaXTZ7rwiwMDhE
+	S4PZ0mJRvKJm2Yo0e7V2ufFW1xPkNpBmisKTlaSjJav1Ml6fty2gIOXvSSxzCQ58OPVue/Sogul
+	oYqS7ZfnB/exveD4mNqt+pOUgTVHrSIs55OC409YGr81GGyLtS8L+tzpyVUNTgy+rsAusk287gb
+	P0qIXRlDeZAr/E11hIrFq863lWrNHLwzYDMu/gW4EbzGZQmtx9JrpnCda8DqVW5HMguCOAv9Q8M
+	mOPWscyn5d3+EkUEzVIkyqbMkIo124s4/u1e4jnqv68rAqRtbMNmrdQjd0Q9qobAH0R1d7qqu6b
+	eCxgBXcPtsp/c1wN/PqJ/Gf8nfLtfZTXX2myTjYXpr8u/OwkREYk0JNZGrLc2aFvLYzU/UY4FsS
+	PNMYVFcqL5Pp/7i2Dmcxvp7Vr8fAPFqWGTbAM9P7Cc20MobowSAjMdSqw8G40QeQM2NxR0rQNZC
+	Rv4Ta7/Yc6pzbSpe4wfd05sJd
+X-Received: by 2002:a05:600c:8b21:b0:4a7:a5db:a93e with SMTP id 5b1f17b1804b1-4ba023085c6mr53018695e9.4.1794329238548;
+        Tue, 10 Nov 2026 08:47:18 -0800 (PST)
 Received: from PKL-HASEEBA-LT.. ([39.36.65.144])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4ba01fe9357sm84905075e9.9.2026.11.10.08.47.09
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4ba01fe9357sm84905075e9.9.2026.11.10.08.47.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Nov 2026 08:47:13 -0800 (PST)
+        Tue, 10 Nov 2026 08:47:17 -0800 (PST)
 From: Haseeb Ashraf <haseebashraf091@gmail.com>
 To: maz@kernel.org,
 	Oliver Upton <oupton@kernel.org>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>,
+Cc: Haseeb Ashraf <haseeb.ashraf@siemens.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
 	Wei-Lin Chang <weilin.chang@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	fahad.arslan@siemens.com,
-	haseeb.ashraf@siemens.com,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
@@ -95,10 +96,12 @@ Cc: Fuad Tabba <fuad.tabba@linux.dev>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 0/1] KVM: arm64: Resume stage-2 unmap where the walk stopped
-Date: Tue, 10 Nov 2026 21:47:05 +0500
-Message-ID: <20261110164706.582879-1-haseebashraf091@gmail.com>
+Subject: [PATCH v2] KVM: arm64: Resume stage-2 unmap where the walk stopped
+Date: Tue, 10 Nov 2026 21:47:06 +0500
+Message-ID: <20261110164706.582879-2-haseebashraf091@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20261110164706.582879-1-haseebashraf091@gmail.com>
+References: <20261110164706.582879-1-haseebashraf091@gmail.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -110,88 +113,216 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Unmapping the whole IPA space of a shadow stage-2, as emulating TLBI
-VMALLS12E1IS and TLBI ALLE1IS does, walks it one block-sized chunk at a
+From: Haseeb Ashraf <haseeb.ashraf@siemens.com>
+
+kvm_vm_stage2_unmap_range() unmaps a range one block-sized chunk at a
 time. The walker steps over an invalid entry in one go, but the next
 walk starts at the following chunk, so an invalid entry larger than a
-chunk is visited once for every chunk it covers. Each walk also ends
-with a range TLBI when FEAT_TLBIRANGE and FWB are available.
+chunk is visited once for every chunk it covers. Unmapping the whole
+IPA space of a shadow stage-2, as emulating TLBI VMALLS12E1IS and TLBI
+ALLE1IS does, takes 2^18 walks with 4K pages and a 48-bit IPA space,
+however little it maps. Each walk also ends with a range TLBI when
+FEAT_TLBIRANGE and FWB are available.
 
-This version follows the approach of Fuad's series [2]: the walk reports
-the address it reached, and the unmap loop resumes from there. The walk
-already handles every entry it steps over, so nothing has to be looked
-up beforehand.
+On an AmpereOne A192-32X (192 CPUs, Xen on KVM, 4K pages, 48-bit IPA),
+a full-range unmap of one shadow stage-2 took 0.82-0.94 s (mean 0.91 s
+over 192 unmaps) on 6.18.29. With this change and the mainline commits
+it builds on backported, it took 2.1-27.8 ms (mean 3.8 ms over 128
+unmaps), with 512 to 1024 walks instead of 262144. A TLBI VMALLS12E1IS
+trap that unmapped two shadow stage-2s took up to 1.85 s before.
 
-An example shows what changes. Take 4K pages and a 48-bit IPA space.
-The root is a level-0 table with 512 entries of 512GB each, and a chunk
-is 1GB:
+Add kvm_pgtable_stage2_unmap_range(), which returns the address its
+walk reached, and have the unmap loop resume from there.
+kvm_pgtable_stage2_unmap() still returns 0 or an error, for its
+callers at EL2. The walk handles every entry it steps over, including
+invalid entries that carry state, so nothing has to be looked up
+beforehand.
 
-  Empty shadow stage-2
-    before: 2^18 = 262144 walks. Each of the 512 level-0 entries is
-            visited once for every one of the 512 chunks under it.
-    after:  512 walks. The first walk under an invalid entry returns
-            the end of that entry, and the loop resumes there.
+The unmap of a shadow stage-2 also drops the guest stage-2 records of
+the whole span the walk covered: nothing is mapped in the part it
+stepped over, so any record there is stale. Each walk that remains
+ends with the same deferred TLB invalidation as before. The spans that
+were skipped have no valid entry, so there is nothing to invalidate.
 
-  One populated 512GB region (RAM and devices low in the IPA space)
-    before: 262144 walks.
-    after:  at most 512 + 511 = 1023 walks: 512 chunks inside the
-            region, and one step over each of the 511 other entries.
+Suggested-by: Oliver Upton <oupton@kernel.org>
+Signed-off-by: Haseeb Ashraf <haseeb.ashraf@siemens.com>
+---
+ arch/arm64/include/asm/kvm_pgtable.h | 18 ++++++++
+ arch/arm64/kvm/hyp/pgtable.c         | 22 ++++++++--
+ arch/arm64/kvm/mmu.c                 | 63 +++++++++++++++++++++++-----
+ 3 files changed, 90 insertions(+), 13 deletions(-)
 
-The example is derived from the page-table layout. Measurements follow.
-The machine is an AmpereOne A192-32X (192 CPUs, bare metal, 4K pages,
-48-bit IPA, FWB and TLB range maintenance present) running Xen as a KVM
-guest. The workload is one create and destroy cycle of an 8GB guest
-under Xen. bpftrace kprobes and kretprobes recorded every full-range
-unmap (start 0, size 2^48), its walks, its range TLBIs and its duration.
-"Before" is plain 6.18.29. "After" is 6.18.29 with this patch, adapted
-to the older unmap loop, and with seven commits that are already in
-mainline backported: 33346f8960c7 and e5843f4effaa (nested_mmus life
-cycle), and a6ca6cba5959, c2778d14cd2f, 5491980c1a41, e6084aecaeef and
-2064f15b0848 (guest stage-2 tracking).
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 1c9c57c..4ed096f 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -725,6 +725,24 @@ int kvm_pgtable_stage2_annotate(struct kvm_pgtable *pgt, u64 addr, u64 size,
+  */
+ int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size);
+ 
++/**
++ * kvm_pgtable_stage2_unmap_range() - Remove a mapping from a guest stage-2
++ *                                    page-table, and report where the walk
++ *                                    stopped.
++ * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
++ * @addr:	Intermediate physical address from which to remove the mapping.
++ * @size:	Size of the mapping.
++ *
++ * Same as kvm_pgtable_stage2_unmap(), but the walk can end past @addr + @size
++ * when it steps over an invalid entry that extends beyond the range. Nothing
++ * is mapped up to the address that is returned, so a caller that unmaps a
++ * larger range in chunks can resume from it.
++ *
++ * Return: the address the walk reached, which can be past @addr + @size, or a
++ * negative error code on failure.
++ */
++s64 kvm_pgtable_stage2_unmap_range(struct kvm_pgtable *pgt, u64 addr, u64 size);
++
+ /**
+  * kvm_pgtable_stage2_wrprotect() - Write-protect guest stage-2 address range
+  *                                  without TLB invalidation.
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 9c83837..b02f548 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -1197,7 +1197,7 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
+ 	return 0;
+ }
+ 
+-int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
++s64 kvm_pgtable_stage2_unmap_range(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ {
+ 	int ret;
+ 	struct kvm_pgtable_walker walker = {
+@@ -1205,13 +1205,29 @@ int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ 		.arg	= pgt,
+ 		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
+ 	};
++	struct kvm_pgtable_walk_data data = {
++		.walker	= &walker,
++		.start	= ALIGN_DOWN(addr, PAGE_SIZE),
++		.addr	= ALIGN_DOWN(addr, PAGE_SIZE),
++		.end	= PAGE_ALIGN(data.addr + size),
++	};
+ 
+-	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
++	ret = _kvm_pgtable_walk(pgt, &data);
+ 	if (stage2_unmap_defer_tlb_flush(pgt))
+ 		/* Perform the deferred TLB invalidations */
+ 		kvm_tlb_flush_vmid_range(pgt->mmu, addr, size);
+ 
+-	return ret;
++	if (ret)
++		return ret;
++
++	return data.addr;
++}
++
++int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
++{
++	s64 ret = kvm_pgtable_stage2_unmap_range(pgt, addr, size);
++
++	return ret < 0 ? ret : 0;
+ }
+ 
+ struct stage2_attr_data {
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 1db10d8..55a3cb5 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -319,22 +319,64 @@ static void invalidate_icache_guest_page(void *va, size_t size)
+ 	__invalidate_icache_guest_page(va, size);
+ }
+ 
+-static int kvm_pgtable_stage2_unmap_tracked(struct kvm_pgtable *pgt,
++static s64 kvm_pgtable_stage2_unmap_tracked(struct kvm_pgtable *pgt,
+ 					    u64 addr, u64 size);
+ 
++/*
++ * Unmap [start, end) one chunk at a time, resuming from the address that each
++ * walk reached. An invalid entry that is larger than a chunk is then stepped
++ * over once, rather than once for every chunk that it covers.
++ */
++static int stage2_apply_unmap_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
++				    phys_addr_t end,
++				    s64 (*fn)(struct kvm_pgtable *, u64, u64),
++				    bool resched)
++{
++	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
++	bool lock_dropped = false;
++	phys_addr_t addr = start;
++	u64 next;
++	s64 ret;
++
++	do {
++		struct kvm_pgtable *pgt = mmu->pgt;
++
++		/*
++		 * We may be raced on PGT teardown when we release the
++		 * kvm->mmu_lock. That's fine as the PGT is legitimately no
++		 * longer present.
++		 */
++		if (!pgt)
++			return lock_dropped ? 0 : -EINVAL;
++
++		next = stage2_range_addr_end(addr, end);
++		ret = fn(pgt, addr, next - addr);
++		if (ret < 0)
++			return ret;
++
++		next = min_t(u64, ret, end);
++		if (resched && next != end) {
++			cond_resched_rwlock_write(&kvm->mmu_lock);
++			lock_dropped = true;
++		}
++	} while (addr = next, addr != end);
++
++	return 0;
++}
++
+ static void kvm_vm_stage2_unmap_range(struct kvm_s2_mmu *mmu,
+ 				      phys_addr_t start,
+ 				      u64 size, bool may_block)
+ {
+ 	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+-	int (*fn)(struct kvm_pgtable *, u64, u64);
++	s64 (*fn)(struct kvm_pgtable *pgt, u64 addr, u64 size);
+ 
+ 	if (kvm_is_nested_s2_mmu(kvm, mmu))
+ 		fn = kvm_pgtable_stage2_unmap_tracked;
+ 	else
+-		fn = kvm_pgtable_stage2_unmap;
++		fn = kvm_pgtable_stage2_unmap_range;
+ 
+-	WARN_ON(stage2_apply_range(mmu, start, start + size, fn, may_block));
++	WARN_ON(stage2_apply_unmap_range(mmu, start, start + size, fn, may_block));
+ }
+ 
+ static void pkvm_stage2_unmap_range(struct kvm_s2_mmu *mmu,
+@@ -375,16 +417,17 @@ static void no_stage2_unmap_range(struct kvm_s2_mmu *mmu,
+  * does.
+  */
+ 
+-static int kvm_pgtable_stage2_unmap_tracked(struct kvm_pgtable *pgt, u64 addr, u64 size)
++static s64 kvm_pgtable_stage2_unmap_tracked(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ {
+-	int ret;
++	s64 ret;
+ 
+-	ret = kvm_pgtable_stage2_unmap(pgt, addr, size);
+-	if (ret)
++	ret = kvm_pgtable_stage2_unmap_range(pgt, addr, size);
++	if (ret < 0)
+ 		return ret;
+ 
+-	kvm_remove_guest_s2_mappings(pgt->mmu, addr, size);
+-	return 0;
++	/* The walk may have stepped over invalid entries: any record there is stale. */
++	kvm_remove_guest_s2_mappings(pgt->mmu, addr, ret - addr);
++	return ret;
+ }
+ 
+ /**
+-- 
+2.43.0
 
-                                    before          after
-  full-range unmaps                    192            128
-  walks per unmap                   262144     512 - 1024
-  range TLBIs per unmap             262144  same as walks
-  unmap duration, mean            907.8 ms        3.77 ms
-  unmap duration, median          909.3 ms        2.46 ms
-  unmap duration, min             815.5 ms        2.06 ms
-  unmap duration, max             937.6 ms       27.8  ms
-  VMALLS12E1IS trap, mean         957.0 ms        3.78 ms
-  VMALLS12E1IS trap, max         1848.6 ms       27.9  ms
-
-Walks per unmap after the change: 512 (10 unmaps), 534 (1), 546 (78),
-1023 (38) and 1024 (1), mean 689. The page-table occupancy was not
-recorded, so I cannot tie each count to a layout. 1024 is one more than
-a single populated region gives. Before the change nine of the 177 traps
-unmapped two shadow stage-2s and took about twice as long; after it
-every trap unmapped one.
-
-Patch 1 adds kvm_pgtable_stage2_unmap_range(), which returns the address
-its walk reached, and has the unmap loop resume from there.
-kvm_pgtable_stage2_unmap() keeps its return value for its callers at
-EL2. The unmap of a shadow stage-2 also drops the guest stage-2 records
-of the whole span the walk covered. The TLBI VMALLS12E1IS handler,
-kvm_nested_s2_unmap() and the pending unmap of a recycled shadow stage-2
-need no change.
-
-Changes since v1 [1]:
-  - Reworked as Oliver suggested: the walk reports the next IPA to the
-    outer loop, as in Fuad's series [2]. This replaces
-    kvm_stage2_unmap_all() and its kvm_pgtable_get_leaf() lookup.
-  - No extra VMID-wide TLBI: each walk keeps its own TLB maintenance.
-  - Measurements added.
-  - Based on Linux 7.4-rc1, the same base as [2]. It does not depend on
-    [2]; it applies with and without it.
-
-[1] https://lore.kernel.org/r/cfa77cdbf14d9fd24c22ab1ef9b940a0d7411699.1794229714.git.haseeb.ashraf@siemens.com
-[2] https://lore.kernel.org/r/20261106133000.453240-1-fuad.tabba@linux.dev
-
-Tooling: the patch was drafted with AI assistance (SiemensGPT). The
-statistics were collected with bpftrace, using kprobes at function entry
-and kretprobes at function return.
-
-Testing: the backport of this patch, together with the seven commits
-listed above, was booted as 6.18.29 on the machine above, and the
-measurements are from that kernel. The patch for 7.4-rc1 itself was only
-compile-checked in isolation.
