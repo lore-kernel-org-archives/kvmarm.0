@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794322950;
-	b=YQ9Oy04N6ff8TBuwiDnqbtjXnq3w6fcErtLlRRvFpHLdJOOR84sr8lrjyc7tHjmi4Rif
-	 6zYQYF0qEvrAqNT1oMCa0zBIUN3/crIqHdFENc07PDA3LTFrs13cz8i+1XOXAo7h55JFC
-	 zB2Ss5qCPEXyhx3ajgVBnEn4rWw1D7VVlhK5t4hbHoQ9hT4fYhvKz9NaUgYc5V1y0YICa
-	 4eSy9dSrZqh3AZ/ZNFyDAs8QSoSAea1mPsLiA17fdaKYdMbCmwLOrl96zW+9fALdPiUQT
-	 e/gqFIhiFCtb+sV4mJ0GpoilxuDPEtHkdYp+CF7z99t0i6ZeJ/faHWmB4ndywbW0ZCw==
+	t=1794323022;
+	b=Fge9o24/+AOGKjPjfUVewxK54XvbJHQhAUKKJCyCbvvOsmbV07zw0v0ju8qv8KCMWsfZ
+	 ZRCZ3CEH3Xl76eil+vKX38ArW24QTzqti1squGzKt3Gthj+ETKGiPSUWxunOCoxWyv9SA
+	 RsEl1cP3y479FimrCelpsoTED+z/axUewHljL79Q0vU96S7l6X87o1plLZ5IvJy+x6g1z
+	 nwf9oJVUV4RkAka/JCN5ccSI+lSZAoBqFgbVS4OtY89U0tIMBtOYp65pH1aCEzWeIvTaB
+	 XbRD2Fzm2NkHoOmxhZoqer6oODqZShG2k+OUF7SK4Wnv8CDgHHzBsfI9PAjxXq2K01g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794322950;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794323022;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
 	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
 	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=4gXXedfU+at3CF8LAScfFVlF8KoBb0SDUnRC5ZiBGXc=;
-	b=qoIAZq6INRco2GPXdholSUZMN2AZ/bWVCxOxyG5qvUvKvAlaSoEXarbEk0Jq9SQLOYDs
-	 dfTWgNxotgD/J1srWFNBJuM9EbNHOKG5F/ZiyF7Y9mDOJopCq1mxNVnFMpkvMqKAbtIsP
-	 xB70khz5tKE3wixNd8zqagu/GpzCMnz8uXW+9O/8iai7EINSxGNlmYhMh3Kqwvr4fAkif
-	 59lvcgu/guLzAh6vdxmokLyZKkUCWC6R41TvCnWTHP799pOgqiuwRDeXyl/qUKTtuyJI3
-	 F85v1LR3TayBf0yR5FXpE6XPQsgiYo4gSrwYE/lY0cL+DYJ2XvGgFccudn+NdpoALlQ==
+	bh=AMHbmw6AVtBrgvvIHxlDgD7+QXqZ2+qmHiJeu2jXxSY=;
+	b=Ly7bu9kg8uzRhcepRm95TczzS/jpkMsHAEO/KagoDeTtlk/9FHbisLFcLvrvZ1uG3CGD
+	 TTpU0zF+O3lPWXoMCSpiGkPXAdh09+Bqb6g8D91GY7gqnXFVFexXEngIxO2Xzj0lBkPqs
+	 m1rznTqr8LizkCSd+DIBLUY/4anpWUEFn3+JQavTqK3F91tQ7fFyJGkARBAkKkokG6ST/
+	 ofQ00/mcuIp2dZIxsRTJw7cgY6SHse4KK4q2OzVPkRuuS582awUZt0b0lJBttjs0dLI96
+	 zRIFta5AmprbgJxaBMdDvZSMPq/NfZ4KOUMVnats8+qAONKahR3MM1UqyVk8DIFh3bg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Tf8dVvER;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=BDXHlq7q;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF83C606A326
-	for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 15:02:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DF83C606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C83760A6F6E
+	for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 15:03:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4C83760A6F6E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Tf8dVvER
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=BDXHlq7q
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3B84D1477;
-	Tue, 10 Nov 2026 07:02:26 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AE1241477;
+	Tue, 10 Nov 2026 07:03:37 -0800 (PST)
 Received: from [10.0.154.42] (e121487-lin.cambridge.arm.com [10.0.154.42])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6A2D33F632;
-	Tue, 10 Nov 2026 07:02:27 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E02513F85F;
+	Tue, 10 Nov 2026 07:03:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794322949; bh=ZEzp2lVsIPCY2+Z0Y8hijRS/rpyqEe8uNVwKEbqyqPg=;
+	t=1794323020; bh=+CQQvJipOP4J7j27DlWXVN4Zz15AKszvwAXw7sWPqqg=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Tf8dVvERyVnFiUAzScbcZwyhRckiQFKWX13YdOcJaVhPbUC+J1XmrCRu8V6R55Tdy
-	 dlGVLHVklAtkPrMas+g5509s0WPg8B3a3V6OHB0EYtHG9QRX++OVdW9Idq6PDlIktP
-	 nEWL0Lqr5euPuhApVe8lt2oXrgkigTHFZFVe8r9g=
-Message-ID: <b36259d1-b9cc-4389-82aa-ea7dd5691e32@arm.com>
-Date: Tue, 10 Nov 2026 15:02:25 +0000
+	b=BDXHlq7qHdvVgaQ+ZYR6KGBROFyuL2TyBQrmoKdgJlTeP0i7eK/iLWAM2u1/aPBag
+	 LbKPKIvrlwQa5RRvqTVytxn+T1nLmidWPm3TyDP+jXHyV9vNGDmCqSkLrlzWpc4b6x
+	 s707A2RQDdfvks31yuTOBwqUr+Gd6ZU6Bikjmhw0=
+Message-ID: <29794754-0152-4820-b457-33aea6a8cda2@arm.com>
+Date: Tue, 10 Nov 2026 15:03:36 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -54,66 +54,126 @@ List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kvmtool v4 05/23] arm64: Add GICv5 irqchip device support
+Subject: Re: [PATCH kvmtool v4 06/23] arm64: Configure GIC interrupt bases
 To: Sascha Bischoff <sascha.bischoff@arm.com>, will@kernel.org,
  julien.thierry.kdev@gmail.com
 Cc: maz@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
  timothy.hayes@arm.com, Peter Maydell <peter.maydell@linaro.org>
 References: <20261102213413.4136118-1-sascha.bischoff@arm.com>
- <20261102213413.4136118-6-sascha.bischoff@arm.com>
+ <20261102213413.4136118-7-sascha.bischoff@arm.com>
 Content-Language: en-GB
 From: Vladimir Murzin <vladimir.murzin@arm.com>
-In-Reply-To: <20261102213413.4136118-6-sascha.bischoff@arm.com>
+In-Reply-To: <20261102213413.4136118-7-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 11/2/26 21:33, Sascha Bischoff wrote:
-> Add IRQCHIP_GICV5 and create KVM_DEV_TYPE_ARM_VGIC_V5 for it. GICv5
-> has no distributor or redistributor MMIO frame, so omit those address
-> attributes.
+> Record the SPI and PPI bases for the selected irqchip and expose getters
+> to code that does not receive the irqchip type. Configure the bases
+> after the GIC device and MSI frame have been created.
 > 
 > Tested-by: Vladimir Murzin <vladimir.murzin@arm.com>
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 > ---
->  arm64/gic.c             | 5 +++++
->  arm64/include/kvm/gic.h | 1 +
->  2 files changed, 6 insertions(+)
+>  arm64/gic.c             | 48 +++++++++++++++++++++++++++++++++++++++++
+>  arm64/include/kvm/gic.h |  4 ++++
+>  2 files changed, 52 insertions(+)
 > 
 > diff --git a/arm64/gic.c b/arm64/gic.c
-> index 57f3fa02..51a32159 100644
+> index 51a32159..df5689a7 100644
 > --- a/arm64/gic.c
 > +++ b/arm64/gic.c
-> @@ -227,6 +227,9 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
->  	case IRQCHIP_GICV3_ITS:
->  		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V3;
->  		break;
-> +	case IRQCHIP_GICV5:
-> +		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V5;
-> +		break;
->  	case IRQCHIP_AUTO:
->  		return -ENODEV;
+> @@ -21,6 +21,18 @@ static u64 gic_redists_size;
+>  static u64 gic_msi_base;
+>  static u64 gic_msi_size = 0;
+>  static bool vgic_is_init = false;
+> +static int gic_spi_base = GIC_SPI_IRQ_BASE;
+> +static int gic_ppi_base = GIC_PPI_IRQ_BASE;
+> +
+> +int gic__get_spi_base(void)
+> +{
+> +	return gic_spi_base;
+> +}
+> +
+> +int gic__get_ppi_base(void)
+> +{
+> +	return gic_ppi_base;
+> +}
+>  
+>  struct kvm_irqfd_line {
+>  	unsigned int		gsi;
+> @@ -211,6 +223,34 @@ static int gic__set_dist(enum irqchip_type type)
 >  	}
-> @@ -321,6 +324,8 @@ int gic__create(struct kvm *kvm, enum irqchip_type type)
->  		gic_redists_base = ARM_GIC_DIST_BASE - gic_redists_size;
->  		gic_msi_base = gic_redists_base - gic_msi_size;
->  		break;
+>  }
+>  
+> +static int gic__set_spi(enum irqchip_type type)
+> +{
+> +	switch (type) {
 > +	case IRQCHIP_GICV5:
+> +		gic_spi_base = GICV5_SPI_IRQ_BASE;
 > +		break;
->  	default:
->  		return -ENODEV;
->  	}
+> +	default:
+> +		gic_spi_base = GIC_SPI_IRQ_BASE;
+> +		break;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int gic__set_ppi(enum irqchip_type type)
+> +{
+> +	switch (type) {
+> +	case IRQCHIP_GICV5:
+> +		gic_ppi_base = GICV5_PPI_IRQ_BASE;
+> +		break;
+> +	default:
+> +		gic_ppi_base = GIC_PPI_IRQ_BASE;
+> +		break;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+>  {
+>  	int err;
+> @@ -256,6 +296,14 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+>  	if (err)
+>  		goto out_err;
+>  
+> +	err = gic__set_spi(type);
+> +	if (err)
+> +		goto out_err;
+> +
+> +	err = gic__set_ppi(type);
+> +	if (err)
+> +		goto out_err;
+> +
+>  	return 0;
+>  
+>  out_err:
 > diff --git a/arm64/include/kvm/gic.h b/arm64/include/kvm/gic.h
-> index 8490cca6..630f0bbd 100644
+> index 630f0bbd..c4f78cde 100644
 > --- a/arm64/include/kvm/gic.h
 > +++ b/arm64/include/kvm/gic.h
-> @@ -29,6 +29,7 @@ enum irqchip_type {
->  	IRQCHIP_GICV2M,
->  	IRQCHIP_GICV3,
->  	IRQCHIP_GICV3_ITS,
-> +	IRQCHIP_GICV5,
->  };
+> @@ -4,6 +4,8 @@
+>  #define GIC_SGI_IRQ_BASE		0
+>  #define GIC_PPI_IRQ_BASE		16
+>  #define GIC_SPI_IRQ_BASE		32
+> +#define GICV5_PPI_IRQ_BASE		0
+> +#define GICV5_SPI_IRQ_BASE		0
+>  
+>  #define GIC_FDT_IRQ_NUM_CELLS		3
+>  
+> @@ -34,6 +36,8 @@ enum irqchip_type {
 >  
 >  struct kvm;
+>  
+> +int gic__get_spi_base(void);
+> +int gic__get_ppi_base(void);
+>  int gic__alloc_irqnum(void);
+>  int gic__create(struct kvm *kvm, enum irqchip_type type);
+>  int gic__create_gicv2m_frame(struct kvm *kvm, u64 msi_frame_addr);
 > -- 2.34.1
 > 
 
