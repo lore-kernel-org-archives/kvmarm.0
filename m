@@ -1,83 +1,104 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794328775;
-	b=glGRIp62HHnIA2nINj/xLVwRkbmbH2Xq2HpJ4wU9x2cqhlKA9eY7ljVH5G58xNZn4YX5
-	 L5ff1PRHs1QouALPBeRjJwePHvxVEfPlCJpv692wcaY0b4eGOgXCQ9c8hUsgRSpujh3v6
-	 BY+m3jXH3E1qDKaxnO+do7UwNwA73jsNLhafwKRuZDGvC28w5Keqa42UGhmuEAvGoXQlG
-	 2Mwzwg6e+EDQNBXzRTAPQ+6Yf9VK7pZdX2woCL61rVpQJx5nNx5nMmigIorR82Ed4ENKl
-	 BFJvrUJIA2rf+5S/dJoCe9mi5NPzoFsk/NSOcgbkmCMllECE45APVN3HYxAQxo+movw==
+	t=1794329236;
+	b=DIWLzB6n1ZK7IVVOTHj8dJJAb9SfUEevFWDouAoFU0E3UPkZKyecb+278CIgnqpzP4GB
+	 jgSyYnlAJ3HCgRxCP/Ei/bAkSxf2OS2N0sVOQAq/Op5R046id84Oajx1DUGz/W2gG2R2H
+	 Gb7ZtVWIup8VYnkGrn8MZaiXl4RQO3EIU89OnoC9TW7NvFGe/OtFrjPL8ol4/XVwBL4Y/
+	 iq3GrpCjGbh6JhHT0Oly3GS/9Ah5+Ax3LQnlYtpEUQSP6B1MzG636U9FEfxeDQnngyqRl
+	 9nqgtuMC8rX4C7dmPejQyxc1E2fbO2D1JeKB48ekYpeeEC1RhoOpluacKSXMlCL443A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794328775;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794329236;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Mime-Version:
-	 Content-Transfer-Encoding:Content-Type:Date:Message-Id:Cc:Subject:
-	 From:To:X-Mailer:References:In-Reply-To;
-	bh=KprtAoIZUPQy03e7SCEXrO4BhVdW6Lml6VdK8wkVG2w=;
-	b=FP9pgLqaS7pz6BRlnjUzDRaMKFFm3DDlz1pcdUvMzzEjtHVNYVDPS6fmbAzcw0xfTDcB
-	 6yUoUZCAI1H4LLQm2lLO6EzuJ9XFBb8Ve/c9B5b8Nbmk+HxNNUWQN4p1PwIRl4e82IGOK
-	 1cZx2PHxnxRrrR2/x3HLjHPbRhYAnd5RdpWzxdO7V9de+8kgshgZAPHd7+eXXrVhD/3ei
-	 +ul+72BC1FIqiZiTnvocBJfxs2pcXs0cKHw9gm4gv9iVA1J+HVhdJjzZccvjZAZAdnyoR
-	 VEJCzktB7R42JYxAF4ZN9GrrPqoYx8tOFiOJlg1kUBYkxoRZJKW6y7Hpbtol2nDxjsg==
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=WT6C7Hu6Q9Eo/dM1QL4EzHwS0urSyLblqYy3glwBl5U=;
+	b=pcmLZxBSnFquXDAS9i3ypAKanfm4B07GWBK8+8YkTVONlp9GlxIGKVYfoN+WNMDqJBlx
+	 +S6RVrZ/H3EInD/W+csbYgdLI5cd+CCEQXbuZnq2tZjUa7AgfqHco/ODvNDLxo7Z2+VDj
+	 L5hr74plW46uT7qiRXvJZhhIpuFE5RI+zYasLl02XAl3cINuLsGe5+hwVBLV6rZ2jJwfJ
+	 lwKxwN/c5wLjxfD952rjdvopgBVBavAo7aUoFD9p9zSh/Eukjs7zfnUwnsuABDlyiTxhS
+	 MmJ6s/E1D9DP2pZiiIZ5it05Kofn9OTBOBtjhhoWNSnh6SRhHgDwH4UfF7KhPoJW/aA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b="DwMnh/7f";
-	arc=none smtp.remote-ip=209.85.216.53
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WY5ToL7y;
+	arc=none smtp.remote-ip=209.85.128.47
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93F7F60A263F
-	for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 16:39:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 93F7F60A263F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B285606A334
+	for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 16:47:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3B285606A334
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=DwMnh/7f
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-3b0d0b80fb9so1364228a91.1
-        for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 08:39:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WY5ToL7y
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4a20a37703bso16467395e9.1
+        for <kvmarm@lists.linux.dev>; Tue, 10 Nov 2026 08:47:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794328774; x=1794933574; darn=lists.linux.dev;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-type:content-transfer-encoding:mime-version:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=KprtAoIZUPQy03e7SCEXrO4BhVdW6Lml6VdK8wkVG2w=;
-        b=DwMnh/7fvo2aKeuK7+E7zP5py2qlGXJhBDucZGjSafiZq1HXurD3YzgE7kV7SZ3Ply
-         3CwO/jPf8TXQz7UC/uDIjRBARW0nc4R90OqSDOM7mRl6lbdKH9HVfrTLqHGQ0869Xifn
-         j2G5XcOHkqVBe4m4Z/6T/fIjRUvhSjVPX/btuz9jJA331broIJTaD2BgXz9n5QJN/5t2
-         zZpGsiA5s3CpxmRwAj0MnwkckL1cZWko35wqzFpriAUbXFmnS7GjedGtvrRsAA+ALOij
-         RaLhm3/rvMFha0U2gWhK+7c8oJHVuXtqbYZI/8ybiPEXEhhXYUihMcuj2oIBznsjwh2A
-         Hd2w==
+        d=gmail.com; s=20260707; t=1794329234; x=1794934034; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=WT6C7Hu6Q9Eo/dM1QL4EzHwS0urSyLblqYy3glwBl5U=;
+        b=WY5ToL7yQdUHX8Ab37xmVm0vS6bJghds7MCMvypysUb4G6dtmapzP272h/Tq/ravkr
+         vpxjUSL4e19SJuDDdHH3omzneNNfKYS/weWKoTNRpzQ3sG54FqOvHAMRDqCeSCYdgqGU
+         Ylr0imW42kzkHT9ymD94LIZa1iH4FyChSe8cLr+NW97r/gRg6NliPSBPDD+nzrPR/6Tk
+         /kB3bYT1IwjvGlXgO2xHSyKSY+UgoKClmQUQeePMuKNheoj8Mb1Kt4tX+Fq18bUi+sit
+         zGD5DqOA/V9iSXS4A9Gi0TzgRljmvOf9t1xzFn9ux5YLbz5GnWZw6nBCUtIWgPwnyPFG
+         G6kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794328774; x=1794933574;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-type:content-transfer-encoding:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=KprtAoIZUPQy03e7SCEXrO4BhVdW6Lml6VdK8wkVG2w=;
-        b=yIftQvBXrcMGg6TvxR69Hy79Ua8XgaJBahg9UI6Y5A54DuNcgqN+oW1yRjWRV85o7j
-         c4vDuVSgFy9wzwgONt/FsbiNaoye/WkIewZbNJaxns3bq4WTwcS2y8wCl7MhH2Zi0xEV
-         v/R39+L0IjUKW/PiaH/7u4+TPTqqTCbc/RPt4Ak4ScbpAJ+oaYlWy6r2r+snJNRUZ+EU
-         cBW7yDxAeOKkYmw4WwxgMxrjraMykWYnHwg9bDsDMaBAC3wIJu7PcqxQUSQS/Dqdm1/s
-         b0gDjcyO40wXVC+BqwBYBKWQbTs30L1jtWJCj2f1RlX5eM/6U89AVzK9C3hVuUaWw/Lf
-         BHHA==
-X-Gm-Message-State: APuU4Z/x+Gb8z42erB4C0C7ZvmGIPSZAry/JpCMKN+Qx4BnfMKmhnY//
-	EADMldpVO9HrAYvrqIvYSWtojPyiRoWq4kSkNOlYFdxichaU1t1uaIpee2iEyLEdYg==
-X-Gm-Gg: AYBFou0hqOkUDKmFDL8bw5IssLLfBmT5jhnJL178bwG4150B0UNsYE1ZFQajwov5+Q4
-	1YOKAu4bxp/Qqt9neELfTPVsDCwbHtVo6XNPR3Sm3DT9AJTYwWP3elvexJy9Z2NCyi+vF0TaDeY
-	qFejkAchaFhrEUuz0DWMi/yCl+8QRDcb2IlfiXkY/XpbdpakI/mkiPSyC/YtMRz5cJ6eSPSy97P
-	1VbMlIfKmq3slo+0AY3JfKcOzzyNlAxEZDBPaJlYFZpFKvAWgGdckCm1SYoCf9kDcQYCHtuZvck
-	rQ91izMTn3rJne45Om1xk92vMyTeFaq5fR22eLCwmcxXYL3DD6p+FvxUPj1654k2ClIcnCBqvmv
-	h/HUxRH6A93XoJFj6O/MEdo40o3ybVtF8q0DlkODappmNjqmsR6Mm5sQ1uaWZ39Ugd1TUhcYBVt
-	7PB1ScOLptt/SFteslY1Lxcs3sbCcg1WRZm4Mspr1dciMmfaji08Kn/wJDGi0e1/rY1Yrgpvn4d
-	NCN5VaJpoPE18L6XkRpCksuIaBilCSGmwmFWDR60SzCkSBzyO1n9TC5daIyyJvRFf3472AfQME7
-	6dY8AVjQlr4QiisS+aFfUIe3V/Qf0f3Z8I//BzTThlP5tvzkTW7icuW3Fc7XDold
-X-Received: by 2002:a17:90a:d444:b0:3ac:9d83:8861 with SMTP id 98e67ed59e1d1-3b166e3c924mr3152630a91.67.1794328773194;
-        Tue, 10 Nov 2026 08:39:33 -0800 (PST)
-Received: from localhost (33.79.127.34.bc.googleusercontent.com. [34.127.79.33])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b168a8de09sm2418499a91.0.2026.11.10.08.39.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Nov 2026 08:39:31 -0800 (PST)
+        d=1e100.net; s=20260707; t=1794329234; x=1794934034;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=WT6C7Hu6Q9Eo/dM1QL4EzHwS0urSyLblqYy3glwBl5U=;
+        b=hqcpCmSFs68ruOtcyYbw/Syt+L8SqRKXwKXO0+vau2zEyA+6/K4AJQq/9aOdLUAc3Y
+         vbkesU6IlLW3yBfiqZmOJ8AUSewULXEQ3Bo4XD1gmOR7bsLBAb4TnEX8/vRoTNuIUYV8
+         ItcGfDrnDuSordlXVkNDzV2jMSGkxXnO3KR9xAuseLNEwElnF9fmsUhSw4mwen+Q22bp
+         fkiMYDNj+LFhwkLwQd8WwaEqU+Uwiogy1FHsf2wktsvX7hrMMZWyDaOZ6L0p1Nv6TWps
+         Bfiz8eSAVOKch2MoZLVGUvfqOLGqnqz7VrVPKORpgkKOs0eab/Zn50YFoO/MlLk1qljR
+         aFbg==
+X-Forwarded-Encrypted: i=1; AL+hErHtRNPKmzmx8pVKuyxEzFdRjtTcdmlmZcw8E5KIQVeNdGDSR7efVi6vRLBbOkxkkAgMINR65pQ=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+jivKH0fVTtAjaqUbaavSw4PNljjU2+EH1b05nmVByi0p95/JL
+	wvw9r3FuPtH5u3rgZ2JU+iQ7MHinnWD44daHBS87PDaioI8zMkmeMfQU
+X-Gm-Gg: AYBFou2ViUu64CkbZQjUbFHjZoPUMCamKzXVzcZ5DRtG0wXOdiH8X8rySdE+KSgKgQ6
+	gTvzwmDL06vlw4Ue3kd3m/q50RSq8ZWoOnZO0hBOet8N2TugTb3wWPnKDSZ7tSOjFe0I6o6AVuD
+	krziQ4C1R+r90al0TGNxdpTmEXdRoNeZ4AqEpFA+eVoj+84jkf3ulpbiroh4FenXF9k0r1/Jkkx
+	6n2D5R2hsXsGvctOHyJEXvSgCxkMRXwQEDzOAngoJQ312vs8FH2+2HtOAD9gjBD8cPMCAMA4nvK
+	N7YArbe/2rc0NOyw6c6JwqQdyZikk1DrAeMqDfTHhR5jaNU9sAhs1DaXYzkzNNoaJkqgA8kZgju
+	OjIEklW4VZmuDgVMDjb9fhPTCe1vtcU9H5shqG6K8p6w8M8Mb1D/YNnMxe36SRXa6tvg59iPuYL
+	IU+UQH+qQpStC2ilAugaEer2Lt0jdhzl2VzhFI0DIUay87ZHZooj/qUyFAIkV+xhIMy7JLhTvZ+
+	lAgojNp84CTJSKYZOOjWMXK3B+BZhpKWY6oWs9FkPaZUAZCNlX9vbNeEhCLJqlyC7i2ZbYUkKDs
+	10uRT4tNkoRcAYzknJg9Q3Xmyk5K76X8+r7LzYH9hEqhtH40d4UcgjtdHjtWhT49AV3qI5gh7pm
+	LwEqDUievsmtf20gt9gAqKurk
+X-Received: by 2002:a05:600c:4e8a:b0:4a2:fd2:985d with SMTP id 5b1f17b1804b1-4ba02345745mr59161225e9.12.1794329234174;
+        Tue, 10 Nov 2026 08:47:14 -0800 (PST)
+Received: from PKL-HASEEBA-LT.. ([39.36.65.144])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4ba01fe9357sm84905075e9.9.2026.11.10.08.47.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Nov 2026 08:47:13 -0800 (PST)
+From: Haseeb Ashraf <haseebashraf091@gmail.com>
+To: maz@kernel.org,
+	Oliver Upton <oupton@kernel.org>
+Cc: Fuad Tabba <fuad.tabba@linux.dev>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	fahad.arslan@siemens.com,
+	haseeb.ashraf@siemens.com,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/1] KVM: arm64: Resume stage-2 unmap where the walk stopped
+Date: Tue, 10 Nov 2026 21:47:05 +0500
+Message-ID: <20261110164706.582879-1-haseebashraf091@gmail.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -86,101 +107,91 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 10 Nov 2026 16:39:31 +0000
-Message-Id: <DMROGPTP93G4.13PA42UFKZJNJ@google.com>
-Cc: <kvmarm@lists.linux.dev>, <linux-pci@vger.kernel.org>, "Pratyush Yadav"
- <pratyush@kernel.org>, <kexec@lists.infradead.org>, <kvm@vger.kernel.org>,
- <iommu@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
- <skhawaja@google.com>, <sagis@google.com>, <linux-arch@vger.kernel.org>,
- <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 15/19] PCI: liveupdate: Add feature header to struct
- pci_ser
-From: "David Matlack" <dmatlack@google.com>
-To: "Tarun Sahu" <tarunsahu@google.com>, "Pasha Tatashin"
- <pasha.tatashin@soleen.com>, "Mike Rapoport" <rppt@kernel.org>,
- <robin.murphy@arm.com>, <maz@kernel.org>, <will@kernel.org>, "David
- Matlack" <dmatlack@google.com>, "Alexander Graf" <graf@amazon.com>,
- <seanjc@google.com>, <jgg@nvidia.com>, <loganodell@google.com>,
- <arnd@arndb.de>, <dwmw2@infradead.org>, <baolu.lu@linux.intel.com>, "Bjorn
- Helgaas" <bhelgaas@google.com>, <oupton@kernel.org>, <alex@shazbot.org>,
- <gle.com@google.com>, <pbonzini@redhat.com>, "Andrew Morton"
- <akpm@linux-foundation.org>, <kevin.tian@intel.com>, <joro@8bytes.org>
-X-Mailer: aerc 0.21.0
-References: <20261110050202.529473-1-tarunsahu@google.com>
- <20261110050202.529473-16-tarunsahu@google.com>
-In-Reply-To: <20261110050202.529473-16-tarunsahu@google.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Tue Nov 10, 2026 at 5:01 AM UTC, Tarun Sahu wrote:
-> PCI_SER_REQUIRED_FLAGS_SUPPORTED. Remove dev_ser_size and
-> PCI_DEV_SER_MIN_SIZE so restoration derives the struct pci_dev_ser stride
-> from the KHO block header entry_size. Drop __packed from struct pci_ser
+Unmapping the whole IPA space of a shadow stage-2, as emulating TLBI
+VMALLS12E1IS and TLBI ALLE1IS does, walks it one block-sized chunk at a
+time. The walker steps over an invalid entry in one go, but the next
+walk starts at the following chunk, so an invalid entry larger than a
+chunk is visited once for every chunk it covers. Each walk also ends
+with a range TLBI when FEAT_TLBIRANGE and FWB are available.
 
-Taking the stride from the block header is good, but dropping
-PCI_DEV_SER_MIN_SIZE removes the only check that incoming entries are
-large enough to hold the fields this kernel reads.
-kho_block_set_restore() only rejects an entry_size of 0, so
-pci_flb_retrieve() will now read past the end of entries smaller than
-offsetofend(struct pci_dev_ser, refcount) instead of panicking. Please
-keep an equivalent check against the incoming entry size.
+This version follows the approach of Fuad's series [2]: the walk reports
+the address it reached, and the unmap loop resumes from there. The walk
+already handles every entry it steps over, so nothing has to be looked
+up beforehand.
 
-> from the KHO block header entry_size. Drop __packed from struct pci_ser
-> and struct pci_dev_ser, adding an explicit u32 reserved field to struct
-> pci_ser for 8-byte alignment, and bump PCI_LUO_FLB_COMPATIBLE from pci to
+An example shows what changes. Take 4K pages and a 48-bit IPA space.
+The root is a level-0 table with 512 entries of 512GB each, and a chunk
+is 1GB:
 
-Please move this to patch 1, which drops __packed from the other ABI
-structs.
+  Empty shadow stage-2
+    before: 2^18 = 262144 walks. Each of the 512 level-0 entries is
+            visited once for every one of the 512 chunks under it.
+    after:  512 walks. The first walk under an invalid entry returns
+            the end of that entry, and the loop resumes there.
 
-> pci_ser for 8-byte alignment, and bump PCI_LUO_FLB_COMPATIBLE from pci to
-> pci-v2.
+  One populated 512GB region (RAM and devices low in the IPA space)
+    before: 262144 walks.
+    after:  at most 512 + 511 = 1023 walks: 512 chunks inside the
+            region, and one step over each of the 511 other entries.
 
-The PCI Live Update ABI hasn't been in a release yet, so maybe we don't
-need a version bump?
+The example is derived from the page-table layout. Measurements follow.
+The machine is an AmpereOne A192-32X (192 CPUs, bare metal, 4K pages,
+48-bit IPA, FWB and TLB range maintenance present) running Xen as a KVM
+guest. The workload is one create and destroy cycle of an 8GB guest
+under Xen. bpftrace kprobes and kretprobes recorded every full-range
+unmap (start 0, size 2^48), its walks, its range TLBIs and its duration.
+"Before" is plain 6.18.29. "After" is 6.18.29 with this patch, adapted
+to the older unmap loop, and with seven commits that are already in
+mainline backported: 33346f8960c7 and e5843f4effaa (nested_mmus life
+cycle), and a6ca6cba5959, c2778d14cd2f, 5491980c1a41, e6084aecaeef and
+2064f15b0848 (guest stage-2 tracking).
 
-[...]
+                                    before          after
+  full-range unmaps                    192            128
+  walks per unmap                   262144     512 - 1024
+  range TLBIs per unmap             262144  same as walks
+  unmap duration, mean            907.8 ms        3.77 ms
+  unmap duration, median          909.3 ms        2.46 ms
+  unmap duration, min             815.5 ms        2.06 ms
+  unmap duration, max             937.6 ms       27.8  ms
+  VMALLS12E1IS trap, mean         957.0 ms        3.78 ms
+  VMALLS12E1IS trap, max         1848.6 ms       27.9  ms
 
-> - *  * The size of each struct pci_dev_ser is recorded in
-> - *    ``pci_ser.dev_ser_size`` and is never smaller than
-> - *    ``PCI_DEV_SER_MIN_SIZE``. The next kernel ignores any fields beyon=
-d the
-> - *    ones it knows about, and must handle entries that are smaller than=
- its
-> - *    own struct pci_dev_ser.
-> + * Preserved devices are serialized as struct pci_dev_ser entries stored=
- in
-> + * a KHO block set. The block header records the entry size, allowing th=
-e
-> + * next kernel to step through entries using the source kernel's stride
-> + * even if fields are added in later versions.
+Walks per unmap after the change: 512 (10 unmaps), 534 (1), 546 (78),
+1023 (38) and 1024 (1), mean 689. The page-table occupancy was not
+recorded, so I cannot tie each count to a layout. 1024 is one more than
+a single populated region gives. Before the change nine of the 177 traps
+unmapped two shadow stage-2s and took about twice as long; after it
+every trap unmapped one.
 
-Please keep the rules for extending struct pci_dev_ser. I'd say
-something like: fields appended to struct pci_dev_ser must be gated by
-a feature in struct pci_ser's header, entries are never smaller than
-PCI_DEV_SER_MIN_SIZE, and the next kernel must not read fields beyond
-the incoming entry size.
+Patch 1 adds kvm_pgtable_stage2_unmap_range(), which returns the address
+its walk reached, and has the unmap loop resume from there.
+kvm_pgtable_stage2_unmap() keeps its return value for its callers at
+EL2. The unmap of a shadow stage-2 also drops the guest stage-2 records
+of the whole span the walk covered. The TLBI VMALLS12E1IS handler,
+kvm_nested_s2_unmap() and the pending unmap of a recycled shadow stage-2
+need no change.
 
-[...]
+Changes since v1 [1]:
+  - Reworked as Oliver suggested: the walk reports the next IPA to the
+    outer loop, as in Fuad's series [2]. This replaces
+    kvm_stage2_unmap_all() and its kvm_pgtable_get_leaf() lookup.
+  - No extra VMID-wide TLBI: each walk keeps its own TLB maintenance.
+  - Measurements added.
+  - Based on Linux 7.4-rc1, the same base as [2]. It does not depend on
+    [2]; it applies with and without it.
 
->  struct pci_flb_outgoing {
-> -	struct pci_ser *ser;
-> +	DECLARE_KHO_SER_HDR(pci_ser, *fhdr);
->  	struct kho_block_set block_set;
->  };
+[1] https://lore.kernel.org/r/cfa77cdbf14d9fd24c22ab1ef9b940a0d7411699.1794229714.git.haseeb.ashraf@siemens.com
+[2] https://lore.kernel.org/r/20261106133000.453240-1-fuad.tabba@linux.dev
 
-I'd keep the ser pointer here (and in struct pci_flb_incoming) and add
-the header pointer alongside it. The header is only needed to free the
-allocation and for args->data, and keeping ser avoids sprinkling
-kho_ser_payload(outgoing->fhdr, pci_ser)-> throughout the file.
+Tooling: the patch was drafted with AI assistance (SiemensGPT). The
+statistics were collected with bpftrace, using kprobes at function entry
+and kretprobes at function return.
 
-Also, please call it header rather than fhdr, here and throughout the
-series. fhdr isn't obvious to someone reading this code for the first
-time, whereas header is very obvious and clear.
-
-[...]
-
-> + * @reserved: Reserved for alignment.
-
-Please document that this must be zero, so it can be used by a future
-feature.
+Testing: the backport of this patch, together with the seven commits
+listed above, was booted as 6.18.29 on the machine above, and the
+measurements are from that kernel. The patch for 7.4-rc1 itself was only
+compile-checked in isolation.
