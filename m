@@ -1,65 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794399414;
-	b=I9HQ6VCCIpHu3UAD5fHmd82TSxvPDdnUKwHAWwygLWzYRUSmlvmbagZuGHJ2vIzikp4v
-	 uuHTrlAOwVgi409oZFRS3TIPMX4Hg4qsALTCqTRaiQc2/NNHtEY8UBZqX+CvpCSKsIqYp
-	 OUkhtB7PXVAQbGbvTvUVroxLZZa1volAYtCnqLGuKrN1yf1elBoGXPBILPq9GhIJa7T/0
-	 GWwqVe7I1P68emW55zDPSVx7VE5qM+n0p00TyqAxGnx25berVzmpSmwDrUWsIUf5Y9rkG
-	 v+eMyfmfwr0Q2+Gr7LPQNbaVeNSdrIQAGHwSyypT1FqjbATafrMGQbBABW42DDvtuFg==
+	t=1794405563;
+	b=Gou4EnMaD//yT1wX6g0iuXJWSz7KvsD2+j+q1dijEdYw4dacrdBfoFhTVILO4CwOTGvt
+	 ZICSUT2uUyFtHY3veVGWZWHu4AfOk3LjArPvcBHWCfwkT/x/D1azutLt8Ja+zZ8/2GUt0
+	 HQXZX4dSbSXMxgUoxma5J2J0pMQAWJOuvEQxMtDQ9P3SdQ6Ur4s1hM6ziMhenbiaEFnBZ
+	 MezoW9nApDiqqys7kwa6x7SHGl6dGwMepRuHLOS916sPjty/QGlv8kdkD3glxpA1zbCt2
+	 gLTUAfbMszBNATeKMjJoe9t5raOo0CO/aceY5/rPm8/IgRX657oKnXrqU3mVP6Hs0ZQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794399414;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
-	bh=UhyhIOX7imp5mBWbRK2/NSiFHVImK/OE1OBipxfe6bs=;
-	b=KazLQ345Ak3f5NEeak6S4OphBHfjlbdd5hRbPGtx92iS39FTEKbpNpzv+fyporY7cCzs
-	 PUMcb993uSNlNxFag+Ye+XS4cFBqqS0+A7zLy4qHwfpS03yAA85yAFNf6chkuXmsfN5Nu
-	 lVM82HmQKCEIPe0x1KwYqagAznuV2BUpCb/vZmU+HAjLhg3+kCTxvIk0yHgNIT0uQ179b
-	 NPtsxS0uf4NC0VveGMVdS21NBot8x5tcTbTNGmxMc8F9a8h4fwbaNok+QQETwyGsBn8il
-	 63S1t+Z7wAcWRXs9xBEGtM0JzscgZF0zprlDNX65UWb6mf/IQUE/Qf7IRXc43YVyRlA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794405563;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
+	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=yWS0+4kurKjndaOQRErlwqMS9KCLA/8IMzcMt6fHeEk=;
+	b=Cura92ARFU1GGJtFEsFFTchRgaBVv4W9ms/42oTAWmaHnIwVN5secfnPatNhBaIclknm
+	 HvBTsps4wbC4dgAeasxVdoE0R+Dy2dfA4Ayb+JCGM9yLx4icbwWLQdCARozKguxdIEsq9
+	 yhcOPvWEtFT1+SGSpm4TzSNLxRNHpgyKNKcOVAXrILgKxbYir29Jkmlq5NFREGso1EK8d
+	 afOvS7UPkpNloNXQLg9od0Yz8lTzjCmWERskeBPmlYWeXYrVZ3SVCAM42iCVGrGaX2V1/
+	 0eU+P69YKXGW9VgKo8zn+EdDnEl5WVPNkFBWULUmUn8gKfYcHQT3P2oUN4vq21c7sig==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=ZndW6QmP;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=eO3N8mVU;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95587606A324
-	for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 12:16:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 95587606A324
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83D87606A326
+	for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 13:59:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 83D87606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=ZndW6QmP
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=eO3N8mVU
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C425C1576;
-	Wed, 11 Nov 2026 04:16:49 -0800 (PST)
-Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 24CFC3F632;
-	Wed, 11 Nov 2026 04:16:51 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E68AB1576;
+	Wed, 11 Nov 2026 05:59:18 -0800 (PST)
+Received: from [10.57.69.47] (unknown [10.57.69.47])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AD9FE3F673;
+	Wed, 11 Nov 2026 05:59:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794399412; bh=6o9WL3LbxwWjRuuSAZAU1s3uvYxMlarF7UOOA3mk1BY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZndW6QmPdIppTYfh2pC54oryPfzVs1WfZyMXbgnBc548WdsvM6/u3Pq4B1V4p1cjH
-	 L6V+KqBATxFayX6yKj7IRI4J2DO1VJtMYm7XhqQXLGegvaBNWaNWXD6KLbbelGxS1q
-	 EPxirp0ysXRkPtV0JlzoBEh4zgIh7g0UGmE6TVls=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 7/8] KVM: arm64: nv: Enforce sysreg visibility before evaulating guest traps
-Date: Wed, 11 Nov 2026 12:16:28 +0000
-Message-ID: <avRcnIB6O-_wnDHr@LeoBrasDK>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261104192124.3932743-8-oupton@kernel.org>
-References: <20261104192124.3932743-1-oupton@kernel.org> <20261104192124.3932743-8-oupton@kernel.org>
+	t=1794405561; bh=ZS/6+logSEVjBhsJ898Tt4DanlJ8je6TCRqCH1C6kak=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=eO3N8mVUBUtNqhII9a/tEc81Ec4bqXfC3opjg7RtnAwOj48vBxoFwn0gTgJjSe28j
+	 azwZd8fu84HHjudgNafZPbstRNInc2Bj0M4wjZcfOLEnhYbNtLA5Mf3TPRwFsRl/9u
+	 ZATQVUicbb+glkJc/EWmw1eC3blUY/XrGaS/I4Jc=
+Message-ID: <5fa8a1fb-4e2c-4746-8a70-a47f387ef0d6@arm.com>
+Date: Wed, 11 Nov 2026 13:59:17 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -69,184 +53,196 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 09/18] KVM: arm64: Implement HVC handling for protected
+ guests at EL2
+To: Fuad Tabba <fuad.tabba@linux.dev>, maz@kernel.org, oupton@kernel.org,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+Cc: catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com,
+ seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ mark.rutland@arm.com, steven.price@arm.com, vdonnefort@google.com,
+ qperret@google.com, tabba@google.com
+References: <20261001135711.1640520-1-fuad.tabba@linux.dev>
+ <20261001135711.1640520-10-fuad.tabba@linux.dev>
+From: Ryan Roberts <ryan.roberts@arm.com>
+Content-Language: en-GB
+In-Reply-To: <20261001135711.1640520-10-fuad.tabba@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 04, 2026 at 11:21:23AM -0800, Oliver Upton wrote:
-> Not all sysregs / system instructions can be described by FGUs. Of
-> these, there are some which may be not implemented for the VM (e.g. MTE
-> cache maintenance instructions) yet intersect with valid trap bits for
-> the VM (HCR_EL2.TPCP).
+Hi Faud,
+
+I have some drive-by comments for this patch, having stumbled upon it while
+poking around in SSBS code today...
+
+
+On 01/10/2026 14:57, Fuad Tabba wrote:
+> Extend kvm_handle_pvm_hvc64() to handle SMCCC_VERSION,
+> SMCCC_ARCH_FEATURES and the vendor hypervisor call UID at EL2, so
+> these queries don't reach the host. ARCH_FEATURES is mandatory from
+> SMCCC 1.1, the version EL2 implements: it returns SUCCESS for itself and
+> for SMCCC_VERSION, NOT_SUPPORTED for anything else, and handles the
+> ARCH_WORKAROUND_1/2/3 queries as the host does, from a copy of the
+> host's mitigation state taken at init with the sanitised ID registers.
+> The workaround calls themselves are already handled on hyp entry.
 > 
-> This is annoying to deal with since most of our UNDEF infrastructure is
-> built around traps being RESx for unimplemented features. Test the
-> visibility of the sys_reg_desc to avoid injecting traps for non-existent
-> system registers into the guest hypervisor.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: a7484c80e5ca ("KVM: arm64: Allow userspace to request KVM_ARM_VCPU_EL2*")
-> Signed-off-by: Oliver Upton <oupton@kernel.org>
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 > ---
->  arch/arm64/kvm/emulate-nested.c | 24 +++++++++++++++++++++---
->  arch/arm64/kvm/sys_regs.c       | 18 ++++++++++--------
->  arch/arm64/kvm/sys_regs.h       |  4 +++-
->  3 files changed, 34 insertions(+), 12 deletions(-)
+>  arch/arm64/include/asm/kvm_hyp.h |  4 ++
+>  arch/arm64/kvm/arm.c             |  4 ++
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c   | 68 ++++++++++++++++++++++++++++++++
+>  3 files changed, 76 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index d04ac5203454..46dc658b041b 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -2546,12 +2546,13 @@ static bool check_fgt_bit(struct kvm_vcpu *vcpu, enum vcpu_sysreg sr,
->  	return !(kvm_get_sysreg_res0(kvm, sr) & BIT(tc.bit));
->  }
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 4974492744cc8..7609c78c68f34 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -10,6 +10,7 @@
+>  #include <linux/compiler.h>
+>  #include <linux/kvm_host.h>
+>  #include <asm/alternative.h>
+> +#include <asm/spectre.h>
+>  #include <asm/sysreg.h>
 >  
-> -bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
-> +bool triage_sysreg_trap(struct kvm_vcpu *vcpu, const struct sys_reg_desc **r)
+>  DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+> @@ -150,6 +151,9 @@ extern u64 kvm_nvhe_sym(id_aa64smfr0_el1_sys_val);
+>  
+>  extern unsigned long kvm_nvhe_sym(__icache_flags);
+>  extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
+> +extern enum mitigation_state kvm_nvhe_sym(spectre_v2_state);
+> +extern enum mitigation_state kvm_nvhe_sym(spectre_v4_state);
+> +extern enum mitigation_state kvm_nvhe_sym(spectre_bhb_state);
+>  extern unsigned int kvm_nvhe_sym(kvm_host_sve_max_vl);
+>  extern unsigned long kvm_nvhe_sym(hyp_nr_cpus);
+>  extern unsigned int kvm_nvhe_sym(hyp_gicv3_nr_lr);
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index db36815630790..cceeeee266902 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -2622,6 +2622,10 @@ static void kvm_hyp_init_symbols(void)
+>  	kvm_nvhe_sym(__icache_flags) = __icache_flags;
+>  	kvm_nvhe_sym(kvm_arm_vmid_bits) = kvm_arm_vmid_bits;
+>  
+> +	kvm_nvhe_sym(spectre_v2_state) = arm64_get_spectre_v2_state();
+> +	kvm_nvhe_sym(spectre_v4_state) = arm64_get_spectre_v4_state();
+> +	kvm_nvhe_sym(spectre_bhb_state) = arm64_get_spectre_bhb_state();
+
+Is it really correct to snapshot this state then use it at runtime assuming its
+still accurate? See below...
+
+
+> +
+>  	/* Propagate the FGT state to the nVHE side */
+>  	kvm_nvhe_sym(hfgrtr_masks)  = hfgrtr_masks;
+>  	kvm_nvhe_sym(hfgwtr_masks)  = hfgwtr_masks;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> index 6ff08d195ff56..10ff2ba6c6c1b 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -10,12 +10,18 @@
+>  #include <linux/mm.h>
+>  
+>  #include <asm/kvm_emulate.h>
+> +#include <asm/spectre.h>
+>  
+>  #include <nvhe/mem_protect.h>
+>  #include <nvhe/memory.h>
+>  #include <nvhe/pkvm.h>
+>  #include <nvhe/trap_handler.h>
+>  
+> +/* The host's Spectre mitigation state, for SMCCC_ARCH_FEATURES. */
+> +enum mitigation_state spectre_v2_state;
+> +enum mitigation_state spectre_v4_state;
+> +enum mitigation_state spectre_bhb_state;
+> +
+>  /* Used by icache_is_aliasing(). */
+>  unsigned long __icache_flags;
+>  
+> @@ -1181,8 +1187,70 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
 >  {
->  	enum vcpu_sysreg fgtreg;
->  	union trap_config tc;
->  	enum trap_behaviour b;
->  	bool is_read;
-> +	int sr_index;
->  	u32 sysreg;
->  	u64 esr;
+>  	u64 val[4] = { SMCCC_RET_INVALID_PARAMETER };
+>  	bool handled = true;
+> +	u32 feature;
+> +	uuid_t uuid;
 >  
-> @@ -2559,6 +2560,7 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
->  	sysreg = esr_sys64_to_sysreg(esr);
->  	is_read = (esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_READ;
->  
-> +	*r = NULL;
+>  	switch (smccc_get_function(vcpu)) {
+> +	case ARM_SMCCC_VERSION_FUNC_ID:
+> +		/* Nothing to be handled by the host. Go back to the guest. */
+> +		val[0] = ARM_SMCCC_VERSION_1_1;
+> +		break;
+> +	case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
+> +		/* The workaround calls themselves are handled on hyp entry. */
+> +		val[0] = SMCCC_RET_NOT_SUPPORTED;
+> +		feature = smccc_get_arg1(vcpu);
+> +		switch (feature) {
+> +		case ARM_SMCCC_VERSION_FUNC_ID:
+> +		case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
+> +			val[0] = SMCCC_RET_SUCCESS;
+> +			break;
+> +		case ARM_SMCCC_ARCH_WORKAROUND_1:
+> +			switch (spectre_v2_state) {
+> +			case SPECTRE_VULNERABLE:
+> +				break;
+> +			case SPECTRE_MITIGATED:
+> +				val[0] = SMCCC_RET_SUCCESS;
+> +				break;
+> +			case SPECTRE_UNAFFECTED:
+> +				val[0] = SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED;
+> +				break;
+> +			}
+> +			break;
+> +		case ARM_SMCCC_ARCH_WORKAROUND_2:
+> +			switch (spectre_v4_state) {
+> +			case SPECTRE_VULNERABLE:
+> +				break;
+> +			case SPECTRE_MITIGATED:
+> +				/* With SSBS advertised the guest's default is safe. */
+> +				if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, SSBS, IMP))
+> +					break;
 
-In the caller, desc is already NULL, and here we are overwriting as NULL 
-again. Is it needed here?
+For this case (and the break immediately above) you return val[0] =
+SMCCC_RET_INVALID_PARAMETER (from init at top of this function). But the
+kernel's kvm_smccc_call_handler() returns val[0] = SMCCC_RET_NOT_SUPPORTED in
+these cases (which seems more likely to be correct). Does this violate the ABI?
 
-(For some reason it looks weird to me that the first thing we do with a 
-parameter is to clean it's contents here)
+> +				fallthrough;
+> +			case SPECTRE_UNAFFECTED:
+> +				val[0] = SMCCC_RET_NOT_REQUIRED;
 
->  	tc = get_trap_config(sysreg);
->  
->  	/*
-> @@ -2569,6 +2571,11 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
->  	if (!tc.val)
->  		goto local;
->  
-> +	if (tc.sri) {
-> +		sr_index = tc.sri - 1;
-> +		*r = kvm_sys_reg_idx_to_desc(esr_sys64_to_sysreg(esr), sr_index);
+Is it possible that the (compromised) kernel could have disabled the mitigation
+after the state snapshot was taken? I.e. spectre_v4_state == SPECTRE_MITIGATED
+and the VM doesn't advertise SSBS so it returns SMCCC_RET_NOT_REQUIRED here. But
+the kernel has since turned off the mitigation?
 
-IIUC sr_index is used only in this block, maybe we could make it local to 
-it?
+Thanks,
+Ryan
 
-> +	}
-> +
->  	/*
->  	 * If a sysreg can be trapped using a FGT, first check whether we
->  	 * trap for the purpose of forbidding the feature. In that case,
-> @@ -2595,6 +2602,18 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
->  	if (is_hyp_ctxt(vcpu) && !vcpu_is_host_el0(vcpu))
->  		goto local;
->  
-> +	/*
-> +	 * Certain sysregs and system instructions could be UNDEF for the VM
-> +	 * but lack a corresponding FGU description and intersect with a valid
-> +	 * trap bit for the VM. Test the visibility the sysreg (if we have a
-> +	 * sys_reg_desc) before determining the effects of the guest
-> +	 * hypervisor's traps.
-> +	 */
-> +	if (*r && sysreg_guest_hidden(vcpu, *r)) {
-> +		kvm_inject_undefined(vcpu);
-> +		return true;
-> +	}
-> +
->  	switch ((enum fgt_group_id)tc.fgt) {
->  	case __NO_FGT_GROUP__:
->  		break;
-> @@ -2666,7 +2685,7 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
->  		goto inject;
->  
->  local:
-> -	if (!tc.sri) {
-> +	if (!(*r)) {
->  		struct sys_reg_params params;
->  
->  		params = esr_sys64_to_params(esr);
-> @@ -2697,7 +2716,6 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
->  		return true;
->  	}
->  
-> -	*sr_index = tc.sri - 1;
->  	return false;
->  
->  inject:
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 7f7a197a9ad6..7c8277de0494 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -5407,6 +5407,15 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
->  		kvm_make_request(KVM_REQ_RELOAD_PMU, vcpu);
->  }
->  
-> +const struct sys_reg_desc *kvm_sys_reg_idx_to_desc(u32 encoding, int sr_idx)
-> +{
-> +	/* System registers have Op0=={2,3}, as per DDI487 J.a C5.1.2 */
-> +	if (sys_reg_Op0(encoding) == 2 || sys_reg_Op0(encoding) == 3)
-> +		return &sys_reg_descs[sr_idx];
-> +	else
-> +		return &sys_insn_descs[sr_idx];
-> +}
-> +
->  /**
->   * kvm_handle_sys_reg -- handles a system instruction or mrs/msr instruction
->   *			 trap on a guest execution
-> @@ -5418,22 +5427,15 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
->  	struct sys_reg_params params;
->  	unsigned long esr = kvm_vcpu_get_esr(vcpu);
->  	int Rt = kvm_vcpu_sys_get_rt(vcpu);
-> -	int sr_idx;
->  
->  	trace_kvm_handle_sys_reg(esr);
->  
-> -	if (triage_sysreg_trap(vcpu, &sr_idx))
-> +	if (triage_sysreg_trap(vcpu, &desc))
->  		return 1;
->  
->  	params = esr_sys64_to_params(esr);
->  	params.regval = vcpu_get_reg(vcpu, Rt);
->  
-> -	/* System registers have Op0=={2,3}, as per DDI487 J.a C5.1.2 */
-> -	if (params.Op0 == 2 || params.Op0 == 3)
-> -		desc = &sys_reg_descs[sr_idx];
-> -	else
-> -		desc = &sys_insn_descs[sr_idx];
-> -
->  	perform_access(vcpu, &params, desc);
->  
->  	/* Read from system register? */
-> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> index 50214271b24a..d8ae21578665 100644
-> --- a/arch/arm64/kvm/sys_regs.h
-> +++ b/arch/arm64/kvm/sys_regs.h
-> @@ -263,10 +263,12 @@ int kvm_sys_reg_get_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
->  int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
->  			 const struct sys_reg_desc table[], unsigned int num);
->  
-> -bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index);
-> +bool triage_sysreg_trap(struct kvm_vcpu *vcpu, const struct sys_reg_desc **r);
->  
->  int kvm_vcpu_finalize_sys_regs(struct kvm_vcpu *vcpu);
->  
-> +const struct sys_reg_desc *kvm_sys_reg_idx_to_desc(u32 encoding, int sr_idx);
-> +
->  #define AA32(_x)	.aarch32_map = AA32_##_x
->  #define Op0(_x) 	.Op0 = _x
->  #define Op1(_x) 	.Op1 = _x
-> -- 
-> 2.47.3
-> 
+> +				break;
+> +			}
+> +			break;
+> +		case ARM_SMCCC_ARCH_WORKAROUND_3:
+> +			switch (spectre_bhb_state) {
+> +			case SPECTRE_VULNERABLE:
+> +				break;
+> +			case SPECTRE_MITIGATED:
+> +				val[0] = SMCCC_RET_SUCCESS;
+> +				break;
+> +			case SPECTRE_UNAFFECTED:
+> +				val[0] = SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED;
+> +				break;
+> +			}
+> +			break;
+> +		}
+> +		break;
+> +	case ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID:
+> +		uuid = ARM_SMCCC_VENDOR_HYP_UID_KVM;
+> +		val[0] = smccc_uuid_to_reg(&uuid, 0);
+> +		val[1] = smccc_uuid_to_reg(&uuid, 1);
+> +		val[2] = smccc_uuid_to_reg(&uuid, 2);
+> +		val[3] = smccc_uuid_to_reg(&uuid, 3);
+> +		break;
+>  	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+>  		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
+>  		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_HYP_MEMINFO);
 
-In general terms, I like that the change makes it easier to understand the 
-function.
-
-Thanks!
-Leo
