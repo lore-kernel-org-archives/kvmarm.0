@@ -1,60 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794419089;
-	b=ow5y3hYbG0Mq05qOSmNLQcan9y0HbGZUwsoP00aVY5LZ/DVzMi0S/DHqeBWvY4B4WWoR
-	 cU4egzzb6ooklC4JviiNflG+mq+/7DxpeYP6iIgYmUFD/TzBOdyw3+srp9+0fb773HfsN
-	 beJZ7KljK9/0CMHnHpLa3eiL6HpmmksHazlG8tDCvdW0XBL+03i3X2HZ+lg4v/eEl/aHW
-	 dv1z5Z1rOFTBuUkRVeU13rPcFhqZFMuscirydZdAxrzSt276pFY6nptNf6hhbiOAwxz4O
-	 D7TsG8zkhSynd4pJ/kzBIiIJ5M4V4HhCR8nGcwO9Xj7IM8kEk5uVozPj8FrgvWsHoOw==
+	t=1794419437;
+	b=YbDI33swMJEQkag7zC/ZyEzfJIDWvl8g1JkyKzS5Hqew/qRaW2ynWCScpuQJbh8O7ZAT
+	 ksTA76bnB7Q1XTHADjbuMkp3t6CL3UE2/IQULPdMI/iIgh7Pe8GBGv+6Ydklz6R1O7aJh
+	 QgaThmAB/RMTMPGEW4RKzWBFpk3GezcPrR/JfSWzzix9QQLrXH69Sjum03X4MRbCR8PRt
+	 rDtclvZaXoiBNyNQHLqGj4M+WUfMrjzdad+wZqwaGrWfB/hriPhOkq0c7W4GfmhNUl9Bj
+	 /UUmxQQKibwkMtfZAKNtdzQQ3alpMgV+M8VprLLaCXCSmxAZhz/k3EKHjieYWCTdkog==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794419089;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=Lg38hiBjDXw9cSHliNLU5G5GwmBdVZAwW1RU9LwK+4w=;
-	b=AgN41vT5DvPvucU2lWaAzlvaFxT1Z75Z/IYNRGtrfYMDap+ZpR+nh/dfXP0ZKkCQIdGo
-	 4IvCqReEKnAZVlJDp/xcHdDZQOAoRW/Z9mLI7Dtf5hc68TPmOVy12TbHQUQoXsiG2Ht4+
-	 plFQrp2s6HKwZ+maDt0l4k2EAFBNlr0yAJ/YNqkDuakg6Htm1VV2vuTMQvlKSl3I4CZWW
-	 lnqb3bTDr2ufUc3QZ6VP3yb+ngScCxYjlOo7vIH9Xz2u/DTq9GFWovM5WZXhlCO5AqOKV
-	 86KVGghl9kcbyNPOuRUlRV2ezmTtkys+tEn/QKhQ7rud5vNlUuNv9gVOVvnMM1DrM2w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794419437;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
+	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=Z8qU6+HvaIS0hGP6RSMrC3qaiOO8YyUA1e15Sl/ZGXE=;
+	b=mgYD16TuX7yTUr7kPgCgGshy6JRdGgFja7YDBF32vK4+t18KJHAtlW5Xtqj6z7t96BRy
+	 Gh+ayOe6FS1t+lSEFGYGCEzbBUAkDzSGqgjgJF8Uq+0SdDmKHpZ6JclkuXqt6499oZ9tS
+	 UOLWt3YpKNPfcJJ8Q/4tlKBa7WIPdni3aFv5Z9vxK2xBLlIhlKkCqSrM+nKZ7pglBBIF3
+	 zZM6byjcWEw2F/J1VpAzTauGdA8+2IdWMB4CB89sonLHIDXkc1YxFHEK1QkPQ4zAW2n/d
+	 19Wt+nb3IZpXXE88/T2hez6WM2Fi4Y98Y6NT3MVSnHO/cxWtquo86MwT7UKsuXtkqng==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aYsNj+Jj;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A99606A326;
-	Wed, 11 Nov 2026 17:44:49 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=B0vx20da;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CE74606A321
+	for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 17:50:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8CE74606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aYsNj+Jj
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C0F61F00A05;
-	Wed, 11 Nov 2026 17:44:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794419089;
-	bh=Lg38hiBjDXw9cSHliNLU5G5GwmBdVZAwW1RU9LwK+4w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=aYsNj+JjgNOG/AX25zAAGt2RliUQSf76sv5AsNjNO1u/LByCnXQg19OCButP+nN+L
-	 2zFXvTe6prgut3foVwuXfZs2xfSptIk7wI92j8dQmtsqfyEJRsBvFMWbOD4RPnMpaV
-	 WNHqkEh/XbLnB5pBb/G6pDjSktZAka5wOlmHItQ8YK+mxmtw1BTllMhFomoSfYKotW
-	 woD4H7rHXd3hTGYsaiQB4ELEVeSx6z+IgOquJnfR8pT9NnlVpPFXrekXY53aBev0aJ
-	 FQdENxc9+JVgax638KjqDUH4UV/TolKmzVK5KyIsfqVtckoPkifyhnLoZlIPKqATud
-	 qfZlrleX+BcwA==
-Date: Wed, 11 Nov 2026 17:44:43 +0000
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>, pbonzini@redhat.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, maz@kernel.org, oupton@kernel.org, 
-	suzuki.poulose@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	david@kernel.org, mark.rutland@arm.com, ackerleytng@google.com
-Subject: Re: [PATCH v2] KVM: Ignore MMU notifiers for guest_memfd-only
- memslots
-Message-ID: <avSpIZXjqXZbpUIi@gremlin>
-References: <20260714160411.302386-1-alexandru.elisei@arm.com>
- <amPCdAswlk24Xilf@google.com>
- <anxAGkdyPYXBlS00@raptor>
- <autwsR83Ii-tRrqF@gremlin>
- <auzSxEsGAcm3MYtN@google.com>
- <avSn-IW8DMybO-Tg@seanjc-mac.roam.internal>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=B0vx20da
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DADC11576;
+	Wed, 11 Nov 2026 09:50:32 -0800 (PST)
+Received: from [10.57.69.47] (unknown [10.57.69.47])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DC4093F632;
+	Wed, 11 Nov 2026 09:50:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1794419435; bh=mkeJMyoQ8Qv6RCg92gwoZ/tiJll4x2tHEGTQlboYilQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=B0vx20daoO+pjHgnuqgkbbdr6Am0qaJ+xSgQiGc5DV5qXM28UAODjDIdbLLg3j+P/
+	 JVlF8vJ8I0yzmAja1WatBIQIdsq/5ssyGRXt8SQoW39vxsUmwE3B3KibZBxalzjzoM
+	 52ANnchXJdVDMcsSysOPgEhvoy0NWAp+/DfnpoPE=
+Message-ID: <c426f5a3-d161-476d-8911-99903ecf8e46@arm.com>
+Date: Wed, 11 Nov 2026 17:50:31 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -64,49 +53,102 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <avSn-IW8DMybO-Tg@seanjc-mac.roam.internal>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 09/18] KVM: arm64: Implement HVC handling for protected
+ guests at EL2
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com,
+ seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ mark.rutland@arm.com, steven.price@arm.com, vdonnefort@google.com,
+ qperret@google.com
+References: <20261001135711.1640520-1-fuad.tabba@linux.dev>
+ <20261001135711.1640520-10-fuad.tabba@linux.dev>
+ <5fa8a1fb-4e2c-4746-8a70-a47f387ef0d6@arm.com>
+ <CA+EHjTyCcGPMte9=HuqyvCS7CCCt80Lc_JQuA+1e3ZE+3A0zqQ@mail.gmail.com>
+From: Ryan Roberts <ryan.roberts@arm.com>
+Content-Language: en-GB
+In-Reply-To: <CA+EHjTyCcGPMte9=HuqyvCS7CCCt80Lc_JQuA+1e3ZE+3A0zqQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 11, 2026 at 09:38:00AM -0800, Sean Christopherson wrote:
-> On Thu, Nov 05, 2026, Sean Christopherson wrote:
-> > On Wed, Nov 04, 2026, Lorenzo Stoakes (ARM) wrote:
-> > > [updated David's email address to @kernel.org]
-> > >
-> > > On Wed, Aug 12, 2026 at 10:42:50AM +0100, Alexandru Elisei wrote:
-> > > [ ... ]
-> > > > On Fri, Jul 24, 2026 at 12:52:20PM -0700, Sean Christopherson wrote:
-> > > > > It'll probably take me a few weeks to circle back to this, as I finally crawled
-> > > > > out from underneath a pile of urgent and am just now getting back into review
-> > > > > mode, but this is fairly high on my todo list, so with luck we might still squeeze
-> > > > > this into 7.3.
-> > >
-> > > Hey Sean,
-> > >
-> > > I wondered whether you'd had a chance to look at this?
-> > >
-> > > After discussing this with Marc and Alex it is clear that this is really a
-> > > blocker for Alex's SPE series, as we need a sensible means of ensuring
-> > > that stage-2 mappings stay in place.
-> > >
-> > > So ideally would prefer to get something like this in in the next cycle,
-> > > if you don't have any objections to it? :)
-> > >
-> > > If it'd be easier, I think a smaller version of the same patch would also
-> > > give us what we need? I.e. your snippet from June with the page ageing part
-> > > dropped, as below.
-> >
-> > The GPC invalidation fix landed, so we can go straight to the super simple v1.
-> > Compile tested only at this point, I'll formally post this (hopefully today),
-> > assuming nothing explodes in testing.
->
-> /facepalm
->
-> I spaced on sending this (and I think on testing it too...).  I'll try to get it
-> posted in the next few days.
+On 11/11/2026 16:45, Fuad Tabba wrote:
+> Hi Ryan,
+> 
+> On Wed, 11 Nov 2026 13:59:17 +0000, Ryan Roberts <ryan.roberts@arm.com> wrote:
+> [...]
+>>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> [...]
+>>> @@ -2622,6 +2622,10 @@ static void kvm_hyp_init_symbols(void)
+>>>          kvm_nvhe_sym(__icache_flags) = __icache_flags;
+>>>          kvm_nvhe_sym(kvm_arm_vmid_bits) = kvm_arm_vmid_bits;
+>>>
+>>> +        kvm_nvhe_sym(spectre_v2_state) = arm64_get_spectre_v2_state();
+>>> +        kvm_nvhe_sym(spectre_v4_state) = arm64_get_spectre_v4_state();
+>>> +        kvm_nvhe_sym(spectre_bhb_state) = arm64_get_spectre_bhb_state();
+>>
+>> Is it really correct to snapshot this state then use it at runtime assuming its
+>> still accurate? See below...
+> 
+> These can't change after this point: update_mitigation_state() doesn't
+> update a state once system_capabilities_finalized() is true, and
+> kvm_arm_init() runs after that.
+> 
+> [...]
+>>> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> [...]
+>>> @@ -1181,8 +1187,70 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
+> [...]
+>>> +        case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
+>>> +                /* The workaround calls themselves are handled on hyp entry. */
+>>> +                val[0] = SMCCC_RET_NOT_SUPPORTED;
+> [...]
+>>> +                case ARM_SMCCC_ARCH_WORKAROUND_2:
+>>> +                        switch (spectre_v4_state) {
+>>> +                        case SPECTRE_VULNERABLE:
+>>> +                                break;
+>>> +                        case SPECTRE_MITIGATED:
+>>> +                                /* With SSBS advertised the guest's default is safe. */
+>>> +                                if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, SSBS, IMP))
+>>> +                                        break;
+>>
+>> For this case (and the break immediately above) you return val[0] =
+>> SMCCC_RET_INVALID_PARAMETER (from init at top of this function). But the
+>> kernel's kvm_smccc_call_handler() returns val[0] = SMCCC_RET_NOT_SUPPORTED in
+>> these cases (which seems more likely to be correct). Does this violate the ABI?
+> 
+> Both return NOT_SUPPORTED. val[0] is set to it at the top of the
+> ARM_SMCCC_ARCH_FEATURES_FUNC_ID case.
 
-Thanks :) and understandable, the AI wave is making the mailing list
-quite... an interesting place to be lately!
+Ahh missed that oops!
 
---
-Cheers, Lorenzo
+> 
+>>
+>>> +                                fallthrough;
+>>> +                        case SPECTRE_UNAFFECTED:
+>>> +                                val[0] = SMCCC_RET_NOT_REQUIRED;
+>>
+>> Is it possible that the (compromised) kernel could have disabled the mitigation
+>> after the state snapshot was taken? I.e. spectre_v4_state == SPECTRE_MITIGATED
+>> and the VM doesn't advertise SSBS so it returns SMCCC_RET_NOT_REQUIRED here. But
+>> the kernel has since turned off the mitigation?
+> 
+> Yes, where the mitigation is the firmware one. The host can disable it
+> with an ARM_SMCCC_ARCH_WORKAROUND_2 call, which EL2 forwards, and EL2
+> doesn't enable it again before running the guest. With TF-A that's
+> only on a Cortex-A76 without SSBS, the only CPU it implements the
+> dynamic workaround for.
+
+If the mitigation is via SSBS but SSBS is not exposed to the guest, I'm guessing
+this is safe because the guest is expected to set SSBS=0 in this case?
+
+Thanks,
+Ryan
+
+> 
+> I'll send out a fix. Thanks for spotting this!
+> 
+> Cheers,
+> /fuad
+
