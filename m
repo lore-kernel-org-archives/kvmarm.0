@@ -1,55 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=90.155.50.34
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794436160;
-	b=rCMKo6z9zLj+3wmiop3yDgXzHpn68XGyxbTDGyW44KPqJWB7Dp8K02Mye3cTu8Mu500r
-	 JqTXjjHfJo2zc5Bbk6XvWZa+ztOuhEKvFVSjv7oDS7BAEGva8iBHUq5CduKVFes6AhUuy
-	 yGWSYwkOaqqWuVn5UKgpI04tLU764nsWDOFhZk2eWAvCk0Rqx/yEgExMf9A928m3NJaOr
-	 AuLamFR55DKhCCSFcf7OeOgj4Sw86h/bqFTWlJgsmE5fkwp/1OokoqNxlUcqU9iUkfpM1
-	 SwjG+z3mLJBYbtLj0BdpXx9QuN9doOj9GZZzlaWNOOqy0fvaNpTVmQZAo7KJI5FucMw==
+	t=1794436158;
+	b=eMMMmSgaoQXm+RxsrdMU4zFisENbF9mN2+jQ0wqWkRF6rK7i1DEB8EZFBN6SK57QakFR
+	 S99DlA1FgzxBAi0WGgotct/jrzhoWB/uGac4ovnlBNPPxNWJ6BlSUbInQnj58vNlV/+OA
+	 /TBcfHZGOw65J4RFLPV1WbqdMRuryByzhU+wMqwSxMIw55oXkkZfjsKJ05xyScLMnAstA
+	 o1v7lr+xkYcDK79qnUCeidLGA2ZbniqdAHcSpONTxo6x63oNP1VI/kxTatJ8ck7q7I5g4
+	 Z477CX8rizjrowf4gXraRm6opuHZaQYukLkQu5n+osSgjSG3+6t/kN+q2KBN9QhIULg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794436160;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794436158;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:Sender:X-SRS-Rewrite;
-	bh=hNcFDdx6SEsMQ2wb+0TdBub7tg0kF/xbhNU9Q5R/+fI=;
-	b=vv9NwfncDeb2p3PSo9fHxANQvJB9/MnxuhvbCmkrJvUm+8jF6w+36qxhGWtK/Md7Tw7y
-	 O7I+Xx22a6puTwANHEbPnNpcOctosXRYT9QrgpjCgUF4sI8+PNkl6Qo/mEbYPC8vBiDz3
-	 f2CbGyjR/Ejaw+dvVL5vdglNfGS6miyoddcL8FM7XmCJJnCZQOvUhF3hqx4o//iR8tKYQ
-	 8IS2ah9K6u3ao4+hOOGYew6CKSOTgHdq2jkEr1HjHLnITXr9eRba4hV0ycHoKKKSsU8ra
-	 0yuBLurd8cVR+fipgXl5Dd0tsWQcMqdpQj34SQqUkYDn3R2wf7rdqXvjCiwmNDKTrSw==
+	 Content-Transfer-Encoding:Sender:X-SRS-Rewrite;
+	bh=/4oURmAxtdLzwOmlIkuFexz35TYtLyT7OPag22iURQs=;
+	b=PjVuo7ldsTuC5K5JhZSxsEtAwBVfI5dp1GIJukvwpBOqXLnS0Xeh1VtDcyAPBoSY3qGs
+	 5jinREdKKp8SUZA6GAHWrxlETsOAKX3CuVpF5y6t/v2wfaU4YXmOdV0+9MV21cKWyX5cc
+	 jnsVSUOK0IQENN33v9SnwhV/e/pVb3sZ55bsPpw9x4gaT3otAXYFTFhjRlk12Vva6/+Yv
+	 kBdF5tgMRd542QOwBi1FK/yapq3zD2wN5pZHr/bwrQ5SQNjvQFfpAG9Z0AuKFROQ/yoNK
+	 up93WlrsqLEM1D4WFkKBLlnz4z57Xe+hPXePf18H3joiTvJIl1PWSzl3ixhHPtV6F+w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=infradead.org;
-	spf=none smtp.mailfrom=desiato.srs.infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=desiato.20200630 header.b=nWz1gFPi;
-	arc=none smtp.remote-ip=90.155.92.199
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	spf=none smtp.mailfrom=casper.srs.infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=casper.20170209 header.b=oSYIS3qt;
+	arc=none smtp.remote-ip=90.155.50.34
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8CD160A2628;
-	Wed, 11 Nov 2026 22:29:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C8CD160A2628
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF57606A330;
+	Wed, 11 Nov 2026 22:29:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6EF57606A330
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=desiato.20200630 header.b=nWz1gFPi
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=casper.20170209 header.b=oSYIS3qt
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:
-	To:From:Reply-To:Content-ID:Content-Description;
-	bh=hNcFDdx6SEsMQ2wb+0TdBub7tg0kF/xbhNU9Q5R/+fI=; b=nWz1gFPieTMjS6ZWY7nAHM/nOJ
-	syw4NbeMkSO0aHt+eO0M1dMge7tZNU7ehYKvmryl84z8rwj+DmAtGbpkvydeEKAcnNNw7+jYyD5t4
-	5sxuulgOozKiHvuBZx2/ltbcOJucbl3aEMjTjPGGZtuwMFAUW+4UIl/9RnjpEs5wzYs//JOQCxVfe
-	Z5vV95kf3tW2bfUmND973isg/ref1Y14Ui9VcW5OAU9bFdTYvOD/IO7iUOyLzG5ENC+BD8ktH62+N
-	CNhTo0V4MYK/g3P3FYB65jEOYAjZy162p7oL8xg+UySIOd4jizNQ1HXVfvs38/yhP7RmuPdZR+eB6
-	2JplI6gg==;
+	d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+	Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=/4oURmAxtdLzwOmlIkuFexz35TYtLyT7OPag22iURQs=; b=oSYIS3qt2o+qaxk7+Ax/IMqAJu
+	RIdXcgqZmR4rTHiEzQq+OpnllgOOrzxl0Vv7vKpbtFHpKguQghkHJsn1qcTjTT/i63pZaF1QbndNr
+	mMSYrKVSdS8Bl69f64aKWkTbFhEdg1EilfOegU5l17Hcv51F2jknDzI+QN+MgXm0yo6GrYH6O4lol
+	pmOXVMn369QeFQ+qLe8/cmj4O8RlKQpsPDNtMrHx2WueaNeiol/bXH4RZDHZu3W0cqWQQlx/7ZrOg
+	oFZStZjJlpdMwCE2fji6c4nRQW9gfyTdfUZXGap1hJIyhU8afZ5QYh4ebFQDyeC/PnUFfbtw3VuCW
+	T9VdSJ/w==;
 Received: from [2001:8b0:10b:1::425] (helo=i7.infradead.org)
-	by desiato.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xRGoc-00000009dbX-29VX;
-	Wed, 11 Nov 2026 22:29:14 +0000
+	by casper.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xRGoa-0000000G3nx-11mM;
+	Wed, 11 Nov 2026 22:29:12 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.99.5 #2 (Red Hat Linux))
-	id 1xRGoZ-0000000007o-1y0L;
-	Wed, 11 Nov 2026 22:29:11 +0000
+	id 1xRGoa-0000000008S-098c;
+	Wed, 11 Nov 2026 22:29:12 +0000
 From: David Woodhouse <dwmw2@infradead.org>
 To: =?UTF-8?q?J=C3=B6rg=20R=C3=B6del?= <joro@8bytes.org>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -74,12 +74,13 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	Mushahid Hussain <hmushi@amazon.co.uk>,
 	Sriram Nambakam <snambakam@linux.microsoft.com>,
 	David Woodhouse <dwmw@amazon.co.uk>
-Subject: [PATCH 00/16] KVM: Fixes for the Planes + SEV-SNP series
-Date: Wed, 11 Nov 2026 14:28:55 -0800
-Message-ID: <20261111222911.477-1-dwmw2@infradead.org>
+Subject: [PATCH 10/16] KVM: planes: Keep current_vcpu in sync in vcpu_load()
+Date: Wed, 11 Nov 2026 14:29:05 -0800
+Message-ID: <20261111222911.477-11-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260608144252.351443-1-joro@8bytes.org>
+In-Reply-To: <20261111222911.477-1-dwmw2@infradead.org>
 References: <20260608144252.351443-1-joro@8bytes.org>
+ <20261111222911.477-1-dwmw2@infradead.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -89,117 +90,164 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-I rebased Jörg's KVM Planes + SEV-SNP series¹ to 7.4-rc2² and used it
-to add VSM support³. Here's a batch of fixes.
+The preempt notifiers save and restore common->current_vcpu
+(kvm_sched_out()/kvm_sched_in()), but vcpu_load() does not update it.
 
-Thirteen of the sixteen apply in order, without conflicts, to the
-kvm-planes-v7.1 branch. The other three need what has landed upstream
-since v7.1: patch 1 fixes the s390 arm64 KVM module, which only
-arrived in 7.4; patch 12 touches the PID-table clearing in
-vmx_vcpu_free() from b41f2ca6c060; and patch 16 extends the VMSA
-invalidation from d1a3c2162334.
+An ioctl on a plane-N fd loads that plane's vCPU while current_vcpu
+may still name the plane that ran last. A reschedule inside the ioctl
+then arch-puts the stale twin, whose state is not resident, and
+arch-loads it back over the state the ioctl made resident: on VMX the
+ioctl's VMCS writes land in the other plane's VMCS, and the trailing
+vcpu_put() unloads a non-resident vCPU, corrupting the per-pCPU
+loaded_vmcs tracking. The kick paths read current_vcpu->cpu too, and
+the next patch, which swaps each twin in around its update after
+KVM_SET_CPUID2, relies on the loaded vCPU being the one the preempt
+notifiers see.
 
-The ones that matter:
+Set common->current_vcpu in vcpu_load(), so every load path (the run
+loop and vCPU ioctls on any plane's fd) agrees with what the preempt
+notifiers will operate on. kvm_vcpu_select_plane() keeps its own
+assignment; both stores use WRITE_ONCE() to pair with the lock-free
+readers in the kick paths.
 
- - 01 s390: arm64: Pass plane_level to the kvm_set_routing_entry() stub
-   The arm64 KVM module on s390 kept the old prototype; the kernel
-   test robot caught it on the rebased tree.
+That makes twin creation a writer as well: kvm_arch_vcpu_create()
+calls vcpu_load() on the new twin while its plane-0 twin may be in
+KVM_RUN on another pCPU, and the shared preempt notifier would be
+registered twice. Hold the shared vCPU mutex across creation of a
+non-zero plane's vCPU, from before kvm_arch_vcpu_create() to the end,
+including the error-path kvm_arch_vcpu_destroy(), which can
+vcpu_load() too (nested_vmx_free_vcpu()). Since vcpu_put() leaves
+current_vcpu naming the new twin, put back the twin that owned it once
+the arch code returns, on success and on every failure path; otherwise
+a failed creation (create_vcpu_fd() can be made to fail with
+RLIMIT_NOFILE) frees a vCPU that the lock-free kick paths still
+dereference.
 
- - 05 Initialise Hyper-V state on every plane vCPU
-   kvm_set_cpuid() passed the plane 0 vCPU to kvm_hv_vcpu_init() for
-   every plane, and a twin created late got vp_index -1.
+Found by a local Sashiko review.
 
- - 08 Publish a new plane only once KVM_CREATE_PLANE cannot fail
-   A failed create left a freed plane in kvm->planes[], where the SNP
-   VMPL switch could still find it, and VM teardown freed it again.
+Fixes the current_vcpu tracking in "kvm: Move VCPU scheduling state to
+struct kvm_vcpu_common".
 
- - 10 Keep current_vcpu in sync in vcpu_load()
-   A reschedule inside an ioctl on a plane fd put and loaded the wrong
-   twin, and a failed twin create left current_vcpu dangling.
+Fixes: https://lore.kernel.org/all/20260608144252.351443-16-joro@8bytes.org/
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+ virt/kvm/kvm_main.c | 54 ++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 48 insertions(+), 6 deletions(-)
 
- - 11 Load each plane twin while updating it after KVM_SET_CPUID
-   On VMX the vendor callback wrote the twins' controls into the
-   caller's VMCS.
-
- - 12 Leave the IPIv PID-table entry to the plane 0 vCPU
-   A twin has the same vCPU ID as plane 0, so creating or freeing one
-   repointed or cleared plane 0's entry. Latent for now, since planes
-   inhibit APICv.
-
- - 13 Leave TSC matching to the plane 0 vCPUs
-   Each twin counted as another vCPU with a matching TSC, so the master
-   clock could never come back on.
-
- - 14 Derive runtime CPUID bits from the executing plane
-   OSXSAVE, OSPKE, APIC, MWAIT and the XSAVE sizes follow per-plane
-   registers, but the table they live in is shared.
-
-Three things I've noticed and *not* fixed here:
-
- - The AVIC physical ID table is indexed by vCPU ID too, so it has the
-   same collision as the IPIv PID table in patch 12. It's masked while
-   APICv is inhibited for planes, as it is today.
-
- - A host-side TSC write on plane 0 (or KVM_SET_TSC_KHZ) after the
-   twins exist doesn't reach them. Fixing that means loading each twin,
-   and I'd rather agree how before doing it.
-
- - For Jörg and Tom: the SNP VMPL switch stops the current plane with
-   kvm_vcpu_set_plane_stopped() and no latch, so KVM_GET_PLANE_RUN_STATE
-   reports it as STOPPED, and a VMM that saves and restores that value
-   turns it into a userspace stop. Does VMPL want a notion of
-   KVM-initiated suspension of its own, or is that the intended
-   contract?
-
-¹ https://lore.kernel.org/all/20260608144252.351443-1-joro@8bytes.org/
-² https://git.infradead.org/?p=users/dwmw2/linux.git;a=shortlog;h=refs/heads/vsm2/planes-fixes
-³ https://lore.kernel.org/kvm/20261017122501.610248-1-dwmw2@infradead.org/
-
-David Woodhouse (14):
-  KVM: s390: arm64: Pass plane_level to the kvm_set_routing_entry() stub
-  KVM: SVM: Derive the plane limit from the immutable VM type
-  KVM: planes: Report KVM_MAX_PLANES from the system fd
-  KVM: Guard the per-plane KVM_SIGNAL_MSI cases with __KVM_HAVE_MSI
-  KVM: x86: Initialise Hyper-V state on every plane vCPU
-  KVM: x86: Widen the plane vCPU fd ioctl allowlist
-  KVM: x86/mmu: Free obsolete roots of all planes
-  KVM: planes: Publish a new plane only once KVM_CREATE_PLANE cannot
-    fail
-  KVM: planes: Kick the running twin's pCPU, not the request target's
-  KVM: planes: Keep current_vcpu in sync in vcpu_load()
-  KVM: x86: Load each plane twin while updating it after KVM_SET_CPUID
-  KVM: VMX: Leave the IPIv PID-table entry to the plane 0 vCPU
-  KVM: planes: Annotate the lockless twin-publication protocol
-  KVM: SVM: Make KVM_REQ_VMSA_PAGE_RELOAD per plane
-
-Mushahid Hussain (2):
-  KVM: x86: Leave TSC matching to the plane 0 vCPUs
-  KVM: x86: Derive runtime CPUID bits from the executing plane
-
- Documentation/virt/kvm/api.rst  |  21 ++++--
- arch/s390/kvm/arm64/arm.c       |   3 +-
- arch/x86/include/asm/kvm_host.h |   3 +-
- arch/x86/kvm/cpuid.c            | 128 +++++++++++++++++++++++---------
- arch/x86/kvm/cpuid.h            |   6 +-
- arch/x86/kvm/hyperv.c           |   7 +-
- arch/x86/kvm/irq.c              |   5 +-
- arch/x86/kvm/mmu/mmu.c          |  16 +++-
- arch/x86/kvm/svm/sev.c          |  29 ++++++--
- arch/x86/kvm/svm/svm.c          |  10 ++-
- arch/x86/kvm/svm/svm.h          |   2 -
- arch/x86/kvm/vmx/vmx.c          |  10 ++-
- arch/x86/kvm/x86.c              |  87 ++++++++++++++++++++--
- include/linux/kvm_host.h        |   7 +-
- virt/kvm/kvm_main.c             | 115 +++++++++++++++++++++++-----
- 15 files changed, 365 insertions(+), 84 deletions(-)
-
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 24d2291b60a2..b6bdbe5c5133 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -174,6 +174,16 @@ void vcpu_load(struct kvm_vcpu *vcpu)
+ {
+ 	int cpu = get_cpu();
+ 
++	/*
++	 * The preempt notifiers operate on common->current_vcpu, so it
++	 * must name the plane vCPU being loaded here: an ioctl taken on
++	 * another plane's fd than the one that ran last would otherwise
++	 * have a preemption arch-put the stale twin (whose state is not
++	 * resident) and arch-load it back over the state this load makes
++	 * resident.  The kick paths also read it to find the running
++	 * twin's pCPU.
++	 */
++	WRITE_ONCE(vcpu->common->current_vcpu, vcpu);
+ 	__this_cpu_write(kvm_running_vcpu, vcpu->common);
+ 	preempt_notifier_register(&vcpu->common->preempt_notifier);
+ 	kvm_arch_vcpu_load(vcpu, cpu);
+@@ -4470,7 +4480,7 @@ static void kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
+ static int kvm_plane_ioctl_create_vcpu(struct kvm_plane *plane, unsigned long id)
+ {
+ 	struct kvm *kvm = plane->kvm;
+-	struct kvm_vcpu *vcpu;
++	struct kvm_vcpu *vcpu, *prev = NULL;
+ 	int r;
+ 
+ 	guard(mutex)(&kvm->lock);
+@@ -4513,9 +4523,34 @@ static int kvm_plane_ioctl_create_vcpu(struct kvm_plane *plane, unsigned long id
+ 
+ 	kvm_vcpu_init(vcpu, kvm, id);
+ 
++	/*
++	 * A non-zero plane shares 'common' with a plane-0 twin which may
++	 * already be running.  kvm_arch_vcpu_create() calls vcpu_load(),
++	 * which publishes the half-created vCPU through
++	 * common->current_vcpu and registers the shared preempt notifier,
++	 * so it must not run concurrently with a twin's KVM_RUN: hold the
++	 * shared vCPU mutex from here to the end of creation, including
++	 * the error-path kvm_arch_vcpu_destroy(), which can vcpu_load()
++	 * too (nested VMX teardown).  It nests inside the kvm->lock held
++	 * for all of vCPU creation, the usual kvm->lock -> vcpu mutex order.
++	 *
++	 * vcpu_put() leaves current_vcpu naming the new twin; put back
++	 * the twin that owned it, so that the lock-free kick paths never
++	 * see a vCPU that is not reachable yet, or that a failed creation
++	 * frees.
++	 */
++	if (plane->level > 0) {
++		r = mutex_lock_killable(kvm_vcpu_mutex(vcpu));
++		if (r)
++			goto vcpu_free_common;
++		prev = vcpu->common->current_vcpu;
++	}
++
+ 	r = kvm_arch_vcpu_create(vcpu);
++	if (plane->level > 0)
++		WRITE_ONCE(vcpu->common->current_vcpu, prev);
+ 	if (r)
+-		goto vcpu_free_common;
++		goto unlock_vcpu_free_common;
+ 
+ 	/*
+ 	 * Set the vCPU's index *before* the vCPU is reachable by other tasks.
+@@ -4534,9 +4569,10 @@ static int kvm_plane_ioctl_create_vcpu(struct kvm_plane *plane, unsigned long id
+ 	 * visible (per online_vcpus), e.g. so that KVM doesn't get tricked
+ 	 * into a NULL-pointer dereference because KVM thinks the _current_
+ 	 * vCPU doesn't exist.  As a bonus, taking vcpu->mutex ensures lockdep
+-	 * knows it's taken *inside* kvm->lock.
++	 * knows it's taken *inside* kvm->lock.  A twin holds it already.
+ 	 */
+-	kvm_vcpu_lock(vcpu);
++	if (!plane->level)
++		kvm_vcpu_lock(vcpu);
+ 	kvm_get_kvm(kvm);
+ 	r = create_vcpu_fd(vcpu);
+ 	if (r < 0)
+@@ -4550,12 +4586,18 @@ static int kvm_plane_ioctl_create_vcpu(struct kvm_plane *plane, unsigned long id
+ 	return r;
+ 
+ kvm_put_xa_erase:
+-	kvm_vcpu_unlock(vcpu);
++	if (!plane->level)
++		kvm_vcpu_unlock(vcpu);
+ 	kvm_put_kvm_no_destroy(kvm);
+ 	xa_erase(&plane->vcpu_array, vcpu->vcpu_idx);
+ unlock_vcpu_destroy:
+ 	vcpu->vcpu_idx = -1;
+ 	kvm_arch_vcpu_destroy(vcpu);
++	if (plane->level > 0)
++		WRITE_ONCE(vcpu->common->current_vcpu, prev);
++unlock_vcpu_free_common:
++	if (plane->level > 0)
++		kvm_vcpu_unlock(vcpu);
+ vcpu_free_common:
+ 	kvm_vcpu_common_destroy(vcpu);
+ vcpu_free:
+@@ -5136,7 +5178,7 @@ struct kvm_vcpu *kvm_vcpu_select_plane(struct kvm_vcpu *vcpu)
+ 		ret->plane_state = RUNNABLE;
+ 	}
+ 
+-	common->current_vcpu = ret;
++	WRITE_ONCE(common->current_vcpu, ret);
+ 
+ 	common->plane_switch = false;
+ 
 -- 
 2.50.1
 
