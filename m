@@ -1,57 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794411169;
-	b=sdHtIM6N6lu0a19Pi7K59Ff+1x7lJ3vBx1F4ejcj6dF5hIqWgPmgmYRfLc9eNd7QyWmw
-	 qCkVRo24s1m0CJ+0k1P5fPR/voLkMXDdqm/qd++JcGdhfCU6r1EFz+aT8qkRC7Ha0j1lD
-	 pHS9YMoiEMaH9FmHVnpOMDJ0sp5dcl45AYs2AYKRZx1k/8IwgutHaieI5eldH1gBeWcqG
-	 +uAUoruRCtMZlbx/SlazRFZAw9UpZwr02GcRi5XkF8VPV6RyXZbkZYPqUlc2oxbKFcpIR
-	 J3Uv1ojpibxRaxVN53TKuiSeVTYLIjzy8BU9I+wzuv4OTcafvS9AXAbUI3EpMXTaMAA==
+	t=1794414602;
+	b=eHAqO920Iol4MeJGlG42LdH4grZWg1Cik+cJPKwW5Fp5dReH5Bh+0PXCbT+Re3Qi1COn
+	 3Sm1nvxic+KV4+sQ57RjziiKSpNh49tkYgPWAn4TppIW2OUyU/bmaB8lupKJszUD8Q/h2
+	 xqpVcjBAQPXmmLlKGZAZnjX4bfXGWnKuAlLfa185688kC0gUzqdsiqIvTz2GK+85g5rWR
+	 FYDS9JEjsxUtwBXQSesC/zGcQ+97ZVBlLLfbROzX2PU0Wsok/bLyZpz5fLHCOyoOD3F3i
+	 SwnHT2nHg+uHKIvMuGCk1yV2dW0jQPCDiQBqiCEDeDlScjuoEQeXBkDsyqgSp/IYeSQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794411169;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To;
-	bh=EXB+uPBraiEi9Fxzrb/OQqOcGOpyOCq3/nVjFHtbk7k=;
-	b=2MomwPecvVuox91XL6obegdQjdhQV3WX57PkzhwU9zbIAkFTd2nF26K36wG/0mDwtB6D
-	 ZnN/PX7b3PM5jEZf/uoL5K9v+OP06XuT9YMX7323G696/4uDo+dx43fgjl3t34cJj09Tj
-	 d2ZoAUE2BOl6yYYctEIB98i6lFh1zgFclV8Fn2LHfJWS9XhSgzsarafFZPXP7TVXaxPdn
-	 XeSiH+YKmzHiVmQhUKMr1ZqJYA35J1Fzz7sXl104auDpxTKA8EsaP8SttUAkAbAXt6izg
-	 lhPIxekL/TfopNkKJr8eKy5aEoZ7UKj2mZdswW5XXplx/xTwar+cP8QBun1YtIIke7w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794414602;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=OTgmmvmFoFwlCxssmfqD6UcdBcRA0ZDfykReKIVhCIY=;
+	b=I62O5J/N1dSihVwTksDixx5Rh8kpnslKc2c/r24eRwjdqQ4wBOuYZ/zO9eiwg1c8Eknz
+	 IvB+uzEtdli7NBXzX3Oh4JHabt86IekzjSPYZNaPIHiASEsx5wpDJ+/Ba1lxmzsEg5wF8
+	 xXKTPmPySAwp83A1n7FWpznpIGwP5rJJvBR4Q2xmJZ/4SNZfNI2DV1TqIA9uh7V8Y/dVz
+	 5oUPvwItFwS8fxe5jXa92W8cIAseYdTkRbi/XmSr3216PPHO+/r3xfxr/G4ZkYFofUZm2
+	 3vUuzFuBzRkG1XIZYWiyx0S+C3l4LXE3SQCIaflJ8UL7iBpHB3WFdrVLPnojnsYyFfQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=sIRMzQ6h;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0B97606A337;
-	Wed, 11 Nov 2026 15:32:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D0B97606A337
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NHVCSdOu;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D84606A334;
+	Wed, 11 Nov 2026 16:30:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=sIRMzQ6h
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1E8261576;
-	Wed, 11 Nov 2026 07:32:45 -0800 (PST)
-Received: from e142392.arm.com (e142392.arm.com [10.2.213.23])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7E6603F632;
-	Wed, 11 Nov 2026 07:32:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794411168; bh=qZRo/y/SL8f1h9sIl4GD34baEFZgFt2Hfr13Sg12NeY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sIRMzQ6hL/XQ8RhWLuNf2erE2aN2p/mc9YmJSvqY5dRfoZ8KtrC7Kqde7O5/nksLn
-	 ezwzT1L3VMW8YFxb7E8xPg9IbMbE5y+8wFE4w1EApOrVwjNYmeeTThw+6JwZg4+rEs
-	 ywN6floPvxAVhDUaXUt88N9pPWe1dVR/j4hN2UMY=
-Date: Wed, 11 Nov 2026 15:32:38 +0000
-From: Kristina =?utf-8?Q?Mart=C5=A1enko?= <kristina.martsenko@arm.com>
-To: sashiko-reviews@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	kvmarm@lists.linux.dev
-Subject: Re: [RFC 05/12] ACPICA: Add TLBI table definition
-Message-ID: <fqiztye7frn6z2ltr4tm2l2bkdrdr7atg67pim4f43xloiuydx@4yqzybdjgtcg>
-References: <20261001110655.461473-1-kristina.martsenko@arm.com>
- <20261001110655.461473-6-kristina.martsenko@arm.com>
- <20261001115614.82F9F1F0089A@smtp.kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NHVCSdOu
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 226741F00A05;
+	Wed, 11 Nov 2026 16:30:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794414602;
+	bh=OTgmmvmFoFwlCxssmfqD6UcdBcRA0ZDfykReKIVhCIY=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=NHVCSdOu4lEREh1wFivmxZVUbjU/BKRrn2jlJgK1c9meBq66cEph+GYI0YfrIsflR
+	 uDlQc00b0kGZpLsp3oAcKobK6lSEfBHh3Gf3FY0glUCbs3i2Xkofcppbu7iaaHD3K2
+	 vLTszxZQbDjaXfOwqx7NT4exBy8GxV+pz2fS/vSaSwz4Mq2IPHK8uujWmba73XxCTz
+	 sYOeYjyKj2+s5Gt+1PcNjidBtgR63uGAp1APZIFpKX3Of4iiI5x/mg5ejlHZ2kJ5wC
+	 vpzgeCJZrQ082+i2zGIjjECQN9TftPR8e7y1bkjk19G7ySyd/F5IMzrUcpdPV8OzAK
+	 jr5ZFHExSWYXw==
+Message-ID: <sashiko-outbox-209288@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 02/12] KVM: arm64: guest_memfd: Check mmap support
+ when preparing memslot
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Steven Price" <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
+In-Reply-To: <20261111145758.217946-3-steven.price@arm.com>
+References: <20261111145758.217946-1-steven.price@arm.com>
+ <20261111145758.217946-3-steven.price@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 11 Nov 2026 16:30:01 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -60,98 +60,60 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20261001115614.82F9F1F0089A@smtp.kernel.org>
 
-On Thu, Oct 01, 2026 at 11:56:14AM +0000, sashiko-bot@kernel.org wrote:
-> > diff --git a/include/acpi/actbl2.h b/include/acpi/actbl2.h
-> > index baef525367b5c..68849c9f7cf69 100644
-> > --- a/include/acpi/actbl2.h
-> > +++ b/include/acpi/actbl2.h
-> > @@ -61,6 +61,7 @@
-> >  #define ACPI_SIG_SVKL           "SVKL"	/* Storage Volume Key Location Table */
-> >  #define ACPI_SIG_SWFT           "SWFT"	/* SoundWire File Table */
-> >  #define ACPI_SIG_TDEL           "TDEL"	/* TD Event Log Table */
-> > +#define ACPI_SIG_TLBI           "TLBI"	/* TLB Invalidate Domain Table */
->                                    ^^^^
-> 
-> [Severity: Medium]
-> Is it appropriate to introduce a draft, non-final table signature directly into
-> the global upstream-maintained acpica headers?
-> 
-> The commit message explicitly notes this patch should not be merged as is
-> because the TLBI table description is not yet public and may change. Merging
-> draft specifications creates a risk of dead uapi and compatibility issues if
-> the final specification differs.
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue to consider:
+- [Medium] KVM: arm64: mmap check bypassed in
+  kvm_arch_prepare_memory_region()
+--
 
-The commit message already states that this patch is not yet part of
-ACPICA and should not be merged. There is nothing to change.
+commit 30a76d4c8b8b8454f9d59879df7f0b5de9a2cdbb
+Author: Steven Price <steven.price@arm.com>
 
-> > @@ -3701,6 +3702,37 @@ struct acpi_table_tdel {
-> >  	u64 log_area_start_address;
-> >  };
-> >  
-> > +/*******************************************************************************
-> > + *
-> > + * TLBI - TLBI Domain Table
-> > + *
-> > + ******************************************************************************/
-> > +
-> > +struct acpi_table_tlbi {
-> > +	struct acpi_table_header header;
-> > +	u32 domain_count;
-> > +	u32 domains_offset;
-> > +};
-> 
-> [Severity: Medium]
-> Is it acceptable to add a Linux-specific out-of-tree structure definition to an
-> upstream-maintained acpica file?
-> 
-> The acpica headers are maintained upstream, and Linux kernel policy typically
-> requires changes to first be accepted by the acpica project before being synced
-> to the Linux tree.
+KVM: arm64: guest_memfd: Check mmap support when preparing memslot
 
-Same as above.
+This commit adds kvm_gmem_slot_supports_mmap() and updates
+kvm_arch_prepare_memory_region() to check whether the guest_memfd backing
+file supports mmap rather than checking kvm_memslot_is_gmem_only().
 
-> commit cb4c50a2ac546f3127893846943d61a1ea5cc49e
-> Author: Kristina Martšenko <kristina.martsenko@arm.com>
-> 
-> KVM: arm64: Hide TLBID from guest sysregs
-> 
-> This commit hides TLBID system registers and fields from the guest to prevent
-> them from discovering domains. It reports the feature as unsupported and
-> sanitizes a nested hypervisor's HCRX register bits.
-> 
-> >   * Sanitize a nested hypervisor's HCRX.{VTLBIDEn,VTLBIDOSEn,FNB}.
-> 
-> [Severity: Medium]
-> The commit message claims to sanitize the guest's HCRX_EL2.FNB bit, but it
-> appears HCRX_EL2_FNB is omitted from NV_HCRX_GUEST_EXCLUDE:
-> 
-> arch/arm64/kvm/hyp/include/hyp/switch.h:
-> #define NV_HCRX_GUEST_EXCLUDE	(HCRX_EL2_TMEA	    | HCRX_EL2_PTTWI	| \
-> 				 HCRX_EL2_EnIDCP128 | HCRX_EL2_VTLBIDEn	| \
-> 				 HCRX_EL2_VTLBIDOSEn)
-> 
-> Because HCRX_EL2 is a VNCR-backed register, a nested guest hypervisor (L1) can
-> write to it directly in memory without trapping. During context switch, KVM
-> reads the guest's HCRX_EL2 from the VNCR page and masks it with
-> ~NV_HCRX_GUEST_EXCLUDE.
-> 
-> Since FNB is not excluded, will KVM apply the guest's FNB bit to the physical
-> HCRX_EL2 register, breaking the virtualization boundary?
-> 
-> The impact appears to be limited to the guest's own TLBI coherence.
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 1db10d8d6db73..a146f6cde3d02 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -2839,10 +2839,11 @@ int kvm_arch_prepare_memory_region(struct kvm *kv=
+m,
+>  		return -EFAULT;
+> =20
+>  	/*
+> -	 * Only support guest_memfd backed memslots with mappable memory, since
+> -	 * there aren't any CoCo VMs that support only private memory on arm64.
+> +	 * Protected VMs currently require guest_memfd backed memslots with
+> +	 * mappable memory to support shared mappings.
+>  	 */
+> -	if (kvm_slot_has_gmem(new) && !kvm_memslot_is_gmem_only(new))
+> +	if (kvm_arch_has_private_mem(kvm) && kvm_slot_has_gmem(new) &&
+> +	    !kvm_gmem_slot_supports_mmap(new))
+>  		return -EINVAL;
 
-No, the FNB bit is sanitized in __vcpu_sys_reg() as a result of this change:
+[Severity: Medium]
+Does gating this check on kvm_arch_has_private_mem(kvm) cause a
+regression that allows binding non-mappable guest_memfds to non-Realm VMs
+on arm64?
 
-+	NEEDS_FEAT(HCRX_EL2_FNB			|
-+		   HCRX_EL2_VTLBIDOSEn		|
-+		   HCRX_EL2_VTLBIDEn,
-+		   FEAT_TLBID),
+At this commit kvm_arch_has_private_mem(kvm) resolves to the stub in
+include/linux/kvm_host.h that unconditionally returns false, and even
+after commit "KVM: arm64: CCA: Prevent memslot modifications after Realm
+creation" defines it as kvm_vm_is_realm(kvm), it remains false for all
+non-Realm VMs.
 
-Thanks,
-Kristina
+Userspace can then create a guest_memfd without GUEST_MEMFD_FLAG_MMAP and
+bind it to a normal VM via KVM_SET_USER_MEMORY_REGION2.  Stage-2 faults
+in kvm_vm_mem_abort() -> gmem_abort() will fault those unmappable pages
+into the guest while HVA-based KVM accesses via slot->userspace_addr
+(such as kvm_read_guest() and kvm_write_guest()) access unrelated VMA
+memory.  Dropping the kvm_arch_has_private_mem(kvm) condition here would
+preserve the requirement across all arm64 VMs.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261111145758.2179=
+46-1-steven.price@arm.com?part=3D2
