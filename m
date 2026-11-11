@@ -1,70 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794426416;
-	b=uu+nQDWpR6EWc/eX8D9rPL32Jm/bi4uWCr/KqlIcSbCttLUA3p1dgedayu4Ctr7PZmR4
-	 LMKmV+rh3HXzS7J4iAO84Yt5TI+HCm9yyFltZxqqptYt+oVF3fWNgcw3FTmV+A5bcmp6J
-	 KT0wqe5c+xQX4LMtp3EfXrX05lDwOrd5pvmikOVbjfitLbi56qJh65K+/Q9xMIeEscNFj
-	 DgGjGlxeXWfU6BQGActkKz2hOUe6Sqfqg3fBzug/MZpLI0SJY+Sd+rpu/qZsS2UaXgfXH
-	 V2I3KGjnHzgkNBTEUgSpZauSktaIu8aLPpQ5K0m50JbPn3FpcXmhzIm//2m39yktoiA==
+	t=1794430785;
+	b=zDHloLZ0F23WgMVK+Ed26QzLzalrv/FGAkE8f2pAHoKTsHlA03DL3MHb0sOJYDnwesTq
+	 TJqiPrMtge3pxHvoa1BR7/HW3Cjrs/mONSiNaU2fh5ppjIC6OjFSNxVlAcCZK3YqvDWyi
+	 sbC+D97ZuhBffB9Ffs7zB/iUVI4t0hxnw5Qla0QhyGbAjYSyj3v1b63rgkCKtQvptbr+c
+	 EtLA9pqlTZd4OyKvQYHTS9Mnp8SpacklI8p1THmDYgvDK0aVEuSXPzBRC+ZZ7bndnw+4F
+	 g3oqV7rKaa5oEoS2GDLy244VijghQYdvGeSJKPvmWwH3WVuytuTB3dqKe7viMMO3MAA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794426416;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=TEA8Apju+c2xFXRAkFgrvx3sun6rF0Eje/7sHrYH2Vo=;
-	b=k2KAJijxtJ6l0jt/GzwQAwsLy0jMtbs9TvfkuuNzDxvs5utmJf5lA5CtuBXV0IuLEhVt
-	 KcbIPDUeYdfboKC+NyGJXDDZ2/GS8r3XhhMJYgDN4lcuTujRY4eX1FzOBl5jlc9XHM0eI
-	 svDuB/NIWlpEmzBKVJz6VrEXamTsfBsZw2A8K/lSvILbyGduYor9PbKo7PeF04zca2xeK
-	 gqEAdvWVR4Gh8ZC+B6S0HY/W15xYDBfAAAMqY/c5NCD3pE3Ww1uvaV8+QbGT6YvTlIHTW
-	 7hg7SUh5ogwWIiJZA4SekTUfo+RwupqIaIzV7BT76CCmskSs/Xtfl/yVPGLcZO4uoFA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794430785;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=rJtMZ+oQ2ftbIpYEVBAu9rDREp/nXzUYJLHQXQsg0HU=;
+	b=rhvMAnuYRkenbHP72ARXtbPI6SaqPAxfkAe0T5xbvM3JWgG4q33AqatHrYov2s1GbqAp
+	 wcg8fTSVvnGTvpoGH8WW6M/8XOK0TiDpGlQAZAUdz1ISU2VQnVkqbJVcmJquTJcoBhILt
+	 BsEkDQbdr82PGeQ1i23ds7W8aWcR51dGME+QP7bbtksu60grSAG08DU+xZ7G35dDkxSrQ
+	 psV1wi7fYHA/SnMAncxk0jVontq67rEYwCaqk1sIsS7lRBEyiH+e9mxG5ECWE1r3Sc5DE
+	 w4kADunVNxswYHgRhA0D3boDOh5kOxopo8B3iVrQKb1usQjuEVjZboaVDQr+hLm3HAg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=iCHAVtIZ;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83CB1606A321;
-	Wed, 11 Nov 2026 19:46:56 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=EcNEcgLx;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88E73606A32E
+	for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 20:59:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 88E73606A32E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=iCHAVtIZ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 147C61F00A05;
-	Wed, 11 Nov 2026 19:46:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794426416;
-	bh=TEA8Apju+c2xFXRAkFgrvx3sun6rF0Eje/7sHrYH2Vo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=iCHAVtIZhmXIEkCi9XEq5ZvLA0vhBX9/VL11RcUGWxznfbZwW6tuCL26tfzeSXJO1
-	 Qf979tWcOSyzU9sMCyiiCrv3tVOLGIzCBslYE92/Oap7tz4772n7PdhXYAlJnFvaGt
-	 7YXMYq3A2oRDAd4ff+HKEBH/4AjfOmrVlLV31UlYRCNQYfQhZZYEXTkeMVstTsOVvR
-	 ZBkxjipDEEpO6IjZk1+AsUXq17W73ZhUfM7RHWH4acrHdJ6oCW1iRoI9jEyPJXoYYe
-	 qRXwIQSeO4fpeD33h/lULr3mUSeF+eB+zPPBQ75SjPVCYz82iIlh5gRkgYOUabLxem
-	 PcaHUhNHFj16g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xREHV-0000000ESvo-3uKv;
-	Wed, 11 Nov 2026 19:46:54 +0000
-Date: Wed, 11 Nov 2026 19:46:53 +0000
-Message-ID: <86ld6z1782.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Dan Carpenter <dan@cryspen.com>
-Cc: Oliver Upton <oupton@kernel.org>,	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,	Zenghui Yu
- <yuzenghui@huawei.com>,	Catalin Marinas <catalin.marinas@arm.com>,	Will
- Deacon <will@kernel.org>,	Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org,	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,	Karthik Bhargavan <karthik@pereq.eu>,
-	=?UTF-8?B?Q2zDqW1lbnQ=?= Blaudeau <clement@cryspen.com>
-Subject: Re: [PATCH] KVM: arm64: nv: Initialize hw_mmu to NULL for nested vCPUs
-In-Reply-To: <d3571fb535e1832d2a067649f294b83d824d4350.1794395321.git.dan@cryspen.com>
-References: <d3571fb535e1832d2a067649f294b83d824d4350.1794395321.git.dan@cryspen.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=EcNEcgLx
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 68503153B;
+	Wed, 11 Nov 2026 12:59:39 -0800 (PST)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4E9FE3F85F;
+	Wed, 11 Nov 2026 12:59:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1794430782; bh=GvTWPjgOeMhK10lBp/x80dBPCkX7FkHbNjd4m6Rj3Io=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EcNEcgLxh8R4qgoGx5zt/BAiEPlEPgPQ5bJyg31SxFdqKQtTwJ6iyFz9dR8Pa45eo
+	 5bjD6JCeoE+Z6XkT6uG1bDWU/8OkCGqilXZCHG+WVhKDKQL1oYbZ4gyatCCuN2U6IT
+	 0gN8y26J/JidPb860oE6jToCtYBB/N74sVWdrtgU=
+Date: Wed, 11 Nov 2026 20:59:27 +0000
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Haseeb Ashraf <haseebashraf091@gmail.com>, maz@kernel.org, 
+	Oliver Upton <oupton@kernel.org>
+Cc: Haseeb Ashraf <haseeb.ashraf@siemens.com>, 
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, fahad.arslan@siemens.com, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: arm64: Resume stage-2 unmap where the walk
+ stopped
+Message-ID: <lnqoq6pirbxwdl3ki3khiju6kkh3itw2meh67emmd6ck4lu6sl@ai5ctyvuhpuy>
+References: <20261110164706.582879-1-haseebashraf091@gmail.com>
+ <20261110164706.582879-2-haseebashraf091@gmail.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -73,89 +65,118 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: dan@cryspen.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, karthik@pereq.eu, clement@cryspen.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261110164706.582879-2-haseebashraf091@gmail.com>
 
-Hi Dan,
+Hi,
 
-On Wed, 11 Nov 2026 11:11:19 +0000,
-Dan Carpenter <dan@cryspen.com> wrote:
+On Tue, Nov 10, 2026 at 09:47:06PM +0500, Haseeb Ashraf wrote:
+> From: Haseeb Ashraf <haseeb.ashraf@siemens.com>
 > 
-> Before commit 6ded46b5a4fd ("KVM: arm64: nv: Keep reference on stage-2
-> MMU when scheduled out"), kvm_vcpu_load_hw_mmu() would set ->hw_mmu on
-> every load.  Now it only sets it when it is set to NULL.
+> kvm_vm_stage2_unmap_range() unmaps a range one block-sized chunk at a
+> time. The walker steps over an invalid entry in one go, but the next
+> walk starts at the following chunk, so an invalid entry larger than a
+> chunk is visited once for every chunk it covers. Unmapping the whole
+> IPA space of a shadow stage-2, as emulating TLBI VMALLS12E1IS and TLBI
+> ALLE1IS does, takes 2^18 walks with 4K pages and a 48-bit IPA space,
+> however little it maps. Each walk also ends with a range TLBI when
+> FEAT_TLBIRANGE and FWB are available.
 > 
-> In kvm_vcpu_init_nested() the vcpu->arch.hw_mmu points to &kvm->arch.mmu
-> from when it was set in kvm_arch_vcpu_create().
+> On an AmpereOne A192-32X (192 CPUs, Xen on KVM, 4K pages, 48-bit IPA),
+> a full-range unmap of one shadow stage-2 took 0.82-0.94 s (mean 0.91 s
+> over 192 unmaps) on 6.18.29. With this change and the mainline commits
+> it builds on backported, it took 2.1-27.8 ms (mean 3.8 ms over 128
+> unmaps), with 512 to 1024 walks instead of 262144. A TLBI VMALLS12E1IS
+> trap that unmapped two shadow stage-2s took up to 1.85 s before.
 > 
-> Normally what happens next is a two step process.  KVM_ARM_VCPU_INIT
-> calls kvm_reset_vcpu_core() and that sets the vcpu into hyp context
-> (vEL2).  Then KVM_RUN calls kvm_vcpu_load_hw_mmu() which doesn't do
-> anything.  But that is fine because we are in hyp context and the
-> ->hw_mmu already is pointing to the correct place.
+> Add kvm_pgtable_stage2_unmap_range(), which returns the address its
+> walk reached, and have the unmap loop resume from there.
+> kvm_pgtable_stage2_unmap() still returns 0 or an error, for its
+> callers at EL2. The walk handles every entry it steps over, including
+> invalid entries that carry state, so nothing has to be looked up
+> beforehand.
 > 
-> However if, for example, we are restoring a vcpu that was saved in L2
-> context, then the VMM uses KVM_SET_ONE_REG to overwrite the vEL2 state
-> that kvm_reset_vcpu_core() set up, and the vCPU is in L2 context when
-> KVM_RUN loads it for the first time.  Ideally, kvm_vcpu_load_hw_mmu()
-> would set the hw_mm to point to L2's page tables but, since is non-NULL,
-> it leaves it as is.  At this point L2 can access L1's memory.
-
-Ah, nice one. You can tell how much testing has gone into
-save/restore...
-
->
-> Fix this bug but setting ->hw_mmu to NULL in kvm_vcpu_init_nested() so
-
-nit: s/but/by/
-
-> that kvm_vcpu_load_hw_mmu() always sets it correctly on the first load.
+> The unmap of a shadow stage-2 also drops the guest stage-2 records of
+> the whole span the walk covered: nothing is mapped in the part it
+> stepped over, so any record there is stale. Each walk that remains
+> ends with the same deferred TLB invalidation as before. The spans that
+> were skipped have no valid entry, so there is nothing to invalidate.
 > 
-> Fixes: 6ded46b5a4fd ("KVM: arm64: nv: Keep reference on stage-2 MMU when scheduled out")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Dan Carpenter <dan@cryspen.com>
+> Suggested-by: Oliver Upton <oupton@kernel.org>
+> Signed-off-by: Haseeb Ashraf <haseeb.ashraf@siemens.com>
 > ---
->  arch/arm64/kvm/nested.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 78fa433774c6..60bccb66e52c 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -140,6 +140,8 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
->  		kvm->arch.nested_mmus_size += S2_MMU_PER_VCPU;
->  	}
->  
-> +	vcpu->arch.hw_mmu = NULL;
+
+[...]
+
+> +/*
+> + * Unmap [start, end) one chunk at a time, resuming from the address that each
+> + * walk reached. An invalid entry that is larger than a chunk is then stepped
+> + * over once, rather than once for every chunk that it covers.
+> + */
+> +static int stage2_apply_unmap_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
+> +				    phys_addr_t end,
+> +				    s64 (*fn)(struct kvm_pgtable *, u64, u64),
+> +				    bool resched)
+> +{
+> +	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+> +	bool lock_dropped = false;
+> +	phys_addr_t addr = start;
+> +	u64 next;
+> +	s64 ret;
 > +
+> +	do {
+> +		struct kvm_pgtable *pgt = mmu->pgt;
+> +
+> +		/*
+> +		 * We may be raced on PGT teardown when we release the
+> +		 * kvm->mmu_lock. That's fine as the PGT is legitimately no
+> +		 * longer present.
+> +		 */
+> +		if (!pgt)
+> +			return lock_dropped ? 0 : -EINVAL;
+> +
+> +		next = stage2_range_addr_end(addr, end);
+> +		ret = fn(pgt, addr, next - addr);
+> +		if (ret < 0)
+> +			return ret;
+> +
+> +		next = min_t(u64, ret, end);
+> +		if (resched && next != end) {
+> +			cond_resched_rwlock_write(&kvm->mmu_lock);
+> +			lock_dropped = true;
+> +		}
+> +	} while (addr = next, addr != end);
+> +
+> +	return 0;
+> +}
 
-I think this really needs a comment to explain why we repaint hw_mmu
-to NULL, because the next idiot who looks at this (likely me) will
-probably remove this line...
-
-The other thing is that this means that nothing can evaluate
-vcpu->arch.hw_mmu anywhere outside of the loaded path, as it can be
-NULL. I *think* this is OK, but I need to really convince myself...
-
-I'd like to add something like:
-
-	/*
-	 * We can't rely on the S2 MMU being the canonical one,
-	 * as userspace can restore a nested context. Nuke the
-	 * hw_mmu early to ensure that we pick the correct one
-	 * load time. It also means that we can't rely on hw_mmu
-	 * being set to anything useful if the vcpu isn't loaded.
-	 */
-
-If that works for you, I'll squash that in.
+In my opinion it is worth giving the same treatment to all users of
+stage2_apply_range(), instead of having this new
+stage2_apply_unmap_range() that is almost identical.
 
 Thanks,
+Wei-Lin Chang
 
-	M.
+> +
+>  static void kvm_vm_stage2_unmap_range(struct kvm_s2_mmu *mmu,
+>  				      phys_addr_t start,
+>  				      u64 size, bool may_block)
+>  {
+>  	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+> -	int (*fn)(struct kvm_pgtable *, u64, u64);
+> +	s64 (*fn)(struct kvm_pgtable *pgt, u64 addr, u64 size);
+>  
+>  	if (kvm_is_nested_s2_mmu(kvm, mmu))
+>  		fn = kvm_pgtable_stage2_unmap_tracked;
+>  	else
+> -		fn = kvm_pgtable_stage2_unmap;
+> +		fn = kvm_pgtable_stage2_unmap_range;
+>  
+> -	WARN_ON(stage2_apply_range(mmu, start, start + size, fn, may_block));
+> +	WARN_ON(stage2_apply_unmap_range(mmu, start, start + size, fn, may_block));
+>  }
+>  
 
--- 
-Without deviation from the norm, progress is not possible.
+[...]
