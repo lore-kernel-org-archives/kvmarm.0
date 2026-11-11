@@ -1,49 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794419437;
-	b=YbDI33swMJEQkag7zC/ZyEzfJIDWvl8g1JkyKzS5Hqew/qRaW2ynWCScpuQJbh8O7ZAT
-	 ksTA76bnB7Q1XTHADjbuMkp3t6CL3UE2/IQULPdMI/iIgh7Pe8GBGv+6Ydklz6R1O7aJh
-	 QgaThmAB/RMTMPGEW4RKzWBFpk3GezcPrR/JfSWzzix9QQLrXH69Sjum03X4MRbCR8PRt
-	 rDtclvZaXoiBNyNQHLqGj4M+WUfMrjzdad+wZqwaGrWfB/hriPhOkq0c7W4GfmhNUl9Bj
-	 /UUmxQQKibwkMtfZAKNtdzQQ3alpMgV+M8VprLLaCXCSmxAZhz/k3EKHjieYWCTdkog==
+	t=1794420371;
+	b=NXunhG16iblw4eParuj3N2YEMdF61+t6tl8c6qwzBh+B1cwqsVTaHLb7WPQKmOKen3YD
+	 l2KgQ/LxemEcAJESN5SznUwAnjm04ddLMUdggvtxZkW8Euu72tOavQVyT25SfiXJVFij4
+	 icyOa1lI0j/EJ6qUKNESBxLaC2os5Hlfy9c+j5KYKuGC7McEDOrMQTvQkUSrxKrPFU3GQ
+	 zz3N/rhO2J3nvQZO1wtMrPmRVuMK+z/geVL0JJCi2b2cFEmtid/HQRKHAIVqOuCM2buvo
+	 A9NsWuNCtWoYvW7UulzaRhnUuPC6hnAIcfbKYqPaow9HqRorsRVA6LsepV6MhMnm52A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794419437;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
-	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=Z8qU6+HvaIS0hGP6RSMrC3qaiOO8YyUA1e15Sl/ZGXE=;
-	b=mgYD16TuX7yTUr7kPgCgGshy6JRdGgFja7YDBF32vK4+t18KJHAtlW5Xtqj6z7t96BRy
-	 Gh+ayOe6FS1t+lSEFGYGCEzbBUAkDzSGqgjgJF8Uq+0SdDmKHpZ6JclkuXqt6499oZ9tS
-	 UOLWt3YpKNPfcJJ8Q/4tlKBa7WIPdni3aFv5Z9vxK2xBLlIhlKkCqSrM+nKZ7pglBBIF3
-	 zZM6byjcWEw2F/J1VpAzTauGdA8+2IdWMB4CB89sonLHIDXkc1YxFHEK1QkPQ4zAW2n/d
-	 19Wt+nb3IZpXXE88/T2hez6WM2Fi4Y98Y6NT3MVSnHO/cxWtquo86MwT7UKsuXtkqng==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794420371;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=nwZSOB7nv5mfMD76NYXhw0l0C4u8SWDXtLLQ6qO27Sw=;
+	b=NeT2UCqkJ2nI/XDZqEGxJmGc2WJdTa9ibgvO0qZlBO8iVV0z6/7oIv7YBAOgWnVvqjHy
+	 X8ZtvRRHC1cftfDQj45dXuTUBIqoPnq1coOoyyU7E/N6ooN8jCfqtVj0hQ7cgQJ7s3jm0
+	 RIvWaMlfdD0ukXjEoOz9FWCP90iTk+XcWZSm6UgADMq35FzPgF7Xo1RcuYqreZsoadGs4
+	 sNaNPBsmocOeIGMa0oM95KygLqX2cB/EmjdPxEgCesw5JDU+BmkoFniC8+oUJQv1wd4cb
+	 Rxpc3z+QEJ7sj/09QU/JiGkyEUgqlv8hFzuaa9phzUs/lzZTu3+2MKUEdf3Yc/HD8aA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=B0vx20da;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CE74606A321
-	for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 17:50:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8CE74606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FAw8aSSw;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39EBD606A31C;
+	Wed, 11 Nov 2026 18:06:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=B0vx20da
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DADC11576;
-	Wed, 11 Nov 2026 09:50:32 -0800 (PST)
-Received: from [10.57.69.47] (unknown [10.57.69.47])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DC4093F632;
-	Wed, 11 Nov 2026 09:50:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794419435; bh=mkeJMyoQ8Qv6RCg92gwoZ/tiJll4x2tHEGTQlboYilQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=B0vx20daoO+pjHgnuqgkbbdr6Am0qaJ+xSgQiGc5DV5qXM28UAODjDIdbLLg3j+P/
-	 JVlF8vJ8I0yzmAja1WatBIQIdsq/5ssyGRXt8SQoW39vxsUmwE3B3KibZBxalzjzoM
-	 52ANnchXJdVDMcsSysOPgEhvoy0NWAp+/DfnpoPE=
-Message-ID: <c426f5a3-d161-476d-8911-99903ecf8e46@arm.com>
-Date: Wed, 11 Nov 2026 17:50:31 +0000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FAw8aSSw
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 257C11F00A05;
+	Wed, 11 Nov 2026 18:06:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794420370;
+	bh=nwZSOB7nv5mfMD76NYXhw0l0C4u8SWDXtLLQ6qO27Sw=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=FAw8aSSwJBOyV6HWsjAbX77NwM7Y0oZNbXY5wsYwerV7Gcu2QDnk79j5TstbLzaJN
+	 y18jUwDmEBL/fugRD7PFh5rd4NPZxu2k0qVri2yuDvhzcKZ1jdtbMHQxLzcdszSrcu
+	 hnCnRXufK5HHPZSu7gm3N0XX2NDPaTKDDEdeu+xhCtiAEjWOnZsKVKB4ouwyeVy/FS
+	 NzeCp0mmcSvEeuwrG+E1paXsLn4pwoVfDRVOuTor7DQBb0Jc+QZ+pt8Z3q36wljfh6
+	 GOK9DpLw/aTmjEV/RNf1yufTGxFTd9uCxozbcauG2i2fgwZfkZBOqkT5OP+IeSbLjD
+	 tc8kzKoo/sxgw==
+Message-ID: <sashiko-outbox-209447@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 08/12] KVM: arm64: CCA: Add Realm RTT mapping and
+ invalidation helpers
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Steven Price" <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
+In-Reply-To: <20261111145758.217946-9-steven.price@arm.com>
+References: <20261111145758.217946-1-steven.price@arm.com>
+ <20261111145758.217946-9-steven.price@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 11 Nov 2026 18:06:09 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -52,103 +60,163 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 09/18] KVM: arm64: Implement HVC handling for protected
- guests at EL2
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com,
- seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
- mark.rutland@arm.com, steven.price@arm.com, vdonnefort@google.com,
- qperret@google.com
-References: <20261001135711.1640520-1-fuad.tabba@linux.dev>
- <20261001135711.1640520-10-fuad.tabba@linux.dev>
- <5fa8a1fb-4e2c-4746-8a70-a47f387ef0d6@arm.com>
- <CA+EHjTyCcGPMte9=HuqyvCS7CCCt80Lc_JQuA+1e3ZE+3A0zqQ@mail.gmail.com>
-From: Ryan Roberts <ryan.roberts@arm.com>
-Content-Language: en-GB
-In-Reply-To: <CA+EHjTyCcGPMte9=HuqyvCS7CCCt80Lc_JQuA+1e3ZE+3A0zqQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 11/11/2026 16:45, Fuad Tabba wrote:
-> Hi Ryan,
-> 
-> On Wed, 11 Nov 2026 13:59:17 +0000, Ryan Roberts <ryan.roberts@arm.com> wrote:
-> [...]
->>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> [...]
->>> @@ -2622,6 +2622,10 @@ static void kvm_hyp_init_symbols(void)
->>>          kvm_nvhe_sym(__icache_flags) = __icache_flags;
->>>          kvm_nvhe_sym(kvm_arm_vmid_bits) = kvm_arm_vmid_bits;
->>>
->>> +        kvm_nvhe_sym(spectre_v2_state) = arm64_get_spectre_v2_state();
->>> +        kvm_nvhe_sym(spectre_v4_state) = arm64_get_spectre_v4_state();
->>> +        kvm_nvhe_sym(spectre_bhb_state) = arm64_get_spectre_bhb_state();
->>
->> Is it really correct to snapshot this state then use it at runtime assuming its
->> still accurate? See below...
-> 
-> These can't change after this point: update_mitigation_state() doesn't
-> update a state once system_capabilities_finalized() is true, and
-> kvm_arm_init() runs after that.
-> 
-> [...]
->>> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> [...]
->>> @@ -1181,8 +1187,70 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
-> [...]
->>> +        case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
->>> +                /* The workaround calls themselves are handled on hyp entry. */
->>> +                val[0] = SMCCC_RET_NOT_SUPPORTED;
-> [...]
->>> +                case ARM_SMCCC_ARCH_WORKAROUND_2:
->>> +                        switch (spectre_v4_state) {
->>> +                        case SPECTRE_VULNERABLE:
->>> +                                break;
->>> +                        case SPECTRE_MITIGATED:
->>> +                                /* With SSBS advertised the guest's default is safe. */
->>> +                                if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, SSBS, IMP))
->>> +                                        break;
->>
->> For this case (and the break immediately above) you return val[0] =
->> SMCCC_RET_INVALID_PARAMETER (from init at top of this function). But the
->> kernel's kvm_smccc_call_handler() returns val[0] = SMCCC_RET_NOT_SUPPORTED in
->> these cases (which seems more likely to be correct). Does this violate the ABI?
-> 
-> Both return NOT_SUPPORTED. val[0] is set to it at the top of the
-> ARM_SMCCC_ARCH_FEATURES_FUNC_ID case.
+Thank you for your contribution! Sashiko AI review found 2 potential
+issues to consider:
+- [Medium] KVM: arm64: wrong granule level when skipping missing RTT in
+  realm_fold_rtt_level()
+- [Medium] KVM: arm64: cca: unhandled GFP_ATOMIC failure in
+  realm_create_rtt_levels()
+--
 
-Ahh missed that oops!
+commit 68d993c0f3cb9846fd5972acfd789cb5ebe22bac
+Author: Steven Price <steven.price@arm.com>
 
-> 
->>
->>> +                                fallthrough;
->>> +                        case SPECTRE_UNAFFECTED:
->>> +                                val[0] = SMCCC_RET_NOT_REQUIRED;
->>
->> Is it possible that the (compromised) kernel could have disabled the mitigation
->> after the state snapshot was taken? I.e. spectre_v4_state == SPECTRE_MITIGATED
->> and the VM doesn't advertise SSBS so it returns SMCCC_RET_NOT_REQUIRED here. But
->> the kernel has since turned off the mitigation?
-> 
-> Yes, where the mitigation is the firmware one. The host can disable it
-> with an ARM_SMCCC_ARCH_WORKAROUND_2 call, which EL2 forwards, and EL2
-> doesn't enable it again before running the guest. With TF-A that's
-> only on a Cortex-A76 without SSBS, the only CPU it implements the
-> dynamic workaround for.
+KVM: arm64: CCA: Add Realm RTT mapping and invalidation helpers
 
-If the mitigation is via SSBS but SSBS is not exposed to the guest, I'm guessing
-this is safe because the guest is expected to set SSBS=0 in this case?
+This commit adds helpers to create, fold, and unmap Realm Translation
+Tables (RTTs) for shared and private IPA ranges.
 
-Thanks,
-Ryan
+> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+> index b904e6541fb07..5aa34d68de595 100644
+> --- a/arch/arm64/kvm/rmi.c
+> +++ b/arch/arm64/kvm/rmi.c
 
-> 
-> I'll send out a fix. Thanks for spotting this!
-> 
-> Cheers,
-> /fuad
+[ ... ]
 
+> @@ -156,12 +286,94 @@ static int realm_tear_down_rtt_range(struct realm *=
+realm,
+>  					 start, end);
+>  }
+> =20
+> +/*
+> + * Returns 0 on successful fold, a negative value on error, a positive v=
+alue if
+> + * we were not able to fold all tables at this level.
+> + */
+> +static int realm_fold_rtt_level(struct realm *realm, int level,
+> +				unsigned long start, unsigned long end)
+> +{
+> +	int not_folded =3D 0;
+> +	ssize_t map_size;
+> +	unsigned long addr, next_addr;
+> +
+> +	if (WARN_ON(level > KVM_PGTABLE_LAST_LEVEL))
+> +		return -EINVAL;
+> +
+> +	map_size =3D kvm_granule_size(level - 1);
+> +
+> +	for (addr =3D start; addr < end; addr =3D next_addr) {
+> +		phys_addr_t rtt_granule;
+> +		long ret;
+> +
+> +		next_addr =3D ALIGN(addr + 1, map_size);
+> +
+> +		ret =3D realm_rtt_fold(realm, addr, level, &rtt_granule);
+> +		if (ret < 0)
+> +			return ret;
+> +
+> +		switch (RMI_RESULT_STATUS(ret)) {
+> +		case RMI_SUCCESS:
+> +			free_rtt(rtt_granule);
+> +			break;
+> +		case RMI_ERROR_RTT: {
+> +			int err_level =3D RMI_RESULT_DATA_LEVEL(ret);
+> +
+> +			if (err_level < level) {
+> +				/* No RTT at this level; skip the missing ancestor. */
+> +				if (WARN_ON(err_level < get_start_level(realm)))
+> +					return -EINVAL;
+> +				next_addr =3D ALIGN(addr + 1,
+> +						  kvm_granule_size(err_level - 1));
+> +				break;
+> +			}
+
+[Severity: Medium]
+Should this advance next_addr by kvm_granule_size(err_level) instead of
+kvm_granule_size(err_level - 1) (matching realm_unmap_shared_range() and
+realm_unmap_private_range())?
+
+When realm_rtt_fold() fails at err_level < level, the walk stopped at a
+single non-table entry in the table at err_level, which spans
+kvm_granule_size(err_level).  Using err_level - 1 skips the span of the
+entire table at err_level, leaving any foldable sibling RTTs in the rest of
+that table unfolded, and evaluates kvm_granule_size(-1) when err_level is 0
+on 4-level stage-2 tables (shifting past 64 bits on 16KB and 64KB pages).
+
+[ ... ]
+
+> @@ -191,6 +403,154 @@ int kvm_realm_teardown_stage2(struct kvm *kvm)
+>  	return 0;
+>  }
+> =20
+> +static void realm_unmap_shared_range(struct kvm *kvm,
+> +				     unsigned long start,
+> +				     unsigned long end,
+> +				     bool may_block)
+> +{
+
+[ ... ]
+
+> +		case RMI_ERROR_RTT: {
+> +			int err_level =3D RMI_RESULT_DATA_LEVEL(ret);
+> +			int level =3D find_map_level(realm, addr, end);
+> +
+> +			if (WARN_ON(err_level > KVM_PGTABLE_LAST_LEVEL))
+> +				return;
+> +
+> +			if (err_level >=3D level) {
+> +				/* Nothing present, so skip */
+> +				next_addr =3D ALIGN(addr + 1,
+> +						  kvm_granule_size(err_level));
+> +				break;
+> +			}
+> +
+> +			ret =3D realm_create_rtt_levels(realm, addr, err_level,
+> +						      level, NULL);
+> +			if (WARN_ON(ret))
+> +				return;
+
+[ ... ]
+
+> +static void realm_unmap_private_range(struct kvm *kvm,
+> +				      unsigned long start,
+> +				      unsigned long end,
+> +				      bool may_block)
+> +{
+
+[ ... ]
+
+> +		case RMI_ERROR_RTT: {
+> +			int err_level =3D RMI_RESULT_DATA_LEVEL(ret);
+> +			int level =3D find_map_level(realm, addr, end);
+> +
+> +			if (WARN_ON(err_level > KVM_PGTABLE_LAST_LEVEL))
+> +				return;
+> +
+> +			if (err_level >=3D level) {
+> +				/* Nothing present, so skip this RTT entry. */
+> +				next_addr =3D ALIGN(addr + 1,
+> +						  kvm_granule_size(err_level));
+> +				break;
+> +			}
+> +
+> +			ret =3D realm_create_rtt_levels(realm, addr, err_level,
+> +						      level, NULL);
+> +			if (WARN_ON(ret))
+> +				return;
+
+[Severity: Medium]
+Can realm_create_rtt_levels() fail with -ENOMEM here, triggering WARN_ON()
+and aborting the unmap?
+
+Passing mc =3D NULL causes alloc_delegated_granule() to allocate RTT pages
+with GFP_ATOMIC | __GFP_ZERO | __GFP_ACCOUNT.  When unmapping a sub-block
+range under memory pressure or a memcg limit, an allocation failure fires
+WARN_ON(ret) and returns early, leaving the rest of [addr, end) mapped in
+the Realm RTTs (for example across an MMU notifier invalidation before the
+host frees the backing pages).
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261111145758.2179=
+46-1-steven.price@arm.com?part=3D8
