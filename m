@@ -1,49 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794392067;
-	b=cgcepHoMypzk+Id8iQ6/n/xw7CsikIau5YfQ1iiDzRoLKniX50DGArs9DngjeEzO1kQi
-	 GMH3KfG/muiyJbF6A2zI2c8UEMPIjc4ULQlINbXu+Uyz5Z9Oe8ZS1QzFB1TUyBiX9RN2v
-	 dysurzJueXc5RV6oSv2UfoPxSCvQXASQu0rjQoYa3b04aRaa1gYvntewF5GbHIstWtx2O
-	 Th8FFJIJmQvbWyhLWQfiTww/p83qzqwW8b9R8AOKfzPXgPup/1lV+I60LqHlaorRAeG9E
-	 uEuIND/1VrsqJ4P9yWLYMdGAvM0uYroXdQp4aGkM6LylyPw+JRO2JmYKAeSEtKe3peg==
+	t=1794394931;
+	b=4IwF2tfWj2Y1EeUhFZ/e0n5BZpHJ92c7XNZNkQp5dEhJUj/w6vJw5RaRJzHPiGbKlwBo
+	 b/+6pwqRGAx5v4SvaY45rT+7JkviRAeVl6xs3Ka5uR497ltEGxlTqjoywXSvxLus17pOv
+	 6jjOGBd7si0r91IKXymYQuMXcq97IBuZirY9I0XmsksqK0JK2ZCETtD7bSkeFpjpBtgUb
+	 lJvMRCHE+8KjhJeyewImrxL40612rYVev3zmn5s4Wzi7RqmtKqjsHL7PDEI1zOx8vmSJv
+	 njUaCJ7YvW+vZC/jMsOAuMLSu09fk0dc9gGw4vEvXkmPuSvxAshcwjXYb2kqZX/ZiDw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794392067;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=O2yy4V/+eRWwmPhN0rKWvJ8TBXDXhmiokVDl73YABGI=;
-	b=uxtz8iXaVUsNRtmxKHHqvt+gR/jMNgpT19wak9mjVEK67zZjkZOL/0wEBLsVNps8QwrN
-	 G9cqcklitH9RFUqfCi9z5FUJX9edevjabeori8HJBQqC86ZA/iuvDWpCnfoj4E1FzZPao
-	 2Xvi6wzCUSmFQXkvdB1zrGAPtdhd8kcLYEGtT629gGksrUB01OzuamH5dWTBWtijrbtlw
-	 rM9hB1Yoz+AiWAR66gxXGV7dHvlKtiOX6kX4sUE9D320tfh1YQyYo1osvplJCV4xRRF6O
-	 82IFmako/Ss9M17LrgeMXAnxWDEHAoVws3BSwe7J2hmYuXipb8LPZ8aqYGNWC/g60Ng==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794394931;
+	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:MIME-Version:Content-Type:Content-Disposition:
+	 X-Mailer;
+	bh=vx06wP7sOtawrWt780eGmmqhNLqmiCDx1ykk7VKYMck=;
+	b=xQd5kBVOfnnxauPg3Hjv/fGuR3V0zx3yk842RlCzQa/U4i8EN3eN2c3Zdsz/TnltW5jO
+	 a5NpMqttdypJBlpVOl9ipR54LCnuluS8h5pgkm9kH2DQZ9BnAI1HYYuIv3Nb1D7C/M8RA
+	 lT5AYhPAodHMCcp8+sAR/yQKWxXYuhQdp/jVHqTzvu6uRM21Wb4ysogvlSak0Zro1scSW
+	 WItg+puEA/hMQfjmixBbcmMreBQOyXGGScUqyO2VVnC0ZWM5pUz603ShK4UjOTFnJnpTd
+	 buV9NVqkc66tVl0drET8LTrHWXtbBz+S+Vw8rAumsRmriOWBjCt8AhLRPSEPPoLMmUA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=J8dFTzKN;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B7E4606A321;
-	Wed, 11 Nov 2026 10:14:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7B7E4606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=J8dFTzKN
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D4CE71576;
-	Wed, 11 Nov 2026 02:14:22 -0800 (PST)
-Received: from [10.2.197.99] (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 646E23F632;
-	Wed, 11 Nov 2026 02:14:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794392065; bh=ld6QCXuiYeyxffuOuDY+SDVXlqPyqjix1+nuLDfWSFA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=J8dFTzKNyF6kYm9CzUq26UxXEEBaqYaG302JjseermLJdecPfaeRRszp2cyBjAtcb
-	 jEPWLxXKFHHrCm3Q8OObBwGJbopqGSy24pJXyJddmL5QqxkMPgSwcW+pANCDyWtFN7
-	 wAfiCXWRzNkIs7TW59Dpa18wRpMlmvps2Tojh/rE=
-Message-ID: <bc0a6290-ddca-4005-9d22-b74833f435b9@arm.com>
-Date: Wed, 11 Nov 2026 10:14:20 +0000
+	dmarc=none header.from=cryspen.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	arc=none smtp.remote-ip=209.85.128.43
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3107606A31C
+	for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 11:02:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F3107606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cryspen.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4a59100fa83so26556615e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 03:02:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794394929; x=1794999729;
+        h=content-disposition:content-type:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=vx06wP7sOtawrWt780eGmmqhNLqmiCDx1ykk7VKYMck=;
+        b=BLBgZPVPDxHcRNLkVdx503JEnOQr1TYlglHCGtyEUZaxCNZwl7qs3p4mnjdp07Bjsc
+         Qcm+pEM2KYmrScy8SrlamwvY3crOlha3/+yEig/K+/EQdBiTmAveOdWS1dg12j+8/Qap
+         qxot6r2eJ371j6z+O3m7qUlHY4nW3dLvbutUhM99EwS3vllSdmTY/Qdd8ApNNUUwbjGr
+         RzDW9jiIjiiqvDL3LBMMxYtvikoWrWhaqXu647Oq1qBNSfXPU1qdE817LkahpmuS3lax
+         i5fo+EqNCfAH6gyWvf1P4AX3qHLHzo14vegENmWiEoo0jQx7Aukq92R+lDarkBRXMN/Z
+         3FvA==
+X-Forwarded-Encrypted: i=1; AL+hErFx3PEbOgOcY/0yr6vo5yh0hqhbphpcW6PVp5tnHX7Z82dIBpSYhrwMeHwh/fVOCQQYTQYmeRs=@lists.linux.dev
+X-Gm-Message-State: APuU4Z++A52goEU60UqCkS7AoF14WxSQMiononuGX5kGcPCDIxUm2RIu
+	6Ku1Ud+ujH2hAw5JqVCp3bRKwowelubDdgTumkADiZbwB5uT5Q4g5lvK
+X-Gm-Gg: AYBFou3SSAEKMy29pWh5SrCb1iPeeLgCIM7OsxiZLEflsNdbisRq1HTNONjj4Ooo7uV
+	6pmLw72kNOjEQMaFyOVpBB9o8w9oEVKDGVydb1RpCDQKz66jYshp8aaHoX5Ct81hj5d4HO30OW6
+	7cypUxktXB6Og6hC9t8+SXrf5HuNb4c0O1Y7vi87BwUivWFcZUnS2/sXTSdEFz03QqwJsTFo559
+	hLnnHIniEjQ2pBYIBG8JvSaHYW+h8svyqzpaafLKip2R2FrR5C+SoTw2udK0aYI+xvjmMhooCwh
+	gpNbltyJkpk6Ree+9RN6Xw1N26rjVgRsgkI8fTtki/fWtZfZOUhKniCLsvkmwx2UBOb1eJA3wEF
+	XR9s+WTCJWClUEmw/HsLQmS9zxO1UT0Kxwj94W34NB+hQpBfHeJHAQE7zENzqqoG5fw21l6PkWJ
+	ja0zlczUlZlVtz1OOf5LKaWy7ivhu7naWsi9HR7OPqpZIbu/XFEuhr0eLCGjypKvKZB9ptUliXN
+	Tgd4xpMgzUGIrjRgPosKMc21ZX01qXbWlCYCjaoS+/OpPb6QhcyL5voxp8QJLsdL1vAZMd4Uh8Q
+	KIqo77Ypad4zfTDnHR2TnaALKNtEn2qK5bgJVhb01waOZCGNmyJoShunIrPOqCf3X09NzoQlrA4
+	u77uXpcf4emC2jOIDMhH/NLt3HovlIQmGzhVNsfeB02Xi9MZh9XOUNzu63Vjiog9EFyZ4YR6vIp
+	Dv7X7rzN17dg==
+X-Received: by 2002:a05:600c:a00d:b0:4a1:fa27:df7c with SMTP id 5b1f17b1804b1-4ba093acadfmr38447905e9.34.1794394929145;
+        Wed, 11 Nov 2026 03:02:09 -0800 (PST)
+Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4ba08ddbe68sm85849165e9.0.2026.11.11.03.02.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Nov 2026 03:02:08 -0800 (PST)
+Date: Wed, 11 Nov 2026 14:02:04 +0300
+From: Dan Carpenter <dan@cryspen.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Timothy Hayes <timothy.hayes@arm.com>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Christoffer Dall <cdall@linaro.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Karthik Bhargavan <karthik@pereq.eu>,
+	=?iso-8859-1?Q?Cl=E9ment?= Blaudeau <clement@cryspen.com>
+Subject: [PATCH v2] KVM: arm64: vgic: Don't truncate offsets in
+ vgic_find_mmio_region()
+Message-ID: <avRLLMOiudnKoSlk@stanley.mountain>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,285 +94,87 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/11] KVM: arm64: CCA: Introduce Realms
-To: Steven Price <steven.price@arm.com>, Kohei Enju <enju.kohei@fujitsu.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>
-References: <20261102141304.126883-1-steven.price@arm.com>
- <20261102141304.126883-3-steven.price@arm.com>
- <avL9kNR2mGmqmcA9@FCCLS0092175.localdomain>
- <45104e19-4197-4584-895a-0486c0782c9c@arm.com>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <45104e19-4197-4584-895a-0486c0782c9c@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-On 11/11/2026 10:11, Steven Price wrote:
-> On 10/11/2026 11:42, Kohei Enju wrote:
->> Hi Steve,
-> 
-> Hi Kohei,
-> 
->> On 11/02 14:12, Steven Price wrote:
->>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>
->>> Add foundational work for supporting Realms.
->>>   - Add a new VM flavor.
->>>   - At KVM init, check if the KVM can support Realms (though not functional
->>>     yet) and will be advertised by static key kvm_rmi_is_available. This
->>>     will be turned on in a later patch, once we have all the bits and
->>>     pieces ready. For now check if we are blessed with KVM_MODE_RMM.
->>>   - Add realm specific tracking in kvm_arch. Since Realm and protected pKVM
->>>     states are mutually exclusive, move them into a union.
->>>   - Also adjust the memslot preparation checks to reflect the changes.
->>>
->>> Please note that we cannot create Realm VMs yet. This requires further
->>> changes to the UABI and core RMI driver support, which will come later.
->>>
->>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>> Signed-off-by: Steven Price <steven.price@arm.com>
->>> ---
->>>   arch/arm64/include/asm/kvm_emulate.h   | 16 +++++++
->>>   arch/arm64/include/asm/kvm_host.h      | 57 +++++++++++++++++-------
->>>   arch/arm64/include/asm/kvm_rmi.h       | 61 ++++++++++++++++++++++++++
->>>   arch/arm64/include/asm/virt.h          |  1 +
->>>   arch/arm64/kvm/Makefile                |  2 +-
->>>   arch/arm64/kvm/arm.c                   | 24 ++++++++--
->>>   arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  2 +-
->>>   arch/arm64/kvm/hyp/nvhe/switch.c       |  4 +-
->>>   arch/arm64/kvm/hyp/nvhe/timer-sr.c     |  2 +-
->>>   arch/arm64/kvm/mmu.c                   | 13 +++---
->>>   arch/arm64/kvm/rmi.c                   | 18 ++++++++
->>>   11 files changed, 169 insertions(+), 31 deletions(-)
->>>   create mode 100644 arch/arm64/include/asm/kvm_rmi.h
->>>   create mode 100644 arch/arm64/kvm/rmi.c
->>>
->>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
->>> index 334211b8b2ee..32021bdf2610 100644
->>> --- a/arch/arm64/include/asm/kvm_emulate.h
->>> +++ b/arch/arm64/include/asm/kvm_emulate.h
->>> @@ -831,4 +831,20 @@ static inline void kvm_reset_vcpu_psci(struct kvm_vcpu *vcpu,
->>>   	vcpu_set_reg(vcpu, 0, reset_state->r0);
->>>   }
->>>   
->>> +static inline enum realm_state kvm_realm_state(struct kvm *kvm)
->>> +{
->>> +	return READ_ONCE(kvm->arch.realm.state);
->>> +}
->>> +
->>> +static inline void kvm_set_realm_state(struct kvm *kvm,
->>> +				       enum realm_state new_state)
->>> +{
->>> +	WRITE_ONCE(kvm->arch.realm.state, new_state);
->>> +}
->>> +
->>> +static inline bool kvm_realm_is_created(struct kvm *kvm)
->>> +{
->>> +	return kvm_vm_is_realm(kvm) && kvm_realm_state(kvm) != REALM_STATE_NONE;
->>> +}
->>> +
->>>   #endif /* __ARM64_KVM_EMULATE_H__ */
->>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->>> index ccd2dc8f73c3..7d0222047ca1 100644
->>> --- a/arch/arm64/include/asm/kvm_host.h
->>> +++ b/arch/arm64/include/asm/kvm_host.h
->>> @@ -29,6 +29,7 @@
->>>   #include <asm/kvm.h>
->>>   #include <asm/kvm_asm.h>
->>>   #include <asm/kvm_hcall.h>
->>> +#include <asm/kvm_rmi.h>
->>>   #include <asm/vncr_mapping.h>
->>>   
->>>   #define __KVM_HAVE_ARCH_INTC_INITIALIZED
->>> @@ -48,6 +49,13 @@
->>>   #define KVM_VCPU_MAX_FEATURES 10
->>>   #define KVM_VCPU_VALID_FEATURES	(BIT(KVM_VCPU_MAX_FEATURES) - 1)
->>>   
->>> +#define KVM_REALM_VCPU_VALID_FEATURES			\
->>> +	(BIT(KVM_ARM_VCPU_POWER_OFF)		|	\
->>> +	 BIT(KVM_ARM_VCPU_PSCI_0_2)		|	\
->>> +	 BIT(KVM_ARM_VCPU_PTRAUTH_ADDRESS)	|	\
->>> +	 BIT(KVM_ARM_VCPU_SVE)			|	\
->>> +	 BIT(KVM_ARM_VCPU_PTRAUTH_GENERIC))
->>> +
->>>   #define KVM_REQ_SLEEP \
->>>   	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->>>   #define KVM_REQ_IRQ_PENDING		KVM_ARCH_REQ(1)
->>> @@ -409,6 +417,7 @@ enum kvm_arm_vm_flavor {
->>>   	VM_PKVM,		/* Normal guests on pKVM */
->>>   	MARKER(__VM_PROTECTED),
->>>   	VM_PROTECTED_PKVM,	/* Protected VM */
->>> +	VM_REALM,		/* CCA */
->>>   	VM_FLAVOR_MAX
->>>   };
->>>   
->>> @@ -502,11 +511,14 @@ struct kvm_arch {
->>>   	/* Count the number of VNCR_EL2 TLBs */
->>>   	atomic_t vncr_tlb_count;
->>>   
->>> -	/*
->>> -	 * For an untrusted host VM, 'pkvm.handle' is used to lookup
->>> -	 * the associated pKVM instance in the hypervisor.
->>> -	 */
->>> -	struct kvm_protected_vm pkvm;
->>> +	union {
->>> +		/*
->>> +		 * For an untrusted host VM, 'pkvm.handle' is used to lookup
->>> +		 * the associated pKVM instance in the hypervisor.
->>> +		 */
->>> +		struct kvm_protected_vm pkvm;
->>> +		struct realm realm;
->>> +	};
->>>   
->>>   #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
->>>   	/* Nested virtualization info */
->>> @@ -1572,30 +1584,43 @@ struct kvm *kvm_arch_alloc_vm(void);
->>>   
->>>   #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
->>>   
->>> -#ifdef __KVM_NVHE_HYPERVISOR__
->>> +#define kvm_vm_is_protected(kvm)	((kvm)->arch.vm_flavor >= __VM_PROTECTED)
->>>   
->>> -#define kvm_vm_is_protected(kvm)			\
->>> -	(is_protected_kvm_enabled() && ((kvm)->arch.vm_flavor == VM_PROTECTED_PKVM))
->>> +#ifdef __KVM_NVHE_HYPERVISOR__
->>>   /*
->>>    * Accessing vcpu->kvm from nVHE hyp stub is tricky, as we need to convert the
->>>    * pointer to the hyp VA. With pKVM, the nVHE code runs with the hyp_vcpu,
->>> - * which is populated correctly and is gated on is_protected_kvm_enabled().
->>> + * which is populated correctly. Always vcpu_is_protected_pkvm(), which is
->>> + * gated on is_protected_kvm_enabled().
->>> + */
->>> +#define vcpu_is_protected(vcpu)		BUILD_BUG_ON(1)
->>> +#else
->>> +#define vcpu_is_protected(vcpu)		kvm_vm_is_protected((vcpu)->kvm)
->>> +#endif
->>> +
->>> +#define kvm_vm_is_protected_pkvm(kvm)					\
->>> +	(is_protected_kvm_enabled() && ((kvm)->arch.vm_flavor == VM_PROTECTED_PKVM))
->>> +
->>> +/*
->>> + * Rely on is_protected_kvm_enabled() check in kvm_vm_is_protected_pkvm() to
->>> + * make sure the vcpu->kvm is always valid VA in the context
->>>    */
->>> -#define vcpu_is_protected(vcpu)						\
->>> +#define vcpu_is_protected_pkvm(vcpu)					\
->>>   	({								\
->>>   		struct kvm *__kvm = READ_ONCE((vcpu)->kvm);		\
->>>   									\
->>> -		(__kvm && kvm_vm_is_protected(__kvm));			\
->>> +		(__kvm && kvm_vm_is_protected_pkvm(__kvm));		\
->>>   	})
->>
->> I've tested the integration branch and found that the secondary CPU
->> bring-up fails:
->>      [    1.426502] smp: Bringing up secondary CPUs ...
->>      [    9.194442] CPU1: failed to come online
->>      [    9.194558] CPU1: failed in unknown state : 0x0
->>      [    9.197714] smp: Brought up 1 node, 1 CPU
->>      [    9.197775] SMP: Total of 1 processors activated.
->>
->> It seems that this patch missed replacing a use of
->> vcpu_is_protected() introduced by the following commit:
->>
->>      25d726dddc23 ("KVM: arm64: Reject host power-on of a vCPU that EL2 holds powered off")
->>
->> The following diff fixes the issue for me. Also, though not included in
->> the diff, I think vcpu_is_protected() in __pkvm_create_hyp_vcpu() should
->> be replaced with vcpu_is_protected_pkvm() as well.
-> 
-> Thanks for the patch - I'll include that in v2.
+In vgic_its_has_attr_regs() and vgic_its_attr_regs_access() we take a
+u64 "offset" from the user and pass it to vgic_find_mmio_region() to
+find the correct region.  The problem is that vgic_find_mmio_region()
+truncates the "offset" to 32 bits so we might find a region even
+though really we shouldn't.
 
-Please could we make it something like this :
+Later the untruncated offset is used to calculate "addr".
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 4edcaf1090f9..2108c1bf5481 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -989,7 +989,8 @@ static bool kvm_arm_vcpu_suspended(struct kvm_vcpu 
-*vcpu)
-  /* Only the guest's CPU_ON may start a vCPU EL2 holds powered off. */
-  bool kvm_pkvm_vcpu_is_powered_off(struct kvm_vcpu *vcpu)
-  {
--       return READ_ONCE(vcpu->arch.mp_state.mp_state) == 
-KVM_MP_STATE_UNINITIALIZED;
-+       return vcpu_is_protected_pkvm(vcpu) &&
-+               READ_ONCE(vcpu->arch.mp_state.mp_state) == 
-KVM_MP_STATE_UNINITIALIZED;
-  }
+	addr = its->vgic_its_base + offset;
 
-  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
-diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-index b01f8d44033f..b7606c3542f8 100644
---- a/arch/arm64/kvm/psci.c
-+++ b/arch/arm64/kvm/psci.c
-@@ -68,7 +68,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu 
-*source_vcpu)
-          * STOPPED before that is the VMM's pause.
-          */
-         if (!kvm_arm_vcpu_stopped(vcpu) ||
--           (vcpu_is_protected(vcpu) && 
-!kvm_pkvm_vcpu_is_powered_off(vcpu))) {
-+           !kvm_pkvm_vcpu_is_powered_off(vcpu)) {
-                 if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
-                         ret = PSCI_RET_ALREADY_ON;
-                 else
+For example, an offset of 0x100000084 finds the 64-bit GITS_CBASER
+register at 0x80, and the write reaches update_64bit_reg() with an
+offset of 4 into the register and a length of 8.  It exhibits as a
+UBSAN warning.
 
+[  183.796046] UBSAN: shift-out-of-bounds in arch/arm64/kvm/vgic/vgic-mmio-v3.c:35:10
+[  183.796198] shift exponent 18446744073709551584 is too large for 64-bit type 'long long unsigned int'
 
-i.e, check for pkvm vcpu as it should have been in the first case, 
-rather than spilling the check for protected vcpu and an explicit
-check to see if that is powered off ?
+The GICv5 IRS code has the same problem in vgic_v5_has_attr_regs() and
+vgic_v5_irs_attr_regs_access().
 
+Make vgic_find_mmio_region() and match_region() take the offset as a
+u64, so an offset of 2^32 or more no longer matches any region.  The
+other callers only pass offsets which fit in 32 bits so they are not
+affected.
 
-Suzuki>
-> Thanks,
-> Steve
-> 
->> Thanks,
->> Kohei
->>
->> ---8<---
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 522a837637fe..be676c13e219 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -960,7 +960,8 @@ static void __kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu, u32 mp_state)
->>   /* The guest's own CPU_OFF: EL2 has already powered the vCPU off. */
->>   void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
->>   {
->> -       u32 mp_state = vcpu_is_protected(vcpu) ? KVM_MP_STATE_UNINITIALIZED : KVM_MP_STATE_STOPPED;
->> +       u32 mp_state = vcpu_is_protected_pkvm(vcpu) ?
->> +                      KVM_MP_STATE_UNINITIALIZED : KVM_MP_STATE_STOPPED;
->>
->>          spin_lock(&vcpu->arch.mp_state_lock);
->>          __kvm_arm_vcpu_power_off(vcpu, mp_state);
->> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
->> index b01f8d44033f..6674e8d6ff4c 100644
->> --- a/arch/arm64/kvm/psci.c
->> +++ b/arch/arm64/kvm/psci.c
->> @@ -68,7 +68,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
->>           * STOPPED before that is the VMM's pause.
->>           */
->>          if (!kvm_arm_vcpu_stopped(vcpu) ||
->> -           (vcpu_is_protected(vcpu) && !kvm_pkvm_vcpu_is_powered_off(vcpu))) {
->> +           (vcpu_is_protected_pkvm(vcpu) && !kvm_pkvm_vcpu_is_powered_off(vcpu))) {
->>                  if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
->>                          ret = PSCI_RET_ALREADY_ON;
->>                  else
->>
-> 
+Fortunately the effect of this bug is very minor.  The worst case is that
+the VMM accesses an emulated register and sets something nonsensical
+and users are already allowed to do that without the bug.
+
+Fixes: 8331c23c28e8 ("KVM: arm64: vgic-its: Implement vgic_its_has_attr_regs and attr_regs_access")
+Fixes: 71091136d145 ("KVM: arm64: gic-v5: Handle userspace accesses to IRS MMIO region")
+Signed-off-by: Dan Carpenter <dan@cryspen.com>
+---
+v2: Change vgic_find_mmio_region() to take a u64 instead of rejecting
+    large offsets in the ITS callers, as Marc suggested.  This also
+    fixes the GICv5 IRS code which my previous patch didn't.  Drop the
+    Cc: stable.
+
+ arch/arm64/kvm/vgic/vgic-mmio.c | 4 ++--
+ arch/arm64/kvm/vgic/vgic-mmio.h | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
+index fddb9da0403d..59bdec495cd7 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio.c
+@@ -820,7 +820,7 @@ void vgic_write_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
+ 
+ static int match_region(const void *key, const void *elt)
+ {
+-	const unsigned int offset = (unsigned long)key;
++	const u64 offset = (unsigned long)key;
+ 	const struct vgic_register_region *region = elt;
+ 
+ 	if (offset < region->reg_offset)
+@@ -834,7 +834,7 @@ static int match_region(const void *key, const void *elt)
+ 
+ const struct vgic_register_region *
+ vgic_find_mmio_region(const struct vgic_register_region *regions,
+-		      int nr_regions, unsigned int offset)
++		      int nr_regions, u64 offset)
+ {
+ 	return bsearch((void *)(uintptr_t)offset, regions, nr_regions,
+ 		       sizeof(regions[0]), match_region);
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio.h b/arch/arm64/kvm/vgic/vgic-mmio.h
+index 38ed730d68ac..6c3c4de6883e 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio.h
++++ b/arch/arm64/kvm/vgic/vgic-mmio.h
+@@ -228,6 +228,6 @@ u64 vgic_sanitise_field(u64 reg, u64 field_mask, int field_shift,
+ /* Find the proper register handler entry given a certain address offset */
+ const struct vgic_register_region *
+ vgic_find_mmio_region(const struct vgic_register_region *regions,
+-		      int nr_regions, unsigned int offset);
++		      int nr_regions, u64 offset);
+ 
+ #endif
+-- 
+2.53.0
 
