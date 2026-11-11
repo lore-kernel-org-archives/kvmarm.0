@@ -1,62 +1,86 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=90.155.50.34
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794430785;
-	b=zDHloLZ0F23WgMVK+Ed26QzLzalrv/FGAkE8f2pAHoKTsHlA03DL3MHb0sOJYDnwesTq
-	 TJqiPrMtge3pxHvoa1BR7/HW3Cjrs/mONSiNaU2fh5ppjIC6OjFSNxVlAcCZK3YqvDWyi
-	 sbC+D97ZuhBffB9Ffs7zB/iUVI4t0hxnw5Qla0QhyGbAjYSyj3v1b63rgkCKtQvptbr+c
-	 EtLA9pqlTZd4OyKvQYHTS9Mnp8SpacklI8p1THmDYgvDK0aVEuSXPzBRC+ZZ7bndnw+4F
-	 g3oqV7rKaa5oEoS2GDLy244VijghQYdvGeSJKPvmWwH3WVuytuTB3dqKe7viMMO3MAA==
+	t=1794436157;
+	b=Q8wdP//6Smv8vyiI5BpVsHgswpmqy2Fl96a7F9oVklpJt7GFZkIhgkAUpGJ58sdcIe1B
+	 Q/5rjDyYz6HGEXUClPFjJLxcriTUdF2taBHW7JIjz4HEGqB5804ExwGuNx8/obM0w0Yfu
+	 VC6TS1x493Wc/muDHpf33ZIhgE4p1jEP1EFYvyD3zpabX6HzTGggJzf8f0imxQ0xKU7o2
+	 UoIvk7Cew8oJ8sAceawB2kwmg9+ALI0DwVrThnfniPNT4whO8n6m2TB61wJnHUf2JyrMj
+	 N+ew03d3ePhnaEZnEUFO9ctq3wn+eMqqldzwk7wYPN9HxP/agPDk6vrwsWhcM/F6EqQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794430785;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=rJtMZ+oQ2ftbIpYEVBAu9rDREp/nXzUYJLHQXQsg0HU=;
-	b=rhvMAnuYRkenbHP72ARXtbPI6SaqPAxfkAe0T5xbvM3JWgG4q33AqatHrYov2s1GbqAp
-	 wcg8fTSVvnGTvpoGH8WW6M/8XOK0TiDpGlQAZAUdz1ISU2VQnVkqbJVcmJquTJcoBhILt
-	 BsEkDQbdr82PGeQ1i23ds7W8aWcR51dGME+QP7bbtksu60grSAG08DU+xZ7G35dDkxSrQ
-	 psV1wi7fYHA/SnMAncxk0jVontq67rEYwCaqk1sIsS7lRBEyiH+e9mxG5ECWE1r3Sc5DE
-	 w4kADunVNxswYHgRhA0D3boDOh5kOxopo8B3iVrQKb1usQjuEVjZboaVDQr+hLm3HAg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794436157;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding:Sender:X-SRS-Rewrite;
+	bh=JaNk7OEYJEumDm+gccWLZZ4A2vbsU0ZFt9jBxsRtaJM=;
+	b=CtdfUX2eyqbx5BzRfymzVKd83P69+2maaFP3e2gGSZbgK775JpjtldGjc5mBEmkIHWLL
+	 qCqB0ts99o+uWpCARTTVwLFh5uRzcTzGAOWqnwpJ7C/SRX20sIjy+xEkZVRRcTzDveYs5
+	 sPkl5R9XbPoXLcEy7n1UOgc5FiIS/DHDRJrCJOySiKiUKIZ8BVUGyMar25SEIUtqZ1nTt
+	 mfTFYdEyQ8zbdAucoZZ8eu35upZuyqeVwEjETRgND0mNNSM6ff4fSxt5WFIoVL9a6d/Wr
+	 Z1aAjwL6yBmLcV9lkrCBWyUy6U/gkVsifLs3PnQj862O3FanGzaoIYUsmIBX/4lkoSQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=EcNEcgLx;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88E73606A32E
-	for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 20:59:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 88E73606A32E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=infradead.org;
+	spf=none smtp.mailfrom=casper.srs.infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=casper.20170209 header.b=f+ZXiJ1E;
+	arc=none smtp.remote-ip=90.155.50.34
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFBF606A331;
+	Wed, 11 Nov 2026 22:29:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6EFBF606A331
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=EcNEcgLx
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 68503153B;
-	Wed, 11 Nov 2026 12:59:39 -0800 (PST)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4E9FE3F85F;
-	Wed, 11 Nov 2026 12:59:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794430782; bh=GvTWPjgOeMhK10lBp/x80dBPCkX7FkHbNjd4m6Rj3Io=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EcNEcgLxh8R4qgoGx5zt/BAiEPlEPgPQ5bJyg31SxFdqKQtTwJ6iyFz9dR8Pa45eo
-	 5bjD6JCeoE+Z6XkT6uG1bDWU/8OkCGqilXZCHG+WVhKDKQL1oYbZ4gyatCCuN2U6IT
-	 0gN8y26J/JidPb860oE6jToCtYBB/N74sVWdrtgU=
-Date: Wed, 11 Nov 2026 20:59:27 +0000
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Haseeb Ashraf <haseebashraf091@gmail.com>, maz@kernel.org, 
-	Oliver Upton <oupton@kernel.org>
-Cc: Haseeb Ashraf <haseeb.ashraf@siemens.com>, 
-	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, fahad.arslan@siemens.com, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: arm64: Resume stage-2 unmap where the walk
- stopped
-Message-ID: <lnqoq6pirbxwdl3ki3khiju6kkh3itw2meh67emmd6ck4lu6sl@ai5ctyvuhpuy>
-References: <20261110164706.582879-1-haseebashraf091@gmail.com>
- <20261110164706.582879-2-haseebashraf091@gmail.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=casper.20170209 header.b=f+ZXiJ1E
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+	Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=JaNk7OEYJEumDm+gccWLZZ4A2vbsU0ZFt9jBxsRtaJM=; b=f+ZXiJ1E15LXl2si0WRvwLcl4f
+	wo/9va1fMYYV7u8Tr+5HxPMNSTYQtI8AhWEo7a0AVikbihPeaV1fIeXPN5pqpy78KCQY04kYw4W4j
+	YifJPlucAI04Wfub++b5/ARizA2/Th+VrBSwCmD+1jH5kKrlVGV3FjYIyAn9gXqm3sqJC1reqLN7e
+	OAtfTi5Vo7k5ptuoEdABeHPAkIt2J+Y9VXaS+mpAfGHKl0BFsu0uflqhQWPuP8m557MVu4QRgznVB
+	vMnPjbxxSShlqqjSgDE+BQh1vwFu1/2/Oz8Rzzlier1KQmhIbHEsAmgZsJna86PcdXzfQz0hbVwod
+	DGZp334Q==;
+Received: from [2001:8b0:10b:1::425] (helo=i7.infradead.org)
+	by casper.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xRGoa-0000000G3nq-0589;
+	Wed, 11 Nov 2026 22:29:12 +0000
+Received: from dwoodhou by i7.infradead.org with local (Exim 4.99.5 #2 (Red Hat Linux))
+	id 1xRGoZ-0000000008C-3KMB;
+	Wed, 11 Nov 2026 22:29:11 +0000
+From: David Woodhouse <dwmw2@infradead.org>
+To: =?UTF-8?q?J=C3=B6rg=20R=C3=B6del?= <joro@8bytes.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	ashish.kalra@amd.com,
+	michael.roth@amd.com,
+	nsaenz@amazon.com,
+	anelkz@amazon.de,
+	James.Bottomley@HansenPartnership.com,
+	Melody Wang <huibo.wang@amd.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	loongarch@lists.linux.dev,
+	linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org,
+	x86@kernel.org,
+	coconut-svsm@lists.linux.dev,
+	joerg.roedel@amd.com,
+	Mushahid Hussain <hmushi@amazon.co.uk>,
+	Sriram Nambakam <snambakam@linux.microsoft.com>,
+	David Woodhouse <dwmw@amazon.co.uk>
+Subject: [PATCH 06/16] KVM: x86: Widen the plane vCPU fd ioctl allowlist
+Date: Wed, 11 Nov 2026 14:29:01 -0800
+Message-ID: <20261111222911.477-7-dwmw2@infradead.org>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20261111222911.477-1-dwmw2@infradead.org>
+References: <20260608144252.351443-1-joro@8bytes.org>
+ <20261111222911.477-1-dwmw2@infradead.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,117 +90,204 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261110164706.582879-2-haseebashraf091@gmail.com>
+Content-Transfer-Encoding: 8bit
+Sender: David Woodhouse <dwmw2@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-Hi,
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-On Tue, Nov 10, 2026 at 09:47:06PM +0500, Haseeb Ashraf wrote:
-> From: Haseeb Ashraf <haseeb.ashraf@siemens.com>
-> 
-> kvm_vm_stage2_unmap_range() unmaps a range one block-sized chunk at a
-> time. The walker steps over an invalid entry in one go, but the next
-> walk starts at the following chunk, so an invalid entry larger than a
-> chunk is visited once for every chunk it covers. Unmapping the whole
-> IPA space of a shadow stage-2, as emulating TLBI VMALLS12E1IS and TLBI
-> ALLE1IS does, takes 2^18 walks with 4K pages and a 48-bit IPA space,
-> however little it maps. Each walk also ends with a range TLBI when
-> FEAT_TLBIRANGE and FWB are available.
-> 
-> On an AmpereOne A192-32X (192 CPUs, Xen on KVM, 4K pages, 48-bit IPA),
-> a full-range unmap of one shadow stage-2 took 0.82-0.94 s (mean 0.91 s
-> over 192 unmaps) on 6.18.29. With this change and the mainline commits
-> it builds on backported, it took 2.1-27.8 ms (mean 3.8 ms over 128
-> unmaps), with 512 to 1024 walks instead of 262144. A TLBI VMALLS12E1IS
-> trap that unmapped two shadow stage-2s took up to 1.85 s before.
-> 
-> Add kvm_pgtable_stage2_unmap_range(), which returns the address its
-> walk reached, and have the unmap loop resume from there.
-> kvm_pgtable_stage2_unmap() still returns 0 or an error, for its
-> callers at EL2. The walk handles every entry it steps over, including
-> invalid entries that carry state, so nothing has to be looked up
-> beforehand.
-> 
-> The unmap of a shadow stage-2 also drops the guest stage-2 records of
-> the whole span the walk covered: nothing is mapped in the part it
-> stepped over, so any record there is stale. Each walk that remains
-> ends with the same deferred TLB invalidation as before. The spans that
-> were skipped have no valid entry, so there is nothing to invalidate.
-> 
-> Suggested-by: Oliver Upton <oupton@kernel.org>
-> Signed-off-by: Haseeb Ashraf <haseeb.ashraf@siemens.com>
-> ---
+A VMM that puts an initial VTL context on a higher plane cannot finish
+the job through the plane vCPU's fd. kvm_arch_is_vcpu_plane_ioctl()
+refuses the ioctls it needs, while the one capability ioctl it does
+admit, KVM_ENABLE_CAP, reaches *every* vCPU capability handler.
 
-[...]
+ - KVM_GET/SET_MP_STATE: a plane vCPU for an AP starts in
+   wait-for-INIT like any non-boot x86 vCPU, and nothing ever sends
+   INIT/SIPI to the higher plane of an AP. The VMM has to mark it
+   runnable itself.
+ - KVM_SET_GUEST_DEBUG: single-step and breakpoints on a non-zero
+   plane. The debug exits surface through the plane-0 KVM_RUN loop
+   like any other plane exit.
+ - KVM_X86_SETUP_MCE: mcg_cap is per vCPU and every twin starts with
+   the KVM_MAX_MCE_BANKS default, so programming plane 0 alone leaves
+   the planes disagreeing. Hyper-V shares MCG state across VTLs.
+ - KVM_ENABLE_CAP: accept only the audited capabilities on a plane fd,
+   the SynIC pair and the two CPUID-enforcement toggles, which change
+   state that each twin keeps separately. Anything else gets -EINVAL, as
+   non-allowlisted ioctls already do. The nested paths behind
+   enlightened VMCS and direct TLB flush have never been audited for
+   plane_level > 0, and without the filter any future vCPU cap would
+   work on planes without anyone having decided that it should.
 
-> +/*
-> + * Unmap [start, end) one chunk at a time, resuming from the address that each
-> + * walk reached. An invalid entry that is larger than a chunk is then stepped
-> + * over once, rather than once for every chunk that it covers.
-> + */
-> +static int stage2_apply_unmap_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
-> +				    phys_addr_t end,
-> +				    s64 (*fn)(struct kvm_pgtable *, u64, u64),
-> +				    bool resched)
-> +{
-> +	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
-> +	bool lock_dropped = false;
-> +	phys_addr_t addr = start;
-> +	u64 next;
-> +	s64 ret;
-> +
-> +	do {
-> +		struct kvm_pgtable *pgt = mmu->pgt;
-> +
-> +		/*
-> +		 * We may be raced on PGT teardown when we release the
-> +		 * kvm->mmu_lock. That's fine as the PGT is legitimately no
-> +		 * longer present.
-> +		 */
-> +		if (!pgt)
-> +			return lock_dropped ? 0 : -EINVAL;
-> +
-> +		next = stage2_range_addr_end(addr, end);
-> +		ret = fn(pgt, addr, next - addr);
-> +		if (ret < 0)
-> +			return ret;
-> +
-> +		next = min_t(u64, ret, end);
-> +		if (resched && next != end) {
-> +			cond_resched_rwlock_write(&kvm->mmu_lock);
-> +			lock_dropped = true;
-> +		}
-> +	} while (addr = next, addr != end);
-> +
-> +	return 0;
-> +}
+KVM_SET_GUEST_DEBUG on a higher plane can set KVM_GUESTDBG_BLOCKIRQ
+there, but the VM-wide APICv BLOCKIRQ inhibit is recomputed over
+kvm_for_each_vcpu(), which walks plane 0 only. The inhibit then never
+rises for a higher plane, and a plane-0 update drops it while a higher
+plane still wants it. Recompute it over every twin. Nothing reaches
+this yet (multi-plane VMs are SEV-SNP only, which inhibits APICv
+anyway), but it would bite as soon as planes and APICv could coexist.
 
-In my opinion it is worth giving the same treatment to all users of
-stage2_apply_range(), instead of having this new
-stage2_apply_unmap_range() that is almost identical.
+api.rst marks the new ioctls, and KVM_ENABLE_CAP, as accepted on all
+planes, and lists the capabilities a plane fd accepts.
 
-Thanks,
-Wei-Lin Chang
+The KVM_ENABLE_CAP filter was found by a local Sashiko review.
 
-> +
->  static void kvm_vm_stage2_unmap_range(struct kvm_s2_mmu *mmu,
->  				      phys_addr_t start,
->  				      u64 size, bool may_block)
->  {
->  	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
-> -	int (*fn)(struct kvm_pgtable *, u64, u64);
-> +	s64 (*fn)(struct kvm_pgtable *pgt, u64 addr, u64 size);
->  
->  	if (kvm_is_nested_s2_mmu(kvm, mmu))
->  		fn = kvm_pgtable_stage2_unmap_tracked;
->  	else
-> -		fn = kvm_pgtable_stage2_unmap;
-> +		fn = kvm_pgtable_stage2_unmap_range;
->  
-> -	WARN_ON(stage2_apply_range(mmu, start, start + size, fn, may_block));
-> +	WARN_ON(stage2_apply_unmap_range(mmu, start, start + size, fn, may_block));
->  }
->  
+The KVM_X86_SETUP_MCE part is from Mushahid Hussain.
 
-[...]
+Co-developed-by: Mushahid Hussain <hmushi@amazon.co.uk>
+Not-signed-off-by: Mushahid Hussain <hmushi@amazon.co.uk>
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+ Documentation/virt/kvm/api.rst | 14 ++++++++-----
+ arch/x86/kvm/x86.c             | 38 ++++++++++++++++++++++++++++++----
+ 2 files changed, 43 insertions(+), 9 deletions(-)
+
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 6c701cda61ef..d21378183c51 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -1494,7 +1494,7 @@ documentation when it pops into existence).
+ 
+ :Capability: KVM_CAP_ENABLE_CAP
+ :Architectures: mips, ppc, s390, x86, loongarch
+-:Type: vcpu ioctl
++:Type: vcpu ioctl (all planes)
+ :Parameters: struct kvm_enable_cap (in)
+ :Returns: 0 on success; -1 on error
+ 
+@@ -1515,6 +1515,10 @@ do support it, it only works for extensions that are supported for enablement.
+ To check if a capability can be enabled, the KVM_CHECK_EXTENSION ioctl should
+ be used.
+ 
++On x86, the vCPU fd of a plane other than plane 0 accepts only
++KVM_CAP_HYPERV_SYNIC, KVM_CAP_HYPERV_SYNIC2, KVM_CAP_HYPERV_ENFORCE_CPUID and
++KVM_CAP_ENFORCE_PV_FEATURE_CPUID; any other capability fails with -EINVAL.
++
+ ::
+ 
+   struct kvm_enable_cap {
+@@ -1549,7 +1553,7 @@ for vm-wide capabilities.
+ 
+ :Capability: KVM_CAP_MP_STATE
+ :Architectures: x86, s390, arm64, riscv, loongarch
+-:Type: vcpu ioctl
++:Type: vcpu ioctl (all planes)
+ :Parameters: struct kvm_mp_state (out)
+ :Returns: 0 on success; -1 on error
+ 
+@@ -1632,7 +1636,7 @@ whether the vcpu is runnable.
+ 
+ :Capability: KVM_CAP_MP_STATE
+ :Architectures: x86, s390, arm64, riscv, loongarch
+-:Type: vcpu ioctl
++:Type: vcpu ioctl (all planes)
+ :Parameters: struct kvm_mp_state (in)
+ :Returns: 0 on success; -1 on error
+ 
+@@ -3779,7 +3783,7 @@ handled.
+ 
+ :Capability: KVM_CAP_SET_GUEST_DEBUG
+ :Architectures: x86, s390, ppc, arm64
+-:Type: vcpu ioctl
++:Type: vcpu ioctl (all planes)
+ :Parameters: struct kvm_guest_debug (in)
+ :Returns: 0 on success; -1 on error
+ 
+@@ -4623,7 +4627,7 @@ capabilities will have the corresponding bits set.
+ 
+ :Capability: KVM_CAP_MCE
+ :Architectures: x86
+-:Type: vcpu ioctl
++:Type: vcpu ioctl (all planes)
+ :Parameters: u64 mcg_cap (in)
+ :Returns: 0 on success,
+          -EFAULT if u64 mcg_cap cannot be read,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 25f574bfbb32..cd0e9b6cf8f7 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3416,6 +3416,25 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+ 	if (cap->flags)
+ 		return -EINVAL;
+ 
++	/*
++	 * KVM_ENABLE_CAP is accepted on plane vCPU fds, but only the caps
++	 * below have been audited for plane_level > 0.  The nested paths
++	 * behind eVMCS and direct TLB flush have not; refuse those rather
++	 * than implicitly extending every current and future vCPU cap to
++	 * planes.
++	 */
++	if (vcpu->plane_level) {
++		switch (cap->cap) {
++		case KVM_CAP_HYPERV_SYNIC:
++		case KVM_CAP_HYPERV_SYNIC2:
++		case KVM_CAP_HYPERV_ENFORCE_CPUID:
++		case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
++			break;
++		default:
++			return -EINVAL;
++		}
++	}
++
+ 	switch (cap->cap) {
+ #ifdef CONFIG_KVM_HYPERV
+ 	case KVM_CAP_HYPERV_SYNIC2:
+@@ -3468,6 +3487,7 @@ bool kvm_arch_is_vcpu_plane_ioctl(unsigned ioctl)
+ {
+ 	switch (ioctl) {
+ 	case KVM_ENABLE_CAP:
++	case KVM_SET_GUEST_DEBUG:
+ 	case KVM_GET_DEBUGREGS:
+ 	case KVM_SET_DEBUGREGS:
+ 	case KVM_GET_LAPIC:
+@@ -3480,6 +3500,8 @@ bool kvm_arch_is_vcpu_plane_ioctl(unsigned ioctl)
+ 	case KVM_SET_ONE_REG:
+ 	case KVM_GET_SREGS2:
+ 	case KVM_SET_SREGS2:
++	case KVM_GET_MP_STATE:
++	case KVM_SET_MP_STATE:
+ 	case KVM_GET_VCPU_EVENTS:
+ 	case KVM_SET_VCPU_EVENTS:
+ 	case KVM_GET_XCRS:
+@@ -3488,6 +3510,7 @@ bool kvm_arch_is_vcpu_plane_ioctl(unsigned ioctl)
+ 	case KVM_GET_XSAVE2:
+ 	case KVM_SET_XSAVE:
+ 	case KVM_GET_REG_LIST:
++	case KVM_X86_SETUP_MCE:
+ 		return true;
+ 	default:
+ 		return false;
+@@ -9355,19 +9378,26 @@ EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_task_switch);
+ static void kvm_arch_vcpu_guestdbg_update_apicv_inhibit(struct kvm *kvm)
+ {
+ 	bool set = false;
+-	struct kvm_vcpu *vcpu;
++	struct kvm_vcpu *vcpu, *v;
+ 	unsigned long i;
++	int p;
+ 
+ 	if (!enable_apicv)
+ 		return;
+ 
+ 	down_write(&kvm->arch.apicv_update_lock);
+ 
++	/*
++	 * KVM_SET_GUEST_DEBUG is accepted on every plane's vCPU fd, and
++	 * kvm_for_each_vcpu() only walks plane 0: look at every twin.
++	 */
+ 	kvm_for_each_vcpu(i, vcpu, kvm) {
+-		if (vcpu->guest_debug & KVM_GUESTDBG_BLOCKIRQ) {
+-			set = true;
+-			break;
++		vcpu_for_each_plane(vcpu->common, p, v) {
++			if (v->guest_debug & KVM_GUESTDBG_BLOCKIRQ)
++				set = true;
+ 		}
++		if (set)
++			break;
+ 	}
+ 	__kvm_set_or_clear_apicv_inhibit(kvm, APICV_INHIBIT_REASON_BLOCKIRQ, set);
+ 	up_write(&kvm->arch.apicv_update_lock);
+-- 
+2.50.1
+
