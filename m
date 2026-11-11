@@ -1,54 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=90.155.50.34
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794436157;
-	b=byFvvWXziB9236BUmbt1FmqZUvSZJBt08hvCqvQEQAFmqqvXC1joJSqOxiVe+IIo8zQI
-	 MdweTmUPB1Q0RLitOqAw2yffkskitg1rhW/Y+3ctfnv0VHoOjDioXQZHCaY7r9Bvgd8wk
-	 JMEDOgE4pU73hN17WZB+fqdOneWSoKKn8ELA9toHlUHxs2UelPLQbeK32PoLMsaLFsXlO
-	 Wj3sPtNnZgkZrT+RPzYcyaTdpRjAv21L/8L8jeTOnPkpVyANeVOZCTlACx55IPcKa71DA
-	 HKJZm3OSj9cYOQ/lgOfDjHu8f0QtXAUKNRwJgfZBgdg9M0ytty4xoOw1TjzHCfo10rg==
+	t=1794436158;
+	b=OS5LZ1H1L8UuqwbUl/PyUc6rk9If6WCgES46yoTwo+0AWUXFOk4XC1tE7yVeKuxVXjtR
+	 MuV3SZrs99jFMnQ5p6cibMLU5BlH2hOeDwEmOJ5wK5jjGtho0t/BEAsA0xhwlctJyJYtJ
+	 XACjHflcwOks/yp9dfRfPbzbTQ0ivNL/u8j29UuxYOltfHCM/vtfn2L7ctDovFDbRQr+f
+	 +pV31W5bCX5Ch5DOTgURf3kRNpFgqlrrp4obge8hOqRuP7bTuuK4YjXzQGq3P4orbqgx8
+	 criNQ0Zdzrv4TlIwKRKPJnITADDth17XEdOWE+jO95zb5fEogLksgK3pHQKLaLjBE/A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794436157;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794436158;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding:Sender:X-SRS-Rewrite;
-	bh=E8rVfKCMqU27RWIM2bfWVZEtsM9bj4ortAwrQwz/hPM=;
-	b=vyCAjfpg+m7JkxZ8yBGXQJra7bfVnxU62erglp0Qi6k9CUsc4z8V29aVAOcK60hb5Cu7
-	 uC6Pang5wo7F2qgQ1qLzz8ZgvsNjTf/kTk+2Wa6pQF6znW2arBy7ngiXbUrMZK1lY0HB+
-	 lbtGiZe4JE1BEFY8ChgHsrcY0A7K+MBrnhyp6TEsoW/QOffonA3SurSUdw6Z+tN8X+CIk
-	 rolMq5HUHQI8NvVzupqUW8MQFCF5KvHphlNtX6vgM0tB8d7kG4UCN8ozIRPHpUZSPzOu2
-	 VzwdMooLOJ1elGczkcCNA3sVq/TezdFI0Ocpg56+kcuTdpJ+sdEJ0ExWDT4Yg6F4pAA==
+	bh=8rIcuP/4Kb5zS07YkanQvDf9xFXdSyL1L4TPZLIk6kE=;
+	b=KLsIZoo7xfkJrhlJnIL3fcbQ90Y9bP4JR35aphUk1oYYFYu37s68hPl3UZrGlpz+aArc
+	 gIwq6TGABbHLZakNsy1zuB+tKu2Lday5zUoAxn36woEvWKNRu1nn0PlVA6bMi1IX89AC2
+	 rNla7UxzXV0Zkt3jvyNt7++JcX8ZVjcNdAPWLgA76pynoS8jd/C9nzXWUMcDlzFazOQ73
+	 aZmd1fpw28PSi7ex09gxGBC5645yS1DH4pcivoewrOUTcbWzGrinz2ewFa2pUqeqBUzMT
+	 GbhUNZz8IWu70BwuyRDz9HsNmJ5J7EKms3CtyLfE3u2cI+2ms8oGPy4balFruD9W4xA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=infradead.org;
 	spf=none smtp.mailfrom=casper.srs.infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=casper.20170209 header.b=wCjtEbpv;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=casper.20170209 header.b=Mhmpih29;
 	arc=none smtp.remote-ip=90.155.50.34
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EE23606A32D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6D0606A31C;
 	Wed, 11 Nov 2026 22:29:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6EE23606A32D
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9D6D0606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=casper.20170209 header.b=wCjtEbpv
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=casper.20170209 header.b=Mhmpih29
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
 	Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=E8rVfKCMqU27RWIM2bfWVZEtsM9bj4ortAwrQwz/hPM=; b=wCjtEbpv8XHuBy6wJMmQMnzuo0
-	h0jSZydE2akV5ZyvNvFU8gfabmnnX1AvPipDVPw8246mtWUuU0pqGoi9KOmi9xDMlTnWUd3RFEsvu
-	wNx9R8j+Tv10A/0+n1ha9K917Mfen35ra3jusd2RJHDj8TcYgZoU6ofIr1TSFWqRK3h8Sh3fPEAxu
-	svIoD7jIOopcL6q84r7feglY523gu6q+DATzxxIoGKhygr5u8wz/Bx0cJ1oknpRP3XqCD8DJW7JiH
-	5OjrfuABd5NyZA3x73i3dJcjLwYlKffTZdbNWzzOmLK1VFVZZoIq5/XVZiQvOzF9Sotr67KDOwB5P
-	5M3WSmmg==;
+	bh=8rIcuP/4Kb5zS07YkanQvDf9xFXdSyL1L4TPZLIk6kE=; b=Mhmpih290/1F4Cy7rNJmsiv5xh
+	KTagvj0bmx+Rz/i0HPD3LG1iyTt/YmhjDLkwCJ6yHvibNng59JHqE5BtJb9aKzo/MWT+/eB4oK7PQ
+	eTna6CYO28WO6lwYglmDm/xSFfqkQZoizUi5y0Qaz9Ty61r0JMZdXBURF/cMtIJDbKjA9D9u3ODHa
+	onjj0lnNe8MSLGmSP4n4y825566WLHZTuVs1adnPZyKyiN9uFpPP6pJgcA9XKflU+jvrFpUnayZnN
+	p7k6mKovmSz+llF1OnTs1x+AEIYOdy7OnvmjDLtRjBdYbc8pE55CLndTDWfWHVu4WlK9Vz6EZ5/l6
+	hHZ6kcSg==;
 Received: from [2001:8b0:10b:1::425] (helo=i7.infradead.org)
 	by casper.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xRGoa-0000000G3ny-1BO7;
-	Wed, 11 Nov 2026 22:29:12 +0000
+	id 1xRGoa-0000000G3o6-1sWv;
+	Wed, 11 Nov 2026 22:29:14 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.99.5 #2 (Red Hat Linux))
-	id 1xRGoa-0000000008W-0P3R;
+	id 1xRGoa-0000000008m-15dz;
 	Wed, 11 Nov 2026 22:29:12 +0000
 From: David Woodhouse <dwmw2@infradead.org>
 To: =?UTF-8?q?J=C3=B6rg=20R=C3=B6del?= <joro@8bytes.org>
@@ -74,9 +74,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	Mushahid Hussain <hmushi@amazon.co.uk>,
 	Sriram Nambakam <snambakam@linux.microsoft.com>,
 	David Woodhouse <dwmw@amazon.co.uk>
-Subject: [PATCH 11/16] KVM: x86: Load each plane twin while updating it after KVM_SET_CPUID
-Date: Wed, 11 Nov 2026 14:29:06 -0800
-Message-ID: <20261111222911.477-12-dwmw2@infradead.org>
+Subject: [PATCH 15/16] KVM: planes: Annotate the lockless twin-publication protocol
+Date: Wed, 11 Nov 2026 14:29:10 -0800
+Message-ID: <20261111222911.477-16-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20261111222911.477-1-dwmw2@infradead.org>
 References: <20260608144252.351443-1-joro@8bytes.org>
@@ -96,70 +96,68 @@ X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-kvm_vcpu_ioctl_set_cpuid() runs kvm_vcpu_after_set_cpuid() on every
-plane twin, but only the calling vCPU is loaded. The vendor callback
-writes VMCS/VMCB controls, and on VMX those writes go to whatever VMCS
-is loaded on the current pCPU: the caller's, not the twin's. The
-twin's controls shadow is updated anyway, so the stale values in its
-real VMCS can never be corrected later; a twin created before
-KVM_SET_CPUID2 keeps its empty-CPUID controls (RDSEED/RDRAND exiting
-among them), and the guest's higher VTL takes a spurious #UD on its
-first RDSEED.
+Plane twins are published with a plain store to common->vcpus[] plus an
+smp_wmb() that pairs with online_vcpus, not with twin initialisation,
+while vcpu_for_each_plane() reads the slots with a bare load.  x86-TSO
+hides it, but the protocol is unannotated generic code: KCSAN reports
+it, and nothing stops a reordered publication from exposing a
+half-initialised twin to a lockless iterator.
 
-Swap each twin in as the loaded vCPU for its update, and reload the
-caller once at the end. Plane ioctls all share the common vCPU mutex,
-so the twin cannot be loaded elsewhere concurrently. A preemption
-inside the window is safe only because vcpu_load() now publishes the
-loaded twin as common->current_vcpu (previous patch); before that, the
-preempt notifiers would arch-put and arch-load the caller instead.
+Publish the slot with smp_store_release(), read it with READ_ONCE() in
+vcpu_for_each_plane(), and document the pairing at the iterator. The
+lockless readers here are vcpu_for_each_plane() callers that walk other
+vCPUs' twins, such as the APICv BLOCKIRQ recompute; the kick paths read
+common->current_vcpu instead, and the Hyper-V twin lookups that also
+pair with the release come later, with the VSM code.
 
-Fixes the twin updates in "kvm: x86: Update state for all plane VCPUs
-after CPUID update".
+No functional change on x86.
 
-Fixes: https://lore.kernel.org/all/20260608144252.351443-46-joro@8bytes.org/
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/x86/kvm/cpuid.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ include/linux/kvm_host.h | 7 ++++++-
+ virt/kvm/kvm_main.c      | 9 ++++++++-
+ 2 files changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 54bcfedc5226..c9b7dfc5c967 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -501,7 +501,7 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 1f47b3bfa4bb..6922e3063ad8 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -393,9 +393,14 @@ struct kvm_vcpu_common {
+ 	struct kvm_vcpu_arch_common arch;
+ };
+ 
++/*
++ * The slot read pairs with the smp_store_release() publication in
++ * kvm_vcpu_finish_common() for iterators running outside the locks that
++ * serialise twin creation.
++ */
+ #define vcpu_for_each_plane(common, i, v)			\
+ 	for ((i) = 0; (i) < KVM_MAX_PLANES; ++(i))		\
+-		if (((v) = common->vcpus[(i)]) != NULL)
++		if (((v) = READ_ONCE(common->vcpus[(i)])) != NULL)
+ 
+ /* Tracked per plane-VCPU - used for deciding which plane-vcpu to run */
+ enum kvm_vcpu_state {
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index b6bdbe5c5133..7f215822e48e 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -548,7 +548,14 @@ static int kvm_vcpu_init_common(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned
+ static void kvm_vcpu_finish_common(struct kvm_vcpu *vcpu)
  {
- 	struct kvm_vcpu_common *common = vcpu->common;
- 	u32 vcpu_caps[NR_KVM_CPU_CAPS];
--	struct kvm_vcpu *v;
-+	struct kvm_vcpu *v, *loaded = vcpu;
- 	unsigned i;
- 	int r;
- 
-@@ -568,9 +568,24 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
- #ifdef CONFIG_KVM_XEN
- 		v->arch.xen.cpuid = kvm_get_hypervisor_cpuid(vcpu, XEN_SIGNATURE);
- #endif
-+		/*
-+		 * The ioctl loaded the calling vCPU; updating a twin's
-+		 * VMCS/VMCB controls requires that twin to be the loaded
-+		 * one, so swap it in for the update.
-+		 */
-+		if (v != loaded) {
-+			vcpu_put(loaded);
-+			vcpu_load(v);
-+			loaded = v;
-+		}
- 		kvm_vcpu_after_set_cpuid(v);
- 	}
- 
-+	if (loaded != vcpu) {
-+		vcpu_put(loaded);
-+		vcpu_load(vcpu);
-+	}
-+
- success:
- 	kvfree(e2);
- 	return 0;
+ 	WARN_ON(vcpu->common->vcpus[vcpu->plane_level] != NULL);
+-	vcpu->common->vcpus[vcpu->plane_level] = vcpu;
++	/*
++	 * Publish with release semantics so that vcpu_for_each_plane()
++	 * callers running outside the locks that serialise twin creation
++	 * (such as the APICv BLOCKIRQ recompute, which walks every vCPU's
++	 * twins) observe a fully initialised vCPU through their READ_ONCE()
++	 * of the slot; the plain store relied on x86-TSO.
++	 */
++	smp_store_release(&vcpu->common->vcpus[vcpu->plane_level], vcpu);
+ 	smp_wmb();
+ 	if (vcpu->plane_level == 0) {
+ 		/*
 -- 
 2.50.1
 
