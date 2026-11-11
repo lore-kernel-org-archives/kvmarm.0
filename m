@@ -1,49 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.200
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794405563;
-	b=Gou4EnMaD//yT1wX6g0iuXJWSz7KvsD2+j+q1dijEdYw4dacrdBfoFhTVILO4CwOTGvt
-	 ZICSUT2uUyFtHY3veVGWZWHu4AfOk3LjArPvcBHWCfwkT/x/D1azutLt8Ja+zZ8/2GUt0
-	 HQXZX4dSbSXMxgUoxma5J2J0pMQAWJOuvEQxMtDQ9P3SdQ6Ur4s1hM6ziMhenbiaEFnBZ
-	 MezoW9nApDiqqys7kwa6x7SHGl6dGwMepRuHLOS916sPjty/QGlv8kdkD3glxpA1zbCt2
-	 gLTUAfbMszBNATeKMjJoe9t5raOo0CO/aceY5/rPm8/IgRX657oKnXrqU3mVP6Hs0ZQ==
+	t=1794409068;
+	b=x2P6VWX1Q6st0mYB0Jo8GRhkSS3FmhOYgER8SnTVNL2T0UNPXKl63thJRYur428ftoCH
+	 fJ5Dh3WM7uvNF0LZfq3knkn2jdfnIcsuBVOkRpuybenm2mBiv6H6Ux+ULaB/ov3kOOIAf
+	 2oa2eEUQI8k5VFeWfxwFW0pWAxGjsir19Oh8vrtUBhX5EsMYYYquX5/t6XTWXdHprbezV
+	 Ci91umlVbdUzaHx8psW5487H5kEinH1LSDA73j1B9mjVo9Nw+5U8JjLCMbX8qwvGxcwM7
+	 57NRBYYYBANeFExfKgvww3Z+zNTx2ng04w7xSbfi+v6uVQdFjYhA812c9z7gqa4QKvQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794405563;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
-	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=yWS0+4kurKjndaOQRErlwqMS9KCLA/8IMzcMt6fHeEk=;
-	b=Cura92ARFU1GGJtFEsFFTchRgaBVv4W9ms/42oTAWmaHnIwVN5secfnPatNhBaIclknm
-	 HvBTsps4wbC4dgAeasxVdoE0R+Dy2dfA4Ayb+JCGM9yLx4icbwWLQdCARozKguxdIEsq9
-	 yhcOPvWEtFT1+SGSpm4TzSNLxRNHpgyKNKcOVAXrILgKxbYir29Jkmlq5NFREGso1EK8d
-	 afOvS7UPkpNloNXQLg9od0Yz8lTzjCmWERskeBPmlYWeXYrVZ3SVCAM42iCVGrGaX2V1/
-	 0eU+P69YKXGW9VgKo8zn+EdDnEl5WVPNkFBWULUmUn8gKfYcHQT3P2oUN4vq21c7sig==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794409068;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
+	 Mime-Version:References:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=eAVBx7wFjerY7MFoeOAbmTCOK2sMbdc2RAGG1TuVAr8=;
+	b=CYQnZh9sHI9YU70FeeI5VWkFLyBbxlWiXIH9lv4O0zHVVFVTu49wYO4YHjjNImRHQXz9
+	 yXmYuH5y/JJnRMizcl7xpWqYvrFBMjp/UtU86GngsOQqsE53Esscj3CLX5O7qMiU7/zSE
+	 EgAOFCcSX2e8QyUdKBGX3Q1MzcPixYvi9kx7qCbWgrxiqhh81IqQlHlSz/vMDmsj8L8Ha
+	 mdCghYqWBV+5reSyns72l0HK+MLDVFP1tYBZXVsnkfKLZpFmvTBhedl26mpFnoZM70itc
+	 urNmMIgUWjPkHMUgaSGvgIKhvKim1/nMgKsZzgHRI5TIqDefUeeVdzQkHwV29wLaUZw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=eO3N8mVU;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83D87606A326
-	for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 13:59:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 83D87606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=BNv6qC62;
+	arc=none smtp.remote-ip=209.85.214.200
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78AB9606A324
+	for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 14:57:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 78AB9606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=eO3N8mVU
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E68AB1576;
-	Wed, 11 Nov 2026 05:59:18 -0800 (PST)
-Received: from [10.57.69.47] (unknown [10.57.69.47])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AD9FE3F673;
-	Wed, 11 Nov 2026 05:59:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794405561; bh=ZS/6+logSEVjBhsJ898Tt4DanlJ8je6TCRqCH1C6kak=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=eO3N8mVUBUtNqhII9a/tEc81Ec4bqXfC3opjg7RtnAwOj48vBxoFwn0gTgJjSe28j
-	 azwZd8fu84HHjudgNafZPbstRNInc2Bj0M4wjZcfOLEnhYbNtLA5Mf3TPRwFsRl/9u
-	 ZATQVUicbb+glkJc/EWmw1eC3blUY/XrGaS/I4Jc=
-Message-ID: <5fa8a1fb-4e2c-4746-8a70-a47f387ef0d6@arm.com>
-Date: Wed, 11 Nov 2026 13:59:17 +0000
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=BNv6qC62
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2e9501034c4so50332255ad.0
+        for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 06:57:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1794409068; x=1795013868; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=eAVBx7wFjerY7MFoeOAbmTCOK2sMbdc2RAGG1TuVAr8=;
+        b=BNv6qC62SJL2n0nfn7N6MMweQqyzkqFriF7kyHz8kMUG48YsCYs4WksqD+z69UKob6
+         UE3wDUpLtZR1Chz6WP454FMn0Lm26nmHlFcEdRMUrK5qIu77E1mzZRag0I2dAWXsFJO5
+         8aKQZvV0g+GbPigvZsytI2+0JTlupQfj0cqz6gWPK1aAC7d88d43ZMCWTP80U6LpP3iD
+         jX8PvkCHE6tpai7IquCZl2XAygeGEemHFUw88e2ef819ZMMDhEksJIB/h5l1ezekMjC7
+         4vs6SrT5t7/MD5HXenAKU2npivAvoCcP450QwxrJtJYiJt2J+F//jzXxUDgWq3GEn6Gv
+         4Mgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794409068; x=1795013868;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=eAVBx7wFjerY7MFoeOAbmTCOK2sMbdc2RAGG1TuVAr8=;
+        b=U2oPpUkOOLSTz4nU8VLLF0yqfTfecNmg4knPmNi7mTmBG3s/NW0IQlnQkPSg0h/np5
+         patB/w3Bz9CJJfjahMyyCJlImt/HSJjxI6i9txIcLpMA/iB03cTFyvwh4R+GHQ5CdEc6
+         /tX0ScFK1mJ1r9UhEEGyoxuFwAI7tw0RZwbn73o6ZYf1c8hv/7e/AQe5JQsPptuPryms
+         KomLW5KtYhvaVJyUXm5Q9aRVblrohgnenPAOLjzHVmQ0skHuG+f7rzGt7+jrRG/yxK4W
+         yohaL6uOYz/m47XYLf2WhOLJr+rRPsTfMUg/0K4VI4pPVYX8nf9tlNcL/qwNmUw7j6Ng
+         K0Ug==
+X-Forwarded-Encrypted: i=1; AL+hErF1tiJNHfluuuIbWSkAG6mTbJ5zMnXQYKDpy+ySVWx/xSWWnE1JT3gj59mSrVkoqbYVRQLjpZc=@lists.linux.dev
+X-Gm-Message-State: APuU4Z8VgbKZlXVklpAZgvGzW1/qZrKL2uiK94Wd+a9p3C4cDTWtQB3U
+	BagkFmMgEKxTPO4VdDWAo0X7xwRUyEOkZD6bG3rJup2Rm1V5vMZC1TQGQFtygQwHPU9cdoSQY0I
+	uBEjX1A==
+X-Received: from plri11.prod.google.com ([2002:a17:903:32cb:b0:2e9:4bf0:5f17])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:b84:b0:2ed:238b:7db8
+ with SMTP id d9443c01a7336-2edd7bae0fcmr30337835ad.61.1794409067689; Wed, 11
+ Nov 2026 06:57:47 -0800 (PST)
+Date: Wed, 11 Nov 2026 06:57:46 -0800
+In-Reply-To: <avQ9Jhsnq7e3KPw-@raptor>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -52,197 +77,66 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 09/18] KVM: arm64: Implement HVC handling for protected
- guests at EL2
-To: Fuad Tabba <fuad.tabba@linux.dev>, maz@kernel.org, oupton@kernel.org,
- kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
-Cc: catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com,
- seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
- mark.rutland@arm.com, steven.price@arm.com, vdonnefort@google.com,
- qperret@google.com, tabba@google.com
-References: <20261001135711.1640520-1-fuad.tabba@linux.dev>
- <20261001135711.1640520-10-fuad.tabba@linux.dev>
-From: Ryan Roberts <ryan.roberts@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20261001135711.1640520-10-fuad.tabba@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20261110110724.3614412-1-fuad.tabba@linux.dev>
+ <20261110110724.3614412-3-fuad.tabba@linux.dev> <avMoubwqgXbpflwM@gremlin>
+ <CA+EHjTxT_9NghyLSZmOOi_oQboQw-g+6z9WxwaF=-7RdaGbMNw@mail.gmail.com>
+ <avM9_7aWUDJSL3Lq@seanjc-mac.roam.internal> <avM_FXXF9oBkderF@gremlin> <avQ9Jhsnq7e3KPw-@raptor>
+Message-ID: <avSCaugZ4fRxRdpT@seanjc-mac.roam.internal>
+Subject: Re: [PATCH 2/2] KVM: selftests: Test KVM_PRE_FAULT_MEMORY against a
+ full dirty ring
+From: Sean Christopherson <seanjc@google.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>, 
+	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, 
+	Wei-Lin Chang <weilin.chang@arm.com>, Will Deacon <will@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Faud,
-
-I have some drive-by comments for this patch, having stumbled upon it while
-poking around in SSBS code today...
-
-
-On 01/10/2026 14:57, Fuad Tabba wrote:
-> Extend kvm_handle_pvm_hvc64() to handle SMCCC_VERSION,
-> SMCCC_ARCH_FEATURES and the vendor hypervisor call UID at EL2, so
-> these queries don't reach the host. ARCH_FEATURES is mandatory from
-> SMCCC 1.1, the version EL2 implements: it returns SUCCESS for itself and
-> for SMCCC_VERSION, NOT_SUPPORTED for anything else, and handles the
-> ARCH_WORKAROUND_1/2/3 queries as the host does, from a copy of the
-> host's mitigation state taken at init with the sanitised ID registers.
-> The workaround calls themselves are already handled on hyp entry.
+On Wed, Nov 11, 2026, Alexandru Elisei wrote:
+> On Tue, Nov 10, 2026 at 04:02:21PM +0000, Lorenzo Stoakes (ARM) wrote:
+> > On Tue, Nov 10, 2026 at 07:53:35AM -0800, Sean Christopherson wrote:
+> > > On Tue, Nov 10, 2026, Fuad Tabba wrote:
+> > > > > > diff --git a/tools/testing/selftests/kvm/pre_fault_memory_test.c b/tools/testing/selftests/kvm/pre_fault_memory_test.c
+> > > > [...]
+> > > > > > +static void test_pre_fault_dirty_ring(void)
+> > > > [...]
+> > > > > > +    /* Populate the pages, so that pre-faulting can map them writable. */
+> > > > >
+> > > > > Reviewed below, but I wonder how x86 could then read fault these?
+> > > >
+> > > > KVM_PRE_FAULT_MEMORY is defined as a read fault, but x86 maps the page
+> > > > writable when the host page is, and marks it dirty, unless it falls
+> > > > back to access tracking (below). Populating the pages makes sure they
+> > > > aren't backed by the zero page.
+> > >
+> > > Before we effectively solidify the behavior, I think we should have an explicit
+> > > discussion about the desired behavior of KVM_PRE_FAULT_MEMORY when dirty logging
+> > > is enabled.  E.g. the only reason I kept the existing behavior in my auto-prefault
+> > > series was because I couldn't think of a good reason to change it.  But we never
+> > > made a concious decision in the first place, i.e. we never considered what would
+> > > happen if prefaulting collided with dirty logging (as evidenced by this bug).
+> > 
+> > Yeah, I do worry about implicit assumptions (also commented re: ordering).
+> > 
+> > I guess what makes sense, given the general approach for prefaulting = injecting
+> > a synthetic read fault, is for the expectation to be that it matches the
+> > behaviour of an ordinary read fault.
 > 
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->  arch/arm64/include/asm/kvm_hyp.h |  4 ++
->  arch/arm64/kvm/arm.c             |  4 ++
->  arch/arm64/kvm/hyp/nvhe/pkvm.c   | 68 ++++++++++++++++++++++++++++++++
->  3 files changed, 76 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 4974492744cc8..7609c78c68f34 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -10,6 +10,7 @@
->  #include <linux/compiler.h>
->  #include <linux/kvm_host.h>
->  #include <asm/alternative.h>
-> +#include <asm/spectre.h>
->  #include <asm/sysreg.h>
->  
->  DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
-> @@ -150,6 +151,9 @@ extern u64 kvm_nvhe_sym(id_aa64smfr0_el1_sys_val);
->  
->  extern unsigned long kvm_nvhe_sym(__icache_flags);
->  extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
-> +extern enum mitigation_state kvm_nvhe_sym(spectre_v2_state);
-> +extern enum mitigation_state kvm_nvhe_sym(spectre_v4_state);
-> +extern enum mitigation_state kvm_nvhe_sym(spectre_bhb_state);
->  extern unsigned int kvm_nvhe_sym(kvm_host_sve_max_vl);
->  extern unsigned long kvm_nvhe_sym(hyp_nr_cpus);
->  extern unsigned int kvm_nvhe_sym(hyp_gicv3_nr_lr);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index db36815630790..cceeeee266902 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2622,6 +2622,10 @@ static void kvm_hyp_init_symbols(void)
->  	kvm_nvhe_sym(__icache_flags) = __icache_flags;
->  	kvm_nvhe_sym(kvm_arm_vmid_bits) = kvm_arm_vmid_bits;
->  
-> +	kvm_nvhe_sym(spectre_v2_state) = arm64_get_spectre_v2_state();
-> +	kvm_nvhe_sym(spectre_v4_state) = arm64_get_spectre_v4_state();
-> +	kvm_nvhe_sym(spectre_bhb_state) = arm64_get_spectre_bhb_state();
+> Unfortunately, what happens in this case is not as obvious as it sounds,
+> because a read fault on a memslot backed by guest_memfd maps the GPA with
+> read *and* write permission on arm64 (if the memslot is not readonly,
+> haven't checked what x86 does).
 
-Is it really correct to snapshot this state then use it at runtime assuming its
-still accurate? See below...
+Ya, this isn't about read vs. write faults, it's about whether or not *any* "fault"
+from KVM_PRE_FAULT_MEMORY should be allowed if the target memslot has dirty logging
+enabled.
 
-
-> +
->  	/* Propagate the FGT state to the nVHE side */
->  	kvm_nvhe_sym(hfgrtr_masks)  = hfgrtr_masks;
->  	kvm_nvhe_sym(hfgwtr_masks)  = hfgwtr_masks;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 6ff08d195ff56..10ff2ba6c6c1b 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -10,12 +10,18 @@
->  #include <linux/mm.h>
->  
->  #include <asm/kvm_emulate.h>
-> +#include <asm/spectre.h>
->  
->  #include <nvhe/mem_protect.h>
->  #include <nvhe/memory.h>
->  #include <nvhe/pkvm.h>
->  #include <nvhe/trap_handler.h>
->  
-> +/* The host's Spectre mitigation state, for SMCCC_ARCH_FEATURES. */
-> +enum mitigation_state spectre_v2_state;
-> +enum mitigation_state spectre_v4_state;
-> +enum mitigation_state spectre_bhb_state;
-> +
->  /* Used by icache_is_aliasing(). */
->  unsigned long __icache_flags;
->  
-> @@ -1181,8 +1187,70 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
->  {
->  	u64 val[4] = { SMCCC_RET_INVALID_PARAMETER };
->  	bool handled = true;
-> +	u32 feature;
-> +	uuid_t uuid;
->  
->  	switch (smccc_get_function(vcpu)) {
-> +	case ARM_SMCCC_VERSION_FUNC_ID:
-> +		/* Nothing to be handled by the host. Go back to the guest. */
-> +		val[0] = ARM_SMCCC_VERSION_1_1;
-> +		break;
-> +	case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
-> +		/* The workaround calls themselves are handled on hyp entry. */
-> +		val[0] = SMCCC_RET_NOT_SUPPORTED;
-> +		feature = smccc_get_arg1(vcpu);
-> +		switch (feature) {
-> +		case ARM_SMCCC_VERSION_FUNC_ID:
-> +		case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
-> +			val[0] = SMCCC_RET_SUCCESS;
-> +			break;
-> +		case ARM_SMCCC_ARCH_WORKAROUND_1:
-> +			switch (spectre_v2_state) {
-> +			case SPECTRE_VULNERABLE:
-> +				break;
-> +			case SPECTRE_MITIGATED:
-> +				val[0] = SMCCC_RET_SUCCESS;
-> +				break;
-> +			case SPECTRE_UNAFFECTED:
-> +				val[0] = SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED;
-> +				break;
-> +			}
-> +			break;
-> +		case ARM_SMCCC_ARCH_WORKAROUND_2:
-> +			switch (spectre_v4_state) {
-> +			case SPECTRE_VULNERABLE:
-> +				break;
-> +			case SPECTRE_MITIGATED:
-> +				/* With SSBS advertised the guest's default is safe. */
-> +				if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, SSBS, IMP))
-> +					break;
-
-For this case (and the break immediately above) you return val[0] =
-SMCCC_RET_INVALID_PARAMETER (from init at top of this function). But the
-kernel's kvm_smccc_call_handler() returns val[0] = SMCCC_RET_NOT_SUPPORTED in
-these cases (which seems more likely to be correct). Does this violate the ABI?
-
-> +				fallthrough;
-> +			case SPECTRE_UNAFFECTED:
-> +				val[0] = SMCCC_RET_NOT_REQUIRED;
-
-Is it possible that the (compromised) kernel could have disabled the mitigation
-after the state snapshot was taken? I.e. spectre_v4_state == SPECTRE_MITIGATED
-and the VM doesn't advertise SSBS so it returns SMCCC_RET_NOT_REQUIRED here. But
-the kernel has since turned off the mitigation?
-
-Thanks,
-Ryan
-
-> +				break;
-> +			}
-> +			break;
-> +		case ARM_SMCCC_ARCH_WORKAROUND_3:
-> +			switch (spectre_bhb_state) {
-> +			case SPECTRE_VULNERABLE:
-> +				break;
-> +			case SPECTRE_MITIGATED:
-> +				val[0] = SMCCC_RET_SUCCESS;
-> +				break;
-> +			case SPECTRE_UNAFFECTED:
-> +				val[0] = SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED;
-> +				break;
-> +			}
-> +			break;
-> +		}
-> +		break;
-> +	case ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID:
-> +		uuid = ARM_SMCCC_VENDOR_HYP_UID_KVM;
-> +		val[0] = smccc_uuid_to_reg(&uuid, 0);
-> +		val[1] = smccc_uuid_to_reg(&uuid, 1);
-> +		val[2] = smccc_uuid_to_reg(&uuid, 2);
-> +		val[3] = smccc_uuid_to_reg(&uuid, 3);
-> +		break;
->  	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
->  		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
->  		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_HYP_MEMINFO);
-
+I'm leaning toward "yes", mainly because I suspect that fully preventing installing
+writable mappings when dirty logging is enabled across all architectures would be
+more difficult that ensuring generic code doesn't explode, and in practice I doubt
+any real VMM usage of KVM_PRE_FAULT_MEMORY will care about dirty logging interactions,
+i.e. any KVM behavior will be a-ok with userspace.
