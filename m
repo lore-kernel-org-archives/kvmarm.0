@@ -1,62 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.200
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794417664;
-	b=TmvCBDvsdrg/QnFQRIR+7/4Tpou36NYxIbtrxbTklvvJN/wnAAEMb3HUKbtHoMkY3QRf
-	 ZpTsem1hQnrlL0dJaJykfyx36+bKcUjJJzSxElMHA4nRC5/e42rbSXdIhM88fXJegEfWG
-	 tg+UFe8CzVAODe2s3t3YopvqS63lu6iBG7uZsaMY+Q8GXqrhXFtcHfSy5flG38NWRHUSm
-	 fpQ4xsIgM50GtrAR/ZAiplJ/6QZVF1XHv6FEVGqsIKFArxQCrWPwdytbC77hFqUlbBQN+
-	 eHpkCwD7qkfNPCxkYyqUx3EnoBzIl5DAbOfYV3DoX7PbokiuyYsMYqNXNYuREf7KXwQ==
+	t=1794418682;
+	b=MyoLLQHgvrREohZDO+ef0r44NfQiCyGXQ7UtaPogHntamgesyjt5FX9DlURO3KrcB9AJ
+	 dWEnbntvInbXCd8+DoO1N7xBdsLB1hP26dsqm0nmHftCUu2AAsVKL3kYv+IZdTiar1w4z
+	 U4aHlpWWjqtUZUKz1NnMUqEXU2XwrK+kvgkcUZOU8wWNobG8w4yWnvF+LEm4jB3AjOdcv
+	 /dSdfgcnHhnr75YnpM7/KyV7H60u7FuR3vMnAYXSiU5xaeCXwRZJQgPDEaa2XmnvYou9o
+	 eEdouLuQW2uPvmuv/Ao7D+bqValU3JjN0Ph9uKPI+hmZvCUN4hgE9VC/kU3BXijMEgQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794417664;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=oHVW7jNgTo/7nIb4CmqK42I4MtbBzqJmNU5KyxcTUvE=;
-	b=uH+/z7eAB8TKjIt3tocg4upV+3n/lmh5areirkoD/vdVDWE/Wfd05vvzvrrjXj5QhM9R
-	 tnxn+1xw/KqoBMkmnGMM/Un7kHdUrMih10FqxzbWj4we+08qyas+9h/sA+H5zYx+mmz+1
-	 mD8VzcSb+CMgck3dXYr2d76wliiUWASWqqJjywLNHoYeIa1RhgP2wR5JZ7IVrk5LhNZVU
-	 qaSbz0bbsBF5oO2crOr5vyKKe/3nig5sQzX8bF5IaunYSJr+m056DjZa6xLXDjhqeU/iV
-	 iW6SSxQo4VJjMNSrp7kdBN9+mVwXhpklPI+hwYCHfpmlBDgVd0sMFz/b9y8DrHUsyng==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794418682;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
+	 Mime-Version:References:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=IGymzurcCAqkuazrSBLvvuD8i7vbGW+naOWdeyf6NCQ=;
+	b=k2uT6XcOWPw4JlIBcEklpmNqOyk44R+24x7jGR0jEyX3isnTXOkFmaDWABeWE28bc7Nj
+	 gTvDURYuXSkW37C4Ncstzo5mZGc2UJRzhZC4+q6hzA64Mqs5gjlJ3OrcvW/PyYAQ15tXd
+	 ICa2ksCgIPOaCAST2oEoX1HfJ8v5IfITUzVt3sR/o5f1GHq2pMf3HhvYyDtKrvE1N9n/5
+	 6dz2YVvrquL0e7wKsjsf/E6AqkvLNuUqXNOfbaGcQAU114Ts0xBfzuw8rnLfF1vtP+8vM
+	 NH4zV30u8zzHiZvu7idTLnJ3gHAoK6/I/1AA/RLixSXyWzq1qWqyOPLaB7veXNlhJfA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Z3NEcnpz;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68F58606A324
-	for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 17:21:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 68F58606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=dgEAFrKJ;
+	arc=none smtp.remote-ip=209.85.215.200
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939A9606A333
+	for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 17:38:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 939A9606A333
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Z3NEcnpz
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BDC441576;
-	Wed, 11 Nov 2026 09:21:00 -0800 (PST)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 87BAC3F632;
-	Wed, 11 Nov 2026 09:21:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794417663; bh=Rf4ebtvltCctbkDc/Gv4WhpuRQ5MW6jqs73z5jo5cb0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z3NEcnpzN+rb8IhiTNoLslEyKdoUWksMEpnQHcWQAB7rr/bq5YHO2aUh9LZBJb9kZ
-	 NVJ4FctJSnEOQvL9bv8EUE5im5n3NvHjBD2tLY/0pcjk8MmodxdQ9Z4LUMN0lfvE87
-	 XlML061p/+aCR23TsCURNUlK6CPGFo+EFvOdFTcc=
-Date: Wed, 11 Nov 2026 17:20:08 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev,
-	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, will@kernel.org, mark.rutland@arm.com,
-	linux-perf-users@vger.kernel.org, catalin.marinas@arm.com,
-	james.clark@linaro.org
-Subject: Re: [RFC PATCH v7 05/28] perf: arm_spe_pmu: Add PMBIDR_EL1 and
- PMSIDR_EL1 to struct arm_spe_pmu
-Message-ID: <avSjyLhFsYjI7tG_@raptor>
-References: <20260903160623.315525-1-alexandru.elisei@arm.com>
- <20260903160623.315525-6-alexandru.elisei@arm.com>
- <atDmDRSNDllpJtmL@gremlin>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=dgEAFrKJ
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-cdd9fa2a558so1165873a12.0
+        for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 09:38:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1794418682; x=1795023482; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=IGymzurcCAqkuazrSBLvvuD8i7vbGW+naOWdeyf6NCQ=;
+        b=dgEAFrKJ/qnsiqUd+i5gOJype8syiwWvGZEpJbnVqKNEt933PiWSC8bF+BSFHYXaEV
+         25NXiMzK6e81pV8yTDuKO49hcqdGKurYIqyvi5WdoPTFRHFpnhHotr+aLJsLRNF1+kpI
+         iqF3o+rulte3QhBe/tj30La9TUU4QJWfo8cvVdYeICzy7q8b3xJkDMXYVpd1mQLdvwwB
+         s8QDQRewy9X3vRwOytAAHW4w5b26kkqg+q/uzCgrpyuCRrVvqqLiH9gEgij0AqXhV0OE
+         AWpG31DiJCFAIFYEgpIbT+lXpeb7yxPuVU+x41W+u6krzv+pj1XZ73iA35bLox9vZ1hY
+         vIuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794418682; x=1795023482;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=IGymzurcCAqkuazrSBLvvuD8i7vbGW+naOWdeyf6NCQ=;
+        b=RgETEIfArvGDTrCneYICtF4pGYy7CIJo9fQ92dn2g+/+srlxVjClXLJNXjZKiSu79U
+         G2SWKNeIcKEmUB6u2L6PxH3ybfb+fK/sK15Qhvkw71iyoEnlBqz794GLG0OGFHUfXOPj
+         iVxW9mWo8PEu7J381Dn337LOxla8+QMlQH3KbhyBHqASeW6GgD4/ggCrrsivzNF3W4lf
+         XY6tAdrjgfD8eL9Hzcr1kLvj/o43onCKF0sCEnBEKPEWEhni1NMYnnTjX6tX71Zozhgs
+         XljWwKrfcM+y+n7oTlkkZqGx0zCetPqVN9ZFxEttzdkgKRLqKT5QHNHb7ZHkyvXIJoDu
+         I1Jg==
+X-Forwarded-Encrypted: i=1; AL+hErGrixCH8DjPIAzP1OkJ7xVOWDuLxx9IGfioUiIZnm4GrAkebE2kcn9Sge7UE8mBhAKHEj65svk=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/eRokt1wsFjMDBVIIv5gM6UK/1iYVYyZcaUqlIfX+io9W8Q+2c
+	7tRF0vmy3IEDvN9UMIeM5xm2p55+R/hbGARc7H6ZQsQmosX1CbcD0QBy61u0Iaoc+NFR/qQveQQ
+	qHuwkbA==
+X-Received: from pgoo5.prod.google.com ([2002:a05:6a02:3485:b0:cd8:b51c:c0b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7349:b0:3e2:6b5a:fea3
+ with SMTP id adf61e73a8af0-3f2ff4cfa62mr3490465637.71.1794418681497; Wed, 11
+ Nov 2026 09:38:01 -0800 (PST)
+Date: Wed, 11 Nov 2026 09:38:00 -0800
+In-Reply-To: <auzSxEsGAcm3MYtN@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -65,140 +77,53 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <atDmDRSNDllpJtmL@gremlin>
+Mime-Version: 1.0
+References: <20260714160411.302386-1-alexandru.elisei@arm.com>
+ <amPCdAswlk24Xilf@google.com> <anxAGkdyPYXBlS00@raptor> <autwsR83Ii-tRrqF@gremlin>
+ <auzSxEsGAcm3MYtN@google.com>
+Message-ID: <avSn-IW8DMybO-Tg@seanjc-mac.roam.internal>
+Subject: Re: [PATCH v2] KVM: Ignore MMU notifiers for guest_memfd-only memslots
+From: Sean Christopherson <seanjc@google.com>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, maz@kernel.org, oupton@kernel.org, 
+	suzuki.poulose@arm.com, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, david@kernel.org, mark.rutland@arm.com, 
+	ackerleytng@google.com
+Content-Type: text/plain; charset="us-ascii"
 
-Hi,
+On Thu, Nov 05, 2026, Sean Christopherson wrote:
+> On Wed, Nov 04, 2026, Lorenzo Stoakes (ARM) wrote:
+> > [updated David's email address to @kernel.org]
+> > 
+> > On Wed, Aug 12, 2026 at 10:42:50AM +0100, Alexandru Elisei wrote:
+> > [ ... ]
+> > > On Fri, Jul 24, 2026 at 12:52:20PM -0700, Sean Christopherson wrote:
+> > > > It'll probably take me a few weeks to circle back to this, as I finally crawled
+> > > > out from underneath a pile of urgent and am just now getting back into review
+> > > > mode, but this is fairly high on my todo list, so with luck we might still squeeze
+> > > > this into 7.3.
+> > 
+> > Hey Sean,
+> > 
+> > I wondered whether you'd had a chance to look at this?
+> > 
+> > After discussing this with Marc and Alex it is clear that this is really a
+> > blocker for Alex's SPE series, as we need a sensible means of ensuring
+> > that stage-2 mappings stay in place.
+> > 
+> > So ideally would prefer to get something like this in in the next cycle,
+> > if you don't have any objections to it? :)
+> > 
+> > If it'd be easier, I think a smaller version of the same patch would also
+> > give us what we need? I.e. your snippet from June with the page ageing part
+> > dropped, as below.
+> 
+> The GPC invalidation fix landed, so we can go straight to the super simple v1.
+> Compile tested only at this point, I'll formally post this (hopefully today),
+> assuming nothing explodes in testing.
 
-On Thu, Oct 15, 2026 at 04:12:27PM +0100, Lorenzo Stoakes (ARM) wrote:
-> I think probably some kind of commit message would be good even for a
-> trivial change :)
+/facepalm
 
-Of course, I'll add something here.
-
-> 
-> On Thu, Sep 03, 2026 at 05:06:00PM +0100, Alexandru Elisei wrote:
-> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > ---
-> >  drivers/perf/arm_spe_pmu.c       | 3 +++
-> >  include/linux/perf/arm_spe_pmu.h | 2 ++
-> >  2 files changed, 5 insertions(+)
-> >
-> > diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
-> > index 79c571a649d5..42ba0924bd02 100644
-> > --- a/drivers/perf/arm_spe_pmu.c
-> > +++ b/drivers/perf/arm_spe_pmu.c
-> > @@ -1095,6 +1095,7 @@ static void __arm_spe_pmu_dev_probe(void *info)
-> >  			"profiling buffer owned by higher exception level\n");
-> >  		return;
-> >  	}
-> > +	spe_pmu->pmbidr_el1 = reg;
-> 
-> This doesn't seem to be used anywhere in the series?
-
-Indeed, that's a leftover from the previous iterations, will remove.
-
-> 
-> >
-> >  	/* Minimum alignment. If it's out-of-range, then fail the probe */
-> >  	fld = FIELD_GET(PMBIDR_EL1_ALIGN, reg);
-> > @@ -1107,6 +1108,8 @@ static void __arm_spe_pmu_dev_probe(void *info)
-> >
-> >  	/* It's now safe to read PMSIDR and figure out what we've got */
-> >  	reg = read_sysreg_s(SYS_PMSIDR_EL1);
-> > +	spe_pmu->pmsidr_el1 = reg;
-> > +
-> >  	if (FIELD_GET(PMSIDR_EL1_FE, reg))
-> >  		spe_pmu->features |= SPE_PMU_FEAT_FILT_EVT;
-> >
-> > diff --git a/include/linux/perf/arm_spe_pmu.h b/include/linux/perf/arm_spe_pmu.h
-> > index af86fd184050..97b14e236fcd 100644
-> > --- a/include/linux/perf/arm_spe_pmu.h
-> > +++ b/include/linux/perf/arm_spe_pmu.h
-> > @@ -21,6 +21,8 @@ struct arm_spe_pmu {
-> >  	cpumask_t				supported_cpus;
-> >  	struct hlist_node			hotplug_node;
-> >
-> > +	u64					pmbidr_el1;
-> 
-> Equally, this doesn't seem to be used anywhere in the series, maybe drop?
-
-Fixed.
-
-> 
-> > +	u64					pmsidr_el1;
-> 
-> This field is used in kvm_spe_has_feat_spe_fds() and
-> kvm_spe_has_feat_spe_fne():
-> 
-> bool kvm_spe_has_feat_spe_fds(struct kvm *kvm)
-> {
-> 	...
-> 	return kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P4) &&
-> 	       FIELD_GET(PMSIDR_EL1_FDS, spe_pmu->pmsidr_el1);
-> }
-> 
-> bool kvm_spe_has_feat_spe_fne(struct kvm *kvm)
-> {
-> 	...
-> 	return kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P2) &&
-> 	       FIELD_GET(PMSIDR_EL1_FnE, spe_pmu->pmsidr_el1);
-> }
-> 
-> So checking for FDS and FnE, but these are available as feature flags as
-> __arm_spe_pmu_dev_probe() gets these:
-> 
-> static void __arm_spe_pmu_dev_probe(void *info)
-> {
-> 	...
-> 	if (FIELD_GET(PMSIDR_EL1_FnE, reg))
-> 		spe_pmu->features |= SPE_PMU_FEAT_INV_FILT_EVT;
-> 	...
-> 	if (FIELD_GET(PMSIDR_EL1_FDS, reg))
-> 		spe_pmu->features |= SPE_PMU_FEAT_FDS;
-> 	...
-> }
-> 
-> And then kvm_spe_has_feat_spe_fds() and kvm_spe_has_feat_spe_fne() can be:
-> 
-> bool kvm_spe_has_feat_spe_fds(struct kvm *kvm)
-> {
-> 	...
-> 	return kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P4) &&
-> 	       (spe_pmu->features & SPE_PMU_FEAT_FDS);
-> }
-> 
-> bool kvm_spe_has_feat_spe_fne(struct kvm *kvm)
-> {
-> 	...
-> 	return kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P2) &&
-> 	       (spe_pmu->features & SPE_PMU_FEAT_INV_FILT_EVT);
-> }
-> 
-> Right?
-
-In this use case they are functionally the same, yes, but conceptually, they are
-not the same thing. spe_pmu->features advertises the features that the SPE
-*driver* supports, PMSIDR_EL1 advertises the features that the *hardware*
-implements. The two are not always equal.  For example, KVM added handling for
-the PMSNEVFR_EL1 register (added by FEAT_SPE_FnE), a few years before the SPE
-driver supported FEAT_SPE_FnE.
-
-I can see KVM, in the future, having to virtualize hardware features not
-supported by the host driver yet, so unless you have a strong objection, I would
-rather keep the use of the architectural register instead of relying on the
-driver.
-
-> 
-> So it seems you could drop this patch from the series in general? Is there
-> another reason to get these fields?
-> 
-> Also - there seems to be a divergence in the naming there between FnE and
-> INV_FILT_EVT, is that intentional?
-
-I think that's a question for the person who added FEAT_PMU_FEAT_INV_FILT_EVT?
-
-Thanks,
-Alex
+I spaced on sending this (and I think on testing it too...).  I'll try to get it
+posted in the next few days.
