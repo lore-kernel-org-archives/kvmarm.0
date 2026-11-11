@@ -1,62 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.113
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794415573;
-	b=U3LXAzqA9JAFr0xquuFR17nxPRLlFmGihZF5yiaTbx6DJ89t1WDRFy8e4DFx6x9S6LeJ
-	 hFp9hZYx8dp6YVVolKlMTVoBSOIg5mKItpLZuSgJJ1Um5/+cq4ON7lpbIfgqANQBzhH3O
-	 +2d+fLFKpnl0RTZ6iPib+l/VmJF/XfkcGHk4MCSV5hdoTkwebnBgBsDmKPaAQwPtql7ix
-	 AHPZiThcJ4HC/9+/BxbHFzXtySjIc2rkEVfXJq7qBuKgrBlvZec7w5WeOuN5E+0enXJHO
-	 YXksZhp3XUXqRZqcg6gB5B0lb6S8QC8yJHRTBH2Cw87FVYAHg4PzkjkrIXwrh4g5xgg==
+	t=1794417313;
+	b=dekL8S7L37qoDTYEQL5xAqaBGFiVStwEexxo9/jSPkr27jCVmhQ5xXCpA47QDV9wL8YU
+	 bhadxkFu89xtO5K3tVdPbZGvcYqTxgYanfcIxfKLx+poqoVFsRQdmQeYDhcHL7S62ZjYM
+	 zI+WHyC1mCBRq53iB35/wuoDsqZLtQKTfZvBDkplLnMmfIJsUTuA0EpUKjAUFgVEGCFe/
+	 HEGP6XSQarpINQTdz47yP4bHvfDJajQdg1ByAXco2Ne+wDS/Wwnyrl9MPpeKceaLLhZKu
+	 +7U5GPNDZ/+ygcWcon/E28hr8kuOGoDfejur1+bRzUiT5czW52xbuTNy4zKsUac1Oqg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794415573;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=zfYkUkK1FvEiamJkD2w+G92+ZaU+ueOZOEIhISapy8E=;
-	b=CItBGNDZRQUhdnnCenf0zXZb67GnEgbHSJhQu4erWWFRAU4dHSt3JVrGMyq7YnMWNfa0
-	 x3eopr+6qDpQKVsr1IYJvZXAtbNVBXv+74rpUYJmAiLZMhrm2K4iRbUH222I0+73aox8l
-	 e5WOicfb7JPSPoGMt9j2AOIEnLOxik86EchE8kD8/WQr7J6oAYtkC6R2XW8d4Ulevo2F5
-	 4ck5oh+4S8URFfxQ5KrWLmYJ3y613u70irYhlqgRARqXJlTp8Ubh11kypadcqa5ZIl51F
-	 IH/RY7TwF6BCQVtvfJGPhZbiHaDds3VvMEqrMt8/6XrXRQidlmQucdmt3UEt8uTQ/mQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794417313;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=y9Z+7orzJdSx58L4lqUe9cGolgKUXKFkRTuN7SA8P9w=;
+	b=J8PR0jUbMD7/AR57IpUMrt7vuv4xmPevJblfw9IPYl+Q+rX/WHSG3oiuF2vF/fpsPoPX
+	 GrLc3iAvE7Vk9tTGi1ZIi8bugjPSNxbDVLch8WOwo6By7BVhhUKKfiVy9uv0RlLv//ICC
+	 uQSQpSXblRwHOtetCs5yL8ioN8Wscc9koldekZpEYHYzy+xnBRH8pvMS5U/dEeDeixI4N
+	 JXPmnRdOEo3ulLl5Mu9thcw6zCH1HBzAvFnTY2iAYQg9w2aWlMITr1s7PCg39oQg6OIyE
+	 KLw+x486WhqRLkkS9AbgiYNc61VxIR7eTp7HLYJGMdW7KGezudcewXrsB5A3fhO2NCw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=dtbNmzkB;
-	arc=none smtp.remote-ip=91.218.175.113
-Received: from mta0.migadu.com (unknown [91.218.175.113])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2435C606A321
-	for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 16:46:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2435C606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Jvb50AXx;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8DE606A324
+	for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 17:15:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2E8DE606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=dtbNmzkB
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=vTOKXuEi2SgorO3quCcM6rXO+IcsXT+k+wyiUNo4CmU=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794415568; v=1; x=1795020368;
- b=dtbNmzkBU+l0UXQUiLmSRtxdPEKWkxw+iOV6DZ9NaJJNCL4EuukzlLvlAhvZq9MwKQ5d32G+
- SXTeqSubKp1ijl/yOc7nydlVCqEkX3fTNHHMLa+X4b55ZIsBgmtlo8o5pP2DR6c0bTQQODyeqBK
- g0mUa+sl2zYKlg7QnI+LsrZs=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 542fbedc8ff8cfdd;
-	Wed, 11 Nov 2026 16:46:08 +0000
-X-Mizu-Trace-ID: 542fbedc8ff8cfdd
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5c00d7ac49dso5629e87.1
-        for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 08:46:04 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErEcIhJb0Jg1gOW37X2yNlYdkj3j2V90LGZXGMw6rIHHBLv4Un9XzuWZPnNn+1pgzFVUSN8BDko=@lists.linux.dev
-X-Gm-Message-State: APuU4Z87OnJzrdMcw3QySqyS1rNZmfx06LUE8eo51veAgyGcQE7nSbDq
-	y55kIXpLu54Kbj52b7miKDYjoMrqJffBVuOv5Byy6+rd06mObXwIfLbqdnTPJjxNj6r1vB+kAOU
-	NE5HlasxdbNBi/KggFJWxC4P1VJ9nmR4G0oe+gLRv
-X-Received: by 2002:a05:6512:1281:b0:5c1:488e:a067 with SMTP id
- 2adb3069b0e04-5c15e321265mr149685e87.16.1794415563460; Wed, 11 Nov 2026
- 08:46:03 -0800 (PST)
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Jvb50AXx
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CDE101576;
+	Wed, 11 Nov 2026 09:15:07 -0800 (PST)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9914B3F632;
+	Wed, 11 Nov 2026 09:14:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1794417310; bh=2McGIo0I0qUn9Z5Bkhx58ruHvjbNzDromBqTIw7cA/c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Jvb50AXxGnQj9GSO/QAEN0TazkCWaZ2N/9XsGCnE/0y+001MSDX3Em9LlDYbwWLNr
+	 QRDX5Hvi6PR46zWdXB3NvONbRrGlXeIODQnhFpC2TzOqBoUZ6eYJfpjZ9s38QMUWTJ
+	 h5VqXB7zhPj4AiQnK6JXy4lYVlq3qKZ2O2qQgOvU=
+Date: Wed, 11 Nov 2026 17:14:48 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev,
+	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, will@kernel.org, mark.rutland@arm.com,
+	linux-perf-users@vger.kernel.org, catalin.marinas@arm.com,
+	james.clark@linaro.org
+Subject: Re: [RFC PATCH v7 02/28] arm64/sysreg: Define MDCR_EL2.E2PB values
+Message-ID: <avSiiFvN13FqNCDm@raptor>
+References: <20260903160623.315525-1-alexandru.elisei@arm.com>
+ <20260903160623.315525-3-alexandru.elisei@arm.com>
+ <atDUMAe0QGP_4swk@gremlin>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,89 +65,135 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261001135711.1640520-1-fuad.tabba@linux.dev>
- <20261001135711.1640520-10-fuad.tabba@linux.dev> <5fa8a1fb-4e2c-4746-8a70-a47f387ef0d6@arm.com>
-In-Reply-To: <5fa8a1fb-4e2c-4746-8a70-a47f387ef0d6@arm.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Wed, 11 Nov 2026 16:45:27 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTyCcGPMte9=HuqyvCS7CCCt80Lc_JQuA+1e3ZE+3A0zqQ@mail.gmail.com>
-X-Gm-Features: AclHuK_8e85qNvEPUChw2hXq-xwQhB1Rl-UgkdF_cZM8i8KqhVquzOK3Y1yl4BA
-Message-ID: <CA+EHjTyCcGPMte9=HuqyvCS7CCCt80Lc_JQuA+1e3ZE+3A0zqQ@mail.gmail.com>
-Subject: Re: [PATCH v4 09/18] KVM: arm64: Implement HVC handling for protected
- guests at EL2
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, 
-	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	mark.rutland@arm.com, steven.price@arm.com, vdonnefort@google.com, 
-	qperret@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <atDUMAe0QGP_4swk@gremlin>
 
-Hi Ryan,
+Hi Lorenzo,
 
-On Wed, 11 Nov 2026 13:59:17 +0000, Ryan Roberts <ryan.roberts@arm.com> wrote:
-[...]
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-[...]
-> > @@ -2622,6 +2622,10 @@ static void kvm_hyp_init_symbols(void)
-> >          kvm_nvhe_sym(__icache_flags) = __icache_flags;
-> >          kvm_nvhe_sym(kvm_arm_vmid_bits) = kvm_arm_vmid_bits;
+On Thu, Oct 15, 2026 at 02:52:32PM +0100, Lorenzo Stoakes (ARM) wrote:
+> On Thu, Sep 03, 2026 at 05:05:57PM +0100, Alexandru Elisei wrote:
+> > KVM will make use of the different values for MDCR_EL2.E2PB, document them.
+> 
+> As with 1/28, using [0] to check the definition of the register.
+> 
 > >
-> > +        kvm_nvhe_sym(spectre_v2_state) = arm64_get_spectre_v2_state();
-> > +        kvm_nvhe_sym(spectre_v4_state) = arm64_get_spectre_v4_state();
-> > +        kvm_nvhe_sym(spectre_bhb_state) = arm64_get_spectre_bhb_state();
->
-> Is it really correct to snapshot this state then use it at runtime assuming its
-> still accurate? See below...
+> > Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> 
+> Looks correct, a couple small nits below, with those addressed:
+> 
+> Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+> 
+> > ---
+> >  arch/arm64/tools/sysreg | 7 ++++++-
+> >  1 file changed, 6 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> > index a11a968eb707..4485736a4f49 100644
+> > --- a/arch/arm64/tools/sysreg
+> > +++ b/arch/arm64/tools/sysreg
+> > @@ -4045,7 +4045,12 @@ Field	17	HPMD
+> >  Res0	16
+> >  Field	15	EnSPM
+> >  Field	14	TPMS
+> > -Field	13:12	E2PB
+> > +UnsignedEnum	13:12 E2PB
+> 
+> MEGA NIT: Shouldn't there be a tab rather than a space after '13:12'? :)
 
-These can't change after this point: update_mitigation_state() doesn't
-update a state once system_capabilities_finalized() is true, and
-kvm_arm_init() runs after that.
+Fixed.
 
-[...]
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-[...]
-> > @@ -1181,8 +1187,70 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
-[...]
-> > +        case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
-> > +                /* The workaround calls themselves are handled on hyp entry. */
-> > +                val[0] = SMCCC_RET_NOT_SUPPORTED;
-[...]
-> > +                case ARM_SMCCC_ARCH_WORKAROUND_2:
-> > +                        switch (spectre_v4_state) {
-> > +                        case SPECTRE_VULNERABLE:
-> > +                                break;
-> > +                        case SPECTRE_MITIGATED:
-> > +                                /* With SSBS advertised the guest's default is safe. */
-> > +                                if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, SSBS, IMP))
-> > +                                        break;
->
-> For this case (and the break immediately above) you return val[0] =
-> SMCCC_RET_INVALID_PARAMETER (from init at top of this function). But the
-> kernel's kvm_smccc_call_handler() returns val[0] = SMCCC_RET_NOT_SUPPORTED in
-> these cases (which seems more likely to be correct). Does this violate the ABI?
+> 
+> > +	0b00	EL2
+> 
+> So broadly - this means EL2 owns the profiling buffer right?
 
-Both return NOT_SUPPORTED. val[0] is set to it at the top of the
-ARM_SMCCC_ARCH_FEATURES_FUNC_ID case.
+Yes.
 
->
-> > +                                fallthrough;
-> > +                        case SPECTRE_UNAFFECTED:
-> > +                                val[0] = SMCCC_RET_NOT_REQUIRED;
->
-> Is it possible that the (compromised) kernel could have disabled the mitigation
-> after the state snapshot was taken? I.e. spectre_v4_state == SPECTRE_MITIGATED
-> and the VM doesn't advertise SSBS so it returns SMCCC_RET_NOT_REQUIRED here. But
-> the kernel has since turned off the mitigation?
+> 
+> This seems to align with the document (which is very verbose, obviously :):
+> 
+> "If EL2 is implemented and enabled in the Profiling Buffer owning Security
+> state, then the Profiling Buffer owning Exception level is EL2. Otherwise,
+> the Profiling Buffer owning Exception level is EL1 and, Profiling is
+> prohibited at EL2."
+> 
+> "If EL2 is implemented and enabled in the current Security state, then
+> accesses to Profiling Buffer System registers at EL1 are trapped to EL2,
+> unless the access generates a higher priority exception."
+> 
+> > +	0b01	RESERVED
+> 
+> NIT: Hmm, it seems to be the convention to just omit entries that are
+> missing from the definition in the docs? So is this needed?
 
-Yes, where the mitigation is the firmware one. The host can disable it
-with an ARM_SMCCC_ARCH_WORKAROUND_2 call, which EL2 forwards, and EL2
-doesn't enable it again before running the guest. With TF-A that's
-only on a Cortex-A76 without SSBS, the only CPU it implements the
-dynamic workaround for.
+Removed.
 
-I'll send out a fix. Thanks for spotting this!
+> 
+> I see a couple named ones, e.g. in CTR_EL0.L1Ip:
+> 
+> 	# This was named as VPIPT in the ARM but now documented as reserved
+> 	0b00	RESERVED_VPIPT
+> 	# This is named as AIVIVT in the ARM but documented as reserved
+> 	0b01	RESERVED_AIVIVT
+> 
+> Which have comments explaining why, i.e. they were defined before but are
+> now reserved.
+> 
+> > +	0b10	EL1_TRAP
+> 
+> Again my understanding - EL1 owns the profiling buffer, but EL1 sysreg
+> accesses trap to EL2?
 
-Cheers,
-/fuad
+Yes.
+
+> 
+> Seems to align with docs:
+> 
+> "Profiling Buffer owning Exception level is EL1. Profiling is prohibited at
+> EL2."
+> 
+> "If EL2 is implemented and enabled in the current Security state, then
+> accesses to Profiling Buffer System registers at EL1 are trapped to EL2,
+> unless the access generates a higher priority exception."
+> 
+> > +	0b11	EL1
+> 
+> And finally - EL1, traps to EL1 too right?
+
+Profiling buffer owning exception level is EL1, accesses to the profiling buffer
+registers made at EL1 are not trapped.
+
+For the exact trapping priority and possible trap configurations, you can have a
+look at the pseudocode for accessing one of the profiling buffer system
+registers (PMBSR_EL1, PMPTR_EL1 or PMBLIMITR_EL1).
+
+> 
+> Again seems to align with docs:
+> 
+> "Profiling Buffer owning Exception level is EL1. Profiling is prohibited at
+> EL2."
+> 
+> "Accesses to Profiling Buffer System registers at EL1 are not trapped by
+> this mechanism."
+> 
+> > +EndEnum
+> >  Field	11	TDRA
+> >  Field	10	TDOSA
+> >  Field	9	TDA
+> > --
+> > 2.43.0
+> >
+> >
+> 
+> All LGTM!
+
+Thanks,
+Alex
+
+> 
+> --
+> Cheers, Lorenzo
+> 
+> [0]:https://support.arm.com/documentation/ddi0601/2026-09/AArch64-Registers/MDCR-EL2--Monitor-Debug-Configuration-Register--EL2-?lang=en
