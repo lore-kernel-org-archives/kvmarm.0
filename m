@@ -1,90 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794394931;
-	b=4IwF2tfWj2Y1EeUhFZ/e0n5BZpHJ92c7XNZNkQp5dEhJUj/w6vJw5RaRJzHPiGbKlwBo
-	 b/+6pwqRGAx5v4SvaY45rT+7JkviRAeVl6xs3Ka5uR497ltEGxlTqjoywXSvxLus17pOv
-	 6jjOGBd7si0r91IKXymYQuMXcq97IBuZirY9I0XmsksqK0JK2ZCETtD7bSkeFpjpBtgUb
-	 lJvMRCHE+8KjhJeyewImrxL40612rYVev3zmn5s4Wzi7RqmtKqjsHL7PDEI1zOx8vmSJv
-	 njUaCJ7YvW+vZC/jMsOAuMLSu09fk0dc9gGw4vEvXkmPuSvxAshcwjXYb2kqZX/ZiDw==
+	t=1794395487;
+	b=xzJ5zgvwFpCDKQZVPcie3bRr7pMye8nDdJg5Whm8TcFjg28gX/aNInf8/cG8GOAo5f9h
+	 UhcpM6miW03jABQ5CUB7eks0/fn48JT9IKLOmH2HShtu+Gmjd/zmvIEPGTnDdXn1kzQsK
+	 5XeFBnXUvLQn/C+j63qutZAK/QKQeZvNeJXz/bPEwuVgqA0UMIcEKgFtm3MTpD2thCj7L
+	 nj93u5+nhHL8wUTqNxMds3jDYxO5BbpU/3xFeGIZDBQfoq8Ef3iLsjO7bW5n2Whodlj2q
+	 ZoHL1St3bG1kdrjf4RnPeHnBf/c1Ah1JfK7n2idxSQxe+txEeUbnK6JzXCXPIu4v3zw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794394931;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794395487;
 	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:MIME-Version:Content-Type:Content-Disposition:
-	 X-Mailer;
-	bh=vx06wP7sOtawrWt780eGmmqhNLqmiCDx1ykk7VKYMck=;
-	b=xQd5kBVOfnnxauPg3Hjv/fGuR3V0zx3yk842RlCzQa/U4i8EN3eN2c3Zdsz/TnltW5jO
-	 a5NpMqttdypJBlpVOl9ipR54LCnuluS8h5pgkm9kH2DQZ9BnAI1HYYuIv3Nb1D7C/M8RA
-	 lT5AYhPAodHMCcp8+sAR/yQKWxXYuhQdp/jVHqTzvu6uRM21Wb4ysogvlSak0Zro1scSW
-	 WItg+puEA/hMQfjmixBbcmMreBQOyXGGScUqyO2VVnC0ZWM5pUz603ShK4UjOTFnJnpTd
-	 buV9NVqkc66tVl0drET8LTrHWXtbBz+S+Vw8rAumsRmriOWBjCt8AhLRPSEPPoLMmUA==
+	 Subject:Message-ID:MIME-Version:Content-Type:Content-Disposition;
+	bh=ml3p/AxADI1kPwVB1ta2/1LkU6QgLRbPMaZJLAyCaWY=;
+	b=CJi0tC1p1cDwm+DAzABknc7/C1mw8YBf89bmFVEM3Ln8In/e+/DNzg5A5/g3XsrHtnzw
+	 cKUO36qOEQa2iUA/0d8FhWquqyyGngtL3J0FYaeyhwe7AWwk62W5aTB7bTB9R6K6ysdnx
+	 Z7BprG5V/1Dp/DZLQW93MT2qOq+QxxHkZvaSYICtzmN/2A33IFFVkQ3RwL4DIWILm+ilB
+	 ktiNLaJOYUNSiu0QWhd9Vh9T8XiuzX8z6iMI3fmctZg4qI7+4h7ZfoNYZpZf196vlVWAl
+	 TcwlWe/zIIGeT26r1LVrm4lje9F1dpiDlQN+f5iqeCuiR+UwU2lyf2vcoXXS/A+SNRA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=cryspen.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	arc=none smtp.remote-ip=209.85.128.43
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	arc=none smtp.remote-ip=209.85.128.46
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3107606A31C
-	for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 11:02:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F3107606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2F4606A32E
+	for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 11:11:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0F2F4606A32E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cryspen.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4a59100fa83so26556615e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 03:02:10 -0800 (PST)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4a3517554f7so32090445e9.2
+        for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 03:11:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794394929; x=1794999729;
+        d=1e100.net; s=20260707; t=1794395485; x=1795000285;
         h=content-disposition:content-type:mime-version:message-id:subject:cc
          :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=vx06wP7sOtawrWt780eGmmqhNLqmiCDx1ykk7VKYMck=;
-        b=BLBgZPVPDxHcRNLkVdx503JEnOQr1TYlglHCGtyEUZaxCNZwl7qs3p4mnjdp07Bjsc
-         Qcm+pEM2KYmrScy8SrlamwvY3crOlha3/+yEig/K+/EQdBiTmAveOdWS1dg12j+8/Qap
-         qxot6r2eJ371j6z+O3m7qUlHY4nW3dLvbutUhM99EwS3vllSdmTY/Qdd8ApNNUUwbjGr
-         RzDW9jiIjiiqvDL3LBMMxYtvikoWrWhaqXu647Oq1qBNSfXPU1qdE817LkahpmuS3lax
-         i5fo+EqNCfAH6gyWvf1P4AX3qHLHzo14vegENmWiEoo0jQx7Aukq92R+lDarkBRXMN/Z
-         3FvA==
-X-Forwarded-Encrypted: i=1; AL+hErFx3PEbOgOcY/0yr6vo5yh0hqhbphpcW6PVp5tnHX7Z82dIBpSYhrwMeHwh/fVOCQQYTQYmeRs=@lists.linux.dev
-X-Gm-Message-State: APuU4Z++A52goEU60UqCkS7AoF14WxSQMiononuGX5kGcPCDIxUm2RIu
-	6Ku1Ud+ujH2hAw5JqVCp3bRKwowelubDdgTumkADiZbwB5uT5Q4g5lvK
-X-Gm-Gg: AYBFou3SSAEKMy29pWh5SrCb1iPeeLgCIM7OsxiZLEflsNdbisRq1HTNONjj4Ooo7uV
-	6pmLw72kNOjEQMaFyOVpBB9o8w9oEVKDGVydb1RpCDQKz66jYshp8aaHoX5Ct81hj5d4HO30OW6
-	7cypUxktXB6Og6hC9t8+SXrf5HuNb4c0O1Y7vi87BwUivWFcZUnS2/sXTSdEFz03QqwJsTFo559
-	hLnnHIniEjQ2pBYIBG8JvSaHYW+h8svyqzpaafLKip2R2FrR5C+SoTw2udK0aYI+xvjmMhooCwh
-	gpNbltyJkpk6Ree+9RN6Xw1N26rjVgRsgkI8fTtki/fWtZfZOUhKniCLsvkmwx2UBOb1eJA3wEF
-	XR9s+WTCJWClUEmw/HsLQmS9zxO1UT0Kxwj94W34NB+hQpBfHeJHAQE7zENzqqoG5fw21l6PkWJ
-	ja0zlczUlZlVtz1OOf5LKaWy7ivhu7naWsi9HR7OPqpZIbu/XFEuhr0eLCGjypKvKZB9ptUliXN
-	Tgd4xpMgzUGIrjRgPosKMc21ZX01qXbWlCYCjaoS+/OpPb6QhcyL5voxp8QJLsdL1vAZMd4Uh8Q
-	KIqo77Ypad4zfTDnHR2TnaALKNtEn2qK5bgJVhb01waOZCGNmyJoShunIrPOqCf3X09NzoQlrA4
-	u77uXpcf4emC2jOIDMhH/NLt3HovlIQmGzhVNsfeB02Xi9MZh9XOUNzu63Vjiog9EFyZ4YR6vIp
-	Dv7X7rzN17dg==
-X-Received: by 2002:a05:600c:a00d:b0:4a1:fa27:df7c with SMTP id 5b1f17b1804b1-4ba093acadfmr38447905e9.34.1794394929145;
-        Wed, 11 Nov 2026 03:02:09 -0800 (PST)
+        bh=ml3p/AxADI1kPwVB1ta2/1LkU6QgLRbPMaZJLAyCaWY=;
+        b=gcF9HVRIRTirJcvbg1JdX/yg568lfo1YPGP/2EDWvHxt1/1tjN9iHhXzugPCwDQn9i
+         DvAAqPGDfJC379pzMFMA0FtlpzUqfdK1InUW0sKKjm8bbwvWKlmWBb1Skapf/HYnAY5w
+         zmuShdqdb94EZPdOZUxOo44rNqk+DRpJ+IN7jcu88gEqtm6aPbSs5iRMem17o+Bobxgn
+         4t6NVIz2Z+qjJu0dsE7qU2bUhACzVoziKosdcWSFojJ8jjGSwtvk38ozZIFH2+cOeEs3
+         VWra3NDakkSTp7jiUi5yVGEIxG7HyhZcDmrnMhmeaU1K93f5la80+Gsawm9TUkbaVMEX
+         8qXw==
+X-Forwarded-Encrypted: i=1; AL+hErHHkG5Mrzmfn8zS3eJMlk/wWZXTwb+NQrYM868jf8IkgOurN8e1fhARYcDMei7KoPQamjshQYo=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+krkrh8jH+nGz+7aQph6pIiQqAMb96y6nUrG5S5R2bqbxwpfv9
+	IQF+EDL+jFrQSDw9PxtIyuWbtXbF1vnNEIENSmMedO3Tw6hfnfLzjOSK
+X-Gm-Gg: AYBFou0rOnqo+q0iWNw4YZCyOGP6+96bEpPrf9M3RTosEOtqDOgJrnlDEvDZzLPjRHx
+	M3gYexWTOXH7E3XgF2m9KgnxgzUsPV8AHlYIvSBcBiomoqCCXj8ozWhT73SUbIHSnIz4w3gtzRQ
+	Ubh7owfvJ+e7F6yi7/sAjpGbtDQ7dEotcwwjwhsQ6N3MXW/ac35sD5KCNHc1mUSYAmYvp7XLAbh
+	6LaclS0ybAaTn95lI26jDageizcah2Sewiz1UJvPQcly27ZpV5zlEUcFhIQRyhWkDsqccg4mSZO
+	RycgyMjrO+vy7HDqDTZ+c0J/9Nh/60LBMYzVM+CRmL4Ducq3zm22vkn4FPfwa53NTzR59ev07o0
+	iBkqt2g8+suYMAy4J9qddPH33kEzefntIG2JM0N39BiPyhV4WJEzoZjvoASDMPHt3GC1O0QI3FY
+	L5DHNnf/nOyH7vaHxsPu/2OAsNXOqrP+vrjw70jakwg2ZwHDzm47zyTSxrQjm77nXXV7CKk8erC
+	OA5Z2qllHSV2Rwg4dbPrM/VhpcrXKpJ0Wo5h3CPCm2ADFRxZZgJag+OGVjs2SB+I6z8baBlAo4N
+	dSxYQRmkjIf2UfNdde57Jv/4vqBmw9beVTeOPvSFkEARMONumxUGGmMmxAwzL/5ig3hW8P+Rlcn
+	EFciO3ew95hUf3nLJIexWQ/kqgfw/R5h1Pg7bHZOqFPQUNj6XVXvpgV/yiZ0EoAoe
+X-Received: by 2002:a05:600c:a0c:b0:4b8:4af2:88b3 with SMTP id 5b1f17b1804b1-4ba0938b7f3mr40085265e9.22.1794395485364;
+        Wed, 11 Nov 2026 03:11:25 -0800 (PST)
 Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4ba08ddbe68sm85849165e9.0.2026.11.11.03.02.07
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4ba02043149sm125436565e9.8.2026.11.11.03.11.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Nov 2026 03:02:08 -0800 (PST)
-Date: Wed, 11 Nov 2026 14:02:04 +0300
+        Wed, 11 Nov 2026 03:11:23 -0800 (PST)
+Date: Wed, 11 Nov 2026 14:11:19 +0300
 From: Dan Carpenter <dan@cryspen.com>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+To: Oliver Upton <oupton@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Timothy Hayes <timothy.hayes@arm.com>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Christoffer Dall <cdall@linaro.org>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org, Karthik Bhargavan <karthik@pereq.eu>,
 	=?iso-8859-1?Q?Cl=E9ment?= Blaudeau <clement@cryspen.com>
-Subject: [PATCH v2] KVM: arm64: vgic: Don't truncate offsets in
- vgic_find_mmio_region()
-Message-ID: <avRLLMOiudnKoSlk@stanley.mountain>
+Subject: [PATCH] KVM: arm64: nv: Initialize hw_mmu to NULL for nested vCPUs
+Message-ID: <d3571fb535e1832d2a067649f294b83d824d4350.1794395321.git.dan@cryspen.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -96,85 +89,50 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
 
-In vgic_its_has_attr_regs() and vgic_its_attr_regs_access() we take a
-u64 "offset" from the user and pass it to vgic_find_mmio_region() to
-find the correct region.  The problem is that vgic_find_mmio_region()
-truncates the "offset" to 32 bits so we might find a region even
-though really we shouldn't.
+Before commit 6ded46b5a4fd ("KVM: arm64: nv: Keep reference on stage-2
+MMU when scheduled out"), kvm_vcpu_load_hw_mmu() would set ->hw_mmu on
+every load.  Now it only sets it when it is set to NULL.
 
-Later the untruncated offset is used to calculate "addr".
+In kvm_vcpu_init_nested() the vcpu->arch.hw_mmu points to &kvm->arch.mmu
+from when it was set in kvm_arch_vcpu_create().
 
-	addr = its->vgic_its_base + offset;
+Normally what happens next is a two step process.  KVM_ARM_VCPU_INIT
+calls kvm_reset_vcpu_core() and that sets the vcpu into hyp context
+(vEL2).  Then KVM_RUN calls kvm_vcpu_load_hw_mmu() which doesn't do
+anything.  But that is fine because we are in hyp context and the
+->hw_mmu already is pointing to the correct place.
 
-For example, an offset of 0x100000084 finds the 64-bit GITS_CBASER
-register at 0x80, and the write reaches update_64bit_reg() with an
-offset of 4 into the register and a length of 8.  It exhibits as a
-UBSAN warning.
+However if, for example, we are restoring a vcpu that was saved in L2
+context, then the VMM uses KVM_SET_ONE_REG to overwrite the vEL2 state
+that kvm_reset_vcpu_core() set up, and the vCPU is in L2 context when
+KVM_RUN loads it for the first time.  Ideally, kvm_vcpu_load_hw_mmu()
+would set the hw_mm to point to L2's page tables but, since is non-NULL,
+it leaves it as is.  At this point L2 can access L1's memory.
 
-[  183.796046] UBSAN: shift-out-of-bounds in arch/arm64/kvm/vgic/vgic-mmio-v3.c:35:10
-[  183.796198] shift exponent 18446744073709551584 is too large for 64-bit type 'long long unsigned int'
+Fix this bug but setting ->hw_mmu to NULL in kvm_vcpu_init_nested() so
+that kvm_vcpu_load_hw_mmu() always sets it correctly on the first load.
 
-The GICv5 IRS code has the same problem in vgic_v5_has_attr_regs() and
-vgic_v5_irs_attr_regs_access().
-
-Make vgic_find_mmio_region() and match_region() take the offset as a
-u64, so an offset of 2^32 or more no longer matches any region.  The
-other callers only pass offsets which fit in 32 bits so they are not
-affected.
-
-Fortunately the effect of this bug is very minor.  The worst case is that
-the VMM accesses an emulated register and sets something nonsensical
-and users are already allowed to do that without the bug.
-
-Fixes: 8331c23c28e8 ("KVM: arm64: vgic-its: Implement vgic_its_has_attr_regs and attr_regs_access")
-Fixes: 71091136d145 ("KVM: arm64: gic-v5: Handle userspace accesses to IRS MMIO region")
+Fixes: 6ded46b5a4fd ("KVM: arm64: nv: Keep reference on stage-2 MMU when scheduled out")
+Cc: stable@vger.kernel.org
 Signed-off-by: Dan Carpenter <dan@cryspen.com>
 ---
-v2: Change vgic_find_mmio_region() to take a u64 instead of rejecting
-    large offsets in the ITS callers, as Marc suggested.  This also
-    fixes the GICv5 IRS code which my previous patch didn't.  Drop the
-    Cc: stable.
+ arch/arm64/kvm/nested.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
- arch/arm64/kvm/vgic/vgic-mmio.c | 4 ++--
- arch/arm64/kvm/vgic/vgic-mmio.h | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
-index fddb9da0403d..59bdec495cd7 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio.c
-@@ -820,7 +820,7 @@ void vgic_write_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 78fa433774c6..60bccb66e52c 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -140,6 +140,8 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+ 		kvm->arch.nested_mmus_size += S2_MMU_PER_VCPU;
+ 	}
  
- static int match_region(const void *key, const void *elt)
- {
--	const unsigned int offset = (unsigned long)key;
-+	const u64 offset = (unsigned long)key;
- 	const struct vgic_register_region *region = elt;
++	vcpu->arch.hw_mmu = NULL;
++
+ 	return 0;
+ }
  
- 	if (offset < region->reg_offset)
-@@ -834,7 +834,7 @@ static int match_region(const void *key, const void *elt)
- 
- const struct vgic_register_region *
- vgic_find_mmio_region(const struct vgic_register_region *regions,
--		      int nr_regions, unsigned int offset)
-+		      int nr_regions, u64 offset)
- {
- 	return bsearch((void *)(uintptr_t)offset, regions, nr_regions,
- 		       sizeof(regions[0]), match_region);
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio.h b/arch/arm64/kvm/vgic/vgic-mmio.h
-index 38ed730d68ac..6c3c4de6883e 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio.h
-+++ b/arch/arm64/kvm/vgic/vgic-mmio.h
-@@ -228,6 +228,6 @@ u64 vgic_sanitise_field(u64 reg, u64 field_mask, int field_shift,
- /* Find the proper register handler entry given a certain address offset */
- const struct vgic_register_region *
- vgic_find_mmio_region(const struct vgic_register_region *regions,
--		      int nr_regions, unsigned int offset);
-+		      int nr_regions, u64 offset);
- 
- #endif
 -- 
 2.53.0
 
