@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=90.155.50.34
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794436158;
-	b=OS5LZ1H1L8UuqwbUl/PyUc6rk9If6WCgES46yoTwo+0AWUXFOk4XC1tE7yVeKuxVXjtR
-	 MuV3SZrs99jFMnQ5p6cibMLU5BlH2hOeDwEmOJ5wK5jjGtho0t/BEAsA0xhwlctJyJYtJ
-	 XACjHflcwOks/yp9dfRfPbzbTQ0ivNL/u8j29UuxYOltfHCM/vtfn2L7ctDovFDbRQr+f
-	 +pV31W5bCX5Ch5DOTgURf3kRNpFgqlrrp4obge8hOqRuP7bTuuK4YjXzQGq3P4orbqgx8
-	 criNQ0Zdzrv4TlIwKRKPJnITADDth17XEdOWE+jO95zb5fEogLksgK3pHQKLaLjBE/A==
+	b=h7uMzF9wwuAidHRbVVRfwjf9WlKyix9JunmQUwfD+EqQoVKkr38LMYILKPPtKfIRfnlv
+	 jkapcOlPpYq3pXNWN8mMoK9k39hRk5y76qyKoPXfQcsDGeK1/jLx/qiniprHXqt3MdGS7
+	 ZU0OTRaJX4aUhqrtrHTf3AtzZ/ABSdPfWmkVpdeQtsV/YA8v5xszb9ecKhVXIdPQEcAPM
+	 4q0/MGSieWsJKEkLzJ2y39berWcua+Jd4/bkJ374NQtdiNKlPwP1engtlJTu2cz5+WymI
+	 f1RG1Spk5iKpgIFjunZo3iXQHwkdcEPme8E5LiRK0/CGZtl5A+Fkr7cwJM4UYCqv89w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794436158;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding:Sender:X-SRS-Rewrite;
-	bh=8rIcuP/4Kb5zS07YkanQvDf9xFXdSyL1L4TPZLIk6kE=;
-	b=KLsIZoo7xfkJrhlJnIL3fcbQ90Y9bP4JR35aphUk1oYYFYu37s68hPl3UZrGlpz+aArc
-	 gIwq6TGABbHLZakNsy1zuB+tKu2Lday5zUoAxn36woEvWKNRu1nn0PlVA6bMi1IX89AC2
-	 rNla7UxzXV0Zkt3jvyNt7++JcX8ZVjcNdAPWLgA76pynoS8jd/C9nzXWUMcDlzFazOQ73
-	 aZmd1fpw28PSi7ex09gxGBC5645yS1DH4pcivoewrOUTcbWzGrinz2ewFa2pUqeqBUzMT
-	 GbhUNZz8IWu70BwuyRDz9HsNmJ5J7EKms3CtyLfE3u2cI+2ms8oGPy4balFruD9W4xA==
+	bh=KgKBmfNow48cZ1G10epSivTTjrObHChEEXVuHDKOCn8=;
+	b=O1wM8/UjAXIxgArd1RC3kpVKCCPfBkg0+9nIAOp1jju00pyj8be1ZyFf07/2bjoA7Rb4
+	 qtPw3OdyOPQXRIdvH49lkW/ywt2k0r29JoCYrYhaGmJT9NC+bGcz0BuXuMgAV9A0+Jy4s
+	 oFZz2UEZ7+j2oOERPSCm4PeXTqqgO1ftvGLDMnIyw4lOGrrh1bosG83KAYy32ANq0+gzQ
+	 3Rvi7CnJ81qEcr2a9Pc14oLaMpkcYaOqlpnAw0N1rEphQiSoQY63KiNG96LpZriDx76PD
+	 jNV9YIhZ/w0PNL4P3VXYAJp2/dikY3LbIJsLzQlKHKNV7XKJZnIArZOF71ldOmdq/JQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=infradead.org;
 	spf=none smtp.mailfrom=casper.srs.infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=casper.20170209 header.b=Mhmpih29;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=casper.20170209 header.b=Pm4SuBXS;
 	arc=none smtp.remote-ip=90.155.50.34
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6D0606A31C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0D0606A332;
 	Wed, 11 Nov 2026 22:29:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9D6D0606A31C
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6F0D0606A332
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=casper.20170209 header.b=Mhmpih29
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=casper.20170209 header.b=Pm4SuBXS
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
 	Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=8rIcuP/4Kb5zS07YkanQvDf9xFXdSyL1L4TPZLIk6kE=; b=Mhmpih290/1F4Cy7rNJmsiv5xh
-	KTagvj0bmx+Rz/i0HPD3LG1iyTt/YmhjDLkwCJ6yHvibNng59JHqE5BtJb9aKzo/MWT+/eB4oK7PQ
-	eTna6CYO28WO6lwYglmDm/xSFfqkQZoizUi5y0Qaz9Ty61r0JMZdXBURF/cMtIJDbKjA9D9u3ODHa
-	onjj0lnNe8MSLGmSP4n4y825566WLHZTuVs1adnPZyKyiN9uFpPP6pJgcA9XKflU+jvrFpUnayZnN
-	p7k6mKovmSz+llF1OnTs1x+AEIYOdy7OnvmjDLtRjBdYbc8pE55CLndTDWfWHVu4WlK9Vz6EZ5/l6
-	hHZ6kcSg==;
+	bh=KgKBmfNow48cZ1G10epSivTTjrObHChEEXVuHDKOCn8=; b=Pm4SuBXS8SoBqJZi9NmFWsZy9L
+	x0MVQqHd1l+IslxepicxxQh2nE6uQ9N5mEoR6whjfR2AZEz0psaZYeVvZrGpompc62cXG3u+5ARTk
+	pcOkzQ+oqbY2/rACT0DRF9FDvvrAzai3SmStFzKXJNu/QPMJdWkOzaWIq/k3DtCl2jZBwvP6AN6XO
+	UbzUJXfObyZ6n4anyORINk1sg/CGhCBAhpV2N8FAlMjebExTQ6poCdOsdWybSf5ywhurcd2eOp2Xp
+	TdgU8Yc54ANXwBz9lKNifs4DgAAREosK5RNlgVCYs8BHe1r9NCJZmwK0oo0q+fcChzZ1LcYpMCF1i
+	PND7Y70A==;
 Received: from [2001:8b0:10b:1::425] (helo=i7.infradead.org)
 	by casper.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xRGoa-0000000G3o6-1sWv;
-	Wed, 11 Nov 2026 22:29:14 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.99.5 #2 (Red Hat Linux))
-	id 1xRGoa-0000000008m-15dz;
+	id 1xRGoZ-0000000G3nm-43bK;
 	Wed, 11 Nov 2026 22:29:12 +0000
+Received: from dwoodhou by i7.infradead.org with local (Exim 4.99.5 #2 (Red Hat Linux))
+	id 1xRGoZ-00000000088-35Wr;
+	Wed, 11 Nov 2026 22:29:11 +0000
 From: David Woodhouse <dwmw2@infradead.org>
 To: =?UTF-8?q?J=C3=B6rg=20R=C3=B6del?= <joro@8bytes.org>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -74,9 +74,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	Mushahid Hussain <hmushi@amazon.co.uk>,
 	Sriram Nambakam <snambakam@linux.microsoft.com>,
 	David Woodhouse <dwmw@amazon.co.uk>
-Subject: [PATCH 15/16] KVM: planes: Annotate the lockless twin-publication protocol
-Date: Wed, 11 Nov 2026 14:29:10 -0800
-Message-ID: <20261111222911.477-16-dwmw2@infradead.org>
+Subject: [PATCH 05/16] KVM: x86: Initialise Hyper-V state on every plane vCPU
+Date: Wed, 11 Nov 2026 14:29:00 -0800
+Message-ID: <20261111222911.477-6-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20261111222911.477-1-dwmw2@infradead.org>
 References: <20260608144252.351443-1-joro@8bytes.org>
@@ -96,68 +96,146 @@ X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-Plane twins are published with a plain store to common->vcpus[] plus an
-smp_wmb() that pairs with online_vcpus, not with twin initialisation,
-while vcpu_for_each_plane() reads the slots with a bare load.  x86-TSO
-hides it, but the protocol is unannotated generic code: KCSAN reports
-it, and nothing stops a reordered publication from exposing a
-half-initialised twin to a lockless iterator.
+When userspace sets a Hyper-V CPUID, kvm_set_cpuid() walks the vCPU's
+planes to allocate the per-plane kvm_vcpu_hv, but passes the plane-0
+vCPU to kvm_hv_vcpu_init() on every iteration. Non-zero plane vCPUs
+are left without hv_vcpu, which trips the
+WARN_ON_ONCE(vcpu->arch.hyperv_enabled) in kvm_hv_set_cpuid() and
+leaves their vp_index and SynIC state uninitialised until a lazy init
+path happens to run. Pass the plane vCPU being iterated.
 
-Publish the slot with smp_store_release(), read it with READ_ONCE() in
-vcpu_for_each_plane(), and document the pairing at the iterator. The
-lockless readers here are vcpu_for_each_plane() callers that walk other
-vCPUs' twins, such as the APICv BLOCKIRQ recompute; the kick paths read
-common->current_vcpu instead, and the Hyper-V twin lookups that also
-pair with the release come later, with the VSM code.
+A twin created *after* KVM_SET_CPUID never passes through
+kvm_set_cpuid() at all, but shares a CPUID that already advertises
+Hyper-V. Allocate its context in kvm_arch_vcpu_create(), so that
+-ENOMEM fails KVM_CREATE_VCPU on the plane fd rather than leaving one
+twin silently without Hyper-V.
 
-No functional change on x86.
+That allocation runs before the twin's vcpu->vcpu_idx is assigned, so
+kvm_hv_vcpu_init() takes the default VP index from the common, which
+already holds it. With vcpu->vcpu_idx the twin would latch 0xFFFFFFFF,
+and a host write of the real index to HV_X64_MSR_VP_INDEX would then
+decrement num_mismatched_vp_indexes for a mismatch that was never
+counted. (Assigning vcpu->vcpu_idx earlier instead would defeat the
+"vcpu_idx < 0 means unreachable" test that to_hv_vcpu()'s lockdep
+assertion falls back on during creation.)
 
+Also admit KVM_ENABLE_CAP on plane vCPU fds, so userspace can enable
+per-vCPU capabilities such as KVM_CAP_HYPERV_SYNIC2 on a plane vCPU
+before it first runs.
+
+Fixes the Hyper-V initialisation of plane vCPUs in "kvm: x86: Update
+state for all plane VCPUs after CPUID update" and "KVM: Implement
+KVM_CREATE_VCPU ioctl for planes".
+
+Fixes: https://lore.kernel.org/all/20260608144252.351443-46-joro@8bytes.org/
+Fixes: https://lore.kernel.org/all/20260608144252.351443-34-joro@8bytes.org/
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- include/linux/kvm_host.h | 7 ++++++-
- virt/kvm/kvm_main.c      | 9 ++++++++-
- 2 files changed, 14 insertions(+), 2 deletions(-)
+ arch/x86/kvm/cpuid.c  |  4 ++--
+ arch/x86/kvm/cpuid.h  |  1 +
+ arch/x86/kvm/hyperv.c |  7 ++++++-
+ arch/x86/kvm/x86.c    | 20 +++++++++++++++++++-
+ 4 files changed, 28 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 1f47b3bfa4bb..6922e3063ad8 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -393,9 +393,14 @@ struct kvm_vcpu_common {
- 	struct kvm_vcpu_arch_common arch;
- };
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 7a32f658238a..54bcfedc5226 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -326,7 +326,7 @@ static void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
+ 						 vcpu->arch.ia32_xss, true);
+ }
  
-+/*
-+ * The slot read pairs with the smp_store_release() publication in
-+ * kvm_vcpu_finish_common() for iterators running outside the locks that
-+ * serialise twin creation.
-+ */
- #define vcpu_for_each_plane(common, i, v)			\
- 	for ((i) = 0; (i) < KVM_MAX_PLANES; ++(i))		\
--		if (((v) = common->vcpus[(i)]) != NULL)
-+		if (((v) = READ_ONCE(common->vcpus[(i)])) != NULL)
- 
- /* Tracked per plane-VCPU - used for deciding which plane-vcpu to run */
- enum kvm_vcpu_state {
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index b6bdbe5c5133..7f215822e48e 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -548,7 +548,14 @@ static int kvm_vcpu_init_common(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned
- static void kvm_vcpu_finish_common(struct kvm_vcpu *vcpu)
+-static bool kvm_cpuid_has_hyperv(struct kvm_vcpu *vcpu)
++bool kvm_cpuid_has_hyperv(struct kvm_vcpu *vcpu)
  {
- 	WARN_ON(vcpu->common->vcpus[vcpu->plane_level] != NULL);
--	vcpu->common->vcpus[vcpu->plane_level] = vcpu;
+ #ifdef CONFIG_KVM_HYPERV
+ 	struct kvm_cpuid_entry2 *entry;
+@@ -553,7 +553,7 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
+ #ifdef CONFIG_KVM_HYPERV
+ 	if (kvm_cpuid_has_hyperv(vcpu)) {
+ 		vcpu_for_each_plane(common, i, v) {
+-			r = kvm_hv_vcpu_init(vcpu);
++			r = kvm_hv_vcpu_init(v);
+ 			if (r)
+ 				goto err;
+ 		}
+diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+index 2abfab4b1c33..02dbd02c8f80 100644
+--- a/arch/x86/kvm/cpuid.h
++++ b/arch/x86/kvm/cpuid.h
+@@ -21,6 +21,7 @@ static inline void kvm_finalize_cpu_caps(void)
+ }
+ 
+ void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu);
++bool kvm_cpuid_has_hyperv(struct kvm_vcpu *vcpu);
+ struct kvm_cpuid_entry2 *kvm_find_cpuid_entry2(struct kvm_cpuid_entry2 *entries,
+ 					       int nent, u32 function, u64 index);
+ /*
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 1855b7e13e82..0b7440d09d49 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -997,7 +997,12 @@ int kvm_hv_vcpu_init(struct kvm_vcpu *vcpu)
+ 	for (i = 0; i < ARRAY_SIZE(hv_vcpu->stimer); i++)
+ 		stimer_init(&hv_vcpu->stimer[i], i);
+ 
+-	hv_vcpu->vp_index = vcpu->vcpu_idx;
 +	/*
-+	 * Publish with release semantics so that vcpu_for_each_plane()
-+	 * callers running outside the locks that serialise twin creation
-+	 * (such as the APICv BLOCKIRQ recompute, which walks every vCPU's
-+	 * twins) observe a fully initialised vCPU through their READ_ONCE()
-+	 * of the slot; the plain store relied on x86-TSO.
++	 * A plane twin is initialised here from kvm_arch_vcpu_create(),
++	 * before vcpu->vcpu_idx is assigned; the index it is about to
++	 * get is already in the shared common.
 +	 */
-+	smp_store_release(&vcpu->common->vcpus[vcpu->plane_level], vcpu);
- 	smp_wmb();
- 	if (vcpu->plane_level == 0) {
- 		/*
++	hv_vcpu->vp_index = vcpu->common->vcpu_idx;
+ 
+ 	for (i = 0; i < HV_NR_TLB_FLUSH_FIFOS; i++) {
+ 		INIT_KFIFO(hv_vcpu->tlb_flush_fifo[i].entries);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 2e38eaa0b7df..25f574bfbb32 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3467,6 +3467,7 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+ bool kvm_arch_is_vcpu_plane_ioctl(unsigned ioctl)
+ {
+ 	switch (ioctl) {
++	case KVM_ENABLE_CAP:
+ 	case KVM_GET_DEBUGREGS:
+ 	case KVM_SET_DEBUGREGS:
+ 	case KVM_GET_LAPIC:
+@@ -9635,9 +9636,24 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.hv_root_tdp = INVALID_PAGE;
+ #endif
+ 
++	/*
++	 * A plane twin created after KVM_SET_CPUID shares CPUID that may
++	 * already advertise Hyper-V.  Allocate the Hyper-V context now so
++	 * a failure fails the creation; left to kvm_vcpu_after_set_cpuid()
++	 * below, an -ENOMEM silently downgrades just this twin to no
++	 * Hyper-V (its MSRs fail) while the shared CPUID still advertises
++	 * the Hyper-V signature, and nothing short of another full
++	 * KVM_SET_CPUID repairs it.
++	 */
++	if (kvm_cpuid_has_hyperv(vcpu)) {
++		r = kvm_hv_vcpu_init(vcpu);
++		if (r)
++			goto free_guest_fpu;
++	}
++
+ 	r = kvm_x86_call(vcpu_create)(vcpu);
+ 	if (r)
+-		goto free_guest_fpu;
++		goto free_hv;
+ 
+ 	kvm_xen_init_vcpu(vcpu);
+ 	vcpu_load(vcpu);
+@@ -9648,6 +9664,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 	vcpu_put(vcpu);
+ 	return 0;
+ 
++free_hv:
++	kvm_hv_vcpu_uninit(vcpu);
+ free_guest_fpu:
+ 	fpu_free_guest_fpstate(&vcpu->arch.guest_fpu);
+ free_emulate_ctxt:
 -- 
 2.50.1
 
