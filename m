@@ -1,108 +1,115 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.181
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794504566;
-	b=fndHHzNbmKwUwmsz5kR/BT3i5fNR6oo5Igm5T82gIG92czWy30U9UsqEhiUxdVfZ+YBk
-	 9byAc8D4Q4JlzNVwcVRNHkpifXbKSFRbVo0o8Lb1e2uXMCrIiEQ3QfUdPfolHPkPVcpuW
-	 5hPmT3KNmsTutNTRB6u4v0D4tyrS/aFQslHT5QWkRapaPsSzEZ2HPBcVPjHWIPsJ7ovQ9
-	 cy4CirvmCHborQH2cPldwviCM1a2XWvFRPwqaF7jzelyM+wPL1FEnLwn32nehu0G4J85O
-	 FkyGk9RYaErI9lvCnGoEbvBXGFGneppB+BeE93Fa9rQtC/fgXmLb0s/lajHnngwdYAQ==
+	t=1794506867;
+	b=FJewTJQtKbaZm8DtIYHshwsHDAu5tkXaS1a2IXJ0tU8exNLmLQplJlLHZF0q33l0Pz+1
+	 CQA9P9BQYCgbjP2D5GyhqjsTxIfDEx32w61vv9anq8+cbsOL0JNFqL8ZLuVxSyT8xzdyh
+	 In/3RE1BQtYhktAi68sZIzCs87b6VTP6Xg8eyDSmR+oU5fg4o+I41FmhmYSW3k/mnVnuN
+	 dsfRMj6eOJU6wpBnmyZyPrnA44l3Wj9dNMun/HGK5s4Wo5x+Bk5HMANtwuUHaEZwu683P
+	 mBEpYEOSLmLMW1nykN2Ho5hJWQlYMQsvgJyPac3JG3qnEOyW++0GTVOEhjOptiF/S8w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794504566;
-	h=Received:DKIM-Signature:X-Mailer:From:To:Cc:Subject:In-Reply-To:
-	 References:Date:Message-ID:MIME-Version:Content-Type;
-	bh=MZA4OFzaj3eAw5VAprKw61yeVsB5hZt4za95D/BJANg=;
-	b=ayNdVWMEji88uNh1BZMc+pvaN3lP1N2dpsfeyCAR2VmzkGIHKyl4O6fMKtanmRcyrCG/
-	 wbkYKOw07Oeyexope2L2MTJXoaVhSWTV7cukNnnDfLbUoLwIHKrNTRUgJXMnj93iNlq//
-	 e8VKMiqWlzyVk7MdAwdxrmnlmdfmLlsBeavbOAjnG/OtiDRk0gvYDk1VSFg4xCuY/El37
-	 woJkvUYU76m8HCi8DDfT1ONAD+Ga1GTL62rJVzDCI8LXNjXa5L1Ij1CT5gCrxeZ3iM9AX
-	 Q/5Jgx8kEMr7ab8/alW5rS4copPG30xePhnaXOfFAyxIr1LX/b0urkxGJ9+iO5heOHQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794506867;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding;
+	bh=k1iKJ3ce6I7V1KzAt6ijmlB03GjSeH93EgIWrRWokzQ=;
+	b=mWtZB9zziT26OA17lRRS3K2Mr9FXispALinnURUpCWrRmbouh825heiXoLIMBnK+qzDE
+	 ujnnRYrFYC42+6Yj8ZNAJKmrPLD605Bw7QuasjJ1XzIholRe+YtUjg9mAw/rs2PujfIlO
+	 KdZteVOcrCbLrkuu7JDoaBPQpIOBVzjYe4P8xEk/pC5Ilxd9aI3g9qiE6ubpIb/qylul0
+	 pBtjF2+vJjqXsJqU7DzxlMXBelrdMrFtdKokpq+fXNJorHLhwmJCM/B2vhH7y13IYAeOh
+	 LpvDxrZLmRmHirkvTApSV09PYoy9nfG1jg084ynscb56dMn+PxTxe8c/oJkx0Xi3tlw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=c7hFlUdc;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=sGBkcbTB;
+	arc=none smtp.remote-ip=209.85.215.181
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F1AD606A31C;
-	Thu, 12 Nov 2026 17:29:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 407FB606A33A
+	for <kvmarm@lists.linux.dev>; Thu, 12 Nov 2026 18:07:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 407FB606A33A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=c7hFlUdc
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32E7C1F000C5;
-	Thu, 12 Nov 2026 17:29:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794504566;
-	bh=MZA4OFzaj3eAw5VAprKw61yeVsB5hZt4za95D/BJANg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=c7hFlUdcGfKUf+hHVn2/yVYHZsVNy6kfPE9IT9ZZGeEfrLU6+boZ5EJZbTZl9T9mo
-	 MCgGah8anRUItmb4sYVgmSk5rGvcx9VOQ86EmE1pfcU+EzCnvoBLsTN4s2GpirY/kz
-	 lN9JMius9t6KWIr0b7xKmPe+Orr9jv7u/fmFzEjOLcKWdyYfBSjNpOsRW/V0mvGfp6
-	 nBa/rauB0XQa/hN1YRkkOqxxLYAjIDGAwIgaxpQgRUI26AkfHCpWK36TgGbKiBenCj
-	 razHIez4XGUaB9aXoddjLBMZb/axa9YTmSIPOfBOic7cVEupqmywbNSVj1U1naK1qI
-	 LULqu7VG4wSag==
-X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Baoquan He <baoquan.he@linux.dev>,
-	Mike Rapoport <rppt@kernel.org>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Pratyush Yadav <pratyush@kernel.org>,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=sGBkcbTB
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-cdba1bbde0bso54369a12.2
+        for <kvmarm@lists.linux.dev>; Thu, 12 Nov 2026 10:07:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794506866; x=1795111666; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=k1iKJ3ce6I7V1KzAt6ijmlB03GjSeH93EgIWrRWokzQ=;
+        b=sGBkcbTB+yOcpDkB6ywZmLgU3ywYg96lJn5LR+QwFPaauz1cvpogOD9rQCPF8MRJpG
+         LFos4MFWugP0Sg5ikuLzTjtLM/kJLKxYarCD6FhqTxvQOXWjl/YtEmmCTXEPSRXAlQlm
+         FGT0LNhBpx6jXflJV1UKfMDN9yFla/djmW+gf3/MZQ8sPK2/9o8lhebvkRXdSoLYu4m+
+         0QatcqxbnSdVNviUGtIDkbUToiKH+LX4baURNqFjncxEN7c2LEMG9dcCKxgEBvDMfpHx
+         h4ouAi1b0TxVwUojmN/RWK76nTekhJX9FXO5s7w7echMfSV+fUKN/O3w/n0QEwnslAT8
+         Sr0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794506866; x=1795111666;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=k1iKJ3ce6I7V1KzAt6ijmlB03GjSeH93EgIWrRWokzQ=;
+        b=f8AlQKL6YIVGp+OPNUMizFQ5pK3m5iMfhjtHnapROAy8Lx8uBIXjhCmHZsvTWOfNOV
+         0CEEZIXqKMwIo3vFfuqKHEI3sj0TTxhlLIW1tcGqmKISILykVB5dXyMmSusAnjn1ynWH
+         kBpR29LAlD3ujkSz2gcwFoE6jBovXgr39pg7XVOmOCxbgWqgbjSQftMF7fgWZK4qj/Iq
+         6KBt4PLlqDFT4OskAodgJD1VOmBrRF4YCQLvc//pk9/8sixjG+MmStROoOO6tvHsfakt
+         8gVQRncNn+A2/6u8o2ex+3sJ8VZAJ9spOW8qlqzxvItxP3kVQV8W6C2/XiREs3hvreYu
+         yEgA==
+X-Forwarded-Encrypted: i=1; AL+hErGwehHpFhx0Mn/Kra5JUtcJQWwBnDWA0KERkY0NEvA6rFtazL6CLDsgLxjOOpqQy8K3D+ez2xg=@lists.linux.dev
+X-Gm-Message-State: APuU4Z92CfaSR7fQnymlH2RbgILF7yEis8YXDmPiYab2BeydWYSdnF10
+	AWMJMRZbNBxsXkSVtaozrUfBNv2t2rJbPf1JnX2toS96fwrktJUDNKtQ
+X-Gm-Gg: AYBFou1JQGJQoM6JrFletBliwbgP+1F6w7pz3S1rrr8EK4izFuWKxip2Wh3xOqueD1a
+	y/rRe1zK9YiCzRPAztxn4vWCp8PcvaUXISYIMdvY2eqXR0EwWk+o/0CJwBOc9OAYyzLTBSTnLD0
+	ithLL0aSIX6LPASlamcn0QroeW40PXf2UUDDOJVHt3mIa7RBr3LfbT7mBmPXnztP7QD4xpaLJcI
+	4vGSTFDRDoDHGM113u6YwHM8W1mqdK9H9iKho8QBHwbPkHPujOUdA+3YUWMh6TlbBBp9IbHSthL
+	QZATMXDNHZLEOa3hP1Wz9sK5mmLEwpOioh5++R49+DWsC7TzJZpZ6+fTrr+V2+vrm8oAlftU7qm
+	qS3rNqnvbJDPtoXD2jwlNSa/hp5Z8Tw6WOpmQBJKgibiNq0kvK+jC/6jQYw0CnQvKoiPPya0KA6
+	uvGexymF9gKCm/W0ZAxaoF03bj10Dt3hPQM4/flqocyNAhbaYNUiS9/T2lQ5WS79tGHiNwL1Zoo
+	B/vu4Vo+jfIzwlb3tGooE0K4AbwCTOjC6XqrewJPwJEfo4jq8U/Gy/u80bhSrsE60FLDPPRHuJ9
+	MIKGLreuI3dCAEFBctMKIpaWNYO5Po4w7YtZag7WYjDS7hELjsYhB1cQoh1hmALOpnEYB84VoHn
+	n18BAUrjGSX8YteBtgf7KF1cZNCCdOB7aoVOIWJyR+h7RLpy3wRDl9zRYbwMAiYugH3SGAOKJGU
+	xtqqjs+Wx4VnzR4ElrvRTyU7L9ChhJGAPjMfwcpvhV
+X-Received: by 2002:a17:90a:e387:b0:3b1:8380:a9a0 with SMTP id 98e67ed59e1d1-3b18380ac2fmr4732901a91.46.1794506866237;
+        Thu, 12 Nov 2026 10:07:46 -0800 (PST)
+Received: from sid-dev-env.cgrhrlrrq2nuffriizdlnb1x4b.xx.internal.cloudapp.net ([4.155.54.158])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b181f8fd59sm5540773a91.1.2026.11.12.10.07.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Nov 2026 10:07:45 -0800 (PST)
+From: Siddharth Chintamaneni <sidchintamaneni@gmail.com>
+To: Arnd Bergmann <arnd@arndb.de>,
+	Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian =?utf-8?Q?K=C3=B6nig?= <christian.koenig@amd.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Joerg Roedel <joro@8bytes.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@kernel.org>,
 	Will Deacon <will@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Benjamin Gaignard <benjamin.gaignard@collabora.com>,
-	Brian Starkey <Brian.Starkey@arm.com>,
-	John Stultz <jstultz@google.com>,
 	Mark Rutland <mark.rutland@arm.com>,
-	Radu Rendec <radu@rendec.net>,
-	"T.J. Mercier" <tjmercier@google.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <chleroy@kernel.org>,
-	Ritesh Harjani <ritesh.list@gmail.com>,
-	Shrikanth Hegde <sshegde@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Kiryl Shutsemau <kas@kernel.org>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	"K . Y . Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
-	kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
-	media-ci@linuxtv.org
-Subject: Re: [PATCH v9 02/14] mm: Zero memory during shared memory transitions
-In-Reply-To: <sashiko-outbox-199540@kernel.org>
-References: <20261104164555.3555725-1-aneesh.kumar@kernel.org>
- <20261104164555.3555725-3-aneesh.kumar@kernel.org>
- <sashiko-outbox-199540@kernel.org>
-Date: Thu, 12 Nov 2026 22:59:05 +0530
-Message-ID: <yq5av762gdr2.fsf@kernel.org>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Yicong Yang <yangyicong@hisilicon.com>,
+	Zhou Wang <wangzhou1@hisilicon.com>,
+	Navneet Singh <navneetsingh@microsoft.com>,
+	apais@microsoft.com,
+	rlmenge@gmail.com,
+	hargar@linux.microsoft.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Siddharth Chintamaneni <sidchintamaneni@gmail.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Hide FEAT_LS64_ACCDATA from guests
+Date: Thu, 12 Nov 2026 18:07:41 +0000
+Message-ID: <20261112180741.17614-1-sidchintamaneni@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <040cf379-baba-4e3a-bf3d-6bc009a9e28d@app.fastmail.com>
+References: <20261023070110.1833446-1-fuad.tabba@linux.dev> <20261023070110.1833446-2-fuad.tabba@linux.dev> <86fqxwzul7.wl-maz@kernel.org> <CA+EHjTw08SZC_3Uodt6ew6vXVH-doW-8G41fVCF-rmaKsv+0fQ@mail.gmail.com> <86ecdgzp6m.wl-maz@kernel.org> <CA+EHjTy0jpY3sdVCENJRj_kfRDwbZ6TpkCAHQ2xUO-7ZuErpcA@mail.gmail.com> <ad724195-3452-495a-a50a-5e5c8093a483@app.fastmail.com> <CA+EHjTyLnAXanf9R7SuoL3gFZUNewX7QOnW=mc3qzwvaxg7jJg@mail.gmail.com> <040cf379-baba-4e3a-bf3d-6bc009a9e28d@app.fastmail.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -112,227 +119,34 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-sashiko-bot@kernel.org writes:
-
-> Thank you for your contribution! Sashiko AI review found 5 potential issue(s) to consider:
-> - [Critical] x86/hyperv: premature zeroing in hv_vtom_clear_present() before transition
-> - [High] Drivers: hv: uninitialized SynIC pages in hv_alloc_page() on non-CoCo VMs
-> - [High] dma-pool: dirty cache lines left on linear alias by set_memory_decrypted()
-> - [Medium] x86/mm: set_memory_decrypted() zeroes legacy VGA VRAM/MMIO in VGA_MAP_MEM()
-> - [Medium] powerpc/pseries/svm: set_memory_decrypted() zeroes private page before sharing
-> --
+On Tue, Oct 27, 2026 at 02:48:29PM +0100, Arnd Bergmann wrote:
+> On Sat, Oct 24, 2026, at 09:14, Fuad Tabba wrote:
+> > On a host that runs at EL1 (nVHE or hVHE), this also requires
+> > __init_el2_fgt to set nACCDATA_EL1 in HFGRTR_EL2 and HFGWTR_EL2, and
+> > __init_el2_hcrx to set HCRX_EL2.EnAS0. Without them, the ACCDATA_EL1
+> > access traps to EL2 and the hypervisor panics, and so does ST64BV0
+> > once SCTLR_EL1.EnAS0 is set. Happy to write those and the KVM change
+> > once you're ready to post this.
 >
+> Thanks for the offer, that part is definitely not my area.
 
-I used an LLM to review the CoCo implementations and suggest the correct
-sequence for clearing memory. Except on s390 and pKVM, memory must be
-cleared after it is converted to shared. The resulting patch is below,
-with comments explaining the architecture-specific differences.
+Hi Arnd, Fuad,
 
-This needs review and acknowledgment from the relevant architecture
-maintainers.
+We are preparing to post the Microsoft Smart Data Accelerator (SDA) VF
+dmaengine driver for Microsoft Cobalt SoCs, which uses IOMMU SVA with
+direct EL0 ST64BV0 portal submissions carrying the process PASID in
+ACCDATA_EL1.
 
-modified    arch/arm64/mm/mem_encrypt.c
-@@ -17,6 +17,7 @@
- #include <linux/compiler.h>
- #include <linux/err.h>
- #include <linux/mm.h>
-+#include <linux/string.h>
- 
- #include <asm/mem_encrypt.h>
- 
-@@ -42,8 +43,13 @@ EXPORT_SYMBOL_GPL(set_memory_encrypted);
- 
- int set_memory_decrypted(unsigned long addr, int numpages)
- {
--	if (likely(!crypt_ops) || WARN_ON(!PAGE_ALIGNED(addr)))
-+	if (likely(!crypt_ops)) {
-+		memset((void *)addr, 0, (size_t)numpages << PAGE_SHIFT);
- 		return 0;
-+	}
-+
-+	if (WARN_ON(!PAGE_ALIGNED(addr)))
-+		return -EINVAL;
- 
- 	return crypt_ops->decrypt(addr, numpages);
- }
+Now that Fuad's KVM guest FEAT_LS64_ACCDATA series is queued, are you
+planning to post the host ST64BV0 SVA + EL2/KVM patches as a standalone
+series soon?
 
-modified    arch/powerpc/platforms/pseries/svm.c
-@@ -54,14 +54,13 @@ int set_memory_encrypted(unsigned long addr, int numpages)
- 
- int set_memory_decrypted(unsigned long addr, int numpages)
- {
--	if (!cc_platform_has(CC_ATTR_MEM_ENCRYPT))
--		return 0;
--
- 	if (!PAGE_ALIGNED(addr))
- 		return -EINVAL;
- 
-+	if (cc_platform_has(CC_ATTR_MEM_ENCRYPT))
-+		uv_share_page(PHYS_PFN(__pa(addr)), numpages);
-+	/* Sharing can replace the secure backing; clear the final mapping. */
- 	memset((void *)addr, 0, (size_t)numpages << PAGE_SHIFT);
--	uv_share_page(PHYS_PFN(__pa(addr)), numpages);
- 
- 	return 0;
- }
+Either way, we have Cobalt hardware with FEAT_LS64_ACCDATA available and
+would be happy to test your patches on silicon, or help put together and
+carry any remaining pieces alongside our driver series if you prefer.
 
-modified    arch/s390/mm/init.c
-@@ -130,6 +130,10 @@ int set_memory_decrypted(unsigned long vaddr, int numpages)
- {
- 	int i;
- 
-+	/*
-+	 * uv_set_shared() exposes existing contents to the host; see the data
-+	 * leakage warning in share() in asm/uv.h. Clear private data first.
-+	 */
- 	memset((void *)vaddr, 0, (size_t)numpages << PAGE_SHIFT);
- 
- 	/* make specified pages shared (swiotlb, dma_alloca) */
-
-modified    arch/x86/coco/tdx/tdx.c
-@@ -980,9 +980,6 @@ static int tdx_enc_status_change_finish(unsigned long vaddr, int numpages,
- 	if (!enc && !tdx_enc_status_changed(vaddr, numpages, enc))
- 		return -EIO;
- 
--	if (!enc)
--		memset((void *)vaddr, 0, (size_t)numpages << PAGE_SHIFT);
--
- 	if (enc)
- 		atomic_long_sub(numpages, &nr_shared);
- 	else
-
-modified    arch/x86/hyperv/ivm.c
-@@ -755,10 +755,6 @@ static int hv_mark_gpa_visibility(u16 count, const u64 pfn[],
-  */
- static int hv_vtom_clear_present(unsigned long kbuffer, int pagecount, bool enc)
- {
--	if (!enc)
--		memset((void *)kbuffer, 0,
--		       (size_t)pagecount << PAGE_SHIFT);
--
- 	return set_memory_np(kbuffer, pagecount);
- }
- 
-
-modified    arch/x86/include/asm/set_memory.h
-@@ -52,6 +52,7 @@ bool set_memory_enc_stop_conversion(void);
- bool set_memory_enc_stop_conversion(void);
- int set_memory_encrypted(unsigned long addr, int numpages);
- int set_memory_decrypted(unsigned long addr, int numpages);
-+int set_memory_decrypted_nozero(unsigned long addr, int numpages);
- 
- int set_memory_np_noalias(unsigned long addr, int numpages);
- int set_memory_nonglobal(unsigned long addr, int numpages);
-
-modified    arch/x86/include/asm/vga.h
-@@ -14,7 +14,7 @@
-  *	On the PC, we can just recalculate addresses and then
-  *	access the videoram directly without any black magic.
-  *	To support memory encryption however, we need to access
-- *	the videoram as decrypted memory.
-+ *	the videoram as decrypted memory without clearing its contents.
-  */
- 
- #define VGA_MAP_MEM(x, s)					\
-@@ -22,7 +22,7 @@
- 	unsigned long start = (unsigned long)phys_to_virt(x);	\
- 								\
- 	if (IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT))			\
--		set_memory_decrypted(start, (s) >> PAGE_SHIFT);	\
-+		set_memory_decrypted_nozero(start, (s) >> PAGE_SHIFT);	\
- 								\
- 	start;							\
- })
-
-modified    arch/x86/mm/mem_encrypt_amd.c
-@@ -309,9 +309,6 @@ static int amd_enc_status_change_finish(unsigned long vaddr, int npages, bool en
- 	if (!cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
- 		enc_dec_hypercall(vaddr, npages << PAGE_SHIFT, enc);
- 
--	if (!enc)
--		memset((void *)vaddr, 0, (size_t)npages << PAGE_SHIFT);
--
- 	return 0;
- }
- 
-
-modified    arch/x86/mm/pat/set_memory.c
-@@ -2545,9 +2545,22 @@ EXPORT_SYMBOL_GPL(set_memory_encrypted);
- 
- int set_memory_decrypted(unsigned long addr, int numpages)
- {
-+	int ret = __set_memory_enc_dec(addr, numpages, false);
-+
-+	/* The finish callback must restore the shared mapping before clearing. */
-+	if (!ret)
-+		memset((void *)addr, 0, (size_t)numpages << PAGE_SHIFT);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(set_memory_decrypted);
-+
-+/* Device memory needs a decrypted mapping without writes to its contents. */
-+int set_memory_decrypted_nozero(unsigned long addr, int numpages)
-+{
- 	return __set_memory_enc_dec(addr, numpages, false);
- }
--EXPORT_SYMBOL_GPL(set_memory_decrypted);
-+EXPORT_SYMBOL_GPL(set_memory_decrypted_nozero);
- 
- int set_pages_uc(struct page *page, int numpages)
- {
-
-modified    drivers/firmware/arm_rmm/rsi.c
-@@ -147,6 +147,7 @@ static int realm_set_memory_decrypted(unsigned long addr, int numpages)
- {
- 	int ret = __set_memory_enc_dec(addr, numpages, false);
- 
-+	/* The transition invalidates private contents; clear the shared mapping. */
- 	if (!ret)
- 		memset((void *)addr, 0, (size_t)numpages << PAGE_SHIFT);
- 
-
-modified    drivers/virt/coco/pkvm-guest/arm-pkvm-guest.c
-@@ -62,6 +62,7 @@ static int pkvm_set_memory_encrypted(unsigned long addr, int numpages)
- 
- static int pkvm_set_memory_decrypted(unsigned long addr, int numpages)
- {
-+	/* Sharing exposes the existing contents to the host; clear them first. */
- 	memset((void *)addr, 0, (size_t)numpages << PAGE_SHIFT);
- 
- 	return __set_memory_range(ARM_SMCCC_VENDOR_HYP_KVM_MEM_SHARE_FUNC_ID,
-
-modified    include/linux/set_memory.h
-@@ -5,6 +5,10 @@
- #ifndef _LINUX_SET_MEMORY_H_
- #define _LINUX_SET_MEMORY_H_
- 
-+#include <linux/string.h>
-+
-+#include <asm/page.h>
-+
- /**
-  * DOC: Kernel page table permissions
-  *
-@@ -21,7 +25,8 @@
-  *
-  * When an architecture does not implement these APIs they succeed without
-  * doing anything, so a return value of 0 does not mean that the permissions
-- * were actually changed.
-+ * were actually changed. set_memory_decrypted() also clears the range,
-+ * including when no encryption change is needed. It is for normal RAM only.
-  *
-  * Callers that depend on the permissions being applied must ensure that the
-  * architecture supports the required operation for the target addresses. The
-@@ -186,6 +191,7 @@ static inline int set_memory_encrypted(unsigned long addr, int numpages)
- 
- static inline int set_memory_decrypted(unsigned long addr, int numpages)
- {
-+	memset((void *)addr, 0, (size_t)numpages << PAGE_SHIFT);
- 	return 0;
- }
- #endif /* CONFIG_ARCH_HAS_MEM_ENCRYPT */
-
-
+Thanks,
+Siddharth
