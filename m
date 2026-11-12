@@ -1,60 +1,56 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794522267;
-	b=bMQ2EGmUdPZNnbGxEahfRU+LLlI/pXmknZM+G45HtGV44QXwI6Hsgnns3Hiu97NQrZ+R
-	 BiToZo0xve4YP4ds1ZnvyXeTua6qv5375u70NvLlg5ezZppTfx1+b9SrnIFz3wVVuSmEH
-	 PAcSipaJegTpw1qB9/q2M9D15mGvi3wUC8Y6ucrMlBO3omAA6CGNPo4Kr7lMFrQoKwz6+
-	 01s3zWprTJiuyRqQDnj/UZh+zkRXu/vTj0Os9KCViwiQ2JhqUn+0p8J55HGNCSykjf8WL
-	 HwqBvbuvEzOdGpcgQ9wEKIc2JZoz9XSE7dB3YXULy8ORjEjdGJjvT7On1ED5V8dd06g==
+	t=1794523528;
+	b=JdHF5wWPbl24Kr/BmRxXdTgGT++EOem5EiFj/Pca2FtE4cAxaXcBdX2VzYUJbgh+njjE
+	 h5ungevTjNdi0F8CiedqmBcSCAWvAO14nHiuMqOblA/7MJ2kk07mv4we+iL3G3Hu0an6V
+	 T6tMMPWo0nTw9nRWYr80Gte6lLgvsy439hgrt04WQ0OHG8qM7M/nqybBCfxGcFF64hhT7
+	 h4TBFCfHaCo8sKbI+xibheBkymBgdr0YJdtjYe0HMasy+yscnbfvhJzRtD0QB1CIruIKN
+	 TJiD0+XeV6X/YbrVcTt7R8QGoQo3co4L6FmxIifBrNsAGV7a8aCi5aT8rBFFCnw+Jqw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794522267;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794523528;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=7FayPK/pGf2zT+BfrUKWRiW6uC1vgz+HaFeSIlSFsq4=;
-	b=NGtFEYrD9xrjg22/sMFjCnsPfldnUUKdPGe8BS3xjXwfsbvl3Y4nH/WK4Wi8hmIlQfkb
-	 qkLjvWALv2cNrb72HXnWjDzOHRjjrXdd7DvbW/ECmB8e6+gtjngB0hQikfFaBYmkT350W
-	 +GnzoRlZosr3A/bCQWnfIxDuwGAB4vH2770h671WgWkCTGijVAiR+Ge8XBfh1gQpsto2m
-	 KMiXHbxmjgFmHF9g7sFvMdQ0mbivBVasVfM/QB4iBMt/ZukVXPye+Jigkn+G/5ZFiwObJ
-	 eBqZuhfajTLUX5a4cXFqvHxoVlucCNcCCGEwqyy0i3eQhSz4bqOuIsPe1Q1xaYPX4lw==
+	bh=dVftfgY9h5Mmz62Tp5CN9A5dWL3JITYcqWVOdUje7V0=;
+	b=miy4fnsbrNTV5m2fSTf/lgRPv0/rVZcznle/nADGLXH2ZVfa8CQzlJM0XpfGsNaq8SEh
+	 iDossRmpahJjMIcj3erwA8H42+f2BS/3Yh8Mzsg9daJfGGYi2MgGRZnwQUNzeG/9QgcpZ
+	 CBzuKz2a6iYSNKZjHNH/bWPZ9PN+hcLlw2vIySLIDUpRqdSTCdo0Mju36szKXLZYGkKfH
+	 SBwCkuR6xVma0pY06CN/uvq6GsWGebo7UphvipUBvMY8+fhZKzC61zGGDPXJ63+3DBZvZ
+	 /ICzdHRugV3nfSpghx6n3epxZtzu0tg8qUhr+x+hLTn5klXlYacyYb5XbuJmEt6pM9A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=i8vWLn5k;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=e6t+iVAP;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C50606A31C;
-	Thu, 12 Nov 2026 22:24:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF6BF606A31C
+	for <kvmarm@lists.linux.dev>; Thu, 12 Nov 2026 22:45:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=i8vWLn5k
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 683271F000C5;
-	Thu, 12 Nov 2026 22:24:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=e6t+iVAP
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46A241F000C4;
+	Thu, 12 Nov 2026 22:45:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794522267;
-	bh=7FayPK/pGf2zT+BfrUKWRiW6uC1vgz+HaFeSIlSFsq4=;
+	s=k20260515; t=1794523528;
+	bh=dVftfgY9h5Mmz62Tp5CN9A5dWL3JITYcqWVOdUje7V0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=i8vWLn5klVkd3LCjSungb5kBKE9oiC8ViLRZ/01fWAObXV7Sz6d2wzOPz7WP54gZ3
-	 6BmxGsvJAkb7fijW056g2zB7AOaoea/YntE2Qs/bnE1C0o7tKWYTALZuuCB4PacyKk
-	 eYfMGilb6z4vqj7PSjj2XsxW4iVxZ0MHAFO3OGpbLl3fqWfBM2F7cOZH+f5h0auK3x
-	 tOiC1Bu8rb8/VRzinO8X7evmwpdHTjuaCnWjkdfmZKVtx6KIHC4sgmbRilloCNyzof
-	 eacY6a22reioQyylJoWPxzQbgRR9qSlqCkRziOrD9b08VNol3z7qYFK3Gm2i3oNOLP
-	 WTI7ZKSBxJvmA==
-Date: Thu, 12 Nov 2026 14:22:25 -0800
+	b=e6t+iVAPM072pXeZ2LfauFekXuJWPOAN7a4R3aCsw80dvEHdtL1gu3FFGcaBJngk0
+	 o6Y3EJGbfN/i4qX0vOlEB12HGwRtZ7T2qWixSmnWQXhleyzNtUwZzxV8ae2cwKb755
+	 t9gIkjjuU1fatIQGNgyjfpXWARC9GxzZ6PoQ3bBGhvKTuKW4G5c48C2PrEyALoKrL+
+	 2Any6znXudNxWSrEVwvfXv+2WrZ2lXPtIHuabytxC1T1p0BP7p6IqdFPrb4z949zhG
+	 3tQlO8jSk+fMAU58QWAeaX9MsNQ4ZvAAg+ZAauxDRzf16UP0Ho3ucNc52NrKbt4C+A
+	 WoXrglz9k9kjw==
+Date: Thu, 12 Nov 2026 14:45:21 -0800
 From: Oliver Upton <oupton@kernel.org>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>, stable@vger.kernel.org
-Subject: Re: [PATCH 8/8] KVM: arm64: Stop leaning on __kvm_inject_sea() for
- abort injection
-Message-ID: <avY8IUOoxScjsisA@kernel.org>
-References: <20261104192124.3932743-1-oupton@kernel.org>
- <20261104192124.3932743-9-oupton@kernel.org>
- <avXXSLhMCQVOvv4G@LeoBrasDK>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com,
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com,
+	fuad.tabba@linux.dev
+Subject: Re: [PATCH v2] KVM: arm64: Fast fail transparent_hugepage_adjust()
+ for non-PMD folios
+Message-ID: <avZBgRLTFOQVh5LZ@kernel.org>
+References: <20261112113729.2858513-1-vdonnefort@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,249 +62,147 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <avXXSLhMCQVOvv4G@LeoBrasDK>
+In-Reply-To: <20261112113729.2858513-1-vdonnefort@google.com>
 
-On Thu, Nov 12, 2026 at 03:12:08PM +0000, Leonardo Bras wrote:
-> > -static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr)
-> > +static void __inject_abt64(struct kvm_vcpu *vcpu, bool iabt, u32 iss, unsigned long addr)
-> >  {
-> > -	unsigned long cpsr = *vcpu_cpsr(vcpu);
-> > -	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
-> > -	u64 esr = 0, fsc;
-> > -	int level;
-> > +	u64 esr;
-> > +	u8 ec;
-> > +
-> > +	if (vcpu_mode_priv(vcpu))
+On Thu, Nov 12, 2026 at 11:37:29AM +0000, Vincent Donnefort wrote:
+> transparent_hugepage_adjust() must walk the userspace stage-1 to detect
+> if a PMD-level mapping is installed and whether a stage-2 block mapping
+> can be used. Even though this stage-1 walk is most likely cache hot
+> (in most cases, the mapping has just been installed), walking a
+> page-table is still costly.
 > 
-> Maybe I am getting this wrong, but this line was previously:
-> -	if (is_aarch32 || (cpsr & PSR_MODE_MASK) == PSR_MODE_EL0t)
+> While we can't be sure by solely looking at the folio if the stage-1 is
+> a block mapping as userspace has multiple ways to split it, we can infer
+> from its size if the stage-1 mapping is smaller than PMD_SIZE. Anonymous
+> memory or memfd faults allocate a big enough folio, as do khugepaged or
+> MADV_COLLAPSE.
 > 
-> but vcpu_mode_priv() does not test exactly the same thing, it would test:
-> vcpu_mode_is_32bit(), tested in is_aarch32, &&
-> cpsr_mode > PSR_AA32_MODE_USR, not tested above, ||
-> *vcpu_cpsr(vcpu) & PSR_MODE_MASK != PSR_MODE_EL0t
+> Add a fast fail based on the folio size: whenever a struct page is
+> present and its folio is not PMD-mappable, bail out early and do not
+> walk stage-1. This helps when THPs are disabled or under memory
+> pressure, while adding a folio check on the PMD-hit path.
 > 
-> This last line is testing the exact opposite of what was here. 
-> Is that another fix?
+> To measure this walk on 100% PMD misses, function_graph traced
+> user_mem_abort() and get_user_mapping_size() with THP disabled while a
+> guest faulted PAGE_SIZE anonymous pages:
+> 
+>   Platform            Setup                get_user_mapping_size()
+>   ------------------  -------------------  -----------------------
+>   Apple M2 (big CPU)  nested L1->L2, perf  mean  5.25%, med  2.70%
+>   Ampere Altra        non-NV, VHE          mean 13.69%, med 12.28%
+> 
+> On non-NV VHE Ampere Altra, get_user_mapping_size() takes 0.26 us mean
+> (0.24 us median) out of 2.32 us in user_mem_abort(). On nested L1->L2
+> Apple M2, longer L1 user_mem_abort() handling shrinks the relative
+> share.
+> 
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-No, it's equivalent. What we had here before was inscrutable. If we're
-taking an exception from 32-bit into a 64-bit EL1, the only way we get
-there is from a 32-bit EL0, so this short-circuited it to xABT_LOW.
+Reviewed-by: Oliver Upton <oupton@kernel.org>
 
-If there's no exception level change, xABT_CUR. Otherwise, xABT_LOW.
+I missed the conversation on v1 but replacing get_user_mapping_size()
+with something else is worth considering, even if it isn't to blame for
+performance.
+
+I worry a bit about KVM's view of the stage-1 configuration getting out
+of sync with what's actually happening in the host stage-1. Using the
+usual MM table walkers would allow us to completely gloss over this
+point.
+
+Anyway, LGTM.
 
 Thanks,
 Oliver
 
-> > +		ec = iabt ? ESR_ELx_EC_IABT_CUR : ESR_ELx_EC_DABT_CUR;
-> > +	else
-> > +		ec = iabt ? ESR_ELx_EC_IABT_LOW : ESR_ELx_EC_DABT_LOW;
-> > +
-> > +	esr = FIELD_PREP(ESR_ELx_EC_MASK, ec) | FIELD_PREP(ESR_ELx_ISS_MASK, iss) |
-> > +	      ESR_ELx_IL;
-> > +
-> > +	vcpu_write_sys_reg(vcpu, addr, exception_far_elx(vcpu));
-> > +	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
-> > +}
-> > +
-> > +static void inject_abt64(struct kvm_vcpu *vcpu, bool iabt, u32 iss, u64 addr)
-> > +{
-> > +	pend_sync_exception(vcpu);
-> > +	__inject_abt64(vcpu, iabt, iss, addr);
-> > +}
-> > +
-> > +static void inject_sea64(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
-> > +{
-> > +	u8 fsc;
-> >  
-> >  	/*
-> >  	 * If injecting an abort from a failed S1PTW, rewalk the S1 PTs to
-> > @@ -116,7 +136,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
-> >  	 */
-> >  	if (kvm_vcpu_abt_iss1tw(vcpu)) {
-> >  		u64 hpfar = kvm_vcpu_get_fault_ipa(vcpu);
-> > -		int ret;
-> > +		int ret, level;
-> >  
-> >  		if (hpfar == INVALID_GPA)
-> >  			return;
-> > @@ -137,28 +157,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
-> >  	else
-> >  		pend_sync_exception(vcpu);
-> >  
-> > -	/*
-> > -	 * Build an {i,d}abort, depending on the level.
-> > -	 * Report an external synchronous abort.
-> > -	 */
-> > -	esr |= ESR_ELx_IL;
-> > -
-> > -	/*
-> > -	 * Here, the guest runs in AArch64 mode when in EL1. If we get
-> > -	 * an AArch32 fault, it means we managed to trap an EL0 fault.
-> > -	 */
-> > -	if (is_aarch32 || (cpsr & PSR_MODE_MASK) == PSR_MODE_EL0t)
-> > -		esr |= (ESR_ELx_EC_IABT_LOW << ESR_ELx_EC_SHIFT);
-> > -	else
-> > -		esr |= (ESR_ELx_EC_IABT_CUR << ESR_ELx_EC_SHIFT);
-> > -
-> > -	if (!is_iabt)
-> > -		esr |= ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT;
-> > -
-> > -	esr |= fsc;
-> > -
-> > -	vcpu_write_sys_reg(vcpu, addr, exception_far_elx(vcpu));
-> > -	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
-> > +	__inject_abt64(vcpu, iabt, fsc, addr);
-> >  }
-> >  
-> >  void kvm_inject_sync(struct kvm_vcpu *vcpu, u64 esr)
-> > @@ -174,31 +173,41 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
-> >  	kvm_inject_sync(vcpu, esr);
-> >  }
-> >  
-> > -#define DFSR_FSC_EXTABT_LPAE	0x10
-> > -#define DFSR_FSC_EXTABT_nLPAE	0x08
-> > -#define DFSR_LPAE		BIT(9)
-> > -#define TTBCR_EAE		BIT(31)
-> > +#define DFSR_FS_4			BIT(10)
-> > +#define DFSR_FS_3_0			GENMASK(3, 0)
-> > +#define DFSR_FS_EXTABT_nLPAE		0x08
-> > +#define DFSR_FS_EXCL_ATOMIC_nLPAE	0x15
+> ---
 > 
-> Maybe I am reading the wrong place, but in M.d, I see:
-> DFSR.FS = 0b10101
-> IMPLEMENTATION DEFINED fault (Unsupported Exclusive access fault).
+> Notes:
+>     v2:
+>       - Reword commit message as a fast fail, describe the function_graph
+>         setup, and include both nested Apple M2 and non-NV Ampere Altra
+>         numbers (Marc)
+>     
+>     v1: https://lore.kernel.org/all/20261102211900.504192-1-vdonnefort@google.com/
 > 
-> > +#define DFSR_FSC			GENMASK(5, 0)
-> > +#define DFSR_FSC_EXTABT_LPAE		0x10
+>  arch/arm64/kvm/mmu.c | 42 ++++++++++++++++++++++++------------------
+>  1 file changed, 24 insertions(+), 18 deletions(-)
 > 
-> Wouldn't this be STATUS bits instead of FSC?
-> (Maybe FSC got renamed STATUS in the meantime)
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 1db10d8d6db7..9d81d908e230 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1553,36 +1553,42 @@ static bool fault_supports_stage2_huge_mapping(const struct kvm_s2_fault_desc *s
+>   * Returns the size of the mapping.
+>   */
+>  static long
+> -transparent_hugepage_adjust(const struct kvm_s2_fault_desc *s2fd, kvm_pfn_t *pfnp, gfn_t *gfnp)
+> +transparent_hugepage_adjust(const struct kvm_s2_fault_desc *s2fd,
+> +			    const struct kvm_s2_fault_vma_info *s2vi, kvm_pfn_t *pfnp, gfn_t *gfnp)
+>  {
+>  	struct kvm *kvm = s2fd->vcpu->kvm;
+> -	kvm_pfn_t pfn = *pfnp;
+> -	gfn_t gfn = *gfnp;
+> +	int sz;
+>  
+>  	/*
+>  	 * Make sure the adjustment is done only for THP pages. Also make
+>  	 * sure that the HVA and IPA are sufficiently aligned and that the
+>  	 * block map is contained within the memslot.
+>  	 */
+> -	if (fault_supports_stage2_huge_mapping(s2fd, PMD_SIZE)) {
+> -		int sz = get_user_mapping_size(kvm, s2fd->hva);
+> +	if (!fault_supports_stage2_huge_mapping(s2fd, PMD_SIZE))
+> +		return PAGE_SIZE;
+>  
+> -		if (sz < 0)
+> -			return sz;
+> +	/*
+> +	 * If the allocated folio isn't at least PMD_SIZE, there is no way a
+> +	 * stage-1 PMD level was installed.
+> +	 */
+> +	if (s2vi->page && !folio_test_pmd_mappable(page_folio(s2vi->page)))
+> +		return PAGE_SIZE;
+>  
+> -		if (sz < PMD_SIZE)
+> -			return PAGE_SIZE;
+> +	/*
+> +	 * Even though the folio size is big enough, the stage-1 mapping might
+> +	 * have been split. Verify it.
+> +	 */
+> +	sz = get_user_mapping_size(kvm, s2fd->hva);
+> +	if (sz < 0)
+> +		return sz;
+>  
+> -		gfn &= ~(PTRS_PER_PMD - 1);
+> -		*gfnp = gfn;
+> -		pfn &= ~(PTRS_PER_PMD - 1);
+> -		*pfnp = pfn;
+> +	if (sz < PMD_SIZE)
+> +		return PAGE_SIZE;
+>  
+> -		return PMD_SIZE;
+> -	}
+> +	*gfnp &= ~(PTRS_PER_PMD - 1);
+> +	*pfnp &= ~(PTRS_PER_PMD - 1);
+>  
+> -	/* Use page mapping if we cannot use block mapping. */
+> -	return PAGE_SIZE;
+> +	return PMD_SIZE;
+>  }
+>  
+>  static int get_vma_page_shift(struct vm_area_struct *vma)
+> @@ -2186,7 +2192,7 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+>  		if (perm_fault_granule > PAGE_SIZE) {
+>  			mapping_size = perm_fault_granule;
+>  		} else {
+> -			mapping_size = transparent_hugepage_adjust(s2fd, &pfn, &gfn);
+> +			mapping_size = transparent_hugepage_adjust(s2fd, s2vi, &pfn, &gfn);
+>  			if (mapping_size < 0) {
+>  				ret = mapping_size;
+>  				goto out_unlock;
+> 
+> base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+> -- 
+> 2.56.0.567.gdb80ae8cd5-goog
 > 
 > 
-> > +#define DFSR_LPAE			BIT(9)
-> > +#define TTBCR_EAE			BIT(31)
-> >  
-> >  static void inject_undef32(struct kvm_vcpu *vcpu)
-> >  {
-> >  	kvm_pend_exception(vcpu, EXCEPT_AA32_UND);
-> >  }
-> >  
-> > +static bool vcpu_trans_32bit_non_lpae(struct kvm_vcpu *vcpu)
-> > +{
-> > +	return vcpu_el1_is_32bit(vcpu) && !(vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE);
-> > +}
-> > +
-> >  /*
-> >   * Modelled after TakeDataAbortException() and TakePrefetchAbortException
-> >   * pseudocode.
-> >   */
-> > -static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
-> > +static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u8 status, u32 addr)
-> >  {
-> >  	u64 far;
-> >  	u32 fsr;
-> >  
-> > -	/* Give the guest an IMPLEMENTATION DEFINED exception */
-> > -	if (vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE) {
-> > -		fsr = DFSR_LPAE | DFSR_FSC_EXTABT_LPAE;
-> > +	if (vcpu_trans_32bit_non_lpae(vcpu)) {
-> > +		/* Ensure status actually fits in DFSR.FS */
-> > +		KVM_BUG_ON(status > 0x1F, vcpu->kvm);
-> > +		fsr = FIELD_PREP(DFSR_FS_4, FIELD_GET(BIT(4), status)) |
-> > +		      FIELD_PREP(DFSR_FS_3_0, FIELD_GET(GENMASK(3, 0), status));
-> >  	} else {
-> > -		/* no need to shuffle FS[4] into DFSR[10] as it's 0 */
-> > -		fsr = DFSR_FSC_EXTABT_nLPAE;
-> > +		fsr = FIELD_PREP(DFSR_FSC, status) | DFSR_LPAE;
-> >  	}
-> >  
-> >  	far = vcpu_read_sys_reg(vcpu, FAR_EL1);
-> > @@ -218,12 +227,28 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
-> >  	vcpu_write_sys_reg(vcpu, far, FAR_EL1);
-> >  }
-> >  
-> > +static void inject_sea32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
-> > +{
-> > +	if (vcpu_trans_32bit_non_lpae(vcpu))
-> > +		inject_abt32(vcpu, is_pabt, DFSR_FS_EXTABT_nLPAE, addr);
-> > +	else
-> > +		inject_abt32(vcpu, is_pabt, DFSR_FSC_EXTABT_LPAE, addr);
-> > +}
-> > +
-> >  static void __kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
-> >  {
-> >  	if (vcpu_el1_is_32bit(vcpu))
-> > -		inject_abt32(vcpu, iabt, addr);
-> > +		inject_sea32(vcpu, iabt, addr);
-> >  	else
-> > -		inject_abt64(vcpu, iabt, addr);
-> > +		inject_sea64(vcpu, iabt, addr);
-> > +}
-> > +
-> > +static void __kvm_inject_abort(struct kvm_vcpu *vcpu, bool iabt, u8 fsc, u64 addr)
-> > +{
-> > +	if (vcpu_el1_is_32bit(vcpu))
-> > +		inject_abt32(vcpu, iabt, fsc, addr);
-> > +	else
-> > +		inject_abt64(vcpu, iabt, fsc, addr);
-> >  }
-> >  
-> >  static bool kvm_sea_target_is_el2(struct kvm_vcpu *vcpu)
-> > @@ -270,28 +295,25 @@ static int kvm_inject_nested_excl_atomic(struct kvm_vcpu *vcpu, u64 addr)
-> >   */
-> >  int kvm_inject_dabt_excl_atomic(struct kvm_vcpu *vcpu, u64 addr)
-> >  {
-> > -	u64 esr;
-> > -
-> >  	if (is_nested_ctxt(vcpu) && (vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_EL2_VM))
-> >  		return kvm_inject_nested_excl_atomic(vcpu, addr);
-> >  
-> > -	__kvm_inject_sea(vcpu, false, addr);
-> > -	esr = vcpu_read_sys_reg(vcpu, exception_esr_elx(vcpu));
-> > -	esr &= ~ESR_ELx_FSC;
-> > -	esr |= ESR_ELx_FSC_EXCL_ATOMIC;
-> > -	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
-> > +	if (vcpu_trans_32bit_non_lpae(vcpu))
-> > +		__kvm_inject_abort(vcpu, false, DFSR_FS_EXCL_ATOMIC_nLPAE, addr);
-> > +	else
-> > +		__kvm_inject_abort(vcpu, false, ESR_ELx_FSC_EXCL_ATOMIC, addr);
-> > +
-> >  	return 1;
-> >  }
-> >  
-> >  void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
-> >  {
-> > -	unsigned long addr, esr;
-> > +	bool iabt = kvm_vcpu_trap_is_iabt(vcpu);
-> > +	unsigned long addr;
-> >  
-> >  	addr  = kvm_vcpu_get_fault_ipa(vcpu);
-> >  	addr |= FAR_TO_FIPA_OFFSET(kvm_vcpu_get_hfar(vcpu));
-> >  
-> > -	__kvm_inject_sea(vcpu, kvm_vcpu_trap_is_iabt(vcpu), addr);
-> > -
-> >  	/*
-> >  	 * If AArch64 or LPAE, set FSC to 0 to indicate an Address
-> >  	 * Size Fault at level 0, as if exceeding PARange.
-> > @@ -299,13 +321,10 @@ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
-> >  	 * Non-LPAE guests will only get the external abort, as there
-> >  	 * is no way to describe the ASF.
-> >  	 */
-> > -	if (vcpu_el1_is_32bit(vcpu) &&
-> > -	    !(vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE))
-> > -		return;
-> > -
-> > -	esr = vcpu_read_sys_reg(vcpu, exception_esr_elx(vcpu));
-> > -	esr &= ~GENMASK_ULL(5, 0);
-> > -	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
-> > +	if (vcpu_trans_32bit_non_lpae(vcpu))
-> > +		__kvm_inject_sea(vcpu, iabt, addr);
-> > +	else
-> > +		__kvm_inject_abort(vcpu, iabt, ESR_ELx_FSC_ADDRSZ, addr);
-> 
-> The rest seems correct, and make easier to comprehend. :)
-> 
-> Thanks!
-> Leo
