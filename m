@@ -1,104 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794490364;
-	b=TZwMgr7gZ/Bi3Ack5YdWmoixLm9HOMJqn3/Rt2jTdJdo7WnsBxwQzm6XE5sAUFA33w3a
-	 iNVIYuLpjKDfzEX9fgsk1LiKXL4qe/pd4sMmr4F0pPYOCG+bIy7BTpX9q31i2Z4TykFUo
-	 ZiwaE+rnsDsBZ20ygHme9FhSqN70uAp9HlbA3JfJnYkbHPPH93cdPPzg8NBagnCHdKpA2
-	 Hk9lLIEvOm3r2i4pZ7WOFZFSzc4Vi6dR3CvnuSpO8XgF2uYuBYt7qug5gU8jUVKjiRQOk
-	 ZcjDFAqUFYeAkfHT9yjkb18moFY+JsrXurC2/Pwv0uLNmpFSViQrc0bPyzWKmfzPwJw==
+	t=1794491276;
+	b=uwU7x0zCSclB2gc/gHzteQDoBPfaU+p/93rydjCuFjWtCnNPIMKY2lWVF6sNNOTjxQ9A
+	 R18II+Fx6T10vuH6r4kSs5qxkbvfZa01PKfHeG2E/ZE2bTcaj7J4sR/UOtbSobCYTbu2o
+	 +hPok1gk9NgBifNVjAOIpcZPOdFqHz1dLl4iL5OlopFAiTqM+O9Z4AK7P7Mk+18rDryDX
+	 DGJdFeKwWUvdJThG2fmL90ddPphi/SwhlhscPOZMj1qpbQZuxlc+ZDryrsomzVikNzQrp
+	 J2QH6eKW/xt2baIZIoJMbdOnAEeDX/+7TJSZA/qZzdvBPnsbRRzfE3Ri5g53QMAGuJg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794490364;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=y4NWcGpyLAF/FiolKWe6/Gbz2ERucyrW993TXlYX5t8=;
-	b=kv+YBJg+i8ZmHzScab7jCx5jVlY33kEz59cCCmfskDQ9FS5MaP+HMGZBLUO+Zwa5/RBn
-	 1cIzP0XySzHDjW9dJM96glPrQ7ASpZgXBCoVL3pWaORFncG2exNZAJLxH0SKTwd+Qn+PS
-	 BFeaz9ZDuoYLMZj4imINBmKznSx7QKVClA/uPfc7U+IKrlmliwFbIT4CzmPhMWCgcZCLs
-	 M5oeqvUlNDBCJGE7flCXgXKCx0s1rbSwzCA/eR2UqqzgCKGTmVjDMXXQwGMgnWLDIXRGl
-	 gg1WJTVvHFdFp2He/1EhI3LLXobyGX0BbHX+hzDdYIcgd0rGUF2+F1jRe+43qNiMEeg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794491276;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
+	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=LnK819qJp0xv5xUqZiia/owkuvJXj5/I8hwEXIAmGIk=;
+	b=FqhxO171BtKleC7EZy6OO5TO7pt6IScY3Q21aGqaZ/TE3PfABDxbBE9TORSDl5dGuiO8
+	 eZcSNTFWUrloHGao4tIq5ZtUhld3CyD8uoyuSnThfwHgPElvn9gK2rkiQlRMYxHqtsofE
+	 /iiHE6AYvLdTREQzq607Fh7dh+i2RWbt9NK5GriXVuf2gGdiK6No8VrgQIOX8Z/ZrC4fK
+	 C1AXsGNhzDBXZRJVfgteN3zyepRW3AcFTiOgC8BZreh5k2+hb+fyz0u8WbwcavEWMsSNR
+	 CkADsc6jeM0VbXxJCTfU0cYyb5Pf/K3+B+KYj322MiCll6U+japWbmhImuABil3HHiw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=XcQ0APyV;
-	arc=none smtp.remote-ip=209.85.128.45
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ABE5606A323
-	for <kvmarm@lists.linux.dev>; Thu, 12 Nov 2026 13:32:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2ABE5606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=OkUpyUCC;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39563606A31C;
+	Thu, 12 Nov 2026 13:47:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 39563606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=XcQ0APyV
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4a206f0b95bso43805e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 12 Nov 2026 05:32:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794490362; x=1795095162; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=y4NWcGpyLAF/FiolKWe6/Gbz2ERucyrW993TXlYX5t8=;
-        b=XcQ0APyVr216CU2SFI0vtOk1H3orJnIti5YPG/UAK4emrz+nBRZtOpcfwQnJzMRO8l
-         cHztwfM6LEk1ocX3ScTLHnta5fo1t/m+EkoTerlF+3RX3TtU+bkBPz5uINKQz9y3qdIl
-         4hy+SnOX2gg4EBpFFlg6kupPPy8kzi5/53QVG1JN5jv29ynVUqsaS0hu6Mv2OM1sywXF
-         rNtZtAK8nMw5Iwa4LOf/hdzUFuBAOCtaCBGwSLJcmrMlGDhegt1xnCRUNPZLlljQatzj
-         sd7tB284EIt6Vis4qB1svCCD9W23bm23Gj/f1258g6SgDZ0IP4Z9d5lJmMJUCKfOxUTj
-         s9lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794490362; x=1795095162;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=y4NWcGpyLAF/FiolKWe6/Gbz2ERucyrW993TXlYX5t8=;
-        b=C7OQ4jAp5MS7GL6BPRZ+twu0D+FjPLnF6fjhRu2MDyeiO6Xv00XEJZzCbxnbfSKp/A
-         HUNvl8KPypcv2mk5HFaWbpucCUZgnTKT+iq7yFFPZ8djubDZWjGbGj9gcI9TRBYLTBjA
-         4UMloPXRo3q1wzyP5iIaaiMXQaAi83fJI6rM8D2YAUPRkOH0IXtPV44L4Bk5+7y9euAv
-         YLIM4zH03LXpyY27hBgvyT8Jx7qOJgsvBCj55+yghuxj5ie6frT/S3hnHm6/3pOb4q1Z
-         70y5WFwMIXgn8D9utUcIFJDqmmXeFUjyQe2TnOUB9IMznuH1cMgmluDdFW46gpo/D/KS
-         qDoA==
-X-Forwarded-Encrypted: i=1; AL+hErGbgVu4HaPpeQ/D7TQfOeVDd9VyRmPk9SBy32F6BW5rGYXX/SdORU6pURHD+g98tvYn59QLlAM=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9uhlGMGIYCEa05iBCbbZ+m5F8CTlfni85XOjhzyqYoISuIOCga
-	ZS8Q5awF9fDxWaxBuNrU5kDgN3JsG/pmBDIwj9xTJ5hgc+OuHZATivRianYBLnMMZA==
-X-Gm-Gg: AYBFou3vTlTqMWS3mjCb/5V123YvS05n5icdEwBUgLu6odbrq2kwOkZOq9EC/yAq+gU
-	nyTENCbu6G4CWtvb54d02L8Zx5D2sBJw2a/fRgvgcpKopuueHzD17EX1WuuUZRLBTwXqKv4eUX0
-	dgOGcfD9tu9fTNJkpJ8nKrH0P+weDpirfrhR13isJJ/Ydjr3qBDB4vpKlUHSKYBXlg0pbezz3r4
-	OWNUwrO220ijB9aUjXbVzYHRoSrIEg2gQNeRnBqsfiAg5vOPumzAVN9UFU4TSqgwsnJWIauuNvK
-	n/DmRksAEncdwCYnp07jAmJMunWYnPV+qmmuUCITo898ZtTnzueEEeF6t6QCnfgeCk9qIVcLO47
-	lcz97wZ9br3uWDf38U7O7SIXIL+u1AcodC9p4XNCH8n6LC4m3+O4zSyKW4KPAU4Ri9KdAGqczBO
-	v1zhWRkLFEMGxpuByhBGGCn/Lha8rLvtLFKSi9I9mvn3s0+0XbkRHrxvGnDL2sbv70El9pCobAf
-	JnFI2spqtaf2VzIiSAjutvvZXM0W2t1zXKQgONasYpy/6jv1ibj3h2R0ooIZtEDvgJ/xZ5Yvdf4
-	7KC59NtNs+wbhfMix5/dScIDHlBjRCEfUcOMnXrFJlbFedu2r2CkVBJ31rjDROoINFrUuCcEszi
-	BDapQpVqSC4P1ev7r
-X-Received: by 2002:a05:600c:a115:b0:4b6:c939:3bfe with SMTP id 5b1f17b1804b1-4bb4ff4ad18mr794835e9.8.1794490362201;
-        Thu, 12 Nov 2026 05:32:42 -0800 (PST)
-Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4983585923bsm17339835f8f.11.2026.11.12.05.32.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Nov 2026 05:32:40 -0800 (PST)
-Date: Thu, 12 Nov 2026 13:32:36 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Nicolin Chen <nicolinc@nvidia.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
-	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, joro@8bytes.org, jgg@ziepe.ca,
-	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
-	vdonnefort@google.com
-Subject: Re: [PATCH v9 11/25] iommu/arm-smmu-v3-kvm: Add the kernel driver
-Message-ID: <avW_9A48mtnK383x@google.com>
-References: <20261015200903.2735565-1-smostafa@google.com>
- <20261015200903.2735565-12-smostafa@google.com>
- <auzvygiGRTWgJXzF@nvidia.com>
- <avGk0ilyJh3obmKx@google.com>
- <avJidXM9yQOX4VBJ@nvidia.com>
- <avL016l_xASN5paR@google.com>
- <avNhekBYqiiZ9IM2@nvidia.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=OkUpyUCC
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 748C51477;
+	Thu, 12 Nov 2026 05:47:51 -0800 (PST)
+Received: from [10.0.129.47] (e122027.cambridge.arm.com [10.0.129.47])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A003F3F632;
+	Thu, 12 Nov 2026 05:47:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1794491274; bh=cNgEVgFO1jT1N6Afjj4PzPTHSvSJn3tCiGLPCSFHHT0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=OkUpyUCC0KjC/AJtGXL+QZ6TSgsGbjuPOblgRkJ9zP2rfH2y1Yt38iMNFDdSj4cNh
+	 zmdGB1nlX9BkWO+Y7Gp/j3KhfxH5jFaUpgGpsx8yrcDtlTXfloMdf1j6kKJYg1ToX7
+	 qjIAFhzlrAQrd970PFTOeZ3Iusl8Aj2X7Tli3B8s=
+Message-ID: <045b0a66-55d1-4939-95aa-65dde0cb08a1@arm.com>
+Date: Thu, 12 Nov 2026 13:47:51 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -108,69 +53,164 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <avNhekBYqiiZ9IM2@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 07/12] KVM: arm64: CCA: Tear down RTTs
+To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
+References: <20261111145758.217946-1-steven.price@arm.com>
+ <20261111145758.217946-8-steven.price@arm.com>
+ <sashiko-outbox-209425@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <sashiko-outbox-209425@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 10, 2026 at 10:24:58AM -0800, Nicolin Chen wrote:
-> On Tue, Nov 10, 2026 at 10:41:27AM +0000, Mostafa Saleh wrote:
-> > On Mon, Nov 09, 2026 at 04:16:53PM -0800, Nicolin Chen wrote:
-> > > On Mon, Nov 09, 2026 at 10:47:46AM +0000, Mostafa Saleh wrote:
-> > > > On Thu, Nov 05, 2026 at 01:06:18PM -0800, Nicolin Chen wrote:
-> > > > > On Thu, Oct 15, 2026 at 08:08:42PM +0000, Mostafa Saleh wrote:
-> > > > > > diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> > > > > > +#ifdef CONFIG_ARM_SMMU_V3_PKVM
-> > > > > > +/*
-> > > > > > + * Two devices are involved: the aux device bound to this driver, and the
-> > > > > > + * physical platform device bound to the pKVM init driver, which only uses it
-> > > > > > + * for discovery. This driver keeps using the platform device, as it carries
-> > > > > > + * the fwnode the IOMMU core and consumers link to, the DMA configuration and
-> > > > > > + * the IRQs.
-> > > > > 
-> > > > > It would be nicer to have a diagram or so to show the co-relationship
-> > > > > among different devices and drivers.
-> > > > > 
-> > > > > I assume the regular arm-smmu-v3 driver is a part of the picture too,
-> > > > > when the pkvm driver binding fails?
-> > > > > 
-> > > > 
-> > > > I can add some ASCII diagram.
-> > > > If pKVM driver fails, no aux devices are created and the main driver
-> > > > probes the platform SMMUv3 devices as usual.
-> > > 
-> > > I didn't check closely, but would it be safe to do so?
-> > > 
-> > > Is pkvm aware of the missing SMMU device and handling it properly?
-> > > 
-> > > When pkvm is enabled and the SMMU device is supposed to be a pkvm
-> > > device, should it not fall back to the main driver?
-> > 
-> > If pKVM fails to init for any reason (unsupported layout or non-coherent
-> > HW) the SMMU will be bound to the main driver so the system remains
-> > functional.
-> > 
-> > However, pKVM will not be safe in that case regarding DMA isolation
-> > as the status quo.
-> > In Android, in that case, pKVM clears the FW (called pvmfw) that loads
-> > the protected VM and authenticate it so any protected VM knows the
-> > system is not trusted. This part is not upstream yet. [1]
+On 11/11/2026 17:38, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 2 potential
+> issues to consider:
+> - [Low] KVM: arm64: possible skipped parent retry in
+>   realm_tear_down_rtt_level()
+> - [Low] KVM: arm64: cca: leak of realm->sro on error returns in
+>   kvm_destroy_realm()
+> --
 > 
-> You might want to double check a dual-SMMU case, where one gets
-> accepted by pkvm driver and the other fails and so bound to the
-> main driver.
+> commit 9b5e6ebefa08ce4aff4f7ddec8f9b62647e79039
+> Author: Steven Price <steven.price@arm.com>
 > 
-> It seems the pkvm driver would still pkvm_iommu_register_driver
-> and carry on with an untrusted SMMU. Would it also clear the FW
-> and mark the system as not trusted?
+> KVM: arm64: CCA: Tear down RTTs
 > 
+> This commit adds stage-2 unmapping and RTT destruction for CCA Realms,
+> walking and undelegating non-root RTTs before destroying the Realm
+> Descriptor.
+> 
+>> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+>> index 69c628cfb6c74..b904e6541fb07 100644
+>> --- a/arch/arm64/kvm/rmi.c
+>> +++ b/arch/arm64/kvm/rmi.c
+> 
+> [ ... ]
+> 
+>> +static int realm_tear_down_rtt_level(struct realm *realm, int level,
+>> +				     unsigned long start, unsigned long end)
+>> +{
+>> +	ssize_t map_size;
+>> +	unsigned long addr, next_addr;
+>> +
+>> +	if (WARN_ON(level > KVM_PGTABLE_LAST_LEVEL))
+>> +		return -EINVAL;
+>> +
+>> +	map_size = rmi_rtt_level_mapsize(level - 1);
+>> +
+>> +	for (addr = start; addr < end; addr = next_addr) {
+>> +		phys_addr_t rtt_granule;
+>> +		long ret;
+>> +		unsigned long align_addr = ALIGN(addr, map_size);
+>> +
+>> +		next_addr = ALIGN(addr + 1, map_size);
+>> +
+>> +		if (next_addr > end || align_addr != addr) {
+>> +			/*
+>> +			 * The target range is smaller than what this level
+>> +			 * covers, recurse deeper.
+>> +			 */
+>> +			ret = realm_tear_down_rtt_level(realm,
+>> +							level + 1,
+>> +							addr,
+>> +							min(next_addr, end));
+>> +			if (ret)
+>> +				return ret;
+>> +			continue;
+>> +		}
+>> +
+>> +		ret = realm_rtt_destroy(realm, addr, level,
+>> +					&rtt_granule, &next_addr);
+>> +		if (ret < 0)
+>> +			return ret;
+>> +
+>> +		switch (RMI_RESULT_STATUS(ret)) {
+>> +		case RMI_SUCCESS:
+>> +			free_rtt(rtt_granule);
+>> +			break;
+>> +		case RMI_ERROR_RTT:
+>> +			if (next_addr > addr) {
+>> +				/* Missing RTT, skip */
+>> +				break;
+>> +			}
+>> +			/*
+>> +			 * We tear down the RTT range for the full IPA
+>> +			 * space, after everything is unmapped. Also we
+>> +			 * descend down only if we cannot tear down a
+>> +			 * top level RTT. Thus RMM must be able to walk
+>> +			 * to the requested level. e.g., a block mapping
+>> +			 * exists at L1 or L2.
+>> +			 */
+>> +			if (WARN_ON(RMI_RESULT_DATA_LEVEL(ret) != level))
+>> +				return -EBUSY;
+> 
+> [Severity: Low]
+> Can SMC_RMI_RTT_DESTROY return RMI_ERROR_RTT with next_addr > addr (and
+> next_addr < addr + map_size) when the target RTT at level has non-live
+> initial entries followed by a live child table entry, or does the walk
+> terminate at level - 1?  This rests on an RMM specification detail for
+> SMC_RMI_RTT_DESTROY that could not be confirmed from the kernel source.
 
-That shouldn't be possible, if one SMMU fail the whole thing will
-and the driver should clean up after as the probe is done through:
-	ret = platform_driver_probe(&smmuv3_nesting_driver, smmuv3_nesting_probe);
+This is ruled out by the spec. The only situation for RMI_ERROR_RTT with
+top > ipa is the "Missing RTT" case.
 
-In that case, that system will be considered untrusted.
+[Note I have noticed the rendering in the PDF spec is broken with ">"
+not appearing - I've raised this internally]
 
-Thanks,
-Mostafa
+> If RMM returns RMI_RESULT_DATA_LEVEL(ret) == level with addr < next_addr <
+> addr + map_size, the next_addr > addr check treats the live RTT as missing
+> and advances addr to the unaligned next_addr.  The next iteration sees
+> align_addr != addr, tears down the remaining child RTTs at level + 1, and
+> executes continue, advancing to the next map_size boundary without retrying
+> realm_rtt_destroy() on the parent RTT at level.  Alternatively, if the walk
+> terminates at the parent entry and returns RMI_RESULT_DATA_LEVEL(ret) ==
+> level - 1 with next_addr == addr, WARN_ON(RMI_RESULT_DATA_LEVEL(ret) !=
+> level) triggers and aborts teardown with -EBUSY, leaving the RD and RTTs
+> leaked.
+> 
+> [ ... ]
+> 
+>> @@ -29,12 +206,24 @@ void kvm_destroy_realm(struct kvm *kvm)
+>>  
+>>  	kvm_set_realm_state(kvm, REALM_STATE_DYING);
+>>  
+>> +	/*
+>> +	 * REALM_DESTROY requires the realm to be non-live: all RECs must have
+>> +	 * been destroyed and the root RTTs must be empty. Unmap the IPA space
+>> +	 * and destroy any non-root RTTs before tearing down the RD. The root
+>> +	 * RTT pages are still owned by the RMM at this point, so keep the KVM
+>> +	 * pgtable alive until after REALM_DESTROY and undelegation.
+>> +	 */
+>> +	realm_unmap_stage2(kvm);
+>> +
+>>  	if (realm->rd) {
+>>  		phys_addr_t rd_phys = virt_to_phys(realm->rd);
+>>  
+>>  		if (WARN_ON(rmi_realm_terminate(rd_phys, realm->sro)))
+>>  			return;
+>>  
+>> +		if (WARN_ON(realm_destroy_rtts(kvm)))
+>> +			return;
+>> +
+>>  		if (WARN_ON(rmi_realm_destroy(rd_phys, realm->sro)))
+>>  			return;
+>>  		rmi_free_delegated_page(rd_phys);
+> 
+> [Severity: Low]
+> Does returning early on failure in realm_destroy_rtts() (or the surrounding
+> RMI teardown calls) leak realm->sro?  Unlike realm->rd and the stage-2 PGD
+> pages, realm->sro is host-owned heap memory that is never delegated to the
+> RMM, and kfree(realm->sro) at the end of kvm_destroy_realm() is skipped on
+> these early returns.
 
-> Nicolin
+Technically correct. Although all these early returns are WARN_ON()
+cases so Should Never Happen™. Still I guess I can handle this by a
+"goto out_free_sro" case rather than a straight return.
+
+Steve
+
