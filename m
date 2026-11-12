@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794476499;
-	b=pnJOtCmeHjH8T5SC3v+VsIRVymX7xvKRPGfM09HVPzVr+Ipk4gxzgYCoW+GxtHfY8sso
-	 4Y/kXcCmtMGEbptXi23fNrncgo/U2bRp8Wta7yYIWQ7tclwYUO7SfwlwSqD2qufRvMEe6
-	 b2qlm+iJvevPZ5uej7v5z9AkrM+ze9sN3eIyvNGxIt1eV9uGgnKPjtK17Uht2/2iSq0R3
-	 aTAeQxud4Vk4ZBto/eZqJqLSOL2/MDoh4FdjEKqtmjhlcUYY+SEDU0HrP2Bx8zttaNnKd
-	 LMUCb4j6j/Fkg7kapx+ltBJDTLbXk1Nu61TILYMKHFAUzjuRL44CpjxOLSoxLWMsetg==
+	t=1794480199;
+	b=cjdPq9oQIk5K56+U74s2rDclb3fkXEiLcNfJyGKx/7jVEx4RPzAKgHsYFp1rLmKJfZwC
+	 s+WLW/Oi/gpceDp/hmH1BZxKTiVAAGV944c5LdYNMbDT7vGSz0OnSvScjaySQm1x87Bv1
+	 m8vvHO53Byr9ynDJcl8f9q7isWfOemZ+Hxq3tTzJPO4glvLQgCVnQohO70qCiLaDF9THs
+	 YpoALuLo74O3grZCMZp7Gy5JysG7RQoVUIoWjImGdYCYmxwqZmLeNw+ONVxe8QizHfFgi
+	 GqvIie1UQU4eVHkX4y961fGcB7NekYO3pnvMz0/L/kqvE+dPFraDC5nXP2Pc+MQnU4g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794476499;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794480199;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
 	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
 	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=220ugqDuyQyPHtA/XrNCqAcUUimFC+lFQ4mNPAn6NRA=;
-	b=aWGBEVJi5H7hoL9o6vkBWT3vu/GgfSrl6lhfRKDlGgOsQkkoGJ8eElocApMvjPJesfez
-	 vOKFZSud8j/1BBgEkGaXQV+QR/TJqdhUv7wus7R9elye2M2IJQiLJxVcdJI8zlHNdfSHM
-	 SzIt5t2NQGUB7KJ8ckxDekvz5buujrzmH2OKpabWKZoNMgZqZ3wjLV//w6p8zFs9oJ4Vj
-	 S8/CpWQD0J3D+EMiqOfMx7lywaIzyA40JfZ6tVDfx5hQ7a61g/O+HA1pyKImbJQlPAxoF
-	 fI4vALLV1AqIAa/JZ47F+LJJR+zluc2scD7FDEz0/qHihNnTxV/A1T1o5BlcGcK03wA==
+	bh=X2j4x6ETnjsd3Kk7UiXLGfpl+QRCIcV4hL4S2HQyUOs=;
+	b=MzejDdPRvwXxd679rBbS9hZhH1PLzvsgiRDYnhTh2+UJlCg0RIN3I3dugNSM5dxhFyR/
+	 BLEE97nc8M/ADjLAx85nb19nMhxnOOEtw6RKKI8nFSkk042im3rJJJ/8jhMWCdAQfKsH1
+	 CMSlIN5jfjcSL6qspndvNuJeOxIe0wwHr0U5rR+9zx1sNLbIvAgZaa0t3a6vOCc/ObShl
+	 ezygRY5EsVcLVOX0Vfl7ug8zsMLTwy1cCB9A3zoxCdOPllOd4c60uH35N3zfWxQJ8Za7M
+	 kLsybJHORsYlAfirtvh7wFYxbSXOJLxV45eVKcwoaNULSSktBcGuYEiBpME/RoOfVjA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="vmzj/Kff";
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="sz/bRcPX";
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5D78606A886;
-	Thu, 12 Nov 2026 09:41:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E5D78606A886
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78A51606A337;
+	Thu, 12 Nov 2026 10:43:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 78A51606A337
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=vmzj/Kff
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=sz/bRcPX
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 09344153B;
-	Thu, 12 Nov 2026 01:41:35 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9CC8C153B;
+	Thu, 12 Nov 2026 02:43:14 -0800 (PST)
 Received: from [10.0.129.47] (e122027.cambridge.arm.com [10.0.129.47])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C443D3F632;
-	Thu, 12 Nov 2026 01:41:28 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 76C8C3F673;
+	Thu, 12 Nov 2026 02:43:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794476498; bh=wsUciV+efeTQCIVGRFWUTHzo6OWjjig7oVL2Hlvu3Do=;
+	t=1794480197; bh=xDR73f4nxpZk5DSaOewf66eooDmTQ5dy0pwmOSiLIuw=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=vmzj/KffMUnSTgxJ9oWy92AHHsu+KlvSL1PYaGD6G5XriiSu8w8KE7KGTzZaTN6U5
-	 CER5uSOeYHgUJTU2rmyJyLEMApaNv/fSaEtfVj0gBCjwmC88P/COYdfHvGwPi1GTMG
-	 BNkhuxNjxLgDR3CtZUwX6xR3qq/K74GnFMcPcVQY=
-Message-ID: <a25321ce-7593-4c75-a529-e19c273638ef@arm.com>
-Date: Thu, 12 Nov 2026 09:41:26 +0000
+	b=sz/bRcPXFEyNa7belfSW5kTpVnMxp65VhQF1lieCCf0rIAi0oiwk3xn+JZFcig9CD
+	 1gcmn08lsRczfyJ6K8ZbBvOpIDzJ9EnXmgUZqfKoqEarzelQvs12nZW7bi6qrs3iCC
+	 KiUIJYqG1GFIcWLl7RHP5oXDUOBXgOfs70RBQC7E=
+Message-ID: <1e02dfff-c1ad-46bb-9834-fd4bbaa46179@arm.com>
+Date: Thu, 12 Nov 2026 10:43:13 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -54,107 +54,131 @@ List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/12] KVM: arm64: CCA: Prepare Realm memory management
-To: Kohei Enju <enju.kohei@fujitsu.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+Subject: Re: [PATCH v2 02/12] KVM: arm64: guest_memfd: Check mmap support when
+ preparing memslot
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
  Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
  Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
  <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
  Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ Kohei Enju <enju.kohei@fujitsu.com>
 References: <20261111145758.217946-1-steven.price@arm.com>
- <avV-P2_fOkFWQVnM@FCCLS0092175.localdomain>
+ <20261111145758.217946-3-steven.price@arm.com>
+ <fbc33983-cb8a-48e4-854f-ce009cc5668f@arm.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <avV-P2_fOkFWQVnM@FCCLS0092175.localdomain>
+In-Reply-To: <fbc33983-cb8a-48e4-854f-ce009cc5668f@arm.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 12/11/2026 09:08, Kohei Enju wrote:
-> Hi Steve,
+On 11/11/2026 15:21, Suzuki K Poulose wrote:
+> On 11/11/2026 14:57, Steven Price wrote:
+>> Check the guest_memfd backing file when deciding whether an arm64
+>> memslot has mappable memory rather than checking whether the slot is
+>> gmem only. A public helper function is added to be able to reuse the
+>> static kvm_gmem_supports_mmap() function.
+>>
+> 
+> Please could you explain why we need this ? Why not rely on
+> kvm_memslot_is_gmem_only(), which already tells
+> kvm_gmem_supports_mmap() ? With inplace conversion support gmem supports
+> mmap.
 
-Hi Kohei,
+Unless I'm missing something it's still possible to create a guest_memfd
+that doesn't support mmap() by not passing the GUEST_MEMFD_FLAG_MMAP
+flag. So kvm_memslot_is_gmem_only() doesn't actually guarantee that it's
+a guest_memfd that supports mmap().
 
-> On 11/11 14:57, Steven Price wrote:
->> This series adds the memory management plumbing for CCA, building on the
->> basic RMM support [1]. Thank you to those who reviewed v1 - I'm
->> attempted to address all the comments.
+> 
+>> Signed-off-by: Steven Price <steven.price@arm.com>
 >>
->> The patches introduce internal Realm VM state and RMI feature checks,
->> prepare Realm stage-2 setup and teardown, and provide RTT mapping and
->> invalidation helpers. Realm memslots are restricted to the lower half
->> of the IPA space because the protected and shared halves alias each
->> other. The final patch connects the helpers to KVM's stage-2 MMU
->> operations.
->>
->> This is the memory management portion of the larger Realm host series.
->> Realm descriptor creation, REC entry and exit, activation, and the new
->> uAPI follow in the integration stack. This series alone does not enable
->> Realm creation.
->>
->> As before there's an integration branch[2] that includes the realm
->> creation, REC entry/exit etc building on top of this series. I've also
->> pushed a git branch[3] of just this series.
->>
+>> ---
 >> Changes since v1:
->> - Add a guest_memfd prerequisite patch that checks whether the backing
->>   file supports mmap when preparing an arm64 memslot.
->> - Combine the RMI availability and feature checks into one patch, and
->>   move Realm vCPU feature restrictions to the integration stack.
->> - Correct Realm IPA sizing and RTT teardown, including teardown before
->>   activation, RTT accounting, and handling of missing or folded RTTs.
->> - Rework RTT mapping to respect IPA and physical alignment, handle
->>   partial RMI progress, and retry interrupted operations.
->> - Preserve private mappings when a Realm guest_memfd memslot deletion is
->>   rejected, and tighten Realm fault handling and stage-2 destruction.
+>> - New patch in v2. Check the guest_memfd backing file rather than the
+>>    memslot flag when deciding whether arm64 can map the backing memory.
+>> ---
+>>   arch/arm64/kvm/mmu.c     | 7 ++++---
+>>   include/linux/kvm_host.h | 1 +
+>>   virt/kvm/guest_memfd.c   | 6 ++++++
+>>   3 files changed, 11 insertions(+), 3 deletions(-)
 >>
->> [1] https://lore.kernel.org/all/20261007073537.2454351-1-suzuki.poulose@arm.com/
->> [2] https://gitlab.arm.com/linux-arm/linux-cca
->>     branch: cca-host-mm/v2/integration
->> [3] https://gitlab.arm.com/linux-arm/linux-cca
->>     branch: cca-host-mm/v2/mm
->>
->> Steven Price (7):
->>   KVM: arm64: CCA: Reserve the RMM mode
->>   KVM: arm64: guest_memfd: Check mmap support when preparing memslot
->>   KVM: arm64: CCA: Check RMI support and features at init
->>   KVM: arm64: CCA: Add basic infrastructure for creating a realm
->>   KVM: arm64: CCA: Tear down RTTs
->>   KVM: arm64: CCA: Add Realm RTT mapping and invalidation helpers
->>   KVM: arm64: CCA: Support runtime faulting of memory
->>
->> Suzuki K Poulose (5):
->>   KVM: arm64: CCA: Introduce Realms
->>   KVM: arm64: Handle attributes in stage2_unmap_range
->>   KVM: Allow architectures to reject memslot changes before invalidation
->>   KVM: arm64: CCA: Prevent memslot modifications after Realm creation
->>   KVM: arm64: CCA: Add Realm stage-2 MMU operations
-> 
-> I've tested the integration branch [2] including this series on our
-> hardware using the QEMU-VMM proposed in:
->   https://lore.kernel.org/qemu-devel/20261002202026.1204110-1-mathieu.poirier@linaro.org/
-> 
-> The Realm guest VM (32 vCPUs, 16 GiB RAM) booted successfully. To
-> exercise the guest with a more realistic workload, I also performed a
-> full Linux kernel build, which completed successfully.
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 1db10d8d6db7..a146f6cde3d0 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -2839,10 +2839,11 @@ int kvm_arch_prepare_memory_region(struct kvm
+>> *kvm,
+>>           return -EFAULT;
+>>         /*
+>> -     * Only support guest_memfd backed memslots with mappable memory,
+>> since
+>> -     * there aren't any CoCo VMs that support only private memory on
+>> arm64.
+>> +     * Protected VMs currently require guest_memfd backed memslots with
+>> +     * mappable memory to support shared mappings.
+>>        */
+>> -    if (kvm_slot_has_gmem(new) && !kvm_memslot_is_gmem_only(new))
+>> +    if (kvm_arch_has_private_mem(kvm) && kvm_slot_has_gmem(new) &&
+>> +        !kvm_gmem_slot_supports_mmap(new))
 
-Awesome - thank you very much for testing.
+Sashiko has identified I've screwed up this condition though.
+kvm_arch_has_private_mem(kvm) shouldn't be in there as that allows a
+non-private VM to bind a non-mmappable gmem.
 
-> A Tested-by tag might not be carried over to the next revision, if any,
-> but anyway, for this series:
+>>           return -EINVAL;
+>>         /* guest_memfd is incompatible with MTE. */
+>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+>> index e7fc94e2910a..f65728a713ec 100644
+>> --- a/include/linux/kvm_host.h
+>> +++ b/include/linux/kvm_host.h
+>> @@ -2614,6 +2614,7 @@ static inline bool kvm_is_private_gfn(struct kvm
+>> *kvm, gfn_t gfn)
+>>     #ifdef CONFIG_KVM_GUEST_MEMFD
+>>   bool kvm_gmem_is_private_gfn(struct kvm *kvm, gfn_t gfn);
+>> +bool kvm_gmem_slot_supports_mmap(const struct kvm_memory_slot *slot);
+>>   bool kvm_arch_supports_gmem_init_shared(struct kvm *kvm);
+>>     static inline u64 kvm_gmem_get_supported_flags(struct kvm *kvm)
+>> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+>> index 8c97a69b16dc..3dd8d227bebb 100644
+>> --- a/virt/kvm/guest_memfd.c
+>> +++ b/virt/kvm/guest_memfd.c
+>> @@ -442,6 +442,12 @@ static bool kvm_gmem_supports_mmap(struct inode
+>> *inode)
+>>       return GMEM_I(inode)->flags & GUEST_MEMFD_FLAG_MMAP;
+>>   }
+>>   +bool kvm_gmem_slot_supports_mmap(const struct kvm_memory_slot *slot)
+>> +{
+>> +    /* The guest_memfd file is pinned while preparing a new memslot. */
 > 
-> Tested-by: Kohei Enju <enju.kohei@fujitsu.com>
+> We should gate this on kvm_slot_has_gmem() and how do we ensure that the
+> call comes after it is prepared ?
+
+I'm not sure what you mean by "gate this on kvm_slot_has_gmem()" - yes
+this function only makes sense on a gmem slot - the user above checks
+that first. I'm not sure what value the function should call if you call
+it on a non-gmem slot?
 
 Thanks,
 Steve
+
+>> +    return kvm_gmem_supports_mmap(file_inode(slot->gmem.file));
+>> +}
+>> +
+>>   static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
+>>   {
+>>       struct inode *inode = file_inode(vmf->vma->vm_file);
+> 
+> 
+> Cheers
+> Suzuki
 
