@@ -1,108 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794502205;
-	b=Hba+UqR1bcTGP/EwKWE6enM6X1joOF6J5IFJLUdNquH+9tR3Jy8FZYzbjojTFQCuwkhX
-	 1fuWC6/mLXOmgS3HruG+LMZSPV1862D8NFqazvIXwN4Op+kTWE5734BExocLcOSILIM9L
-	 zTcHU7VuZxtEgFIUPoDTdJoBt5zBX547o/ExYASrVey5bsMoFCZxFvk0k6wta0Z8G5OU9
-	 FubKT34aAKJG2boxriP3GMzgSibTb2KPCPDseNwNHDC/Pulb+C4VpmNoYNlhTg2JkEvbv
-	 fBTRfeYlMIAe4BUA3XyWKiRNXbxr5jLPsNKEq2r4FpSZPZhz4zMF/3hrL/uoxjBtoYA==
+	t=1794502644;
+	b=023twWRDu/ac0ytLAAbCKf2lp8wq5vznJt8yghG5ff3JiNax7qRuYYUV1mlx90Bldgyu
+	 aJW533t9UwkZTsq2UIzU2LBpixE6Fn5zL3oopCEGaaCgBuw1DGOqRxXwtka3T4NxyGnB4
+	 8LQl3k0Nc+uyZnVhG4+KODoTuxO29BwTdyF1nPEb7Qo10D8GYQHZ5SqxJRwZc4ekH+xT+
+	 HB9B3rSwHZflE4LoDxPz7jDQLzL2CmhFHGN1x8SVTzx8kteKw+39q/9MimQFxZDCYo7vh
+	 +9Pj4qacnqCQe34t5IJO6AZsUUNi70cN8iNBduMq6aCf/kPNrC0Ovnbt0hKYKEIks5A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794502205;
-	h=Received:DKIM-Signature:X-Mailer:From:To:Cc:Subject:In-Reply-To:
-	 References:Date:Message-ID:MIME-Version:Content-Type;
-	bh=AcN09gsgAs2Ff3t7W84Nu6Qih9q/psMVcrup6/u4Mb8=;
-	b=ilphkJmjeqwrWmuTYmn5pX3CPO09gNYAW0R1oaBCVS/ezCCT+2CX93dvyWVyLLctgwGS
-	 xmCZ0AQJM9INtbfVG9i78A1vwCCw+Updj+BQgoTq3sqZgqEKSAz0QEjOBoXd3lbESRe/z
-	 q+oMAFY1yoHo0lKrO8kMfdF1roFuN0pq0uPnYPVtARinDbLTmOIHjX0I/Z4at5eVNKhup
-	 GAjXFYCEBgx55aVBBMJJYCepOZgFCugOTz174fPqdIQYlEjvomJ2KM1zFV1P2SP+wcvJx
-	 33tfwvWdKQJXVBphuSwUPtICJd6riZR1YdsrXa7x735AIlEE9cbPP3hihXp7r65cziA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794502644;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:Content-Language:From:To:Cc:
+	 References:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=Fz3ok1xgLMCevgKit+vc08GYfcHPvlYtyNknEWCsv+M=;
+	b=Jcm13+f3Zjyi+lVF2gCbcDygrFu5H/QuQZNL+ZC2S+JbidOcT0DIusWRnySpMJHSY8Mp
+	 jF7wi+poSmsveS7CDOjP8UNychZJEG1gHlrE4m1g8kmfrTFQK808YlFARSScTBAbbkzeh
+	 DY6kFllylymuLBxMUg89mTWcvsfkMxvhwjCuaUR4ePVRBzGVK7X+AsCQ3gsKMbTnmhUip
+	 GMEggGYKeBj/7Xkwd/li/oBqMovAsJ6nmv1E0R8kckC4439zKU0OJQgqyzJ31crb97XMf
+	 2lg1mWPFiLi9k2cVvd+yBgbPSroBoNsNAHgla7zFyYnD8kHvIfhuTs2CwWgtqKWVw0w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="W/9czcKj";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EADC606A31C;
-	Thu, 12 Nov 2026 16:50:05 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=tNGxxaHv;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A6CA606A897;
+	Thu, 12 Nov 2026 16:57:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3A6CA606A897
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=W/9czcKj
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D1661F000C4;
-	Thu, 12 Nov 2026 16:49:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794502205;
-	bh=AcN09gsgAs2Ff3t7W84Nu6Qih9q/psMVcrup6/u4Mb8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=W/9czcKjc212sPdhIyrx1NDyBKYyPPRS27FVKM/1YECl6e+INBhZ8lwiXJw/0PD0C
-	 yvm9HXsHdRjXkX9jxfHpSGpkQLE4ZHcUSVMisCsBBtrAhip7HSmlWRU6SkJk1tZauH
-	 vckQ8/eh3RZyd3mD9o9PbLleTigE7S33mitpROx+eYBbjeK6o+wS/OJ/Ap2ypHXB3Z
-	 fCaDj4oC4JFFSUy6kIY4loUbWtVDYSgPXYyWsB18EaNkcc43JJQDp5dVi1NCaPnlWW
-	 ycuPRKf6HDqbrcEyvmAiJ09mRF1hLuZcy5Tko/7PNAiAyhZORNcHT7iJ5+PVmKaIBB
-	 kubrpP4ayRa6Q==
-X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Baoquan He <baoquan.he@linux.dev>,
-	Mike Rapoport <rppt@kernel.org>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Pratyush Yadav <pratyush@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian =?utf-8?Q?K=C3=B6nig?= <christian.koenig@amd.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Joerg Roedel <joro@8bytes.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Benjamin Gaignard <benjamin.gaignard@collabora.com>,
-	Brian Starkey <Brian.Starkey@arm.com>,
-	John Stultz <jstultz@google.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Radu Rendec <radu@rendec.net>,
-	"T.J. Mercier" <tjmercier@google.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <chleroy@kernel.org>,
-	Ritesh Harjani <ritesh.list@gmail.com>,
-	Shrikanth Hegde <sshegde@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Kiryl Shutsemau <kas@kernel.org>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	"K . Y . Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
-	kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
-	media-ci@linuxtv.org
-Subject: Re: [PATCH v9 01/14] mm: Add an allocator for CoCo shared memory
-In-Reply-To: <sashiko-outbox-199539@kernel.org>
-References: <20261104164555.3555725-1-aneesh.kumar@kernel.org>
- <20261104164555.3555725-2-aneesh.kumar@kernel.org>
- <sashiko-outbox-199539@kernel.org>
-Date: Thu, 12 Nov 2026 22:19:41 +0530
-Message-ID: <yq5ay0aygfkq.fsf@kernel.org>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=tNGxxaHv
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7C8B51516;
+	Thu, 12 Nov 2026 08:57:20 -0800 (PST)
+Received: from [10.57.67.215] (unknown [10.57.67.215])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CEA383F673;
+	Thu, 12 Nov 2026 08:57:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1794502643; bh=n2YAal6lwAvLkGjEYo4/CPDxHN6fr05biMtI54HCe30=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=tNGxxaHvtfVA43zvRnB7GTnGJoDyTosQUMhEXFkpKP4DM07ISyw/1a6JwnDIzfeVt
+	 iPFZYAuyr7J7aOLWZPHXLLDlPIrzG0j4O6jDVSDxGQbuXq5MM8hFZEpxOFPK8LgeeI
+	 w5IruCxrFPIbf5Si6pQxMDpCHFztBO57Uco6Vvh0=
+Message-ID: <87c408e4-95cd-477c-9656-b472983c6df7@arm.com>
+Date: Thu, 12 Nov 2026 16:57:18 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -112,181 +53,173 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 02/12] KVM: arm64: guest_memfd: Check mmap support when
+ preparing memslot
+Content-Language: en-GB
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, Ackerley Tng <ackerleytng@google.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ Kohei Enju <enju.kohei@fujitsu.com>
+References: <20261111145758.217946-1-steven.price@arm.com>
+ <20261111145758.217946-3-steven.price@arm.com>
+ <fbc33983-cb8a-48e4-854f-ce009cc5668f@arm.com>
+ <1e02dfff-c1ad-46bb-9834-fd4bbaa46179@arm.com>
+ <26a29420-8d27-4069-bbd5-28692c9e8542@arm.com>
+In-Reply-To: <26a29420-8d27-4069-bbd5-28692c9e8542@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-sashiko-bot@kernel.org writes:
+On 12/11/2026 16:35, Suzuki K Poulose wrote:
+> On 12/11/2026 10:43, Steven Price wrote:
+>> On 11/11/2026 15:21, Suzuki K Poulose wrote:
+>>> On 11/11/2026 14:57, Steven Price wrote:
+>>>> Check the guest_memfd backing file when deciding whether an arm64
+>>>> memslot has mappable memory rather than checking whether the slot is
+>>>> gmem only. A public helper function is added to be able to reuse the
+>>>> static kvm_gmem_supports_mmap() function.
+>>>>
+>>>
+>>> Please could you explain why we need this ? Why not rely on
+>>> kvm_memslot_is_gmem_only(), which already tells
+>>> kvm_gmem_supports_mmap() ? With inplace conversion support gmem supports
+>>> mmap.
+>>
+>> Unless I'm missing something it's still possible to create a guest_memfd
+>> that doesn't support mmap() by not passing the GUEST_MEMFD_FLAG_MMAP
+>> flag. So kvm_memslot_is_gmem_only() doesn't actually guarantee that it's
+>> a guest_memfd that supports mmap().
+> 
+> I see, while the KVM decides that, with inplace conversion shared pages
+> come from gmem, we do allow creation of gmem without MMAP set, implying
+> we would fail the mmap request from VMM, which is pretty pointless. But
+> should the KVM fail this when VMM is shooting on its foot ? Only makes
+> sense if there are no untrusted device DMA for the CoCo Guest.
 
-> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
-> - [High] mm: invalid cc_make_private() call on cc_make_shared() failure
-> --
->
-> commit 8a434c0ee7399613dbf060530383d80bbc1ab7af
-> Author: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
->
-> mm: Add an allocator for CoCo shared memory
->
-> This commit introduces a common allocator and transition helpers for
-> confidential-computing shared memory, including alloc_cc_shared_pages(),
-> alloc_cc_shared_pages_node(), and free_cc_shared_pages().
->
->> diff --git a/mm/cc_shared.c b/mm/cc_shared.c
->> new file mode 100644
->> index 0000000000000..5c4c971cfb7b2
->> --- /dev/null
->> +++ b/mm/cc_shared.c
->> @@ -0,0 +1,233 @@
->
-> [ ... ]
->
->> +static int __alloc_cc_shared_pages_node(int nid, gfp_t gfp,
->> +					size_t requested,
->> +					struct cc_shared_pages *mem)
->> +{
->> +	struct cc_shared_layout layout;
->> +	struct page *page;
->> +	unsigned int order;
->> +	bool zero = gfp & __GFP_ZERO;
->> +	int ret;
->> +
->> +	ret = cc_shared_calc_layout(requested, &layout);
->> +	if (ret)
->> +		return ret;
->> +
->> +	order = get_order(layout.shared_size);
->> +	if (order > MAX_PAGE_ORDER)
->> +		return -EINVAL;
->> +	/*
->> +	 * State transitions require a linear-map address and may modify memory.
->> +	 * Allocate from low memory and defer requested zeroing until afterwards.
->> +	 * Shared allocations have no migration support, so they must not
->> +	 * be allocated with __GFP_MOVABLE.
->> +	 */
->> +	gfp &= ~(__GFP_HIGHMEM | __GFP_ZERO | __GFP_MOVABLE);
->> +	if (nid == NUMA_NO_NODE)
->> +		page = alloc_pages(gfp, order);
->> +	else
->> +		page = alloc_pages_node(nid, gfp, order);
->> +	if (!page)
->> +		return -ENOMEM;
->> +
->> +	ret = cc_make_shared(page_address(page), layout.shared_size);
->> +	if (ret) {
->> +		if (!cc_make_private(page_address(page), layout.shared_size))
->> +			__free_pages(page, order);
->> +		else
->> +			pr_warn_ratelimited("leaking %zu bytes with uncertain shared state\n",
->> +					    layout.shared_size);
->> +		return ret;
->> +	}
->
-> [Severity: High]
-> Is it safe to call cc_make_private() across the entire layout.shared_size
-> range when cc_make_shared() fails in __alloc_cc_shared_pages_node()?
->
-> When cc_make_shared() fails via set_memory_decrypted(), the pages in the
-> range may not have been transitioned to shared state at all, or only a prefix
-> of the range may have been transitioned.
->
-> For example, on x86 TDX in arch/x86/mm/pat/set_memory.c and
-> arch/x86/coco/tdx/tdx.c:
->
-> __set_memory_enc_pgtable() {
-> 	ret = x86_platform.guest.enc_status_change_prepare(addr, numpages, enc);
-> 	if (ret)
-> 		goto vmm_fail;
->
-> 	ret = __change_page_attr_set_clr(&cpa, 1);
-> 	...
-> 	if (ret)
-> 		return ret;
->
-> 	ret = x86_platform.guest.enc_status_change_finish(addr, numpages, enc);
-> 	if (ret)
-> 		goto vmm_fail;
-> }
->
-> tdx_enc_status_change_finish() {
-> 	if (!enc && !tdx_enc_status_changed(vaddr, numpages, enc))
-> 		return -EIO;
->
-> 	if (enc)
-> 		atomic_long_sub(numpages, &nr_shared);
-> 	else
-> 		atomic_long_add(numpages, &nr_shared);
->
-> 	return 0;
-> }
->
-> If set_memory_decrypted() (enc = false) fails with -EBUSY on mem_enc_lock or
-> with -ENOMEM in __change_page_attr_set_clr() before
-> tdx_enc_status_change_finish() is reached, the pages remain private and
-> accepted in the TDX module, and nr_shared is not incremented. Calling
-> cc_make_private() (set_memory_encrypted(), enc = true) then invokes
-> tdx_enc_status_change_prepare() -> tdx_accept_memory() -> try_accept_one() on
-> already-accepted private memory, which fails and jumps to vmm_fail in
-> __set_memory_enc_pgtable(), triggering a spurious WARN_ONCE and leaking memory
-> that was never shared.
->
-> Conversely, if tdx_enc_status_change_finish() fails during cc_make_shared()
-> before atomic_long_add(numpages, &nr_shared), and the subsequent
-> cc_make_private() call succeeds, tdx_enc_status_change_finish() will execute
-> atomic_long_sub(numpages, &nr_shared), underflowing nr_shared and corrupting
-> the accounting checked in tdx_kexec_finish().
->
-> Similarly, on arm64 pKVM in drivers/virt/coco/pkvm-guest/arm-pkvm-guest.c,
-> pkvm_set_memory_decrypted() shares pages one by one and stops at the first
-> failing page, leaving the remaining pages private. Calling cc_make_private()
-> across the full range then invokes KVM_MEM_UNSHARE on private pages, which
-> fails with -EPERM.
->
-> Other callers in the kernel (such as dma_direct_alloc_pages(),
-> atomic_pool_expand(), and swiotlb_init_late()) do not call
-> set_memory_encrypted() when set_memory_decrypted() fails, and instead leak the
-> pages directly because the transition state of the range is unknown. Should
-> __alloc_cc_shared_pages_node() do the same here instead of calling
-> cc_make_private()?
->
+See Documentation/virt/kvm/api.rst, under section : KVM_CREATE_GUEST_MEMFD
 
-Yes, I agree that we should do this. Something like:
 
-modified   kernel/dma/swiotlb.c
-@@ -748,14 +748,9 @@ static struct page *alloc_dma_pages(gfp_t gfp, size_t bytes,
- 
- 	vaddr = phys_to_virt(paddr);
- 	if (cc_shared && cc_make_shared(vaddr, bytes))
--		goto error;
-+		/* leak pages on error */
-+		return NULL;
- 	return page;
--
--error:
--	/* Intentional leak if pages cannot be encrypted again. */
--	if (cc_shared && !cc_make_private(vaddr, bytes))
--		__free_pages(page, order);
--	return NULL;
- }
- 
- /**
-modified   mm/cc_shared.c
-@@ -133,11 +133,16 @@ static int __alloc_cc_shared_pages_node(int nid, gfp_t gfp,
- 
- 	ret = cc_make_shared(page_address(page), layout.shared_size);
- 	if (ret) {
--		if (!cc_make_private(page_address(page), layout.shared_size))
--			__free_pages(page, order);
--		else
--			pr_warn_ratelimited("leaking %zu bytes with uncertain shared state\n",
--					    layout.shared_size);
-+		/*
-+		 * A failed transition may leave the range partially
-+		 * shared, with no indication of which pages changed state.
-+		 * Converting the whole range back to private is not safe
-+		 * on architectures that cannot handle pages which are
-+		 * already private. Leak the allocation rather than return
-+		 * pages with uncertain state to the allocator.
-+		 */
-+		pr_warn_ratelimited("leaking %zu bytes with uncertain shared state\n",
-+				    layout.shared_size);
- 		return ret;
- 	}
- 
+"When the KVM MMU performs a PFN lookup to service a guest fault, the 
+fault will
+always be consumed from guest_memfd, regardless of whether it is a 
+shared or a
+private fault (unless in-place conversion is disabled and the backing
+guest_memfd does not have the GUEST_MEMFD_FLAG_MMAP flag set)."
+
+
+Cheers
+Suzuki
+
+
+> 
+> Am I missing something ?
+> 
+> Cheers
+> Suzuki
+> 
+> 
+> 
+> 
+>>
+>>>
+>>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>>>
+>>>> ---
+>>>> Changes since v1:
+>>>> - New patch in v2. Check the guest_memfd backing file rather than the
+>>>>     memslot flag when deciding whether arm64 can map the backing 
+>>>> memory.
+>>>> ---
+>>>>    arch/arm64/kvm/mmu.c     | 7 ++++---
+>>>>    include/linux/kvm_host.h | 1 +
+>>>>    virt/kvm/guest_memfd.c   | 6 ++++++
+>>>>    3 files changed, 11 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>>> index 1db10d8d6db7..a146f6cde3d0 100644
+>>>> --- a/arch/arm64/kvm/mmu.c
+>>>> +++ b/arch/arm64/kvm/mmu.c
+>>>> @@ -2839,10 +2839,11 @@ int kvm_arch_prepare_memory_region(struct kvm
+>>>> *kvm,
+>>>>            return -EFAULT;
+>>>>          /*
+>>>> -     * Only support guest_memfd backed memslots with mappable memory,
+>>>> since
+>>>> -     * there aren't any CoCo VMs that support only private memory on
+>>>> arm64.
+>>>> +     * Protected VMs currently require guest_memfd backed memslots 
+>>>> with
+>>>> +     * mappable memory to support shared mappings.
+>>>>         */
+>>>> -    if (kvm_slot_has_gmem(new) && !kvm_memslot_is_gmem_only(new))
+>>>> +    if (kvm_arch_has_private_mem(kvm) && kvm_slot_has_gmem(new) &&
+>>>> +        !kvm_gmem_slot_supports_mmap(new))
+>>
+>> Sashiko has identified I've screwed up this condition though.
+>> kvm_arch_has_private_mem(kvm) shouldn't be in there as that allows a
+>> non-private VM to bind a non-mmappable gmem.
+>>
+>>>>            return -EINVAL;
+>>>>          /* guest_memfd is incompatible with MTE. */
+>>>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+>>>> index e7fc94e2910a..f65728a713ec 100644
+>>>> --- a/include/linux/kvm_host.h
+>>>> +++ b/include/linux/kvm_host.h
+>>>> @@ -2614,6 +2614,7 @@ static inline bool kvm_is_private_gfn(struct kvm
+>>>> *kvm, gfn_t gfn)
+>>>>      #ifdef CONFIG_KVM_GUEST_MEMFD
+>>>>    bool kvm_gmem_is_private_gfn(struct kvm *kvm, gfn_t gfn);
+>>>> +bool kvm_gmem_slot_supports_mmap(const struct kvm_memory_slot *slot);
+>>>>    bool kvm_arch_supports_gmem_init_shared(struct kvm *kvm);
+>>>>      static inline u64 kvm_gmem_get_supported_flags(struct kvm *kvm)
+>>>> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+>>>> index 8c97a69b16dc..3dd8d227bebb 100644
+>>>> --- a/virt/kvm/guest_memfd.c
+>>>> +++ b/virt/kvm/guest_memfd.c
+>>>> @@ -442,6 +442,12 @@ static bool kvm_gmem_supports_mmap(struct inode
+>>>> *inode)
+>>>>        return GMEM_I(inode)->flags & GUEST_MEMFD_FLAG_MMAP;
+>>>>    }
+>>>>    +bool kvm_gmem_slot_supports_mmap(const struct kvm_memory_slot 
+>>>> *slot)
+>>>> +{
+>>>> +    /* The guest_memfd file is pinned while preparing a new 
+>>>> memslot. */
+>>>
+>>> We should gate this on kvm_slot_has_gmem() and how do we ensure that the
+>>> call comes after it is prepared ?
+>>
+>> I'm not sure what you mean by "gate this on kvm_slot_has_gmem()" - yes
+>> this function only makes sense on a gmem slot - the user above checks
+>> that first. I'm not sure what value the function should call if you call
+>> it on a non-gmem slot?
+>>
+>> Thanks,
+>> Steve
+>>
+>>>> +    return kvm_gmem_supports_mmap(file_inode(slot->gmem.file));
+>>>> +}
+>>>> +
+>>>>    static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
+>>>>    {
+>>>>        struct inode *inode = file_inode(vmf->vma->vm_file);
+>>>
+>>>
+>>> Cheers
+>>> Suzuki
+>>
+> 
+
