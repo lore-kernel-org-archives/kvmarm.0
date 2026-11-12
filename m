@@ -1,94 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.52
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794489327;
-	b=gKjrVTcRBAOAd4S/LNR1mOLvYfUJQzSTzrj7w2npgNutsCSz0r4EqqWVdRO8MzmaVs6D
-	 VPEO/xjaamVq85EbEJVPuXham8n9RALkrC3K5yxbnLNvmfU9VvzbBs0c48ibM2n8cs7Hp
-	 cwezNKxInMeXNY3jwheK15xba5ZGpLnaxZtjwqt5ORUN0cLyfx020/VW0SAwiUdcPSZwT
-	 IqKhVq1PPSPoPFe9lomTTjgHNbO1oxvbrWc2Ncb9UECkor4Rq6Df2Uxz6s7Jpbmfk0UwE
-	 sg9pAxlys+9Wbubjk2s3Xf2Eo4AIbA/85reHqGdmhZC24Y3zIR9NZUMkMH0VS0Sypqg==
+	t=1794489467;
+	b=qKtG94XSP/JOTB58s67FlbgPTz7DFe+5Hy14gcefRJYlUYaIe+a722ixpqAEysgIKD7q
+	 yRMaXfXTqQN4X4eddcsg+sWTEzXLCtZCkM4hh7zTO6fJMqTD9MG2oQpFAvxmPJp7085lA
+	 q/Vfqu/JufKz7cWJLEtGfYBguH9JCfqMYBiPOcgteQg6fDyigTpeQ/NkPVNFCdykz1VGO
+	 Dapzt+FzIWWiB16Vb68g03BBYv4C8ee9Nie729SIZV/UWp5Vvhi0ufZDsL0Ii0cQPdV7K
+	 FHmZBOEvW2y7CqiTTVi5X+N64kePK8QqxpuwSO8CtENT+pjkVZJ58z+P1SPzQq3j3HQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794489327;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794489467;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To;
-	bh=e7CPF5orTIvftcTO8Leab/fUE5tFTHho+53fmzbA+Yw=;
-	b=ScycxMzTy168wRVpjOvNdYEcXcgaC3CmMueRyMmRPnvRnecWvlHJ8c4vUD51Fg/jZ63M
-	 QR99IDxpwb1X5ElPu3F1Eipg12iBDjbns1fgD0qDF9E0ZkXJAxoAsc4mzt99Wl18NiUhG
-	 H2xXKs3cMRx/c19D4G4ny7E6QlWzlYA13RjlMaTm7Mhd+wTECaZ1m0Yj1C5Vx0xIe2/Pg
-	 wQ/mpekF/ZXMr9Ld5EiLLqp+zHkzyF3+YZ+gUua+RLqyOsHAttyKdAYY/m9EpvMk5xIne
-	 2GzTl+VPMYp0v6NZC2o7whZjl6/K8Eloz5FsLWOpUvsCb5QnRJ7fn+AgVNis7mdQ2pg==
+	bh=J0NPd2sJLaiupFx719PpF/2OXb4U3bSy/8nJPIXJVTs=;
+	b=TwhcYD/lh7EevLsHwMcg2MC6ASzZBK+qAUoJmUR3H9JKj0cP/U9MWAVmrpNRdldDNMAg
+	 OksQLXdl8DRd0lqe51az053m5C0gzTGwsrVZIwHRe68Aay030a3VgtSEkteR+mHR4hvfY
+	 PU3kOZJVl2S7xcWF7b8MdFP4Yn7Asbzc9m7E8dqQmOjgHV21Kd7fs3rNVuNAcx/vYoXug
+	 347hl+UFJK8uPkJQ9CKvX0xcGCPR7cOE9qNQUSZSGD51psHDMHVf7Sx3fqwbKszlmW8cJ
+	 wKEHeydrMsiNZugEqE0MOQbBhA7ZKXdnvbneNQQ366tYPRv1bQumGZ+da90PRhq7tYA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=lfr9DOuy;
-	arc=none smtp.remote-ip=209.85.221.43
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=fWYMWfb0;
+	arc=none smtp.remote-ip=209.85.128.52
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 825AC606A327
-	for <kvmarm@lists.linux.dev>; Thu, 12 Nov 2026 13:15:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 825AC606A327
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E00606A321
+	for <kvmarm@lists.linux.dev>; Thu, 12 Nov 2026 13:17:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 17E00606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=lfr9DOuy
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-4910b863b84so561346f8f.0
-        for <kvmarm@lists.linux.dev>; Thu, 12 Nov 2026 05:15:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=fWYMWfb0
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4a5720b0a57so5466355e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 12 Nov 2026 05:17:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794489326; x=1795094126; darn=lists.linux.dev;
+        d=google.com; s=20260707; t=1794489465; x=1795094265; darn=lists.linux.dev;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :content-type:mime-version:references:message-id:subject:cc:to:from
          :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=e7CPF5orTIvftcTO8Leab/fUE5tFTHho+53fmzbA+Yw=;
-        b=lfr9DOuyZWmv5Ssus+lxnBlJ5IRb34UhjM0HGOXuqnDqXM10ISr796MkpvqwN7yP0X
-         ZPbsV1LZIE5ax0IszTR3mcHYxOFgh90JiPmG0RHZIq58jg2Y/JBEwQAH9xtMfJCmF99T
-         9lz7/FpftdpIQzdCKSaO7n2bKDfssIevck10lvds8oGK7CsLu3UvqKLbXZDv9QEH46xK
-         qWasSzIsFuWdBCyMTL1OkMuJnfpq+jNA1eKVEroTPzD83iIdsyezqsm5UQU4AyQIeEgF
-         4HU9KcX+OR6Zg8tZIUs9GNcFww+DuRVAMPw5MN1RNJcd/RJBxaVurwZyeQnIFqZzsefP
-         yT3A==
+        bh=J0NPd2sJLaiupFx719PpF/2OXb4U3bSy/8nJPIXJVTs=;
+        b=fWYMWfb03Gum895Rqe6yP5cXmiBuyEIRJHjMBsllVCtFytYFdnM2H1ASqPXEFnTijY
+         tG+jcIUmPrmm+AMQdc3lrc/E5piUJZvZKq15EZTYr1iZnxr+VCZ2cIBgEeT92rJR7OqJ
+         NBAmbMGW9yOgNIaD68tr4TuMVz4i75I3y2cWu2cHOorHsEimXRCxhdcMppdyvjHVK94f
+         myOLHDUx8a9tQDHH4aiybyYvi4gRozVaxNDHRiN4rhOF1UCJFqTt8HJZCWTOx3WNggi+
+         LNgo9SB8kFxSsWXVVltRSPRc7hyZsXOdWq4NwSDDrUrvRMGviRQtg1zyRC5DkdvPZ0Vq
+         OCxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794489326; x=1795094126;
+        d=1e100.net; s=20260707; t=1794489465; x=1795094265;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :content-type:mime-version:references:message-id:subject:cc:to:from
          :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=e7CPF5orTIvftcTO8Leab/fUE5tFTHho+53fmzbA+Yw=;
-        b=e2uubwEe+5WqS2TXJX22UQzq4W3+9LEpF8N/prXgL/lRtuAeBqoRZT2Mk3nCDHUGtI
-         MCrXqyGTcxBfo8E3deqfEyHqaQ5M4Rg5cOWGUD2fHSdGzgdpMFVMp0hoRt7FTpPJRSzp
-         TrefoPr0LBuo/PRYYXdHu4Nq577F7yjNaEFyAPkeb8z9NLnG7fvf+RMA+WY4KKg1Z3gm
-         8bFikAOLU8ScgU/dI2+NT1dyLi5AkagIC9cAd01ty+5Xx+DTRIFHo3miVvszIkIBw6Pe
-         XnBxgKo6CnzrdbrI8Kquyi/i375x9GRwcwnedHS7GnKzMJvNyAQE10fyA7f4+QycBohO
-         fMdw==
-X-Gm-Message-State: APuU4Z8ZmkB2iNeYtpxCCbgGLQ9u8rQvp/IYY0MBu+O0pIfEyXnz1Z7G
-	Rt7VR93ESZzKEv6S2NVHwH1BT2kU3GM3CNSfXDOkGvolM10aXJNyy5LQ2zEIwWkATA==
-X-Gm-Gg: AYBFou1iFfF0y4OsKiHy6sgED/BPqd8K/zDs/QLD61RdKPzlFOVawF3rQgRc8BgvQLq
-	N8bL2NaPakbbtWsYXjd4IvGJQv/NrJttLKILIS+seUj2yaoU6/XHdShFASCnSscEnEpApB7TvJa
-	fOOvs0A3tEwmsmjdhKpHvLzpAEWw/j2gGCrop+WcOhsfYyB880V5LructpFYm2b8itOe0HKVG9H
-	evWKwPHAbgj5rT5wZN8pZLPMC71LXDAI14fyQYrRNvpj1CbzqzAY78nNYErmFMCUo5azLw5cbKV
-	3YZzm6R5gqFrFVXA9viSfmiFi4s95DYCzVCik4u9ZIUDmWK1IIkvSG3NQ71xCzqIzoCTdrwwdsU
-	5Upyx3Xg8LYuMZ7e+0MS2FBUDOiFR2bHNaMdNH5lZsEmNz+1xcixpDRu9itlc5Yo3zUxsrBm6HO
-	auJPJRJ/KyQztk76K4Vz8VaPS52RA23R4QGx89nDautmI8mVTBd/gF41EXoKWxHM1YNpJDDBE5T
-	tagZpFhggSlrabvG6/c7epxKRiyu/uJUWrCeT9N798qxhXO1wEBvQZS5WVpu6ZyorstLgLhOBEa
-	7Wa0P69/okzKj9RRDXpLugWJBK4wVVZT0Q7h0rOloEPFkgBqGERVle026DVVzIDGdQ==
-X-Received: by 2002:a05:6000:4684:b0:491:9332:935a with SMTP id ffacd0b85a97d-49afdf7ee91mr3623954f8f.1.1794489325121;
-        Thu, 12 Nov 2026 05:15:25 -0800 (PST)
+        bh=J0NPd2sJLaiupFx719PpF/2OXb4U3bSy/8nJPIXJVTs=;
+        b=Ex6kBMBHuYDuTBRKVc4nvlPzy0Gs/mznxDEDOoXR32CRH30kKLGpnMDv6sprsrimTa
+         /DpnrikpqkJG5AUBqwo56rBpZN663jTPS/VEWV4Wd8DuelYLKbXLmsdSpVDUO0uZgI5D
+         92UJWNM2KqsTTnjCpgVye2aC12IRTnwRgS0KyBXtOsrf9YR4rkx5Ie91fKvAOsQ9v8G/
+         6jGIX4NWUqyYpj2xnrlca91jqJhaFwe61HcQzdCHoPuiiNRjFmKvTAPgVJP4hgsEVTj5
+         uGsJfiH5DxtN6ua/viMJhmxMhf1N2LWGczziRAWkjYZGMLVXEtQ4sPKVP0YA133NKbZk
+         gInQ==
+X-Gm-Message-State: APuU4Z8fpEyRhu+/ve6jO8sERKm8AEDDKsZuhZNgN4Kfr5ntirvtXiIS
+	+hJT/wOViGA/24fR5FMexoOyQJZOy8SX6XiL3tA8K43iJ3Q63z7dKGUGIvO6R3x89Pzb+dSKo0b
+	eRZiMGw==
+X-Gm-Gg: AYBFou2Vl9A9LPeg6d7kW1ZNoxz2o2D7v4e+Z+U/irzXU12K2FAmQa/8yOJCNVp14y1
+	pFcpeCKwCNfaZYGUbblUWTW6Um5c7ew365bGPfy7yWirw8Ax9z41kojz0xcMffqw7oheJKrvQG7
+	7htsq8vMmxWoAsMyFbWRjEX/WSz0qKYZUUF3MAiu/bDvwHZCojNX6rVBOBecfooSbZyBkxp0+YX
+	79Qo4d9rsfS4nG32MbRoBYxfJae4lZvj4ZuxC/Nd+cJReh+Pa6W9ouUGPJ57xQmpZcVjDgJi8tI
+	I/bTgPCq1J+1thzl01qt88fznjzyc4ByqhCpUnPjME6MeqxUodn3h4ILflcULb2u4+jit00gwnZ
+	XcSYXZ89Tg3dnSyD5LTN120Ozkz5fV61HGKDYs3kNfEKWVMcQwfq4EIrZ2T+/PP3oXuSeMEJdQU
+	6niRh1lb+5GNpG72EcT8UlckqvfY52PV5M5TYKNdkdkvo6cCzoDWUrKGZ7uXE02cnwpwv+vzG5R
+	sVIEUt6NsznHAM2KsP2hy6SjQ7iDQodE/ZHT/vUu7qeGNobFbHdCTTeSqJiBBxjtcC1LUEoPFXx
+	s0NZWqWobr7dGw6bxAaGQTdnD0gJT40T4x+OQSfHQiLb+IR+cCAPeaTQDSaUhMVwqg==
+X-Received: by 2002:a05:600c:870c:b0:4a2:180a:3417 with SMTP id 5b1f17b1804b1-4bb4e270881mr55125285e9.1.1794489464498;
+        Thu, 12 Nov 2026 05:17:44 -0800 (PST)
 Received: from google.com (0.182.34.34.bc.googleusercontent.com. [34.34.182.0])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49835d2bf91sm17033305f8f.23.2026.11.12.05.15.24
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb4e2776casm101794785e9.14.2026.11.12.05.17.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Nov 2026 05:15:24 -0800 (PST)
-Date: Thu, 12 Nov 2026 13:15:20 +0000
+        Thu, 12 Nov 2026 05:17:43 -0800 (PST)
+Date: Thu, 12 Nov 2026 13:17:40 +0000
 From: Vincent Donnefort <vdonnefort@google.com>
 To: sashiko-reviews@lists.linux.dev
 Cc: kvmarm@lists.linux.dev, Oliver Upton <oupton@kernel.org>,
 	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v3 18/23] KVM: arm64: Introduce
- kvm_pgtable_stage2_table_install()
-Message-ID: <avW76NcAokHunPXw@google.com>
+Subject: Re: [PATCH v3 19/23] KVM: arm64: Add __pkvm_host_split_guest HVC
+Message-ID: <avW8dIWt5VLbU5_t@google.com>
 References: <20261102204628.401871-1-vdonnefort@google.com>
- <20261102204628.401871-19-vdonnefort@google.com>
- <sashiko-outbox-194174@kernel.org>
+ <20261102204628.401871-20-vdonnefort@google.com>
+ <sashiko-outbox-194185@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -101,136 +101,142 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <sashiko-outbox-194174@kernel.org>
+In-Reply-To: <sashiko-outbox-194185@kernel.org>
 
-On Mon, Nov 02, 2026 at 09:02:11PM +0000, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 2 potential issue(s) to consider:
-> - [Medium] KVM: arm64: missing block alignment check in stage2_table_install_walker()
-> - [Low] KVM: arm64: kernel-doc mismatch for kvm_pgtable_stage2_table_install()
+On Mon, Nov 02, 2026 at 09:13:51PM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 1 potential issue(s) to consider:
+> - [Medium] KVM: arm64: Missing host_stage2_try() when splitting host stage-2 GFN metadata
 > --
 > 
-> commit 2ec53eff489eca020eb2705b64a21720b1def67f
+> commit 1780446e119343d8ac04e9e17e8d107c87019c8d
 > Author: Vincent Donnefort <vdonnefort@google.com>
 > 
-> KVM: arm64: Introduce kvm_pgtable_stage2_table_install()
+> KVM: arm64: Add __pkvm_host_split_guest HVC
 > 
-> This commit introduces kvm_pgtable_stage2_table_install() to replace a
-> stage-2 leaf entry with a pre-allocated table, enabling pKVM to handle block
-> splitting in mem_protect.c without relying on kvm_mmu_memory_cache.
+> This commit introduces the __pkvm_host_split_guest hypercall so the host can
+> split a PMD block mapping in a protected VM's stage-2 page table and update
+> the corresponding host stage-2 GFN metadata annotations to page granularity.
 > 
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > index 1c9c57cd6ae40..587874c3a5259 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -835,6 +835,18 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
-> >  int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> >  			     struct kvm_mmu_memory_cache *mc);
-> >  
-> > +/**
-> > + * kvm_pgtable_stage2_table_install() - Replace a stage-2 leaf entry with a table.
-> > + * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_create_unlinked().
-> > + * @addr:	Address identifying the leaf entry to replace.
-> > + * @size:	Size of the block to replace.
-> > + * @tab:	Pointer to the pre-allocated table to install.
-> > + *
-> > + * Return: 0 on success, negative error code on failure.
-> > + */
-> > +int kvm_pgtable_stage2_table_install(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > +				     kvm_pte_t *table);
-> 
-> [Severity: Low]
-> In the kernel-doc comment for kvm_pgtable_stage2_table_install(), @tab does
-> not match the parameter name table in the prototype (and definition in
-> arch/arm64/kvm/hyp/pgtable.c), which triggers a scripts/kernel-doc warning.
-> 
-> Also, @pgt is described as initialised by
-> kvm_pgtable_stage2_create_unlinked(). Should @pgt be documented as
-> initialised by kvm_pgtable_stage2_init*(), with @table being the table that
-> may be created by kvm_pgtable_stage2_create_unlinked()?
-
-That one is easy!
-
-> 
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index abd32e94f6ff0..19634e5ec5557 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > index 88af0aec1ea92..7ecf4c98d7b5e 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
 > 
 > [ ... ]
 > 
-> > @@ -1620,6 +1634,55 @@ int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> >  	return ret;
+> > @@ -690,17 +693,59 @@ static int host_stage2_decode_gfn_meta(kvm_pte_t pte, struct pkvm_hyp_vm **vm,
+> >  		return -EPERM;
+> >  
+> >  	meta = FIELD_GET(KVM_HOST_DONATION_PTE_EXTRA_MASK, pte);
+> > -	handle = FIELD_GET(KVM_HOST_PTE_OWNER_GUEST_HANDLE_MASK, meta);
+> > -	*vm = get_vm_by_handle(handle);
+> > -	if (!*vm) {
+> > -		/* We probably raced with teardown; try again */
+> > -		return -EAGAIN;
+> > -	}
+> > -
+> > +	*handle = FIELD_GET(KVM_HOST_PTE_OWNER_GUEST_HANDLE_MASK, meta);
+> >  	*gfn = FIELD_GET(KVM_HOST_PTE_OWNER_GUEST_GFN_MASK, meta);
+> >  	return 0;
 > >  }
 > >  
-> > +struct stage2_table_install_data {
-> > +	struct kvm_s2_mmu	*mmu;
-> > +	kvm_pte_t		*table;
-> > +};
-> > +
-> > +static int stage2_table_install_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> > +				       enum kvm_pgtable_walk_flags visit)
+> > +static int host_stage2_split_gfn_meta(phys_addr_t phys, u64 ipa, u64 size, struct pkvm_hyp_vm *vm)
 > > +{
-> > +	struct stage2_table_install_data *data = ctx->arg;
-> > +	struct kvm_s2_mmu *mmu = data->mmu;
-> > +	kvm_pte_t *childp = data->table;
+> > +	struct kvm_pgtable_mm_ops *mm_ops = &host_mmu.mm_ops;
+> > +	struct kvm_pgtable *pgt = &host_mmu.pgt;
+> > +	kvm_pte_t pte, *table, *ptep;
+> > +	pkvm_handle_t handle;
+> > +	s8 level;
+> > +	u64 gfn;
+> > +	int ret;
 > > +
-> > +	if (ctx->level == KVM_PGTABLE_LAST_LEVEL)
+> > +	ret = kvm_pgtable_get_leaf(pgt, phys, &pte, &level, 0);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	if (kvm_granule_size(level) != size)
 > > +		return -EINVAL;
 > > +
-> > +	if (ctx->addr != ctx->start ||
-> > +	    ctx->end != ctx->addr + kvm_granule_size(ctx->level))
+> > +	ret = host_stage2_decode_gfn_meta(pte, &handle, &gfn);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	if (handle != vm->kvm.arch.pkvm.handle || gfn != (ipa >> PAGE_SHIFT))
 > > +		return -EINVAL;
+> > +
+> > +	table = mm_ops->zalloc_page(&host_s2_pool);
+> > +	if (!table)
+> > +		return -ENOMEM;
+> 
+> [ ... ]
+> 
+> > @@ -1778,6 +1830,55 @@ int __pkvm_host_mkyoung_guest(u64 gfn, struct pkvm_hyp_vcpu *vcpu)
+> >  	return 0;
+> >  }
+> >  
+> > +int __pkvm_host_split_guest(u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu *vcpu)
+> > +{
+> > +	struct kvm_hyp_memcache *mc = &vcpu->vcpu.arch.stage2_mc;
+> > +	struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(vcpu);
+> > +	u64 size = nr_pages << PAGE_SHIFT;
+> > +	u64 ipa = hyp_pfn_to_phys(gfn);
+> > +	kvm_pte_t pte, *table;
+> > +	phys_addr_t phys;
+> > +	s8 level;
+> > +	int ret;
+> > +
+> > +	if (!mc->nr_pages)
+> > +		return -ENOMEM;
+> > +
+> > +	if (size != PMD_SIZE || !IS_ALIGNED(ipa, PMD_SIZE))
+> > +		return -EINVAL;
+> > +
+> > +	level = KVM_PGTABLE_LAST_LEVEL - 1;
+> > +
+> > +	host_lock_component();
+> > +	guest_lock_component(vm);
+> > +
+> > +	ret = get_valid_guest_pte(vm, ipa, size, &pte, &phys);
+> > +	if (ret)
+> > +		goto unlock;
+> > +
+> > +	table = kvm_pgtable_stage2_create_unlinked(&vm->pgt, kvm_pte_to_phys(pte), level,
+> > +						   kvm_pgtable_stage2_pte_prot(pte),
+> > +						   mc, true);
+> > +	if (IS_ERR(table)) {
+> > +		ret = PTR_ERR(table);
+> > +		goto unlock;
+> > +	}
+> > +
+> > +	ret = host_stage2_split_gfn_meta(phys, ipa, size, vm);
 > 
 > [Severity: Medium]
-> Does this check verify that ctx->addr is aligned to the block granule size
-> kvm_granule_size(ctx->level)?
+> Should the call to host_stage2_split_gfn_meta() be wrapped with
+> host_stage2_try()?
 > 
-> In kvm_pgtable_walk(), both walk_data.start and walk_data.addr are
-> initialised to ALIGN_DOWN(addr, PAGE_SIZE):
+> In host_stage2_split_gfn_meta(), mm_ops->zalloc_page(&host_s2_pool)
+> allocates a page-table page from the fixed-size host_s2_pool. When system
+> RAM is mapped or donated at PMD block granularity in host_mmu.pgt, the
+> unused PTE-level page-table pages in host_s2_pool can be consumed by host
+> MMIO mappings faulted in via handle_host_mem_abort() -> host_stage2_idmap().
 > 
-> 	struct kvm_pgtable_walk_data walk_data = {
-> 		.start	= ALIGN_DOWN(addr, PAGE_SIZE),
-> 		.addr	= ALIGN_DOWN(addr, PAGE_SIZE),
-> 		.end	= PAGE_ALIGN(walk_data.addr + size),
-> 		.walker	= walker,
-> 	};
+> Other callers that allocate from host_s2_pool (such as
+> host_stage2_idmap_locked() and host_stage2_set_owner_metadata_locked()) wrap
+> their page-table operations in host_stage2_try(), which handles -ENOMEM by
+> calling host_stage2_unmap_dev_all() to reclaim MMIO page-table pages and
+> retrying.
 > 
-> In __kvm_pgtable_visit(), data->addr is only aligned down to
-> kvm_granule_size(level) and advanced after the leaf callback returns 0:
-> 
-> 	if (!table) {
-> 		data->addr = ALIGN_DOWN(data->addr, kvm_granule_size(level));
-> 		data->addr += kvm_granule_size(level);
-> 		goto out;
-> 	}
-> 
-> Because stage2_table_install_walker() is only invoked for
-> KVM_PGTABLE_WALK_LEAF and always returns a non-zero value, ctx->addr is
-> always equal to ctx->start on the first visited leaf entry, making
-> ctx->addr != ctx->start always false.
-
-Right, this can be dropped.
-
-> 
-> If kvm_pgtable_stage2_table_install() is called with an addr that is
-> page-aligned but not aligned to kvm_granule_size(ctx->level) and with size
-> equal to kvm_granule_size(ctx->level), this check will pass, replacing the
-> enclosing block PTE and passing an unaligned IPA to stage2_try_break_pte().
-> Although the callers added later in the series (__pkvm_host_split_guest()
-> and host_stage2_split_gfn_meta()) check PMD_SIZE alignment beforehand,
-> should stage2_table_install_walker() check
-> !IS_ALIGNED(ctx->addr, kvm_granule_size(ctx->level))?
+> Because pkvm_refill_memcache() only refills the guest stage2_mc, can
+> __pkvm_host_split_guest() fail with -ENOMEM if host MMIO mappings have
+> exhausted host_s2_pool?
 > 
 > -- 
-> Sashiko AI review · https://sashiko.dev/#/patchset/20261102204628.401871-1-vdonnefort@google.com?part=18
+> Sashiko AI review · https://sashiko.dev/#/patchset/20261102204628.401871-1-vdonnefort@google.com?part=19
 
-Perhaps a better API would be
+The size of the host stage-2 pool makes it very much unlikely the retry will
+ever be hit. 
 
-  int kvm_pgtable_stage2_table_install(struct kvm_pgtable *pgt, kvm_pte_t *table, u64 addr, s8 level)
-
-This would match kvm_pgtable_stage2_create_unlinked() which is also using
-"level". Then, we can easily reject a non-aligned addr and drop the checks in
-the walker.
+But better to align with the other callers.
 
 -- 
 Vincent
