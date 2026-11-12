@@ -1,49 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.69
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794480199;
-	b=cjdPq9oQIk5K56+U74s2rDclb3fkXEiLcNfJyGKx/7jVEx4RPzAKgHsYFp1rLmKJfZwC
-	 s+WLW/Oi/gpceDp/hmH1BZxKTiVAAGV944c5LdYNMbDT7vGSz0OnSvScjaySQm1x87Bv1
-	 m8vvHO53Byr9ynDJcl8f9q7isWfOemZ+Hxq3tTzJPO4glvLQgCVnQohO70qCiLaDF9THs
-	 YpoALuLo74O3grZCMZp7Gy5JysG7RQoVUIoWjImGdYCYmxwqZmLeNw+ONVxe8QizHfFgi
-	 GqvIie1UQU4eVHkX4y961fGcB7NekYO3pnvMz0/L/kqvE+dPFraDC5nXP2Pc+MQnU4g==
+	t=1794483467;
+	b=wxQQnOaSUuorRAFVUCUlJr4Qt5i/m3ct63i4CVz7i+tOF39oDuk44nIv2f4hixxanYaL
+	 gRAuMh1EsGjt3T316Rhfe8cS9pcTZ4rTQEhmGHIVhB/Wj/WkeE/qpnABFjDuzSr9s0bhd
+	 yAwxeAWMyMGn1AXyFjvHnKlhobu9C6yMorv21/IfTMX7hOhmbt+rU/WRVpa06bkrNPmN4
+	 S7rvYb6e4zgzUGjovhrGNnA+Bo8h0z8qAaEvYrw+/No57IzeiTvIzch1Mb/dZpx1jq8NL
+	 OpMvJC0oeiLSe2oDWNVoh7O4qHaSDnKQAOEYA3cKq3Q4KKJ/1uCW7UF/8ZYMlbnztRA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794480199;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
-	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=X2j4x6ETnjsd3Kk7UiXLGfpl+QRCIcV4hL4S2HQyUOs=;
-	b=MzejDdPRvwXxd679rBbS9hZhH1PLzvsgiRDYnhTh2+UJlCg0RIN3I3dugNSM5dxhFyR/
-	 BLEE97nc8M/ADjLAx85nb19nMhxnOOEtw6RKKI8nFSkk042im3rJJJ/8jhMWCdAQfKsH1
-	 CMSlIN5jfjcSL6qspndvNuJeOxIe0wwHr0U5rR+9zx1sNLbIvAgZaa0t3a6vOCc/ObShl
-	 ezygRY5EsVcLVOX0Vfl7ug8zsMLTwy1cCB9A3zoxCdOPllOd4c60uH35N3zfWxQJ8Za7M
-	 kLsybJHORsYlAfirtvh7wFYxbSXOJLxV45eVKcwoaNULSSktBcGuYEiBpME/RoOfVjA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794483467;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
+	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=Hj1fn4YijWukXcrgsrpSbQ0BagEFJZMcHse/ByJWp3c=;
+	b=w6ChCjE1Fr02HYnrVhkQ/iPjWZ+cZ5MAahGOPi2dThVnHf4a897k4FZbr3tVfQyELz7x
+	 bagCcCXU5rfKhyZjGfoWom4DKx2GFpSzt5PiY7eN9iHN7gvstqbCYkQfFYSpLawSJ9191
+	 C/wF+HmS/czyKKFMc+rMHD2QrDS4YpiwDA9VG3B6nvy07cgUvAM3nLS+bNBMmK7WofHTQ
+	 qZbldy5soxs7ognNNpifTy687kP3lCyDLovFthn7lbr7i56oEj5qSuMEGFWOQs/E8r0eM
+	 bULkpidIlr6SHUElonn2Xx/JoeI+xmWKK5X4+TyeeIRbHO7l2y0ILXmR+QJw8W35qNw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="sz/bRcPX";
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78A51606A337;
-	Thu, 12 Nov 2026 10:43:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 78A51606A337
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=D1nyltr6;
+	arc=none smtp.remote-ip=209.85.221.69
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4EB606A323
+	for <kvmarm@lists.linux.dev>; Thu, 12 Nov 2026 11:37:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1C4EB606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=sz/bRcPX
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9CC8C153B;
-	Thu, 12 Nov 2026 02:43:14 -0800 (PST)
-Received: from [10.0.129.47] (e122027.cambridge.arm.com [10.0.129.47])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 76C8C3F673;
-	Thu, 12 Nov 2026 02:43:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794480197; bh=xDR73f4nxpZk5DSaOewf66eooDmTQ5dy0pwmOSiLIuw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=sz/bRcPXFEyNa7belfSW5kTpVnMxp65VhQF1lieCCf0rIAi0oiwk3xn+JZFcig9CD
-	 1gcmn08lsRczfyJ6K8ZbBvOpIDzJ9EnXmgUZqfKoqEarzelQvs12nZW7bi6qrs3iCC
-	 KiUIJYqG1GFIcWLl7RHP5oXDUOBXgOfs70RBQC7E=
-Message-ID: <1e02dfff-c1ad-46bb-9834-fd4bbaa46179@arm.com>
-Date: Thu, 12 Nov 2026 10:43:13 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=D1nyltr6
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-4901562b819so3708357f8f.3
+        for <kvmarm@lists.linux.dev>; Thu, 12 Nov 2026 03:37:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1794483465; x=1795088265; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Hj1fn4YijWukXcrgsrpSbQ0BagEFJZMcHse/ByJWp3c=;
+        b=D1nyltr6sVdOmZWnSdEg1n9HGUZ8ofvAX5yf/4nR0XjHUTycxgFpLFMgHe/K/g/+vG
+         lvsbYz2JSSgAAs571WSOF6yoMBpguQzxylnxW2Oy1oipFnhDpsoWx77A/QOmbwFbS6P0
+         9RrXgiQKP9p14Tu60jYzq9q+UPodhWH2bNesKZ36NsxoQsV3t4hbUAzZIdBWcCgcW3qK
+         5ouEaiV4XhVLj+UIjLbrZC6gm7ioLuocrdi0foWvz8i4YtlphSewVi+foRCh8ofWshWi
+         lKfhkhYFbrnASL34p3FhkHMLqhqyAYb+RPGgW4l2TnewgbTc48RcSmdtxCcmLUVXVUTc
+         FU7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794483465; x=1795088265;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Hj1fn4YijWukXcrgsrpSbQ0BagEFJZMcHse/ByJWp3c=;
+        b=O1ruZI8URH8D7QzWeg2+am3rv79IdKlaHboY4/ssAJkY4uGGZK+VoUzVGYtyVHYiPg
+         2PHhFBC0fIziREg/Lv5DkLXk8HFwh0y7/t4YPc3GSwf8ViYNUJuKUMbD5XFaNuSbj23t
+         Vhz84u6G8TvcMcGGRxgXqIxa0QuqssYAmE5ppmP2o4mbIqwd1ufrH8IRaOXdYu0t36qd
+         HXHRUK/ZKMdnQxCbvqYfny6JYYt6mFkXIyG1s9su4bP28E1tljZLEpUfJ9UHDONraGZx
+         VHhWAtmCVK8MUKrHGnSpr7t3ncHhJwO2K3LsXOOmyJMPO5OGQJuWpwiHIyVZCjrX2AOv
+         S+Xg==
+X-Forwarded-Encrypted: i=1; AL+hErGNb8cLh8muOfSknikK3JgnQihEzpSKTlBDG6S8tqVaGA41rR8EURGa4CfQxbq+6Lmes4w5iKM=@lists.linux.dev
+X-Gm-Message-State: APuU4Z8juT1q7joFWUATQ5JvvdlxB9yugxg3KQ76OcCd8bmkD8+4IsAJ
+	fUXUNV/lz4nWffMHEKKYx/XE4erq0DttHr+ZN1C3CJLB28BrqOSDnFXMEYVjoaj5NhYJqIaR5mC
+	7GQnN5gR/bpqYsUZGW7Hnzw==
+X-Received: from wrwc2.prod.google.com ([2002:a5d:63c2:0:b0:48e:a11:b240])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:6095:b0:4a2:10f9:37ce with SMTP id 5b1f17b1804b1-4ba09381439mr100508465e9.15.1794483464714;
+ Thu, 12 Nov 2026 03:37:44 -0800 (PST)
+Date: Thu, 12 Nov 2026 11:37:29 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -52,133 +75,140 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 02/12] KVM: arm64: guest_memfd: Check mmap support when
- preparing memslot
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Kohei Enju <enju.kohei@fujitsu.com>
-References: <20261111145758.217946-1-steven.price@arm.com>
- <20261111145758.217946-3-steven.price@arm.com>
- <fbc33983-cb8a-48e4-854f-ce009cc5668f@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <fbc33983-cb8a-48e4-854f-ce009cc5668f@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.567.gdb80ae8cd5-goog
+Message-ID: <20261112113729.2858513-1-vdonnefort@google.com>
+Subject: [PATCH v2] KVM: arm64: Fast fail transparent_hugepage_adjust() for
+ non-PMD folios
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oupton@kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	kernel-team@android.com, fuad.tabba@linux.dev, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/11/2026 15:21, Suzuki K Poulose wrote:
-> On 11/11/2026 14:57, Steven Price wrote:
->> Check the guest_memfd backing file when deciding whether an arm64
->> memslot has mappable memory rather than checking whether the slot is
->> gmem only. A public helper function is added to be able to reuse the
->> static kvm_gmem_supports_mmap() function.
->>
-> 
-> Please could you explain why we need this ? Why not rely on
-> kvm_memslot_is_gmem_only(), which already tells
-> kvm_gmem_supports_mmap() ? With inplace conversion support gmem supports
-> mmap.
+transparent_hugepage_adjust() must walk the userspace stage-1 to detect
+if a PMD-level mapping is installed and whether a stage-2 block mapping
+can be used. Even though this stage-1 walk is most likely cache hot
+(in most cases, the mapping has just been installed), walking a
+page-table is still costly.
 
-Unless I'm missing something it's still possible to create a guest_memfd
-that doesn't support mmap() by not passing the GUEST_MEMFD_FLAG_MMAP
-flag. So kvm_memslot_is_gmem_only() doesn't actually guarantee that it's
-a guest_memfd that supports mmap().
+While we can't be sure by solely looking at the folio if the stage-1 is
+a block mapping as userspace has multiple ways to split it, we can infer
+from its size if the stage-1 mapping is smaller than PMD_SIZE. Anonymous
+memory or memfd faults allocate a big enough folio, as do khugepaged or
+MADV_COLLAPSE.
 
-> 
->> Signed-off-by: Steven Price <steven.price@arm.com>
->>
->> ---
->> Changes since v1:
->> - New patch in v2. Check the guest_memfd backing file rather than the
->>    memslot flag when deciding whether arm64 can map the backing memory.
->> ---
->>   arch/arm64/kvm/mmu.c     | 7 ++++---
->>   include/linux/kvm_host.h | 1 +
->>   virt/kvm/guest_memfd.c   | 6 ++++++
->>   3 files changed, 11 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index 1db10d8d6db7..a146f6cde3d0 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -2839,10 +2839,11 @@ int kvm_arch_prepare_memory_region(struct kvm
->> *kvm,
->>           return -EFAULT;
->>         /*
->> -     * Only support guest_memfd backed memslots with mappable memory,
->> since
->> -     * there aren't any CoCo VMs that support only private memory on
->> arm64.
->> +     * Protected VMs currently require guest_memfd backed memslots with
->> +     * mappable memory to support shared mappings.
->>        */
->> -    if (kvm_slot_has_gmem(new) && !kvm_memslot_is_gmem_only(new))
->> +    if (kvm_arch_has_private_mem(kvm) && kvm_slot_has_gmem(new) &&
->> +        !kvm_gmem_slot_supports_mmap(new))
+Add a fast fail based on the folio size: whenever a struct page is
+present and its folio is not PMD-mappable, bail out early and do not
+walk stage-1. This helps when THPs are disabled or under memory
+pressure, while adding a folio check on the PMD-hit path.
 
-Sashiko has identified I've screwed up this condition though.
-kvm_arch_has_private_mem(kvm) shouldn't be in there as that allows a
-non-private VM to bind a non-mmappable gmem.
+To measure this walk on 100% PMD misses, function_graph traced
+user_mem_abort() and get_user_mapping_size() with THP disabled while a
+guest faulted PAGE_SIZE anonymous pages:
 
->>           return -EINVAL;
->>         /* guest_memfd is incompatible with MTE. */
->> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
->> index e7fc94e2910a..f65728a713ec 100644
->> --- a/include/linux/kvm_host.h
->> +++ b/include/linux/kvm_host.h
->> @@ -2614,6 +2614,7 @@ static inline bool kvm_is_private_gfn(struct kvm
->> *kvm, gfn_t gfn)
->>     #ifdef CONFIG_KVM_GUEST_MEMFD
->>   bool kvm_gmem_is_private_gfn(struct kvm *kvm, gfn_t gfn);
->> +bool kvm_gmem_slot_supports_mmap(const struct kvm_memory_slot *slot);
->>   bool kvm_arch_supports_gmem_init_shared(struct kvm *kvm);
->>     static inline u64 kvm_gmem_get_supported_flags(struct kvm *kvm)
->> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
->> index 8c97a69b16dc..3dd8d227bebb 100644
->> --- a/virt/kvm/guest_memfd.c
->> +++ b/virt/kvm/guest_memfd.c
->> @@ -442,6 +442,12 @@ static bool kvm_gmem_supports_mmap(struct inode
->> *inode)
->>       return GMEM_I(inode)->flags & GUEST_MEMFD_FLAG_MMAP;
->>   }
->>   +bool kvm_gmem_slot_supports_mmap(const struct kvm_memory_slot *slot)
->> +{
->> +    /* The guest_memfd file is pinned while preparing a new memslot. */
-> 
-> We should gate this on kvm_slot_has_gmem() and how do we ensure that the
-> call comes after it is prepared ?
+  Platform            Setup                get_user_mapping_size()
+  ------------------  -------------------  -----------------------
+  Apple M2 (big CPU)  nested L1->L2, perf  mean  5.25%, med  2.70%
+  Ampere Altra        non-NV, VHE          mean 13.69%, med 12.28%
 
-I'm not sure what you mean by "gate this on kvm_slot_has_gmem()" - yes
-this function only makes sense on a gmem slot - the user above checks
-that first. I'm not sure what value the function should call if you call
-it on a non-gmem slot?
+On non-NV VHE Ampere Altra, get_user_mapping_size() takes 0.26 us mean
+(0.24 us median) out of 2.32 us in user_mem_abort(). On nested L1->L2
+Apple M2, longer L1 user_mem_abort() handling shrinks the relative
+share.
 
-Thanks,
-Steve
+Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+---
 
->> +    return kvm_gmem_supports_mmap(file_inode(slot->gmem.file));
->> +}
->> +
->>   static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
->>   {
->>       struct inode *inode = file_inode(vmf->vma->vm_file);
-> 
-> 
-> Cheers
-> Suzuki
+Notes:
+    v2:
+      - Reword commit message as a fast fail, describe the function_graph
+        setup, and include both nested Apple M2 and non-NV Ampere Altra
+        numbers (Marc)
+    
+    v1: https://lore.kernel.org/all/20261102211900.504192-1-vdonnefort@google.com/
+
+ arch/arm64/kvm/mmu.c | 42 ++++++++++++++++++++++++------------------
+ 1 file changed, 24 insertions(+), 18 deletions(-)
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 1db10d8d6db7..9d81d908e230 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1553,36 +1553,42 @@ static bool fault_supports_stage2_huge_mapping(const struct kvm_s2_fault_desc *s
+  * Returns the size of the mapping.
+  */
+ static long
+-transparent_hugepage_adjust(const struct kvm_s2_fault_desc *s2fd, kvm_pfn_t *pfnp, gfn_t *gfnp)
++transparent_hugepage_adjust(const struct kvm_s2_fault_desc *s2fd,
++			    const struct kvm_s2_fault_vma_info *s2vi, kvm_pfn_t *pfnp, gfn_t *gfnp)
+ {
+ 	struct kvm *kvm = s2fd->vcpu->kvm;
+-	kvm_pfn_t pfn = *pfnp;
+-	gfn_t gfn = *gfnp;
++	int sz;
+ 
+ 	/*
+ 	 * Make sure the adjustment is done only for THP pages. Also make
+ 	 * sure that the HVA and IPA are sufficiently aligned and that the
+ 	 * block map is contained within the memslot.
+ 	 */
+-	if (fault_supports_stage2_huge_mapping(s2fd, PMD_SIZE)) {
+-		int sz = get_user_mapping_size(kvm, s2fd->hva);
++	if (!fault_supports_stage2_huge_mapping(s2fd, PMD_SIZE))
++		return PAGE_SIZE;
+ 
+-		if (sz < 0)
+-			return sz;
++	/*
++	 * If the allocated folio isn't at least PMD_SIZE, there is no way a
++	 * stage-1 PMD level was installed.
++	 */
++	if (s2vi->page && !folio_test_pmd_mappable(page_folio(s2vi->page)))
++		return PAGE_SIZE;
+ 
+-		if (sz < PMD_SIZE)
+-			return PAGE_SIZE;
++	/*
++	 * Even though the folio size is big enough, the stage-1 mapping might
++	 * have been split. Verify it.
++	 */
++	sz = get_user_mapping_size(kvm, s2fd->hva);
++	if (sz < 0)
++		return sz;
+ 
+-		gfn &= ~(PTRS_PER_PMD - 1);
+-		*gfnp = gfn;
+-		pfn &= ~(PTRS_PER_PMD - 1);
+-		*pfnp = pfn;
++	if (sz < PMD_SIZE)
++		return PAGE_SIZE;
+ 
+-		return PMD_SIZE;
+-	}
++	*gfnp &= ~(PTRS_PER_PMD - 1);
++	*pfnp &= ~(PTRS_PER_PMD - 1);
+ 
+-	/* Use page mapping if we cannot use block mapping. */
+-	return PAGE_SIZE;
++	return PMD_SIZE;
+ }
+ 
+ static int get_vma_page_shift(struct vm_area_struct *vma)
+@@ -2186,7 +2192,7 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+ 		if (perm_fault_granule > PAGE_SIZE) {
+ 			mapping_size = perm_fault_granule;
+ 		} else {
+-			mapping_size = transparent_hugepage_adjust(s2fd, &pfn, &gfn);
++			mapping_size = transparent_hugepage_adjust(s2fd, s2vi, &pfn, &gfn);
+ 			if (mapping_size < 0) {
+ 				ret = mapping_size;
+ 				goto out_unlock;
+
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+-- 
+2.56.0.567.gdb80ae8cd5-goog
 
