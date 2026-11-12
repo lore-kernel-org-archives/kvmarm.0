@@ -1,88 +1,99 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.53
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794461329;
-	b=oDObywN5Zzkum3ioOoaooAChQdrqZBZ1Cek9A2RsTr2sAD+sLbLn8mO/lHONGAgbzoc5
-	 uUv4hYpiX1VqUEUADysQ633G0edrKpQUzgpm1Czs6BzDo0ZqIsarXumTz9BL0FijH764e
-	 QArimrM7w4NAliE6hoO+xk+Q7jqYYIMMZDW9HM7gtCrVitCleDXpwtxuwwdX24zzFJAtu
-	 JrTRcnDw56EP9hydc9rCSbco6Sg7DMtsoqNewqqQB18A2gJg1l5CxU8LStT1do1PSFdAR
-	 s+iXEu0nGhos/0NWtQws743f/2B+Jmft9luvDbgNaWNC0243YQKWVaFUf4rWjKH0Zcg==
+	t=1794470026;
+	b=1t0GZgFPI0gimlAxKu96jWUgP8Gb3t3wCwnLmSIWfXDaqQqZdztGTDxfqxVEuy3N8RZc
+	 Cqp2D/OKoLl0qH4swnVqcFXeS8yrlcrSJVo/RbeAquR0x26NVlLriEwX7w7szvUxtdRIB
+	 z1Rc+VDzYidMQkfpzwZH859IUxhSfti3kvOd7/2Fmc6nqhupoLdUnT1W+4z+OxfpnjqKd
+	 EOU3rm9p/wEEBwyfyjlO73v+gsFsJI509XFNR1PLEgGtSufrwXUiMFINHrC2voFZYeFwG
+	 uF2aLg5rXIT/n3OaulEP6O8I0103k21JOtfvnGW4s054qpD+ySNktnOK4g7cVFrPcXw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794461329;
-	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=hNlfYdQobugmf9UW73UA0KZ3DncrTeY2FGpbRf8Ii54=;
-	b=YBW8E8hBasOeYqqflCsRCm4hE78iKX8NDIRivk9TdNq8ASzmXiqKedFDNdWotO5Fw16S
-	 pRNH1/9qdJbt5mRImE9b/chyjD1oYs9rFLc3kDaLOUo1rSYzKGcCthKAm4tQwEdvlNXaq
-	 kJIPSMvSBJkgSOQXKsmw1aO6wnmdTQA7FWUlazjNRdiIFnkPnLQML+j0L49aYIWM6Xukt
-	 iVQjixyRrteF/uUlDwIaljUlI0FJh/9d9lhZjOxQD7AfB/FoBC5I/Os08ThWgbBAzNBOx
-	 QX2FE+zxI/c88Fiuhv+LXsLmialvyDq3YZ8so+Efr6KxBUNCmKAc4PTU2JXbbiCzzIA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794470026;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=Tb7xdtovrUiu0U2PtVOgt58uhZRmxutl3MY7Wj6Buy8=;
+	b=HUy9Hoy1iuHsB76U89lrMzd3ZTwRIC5+e3ymZgqBid/7p8Mi0JIcw5v96kZy6GyuY8V5
+	 QeBwDOXlPtkgg8c+DPKaByl2o8aliWh2v4e00trLB/zQE0jWcIzXHnqsm+dIYyYErBUtM
+	 Ywy8wLllT/dDgsAuCufFMymtyoqY6rC94ZNO3ciTAqIbGRPE3CFkzQR2qWjwaNlfb4WHh
+	 l5Z9AXoHzU5HgHF/6GTARAXQ70PnOXBpoc42ydkWXU5A6xAXroarPYwaNq4hJksrSj6Rn
+	 nE0D2Zcng06hFZsXHXbBoQBjbE5FB0ItoEjOlj1q7EihpRRlul3rdIK/671+Qga0Hew==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=fail header.from=pereq.eu;
-	spf=pass smtp.mailfrom=gmail.com;
-	arc=none smtp.remote-ip=209.85.221.46
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=aTb+IuRl;
+	arc=none smtp.remote-ip=209.85.221.53
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8926A606A32A
-	for <kvmarm@lists.linux.dev>; Thu, 12 Nov 2026 05:28:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8926A606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=pereq.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-490d59c3f0aso2063212f8f.1
-        for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 21:28:48 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC7B606A32E
+	for <kvmarm@lists.linux.dev>; Thu, 12 Nov 2026 07:53:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4DC7B606A32E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=aTb+IuRl
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-492fcbfaa88so2636232f8f.3
+        for <kvmarm@lists.linux.dev>; Wed, 11 Nov 2026 23:53:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1794470024; x=1795074824; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=Tb7xdtovrUiu0U2PtVOgt58uhZRmxutl3MY7Wj6Buy8=;
+        b=aTb+IuRlzFHQ0QTDObBeWI5shdaSt3IFEqFfhwGs2EUqSmeJd+r4TtIhiyruJ95CiI
+         ami8Hcs/CYI+XdkJCqxgfKRBgDTAEc6u4OkeigV2qe+++/OZ8J9qzii971z0c7hsaLHm
+         uqcgHLyYiBF5hYABE4kGiuanI602qETNzecHMZcE1ZxoisezVTq8lCCTGQ/QfRPIBVEm
+         i+apMN0kDIUia0y4oVJ01OlqFO4bl6zLjLz9lWsRh+AwiZT9kgwOp4RA8WkLhPG9rxSr
+         SWC0w8CUAPw2VCGPpc6cHsypH3ZzXcwV23gop4iglqkJN1TmjZOVn4eK3aUIQ5V3Ue7E
+         VALA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794461327; x=1795066127;
+        d=1e100.net; s=20260707; t=1794470024; x=1795074824;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=hNlfYdQobugmf9UW73UA0KZ3DncrTeY2FGpbRf8Ii54=;
-        b=Rdv9CThutWv2dk6lAZHBjFlL9Awjjlx4d8prWgcm6EhTztI2XrFDVsTwQ9e//FE7CA
-         //ebQSCkSyW9d7qwpUIpKF6gpyBvedbrpSOC1nXbR5ps5CfRto4NlQauXFTBGB1mFZwc
-         bn4kgAgdeO7XUIyp9mga5gPXizt2yEdeAZipD+u4ghMGrqTH7XXjO8GlA9d0Bv2BIPjm
-         Yli01XjpLkH01lp/gOsp6BRyv7/UPXg9dvZQtKgiKzPYtl49YUAn2D/5942WCGbMQP91
-         XC0n8Etc2WRmCSDTQ5B/G6dWZyLKiLNDSqoVsqZ/6pkrRxnGFLiXaT1VWjh6TstdUVKg
-         LpJA==
-X-Forwarded-Encrypted: i=1; AL+hErHwAUQo8XP4q9vZPQbvrBWBj5zLhj2VftrftSh+KD9sySymJup41rwVbkJE7JWu3RneLDkt2I4=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9Bc/ZP/vwJlmbPYLjFvIPeV4VHLin2Em1du2FVfR5LgbC07+DR
-	N//tREWVcuq1Xt6mxgUjEqXBMnNMQw07mu+uE9OnM9jpAg/JcNrawl0w
-X-Gm-Gg: AYBFou3YPK7a1xBb/D31T9q+mi/uXrs1nefIKSxhH7nHP+/VWeN1vHaRQckrLG4nyeQ
-	+5zq6Zlh/VT65C9jIu6suP+yhucGHRih6JeLJHUp47489fjMKJXP3yRAnJUM7lSrkVIMtb10iJZ
-	dqp5w0tY2ZI36PmGP+SsgE4zTbsI6SmwN44CnFuAdyeyOgTxYM1MB1jjQJb/yc2/aAi/KCQUkfl
-	Gwxw+fqImmwgJIIxKevn4mY0svROvYNSDqCvYgJHPdlzqON4+mk2+VNtfvVC6m194HGwp8Zn3uq
-	NY/SRIJ4OPuYrvu2zTAUIVlznCobqDZDtzHuYwb6IzF0Xr1EdV7vFqg7cKOZ3jF1sUOjBOIk3fk
-	1MhJptL3jlBaNjlH8z6X2Qt2j1oiCj2L7ZVPoh+i7mYTPtQ4dR2f2NLtP70tOm/rIwla+AW7/4k
-	+xz0X1uYjsHlsAkgqILfaQ5gCMyax37BH1a+udb+j3ZcAjpIOf3CYmumVfzXYXJ0GrKXheiAPva
-	ldV8GbSds5wTdizzoFX+wj6lCk+m74gGO15PbQv2w1TWUdQ4uuLGSKM4LanKGTTaiIMj9AHiCuS
-	IaSgmSeDCzTx4Pao2rYIuMFHZIU53/asd6qTn+lrl970pOwaEHOU5hMNt73482dKpVr7F6Hg3JM
-	BJtESC2O9Oxosn/0mXFgULvDKtmaabrk9SRKxE9L+XWXWxnPISfGyllYV19OO
-X-Received: by 2002:a05:600c:8708:b0:4a7:c366:d791 with SMTP id 5b1f17b1804b1-4ba0931c364mr69232725e9.1.1794461326740;
-        Wed, 11 Nov 2026 21:28:46 -0800 (PST)
-Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49944d646f9sm11119109f8f.32.2026.11.11.21.28.45
+        bh=Tb7xdtovrUiu0U2PtVOgt58uhZRmxutl3MY7Wj6Buy8=;
+        b=neiwjVCNWRR13AXkG2aG9+TuQXtJO0NCuxbkdhAKSUiLjI5v5VDayehkGTLgPPVTTW
+         fItO1fJPENvNW3U/fMLqdRelxITqrbVu7C92qcBr1sZojywMy46v+2sWNjmg2aa/MTxi
+         4ZZef/LryLe5rDmszasTVhdzNWZNSapG51UWNNGIIJZXsv1Pw1UsZL8rG8s/AyTdOB7S
+         gj4ARFGqwkSv5cNXmdyPA8DbgWTU4iCY1B6ydXjBiYBf3ZFIov2R8kjwYvT8LWFJUBys
+         o3dvIWpIZAYYNCKp84TNdTQbQfb0RSriVR/auA9vVADT4gMVhXZmkyq2hm4J8iAHBd/d
+         E4rQ==
+X-Forwarded-Encrypted: i=1; AL+hErHWVRDdbhmAfauGSjs1AdLL/NaDFVWWK/z3M+e8bzpG75rz4BrQ5P7y+6XO4IIlxtvsPgpR1fg=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/E++TxO5s7XxhLgVtjI9tWVdt5lfcyX724mSRHemr9h0Yg8oWR
+	ZUGv4s1w6f5RsheCm/JE0quVrydFVR2CI9pvwzzoMdQFd3d5DKaQZ2mP/hYaV3MwwA==
+X-Gm-Gg: AYBFou0XC9HW+ITOr2eUEFyZytyIqUuRgmL5ehxZaJlqpFloMDLFv/4p9uMK4t5u3CF
+	LzfJpDVBsCrSXb2LflJrgQIiNoEEVGeE/fMXh9zY0cpIUYuPmrbzi0msdk4bkhSRT4I7SZGtHiv
+	Y30vZkfG6S2qU+4Snf50LWWHaTW9QNnMaqFfA9hBpcJUqBQQZHucFPr5cYzCC4/3REavTIp8r5v
+	xmF6QUxVkuQaS3fnaFTu9Iru8oq5Zo4BaPuXztsy06MLaclXJ87+vbQluhKKeOq8/4Z3i3RI+ua
+	MC394USnu2deNIZ0jnizTJYzKrDkS54WWV6PcWDxKYrU8V5zi/S9V79Fa9tGpL+zT061lbJGzAF
+	bbzkjzGuL6VBxC2XfZ3caGBEMbbwijberp6Jg0LBuuG+VlnEwuJ1RMlaOrg3p8H7vGBR/aBIkWK
+	P+In+jAG2XYspo5Y4/hMz8s4ZGtuLbDzccdXEWe6ebhhQuANNxKage7br5vpxG7Yvaz/3j0VBQg
+	1cJB179KkIMXdTO39nvOEYywIZP99z9DYqF3PLIqdKR8SVRGQExpPiRyjP0bRjdAzCDuhTbLghi
+	n4l1YZhWyz2v7feDC0nCDrCrfDOT18f7SvDtwK3KKVNd30RnDXISEKg3uERhF/11dA==
+X-Received: by 2002:a05:6000:26c8:b0:487:40d:af29 with SMTP id ffacd0b85a97d-499c84b52admr8993973f8f.36.1794470023947;
+        Wed, 11 Nov 2026 23:53:43 -0800 (PST)
+Received: from google.com (0.182.34.34.bc.googleusercontent.com. [34.34.182.0])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4983585c4fdsm15541519f8f.10.2026.11.11.23.53.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Nov 2026 21:28:46 -0800 (PST)
-Date: Thu, 12 Nov 2026 08:28:42 +0300
-From: Dan Carpenter <dan@pereq.eu>
+        Wed, 11 Nov 2026 23:53:42 -0800 (PST)
+Date: Thu, 12 Nov 2026 07:53:38 +0000
+From: Vincent Donnefort <vdonnefort@google.com>
 To: Marc Zyngier <maz@kernel.org>
-Cc: Dan Carpenter <dan@cryspen.com>, Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Karthik Bhargavan <karthik@pereq.eu>,
-	=?iso-8859-1?Q?Cl=E9ment?= Blaudeau <clement@cryspen.com>
-Subject: Re: [PATCH] KVM: arm64: nv: Initialize hw_mmu to NULL for nested
- vCPUs
-Message-ID: <avVOivX0YmlES4Pe@stanley.mountain>
-References: <d3571fb535e1832d2a067649f294b83d824d4350.1794395321.git.dan@cryspen.com>
- <86ld6z1782.wl-maz@kernel.org>
+Cc: oupton@kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com,
+	seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, kernel-team@android.com,
+	fuad.tabba@linux.dev, ljs@kernel.org, ryan.roberts@arm.com
+Subject: Re: [PATCH v1] KVM: arm64: Fast path transparent_hugepage_adjust()
+ for non-PMD folios
+Message-ID: <avVwgiUduRV3xQQ1@google.com>
+References: <20261102211900.504192-1-vdonnefort@google.com>
+ <867biu2ujs.wl-maz@kernel.org>
+ <aunvGQb--3Lp6kQp@google.com>
+ <86pkwb202x.wl-maz@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -94,32 +105,90 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86ld6z1782.wl-maz@kernel.org>
+In-Reply-To: <86pkwb202x.wl-maz@kernel.org>
 
-On Wed, Nov 11, 2026 at 07:46:53PM +0000, Marc Zyngier wrote:
+On Wed, Nov 11, 2026 at 09:23:34AM +0000, Marc Zyngier wrote:
+> On Tue, 03 Nov 2026 14:26:33 +0000,
+> Vincent Donnefort <vdonnefort@google.com> wrote:
+> > 
+> > On Tue, Nov 03, 2026 at 08:22:47AM +0000, Marc Zyngier wrote:
+> > > On Mon, 02 Nov 2026 21:19:00 +0000,
+> > > Vincent Donnefort <vdonnefort@google.com> wrote:
+> > > > 
+> > > > transparent_hugepage_adjust() must walk the userspace stage-1 to detect
+> > > > if a PMD-level mapping is installed. If it is, then a stage-2 block
+> > > > mapping can be installed. Even though this stage-1 walk is most likely
+> > > > cache hot (in most cases, the mapping has just been installed), walking
+> > > > a page-table is still costly. This walks accounts for ~5% of the
+> > > > user_mem_abort() execution time on an Apple M2 big core. This makes a
+> > > > fast path interesting.
+> > > 
+> > > This raises a few questions:
+> > > 
+> > > - Isn't this a "fast fail" rather than a fast path? You don't make the
+> > >   S1 walk faster, but you instead avoid cases where it would have
+> > >   returned an level-3 size.
+> > > 
+> > >   If anything, you make transparent_hugepage_adjust() slower for the
+> > >   case that succeeds. I don't think this invalidates the approach, but
+> > >   it feels that the commit message is just wrong.
+> > 
+> > Yes, "fast fail" would be a far better description.
+> > 
+> > > 
+> > > - How do you measure this? 5% feels like a huge amount for something
+> > >   that should be 3 loads. Isn't this more an indication that the page
+> > >   table walker is overly complicated because it was designed for
+> > >   something else? In any case, It'd be good to verify your findings,
+> > >   so please provide a minimal reproducer.
+> > 
+> > I have booted with qemu a L1 guest. Pinned to the biggest CPUs of the Mac M2 and
+> > set the performance governor.
+> > 
+> > Then in the L1 guest, I disabled completely THPs and enabled the tracing
+> > function_graph to measure user_mem_abort() and get_user_mapping_size(), before
+> > booting a L2 guest with a single vCPU.
 > 
-> I think this really needs a comment to explain why we repaint hw_mmu
-> to NULL, because the next idiot who looks at this (likely me) will
-> probably remove this line...
+> Oh crap, this is *nested*! No wonder things take ages, as you end-up
+> going via S2 (and any miss in a TLB is pretty taxing). This really
+> should be captured in the commit message...
 > 
-> The other thing is that this means that nothing can evaluate
-> vcpu->arch.hw_mmu anywhere outside of the loaded path, as it can be
-> NULL. I *think* this is OK, but I need to really convince myself...
-> 
-> I'd like to add something like:
-> 
-> 	/*
-> 	 * We can't rely on the S2 MMU being the canonical one,
-> 	 * as userspace can restore a nested context. Nuke the
-> 	 * hw_mmu early to ensure that we pick the correct one
-> 	 * load time. It also means that we can't rely on hw_mmu
-> 	 * being set to anything useful if the vcpu isn't loaded.
-> 	 */
-> 
-> If that works for you, I'll squash that in.
+> What is the impact on a non-NV setup?
 
-Absolutely.  Thanks so much.
+I do all the testing with nested: it works great, and it makes sure I don't
+break the machine :) 
 
-regards,
-dan carpenter
+I have tried on an Ampere Altra machine and the results are actually
+interesting: get_user_mapping() seems on average taking just as much time
+(0.26us). However the whole user_mem_abort() is also shorter (2.3us) so the
+percentage is actually higher: 13% on average.
 
+-- 
+Vincent
+
+> 
+> > That gave me something like ...
+> > 
+> >  0)               |  user_mem_abort() {
+> >  0)   0.208 us    |    get_user_mapping_size();
+> >  0)   5.958 us    |  }
+> > 
+> > I have skipped the outliers (the function_graph prefix them with '+', '$' ...)
+> > which I believe are most likely related to interrupts.
+> > 
+> > Then for each pair, I got the percentage get_user_mapping_size() represents in
+> > the user_mem_abort() execution time.
+> > 
+> > Now looking again at the results I have, I realised I gave the mean (5%) but
+> > perhaps the median which is 2.7% is a better representation of the overall
+> > improvement and is slightly less impressive.
+> 
+> Yeah, but still. Please respin this with an amended commit message,
+> and we'll see how we route this.
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
