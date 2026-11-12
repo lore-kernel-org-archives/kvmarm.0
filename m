@@ -1,97 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794521981;
-	b=a6p94EfdJaKTbsLVbJyJnP00VwSv6pA5/wtJJgIQcP6ic362XwrFSaUXVmF2UYN5XIE8
-	 fA/mEQsB6qj9dB8bTOj5AHVHgt160qqB0zmM7bF+w8PZTw96BJheXsFx3U6t3TA0Uqz3m
-	 6kBWmYVQarhpRNfrkPg5uerWGs7AVJ4hlMDHVyOu35U3AW5rs7qfcVmdSduFwwrJlRw7P
-	 mSk0xP2kEq0pV/ykuLNw49cShRoZ4oIc6fANuixJtrmuz1pr2o89TN6eRDJ2Kd/BLv7lm
-	 gB79UA7brlQMa0YfTDbg73vWYd3Tn0haXvZAjL8hMWt4iyO6Hbfl073puMMph8b0cnQ==
+	t=1794522267;
+	b=bMQ2EGmUdPZNnbGxEahfRU+LLlI/pXmknZM+G45HtGV44QXwI6Hsgnns3Hiu97NQrZ+R
+	 BiToZo0xve4YP4ds1ZnvyXeTua6qv5375u70NvLlg5ezZppTfx1+b9SrnIFz3wVVuSmEH
+	 PAcSipaJegTpw1qB9/q2M9D15mGvi3wUC8Y6ucrMlBO3omAA6CGNPo4Kr7lMFrQoKwz6+
+	 01s3zWprTJiuyRqQDnj/UZh+zkRXu/vTj0Os9KCViwiQ2JhqUn+0p8J55HGNCSykjf8WL
+	 HwqBvbuvEzOdGpcgQ9wEKIc2JZoz9XSE7dB3YXULy8ORjEjdGJjvT7On1ED5V8dd06g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794521981;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=MdFOkR9T1vyvJTEbm/GmyrakOZfYhcZ9ZgO9mPMwqgE=;
-	b=N4eGRyHzaLSeWnyH93Tbvyy71kSqiLbwFpgp4kB5jL+bkknBhbPbBGoV3/VLcEmTMh8g
-	 3FUkoBs6/JHYFV0kTDEY3v8r3aanmzDxU1w4Kaw9Ze0/qpmNgpxI1w2fbDizu0HtxaRuw
-	 NMAQR8/jxuiajfliFJGIGp9pOIo76ZCnDf0juYZVeFRziVk361sfsESD8jTwd/vRicBWs
-	 YHYUurI0W9XHdp8TKlLS4r63tr7lzD3vVRg9vm1ZRxOfj5qvpxrr6yK57ovwzJ9IfVWdm
-	 j+Ohpvvx+wMIlFIYU6SkRjmQV3SObF+F8sl94U2/jf7TPF18HutDqPwYUmlzQhISfSw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794522267;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=7FayPK/pGf2zT+BfrUKWRiW6uC1vgz+HaFeSIlSFsq4=;
+	b=NGtFEYrD9xrjg22/sMFjCnsPfldnUUKdPGe8BS3xjXwfsbvl3Y4nH/WK4Wi8hmIlQfkb
+	 qkLjvWALv2cNrb72HXnWjDzOHRjjrXdd7DvbW/ECmB8e6+gtjngB0hQikfFaBYmkT350W
+	 +GnzoRlZosr3A/bCQWnfIxDuwGAB4vH2770h671WgWkCTGijVAiR+Ge8XBfh1gQpsto2m
+	 KMiXHbxmjgFmHF9g7sFvMdQ0mbivBVasVfM/QB4iBMt/ZukVXPye+Jigkn+G/5ZFiwObJ
+	 eBqZuhfajTLUX5a4cXFqvHxoVlucCNcCCGEwqyy0i3eQhSz4bqOuIsPe1Q1xaYPX4lw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=KkJPMBad;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=i8vWLn5k;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6BE1606A31C;
-	Thu, 12 Nov 2026 22:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C50606A31C;
+	Thu, 12 Nov 2026 22:24:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=KkJPMBad
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A31C1F000C4;
-	Thu, 12 Nov 2026 22:19:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=i8vWLn5k
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 683271F000C5;
+	Thu, 12 Nov 2026 22:24:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794521981;
-	bh=MdFOkR9T1vyvJTEbm/GmyrakOZfYhcZ9ZgO9mPMwqgE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=KkJPMBadtLEVv4ypOglQwOiufTUuvQXpZInKdUsDfVLX5m16RASaLRZGF3Pfpwq5k
-	 Z3l76XFR6I6l2Ruv8Kj3Nwk4AFyFkGuK9xYfnJeQQTscKJVWq3zctGaoNQdWQbyQZM
-	 JTfhw6EKmkNKKAx4UaeNOGU3vdAc9pBpcDvKS3OVMw3C+ZTuYa3o9nolv7dXk4a7kM
-	 FNCFi6+G/UdRgo8wHU+FMyG3JGJMXBoJe6ln/FqhEDt8uoLumgEFgCtVUE6ufwZEUz
-	 22ZFh7iknY4Ssw62qkkSZGpWu/c5KtAOmDmY1R2c/TjcUPFbtZo/AbBjdVW5PwfokN
-	 nqgy8nw1bs8qA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xRd8r-0000000F2ee-31UM;
-	Thu, 12 Nov 2026 22:19:38 +0000
-Date: Thu, 12 Nov 2026 22:22:52 +0000
-Message-ID: <87ld6x8zb7.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-Cc: linux-coco@lists.linux.dev,	Andrew Morton <akpm@linux-foundation.org>,
-	Baoquan He <baoquan.he@linux.dev>,	Mike Rapoport <rppt@kernel.org>,	Pasha
- Tatashin <pasha.tatashin@soleen.com>,	Pratyush Yadav <pratyush@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,	Christian =?UTF-8?B?S8O2bmln?=
- <christian.koenig@amd.com>,	Jason Gunthorpe <jgg@ziepe.ca>,	Joerg Roedel
- <joro@8bytes.org>,	Marek Szyprowski <m.szyprowski@samsung.com>,	Robin
- Murphy <robin.murphy@arm.com>,	Steven Price <steven.price@arm.com>,	Sumit
- Semwal <sumit.semwal@linaro.org>,	Suzuki K Poulose
- <suzuki.poulose@arm.com>,	Thomas Gleixner <tglx@kernel.org>,	Will Deacon
- <will@kernel.org>,	Russell King <linux@armlinux.org.uk>,	Benjamin Gaignard
- <benjamin.gaignard@collabora.com>,	Brian Starkey <Brian.Starkey@arm.com>,
-	John Stultz <jstultz@google.com>,	Mark Rutland <mark.rutland@arm.com>,	Radu
- Rendec <radu@rendec.net>,	"T.J. Mercier" <tjmercier@google.com>,	Madhavan
- Srinivasan <maddy@linux.ibm.com>,	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,	Christophe Leroy <chleroy@kernel.org>,
-	Ritesh Harjani <ritesh.list@gmail.com>,	Shrikanth Hegde
- <sshegde@linux.ibm.com>,	Alexander Gordeev <agordeev@linux.ibm.com>,	Gerald
- Schaefer <gerald.schaefer@linux.ibm.com>,	Heiko Carstens
- <hca@linux.ibm.com>,	Vasily Gorbik <gor@linux.ibm.com>,	Christian
- Borntraeger <borntraeger@linux.ibm.com>,	Sven Schnelle
- <svens@linux.ibm.com>,	Ingo Molnar <mingo@redhat.com>,	Borislav Petkov
- <bp@alien8.de>,	Dave Hansen <dave.hansen@linux.intel.com>,	x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>,	Kiryl Shutsemau <kas@kernel.org>,	Rick
- Edgecombe <rick.p.edgecombe@intel.com>,	"K . Y . Srinivasan"
- <kys@microsoft.com>,	Haiyang Zhang <haiyangz@microsoft.com>,	Wei Liu
- <wei.liu@kernel.org>,	Dexuan Cui <decui@microsoft.com>,	Long Li
- <longli@microsoft.com>,	Paolo Bonzini <pbonzini@redhat.com>,	Vitaly
- Kuznetsov <vkuznets@redhat.com>,	Andy Lutomirski <luto@kernel.org>,	Peter
- Zijlstra <peterz@infradead.org>,	dri-devel@lists.freedesktop.org,
-	iommu@lists.linux.dev,	linaro-mm-sig@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org,	linux-media@vger.kernel.org,
-	linux-mm@kvack.org,	kvmarm@lists.linux.dev,	patches@lists.linux.dev
-Subject: Re: [PATCH v9 14/14] irqchip/gic-v3-its: Preallocate VPE L1 tables
-In-Reply-To: <yq5ah5huoteu.fsf@kernel.org>
-References: <20261104164555.3555725-1-aneesh.kumar@kernel.org>
-	<20261104164555.3555725-15-aneesh.kumar@kernel.org>
-	<86zevn1c9a.wl-maz@kernel.org>
-	<yq5ah5huoteu.fsf@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20260515; t=1794522267;
+	bh=7FayPK/pGf2zT+BfrUKWRiW6uC1vgz+HaFeSIlSFsq4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=i8vWLn5klVkd3LCjSungb5kBKE9oiC8ViLRZ/01fWAObXV7Sz6d2wzOPz7WP54gZ3
+	 6BmxGsvJAkb7fijW056g2zB7AOaoea/YntE2Qs/bnE1C0o7tKWYTALZuuCB4PacyKk
+	 eYfMGilb6z4vqj7PSjj2XsxW4iVxZ0MHAFO3OGpbLl3fqWfBM2F7cOZH+f5h0auK3x
+	 tOiC1Bu8rb8/VRzinO8X7evmwpdHTjuaCnWjkdfmZKVtx6KIHC4sgmbRilloCNyzof
+	 eacY6a22reioQyylJoWPxzQbgRR9qSlqCkRziOrD9b08VNol3z7qYFK3Gm2i3oNOLP
+	 WTI7ZKSBxJvmA==
+Date: Thu, 12 Nov 2026 14:22:25 -0800
+From: Oliver Upton <oupton@kernel.org>
+To: Leonardo Bras <leo.bras@arm.com>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>, stable@vger.kernel.org
+Subject: Re: [PATCH 8/8] KVM: arm64: Stop leaning on __kvm_inject_sea() for
+ abort injection
+Message-ID: <avY8IUOoxScjsisA@kernel.org>
+References: <20261104192124.3932743-1-oupton@kernel.org>
+ <20261104192124.3932743-9-oupton@kernel.org>
+ <avXXSLhMCQVOvv4G@LeoBrasDK>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -100,57 +63,252 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: aneesh.kumar@kernel.org, linux-coco@lists.linux.dev, akpm@linux-foundation.org, baoquan.he@linux.dev, rppt@kernel.org, pasha.tatashin@soleen.com, pratyush@kernel.org, catalin.marinas@arm.com, christian.koenig@amd.com, jgg@ziepe.ca, joro@8bytes.org, m.szyprowski@samsung.com, robin.murphy@arm.com, steven.price@arm.com, sumit.semwal@linaro.org, suzuki.poulose@arm.com, tglx@kernel.org, will@kernel.org, linux@armlinux.org.uk, benjamin.gaignard@collabora.com, Brian.Starkey@arm.com, jstultz@google.com, mark.rutland@arm.com, radu@rendec.net, tjmercier@google.com, maddy@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com, chleroy@kernel.org, ritesh.list@gmail.com, sshegde@linux.ibm.com, agordeev@linux.ibm.com, gerald.schaefer@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com, mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, kas@kernel.org, rick.p.edgecombe@intel.com, kys@microsoft.
- com, haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com, longli@microsoft.com, pbonzini@redhat.com, vkuznets@redhat.com, luto@kernel.org, peterz@infradead.org, dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, linaro-mm-sig@lists.linaro.org, linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev, patches@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <avXXSLhMCQVOvv4G@LeoBrasDK>
 
-On Fri, 06 Nov 2026 15:45:29 +0000,
-Aneesh Kumar K.V <aneesh.kumar@kernel.org> wrote:
+On Thu, Nov 12, 2026 at 03:12:08PM +0000, Leonardo Bras wrote:
+> > -static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr)
+> > +static void __inject_abt64(struct kvm_vcpu *vcpu, bool iabt, u32 iss, unsigned long addr)
+> >  {
+> > -	unsigned long cpsr = *vcpu_cpsr(vcpu);
+> > -	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
+> > -	u64 esr = 0, fsc;
+> > -	int level;
+> > +	u64 esr;
+> > +	u8 ec;
+> > +
+> > +	if (vcpu_mode_priv(vcpu))
 > 
-> Marc Zyngier <maz@kernel.org> writes:
+> Maybe I am getting this wrong, but this line was previously:
+> -	if (is_aarch32 || (cpsr & PSR_MODE_MASK) == PSR_MODE_EL0t)
 > 
-> > On Wed, 04 Nov 2026 16:45:55 +0000,
-> > "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
-> >> 
-> >> VPE L1 tables are allocated from the CPU-starting callback, where sleeping is
-> >> not allowed.  Remove the page allocation from this atomic path.
-> >> 
-> >> Use a blocking allocation for the boot CPU and record the resulting table
-> >> order.  Allocate a page of that order from the sleepable CPU hotplug prepare
-> >> stage for each secondary CPU.  Consume the preallocated page only when the CPU
-> >> cannot inherit an existing redistributor or ITS table.
-> >> 
-> >> Reclaim unused preallocations after the CPU reaches the online state, and from
-> >> the prepare-state teardown when CPU bring-up aborts.
-> >
-> > No. The way to do it is to move the ITS probing out of the
-> > non-sleepable CPU hotplug path.
-> >
-> > I proposed a potential hack at [1] (which I find far more palatable
-> > than this proposal), but the real fix is to probe the ITSs as
-> > devices.
-> >
+> but vcpu_mode_priv() does not test exactly the same thing, it would test:
+> vcpu_mode_is_32bit(), tested in is_aarch32, &&
+> cpsr_mode > PSR_AA32_MODE_USR, not tested above, ||
+> *vcpu_cpsr(vcpu) & PSR_MODE_MASK != PSR_MODE_EL0t
 > 
-> Could you share a bit more detail on what you have in mind?
-> 
-> Are you suggesting that we create a platform device for each ITS and
-> initialize it through the driver's probe callback, while the rest of the
-> GIC initialization stays in the existing early boot path?
-> 
-> Would that mean the main GIC is operational during early boot, while
-> ITS-dependent features, such as MSI delivery and direct injection, become
-> available after the ITS devices probe?
-> 
-> Is that the split you have in mind?
+> This last line is testing the exact opposite of what was here. 
+> Is that another fix?
 
-Yes. Then once this is done, all the tables become normal DMA
-allocations, for which there should already be adequate support.
+No, it's equivalent. What we had here before was inscrutable. If we're
+taking an exception from 32-bit into a 64-bit EL1, the only way we get
+there is from a 32-bit EL0, so this short-circuited it to xABT_LOW.
 
-	M.
+If there's no exception level change, xABT_CUR. Otherwise, xABT_LOW.
 
--- 
-Jazz isn't dead. It just smells funny.
+Thanks,
+Oliver
+
+> > +		ec = iabt ? ESR_ELx_EC_IABT_CUR : ESR_ELx_EC_DABT_CUR;
+> > +	else
+> > +		ec = iabt ? ESR_ELx_EC_IABT_LOW : ESR_ELx_EC_DABT_LOW;
+> > +
+> > +	esr = FIELD_PREP(ESR_ELx_EC_MASK, ec) | FIELD_PREP(ESR_ELx_ISS_MASK, iss) |
+> > +	      ESR_ELx_IL;
+> > +
+> > +	vcpu_write_sys_reg(vcpu, addr, exception_far_elx(vcpu));
+> > +	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
+> > +}
+> > +
+> > +static void inject_abt64(struct kvm_vcpu *vcpu, bool iabt, u32 iss, u64 addr)
+> > +{
+> > +	pend_sync_exception(vcpu);
+> > +	__inject_abt64(vcpu, iabt, iss, addr);
+> > +}
+> > +
+> > +static void inject_sea64(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
+> > +{
+> > +	u8 fsc;
+> >  
+> >  	/*
+> >  	 * If injecting an abort from a failed S1PTW, rewalk the S1 PTs to
+> > @@ -116,7 +136,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+> >  	 */
+> >  	if (kvm_vcpu_abt_iss1tw(vcpu)) {
+> >  		u64 hpfar = kvm_vcpu_get_fault_ipa(vcpu);
+> > -		int ret;
+> > +		int ret, level;
+> >  
+> >  		if (hpfar == INVALID_GPA)
+> >  			return;
+> > @@ -137,28 +157,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+> >  	else
+> >  		pend_sync_exception(vcpu);
+> >  
+> > -	/*
+> > -	 * Build an {i,d}abort, depending on the level.
+> > -	 * Report an external synchronous abort.
+> > -	 */
+> > -	esr |= ESR_ELx_IL;
+> > -
+> > -	/*
+> > -	 * Here, the guest runs in AArch64 mode when in EL1. If we get
+> > -	 * an AArch32 fault, it means we managed to trap an EL0 fault.
+> > -	 */
+> > -	if (is_aarch32 || (cpsr & PSR_MODE_MASK) == PSR_MODE_EL0t)
+> > -		esr |= (ESR_ELx_EC_IABT_LOW << ESR_ELx_EC_SHIFT);
+> > -	else
+> > -		esr |= (ESR_ELx_EC_IABT_CUR << ESR_ELx_EC_SHIFT);
+> > -
+> > -	if (!is_iabt)
+> > -		esr |= ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT;
+> > -
+> > -	esr |= fsc;
+> > -
+> > -	vcpu_write_sys_reg(vcpu, addr, exception_far_elx(vcpu));
+> > -	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
+> > +	__inject_abt64(vcpu, iabt, fsc, addr);
+> >  }
+> >  
+> >  void kvm_inject_sync(struct kvm_vcpu *vcpu, u64 esr)
+> > @@ -174,31 +173,41 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+> >  	kvm_inject_sync(vcpu, esr);
+> >  }
+> >  
+> > -#define DFSR_FSC_EXTABT_LPAE	0x10
+> > -#define DFSR_FSC_EXTABT_nLPAE	0x08
+> > -#define DFSR_LPAE		BIT(9)
+> > -#define TTBCR_EAE		BIT(31)
+> > +#define DFSR_FS_4			BIT(10)
+> > +#define DFSR_FS_3_0			GENMASK(3, 0)
+> > +#define DFSR_FS_EXTABT_nLPAE		0x08
+> > +#define DFSR_FS_EXCL_ATOMIC_nLPAE	0x15
+> 
+> Maybe I am reading the wrong place, but in M.d, I see:
+> DFSR.FS = 0b10101
+> IMPLEMENTATION DEFINED fault (Unsupported Exclusive access fault).
+> 
+> > +#define DFSR_FSC			GENMASK(5, 0)
+> > +#define DFSR_FSC_EXTABT_LPAE		0x10
+> 
+> Wouldn't this be STATUS bits instead of FSC?
+> (Maybe FSC got renamed STATUS in the meantime)
+> 
+> 
+> > +#define DFSR_LPAE			BIT(9)
+> > +#define TTBCR_EAE			BIT(31)
+> >  
+> >  static void inject_undef32(struct kvm_vcpu *vcpu)
+> >  {
+> >  	kvm_pend_exception(vcpu, EXCEPT_AA32_UND);
+> >  }
+> >  
+> > +static bool vcpu_trans_32bit_non_lpae(struct kvm_vcpu *vcpu)
+> > +{
+> > +	return vcpu_el1_is_32bit(vcpu) && !(vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE);
+> > +}
+> > +
+> >  /*
+> >   * Modelled after TakeDataAbortException() and TakePrefetchAbortException
+> >   * pseudocode.
+> >   */
+> > -static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
+> > +static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u8 status, u32 addr)
+> >  {
+> >  	u64 far;
+> >  	u32 fsr;
+> >  
+> > -	/* Give the guest an IMPLEMENTATION DEFINED exception */
+> > -	if (vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE) {
+> > -		fsr = DFSR_LPAE | DFSR_FSC_EXTABT_LPAE;
+> > +	if (vcpu_trans_32bit_non_lpae(vcpu)) {
+> > +		/* Ensure status actually fits in DFSR.FS */
+> > +		KVM_BUG_ON(status > 0x1F, vcpu->kvm);
+> > +		fsr = FIELD_PREP(DFSR_FS_4, FIELD_GET(BIT(4), status)) |
+> > +		      FIELD_PREP(DFSR_FS_3_0, FIELD_GET(GENMASK(3, 0), status));
+> >  	} else {
+> > -		/* no need to shuffle FS[4] into DFSR[10] as it's 0 */
+> > -		fsr = DFSR_FSC_EXTABT_nLPAE;
+> > +		fsr = FIELD_PREP(DFSR_FSC, status) | DFSR_LPAE;
+> >  	}
+> >  
+> >  	far = vcpu_read_sys_reg(vcpu, FAR_EL1);
+> > @@ -218,12 +227,28 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
+> >  	vcpu_write_sys_reg(vcpu, far, FAR_EL1);
+> >  }
+> >  
+> > +static void inject_sea32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
+> > +{
+> > +	if (vcpu_trans_32bit_non_lpae(vcpu))
+> > +		inject_abt32(vcpu, is_pabt, DFSR_FS_EXTABT_nLPAE, addr);
+> > +	else
+> > +		inject_abt32(vcpu, is_pabt, DFSR_FSC_EXTABT_LPAE, addr);
+> > +}
+> > +
+> >  static void __kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
+> >  {
+> >  	if (vcpu_el1_is_32bit(vcpu))
+> > -		inject_abt32(vcpu, iabt, addr);
+> > +		inject_sea32(vcpu, iabt, addr);
+> >  	else
+> > -		inject_abt64(vcpu, iabt, addr);
+> > +		inject_sea64(vcpu, iabt, addr);
+> > +}
+> > +
+> > +static void __kvm_inject_abort(struct kvm_vcpu *vcpu, bool iabt, u8 fsc, u64 addr)
+> > +{
+> > +	if (vcpu_el1_is_32bit(vcpu))
+> > +		inject_abt32(vcpu, iabt, fsc, addr);
+> > +	else
+> > +		inject_abt64(vcpu, iabt, fsc, addr);
+> >  }
+> >  
+> >  static bool kvm_sea_target_is_el2(struct kvm_vcpu *vcpu)
+> > @@ -270,28 +295,25 @@ static int kvm_inject_nested_excl_atomic(struct kvm_vcpu *vcpu, u64 addr)
+> >   */
+> >  int kvm_inject_dabt_excl_atomic(struct kvm_vcpu *vcpu, u64 addr)
+> >  {
+> > -	u64 esr;
+> > -
+> >  	if (is_nested_ctxt(vcpu) && (vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_EL2_VM))
+> >  		return kvm_inject_nested_excl_atomic(vcpu, addr);
+> >  
+> > -	__kvm_inject_sea(vcpu, false, addr);
+> > -	esr = vcpu_read_sys_reg(vcpu, exception_esr_elx(vcpu));
+> > -	esr &= ~ESR_ELx_FSC;
+> > -	esr |= ESR_ELx_FSC_EXCL_ATOMIC;
+> > -	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
+> > +	if (vcpu_trans_32bit_non_lpae(vcpu))
+> > +		__kvm_inject_abort(vcpu, false, DFSR_FS_EXCL_ATOMIC_nLPAE, addr);
+> > +	else
+> > +		__kvm_inject_abort(vcpu, false, ESR_ELx_FSC_EXCL_ATOMIC, addr);
+> > +
+> >  	return 1;
+> >  }
+> >  
+> >  void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
+> >  {
+> > -	unsigned long addr, esr;
+> > +	bool iabt = kvm_vcpu_trap_is_iabt(vcpu);
+> > +	unsigned long addr;
+> >  
+> >  	addr  = kvm_vcpu_get_fault_ipa(vcpu);
+> >  	addr |= FAR_TO_FIPA_OFFSET(kvm_vcpu_get_hfar(vcpu));
+> >  
+> > -	__kvm_inject_sea(vcpu, kvm_vcpu_trap_is_iabt(vcpu), addr);
+> > -
+> >  	/*
+> >  	 * If AArch64 or LPAE, set FSC to 0 to indicate an Address
+> >  	 * Size Fault at level 0, as if exceeding PARange.
+> > @@ -299,13 +321,10 @@ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
+> >  	 * Non-LPAE guests will only get the external abort, as there
+> >  	 * is no way to describe the ASF.
+> >  	 */
+> > -	if (vcpu_el1_is_32bit(vcpu) &&
+> > -	    !(vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE))
+> > -		return;
+> > -
+> > -	esr = vcpu_read_sys_reg(vcpu, exception_esr_elx(vcpu));
+> > -	esr &= ~GENMASK_ULL(5, 0);
+> > -	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
+> > +	if (vcpu_trans_32bit_non_lpae(vcpu))
+> > +		__kvm_inject_sea(vcpu, iabt, addr);
+> > +	else
+> > +		__kvm_inject_abort(vcpu, iabt, ESR_ELx_FSC_ADDRSZ, addr);
+> 
+> The rest seems correct, and make easier to comprehend. :)
+> 
+> Thanks!
+> Leo
