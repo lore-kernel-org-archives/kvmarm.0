@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794491276;
-	b=uwU7x0zCSclB2gc/gHzteQDoBPfaU+p/93rydjCuFjWtCnNPIMKY2lWVF6sNNOTjxQ9A
-	 R18II+Fx6T10vuH6r4kSs5qxkbvfZa01PKfHeG2E/ZE2bTcaj7J4sR/UOtbSobCYTbu2o
-	 +hPok1gk9NgBifNVjAOIpcZPOdFqHz1dLl4iL5OlopFAiTqM+O9Z4AK7P7Mk+18rDryDX
-	 DGJdFeKwWUvdJThG2fmL90ddPphi/SwhlhscPOZMj1qpbQZuxlc+ZDryrsomzVikNzQrp
-	 J2QH6eKW/xt2baIZIoJMbdOnAEeDX/+7TJSZA/qZzdvBPnsbRRzfE3Ri5g53QMAGuJg==
+	t=1794495018;
+	b=kVfqbl3jf9Z79Z7TF+aM1XbY/8owuMfA/xfYOTbGYiKT99cmu9rXWGAC98pTDrFR1F4h
+	 yZi/doxDkzJS7P2p15KqinZCAl91N6IbtTAgX7nclw66cveCfOI/CuyCx3dvJbouufbWK
+	 kwj2hBAYQdIJrepNG2SUi+aPXf5NM5s8ZmVytxVgZp19Gi00VCVvolzjOKG8KsQ0cAhmy
+	 yQdTx66D8NmzTCThfisGhGumHpm4JgGIPIW34uM39LgEoywapVF7T6pKcwVdswnZeK1jX
+	 6hXZHPE3d7eAP0iyBNOzxgai2rfPPrjNSNWKXnJ928sm3JmUTvGjP6ziajiMeCLLEfQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794491276;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794495018;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
-	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=LnK819qJp0xv5xUqZiia/owkuvJXj5/I8hwEXIAmGIk=;
-	b=FqhxO171BtKleC7EZy6OO5TO7pt6IScY3Q21aGqaZ/TE3PfABDxbBE9TORSDl5dGuiO8
-	 eZcSNTFWUrloHGao4tIq5ZtUhld3CyD8uoyuSnThfwHgPElvn9gK2rkiQlRMYxHqtsofE
-	 /iiHE6AYvLdTREQzq607Fh7dh+i2RWbt9NK5GriXVuf2gGdiK6No8VrgQIOX8Z/ZrC4fK
-	 C1AXsGNhzDBXZRJVfgteN3zyepRW3AcFTiOgC8BZreh5k2+hb+fyz0u8WbwcavEWMsSNR
-	 CkADsc6jeM0VbXxJCTfU0cYyb5Pf/K3+B+KYj322MiCll6U+japWbmhImuABil3HHiw==
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=9A2jow7JRlptqCTEzg0jkw5u5ky6w2/LLBX62c+exTc=;
+	b=CZSi5c6D7SVSG4hoKDPCI5BjI2gpsuE0H5nw7tUzF/gbh1L97izTDXfL1WvU2OEDkKnf
+	 xj63oW97sm65jPT438tlmzOTVGu1RFyeqHvUCrFqCrT6UhnDt2ZrSceXBp95IUVTdpkU4
+	 vZSejwtu/rV/VwVtspG48wGVHpyqsP9J9KkL+Qdk9dfVk3tnXDPWddX6LAklhooRd3tep
+	 68C4JGVeHr7G93hibrIlGfn7mEgzZNSABOINfWdmkHlrui+bJvxKpnNUACkdxjQwVtRkQ
+	 ej5rfZl3N3YXMwV1P71LliTC2oN6grGfHiyasoPsWBJXqbffEFy8fOR1Do+3LNN9j6A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=OkUpyUCC;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="VDj/KxF3";
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39563606A31C;
-	Thu, 12 Nov 2026 13:47:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 39563606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09DE6606A31C
+	for <kvmarm@lists.linux.dev>; Thu, 12 Nov 2026 14:50:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 09DE6606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=OkUpyUCC
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=VDj/KxF3
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 748C51477;
-	Thu, 12 Nov 2026 05:47:51 -0800 (PST)
-Received: from [10.0.129.47] (e122027.cambridge.arm.com [10.0.129.47])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A003F3F632;
-	Thu, 12 Nov 2026 05:47:53 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 447C31516;
+	Thu, 12 Nov 2026 06:50:14 -0800 (PST)
+Received: from [10.0.154.42] (e121487-lin.cambridge.arm.com [10.0.154.42])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0F2FA3F673;
+	Thu, 12 Nov 2026 06:50:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794491274; bh=cNgEVgFO1jT1N6Afjj4PzPTHSvSJn3tCiGLPCSFHHT0=;
+	t=1794495017; bh=UkEVO6b2IdtK1EQstNMRtPhMcvSj6PEpb26mZ/3yqrI=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=OkUpyUCC0KjC/AJtGXL+QZ6TSgsGbjuPOblgRkJ9zP2rfH2y1Yt38iMNFDdSj4cNh
-	 zmdGB1nlX9BkWO+Y7Gp/j3KhfxH5jFaUpgGpsx8yrcDtlTXfloMdf1j6kKJYg1ToX7
-	 qjIAFhzlrAQrd970PFTOeZ3Iusl8Aj2X7Tli3B8s=
-Message-ID: <045b0a66-55d1-4939-95aa-65dde0cb08a1@arm.com>
-Date: Thu, 12 Nov 2026 13:47:51 +0000
+	b=VDj/KxF3lZEycISfL20ixB75nykJEFJuP5ip9dZ7pplt82yTWJSAfsSoVBdPM2MSD
+	 6lPMVOWBvKSt8GEJ4wAZ/W0TQt6VohwjbQr/DXHeQLCl1c54aj4ujidynhh/t2v+n/
+	 7XC4+xloFr2XHubi1yvfG5i5EjlRPe9SjXBHr6JY=
+Message-ID: <295c2f27-c45b-4bbd-b26d-b81a5dd5ef0d@arm.com>
+Date: Thu, 12 Nov 2026 14:50:14 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -54,163 +54,170 @@ List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 07/12] KVM: arm64: CCA: Tear down RTTs
-To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
-References: <20261111145758.217946-1-steven.price@arm.com>
- <20261111145758.217946-8-steven.price@arm.com>
- <sashiko-outbox-209425@kernel.org>
-From: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH kvmtool v4 20/23] arm64: Add GICv5 ITS device support
+To: Sascha Bischoff <sascha.bischoff@arm.com>, will@kernel.org,
+ julien.thierry.kdev@gmail.com
+Cc: maz@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ timothy.hayes@arm.com, Peter Maydell <peter.maydell@linaro.org>
+References: <20261102213413.4136118-1-sascha.bischoff@arm.com>
+ <20261102213413.4136118-21-sascha.bischoff@arm.com>
 Content-Language: en-GB
-In-Reply-To: <sashiko-outbox-209425@kernel.org>
+From: Vladimir Murzin <vladimir.murzin@arm.com>
+In-Reply-To: <20261102213413.4136118-21-sascha.bischoff@arm.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 11/11/2026 17:38, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 2 potential
-> issues to consider:
-> - [Low] KVM: arm64: possible skipped parent retry in
->   realm_tear_down_rtt_level()
-> - [Low] KVM: arm64: cca: leak of realm->sro on error returns in
->   kvm_destroy_realm()
-> --
+On 11/2/26 21:34, Sascha Bischoff wrote:
+> Allow the GICv5 ITS irqchip to create a separate KVM ITS device and
+> place its CONFIG and TRANSLATE frames immediately below the IRS.
+> Reuse the ITS creation helper for GICv3 and GICv5, selecting the
+> device and address types for each model.
 > 
-> commit 9b5e6ebefa08ce4aff4f7ddec8f9b62647e79039
-> Author: Steven Price <steven.price@arm.com>
+> At this stage, --irqchip=gicv5-its is not yet exposed, and automatic
+> irqchip selection starts with GICv5.
 > 
-> KVM: arm64: CCA: Tear down RTTs
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arm64/gic.c                  | 25 +++++++++++++++++++------
+>  arm64/include/kvm/gic.h      |  1 +
+>  arm64/include/kvm/kvm-arch.h |  8 ++++++++
+>  3 files changed, 28 insertions(+), 6 deletions(-)
 > 
-> This commit adds stage-2 unmapping and RTT destruction for CCA Realms,
-> walking and undelegating non-root RTTs before destroying the Realm
-> Descriptor.
-> 
->> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
->> index 69c628cfb6c74..b904e6541fb07 100644
->> --- a/arch/arm64/kvm/rmi.c
->> +++ b/arch/arm64/kvm/rmi.c
-> 
-> [ ... ]
-> 
->> +static int realm_tear_down_rtt_level(struct realm *realm, int level,
->> +				     unsigned long start, unsigned long end)
->> +{
->> +	ssize_t map_size;
->> +	unsigned long addr, next_addr;
->> +
->> +	if (WARN_ON(level > KVM_PGTABLE_LAST_LEVEL))
->> +		return -EINVAL;
->> +
->> +	map_size = rmi_rtt_level_mapsize(level - 1);
->> +
->> +	for (addr = start; addr < end; addr = next_addr) {
->> +		phys_addr_t rtt_granule;
->> +		long ret;
->> +		unsigned long align_addr = ALIGN(addr, map_size);
->> +
->> +		next_addr = ALIGN(addr + 1, map_size);
->> +
->> +		if (next_addr > end || align_addr != addr) {
->> +			/*
->> +			 * The target range is smaller than what this level
->> +			 * covers, recurse deeper.
->> +			 */
->> +			ret = realm_tear_down_rtt_level(realm,
->> +							level + 1,
->> +							addr,
->> +							min(next_addr, end));
->> +			if (ret)
->> +				return ret;
->> +			continue;
->> +		}
->> +
->> +		ret = realm_rtt_destroy(realm, addr, level,
->> +					&rtt_granule, &next_addr);
->> +		if (ret < 0)
->> +			return ret;
->> +
->> +		switch (RMI_RESULT_STATUS(ret)) {
->> +		case RMI_SUCCESS:
->> +			free_rtt(rtt_granule);
->> +			break;
->> +		case RMI_ERROR_RTT:
->> +			if (next_addr > addr) {
->> +				/* Missing RTT, skip */
->> +				break;
->> +			}
->> +			/*
->> +			 * We tear down the RTT range for the full IPA
->> +			 * space, after everything is unmapped. Also we
->> +			 * descend down only if we cannot tear down a
->> +			 * top level RTT. Thus RMM must be able to walk
->> +			 * to the requested level. e.g., a block mapping
->> +			 * exists at L1 or L2.
->> +			 */
->> +			if (WARN_ON(RMI_RESULT_DATA_LEVEL(ret) != level))
->> +				return -EBUSY;
-> 
-> [Severity: Low]
-> Can SMC_RMI_RTT_DESTROY return RMI_ERROR_RTT with next_addr > addr (and
-> next_addr < addr + map_size) when the target RTT at level has non-live
-> initial entries followed by a live child table entry, or does the walk
-> terminate at level - 1?  This rests on an RMM specification detail for
-> SMC_RMI_RTT_DESTROY that could not be confirmed from the kernel source.
+> diff --git a/arm64/gic.c b/arm64/gic.c
+> index 6abd7d44..fca99aef 100644
+> --- a/arm64/gic.c
+> +++ b/arm64/gic.c
+> @@ -51,6 +51,7 @@ int gic__encode_ppi_irq(enum irqchip_type type, int irq)
+>  {
+>  	switch (type) {
+>  	case IRQCHIP_GICV5:
+> +	case IRQCHIP_GICV5_ITS:
+>  		return irq | (GICV5_IRQ_TYPE_PPI << GICV5_IRQ_TYPE_SHIFT);
+>  	default:
+>  		return irq;
+> @@ -136,15 +137,15 @@ static int irq__routing_init(struct kvm *kvm)
+>  	return 0;
+>  }
+>  
+> -static int gic__create_its_frame(struct kvm *kvm, u64 its_frame_addr)
+> +static int gic__create_its_frame(struct kvm *kvm, u64 its_frame_addr, const bool v5)
+>  {
+>  	struct kvm_create_device its_device = {
+> -		.type = KVM_DEV_TYPE_ARM_VGIC_ITS,
+> +		.type = v5 ? KVM_DEV_TYPE_ARM_VGIC_V5_ITS : KVM_DEV_TYPE_ARM_VGIC_ITS,
+>  		.flags	= 0,
+>  	};
+>  	struct kvm_device_attr its_attr = {
+>  		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
+> -		.attr	= KVM_VGIC_ITS_ADDR_TYPE,
+> +		.attr	= v5 ? KVM_VGIC_V5_ADDR_TYPE_ITS : KVM_VGIC_ITS_ADDR_TYPE,
+>  		.addr	= (u64)(unsigned long)&its_frame_addr,
+>  	};
+>  	struct kvm_device_attr its_init_attr = {
+> @@ -155,8 +156,9 @@ static int gic__create_its_frame(struct kvm *kvm, u64 its_frame_addr)
+>  
+>  	err = ioctl(kvm->vm_fd, KVM_CREATE_DEVICE, &its_device);
+>  	if (err) {
+> -		pr_err("GICv3 ITS requested, but kernel does not support it.");
+> -		pr_err("Try --irqchip=gicv3 instead");
+> +		pr_err("GICv%c ITS requested, but kernel does not support it.",
+> +			v5 ? '5' : '3');
+> +		pr_err("Try --irqchip=gicv%c instead", v5 ? '5' : '3');
+>  		return err;
+>  	}
+>  
+> @@ -185,7 +187,9 @@ static int gic__create_msi_frame(struct kvm *kvm, enum irqchip_type type)
+>  	case IRQCHIP_GICV2M:
+>  		return gic__create_gicv2m_frame(kvm, gic_msi_base);
+>  	case IRQCHIP_GICV3_ITS:
+> -		return gic__create_its_frame(kvm, gic_msi_base);
+> +		return gic__create_its_frame(kvm, gic_msi_base, false);
+> +	case IRQCHIP_GICV5_ITS:
+> +		return gic__create_its_frame(kvm, gic_msi_base, true);
+>  	default:	/* No MSI frame needed */
+>  		return 0;
+>  	}
+> @@ -235,6 +239,7 @@ static int gic__set_irs(enum irqchip_type type)
+>  
+>  	switch (type) {
+>  	case IRQCHIP_GICV5:
+> +	case IRQCHIP_GICV5_ITS:
+>  		return ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &irs_attr);
+>  	default:	/* No IRS needed */
+>  		return 0;
+> @@ -270,6 +275,7 @@ static int gic__set_spi(enum irqchip_type type)
+>  
+>  	switch (type) {
+>  	case IRQCHIP_GICV5:
+> +	case IRQCHIP_GICV5_ITS:
+>  		spi_base = GICV5_SPI_IRQ_BASE;
+>  		fdt_type = GICV5_FDT_IRQ_TYPE_SPI;
+>  		break;
+> @@ -294,6 +300,7 @@ static int gic__set_ppi(enum irqchip_type type)
+>  {
+>  	switch (type) {
+>  	case IRQCHIP_GICV5:
+> +	case IRQCHIP_GICV5_ITS:
+>  		gic_ppi_base = GICV5_PPI_IRQ_BASE;
+>  		gic_ppi_fdt_type = GICV5_FDT_IRQ_TYPE_PPI;
+>  		break;
+> @@ -322,6 +329,7 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+>  	case IRQCHIP_GICV3_ITS:
+>  		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V3;
+>  		break;
+> +	case IRQCHIP_GICV5_ITS:
+>  	case IRQCHIP_GICV5:
+>  		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V5;
+>  		break;
+> @@ -431,6 +439,11 @@ int gic__create(struct kvm *kvm, enum irqchip_type type)
+>  		gic_redists_base = ARM_GIC_DIST_BASE - gic_redists_size;
+>  		gic_msi_base = gic_redists_base - gic_msi_size;
+>  		break;
+> +	case IRQCHIP_GICV5_ITS:
+> +		gic_msi_base = ARM_GICV5_ITS_BASE;
+> +		gic_msi_size = ARM_GICV5_ITS_SIZE;
+> +		gicv5_irs_base = ARM_GICV5_IRS_BASE;
+> +		break;
 
-This is ruled out by the spec. The only situation for RMI_ERROR_RTT with
-top > ipa is the "Missing RTT" case.
+Nitpick: can it fall through into IRQCHIP_GICV5 similarly to IRQCHIP_GICV3_ITS?
 
-[Note I have noticed the rendering in the PDF spec is broken with ">"
-not appearing - I've raised this internally]
-
-> If RMM returns RMI_RESULT_DATA_LEVEL(ret) == level with addr < next_addr <
-> addr + map_size, the next_addr > addr check treats the live RTT as missing
-> and advances addr to the unaligned next_addr.  The next iteration sees
-> align_addr != addr, tears down the remaining child RTTs at level + 1, and
-> executes continue, advancing to the next map_size boundary without retrying
-> realm_rtt_destroy() on the parent RTT at level.  Alternatively, if the walk
-> terminates at the parent entry and returns RMI_RESULT_DATA_LEVEL(ret) ==
-> level - 1 with next_addr == addr, WARN_ON(RMI_RESULT_DATA_LEVEL(ret) !=
-> level) triggers and aborts teardown with -EBUSY, leaving the RD and RTTs
-> leaked.
+>  	case IRQCHIP_GICV5:
+>  		gicv5_irs_base = ARM_GICV5_IRS_BASE;
+>  		break;
+> diff --git a/arm64/include/kvm/gic.h b/arm64/include/kvm/gic.h
+> index 9f1a3a25..0a5c70a1 100644
+> --- a/arm64/include/kvm/gic.h
+> +++ b/arm64/include/kvm/gic.h
+> @@ -38,6 +38,7 @@ enum irqchip_type {
+>  	IRQCHIP_GICV3,
+>  	IRQCHIP_GICV3_ITS,
+>  	IRQCHIP_GICV5,
+> +	IRQCHIP_GICV5_ITS,
+>  };
+>  
+>  struct kvm;
+> diff --git a/arm64/include/kvm/kvm-arch.h b/arm64/include/kvm/kvm-arch.h
+> index 94140364..3b0ffead 100644
+> --- a/arm64/include/kvm/kvm-arch.h
+> +++ b/arm64/include/kvm/kvm-arch.h
+> @@ -65,6 +65,14 @@
+>  #define ARM_GICV5_IRS_SETLPI_BASE	(ARM_GICV5_IRS_CONFIG_BASE + ARM_GICV5_IRS_CONFIG_SIZE)
+>  #define ARM_GICV5_IRS_SETLPI_SIZE	0x10000
+>  
+> +/* GICv5 ITS CONFIG and TRANSLATE frames precede the IRS frames. */
+> +#define ARM_GICV5_ITS_BASE		(ARM_GICV5_IRS_BASE - ARM_GICV5_ITS_SIZE)
+> +#define ARM_GICV5_ITS_SIZE		(ARM_GICV5_ITS_CONFIG_SIZE + ARM_GICV5_ITS_TRANSL_SIZE)
+> +#define ARM_GICV5_ITS_CONFIG_BASE	ARM_GICV5_ITS_BASE
+> +#define ARM_GICV5_ITS_CONFIG_SIZE	0x10000
+> +#define ARM_GICV5_ITS_TRANSL_BASE	(ARM_GICV5_ITS_CONFIG_BASE + ARM_GICV5_ITS_CONFIG_SIZE)
+> +#define ARM_GICV5_ITS_TRANSL_SIZE	0x10000
+> +
+>  #define KVM_PCI_CFG_AREA	ARM_AXI_AREA
+>  #define ARM_PCI_CFG_SIZE	(1ULL << 28)
+>  #define KVM_PCI_MMIO_AREA	(KVM_PCI_CFG_AREA + ARM_PCI_CFG_SIZE)
+> -- 2.34.1
 > 
-> [ ... ]
-> 
->> @@ -29,12 +206,24 @@ void kvm_destroy_realm(struct kvm *kvm)
->>  
->>  	kvm_set_realm_state(kvm, REALM_STATE_DYING);
->>  
->> +	/*
->> +	 * REALM_DESTROY requires the realm to be non-live: all RECs must have
->> +	 * been destroyed and the root RTTs must be empty. Unmap the IPA space
->> +	 * and destroy any non-root RTTs before tearing down the RD. The root
->> +	 * RTT pages are still owned by the RMM at this point, so keep the KVM
->> +	 * pgtable alive until after REALM_DESTROY and undelegation.
->> +	 */
->> +	realm_unmap_stage2(kvm);
->> +
->>  	if (realm->rd) {
->>  		phys_addr_t rd_phys = virt_to_phys(realm->rd);
->>  
->>  		if (WARN_ON(rmi_realm_terminate(rd_phys, realm->sro)))
->>  			return;
->>  
->> +		if (WARN_ON(realm_destroy_rtts(kvm)))
->> +			return;
->> +
->>  		if (WARN_ON(rmi_realm_destroy(rd_phys, realm->sro)))
->>  			return;
->>  		rmi_free_delegated_page(rd_phys);
-> 
-> [Severity: Low]
-> Does returning early on failure in realm_destroy_rtts() (or the surrounding
-> RMI teardown calls) leak realm->sro?  Unlike realm->rd and the stage-2 PGD
-> pages, realm->sro is host-owned heap memory that is never delegated to the
-> RMM, and kfree(realm->sro) at the end of kvm_destroy_realm() is skipped on
-> these early returns.
 
-Technically correct. Although all these early returns are WARN_ON()
-cases so Should Never Happen™. Still I guess I can handle this by a
-"goto out_free_sro" case rather than a straight return.
+Looks pretty neat! Thanks!
 
-Steve
-
+Vladimir
