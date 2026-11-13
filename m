@@ -1,56 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794564066;
-	b=LaIFAvFAmozasp3I5jPkPyauhuk0W0TFUDcUt3xuD+d7zfbXxfJQeknOUNqvNSFMndUl
-	 +q+gZ6+ldbSAM5s27NrzT86IqgZaa5JAMcJXaTWOwbLNrpaxDaW/kyQGXujPtv9FX2puA
-	 PxCiFP+ikUP1uydY1gbeXmUEc9LzzntXOFkwGzkD4Uh9bEyzcyTiP8rXsEwIU6VLmu2xI
-	 JFSmAmbeXIJDZ7LxOgWmI6fI70zBdS/pWPiuulJ8uDrmIXGW4YIp/eehD4IM0uNNgqqBo
-	 OA7ONJS6NMkMrVpwmXzMGuklUfPX1z3uStzTuLN9Hjctddh6qQRa1/zegUHNENnb3yQ==
+	t=1794570588;
+	b=DwtBdD+OLc2WNi6BNLhTHDcPcETlZyKh95G9rVMbyoAMZs9XzWZpMfCR1TtKv+oGvNcl
+	 Q9159Q7Dc65cBv/GYSUaiHsKMzstOyv5lvRJwzxtppT1TfYR5BPBjrr4+Kx3zuzmvLv2r
+	 k4iUoME/pPqUtuIb3GvFan7DkPpjYIx9deA73CnBox4bHiJlbsUJ1fzOeiS37Y0hukW/Y
+	 WVP9hSBpXwa8cC3mkt8aUn92eAdZWvx1fUiYi7iLs/NFLwydg1JgmacYNs1gbQ5BrqAUC
+	 iporjPzIFLrZXo01Z5zYhXcP5GNVdPHMIZdjm/MwZLX0MNXVnIR4qwOtvNRMDIiRLyg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794564066;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=hd7fUprEi2Y+4iIQNx6DIQGgCg9D//Xh4pvhFlRA0ko=;
-	b=Bg6LdWzqEnIHWSzYwSFlfhksAdVSajvazHrlTV16fm55OzhMzzAJpYzMbqL1VgrivG44
-	 lVk48rWjGP+Jkiv0pTnAYkoXv1FFdWyCdQLkFZr6d/U59F7ak96WdvYnNxycHBgJB9QoK
-	 L3GvPLyYo2gvTf+0EHrOoRcCCAskSqgurm+HkTiuCbzn8/UxjwSfd6PwyAppja1WR5ms1
-	 +NvBegPtWBwnNmT+D37WZaZdYNfGNzjUhFsb9JKyW5Zi7voyvlbQhMrDfvNy57Z8RreTY
-	 J273uVdtHGtPJ5XUHJ9kPYKjfPLAk/cGCbb42Sj8oP4gWQwa7bSEutqJTNolzrZ6ZPg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794570588;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
+	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=PDXGfWB4PZogCYntKNGgT7hTDVutfH++L88sgu7Hiws=;
+	b=yJvzY2QjgOao+3Qpg19uh0QnRFd7CDRG5YuocB7nuAgs5Lv+0rnDTFJOzSk198yl33sZ
+	 HbGT3mQQ994W7qkUZ3T1tUDYq1wxEGZ+0NKiNHpg1lvaq6MZok0Ktb1E/hQgzrHmj+20I
+	 tg/roBQgKpKS2JzGLvd407b/1yL1wRJpBvI1hzki1yLIBzuN+Oaz+vdNy4AKfZB08Cfs4
+	 PzD6dHlcJ0PEZIz9a73Hxcz5EyYxLWVSaMhwKa3t//ga9pDDYqhlVRGdfF877uPmSdoOn
+	 QqjN5e+AehCJCfsIwR9NMyx8yocgPxhACkfNtYiuT8LFsK6o3DCJjjpWx1AtUDJwKsw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AzGeZNUI;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E82E606A321
-	for <kvmarm@lists.linux.dev>; Fri, 13 Nov 2026 10:01:06 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=d9PNrozM;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7347E606A31C;
+	Fri, 13 Nov 2026 11:49:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7347E606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AzGeZNUI
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A00891F000C4;
-	Fri, 13 Nov 2026 10:01:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794564065;
-	bh=hd7fUprEi2Y+4iIQNx6DIQGgCg9D//Xh4pvhFlRA0ko=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=AzGeZNUI/OScS19QhQoR5aWcF1t+OG+WPTYDT8abLwVcDFZX1UiPSl87WypDDX5F4
-	 UimcEo04W7B2K0eHu7wPaEG303tnfraK072/TZGb3TLCShHBgOua7ET8X7yYl7L7Qw
-	 Mw5E8h0GLviolUfIPsTqdRI9PWPoh0JVzEYWZU7B5Qvg+PHkTI/HmsCECV/D5EUV6q
-	 m1jTYAEn8nYn+umRYRkTmhtW4Ul5GchD57a0qLD6OzZ5INQtUZ64pogY05b/pNiDKV
-	 rOtSUs1g4xC3tv6OEyAegFtbL4ZntMg4uO9J6X1vbHweGRwQ4+3gtlbj5DpN0d08s+
-	 9zf8RQcLzwWfw==
-Message-ID: <sashiko-outbox-212593@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2] KVM: arm64: Register irq_bypass consumers only when
- direct MSIs are possible
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Jinqian Yang" <yangjinqian1@huawei.com>, kvmarm@lists.linux.dev
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261113093840.1034795-1-yangjinqian1@huawei.com>
-References: <20261113093840.1034795-1-yangjinqian1@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Nov 2026 10:01:05 +0000
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=d9PNrozM
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 926252F;
+	Fri, 13 Nov 2026 03:49:42 -0800 (PST)
+Received: from [10.0.129.47] (e122027.cambridge.arm.com [10.0.129.47])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6ABAE3F85F;
+	Fri, 13 Nov 2026 03:49:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1794570585; bh=U3MSbDzd0AoPEKAIE+49xX+i32d6XfNe3/DShPyZg/E=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=d9PNrozMFDmUla99J4Yoh5+4HUNgGxTEn9+mEf4To874n2aUoByE3QRP/x/XrYgD3
+	 lBvVKh1SuIIL6rPr30Qe2vhvIgU+TpHjxaqL82fBpzjytUEktPV4wchettmIgNd282
+	 HyQOoi6z1NTm8c1CmIg78h1plo0xyDQqEHByEC5A=
+Message-ID: <f09683c5-0bd9-4a59-b860-0c3bafa52da6@arm.com>
+Date: Fri, 13 Nov 2026 11:49:37 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -59,68 +52,217 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 04/12] KVM: arm64: CCA: Check RMI support and features
+ at init
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ Kohei Enju <enju.kohei@fujitsu.com>
+References: <20261111145758.217946-1-steven.price@arm.com>
+ <20261111145758.217946-5-steven.price@arm.com>
+ <4ccf4e34-bf7e-48da-bd70-acfed1e5ce04@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <4ccf4e34-bf7e-48da-bd70-acfed1e5ce04@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Medium] KVM: arm64: irq_bypass skipped if vITS is created after
-  KVM_IRQFD
---
+On 12/11/2026 16:39, Suzuki K Poulose wrote:
+> Hi Steven
+> 
+> On 11/11/2026 14:57, Steven Price wrote:
+>> Wire RMI initialization into KVM startup and select ARM_RMM_RMI.
+>> Proceed only when RMM mode is selected and RMI is available. If
+>> KVM uses LPA2, require RMM LPA2 support. Also require SHA-256
+>> measurement support.
+>>
+>> Define a disabled kvm_rmi_is_available static key for later Realm
+>> capability checks. The key is enabled after the remaining Realm
+>> support is in place.
+> 
+> Given all of this is only used for the UABI (KVM_CAP_ARM_RMI and
+> others), does it make sense to move this patch to the next batch
+> of the CCA support and keep this only to sort out the memory
+> management support ? Similarly for the Patch 1 ?
 
-commit 3a0bd42f42a6d2802fe72bb1bc5c8b719382be8f
-Author: Jinqian Yang <yangjinqian1@huawei.com>
+True, I can move this patch (and patch 1) out and include it as part of
+a future series.
 
-KVM: arm64: Register irq_bypass consumers only when direct MSIs are possible
+Thanks,
+Steve
 
-This commit passes struct kvm to kvm_arch_has_irq_bypass() and gates
-arm64 irq_bypass consumer registration on vgic_supports_direct_msis(kvm).
+> Cheers
+> Suzuki
+> 
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>
+>> ---
+>> Changes since v1:
+>> - Combine the separate v1 RMI availability and LPA2/SHA-256 feature
+>>    check patches into one initialization patch.
+>> ---
+>>   arch/arm64/include/asm/kvm_rmi.h |  2 ++
+>>   arch/arm64/include/asm/virt.h    |  1 +
+>>   arch/arm64/kvm/Kconfig           |  1 +
+>>   arch/arm64/kvm/Makefile          |  2 +-
+>>   arch/arm64/kvm/arm.c             |  5 ++++
+>>   arch/arm64/kvm/rmi.c             | 42 ++++++++++++++++++++++++++++++++
+>>   include/linux/arm-rmi-cmds.h     |  5 ++++
+>>   7 files changed, 57 insertions(+), 1 deletion(-)
+>>   create mode 100644 arch/arm64/kvm/rmi.c
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/
+>> asm/kvm_rmi.h
+>> index 67f16793b4d0..3194daaacf2b 100644
+>> --- a/arch/arm64/include/asm/kvm_rmi.h
+>> +++ b/arch/arm64/include/asm/kvm_rmi.h
+>> @@ -56,4 +56,6 @@ struct realm {
+>>       enum realm_state state;
+>>   };
+>>   +void kvm_init_rmi(void);
+>> +
+>>   #endif /* __ASM_KVM_RMI_H */
+>> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/
+>> virt.h
+>> index b546703c3ab9..92cec42952f4 100644
+>> --- a/arch/arm64/include/asm/virt.h
+>> +++ b/arch/arm64/include/asm/virt.h
+>> @@ -87,6 +87,7 @@ void __hyp_reset_vectors(void);
+>>   bool is_kvm_arm_initialised(void);
+>>     DECLARE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
+>> +DECLARE_STATIC_KEY_FALSE(kvm_rmi_is_available);
+>>     static inline bool is_pkvm_initialized(void)
+>>   {
+>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+>> index cecea0820e52..d067063a3686 100644
+>> --- a/arch/arm64/kvm/Kconfig
+>> +++ b/arch/arm64/kvm/Kconfig
+>> @@ -34,6 +34,7 @@ menuconfig KVM
+>>       select GUEST_PERF_EVENTS if PERF_EVENTS
+>>       select KVM_GUEST_MEMFD
+>>       select KVM_GENERIC_PRE_FAULT_MEMORY
+>> +    select ARM_RMM_RMI
+>>       help
+>>         Support hosting virtualized guest machines.
+>>   diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+>> index 7aaeeb84e788..66a719ab5b6b 100644
+>> --- a/arch/arm64/kvm/Makefile
+>> +++ b/arch/arm64/kvm/Makefile
+>> @@ -16,7 +16,7 @@ CFLAGS_handle_exit.o += -Wno-override-init
+>>   kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+>>        inject_fault.o va_layout.o handle_exit.o config.o \
+>>        guest.o debug.o reset.o sys_regs.o stacktrace.o \
+>> -     vgic-sys-reg-v3.o fpsimd.o pkvm.o \
+>> +     vgic-sys-reg-v3.o fpsimd.o pkvm.o rmi.o \
+>>        arch_timer.o trng.o vmid.o emulate-nested.o nested.o at.o \
+>>        vgic/vgic.o vgic/vgic-init.o \
+>>        vgic/vgic-irqfd.o vgic/vgic-v2.o \
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index e06cc390a3d6..318e8a4b19f8 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -42,6 +42,7 @@
+>>   #include <asm/kvm_nested.h>
+>>   #include <asm/kvm_pkvm.h>
+>>   #include <asm/kvm_ptrauth.h>
+>> +#include <asm/kvm_rmi.h>
+>>   #include <asm/sections.h>
+>>   #include <asm/stacktrace/nvhe.h>
+>>   @@ -112,6 +113,8 @@ long kvm_get_cap_for_kvm_ioctl(unsigned int
+>> ioctl, long *ext)
+>>       return -EINVAL;
+>>   }
+>>   +DEFINE_STATIC_KEY_FALSE(kvm_rmi_is_available);
+>> +
+>>   DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+>>     DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_base);
+>> @@ -3272,6 +3275,8 @@ static __init int kvm_arm_init(void)
+>>         in_hyp_mode = is_kernel_in_hyp_mode();
+>>   +    kvm_init_rmi();
+>> +
+>>       if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
+>>           cpus_have_final_cap(ARM64_WORKAROUND_1508412))
+>>           kvm_info("Guests without required CPU erratum workarounds
+>> can deadlock system!\n" \
+>> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+>> new file mode 100644
+>> index 000000000000..f4c45021c6f7
+>> --- /dev/null
+>> +++ b/arch/arm64/kvm/rmi.c
+>> @@ -0,0 +1,42 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * Copyright (C) 2023-2026 ARM Ltd.
+>> + */
+>> +
+>> +#include <linux/arm-rmi-cmds.h>
+>> +#include <linux/kvm_host.h>
+>> +
+>> +#include <asm/kvm_pgtable.h>
+>> +#include <asm/virt.h>
+>> +
+>> +static int rmm_check_features(void)
+>> +{
+>> +    if (kvm_lpa2_is_enabled() &&
+>> +        !rmi_has_feature(0, RMI_FEATURE_REGISTER_0_LPA2)) {
+>> +        kvm_err("RMM doesn't support LPA2\n");
+>> +        return -ENXIO;
+>> +    }
+>> +
+>> +    if (!rmi_has_feature(1, RMI_FEATURE_REGISTER_1_HASH_SHA_256)) {
+>> +        kvm_err("RMM doesn't support SHA-256 measurements\n");
+>> +        return -ENXIO;
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>> +
+>> +void kvm_init_rmi(void)
+>> +{
+>> +    if (kvm_get_mode() != KVM_MODE_RMM)
+>> +        return;
+>> +
+>> +    if (!is_rmi_available()) {
+>> +        kvm_info("Realm VM support is disabled because RMI is not
+>> available\n");
+>> +        return;
+>> +    }
+>> +
+>> +    if (rmm_check_features())
+>> +        return;
+>> +
+>> +    /* Future patch will enable static branch kvm_rmi_is_available */
+>> +}
+>> diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
+>> index a84e50ac851c..6f43eac7c7be 100644
+>> --- a/include/linux/arm-rmi-cmds.h
+>> +++ b/include/linux/arm-rmi-cmds.h
+>> @@ -67,6 +67,11 @@ static __always_inline void
+>> rmi_smccc_invoke_once(struct arm_smccc_1_2_regs *reg
+>>     unsigned long rmi_feat_reg(unsigned int index);
+>>   +static inline bool rmi_has_feature(unsigned int index, unsigned
+>> long feature)
+>> +{
+>> +    return !!(rmi_feat_reg(index) & feature);
+>> +}
+>> +
+>>   int rmi_delegate_range(phys_addr_t phys, unsigned long size,
+>>                  phys_addr_t *out_phys);
+>>   int rmi_undelegate_range(phys_addr_t phys, unsigned long size);
+> 
 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/k=
-vm_host.h
-> index 97332ffcb1300..da86646b67097 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1742,9 +1742,9 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u6=
-4 val);
->  #define kvm_has_sctlr2(k)				\
->  	(kvm_has_feat((k), ID_AA64MMFR3_EL1, SCTLRX, IMP))
-> =20
-> -static inline bool kvm_arch_has_irq_bypass(void)
-> +static inline bool kvm_arch_has_irq_bypass(struct kvm *kvm)
->  {
-> -	return true;
-> +	return vgic_supports_direct_msis(kvm);
->  }
-> =20
->  void kvm_idregs_enforce_dependencies(struct kvm *kvm);
-
-[Severity: Medium]
-Can kvm_irqfd_assign() skip irq_bypass_register_consumer() when userspace
-creates the virtual ITS after initializing the VGICv3 distributor and
-assigning irqfds?
-
-kvm_irqfd_assign() only requires kvm_arch_intc_initialized(kvm)
-(vgic_initialized(kvm)) and evaluates kvm_arch_has_irq_bypass(kvm) once
-without holding kvm->arch.config_lock.  vgic_supports_direct_msis(kvm)
-checks vgic_has_its(kvm), which tests dist->its_model, but vgic_its_create()
-explicitly allows creating a KVM_DEV_TYPE_ARM_VGIC_ITS device after the
-VGIC is already initialized:
-
-arch/arm64/kvm/vgic/vgic-its.c:vgic_its_create() {
-	...
-	if (vgic_initialized(dev->kvm)) {
-		ret =3D vgic_v4_init(dev->kvm);
-	...
-	dev->kvm->arch.vgic.msis_require_devid =3D true;
-	dev->kvm->arch.vgic.its_model =3D KVM_DEV_TYPE_ARM_VGIC_V3;
-}
-
-If userspace initializes the VGICv3 distributor, assigns an irqfd via
-KVM_IRQFD, and then creates the ITS and configures MSI routing,
-vgic_supports_direct_msis(kvm) returns false during kvm_irqfd_assign().
-Because vgic_its_create() does not register existing irqfds as irq_bypass
-consumers, GICv4 direct vLPI forwarding is never enabled for those irqfds
-and interrupts silently fall back to software injection.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261113093840.1034=
-795-1-yangjinqian1@huawei.com?part=3D1
