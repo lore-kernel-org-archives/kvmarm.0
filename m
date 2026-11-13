@@ -1,101 +1,86 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.51
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794589747;
-	b=jU3jCcXnoyQ8Pc3hlm5/tflzi7Vfy32AR9vCLnnsfHQ/0UH/2dgbrTYpqXGUBnsP7v5P
-	 ibXoOtcfwy3egPCzX4oSfTjTiBSgUWgdwQm3/4XY0FLUYsaFQ5hQT5tLxTb2A6iB937Z6
-	 HTxCTQB0yOQZDOyOmq8V6v1QVKQGpNk1A+iw8uI5zhGtONiwMS2RnNu9hSRn6s6z1VaKo
-	 Qeh7rdfU1rae8fEca6MiDUaiJdBnyNr5GA2CudH4G8T5FVWv+zH3IAhSjfMQlc68s0yyC
-	 +TnaRQXfp9oc7WXmV+s5hu95ArrYVJ13wnN9/b/qQt2B7PdGfPq5pbkM5RLzS6QFKSw==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794589747;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type;
-	bh=zTGaV1UloT0Chf0ol30qq10ZNwEvfaESId1U8G45Gn0=;
-	b=iLu3WqjUCenpkyeSyd7uoH5wuyb4ugUi3VboL55pVTB9SVhSF9Mer6qDG3PBRDVrW2Fb
-	 1Q0zqGctgdIHuP+Ledq+zOYqYK6A+la7hs2DJvr9OjlctIn1SUaiSaF7f2GCt+jU0exGd
-	 Mqvs+dV7nYWZQI57ryLWQZYv67q5uOKGJfOc2tf26rm3XXXbKb/RE4gbVepK8gi0Tihvu
-	 WevFMXAes1wU/qN4kKTtYwm0fcIb/E569mLOzBNKFrkGnQ6V5DOsyct7jtKCEUsZ3DE45
-	 boPGU9H+jCjsiOTgpxXaWuzUWaSB+raJ9ANGE+COek4LfnUGCA1ErUEAWGVUvU7VJlw==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WQUxNrJE;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.51
-Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=90.155.50.34
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794594372;
+	b=LA2D12c11qd67yiDkXT9D9F5syeTIgqrUEinePF2xFCdW6UkRAEUhR/9wdBMHtJcoH/t
+	 wk1xXdLohkgASnNhZBYVuFqsrHJdsh2RbSWq6zKcGmQ52xojSK4MIwPzNWbohsyNRSlOS
+	 H3IkvVy5NDNQrsStr9Skye2Jg9a6txI/AEpZul7rwtkimM0iWfcTLMfcOXE4vafroBjBU
+	 9efaGksH6zdmh4QZNBAM5QfBRY10zQuPBEDWhwT2jVVVZaX5aTIUzPr6cVA4F4T9QA6id
+	 wUNfXSaaMMRaBLLwkbHjltOfXGoWbsCW0bsHnQOTe2sWZMvzP/LiZfaxq7wNNEUOJEQ==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794594372;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding:Sender:X-SRS-Rewrite;
+	bh=msKkdHtgD2b3oR0fa9FcUaIRWkyCYgWeMc0j/s9P6i0=;
+	b=ryZRqNJLFbZsw++iM5SauyvyU0KaCsQkYznGGyKRqPljOh9NAcfCgOtePH2zPeojyJvY
+	 hvcxtdM0JBGVThsXf+Z8aPKlDl5AI+7hzyWY/kFb/7ev+q+XxP22ouTgynUPMquYf5R+0
+	 3Vd/bw/rp3To4QjQXMDpEhY636IvOc8SC8SmjUOeGM3ZxCuy7+CVh3a2iGgc6HiTkFDHR
+	 Lebjbt4fxSfA7mEpC1or4WXuVxi4HvTa03JGVJOSG6dx26IIw/iiWk+Rsf9XOAgtWj8Yi
+	 hf0WS36vRqstIYvtGg7Ha03XuoJP1sjznaBrPgY6TzdShfklj/drK2GXSw8EwCKnBrg==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=infradead.org;
+	spf=none smtp.mailfrom=casper.srs.infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=casper.20170209 header.b=Zx4HqS+o;
+	arc=none smtp.remote-ip=90.155.50.34
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B68606A323
-	for <kvmarm@lists.linux.dev>; Fri, 13 Nov 2026 17:09:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 07B68606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E40A606A335;
+	Fri, 13 Nov 2026 18:26:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4E40A606A335
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WQUxNrJE
-Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-67be9601f48so331504d50.2
-        for <kvmarm@lists.linux.dev>; Fri, 13 Nov 2026 09:09:06 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1794589746; cv=none;
-        d=google.com; s=arc-20260327;
-        b=UXPVqZjCNcjMDl1QcTTirZBW9ln45rm8XzkIiL9ybMme2lVDq4rhNWAl3dDFMwS0Oh
-         zn4lGQyW5ynV2jno3rsGDLNYPQqY7vg7mGNyA93Gp9tPoStgx2hI9dasJrWl9bSnfPhq
-         MG27kPjGz8xSQeMfGexhFLOEK8SCWgdLSU124hwDGT7GU5atw1Bjl3EmtRGUQ8sum2We
-         hBbTI9fbVnt8uEKRjfInmt6JPiERr5hPOBvAwBBRUM632ocdrayj8B/RkJwZ8myEmnVq
-         Oq7zSIf8wAvBr6BB38jskLLGj7iSaVjDo0DrjnvzDuDl3O2jH18s+yuQY1aOy0qPHuNr
-         TSQg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=zTGaV1UloT0Chf0ol30qq10ZNwEvfaESId1U8G45Gn0=;
-        fh=Cw7yOD/Kqyrqc0EWINltWiaAVOhOmDuRDB5mwM7AtkI=;
-        b=h96olp85eQLbWRgVDyGTdLNWyjdAmfLm84WZ6F91xctMnCeeWAIDyeitEUfmWRIUj1
-         xLmPuKBpme1mleKGpAoyIjsyG7g/38CjhinhbOVllEdzznEVlfQ01+0+RXdgbTHG43RG
-         +JKfIaNwS77qPVCyZXg6U8QNCd4jFs5CESwm9mOepWGlvUVbsC8jb7Y5m7bi09rs9Lf0
-         Uz6d1GBx/9nN677IUDkcPB1/LwF1xX2NS4GMR0/pezMbJLsMfOCAZhHhaVBz/sP3GFoZ
-         N6ViG7/glspH7G5IDaKlr7d0holLxy+IyiVO9B8uu+WITMvHeZCOkEtVX/nYFhF3sMuo
-         h5nw==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794589746; x=1795194546; darn=lists.linux.dev;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=zTGaV1UloT0Chf0ol30qq10ZNwEvfaESId1U8G45Gn0=;
-        b=WQUxNrJExGBiYN/mzYcnBvNJTiYVjVwQIM8Cp4p0+jgPSXaviVFRSXmFzExbaFj7QM
-         wzRS+avIbVDP2PlM2v3ctZ/EKW2vbrN1Ch20489D1LEG7uqUDmlehrNXUtBrILlfCXcF
-         iGQa0SnN6IEaBkTkHdfKqz4VDUXE96NnwDMDoX9xKhXt1AMNNeJUEJ1tCmcqby7hHy3h
-         5GVzEXVXUSOj4hojP8og7vrCLPwOqralYP/CCU9ipxT1Gcb39zr/DiOqYhCEWhieni47
-         H8+sNMGdU0XQpajrTG6Z1gD9Iaz22G7Rj38WuE39rJS6J1kHrpXHrsrC2CnAmsmBoQLC
-         T2pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794589746; x=1795194546;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=zTGaV1UloT0Chf0ol30qq10ZNwEvfaESId1U8G45Gn0=;
-        b=LtVnEBW/4d2lbSlohMP56XSe0dyXgkNoItF3/fEt8WKRV3QqGtD7u9kg2aseOMLC4B
-         rJzqv4QcRl+frWtoNFEMV9RRH2PhgiyMHlBfYEggeR6tVJpKP67J9qrOH8EXWNaO5/xN
-         Fy9uftORfzmBWbiLmzxyWWdJU0Z8xOi/SJsWvEUpWr7RJTzDuILo44cF+Y4/Ii34yUr8
-         ubFTKOpgfZvnVn2L08970fvSYU7IuO2sWBxvolc2munb5cF1ewksPOlTQNPZvTgzEQM7
-         gWH8eQpfjwnRqSrb+NT7pdNTygfMYJKxjrlWf7oa4ShJiaQG1hI64ditRQasJfK6C9il
-         SdYQ==
-X-Forwarded-Encrypted: i=1; AL+hErHLANUrAKSIxVMsc3zGAy80nbPc/HxcqgRkBNNVPqTe1SzjbiS3Lx/CuMY+SuH+iR645VPTAiw=@lists.linux.dev
-X-Gm-Message-State: APuU4Z/q8SFeILPrkvPie5dRtq+zT3Vnzb6RYvWLoATRenPgY8/peaFJ
-	FjYeZT+Kd4jl7tv9h51waSeBv2OQrkXabU+/SSPOlFeypJ8G2Z0uJDdUl8tZ1PZ88v3fsvoHk4/
-	M1zzsu4kal/tfNT2+SinGxeThWCCK8Kw=
-X-Gm-Gg: AYBFou034nz0xhuFEOFsiAWRAhPpTsOd8dTVH+MGANS0XoL2KfVaikgjugIhO7WEzAz
-	pCNX2LZi7Ju6YVxG2IDt8zbbnYpCF0djGfjM/X3Yv4y0X7YS1m4O2647kKBBT99Tiu4Z7HrLgs+
-	tSh+xZXY6hRZrFcJTyfvLz7XD7jyf2ZV3GOMVFxh5kk3jP6dXegOH5WhgqS7C/ppFakRp5FjpMg
-	CK35rl9qAHbNoSadFViUqSiK7P09mTLV6roVwfuqIJmdgPEA2BhVXD2ByYtnwYNhS25cOEgayoa
-	Ee6BA9YUSxt/6jbjOBpeU5787W66f6M8w2vD+Je8zicftvMCmHUSqkac6s3EyO6j0dAnzg0AytJ
-	0V+P0MqwYhBtNQB9UunvcXGme6dq4H119ZGaBhXCV2D21b1G+Lt2Paif+u89clTraTOTm3Hvo2m
-	/LJyVjoeR50BrqQejyVZ76k74Z7VpKotUlFYlK9BEvmo10Su+3L1Y5sOhTiZoJe4N3aQVMWVHET
-	r3UFyqF
-X-Received: by 2002:a05:690e:b83:b0:67c:1fc:2a49 with SMTP id
- 956f58d0204a3-67d970207c9mr377453d50.54.1794589746003; Fri, 13 Nov 2026
- 09:09:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=casper.20170209 header.b=Zx4HqS+o
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+	Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=msKkdHtgD2b3oR0fa9FcUaIRWkyCYgWeMc0j/s9P6i0=; b=Zx4HqS+ofJPysjuxqvHILtgMFz
+	fztLdc4K36XPZ6PZLoefYSbw5DvHM+1xg5D4gEN2t8LvGnjxeeCHChs5cqiQU8+1x/zFQnXQm646l
+	vCozneNrBYMFTQebLmimVaDmt9AlOhKnN8aFK8Ck5mwgxEamqEAohOcXnHxWiAo4ctWEEbIWq232P
+	PtDivBQLBUReqXJ/pN+aqrdQ2PA79OVflNncjbceKvt52DZsZpvaOD+W/NZ8oVFHu11SdZ8Du2CMf
+	BEorl+Ej/aumtFZWUFZU87deTHDoGnNf8xcR6AYFSQsO4S2/ugiQhV9+n/AGOGTMttC3B7jF72eYy
+	/Ez7yqiA==;
+Received: from [2001:8b0:10b:1::425] (helo=i7.infradead.org)
+	by casper.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xRvyS-00000004cT7-0Gm0;
+	Fri, 13 Nov 2026 18:26:08 +0000
+Received: from dwoodhou by i7.infradead.org with local (Exim 4.99.5 #2 (Red Hat Linux))
+	id 1xRvyR-00000000LYZ-3bgH;
+	Fri, 13 Nov 2026 18:26:07 +0000
+From: David Woodhouse <dwmw2@infradead.org>
+To: =?UTF-8?q?J=C3=B6rg=20R=C3=B6del?= <joro@8bytes.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	ashish.kalra@amd.com,
+	michael.roth@amd.com,
+	nsaenz@amazon.com,
+	anelkz@amazon.de,
+	James.Bottomley@HansenPartnership.com,
+	Melody Wang <huibo.wang@amd.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	loongarch@lists.linux.dev,
+	linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org,
+	x86@kernel.org,
+	coconut-svsm@lists.linux.dev,
+	joerg.roedel@amd.com,
+	Mushahid Hussain <hmushi@amazon.co.uk>,
+	Sriram Nambakam <snambakam@linux.microsoft.com>,
+	David Woodhouse <dwmw@amazon.co.uk>
+Subject: [RFC PATCH 12/13] KVM: selftests: Check CPUID handling of plane twins
+Date: Fri, 13 Nov 2026 11:26:06 -0700
+Message-ID: <20261113182607.82813-13-dwmw2@infradead.org>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20261113182607.82813-1-dwmw2@infradead.org>
+References: <20260608144252.351443-1-joro@8bytes.org>
+ <20261113182607.82813-1-dwmw2@infradead.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -105,73 +90,190 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261023070110.1833446-1-fuad.tabba@linux.dev>
- <20261023070110.1833446-2-fuad.tabba@linux.dev> <86fqxwzul7.wl-maz@kernel.org>
- <CA+EHjTw08SZC_3Uodt6ew6vXVH-doW-8G41fVCF-rmaKsv+0fQ@mail.gmail.com>
- <86ecdgzp6m.wl-maz@kernel.org> <CA+EHjTy0jpY3sdVCENJRj_kfRDwbZ6TpkCAHQ2xUO-7ZuErpcA@mail.gmail.com>
- <ad724195-3452-495a-a50a-5e5c8093a483@app.fastmail.com> <CA+EHjTyLnAXanf9R7SuoL3gFZUNewX7QOnW=mc3qzwvaxg7jJg@mail.gmail.com>
- <040cf379-baba-4e3a-bf3d-6bc009a9e28d@app.fastmail.com> <20261112180741.17614-1-sidchintamaneni@gmail.com>
- <0a5e252e-1494-4b0f-a761-d984238c9d0d@app.fastmail.com>
-In-Reply-To: <0a5e252e-1494-4b0f-a761-d984238c9d0d@app.fastmail.com>
-From: Siddharth Chintamaneni <sidchintamaneni@gmail.com>
-Date: Fri, 13 Nov 2026 09:08:54 -0800
-X-Gm-Features: AclHuK_eSsuSs47N6QK3g2E7GgnMGVY8PMc7m7IxLZzX0JjkDZoYycjEKtYvyFw
-Message-ID: <CAE5sdEjVx-eGz4hkN3bMMJAag_g0hm+J18G6JvFH814Z4_ZGaA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: Hide FEAT_LS64_ACCDATA from guests
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Fuad Tabba <fuad.tabba@linux.dev>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Steffen Eiden <seiden@linux.ibm.com>, 
-	Zhou Wang <wangzhou1@hisilicon.com>, Navneet Singh <navneetsingh@microsoft.com>, 
-	apais@microsoft.com, rlmenge@gmail.com, hargar@linux.microsoft.com, 
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Sender: David Woodhouse <dwmw2@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, 13 Nov 2026 at 03:31, Arnd Bergmann <arnd@arndb.de> wrote:
->
-> On Thu, Nov 12, 2026, at 19:07, Siddharth Chintamaneni wrote:
-> > On Tue, Oct 27, 2026 at 02:48:29PM +0100, Arnd Bergmann wrote:
-> >> On Sat, Oct 24, 2026, at 09:14, Fuad Tabba wrote:
-> >> > On a host that runs at EL1 (nVHE or hVHE), this also requires
-> >> > __init_el2_fgt to set nACCDATA_EL1 in HFGRTR_EL2 and HFGWTR_EL2, and
-> >> > __init_el2_hcrx to set HCRX_EL2.EnAS0. Without them, the ACCDATA_EL1
-> >> > access traps to EL2 and the hypervisor panics, and so does ST64BV0
-> >> > once SCTLR_EL1.EnAS0 is set. Happy to write those and the KVM change
-> >> > once you're ready to post this.
-> >>
-> >> Thanks for the offer, that part is definitely not my area.
-> >
-> > We are preparing to post the Microsoft Smart Data Accelerator (SDA) VF
-> > dmaengine driver for Microsoft Cobalt SoCs, which uses IOMMU SVA with
-> > direct EL0 ST64BV0 portal submissions carrying the process PASID in
-> > ACCDATA_EL1.
-> >
-> > Now that Fuad's KVM guest FEAT_LS64_ACCDATA series is queued, are you
-> > planning to post the host ST64BV0 SVA + EL2/KVM patches as a standalone
-> > series soon?
->
-> Yes, sorry for the delay on my side, I'll try to get it to you ASAP.
->
-> For my understanding of your requirements:
->
-> - Is that hardware using an SMMUv3 or a different type of IOMMU?
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-SMMUv3.
+Two checks of how plane twins follow the CPUID they share.
 
+A plane vCPU created after KVM_SET_CPUID gets its Hyper-V context in
+kvm_arch_vcpu_create(), before its vCPU index is assigned, and used to
+latch a VP index of 0xFFFFFFFF. Create two vCPUs, give them a Hyper-V
+CPUID, then create their plane-1 twins and check that
+HV_X64_MSR_VP_INDEX on each twin reads its vCPU index.
 
-> - Do you have userspace calling ST64BV0 on the host, guest or possibly both?
->
+Once a twin has run, KVM_SET_CPUID2 must accept only the CPUID already
+set, even on a plane 0 that has never run. Run plane 1 with plane 0
+held (a real-mode OUT, then retired), and check that identical CPUID is
+accepted and that CPUID with XTILE added to leaf 0xD fails with EINVAL.
+Before kvm_set_cpuid() checked every twin, that call went on to the
+fpstate code, which failed it with EPERM, or resized the twin that ran
+if the process had AMX permission.
 
-We are focusing on guest VMs first, where guest userspace calls ST64BV0 on
-the portal mmap'd by the guest VF driver (with bare-metal host follow later).
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+ tools/testing/selftests/kvm/x86/planes_test.c | 125 +++++++++++++++++-
+ 1 file changed, 122 insertions(+), 3 deletions(-)
 
-> > Either way, we have Cobalt hardware with FEAT_LS64_ACCDATA available and
-> > would be happy to test your patches on silicon, or help put together and
-> > carry any remaining pieces alongside our driver series if you prefer.
->
-> Sounds good, thanks!
->
->     Arnd
+diff --git a/tools/testing/selftests/kvm/x86/planes_test.c b/tools/testing/selftests/kvm/x86/planes_test.c
+index 968f1b099b8e..dd3c251f0b7a 100644
+--- a/tools/testing/selftests/kvm/x86/planes_test.c
++++ b/tools/testing/selftests/kvm/x86/planes_test.c
+@@ -1,16 +1,19 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ /*
+  * Test the KVM_CAP_PLANES opt-in and the plane lifecycle uAPI: plane
+- * creation bounds, plane vCPU creation, and the independence of
+- * per-plane vCPU register state.
++ * creation bounds, plane vCPU creation, the independence of
++ * per-plane vCPU register state, the Hyper-V VP index of a plane
++ * vCPU created after KVM_SET_CPUID, and KVM_SET_CPUID2 once a twin
++ * has run.
+  */
+ #include <errno.h>
+ #include <string.h>
+ 
+ #include "kvm_util.h"
+ #include "processor.h"
++#include "hyperv.h"
+ 
+-/* Where the run-state test puts plane 0's one instruction. */
++/* Where the tests that enter a plane put its one instruction. */
+ #define CODE_GPA	0x1000
+ 
+ /*
+@@ -317,6 +320,120 @@ static void test_plane_lifecycle(void)
+ 	kvm_vm_free(vm);
+ }
+ 
++/*
++ * A plane vCPU created after KVM_SET_CPUID gets its Hyper-V context at
++ * creation, and its default VP index must be its vCPU index like any
++ * other vCPU's, not the -1 the vCPU carries until it is published.
++ */
++static void test_late_twin_vp_index(void)
++{
++	struct kvm_plane_vcpu *twin;
++	struct kvm_vcpu *vcpu[2];
++	struct kvm_plane *plane;
++	struct kvm_vm *vm;
++	int i;
++
++	if (!kvm_has_cap(KVM_CAP_SYS_HYPERV_CPUID)) {
++		print_skip("KVM_CAP_SYS_HYPERV_CPUID not supported");
++		return;
++	}
++
++	vm = vm_create_barebones_irqchip(true);
++	vm_enable_cap(vm, KVM_CAP_PLANES, 2);
++	plane = vm_plane_add(vm, 1);
++
++	for (i = 0; i < 2; i++) {
++		vcpu[i] = __vm_vcpu_add(vm, i);
++		vcpu_set_hv_cpuid(vcpu[i]);
++	}
++
++	for (i = 0; i < 2; i++) {
++		twin = __vm_plane_vcpu_add(vcpu[i], plane);
++		TEST_ASSERT_EQ(plane_vcpu_get_msr(twin, HV_X64_MSR_VP_INDEX), i);
++	}
++
++	kvm_vm_free(vm);
++}
++
++/*
++ * CPUID is shared between plane twins, so once any twin has run,
++ * KVM_SET_CPUID2 on plane 0 only accepts the CPUID already set, even
++ * while plane 0 itself has never run.  Without that, an enlarged
++ * dynamic xfeature would resize the fpstate of the twin that ran.
++ * Plane 1 runs here with plane 0 held: a real-mode OUT at CODE_GPA,
++ * which is then retired.
++ */
++static void test_cpuid_after_twin_ran(void)
++{
++	static const u8 out_insn[] = { 0xe6, 0x10 };	/* out %al, $0x10 */
++	u64 hold = KVM_PLANE_RUN_STATE_USER_HOLD, none = 0;
++	struct kvm_cpuid_entry2 *leaf_d = NULL;
++	struct kvm_plane_vcpu *vcpu1;
++	struct kvm_cpuid2 *enlarged;
++	struct kvm_plane *plane;
++	struct kvm_sregs sregs;
++	struct kvm_vcpu *vcpu0;
++	struct kvm_regs regs;
++	struct kvm_vm *vm;
++	u32 i;
++
++	vm = vm_create_barebones_irqchip(true);
++	vm_enable_cap(vm, KVM_CAP_PLANES, 2);
++	plane = vm_plane_add(vm, 1);
++	vcpu0 = __vm_vcpu_add(vm, 0);
++	vcpu1 = __vm_plane_vcpu_add(vcpu0, plane);
++	vcpu_init_cpuid(vcpu0, kvm_get_supported_cpuid());
++
++	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, CODE_GPA, 1, 1, 0);
++	memcpy(addr_gpa2hva(vm, CODE_GPA), out_insn, sizeof(out_insn));
++
++	plane_vcpu_ioctl(vcpu1, KVM_GET_SREGS, &sregs);
++	sregs.cs.selector = 0;
++	sregs.cs.base = 0;
++	plane_vcpu_ioctl(vcpu1, KVM_SET_SREGS, &sregs);
++	plane_vcpu_ioctl(vcpu1, KVM_GET_REGS, &regs);
++	regs.rip = CODE_GPA;
++	plane_vcpu_ioctl(vcpu1, KVM_SET_REGS, &regs);
++
++	vcpu_ioctl(vcpu0, KVM_SET_PLANE_RUN_STATE, &hold);
++	plane_vcpu_ioctl(vcpu1, KVM_SET_PLANE_RUN_STATE, &none);
++	TEST_ASSERT_EQ(__vcpu_run(vcpu0), 0);
++	TEST_ASSERT_EQ(vcpu0->run->exit_reason, KVM_EXIT_IO);
++	TEST_ASSERT_EQ(vcpu0->run->io.port, 0x10);
++
++	/* Retire the OUT without entering again. */
++	vcpu0->run->immediate_exit = 1;
++	TEST_ASSERT_EQ(__vcpu_run(vcpu0), -1);
++	TEST_ASSERT_EQ(errno, EINTR);
++	vcpu0->run->immediate_exit = 0;
++
++	/* Identical CPUID is still accepted. */
++	TEST_ASSERT_EQ(__vcpu_ioctl(vcpu0, KVM_SET_CPUID2, vcpu0->cpuid), 0);
++
++	/*
++	 * An enlarged dynamic xfeature is refused by the has-run check
++	 * (EINVAL), before the fpstate code could fail it for lack of
++	 * permission (EPERM).
++	 */
++	enlarged = allocate_kvm_cpuid2(vcpu0->cpuid->nent);
++	memcpy(enlarged, vcpu0->cpuid, kvm_cpuid2_size(vcpu0->cpuid->nent));
++	for (i = 0; i < enlarged->nent; i++) {
++		if (enlarged->entries[i].function == 0xd &&
++		    enlarged->entries[i].index == 0)
++			leaf_d = &enlarged->entries[i];
++	}
++	if (leaf_d) {
++		leaf_d->eax |= XFEATURE_MASK_XTILE;
++		TEST_ASSERT_EQ(__vcpu_ioctl(vcpu0, KVM_SET_CPUID2, enlarged), -1);
++		TEST_ASSERT_EQ(errno, EINVAL);
++	} else {
++		print_skip("no CPUID leaf 0xD, enlarged-xfeature check");
++	}
++	free(enlarged);
++
++	kvm_vm_free(vm);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_PLANES));
+@@ -326,6 +443,8 @@ int main(int argc, char *argv[])
+ 	test_enable_cap_bounds();
+ 	test_enable_cap_too_late();
+ 	test_plane_lifecycle();
++	test_late_twin_vp_index();
++	test_cpuid_after_twin_ran();
+ 
+ 	return 0;
+ }
+-- 
+2.50.1
+
