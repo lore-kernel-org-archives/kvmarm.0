@@ -1,54 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=90.155.92.199
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794594399;
-	b=IewUBcZb0CMhBwfelEfaxERlyW6MX/WK9CjVyDYf8CFOF/0sW85RcxshCTz93FH6/THn
-	 9IMWkRDLoTYjsfFsLzsCR9kLh9hfSiFkLdSOU6xZh+zzf4fCADO58+7ni+CUz8c4fdozL
-	 lnC5jra9UEb1ffliygs4lZL17RVsJf65mhWd7vsmV++8NoIiqdxwDuSkmWB3umPa1lljQ
-	 VjgzXQnqXsQ2zIGeP9kyNo+kVL43xFReRGZF8T0e2uHt2ZjQZgJMgyboVdfzCFHIWAkBA
-	 xd/nQvjYUM/Y2rP2lSHbuor4OgoJPydQynKvlEj2MMaUjkrdV+Wlhmgm/KksWdvlGYQ==
+	b=HT5dTJdTpObEsTF8pKUhAEz2xGMQUXlb0dEeJXwXFDYGPz7+jxq7PwEj3UhX74/vku1V
+	 X6y4QwDZ71oeNIJvAHk56XTGH5eztW2tsFc2tSNd+64xZddXe0dAqSCarS0dvjimzTsOW
+	 LJ2OrQROt9cE8PSisAA8UtzYqC+N5MeJt9hiopVUMVFnwiBXsYa86/cvJHsyAdYOuirXk
+	 99e3VPCX0ZbjDj4yvGbS26Y532dZ3eHFmscI74FJFWTQ6G+vFQvxHl9aEt8b+d0gNOvQn
+	 H4OfjANvGHyrebTzpgcJcW2X6W5bUfHsZQsNdhnuCodO0sIQ4GQYir9LW2ywf/Uog6g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794594399;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding:Sender:X-SRS-Rewrite;
-	bh=vhD9zqcQ9I2xlJwWYwXWk6MJvw5eWbXdZkn7PypG6JM=;
-	b=4R75y65AQwAisEe1QfZgaworYvd5g3Vep8K7rCnUWWrXi3t9q+99OrZqQ6J6f4G7LsQo
-	 sVx1pIq46pBTQIrNX88jC4Rk1X6NnfIOPg7e/9vUaigiKXccz2G3SdqzOPVgZIhTolVZ5
-	 0n/WfFBnWo/YpBuWLJjRPSpoh14BvtJ5ryPkLvs4BnCg428CCrZmFpUTlr/IavqDTy4oI
-	 BjwcsjLAIeKzK6m21zqPq6G260JRWfx3Fjq6p1ckem29IGIj2TsjvSJAkG+M3vQwDF+Mc
-	 MOl/lkrjDVf/9kJrXSlgZBTkQnZYQO4Mc5GCRth6eXCSkMoLS6mWejKDuNzyZIFNh0Q==
+	bh=1AnoyR0j7y5hdrymYbL+ph5cczEf+Al0Tzoil8ZfR/Q=;
+	b=qpBtbY2kvlpcTBp2litcszcP1yKM+rFyxrN2W2tYxld24K4CKPeYU6zyQkMOipBj+tc3
+	 l5CPFKbu+HyklhPpRkGSlO3vCuZuEOdsz8K49I4uPByz1I9/9nJjj/XSd93pCCEX/Ngr9
+	 VbtI0coU4QWQy6ITBI6NDjbi/M7+LyXcR7VPzCpyVxsuVi/ZCeWoCYlyc1flT60fKUBM7
+	 kKOF+3TPYrU+YULit1+jjIx8yF20zC1pd3jNmSVgkR5+ipp6j0wRwUgmx9SDXNwZla6Zc
+	 OEW46hiKbI9T87OOQRKTnxKL/dX9lOFGOHQ9L7LatKvfMLCiVT8dC6yofGjxY1Kx1nw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=infradead.org;
 	spf=none smtp.mailfrom=desiato.srs.infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=desiato.20200630 header.b=Qn2EM2hE;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=desiato.20200630 header.b=hEmKYu4c;
 	arc=none smtp.remote-ip=90.155.92.199
 Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EAAC606C141;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE11606C14B;
 	Fri, 13 Nov 2026 18:26:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9EAAC606C141
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9EE11606C14B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=desiato.20200630 header.b=Qn2EM2hE
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=desiato.20200630 header.b=hEmKYu4c
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
 	Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=vhD9zqcQ9I2xlJwWYwXWk6MJvw5eWbXdZkn7PypG6JM=; b=Qn2EM2hE0DULE2YXO4vgcYFo1P
-	IYQRBXfu5Zo3umDl2NdDTuLwTNWFabPCd3j5t1h91xjDlCS5pJ0CmOxv67hbFfb5drKJyaB6qOemN
-	ScYg5FHhGeIb/KyK+/bHLpYntOkeARbWkWixTpy5vcG3Zwx9GxIEl1eDhy7dyrJV54u8LZb4b9fIJ
-	LW/Eg949YM/nytwZEn4lu4Tq2+cVwunnQKuw44D6sWwCZBJHhZ2ZYRXDeStPvLqP5cMO0d6zkx9Pj
-	UoAiRvGnAmaxOLMwiAtJMlsB8Dhv3TTgUzDFAuSIHVBj1HgPAzAy8kjOgFhugc+7uTWXqDy8JQysF
-	U/PL5A9g==;
+	bh=1AnoyR0j7y5hdrymYbL+ph5cczEf+Al0Tzoil8ZfR/Q=; b=hEmKYu4crsHN6alaS6gx4febeC
+	bBb2NUhbMZ5nWRl3GR3qDIUZZj9V3hZFviUpX5E2SmikEwTum+wkvcL4hR0+ud4EXfbfT1pTv97r7
+	H4nSpPnODolqqQyw81YXnMDLl0QPwSyDqGfhmTW7fXZZ8+vwMO0rVE5rjn8OPd9mCSstFbUmL8VKp
+	C4gP2NpnmJg/mzEAIWov1vU4Y6mRSlilz+pPxacK8RJLR6siF04H7xrN0yrsJXKReF40AqvkNEXAM
+	L+zp+1MsgIWI5PCEqROMMPtxAiLdq0lcO2na+uqUF9pTLSSafp6xbLjyHWyynqv6BPqWFTL6CBVCY
+	e26pXl9g==;
 Received: from [2001:8b0:10b:1::425] (helo=i7.infradead.org)
 	by desiato.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xRvyU-0000000BeOb-16OL;
+	id 1xRvyU-0000000BeOY-15uE;
 	Fri, 13 Nov 2026 18:26:30 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.99.5 #2 (Red Hat Linux))
-	id 1xRvyR-00000000LYR-38ur;
+	id 1xRvyR-00000000LY7-2B60;
 	Fri, 13 Nov 2026 18:26:07 +0000
 From: David Woodhouse <dwmw2@infradead.org>
 To: =?UTF-8?q?J=C3=B6rg=20R=C3=B6del?= <joro@8bytes.org>
@@ -74,9 +74,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	Mushahid Hussain <hmushi@amazon.co.uk>,
 	Sriram Nambakam <snambakam@linux.microsoft.com>,
 	David Woodhouse <dwmw@amazon.co.uk>
-Subject: [RFC PATCH 10/13] KVM: planes: Let plane twins share XCR0
-Date: Fri, 13 Nov 2026 11:26:04 -0700
-Message-ID: <20261113182607.82813-11-dwmw2@infradead.org>
+Subject: [RFC PATCH 05/13] KVM: selftests: Cover plane run-state ioctls in planes_test
+Date: Fri, 13 Nov 2026 11:25:59 -0700
+Message-ID: <20261113182607.82813-6-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20261113182607.82813-1-dwmw2@infradead.org>
 References: <20260608144252.351443-1-joro@8bytes.org>
@@ -96,167 +96,258 @@ X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-XCR0/XFEM is shared between VTLs (TLFS 15.4). The planes series keeps
-arch.xcr0 per vCPU, so an XSETBV in one VTL is invisible in the other,
-and VTL1 reads a stale XFEM: a feature VTL0 enabled (AVX, for the
-Windows secure kernel) is not enabled in VTL1's XCR0. The register
-contents themselves are a separate matter, carried by the code that
-switches VTLs.
+Assert that a new plane-1 vCPU starts with KVM_PLANE_RUN_STATE_INACTIVE
+and plane 0's with no flags, that every valid combination of
+KVM_PLANE_RUN_STATE_USER_HOLD, KVM_PLANE_RUN_STATE_SUSPENDED and
+KVM_PLANE_RUN_STATE_INACTIVE reads back as written (so a saved state
+restores), and that clearing them reads back as runnable. INACTIVE on
+plane 0, INACTIVE together with SUSPENDED and the lowest undefined bit
+are refused with EINVAL, and a refused SET leaves an existing hold in
+place. On a VM that did not enable more than one plane both ioctls fail
+with EINVAL.
 
-Add KVM_PLANE_SHARE_XCR0 to the KVM_CAP_PLANES share mask. With it set,
-propagate the validated value to every plane twin in __kvm_set_xcr(),
-covering both guest XSETBV and the KVM_SET_XCRS ioctl path, and let a
-twin created later inherit plane 0's current value. The CPUID
-dynamic-bits dirty marker lives in the shared common state, so the
-existing single set covers the twins. Update the planes section of
-api.rst and the kvm_cpuid_apply_runtime() comment, which still listed
-XCR0 among the per-plane registers.
-
-SEV-SNP VMPLs bank XCR0 per VMSA, and sharing it there would be wrong
-in two ways: sev_es_sync_from_ghcb() feeds a VMPL's GHCB XCR0 to
-__kvm_set_xcr(), so a less-privileged VMPL would overwrite its siblings'
-values (and the MSR-protocol CPUID leaf 0xD sizes would then follow the
-wrong VMPL); and a pre-launch KVM_SET_XCRS on one twin would change
-plane 0's VMSA, and with it the launch measurement. An SNP VM cannot
-set the share mask, since KVM_CAP_PLANES refuses its VM type, so its
-VMPLs keep XCR0 of their own by construction.
-
-The twins' fpstate sizing does not depend on this bit: the planes share
-CPUID, so any twin's own XSETBV can enable a dynamic xfeature whether or
-not XCR0 is shared.
+With plane 0 held and nothing runnable, KVM_RUN still honours
+immediate_exit with EINTR, and otherwise exits with KVM_EXIT_PLANE_EVENT
+and cause KVM_PLANE_EVENT_HELD, with kvm_run's if_flag and apic_base
+filled in as on any other exit. That exit leaves registers marked in
+kvm_dirty_regs unconsumed and unrefreshed, and once plane 1 is released
+they land in plane 1, not plane 0. If plane 0 holds a pending I/O
+completion, here from a real-mode OUT, a held KVM_RUN fails with EBUSY,
+with or without immediate_exit, leaves the KVM_EXIT_IO in kvm_run and
+plane 0's RIP on the OUT, and the OUT retires once plane 0 is released.
 
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- Documentation/virt/kvm/api.rst  | 11 ++++++++---
- arch/x86/include/uapi/asm/kvm.h |  3 +++
- arch/x86/kvm/cpuid.c            |  4 +++-
- arch/x86/kvm/x86.c              | 34 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/x86.h              |  2 +-
- 5 files changed, 49 insertions(+), 5 deletions(-)
+ tools/testing/selftests/kvm/x86/planes_test.c | 198 +++++++++++++++++-
+ 1 file changed, 196 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index a6008cb33e99..22dc3c793bc4 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -374,8 +374,9 @@ The planes of a vCPU share its CPUID model, set through the plane 0 fd with
- KVM_SET_CPUID2.  The CPUID bits that follow a vCPU's own registers (OSXSAVE
- from CR4.OSXSAVE, OSPKE from CR4.PKE, the APIC enable, MWAIT from
- MISC_ENABLE, and the XSAVE area sizes from XCR0 and XSS) reflect the plane
--that executes CPUID, since every plane has these registers of its own.
--KVM_GET_CPUID2 returns them as plane 0 sees them.
-+that executes CPUID, since every plane has these registers of its own,
-+unless the VM asked the planes to share XCR0 with KVM_PLANE_SHARE_XCR0 (see
-+:ref:`KVM_CAP_PLANES`).  KVM_GET_CPUID2 returns them as plane 0 sees them.
+diff --git a/tools/testing/selftests/kvm/x86/planes_test.c b/tools/testing/selftests/kvm/x86/planes_test.c
+index f7db6cb6807d..968f1b099b8e 100644
+--- a/tools/testing/selftests/kvm/x86/planes_test.c
++++ b/tools/testing/selftests/kvm/x86/planes_test.c
+@@ -8,6 +8,10 @@
+ #include <string.h>
  
- 4.8 KVM_GET_DIRTY_LOG
- ---------------------
-@@ -9347,7 +9348,11 @@ through one plane is seen by all of them.  KVM_CHECK_EXTENSION
- (KVM_CAP_PLANES_SHARE) returns the bits KVM supports on the system fd, and
- the bits the VM enabled on a VM fd.  Setting an unsupported bit, or a
- non-zero args[2] or args[3], fails with -EINVAL.  Like the count, the mask
--is set once.
-+is set once.  The bits are:
+ #include "kvm_util.h"
++#include "processor.h"
 +
-+- KVM_PLANE_SHARE_XCR0: XCR0, whether written by the guest with XSETBV or
-+  with KVM_SET_XCRS on any plane's vCPU fd.  A plane vCPU created later
-+  starts with plane 0's value.
- 
- 8. Other capabilities.
- ======================
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 00ce265391e1..edec00979acf 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -922,6 +922,9 @@ struct kvm_sev_snp_launch_finish {
- #define KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST	_BITULL(2)
- #define KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST	_BITULL(3)
- 
-+/* KVM_CAP_PLANES args[1]: state the planes of a vCPU share */
-+#define KVM_PLANE_SHARE_XCR0				_BITULL(0)
-+
- struct kvm_hyperv_eventfd {
- 	__u32 conn_id;
- 	__s32 fd;
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 971ebd781c6e..aa89d1b6f6c4 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -2155,7 +2155,9 @@ get_out_of_range_cpuid_entry(struct kvm_vcpu *vcpu, u32 *fn_ptr, u32 index)
++/* Where the run-state test puts plane 0's one instruction. */
++#define CODE_GPA	0x1000
  
  /*
-  * The planes share the CPUID table but not CR4, the APIC enable, MISC_ENABLE
-- * or XCR0/XSS: the bits that follow those come from the executing plane.
-+ * or XSS, nor XCR0 unless userspace asked for KVM_PLANE_SHARE_XCR0, in which
-+ * case __kvm_set_xcr() keeps it equal across the twins: the bits that follow
-+ * those come from the executing plane.
-  */
- static void kvm_cpuid_apply_runtime(struct kvm_vcpu *vcpu, u32 function,
- 				    u32 index, u32 *eax, u32 *ebx, u32 *ecx,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 4d70e111eeb0..ceec10d116a9 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -799,6 +799,31 @@ int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
+  * Whether this host lets a VM have more than one plane: the opt-in also
+@@ -61,12 +65,22 @@ static void test_enable_cap_bounds(void)
+ static void test_enable_cap_too_late(void)
+ {
+ 	struct kvm_vm *vm = vm_create_barebones_irqchip(true);
+-
+-	__vm_vcpu_add(vm, 0);
++	struct kvm_vcpu *vcpu = __vm_vcpu_add(vm, 0);
  
- 	vcpu->arch.xcr0 = xcr0;
+ 	TEST_ASSERT_EQ(__vm_enable_cap(vm, KVM_CAP_PLANES, 2), -1);
+ 	TEST_ASSERT_EQ(errno, EEXIST);
  
-+	/*
-+	 * XCR0/XFEM is shared across VTLs (TLFS 15.4): propagate the new
-+	 * value to every plane twin so the other VTLs observe it.  This
-+	 * covers both guest XSETBV and the KVM_SET_XCRS ioctl path.  The
-+	 * CPUID dirty marker below lives in the shared common state, so one
-+	 * set covers the twins too.
-+	 *
-+	 * Only planes that userspace asked to share XCR0 do so.  SEV-SNP
-+	 * VMPLs bank it per VMSA, and an SNP VM cannot set the share mask
-+	 * (KVM_CAP_PLANES refuses its VM type), so they never fan out.
-+	 *
-+	 * Skip the fan-out until this vCPU is published in
-+	 * common->vcpus[]: the architectural reset of a twin still being
-+	 * created must not clobber a live sibling's XCR0 (the new twin
-+	 * inherits the shared value instead, in kvm_arch_vcpu_create()).
-+	 */
-+	if (kvm_plane_shares(vcpu->kvm, KVM_PLANE_SHARE_XCR0) && vcpu->common &&
-+	    vcpu->common->vcpus[vcpu->plane_level] == vcpu) {
-+		struct kvm_vcpu *twin;
-+		int i;
++	/* Without more than one user-managed plane there is no run state. */
++	{
++		u64 flags;
 +
-+		vcpu_for_each_plane(vcpu->common, i, twin)
-+			twin->arch.xcr0 = xcr0;
++		TEST_ASSERT_EQ(__vcpu_ioctl(vcpu, KVM_GET_PLANE_RUN_STATE, &flags), -1);
++		TEST_ASSERT_EQ(errno, EINVAL);
++		flags = 0;
++		TEST_ASSERT_EQ(__vcpu_ioctl(vcpu, KVM_SET_PLANE_RUN_STATE, &flags), -1);
++		TEST_ASSERT_EQ(errno, EINVAL);
 +	}
 +
- 	if ((xcr0 ^ old_xcr0) & XFEATURE_MASK_EXTEND)
- 		cpuid_set_dirty(vcpu);
- 	return 0;
-@@ -9820,6 +9845,15 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	kvm_vcpu_after_set_cpuid(vcpu);
- 	kvm_set_tsc_khz(vcpu, vcpu->kvm->arch.default_tsc_khz);
- 	kvm_vcpu_reset(vcpu, false);
-+	/*
-+	 * With XCR0 shared, a twin created after its plane-0 sibling has run
-+	 * (Hyper-V VSM enables VTL1 at runtime) inherits the current shared
-+	 * value; the architectural reset value only stands when no sibling
-+	 * exists yet, or when the planes keep XCR0 of their own.
-+	 */
-+	if (kvm_plane_shares(vcpu->kvm, KVM_PLANE_SHARE_XCR0) &&
-+	    vcpu->plane_level && vcpu->common->vcpus[0])
-+		vcpu->arch.xcr0 = vcpu->common->vcpus[0]->arch.xcr0;
- 	kvm_init_mmu(vcpu);
- 	vcpu_put(vcpu);
- 	return 0;
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 2f51b476dbd1..aa8abd219507 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -927,7 +927,7 @@ unsigned kvm_x86_default_max_planes(struct kvm *kvm);
-  * The per-vCPU state that userspace may ask the planes of a vCPU to share,
-  * in args[1] of KVM_ENABLE_CAP(KVM_CAP_PLANES).
-  */
--#define KVM_PLANE_SHARE_VALID	0
-+#define KVM_PLANE_SHARE_VALID	KVM_PLANE_SHARE_XCR0
+ 	kvm_vm_free(vm);
+ }
  
- static inline bool kvm_plane_shares(struct kvm *kvm, u64 state)
- {
+@@ -107,6 +121,186 @@ static void test_plane_lifecycle(void)
+ 	vcpu0 = __vm_vcpu_add(vm, 0);
+ 	vcpu1 = __vm_plane_vcpu_add(vcpu0, plane);
+ 
++	/*
++	 * A new plane-1 vCPU is inactive, and plane 0's has no flags.
++	 * Every valid combination reads back as written, so a saved state
++	 * restores; unknown bits, INACTIVE on plane 0 and INACTIVE together
++	 * with SUSPENDED are refused.
++	 */
++	{
++		static const u64 states[] = {
++			KVM_PLANE_RUN_STATE_USER_HOLD,
++			KVM_PLANE_RUN_STATE_SUSPENDED,
++			KVM_PLANE_RUN_STATE_USER_HOLD |
++				KVM_PLANE_RUN_STATE_SUSPENDED,
++			KVM_PLANE_RUN_STATE_INACTIVE,
++			KVM_PLANE_RUN_STATE_USER_HOLD |
++				KVM_PLANE_RUN_STATE_INACTIVE,
++			0,
++		};
++		u64 flags = ~0ULL;
++		int i;
++
++		plane_vcpu_ioctl(vcpu1, KVM_GET_PLANE_RUN_STATE, &flags);
++		TEST_ASSERT_EQ(flags, KVM_PLANE_RUN_STATE_INACTIVE);
++		flags = ~0ULL;
++		vcpu_ioctl(vcpu0, KVM_GET_PLANE_RUN_STATE, &flags);
++		TEST_ASSERT_EQ(flags, 0);
++
++		flags = KVM_PLANE_RUN_STATE_INACTIVE;
++		TEST_ASSERT_EQ(__vcpu_ioctl(vcpu0, KVM_SET_PLANE_RUN_STATE,
++					    &flags), -1);
++		TEST_ASSERT_EQ(errno, EINVAL);
++
++		for (i = 0; i < ARRAY_SIZE(states); i++) {
++			flags = states[i];
++			plane_vcpu_ioctl(vcpu1, KVM_SET_PLANE_RUN_STATE, &flags);
++			flags = ~0ULL;
++			plane_vcpu_ioctl(vcpu1, KVM_GET_PLANE_RUN_STATE, &flags);
++			TEST_ASSERT_EQ(flags, states[i]);
++		}
++
++		/* A refused SET leaves the hold in place. */
++		flags = KVM_PLANE_RUN_STATE_USER_HOLD;
++		plane_vcpu_ioctl(vcpu1, KVM_SET_PLANE_RUN_STATE, &flags);
++
++		flags = KVM_PLANE_RUN_STATE_INACTIVE | KVM_PLANE_RUN_STATE_SUSPENDED;
++		TEST_ASSERT_EQ(__plane_vcpu_ioctl(vcpu1, KVM_SET_PLANE_RUN_STATE,
++						  &flags), -1);
++		TEST_ASSERT_EQ(errno, EINVAL);
++
++		/* The lowest bit that no flag defines. */
++		flags = ~(u64)(KVM_PLANE_RUN_STATE_USER_HOLD |
++			       KVM_PLANE_RUN_STATE_SUSPENDED |
++			       KVM_PLANE_RUN_STATE_INACTIVE);
++		flags &= -flags;
++		TEST_ASSERT_EQ(__plane_vcpu_ioctl(vcpu1, KVM_SET_PLANE_RUN_STATE,
++						  &flags), -1);
++		TEST_ASSERT_EQ(errno, EINVAL);
++		flags = ~0ULL;
++		plane_vcpu_ioctl(vcpu1, KVM_GET_PLANE_RUN_STATE, &flags);
++		TEST_ASSERT_EQ(flags, KVM_PLANE_RUN_STATE_USER_HOLD);
++	}
++
++	/*
++	 * Plane 1 is held from above.  With plane 0 held too, nothing is
++	 * runnable, and KVM_RUN hands that back to userspace instead of
++	 * running the held plane 0.
++	 */
++	{
++		u64 flags = KVM_PLANE_RUN_STATE_USER_HOLD;
++		struct kvm_regs regs;
++
++		vcpu_ioctl(vcpu0, KVM_SET_PLANE_RUN_STATE, &flags);
++
++		/* immediate_exit yields EINTR, as on any KVM_RUN. */
++		vcpu0->run->immediate_exit = 1;
++		TEST_ASSERT_EQ(__vcpu_run(vcpu0), -1);
++		TEST_ASSERT_EQ(errno, EINTR);
++		vcpu0->run->immediate_exit = 0;
++
++		/* The exit fills in kvm_run like any other: poison two fields. */
++		vcpu0->run->if_flag = 0xff;
++		vcpu0->run->apic_base = 0;
++		TEST_ASSERT_EQ(__vcpu_run(vcpu0), 0);
++		TEST_ASSERT_EQ(vcpu0->run->exit_reason, KVM_EXIT_PLANE_EVENT);
++		TEST_ASSERT_EQ(vcpu0->run->plane_event.cause, KVM_PLANE_EVENT_HELD);
++		TEST_ASSERT_EQ(vcpu0->run->plane_event.plane, 0);
++		TEST_ASSERT_EQ(vcpu0->run->if_flag, 0);
++		TEST_ASSERT_EQ(vcpu0->run->apic_base,
++			       vcpu_get_msr(vcpu0, MSR_IA32_APICBASE));
++
++		/*
++		 * Registers userspace marks dirty are for the plane that runs
++		 * next: the held exit neither consumes nor overwrites them.
++		 */
++		plane_vcpu_ioctl(vcpu1, KVM_GET_REGS, &vcpu0->run->s.regs.regs);
++		vcpu0->run->s.regs.regs.rdx = 0x5ca1ab1e;	/* arbitrary marker */
++		vcpu0->run->kvm_valid_regs = KVM_SYNC_X86_REGS;
++		vcpu0->run->kvm_dirty_regs = KVM_SYNC_X86_REGS;
++		TEST_ASSERT_EQ(__vcpu_run(vcpu0), 0);
++		TEST_ASSERT_EQ(vcpu0->run->exit_reason, KVM_EXIT_PLANE_EVENT);
++		TEST_ASSERT_EQ(vcpu0->run->kvm_dirty_regs, KVM_SYNC_X86_REGS);
++		TEST_ASSERT_EQ(vcpu0->run->s.regs.regs.rdx, 0x5ca1ab1e);
++
++		/*
++		 * Released, plane 1 is next and takes them; immediate_exit
++		 * stops it before entry, after the registers are applied.
++		 */
++		flags = 0;
++		plane_vcpu_ioctl(vcpu1, KVM_SET_PLANE_RUN_STATE, &flags);
++		vcpu0->run->immediate_exit = 1;
++		TEST_ASSERT_EQ(__vcpu_run(vcpu0), -1);
++		TEST_ASSERT_EQ(errno, EINTR);
++		vcpu0->run->immediate_exit = 0;
++		TEST_ASSERT_EQ(vcpu0->run->kvm_dirty_regs, 0);
++		vcpu0->run->kvm_valid_regs = 0;
++
++		plane_vcpu_ioctl(vcpu1, KVM_GET_REGS, &regs);
++		TEST_ASSERT_EQ(regs.rdx, 0x5ca1ab1e);
++		vcpu_ioctl(vcpu0, KVM_GET_REGS, &regs);
++		TEST_ASSERT(regs.rdx != 0x5ca1ab1e,
++			    "plane 0 took the registers dirtied while it was held");
++
++		vcpu_ioctl(vcpu0, KVM_SET_PLANE_RUN_STATE, &flags);
++	}
++
++	/*
++	 * A completion plane 0 still owes its last exit stays pending while
++	 * plane 0 is held: KVM_RUN fails with EBUSY and leaves the exit in
++	 * kvm_run, and the completion runs once plane 0 runs again.  The
++	 * exit is a real-mode OUT at CODE_GPA, which userspace handles.
++	 */
++	{
++		static const u8 out_insn[] = { 0xe6, 0x10 };	/* out %al, $0x10 */
++		u64 flags = KVM_PLANE_RUN_STATE_USER_HOLD;
++		struct kvm_sregs sregs;
++		struct kvm_regs regs;
++
++		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, CODE_GPA,
++					    1, 1, 0);
++		memcpy(addr_gpa2hva(vm, CODE_GPA), out_insn, sizeof(out_insn));
++
++		vcpu_sregs_get(vcpu0, &sregs);
++		sregs.cs.selector = 0;
++		sregs.cs.base = 0;
++		vcpu_sregs_set(vcpu0, &sregs);
++		vcpu_regs_get(vcpu0, &regs);
++		regs.rip = CODE_GPA;
++		vcpu_regs_set(vcpu0, &regs);
++
++		/* Plane 1 stays held, so only plane 0 can run. */
++		plane_vcpu_ioctl(vcpu1, KVM_SET_PLANE_RUN_STATE, &flags);
++		TEST_ASSERT_EQ(__vcpu_run(vcpu0), 0);
++		TEST_ASSERT_EQ(vcpu0->run->exit_reason, KVM_EXIT_IO);
++		TEST_ASSERT_EQ(vcpu0->run->io.direction, KVM_EXIT_IO_OUT);
++		TEST_ASSERT_EQ(vcpu0->run->io.port, 0x10);
++
++		vcpu_ioctl(vcpu0, KVM_SET_PLANE_RUN_STATE, &flags);
++		vcpu0->run->immediate_exit = 1;
++		TEST_ASSERT_EQ(__vcpu_run(vcpu0), -1);
++		TEST_ASSERT_EQ(errno, EBUSY);
++		vcpu0->run->immediate_exit = 0;
++		TEST_ASSERT_EQ(__vcpu_run(vcpu0), -1);
++		TEST_ASSERT_EQ(errno, EBUSY);
++		TEST_ASSERT_EQ(vcpu0->run->exit_reason, KVM_EXIT_IO);
++		TEST_ASSERT_EQ(vcpu0->run->io.port, 0x10);
++		vcpu_regs_get(vcpu0, &regs);
++		TEST_ASSERT_EQ(regs.rip, CODE_GPA);
++
++		/* Released, plane 0 retires the OUT before immediate_exit. */
++		flags = 0;
++		vcpu_ioctl(vcpu0, KVM_SET_PLANE_RUN_STATE, &flags);
++		vcpu0->run->immediate_exit = 1;
++		TEST_ASSERT_EQ(__vcpu_run(vcpu0), -1);
++		TEST_ASSERT_EQ(errno, EINTR);
++		vcpu0->run->immediate_exit = 0;
++		vcpu_regs_get(vcpu0, &regs);
++		TEST_ASSERT_EQ(regs.rip, CODE_GPA + sizeof(out_insn));
++
++		plane_vcpu_ioctl(vcpu1, KVM_SET_PLANE_RUN_STATE, &flags);
++	}
++
+ 	/* Register state is per plane: write plane 1, plane 0 unaffected. */
+ 	plane_vcpu_ioctl(vcpu1, KVM_GET_REGS, &regs1);
+ 	regs1.rbx = 0x5157ca11;	/* arbitrary marker */
 -- 
 2.50.1
 
