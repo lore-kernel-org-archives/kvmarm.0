@@ -1,73 +1,110 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.74
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.155
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794557982;
-	b=1FQse+xa9YBpzlJhuHG3CBnW0EQY7vFM491/HOFPVeh0kv3Wc9aISJsoWB7W77zqd7P4
-	 MedOQqExsHRauigelYh6kIUkHy5RSvro6SRBzBowwnL/8rvhtzo60Z/Cb+TSnnIsx3tTm
-	 tbJQFZ36cWqSRlUutydNCof9Q2V0yS6F1bQ2PvqMs04thqqRftHBYVbpLdb8YAeGWgbzt
-	 P4gtNhjaPv5xH/7jyJX9mYdbNa0ZF/pKlBaegbMZhlMX7wHKqt+AdrftHzyqf5ud24AHw
-	 lzrEs75YWmjtAm2FfPyb+VXi9rNxEFa3zoRHP+0G1OHjVFGYAQ2BjRzq65ayM7T9bLg==
+	t=1794561529;
+	b=O+v6+ZXLFUfhMuKxhgCKoy3apMhAt9l8WA/3Z1McDvoKfMw3R/peF/CdAw4iRAo5Ls62
+	 b1Ao9G0earlMxz/wZ/JeOgos2w4GLzlRX4q7wZ9WXXrlR31O8g/ynZmSYs9duNidqOEyx
+	 9JP/wVNlpwEUcmgCjnjnWAHytPXXlhG8YItKX6VR8rYey9F1q06FEheWA3ZyIXYWKkKki
+	 3tPr/W9IAbl0oKFbLtMJDXcwsDzhNtzPBTaOis6/yBAuvbINO8u0rWBlE8gMage4R61Qh
+	 5JLdjDiy3eCMyKOHIeBwsYVcwO5bUpz0euKewdX81P8ZSmqnMBIxzyEzRC7ehngflXQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794557982;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=wAS3oQHuzL7ajnzxXYWPyyMndbqhHMc9tInB7WPJ4ZM=;
-	b=Jt3h3Jgw/1d686Nxfzx6QRRxA2J+nO8aUvdSdQk598iMOihuLhl8Ua//elj1DvS8Kawp
-	 VMSPdK2TX9kJ1huPaxjn2+su8+UxAcVRcf4L1SJH4ytcdEML+IIHdQaiZvUqkkyUR4JKD
-	 TB9mL2OVcc17T8iou1EDqhXH9m3ApoePNa2znOCmFMSIIPtnC22asCw5vGmpHd2oaF9tZ
-	 zi2rd4oUpF304+n/qrrlxZGqO2jHG74S76gFq9Wj+p8idXwSRNAyycjP4qIOqNsd7dGK+
-	 YHbmkOt11oBeLvuvYUXwK8WcIcMapHB8RBy/vINOmZwpH/Vf0OPZWQABxeixcUvYM8A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794561529;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
+	 MIME-Version:X-ThreadId:Date:From:To:Cc:Message-Id:In-Reply-To:
+	 References:Subject:Content-Type:Content-Transfer-Encoding;
+	bh=6y/Vwdb7m8Q4VQEZiWRGa4EBI0ZcNW5mrZJmNnLAIEk=;
+	b=vKeNN2aiavQjsaXdpIEc30cA5xGAIN7i39LP9K4rl9WYMt+b/Cab8e94Oz5yvIPXVOGK
+	 XWy92DdqWYgj1jtqqXTpwCnRH6LKLsEWm4jzOBBrjFrJRIKdpi+Ez1jAWqp3c1ch5nBhJ
+	 ZIy4GkmMXjFT43UnHXUwK/lVsFPhKZzsHL9WK9TnAX32Jk7q9AuXmnaBcbRQJliPnnmyC
+	 OQJUj6feSQB6HWuHDN+cRVOiDABwFQRWF+Rr7AG1Rt0WVLyD3V062V/wzAAzKo5UZPthM
+	 7hURVTA6QUx89a2tAZ5/BzI1QlNrzvlOPV5OuIXFwC+nIrAqKFV/yVr4qPsA1nbwU7g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="gLzP/gbA";
-	arc=none smtp.remote-ip=95.215.58.74
-Received: from mta1.migadu.com (out-74.mta1.migadu.com [95.215.58.74])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=arndb.de;
+	spf=pass smtp.mailfrom=arndb.de;
+	dkim=pass header.d=arndb.de header.i=@arndb.de header.a=rsa-sha256 header.s=fm2 header.b=XU1Lk5w0;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=0cGPAQzH;
+	arc=none smtp.remote-ip=202.12.124.155
+Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94100606A327
-	for <kvmarm@lists.linux.dev>; Fri, 13 Nov 2026 08:19:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 94100606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4134B606A31C
+	for <kvmarm@lists.linux.dev>; Fri, 13 Nov 2026 09:18:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4134B606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=gLzP/gbA
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=LM1ni5prrsjlOdbw8JePvasxWgCV5AgG25++/phTO84=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794557979; v=1; x=1795162779;
- b=gLzP/gbAqb1l1eiwC/6XqzzTKGKP1KEgSdHp0/ClapYbYixi6AZamfD+RIhm3tGdbeIYRUOX
- wg/n0eHKkQeJ8N8WtPwNVuijZOPfZDmHsytLqMx8keGN3HZrWIzl1TB47rgSLfq4GZqNo2ae/jz
- U89IKEHAx0t0UYQyv13pM/kc=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 143baa0b577e5982;
-	Fri, 13 Nov 2026 08:19:39 +0000
-X-Mizu-Trace-ID: 143baa0b577e5982
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: maz@kernel.org,
-	oupton@kernel.org
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	joey.gouly@arm.com,
-	seiden@linux.ibm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	mark.rutland@arm.com,
-	vdonnefort@google.com,
-	ryan.roberts@arm.com,
-	qperret@google.com,
-	steven.price@arm.com,
-	tabba@google.com
-Subject: [PATCH] KVM: arm64: Keep firmware Spectre-v4 mitigation on for protected guests
-Date: Fri, 13 Nov 2026 08:19:34 +0000
-Message-ID: <20261113081934.1715497-1-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key, unprotected) header.d=arndb.de header.i=@arndb.de header.a=rsa-sha256 header.s=fm2 header.b=XU1Lk5w0;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=0cGPAQzH
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 3C39A7A0493
+	for <kvmarm@lists.linux.dev>; Fri, 13 Nov 2026 04:18:48 -0500 (EST)
+Received: from ams-imap-03 ([10.64.2.23])
+  by ams-compute-02.internal (MEProxy); Fri, 13 Nov 2026 04:18:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1794561517;
+	 x=1794647917; bh=6y/Vwdb7m8Q4VQEZiWRGa4EBI0ZcNW5mrZJmNnLAIEk=; b=
+	XU1Lk5w0uu+L798wbsZMLuM/oLYfa2jptOAdI0/brmVfRTwfItVhsy3/WAwvax1F
+	fuaQl4/YNqrjvvedfsQ98apUbuq2EWa3KR/0yNMIo8oMGN6RYG2KhrIIjntO7XyE
+	3T/x22Q0ofh10QVEM3ULAFsFyWj3odFZ7AoKT22lf3icg2StEk+zw2eVVSKHPx+k
+	jvSYUMM/Ua6Iws2yFqcpGetJUD14kijTlkJiW8MpsS1uZxK6FFg9urFhVnwDhwlk
+	Q2sm/viJV6LlSQ9L7J0bNYRhncmf/YGINIJsD/H/Jcg0bofs5O/+sC/SeoLB0FIb
+	JBzviiALhI7Sr8vj5M0l8Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1794561517; x=
+	1794647917; bh=6y/Vwdb7m8Q4VQEZiWRGa4EBI0ZcNW5mrZJmNnLAIEk=; b=0
+	cGPAQzH3SBhTsnw+2A9ATJi83tr8tGmI+3kDDLfaTEaRbD5laHcp8CEuyufeolH9
+	jURzrwqeJ7ww6MXCBKDrknmhPGSRPic4aLVzEIABu0DK1XaLZxihlxBePOJqkVI7
+	8U26SDrkzAAubG/VO1ysi5U+MZosEKyDySXbdlR14MknUMkpTa2U73QgwVPhGWo0
+	1CRBlJ2Jo+kwqpRUt2hOGj0KXxfNA9ddfC3jatqzvpCv/BoiYk4TzDg5zI/t7r+q
+	VtSrxa3A1dYMyBXFDt6yYVgyPOWgq6KEsM5mSRXJi8NyFP8ps0wXYBQGOlvhgcdM
+	8GGdR0qeBeN+LCQipeAvQ==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=sign d=arndb.de a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1794561517; d=arndb.de;
+	mf=PGFybmRAYXJuZGIuZGU+; rt=PGt2bWFybUBsaXN0cy5saW51eC5kZXY+;
+	s=fm2:rsa-sha256:DWvVQDrKCYsVe95UbxjRyuhilbNrHr8P6vxGndr5L2RHoyv
+	Zm7/Nq/b2FJMMu8hKXK113Hpy2WDCSaF9searygZUev8NDqblOqCnjEkA9torDAD
+	QlMAX3UZLq8CLSV0gWhcDde1UanKcu+PvZ6S8yGdc0AEoc7nDVklfA2kZeNsagbe
+	yCB9YWtegT0xfdb5RUZKKAb8tmHnLqxU9GI2NBEh0HA11x2/G+DTIkbbvph6WuV+
+	fvjodaE1DfYDe8idK0iVbSyFs+Ib+dO1B30NPert/KYgWtbfUrEY+RPcNY3c2yFw
+	x1F2bWB1NjJ1vbzxy8F1BBTWSzy1Wrq4XS8duSA==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=mi-m=1; hc=12;
+	hn=cc,content-transfer-encoding,content-type,date,feedback-id,
+	from,in-reply-to,message-id,mime-version,references,subject,to;
+Message-Instance: m=1; h=sha256:vxkME9aONuWR23Ea+xNeRHIFYOKp3Ac+/gT4UmzDtbY=:vv1cmvtVAPstmIXGMWwsHMK7bkwINRxjdcmQxQpM0k8=;
+X-ME-Sender: <xms:59X2attsw9jzsR2DUXa62XldNiNGsOnYuvtuSGWCEWJVshM_h3vLtg>
+    <xme:59X2ahTvdP4tih94hNRex_pSoHh7BSjTgNR3au7lIU_BLhrc0JNfgH1QHALo6fbI9
+    F2P3TSxOICtcRLssuCHUsnZCIZfOrWCz5_RdAhRNdxTrFkjkvmYyGtxvg>
+X-ME-Proxy-Cause: dmFkZTFVGdrpsZrdpDlQwvZlSXs02XDBfEcLRW3P1tW5KGZAS4C4fdOW+W5npGRXES212F
+    utLs+hHqpTKLWMZ8tmzA9bRCMjG0dVFWaSgJP+Kckx36Uhk3RvGJbOg+K4+tlArKmH5okZ
+    6FgrfzpHTKtyBWqQtQ5SXsJIHv2n58bHsVCtj2LHVz7CM+T2lcvIrMZU9wZdnHcSztbo3Z
+    PRGrfN5bV9fOZ8IBqi+gkiEDpyNnnh9UROjquhjmwPcYIK/5TwNMJ3JjwjX/ueMEKWjrBo
+    A984hL86fNebMBTXelnTURIMGALHrSY516+YwVrZluwfyr2j6zlviEFXVo6AMfekpGh+YM
+    9c7UuzdfAJ4GPX25yxpydOysxG4iok0RzNv8mvAsX9+/oOTxH+YneYQynPdVFxaaZ/fhrp
+    I+cvtUg/aCxktQ8IVzPAKNgg7FDajd6PMTLOh81U3GlPlYGp0BGc2zo/dxBTVxkXAHr8Zy
+    6X3adHnyud1c6HaY/j1ad5kiVuHeb8/Do47imt06tXJNNAOg7/FxaVQQCVEAQWbqwQu6sl
+    BZaqbgAGHOJsRnqob8hw23nUoUuidlrWANfNd4fkJJlU7qivtKsw6n3UxSJSZq7Yxx2PlU
+    +quMQCQmgDc1BLWKWPSNYJB/IVjbT8IwBH0VeL8UOfE0sS3NBxiwDMRpchuw
+X-ME-Proxy: <xmx:6tX2agqyKoQmSsheqqC2_7zSEJ_p8jtnYFSH9zQgk6vHM_U9OcD1Fg>
+    <xmx:6tX2as8NGURzv57ffr7OrcTGIoV_qwI3Qi5wFRpU6pQqvFxRPgEoUQ>
+    <xmx:6tX2ah4yH9TU7d222ttOVwAZD23Qqesdxspq21XIczL7_LjK0nQ87A>
+    <xmx:6tX2amjDrofUuFTMkIbeFBNLIsmZOjajRlgRPWVYfIsCOlPeVITU1w>
+    <xmx:7dX2amMSM3lU66UWuHc95ZrHdkPEHIlb_f9fZLmlQxUm6A9xbSczPzX8>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id 0B16132A0099; Fri, 13 Nov 2026 04:18:31 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -77,100 +114,71 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-ThreadId: AmcrnnMArev7
+Date: Fri, 13 Nov 2026 10:18:10 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Siddharth Chintamaneni" <sidchintamaneni@gmail.com>,
+ "Fuad Tabba" <fuad.tabba@linux.dev>
+Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>,
+ "Catalin Marinas" <catalin.marinas@arm.com>, "Will Deacon" <will@kernel.org>,
+ "Mark Rutland" <mark.rutland@arm.com>,
+ "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+ "Joey Gouly" <joey.gouly@arm.com>, "Zenghui Yu" <yuzenghui@huawei.com>,
+ "Steffen Eiden" <seiden@linux.ibm.com>,
+ "Yicong Yang" <yangyicong@hisilicon.com>,
+ "Zhou Wang" <wangzhou1@hisilicon.com>,
+ "Navneet Singh" <navneetsingh@microsoft.com>, apais@microsoft.com,
+ rlmenge@gmail.com, hargar@linux.microsoft.com, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Message-Id: <0a5e252e-1494-4b0f-a761-d984238c9d0d@app.fastmail.com>
+In-Reply-To: <20261112180741.17614-1-sidchintamaneni@gmail.com>
+References: <20261023070110.1833446-1-fuad.tabba@linux.dev>
+ <20261023070110.1833446-2-fuad.tabba@linux.dev>
+ <86fqxwzul7.wl-maz@kernel.org>
+ <CA+EHjTw08SZC_3Uodt6ew6vXVH-doW-8G41fVCF-rmaKsv+0fQ@mail.gmail.com>
+ <86ecdgzp6m.wl-maz@kernel.org>
+ <CA+EHjTy0jpY3sdVCENJRj_kfRDwbZ6TpkCAHQ2xUO-7ZuErpcA@mail.gmail.com>
+ <ad724195-3452-495a-a50a-5e5c8093a483@app.fastmail.com>
+ <CA+EHjTyLnAXanf9R7SuoL3gFZUNewX7QOnW=mc3qzwvaxg7jJg@mail.gmail.com>
+ <040cf379-baba-4e3a-bf3d-6bc009a9e28d@app.fastmail.com>
+ <20261112180741.17614-1-sidchintamaneni@gmail.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Hide FEAT_LS64_ACCDATA from guests
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-EL2 handles a protected guest's ARM_SMCCC_ARCH_WORKAROUND_2 discovery
-query from the host's Spectre-v4 state at init. If the system is
-mitigated and the guest doesn't have SSBS, it returns NOT_REQUIRED,
-which means that firmware mitigation is permanently enabled. However,
-the host can disable the mitigation before running a protected vCPU,
-with an ARM_SMCCC_ARCH_WORKAROUND_2 call that EL2 forwards to the
-firmware.
+On Thu, Nov 12, 2026, at 19:07, Siddharth Chintamaneni wrote:
+> On Tue, Oct 27, 2026 at 02:48:29PM +0100, Arnd Bergmann wrote:
+>> On Sat, Oct 24, 2026, at 09:14, Fuad Tabba wrote:
+>> > On a host that runs at EL1 (nVHE or hVHE), this also requires
+>> > __init_el2_fgt to set nACCDATA_EL1 in HFGRTR_EL2 and HFGWTR_EL2, and
+>> > __init_el2_hcrx to set HCRX_EL2.EnAS0. Without them, the ACCDATA_EL1
+>> > access traps to EL2 and the hypervisor panics, and so does ST64BV0
+>> > once SCTLR_EL1.EnAS0 is set. Happy to write those and the KVM change
+>> > once you're ready to post this.
+>>
+>> Thanks for the offer, that part is definitely not my area.
+>
+> We are preparing to post the Microsoft Smart Data Accelerator (SDA) VF
+> dmaengine driver for Microsoft Cobalt SoCs, which uses IOMMU SVA with
+> direct EL0 ST64BV0 portal submissions carrying the process PASID in
+> ACCDATA_EL1.
+>
+> Now that Fuad's KVM guest FEAT_LS64_ACCDATA series is queued, are you
+> planning to post the host ST64BV0 SVA + EL2/KVM patches as a standalone
+> series soon?
 
-The host makes that call for its own userspace, so keep forwarding it,
-without hints so that the firmware decodes it as EL2 does. Track it per
-CPU, and on a mitigated system enable the mitigation again before
-running a protected vCPU on a CPU where the host has disabled it.
-Firmware enables it when a CPU powers up, so the tracked state isn't
-reset on CPU_ON or resume.
+Yes, sorry for the delay on my side, I'll try to get it to you ASAP.
 
-Fixes: fe40ff87ead5c ("KVM: arm64: Implement HVC handling for protected guests at EL2")
-Reported-by: Ryan Roberts <ryan.roberts@arm.com>
-Closes: https://lore.kernel.org/all/5fa8a1fb-4e2c-4746-8a70-a47f387ef0d6@arm.com/
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
+For my understanding of your requirements:
 
-Notes:
-    Tested on QEMU with TF-A. Upstream TF-A implements the dynamic
-    workaround only for Cortex-A76, so I patched it to advertise the
-    workaround on the Cortex-A57 that QEMU models. With a host that
-    disables the mitigation before running a protected vCPU, TF-A gets the
-    call to enable it again from EL2 with this patch, and doesn't without
-    it. TF-A's handler for the call does nothing there and QEMU doesn't
-    model the mitigation, so this tests the calls and not their effect.
-    
-    Calling the firmware before every protected vCPU run would do without
-    the tracking, at the cost of an SMC per run.
-    
-    Based on Linux 7.4-rc2 (7475ea8b58616).
+- Is that hardware using an SMMUv3 or a different type of IOMMU?
+- Do you have userspace calling ST64BV0 on the host, guest or possibly both?
 
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+> Either way, we have Cobalt hardware with FEAT_LS64_ACCDATA available and
+> would be happy to test your patches on silicon, or help put together and
+> carry any remaining pieces alongside our driver series if you prefer.
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 179d7c8277b88..081a8780fa3b7 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -21,6 +21,7 @@
- #include <asm/kvm_mmu.h>
- 
- #include <nvhe/alloc.h>
-+#include <nvhe/arm-smccc.h>
- #include <nvhe/ffa.h>
- #include <nvhe/mem_protect.h>
- #include <nvhe/mm.h>
-@@ -30,6 +31,8 @@
- 
- DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
- 
-+static DEFINE_PER_CPU(bool, host_ssbd_disabled);
-+
- /*
-  * Define a hypercall handler: handle_<name> unmarshals the arguments from
-  * the host context and hands them, correctly typed, to the body that
-@@ -940,6 +943,17 @@ DEFINE_KVM_HOST_HCALL(int, __kvm_vcpu_run, struct kvm_vcpu __kern *, vcpu)
- 			return ret;
- 		}
- 
-+		/*
-+		 * Firmware Spectre-v4 mitigation can be advertised to a
-+		 * protected guest as permanent. The host kernel runs with it
-+		 * enabled, so nothing is restored on exit.
-+		 */
-+		if (pkvm_hyp_vcpu_is_protected(hyp_vcpu) && spectre_v4_state == SPECTRE_MITIGATED &&
-+		    __this_cpu_read(host_ssbd_disabled)) {
-+			hyp_smccc_1_1_smc(ARM_SMCCC_ARCH_WORKAROUND_2, true, NULL);
-+			__this_cpu_write(host_ssbd_disabled, false);
-+		}
-+
- 		flush_hyp_vcpu(hyp_vcpu);
- 
- 		ret = __kvm_vcpu_run(&hyp_vcpu->vcpu);
-@@ -1671,6 +1685,12 @@ static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
- 		goto exit_skip_instr;
- 	}
- 
-+	if (func_id == ARM_SMCCC_ARCH_WORKAROUND_2) {
-+		/* Drop the hints, so that the firmware decodes the ID as EL2 did. */
-+		cpu_reg(host_ctxt, 0) = func_id;
-+		__this_cpu_write(host_ssbd_disabled, !lower_32_bits(cpu_reg(host_ctxt, 1)));
-+	}
-+
- 	handled = kvm_host_psci_handler(host_ctxt, func_id);
- 	if (!handled)
- 		handled = kvm_host_ffa_handler(host_ctxt, func_id);
+Sounds good, thanks!
 
-base-commit: 7475ea8b58616b33c04afb976cf0fbaad9dd63fb
--- 
-2.47.3
-
+    Arnd
