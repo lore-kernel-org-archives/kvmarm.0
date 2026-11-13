@@ -1,81 +1,65 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794571275;
-	b=lM7wH+R4PoILJ6sdbSzV6rwt4rAQC+Kdfrgtz4FQB7O6M8D73yA9cnZT3LlilyWq6OCq
-	 UqAs58BISFtQ5sZdbUNLcpjdQrc1WoVDAKA/rhfLJidsKdBqbnG6bWFY/GXw8XscBvjbP
-	 0Z3f9Va1LB+yfp2M1ed9Qss+jXwCK4LxEc476XUJtqx4FIPJIL9HFeOCbuVJat4e8eU1G
-	 3SUiZPfrRq1uxO6x603+CjumsqbExU/iTz48ED0BhA+cIhy5RY5LJnhduBi2Vf5/evwZH
-	 2qxOVpkb71ysRPvqAmKzt/2ua/Lg4vnVKMAHG+hDZrl6H57La3aARekfiJmll2DhutQ==
+	t=1794571790;
+	b=GaUQaiqYYWvZbiCuClVma0ih2aRtMH5P0fpYQDICUJJDOEMEf1bFnidP9PktHUsU2Mwv
+	 t1bQPAyBFeug77rV0gJkHiJNJGrGLWuFqNvemYq33SHYIkJ4B/3+hYKt+ElNfXFLUXOmG
+	 8lVMyhln0fGy6KTRL77qZ3664+M/SpGzRmqrXwNWxtQJpxrmQ9iTLqkVx1j8/s6EWuYUO
+	 LXgjH1LeieoD14Wq/BHVHf+jnyTLUu805ElKifT2MVFaquOu6DkFAR1gvW5b1c4W4XP3z
+	 3EWCcxROU9q6SMmfGtTb78mu/4WfG8TJAArDPKVdJGpblg5alJwuSBJe8b8737rjMiA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794571275;
-	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
-	 X-Mimecast-MFC-AGG-ID:Received:Received:From:To:Cc:Subject:Date:
-	 Message-ID:MIME-Version:X-Scanned-By:X-Mimecast-MFC-PROC-ID:
-	 X-Mimecast-Originator:Content-Transfer-Encoding:content-type;
-	bh=QuDGTGEuVvl3MPiP6Lxh0kED44wnv1RS4KyW/3v5QR0=;
-	b=4XWo70kRr3DoyVN41+PDm3nonoSsI61+cnv0J/Pd8I39RCGR40yQB+WjY7dDtgO730aH
-	 Y+/kW9h+/BPO3mBuOua4AQ/z7RoO3m/PMVa5O2Q5p6Hj+OzUuUQByU7OU29SVKyJPZXK+
-	 xlZoyOCUuXiy+WoZDvnzTCy3s8JHYxdfJG5PP57iyyX0/MnZkTTtjUAnvQAdP56DjjEuu
-	 8Mie507/idSlU7xpHj5iHZy8DEngpk2+6DDsP+sS2PGVhVGAEMdEfzjlWBA6NmYh2HkEi
-	 UXAjo35RJSqL6M5BJaSIkHxYts2lgXlKEA9QJtFQyeZTGrG+krosa+qikBJcxMRD4LQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794571790;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Type:Content-Disposition:Content-Transfer-Encoding;
+	bh=2G+piNO/0Q80N5pPAqfiUGw2eEMQVAldj94yU7VhUZM=;
+	b=QK+8VfjNYXPfBh78nNugzvKemG2nCZcbo20WJc9UJYUWkl/cWFJ+7nBRlq7PRZ0DElqg
+	 knMNdeescr5OaSRnleknG8cMhMxEX0GmllX7c316wAnz4DUOIiM/Pz9RgGVYp0cgrltZH
+	 DFb0Z67iYwqiXWXtlPDTswNMd7Wqwl4GBZEij5TlwcsSys5onIB58/ZpAB04V+WdZUnmJ
+	 rjkwUgRGk3VQID5OwPiT+A/sFFoT+KweygjQi3hC+x4+KZ4wHETXEon8fnlFACTDN+X3e
+	 WvXira3r1EgQe2twoxrTyoj6QyuNC6TXqnFmWqTTyP0ZJW7MVPHtY8OI3jAyZEQvaoQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=redhat.com;
-	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=Q4G9JTZA;
-	arc=none smtp.remote-ip=170.10.129.124
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4265606A886
-	for <kvmarm@lists.linux.dev>; Fri, 13 Nov 2026 12:01:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D4265606A886
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=GhEzHD1s;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A00C606A331
+	for <kvmarm@lists.linux.dev>; Fri, 13 Nov 2026 12:09:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2A00C606A331
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=Q4G9JTZA
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1794571273;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=QuDGTGEuVvl3MPiP6Lxh0kED44wnv1RS4KyW/3v5QR0=;
-	b=Q4G9JTZANLrW/imf+74myL13NvUi668N/h2yIxPnuuZpyEomJHf2Wx6dqdNOKMVl8ZiaBz
-	HMHEJVbJoSBIiddYGUFI8urQZhEt5nltjBTSf5S/P1N12rUAfbTw+JUhXJ/GxUuhEn49l4
-	vjt7VcnUsH85YMGGKDzGQd94m056tXc=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-353-A7ZsTMK1NMyLP5Xu2r78Mg-1; Fri,
- 13 Nov 2026 07:01:10 -0500
-X-MC-Unique: A7ZsTMK1NMyLP5Xu2r78Mg-1
-X-Mimecast-MFC-AGG-ID: A7ZsTMK1NMyLP5Xu2r78Mg_1794571268
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4329E1800607;
-	Fri, 13 Nov 2026 12:01:07 +0000 (UTC)
-Received: from thuth-p1g4.redhat.com (unknown [10.44.48.21])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B092418004FC;
-	Fri, 13 Nov 2026 12:01:02 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Andrew Jones <andrew.jones@linux.dev>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	kvm@vger.kernel.org
-Cc: Laurent Vivier <lvivier@redhat.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	=?UTF-8?q?Nico=20B=C3=B6hr?= <nrb@linux.ibm.com>,
-	Chinmay Rath <rathc@linux.ibm.com>,
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=GhEzHD1s
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2DD832F;
+	Fri, 13 Nov 2026 04:09:39 -0800 (PST)
+Received: from LeoBrasDK.cambridge.arm.com (LeoBrasDK.cambridge.arm.com [10.2.212.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 84FD33F673;
+	Fri, 13 Nov 2026 04:09:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1794571782; bh=drBmT0h2GElfkVIvcl3FbjsfB/gjaDmjLdB/XjWCtYY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=GhEzHD1s1S/hn7S9o823Z9Kml/Bn07QRPiUMge5k85YJ/zjq84E3dfp1sZYlSVZIT
+	 d2+JPKSCiQWkZgF20aWrqhok+c1RlK9XV9BNhIAo1OKRgLE8zAJGkESws76JC4RWb8
+	 NOIMYjbTKyj4apvi/6QIyJbnM+i7JP5AafbM99iY=
+From: Leonardo Bras <leo.bras@arm.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>,
 	kvmarm@lists.linux.dev,
-	linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org,
-	Amit Machhiwal <amachhiw@linux.ibm.com>
-Subject: [kvm-unit-tests PATCH] Move position-independant code flags into the target specific Makefiles
-Date: Fri, 13 Nov 2026 13:01:01 +0100
-Message-ID: <20261113120101.145183-1-thuth@redhat.com>
+	Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Wei-Lin Chang <weilin.chang@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 8/8] KVM: arm64: Stop leaning on __kvm_inject_sea() for abort injection
+Date: Fri, 13 Nov 2026 12:09:35 +0000
+Message-ID: <avb9_21JEsS6-lz3@LeoBrasDK>
+X-Mailer: git-send-email 2.56.1
+In-Reply-To: <avY8IUOoxScjsisA@kernel.org>
+References: <20261104192124.3932743-1-oupton@kernel.org> <20261104192124.3932743-9-oupton@kernel.org> <avXXSLhMCQVOvv4G@LeoBrasDK> <avY8IUOoxScjsisA@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -85,161 +69,140 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
-X-Mimecast-MFC-PROC-ID: 5YgxCL8s0nC1iOqRhczEkHVwXfpMKpRGvx2QPAFiY-s_1794571268
-X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-content-type: text/plain; charset="US-ASCII"; x-default=true
 
-The settings for position-independant code are currently quite a mess:
-It depends on the target whether we need the flags or rather should even
-disable PIC / PIE, but currently the settings are spread between the
-main Makefile (-fno-pic is the default, unless CONFIG_EFI has been set)
-and the target specific Makefiles.
-This leads to some weird situations where we have -fno-pic in the CFLAGS,
-but link with -pie in the LDFLAGS since we still want to get a relocation
-table, but then again need to add a "-z notext" to the linker flags to
-avoid warnings about relocation entries in the text segment.
-Let's face it: Always adding -fno-pic / -no-pie in the main Makefile is
-a bad idea. Move the settings to the target specific Makefiles instead
-where we know what we really want, and then we can finally drop the
-"-z notext" settings, too.
+On Thu, Nov 12, 2026 at 02:22:25PM -0800, Oliver Upton wrote:
+> On Thu, Nov 12, 2026 at 03:12:08PM +0000, Leonardo Bras wrote:
+> > > -static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr)
+> > > +static void __inject_abt64(struct kvm_vcpu *vcpu, bool iabt, u32 iss, unsigned long addr)
+> > >  {
+> > > -	unsigned long cpsr = *vcpu_cpsr(vcpu);
+> > > -	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
+> > > -	u64 esr = 0, fsc;
+> > > -	int level;
+> > > +	u64 esr;
+> > > +	u8 ec;
+> > > +
+> > > +	if (vcpu_mode_priv(vcpu))
+> > 
+> > Maybe I am getting this wrong, but this line was previously:
+> > -	if (is_aarch32 || (cpsr & PSR_MODE_MASK) == PSR_MODE_EL0t)
+> > 
+> > but vcpu_mode_priv() does not test exactly the same thing, it would test:
+> > vcpu_mode_is_32bit(), tested in is_aarch32, &&
+> > cpsr_mode > PSR_AA32_MODE_USR, not tested above, ||
+> > *vcpu_cpsr(vcpu) & PSR_MODE_MASK != PSR_MODE_EL0t
+> > 
+> > This last line is testing the exact opposite of what was here. 
+> > Is that another fix?
+> 
+> No, it's equivalent. What we had here before was inscrutable. If we're
+> taking an exception from 32-bit into a 64-bit EL1, the only way we get
+> there is from a 32-bit EL0, so this short-circuited it to xABT_LOW.
+> 
+> If there's no exception level change, xABT_CUR. Otherwise, xABT_LOW.
+> 
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- Makefile            | 6 +-----
- arm/Makefile.arm    | 2 ++
- arm/Makefile.arm64  | 3 +--
- powerpc/Makefile    | 5 ++++-
- riscv/Makefile      | 1 +
- s390x/Makefile      | 3 +++
- x86/Makefile.common | 5 +++++
- 7 files changed, 17 insertions(+), 8 deletions(-)
+Ah, I see. Thanks for helping me understand :)
 
-diff --git a/Makefile b/Makefile
-index 8e002043..b0a0b89f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -70,8 +70,6 @@ fomit_frame_pointer := $(call cc-option, $(frame-pointer-flag), "")
- fno_stack_protector := $(call cc-option, -fno-stack-protector, "")
- fno_stack_protector_all := $(call cc-option, -fno-stack-protector-all, "")
- wno_frame_address := $(call cc-option, -Wno-frame-address, "")
--fno_pic := $(call cc-option, -fno-pic, "")
--no_pie := $(call cc-option, -no-pie, "")
- wclobbered := $(call cc-option, -Wclobbered, "")
- wunused_but_set_parameter := $(call cc-option, -Wunused-but-set-parameter, "")
- wmissing_parameter_type := $(call cc-option, -Wmissing-parameter-type, "")
-@@ -85,8 +83,6 @@ COMMON_CFLAGS += $(wno_frame_address)
- COMMON_CFLAGS += $(if $(U32_LONG_FMT),-D__U32_LONG_FMT__,)
- ifeq ($(CONFIG_EFI),y)
- COMMON_CFLAGS += $(EFI_CFLAGS)
--else
--COMMON_CFLAGS += $(fno_pic)
- endif
- COMMON_CFLAGS += $(wclobbered)
- COMMON_CFLAGS += $(wunused_but_set_parameter)
-@@ -103,7 +99,7 @@ CFLAGS += $(LATE_CFLAGS)
- 
- autodepend-flags = -MMD -MP -MF $(dir $*).$(notdir $*).d
- 
--LDFLAGS += -nostdlib $(no_pie) -z noexecstack
-+LDFLAGS += -nostdlib -z noexecstack
- 
- $(libcflat): $(cflatobjs)
- 	$(AR) rcs $@ $^
-diff --git a/arm/Makefile.arm b/arm/Makefile.arm
-index 7734e17f..7313c843 100644
---- a/arm/Makefile.arm
-+++ b/arm/Makefile.arm
-@@ -13,6 +13,8 @@ endif
- 
- CFLAGS += $(machine)
- CFLAGS += -mno-unaligned-access
-+CFLAGS += -fno-pic
-+LDFLAGS += -no-pie
- 
- ifeq ($(TARGET),qemu)
- arch_LDFLAGS = -Ttext=40010000
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index a40c830d..ea0202eb 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -7,8 +7,7 @@ bits = 64
- ldarch = elf64-littleaarch64
- 
- arch_LDFLAGS = -pie -n
--arch_LDFLAGS += -z notext
--CFLAGS += -mstrict-align
-+CFLAGS += -fpie -mstrict-align
- 
- sve_flag := $(call cc-option, -march=armv8.5-a+sve, "")
- ifneq ($(strip $(sve_flag)),)
-diff --git a/powerpc/Makefile b/powerpc/Makefile
-index 41e752b0..eff129b0 100644
---- a/powerpc/Makefile
-+++ b/powerpc/Makefile
-@@ -66,6 +66,9 @@ CFLAGS += -ffreestanding
- CFLAGS += -O2 -msoft-float -mno-altivec $(mabi_no_altivec)
- CFLAGS += -I $(SRCDIR)/lib -I $(SRCDIR)/lib/libfdt -I lib
- CFLAGS += -Wa,-mregnames
-+CFLAGS += -fpie
-+
-+LDFLAGS += -pie
- 
- # We want to keep intermediate files
- .PRECIOUS: %.o
-@@ -78,7 +81,7 @@ include $(SRCDIR)/scripts/asm-offsets.mak
- 
- FLATLIBS = $(libcflat) $(LIBFDT_archive)
- %.elf: CFLAGS += $(arch_CFLAGS)
--%.elf: LDFLAGS += $(arch_LDFLAGS) -pie -n
-+%.elf: LDFLAGS += $(arch_LDFLAGS) -n
- %.elf: %.o $(FLATLIBS) $(SRCDIR)/powerpc/flat.lds $(cstart.o) $(reloc.o) %.aux.o
- 	$(LD) $(LDFLAGS) -o $@ \
- 		-T $(SRCDIR)/powerpc/flat.lds --build-id=none \
-diff --git a/riscv/Makefile b/riscv/Makefile
-index 348a30a7..79a9c1ad 100644
---- a/riscv/Makefile
-+++ b/riscv/Makefile
-@@ -93,6 +93,7 @@ CFLAGS += -std=gnu99
- CFLAGS += -ffreestanding
- CFLAGS += -O2
- CFLAGS += -I $(SRCDIR)/lib -I $(SRCDIR)/lib/libfdt -I lib -I $(SRCDIR)/riscv
-+CFLAGS += -fno-pic
- 
- asm-offsets = lib/riscv/asm-offsets.h riscv/sbi-asm-offsets.h
- include $(SRCDIR)/scripts/asm-offsets.mak
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 97ed0b47..29bea5cc 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -88,7 +88,10 @@ CFLAGS += -O2
- CFLAGS += -march=zEC12
- CFLAGS += -mbackchain
- CFLAGS += -fno-delete-null-pointer-checks
-+CFLAGS += -fno-pic
-+
- LDFLAGS += -Wl,--build-id=none
-+LDFLAGS += -no-pie
- 
- # We want to keep intermediate files
- .PRECIOUS: %.o %.lds
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index 054e2391..a0201fcd 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -40,6 +40,11 @@ COMMON_CFLAGS += -Wa,--divide
- endif
- COMMON_CFLAGS += -O1
- 
-+ifneq ($(CONFIG_EFI),y)
-+CFLAGS += -fno-pic
-+LDFLAGS += -no-pie
-+endif
-+
- # stack.o relies on frame pointers.
- KEEP_FRAME_POINTER := y
- 
--- 
-2.56.0
+There are a couple more comments below:
 
+> Thanks,
+> Oliver
+> 
+> > > +		ec = iabt ? ESR_ELx_EC_IABT_CUR : ESR_ELx_EC_DABT_CUR;
+> > > +	else
+> > > +		ec = iabt ? ESR_ELx_EC_IABT_LOW : ESR_ELx_EC_DABT_LOW;
+> > > +
+> > > +	esr = FIELD_PREP(ESR_ELx_EC_MASK, ec) | FIELD_PREP(ESR_ELx_ISS_MASK, iss) |
+> > > +	      ESR_ELx_IL;
+> > > +
+> > > +	vcpu_write_sys_reg(vcpu, addr, exception_far_elx(vcpu));
+> > > +	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
+> > > +}
+> > > +
+> > > +static void inject_abt64(struct kvm_vcpu *vcpu, bool iabt, u32 iss, u64 addr)
+> > > +{
+> > > +	pend_sync_exception(vcpu);
+> > > +	__inject_abt64(vcpu, iabt, iss, addr);
+> > > +}
+> > > +
+> > > +static void inject_sea64(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
+> > > +{
+> > > +	u8 fsc;
+> > >  
+> > >  	/*
+> > >  	 * If injecting an abort from a failed S1PTW, rewalk the S1 PTs to
+> > > @@ -116,7 +136,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+> > >  	 */
+> > >  	if (kvm_vcpu_abt_iss1tw(vcpu)) {
+> > >  		u64 hpfar = kvm_vcpu_get_fault_ipa(vcpu);
+> > > -		int ret;
+> > > +		int ret, level;
+> > >  
+> > >  		if (hpfar == INVALID_GPA)
+> > >  			return;
+> > > @@ -137,28 +157,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+> > >  	else
+> > >  		pend_sync_exception(vcpu);
+> > >  
+> > > -	/*
+> > > -	 * Build an {i,d}abort, depending on the level.
+> > > -	 * Report an external synchronous abort.
+> > > -	 */
+> > > -	esr |= ESR_ELx_IL;
+> > > -
+> > > -	/*
+> > > -	 * Here, the guest runs in AArch64 mode when in EL1. If we get
+> > > -	 * an AArch32 fault, it means we managed to trap an EL0 fault.
+> > > -	 */
+> > > -	if (is_aarch32 || (cpsr & PSR_MODE_MASK) == PSR_MODE_EL0t)
+> > > -		esr |= (ESR_ELx_EC_IABT_LOW << ESR_ELx_EC_SHIFT);
+> > > -	else
+> > > -		esr |= (ESR_ELx_EC_IABT_CUR << ESR_ELx_EC_SHIFT);
+> > > -
+> > > -	if (!is_iabt)
+> > > -		esr |= ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT;
+> > > -
+> > > -	esr |= fsc;
+> > > -
+> > > -	vcpu_write_sys_reg(vcpu, addr, exception_far_elx(vcpu));
+> > > -	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
+> > > +	__inject_abt64(vcpu, iabt, fsc, addr);
+> > >  }
+> > >  
+> > >  void kvm_inject_sync(struct kvm_vcpu *vcpu, u64 esr)
+> > > @@ -174,31 +173,41 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+> > >  	kvm_inject_sync(vcpu, esr);
+> > >  }
+> > >  
+> > > -#define DFSR_FSC_EXTABT_LPAE	0x10
+> > > -#define DFSR_FSC_EXTABT_nLPAE	0x08
+> > > -#define DFSR_LPAE		BIT(9)
+> > > -#define TTBCR_EAE		BIT(31)
+> > > +#define DFSR_FS_4			BIT(10)
+> > > +#define DFSR_FS_3_0			GENMASK(3, 0)
+> > > +#define DFSR_FS_EXTABT_nLPAE		0x08
+> > > +#define DFSR_FS_EXCL_ATOMIC_nLPAE	0x15
+> > 
+> > Maybe I am reading the wrong place, but in M.d, I see:
+> > DFSR.FS = 0b10101
+> > IMPLEMENTATION DEFINED fault (Unsupported Exclusive access fault).
+> > 
+
+^
+
+> > > +#define DFSR_FSC			GENMASK(5, 0)
+> > > +#define DFSR_FSC_EXTABT_LPAE		0x10
+> > 
+> > Wouldn't this be STATUS bits instead of FSC?
+> > (Maybe FSC got renamed STATUS in the meantime)
+> > 
+
+^
+
+
+Thanks!
+Leo
