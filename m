@@ -1,54 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=90.155.92.199
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794594399;
-	b=rJhjLe0rMIW8US05Ws9DRNgLhIVdSdu2/Tc3zSrFskEdEoRxhDFsQF5Ro+nQJPTDhtX4
-	 TxGQ33iBgrGJOprHwwS4oFGclWA9OJCuZq+6yUdRzkFrB9Y/YuthWSbD8CqGFrvNQEH0b
-	 FL2lmK9gl2AU69ft17HoMIIft4RHGRRL6aQUI2RsUwdNLfxjeU3i8JmxluiJ5zajtQ/zp
-	 zdAtzsv8ovZE8kDJnE9zXYcz9Ksru6FYW8Hk7IZxdhpc1kdSich2gu28k/Bq3Cf48ZI++
-	 m1Iyag5vi3D1sULhzTiTwhlS/h2CMLCgX1cXGwYOXkqJWaYW6lKpvnurgYmeUL7iAdg==
+	b=igwubqh6/xELtTusIutjIzqpS1CaL2ur9C2Jeaa+aschJSzpNOyxOTXj18z7F/T3ldom
+	 vofLoU5A2+r8PHEa8/E8OHmsimhs8nuActCi9OaGP14B4EN4PY7W3HqAE/1rNz9JXF2D3
+	 VCbE83sYrD5Flpdw4jFMNn8F4oW1OzC5wY3A5Jx6o4qpSAMUORI5hSF//o+eAJJ9ySWUJ
+	 I5PyhPmEpN95oxnxgcbekR2WuzgEc55dQMi/N+zujySFiQgG4QKOk3Pfy+z8ybKexMGUH
+	 iyXjbHXRFQFqBamKDhrzAG+5BLw7n+ngq/YofoBcVbjs6Mtxnkr5AhP9h9fk9gng7Mg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794594399;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding:Sender:X-SRS-Rewrite;
-	bh=wt/q8P3zBd6hu3TnYFCC/E9Q4utWihMtB20Llr0upI4=;
-	b=fi2vylLW6hOhvHJko+HrtCIi/it/ReckX4RrO6OZh/5H28koOOi5vzkOTHT8QJKJeiUU
-	 +kkfFNpBxA6atNEWNo7kpmgEfs64qNxwup+fA+EKMfx8ELO6FCE7KHECsGl+vpBG8vYWI
-	 tbupYXS770MVc0nCXXl3DoHvXMWezijKBvBLHmlOcOYWCK/2Q7V8NPfMB+pPmWjF4/Oo9
-	 rOiXX1b1OE8cPdQftB+cOWvyq+JcSQ6DbkIZ1+FGdDIBr2QCsxUgpHK0p/x5SA3aVnGvr
-	 dV0GWLhRXupsU6KtdVEKCDcYHHE9v7axScJf93IomMXh+WaJJYlrBrOMoZhvypOlrQg==
+	bh=j/cyH+I8JbWGr5y7TfZ1fzTJDNXAOvaKoNeDeX1cLxg=;
+	b=IdYix+jAJr00zIf/+Xobb5d4rwBSqKnL2BU/hX9UHjauofHAGU2/aOw5xPlr2mqMoPui
+	 Yl7pAG/u9B05nBFzQQofLwmLGCfIvxoQcCROVa1dAuzNbTAunpIPIA2wUGvECbKXVjAuh
+	 Vj7ffP8dRGoGDXmvFm/aC2MYa+fwU6RUYUR7mcbNFXFWY9w/fZdqjGp40xLyL4JLe2SbV
+	 DKzdSV+G523PSP5V5zRD2ZlHBqvF0QA1k6i3MTn4z7t7MUiLcNCZsCfuk7KcTQzE9N8Jl
+	 ++8cZQ4ClUAcEhc6Q2+4GLvg81q19Vca4kBtbbXxm/htUkf5/aLOOr3ZjAhwzK/jgSw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=infradead.org;
 	spf=none smtp.mailfrom=desiato.srs.infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=desiato.20200630 header.b=IurXzNvO;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=desiato.20200630 header.b=oqb9qBbL;
 	arc=none smtp.remote-ip=90.155.92.199
 Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB92606C148;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC73606C149;
 	Fri, 13 Nov 2026 18:26:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9EB92606C148
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9EC73606C149
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=desiato.20200630 header.b=IurXzNvO
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=desiato.20200630 header.b=oqb9qBbL
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
 	Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=wt/q8P3zBd6hu3TnYFCC/E9Q4utWihMtB20Llr0upI4=; b=IurXzNvOVzHUcQTnti7AZh9iWR
-	2PP1E9zBV7zj0qsF2ZP+4FPlAHRv6adPzJmuYKePMPZELglQtVflHlNUVyH45pRep/Nnz3pKM7cJC
-	xynxAXqcJ3Mw8dMFpiH817ogl/06FIs+3k7trMuaeqn8dH1MFGrhkqWfepyGFVtgOD+nuVOEf7wNL
-	tLg5nMccierJmLRrPIljFS2pkkOPccd3+KeviApcxvzMRIPOMeNPPuvyNBN+lmyL/kK8/TSipAI7s
-	uv77YUqE3/BiVqMZ3+tzNXB6mnoDk2nvjrRhZIjDNTVe0jLeBRQeKBnsUgCkIrUx2PUFratgVzwT4
-	3h1pmwcQ==;
+	bh=j/cyH+I8JbWGr5y7TfZ1fzTJDNXAOvaKoNeDeX1cLxg=; b=oqb9qBbLcyFRFld14uYWjtCayL
+	AN3z/nzQ9Nwv+qMPkfYzvER/Q6aj+KsXb0xcDtyCZVlk7KLKENSZnsDADr0rAH8Kf9cnHybdsrm56
+	q2B9QNHKOmeg3RTuBOV0eXIowU7ogn/RsBZysvkMsSYqj7stBXOiQIvyoVZH3gjySgbr2RhnXMixz
+	v8Gk+Un3Ld2Yy/W/tBcmJu/+RS6/yN1gjFmqnpzwJc0BWVG1wRCtlAc5TbVnGtOQyagsle+vrKws4
+	o9PbqYnhPRjpmNzIxNh4Xet/3kkwS5mfI5em/aRlb7dbOycG8V4Zs1406FgRF529RYxcf4W7GC6qd
+	I5WRM+GQ==;
 Received: from [2001:8b0:10b:1::425] (helo=i7.infradead.org)
 	by desiato.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xRvyU-0000000BeOa-173F;
+	id 1xRvyU-0000000BeOc-16c6;
 	Fri, 13 Nov 2026 18:26:30 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.99.5 #2 (Red Hat Linux))
-	id 1xRvyR-00000000LYJ-2o1a;
+	id 1xRvyR-00000000LYd-3rMe;
 	Fri, 13 Nov 2026 18:26:07 +0000
 From: David Woodhouse <dwmw2@infradead.org>
 To: =?UTF-8?q?J=C3=B6rg=20R=C3=B6del?= <joro@8bytes.org>
@@ -74,9 +74,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	Mushahid Hussain <hmushi@amazon.co.uk>,
 	Sriram Nambakam <snambakam@linux.microsoft.com>,
 	David Woodhouse <dwmw@amazon.co.uk>
-Subject: [RFC PATCH 08/13] KVM: planes: Enlarge every twin's fpstate for dynamic xfeatures
-Date: Fri, 13 Nov 2026 11:26:02 -0700
-Message-ID: <20261113182607.82813-9-dwmw2@infradead.org>
+Subject: [RFC PATCH 13/13] KVM: selftests: Cover plane state sharing
+Date: Fri, 13 Nov 2026 11:26:07 -0700
+Message-ID: <20261113182607.82813-14-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20261113182607.82813-1-dwmw2@infradead.org>
 References: <20260608144252.351443-1-joro@8bytes.org>
@@ -96,114 +96,206 @@ X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-Plane twins share CPUID, so a twin's guest can set the XCR0 bits for a
-dynamic xfeature such as AMX's XTILEDATA with its own XSETBV. But
-kvm_check_cpuid() calls fpu_enable_guest_xfd_features() only for the
-vCPU that KVM_SET_CPUID was issued on, and a twin created afterwards
-starts with the default fpstate. A twin that then runs AMX code loses
-its tile data on every fpstate save, because the fpstate it saves into
-has no room for it. On a host that exposes AMX to the guest, any twin
-using AMX hits this.
+Check the KVM_CAP_PLANES share mask: KVM_CAP_PLANES_SHARE reports
+XCR0|DR6 on the system fd, 0 on a VM fd before the opt-in and the
+enabled bits after it; an unknown bit and a non-zero args[2] fail with
+EINVAL, and a second opt-in with another mask fails with EEXIST.
 
-Whether the XRSTORS on the next entry can also leave a previous
-context's tile registers in place for that twin to read is an open
-question; it has not been verified.
-
-Enlarge the fpstate of every twin in kvm_check_cpuid(), and give a twin
-created after KVM_SET_CPUID the dynamic xfeatures of its plane-0
-sibling's fpstate.
-
-Only a twin that has not run may have its fpstate enlarged:
-fpstate_realloc() hands a guest fpstate that is not loaded a fresh
-image and copies nothing, so a twin that has run would lose its XSAVE
-state. kvm_set_cpuid() already accepts only identical CPUID once the
-vCPU has run, but it checked only the vCPU the ioctl was issued on.
-With plane 0 held while a higher plane runs, KVM_SET_CPUID2 on plane 0
-would pass that check and resize the plane that ran. Since the twins
-share CPUID, take the identical-CPUID path once any twin has run.
+Then, with no sharing and with XCR0 and DR6 shared, write XCR0 and DR6
+through plane 0 before creating a plane-1 twin, and check that the twin
+inherits them only when shared; write them through plane 1 and check
+plane 0; and have plane 1 write DR6 with MOV (real mode, plane 0 held)
+and check that plane 0 sees the guest's value only when DR6 is shared.
 
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/x86/kvm/cpuid.c | 21 +++++++++++++++++++--
- arch/x86/kvm/x86.c   | 17 +++++++++++++++++
- 2 files changed, 36 insertions(+), 2 deletions(-)
+ tools/testing/selftests/kvm/x86/planes_test.c | 159 +++++++++++++++++-
+ 1 file changed, 157 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index c5fa0551ddd5..971ebd781c6e 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -141,7 +141,9 @@ EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_find_cpuid_entry2);
- static int kvm_check_cpuid(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpuid_entry2 *best;
-+	struct kvm_vcpu *v;
- 	u64 xfeatures;
-+	int i, r;
- 
- 	/*
- 	 * The existing code assumes virtual address is 48-bit or 57-bit in the
-@@ -168,7 +170,18 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu)
- 	if (!xfeatures)
- 		return 0;
- 
--	return fpu_enable_guest_xfd_features(&vcpu->arch.guest_fpu, xfeatures);
-+	/*
-+	 * The planes share CPUID, so any twin's guest can enable these
-+	 * xfeatures in its XCR0: enlarge every twin's fpstate, not just
-+	 * this vCPU's.
-+	 */
-+	vcpu_for_each_plane(vcpu->common, i, v) {
-+		r = fpu_enable_guest_xfd_features(&v->arch.guest_fpu, xfeatures);
-+		if (r)
-+			return r;
-+	}
-+
-+	return 0;
+diff --git a/tools/testing/selftests/kvm/x86/planes_test.c b/tools/testing/selftests/kvm/x86/planes_test.c
+index dd3c251f0b7a..02242cc7d576 100644
+--- a/tools/testing/selftests/kvm/x86/planes_test.c
++++ b/tools/testing/selftests/kvm/x86/planes_test.c
+@@ -3,8 +3,8 @@
+  * Test the KVM_CAP_PLANES opt-in and the plane lifecycle uAPI: plane
+  * creation bounds, plane vCPU creation, the independence of
+  * per-plane vCPU register state, the Hyper-V VP index of a plane
+- * vCPU created after KVM_SET_CPUID, and KVM_SET_CPUID2 once a twin
+- * has run.
++ * vCPU created after KVM_SET_CPUID, KVM_SET_CPUID2 once a twin has
++ * run, and the KVM_CAP_PLANES share mask.
+  */
+ #include <errno.h>
+ #include <string.h>
+@@ -434,6 +434,154 @@ static void test_cpuid_after_twin_ran(void)
+ 	kvm_vm_free(vm);
  }
  
- static u32 kvm_apply_cpuid_pv_features_quirk(struct kvm_vcpu *vcpu);
-@@ -545,8 +558,12 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
- 	 * VMMs (e.g. QEMU) reuse vCPU fds for CPU hotplug/unplug and do
- 	 * KVM_SET_CPUID{,2} again. To support this legacy behavior, check
- 	 * whether the supplied CPUID data is equal to what's already set.
-+	 * Plane twins share CPUID, so this applies once any twin has run.
- 	 */
--	if (!kvm_can_set_cpuid_and_feature_msrs(vcpu)) {
-+	vcpu_for_each_plane(common, i, v) {
-+		if (kvm_can_set_cpuid_and_feature_msrs(v))
-+			continue;
++static int __enable_planes_share(struct kvm_vm *vm, u64 count, u64 share, u64 arg2)
++{
++	struct kvm_enable_cap cap = {
++		.cap = KVM_CAP_PLANES,
++		.args = { count, share, arg2 },
++	};
 +
- 		r = kvm_cpuid_check_equal(vcpu, e2, nent);
- 		if (r)
- 			goto err;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 6d3d93e85a65..af28e73e4b9b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9771,6 +9771,23 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	vcpu->arch.hv_root_tdp = INVALID_PAGE;
- #endif
- 
-+	/*
-+	 * A plane twin created after KVM_SET_CPUID shares CPUID that may
-+	 * already allow dynamic xfeatures, which KVM_SET_CPUID enabled only
-+	 * in the twins that existed at the time.  Give it the dynamic
-+	 * xfeatures of its plane-0 sibling's fpstate.
-+	 */
-+	if (vcpu->plane_level && vcpu->common->vcpus[0]) {
-+		u64 dyn = vcpu->common->vcpus[0]->arch.guest_fpu.fpstate->xfeatures &
-+			  XFEATURE_MASK_USER_DYNAMIC;
++	return __vm_ioctl(vm, KVM_ENABLE_CAP, &cap);
++}
 +
-+		if (dyn) {
-+			r = fpu_enable_guest_xfd_features(&vcpu->arch.guest_fpu, dyn);
-+			if (r)
-+				goto free_guest_fpu;
-+		}
++/*
++ * KVM_CAP_PLANES_SHARE reports the supported share bits on the system fd
++ * and the enabled ones on a VM fd.  Unknown bits and a non-zero args[2]
++ * are refused, and like the count the mask is set once.
++ */
++static void test_share_opt_in(void)
++{
++	u64 defined = KVM_PLANE_SHARE_XCR0 | KVM_PLANE_SHARE_DR6;
++	u64 unknown = ~defined & -~defined;
++	struct kvm_vm *vm;
++
++	TEST_ASSERT_EQ(kvm_check_cap(KVM_CAP_PLANES_SHARE), defined);
++
++	vm = vm_create_barebones_irqchip(true);
++	TEST_ASSERT_EQ(vm_check_cap(vm, KVM_CAP_PLANES_SHARE), 0);
++	TEST_ASSERT_EQ(__enable_planes_share(vm, 2, unknown, 0), -1);
++	TEST_ASSERT_EQ(errno, EINVAL);
++	TEST_ASSERT_EQ(__enable_planes_share(vm, 2, 0, 1), -1);
++	TEST_ASSERT_EQ(errno, EINVAL);
++	TEST_ASSERT_EQ(vm_check_cap(vm, KVM_CAP_PLANES), 1);
++
++	TEST_ASSERT_EQ(__enable_planes_share(vm, 2, KVM_PLANE_SHARE_DR6, 0), 0);
++	TEST_ASSERT_EQ(vm_check_cap(vm, KVM_CAP_PLANES_SHARE), KVM_PLANE_SHARE_DR6);
++	TEST_ASSERT_EQ(__enable_planes_share(vm, 2, KVM_PLANE_SHARE_XCR0, 0), -1);
++	TEST_ASSERT_EQ(errno, EEXIST);
++	TEST_ASSERT_EQ(vm_check_cap(vm, KVM_CAP_PLANES_SHARE), KVM_PLANE_SHARE_DR6);
++	kvm_vm_free(vm);
++}
++
++static u64 get_xcr0(int fd)
++{
++	struct kvm_xcrs xcrs = {};
++
++	TEST_ASSERT_EQ(ioctl(fd, KVM_GET_XCRS, &xcrs), 0);
++	TEST_ASSERT_EQ(xcrs.nr_xcrs, 1);
++	return xcrs.xcrs[0].value;
++}
++
++static void set_xcr0(int fd, u64 xcr0)
++{
++	struct kvm_xcrs xcrs = { .nr_xcrs = 1, .xcrs[0] = { .xcr = 0, .value = xcr0 } };
++
++	TEST_ASSERT_EQ(ioctl(fd, KVM_SET_XCRS, &xcrs), 0);
++}
++
++static u64 get_dr6(int fd)
++{
++	struct kvm_debugregs dbg;
++
++	TEST_ASSERT_EQ(ioctl(fd, KVM_GET_DEBUGREGS, &dbg), 0);
++	return dbg.dr6;
++}
++
++static void set_dr6(int fd, u64 dr6)
++{
++	struct kvm_debugregs dbg;
++
++	TEST_ASSERT_EQ(ioctl(fd, KVM_GET_DEBUGREGS, &dbg), 0);
++	dbg.dr6 = dr6;
++	TEST_ASSERT_EQ(ioctl(fd, KVM_SET_DEBUGREGS, &dbg), 0);
++}
++
++/*
++ * With @share, a write through one plane is seen through the other, and a
++ * plane vCPU created later starts with plane 0's value; without it each
++ * plane keeps its own.  Checked for XCR0 and DR6 by ioctl, and for DR6 by
++ * a guest MOV in plane 1 (real mode, at CODE_GPA, with plane 0 held).
++ */
++static void test_share_state(u64 share)
++{
++	static const u8 mov_dr6[] = {
++		0x66, 0xb8, 0xf4, 0x0f, 0xff, 0xff,	/* mov $0xffff0ff4, %eax */
++		0x0f, 0x23, 0xf0,			/* mov %eax, %dr6 */
++		0xe6, 0x10,				/* out %al, $0x10 */
++	};
++	bool xcr0_shared = share & KVM_PLANE_SHARE_XCR0;
++	bool dr6_shared = share & KVM_PLANE_SHARE_DR6;
++	u64 hold = KVM_PLANE_RUN_STATE_USER_HOLD, none = 0;
++	struct kvm_plane_vcpu *vcpu1;
++	struct kvm_plane *plane;
++	struct kvm_sregs sregs;
++	struct kvm_vcpu *vcpu0;
++	struct kvm_regs regs;
++	struct kvm_vm *vm;
++
++	vm = vm_create_barebones_irqchip(true);
++	TEST_ASSERT_EQ(__enable_planes_share(vm, 2, share, 0), 0);
++	plane = vm_plane_add(vm, 1);
++	vcpu0 = __vm_vcpu_add(vm, 0);
++	vcpu_init_cpuid(vcpu0, kvm_get_supported_cpuid());
++
++	/* Plane 0 first, then a plane-1 twin that inherits or not. */
++	set_xcr0(vcpu0->fd, XFEATURE_MASK_FP | XFEATURE_MASK_SSE);
++	set_dr6(vcpu0->fd, 0xffff0ff1);
++	vcpu1 = __vm_plane_vcpu_add(vcpu0, plane);
++	TEST_ASSERT_EQ(get_xcr0(vcpu1->fd), xcr0_shared ?
++		       XFEATURE_MASK_FP | XFEATURE_MASK_SSE : XFEATURE_MASK_FP);
++	TEST_ASSERT_EQ(get_dr6(vcpu1->fd), dr6_shared ? 0xffff0ff1 : 0xffff0ff0);
++
++	/* A write through plane 1. */
++	set_xcr0(vcpu1->fd, XFEATURE_MASK_FP);
++	set_dr6(vcpu1->fd, 0xffff0ff2);
++	TEST_ASSERT_EQ(get_xcr0(vcpu0->fd), xcr0_shared ?
++		       XFEATURE_MASK_FP : XFEATURE_MASK_FP | XFEATURE_MASK_SSE);
++	TEST_ASSERT_EQ(get_dr6(vcpu0->fd), dr6_shared ? 0xffff0ff2 : 0xffff0ff1);
++
++	/* A guest write of DR6 in plane 1. */
++	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, CODE_GPA, 1, 1, 0);
++	memcpy(addr_gpa2hva(vm, CODE_GPA), mov_dr6, sizeof(mov_dr6));
++	plane_vcpu_ioctl(vcpu1, KVM_GET_SREGS, &sregs);
++	sregs.cs.selector = 0;
++	sregs.cs.base = 0;
++	plane_vcpu_ioctl(vcpu1, KVM_SET_SREGS, &sregs);
++	plane_vcpu_ioctl(vcpu1, KVM_GET_REGS, &regs);
++	regs.rip = CODE_GPA;
++	plane_vcpu_ioctl(vcpu1, KVM_SET_REGS, &regs);
++
++	vcpu_ioctl(vcpu0, KVM_SET_PLANE_RUN_STATE, &hold);
++	plane_vcpu_ioctl(vcpu1, KVM_SET_PLANE_RUN_STATE, &none);
++	TEST_ASSERT_EQ(__vcpu_run(vcpu0), 0);
++	TEST_ASSERT_EQ(vcpu0->run->exit_reason, KVM_EXIT_IO);
++	TEST_ASSERT_EQ(vcpu0->run->io.port, 0x10);
++	vcpu0->run->immediate_exit = 1;
++	TEST_ASSERT_EQ(__vcpu_run(vcpu0), -1);
++	TEST_ASSERT_EQ(errno, EINTR);
++	vcpu0->run->immediate_exit = 0;
++
++	TEST_ASSERT(get_dr6(vcpu1->fd) & BIT(2),
++		    "plane 1 DR6 0x%lx lacks the B2 bit the guest wrote",
++		    (unsigned long)get_dr6(vcpu1->fd));
++	if (dr6_shared)
++		TEST_ASSERT_EQ(get_dr6(vcpu0->fd), get_dr6(vcpu1->fd));
++	else
++		TEST_ASSERT_EQ(get_dr6(vcpu0->fd), 0xffff0ff1);
++
++	kvm_vm_free(vm);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_PLANES));
+@@ -445,6 +593,13 @@ int main(int argc, char *argv[])
+ 	test_plane_lifecycle();
+ 	test_late_twin_vp_index();
+ 	test_cpuid_after_twin_ran();
++	test_share_opt_in();
++	if (kvm_cpu_has(X86_FEATURE_XSAVE)) {
++		test_share_state(0);
++		test_share_state(KVM_PLANE_SHARE_XCR0 | KVM_PLANE_SHARE_DR6);
++	} else {
++		print_skip("XSAVE not supported, plane state sharing");
 +	}
-+
- 	/*
- 	 * A plane twin created after KVM_SET_CPUID shares CPUID that may
- 	 * already advertise Hyper-V.  Allocate the Hyper-V context now so
+ 
+ 	return 0;
+ }
 -- 
 2.50.1
 
