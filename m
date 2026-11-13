@@ -1,49 +1,81 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794570588;
-	b=DwtBdD+OLc2WNi6BNLhTHDcPcETlZyKh95G9rVMbyoAMZs9XzWZpMfCR1TtKv+oGvNcl
-	 Q9159Q7Dc65cBv/GYSUaiHsKMzstOyv5lvRJwzxtppT1TfYR5BPBjrr4+Kx3zuzmvLv2r
-	 k4iUoME/pPqUtuIb3GvFan7DkPpjYIx9deA73CnBox4bHiJlbsUJ1fzOeiS37Y0hukW/Y
-	 WVP9hSBpXwa8cC3mkt8aUn92eAdZWvx1fUiYi7iLs/NFLwydg1JgmacYNs1gbQ5BrqAUC
-	 iporjPzIFLrZXo01Z5zYhXcP5GNVdPHMIZdjm/MwZLX0MNXVnIR4qwOtvNRMDIiRLyg==
+	t=1794571275;
+	b=lM7wH+R4PoILJ6sdbSzV6rwt4rAQC+Kdfrgtz4FQB7O6M8D73yA9cnZT3LlilyWq6OCq
+	 UqAs58BISFtQ5sZdbUNLcpjdQrc1WoVDAKA/rhfLJidsKdBqbnG6bWFY/GXw8XscBvjbP
+	 0Z3f9Va1LB+yfp2M1ed9Qss+jXwCK4LxEc476XUJtqx4FIPJIL9HFeOCbuVJat4e8eU1G
+	 3SUiZPfrRq1uxO6x603+CjumsqbExU/iTz48ED0BhA+cIhy5RY5LJnhduBi2Vf5/evwZH
+	 2qxOVpkb71ysRPvqAmKzt/2ua/Lg4vnVKMAHG+hDZrl6H57La3aARekfiJmll2DhutQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794570588;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
-	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=PDXGfWB4PZogCYntKNGgT7hTDVutfH++L88sgu7Hiws=;
-	b=yJvzY2QjgOao+3Qpg19uh0QnRFd7CDRG5YuocB7nuAgs5Lv+0rnDTFJOzSk198yl33sZ
-	 HbGT3mQQ994W7qkUZ3T1tUDYq1wxEGZ+0NKiNHpg1lvaq6MZok0Ktb1E/hQgzrHmj+20I
-	 tg/roBQgKpKS2JzGLvd407b/1yL1wRJpBvI1hzki1yLIBzuN+Oaz+vdNy4AKfZB08Cfs4
-	 PzD6dHlcJ0PEZIz9a73Hxcz5EyYxLWVSaMhwKa3t//ga9pDDYqhlVRGdfF877uPmSdoOn
-	 QqjN5e+AehCJCfsIwR9NMyx8yocgPxhACkfNtYiuT8LFsK6o3DCJjjpWx1AtUDJwKsw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794571275;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:Received:From:To:Cc:Subject:Date:
+	 Message-ID:MIME-Version:X-Scanned-By:X-Mimecast-MFC-PROC-ID:
+	 X-Mimecast-Originator:Content-Transfer-Encoding:content-type;
+	bh=QuDGTGEuVvl3MPiP6Lxh0kED44wnv1RS4KyW/3v5QR0=;
+	b=4XWo70kRr3DoyVN41+PDm3nonoSsI61+cnv0J/Pd8I39RCGR40yQB+WjY7dDtgO730aH
+	 Y+/kW9h+/BPO3mBuOua4AQ/z7RoO3m/PMVa5O2Q5p6Hj+OzUuUQByU7OU29SVKyJPZXK+
+	 xlZoyOCUuXiy+WoZDvnzTCy3s8JHYxdfJG5PP57iyyX0/MnZkTTtjUAnvQAdP56DjjEuu
+	 8Mie507/idSlU7xpHj5iHZy8DEngpk2+6DDsP+sS2PGVhVGAEMdEfzjlWBA6NmYh2HkEi
+	 UXAjo35RJSqL6M5BJaSIkHxYts2lgXlKEA9QJtFQyeZTGrG+krosa+qikBJcxMRD4LQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=d9PNrozM;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7347E606A31C;
-	Fri, 13 Nov 2026 11:49:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7347E606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=Q4G9JTZA;
+	arc=none smtp.remote-ip=170.10.129.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4265606A886
+	for <kvmarm@lists.linux.dev>; Fri, 13 Nov 2026 12:01:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D4265606A886
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=d9PNrozM
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 926252F;
-	Fri, 13 Nov 2026 03:49:42 -0800 (PST)
-Received: from [10.0.129.47] (e122027.cambridge.arm.com [10.0.129.47])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6ABAE3F85F;
-	Fri, 13 Nov 2026 03:49:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794570585; bh=U3MSbDzd0AoPEKAIE+49xX+i32d6XfNe3/DShPyZg/E=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=d9PNrozMFDmUla99J4Yoh5+4HUNgGxTEn9+mEf4To874n2aUoByE3QRP/x/XrYgD3
-	 lBvVKh1SuIIL6rPr30Qe2vhvIgU+TpHjxaqL82fBpzjytUEktPV4wchettmIgNd282
-	 HyQOoi6z1NTm8c1CmIg78h1plo0xyDQqEHByEC5A=
-Message-ID: <f09683c5-0bd9-4a59-b860-0c3bafa52da6@arm.com>
-Date: Fri, 13 Nov 2026 11:49:37 +0000
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=Q4G9JTZA
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1794571273;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=QuDGTGEuVvl3MPiP6Lxh0kED44wnv1RS4KyW/3v5QR0=;
+	b=Q4G9JTZANLrW/imf+74myL13NvUi668N/h2yIxPnuuZpyEomJHf2Wx6dqdNOKMVl8ZiaBz
+	HMHEJVbJoSBIiddYGUFI8urQZhEt5nltjBTSf5S/P1N12rUAfbTw+JUhXJ/GxUuhEn49l4
+	vjt7VcnUsH85YMGGKDzGQd94m056tXc=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-353-A7ZsTMK1NMyLP5Xu2r78Mg-1; Fri,
+ 13 Nov 2026 07:01:10 -0500
+X-MC-Unique: A7ZsTMK1NMyLP5Xu2r78Mg-1
+X-Mimecast-MFC-AGG-ID: A7ZsTMK1NMyLP5Xu2r78Mg_1794571268
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4329E1800607;
+	Fri, 13 Nov 2026 12:01:07 +0000 (UTC)
+Received: from thuth-p1g4.redhat.com (unknown [10.44.48.21])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B092418004FC;
+	Fri, 13 Nov 2026 12:01:02 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Andrew Jones <andrew.jones@linux.dev>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	kvm@vger.kernel.org
+Cc: Laurent Vivier <lvivier@redhat.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	=?UTF-8?q?Nico=20B=C3=B6hr?= <nrb@linux.ibm.com>,
+	Chinmay Rath <rathc@linux.ibm.com>,
+	kvmarm@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	Amit Machhiwal <amachhiw@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH] Move position-independant code flags into the target specific Makefiles
+Date: Fri, 13 Nov 2026 13:01:01 +0100
+Message-ID: <20261113120101.145183-1-thuth@redhat.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,216 +85,161 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 04/12] KVM: arm64: CCA: Check RMI support and features
- at init
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Kohei Enju <enju.kohei@fujitsu.com>
-References: <20261111145758.217946-1-steven.price@arm.com>
- <20261111145758.217946-5-steven.price@arm.com>
- <4ccf4e34-bf7e-48da-bd70-acfed1e5ce04@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <4ccf4e34-bf7e-48da-bd70-acfed1e5ce04@arm.com>
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Mimecast-MFC-PROC-ID: 5YgxCL8s0nC1iOqRhczEkHVwXfpMKpRGvx2QPAFiY-s_1794571268
+X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
+content-type: text/plain; charset="US-ASCII"; x-default=true
 
-On 12/11/2026 16:39, Suzuki K Poulose wrote:
-> Hi Steven
-> 
-> On 11/11/2026 14:57, Steven Price wrote:
->> Wire RMI initialization into KVM startup and select ARM_RMM_RMI.
->> Proceed only when RMM mode is selected and RMI is available. If
->> KVM uses LPA2, require RMM LPA2 support. Also require SHA-256
->> measurement support.
->>
->> Define a disabled kvm_rmi_is_available static key for later Realm
->> capability checks. The key is enabled after the remaining Realm
->> support is in place.
-> 
-> Given all of this is only used for the UABI (KVM_CAP_ARM_RMI and
-> others), does it make sense to move this patch to the next batch
-> of the CCA support and keep this only to sort out the memory
-> management support ? Similarly for the Patch 1 ?
+The settings for position-independant code are currently quite a mess:
+It depends on the target whether we need the flags or rather should even
+disable PIC / PIE, but currently the settings are spread between the
+main Makefile (-fno-pic is the default, unless CONFIG_EFI has been set)
+and the target specific Makefiles.
+This leads to some weird situations where we have -fno-pic in the CFLAGS,
+but link with -pie in the LDFLAGS since we still want to get a relocation
+table, but then again need to add a "-z notext" to the linker flags to
+avoid warnings about relocation entries in the text segment.
+Let's face it: Always adding -fno-pic / -no-pie in the main Makefile is
+a bad idea. Move the settings to the target specific Makefiles instead
+where we know what we really want, and then we can finally drop the
+"-z notext" settings, too.
 
-True, I can move this patch (and patch 1) out and include it as part of
-a future series.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ Makefile            | 6 +-----
+ arm/Makefile.arm    | 2 ++
+ arm/Makefile.arm64  | 3 +--
+ powerpc/Makefile    | 5 ++++-
+ riscv/Makefile      | 1 +
+ s390x/Makefile      | 3 +++
+ x86/Makefile.common | 5 +++++
+ 7 files changed, 17 insertions(+), 8 deletions(-)
 
-Thanks,
-Steve
-
-> Cheers
-> Suzuki
-> 
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->>
->> ---
->> Changes since v1:
->> - Combine the separate v1 RMI availability and LPA2/SHA-256 feature
->>    check patches into one initialization patch.
->> ---
->>   arch/arm64/include/asm/kvm_rmi.h |  2 ++
->>   arch/arm64/include/asm/virt.h    |  1 +
->>   arch/arm64/kvm/Kconfig           |  1 +
->>   arch/arm64/kvm/Makefile          |  2 +-
->>   arch/arm64/kvm/arm.c             |  5 ++++
->>   arch/arm64/kvm/rmi.c             | 42 ++++++++++++++++++++++++++++++++
->>   include/linux/arm-rmi-cmds.h     |  5 ++++
->>   7 files changed, 57 insertions(+), 1 deletion(-)
->>   create mode 100644 arch/arm64/kvm/rmi.c
->>
->> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/
->> asm/kvm_rmi.h
->> index 67f16793b4d0..3194daaacf2b 100644
->> --- a/arch/arm64/include/asm/kvm_rmi.h
->> +++ b/arch/arm64/include/asm/kvm_rmi.h
->> @@ -56,4 +56,6 @@ struct realm {
->>       enum realm_state state;
->>   };
->>   +void kvm_init_rmi(void);
->> +
->>   #endif /* __ASM_KVM_RMI_H */
->> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/
->> virt.h
->> index b546703c3ab9..92cec42952f4 100644
->> --- a/arch/arm64/include/asm/virt.h
->> +++ b/arch/arm64/include/asm/virt.h
->> @@ -87,6 +87,7 @@ void __hyp_reset_vectors(void);
->>   bool is_kvm_arm_initialised(void);
->>     DECLARE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
->> +DECLARE_STATIC_KEY_FALSE(kvm_rmi_is_available);
->>     static inline bool is_pkvm_initialized(void)
->>   {
->> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
->> index cecea0820e52..d067063a3686 100644
->> --- a/arch/arm64/kvm/Kconfig
->> +++ b/arch/arm64/kvm/Kconfig
->> @@ -34,6 +34,7 @@ menuconfig KVM
->>       select GUEST_PERF_EVENTS if PERF_EVENTS
->>       select KVM_GUEST_MEMFD
->>       select KVM_GENERIC_PRE_FAULT_MEMORY
->> +    select ARM_RMM_RMI
->>       help
->>         Support hosting virtualized guest machines.
->>   diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
->> index 7aaeeb84e788..66a719ab5b6b 100644
->> --- a/arch/arm64/kvm/Makefile
->> +++ b/arch/arm64/kvm/Makefile
->> @@ -16,7 +16,7 @@ CFLAGS_handle_exit.o += -Wno-override-init
->>   kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->>        inject_fault.o va_layout.o handle_exit.o config.o \
->>        guest.o debug.o reset.o sys_regs.o stacktrace.o \
->> -     vgic-sys-reg-v3.o fpsimd.o pkvm.o \
->> +     vgic-sys-reg-v3.o fpsimd.o pkvm.o rmi.o \
->>        arch_timer.o trng.o vmid.o emulate-nested.o nested.o at.o \
->>        vgic/vgic.o vgic/vgic-init.o \
->>        vgic/vgic-irqfd.o vgic/vgic-v2.o \
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index e06cc390a3d6..318e8a4b19f8 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -42,6 +42,7 @@
->>   #include <asm/kvm_nested.h>
->>   #include <asm/kvm_pkvm.h>
->>   #include <asm/kvm_ptrauth.h>
->> +#include <asm/kvm_rmi.h>
->>   #include <asm/sections.h>
->>   #include <asm/stacktrace/nvhe.h>
->>   @@ -112,6 +113,8 @@ long kvm_get_cap_for_kvm_ioctl(unsigned int
->> ioctl, long *ext)
->>       return -EINVAL;
->>   }
->>   +DEFINE_STATIC_KEY_FALSE(kvm_rmi_is_available);
->> +
->>   DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
->>     DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_base);
->> @@ -3272,6 +3275,8 @@ static __init int kvm_arm_init(void)
->>         in_hyp_mode = is_kernel_in_hyp_mode();
->>   +    kvm_init_rmi();
->> +
->>       if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
->>           cpus_have_final_cap(ARM64_WORKAROUND_1508412))
->>           kvm_info("Guests without required CPU erratum workarounds
->> can deadlock system!\n" \
->> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
->> new file mode 100644
->> index 000000000000..f4c45021c6f7
->> --- /dev/null
->> +++ b/arch/arm64/kvm/rmi.c
->> @@ -0,0 +1,42 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * Copyright (C) 2023-2026 ARM Ltd.
->> + */
->> +
->> +#include <linux/arm-rmi-cmds.h>
->> +#include <linux/kvm_host.h>
->> +
->> +#include <asm/kvm_pgtable.h>
->> +#include <asm/virt.h>
->> +
->> +static int rmm_check_features(void)
->> +{
->> +    if (kvm_lpa2_is_enabled() &&
->> +        !rmi_has_feature(0, RMI_FEATURE_REGISTER_0_LPA2)) {
->> +        kvm_err("RMM doesn't support LPA2\n");
->> +        return -ENXIO;
->> +    }
->> +
->> +    if (!rmi_has_feature(1, RMI_FEATURE_REGISTER_1_HASH_SHA_256)) {
->> +        kvm_err("RMM doesn't support SHA-256 measurements\n");
->> +        return -ENXIO;
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->> +void kvm_init_rmi(void)
->> +{
->> +    if (kvm_get_mode() != KVM_MODE_RMM)
->> +        return;
->> +
->> +    if (!is_rmi_available()) {
->> +        kvm_info("Realm VM support is disabled because RMI is not
->> available\n");
->> +        return;
->> +    }
->> +
->> +    if (rmm_check_features())
->> +        return;
->> +
->> +    /* Future patch will enable static branch kvm_rmi_is_available */
->> +}
->> diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
->> index a84e50ac851c..6f43eac7c7be 100644
->> --- a/include/linux/arm-rmi-cmds.h
->> +++ b/include/linux/arm-rmi-cmds.h
->> @@ -67,6 +67,11 @@ static __always_inline void
->> rmi_smccc_invoke_once(struct arm_smccc_1_2_regs *reg
->>     unsigned long rmi_feat_reg(unsigned int index);
->>   +static inline bool rmi_has_feature(unsigned int index, unsigned
->> long feature)
->> +{
->> +    return !!(rmi_feat_reg(index) & feature);
->> +}
->> +
->>   int rmi_delegate_range(phys_addr_t phys, unsigned long size,
->>                  phys_addr_t *out_phys);
->>   int rmi_undelegate_range(phys_addr_t phys, unsigned long size);
-> 
+diff --git a/Makefile b/Makefile
+index 8e002043..b0a0b89f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -70,8 +70,6 @@ fomit_frame_pointer := $(call cc-option, $(frame-pointer-flag), "")
+ fno_stack_protector := $(call cc-option, -fno-stack-protector, "")
+ fno_stack_protector_all := $(call cc-option, -fno-stack-protector-all, "")
+ wno_frame_address := $(call cc-option, -Wno-frame-address, "")
+-fno_pic := $(call cc-option, -fno-pic, "")
+-no_pie := $(call cc-option, -no-pie, "")
+ wclobbered := $(call cc-option, -Wclobbered, "")
+ wunused_but_set_parameter := $(call cc-option, -Wunused-but-set-parameter, "")
+ wmissing_parameter_type := $(call cc-option, -Wmissing-parameter-type, "")
+@@ -85,8 +83,6 @@ COMMON_CFLAGS += $(wno_frame_address)
+ COMMON_CFLAGS += $(if $(U32_LONG_FMT),-D__U32_LONG_FMT__,)
+ ifeq ($(CONFIG_EFI),y)
+ COMMON_CFLAGS += $(EFI_CFLAGS)
+-else
+-COMMON_CFLAGS += $(fno_pic)
+ endif
+ COMMON_CFLAGS += $(wclobbered)
+ COMMON_CFLAGS += $(wunused_but_set_parameter)
+@@ -103,7 +99,7 @@ CFLAGS += $(LATE_CFLAGS)
+ 
+ autodepend-flags = -MMD -MP -MF $(dir $*).$(notdir $*).d
+ 
+-LDFLAGS += -nostdlib $(no_pie) -z noexecstack
++LDFLAGS += -nostdlib -z noexecstack
+ 
+ $(libcflat): $(cflatobjs)
+ 	$(AR) rcs $@ $^
+diff --git a/arm/Makefile.arm b/arm/Makefile.arm
+index 7734e17f..7313c843 100644
+--- a/arm/Makefile.arm
++++ b/arm/Makefile.arm
+@@ -13,6 +13,8 @@ endif
+ 
+ CFLAGS += $(machine)
+ CFLAGS += -mno-unaligned-access
++CFLAGS += -fno-pic
++LDFLAGS += -no-pie
+ 
+ ifeq ($(TARGET),qemu)
+ arch_LDFLAGS = -Ttext=40010000
+diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+index a40c830d..ea0202eb 100644
+--- a/arm/Makefile.arm64
++++ b/arm/Makefile.arm64
+@@ -7,8 +7,7 @@ bits = 64
+ ldarch = elf64-littleaarch64
+ 
+ arch_LDFLAGS = -pie -n
+-arch_LDFLAGS += -z notext
+-CFLAGS += -mstrict-align
++CFLAGS += -fpie -mstrict-align
+ 
+ sve_flag := $(call cc-option, -march=armv8.5-a+sve, "")
+ ifneq ($(strip $(sve_flag)),)
+diff --git a/powerpc/Makefile b/powerpc/Makefile
+index 41e752b0..eff129b0 100644
+--- a/powerpc/Makefile
++++ b/powerpc/Makefile
+@@ -66,6 +66,9 @@ CFLAGS += -ffreestanding
+ CFLAGS += -O2 -msoft-float -mno-altivec $(mabi_no_altivec)
+ CFLAGS += -I $(SRCDIR)/lib -I $(SRCDIR)/lib/libfdt -I lib
+ CFLAGS += -Wa,-mregnames
++CFLAGS += -fpie
++
++LDFLAGS += -pie
+ 
+ # We want to keep intermediate files
+ .PRECIOUS: %.o
+@@ -78,7 +81,7 @@ include $(SRCDIR)/scripts/asm-offsets.mak
+ 
+ FLATLIBS = $(libcflat) $(LIBFDT_archive)
+ %.elf: CFLAGS += $(arch_CFLAGS)
+-%.elf: LDFLAGS += $(arch_LDFLAGS) -pie -n
++%.elf: LDFLAGS += $(arch_LDFLAGS) -n
+ %.elf: %.o $(FLATLIBS) $(SRCDIR)/powerpc/flat.lds $(cstart.o) $(reloc.o) %.aux.o
+ 	$(LD) $(LDFLAGS) -o $@ \
+ 		-T $(SRCDIR)/powerpc/flat.lds --build-id=none \
+diff --git a/riscv/Makefile b/riscv/Makefile
+index 348a30a7..79a9c1ad 100644
+--- a/riscv/Makefile
++++ b/riscv/Makefile
+@@ -93,6 +93,7 @@ CFLAGS += -std=gnu99
+ CFLAGS += -ffreestanding
+ CFLAGS += -O2
+ CFLAGS += -I $(SRCDIR)/lib -I $(SRCDIR)/lib/libfdt -I lib -I $(SRCDIR)/riscv
++CFLAGS += -fno-pic
+ 
+ asm-offsets = lib/riscv/asm-offsets.h riscv/sbi-asm-offsets.h
+ include $(SRCDIR)/scripts/asm-offsets.mak
+diff --git a/s390x/Makefile b/s390x/Makefile
+index 97ed0b47..29bea5cc 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -88,7 +88,10 @@ CFLAGS += -O2
+ CFLAGS += -march=zEC12
+ CFLAGS += -mbackchain
+ CFLAGS += -fno-delete-null-pointer-checks
++CFLAGS += -fno-pic
++
+ LDFLAGS += -Wl,--build-id=none
++LDFLAGS += -no-pie
+ 
+ # We want to keep intermediate files
+ .PRECIOUS: %.o %.lds
+diff --git a/x86/Makefile.common b/x86/Makefile.common
+index 054e2391..a0201fcd 100644
+--- a/x86/Makefile.common
++++ b/x86/Makefile.common
+@@ -40,6 +40,11 @@ COMMON_CFLAGS += -Wa,--divide
+ endif
+ COMMON_CFLAGS += -O1
+ 
++ifneq ($(CONFIG_EFI),y)
++CFLAGS += -fno-pic
++LDFLAGS += -no-pie
++endif
++
+ # stack.o relies on frame pointers.
+ KEEP_FRAME_POINTER := y
+ 
+-- 
+2.56.0
 
