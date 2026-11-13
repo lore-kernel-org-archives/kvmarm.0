@@ -1,71 +1,56 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.137
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794582482;
-	b=ojmxzOL8ST6B7qi1025TUOmTwhJp3gAFRtDv5+oMILtQ/ScBD3tfkMwDv8+l4qTLpB6Q
-	 XA580RFxivYTbxCf3MIpAF2Y9MS+uV0U82UMOoBW42Ci4/bn9nBylQT6h/dwqCndN5MkI
-	 QsxtbWObmQ1P4lVC8GVPQoaJazhO1hD35IMvlXASCKf+Du7SfLSoSG2Asr1GUGzdddEsA
-	 hF21t/DA0RJCtVocAKRWxqBc5ZoqU7igpkupdDxc3xZ+CsHNL3Varvg2s5ejmPdEB74se
-	 OpPK++XeoVx5gfwapWTEaVhhJ6e6OAy8NI5D3K2o5YiY7SZft+waZ13nTB2NWOivDSQ==
+	t=1794584368;
+	b=u5qwDL3jrL2LTbyiIeJ6Feg1ohChC+NMxiXwin8j81dzjwGddeKCJU1+krFRq2KVccUZ
+	 UsTAR18CUxII1uRHiSEhJqNojLM6z6gdLPrSrAXiIcHLZDY/QbJ1l+4EhB5cwrDISL8wh
+	 Az7KiPdQ1nVXr+XUB6j4RPoLkYLLnFEbF21tQasfgc+FiNtW72LmR9es8KxkACAKabcXl
+	 qWmeJG0HJWABTH9SO5gIhHnRKH6A+2QG++FMJ9fzYns3ibY5amiEI4T/JfWWOUFtejDGT
+	 gCNZ8lKuoFPv3MmZoTiQMMGWpdiKpD/MgvmcocLYt98lddkkZnLCItI30DjdJ5JWbNQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794582482;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Type:Content-Transfer-Encoding;
-	bh=aOrKfpbFYffgtTODqXNpk01o8WFHQPGbS4apVzTT7bQ=;
-	b=EJjFu2hNe5voiHRG+VlP2qkzTkxlzacl71e+wQVIjz5YNBDxTTGT2hNCbpdvdIH62U9V
-	 4w14pU9S/o2DGpEiA8lOndikhmxmgF5snGf6b3JIkrcG9/Oz5gcKM5mMTvzUEmlCmHGO4
-	 cPXeFWFThn4YLcmQOzyZAO/v3gYJggzmURIizTw8qLteLE8aB/Q3iSqs1pgj7WJfRwjjo
-	 GO7R7tx+OPNX0KJqK1aD591d1bP0AFGLiEem8J2im9ohdu39ssOnHFooCTme9f24Efs4V
-	 4FPv98MGYH7Q+3vxRG39O3jIwgniPLhSz3fqcEQcDgFG/ap/xTKaRly+pNA6OOiQTYA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794584368;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=yAqgd2DmDVtgaLtAAzLbASIZIpgEG5EwxsbUUxN4qh8=;
+	b=WSOKI9635XamWb2N+xS8e8o959/CLwoQThjas5tdXW4w/zg2d9Z+QWq0t00GtmfvFYJn
+	 virTTBsQw8gmLBVVSGAKcORn57vpCAvhyQpB2+5GIAGaT+wu0tbiZutNdJu88mSpr81yh
+	 yIqBYy3IB9hMHy4BWK99pYAlqUe9gM7zDDyRiGna/32Hf17QMiF0oIcBrm+XxXXmod9tA
+	 C3uNvDKYLGahT2P0KjJStzLDzl/qu5wprs5Fi65H0nx3hdY3z5JFvc7oWO08S8tEXiw9j
+	 LuO0zcoC3SgqbFwjmb0b4aAUUQpPeziqCRRPMT0UmjENAiVtuVkfSNFdb6fS3X9FIqQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=ipm2ljuh;
-	arc=none smtp.remote-ip=91.218.175.137
-Received: from mta0.migadu.com (out-137.mta0.migadu.com [91.218.175.137])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D72606EB74
-	for <kvmarm@lists.linux.dev>; Fri, 13 Nov 2026 15:08:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 84D72606EB74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=SOReZjn4;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F138A606A323
+	for <kvmarm@lists.linux.dev>; Fri, 13 Nov 2026 15:39:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F138A606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=ipm2ljuh
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=5JN5ghI8dNw9QS0mTyFnJuNnXSuxG5Od9sIgQTg8Rss=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794582479; v=1; x=1795187279;
- b=ipm2ljuh89p+MZIQXU33RzY4MuB1Vxg9XvIjcS7OMHudXFJJv24l/QkflnkA2mYduWsRza54
- QmR+IomLiLmC2VEgoHNbMl462ECO4XVGeb4W17dznlZujBECOqka9t5myQtyK3ILw+HZCcqm6dL
- YsN62VGocIqqUWtdBFtKNOMY=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 190fc832efd7b1c5;
-	Fri, 13 Nov 2026 15:07:58 +0000
-X-Mizu-Trace-ID: 190fc832efd7b1c5
-X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>
-Cc: Shuah Khan <shuah@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Oliver Upton <oupton@kernel.org>,
-	James Houghton <jthoughton@google.com>,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	cgroups@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	kvm@vger.kernel.org,
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=SOReZjn4
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 538F6339;
+	Fri, 13 Nov 2026 07:39:23 -0800 (PST)
+Received: from gentoo-vm (kajpuc01-mac-mini.manchester.arm.com [10.33.9.44])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 718E33F85F;
+	Fri, 13 Nov 2026 07:39:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1794584366; bh=8nVoOAvDSYurW4p45koPq31BX2GIkyagHKY0KrKsJQY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=SOReZjn4djklcugPwZmM+0b0Q9W6n0lMlvB5NxF6T7IqIhav5olbdcCnG23OHWeam
+	 jqkuYUe4EDwI7rApBLdr+0zDV6ZQp7D5v0mA0F2hcQLSy4VwZZ8/OsPrdIFGnIVKtX
+	 XcwYyy9aDiASb/XR1zzlcMnJkjZ49usd4ZfA9ERU=
+From: Kajetan Puchalski <kajetan.puchalski@arm.com>
+To: kvm@vger.kernel.org
+Cc: will@kernel.org,
+	julien.thierry.kdev@gmail.com,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3] selftests/cgroup: Make the object directory an order-only prerequisite
-Date: Fri, 13 Nov 2026 15:07:57 +0000
-Message-ID: <20261113150757.646085-1-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.47.3
+	Kajetan Puchalski <kajetan.puchalski@arm.com>
+Subject: [PATCH kvmtool] include: linux/types.h: Add 128-bit integer types
+Date: Fri, 13 Nov 2026 15:38:47 +0000
+Message-ID: <20261113153847.60183-1-kajetan.puchalski@arm.com>
+X-Mailer: git-send-email 2.51.0
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -75,52 +60,35 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The cgroup_util.o rule in libcgroup.mk lists the object directory as a
-normal prerequisite. The KVM selftests include libcgroup.mk, so for
-them that directory is their own $(OUTPUT)/lib. After any incremental
-KVM build that rebuilds an object there, the directory is newer than
-cgroup_util.o, and the next build recompiles cgroup_util.o and relinks
-every test.
+The tree no longer builds on new systems (e.g. latest Fedora images)
+because the included types.h is missing 128-bit integer types.
 
-Make the directory an order-only prerequisite, as libvfio.mk does.
+Add typedefs analogous to Linux commit 10a47fb67340bca274276faf855d7 to
+fix the build failures.
 
-Acked-by: Michal Koutný <mkoutny@suse.com>
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+Signed-off-by: Kajetan Puchalski <kajetan.puchalski@arm.com>
 ---
+ include/linux/types.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Notes:
-    This was patch 2/2 of v2 [1]. Sean took patch 1 through kvm-x86 and
-    asked for this one to go through the cgroup tree [2].
-    
-    Changes since v2:
-    - Collected Michal's Acked-by.
-    - Rebased on cgroup/for-7.5.
-    - Dropped the Fixes: tag, as the patch only saves a rebuild.
-    
-    [1] https://lore.kernel.org/all/20260922071945.693714-1-fuad.tabba@linux.dev/
-    [2] https://lore.kernel.org/all/avJqZzKX1ZVAMGr-@seanjc-mac.roam.internal/
-
- tools/testing/selftests/cgroup/lib/libcgroup.mk | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/cgroup/lib/libcgroup.mk b/tools/testing/selftests/cgroup/lib/libcgroup.mk
-index 7a73007204c39..bcf6fe2516223 100644
---- a/tools/testing/selftests/cgroup/lib/libcgroup.mk
-+++ b/tools/testing/selftests/cgroup/lib/libcgroup.mk
-@@ -13,7 +13,7 @@ EXTRA_HDRS := $(selfdir)/clone3/clone3_selftests.h
- $(LIBCGROUP_O_DIRS):
- 	mkdir -p $@
+diff --git a/include/linux/types.h b/include/linux/types.h
+index 5e20f10..1b71001 100644
+--- a/include/linux/types.h
++++ b/include/linux/types.h
+@@ -5,6 +5,11 @@
+ #define __SANE_USERSPACE_TYPES__	/* For PPC64, to get LL64 types */
+ #include <asm/types.h>
  
--$(LIBCGROUP_O): $(OUTPUT)/%.o : $(CGROUP_DIR)/%.c $(EXTRA_HDRS) $(LIBCGROUP_O_DIRS)
-+$(LIBCGROUP_O): $(OUTPUT)/%.o : $(CGROUP_DIR)/%.c $(EXTRA_HDRS) | $(LIBCGROUP_O_DIRS)
- 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
++#ifdef __SIZEOF_INT128__
++typedef __signed__ __int128 __s128 __attribute__((aligned(16)));
++typedef unsigned __int128 __u128 __attribute__((aligned(16)));
++#endif
++
+ typedef __u64 u64;
+ typedef __s64 s64;
  
- EXTRA_CLEAN += $(LIBCGROUP_O)
-
-base-commit: 80bf33fd523ee1df2d265d34970df670a44a2ccd
 -- 
-2.47.3
+2.51.0
 
