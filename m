@@ -1,110 +1,69 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.155
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.220
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794561529;
-	b=O+v6+ZXLFUfhMuKxhgCKoy3apMhAt9l8WA/3Z1McDvoKfMw3R/peF/CdAw4iRAo5Ls62
-	 b1Ao9G0earlMxz/wZ/JeOgos2w4GLzlRX4q7wZ9WXXrlR31O8g/ynZmSYs9duNidqOEyx
-	 9JP/wVNlpwEUcmgCjnjnWAHytPXXlhG8YItKX6VR8rYey9F1q06FEheWA3ZyIXYWKkKki
-	 3tPr/W9IAbl0oKFbLtMJDXcwsDzhNtzPBTaOis6/yBAuvbINO8u0rWBlE8gMage4R61Qh
-	 5JLdjDiy3eCMyKOHIeBwsYVcwO5bUpz0euKewdX81P8ZSmqnMBIxzyEzRC7ehngflXQ==
+	t=1794562727;
+	b=ba61NWR5gOxUzcwZcI2QULqDbXV327EzcuY73Y47ZcwOxHxU4qe6j5k1ux2mu6/Gbgq0
+	 ptxtfsuv/LvpzF3qMR3+ebLCib8zj5ipFtJqGCpT8DiyK5XgPLJsCisRuc1Ksv//ccq8C
+	 AN6hUr8/nhmupxM5lryDMLwVUJEDIgJKfT5G3Nx1h3Bz+0Ay7sf0FJwH3SscGdWHoheSr
+	 DUpP94SvpTPZViQJyXFfxi73u19WjcNKIPCQAe5pU2unR7XUH1qoCvQizphRT3/UQH1J+
+	 i4IwNL63NE7p2ZqjXMso+cyh92Uc3430U5myW9dQ6sM3Q0ftOBfDQ5qcjk5/riGysKw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794561529;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
-	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
-	 X-ME-Sender:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
-	 MIME-Version:X-ThreadId:Date:From:To:Cc:Message-Id:In-Reply-To:
-	 References:Subject:Content-Type:Content-Transfer-Encoding;
-	bh=6y/Vwdb7m8Q4VQEZiWRGa4EBI0ZcNW5mrZJmNnLAIEk=;
-	b=vKeNN2aiavQjsaXdpIEc30cA5xGAIN7i39LP9K4rl9WYMt+b/Cab8e94Oz5yvIPXVOGK
-	 XWy92DdqWYgj1jtqqXTpwCnRH6LKLsEWm4jzOBBrjFrJRIKdpi+Ez1jAWqp3c1ch5nBhJ
-	 ZIy4GkmMXjFT43UnHXUwK/lVsFPhKZzsHL9WK9TnAX32Jk7q9AuXmnaBcbRQJliPnnmyC
-	 OQJUj6feSQB6HWuHDN+cRVOiDABwFQRWF+Rr7AG1Rt0WVLyD3V062V/wzAAzKo5UZPthM
-	 7hURVTA6QUx89a2tAZ5/BzI1QlNrzvlOPV5OuIXFwC+nIrAqKFV/yVr4qPsA1nbwU7g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794562727;
+	h=DMARC-Filter:dkim-signature:Received:Received:Received:From:To:CC:
+	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
+	 X-ClientProxiedBy;
+	bh=lIuV6FUuCmbku+6c3MP0BacKv5OXTGUjdv/prBUucwQ=;
+	b=QE+45dtA6vja87A7FXU3w/Ws59SmbY6z0FOJwajxSHOM2rytZcVsGzBcd367H3laiDVe
+	 YiBrO20sAV2skcdmLSQU5xpe1WHZvBZde+6VokcQtbAPJrd1NeQeiSiy7PJeJtDnGiesC
+	 frEd03WPUAWJWZEp+7teMNhFYo+Rax74uzI8agWBb0OY+CeVTc7CDvphuHq4xcg/gIQ0p
+	 6XUCvZI3THjvHS2gHAEI9/LaUVJgyg6UjDZdZF29J3UOaj8ifPo3GUp9ie7jt4jOKJWM1
+	 yYPatN2Ew/xqzmLZ1DPNHUlclROrHHVJwI6eHN8hIBtBPRRgzlYQPupUm0Kprr+Opvg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arndb.de;
-	spf=pass smtp.mailfrom=arndb.de;
-	dkim=pass header.d=arndb.de header.i=@arndb.de header.a=rsa-sha256 header.s=fm2 header.b=XU1Lk5w0;
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=0cGPAQzH;
-	arc=none smtp.remote-ip=202.12.124.155
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+	dmarc=pass header.from=huawei.com;
+	spf=pass smtp.mailfrom=huawei.com;
+	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b="S/aXOX9r";
+	arc=none smtp.remote-ip=113.46.200.220
+Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4134B606A31C
-	for <kvmarm@lists.linux.dev>; Fri, 13 Nov 2026 09:18:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4134B606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FD5606A889
+	for <kvmarm@lists.linux.dev>; Fri, 13 Nov 2026 09:38:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B2FD5606A889
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=arndb.de header.i=@arndb.de header.a=rsa-sha256 header.s=fm2 header.b=XU1Lk5w0;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=0cGPAQzH
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 3C39A7A0493
-	for <kvmarm@lists.linux.dev>; Fri, 13 Nov 2026 04:18:48 -0500 (EST)
-Received: from ams-imap-03 ([10.64.2.23])
-  by ams-compute-02.internal (MEProxy); Fri, 13 Nov 2026 04:18:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1794561517;
-	 x=1794647917; bh=6y/Vwdb7m8Q4VQEZiWRGa4EBI0ZcNW5mrZJmNnLAIEk=; b=
-	XU1Lk5w0uu+L798wbsZMLuM/oLYfa2jptOAdI0/brmVfRTwfItVhsy3/WAwvax1F
-	fuaQl4/YNqrjvvedfsQ98apUbuq2EWa3KR/0yNMIo8oMGN6RYG2KhrIIjntO7XyE
-	3T/x22Q0ofh10QVEM3ULAFsFyWj3odFZ7AoKT22lf3icg2StEk+zw2eVVSKHPx+k
-	jvSYUMM/Ua6Iws2yFqcpGetJUD14kijTlkJiW8MpsS1uZxK6FFg9urFhVnwDhwlk
-	Q2sm/viJV6LlSQ9L7J0bNYRhncmf/YGINIJsD/H/Jcg0bofs5O/+sC/SeoLB0FIb
-	JBzviiALhI7Sr8vj5M0l8Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1794561517; x=
-	1794647917; bh=6y/Vwdb7m8Q4VQEZiWRGa4EBI0ZcNW5mrZJmNnLAIEk=; b=0
-	cGPAQzH3SBhTsnw+2A9ATJi83tr8tGmI+3kDDLfaTEaRbD5laHcp8CEuyufeolH9
-	jURzrwqeJ7ww6MXCBKDrknmhPGSRPic4aLVzEIABu0DK1XaLZxihlxBePOJqkVI7
-	8U26SDrkzAAubG/VO1ysi5U+MZosEKyDySXbdlR14MknUMkpTa2U73QgwVPhGWo0
-	1CRBlJ2Jo+kwqpRUt2hOGj0KXxfNA9ddfC3jatqzvpCv/BoiYk4TzDg5zI/t7r+q
-	VtSrxa3A1dYMyBXFDt6yYVgyPOWgq6KEsM5mSRXJi8NyFP8ps0wXYBQGOlvhgcdM
-	8GGdR0qeBeN+LCQipeAvQ==
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
-	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=sign d=arndb.de a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1794561517; d=arndb.de;
-	mf=PGFybmRAYXJuZGIuZGU+; rt=PGt2bWFybUBsaXN0cy5saW51eC5kZXY+;
-	s=fm2:rsa-sha256:DWvVQDrKCYsVe95UbxjRyuhilbNrHr8P6vxGndr5L2RHoyv
-	Zm7/Nq/b2FJMMu8hKXK113Hpy2WDCSaF9searygZUev8NDqblOqCnjEkA9torDAD
-	QlMAX3UZLq8CLSV0gWhcDde1UanKcu+PvZ6S8yGdc0AEoc7nDVklfA2kZeNsagbe
-	yCB9YWtegT0xfdb5RUZKKAb8tmHnLqxU9GI2NBEh0HA11x2/G+DTIkbbvph6WuV+
-	fvjodaE1DfYDe8idK0iVbSyFs+Ib+dO1B30NPert/KYgWtbfUrEY+RPcNY3c2yFw
-	x1F2bWB1NjJ1vbzxy8F1BBTWSzy1Wrq4XS8duSA==;
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
-	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=mi-m=1; hc=12;
-	hn=cc,content-transfer-encoding,content-type,date,feedback-id,
-	from,in-reply-to,message-id,mime-version,references,subject,to;
-Message-Instance: m=1; h=sha256:vxkME9aONuWR23Ea+xNeRHIFYOKp3Ac+/gT4UmzDtbY=:vv1cmvtVAPstmIXGMWwsHMK7bkwINRxjdcmQxQpM0k8=;
-X-ME-Sender: <xms:59X2attsw9jzsR2DUXa62XldNiNGsOnYuvtuSGWCEWJVshM_h3vLtg>
-    <xme:59X2ahTvdP4tih94hNRex_pSoHh7BSjTgNR3au7lIU_BLhrc0JNfgH1QHALo6fbI9
-    F2P3TSxOICtcRLssuCHUsnZCIZfOrWCz5_RdAhRNdxTrFkjkvmYyGtxvg>
-X-ME-Proxy-Cause: dmFkZTFVGdrpsZrdpDlQwvZlSXs02XDBfEcLRW3P1tW5KGZAS4C4fdOW+W5npGRXES212F
-    utLs+hHqpTKLWMZ8tmzA9bRCMjG0dVFWaSgJP+Kckx36Uhk3RvGJbOg+K4+tlArKmH5okZ
-    6FgrfzpHTKtyBWqQtQ5SXsJIHv2n58bHsVCtj2LHVz7CM+T2lcvIrMZU9wZdnHcSztbo3Z
-    PRGrfN5bV9fOZ8IBqi+gkiEDpyNnnh9UROjquhjmwPcYIK/5TwNMJ3JjwjX/ueMEKWjrBo
-    A984hL86fNebMBTXelnTURIMGALHrSY516+YwVrZluwfyr2j6zlviEFXVo6AMfekpGh+YM
-    9c7UuzdfAJ4GPX25yxpydOysxG4iok0RzNv8mvAsX9+/oOTxH+YneYQynPdVFxaaZ/fhrp
-    I+cvtUg/aCxktQ8IVzPAKNgg7FDajd6PMTLOh81U3GlPlYGp0BGc2zo/dxBTVxkXAHr8Zy
-    6X3adHnyud1c6HaY/j1ad5kiVuHeb8/Do47imt06tXJNNAOg7/FxaVQQCVEAQWbqwQu6sl
-    BZaqbgAGHOJsRnqob8hw23nUoUuidlrWANfNd4fkJJlU7qivtKsw6n3UxSJSZq7Yxx2PlU
-    +quMQCQmgDc1BLWKWPSNYJB/IVjbT8IwBH0VeL8UOfE0sS3NBxiwDMRpchuw
-X-ME-Proxy: <xmx:6tX2agqyKoQmSsheqqC2_7zSEJ_p8jtnYFSH9zQgk6vHM_U9OcD1Fg>
-    <xmx:6tX2as8NGURzv57ffr7OrcTGIoV_qwI3Qi5wFRpU6pQqvFxRPgEoUQ>
-    <xmx:6tX2ah4yH9TU7d222ttOVwAZD23Qqesdxspq21XIczL7_LjK0nQ87A>
-    <xmx:6tX2amjDrofUuFTMkIbeFBNLIsmZOjajRlgRPWVYfIsCOlPeVITU1w>
-    <xmx:7dX2amMSM3lU66UWuHc95ZrHdkPEHIlb_f9fZLmlQxUm6A9xbSczPzX8>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 0B16132A0099; Fri, 13 Nov 2026 04:18:31 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=S/aXOX9r
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=lIuV6FUuCmbku+6c3MP0BacKv5OXTGUjdv/prBUucwQ=;
+	b=S/aXOX9r9n9WEKK0m+2dsd4BkY5a453lC7zFvvCFk6fU7g/tug8D05gyvGxBq0vGKDEYPwpEg
+	CjxCEk2WXr4RQILCWUCtd2cRdIiAkyPn6Vrin93dYMc4Kt+LKoMesVQmN/O1Eet9MONTgOlBgtF
+	mQYJ3N3z57lsE/IlFn/QxHg=
+Received: from mail.maildlp.com (unknown [172.19.162.223])
+	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4jQsdg3pqFz12LJw;
+	Fri, 13 Nov 2026 17:38:47 +0800 (CST)
+Received: from kwepemk300013.china.huawei.com (unknown [7.202.194.231])
+	by mail.maildlp.com (Postfix) with ESMTPS id 7241640561;
+	Fri, 13 Nov 2026 17:38:41 +0800 (CST)
+Received: from huawei.com (10.50.163.32) by kwepemk300013.china.huawei.com
+ (7.202.194.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Fri, 13 Nov
+ 2026 17:38:40 +0800
+From: Jinqian Yang <yangjinqian1@huawei.com>
+To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>
+CC: <maz@kernel.org>, <oupton@kernel.org>, <fuad.tabba@linux.dev>,
+	<yuzenghui@huawei.com>, <joey.gouly@arm.com>, <seiden@linux.ibm.com>,
+	<suzuki.poulose@arm.com>, <yangjinqian1@huawei.com>,
+	<liuyonglong@huawei.com>, <wangzhou1@hisilicon.com>,
+	<prime.zeng@hisilicon.com>, <tangchengchang@huawei.com>,
+	<zhengtian10@huawei.com>, <linuxarm@huawei.com>, <liujian222@huawei.com>
+Subject: [PATCH v2] KVM: arm64: Register irq_bypass consumers only when direct MSIs are possible
+Date: Fri, 13 Nov 2026 17:38:40 +0800
+Message-ID: <20261113093840.1034795-1-yangjinqian1@huawei.com>
+X-Mailer: git-send-email 2.33.0
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -114,71 +73,168 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-X-ThreadId: AmcrnnMArev7
-Date: Fri, 13 Nov 2026 10:18:10 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Siddharth Chintamaneni" <sidchintamaneni@gmail.com>,
- "Fuad Tabba" <fuad.tabba@linux.dev>
-Cc: "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oupton@kernel.org>,
- "Catalin Marinas" <catalin.marinas@arm.com>, "Will Deacon" <will@kernel.org>,
- "Mark Rutland" <mark.rutland@arm.com>,
- "Suzuki K Poulose" <suzuki.poulose@arm.com>,
- "Joey Gouly" <joey.gouly@arm.com>, "Zenghui Yu" <yuzenghui@huawei.com>,
- "Steffen Eiden" <seiden@linux.ibm.com>,
- "Yicong Yang" <yangyicong@hisilicon.com>,
- "Zhou Wang" <wangzhou1@hisilicon.com>,
- "Navneet Singh" <navneetsingh@microsoft.com>, apais@microsoft.com,
- rlmenge@gmail.com, hargar@linux.microsoft.com, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Message-Id: <0a5e252e-1494-4b0f-a761-d984238c9d0d@app.fastmail.com>
-In-Reply-To: <20261112180741.17614-1-sidchintamaneni@gmail.com>
-References: <20261023070110.1833446-1-fuad.tabba@linux.dev>
- <20261023070110.1833446-2-fuad.tabba@linux.dev>
- <86fqxwzul7.wl-maz@kernel.org>
- <CA+EHjTw08SZC_3Uodt6ew6vXVH-doW-8G41fVCF-rmaKsv+0fQ@mail.gmail.com>
- <86ecdgzp6m.wl-maz@kernel.org>
- <CA+EHjTy0jpY3sdVCENJRj_kfRDwbZ6TpkCAHQ2xUO-7ZuErpcA@mail.gmail.com>
- <ad724195-3452-495a-a50a-5e5c8093a483@app.fastmail.com>
- <CA+EHjTyLnAXanf9R7SuoL3gFZUNewX7QOnW=mc3qzwvaxg7jJg@mail.gmail.com>
- <040cf379-baba-4e3a-bf3d-6bc009a9e28d@app.fastmail.com>
- <20261112180741.17614-1-sidchintamaneni@gmail.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: Hide FEAT_LS64_ACCDATA from guests
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemk300013.china.huawei.com (7.202.194.231)
 
-On Thu, Nov 12, 2026, at 19:07, Siddharth Chintamaneni wrote:
-> On Tue, Oct 27, 2026 at 02:48:29PM +0100, Arnd Bergmann wrote:
->> On Sat, Oct 24, 2026, at 09:14, Fuad Tabba wrote:
->> > On a host that runs at EL1 (nVHE or hVHE), this also requires
->> > __init_el2_fgt to set nACCDATA_EL1 in HFGRTR_EL2 and HFGWTR_EL2, and
->> > __init_el2_hcrx to set HCRX_EL2.EnAS0. Without them, the ACCDATA_EL1
->> > access traps to EL2 and the hypervisor panics, and so does ST64BV0
->> > once SCTLR_EL1.EnAS0 is set. Happy to write those and the KVM change
->> > once you're ready to post this.
->>
->> Thanks for the offer, that part is definitely not my area.
->
-> We are preparing to post the Microsoft Smart Data Accelerator (SDA) VF
-> dmaengine driver for Microsoft Cobalt SoCs, which uses IOMMU SVA with
-> direct EL0 ST64BV0 portal submissions carrying the process PASID in
-> ACCDATA_EL1.
->
-> Now that Fuad's KVM guest FEAT_LS64_ACCDATA series is queued, are you
-> planning to post the host ST64BV0 SVA + EL2/KVM patches as a standalone
-> series soon?
+kvm_arch_has_irq_bypass() on arm64 returns true unconditionally, so
+every irqfd assignment registers an irq_bypass consumer even when KVM
+cannot do direct MSI forwarding for the VM. In that case
+kvm_vgic_v4_set_forwarding() bails out at its very first check, since
+vgic_supports_direct_msis() is false, and the registration becomes pure
+overhead: every KVM_IRQFD ioctl takes the global irq_bypass mutex, which
+becomes a contention point when many VMs boot concurrently.
 
-Yes, sorry for the delay on my side, I'll try to get it to you ASAP.
+Pass struct kvm to kvm_arch_has_irq_bypass() and gate the registration
+on vgic_supports_direct_msis(kvm), like x86 gates on
+enable_device_posted_irqs. Reading the per-VM vgic state is safe here,
+as kvm_irqfd_assign() requires an initialized irqchip.
 
-For my understanding of your requirements:
+Functionally this is a no-op: without direct MSI support the consumer
+registration never did anything beyond acquiring the lock. On a
+GICv3-only host booting 100 microVMs concurrently this cuts the average
+boot time by ~5 ms, matching the gain observed with
+CONFIG_HAVE_KVM_IRQ_BYPASS=n.
 
-- Is that hardware using an SMMUv3 or a different type of IOMMU?
-- Do you have userspace calling ST64BV0 on the host, guest or possibly both?
+Signed-off-by: Jinqian Yang <yangjinqian1@huawei.com>
+---
+v1 -> v2:
+ - Gate on vgic_supports_direct_msis(kvm) instead of the global
+   kvm_vgic_global_state.has_gicv4 flag, This requires passing struct
+   kvm to kvm_arch_has_irq_bypass() and updating the x86 and PPC callers.
 
-> Either way, we have Cobalt hardware with FEAT_LS64_ACCDATA available and
-> would be happy to test your patches on silicon, or help put together and
-> carry any remaining pieces alongside our driver series if you prefer.
+v1: https://lore.kernel.org/linux-arm-kernel/20261109112018.241298-1-yangjinqian1@huawei.com/
 
-Sounds good, thanks!
+ arch/arm64/include/asm/kvm_host.h | 4 ++--
+ arch/arm64/kvm/vgic/vgic.h        | 1 -
+ arch/powerpc/kvm/powerpc.c        | 2 +-
+ arch/x86/include/asm/kvm_host.h   | 2 +-
+ arch/x86/kvm/irq.c                | 2 +-
+ arch/x86/kvm/vmx/posted_intr.c    | 2 +-
+ include/kvm/arm_vgic.h            | 1 +
+ include/linux/kvm_host.h          | 2 +-
+ virt/kvm/eventfd.c                | 2 +-
+ 9 files changed, 9 insertions(+), 9 deletions(-)
 
-    Arnd
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 97332ffcb130..da86646b6709 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1742,9 +1742,9 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
+ #define kvm_has_sctlr2(k)				\
+ 	(kvm_has_feat((k), ID_AA64MMFR3_EL1, SCTLRX, IMP))
+ 
+-static inline bool kvm_arch_has_irq_bypass(void)
++static inline bool kvm_arch_has_irq_bypass(struct kvm *kvm)
+ {
+-	return true;
++	return vgic_supports_direct_msis(kvm);
+ }
+ 
+ void kvm_idregs_enforce_dependencies(struct kvm *kvm);
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index 97fc3bdf520e..3c128e4d9afa 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -521,7 +521,6 @@ static inline bool vgic_host_has_gicv5(void)
+ }
+ 
+ bool system_supports_direct_sgis(void);
+-bool vgic_supports_direct_msis(struct kvm *kvm);
+ bool vgic_supports_direct_sgis(struct kvm *kvm);
+ 
+ static inline bool vgic_supports_direct_irqs(struct kvm *kvm)
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index 9194cf492d1c..74c0d457f4ca 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -875,7 +875,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+  * irq_bypass_stop and irq_bypass_start are not needed and so
+  * kvm_ops are not defined for them.
+  */
+-bool kvm_arch_has_irq_bypass(void)
++bool kvm_arch_has_irq_bypass(struct kvm *kvm)
+ {
+ 	return ((kvmppc_hv_ops && kvmppc_hv_ops->irq_bypass_add_producer) ||
+ 		(kvmppc_pr_ops && kvmppc_pr_ops->irq_bypass_add_producer));
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 1ee4b127004d..8b6f5b72fea5 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1919,7 +1919,7 @@ static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
+ 	kvm_x86_call(vcpu_unblocking)(vcpu);
+ }
+ 
+-static inline bool kvm_arch_has_irq_bypass(void)
++static inline bool kvm_arch_has_irq_bypass(struct kvm *kvm)
+ {
+ 	return enable_device_posted_irqs;
+ }
+diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
+index 871977288272..81eeecc614ef 100644
+--- a/arch/x86/kvm/irq.c
++++ b/arch/x86/kvm/irq.c
+@@ -439,7 +439,7 @@ static int kvm_pi_update_irte(struct kvm_kernel_irqfd *irqfd,
+ 	struct kvm_lapic_irq irq;
+ 	int r;
+ 
+-	if (WARN_ON_ONCE(!irqchip_in_kernel(kvm) || !kvm_arch_has_irq_bypass()))
++	if (WARN_ON_ONCE(!irqchip_in_kernel(kvm) || !kvm_arch_has_irq_bypass(kvm)))
+ 		return -EINVAL;
+ 
+ 	if (entry && entry->type == KVM_IRQ_ROUTING_MSI) {
+diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+index 2644add54b76..15d7a97fd7f6 100644
+--- a/arch/x86/kvm/vmx/posted_intr.c
++++ b/arch/x86/kvm/vmx/posted_intr.c
+@@ -153,7 +153,7 @@ static bool vt_can_use_vtd_pi(struct kvm *kvm)
+ 	 * bypass IRQ being attached to the VM.  vt_pi_start_bypass() ensures
+ 	 * blockng vCPUs will see an elevated count or get KVM_REQ_UNBLOCK.
+ 	 */
+-	return irqchip_in_kernel(kvm) && kvm_arch_has_irq_bypass() &&
++	return irqchip_in_kernel(kvm) && kvm_arch_has_irq_bypass(kvm) &&
+ 	       READ_ONCE(kvm->arch.nr_possible_bypass_irqs);
+ }
+ 
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 4b2c41917b77..39c69d861060 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -215,6 +215,7 @@ struct vgic_global {
+ };
+ 
+ extern struct vgic_global kvm_vgic_global_state;
++bool vgic_supports_direct_msis(struct kvm *kvm);
+ 
+ #define VGIC_V2_MAX_LRS		(1 << 6)
+ #define VGIC_V3_MAX_LRS		16
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index e7fc94e2910a..bdf002a62686 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -2458,7 +2458,7 @@ struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void);
+ #if IS_ENABLED(CONFIG_HAVE_KVM_IRQ_BYPASS)
+ struct kvm_kernel_irqfd;
+ 
+-bool kvm_arch_has_irq_bypass(void);
++bool kvm_arch_has_irq_bypass(struct kvm *kvm);
+ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *,
+ 			   struct irq_bypass_producer *);
+ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *,
+diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+index f43b8b25bc85..07a7c8fc3bbe 100644
+--- a/virt/kvm/eventfd.c
++++ b/virt/kvm/eventfd.c
+@@ -488,7 +488,7 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
+ 		schedule_work(&irqfd->inject);
+ 
+ #if IS_ENABLED(CONFIG_HAVE_KVM_IRQ_BYPASS)
+-	if (kvm_arch_has_irq_bypass()) {
++	if (kvm_arch_has_irq_bypass(kvm)) {
+ 		irqfd->consumer.add_producer = kvm_arch_irq_bypass_add_producer;
+ 		irqfd->consumer.del_producer = kvm_arch_irq_bypass_del_producer;
+ 		irqfd->consumer.stop = kvm_arch_irq_bypass_stop;
+-- 
+2.33.0
+
