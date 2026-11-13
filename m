@@ -1,54 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=90.155.92.199
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794594399;
-	b=cr5jv5dNs9EPk41wJvLuVsU7qC4i9NrroNe9rJsxrHXMZK8SO8fXkbHYDIaw37jdioEe
-	 aoFKaeG+pvZlp8+UsLMe+8hbljWbA8O7mP7yTshzTCmkIPYsHcplPhGrZCe9Dx3EtEW2Z
-	 f6+iDzIsJUawWWkexcYufS0VGZRL+4Qr7pUmi2nN2ZsXFrgjtaUSfqhnCE4cqAw/p/S2s
-	 xnFi8PbSbsBtv9UE0ga+gOYnd9gD5LN01XcfUvshp3AWn0ldVtkF/hf93mE3Nhvu2MpQr
-	 xqFHQ7dc67kCfdG6b08JWxAlpqLgqAgzdETmz1Kh6okniX42wyd4BXC6t7VeTbps5Tg==
+	b=IewUBcZb0CMhBwfelEfaxERlyW6MX/WK9CjVyDYf8CFOF/0sW85RcxshCTz93FH6/THn
+	 9IMWkRDLoTYjsfFsLzsCR9kLh9hfSiFkLdSOU6xZh+zzf4fCADO58+7ni+CUz8c4fdozL
+	 lnC5jra9UEb1ffliygs4lZL17RVsJf65mhWd7vsmV++8NoIiqdxwDuSkmWB3umPa1lljQ
+	 VjgzXQnqXsQ2zIGeP9kyNo+kVL43xFReRGZF8T0e2uHt2ZjQZgJMgyboVdfzCFHIWAkBA
+	 xd/nQvjYUM/Y2rP2lSHbuor4OgoJPydQynKvlEj2MMaUjkrdV+Wlhmgm/KksWdvlGYQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794594399;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding:Sender:X-SRS-Rewrite;
-	bh=a8uW+4oqYv72sJkgKsoP+73URG/7qnLsk5wAKeTN0oY=;
-	b=hJu0POCyzBp+gs2ZBAI5HWaeHA6u5UJHjhjHzdfi5Q8x7DYeVuIRPkSvN+S6w5lp4IC6
-	 gUIUJ9pCcG0Ve1Y99SJAg0J7Dvj2d6jFxlUM8I0IHDQD8jcAfSPgWTm3TGs45Oz9ddp9a
-	 U/WcnwIJnLVF+Drk39Yvfl9df2SC+Gw7KtjIDQaDPo02JfNT5OiJuY4emBASk1/3HEKmm
-	 1hC2kP4449JhikQPn8Hogl5vNOthZ+XQfsWX3np8LvXHZCtkVn7s4q1y90Wybfrn7w8BB
-	 MPXR6pLEbkyQofjnYhro95l1TC76fEGCzi6cBDMnlYFRnss5Ka1rdCjcSKKYhaGEl/A==
+	bh=vhD9zqcQ9I2xlJwWYwXWk6MJvw5eWbXdZkn7PypG6JM=;
+	b=4R75y65AQwAisEe1QfZgaworYvd5g3Vep8K7rCnUWWrXi3t9q+99OrZqQ6J6f4G7LsQo
+	 sVx1pIq46pBTQIrNX88jC4Rk1X6NnfIOPg7e/9vUaigiKXccz2G3SdqzOPVgZIhTolVZ5
+	 0n/WfFBnWo/YpBuWLJjRPSpoh14BvtJ5ryPkLvs4BnCg428CCrZmFpUTlr/IavqDTy4oI
+	 BjwcsjLAIeKzK6m21zqPq6G260JRWfx3Fjq6p1ckem29IGIj2TsjvSJAkG+M3vQwDF+Mc
+	 MOl/lkrjDVf/9kJrXSlgZBTkQnZYQO4Mc5GCRth6eXCSkMoLS6mWejKDuNzyZIFNh0Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=infradead.org;
 	spf=none smtp.mailfrom=desiato.srs.infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=desiato.20200630 header.b=NYFEjsv5;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=desiato.20200630 header.b=Qn2EM2hE;
 	arc=none smtp.remote-ip=90.155.92.199
 Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED6D606C14A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EAAC606C141;
 	Fri, 13 Nov 2026 18:26:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9ED6D606C14A
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9EAAC606C141
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=desiato.20200630 header.b=NYFEjsv5
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=desiato.20200630 header.b=Qn2EM2hE
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
 	Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=a8uW+4oqYv72sJkgKsoP+73URG/7qnLsk5wAKeTN0oY=; b=NYFEjsv5JTvQrCDdrUhtjYOnVL
-	LzDBfP+Mjsbl3xJLs2jAxr3kd4oBKbxYWYpZ8iMXU+tLpBC7KqTAxCkMgBPYQc8eknIgPjUmWSz7N
-	02Sb3NLmDWCINk3ZFejM+d2NHgjVf0C2ySvFgg7mjD57V+zP8RWF4IXmqxY2gB5ugzmRLvMOq7hQ1
-	QutSMlT8ZFUUutHNk1hCGW6/UIc/S52KoMICy6LsrK6FZRbd5nDvGBUZ0SLRxkrtswQoCWlZEHHNG
-	SAf6YGF3lcDdqFMBTwL1Pf5kQGFgCPkH8NVs3McggKSUHpAB0IyUP7zob49fNmWJmSAJ0BggMsZ8a
-	96bz1rwg==;
+	bh=vhD9zqcQ9I2xlJwWYwXWk6MJvw5eWbXdZkn7PypG6JM=; b=Qn2EM2hE0DULE2YXO4vgcYFo1P
+	IYQRBXfu5Zo3umDl2NdDTuLwTNWFabPCd3j5t1h91xjDlCS5pJ0CmOxv67hbFfb5drKJyaB6qOemN
+	ScYg5FHhGeIb/KyK+/bHLpYntOkeARbWkWixTpy5vcG3Zwx9GxIEl1eDhy7dyrJV54u8LZb4b9fIJ
+	LW/Eg949YM/nytwZEn4lu4Tq2+cVwunnQKuw44D6sWwCZBJHhZ2ZYRXDeStPvLqP5cMO0d6zkx9Pj
+	UoAiRvGnAmaxOLMwiAtJMlsB8Dhv3TTgUzDFAuSIHVBj1HgPAzAy8kjOgFhugc+7uTWXqDy8JQysF
+	U/PL5A9g==;
 Received: from [2001:8b0:10b:1::425] (helo=i7.infradead.org)
 	by desiato.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xRvyU-0000000BeOZ-1731;
+	id 1xRvyU-0000000BeOb-16OL;
 	Fri, 13 Nov 2026 18:26:30 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.99.5 #2 (Red Hat Linux))
-	id 1xRvyR-00000000LYB-2VCU;
+	id 1xRvyR-00000000LYR-38ur;
 	Fri, 13 Nov 2026 18:26:07 +0000
 From: David Woodhouse <dwmw2@infradead.org>
 To: =?UTF-8?q?J=C3=B6rg=20R=C3=B6del?= <joro@8bytes.org>
@@ -74,9 +74,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	Mushahid Hussain <hmushi@amazon.co.uk>,
 	Sriram Nambakam <snambakam@linux.microsoft.com>,
 	David Woodhouse <dwmw@amazon.co.uk>
-Subject: [RFC PATCH 06/13] KVM: planes: Fan out per-plane requests to twin vCPUs
-Date: Fri, 13 Nov 2026 11:26:00 -0700
-Message-ID: <20261113182607.82813-7-dwmw2@infradead.org>
+Subject: [RFC PATCH 10/13] KVM: planes: Let plane twins share XCR0
+Date: Fri, 13 Nov 2026 11:26:04 -0700
+Message-ID: <20261113182607.82813-11-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20261113182607.82813-1-dwmw2@infradead.org>
 References: <20260608144252.351443-1-joro@8bytes.org>
@@ -96,157 +96,167 @@ X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-A request raised on one plane's vCPU for a VM-wide reason (TLB flush
-after a host-side zap, APIC page reload, obsolete-roots release) is
-consumed by whichever twin runs first, so the other planes keep stale
-translations. The plane-1 twin of a Windows VSM guest then runs on a
-zapped root and the guest bugchecks.
+XCR0/XFEM is shared between VTLs (TLFS 15.4). The planes series keeps
+arch.xcr0 per vCPU, so an XSETBV in one VTL is invisible in the other,
+and VTL1 reads a stale XFEM: a feature VTL0 enabled (AVX, for the
+Windows secure kernel) is not enabled in VTL1's XCR0. The register
+contents themselves are a separate matter, carried by the code that
+switches VTLs.
 
-Mark those three requests per-plane and make kvm_make_vcpu_request()
-replicate any KVM_REQUEST_PER_PLANE request to every twin of the
-target vCPU through vcpu_for_each_plane(). Mode and wait live in the
-shared common and the kick targets the running twin's pCPU, so the
-existing kick logic already reaches the twins.
+Add KVM_PLANE_SHARE_XCR0 to the KVM_CAP_PLANES share mask. With it set,
+propagate the validated value to every plane twin in __kvm_set_xcr(),
+covering both guest XSETBV and the KVM_SET_XCRS ioctl path, and let a
+twin created later inherit plane 0's current value. The CPUID
+dynamic-bits dirty marker lives in the shared common state, so the
+existing single set covers the twins. Update the planes section of
+api.rst and the kvm_cpuid_apply_runtime() comment, which still listed
+XCR0 among the per-plane registers.
 
-The x86 kvm_exit and powerpc kvm_check_requests tracepoints logged
-only the shared request word, so the three requests would vanish from
-them. OR in the vCPU's plane requests instead; a separate field would
-say which word a bit came from, but changes the tracepoint format for
-little gain.
+SEV-SNP VMPLs bank XCR0 per VMSA, and sharing it there would be wrong
+in two ways: sev_es_sync_from_ghcb() feeds a VMPL's GHCB XCR0 to
+__kvm_set_xcr(), so a less-privileged VMPL would overwrite its siblings'
+values (and the MSR-protocol CPUID leaf 0xD sizes would then follow the
+wrong VMPL); and a pre-launch KVM_SET_XCRS on one twin would change
+plane 0's VMSA, and with it the launch measurement. An SNP VM cannot
+set the share mask, since KVM_CAP_PLANES refuses its VM type, so its
+VMPLs keep XCR0 of their own by construction.
+
+The twins' fpstate sizing does not depend on this bit: the planes share
+CPUID, so any twin's own XSETBV can enable a dynamic xfeature whether or
+not XCR0 is shared.
 
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/powerpc/kvm/trace.h        |  3 ++-
- arch/x86/include/asm/kvm_host.h |  6 ++++--
- arch/x86/kvm/mmu/mmu.c          | 13 ++++++++-----
- arch/x86/kvm/trace.h            |  3 ++-
- include/linux/kvm_host.h        |  3 ++-
- virt/kvm/kvm_main.c             | 20 +++++++++++++++++++-
- 6 files changed, 37 insertions(+), 11 deletions(-)
+ Documentation/virt/kvm/api.rst  | 11 ++++++++---
+ arch/x86/include/uapi/asm/kvm.h |  3 +++
+ arch/x86/kvm/cpuid.c            |  4 +++-
+ arch/x86/kvm/x86.c              | 34 +++++++++++++++++++++++++++++++++
+ arch/x86/kvm/x86.h              |  2 +-
+ 5 files changed, 49 insertions(+), 5 deletions(-)
 
-diff --git a/arch/powerpc/kvm/trace.h b/arch/powerpc/kvm/trace.h
-index 35c000d918bb..2fc60a4e159f 100644
---- a/arch/powerpc/kvm/trace.h
-+++ b/arch/powerpc/kvm/trace.h
-@@ -108,7 +108,8 @@ TRACE_EVENT(kvm_check_requests,
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index a6008cb33e99..22dc3c793bc4 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -374,8 +374,9 @@ The planes of a vCPU share its CPUID model, set through the plane 0 fd with
+ KVM_SET_CPUID2.  The CPUID bits that follow a vCPU's own registers (OSXSAVE
+ from CR4.OSXSAVE, OSPKE from CR4.PKE, the APIC enable, MWAIT from
+ MISC_ENABLE, and the XSAVE area sizes from XCR0 and XSS) reflect the plane
+-that executes CPUID, since every plane has these registers of its own.
+-KVM_GET_CPUID2 returns them as plane 0 sees them.
++that executes CPUID, since every plane has these registers of its own,
++unless the VM asked the planes to share XCR0 with KVM_PLANE_SHARE_XCR0 (see
++:ref:`KVM_CAP_PLANES`).  KVM_GET_CPUID2 returns them as plane 0 sees them.
  
- 	TP_fast_assign(
- 		__entry->cpu_nr		= vcpu->vcpu_id;
--		__entry->requests	= vcpu->common->requests;
-+		__entry->requests	= READ_ONCE(vcpu->common->requests) |
-+					  READ_ONCE(vcpu->plane_requests);
- 	),
- 
- 	TP_printk("vcpu=%x requests=%x",
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index d4628ab99197..596be8ad7154 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -107,7 +107,8 @@
- 	KVM_ARCH_REQ_FLAGS(15, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_GLOBAL_CLOCK_UPDATE	KVM_ARCH_REQ(16)
- #define KVM_REQ_APIC_PAGE_RELOAD \
--	KVM_ARCH_REQ_FLAGS(17, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-+	KVM_ARCH_REQ_FLAGS(17, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP | \
-+			   KVM_REQUEST_PER_PLANE)
- #define KVM_REQ_HV_CRASH		KVM_ARCH_REQ(18)
- #define KVM_REQ_IOAPIC_EOI_EXIT		KVM_ARCH_PLANE_REQ(19)
- #define KVM_REQ_HV_RESET		KVM_ARCH_REQ(20)
-@@ -125,7 +126,8 @@
- #define KVM_REQ_UPDATE_CPU_DIRTY_LOGGING \
- 	KVM_ARCH_REQ_FLAGS(30, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_MMU_FREE_OBSOLETE_ROOTS \
--	KVM_ARCH_REQ_FLAGS(31, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-+	KVM_ARCH_REQ_FLAGS(31, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP | \
-+			   KVM_REQUEST_PER_PLANE)
- #define KVM_REQ_HV_TLB_FLUSH \
- 	KVM_ARCH_REQ_FLAGS(32, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_VMSA_PAGE_RELOAD \
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index e8eb1e48df36..ef6df08f5a99 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6405,11 +6405,14 @@ void kvm_mmu_free_obsolete_roots(struct kvm_vcpu *vcpu)
- 	int i;
- 
- 	/*
--	 * KVM_REQ_MMU_FREE_OBSOLETE_ROOTS is tracked in the request set
--	 * shared by all of the vCPU's planes, so the plane that consumes
--	 * the request is not necessarily the plane whose root is obsolete.
--	 * Service every plane: the inactive twins cannot be running (all
--	 * planes of a vCPU share one thread), so their MMUs are stable.
-+	 * KVM_REQ_MMU_FREE_OBSOLETE_ROOTS fans out to every plane twin,
-+	 * but each twin only consumes its own copy when it next runs, and
-+	 * a plane that userspace never re-enters would pin its obsolete
-+	 * roots indefinitely.  Service every plane from whichever twin
-+	 * consumes its request first: the inactive twins cannot be
-+	 * running (all planes of a vCPU share one thread), so their MMUs
-+	 * are stable, and a twin's own later request finds nothing left
-+	 * to free.
- 	 */
- 	vcpu_for_each_plane(vcpu->common, i, v) {
- 		__kvm_mmu_free_obsolete_roots(vcpu->kvm, &v->arch.root_mmu);
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index 7038e596019a..ad901836c08a 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -409,7 +409,8 @@ TRACE_EVENT(name,							     \
- 		__entry->guest_rip	= tracing_kvm_rip_read(vcpu);		     \
- 		__entry->isa            = isa;				     \
- 		__entry->vcpu_id        = vcpu->vcpu_id;		     \
--		__entry->requests       = READ_ONCE(vcpu->common->requests); \
-+		__entry->requests       = READ_ONCE(vcpu->common->requests) | \
-+					  READ_ONCE(vcpu->plane_requests);   \
- 		kvm_x86_call(get_exit_info)(vcpu,			     \
- 					    &__entry->exit_reason,	     \
- 					    &__entry->info1,		     \
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index b30982fcd3e7..6c50c1dc5819 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -168,7 +168,8 @@ static inline bool kvm_is_error_gpa(gpa_t gpa)
-  * Architecture-independent vcpu->requests bit members
-  * Bits 3-7 are reserved for more arch-independent bits.
-  */
--#define KVM_REQ_TLB_FLUSH		(0 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-+#define KVM_REQ_TLB_FLUSH \
-+	(0 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP | KVM_REQUEST_PER_PLANE)
- #define KVM_REQ_VM_DEAD			(1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_UNBLOCK			2
- #define KVM_REQ_DIRTY_RING_SOFT_FULL	3
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 6a00654490ae..c323d067256e 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -237,9 +237,27 @@ static void kvm_make_vcpu_request(struct kvm_vcpu *vcpu, unsigned int req,
- {
- 	int cpu;
- 
--	if (likely(!(req & KVM_REQUEST_NO_ACTION)))
-+	if (likely(!(req & KVM_REQUEST_NO_ACTION))) {
- 		__kvm_make_request(req, vcpu);
- 
-+		/*
-+		 * A per-plane request raised on "the vCPU" (TLB flush after
-+		 * a host-side zap, obsolete-roots reload, ...) concerns
-+		 * every plane: fan it out to the twins, or the plane that
-+		 * runs next consumes a bit the others still need.  Mode and
-+		 * wait live in the common and the kick below targets the
-+		 * running twin's pCPU, so it covers the twins too.
-+		 */
-+		if (req & KVM_REQUEST_PER_PLANE) {
-+			struct kvm_vcpu *twin;
-+			int p;
+ 4.8 KVM_GET_DIRTY_LOG
+ ---------------------
+@@ -9347,7 +9348,11 @@ through one plane is seen by all of them.  KVM_CHECK_EXTENSION
+ (KVM_CAP_PLANES_SHARE) returns the bits KVM supports on the system fd, and
+ the bits the VM enabled on a VM fd.  Setting an unsupported bit, or a
+ non-zero args[2] or args[3], fails with -EINVAL.  Like the count, the mask
+-is set once.
++is set once.  The bits are:
 +
-+			vcpu_for_each_plane(vcpu->common, p, twin)
-+				if (twin != vcpu)
-+					__kvm_make_request(req, twin);
-+		}
++- KVM_PLANE_SHARE_XCR0: XCR0, whether written by the guest with XSETBV or
++  with KVM_SET_XCRS on any plane's vCPU fd.  A plane vCPU created later
++  starts with plane 0's value.
+ 
+ 8. Other capabilities.
+ ======================
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 00ce265391e1..edec00979acf 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -922,6 +922,9 @@ struct kvm_sev_snp_launch_finish {
+ #define KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST	_BITULL(2)
+ #define KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST	_BITULL(3)
+ 
++/* KVM_CAP_PLANES args[1]: state the planes of a vCPU share */
++#define KVM_PLANE_SHARE_XCR0				_BITULL(0)
++
+ struct kvm_hyperv_eventfd {
+ 	__u32 conn_id;
+ 	__s32 fd;
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 971ebd781c6e..aa89d1b6f6c4 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -2155,7 +2155,9 @@ get_out_of_range_cpuid_entry(struct kvm_vcpu *vcpu, u32 *fn_ptr, u32 index)
+ 
+ /*
+  * The planes share the CPUID table but not CR4, the APIC enable, MISC_ENABLE
+- * or XCR0/XSS: the bits that follow those come from the executing plane.
++ * or XSS, nor XCR0 unless userspace asked for KVM_PLANE_SHARE_XCR0, in which
++ * case __kvm_set_xcr() keeps it equal across the twins: the bits that follow
++ * those come from the executing plane.
+  */
+ static void kvm_cpuid_apply_runtime(struct kvm_vcpu *vcpu, u32 function,
+ 				    u32 index, u32 *eax, u32 *ebx, u32 *ecx,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4d70e111eeb0..ceec10d116a9 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -799,6 +799,31 @@ int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
+ 
+ 	vcpu->arch.xcr0 = xcr0;
+ 
++	/*
++	 * XCR0/XFEM is shared across VTLs (TLFS 15.4): propagate the new
++	 * value to every plane twin so the other VTLs observe it.  This
++	 * covers both guest XSETBV and the KVM_SET_XCRS ioctl path.  The
++	 * CPUID dirty marker below lives in the shared common state, so one
++	 * set covers the twins too.
++	 *
++	 * Only planes that userspace asked to share XCR0 do so.  SEV-SNP
++	 * VMPLs bank it per VMSA, and an SNP VM cannot set the share mask
++	 * (KVM_CAP_PLANES refuses its VM type), so they never fan out.
++	 *
++	 * Skip the fan-out until this vCPU is published in
++	 * common->vcpus[]: the architectural reset of a twin still being
++	 * created must not clobber a live sibling's XCR0 (the new twin
++	 * inherits the shared value instead, in kvm_arch_vcpu_create()).
++	 */
++	if (kvm_plane_shares(vcpu->kvm, KVM_PLANE_SHARE_XCR0) && vcpu->common &&
++	    vcpu->common->vcpus[vcpu->plane_level] == vcpu) {
++		struct kvm_vcpu *twin;
++		int i;
++
++		vcpu_for_each_plane(vcpu->common, i, twin)
++			twin->arch.xcr0 = xcr0;
 +	}
 +
- 	if (!(req & KVM_REQUEST_NO_WAKEUP) && kvm_vcpu_wake_up(vcpu))
- 		return;
+ 	if ((xcr0 ^ old_xcr0) & XFEATURE_MASK_EXTEND)
+ 		cpuid_set_dirty(vcpu);
+ 	return 0;
+@@ -9820,6 +9845,15 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 	kvm_vcpu_after_set_cpuid(vcpu);
+ 	kvm_set_tsc_khz(vcpu, vcpu->kvm->arch.default_tsc_khz);
+ 	kvm_vcpu_reset(vcpu, false);
++	/*
++	 * With XCR0 shared, a twin created after its plane-0 sibling has run
++	 * (Hyper-V VSM enables VTL1 at runtime) inherits the current shared
++	 * value; the architectural reset value only stands when no sibling
++	 * exists yet, or when the planes keep XCR0 of their own.
++	 */
++	if (kvm_plane_shares(vcpu->kvm, KVM_PLANE_SHARE_XCR0) &&
++	    vcpu->plane_level && vcpu->common->vcpus[0])
++		vcpu->arch.xcr0 = vcpu->common->vcpus[0]->arch.xcr0;
+ 	kvm_init_mmu(vcpu);
+ 	vcpu_put(vcpu);
+ 	return 0;
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 2f51b476dbd1..aa8abd219507 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -927,7 +927,7 @@ unsigned kvm_x86_default_max_planes(struct kvm *kvm);
+  * The per-vCPU state that userspace may ask the planes of a vCPU to share,
+  * in args[1] of KVM_ENABLE_CAP(KVM_CAP_PLANES).
+  */
+-#define KVM_PLANE_SHARE_VALID	0
++#define KVM_PLANE_SHARE_VALID	KVM_PLANE_SHARE_XCR0
  
+ static inline bool kvm_plane_shares(struct kvm *kvm, u64 state)
+ {
 -- 
 2.50.1
 
