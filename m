@@ -1,94 +1,73 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.71
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794677033;
-	b=prmjnf0UGNOMdBLWPZLpO2vYygqSV9iiqQYnWn15AblC6nSCq9HcvgPCCsP+iK6uvHnu
-	 IcH+5s/5tBvEG1S+CfbQuat2XhNktFzBIFxju7zb7332YwqBmoWsqVTgT0z3t0/lJkwu7
-	 9wmx0ahKfp7Zvf63Fy9MjZerc+yHnTR1dzZjq6Ta2nthcRscg1dRyLlwZoRObi8MZQmNK
-	 s6dRyrfjYT9FUpWv2ruTnQxnrp40h2x+rxughQeX0Vghm6jvI8wt6jctEe31nukfMB1CR
-	 wrJtqWEQMRXpo1pPe3lseoIWxbjTNvfRDfHkqG+i0w+HpGOgqMxqe1lJlwpViAlWhOw==
+	t=1794677751;
+	b=oyuxOkrKr5fMRdd+oGZ0ictKJaQeMiTGI4KFr9IKCWHMKPlnRxAVTblh9TcTcySXwqpD
+	 aSsU6wSJGpEGFf8sCFJxToUGdlgWZ21d84RWFzK0ikvKbsj6eI4wpb5sKmTOqvXXDbK4M
+	 qKmt8zmHdC+keJYK9D8uQNF4WKUXc488PMjLMqWdKd8oK8HZ2PWCQkHf8/S2PJnyx8D9r
+	 5NI6QKm8gY7JwklkuVPwTYYenrKBrFXLeEgUn6DGUDWLod7Kb/WkxkD3EiNPyifSMwRwu
+	 vI1ay+jvoKHw9Bj7vfs+iSrs7jQo8rpLy8UU+t2Np9Mx/metEdzwjtoj5zI9x76el+A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794677033;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=jCgnmtgOCdPYkEDmr+VTaAMsNukSPghc49+bvrtNoAA=;
-	b=qkp9+rFxPNRAJ8R1qRpqdjNRwTLsXHy6HG6EHTfTyvTJYLNva7FALji7FhTutY54xxXO
-	 1BtQL4YzqjI6pKqTM/sy2tUSkD2ZeQ+y23sw2uXo5T8VQqwLhlGdd6KUyBfs8mw6XwAAF
-	 vQYIwgKyF+Ev8lxc5ju4RHHugKURn5Sh0Vr8bmR2KVtvyQbjrQKSXpcA7H7Cxtog5eOip
-	 P6tyvIkEcSKvUklwpEJWZ1siRmPXs69sX8ekTTGJgxQckLW8RQiHWkAJXDHVQRj03Q+eq
-	 e9MsbOM5uW/2fsfp2X5xRIAIWKegI4k+Q1PsN81gVIO51VHPHSLY8nICTic73fzE5Kw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794677751;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Received:Date:In-Reply-To:Mime-Version:
+	 References:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=JNaJcXdU6JL88Hplnr1u9aTEynknq2tK7kpa3hgYbA8=;
+	b=xfVdMR5QDPqhBjkO65kcO4ukCr4aBuI+R0sXp+DVvUsBg/1tZnfzWKyfJmBdwKySxYGJ
+	 Cm5drwU+EA10gV3dbk8FwyzMEQXhJfaoEz7fQYltPQJL1MzAVCMw77l7aqk7+cvYgoUv9
+	 bRtWLgSTdkQw0IYFqvBla63Hseze9PypvkCSGm2kchd5Kzz9EXNEwuHNboVvKclvWIJ0A
+	 OOVRFZ8p63b0SiFOEh3kUmzRn28MC0oQFhsEmPgIkcjPtm5ezpX2++ciw43rm22Gq9sS0
+	 M3YkmlQyeMWITfu8D5WjXo+5ga/n8qdRovjYc2M/LlyUMOfB7V02991zlkPmtAg1nCQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cVH10VSU;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=fFZZ39fn;
+	arc=none smtp.remote-ip=209.85.218.71
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com [209.85.218.71])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B805B606A329;
-	Sat, 14 Nov 2026 17:23:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058C7606A338
+	for <kvmarm@lists.linux.dev>; Sat, 14 Nov 2026 17:35:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 058C7606A338
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cVH10VSU
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05CB21F000C4;
-	Sat, 14 Nov 2026 17:23:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794677033;
-	bh=jCgnmtgOCdPYkEDmr+VTaAMsNukSPghc49+bvrtNoAA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=cVH10VSU7hl5YcDZSYF7i2POZOcTnx2uLsHfvyXL6HXXY89/pdwTo84I4mtY3aUGy
-	 VGcpOEv/ycaxIsJcpg1qczl9+hr1LSfFcBDEk8WmmMimYp7bYFra3WOrXwPTIfoqhT
-	 qRHO7swK1RIOrMcqmc0e1+GmzufCKoA4ZRIe0VtWGiRPZ5vXbHsRZfKo/AAbq9RDRV
-	 AyhN4o10/D81jgESOZKmqOjpzpo7oJ2sOqpfNxp9+22RIns1l7ifNffcSjiYaGDFrQ
-	 75D18SAdBX+bI3AqEidhNDJyiSrB4lIpbX9DBK7UjnoTu4jttoHb3muNtBO+cFW/F7
-	 A7X1UiQa4EVxA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xSHTi-0000000Fpux-2LPy;
-	Sat, 14 Nov 2026 17:23:50 +0000
-Date: Sat, 14 Nov 2026 17:27:09 +0000
-Message-ID: <87ik1z8gsy.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Andreas Grapentin <gra@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@kernel.org>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Friedrich Welter <fritz@linux.ibm.com>,
-	Gautam Gala <ggala@linux.ibm.com>,
-	Hariharan Mari <hari55@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Ulrich Weigand <Ulrich.Weigand@de.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Subject: Re: [PATCH v3 01/23] KVM: arm64: Refactor idreg caching into dedicated structure
-In-Reply-To: <20261106-sysreg-v3-1-75e95980fb10@linux.ibm.com>
-References: <20261106-sysreg-v3-0-75e95980fb10@linux.ibm.com>
-	<20261106-sysreg-v3-1-75e95980fb10@linux.ibm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=fFZZ39fn
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-c50713860c0so198186666b.0
+        for <kvmarm@lists.linux.dev>; Sat, 14 Nov 2026 09:35:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1794677748; x=1795282548; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=JNaJcXdU6JL88Hplnr1u9aTEynknq2tK7kpa3hgYbA8=;
+        b=fFZZ39fn2MZTv+bfIh0wc5tSOYJYUm/RsTm+/1Nc+KtA3Fk2FMxHhNgLJr89aq//V+
+         BYR7fWq8NduYICbCxgl5H7sedT9H3mc7hamIq76spyf/9Pem0ZgmdccqJTMKUrGqBU5u
+         zCpGacw21rZybQx2BGvTMRPm3cx2BMcqwnp0glCNuDRyH/GQeBnR8ORGdfHANSW7kNtJ
+         GGvl/BvWOk3m+cJ6XI5O/rebLV2wTTD0VOmKocqecvXuocPafrtS99wx4mF778X9xm7Z
+         bESO5/aHI7XC8Dloy0O6kMfrHMMNWtPBLzVbBmX74XGEea3X6nOov0xq9F7gNrh1UKxf
+         ljcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794677748; x=1795282548;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=JNaJcXdU6JL88Hplnr1u9aTEynknq2tK7kpa3hgYbA8=;
+        b=g+0AzZSTiis872PME7zHrPzFhu2K/8anYgHSZ3pGQyhcMBCR7hc9CZCSCz1Kw34dTQ
+         PW9S1OF9FN5aNx65ZqflVRIx6H1y1biyzKlOycktbo1k8dO6yQWLf0fMqsV9/5iQEsTj
+         o2Nv2V95dXEdGLmQt6RfzaRVJZOaAqGP5BzqhTCiaOyDTR2aLoY49V3dO3pIAjqmmUhK
+         2r8/nHWha+wdoSKRjb7I7TCb+2MCdldnoASyeZ3a9Fb6tN5AZBQuAs6t/f2xj00lUuPD
+         TucCMAIRxv2sNELpGYpQrG3iFhvGWyw61EPrIXi0l4DVXj/EJ/3I5qNvXb8KfsiwK3iS
+         TrpQ==
+X-Gm-Message-State: APuU4Z8BTgDjhu4CAvjlsuFi8WycUUXhLlpQwaipLXt4w2UaFmv6AsK3
+	9qSe1FckoVC4N7NLgr6GoSYn7YGhHfuB8CXEmBruNuIweulcqSii00seWmQdMu2sulE+Kt+mKNv
+	+NF5D7U6JzIHEsdM0bQ==
+X-Received: from ejfz7.prod.google.com ([2002:a17:906:ac7:b0:c2e:3202:ef75])
+ (user=tarunsahu job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:907:868f:b0:c33:ae8b:817d with SMTP id a640c23a62f3a-c509654f9admr515384166b.46.1794677747981;
+ Sat, 14 Nov 2026 09:35:47 -0800 (PST)
+Date: Sat, 14 Nov 2026 17:35:47 +0000
+In-Reply-To: <DMRO4QXXB8H4.127C1CPT3RZ18@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -97,277 +76,135 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seiden@linux.ibm.com, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, gra@linux.ibm.com, borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, david@kernel.org, hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com, svens@linux.ibm.com, fritz@linux.ibm.com, ggala@linux.ibm.com, hari55@linux.ibm.com, brueckner@linux.ibm.com, nrb@linux.ibm.com, Ulrich.Weigand@de.ibm.com, arnd@arndb.de, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-s390@vger.kernel.org, nsg@linux.ibm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20261110050202.529473-1-tarunsahu@google.com> <20261110050202.529473-17-tarunsahu@google.com>
+ <DMRO4QXXB8H4.127C1CPT3RZ18@google.com>
+Message-ID: <9huzmrrbpb7w.fsf@tarunix.c.googlers.com>
+Subject: Re: [PATCH v4 16/19] PCI: liveupdate: Add feature header to struct pci_dev_ser
+From: tarunsahu@google.com
+To: David Matlack <dmatlack@google.com>, Pasha Tatashin <pasha.tatashin@soleen.com>, 
+	Mike Rapoport <rppt@kernel.org>, robin.murphy@arm.com, maz@kernel.org, will@kernel.org, 
+	Alexander Graf <graf@amazon.com>, seanjc@google.com, jgg@nvidia.com, loganodell@google.com, 
+	arnd@arndb.de, dwmw2@infradead.org, baolu.lu@linux.intel.com, 
+	Bjorn Helgaas <bhelgaas@google.com>, oupton@kernel.org, alex@shazbot.org, 
+	gle.com@google.com, pbonzini@redhat.com, 
+	Andrew Morton <akpm@linux-foundation.org>, kevin.tian@intel.com, joro@8bytes.org
+Cc: kvmarm@lists.linux.dev, linux-pci@vger.kernel.org, 
+	Pratyush Yadav <pratyush@kernel.org>, kexec@lists.infradead.org, kvm@vger.kernel.org, 
+	iommu@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	skhawaja@google.com, sagis@google.com, linux-arch@vger.kernel.org, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 06 Nov 2026 16:07:34 +0000,
-Steffen Eiden <seiden@linux.ibm.com> wrote:
-> 
-> Move VM-wide ID register emulation fields from struct kvm_arch into a
-> new struct kvm_vm_id_regs. The new struct is placed in a shared region.
-> Update all users to use the new structure.
-> 
-> No functional changes.
-> 
-> Co-developed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> Co-developed-by: Andreas Grapentin <gra@linux.ibm.com>
-> Signed-off-by: Andreas Grapentin <gra@linux.ibm.com>
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h  | 50 ++++++++++++++++++++------------------
->  arch/arm64/kvm/config.c            | 10 ++++----
->  arch/arm64/kvm/hyp/nvhe/pkvm.c     |  7 +++---
->  arch/arm64/kvm/hyp/nvhe/sys_regs.c |  4 +--
->  arch/arm64/kvm/sys_regs.c          |  2 +-
->  5 files changed, 39 insertions(+), 34 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 97332ffcb130..7f051dad79c7 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -105,6 +105,25 @@ struct vcpu_reset_state {
->  	bool		reset;
->  };
->  
-> +struct kvm_vm_id_regs {
-> +	/*
-> +	 * Emulated CPU ID registers per VM
-> +	 * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved in it
-> +	 * is (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8.
-> +	 *
-> +	 * These emulated idregs are VM-wide, but accessed from the context of a vCPU.
-> +	 * Atomic access to multiple idregs are guarded by kvm_arch.config_lock.
-> +	 */
-> +#define IDREG_IDX(id)		(((sys_reg_CRm(id) - 1) << 3) | sys_reg_Op2(id))
-> +#define KVM_ARM_ID_REG_NUM	(IDREG_IDX(sys_reg(3, 0, 0, 7, 7)) + 1)
-> +	u64 ftr_reg[KVM_ARM_ID_REG_NUM];
+"David Matlack" <dmatlack@google.com> writes:
 
-I'm OK with changing the name of the array, but then you need to be
-consistent and change the name of the indexing macros throughout the
-code. This should be a preliminary change.
-
-> +
-> +	u64 midr_el1;
-> +	u64 revidr_el1;
-> +	u64 aidr_el1;
-> +	u64 ctr_el0;
-> +};
-> +
->  #endif /* ARM64_S390_COMMON == 1 */
->  
->  #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
-> @@ -478,22 +497,7 @@ struct kvm_arch {
->  	struct kvm_smccc_features smccc_feat;
->  	struct maple_tree smccc_filter;
->  
-> -	/*
-> -	 * Emulated CPU ID registers per VM
-> -	 * (Op0, Op1, CRn, CRm, Op2) of the ID registers to be saved in it
-> -	 * is (3, 0, 0, crm, op2), where 1<=crm<8, 0<=op2<8.
-> -	 *
-> -	 * These emulated idregs are VM-wide, but accessed from the context of a vCPU.
-> -	 * Atomic access to multiple idregs are guarded by kvm_arch.config_lock.
-> -	 */
-> -#define IDREG_IDX(id)		(((sys_reg_CRm(id) - 1) << 3) | sys_reg_Op2(id))
-> -#define KVM_ARM_ID_REG_NUM	(IDREG_IDX(sys_reg(3, 0, 0, 7, 7)) + 1)
-> -	u64 id_regs[KVM_ARM_ID_REG_NUM];
-> -
-> -	u64 midr_el1;
-> -	u64 revidr_el1;
-> -	u64 aidr_el1;
-> -	u64 ctr_el0;
-> +	struct kvm_vm_id_regs id_regs;
->  
->  	/* Masks for VNCR-backed and general EL2 sysregs */
->  	struct kvm_sysreg_masks	*sysreg_masks;
-> @@ -1634,19 +1638,19 @@ void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
->  bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
->  bool kvm_pkvm_vcpu_is_powered_off(struct kvm_vcpu *vcpu);
->  
-> -static inline u64 *__vm_id_reg(struct kvm_arch *ka, u32 reg)
-> +static inline u64 *__vm_id_reg(struct kvm_vm_id_regs *id_regs, u32 reg)
->  {
->  	switch (reg) {
->  	case sys_reg(3, 0, 0, 1, 0) ... sys_reg(3, 0, 0, 7, 7):
-> -		return &ka->id_regs[IDREG_IDX(reg)];
-> +		return &id_regs->ftr_reg[IDREG_IDX(reg)];
->  	case SYS_CTR_EL0:
-> -		return &ka->ctr_el0;
-> +		return &id_regs->ctr_el0;
->  	case SYS_MIDR_EL1:
-> -		return &ka->midr_el1;
-> +		return &id_regs->midr_el1;
->  	case SYS_REVIDR_EL1:
-> -		return &ka->revidr_el1;
-> +		return &id_regs->revidr_el1;
->  	case SYS_AIDR_EL1:
-> -		return &ka->aidr_el1;
-> +		return &id_regs->aidr_el1;
->  	default:
->  		WARN_ON_ONCE(1);
->  		return NULL;
-> @@ -1654,7 +1658,7 @@ static inline u64 *__vm_id_reg(struct kvm_arch *ka, u32 reg)
->  }
->  
->  #define kvm_read_vm_id_reg(kvm, reg)					\
-> -	({ u64 __val = *__vm_id_reg(&(kvm)->arch, reg); __val; })
-> +	({ u64 __val = *__vm_id_reg(&(kvm)->arch.id_regs, reg); __val; })
->  
->  void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
->  
-> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> index adaf26ab93b8..49bbe68c0b9e 100644
-> --- a/arch/arm64/kvm/config.c
-> +++ b/arch/arm64/kvm/config.c
-> @@ -1467,11 +1467,11 @@ static bool idreg_apply_deps(struct kvm *kvm, const struct reg_feat_map_desc *r)
->  			resx.res0 |= reg_feat_map_bits(&r->bit_feat_map[i]);
->  	}
->  
-> -	val = kvm->arch.id_regs[r->idreg_idx];
-> -	kvm->arch.id_regs[r->idreg_idx] &= ~resx.res0;
-> -	kvm->arch.id_regs[r->idreg_idx] |= resx.res1;
-> +	val = kvm->arch.id_regs.ftr_reg[r->idreg_idx];
-> +	kvm->arch.id_regs.ftr_reg[r->idreg_idx] &= ~resx.res0;
-> +	kvm->arch.id_regs.ftr_reg[r->idreg_idx] |= resx.res1;
+> On Tue Nov 10, 2026 at 5:01 AM UTC, Tarun Sahu wrote:
+>> Precede each serialized PCI device entry in the PCI Live Update KHO block
+>> set with struct kho_ser_hdr via DECLARE_KHO_SER so future per-device PCI
+>> Live Update features can append fields to struct pci_dev_ser without
+>> breaking compatibility between adjacent kernels.
 >
-> -	return val != kvm->arch.id_regs[r->idreg_idx];
-> +	return val != kvm->arch.id_regs.ftr_reg[r->idreg_idx];
->  }
->  
->  void kvm_idregs_enforce_dependencies(struct kvm *kvm)
-> @@ -1488,7 +1488,7 @@ void kvm_idregs_enforce_dependencies(struct kvm *kvm)
->  
->  static bool idreg_feat_match(struct kvm *kvm, const struct reg_bits_to_feat_map *map)
->  {
-> -	u64 regval = kvm->arch.id_regs[map->regidx];
-> +	u64 regval = kvm->arch.id_regs.ftr_reg[map->regidx];
->  	u64 regfld = (regval >> map->shift) & GENMASK(map->width - 1, 0);
->  
->  	if (map->sign) {
+> Elements of a collection should not have their own feature headers. This
+> applies to patches 10, 12, 14, 16 and 18. I raised this during the v2
+> discussion [1][2], but I don't think it was addressed.
+>
 
-All this stuff should really be cleaned up by introducing the correct
-level of abstraction. I have a local untested hack that does this:
+As per [3], I tried to add feature header to all possible instances of
+ser structs. Maybe this is the right time to audit these structs and decide
+which one will never need feature header.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index ed00637f1d7a8..65d34e2da17d2 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1639,11 +1639,16 @@ void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
- bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
- bool kvm_pkvm_vcpu_is_powered_off(struct kvm_vcpu *vcpu);
- 
-+static inline u64 *__vm_ftr_reg_by_idx(struct kvm_vm_id_regs *id_regs, u32 idx)
-+{
-+	return &id_regs->ftr_reg[idx];
-+}
-+
- static inline u64 *__vm_id_reg(struct kvm_vm_id_regs *id_regs, u32 reg)
- {
- 	switch (reg) {
- 	case sys_reg(3, 0, 0, 1, 0) ... sys_reg(3, 0, 0, 7, 7):
--		return &id_regs->ftr_reg[IDREG_IDX(reg)];
-+		return __vm_ftr_reg_by_idx(id_regs, IDREG_IDX(reg));
- 	case SYS_CTR_EL0:
- 		return &id_regs->ctr_el0;
- 	case SYS_MIDR_EL1:
-@@ -1658,8 +1663,14 @@ static inline u64 *__vm_id_reg(struct kvm_vm_id_regs *id_regs, u32 reg)
- 	}
- }
- 
--#define kvm_read_vm_id_reg(kvm, reg)					\
--	({ u64 __val = *__vm_id_reg(&(kvm)->arch.id_regs, reg); __val; })
-+#define kvm_get_vm_ftr_reg_by_idx(kvm, idx)					\
-+	({ u64 *__valp = __vm_ftr_reg_by_idx(&(kvm)->arch.id_regs, idx); __valp; })
-+
-+#define kvm_get_vm_id_reg(kvm, reg)					\
-+	({ u64 *__valp = __vm_id_reg(&(kvm)->arch.id_regs, reg); __valp; })
-+
-+#define kvm_read_vm_id_reg(kvm, reg)				\
-+	({ u64 __val = *kvm_get_vm_id_reg(kvm, reg); __val; })
- 
- void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
- 
-diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index 399693203e934..37eae14c3924a 100644
---- a/arch/arm64/kvm/config.c
-+++ b/arch/arm64/kvm/config.c
-@@ -1565,7 +1565,7 @@ static const struct reg_feat_map_desc *idreg_feat_maps[] = {
- static bool idreg_apply_deps(struct kvm *kvm, const struct reg_feat_map_desc *r)
- {
- 	struct resx resx = {};
--	u64 val;
-+	u64 val, *valp;
- 
- 	for (int i = 0; i < r->bit_feat_map_sz; i++) {
- 		if ((r->bit_feat_map[i].flags & CALL_FUNC) &&
-@@ -1573,11 +1573,12 @@ static bool idreg_apply_deps(struct kvm *kvm, const struct reg_feat_map_desc *r)
- 			resx.res0 |= reg_feat_map_bits(&r->bit_feat_map[i]);
- 	}
- 
--	val = kvm->arch.id_regs.ftr_reg[r->idreg_idx];
--	kvm->arch.id_regs.ftr_reg[r->idreg_idx] &= ~resx.res0;
--	kvm->arch.id_regs.ftr_reg[r->idreg_idx] |= resx.res1;
-+	valp = kvm_get_vm_ftr_reg_by_idx(kvm, r->idreg_idx);
-+	val = *valp;
-+	*valp &= ~resx.res0;
-+	*valp |= resx.res1;
- 
--	return val != kvm->arch.id_regs.ftr_reg[r->idreg_idx];
-+	return val != *valp;
- }
- 
- void kvm_idregs_enforce_dependencies(struct kvm *kvm)
-@@ -1594,7 +1595,7 @@ void kvm_idregs_enforce_dependencies(struct kvm *kvm)
- 
- static bool idreg_feat_match(struct kvm *kvm, const struct reg_bits_to_feat_map *map)
- {
--	u64 regval = kvm->arch.id_regs.ftr_reg[map->regidx];
-+	u64 regval = *kvm_get_vm_ftr_reg_by_idx(kvm, map->regidx);
- 	u64 regfld = (regval >> map->shift) & GENMASK(map->width - 1, 0);
- 
- 	if (map->sign) {
+[3]: https://lore.kernel.org/kexec/CA+CK2bB9xoAWP0kC+KtXeDTdwt0kWqb-PLHN=6DsA=mnRpMfxA@mail.gmail.com/
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index fc0475f0877d..41ee83290697 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -399,7 +399,7 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
->  	DECLARE_BITMAP(allowed_features, KVM_VCPU_MAX_FEATURES);
->  
->  	/* CTR_EL0 is always under host control, even for protected VMs. */
-> -	hyp_vm->kvm.arch.ctr_el0 = host_kvm->arch.ctr_el0;
-> +	hyp_vm->kvm.arch.id_regs.ctr_el0 = host_kvm->arch.id_regs.ctr_el0;
+> All entries in a KHO block set are written by the same kernel using the
+> same struct, and the block set has a single entry_size, so every entry
+> header is necessarily identical. They don't convey anything that the
+> header of the struct that owns the collection can't. In this case,
+> struct pci_ser's header can define features that describe fields in
+> struct pci_dev_ser, and the PCI core checks them once before iterating.
+> If a feature only applies to some devices, the field's value in each
+> entry says whether that device uses it.
+>
 
-This stuff is just terrible code, and needs to be cleaned up. It
-should read something like:
+pci_dev_ser can be refrained from using kho_ser_hdr but not
+memfd_luo_folio_ser.
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index ef936dee20ad3..ad100df6a8b0d 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -413,7 +413,7 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
- 	DECLARE_BITMAP(allowed_features, KVM_VCPU_MAX_FEATURES);
- 
- 	/* CTR_EL0 is always under host control, even for protected VMs. */
--	hyp_vm->kvm.arch.id_regs.ctr_el0 = host_kvm->arch.id_regs.ctr_el0;
-+	*kvm_get_vm_id_reg(kvm, SYS_CTR_EL0) = kvm_read_vm_id_reg((struct kvm *)host_kvm, SYS_CTR_EL0);
- 
- 	/*
- 	 * pKVM runs only GICv3. Anything else becomes 0, the model of a VM
+The difference lies in their API usage. one use kho block and other one
+kho_vmalloc. With kho block, we carry entry_size, so the parent
+pci_ser's kho_ser_hdr can communicate about the new field/feature in the
+pci_dev_ser and entry_size will carry correct the size of pci_dev_ser
+for iterator on deserialization. But for memfd_luo_ser, kho_vmalloc does
+not carry such entry_size. So we can solve this by adding the
+folio_ser_size into memfd_luo_ser struct.
 
-Overall, I'd like to see a first patch introducing helpers that the
-code uses everywhere possible, then another patch that introduces the
-structure, the renaming, and changes the accessors without touching
-the rest of the code.
+Without entry_size, we can only add new changes to such structs by
+adding feature in parent struct with required = 1. That way rollback or
+upgrade will fail to the kernel which does not support this required
+feature. Incase, if we have entry_size (folio_ser_size in above
+example), it will help marking such feature to be optional also and
+deserialization can correctly parse with entry_size and can ignore those
+changes if the kernel wants to.
 
-Thanks,
 
-	M.
+> Per-entry headers also cost a lot for small entries. struct pci_dev_ser
+> goes from 8 to 16 bytes, and to 24 bytes once the first feature is
+> added. Patch 18 does the same for every preserved memfd folio, which for
+> a large guest backed by 4K pages adds gigabytes of preserved metadata.
+>
 
--- 
-Jazz isn't dead. It just smells funny.
+Yeah, we are carrying 8/16 byte of extra memory where every entry share
+the same header. Which is a waste.
+
+> They also add new ways to read out of bounds. kho_ser_payload() trusts
+> nr_required/nr_optional in each entry, and nothing checks that the entry
+> header plus payload fit within entry_size. In patches 14 and 18 the walk
+> uses each entry's fhdr->size to find the next entry, so one bad header
+> throws off every entry after it.
+
+Bad feature header is not the reasoning here we should back this
+requirement. A bad feature header already imply the deserialization is
+compromised and hence accessing anything further is undefined. This
+holds true for any struct with feature header.
+
+>
+> Instead I would keep struct pci_dev_ser as a plain struct, take the
+> entry size from the KHO block header (patch 2), and in pci_flb_retrieve()
+> check once that the entry size covers the base fields, plus the fields
+> of any features set in struct pci_ser's header, e.g.:
+>
+> 	entry_size = kho_block_set_entry_size(&incoming->block_set);
+> 	if (entry_size < offsetofend(struct pci_dev_ser, refcount))
+> 		panic(...);
+>
+> That also restores the minimum entry size check that the v10 PCI series
+> had with PCI_DEV_SER_MIN_SIZE, which this version drops.
+
+offsetofend() is a good idea to replace PCI_DEV_SER_MIN_SIZE.
+
+>
+> [...]
+>
+>> -	kho_block_set_init(&incoming->block_set, sizeof(struct pci_dev_ser));
+>> +	kho_block_set_init(&incoming->block_set, kho_ser_size(pci_dev_ser));
+>
+> This size is never used. kho_block_set_restore() overwrites it with the
+> entry size recorded by the previous kernel. Passing this kernel's size
+> here is misleading: pci_flb_retrieve() (and the LUO session/file restore
+> paths) read as if they iterate incoming entries with the outgoing entry
+> size, which would be a bug.
+>
+> Incoming block sets should not take an entry size at all.
+> kho_block_set_restore() should initialize the block set itself from the
+> incoming block headers, and the incoming paths should drop the
+> kho_block_set_init() call.
+
+Yes, We can avoid this dual initialization. kho_block_set_restore can
+take care of it. Also once we will agree on having having
+kho_block_set_ser to have entry_size which will be part of only
+block[0], then we will not have to update the entry_size inside the loop
+again and again and count_per_block can also be calculated before the
+loop for block 0 and 1..N.
+
+~Tarun
+>
+> [1] https://lore.kernel.org/kexec/atl6K2Juy6Bh29lh@google.com/
+> [2] https://lore.kernel.org/kexec/at-8vkVpN2SF3XgB@google.com/
