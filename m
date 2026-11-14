@@ -1,73 +1,78 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.72
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794648885;
-	b=HFB1mMK2Bh1Zw6+jNkNF3OlZ0UhZ3uRSDhKBU3Td9wl0FnvZMkkjly6EKcrpqyha6nbP
-	 HoFgqqAlUlwGdKpAT/IwwO/mmGcdcFZ63eJs2EN0ykZLzFP0jFfva++a4DUMVeaJFOqZR
-	 EPV9NDVIv2w65Y57ROlrniCBMetaNk9KhaDtXZpIN3aweC2F+uyh27+kF99Zqym8h+s5y
-	 HCkHKd11vO4GoQLhDW9IEPQMcVEUjNiIZRHWz94i/uRlg4VZ5XzgRgwdXT+AJEQCHVWa6
-	 M1XpXv1Hw2GMAYyDvZmLMB43517I0kX9mIwmKBD2qPmYnRfXbC/a1K0H1ke3rM4/gBw==
+	t=1794670226;
+	b=rV0btiZ1r4RxKjhO4yaBprVz0lTk7ZR8+nro/q41ioGvgZ+fk4m6i9tjmHt6TqMgeQ8G
+	 B3wO1LfFMrZxWTVV+Sv5l05EwlXJ1HyBL4v8v4B/ZLAqDy2bbKAYESQv9TfpKS1zUj0bI
+	 BIXLr8daCIaX+x5d8qS/G6OEssdh00HOFtJHi/DsJj92iZI+ydMQMuM8V9XlUmqhy3xiC
+	 o4D1OZI/XN1aovKbxERNIlfQYzqstfUdlE7d+veLdP1MlKOEjDe/fadUyu+hlmgZTWVEN
+	 Pw1uZ4gwp+VHPUnWQ8LZ4wdO/+tLiU/PqXwr76Vjlw9rw5Y4m4Oc9pIGcAszWb5h0Vw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794648885;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Received:Date:In-Reply-To:Mime-Version:
-	 References:Message-ID:Subject:From:To:Cc:Content-Type;
-	bh=cYfB8ZYjzkbZTu8PkWr5VdyVYonCx+ZsO65KHqfQojE=;
-	b=sPvFU6FlIgC2UA93CxrtugwM+ah6/p1Twt8dhvxnXPLoxN2RhLgJZufeThTfPlD5K/px
-	 CqKZNcdPRer3eXZN3eRkzhUSpfzfyUaq26Xw4Hj+CfmurTWvrUST8qratpiDJT6r5j9jR
-	 RctZtZDWoGJlfxTl5d+kKqI1T34vAiSBKquxpWCXC3lw08EHegTPwV38KpxiANX4HxYfe
-	 VMCCAsGshZudVchfTGXZwIoNTLmlXKs/TPYklCMseQH89xo0EV1CP+y4Cg8wkQq24yj84
-	 NICmpj0u4btsdDcSzvlgbld/OMxpDMqXhSYBvJXWo3e0tfFKbFAneQ8tTSnWpuN9bug==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794670226;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=icGyiR0uE2382AnPCFPae3R/fkT1DCY3Eri8AeWkibw=;
+	b=Rea/7XwOpJakJhf7AwnyNqsL1WAmzG9wA0jmPQLs6rz4xkM3MNV5cwpo5VMBfvZiFAq4
+	 IhWdXApUQXqMfMZknQxFJEZczoNvKVryy/f0dUwrhmN+HInxT0X05Kwo1pBrTl2UFpmOP
+	 bvFgMmvGfD0GvGDHyNEdE9X8AREq7+c1CM8qKsIYGqhViuQNfjv7Y4XHVMseUAO0asV3u
+	 frPaEYYUnIYL/IqJkMZN54Iv4aOmOUmvd7jMuQ4Ui6or9ky0444Gdj/Bno1SkqoyY09JE
+	 fXkEVEx3vPakelOa+kwEgJ27Nrz/AJDaR//StOKJiTcQ9U+cZgH1w3YSf7OC6zRLXHw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=ZZ0Bdc7a;
-	arc=none smtp.remote-ip=209.85.218.72
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com [209.85.218.72])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cP5RmpnH;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D4D4606A336
-	for <kvmarm@lists.linux.dev>; Sat, 14 Nov 2026 09:34:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5D4D4606A336
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62AE3606A327;
+	Sat, 14 Nov 2026 15:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=ZZ0Bdc7a
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-c4d34d6082fso170335166b.0
-        for <kvmarm@lists.linux.dev>; Sat, 14 Nov 2026 01:34:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794648884; x=1795253684; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=cYfB8ZYjzkbZTu8PkWr5VdyVYonCx+ZsO65KHqfQojE=;
-        b=ZZ0Bdc7aNfX61/F0ANr5xkvk9K62pFsAenBTG8ZxCOmDIF6nKad0BHMIpSijUz9oLl
-         l/0D6Qw/tBkhh4ZlCaqOVrbG1X8YXvdBz6i8qICymbqYgJg/nyoD7ZkzBqQn+KrgB1yr
-         Ear77WzRrekOPxSlhJlnRz7LzWs6Hcupa4jP1GdBRsE1yf0ovgGCB4sl4ra7CDg4Nyu9
-         TD1J1Ugr7LowtxTYYjX4SDL1Yo37RBuSpZGWCFcAPxVvEQIAduZ/2ez2+Y0vXWkIHKhu
-         +ELr11L1AMQvsYyHswyqxrg3oP/eULC1TQVfGwV95VVEGc9k/sXDkaOcqdvHgYVBxG7k
-         ktUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794648884; x=1795253684;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=cYfB8ZYjzkbZTu8PkWr5VdyVYonCx+ZsO65KHqfQojE=;
-        b=qUZMTBUn8HSGU8FCf3g15CCi95u9EUKgShrkrzumBaSB2pAd60fYsiYZ8/mrw6Iyh4
-         UKjW9LGwX43Esk19fFhCP02SRgQGQ8Z9+dNV/PlfRKIhfB8xojNt8Jow9/tKfumGCOn9
-         BKQ4Og0YjXMArRTvTzwUz2RmLi0LXKh0YS7fMivrgQEyGa9E2kD9wFxgPqxP2c0AJXS/
-         JI8M3rS0vKqCzow8gF+ndVShYwRA+fm6NbApqjUbU5qTA3/nhVkD3AmpZQNPwEd5IFMw
-         MscyUtvjxa+gYX/DOBbjUQuzg55uAVUnHsUgwQh8yRDvvA3HGvp3ac+MTvaCYNwYQHyo
-         KXOA==
-X-Gm-Message-State: APuU4Z/WIvpWKBYrGjvA0OCpndLxuF41XVx21VDz/nBKVaaiCMmS8e1o
-	EJWP99KlzaU7qSMqCn/1i0ORJzsDw4yMvUf8GVtWb+uyfBnWdOTOaCF26sauqA7lGwieYId1wxD
-	quVOR1pvoNbSffRmt+w==
-X-Received: from ejbgl17.prod.google.com ([2002:a17:906:e0d1:b0:c50:537a:6835])
- (user=tarunsahu job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:907:7b83:b0:c41:b4e4:7958 with SMTP id a640c23a62f3a-c5095dd7931mr418395066b.0.1794648883281;
- Sat, 14 Nov 2026 01:34:43 -0800 (PST)
-Date: Sat, 14 Nov 2026 09:34:41 +0000
-In-Reply-To: <DMRP21FATCC0.ARAURXWV85JP@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cP5RmpnH
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE90D1F000C7;
+	Sat, 14 Nov 2026 15:30:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794670226;
+	bh=icGyiR0uE2382AnPCFPae3R/fkT1DCY3Eri8AeWkibw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=cP5RmpnHHgTGfDQytX/wV6G7iqKv/yFkZ9OArq3Mvs43GA+vZJy2Aa3valFNwKSTW
+	 1UbCoW0F8WmQCp6s22RO0h9ieyXbJo+6h3ls7oL4fd5PcnL7YNPopKyTQQ5AFt0d9b
+	 IZKPA3ySIW4DzEbmspecu6jd0sBUPY2vs8ZlenwMopuTOdJ/sRtbH6xQSr+F8mPh0o
+	 l7m/tcYg8uDxRLlBfcdubJ9JlwTAtJZcUp3B4Py6HHL4CMy57bKi3UQH2ydB26lsQ1
+	 XrNsjFrg/apSPVGF0xibQ2Te8IfHSga4Akb86jcwI/RfzE3dHB1lr6hdZW12lNoFgO
+	 hnu0D8Xukr+ng==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xSFhu-0000000Fo7y-3uda;
+	Sat, 14 Nov 2026 15:30:23 +0000
+Date: Sat, 14 Nov 2026 15:33:44 +0000
+Message-ID: <87jymf8m1z.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: oupton@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	joey.gouly@arm.com,
+	seiden@linux.ibm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	mark.rutland@arm.com,
+	vdonnefort@google.com,
+	ryan.roberts@arm.com,
+	qperret@google.com,
+	steven.price@arm.com,
+	tabba@google.com
+Subject: Re: [PATCH] KVM: arm64: Keep firmware Spectre-v4 mitigation on for protected guests
+In-Reply-To: <20261113081934.1715497-1-fuad.tabba@linux.dev>
+References: <20261113081934.1715497-1-fuad.tabba@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -76,70 +81,132 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-Mime-Version: 1.0
-References: <20261110050202.529473-1-tarunsahu@google.com> <20261110050202.529473-9-tarunsahu@google.com>
- <DMRP21FATCC0.ARAURXWV85JP@google.com>
-Message-ID: <9huzse13pxhq.fsf@tarunix.c.googlers.com>
-Subject: Re: [PATCH v4 08/19] kho: block: Add the feature header to blocks
-From: tarunsahu@google.com
-To: David Matlack <dmatlack@google.com>, Pasha Tatashin <pasha.tatashin@soleen.com>, 
-	Mike Rapoport <rppt@kernel.org>, robin.murphy@arm.com, maz@kernel.org, will@kernel.org, 
-	Alexander Graf <graf@amazon.com>, seanjc@google.com, jgg@nvidia.com, loganodell@google.com, 
-	arnd@arndb.de, dwmw2@infradead.org, baolu.lu@linux.intel.com, 
-	Bjorn Helgaas <bhelgaas@google.com>, oupton@kernel.org, alex@shazbot.org, 
-	gle.com@google.com, pbonzini@redhat.com, 
-	Andrew Morton <akpm@linux-foundation.org>, kevin.tian@intel.com, joro@8bytes.org
-Cc: kvmarm@lists.linux.dev, linux-pci@vger.kernel.org, 
-	Pratyush Yadav <pratyush@kernel.org>, kexec@lists.infradead.org, kvm@vger.kernel.org, 
-	iommu@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	skhawaja@google.com, sagis@google.com, linux-arch@vger.kernel.org, 
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, vdonnefort@google.com, ryan.roberts@arm.com, qperret@google.com, steven.price@arm.com, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-"David Matlack" <dmatlack@google.com> writes:
+On Fri, 13 Nov 2026 08:19:34 +0000,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
+> 
+> EL2 handles a protected guest's ARM_SMCCC_ARCH_WORKAROUND_2 discovery
+> query from the host's Spectre-v4 state at init. If the system is
+> mitigated and the guest doesn't have SSBS, it returns NOT_REQUIRED,
+> which means that firmware mitigation is permanently enabled. However,
+> the host can disable the mitigation before running a protected vCPU,
+> with an ARM_SMCCC_ARCH_WORKAROUND_2 call that EL2 forwards to the
+> firmware.
+> 
+> The host makes that call for its own userspace, so keep forwarding it,
+> without hints so that the firmware decodes it as EL2 does. Track it per
+> CPU, and on a mitigated system enable the mitigation again before
+> running a protected vCPU on a CPU where the host has disabled it.
+> Firmware enables it when a CPU powers up, so the tracked state isn't
+> reset on CPU_ON or resume.
+> 
+> Fixes: fe40ff87ead5c ("KVM: arm64: Implement HVC handling for protected guests at EL2")
+> Reported-by: Ryan Roberts <ryan.roberts@arm.com>
+> Closes: https://lore.kernel.org/all/5fa8a1fb-4e2c-4746-8a70-a47f387ef0d6@arm.com/
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+> ---
+> 
+> Notes:
+>     Tested on QEMU with TF-A. Upstream TF-A implements the dynamic
+>     workaround only for Cortex-A76, so I patched it to advertise the
+>     workaround on the Cortex-A57 that QEMU models. With a host that
+>     disables the mitigation before running a protected vCPU, TF-A gets the
+>     call to enable it again from EL2 with this patch, and doesn't without
+>     it. TF-A's handler for the call does nothing there and QEMU doesn't
+>     model the mitigation, so this tests the calls and not their effect.
+>     
+>     Calling the firmware before every protected vCPU run would do without
+>     the tracking, at the cost of an SMC per run.
+>     
+>     Based on Linux 7.4-rc2 (7475ea8b58616).
+> 
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 179d7c8277b88..081a8780fa3b7 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -21,6 +21,7 @@
+>  #include <asm/kvm_mmu.h>
+>  
+>  #include <nvhe/alloc.h>
+> +#include <nvhe/arm-smccc.h>
+>  #include <nvhe/ffa.h>
+>  #include <nvhe/mem_protect.h>
+>  #include <nvhe/mm.h>
+> @@ -30,6 +31,8 @@
+>  
+>  DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+>  
+> +static DEFINE_PER_CPU(bool, host_ssbd_disabled);
+> +
 
-> On Tue Nov 10, 2026 at 5:01 AM UTC, Tarun Sahu wrote:
->> Precede struct kho_block_header_ser with struct kho_ser_hdr using
->> DECLARE_KHO_SER. Each block in a block set starts with struct
->> kho_ser_hdr followed by struct kho_block_header_ser. Serialized entries
->> start immediately after the header payload at offset fhdr->size.
->
-> This adds a feature header to every block in the set, but the layout it
-> describes is a property of the whole set: all blocks are written by the
-> same kernel with the same header.
->
-> Blocks are only ever added and removed at the tail, so the head block
-> is stable for the lifetime of the set. I'd put a single set-wide
-> header in the first block only, e.g. a struct kho_block_set_ser with
-> its own feature header, and keep the per-block header to next and
-> count.
->
-> entry_size (added in patch 2) is another set-wide property that belongs
-> there. All blocks in a set have the same entry size, so recording it in
-> every block is redundant, and restore has to check that the copies
-> agree.
->
+Why do we need yet another set of per-CPU booleans to track the host
+state that is supposed to be stored in kvm_host_data? We already have
+a metric bazillion of flags for any odd state tracking, and I really
+can't see why this should be an exception.
 
-Yes, adding a ser_hdr to each block_header is unnecessary and also cause
-8 bytes to get added to every block. This can be solved like you said by
-adding it only to the first block. But this will make number of entries
-in block[0] to be less than blocks 1..N. I am not sure if that is
-acceptable but if it can be then we can avoid adding ser_hdr to each
-block. Same for entry_size which can be moved to the first block only
-like you suggested part of struct kho_block_set_ser.
+>  /*
+>   * Define a hypercall handler: handle_<name> unmarshals the arguments from
+>   * the host context and hands them, correctly typed, to the body that
+> @@ -940,6 +943,17 @@ DEFINE_KVM_HOST_HCALL(int, __kvm_vcpu_run, struct kvm_vcpu __kern *, vcpu)
+>  			return ret;
+>  		}
+>  
+> +		/*
+> +		 * Firmware Spectre-v4 mitigation can be advertised to a
+> +		 * protected guest as permanent. The host kernel runs with it
+> +		 * enabled, so nothing is restored on exit.
 
-> [...]
->
->>  		entry_size = ser->entry_size;
->>  		bs->entry_size = entry_size;
->> -		capacity = (KHO_BLOCK_SIZE - sizeof(*ser)) / bs->entry_size;
->> +		capacity = (KHO_BLOCK_SIZE - fhdr->size) / bs->entry_size;
->>  		bs->count_per_block = capacity;
->
-> Nothing checks that the blocks agree. Each block's entries start at its
-> own fhdr->size, and count_per_block ends up being whatever the last
-> block implies. With a single set-wide header this can't happen.
+I don't understand this. If the host is supposed to run with the
+mitigation enabled, how did we get here with the mitigation disabled?
+It's not like we can get here directly from userspace...
 
-yes.
+So either the reasoning in the comment is wrong (and therefore needs
+fixing), or this is a buggy (malicious?) host that tries to trick the
+hypervisor (and then I question whether we should even try to continue
+running the guest).
 
-~Tarun
+> +		 */
+> +		if (pkvm_hyp_vcpu_is_protected(hyp_vcpu) && spectre_v4_state == SPECTRE_MITIGATED &&
+> +		    __this_cpu_read(host_ssbd_disabled)) {
+> +			hyp_smccc_1_1_smc(ARM_SMCCC_ARCH_WORKAROUND_2, true, NULL);
+> +			__this_cpu_write(host_ssbd_disabled, false);
+> +		}
+> +
+>  		flush_hyp_vcpu(hyp_vcpu);
+>  
+>  		ret = __kvm_vcpu_run(&hyp_vcpu->vcpu);
+> @@ -1671,6 +1685,12 @@ static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
+>  		goto exit_skip_instr;
+>  	}
+>  
+> +	if (func_id == ARM_SMCCC_ARCH_WORKAROUND_2) {
+> +		/* Drop the hints, so that the firmware decodes the ID as EL2 did. */
+> +		cpu_reg(host_ctxt, 0) = func_id;
+> +		__this_cpu_write(host_ssbd_disabled, !lower_32_bits(cpu_reg(host_ctxt, 1)));
+> +	}
+> +
+
+This should be pushed into default_host_smc_handler() rather than left
+dangling here (it is pretty obvious that it has nothing to do with
+PSCI or FFA).
+
+>  	handled = kvm_host_psci_handler(host_ctxt, func_id);
+>  	if (!handled)
+>  		handled = kvm_host_ffa_handler(host_ctxt, func_id);
+> 
+
+Thanks,
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
