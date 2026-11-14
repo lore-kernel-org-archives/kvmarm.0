@@ -1,120 +1,73 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.193.16
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794608881;
-	b=c53kbeVljb6OSMWeXRHErr+PMulMghasdO5HhpeKzxQ9GHgX2F6QvvOpxZFgYxl7ZlSA
-	 zc3mgnpZ9rDVNjAGlgVXOSugoGwVbrEks1dWG1246EEQwseglbmxwiOdpgk0yadg4Nh9y
-	 9cjLY/Frs1P1VWjGDXvidcqRDplq0zAhCDI0FLiMwLpcOpKO3Ssmmsh/T9vtRnLiJB7i1
-	 /n5+Oi3DrqdUbL06jpQ1hrgQi20Mj0PY5E8MvX/Cwq7OmVxgzavOdmkwIJ71tuQ93Aa8G
-	 d6FAjs91UdiVeCgs7+38Oshy4pV2Jgj3LBKDEXMRllL/t1L3HjfT/FaiZUIIOIdmEhA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794608881;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:
-	 X-MS-Exchange-Authentication-Results:Received-SPF:Received:Received:
-	 Received:Received:Date:From:To:CC:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
-	 X-NV-OnPremToCloud:X-EOPAttributedMessage:X-MS-PublicTrafficType:
-	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
-	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
-	 X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-Id:
-	 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped:X-OriginatorOrg;
-	bh=rwIedolhmVBWAJLaTlhsxuSZ2r+MC+t25ryrT44emfc=;
-	b=HpEexJR//5TOhpUNPcYppeLp9UlZ2b+tSkpCXv3DZJwWSOPmfRwKU0AByBPLDxswvAEJ
-	 bNh1MZ6Y8806asb0cqvygCJnw2rb3X8YKL/5YsQ+P2O8lOgzf7W+I4Q+1xgGTF16FJYgO
-	 pyj/ALFFxacg4szqlsBP/dfSRxPmu0xvw36PABSN+2qbemQzYK7lFEFajeTu9ywTRvvaP
-	 yOxQRfa25ROWy2LToGMpVw3vZYGgpVdJA4zzVpl2ZREzkluViT0/Bqbh+Hr4WGNthifyv
-	 cMfRQyTaKTA1s8FdOQrOnMOZPYm6009ZxJoILF8Veay086giP8nKavGg238hYMmnBOw==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=nvidia.com;
-	spf=fail smtp.mailfrom=nvidia.com;
-	dkim=pass header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=BFIkAYjp;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.193.16
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010016.outbound.protection.outlook.com [52.101.193.16])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.72
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794648885;
+	b=HFB1mMK2Bh1Zw6+jNkNF3OlZ0UhZ3uRSDhKBU3Td9wl0FnvZMkkjly6EKcrpqyha6nbP
+	 HoFgqqAlUlwGdKpAT/IwwO/mmGcdcFZ63eJs2EN0ykZLzFP0jFfva++a4DUMVeaJFOqZR
+	 EPV9NDVIv2w65Y57ROlrniCBMetaNk9KhaDtXZpIN3aweC2F+uyh27+kF99Zqym8h+s5y
+	 HCkHKd11vO4GoQLhDW9IEPQMcVEUjNiIZRHWz94i/uRlg4VZ5XzgRgwdXT+AJEQCHVWa6
+	 M1XpXv1Hw2GMAYyDvZmLMB43517I0kX9mIwmKBD2qPmYnRfXbC/a1K0H1ke3rM4/gBw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794648885;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Received:Date:In-Reply-To:Mime-Version:
+	 References:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=cYfB8ZYjzkbZTu8PkWr5VdyVYonCx+ZsO65KHqfQojE=;
+	b=sPvFU6FlIgC2UA93CxrtugwM+ah6/p1Twt8dhvxnXPLoxN2RhLgJZufeThTfPlD5K/px
+	 CqKZNcdPRer3eXZN3eRkzhUSpfzfyUaq26Xw4Hj+CfmurTWvrUST8qratpiDJT6r5j9jR
+	 RctZtZDWoGJlfxTl5d+kKqI1T34vAiSBKquxpWCXC3lw08EHegTPwV38KpxiANX4HxYfe
+	 VMCCAsGshZudVchfTGXZwIoNTLmlXKs/TPYklCMseQH89xo0EV1CP+y4Cg8wkQq24yj84
+	 NICmpj0u4btsdDcSzvlgbld/OMxpDMqXhSYBvJXWo3e0tfFKbFAneQ8tTSnWpuN9bug==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=ZZ0Bdc7a;
+	arc=none smtp.remote-ip=209.85.218.72
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com [209.85.218.72])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B98F606A8AB;
-	Fri, 13 Nov 2026 22:28:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2B98F606A8AB
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D4D4606A336
+	for <kvmarm@lists.linux.dev>; Sat, 14 Nov 2026 09:34:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5D4D4606A336
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=Nvidia.com header.i=@Nvidia.com header.a=rsa-sha256 header.s=selector2 header.b=BFIkAYjp
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=D78Lc5uXR+xUIFWslIjQaHHamRTANt6Z0wUqul+7sgvt3hd9MkotApGuvsiTh4B4OeJTT6r+D2M1e4Osbsky8b6L2i5/debNrws56x50vlbO1DU00npCCj95W/gt2pIXunD+oGOLCUuUurxQOetvDS5siqJLVKE+/gF+lTzcxh1mmT52FgtZg+KmCR1PZvWQd1bc1J4k7choeKf29H3v4MpO+UnRR87l0wlYCJOqxijIj1iAoQxbxGr/KxGuTYLOZ3wWbWEKfhBJOLksbq+INv+8W4CUeUFoBi+VoJ5XuvDnZL8VZH3RbgTQekLD6h9FdSKnRJX8VbihTn0Yg8Pl7Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rwIedolhmVBWAJLaTlhsxuSZ2r+MC+t25ryrT44emfc=;
- b=guoyGolE6M/Sm1lPpzvGk2iCQK1R/WXcnTSK/H8T6neVAL9QQfYjyPxtp3IZMSUn9JJM3wi0rJwr7XcofZG+hya010Zt0E4TwqU3U/t7zalCbGAIQoxmP143an0XMSuj0CaL8dRBPyE2EdSInlUdPF7gAWZkcIk6BE2wNVmhLpYM6pKhhXvbE8uoUw69P/S8NlzzmUlBGYIkzGfiOD7SOfVMSlruClnwgEyMFDSVs8cKn0TE3hHzB9QsrfXqplLjFcVlK6727tuEU/s2qNM9tbp6dRczDgEfFQn/wdM1O4CYG15rtEY3vXG8JAbi5P/QdBNA2eXe6bI8I6StBaUpLQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rwIedolhmVBWAJLaTlhsxuSZ2r+MC+t25ryrT44emfc=;
- b=BFIkAYjpghwxy8E9MBv3+MVIPuovj7LYmsqnMkC2bg0jvD0sY2JflaZxunATvAH5AdYbCkeF2D1k4NJ4xQRTL00BqCTqYdob6nSj4L+8z6Bv7z6tnhAX8RTIS+r/jKLVyRJ/RaySQvTDH8sUwy+4z83/MKmqtqGjxnQa6/a4fQabKNdk7mxZ30UpnQWnNUOLpi39C3PYzBLgRcTxswtpQrKmb2Wu4nTUsKwBE5VtKunxa7bNxahGEfXH0dgk8MgwmxlcgYgRWZxV6OsajSy/I1cP/oqdnwWm/+YAYdlR+t5fE8rSQmZF9L0A+pj/iVzOTQD7wcJVcnt0LUM1Z4PRFw==
-Received: from SJ0PR13CA0045.namprd13.prod.outlook.com (2603:10b6:a03:2c2::20)
- by LV2PR12MB5872.namprd12.prod.outlook.com (2603:10b6:408:173::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.615.8; Fri, 13 Nov
- 2026 22:26:55 +0000
-Received: from BY1PEPF0001AE19.namprd04.prod.outlook.com
- (2603:10b6:a03:2c2:cafe::9c) by SJ0PR13CA0045.outlook.office365.com
- (2603:10b6:a03:2c2::20) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.615.8 via Frontend Transport; Fri, 13
- Nov 2026 22:26:54 +0000
-X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
- is 216.228.117.160) smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BY1PEPF0001AE19.mail.protection.outlook.com (10.167.242.101) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.615.4 via Frontend Transport; Fri, 13 Nov 2026 22:26:54 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56; Fri, 13 Nov
- 2026 09:44:56 -0800
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56; Fri, 13 Nov
- 2026 09:29:14 -0800
-Received: from nvidia.com (10.127.8.14) by mail.nvidia.com (10.129.68.8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.56 via Frontend
- Transport; Fri, 13 Nov 2026 09:29:12 -0800
-Date: Fri, 13 Nov 2026 09:29:10 -0800
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: Mostafa Saleh <smostafa@google.com>
-CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>, <iommu@lists.linux.dev>, <catalin.marinas@arm.com>,
-	<will@kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
-	<joro@8bytes.org>, <jgg@ziepe.ca>, <mark.rutland@arm.com>,
-	<qperret@google.com>, <tabba@google.com>, <vdonnefort@google.com>
-Subject: Re: [PATCH v9 11/25] iommu/arm-smmu-v3-kvm: Add the kernel driver
-Message-ID: <avdI5olRpBdKeE9C@nvidia.com>
-References: <20261015200903.2735565-1-smostafa@google.com>
- <20261015200903.2735565-12-smostafa@google.com>
- <auzvygiGRTWgJXzF@nvidia.com>
- <avGk0ilyJh3obmKx@google.com>
- <avJidXM9yQOX4VBJ@nvidia.com>
- <avL016l_xASN5paR@google.com>
- <avNhekBYqiiZ9IM2@nvidia.com>
- <avW_9A48mtnK383x@google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=ZZ0Bdc7a
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-c4d34d6082fso170335166b.0
+        for <kvmarm@lists.linux.dev>; Sat, 14 Nov 2026 01:34:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1794648884; x=1795253684; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=cYfB8ZYjzkbZTu8PkWr5VdyVYonCx+ZsO65KHqfQojE=;
+        b=ZZ0Bdc7aNfX61/F0ANr5xkvk9K62pFsAenBTG8ZxCOmDIF6nKad0BHMIpSijUz9oLl
+         l/0D6Qw/tBkhh4ZlCaqOVrbG1X8YXvdBz6i8qICymbqYgJg/nyoD7ZkzBqQn+KrgB1yr
+         Ear77WzRrekOPxSlhJlnRz7LzWs6Hcupa4jP1GdBRsE1yf0ovgGCB4sl4ra7CDg4Nyu9
+         TD1J1Ugr7LowtxTYYjX4SDL1Yo37RBuSpZGWCFcAPxVvEQIAduZ/2ez2+Y0vXWkIHKhu
+         +ELr11L1AMQvsYyHswyqxrg3oP/eULC1TQVfGwV95VVEGc9k/sXDkaOcqdvHgYVBxG7k
+         ktUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794648884; x=1795253684;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=cYfB8ZYjzkbZTu8PkWr5VdyVYonCx+ZsO65KHqfQojE=;
+        b=qUZMTBUn8HSGU8FCf3g15CCi95u9EUKgShrkrzumBaSB2pAd60fYsiYZ8/mrw6Iyh4
+         UKjW9LGwX43Esk19fFhCP02SRgQGQ8Z9+dNV/PlfRKIhfB8xojNt8Jow9/tKfumGCOn9
+         BKQ4Og0YjXMArRTvTzwUz2RmLi0LXKh0YS7fMivrgQEyGa9E2kD9wFxgPqxP2c0AJXS/
+         JI8M3rS0vKqCzow8gF+ndVShYwRA+fm6NbApqjUbU5qTA3/nhVkD3AmpZQNPwEd5IFMw
+         MscyUtvjxa+gYX/DOBbjUQuzg55uAVUnHsUgwQh8yRDvvA3HGvp3ac+MTvaCYNwYQHyo
+         KXOA==
+X-Gm-Message-State: APuU4Z/WIvpWKBYrGjvA0OCpndLxuF41XVx21VDz/nBKVaaiCMmS8e1o
+	EJWP99KlzaU7qSMqCn/1i0ORJzsDw4yMvUf8GVtWb+uyfBnWdOTOaCF26sauqA7lGwieYId1wxD
+	quVOR1pvoNbSffRmt+w==
+X-Received: from ejbgl17.prod.google.com ([2002:a17:906:e0d1:b0:c50:537a:6835])
+ (user=tarunsahu job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:907:7b83:b0:c41:b4e4:7958 with SMTP id a640c23a62f3a-c5095dd7931mr418395066b.0.1794648883281;
+ Sat, 14 Nov 2026 01:34:43 -0800 (PST)
+Date: Sat, 14 Nov 2026 09:34:41 +0000
+In-Reply-To: <DMRP21FATCC0.ARAURXWV85JP@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -123,63 +76,70 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <avW_9A48mtnK383x@google.com>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BY1PEPF0001AE19:EE_|LV2PR12MB5872:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0998d419-047f-43ab-d986-08df41d53890
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
- BCL:0;ARA:13230040|36860700016|23010399003|7416014|1800799024|82310400026|376014|4143699003|11063799006|56012099006|18002099003|22082099003|261009223027099003|261028144727099003|261022075727099003|261026121527099003|261026140227099003|261021135927099003|261022105027099003|10067099003;
-X-Microsoft-Antispam-Message-Info:
- kRS3y3YnBAK0bGxdf3RkQQldEc6lzbrzJtBep0ik2nzf2TQvH5cxMi+RvzgUtEg49lqs6DtGtPmPZqXHqCgCP4FMtk5k7GhFymQQVdF1Z7E4dCLQbSWkt6vAhUw+S4ZswxoDfTVpqZpl4jLbCSqyg8fEOlvA29J+1Og70C6ofDImx46FFnkAvSrZUAwEiF84lQZEKg5A/viSBe4nJOozzMqM7PSBCz7ot/0lQGfBIzxb12dEAhhahwLM6UBwj5GzRpFl7GKjORHOB+xibwpPnWJeGkTslv0/ACBuHlD02qXKuL8U3nFXGr02eZ2Ywir1rCZj/bHAnpn8Rvm0FU5RIx3nFmDBXAPVaP4d44bL6uRX09Nh5LDO9rZL9g0EZqJ0ET2cXgSh3UobJhh8oRCN/0s1ENi6uWww2DPuRHZQBJlOdtSvyQcs0wRIgPJvmc7rMtcgz8lkwqqVAu0WsRyNIqS11Ua2i6e8lbO7gRC4ne+XCvlC++0nzIO6ser6ie0gKEkQGJlIh5YDSq8GNDIj2Fp8s0kc984Pzo6Ja5mPcYzv9F6jc7hrYm90rYj8pDOlspLT2AOTB7pX+h3UvuXLd5fEH+uaGO4yWCFvXim65sIvIPfvkcQGszFo8WO6CbiSWHc/WtFlq4YROUpihxD+kKNPc9sA+ey1T2V2/bAvfLx5/IBolnqH3ETeJGy58Lnzk+f0fn5wlNnosv59qnHPaw==
-X-Forefront-Antispam-Report:
- CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700016)(23010399003)(7416014)(1800799024)(82310400026)(376014)(4143699003)(11063799006)(56012099006)(18002099003)(22082099003)(261009223027099003)(261028144727099003)(261022075727099003)(261026121527099003)(261026140227099003)(261021135927099003)(261022105027099003)(10067099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
- s0i2F2RLk6FN4xSn7aeNLrnkDE6XpwSfKyjAVIEfoVPq3nS+1awJkL/QpHmdkckwNE7FPZszH4G9gwkcXlHJYxSfEi3EO+7ejXxcKwkdE26MKb2GU5ZMDZmMGboKssyx5cVrD8PuySfqfgXfr9hoLbtxbqalDzda2nu2tCiHXVKMmQmAmWRKc2VAKd/HvaqwnX60FOxuKvDaZ8Xqh3me/FfZBIpJuxFP/KrEg4hJgBW7KpZSNyH8WRoKpyCb8ddleOl5GHkiy/uJJQXMTAk4v42hY/jCxxCvm5Ue0coQeV7/jXVjA+z7oYUB5H2pvFN6emhvYJO2UQQthfy3k/gwMDBL/ziDcfJK2f72M8UlHTuQ4u883/Ik/4gIBbOsIadSl0OPDwnyUlKfsWEHe+zcBBo6DwzkxXhqJev1yh5n3gHjy8AMI8gQHLgsrGfLrlWt
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2026 22:26:54.2359
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0998d419-047f-43ab-d986-08df41d53890
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
- BY1PEPF0001AE19.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5872
-X-OriginatorOrg: Nvidia.com
+Mime-Version: 1.0
+References: <20261110050202.529473-1-tarunsahu@google.com> <20261110050202.529473-9-tarunsahu@google.com>
+ <DMRP21FATCC0.ARAURXWV85JP@google.com>
+Message-ID: <9huzse13pxhq.fsf@tarunix.c.googlers.com>
+Subject: Re: [PATCH v4 08/19] kho: block: Add the feature header to blocks
+From: tarunsahu@google.com
+To: David Matlack <dmatlack@google.com>, Pasha Tatashin <pasha.tatashin@soleen.com>, 
+	Mike Rapoport <rppt@kernel.org>, robin.murphy@arm.com, maz@kernel.org, will@kernel.org, 
+	Alexander Graf <graf@amazon.com>, seanjc@google.com, jgg@nvidia.com, loganodell@google.com, 
+	arnd@arndb.de, dwmw2@infradead.org, baolu.lu@linux.intel.com, 
+	Bjorn Helgaas <bhelgaas@google.com>, oupton@kernel.org, alex@shazbot.org, 
+	gle.com@google.com, pbonzini@redhat.com, 
+	Andrew Morton <akpm@linux-foundation.org>, kevin.tian@intel.com, joro@8bytes.org
+Cc: kvmarm@lists.linux.dev, linux-pci@vger.kernel.org, 
+	Pratyush Yadav <pratyush@kernel.org>, kexec@lists.infradead.org, kvm@vger.kernel.org, 
+	iommu@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	skhawaja@google.com, sagis@google.com, linux-arch@vger.kernel.org, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Nov 12, 2026 at 01:32:36PM +0000, Mostafa Saleh wrote:
-> On Tue, Nov 10, 2026 at 10:24:58AM -0800, Nicolin Chen wrote:
-> > On Tue, Nov 10, 2026 at 10:41:27AM +0000, Mostafa Saleh wrote:
-> > > In Android, in that case, pKVM clears the FW (called pvmfw) that loads
-> > > the protected VM and authenticate it so any protected VM knows the
-> > > system is not trusted. This part is not upstream yet. [1]
-> > 
-> > You might want to double check a dual-SMMU case, where one gets
-> > accepted by pkvm driver and the other fails and so bound to the
-> > main driver.
-> > 
-> > It seems the pkvm driver would still pkvm_iommu_register_driver
-> > and carry on with an untrusted SMMU. Would it also clear the FW
-> > and mark the system as not trusted?
-> > 
-> 
-> That shouldn't be possible, if one SMMU fail the whole thing will
-> and the driver should clean up after as the probe is done through:
-> 	ret = platform_driver_probe(&smmuv3_nesting_driver, smmuv3_nesting_probe);
+"David Matlack" <dmatlack@google.com> writes:
 
-Hmm, if I read __platform_driver_probe correctly:
- * __driver_attach() doesn't propagate ret from driver_probe_device()
-   via bus_for_each_dev to the caller
- * bus_for_each_dev(..., is_bound_to_driver) at the end also returns
-   true, as one SMMU is bound to the driver while the other failed
-?
+> On Tue Nov 10, 2026 at 5:01 AM UTC, Tarun Sahu wrote:
+>> Precede struct kho_block_header_ser with struct kho_ser_hdr using
+>> DECLARE_KHO_SER. Each block in a block set starts with struct
+>> kho_ser_hdr followed by struct kho_block_header_ser. Serialized entries
+>> start immediately after the header payload at offset fhdr->size.
+>
+> This adds a feature header to every block in the set, but the layout it
+> describes is a property of the whole set: all blocks are written by the
+> same kernel with the same header.
+>
+> Blocks are only ever added and removed at the tail, so the head block
+> is stable for the lifetime of the set. I'd put a single set-wide
+> header in the first block only, e.g. a struct kho_block_set_ser with
+> its own feature header, and keep the per-block header to next and
+> count.
+>
+> entry_size (added in patch 2) is another set-wide property that belongs
+> there. All blocks in a set have the same entry size, so recording it in
+> every block is redundant, and restore has to check that the copies
+> agree.
+>
 
-Nicolin
+Yes, adding a ser_hdr to each block_header is unnecessary and also cause
+8 bytes to get added to every block. This can be solved like you said by
+adding it only to the first block. But this will make number of entries
+in block[0] to be less than blocks 1..N. I am not sure if that is
+acceptable but if it can be then we can avoid adding ser_hdr to each
+block. Same for entry_size which can be moved to the first block only
+like you suggested part of struct kho_block_set_ser.
+
+> [...]
+>
+>>  		entry_size = ser->entry_size;
+>>  		bs->entry_size = entry_size;
+>> -		capacity = (KHO_BLOCK_SIZE - sizeof(*ser)) / bs->entry_size;
+>> +		capacity = (KHO_BLOCK_SIZE - fhdr->size) / bs->entry_size;
+>>  		bs->count_per_block = capacity;
+>
+> Nothing checks that the blocks agree. Each block's entries start at its
+> own fhdr->size, and count_per_block ends up being whatever the last
+> block implies. With a single set-wide header this can't happen.
+
+yes.
+
+~Tarun
