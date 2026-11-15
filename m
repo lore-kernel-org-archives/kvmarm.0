@@ -1,58 +1,73 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.70
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794701850;
-	b=eeKjpN+Vwi3qf0Op6vo8t5LbnQHcTZH511QMjzsd8vh2v+Xn1wdB41t2qDyUxebPBLp0
-	 eR0gTy1VXu79ck7rOga/VSQe0B0m6ih0yIYlmamaaMZua2W7XV5boLmjT4bWYmbgrfeH+
-	 H5GcGRBO5EcY6iSyg+4b1F/9TMTAX8VXgfl4CywQ8KlpjNZTFmZpNCH4zTuuCuqDHFqxw
-	 IroD0QkF4SfykOYk6PjHOyvqCVj2TwTHo1fxtj8nmV8CS08VYTy+8Knw0cDF7ySUZoUow
-	 gCfpecTtyLe8dZkMXLf5Ru82mIFAw0kQGSBf25fG8EmBbSesXmVwN/zgn06swM6nQYQ==
+	t=1794724654;
+	b=KT92Ylo2FwxR8DDcGNFQ2cwwR6KMy9B15y8DGDGMGa14rahfY8wcuBIQubY0lxcSQeqn
+	 Cg2OzbqGZPG1vSEiTX8C7R6dGhS/tDlc03Fs6l+u1o5HoE2QWiV7H8lN2LqgiOQQxhFIP
+	 iV8FfJeBpsrHjTbq+74ZjXB48Qw6PTtuRbHzMMXbW6ko9OA0GxEfApD7/Xd4P9doL1iF7
+	 3lpIJypn/77DqVmBvgFsMZwqRIGz5qkSB7/FCWeHzw1yr3Jm/Kwg/7Xr/IeY2UjeKGOlh
+	 MmOUNxhAEZiDsCQ195phmoUulYta1bdChX6HIMQpnbH9h79mRPz5TA8tB+UxV1rQEvg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794701850;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=kHIIHcLqTbRuwWpPuK1atPf48K3n1KHOK4sFy1WmaxY=;
-	b=GMz0+bGE3LL6kkwdwl1M+BfOV3Lgq2GIhklrVORD2xsb+7kVhwjAyqDDa98DmPrNxc/3
-	 ihNUpI2seXybP3ZvuoHiiS67uhBZxtuhZTfdkMLQUoqgDly2+8dPaZ/B3ExgYVrBoyNiR
-	 Z2xcRQpvtxAhMhzdkTdAEfpUkTyfnbPerT5ApOMwTBafOODrezu6b+PWSGEEojHV7npJi
-	 RHwdAr+B03BujJHD9TBOp+T+Ch/rYZATM1TABuKDVASYqGE6YQTiKVq6h1GBcd9SqvInq
-	 UlLK/PO/DxzmwuQ7OQI2lE8GGAMuyN8kJ9vwf8ARLYDZh8gvVAzGjmqr7bo4dR75Fhg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794724654;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Received:Date:In-Reply-To:Mime-Version:
+	 References:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=aE92BuA/q+u7mWs8kchTDkcjs1m/i8lsv1ezZ7OruqU=;
+	b=pCSyb9NZuu5PkkWRKV8aoxhDPvcilxq4h15SvgibqsMwgSX5/kYOTlbGjeGQBA8CJac5
+	 mj8WsUKKFys50WcoBcTiYJxXzspksbkPv/O4o3RVBRHXcXdGkkewxQv0IVg8dUH4DOFoY
+	 FCVe3sID9CKGRFd7m/SnhZclSXFDGGr1vsZkk8qPcJDPbBxru7TbVGWgt3DITRqLINzxW
+	 OvCY+HaE0m/gEXI3+v5EYURMJEaEubugyAI+tJoP8G9xxxT7lslKEDpG0CnGSaBiGP45b
+	 CLt81DVPRuMX2nq4FaDKYfHUd6Mq/LOyEXJhcBC9Jli2mByAvamlMZmIaOPtguDOgLg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="l/hFXcNe";
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50E16606A327
-	for <kvmarm@lists.linux.dev>; Sun, 15 Nov 2026 00:17:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 50E16606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b="lfic/lB3";
+	arc=none smtp.remote-ip=209.85.218.70
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com [209.85.218.70])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13285606A327
+	for <kvmarm@lists.linux.dev>; Sun, 15 Nov 2026 06:37:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 13285606A327
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=l/hFXcNe
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E3CD7143D;
-	Sat, 14 Nov 2026 16:17:23 -0800 (PST)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F3B413F673;
-	Sat, 14 Nov 2026 16:17:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794701846; bh=kxN6iZQ2hHfg8DYo4csM3MJfm3vVSM5qRDmT3A1+2W0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=l/hFXcNe8QEyaDd4jcOXCx55+lmgETEBj2/kKhVTD/bva2xXH7EwHo8zRK5h90eqp
-	 jJcOmEZd/XnSZJLLNtqOgJugnslkeGoAEaYuygjR++Klc0hNPsBLLrQB3BxFZ3x2YO
-	 xGITULcfZFoG+tqE/7EeWQhAcExE2i200ZhG2uig=
-Date: Sun, 15 Nov 2026 00:17:19 +0000
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Sascha Bischoff <sascha.bischoff@arm.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, 
-	lpieralisi@kernel.org, timothy.hayes@arm.com, fuad.tabba@linux.dev
-Subject: Re: [PATCH v2 11/16] irqchip/gic-v5: Enable direct injection in ITS
-Message-ID: <jjok7alo24golbl53cpyo2j7ypnm57eheoz2cimsizied6l5ru@nt2wy2klyoiq>
-References: <20261102194454.4086911-1-sascha.bischoff@arm.com>
- <20261102194454.4086911-12-sascha.bischoff@arm.com>
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=lfic/lB3
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-c505eecba6cso103602566b.1
+        for <kvmarm@lists.linux.dev>; Sat, 14 Nov 2026 22:37:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1794724652; x=1795329452; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=aE92BuA/q+u7mWs8kchTDkcjs1m/i8lsv1ezZ7OruqU=;
+        b=lfic/lB32zga7USVCjmudfQwrO/kW9r41/zrmbRUMIvViMsr6q8bwchfXWZC4lDO0v
+         +TwVWPFxZ9HdVjkLdQQvQqlWSJhFYM8PuNC4M0tTimvqosuEzEi15vfx6HkY7VUHGyr0
+         Und6fsWrdW1W30H1uicsjXh2PBNw9xnPU7b0UbHv1miRizjX+BQ+IywKc3FVHnuo8NMK
+         oaJBqibJJy2PuJUElgTteoCwKgfiFie4E3Zy9twe9jjlBzrnsqrOjXnkCHlONZfamqFC
+         sjKUZq3DOQkFv/xnjMYIR0wP1At3FpT8LXSRK3vkAcFxFAj6VEhZG587SbKz2vcPL5qi
+         jzxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794724652; x=1795329452;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=aE92BuA/q+u7mWs8kchTDkcjs1m/i8lsv1ezZ7OruqU=;
+        b=NtigEfGPzAs00jy6UUE0+MP3wzY97YgNFAJuAGe/cgBoEmtnVlrbJD5+01acSHFnRz
+         8WbcWuLhW5zxA41kFoLxNPcfXmsW52pO34/u43Aw7LRvihbbq9vnvDp+eHU2QKq36AEu
+         acgiDO6Q3iAZu+9iZz4eBIRgDuuahrGw/9DQIlDnnqBN/ToDrQmIqDMCgeniDMO1H1T6
+         F4wilmISrQX6FXp5KpCTZxW5OTGQaNILKc8wd751gHs6h0KyEBVHhTBBjjQSq/IAs3af
+         WmlTqkIGilQZDT9x2BpCEfE1rCu24TaqbTlSqV/dcMoLlJ+IVmUi95tG7VGs7QpVx8pw
+         YS9A==
+X-Gm-Message-State: APuU4Z8nDDEJNzA7rVEslv1tcSb+JK61o4nBcxlDveTsAR8CjkGOHmgR
+	Q7zxZl1j/KDCxYMpMYdi5cjTzoIC8YCyGjFjEU45Wsnu+J/sCCLW3Y0LkO537K4xPuiVVvpoXGK
+	ZlSHwxuXTkbHg3kvhbg==
+X-Received: from ejbge24.prod.google.com ([2002:a17:907:9098:b0:c46:7bd3:aa06])
+ (user=tarunsahu job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:907:a714:b0:c42:5363:38dc with SMTP id a640c23a62f3a-c509637e20cmr533164966b.25.1794724652053;
+ Sat, 14 Nov 2026 22:37:32 -0800 (PST)
+Date: Sun, 15 Nov 2026 06:37:31 +0000
+In-Reply-To: <DMROZB8DPEWD.W2BFC7JIBVZP@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -61,60 +76,78 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261102194454.4086911-12-sascha.bischoff@arm.com>
+Mime-Version: 1.0
+References: <20261110050202.529473-1-tarunsahu@google.com> <20261110050202.529473-3-tarunsahu@google.com>
+ <DMROZB8DPEWD.W2BFC7JIBVZP@google.com>
+Message-ID: <9huzjymepplg.fsf@tarunix.c.googlers.com>
+Subject: Re: [PATCH v4 02/19] kho: block: Record the entry size in the block header
+From: tarunsahu@google.com
+To: David Matlack <dmatlack@google.com>, Pasha Tatashin <pasha.tatashin@soleen.com>, 
+	Mike Rapoport <rppt@kernel.org>, robin.murphy@arm.com, maz@kernel.org, will@kernel.org, 
+	Alexander Graf <graf@amazon.com>, seanjc@google.com, jgg@nvidia.com, loganodell@google.com, 
+	arnd@arndb.de, dwmw2@infradead.org, baolu.lu@linux.intel.com, 
+	Bjorn Helgaas <bhelgaas@google.com>, oupton@kernel.org, alex@shazbot.org, 
+	gle.com@google.com, pbonzini@redhat.com, 
+	Andrew Morton <akpm@linux-foundation.org>, kevin.tian@intel.com, joro@8bytes.org
+Cc: kvmarm@lists.linux.dev, linux-pci@vger.kernel.org, 
+	Pratyush Yadav <pratyush@kernel.org>, kexec@lists.infradead.org, kvm@vger.kernel.org, 
+	iommu@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	skhawaja@google.com, sagis@google.com, linux-arch@vger.kernel.org, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Nov 02, 2026 at 07:44:49PM +0000, Sascha Bischoff wrote:
-> Allow KVM to replace a host ITTE with a virtual translation that
-> directly injects an interrupt into a guest. Add an irq_chip callback to
-> install and remove the virtual translation, and disable lazy masking
-> while the interrupt is forwarded. The KVM caller is added later.
-> 
-> The ITS writes the ITTE before invalidating its cache. If invalidation
-> times out, hardware may still use the virtual translation even though
-> setup failed. Allow disable to restore the host ITTE when the forwarded
-> flag is clear, and retain retryable state if restoration also times
-> out. Keep lazy masking disabled until the host mapping is restored.
-> 
-> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> ---
->  drivers/irqchip/irq-gic-v5-its.c   | 141 +++++++++++++++++++++++++++++
->  include/linux/irqchip/arm-gic-v5.h |   8 ++
->  2 files changed, 149 insertions(+)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v5-its.c b/drivers/irqchip/irq-gic-v5-its.c
-> index 28e39b065de0e..d91f4ea1ef440 100644
-> --- a/drivers/irqchip/irq-gic-v5-its.c
-> +++ b/drivers/irqchip/irq-gic-v5-its.c
-> @@ -61,6 +61,48 @@ static void its_writeq_relaxed(struct gicv5_its_chip_data *its_node, const u64 v
->  	writeq_relaxed(val, its_node->its_base + reg_offset);
->  }
->  
+"David Matlack" <dmatlack@google.com> writes:
 
-[...]
+> On Tue Nov 10, 2026 at 5:01 AM UTC, Tarun Sahu wrote:
+>> Add an entry_size field to struct kho_block_header_ser. On the outgoing
+>> side, record bs->entry_size into every block header during allocation.
+>> During restoration, derive the entry stride directly from the block
+>> header instead of relying on caller-supplied dimensions. The
+>> kho_block_set_init() interface remains unchanged. A zero entry size,
+>
+> Since the entry size now comes from the block headers, incoming block
+> sets should not take an entry size at all. I pointed this out on the
+> PCI patch (16/19) as well. As is, every incoming path still calls
+> kho_block_set_init() with this kernel's (outgoing) entry size, which
+> kho_block_set_restore() then silently overwrites. That makes the
+> callers (e.g. pci_flb_retrieve() and the LUO session/file restore
+> paths) read as if they iterate incoming entries with the outgoing entry
+> size. kho_block_set_restore() should initialize the block set itself
+> from the incoming block headers, and the incoming paths should drop the
+> kho_block_set_init() call.
+>
+I agree, responded to the PCI 16/19 patch.
 
-> +
->  static const struct irq_chip gicv5_its_irq_chip = {
->  	.name			= "GICv5-ITS-MSI",
->  	.irq_mask		= irq_chip_mask_parent,
+> Please also add an accessor for the entry size, e.g.
+> kho_block_set_entry_size(). Users of the block set need it to check that
+> incoming entries are large enough for the fields they read, and that
+> the fields of a feature are within the entry.
 
-We should also update gicv5_its_irq_chip.irq_mask/irq_unmask to consider
-direct injected vLPIs right?
+Sure, Will update it.
 
-Thanks,
-Wei-Lin Chang
+> [...]
+>
+>> + * Each block header also records the size of its entries. A newer kernel may
+>> + * append fields to an entry, so the kernel that writes a block and the kernel
+>> + * that reads it can use different entry sizes. The reader steps through the
+>> + * entries with the recorded size, so every entry is found, and it does not read
+>> + * beyond the recorded size of an entry.
+>
+> KHO blocks can't guarantee the last part. The iterator returns a void *
+> that the caller casts to its own struct, so it is up to the caller to
+> not read fields beyond the entry size. Please document that callers must
+> check the entry size before accessing fields that may not be present.
 
-> @@ -732,6 +870,9 @@ static const struct irq_chip gicv5_its_irq_chip = {
->  	.irq_get_irqchip_state	= irq_chip_get_parent_state,
->  	.irq_set_irqchip_state	= irq_chip_set_parent_state,
->  	.irq_compose_msi_msg	= gicv5_its_compose_msi_msg,
-> +#ifdef CONFIG_KVM
-> +	.irq_set_vcpu_affinity	= gicv5_its_set_vcpu_affinity,
-> +#endif /* CONFIG_KVM */
->  };
->  
+Yes, I meant the same thing. by having a check on entry_size reader must
+prevent itself to read beyong the provded entry_size. I update the
+correct the documentation.
 
-[...]
+Also, I realize tha, after checking the base fields using offsetofend,
+for any following new feature fields, a entry_size should also be
+compared against the readers offsetofend till this feature field for
+required fields. Incase reader does not have that field and
+kho_ser_validate passes, that means that field certainly is optional.
+
+I can add this also part of the documentation.
+
+~Tarun
