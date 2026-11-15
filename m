@@ -1,73 +1,63 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.70
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794724654;
-	b=KT92Ylo2FwxR8DDcGNFQ2cwwR6KMy9B15y8DGDGMGa14rahfY8wcuBIQubY0lxcSQeqn
-	 Cg2OzbqGZPG1vSEiTX8C7R6dGhS/tDlc03Fs6l+u1o5HoE2QWiV7H8lN2LqgiOQQxhFIP
-	 iV8FfJeBpsrHjTbq+74ZjXB48Qw6PTtuRbHzMMXbW6ko9OA0GxEfApD7/Xd4P9doL1iF7
-	 3lpIJypn/77DqVmBvgFsMZwqRIGz5qkSB7/FCWeHzw1yr3Jm/Kwg/7Xr/IeY2UjeKGOlh
-	 MmOUNxhAEZiDsCQ195phmoUulYta1bdChX6HIMQpnbH9h79mRPz5TA8tB+UxV1rQEvg==
+	t=1794729588;
+	b=EyLNwXRqscWdHYx+kNUoCdZsGS//Om4fIZXvG/0QRPQdYHG01apjVZjZlEIBrdTYperb
+	 IEZa7687XaXgkvT+J6WhpQQ3iLIpZFPk/qYuNrmAlPhrf+zkoh+YJF0ttJEsc8aDk9G2Q
+	 jbpD/vs9H5ZXB2vp6rJZa/SybNUXjYA+904FJhgxcsGIO8mmgzeFAfunSRGkfW0JHCcq7
+	 UfFbxV5IjNqlLoDWSj7a7Y324/TsHkGlIgGPS3Z50qMmmiQy7U03e4LhFH+oc31m37G3N
+	 wSP0cPSr75G9S7M9XXWxzeUMGrAKJfSIhxR0Z+jyrULFqNYxGhRW0StVM5xNXf48rTA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794724654;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Received:Date:In-Reply-To:Mime-Version:
-	 References:Message-ID:Subject:From:To:Cc:Content-Type;
-	bh=aE92BuA/q+u7mWs8kchTDkcjs1m/i8lsv1ezZ7OruqU=;
-	b=pCSyb9NZuu5PkkWRKV8aoxhDPvcilxq4h15SvgibqsMwgSX5/kYOTlbGjeGQBA8CJac5
-	 mj8WsUKKFys50WcoBcTiYJxXzspksbkPv/O4o3RVBRHXcXdGkkewxQv0IVg8dUH4DOFoY
-	 FCVe3sID9CKGRFd7m/SnhZclSXFDGGr1vsZkk8qPcJDPbBxru7TbVGWgt3DITRqLINzxW
-	 OvCY+HaE0m/gEXI3+v5EYURMJEaEubugyAI+tJoP8G9xxxT7lslKEDpG0CnGSaBiGP45b
-	 CLt81DVPRuMX2nq4FaDKYfHUd6Mq/LOyEXJhcBC9Jli2mByAvamlMZmIaOPtguDOgLg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794729588;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=1y5feySbZxYFKfGlVP6b+/eacqeZv86DnLdBtPAZn5k=;
+	b=w/VfwK1+7t7Tj2jhk/YBiV1qORHLau2skh4Rz65sk5BuXlZkKdfW02PySBg69lZKeX65
+	 JNB/ZCebXDpDBYsYOEoVn14qt7rZK9LJt9UPNwKVgjuVCLmmJZYhAobB8xygU4flpDjAu
+	 FXwKTqPlf3RdWx23UK9MrsAXYVKRmei9/CHpGhuf+JK4S0rFDiPunIPtVj3kaXCPIfXhg
+	 zUdfeUnkuj5b38Wq59IqxOFwx4ztUeRlZtGAyXcLUe2vnNF7XbwQ/F/eQuPHFSnq1vf8T
+	 sTm39lPQpmEjFpRYEuadIxT/TC9bxPCF19luuumwBUsCXXWsgctHBz1EaBcTzmIhjgw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b="lfic/lB3";
-	arc=none smtp.remote-ip=209.85.218.70
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com [209.85.218.70])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13285606A327
-	for <kvmarm@lists.linux.dev>; Sun, 15 Nov 2026 06:37:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 13285606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tarunsahu.bounces.google.com
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Kq6fvGzS;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53F94606A31A
+	for <kvmarm@lists.linux.dev>; Sun, 15 Nov 2026 07:59:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 53F94606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=lfic/lB3
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-c505eecba6cso103602566b.1
-        for <kvmarm@lists.linux.dev>; Sat, 14 Nov 2026 22:37:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794724652; x=1795329452; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=aE92BuA/q+u7mWs8kchTDkcjs1m/i8lsv1ezZ7OruqU=;
-        b=lfic/lB32zga7USVCjmudfQwrO/kW9r41/zrmbRUMIvViMsr6q8bwchfXWZC4lDO0v
-         +TwVWPFxZ9HdVjkLdQQvQqlWSJhFYM8PuNC4M0tTimvqosuEzEi15vfx6HkY7VUHGyr0
-         Und6fsWrdW1W30H1uicsjXh2PBNw9xnPU7b0UbHv1miRizjX+BQ+IywKc3FVHnuo8NMK
-         oaJBqibJJy2PuJUElgTteoCwKgfiFie4E3Zy9twe9jjlBzrnsqrOjXnkCHlONZfamqFC
-         sjKUZq3DOQkFv/xnjMYIR0wP1At3FpT8LXSRK3vkAcFxFAj6VEhZG587SbKz2vcPL5qi
-         jzxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794724652; x=1795329452;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=aE92BuA/q+u7mWs8kchTDkcjs1m/i8lsv1ezZ7OruqU=;
-        b=NtigEfGPzAs00jy6UUE0+MP3wzY97YgNFAJuAGe/cgBoEmtnVlrbJD5+01acSHFnRz
-         8WbcWuLhW5zxA41kFoLxNPcfXmsW52pO34/u43Aw7LRvihbbq9vnvDp+eHU2QKq36AEu
-         acgiDO6Q3iAZu+9iZz4eBIRgDuuahrGw/9DQIlDnnqBN/ToDrQmIqDMCgeniDMO1H1T6
-         F4wilmISrQX6FXp5KpCTZxW5OTGQaNILKc8wd751gHs6h0KyEBVHhTBBjjQSq/IAs3af
-         WmlTqkIGilQZDT9x2BpCEfE1rCu24TaqbTlSqV/dcMoLlJ+IVmUi95tG7VGs7QpVx8pw
-         YS9A==
-X-Gm-Message-State: APuU4Z8nDDEJNzA7rVEslv1tcSb+JK61o4nBcxlDveTsAR8CjkGOHmgR
-	Q7zxZl1j/KDCxYMpMYdi5cjTzoIC8YCyGjFjEU45Wsnu+J/sCCLW3Y0LkO537K4xPuiVVvpoXGK
-	ZlSHwxuXTkbHg3kvhbg==
-X-Received: from ejbge24.prod.google.com ([2002:a17:907:9098:b0:c46:7bd3:aa06])
- (user=tarunsahu job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:907:a714:b0:c42:5363:38dc with SMTP id a640c23a62f3a-c509637e20cmr533164966b.25.1794724652053;
- Sat, 14 Nov 2026 22:37:32 -0800 (PST)
-Date: Sun, 15 Nov 2026 06:37:31 +0000
-In-Reply-To: <DMROZB8DPEWD.W2BFC7JIBVZP@google.com>
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Kq6fvGzS
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3D310143D;
+	Sat, 14 Nov 2026 23:59:43 -0800 (PST)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D161A3F85F;
+	Sat, 14 Nov 2026 23:59:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1794729586; bh=RtREhx24vm0xSN0YvyO2whbcheqdh4KYyhiGt77tUTE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Kq6fvGzS8bBURKe01268mPdpM12ho4S6qynQTk8jmqiVaRhJfXajAOJIT3pqRfkUs
+	 M43cpozGBFMd398we6ec41e9aChcKPLImqq2CGG8rQJaaYx0uKUbb92OSQWOalzEdk
+	 YIY1ep1quTfxzuB6Kf87xb5/4W8/IuPmHR2p3z8E=
+Date: Sun, 15 Nov 2026 07:59:27 +0000
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Dan Carpenter <dan@cryspen.com>, Eric Auger <eric.auger@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Sascha Bischoff <Sascha.Bischoff@arm.com>, Timothy Hayes <timothy.hayes@arm.com>, 
+	Jonathan Cameron <jic23@kernel.org>, Christoffer Dall <cdall@linaro.org>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Karthik Bhargavan <karthik@pereq.eu>, =?utf-8?Q?Cl=C3=A9ment?= Blaudeau <clement@cryspen.com>
+Subject: Re: [PATCH v2] KVM: arm64: vgic: Don't truncate offsets in
+ vgic_find_mmio_region()
+Message-ID: <dreynmxfzebsybkwjor74uddje6edmth5joj3rijtezrdh5c6n@i5xwud5ix7t5>
+References: <avRLLMOiudnKoSlk@stanley.mountain>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -76,78 +66,107 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-Mime-Version: 1.0
-References: <20261110050202.529473-1-tarunsahu@google.com> <20261110050202.529473-3-tarunsahu@google.com>
- <DMROZB8DPEWD.W2BFC7JIBVZP@google.com>
-Message-ID: <9huzjymepplg.fsf@tarunix.c.googlers.com>
-Subject: Re: [PATCH v4 02/19] kho: block: Record the entry size in the block header
-From: tarunsahu@google.com
-To: David Matlack <dmatlack@google.com>, Pasha Tatashin <pasha.tatashin@soleen.com>, 
-	Mike Rapoport <rppt@kernel.org>, robin.murphy@arm.com, maz@kernel.org, will@kernel.org, 
-	Alexander Graf <graf@amazon.com>, seanjc@google.com, jgg@nvidia.com, loganodell@google.com, 
-	arnd@arndb.de, dwmw2@infradead.org, baolu.lu@linux.intel.com, 
-	Bjorn Helgaas <bhelgaas@google.com>, oupton@kernel.org, alex@shazbot.org, 
-	gle.com@google.com, pbonzini@redhat.com, 
-	Andrew Morton <akpm@linux-foundation.org>, kevin.tian@intel.com, joro@8bytes.org
-Cc: kvmarm@lists.linux.dev, linux-pci@vger.kernel.org, 
-	Pratyush Yadav <pratyush@kernel.org>, kexec@lists.infradead.org, kvm@vger.kernel.org, 
-	iommu@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	skhawaja@google.com, sagis@google.com, linux-arch@vger.kernel.org, 
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <avRLLMOiudnKoSlk@stanley.mountain>
 
-"David Matlack" <dmatlack@google.com> writes:
+On Wed, Nov 11, 2026 at 02:02:04PM +0300, Dan Carpenter wrote:
+> In vgic_its_has_attr_regs() and vgic_its_attr_regs_access() we take a
+> u64 "offset" from the user and pass it to vgic_find_mmio_region() to
+> find the correct region.  The problem is that vgic_find_mmio_region()
+> truncates the "offset" to 32 bits so we might find a region even
+> though really we shouldn't.
+> 
+> Later the untruncated offset is used to calculate "addr".
+> 
+> 	addr = its->vgic_its_base + offset;
+> 
+> For example, an offset of 0x100000084 finds the 64-bit GITS_CBASER
+> register at 0x80, and the write reaches update_64bit_reg() with an
+> offset of 4 into the register and a length of 8.  It exhibits as a
+> UBSAN warning.
+> 
+> [  183.796046] UBSAN: shift-out-of-bounds in arch/arm64/kvm/vgic/vgic-mmio-v3.c:35:10
+> [  183.796198] shift exponent 18446744073709551584 is too large for 64-bit type 'long long unsigned int'
+> 
+> The GICv5 IRS code has the same problem in vgic_v5_has_attr_regs() and
+> vgic_v5_irs_attr_regs_access().
+> 
+> Make vgic_find_mmio_region() and match_region() take the offset as a
+> u64, so an offset of 2^32 or more no longer matches any region.  The
+> other callers only pass offsets which fit in 32 bits so they are not
+> affected.
 
-> On Tue Nov 10, 2026 at 5:01 AM UTC, Tarun Sahu wrote:
->> Add an entry_size field to struct kho_block_header_ser. On the outgoing
->> side, record bs->entry_size into every block header during allocation.
->> During restoration, derive the entry stride directly from the block
->> header instead of relying on caller-supplied dimensions. The
->> kho_block_set_init() interface remains unchanged. A zero entry size,
->
-> Since the entry size now comes from the block headers, incoming block
-> sets should not take an entry size at all. I pointed this out on the
-> PCI patch (16/19) as well. As is, every incoming path still calls
-> kho_block_set_init() with this kernel's (outgoing) entry size, which
-> kho_block_set_restore() then silently overwrites. That makes the
-> callers (e.g. pci_flb_retrieve() and the LUO session/file restore
-> paths) read as if they iterate incoming entries with the outgoing entry
-> size. kho_block_set_restore() should initialize the block set itself
-> from the incoming block headers, and the incoming paths should drop the
-> kho_block_set_init() call.
->
-I agree, responded to the PCI 16/19 patch.
+Just wanted to point out that GICv5 IRS could have avoided this if the
+code used reg_attr.addr produced by vgic_v5_parse_attr():
 
-> Please also add an accessor for the entry size, e.g.
-> kho_block_set_entry_size(). Users of the block set need it to check that
-> incoming entries are large enough for the fields they read, and that
-> the fields of a feature are within the entry.
+reg_attr->addr = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
 
-Sure, Will update it.
+This is why GICv3 isn't affected, it uses the masked value.
 
-> [...]
->
->> + * Each block header also records the size of its entries. A newer kernel may
->> + * append fields to an entry, so the kernel that writes a block and the kernel
->> + * that reads it can use different entry sizes. The reader steps through the
->> + * entries with the recorded size, so every entry is found, and it does not read
->> + * beyond the recorded size of an entry.
->
-> KHO blocks can't guarantee the last part. The iterator returns a void *
-> that the caller casts to its own struct, so it is up to the caller to
-> not read fields beyond the entry size. Please document that callers must
-> check the entry size before accessing fields that may not be present.
+However this patch solves the problem in a more fundamental way, making
+using reg_attr.addr produced by vgic_v5_parse_attr() more of a cleanup.
 
-Yes, I meant the same thing. by having a check on entry_size reader must
-prevent itself to read beyong the provded entry_size. I update the
-correct the documentation.
+For the patch:
 
-Also, I realize tha, after checking the base fields using offsetofend,
-for any following new feature fields, a entry_size should also be
-compared against the readers offsetofend till this feature field for
-required fields. Incase reader does not have that field and
-kho_ser_validate passes, that means that field certainly is optional.
+Reviewed-by: Wei-Lin Chang <weilin.chang@arm.com>
 
-I can add this also part of the documentation.
+Thanks,
+Wei-Lin Chang
 
-~Tarun
+> 
+> Fortunately the effect of this bug is very minor.  The worst case is that
+> the VMM accesses an emulated register and sets something nonsensical
+> and users are already allowed to do that without the bug.
+> 
+> Fixes: 8331c23c28e8 ("KVM: arm64: vgic-its: Implement vgic_its_has_attr_regs and attr_regs_access")
+> Fixes: 71091136d145 ("KVM: arm64: gic-v5: Handle userspace accesses to IRS MMIO region")
+> Signed-off-by: Dan Carpenter <dan@cryspen.com>
+> ---
+> v2: Change vgic_find_mmio_region() to take a u64 instead of rejecting
+>     large offsets in the ITS callers, as Marc suggested.  This also
+>     fixes the GICv5 IRS code which my previous patch didn't.  Drop the
+>     Cc: stable.
+> 
+>  arch/arm64/kvm/vgic/vgic-mmio.c | 4 ++--
+>  arch/arm64/kvm/vgic/vgic-mmio.h | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
+> index fddb9da0403d..59bdec495cd7 100644
+> --- a/arch/arm64/kvm/vgic/vgic-mmio.c
+> +++ b/arch/arm64/kvm/vgic/vgic-mmio.c
+> @@ -820,7 +820,7 @@ void vgic_write_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
+>  
+>  static int match_region(const void *key, const void *elt)
+>  {
+> -	const unsigned int offset = (unsigned long)key;
+> +	const u64 offset = (unsigned long)key;
+>  	const struct vgic_register_region *region = elt;
+>  
+>  	if (offset < region->reg_offset)
+> @@ -834,7 +834,7 @@ static int match_region(const void *key, const void *elt)
+>  
+>  const struct vgic_register_region *
+>  vgic_find_mmio_region(const struct vgic_register_region *regions,
+> -		      int nr_regions, unsigned int offset)
+> +		      int nr_regions, u64 offset)
+>  {
+>  	return bsearch((void *)(uintptr_t)offset, regions, nr_regions,
+>  		       sizeof(regions[0]), match_region);
+> diff --git a/arch/arm64/kvm/vgic/vgic-mmio.h b/arch/arm64/kvm/vgic/vgic-mmio.h
+> index 38ed730d68ac..6c3c4de6883e 100644
+> --- a/arch/arm64/kvm/vgic/vgic-mmio.h
+> +++ b/arch/arm64/kvm/vgic/vgic-mmio.h
+> @@ -228,6 +228,6 @@ u64 vgic_sanitise_field(u64 reg, u64 field_mask, int field_shift,
+>  /* Find the proper register handler entry given a certain address offset */
+>  const struct vgic_register_region *
+>  vgic_find_mmio_region(const struct vgic_register_region *regions,
+> -		      int nr_regions, unsigned int offset);
+> +		      int nr_regions, u64 offset);
+>  
+>  #endif
+> -- 
+> 2.53.0
+> 
