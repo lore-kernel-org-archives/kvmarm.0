@@ -1,72 +1,75 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.71
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.160.72
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794859462;
-	b=JncrmSdonD/owbiN6RXdCSjMaWOvk8K7AmSvvCeF481D2cetNk89d7aTWYy4o3pbvntp
-	 i6EcC9+DRec3yKlwHu6ipLsQM/yfGumCzwVnLqkDu/OuVTlwJTcebGN8aaLrPKU/HY923
-	 YE5131fFkjIk+Uc8UpvgC3ZA8hncfOpIWT0RCehGcHhv1siXHsyaWSyuSuoj1aay/tAz8
-	 4P2ewCT6hwcDjeitnZPlMbVUIcT6F3UjwTHHVchMLHEFJGVaMwgWgFAuj5jn286CKYA6t
-	 Hxnn/QrapsSh9JO7+QCWKhIt1AwWovlBN2V1FoXFa+bW1j/c96u5pJfnvuxLXwtUH+w==
+	b=bopy+2sJCcRzYLq/8LFXFPNWwPOoSj4jqoR13FStZ5LBYxhuN5Kt6zIsQ1V2Ygf4aWJc
+	 6jNznK4kPkGPShqCAoQEIbduQDS34qxrYbrzT6w1e7jtVG7eCTlPLB2gCAXiW2/GTgSiK
+	 9OKO34i1vDx2WHKkoy6DQjkzvRkOlQulDwm8XhY4ZaJMqHcvAQX0NG1EZFE41rDc871Je
+	 dh1ax67oO2efjNwPI5Y2974SrJlOGZLtB2MJfrAMb1hdkfFH7TL0an2VFiw1ajjOE3Qyg
+	 Q1gwLHtUcxgmZF3PbM3oO+RWko3BGEUJqNzflfGD9fPHCcME5kg4myWlj6ByAl/+Glg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794859462;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
-	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
-	bh=9bIAYBNiz3NB6EQnZLvtp2y9CTLyvsz22fhiOVY49c0=;
-	b=1JhXJ7p2/QiXiJNC4x2yuCpPuZaan4S9XJlm1xv22MTdY68+kcF/xLOgtPBw20pADo4j
-	 SsaFpK4ucNQJaGfdeWpSSVYbVqcpMOE8nhI8/KWLYJMxBZAzRkB8Qka/38Iqr1Bw7f4lo
-	 5U0RHPnmqoTxF4SjAXQFwIkUUexafCzQVZsIz73ZXRQ/SCN79Lg90RdnxbdFBIH7GYkxP
-	 wFR1QA75bSMiY14nUn/+2aeAE7wbsWj63lDFavM3hhHA7l3Ebt1Oe5b40BfgamyUE2laU
-	 oLHV/XidqR1bTsh/+yAPBkEG4F43EvtI87yTC4SX1HyK6gUoTcA0bNlwYzceIxTPXRw==
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
+	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
+	 Content-Type;
+	bh=fLiUogQDb6C/5hkqgN4Zccv3qSnCF6DVX/+qKwo4uaw=;
+	b=E8HNiYwz0nnKQhrafWeSzToBtg6mLY4153HCPstHpeXR0ZRCWa+Qy16m7PYbvWt9SZQ+
+	 W3plKDWGVp44lOfeJ2Ch4cXiNAoQJipd3eOCwXbVkruqtQytWTpjPsoSTyRTQh7ufcR9i
+	 U6rA+iHyjeUxJ1HehTKeLdZ93GRF5enFpwRfHOttfc9XK9GkQZeWME7PS0SxrEYZ7iqs8
+	 IJFgtN9W5F9KqQo9C0Khl2/PhhmygFRuuR4y/MpZxsNFaUgpqCxCHPHFozJUcZCLXjdLy
+	 PgA+2ejoLwUcjdGIXc/KHdF7NdQ1sQepMSwj3QakqNMSeLUX6XObl8y5YAtv5IXc5tg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=hsxtMS8v;
-	arc=none smtp.remote-ip=209.85.210.71
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com [209.85.210.71])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=i+th2s8I;
+	arc=none smtp.remote-ip=209.85.160.72
+Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com [209.85.160.72])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B91C606A33A
-	for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 20:04:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0B91C606A33A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA21D606A889
+	for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 20:04:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CA21D606A889
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=hsxtMS8v
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-85a6d046af0so2077871a34.2
-        for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 12:04:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=i+th2s8I
+Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-46a5954cdfcso3719279fac.3
+        for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 12:04:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794859460; x=1795464260; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=9bIAYBNiz3NB6EQnZLvtp2y9CTLyvsz22fhiOVY49c0=;
-        b=hsxtMS8v2/fJilZKnj5sE7un4fPODGqCcEk15XGqAm1LvsMCmmRx3gYyF5RoVedOF1
-         3jr9rBe1goQeDZTVPG19EWxEnVfSyQRURmjr8zemmz7w/naI+9lsIBVKYNZ2EH7+t4n3
-         0HIKkiH9pLWE/SPqUj88KP9wp9cROTTIvPTiTptGL5ZZUWU+Biod55YqckoZrBkFgUb2
-         tSr1lDbhPoe8/bepZgxrrIhTQ64YmkLmFqXI1wDDT6/J47HHjYRkhZeptLGVl272h5Ta
-         +KVfBiGs8cKT1ztHBWNhvrsF3V2wV873NzP20fpxtcnoyBNT0ybfgNuti9ZZ2PICACps
-         hVAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794859460; x=1795464260;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=google.com; s=20260707; t=1794859461; x=1795464261; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=9bIAYBNiz3NB6EQnZLvtp2y9CTLyvsz22fhiOVY49c0=;
-        b=zOPZN3RUNMBD5s+Zy1P91LM8/Wt0KE0ZfsZi7qSeyzKWcYR4S3c2pWqEw4Yo+Z/L66
-         qVEm6lRKGaYZS506a+w8IV/CIgeawxc9KQrk0pxcXCnc3WbSjVjKW1unaZeOM5jCL06H
-         +XqC/pudvi2qCm5mhPl7S8flNAVXxariwYdmDzY1/GQgO1nLcBcKY02OCOmgcvRZ53GV
-         pJVfm/byS4QO13ih+YGRja2FqdnYCKCFsuofqRjm4rHXBn1jiDokObjPqNqXuaXOWzwg
-         Jyot7PBVvLqdk/It/SvltK3NJxWSr1MMnoJOThS4Ue9Wl8CvS6CoT4aMrh+chZ7oErZU
-         Vlhw==
-X-Forwarded-Encrypted: i=1; AL+hErGfJwV4sb6LcDHpfoOYHW28FM/kQHfkB7s26U7IELQwDYoUxGt/TLAmjRB+vin+itelJsp0lZk=@lists.linux.dev
-X-Gm-Message-State: APuU4Z+0M0MAgUUN6WeRjwLEPvvZDPZEgm1yaHIoUkgp7uuTn+hiV/fj
-	oHlEtHHK1hzP7j35EgfP3ck9bxLmquWbux2f2/IU13RkCSKuJFvenOga15Gg7Jlun70QYZMWiiE
-	5HmhRIt1jH9Tg99c0+VVB+GLjnA==
-X-Received: from iodf4.prod.google.com ([2002:a05:6602:62c4:b0:9ca:727a:80b2])
+        bh=fLiUogQDb6C/5hkqgN4Zccv3qSnCF6DVX/+qKwo4uaw=;
+        b=i+th2s8IjT1ZCLM/MBA8dH/x8cJRkk6V/ZIXkYS2hivBwRM+ncwyfhJC/kVwH9IPin
+         RlAPB9AZoORZOwQFiRUArVokMHJal8U3vjYhQ9R1l1LplPehX7rfs/kwe3KGlVNMQ/kz
+         FbUz6b9DyaS9hWfBVlIuIo6xk2ivD78XMziFBHrQ0H2NnMn1QwyoIjEjLf4T2aq/odF1
+         Dfxx1GnwKiOLRWCm9hIlgtRIVSikikK9E7YUz2xJRRGuV4BgHt58r9RYirRhLy8VpwF5
+         64v2jSfQKJPC1+coNDCFPnk/j5RKLyyeGOk3CJx6TAoE8ZDLrN2lCwaj/LLcjFno4U9o
+         l0jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794859461; x=1795464261;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=fLiUogQDb6C/5hkqgN4Zccv3qSnCF6DVX/+qKwo4uaw=;
+        b=NXbg/8lWZYS+d6e+T4HFCDUnZOSgp8VRwQbh0sa7GmfaAoEeK2r7k2Vidxc0+t53dF
+         ymFlnVf9EUoVBF/pRSDkrdy88mkp4pTlIGCSSZhg9M0ceV9UmmuBWn6OzOrJmOrZR+8I
+         blwtd7PjuX6aD83Uel8UcoeS3+YLyZyt00/pHRBKA7Ya2k4BDnXJKqQNc3WB9t3IQcKc
+         SvSC8wRcE8ahOsHN3FMnCRol35WcjjEGpXMLyAHXTk5SprW+/Ze3O5kGyUZCS2PK6fRm
+         0ydu1aVOYgoxeqmtg6ygmpmHmj/oLYGER9t/D+UfeVz9qe4QPDbwlpqRJsbNHXusL4tb
+         LNYg==
+X-Forwarded-Encrypted: i=1; AL+hErHGgrRvpGzVnvItZViRHHIeDBPwQzcD8e/kL1qW1mK93OputyvjLnrsKLv0WOXHLYARWAFwL2o=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/CFUd7iDw/EKaKW6NKSMvhCCczHFakCUT7p6Tu7zNBF2HHMSD3
+	uk8qFDk57gWYgDcWSw/0YZDP7z6aleT+rWmAKCtw+2DAHlwQ+wzBhwdPMsTmKGcf1r3PP6MQt16
+	DiJm6E4tAw+p4e/78422tdkQS1A==
+X-Received: from jacnj25-n1.prod.google.com ([2002:a05:6639:299:10b0:60b:77aa:12a3])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6808:152b:b0:4e8:721f:2824 with SMTP id 5614622812f47-56e65625626mr9335826b6e.60.1794859459512;
- Mon, 16 Nov 2026 12:04:19 -0800 (PST)
-Date: Mon, 16 Nov 2026 20:04:16 +0000
+ 2002:a05:6808:4d06:b0:572:86c8:6b4c with SMTP id 5614622812f47-57286c86d22mr6304607b6e.6.1794859460579;
+ Mon, 16 Nov 2026 12:04:20 -0800 (PST)
+Date: Mon, 16 Nov 2026 20:04:17 +0000
+In-Reply-To: <20261116200418.3535619-1-coltonlewis@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -76,9 +79,10 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 Mime-Version: 1.0
+References: <20261116200418.3535619-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.56.1.750.gf70dc682cf-goog
-Message-ID: <20261116200418.3535619-1-coltonlewis@google.com>
-Subject: [PATCH v1 0/2] KVM: arm64: Fix inverted E2H0 check for HCR_EL2.NV1
+Message-ID: <20261116200418.3535619-2-coltonlewis@google.com>
+Subject: [PATCH v1 1/2] KVM: arm64: Fix inverted E2H0 check for HCR_EL2.NV1
 From: Colton Lewis <coltonlewis@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
 Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
@@ -87,32 +91,49 @@ Cc: Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
 	linux-kernel@vger.kernel.org, Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-When commit b2a324ff01fe ("KVM: arm64: Use HCR_EL2 feature map to drive
-fixed-value bits") migrated HCR_EL2 fixed-bit masking to hcr_feat_map,
-feat_nv2_e2h0_ni() was written as !kvm_has_feat(kvm, FEAT_E2H0). Because
-ID_AA64MMFR4_EL1.E2H0 is a signed 4-bit field where IMP is 0, NI is -1,
-and NI_NV1 is -2, !kvm_has_feat(kvm, FEAT_E2H0) tests E2H0 < 0 and
-returns true for NI_NV1 (-2), leaving HCR_EL2.NV1 writable instead of
-RES0 for VHE-only nested guests (and conversely treating HCR_EL2.NV1 as
-RES0 when E2H0 is IMP).
+ID_AA64MMFR4_EL1.E2H0 is a signed 4-bit field where:
+  - 0b0000 (IMP, 0): FEAT_E2H0 is implemented.
+  - 0b1111 (NI, -1): FEAT_E2H0 is not implemented, except HCR_EL2.NV1
+    is implemented.
+  - 0b1110 (NI_NV1, -2): Neither HCR_EL2.E2H == 0 nor HCR_EL2.NV1 is
+    implemented, and HCR_EL2.NV1 is RES0.
 
-Patch 1 restores the check in feat_nv2_e2h0_ni() to
-kvm_has_feat(kvm, ID_AA64MMFR4_EL1, E2H0, NI) (E2H0 >= -1) so that
-HCR_EL2.NV1 is implemented for IMP and NI and forced to RES0 for NI_NV1.
-Patch 2 extends the arm64 hello_el2 selftest to verify that HCR_EL2.E2H
-remains RES1 and HCR_EL2.NV1 remains RES0 across both guest EL2 writes
-and userspace KVM_SET_ONE_REG writes when E2H0 is NI_NV1.
+Prior to commit b2a324ff01fe ("KVM: arm64: Use HCR_EL2 feature map to
+drive fixed-value bits"), kvm_init_nv_sysregs() marked HCR_EL2.NV1 as
+RES0 when !kvm_has_feat(kvm, ID_AA64MMFR4_EL1, E2H0, NI), i.e., when the
+signed E2H0 field is less than NI (-1), which matches NI_NV1 (-2).
 
-Colton Lewis (2):
-  KVM: arm64: Fix inverted E2H0 check for HCR_EL2.NV1
-  KVM: arm64: selftests: Verify HCR_EL2.NV1 is RES0 when E2H0 is NI_NV1
+When converting HCR_EL2 to the feature map, feat_nv2_e2h0_ni() was
+written as !kvm_has_feat(kvm, FEAT_E2H0), where FEAT_E2H0 checks
+E2H0 >= IMP (0). This inverted the condition: feat_nv2_e2h0_ni()
+evaluates to true when E2H0 < 0 (including NI_NV1), leaving HCR_EL2.NV1
+writable instead of RES0 for VHE-only nested guests where KVM advertises
+ID_AA64MMFR4_EL1.E2H0 = NI_NV1.
 
- arch/arm64/kvm/config.c                       |  3 +-
- tools/testing/selftests/kvm/arm64/hello_el2.c | 34 ++++++++++++++++---
- 2 files changed, 31 insertions(+), 6 deletions(-)
+Check kvm_has_feat(kvm, ID_AA64MMFR4_EL1, E2H0, NI) in
+feat_nv2_e2h0_ni() so that HCR_EL2.NV1 is treated as implemented only
+when E2H0 is IMP or NI, and forced to RES0 when E2H0 is NI_NV1.
 
+Fixes: b2a324ff01fe ("KVM: arm64: Use HCR_EL2 feature map to drive fixed-value bits")
+Signed-off-by: Colton Lewis <coltonlewis@google.com>
+---
+ arch/arm64/kvm/config.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-base-commit: aebb7274476403040d582c61478df8f4a7bf9cd3
+diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+index adaf26ab93b85..b4f555d39f54a 100644
+--- a/arch/arm64/kvm/config.c
++++ b/arch/arm64/kvm/config.c
+@@ -258,7 +258,8 @@ static bool feat_nv2(struct kvm *kvm)
+ 
+ static bool feat_nv2_e2h0_ni(struct kvm *kvm)
+ {
+-	return feat_nv2(kvm) && !kvm_has_feat(kvm, FEAT_E2H0);
++	return feat_nv2(kvm) &&
++	       kvm_has_feat(kvm, ID_AA64MMFR4_EL1, E2H0, NI);
+ }
+ 
+ static bool feat_rasv1p1(struct kvm *kvm)
 -- 
 2.56.1.750.gf70dc682cf-goog
 
