@@ -1,62 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794814941;
-	b=Ca9Ys1CXPv55AKOXEDRsD15f5V38Lh0q+8+BPPg2gGg34AXG6WlHQGPGOIbil2h0KOJB
-	 O0t8ukAMpcXkrAh5lfwn7tCij3xMbYMLkTOOxVGUPVuB85ABiTNU9znSyVtgXn8fXyC0i
-	 Ep+ZGYNaS4hNY9UpiJ+ekUufxY72F4rxXam/67Dn/JdyiXsPSfEcJ9XwTr2TW6CBUj7XJ
-	 F2K8ZRWYB2OwfrAN4eU8nNUCJOvLmInl8K3Unla5XvHBFS8r9jrooFXCB6S5ghZ80cfJI
-	 ESf2cQ7dxcpXLjpWagHNMQ4U9YBQf15ykCiZZ7X7F3kbPe2JVxxtXYAj7eNInF2YJsA==
+	t=1794816439;
+	b=Q6qTmHLQGgvGoJ5PqAaXS8szM0IZ/m2NnL/Rj1FHEA6MYtn4dwMx5CcUVhbTyd92DYYm
+	 ZamvsWE3FQnBuhy2gbiYzQsjyjxFBOCaI2qgpyM6oydyqzE0rbVr6LwvCheo8RyErweWM
+	 X2mcbHAqgVEVTilIbLxNFB1MGOEhppPdtZriJRfybdM1KAp1gT8EZkSAHAiN6xa9Q9E06
+	 SYZx2stPXUR5Jhwx//TwBxVaw88SZx/v7trd2/Tf5cwcNYQZG1/MX2+MrwCEKZ5UrJmW6
+	 PLNZZGcMCoLwUK6/QjQ+55uUN1q6bpNXnHURD5/tL7rD1F73rgxj9CTTCcBOApSPC4w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794814941;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=Sqeef6VWXCGPSprL2sUdbvrAz/Iy/oSXdyGiMisPWE4=;
-	b=B+NO10xniF37T28xy91fRnUQLg/0+FJkdnZQ/S7VKJ10m1+N6Jlx6yUf5LT9LXKXDg6x
-	 3QIO2rhrisFiS3SW2SYWPVBI09IwSAYvHn420icf1olHYq3gij+UR4N61TW9Iwpz1cUSe
-	 E9o9a8Yw4nddLI7ENnwrfXBVRWK1qENcjIDJAaWG7XECz/3j4ymtf3yV9yF/+iosLpNCD
-	 wz15X0NQYkejOLS7+4TuW/BfTx1l0WOlIGv3cKltOjAp17WUg6mmJNayz+PI/1vxWgfbk
-	 Y3Z3pEdqN+R3/M+jmoDp/JvHHuPbo+Jd3E5mABsvYzXX+IvmP4VGk5tI+FyMlpbwA3Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794816439;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=2gmpRxb8gQ1bNObRSr0Uai6JC9BUASRtSm25oFPH37k=;
+	b=jRYPXKFMgg1o7yCVzr/O3ydiyMmw9TGPwzJvb+PGdefznzchnUk7fmCdFx8K8XcaF+X2
+	 66TmyVcu+fc199GCe0w0+r2IEIAbjMLAsWyos4jyn4bhXDCm0SGX0jMIiaZctAIdfrNFV
+	 OCK0fVRIrf3Bf/se1OedcD1jUT6oHZT3pJijqzudsVP+zR6yS/jnUJ4cCDca5HQSP1g6J
+	 oNAQhZshbFLt0fj7Xlpnz9G9S4Jam+sq9ed4ew6gCEegK6A4ZktiG4vb9vyjPKIuROVvz
+	 2iOHqn1Uf79shIzEEKXL9TEotRqGq/rtJdE0/Q6HDbO+Hy+pgYMNqthpu1HB4CPPabQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=V+bQ2qC9;
-	arc=none smtp.remote-ip=95.215.58.188
-Received: from mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DRtA3bpX;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CAA4606A32C
-	for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 07:42:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6CAA4606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6F1606A31C;
+	Mon, 16 Nov 2026 08:07:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=V+bQ2qC9
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=4boBAffMzoVHjAgWiSv2kJlP8mtRBwtsuJLv1o8lqGk=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794814938; v=1; x=1795419738;
- b=V+bQ2qC9kaZI/An86/ujiZDKM5VZRKsxKogoGYXdmtN43zGGV+qwSzalHCfOSYoQkm0+uxoY
- 2Yf48V3kk7sGWYPvvlqAlfuvhDRBKRMcOzj3pP8r4OTNDdPslm0j0GXm4OeVxIy3l5mmZXmFsWB
- I0E2YsAvWXI8d9v3D8tVrt0I=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id cd14d68dc4d07867;
-	Mon, 16 Nov 2026 07:42:18 +0000
-X-Mizu-Trace-ID: cd14d68dc4d07867
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5be58ad9600so6407e87.0
-        for <kvmarm@lists.linux.dev>; Sun, 15 Nov 2026 23:42:13 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErEt5VlIgDTQs0iuXvUxjGS2uuUA0yo/TtThHd42udOUksX3AwTXcx+7LHAYDT6xYOuOGhsiyPk=@lists.linux.dev
-X-Gm-Message-State: APuU4Z8na5ZX3Kt5tB9zU8gSQokb3MW3eTUQlruSESEdIJ3cIxtZihPJ
-	UbW8qDiYl93qs5XQSZiZaf1LzvdiGIjdlMgD+n8WkkUEmIGk0IDYl3dpkBsqiy/l/l9i3u664nB
-	X03a2ZSPoGYmCjDVzvch7E8b3ZDIsbe4rgcgFtpUR
-X-Received: by 2002:a05:6512:1244:b0:5c1:4bd2:df42 with SMTP id
- 2adb3069b0e04-5c17e452300mr135874e87.12.1794814932262; Sun, 15 Nov 2026
- 23:42:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DRtA3bpX
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A90C1F000C4;
+	Mon, 16 Nov 2026 08:07:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794816438;
+	bh=2gmpRxb8gQ1bNObRSr0Uai6JC9BUASRtSm25oFPH37k=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=DRtA3bpX/eUT/rX2maLdKgu3dE/wvhdhrc5ezjzyJWpU61ECINB0UPCRRK9wBn44X
+	 YWMlEJJ8ER4OUiz1kpKAjJCbh0zSRvT3NBF1RgfaeGqJbGQQ7ZZ/ok0jSoTKJd3i83
+	 Bt320IYx5iALR0969RGlmdIVcCGD9bhRMz+0x3BSgRjrhDEsUmdlfRC9l8sAqZPQ9n
+	 uNw8c56ogQtJyTcMTJsKXcmSSyZq/pwKUklAt+8hph8RTsfvGQKokbCgnLkZ/jgV7w
+	 5OJqxKUU1HMwofBEfS0XW0RfCxDejuFllPUv5l5kmVBjNFIx9yYNFIYfZcBlRKQQPz
+	 x2lvrfBSGsY7g==
+Message-ID: <sashiko-outbox-216506@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 2/2] KVM: arm64: gic-v5: Don't move the vPE doorbell
+ from kvm_sched_out()
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Jia He" <justin.he@arm.com>
+Cc: kvmarm@lists.linux.dev, linux-rt-devel@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>, linux-kernel@vger.kernel.org
+In-Reply-To: <20261116071304.2037895-3-justin.he@arm.com>
+References: <20261116071304.2037895-1-justin.he@arm.com>
+ <20261116071304.2037895-3-justin.he@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 16 Nov 2026 08:07:18 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -65,90 +61,82 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-References: <20261113081934.1715497-1-fuad.tabba@linux.dev> <87jymf8m1z.wl-maz@kernel.org>
-In-Reply-To: <87jymf8m1z.wl-maz@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 16 Nov 2026 07:41:35 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTyhBd1rNqr2DV7kAdbtonEW8a+euJHMMsD-UsD9_-5S8g@mail.gmail.com>
-X-Gm-Features: Aa3M54o6cnejirjhEwUOGDdCwRplzokz4vB083Z4FAIDONp5f_S3HfgryjrtL68
-Message-ID: <CA+EHjTyhBd1rNqr2DV7kAdbtonEW8a+euJHMMsD-UsD9_-5S8g@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Keep firmware Spectre-v4 mitigation on for
- protected guests
-To: Marc Zyngier <maz@kernel.org>
-Cc: oupton@kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	mark.rutland@arm.com, vdonnefort@google.com, ryan.roberts@arm.com, 
-	qperret@google.com, steven.price@arm.com
-Content-Type: text/plain; charset="UTF-8"
 
-Hi Marc,
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue to consider:
+- [Medium] KVM: arm64: gic-v5: vgic_v5_load() in WFI disarms doorbells
+  and loses wakeups
+--
 
-On Sat, 14 Nov 2026 15:33:44 +0000, Marc Zyngier <maz@kernel.org> wrote:
-[...]
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-[...]
-> > @@ -30,6 +31,8 @@
-> >
-> >  DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
-> >
-> > +static DEFINE_PER_CPU(bool, host_ssbd_disabled);
-> > +
->
-> Why do we need yet another set of per-CPU booleans to track the host
-> state that is supposed to be stored in kvm_host_data? We already have
-> a metric bazillion of flags for any odd state tracking, and I really
-> can't see why this should be an exception.
+commit 36844cdbda4df2b177b6c013c2074287d75ff5f3
+Author: Jia He <justin.he@arm.com>
 
-I'll use a kvm_host_data flag in v2.
+KVM: arm64: gic-v5: Don't move the vPE doorbell from kvm_sched_out()
 
-[...]
-> > @@ -940,6 +943,17 @@ DEFINE_KVM_HOST_HCALL(int, __kvm_vcpu_run, struct kvm_vcpu __kern *, vcpu)
-> >                          return ret;
-> >                  }
-> >
-> > +                /*
-> > +                 * Firmware Spectre-v4 mitigation can be advertised to a
-> > +                 * protected guest as permanent. The host kernel runs with it
-> > +                 * enabled, so nothing is restored on exit.
->
-> I don't understand this. If the host is supposed to run with the
-> mitigation enabled, how did we get here with the mitigation disabled?
-> It's not like we can get here directly from userspace...
->
-> So either the reasoning in the comment is wrong (and therefore needs
-> fixing), or this is a buggy (malicious?) host that tries to trick the
-> hypervisor (and then I question whether we should even try to continue
-> running the guest).
+This commit skips calling irq_set_affinity() in vgic_v5_put() when
+vcpu->scheduled_out is set, avoiding acquiring irq_desc and pi_lock under t=
+he
+runqueue lock during kvm_sched_out().
 
-It's the second. The host kernel enables the mitigation on every entry
-from userspace, so only a misbehaving host gets here with it disabled.
-I'll say so in the comment.
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index 91810fbd99afa..5824b00bb50df 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -1248,8 +1248,14 @@ void vgic_v5_put(struct kvm_vcpu *vcpu)
+>  			 * Make the doorbell affine to this CPU, if it isn't
+>  			 * already. Actively check the cpumask first as it is
+>  			 * cheaper than changing the affinity every time.
+> +			 *
+> +			 * Don't do it from kvm_sched_out(), which holds the
+> +			 * runqueue lock: irq_set_affinity() takes the
+> +			 * doorbell's irq_desc lock and may wake its irq
+> +			 * thread. The doorbell works from any CPU, and the
+> +			 * next WFI entry moves it.
+>  			 */
+> -			if (!cpumask_test_cpu(cpu, aff)) {
+> +			if (!vcpu->scheduled_out && !cpumask_test_cpu(cpu, aff)) {
+>  				int ret;
+> =20
+>  				ret =3D irq_set_affinity(db_irq, cpumask_of(cpu));
 
-I had EL2 enable it again so that the NOT_REQUIRED it returns to the
-guest holds whatever the host does, but failing the run does that too.
-I'll do that in v2, like the SVCR check above.
+[Severity: Medium]
+Should vgic_v5_load() bail out when IN_WFI is set instead of only skipping
+irq_set_affinity() here?
 
-[...]
-> > @@ -1671,6 +1685,12 @@ static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
-> >                  goto exit_skip_instr;
-> >          }
-> >
-> > +        if (func_id == ARM_SMCCC_ARCH_WORKAROUND_2) {
-> > +                /* Drop the hints, so that the firmware decodes the ID as EL2 did. */
-> > +                cpu_reg(host_ctxt, 0) = func_id;
-> > +                __this_cpu_write(host_ssbd_disabled, !lower_32_bits(cpu_reg(host_ctxt, 1)));
-> > +        }
-> > +
->
-> This should be pushed into default_host_smc_handler() rather than left
-> dangling here (it is pretty obvious that it has nothing to do with
-> PSCI or FFA).
+Because vgic_v5_load() does not check vcpu_get_flag(vcpu, IN_WFI), any
+kvm_sched_in() while the vCPU is halting in kvm_vcpu_halt() calls
+__vgic_v5_make_resident(), setting gicv5_vpe.resident =3D true and clearing
+ICH_CONTEXTR_EL2_DB in hardware.
 
-I put it there since that's where the function ID is decoded, but I'll
-move it into default_host_smc_handler() and pass the ID in.
+If the vPE doorbell fires while blocked in kvm_vcpu_block(), db_handler()
+sets gicv5_vpe.db_fired =3D true and wakes the vCPU thread. When the thread
+schedules in, vgic_v5_load() makes the vPE resident before schedule() retur=
+ns
+to the loop in kvm_vcpu_block(). If the vCPU thread is preempted again befo=
+re
+kvm_vcpu_check_block() consumes db_fired, kvm_sched_out() -> vgic_v5_put()
+still calls __vgic_v5_make_non_resident():
 
-Cheers,
-/fuad
+arch/arm64/kvm/hyp/vgic-v5-sr.c:__vgic_v5_make_non_resident() {
+	...
+	WRITE_ONCE(cpu_if->gicv5_vpe.db_fired, false);
+	cpu_if->gicv5_vpe.resident =3D false;
+}
+
+When the thread schedules back in, kvm_vcpu_check_block() ->
+kvm_vgic_vcpu_pending_irq() sees db_fired =3D=3D false and goes back to sle=
+ep in
+schedule(), losing the wakeup.
+
+Making the vPE resident on schedule-in during halt-polling also disarms the
+hardware doorbell for the rest of the poll window, so newly pending SPIs and
+LPIs do not set db_fired, and a subsequent kvm_sched_out() still runs the E=
+L2
+residency hypercalls and vgic_v5_sync_ppi_priorities() under the runqueue
+lock. Returning early from vgic_v5_load() when IN_WFI is set keeps
+gicv5_vpe.resident false throughout kvm_vcpu_halt(), so kvm_sched_out()
+returns immediately in vgic_v5_put().
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261116071304.2037=
+895-1-justin.he@arm.com?part=3D2
