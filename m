@@ -1,71 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.126
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794844899;
-	b=KuWK7SLKQqrxGSgkOerlTPnw04zQNWYmtTfXFz/6BAfQVlQKkHYOI7I2Wi6az08PS1P4
-	 bQ+6NWmUhNQQqgSLAgCOt1fYqmLNLhUodIUVwMJp7ErMY9Td3g2JfXIaGQeRrnVsefENS
-	 hapwDUprPr96HIPyurG3hdhsMUJND4q0JUkveXMqpNoNqUGYnwCn6fX0kKKfbU1utg6nN
-	 bPoxhB4KdjS/dlDjoiNVNGLxL3w2mx4z+O8is6yQxsdSC8wMzk2NtT5KDDglde2/7p5d7
-	 Qs6eCJrloJHgT4oP/fL4mj7uNsGWiYn2ftOdwOcpzOUaOgT1NW9y053JSuxzsrrTXJg==
+	t=1794845370;
+	b=bR1oHT7uZv35eiM09Y/8b5Q98E5Z7tq/XwZE+ywt9GBSR5rqFyS1XAL+QxucqlrxEJY4
+	 s/nxp8GcYI2UGOB8EGl6A1qSIZkHKHu5q1VBTho7yIDInNSu06hooP2LRB99yLFq48JQg
+	 J40SGnAX0xElZLEdhtVsrf+s7LcusfZzyrHWE5xi2cV5SvNOc3jGgkmSLzmjG5q0qwhHs
+	 lZFLxBs1OVBwRF40uprSmXfOF0lzMt08w8myxV9WrBsfLV9sSOh0aS/hBdqMw6laEvc6h
+	 9wlvcBP/VJ8P2MUscGMi7LFU3IewE7oZ1Qi0l/qmfvCgDlZsGHm3ThNq11Ocb2niHww==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794844899;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=vWxnD3JhZUol/MGQugCerD+bGnYWHzc8eSVqln/Wqi4=;
-	b=AoAtUbk9FMT6/48LvxnI92nsBCYwBne0CsU2bsaKcy2kOsUT+5KI8mgO3AjVsumxvPup
-	 oR5Gd4BPQXDSwfiTihAz239+I4ebWklEAMMVljfnKdEXFL6hK4/Gr7em0rTTonWVLKnhT
-	 mhYLBT191ScTzDdvtzRHw+rot+RYumuZ+lPPU5jPXoaP/LtRylk+zg3ks4zgKLxOJbJP1
-	 0Aq5LiU3EHVdmDGtjhmUR5dOMsa7LPudoLXoOsxL2PXuDPizxrap2NEcgM9kwP8fSMaZA
-	 +BTtBkZKMXGSVYKk/ABQlkDbTWVJEYEFEqSdS+BA9XzSdhPJnNTFXryMfPl3Ps7Q9ZA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794845370;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=xuWJrrizIQaSrZTQFgUO3V0HL4ic1BmuoACdN3FzMhU=;
+	b=2dBuAsYmfrNiQWghYqHNKGdEgQy8YUJ7DVY5f4srM99KBzCKyGZKyUjPYM6O4krxsf6S
+	 nvA2wYzZV7S2gePWuV4ct3jM+DYrhFppbOdk5aF9RatEsNs/ESlIJBhjnmq2GInik6eIP
+	 ge0V/cfVuUFqlKmHHXhvJlUqhPyx0cOCiG4ic/b/WHgQve402TzEKX5d8JjkzSl1Ojkjg
+	 H8RQXoKJCscqFl9g234/Va6xbVD6Ls+Dvs0EKeGtggxo6wXj3gb2DP2C+1zbGMERNF4+M
+	 KC2ojFr+Wlm1sLeWdpIrmCOm5rzEDPhvVOWMKUJl8oBC0WJPp6JxKq9/ExkIOoND3Og==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="OTWL/4HP";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=U0kna3NM;
+	arc=none smtp.remote-ip=91.218.175.126
+Received: from mta0.migadu.com (out-126.mta0.migadu.com [91.218.175.126])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86AF606A339;
-	Mon, 16 Nov 2026 16:01:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B676606A322
+	for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 16:09:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4B676606A322
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OTWL/4HP
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CD341F000C4;
-	Mon, 16 Nov 2026 16:01:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794844899;
-	bh=vWxnD3JhZUol/MGQugCerD+bGnYWHzc8eSVqln/Wqi4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=OTWL/4HPInwhhKALFy+nccOqOFnlRl3KeNdl7Pai4xabJ8kYIIarWfWF68LZTWb9K
-	 IZ/dGvrw4tZqOWP/fn7QrMrFiRn8OeWviR6G3QTSSbmVXZgYyZ6wqWbTRGMZ6bNPVA
-	 RfGoiBGHjvYYQHsQsjDRzreATKK3z3zVXc2QLiSTM2lL6gncdxuSyBUE2rb3O4th6b
-	 rIsjdI7ZgbwgLA3VUeGBOaRMv1aZpwgBKYsyUVlC7yB7B0rLeRFlpnz17rhpDuYznq
-	 8RbUe1epeyWxBKruqRc3tSvefrfrtu0WhfO3ynPk4OOnVEJ+9Uy/ujiZPre2CS+MKD
-	 CYW9OnSVUN0GA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xSz9E-0000000GXqJ-3Vfj;
-	Mon, 16 Nov 2026 16:01:36 +0000
-Date: Mon, 16 Nov 2026 16:01:36 +0000
-Message-ID: <86ik1w22an.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Dan Carpenter <dan@pereq.eu>
-Cc: Oliver Upton <oupton@kernel.org>,	Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,	Zenghui Yu
- <yuzenghui@huawei.com>,	Catalin Marinas <catalin.marinas@arm.com>,	Will
- Deacon <will@kernel.org>,	Mark Rutland <mark.rutland@arm.com>,	Jintack Lim
- <jintack.lim@linaro.org>,	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,	linux-kernel@vger.kernel.org,	Karthik Bhargavan
- <karthik@pereq.eu>,	=?UTF-8?B?Q2zDqW1lbnQ=?= Blaudeau <clement@cryspen.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: nv: Fix AT emulation for TCR2_EL1
-In-Reply-To: <eec50693a12e1ba34d60458ae8fe605ac198a79c.1794808373.git.dan@pereq.eu>
-References: <cover.1794808373.git.dan@pereq.eu>
-	<eec50693a12e1ba34d60458ae8fe605ac198a79c.1794808373.git.dan@pereq.eu>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=U0kna3NM
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=xuWJrrizIQaSrZTQFgUO3V0HL4ic1BmuoACdN3FzMhU=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1794845368; v=1; x=1795450168;
+ b=U0kna3NMwIP0yu9sqJFhrpm2vr144awdm4FaRl/JloNBV3+PnZOxa8uRg5tpTZVFpT82km4w
+ RXe7enmqkg0iwArMBg5yWCDGzVBCQGWjAXMdLoOMLh5wV3t6g2KEv9c5zaYytTSdm9Be1LUk0W8
+ nVQR3+uDXSIjVjz8FSblmi0Y=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 3e4d4f8f7922116a;
+	Mon, 16 Nov 2026 16:09:28 +0000
+X-Mizu-Trace-ID: 3e4d4f8f7922116a
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5c14bc5a743so12525e87.0
+        for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 08:09:24 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErFsrodfKVEquA8O0YX1CQB0AzpQE8mzw4X+b0tioNrcWmyRtzseLib/OfLhSSBhdaRfRSl/icg=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/vLdIwcNdlQwwbGjFuSICZqaHU4LhDRk9Lq2DDceZpmF1zYrQk
+	nGcnVLARWH3nhLsI9XdA5yTPqkvGtvMWtD6YXEZn9q6ue3jc5a0JC41i+JBEwiUFnkPrdjJNhst
+	AGjRJeuWRqOKGWTU8vhlNlfKhGeNtKx2Mb2ppbvOh
+X-Received: by 2002:a05:6512:1304:b0:5c1:4cc8:2f22 with SMTP id
+ 2adb3069b0e04-5c17e4b9f86mr221482e87.8.1794845363481; Mon, 16 Nov 2026
+ 08:09:23 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -74,170 +65,48 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: dan@pereq.eu, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, jintack.lim@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, karthik@pereq.eu, clement@cryspen.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20261110110724.3614412-1-fuad.tabba@linux.dev>
+ <20261110110724.3614412-2-fuad.tabba@linux.dev> <avM81YcTBTJ8zCMX@seanjc-mac.roam.internal>
+ <CA+EHjTz-Nb-g9YQKX2fKk61hC2BfzXfmUHv=2j+eZ18YuTv2Eg@mail.gmail.com>
+In-Reply-To: <CA+EHjTz-Nb-g9YQKX2fKk61hC2BfzXfmUHv=2j+eZ18YuTv2Eg@mail.gmail.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 16 Nov 2026 16:08:47 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTyqJfGS+5UajX=RYTAG-qfhZ-vmGi=1SixXydWhwGHLUA@mail.gmail.com>
+X-Gm-Features: Aa3M54pa7DZ_uBY7ynCUhZPG35ZaG2vJ1bC6E24f7r2YagR26_2vzli-PPKoWqQ
+Message-ID: <CA+EHjTyqJfGS+5UajX=RYTAG-qfhZ-vmGi=1SixXydWhwGHLUA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: Stop KVM_PRE_FAULT_MEMORY when the vCPU's dirty
+ ring is full
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Lorenzo Stoakes <ljs@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev, 
+	Wei-Lin Chang <weilin.chang@arm.com>, Will Deacon <will@kernel.org>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 16 Nov 2026 06:00:52 +0000,
-Dan Carpenter <dan@pereq.eu> wrote:
-> 
-> Arm provides an AT instruction that translates a virtual address the way
-> the MMU would and returns the result.  There is a bug in the way this
-> instruction is emulated for nested virtualization because of how TCR2_EL1
-> is handled.  The bug is fairly minor.
-> 
-> The TCR2_EL1 register has bits which turn on permission indirection
-> (PIE) and permission overlays (POE).  When these bits are set, the AT
-> instruction reads the permissions stored in PIR_EL1 and POR_EL1.  If
-> you have the right features and permissions then in the return value from
-> the AT instruction we set one bit to either 1 or 0 depending on whether
-> the access would be allowed or whether it would fault.
-> 
-> However, the bug is that just because the host has TCR2 enabled, it
-> doesn't mean the VM has it.  KVM doesn't load these registers for a VM
-> which doesn't have the features, instead the AT runs with the host's
-> HCRX_EL2, which has TCR2En set.  So the AT uses the TCR2_EL1, PIR_EL1 and
-> POR_EL1 values another VM left on the CPU, or possibly the VMM's POR_EL0.
-> Likewise, for a VM which has TCR2 but not PIE or POE, the L2's TCR2_EL1
-> is loaded unmasked.
-> 
-> The impact of this bug is that we leak a single bit of data to the L1,
-> but in real life it's hard to imagine how it is useful to an attacker.
-> 
-> Fix this by writing zero to TCR2_EL1 when the VM doesn't have TCR2, and
-> by clearing the PIE and POE bits when the VM doesn't have those
-> features.  Also it should be effective_tcr2(vcpu, TR_EL10) to read the
-> TCR2 for the L1 instead of vcpu_read_sys_reg(vcpu, TCR2_EL1).
-> 
-> Fixes: 477e89cabb14 ("KVM: arm64: nv: Add basic emulation of AT S1E{0,1}{R,W}")
-> Fixes: 23e7a34c8397 ("KVM: arm64: Add AT fast-path support for S1PIE")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Dan Carpenter <dan@pereq.eu>
-> ---
->  arch/arm64/kvm/at.c | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index 30d8f062b2c2..06765881a4c8 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -1438,7 +1438,13 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
->  	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR_EL1),	SYS_TCR);
->  	write_sysreg_el1(vcpu_read_sys_reg(vcpu, MAIR_EL1),	SYS_MAIR);
->  	if (kvm_has_tcr2(vcpu->kvm)) {
-> -		write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR2_EL1), SYS_TCR2);
-> +		u64 tcr2 = effective_tcr2(vcpu, TR_EL10);
-> +
-> +		if (!kvm_has_s1pie(vcpu->kvm))
-> +			tcr2 &= ~TCR2_EL1_PIE;
-> +		if (!kvm_has_s1poe(vcpu->kvm))
-> +			tcr2 &= ~(TCR2_EL1_POE | TCR2_EL1_E0POE);
-> +		write_sysreg_el1(tcr2, SYS_TCR2);
+Hi Sean,
 
-The sanitising should really be moved into the effective_tcr2()
-helper, as this is its purpose. Something like the below, which is
-obviously untested... Ultimately, TCR2_EL1 should be moved to the
-automatic sanitisation scheme to inherit the expected RES0 behaviours.
+On Tue, 10 Nov 2026 17:18:22 +0000, Fuad Tabba <fuad.tabba@linux.dev> wrote:
+[...]
+> > Eh, I vote to just use kvm_dirty_ring_check_request(), I don't see any harm in
+> > clobbering vcpu->run->exit_reason.
+>
+> Will do.
 
->  		if (kvm_has_s1pie(vcpu->kvm)) {
->  			write_sysreg_el1(vcpu_read_sys_reg(vcpu, PIR_EL1), SYS_PIR);
->  			write_sysreg_el1(vcpu_read_sys_reg(vcpu, PIRE0_EL1), SYS_PIRE0);
-> @@ -1452,6 +1458,9 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
->  	__load_stage2(mmu);
->  
->  skip_mmu_switch:
-> +	if (cpus_have_final_cap(ARM64_HAS_TCR2) && !kvm_has_tcr2(vcpu->kvm))
-> +		write_sysreg_el1(0, SYS_TCR2);
-> +
->  	/* Temporarily switch back to guest context */
->  	write_sysreg_hcr(vcpu->arch.hcr_el2);
->  	isb();
-> @@ -1554,6 +1563,9 @@ int __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
->  		if (!vcpu_el2_e2h_is_set(vcpu))
->  			val |= HCR_EL2_NV | HCR_EL2_NV1;
->  
-> +		if (cpus_have_final_cap(ARM64_HAS_TCR2) && !kvm_has_tcr2(vcpu->kvm))
-> +			write_sysreg_el1(0, SYS_TCR2);
-> +
->  		write_sysreg_hcr(val);
->  		isb();
->  
+After taking a closer look, the clobber is problematic on arm64, where
+KVM_RUN completes a pending MMIO exit only if run->exit_reason is
+still KVM_EXIT_MMIO. If a pre-fault stops on a full ring after an MMIO
+exit, the helper overwrites exit_reason, so the next KVM_RUN doesn't
+complete the exit and the guest repeats the MMIO access. The ring can
+be full at that point if the pre-fault dirties pages, or with NV, if
+the stage-2 walk for the MMIO access does.
 
-This one needs fixing, as sashiko reported, but the reason why the
-proposed fix works at all is pretty fragile:
+I don't think changing how arm64 completes an MMIO exit should be in a
+fix for stable, so should I keep testing kvm_dirty_ring_soft_full()
+directly in v2, or do you have another suggestion?
 
-- the reset value is 0
-- we enforce RES0 behaviours on all interesting fields
-- TCR2_ELx are trapped and result in an UNDEF
-
-So this deserves a comment, along the lines of what I have written in
-the hack below.
-
-Thanks,
-
-	M.
-
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 30d8f062b2c29..1ff452277f27e 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -91,11 +91,16 @@ static enum trans_regime compute_translation_regime(struct kvm_vcpu *vcpu, u32 o
- static u64 effective_tcr2(struct kvm_vcpu *vcpu, enum trans_regime regime)
- {
- 	if (regime == TR_EL10) {
-+		u64 val;
-+
- 		if (vcpu_has_nv(vcpu) &&
- 		    !(__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En))
- 			return 0;
- 
--		return vcpu_read_sys_reg(vcpu, TCR2_EL1);
-+		val = vcpu_read_sys_reg(vcpu, TCR2_EL1);
-+		val &= ~(kvm_has_s1poe(vcpu->kvm) ? (TCR2_EL1_POE | TCR2_EL1_E0POE) : 0);
-+		val &= ~(kvm_has_s1pie(vcpu->kvm) ? TCR2_EL1_PIE : 0);
-+		return val;
- 	}
- 
- 	return vcpu_read_sys_reg(vcpu, TCR2_EL2);
-@@ -1544,7 +1549,7 @@ int __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 	 * switching context behind everybody's back, disable interrupts...
- 	 */
- 	scoped_guard(write_lock_irqsave, &vcpu->kvm->mmu_lock) {
--		u64 val, hcr;
-+		u64 val, hcr, tcr2;
- 		bool fail;
- 
- 		val = hcr = read_sysreg(hcr_el2);
-@@ -1554,6 +1559,16 @@ int __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 		if (!vcpu_el2_e2h_is_set(vcpu))
- 			val |= HCR_EL2_NV | HCR_EL2_NV1;
- 
-+		if (cpus_have_final_cap(ARM64_HAS_TCR2)) {
-+			tcr2 = read_sysreg_el1(SYS_TCR2);
-+			/*
-+			 * This relies on the reset value of TCR2_EL2
-+			 * being 0, and not being modified when
-+			 * FEAT_TCR2 is not exposed to the guest
-+			 */
-+			write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR2_EL2), SYS_TCR2);
-+		}
-+
- 		write_sysreg_hcr(val);
- 		isb();
- 
-@@ -1577,6 +1592,9 @@ int __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 		if (!fail)
- 			par = read_sysreg_par();
- 
-+		if (cpus_have_final_cap(ARM64_HAS_TCR2))
-+			write_sysreg_el1(tcr2, SYS_TCR2);
-+
- 		write_sysreg_hcr(hcr);
- 		isb();
- 	}
-
--- 
-Without deviation from the norm, progress is not possible.
+Cheers,
+/fuad
