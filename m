@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794852055;
-	b=5GqJEAkiWked1J0mxpsI5xDk6IzQv+Sk8AxN7SkYSRd0nv5IH6+rtCwb5tzVScSosczD
-	 +xmondjzMcpAOH+SDJ5CVOsZkgzr/mndtvOFB11Hk9J0L/80Xe5LMY1yXVbJOYf9AdPM2
-	 djCSmsDhyrJA9nVBNYw38EJtMidqnMO4DQkPefxIjHZXd66aOHU3Zh6ZZwz/HUyh/LNSy
-	 gMDzBcf/VNC46K34mjAI5XctosHuLLVXVV4cQeOBk6iE8gNH7ngE9fxKz2WTCrRzMDY1W
-	 6TvE872nu82Htm5sCP+VvzP57Leg/SP9KHH//wkWLftaFgFMSQVRUwYM3wiymy/vFzg==
+	t=1794852242;
+	b=bkkiq7ae0lDqKPl+Lv5XvEz2sjJYkPmmTRnSk5SNWCxACtOnkpD2fU4BOKu4vwct8ajO
+	 sDbzhbmQdyoox6Qbd47jXB+atK7Bp6qj4/gmXQHu8AbT60wiZatg6cdtVZP01S4NJf6aa
+	 cZjMHzfNVqKZKTWQqtPIdov07M31SJEr9WYyVOf/HKjgk2t/3cxjvubnliv2i8FuKfTKB
+	 mXNE7cXF6GxN/xgtRT94YvRDhZKSBZnyNI3HBc303hy9voxWMgtcGBeQ46tR0yXJM8zND
+	 C9NcEUUJarlald872hrKYW5Y+DbIJodHcn/WF8iuN8Ou3dCaSOY9jvh7TvoY3b4t1bg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794852055;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794852242;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=D/XBLOi0WjEnBxk1dG/LNzqKf7nMH35SVhi22WC5wxI=;
-	b=yN7vjnyyUnwN+cKO9IHdN/tXG0SwFOmjPweWZIjGfK8N5sfUpRAyxJiuo2PR3JH1u4lb
-	 CRmwQD7bDPglF1nMtEAyRDktuLIBBUjAEjFddlX7m5Mf2hggSfmfDEkzNjM84HdUec3xS
-	 XK96tb/rrjmoTLr65L8GuwRKnuaB3AR/0ihn8kSDd60MUP18wN/chb3zf5vnnrdNkWfhc
-	 rMbtEBy3J21HqES+jYZgeSJNvVmDOUaATQ8kH7cJx0CLLyhsGsyYYbAWLOuiTFtR/7v2p
-	 BEz7sKBIm24OLtUp6cNQo+v7jvGFK3rzbSBIDszkcmVU5B/kcl0iKYe4+6ssSt+FePg==
+	bh=PjgDifA+WY+ML1G6HjbkqA7torFG5UegbIaFkipl26w=;
+	b=OyIoXgwG5lvkJjmvY/hH7Qfwt9lKjjrJ+RtvY/UHj//bwoH6fnyCNhkotb4Ewd62Fd2/
+	 ZQsnkqKkD2K0Opk4NUfy9pGMA8NI+XJPZtYOY35C8Uim33EZG+ikXaJtSntj8ZE8fCCj1
+	 s4ZIcXOQ+gHZe6odTh64sxsdWphFDzrx3QGrCCiAnpurpFjdfdxwNcW1WFJ008DK5Nb39
+	 XsNwXOz3RFEmh+GU2M+mEWn6SXIfz9o61GZntmzR/ytLXoRyIJiir697vd6/EzJ93JJVx
+	 7K0QDa80HOcZ3kLtNDRv97AsUyDAZ+aHClBRMV4A5xZ5r22hDRJyTdZ1nndt26wuXsw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BjE33oFM;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BZQvZvdn;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA601606A880;
-	Mon, 16 Nov 2026 18:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856A6606A322;
+	Mon, 16 Nov 2026 18:04:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BjE33oFM
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1DF31F000C9;
-	Mon, 16 Nov 2026 18:00:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BZQvZvdn
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 370F81F000C4;
+	Mon, 16 Nov 2026 18:03:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794852055;
-	bh=D/XBLOi0WjEnBxk1dG/LNzqKf7nMH35SVhi22WC5wxI=;
+	s=k20260515; t=1794852242;
+	bh=PjgDifA+WY+ML1G6HjbkqA7torFG5UegbIaFkipl26w=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=BjE33oFMXa4AhDYze0syrDZC6bL5KpQ9tBbRd6fTchO0dU9u1tiqfQDom2owirBZ8
-	 sL7dtbAr1WBy5/ihvcYE2iOZccGSKT9NpgN2AH8Pl18JebYWsx7QMxMdvPb8E/xrdK
-	 OZT0dbOMekLl95lZiuKd+aUybKVeTNxvM+5ZoxjHrJ6UVetL0SYJETzRwLMij4vlqO
-	 3X98MRk/M9aWGH2yC8geBWYvyC21jzZhD3OjctccJvlZe2nEhqmIvzQkjGT00uFhiR
-	 1jU0omwb8l85KhpFaT43Du8By1VwRfHDCoDIgVHJqoIS6Rd2WxhOVB7Jf4sLf+ZzxA
-	 sHzMNiDdtBlwA==
-Date: Mon, 16 Nov 2026 18:00:48 +0000
+	b=BZQvZvdnCu1giJ3n9uXH1U5699IR0+LrLB7Y8Ha/qpjipq/k5KAbUrH5utPqTM5P2
+	 HQDKJxG2+GlXB9EMO6S7nFz2X7N/LHyZ6IHoJZL/izg8PP93rExefpbo5vm3mloKRa
+	 pquMJdJ/EkrGWpEF82c9Tac77BaJO/elDrRDLvseO8kGHFFr9ElDzVxdnFo4NpxuDI
+	 lrmoqU/D/flKe151y5d8z45H0et4/vOMd8L/XnUrw8RDiVqZpVp+2QLnOUchXm4O7S
+	 nc4QlNJARiOkUGcp1ZAUe1yt0XzD7T8MEev8Q2gpJuoz60e9RMvFHiVQ7UMfyoqxvX
+	 Gn3/KbYdSR6Qg==
+Date: Mon, 16 Nov 2026 18:03:49 +0000
 From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
 Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, 
@@ -47,12 +47,13 @@ Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev,
 	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
 	will@kernel.org, mark.rutland@arm.com, linux-perf-users@vger.kernel.org, 
 	catalin.marinas@arm.com, james.clark@linaro.org
-Subject: Re: [RFC PATCH v7 02/28] arm64/sysreg: Define MDCR_EL2.E2PB values
-Message-ID: <avtEyQjo7o7Chzw_@gremlin>
+Subject: Re: [RFC PATCH v7 04/28] perf: arm_spe_pmu: Move struct arm_spe_pmu
+ to a separate header file
+Message-ID: <avtFfIHH5KP01r0j@gremlin>
 References: <20260903160623.315525-1-alexandru.elisei@arm.com>
- <20260903160623.315525-3-alexandru.elisei@arm.com>
- <atDUMAe0QGP_4swk@gremlin>
- <avSiiFvN13FqNCDm@raptor>
+ <20260903160623.315525-5-alexandru.elisei@arm.com>
+ <atDgBR0WOGHUsLaF@gremlin>
+ <avSjIvJM5TZAuQlG@raptor>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -64,139 +65,175 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <avSiiFvN13FqNCDm@raptor>
+In-Reply-To: <avSjIvJM5TZAuQlG@raptor>
 
-On Wed, Nov 11, 2026 at 05:14:48PM +0000, Alexandru Elisei wrote:
+On Wed, Nov 11, 2026 at 05:17:22PM +0000, Alexandru Elisei wrote:
 > Hi Lorenzo,
 >
-> On Thu, Oct 15, 2026 at 02:52:32PM +0100, Lorenzo Stoakes (ARM) wrote:
-> > On Thu, Sep 03, 2026 at 05:05:57PM +0100, Alexandru Elisei wrote:
-> > > KVM will make use of the different values for MDCR_EL2.E2PB, document them.
-> >
-> > As with 1/28, using [0] to check the definition of the register.
-> >
+> On Thu, Oct 15, 2026 at 03:40:09PM +0100, Lorenzo Stoakes (ARM) wrote:
+> > On Thu, Sep 03, 2026 at 05:05:59PM +0100, Alexandru Elisei wrote:
+> > > KVM will soon want to make use of struct arm_spe_pmu, move it to a separate
+> > > header where it will be easily accessible.
 > > >
-> > > Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > > Cc: Will Deacon <will@kernel.org>
 > > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > >
-> > Looks correct, a couple small nits below, with those addressed:
+> > Looks to be a straightforward mechanical change, couple nits below but with
+> > those addressed:
 > >
 > > Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
 > >
 > > > ---
-> > >  arch/arm64/tools/sysreg | 7 ++++++-
-> > >  1 file changed, 6 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> > > index a11a968eb707..4485736a4f49 100644
-> > > --- a/arch/arm64/tools/sysreg
-> > > +++ b/arch/arm64/tools/sysreg
-> > > @@ -4045,7 +4045,12 @@ Field	17	HPMD
-> > >  Res0	16
-> > >  Field	15	EnSPM
-> > >  Field	14	TPMS
-> > > -Field	13:12	E2PB
-> > > +UnsignedEnum	13:12 E2PB
+> > >  drivers/perf/arm_spe_pmu.c       | 33 +--------------------
+> > >  include/linux/perf/arm_spe_pmu.h | 50 ++++++++++++++++++++++++++++++++
 > >
-> > MEGA NIT: Shouldn't there be a tab rather than a space after '13:12'? :)
+> > This should be added to MAINTAINERS too I think?
+>
+> Added this under ARM PMU PROFILING AND DEBUGGING:
+>
+> +F:     include/linux/perf/arm_spe_pmu.h
+>
+> >
+> > >  2 files changed, 51 insertions(+), 32 deletions(-)
+> > >  create mode 100644 include/linux/perf/arm_spe_pmu.h
+> > >
+> > > diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
+> > > index b70f3fedf028..79c571a649d5 100644
+> > > --- a/drivers/perf/arm_spe_pmu.c
+> > > +++ b/drivers/perf/arm_spe_pmu.c
+> > > @@ -28,6 +28,7 @@
+> > >  #include <linux/of.h>
+> > >  #include <linux/perf_event.h>
+> > >  #include <linux/perf/arm_pmu.h>
+> > > +#include <linux/perf/arm_spe_pmu.h>
+> > >  #include <linux/platform_device.h>
+> > >  #include <linux/printk.h>
+> > >  #include <linux/slab.h>
+> > > @@ -67,38 +68,6 @@ struct arm_spe_pmu_buf {
+> > >  	void					*base;
+> > >  };
+> > >
+> > > -struct arm_spe_pmu {
+> > > -	struct pmu				pmu;
+> > > -	struct platform_device			*pdev;
+> > > -	cpumask_t				supported_cpus;
+> > > -	struct hlist_node			hotplug_node;
+> > > -
+> > > -	int					irq; /* PPI */
+> > > -	u16					pmsver;
+> > > -	u16					min_period;
+> > > -	u16					counter_sz;
+> > > -
+> > > -#define SPE_PMU_FEAT_FILT_EVT			(1UL << 0)
+> > > -#define SPE_PMU_FEAT_FILT_TYP			(1UL << 1)
+> > > -#define SPE_PMU_FEAT_FILT_LAT			(1UL << 2)
+> > > -#define SPE_PMU_FEAT_ARCH_INST			(1UL << 3)
+> > > -#define SPE_PMU_FEAT_LDS			(1UL << 4)
+> > > -#define SPE_PMU_FEAT_ERND			(1UL << 5)
+> > > -#define SPE_PMU_FEAT_INV_FILT_EVT		(1UL << 6)
+> > > -#define SPE_PMU_FEAT_DISCARD			(1UL << 7)
+> > > -#define SPE_PMU_FEAT_EFT			(1UL << 8)
+> > > -#define SPE_PMU_FEAT_FDS			(1UL << 9)
+> > > -#define SPE_PMU_FEAT_DEV_PROBED			(1UL << 63)
+> > > -	u64					features;
+> > > -
+> > > -	u64					pmsevfr_res0;
+> > > -	u16					max_record_sz;
+> > > -	u16					align;
+> > > -	struct perf_output_handle __percpu	*handle;
+> > > -};
+> > > -
+> > > -#define to_spe_pmu(p) (container_of(p, struct arm_spe_pmu, pmu))
+> > > -
+> > >  /* Convert a free-running index from perf into an SPE buffer offset */
+> > >  #define PERF_IDX2OFF(idx, buf) \
+> > >  	((idx) % ((unsigned long)(buf)->nr_pages << PAGE_SHIFT))
+> > > diff --git a/include/linux/perf/arm_spe_pmu.h b/include/linux/perf/arm_spe_pmu.h
+> > > new file mode 100644
+> > > index 000000000000..af86fd184050
+> > > --- /dev/null
+> > > +++ b/include/linux/perf/arm_spe_pmu.h
+> > > @@ -0,0 +1,50 @@
+> > > +// SPDX-License-Identifier: GPL-2.0
+> >
+> > Pedantic I know, sorry :P but as per Documentation/process/license-rules.rst:
+> >
+> >       C source:	// SPDX-License-Identifier: <SPDX License Expression>
+> >       C header:	/* SPDX-License-Identifier: <SPDX License Expression> */
+> >       ...
+> >
+> > So should be /* */ here.
 >
 > Fixed.
 >
 > >
-> > > +	0b00	EL2
+> > > +/*
+> > > + * Split from driver/perf/arm_spe_pmu.c
 > >
-> > So broadly - this means EL2 owns the profiling buffer right?
+> > NIT: should be drivers/...
 >
-> Yes.
->
-> >
-> > This seems to align with the document (which is very verbose, obviously :):
-> >
-> > "If EL2 is implemented and enabled in the Profiling Buffer owning Security
-> > state, then the Profiling Buffer owning Exception level is EL2. Otherwise,
-> > the Profiling Buffer owning Exception level is EL1 and, Profiling is
-> > prohibited at EL2."
-> >
-> > "If EL2 is implemented and enabled in the current Security state, then
-> > accesses to Profiling Buffer System registers at EL1 are trapped to EL2,
-> > unless the access generates a higher priority exception."
-> >
-> > > +	0b01	RESERVED
-> >
-> > NIT: Hmm, it seems to be the convention to just omit entries that are
-> > missing from the definition in the docs? So is this needed?
->
-> Removed.
->
-> >
-> > I see a couple named ones, e.g. in CTR_EL0.L1Ip:
-> >
-> > 	# This was named as VPIPT in the ARM but now documented as reserved
-> > 	0b00	RESERVED_VPIPT
-> > 	# This is named as AIVIVT in the ARM but documented as reserved
-> > 	0b01	RESERVED_AIVIVT
-> >
-> > Which have comments explaining why, i.e. they were defined before but are
-> > now reserved.
-> >
-> > > +	0b10	EL1_TRAP
-> >
-> > Again my understanding - EL1 owns the profiling buffer, but EL1 sysreg
-> > accesses trap to EL2?
->
-> Yes.
->
-> >
-> > Seems to align with docs:
-> >
-> > "Profiling Buffer owning Exception level is EL1. Profiling is prohibited at
-> > EL2."
-> >
-> > "If EL2 is implemented and enabled in the current Security state, then
-> > accesses to Profiling Buffer System registers at EL1 are trapped to EL2,
-> > unless the access generates a higher priority exception."
-> >
-> > > +	0b11	EL1
-> >
-> > And finally - EL1, traps to EL1 too right?
->
-> Profiling buffer owning exception level is EL1, accesses to the profiling buffer
-> registers made at EL1 are not trapped.
->
-> For the exact trapping priority and possible trap configurations, you can have a
-> look at the pseudocode for accessing one of the profiling buffer system
-> registers (PMBSR_EL1, PMPTR_EL1 or PMBLIMITR_EL1).
->
-> >
-> > Again seems to align with docs:
-> >
-> > "Profiling Buffer owning Exception level is EL1. Profiling is prohibited at
-> > EL2."
-> >
-> > "Accesses to Profiling Buffer System registers at EL1 are not trapped by
-> > this mechanism."
-> >
-> > > +EndEnum
-> > >  Field	11	TDRA
-> > >  Field	10	TDOSA
-> > >  Field	9	TDA
-> > > --
-> > > 2.43.0
-> > >
-> > >
-> >
-> > All LGTM!
+> Fixed.
 >
 > Thanks,
 > Alex
 >
 > >
+> > > + *
+> > > + * Copyright (C) 2016 ARM Limited
+> > > + */
+> > > +
+> > > +#ifndef __PERF_ARM_SPE_PMU_H__
+> > > +#define __PERF_ARM_SPE_PMU_H__
+> > > +
+> > > +#include <linux/cpumask.h>
+> > > +#include <linux/container_of.h>
+> > > +#include <linux/list.h>
+> > > +#include <linux/perf_event.h>
+> > > +#include <linux/platform_device.h>
+> > > +#include <linux/types.h>
+> > > +
+> > > +struct arm_spe_pmu {
+> > > +	struct pmu				pmu;
+> > > +	struct platform_device			*pdev;
+> > > +	cpumask_t				supported_cpus;
+> > > +	struct hlist_node			hotplug_node;
+> > > +
+> > > +	int					irq; /* PPI */
+> > > +	u16					pmsver;
+> > > +	u16					min_period;
+> > > +	u16					counter_sz;
+> > > +
+> > > +#define SPE_PMU_FEAT_FILT_EVT			(1UL << 0)
+> > > +#define SPE_PMU_FEAT_FILT_TYP			(1UL << 1)
+> > > +#define SPE_PMU_FEAT_FILT_LAT			(1UL << 2)
+> > > +#define SPE_PMU_FEAT_ARCH_INST			(1UL << 3)
+> > > +#define SPE_PMU_FEAT_LDS			(1UL << 4)
+> > > +#define SPE_PMU_FEAT_ERND			(1UL << 5)
+> > > +#define SPE_PMU_FEAT_INV_FILT_EVT		(1UL << 6)
+> > > +#define SPE_PMU_FEAT_DISCARD			(1UL << 7)
+> > > +#define SPE_PMU_FEAT_EFT			(1UL << 8)
+> > > +#define SPE_PMU_FEAT_FDS			(1UL << 9)
+> > > +#define SPE_PMU_FEAT_DEV_PROBED			(1UL << 63)
+> > > +	u64					features;
+> > > +
+> > > +	u64					pmsevfr_res0;
+> > > +	u16					max_record_sz;
+> > > +	u16					align;
+> > > +	struct perf_output_handle __percpu	*handle;
+> > > +};
+> > > +
+> > > +#define to_spe_pmu(p) (container_of(p, struct arm_spe_pmu, pmu))
+> > > +
+> > > +#endif /* __PERF_ARM_SPE_PMU_H__ */
+> > > --
+> > > 2.43.0
+> > >
+> > >
+> >
 > > --
 > > Cheers, Lorenzo
-> >
-> > [0]:https://support.arm.com/documentation/ddi0601/2026-09/AArch64-Registers/MDCR-EL2--Monitor-Debug-Configuration-Register--EL2-?lang=en
 
-Thanks for all above :)
+Cheers for all above!
 
 --
 Cheers, Lorenzo
