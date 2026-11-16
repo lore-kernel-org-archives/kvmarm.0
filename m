@@ -1,58 +1,111 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794816439;
-	b=Q6qTmHLQGgvGoJ5PqAaXS8szM0IZ/m2NnL/Rj1FHEA6MYtn4dwMx5CcUVhbTyd92DYYm
-	 ZamvsWE3FQnBuhy2gbiYzQsjyjxFBOCaI2qgpyM6oydyqzE0rbVr6LwvCheo8RyErweWM
-	 X2mcbHAqgVEVTilIbLxNFB1MGOEhppPdtZriJRfybdM1KAp1gT8EZkSAHAiN6xa9Q9E06
-	 SYZx2stPXUR5Jhwx//TwBxVaw88SZx/v7trd2/Tf5cwcNYQZG1/MX2+MrwCEKZ5UrJmW6
-	 PLNZZGcMCoLwUK6/QjQ+55uUN1q6bpNXnHURD5/tL7rD1F73rgxj9CTTCcBOApSPC4w==
+	t=1794820319;
+	b=4sDlCK0KgI9Y6mrpn1997JZ8rB4Ru7GHo/5XNediXFaQf3Nr6rhQNsjqA8TLp+At4X+O
+	 cwuHMpei45sr+kiCvQENGziwiMmeiIlur84DoZ2IKkrnqSRZ59QKKtRw6PkvnariTopud
+	 l+BCr/hRGvvEfj3AyA3D63n/0/tbJF63oqJeaogniZnd3eUMhL9ImVXFZKBj2YIPMCZBO
+	 6AED6EqmvqvhnJvkSotqmD6N4Y7fSF7/rFCHx5EcYjdZ2jBYI0M/Rft7GZ8hNFplOWc44
+	 sHYooHmhEPiPnsu2GHG9DKbFK4vspiAAzIzaNyZ0E5nHXRPtIB+/ijMHw9kViui0QPw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794816439;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=2gmpRxb8gQ1bNObRSr0Uai6JC9BUASRtSm25oFPH37k=;
-	b=jRYPXKFMgg1o7yCVzr/O3ydiyMmw9TGPwzJvb+PGdefznzchnUk7fmCdFx8K8XcaF+X2
-	 66TmyVcu+fc199GCe0w0+r2IEIAbjMLAsWyos4jyn4bhXDCm0SGX0jMIiaZctAIdfrNFV
-	 OCK0fVRIrf3Bf/se1OedcD1jUT6oHZT3pJijqzudsVP+zR6yS/jnUJ4cCDca5HQSP1g6J
-	 oNAQhZshbFLt0fj7Xlpnz9G9S4Jam+sq9ed4ew6gCEegK6A4ZktiG4vb9vyjPKIuROVvz
-	 2iOHqn1Uf79shIzEEKXL9TEotRqGq/rtJdE0/Q6HDbO+Hy+pgYMNqthpu1HB4CPPabQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794820319;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding;
+	bh=w3ZTI2Hxpp8i0Nf4hdErNJ38SFIe71jHPYvPRCA1ED0=;
+	b=oNxhyQcGivrb/bW0V0opA+txQLOobmA4iB4ws0OAInDMCUKkVyvz/6nnk7xeKNAkS/2/
+	 OV7Ix0GyLckxMKmKn9x0aQpFcIhDZEAyukdtD4PICFjwGDRrMhScCnAnR62t+DG/N05/v
+	 nIl0mfSeyGYikwIe/EfEpRgG3BMhalLtV2g6ZnA5pvYHZz521YJPnB17UJiZ/4RoetwhX
+	 URseqZOzMOUdKyjiGBk7W1ng5hFFl4hB/ksBkRYwbrmSRsNzx3SzZJn2KSrds53lywONW
+	 mEDPwZ2ZeH4yTYxjn4vW/qS+8yvctecQulp95m5OGE3KXBvquSesEWf7Ym/amPUjo6g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DRtA3bpX;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Uyb2DaQC;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6F1606A31C;
-	Mon, 16 Nov 2026 08:07:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD75606A31C;
+	Mon, 16 Nov 2026 09:11:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DRtA3bpX
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A90C1F000C4;
-	Mon, 16 Nov 2026 08:07:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Uyb2DaQC
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 008BB1F000C4;
+	Mon, 16 Nov 2026 09:11:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794816438;
-	bh=2gmpRxb8gQ1bNObRSr0Uai6JC9BUASRtSm25oFPH37k=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=DRtA3bpX/eUT/rX2maLdKgu3dE/wvhdhrc5ezjzyJWpU61ECINB0UPCRRK9wBn44X
-	 YWMlEJJ8ER4OUiz1kpKAjJCbh0zSRvT3NBF1RgfaeGqJbGQQ7ZZ/ok0jSoTKJd3i83
-	 Bt320IYx5iALR0969RGlmdIVcCGD9bhRMz+0x3BSgRjrhDEsUmdlfRC9l8sAqZPQ9n
-	 uNw8c56ogQtJyTcMTJsKXcmSSyZq/pwKUklAt+8hph8RTsfvGQKokbCgnLkZ/jgV7w
-	 5OJqxKUU1HMwofBEfS0XW0RfCxDejuFllPUv5l5kmVBjNFIx9yYNFIYfZcBlRKQQPz
-	 x2lvrfBSGsY7g==
-Message-ID: <sashiko-outbox-216506@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 2/2] KVM: arm64: gic-v5: Don't move the vPE doorbell
- from kvm_sched_out()
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Jia He" <justin.he@arm.com>
-Cc: kvmarm@lists.linux.dev, linux-rt-devel@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>, linux-kernel@vger.kernel.org
-In-Reply-To: <20261116071304.2037895-3-justin.he@arm.com>
-References: <20261116071304.2037895-1-justin.he@arm.com>
- <20261116071304.2037895-3-justin.he@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 16 Nov 2026 08:07:18 +0000
+	s=k20260515; t=1794820318;
+	bh=w3ZTI2Hxpp8i0Nf4hdErNJ38SFIe71jHPYvPRCA1ED0=;
+	h=From:To:Cc:Subject:Date;
+	b=Uyb2DaQCAcHg85gbVmEVzpWpk6cmUuQqb7L3dErPgBimrtNH86oMfqwAwDJKZIuZS
+	 d/pzsSf0375D2Go2BKd6dIXZKeeYz/iB89b+kk1IfO1JTN/VTdLsq838cn/oIKUHhh
+	 8c/PUUfnDANeuad296V9eMDCARmnazBLzWmMvE5zaeNSMYDn5ZUttTQyYD7WHrE8QY
+	 1AwiiaItY6Z4MBj8zI13BoPXPTmA3KFrCE/vqBp7iR8vrO0UgKme2FAd9uXkuKUdY8
+	 iCf7ja74Uz8JlZ60MJ9Yp7ZGPZh+jV1gsLPGwZRuAVi+v3lBjuyEgqnf2fpPULqx/n
+	 RBo3ZCLh5dD9w==
+From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+To: linux-coco@lists.linux.dev
+Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Baoquan He <baoquan.he@linux.dev>,
+	Mike Rapoport <rppt@kernel.org>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Pratyush Yadav <pratyush@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Joerg Roedel <joro@8bytes.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Benjamin Gaignard <benjamin.gaignard@collabora.com>,
+	Brian Starkey <Brian.Starkey@arm.com>,
+	John Stultz <jstultz@google.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Radu Rendec <radu@rendec.net>,
+	"T.J. Mercier" <tjmercier@google.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <chleroy@kernel.org>,
+	Ritesh Harjani <ritesh.list@gmail.com>,
+	Shrikanth Hegde <sshegde@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Kiryl Shutsemau <kas@kernel.org>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	"K . Y . Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	dri-devel@lists.freedesktop.org,
+	iommu@lists.linux.dev,
+	linaro-mm-sig@lists.linaro.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-media@vger.kernel.org,
+	linux-mm@kvack.org,
+	kvmarm@lists.linux.dev,
+	patches@lists.linux.dev
+Subject: [PATCH v10 00/13] coco: guest: Add a shared-granule allocator for host-shared memory
+Date: Mon, 16 Nov 2026 14:41:23 +0530
+Message-ID: <20261116091137.94252-1-aneesh.kumar@kernel.org>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -61,82 +114,272 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Medium] KVM: arm64: gic-v5: vgic_v5_load() in WFI disarms doorbells
-  and loses wakeups
---
 
-commit 36844cdbda4df2b177b6c013c2074287d75ff5f3
-Author: Jia He <justin.he@arm.com>
+This series tightens the alignment requirements for buffers that are shared
+between confidential-computing guests and the host, and adds a common
+allocator for host-shared memory.
 
-KVM: arm64: gic-v5: Don't move the vPE doorbell from kvm_sched_out()
+When a guest runs with private memory, buffers shared with the hypervisor
+are not only accessed by the guest. They are also accessed by the host
+kernel, and the host may manage the corresponding shared/private state at a
+granularity larger than the guest page size.
 
-This commit skips calling irq_set_affinity() in vgic_v5_put() when
-vcpu->scheduled_out is set, avoiding acquiring irq_desc and pi_lock under t=
-he
-runqueue lock during kvm_sched_out().
+Architectures such as Arm can detect incorrect accesses to Realm physical
+address space PFNs through GPC faults. However, relying on that as the only
+line of defence is fragile and can still lead to kernel crashes. The risk
+is especially visible for shared buffers that are later mmapped into
+userspace, such as guest_memfd or dma-buf backed allocations. Once
+userspace can access the mapping, the kernel cannot guarantee that
+applications will only touch the intended 4K region rather than the whole
+host page mapped into their address space. Those userspace addresses may
+also be passed back into the kernel and accessed through the linear map,
+resulting in a GPC fault.
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 91810fbd99afa..5824b00bb50df 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -1248,8 +1248,14 @@ void vgic_v5_put(struct kvm_vcpu *vcpu)
->  			 * Make the doorbell affine to this CPU, if it isn't
->  			 * already. Actively check the cpumask first as it is
->  			 * cheaper than changing the affinity every time.
-> +			 *
-> +			 * Don't do it from kvm_sched_out(), which holds the
-> +			 * runqueue lock: irq_set_affinity() takes the
-> +			 * doorbell's irq_desc lock and may wake its irq
-> +			 * thread. The doorbell works from any CPU, and the
-> +			 * next WFI entry moves it.
->  			 */
-> -			if (!cpumask_test_cpu(cpu, aff)) {
-> +			if (!vcpu->scheduled_out && !cpumask_test_cpu(cpu, aff)) {
->  				int ret;
-> =20
->  				ret =3D irq_set_affinity(db_irq, cpumask_of(cpu));
+To avoid this, host-shared buffers must satisfy two constraints:
 
-[Severity: Medium]
-Should vgic_v5_load() bail out when IN_WFI is set instead of only skipping
-irq_set_affinity() here?
+  - the address must be aligned to the CoCo shared-granule size
+  - the size must be a multiple of that granule size
 
-Because vgic_v5_load() does not check vcpu_get_flag(vcpu, IN_WFI), any
-kvm_sched_in() while the vCPU is halting in kvm_vcpu_halt() calls
-__vgic_v5_make_resident(), setting gicv5_vpe.resident =3D true and clearing
-ICH_CONTEXTR_EL2_DB in hardware.
+The series adds a common CoCo shared-memory layer for enforcing these
+constraints. It provides shared-granule geometry and range-validation
+helpers, byte-oriented private/shared transition helpers, and
+alloc_cc_shared_pages(). The allocator rounds a request to the architecture
+shared granule, allocates suitably aligned contiguous pages, transitions
+the complete allocation to shared state, and returns the transitioned size
+alongside the page.
 
-If the vPE doorbell fires while blocked in kvm_vcpu_block(), db_handler()
-sets gicv5_vpe.db_fired =3D true and wakes the vCPU thread. When the thread
-schedules in, vgic_v5_load() makes the vPE resident before schedule() retur=
-ns
-to the loop in kvm_vcpu_block(). If the vCPU thread is preempted again befo=
-re
-kvm_vcpu_check_block() consumes db_fired, kvm_sched_out() -> vgic_v5_put()
-still calls __vgic_v5_make_non_resident():
+The corresponding free helper restores the complete allocation to private
+state before returning it to the buddy allocator. If private state cannot
+be restored safely, the allocation is deliberately leaked rather than
+returning potentially shared memory for unrelated use.
 
-arch/arm64/kvm/hyp/vgic-v5-sr.c:__vgic_v5_make_non_resident() {
-	...
-	WRITE_ONCE(cpu_if->gicv5_vpe.db_fired, false);
-	cpu_if->gicv5_vpe.resident =3D false;
-}
+The series also makes zeroing part of private-to-shared transitions, with
+each architecture clearing memory at the appropriate point. Callers must
+therefore initialize shared buffers after the transition; existing contents
+are not preserved.
 
-When the thread schedules back in, kvm_vcpu_check_block() ->
-kvm_vgic_vcpu_pending_irq() sees db_fired =3D=3D false and goes back to sle=
-ep in
-schedule(), losing the wakeup.
+The shared-granule size defaults to PAGE_SIZE and can be overridden by an
+architecture. The arm64 CCA changes to discover the host's IPA state change
+alignment are not included in this series.
 
-Making the vPE resident on schedule-in during halt-polling also disarms the
-hardware doorbell for the rest of the poll window, so newly pending SPIs and
-LPIs do not set db_fired, and a subsequent kvm_sched_out() still runs the E=
-L2
-residency hypercalls and vgic_v5_sync_ppi_priorities() under the runqueue
-lock. Returning early from vgic_v5_load() when IN_WFI is set keeps
-gicv5_vpe.resident false throughout kvm_vcpu_halt(), so kvm_sched_out()
-returns immediately in vgic_v5_put().
+GIC ITS command queues and tables and the dma-buf system_cc_shared heap
+use the common allocator. DMA direct, atomic DMA pools and SWIOTLB retain
+their allocation paths and use the common layout or transition helpers.
+Restricted DMA pools are checked for shared-granule alignment.
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261116071304.2037=
-895-1-justin.he@arm.com?part=3D2
+Hyper-V users of set_memory_encrypted() and set_memory_decrypted() are not
+changed to use cc_make_shared() by this series. Those paths are not
+currently used by the arm64 CCA code path, and therefore are not part of
+the arm64 CCA IPA state change alignment problem addressed here.
+
+Notes:
+* Codex assisted with implementation, review and series organization.
+
+Changes from v9:
+https://lore.kernel.org/all/20261104164555.3555725-1-aneesh.kumar@kernel.org
+* Leak allocations after failed sharing in the common allocator and SWIOTLB.
+* Move x86 zeroing from the AMD, TDX and Hyper-V vTOM callbacks to
+  set_memory_decrypted(), after a successful transition
+* Add set_memory_decrypted_nozero() for VGA mappings, which must change
+  memory attributes without clearing device memory.
+* Zero memory even when encryption is inactive in the generic, arm64 and
+  pSeries implementations of set_memory_decrypted().
+* Move pSeries zeroing after sharing. Document why pKVM and s390 must clear
+  private contents before sharing
+* Drop the GIC ITS VPE L1 preallocation patch from this series.
+  This issue predates the series and will be addressed separately.
+* Add mm/cc_shared.c and include/linux/cc_shared.h to the TSM MAINTAINERS
+  entry.
+
+Changes from v8:
+https://lore.kernel.org/all/20260924100529.1398790-1-aneesh.kumar@kernel.org
+* Rebase onto the 7.4-rc1
+* Move TDX and AMD (including SEV-SNP) zeroing to their finish callbacks
+  so private-to-shared transitions clear the final shared mapping.
+* Clear __GFP_MOVABLE for shared allocations, which cannot be migrated.
+* Resolve NUMA_NO_NODE in the common ITS allocation helper to preserve
+  placement for all ITS callers.
+* Stop SWIOTLB allocation retries when the reduced pool would fall below
+  the shared granule size, avoiding an allocation retry loop.
+
+Changes from v7:
+https://lore.kernel.org/all/20260921144847.501151-1-aneesh.kumar@kernel.org
+* Add the following new patches:
+  * "irqchip/gic-v3-its: Preallocate VPE L1 tables"
+  * "mm: Assert CoCo shared allocations may sleep"
+  * "mm: Zero memory during shared memory transitions"
+* Drop the arm64 RHI and shared granule size patches so that the series can
+  be rebased on top of upstream to enable Shashiko review.
+
+Changes from v6:
+https://lore.kernel.org/all/20260904103452.1197239-1-aneesh.kumar@kernel.org
+* Add a common allocator and geometry/transition helpers for CoCo host-shared
+  memory.
+* Convert GIC ITS, dma-direct, atomic DMA pools, and the dma-buf
+  system_cc_shared heap to the common allocator.
+* Limit dma-buf scatterlist entries to the requested buffer size so rounded
+  backing is not exposed to importers.
+
+Changes from v5:
+https://lore.kernel.org/all/20260706060432.1375570-1-aneesh.kumar@kernel.org
+* Rebased to latest kernel
+* Drop patch arm64: realm: Move Realm memory encryption ops to RSI code
+
+Changes from v4:
+https://lore.kernel.org/all/20260427063108.909019-1-aneesh.kumar@kernel.org
+* Rename the helpers to use CoCo terminology
+  (mem_cc_shared_granule_size() / mem_cc_align_to_shared_granule() instead of
+  mem_decrypt_granule_size() / mem_decrypt_align()).
+* Use __DMA_ATTR_ALLOC_CC_SHARED to pass CoCo shared allocation requirements
+  down to CMA-based allocation helpers.
+* Add validation for restricted DMA pools to reject pools that are not aligned
+  to the shared granule size.
+* Add dma-buf system heap handling for cc-shared buffers.
+* Split the previous combined DMA/SWIOTLB/ITS change into smaller subsystem
+  patches covering ITS, DMA direct, SWIOTLB, restricted DMA pools, dma-buf
+  system heap, and arm64 Realm support.
+* Rework arm64 Realm support by moving Realm memory encryption ops into RSI
+  code and exposing the CCA shared granule size through arm64_mem_crypt_ops.
+
+Changes from v3:
+https://lore.kernel.org/all/20260309102625.2315725-1-aneesh.kumar@kernel.org
+* Fix build error reported by kernel test robot <lkp@intel.com>
+
+Changes from v2:
+https://lore.kernel.org/all/20251221160920.297689-1-aneesh.kumar@kernel.org
+* Rebase to latest kernel
+* Consider swiotlb always decrypted and don't align when allocating from swiotlb.
+
+Changes from v1:
+* Rename the helper to mem_encrypt_align
+* Improve the commit message
+* Handle DMA allocations from contiguous memory
+* Handle DMA allocations from the pool
+* swiotlb is still considered unencrypted. Support for an encrypted swiotlb pool
+  is left as TODO and is independent of this series.
+
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Baoquan He <baoquan.he@linux.dev>
+Cc: Mike Rapoport <rppt@kernel.org>
+Cc: Pasha Tatashin <pasha.tatashin@soleen.com>
+Cc: Pratyush Yadav <pratyush@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: "Christian König" <christian.koenig@amd.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Joerg Roedel (AMD) <joro@8bytes.org>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Robin Murphy <robin.murphy@arm.com>
+Cc: Steven Price <steven.price@arm.com>
+Cc: Sumit Semwal <sumit.semwal@linaro.org>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Thomas Gleixner <tglx@kernel.org>
+Cc: Will Deacon <will@kernel.org>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: Benjamin Gaignard <benjamin.gaignard@collabora.com>
+Cc: Brian Starkey <Brian.Starkey@arm.com>
+Cc: John Stultz <jstultz@google.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Radu Rendec <radu@rendec.net>
+Cc: "T.J. Mercier" <tjmercier@google.com>
+Cc: Madhavan Srinivasan <maddy@linux.ibm.com>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Nicholas Piggin <npiggin@gmail.com>
+Cc: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
+Cc: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
+Cc: Shrikanth Hegde <sshegde@linux.ibm.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: Gerald Schaefer <gerald.schaefer@linux.ibm.com>
+Cc: Heiko Carstens <hca@linux.ibm.com>
+Cc: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Sven Schnelle <svens@linux.ibm.com>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: x86@kernel.org
+Cc: H. Peter Anvin <hpa@zytor.com>
+Cc: Kiryl Shutsemau <kas@kernel.org>
+Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: K. Y. Srinivasan <kys@microsoft.com>
+Cc: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: Wei Liu <wei.liu@kernel.org>
+Cc: Dexuan Cui <decui@microsoft.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: dri-devel@lists.freedesktop.org
+Cc: iommu@lists.linux.dev
+Cc: linaro-mm-sig@lists.linaro.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-media@vger.kernel.org
+Cc: linux-mm@kvack.org
+Cc: kvmarm@lists.linux.dev
+Cc: patches@lists.linux.dev
+
+Aneesh Kumar K.V (Arm) (13):
+  mm: Add an allocator for CoCo shared memory
+  mm: Zero memory during shared memory transitions
+  irqchip/gic-v3-its: Resolve the default NUMA node explicitly
+  irqchip/gic-v3-its: Allocate shared tables using CoCo shared memory
+    allocator
+  dma-contiguous: Derive shared alignment from DMA attributes
+  dma-pool: Allocate CoCo atomic pools using CoCo shared memory
+    allocator
+  dma-direct: Align CoCo shared DMA allocations to the shared granule
+    size
+  swiotlb: Align shared IO TLB pools to the shared granule size
+  swiotlb: Reject misaligned restricted DMA pools for CoCo guests
+  dma-buf: system_heap: Limit scatterlist entries to the buffer size
+  dma-buf: system_heap: Allocate shared buffers using CoCo shared memory
+    allocator
+  swiotlb: Make rounded shared pool capacity allocatable
+  mm: Assert CoCo shared allocations may sleep
+
+ MAINTAINERS                                   |   2 +
+ arch/arm/mm/dma-mapping.c                     |   5 +-
+ arch/arm64/mm/mem_encrypt.c                   |   8 +-
+ arch/powerpc/platforms/pseries/svm.c          |  13 +-
+ arch/s390/mm/init.c                           |   7 +
+ arch/x86/hyperv/hv_init.c                     |   6 +-
+ arch/x86/include/asm/set_memory.h             |   1 +
+ arch/x86/include/asm/vga.h                    |   4 +-
+ arch/x86/kernel/kvmclock.c                    |   6 +-
+ arch/x86/mm/mem_encrypt_amd.c                 |   1 +
+ arch/x86/mm/pat/set_memory.c                  |  19 +-
+ drivers/dma-buf/heaps/system_heap.c           | 128 +++++-----
+ drivers/firmware/arm_rmm/rsi.c                |   9 +
+ drivers/hv/connection.c                       |  41 ++-
+ drivers/hv/hv.c                               |  11 +-
+ drivers/hv/hv_common.c                        |   2 -
+ drivers/iommu/dma-iommu.c                     |   2 +-
+ drivers/irqchip/irq-gic-v3-its.c              |  42 ++--
+ drivers/virt/coco/pkvm-guest/arm-pkvm-guest.c |   4 +
+ include/linux/cc_shared.h                     |  39 +++
+ include/linux/dma-map-ops.h                   |   9 +-
+ include/linux/set_memory.h                    |   8 +-
+ kernel/dma/contiguous.c                       |  41 ++-
+ kernel/dma/direct.c                           |  73 ++++--
+ kernel/dma/ops_helpers.c                      |   2 +-
+ kernel/dma/pool.c                             |  27 +-
+ kernel/dma/swiotlb.c                          |  94 ++++---
+ kernel/kexec_file.c                           |   3 +-
+ mm/Makefile                                   |   1 +
+ mm/cc_shared.c                                | 238 ++++++++++++++++++
+ 30 files changed, 635 insertions(+), 211 deletions(-)
+ create mode 100644 include/linux/cc_shared.h
+ create mode 100644 mm/cc_shared.c
+
+
+base-commit: aebb7274476403040d582c61478df8f4a7bf9cd3
+prerequisite-patch-id: 121492d71cc22b2adbfdedd668868c5a449ad764
+prerequisite-patch-id: ed31fd728f0adba3d60dcd6f3bae8da1a2193bcc
+-- 
+2.43.0
+
