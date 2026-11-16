@@ -1,49 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794843160;
-	b=pgtjRd/PK936NH22j3DQXsatHfiN/w8RjuwMM8jkClj3q6GhwCdzhgHLV+Y5h499m9ol
-	 WQWWt1LkIZME0Qu+zAQ603uXQirKpNxGAkBHL+Bj1l6gjA8UrVkT+M9GfPahdYNu62jSf
-	 mHgtdW9uh6CpNXtrRxaQ8FPf/AAPaS8VrsfzhBO7EAiBYp5A1299M5J57tBW+HE293DLc
-	 IcefaWV8FKeTch4mgiz0UtaiRfgNLB9oi0/Ll4u9OYpjNBrYPMmILA/DXo5aSsoByCcPR
-	 QEiHRGdof9+AGNmVUONB4XmJNzj4RA06VAWEwrXnvp307RuCCCXaKN2lWAEb20H53fQ==
+	t=1794844899;
+	b=KuWK7SLKQqrxGSgkOerlTPnw04zQNWYmtTfXFz/6BAfQVlQKkHYOI7I2Wi6az08PS1P4
+	 bQ+6NWmUhNQQqgSLAgCOt1fYqmLNLhUodIUVwMJp7ErMY9Td3g2JfXIaGQeRrnVsefENS
+	 hapwDUprPr96HIPyurG3hdhsMUJND4q0JUkveXMqpNoNqUGYnwCn6fX0kKKfbU1utg6nN
+	 bPoxhB4KdjS/dlDjoiNVNGLxL3w2mx4z+O8is6yQxsdSC8wMzk2NtT5KDDglde2/7p5d7
+	 Qs6eCJrloJHgT4oP/fL4mj7uNsGWiYn2ftOdwOcpzOUaOgT1NW9y053JSuxzsrrTXJg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794843160;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
-	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=Jj5m6gkNclPyoQQk/4BXK65xYrNPjI5avdyYMJJgjD8=;
-	b=L1DwqIAbIo6TIWKqBlLeYJgH4aoNGnlcwtGEbENs1VNlRQWr3d8T9Z0y/eP5atYP0tH5
-	 i6e19OumCzIJ2UR/GA1dymu9VCkFnXUtOnaqjFKZVXGsB0TNa7dRUfvqG+UlYVfqJtyBZ
-	 Dnk7fK6hFNQR0YowI+aO3H6bNdW9IPFAGXH0fN42NgCP/e0Z291rw4i1DQe+PiVvZVwhd
-	 9OlK7vEmmnk+KNPUmkacCZXt8hBC8EzKORWw2XaY69R+Gfc3Z+NLa1E+Fo3y3iPrRv1WV
-	 HTrSD7UX4TYzbuvtzdOLkEYzK8TjweOo5B0cLXmNWKM90bQ+WuyiZ/UmosvUInTTkSA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794844899;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=vWxnD3JhZUol/MGQugCerD+bGnYWHzc8eSVqln/Wqi4=;
+	b=AoAtUbk9FMT6/48LvxnI92nsBCYwBne0CsU2bsaKcy2kOsUT+5KI8mgO3AjVsumxvPup
+	 oR5Gd4BPQXDSwfiTihAz239+I4ebWklEAMMVljfnKdEXFL6hK4/Gr7em0rTTonWVLKnhT
+	 mhYLBT191ScTzDdvtzRHw+rot+RYumuZ+lPPU5jPXoaP/LtRylk+zg3ks4zgKLxOJbJP1
+	 0Aq5LiU3EHVdmDGtjhmUR5dOMsa7LPudoLXoOsxL2PXuDPizxrap2NEcgM9kwP8fSMaZA
+	 +BTtBkZKMXGSVYKk/ABQlkDbTWVJEYEFEqSdS+BA9XzSdhPJnNTFXryMfPl3Ps7Q9ZA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=jRNS6qMT;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42959606A337;
-	Mon, 16 Nov 2026 15:32:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 42959606A337
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="OTWL/4HP";
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86AF606A339;
+	Mon, 16 Nov 2026 16:01:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=jRNS6qMT
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 981E61684;
-	Mon, 16 Nov 2026 07:32:36 -0800 (PST)
-Received: from [10.57.63.54] (unknown [10.57.63.54])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F11FA3F763;
-	Mon, 16 Nov 2026 07:32:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794843159; bh=43dgJFkp15JzcneMwI62MfsDly+SSUj435aeqqE9QFA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=jRNS6qMTC1i1b0ZGoCqXwbS6KBrk+Yh5SqMP1Ral6xS3Kl4b05yV/26O1O9OQPr/V
-	 VKv8wWRTeAZ2qJ0AGAc5mdeJ1sNcv8KVpuqbRXV/JZl8UK6xrppLNhbKHBUqg37QLZ
-	 28VI45Iu+Fte5YfxEwqeMoQxZGRjZaXXLp6Vp5Us=
-Message-ID: <f2e47b68-1aee-4d17-8b63-e67075e7a42e@arm.com>
-Date: Mon, 16 Nov 2026 15:32:25 +0000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OTWL/4HP
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CD341F000C4;
+	Mon, 16 Nov 2026 16:01:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794844899;
+	bh=vWxnD3JhZUol/MGQugCerD+bGnYWHzc8eSVqln/Wqi4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=OTWL/4HPInwhhKALFy+nccOqOFnlRl3KeNdl7Pai4xabJ8kYIIarWfWF68LZTWb9K
+	 IZ/dGvrw4tZqOWP/fn7QrMrFiRn8OeWviR6G3QTSSbmVXZgYyZ6wqWbTRGMZ6bNPVA
+	 RfGoiBGHjvYYQHsQsjDRzreATKK3z3zVXc2QLiSTM2lL6gncdxuSyBUE2rb3O4th6b
+	 rIsjdI7ZgbwgLA3VUeGBOaRMv1aZpwgBKYsyUVlC7yB7B0rLeRFlpnz17rhpDuYznq
+	 8RbUe1epeyWxBKruqRc3tSvefrfrtu0WhfO3ynPk4OOnVEJ+9Uy/ujiZPre2CS+MKD
+	 CYW9OnSVUN0GA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xSz9E-0000000GXqJ-3Vfj;
+	Mon, 16 Nov 2026 16:01:36 +0000
+Date: Mon, 16 Nov 2026 16:01:36 +0000
+Message-ID: <86ik1w22an.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Dan Carpenter <dan@pereq.eu>
+Cc: Oliver Upton <oupton@kernel.org>,	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,	Zenghui Yu
+ <yuzenghui@huawei.com>,	Catalin Marinas <catalin.marinas@arm.com>,	Will
+ Deacon <will@kernel.org>,	Mark Rutland <mark.rutland@arm.com>,	Jintack Lim
+ <jintack.lim@linaro.org>,	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,	linux-kernel@vger.kernel.org,	Karthik Bhargavan
+ <karthik@pereq.eu>,	=?UTF-8?B?Q2zDqW1lbnQ=?= Blaudeau <clement@cryspen.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: nv: Fix AT emulation for TCR2_EL1
+In-Reply-To: <eec50693a12e1ba34d60458ae8fe605ac198a79c.1794808373.git.dan@pereq.eu>
+References: <cover.1794808373.git.dan@pereq.eu>
+	<eec50693a12e1ba34d60458ae8fe605ac198a79c.1794808373.git.dan@pereq.eu>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -52,155 +74,170 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 14/14] irqchip/gic-v3-its: Preallocate VPE L1 tables
-To: Lorenzo Pieralisi <lpieralisi@kernel.org>,
- "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, linux-coco@lists.linux.dev,
- Andrew Morton <akpm@linux-foundation.org>, Baoquan He
- <baoquan.he@linux.dev>, Mike Rapoport <rppt@kernel.org>,
- Pasha Tatashin <pasha.tatashin@soleen.com>,
- Pratyush Yadav <pratyush@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Joerg Roedel <joro@8bytes.org>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Robin Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Thomas Gleixner
- <tglx@kernel.org>, Will Deacon <will@kernel.org>,
- Russell King <linux@armlinux.org.uk>,
- Benjamin Gaignard <benjamin.gaignard@collabora.com>,
- Brian Starkey <Brian.Starkey@arm.com>, John Stultz <jstultz@google.com>,
- Mark Rutland <mark.rutland@arm.com>, Radu Rendec <radu@rendec.net>,
- "T.J. Mercier" <tjmercier@google.com>,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- Christophe Leroy <chleroy@kernel.org>, Ritesh Harjani
- <ritesh.list@gmail.com>, Shrikanth Hegde <sshegde@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
- Kiryl Shutsemau <kas@kernel.org>, Rick Edgecombe
- <rick.p.edgecombe@intel.com>, "K . Y . Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
- linaro-mm-sig@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
- linux-media@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev,
- patches@lists.linux.dev
-References: <20261104164555.3555725-1-aneesh.kumar@kernel.org>
- <20261104164555.3555725-15-aneesh.kumar@kernel.org>
- <86zevn1c9a.wl-maz@kernel.org> <yq5ah5huoteu.fsf@kernel.org>
- <87ld6x8zb7.wl-maz@kernel.org> <yq5apkw5xpnz.fsf@kernel.org>
- <avrgNBXDFMGL6dqO@red-moon>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <avrgNBXDFMGL6dqO@red-moon>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dan@pereq.eu, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, jintack.lim@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, karthik@pereq.eu, clement@cryspen.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 16/11/2026 10:51, Lorenzo Pieralisi wrote:
-> On Mon, Nov 16, 2026 at 11:51:04AM +0530, Aneesh Kumar K.V wrote:
->> Marc Zyngier <maz@kernel.org> writes:
->>
->>> On Fri, 06 Nov 2026 15:45:29 +0000,
->>> Aneesh Kumar K.V <aneesh.kumar@kernel.org> wrote:
->>>>
->>>> Marc Zyngier <maz@kernel.org> writes:
->>>>
->>>>> On Wed, 04 Nov 2026 16:45:55 +0000,
->>>>> "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
->>>>>>
->>>>>> VPE L1 tables are allocated from the CPU-starting callback, where sleeping is
->>>>>> not allowed.  Remove the page allocation from this atomic path.
->>>>>>
->>>>>> Use a blocking allocation for the boot CPU and record the resulting table
->>>>>> order.  Allocate a page of that order from the sleepable CPU hotplug prepare
->>>>>> stage for each secondary CPU.  Consume the preallocated page only when the CPU
->>>>>> cannot inherit an existing redistributor or ITS table.
->>>>>>
->>>>>> Reclaim unused preallocations after the CPU reaches the online state, and from
->>>>>> the prepare-state teardown when CPU bring-up aborts.
->>>>>
->>>>> No. The way to do it is to move the ITS probing out of the
->>>>> non-sleepable CPU hotplug path.
->>>>>
->>>>> I proposed a potential hack at [1] (which I find far more palatable
->>>>> than this proposal), but the real fix is to probe the ITSs as
->>>>> devices.
->>>>>
->>>>
->>>> Could you share a bit more detail on what you have in mind?
->>>>
->>>> Are you suggesting that we create a platform device for each ITS and
->>>> initialize it through the driver's probe callback, while the rest of the
->>>> GIC initialization stays in the existing early boot path?
->>>>
->>>> Would that mean the main GIC is operational during early boot, while
->>>> ITS-dependent features, such as MSI delivery and direct injection, become
->>>> available after the ITS devices probe?
->>>>
->>>> Is that the split you have in mind?
->>>
->>> Yes. Then once this is done, all the tables become normal DMA
->>> allocations, for which there should already be adequate support.
->>>
->>
->> Thanks for confirming. Can we handle the ITS platform-device conversion
->> and the switch to DMA allocations in a separate series?
->>
->> The existing VPE L1 allocation path calls set_memory_decrypted() from
->> the non-sleepable CPU-starting callback, even though
->> set_memory_decrypted() can sleep. This issue predates the shared-granule
->> allocator changes.
+On Mon, 16 Nov 2026 06:00:52 +0000,
+Dan Carpenter <dan@pereq.eu> wrote:
 > 
-> If I may ask, why does the existing code ends up calling set_memory_decrypt(),
-> or reworded, why does the VPE L1 allocation path goes through the ITS specific
-> allocation function rather than using alloc_pages() (as it was before
-> b08e2f42e86b5) ?
+> Arm provides an AT instruction that translates a virtual address the way
+> the MMU would and returns the result.  There is a bug in the way this
+> instruction is emulated for nested virtualization because of how TCR2_EL1
+> is handled.  The bug is fairly minor.
+> 
+> The TCR2_EL1 register has bits which turn on permission indirection
+> (PIE) and permission overlays (POE).  When these bits are set, the AT
+> instruction reads the permissions stored in PIR_EL1 and POR_EL1.  If
+> you have the right features and permissions then in the return value from
+> the AT instruction we set one bit to either 1 or 0 depending on whether
+> the access would be allowed or whether it would fault.
+> 
+> However, the bug is that just because the host has TCR2 enabled, it
+> doesn't mean the VM has it.  KVM doesn't load these registers for a VM
+> which doesn't have the features, instead the AT runs with the host's
+> HCRX_EL2, which has TCR2En set.  So the AT uses the TCR2_EL1, PIR_EL1 and
+> POR_EL1 values another VM left on the CPU, or possibly the VMM's POR_EL0.
+> Likewise, for a VM which has TCR2 but not PIE or POE, the L2's TCR2_EL1
+> is loaded unmasked.
+> 
+> The impact of this bug is that we leak a single bit of data to the L1,
+> but in real life it's hard to imagine how it is useful to an attacker.
+> 
+> Fix this by writing zero to TCR2_EL1 when the VM doesn't have TCR2, and
+> by clearing the PIE and POE bits when the VM doesn't have those
+> features.  Also it should be effective_tcr2(vcpu, TR_EL10) to read the
+> TCR2 for the L1 instead of vcpu_read_sys_reg(vcpu, TCR2_EL1).
+> 
+> Fixes: 477e89cabb14 ("KVM: arm64: nv: Add basic emulation of AT S1E{0,1}{R,W}")
+> Fixes: 23e7a34c8397 ("KVM: arm64: Add AT fast-path support for S1PIE")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Dan Carpenter <dan@pereq.eu>
+> ---
+>  arch/arm64/kvm/at.c | 14 +++++++++++++-
+>  1 file changed, 13 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index 30d8f062b2c2..06765881a4c8 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -1438,7 +1438,13 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>  	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR_EL1),	SYS_TCR);
+>  	write_sysreg_el1(vcpu_read_sys_reg(vcpu, MAIR_EL1),	SYS_MAIR);
+>  	if (kvm_has_tcr2(vcpu->kvm)) {
+> -		write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR2_EL1), SYS_TCR2);
+> +		u64 tcr2 = effective_tcr2(vcpu, TR_EL10);
+> +
+> +		if (!kvm_has_s1pie(vcpu->kvm))
+> +			tcr2 &= ~TCR2_EL1_PIE;
+> +		if (!kvm_has_s1poe(vcpu->kvm))
+> +			tcr2 &= ~(TCR2_EL1_POE | TCR2_EL1_E0POE);
+> +		write_sysreg_el1(tcr2, SYS_TCR2);
 
-Because it needs to be accessible to the GIC "hardware". In this case
-the GIC is emulated by the hypervisor and the hypervisor for a realm can
-only see the unprotected memory.
+The sanitising should really be moved into the effective_tcr2()
+helper, as this is its purpose. Something like the below, which is
+obviously untested... Ultimately, TCR2_EL1 should be moved to the
+automatic sanitisation scheme to inherit the expected RES0 behaviours.
 
-Now I agree this is a little academic in practise because Linux (as a
-hypervisor) will not expose RVPEID - so allocate_vpe_l1_table() will
-early out. IIUC this would only actually be relevant in the case of
-nested virtualisation within a realm guest - which is a long way off if
-it ever happens.
+>  		if (kvm_has_s1pie(vcpu->kvm)) {
+>  			write_sysreg_el1(vcpu_read_sys_reg(vcpu, PIR_EL1), SYS_PIR);
+>  			write_sysreg_el1(vcpu_read_sys_reg(vcpu, PIRE0_EL1), SYS_PIRE0);
+> @@ -1452,6 +1458,9 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>  	__load_stage2(mmu);
+>  
+>  skip_mmu_switch:
+> +	if (cpus_have_final_cap(ARM64_HAS_TCR2) && !kvm_has_tcr2(vcpu->kvm))
+> +		write_sysreg_el1(0, SYS_TCR2);
+> +
+>  	/* Temporarily switch back to guest context */
+>  	write_sysreg_hcr(vcpu->arch.hcr_el2);
+>  	isb();
+> @@ -1554,6 +1563,9 @@ int __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>  		if (!vcpu_el2_e2h_is_set(vcpu))
+>  			val |= HCR_EL2_NV | HCR_EL2_NV1;
+>  
+> +		if (cpus_have_final_cap(ARM64_HAS_TCR2) && !kvm_has_tcr2(vcpu->kvm))
+> +			write_sysreg_el1(0, SYS_TCR2);
+> +
+>  		write_sysreg_hcr(val);
+>  		isb();
+>  
 
-> Why did b08e2f42e86b5 patched allocate_vpe_l1_table() allocation and moved
-> it to using its_alloc_pages() ?
+This one needs fixing, as sashiko reported, but the reason why the
+proposed fix works at all is pretty fragile:
 
-In that commit I simply changed all the allocation paths which were
-allocating memory to be visible to the GIC to use the new allocator. As
-we "know" that the GIC can only access "decrypted" memory. Admittedly
-that could easily change in the future - but my expectation is that it
-will only change with the switch to GICv5.
+- the reset value is 0
+- we enforce RES0 behaviours on all interesting fields
+- TCR2_ELx are trapped and result in an UNDEF
 
-Of course what I missed was that this specific allocation uses
-GFP_ATOMIC and that set_memory_decrypted() can sleep. This wouldn't have
-shown up on any testing because of the early exit:
-
-        if (!gic_rdists->has_rvpeid)
-                return 0;
+So this deserves a comment, along the lines of what I have written in
+the hack below.
 
 Thanks,
-Steve
 
-> Thanks,
-> Lorenzo
-> 
->>
->> Since fixing this properly needs a broader ITS rework, can we handle
->> that separately and drop the preallocation patch from this series?
->>
->> -aneesh
+	M.
 
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index 30d8f062b2c29..1ff452277f27e 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -91,11 +91,16 @@ static enum trans_regime compute_translation_regime(struct kvm_vcpu *vcpu, u32 o
+ static u64 effective_tcr2(struct kvm_vcpu *vcpu, enum trans_regime regime)
+ {
+ 	if (regime == TR_EL10) {
++		u64 val;
++
+ 		if (vcpu_has_nv(vcpu) &&
+ 		    !(__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En))
+ 			return 0;
+ 
+-		return vcpu_read_sys_reg(vcpu, TCR2_EL1);
++		val = vcpu_read_sys_reg(vcpu, TCR2_EL1);
++		val &= ~(kvm_has_s1poe(vcpu->kvm) ? (TCR2_EL1_POE | TCR2_EL1_E0POE) : 0);
++		val &= ~(kvm_has_s1pie(vcpu->kvm) ? TCR2_EL1_PIE : 0);
++		return val;
+ 	}
+ 
+ 	return vcpu_read_sys_reg(vcpu, TCR2_EL2);
+@@ -1544,7 +1549,7 @@ int __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 	 * switching context behind everybody's back, disable interrupts...
+ 	 */
+ 	scoped_guard(write_lock_irqsave, &vcpu->kvm->mmu_lock) {
+-		u64 val, hcr;
++		u64 val, hcr, tcr2;
+ 		bool fail;
+ 
+ 		val = hcr = read_sysreg(hcr_el2);
+@@ -1554,6 +1559,16 @@ int __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 		if (!vcpu_el2_e2h_is_set(vcpu))
+ 			val |= HCR_EL2_NV | HCR_EL2_NV1;
+ 
++		if (cpus_have_final_cap(ARM64_HAS_TCR2)) {
++			tcr2 = read_sysreg_el1(SYS_TCR2);
++			/*
++			 * This relies on the reset value of TCR2_EL2
++			 * being 0, and not being modified when
++			 * FEAT_TCR2 is not exposed to the guest
++			 */
++			write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR2_EL2), SYS_TCR2);
++		}
++
+ 		write_sysreg_hcr(val);
+ 		isb();
+ 
+@@ -1577,6 +1592,9 @@ int __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 		if (!fail)
+ 			par = read_sysreg_par();
+ 
++		if (cpus_have_final_cap(ARM64_HAS_TCR2))
++			write_sysreg_el1(tcr2, SYS_TCR2);
++
+ 		write_sysreg_hcr(hcr);
+ 		isb();
+ 	}
+
+-- 
+Without deviation from the norm, progress is not possible.
