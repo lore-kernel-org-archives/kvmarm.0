@@ -1,57 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794838001;
-	b=aQWDxBWy0+SiAZk1DFaJR0yf8c6kNsswmPkNq4GrfSUwIlBpQ8wWqRC2gUWuwik61G+g
-	 41OEYPp4/w4s42yCjhzZShlu7AjpuEhNtPm6yVsFzMP8C/BrJILLtGSZoCL4UWtImO5ia
-	 NhiwsuKCYn43tZVlDTu0DNV69K7vcfU95RgQMU+mFjI2TH38huuYIFp3BwSGM9UYnhZ5/
-	 SaaN+6xyY+nwduD1sZLSc2q+8pH1JxEtGbPw/dwcAamHlJdr3VXCvPuj7tpVfnM5ClVF3
-	 Cv9AR8UdmTq8w8VT8mkTn+vi8RxZ9hezx10/7ZYsshEBZRPcEnbq3FCgsWH32znwHXA==
+	t=1794840922;
+	b=kSlZCvqzxe132gBRorOLzpWPr5kFbdl42A4HENPgsC6DdAKcmTD+zSmdyZ33dU1PhFKw
+	 +Vil2QhE7hvBESWBUq0EF2rRDkZ8PNCDlT3Yh7cqq5p3Sd1fF1Ghu+1sSrbkM0csqoBSO
+	 TvWzR2Brt92CVd5Q2mMXsbl1UsRLZKM8LX2GEDu6amoyK099LJZdJoqwTxd4Ri5uVGU0V
+	 I+svcw1ZC8BQnOy36k8TWG8SvJ9TCDZ3aeZ1Hm3PPE6ndLl9SEAfeagqq+//CPWtqjv+K
+	 J6P2LHZHxLYKz/Sd5AaJrZm2F7vcjoj8lzb/CqugwB0Kkh3lAYXLxxEjNjwzba1TYzg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794838001;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=m/HyeUXYh0w1dEeZG21NLs2HymAP5ME2rXx+zB9OAeI=;
-	b=IEa1h8wKPDvg5/t4nQg30Oj+gep/9+llV7Ut7VZ2+/kDDpm1ep07XRqWxPvqwsebnz+b
-	 cS73TtVX6Nlls+NrNPIUUnFUPCyY0Kt1rcmDC+APOND68AUwFt60CvyVj5HJ24TCB+ei1
-	 G+9f6P3ZM/Ku1bLRZVcmYpIMcrnQmq4lZnH8PFGJHoPOyjf47nIWeUczkY/8pctmCXPcb
-	 5MSAiV8gsoOdIj7mizdjDo++JbifS5y5xCRtqkWK2gZEuJSA1RmWdHi2HU3grznZpdjE+
-	 zLL2Ai4eJriNOQj7jZ5vRZ4j75KZVc/wblWfYeNagOFKDHmmkr7dC94MPQzrgzyIBmQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794840922;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
+	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=dhpNbptHtWGeqwtJDxxu+ZKON7t1aC1UAEhp1vp/RvQ=;
+	b=Q0WIywViTRbj013PNC7cRh35TJURCm9w3jjFjqRyjsou3DImjL6F5UkY31hxECvOIwgP
+	 t/6nAN8t6bRL8H12otJqDl6HcIrWXRkMIFZQ8o8cLzLo/1x3ZdQB9ZGRuIoPwwhm8mn5r
+	 rwixDtzsHo/HtJPlVbf1VtO1qU5kOwRPFyp3Z75T3FNWBIUZvSJa6YByBId1QITY0G6fR
+	 7DZShj70fFElM9hOzWGzbK+tySBSDXk9gIm0bQdDt7ow4+IxlTLbCmDlPxIa1KoMPZFab
+	 KZ+FBloUJECAU8f1gM/SU6uQ30naVFdFPS/sKcXCuFatqOtccoPN54xSh/Z/0hNIN/Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ic12xE3t;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B16606A323
-	for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 14:06:41 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=eLtxxtnB;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF796606A31C;
+	Mon, 16 Nov 2026 14:55:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BF796606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ic12xE3t
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB98F1F000C5;
-	Mon, 16 Nov 2026 14:06:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794838001;
-	bh=m/HyeUXYh0w1dEeZG21NLs2HymAP5ME2rXx+zB9OAeI=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=ic12xE3t6kX4KEeWCcGa7lykb6ikFCisffgB6qawdJ/VETPOKoS6C7ZXZHPhrO8uF
-	 URdv+BN84wygp6x3J9bL7873sjIacpdQ3TNagwN0/Zj7mRnZDq1xNkqfWZYZRvzG43
-	 +BRA9arBtyYLeXIDnV5g2g+Ox/zWeXMxYUBdmdHGLrSA1+gCuGIJo5+HXXPx88fiEn
-	 A0p2VWg1OYQ3wihtP/KZ6Zx6L5lt3FdAywHQM28tnvRiKlkPWsa6UZjDCic6s1oc0P
-	 vKLB7NUuZmsomp/Qfi/l7chEREZhE5orFQPo1AKienVwpDgVgMLUhGkcKGDyQKgKo1
-	 4HWx3qCWNpkCA==
-Message-ID: <sashiko-outbox-217134@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH] KVM: arm64: nv: Fix NULL dereference in
- kvm_inject_nested()
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Dan Carpenter" <dan@pereq.eu>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <avsH0lxpLIF2Ug64@stanley.mountain>
-References: <avsH0lxpLIF2Ug64@stanley.mountain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 16 Nov 2026 14:06:38 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=eLtxxtnB
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B49EA1684;
+	Mon, 16 Nov 2026 06:55:16 -0800 (PST)
+Received: from [10.57.63.54] (unknown [10.57.63.54])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 351C43F763;
+	Mon, 16 Nov 2026 06:55:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1794840919; bh=Sp7fVwBe+QVG0GBjjUXT43r55ZA8pJUJowv4qnMKltM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=eLtxxtnB3kbyPyVxz0I8NYvtZyDlTDjTDBxvVHLHHHSer6CfjCy71wmNwusyXm3sW
+	 I6Xhgyi7yKx3n2aBaQxgdY5YDOYZowsl0TAnNIlNChL33P8ExyUXU87DGiZ89ibCxr
+	 1Hg/6UdnY43fIPXvNlhhfH4Eig/Ve+4kgTyQ/IGA=
+Message-ID: <7446568c-d794-4177-aac5-49746e2f05c9@arm.com>
+Date: Mon, 16 Nov 2026 14:55:12 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -60,97 +52,61 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 12/12] KVM: arm64: CCA: Add Realm stage-2 MMU
+ operations
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ Kohei Enju <enju.kohei@fujitsu.com>
+References: <20261111145758.217946-1-steven.price@arm.com>
+ <20261111145758.217946-13-steven.price@arm.com>
+ <37a57d36-a516-4312-9e4e-fc151ab77c8b@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <37a57d36-a516-4312-9e4e-fc151ab77c8b@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [High] KVM: arm64: nv: unguarded kvm_pmu_nested_transition() in
-  kvm_inject_nested()
---
+On 16/11/2026 11:46, Suzuki K Poulose wrote:
+> On 11/11/2026 14:57, Steven Price wrote:
+>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>
+>> Register the Realm stage-2 MMU operations now that the RMM mapping
+>> and unmapping helpers are available. Route unmapping through the
+>> RMM, and use the existing fault handler for Realm memory faults.
+>>
+>> The RMM handles TLB invalidation when stage-2 mappings change, so
+>> the host has no separate TLB flush to perform. Realm stage-2 does
+>> not support access flags, including for shared IPAs.
+>>
+>> Dispatch stage-2 destruction according to the VM flavor. Realm
+>> teardown destroys non-root RTTs through RMI, so the host frees
+>> only the root RTT pages.
+> 
+> Minor nit: It may be worth splitting the destroy abstraction as a
+> separate patch. Otherwise looks good to me.
 
-commit 7702078604222808ef62a9f6855a5c6c2add9d59
-Author: Dan Carpenter <dan@pereq.eu>
+Good point - I can split that out.
 
-KVM: arm64: nv: Fix NULL dereference in kvm_inject_nested()
+Thanks,
+Steve
 
-This commit guards the kvm_arch_vcpu_put() and kvm_arch_vcpu_load() calls
-in kvm_inject_nested() with a check that the vCPU is currently loaded.
+>>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>
 
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nes=
-ted.c
-> index 2bec816683614..22ca735a34f69 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -2862,7 +2862,7 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu,=
- u64 esr_el2,
->  			     enum exception_type type)
->  {
->  	u64 pstate, mode;
-> -	bool direct_inject;
-> +	bool direct_inject, loaded;
-> =20
->  	if (!vcpu_has_nv(vcpu)) {
->  		kvm_err("Unexpected call to %s for the non-nesting configuration\n",
-> @@ -2891,6 +2891,7 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu,=
- u64 esr_el2,
->  	}
-> =20
->  	preempt_disable();
-> +	loaded =3D (vcpu->cpu !=3D -1);
-> =20
->  	vcpu_set_flag(vcpu, IN_NESTED_EXCEPTION);
-> =20
-> @@ -2900,7 +2901,8 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu,=
- u64 esr_el2,
->  	 */
->  	__kvm_adjust_pc(vcpu);
-> =20
-> -	kvm_arch_vcpu_put(vcpu);
-> +	if (loaded)
-> +		kvm_arch_vcpu_put(vcpu);
-> =20
->  	kvm_inject_el2_exception(vcpu, esr_el2, type);
-> =20
-> @@ -2915,7 +2917,8 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu,=
- u64 esr_el2,
->  	 */
->  	__kvm_adjust_pc(vcpu);
-> =20
-> -	kvm_arch_vcpu_load(vcpu, smp_processor_id());
-> +	if (loaded)
-> +		kvm_arch_vcpu_load(vcpu, smp_processor_id());
->  	vcpu_clear_flag(vcpu, IN_NESTED_EXCEPTION);
-> =20
->  	preempt_enable();
-
-[Severity: High]
-Can kvm_pmu_nested_transition() at the end of kvm_inject_nested() still
-run when the vCPU is not loaded?
-
-Right below preempt_enable(), kvm_inject_nested() unconditionally calls
-kvm_pmu_nested_transition():
-
-arch/arm64/kvm/emulate-nested.c:kvm_inject_nested() {
-    ...
-	preempt_enable();
-
-	if (kvm_vcpu_has_pmu(vcpu))
-		kvm_pmu_nested_transition(vcpu);
-}
-
-When KVM_SET_VCPU_EVENTS reaches kvm_inject_nested() on an unloaded vCPU,
-kvm_pmu_nested_transition() calls kvm_pmu_create_perf_event() and
-kvm_vcpu_pmu_restore_guest().  If the vCPU was created with
-KVM_ARM_VCPU_PMU_V3_STRICT before KVM_ARM_VCPU_PMU_V3_SET_PMU is called,
-kvm_pmu_create_perf_event() -> kvm_map_pmu_event() dereferences a NULL
-vcpu->kvm->arch.arm_pmu.  If called before KVM_ARM_VCPU_PMU_V3_INIT, it
-can also queue an uninitialized vcpu->arch.pmu.overflow_work.
-
-Even on an initialized PMU, running kvm_pmu_nested_transition() while
-unloaded binds the new perf_event to current (which may be a VMM control
-thread rather than the vCPU thread) and programs the physical CPU's PMU
-EL0 filters via kvm_vcpu_pmu_restore_guest() without a matching
-kvm_vcpu_pmu_restore_host() before returning to userspace.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/avsH0lxpLIF2Ug64@st=
-anley.mountain?part=3D1
