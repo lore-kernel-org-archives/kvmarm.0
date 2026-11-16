@@ -1,102 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794808844;
-	b=2eyIwVC9rKuumxQKCYYu3Cx840NOhAbrYQJiY1yM5WHoc0kRLq3V+AWLMEY/9t1eTfK7
-	 8CyyRiWqpOSwFG5PwuE2mYw2rUGhrkUIswRfumg45KbuXdNadmzG8GII0MR9dbkeQRdlD
-	 1C6xul2FrQ65VgMvVWi6UfWwSLXro5uBqnkz8RimRWoZoKumRjZttf5TrzcqULqINd2uv
-	 BgoeLJbFLpAueSNTs0MgS62rDux3WwXFD7pYkrz0ijb6tuhmKUH9OAEHdT53Ixa4cfsm3
-	 Or8Fvyc7YMW71zWh19r++MUlRV3ADX/xsN3Sg56QBY5T9jos1eI/T4EElXkoHHu+mDw==
+	t=1794808854;
+	b=2bsDprvRwC36XlfkTXMNY0Z8Nc027H+C3R3hJcOp0UbWEiMv4QNAmIKDgxL9+H8Dz3X4
+	 p/4TrBMVrV75TOjVDn5o7IwsV2xtVL0EyLR7XySx7azlsXqGDpYDujtM4qNsfA4Y5rgqt
+	 NiVcnBqtETHIpj2+takhceEFjGZgEj9sgJ9pnRSUx6koDDKCWgUBpnKEpwQRgGzZSrHyG
+	 aIoMGCeQuSDA+ZBR/JScQCqmTov+Eb9PqxZatqNyP5DGjVroE2HQdDoUFwYqFuljym5dL
+	 tbNjW/sL6pGs/C779uR0f+UgTe5irQmdvXysaBupz7dj1cI67m/TLrJm/dwQHI9X2jA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794808844;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794808854;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=4EJinoQFWOQAxBpp8/0xszfKNpVkrh34c2hx1lgmetc=;
-	b=PuVSELKDmp8yt8jhfB+MAKPIjBk0gSVWVdsmMgHHjOTD4Y20HhQVh2drxGWvcKr8hqr4
-	 otJmR+VuchJaiPTNGbyZoQem5XALRAuq8pTLxcZ2XJvH+gW7S9B6UOf7UeQ12XbKGDsYM
-	 czyH+n+bBGWDQB2i0HIJ2f6F3NEGylJhWUB0Edc5rDMKwjBhzo5bZ600Ud+39FS2YTCpV
-	 4ELurwpQAECGZJMCkdsVp3ZOTQTneqhBezxqqkbj2U992CLSD/k2d8wM8Hf8Jtjv0AbBD
-	 Ao7UeNsiOz/UpsY/2gqxQxL5//mM3SG7jEwVJhjz3uf7RvVPU+TSMGD0HzGEIwF6p0A==
+	 Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition;
+	bh=WFV4t0eUs0gbqqsFkBQx5rUyLF4Yon8sMLY8mNC/aTw=;
+	b=cqOyvackT6vDzWW9nXsdEmIa6avjI8h9IMFNX0E/VLS8H2lDe8U5GqMMHKjpBB8NZmgu
+	 PUxd2C+6qAh1yDRt0HvQjBR/YI0UjUJ7qYfSTHPjuDeVnLh9uoRQDgGh32lmmUWWvxtqx
+	 zBGZ6Y868t9pCm2Wa4XlYzbsiV+5SuQx/fcEXVbdjGOijTrTBI4aXaUXzUqg9r8nT7Ym5
+	 mKBfiiJ7NF6uE7L3D9LGVSHyEuEYkkP5cFyMS/mFRGkQGbYcAhPHmvXN+oVe11jCxXFDw
+	 qmgo/Vpm3S8l/N6FqLiIUjxysu+hIqW6jkfC7vMnMZewAzm55MZBYt1HKOTtnLKqibQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=pereq.eu;
 	spf=pass smtp.mailfrom=cryspen.com;
-	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=Pa6yCJYl;
-	arc=none smtp.remote-ip=209.85.208.41
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=LNvpUTcp;
+	arc=none smtp.remote-ip=209.85.221.43
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4A8606A31C
-	for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 06:00:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EC4A8606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C22606A323
+	for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 06:00:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 44C22606A323
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=Pa6yCJYl
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6b4bd3d98bfso4269280a12.1
-        for <kvmarm@lists.linux.dev>; Sun, 15 Nov 2026 22:00:42 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=LNvpUTcp
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-491f34b4e0fso1187699f8f.2
+        for <kvmarm@lists.linux.dev>; Sun, 15 Nov 2026 22:00:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pereq.eu; s=google; t=1794808841; x=1795413641; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=4EJinoQFWOQAxBpp8/0xszfKNpVkrh34c2hx1lgmetc=;
-        b=Pa6yCJYljfw77Txa02Gv6yY8KJ7MCFkhqntFGZvjxg/eGaOtMsWk/GpDaXz0wLKu/q
-         ug8FsLtZKbZyFqn9eEjflBm5GIXJlZvzeJzrt2QPx4fwcMRzwMUjugilxDo8Cu3FvLvM
-         46nJDaDOBQ7mgkLfkTKkzaQVtwt0vvC9Wn/Wwbbsr9TVX0YUx2H38VPIINXbngeNnaco
-         jAX/2Zc4Kw2AenjmS1Qxxn9XbZe8jpmCnaA4DzH9Ub+X58GQ1zZTNMqoqgN8AKMVOq0/
-         9ard4jmIvAp02C8An6jBz29a7ASiUisIaMrfV16m6pY7RicLlt/3tkkTuHHSYqXcIIfq
-         3oSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794808841; x=1795413641;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=pereq.eu; s=google; t=1794808852; x=1795413652; darn=lists.linux.dev;
+        h=content-disposition:content-type:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=4EJinoQFWOQAxBpp8/0xszfKNpVkrh34c2hx1lgmetc=;
-        b=ifBQpMpTIjO1gXvb26pYTmrrzIyl28VKleMnA9BPQq3nz+QxKnO4aR2x1fUVSsOF8t
-         RfLRLHHQH9EnPbDvuQM7ux4zDRCq6TYDCstwFkZdP6I4TqT1QaZsI8o+R0oS/UIPkjc4
-         sxIq1F8LJnUpzU0QFT73JjQv0sZwU/Gb1pZAShw6vYWclblvzTpTaHO0wF/qYu/PPbc5
-         wAuhElvh5Ia7Nu+yEoLRuyCiFBrv4YaLuaMjU7QF1GpMdivUcNUFHMLIN571H68N71Xv
-         8YtS8vFOcsr7mxEehwKqbVLhDGVaoystZrNsIcbkU/LJfCQ06azE+qjBNKmO4HEqkT8t
-         ZOFg==
-X-Forwarded-Encrypted: i=1; AL+hErFA5h+4k7Rm3IdRDPookwLeE4Ojhzghn9AYrQYIemXciqq1glHLL6vQMGn+2mrMUeme0dFQoP8=@lists.linux.dev
-X-Gm-Message-State: APuU4Z+8u+kCzYYmn7LOLrKJYY9ByrYHddxNHdnpDoZpa/VMoBa8WqhK
-	33OkfEgaNMrHWG1vd+20dBrgnSN2vSre/eXn3o7J1JPA8533Py2u8MiU00GvKPP+HG8=
-X-Gm-Gg: AYBFou3dWb8fkN0Fo/Ltqx9JNnvGsXrAUnnBMjwq0M7qtuwV2YpuB6U8S+IeQoStJT2
-	fLRwCW8jsgQBjZZw22vfZd3g6wlb326YSUmexnGRVROb+eU7L7Q9PP9DmRVaeJ9YfaFCcX66mkP
-	thAeJHnqHvjRfw/6VJZFCa05xEfc/WAc2e9xtJj5av5xOjH6azPKpbUYduyd0F6o/RHzPFjsE8E
-	Ig4noG+DEa5pMbr5T9snoWzUW9mtNX+M4GH4wZ9n1NAFLaUUe0mpErttmWDRU9JfaisP2Zm5DFn
-	wBaUfxaHEgqS8/KzWLpZZ8McQJqDegkPdaF5HMRW1LVRbJh145+iYTnlZ1Q3UwKmHnrMhoV+CPq
-	887IgJOpQ6PPoxdzND7tHh91NtkVuiTx3gp0KI++f6mxVVt5M2nVfPiEbZDgsHPnwDq2wizck8c
-	aRKurqiEK2GZ0M77LZqDZzkGXjmt49NIvjZ1tVcp80Z23hv4fBmPwJo5dc3ChkpiHJO4C1jLuHZ
-	CDTmTdVBEe42wGtVVppbMUbiUEL4W3KqLNQ6xSIxWUJwTZ+oL/t6fhWzQ34JoxWqYWLVDOCXscC
-	7HlQa5+IbW6yQPB1Otg=
-X-Received: by 2002:a05:6402:2389:b0:6b7:1c:ead6 with SMTP id 4fb4d7f45d1cf-6b7c0be11abmr4151963a12.28.1794808841111;
-        Sun, 15 Nov 2026 22:00:41 -0800 (PST)
+        bh=WFV4t0eUs0gbqqsFkBQx5rUyLF4Yon8sMLY8mNC/aTw=;
+        b=LNvpUTcpfGL4W0x8c8tNSiGPv74GJFe1UUoAnOGN9xc3fDuqhnIEOHxDIAs98V2g1k
+         4h9HTOw1zNnAjAYqi9ikBid0LLZY3YfXq/14K2XZp8QvESKOyxG6bPpP8ipxFAelfBti
+         HWtDsiixJ9uoWLYJdx46oMj+T/a8CNp1FaJIRK3FzAd+2+0ovRSgSlZ6iVPhgR+3xL0Q
+         b18ER0nssPRUyVOKuDRslgiBrYCE+6WVoypzz0AH68+EgDmjS79qXWAgR58Fw1hbZQ0K
+         W2jy4Buw0rkXxE9CSsrYpaAOTmpRKbXC8VPR5c745ZewsNrhe7LTUcEaihUk+npWYuWL
+         85kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794808852; x=1795413652;
+        h=content-disposition:content-type:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=WFV4t0eUs0gbqqsFkBQx5rUyLF4Yon8sMLY8mNC/aTw=;
+        b=oQH7e5z+8/KUhLLwJi8zkGi4HVRB66HdkH/e45OJclEomWoSJWh3yTM4iAYhEFcH2D
+         ZiO6pJDVzQA6mK+wTD8RK98P4e506WVfdBDK6o2hl8lXwhn27N+iAPg6vbdy7oAwo1A/
+         Fonj1mOf3/rsQrShPJ3IqrR87LhPc1SrdvuGACF5/mTA8Wc7UaPXH6YK+SJyTuWiCK00
+         ifJgAZ3Od/tUiGASjsX6StN/LZbP813JD2dZ6zgRlnqeF/gejdHpI3+iDrb8yyJ7yFaw
+         cZ+3+PwMITfYkslBQ3cQrCYG/oqu5fDv35pRlcv3zVPZUj1/2jkhsT/5c9Q+OnQABxAP
+         OMOQ==
+X-Forwarded-Encrypted: i=1; AL+hErEbI+Ljnsz0kpR27HtKGPrbZnUWsVEMcYTHfpXqdSiaHtvTch/7GLwUdSKjsvZ6VEoI2tSywaQ=@lists.linux.dev
+X-Gm-Message-State: APuU4Z84izJ8477V31rm6u0LgxPRw7yfTZxgNcQKZGrWuUMtzgIV2HHn
+	lTZyDcNrdYo4AL9MqAPVP7oXB3Ept6Bup2sPoL4TY1L16t2VoyALVzOdM3WT1BLv8kY=
+X-Gm-Gg: AYBFou0KDs8kj4xZrPTO/MRY4eN3WJxdTMJF10QjEl/p3JCqB+ePgQD6UFEt16lHASi
+	DISF3e/ZSHrgdpXaF0bvWObBep3AVoFgkiypiFejZyDg6K635C2V45+R45lWEhWP1GqOFtnLU7E
+	Q1COlfm3LqLeeODJA/R4TzxnNDbnSutqutTUR71h+zmjEthhiMKjPK81nbG6/Yycc2mCXXasLiz
+	E9Eg/Xzb/6nXDwgcKHsH/FN/tBDN+JCxMIqu1+SAyHEG+F8KX2A+V+A5TPBKpu6SOylnYL3p82D
+	MYgyrlS4+xhGM2bGVfDCiaWBGkJyvfF7DM+D0iIPXyoVSxGN0haMWTmEeQh8UHlkEPUGgOecW0h
+	8C+tYpfyFX45df1eO+EABjyp6j9eXZDKw+8XOxc/ZxGIYd+4B45dM455te+GmRbGDfuvWlg+KP1
+	qMZI68OrG/aGhKtHDDNon1BAHM3UT/JKjACuJlInZGTLE7WqQGtI/MwUltl8YOzfRQkTPJ7IEu6
+	8ETHcDqWNjWaBDlrihLuEB8Jx3MUrA7g244UUosHgdMFkvwBIMSYC+45R7jpgJWkUTgAz/XdsmO
+	bq0oaW1zvO6kJdEooyY=
+X-Received: by 2002:a5d:5e85:0:b0:48d:f391:5c45 with SMTP id ffacd0b85a97d-49c740bcf7amr18562595f8f.42.1794808852035;
+        Sun, 15 Nov 2026 22:00:52 -0800 (PST)
 Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6b7c21b1b5asm3973648a12.4.2026.11.15.22.00.39
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49c6020bb7dsm20283638f8f.33.2026.11.15.22.00.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Nov 2026 22:00:40 -0800 (PST)
-Date: Mon, 16 Nov 2026 09:00:36 +0300
+        Sun, 15 Nov 2026 22:00:51 -0800 (PST)
+Date: Mon, 16 Nov 2026 09:00:48 +0300
 From: Dan Carpenter <dan@pereq.eu>
 To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	Jintack Lim <jintack.lim@linaro.org>,
+	Joey Gouly <joey.gouly@arm.com>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Mark Rutland <mark.rutland@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Jintack Lim <jintack.lim@linaro.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Karthik Bhargavan <karthik@pereq.eu>,
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	Karthik Bhargavan <karthik@pereq.eu>,
 	=?iso-8859-1?Q?Cl=E9ment?= Blaudeau <clement@cryspen.com>
-Subject: [PATCH 2/2] KVM: arm64: nv: Update the shadow MMU's VMID for AT
- emulation
-Message-ID: <5467fc4aae218b86846454bba96c3ba2b95931bf.1794808373.git.dan@pereq.eu>
-References: <cover.1794808373.git.dan@pereq.eu>
+Subject: [PATCH 0/2] KVM: arm64: nv: fix a couple bugs in AT emulation
+Message-ID: <cover.1794808373.git.dan@pereq.eu>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -108,68 +106,23 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1794808373.git.dan@pereq.eu>
 
-There is a missing kvm_arm_vmid_update() before the __load_stage2()
-in __kvm_at_s1e01_fast().  The bug affects nested virtualization on
-arm64.
+These are two bugs in __kvm_at_s1e01_fast() which affect nested
+virtualization on arm64.
 
-In KVM a "stage 2" refers to the VM's page table mappings. The
-__kvm_at_s1e01_fast() function emulates the AT instruction, which
-translates a virtual address the way the MMU would and returns the
-result.
+They were found as part of our Formal Analysis work at Pereq.
 
-Each stage 2 has a VMID, which the hardware uses to tag TLB and
-walk-cache entries, so that one VM never uses another's entries.  There
-are only 2^8 or 2^16 VMIDs, which is quite limited, so vmid.c hands
-them out by generation.  When they run out, a rollover starts a new
-generation and flushes the TLBs: the VMIDs active on a CPU at that
-moment are kept, and every other VMID can be given to another VM.
+I have tried my best to get things right and I have tested the results
+but please understand that I am a newbie in this area and review
+accordingly.
 
-The kvm_arm_vmid_update() function checks the VMID's generation, takes
-a new VMID if it is from an old generation, and marks it as active on
-this CPU.  Without this, the shadow MMU's VMID could be an old one that
-now belongs to another VM, or a rollover on another CPU could hand it
-to another VM while we are using it.  Either way the AT fills TLB entries
-tagged with another VM's VMID.
+Dan Carpenter (2):
+  KVM: arm64: nv: Fix AT emulation for TCR2_EL1
+  KVM: arm64: nv: Update the shadow MMU's VMID for AT emulation
 
-To fix this, call kvm_arm_vmid_update() to update the VMID before loading
-the shadow stage 2.  That marks it as active on the CPU.  Then at the end
-of the function, undo that.  Restore the original VMID as active while
-checking for and handling rollover.
+ arch/arm64/kvm/at.c | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
 
-Fixes: 477e89cabb14 ("KVM: arm64: nv: Add basic emulation of AT S1E{0,1}{R,W}")
-Cc: stable@vger.kernel.org
-Signed-off-by: Dan Carpenter <dan@pereq.eu>
----
- arch/arm64/kvm/at.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 06765881a4c8..34c9d10188e0 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -1455,6 +1455,7 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 		}
- 	}
- 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, SCTLR_EL1),	SYS_SCTLR);
-+	kvm_arm_vmid_update(&mmu->vmid);
- 	__load_stage2(mmu);
- 
- skip_mmu_switch:
-@@ -1496,8 +1497,11 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 
- 	write_sysreg_hcr(HCR_HOST_VHE_FLAGS);
- 
--	if (mmu_cs)
-+	if (mmu_cs) {
-+		kvm_arm_vmid_update(&vcpu->arch.hw_mmu->vmid);
-+		config.vttbr = kvm_get_vttbr(vcpu->arch.hw_mmu);
- 		__mmu_config_restore(&config);
-+	}
- 
- 	return par;
- }
 -- 
 2.53.0
 
