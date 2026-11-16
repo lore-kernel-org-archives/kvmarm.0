@@ -1,57 +1,58 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794850307;
-	b=FT7JtU8W8luwe4kZuJBYQBDnbZwC4EvFBVkL7TTD9Jgt8nHc7kZfJ/WSS++DPXS5A1+w
-	 NCGh8caV4AO2OU4byrjksWKbv0MRP3ARF5HOlUtkjvvK6helb/AikSHFWN+dM8e/vWkSz
-	 eppAjakGCHLfhKpaUeiKr9ipeGLsf4Okt0ZzJuWBptWn4f76m9BYP80574xnY0dY2Hto6
-	 9N56S1WNMy6ulLp9qADrTOKd+ViTR0FRZMO5zUol3HNJwiUA8W9SqBw/dblubCNQIJkT8
-	 xoYoN9i7m94H5yJ3Ar6m4n07x0HRA9YPhfVxo/oqghKMZDw+7wXFk80RQ5EXDQAbg0A==
+	t=1794851492;
+	b=NYWVALJMlZBC2XpMjv/QbAru0zg/wq8SE2rlzxfVpbRp7WUs6U7L6AkG0WEei7jLalAb
+	 qS+kH4sFYrdHCQ0cbNKF2JssJc8n5R7rIPUjL07FoS0qfH2+BNlWAdZqoOsaJdu0F4HmL
+	 loCenW0Y7QTu12u8VZjZkAtC9MUCAnBuYhT3rvoSztd3WMhmRlXvEZjlOZGOrNQTHZyVq
+	 /JeJX4h5/4gHQ5AdoKxdF2WofoIrl3TFLzQLXwoS8oW1p0B9Di7zslvjI8t5js8I4H1Cu
+	 i1S7Sc5+LkuHC64Rz2vjYkOUZ8TheDZyNxjOI08p34Q8T8JzJkBJKNjwFYF7mKV4FBA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794850307;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=Hm64xLHNibckADV1peCrsacIKe9H5aSr0f1d+XzjCzQ=;
-	b=buuuRWP2mzut8SedBkRlTEUZj1Hij1ZFY4Jp8TRDaXyWZYjmroAlJCPCPi6poJ7XOqN5
-	 0ZkUhBO91GWZDKzIZUXbdL8bmp+Ty1YL6PMaI2rftTOKP6eSU7mX+Gx7axPbWZyJPwhh2
-	 eEAIuce3C1pUOIo8iRXh38hU1p3wc+RgvAa7hKMvbb9yIvZCNQDb/T+pbAvk7m3E2nXUk
-	 LOg59vwQ1ccXktwRV89I+V0c6JWHUp/cYrG8V4u4yEKgwUiZjvaAlGn8AFPeB4ku+iJvm
-	 GGpN3G1C6khq1aIpHxpR4hP46y80YoLj6RGLGFlsOyJtHV9ANp4TC0fGpf3U6cw/HhA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794851492;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=blGIJDCDss+E3b9SqzgbEdlWTUpb2T+aJik+W4Q8e9Y=;
+	b=3wpiNUx5TwO9xoRGzebqSXwPB4NlPOGjGVn/Csz2SAn2svn0XwMKot0wCW3U0rD3Tc5O
+	 7URJJgnruHKmNZgbhrbXEoFkXdPSZNALriPEiaGtJbykuAapj4iBpByaQfOwRcCmtu56a
+	 zaMzcXDpukbomOyo/NUjM5A/HQojS4Y9SlWRXKN96WJloUlAbUV5IjbhJR7Kyr9dilJBS
+	 TQS2iLTN7udBHK/NUpqPic4DHtXqHHNuy10rZo/WDPnRWt+IQt62DybzbdXRUa2m5pnQ9
+	 z9CM+hiTEARHquROTyBtcxXeqfj2kZ9c6zc4aOGnNjSQfDUw8eMaC0FypXiEiL8Wt+g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bbLi9RNJ;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TuSee7pi;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4153F606A32F;
-	Mon, 16 Nov 2026 17:31:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DCC606A891;
+	Mon, 16 Nov 2026 17:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bbLi9RNJ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 907671F000C4;
-	Mon, 16 Nov 2026 17:31:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TuSee7pi
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 290F51F000C4;
+	Mon, 16 Nov 2026 17:51:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794850306;
-	bh=Hm64xLHNibckADV1peCrsacIKe9H5aSr0f1d+XzjCzQ=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=bbLi9RNJUuydZ+xDpiu4l2NnQCKDcMmTX0ejvQaNiL+rIW23Oavq82+yqexf+CMTv
-	 7ZVyTdVbSJram3xv7Fkqf/gwXbxfbmW0aZ10NaiMcFCUiRRkXhucJObawr+5hgYAbe
-	 EOfe5G2wJJF+ZmFMKjqD8LhdDolw4tU2Mvhxqf5fjnZXS25yupIQ67vg/WCLkrMyWd
-	 lxTy/Sebh1oPHsw9/WpyCN8npvBz/6pLqg+POyhnV7rTQIpjKWh9lGVpqwY7bztbGj
-	 1Bulu+b83UnmMgKGqzyGQ4dkMtOnE/zAw2gphc8tbWyQQWS+zUQsfeLP1DqAVAAqMR
-	 jBAgvAU5SeIXg==
-Message-ID: <sashiko-outbox-217436@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 09/11] KVM: arm64: CCA: Support runtime faulting of
- memory
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Steven Price" <steven.price@arm.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: "Oliver Upton" <oupton@kernel.org>, "Marc Zyngier" <maz@kernel.org>
-In-Reply-To: <20261116164358.142785-10-steven.price@arm.com>
-References: <20261116164358.142785-1-steven.price@arm.com>
- <20261116164358.142785-10-steven.price@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 16 Nov 2026 17:31:46 +0000
+	s=k20260515; t=1794851492;
+	bh=blGIJDCDss+E3b9SqzgbEdlWTUpb2T+aJik+W4Q8e9Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=TuSee7pijL/EQxTZBDS2rvh9VhYUoswVcG+r5Rfl+jzNs9/BAeEA+G64PHMQljEW4
+	 S7+o2QcBzV702jg+VlVZ8U1n54eSLYBffN0NJagqWuWShBpfKdl7g64a6qJTsZdjtp
+	 uo27CFZfolNpxff3rCt5GoXjpBUS4UCmkjE4y7FrYprtQE8H5Z3M1Dbi67VA3R92IN
+	 vJYjoXxHlMokNSSaxfRvRZCrmrdiW5iraCRMUDAxw2kwl3p0Oin+ILPZFgHPaPcRgv
+	 ayWoJKO5MJUOllsnyyLN1vcPoBndg3uq5ncW3/V8OCovO2qRViX3sEYv4YGIexL4vR
+	 s9kNVS4WatYdQ==
+Date: Mon, 16 Nov 2026 17:51:25 +0000
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, 
+	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	will@kernel.org, mark.rutland@arm.com, linux-perf-users@vger.kernel.org, 
+	catalin.marinas@arm.com, james.clark@linaro.org
+Subject: Re: [RFC PATCH v7 00/28] KVM: arm64: Add Statistical Profiling
+ Extension (SPE) support
+Message-ID: <avs9oxfRNGiIi8an@gremlin>
+References: <20260903160623.315525-1-alexandru.elisei@arm.com>
+ <auy-TwnMbIn-r2xl@gremlin>
+ <au29ACRXFEOXaWPV@raptor>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -60,180 +61,189 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <au29ACRXFEOXaWPV@raptor>
 
-Thank you for your contribution! Sashiko AI review found 3 potential
-issues to consider:
-- [Medium] KVM: arm64: KVM_CAP_PRE_FAULT_MEMORY advertised for Realm VMs
-- [Medium] KVM: arm64: missing unmap on partial failure in
-  realm_map_unprotected()
-- [Low] KVM: arm64: unhandled exec fault on shared Realm IPA in
-  gmem_abort() and user_mem_abort()
+On Fri, Nov 06, 2026 at 11:41:52AM +0000, Alexandru Elisei wrote:
+> Hi Lorenzo,
+>
+> On Thu, Nov 05, 2026 at 05:47:45PM +0000, Lorenzo Stoakes (ARM) wrote:
+> > Hi Alex,
+> >
+> > I've gone through all of the patches now, thank you for your patience with
+> > the review :)
+>
+> Many thanks for the stellar review, will start replying soonish.
+>
+> >
+> > So there are various dependencies/architectural decisions that need to be
+> > made here to go from RFC -> non-RFC:
+> >
+> > 1. The 'Ignore MMU notifiers for guest_memfd-only memslots' patch [0] is a
+> >    hard dependency for the series. I chased over there, hopefully we can
+> >    get something landed there.
+>
+> Like you said, Sean is planning to send my original version of that patch with
+> an updated commit message, thanks for the ping!
+
+No worries! :)
+
+>
+> >
+> > 2. non-VHE, pKVM, NV disallowed for SPE - As I mentioned off-list, I spoke
+> >    to Marc, and he confirmed that he's more than happy for these to be off
+> >    the table for a v1. So I think you can drop the HACK: patches and just
+> >    make these conditions of using SPE.
+>
+> Oliver, some time ago, expressed the opposite preference: VHE-only is OK for an
+> RFC, but he was concerned about the discrepancy between VHE and nVHE
+> configurations. Maybe the direction for KVM changed in the meantime.
+>
+> Fine by me to drop the HACK! patches, of course, that's just something to keep
+> in mind.
+
+Ack, Oliver - let us know if this is a problem (Marc suggested he was fine with
+requiring VHE), I think certainly it's useful most of all to move forwards
+without the 'HACK' patches, and with the various architectural points raised
+here addressed we can look to a non-RFC series.
+
+And obviously we can update as necessary as we go based on maintainer
+requirements.
+
+>
+> >
+> > 3. The entire VM needs to be pre-faulted, but who should do it? - I do
+> >    think that relying on userland to do this is a little iffy. So I wonder
+>
+> There's plenty of iffiness that userspace already handles when it comes to
+> virtual machines.
+
+Yup, does seem to be a fair bit of implicit assumptions of sanity :)
+
+>
+> Or, how Oliver put it [1] (regarding migration, but it fits):
+>
+> 'My take is that there's no amount of idiot-proofing we can do in KVM to prevent
+> the VMM from messing this up somehow'.
+
+Haha, right.
+
+I guess fine to require userland to set things up like that, and can always add
+an option to have it automatically set up for them in future as a nice-to-have.
+
+I want to separate out the gmem bit though, replying below:
+
+>
+> [1] https://lore.kernel.org/kvm/alE3jRLtYeq-WesA@kernel.org/
+>
+> >    whether it might be possible to, on SPE first run, prefault the ranges
+> >    there, and make that a condition of using it? Relatedly, KVM could
+> >    reject non-guest_memfd memslots for an SPE VM rather than trusting
+> >    userspace there too.
+>
+> I'm not sure that's the best idea. Mainly two reasons:
+>
+> 1. KVM will be imposing the condition that *all* writable memslots be backed by
+> guest_memfd, and *all* memory backing these memslots be pre-faulted and
+> effectively pinned.
+
+I mean this really is a requirement for SPE to work at all, since the guest is
+effectively deciding which memory is being used for SPE (I think it's perf AUX
+memory right?)
+
+I think given that it's guest-designated _and_ the guest has no idea which parts
+of memory are 'SPE safe' and 'SPE unsafe', this is a requirement.
+
+>
+> There are use cases for writable memslots to describe guest memory that won't be
+> used by SPE. First thing that comes to mind would be paravirtualized interfaces
+> between host userspace and the guest. For example, pvtime - kvmtool creates a
+> RAM memslot for pvtime (i.e, non-read-only memslot), and it looks to me that
+> qemu does the same (but my knowledge of qemu is severely limited, so I might be
+> completely wrong).
+
+I don't think any of this is disallowed by the gmem requirement.
+
+>
+> Then there's also the possibility that a guest might want to assign a slice of
+> RAM for use by SPE, to avoid pre-faulting and pinning the entire VM memory. In
+> this case, userspace will want to have *only* the memslot describing that slice
+> pre-faulted and pinned, and not the rest of system memory.
+
+As above, there's just no way for userspace to know which bits of memory are SPE
+safe and which are not. So I don't think this works.
+
+>
+> 2. Perfomance - userspace can pre-fault in parallel, KVM cannot easily do that.
+>
+> arm64 now has support for KVM_PRE_FAULT_MEMORY, I say let's use that :)
+
+:) right.
+
+OK, so maybe the right path then is to keep the prefaulting with userspace, but
+I really do think we have to have KVM reject a writable non-gmem memslot once
+SPE is enabled for the VM (and reject enabling SPE if one already exists).
+
+That should be relatively straightforward and avoids at least the most broken
+userland mistakes.
+
+>
+> >
+> > 4. Dirty page logging - patch 27/28 relies on series [1] being landed,
+> >    which is also an RFC, and allows migration of SPE VMs. So we need to
+> >    decide - do we want this migration? Additionally, I think it's
+> >    reasonable to, if we want it, send both [1] and patch 27/28 as a follow
+> >    up separate from the v1 non-RFC of the series.
+>
+> For background, I started this conversation in the LOG_DIRTY_PAGES support for
+> guest_memfd series [2]. Oliver had some concerns, but he didn't follow up on my
+> explanations, so I decided to send migration support as part of SPE so people
+> can have a more complete picture of how everything fits together.
+>
+> I would be very happy to get basic support for SPE merged in KVM, and, if we
+> decide it's useful, migration implemented as a follow up, as that involves
+> landing dirty page logging support for guest_memfd.
+
+Ack, thanks, let's treat that as a follow-up then, I think best thing here is
+definitely to focus on getting the fundamental bits in for SPE first.
+
+>
+> [2] https://lore.kernel.org/kvm/alAFmiAsNf6Xm49_@kernel.org/
+>
+> >
+> > 5. Errata handling - the default already disallows SPE on the affected
+> >    silicon, which seems right. I wonder whether kvm-arm.ignore_spe_errata
+> >    should exist at all though, other than in some sort of debug mode.
+>
+> It is intended as a debug/development option, to be used only when the VMs are
+> trusted. As to why it's there, it's there because without it, SPE would be
+> disabled on all the machines that I have access to, and I suspect systems not
+> affected are few and rare between.
+
+Ack ok that clarifies that :) let's then clearly mark that as such
+e.g. 'debug/development only, trusted VMs only' in the documentation, and
+tainting the kernel if it's enabled, I think, would be sensible.
+
+>
+> >
+> > So 1 is a known dependency, I think there's no getting around that, and
+> > thus that makes merging [0] or something like it a top priority.
+> >
+> > It seems to me 2 is pretty clear-cut, and 4 can reasonably (if we want it)
+> > be sent as a follow up.
+> >
+> > So really 3 and 5 are the decisions to make here!
+>
+> I really appreciate your enthusiasm, thanks!
+
+No worries :) am happy to put in some work on my side to help move things
+forwards (and obviously more than happy to help with review on respins of
+course :)
+
+>
+> Alex
+
 --
-
-commit 5a0919ef6adc946a1afb4f6ad7cf84e5573597f3
-Author: Steven Price <steven.price@arm.com>
-
-KVM: arm64: CCA: Support runtime faulting of memory
-
-This commit adds runtime stage-2 fault handling for Realm VMs, delegating
-and mapping private guest_memfd pages in the protected IPA region and
-mapping shared pages in the unprotected IPA region via the RMM.
-
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 0db3c293fdd52..9b371159be92c 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-[ ... ]
-> @@ -1846,6 +1882,16 @@ static int gmem_abort(const struct kvm_s2_fault_de=
-sc *s2fd,
->  		goto out_unlock;
->  	}
-> =20
-> +	switch (kvm->arch.vm_flavor) {
-> +	case VM_REALM:
-> +		prot &=3D ~KVM_PGTABLE_PROT_X;
-> +		ret =3D realm_map_ipa(kvm, s2fd->fault_ipa, s2vi.pfn,
-> +				    PAGE_SIZE, prot, memcache);
-> +		goto out_unlock;
-> +	default:
-> +		break;
-> +	}
-> +
-[ ... ]
-> @@ -2242,12 +2289,15 @@ static int kvm_s2_fault_map(const struct kvm_s2_f=
-ault_desc *s2fd,
->  	if (!perm_fault_granule && !s2vi->map_non_cacheable && kvm_has_mte(kvm))
->  		sanitise_mte_tags(kvm, pfn, mapping_size);
-> =20
-> -	/*
-> -	 * Under the premise of getting a FSC_PERM fault, we just need to relax
-> -	 * permissions only if mapping_size equals perm_fault_granule. Otherwis=
-e,
-> -	 * kvm_pgtable_stage2_map() should be called to change block size.
-> -	 */
-> -	if (mapping_size =3D=3D perm_fault_granule) {
-> +	if (kvm_vm_is_realm(kvm)) {
-> +		ret =3D realm_map_ipa(kvm, s2fd->fault_ipa, pfn, mapping_size,
-> +				    prot, memcache);
-
-[Severity: Low]
-This question rests on an architecture detail that could not be confirmed
-from the kernel source: can a Realm guest instruction fetch from an
-unprotected (shared) IPA exit to the host as a stage-2 instruction abort
-that reaches kvm_handle_guest_abort()?
-
-If so, unprotected RTT mappings only encode RMI_S2AP_DIRECT_READ and
-RMI_S2AP_DIRECT_WRITE and cannot grant execute permission, but neither
-gmem_abort() nor user_mem_abort() rejects kvm_s2_fault_is_exec(s2fd) with
--ENOEXEC to inject an instruction abort.  Instead, realm_map_unprotected()
-installs a non-executable mapping, and on subsequent instruction permission
-faults at the same IPA where level >=3D req_level, unmaps and remaps the pa=
-ge
-with the same non-executable permissions and returns 0 in an endless fault
-loop.
-
-[ ... ]
-
-> @@ -3155,7 +3217,7 @@ pre_fault_bytes_consumed(gpa_t gpa, unsigned long g=
-ranule_size,
-> =20
->  int kvm_arch_pre_fault_allowed(struct kvm_vcpu *vcpu)
->  {
-> -	if (is_protected_kvm_enabled())
-> +	if (is_protected_kvm_enabled() || kvm_vm_is_realm(vcpu->kvm))
->  		return -EOPNOTSUPP;
->  	if (!kvm_vcpu_initialized(vcpu))
->  		return -ENOEXEC;
-
-[Severity: Medium]
-Should kvm_vm_ioctl_check_extension() also report 0 for
-KVM_CAP_PRE_FAULT_MEMORY when kvm && kvm_vm_is_realm(kvm)?
-
-Currently kvm_vm_ioctl_check_extension() only gates capabilities on
-is_protected_kvm_enabled() and otherwise unconditionally sets r =3D 1 for
-KVM_CAP_PRE_FAULT_MEMORY, advertising the capability on a Realm VM file
-descriptor even though KVM_PRE_FAULT_MEMORY always fails here with
--EOPNOTSUPP.
-
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index 838f95c201ada..4cacb9fe000f4 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-[ ... ]
-> +static int realm_map_unprotected(struct kvm *kvm,
-> +				 unsigned long ipa,
-> +				 kvm_pfn_t pfn,
-> +				 unsigned long size,
-> +				 enum kvm_pgtable_prot prot,
-> +				 struct kvm_mmu_memory_cache *memcache)
-> +{
-[ ... ]
-> +	while (ipa < ipa_top) {
-> +		unsigned long range_desc =3D addr_range_desc(realm, ipa, phys,
-> +							   ipa_top - ipa,
-> +							   RMI_OP_MEM_UNDELEGATED);
-> +		unsigned long call_top =3D ipa + RMI_ADDR_RANGE_COUNT(range_desc) *
-> +			rmi_addr_block_size_to_bytes(RMI_ADDR_RANGE_BLOCK_SIZE(range_desc));
-> +		unsigned long out_top;
-> +
-> +		ret =3D rmi_rtt_unprot_map(rd, ipa, call_top, flags, range_desc,
-> +					 &out_top);
-> +		if (ret < 0)
-> +			return ret;
-> +
-> +		if (ret) {
-> +			/* Create missing RTTs and retry */
-> +			int level =3D RMI_RESULT_DATA_LEVEL(ret);
-> +			int req_level =3D KVM_PGTABLE_LAST_LEVEL -
-> +				RMI_ADDR_RANGE_BLOCK_SIZE(range_desc);
-> +
-> +			if (RMI_RESULT_STATUS(ret) !=3D RMI_ERROR_RTT ||
-> +			    ++retries > KVM_PGTABLE_LAST_LEVEL + 2)
-> +				return -ENXIO;
-> +
-> +			/* Replace an existing mapping to update its permissions. */
-> +			if (level >=3D req_level) {
-> +				realm_unmap_shared_range(kvm, ipa, ipa_top, false,
-> +							 memcache);
-> +				continue;
-> +			}
-> +
-> +			ret =3D realm_create_rtt_levels(realm, ipa, level,
-> +						      req_level,
-> +						      memcache);
-> +			if (ret)
-> +				return ret;
-> +
-> +			continue;
-> +		}
-> +
-> +		/* Retry the fault after releasing mmu_lock to service the IRQ. */
-> +		if (out_top =3D=3D ipa)
-> +			return -EAGAIN;
-> +		if (WARN_ON_ONCE(out_top < ipa || out_top > call_top))
-> +			return -ENXIO;
-> +
-> +		phys +=3D out_top - ipa;
-> +		ipa =3D out_top;
-> +		retries =3D 0;
-> +	}
-
-[Severity: Medium]
-Can a multi-iteration call to realm_map_unprotected() leave a writable
-prefix mapped when a later iteration fails or returns -EAGAIN?
-
-For a Realm with a 32- to 34-bit IPA space on 4KB pages, get_start_level()
-is 2, so addr_range_desc() caps rmi_size at 1 (PMD_SIZE).  When a shared
-memslot is backed by a 1GB hugetlbfs VMA, kvm_s2_fault_map() passes
-mapping_size =3D PUD_SIZE and this loop runs across multiple 2MB iterations.
-If an iteration after the first is interrupted (out_top =3D=3D ipa) or hits=
- an
-error, realm_map_unprotected() returns non-zero without unmapping the
-already-installed prefix (unlike realm_map_protected()).  kvm_s2_fault_map()
-then passes !!ret (unused =3D true) to kvm_release_faultin_page() and skips
-mark_page_dirty_in_slot(), so if the faulting IPA lies in the mapped prefix,
-the guest can write to the page without marking the host folio dirty.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261116164358.1427=
-85-1-steven.price@arm.com?part=3D9
+Cheers, Lorenzo
