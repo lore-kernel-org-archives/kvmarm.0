@@ -1,62 +1,98 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.105
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794836056;
-	b=xt7PiuJZa/9qONv3fAo234nG6l/ZWpqOYYNGiD6D5BTtSJIGvHUYTowvy89akxhAd+31
-	 gSbbHHCmhyAMPCpCVnDj8bCxQSIWHEXkZbniYW5mXHZhtVBZARd3Mq1RiAlKplUoVtYsv
-	 DAVxZEo6FsqK2NZL+Wh2DU638Q1Ag0yO+vcfjNHwDpA9DxZdgx4kVK90hbt4mrr9zk2UC
-	 h+6CQ9ZGmSUKLF665SP87yEEjrfF0ruRiHNZB0JOivr5FsMsTRw7T3sGdckrsAK7+u2nv
-	 AApDB7Rq2GdsgnUnAlba3pbzF2OT2l7BUAeRriIGxeE/ImHEAlIVuX7MIFbVDirdp9w==
+	t=1794836440;
+	b=IM5+fcj/+DuyGE932m0gf2KpzAQ1dsZ5Y3wPZxpc4d9OdOzO320b9A68gzGF+TpI15My
+	 eqogv4bjEzNhmV5tqDCGl6N+ab/lgINRS4nspPEVSKEb45h9GoU8K+DD1gTTeL217J0l1
+	 6XLdLXc6AkjeLu1in3faV5T+Wq02JY4vhU5IEjtwWxlh00d1ZbFQ+Ns5b0KS1dGhxppVq
+	 xrSe2VgjB5bRfBMtHvlr/29MJP7cXUj2+8rmK5ZAGRa0DHD7jAER5HuoGtj9TI+W4rhDB
+	 Pb00rO4H+5u9xXg48X2bBzk0y5AM7EJvVxXU+7EqRaCj7isyrKV3reIBwtBqtvCoFdA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794836056;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=kFki2hBsnHrC0juVnTO+KTiVDm5TzD8rtd8Do1S8nSI=;
-	b=QwJHQJB3DeHQhkgzQoLj7YPFm+IkII6medBKy582lMLwjNh7wEfLzEKNOamiB7LAZlLW
-	 S4Yhet6myRxyMVQ5GLi6XitKbZymck/0SxZAjyVqt7CnabEwUiM5mrshBfaQDuRqniirK
-	 DVRJxAOuBnmmdLA62apFrhXLawP5j6K9K+Jy4ENHeyJrhr693MewYfOQVDpQdjEGV3XBX
-	 zz/PN/7MWKRPDdvJQgjz7tXL0G+JBf/Gd8Iw4Q9MsAfFf/n3fqWNOBP52vLOPNuFzv1Xf
-	 UuHgH+Dg8Yi8G/9htoln3HzZzVFhlWudKq/Yh8U5Pa+v7+vKOVlhUM8GVoNqGBuSAmw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794836440;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:X-Mailer;
+	bh=rYZSKiWzbzGDSkOFczv6tAqyqip908dCHTB+bDdlwYA=;
+	b=c/XFeg/DIaK0lZdE+IOC5MqN4QJh70pYKBY7ouhPCF0zrl8/tEKcDLUfgmnWtoLFCRvs
+	 592c+9N9UWe8pys7Mc5nqx2LLDCtMQoAlOUhRg911tHC5ms4Hgto5cGg0uhMpghu50OOY
+	 fA2FmYF7an9hpnZDgAF23n9sHtAka4m6IsCEPHCgqFaNOOSgFlFlD5PaoVVjKi2/pR12N
+	 JryxkL5vP6DriDhaFaIb7xCfvuLdqYhMEapZp1hFFjpBZDKWMnmkHHwdkJf7HVz+ldOD3
+	 Bz/SfpAbRw6dJmmujwn2v9E5o82d4Gxpes3GP1rehc/RUddfV9ReDHX/t+BMNh7JKWw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=cVjD1IIy;
-	arc=none smtp.remote-ip=91.218.175.105
-Received: from mta0.migadu.com (out-105.mta0.migadu.com [91.218.175.105])
+	dmarc=pass header.from=pereq.eu;
+	spf=pass smtp.mailfrom=cryspen.com;
+	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=VQnsuG5U;
+	arc=none smtp.remote-ip=209.85.218.46
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 957D5606A32F
-	for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 13:34:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 957D5606A32F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72DED606A891
+	for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 13:40:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 72DED606A891
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=cVjD1IIy
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=kFki2hBsnHrC0juVnTO+KTiVDm5TzD8rtd8Do1S8nSI=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794836053; v=1; x=1795440853;
- b=cVjD1IIyjvB3aeptttsmfmPZky+MtqINq24PqHtlxmox00kfdTfv5yl2cCXlBxJrPyWSfYea
- Jsr+TaIOrLPOdDhKzwi3ow9GFAoXUpW84HAcfl/KlFLJfFwQA5UcNs340C/oZBVESo8N2UYG5J1
- j9+BGuax2ZJYGWybXbamWdDM=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 007161685eb340ed;
-	Mon, 16 Nov 2026 13:34:13 +0000
-X-Mizu-Trace-ID: 007161685eb340ed
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5c14bc5a743so10054e87.0
-        for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 05:34:08 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErEdt1lm6/vz1Y+f9IKmn2TrkGSuCrIflBnczuC41703AM9bzq0RBg0Ob9lCWRhM+M/ppAGqT1Y=@lists.linux.dev
-X-Gm-Message-State: APuU4Z/QupxZiE4Otr2YrFC3sTl6q6T+iat2dBDnRWyRpQF2BRmttlFF
-	3hYl27fxUrhf4YfHvakaLGZD23qOiy9cQlZnnJtT2l/bJzVxBEfThMFJZwnY1qrNH+AXZ9aCpgj
-	ARcVpF8NCTbPAOgrhP3MSLjLHXfHk7RE0ExA+cz/b
-X-Received: by 2002:a05:6512:3087:b0:5bf:b994:6598 with SMTP id
- 2adb3069b0e04-5c17d98271emr226475e87.6.1794836047954; Mon, 16 Nov 2026
- 05:34:07 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=VQnsuG5U
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-c4cb6834eaaso104796366b.2
+        for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 05:40:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=pereq.eu; s=google; t=1794836439; x=1795441239; darn=lists.linux.dev;
+        h=content-disposition:content-type:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=rYZSKiWzbzGDSkOFczv6tAqyqip908dCHTB+bDdlwYA=;
+        b=VQnsuG5UYPekOV0ZCP0oqPjA89uFJGxSAOJUH4ZkgtLF5z6U3H42joWmkczpGjsiwC
+         Qq9ElPWqCRE77NWPHCSSbKlGXf0eUKpI22NeiL+DA2g/dcO8XkOyV6VfM7bipNI7Qm7D
+         YRt/+Uld4WJnBA+TIpYr01fFiktXg4WwDnkLRdiu/OFzW81SdeR47JRcjC6iWespjrR+
+         yw9WHfRlZz5u/06NZDgM+xdIJ+7azY09N4HD9Ilxip2iNumgAp9eHyvSlVhr9jN4gNcD
+         ZhJ7wAjjucnZCvtdO1VpsIkvNHYBeIYkj7JGzHauci/OnlzGyw7rXKVJ8tiYbWhg64Pn
+         vJdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794836439; x=1795441239;
+        h=content-disposition:content-type:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=rYZSKiWzbzGDSkOFczv6tAqyqip908dCHTB+bDdlwYA=;
+        b=BHOgpuujEE/qbUA+bxYyHKslbor57sYXy9x+wgOGrOw6dOd6n2laCYyx9qVF1oScJS
+         OindzxTSTg57uZPYonWpy8ME1DmsdKDc43aLhwd7MzPQ/LtzB05KRg54+itocHCK4zQ0
+         QkeLNOe6v1ZreoJSUxq/2AA8maL6UXecQmjd19OcUtxOaMs8fqEXsM1dRCPrpG13rWGa
+         MFt3BPt7PEPkD+zEInneA01U1OskrM78W+EApUBFK+jXVpBhkm+aoRANfBktrOkvzHRK
+         rijwDRNPNB34JkawzfnQXVbTFaUl5tC+dO7BrnzxivzrUg9r1tycoNYMxcyap31JAdvG
+         hC4A==
+X-Forwarded-Encrypted: i=1; AL+hErF5hX5aSs2SYsEOIZKFusgzp/5Nr7XOlXHr4VEUexrKm3xrEq3Xl/tG32gtwoETpjBlBEqv04M=@lists.linux.dev
+X-Gm-Message-State: APuU4Z989Gt8eiVI4Z2F0ymVlWQQSU6BLNm3WEIs1JmSRu0dkdOw9ZSw
+	+u+hdUDx1AH6Qex01kncR9wcCnztqfmqZ0A2sMBiinYmNp0K/B4qJxLTuYYEGcudPlQ=
+X-Gm-Gg: AYBFou1eZBeX+Y8iCvZUUvCNpGHmdpCajCbrTgT9UZq011QWbYPRsM8pzAqRecM7zOE
+	/UAAzMt6fSiThK+7014DTk80GMTHhI8f5TiXMLA0/Z8Ge8V39/u3AzxNdb7HttBYVXrYNMGstJI
+	FPTUz59356LEqAUct5ex3x38Pl7/P7wuST/H7be8AsRjxP49glYWSfO+v+MM8XSzdoPEYmeqi9z
+	+25jFC14Ln7DmxMb7uRXgnM9aGp6dco8G200PhMpNOQKqZ8EqOy6qeMUNSjXqxsBZMfgBM4PNfK
+	qDoWDib87dayq7YgzTEcUM3G4h5GqI3qfaAX4I1RJUf7W8n1e29Pgpj1docHhPC23TtDBsu8taw
+	dwqpel/46I1iG71NNDxkjmYziboUixKVsVKu6lZQwlkLui1NNbxOsPzXZyfkHFKRR+yiBCGlG89
+	BMKDKGEzcb4/rYfkLGYHMzVNHJSD3MNH7QOD7CL8xwPZ61pSPmc3ZL6VkFSJeQ2cy2L30LDntPN
+	1H92MOnG072ntfJ7K/qmmQNLrmPGGm0+Rwy3L7pEr4xOEb5ueoEvoqR3Q+EFwz3f/eJAby4X1L1
+	Q7YOXYY1XWQedjs2138=
+X-Received: by 2002:a17:907:9492:b0:c2e:52d6:1fb7 with SMTP id a640c23a62f3a-c509636a2ffmr771296866b.22.1794836438561;
+        Mon, 16 Nov 2026 05:40:38 -0800 (PST)
+Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c5095b2369asm426229866b.25.2026.11.16.05.40.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Nov 2026 05:40:37 -0800 (PST)
+Date: Mon, 16 Nov 2026 16:40:34 +0300
+From: Dan Carpenter <dan@pereq.eu>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Karthik Bhargavan <karthik@pereq.eu>,
+	=?iso-8859-1?Q?Cl=E9ment?= Blaudeau <clement@cryspen.com>
+Subject: [PATCH] KVM: arm64: nv: Fix NULL dereference in kvm_inject_nested()
+Message-ID: <avsH0lxpLIF2Ug64@stanley.mountain>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,64 +102,90 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261116091137.94252-1-aneesh.kumar@kernel.org> <20261116091137.94252-3-aneesh.kumar@kernel.org>
-In-Reply-To: <20261116091137.94252-3-aneesh.kumar@kernel.org>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 16 Nov 2026 13:33:31 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTw7QzzkQYKV3jyvW5mqZQMenTfm=kus9i87tYqACDOv0Q@mail.gmail.com>
-X-Gm-Features: AclHuK93q6K13zN84KswjEKi9cVQgC-Cy80dn3a2peCMzM1qEee3TapGEGzaKvg
-Message-ID: <CA+EHjTw7QzzkQYKV3jyvW5mqZQMenTfm=kus9i87tYqACDOv0Q@mail.gmail.com>
-Subject: Re: [PATCH v10 02/13] mm: Zero memory during shared memory transitions
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-Cc: linux-coco@lists.linux.dev, Andrew Morton <akpm@linux-foundation.org>, 
-	Baoquan He <baoquan.he@linux.dev>, Mike Rapoport <rppt@kernel.org>, 
-	Pasha Tatashin <pasha.tatashin@soleen.com>, Pratyush Yadav <pratyush@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Steven Price <steven.price@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Thomas Gleixner <tglx@kernel.org>, Will Deacon <will@kernel.org>, 
-	Russell King <linux@armlinux.org.uk>, Benjamin Gaignard <benjamin.gaignard@collabora.com>, 
-	Brian Starkey <Brian.Starkey@arm.com>, John Stultz <jstultz@google.com>, 
-	Mark Rutland <mark.rutland@arm.com>, Radu Rendec <radu@rendec.net>, 
-	"T.J. Mercier" <tjmercier@google.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
-	Christophe Leroy <chleroy@kernel.org>, Ritesh Harjani <ritesh.list@gmail.com>, 
-	Shrikanth Hegde <sshegde@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H . Peter Anvin" <hpa@zytor.com>, Kiryl Shutsemau <kas@kernel.org>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, "K . Y . Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, dri-devel@lists.freedesktop.org, 
-	iommu@lists.linux.dev, linaro-mm-sig@lists.linaro.org, 
-	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org, 
-	linux-mm@kvack.org, kvmarm@lists.linux.dev, patches@lists.linux.dev, 
-	Vincent Donnefort <vdonnefort@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-Hi Aneesh,
+There is a NULL dereference of vcpu->arch.hw_mmu in kvm_inject_nested()
 
-On Mon, 16 Nov 2026 at 09:12, Aneesh Kumar K.V (Arm)
-<aneesh.kumar@kernel.org> wrote:
-[...]
-> Keep allocations on platforms without memory encryption on the ordinary page
-> allocator path so the original GFP constraints, including __GFP_ZERO, remain
-> intact. Remove post-transition memset() calls that are now redundant and
-> explicitly clear allocations on paths where no transition occurs.
->
-> This intentionally makes every private-to-shared transition destructive;
-> callers can no longer use set_memory_decrypted() to preserve existing contents.
+Unable to handle kernel NULL pointer dereference at virtual address 0000000000000084
+  kvm_vcpu_put_hw_mmu (arch/arm64/kvm/nested.c:1046) (P)
+  vhe_vcpu_put (arch/arm64/kvm/arm.c:827)
+  kvm_arch_vcpu_put (arch/arm64/kvm/arm.c:860)
+  kvm_inject_nested (arch/arm64/kvm/emulate-nested.c:2903)
+  kvm_inject_nested_serror (arch/arm64/kvm/emulate-nested.c:2976)
+  kvm_inject_serror_esr (arch/arm64/kvm/inject_fault.c:365)
+  __kvm_arm_vcpu_set_events (arch/arm64/kvm/guest.c:827)
+  kvm_arch_vcpu_ioctl (arch/arm64/kvm/arm.c:2017 arch/arm64/kvm/arm.c:2157)
+  kvm_vcpu_ioctl (arch/arm64/kvm/../../../virt/kvm/kvm_main.c:4772)
 
-pKVM shares memory in place, and a guest has to be able to share
-memory it has already set up, as Vincent pointed out [1]. That was one
-of the primary reasons for in-place conversion in guest_memfd.
+KVM_SET_VCPU_EVENTS does not load the vcpu, but it injects a pending
+SError or external abort straight away.  If the vcpu is in L2 context
+and L1 has asked for the exception, kvm_inject_nested() puts and loads
+a vcpu that is not loaded.  vcpu->arch.hw_mmu is NULL when the vcpu is
+not loaded, so kvm_vcpu_put_hw_mmu() dereferences a NULL pointer.
 
-Cheers,
-/fuad
+To fix this bug, only put and load the vcpu when it is loaded, similar
+to what kvm_reset_vcpu() does.  When the vcpu is not loaded there is
+nothing to switch: the next kvm_arch_vcpu_load() loads L1's context.
 
-[1] https://lore.kernel.org/all/avro44jUWOARFzul@google.com/
+Fixes: 9aba641b9ec2 ("KVM: arm64: nv: Respect exception routing rules for SEAs")
+Fixes: 77ee70a07357 ("KVM: arm64: nv: Honor SError exception routing / masking")
+Cc: stable@vger.kernel.org
+Signed-off-by: Dan Carpenter <dan@pereq.eu>
+---
+This was found through Pereq's formal analysis but the stack trace
+comes from real life testing.
+
+x86 implements kvm_arch_vcpu_ioctl() differently and puts vcpu_load()
+at the start of the ioctl.  But the way arm64 does it is deliberately
+and just something that people working with the code need to be aware
+of, I guess.
+
+ arch/arm64/kvm/emulate-nested.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 2bec81668361..22ca735a34f6 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -2862,7 +2862,7 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
+ 			     enum exception_type type)
+ {
+ 	u64 pstate, mode;
+-	bool direct_inject;
++	bool direct_inject, loaded;
+ 
+ 	if (!vcpu_has_nv(vcpu)) {
+ 		kvm_err("Unexpected call to %s for the non-nesting configuration\n",
+@@ -2891,6 +2891,7 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
+ 	}
+ 
+ 	preempt_disable();
++	loaded = (vcpu->cpu != -1);
+ 
+ 	vcpu_set_flag(vcpu, IN_NESTED_EXCEPTION);
+ 
+@@ -2900,7 +2901,8 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
+ 	 */
+ 	__kvm_adjust_pc(vcpu);
+ 
+-	kvm_arch_vcpu_put(vcpu);
++	if (loaded)
++		kvm_arch_vcpu_put(vcpu);
+ 
+ 	kvm_inject_el2_exception(vcpu, esr_el2, type);
+ 
+@@ -2915,7 +2917,8 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
+ 	 */
+ 	__kvm_adjust_pc(vcpu);
+ 
+-	kvm_arch_vcpu_load(vcpu, smp_processor_id());
++	if (loaded)
++		kvm_arch_vcpu_load(vcpu, smp_processor_id());
+ 	vcpu_clear_flag(vcpu, IN_NESTED_EXCEPTION);
+ 
+ 	preempt_enable();
+-- 
+2.53.0
+
