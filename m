@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794851794;
-	b=BZ+yC2GBddWsa0WfaV186M+Hzg5X4zylNQ3hftjQa9nThkhc4GAJPUJ1/1GGTWjmtkKg
-	 PFmNhkGipSwUl7fgxmq1dLdzqDrMl69JW/ekTn3Q4TbiJWLBE4YecSTJXXTRz6IaxFQ7I
-	 Gy8QU9ov5Fu65t+m2YId9nlnPRK2hjv1s7jBGoWY5A4ocfeIHL0D9PGwMmspjJnlAiwaZ
-	 8TXdLpPJjkCenvuGAneSSuzJYa0CzupeMrxNI8gpCU8XKX5uDcoxugF1simnPoGwXiee6
-	 Qe8q7zYPUO0antp3J+y7t4C0UWlkPXSgkvvCLu+VIpbHubIevNztMig5tM/BR226/1w==
+	t=1794851984;
+	b=zRpk+AlKTOaOEfw56pyYErr/3iirJvXLDVX4AbZwGGNUzZeriYQAO67z3rnP19tNXosP
+	 IIuPhYjqH2wivxoumHFcR0v2l5k+oV5pVqXDaPMMVFoJqFKlvm3TjdAl4ODQ0On/ZxKj3
+	 I6EsY1RUCGlgbT98GjxRUCU/myfga4sq538c+8xR0lbyqeUbvWWtoqdjdpyo/DmgAvWso
+	 /flk2S+jqONU9xocuUWHP8ZZD2glVW2G2mK0VILkd6PZrsHEBJzV1abA5mo1EJasne12K
+	 AlToxaJrbWnrXFopxE/YOk5p7/1rtNgXql2ytNAMDu/dX+9pqfB5VMh4Y12ba+rwMxQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794851794;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794851984;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=fwWQDlnnSTNyph3hgjd/jHBsSgprm3l/XThcAnorVzc=;
-	b=1C/i1uxm0hV2HJTqwX7xAhQPG1Yz21+TK8BQkbWSNpE/Qh++F0FiFY/j028ti4qTgQHt
-	 t+8MB+XL6VULS+18O0/BArcJBinHMjUP5itHv/+WQVAKUFrKr1d8TjZlngU1jKF6OSVHl
-	 XG7FGrSw+DRiweGwcBsGUFE2Y1hb9GhYCn6J6depg9WKoq8Aommz2s9/zrKDUXCoYEdNt
-	 M/D4GHbXXrk5/dSqc9tH5E5Vla+WZWmwB3mkmhh2TWrUbvtInbuDivj7ufCfdFcogPhV3
-	 tgT3lL0mkWjX0oAayenJzfPjLbayALqVxvsGqIXZq7MBvMKD6pKvhQu8+U8MkD7ek/A==
+	bh=Hx/zwz9ol4l1LDJ7Dd/bGQfgA1YUM37wVvRIuAH27ZI=;
+	b=kGIRit5sXOWhjNQNt76Lr0yGHMqrf1yZ8Hrl0z3HOMr1CK6u51IUsBW2a7jtlxzKJ01B
+	 ynigfn9T1IAb1aS6D34kzlQZ+wP3cWXAZ8zjWWJFzuept28TBH9DGg+C1JKiuLhimUCDX
+	 kag7zKjC+bTYwXrvmesqHgWb1QXN8n8JCDnqi/XA29Cks+ldt1x2g/VveZ7t+Fw7lRFQe
+	 ZQkexixboua6lXnlH/dNGB8bXWkkGHx4uMS/mz47M4px8yyb10HwKSYOxcurDdO49jTCe
+	 2EL5rqVylpNvJPIko8rbv1Vrz97uqG7CEQE/z2KbgfV5XuLCLwhHAeu/mQ4UMFdb0Vg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZPmjOCmj;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eLJVFGak;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A6C606A89D;
-	Mon, 16 Nov 2026 17:56:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E056606A33E;
+	Mon, 16 Nov 2026 17:59:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZPmjOCmj
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 090D91F000C4;
-	Mon, 16 Nov 2026 17:56:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eLJVFGak
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C9CC1F000CC;
+	Mon, 16 Nov 2026 17:59:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794851794;
-	bh=fwWQDlnnSTNyph3hgjd/jHBsSgprm3l/XThcAnorVzc=;
+	s=k20260515; t=1794851984;
+	bh=Hx/zwz9ol4l1LDJ7Dd/bGQfgA1YUM37wVvRIuAH27ZI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ZPmjOCmjno9nExForLkbzUF13rzZndhUhxLFyhcs6ndrKiOfrHZB3452l8ISZGQ7a
-	 iYsimyIzyefhY/oc0K0Vfemi/N6TEn8rXGyOpQ0gU73R0/NFoYDoxdzp0d4aDmcgYx
-	 PbYsURnlZMIsvqEfHzK8OzalcWBjck31xbND7wq53aERpH9jocyLE9toVILdqk7A8S
-	 PhulloZRXZGRVjWl41g3MI9mo4O1mXL6sKIAi3Tnw6BpI+V+iQmyzXVQ3AObWBs6Gj
-	 t5ib62RErvLafzsMEoDgEXi6TaWuiDqATzZpnK6iI8setbIO4LkG3gE84ueLqrLBDP
-	 sY89CO5r1y05g==
-Date: Mon, 16 Nov 2026 17:56:28 +0000
+	b=eLJVFGakU4VSc4iWqh0M+dGNOpQzetPnRCEVSi6rgv/tiL8L8piS5IooI/qP9Blps
+	 AhmrhJQrCmNZg383iGl7FcR5WU4AXnJzQ4OMfA5DuitD1n+DX8lqD1s5Gqv6Mf7PL1
+	 OZ29uW8hHtpor9dJSN8UqUzLNIGNWY4zuQ8/1ZMdxTcoRxfoJ9dQQw5ddxBPKXAMbW
+	 E9JRDKpbOLFj499hFhuVGnPiXhcRPyj0c1CaF4A+DRAHr/G1furIFGBV583s1yVDkW
+	 HnXcBkFZ9Zjp2L/oooUPrmIVu0wY4S9E1M0UM5uiikYAd1W8ofp3YYjNOVOcEQbxHM
+	 YES16R7BXG2IA==
+Date: Mon, 16 Nov 2026 17:59:07 +0000
 From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
 Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, 
@@ -47,13 +47,13 @@ Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev,
 	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
 	will@kernel.org, mark.rutland@arm.com, linux-perf-users@vger.kernel.org, 
 	catalin.marinas@arm.com, james.clark@linaro.org
-Subject: Re: [RFC PATCH v7 05/28] perf: arm_spe_pmu: Add PMBIDR_EL1 and
- PMSIDR_EL1 to struct arm_spe_pmu
-Message-ID: <avtDK5rtD38jnhqR@gremlin>
+Subject: Re: [RFC PATCH v7 07/28] KVM: arm64: Add KVM_ARM_VCPU_SPE VCPU
+ feature
+Message-ID: <avtEJaF27eHb_Ryd@gremlin>
 References: <20260903160623.315525-1-alexandru.elisei@arm.com>
- <20260903160623.315525-6-alexandru.elisei@arm.com>
- <atDmDRSNDllpJtmL@gremlin>
- <avSjyLhFsYjI7tG_@raptor>
+ <20260903160623.315525-8-alexandru.elisei@arm.com>
+ <atIr8IWcXcrjQ0wF@gremlin>
+ <avX0-TDCOlQq-4iX@raptor>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -65,144 +65,73 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <avSjyLhFsYjI7tG_@raptor>
+In-Reply-To: <avX0-TDCOlQq-4iX@raptor>
 
-On Wed, Nov 11, 2026 at 05:20:08PM +0000, Alexandru Elisei wrote:
-> Hi,
+On Thu, Nov 12, 2026 at 05:18:49PM +0000, Alexandru Elisei wrote:
+> Hi Lorenzo,
 >
-> On Thu, Oct 15, 2026 at 04:12:27PM +0100, Lorenzo Stoakes (ARM) wrote:
-> > I think probably some kind of commit message would be good even for a
-> > trivial change :)
+> On Fri, Oct 16, 2026 at 03:23:57PM +0100, Lorenzo Stoakes (ARM) wrote:
+> > On Thu, Sep 03, 2026 at 05:06:02PM +0100, Alexandru Elisei wrote:
+> > > Add a new VCPU feature that enables SPE virtualization when set by
+> > > userspace. KVM_VCPU_MAX_FEATURE will be bumped and the feature will
+> > > become selectable by userspace once SPE support in KVM is implemented.
+> >
+> > I guess it's also limited currently at this point in the series by
+> > KVM_CAP_ARM_SPE being unselectable as it stands I think?
 >
-> Of course, I'll add something here.
+> Yes, indirectly - KVM_CAP_ARM_SPE is advertised only when
+> kvm_supports_spe() is true, and KVM_ARM_VCPU_SPE also depends on
+> kvm_supports_spe(). CONFIG_KVM_ARM_SPE=y is required, but not sufficient,
+> for kvm_supports_spe() to be true. So all of this depends on the Kconfig
+> option, maybe I should document that in the capability doc.
+
+Thanks that'd be good.
+
 >
 > >
-> > On Thu, Sep 03, 2026 at 05:06:00PM +0100, Alexandru Elisei wrote:
+> > Maybe worth mentioning here that you're adding KVM_ARM_VPCU_SPE to the uapi,
+> > updating docs, etc.?
+>
+> I can mention it, but the short diff should speak for itself?
+
+I think it's worth giving the intent of your changes in the commit message, it
+doesn't have to be much like 'Export to UAPI, document' etc. etc.
+
+>
+> >
+> > >
 > > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> >
+> > I wonder if there are any dependencies that need expressing in
+> > arch/arm64/kvm/config.c?
+> >
+> > In any case all LGTM, with mega-nit below addressed :):
+> >
+> > Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
+> >
 > > > ---
-> > >  drivers/perf/arm_spe_pmu.c       | 3 +++
-> > >  include/linux/perf/arm_spe_pmu.h | 2 ++
-> > >  2 files changed, 5 insertions(+)
+> > >  Documentation/virt/kvm/api.rst    | 2 ++
+> > >  arch/arm64/include/asm/kvm_spe.h  | 5 +++++
+> > >  arch/arm64/include/uapi/asm/kvm.h | 1 +
+> > >  arch/arm64/kvm/arm.c              | 7 +++++++
+> > >  4 files changed, 15 insertions(+)
 > > >
-> > > diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
-> > > index 79c571a649d5..42ba0924bd02 100644
-> > > --- a/drivers/perf/arm_spe_pmu.c
-> > > +++ b/drivers/perf/arm_spe_pmu.c
-> > > @@ -1095,6 +1095,7 @@ static void __arm_spe_pmu_dev_probe(void *info)
-> > >  			"profiling buffer owned by higher exception level\n");
-> > >  		return;
-> > >  	}
-> > > +	spe_pmu->pmbidr_el1 = reg;
+> > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > > index 1ed5c389c7a4..654736fac78c 100644
+> > > --- a/Documentation/virt/kvm/api.rst
+> > > +++ b/Documentation/virt/kvm/api.rst
+> > > @@ -3591,6 +3591,8 @@ Possible features:
+> > >  	  Depends on KVM_CAP_ARM_EL2_E2H0.
+> > >  	  KVM_ARM_VCPU_HAS_EL2 must also be set.
+> > >
+> > > +        - KVM_ARM_VCPU_SPE: Enable SPE for the CPU. Depends on KVM_CAP_ARM_SPE.
 > >
-> > This doesn't seem to be used anywhere in the series?
->
-> Indeed, that's a leftover from the previous iterations, will remove.
->
-> >
-> > >
-> > >  	/* Minimum alignment. If it's out-of-range, then fail the probe */
-> > >  	fld = FIELD_GET(PMBIDR_EL1_ALIGN, reg);
-> > > @@ -1107,6 +1108,8 @@ static void __arm_spe_pmu_dev_probe(void *info)
-> > >
-> > >  	/* It's now safe to read PMSIDR and figure out what we've got */
-> > >  	reg = read_sysreg_s(SYS_PMSIDR_EL1);
-> > > +	spe_pmu->pmsidr_el1 = reg;
-> > > +
-> > >  	if (FIELD_GET(PMSIDR_EL1_FE, reg))
-> > >  		spe_pmu->features |= SPE_PMU_FEAT_FILT_EVT;
-> > >
-> > > diff --git a/include/linux/perf/arm_spe_pmu.h b/include/linux/perf/arm_spe_pmu.h
-> > > index af86fd184050..97b14e236fcd 100644
-> > > --- a/include/linux/perf/arm_spe_pmu.h
-> > > +++ b/include/linux/perf/arm_spe_pmu.h
-> > > @@ -21,6 +21,8 @@ struct arm_spe_pmu {
-> > >  	cpumask_t				supported_cpus;
-> > >  	struct hlist_node			hotplug_node;
-> > >
-> > > +	u64					pmbidr_el1;
-> >
-> > Equally, this doesn't seem to be used anywhere in the series, maybe drop?
+> > Super nitty, sorry, but it seems other parts of the docs use tabs, whereas this
+> > uses spaces?
 >
 > Fixed.
->
-> >
-> > > +	u64					pmsidr_el1;
-> >
-> > This field is used in kvm_spe_has_feat_spe_fds() and
-> > kvm_spe_has_feat_spe_fne():
-> >
-> > bool kvm_spe_has_feat_spe_fds(struct kvm *kvm)
-> > {
-> > 	...
-> > 	return kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P4) &&
-> > 	       FIELD_GET(PMSIDR_EL1_FDS, spe_pmu->pmsidr_el1);
-> > }
-> >
-> > bool kvm_spe_has_feat_spe_fne(struct kvm *kvm)
-> > {
-> > 	...
-> > 	return kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P2) &&
-> > 	       FIELD_GET(PMSIDR_EL1_FnE, spe_pmu->pmsidr_el1);
-> > }
-> >
-> > So checking for FDS and FnE, but these are available as feature flags as
-> > __arm_spe_pmu_dev_probe() gets these:
-> >
-> > static void __arm_spe_pmu_dev_probe(void *info)
-> > {
-> > 	...
-> > 	if (FIELD_GET(PMSIDR_EL1_FnE, reg))
-> > 		spe_pmu->features |= SPE_PMU_FEAT_INV_FILT_EVT;
-> > 	...
-> > 	if (FIELD_GET(PMSIDR_EL1_FDS, reg))
-> > 		spe_pmu->features |= SPE_PMU_FEAT_FDS;
-> > 	...
-> > }
-> >
-> > And then kvm_spe_has_feat_spe_fds() and kvm_spe_has_feat_spe_fne() can be:
-> >
-> > bool kvm_spe_has_feat_spe_fds(struct kvm *kvm)
-> > {
-> > 	...
-> > 	return kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P4) &&
-> > 	       (spe_pmu->features & SPE_PMU_FEAT_FDS);
-> > }
-> >
-> > bool kvm_spe_has_feat_spe_fne(struct kvm *kvm)
-> > {
-> > 	...
-> > 	return kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P2) &&
-> > 	       (spe_pmu->features & SPE_PMU_FEAT_INV_FILT_EVT);
-> > }
-> >
-> > Right?
->
-> In this use case they are functionally the same, yes, but conceptually, they are
-> not the same thing. spe_pmu->features advertises the features that the SPE
-> *driver* supports, PMSIDR_EL1 advertises the features that the *hardware*
-> implements. The two are not always equal.  For example, KVM added handling for
-> the PMSNEVFR_EL1 register (added by FEAT_SPE_FnE), a few years before the SPE
-> driver supported FEAT_SPE_FnE.
->
-> I can see KVM, in the future, having to virtualize hardware features not
-> supported by the host driver yet, so unless you have a strong objection, I would
-> rather keep the use of the architectural register instead of relying on the
-> driver.
 
-Ack OK, sounds sensible, no strong objection but could you add a sentence to the
-commit msg about that? Thanks! :)
-
->
-> >
-> > So it seems you could drop this patch from the series in general? Is there
-> > another reason to get these fields?
-> >
-> > Also - there seems to be a divergence in the naming there between FnE and
-> > INV_FILT_EVT, is that intentional?
->
-> I think that's a question for the person who added FEAT_PMU_FEAT_INV_FILT_EVT?
-
-Haha true I suppose so.
+Thanks!
 
 >
 > Thanks,
