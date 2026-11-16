@@ -1,57 +1,56 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794847490;
-	b=4nRxkj2c69ehzoySa+Ags6XVIGV1A5wNaxdCDXedilAeKVYfGe5xyCT+ecFbYvb9r8f1
-	 +E8lUSwqUjiU+tL/i5L/rRWcfO8FU/a2BJwBSg/Tvp+xhJMBeRtzVlthC4/RTpvMtuSPy
-	 2w/Ayb2j926PplnYL63JJo0dXCfTzOAIbdiKJvZrQJCJQFiqwyiQYKdm6LAEiFpt1V+aZ
-	 YYi66HQKwkkQjfzyMPo0ctnwF3yoSaBCdnykFACQdXqe4bhpvKonqr6fMFyJmQQQTTaK6
-	 eoq07eNID/QpNog9a/vsv5ez752JFiUCLR1RcF1jxDwD3m/Z4vLp2fREIhg7w0KNSiw==
+	t=1794847496;
+	b=4JN4mLafOdv0EYKfg6NYgu99g6zYFuL0gnrWoKx/MuGfjSdXKuYlRDdZi0K+6LS8Ub2a
+	 QsVJPiI5CW/Vb5zc72KDYoj8VzuZf4vzNnB2Ityl3gqZWJtI6dIMBe3eFGRQNDHYbQfVO
+	 EawhleRb7jUXKPun8SBuQ6qVZVzKXzpj7SiVxsN2vqPtbb+odFHlP23Zr/xccXho8u1Dn
+	 vNZSvqTsfvqD0+xOIiBmQyf1hJga47s0QlQi9HOwXOohoVMds08LQ8mtyMaodS5csdQba
+	 DJVm3Ldfza7WjqmePKMBQdy05IMYLpjx9cBvEnGvqsqNrHXfL4kogJ3eByGMGvmhTgg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794847490;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794847496;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=P8fw+2VBy+uX2tPICMYbTuK8vMTxdV9LiIiG9pw/syY=;
-	b=394gt9xOCTDS3khh6bmQfqN4IH8Tf6l2TsRbd0bn5cDYK3laRbYrUCebYQPYLWXU0ygN
-	 p8T1L5imF+FTabHxvn+HpMyVmOE+RVQv/BMZ++oKGv3DJ1W4xRCaRTF4GE/kYt0e5TGlu
-	 VNeCmqbDwh6yIEQGNvFnm9vairxQfh7YgIt3TaJ3/Rh9Wtl839goG45cCfPdraG1+DJIB
-	 Vp50CTfmf5iSaWKpJR3XwGqk92QjMRc4cmthcjLTYG2WvovDPCSYvPEosP3oq8GrJi8qA
-	 NZ8y+Re0p8b6jEec+DWKE1qzckvu/cXbRxtWtbgCGFHd4SIHLGDiMQ/FGwdc+BF+Afg==
+	bh=yF/V4RQcsz22ZXchQTYFWKlhLRQ49e9sOfQfIXFrF5U=;
+	b=JFRiFnw7qhkXv/pcCCCJ3b2iErKcsYErD+4pF+T+zXPqN+BjyBvGAu1gr/NjCK0cTcNu
+	 WIbO0U7xMoAAzBxcRZZwXcmA4z2a1DS9OQI/JfA9uFF9QgzKlnsDs4woe8/gzsk8UxkfN
+	 yQpbFWmBVy2ueCJbNq0eMDCjdikHGqL1dyfCRkz4ghnJb/LtvdWrPqE6R0dBCYJAQuMW+
+	 6FEMJAyAubuLc+qS87tEvucH2dHMcs9AAFZv+7VjWX7zBTXSyGsX4joUNh3ViFNRCIAEh
+	 1S7JIX9nncmqwqYRBOxAIRnx4fKh4Cg72ro30fJ6Gk2BYwim0KydiQqUe4Siinl003Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=OigS+mbp;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=hOkcz00+;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95174606A329;
-	Mon, 16 Nov 2026 16:44:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 95174606A329
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBD14606A332;
+	Mon, 16 Nov 2026 16:44:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BBD14606A332
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=OigS+mbp
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=hOkcz00+
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 12BC01A25;
-	Mon, 16 Nov 2026 08:44:46 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 223C3143D;
+	Mon, 16 Nov 2026 08:44:52 -0800 (PST)
 Received: from e122027.arm.com (unknown [10.57.63.54])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D88353F882;
-	Mon, 16 Nov 2026 08:44:43 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 73A843F882;
+	Mon, 16 Nov 2026 08:44:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794847489; bh=L7k3oDluQ75plIAHMometskgbywci2Xw4DnhGOUlVGQ=;
+	t=1794847495; bh=kYb0vllDY8D8xPF23SOdLAaWWaEXo/vzCyoXKEd1aPE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OigS+mbpRYgFW6w369DBA1mWX4OHDIw4M7CHLgH095/Al9SZ8kmXACdwDiQBETI7W
-	 f4UgKcj1ZSNTHQxib4CZQMgJsiyeKeXHMOmdal6UAhMdjp3Ci0G2Tgmk7p/UtrYf9O
-	 2ejtm7HC/l5I/cmvBU6fOoXcGO+V6AEAjuvrAEvM=
+	b=hOkcz00+JN4EvThhf6fcUB8LbE7ZNwy5bt+qTX/khfTPiAprz3gG0okZ1zCL5M6iM
+	 iGXOkmSwj7SbyOJt1H3EGOF70QF8pv+fMz11QFYWus+if4V2ITQz+E8xS8OfBeDxsX
+	 BWkCn+IUgEe3C9WcVFaVTwqmtGhFKZsvIrlSOfgw=
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Cc: Steven Price <steven.price@arm.com>,
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Marc Zyngier <maz@kernel.org>,
 	Will Deacon <will@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
@@ -69,10 +68,11 @@ Cc: Steven Price <steven.price@arm.com>,
 	Vishal Annapurve <vannapurve@google.com>,
 	WeiLin.Chang@arm.com,
 	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Kohei Enju <enju.kohei@fujitsu.com>
-Subject: [PATCH v3 06/11] KVM: arm64: CCA: Add Realm RTT mapping and invalidation helpers
-Date: Mon, 16 Nov 2026 16:43:52 +0000
-Message-ID: <20261116164358.142785-7-steven.price@arm.com>
+	Kohei Enju <enju.kohei@fujitsu.com>,
+	Steven Price <steven.price@arm.com>
+Subject: [PATCH v3 07/11] KVM: Allow architectures to reject memslot changes before invalidation
+Date: Mon, 16 Nov 2026 16:43:53 +0000
+Message-ID: <20261116164358.142785-8-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261116164358.142785-1-steven.price@arm.com>
 References: <20261116164358.142785-1-steven.price@arm.com>
@@ -87,562 +87,190 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add the RMI RTT creation and unmap helpers needed by CCA Realm stage-2
-memory operations. REC exit handling and guest requested RIPAS changes
-follow in the vCPU series.
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
 
+Architectures may need to reject deletion of a memory slot without
+changing the guest's memory mappings. Currently, KVM invalidates the slot
+and calls kvm_arch_flush_shadow_memslot() before
+kvm_arch_prepare_memory_region() can reject the request. On arm64, this
+unmaps the slot from stage-2. Restoring the old memslot on failure does not
+restore those mappings, so even a rejected deletion has side effects.
+
+Add kvm_arch_validate_memory_region() and invoke it before invalidating
+the slot, with slots_lock and slots_arch_lock held. The hook performs
+validation only, allowing architectures to reject a request without
+changing the memslot or its mappings. Provide a weak no-op implementation
+for architectures that do not need early validation.
+
+Move arm64's protected VM checks into the new hook so that unsupported
+deletions and moves are rejected before stage-2 unmapping. Keep resource
+preparation after invalidation, since invalidation drops slots_arch_lock
+and allows concurrent updates to architecture-specific memslot metadata.
+
+Assisted-by: LLM
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
-
 ---
-Changes since v2:
-- Use a local MMU cache during notifier invalidation, handle
-  failed RTT splits, and validate RMI levels and cache state.
+ arch/arm64/kvm/mmu.c     | 22 ++++++++++++++++------
+ arch/arm64/kvm/pkvm.c    |  2 +-
+ include/linux/kvm_host.h |  4 ++++
+ virt/kvm/kvm_main.c      | 33 ++++++++++++++++++++++++++-------
+ 4 files changed, 47 insertions(+), 14 deletions(-)
 
-Changes since v1:
-- Rework RTT creation and folding around missing or existing RTTs.
-  Use a shared RMI block-size helper and handle alignment, partial
-  progress and errors in range operations.
----
- arch/arm64/include/asm/kvm_rmi.h |   8 +
- arch/arm64/kvm/rmi.c             | 421 +++++++++++++++++++++++++++++++
- drivers/firmware/arm_rmm/rmi.c   |  10 -
- include/linux/arm-rmi-cmds.h     |   8 +
- 4 files changed, 437 insertions(+), 10 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
-index dd16c004b831..11e227172faf 100644
---- a/arch/arm64/include/asm/kvm_rmi.h
-+++ b/arch/arm64/include/asm/kvm_rmi.h
-@@ -80,6 +80,14 @@ int kvm_init_realm(struct kvm *kvm);
- void kvm_destroy_realm(struct kvm *kvm);
- int kvm_realm_teardown_stage2(struct kvm *kvm);
- 
-+enum kvm_gfn_range_filter;
-+
-+void kvm_realm_unmap_range_filter(struct kvm *kvm,
-+				  unsigned long ipa,
-+				  unsigned long size,
-+				  bool may_block,
-+				  enum kvm_gfn_range_filter attr_filter);
-+
- static inline bool kvm_realm_is_private_address(struct realm *realm,
- 						unsigned long addr)
- {
-diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-index 74b89da4e801..838f95c201ad 100644
---- a/arch/arm64/kvm/rmi.c
-+++ b/arch/arm64/kvm/rmi.c
-@@ -25,6 +25,76 @@ static int get_start_level(struct realm *realm)
- 	return 4 - stage2_pgtable_levels(realm->ia_bits);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 9baf2352d2a8..759ac0453828 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -2851,13 +2851,12 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ 	}
  }
  
-+static int find_map_level(struct realm *realm,
-+			  unsigned long start,
-+			  unsigned long end)
-+{
-+	int start_level = get_start_level(realm);
-+	int level = KVM_PGTABLE_LAST_LEVEL;
-+
-+	while (level > start_level) {
-+		unsigned long map_size = kvm_granule_size(level - 1);
-+
-+		if (!IS_ALIGNED(start, map_size) ||
-+		    (start + map_size) > end)
-+			break;
-+
-+		level--;
-+	}
-+
-+	return level;
-+}
-+
-+static int undelegate_range_desc(unsigned long desc)
-+{
-+	unsigned long size = rmi_addr_block_size_to_bytes(RMI_ADDR_RANGE_BLOCK_SIZE(desc));
-+	unsigned long count = RMI_ADDR_RANGE_COUNT(desc);
-+	unsigned long addr = RMI_ADDR_RANGE_ADDR(desc);
-+	unsigned long state = RMI_ADDR_RANGE_STATE(desc);
-+
-+	if (state == RMI_OP_MEM_UNDELEGATED)
-+		return 0;
-+
-+	if (size * count == 0)
-+		return 0;
-+
-+	return rmi_undelegate_range(addr, size * count);
-+}
-+
-+static phys_addr_t alloc_delegated_granule(struct kvm_mmu_memory_cache *mc)
-+{
-+	phys_addr_t phys;
-+	void *virt;
-+
-+	if (mc && kvm_mmu_memory_cache_nr_free_objects(mc)) {
-+		virt = kvm_mmu_memory_cache_alloc(mc);
-+	} else {
-+		virt = (void *)__get_free_page(GFP_ATOMIC | __GFP_ZERO |
-+					       __GFP_ACCOUNT);
-+	}
-+
-+	if (!virt)
-+		return PHYS_ADDR_MAX;
-+
-+	phys = virt_to_phys(virt);
-+	if (rmi_delegate_page(phys)) {
-+		free_page((unsigned long)virt);
-+		return PHYS_ADDR_MAX;
-+	}
-+
-+	return phys;
-+}
-+
-+static phys_addr_t alloc_rtt(struct kvm_mmu_memory_cache *mc)
-+{
-+	phys_addr_t phys = alloc_delegated_granule(mc);
-+
-+	if (phys != PHYS_ADDR_MAX)
-+		kvm_account_pgtable_pages(phys_to_virt(phys), 1);
-+
-+	return phys;
-+}
-+
- static void free_rtt(phys_addr_t phys)
+-int kvm_arch_prepare_memory_region(struct kvm *kvm,
+-				   const struct kvm_memory_slot *old,
+-				   struct kvm_memory_slot *new,
+-				   enum kvm_mr_change change)
++int kvm_arch_validate_memory_region(struct kvm *kvm,
++				    const struct kvm_memory_slot *old,
++				    const struct kvm_memory_slot *new,
++				    enum kvm_mr_change change)
  {
- 	kvm_account_pgtable_pages(phys_to_virt(phys), -1);
-@@ -32,6 +102,32 @@ static void free_rtt(phys_addr_t phys)
- 		kvm_account_pgtable_pages(phys_to_virt(phys), 1);
- }
+-	hva_t hva, reg_end;
+-	int ret = 0;
++	lockdep_assert_held(&kvm->slots_lock);
  
-+static long realm_rtt_create(struct realm *realm,
-+			     unsigned long addr,
-+			     int level,
-+			     phys_addr_t phys)
-+{
-+	addr = ALIGN_DOWN(addr, kvm_granule_size(level - 1));
-+	return rmi_rtt_create(realm->rd_phys, phys, addr, level);
-+}
-+
-+static long realm_rtt_fold(struct realm *realm,
-+			   unsigned long addr,
-+			   int level,
-+			   phys_addr_t *rtt_granule)
-+{
-+	unsigned long out_rtt;
-+	long ret;
-+
-+	addr = ALIGN_DOWN(addr, kvm_granule_size(level - 1));
-+	ret = rmi_rtt_fold(realm->rd_phys, addr, level, &out_rtt);
-+
-+	if (ret == RMI_SUCCESS && rtt_granule)
-+		*rtt_granule = out_rtt;
-+
-+	return ret;
-+}
-+
- /*
-  * realm_rtt_destroy - Destroy an RTT at @level for @addr.
-  *
-@@ -56,6 +152,47 @@ static long realm_rtt_destroy(struct realm *realm, unsigned long addr,
- 	return ret;
- }
+ 	if (kvm_vm_is_protected(kvm)) {
+ 		/* Cannot modify memslots once a pVM has run. */
+@@ -2872,6 +2871,17 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 		}
+ 	}
  
-+static int realm_create_rtt_levels(struct realm *realm,
-+				   unsigned long ipa,
-+				   int level,
-+				   int max_level,
-+				   struct kvm_mmu_memory_cache *mc)
-+{
-+	long ret = 0;
-+	phys_addr_t rtt = PHYS_ADDR_MAX;
-+
-+	while (level++ < max_level) {
-+		if (rtt == PHYS_ADDR_MAX)
-+			rtt = alloc_rtt(mc);
-+		if (rtt == PHYS_ADDR_MAX)
-+			return -ENOMEM;
-+
-+		ret = realm_rtt_create(realm, ipa, level, rtt);
-+		if (ret < 0)
-+			break;
-+
-+		if (RMI_RESULT_STATUS(ret) == RMI_ERROR_RTT &&
-+		    RMI_RESULT_DATA_LEVEL(ret) == level - 1) {
-+			/* The RTT already exists, reuse the granule at the next level. */
-+			ret = 0;
-+			continue;
-+		}
-+
-+		if (ret) {
-+			WARN(1, "Failed to create RTT at level %d: %ld\n",
-+			     level, ret);
-+			ret = -ENXIO;
-+			break;
-+		}
-+		rtt = PHYS_ADDR_MAX;
-+	}
-+
-+	if (rtt != PHYS_ADDR_MAX)
-+		free_rtt(rtt);
-+
-+	return ret;
++	return 0;
 +}
 +
- static int realm_tear_down_rtt_level(struct realm *realm, int level,
- 				     unsigned long start, unsigned long end)
- {
-@@ -154,12 +291,94 @@ static int realm_tear_down_rtt_range(struct realm *realm,
- 					 start, end);
++int kvm_arch_prepare_memory_region(struct kvm *kvm,
++				   const struct kvm_memory_slot *old,
++				   struct kvm_memory_slot *new,
++				   enum kvm_mr_change change)
++{
++	hva_t hva, reg_end;
++	int ret = 0;
++
+ 	if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
+ 			change != KVM_MR_FLAGS_ONLY)
+ 		return 0;
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index a5145bd75d0c..f4db0e051d6a 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -262,7 +262,7 @@ int pkvm_create_hyp_vm(struct kvm *kvm)
+ 	int ret = 0;
+ 
+ 	/*
+-	 * Synchronise with kvm_arch_prepare_memory_region(), as we
++	 * Synchronise with kvm_arch_validate_memory_region(), as we
+ 	 * prevent memslot modifications on a pVM that has been run.
+ 	 */
+ 	mutex_lock(&kvm->slots_lock);
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index f65728a713ec..15848221860f 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1255,6 +1255,10 @@ int kvm_set_internal_memslot(struct kvm *kvm,
+ 			     const struct kvm_userspace_memory_region2 *mem);
+ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot);
+ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen);
++int kvm_arch_validate_memory_region(struct kvm *kvm,
++				    const struct kvm_memory_slot *old,
++				    const struct kvm_memory_slot *new,
++				    enum kvm_mr_change change);
+ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 				const struct kvm_memory_slot *old,
+ 				struct kvm_memory_slot *new,
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index cf4cb586f140..3ef370d71818 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1682,6 +1682,20 @@ static void kvm_swap_active_memslots(struct kvm *kvm, int as_id)
+ 	slots->generation = gen;
  }
  
 +/*
-+ * Returns 0 on successful fold, a negative value on error, a positive value if
-+ * we were not able to fold all tables at this level.
++ * Validate a memslot change before invalidation, which may irreversibly reclaim
++ * private guest memory. Called with slots_lock and slots_arch_lock held.
++ * Implementations must not modify memslot state or allocate resources; leave
++ * those operations to kvm_arch_prepare_memory_region().
 + */
-+static int realm_fold_rtt_level(struct realm *realm, int level,
-+				unsigned long start, unsigned long end)
++__weak int kvm_arch_validate_memory_region(struct kvm *kvm,
++					   const struct kvm_memory_slot *old,
++					   const struct kvm_memory_slot *new,
++					   enum kvm_mr_change change)
 +{
-+	int not_folded = 0;
-+	ssize_t map_size;
-+	unsigned long addr, next_addr;
-+
-+	if (WARN_ON(level > KVM_PGTABLE_LAST_LEVEL))
-+		return -EINVAL;
-+
-+	map_size = kvm_granule_size(level - 1);
-+
-+	for (addr = start; addr < end; addr = next_addr) {
-+		phys_addr_t rtt_granule;
-+		long ret;
-+
-+		next_addr = ALIGN(addr + 1, map_size);
-+
-+		ret = realm_rtt_fold(realm, addr, level, &rtt_granule);
-+		if (ret < 0)
-+			return ret;
-+
-+		switch (RMI_RESULT_STATUS(ret)) {
-+		case RMI_SUCCESS:
-+			free_rtt(rtt_granule);
-+			break;
-+		case RMI_ERROR_RTT: {
-+			int err_level = RMI_RESULT_DATA_LEVEL(ret);
-+
-+			if (err_level < level) {
-+				/* No RTT at this level; skip the missing ancestor. */
-+				if (WARN_ON(err_level < get_start_level(realm)))
-+					return -EINVAL;
-+				next_addr = ALIGN(addr + 1,
-+						  kvm_granule_size(err_level));
-+				break;
-+			}
-+			if (level == KVM_PGTABLE_LAST_LEVEL) {
-+				not_folded++;
-+				break;
-+			}
-+			/* Recurse a level deeper */
-+			ret = realm_fold_rtt_level(realm,
-+						   level + 1,
-+						   addr,
-+						   min(next_addr, end));
-+			if (ret < 0)
-+				return ret;
-+			if (ret) {
-+				not_folded++;
-+				break;
-+			}
-+			/* Try once more after folding the child RTTs. */
-+			ret = realm_rtt_fold(realm, addr, level, &rtt_granule);
-+			if (ret < 0)
-+				return ret;
-+			if (RMI_RESULT_STATUS(ret) == RMI_SUCCESS) {
-+				free_rtt(rtt_granule);
-+				break;
-+			}
-+			if (RMI_RESULT_STATUS(ret) != RMI_ERROR_RTT) {
-+				WARN_ON(1);
-+				return -ENXIO;
-+			}
-+			not_folded++;
-+			break;
-+		}
-+		default:
-+			WARN_ON(1);
-+			return -ENXIO;
-+		}
-+	}
-+
-+	return not_folded;
++	return 0;
 +}
 +
- static int realm_destroy_rtts(struct kvm *kvm)
- {
- 	struct realm *realm = &kvm->arch.realm;
- 	unsigned int ia_bits = realm->ia_bits;
+ static int kvm_prepare_memory_region(struct kvm *kvm,
+ 				     const struct kvm_memory_slot *old,
+ 				     struct kvm_memory_slot *new,
+@@ -1934,6 +1948,10 @@ static int kvm_set_memslot(struct kvm *kvm,
+ 	 */
+ 	mutex_lock(&kvm->slots_arch_lock);
  
- 	lockdep_assert_held(&kvm->arch.config_lock);
-+	if (WARN_ON_ONCE(!realm->stage2_unmapped))
-+		return -EINVAL;
++	r = kvm_arch_validate_memory_region(kvm, old, new, change);
++	if (r)
++		goto unlock_err;
++
+ 	/*
+ 	 * Invalidate the old slot if it's being deleted or moved.  This is
+ 	 * done prior to actually deleting/moving the memslot to allow vCPUs to
+@@ -1950,22 +1968,22 @@ static int kvm_set_memslot(struct kvm *kvm,
+ 	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
+ 		invalid_slot = kzalloc_obj(*invalid_slot, GFP_KERNEL_ACCOUNT);
+ 		if (!invalid_slot) {
+-			mutex_unlock(&kvm->slots_arch_lock);
+-			return -ENOMEM;
++			r = -ENOMEM;
++			goto unlock_err;
+ 		}
+ 		kvm_invalidate_memslot(kvm, old, invalid_slot);
+ 	}
  
- 	return realm_tear_down_rtt_range(realm, 0, (1UL << ia_bits));
- }
-@@ -189,6 +408,208 @@ int kvm_realm_teardown_stage2(struct kvm *kvm)
+ 	r = kvm_prepare_memory_region(kvm, old, new, change);
+ 	if (r)
+-		goto err;
++		goto revert_slot;
+ 
+ 	if (change == KVM_MR_CREATE && (new->flags & KVM_MEM_GUEST_MEMFD)) {
+ 		r = kvm_gmem_commit_memory_region(kvm, new);
+ 		if (r) {
+ 			kvm_arch_free_memslot(kvm, new);
+ 			kvm_destroy_dirty_bitmap(new);
+-			goto err;
++			goto unlock_err;
+ 		}
+ 	}
+ 
+@@ -2000,7 +2018,7 @@ static int kvm_set_memslot(struct kvm *kvm,
+ 
  	return 0;
+ 
+-err:
++revert_slot:
+ 	/*
+ 	 * For DELETE/MOVE, revert the above INVALID change.  No modifications
+ 	 * required since the original slot was preserved in the inactive slots.
+@@ -2009,9 +2027,10 @@ static int kvm_set_memslot(struct kvm *kvm,
+ 	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
+ 		kvm_activate_memslot(kvm, invalid_slot, old);
+ 		kfree(invalid_slot);
+-	} else {
+-		mutex_unlock(&kvm->slots_arch_lock);
++		return r;
+ 	}
++unlock_err:
++	mutex_unlock(&kvm->slots_arch_lock);
+ 	return r;
  }
  
-+static bool realm_unmap_cache_topup(struct kvm *kvm,
-+				    struct kvm_mmu_memory_cache *mc, int needed)
-+{
-+	int ret;
-+
-+	if (!mc || kvm_mmu_memory_cache_nr_free_objects(mc) >= needed)
-+		return false;
-+
-+	lockdep_assert_held_write(&kvm->mmu_lock);
-+	write_unlock(&kvm->mmu_lock);
-+	ret = __kvm_mmu_topup_memory_cache(mc, KVM_PGTABLE_LAST_LEVEL, needed);
-+	write_lock(&kvm->mmu_lock);
-+
-+	return !ret;
-+}
-+
-+static void realm_unmap_shared_range(struct kvm *kvm,
-+				     unsigned long start,
-+				     unsigned long end,
-+				     bool may_block,
-+				     struct kvm_mmu_memory_cache *mc)
-+{
-+	struct realm *realm = &kvm->arch.realm;
-+	unsigned long rd = realm->rd_phys;
-+	unsigned long next_addr, addr;
-+	unsigned long shared_bit = BIT(realm->ia_bits - 1);
-+
-+	if (start >= end)
-+		return;
-+
-+	/*
-+	 * Callers may pass either an IPA range or its shared alias. Add the
-+	 * shared bit only for the former. Use addition so an exclusive end at
-+	 * shared_bit advances to the end of the IPA space.
-+	 */
-+	if (start < shared_bit) {
-+		start += shared_bit;
-+		end += shared_bit;
-+	}
-+
-+	for (addr = start; addr < end; addr = next_addr) {
-+		long ret;
-+
-+		ret = rmi_rtt_unprot_unmap(rd, addr, end, RMI_ADDR_TYPE_NONE,
-+					   0, &next_addr, NULL, NULL);
-+		if (WARN_ON(ret < 0))
-+			return;
-+
-+		switch (RMI_RESULT_STATUS(ret)) {
-+		case RMI_SUCCESS:
-+			break;
-+		case RMI_ERROR_RTT: {
-+			int err_level = RMI_RESULT_DATA_LEVEL(ret);
-+			int level = find_map_level(realm, addr, end);
-+
-+			if (WARN_ON(err_level < get_start_level(realm) ||
-+				    err_level > KVM_PGTABLE_LAST_LEVEL))
-+				return;
-+
-+			if (err_level >= level) {
-+				/* Nothing present, so skip */
-+				next_addr = ALIGN(addr + 1,
-+						  kvm_granule_size(err_level));
-+				break;
-+			}
-+
-+			if (may_block && realm_unmap_cache_topup(kvm, mc,
-+								 level - err_level)) {
-+				next_addr = addr;
-+				break;
-+			}
-+
-+			ret = realm_create_rtt_levels(realm, addr, err_level,
-+						      level, mc);
-+			if (!ret) {
-+				/* Retry with the RTT levels in place. */
-+				next_addr = addr;
-+				break;
-+			}
-+			WARN_ON(ret != -ENOMEM);
-+
-+			/* Splitting failed; unmap the entire existing block. */
-+			next_addr = ALIGN_DOWN(addr, kvm_granule_size(err_level));
-+			end = max(end, next_addr + kvm_granule_size(err_level));
-+			break;
-+		}
-+		default:
-+			WARN_ON(1);
-+			return;
-+		}
-+
-+		if (may_block)
-+			cond_resched_rwlock_write(&kvm->mmu_lock);
-+	}
-+
-+	realm_fold_rtt_level(realm, get_start_level(realm) + 1,
-+			     start, end);
-+}
-+
-+static void realm_unmap_private_range(struct kvm *kvm,
-+				      unsigned long start,
-+				      unsigned long end,
-+				      bool may_block,
-+				      struct kvm_mmu_memory_cache *mc)
-+{
-+	struct realm *realm = &kvm->arch.realm;
-+	unsigned long rd = realm->rd_phys;
-+	unsigned long next_addr, addr;
-+	long ret;
-+
-+	for (addr = start; addr < end; addr = next_addr) {
-+		unsigned long out_range;
-+		unsigned long flags = RMI_ADDR_TYPE_SINGLE;
-+		/* TODO: Optimise using RMI_ADDR_TYPE_LIST */
-+
-+		ret = rmi_rtt_data_unmap(rd, addr, end, flags, 0,
-+					 &next_addr, &out_range, NULL);
-+		if (WARN_ON(ret < 0))
-+			return;
-+
-+		switch (RMI_RESULT_STATUS(ret)) {
-+		case RMI_SUCCESS:
-+			ret = undelegate_range_desc(out_range);
-+			if (WARN_ON(ret))
-+				return;
-+			break;
-+		case RMI_ERROR_RTT: {
-+			int err_level = RMI_RESULT_DATA_LEVEL(ret);
-+			int level = find_map_level(realm, addr, end);
-+
-+			if (WARN_ON(err_level < get_start_level(realm) ||
-+				    err_level > KVM_PGTABLE_LAST_LEVEL))
-+				return;
-+
-+			if (err_level >= level) {
-+				/* Nothing present, so skip this RTT entry. */
-+				next_addr = ALIGN(addr + 1,
-+						  kvm_granule_size(err_level));
-+				break;
-+			}
-+
-+			if (may_block && realm_unmap_cache_topup(kvm, mc,
-+								 level - err_level)) {
-+				next_addr = addr;
-+				break;
-+			}
-+
-+			ret = realm_create_rtt_levels(realm, addr, err_level,
-+						      level, mc);
-+			if (!ret) {
-+				next_addr = addr;
-+				break;
-+			}
-+
-+			/* A failed split cannot leave the backing pages mapped. */
-+			KVM_BUG_ON(1, kvm);
-+			next_addr = ALIGN_DOWN(addr, kvm_granule_size(err_level));
-+			end = max(end, next_addr + kvm_granule_size(err_level));
-+			break;
-+		}
-+		default:
-+			WARN_ON(1);
-+			return;
-+		}
-+
-+		if (may_block)
-+			cond_resched_rwlock_write(&kvm->mmu_lock);
-+	}
-+
-+	realm_fold_rtt_level(realm, get_start_level(realm) + 1,
-+			     start, end);
-+}
-+
-+void kvm_realm_unmap_range_filter(struct kvm *kvm, unsigned long start,
-+				  unsigned long size, bool may_block,
-+				  enum kvm_gfn_range_filter attr_filter)
-+{
-+	/*
-+	 * MMU notifier callbacks cannot take slots_lock, which protects the
-+	 * eager split cache. Use a cache owned by this invalidation instead.
-+	 */
-+	struct kvm_mmu_memory_cache cache = { .gfp_zero = __GFP_ZERO };
-+	unsigned long end = start + size;
-+	struct realm *realm = &kvm->arch.realm;
-+
-+	if (!kvm_realm_is_created(kvm))
-+		return;
-+
-+	end = min(BIT(realm->ia_bits - 1), end);
-+
-+	if (attr_filter & KVM_FILTER_SHARED)
-+		realm_unmap_shared_range(kvm, start, end, may_block, &cache);
-+	if (attr_filter & KVM_FILTER_PRIVATE)
-+		realm_unmap_private_range(kvm, start, end, may_block, &cache);
-+
-+	if (cache.objects) {
-+		write_unlock(&kvm->mmu_lock);
-+		kvm_mmu_free_memory_cache(&cache);
-+		write_lock(&kvm->mmu_lock);
-+	}
-+}
-+
- void kvm_destroy_realm(struct kvm *kvm)
- {
- 	struct realm *realm = &kvm->arch.realm;
-diff --git a/drivers/firmware/arm_rmm/rmi.c b/drivers/firmware/arm_rmm/rmi.c
-index 77255a90e0a6..a9f42c9a4f79 100644
---- a/drivers/firmware/arm_rmm/rmi.c
-+++ b/drivers/firmware/arm_rmm/rmi.c
-@@ -11,7 +11,6 @@
- #include <linux/slab.h>
- 
- #include <asm/memory.h>
--#include <asm/pgtable-hwdef.h>
- 
- /* RMM v2.0 defines RmiFeatureRegister0 to RmiFeatureRegister4. */
- static unsigned long rmi_feat_reg_cache[5] __ro_after_init;
-@@ -183,15 +182,6 @@ int rmi_free_delegated_page(phys_addr_t phys)
- }
- EXPORT_SYMBOL_GPL(rmi_free_delegated_page);
- 
--/*
-- * Convert the RmiAddrBlockSize to actual size. This is used in RmiDonateReq
-- * and RmiAddrRangeDesc*.
-- */
--static unsigned long rmi_addr_block_size_to_bytes(unsigned long block_size_fld)
--{
--	return BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(3 - block_size_fld));
--}
--
- /*
-  * free_addr_range: Free memory described by the address range entry, which may
-  *		    be partially consumed by RMM.
-diff --git a/include/linux/arm-rmi-cmds.h b/include/linux/arm-rmi-cmds.h
-index a84e50ac851c..1a885f1017df 100644
---- a/include/linux/arm-rmi-cmds.h
-+++ b/include/linux/arm-rmi-cmds.h
-@@ -13,8 +13,16 @@
- #include <linux/string.h>
- #include <linux/types.h>
- 
-+#include <asm/pgtable-hwdef.h>
-+
- #define RMI_MAX_ADDR_LIST	256
- 
-+/* Convert the block size used by RmiDonateReq and RmiAddrRangeDesc. */
-+static inline unsigned long rmi_addr_block_size_to_bytes(unsigned long block_size)
-+{
-+	return BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(3 - block_size));
-+}
-+
- struct rmi_sro_state {
- 	struct arm_smccc_1_2_regs regs;
- 	int addr_count;
 -- 
 2.43.0
 
