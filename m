@@ -1,49 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.60
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794829598;
-	b=HzxOc4KUpUpWQcL4v1dJknC2G4LePgE5jECyr+FWPYvhB0SujZa11bBl1GDZvcojHEcd
-	 4eiZEHPvqzKoEO2oewhRmPHGvsXy/WI/yrlgATXeVUCCj0KiffwXe5Lamn4vzOFjtX003
-	 grmme4QafCeAuQm1b4/MfyqD+3r7ITS/DFBK+O9c2+aAb2lTG0OrBwM3IQ6/Yp/Twlk3G
-	 +dfdoW+VVEUCs5zxJC7J0TpHcN4AmjckYsC7aJ+qyrtrc0g6+zuDtzqtAh4FGytrU/Gad
-	 h1B0qEgYRKjmGdQKoQX/2MXkijaAh8s7xkzPP/4I6mUzvsMV8N02tfxbR9nEMLqdWDw==
+	t=1794831987;
+	b=TxNQRbqE+PIT16anUqlEKwiwguQq+OyWh2PILOyyXpm/u45Wo6fbwYjjCR2WK/L/vWha
+	 lcl2zw/F44sCUdSuKfpxIMSSw717YX/VhFPPA/7wnHVxJyZuyAUdVX8mMeptDf864rKba
+	 +6TCWAgt0UOX0WVhUhpVm0khKpWQBCW/MGOVtC7cl8sVtZ+jczm6+TUl1hraCp673R05j
+	 QStM7mpcIgnJ885cGh4QDZGGFT7mEQw46Q2/AXGDcq/ucIfdRj5qhdqkfo9F7tyu8ICiU
+	 zrGr0zBFnz52hzcOVG2lZ6lrJYc8KKFHAIgcFTJqNmjWrsuX9yM24bwEuT9m0eCEEeA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794829598;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=7FCAHSMlIJagIxDM1Al7KCUaNaZ/IrEvhQVcqS28GKE=;
-	b=BuSvopi85zKjnlNcGDxiY9hf0lerr9la5UtIVufMZeluR1eOGT0WYeye+3e9+JvZlHnJ
-	 Uv0bxu9OiMjGcBjTxGzNnEK3qczf5JjRKivPqAG0is83rYrtGMSA3dq6Cpx0lTLzw8hk3
-	 qLRmcJs+onkKPB9YIpKwN+ySuwzdGsBpMKTkQ28nlv5GM+WgYn/N7pd2JlhF1ZOwEYTiu
-	 agUAHShoOyn5O0+4fFGURPNXocENVnaKjjafYPybRxnSSxVUmkaAkTKJ5/sHdHXLVAlBN
-	 I5w+QW7Yjkz2yMUTqFM+3N9N02uhc7fPj4QiRqEPny2xSTd+Mw5MFNyNJfynI0+aPfA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794831987;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=n0Epwbp8Lzi+kI0RuXeSMG9mic2jpFCzQkf5ONSBZoI=;
+	b=cSx7tmv8LP+1MMLBTa8C1JDu5zsCwsvJcYsp268gAiNQR34b+2vx79+YzXmpnpXs4XTw
+	 T/vT42QYkQyT/FQOwCF8l1uQzsEN5crWbhAhtwwcEFTei71jHksYvIT2wxaWC+AD+AwWY
+	 Dl/M019l94nhoSSGexoD/KBz1iK0CZ8OVo/HcR/PIWpjLSkDabxXxXqq5Xd4n95S0YptI
+	 N6KAEGHPA0ObQ2PdqJ/WQoSyxUw+WKHQwoBa12iahkwZv9Md5qYYLDc2eEj4QS60u3UFU
+	 zIz0d/6oxeI7+5g+5M6eAycblmBfub3jshVSbuX+EWZ3/M6DyYcPEpA/jQhOQ2UKX/w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Ju8FC3nu;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF84606A323;
-	Mon, 16 Nov 2026 11:46:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2EF84606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=tGogcp67;
+	arc=none smtp.remote-ip=95.215.58.60
+Received: from mta1.migadu.com (out-60.mta1.migadu.com [95.215.58.60])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D5B606A333
+	for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 12:26:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D7D5B606A333
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Ju8FC3nu
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 88C041713;
-	Mon, 16 Nov 2026 03:46:34 -0800 (PST)
-Received: from [10.2.197.99] (ewhatever.cambridge.arm.com [10.2.197.99])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E36413F632;
-	Mon, 16 Nov 2026 03:46:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1794829597; bh=wXM3hUJrXDy5hrAEupSn/9LmBSDLTT18BTQMQ+4PEks=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ju8FC3nuLWXhWC7WxZGAzcQ4/3trBymnrVn3+i6W5Kz1adJ1BhYg3C+gzVotAyQ0k
-	 xkDPaOs5WRM1VAkpmoyDoJqLHgGqzbu0CkJKl/sju45wadsDFjq/vsDTpMCETn3dgt
-	 1S4s233KeJBhyneVq0OG+uhwPaqC3jMRxLsY0Wvo=
-Message-ID: <37a57d36-a516-4312-9e4e-fc151ab77c8b@arm.com>
-Date: Mon, 16 Nov 2026 11:46:32 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=tGogcp67
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=rMg7ePytN4P08Ni21SDstdH+iA+/lX/CBMDE9CVdeAk=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1794831985; v=1; x=1795436785;
+ b=tGogcp67w2qsswyi6vEI28wl/KlV4kNE1MicEWsAkiz34N+dm/BO6lu2nGTTsxYdPbtduJLg
+ zVG5BhueE+BEUvkek7ZYkcBF8dF536TM1Ux8w5NQPiLMQwsvB/JdanZEVdtG0EtTKeK2Z3zfF88
+ +ckgs/tCQ3xp7ypsms43a2jM=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 1c459341e44785fd;
+	Mon, 16 Nov 2026 12:26:24 +0000
+X-Mizu-Trace-ID: 1c459341e44785fd
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5c14bc5a743so9073e87.0
+        for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 04:26:20 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErH8xA+1siEE/txt/LL9NM4OTEwOe/EvTNikIP64WBEG9/Sqary6vNExtybrlstLP1RgqKrHx/o=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+BNocSPOHe1ADWZas4ZoF1XMU7KcCtBZokmNZCz56+PdxDoZSj
+	Y6o611OEvA8JhB9r1EiLQ7iSXyMOjFUSXUasyoA6erJUcFA4MSYK5/Rph/e0TjAnCr/0XZGAsGD
+	h8AgxrXf+kz729zjIhNX4nuqYH5EERGhLOik8U8yN
+X-Received: by 2002:a05:6512:3e22:b0:5c1:56f6:2f50 with SMTP id
+ 2adb3069b0e04-5c17d6151bemr251895e87.1.1794831979748; Mon, 16 Nov 2026
+ 04:26:19 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,53 +66,52 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 12/12] KVM: arm64: CCA: Add Realm stage-2 MMU
- operations
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Kohei Enju <enju.kohei@fujitsu.com>
-References: <20261111145758.217946-1-steven.price@arm.com>
- <20261111145758.217946-13-steven.price@arm.com>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20261111145758.217946-13-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20261116110549.1863653-1-fuad.tabba@linux.dev> <avro44jUWOARFzul@google.com>
+In-Reply-To: <avro44jUWOARFzul@google.com>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Mon, 16 Nov 2026 12:25:43 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTxWuiyjmUc3vH_KxRtS_3oX5w=CE76LdsLcrqC+RzLGfg@mail.gmail.com>
+X-Gm-Features: Aa3M54okcmr9MdJAy7XSmuEmAJr7gqz5micdc5fGZdFcC1JtmeOKxVLrP8oEceQ
+Message-ID: <CA+EHjTxWuiyjmUc3vH_KxRtS_3oX5w=CE76LdsLcrqC+RzLGfg@mail.gmail.com>
+Subject: Re: [PATCH] drivers/virt: pkvm: Zero and clean memory before sharing
+ it with the host
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Marc Zyngier <maz@kernel.org>, Mostafa Saleh <smostafa@google.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-coco@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/11/2026 14:57, Steven Price wrote:
-> From: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
-> Register the Realm stage-2 MMU operations now that the RMM mapping
-> and unmapping helpers are available. Route unmapping through the
-> RMM, and use the existing fault handler for Realm memory faults.
-> 
-> The RMM handles TLB invalidation when stage-2 mappings change, so
-> the host has no separate TLB flush to perform. Realm stage-2 does
-> not support access flags, including for shared IPAs.
-> 
-> Dispatch stage-2 destruction according to the VM flavor. Realm
-> teardown destroys non-root RTTs through RMI, so the host frees
-> only the root RTT pages.
+Hi Vincent,
 
-Minor nit: It may be worth splitting the destroy abstraction as a
-separate patch. Otherwise looks good to me.
+On Mon, 16 Nov 2026 at 11:28, Vincent Donnefort <vdonnefort@google.com> wrote:
+[...]
+> > +     /*
+> > +      * The host can read the pages as soon as they are shared, possibly
+> > +      * through a Non-cacheable mapping. No caller relies on their contents.
+> > +      */
+> > +     memset((void *)addr, 0, size);
+>
+> Are we sure we want that? The guest may want to setup memory and then share it.
+> I am not sure about modifying this API.
 
+Right! I wanted to fix the bug for the ITS property table, which is
+shared before it's initialized, and totally forgot that this is the
+path all sharing goes through... I'll drop this, and put that fix back
+in the ITS series.
 
-> 
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> 
+> > +     dcache_clean_poc(addr, addr + size);
+>
+> I believe the hypervisor is already doing the cache maintainance when the page
+> is mapped back into the host. (see stage2_map_walker_try_leaf())
+
+I don't think it does on this path. host_mmu.mm_ops doesn't have a
+dcache_clean_inval_poc() callback, so stage2_map_walker_try_leaf()
+doesn't do the CMO for a host mapping. On the guest's side,
+__pkvm_guest_share_host() only changes the software bits of the
+existing mapping, and the walker returns before the CMO in that case.
+
+Cheers,
+/fuad
