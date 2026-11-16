@@ -1,104 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.41
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794803663;
-	b=H/aQXmuwb9fqenJD8LyKW92DFoD9pTbklUchrOp63CAOlLMqE95yc3CjaVZCExtQWpQA
-	 RwLlUzZ422rXF9pU7uhWpMOTYtHVx0cQAJxsU/gV47rfNZlz4fXJ+QSldAa/I1172nxBU
-	 W2yvQ/HPIuVks38uSyzWcVuhBXdBDwjqdcygSP6AB4Lv2kurcj2ehtgQo3qUAZKreY1Sl
-	 uH0tJJRKEqLHI+pXgCfgq6b67XDayeQ7N5jIA6goB7ya1UgSQOAKSlT4u8euOJO1gykr7
-	 grc6zGMu3sfdwdlUJFWj24ZfvCMOEx9RCzh4qXnad90wDtylREqqRtS08/MKq3eeBdA==
+	t=1794808844;
+	b=2eyIwVC9rKuumxQKCYYu3Cx840NOhAbrYQJiY1yM5WHoc0kRLq3V+AWLMEY/9t1eTfK7
+	 8CyyRiWqpOSwFG5PwuE2mYw2rUGhrkUIswRfumg45KbuXdNadmzG8GII0MR9dbkeQRdlD
+	 1C6xul2FrQ65VgMvVWi6UfWwSLXro5uBqnkz8RimRWoZoKumRjZttf5TrzcqULqINd2uv
+	 BgoeLJbFLpAueSNTs0MgS62rDux3WwXFD7pYkrz0ijb6tuhmKUH9OAEHdT53Ixa4cfsm3
+	 Or8Fvyc7YMW71zWh19r++MUlRV3ADX/xsN3Sg56QBY5T9jos1eI/T4EElXkoHHu+mDw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794803663;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794808844;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:In-Reply-To:References:MIME-Version:
-	 Content-Type:Content-Disposition:Message-ID:User-Agent;
-	bh=0RTPkBSn8aHOwll0NIb+MH6Rxh2TXo2nlFC6RRntyeU=;
-	b=rROF2oCgxF7bL3ytPuBL9G1YGTrwM2ex7f1jGLhs9q6juyBQCPaeCuCFISLTfYyi3bm6
-	 YXE88OX8qn1EzAEw9w+33xC5BGTwJ4likFiQuhkBjdp32bXALzIx8F20fU4Tpp8c1Lytb
-	 Ba2VU9G/baxOAM30H7m0azTzfYT+ACRjd5KbRRcamM6YuJWQeUfKrHqNlGZY9j3cGdJBC
-	 whAkm9JJDEXuwgxXPfk29YqJbMCpJofJhRRqW3MtnauWVYiZnNPjtGn6rs7ruRFVepsU6
-	 wL0RtyBa5Jfr7mIaBtOKt/OSBPncsFb4un+np/NR9xS3XJd5VNX2Vqm2cSSysGIwaVQ==
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=4EJinoQFWOQAxBpp8/0xszfKNpVkrh34c2hx1lgmetc=;
+	b=PuVSELKDmp8yt8jhfB+MAKPIjBk0gSVWVdsmMgHHjOTD4Y20HhQVh2drxGWvcKr8hqr4
+	 otJmR+VuchJaiPTNGbyZoQem5XALRAuq8pTLxcZ2XJvH+gW7S9B6UOf7UeQ12XbKGDsYM
+	 czyH+n+bBGWDQB2i0HIJ2f6F3NEGylJhWUB0Edc5rDMKwjBhzo5bZ600Ud+39FS2YTCpV
+	 4ELurwpQAECGZJMCkdsVp3ZOTQTneqhBezxqqkbj2U992CLSD/k2d8wM8Hf8Jtjv0AbBD
+	 Ao7UeNsiOz/UpsY/2gqxQxL5//mM3SG7jEwVJhjz3uf7RvVPU+TSMGD0HzGEIwF6p0A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chrisdown.name;
-	spf=pass smtp.mailfrom=chrisdown.name;
-	dkim=pass header.d=chrisdown.name header.i=@chrisdown.name header.a=rsa-sha256 header.s=google header.b="or/AlSf9";
-	arc=none smtp.remote-ip=74.125.82.54
-Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
+	dmarc=pass header.from=pereq.eu;
+	spf=pass smtp.mailfrom=cryspen.com;
+	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=Pa6yCJYl;
+	arc=none smtp.remote-ip=209.85.208.41
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16648606A321
-	for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 04:34:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 16648606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chrisdown.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chrisdown.name
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4A8606A31C
+	for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 06:00:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EC4A8606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chrisdown.name header.i=@chrisdown.name header.a=rsa-sha256 header.s=google header.b=or/AlSf9
-Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-170135e43c7so4781832c88.0
-        for <kvmarm@lists.linux.dev>; Sun, 15 Nov 2026 20:34:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=Pa6yCJYl
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6b4bd3d98bfso4269280a12.1
+        for <kvmarm@lists.linux.dev>; Sun, 15 Nov 2026 22:00:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chrisdown.name; s=google; t=1794803662; x=1795408462; darn=lists.linux.dev;
-        h=user-agent:message-id:content-disposition:content-type:mime-version
-         :references:in-reply-to:subject:cc:to:from:date:from:to:cc:subject
+        d=pereq.eu; s=google; t=1794808841; x=1795413641; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=0RTPkBSn8aHOwll0NIb+MH6Rxh2TXo2nlFC6RRntyeU=;
-        b=or/AlSf9ID4PF+8qGNAByt+9leWavjQqMUqA4Z9mYViTJaSQxSjQzezRt8M+zlIye5
-         IPTUjLqWNBpwmPCBomO39L5vvj9o4sKC4CKSexCkB8IiLxc6ouLv6Xf/rg/EPWX5j3Zk
-         HK06YBEOYxtjDirteBgNqXxCv4a/KxzBK8G/s=
+        bh=4EJinoQFWOQAxBpp8/0xszfKNpVkrh34c2hx1lgmetc=;
+        b=Pa6yCJYljfw77Txa02Gv6yY8KJ7MCFkhqntFGZvjxg/eGaOtMsWk/GpDaXz0wLKu/q
+         ug8FsLtZKbZyFqn9eEjflBm5GIXJlZvzeJzrt2QPx4fwcMRzwMUjugilxDo8Cu3FvLvM
+         46nJDaDOBQ7mgkLfkTKkzaQVtwt0vvC9Wn/Wwbbsr9TVX0YUx2H38VPIINXbngeNnaco
+         jAX/2Zc4Kw2AenjmS1Qxxn9XbZe8jpmCnaA4DzH9Ub+X58GQ1zZTNMqoqgN8AKMVOq0/
+         9ard4jmIvAp02C8An6jBz29a7ASiUisIaMrfV16m6pY7RicLlt/3tkkTuHHSYqXcIIfq
+         3oSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794803662; x=1795408462;
-        h=user-agent:message-id:content-disposition:content-type:mime-version
-         :references:in-reply-to:subject:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20260707; t=1794808841; x=1795413641;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=0RTPkBSn8aHOwll0NIb+MH6Rxh2TXo2nlFC6RRntyeU=;
-        b=cIhWfpHFMvwBN7SNy0PmKXn+Tz+CQjAqLdheGEH1yROiJ3JE1pDYezB6Gqz3VLmvch
-         KNjPo3AkT17AWzYYMd8VH25bP4q6lj5KZq4Yz4sAcFIwUxoMXIch9rj52grP+LknaXPM
-         PKE60eRd5EN5Q5DjrpikjVmxnVATx09wa4otHw3VZHUsjJcEND9npwNuFiWijvtKVAbn
-         GSewXld8agebLM3Ywub+81HvealslVjm6s2pnBZquowMD5xB2MXV3U/XzfOa1TNHctbN
-         uLPeuy0ZNm8kH/lETQ0mqTs6TSNT3yAcNH6DmHvvjif8CWxYqL1IpKG5gv7C6+nZkYTz
-         j18A==
-X-Forwarded-Encrypted: i=1; AL+hErHw++8qkx6mWARnYCY4Zz4sAQLpYCQw5cq7KB1jfiAyCi55FNsw+356rnCHOleAeXfVyTgE9o4=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9ZpZ8tZz2ryAskf49x9/kFPA4km5SJKZT1NF+ULXq5aJJKbN8V
-	scarvt8KmPWVdymxD5nFMcRsF3TMVHRT4wJ3b67iQvXvZ8eafPa0QrXGdWXkPyP9/XU=
-X-Gm-Gg: AYBFou2oyPEbyBGznBGFlJVpUZTH0EYD0BCorsTwBGSxnuaf7PHMcBblRp6//Pw5PUU
-	//JRf7hwXbS2x24ZkQEPVDQqsffOQWTPOJsa1U+k8jAGueHtXTWWIoAEsVM6K6/0KVsXVkEZ3Pn
-	CckYvP47mgbhvacg29uEUB4/QrCdpemijLx+Vr3wE789cDT+TsQgWBiTqDqkb8hgucNesyTr3Bc
-	qbz9peH/okOZZLySeIM8qd/6symgv4Bv+0nLDgxaPEvdthtkSdcykxXq/hpiioS4TyJNfCkTKuQ
-	YR9RrywU6fHIPK7sT8TB+xJ1w3bH5GHOg/EYkzAOLlCuS8mifImBtk819POS8i+BbvBgt8GtBfP
-	JYFqnB3ITToBGNrhKk7je+bPhduPvsWiIGkEEH5yE2BsTBOZ2lWyW3XUDe54+cJ7C8/7ikM0aly
-	7J+r4h264pUx+4OoZCw+UdLVQfjzadxZRFAIrcVwWdsUL8s4PDKnIwY/VP0yXsfeLNyXLvpg0si
-	33g8MXaKn/vF3yzZ9miz3xDu37RKbLTFpCc39dSRNrzECFkTZlsJqEeTm7TAF7LiG8xYZWLkvRs
-	HVHJtA2E/RoRzdBLrkzdtzIcAGIGYzsC2ccZ0dMTm5J5uDNrFo5cZKXRgR+TPNQ857ZykJ/TcgQ
-	ki7urJVyM0IthO+4u8GrxN02wcCyOwMEbKWV2y8Y32i8ldIjxt0fTSVuZ/tRgQtia5bbxKEF/Jq
-	lzdx5feWLJIJVvs8/U9tFP2Przdvc42NUimiEbKCmOyQK6hWdgCIs78VZ4m8R33YQd
-X-Received: by 2002:a05:701b:4508:20b0:194:9e7a:3ba2 with SMTP id a92af1059eb24-1b50306c4d3mr9813315c88.2.1794803662025;
-        Sun, 15 Nov 2026 20:34:22 -0800 (PST)
-Received: from [172.18.0.2] ([172.56.232.151])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b5329ec87bsm2576204c88.0.2026.11.15.20.34.19
+        bh=4EJinoQFWOQAxBpp8/0xszfKNpVkrh34c2hx1lgmetc=;
+        b=ifBQpMpTIjO1gXvb26pYTmrrzIyl28VKleMnA9BPQq3nz+QxKnO4aR2x1fUVSsOF8t
+         RfLRLHHQH9EnPbDvuQM7ux4zDRCq6TYDCstwFkZdP6I4TqT1QaZsI8o+R0oS/UIPkjc4
+         sxIq1F8LJnUpzU0QFT73JjQv0sZwU/Gb1pZAShw6vYWclblvzTpTaHO0wF/qYu/PPbc5
+         wAuhElvh5Ia7Nu+yEoLRuyCiFBrv4YaLuaMjU7QF1GpMdivUcNUFHMLIN571H68N71Xv
+         8YtS8vFOcsr7mxEehwKqbVLhDGVaoystZrNsIcbkU/LJfCQ06azE+qjBNKmO4HEqkT8t
+         ZOFg==
+X-Forwarded-Encrypted: i=1; AL+hErFA5h+4k7Rm3IdRDPookwLeE4Ojhzghn9AYrQYIemXciqq1glHLL6vQMGn+2mrMUeme0dFQoP8=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+8u+kCzYYmn7LOLrKJYY9ByrYHddxNHdnpDoZpa/VMoBa8WqhK
+	33OkfEgaNMrHWG1vd+20dBrgnSN2vSre/eXn3o7J1JPA8533Py2u8MiU00GvKPP+HG8=
+X-Gm-Gg: AYBFou3dWb8fkN0Fo/Ltqx9JNnvGsXrAUnnBMjwq0M7qtuwV2YpuB6U8S+IeQoStJT2
+	fLRwCW8jsgQBjZZw22vfZd3g6wlb326YSUmexnGRVROb+eU7L7Q9PP9DmRVaeJ9YfaFCcX66mkP
+	thAeJHnqHvjRfw/6VJZFCa05xEfc/WAc2e9xtJj5av5xOjH6azPKpbUYduyd0F6o/RHzPFjsE8E
+	Ig4noG+DEa5pMbr5T9snoWzUW9mtNX+M4GH4wZ9n1NAFLaUUe0mpErttmWDRU9JfaisP2Zm5DFn
+	wBaUfxaHEgqS8/KzWLpZZ8McQJqDegkPdaF5HMRW1LVRbJh145+iYTnlZ1Q3UwKmHnrMhoV+CPq
+	887IgJOpQ6PPoxdzND7tHh91NtkVuiTx3gp0KI++f6mxVVt5M2nVfPiEbZDgsHPnwDq2wizck8c
+	aRKurqiEK2GZ0M77LZqDZzkGXjmt49NIvjZ1tVcp80Z23hv4fBmPwJo5dc3ChkpiHJO4C1jLuHZ
+	CDTmTdVBEe42wGtVVppbMUbiUEL4W3KqLNQ6xSIxWUJwTZ+oL/t6fhWzQ34JoxWqYWLVDOCXscC
+	7HlQa5+IbW6yQPB1Otg=
+X-Received: by 2002:a05:6402:2389:b0:6b7:1c:ead6 with SMTP id 4fb4d7f45d1cf-6b7c0be11abmr4151963a12.28.1794808841111;
+        Sun, 15 Nov 2026 22:00:41 -0800 (PST)
+Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6b7c21b1b5asm3973648a12.4.2026.11.15.22.00.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Nov 2026 20:34:21 -0800 (PST)
-Date: Sun, 15 Nov 2026 20:34:13 -0800
-From: Chris Down <chris@chrisdown.name>
-To: Tarun Sahu <tarunsahu@google.com>
-Cc: Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Mike Rapoport <rppt@kernel.org>, robin.murphy@arm.com, maz@kernel.org,
-	will@kernel.org, David Matlack <dmatlack@google.com>,
-	Alexander Graf <graf@amazon.com>, seanjc@google.com, jgg@nvidia.com,
-	loganodell@google.com, arnd@arndb.de, dwmw2@infradead.org,
-	baolu.lu@linux.intel.com, Bjorn Helgaas <bhelgaas@google.com>,
-	oupton@kernel.org, alex@shazbot.org, gle.com@google.com, pbonzini@redhat.com,
-	Andrew Morton <akpm@linux-foundation.org>, kevin.tian@intel.com,
-	joro@8bytes.org, kvmarm@lists.linux.dev, linux-pci@vger.kernel.org,
-	Pratyush Yadav <pratyush@kernel.org>, kexec@lists.infradead.org,
-	kvm@vger.kernel.org, iommu@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, skhawaja@google.com, sagis@google.com,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 14/19] liveupdate: Add feature header to struct
-	luo_flb_ser
-In-Reply-To: <20261110050202.529473-15-tarunsahu@google.com>
-References: <20261110050202.529473-1-tarunsahu@google.com>
-	<20261110050202.529473-15-tarunsahu@google.com>
+        Sun, 15 Nov 2026 22:00:40 -0800 (PST)
+Date: Mon, 16 Nov 2026 09:00:36 +0300
+From: Dan Carpenter <dan@pereq.eu>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Jintack Lim <jintack.lim@linaro.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Karthik Bhargavan <karthik@pereq.eu>,
+	=?iso-8859-1?Q?Cl=E9ment?= Blaudeau <clement@cryspen.com>
+Subject: [PATCH 2/2] KVM: arm64: nv: Update the shadow MMU's VMID for AT
+ emulation
+Message-ID: <5467fc4aae218b86846454bba96c3ba2b95931bf.1794808373.git.dan@pereq.eu>
+References: <cover.1794808373.git.dan@pereq.eu>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -108,40 +106,70 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Message-ID: <20261115203413.eaa54fcba43adc22@chrisdown.name>
-User-Agent: Mutt/2.4.3 (cc9e3943) (2026-10-09)
+In-Reply-To: <cover.1794808373.git.dan@pereq.eu>
 
-Hi Tarun,
+There is a missing kvm_arm_vmid_update() before the __load_stage2()
+in __kvm_at_s1e01_fast().  The bug affects nested virtualization on
+arm64.
 
-Tarun Sahu writes:
->+	for (u64 i = 0; i < fh->header_ser->count;
->+	     i++, fhdr = (void *)fhdr + fhdr->size) {
->+		struct luo_flb_ser *ser;
->+
->+		err = kho_ser_validate(fhdr, luo_flb_ser);
->+		if (err)
->+			return err;
+In KVM a "stage 2" refers to the VM's page table mappings. The
+__kvm_at_s1e01_fast() function emulates the AT instruction, which
+translates a virtual address the way the MMU would and returns the
+result.
 
-I think there's a problem with returning this error as it is. For an
-unknown required feature kho_ser_validate() returns -EOPNOTSUPP, but
-callers of liveupdate_flb_get_incoming() already take -EOPNOTSUPP to mean
-that live update is disabled. pci_liveupdate_flb_get_incoming() returns
-NULL for it, so instead of panicking, PCI carries on as if nothing was
-preserved, even though those devices may still be doing DMA.
+Each stage 2 has a VMID, which the hardware uses to tag TLB and
+walk-cache entries, so that one VM never uses another's entries.  There
+are only 2^8 or 2^16 VMIDs, which is quite limited, so vmid.c hands
+them out by generation.  When they run out, a rollover starts a new
+generation and flushes the TLBs: the VMIDs active on a CPU at that
+moment are kept, and every other VMID can be given to another VM.
 
- From a quick test with an outgoing kernel hacked to set an unknown
-required bit on its luo_flb_ser entries, that is what happens after the
-kexec, in that the PCI FLB is never retrieved and boot carries on.
+The kvm_arm_vmid_update() function checks the VMID's generation, takes
+a new VMID if it is from an old generation, and marks it as active on
+this CPU.  Without this, the shadow MMU's VMID could be an old one that
+now belongs to another VM, or a rollover on another CPU could hand it
+to another VM while we are using it.  Either way the AT fills TLB entries
+tagged with another VM's VMID.
 
-Could you validate the entries once in luo_flb_setup_incoming() instead?
-They are all written with the same header by luo_flb_serialize(), so
-there's no need to check them on every lookup. Going by the code, a
-failure there would panic through luo_restore_fail(), like a bad
-luo_flb_header_ser already does. If the per-entry headers end up going
-away as David suggested, then this check goes away with them, of course.
+To fix this, call kvm_arm_vmid_update() to update the VMID before loading
+the shadow stage 2.  That marks it as active on the CPU.  Then at the end
+of the function, undo that.  Restore the original VMID as active while
+checking for and handling rollover.
 
-Thanks!
+Fixes: 477e89cabb14 ("KVM: arm64: nv: Add basic emulation of AT S1E{0,1}{R,W}")
+Cc: stable@vger.kernel.org
+Signed-off-by: Dan Carpenter <dan@pereq.eu>
+---
+ arch/arm64/kvm/at.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Chris
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index 06765881a4c8..34c9d10188e0 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -1455,6 +1455,7 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 		}
+ 	}
+ 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, SCTLR_EL1),	SYS_SCTLR);
++	kvm_arm_vmid_update(&mmu->vmid);
+ 	__load_stage2(mmu);
+ 
+ skip_mmu_switch:
+@@ -1496,8 +1497,11 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 
+ 	write_sysreg_hcr(HCR_HOST_VHE_FLAGS);
+ 
+-	if (mmu_cs)
++	if (mmu_cs) {
++		kvm_arm_vmid_update(&vcpu->arch.hw_mmu->vmid);
++		config.vttbr = kvm_get_vttbr(vcpu->arch.hw_mmu);
+ 		__mmu_config_restore(&config);
++	}
+ 
+ 	return par;
+ }
+-- 
+2.53.0
+
