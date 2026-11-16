@@ -1,62 +1,104 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794846800;
-	b=KYWXKTg8lUtIEKEwkO+i/X4ZmPJgUSS4hCjd/f0xcNu/4Az5zkAp5THSXHoDReSJg8MV
-	 pj4t5JKGLWD8p7Z8dkVsES6MJL9pEiUtQc46po2U1ZlIByn7pxg7zSldTa6HBLxkqlW1z
-	 rLEMXEKXTk5A7vDplZTR5e18S2mcW80XtafRZ5vPsKQCgNRHj/Pf/qaC2Nohs0VUeUNpj
-	 Bl1kmO3VbIErhwqAkbIBJaxATZDMO7g5IVjOyvGiAtn601zKZI8z0gImcjN9zfwvkrle5
-	 dAiM0+G9I9OSckDULWkgnOHb9ddaTrt9uWHgtip5eX4VMCcvJ2U/4mGMKDJ7zvFhAvA==
+	t=1794847146;
+	b=xoDPARSUz4SZApkEdZY4f/WozaeBI+SDZy0ijBZv5BSslCj6H3lm3lXnEc39BBCyvQh5
+	 /HUOCFsvEYyrNQHPfqP9cSH+/4ScYL7IT0pt9Ib1DVsxYUsRiMa45jORBph/FxMLRVd1K
+	 a0e0cFnS2Em9L5Pz32/m9Suj5a6dgpQJ0e1hO0o3BClhKruLAvxCGM8QBCXJ8bdn99SGD
+	 CuqmJDG4MNIsbRrcBg/d4R43hSWRDm+WoSmv/3xrqXJBIVHiG1qA9ppjSc+/Gy7vHIzNf
+	 6Pw6LTEoG6v675eeKUGnrlDKW8ILXF/AY5gFtRYF/eLqKmhKc2QRvcsX7/+nInKYGwQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794846800;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=GXr7TvVYy4WPx6ph5OJOFoOmqPDe/zCDq2W6XppAZFY=;
-	b=xxeVsYBWQpukDFzgWP/Iu57IcyH+ofWSMiIncXz1iC9IlHij/Ls/Vys/sreUPovBh+YW
-	 TGzWAdZ1DCOqCsrqKD/kHLGH+TN48Kwm+Fl2V94rOIIm2qYHkm5Knx7Wpaa3xmiiYYERY
-	 Oy5SZfjOJ6PczWpUAjQmIw2WIDOahCVRlGMVRponfIWuzzj5h402DK2iY1V+USvmQyHxa
-	 yQywBK1OL8aSSM3gqsjkSRoB06dXrWb4jgjIXxdjPghgPc7U5FHRlJpElPLeh1Mh4zjh7
-	 M8/6nGxGyTJ+4iS3ua7+gp9U+sPOe0kGevQvZhIxZ9iomlSDzGkPkn1Dz7uomjvvc/A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794847146;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=lMR9qDrcuTjHQIrjpgVj0zhPv473ZEqMMWfCbIqm3Q0=;
+	b=h64GYGyn2oGXRhseOPhczlObVxd390jrWDGoicwGLL1LpqsdfTjxUD6piDMp8Ov69/kv
+	 JN/h4R/BLrNDos6q0jRFK9WzlYgdBT0RLXx3txQMOsuUVBSFuadKzGqS7PdP5Hosv6YvG
+	 CSfX+Ufr2t7pV67JDKt96mJ1wi73R0maHeMvbgOsYXdDeOM18zNbuREs2s7tvknt8gkfX
+	 XzfyYuMFVZfT8I5CQtuo2IIVDVECy9/Og2+KSfiRA/3XkUoU7KcRK1/Bmc1GPMkeA1tyG
+	 u3olJUHnx/6u8QLbqYojCSYejw10SvDNuoVmCkNrX909wbmWSrEC+mq2Jke6GYzPrug==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.dev;
-	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="E8cE/N70";
-	arc=none smtp.remote-ip=91.218.175.18
-Received: from mta0.migadu.com (out-18.mta0.migadu.com [91.218.175.18])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mIAvKWrp;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20FF3606A331
-	for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 16:33:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 20FF3606A331
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F75606A31C;
+	Mon, 16 Nov 2026 16:39:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=E8cE/N70
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=GXr7TvVYy4WPx6ph5OJOFoOmqPDe/zCDq2W6XppAZFY=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794846798; v=1; x=1795451598;
- b=E8cE/N70XfZUuIHp0p/D81QESCMBsXWNXBB7FdNb4rsbOxt3Gq5vWbPnGyWZWQa7r2U0l8G6
- RtULJc2HFGtTBuBlvAD7QjJSSw1yNZR42cJ7zUCiM76z8F8JG/jlKA0KkvUztCS+AHIzRAhbOwj
- KGrA0tGBMZSO/w7kqQqDrF5c=
-X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id b197041dfcd2c9a3;
-	Mon, 16 Nov 2026 16:33:18 +0000
-X-Mizu-Trace-ID: b197041dfcd2c9a3
-X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5be58ad9600so11572e87.0
-        for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 08:33:17 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErFSNvZgkmW5IDOuCIUkMT5KGmRreCA1yqwkDTsgknjiF/mGGcsj8sHU5WaL7bi6zykqpxTzvRc=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9HreU8fk+Yk44jrrzY8YHwaUu7wb17ghp1CDSfPdKP6BAu+mxB
-	6ioyoeki/AoY0lDhcF+wAaTirWk9Vjfw4mKadDIYBVHE/TdhiRMAiyCYPUIKitNbPQZymPV25wc
-	KVS6jWMiczWTL28UkIJK5Uy8AY/UMw9mIF0WLeNMV
-X-Received: by 2002:a05:6512:1156:b0:5c1:5978:6abf with SMTP id
- 2adb3069b0e04-5c17e42fd2fmr254711e87.9.1794846796829; Mon, 16 Nov 2026
- 08:33:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mIAvKWrp
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAD0A1F000C4;
+	Mon, 16 Nov 2026 16:38:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794847146;
+	bh=lMR9qDrcuTjHQIrjpgVj0zhPv473ZEqMMWfCbIqm3Q0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=mIAvKWrpblygY2gORXGuS+vgNMSQVSMyYMGIWMZc/H6+A5K1SRoMSSKhPXBmNJgcL
+	 mHah2e2gLJCrS2rxFDDsqYQDQN2FxJ5htDLRKrxn2bLKgTVEqpump37b2SIHvTGsNQ
+	 Ku5hQP3825SFJhmREJktFIa1+uNR3LVV36d53y4Pua2UL+tsbROoDeiW2EWcsiQjF8
+	 tMV5yx4cwz+87l8OdaVp1F+SRVxQXher8R55izBUPgHi/4VmsjOC/E29z/2iAVxVRe
+	 y35CyYf1mPlNrWcbpNKBstQFgnObG4iv555rXzHuoT41V85m42mMchmbA63X97Xt6w
+	 Q/i7Lj/aLTTvg==
+Date: Mon, 16 Nov 2026 17:38:50 +0100
+From: Lorenzo Pieralisi <lpieralisi@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	Marc Zyngier <maz@kernel.org>, linux-coco@lists.linux.dev,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Baoquan He <baoquan.he@linux.dev>, Mike Rapoport <rppt@kernel.org>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Pratyush Yadav <pratyush@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Joerg Roedel <joro@8bytes.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>, Will Deacon <will@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Benjamin Gaignard <benjamin.gaignard@collabora.com>,
+	Brian Starkey <Brian.Starkey@arm.com>,
+	John Stultz <jstultz@google.com>,
+	Mark Rutland <mark.rutland@arm.com>, Radu Rendec <radu@rendec.net>,
+	"T.J. Mercier" <tjmercier@google.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <chleroy@kernel.org>,
+	Ritesh Harjani <ritesh.list@gmail.com>,
+	Shrikanth Hegde <sshegde@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>, Kiryl Shutsemau <kas@kernel.org>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	"K . Y . Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+	linaro-mm-sig@lists.linaro.org,
+	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
+	linux-mm@kvack.org, kvmarm@lists.linux.dev, patches@lists.linux.dev
+Subject: Re: [PATCH v9 14/14] irqchip/gic-v3-its: Preallocate VPE L1 tables
+Message-ID: <avsxmk815rlqNstc@red-moon>
+References: <20261104164555.3555725-1-aneesh.kumar@kernel.org>
+ <20261104164555.3555725-15-aneesh.kumar@kernel.org>
+ <86zevn1c9a.wl-maz@kernel.org>
+ <yq5ah5huoteu.fsf@kernel.org>
+ <87ld6x8zb7.wl-maz@kernel.org>
+ <yq5apkw5xpnz.fsf@kernel.org>
+ <avrgNBXDFMGL6dqO@red-moon>
+ <f2e47b68-1aee-4d17-8b63-e67075e7a42e@arm.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,50 +108,59 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261116110549.1863653-1-fuad.tabba@linux.dev>
- <avro44jUWOARFzul@google.com> <CA+EHjTxWuiyjmUc3vH_KxRtS_3oX5w=CE76LdsLcrqC+RzLGfg@mail.gmail.com>
- <avsNdPissIDAb1hA@google.com>
-In-Reply-To: <avsNdPissIDAb1hA@google.com>
-From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 16 Nov 2026 16:32:40 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTwuvhAPWje63TJRR_d+VHT0xwORktQ4zxrcV7KMaHxupQ@mail.gmail.com>
-X-Gm-Features: AclHuK_oLN7lZHnxxyf05gt8nVYYVHzgK9T59Mb4I86hjWlMfwLiJmejDHvb7kk
-Message-ID: <CA+EHjTwuvhAPWje63TJRR_d+VHT0xwORktQ4zxrcV7KMaHxupQ@mail.gmail.com>
-Subject: Re: [PATCH] drivers/virt: pkvm: Zero and clean memory before sharing
- it with the host
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Marc Zyngier <maz@kernel.org>, Mostafa Saleh <smostafa@google.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-coco@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f2e47b68-1aee-4d17-8b63-e67075e7a42e@arm.com>
 
-On Mon, 16 Nov 2026 at 14:04, Vincent Donnefort <vdonnefort@google.com> wrote:
+On Mon, Nov 16, 2026 at 03:32:25PM +0000, Steven Price wrote:
+
 [...]
-> Ha yes of course, that's the host s2 we are mapping into. And on the guest side,
-> we are only changing the software bits, so no CMO. Actually I should have read
-> the comment in stage2_map_walker_try_leaf() more carefully.
->
-> That said, I wonder if that shouldn't be handled by the hypervisor, just like
-> hyp_poison_page() do the cache clean.
->
-> That would be slightly slower than letting the guest (who has a mapping already)
-> do it, but pKVM is enforcing isolation between host and guest, and it feels like
-> it should do it by default no matter the memory transition.
 
-After the discussion on the related thread [1], if we have the zeroing
-here, we need the clean here as well. So I think that this patch is
-the right fix now.
+> >> Thanks for confirming. Can we handle the ITS platform-device conversion
+> >> and the switch to DMA allocations in a separate series?
+> >>
+> >> The existing VPE L1 allocation path calls set_memory_decrypted() from
+> >> the non-sleepable CPU-starting callback, even though
+> >> set_memory_decrypted() can sleep. This issue predates the shared-granule
+> >> allocator changes.
+> > 
+> > If I may ask, why does the existing code ends up calling set_memory_decrypt(),
+> > or reworded, why does the VPE L1 allocation path goes through the ITS specific
+> > allocation function rather than using alloc_pages() (as it was before
+> > b08e2f42e86b5) ?
+> 
+> Because it needs to be accessible to the GIC "hardware". In this case
+> the GIC is emulated by the hypervisor and the hypervisor for a realm can
+> only see the unprotected memory.
+> 
+> Now I agree this is a little academic in practise because Linux (as a
+> hypervisor) will not expose RVPEID - so allocate_vpe_l1_table() will
+> early out. IIUC this would only actually be relevant in the case of
+> nested virtualisation within a realm guest - which is a long way off if
+> it ever happens.
 
-Cheers,
-/fuad
+That's what I was actually getting at.
 
+> > Why did b08e2f42e86b5 patched allocate_vpe_l1_table() allocation and moved
+> > it to using its_alloc_pages() ?
+> 
+> In that commit I simply changed all the allocation paths which were
+> allocating memory to be visible to the GIC to use the new allocator. As
+> we "know" that the GIC can only access "decrypted" memory. Admittedly
+> that could easily change in the future - but my expectation is that it
+> will only change with the switch to GICv5.
 
-[1] https://lore.kernel.org/all/CA+EHjTywWTaKLtM6OPF_0ETv29-m8JsHdvF3BeW9Xa=h713eEg@mail.gmail.com/
+Yes. I just wanted to understand whether, for VPE tables, this is,
+currently, a requirement.
 
+> Of course what I missed was that this specific allocation uses
+> GFP_ATOMIC and that set_memory_decrypted() can sleep. This wouldn't have
+> shown up on any testing because of the early exit:
+> 
+>         if (!gic_rdists->has_rvpeid)
+>                 return 0;
 
->
-> --
-> Vincent
+Understood, see above.
+
+Thanks,
+Lorenzo
