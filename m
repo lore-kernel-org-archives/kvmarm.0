@@ -1,59 +1,70 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794852242;
-	b=bkkiq7ae0lDqKPl+Lv5XvEz2sjJYkPmmTRnSk5SNWCxACtOnkpD2fU4BOKu4vwct8ajO
-	 sDbzhbmQdyoox6Qbd47jXB+atK7Bp6qj4/gmXQHu8AbT60wiZatg6cdtVZP01S4NJf6aa
-	 cZjMHzfNVqKZKTWQqtPIdov07M31SJEr9WYyVOf/HKjgk2t/3cxjvubnliv2i8FuKfTKB
-	 mXNE7cXF6GxN/xgtRT94YvRDhZKSBZnyNI3HBc303hy9voxWMgtcGBeQ46tR0yXJM8zND
-	 C9NcEUUJarlald872hrKYW5Y+DbIJodHcn/WF8iuN8Ou3dCaSOY9jvh7TvoY3b4t1bg==
+	t=1794852678;
+	b=NcKxj2V07WM3yiqJ+B5sgPaeTR6aXru9LQY4I7F6j7Lxh44PiGHLEN9l/n/n7Vd/ANEy
+	 0/ZfUuE/FrdUNGNGOV94MW4QsIDSHtBua/dxOAEIhn1l+ZnmIQ+K61ZlfP4kQO+//cg9m
+	 uutZtWbqgKmA93VC1K2IbDS8oaxkLE5IP3+180iXXAKdS4VwWv3hgIDjX8YUhyD8wNQN+
+	 dRrrAm3T1545kvV93+CK4g9An5+NNCsBE2aFSS3YOg/64g/fnix7nmulrSKm79hZqZhqW
+	 NeOTZj5dLJPS5C9cOhjCWSrq3SYQeC6SxEyEm8Hf24Jfa72oABe6pby4IqkfAOKRlwg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794852242;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=PjgDifA+WY+ML1G6HjbkqA7torFG5UegbIaFkipl26w=;
-	b=OyIoXgwG5lvkJjmvY/hH7Qfwt9lKjjrJ+RtvY/UHj//bwoH6fnyCNhkotb4Ewd62Fd2/
-	 ZQsnkqKkD2K0Opk4NUfy9pGMA8NI+XJPZtYOY35C8Uim33EZG+ikXaJtSntj8ZE8fCCj1
-	 s4ZIcXOQ+gHZe6odTh64sxsdWphFDzrx3QGrCCiAnpurpFjdfdxwNcW1WFJ008DK5Nb39
-	 XsNwXOz3RFEmh+GU2M+mEWn6SXIfz9o61GZntmzR/ytLXoRyIJiir697vd6/EzJ93JJVx
-	 7K0QDa80HOcZ3kLtNDRv97AsUyDAZ+aHClBRMV4A5xZ5r22hDRJyTdZ1nndt26wuXsw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794852678;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=q46AE2TsYo8zXLliVKO5Tx+OouQ4BpY5EoM6nx9zS/Y=;
+	b=oRfbwsyyhSy7NmWof/delJkEWi85/u5/Va6YuSgKy+0u0gKtVdw/uzPcyXX+K4jY/+Ck
+	 M/FSQqq2AZmWr5mqGuaN5DMgQT7y39B+R7pKNj17DAxoChnUOXdkpujUI4syub857isIa
+	 JRkJ/qyoPoBnRr4f3uJ8DSRCjyoQmVRwyq2y8DQwvdKSqH8Z8D6/27zjNW96udZF9tBoD
+	 xdnuq/hnXatBD3MM3MVjE2tUR9Zk+5MLB4rOvICYJ/dyplp7SK5SqFAmpQ07bvJnVo+Wb
+	 p2u4sAvlufeabunIeFzJz5B56g7JJcQLOaNqNaYCwMqxIQNW0x5pdIvSFunmimSeBhg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BZQvZvdn;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="X/bxCzJd";
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856A6606A322;
-	Mon, 16 Nov 2026 18:04:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA28606A322;
+	Mon, 16 Nov 2026 18:11:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BZQvZvdn
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 370F81F000C4;
-	Mon, 16 Nov 2026 18:03:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X/bxCzJd
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66C5C1F000C9;
+	Mon, 16 Nov 2026 18:11:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794852242;
-	bh=PjgDifA+WY+ML1G6HjbkqA7torFG5UegbIaFkipl26w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=BZQvZvdnCu1giJ3n9uXH1U5699IR0+LrLB7Y8Ha/qpjipq/k5KAbUrH5utPqTM5P2
-	 HQDKJxG2+GlXB9EMO6S7nFz2X7N/LHyZ6IHoJZL/izg8PP93rExefpbo5vm3mloKRa
-	 pquMJdJ/EkrGWpEF82c9Tac77BaJO/elDrRDLvseO8kGHFFr9ElDzVxdnFo4NpxuDI
-	 lrmoqU/D/flKe151y5d8z45H0et4/vOMd8L/XnUrw8RDiVqZpVp+2QLnOUchXm4O7S
-	 nc4QlNJARiOkUGcp1ZAUe1yt0XzD7T8MEev8Q2gpJuoz60e9RMvFHiVQ7UMfyoqxvX
-	 Gn3/KbYdSR6Qg==
-Date: Mon, 16 Nov 2026 18:03:49 +0000
-From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, 
-	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	will@kernel.org, mark.rutland@arm.com, linux-perf-users@vger.kernel.org, 
-	catalin.marinas@arm.com, james.clark@linaro.org
-Subject: Re: [RFC PATCH v7 04/28] perf: arm_spe_pmu: Move struct arm_spe_pmu
- to a separate header file
-Message-ID: <avtFfIHH5KP01r0j@gremlin>
-References: <20260903160623.315525-1-alexandru.elisei@arm.com>
- <20260903160623.315525-5-alexandru.elisei@arm.com>
- <atDgBR0WOGHUsLaF@gremlin>
- <avSjIvJM5TZAuQlG@raptor>
+	s=k20260515; t=1794852678;
+	bh=q46AE2TsYo8zXLliVKO5Tx+OouQ4BpY5EoM6nx9zS/Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=X/bxCzJdAoaLpc4TJKp1MPffvF9eU2tf9Eg/YQFHd9gDjXM4+TV6RZaNrcXGeKk0p
+	 LeE6RDixr7VEnDWt/1qbysXCgJmCK2NWqseCxBD50haobqGedfGc3IDtDKL5CB/G6c
+	 2YddrXfJQ6TPnXoY/NAOlGyo5ancAkGvS10ND/rxDDVfc1fv5CTa5BG1tnfY2m3RUc
+	 jMz4AROlbCB1XQW4aVLbmZ80vKbnjy7ODpePuH4RaOjUe3nlcKRGZxliq5O7dPAdq0
+	 hs5z7UgIG5ut1WtTYdFneNza5mI+hGZF4bvAK2qZEgguvfn9GCoOES/+/fFqeX2Rbp
+	 N2SBMzBWUEr7A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xT1Ai-0000000GbgH-1eXM;
+	Mon, 16 Nov 2026 18:11:16 +0000
+Date: Mon, 16 Nov 2026 18:11:15 +0000
+Message-ID: <86h5hg1wak.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Dan Carpenter <dan@pereq.eu>
+Cc: Oliver Upton <oupton@kernel.org>,	Fuad Tabba <fuad.tabba@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,	Steffen Eiden <seiden@linux.ibm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,	Zenghui Yu
+ <yuzenghui@huawei.com>,	Catalin Marinas <catalin.marinas@arm.com>,	Will
+ Deacon <will@kernel.org>,	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org,	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,	Karthik Bhargavan <karthik@pereq.eu>,
+	=?UTF-8?B?Q2zDqW1lbnQ=?= Blaudeau <clement@cryspen.com>
+Subject: Re: [PATCH] KVM: arm64: nv: Fix NULL dereference in kvm_inject_nested()
+In-Reply-To: <avsH0lxpLIF2Ug64@stanley.mountain>
+References: <avsH0lxpLIF2Ug64@stanley.mountain>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -62,178 +73,134 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <avSjIvJM5TZAuQlG@raptor>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dan@pereq.eu, oupton@kernel.org, fuad.tabba@linux.dev, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, karthik@pereq.eu, clement@cryspen.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Nov 11, 2026 at 05:17:22PM +0000, Alexandru Elisei wrote:
-> Hi Lorenzo,
->
-> On Thu, Oct 15, 2026 at 03:40:09PM +0100, Lorenzo Stoakes (ARM) wrote:
-> > On Thu, Sep 03, 2026 at 05:05:59PM +0100, Alexandru Elisei wrote:
-> > > KVM will soon want to make use of struct arm_spe_pmu, move it to a separate
-> > > header where it will be easily accessible.
-> > >
-> > > Cc: Will Deacon <will@kernel.org>
-> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> >
-> > Looks to be a straightforward mechanical change, couple nits below but with
-> > those addressed:
-> >
-> > Reviewed-by: Lorenzo Stoakes (ARM) <ljs@kernel.org>
-> >
-> > > ---
-> > >  drivers/perf/arm_spe_pmu.c       | 33 +--------------------
-> > >  include/linux/perf/arm_spe_pmu.h | 50 ++++++++++++++++++++++++++++++++
-> >
-> > This should be added to MAINTAINERS too I think?
->
-> Added this under ARM PMU PROFILING AND DEBUGGING:
->
-> +F:     include/linux/perf/arm_spe_pmu.h
->
-> >
-> > >  2 files changed, 51 insertions(+), 32 deletions(-)
-> > >  create mode 100644 include/linux/perf/arm_spe_pmu.h
-> > >
-> > > diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
-> > > index b70f3fedf028..79c571a649d5 100644
-> > > --- a/drivers/perf/arm_spe_pmu.c
-> > > +++ b/drivers/perf/arm_spe_pmu.c
-> > > @@ -28,6 +28,7 @@
-> > >  #include <linux/of.h>
-> > >  #include <linux/perf_event.h>
-> > >  #include <linux/perf/arm_pmu.h>
-> > > +#include <linux/perf/arm_spe_pmu.h>
-> > >  #include <linux/platform_device.h>
-> > >  #include <linux/printk.h>
-> > >  #include <linux/slab.h>
-> > > @@ -67,38 +68,6 @@ struct arm_spe_pmu_buf {
-> > >  	void					*base;
-> > >  };
-> > >
-> > > -struct arm_spe_pmu {
-> > > -	struct pmu				pmu;
-> > > -	struct platform_device			*pdev;
-> > > -	cpumask_t				supported_cpus;
-> > > -	struct hlist_node			hotplug_node;
-> > > -
-> > > -	int					irq; /* PPI */
-> > > -	u16					pmsver;
-> > > -	u16					min_period;
-> > > -	u16					counter_sz;
-> > > -
-> > > -#define SPE_PMU_FEAT_FILT_EVT			(1UL << 0)
-> > > -#define SPE_PMU_FEAT_FILT_TYP			(1UL << 1)
-> > > -#define SPE_PMU_FEAT_FILT_LAT			(1UL << 2)
-> > > -#define SPE_PMU_FEAT_ARCH_INST			(1UL << 3)
-> > > -#define SPE_PMU_FEAT_LDS			(1UL << 4)
-> > > -#define SPE_PMU_FEAT_ERND			(1UL << 5)
-> > > -#define SPE_PMU_FEAT_INV_FILT_EVT		(1UL << 6)
-> > > -#define SPE_PMU_FEAT_DISCARD			(1UL << 7)
-> > > -#define SPE_PMU_FEAT_EFT			(1UL << 8)
-> > > -#define SPE_PMU_FEAT_FDS			(1UL << 9)
-> > > -#define SPE_PMU_FEAT_DEV_PROBED			(1UL << 63)
-> > > -	u64					features;
-> > > -
-> > > -	u64					pmsevfr_res0;
-> > > -	u16					max_record_sz;
-> > > -	u16					align;
-> > > -	struct perf_output_handle __percpu	*handle;
-> > > -};
-> > > -
-> > > -#define to_spe_pmu(p) (container_of(p, struct arm_spe_pmu, pmu))
-> > > -
-> > >  /* Convert a free-running index from perf into an SPE buffer offset */
-> > >  #define PERF_IDX2OFF(idx, buf) \
-> > >  	((idx) % ((unsigned long)(buf)->nr_pages << PAGE_SHIFT))
-> > > diff --git a/include/linux/perf/arm_spe_pmu.h b/include/linux/perf/arm_spe_pmu.h
-> > > new file mode 100644
-> > > index 000000000000..af86fd184050
-> > > --- /dev/null
-> > > +++ b/include/linux/perf/arm_spe_pmu.h
-> > > @@ -0,0 +1,50 @@
-> > > +// SPDX-License-Identifier: GPL-2.0
-> >
-> > Pedantic I know, sorry :P but as per Documentation/process/license-rules.rst:
-> >
-> >       C source:	// SPDX-License-Identifier: <SPDX License Expression>
-> >       C header:	/* SPDX-License-Identifier: <SPDX License Expression> */
-> >       ...
-> >
-> > So should be /* */ here.
->
-> Fixed.
->
-> >
-> > > +/*
-> > > + * Split from driver/perf/arm_spe_pmu.c
-> >
-> > NIT: should be drivers/...
->
-> Fixed.
->
-> Thanks,
-> Alex
->
-> >
-> > > + *
-> > > + * Copyright (C) 2016 ARM Limited
-> > > + */
-> > > +
-> > > +#ifndef __PERF_ARM_SPE_PMU_H__
-> > > +#define __PERF_ARM_SPE_PMU_H__
-> > > +
-> > > +#include <linux/cpumask.h>
-> > > +#include <linux/container_of.h>
-> > > +#include <linux/list.h>
-> > > +#include <linux/perf_event.h>
-> > > +#include <linux/platform_device.h>
-> > > +#include <linux/types.h>
-> > > +
-> > > +struct arm_spe_pmu {
-> > > +	struct pmu				pmu;
-> > > +	struct platform_device			*pdev;
-> > > +	cpumask_t				supported_cpus;
-> > > +	struct hlist_node			hotplug_node;
-> > > +
-> > > +	int					irq; /* PPI */
-> > > +	u16					pmsver;
-> > > +	u16					min_period;
-> > > +	u16					counter_sz;
-> > > +
-> > > +#define SPE_PMU_FEAT_FILT_EVT			(1UL << 0)
-> > > +#define SPE_PMU_FEAT_FILT_TYP			(1UL << 1)
-> > > +#define SPE_PMU_FEAT_FILT_LAT			(1UL << 2)
-> > > +#define SPE_PMU_FEAT_ARCH_INST			(1UL << 3)
-> > > +#define SPE_PMU_FEAT_LDS			(1UL << 4)
-> > > +#define SPE_PMU_FEAT_ERND			(1UL << 5)
-> > > +#define SPE_PMU_FEAT_INV_FILT_EVT		(1UL << 6)
-> > > +#define SPE_PMU_FEAT_DISCARD			(1UL << 7)
-> > > +#define SPE_PMU_FEAT_EFT			(1UL << 8)
-> > > +#define SPE_PMU_FEAT_FDS			(1UL << 9)
-> > > +#define SPE_PMU_FEAT_DEV_PROBED			(1UL << 63)
-> > > +	u64					features;
-> > > +
-> > > +	u64					pmsevfr_res0;
-> > > +	u16					max_record_sz;
-> > > +	u16					align;
-> > > +	struct perf_output_handle __percpu	*handle;
-> > > +};
-> > > +
-> > > +#define to_spe_pmu(p) (container_of(p, struct arm_spe_pmu, pmu))
-> > > +
-> > > +#endif /* __PERF_ARM_SPE_PMU_H__ */
-> > > --
-> > > 2.43.0
-> > >
-> > >
-> >
-> > --
-> > Cheers, Lorenzo
+On Mon, 16 Nov 2026 13:40:34 +0000,
+Dan Carpenter <dan@pereq.eu> wrote:
+> 
+> There is a NULL dereference of vcpu->arch.hw_mmu in kvm_inject_nested()
+> 
+> Unable to handle kernel NULL pointer dereference at virtual address 0000000000000084
+>   kvm_vcpu_put_hw_mmu (arch/arm64/kvm/nested.c:1046) (P)
+>   vhe_vcpu_put (arch/arm64/kvm/arm.c:827)
+>   kvm_arch_vcpu_put (arch/arm64/kvm/arm.c:860)
+>   kvm_inject_nested (arch/arm64/kvm/emulate-nested.c:2903)
+>   kvm_inject_nested_serror (arch/arm64/kvm/emulate-nested.c:2976)
+>   kvm_inject_serror_esr (arch/arm64/kvm/inject_fault.c:365)
+>   __kvm_arm_vcpu_set_events (arch/arm64/kvm/guest.c:827)
+>   kvm_arch_vcpu_ioctl (arch/arm64/kvm/arm.c:2017 arch/arm64/kvm/arm.c:2157)
+>   kvm_vcpu_ioctl (arch/arm64/kvm/../../../virt/kvm/kvm_main.c:4772)
+> 
+> KVM_SET_VCPU_EVENTS does not load the vcpu, but it injects a pending
+> SError or external abort straight away.  If the vcpu is in L2 context
+> and L1 has asked for the exception, kvm_inject_nested() puts and loads
+> a vcpu that is not loaded.  vcpu->arch.hw_mmu is NULL when the vcpu is
+> not loaded, so kvm_vcpu_put_hw_mmu() dereferences a NULL pointer.
+> 
+> To fix this bug, only put and load the vcpu when it is loaded, similar
+> to what kvm_reset_vcpu() does.  When the vcpu is not loaded there is
+> nothing to switch: the next kvm_arch_vcpu_load() loads L1's context.
+> 
+> Fixes: 9aba641b9ec2 ("KVM: arm64: nv: Respect exception routing rules for SEAs")
+> Fixes: 77ee70a07357 ("KVM: arm64: nv: Honor SError exception routing / masking")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Dan Carpenter <dan@pereq.eu>
+> ---
+> This was found through Pereq's formal analysis but the stack trace
+> comes from real life testing.
+> 
+> x86 implements kvm_arch_vcpu_ioctl() differently and puts vcpu_load()
+> at the start of the ioctl.  But the way arm64 does it is deliberately
+> and just something that people working with the code need to be aware
+> of, I guess.
+> 
+>  arch/arm64/kvm/emulate-nested.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 2bec81668361..22ca735a34f6 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -2862,7 +2862,7 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
+>  			     enum exception_type type)
+>  {
+>  	u64 pstate, mode;
+> -	bool direct_inject;
+> +	bool direct_inject, loaded;
+>  
+>  	if (!vcpu_has_nv(vcpu)) {
+>  		kvm_err("Unexpected call to %s for the non-nesting configuration\n",
+> @@ -2891,6 +2891,7 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
+>  	}
+>  
+>  	preempt_disable();
+> +	loaded = (vcpu->cpu != -1);
+>  
+>  	vcpu_set_flag(vcpu, IN_NESTED_EXCEPTION);
+>  
+> @@ -2900,7 +2901,8 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
+>  	 */
+>  	__kvm_adjust_pc(vcpu);
+>  
+> -	kvm_arch_vcpu_put(vcpu);
+> +	if (loaded)
+> +		kvm_arch_vcpu_put(vcpu);
+>  
+>  	kvm_inject_el2_exception(vcpu, esr_el2, type);
+>  
+> @@ -2915,7 +2917,8 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
+>  	 */
+>  	__kvm_adjust_pc(vcpu);
+>  
+> -	kvm_arch_vcpu_load(vcpu, smp_processor_id());
+> +	if (loaded)
+> +		kvm_arch_vcpu_load(vcpu, smp_processor_id());
+>  	vcpu_clear_flag(vcpu, IN_NESTED_EXCEPTION);
+>  
+>  	preempt_enable();
 
-Cheers for all above!
+I wonder if a marginally better approach is to add an unconditional
+vcpu_load() in the event injection ioctl:
 
---
-Cheers, Lorenzo
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 5959bbbfa026f..21cd872ea394b 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2007,7 +2007,7 @@ static int kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
+ static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+ 				   struct kvm_vcpu_events *events)
+ {
+-	int i;
++	int i, ret;
+ 
+ 	/* check whether the reserved field is zero */
+ 	for (i = 0; i < ARRAY_SIZE(events->reserved); i++)
+@@ -2019,7 +2019,11 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+ 		if (events->exception.pad[i])
+ 			return -EINVAL;
+ 
+-	return __kvm_arm_vcpu_set_events(vcpu, events);
++	vcpu_load(vcpu);
++	ret = __kvm_arm_vcpu_set_events(vcpu, events);
++	vcpu_put(vcpu);
++
++	return ret;
+ }
+ 
+ /*
+
+and be done with it, avoiding the fast-path bloating altogether.
+Unless you can spot another path where the vcpu is not loaded, but
+still requires the injection of an exception?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
