@@ -1,62 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794846529;
-	b=n2ex4B9JAiY0KD4OsAnk3rUZyyUMScz16taauLhSx0N0dHzWzhlEojflJ9ZhNfgPKS9m
-	 ZKbjNXHkzzQoEfKd/Kt9aNWft26Miq4g8SflZHKaMJgrNTkpIGx447CuyiDKpN2iqAQ0O
-	 q/nQ2RjNqdr4Iyx1HfampiBFjH2bS9+lgvcu/6CDYuZXZcYtZSKPEqHQ2BbxflsvfD/Dq
-	 ir2J0+8TAlZtT64OFVyyH12uK4zJwfQNF4T2U7a36djTITnwEWcg87BX1y3UXFBsn9pGa
-	 9RduZsyCJfBYepc/TiJPBmKRaQmJI/CjOhBDyLNNM3Wn3LAFjwFPQPQeDXmvDP7cqSg==
+	t=1794846800;
+	b=KYWXKTg8lUtIEKEwkO+i/X4ZmPJgUSS4hCjd/f0xcNu/4Az5zkAp5THSXHoDReSJg8MV
+	 pj4t5JKGLWD8p7Z8dkVsES6MJL9pEiUtQc46po2U1ZlIByn7pxg7zSldTa6HBLxkqlW1z
+	 rLEMXEKXTk5A7vDplZTR5e18S2mcW80XtafRZ5vPsKQCgNRHj/Pf/qaC2Nohs0VUeUNpj
+	 Bl1kmO3VbIErhwqAkbIBJaxATZDMO7g5IVjOyvGiAtn601zKZI8z0gImcjN9zfwvkrle5
+	 dAiM0+G9I9OSckDULWkgnOHb9ddaTrt9uWHgtip5eX4VMCcvJ2U/4mGMKDJ7zvFhAvA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794846529;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794846800;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
 	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
 	 Subject:To:Cc:Content-Type;
-	bh=eqhrbr8iKieSrVR0UuN7fPro2ug2CEul2vf55oUadPY=;
-	b=uPxcOddQaR83TJRYz98xlKFLoPjqrf+8t1U+sU8oTsDtrjYMAz5XMM/orDRTenbR7zEf
-	 I3qg4qQvq0vCPNBK79qulWb+KMldIUxG4Xk5s8Ieoat+FSa6Fy9TMTOu5lBfsn3/XJOwA
-	 Nq7EMHPSia+dk5e+1wuE7qQlG4f/r+O8c+OJEq8220ZW3K8UEi+U14tjjf8WJbgSK1WY5
-	 YAVlPstYMqq3OCSO1g98ydBTHxIudn2xfKO6+CxYMJLtPJ+ZfgCQjB86DQG5sFAw0bK4s
-	 g+JBcD44CKTdYsOuzVoPpUQW3Ldzkj9T2VCL3ckTj0xU0cONkBFEKkXanZAkZbq+U0g==
+	bh=GXr7TvVYy4WPx6ph5OJOFoOmqPDe/zCDq2W6XppAZFY=;
+	b=xxeVsYBWQpukDFzgWP/Iu57IcyH+ofWSMiIncXz1iC9IlHij/Ls/Vys/sreUPovBh+YW
+	 TGzWAdZ1DCOqCsrqKD/kHLGH+TN48Kwm+Fl2V94rOIIm2qYHkm5Knx7Wpaa3xmiiYYERY
+	 Oy5SZfjOJ6PczWpUAjQmIw2WIDOahCVRlGMVRponfIWuzzj5h402DK2iY1V+USvmQyHxa
+	 yQywBK1OL8aSSM3gqsjkSRoB06dXrWb4jgjIXxdjPghgPc7U5FHRlJpElPLeh1Mh4zjh7
+	 M8/6nGxGyTJ+4iS3ua7+gp9U+sPOe0kGevQvZhIxZ9iomlSDzGkPkn1Dz7uomjvvc/A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="ucu/USF5";
-	arc=none smtp.remote-ip=91.218.175.183
-Received: from mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="E8cE/N70";
+	arc=none smtp.remote-ip=91.218.175.18
+Received: from mta0.migadu.com (out-18.mta0.migadu.com [91.218.175.18])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE97606A882
-	for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 16:28:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3DE97606A882
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20FF3606A331
+	for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 16:33:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 20FF3606A331
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=ucu/USF5
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=E8cE/N70
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=eqhrbr8iKieSrVR0UuN7fPro2ug2CEul2vf55oUadPY=;
+DKIM-Signature: a=rsa-sha256; bh=GXr7TvVYy4WPx6ph5OJOFoOmqPDe/zCDq2W6XppAZFY=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794846526; v=1; x=1795451326;
- b=ucu/USF5L6j3xx8be3/FBm299AV+a47dsd2tH64gH3jq95m+jjGg9LGcprLI3q9oULItOeUt
- Qc39SLVTcnghWOkNSUl1uK3rrukH4CmW9GJc+FCrCro7iw4B6m6d8S+12zKFL1B779157/6jKvP
- 9pjfCsJg5MA9gmWzf/d3q6RY=
+ t=1794846798; v=1; x=1795451598;
+ b=E8cE/N70XfZUuIHp0p/D81QESCMBsXWNXBB7FdNb4rsbOxt3Gq5vWbPnGyWZWQa7r2U0l8G6
+ RtULJc2HFGtTBuBlvAD7QjJSSw1yNZR42cJ7zUCiM76z8F8JG/jlKA0KkvUztCS+AHIzRAhbOwj
+ KGrA0tGBMZSO/w7kqQqDrF5c=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id fd106f81f1774e95;
-	Mon, 16 Nov 2026 16:28:46 +0000
-X-Mizu-Trace-ID: fd106f81f1774e95
+Received: by smtp.migadu.com with ESMTPS id b197041dfcd2c9a3;
+	Mon, 16 Nov 2026 16:33:18 +0000
+X-Mizu-Trace-ID: b197041dfcd2c9a3
 X-Migadu-Flow: FLOW_OUT
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5be58ad9600so11492e87.0
-        for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 08:28:42 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErGOD5EFHzUoLXsrLF0pe5hl7OP6Y3oEWXiXFpdqriEYIPXEOqMEcnU/oNJZgo7LOCeAJZ4kOnk=@lists.linux.dev
-X-Gm-Message-State: APuU4Z/EgemSxvZhJQAKQ4xqILackURw7+3lZZIRUpUgjF3seke7B15l
-	qd/0OuYwMc+5N0KRncWtmN2D69ApHAuJkZrU4JCw7NitPDlAGr1k0Tu8U5DKZ0rwOWrsZH/mJ4M
-	NwVe6uW0Oj1l7O+RbmLRHtx9tYGqefTF4EIBQbCip
-X-Received: by 2002:a05:6512:1290:b0:5c1:5209:5a44 with SMTP id
- 2adb3069b0e04-5c17d8cd72fmr248826e87.4.1794846521147; Mon, 16 Nov 2026
- 08:28:41 -0800 (PST)
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5be58ad9600so11572e87.0
+        for <kvmarm@lists.linux.dev>; Mon, 16 Nov 2026 08:33:17 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErFSNvZgkmW5IDOuCIUkMT5KGmRreCA1yqwkDTsgknjiF/mGGcsj8sHU5WaL7bi6zykqpxTzvRc=@lists.linux.dev
+X-Gm-Message-State: APuU4Z9HreU8fk+Yk44jrrzY8YHwaUu7wb17ghp1CDSfPdKP6BAu+mxB
+	6ioyoeki/AoY0lDhcF+wAaTirWk9Vjfw4mKadDIYBVHE/TdhiRMAiyCYPUIKitNbPQZymPV25wc
+	KVS6jWMiczWTL28UkIJK5Uy8AY/UMw9mIF0WLeNMV
+X-Received: by 2002:a05:6512:1156:b0:5c1:5978:6abf with SMTP id
+ 2adb3069b0e04-5c17e42fd2fmr254711e87.9.1794846796829; Mon, 16 Nov 2026
+ 08:33:16 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -66,116 +66,50 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261116091137.94252-1-aneesh.kumar@kernel.org>
- <20261116091137.94252-3-aneesh.kumar@kernel.org> <CA+EHjTw7QzzkQYKV3jyvW5mqZQMenTfm=kus9i87tYqACDOv0Q@mail.gmail.com>
- <yq5ah5hgyj1p.fsf@kernel.org> <20261116140259.GL2532299@ziepe.ca>
-In-Reply-To: <20261116140259.GL2532299@ziepe.ca>
+References: <20261116110549.1863653-1-fuad.tabba@linux.dev>
+ <avro44jUWOARFzul@google.com> <CA+EHjTxWuiyjmUc3vH_KxRtS_3oX5w=CE76LdsLcrqC+RzLGfg@mail.gmail.com>
+ <avsNdPissIDAb1hA@google.com>
+In-Reply-To: <avsNdPissIDAb1hA@google.com>
 From: Fuad Tabba <fuad.tabba@linux.dev>
-Date: Mon, 16 Nov 2026 16:28:04 +0000
-X-Gmail-Original-Message-ID: <CA+EHjTywWTaKLtM6OPF_0ETv29-m8JsHdvF3BeW9Xa=h713eEg@mail.gmail.com>
-X-Gm-Features: AclHuK8v9DG_RUNyj3rKA0Y0tmAlsYWqFzMKzPZz5wl1VueI09Ml-h3rn0SbMmg
-Message-ID: <CA+EHjTywWTaKLtM6OPF_0ETv29-m8JsHdvF3BeW9Xa=h713eEg@mail.gmail.com>
-Subject: Re: [PATCH v10 02/13] mm: Zero memory during shared memory transitions
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, linux-coco@lists.linux.dev, 
-	Andrew Morton <akpm@linux-foundation.org>, Baoquan He <baoquan.he@linux.dev>, 
-	Mike Rapoport <rppt@kernel.org>, Pasha Tatashin <pasha.tatashin@soleen.com>, 
-	Pratyush Yadav <pratyush@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Joerg Roedel <joro@8bytes.org>, Marc Zyngier <maz@kernel.org>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Steven Price <steven.price@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Thomas Gleixner <tglx@kernel.org>, Will Deacon <will@kernel.org>, 
-	Russell King <linux@armlinux.org.uk>, Benjamin Gaignard <benjamin.gaignard@collabora.com>, 
-	Brian Starkey <Brian.Starkey@arm.com>, John Stultz <jstultz@google.com>, 
-	Mark Rutland <mark.rutland@arm.com>, Radu Rendec <radu@rendec.net>, 
-	"T.J. Mercier" <tjmercier@google.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
-	Christophe Leroy <chleroy@kernel.org>, Ritesh Harjani <ritesh.list@gmail.com>, 
-	Shrikanth Hegde <sshegde@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H . Peter Anvin" <hpa@zytor.com>, Kiryl Shutsemau <kas@kernel.org>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, "K . Y . Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, dri-devel@lists.freedesktop.org, 
-	iommu@lists.linux.dev, linaro-mm-sig@lists.linaro.org, 
-	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org, 
-	linux-mm@kvack.org, kvmarm@lists.linux.dev, patches@lists.linux.dev, 
-	Vincent Donnefort <vdonnefort@google.com>
+Date: Mon, 16 Nov 2026 16:32:40 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTwuvhAPWje63TJRR_d+VHT0xwORktQ4zxrcV7KMaHxupQ@mail.gmail.com>
+X-Gm-Features: AclHuK_oLN7lZHnxxyf05gt8nVYYVHzgK9T59Mb4I86hjWlMfwLiJmejDHvb7kk
+Message-ID: <CA+EHjTwuvhAPWje63TJRR_d+VHT0xwORktQ4zxrcV7KMaHxupQ@mail.gmail.com>
+Subject: Re: [PATCH] drivers/virt: pkvm: Zero and clean memory before sharing
+ it with the host
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Marc Zyngier <maz@kernel.org>, Mostafa Saleh <smostafa@google.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-coco@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Jason, Aneesh,
-
-On Mon, 16 Nov 2026 14:02:59 +0000, Jason Gunthorpe <jgg@ziepe.ca> wrote:
+On Mon, 16 Nov 2026 at 14:04, Vincent Donnefort <vdonnefort@google.com> wrote:
 [...]
-> Just like you are wrapping set_memory_decrypted() in an allocator API
-> the user that wants to have the no-change sharing needs its own
-> special API too.
+> Ha yes of course, that's the host s2 we are mapping into. And on the guest side,
+> we are only changing the software bits, so no CMO. Actually I should have read
+> the comment in stage2_map_walker_try_leaf() more carefully.
+>
+> That said, I wonder if that shouldn't be handled by the hypervisor, just like
+> hyp_poison_page() do the cache clean.
+>
+> That would be slightly slower than letting the guest (who has a mapping already)
+> do it, but pKVM is enforcing isolation between host and guest, and it feels like
+> it should do it by default no matter the memory transition.
 
-That works. A separate API can cover no-change sharing when a user
-needs it, so I'm fine with set_memory_decrypted() zeroing.
-
-Aneesh, the pKVM hunk does need cache maintenance after the memset(),
-which I have in the Cc: stable patch I posted earlier today [1].
+After the discussion on the related thread [1], if we have the zeroing
+here, we need the clean here as well. So I think that this patch is
+the right fix now.
 
 Cheers,
 /fuad
 
-[1] https://lore.kernel.org/all/20261116110549.1863653-1-fuad.tabba@linux.dev/
 
-On Mon, 16 Nov 2026 at 14:03, Jason Gunthorpe <jgg@ziepe.ca> wrote:
+[1] https://lore.kernel.org/all/CA+EHjTywWTaKLtM6OPF_0ETv29-m8JsHdvF3BeW9Xa=h713eEg@mail.gmail.com/
+
+
 >
-> On Mon, Nov 16, 2026 at 07:28:42PM +0530, Aneesh Kumar K.V wrote:
-> > Fuad Tabba <fuad.tabba@linux.dev> writes:
-> >
-> > > Hi Aneesh,
-> > >
-> > > On Mon, 16 Nov 2026 at 09:12, Aneesh Kumar K.V (Arm)
-> > > <aneesh.kumar@kernel.org> wrote:
-> > > [...]
-> > >> Keep allocations on platforms without memory encryption on the ordinary page
-> > >> allocator path so the original GFP constraints, including __GFP_ZERO, remain
-> > >> intact. Remove post-transition memset() calls that are now redundant and
-> > >> explicitly clear allocations on paths where no transition occurs.
-> > >>
-> > >> This intentionally makes every private-to-shared transition destructive;
-> > >> callers can no longer use set_memory_decrypted() to preserve existing contents.
-> > >
-> > > pKVM shares memory in place, and a guest has to be able to share
-> > > memory it has already set up, as Vincent pointed out [1]. That was one
-> > > of the primary reasons for in-place conversion in guest_memfd.
-> > >
-> > > Cheers,
-> > > /fuad
-> > >
-> > > [1] https://lore.kernel.org/all/avro44jUWOARFzul@google.com/
-> >
-> >
-> > Thanks for catching this. We discussed it before, but I reached the
-> > opposite conclusion:
-> >
-> > https://lore.kernel.org/all/yq5a5wzw2ree.fsf@kernel.org
-> >
-> > My mistake. How do you suggest we handle this? We want to avoid zeroing
-> > pages multiple times with different CoCo configurations. For example, to
-> > allocate a zeroed page, we currently do:
-> >
-> > alloc_pages(__GFP_ZERO)
-> > set_memory_decrypted()
-> > memset(0, PAGE_SIZE)
->
-> Just like you are wrapping set_memory_decrypted() in an allocator API
-> the user that wants to have the no-change sharing needs its own
-> special API too.
->
-> Then you can bury a special implementation for pkvm there.
->
-> Where is this special user in the kernel anyhow?
->
-> Jason
->
+> --
+> Vincent
