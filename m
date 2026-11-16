@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794851492;
-	b=NYWVALJMlZBC2XpMjv/QbAru0zg/wq8SE2rlzxfVpbRp7WUs6U7L6AkG0WEei7jLalAb
-	 qS+kH4sFYrdHCQ0cbNKF2JssJc8n5R7rIPUjL07FoS0qfH2+BNlWAdZqoOsaJdu0F4HmL
-	 loCenW0Y7QTu12u8VZjZkAtC9MUCAnBuYhT3rvoSztd3WMhmRlXvEZjlOZGOrNQTHZyVq
-	 /JeJX4h5/4gHQ5AdoKxdF2WofoIrl3TFLzQLXwoS8oW1p0B9Di7zslvjI8t5js8I4H1Cu
-	 i1S7Sc5+LkuHC64Rz2vjYkOUZ8TheDZyNxjOI08p34Q8T8JzJkBJKNjwFYF7mKV4FBA==
+	t=1794851794;
+	b=BZ+yC2GBddWsa0WfaV186M+Hzg5X4zylNQ3hftjQa9nThkhc4GAJPUJ1/1GGTWjmtkKg
+	 PFmNhkGipSwUl7fgxmq1dLdzqDrMl69JW/ekTn3Q4TbiJWLBE4YecSTJXXTRz6IaxFQ7I
+	 Gy8QU9ov5Fu65t+m2YId9nlnPRK2hjv1s7jBGoWY5A4ocfeIHL0D9PGwMmspjJnlAiwaZ
+	 8TXdLpPJjkCenvuGAneSSuzJYa0CzupeMrxNI8gpCU8XKX5uDcoxugF1simnPoGwXiee6
+	 Qe8q7zYPUO0antp3J+y7t4C0UWlkPXSgkvvCLu+VIpbHubIevNztMig5tM/BR226/1w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794851492;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794851794;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=blGIJDCDss+E3b9SqzgbEdlWTUpb2T+aJik+W4Q8e9Y=;
-	b=3wpiNUx5TwO9xoRGzebqSXwPB4NlPOGjGVn/Csz2SAn2svn0XwMKot0wCW3U0rD3Tc5O
-	 7URJJgnruHKmNZgbhrbXEoFkXdPSZNALriPEiaGtJbykuAapj4iBpByaQfOwRcCmtu56a
-	 zaMzcXDpukbomOyo/NUjM5A/HQojS4Y9SlWRXKN96WJloUlAbUV5IjbhJR7Kyr9dilJBS
-	 TQS2iLTN7udBHK/NUpqPic4DHtXqHHNuy10rZo/WDPnRWt+IQt62DybzbdXRUa2m5pnQ9
-	 z9CM+hiTEARHquROTyBtcxXeqfj2kZ9c6zc4aOGnNjSQfDUw8eMaC0FypXiEiL8Wt+g==
+	bh=fwWQDlnnSTNyph3hgjd/jHBsSgprm3l/XThcAnorVzc=;
+	b=1C/i1uxm0hV2HJTqwX7xAhQPG1Yz21+TK8BQkbWSNpE/Qh++F0FiFY/j028ti4qTgQHt
+	 t+8MB+XL6VULS+18O0/BArcJBinHMjUP5itHv/+WQVAKUFrKr1d8TjZlngU1jKF6OSVHl
+	 XG7FGrSw+DRiweGwcBsGUFE2Y1hb9GhYCn6J6depg9WKoq8Aommz2s9/zrKDUXCoYEdNt
+	 M/D4GHbXXrk5/dSqc9tH5E5Vla+WZWmwB3mkmhh2TWrUbvtInbuDivj7ufCfdFcogPhV3
+	 tgT3lL0mkWjX0oAayenJzfPjLbayALqVxvsGqIXZq7MBvMKD6pKvhQu8+U8MkD7ek/A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TuSee7pi;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZPmjOCmj;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DCC606A891;
-	Mon, 16 Nov 2026 17:51:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A6C606A89D;
+	Mon, 16 Nov 2026 17:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TuSee7pi
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 290F51F000C4;
-	Mon, 16 Nov 2026 17:51:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZPmjOCmj
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 090D91F000C4;
+	Mon, 16 Nov 2026 17:56:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794851492;
-	bh=blGIJDCDss+E3b9SqzgbEdlWTUpb2T+aJik+W4Q8e9Y=;
+	s=k20260515; t=1794851794;
+	bh=fwWQDlnnSTNyph3hgjd/jHBsSgprm3l/XThcAnorVzc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=TuSee7pijL/EQxTZBDS2rvh9VhYUoswVcG+r5Rfl+jzNs9/BAeEA+G64PHMQljEW4
-	 S7+o2QcBzV702jg+VlVZ8U1n54eSLYBffN0NJagqWuWShBpfKdl7g64a6qJTsZdjtp
-	 uo27CFZfolNpxff3rCt5GoXjpBUS4UCmkjE4y7FrYprtQE8H5Z3M1Dbi67VA3R92IN
-	 vJYjoXxHlMokNSSaxfRvRZCrmrdiW5iraCRMUDAxw2kwl3p0Oin+ILPZFgHPaPcRgv
-	 ayWoJKO5MJUOllsnyyLN1vcPoBndg3uq5ncW3/V8OCovO2qRViX3sEYv4YGIexL4vR
-	 s9kNVS4WatYdQ==
-Date: Mon, 16 Nov 2026 17:51:25 +0000
+	b=ZPmjOCmjno9nExForLkbzUF13rzZndhUhxLFyhcs6ndrKiOfrHZB3452l8ISZGQ7a
+	 iYsimyIzyefhY/oc0K0Vfemi/N6TEn8rXGyOpQ0gU73R0/NFoYDoxdzp0d4aDmcgYx
+	 PbYsURnlZMIsvqEfHzK8OzalcWBjck31xbND7wq53aERpH9jocyLE9toVILdqk7A8S
+	 PhulloZRXZGRVjWl41g3MI9mo4O1mXL6sKIAi3Tnw6BpI+V+iQmyzXVQ3AObWBs6Gj
+	 t5ib62RErvLafzsMEoDgEXi6TaWuiDqATzZpnK6iI8setbIO4LkG3gE84ueLqrLBDP
+	 sY89CO5r1y05g==
+Date: Mon, 16 Nov 2026 17:56:28 +0000
 From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
 Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev, 
@@ -47,12 +47,13 @@ Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev,
 	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
 	will@kernel.org, mark.rutland@arm.com, linux-perf-users@vger.kernel.org, 
 	catalin.marinas@arm.com, james.clark@linaro.org
-Subject: Re: [RFC PATCH v7 00/28] KVM: arm64: Add Statistical Profiling
- Extension (SPE) support
-Message-ID: <avs9oxfRNGiIi8an@gremlin>
+Subject: Re: [RFC PATCH v7 05/28] perf: arm_spe_pmu: Add PMBIDR_EL1 and
+ PMSIDR_EL1 to struct arm_spe_pmu
+Message-ID: <avtDK5rtD38jnhqR@gremlin>
 References: <20260903160623.315525-1-alexandru.elisei@arm.com>
- <auy-TwnMbIn-r2xl@gremlin>
- <au29ACRXFEOXaWPV@raptor>
+ <20260903160623.315525-6-alexandru.elisei@arm.com>
+ <atDmDRSNDllpJtmL@gremlin>
+ <avSjyLhFsYjI7tG_@raptor>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -64,185 +65,147 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <au29ACRXFEOXaWPV@raptor>
+In-Reply-To: <avSjyLhFsYjI7tG_@raptor>
 
-On Fri, Nov 06, 2026 at 11:41:52AM +0000, Alexandru Elisei wrote:
-> Hi Lorenzo,
+On Wed, Nov 11, 2026 at 05:20:08PM +0000, Alexandru Elisei wrote:
+> Hi,
 >
-> On Thu, Nov 05, 2026 at 05:47:45PM +0000, Lorenzo Stoakes (ARM) wrote:
-> > Hi Alex,
-> >
-> > I've gone through all of the patches now, thank you for your patience with
-> > the review :)
+> On Thu, Oct 15, 2026 at 04:12:27PM +0100, Lorenzo Stoakes (ARM) wrote:
+> > I think probably some kind of commit message would be good even for a
+> > trivial change :)
 >
-> Many thanks for the stellar review, will start replying soonish.
+> Of course, I'll add something here.
 >
 > >
-> > So there are various dependencies/architectural decisions that need to be
-> > made here to go from RFC -> non-RFC:
+> > On Thu, Sep 03, 2026 at 05:06:00PM +0100, Alexandru Elisei wrote:
+> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > > ---
+> > >  drivers/perf/arm_spe_pmu.c       | 3 +++
+> > >  include/linux/perf/arm_spe_pmu.h | 2 ++
+> > >  2 files changed, 5 insertions(+)
+> > >
+> > > diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
+> > > index 79c571a649d5..42ba0924bd02 100644
+> > > --- a/drivers/perf/arm_spe_pmu.c
+> > > +++ b/drivers/perf/arm_spe_pmu.c
+> > > @@ -1095,6 +1095,7 @@ static void __arm_spe_pmu_dev_probe(void *info)
+> > >  			"profiling buffer owned by higher exception level\n");
+> > >  		return;
+> > >  	}
+> > > +	spe_pmu->pmbidr_el1 = reg;
 > >
-> > 1. The 'Ignore MMU notifiers for guest_memfd-only memslots' patch [0] is a
-> >    hard dependency for the series. I chased over there, hopefully we can
-> >    get something landed there.
+> > This doesn't seem to be used anywhere in the series?
 >
-> Like you said, Sean is planning to send my original version of that patch with
-> an updated commit message, thanks for the ping!
-
-No worries! :)
-
->
-> >
-> > 2. non-VHE, pKVM, NV disallowed for SPE - As I mentioned off-list, I spoke
-> >    to Marc, and he confirmed that he's more than happy for these to be off
-> >    the table for a v1. So I think you can drop the HACK: patches and just
-> >    make these conditions of using SPE.
->
-> Oliver, some time ago, expressed the opposite preference: VHE-only is OK for an
-> RFC, but he was concerned about the discrepancy between VHE and nVHE
-> configurations. Maybe the direction for KVM changed in the meantime.
->
-> Fine by me to drop the HACK! patches, of course, that's just something to keep
-> in mind.
-
-Ack, Oliver - let us know if this is a problem (Marc suggested he was fine with
-requiring VHE), I think certainly it's useful most of all to move forwards
-without the 'HACK' patches, and with the various architectural points raised
-here addressed we can look to a non-RFC series.
-
-And obviously we can update as necessary as we go based on maintainer
-requirements.
-
+> Indeed, that's a leftover from the previous iterations, will remove.
 >
 > >
-> > 3. The entire VM needs to be pre-faulted, but who should do it? - I do
-> >    think that relying on userland to do this is a little iffy. So I wonder
+> > >
+> > >  	/* Minimum alignment. If it's out-of-range, then fail the probe */
+> > >  	fld = FIELD_GET(PMBIDR_EL1_ALIGN, reg);
+> > > @@ -1107,6 +1108,8 @@ static void __arm_spe_pmu_dev_probe(void *info)
+> > >
+> > >  	/* It's now safe to read PMSIDR and figure out what we've got */
+> > >  	reg = read_sysreg_s(SYS_PMSIDR_EL1);
+> > > +	spe_pmu->pmsidr_el1 = reg;
+> > > +
+> > >  	if (FIELD_GET(PMSIDR_EL1_FE, reg))
+> > >  		spe_pmu->features |= SPE_PMU_FEAT_FILT_EVT;
+> > >
+> > > diff --git a/include/linux/perf/arm_spe_pmu.h b/include/linux/perf/arm_spe_pmu.h
+> > > index af86fd184050..97b14e236fcd 100644
+> > > --- a/include/linux/perf/arm_spe_pmu.h
+> > > +++ b/include/linux/perf/arm_spe_pmu.h
+> > > @@ -21,6 +21,8 @@ struct arm_spe_pmu {
+> > >  	cpumask_t				supported_cpus;
+> > >  	struct hlist_node			hotplug_node;
+> > >
+> > > +	u64					pmbidr_el1;
+> >
+> > Equally, this doesn't seem to be used anywhere in the series, maybe drop?
 >
-> There's plenty of iffiness that userspace already handles when it comes to
-> virtual machines.
-
-Yup, does seem to be a fair bit of implicit assumptions of sanity :)
-
->
-> Or, how Oliver put it [1] (regarding migration, but it fits):
->
-> 'My take is that there's no amount of idiot-proofing we can do in KVM to prevent
-> the VMM from messing this up somehow'.
-
-Haha, right.
-
-I guess fine to require userland to set things up like that, and can always add
-an option to have it automatically set up for them in future as a nice-to-have.
-
-I want to separate out the gmem bit though, replying below:
-
->
-> [1] https://lore.kernel.org/kvm/alE3jRLtYeq-WesA@kernel.org/
->
-> >    whether it might be possible to, on SPE first run, prefault the ranges
-> >    there, and make that a condition of using it? Relatedly, KVM could
-> >    reject non-guest_memfd memslots for an SPE VM rather than trusting
-> >    userspace there too.
->
-> I'm not sure that's the best idea. Mainly two reasons:
->
-> 1. KVM will be imposing the condition that *all* writable memslots be backed by
-> guest_memfd, and *all* memory backing these memslots be pre-faulted and
-> effectively pinned.
-
-I mean this really is a requirement for SPE to work at all, since the guest is
-effectively deciding which memory is being used for SPE (I think it's perf AUX
-memory right?)
-
-I think given that it's guest-designated _and_ the guest has no idea which parts
-of memory are 'SPE safe' and 'SPE unsafe', this is a requirement.
-
->
-> There are use cases for writable memslots to describe guest memory that won't be
-> used by SPE. First thing that comes to mind would be paravirtualized interfaces
-> between host userspace and the guest. For example, pvtime - kvmtool creates a
-> RAM memslot for pvtime (i.e, non-read-only memslot), and it looks to me that
-> qemu does the same (but my knowledge of qemu is severely limited, so I might be
-> completely wrong).
-
-I don't think any of this is disallowed by the gmem requirement.
-
->
-> Then there's also the possibility that a guest might want to assign a slice of
-> RAM for use by SPE, to avoid pre-faulting and pinning the entire VM memory. In
-> this case, userspace will want to have *only* the memslot describing that slice
-> pre-faulted and pinned, and not the rest of system memory.
-
-As above, there's just no way for userspace to know which bits of memory are SPE
-safe and which are not. So I don't think this works.
-
->
-> 2. Perfomance - userspace can pre-fault in parallel, KVM cannot easily do that.
->
-> arm64 now has support for KVM_PRE_FAULT_MEMORY, I say let's use that :)
-
-:) right.
-
-OK, so maybe the right path then is to keep the prefaulting with userspace, but
-I really do think we have to have KVM reject a writable non-gmem memslot once
-SPE is enabled for the VM (and reject enabling SPE if one already exists).
-
-That should be relatively straightforward and avoids at least the most broken
-userland mistakes.
-
+> Fixed.
 >
 > >
-> > 4. Dirty page logging - patch 27/28 relies on series [1] being landed,
-> >    which is also an RFC, and allows migration of SPE VMs. So we need to
-> >    decide - do we want this migration? Additionally, I think it's
-> >    reasonable to, if we want it, send both [1] and patch 27/28 as a follow
-> >    up separate from the v1 non-RFC of the series.
->
-> For background, I started this conversation in the LOG_DIRTY_PAGES support for
-> guest_memfd series [2]. Oliver had some concerns, but he didn't follow up on my
-> explanations, so I decided to send migration support as part of SPE so people
-> can have a more complete picture of how everything fits together.
->
-> I would be very happy to get basic support for SPE merged in KVM, and, if we
-> decide it's useful, migration implemented as a follow up, as that involves
-> landing dirty page logging support for guest_memfd.
-
-Ack, thanks, let's treat that as a follow-up then, I think best thing here is
-definitely to focus on getting the fundamental bits in for SPE first.
-
->
-> [2] https://lore.kernel.org/kvm/alAFmiAsNf6Xm49_@kernel.org/
->
+> > > +	u64					pmsidr_el1;
 > >
-> > 5. Errata handling - the default already disallows SPE on the affected
-> >    silicon, which seems right. I wonder whether kvm-arm.ignore_spe_errata
-> >    should exist at all though, other than in some sort of debug mode.
+> > This field is used in kvm_spe_has_feat_spe_fds() and
+> > kvm_spe_has_feat_spe_fne():
+> >
+> > bool kvm_spe_has_feat_spe_fds(struct kvm *kvm)
+> > {
+> > 	...
+> > 	return kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P4) &&
+> > 	       FIELD_GET(PMSIDR_EL1_FDS, spe_pmu->pmsidr_el1);
+> > }
+> >
+> > bool kvm_spe_has_feat_spe_fne(struct kvm *kvm)
+> > {
+> > 	...
+> > 	return kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P2) &&
+> > 	       FIELD_GET(PMSIDR_EL1_FnE, spe_pmu->pmsidr_el1);
+> > }
+> >
+> > So checking for FDS and FnE, but these are available as feature flags as
+> > __arm_spe_pmu_dev_probe() gets these:
+> >
+> > static void __arm_spe_pmu_dev_probe(void *info)
+> > {
+> > 	...
+> > 	if (FIELD_GET(PMSIDR_EL1_FnE, reg))
+> > 		spe_pmu->features |= SPE_PMU_FEAT_INV_FILT_EVT;
+> > 	...
+> > 	if (FIELD_GET(PMSIDR_EL1_FDS, reg))
+> > 		spe_pmu->features |= SPE_PMU_FEAT_FDS;
+> > 	...
+> > }
+> >
+> > And then kvm_spe_has_feat_spe_fds() and kvm_spe_has_feat_spe_fne() can be:
+> >
+> > bool kvm_spe_has_feat_spe_fds(struct kvm *kvm)
+> > {
+> > 	...
+> > 	return kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P4) &&
+> > 	       (spe_pmu->features & SPE_PMU_FEAT_FDS);
+> > }
+> >
+> > bool kvm_spe_has_feat_spe_fne(struct kvm *kvm)
+> > {
+> > 	...
+> > 	return kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P2) &&
+> > 	       (spe_pmu->features & SPE_PMU_FEAT_INV_FILT_EVT);
+> > }
+> >
+> > Right?
 >
-> It is intended as a debug/development option, to be used only when the VMs are
-> trusted. As to why it's there, it's there because without it, SPE would be
-> disabled on all the machines that I have access to, and I suspect systems not
-> affected are few and rare between.
+> In this use case they are functionally the same, yes, but conceptually, they are
+> not the same thing. spe_pmu->features advertises the features that the SPE
+> *driver* supports, PMSIDR_EL1 advertises the features that the *hardware*
+> implements. The two are not always equal.  For example, KVM added handling for
+> the PMSNEVFR_EL1 register (added by FEAT_SPE_FnE), a few years before the SPE
+> driver supported FEAT_SPE_FnE.
+>
+> I can see KVM, in the future, having to virtualize hardware features not
+> supported by the host driver yet, so unless you have a strong objection, I would
+> rather keep the use of the architectural register instead of relying on the
+> driver.
 
-Ack ok that clarifies that :) let's then clearly mark that as such
-e.g. 'debug/development only, trusted VMs only' in the documentation, and
-tainting the kernel if it's enabled, I think, would be sensible.
+Ack OK, sounds sensible, no strong objection but could you add a sentence to the
+commit msg about that? Thanks! :)
 
 >
 > >
-> > So 1 is a known dependency, I think there's no getting around that, and
-> > thus that makes merging [0] or something like it a top priority.
+> > So it seems you could drop this patch from the series in general? Is there
+> > another reason to get these fields?
 > >
-> > It seems to me 2 is pretty clear-cut, and 4 can reasonably (if we want it)
-> > be sent as a follow up.
-> >
-> > So really 3 and 5 are the decisions to make here!
+> > Also - there seems to be a divergence in the naming there between FnE and
+> > INV_FILT_EVT, is that intentional?
 >
-> I really appreciate your enthusiasm, thanks!
+> I think that's a question for the person who added FEAT_PMU_FEAT_INV_FILT_EVT?
 
-No worries :) am happy to put in some work on my side to help move things
-forwards (and obviously more than happy to help with review on respins of
-course :)
+Haha true I suppose so.
 
 >
+> Thanks,
 > Alex
 
 --
