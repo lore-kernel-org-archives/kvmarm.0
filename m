@@ -1,74 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.237
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.249
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794933440;
-	b=RrPRequK98UOfyjMqrzKX65wjbLqSHx4HkT+fCxyUMkNoZPSvKeH/ktqLvZqoDPxFP6t
-	 2ESdzzVzgAV4vtxMXvxzzdZHTpLjADYTlo79sbnjlxEIuZMeb2625my9f2Om/Uq/6hoLs
-	 mCSApX9OTw2GwJLgBE9+EdXGERcYBrWUBXL+oJ9fKo9oTo5PN0b6bAtOxzvqZIatumStP
-	 7+kUdwxlTDNznmgVnyVYbjkZWXolcU7Vgp5WEqV7b/pKdxhbPCI98hd9uTetCWsbz503H
-	 qJ+6/TUEqZ/1xy4br3UcMHZL8SORz/rLGwyS06R6jKqJiKhiX4YL+Me1p1aFD2QcVxA==
+	t=1794935190;
+	b=TyCSn1LQIPdFehG6LE5kE0PQCFqMoB7NQbLH06wHStPn2j3JAHAJjuF2vOv1QWaSLjJa
+	 eOWIH9mE/jBMFhprtaYJhfJEAYpj1YB5Xvwpbk78s9wG/PK9GHo+/cFTysf4cNUDVTnkf
+	 1thDf4Wdvj2zI7bxXKF0IR4dRkoPii6T+WACeo2HV96yREUdcEfE6y7TsFHpGpAm3qs7H
+	 pE2Tsp5tk7VGM8D4/eOY1iFdVf8Mg5vNrm/pzLZ0bPwxNdkm5VD7csEFXhTBKnHumm/6Y
+	 0b9JZicpIq4uE5WaKtxmnnGHpE39SxMRiqmO31ynEd2Y+ez37zGpk+yCyVABB94B6Iw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794933440;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794935190;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=Ihyr4DFcCTnUi8RpBAkPBo5h4glV/gGCS8t9FUoUP5c=;
-	b=Nslzp/wQvqU32T60BrM2Uixlqe8Ls+SqFHKwDlSzkhYwIAFmJvJ1sWEu8CTbWZjLI6DC
-	 O3WmqulFKkF6XftOiexpipxWOn8vg7xFj8ZKs6UZx6w6hgDPm1KJBAWTdfoi14X+S/tvO
-	 vffnfT/YnQWnPv26IVPM0AmzIAdHbYUkusMhAlkqHVzZhFDZM1gHf7MWwqCR10HYeQlmk
-	 4eHeFz9hxYWO18RP2lJPIn9pAGaNzayux/sgTEtcF4a7hOtFAG6EdY7jYTZg2kSuzSrMU
-	 e17PQSQzj7ufDwL7M6EG2YYf3bvjSCv9UOjiJcP/wLvej0ULm0UPIGXCIX+/1DLWp3g==
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=hixzDBYjex72mbAqfdJ0BMP0XnPJdhglkhJ+5expOLw=;
+	b=zQsvFh8GNQE+PHnVuigR+x+1bK68VbIDM+nCYIgSwfKLFInsgMrCxKhVnEOjO8JePleM
+	 2iW6Kqyi0tmVZN5p4nDCMqvPspDm0cR6GvAljA4bw0B4StPt3AK7/4CDgzdY7YNl5Fh7a
+	 4ixG85VjP1TxU6G+k0WkE3clNOPKu1yOYrKuy+Z10soNmoQtJ9j1ffGQJXrBlhVQgwiRS
+	 zRycByTRHSXHKXSpP8dzPSY+S3CyQ9AWoORhUyvsISm3R+lmBhupxdZMiEJPeRQXMH2cD
+	 O/fGuFxhEXjERAQI33+AWk0egAuk73yThOtqouAwkDXb8mXtHPuFmhnJoKSDZPxwE/Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Q7Pj5+NK;
-	arc=none smtp.remote-ip=91.218.175.237
-Received: from mta0.migadu.com (out-237.mta0.migadu.com [91.218.175.237])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=cVG2SpNc;
+	arc=none smtp.remote-ip=91.218.175.249
+Received: from mta0.migadu.com (out-249.mta0.migadu.com [91.218.175.249])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D474606A32F
-	for <kvmarm@lists.linux.dev>; Tue, 17 Nov 2026 16:37:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9D474606A32F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D35606A883
+	for <kvmarm@lists.linux.dev>; Tue, 17 Nov 2026 17:06:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 75D35606A883
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=Q7Pj5+NK
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=cVG2SpNc
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=daj20mbvFvBdLEpKz25aOkweMY59YlNCAihrBtLyt2c=;
+DKIM-Signature: a=rsa-sha256; bh=CuWYfoaIeUOLVmPy0v9FnC5ISe1ZRoIopzCKCHIxYjE=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1794933437; v=1; x=1795538237;
- b=Q7Pj5+NKA4t5HUgDYsiw/WXYCpd8LYBNQaRf9cSGQxNWDXzyXvgDmqY81IePvMzTvNRzoAYn
- rkqRckqmdlbbAGn1hPu0qnd2pxsSHjLTcwolHL/E1fm0UVBeZ2zasJCFg9trL+mEUmH0+AOArtF
- z5GyQOZJA0S9yRJdzHbfDlrU=
+ t=1794935187; v=1; x=1795539987;
+ b=cVG2SpNcGfjjeCF6BR9LSWPKUQlaIL7f29o9qhW9jyP3hBCeuxgzG+znoeRY+u0r5u/l3cin
+ jN8YMNikwSH1yq0z6DSQq/WNzA5y6LKEMHYvS/c0Fz6nRk/XZ/QWny9UTD7opVjTEJF+tkBus4P
+ 4Oh1/Zrdci34Epr0qIbUB+vE=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 89a4f049cb720cd1;
-	Tue, 17 Nov 2026 16:37:17 +0000
-X-Mizu-Trace-ID: 89a4f049cb720cd1
+Received: by smtp.migadu.com with ESMTPS id 8be41952a0f8a6ed;
+	Tue, 17 Nov 2026 17:06:27 +0000
+X-Mizu-Trace-ID: 8be41952a0f8a6ed
 X-Migadu-Flow: FLOW_OUT
-From: Fuad Tabba <fuad.tabba@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] KVM: arm64: Don't run a pVM with firmware Spectre-v4 mitigation disabled
-Date: Tue, 17 Nov 2026 16:37:01 +0000
-Message-ID: <20261117163702.1678277-3-fuad.tabba@linux.dev>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261117163702.1678277-1-fuad.tabba@linux.dev>
-References: <20261117163702.1678277-1-fuad.tabba@linux.dev>
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5c00d7ac49dso9471e87.1
+        for <kvmarm@lists.linux.dev>; Tue, 17 Nov 2026 09:06:27 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErENHbp1sL/LG4f2ZmLjPd5Jvq+Vg+Ai39Ifccf8i1Yyh/WYAWFcUXSvaMvcNik4JRYyPK3bTs0=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/R+I1P2409Ubz8DNo3j9r2Duas711CAoqYW3o/OhpxYeg10f9q
+	21uXhCnJlEL66bg04UyNAYi9/jl9rxYA9RtKYop02VBCHA+3YjVp8Q7PXSgVBBdkmUnAO/7BBcc
+	sPHl3cidOnhTt/8zNSG/raZ7eFdtIiD9H7laK8FZs
+X-Received: by 2002:a05:6512:b8d:b0:5bf:f0fb:2c9c with SMTP id
+ 2adb3069b0e04-5c1a189bda1mr156069e87.5.1794935186033; Tue, 17 Nov 2026
+ 09:06:26 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -78,87 +66,128 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261117074428.7544-1-fuad.tabba@linux.dev> <20261117074428.7544-2-fuad.tabba@linux.dev>
+ <avxfgWNePsGPK9mm@gremlin>
+In-Reply-To: <avxfgWNePsGPK9mm@gremlin>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 17 Nov 2026 17:05:49 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTzUrDxLSMEo6X66XhKtQ-=ew3zZhMdFWR6U9Ga17WLWkw@mail.gmail.com>
+X-Gm-Features: AclHuK8hlW_ShztJ0BsSWqDzcCkcDDTWK01dR1LguEsZLGP95yN_yfyBcMKgMpA
+Message-ID: <CA+EHjTzUrDxLSMEo6X66XhKtQ-=ew3zZhMdFWR6U9Ga17WLWkw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] KVM: Stop KVM_PRE_FAULT_MEMORY when the vCPU's
+ dirty ring is full
+To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+	Wei-Lin Chang <weilin.chang@arm.com>, Will Deacon <will@kernel.org>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-EL2 handles a protected guest's ARM_SMCCC_ARCH_WORKAROUND_2 discovery
-query using a copy of the host's Spectre-v4 state taken at init. If the
-system is mitigated and the guest doesn't have SSBS, EL2 returns
-NOT_REQUIRED, which indicates to the guest that firmware mitigation is
-permanently enabled. However, EL2 forwards the host's
-ARM_SMCCC_ARCH_WORKAROUND_2 calls to firmware, so the host can disable
-the mitigation and then run a protected vCPU.
+Hi Lorenzo,
 
-On a mitigated system, the host kernel disables the mitigation only
-while its own userspace runs, so a host that runs a vCPU with it
-disabled is misbehaving, whatever the guest was told. Track the
-mitigation state per CPU from the host's calls, and don't run a
-protected vCPU on a CPU where it's disabled. Forward the calls without
-hints, so that firmware decodes the same function ID as EL2.
+On Tue, 17 Nov 2026 14:23:09 +0000, "Lorenzo Stoakes (ARM)"
+<ljs@kernel.org> wrote:
+[...]
+> > The check also sets run->exit_reason, and arm64's KVM_RUN completes a
+> > pending MMIO exit only if exit_reason is still KVM_EXIT_MMIO. If a
+> > pre-fault stops on a full ring while an MMIO exit is pending, the next
+> > KVM_RUN doesn't complete the exit and the guest repeats the MMIO
+> > access. Userspace can avoid that by completing the exit with KVM_RUN
+> > before it pre-faults.
+>
+> That's also true for riscv:
+>
+>         switch (run->exit_reason) {
+>         case KVM_EXIT_MMIO:
+>                 /* Process MMIO value returned from user-space */
+>                 ret = kvm_riscv_vcpu_mmio_return(vcpu, vcpu->run);
+>                 break;
+>         case KVM_EXIT_RISCV_SBI:
+>                 /* Process SBI value returned from user-space */
+>                 ret = kvm_riscv_vcpu_sbi_return(vcpu, vcpu->run);
+>                 break;
+>         case KVM_EXIT_RISCV_CSR:
+>                 /* Process CSR value returned from user-space */
+>                 ret = kvm_riscv_vcpu_csr_return(vcpu, vcpu->run);
+>                 break;
+>         }
+>
+> (note that it skips CSR, SBI also with a changed exit_reason).
 
-Firmware enables the mitigation when a CPU powers up (SMCCC DEN0028,
-7.6.4), so the tracked state doesn't have to be reset on CPU_ON or
-resume. When an SDEI event completes, firmware also restores the
-mitigation state of the interrupted context. EL2 can't track that, so
-this fix relies on the host's SDEI calls not being forwarded.
+Ack.
 
-Fixes: fe40ff87ead5c ("KVM: arm64: Implement HVC handling for protected guests at EL2")
-Reported-by: Ryan Roberts <ryan.roberts@arm.com>
-Closes: https://lore.kernel.org/all/5fa8a1fb-4e2c-4746-8a70-a47f387ef0d6@arm.com/
-Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
----
- arch/arm64/include/asm/kvm_host.h  |  1 +
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 19 +++++++++++++++++++
- 2 files changed, 20 insertions(+)
+> But the overflow bug only applies to x86 (see below), so is this something
+> we should worry about at all?
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 97332ffcb1300..80d0665b93f25 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -839,6 +839,7 @@ struct kvm_host_data {
- #define KVM_HOST_DATA_FLAG_VCPU_IN_HYP_CONTEXT		4
- #define KVM_HOST_DATA_FLAG_L1_VNCR_MAPPED		5
- #define KVM_HOST_DATA_FLAG_HAS_BRBE			6
-+#define KVM_HOST_DATA_FLAG_SSBD_DISABLED		7
- 	unsigned long flags;
- 
- 	struct kvm_cpu_context host_ctxt;
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 37fb9896ba3ad..8cc541e6e521b 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -925,6 +925,15 @@ DEFINE_KVM_HOST_HCALL(int, __kvm_vcpu_run, struct kvm_vcpu __kern *, vcpu)
- 		if (unlikely(system_supports_sme() && read_sysreg_s(SYS_SVCR)))
- 			return ret;
- 
-+		/*
-+		 * Firmware Spectre-v4 mitigation can be advertised to a
-+		 * protected guest as permanent. The host kernel runs with it
-+		 * enabled, so if it's disabled the host is misbehaving.
-+		 */
-+		if (pkvm_hyp_vcpu_is_protected(hyp_vcpu) && spectre_v4_state == SPECTRE_MITIGATED &&
-+		    host_data_test_flag(SSBD_DISABLED))
-+			return ret;
-+
- 		/*
- 		 * ON has a single writer, pkvm_reset_vcpu() on this CPU, so
- 		 * READ_ONCE suffices. ON_PENDING takes the reset; -ECANCELED
-@@ -1656,6 +1665,16 @@ static void default_host_smc_handler(struct kvm_cpu_context *host_ctxt, u64 func
- 		return;
- 	}
- 
-+	if (func_id == ARM_SMCCC_ARCH_WORKAROUND_2) {
-+		/* Drop the hints, so that firmware decodes the ID as EL2 did. */
-+		cpu_reg(host_ctxt, 0) = func_id;
-+
-+		if (lower_32_bits(cpu_reg(host_ctxt, 1)))
-+			host_data_clear_flag(SSBD_DISABLED);
-+		else
-+			host_data_set_flag(SSBD_DISABLED);
-+	}
-+
- 	trace_hyp_exit(host_ctxt, HYP_REASON_SMC);
- 	__kvm_hyp_host_forward_smc(host_ctxt);
- 	trace_hyp_enter(host_ctxt, HYP_REASON_SMC);
--- 
-2.47.3
+The ring overflows on arm64 too (below). As for exit_reason, I asked
+Sean about the arm64 MMIO case on v1, and his answer was that a VMM
+that pre-faults between a KVM_EXIT_MMIO return and the next KVM_RUN
+"gets to deal with the fallout" [1]. I think the same goes for riscv's
+exits.
 
+[...]
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+[...]
+> >  The dirty ring can get full.  When it happens, the KVM_RUN of the
+> > -vcpu will return with exit reason KVM_EXIT_DIRTY_RING_FULL.
+> > +vcpu will return with exit reason KVM_EXIT_DIRTY_RING_FULL, and
+> > +KVM_PRE_FAULT_MEMORY on the vcpu will process no more pages until the
+> > +ring has been harvested and reset.
+>
+> Maybe worth mentioning the exit_reason thing if we keep this arch-generic?
+
+Sure, I'll document that userspace should complete a pending exit with
+KVM_RUN before it pre-faults on that vCPU.
+
+[...]
+> I wonder if this shouldn't just be an x86-only fix, since no other arch is
+> impacted AFAICT.
+>
+> arm64 and riscv never map a dirty-logged memslot writable, so they're never
+> pushed to the rin, and s390 doesn't have a dirty ring at all:
+>
+> arm64:
+>
+> static int kvm_s2_fault_compute_prot(const struct kvm_s2_fault_desc *s2fd,
+>                                      const struct kvm_s2_fault_vma_info *s2vi,
+>                                      enum kvm_pgtable_prot *prot)
+> {
+>         ...
+>         if (s2vi->map_writable && (s2vi->device ||
+>                                    !memslot_is_logging(s2fd->memslot) ||
+>                                    kvm_s2_fault_is_write(s2fd)))
+>                 *prot |= KVM_PGTABLE_PROT_W;
+>         ...
+> }
+
+arm64 does map a logged slot as writable today. memslot_is_logging()
+tests memslot->dirty_bitmap, which isn't allocated when only the dirty
+ring is enabled, and patch 2's selftest triggers the WARN in
+kvm_dirty_ring_push() on arm64 without patch 1. Wei-Lin's fix to
+memslot_is_logging() [2] is in kvmarm/fixes, not in mainline yet.
+
+With it, the s2vi->device case above still maps a device page writable
+on a read fault in a logged slot. kvm_arch_prepare_memory_region()
+rejects logging on a VM_PFNMAP VMA, so that requires userspace to map
+the device under the slot after creating it (I haven't tested it).
+
+So I think the check should be in the generic loop.
+
+[...]
+> An x86-only version would be pretty simple, something like the below.
+>
+> This also covers off the retry (RET_PF_RETRY) loop which a generic version
+> doesn't.
+
+True. To overflow there, the retries for one page would have to push
+more entries than the ring has in reserve (at least 64), and I don't
+see a way to get that, so I left it alone.
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/avs5UD79FB_DG1Vs@seanjc-mac.roam.internal/
+[2] https://lore.kernel.org/all/20261029175238.3214788-2-weilin.chang@arm.com/
