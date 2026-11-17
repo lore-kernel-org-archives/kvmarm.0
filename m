@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794955605;
-	b=2ooMvwUiy3SxlRkP0mKhySiYIBpNWq9E/oPI4k9kbcpYYouGWC4B44oGQtVkZ7tjGNs3
-	 ScrlP0oGflK5PdsKIfi7O+XomjFpEHATaZGXukHpJiBqv4PxRMgraw7X+X4oXIKCnnxhx
-	 XU0uWlJyFswFXJ+Kz7Oxy/dzMgDMLcVNxDudC7vyTnlFFk06Pm9SQXEiJKsl3G0AluXYT
-	 z+5u02czVy/B7q/u8/p2w7Tz2kf5PJ4CezOXchdHUdrV3YncLhst2yxa000m4Qzmt5cDM
-	 1x5/JZ5r5d6Bo4S4ArapSXGR2rBnz5o2rHKygvw+0aFAD0Zc/huYw+X6HFKRTQlChCA==
+	t=1794955792;
+	b=wIVa49YI3OXAkHpVlX+EreAhaECY8zm/27DtX5Ypcw+KFLJIxO5/PSc2spAR8Fe+Orwx
+	 +M5604RarD+SbnEVcjzjLseFZCUyOxOmgBPrIhHbSaINOQtGoGXZbFuRxbOGPiZa0y+x7
+	 XjrXeHUHmLjOwCV0kPTUEEsftH/9cOt6ybwLFi2K4CaIBbVhddX0efeXdEDz7ZFoVQbGi
+	 jarOYOdHyNxr2fazg1JCcDQCmHX9tgCsljrncAXcN0RpJJZMRxeBS572p0wSxK5RcVi3/
+	 kZbM8oHcE5qVmJub3M2tBHz2Mro35ij/MrNfQA1QoRVp9NKG8jp7Ku1FaT2uePAOWRA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794955605;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794955792;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=O42IkrS9jeTCK/NHaai3Y1tyVx5hVS+EWpn+Yy3d8yI=;
-	b=n64q5YS0EgMdViA0tsMzQpbVoSkY+gfJ3HYLSrq4z1LT1zTIV/turwP+483TfeV5m6c6
-	 6gGa4aEsGD0MJ235Zkzk+IIh9uZZ/JSZH7sc/5oKCHCfGMscwixxj9XNoq2gtP/P4trqs
-	 pxwa783rFJcqMxp7440APl5c7dFokEuikU/3S0NTc5XdEJzuPAe5cHVsApCaANJ8J47GZ
-	 /P2Pa19GEPzS6W90P4PeGZvTrtH+rAAqhnA2mL8HJFsY+6NZEyno5gxEIbuf4XIClm/H+
-	 OKemIxeEt5J2sDO02EFElVDOK71C6e/IRg+4w00l8PX8US1lwDjaAYwV/ysMHaGbV4w==
+	bh=xoLIi0+olq1ojYmB+iwbcLFbgFXr/KR/iCCHN1uHop8=;
+	b=uhq3DqZJRb/0CPS9b4p0J7q7r3Fxmyf+2xR70dDCXiFZGCJT7+XwprgNKwgRzW0KrZhJ
+	 PjhfnqVWaiSJu2HqqVauv583SQoZEbykeNrUkAeKvT8GoGBWl9DykI+uwoKS7Pzl+0xCj
+	 JRf3M+wOozvHnyYYPjdScCuFfj+/FsPHkBX5bvUuzcuIXXcCuKUtyho6yMHyfL6AHNkMD
+	 ZrLJbpvVHuX2uAUukwqeU8GHk/74GLoyA2IgOtncB1yuZrJm8yrrmMH/bvA3vYnvXzc+/
+	 dF7qhO1rFg4M5vPM1IqEvOZQHQNTg9+jlOVv5mR+z6a9hp9Cijwbv0ytbuPcpwx5MaA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=iyO9GWF2;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VwjGYOJh;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37FC7606A32A;
-	Tue, 17 Nov 2026 22:46:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436BA606A32A;
+	Tue, 17 Nov 2026 22:49:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=iyO9GWF2
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E46F41F000C4;
-	Tue, 17 Nov 2026 22:46:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VwjGYOJh
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD8911F000C4;
+	Tue, 17 Nov 2026 22:49:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794955605;
-	bh=O42IkrS9jeTCK/NHaai3Y1tyVx5hVS+EWpn+Yy3d8yI=;
+	s=k20260515; t=1794955791;
+	bh=xoLIi0+olq1ojYmB+iwbcLFbgFXr/KR/iCCHN1uHop8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=iyO9GWF2tAcGIGrZynM3V9LMbB3J3bzToMv8b0reAugTl73Sx4KZii0IJsV1VBfx2
-	 WGvl6RFuotOhxRMGJoU5ayKO92eMS8kwLZx140AxWWqTpy1TxTk7iygRo06VzvBHN8
-	 KgfG5jrSvA2PiQ2lsc3Hi8WtAeEc1rF1q65+j9gD3pvTbBZ3l2yVzKr4usIwcq/JDY
-	 1Q9IWj5Xy4plv83pxJOrsAZLBVGf/2uNbBCzHtYS7sCo6FbiBMr4DZC2tt/7qHdLew
-	 Unjnf5r8pOmNdxp5RiA1ljIGfHRjlqUJWM/5YFgQaHNYPv+MkAG8YQg8pzZumR8Sg/
-	 0JwSgIuselQYw==
-Date: Tue, 17 Nov 2026 14:46:43 -0800
+	b=VwjGYOJhlAj8ZpYJeytQG47xN61sbDQutcXuSQlxtF0fWFJ2Zd5V6wzE0g7m6YzZN
+	 dHRFlOJKCqYCSL7pnYD63FHOCtfqV6aWC+WxNlOUCMaqFQshLLN2/31d3wdFhcv/ul
+	 0ZLTOAxA8YgseK6uBCIqBZTTL2EWys00vbsPoZpjg3w4autIth33cv5mzM+jyeFM17
+	 9LJwlgFPNWTIVl6UFi8GTDI83XZ3tp3yZ+jxmBwZYVUNCdR1NE7HmcktvaLkfBcZVU
+	 /Z1wOSx8jySqBZSGtegqLhYLeX2LeJ6LE03sGIBA89IoWz+T1OK8LN91pVBYId8I//
+	 7dc3Uql7OkHFw==
+Date: Tue, 17 Nov 2026 14:49:50 -0800
 From: Oliver Upton <oupton@kernel.org>
 To: Colton Lewis <coltonlewis@google.com>
 Cc: Marc Zyngier <maz@kernel.org>, Leonardo Bras <leo.bras@arm.com>,
@@ -49,11 +49,11 @@ Cc: Marc Zyngier <maz@kernel.org>, Leonardo Bras <leo.bras@arm.com>,
 	Fuad Tabba <fuad.tabba@linux.dev>, kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] KVM: arm64: Fix inverted E2H0 check for
- HCR_EL2.NV1
-Message-ID: <avzZUyu9EhxAWtbd@kernel.org>
+Subject: Re: [PATCH v2 2/2] KVM: arm64: selftests: Verify HCR_EL2.NV1 is RES0
+ when E2H0 is NI_NV1
+Message-ID: <avzaDnFRQ2GTHDiN@kernel.org>
 References: <20261117204535.4036191-1-coltonlewis@google.com>
- <20261117204535.4036191-2-coltonlewis@google.com>
+ <20261117204535.4036191-3-coltonlewis@google.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -65,65 +65,49 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261117204535.4036191-2-coltonlewis@google.com>
+In-Reply-To: <20261117204535.4036191-3-coltonlewis@google.com>
 
-On Tue, Nov 17, 2026 at 08:45:34PM +0000, Colton Lewis wrote:
-> ID_AA64MMFR4_EL1.E2H0 is a signed 4-bit field where:
->   - 0b0000 (IMP, 0): FEAT_E2H0 is implemented.
->   - 0b1111 (NI, -1): FEAT_E2H0 is not implemented, except HCR_EL2.NV1
->     is implemented.
->   - 0b1110 (NI_NV1, -2): Neither HCR_EL2.E2H == 0 nor HCR_EL2.NV1 is
->     implemented, and HCR_EL2.NV1 is RES0.
+On Tue, Nov 17, 2026 at 08:45:35PM +0000, Colton Lewis wrote:
+> In a VHE-only EL2 guest (KVM_ARM_VCPU_HAS_EL2 without
+> KVM_ARM_VCPU_HAS_EL2_E2H0), KVM advertises ID_AA64MMFR4_EL1.E2H0 as
+> NI_NV1, making HCR_EL2.E2H RES1 and HCR_EL2.NV1 RES0.
 > 
-> Prior to commit b2a324ff01fe ("KVM: arm64: Use HCR_EL2 feature map to
-> drive fixed-value bits"), kvm_init_nv_sysregs() marked HCR_EL2.NV1 as
-> RES0 when !kvm_has_feat(kvm, ID_AA64MMFR4_EL1, E2H0, NI), i.e., when the
-> signed E2H0 field is less than NI (-1), which matches NI_NV1 (-2).
+> Extend hello_el2 to attempt clearing HCR_EL2.E2H and setting HCR_EL2.NV1
+> from userspace via KVM_SET_ONE_REG, verifying that HCR_EL2.E2H remains
+> RES1 and HCR_EL2.NV1 is masked to RES0.
 > 
-> When converting HCR_EL2 to the feature map, feat_nv2_e2h0_ni() was
-> written as !kvm_has_feat(kvm, FEAT_E2H0), where FEAT_E2H0 checks
-> E2H0 >= IMP (0). This inverted the condition: feat_nv2_e2h0_ni()
-> evaluates to true when E2H0 < 0 (including NI_NV1), leaving HCR_EL2.NV1
-> writable instead of RES0 for VHE-only nested guests where KVM advertises
-> ID_AA64MMFR4_EL1.E2H0 = NI_NV1.
-> 
-> Check kvm_has_feat(kvm, ID_AA64MMFR4_EL1, E2H0, NI) so that HCR_EL2.NV1
-> is treated as implemented only when E2H0 is IMP or NI, and forced to
-> RES0 when E2H0 is NI_NV1. Rename the helper from feat_nv2_e2h0_ni() to
-> feat_nv2_nv1_not_res0() to clearly reflect what it tests.
-> 
-> Fixes: b2a324ff01fe ("KVM: arm64: Use HCR_EL2 feature map to drive fixed-value bits")
 > Signed-off-by: Colton Lewis <coltonlewis@google.com>
 > ---
->  arch/arm64/kvm/config.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  tools/testing/selftests/kvm/arm64/hello_el2.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> index adaf26ab93b85..a975ac73ed876 100644
-> --- a/arch/arm64/kvm/config.c
-> +++ b/arch/arm64/kvm/config.c
-> @@ -256,9 +256,10 @@ static bool feat_nv2(struct kvm *kvm)
->  		kvm_has_feat(kvm, ID_AA64MMFR2_EL1, NV, NV2));
->  }
+> diff --git a/tools/testing/selftests/kvm/arm64/hello_el2.c b/tools/testing/selftests/kvm/arm64/hello_el2.c
+> index bbe6862c6ab16..5910497f8fbe4 100644
+> --- a/tools/testing/selftests/kvm/arm64/hello_el2.c
+> +++ b/tools/testing/selftests/kvm/arm64/hello_el2.c
+> @@ -45,6 +45,7 @@ int main(void)
+>  	struct kvm_vcpu *vcpu;
+>  	struct kvm_vm *vm;
+>  	struct ucall uc;
+> +	u64 hcr;
 >  
-> -static bool feat_nv2_e2h0_ni(struct kvm *kvm)
-> +static bool feat_nv2_nv1_not_res0(struct kvm *kvm)
->  {
-> -	return feat_nv2(kvm) && !kvm_has_feat(kvm, FEAT_E2H0);
-> +	return feat_nv2(kvm) &&
-> +	       kvm_has_feat(kvm, ID_AA64MMFR4_EL1, E2H0, NI);
->  }
+>  	TEST_REQUIRE(kvm_check_cap(KVM_CAP_ARM_EL2));
+>  
+> @@ -66,6 +67,13 @@ int main(void)
+>  		TEST_FAIL("Unhandled ucall: %ld\n", uc.cmd);
+>  	}
+>  
+> +	hcr = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2));
+> +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2),
+> +		     (hcr & ~HCR_EL2_E2H) | HCR_EL2_NV1);
+> +	hcr = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2));
+> +	TEST_ASSERT(hcr & HCR_EL2_E2H, "HCR_EL2.E2H should be RES1");
+> +	TEST_ASSERT(!(hcr & HCR_EL2_NV1), "HCR_EL2.NV1 should be RES0");
+> +
 
-This could benefit from a comment, because testing for NI as a feature
-is very misleading. Also, I don't why this needs to spill onto another
-line.
-
-	/*
-	 * The E2H0 field is a 'negative' feature field, where a value
-	 * of -1 implies FEAT_E2H0 is not implemented but does not
-	 * restrict the use of HCR_EL2.NV1.
-	 */
-	return feat_nv2(kvm) && kvm_has_feat(kvm, ID_AA64MMFR4_EL1, E2H0, NI);
+Again, comment would be helpful for why this is done from userspace,
+i.e. the RESx as seen from the guest POV is stateful but the value is
+ignored.
 
 Thanks,
 Oliver
