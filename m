@@ -1,113 +1,72 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794917275;
-	b=E2k5uxFRXYGiBZVg6pLUmoSbloSjgcIW5WTeOaQn8dQH3EoIeF9UoFf6aJy741OSAe7k
-	 O6Jl+n9KEcfC9DKV22OY1hLwx1W3ZorwueLiXRRZK/gY4VWEJHIQAWrYYmWs2cXAW+QSs
-	 gavs7PrFnD8E8L+oeYktd0UwS5KQDsS1UApn3hNU+qzF9jDFqQMLusSxPlsHU31IrPImw
-	 34kJ3ETFG/kShpio3v2NWQWwfRWFljRS4C41sXnB5ZToG1O9FCAIHUVrN4madbh7dEtGE
-	 +RUJkhwNKiQNgaOVv1O1Zgw5ZFvfuh3rEdFAKiZwuy5g8RjTtA74x3MEC3FJQOiKrFA==
+	t=1794920701;
+	b=gwsBVwKyO0TVKMnPuLubjOkUSEhEc0IBbrM285OpXAv3bNwP7PGjx6bU4jUMybiAItjU
+	 1yZIBUKE1PT+rNPyIbtp4PoHUpL456lhTFaRrkDimU5JDtYMs1lWoSRf17NV0aTW98MhY
+	 JcYQ0bXjjMC0hwTLaCuPn+TeQ6Ve6V9KqEtV3uFRfQ/v64Dj5k2fwcVBz5eMuozPlnvgX
+	 GLzspBKcA/oXfaTX3nX6eEOcdEgH2OQ4X3IqHfljs8RV4Rm4eN85/c0RjOiAG8mEqL/tQ
+	 iAxrl59tPlYvD8ogmoldSdpFTs3L47RzwaPLTR/djPWPXn7fmKxkMl6enaNUb1cn1LA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794917275;
-	h=Received:DKIM-Signature:X-Mailer:From:To:Cc:Subject:In-Reply-To:
-	 References:Date:Message-ID:MIME-Version:Content-Type;
-	bh=s/GxyM3xQ3jHfxh/01l7Pa4ILI1xRNFU3MUIalnJ/Ic=;
-	b=t/wdNSO/0dn13vmTEsOevq5Og5fixQLbqT2kWVcze7dsAQA3Tt3YWbeq8G79UIZYk83e
-	 BAaj/qLloPem+q/1+x0Xu44ucCJkKtDq+pwJhRou+F20KAffOCD5EGTzjpbHoCrNVd8Kn
-	 VAwFnqHya4NtoJsIE74Uf38nOho5//saZZ8QZ3ZiqFW4XH1W8JiJTDprrb4wGK1HvgZyA
-	 Onm+UMXMUugq8lGGJBrJbJsqVehaA9gZv/wodG9O5ocYLiaZHQ6x4ZplS9ta98qNY6tF7
-	 C2mDHq3MpT3N1weDUy1k3ffo0dUU1NFQx2nJZCMlZ/XjCo9b2At6esfPOeb4btBrerg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794920701;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=9LFSH3S79yMExFk+1qBwbTLcoT6gqxw3yAePeaVU2no=;
+	b=c/tcsMnH1Wn74mxW5Q5i6KTKZwZIiI6lVOpN+i2nSOMSJtGdElFq0IHafGj2k/7zcAh9
+	 SZMuSOOZ98je6EtMAf5AhLfoeGMFQ4XNmVK05uFuPdOhQ2p6q/vMyy0++Spb98bBKVeTz
+	 lTd+/GjYxcspQv4f+w737qurPR46rvwnKIC+iIoJRzKPVANJmTeMoyDMfc+X/FWSxINuP
+	 iw5P5iplnpVQ4D1w0/OnAuHZMAgyD++tDk0wcDaX20xReehGk6oXtTkve43SJpdQUobbA
+	 XNyefa7yYf2V9ETXF8ABAop8HhSB5v+9fCs+2E98sE2t1e/KsQd3FHb0m0VXxL3pAhA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TYjgvtoN;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IH33jRbk;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA192606A33D;
-	Tue, 17 Nov 2026 12:07:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 074D8606A335;
+	Tue, 17 Nov 2026 13:05:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TYjgvtoN
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 568641F00934;
-	Tue, 17 Nov 2026 12:07:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IH33jRbk
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D37DB1F000C4;
+	Tue, 17 Nov 2026 13:05:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794917275;
-	bh=s/GxyM3xQ3jHfxh/01l7Pa4ILI1xRNFU3MUIalnJ/Ic=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=TYjgvtoNuQZfGkR/SgqLaJ5HoTzQ3ZEBdzd/+euHF+gqzHqfw9aoVgzXdgQ+dIJuk
-	 uGrTDvInZqzbx0XvBdevqb/w0aOKtbE/d1/S1Hufvhq+QeUVQcQlTiRvVGlr1EfA3h
-	 e+IQj9nh2dI/1foUD7Ho193uxD7s3+11q3hcayoip/FuKx4ODfCsC/lOw6CbyzuApi
-	 OPk/igYER2aoVVLOL5wduIqtTcSVxEfCBxVygpdtTbz/6YB4P8ZWXbqDTvoZdukb8h
-	 ebah/4xrrgRrreD/h9x3OsMl2NuftMm7xJgS+TXAeEowpt+h3psMuf2GiMNxLfdVPQ
-	 A2CmscMuHGmnA==
-X-Mailer: emacs 31.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>, Jason Gunthorpe <jgg@ziepe.ca>
-Cc: linux-coco@lists.linux.dev,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Baoquan He <baoquan.he@linux.dev>,
-	Mike Rapoport <rppt@kernel.org>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Pratyush Yadav <pratyush@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christian =?utf-8?Q?K=C3=B6nig?= <christian.koenig@amd.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
+	s=k20260515; t=1794920700;
+	bh=9LFSH3S79yMExFk+1qBwbTLcoT6gqxw3yAePeaVU2no=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=IH33jRbkgbCTnzClh4uPWtcVmy8d8zo2+fod1PZlqY0625ITG/aRoJpveNziUuuxH
+	 UQtu4t55Bz3GjSHxQOWQkXhNus369KTv+DyjyOsyDdIkxyu0I43oWSW0ltMnbmHvWa
+	 3dE+XyNsKpOCu6KEm6efZWDoJftV4wyFxVx5TuGKl1YSuh1vnVDF47ImdtJZZuxbxD
+	 HGmZDw/98qeLffrdLnXvVoa65jiSX3JhasDQz4EMEN4TAfjUv1EJRZlVJ6fUqiieuC
+	 i5BSfByiTU/l6iSy4WgsEIDby6zvI+ByJR1hmU+tjlkAbAb1xBuJfskTYvY/YP60d1
+	 I96E6nU1W9hZA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xTIrq-0000000H0kI-1LWK;
+	Tue, 17 Nov 2026 13:04:58 +0000
+Date: Tue, 17 Nov 2026 13:04:57 +0000
+Message-ID: <86fqwz1udi.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Benjamin Gaignard <benjamin.gaignard@collabora.com>,
-	Brian Starkey <Brian.Starkey@arm.com>,
-	John Stultz <jstultz@google.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Radu Rendec <radu@rendec.net>,
-	"T.J. Mercier" <tjmercier@google.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <chleroy@kernel.org>,
-	Ritesh Harjani <ritesh.list@gmail.com>,
-	Shrikanth Hegde <sshegde@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Kiryl Shutsemau <kas@kernel.org>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	"K . Y . Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	linaro-mm-sig@lists.linaro.org,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <fuad.tabba@linux.dev>,
+	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org,
-	kvmarm@lists.linux.dev, patches@lists.linux.dev,
-	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH v10 02/13] mm: Zero memory during shared memory transitions
-In-Reply-To: <CA+EHjTywWTaKLtM6OPF_0ETv29-m8JsHdvF3BeW9Xa=h713eEg@mail.gmail.com>
-References: <20261116091137.94252-1-aneesh.kumar@kernel.org>
- <20261116091137.94252-3-aneesh.kumar@kernel.org>
- <CA+EHjTw7QzzkQYKV3jyvW5mqZQMenTfm=kus9i87tYqACDOv0Q@mail.gmail.com>
- <yq5ah5hgyj1p.fsf@kernel.org> <20261116140259.GL2532299@ziepe.ca>
- <CA+EHjTywWTaKLtM6OPF_0ETv29-m8JsHdvF3BeW9Xa=h713eEg@mail.gmail.com>
-Date: Tue, 17 Nov 2026 17:37:07 +0530
-Message-ID: <yq5a7biby844.fsf@kernel.org>
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 2/2] KVM: arm64: selftests: Verify HCR_EL2.NV1 is RES0 when E2H0 is NI_NV1
+In-Reply-To: <20261116200418.3535619-3-coltonlewis@google.com>
+References: <20261116200418.3535619-1-coltonlewis@google.com>
+	<20261116200418.3535619-3-coltonlewis@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -116,27 +75,107 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, fuad.tabba@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Fuad Tabba <fuad.tabba@linux.dev> writes:
+On Mon, 16 Nov 2026 20:04:18 +0000,
+Colton Lewis <coltonlewis@google.com> wrote:
+> 
+> In a VHE-only EL2 guest (KVM_ARM_VCPU_HAS_EL2 without
+> KVM_ARM_VCPU_HAS_EL2_E2H0), KVM advertises ID_AA64MMFR4_EL1.E2H0 as
+> NI_NV1, making HCR_EL2.E2H RES1 and HCR_EL2.NV1 RES0.
+> 
+> Extend hello_el2 to attempt clearing HCR_EL2.E2H and setting HCR_EL2.NV1
+> both from guest EL2 (across a trapped ID register exit) and from
+> userspace via KVM_SET_ONE_REG, verifying that HCR_EL2.E2H remains RES1
+> and HCR_EL2.NV1 is masked to RES0.
+>
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>  tools/testing/selftests/kvm/arm64/hello_el2.c | 34 ++++++++++++++++---
+>  1 file changed, 29 insertions(+), 5 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/arm64/hello_el2.c b/tools/testing/selftests/kvm/arm64/hello_el2.c
+> index bbe6862c6ab16..46b0f63e199f0 100644
+> --- a/tools/testing/selftests/kvm/arm64/hello_el2.c
+> +++ b/tools/testing/selftests/kvm/arm64/hello_el2.c
+> @@ -13,13 +13,29 @@
+>  
+>  static void guest_code(void)
+>  {
+> -	u64 mmfr0 = read_sysreg_s(SYS_ID_AA64MMFR0_EL1);
+> -	u64 mmfr1 = read_sysreg_s(SYS_ID_AA64MMFR1_EL1);
+> -	u64 mmfr4 = read_sysreg_s(SYS_ID_AA64MMFR4_EL1);
+> -	u8 e2h0 = SYS_FIELD_GET(ID_AA64MMFR4_EL1, E2H0, mmfr4);
+> +	u64 mmfr0, mmfr1, mmfr4, hcr;
+> +	u8 e2h0;
+>  
+>  	GUEST_ASSERT_EQ(get_current_el(), 2);
+> -	GUEST_ASSERT(read_sysreg(hcr_el2) & HCR_EL2_E2H);
+> +
+> +	hcr = read_sysreg(hcr_el2);
+> +	GUEST_ASSERT(hcr & HCR_EL2_E2H);
+> +
+> +	/*
+> +	 * Attempt to clear HCR_EL2.E2H (RES1) and set HCR_EL2.NV1 (RES0).
+> +	 * KVM sanitises VNCR-backed HCR_EL2 across exits such as the
+> +	 * trapped ID register reads below.
+> +	 */
+> +	write_sysreg((hcr & ~HCR_EL2_E2H) | HCR_EL2_NV1, hcr_el2);
+> +
+> +	mmfr0 = read_sysreg_s(SYS_ID_AA64MMFR0_EL1);
+> +	mmfr1 = read_sysreg_s(SYS_ID_AA64MMFR1_EL1);
+> +	mmfr4 = read_sysreg_s(SYS_ID_AA64MMFR4_EL1);
+> +	e2h0 = SYS_FIELD_GET(ID_AA64MMFR4_EL1, E2H0, mmfr4);
+> +
+> +	hcr = read_sysreg(hcr_el2);
+> +	GUEST_ASSERT(hcr & HCR_EL2_E2H);
+> +	GUEST_ASSERT(!(hcr & HCR_EL2_NV1));
 
-> Hi Jason, Aneesh,
->
-> On Mon, 16 Nov 2026 14:02:59 +0000, Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> [...]
->> Just like you are wrapping set_memory_decrypted() in an allocator API
->> the user that wants to have the no-change sharing needs its own
->> special API too.
->
-> That works. A separate API can cover no-change sharing when a user
-> needs it, so I'm fine with set_memory_decrypted() zeroing.
->
-> Aneesh, the pKVM hunk does need cache maintenance after the memset(),
-> which I have in the Cc: stable patch I posted earlier today [1].
->
+That's relying on a KVM-specific behaviour, and not something the
+architecture guarantees. You should test that you either get the
+original written value, or the effective value.
 
-I will add that, along with the relevant comments.
+Also, ID_AA64MMFR4_EL1 doesn't necessarily trap, since this relies on
+FGT being implemented. So on an older code (Neoverse V2, for example),
+this is unlikely to give you the correct results.
+
+>  	GUEST_ASSERT_EQ(SYS_FIELD_GET(ID_AA64MMFR1_EL1, VH, mmfr1),
+>  			ID_AA64MMFR1_EL1_VH_IMP);
+>  
+> @@ -45,6 +61,7 @@ int main(void)
+>  	struct kvm_vcpu *vcpu;
+>  	struct kvm_vm *vm;
+>  	struct ucall uc;
+> +	u64 hcr;
+>  
+>  	TEST_REQUIRE(kvm_check_cap(KVM_CAP_ARM_EL2));
+>  
+> @@ -66,6 +83,13 @@ int main(void)
+>  		TEST_FAIL("Unhandled ucall: %ld\n", uc.cmd);
+>  	}
+>  
+> +	hcr = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2));
+> +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2),
+> +		     (hcr & ~HCR_EL2_E2H) | HCR_EL2_NV1);
+> +	hcr = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2));
+> +	TEST_ASSERT(hcr & HCR_EL2_E2H, "HCR_EL2.E2H should be RES1");
+> +	TEST_ASSERT(!(hcr & HCR_EL2_NV1), "HCR_EL2.NV1 should be RES0");
+> +
+
+I think this is the only reliable test you can implement.
+
+>  	kvm_vm_free(vm);
+>  	return 0;
+>  }
 
 Thanks,
--aneesh
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
