@@ -1,82 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.212
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794944517;
-	b=oP8UbQXNLid6r2RrQ6GeJACsRJ6Soqs0XUH/Myk4PPRxvfmi2+vq8KDxIbTENL5v+1bh
-	 AcrRA0LAhxrZOx/sBccGBrwuSbbtlg6DWVJz06A/aKpFYVqdKJjbi49NPSTsOMs3etAhL
-	 lEatKfsFWkYzySW7QF0WcKTWvDKhdroR+M9hkvkz1F3WjRry1aHQ/fXW08ORP5uNHNsi3
-	 x1YbVksfwmZrni6cRoOUdpcSoY+UQPDB2ad2JH6B5O1U5XqPlvZTv7QqEDKWMktmOiaqc
-	 YKhTb3vyhzoDGm2gA4IKeQYx9R5LJ9mZ9eqGL6dRoVANpeT19IN55sWa4FC1bnw9Sfg==
+	t=1794944897;
+	b=CM7msD+eHPXVmxq/SNlZrsGQw4jRjQAGNQYuqlUFlF9JV9OHkTBD5NkwODEWqwN1pvp7
+	 ln6psDmvXaKm1xLMCN9yX8aIaXiqpec1P2zQG7ChnvdzL+obNdgxaMYsgaCqGuFud7ZWC
+	 tbw7dXGsXIV409C1DGsvVSyLMIoLKLNFCl99BXH3Rwu5y0+0Cq6M/B1jmmp7NG4Z4oBwe
+	 hlIV9O4jKLKsWiU3YmX8Fr1FTDaGSWCIL6SyrodKLtU6RjBqRmC6gXHxalFKJ3q+SfjoL
+	 lMSvMoqihh8Rg9NVK8wRejOIXbz5ITK81ljxRxLi9el/gHHZ4bCMkTJwdc5xYa8nbeA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794944517;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=+M/Rtxh3yGMbVllbJRU+JtKA13rBSYOFw41bb75VE4U=;
-	b=WPFMNSher3jJfm/0IRT/5Z9ZCTIsSd8zR5e9AAlbqMa+K6U4fXexmOJIUhEvpFUbw3dV
-	 7WjULp1MsmAgk6a409G64wsgHUsvd7ckmzY9f7yufrq54mKslpj3NjVBrUloZGcUs3PbN
-	 9lTeClDbi0sLJSMYyNWX6VH8P6nIgdlmD6Bk2BkZ7oAc8KjziqAWSdR+tN/MkveT74rky
-	 pm2N+fZi6nxPJ4aWKYXs0/kEVuaKBmciesVLPYx0KWc+TNCsA0kVVQEd5CevRKiA6o1VN
-	 GaDpGnWDNE9xoVi9LxN+8WmJdyulz8gNu1kzwZUxi5NMGcBU3C7uR/GbZ2JDpSbFn4Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794944897;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=uKJuLqQr75Y+bo8J7GoFF1WkhE7oAHbeqLhg/Qlni5U=;
+	b=K0ZBldcpX7uEs7GTGjiKwUA51rp8v6TEmkGzZak/PQrRf3ZfG0ahjl5FtJum4yHMBvsU
+	 oF4PYKAm96RIojVrMXcXHzgRPqOZA5oUcp0V9ZxzYzJ81DCltwN25BfnujUV1PfOpqAne
+	 gTEcZiR3wcoOvim+LMB0CTCc7Qr5KancpE6qnspeFmwKoNZTf0McZ5SoLp7ZMFdArexFw
+	 HVoDiZgkpTO5/QMIfxi5aD3LYqoRfYgbEGnitSeL0bTffRpz+deYyRPwzUodE9Dz0oNDN
+	 drnmkXb2Wlyq9EHVlvDjtxqUSFx7Y22P6hTO2IRwrHbzbPyPjQxE/Q7lQhVxGwEu/MQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=E96h9sv4;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=UXM8ypuM;
+	arc=none smtp.remote-ip=91.218.175.212
+Received: from mta0.migadu.com (out-212.mta0.migadu.com [91.218.175.212])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 017A4606A31C;
-	Tue, 17 Nov 2026 19:41:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4CE606A32C
+	for <kvmarm@lists.linux.dev>; Tue, 17 Nov 2026 19:48:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1C4CE606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=E96h9sv4
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE9A81F000C5;
-	Tue, 17 Nov 2026 19:41:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794944516;
-	bh=+M/Rtxh3yGMbVllbJRU+JtKA13rBSYOFw41bb75VE4U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=E96h9sv4SckZZn0xBQJFDt4SE5F4NR5pDOuHOdrlzwystp4RmrvzVT8agTD6itkot
-	 ks6naELZWw6Yk3V0FlemoqnJDyW1/qroAm9MY/tndKlHNqAvZ28n4xtjU6nhMDzh80
-	 +iGpCfj31kUN/LzD7Vu9j3ny5m+TWL54Dco8XO2t3CuaMcEaUuGjIClY+1xzJDNl2Y
-	 uvxznDi+8xqAyhKnIJY9bl3keFC0xypVzollgnMgYNgGZc84WTPkJQGQ6iRq3szo5K
-	 eNGz3SUGSLSSYV8bFSc7fPQZx6FJfYAQhXqE/edmhJI+Zey25KSrCG01PD7nDqiIZT
-	 yql77Q9cxOw8Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xTP3y-0000000HCc3-2ZQd;
-	Tue, 17 Nov 2026 19:41:54 +0000
-Date: Tue, 17 Nov 2026 19:41:54 +0000
-Message-ID: <86bj7n1bzx.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Quentin Perret <qperret@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 01/19] KVM: arm64: Hide generic ptrauth from protected VMs without ptrauth
-In-Reply-To: <20261109084854.840576-2-fuad.tabba@linux.dev>
-References: <20261109084854.840576-1-fuad.tabba@linux.dev>
-	<20261109084854.840576-2-fuad.tabba@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=UXM8ypuM
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=uKJuLqQr75Y+bo8J7GoFF1WkhE7oAHbeqLhg/Qlni5U=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1794944894; v=1; x=1795549694;
+ b=UXM8ypuMZFrmGzxKR0QiG77imGgss9oJ49yHHDBuseqi54SVZz5yE6Kv6q5+jvTtaBK6+E+X
+ U00gFoPNePAFkIbhk/x1IOQEUkTx275fdpyiOdYVUOIRiRxzP5fPXBiToar/5oy1DXyqzRN+vL6
+ If4hXEAVets2MoyhuyqJxQL0=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 0d2a261d291bac5f;
+	Tue, 17 Nov 2026 19:48:14 +0000
+X-Mizu-Trace-ID: 0d2a261d291bac5f
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5c00d7ac49dso1200e87.1
+        for <kvmarm@lists.linux.dev>; Tue, 17 Nov 2026 11:48:13 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErG6NVsDsubY79MtFNscAcezc9lkJzcWyRkZimHvD3NtvaHZnmKjJyqpmQ/+6fPJ9ZQ+48w+6B4=@lists.linux.dev
+X-Gm-Message-State: APuU4Z8EVuqDP6Gs3YRNxoDCUMU/seHUPh0Npzd23tTqErlOBEmZDZQ5
+	DIb/nFCON5wbfmzhyDeGCE6yUh5rU21Lw/XuS24upBHG8a/55N00obIPSyvU5kZ97ISEPd5qw5Z
+	yn3Dwr4zUj5CwfMLbLkDGxPdxeKwQOP9IjeILG7BF
+X-Received: by 2002:a05:6512:2514:b0:5c1:488e:a067 with SMTP id
+ 2adb3069b0e04-5c1a21b8c88mr211122e87.16.1794944892940; Tue, 17 Nov 2026
+ 11:48:12 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -85,52 +65,42 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, vdonnefort@google.com, qperret@google.com, tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20261109084854.840576-1-fuad.tabba@linux.dev> <20261109084854.840576-2-fuad.tabba@linux.dev>
+ <86bj7n1bzx.wl-maz@kernel.org>
+In-Reply-To: <86bj7n1bzx.wl-maz@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Tue, 17 Nov 2026 19:47:36 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTwJ9XTCfrfBLgGjed3GrRtiTnk-ErvPSwU-AhvyTVcnsw@mail.gmail.com>
+X-Gm-Features: AclHuK-8bTfTjzWgE2se3igLLysfjqAzQV8BoEmKuQlaC_gyenaFOJ31_2y-pYk
+Message-ID: <CA+EHjTwJ9XTCfrfBLgGjed3GrRtiTnk-ErvPSwU-AhvyTVcnsw@mail.gmail.com>
+Subject: Re: [PATCH v2 01/19] KVM: arm64: Hide generic ptrauth from protected
+ VMs without ptrauth
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, Will Deacon <will@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Vincent Donnefort <vdonnefort@google.com>, Quentin Perret <qperret@google.com>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 09 Nov 2026 08:48:36 +0000,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
-> 
-> A protected VM without the ptrauth vCPU features shouldn't have pointer
-> authentication in its ID registers. Commit 3d7ff00700d1 ("KVM: arm64:
-> Rework specifying restricted features for protected VMs") gated APA,
-> API, APA3 and GPA3 on vm_has_ptrauth(), but left GPA and GPI capped
-> at IMP. So generic authentication is advertised to a protected guest
-> without ptrauth, and PACGA UNDEFs.
-> 
-> Gate GPA and GPI on vm_has_ptrauth() too.
-> 
-> Fixes: 3d7ff00700d1 ("KVM: arm64: Rework specifying restricted features for protected VMs")
-> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
-> ---
->  arch/arm64/kvm/hyp/nvhe/sys_regs.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> index 32e82653ebf7e..e5502d5651b05 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> @@ -157,8 +157,8 @@ static const struct pvm_ftr_bits pvmid_aa64isar1[] = {
->  	MAX_FEAT(ID_AA64ISAR1_EL1, JSCVT, IMP),
->  	MAX_FEAT(ID_AA64ISAR1_EL1, FCMA, IMP),
->  	MAX_FEAT(ID_AA64ISAR1_EL1, LRCPC, LRCPC3),
-> -	MAX_FEAT(ID_AA64ISAR1_EL1, GPA, IMP),
-> -	MAX_FEAT(ID_AA64ISAR1_EL1, GPI, IMP),
-> +	MAX_FEAT_FUNC(ID_AA64ISAR1_EL1, GPA, IMP, vm_has_ptrauth),
-> +	MAX_FEAT_FUNC(ID_AA64ISAR1_EL1, GPI, IMP, vm_has_ptrauth),
->  	MAX_FEAT(ID_AA64ISAR1_EL1, FRINTTS, IMP),
->  	MAX_FEAT(ID_AA64ISAR1_EL1, SB, IMP),
->  	MAX_FEAT(ID_AA64ISAR1_EL1, SPECRES, COSP_RCTX),
+Hi Marc,
 
-Burying a fix in a selftest series is a recipe to make sure it is
-ignored for a full cycle... Why isn't that with the "massive feature
-set" series?
+On Tue, 17 Nov 2026 19:41:54 +0000, Marc Zyngier <maz@kernel.org> wrote:
+[...]
+> Burying a fix in a selftest series is a recipe to make sure it is
+> ignored for a full cycle... Why isn't that with the "massive feature
+> set" series?
 
-	M.
+It's in this one because pkvm_id_regs depends on it. The test checks
+that GPA and GPI read 0 in a protected VM without ptrauth, and it
+fails without the fix.
 
--- 
-Without deviation from the norm, progress is not possible.
+Would you prefer that I send it on its own, or with the respin of the
+features series?
+
+Cheers,
+/fuad
