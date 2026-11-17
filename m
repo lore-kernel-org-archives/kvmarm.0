@@ -1,68 +1,79 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794944021;
-	b=2fD6SEMPrLTpU+lGnXgBWUmktFbn+iXiPcXDSXjK9hWcaHNNhPG6JqjmtVU+Q0gV+b5V
-	 ngbH9sAsfSss8/Kvrg8b2oV7lOGOh8Xo26MVGp1Nz8wO9xv3MHPAkHN6RkZhu8LUnKh9u
-	 /ah7RP93Y+WoU7m+K4JwSGq6o6rHM3TeJ/nxUbcyG4KHC+WnnLfVmIXyasLwYsnruPJCN
-	 rb4Jk3g4iqqGHe2x7hsV5GX8IyvR3xT8frYba2z3Be20I+WRsAcM4b8tq6I7Doy+9zsm/
-	 ti3WjyVmxlQqdzZofzofj1X5t9y4717zT3mT7xknu4Iz5kMUNO9oyotIpAgAFzJoxjg==
+	t=1794944517;
+	b=oP8UbQXNLid6r2RrQ6GeJACsRJ6Soqs0XUH/Myk4PPRxvfmi2+vq8KDxIbTENL5v+1bh
+	 AcrRA0LAhxrZOx/sBccGBrwuSbbtlg6DWVJz06A/aKpFYVqdKJjbi49NPSTsOMs3etAhL
+	 lEatKfsFWkYzySW7QF0WcKTWvDKhdroR+M9hkvkz1F3WjRry1aHQ/fXW08ORP5uNHNsi3
+	 x1YbVksfwmZrni6cRoOUdpcSoY+UQPDB2ad2JH6B5O1U5XqPlvZTv7QqEDKWMktmOiaqc
+	 YKhTb3vyhzoDGm2gA4IKeQYx9R5LJ9mZ9eqGL6dRoVANpeT19IN55sWa4FC1bnw9Sfg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794944021;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794944517;
 	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
 	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
 	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
 	 X-SA-Exim-Scanned;
-	bh=HyYwQ3lbDzithURQQVoi8Wm6ef0Je2C3G3ZeNd2Dzlo=;
-	b=L7lQNWm0bpLcPDMpmBFj5HGRE475NVGu78JSulujrjdXlhNrxuUodhtOxOPUvtjlpnhu
-	 kDUhC2S3UoZ/qk04jQg7ZfHv59YiLALbFRcVnF59EDQiC084IE5lO0cb3woTWJy/vS53o
-	 UckG98+XXHp5tXNcCLn5/cy1KmtXjkkHU9gJtPFQTw6mwfWy/FVB0zFXwuhE/Z+oBMS3D
-	 8gOH3ty8VqfDH32/HQ598Jijd50jY7JK0pXaAeijAIJ2fQ4DNIddWMr/Xzni+VnT+gpul
-	 jx5JcHiJARRNy4cuhcqKc1XJ9EqZt34csvBuKTsolz6rm/9Y726kImyKoylu01Bg/5w==
+	bh=+M/Rtxh3yGMbVllbJRU+JtKA13rBSYOFw41bb75VE4U=;
+	b=WPFMNSher3jJfm/0IRT/5Z9ZCTIsSd8zR5e9AAlbqMa+K6U4fXexmOJIUhEvpFUbw3dV
+	 7WjULp1MsmAgk6a409G64wsgHUsvd7ckmzY9f7yufrq54mKslpj3NjVBrUloZGcUs3PbN
+	 9lTeClDbi0sLJSMYyNWX6VH8P6nIgdlmD6Bk2BkZ7oAc8KjziqAWSdR+tN/MkveT74rky
+	 pm2N+fZi6nxPJ4aWKYXs0/kEVuaKBmciesVLPYx0KWc+TNCsA0kVVQEd5CevRKiA6o1VN
+	 GaDpGnWDNE9xoVi9LxN+8WmJdyulz8gNu1kzwZUxi5NMGcBU3C7uR/GbZ2JDpSbFn4Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kHuZiBG3;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=E96h9sv4;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE46960A5BEB;
-	Tue, 17 Nov 2026 19:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 017A4606A31C;
+	Tue, 17 Nov 2026 19:41:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kHuZiBG3
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C86131F0181D;
-	Tue, 17 Nov 2026 19:33:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=E96h9sv4
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE9A81F000C5;
+	Tue, 17 Nov 2026 19:41:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794944020;
-	bh=HyYwQ3lbDzithURQQVoi8Wm6ef0Je2C3G3ZeNd2Dzlo=;
+	s=k20260515; t=1794944516;
+	bh=+M/Rtxh3yGMbVllbJRU+JtKA13rBSYOFw41bb75VE4U=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=kHuZiBG3zOcLglC9Ory/cu41SYsYooLz1Urnw2yKPDP3zSfrELeQfdvOX/viancku
-	 MfybP7Xn/hRrgWFpr5t5wjJgjAkyhrsK7vTalPyS9Z91WBERY63nEOmPplmEFGXD0i
-	 7YjBXeNr30I8wyCihI2iZPglG4vCCzTqeWHIXpm0WeQw4vAu41HP3QfOrBe42thfJD
-	 336GK5N5wnhnS/XXAu63mBCfzzfC0zog0fc0UVrIgXkWw3QA+L9VyprwuePu/joL9G
-	 U94s87P3MtqGjxpA4F9noB12jIq3ppzjH1ni+ewLjBPzTbeRxHKTpz5z0pY1/sRJDT
-	 Qc36ozr9qjvlQ==
+	b=E96h9sv4SckZZn0xBQJFDt4SE5F4NR5pDOuHOdrlzwystp4RmrvzVT8agTD6itkot
+	 ks6naELZWw6Yk3V0FlemoqnJDyW1/qroAm9MY/tndKlHNqAvZ28n4xtjU6nhMDzh80
+	 +iGpCfj31kUN/LzD7Vu9j3ny5m+TWL54Dco8XO2t3CuaMcEaUuGjIClY+1xzJDNl2Y
+	 uvxznDi+8xqAyhKnIJY9bl3keFC0xypVzollgnMgYNgGZc84WTPkJQGQ6iRq3szo5K
+	 eNGz3SUGSLSSYV8bFSc7fPQZx6FJfYAQhXqE/edmhJI+Zey25KSrCG01PD7nDqiIZT
+	 yql77Q9cxOw8Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1xTOvy-0000000HCE3-2u23;
-	Tue, 17 Nov 2026 19:33:38 +0000
-Date: Tue, 17 Nov 2026 19:33:38 +0000
-Message-ID: <86cxs31cdp.wl-maz@kernel.org>
+	id 1xTP3y-0000000HCc3-2ZQd;
+	Tue, 17 Nov 2026 19:41:54 +0000
+Date: Tue, 17 Nov 2026 19:41:54 +0000
+Message-ID: <86bj7n1bzx.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>
-Cc: kvmarm@lists.linux.dev,
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
+	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Wei-Lin Chang <weilin.chang@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Fuad Tabba <fuad.tabba@linux.dev>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2 7/8] KVM: arm64: nv: Enforce sysreg visibility before evaulating guest traps
-In-Reply-To: <20261106183154.3590825-8-oupton@kernel.org>
-References: <20261106183154.3590825-1-oupton@kernel.org>
-	<20261106183154.3590825-8-oupton@kernel.org>
+	Vincent Donnefort <vdonnefort@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Fuad Tabba <tabba@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 01/19] KVM: arm64: Hide generic ptrauth from protected VMs without ptrauth
+In-Reply-To: <20261109084854.840576-2-fuad.tabba@linux.dev>
+References: <20261109084854.840576-1-fuad.tabba@linux.dev>
+	<20261109084854.840576-2-fuad.tabba@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -77,132 +88,49 @@ Precedence: list
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, weilin.chang@arm.com, seiden@linux.ibm.com, fuad.tabba@linux.dev, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, vdonnefort@google.com, qperret@google.com, tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 06 Nov 2026 18:31:53 +0000,
-Oliver Upton <oupton@kernel.org> wrote:
+On Mon, 09 Nov 2026 08:48:36 +0000,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> Not all sysregs / system instructions can be described by FGUs. Of
-> these, there are some which may be not implemented for the VM (e.g. MTE
-> cache maintenance instructions) yet intersect with valid trap bits for
-> the VM (HCR_EL2.TPCP).
+> A protected VM without the ptrauth vCPU features shouldn't have pointer
+> authentication in its ID registers. Commit 3d7ff00700d1 ("KVM: arm64:
+> Rework specifying restricted features for protected VMs") gated APA,
+> API, APA3 and GPA3 on vm_has_ptrauth(), but left GPA and GPI capped
+> at IMP. So generic authentication is advertised to a protected guest
+> without ptrauth, and PACGA UNDEFs.
 > 
-> This is annoying to deal with since most of our UNDEF infrastructure is
-> built around traps being RESx for unimplemented features. Test the
-> visibility of the sys_reg_desc to avoid injecting traps for non-existent
-> system registers into the guest hypervisor.
+> Gate GPA and GPI on vm_has_ptrauth() too.
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: a7484c80e5ca ("KVM: arm64: Allow userspace to request KVM_ARM_VCPU_EL2*")
-> Signed-off-by: Oliver Upton <oupton@kernel.org>
+> Fixes: 3d7ff00700d1 ("KVM: arm64: Rework specifying restricted features for protected VMs")
+> Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 > ---
->  arch/arm64/kvm/emulate-nested.c | 24 +++++++++++++++++++++---
->  arch/arm64/kvm/sys_regs.c       | 18 ++++++++++--------
->  arch/arm64/kvm/sys_regs.h       |  4 +++-
->  3 files changed, 34 insertions(+), 12 deletions(-)
+>  arch/arm64/kvm/hyp/nvhe/sys_regs.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> index 32e82653ebf7e..e5502d5651b05 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> @@ -157,8 +157,8 @@ static const struct pvm_ftr_bits pvmid_aa64isar1[] = {
+>  	MAX_FEAT(ID_AA64ISAR1_EL1, JSCVT, IMP),
+>  	MAX_FEAT(ID_AA64ISAR1_EL1, FCMA, IMP),
+>  	MAX_FEAT(ID_AA64ISAR1_EL1, LRCPC, LRCPC3),
+> -	MAX_FEAT(ID_AA64ISAR1_EL1, GPA, IMP),
+> -	MAX_FEAT(ID_AA64ISAR1_EL1, GPI, IMP),
+> +	MAX_FEAT_FUNC(ID_AA64ISAR1_EL1, GPA, IMP, vm_has_ptrauth),
+> +	MAX_FEAT_FUNC(ID_AA64ISAR1_EL1, GPI, IMP, vm_has_ptrauth),
+>  	MAX_FEAT(ID_AA64ISAR1_EL1, FRINTTS, IMP),
+>  	MAX_FEAT(ID_AA64ISAR1_EL1, SB, IMP),
+>  	MAX_FEAT(ID_AA64ISAR1_EL1, SPECRES, COSP_RCTX),
 
-I think I had an allergic reaction to this patch, mostly due to the
-leaking of sys_reg_desc into triage_sysreg_trap(), which makes the
-change a bit noisy. I ended up with the following hack instead, which
-doesn't change triage_sysreg_trap() much.
-
-Thoughts?
+Burying a fix in a selftest series is a recipe to make sure it is
+ignored for a full cycle... Why isn't that with the "massive feature
+set" series?
 
 	M.
-
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index d04ac52034541..762f9f0b7b193 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -2661,6 +2661,16 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
- 	if (!(b & BEHAVE_FORWARD_IN_HOST_EL0) && vcpu_is_host_el0(vcpu))
- 		goto local;
- 
-+	/*
-+	 * Certain sysregs and system instructions could be UNDEF for the VM
-+	 * but lack a corresponding FGU description and intersect with a valid
-+	 * trap bit for the VM. Test the visibility the sysreg (if we have a
-+	 * sys_reg_desc) before determining the effects of the guest
-+	 * hypervisor's traps.
-+	 */
-+	if (tc.sri && check_sysreg_hidden(vcpu, sysreg, tc.sri - 1))
-+		return true;
-+
- 	if (((b & BEHAVE_FORWARD_READ) && is_read) ||
- 	    ((b & BEHAVE_FORWARD_WRITE) && !is_read))
- 		goto inject;
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 7f7a197a9ad6b..f21112d8d2950 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -5407,6 +5407,25 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
- 		kvm_make_request(KVM_REQ_RELOAD_PMU, vcpu);
- }
- 
-+static const struct sys_reg_desc *kvm_sys_reg_idx_to_desc(u32 encoding, int sr_idx)
-+{
-+	/* System registers have Op0=={2,3}, as per DDI487 J.a C5.1.2 */
-+	if (sys_reg_Op0(encoding) == 2 || sys_reg_Op0(encoding) == 3)
-+		return &sys_reg_descs[sr_idx];
-+	else
-+		return &sys_insn_descs[sr_idx];
-+}
-+
-+bool check_sysreg_hidden(struct kvm_vcpu *vcpu, u32 encoding, int sr_idx)
-+{
-+	if (sysreg_guest_hidden(vcpu, kvm_sys_reg_idx_to_desc(encoding, sr_idx))) {
-+		kvm_inject_undefined(vcpu);
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
- /**
-  * kvm_handle_sys_reg -- handles a system instruction or mrs/msr instruction
-  *			 trap on a guest execution
-@@ -5414,10 +5433,10 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
-  */
- int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
- {
--	const struct sys_reg_desc *desc = NULL;
- 	struct sys_reg_params params;
- 	unsigned long esr = kvm_vcpu_get_esr(vcpu);
- 	int Rt = kvm_vcpu_sys_get_rt(vcpu);
-+	u32 encoding = esr_sys64_to_sysreg(esr);
- 	int sr_idx;
- 
- 	trace_kvm_handle_sys_reg(esr);
-@@ -5428,13 +5447,7 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
- 	params = esr_sys64_to_params(esr);
- 	params.regval = vcpu_get_reg(vcpu, Rt);
- 
--	/* System registers have Op0=={2,3}, as per DDI487 J.a C5.1.2 */
--	if (params.Op0 == 2 || params.Op0 == 3)
--		desc = &sys_reg_descs[sr_idx];
--	else
--		desc = &sys_insn_descs[sr_idx];
--
--	perform_access(vcpu, &params, desc);
-+	perform_access(vcpu, &params, kvm_sys_reg_idx_to_desc(encoding, sr_idx));
- 
- 	/* Read from system register? */
- 	if (!params.is_write &&
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 50214271b24a2..7b24c2703b634 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -267,6 +267,8 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index);
- 
- int kvm_vcpu_finalize_sys_regs(struct kvm_vcpu *vcpu);
- 
-+bool check_sysreg_hidden(struct kvm_vcpu *vcpu, u32 encoding, int sr_idx);
-+
- #define AA32(_x)	.aarch32_map = AA32_##_x
- #define Op0(_x) 	.Op0 = _x
- #define Op1(_x) 	.Op1 = _x
 
 -- 
 Without deviation from the norm, progress is not possible.
