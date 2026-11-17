@@ -1,75 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.197
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.200
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794948226;
-	b=RxIjkN38nl7y7+iEFzpKGssahsE7CnZyU4JC3pK1N4KNCoA9nvwOukBjfIxAbJyt73Rp
-	 wEEvb9TqKUH0pVqPaPTPrSCtFefcn6gh5X8JpH4W5N99hKNpbc3BaLgpTyE9KgxuInK8w
-	 SgvkQi5f4C7AzoHNQiOUB1coiAflEJNH0g3rjzqc+y7sInDtOinXEvsAwj6+MlzqWuwZN
-	 PtaC+NWob2up9H3Y+q0dtT7wq2ZtRWRpXf2WfXMq5IprrDBXLSeXOKn/36J0oeJBYxJ41
-	 esScYmI+VF407bgzUrOgMwP7i2izDXWaMyOO9eDxtMjxH5qjhB88R4JS2W211HW+dfw==
+	t=1794948338;
+	b=IEs20PjgItciKF2IYMyz/J2vgKN0NpGzrljpGp8gy07JLy6SSyRzUUOzdcKaYnY8uh7K
+	 PDhcQpCz7o60mStXcH4VAX21uE83cqtb61vwh9quBPE+MuPkH8LDMvDEJTWMnjLVvVr2A
+	 TwIVLcngN8nQrOZBsfcoBdE4+lJ2Ll5fHhPoYse5OgNn1MlbbeaqrdhWZpdk3X2amJFei
+	 UCTpSbKLpyCXShY+KV4bFHCTYpyY4TyUlJaQOL3yv5oEU42u+U7pxF7P79LjCQPTFIeYq
+	 xC5qPk7gu9pLu1iq5xwtAO4ZVb28onRdJvoqblWgFK+SmtkS3d2s57Cu+S3OOrVNfFw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794948226;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794948338;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
-	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
-	 Content-Type;
-	bh=4s7Hggd7+AEEhOvi2jMoV+jP1lHkwbJcfKFilHVKaf0=;
-	b=JgdJkpyuUgGAwTeAcjDgnUZFlyB6BvGfxpB1fmSzL4bUtzPhk8CbcnV4MxNFVjfN11qw
-	 pBS1vMVanlJODq1LEDXNoYyhd11AM5o92Fyvf6aZAjQgpCgj/mIVRmtN6gNK7PYVMovNJ
-	 puR7ZrJwhhAT/BlBtZpiyZcn+d4hhQX3Q9Lwp/wj1xFkgLQICzZUux7QaS6Rkg1RJJOCL
-	 /AFeAySnT4+kGpgmEbbrgmj93yVDgjhcfiEf6P7x5aQ8uzR7sYb9Ay4fNIHsm9Whi4nnM
-	 Fx+1/gPNMyAGqQzQ/Xzh4/s7e70CNDd6eeVoHKNEDtXLTy6ahrnLJD47BL24Mhb6TdQ==
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
+	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=b6mleucbMdhj8MjjlIVwGs8yhAGAA7tst/tBmXQB1UY=;
+	b=1ADS8IHPcF5uYyhEbhCBmZ2vBKnCxCDReG/vKLzCiwuBVeRDRWyI6qidwYhX5LcWbp7R
+	 zbqtV6kuXmibknCIsgDZwuYKlh1c2+FsY6GGXpbDamWyELGPdJsCFiEGhh7V8KIJ20Ux9
+	 Gr1rHrjWbXEpZgnmZEVOhxrc7PZZEDF/2E7Q34IctoAFjZ2gkrmZEjm1+0XxOwQDSGwhP
+	 uRYYA7jO9gXe/6KdzhMkN9VlPucqzPZI7rcJzkog+rvoCB5vdIbJ5wlnkibq49VyZSDRT
+	 2e03Xg5ndQwou7cxnlHSCcsVTy8YmanGe2J/mLpDhrZn5w9R3C2Ho83AevxOeRWuH9Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=VOOcR4nA;
-	arc=none smtp.remote-ip=209.85.167.197
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com [209.85.167.197])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b="WyMX8/Qo";
+	arc=none smtp.remote-ip=209.85.167.200
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675C8606A31C
-	for <kvmarm@lists.linux.dev>; Tue, 17 Nov 2026 20:43:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 675C8606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE38B606A31C
+	for <kvmarm@lists.linux.dev>; Tue, 17 Nov 2026 20:45:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CE38B606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=VOOcR4nA
-Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-5727b04b81eso83982b6e.3
-        for <kvmarm@lists.linux.dev>; Tue, 17 Nov 2026 12:43:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=WyMX8/Qo
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-5384e381fbbso129323b6e.2
+        for <kvmarm@lists.linux.dev>; Tue, 17 Nov 2026 12:45:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794948225; x=1795553025; darn=lists.linux.dev;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=4s7Hggd7+AEEhOvi2jMoV+jP1lHkwbJcfKFilHVKaf0=;
-        b=VOOcR4nAaH2p5ZvUhbQx77Lp8x4huUAVw0+hEmW9+dIhKM7LQxFS7hI5vBSfGspeTO
-         DbhA0+Z4M/dMhxAnk2AKQ/1WdX4SqfqKH8OndGa/lBl010Mwd/quyHS0O6q1z1b/mktU
-         +JfUuEOy0ITw5pFIF/9pW1jtXKO3UlIbJocqTGhVStn2Wvy9ApGZaMfMMFrjc3rhOa96
-         JO7/4WcudoUSXR2OZ62pBtzMsrkw8RIDOlpH5wVp2zq+0Zr66oavNeXbb5NfnYrZaCte
-         tlVC9JrlOAFHP1fCXqRbYub9YpnGADzUPcIRWukSYB3CjkWDOiMpyCVLCd/CERaNP1NX
-         4b7w==
+        d=google.com; s=20260707; t=1794948337; x=1795553137; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=b6mleucbMdhj8MjjlIVwGs8yhAGAA7tst/tBmXQB1UY=;
+        b=WyMX8/QoPnV8hMMlOhnULn18Mwm1bvsCBZFaavQihOBrK5B0GxY5+hJJSsC2rpMBDV
+         qkJqlEJjCUcRXTBr0kRg6taE5j+YUpt8KtM/NP+ijrcgXdcCCX0jiVKXoAtCiUP2oIi9
+         2vy2xU+H+QJplWrxBfJKnA5R6sDdUf/q2L461bh+qRs0U9FZQiubmMSPcmo3ME4iAHav
+         mbONbMTjJTDlcC5qo2pQThW23gNtQ0oCkIpBHxwptnvapJ67UyGPe05vkrShjZoujD8W
+         1jUph6DqLMRlrP9b15FvS3qhO/cp2hi4lnBLsgKQdJZuGD/WGBICrHwCBUmiakA73uQe
+         lL9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794948225; x=1795553025;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=4s7Hggd7+AEEhOvi2jMoV+jP1lHkwbJcfKFilHVKaf0=;
-        b=LjlmyIqTjO4k5qmuvgpO7nr9BMh9yjThlmWqlLt9B4O9URsrDwiJhmmBi7uMeJ/V/C
-         q89rv8MtLh5bstp6iqPHpX2a7HAJljyfplXn8e/IeEbHrzMCq8WyNgcJMJJXuUBUVjYa
-         AF+oQPvLkzk4NJ0Rwx2+vfh7hodZWz+KlYWKd4KwIcZrp5/F6dOfi2ecIjTLjoWVt/Cg
-         bf/E0R6bXpQ5ARLO/76opvXyBWDhv1/2dOnZGC/KWMwPdUlHVghWNUhuo3+1zjmHg+xR
-         BKvqs6P8baf0EkAwZBVEwcuLiQi1hIlbP9Z9NOGZHIwXILpZcK2bchJqi1Ocjnbl0cs3
-         Etlg==
-X-Forwarded-Encrypted: i=1; AL+hErGeoT0P+dx9dPHe796O5QQ8E04+ThzWE677xu4v5eYbdI1hGMpPatN/mLZ+9Ywd7RjmxVmkciE=@lists.linux.dev
-X-Gm-Message-State: APuU4Z8dKjEHe+2RTUxaV5p8J/MREAUMBvQbTzo3Ly4DQQLe1nI05FEM
-	NvH/qCeEflz/7kPdsK8BjgRRSJacIC3ZtZbl1fPfd5vG+ulminZiLr0G5udqUucydH1g/amd5Lq
-	I5i/TDh0DzrHkXddzc/a2ffPJYg==
-X-Received: from ilbej27-n2.prod.google.com ([2002:a05:6e02:4e1b:20b0:522:8039:f8b4])
+        d=1e100.net; s=20260707; t=1794948337; x=1795553137;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=b6mleucbMdhj8MjjlIVwGs8yhAGAA7tst/tBmXQB1UY=;
+        b=xPRmtH7sc6OirUBghJJNyOXvnC9eNiyl6oYUyInMHTYQlpt6GGLEEknef581FzFBMJ
+         UCUA+iIR6LF/f0Vtxy/+jSo6GsMAye+RpRwZnuhI2pACPFwH1FrRK9ckM/iEiTYSFiEi
+         STBdbJPc2rKd/JTj2mbaQvQkaqtyuoSxsnmfxy9iqX7qMTD63Pf2xtcyuh9dSV4AsQ47
+         OSaL4FoVbm/K7dX93aOGbxJWgkD1sHl/Q3HqZXueBg1w4QVRglZc+sYPDP0VLmxD6bRg
+         raUP/NXTM+N1RJML7WuoTG/7xOTomyfUkcNcTmNAlTvLATVyRWmpTpnMDcIZRpJQUze7
+         ruJw==
+X-Forwarded-Encrypted: i=1; AL+hErFmPP4X0d3F8wSM7tRN3Ca58Yxc1aW8w8N4GCnWQIRiYEoKr3kzo3/VEZdnlgaec9S3f0xmeCw=@lists.linux.dev
+X-Gm-Message-State: APuU4Z8r7LJ87Ujst5LyQkqegVcF37sJe3m3A5ygRnmIrTYGE+Du/LTL
+	+sbGRfC0XR07Uwcf6TkAiU1cWVt961UYDO+0tnpGyTAr1j6VXb39S3SNyULKAtgSdXAFa3s6vFm
+	CKmxoydXDN96RT78hVwN5bsu9Dg==
+X-Received: from jajg7.prod.google.com ([2002:a02:c547:0:b0:61f:ecf1:1cac])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6808:1c0b:b0:571:b166:3d76 with SMTP id 5614622812f47-5773c6322b9mr918759b6e.29.1794948224648;
- Tue, 17 Nov 2026 12:43:44 -0800 (PST)
-Date: Tue, 17 Nov 2026 20:42:19 +0000
-In-Reply-To: <avyNBn24sLjxrfgR@LeoBrasDK>
+ 2002:a05:6808:1387:b0:4c3:e93e:e331 with SMTP id 5614622812f47-5774113234amr977571b6e.30.1794948336458;
+ Tue, 17 Nov 2026 12:45:36 -0800 (PST)
+Date: Tue, 17 Nov 2026 20:45:33 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -79,27 +76,54 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 Mime-Version: 1.0
-References: <20261116200418.3535619-1-coltonlewis@google.com>
- <20261116200418.3535619-2-coltonlewis@google.com> <avyNBn24sLjxrfgR@LeoBrasDK>
 X-Mailer: git-send-email 2.56.1.750.gf70dc682cf-goog
-Message-ID: <20261117204343.4017815-1-coltonlewis@google.com>
-Subject: Re: [PATCH v1 1/2] KVM: arm64: Fix inverted E2H0 check for HCR_EL2.NV1
+Message-ID: <20261117204535.4036191-1-coltonlewis@google.com>
+Subject: [PATCH v2 0/2] KVM: arm64: Fix inverted E2H0 check for HCR_EL2.NV1
 From: Colton Lewis <coltonlewis@google.com>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: Colton Lewis <coltonlewis@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
+Cc: Leonardo Bras <leo.bras@arm.com>, Joey Gouly <joey.gouly@arm.com>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
 	Fuad Tabba <fuad.tabba@linux.dev>, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+	linux-kernel@vger.kernel.org, Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Leonardo Bras <leo.bras@arm.com> writes:
+When commit b2a324ff01fe ("KVM: arm64: Use HCR_EL2 feature map to drive
+fixed-value bits") migrated HCR_EL2 fixed-bit masking to hcr_feat_map,
+feat_nv2_e2h0_ni() was written as !kvm_has_feat(kvm, FEAT_E2H0). Because
+ID_AA64MMFR4_EL1.E2H0 is a signed 4-bit field where IMP is 0, NI is -1,
+and NI_NV1 is -2, !kvm_has_feat(kvm, FEAT_E2H0) tests E2H0 < 0 and
+returns true for NI_NV1 (-2), leaving HCR_EL2.NV1 writable instead of
+RES0 for VHE-only nested guests (and conversely treating HCR_EL2.NV1 as
+RES0 when E2H0 is IMP).
 
-> Maybe feat_nv2_e2h0_not_res0(). What do you think?
+Patch 1 restores the check to kvm_has_feat(kvm, ID_AA64MMFR4_EL1, E2H0,
+NI) (E2H0 >= -1) so that HCR_EL2.NV1 is implemented for IMP and NI and
+forced to RES0 for NI_NV1, and renames the helper from
+feat_nv2_e2h0_ni() to feat_nv2_nv1_not_res0().
+Patch 2 extends the arm64 hello_el2 selftest to verify via
+KVM_SET_ONE_REG and KVM_GET_ONE_REG that HCR_EL2.E2H remains RES1 and
+HCR_EL2.NV1 remains RES0 when E2H0 is NI_NV1.
 
-Agreed on renaming it. Since HCR_EL2.NV1 is the bit marked RES0 (while
-ID_AA64MMFR4_EL1.E2H0 is the signed ID field controlling it), I renamed
-the helper to feat_nv2_nv1_not_res0() in v2.
+Changes in v2:
+- Rename feat_nv2_e2h0_ni() to feat_nv2_nv1_not_res0() to match the
+  condition it checks (Leonardo).
+- Drop the guest EL2 MSR/MRS HCR_EL2 check in hello_el2, as RESx
+  read-back from the guest is not architecturally guaranteed to return
+  the effective value and ID_AA64MMFR4_EL1 reads do not necessarily
+  trap without FEAT_FGT (Marc).
+- Link to v1: https://lore.kernel.org/r/20261116200418.3535619-1-coltonlewis@google.com
 
--- Colton
+Colton Lewis (2):
+  KVM: arm64: Fix inverted E2H0 check for HCR_EL2.NV1
+  KVM: arm64: selftests: Verify HCR_EL2.NV1 is RES0 when E2H0 is NI_NV1
+
+ arch/arm64/kvm/config.c                       | 7 ++++---
+ tools/testing/selftests/kvm/arm64/hello_el2.c | 8 ++++++++
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+
+base-commit: aebb7274476403040d582c61478df8f4a7bf9cd3
+-- 
+2.56.1.750.gf70dc682cf-goog
+
