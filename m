@@ -1,102 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795016139;
-	b=yTeRdqetag0jz/GMswmssB+9Qc6FdILDqxjeHQ1H/Qibz9Pzbuug71TOwyRcz/vvM9GH
-	 /nf7Yt410pAwA57c5YogV06p0KwpN+G5XAVawpk9HKJxF7RGmFcUsbJZibNituG8GbjsN
-	 gjSdBJ9roPK16xJuz+ShX/KQzuHyCyjU4uVXfvqWZHkplioLkPnQHalMiPmzNDujM7cc2
-	 KaiOwvDkoiX4nJ+OzHO3ggwwSP9I0YZSLJuocIOWyR5t4C6huBuU74kTpvCn46PA2Vwbm
-	 QNMHqrwq5X4V46KQC5rctOwqA/N/RDrW/dcrIFsuN3i4Zes6zfwh9+YE6EjYVODAw9g==
+	t=1795018386;
+	b=2bdhl8Ke8OoG+a+SOsN0TAFoKc49vmqIExbeu0QVrNwk2GHqaNjUUOA84dwrwipou8sS
+	 DGUF9J5EdPXQUvhodOCJ5tx8X/Y2moN0azq2tvnK3/CPZ8gJKyYqJx3l+97oQ4WK99rYA
+	 dWU1w3q+vXjaOUAV+l36GlX5d0ZvDIGraWAUKce791PT7awFnYAYstKsHiXwDUNthrL+H
+	 FR8l0qBfO5yMftVmHdLCYo1Mxwi9LdNpgNVBbrpvDjmBU6uplTFay1Yio+O5ENydlMp09
+	 sdr67EkvDrd7fiFzAbfG3FF3haXdGaOpfr30veSpFx18T1JuBTQsj6wPaW9OvVqd1ww==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795016139;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:X-Mailer;
-	bh=I38LaCNb2hWbpAi7aqstQLKMG4G4TLfyKK4eAQEVhf4=;
-	b=ZSLWfWTZ6Qf6CM/y/3KedmVdSuYF4T4DKAbJXXRISrD/iGXJmtbOc1l3m1Hde2YfkNXe
-	 CJ54iWL1fuCRBTsZnq8q61JeILVWE8CYzRVELPMP/zvghEr3k3aomk/SW/eiLAGaCXZtX
-	 fEjGmrwa/OwAri9/XV2yTKA18ldpblwkoW5jquO8oTGMRKHh+GvNf9yd0HDM6m84ZvKta
-	 Pc1efNEBzMTxBFwJTOitv4hqVRAG6eLp6n9rAvsSIn0TnorI14zkPPnt+pJXhSiNrUbyN
-	 e3S0PutRYwqW/N8IN46SnPlE0YGoqJHoW3P6j4E93v+ijDkTUfGunJTbdbodRXjZ/fg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795018386;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
+	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=yYNwdmBSIDxtuxPrHW8cdhm8SfdRppfZaAmTog96H2A=;
+	b=2VwmlbGVaeiWno73AzYiKcRYnYs7mqGPhxtIAtBFpypLWQyzy4U35YEDCtONHsHXqp99
+	 flB4fVn3+hWkUTx11m79W61T0mxX9W1eZN1cipbvoSoqmuZDU4EEkboD1U+MJ2dZYmZIx
+	 Bdh3gW3swLDnROdM9aUKD2K/bd/FRwJykrlhy521V1ozMp+E/8lUeyz9uVi3o8tCjxjlH
+	 mhdK0apwV1MjwjK7XYMKyG3NQ50kQT9Kx4cKDJ7A6ihRWLCkP/ChXQm+WdG1T1FIbp5cn
+	 xAHHZO1CCUp2N1j83DojjoiyvBEKhUYN7brDikJjZ/b33WR+3TBusJB4REF1AiPiY9Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=pereq.eu;
-	spf=pass smtp.mailfrom=cryspen.com;
-	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=EsUaqfWr;
-	arc=none smtp.remote-ip=209.85.221.43
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CFDE606A330
-	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 15:35:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2CFDE606A330
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=VfMYMAuM;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8162606A330;
+	Wed, 18 Nov 2026 16:13:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E8162606A330
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=EsUaqfWr
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-48e10a70540so678556f8f.1
-        for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 07:35:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pereq.eu; s=google; t=1795016136; x=1795620936; darn=lists.linux.dev;
-        h=content-disposition:content-type:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=I38LaCNb2hWbpAi7aqstQLKMG4G4TLfyKK4eAQEVhf4=;
-        b=EsUaqfWrAQlqe1qPm8nPbAvjk5UqfvTjzMXeHPlE06XoczKcBsDpRQNMhKi6aICaHB
-         I1eyqe/EAx+nHmYPab0Ws/hZJrKRS5Jj7/1SlG3eO6y+oU2MnsgcbAl4OLmqe+n+AwuJ
-         wDytVTj++3L7XqtCmsy4eKKCft9RLPkuhBueQr1P5k69mA8F4t3X0clMNfjxtlpO75RG
-         V/WsTW7BonvBOizZ1wZ3PAwY7mFCh1jDlaiKyHE2LhK66pTO0VGPLD4sC4gS2Mt6LdDg
-         b0zcY5kNn5FGrr5U685qtmwyEypjzDZocmgbwmGpSsYfPJVsoaQyuynKjQebT6uM+A/8
-         ikDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795016136; x=1795620936;
-        h=content-disposition:content-type:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=I38LaCNb2hWbpAi7aqstQLKMG4G4TLfyKK4eAQEVhf4=;
-        b=mOVwiEqT1v+ii98L/osxmk0DHm+IbbNIDupU8Knh1oPJZkUR6zwyX95xIhs5k1mb+P
-         oARYMfwGpzd70YDS06LUVpeGZRqZaf7vkVrX93GMCzZE+I48muLSXlQoHHUaWlrnefXx
-         9rBqGeNzg4tDIls8DoA8l6KYDYVd4YnbJEx8uKIhjFwm8MddEuEKjZoSR5doP+Yc90wr
-         H1D0flXzOD13QU0x8C6eP1/KgAmDOQ5TvoQkEZ9tgYAf2+23kYwRp4QrC8dZGXGBnWRZ
-         QoU9dhtHH0f8Oo58I8zwCDp74mTyXmrNoqi78OQI40DZDfdU2MRuQRiP3YyyUhDydMMX
-         6r4g==
-X-Forwarded-Encrypted: i=1; AL+hErFvhbdQtOLpa+fePv9uJDpq/EUwYx1uIIoeFcT/zzLWnvEuU7gk/rhZ+f+vcNFjQ6+nOqbY6i4=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9x3eIJTj4FTrA4TUDrhf9H/LrGYf39obhKRl0ozw9cCiZElSXM
-	hbbOPAsFdRo4Ird4j7Cdot29TmjibsvhltRVbQjtNxjicsTgOZ1Mawbv+WDAJxQ0IcLAaI5Qqfe
-	Bher0gJ8sXg==
-X-Gm-Gg: AZFdTZcDtHB0nZU7Sej/D4MMmDee7cW0du8kr7/CAxSHLv12w9iqtfO0dbCXjsBx/lS
-	1Wjux5UDYwXyDwdWhiDBhkH/5FLIQJOO/DVuJrXz0qE/Cn1kzgPrT+FH+Q0LdVXkWRgjCn2INCz
-	vXqDJU4EKsBzF8KKJfAsgcIe9qvIhn0rpCdI0Ez0QECAIiywD15eAQUDqvWKfSbHV8SLmS4mTwW
-	6tv0hRf/Bvi1mUCb1Fg5mFqCG5cBmxu1kSLtRlc+PXqsvjCdCP1d/ti4WwE0So2yWyCqQQLO1s/
-	EpF5oFW3jA5nzecI4Pv1ZjfRFYz+KcwPRvegzVI35AQiIb06E8++Vj9eV1sbdOYpk1jigwim1/T
-	ubDO+lvJ23ijWz+ic/s/uErz/qPZJ5zxBtQsod+8fjD/4PJYosyQxkz5ZEdGWD4nAfvgIpePvUB
-	xF1u8d3WEgu5DeLooiLb7mNBEFlCcr0/ZuDkZkuQnqgIS+hETYK5VrdnfyKgN2a/dlK9MKUu/l7
-	hGxQ3+H6nn32Qjg8t7QL3zUYrcxAy/pOW0UHjo5SEKyJGCrOE9rmnmynYfHMY5VR3fpSSR+4pwm
-	ZADlhqCNWBWjdft7/XE=
-X-Received: by 2002:a05:6000:144c:b0:4a6:bc53:246d with SMTP id ffacd0b85a97d-4a6bc6269b6mr5843166f8f.45.1795016136152;
-        Wed, 18 Nov 2026 07:35:36 -0800 (PST)
-Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4a656c11643sm5196571f8f.49.2026.11.18.07.35.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 07:35:35 -0800 (PST)
-Date: Wed, 18 Nov 2026 18:35:32 +0300
-From: Dan Carpenter <dan@pereq.eu>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Jintack Lim <jintack.lim@linaro.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	Karthik Bhargavan <karthik@pereq.eu>,
-	=?iso-8859-1?Q?Cl=E9ment?= Blaudeau <clement@cryspen.com>
-Subject: [PATCH] KVM: arm64: nv: Ignore TLBI IPAS2E1 above the IPA limit
-Message-ID: <av3FxJpUvpb_8qMC@stanley.mountain>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=VfMYMAuM
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5FF44339;
+	Wed, 18 Nov 2026 08:13:02 -0800 (PST)
+Received: from [10.57.62.206] (unknown [10.57.62.206])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E29C53F673;
+	Wed, 18 Nov 2026 08:12:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1795018385; bh=7HisUsPk+KXisBKOhhwZZBhSMTa8p36OAkhoTk09/p8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=VfMYMAuMFySbcli51fpiRUiyHhsrWxVA0JvsMlnhNMKHwT3OC8N7svYDR6AXpwyRI
+	 DQ3ucKevGEEZxmSMHnhWCReSwkfPCO0oRhqJaRKuPRh1v7zUXh0fBwqw4KIilbCFx/
+	 PLAJ0VltMjZX2DM+j8kxWZtoujx0Rpj6phIcEFV0=
+Message-ID: <a36b5c53-5148-4b08-b399-ae64b1ad8707@arm.com>
+Date: Wed, 18 Nov 2026 16:12:57 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -106,52 +53,120 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 02/11] KVM: arm64: CCA: Introduce Realms
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ Kohei Enju <enju.kohei@fujitsu.com>
+References: <20261116164358.142785-1-steven.price@arm.com>
+ <20261116164358.142785-3-steven.price@arm.com>
+ <CA+EHjTwfp8p7uwP2LXEqSmTwL6ZHuDCYbvMie_Wr_30xJwfO6A@mail.gmail.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <CA+EHjTwfp8p7uwP2LXEqSmTwL6ZHuDCYbvMie_Wr_30xJwfO6A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-In theory, an L1 hypervisor could issue a TLBI IPAS2E1 for an IPA
-above the host's IPA limit.  The s2_mmu_unmap_ipa() function would
-pass it to kvm_stage2_unmap_range(), the page table walk would fail
-with -ERANGE, and that would trigger the WARN_ON() in
-kvm_vm_stage2_unmap_range():
+On 17/11/2026 14:07, Fuad Tabba wrote:
+> On Mon, 16 Nov 2026 16:43:48 +0000, Steven Price <steven.price@arm.com> wrote:
+> [...]
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> [...]
+>> @@ -1571,31 +1576,39 @@ struct kvm *kvm_arch_alloc_vm(void);
+>>
+>>  #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+>>
+>> -#ifdef __KVM_NVHE_HYPERVISOR__
+>> +#define kvm_vm_is_protected(kvm)        ((kvm)->arch.vm_flavor >= __VM_PROTECTED)
+>>
+>> -#define kvm_vm_is_protected(kvm)                        \
+>> -        (is_protected_kvm_enabled() && ((kvm)->arch.vm_flavor == VM_PROTECTED_PKVM))
+>> +#ifdef __KVM_NVHE_HYPERVISOR__
+>>  /*
+>>   * Accessing vcpu->kvm from nVHE hyp stub is tricky, as we need to convert the
+>>   * pointer to the hyp VA. With pKVM, the nVHE code runs with the hyp_vcpu,
+>> - * which is populated correctly and is gated on is_protected_kvm_enabled().
+>> + * which is populated correctly. Always vcpu_is_protected_pkvm(), which is
+>> + * gated on is_protected_kvm_enabled().
+>>   */
+>> -#define vcpu_is_protected(vcpu)                                                \
+>> +#define vcpu_is_protected(vcpu)                BUILD_BUG_ON(1)
+>> +#else
+>> +#define vcpu_is_protected(vcpu)                kvm_vm_is_protected((vcpu)->kvm)
+>> +#endif
+>> +
+>> +#define kvm_vm_is_protected_pkvm(kvm)                                        \
+>> +        (is_protected_kvm_enabled() && ((kvm)->arch.vm_flavor == VM_PROTECTED_PKVM))
+>> +
+>> +/*
+>> + * Rely on is_protected_kvm_enabled() check in kvm_vm_is_protected_pkvm() to
+>> + * make sure the vcpu->kvm is always valid VA in the context
+>> + */
+>> +#define vcpu_is_protected_pkvm(vcpu)                                        \
+>>          ({                                                                \
+>>                  struct kvm *__kvm = READ_ONCE((vcpu)->kvm);                \
+>>                                                                          \
+>> -                (__kvm && kvm_vm_is_protected(__kvm));                        \
+>> +                (__kvm && kvm_vm_is_protected_pkvm(__kvm));                \
+>>          })
+>>
+>> -#else
+>> -
+>> -#define kvm_vm_is_protected(kvm)        ((kvm)->arch.vm_flavor >= __VM_PROTECTED)
+>> -#define vcpu_is_protected(vcpu)                kvm_vm_is_protected((vcpu)->kvm)
+> 
+> This brings back the _pkvm variants that Marc asked to drop in the
+> plumbing series [1]. In the nVHE hyp code, kvm_vm_is_protected() and
+> vcpu_is_protected() already mean pKVM-protected, so I think the hyp
+> side can stay as it is.
+> 
+> At EL1, the pKVM-only checks that a Realm vCPU also reaches are in
+> kvm_arm_vcpu_power_off() and kvm_psci_vcpu_on(). Could they check
+> vm_flavor == VM_PROTECTED_PKVM directly?
 
-	WARN_ON(stage2_apply_range(mmu, start, start + size, fn, may_block));
+Ah, yes that should work better. Thanks for the suggestion.
 
-The TLBI's IPA field goes up to 48 bits, so this needs a host whose IPA
-limit (its PARange) is below 48 bits, and it would also need to support
-nested virtualization.  There are very few CPUs which meet both these
-requirements.
+>> +#define kvm_vm_is_realm(kvm)                ((kvm)->arch.vm_flavor == VM_REALM)
+>> +#define vcpu_is_rec(vcpu)                kvm_vm_is_realm((vcpu)->kvm)
+> 
+> vcpu_is_rec() isn't used anywhere in this series. Could it be dropped?
 
-The fix for this is to return early.  Since there is nothing mapped above
-the limit, there is nothing to do.  This matches how handle_ripas2e1is()
-also ignores TLBIs that start outside the PA_bits range.
+Yep, I can move it after this series.
 
-Fixes: 70109bcd701e ("KVM: arm64: nv: Handle TLBI IPAS2E1{,IS} operations")
-Signed-off-by: Dan Carpenter <dan@pereq.eu>
----
-This bug was identified as part of our formal analysis work at Pereq.  I
-have not been able to reproduce it on real hardware.  The only CPU Claude
-can think of where you might be able to trigger it is possibly the Apple
-M2?  Not 100% sure about that.
+> [...]
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> [...]
+>> @@ -906,7 +907,8 @@ static bool kvm_arm_vcpu_suspended(struct kvm_vcpu *vcpu)
+>>  /* Only the guest's CPU_ON may start a vCPU EL2 holds powered off. */
+>>  bool kvm_pkvm_vcpu_is_powered_off(struct kvm_vcpu *vcpu)
+>>  {
+>> -        return READ_ONCE(vcpu->arch.mp_state.mp_state) == KVM_MP_STATE_UNINITIALIZED;
+>> +        return vcpu_is_protected_pkvm(vcpu) &&
+>> +                READ_ONCE(vcpu->arch.mp_state.mp_state) == KVM_MP_STATE_UNINITIALIZED;
+> 
+> Only a pVM's vCPU can be in KVM_MP_STATE_UNINITIALIZED, so is this needed?
 
- arch/arm64/kvm/sys_regs.c | 3 +++
- 1 file changed, 3 insertions(+)
+I guess not. I'll drop this change.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index ef4554656ddf..19a914941aff 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -4236,6 +4236,9 @@ static void s2_mmu_unmap_ipa(struct kvm_s2_mmu *mmu,
- 	max_size = compute_tlb_inval_range(mmu, info->ipa.addr);
- 	base_addr &= ~(max_size - 1);
- 
-+	if (base_addr >= kvm_phys_size(mmu))
-+		return;
-+
- 	/*
- 	 * See comment in s2_mmu_unmap_range() for why this is allowed to
- 	 * reschedule.
--- 
-2.53.0
+Thanks,
+Steve
+
+> Cheers,
+> /fuad
+> 
+> [1] https://lore.kernel.org/all/86pkxs2npx.wl-maz@kernel.org/
 
