@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795024768;
-	b=vGPZ/17dmFiAv2USxO83ulFCTmiNHtkSnx8QYYRJGAWgzub/N4swmww7z6rKyumpl8+V
-	 X3nGwu9+B05Mbq8mjT3mdtnbto7FcrvLSSPKSkli0De87GAi4NeDWQRfVxqSOoWGdDBoc
-	 I9719w76qxr/ZFe0puXzgiQHsXye3KJtBS5pp70LZuqHM4p7MXxrjmkns+K1v/s//AV2o
-	 g5Ql/IgYOGm4Naz9VMHHC1RX4iLP5c/wFI+nx9rG2P/TV5PVZCgxd+S66duHrGfD6ZDKE
-	 uT+MZ210xgZtkBCupG7rkCI5idlwSGiwco89qxHxbsPFpkBnqlSGngZhh8T0787be5w==
+	t=1795024772;
+	b=oZ5prq/hhw+UszmhYRP6vga/FssyrCzs95d+aPF/T5PI4HEr3ZF8Wy32ALeJ5WmEqeY+
+	 5mqA+EcMptkTnb+xeD+T1pAzDmn3TGuZpcHjW3vBpOd9C/sIH9qPJpPgXoLVYkio9Y5H5
+	 XKrWPlir99UYvMaSs0kl88O+sgxDVRKKXKDaeGY4ITT2HzgPzOd7QzL7H5pR4ebYaDZkl
+	 qZ7D4z5lJEXSH9xzz8Mk34oCUsGKxR0tSoECgHYJUswC6PTDYIoY3MLZWu/ACB9iRfXhq
+	 8XXRONBsWHh0g9wYsBZKZmNsy2MY4+diFXGgnfIq9D2AF/JOzJBAtrC5ZnHGQ4Z32dQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795024768;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795024772;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
 	 Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=MGoMElNSQBj2t5LiLqacPfbLO7dvGOYEkIJl/gmC47M=;
-	b=LhdBJoHxaEiRkp7WFBaP2yIxP/04J4DtcdA3FaiyeLYQEadYuNa2rdi1bf4caL7/LGJT
-	 2IUxsPmB0MkqN4dOr+ybh94r5IvqEiqkTX/bJ49Idbv68AyhLiVFNM6uRdHpPbT8cBPF1
-	 /ed2K3D3vjUBvpRjv4XJXGJfAe9f6t+n6dROYevzxy3hBf35aPs4QeWq9y33f9XhmdJiW
-	 1K0H7z8MnE6FEXZOTKGZJVqM4lYJOrE7BOartiYcmUhDgylB2ck9zTIYCjUnTm57Ng0+u
-	 O+dbIFSTjVCyawSOqcEJo238F+yoLS95pLF6gVyGdWmrrVcSsCdXsh1zAUzxImTvY2A==
+	bh=9zSIm7gWTYFBc+ECDE60XA8iIL9SluXesnsjWeDWS1s=;
+	b=zKHaVV0tfswRCEEYtzbcM83LIwt/tpAmj42IOKBAJLyQbp5tGbGnqCMx4yduV2zTs7XQ
+	 Ejcwwlba6aXbMFVVKBZYzpaZavoXyHstIDV08QwNAP/Pi6WW3AIf+gmYX2kFVr0cyIXec
+	 X19eK649mrteHmw8saNGkrbV9yHr1g1SOyKiFXlddeq9JwoSMx3g20mOEdmW8+x9s0BVv
+	 MlW1Vg5Ei62t1hxQ/B3HmA47YHKfM6xRC6WP2FjM+aqg3v17NBEcSDlj7NFCSN6qyASK/
+	 H/kkKxWcCSkBoC8nqs7kGMC9DNf+1FB/ZlcmBJU53xkSWW5PXdetA4hxqpMVHTYGeVw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=olqgoVdx;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=s6BmlxCI;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB30060A2609
-	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 17:59:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AB30060A2609
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE54606A32A
+	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 17:59:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BEE54606A32A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=olqgoVdx
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=s6BmlxCI
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 33D701596;
-	Wed, 18 Nov 2026 09:59:24 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 638611477;
+	Wed, 18 Nov 2026 09:59:28 -0800 (PST)
 Received: from e133894.cambridge.arm.com (e133894.arm.com [10.2.80.62])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0EC953FA7A;
-	Wed, 18 Nov 2026 09:59:25 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 09FD93F632;
+	Wed, 18 Nov 2026 09:59:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795024767; bh=ZEEsIqkPi4E30SsVm8RFHWJBm2s2E52PDWePo4fy4a4=;
+	t=1795024771; bh=OXZDPYZiE5lcF81Nwp+XMD7blx4GQLT0uJni+yZYmnc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=olqgoVdx6HAHKVv2ICWpOyX4yEhpl0AeWQdspoWroZPuSO+1qsHQwYe/gCa3177zs
-	 tovqOjKuM6AY8RQIQKwC+o1rOTo9wcV6PmHgcEfvCi+9ZUHv7gyztwtU+ecnV5LrQK
-	 QUeZ29nyAvGazkKYGmd9W6gIWyXiHvPdbozMeqY8=
+	b=s6BmlxCI3t+flYvd7YD5A1v5JZvesYHKTC7VP1h4EZrPgmZtW/e+F+vqbSGLYnLNC
+	 2z2maAv8XA2iOFVPo7me7Am5s/tyTj+pkTiNbeQgG3WNRyrFF583Vb05n1soe3xM85
+	 JQ+x0/zcUXWn/qdoSce2bUppH5gRJmE5cKUXU1Tc=
 From: Sascha Bischoff <sascha.bischoff@arm.com>
 To: will@kernel.org,
 	julien.thierry.kdev@gmail.com
@@ -51,9 +51,9 @@ Cc: vladimir.murzin@arm.com,
 	kvmarm@lists.linux.dev,
 	timothy.hayes@arm.com,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH kvmtool v5 20/23] arm64: Add GICv5 ITS device support
-Date: Wed, 18 Nov 2026 17:57:52 +0000
-Message-Id: <20261118175755.1946977-21-sascha.bischoff@arm.com>
+Subject: [PATCH kvmtool v5 21/23] arm64: Describe the GICv5 ITS in the DT
+Date: Wed, 18 Nov 2026 17:57:53 +0000
+Message-Id: <20261118175755.1946977-22-sascha.bischoff@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261118175755.1946977-1-sascha.bischoff@arm.com>
 References: <20261118175755.1946977-1-sascha.bischoff@arm.com>
@@ -68,149 +68,81 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow the GICv5 ITS irqchip to create a separate KVM ITS device and
-place its CONFIG and TRANSLATE frames immediately below the IRS.
-Reuse the ITS creation helper for GICv3 and GICv5, selecting the
-device and address types for each model.
-
-At this stage, --irqchip=gicv5-its is not yet exposed, and automatic
-irqchip selection starts with GICv5.
+Add an ITS node below the GICv5 IRS node with the CONFIG frame as its
+register region. Add an MSI controller child node for the TRANSLATE
+frame, with a phandle and one MSI cell carrying the DeviceID.
 
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- arm64/gic.c                  | 24 ++++++++++++++++++------
- arm64/include/kvm/gic.h      |  1 +
- arm64/include/kvm/kvm-arch.h |  8 ++++++++
- 3 files changed, 27 insertions(+), 6 deletions(-)
+ arm64/gic.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
 diff --git a/arm64/gic.c b/arm64/gic.c
-index 63e0b979..f19199a3 100644
+index f19199a3..1f837049 100644
 --- a/arm64/gic.c
 +++ b/arm64/gic.c
-@@ -51,6 +51,7 @@ int gic__encode_ppi_irq(enum irqchip_type type, int irq)
- {
- 	switch (type) {
- 	case IRQCHIP_GICV5:
+@@ -565,6 +565,7 @@ void gic__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ 		reg_prop[2] = cpu_to_fdt64(gic_redists_base);
+ 		reg_prop[3] = cpu_to_fdt64(gic_redists_size);
+ 		break;
 +	case IRQCHIP_GICV5_ITS:
- 		return irq | (GICV5_IRQ_TYPE_PPI << GICV5_IRQ_TYPE_SHIFT);
+ 	case IRQCHIP_GICV5:
+ 		return gic__generate_gicv5_fdt_nodes(fdt, kvm);
  	default:
- 		return irq;
-@@ -136,15 +137,15 @@ static int irq__routing_init(struct kvm *kvm)
- 	return 0;
- }
- 
--static int gic__create_its_frame(struct kvm *kvm, u64 its_frame_addr)
-+static int gic__create_its_frame(struct kvm *kvm, u64 its_frame_addr, const bool v5)
- {
- 	struct kvm_create_device its_device = {
--		.type = KVM_DEV_TYPE_ARM_VGIC_ITS,
-+		.type = v5 ? KVM_DEV_TYPE_ARM_VGIC_V5_ITS : KVM_DEV_TYPE_ARM_VGIC_ITS,
- 		.flags	= 0,
+@@ -612,6 +613,16 @@ static void gic__generate_gicv5_fdt_nodes(void *fdt, struct kvm *kvm)
+ 		cpu_to_fdt64(ARM_GICV5_IRS_SETLPI_SIZE)
  	};
- 	struct kvm_device_attr its_attr = {
- 		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
--		.attr	= KVM_VGIC_ITS_ADDR_TYPE,
-+		.attr	= v5 ? KVM_VGIC_V5_ADDR_TYPE_ITS : KVM_VGIC_ITS_ADDR_TYPE,
- 		.addr	= (u64)(unsigned long)&its_frame_addr,
- 	};
- 	struct kvm_device_attr its_init_attr = {
-@@ -155,8 +156,9 @@ static int gic__create_its_frame(struct kvm *kvm, u64 its_frame_addr)
  
- 	err = ioctl(kvm->vm_fd, KVM_CREATE_DEVICE, &its_device);
- 	if (err) {
--		pr_err("GICv3 ITS requested, but kernel does not support it.");
--		pr_err("Try --irqchip=gicv3 instead");
-+		pr_err("GICv%c ITS requested, but kernel does not support it.",
-+			v5 ? '5' : '3');
-+		pr_err("Try --irqchip=gicv%c instead", v5 ? '5' : '3');
- 		return err;
- 	}
- 
-@@ -185,7 +187,9 @@ static int gic__create_msi_frame(struct kvm *kvm, enum irqchip_type type)
- 	case IRQCHIP_GICV2M:
- 		return gic__create_gicv2m_frame(kvm, gic_msi_base);
- 	case IRQCHIP_GICV3_ITS:
--		return gic__create_its_frame(kvm, gic_msi_base);
-+		return gic__create_its_frame(kvm, gic_msi_base, false);
-+	case IRQCHIP_GICV5_ITS:
-+		return gic__create_its_frame(kvm, gic_msi_base, true);
- 	default:	/* No MSI frame needed */
- 		return 0;
- 	}
-@@ -236,6 +240,7 @@ static int gic__set_irs(enum irqchip_type type)
- 
- 	switch (type) {
- 	case IRQCHIP_GICV5:
-+	case IRQCHIP_GICV5_ITS:
- 		return ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &irs_attr);
- 	default:	/* No IRS needed */
- 		return 0;
-@@ -271,6 +276,7 @@ static int gic__set_spi(enum irqchip_type type)
- 
- 	switch (type) {
- 	case IRQCHIP_GICV5:
-+	case IRQCHIP_GICV5_ITS:
- 		spi_base = GICV5_SPI_IRQ_BASE;
- 		fdt_type = GICV5_FDT_IRQ_TYPE_SPI;
- 		break;
-@@ -295,6 +301,7 @@ static int gic__set_ppi(enum irqchip_type type)
- {
- 	switch (type) {
- 	case IRQCHIP_GICV5:
-+	case IRQCHIP_GICV5_ITS:
- 		gic_ppi_base = GICV5_PPI_IRQ_BASE;
- 		gic_ppi_fdt_type = GICV5_FDT_IRQ_TYPE_PPI;
- 		break;
-@@ -323,6 +330,7 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
- 	case IRQCHIP_GICV3_ITS:
- 		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V3;
- 		break;
-+	case IRQCHIP_GICV5_ITS:
- 	case IRQCHIP_GICV5:
- 		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V5;
- 		break;
-@@ -432,6 +440,10 @@ int gic__create(struct kvm *kvm, enum irqchip_type type)
- 		gic_redists_base = ARM_GIC_DIST_BASE - gic_redists_size;
- 		gic_msi_base = gic_redists_base - gic_msi_size;
- 		break;
-+	case IRQCHIP_GICV5_ITS:
-+		gic_msi_base = ARM_GICV5_ITS_BASE;
-+		gic_msi_size = ARM_GICV5_ITS_SIZE;
-+		/* fall through */
- 	case IRQCHIP_GICV5:
- 		gicv5_irs_base = ARM_GICV5_IRS_BASE;
- 		break;
-diff --git a/arm64/include/kvm/gic.h b/arm64/include/kvm/gic.h
-index 9f1a3a25..0a5c70a1 100644
---- a/arm64/include/kvm/gic.h
-+++ b/arm64/include/kvm/gic.h
-@@ -38,6 +38,7 @@ enum irqchip_type {
- 	IRQCHIP_GICV3,
- 	IRQCHIP_GICV3_ITS,
- 	IRQCHIP_GICV5,
-+	IRQCHIP_GICV5_ITS,
- };
- 
- struct kvm;
-diff --git a/arm64/include/kvm/kvm-arch.h b/arm64/include/kvm/kvm-arch.h
-index 94140364..3b0ffead 100644
---- a/arm64/include/kvm/kvm-arch.h
-+++ b/arm64/include/kvm/kvm-arch.h
-@@ -65,6 +65,14 @@
- #define ARM_GICV5_IRS_SETLPI_BASE	(ARM_GICV5_IRS_CONFIG_BASE + ARM_GICV5_IRS_CONFIG_SIZE)
- #define ARM_GICV5_IRS_SETLPI_SIZE	0x10000
- 
-+/* GICv5 ITS CONFIG and TRANSLATE frames precede the IRS frames. */
-+#define ARM_GICV5_ITS_BASE		(ARM_GICV5_IRS_BASE - ARM_GICV5_ITS_SIZE)
-+#define ARM_GICV5_ITS_SIZE		(ARM_GICV5_ITS_CONFIG_SIZE + ARM_GICV5_ITS_TRANSL_SIZE)
-+#define ARM_GICV5_ITS_CONFIG_BASE	ARM_GICV5_ITS_BASE
-+#define ARM_GICV5_ITS_CONFIG_SIZE	0x10000
-+#define ARM_GICV5_ITS_TRANSL_BASE	(ARM_GICV5_ITS_CONFIG_BASE + ARM_GICV5_ITS_CONFIG_SIZE)
-+#define ARM_GICV5_ITS_TRANSL_SIZE	0x10000
++	u64 its_config_reg_prop[] = {
++		cpu_to_fdt64(ARM_GICV5_ITS_CONFIG_BASE),
++		cpu_to_fdt64(ARM_GICV5_ITS_CONFIG_SIZE),
++	};
 +
- #define KVM_PCI_CFG_AREA	ARM_AXI_AREA
- #define ARM_PCI_CFG_SIZE	(1ULL << 28)
- #define KVM_PCI_MMIO_AREA	(KVM_PCI_CFG_AREA + ARM_PCI_CFG_SIZE)
++	u64 its_trans_reg_prop[] = {
++		cpu_to_fdt64(ARM_GICV5_ITS_TRANSL_BASE),
++		cpu_to_fdt64(ARM_GICV5_ITS_TRANSL_SIZE)
++	};
++
+ 	_FDT(fdt_begin_node(fdt, "gicv5-cpuif"));
+ 	_FDT(fdt_property_string(fdt, "compatible", "arm,gic-v5"));
+ 	_FDT(fdt_property_cell(fdt, "#interrupt-cells", GIC_FDT_IRQ_NUM_CELLS));
+@@ -646,6 +657,36 @@ static void gic__generate_gicv5_fdt_nodes(void *fdt, struct kvm *kvm)
+ 	_FDT(fdt_property(fdt, "cpus", cpus, sizeof(u32) * kvm->nrcpus));
+ 	_FDT(fdt_property(fdt, "arm,iaffids", iaffids, sizeof(u16) * kvm->nrcpus));
+ 
++	if (kvm->cfg.arch.irqchip == IRQCHIP_GICV5_ITS) {
++		/*
++		 * GICv5 ITS node
++		 */
++		snprintf(node_at_addr, sizeof(node_at_addr), "its@%llx",
++			 (unsigned long long)ARM_GICV5_ITS_CONFIG_BASE);
++		_FDT(fdt_begin_node(fdt, node_at_addr));
++		_FDT(fdt_property_string(fdt, "compatible", "arm,gic-v5-its"));
++		_FDT(fdt_property_cell(fdt, "#address-cells", 2));
++		_FDT(fdt_property_cell(fdt, "#size-cells", 2));
++		_FDT(fdt_property(fdt, "ranges", NULL, 0));
++
++		_FDT(fdt_property(fdt, "reg", its_config_reg_prop, sizeof(its_config_reg_prop)));
++		_FDT(fdt_property_string(fdt, "reg-names", "ns-config"));
++
++		snprintf(node_at_addr, sizeof(node_at_addr), "msi-controller@%llx",
++			 (unsigned long long)ARM_GICV5_ITS_TRANSL_BASE);
++		_FDT(fdt_begin_node(fdt, node_at_addr));
++		_FDT(fdt_property_cell(fdt, "phandle", PHANDLE_MSI));
++		_FDT(fdt_property(fdt, "msi-controller", NULL, 0));
++		_FDT(fdt_property_cell(fdt, "#msi-cells", 1));
++
++		_FDT(fdt_property(fdt, "reg", its_trans_reg_prop, sizeof(its_trans_reg_prop)));
++		_FDT(fdt_property_string(fdt, "reg-names", "ns-translate"));
++
++		_FDT(fdt_end_node(fdt));
++
++		_FDT(fdt_end_node(fdt));
++	}
++
+ 	_FDT(fdt_end_node(fdt));
+ 
+ 	_FDT(fdt_end_node(fdt));
 -- 
 2.34.1
 
