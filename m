@@ -1,103 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795007161;
-	b=gV3FhrbPV9T1CFo4VY9ho0HXdh56DHCNdmxEGtQsZU6kzA1LYzkVF5F4JVqgHKnk7dzh
-	 r3JVXaW4U9e9n8JgXSN/0VbjAu0fLWePhBj9tTRVBS0/AWREFmx7wKywGHkAAb+ZWd4wY
-	 kj91/96U3ADkei5NvSq7nX1OKSbXyeV3zIhiI8DD8ilPiFu0PFg36ChJ4bETbtRxltkyj
-	 Ax6iCcoK5jEfMiEKb/A9fYkvSpv4N/1JssF9NlsyOzMTIM84c7xqtnm9YTp5I32nkbldN
-	 8nIS4r5oCH+KlFJXkH1BiEQleNd9m/7msTBZjHcHBxKP8TEIUx7nTT0OtpSsNbHebng==
+	t=1795009535;
+	b=17MIEyzomcxkmkXCx5qE670RjajSR2QMpsd2yfLEtDcfegIU+c7HQlm2IiHdHymttwNW
+	 PUj5ZrGsTe7UKHb0Cksh5qKFFUkOhsRPUWRtpq4Yhkkr1p/7D6iwE289FQmq/X7Yth7Fd
+	 RqbCASsHTudOZgjxK4BkJF9R/r0sH6JaOBK1lSY+KYjRYbOnK2B9TtQnX7kjVtYwoauJw
+	 MewqDDFnLoBt5lfEPcFFEXfCxLiXS/kuIWpIEqNW5N2Ye+QrA3YAuteb4DT7rb5PRq7M9
+	 v7mL0njBQIGbHvVae2ZjwxrKg/Dr5pNoHGyFfvCcFHnRxtyAWfK9jQ5+gKkepfHr7lQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795007161;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=OKPy0Il+wJ56FOWGfFGGjchypiWTwMVJH42Ujm6j6NQ=;
-	b=vhdJ7TvEBcnYcpGIocJJMvnh0WF6eymIlLvGXZBbXKTFLDN1ZD14pC5D/TTqdle3U96+
-	 KfIXssUvzimq0FbjN50KkF4Ot0PGNdxPNGSL0UEc0eOtNoHLNTRBHvs2IhPPt4QIWdfNb
-	 VJaiOuUBq6TEpUZVZJQoBRQNnc8O98fs++3WZmSFfW9WgtZgofeDWjblFv27LF78e/rrC
-	 lgYWxcIaXBMY3jlBfueWYUmuIZNebi+vo4tDVtZADfYTYwlhiZfVoO+1zfnBeTrmrN70N
-	 abvenFaoJ/Aiz0iKQjge+boynLwmH8ocW2+IAjLTMVt+bN+m/0NJ+aErWz6Nh5cYnbA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795009535;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=btdBq6aCoOiZ3CdzYw1g+4cWDNUm2li91oUlFkvJcFA=;
+	b=FlUAa+OnAQStZD6j80Hy77HYPLdhSpOLdPmLEGJ6m45WYMRSF05IZnntFHZMEiOvlnwI
+	 iwPCDKFwjtnulK+Cquw1S/d7qApRNF7Bhxe/waWDMiHSuKRubAyhs5O9NGqKJ0yG5LWnx
+	 au9E6SfBJt6BagXuGk5Tacpz9zcZOAyNTANJsXD1FXSHfz4dFQ5XspQSvgk282WBW9LR6
+	 gxkES5an4QKTMqrDUtvOH3pS7j6FxNXJASw/qlmq7bmqCkVYBGlnQvZxAT1YPOkEU/6x1
+	 Piw4rOozYavrkR7hdPrv70AjYfXnuCY1PkWR/EWcm1WV1wx8oB82qkT5UWBJNtxEl2Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=pereq.eu;
-	spf=pass smtp.mailfrom=cryspen.com;
-	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=VNpmbdBU;
-	arc=none smtp.remote-ip=209.85.221.42
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QYSOwNop;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9F0160A2628
-	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 13:05:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E9F0160A2628
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301C3606A333
+	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 13:45:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=VNpmbdBU
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-48dfc0421d9so799416f8f.1
-        for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 05:05:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pereq.eu; s=google; t=1795007158; x=1795611958; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=OKPy0Il+wJ56FOWGfFGGjchypiWTwMVJH42Ujm6j6NQ=;
-        b=VNpmbdBUYQNevC1JymEO0mrouNQ7L+sua4Ro4VToI/JxmiaDBp8hKmqHwsCgVmQijz
-         rc8CsL84sC42kvnjuhNJykOtlULBC4EaLV28iXYWcCI65C/VilCZHFXTd91uliNIkOv+
-         q+xIzOKFL6kQ9E5KpUEqkHr67cZNpBEAVoB5/RalhbPatZGdivcC8p1pmR0S6rxrMEmf
-         koOueHNze1I8Ck0EeKo11tE8/Tv03KErzgjJIow0omql50vfhqbUgmyGRth/AKOJ3OCA
-         rZuHN0wC+MPtsgXhDwj5IyNzpVWxXgDm6w4dTxhiuWrTeP32TiRjJePdXw1+J/un+mWC
-         O/Tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795007158; x=1795611958;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=OKPy0Il+wJ56FOWGfFGGjchypiWTwMVJH42Ujm6j6NQ=;
-        b=dt/kGC7zhtOp0Kozb2Y6EI3ok6MbDiU2ve1fYY44sOiU9c/ZLEUEp0xxOQNqOTmrHV
-         lfbRZ437IkEfA4QNvhpH4etO2A9cl3SSgUbKBOrpa2PBCIDkyEoEh1kAToKk0kowaeaJ
-         ChJW5fBkRyAB+YseD6lgahwpMFIoq4l9+4lMpWIvuqdwImhaK84SXHPyZ9Zm/gg6W1wx
-         SQ4XqddSkHfU6HGk27pgKCYZ0hlB3JbZ4aSU404rbS0uJmNtAnJQHENzHEisUgJKUt6S
-         PBFz7Oaq55GJimgoWWbKMDF7I3wX5GPYchvinT9/T8DsI++DMh6bl3oK7dTcDQTUIDeE
-         1zHA==
-X-Forwarded-Encrypted: i=1; AL+hErEGcqkFsQGeKMhKZybXEQwJ/86JV7w4CnAEpwr1MxF4tVNweEylWMWmOTsX498qeG25w6Gi0Ac=@lists.linux.dev
-X-Gm-Message-State: APuU4Z+DPFRU3YVcpT7hyKBTYN5EmXijhjbKqIl5mvvewmF/BRKC/sxI
-	ITqz1n85TfyLXFn+iOQVj+gLW6tvJx5as6Zw+NT9ax+9S0Nf3qJhVKSNfW57V7TlV2Q=
-X-Gm-Gg: AZFdTZcFWB4GCZZBURYoEvLHggTjH3XYiZoyWFm0rfQqwGfIe9Uhr6MmGWUN026Pa/R
-	HigRJ/YMk7V4PYeAZwtXJgsbqar4U9pyXFZzVst+x3u/SVmT0J+2KnggNCcgnudilPDjnemaMCe
-	JbIM//onv1ZmbBQoEHqEFw0c+DgXx1YZ0uPp1mDBP18++4G4zc9OuLgcGA9ASie5FCVR9nbpOjK
-	yngSGTNm5nae3/YKpRWaBWfDOospLQhYzJCsBOTDC7E9n5MyfxZO9Y9BQ6K2ksbIsFD2em6Oggn
-	8MZ2uF++9iYRchGUYOCYckJifz1pZsvMsFduyP9O2kqBauGBg1f5E29oOLSMpBB6Fchn1XWK7mq
-	Bm3+F2+SVRIglndFlqplVY98mi3VrGEdo/mhSligj5EuKpLuNBo7Y4JCx4HwspaB8DBhTH7wv/S
-	Ond2WBQtJkJrrF+BVaWVuM3UPLFHJNPdlmV2EGyyvkisXswVEnN1xzpoPqnCEX9aKidzQ9r6a8z
-	Q/Hx0nCsvPfUIj2dTc/ecF0QzKtQGCpWcmEN0H9DS2qof7bzDTR4gAw4D+gID0XT9V4pfe5tbjC
-	uRdmypaxS/iUZ7Z5UB4=
-X-Received: by 2002:a05:6000:3cf:b0:4a6:5a2a:f4c4 with SMTP id ffacd0b85a97d-4a65a2af4e3mr5264577f8f.37.1795007158296;
-        Wed, 18 Nov 2026 05:05:58 -0800 (PST)
-Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4a656c11f1csm5156596f8f.53.2026.11.18.05.05.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 05:05:57 -0800 (PST)
-Date: Wed, 18 Nov 2026 16:05:54 +0300
-From: Dan Carpenter <dan@pereq.eu>
-To: Congkai Tan <congkai@amazon.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Fuad Tabba <fuad.tabba@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Haris Okanovic <harisokn@amazon.com>,
-	Stanislav Spassov <stanspas@amazon.de>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	Karthik Bhargavan <karthik@pereq.eu>,
-	=?iso-8859-1?Q?Cl=E9ment?= Blaudeau <clement@cryspen.com>
-Subject: [PATCH v2 2/2] KVM: arm64: nv: Fix NULL dereference in
- kvm_pmu_nested_transition()
-Message-ID: <0f35f6e21bec19774e23c991370488fa99fb37da.1795006659.git.dan@pereq.eu>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QYSOwNop
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 867701F000C8;
+	Wed, 18 Nov 2026 13:45:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795009534;
+	bh=btdBq6aCoOiZ3CdzYw1g+4cWDNUm2li91oUlFkvJcFA=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=QYSOwNopktYpUKLaZzzHI4nCL9nshfkDV+vTiY2ZB8Nl50luE+Roz5Mqzh+r+06vN
+	 mmGrVqR+DWfKI+zpjgn1eQcE9LpydAThP4+Gb4R40a1m2PGxnG8Cih9TlGimtrFSQd
+	 +H+dml0UOz6rcjQTPHvwBzU2NDJLgwekDvIONWJBPvDj/2nxAQLU85ZC6wBuKfayIe
+	 uJ5AoamyO0kTLbbPs3LwZ/lShwxLp/H/jnSN/4bPhAwFKyNDcr8LfA/arww8iaZ3Uj
+	 hCIMbOkXCFRhG7CP4QY7QCtL/PpPUtYwiAI650GCfK31c+08pgFHPRSg4Af3K4HD/m
+	 dnOfXOgtc8S0A==
+Message-ID: <sashiko-outbox-221074@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 1/2] KVM: arm64: Load the vcpu in KVM_SET_VCPU_EVENTS
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Dan Carpenter" <dan@pereq.eu>
+Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>
+In-Reply-To: <033a2d49e0f48426281b46eb1131ae64012aba18.1795006659.git.dan@pereq.eu>
 References: <cover.1795006659.git.dan@pereq.eu>
+ <033a2d49e0f48426281b46eb1131ae64012aba18.1795006659.git.dan@pereq.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 18 Nov 2026 13:45:34 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -106,54 +60,75 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1795006659.git.dan@pereq.eu>
 
-With the KVM_ARM_VCPU_PMU_V3_STRICT feature, kvm->arch.arm_pmu stays
-NULL until userspace selects a PMU with the KVM_ARM_VCPU_PMU_V3_SET_PMU
-attribute.  The KVM_SET_VCPU_EVENTS ioctl can inject an SError or
-external abort before that which leads to a NULL pointer dereference.
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue to consider:
+- [Medium] KVM: arm64: stale mmio_needed after kvm_inject_nested() in
+  KVM_SET_VCPU_EVENTS
+--
 
-Unable to handle kernel NULL pointer dereference at virtual address 00000000000001e8
-  kvm_pmu_create_perf_event (arch/arm64/kvm/pmu-emul.c:710) (P)
-  kvm_pmu_nested_transition (arch/arm64/kvm/pmu-emul.c:1357)
-  kvm_inject_nested (arch/arm64/kvm/emulate-nested.c:2927)
-  kvm_inject_nested_serror (arch/arm64/kvm/emulate-nested.c:2979)
-  kvm_inject_serror_esr (arch/arm64/kvm/inject_fault.c:365)
-  __kvm_arm_vcpu_set_events (arch/arm64/kvm/guest.c:827)
-  kvm_arch_vcpu_ioctl (arch/arm64/kvm/arm.c:2161)
-  kvm_vcpu_ioctl (arch/arm64/kvm/../../../virt/kvm/kvm_main.c:4772)
+commit 178d0de7451612b8ddf14a943cb82094efbd77d1
+Author: Dan Carpenter <dan@pereq.eu>
 
-Return early if the PMU hasn't been initialized to fix this.  After all,
-we can't transition a PMU that doesn't exist.
+KVM: arm64: Load the vcpu in KVM_SET_VCPU_EVENTS
 
-Reported-by: Sashiko <sashiko-bot@kernel.org>
-Closes: https://lore.kernel.org/all/sashiko-outbox-217134@kernel.org/
-Fixes: ad220e275c39 ("KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_STRICT vCPU feature")
-Cc: stable@vger.kernel.org
-Signed-off-by: Dan Carpenter <dan@pereq.eu>
----
-v2: This is a new patch.
+This commit wraps __kvm_arm_vcpu_set_events() in vcpu_load() and vcpu_put()
+so that kvm_inject_nested() operates on a loaded vCPU during
+KVM_SET_VCPU_EVENTS.
 
- arch/arm64/kvm/pmu-emul.c | 3 +++
- 1 file changed, 3 insertions(+)
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 84a52e27ed859..a148e80d0aef7 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -2002,7 +2002,7 @@ static int kvm_arm_vcpu_get_events(struct kvm_vcpu =
+*vcpu,
+>  static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>  				   struct kvm_vcpu_events *events)
+>  {
+> -	int i;
+> +	int i, ret;
+> =20
+>  	/* check whether the reserved field is zero */
+>  	for (i =3D 0; i < ARRAY_SIZE(events->reserved); i++)
+> @@ -2014,7 +2014,11 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu=
+ *vcpu,
+>  		if (events->exception.pad[i])
+>  			return -EINVAL;
+> =20
+> -	return __kvm_arm_vcpu_set_events(vcpu, events);
+> +	vcpu_load(vcpu);
+> +	ret =3D __kvm_arm_vcpu_set_events(vcpu, events);
+> +	vcpu_put(vcpu);
+> +
+> +	return ret;
+>  }
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index e2b28dbc0451..388a6244e7b2 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -1342,6 +1342,9 @@ void kvm_pmu_nested_transition(struct kvm_vcpu *vcpu)
- 	unsigned long mask;
- 	int i;
- 
-+	if (!vcpu->arch.pmu.created)
-+		return;
-+
- 	mask = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
- 	for_each_set_bit(i, &mask, 32) {
- 		struct kvm_pmc *pmc = kvm_vcpu_idx_to_pmc(vcpu, i);
--- 
-2.53.0
+[Severity: Medium]
+Does vcpu->mmio_needed remain set when KVM_SET_VCPU_EVENTS injects an
+exception from L2 that routes to L1 EL2?
 
+When an L2 guest exits with KVM_EXIT_MMIO and userspace aborts the access v=
+ia
+KVM_SET_VCPU_EVENTS (for example with ext_dabt_pending =3D 1 while HCR_EL2.=
+TEA
+is set), kvm_inject_sea_dabt() -> kvm_inject_nested() commits the EL2
+exception entry directly via __kvm_adjust_pc(), which clears
+PENDING_EXCEPTION.  When __kvm_arm_vcpu_set_events() then calls
+commit_pending_events(), PENDING_EXCEPTION is already clear, so it returns
+early without clearing vcpu->mmio_needed:
+
+arch/arm64/kvm/guest.c:commit_pending_events() {
+	if (!vcpu_get_flag(vcpu, PENDING_EXCEPTION))
+		return;
+
+	vcpu->mmio_needed =3D false;
+	kvm_call_hyp(__kvm_adjust_pc, vcpu);
+}
+
+On the next KVM_RUN, kvm_handle_mmio_return() sees vcpu->mmio_needed still
+set, writes the MMIO read value into L1 EL2's destination register and
+advances L1 EL2's exception vector PC by 4 bytes via kvm_incr_pc().
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/cover.1795006659.gi=
+t.dan@pereq.eu?part=3D1
