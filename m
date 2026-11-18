@@ -1,102 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794998487;
-	b=J+vGfx/ud44hQ6MlOKOSPvQ1H942gbEINHSuVDQ2OjaosksQbL9eo99r4qjhuCPDQqSv
-	 DXEd9WWokcKC1sok6297BCTHSqkO1Li6ncEJCcjMR5+JdKIbDlqq2fqj6GnwoRTeGUw6e
-	 76hNxvWAUDSOuWWSvTbOwvqahCyRPUtdLwUIuZRh7Bzo+w/QU4wZxIF+XZ/u/c3LC/+wX
-	 Yb1dKHka/JMX2pb0EZhQ1twESRtMrgIbK9lRXyC2EmwQemzj43RZRvoQGlMbstGDMNdKh
-	 EuiDW1B51CWJqBgkRJ4ENe2qReIMNVJNiTDS1PL2iya6JII8SET0unuRxK16lh+Hhhg==
+	t=1794999312;
+	b=T1D2pwq/6W8jJvd5+Puhspi9wWzhbe10u+RNZVC07nq+MHu1lfQ/AsE4/0fRMJWuCK9s
+	 I1Sf3H+wKeHm8UeIiBfb59CD4sQSaasKVmiu6mtSzKc0XkEwD0x+H4kySdoMWdq2ah3xf
+	 qeThxsyL/NM8j7E5mfei5kawg22VFq2r4QazCM4kdYRAF/QaLmkz700xl1OpsYOm9omiB
+	 V1SWNKnNaObS9QuGTgoK1GJnm4Nrvb6Tr0rfo7So2N+x/rtL9RwlpYBQqebhHC7hJ4d6y
+	 K/j4bAzu0X3YaOLF/HIiIQmJOQilP1KJV0+8bzofOoKZy+6CbqaQ7vnOEuWmzelNmCQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794998487;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=8DddB4BOu0Fwu4SIijc7HO6ywtYEmx0fPwUuOrXpjQw=;
-	b=yS8XhPq4NQRXsXu8fLId3y1xAqW7lPjlYT0bThP5bwqaRPtH6e+bI38y+bCxiEk/g++N
-	 mfT4mMQ4IJOFb1q3Hwg8D3ddquWzi7I178Gno0vqRGmhkC5GRXyuggtNDjBkUqN7FoAsD
-	 Wcl1JGfOOSlqHs2K8XVwQZI+eVtRIwsASAiv6j0YVJE2B5TYc6cKatLd/F0WU9aoW6F8d
-	 GQduzec9mS7QQXOT6oPq7vq/tZVmflPg65vglJtJ9+MgMJdilO6/L6/jSnKGfpO2Cm9Un
-	 i1UHOCBjZZJ1hKlGMygCh26tEC8rhN2jslznKWLhYcfsfzwe003b9piQ7Dop79KYEZw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794999312;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=memSx6w5HIqi6Xog48xQOQU+JeaIiIIsaYQx0kH8P4E=;
+	b=nyqiSk5KBNSHCOlw0tcIpHTacfXDMTVVvp9iZPlelnR/OrK469mAO0QPLijbT6/OrU2c
+	 cGWUk6iwkqlKH1wBrcJnAJXCiZKeSPafrVA4p9CQmRA+PmUrv8E0JlzELJMSq78Yntcf+
+	 mQniIob/O+MsOloNUaIcH3P8MrqIHuWpaNmH/u0o5I/dVSm59xVnlsigMEKEnUJUJiRL8
+	 2rfLXQpPTzjDoLHRF1KiJSS2qM30PPg4LaDswU4oZUbJYAvQhfoLnFMiVCk6hlL4Fn66A
+	 yO9BNdOHAyRO96dmYQMGc9guw3+L+WeEQ8FC180O8KafzKxH0a3kemoZQFEqKYjbXOw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=pereq.eu;
-	spf=pass smtp.mailfrom=cryspen.com;
-	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=YTlHwufU;
-	arc=none smtp.remote-ip=209.85.221.42
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dysLopPW;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59630606A32F
-	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 10:41:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 59630606A32F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53814606A320;
+	Wed, 18 Nov 2026 10:55:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=YTlHwufU
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-490f38e9688so472723f8f.0
-        for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 02:41:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pereq.eu; s=google; t=1794998486; x=1795603286; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=8DddB4BOu0Fwu4SIijc7HO6ywtYEmx0fPwUuOrXpjQw=;
-        b=YTlHwufUyATh0kxqubTeQNAwP5J0ZfLw52oUUT8ZZa59QEolopEy8I83eXUvf1DJNZ
-         CjGpfWNgG4RoJacE4ySTQn4rlip+ncx2OpFoC30Ltzj0Wk5+KK7sSGwezAaQJYEkjFj5
-         D8Xt85eUrSn7158HUlM6cqD/6S/0erWHiDhrJgTgpnIhZAf7aNMg8jXae1T0ILvDwX6v
-         GJiKLlwS5ruB8wn9dPDk2oYxiRHWzpyGVY/mUf+yFoMz/rQYzvaOXLCur421pfSNKfe6
-         M0jOh4o8p43OlJrf8+/Mx6neN/exhhylghQIueZKGUVUNc04NPrf1OQGmPskKmNgfnga
-         Y9pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794998486; x=1795603286;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=8DddB4BOu0Fwu4SIijc7HO6ywtYEmx0fPwUuOrXpjQw=;
-        b=j+N4dOOlYyvtH0Cj02e8jVqjDtYBE/HUOZu3IrO5UYQeEWufjQJA/BftWAcTzqJ+tr
-         Evx9Ltqe/BHXnS+SRj2LZ87Q9OJiVj4RNynkWKF0LNRZPcOTMbPkg2gxq+xzjjRpcvXP
-         4dSqbz9NBTWM1x94iP+v8SqWZKrPyl7xaaKrOK4C9JXTR2j6wK6XaO+BoBBgSEJjHUl7
-         tjgdDZhTJxcSgLMnJ7EPlQoH4TBSS76NsueXfLREVmwYSx2YyTmx3P7fFMnoZawWDEBE
-         kQGl+Z/TusrLYWJv5osUjkcQDvSyUlj5TgVjH8LlfevQqs3IYe7qFlTIMm60l+u7/6Yu
-         3ekg==
-X-Forwarded-Encrypted: i=1; AL+hErGD8QF7mdqfw5xlca2reBvvPHn7MfLu3Az4h9oQFQKpoL7LQIvCEQ4pHcP+C27gFW990iOaiFc=@lists.linux.dev
-X-Gm-Message-State: APuU4Z8cE+aJZal29amVRQo4sIKrqGCzsHziQoBXa6L+ZuFdRltMUDdR
-	SCELfzzbb1HJeIu8l4FmcciP+sHzd7WAebOc3+735tufESkE4w3Yx21ZJAHDZWLBhF0=
-X-Gm-Gg: AZFdTZfHU9VYCkec3zeD5khl/mQGxIusGWR5iMoW235uc3KFnooj6RF9yhdsUehSDdt
-	yb/yvhza8WdR80rWGOECU1vJUEo94XLNUf4Pjig6Aq7V70Dts7GEKboOymKffb4XtRPngF0NibJ
-	esEz69ftTtw2tAt57PdxyzFNbQWwz5Vxa/r4Kv3mEzpYOAQlooxQj7u0z5QQ/LX+bUhkmpsmcHm
-	r2oTc7Pq+XdDunZq5WOYHc5gZB4pBaAzQaVIsbcDCfhvKdSPRoIk8lYmaiSFMm4q/7ity44D4fa
-	iHkygCQG0WN+scrq5Q6qxl69AsDSLw8YHub66PYzh+Uia+n23MB0rdz5pa4rY+c8A5BpEhUdH8R
-	rwU2tfHPpmuIju0GHuEhqAXrxRDP6KN6Nr/NuipQa+eZ+eCPpCr7yr+5Exr8VLBUvTBEzVP400k
-	ZI6tsrKyyYa2Db9dpdkETFkkcChbUMKFadCkAudhLdxUp1KL9tTklYWUoEB9YrtbUeDnvQ9Psr+
-	Ihpzx5RFjnZptoT35y/Oc1IipTfQFzO6bD7iLuaEdi5+7/xvSUvd77IccLSB2/yTxGU12kDikFV
-	3FIh0nQmMPPD3/OyvKMSwvnTCOyGOQXjius6vAIc
-X-Received: by 2002:a05:6000:2489:b0:495:b427:1e6f with SMTP id ffacd0b85a97d-4a62d6d71ebmr4953529f8f.0.1794998485425;
-        Wed, 18 Nov 2026 02:41:25 -0800 (PST)
-Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4a6573baa9fsm4323892f8f.57.2026.11.18.02.41.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 02:41:24 -0800 (PST)
-Date: Wed, 18 Nov 2026 13:41:20 +0300
-From: Dan Carpenter <dan@pereq.eu>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dysLopPW
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 806941F000C4;
+	Wed, 18 Nov 2026 10:55:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794999311;
+	bh=memSx6w5HIqi6Xog48xQOQU+JeaIiIIsaYQx0kH8P4E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=dysLopPW6xzBxxVX4sabNEd7hRGAwc/NKR16PzrI3FOaD3p5wWsfF0tME+iCqseut
+	 JtOSf4LAr+6YdhLpZ4CSyxnk0vu5lHQL4YEROuT/nH6hYJz7KKH1v/tdZd6PovX8zX
+	 NfiCvVElD2VGXMuIuk2zk+KeJUWLpO73HLe2E6KLcUlf7Y4ohXiItq/1KV1s45hv3R
+	 o63fvHyqjmqHDwLm/qcq14HQ5l3CejFYnjhFtP8qPFnmv5lDy3sDBhorIJ4YJyivhO
+	 AU1A/i5pNXhIOb/b2veQbtRZnaQlDyRwjiJLE9CsIWDVP7R+yUMWAsHpY+hBFEMIMh
+	 qyiO/hTdi0TrA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xTdJl-0000000HTmw-1aNo;
+	Wed, 18 Nov 2026 10:55:09 +0000
+Date: Wed, 18 Nov 2026 10:55:08 +0000
+Message-ID: <867bia1kab.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Steffen Eiden <seiden@linux.ibm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Karthik Bhargavan <karthik@pereq.eu>,
-	=?iso-8859-1?Q?Cl=E9ment?= Blaudeau <clement@cryspen.com>
-Subject: Re: [PATCH] KVM: arm64: nv: Fix NULL dereference in
- kvm_inject_nested()
-Message-ID: <av2A0FxSab9P3eMW@stanley.mountain>
-References: <avsH0lxpLIF2Ug64@stanley.mountain>
- <86h5hg1wak.wl-maz@kernel.org>
+	Vincent Donnefort <vdonnefort@google.com>,
+	Quentin Perret <qperret@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 01/19] KVM: arm64: Hide generic ptrauth from protected VMs without ptrauth
+In-Reply-To: <CA+EHjTwJ9XTCfrfBLgGjed3GrRtiTnk-ErvPSwU-AhvyTVcnsw@mail.gmail.com>
+References: <20261109084854.840576-1-fuad.tabba@linux.dev>
+	<20261109084854.840576-2-fuad.tabba@linux.dev>
+	<86bj7n1bzx.wl-maz@kernel.org>
+	<CA+EHjTwJ9XTCfrfBLgGjed3GrRtiTnk-ErvPSwU-AhvyTVcnsw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -105,48 +86,41 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86h5hg1wak.wl-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, vdonnefort@google.com, qperret@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Nov 16, 2026 at 06:11:15PM +0000, Marc Zyngier wrote:
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 5959bbbfa026f..21cd872ea394b 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2007,7 +2007,7 @@ static int kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
->  static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
->  				   struct kvm_vcpu_events *events)
->  {
-> -	int i;
-> +	int i, ret;
->  
->  	/* check whether the reserved field is zero */
->  	for (i = 0; i < ARRAY_SIZE(events->reserved); i++)
-> @@ -2019,7 +2019,11 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
->  		if (events->exception.pad[i])
->  			return -EINVAL;
->  
-> -	return __kvm_arm_vcpu_set_events(vcpu, events);
-> +	vcpu_load(vcpu);
-> +	ret = __kvm_arm_vcpu_set_events(vcpu, events);
-> +	vcpu_put(vcpu);
-> +
-> +	return ret;
->  }
->  
->  /*
+On Tue, 17 Nov 2026 19:47:36 +0000,
+Fuad Tabba <fuad.tabba@linux.dev> wrote:
 > 
-> and be done with it, avoiding the fast-path bloating altogether.
-> Unless you can spot another path where the vcpu is not loaded, but
-> still requires the injection of an exception?
+> Hi Marc,
+> 
+> On Tue, 17 Nov 2026 19:41:54 +0000, Marc Zyngier <maz@kernel.org> wrote:
+> [...]
+> > Burying a fix in a selftest series is a recipe to make sure it is
+> > ignored for a full cycle... Why isn't that with the "massive feature
+> > set" series?
+> 
+> It's in this one because pkvm_id_regs depends on it. The test checks
+> that GPA and GPI read 0 in a protected VM without ptrauth, and it
+> fails without the fix.
 
-I feel like this approach brings arm64 slightly more in line with
-x86 so I like it.  I'll send that.
+But that's a *test*. Nobody runs tests as a production workload.
+Delaying a fix to satisfy testing makes no sense to me. If someone
+screams that their tests are failing, let them scream, safe in the
+knowledge that you have fixed the problem rather than the symptom.
 
-I'm still redoing the TCR2 changes so I won't send those today.
+> Would you prefer that I send it on its own, or with the respin of the
+> features series?
 
-regards,
-dan carpenter
+I'll cherry-pick it directly.
 
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
