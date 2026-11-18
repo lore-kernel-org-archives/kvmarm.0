@@ -1,50 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.5
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.9
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795015152;
-	b=Odd0qDYlSdV+XEnUY76UMF+cZRrT/9Z1xiaAetZLe2abDVaPxEjz/59D/mnKAAK+SO/x
-	 5hIMhCqTJ8BV61Xtfs7phY2/3cfuDB4Ll80ShZSHm0A/EPSrapfup9HnggZS+yqX6WBu3
-	 4OCU9Hpd1DKOc3HnEDD7mGRxoJgU1/52Z+a0BI9bMxR7dzf2RSRMmSdBgIa1pMwPceJQA
-	 wURf3RSbE5+5rcC0EOkozg0lff+MG5A+gi2DXFkTEbeFurek2BY8JEQiV3afp50fF+uo8
-	 vTKjuAGjj6ewj6c4h5qu7phEQNBbQDOdPfOsMB4rR5Oe1vBwRzeV/9aqhN87lZggBOQ==
+	t=1795015156;
+	b=23rmtAq0/+YBlUPg8OZODiMq2hxSCSYdIOnW/v3A4QdytFAsSxPT+d5QIf3ENPjEGpiu
+	 JBl1oE01LR6eVmRGw3boX9Re2H3NXVH5sEWls9tQIsUDTBI7wO7SYZrnDXDctw2TanOc8
+	 CEKaYU4VctQoIiy0cYJds0yVrBcwv27QhuqdKJQCLNIctPLHf5JoXCePDpOiSaJU8Tq+h
+	 l/PbpULUJAacKH4dSJ9x3qK7QWG8aCd1r5kQFPPlyQNMOKZCiCToaED1SmQZfxrueGl12
+	 YvZXLfcA3ZsJWFrGwqHn5qthASEF/aqN52mfZoQEb3mjc5D+8o63qXw/1p+wdH9prtw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795015152;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795015156;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Type:Content-Transfer-Encoding;
-	bh=b/gQvZdYuSoNjfsyaYYmldiSRT42v5KIS64hwTIF/F4=;
-	b=eAyOHN744M47TUZKPmQHQ5n48IUIARuOEcABWSn7Tk90QPnVfCsLZJvHYFF5Aumk/4pN
-	 EsvhDVRWi6qNgTpH8RPIO8ZzujsLqAUjarHoyPlZHGPneO6TTvMa05QxmTMi+RsQrf4Vn
-	 3nX7TQdHXSbfderFMHAtJM/B5yVUlu2ZGAcrXJ47Janui7q/kEO2ly6Jr/stM0ZTtJZOS
-	 1CcrrsYKkJlxhqp40CPieCsCnaSNTvEXFOsy0HU2H3JIYgh0ZCZElRrLOpuwuN7s97BvI
-	 Mz8RKBZzSu0B9LcNWtHUOcOvoWkaKVxDigP1n1Egp0F1ytGUIrUIaL0VmF4+CUXG3Lg==
+	 X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=XxS1Hr5iSvOl6fOwkjhZi3LzWbITchcX649E4+3LqoA=;
+	b=DcmnK8nqwJpDK6nV7cVEroQMFi1mpHwzvQsHXOU6JdlW2o8/tCvlLPiPluTllfBfNWMq
+	 3KMb/nnAXd3AE7In/cPAsykyLqn3dJ1rEwJlSJ7gWhL+O9bleCuV7HGn3vH3dtG6d3LDd
+	 1joCF2dmyHsMaOM+zeNt0uafYo9ds+ZzOCS2Ycapa4GQziV44RqjveNj04pvURQwKQLVh
+	 UrM4Aq/6KC3+d7c6Ri7tXNzRIGxGoIkoy8Q/hytpJDdJk+tA6E/5L4B5kMNpc2X1hB/JP
+	 7O78AJjn8ffSm20KIrk1JXmVxpUnvUCyqEm7+LFSE2EZuiG3/ZIa2r57+ojeYudGpww==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=UsL5AlUb;
-	arc=none smtp.remote-ip=91.218.175.5
-Received: from mta0.migadu.com (out-5.mta0.migadu.com [91.218.175.5])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=pT4iXIZi;
+	arc=none smtp.remote-ip=91.218.175.9
+Received: from mta0.migadu.com (out-9.mta0.migadu.com [91.218.175.9])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6815B606A33D
-	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 15:19:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6815B606A33D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2627E606A336
+	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 15:19:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2627E606A336
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=UsL5AlUb
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=pT4iXIZi
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=F6dPWpezD5NGe7tsKY5+ATADI9q8qmfifryfnNwOJDg=;
+DKIM-Signature: a=rsa-sha256; bh=12FyQSDWC04tw1AfNqnvah2Vp7QoZOeWEZh8bpTz72o=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795015149; v=1; x=1795619949;
- b=UsL5AlUbDWh/19p50gzzwLphRnCXfGIgAskWlrfYE/PSZWxCUhQCZttGoQORTH59g8tuRyCo
- LkNMO7ED3p28DAGdsdrl+UrWSXjPxjxGcFBe5IDwbtjnZ7pQyNO6dth5P+BAgWFYbeUAsyjKqhr
- 4Md6J/rEPVUWIhc+X17kIwwQ=
+ t=1795015154; v=1; x=1795619954;
+ b=pT4iXIZi5+9GTPpooN17TmVPWTOcyrMLbCC96719y1LunQR+qo3uJ0FDUVUTotKS41z9qQbG
+ nPwphHerLiYdU0Svt5gZxMT94I2VXYk33m7eTl+ZDCyXwnE57adRnZpfzz7NxA4OrcaCRe/abpr
+ 25GoHKNlWSmxlYBaZUI9NvEA=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 57c5a3e7a529813e;
-	Wed, 18 Nov 2026 15:19:09 +0000
-X-Mizu-Trace-ID: 57c5a3e7a529813e
+Received: by smtp.migadu.com with ESMTPS id d5f1326243dc5c6c;
+	Wed, 18 Nov 2026 15:19:14 +0000
+X-Mizu-Trace-ID: d5f1326243dc5c6c
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -70,10 +71,12 @@ Cc: Will Deacon <will@kernel.org>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 00/13] KVM: ITS hardening for pKVM
-Date: Wed, 18 Nov 2026 15:18:51 +0000
-Message-ID: <20261118151904.4099560-1-fuad.tabba@linux.dev>
+Subject: [PATCH v4 01/13] KVM: arm64: Donate MMIO to the hypervisor
+Date: Wed, 18 Nov 2026 15:18:52 +0000
+Message-ID: <20261118151904.4099560-2-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261118151904.4099560-1-fuad.tabba@linux.dev>
+References: <20261118151904.4099560-1-fuad.tabba@linux.dev>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -83,115 +86,171 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi folks,
+From: Mostafa Saleh <smostafa@google.com>
 
-Changes since v3 [1]:
-  - The hypervisor never gives an ITT back to the host (patch 11).
-  - The limit on devices per ITS now counts every DeviceID mapped since
-    boot (patch 11).
-  - A host read of an ITS register now aborts, unless the driver reads
-    that register (patch 9).
-  - Rebased on 7.4-rc3.
-  - Various cleanups and wording fixes.
+Add __pkvm_host_donate_hyp_mmio() so IOMMU drivers in the hypervisor can
+take ownership of the IOMMU MMIO. The range is mapped in the hypervisor
+private range and annotated as owned by the hypervisor in the host
+stage-2, so host accesses fault and further donations of the same range
+are refused. MMIO has no struct hyp_page, so the annotation is the only
+state, and a dedicated function is simpler than teaching the memory
+donation path about MMIO. Donation is only allowed before the host is
+de-privileged, which is when the hypervisor IOMMU drivers initialise.
 
-The ITS writes to the memory that its command queue and tables point
-to, and the host programs both, so a host that controls the ITS can
-write to hypervisor and protected-VM memory. With this series the
-hypervisor owns the command queue, the tables and the ITTs, traps every
-host access to the ITS control frame, and checks each command before
-forwarding it to the ITS. The cover letter for v3 [1] describes the
-design in more detail.
+Make kvm_pgtable_stage2_unmap() leave invalid counted PTEs (annotations)
+in place. host_stage2_unmap_dev_all() unmaps all non-memory ranges to
+recycle page-table pages under memory pressure, and would otherwise drop
+the annotation and let the host fault the MMIO back in. No caller depends
+on the old behaviour: host_stage2_unmap_dev_all() only covers non-memory
+ranges, where no annotation existed until now, and the guest unmap paths
+check that the PTE is valid first. Returning an error for counted PTEs
+instead is not an option, as a non-zero visitor return stops the walk,
+which would abort recycling at the first hypervisor-owned MMIO page and
+inject an abort into the host for an unrelated address.
 
-This series covers the ITS. The redistributors will follow in a series
-of their own.
+Link: https://lore.kernel.org/r/20261015200903.2735565-2-smostafa@google.com
+Signed-off-by: Mostafa Saleh <smostafa@google.com>
+[fuad: pass kvm_pgtable_get_leaf() the walk flags ee26443f3dd70 added;
+ drop __pkvm_hyp_donate_host_mmio(), which this series doesn't call]
+Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
+---
+ arch/arm64/include/asm/kvm_pgtable.h          |  2 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  5 ++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 62 ++++++++++++++++++-
+ arch/arm64/kvm/hyp/pgtable.c                  |  8 +--
+ 4 files changed, 70 insertions(+), 7 deletions(-)
 
-Jinjie's series [2] lets the collection table have two levels, which
-this series doesn't handle. Once it's merged, I'll send patches that
-make the hypervisor handle that table the way it handles the device
-table.
-
-Tested on QEMU with a program that writes forged commands, table
-entries and register values to the ITS through /dev/mem from the host's
-userspace. Also tested on FVP, where the ITS uses physical redistributor
-addresses (GITS_TYPER.PTA). There, every secondary CPU was hotplugged
-after the takeover, so that the driver maps each returning CPU's
-collection through the hypervisor with a MAPC that carries a physical
-address.
-
-The series is structured as follows:
-
-  01:     MMIO donation.
-  02:     Taking host-registered MMIO regions at finalisation.
-  03-06:  Driver preparation: GICv4 off, page-aligned ITTs, computing
-          the wait target under the ITS lock, the shared command
-          accessors.
-  07:     Deprivileging the host under stop_machine().
-  08-09:  The takeover: the driver's entry points, then the hypervisor
-          trapping the control frame, taking the command queue and
-          emulating GITS_CTLR and GITS_CBASER.
-  10-11:  The tables and GITS_BASER<n>, then the ITTs.
-  12:     Rejecting commands whose IDs are out of range.
-  13:     Documentation.
-
-Based on Linux 7.4-rc3 (aebb727447640).
-
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/20261102130133.3684226-1-fuad.tabba@linux.dev/
-[2] https://lore.kernel.org/all/20261117123116.591621-1-ruanjinjie@huawei.com/
-
-Bartłomiej Grzesik (2):
-  irqchip/gic-v3: Disable GICv4 features in pKVM
-  irqchip/gic-v3-its: Page-align ITT allocations in pKVM
-
-Fuad Tabba (7):
-  irqchip/gic-v3-its: Compute the wait target under the ITS lock
-  KVM: arm64: Share the ITS command field accessors with the hypervisor
-  KVM: arm64: Deprivilege the host under stop_machine()
-  KVM: arm64: Take the ITS tables and restrict GITS_BASER<n>
-  KVM: arm64: Take the ITT of every device the host maps
-  KVM: arm64: Reject ITS commands whose IDs are out of range
-  Documentation: KVM: arm64: Describe the ITS hardening
-
-Mostafa Saleh (1):
-  KVM: arm64: Donate MMIO to the hypervisor
-
-Sebastian Ene (3):
-  KVM: arm64: Take host-registered MMIO regions at pKVM finalisation
-  irqchip/gic-v3-its: Add the pKVM takeover entry points
-  KVM: arm64: Emulate the ITS command queue
-
- .../admin-guide/kernel-parameters.txt         |   8 +-
- Documentation/virt/kvm/arm/pkvm.rst           |  34 +
- arch/arm64/include/asm/kvm_asm.h              |   2 +
- arch/arm64/include/asm/kvm_hcall.h            |   2 +
- arch/arm64/include/asm/kvm_pgtable.h          |   2 +
- arch/arm64/include/asm/kvm_pkvm.h             |  16 +
- arch/arm64/kvm/arm.c                          |   4 +
- arch/arm64/kvm/hyp/include/nvhe/its_emulate.h |  16 +
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   5 +
- arch/arm64/kvm/hyp/nvhe/Makefile              |   3 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c            |   8 +
- arch/arm64/kvm/hyp/nvhe/its_emulate.c         | 765 ++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 130 ++-
- arch/arm64/kvm/hyp/nvhe/setup.c               |  22 +
- arch/arm64/kvm/hyp/pgtable.c                  |   8 +-
- arch/arm64/kvm/pkvm.c                         | 105 ++-
- arch/arm64/kvm/vgic/vgic-its.c                |  15 -
- drivers/irqchip/irq-gic-common.h              |  13 +
- drivers/irqchip/irq-gic-v3-its.c              | 301 ++++++-
- drivers/irqchip/irq-gic-v3.c                  |   8 +
- include/linux/irqchip/arm-gic-v3.h            |  65 ++
- 21 files changed, 1475 insertions(+), 57 deletions(-)
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/its_emulate.h
- create mode 100644 arch/arm64/kvm/hyp/nvhe/its_emulate.c
-
-
-base-commit: aebb7274476403040d582c61478df8f4a7bf9cd3
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 1c9c57cd6ae40..1a3f6e851c94f 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -721,6 +721,8 @@ int kvm_pgtable_stage2_annotate(struct kvm_pgtable *pgt, u64 addr, u64 size,
+  * freed. Unmapping a cacheable page will ensure that it is clean to the PoC if
+  * FWB is not supported by the CPU.
+  *
++ * Invalid counted PTEs (annotations) are left in place.
++ *
+  * Return: 0 on success, negative error code on failure.
+  */
+ int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size);
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+index ec85a95471207..16e5864ab7f08 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+@@ -36,6 +36,11 @@ int __pkvm_guest_share_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn);
+ int __pkvm_guest_unshare_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn);
+ int __pkvm_host_unshare_hyp(u64 pfn);
+ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
++/*
++ * Donate MMIO range to the hypervisor, it will be mapped in the hypervisor's
++ * private range and unmapped from the host stage-2.
++ */
++int __pkvm_host_donate_hyp_mmio(u64 pfn, u64 nr_pages, unsigned long *haddr);
+ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
+ int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
+ int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index d4c332a918035..a6dacaca77610 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -385,7 +385,11 @@ static int host_stage2_unmap_dev_all(void)
+ 	u64 addr = 0;
+ 	int i, ret;
+ 
+-	/* Unmap all non-memory regions to recycle the pages */
++	/*
++	 * Unmap all non-memory regions to recycle the pages.
++	 * That relies on kvm_pgtable_stage2_unmap() not clearing
++	 * counted PTEs which include hypervisor MMIO.
++	 */
+ 	for (i = 0; i < hyp_memblock_nr; i++, addr = reg->base + reg->size) {
+ 		reg = &hyp_memory[i];
+ 		ret = kvm_pgtable_stage2_unmap(pgt, addr, reg->base - addr);
+@@ -1146,6 +1150,62 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
+ 	return ret;
+ }
+ 
++int __pkvm_host_donate_hyp_mmio(u64 pfn, u64 nr_pages, unsigned long *haddr)
++{
++	u64 phys = hyp_pfn_to_phys(pfn);
++	u64 size = PAGE_SIZE * nr_pages;
++	unsigned long addr;
++	kvm_pte_t pte;
++	u64 offset;
++	int ret;
++
++	/* Only before de-privilege. */
++	if (static_branch_unlikely(&kvm_protected_mode_initialized))
++		return -EPERM;
++
++	if (!pfn_range_is_valid(pfn, nr_pages))
++		return -EINVAL;
++
++	host_lock_component();
++	for (offset = 0; offset < size; offset += PAGE_SIZE) {
++		if (addr_is_memory(phys + offset)) {
++			ret = -EINVAL;
++			goto unlock;
++		}
++		ret = kvm_pgtable_get_leaf(&host_mmu.pgt, phys + offset, &pte, NULL, 0);
++		if (ret)
++			goto unlock;
++		if (pte && !kvm_pte_valid(pte)) {
++			ret = -EPERM;
++			goto unlock;
++		}
++	}
++
++	ret = __pkvm_create_private_mapping(phys, size, PAGE_HYP_DEVICE, &addr);
++	if (ret)
++		goto unlock;
++
++	/*
++	 * Mark the range as owned by the hypervisor in the host stage-2.
++	 * The annotation makes host accesses fault, and is retained by
++	 * host_stage2_unmap_dev_all()
++	 */
++	ret = host_stage2_try(kvm_pgtable_stage2_annotate, &host_mmu.pgt,
++			      phys, size, &host_s2_pool,
++			      KVM_HOST_INVALID_PTE_TYPE_DONATION,
++			      FIELD_PREP(KVM_HOST_DONATION_PTE_OWNER_MASK, PKVM_ID_HYP));
++	if (ret) {
++		hyp_lock_component();
++		WARN_ON(kvm_pgtable_hyp_unmap(&pkvm_pgtable, addr, size) != size);
++		hyp_unlock_component();
++	} else {
++		*haddr = addr;
++	}
++unlock:
++	host_unlock_component();
++	return ret;
++}
++
+ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages)
+ {
+ 	u64 phys = hyp_pfn_to_phys(pfn);
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 9c83837b184d3..041bd0d522f2c 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -1163,13 +1163,9 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
+ 	kvm_pte_t *childp = NULL;
+ 	bool need_flush = false;
+ 
+-	if (!kvm_pte_valid(ctx->old)) {
+-		if (stage2_pte_is_counted(ctx->old)) {
+-			kvm_clear_pte(ctx->ptep);
+-			mm_ops->put_page(ctx->ptep);
+-		}
++	/* Invalid PTEs are left in place, including annotations. */
++	if (!kvm_pte_valid(ctx->old))
+ 		return 0;
+-	}
+ 
+ 	if (kvm_pte_table(ctx->old, ctx->level)) {
+ 		childp = kvm_pte_follow(ctx->old, mm_ops);
 -- 
 2.47.3
 
