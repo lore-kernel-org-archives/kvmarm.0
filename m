@@ -1,57 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795009535;
-	b=17MIEyzomcxkmkXCx5qE670RjajSR2QMpsd2yfLEtDcfegIU+c7HQlm2IiHdHymttwNW
-	 PUj5ZrGsTe7UKHb0Cksh5qKFFUkOhsRPUWRtpq4Yhkkr1p/7D6iwE289FQmq/X7Yth7Fd
-	 RqbCASsHTudOZgjxK4BkJF9R/r0sH6JaOBK1lSY+KYjRYbOnK2B9TtQnX7kjVtYwoauJw
-	 MewqDDFnLoBt5lfEPcFFEXfCxLiXS/kuIWpIEqNW5N2Ye+QrA3YAuteb4DT7rb5PRq7M9
-	 v7mL0njBQIGbHvVae2ZjwxrKg/Dr5pNoHGyFfvCcFHnRxtyAWfK9jQ5+gKkepfHr7lQ==
+	t=1795014041;
+	b=YeImmws8ZfGEfM8Qn5gRXbP89SVKMLFU4ESD0xkOePdOk4rn9zHrzINc/Qwcc+c2Gw3w
+	 03xN3EuNhtOUrK9MbjUGwHRfxAQPXZFjlt5FE40XZlNbocSsn2cZBoPmFim41J2Ky87Nc
+	 TMtc/9Mt1sV1uTKDMsga4AZ+gNA23o7ThgDdusCjoS54TlwxkkTEWNb9LWA9V9JZoikUp
+	 KY8VunrIbGtLuSzu0naAfvbS1eFDd2EdeqJVMglgGmiYLOg3PHn2+/XS3MVPS72JgHBa/
+	 EKXhOvnCb/dJhyZpQa3FQ9kbuj7h/NHcHR7sCuOSDdbJVK9+lAmIx97ssXY3uGn+Zkg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795009535;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=btdBq6aCoOiZ3CdzYw1g+4cWDNUm2li91oUlFkvJcFA=;
-	b=FlUAa+OnAQStZD6j80Hy77HYPLdhSpOLdPmLEGJ6m45WYMRSF05IZnntFHZMEiOvlnwI
-	 iwPCDKFwjtnulK+Cquw1S/d7qApRNF7Bhxe/waWDMiHSuKRubAyhs5O9NGqKJ0yG5LWnx
-	 au9E6SfBJt6BagXuGk5Tacpz9zcZOAyNTANJsXD1FXSHfz4dFQ5XspQSvgk282WBW9LR6
-	 gxkES5an4QKTMqrDUtvOH3pS7j6FxNXJASw/qlmq7bmqCkVYBGlnQvZxAT1YPOkEU/6x1
-	 Piw4rOozYavrkR7hdPrv70AjYfXnuCY1PkWR/EWcm1WV1wx8oB82qkT5UWBJNtxEl2Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795014041;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=q6/RtbwomZxmf6j2uXIJ3iUSV6HbbFnFW/ijGtRHiXM=;
+	b=QK1VmvCraEyBymcOZ8iMGHQbFEQSMzTu6coAku9i1toNwvKC84EH/nqQD9xzq4eBOUoU
+	 D9VvrsX0af36EL2odWHj/rlVqe/KD70cPYP3P7+k/QB3AdQjpJy0COikQZuBogFGS0xX5
+	 AtabjyKTr3IRNUF9WEUv5MmKG3g0mCXb5adnvMyUEbHC6B2Rbeu7dGacWBcpXG6Suf2b7
+	 bvn2RnNN3KDJkr9ouM4Kl9mnUDLUv3xY35AqVhoLaYsiKxexBv4VwhUTuFDGP4e1ncJeO
+	 Pb5AnifkclCqJryAw7SVqEDPKENqjr+wXAbMO/hAQaQeA+nA46DzJij3rX56QhMiPmQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QYSOwNop;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301C3606A333
-	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 13:45:34 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=I50vTSzh;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AFF7606A320
+	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 15:00:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4AFF7606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QYSOwNop
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 867701F000C8;
-	Wed, 18 Nov 2026 13:45:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795009534;
-	bh=btdBq6aCoOiZ3CdzYw1g+4cWDNUm2li91oUlFkvJcFA=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=QYSOwNopktYpUKLaZzzHI4nCL9nshfkDV+vTiY2ZB8Nl50luE+Roz5Mqzh+r+06vN
-	 mmGrVqR+DWfKI+zpjgn1eQcE9LpydAThP4+Gb4R40a1m2PGxnG8Cih9TlGimtrFSQd
-	 +H+dml0UOz6rcjQTPHvwBzU2NDJLgwekDvIONWJBPvDj/2nxAQLU85ZC6wBuKfayIe
-	 uJ5AoamyO0kTLbbPs3LwZ/lShwxLp/H/jnSN/4bPhAwFKyNDcr8LfA/arww8iaZ3Uj
-	 hCIMbOkXCFRhG7CP4QY7QCtL/PpPUtYwiAI650GCfK31c+08pgFHPRSg4Af3K4HD/m
-	 dnOfXOgtc8S0A==
-Message-ID: <sashiko-outbox-221074@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 1/2] KVM: arm64: Load the vcpu in KVM_SET_VCPU_EVENTS
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Dan Carpenter" <dan@pereq.eu>
-Cc: kvmarm@lists.linux.dev, "Oliver Upton" <oupton@kernel.org>, "Marc
- Zyngier" <maz@kernel.org>
-In-Reply-To: <033a2d49e0f48426281b46eb1131ae64012aba18.1795006659.git.dan@pereq.eu>
-References: <cover.1795006659.git.dan@pereq.eu>
- <033a2d49e0f48426281b46eb1131ae64012aba18.1795006659.git.dan@pereq.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 18 Nov 2026 13:45:34 +0000
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=I50vTSzh
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B10EC1477;
+	Wed, 18 Nov 2026 07:00:37 -0800 (PST)
+Received: from [10.0.136.98] (M0PRX50XMG.cambridge.arm.com [10.0.136.98])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 70B203F632;
+	Wed, 18 Nov 2026 07:00:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1795014040; bh=lAqOAZ+NRl4aSYECkflTKHgjeV0Cj+Lx8T55aGUIyiE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=I50vTSzhUV8eFc3Xt7RTfj7vRMBISNll0D+3SGSENDbfsJeSDTljnDqnghS3XQE/1
+	 VpLzeOUVKK4LwDoFPlklH9ytAOelrV54yQdE9QHFaEUKcCyCrCzPpQd/fNwn2TTIPB
+	 nm/AUeahyaEGQ58tJU9k3hjLNEwUTlYGx8pLCtnc=
+Message-ID: <a8117d07-e074-4f6e-afe5-04f1c6949810@arm.com>
+Date: Wed, 18 Nov 2026 15:00:37 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -60,75 +52,204 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH kvmtool v4 03/23] arm64: Split GIC device setup
+To: Vladimir Murzin <vladimir.murzin@arm.com>, will@kernel.org,
+ julien.thierry.kdev@gmail.com
+Cc: maz@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ timothy.hayes@arm.com, Peter Maydell <peter.maydell@linaro.org>
+References: <20261102213413.4136118-1-sascha.bischoff@arm.com>
+ <20261102213413.4136118-4-sascha.bischoff@arm.com>
+ <e641655a-bdaf-4cd8-b61a-b5ba041d732c@arm.com>
+Content-Language: en-GB
+From: Sascha Bischoff <sascha.bischoff@arm.com>
+In-Reply-To: <e641655a-bdaf-4cd8-b61a-b5ba041d732c@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Medium] KVM: arm64: stale mmio_needed after kvm_inject_nested() in
-  KVM_SET_VCPU_EVENTS
---
+On 10/11/2026 15:00, Vladimir Murzin wrote:
+> On 11/2/26 21:33, Sascha Bischoff wrote:
+>> Separate the CPU interface, redistributor and distributor address setup
+>> from GIC device creation. Keep the per-GIC address handling in small
+>> helpers.
+>>
+>> Use the irqchip enum order to omit the GICv2 PPI CPU mask for GICv3
+>> and later generations.
+>>
+>> Suggested-by: Vladimir Murzin <vladimir.murzin@arm.com>
+>> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+>> ---
+>>   arm64/gic.c | 94 +++++++++++++++++++++++++++++++++++------------------
+>>   1 file changed, 62 insertions(+), 32 deletions(-)
+>>
+>> diff --git a/arm64/gic.c b/arm64/gic.c
+>> index f8371f50..57f3fa02 100644
+>> --- a/arm64/gic.c
+>> +++ b/arm64/gic.c
+>> @@ -142,52 +142,90 @@ out_close:
+>>   	return err;
+>>   }
+>>   
+>> -static int gic__create_msi_frame(struct kvm *kvm, enum irqchip_type type,
+>> -				 u64 msi_frame_addr)
+>> +static int gic__create_msi_frame(struct kvm *kvm, enum irqchip_type type)
+>>   {
+>>   	switch (type) {
+>>   	case IRQCHIP_GICV2M:
+>> -		return gic__create_gicv2m_frame(kvm, msi_frame_addr);
+>> +		return gic__create_gicv2m_frame(kvm, gic_msi_base);
+>>   	case IRQCHIP_GICV3_ITS:
+>> -		return gic__create_its_frame(kvm, msi_frame_addr);
+>> +		return gic__create_its_frame(kvm, gic_msi_base);
+>>   	default:	/* No MSI frame needed */
+>>   		return 0;
+> 
+> Nitpick: change is not mentioned in commit log
 
-commit 178d0de7451612b8ddf14a943cb82094efbd77d1
-Author: Dan Carpenter <dan@pereq.eu>
+Thanks, have added that to the commit message!
 
-KVM: arm64: Load the vcpu in KVM_SET_VCPU_EVENTS
+> 
+> 
+>>   	}
+>>   }
+>>   
+>> -static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+>> +static int gic__set_cpu_if(enum irqchip_type type)
+>>   {
+>> -	int err;
+>>   	u64 cpu_if_addr = ARM_GIC_CPUI_BASE;
+>> -	u64 dist_addr = ARM_GIC_DIST_BASE;
+>> -	struct kvm_create_device gic_device = {
+>> -		.flags	= 0,
+>> -	};
+>>   	struct kvm_device_attr cpu_if_attr = {
+>>   		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
+>>   		.attr	= KVM_VGIC_V2_ADDR_TYPE_CPU,
+>>   		.addr	= (u64)(unsigned long)&cpu_if_addr,
+>>   	};
+>> -	struct kvm_device_attr dist_attr = {
+>> -		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
+>> -		.addr	= (u64)(unsigned long)&dist_addr,
+>> -	};
+>> +
+>> +	switch (type) {
+>> +	case IRQCHIP_GICV2M:
+>> +	case IRQCHIP_GICV2:
+>> +		return ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &cpu_if_attr);
+>> +	default:	/* No CPU interface needed */
+>> +		return 0;
+>> +	}
+>> +}
+>> +
+>> +static int gic__set_redist(enum irqchip_type type)
+>> +{
+>>   	struct kvm_device_attr redist_attr = {
+>>   		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
+>>   		.attr	= KVM_VGIC_V3_ADDR_TYPE_REDIST,
+>>   		.addr	= (u64)(unsigned long)&gic_redists_base,
+>>   	};
+>>   
+>> +	switch (type) {
+>> +	case IRQCHIP_GICV3:
+>> +	case IRQCHIP_GICV3_ITS:
+>> +		return ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &redist_attr);
+>> +	default:	/* No redistributor needed */
+>> +		return 0;
+>> +	}
+>> +}
+>> +
+>> +static int gic__set_dist(enum irqchip_type type)
+>> +{
+>> +	u64 dist_addr = ARM_GIC_DIST_BASE;
+>> +	struct kvm_device_attr dist_attr = {
+>> +		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
+>> +		.addr	= (u64)(unsigned long)&dist_addr,
+>> +	};
+>> +
+>> +	switch (type) {
+>> +	case IRQCHIP_GICV2M:
+>> +	case IRQCHIP_GICV2:
+>> +		dist_attr.attr = KVM_VGIC_V2_ADDR_TYPE_DIST;
+>> +		return ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &dist_attr);
+>> +	case IRQCHIP_GICV3:
+>> +	case IRQCHIP_GICV3_ITS:
+>> +		dist_attr.attr = KVM_VGIC_V3_ADDR_TYPE_DIST;
+>> +		return ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &dist_attr);
+>> +	default:	/* No distributor needed */
+>> +		return 0;
+>> +	}
+>> +}
+>> +
+>> +static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+>> +{
+>> +	int err;
+>> +	struct kvm_create_device gic_device = {
+>> +		.flags	= 0,
+>> +	};
+>> +
+>>   	switch (type) {
+>>   	case IRQCHIP_GICV2M:
+>>   	case IRQCHIP_GICV2:
+>>   		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V2;
+>> -		dist_attr.attr  = KVM_VGIC_V2_ADDR_TYPE_DIST;
+>>   		break;
+>>   	case IRQCHIP_GICV3:
+>>   	case IRQCHIP_GICV3_ITS:
+>>   		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V3;
+>> -		dist_attr.attr  = KVM_VGIC_V3_ADDR_TYPE_DIST;
+>>   		break;
+>>   	case IRQCHIP_AUTO:
+>>   		return -ENODEV;
+>> @@ -199,26 +237,19 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+>>   
+>>   	gic_fd = gic_device.fd;
+>>   
+>> -	switch (type) {
+>> -	case IRQCHIP_GICV2M:
+>> -	case IRQCHIP_GICV2:
+>> -		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &cpu_if_attr);
+>> -		break;
+>> -	case IRQCHIP_GICV3_ITS:
+>> -	case IRQCHIP_GICV3:
+>> -		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &redist_attr);
+>> -		break;
+>> -	case IRQCHIP_AUTO:
+>> -		return -ENODEV;
+>> -	}
+>> +	err = gic__set_cpu_if(type);
+>> +	if (err)
+>> +		goto out_err;
+>> +
+>> +	err = gic__set_redist(type);
+>>   	if (err)
+>>   		goto out_err;
+>>   
+>> -	err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &dist_attr);
+>> +	err = gic__set_dist(type);
+>>   	if (err)
+>>   		goto out_err;
+>>   
+>> -	err = gic__create_msi_frame(kvm, type, gic_msi_base);
+>> +	err = gic__create_msi_frame(kvm, type);
+>>   	if (err)
+>>   		goto out_err;
+>>   
+>> @@ -439,8 +470,7 @@ void gic__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+>>   u32 gic__get_fdt_irq_cpumask(struct kvm *kvm)
+>>   {
+>>   	/* Only for GICv2 */
+>> -	if (kvm->cfg.arch.irqchip == IRQCHIP_GICV3 ||
+>> -	    kvm->cfg.arch.irqchip == IRQCHIP_GICV3_ITS)
+>> +	if (kvm->cfg.arch.irqchip >= IRQCHIP_GICV3)
+>>   		return 0;
+>>   
+>>   	if (kvm->nrcpus > 8)
+>> -- 2.34.1
+>>
+> 
+> FWIW:
+> 
+> Reviewed-by: Vladimir Murzin <vladimir.murzin@arm.com>
+> Tested-by: Vladimir Murzin <vladimir.murzin@arm.com>
 
-This commit wraps __kvm_arm_vcpu_set_events() in vcpu_load() and vcpu_put()
-so that kvm_inject_nested() operates on a loaded vCPU during
-KVM_SET_VCPU_EVENTS.
-
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 84a52e27ed859..a148e80d0aef7 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2002,7 +2002,7 @@ static int kvm_arm_vcpu_get_events(struct kvm_vcpu =
-*vcpu,
->  static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
->  				   struct kvm_vcpu_events *events)
->  {
-> -	int i;
-> +	int i, ret;
-> =20
->  	/* check whether the reserved field is zero */
->  	for (i =3D 0; i < ARRAY_SIZE(events->reserved); i++)
-> @@ -2014,7 +2014,11 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu=
- *vcpu,
->  		if (events->exception.pad[i])
->  			return -EINVAL;
-> =20
-> -	return __kvm_arm_vcpu_set_events(vcpu, events);
-> +	vcpu_load(vcpu);
-> +	ret =3D __kvm_arm_vcpu_set_events(vcpu, events);
-> +	vcpu_put(vcpu);
-> +
-> +	return ret;
->  }
-
-[Severity: Medium]
-Does vcpu->mmio_needed remain set when KVM_SET_VCPU_EVENTS injects an
-exception from L2 that routes to L1 EL2?
-
-When an L2 guest exits with KVM_EXIT_MMIO and userspace aborts the access v=
-ia
-KVM_SET_VCPU_EVENTS (for example with ext_dabt_pending =3D 1 while HCR_EL2.=
-TEA
-is set), kvm_inject_sea_dabt() -> kvm_inject_nested() commits the EL2
-exception entry directly via __kvm_adjust_pc(), which clears
-PENDING_EXCEPTION.  When __kvm_arm_vcpu_set_events() then calls
-commit_pending_events(), PENDING_EXCEPTION is already clear, so it returns
-early without clearing vcpu->mmio_needed:
-
-arch/arm64/kvm/guest.c:commit_pending_events() {
-	if (!vcpu_get_flag(vcpu, PENDING_EXCEPTION))
-		return;
-
-	vcpu->mmio_needed =3D false;
-	kvm_call_hyp(__kvm_adjust_pc, vcpu);
-}
-
-On the next KVM_RUN, kvm_handle_mmio_return() sees vcpu->mmio_needed still
-set, writes the MMIO read value into L1 EL2's destination register and
-advances L1 EL2's exception vector PC by 4 bytes via kvm_incr_pc().
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/cover.1795006659.gi=
-t.dan@pereq.eu?part=3D1
