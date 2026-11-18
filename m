@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.239
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795015182;
-	b=ePxQAaTXUwiyOE8a+zAOz/r7yXyPTsDl0fTZhxGIhrw0LIvQ/PyKaw7Hv7ALnxsTHHxE
-	 Bn4xfDWXNGUug0kwDyTYB0EzBXF7FTRROX43O/uobDZ+ZWU3Woda7D1YH5ETT0x43I1CC
-	 j7h71viHafpDmM8OSB9LzQy+JxesovCSIPDGGiIxdGOTCOa73XSiqlVeY5qC4qodIX7WV
-	 zRFYawJVy1/ME7t5jmO918oEiRRZEP/JgV6iECItjHe2mIPA4hppgPFtmCk4TbIYjCqeC
-	 yYkH+4gR1PAdXjXgeJBK79lkmt5crhMNYMBOFUo9dV/Ep8Zgafr3tjkzKb72Uasz6Qg==
+	t=1795015183;
+	b=yNXO1+niEHPQeYnb4VMsieF4L8erx3XCjqdAvL/z2ChdHlGOAIk6fk/n6DV9DpXZDRM9
+	 eUGCF34y/+dPTsldAnfAKPDWGudPrVfydAOHlVK9jsamgUDLuccjijVoCo4n7RdW6oVHy
+	 htzSI7dfJxfOu1SIMLa+v5AGMUArzHl+XfTnMkPsguYWsPCeGcmouZ34uV9S5YFofHB7L
+	 RCPpsHVu/UAdze4VplY06wq9SwtVNS9xUt/jgf3ryntQXpCAE5smT3+8pRlHa0wm00voF
+	 hJ69uRfzt28s5q4fuQmUjf0N11/oM7xm5Zr52S1fkZt6dxJWUQleWHexrKKXJzgDImg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795015182;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795015183;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=Ih7PJseCTUo9992Qi/riC8TJ+5UyoXMZp5GLXDRFGsg=;
-	b=hMZowgG8J8aEJDRMWAI057lgwnm8mpSWFt4Qi/5Q5iMY0B508998J7j4eVPC90vkU34U
-	 CpWexDRAB5vKBf2QVcqmR+U9KzCBiNlkJlQcOlENQbOgQTvDs28Rkc/5X/8Fps9ZmwEvk
-	 HXMqLlckqjOZtJdgZwgMlZdxhiO7c3v07ocwARhE3dcI4GbX3CJtbDF6gi39+nY1ad7ib
-	 tJAUqTGjBimL0BSfJHe8LTO/QkIbgTcT5foRcZyCtdsHZrVepS7iyXjIEC9Gq+3BOsvT6
-	 t1PhLR5ItPoeTB4UFDQ0HA7aJnyNGVXjhEP2WSvzO5df+qGqJTU+YSlDw+BWBxXHnuw==
+	bh=SujFBGnh6yTulhxhe+ai56SzIpUdalRGR1bKdRxm9dY=;
+	b=qzIb5G7zPVNAfrDezLVDYnum/bkf1d15/UvVfWDcQRMt8pPOWqKyFubUYQsALoHL6f85
+	 pBeihm+J53SMfYiqOgzwk3b4l5hBUzgKTwLkaFDYLZgMmxMYP0P5uii9k9nlRG78ujOiS
+	 QZPnNs7vrSbdOIdG74XBLlb+eEWZVxNk4MqTQu+v0ckrWYmNb74dCFrk4PpLhj3lpX2Ex
+	 4Y+YDLIEQaGGpVVoGD0XCKCUUj/2nLmNj0ebqNNgLfAFaRwY77F2a3wBrmJ4BlCOzunF1
+	 jbQicf6o8drqCXp80imEaHf6OKmPnAo34DiQTWBVvUBwzzwAZrwA3Kcj/waz0kV8wAg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="vA/uNhz8";
-	arc=none smtp.remote-ip=95.215.58.239
-Received: from mta1.migadu.com (out-239.mta1.migadu.com [95.215.58.239])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=nTtqyQ+t;
+	arc=none smtp.remote-ip=91.218.175.46
+Received: from mta0.migadu.com (out-46.mta0.migadu.com [91.218.175.46])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60297606A32C
-	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 15:19:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 60297606A32C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41462606A337
+	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 15:19:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 41462606A337
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=vA/uNhz8
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=nTtqyQ+t
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=g087P9+edDWSWSxVVt+5nxjxLatHb08fe1Dv5ib5o6Y=;
+DKIM-Signature: a=rsa-sha256; bh=LaHx7qcqjbwEKcmj0Cj8QcEXuKFYCBuqRrKkPXxYHjQ=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795015179; v=1; x=1795619979;
- b=vA/uNhz8F2uBN8nnSsSN1c42pP/m3YPB3Rr+gI36JK7b/6mu30O8joF+JANxagXYpYNmlqt1
- CtSfXCafKBFyNgqmb/5jIqbw0GfwM76hSkQ7ZOBfwa0iYxtO1ekGtd3rzWWog2oOc1gYtp/JyA/
- SDtNgdzB7/F7YcDlKTGS8jHo=
+ t=1795015180; v=1; x=1795619980;
+ b=nTtqyQ+tY34a17lqzHxa4NvK/WH2RL9iNEMV9574d37qvkRmAhpvU+1N5oZCWnzak9prDmLE
+ NX+Z7ct8eSllzk/mRLA9CdW+nL5PeUvkQJI76iTOsGUAMOeNs+Ik0FynDAH9fGYjkR5xG9hmhY3
+ 5ab/P81YhtRlL3G6D1a36Xuk=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 76ddee6606c60c99;
-	Wed, 18 Nov 2026 15:19:39 +0000
-X-Mizu-Trace-ID: 76ddee6606c60c99
+Received: by smtp.migadu.com with ESMTPS id e544babb2f80ab37;
+	Wed, 18 Nov 2026 15:19:40 +0000
+X-Mizu-Trace-ID: e544babb2f80ab37
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -71,9 +71,9 @@ Cc: Will Deacon <will@kernel.org>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 06/13] KVM: arm64: Share the ITS command field accessors with the hypervisor
-Date: Wed, 18 Nov 2026 15:18:57 +0000
-Message-ID: <20261118151904.4099560-7-fuad.tabba@linux.dev>
+Subject: [PATCH v4 07/13] KVM: arm64: Deprivilege the host under stop_machine()
+Date: Wed, 18 Nov 2026 15:18:58 +0000
+Message-ID: <20261118151904.4099560-8-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261118151904.4099560-1-fuad.tabba@linux.dev>
 References: <20261118151904.4099560-1-fuad.tabba@linux.dev>
@@ -88,105 +88,63 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The vgic's ITS emulation reads command fields with its_cmd_mask_field()
-and the its_cmd_get_*() accessors. struct its_cmd_block, the block they
-decode, is private to the ITS driver, but in a subsequent patch the
-hypervisor parses the host's commands too.
+pkvm_drop_host_privileges() installs the host stage 2 with
+on_each_cpu(), and each CPU goes back to running the host as soon as its
+own __pkvm_prot_finalize() returns. That doesn't work for the ITS
+takeover that a subsequent patch adds here. The other CPUs must not post
+ITS commands while the driver switches to its copy of the command queue,
+and a takeover that fails has to leave every CPU privileged.
 
-Move the command block and the accessors to arm-gic-v3.h, which already
-holds the GITS_CMD_* encodings, so there is one copy of each. Only KVM
-reads commands, but the accessors decode the block the driver writes, so
-they sit with it rather than in a KVM header.
-
-No functional change intended.
+Finalise from a stop_machine() callback instead, so that the takeover
+can run with the other CPUs stopped and before any CPU is finalised. An
+error from any CPU is still returned to finalize_pkvm().
 
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/kvm/vgic/vgic-its.c     | 15 ---------------
- drivers/irqchip/irq-gic-v3-its.c   | 10 ----------
- include/linux/irqchip/arm-gic-v3.h | 22 ++++++++++++++++++++++
- 3 files changed, 22 insertions(+), 25 deletions(-)
+ arch/arm64/kvm/pkvm.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 7e9b265b1f521..78e480d112025 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -802,21 +802,6 @@ static bool vgic_its_map_lpi(struct kvm *kvm, struct its_ite *ite,
- 	return false;
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 016997288fd23..16dfb249b4961 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -11,6 +11,7 @@
+ #include <asm/kvm_mmu.h>
+ #include <linux/memblock.h>
+ #include <linux/mutex.h>
++#include <linux/stop_machine.h>
+ 
+ #include <asm/kvm_pkvm.h>
+ 
+@@ -312,25 +313,19 @@ int pkvm_init_host_vm(struct kvm *kvm)
+ 	return 0;
  }
  
--static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
--{
--	return (le64_to_cpu(its_cmd[word]) >> shift) & (BIT_ULL(size) - 1);
--}
+-static void __init _kvm_host_prot_finalize(void *arg)
++static int __init __pkvm_drop_host_privileges(void *arg)
+ {
+-	int *err = arg;
 -
--#define its_cmd_get_command(cmd)	its_cmd_mask_field(cmd, 0,  0,  8)
--#define its_cmd_get_deviceid(cmd)	its_cmd_mask_field(cmd, 0, 32, 32)
--#define its_cmd_get_size(cmd)		(its_cmd_mask_field(cmd, 1,  0,  5) + 1)
--#define its_cmd_get_id(cmd)		its_cmd_mask_field(cmd, 1,  0, 32)
--#define its_cmd_get_physical_id(cmd)	its_cmd_mask_field(cmd, 1, 32, 32)
--#define its_cmd_get_collection(cmd)	its_cmd_mask_field(cmd, 2,  0, 16)
--#define its_cmd_get_ittaddr(cmd)	(its_cmd_mask_field(cmd, 2,  8, 44) << 8)
--#define its_cmd_get_target_addr(cmd)	its_cmd_mask_field(cmd, 2, 16, 32)
--#define its_cmd_get_validbit(cmd)	its_cmd_mask_field(cmd, 2, 63,  1)
--
- /*
-  * The DISCARD command frees an Interrupt Translation Table Entry (ITTE).
-  * Must be called with the its_lock mutex held.
-diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index 734fe4fb52bd6..df6d7b2fc8611 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -528,16 +528,6 @@ struct its_cmd_desc {
- 	};
- };
- 
--/*
-- * The ITS command block, which is what the ITS actually parses.
-- */
--struct its_cmd_block {
--	union {
--		u64	raw_cmd[4];
--		__le64	raw_cmd_le[4];
--	};
--};
--
- #define ITS_CMD_QUEUE_SZ		SZ_64K
- #define ITS_CMD_QUEUE_NR_ENTRIES	(ITS_CMD_QUEUE_SZ / sizeof(struct its_cmd_block))
- 
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index ea5fd2374ebe0..e0bec40adf2b7 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -657,6 +657,28 @@ static inline bool gic_enable_sre(void)
- 	return !!(val & ICC_SRE_EL1_SRE);
+-	if (WARN_ON(kvm_call_hyp_nvhe(__pkvm_prot_finalize)))
+-		WRITE_ONCE(*err, -EINVAL);
++	return WARN_ON(kvm_call_hyp_nvhe(__pkvm_prot_finalize)) ? -EINVAL : 0;
  }
  
-+struct its_cmd_block {
-+	union {
-+		u64	raw_cmd[4];
-+		__le64	raw_cmd_le[4];
-+	};
-+};
-+
-+static inline u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
-+{
-+	return (le64_to_cpu(its_cmd[word]) >> shift) & (BIT_ULL(size) - 1);
-+}
-+
-+#define its_cmd_get_command(cmd)	its_cmd_mask_field(cmd, 0,  0,  8)
-+#define its_cmd_get_deviceid(cmd)	its_cmd_mask_field(cmd, 0, 32, 32)
-+#define its_cmd_get_size(cmd)		(its_cmd_mask_field(cmd, 1,  0,  5) + 1)
-+#define its_cmd_get_id(cmd)		its_cmd_mask_field(cmd, 1,  0, 32)
-+#define its_cmd_get_physical_id(cmd)	its_cmd_mask_field(cmd, 1, 32, 32)
-+#define its_cmd_get_collection(cmd)	its_cmd_mask_field(cmd, 2,  0, 16)
-+#define its_cmd_get_ittaddr(cmd)	(its_cmd_mask_field(cmd, 2,  8, 44) << 8)
-+#define its_cmd_get_target_addr(cmd)	its_cmd_mask_field(cmd, 2, 16, 32)
-+#define its_cmd_get_validbit(cmd)	its_cmd_mask_field(cmd, 2, 63,  1)
-+
- #endif
+ static int __init pkvm_drop_host_privileges(void)
+ {
+-	int ret = 0;
+-
+ 	/*
+ 	 * Flip the static key upfront as that may no longer be possible
+ 	 * once the host stage 2 is installed.
+ 	 */
+ 	static_branch_enable(&kvm_protected_mode_initialized);
+-	on_each_cpu(_kvm_host_prot_finalize, &ret, 1);
+-	return ret;
++	return stop_machine(__pkvm_drop_host_privileges, NULL, cpu_online_mask);
+ }
  
- #endif
+ static void __init pkvm_selftests(void)
 -- 
 2.47.3
 
