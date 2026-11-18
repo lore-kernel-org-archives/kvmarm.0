@@ -1,50 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.5
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795015123;
-	b=k+9DBFcz4EtpDa3k+AOifDO/sigF7q1sX0n23LO92AIFf75MX0btBshNZLhlfZU4esB6
-	 u7mZE8HKQYkO+hPob8/i7lbJsNIN3dbT6PVUdNMWnMZAFdUvwGhE6ritkGf0RZrr/i/+v
-	 VBGCRL0/VZbmYXY//Ofgui2deBCvLvs9b4XaFQu6t5FfAh9wiR6qSdiTszFSVKn14egbA
-	 eVvzbwMcWDg/1u3OYfvm/1qc7AeJ4BFfDkx3bCM0hD4AuLIUUHgfxU9pZw0CZOoX9umHW
-	 nEnN0v0R6OGj3UBqOzrtEaLyLhMkP9F//nOiwF+X5V4ZjCLsCw6XmsNrKR4m+DFNOlQ==
+	t=1795015152;
+	b=Odd0qDYlSdV+XEnUY76UMF+cZRrT/9Z1xiaAetZLe2abDVaPxEjz/59D/mnKAAK+SO/x
+	 5hIMhCqTJ8BV61Xtfs7phY2/3cfuDB4Ll80ShZSHm0A/EPSrapfup9HnggZS+yqX6WBu3
+	 4OCU9Hpd1DKOc3HnEDD7mGRxoJgU1/52Z+a0BI9bMxR7dzf2RSRMmSdBgIa1pMwPceJQA
+	 wURf3RSbE5+5rcC0EOkozg0lff+MG5A+gi2DXFkTEbeFurek2BY8JEQiV3afp50fF+uo8
+	 vTKjuAGjj6ewj6c4h5qu7phEQNBbQDOdPfOsMB4rR5Oe1vBwRzeV/9aqhN87lZggBOQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795015123;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Content-Type:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:From:
-	 Content-Language:In-Reply-To;
-	bh=y2Daclv3pL9H+Z77v1N/YFpOGh7HbXy37WIqhvkcADA=;
-	b=SfuT01LE4tx72wzOzFLcmT1P5h5UGR+hUWidmeB1Ngk+RlTv6lxV0w4KZ/TItlQfkuwg
-	 A+6KQOD/7qDNttuwIHItLwX1dBijRHYkmNj72PDpTZI8My/qSZLgEaC6Hvl20tuWtUc99
-	 ++KRK+wfTyWIw7FPsnfK9Hs2mAJb4pLEqCSVNP0S9PeO0lkqEOrfaqbQTVwx1V+Og9fsY
-	 mpP96k49iPBGE+XwnjGgNUP5UVnZ9y1nTTA6G0CQMpFtJ9lJ2xNKtsFd9eVGaB0+tWJ7I
-	 fLxnRKphHOmIyqWBY7LIpuJpQxydJHZjAp1biroE+tRooeeh/b+WqGiuu58OaHv8auQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795015152;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Type:Content-Transfer-Encoding;
+	bh=b/gQvZdYuSoNjfsyaYYmldiSRT42v5KIS64hwTIF/F4=;
+	b=eAyOHN744M47TUZKPmQHQ5n48IUIARuOEcABWSn7Tk90QPnVfCsLZJvHYFF5Aumk/4pN
+	 EsvhDVRWi6qNgTpH8RPIO8ZzujsLqAUjarHoyPlZHGPneO6TTvMa05QxmTMi+RsQrf4Vn
+	 3nX7TQdHXSbfderFMHAtJM/B5yVUlu2ZGAcrXJ47Janui7q/kEO2ly6Jr/stM0ZTtJZOS
+	 1CcrrsYKkJlxhqp40CPieCsCnaSNTvEXFOsy0HU2H3JIYgh0ZCZElRrLOpuwuN7s97BvI
+	 Mz8RKBZzSu0B9LcNWtHUOcOvoWkaKVxDigP1n1Egp0F1ytGUIrUIaL0VmF4+CUXG3Lg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="a/CjEp/l";
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C3CC60A2603;
-	Wed, 18 Nov 2026 15:18:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3C3CC60A2603
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=UsL5AlUb;
+	arc=none smtp.remote-ip=91.218.175.5
+Received: from mta0.migadu.com (out-5.mta0.migadu.com [91.218.175.5])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6815B606A33D
+	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 15:19:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6815B606A33D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=a/CjEp/l
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A28B21655;
-	Wed, 18 Nov 2026 07:18:39 -0800 (PST)
-Received: from [10.57.62.206] (unknown [10.57.62.206])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C9A9D3F632;
-	Wed, 18 Nov 2026 07:18:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795015122; bh=w8XDtw7u6zTGcD/Dwtz8Nec/j+mFGkTq9Cwd9QWx4y0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=a/CjEp/lWJU4QLjpelP/JTZv2ruOnbBbt+JLSbKpYAP4VCqrHHdtlgkcAWih3sdxj
-	 WYJKvmin5k2Qjivd13tyo7baEd5InyOwxPHvleh83xiTrhEYXBsYsilr0DlLJongQ1
-	 fQ7iiucy60FJx40w9DUaxvWafVfHMCNzI7k8LEzc=
-Content-Type: multipart/mixed; boundary="------------DUFNbHBbvPDY00EhsT6K87G7"
-Message-ID: <cc27e6a8-6bfa-4c82-92a7-33175baf6803@arm.com>
-Date: Wed, 18 Nov 2026 15:18:35 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=UsL5AlUb
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=F6dPWpezD5NGe7tsKY5+ATADI9q8qmfifryfnNwOJDg=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1795015149; v=1; x=1795619949;
+ b=UsL5AlUbDWh/19p50gzzwLphRnCXfGIgAskWlrfYE/PSZWxCUhQCZttGoQORTH59g8tuRyCo
+ LkNMO7ED3p28DAGdsdrl+UrWSXjPxjxGcFBe5IDwbtjnZ7pQyNO6dth5P+BAgWFYbeUAsyjKqhr
+ 4Md6J/rEPVUWIhc+X17kIwwQ=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id 57c5a3e7a529813e;
+	Wed, 18 Nov 2026 15:19:09 +0000
+X-Mizu-Trace-ID: 57c5a3e7a529813e
+X-Migadu-Flow: FLOW_OUT
+From: Fuad Tabba <fuad.tabba@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>
+Cc: Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Sebastian Ene <sebastianene@google.com>,
+	=?UTF-8?q?Bart=C5=82omiej=20Grzesik?= <bgrzesik@google.com>,
+	Mostafa Saleh <smostafa@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Vladimir Murzin <vladimir.murzin@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Zenghui Yu <zenghui.yu@linux.dev>,
+	Steffen Eiden <seiden@linux.ibm.com>,
+	Radu Rendec <radu@rendec.net>,
+	Fuad Tabba <tabba@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v4 00/13] KVM: ITS hardening for pKVM
+Date: Wed, 18 Nov 2026 15:18:51 +0000
+Message-ID: <20261118151904.4099560-1-fuad.tabba@linux.dev>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -54,117 +83,115 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 01/11] KVM: arm64: guest_memfd: Check mmap support when
- preparing memslot
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Kohei Enju <enju.kohei@fujitsu.com>
-References: <20261116164358.142785-1-steven.price@arm.com>
- <20261116164358.142785-2-steven.price@arm.com>
- <CA+EHjTy5xBmavNWSYPjqU9qXtssV3ZHzsUr1s_4bVOt1GnDLVg@mail.gmail.com>
- <6bb490cd-ebbe-41d7-adf3-d6eaf0e53478@arm.com>
- <b1ef7241-54b0-4a17-83b6-0008e722f2f6@arm.com>
- <8a095a42-662a-416d-a5d7-79e10161201c@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <8a095a42-662a-416d-a5d7-79e10161201c@arm.com>
-
-This is a multi-part message in MIME format.
---------------DUFNbHBbvPDY00EhsT6K87G7
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 18/11/2026 12:04, Suzuki K Poulose wrote:
-> On 18/11/2026 11:14, Steven Price wrote:
->> On 18/11/2026 10:34, Suzuki K Poulose wrote:
->>> Hi Steven
->>>
->>> On 17/11/2026 14:05, Fuad Tabba wrote:
->>>> Hi Steven,
->>>>
->>>> On Mon, 16 Nov 2026 16:43:47 +0000, Steven Price
->>>> <steven.price@arm.com> wrote:
->>>>> Check the guest_memfd backing file when deciding whether an arm64
->>>>> memslot has mappable memory rather than checking whether the slot is
->>>>> gmem only. A public helper function is added to be able to reuse the
->>>>> static kvm_gmem_supports_mmap() function.
->>>>
->>>> nit: could the message say why this is needed? It's a no-op until
->>>> patch 8 defines kvm_arch_has_private_mem(), which makes every
->>>> guest_memfd slot gmem-only.
->>>
->>> I still don't understand why this is needed. For arm64 we have always
->>> prevented guest_memfd without MMAP, in kvm_arch_prepare_memory_region().
->>
->> Fuad is correct, this isn't really needed until patch 8. Patch 8 defines
->> kvm_arch_has_private_mem() - that means that gmem_in_place_conversion
->> becomes true (see include/linux/kvm_host.h). That in turn means that
-> 
->> every guest_memfd slot is KVM_MEMSLOT_GMEM_ONLY including slots backed
->> by a file without mmap support.
-> 
-> But we dont support slots without MMAP anyways even without this series.
->  So, does it really matter for arm64 ?
+Hi folks,
 
-So ChatGPT produced the attached test. It creates a non-mappable gmem
-and tries to add it to a normal (non-realm/non-pkvm) VM. With v7.4-rc1
-it is rejected. However without this patch it succeeds.
+Changes since v3 [1]:
+  - The hypervisor never gives an ITT back to the host (patch 11).
+  - The limit on devices per ITS now counts every DeviceID mapped since
+    boot (patch 11).
+  - A host read of an ITS register now aborts, unless the driver reads
+    that register (patch 9).
+  - Rebased on 7.4-rc3.
+  - Various cleanups and wording fixes.
 
-The issue is that gmem_in_place_conversion changes the behaviour for
-normal VMs.
+The ITS writes to the memory that its command queue and tables point
+to, and the host programs both, so a host that controls the ITS can
+write to hypervisor and protected-VM memory. With this series the
+hypervisor owns the command queue, the tables and the ITTs, traps every
+host access to the ITS control frame, and checks each command before
+forwarding it to the ITS. The cover letter for v3 [1] describes the
+design in more detail.
 
-Thanks,
-Steve
+This series covers the ITS. The redistributors will follow in a series
+of their own.
+
+Jinjie's series [2] lets the collection table have two levels, which
+this series doesn't handle. Once it's merged, I'll send patches that
+make the hypervisor handle that table the way it handles the device
+table.
+
+Tested on QEMU with a program that writes forged commands, table
+entries and register values to the ITS through /dev/mem from the host's
+userspace. Also tested on FVP, where the ITS uses physical redistributor
+addresses (GITS_TYPER.PTA). There, every secondary CPU was hotplugged
+after the takeover, so that the driver maps each returning CPU's
+collection through the hypervisor with a MAPC that carries a physical
+address.
+
+The series is structured as follows:
+
+  01:     MMIO donation.
+  02:     Taking host-registered MMIO regions at finalisation.
+  03-06:  Driver preparation: GICv4 off, page-aligned ITTs, computing
+          the wait target under the ITS lock, the shared command
+          accessors.
+  07:     Deprivileging the host under stop_machine().
+  08-09:  The takeover: the driver's entry points, then the hypervisor
+          trapping the control frame, taking the command queue and
+          emulating GITS_CTLR and GITS_CBASER.
+  10-11:  The tables and GITS_BASER<n>, then the ITTs.
+  12:     Rejecting commands whose IDs are out of range.
+  13:     Documentation.
+
+Based on Linux 7.4-rc3 (aebb727447640).
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20261102130133.3684226-1-fuad.tabba@linux.dev/
+[2] https://lore.kernel.org/all/20261117123116.591621-1-ruanjinjie@huawei.com/
+
+Bartłomiej Grzesik (2):
+  irqchip/gic-v3: Disable GICv4 features in pKVM
+  irqchip/gic-v3-its: Page-align ITT allocations in pKVM
+
+Fuad Tabba (7):
+  irqchip/gic-v3-its: Compute the wait target under the ITS lock
+  KVM: arm64: Share the ITS command field accessors with the hypervisor
+  KVM: arm64: Deprivilege the host under stop_machine()
+  KVM: arm64: Take the ITS tables and restrict GITS_BASER<n>
+  KVM: arm64: Take the ITT of every device the host maps
+  KVM: arm64: Reject ITS commands whose IDs are out of range
+  Documentation: KVM: arm64: Describe the ITS hardening
+
+Mostafa Saleh (1):
+  KVM: arm64: Donate MMIO to the hypervisor
+
+Sebastian Ene (3):
+  KVM: arm64: Take host-registered MMIO regions at pKVM finalisation
+  irqchip/gic-v3-its: Add the pKVM takeover entry points
+  KVM: arm64: Emulate the ITS command queue
+
+ .../admin-guide/kernel-parameters.txt         |   8 +-
+ Documentation/virt/kvm/arm/pkvm.rst           |  34 +
+ arch/arm64/include/asm/kvm_asm.h              |   2 +
+ arch/arm64/include/asm/kvm_hcall.h            |   2 +
+ arch/arm64/include/asm/kvm_pgtable.h          |   2 +
+ arch/arm64/include/asm/kvm_pkvm.h             |  16 +
+ arch/arm64/kvm/arm.c                          |   4 +
+ arch/arm64/kvm/hyp/include/nvhe/its_emulate.h |  16 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   5 +
+ arch/arm64/kvm/hyp/nvhe/Makefile              |   3 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |   8 +
+ arch/arm64/kvm/hyp/nvhe/its_emulate.c         | 765 ++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 130 ++-
+ arch/arm64/kvm/hyp/nvhe/setup.c               |  22 +
+ arch/arm64/kvm/hyp/pgtable.c                  |   8 +-
+ arch/arm64/kvm/pkvm.c                         | 105 ++-
+ arch/arm64/kvm/vgic/vgic-its.c                |  15 -
+ drivers/irqchip/irq-gic-common.h              |  13 +
+ drivers/irqchip/irq-gic-v3-its.c              | 301 ++++++-
+ drivers/irqchip/irq-gic-v3.c                  |   8 +
+ include/linux/irqchip/arm-gic-v3.h            |  65 ++
+ 21 files changed, 1475 insertions(+), 57 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/its_emulate.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/its_emulate.c
 
 
---------------DUFNbHBbvPDY00EhsT6K87G7
-Content-Type: text/x-csrc; charset=UTF-8; name="guest_memfd_nommap_repro.c"
-Content-Disposition: attachment; filename="guest_memfd_nommap_repro.c"
-Content-Transfer-Encoding: base64
+base-commit: aebb7274476403040d582c61478df8f4a7bf9cd3
+-- 
+2.47.3
 
-Ly8gU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IEdQTC0yLjAtb25seQovKgogKiBSZXByb2R1
-Y2UgdGhlIG5vbi1SZWFsbSBndWVzdF9tZW1mZCBtZW1zbG90IHJlZ3Jlc3Npb24uCiAqIEJ1
-aWxkIGZyb20gdGhlIGtlcm5lbCByb290IHdpdGg6CiAqIGNjIC1XYWxsIC1XZXh0cmEgLU8y
-IC1JdG9vbHMvaW5jbHVkZSAtSXRvb2xzL2luY2x1ZGUvdWFwaSBcCiAqICAgIHRvb2xzL3Rl
-c3Rpbmcvc2VsZnRlc3RzL2t2bS9hcm02NC9ndWVzdF9tZW1mZF9ub21tYXBfcmVwcm8uYyAt
-byAvdG1wL2dtZW0tcmVwcm8KICovCiNpbmNsdWRlIDxlcnJuby5oPgojaW5jbHVkZSA8ZmNu
-dGwuaD4KI2luY2x1ZGUgPGxpbnV4L2t2bS5oPgojaW5jbHVkZSA8c3RkaW50Lmg+CiNpbmNs
-dWRlIDxzdGRpby5oPgojaW5jbHVkZSA8c3lzL2lvY3RsLmg+CiNpbmNsdWRlIDxzeXMvbW1h
-bi5oPgojaW5jbHVkZSA8dW5pc3RkLmg+CgppbnQgbWFpbih2b2lkKQp7Cglsb25nIHNpemUg
-PSBzeXNjb25mKF9TQ19QQUdFU0laRSk7CglzdHJ1Y3Qga3ZtX2NyZWF0ZV9ndWVzdF9tZW1m
-ZCBnbWVtID0geyAuc2l6ZSA9IHNpemUgfTsKCXN0cnVjdCBrdm1fdXNlcnNwYWNlX21lbW9y
-eV9yZWdpb24yIHJlZ2lvbiA9IHsKCQkuZmxhZ3MgPSBLVk1fTUVNX0dVRVNUX01FTUZELAoJ
-CS5tZW1vcnlfc2l6ZSA9IHNpemUsCgl9OwoJaW50IGt2bSwgdm0sIGZkLCByZXQsIGVycm9y
-OwoJdm9pZCAqaHZhOwoKCWlmIChzaXplIDw9IDApCgkJcmV0dXJuIDE7Cglrdm0gPSBvcGVu
-KCIvZGV2L2t2bSIsIE9fUkRXUiB8IE9fQ0xPRVhFQyk7CglpZiAoa3ZtIDwgMCkgewoJCXBl
-cnJvcigib3BlbiAvZGV2L2t2bSIpOwoJCXJldHVybiAxOwoJfQoJdm0gPSBpb2N0bChrdm0s
-IEtWTV9DUkVBVEVfVk0sIDApOwoJaWYgKHZtIDwgMCkgewoJCXBlcnJvcigiS1ZNX0NSRUFU
-RV9WTSIpOwoJCXJldHVybiAxOwoJfQoJZmQgPSBpb2N0bCh2bSwgS1ZNX0NSRUFURV9HVUVT
-VF9NRU1GRCwgJmdtZW0pOwoJaWYgKGZkIDwgMCkgewoJCXBlcnJvcigiS1ZNX0NSRUFURV9H
-VUVTVF9NRU1GRCIpOwoJCXJldHVybiAxOwoJfQoJaHZhID0gbW1hcChOVUxMLCBzaXplLCBQ
-Uk9UX1JFQUQgfCBQUk9UX1dSSVRFLAoJCSAgIE1BUF9QUklWQVRFIHwgTUFQX0FOT05ZTU9V
-UywgLTEsIDApOwoJaWYgKGh2YSA9PSBNQVBfRkFJTEVEKSB7CgkJcGVycm9yKCJtbWFwIik7
-CgkJcmV0dXJuIDE7Cgl9CglyZWdpb24udXNlcnNwYWNlX2FkZHIgPSAodWludHB0cl90KWh2
-YTsKCXJlZ2lvbi5ndWVzdF9tZW1mZCA9IGZkOwoJcmV0ID0gaW9jdGwodm0sIEtWTV9TRVRf
-VVNFUl9NRU1PUllfUkVHSU9OMiwgJnJlZ2lvbik7CgllcnJvciA9IGVycm5vOwoJaWYgKHJl
-dCA9PSAtMSAmJiBlcnJvciA9PSBFSU5WQUwpIHsKCQlwdXRzKCJQQVNTOiBub24tbWFwcGFi
-bGUgZ3Vlc3RfbWVtZmQgbWVtc2xvdCByZWplY3RlZCIpOwoJCXJldHVybiAwOwoJfQoJZnBy
-aW50ZihzdGRlcnIsICJGQUlMOiBLVk1fU0VUX1VTRVJfTUVNT1JZX1JFR0lPTjIgcmV0dXJu
-ZWQgJWQgKGVycm5vICVkKVxuIiwKCQlyZXQsIHJldCA8IDAgPyBlcnJvciA6IDApOwoJcmV0
-dXJuIDE7Cn0K
-
---------------DUFNbHBbvPDY00EhsT6K87G7--
