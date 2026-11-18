@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795024728;
-	b=CYAnvWNgJbR2Nrvmzbgx8QZ+To6dB1Yd6T1hjxgVG5X6yYvAk2F3AGzghlsqxGikztQC
-	 4NFzfEIAt2yB9xEcpvwc2kjYxalRrxNMUZ0iJ7o2tHkzFdUh621c5O4Okgo3bb95YcW87
-	 tgicP809NOOZbbMUHhaWfsEOfJXw4UmhkKuQlhtTFlRPN3+OyL2S4svhglyY1GF9f2kX4
-	 9mbbPm2+iRa+gqoPQThRr2Eym4WZKPH0LvMtGtH/8e5tgtYKit5Z1+ec9Lrza2ZP2oMFE
-	 P0oZi/D7M5ivkp+czJOByu2QKw5bITu1Qn38vNRMPZkxHefS5w/qQewy14t8h4NHcbg==
+	t=1795024732;
+	b=OwCGb7PkixMksp3ZqLCPhrRTQAXPBs/JNgC/cgdxnOsR8vB1JqTt8XMAxB5VU63YrrKc
+	 cdht+IpXSA5VQDXorS/WPWXLUoj4ee9asDV3YqUHW2A1d/5lXwW+piIM26tNCCDUGMV7r
+	 QhFBTcjkhYkYpriER8kM2Ea20/IsbU/bt4w4zlxje5/kLQKEtxTag3aeyCvf0KB5DT5bd
+	 /QRytgEcTeylpoRK6jQAzieUv8UlAIeUOYTxpa0bXL8xnHLja+7Xf7AQR0lNyFYeQ9p+U
+	 +4RBEo9BLBmu5Y5283/f8XdETtRD4cch3qK7yFbSTuVGk6ofCkJGjFfhiobDHSWWRKQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795024728;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795024732;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
 	 Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=ixRQatk0cnDrDxprXqJ6lkU0b/6YAnZFD6FR96rHhNg=;
-	b=x5VQTh69jKM8UMwHJukCkeBbLbYUnBVbz1IF+0DNTrHajnQUSTcb92zT9eIvGHCsmAzb
-	 Tqf/O7pngt4jhZ4BDvsghj2LjfoI7zmtjyYzJue7hx3L0FPbsgs+GVkHEUvnHaMNt25K6
-	 M5XT+g+f0OrfVX1DhcmHlZm5R1z2CQyKOMttdbVjuh8MQ7mw64M1Q9rWAwz8AsrpdgItU
-	 Id5PNpqX70/wu94abjTq9mbEGQNtZXbaKrA1yI7LtepKrwrwYB38OR4QXH96mLf9Qs5WX
-	 xhmUcMyA7GICK5YMmMbL8TpjRa/WEiaeL33DSZsOlZ1U63KF+VNVtIfRFS8hKCtcYLg==
+	bh=Uv+QrL1hb3E8q8qlaPr/w05HjKdbUi66ksFf6isyfiE=;
+	b=bXtcnl38DKJHV5B6aTtneHKxSIAH76kuTY3KEID+SypmFDyC14xvPi7AVjB4ZwLRmnYq
+	 kW6yhrdVMQov3Q2bLkwyCfCsFw79a1cZdr3w8VkK/eL4EzfqgoLdy1RQB79PCTKwxoNKc
+	 hPHaNT2upokyY6/vMQanfwkK2w1nAF6xRDDq1Vq1Pwcha3V/cNO4cUpIo8+w7gUWdpi9/
+	 5+BXHp8vCx2APTzRJNOY+bV94SjOVW3tsBpZcERSdrlxd+hT0eSOsMOrPAYCmtx9RfYA3
+	 7lT8yAy1dvyv9N7FhCl3HNohATxFtiAYvXMNgMu9vd2GmjVKL35wvfjM+RPXSyj0hdQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=WKbRsg8R;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="I/BMLlTo";
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15989606A325
-	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 17:58:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 15989606A325
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9955606A320
+	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 17:58:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A9955606A320
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=WKbRsg8R
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=I/BMLlTo
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 708641477;
-	Wed, 18 Nov 2026 09:58:44 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2F2AE1596;
+	Wed, 18 Nov 2026 09:58:48 -0800 (PST)
 Received: from e133894.cambridge.arm.com (e133894.arm.com [10.2.80.62])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4BF5B3F632;
-	Wed, 18 Nov 2026 09:58:46 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0BA0E3F632;
+	Wed, 18 Nov 2026 09:58:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795024727; bh=OnVas4WDYKAVnROEy3UJlkCK4HQnWjf0mNLKZZt4yGg=;
+	t=1795024731; bh=rbFPjXaJgnyTNgicAecmcozOK/secmLDCqj3ux6hUws=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WKbRsg8R7w66WorqC/mgrGqZcyirpxG38bwwN2yOnpTvO41Q9a9JHvo3ROLbiWtUU
-	 1C7Nb3zSZGw6WsKVwyRcPMyBtD3Gw8W2z+N+VLOcn0L4x+4DMc6kQaeCnou+i926xq
-	 wsK5jf98q1X1S4L9Bes7CqyjR7N1BqD66uAavbWE=
+	b=I/BMLlToC2DRRylvYIpi+Oy9PvGE6Wjwmd/ibLCmBSRJBEtwweyYpVpwzPZD4GXqT
+	 xq0ti8lk/7S9w8u4LNiktF2rcld7+KGcj4F+p7+CPzSLaGM/9wFu3VnzNVKR43CJkb
+	 9o9lE+J/oBJrUdXQ7LCefNrnQCLCQ7x7kkjIS1Y4=
 From: Sascha Bischoff <sascha.bischoff@arm.com>
 To: will@kernel.org,
 	julien.thierry.kdev@gmail.com
@@ -51,9 +51,9 @@ Cc: vladimir.murzin@arm.com,
 	kvmarm@lists.linux.dev,
 	timothy.hayes@arm.com,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH kvmtool v5 10/23] arm64: Define GICv5 interrupt types
-Date: Wed, 18 Nov 2026 17:57:42 +0000
-Message-Id: <20261118175755.1946977-11-sascha.bischoff@arm.com>
+Subject: [PATCH kvmtool v5 11/23] arm64: Describe the PMU interrupt for GICv5
+Date: Wed, 18 Nov 2026 17:57:43 +0000
+Message-Id: <20261118175755.1946977-12-sascha.bischoff@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261118175755.1946977-1-sascha.bischoff@arm.com>
 References: <20261118175755.1946977-1-sascha.bischoff@arm.com>
@@ -68,132 +68,53 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Define the PPI and SPI type values used by GICv5 interrupt specifiers,
-and the type-field shift used to construct a full GICv5 INTID for
-KVM's PMU IRQ attribute. Give the FDT type values distinct names while
-retaining the same numeric values.
+Use the GICv5 PPI specifier in the DT. KVM also expects the PMU IRQ
+attribute to contain the GICv5 interrupt type in the upper bits, so
+encode it before setting KVM_ARM_VCPU_PMU_V3_IRQ.
 
-Suggested-by: Vladimir Murzin <vladimir.murzin@arm.com>
 Reviewed-by: Vladimir Murzin <vladimir.murzin@arm.com>
 Tested-by: Vladimir Murzin <vladimir.murzin@arm.com>
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- arm64/gic.c             | 42 +++++++++++++++++++++++++++++++++++++----
- arm64/include/kvm/gic.h |  9 +++++++++
- 2 files changed, 47 insertions(+), 4 deletions(-)
+ arm64/pmu.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/arm64/gic.c b/arm64/gic.c
-index 5034b034..83b034e3 100644
---- a/arm64/gic.c
-+++ b/arm64/gic.c
-@@ -24,6 +24,8 @@ static u64 gic_msi_size = 0;
- static bool vgic_is_init = false;
- static int gic_spi_base = GIC_SPI_IRQ_BASE;
- static int gic_ppi_base = GIC_PPI_IRQ_BASE;
-+static int gic_spi_fdt_type = GIC_FDT_IRQ_TYPE_SPI;
-+static int gic_ppi_fdt_type = GIC_FDT_IRQ_TYPE_PPI;
- 
- int gic__get_spi_base(void)
+diff --git a/arm64/pmu.c b/arm64/pmu.c
+index ef7faca1..b3026d50 100644
+--- a/arm64/pmu.c
++++ b/arm64/pmu.c
+@@ -214,16 +214,17 @@ static int find_pmu(struct kvm *kvm)
+ void pmu__generate_fdt_nodes(void *fdt, struct kvm *kvm)
  {
-@@ -35,6 +37,26 @@ int gic__get_ppi_base(void)
- 	return gic_ppi_base;
- }
+ 	const char compatible[] = "arm,armv8-pmuv3";
++	int irq = KVM_ARM_PMUv3_PPI;
++	u32 irq_prop[3];
+ 	u32 cpu_mask = gic__get_fdt_irq_cpumask(kvm);
+-	u32 irq_prop[] = {
+-		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
+-		cpu_to_fdt32(KVM_ARM_PMUv3_PPI - 16),
+-		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_HIGH),
+-	};
  
-+int gic__get_spi_fdt_type(void)
-+{
-+	return gic_spi_fdt_type;
-+}
-+
-+int gic__get_ppi_fdt_type(void)
-+{
-+	return gic_ppi_fdt_type;
-+}
-+
-+int gic__encode_ppi_irq(enum irqchip_type type, int irq)
-+{
-+	switch (type) {
-+	case IRQCHIP_GICV5:
-+		return irq | (GICV5_IRQ_TYPE_PPI << GICV5_IRQ_TYPE_SHIFT);
-+	default:
-+		return irq;
-+	}
-+}
-+
- struct kvm_irqfd_line {
- 	unsigned int		gsi;
- 	int			trigger_fd;
-@@ -242,18 +264,28 @@ static int gic__set_dist(enum irqchip_type type)
+ 	if (!kvm->cfg.arch.has_pmuv3)
+ 		return;
  
- static int gic__set_spi(enum irqchip_type type)
- {
-+	int spi_base, fdt_type;
-+	int err;
++	irq_prop[0] = cpu_to_fdt32(gic__get_ppi_fdt_type());
++	irq_prop[1] = cpu_to_fdt32(irq - gic__get_ppi_base());
++	irq_prop[2] = cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_HIGH);
 +
- 	switch (type) {
- 	case IRQCHIP_GICV5:
--		gic_spi_base = GICV5_SPI_IRQ_BASE;
-+		spi_base = GICV5_SPI_IRQ_BASE;
-+		fdt_type = GICV5_FDT_IRQ_TYPE_SPI;
- 		break;
- 	default:
--		gic_spi_base = GIC_SPI_IRQ_BASE;
-+		spi_base = GIC_SPI_IRQ_BASE;
-+		fdt_type = GIC_FDT_IRQ_TYPE_SPI;
- 		break;
+ 	_FDT(fdt_begin_node(fdt, "pmu"));
+ 	_FDT(fdt_property(fdt, "compatible", compatible, sizeof(compatible)));
+ 	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
+@@ -248,6 +249,8 @@ int pmu__init(struct kvm *kvm)
+ 		}
  	}
  
--	if (gic_spi_base == GICV5_SPI_IRQ_BASE)
--		return irq__init_irq_offset(gic_spi_base);
-+	if (spi_base == GICV5_SPI_IRQ_BASE) {
-+		err = irq__init_irq_offset(spi_base);
-+		if (err)
-+			return err;
-+	}
- 
-+	gic_spi_base = spi_base;
-+	gic_spi_fdt_type = fdt_type;
- 	return 0;
- }
- 
-@@ -262,9 +294,11 @@ static int gic__set_ppi(enum irqchip_type type)
- 	switch (type) {
- 	case IRQCHIP_GICV5:
- 		gic_ppi_base = GICV5_PPI_IRQ_BASE;
-+		gic_ppi_fdt_type = GICV5_FDT_IRQ_TYPE_PPI;
- 		break;
- 	default:
- 		gic_ppi_base = GIC_PPI_IRQ_BASE;
-+		gic_ppi_fdt_type = GIC_FDT_IRQ_TYPE_PPI;
- 		break;
- 	}
- 
-diff --git a/arm64/include/kvm/gic.h b/arm64/include/kvm/gic.h
-index c4f78cde..9f1a3a25 100644
---- a/arm64/include/kvm/gic.h
-+++ b/arm64/include/kvm/gic.h
-@@ -12,6 +12,12 @@
- #define GIC_FDT_IRQ_TYPE_SPI		0
- #define GIC_FDT_IRQ_TYPE_PPI		1
- 
-+#define GICV5_IRQ_TYPE_PPI		1
-+#define GICV5_IRQ_TYPE_SPI		3
-+#define GICV5_IRQ_TYPE_SHIFT		29
-+#define GICV5_FDT_IRQ_TYPE_PPI		GICV5_IRQ_TYPE_PPI
-+#define GICV5_FDT_IRQ_TYPE_SPI		GICV5_IRQ_TYPE_SPI
++	irq = gic__encode_ppi_irq(kvm->cfg.arch.irqchip, irq);
 +
- #define GIC_FDT_IRQ_PPI_CPU_SHIFT	8
- #define GIC_FDT_IRQ_PPI_CPU_MASK	(0xff << GIC_FDT_IRQ_PPI_CPU_SHIFT)
- 
-@@ -38,6 +44,9 @@ struct kvm;
- 
- int gic__get_spi_base(void);
- int gic__get_ppi_base(void);
-+int gic__get_spi_fdt_type(void);
-+int gic__get_ppi_fdt_type(void);
-+int gic__encode_ppi_irq(enum irqchip_type type, int irq);
- int gic__alloc_irqnum(void);
- int gic__create(struct kvm *kvm, enum irqchip_type type);
- int gic__create_gicv2m_frame(struct kvm *kvm, u64 msi_frame_addr);
+ 	for (i = 0; i < kvm->nrcpus; i++) {
+ 		vcpu = kvm->cpus[i];
+ 		set_pmu_attr(vcpu, &irq, KVM_ARM_VCPU_PMU_V3_IRQ);
 -- 
 2.34.1
 
