@@ -1,85 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795015814;
-	b=OeMDePfFzWofYgObgNOcTjR4dj+N9VlP3NBSAzgK+ZzHBZFEAzIttmObgvAdB3b5YWRL
-	 jHhUZvlGzSmgpLVASkM4K6dy7GBqchEbL3iRSlTN0aAZvHt68nJCuKZ1ntX3xV1SoD963
-	 /HhY4N0E2oN5oQgbpI9I6HfWTlWKW0KLhQ3uXxyl2T1rHMuNmscrU0JqjSMAjUMp3rx9E
-	 NHqYLP2Y19vpS8p/quxN7n1yYvzqOjC7PJko3A34jlUP01Au8ZK68HMxS+kepp/lLFlZ3
-	 ivhSrUojyxNx0DHepkabLb9Lry5cv8QAq3YyWU/+EbiX9AUWlHDsfQcTlD5cntCUGhQ==
+	t=1795016139;
+	b=yTeRdqetag0jz/GMswmssB+9Qc6FdILDqxjeHQ1H/Qibz9Pzbuug71TOwyRcz/vvM9GH
+	 /nf7Yt410pAwA57c5YogV06p0KwpN+G5XAVawpk9HKJxF7RGmFcUsbJZibNituG8GbjsN
+	 gjSdBJ9roPK16xJuz+ShX/KQzuHyCyjU4uVXfvqWZHkplioLkPnQHalMiPmzNDujM7cc2
+	 KaiOwvDkoiX4nJ+OzHO3ggwwSP9I0YZSLJuocIOWyR5t4C6huBuU74kTpvCn46PA2Vwbm
+	 QNMHqrwq5X4V46KQC5rctOwqA/N/RDrW/dcrIFsuN3i4Zes6zfwh9+YE6EjYVODAw9g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795015814;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795016139;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=TxCm5SXDQZvehy91cumJ8DrMIrDWTNnrR4NDVBiT94E=;
-	b=QJXcA3GTgIvkgzZ4mhoWp3Q/hdJyBa17I4d6JtK371zzG+qeBY+MRVPL6lfqYCxyat1W
-	 0cnql7KsWdDAeLOMWwROlB4TaJKTJdRBr1fUDg9yeFAeR5IBA+a5aXIYuasx6JuBqeO8o
-	 3eNVP+tavKa42sfvSf92NdyiXgyhsca9K2i1hKeXdTpi3elpS4qm5zbEwgU9zUfgwHYBM
-	 9wTd/t/CFi3AACTCzBf0wM34l3EYQsr5j10Uzbx/lBkSg34HXe2Ja2TER1zvm5o8zM+6o
-	 /1HClWDR9rSucB3XVFkuuDcuokwnNEUbCJXMH7A1mZZn0gKfnpAoOrgXLwp5th7EoHQ==
+	 Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:X-Mailer;
+	bh=I38LaCNb2hWbpAi7aqstQLKMG4G4TLfyKK4eAQEVhf4=;
+	b=ZSLWfWTZ6Qf6CM/y/3KedmVdSuYF4T4DKAbJXXRISrD/iGXJmtbOc1l3m1Hde2YfkNXe
+	 CJ54iWL1fuCRBTsZnq8q61JeILVWE8CYzRVELPMP/zvghEr3k3aomk/SW/eiLAGaCXZtX
+	 fEjGmrwa/OwAri9/XV2yTKA18ldpblwkoW5jquO8oTGMRKHh+GvNf9yd0HDM6m84ZvKta
+	 Pc1efNEBzMTxBFwJTOitv4hqVRAG6eLp6n9rAvsSIn0TnorI14zkPPnt+pJXhSiNrUbyN
+	 e3S0PutRYwqW/N8IN46SnPlE0YGoqJHoW3P6j4E93v+ijDkTUfGunJTbdbodRXjZ/fg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=pereq.eu;
 	spf=pass smtp.mailfrom=cryspen.com;
-	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=M4KzCHWX;
-	arc=none smtp.remote-ip=209.85.218.50
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=EsUaqfWr;
+	arc=none smtp.remote-ip=209.85.221.43
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0103B60A2621
-	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 15:30:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0103B60A2621
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CFDE606A330
+	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 15:35:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2CFDE606A330
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=M4KzCHWX
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c4d581da0aaso130621366b.2
-        for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 07:30:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=EsUaqfWr
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-48e10a70540so678556f8f.1
+        for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 07:35:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pereq.eu; s=google; t=1795015812; x=1795620612; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=TxCm5SXDQZvehy91cumJ8DrMIrDWTNnrR4NDVBiT94E=;
-        b=M4KzCHWXo+QQ+5rQTjMLOx4L02D5l8iiq7nSXGX9qKLVnSlDDfAGzyA9DYt4QZ03A/
-         /QzfLrsmceyiAC1mhpZkwAdpLOGqgBHpJebTt8dLmzvDezIKy20QHLX2kTMEYSEOpKfL
-         5vc8NsLBk3Tb9KpcehUISh4tFMxnMT3IZFEvnQQzaOCzIgsm6EzAsPp1FEybQtT1ifJn
-         ONrF0sxtDSVZ6Yy1mJAeDC233JIjViswzaiLG/g8cB5v9v7B9nbauMF2HfX5gv2RutHn
-         6AGGXmKLj742IStny9QUJraHct0haDXZBxOvdTmn7ade/UoPvzH7MqEST4Oc6bCZHiZO
-         2CHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795015812; x=1795620612;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=pereq.eu; s=google; t=1795016136; x=1795620936; darn=lists.linux.dev;
+        h=content-disposition:content-type:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=TxCm5SXDQZvehy91cumJ8DrMIrDWTNnrR4NDVBiT94E=;
-        b=127/xQ1kHN4KlbFKEp4u4ekIOgf22ximFT2/NzmV1JA5QZFxQt0Ak3YRGls0GCtqs9
-         zazAU7sMMWs5tAXhKKJZeai9Q1PaBiHoxcyCbs1M/xOKgSnzv2LUJHFbf/ra148jVc/A
-         kPoLgF38QCLHV/dPPia3ZoIo2M5KL8yL59mDS8t3TGykuZ+Mqtx0SZ52R5Hu52Y7UOor
-         M0ZPS2Y/FtBMNb399RZA5rFkYYME3s9BdXm9GqcU8H0CV32ZtNcOMBpiSFDsaCct3zkm
-         NwUvTiVOyueYuzFVU319y/wIz9uqocEAPud8mUbdfg3GX2KoPMJNvRvnne3BZIFKqdCY
-         9fbg==
-X-Forwarded-Encrypted: i=1; AL+hErEeA2OcX4kKcrXYDCURd+dWI42nPr/UXsRMS1LIKljpM+6rayMoC4L3Q5xsMxnfkQ/xiBfpYR0=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9V/tLwVtjooth3Dk0pcOuvxAV19CkIGEYWnOHUwtFa32wnWTFe
-	G66Tk0ndtL7igPP+yBPgk8nOKZXR1YvzJguh8juYNRArSIEInJPHge7AiJRdDS1hOG8=
-X-Gm-Gg: AYBFou1VsErc+9q4Bv5pFOnRDXkjunX5u0tuOpaU0K0xidmCYWps1IfqYsPE2K4SNOk
-	Y0pKJ4WbOI1EKCLkXcDzXS0+8hehollK56hCEahBpJE8ujm23BuQ7ZLp4bZcLBzqiEagX8rNCSa
-	dBSJiT/D9UgrolspXOlGu8jrd6lQIAHjvs/llBKMFONlhs0YvdjBabgiGwNfsi8tZqJNjjjecl7
-	7CTqxLsDlf3KgcMefWHU9HSeKNa0GcOU1k97Mmp91+U1e/+IsJYW7+/12xW/d/PPWhrowNvtui/
-	o9Vd6HSLKkkZLso1nq1/PmuWhCDsdsvU5MuewXGxODace9vHZRIC/ng116shzIgIkEP2qm8AFBB
-	UY1V1rpcPiSSlutbxDgn9J/HDZz9tBpo+fO2UMe0lcDHDJ2Lr4Oe0rwtjRWpVKu4kt8aIgkQT7w
-	Mdel9KW1QZCazTYwW5R/PzEAxUD7RI0m9TIDkBS9CmK5kjDX2HyyATWfvcPrhbHJv05vUTsnM88
-	FoSGG7Df7JFFOcm4Y+xQQ96boyEaOlgZZ1afrHOPPm5Z7/pQAITxL2XqX/pgXMTEwnw8ztaxOCg
-	cpdAf/jLrVUz9aU4YAs=
-X-Received: by 2002:a17:907:9304:b0:c4d:212a:192a with SMTP id a640c23a62f3a-c510e520f80mr286242666b.48.1795015812157;
-        Wed, 18 Nov 2026 07:30:12 -0800 (PST)
+        bh=I38LaCNb2hWbpAi7aqstQLKMG4G4TLfyKK4eAQEVhf4=;
+        b=EsUaqfWrAQlqe1qPm8nPbAvjk5UqfvTjzMXeHPlE06XoczKcBsDpRQNMhKi6aICaHB
+         I1eyqe/EAx+nHmYPab0Ws/hZJrKRS5Jj7/1SlG3eO6y+oU2MnsgcbAl4OLmqe+n+AwuJ
+         wDytVTj++3L7XqtCmsy4eKKCft9RLPkuhBueQr1P5k69mA8F4t3X0clMNfjxtlpO75RG
+         V/WsTW7BonvBOizZ1wZ3PAwY7mFCh1jDlaiKyHE2LhK66pTO0VGPLD4sC4gS2Mt6LdDg
+         b0zcY5kNn5FGrr5U685qtmwyEypjzDZocmgbwmGpSsYfPJVsoaQyuynKjQebT6uM+A/8
+         ikDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795016136; x=1795620936;
+        h=content-disposition:content-type:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=I38LaCNb2hWbpAi7aqstQLKMG4G4TLfyKK4eAQEVhf4=;
+        b=mOVwiEqT1v+ii98L/osxmk0DHm+IbbNIDupU8Knh1oPJZkUR6zwyX95xIhs5k1mb+P
+         oARYMfwGpzd70YDS06LUVpeGZRqZaf7vkVrX93GMCzZE+I48muLSXlQoHHUaWlrnefXx
+         9rBqGeNzg4tDIls8DoA8l6KYDYVd4YnbJEx8uKIhjFwm8MddEuEKjZoSR5doP+Yc90wr
+         H1D0flXzOD13QU0x8C6eP1/KgAmDOQ5TvoQkEZ9tgYAf2+23kYwRp4QrC8dZGXGBnWRZ
+         QoU9dhtHH0f8Oo58I8zwCDp74mTyXmrNoqi78OQI40DZDfdU2MRuQRiP3YyyUhDydMMX
+         6r4g==
+X-Forwarded-Encrypted: i=1; AL+hErFvhbdQtOLpa+fePv9uJDpq/EUwYx1uIIoeFcT/zzLWnvEuU7gk/rhZ+f+vcNFjQ6+nOqbY6i4=@lists.linux.dev
+X-Gm-Message-State: APuU4Z9x3eIJTj4FTrA4TUDrhf9H/LrGYf39obhKRl0ozw9cCiZElSXM
+	hbbOPAsFdRo4Ird4j7Cdot29TmjibsvhltRVbQjtNxjicsTgOZ1Mawbv+WDAJxQ0IcLAaI5Qqfe
+	Bher0gJ8sXg==
+X-Gm-Gg: AZFdTZcDtHB0nZU7Sej/D4MMmDee7cW0du8kr7/CAxSHLv12w9iqtfO0dbCXjsBx/lS
+	1Wjux5UDYwXyDwdWhiDBhkH/5FLIQJOO/DVuJrXz0qE/Cn1kzgPrT+FH+Q0LdVXkWRgjCn2INCz
+	vXqDJU4EKsBzF8KKJfAsgcIe9qvIhn0rpCdI0Ez0QECAIiywD15eAQUDqvWKfSbHV8SLmS4mTwW
+	6tv0hRf/Bvi1mUCb1Fg5mFqCG5cBmxu1kSLtRlc+PXqsvjCdCP1d/ti4WwE0So2yWyCqQQLO1s/
+	EpF5oFW3jA5nzecI4Pv1ZjfRFYz+KcwPRvegzVI35AQiIb06E8++Vj9eV1sbdOYpk1jigwim1/T
+	ubDO+lvJ23ijWz+ic/s/uErz/qPZJ5zxBtQsod+8fjD/4PJYosyQxkz5ZEdGWD4nAfvgIpePvUB
+	xF1u8d3WEgu5DeLooiLb7mNBEFlCcr0/ZuDkZkuQnqgIS+hETYK5VrdnfyKgN2a/dlK9MKUu/l7
+	hGxQ3+H6nn32Qjg8t7QL3zUYrcxAy/pOW0UHjo5SEKyJGCrOE9rmnmynYfHMY5VR3fpSSR+4pwm
+	ZADlhqCNWBWjdft7/XE=
+X-Received: by 2002:a05:6000:144c:b0:4a6:bc53:246d with SMTP id ffacd0b85a97d-4a6bc6269b6mr5843166f8f.45.1795016136152;
+        Wed, 18 Nov 2026 07:35:36 -0800 (PST)
 Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c51233c4d02sm11652266b.21.2026.11.18.07.30.11
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4a656c11643sm5196571f8f.49.2026.11.18.07.35.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 07:30:11 -0800 (PST)
-Date: Wed, 18 Nov 2026 18:30:08 +0300
+        Wed, 18 Nov 2026 07:35:35 -0800 (PST)
+Date: Wed, 18 Nov 2026 18:35:32 +0300
 From: Dan Carpenter <dan@pereq.eu>
 To: Marc Zyngier <maz@kernel.org>
 Cc: Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
@@ -89,13 +89,14 @@ Cc: Oliver Upton <oupton@kernel.org>, Fuad Tabba <fuad.tabba@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Jintack Lim <jintack.lim@linaro.org>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
 	Karthik Bhargavan <karthik@pereq.eu>,
 	=?iso-8859-1?Q?Cl=E9ment?= Blaudeau <clement@cryspen.com>
-Subject: [PATCH 3/3] KVM: arm64: nv: Report EL2 registers with no trap
- forwarding
-Message-ID: <5a7235e9adff42aa043ac9473dbeb0354dca0967.1795014776.git.dan@pereq.eu>
-References: <cover.1795014776.git.dan@pereq.eu>
+Subject: [PATCH] KVM: arm64: nv: Ignore TLBI IPAS2E1 above the IPA limit
+Message-ID: <av3FxJpUvpb_8qMC@stanley.mountain>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -107,98 +108,50 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1795014776.git.dan@pereq.eu>
+X-Mailer: git-send-email haha only kidding
 
-One of the recurring issues we run into is that people add a trap to
-KVM but they forget to add a matching trap for nested virtualization.
-Add a boot time warning to print a warning for missing traps.
+In theory, an L1 hypervisor could issue a TLBI IPAS2E1 for an IPA
+above the host's IPA limit.  The s2_mmu_unmap_ipa() function would
+pass it to kvm_stage2_unmap_range(), the page table walk would fail
+with -ERANGE, and that would trigger the WARN_ON() in
+kvm_vm_stage2_unmap_range():
 
+	WARN_ON(stage2_apply_range(mmu, start, start + size, fn, may_block));
+
+The TLBI's IPA field goes up to 48 bits, so this needs a host whose IPA
+limit (its PARange) is below 48 bits, and it would also need to support
+nested virtualization.  There are very few CPUs which meet both these
+requirements.
+
+The fix for this is to return early.  Since there is nothing mapped above
+the limit, there is nothing to do.  This matches how handle_ripas2e1is()
+also ignores TLBIs that start outside the PA_bits range.
+
+Fixes: 70109bcd701e ("KVM: arm64: nv: Handle TLBI IPAS2E1{,IS} operations")
 Signed-off-by: Dan Carpenter <dan@pereq.eu>
 ---
- arch/arm64/include/asm/kvm_host.h |  2 +-
- arch/arm64/kvm/emulate-nested.c   |  5 ++++-
- arch/arm64/kvm/sys_regs.c         | 23 +++++++++++++++++++++--
- 3 files changed, 26 insertions(+), 4 deletions(-)
+This bug was identified as part of our formal analysis work at Pereq.  I
+have not been able to reproduce it on real hardware.  The only CPU Claude
+can think of where you might be able to trigger it is possibly the Apple
+M2?  Not 100% sure about that.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 8efb21b2d729..0614c3b3a40d 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1379,7 +1379,7 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
- int __init kvm_sys_reg_table_init(void);
- struct sys_reg_desc;
- int __init populate_sysreg_config(const struct sys_reg_desc *sr,
--				  unsigned int idx);
-+				  unsigned int idx, bool needs_nv_trap);
- int __init populate_nv_trap_config(void);
- 
- void kvm_calculate_traps(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 9e0c15e6be47..39136a89d74b 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -2434,7 +2434,7 @@ int __init populate_nv_trap_config(void)
- }
- 
- int __init populate_sysreg_config(const struct sys_reg_desc *sr,
--				  unsigned int idx)
-+				  unsigned int idx, bool needs_nv_trap)
- {
- 	union trap_config tc;
- 	u32 encoding;
-@@ -2452,6 +2452,9 @@ int __init populate_sysreg_config(const struct sys_reg_desc *sr,
- 	encoding = sys_reg(sr->Op0, sr->Op1, sr->CRn, sr->CRm, sr->Op2);
- 	tc = get_trap_config(encoding);
- 
-+	if (needs_nv_trap && !tc.val)
-+		kvm_err("sysreg %s has no NV trap configuration\n", sr->name);
-+
- 	if (tc.sri) {
- 		kvm_err("sysreg %s (%d) duplicate entry (%d)\n",
- 			sr->name, idx - 1, tc.sri);
+ arch/arm64/kvm/sys_regs.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index ef4554656ddf..afd7e76bedff 100644
+index ef4554656ddf..19a914941aff 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -5978,6 +5978,23 @@ int kvm_vcpu_finalize_sys_regs(struct kvm_vcpu *vcpu)
- 	return 0;
- }
+@@ -4236,6 +4236,9 @@ static void s2_mmu_unmap_ipa(struct kvm_s2_mmu *mmu,
+ 	max_size = compute_tlb_inval_range(mmu, info->ipa.addr);
+ 	base_addr &= ~(max_size - 1);
  
-+/* Keep the nested virtualization traps in sync with the KVM traps. */
-+static bool __init needs_nv_trap(const struct sys_reg_desc *r)
-+{
-+	/* op1 4 is the EL2 encodings, op1 5 the _EL12 and _EL02 aliases */
-+	if (r->Op1 != 4 && r->Op1 != 5)
-+		return false;
++	if (base_addr >= kvm_phys_size(mmu))
++		return;
 +
-+	if (!r->access ||
-+	    r->access == bad_vncr_trap ||
-+	    r->access == trap_raz_wi ||
-+	    r->access == bad_redir_trap ||
-+	    r->access == undef_access)
-+		return false;
-+
-+	return true;
-+}
-+
- int __init kvm_sys_reg_table_init(void)
- {
- 	const struct sys_reg_desc *gicv3_regs, *gicv5_regs;
-@@ -6010,10 +6027,12 @@ int __init kvm_sys_reg_table_init(void)
- 	check_feature_map();
- 
- 	for (i = 0; !ret && i < ARRAY_SIZE(sys_reg_descs); i++)
--		ret = populate_sysreg_config(sys_reg_descs + i, i);
-+		ret = populate_sysreg_config(sys_reg_descs + i, i,
-+					     needs_nv_trap(sys_reg_descs + i));
- 
- 	for (i = 0; !ret && i < ARRAY_SIZE(sys_insn_descs); i++)
--		ret = populate_sysreg_config(sys_insn_descs + i, i);
-+		ret = populate_sysreg_config(sys_insn_descs + i, i,
-+					     needs_nv_trap(sys_insn_descs + i));
- 
- 	return ret;
- }
+ 	/*
+ 	 * See comment in s2_mmu_unmap_range() for why this is allowed to
+ 	 * reschedule.
 -- 
 2.53.0
 
