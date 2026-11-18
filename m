@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.23
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795015189;
-	b=Ud96+tvahVaPpIIa7bw3j51jkYqslm+o7OIx+Juch+uSruFl2RpfvLgPsKCi+rpEr+BZ
-	 a3XNVNgSL3IPquMHEpWR6gaUM3Us2E0LD1eZcuZdJc/dPKuiLP83Y0Q7NJ2h4xKT+FGfF
-	 a9hdSzMjMHe548oe47rez9KKplMRTYv/+1s323koGhPlg1KX6KklXSwAIrIcxOi9DNxG2
-	 n3lAuuhZA6nGf3aGA0Vzmm37l+mTGZrWCiCVYiTuGqBD5Avy/HVvylb7mDCjG3wA/xRNt
-	 hIU7WfOTFKlDAebu3i6rsLagVtMgalDs78FKWkYbcA16wn2ajtt7sIb15ZN0Mq1RsDA==
+	t=1795015210;
+	b=mN4otWfrTY+t545bhR4tvHz7YtMHjW7DVzOx6u9oo2ftgkkymSzocQI3sMYC2f0Bd8Cz
+	 fE6BUjq6BVd9TQzQnfxhewiObSNxh1yuaUYIdRc1t3cRhX6YW2NBIqRDekCSBMR87fPYs
+	 dFEKW1xxoGrs78gHhm0GVYXEmpa3xlmr7q0oc+6oKXbjIqsSkOPNbeKkEC5lO/ON2i3t0
+	 Kc1ElIBxSkUPTLKtmGMQv7JFvDcXldSWysjmQ223PuLrvsjJYkEO199GmLQ58vEyQe14d
+	 HW7PAsagezhPnuy+yaWRD5wgtoaN8aJA/65VONqjOL9KAX7uCOUYwrTOXGS0ip5528g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795015189;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795015210;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
+	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=28cn1Kair98GTwqDiRDvASqmoyMJ23a90Jb1Em5523E=;
-	b=OugWPPomKGWrYIkJXS8hS0h7cNltMnCs1n/Fv9n8XlaMn7XCwMeNh1RiivbqozU/5n91
-	 5Cd+x0D2OWGPhNH0qHyFf3xyI41NdxvazubkUrmsLQBl97M05T4WFYN89wbMU3FwgRIvr
-	 WPbCDallYm2oxFmcCTC9ja1mDDOplYFAd6x8LxihpN06+5Nrr8HVedRP7TXsMCxf3p/A+
-	 wFDwb63t9R48cXfBOWoaCmaqVgQwpAqgji1QFeh9Pn8JyG3yxLC3STKSt33KJG+JtAZi6
-	 wbBHlpb2oV3v0PYxiNlXcbboHcNDYJSLIPU74XeV1zHPIFAEEkyDJLvJxgIbYyCXc4A==
+	bh=D6c2np+7XJR2/0M8luEvk7jxxCqT6MGkLrQimWo7JCw=;
+	b=kp355fW6g1Tk2Z9ojGbgxsjtVdpGWVkitlj4efYyLHm7rF91CksyuREMGxyhAdb88XBv
+	 ekTSXOPcnoIXkGv4Zd4eFmqEpkvP92HsLromETzWhPnCx0pZ0SEU1yeSvD1UFePtNU6pZ
+	 dt0oUk5UPXb18XCHYnS20A/PPUrJ02FsuIeTVTSEX+OO9kQwv/C4oyrpY+3bZ/HSEyBLx
+	 KFNt6KgNdnQVbkYgg4uWu0iNrcj6iAh5VfS1bz+gr8rEMmraAvSoxDziyWynocLTPlC7L
+	 hkoUdQ4+73WRsQxwhbdk1VE0Q8FlAxnxFVySWUDu9K1XQgnE0HdfT6cVvmcay5u3XXA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=sSTubd9l;
-	arc=none smtp.remote-ip=95.215.58.23
-Received: from mta1.migadu.com (out-23.mta1.migadu.com [95.215.58.23])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=HiamsQWf;
+	arc=none smtp.remote-ip=95.215.58.47
+Received: from mta1.migadu.com (out-47.mta1.migadu.com [95.215.58.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA3B60A2603
-	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 15:19:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EBA3B60A2603
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E96B606A337
+	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 15:20:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5E96B606A337
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=sSTubd9l
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=HiamsQWf
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=gC89BE6dhBGkEE3drKusXTAY7nFwy3zcNF0PGMb/LAk=;
+DKIM-Signature: a=rsa-sha256; bh=g5xTEIlaMETxJ41YtgF1H3rZhxRy4dhLjjAkhFiuZ5w=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795015186; v=1; x=1795619986;
- b=sSTubd9l9Aqlx/MX47MJhB00dg03oDKBrTKFFu+Kx/UAksop9tBPXWKNvgF++1xUZQUugQRt
- Weva6si1XE8emkvEaZ6X/XjteD6MAfxNlyRWjDIfveGaUwFY4i1DfrlSXjLSIGesUX/FlYXlZcI
- J5tSsp4jPtolgOoCEg2M1xzc=
+ t=1795015207; v=1; x=1795620007;
+ b=HiamsQWfelgsiQP+3+ZN4YQWkBbtLzcblD0AfjzwZbWCETuOEDM8h2xXah6P+oLTpZHx9vlp
+ 3sDO4PQ36Y/nkdTGRTkYTfInS206BXm29xakRKQwPLicKcoXMJL04pkS5PgWx4gG8h0du+1SxlK
+ wL/xo91OEpPWma3ILI/Iu3Ms=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id 39bc16c2b94e545e;
-	Wed, 18 Nov 2026 15:19:45 +0000
-X-Mizu-Trace-ID: 39bc16c2b94e545e
+Received: by smtp.migadu.com with ESMTPS id 3c11f406c939197c;
+	Wed, 18 Nov 2026 15:20:05 +0000
+X-Mizu-Trace-ID: 3c11f406c939197c
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -71,9 +71,9 @@ Cc: Will Deacon <will@kernel.org>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 09/13] KVM: arm64: Emulate the ITS command queue
-Date: Wed, 18 Nov 2026 15:19:00 +0000
-Message-ID: <20261118151904.4099560-10-fuad.tabba@linux.dev>
+Subject: [PATCH v4 10/13] KVM: arm64: Take the ITS tables and restrict GITS_BASER<n>
+Date: Wed, 18 Nov 2026 15:19:01 +0000
+Message-ID: <20261118151904.4099560-11-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261118151904.4099560-1-fuad.tabba@linux.dev>
 References: <20261118151904.4099560-1-fuad.tabba@linux.dev>
@@ -86,781 +86,468 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Sebastian Ene <sebastianene@google.com>
+The ITS writes device and collection entries into the tables
+GITS_BASER<n> points to. At setup the hypervisor takes every such table
+and every level-2 page an indirect device table already points to. That
+includes the vPE table, which the driver allocates whether or not GICv4
+is in use. With GICv4 off for the host, only the device table gains
+level-2 pages after setup.
 
-The ITS writes to the memory its commands point to, so a host that
-queues commands freely can aim those writes at the hypervisor or a
-protected guest.
+From the takeover on, the driver writes new level-1 entries into a copy
+of the device table, which the hypervisor pins. On the first MAPD that
+needs a new entry, the hypervisor publishes the copy's entry if the
+entry holds only Valid and the address of an aligned level-2 page, and
+takes and zeroes that page. A MAPD whose entry stays invalid is
+rejected, and so is a MAPD past the end of a flat device table.
 
-Register each ITS's control frame with the hypervisor, so that every
-host access to it traps once the host is deprivileged. Each ITS takes
-one of the hypervisor's eight MMIO region slots, so on a host with more
-than eight ITSes KVM doesn't initialise in protected mode. Inside the
-stop_machine() callback that deprivileges the host, the hypervisor reads
-GITS_CBASER, GITS_CWRITER and GITS_CREADR itself, takes the queue and
-pins the driver's copy. If that fails, no CPU is deprivileged and
-KVM_CREATE_VM fails with -ENODEV.
+A GITS_BASER<n> write is now accepted only with the ITS disabled and
+quiescent, and only for a register that pointed to a table at setup. The
+hypervisor then writes the value it read at setup in place of the
+host's, and an enable aborts unless every such register still holds it.
 
-On a GITS_CWRITER write, the hypervisor reads each new command once from
-the driver's copy of the queue, checks it and copies it into the
-hardware queue. For a rejected command, the host's GITS_CWRITER write
-takes a data abort, after the commands before it have been forwarded.
-For now that's a vLPI command or an unknown encoding, neither of which
-the driver queues.
-
-An access aborts if its syndrome isn't valid, or if it is narrower than
-four bytes or misaligned. Reads go to the hardware for the registers the
-driver reads, each at the size the driver uses, and other reads abort.
-GITS_CREADR, which the driver reads at 32 bits, can be read at 64 bits
-too.
-
-Writes abort, except to GITS_CWRITER, GITS_BASER<n>, GITS_CTLR and
-GITS_CBASER. The next patch restricts GITS_BASER<n>, and the driver
-writes GITS_CTLR and GITS_CBASER on suspend and resume. A GITS_CBASER
-write is accepted only with the ITS disabled and quiescent, and the
-hypervisor writes the value it read at setup in place of the host's. A
-write that enables the ITS aborts unless GITS_CBASER holds that value.
-While the ITS isn't quiescent, the hypervisor drops such a write rather
-than abort it, which leaves the ITS disabled. The driver re-enables the
-ITS from a syscore callback when a quiesce times out, and an abort
-there would take the host down.
-
-Add to arm-gic-v3.h the GITS_CBASER, GITS_CWRITER and GITS_CREADR
-fields that the hypervisor decodes.
-
+Co-developed-by: Sebastian Ene <sebastianene@google.com>
 Signed-off-by: Sebastian Ene <sebastianene@google.com>
-Co-developed-by: Bartłomiej Grzesik <bgrzesik@google.com>
-Signed-off-by: Bartłomiej Grzesik <bgrzesik@google.com>
-Co-developed-by: Fuad Tabba <fuad.tabba@linux.dev>
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- arch/arm64/include/asm/kvm_asm.h              |   2 +
- arch/arm64/include/asm/kvm_hcall.h            |   2 +
- arch/arm64/include/asm/kvm_pkvm.h             |   4 +
- arch/arm64/kvm/arm.c                          |   4 +
- arch/arm64/kvm/hyp/include/nvhe/its_emulate.h |  16 +
- arch/arm64/kvm/hyp/nvhe/Makefile              |   3 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c            |   8 +
- arch/arm64/kvm/hyp/nvhe/its_emulate.c         | 323 ++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  65 ++++
- arch/arm64/kvm/pkvm.c                         |  98 +++++-
- include/linux/irqchip/arm-gic-v3.h            |   5 +
- 11 files changed, 527 insertions(+), 3 deletions(-)
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/its_emulate.h
- create mode 100644 arch/arm64/kvm/hyp/nvhe/its_emulate.c
+ arch/arm64/kvm/hyp/nvhe/its_emulate.c | 252 +++++++++++++++++++++++++-
+ drivers/irqchip/irq-gic-v3-its.c      |  30 ++-
+ include/linux/irqchip/arm-gic-v3.h    |   7 +-
+ 3 files changed, 280 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index abda476e023de..339850e2702d0 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -122,6 +122,8 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_put,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_sync_state,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_tlb_flush_vmid,
-+	/* Called with kvm_protected_mode_initialized on, before __pkvm_prot_finalize. */
-+	__KVM_HOST_SMCCC_FUNC___pkvm_its_emulate_setup,
- 
- 	MARKER(__KVM_HOST_SMCCC_FUNC_MAX)
- };
-diff --git a/arch/arm64/include/asm/kvm_hcall.h b/arch/arm64/include/asm/kvm_hcall.h
-index 5f77a8aa29635..0748232c387ec 100644
---- a/arch/arm64/include/asm/kvm_hcall.h
-+++ b/arch/arm64/include/asm/kvm_hcall.h
-@@ -254,5 +254,7 @@ DECLARE_KVM_HOST_HCALL0(void, __pkvm_vcpu_put)
- DECLARE_KVM_HOST_HCALL0(void, __pkvm_vcpu_sync_state)
- DECLARE_KVM_HOST_HCALL(void, __pkvm_tlb_flush_vmid,
- 	pkvm_handle_t, handle)
-+DECLARE_KVM_HOST_HCALL(int, __pkvm_its_emulate_setup,
-+	phys_addr_t, its_base, phys_addr_t, desc_pa, size_t, desc_size)
- 
- #endif /* __ARM64_KVM_HCALL_H__ */
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index 4695c35b31e1a..e1203b06ec7b3 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -24,11 +24,15 @@ struct pkvm_protected_reg {
- 	u64			pfn;
- 	u64			nr_pages;
- 	void __iomem		*hyp_va;
-+	/* The ITS's state once it is taken. */
-+	void			*priv;
- };
- 
- extern struct pkvm_protected_reg kvm_nvhe_sym(pkvm_protected_regs)[];
- extern unsigned int kvm_nvhe_sym(num_protected_reg);
- 
-+int pkvm_register_its_regions(void);
-+
- int pkvm_init_host_vm(struct kvm *kvm);
- int pkvm_create_hyp_vm(struct kvm *kvm);
- bool pkvm_hyp_vm_is_created(struct kvm *kvm);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 157bf4b812020..789f6ca13ae12 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -3128,6 +3128,10 @@ static int __init init_hyp_mode(void)
- 		if (err)
- 			goto out_err;
- 
-+		err = pkvm_register_its_regions();
-+		if (err)
-+			goto out_err;
-+
- 		err = kvm_hyp_init_protection(hyp_va_bits);
- 		if (err) {
- 			kvm_err("Failed to init hyp memory protection\n");
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/its_emulate.h b/arch/arm64/kvm/hyp/include/nvhe/its_emulate.h
-new file mode 100644
-index 0000000000000..0b0d4aa25a5b7
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/include/nvhe/its_emulate.h
-@@ -0,0 +1,16 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2026 Google LLC
-+ * Author: Sebastian Ene <sebastianene@google.com>
-+ */
-+#ifndef __ARM64_KVM_NVHE_ITS_EMULATE_H__
-+#define __ARM64_KVM_NVHE_ITS_EMULATE_H__
-+
-+#include <asm/kvm_pkvm.h>
-+
-+int pkvm_its_emulate_setup(phys_addr_t its_base, phys_addr_t desc_pa,
-+			   size_t desc_size);
-+bool pkvm_its_emulate_handler(struct pkvm_protected_reg *region, u64 offset,
-+			      bool write, u64 *val, u8 size);
-+
-+#endif /* __ARM64_KVM_NVHE_ITS_EMULATE_H__ */
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index 56a7e2c05f73a..2c50940849782 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -24,7 +24,8 @@ CFLAGS_switch.nvhe.o += -Wno-override-init
- 
- hyp-obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
- 	 hyp-main.o hyp-smp.o psci-relay.o alloc.o early_alloc.o page_alloc.o \
--	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o
-+	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o \
-+	 its_emulate.o
- hyp-obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
- 	 ../hyp-entry.o ../exception.o ../pgtable.o ../vgic-v5-sr.o
- hyp-obj-y += ../../../kernel/smccc-call.o
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 179d7c8277b88..5efaa32037a5b 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -22,6 +22,7 @@
- 
- #include <nvhe/alloc.h>
- #include <nvhe/ffa.h>
-+#include <nvhe/its_emulate.h>
- #include <nvhe/mem_protect.h>
- #include <nvhe/mm.h>
- #include <nvhe/pkvm.h>
-@@ -1169,6 +1170,12 @@ DEFINE_KVM_HOST_HCALL(void, __pkvm_tlb_flush_vmid,
- 	put_pkvm_hyp_vm(hyp_vm);
- }
- 
-+DEFINE_KVM_HOST_HCALL(int, __pkvm_its_emulate_setup,
-+	phys_addr_t, its_base, phys_addr_t, desc_pa, size_t, desc_size)
-+{
-+	return pkvm_its_emulate_setup(its_base, desc_pa, desc_size);
-+}
-+
- DEFINE_KVM_HOST_HCALL(void, __kvm_flush_cpu_context,
- 	struct kvm_s2_mmu __kern *, mmu)
- {
-@@ -1603,6 +1610,7 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__pkvm_vcpu_put),
- 	HANDLE_FUNC(__pkvm_vcpu_sync_state),
- 	HANDLE_FUNC(__pkvm_tlb_flush_vmid),
-+	HANDLE_FUNC(__pkvm_its_emulate_setup),
- };
- 
- static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
 diff --git a/arch/arm64/kvm/hyp/nvhe/its_emulate.c b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
-new file mode 100644
-index 0000000000000..dd077abb1b24b
---- /dev/null
+index dd077abb1b24b..145997d54ce72 100644
+--- a/arch/arm64/kvm/hyp/nvhe/its_emulate.c
 +++ b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
-@@ -0,0 +1,323 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Emulation of the host's accesses to a GICv3 ITS in pKVM.
-+ *
-+ * Copyright (C) 2026 Google LLC
-+ * Author: Sebastian Ene <sebastianene@google.com>
-+ */
-+
-+#include <linux/bitfield.h>
-+#include <linux/io.h>
-+#include <linux/irqchip/arm-gic-v3.h>
-+
-+#include <asm/kvm_pkvm.h>
-+
-+#include <nvhe/its_emulate.h>
-+#include <nvhe/mem_protect.h>
-+#include <nvhe/memory.h>
-+#include <nvhe/spinlock.h>
-+
-+/* Per-ITS state, in the pages the host donated at setup. */
-+struct its_priv {
-+	hyp_spinlock_t		lock;
-+	void __iomem		*base;
-+	u64			cbaser;
-+
-+	/* The hardware queue, which is hyp-owned, and the host's pinned copy of it. */
-+	void			*cmdq_hw;
-+	void			*cmdq_copy;
-+	u32			cmdq_size;
-+
-+	/* The next slot to forward, at the offset last written to GITS_CWRITER. */
-+	u32			cmd_offset;
-+
-+	/* The GITS_CREADR offset last read. */
-+	u32			hw_creadr;
+@@ -17,11 +17,25 @@
+ #include <nvhe/memory.h>
+ #include <nvhe/spinlock.h>
+ 
++/* A GITS_BASER<n> table, as the register described it at setup. */
++struct its_table {
++	/* The hardware table, which is hyp-owned, and the host's pinned copy of its level 1. */
++	void			*hw;
++	void			*l1_copy;
++	u64			baser;
++	size_t			size;
++	u32			psz;
++	u8			esz;
++	bool			indirect;
 +};
 +
-+static int its_pin_host_pages(phys_addr_t pa, u64 nr_pages)
+ /* Per-ITS state, in the pages the host donated at setup. */
+ struct its_priv {
+ 	hyp_spinlock_t		lock;
+ 	void __iomem		*base;
+ 	u64			cbaser;
++	struct its_table	tables[GITS_BASER_NR_REGS];
++	struct its_table	*dev_table;
+ 
+ 	/* The hardware queue, which is hyp-owned, and the host's pinned copy of it. */
+ 	void			*cmdq_hw;
+@@ -50,10 +64,75 @@ static int its_pin_host_pages(phys_addr_t pa, u64 nr_pages)
+ 	return hyp_pin_shared_mem(va, va + (nr_pages << PAGE_SHIFT));
+ }
+ 
++static size_t its_l2_size(struct its_table *t)
 +{
-+	void *va = hyp_phys_to_virt(pa);
-+	u64 pfn = PHYS_PFN(pa), i;
++	return PAGE_ALIGN(t->psz);
++}
++
++/*
++ * The ITS discards a device table write through an invalid level-1 entry, so
++ * make the entry for device_id valid from the host's copy. A hardware entry
++ * only ever goes from invalid to valid.
++ */
++static bool its_publish_l1(struct its_priv *its, u32 device_id)
++{
++	struct its_table *t = its->dev_table;
++	size_t l2_size;
++	u64 idx, entry;
++	phys_addr_t pa;
++	__le64 *hw;
++
++	/* Without a device table in memory there is no level-1 entry to publish. */
++	if (!t)
++		return true;
++
++	if (!t->indirect)
++		return device_id < t->size / t->esz;
++
++	idx = device_id / (t->psz / t->esz);
++	if (idx >= t->size / GITS_LVL1_ENTRY_SIZE)
++		return false;
++
++	hw = t->hw;
++	if (le64_to_cpu(hw[idx]) & GITS_BASER_VALID)
++		return true;
++
++	/* Read the entry once, as the host can change its copy. */
++	entry = le64_to_cpu(READ_ONCE(((__le64 *)t->l1_copy)[idx]));
++
++	l2_size = its_l2_size(t);
++	pa = GITS_LVL1_ADDRESS(entry);
++	if (entry != (pa | GITS_BASER_VALID) || !IS_ALIGNED(pa, l2_size))
++		return false;
++	if (__pkvm_host_donate_hyp(PHYS_PFN(pa), l2_size >> PAGE_SHIFT))
++		return false;
++
++	/* Using a new level-2 table that isn't all zeros is UNPREDICTABLE. */
++	memset(hyp_phys_to_virt(pa), 0, l2_size);
++	if (!(t->baser & GITS_BASER_SHAREABILITY_MASK))
++		gic_flush_dcache_to_poc(hyp_phys_to_virt(pa), l2_size);
++	/* The ITS can walk a valid entry at any time, so order the zeroing before it. */
++	dma_wmb();
++	hw[idx] = cpu_to_le64(entry);
++	if (!(t->baser & GITS_BASER_SHAREABILITY_MASK))
++		gic_flush_dcache_to_poc(&hw[idx], sizeof(*hw));
++	/* Make the entry visible to the ITS before the command that relies on it is queued. */
++	dsb(sy);
++	return true;
++}
++
++static bool its_mapd(struct its_priv *its, struct its_cmd_block *cmd)
++{
++	u32 device_id = its_cmd_get_deviceid(cmd->raw_cmd);
++
++	return its_publish_l1(its, device_id);
++}
++
+ static bool its_process_cmd(struct its_priv *its, struct its_cmd_block *cmd)
+ {
+ 	switch (its_cmd_get_command(cmd->raw_cmd)) {
+ 	case GITS_CMD_MAPD:
++		return its_mapd(its, cmd);
+ 	case GITS_CMD_MAPC:
+ 	case GITS_CMD_MAPTI:
+ 	case GITS_CMD_MAPI:
+@@ -128,10 +207,26 @@ static bool its_cwriter_write(struct its_priv *its, u64 val)
+ 	return !rejected;
+ }
+ 
+-/* A reset clears GITS_CBASER.Valid, and an enable with it clear is UNPREDICTABLE. */
++/*
++ * A reset clears the Valid bits of GITS_CBASER and GITS_BASER<n>, and enabling the
++ * ITS with the Valid bit of GITS_CBASER or of the device table clear is UNPREDICTABLE.
++ */
+ static bool its_bases_intact(struct its_priv *its)
+ {
+-	return readq_relaxed(its->base + GITS_CBASER) == its->cbaser;
++	unsigned int n;
++
++	if (readq_relaxed(its->base + GITS_CBASER) != its->cbaser)
++		return false;
++
++	for (n = 0; n < GITS_BASER_NR_REGS; n++) {
++		u64 baser = its->tables[n].baser;
++
++		if ((baser & GITS_BASER_VALID) &&
++		    readq_relaxed(its->base + GITS_BASER + n * sizeof(u64)) != baser)
++			return false;
++	}
++
++	return true;
+ }
+ 
+ static bool its_ctlr_write(struct its_priv *its, u64 val)
+@@ -175,6 +270,21 @@ static bool its_cbaser_write(struct its_priv *its)
+ 	return true;
+ }
+ 
++static bool its_baser_write(struct its_priv *its, unsigned int index)
++{
++	u64 baser = its->tables[index].baser;
++
++	if (!its_disabled_quiescent(its))
++		return false;
++
++	/* Refuse a table the hypervisor didn't take, as the driver never restores one. */
++	if (!(baser & GITS_BASER_VALID))
++		return false;
++
++	writeq_relaxed(baser, its->base + GITS_BASER + index * sizeof(u64));
++	return true;
++}
++
+ static bool its_emulate(struct its_priv *its, u64 offset, bool write, u64 *val, u8 size)
+ {
+ 	if (write) {
+@@ -187,10 +297,8 @@ static bool its_emulate(struct its_priv *its, u64 offset, bool write, u64 *val,
+ 			/* The driver writes the low word, and the high word is RES0. */
+ 			return its_cwriter_write(its, *val);
+ 		case GITS_BASER ... GITS_BASER + (GITS_BASER_NR_REGS - 1) * sizeof(u64):
+-			if (size != sizeof(u64))
+-				return false;
+-			writeq_relaxed(*val, its->base + offset);
+-			return true;
++			return size == sizeof(u64) &&
++			       its_baser_write(its, (offset - GITS_BASER) / sizeof(u64));
+ 		default:
+ 			return false;
+ 		}
+@@ -275,6 +383,134 @@ static int its_take_cmdq(struct its_priv *its, phys_addr_t copy_pa)
+ 	return 0;
+ }
+ 
++static u32 its_baser_psz(u64 baser)
++{
++	switch (FIELD_GET(GITS_BASER_PAGE_SIZE_MASK, baser)) {
++	case GIC_PAGE_SIZE_4K:
++		return SZ_4K;
++	case GIC_PAGE_SIZE_16K:
++		return SZ_16K;
++	default:
++		/* 0b11 is reserved and treated as 64K. */
++		return SZ_64K;
++	}
++}
++
++static phys_addr_t its_baser_pa(u64 baser, u32 psz)
++{
++	/* With 64K pages, bits [15:12] of the register hold PA[51:48]. */
++	if (psz == SZ_64K)
++		return GITS_BASER_ADDR_48_to_52(baser);
++
++	return baser & GENMASK_ULL(47, 12);
++}
++
++static int its_take_level2(struct its_table *t)
++{
++	u64 nr_entries = t->size / GITS_LVL1_ENTRY_SIZE;
++	u64 l2_pages = its_l2_size(t) >> PAGE_SHIFT;
++	__le64 *table = t->hw;
++	u64 i, entry;
 +	int ret;
 +
-+	for (i = 0; i < nr_pages; i++) {
-+		ret = __pkvm_host_share_hyp(pfn + i);
++	for (i = 0; i < nr_entries; i++) {
++		entry = le64_to_cpu(table[i]);
++		if (!(entry & GITS_BASER_VALID))
++			continue;
++
++		ret = __pkvm_host_donate_hyp(PHYS_PFN(GITS_LVL1_ADDRESS(entry)), l2_pages);
 +		if (ret)
 +			return ret;
 +	}
 +
-+	return hyp_pin_shared_mem(va, va + (nr_pages << PAGE_SHIFT));
++	return 0;
 +}
 +
-+static bool its_process_cmd(struct its_priv *its, struct its_cmd_block *cmd)
++static int its_take_table(struct its_table *t, phys_addr_t copy_pa)
 +{
-+	switch (its_cmd_get_command(cmd->raw_cmd)) {
-+	case GITS_CMD_MAPD:
-+	case GITS_CMD_MAPC:
-+	case GITS_CMD_MAPTI:
-+	case GITS_CMD_MAPI:
-+	case GITS_CMD_MOVI:
-+	case GITS_CMD_DISCARD:
-+	case GITS_CMD_INV:
-+	case GITS_CMD_MOVALL:
-+	case GITS_CMD_INVALL:
-+	case GITS_CMD_INT:
-+	case GITS_CMD_CLEAR:
-+	case GITS_CMD_SYNC:
-+		return true;
-+	default:
-+		/* The vLPI commands and anything unknown. */
-+		return false;
++	u64 baser = t->baser, nr_pages;
++	phys_addr_t pa;
++	int ret;
++
++	t->psz = its_baser_psz(baser);
++	t->esz = GITS_BASER_ENTRY_SIZE(baser);
++	t->size = GITS_BASER_NR_PAGES(baser) * t->psz;
++	t->indirect = baser & GITS_BASER_INDIRECT;
++	pa = its_baser_pa(baser, t->psz);
++	nr_pages = DIV_ROUND_UP(t->size, PAGE_SIZE);
++
++	ret = __pkvm_host_donate_hyp(PHYS_PFN(pa), nr_pages);
++	if (ret)
++		return ret;
++	t->hw = hyp_phys_to_virt(pa);
++
++	if (!t->indirect)
++		return 0;
++
++	if (copy_pa) {
++		ret = its_pin_host_pages(copy_pa, nr_pages);
++		if (ret)
++			return ret;
++		t->l1_copy = hyp_phys_to_virt(copy_pa);
 +	}
++
++	return its_take_level2(t);
 +}
 +
-+static u64 its_read_creadr(struct its_priv *its)
++/* GICv4.1 ITSes with a common affinity share one vPE table (GITS_TYPER.SVPET). */
++static bool its_vpe_table_taken(u64 baser)
 +{
-+	u64 creadr = readq_relaxed(its->base + GITS_CREADR);
-+	u32 offset = creadr & GITS_CREADR_OFFSET;
++	unsigned int i, n;
 +
-+	its->hw_creadr = offset;
++	for (i = 0; i < num_protected_reg; i++) {
++		struct its_priv *its = pkvm_protected_regs[i].priv;
 +
-+	return creadr;
++		if (!its)
++			continue;
++
++		for (n = 0; n < GITS_BASER_NR_REGS; n++) {
++			if (its->tables[n].hw && its->tables[n].baser == baser)
++				return true;
++		}
++	}
++
++	return false;
 +}
 +
-+/* Returns false on a rejected command, after forwarding the ones before it. */
-+static bool its_cwriter_write(struct its_priv *its, u64 val)
++static int its_take_tables(struct its_priv *its, struct its_pkvm_desc *desc)
 +{
-+	u32 new = val & GITS_CWRITER_OFFSET;
-+	struct its_cmd_block cmd;
-+	bool rejected = false;
-+	unsigned int i;
-+	u64 *slot;
++	unsigned int n;
++	int ret;
 +
-+	if (new >= its->cmdq_size)
-+		return false;
++	for (n = 0; n < GITS_BASER_NR_REGS; n++) {
++		struct its_table *t = &its->tables[n];
++		phys_addr_t copy_pa = 0;
 +
-+	its_read_creadr(its);
++		t->baser = readq_relaxed(its->base + GITS_BASER + n * sizeof(u64));
++		if (!(t->baser & GITS_BASER_VALID))
++			continue;
 +
-+	/* The queue is full with GITS_CWRITER 32 bytes behind GITS_CREADR, so reject an overrun. */
-+	if ((its->cmd_offset + its->cmdq_size - its->hw_creadr) % its->cmdq_size +
-+	    (new + its->cmdq_size - its->cmd_offset) % its->cmdq_size >
-+	    its->cmdq_size - sizeof(cmd))
-+		return false;
-+
-+	/* A value below cmd_offset wraps around the queue, as it does for the ITS. */
-+	while (its->cmd_offset != new) {
-+		/* Read the command once, as the host can change its copy. */
-+		slot = its->cmdq_copy + its->cmd_offset;
-+		for (i = 0; i < ARRAY_SIZE(cmd.raw_cmd); i++)
-+			cmd.raw_cmd[i] = READ_ONCE(slot[i]);
-+		if (!its_process_cmd(its, &cmd)) {
-+			rejected = true;
++		switch (GITS_BASER_TYPE(t->baser)) {
++		case GITS_BASER_TYPE_DEVICE:
++			/* The driver publishes level-1 entries through its copy. */
++			copy_pa = desc->dev_l1_copy_pa;
++			its->dev_table = t;
++			break;
++		case GITS_BASER_TYPE_VCPU:
++			/* Writing it while the ITS is enabled is UNPREDICTABLE, so take it. */
++			if (its_vpe_table_taken(t->baser))
++				continue;
 +			break;
 +		}
 +
-+		memcpy(its->cmdq_hw + its->cmd_offset, &cmd, sizeof(cmd));
-+		/*
-+		 * Flush whatever GITS_CBASER says, as it can read as shareable on an ITS
-+		 * that the driver treats as non-coherent (ITS_FLAGS_CMDQ_NEEDS_FLUSHING).
-+		 */
-+		gic_flush_dcache_to_poc(its->cmdq_hw + its->cmd_offset, sizeof(cmd));
-+		its->cmd_offset = (its->cmd_offset + sizeof(cmd)) % its->cmdq_size;
++		ret = its_take_table(t, copy_pa);
++		if (ret)
++			return ret;
 +	}
-+
-+	dsb(ishst);
-+	/* Retry has no effect unless the hardware stalled on a command error. */
-+	writeq_relaxed(its->cmd_offset | (val & GITS_CWRITER_RETRY), its->base + GITS_CWRITER);
-+	return !rejected;
-+}
-+
-+/* A reset clears GITS_CBASER.Valid, and an enable with it clear is UNPREDICTABLE. */
-+static bool its_bases_intact(struct its_priv *its)
-+{
-+	return readq_relaxed(its->base + GITS_CBASER) == its->cbaser;
-+}
-+
-+static bool its_ctlr_write(struct its_priv *its, u64 val)
-+{
-+	u32 ctlr = readl_relaxed(its->base + GITS_CTLR);
-+
-+	if ((val & GITS_CTLR_ENABLE) && !(ctlr & GITS_CTLR_ENABLE)) {
-+		/*
-+		 * Enabling while not Quiescent is UNPREDICTABLE. Drop the write rather than
-+		 * abort it, as the driver enables the ITS when a quiesce times out on suspend.
-+		 */
-+		if (!(ctlr & GITS_CTLR_QUIESCENT))
-+			return true;
-+		if (!its_bases_intact(its))
-+			return false;
-+	}
-+
-+	writel_relaxed(val, its->base + GITS_CTLR);
-+	return true;
-+}
-+
-+/* GITS_CBASER and GITS_BASER<n> are UNPREDICTABLE to write otherwise. */
-+static bool its_disabled_quiescent(struct its_priv *its)
-+{
-+	u32 ctlr = readl_relaxed(its->base + GITS_CTLR);
-+
-+	return !(ctlr & GITS_CTLR_ENABLE) && (ctlr & GITS_CTLR_QUIESCENT);
-+}
-+
-+static bool its_cbaser_write(struct its_priv *its)
-+{
-+	if (!its_disabled_quiescent(its))
-+		return false;
-+
-+	writeq_relaxed(its->cbaser, its->base + GITS_CBASER);
-+
-+	/* The write reset GITS_CREADR to 0, and the ITS drops what was queued before it. */
-+	its->cmd_offset = 0;
-+	its->hw_creadr = 0;
-+	writeq_relaxed(0, its->base + GITS_CWRITER);
-+	return true;
-+}
-+
-+static bool its_emulate(struct its_priv *its, u64 offset, bool write, u64 *val, u8 size)
-+{
-+	if (write) {
-+		switch (offset) {
-+		case GITS_CTLR:
-+			return size == sizeof(u32) && its_ctlr_write(its, *val);
-+		case GITS_CBASER:
-+			return size == sizeof(u64) && its_cbaser_write(its);
-+		case GITS_CWRITER:
-+			/* The driver writes the low word, and the high word is RES0. */
-+			return its_cwriter_write(its, *val);
-+		case GITS_BASER ... GITS_BASER + (GITS_BASER_NR_REGS - 1) * sizeof(u64):
-+			if (size != sizeof(u64))
-+				return false;
-+			writeq_relaxed(*val, its->base + offset);
-+			return true;
-+		default:
-+			return false;
-+		}
-+	}
-+
-+	/* The driver doesn't read any other register. */
-+	switch (offset) {
-+	case GITS_CTLR:
-+	case GITS_IIDR:
-+	case GITS_MPIDR:
-+	case GITS_PIDR2:
-+		if (size != sizeof(u32))
-+			return false;
-+		break;
-+	case GITS_TYPER:
-+	case GITS_CBASER:
-+	case GITS_BASER ... GITS_BASER + (GITS_BASER_NR_REGS - 1) * sizeof(u64):
-+		if (size != sizeof(u64))
-+			return false;
-+		break;
-+	case GITS_CREADR:
-+		break;
-+	default:
-+		return false;
-+	}
-+
-+	*val = size == sizeof(u64) ? readq_relaxed(its->base + offset) :
-+				     readl_relaxed(its->base + offset);
-+	return true;
-+}
-+
-+bool pkvm_its_emulate_handler(struct pkvm_protected_reg *region, u64 offset,
-+			      bool write, u64 *val, u8 size)
-+{
-+	struct its_priv *its = region->priv;
-+	bool ret;
-+
-+	if (size < sizeof(u32) || !IS_ALIGNED(offset, size))
-+		return false;
-+
-+	hyp_spin_lock(&its->lock);
-+	ret = its_emulate(its, offset, write, val, size);
-+	hyp_spin_unlock(&its->lock);
-+
-+	return ret;
-+}
-+
-+static struct pkvm_protected_reg *its_find_region(phys_addr_t its_base)
-+{
-+	int i;
-+
-+	for (i = 0; i < num_protected_reg; i++) {
-+		if (PFN_PHYS(pkvm_protected_regs[i].pfn) == its_base)
-+			return &pkvm_protected_regs[i];
-+	}
-+
-+	return NULL;
-+}
-+
-+static int its_take_cmdq(struct its_priv *its, phys_addr_t copy_pa)
-+{
-+	u32 cwriter = readq_relaxed(its->base + GITS_CWRITER) & GITS_CWRITER_OFFSET;
-+	u32 creadr = readq_relaxed(its->base + GITS_CREADR) & GITS_CREADR_OFFSET;
-+	u32 size = SZ_4K * (FIELD_GET(GITS_CBASER_SIZE, its->cbaser) + 1);
-+	phys_addr_t hw_pa = GITS_CBASER_ADDRESS(its->cbaser);
-+	u64 nr_pages = size >> PAGE_SHIFT;
-+	int ret;
-+
-+	ret = __pkvm_host_donate_hyp(PHYS_PFN(hw_pa), nr_pages);
-+	if (ret)
-+		return ret;
-+
-+	ret = its_pin_host_pages(copy_pa, nr_pages);
-+	if (ret)
-+		return ret;
-+
-+	its->cmdq_hw = hyp_phys_to_virt(hw_pa);
-+	its->cmdq_copy = hyp_phys_to_virt(copy_pa);
-+	its->cmdq_size = size;
-+	its->cmd_offset = cwriter;
-+	its->hw_creadr = creadr;
-+	return 0;
-+}
-+
-+int pkvm_its_emulate_setup(phys_addr_t its_base, phys_addr_t desc_pa,
-+			   size_t desc_size)
-+{
-+	u64 desc_pages = desc_size >> PAGE_SHIFT;
-+	struct pkvm_protected_reg *region;
-+	struct its_pkvm_desc *desc;
-+	struct its_priv *its;
-+	u64 priv_pages;
-+	int ret;
-+
-+	region = its_find_region(its_base);
-+	if (!region)
-+		return -ENODEV;
-+	if (region->priv)
-+		return -EBUSY;
-+
-+	/*
-+	 * Called once per ITS by the still-privileged host, so its arguments and
-+	 * the registers it programmed are trusted. A failure isn't unwound, as the
-+	 * host is then never deprivileged.
-+	 */
-+	ret = __pkvm_host_donate_hyp(PHYS_PFN(desc_pa), desc_pages);
-+	if (ret)
-+		return ret;
-+	desc = hyp_phys_to_virt(desc_pa);
-+
-+	priv_pages = desc->priv_pages;
-+	ret = __pkvm_host_donate_hyp(PHYS_PFN(desc->priv_pa), priv_pages);
-+	if (ret)
-+		return ret;
-+	its = hyp_phys_to_virt(desc->priv_pa);
-+	memset(its, 0, priv_pages * PAGE_SIZE);
-+
-+	hyp_spin_lock_init(&its->lock);
-+	its->base = region->hyp_va;
-+	its->cbaser = readq_relaxed(its->base + GITS_CBASER);
-+
-+	ret = its_take_cmdq(its, desc->cmdq_copy_pa);
-+	if (ret)
-+		return ret;
-+
-+	WARN_ON(__pkvm_hyp_donate_host(PHYS_PFN(desc_pa), desc_pages));
-+	/* Published by stop_machine()'s exit, and no host CPU traps until then. */
-+	region->priv = its;
-+	return 0;
-+}
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 8d45f45d30e6a..58cc1691b67a6 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -13,10 +13,12 @@
- #include <asm/kvm_pkvm.h>
- #include <asm/stage2_pgtable.h>
- 
-+#include <hyp/adjust_pc.h>
- #include <hyp/fault.h>
- 
- #include <nvhe/arm-smccc.h>
- #include <nvhe/gfp.h>
-+#include <nvhe/its_emulate.h>
- #include <nvhe/memory.h>
- #include <nvhe/mem_protect.h>
- #include <nvhe/mm.h>
-@@ -779,6 +781,65 @@ static void host_inject_mem_abort(struct kvm_cpu_context *host_ctxt)
- 	inject_host_exception(esr);
- }
- 
-+static struct pkvm_protected_reg *find_protected_reg(u64 addr, u8 size)
-+{
-+	struct pkvm_protected_reg *region;
-+	u64 start, end;
-+	int i;
-+
-+	for (i = 0; i < num_protected_reg; i++) {
-+		region = &pkvm_protected_regs[i];
-+		start = PFN_PHYS(region->pfn);
-+		end = start + PFN_PHYS(region->nr_pages);
-+
-+		if (addr >= start && addr + size <= end)
-+			return region;
-+	}
-+
-+	return NULL;
-+}
-+
-+/*
-+ * Returns false when the access cannot be emulated or the emulation rejects it.
-+ * The caller's host stage-2 path then injects the abort.
-+ */
-+static bool handle_host_mmio_trap(struct kvm_cpu_context *host_ctxt, u64 esr,
-+				  u64 addr)
-+{
-+	struct pkvm_protected_reg *region;
-+	u64 val = 0;
-+	u8 size, rt;
-+	bool write;
-+
-+	/* An access without a valid syndrome can't be emulated. */
-+	if (ESR_ELx_EC(esr) != ESR_ELx_EC_DABT_LOW || !(esr & ESR_ELx_ISV))
-+		return false;
-+
-+	size = BIT(FIELD_GET(ESR_ELx_SAS, esr));
-+	region = find_protected_reg(addr, size);
-+	if (!region)
-+		return false;
-+
-+	rt = FIELD_GET(ESR_ELx_SRT_MASK, esr);
-+	write = esr & ESR_ELx_WNR;
-+	if (write && rt != 31)
-+		val = cpu_reg(host_ctxt, rt) & GENMASK_ULL(size * 8 - 1, 0);
-+
-+	if (!pkvm_its_emulate_handler(region, addr - PFN_PHYS(region->pfn), write, &val, size))
-+		return false;
-+
-+	if (!write && rt != 31) {
-+		if ((esr & ESR_ELx_SSE) && size < sizeof(u64))
-+			val = sign_extend64(val, size * 8 - 1);
-+		if (!(esr & ESR_ELx_SF))
-+			val = lower_32_bits(val);
-+		cpu_reg(host_ctxt, rt) = val;
-+	}
-+
-+	kvm_skip_host_instr();
-+	return true;
-+}
-+
- void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
- {
- 	struct kvm_vcpu_fault_info fault;
-@@ -801,6 +862,10 @@ void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
- 	BUG_ON(!(fault.hpfar_el2 & HPFAR_EL2_NS));
- 	addr = FIELD_GET(HPFAR_EL2_FIPA, fault.hpfar_el2) << 12;
- 
-+	if (num_protected_reg &&
-+	    handle_host_mmio_trap(host_ctxt, esr, addr | FAR_TO_FIPA_OFFSET(fault.far_el2)))
-+		return;
-+
- 	switch (host_stage2_idmap(addr)) {
- 	case -EPERM:
- 		host_inject_mem_abort(host_ctxt);
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 16dfb249b4961..ddd797d21d42d 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -6,6 +6,7 @@
- 
- #include <linux/init.h>
- #include <linux/interval_tree_generic.h>
-+#include <linux/irqchip/arm-gic-v3.h>
- #include <linux/kmemleak.h>
- #include <linux/kvm_host.h>
- #include <asm/kvm_mmu.h>
-@@ -43,6 +44,53 @@ static int __init register_memblock_regions(void)
- 	return 0;
- }
- 
-+static int __init pkvm_register_its_region(phys_addr_t its_base)
-+{
-+	unsigned int idx = kvm_nvhe_sym(num_protected_reg);
-+	struct pkvm_protected_reg *region;
-+
-+	if (idx >= PKVM_PROTECTED_REGS_NUM) {
-+		kvm_err("ITS@%pa: no protected region slot left\n", &its_base);
-+		return -ENOSPC;
-+	}
-+
-+	/*
-+	 * Only the control frame is taken. GITS_TRANSLATER is in the next frame and
-+	 * stays host-mapped, as devices raise MSIs through it.
-+	 */
-+	region = &kvm_nvhe_sym(pkvm_protected_regs)[idx];
-+	region->pfn = PHYS_PFN(its_base);
-+	region->nr_pages = PFN_DOWN(GITS_TRANSLATER);
-+	kvm_nvhe_sym(num_protected_reg) = idx + 1;
 +
 +	return 0;
 +}
 +
-+int __init pkvm_register_its_regions(void)
-+{
-+	int ret;
-+
-+	ret = its_pkvm_iter_its(pkvm_register_its_region);
-+	if (ret)
-+		kvm_err("Failed to register the ITS regions with hyp: %d\n", ret);
-+
-+	return ret;
-+}
-+
-+/* Called by the driver with every CPU stopped. */
-+static int __init pkvm_init_its_emulation(phys_addr_t its_base,
-+					  struct its_pkvm_desc *desc,
-+					  size_t desc_size)
-+{
-+	int ret;
-+
-+	ret = kvm_call_hyp_nvhe(__pkvm_its_emulate_setup, its_base, virt_to_phys(desc), desc_size);
-+	if (ret)
-+		kvm_err("ITS@%pa: emulation setup failed: %d\n", &its_base, ret);
-+
-+	return ret;
-+}
-+
- void __init kvm_hyp_reserve(void)
+ int pkvm_its_emulate_setup(phys_addr_t its_base, phys_addr_t desc_pa,
+ 			   size_t desc_size)
  {
- 	u64 hyp_mem_pages = 0;
-@@ -299,6 +347,10 @@ int pkvm_init_host_vm(struct kvm *kvm)
- {
- 	int ret;
+@@ -316,6 +552,10 @@ int pkvm_its_emulate_setup(phys_addr_t its_base, phys_addr_t desc_pa,
+ 	if (ret)
+ 		return ret;
  
-+	/* The ITS takeover failed, so the hypervisor never finalised. */
-+	if (!is_pkvm_initialized())
-+		return -ENODEV;
++	ret = its_take_tables(its, desc);
++	if (ret)
++		return ret;
 +
- 	/* Reserve the VM in hyp and obtain a hyp handle for the VM. */
- 	ret = kvm_call_hyp_nvhe(__pkvm_reserve_vm);
- 	if (ret < 0)
-@@ -313,19 +365,61 @@ int pkvm_init_host_vm(struct kvm *kvm)
- 	return 0;
+ 	WARN_ON(__pkvm_hyp_donate_host(PHYS_PFN(desc_pa), desc_pages));
+ 	/* Published by stop_machine()'s exit, and no host CPU traps until then. */
+ 	region->priv = its;
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index d98e05557a296..c00178249a04b 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -5245,12 +5245,15 @@ static int __init its_compute_its_list_map(struct its_node *its)
  }
  
-+struct pkvm_its_takeover {
-+	int	ret;
-+	bool	done;
-+};
-+
- static int __init __pkvm_drop_host_privileges(void *arg)
+ /*
+- * In pKVM, the driver writes its commands into a copy of the command queue,
+- * and the hypervisor checks each one before the ITS sees it.
++ * In pKVM, the driver writes its commands into a copy of the command queue and
++ * its level-1 entries into a copy of the device table. The hypervisor checks
++ * each one before the ITS sees it.
+  */
+ struct its_pkvm_state {
+ 	void			*priv;
+ 	void			*cmdq;
++	struct its_baser	*dev_baser;
++	void			*dev_l1;
+ 	struct its_pkvm_desc	*desc;
+ 	size_t			desc_size;
+ };
+@@ -5264,6 +5267,7 @@ static DEFINE_MUTEX(its_pkvm_lock);
+ static int __init its_pkvm_alloc_copies(struct its_node *its,
+ 					struct its_pkvm_state *st)
  {
-+	struct pkvm_its_takeover *takeover = arg;
-+
-+	if (smp_processor_id() == cpumask_first(cpu_online_mask)) {
-+		takeover->ret = its_pkvm_setup_commit(pkvm_init_its_emulation);
-+		/* Publishes ret to the CPUs spinning below. */
-+		smp_store_release(&takeover->done, true);
-+	}
-+
-+	/* Pairs with the release above, so that ret is read after done. */
-+	while (!smp_load_acquire(&takeover->done))
-+		cpu_relax();
-+
-+	/* No CPU is deprivileged unless the hypervisor took every ITS. */
-+	if (takeover->ret)
++	struct its_baser *baser = its_get_baser(its, GITS_BASER_TYPE_DEVICE);
+ 	struct page *page;
+ 
+ 	page = its_alloc_pages_node(its->numa_node, GFP_KERNEL, ITS_PKVM_PRIV_ORDER);
+@@ -5277,6 +5281,15 @@ static int __init its_pkvm_alloc_copies(struct its_node *its,
+ 		return -ENOMEM;
+ 	st->cmdq = page_address(page);
+ 
++	if (!baser || !(baser->val & GITS_BASER_INDIRECT))
 +		return 0;
 +
- 	return WARN_ON(kvm_call_hyp_nvhe(__pkvm_prot_finalize)) ? -EINVAL : 0;
++	page = its_alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO, baser->order);
++	if (!page)
++		return -ENOMEM;
++	st->dev_baser = baser;
++	st->dev_l1 = page_address(page);
++
+ 	return 0;
  }
  
- static int __init pkvm_drop_host_privileges(void)
+@@ -5312,6 +5325,8 @@ static int __init its_pkvm_prepare_one(struct its_node *its)
+ 	desc->priv_pa = virt_to_phys(st->priv);
+ 	desc->priv_pages = 1 << ITS_PKVM_PRIV_ORDER;
+ 	desc->cmdq_copy_pa = virt_to_phys(st->cmdq);
++	if (st->dev_l1)
++		desc->dev_l1_copy_pa = virt_to_phys(st->dev_l1);
+ 
+ 	i = 0;
+ 	list_for_each_entry(dev, &its->its_device_list, entry) {
+@@ -5330,6 +5345,9 @@ static int __init its_pkvm_hand_over(struct its_node *its,
  {
-+	struct pkvm_its_takeover takeover = {};
-+	int ret;
+ 	struct its_pkvm_state *st = its->pkvm;
+ 
++	if (st->dev_l1)
++		memcpy(st->dev_l1, st->dev_baser->base, PAGE_ORDER_TO_SIZE(st->dev_baser->order));
 +
-+	/* Device drivers take dev_alloc_lock, through the MSI layer, with the cpus lock held. */
-+	cpus_read_lock();
-+	ret = its_pkvm_setup_prepare();
-+	if (ret)
-+		goto out;
-+
- 	/*
- 	 * Flip the static key upfront as that may no longer be possible
- 	 * once the host stage 2 is installed.
- 	 */
--	static_branch_enable(&kvm_protected_mode_initialized);
--	return stop_machine(__pkvm_drop_host_privileges, NULL, cpu_online_mask);
-+	static_branch_enable_cpuslocked(&kvm_protected_mode_initialized);
-+	ret = stop_machine_cpuslocked(__pkvm_drop_host_privileges, &takeover, cpu_online_mask);
-+	if (takeover.ret) {
-+		/* No stage 2 was installed. Clear the key again, which also refuses every VM. */
-+		static_branch_disable_cpuslocked(&kvm_protected_mode_initialized);
-+		ret = takeover.ret;
-+	}
-+out:
-+	its_pkvm_setup_finish();
-+	cpus_read_unlock();
-+	if (ret && !is_pkvm_initialized())
-+		pr_err("pKVM: ITS takeover failed (%d): host not deprivileged, VMs refused\n", ret);
-+
-+	return ret;
+ 	return setup(its->phys_base, st->desc, st->desc_size);
  }
  
- static void __init pkvm_selftests(void)
+@@ -5341,6 +5359,12 @@ static void __init its_pkvm_switch(struct its_node *its)
+ 	its->cmd_base = st->cmdq;
+ 	st->cmdq = NULL;
+ 	st->priv = NULL;
++
++	/* val still holds the address of the hardware table, which the hypervisor now owns. */
++	if (st->dev_l1) {
++		st->dev_baser->base = st->dev_l1;
++		st->dev_l1 = NULL;
++	}
+ }
+ 
+ static void __init its_pkvm_finish_one(struct its_node *its)
+@@ -5351,6 +5375,8 @@ static void __init its_pkvm_finish_one(struct its_node *its)
+ 		its_free_pages(st->priv, ITS_PKVM_PRIV_ORDER);
+ 	if (st->cmdq)
+ 		its_free_pages(st->cmdq, get_order(ITS_CMD_QUEUE_SZ));
++	if (st->dev_l1)
++		its_free_pages(st->dev_l1, st->dev_baser->order);
+ 
+ 	if (st->desc)
+ 		its_free_pages(st->desc, get_order(st->desc_size));
 diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index 1d31d5a72e009..01110162914f7 100644
+index 01110162914f7..5fc06ca11a53b 100644
 --- a/include/linux/irqchip/arm-gic-v3.h
 +++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -435,6 +435,11 @@
- #define GITS_CBASER_RaWaWb	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWb)
+@@ -498,6 +498,7 @@
+ #define GITS_BASER_TYPE_RESERVED7	7
  
- #define GITS_CBASER_ADDRESS(cbaser)	((cbaser) & GENMASK_ULL(51, 12))
-+#define GITS_CBASER_SIZE		GENMASK_ULL(7, 0)
-+
-+#define GITS_CWRITER_RETRY		(1ULL << 0)
-+#define GITS_CWRITER_OFFSET		GENMASK_ULL(19, 5)
-+#define GITS_CREADR_OFFSET		GENMASK_ULL(19, 5)
+ #define GITS_LVL1_ENTRY_SIZE           (8UL)
++#define GITS_LVL1_ADDRESS(entry)	((entry) & GENMASK_ULL(51, 12))
  
- #define GITS_BASER_NR_REGS		8
+ /*
+  * ITS commands
+@@ -691,11 +692,15 @@ struct its_pkvm_device {
+ 	u8		event_bits;
+ };
  
+-/* Passed to the hypervisor at setup. Every address is physical and page-aligned. */
++/*
++ * Passed to the hypervisor at setup. Every address is physical and page-aligned,
++ * and dev_l1_copy_pa is 0 unless the device table is indirect.
++ */
+ struct its_pkvm_desc {
+ 	phys_addr_t		priv_pa;
+ 	u64			priv_pages;
+ 	phys_addr_t		cmdq_copy_pa;
++	phys_addr_t		dev_l1_copy_pa;
+ 	u32			nr_devices;
+ 	struct its_pkvm_device	devices[];
+ };
 -- 
 2.47.3
 
