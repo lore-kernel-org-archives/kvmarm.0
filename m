@@ -1,72 +1,75 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.198
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795029014;
-	b=1wqi61LcrR4LTl+rgmr4DrrUitA52tivkolCKZCkA28R71ICO0w1XUpwbA6J1ay4buRx
-	 MfPf8J105pT/r4iCIrP/5hHjvN2sJ7VaLoHlk8JnpDX5u3eNbe9abxE6sK6GDWMnz2K7D
-	 KkHP48mXVinQHdePDC7BiFe/W6cLo6ax3Fb9uIloz0C0fSbU+0th7bFxKL+G/kM9vcEpn
-	 kKDb23cB+D2f9M3s2b1VKo7J1KdrbbiVZJAPA/oQ0u4wfD72llEJ4SXVJbLuCQSnh16J1
-	 77nyTJ378mYjde0Ijagx2csSjoHo1ZISYIt/6i4v0n8waQNRtE/zs+qkoVnLv7+Gn4A==
+	t=1795034123;
+	b=RljWjwkNZHblFBi1ccwi/wzsUdlo9yb8QNV+x9UUNt0D0iAv9rBlYihVixamen1Y89kU
+	 j3c3zXeua9M+q+unNYH+Xo4Ac1Pa/3rbl7cZJhhWidoK5DDEbWxADn2RSi3xDJLygcdHm
+	 aFlnfqPDyF2NHwUIa5PDt2APl+cLr6+RBs72wzayyA5t1ug/1lIjaxeBGT3Z4NjzmQAz4
+	 EH5lFp5uqCVbwZUv0G9e6O8uQNtgr+i3lM7JmYdcr9KQj5EevnLUJEzIUCi8vpiEr51q2
+	 OHO658y/1GdVm6ZS5qDAdudIq7rtZa7AEciQsKihfDMYetQRP+xwygtCv2LDOyjpJcw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795029014;
-	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:CC:Subject:
-	 User-Agent:In-Reply-To:References:Message-ID:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:X-SRS-Rewrite;
-	bh=YxWsOpaN6CU+fFgVMclUNy68ZrjNu1idGsKCVJ6O9Z4=;
-	b=4T/1Ueq6uZyFYbRStjJugXV4AP8dov3sLN+NlINzXBFTlzMkhsriQSD3u2aV1CMyR2xZ
-	 P7ATWuSB5XOfB8BC4wKzERixFQ2qMqu4FqKxy69AQzLuKy6c/MUYz1eoJkzirFz8dGWhF
-	 Thy71k7RBuCFmIokERdmo8g1pER4QffsqFaI5uSzevLbWXZB/rN7v8aUvRWoOFHVJWMwX
-	 xx+dgzgcpkTI56WPdVe+ATGBnUnlFbgq4U/pI7+Il+M4nTP/EOLrNWpWZFfq9DWJQxiGJ
-	 ob9LWjxaUFtfGfzL/OvzAXjfVz9nfCfIRvuAX9YuFXU3bLfasnk00FKN8Mh6UuztF1Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795034123;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
+	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
+	 Content-Type;
+	bh=U1/r8Tac5IXDtWrYYG3dpfT9UXio9UGAzrSbVmuM17k=;
+	b=YdVUmGl3BKInUqPg8B45OUaRI6PrWIDwRL1BTrF3U4wj3yeh145J8MseWLsblr+Bid5Y
+	 EWNko8tSTX7knaTsBhXve9ToR3JtbpT3w4z7e4962mlRcjv+FzqSVyuRKoET3MG8Rvh0/
+	 bG4M+WW19FsgW6X4shKYzjjsg6uNaTHPf5wvf8dc7qnxIcr1O6jmCZh8B5hg9JwEyqqGC
+	 QMVO6gQ72y7pByd06xmCb5RCsfz+lIn4Lrs5Pza0ZGOXCDaSjPrm3Qkn+f/qq2PhXFX+u
+	 9+1LXWvpewbDnPiWOaX9m+UI8TsiyIhEo4bSuksSiD/oPWp3SQtdvhCbqt58GqQJziA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=infradead.org;
-	spf=none smtp.mailfrom=desiato.srs.infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=desiato.20200630 header.b=i6T5OkA6;
-	arc=none smtp.remote-ip=90.155.92.199
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=E5QEj6f3;
+	arc=none smtp.remote-ip=209.85.167.198
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E65606A31C;
-	Wed, 18 Nov 2026 19:10:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C2E65606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614B7606A32F
+	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 20:35:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 614B7606A32F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=desiato.20200630 header.b=i6T5OkA6
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=YxWsOpaN6CU+fFgVMclUNy68ZrjNu1idGsKCVJ6O9Z4=; b=i6T5OkA6HB7NG25CMcQ8Te4Ltr
-	KxIOzXx/mNFMONQ4ViCWFPNmIrUOuZVTIe8TZnkkJlz9SvrT7bF+8x41WWOLI8qO2kRjpz3bGORzX
-	iZXB3H/1+181sDQQBjKkDX3Ecxc0BS+EsdKOocrWt+stbQmWHtKIf0QpLepBumkQf/831tPfnEejg
-	Mn0K+Y6S4HnvTOy97cfE4cJl/H97wFiYDnoEOJ+PmptkQJL2VFtvIU9o0jXrb7h8DKMAaRLOBo6Ic
-	75Zv3gjRNJV25Ap9P2B/c6B1/SSOXgveIKaxkIQi9zRBBjJ2Hb8o/hzhGZMKQfHMsaX3VVDtMH58Q
-	ZlneSFqw==;
-Received: from [2a00:23ee:2910:16f:a90:4999:d4c:f045] (helo=ehlo.thunderbird.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xTl2l-0000000GRW5-1yMX;
-	Wed, 18 Nov 2026 19:10:07 +0000
-Date: Wed, 18 Nov 2026 19:10:01 +0000
-From: David Woodhouse <dwmw2@infradead.org>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- =?ISO-8859-1?Q?J=F6rg_R=F6del?= <joro@8bytes.org>
-CC: Sean Christopherson <seanjc@google.com>,
- Tom Lendacky <thomas.lendacky@amd.com>, ashish.kalra@amd.com,
- michael.roth@amd.com, nsaenz@amazon.com, anelkz@amazon.de,
- James.Bottomley@HansenPartnership.com, Melody Wang <huibo.wang@amd.com>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
- loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, x86@kernel.org,
- coconut-svsm@lists.linux.dev, joerg.roedel@amd.com,
- Mushahid Hussain <hmushi@amazon.co.uk>,
- Sriram Nambakam <snambakam@linux.microsoft.com>,
- David Woodhouse <dwmw@amazon.co.uk>
-Subject: Re: [PATCH 06/16] KVM: x86: Widen the plane vCPU fd ioctl allowlist
-User-Agent: K-9 Mail for Android
-In-Reply-To: <4e4fb011-9171-42c1-b499-27b0333a2fd6@redhat.com>
-References: <20260608144252.351443-1-joro@8bytes.org> <20261111222911.477-1-dwmw2@infradead.org> <20261111222911.477-7-dwmw2@infradead.org> <4e4fb011-9171-42c1-b499-27b0333a2fd6@redhat.com>
-Message-ID: <D0EE54A9-3FF3-4005-875B-A9AF04EB1341@infradead.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=E5QEj6f3
+Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-5587351d419so1077096b6e.1
+        for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 12:35:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1795034122; x=1795638922; darn=lists.linux.dev;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=U1/r8Tac5IXDtWrYYG3dpfT9UXio9UGAzrSbVmuM17k=;
+        b=E5QEj6f38lc29N8/9CD3iqfYGfwCnyFtdVIr2gZRyGG61qeNW/PUNgAVf8RI3J8VvN
+         YvrXzPbgIA7UYf9mfYnpvkPCfa5Xcsv8PxejSB2L+vxftVFgsT1NT/v6lbh1RkJ5Zr3B
+         TAYEMozMcDbIwZVHV8pDae7tBEUdVrW+hSVF45A1KRxe0L+5PLbjHkB70cbZAJZ5Pfeu
+         u75XDD1PXy0/4AxHKMY5Y5TLKn5qb8rJOkP5Z1ANovrVjSyFsL0Hzgwmr9tCmRlpO/s9
+         dxqWB4AliGxuv4e5XY4h14MATGDOnY74TGufXojRlQTTOjZ+qP5FVtrX36/AJB6c2IT+
+         gx4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795034122; x=1795638922;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=U1/r8Tac5IXDtWrYYG3dpfT9UXio9UGAzrSbVmuM17k=;
+        b=ALoxz9PEjRq8il3+8hYBAz1++5zFhC2F1hgouLHV0C0h53DEREwjGQREmSYl6GsyLz
+         2iNKTQBXEcmNMbKnGPGpjag/UZJULrdQwF1hV62PMITDjhX5/8jtyqTP6Ga+GJvwKSVI
+         xaLg7lW0ysllNdcDzTpq4wPE7kYX8ycWZdEXC1GiHqO2tw5o4Ki3YMIO1QhJSS9bVLL6
+         jR5NPqx4xJS1SbZPLnjQvKQ9Qc6rZWVGEE3Sj/XtsGEJCYBkyow5NUbZQd9bZcL772DT
+         MhVvlXY8MfKpDpQduFa2rmakjhM7aAg9l2PMn3Onu8TuGeWE6B3/EqrGIJYdhOc56yZr
+         reAA==
+X-Forwarded-Encrypted: i=1; AL+hErEEdA8Ir5+EYLx114Cbj3NsshajJEHb3m+MkAl7XPHpkoqIHuz1o4Yvo26McVoMWU6GrfXJDe4=@lists.linux.dev
+X-Gm-Message-State: APuU4Z+/FeKM6VZIToLfl1O2+SDldEiDF/mOPhiUaI3A71WLYd3KDTdi
+	UOUJBaejj4sPnryemljN2QMlsYc504y2dWqSAHc/5Apnv1L/TuM1iSifY/Htp+ExuDaUsjolFuh
+	Y1W8ilFGL58ouL32sa4QgGHxAiw==
+X-Received: from jacnj16-n1.prod.google.com ([2002:a05:6639:290:10b0:61c:b6b7:f372])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6808:5088:b0:567:cbf5:bb95 with SMTP id 5614622812f47-5773db242camr4395212b6e.7.1795034122012;
+ Wed, 18 Nov 2026 12:35:22 -0800 (PST)
+Date: Wed, 18 Nov 2026 20:35:21 +0000
+In-Reply-To: <86a4n61m7s.wl-maz@kernel.org>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -75,59 +78,39 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+Mime-Version: 1.0
+References: <20261117204535.4036191-1-coltonlewis@google.com>
+ <20261117204535.4036191-2-coltonlewis@google.com> <avzZUyu9EhxAWtbd@kernel.org>
+ <86a4n61m7s.wl-maz@kernel.org>
+X-Mailer: git-send-email 2.56.1.708.g77570a6a1d-goog
+Message-ID: <20261118203521.740501-1-coltonlewis@google.com>
+Subject: Re: [PATCH v2 1/2] KVM: arm64: Fix inverted E2H0 check for HCR_EL2.NV1
+From: Colton Lewis <coltonlewis@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
+Cc: Colton Lewis <coltonlewis@google.com>, Leonardo Bras <leo.bras@arm.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <fuad.tabba@linux.dev>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 18 November 2026 17:58:33 GMT, Paolo Bonzini <pbonzini@redhat=2Ecom> wro=
-te:
->On 11/11/26 23:29, David Woodhouse wrote:
->> From: David Woodhouse <dwmw@amazon=2Eco=2Euk>
->>=20
->> A VMM that puts an initial VTL context on a higher plane cannot finish
->> the job through the plane vCPU's fd=2E kvm_arch_is_vcpu_plane_ioctl()
->> refuses the ioctls it needs, while the one capability ioctl it does
->> admit, KVM_ENABLE_CAP, reaches *every* vCPU capability handler=2E
->>=20
->>   - KVM_GET/SET_MP_STATE: a plane vCPU for an AP starts in
->>     wait-for-INIT like any non-boot x86 vCPU, and nothing ever sends
->>     INIT/SIPI to the higher plane of an AP=2E The VMM has to mark it
->>     runnable itself=2E
->>   - KVM_SET_GUEST_DEBUG: single-step and breakpoints on a non-zero
->>     plane=2E The debug exits surface through the plane-0 KVM_RUN loop
->>     like any other plane exit=2E
->>   - KVM_X86_SETUP_MCE: mcg_cap is per vCPU and every twin starts with
->>     the KVM_MAX_MCE_BANKS default, so programming plane 0 alone leaves
->>     the planes disagreeing=2E Hyper-V shares MCG state across VTLs=2E
->>   - KVM_ENABLE_CAP: accept only the audited capabilities on a plane fd,
->>     the SynIC pair and the two CPUID-enforcement toggles, which change
->>     state that each twin keeps separately=2E Anything else gets -EINVAL=
-, as
->>     non-allowlisted ioctls already do=2E The nested paths behind
->>     enlightened VMCS and direct TLB flush have never been audited for
->>     plane_level > 0, and without the filter any future vCPU cap would
->>     work on planes without anyone having decided that it should=2E
+Marc Zyngier <maz@kernel.org> writes:
+
+> I really wonder why I bothered describing this, introducing a bug in
+> the process. There is no known universe where we can deal with NV1 not
+> being RES0, and this helper is purely academic (and therefore wrong).
 >
->Not sure about KVM_ENABLE_CAP, the other seem sane=2E
+> My personal take on this particular problem is as follows.
 >
->BTW at some point I'll rewrite these commit messages, they're infuriating=
-=2E=2E=2E
+> -	NEEDS_FEAT(HCR_EL2_NV1, feat_nv2_e2h0_ni), /* Missing from JSON */
+> +	NEEDS_FEAT_FLAG(HCR_EL2_NV1, FORCE_RESx), /* Missing from JSON, RES0 as an IMPDEF choice */
 
-Yeah=2E I've grown kind of immune to them now=2E Even found myself typing =
-"load-bearing" with my actual meat fingers the other day=2E
+Makes sense. KVM never exposes a configuration where HCR_EL2.NV1 can be
+non-RES0 anyway (either E2H0=NI_NV1 with VHE, where E2H0 is not
+userspace-writable, or E2H0=IMP without FEAT_VHE/FEAT_NV).
 
-I've also been looking harder at the completion thing=2E We *can't* (well,=
- I don't want to) enter another plane while there's still a completion wait=
-ing on the first plane=2E
+I will adopt your simplification in v3 (with Suggested-by) and drop the
+helper entirely, which also eliminates the confusing NI feature check
+Oliver flagged.
 
-Which means any control register or MSR interception which needs to be han=
-ded to another plane has to completed first=2E
-
-I think we need to be able to complete them with the RIP unchanged (not ad=
-vanced over the instruction)=2E Then for VSM, it's VTL1 which will handle t=
-hem and then advance RIP for its VTL0=2E VTL1 wants to be told the instruct=
-ion length too; I could make QEMU find it but since KVM tends to have it an=
-yway, I'm looking at how I can export that=2E
-
+-- Colton
