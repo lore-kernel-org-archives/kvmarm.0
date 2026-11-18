@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.227
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.239
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795015181;
-	b=5DpuX+jR50dQgL1jxxc/bI2IQSAwvC4o3qESSA7Dtxwsu/XvKSdse/ygAt4L+AGavuvT
-	 RBTltMfmqxliFPikjGZHe5zss+KE2xgPMh9vNYsOcEkCKOZbHVjA5JspJz4pRcAHIgPkN
-	 jOPUvNhVhbfVPGRIxxKCdc2u5/vTZvglshdaU6S/ZHN6ylNAD8RYiv7z4x1W7sPkVTLgG
-	 GLuyJ5ww42Og10KovlYdptb9wRrpyqv2uw1/dlWbkx2THhuONGiLyd/yyBZuciLrF8HTe
-	 4hLThrUNCOoOSeNjcwArXNPzVPQnDMHMh3E02M4EYtI2fflwFsKlrNFb0YrEo3hRtLQ==
+	t=1795015182;
+	b=ePxQAaTXUwiyOE8a+zAOz/r7yXyPTsDl0fTZhxGIhrw0LIvQ/PyKaw7Hv7ALnxsTHHxE
+	 Bn4xfDWXNGUug0kwDyTYB0EzBXF7FTRROX43O/uobDZ+ZWU3Woda7D1YH5ETT0x43I1CC
+	 j7h71viHafpDmM8OSB9LzQy+JxesovCSIPDGGiIxdGOTCOa73XSiqlVeY5qC4qodIX7WV
+	 zRFYawJVy1/ME7t5jmO918oEiRRZEP/JgV6iECItjHe2mIPA4hppgPFtmCk4TbIYjCqeC
+	 yYkH+4gR1PAdXjXgeJBK79lkmt5crhMNYMBOFUo9dV/Ep8Zgafr3tjkzKb72Uasz6Qg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795015181;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795015182;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=4abZZAGFr+op4Fiin9qqMvU61lk2F4uPWmmjiHuLcbQ=;
-	b=KQlHD+Uq7DbAH8HMwdpTTabR3/9Gg/LEV65QnnU1+ZYjP8zOoJlhqK3hxzhtDuCqhQwX
-	 byJkvwDvhsoYCUzc02/3I4sXH3xtepJRZyG0H4LDBGk1cfR865q5CpSsHLrrXznBAfhSp
-	 jf795KqKgE+21+MwJAKkso2/HvdxotaVv74H6uDpVBaSJwSTvFPAfHqTjcg0LUXvPqyLF
-	 H2TVyXrg8XWiZPo5Jym/aCH9jWELHxuprAwqt6oGHZy2SQbNY8RZLA5G6IloUxkNjJ+b6
-	 x773SynxMPqbLZ+PloXQHjRCH4Q2XSpCMQJkpF911FGDChGyuVhnklZvi9Dx+NZCicA==
+	bh=Ih7PJseCTUo9992Qi/riC8TJ+5UyoXMZp5GLXDRFGsg=;
+	b=hMZowgG8J8aEJDRMWAI057lgwnm8mpSWFt4Qi/5Q5iMY0B508998J7j4eVPC90vkU34U
+	 CpWexDRAB5vKBf2QVcqmR+U9KzCBiNlkJlQcOlENQbOgQTvDs28Rkc/5X/8Fps9ZmwEvk
+	 HXMqLlckqjOZtJdgZwgMlZdxhiO7c3v07ocwARhE3dcI4GbX3CJtbDF6gi39+nY1ad7ib
+	 tJAUqTGjBimL0BSfJHe8LTO/QkIbgTcT5foRcZyCtdsHZrVepS7iyXjIEC9Gq+3BOsvT6
+	 t1PhLR5ItPoeTB4UFDQ0HA7aJnyNGVXjhEP2WSvzO5df+qGqJTU+YSlDw+BWBxXHnuw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=xKSb0yMy;
-	arc=none smtp.remote-ip=95.215.58.227
-Received: from mta1.migadu.com (out-227.mta1.migadu.com [95.215.58.227])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b="vA/uNhz8";
+	arc=none smtp.remote-ip=95.215.58.239
+Received: from mta1.migadu.com (out-239.mta1.migadu.com [95.215.58.239])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3F4606A333
-	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 15:19:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AD3F4606A333
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60297606A32C
+	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 15:19:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 60297606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=xKSb0yMy
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=vA/uNhz8
 X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: a=rsa-sha256; bh=AgR9DTR2Y4DJllQF/5/cjrLNXKWsG0SIqMY2siOpC2M=;
+DKIM-Signature: a=rsa-sha256; bh=g087P9+edDWSWSxVVt+5nxjxLatHb08fe1Dv5ib5o6Y=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795015178; v=1; x=1795619978;
- b=xKSb0yMy4rDzsorbN5K8uw5G5Ki/2BIcjXZhP4T1iud4f7XIHrWONQYM6C1/SZBbOeUApbbm
- zYzPhmYs3W+EZAgHyOyLanZhr0EqVESo+2vlI4jJUEn4Tj9uDVbeTQAg7PvaSy3h8MTsvzU+xka
- i8mPaFJd6cuDBOvkwg8aDyPc=
+ t=1795015179; v=1; x=1795619979;
+ b=vA/uNhz8F2uBN8nnSsSN1c42pP/m3YPB3Rr+gI36JK7b/6mu30O8joF+JANxagXYpYNmlqt1
+ CtSfXCafKBFyNgqmb/5jIqbw0GfwM76hSkQ7ZOBfwa0iYxtO1ekGtd3rzWWog2oOc1gYtp/JyA/
+ SDtNgdzB7/F7YcDlKTGS8jHo=
 X-Envelope-To: kvmarm@lists.linux.dev
-Received: by smtp.migadu.com with ESMTPS id dc4acb5ede39579a;
-	Wed, 18 Nov 2026 15:19:38 +0000
-X-Mizu-Trace-ID: dc4acb5ede39579a
+Received: by smtp.migadu.com with ESMTPS id 76ddee6606c60c99;
+	Wed, 18 Nov 2026 15:19:39 +0000
+X-Mizu-Trace-ID: 76ddee6606c60c99
 X-Migadu-Flow: FLOW_OUT
 From: Fuad Tabba <fuad.tabba@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
@@ -71,9 +71,9 @@ Cc: Will Deacon <will@kernel.org>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 05/13] irqchip/gic-v3-its: Compute the wait target under the ITS lock
-Date: Wed, 18 Nov 2026 15:18:56 +0000
-Message-ID: <20261118151904.4099560-6-fuad.tabba@linux.dev>
+Subject: [PATCH v4 06/13] KVM: arm64: Share the ITS command field accessors with the hypervisor
+Date: Wed, 18 Nov 2026 15:18:57 +0000
+Message-ID: <20261118151904.4099560-7-fuad.tabba@linux.dev>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261118151904.4099560-1-fuad.tabba@linux.dev>
 References: <20261118151904.4099560-1-fuad.tabba@linux.dev>
@@ -88,86 +88,105 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-its_wait_for_range_completion() converts the posted command pointer into
-a queue offset against its->cmd_base, after the caller has dropped
-its->lock. That's fine while cmd_base never changes, but the pKVM
-takeover in a subsequent patch switches cmd_base to a copy of the queue
-while the other CPUs are stopped, and a CPU stopped in the wait before
-it has converted the pointer would compute its target against the wrong
-base.
+The vgic's ITS emulation reads command fields with its_cmd_mask_field()
+and the its_cmd_get_*() accessors. struct its_cmd_block, the block they
+decode, is private to the ITS driver, but in a subsequent patch the
+hypervisor parses the host's commands too.
 
-Compute the offset in its_post_commands(), under the lock, and pass it
-to the wait instead of the pointer.
+Move the command block and the accessors to arm-gic-v3.h, which already
+holds the GITS_CMD_* encodings, so there is one copy of each. Only KVM
+reads commands, but the accessors decode the block the driver writes, so
+they sit with it rather than in a KVM header.
 
 No functional change intended.
 
 Signed-off-by: Fuad Tabba <fuad.tabba@linux.dev>
 ---
- drivers/irqchip/irq-gic-v3-its.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/vgic/vgic-its.c     | 15 ---------------
+ drivers/irqchip/irq-gic-v3-its.c   | 10 ----------
+ include/linux/irqchip/arm-gic-v3.h | 22 ++++++++++++++++++++++
+ 3 files changed, 22 insertions(+), 25 deletions(-)
 
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 7e9b265b1f521..78e480d112025 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -802,21 +802,6 @@ static bool vgic_its_map_lpi(struct kvm *kvm, struct its_ite *ite,
+ 	return false;
+ }
+ 
+-static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
+-{
+-	return (le64_to_cpu(its_cmd[word]) >> shift) & (BIT_ULL(size) - 1);
+-}
+-
+-#define its_cmd_get_command(cmd)	its_cmd_mask_field(cmd, 0,  0,  8)
+-#define its_cmd_get_deviceid(cmd)	its_cmd_mask_field(cmd, 0, 32, 32)
+-#define its_cmd_get_size(cmd)		(its_cmd_mask_field(cmd, 1,  0,  5) + 1)
+-#define its_cmd_get_id(cmd)		its_cmd_mask_field(cmd, 1,  0, 32)
+-#define its_cmd_get_physical_id(cmd)	its_cmd_mask_field(cmd, 1, 32, 32)
+-#define its_cmd_get_collection(cmd)	its_cmd_mask_field(cmd, 2,  0, 16)
+-#define its_cmd_get_ittaddr(cmd)	(its_cmd_mask_field(cmd, 2,  8, 44) << 8)
+-#define its_cmd_get_target_addr(cmd)	its_cmd_mask_field(cmd, 2, 16, 32)
+-#define its_cmd_get_validbit(cmd)	its_cmd_mask_field(cmd, 2, 63,  1)
+-
+ /*
+  * The DISCARD command frees an Interrupt Translation Table Entry (ITTE).
+  * Must be called with the its_lock mutex held.
 diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index bbfea565149bb..734fe4fb52bd6 100644
+index 734fe4fb52bd6..df6d7b2fc8611 100644
 --- a/drivers/irqchip/irq-gic-v3-its.c
 +++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -1144,13 +1144,13 @@ static struct its_cmd_block *its_allocate_entry(struct its_node *its)
- 	return cmd;
+@@ -528,16 +528,6 @@ struct its_cmd_desc {
+ 	};
+ };
+ 
+-/*
+- * The ITS command block, which is what the ITS actually parses.
+- */
+-struct its_cmd_block {
+-	union {
+-		u64	raw_cmd[4];
+-		__le64	raw_cmd_le[4];
+-	};
+-};
+-
+ #define ITS_CMD_QUEUE_SZ		SZ_64K
+ #define ITS_CMD_QUEUE_NR_ENTRIES	(ITS_CMD_QUEUE_SZ / sizeof(struct its_cmd_block))
+ 
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index ea5fd2374ebe0..e0bec40adf2b7 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -657,6 +657,28 @@ static inline bool gic_enable_sre(void)
+ 	return !!(val & ICC_SRE_EL1_SRE);
  }
  
--static struct its_cmd_block *its_post_commands(struct its_node *its)
-+static u64 its_post_commands(struct its_node *its)
- {
- 	u64 wr = its_cmd_ptr_to_offset(its, its->cmd_write);
++struct its_cmd_block {
++	union {
++		u64	raw_cmd[4];
++		__le64	raw_cmd_le[4];
++	};
++};
++
++static inline u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
++{
++	return (le64_to_cpu(its_cmd[word]) >> shift) & (BIT_ULL(size) - 1);
++}
++
++#define its_cmd_get_command(cmd)	its_cmd_mask_field(cmd, 0,  0,  8)
++#define its_cmd_get_deviceid(cmd)	its_cmd_mask_field(cmd, 0, 32, 32)
++#define its_cmd_get_size(cmd)		(its_cmd_mask_field(cmd, 1,  0,  5) + 1)
++#define its_cmd_get_id(cmd)		its_cmd_mask_field(cmd, 1,  0, 32)
++#define its_cmd_get_physical_id(cmd)	its_cmd_mask_field(cmd, 1, 32, 32)
++#define its_cmd_get_collection(cmd)	its_cmd_mask_field(cmd, 2,  0, 16)
++#define its_cmd_get_ittaddr(cmd)	(its_cmd_mask_field(cmd, 2,  8, 44) << 8)
++#define its_cmd_get_target_addr(cmd)	its_cmd_mask_field(cmd, 2, 16, 32)
++#define its_cmd_get_validbit(cmd)	its_cmd_mask_field(cmd, 2, 63,  1)
++
+ #endif
  
- 	writel_relaxed(wr, its->base + GITS_CWRITER);
- 
--	return its->cmd_write;
-+	return wr;
- }
- 
- static void its_flush_cmd(struct its_node *its, struct its_cmd_block *cmd)
-@@ -1167,13 +1167,12 @@ static void its_flush_cmd(struct its_node *its, struct its_cmd_block *cmd)
- 
- static int its_wait_for_range_completion(struct its_node *its,
- 					 u64	prev_idx,
--					 struct its_cmd_block *to)
-+					 u64	to_idx)
- {
--	u64 rd_idx, to_idx, linear_idx;
-+	u64 rd_idx, linear_idx;
- 	u32 count = 1000000;	/* 1s! */
- 
- 	/* Linearize to_idx if the command set has wrapped around */
--	to_idx = its_cmd_ptr_to_offset(its, to);
- 	if (to_idx < prev_idx)
- 		to_idx += ITS_CMD_QUEUE_SZ;
- 
-@@ -1216,10 +1215,10 @@ void name(struct its_node *its,						\
- 	  buildtype builder,						\
- 	  struct its_cmd_desc *desc)					\
- {									\
--	struct its_cmd_block *cmd, *sync_cmd, *next_cmd;		\
-+	struct its_cmd_block *cmd, *sync_cmd;				\
- 	synctype *sync_obj;						\
- 	unsigned long flags;						\
--	u64 rd_idx;							\
-+	u64 rd_idx, wr_idx;						\
- 									\
- 	raw_spin_lock_irqsave(&its->lock, flags);			\
- 									\
-@@ -1242,10 +1241,10 @@ void name(struct its_node *its,						\
- 									\
- post:									\
- 	rd_idx = readl_relaxed(its->base + GITS_CREADR);		\
--	next_cmd = its_post_commands(its);				\
-+	wr_idx = its_post_commands(its);				\
- 	raw_spin_unlock_irqrestore(&its->lock, flags);			\
- 									\
--	if (its_wait_for_range_completion(its, rd_idx, next_cmd))	\
-+	if (its_wait_for_range_completion(its, rd_idx, wr_idx))		\
- 		pr_err_ratelimited("ITS cmd %ps failed\n", builder);	\
- }
- 
+ #endif
 -- 
 2.47.3
 
