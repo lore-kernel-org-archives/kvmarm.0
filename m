@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795024759;
-	b=4EPZNQXQn//NQzqmyXoJLkj+UJO6FvG8loBcLo4KseIgfPj/9J1s6A5rgdxXyWSFheUR
-	 DnNaCCeJ7JSSXx65X1GaWcFJZWScmy2untIL98jSJQ7TEuum59RNmN6qcnbcw+MWGDzcB
-	 IHmUkGAZ0HMevKyR4RE6bcKPauwUDIgR7kHZKHDtDeo67k+IhIQXDFtX4vvhTVvtByN5L
-	 q2s7LbutwoXLAEZAR7FGxaBEbjQvNVX/Z+amjGpGNCoiDrexyS+M3SBcJbe2pnqLpTv0U
-	 hhDE6dKfn7eLm4/SMZvYGgf79eumC9tf3gCiH/BFA/pTrv/zIBBJ4Urp8cg7KPwMgNQ==
+	t=1795024764;
+	b=AwQ6dob39bhCWrLY5sgXUCuP4++tp67gKLDryboXnuUgJSBixEVRkNq5qbXBGY8+hE2B
+	 6cWKEYFz8/4bQoLRlWL5kEzEJcmUgkX3xpgt0oH0uYKnTblzrWEai+ry33e3f47/YB7FK
+	 WO6Qv2AjQH2oOH4E3/PD0SPgd7gMErU3ZPNNw6BWc9N4X8D04AsMpfK/u/X7KeGtJ8umW
+	 XSEnYy/v35fJgQ2CEgFiWCpgxIhGg+XqDm2JLf0FGhzmY2sVHKISGp93PUH/NF11icPj8
+	 4ACT5egaGwk8njnBUZQGaM3P574gWEsC8QFU4J/F/v1PhjJ/kKtYXNGu4eJIR1MpI1w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795024759;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795024764;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:From:To:Cc:Subject:
 	 Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=E2uOxf0rKJT7HU77NZNT4DkyxJwury1M45enAmemSE0=;
-	b=4ojIM9fDt6VyXfADdxU//h/tvCQEdW/AF7Lj+RsZuprTxHyO2xbCxb6KRdgD2H6oH2w9
-	 8Rkpe+fYiYGnGKMG8cM5gwfvY/2dDE1IbpNiTv/SWeFh6SFg/hWj57bmL5dkcPJGGf5yS
-	 fqyLI7j8akCcczUvq+1bYuUa6Ok6aPu8ygCLuvmqC+AIx2Mbuu13amklFgpXq6KtS3Sao
-	 0Fr8QejIgHfj3yIDI+IXYh+iM/GsFSMU9fYV1veWpTrg2oCM0kRZSKi4IlGbjGwZthW0n
-	 nsECxLSkRGce1ohytav7UljCyjEqvchkrTF5bHJ7HhdjtvFeEHVnIPu3jZ6MMz5fz7A==
+	bh=Ph63pIapK/Oi0jQftYWPnDgvG3tpuV/CW0Q/GMRXUhc=;
+	b=qo8wPQ9ZqCy2H3JTa7QmwVg+AkykOb6I38Wu2d9KIkAwMjOhuBDXDgDzp7ND2hwdyHyR
+	 prIf4hWaHdbelQwiTaiCvpsKUmgcg9Gw75ryhvvkd+feyanV/tNjq6wvc2hT77uwoHqo/
+	 FgkezHT0ZcPoeUz2tDl5XW9dLc54TSJOp65/JuiGYvVDnqoy0t62k8Oae5mTZ4zLyLP1y
+	 PMhoyHgcdHB1cAIwH3OTq0KBSFQRSn4Nt66Cp07gYsdP3STJdmYndJTldzxW6s42Wv0x3
+	 wog+1nHmvqRv1f2yFzBBPHdvNsoJgb5qwvG/dVoD3t0ZZVMm5nOY3GMJAOMWbUK3YFQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=UDWBNWL1;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=i40lV4uS;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B7F6606A32F
-	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 17:59:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7B7F6606A32F
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B217F606A31C
+	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 17:59:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B217F606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=UDWBNWL1
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=i40lV4uS
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2F5541477;
-	Wed, 18 Nov 2026 09:59:16 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6446E1477;
+	Wed, 18 Nov 2026 09:59:20 -0800 (PST)
 Received: from e133894.cambridge.arm.com (e133894.arm.com [10.2.80.62])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CA8493FA7A;
-	Wed, 18 Nov 2026 09:59:17 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0D4F83F632;
+	Wed, 18 Nov 2026 09:59:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795024759; bh=osGrLTG+wTWwCZXbgV0cH1lOH7Nt5lHAjlM6498QZbg=;
+	t=1795024763; bh=yjBWfAzTzu7cyp4c6c4m2tl0EMMFBBETllhL3u+i548=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UDWBNWL1hfLJUVhRR69dd2vCCowM9bq8Ovv0zCqiSIxRWEXGLT1L+tKkzgnUGkyzu
-	 NYNu37mB4yfGggMADOkWkeKJBfEFyZ40NksiRPexd7pjrw3fJ5UTyQk/GCmgy8pLC2
-	 nKf0ZoKukgrHDv332KUVRxVG8LpNZILUeulJwmEA=
+	b=i40lV4uSfJvo5OKwC0Vrf9D/BDGpSGV3fkpZSI9HkyA4rdhL0VMSjT4jcxzyX6jX/
+	 yU4kKIf0L13JGw2IAxZiU24m1fRkVyQyk6YrDNPrKZBc0cI4lfWP4ckwIQCgDpMFnZ
+	 44uWYp94I/HQ9O6LODq7CKfgTP3a/778lTSs8PFk=
 From: Sascha Bischoff <sascha.bischoff@arm.com>
 To: will@kernel.org,
 	julien.thierry.kdev@gmail.com
@@ -51,9 +51,9 @@ Cc: vladimir.murzin@arm.com,
 	kvmarm@lists.linux.dev,
 	timothy.hayes@arm.com,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH kvmtool v5 18/23] arm64: Expose the GICv5 irqchip option
-Date: Wed, 18 Nov 2026 17:57:50 +0000
-Message-Id: <20261118175755.1946977-19-sascha.bischoff@arm.com>
+Subject: [PATCH kvmtool v5 19/23] arm64: Add proposed GICv5 ITS UAPI definitions
+Date: Wed, 18 Nov 2026 17:57:51 +0000
+Message-Id: <20261118175755.1946977-20-sascha.bischoff@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261118175755.1946977-1-sascha.bischoff@arm.com>
 References: <20261118175755.1946977-1-sascha.bischoff@arm.com>
@@ -68,53 +68,44 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow --irqchip=gicv5 and prefer GICv5 for automatic irqchip selection
-when the kernel supports it. The IRS and guest DT support are now in
-place.
+Mirror the GICv5 ITS device type, address type and size from the posted
+KVM GICv5 ITS series. These definitions are not part of the v7.4-rc1
+UAPI header sync.
 
-Reviewed-by: Vladimir Murzin <vladimir.murzin@arm.com>
-Tested-by: Vladimir Murzin <vladimir.murzin@arm.com>
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- arm64/gic.c                         | 4 +++-
- arm64/include/kvm/kvm-config-arch.h | 2 +-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ arm64/include/asm/kvm.h | 2 ++
+ include/linux/kvm.h     | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/arm64/gic.c b/arm64/gic.c
-index e5a26252..63e0b979 100644
---- a/arm64/gic.c
-+++ b/arm64/gic.c
-@@ -78,6 +78,8 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset)
- 		*type = IRQCHIP_GICV3;
- 	} else if (!strcmp(arg, "gicv3-its")) {
- 		*type = IRQCHIP_GICV3_ITS;
-+	} else if (!strcmp(arg, "gicv5")) {
-+		*type = IRQCHIP_GICV5;
- 	} else {
- 		pr_err("irqchip: unknown type \"%s\"\n", arg);
- 		return -1;
-@@ -405,7 +407,7 @@ int gic__create(struct kvm *kvm, enum irqchip_type type)
+diff --git a/arm64/include/asm/kvm.h b/arm64/include/asm/kvm.h
+index 65ee09bd..8c701173 100644
+--- a/arm64/include/asm/kvm.h
++++ b/arm64/include/asm/kvm.h
+@@ -99,8 +99,10 @@ struct kvm_regs {
  
- 	switch (type) {
- 	case IRQCHIP_AUTO:
--		for (try = IRQCHIP_GICV3_ITS; try >= IRQCHIP_GICV2; try--) {
-+		for (try = IRQCHIP_GICV5; try >= IRQCHIP_GICV2; try--) {
- 			err = gic__create(kvm, try);
- 			if (!err)
- 				break;
-diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-index d8a8ef7f..46130663 100644
---- a/arm64/include/kvm/kvm-config-arch.h
-+++ b/arm64/include/kvm/kvm-config-arch.h
-@@ -59,7 +59,7 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
- 			   "transport (Deprecated: Use --virtio-transport "	\
- 			   "option instead)", virtio_transport_parser, kvm),	\
- 	OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
--		     "[gicv2|gicv2m|gicv3|gicv3-its]",				\
-+		     "[gicv2|gicv2m|gicv3|gicv3-its|gicv5]",			\
- 		     "Type of interrupt controller to emulate in the guest",	\
- 		     irqchip_parser, NULL),					\
- 	OPT_U64('\0', "firmware-address", &(cfg)->fw_addr,			\
+ /* Supported VGICv5 address types  */
+ #define KVM_VGIC_V5_ADDR_TYPE_IRS	6
++#define KVM_VGIC_V5_ADDR_TYPE_ITS	7
+ 
+ #define KVM_VGIC_V5_IRS_SIZE		(2 * SZ_64K)
++#define KVM_VGIC_V5_ITS_SIZE		(2 * SZ_64K)
+ 
+ #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
+ #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
+diff --git a/include/linux/kvm.h b/include/linux/kvm.h
+index 8dff2fc1..c0e11993 100644
+--- a/include/linux/kvm.h
++++ b/include/linux/kvm.h
+@@ -1239,6 +1239,8 @@ enum kvm_device_type {
+ #define KVM_DEV_TYPE_LOONGARCH_DMSINTC	KVM_DEV_TYPE_LOONGARCH_DMSINTC
+ 	KVM_DEV_TYPE_ARM_VGIC_V5,
+ #define KVM_DEV_TYPE_ARM_VGIC_V5	KVM_DEV_TYPE_ARM_VGIC_V5
++	KVM_DEV_TYPE_ARM_VGIC_V5_ITS,
++#define KVM_DEV_TYPE_ARM_VGIC_V5_ITS	KVM_DEV_TYPE_ARM_VGIC_V5_ITS
+ 
+ 	KVM_DEV_TYPE_MAX,
+ 
 -- 
 2.34.1
 
