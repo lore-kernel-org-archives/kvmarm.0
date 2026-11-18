@@ -1,83 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.192
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794999312;
-	b=T1D2pwq/6W8jJvd5+Puhspi9wWzhbe10u+RNZVC07nq+MHu1lfQ/AsE4/0fRMJWuCK9s
-	 I1Sf3H+wKeHm8UeIiBfb59CD4sQSaasKVmiu6mtSzKc0XkEwD0x+H4kySdoMWdq2ah3xf
-	 qeThxsyL/NM8j7E5mfei5kawg22VFq2r4QazCM4kdYRAF/QaLmkz700xl1OpsYOm9omiB
-	 V1SWNKnNaObS9QuGTgoK1GJnm4Nrvb6Tr0rfo7So2N+x/rtL9RwlpYBQqebhHC7hJ4d6y
-	 K/j4bAzu0X3YaOLF/HIiIQmJOQilP1KJV0+8bzofOoKZy+6CbqaQ7vnOEuWmzelNmCQ==
+	t=1794999503;
+	b=bchCu8KuwDN5k4xfU42S5a6X1Q3adA+J4cdUPC+axKpZal0k7Bo3FwxDIX+Xhdir4FF5
+	 VWFtHiCv//4HsmoB4F2KQvGB9P3RMgMVNxrd+23+vSXZMTdfQIHMsPdgdlyliKGKpVcbK
+	 92bJucvlmUh+tjJcpEHvXhB4Bh5+yCv7WCKZUhwEMR3q6PJ8qNTiKdLGCnR0UbMMe2Kcf
+	 yUGN/7kTlRz7X/rqN3QbU2I3DlZIel6XBRzJoE7YAwd6cbhilhXcTzpGVgS5GDb6qHQXD
+	 T1WuYbTdIWzfsAUZL2Dcy0WPW/72+yBtpyNMJCOolLqIv7kcVjY2TSt+VHEwkG31W8g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794999312;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=memSx6w5HIqi6Xog48xQOQU+JeaIiIIsaYQx0kH8P4E=;
-	b=nyqiSk5KBNSHCOlw0tcIpHTacfXDMTVVvp9iZPlelnR/OrK469mAO0QPLijbT6/OrU2c
-	 cGWUk6iwkqlKH1wBrcJnAJXCiZKeSPafrVA4p9CQmRA+PmUrv8E0JlzELJMSq78Yntcf+
-	 mQniIob/O+MsOloNUaIcH3P8MrqIHuWpaNmH/u0o5I/dVSm59xVnlsigMEKEnUJUJiRL8
-	 2rfLXQpPTzjDoLHRF1KiJSS2qM30PPg4LaDswU4oZUbJYAvQhfoLnFMiVCk6hlL4Fn66A
-	 yO9BNdOHAyRO96dmYQMGc9guw3+L+WeEQ8FC180O8KafzKxH0a3kemoZQFEqKYjbXOw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794999503;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=ji0Sy7yk69gklaMPP5Zc2g+qgmHVYq7bGDR02Mw+y7w=;
+	b=1VBq1S5PizTvNjItJXQ/6nbWKxgA0Jsm/nSTut0t7dR32+UJemsyiRfanb/6AuNZ2AL4
+	 I7B3Oh10VkLUXTSb/bvqcK8EizWO46BjPe+Hi5nGUtksMYqIcO4DI8S4uUmUqrA6Zg0MY
+	 NxNzwyJcWHujh4iVs4UWHKQpC1JWRWQdBOdNKgWJPBzE5/05UO55NtUNG98MPm2bGWR97
+	 akfqAUsx5JZ4kjHGl1DDrnxg1ZN4lvtptbSEEMMQcXrMEnMsSjWMzKr49M2dp94oXsls+
+	 zy7n+98IAG+RKQQ6yPBGNJQ4dZyT2Pi9VI86WqxGdMPavKKR4HbVFqgwo5QyW8DmmWg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dysLopPW;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=vt+IfZIZ;
+	arc=none smtp.remote-ip=95.215.58.192
+Received: from mta1.migadu.com (out-192.mta1.migadu.com [95.215.58.192])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53814606A320;
-	Wed, 18 Nov 2026 10:55:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76FA606A325
+	for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 10:58:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A76FA606A325
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dysLopPW
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 806941F000C4;
-	Wed, 18 Nov 2026 10:55:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794999311;
-	bh=memSx6w5HIqi6Xog48xQOQU+JeaIiIIsaYQx0kH8P4E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=dysLopPW6xzBxxVX4sabNEd7hRGAwc/NKR16PzrI3FOaD3p5wWsfF0tME+iCqseut
-	 JtOSf4LAr+6YdhLpZ4CSyxnk0vu5lHQL4YEROuT/nH6hYJz7KKH1v/tdZd6PovX8zX
-	 NfiCvVElD2VGXMuIuk2zk+KeJUWLpO73HLe2E6KLcUlf7Y4ohXiItq/1KV1s45hv3R
-	 o63fvHyqjmqHDwLm/qcq14HQ5l3CejFYnjhFtP8qPFnmv5lDy3sDBhorIJ4YJyivhO
-	 AU1A/i5pNXhIOb/b2veQbtRZnaQlDyRwjiJLE9CsIWDVP7R+yUMWAsHpY+hBFEMIMh
-	 qyiO/hTdi0TrA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xTdJl-0000000HTmw-1aNo;
-	Wed, 18 Nov 2026 10:55:09 +0000
-Date: Wed, 18 Nov 2026 10:55:08 +0000
-Message-ID: <867bia1kab.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <fuad.tabba@linux.dev>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Steffen Eiden <seiden@linux.ibm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Quentin Perret <qperret@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 01/19] KVM: arm64: Hide generic ptrauth from protected VMs without ptrauth
-In-Reply-To: <CA+EHjTwJ9XTCfrfBLgGjed3GrRtiTnk-ErvPSwU-AhvyTVcnsw@mail.gmail.com>
-References: <20261109084854.840576-1-fuad.tabba@linux.dev>
-	<20261109084854.840576-2-fuad.tabba@linux.dev>
-	<86bj7n1bzx.wl-maz@kernel.org>
-	<CA+EHjTwJ9XTCfrfBLgGjed3GrRtiTnk-ErvPSwU-AhvyTVcnsw@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=vt+IfZIZ
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: a=rsa-sha256; bh=ji0Sy7yk69gklaMPP5Zc2g+qgmHVYq7bGDR02Mw+y7w=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1794999500; v=1; x=1795604300;
+ b=vt+IfZIZJOS0URSsZzPpdtdsks8eAAoXxtanAnia9tpoLGYih90ndeL65criPFR/mMaeZzbf
+ uzD1nRpduIpEsqu6Fxvs3Q1n9Z22EIz+r2sA3w68RgfwEhFr9pVOp1v3bW/3HKMBCT+aNvk+OZG
+ lEpOXQMrET0YpQ+nqPVdmU4U=
+X-Envelope-To: kvmarm@lists.linux.dev
+Received: by smtp.migadu.com with ESMTPS id df8d333ee19203cc;
+	Wed, 18 Nov 2026 10:58:20 +0000
+X-Mizu-Trace-ID: df8d333ee19203cc
+X-Migadu-Flow: FLOW_OUT
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5c14bc5a743so6826e87.0
+        for <kvmarm@lists.linux.dev>; Wed, 18 Nov 2026 02:58:20 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErGwdjoaBrEodKtiUvIqbcA3uaJd8udaCuhW0D8eTYcEXlKqjd2AQJgwyLffEvsLR3zija1gWOs=@lists.linux.dev
+X-Gm-Message-State: APuU4Z8C4wWpOzRiQhsLPJjehQrE4kEdBuj1BDlEs1X6svWaBdWh+RdL
+	BO/avWUKITuMtc8xINeXTEZZbQM8HfIOlpsFjO46J2XizSGhW5MjiK7o6k3vYevrruwksAcQIwc
+	K2TEJ9vDqsi+CtgQUxJuTEKrdxJduuoJ6ZY71awv3
+X-Received: by 2002:a05:6512:2346:b0:5c1:6e17:16fc with SMTP id
+ 2adb3069b0e04-5c1a985f78cmr169644e87.2.1794999499497; Wed, 18 Nov 2026
+ 02:58:19 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -86,41 +65,46 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: fuad.tabba@linux.dev, oupton@kernel.org, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org, joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, vdonnefort@google.com, qperret@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20261109084854.840576-1-fuad.tabba@linux.dev> <20261109084854.840576-2-fuad.tabba@linux.dev>
+ <86bj7n1bzx.wl-maz@kernel.org> <CA+EHjTwJ9XTCfrfBLgGjed3GrRtiTnk-ErvPSwU-AhvyTVcnsw@mail.gmail.com>
+ <867bia1kab.wl-maz@kernel.org>
+In-Reply-To: <867bia1kab.wl-maz@kernel.org>
+From: Fuad Tabba <fuad.tabba@linux.dev>
+Date: Wed, 18 Nov 2026 10:57:43 +0000
+X-Gmail-Original-Message-ID: <CA+EHjTxMVXR11s5_U5144hdpYStkd1-gi1P2HK6DLnn5D4RW8Q@mail.gmail.com>
+X-Gm-Features: AclHuK8nMc23WqG7bzjhLPz1LETcOHXAsv2Kso31Kz9QH-6JXZhmhiORkbvHHMI
+Message-ID: <CA+EHjTxMVXR11s5_U5144hdpYStkd1-gi1P2HK6DLnn5D4RW8Q@mail.gmail.com>
+Subject: Re: [PATCH v2 01/19] KVM: arm64: Hide generic ptrauth from protected
+ VMs without ptrauth
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>, Will Deacon <will@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Steffen Eiden <seiden@linux.ibm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Vincent Donnefort <vdonnefort@google.com>, Quentin Perret <qperret@google.com>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 17 Nov 2026 19:47:36 +0000,
-Fuad Tabba <fuad.tabba@linux.dev> wrote:
-> 
-> Hi Marc,
-> 
-> On Tue, 17 Nov 2026 19:41:54 +0000, Marc Zyngier <maz@kernel.org> wrote:
-> [...]
-> > Burying a fix in a selftest series is a recipe to make sure it is
-> > ignored for a full cycle... Why isn't that with the "massive feature
-> > set" series?
-> 
-> It's in this one because pkvm_id_regs depends on it. The test checks
-> that GPA and GPI read 0 in a protected VM without ptrauth, and it
-> fails without the fix.
+On Wed, 18 Nov 2026 at 10:55, Marc Zyngier <maz@kernel.org> wrote:
+[...]
+> > It's in this one because pkvm_id_regs depends on it. The test checks
+> > that GPA and GPI read 0 in a protected VM without ptrauth, and it
+> > fails without the fix.
+>
+> But that's a *test*. Nobody runs tests as a production workload.
+> Delaying a fix to satisfy testing makes no sense to me. If someone
+> screams that their tests are failing, let them scream, safe in the
+> knowledge that you have fixed the problem rather than the symptom.
 
-But that's a *test*. Nobody runs tests as a production workload.
-Delaying a fix to satisfy testing makes no sense to me. If someone
-screams that their tests are failing, let them scream, safe in the
-knowledge that you have fixed the problem rather than the symptom.
+Ack.
 
-> Would you prefer that I send it on its own, or with the respin of the
-> features series?
+> > Would you prefer that I send it on its own, or with the respin of the
+> > features series?
+>
+> I'll cherry-pick it directly.
 
-I'll cherry-pick it directly.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks Marc,
+/fuad
