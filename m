@@ -1,49 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795021457;
-	b=IuFa56fYjSkQln3oxwx/kSmanmwd52sjW3KLBfOqA57psih3teYTqUKwrAWdaI8wRhgl
-	 TM5KD25x9Uh7S6VZT5vgJC1ztbdVQ/HbLFxJkx7yCCRPmvEjnkpC7DHO9dRWXCLn8j2La
-	 ksuDs8kTzwnsBEW8Gdumq5HAkQZ1G02ya2631SigIqBjITEXoaceSGqR8bLKaIivJJJX8
-	 3rBz8h64JEyYMe27TilIcOU742g203NTuYT5Y4EDqD4Mh9TrFV1nP4PIGe1JDQ1QKQHUH
-	 LJozR1G5uiCHsRoM5N8SrLrYElFnpQ4HMJERUe1dRs2KiZpuqwitVA7Pn495MA/RhOg==
+	t=1795023849;
+	b=dcVrqulDXYG3B6lLpRuYBrBPZKzFCGMjPjbiQbdCVFQVIk/x6YfC8e9Keui1rGgcmbMW
+	 RQD+yS9qUxIELWAuJtj+tZU6J2ZLV/dAEDcnWIN4POWJ7/R69Yoj4kny5LQqPDZM/DrPO
+	 eYRhC6RWyFuuD7JEpSjUc/SjAB+GmeUxLTVh8+2JjmTyerAVE6PkzqdR36R6eOvdbN4mh
+	 kVHgtXo7fgQS5Q/MOhaX1zxzdpz9Mj+RIapTtRwcGdgdZM+tLFjFmblYg9VAsgbYL2vs9
+	 lI1UczB7NvSpIixAzNZK0nv18L5+H3/spH2wwpUP0YSEpHbHrs5famMr71feJ7FL3Mg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795021457;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
-	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=nqa+nFQZC5Ig4zRO5uaG7pBGb9F4eWw8/n9HDHKsVu8=;
-	b=AeQVCUucri5ZABLY2I/K65RfFVUEIf+o2VZ7DEdy0PUygTiJSqDYdiPI8Kprx7Kn+jNh
-	 ye8L2ebcBqhmrmTfa79784Sq4sbFSF0w4bGUrlk/wSFl2b4IqHU3wPcnMh+i+qe5XvhxU
-	 Qut8epCVuERye9pfEk3WcczNAPl9Sp/TYJBvYLfxXL9iGujdIfrN+eWIDr51PJ3UD/dQc
-	 rnTSZxioSA7ZhKfIgiOd0ZA8A2vCGsaienK2NXuV+vvBrSUDI33nz6dDJpDXKzfOkO+9Q
-	 nBBs4APpcRI5MjbXQO4tQJkGJSy0PwMU8n8jcpE/TAN4cfbEPnqQXH7CqrqOeUD6njw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795023849;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
+	 X-SA-Exim-Scanned;
+	bh=PsjAHRo5jnkI0ALFabogwq+UwZ+2mKJujdKyho7IR70=;
+	b=XcFyVTOfWvZROJ3xLInkerMD+eTzt8N/LUWePDms//GxGSZjgTngLk+Z/WZ+teSb5Dpp
+	 VhGKZVDutmthQdQnk/9S4l15EUhelBYa5xHzWi1ob257IbcQOwhqD8+vLH9ZD41MdNBi1
+	 QOiMezXirBScl1ym2MfcWx/EcGaBsIX86SUL+mk1aaQFztumf+GTF/Qq4acIyelPOM1pK
+	 rfbhCdHjdYO2WcfybB5Dz/yad623inUEuwa9cKbodo4H2T/L104x4OO6glbN00T8Vh+4M
+	 cJk7z+dmTbvK8sz6bCYJPy6hvZ7yqhJmzLy3UtdLLdfzTOBjMRS/SyAfAitUcTSnBJQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=exJ4ph+D;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2241A60A2605;
-	Wed, 18 Nov 2026 17:04:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2241A60A2605
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PnJkS9nY;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A4F606A330;
+	Wed, 18 Nov 2026 17:44:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=exJ4ph+D
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 857D01477;
-	Wed, 18 Nov 2026 09:04:13 -0800 (PST)
-Received: from [10.57.62.206] (unknown [10.57.62.206])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0B0093F632;
-	Wed, 18 Nov 2026 09:04:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795021456; bh=I2MvshInrGGMMQbQbyG1/Vaqm9Vs7/yev/tVH+ZkcRw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=exJ4ph+DI9p6YDddw/RbEaCWCdBiESakD24KDZaQ9BBVT5dMmLGeq0fitTFmMPs2F
-	 YoJjhaCe+bldPIcJxHpqXATiIEHCRSVXyL092X7TKi/C/oYh8mvYTHEw8h8PUmqSNF
-	 Mk8VyCfh1DGh8TNeIvdNpnHRUslG0h5hp2BhC6RA=
-Message-ID: <8b90d6fc-8ddb-4173-9d05-3c8977b4ed5d@arm.com>
-Date: Wed, 18 Nov 2026 17:04:11 +0000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PnJkS9nY
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7CC41F000C7;
+	Wed, 18 Nov 2026 17:44:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795023848;
+	bh=PsjAHRo5jnkI0ALFabogwq+UwZ+2mKJujdKyho7IR70=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=PnJkS9nY8C7s9v5mncFhm84/YLzlygGH0cJ9SmDGquNicMJ3G42uSMWrM9qiWv8sZ
+	 cTakZiYy0bsrkYZCSqC3LUS57Ow7WwN3b9UuYKBw5m+NlV5y25kzwvpt30IhmRnHZP
+	 e9VY5cxGy6U7jEWEUkx+Y6OLSz6CtkZr1lqoVwKX9mdODg6FOPa/7fNaYS6d2AldVY
+	 ASslvyeTHW5JFlzxqV53RNIvjyzhmQOW3OaHhcp37jdr8GENqSbMoeGsGYMBh91F/s
+	 Br/66kA8lFJl8ch/Yp/PUX1qHcyZ7i/7Ne4hvpn5ygDMNGfxlDFbdXxJAqVbElxkkP
+	 u7l4sNVC/rTog==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1xTjhW-000000004aK-494Z;
+	Wed, 18 Nov 2026 17:44:07 +0000
+Date: Wed, 18 Nov 2026 17:44:06 +0000
+Message-ID: <86zev6yqzd.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: 	"Oliver Upton" <oupton@kernel.org>
+Cc: "Dan Carpenter" <dan@pereq.eu>,
+	kvmarm@lists.linux.dev, sashiko-reviews@lists.linux.dev
+Subject: Re: [PATCH v2 1/2] KVM: arm64: Load the vcpu in KVM_SET_VCPU_EVENTS
+In-Reply-To: <sashiko-outbox-221074@kernel.org>
+References: <cover.1795006659.git.dan@pereq.eu>
+	<033a2d49e0f48426281b46eb1131ae64012aba18.1795006659.git.dan@pereq.eu>
+	<sashiko-outbox-221074@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -52,61 +69,138 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 10/11] KVM: arm64: Dispatch stage-2 destruction by VM
- flavor
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Kohei Enju <enju.kohei@fujitsu.com>
-References: <20261116164358.142785-1-steven.price@arm.com>
- <20261116164358.142785-11-steven.price@arm.com>
- <CA+EHjTy-0k08Ukyo+4mmzqVn9UjRnvhy=BQT9kxSj7CBzzwO_Q@mail.gmail.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <CA+EHjTy-0k08Ukyo+4mmzqVn9UjRnvhy=BQT9kxSj7CBzzwO_Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@kernel.org, dan@pereq.eu, kvmarm@lists.linux.dev, sashiko-reviews@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 17/11/2026 15:02, Fuad Tabba wrote:
-> Hi Steven,
+On Wed, 18 Nov 2026 13:45:34 +0000,
+sashiko-bot@kernel.org wrote:
 > 
-> On Mon, 16 Nov 2026 16:43:56 +0000, Steven Price <steven.price@arm.com> wrote:
-> [...]
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> [...]
->>  static void kvm_stage2_destroy(struct kvm_pgtable *pgt)
->>  {
->>          struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
->> -        unsigned int ia_bits = VTCR_EL2_IPA(pgt->mmu->vtcr);
->> -
->> -        /*
->> -         * Realm RTTs are inaccessible to the host and may contain stale data
->> -         * after the RMM has released them. The non-root RTTs are explicitly
->> -         * destroyed through RMI before the RD is destroyed; only the root PGD
->> -         * pages remain to be freed here.
->> -         */
->> -        if (!kvm_vm_is_realm(kvm))
->> -                stage2_destroy_range(pgt, 0, BIT(ia_bits));
+> Thank you for your contribution! Sashiko AI review found 1 potential
+> issue to consider:
+> - [Medium] KVM: arm64: stale mmio_needed after kvm_inject_nested() in
+>   KVM_SET_VCPU_EVENTS
+> --
 > 
-> Could this patch go before patch 4? Then patch 4 wouldn't need to add
-> this check.
+> commit 178d0de7451612b8ddf14a943cb82094efbd77d1
+> Author: Dan Carpenter <dan@pereq.eu>
+> 
+> KVM: arm64: Load the vcpu in KVM_SET_VCPU_EVENTS
+> 
+> This commit wraps __kvm_arm_vcpu_set_events() in vcpu_load() and vcpu_put()
+> so that kvm_inject_nested() operates on a loaded vCPU during
+> KVM_SET_VCPU_EVENTS.
+> 
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 84a52e27ed859..a148e80d0aef7 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -2002,7 +2002,7 @@ static int kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
+> >  static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+> >  				   struct kvm_vcpu_events *events)
+> >  {
+> > -	int i;
+> > +	int i, ret;
+> >  
+> >  	/* check whether the reserved field is zero */
+> >  	for (i = 0; i < ARRAY_SIZE(events->reserved); i++)
+> > @@ -2014,7 +2014,11 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+> >  		if (events->exception.pad[i])
+> >  			return -EINVAL;
+> >  
+> > -	return __kvm_arm_vcpu_set_events(vcpu, events);
+> > +	vcpu_load(vcpu);
+> > +	ret = __kvm_arm_vcpu_set_events(vcpu, events);
+> > +	vcpu_put(vcpu);
+> > +
+> > +	return ret;
+> >  }
+> 
+> [Severity: Medium]
+> Does vcpu->mmio_needed remain set when KVM_SET_VCPU_EVENTS injects an
+> exception from L2 that routes to L1 EL2?
+> 
+> When an L2 guest exits with KVM_EXIT_MMIO and userspace aborts the access via
+> KVM_SET_VCPU_EVENTS (for example with ext_dabt_pending = 1 while HCR_EL2.TEA
+> is set), kvm_inject_sea_dabt() -> kvm_inject_nested() commits the EL2
+> exception entry directly via __kvm_adjust_pc(), which clears
+> PENDING_EXCEPTION.  When __kvm_arm_vcpu_set_events() then calls
+> commit_pending_events(), PENDING_EXCEPTION is already clear, so it returns
+> early without clearing vcpu->mmio_needed:
+> 
+> arch/arm64/kvm/guest.c:commit_pending_events() {
+> 	if (!vcpu_get_flag(vcpu, PENDING_EXCEPTION))
+> 		return;
+> 
+> 	vcpu->mmio_needed = false;
+> 	kvm_call_hyp(__kvm_adjust_pc, vcpu);
+> }
+> 
+> On the next KVM_RUN, kvm_handle_mmio_return() sees vcpu->mmio_needed still
+> set, writes the MMIO read value into L1 EL2's destination register and
+> advances L1 EL2's exception vector PC by 4 bytes via kvm_incr_pc().
 
-Yes, that's a good idea - I'll make that change.
+I think this is a separate issue, which doesn't intersect with the
+current patch. The problem is that we have multiple ways to "commit'
+the state on exception delivery, and that we miss MMIO handling in the
+EL1->EL2 path.
 
-Thanks,
-Steve
+Oliver, WDYT?
+
+	M.
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 97332ffcb1300..33bced55ce3bb 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1352,6 +1352,7 @@ int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
+ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+ 			      struct kvm_vcpu_events *events);
+ 
++void commit_pending_events(struct kvm_vcpu *vcpu);
+ void kvm_arm_halt_guest(struct kvm *kvm);
+ void kvm_arm_resume_guest(struct kvm *kvm);
+ void kvm_pause_vcpu(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index d04ac52034541..83272adefc4c0 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -2900,7 +2900,7 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
+ 	 * We may have an exception or PC update in the EL0/EL1 context.
+ 	 * Commit it before entering EL2.
+ 	 */
+-	__kvm_adjust_pc(vcpu);
++	commit_pending_events(vcpu);
+ 
+ 	kvm_arch_vcpu_put(vcpu);
+ 
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 878ea4500c5c5..595b23b29af89 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -770,14 +770,16 @@ int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
+ 
+-static void commit_pending_events(struct kvm_vcpu *vcpu)
++void commit_pending_events(struct kvm_vcpu *vcpu)
+ {
+-	if (!vcpu_get_flag(vcpu, PENDING_EXCEPTION))
++	if (!vcpu_get_flag(vcpu, PENDING_EXCEPTION) &&
++	    !vcpu_get_flag(vcpu, INCREMENT_PC))
+ 		return;
+ 
+ 	/*
+ 	 * Reset the MMIO emulation state to avoid stepping PC after emulating
+-	 * the exception entry.
++	 * the exception entry. This also applies if for any reason, we adjust
++	 * PC while in an MMIO phase. But that's rather dodgy...
+ 	 */
+ 	vcpu->mmio_needed = false;
+ 	kvm_call_hyp(__kvm_adjust_pc, vcpu);
+
+-- 
+Without deviation from the norm, progress is not possible.
