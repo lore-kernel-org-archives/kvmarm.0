@@ -1,87 +1,88 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795094764;
-	b=N1xwzit0zEiw13eAjP0o4bJzQBCoRDUpdhUc/gh38kcwVtwA6d4SSGr+QSEraSZe3zSO
-	 9a8eQ+nlfqcnQJEH4YsNDMFIP7v739uRSB+LuJvVL/2AnKSCyFAIEncExRJJNpK+W3HN8
-	 DvTAywSRl6vEEh+3q4VdwybjzDk6hcm+34O/1Gjy+ztG9SZVPa0xSt/5y1Y2rNV8DDxtR
-	 4NViVO6n1hVpB1TvUwbvuwh11ymK6f71dDypF5lqQrdLUhzQUgOdHVtugiMeq49uP11D1
-	 GokcBLhz9adRLeLcX7o7ZmfTxdA4kcXcqjZbnlQ4E0ZRe1xhj1BE8bMAnZSXpA2hT1Q==
+	t=1795094767;
+	b=CgmRIAlOG4NQsIO3DVNsOVun5NnRvJ1oMbbfx2YPUoKJV48sEUIYe8jrfqfeDquxdzZN
+	 dFf8XDu968wWeUf7BnzIiNwUoWvmQekamCdt0k+rDrH3E6U6cGl5LXpHSn15/n6te0Fcf
+	 kFYDNdC13q9LUkyv91dRLdRhyvW/kHcNCqV52/PrsrzqguMgzijz3GUXc2BDLNvgRJqez
+	 XhwgsRgNSqSddaUmffcHRgGiW0XtjdAAqTXIe5G7xFrqGJQ/rwPaZQrZ6kef4TpNjj6ge
+	 9x4xgmSAJubOU3Q7fCcVkCIbOIVAhKsHKARID1zHOFgjg5nbqHGTGQcKkDtU2RQeSAQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795094764;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795094767;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:Date:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer;
-	bh=urel1wTj62Q3r8nRWwBvs+QOOwLpwm3bPvBLzD6Q3KQ=;
-	b=3NIMQr8N1N4lnttUv1FWIkB2QLVCaIbdRK2IgyJQQX7vUMj2azocuut8rCyNyaXbT3GL
-	 vKL9UdmB0qYApydpl1CVPPZGZH6Bnw1oS9g/3aPSm8HLealj+iNhOWJUXzgwq+qNyeSK9
-	 CK6YVClpRfmRjm4sV3OODcVpKv/p2OX/iXt483H7JP1rQfQPMysMrrQB/VxKRfFG2yQCr
-	 vMPdt1va5LngWMdjSgCdaJifs1ulO+dohnplcZBmj0SxhUNCRJtjT9yApPfD6EnjDpdcU
-	 yuMyGym/AEVxJt6R7YhZ4W8J2dmA67RJENpQA8j9MPn1PKdtyrdq5Obo4gqY/6qD+RA==
+	bh=9RCUmBluXL32Xv+pv5scriRF4mb+lkStDc3uAW97NWc=;
+	b=05xi50025iKg9U4WIVpxA7X7//zSz62lhv3X67RH1yKy3wdJdNJ0eJDoqj72pQxqHqHB
+	 Lr29U6v6a4CZoR+mE7YgfnFyU9F1a0n0cXIGBeVQFup6gLNtYZ1CVNA6VGHWC2twpjRP8
+	 2byrPmsD/84A1dOuQyhg22iyNtlkJ4MJA5Y9LGu9mWR0ojTRmxtrXm49oJ7CUL6+UzQct
+	 3BkuLKyijr1nf7sd5Rk8zSoHY3L4+zgxxF0D32e3jIBX+VjJPyNquU7l4yDwl1y+N5dWq
+	 Y7kPfRLWxMj5ln+FIWWCb7t3jOc4GMw3En3Wm1wcTgB4qAtiX1BTR2ylfN39kSp0NYw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=pereq.eu;
 	spf=pass smtp.mailfrom=cryspen.com;
-	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=Njcl+nXd;
-	arc=none smtp.remote-ip=209.85.128.51
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	dkim=pass header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=eqXF57zd;
+	arc=none smtp.remote-ip=209.85.221.50
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF38606A324
-	for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 13:26:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8FF38606A324
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0E7606A32A
+	for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 13:26:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EE0E7606A32A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pereq.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryspen.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=Njcl+nXd
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4bb64c99d2fso24840605e9.3
-        for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 05:26:04 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=pereq.eu header.i=@pereq.eu header.a=rsa-sha256 header.s=google header.b=eqXF57zd
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-49465892f7bso1755385f8f.1
+        for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 05:26:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pereq.eu; s=google; t=1795094763; x=1795699563; darn=lists.linux.dev;
+        d=pereq.eu; s=google; t=1795094765; x=1795699565; darn=lists.linux.dev;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=urel1wTj62Q3r8nRWwBvs+QOOwLpwm3bPvBLzD6Q3KQ=;
-        b=Njcl+nXd9niacPDWnlh51tktK2u2e/PdBwmBo+MaB4m57hzpfqrfLrikFoY+nIuYYx
-         7drLNUyXOTcE+jmSi/xrvO3CK5rVZ7wfyeU0zWfFdAh64hIIGVoFtr2aZY0P/aFcvjBF
-         xYT7668ZOqb58yNMXv9aJtc0YGSwcz7z0SndCHiGh1oOMoy93fsIQK+3wx1KDyAePYND
-         n5vgGIXQx9UX3BVlRf7jSfD9h5DRkPDlatARsy0tqN5T/54me9MYQdQC1rNBVaZATHoj
-         lHLehlKPDz9TSQuFcSGJBZF9V5sRpP+W/PRn/romIpq68Zb8r3GIvqFQBBQKzsFkxzWe
-         MaVw==
+        bh=9RCUmBluXL32Xv+pv5scriRF4mb+lkStDc3uAW97NWc=;
+        b=eqXF57zdzmQDLfKdV8n4nOb14LDMH5RQc+fwh7P5Z0QMUxC+x4bGdJJGZ5SG5xMWla
+         G+87ofAkXpBfNfZMGgiN4OKHsEZNdGGqzwdDCEzG/4sLLSvTF01CpUlJwrlGEfxt/z0h
+         hAKb6G3u8jdKI5bIE6zkEJFsOSD/LNBqPkTmWZ75qRlEks8RBi4kx3am+/HIG/FQHbd4
+         9gEVKZ0gXACqomOJMHn8wwQXk2UdbmkxhGLO/G3puI5I1Dunfa5kqVWZCu+nWk7yNzUD
+         VVu8fd0RdMDP2KvylHv/3Ug09R4Hz/jrQFK7DswuFLB4GVNHInc2RBHE5KxAvnuRkia5
+         V/RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795094763; x=1795699563;
+        d=1e100.net; s=20260707; t=1795094765; x=1795699565;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=urel1wTj62Q3r8nRWwBvs+QOOwLpwm3bPvBLzD6Q3KQ=;
-        b=z7wGea07+2tB0M0SMsdqz+4R1RAFpXmknsWwU54SfaVlmH9HDOrcT/nnkezhBi82cB
-         5KQP8G3Ja2VeASZsUW9rcHNGrbgrJFH0PGUdJaKuV5Eetnlns27v05D0eiUXrzOPVS69
-         lp0lcs6h3lY0NHAUUkgIo2vz9swST5JTw3xB+jz+IdXHv7+QnMqgMzhGkEx+cvrGZpk/
-         DvR8rXb071+EECcErVma0B9kbhPCyOPmSh2rNPVeaCKZOtywhW40jGRoKSOBdr5Spnt/
-         TlagjiGsF0Ql7eEol57iZ8+AFe8SwjDvubBr1gv4+ikLjkNWH1OY/ZFXA13ddxJv+gKT
-         ifxQ==
-X-Forwarded-Encrypted: i=1; AL+hErGhNblbrzqbot1a4GGHOz4l3BWs8/0Gcuo5zFrVydY4cW07SijHK8NSvP78AWzdj8IKkJLnLMY=@lists.linux.dev
-X-Gm-Message-State: APuU4Z+L8kxccj8LL991YnWPANsm+hctkHUfuIpe5WPIMYrVuDyFk0mE
-	4x8ohjyZUlG5ezSptrjYOkyQOm87YJEbnVTW8qL2wKvAEwu+dluyU7DkzctrNpz6DFM=
-X-Gm-Gg: AYBFou1Az1HvsxswWnQoOHGdZ3vcsyjFSnutaKvcqj0awBOdaoRhkb+Wp8q/cZVwCY7
-	6hVubsobHnBS+7UAs9FMsGONqJJqOrUFp0ijfsvjXuqc8cIBKki6ax+lTWp6xG+lz8VjREoe/CR
-	RmCkwS+0sFwXwnV7J9z+s3AADV/CoecS33nFHLiVyguBNbOfD3oxx4i9CE4DzzmuhyoPbO8vr+p
-	JhIPDCfJeBEy6rBejIAa/wtlPRZwrOY9az9khJsZ7JZscQ/iezEjVA6b2ZFObVCfo2XJno1wxrU
-	v2idHr7y9UGrQLOQ+npms+Q8PaAauMOeJCqtv29e7ODjYjTKDPTEJAizq0ZuiReIFRoPsD2vTjw
-	+skkEITR/IliBdKSuhEPrXxJrkJYXgO8JIRrq8EQ2ACAXZHHe+H/VDgGowPqjyEDq36m2/k4CYU
-	+nV2DQxZVEgsY7L3Rri+aMzUmWtGFrKaj/EuOhOYdqCLAzpjseZMOr3QzAOI2UXHzQX/l8qy2hl
-	QuxAxPBncJm/NnmhuWqwtjzU3as+bNSP4TRP4pnonsHqEXqoyuL6ecQr4TOjea8aU/NbMPC6nSb
-	lxeaFAiY/mK3YnRVfCY=
-X-Received: by 2002:a05:600c:1f82:b0:4bb:6848:d433 with SMTP id 5b1f17b1804b1-4bb7da4f53fmr121279865e9.26.1795094762119;
-        Thu, 19 Nov 2026 05:26:02 -0800 (PST)
+        bh=9RCUmBluXL32Xv+pv5scriRF4mb+lkStDc3uAW97NWc=;
+        b=ozeXgDy5o2QTHsi+22qfYqc4YNvdSKDwMU7btoVjTuF7ESGt/viIAW/zHTalEHHFmy
+         YNsmwdtkLQdxx1GXwkW6uNKnrvH7D/k6bHmSY36ByU1KG6bUrNAxGvS42D4fEcMLMffo
+         BFp70kWelFll04Xy4uKp5MB9mlj1u5+u4UZ6ENZB2Rs1iBVAJHg6ekkz5jSo5STIIH75
+         NnvC+JAHLndEGdcJt8NLGgG0DOSx2stm0SgbGN4vgtxx6mJyGNHb6uVklLhpQF9krw0W
+         r6XA9Mu3ymCaaw0c4pYy7l5vEZAEyk2svQT7us0QXHyk20eBlKTvUn8u6/SuraA+jitE
+         WGpg==
+X-Forwarded-Encrypted: i=1; AL+hErHRwPZGyichcnC4l9BrTP4Jw+yZP4J7kRh2+vtwHFHm8hxaXrCptUyCwlZoHx5+ehmNJespFZA=@lists.linux.dev
+X-Gm-Message-State: APuU4Z/myNQnSfOv2tWrSWXC/sDAm7PEvQLLhnXZT9gTTkl/nyO8pcMv
+	Af1CG9LhnpLaTe0LlK2qKqjnD3JSNoc85LJIUQFkI3eIsNEFsf2jq+cOrYY6g/eyC10=
+X-Gm-Gg: AYBFou04odWDqHpctlbYzTDI/JATRV7zHlDxfBpMrvfzmyerZBzoNsy/2lwB9rFSFLV
+	uxggd+W2XvQhfKzwLJwXOn6qd9FksrspmzP8u4dB7e4jrnspNBVsLRv0T5+26QWYFC8UatKuleU
+	15cp4cev6DP7jjYPOSyorZaJCM9auLIWcLlq3UIif0s28qUjujiJ4FGmRJ2BHtz4FPJRmIdqdQ7
+	UXxk1W0F+CE4dqZH9kU/VyYCoocnl0Wmr4SfoTKKI/+PXdVqf95qHroZ1GfTD2/LzdKNiKT9zhd
+	KFkHmPya2yxZLo9vbdZSa5rU29FaWYGLYCawvDuyxALqZTijCci7gbBDmiZTt7RLq8ESwqX8gpW
+	C4t2Zp7zwG+nUEMCWaQBe6O6eiTlErlFY2eVh2XtIBdOyQh5RNi4Gt3BUlD+nRbp3Amw/jbp7KE
+	YGwSwvNW7Gv56j5Wj7+YIfBiTun/73HjjbUHuyuIO+SAIADhURihTLfHqeKUixgMVD+deCFJUQi
+	TjsBipwdaWMlqFs8OBEbztcBQraBWXXahsEbuqN6XDhP4eb4yk9p2DBEwzW6PjUFvNUtZgiMacq
+	CtiLBSzPEx6S5/Ze2bU=
+X-Received: by 2002:a05:600d:19:b0:4bb:8701:a2df with SMTP id 5b1f17b1804b1-4bb8701a2eamr15744495e9.17.1795094765053;
+        Thu, 19 Nov 2026 05:26:05 -0800 (PST)
 Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb84e051desm28697975e9.1.2026.11.19.05.26.00
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb85342cedsm36282605e9.4.2026.11.19.05.26.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Nov 2026 05:26:01 -0800 (PST)
+        Thu, 19 Nov 2026 05:26:04 -0800 (PST)
 From: Dan Carpenter <dan@pereq.eu>
-Date: Thu, 19 Nov 2026 16:25:34 +0300
-Subject: [PATCH v2 1/4] KVM: arm64: nv: Fix AT emulation for TCR2_EL1
+Date: Thu, 19 Nov 2026 16:25:35 +0300
+Subject: [PATCH v2 2/4] KVM: arm64: Trap TCR2_EL1 writes when S1PIE or
+ S1POE is hidden
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -93,7 +94,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261119-nv-tcr2-v2-1-3deb1a6cdba8@pereq.eu>
+Message-Id: <20261119-nv-tcr2-v2-2-3deb1a6cdba8@pereq.eu>
 References: <20261119-nv-tcr2-v2-0-3deb1a6cdba8@pereq.eu>
 In-Reply-To: <20261119-nv-tcr2-v2-0-3deb1a6cdba8@pereq.eu>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
@@ -109,167 +110,84 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
  stable@vger.kernel.org
 X-Mailer: b4 0.16.0
 
-Arm provides an AT instruction that translates a virtual address the way
-the MMU would and returns the result.  There is a bug in the way this
-instruction is emulated for nested virtualization because of how TCR2_EL1
-is handled.  The bug is fairly minor.
+A VMM can offer FEAT_TCR2 to a guest but hide FEAT_S1PIE or FEAT_S1POE,
+for example this is done to keep the VM migratable.  KVM then stops
+loading the PIR_EL1, PIRE0_EL1 and POR_EL1 registers for that guest.  But
+the guest's writes to the TCR2_EL1 register don't trap, and the CPU still
+acts on its PIE, POE and E0POE bits.
 
-The TCR2_EL1 register has bits which turn on permission indirection
-(PIE) and permission overlays (POE).  When these bits are set, the AT
-instruction reads the permissions stored in PIR_EL1 and POR_EL1.  If
-you have the right features and permissions then in the return value from
-the AT instruction we set one bit to either 1 or 0 depending on whether
-the access would be allowed or whether it would fault.
+If a guest turned these features on, it would run with the permission
+settings another VM left on the CPU.  Technically this is a kind of
+information leak and a guest could figure out another guests permission
+setting based on which accesses fault.
 
-However, the bug is that just because the host has TCR2 enabled, it
-doesn't mean the VM has it.  In the current code KVM doesn't load these
-registers for a VM which doesn't have the features, instead the AT runs
-with the host's HCRX_EL2, which has TCR2En set.  So the AT uses the
-TCR2_EL1, PIR_EL1 and POR_EL1 values another VM left on the CPU, or
-possibly the VMM's POR_EL0.  Likewise, for a VM which has TCR2 but not
-PIE or POE, the L2's TCR2_EL1 is loaded unmasked.
+For these VMs, set the TCR_EL1 bit in HFGWTR_EL2 so that writes to
+TCR_EL1 and TCR2_EL1 trap, and clear the hidden bits in a new
+access_tcr2_el1() handler.
 
-The impact of this bug is that we leak a single bit of data to the L1,
-but in real life it's hard to imagine how it is useful to an attacker.
-
-Fix this by clearing the PIE and POE bits in effective_tcr2() when the
-VM doesn't have those features, and use it for the L2's TCR2_EL1.  When
-the AT runs on the guest hypervisor's own registers, in __kvm_at_s1e2()
-and in __kvm_at_s1e01_fast(), load the guest's TCR2_EL2 for the AT and
-restore the live value afterwards.
-
-Fixes: 477e89cabb14 ("KVM: arm64: nv: Add basic emulation of AT S1E{0,1}{R,W}")
-Fixes: 23e7a34c8397 ("KVM: arm64: Add AT fast-path support for S1PIE")
+Fixes: 58627b722ee2 ("KVM: arm64: Make PIR{,E0}_EL1 UNDEF if S1PIE is not advertised to the guest")
+Fixes: b86c9bea6349 ("KVM: arm64: Save/restore POE registers")
 Cc: stable@vger.kernel.org
 Signed-off-by: Dan Carpenter <dan@pereq.eu>
 ---
-v2: Restore original TCR2 values at the end of the AT command
-    Cleanup the code based on Marc's review.
-    Add some comments
----
- arch/arm64/kvm/at.c | 48 +++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 45 insertions(+), 3 deletions(-)
+v2: This is a new patch
 
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 30d8f062b2c2..9dfabd0586e2 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -91,11 +91,18 @@ static enum trans_regime compute_translation_regime(struct kvm_vcpu *vcpu, u32 o
- static u64 effective_tcr2(struct kvm_vcpu *vcpu, enum trans_regime regime)
- {
- 	if (regime == TR_EL10) {
-+		u64 val;
+This is only a partial fix, I will update nested virtualization in the
+next patch and the !vcpu_has_nv(vcpu) condition in __compute_hfgwtr() will
+go away.
+---
+ arch/arm64/kvm/config.c   |  5 +++++
+ arch/arm64/kvm/sys_regs.c | 14 +++++++++++++-
+ 2 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+index e295435a30b8..f756f7c4fdf8 100644
+--- a/arch/arm64/kvm/config.c
++++ b/arch/arm64/kvm/config.c
+@@ -1896,6 +1896,11 @@ static void __compute_hfgwtr(struct kvm_vcpu *vcpu)
+ 
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+ 		*vcpu_fgt(vcpu, HFGWTR_EL2) |= HFGWTR_EL2_TCR_EL1;
 +
- 		if (vcpu_has_nv(vcpu) &&
- 		    !(__vcpu_sys_reg(vcpu, HCRX_EL2) & HCRX_EL2_TCR2En))
- 			return 0;
- 
--		return vcpu_read_sys_reg(vcpu, TCR2_EL1);
-+		val = vcpu_read_sys_reg(vcpu, TCR2_EL1);
-+		if (!kvm_has_s1pie(vcpu->kvm))
-+			val &= ~TCR2_EL1_PIE;
-+		if (!kvm_has_s1poe(vcpu->kvm))
-+			val &= ~(TCR2_EL1_POE | TCR2_EL1_E0POE);
-+		return val;
- 	}
- 
- 	return vcpu_read_sys_reg(vcpu, TCR2_EL2);
-@@ -1384,6 +1391,24 @@ static int handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr, u64 *par)
- 	return 0;
++	/* The CPU acts on hidden TCR2_EL1 bits, so trap writes to clear them */
++	if (!vcpu_has_nv(vcpu) && kvm_has_tcr2(vcpu->kvm) &&
++	    (!kvm_has_s1pie(vcpu->kvm) || !kvm_has_s1poe(vcpu->kvm)))
++		*vcpu_fgt(vcpu, HFGWTR_EL2) |= HFGWTR_EL2_TCR_EL1;
  }
  
-+/*
-+ * TCR2 features are always exposed to the guests.  Clear the ones
-+ * which are not exposed on this VM.  Return the original TCR2 so we
-+ * can restore it after running the AT command.
-+ */
-+static u64 load_guest_tcr2(struct kvm_vcpu *vcpu)
+ static void __compute_hdfgwtr(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index afd7e76bedff..3899702d438b 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -615,6 +615,18 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
+ 
++static bool access_tcr2_el1(struct kvm_vcpu *vcpu,
++			    struct sys_reg_params *p,
++			    const struct sys_reg_desc *r)
 +{
-+	u64 orig = read_sysreg_el1(SYS_TCR2);
++	if (!kvm_has_s1pie(vcpu->kvm))
++		p->regval &= ~TCR2_EL1_PIE;
++	if (!kvm_has_s1poe(vcpu->kvm))
++		p->regval &= ~(TCR2_EL1_POE | TCR2_EL1_E0POE);
 +
-+	/*
-+	 * This relies on the reset value of TCR2_EL2 being 0, and not
-+	 * being modified when FEAT_TCR2 is not exposed to the guest.
-+	 */
-+	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR2_EL2), SYS_TCR2);
-+
-+	return orig;
++	return access_vm_reg(vcpu, p, r);
 +}
 +
- /*
-  * Return the PAR_EL1 value as the result of a valid translation.
-  *
-@@ -1397,7 +1422,9 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- {
- 	struct mmu_config config;
- 	struct kvm_s2_mmu *mmu;
-+	bool swap_tcr2 = false;
- 	bool fail, mmu_cs;
-+	u64 orig_tcr2;
- 	u64 par;
+ static bool access_actlr(struct kvm_vcpu *vcpu,
+ 			 struct sys_reg_params *p,
+ 			 const struct sys_reg_desc *r)
+@@ -3501,7 +3513,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
+ 	{ SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
+ 	{ SYS_DESC(SYS_TCR_EL1), access_vm_reg, reset_val, TCR_EL1, 0 },
+-	{ SYS_DESC(SYS_TCR2_EL1), access_vm_reg, reset_val, TCR2_EL1, 0,
++	{ SYS_DESC(SYS_TCR2_EL1), access_tcr2_el1, reset_val, TCR2_EL1, 0,
+ 	  .visibility = tcr2_visibility },
  
- 	par = SYS_PAR_EL1_F;
-@@ -1438,7 +1465,7 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR_EL1),	SYS_TCR);
- 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, MAIR_EL1),	SYS_MAIR);
- 	if (kvm_has_tcr2(vcpu->kvm)) {
--		write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR2_EL1), SYS_TCR2);
-+		write_sysreg_el1(effective_tcr2(vcpu, TR_EL10), SYS_TCR2);
- 		if (kvm_has_s1pie(vcpu->kvm)) {
- 			write_sysreg_el1(vcpu_read_sys_reg(vcpu, PIR_EL1), SYS_PIR);
- 			write_sysreg_el1(vcpu_read_sys_reg(vcpu, PIRE0_EL1), SYS_PIRE0);
-@@ -1452,6 +1479,12 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 	__load_stage2(mmu);
- 
- skip_mmu_switch:
-+	if (!mmu_cs && vcpu_has_nv(vcpu) &&
-+	    cpus_have_final_cap(ARM64_HAS_TCR2)) {
-+		swap_tcr2 = true;
-+		orig_tcr2 = load_guest_tcr2(vcpu);
-+	}
-+
- 	/* Temporarily switch back to guest context */
- 	write_sysreg_hcr(vcpu->arch.hcr_el2);
- 	isb();
-@@ -1485,6 +1518,9 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 	if (!fail)
- 		par = read_sysreg_par();
- 
-+	if (swap_tcr2)
-+		write_sysreg_el1(orig_tcr2, SYS_TCR2);
-+
- 	write_sysreg_hcr(HCR_HOST_VHE_FLAGS);
- 
- 	if (mmu_cs)
-@@ -1544,7 +1580,7 @@ int __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 	 * switching context behind everybody's back, disable interrupts...
- 	 */
- 	scoped_guard(write_lock_irqsave, &vcpu->kvm->mmu_lock) {
--		u64 val, hcr;
-+		u64 val, hcr, orig_tcr2;
- 		bool fail;
- 
- 		val = hcr = read_sysreg(hcr_el2);
-@@ -1554,6 +1590,9 @@ int __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 		if (!vcpu_el2_e2h_is_set(vcpu))
- 			val |= HCR_EL2_NV | HCR_EL2_NV1;
- 
-+		if (cpus_have_final_cap(ARM64_HAS_TCR2))
-+			orig_tcr2 = load_guest_tcr2(vcpu);
-+
- 		write_sysreg_hcr(val);
- 		isb();
- 
-@@ -1577,6 +1616,9 @@ int __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 		if (!fail)
- 			par = read_sysreg_par();
- 
-+		if (cpus_have_final_cap(ARM64_HAS_TCR2))
-+			write_sysreg_el1(orig_tcr2, SYS_TCR2);
-+
- 		write_sysreg_hcr(hcr);
- 		isb();
- 	}
+ 	PTRAUTH_KEY(APIA),
 
 -- 
 2.53.0
