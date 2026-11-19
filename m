@@ -1,69 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795081998;
-	b=KFVlS2tmFH2AekregFKJ02UnezyS00B9493Yw7V2g4/g4IIHEvLQ281iqQseGXkHbjRO
-	 Ldsexr6flNzcUzWecDaWYMdKCZ5IEkyviBe8bqoLRVrAX6P9Hl47mIpuY/kCSlhLo0v+H
-	 JWTMsHONrwtBYpAjxvdFgzFSJwfwU1hO3g/fF4LL6SXGolRA6nqvxuH8SljYNF7yTLf1E
-	 P1U5Fl4OD3+YhEmFfXLlX98kUmTwwU2pKec1JRKOf382MUjqJwsKY1npQUMmCQUzpOL9i
-	 F2f1RsFUbGgsqmxUQfyo5ryhuj72Z1yfaYovVNb7XUBWBApJ4JklBwQys8ed7/Ib9Lw==
+	t=1795083044;
+	b=gwWm2vNHjoCbEBxmnYfGzCbEczJRvhCK/RKn0D3xa4olUN85PnSYQv18xK9/6wIkTstg
+	 IvY+EDQZNwxIsttupfqZh/YrYbJXA6qKf4Ukfm21/YlxMgW1QnB0ONuC2wfx08erie931
+	 xXvCT5nNriYHMaez3CMgXabTzT1jQ60S0mGFei2qp5ydbR+WL7x75dDt13uNbrYH5TVv6
+	 2htuCR8aNrloMwBjGuQSFrooV+ZuO7hMysOA9qUtxyCNUbv/C+FYVaZXA1Wv+m/0+RcI+
+	 p4dWtEa1GwDCVL+DM9zy08cBqb3OUfFKD+3g33sVKuSHQ91Xq0DJBP7RMJdyxYKvXSg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795081998;
-	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
-	 X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned;
-	bh=uw9sRkfoNYdFSz9CTJOiwcLRj7YgovINkuToV5+7kGc=;
-	b=yttuEkZUcLxmjbZOVZzCu39Tn7VLPKpmc29kelCecFfgGPe7NW/0jO8sk0LcZaKEw8ZW
-	 EH4XoTZ08K1vfMnE9iVQCo/6aw1smFdilzZNimvB+2oE0KTuD19gvnwgmqot9dbU/LiPh
-	 yupBD9iqV3hTD4XUPlSGgLH+fZnHfDXEv4FqzIYtBOOoS7QRyD5VahCE6griiBk6FQc6x
-	 izdRwQWNyoXjvPPXQPPXXzqU1qJsa7agLoigMpyeysUq+uJaDA3lsNb0bD/5oFG35lZjm
-	 WFXHMpGhmVYGth91FWiiA6+Ug/vg8pQd9qZCOrnx5ZTMGk6gQIpYv0oaXTsASejffXw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795083044;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:Content-Language:To:Cc:References:
+	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=o0xJIki+mFoJUWoYjAhFxPBVjnzW6F1WhyTl0VK8FZs=;
+	b=vhzkwbFvTWyNTsaxcDLm1u74nt8HvoVILYogAMuvJQmTKGe0YGIglhFRLOfpnQzmiLsb
+	 yaWtE4cuCZK2PHAFtQYyYwsAvRVEDe/Xvz8SwKoNjhKj5z+m3LjI3CiI1ALRHtM+lCXng
+	 qSAXxT9yGVUolyJzYZIIuds0/bLLOyT3G1b9YlI+d+zoYDTxZsHCU87rqkMdysA1TJp5K
+	 89Pv3+4cT8bhOa+if+xiWrfKHXd0gi8vFkexXsA/pAYKe0anRoulAum8sKSFtbrSTBBY1
+	 TvIEkXaDyt4ZcfFYgMTXaa7mC3FGv8GbhK0eypLUAgqvLYRB98/eOngUMMhZQG4/WUw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=G1AYgeOv;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C342606A324;
-	Thu, 19 Nov 2026 09:53:18 +0000 (UTC)
+	dmarc=pass header.from=arm.com;
+	spf=pass smtp.mailfrom=arm.com;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Q5XwbQpl;
+	arc=none smtp.remote-ip=217.140.110.172
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F64606A324;
+	Thu, 19 Nov 2026 10:10:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D7F64606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=G1AYgeOv
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 185D91F000C5;
-	Thu, 19 Nov 2026 09:53:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795081998;
-	bh=uw9sRkfoNYdFSz9CTJOiwcLRj7YgovINkuToV5+7kGc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=G1AYgeOvg+nwbbnhI1meZ1wYPN1z/5PbRqm5ZqSVd7+WeQEkhMeL63tDZWtqLbxE7
-	 FrlYNzl3+53uiAvojpykPofsM/Epg9a5eiwVW/sHe3crHChT2i7oAI4nomF0mRmZ7t
-	 y9xnXhXZFSBIwHj43RXMpdESV9ygE+vXe5rmP7wRCNoNS2QhBaZ0SolafqNpV8rQAW
-	 tMLD+pN0cslCjXntdWgT9L24hM26o3cKCvh5277hPR7xZQaeEkf6rvlIiEnzcjsIT1
-	 LmqES8UvSHE9u9HuhnpUQvohM0kY2Hcf+m4Lym+HeKchvblyq4wgMB1IIqZw9hLh46
-	 eVYMZWLQwuxdA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1xTypQ-00000000NfP-070Z;
-	Thu, 19 Nov 2026 09:53:16 +0000
-Date: Thu, 19 Nov 2026 09:53:15 +0000
-Message-ID: <86y0apywok.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Dan Carpenter <dan@pereq.eu>
-Cc: Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	sashiko-reviews@lists.linux.dev
-Subject: Re: [PATCH v2 1/2] KVM: arm64: Load the vcpu in KVM_SET_VCPU_EVENTS
-In-Reply-To: <av6wypzwAJxIyKOU@stanley.mountain>
-References: <cover.1795006659.git.dan@pereq.eu>
-	<033a2d49e0f48426281b46eb1131ae64012aba18.1795006659.git.dan@pereq.eu>
-	<sashiko-outbox-221074@kernel.org>
-	<86zev6yqzd.wl-maz@kernel.org>
-	<av6wypzwAJxIyKOU@stanley.mountain>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Q5XwbQpl
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 021D81575;
+	Thu, 19 Nov 2026 02:10:40 -0800 (PST)
+Received: from [10.0.129.3] (Suzukis-MBP.cambridge.arm.com [10.0.129.3])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 90FB23F632;
+	Thu, 19 Nov 2026 02:10:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1795083042; bh=7YWcBLhIPYqKWe2ix2RQNC66Zd0lpOfLCGPkdsJOsBM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Q5XwbQpl4Z1MWetRAjz0CoLEMc7Y0wB+bliAGEGpeV6ErsaD+ydzUiBaPjwO5jKrs
+	 LlqFQ54UaiKTsXHzDr16BV58dhQs/9gv5/7o1EOMNLdON/YbPP7A8pIzJRRaCBTSEb
+	 pBoo0+42pwwdHFFOu29tYezIaJbmqXPp6sfM/iK0=
+Message-ID: <120ad525-efa5-4129-9d97-fa6fa5db747f@arm.com>
+Date: Thu, 19 Nov 2026 10:10:38 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -72,109 +52,114 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: dan@pereq.eu, oupton@kernel.org, kvmarm@lists.linux.dev, sashiko-reviews@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 01/11] KVM: arm64: guest_memfd: Check mmap support when
+ preparing memslot
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, Fuad Tabba <tabba@google.com>,
+ Ackerley Tng <ackerleytng@google.com>,
+ Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ Kohei Enju <enju.kohei@fujitsu.com>
+References: <20261116164358.142785-1-steven.price@arm.com>
+ <20261116164358.142785-2-steven.price@arm.com>
+ <CA+EHjTy5xBmavNWSYPjqU9qXtssV3ZHzsUr1s_4bVOt1GnDLVg@mail.gmail.com>
+ <6bb490cd-ebbe-41d7-adf3-d6eaf0e53478@arm.com>
+ <b1ef7241-54b0-4a17-83b6-0008e722f2f6@arm.com>
+ <8a095a42-662a-416d-a5d7-79e10161201c@arm.com>
+ <cc27e6a8-6bfa-4c82-92a7-33175baf6803@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <cc27e6a8-6bfa-4c82-92a7-33175baf6803@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, 19 Nov 2026 08:18:18 +0000,
-Dan Carpenter <dan@pereq.eu> wrote:
+Cc: Ackerley, Sean
+
+On 18/11/2026 15:18, Steven Price wrote:
+> On 18/11/2026 12:04, Suzuki K Poulose wrote:
+>> On 18/11/2026 11:14, Steven Price wrote:
+>>> On 18/11/2026 10:34, Suzuki K Poulose wrote:
+>>>> Hi Steven
+>>>>
+>>>> On 17/11/2026 14:05, Fuad Tabba wrote:
+>>>>> Hi Steven,
+>>>>>
+>>>>> On Mon, 16 Nov 2026 16:43:47 +0000, Steven Price
+>>>>> <steven.price@arm.com> wrote:
+>>>>>> Check the guest_memfd backing file when deciding whether an arm64
+>>>>>> memslot has mappable memory rather than checking whether the slot is
+>>>>>> gmem only. A public helper function is added to be able to reuse the
+>>>>>> static kvm_gmem_supports_mmap() function.
+>>>>>
+>>>>> nit: could the message say why this is needed? It's a no-op until
+>>>>> patch 8 defines kvm_arch_has_private_mem(), which makes every
+>>>>> guest_memfd slot gmem-only.
+>>>>
+>>>> I still don't understand why this is needed. For arm64 we have always
+>>>> prevented guest_memfd without MMAP, in kvm_arch_prepare_memory_region().
+>>>
+>>> Fuad is correct, this isn't really needed until patch 8. Patch 8 defines
+>>> kvm_arch_has_private_mem() - that means that gmem_in_place_conversion
+>>> becomes true (see include/linux/kvm_host.h). That in turn means that
+>>
+>>> every guest_memfd slot is KVM_MEMSLOT_GMEM_ONLY including slots backed
+>>> by a file without mmap support.
+>>
+>> But we dont support slots without MMAP anyways even without this series.
+>>   So, does it really matter for arm64 ?
 > 
-> On Wed, Nov 18, 2026 at 05:44:06PM +0000, Marc Zyngier wrote:
-> > On Wed, 18 Nov 2026 13:45:34 +0000,
-> > sashiko-bot@kernel.org wrote:
-> > > 
-> > > Thank you for your contribution! Sashiko AI review found 1 potential
-> > > issue to consider:
-> > > - [Medium] KVM: arm64: stale mmio_needed after kvm_inject_nested() in
-> > >   KVM_SET_VCPU_EVENTS
-> > > --
-> > > 
-> > > commit 178d0de7451612b8ddf14a943cb82094efbd77d1
-> > > Author: Dan Carpenter <dan@pereq.eu>
-> > > 
-> > > KVM: arm64: Load the vcpu in KVM_SET_VCPU_EVENTS
-> > > 
-> > > This commit wraps __kvm_arm_vcpu_set_events() in vcpu_load() and vcpu_put()
-> > > so that kvm_inject_nested() operates on a loaded vCPU during
-> > > KVM_SET_VCPU_EVENTS.
-> > > 
-> > > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > > index 84a52e27ed859..a148e80d0aef7 100644
-> > > > --- a/arch/arm64/kvm/arm.c
-> > > > +++ b/arch/arm64/kvm/arm.c
-> > > > @@ -2002,7 +2002,7 @@ static int kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
-> > > >  static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
-> > > >  				   struct kvm_vcpu_events *events)
-> > > >  {
-> > > > -	int i;
-> > > > +	int i, ret;
-> > > >  
-> > > >  	/* check whether the reserved field is zero */
-> > > >  	for (i = 0; i < ARRAY_SIZE(events->reserved); i++)
-> > > > @@ -2014,7 +2014,11 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
-> > > >  		if (events->exception.pad[i])
-> > > >  			return -EINVAL;
-> > > >  
-> > > > -	return __kvm_arm_vcpu_set_events(vcpu, events);
-> > > > +	vcpu_load(vcpu);
-> > > > +	ret = __kvm_arm_vcpu_set_events(vcpu, events);
-> > > > +	vcpu_put(vcpu);
-> > > > +
-> > > > +	return ret;
-> > > >  }
-> > > 
-> > > [Severity: Medium]
-> > > Does vcpu->mmio_needed remain set when KVM_SET_VCPU_EVENTS injects an
-> > > exception from L2 that routes to L1 EL2?
-> > > 
-> > > When an L2 guest exits with KVM_EXIT_MMIO and userspace aborts the access via
-> > > KVM_SET_VCPU_EVENTS (for example with ext_dabt_pending = 1 while HCR_EL2.TEA
-> > > is set), kvm_inject_sea_dabt() -> kvm_inject_nested() commits the EL2
-> > > exception entry directly via __kvm_adjust_pc(), which clears
-> > > PENDING_EXCEPTION.  When __kvm_arm_vcpu_set_events() then calls
-> > > commit_pending_events(), PENDING_EXCEPTION is already clear, so it returns
-> > > early without clearing vcpu->mmio_needed:
-> > > 
-> > > arch/arm64/kvm/guest.c:commit_pending_events() {
-> > > 	if (!vcpu_get_flag(vcpu, PENDING_EXCEPTION))
-> > > 		return;
-> > > 
-> > > 	vcpu->mmio_needed = false;
-> > > 	kvm_call_hyp(__kvm_adjust_pc, vcpu);
-> > > }
-> > > 
-> > > On the next KVM_RUN, kvm_handle_mmio_return() sees vcpu->mmio_needed still
-> > > set, writes the MMIO read value into L1 EL2's destination register and
-> > > advances L1 EL2's exception vector PC by 4 bytes via kvm_incr_pc().
-> > 
-> > I think this is a separate issue, which doesn't intersect with the
-> > current patch.
+> So ChatGPT produced the attached test. It creates a non-mappable gmem
+> and tries to add it to a normal (non-realm/non-pkvm) VM. With v7.4-rc1
+> it is rejected. However without this patch it succeeds.
 > 
-> Yep.
+> The issue is that gmem_in_place_conversion changes the behaviour for
+> normal VMs.
+
+I see, thanks Steven. For context:
+
+Arm64 currently (without inplace conversion support) only allows GMEM
+with MMAP flags only and relies on kvm_slot_gmem_only() to detect that
+the GMEM has MMAP flag. But, when we enable inplace conversion,
+we can't reliably reject the slots by kvm_slot_gmem_only(), because
+all GMEM slots are marked GMEM only with inplace conversion.
+
+Also, from the API Documentation,
+
+"When the KVM MMU performs a PFN lookup to service a guest fault, the 
+fault will
+always be consumed from guest_memfd, regardless of whether it is a 
+shared or a
+private fault (unless in-place conversion is disabled and the backing
+guest_memfd does not have the GUEST_MEMFD_FLAG_MMAP flag set)."
+
+So, in effect, with in-place conversion enabled a KVM_CREATE_GUEST_MEMFD
+without GUEST_MEMFD_FLAG_MMAP is an error and thats what this patch
+is trying to fix in arm64 KVM. The question is:
+
+1) Should this be fixed ? How does TDX/SNP support older VMMs with
+inplace conversion ? What was the conclusion on this breakage ?
+
+2) If it should be, then shouldn't it be done in kvm_gmem_create() ?
+
+Suzuki
+
+
 > 
-> > The problem is that we have multiple ways to "commit'
-> > the state on exception delivery, and that we miss MMIO handling in the
-> > EL1->EL2 path.
-> > 
-> > Oliver, WDYT?
-> > 
+> Thanks,
+> Steve
 > 
-> I have a reproducer for the bug Sashiko found and this patch doesn't
-> work.  Attached.  Claude wanted to just set vcpu->mmio_needed = false;
-> but I told it to call commit_pending_events() instead.
 
-Duh, yes. I had the wrong __adjust_pc()... :-( We need to replace the
-one that triggers the exception delivery, rather than the one that
-performs a previous instruction skip in the original context...
-
-Please send this, and I'll queue it immediately.
-
-Thanks a lot for making it easy to understand the issue!
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
