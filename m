@@ -1,63 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795101907;
-	b=zvtCbxAEGM94njn/YitmhfZcefykzx9k5lhi13KFIIpOjysMWmyjh3qFnrkmT4qflViV
-	 PoP4npzdjaJV/HrkilPsnHaazE1b+rjqJb4TEEd1XnkmPhkMC+agsZ68KGGLUyCJf+dXP
-	 v7eYO7a4cAoewDdHWQW5ugCBFHhKR5iHJ2MoVX5uQdRXWzJJ5rrAZl6U0VD9vE2r+G6Ww
-	 z7/c8gBUAgQ4rFklDLJ9yGP1PrzVGVbmgSoSTbT5uezCncrAxva+3b81v+zdp7tiUn+9b
-	 RUCt2XDBBVTciCL4zZ/8gQf14B/OxK3bNgJOJLGINwTA6VJmrcWo5FnLRAm6q+K5RDg==
+	t=1795101958;
+	b=ANgTlI6Lx7+yunVY5E1czXh6VxLjNDdvFaU+SOz+dPt5WoK/l7HisE/rLpKeQw9MGuga
+	 zVzBeo9L/1CYlP7qNnsL8FVtN3iTtVivLMfK/32/ggjvMkbOyym7RlDT5nHE6YMtVi1rs
+	 F5lOOr5tXnKn6z4lcYODgt4WDpfqqdVYMAkcNysRn6iX3nd1VuxeYRTZsHblQpfRKOASS
+	 PyYMVUlJFA2ap3xRHDzxc4RExtvLrbxXHeA2GmASg7q4/qP1xRHGdzS36gXFVxBDh0+5V
+	 gU7vW+nZeJpjwJHbbAFYKXjAeTsvelyD6+Ngq7+T0p4E6PaFf+v87gYGEZbt9BrmQJg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795101907;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=TzGcuigoI99vvi0jTQ+1RRJQmDFrEo3B9K0Tz4FddVk=;
-	b=CuPkwCy6rlBkp69DXoMjcc57/8mjBsG6zkloS0qUVP/5oJcsx6e4uU4EpvDfHQiGzKeV
-	 x2kqg+eeiHjZP2UlLfdLVlvqLCjNyRlMaQFbzPToVvXn547OWgR50SiyFK0wy87urR3XM
-	 zcj89yOnGrfk+nwLnko4xIwAjMnFxGlrqSOSGpeJ+V74s7rSblkeNRO7cb3KiKLvIvKpu
-	 qtpYVEhxt2OFXNDBfWUmeu7HC+AD/kEg8OIZvoHWNRPQMa39vRd48KkMNZ/zDeVBme8RJ
-	 hJcweGrkKnSxNDyo/TwbRzFQJUtCsuKgUz4zb4VcuUbXN+H4WqNaVIPD5ZdGIOLQTxA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795101958;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
+	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=zdB2fPtL2z7ZG6LCXpPbQvhRXPEXVT2iZIQyInkp3MU=;
+	b=ajKoU+GO8UPEEui0qdbDzErqYwvphFHv8Eg2yN8kpTFd2oE4YqrJG9SH2F3fvAxB5aAw
+	 tzx7DikzFRyfYTOTzoa9zLd7kJKSG7c0k2DwOIZEHRbNLuYKXgfv1N5NyWpfQ7LxwDVID
+	 5ju25Oo6093rR603JFKzBxFggoUYki6xtKTTXcird+jtJyPR8hPcv5ZDKvJ9axKjSJYyU
+	 cWXMO3qQqV0Cl9G9qDnSqfBXCA+AEVvoRwsC/RmJyB2s0ZXkV8rpoisSLyTnW8UzBYxAF
+	 Lrkvc4o2eSq5Jzw8ia+Tl9teBNguqZt2naaqIWkugokpx0cS6hZnCSSsH5KyQ0eMlTw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=gdzLmp43;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="DH8BaBb/";
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD177606A326
-	for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 15:25:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BD177606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC8BA606A325;
+	Thu, 19 Nov 2026 15:25:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EC8BA606A325
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=gdzLmp43
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=DH8BaBb/
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F1F9E1575;
-	Thu, 19 Nov 2026 07:25:02 -0800 (PST)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D21CF3F882;
-	Thu, 19 Nov 2026 07:25:02 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 761591575;
+	Thu, 19 Nov 2026 07:25:54 -0800 (PST)
+Received: from [10.0.129.37] (e122027.cambridge.arm.com [10.0.129.37])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AA5633F882;
+	Thu, 19 Nov 2026 07:25:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795101905; bh=20Got6VdPfVmaxBzBWWAavwva4RwxbMx3KZwEJiJ824=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gdzLmp43XvH+kJPQchdfhLTMJqirL8CBgjtxwKYi7l/ramVMHn6NSMLJfaly9tzSf
-	 Cl+PFRxAZhUPxh4qDNrDQj3x9sth7j4F/chNGBKYyRQxw2RUPNPr/zAf0WheBktyGr
-	 lIQb0Mx/kOyw5+gHP/GM1f5rkZPo+lXU42cbDWIA=
-Date: Thu, 19 Nov 2026 15:24:59 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
-Cc: maz@kernel.org, oupton@kernel.org, fuad.tabba@linux.dev,
-	joey.gouly@arm.com, seiden@linux.ibm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, will@kernel.org, mark.rutland@arm.com,
-	linux-perf-users@vger.kernel.org, catalin.marinas@arm.com,
-	james.clark@linaro.org
-Subject: Re: [RFC PATCH v7 00/28] KVM: arm64: Add Statistical Profiling
- Extension (SPE) support
-Message-ID: <av8Uy763VmZPA4RR@raptor>
-References: <20260903160623.315525-1-alexandru.elisei@arm.com>
- <auy-TwnMbIn-r2xl@gremlin>
- <au29ACRXFEOXaWPV@raptor>
- <avs9oxfRNGiIi8an@gremlin>
+	t=1795101957; bh=L8AM1088GXZp/KUuwOmJHtuk4LM/8kxdRfiw72oFviw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=DH8BaBb//yLeBr2dmfTFqY2aimtfu4bNYokOLjm0EYWZ/gI/t4YS7vcWCodD6wvw4
+	 bkUybIOFHqUe9l9oMSaiGQGxZ1UU+EayJjNDyVPfSwy87x6C9AJVSQyCuVf9MJbRsH
+	 D/m9URoICxgF1J1ZDBBUwarfFfsKqOR8wh2lNpso=
+Message-ID: <1715c8bd-3738-4d1a-9d22-0abbdd688e4c@arm.com>
+Date: Thu, 19 Nov 2026 15:25:53 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -67,215 +53,306 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <avs9oxfRNGiIi8an@gremlin>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 06/11] KVM: arm64: CCA: Add Realm RTT mapping and
+ invalidation helpers
+To: sashiko-reviews@lists.linux.dev, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
+References: <20261116164358.142785-1-steven.price@arm.com>
+ <20261116164358.142785-7-steven.price@arm.com>
+ <sashiko-outbox-217428@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <sashiko-outbox-217428@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Lorenzo,
-
-On Mon, Nov 16, 2026 at 05:51:25PM +0000, Lorenzo Stoakes (ARM) wrote:
-> On Fri, Nov 06, 2026 at 11:41:52AM +0000, Alexandru Elisei wrote:
-> > Hi Lorenzo,
-> >
-> > On Thu, Nov 05, 2026 at 05:47:45PM +0000, Lorenzo Stoakes (ARM) wrote:
-[..]
-> > > 3. The entire VM needs to be pre-faulted, but who should do it? - I do
-> > >    think that relying on userland to do this is a little iffy. So I wonder
-> >
-> > There's plenty of iffiness that userspace already handles when it comes to
-> > virtual machines.
+On 16/11/2026 17:21, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 5 potential
+> issues to consider:
+> - [Medium] KVM: arm64: cca: broken split-failure fallback in
+>   realm_unmap_*_range()
+> - [Medium] KVM: arm64: cca: stale err_level after
+>   realm_unmap_cache_topup() failure
+> - [Medium] KVM: arm64: cca: get_start_level() misses 2-level minimum on
+>   64K pages
+> - [Medium] KVM: arm64: KVM_BUG_ON() on -ENOMEM in
+>   realm_unmap_private_range()
+> - [Low] KVM: arm64: cca: possible RTT creation for unmapped entry in
+>   realm_unmap_*()
+> --
 > 
-> Yup, does seem to be a fair bit of implicit assumptions of sanity :)
+> commit 453fd020abf481912e2fee6d2f403740b481af92
+> Author: Steven Price <steven.price@arm.com>
 > 
-> >
-> > Or, how Oliver put it [1] (regarding migration, but it fits):
-> >
-> > 'My take is that there's no amount of idiot-proofing we can do in KVM to prevent
-> > the VMM from messing this up somehow'.
+> KVM: arm64: CCA: Add Realm RTT mapping and invalidation helpers
 > 
-> Haha, right.
+> This commit adds RMI RTT creation, folding, and unmap helpers for CCA
+> Realm stage-2 shared and private address ranges.
 > 
-> I guess fine to require userland to set things up like that, and can always add
-> an option to have it automatically set up for them in future as a nice-to-have.
+>> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+>> index 74b89da4e8015..838f95c201ada 100644
+>> --- a/arch/arm64/kvm/rmi.c
+>> +++ b/arch/arm64/kvm/rmi.c
 > 
-> I want to separate out the gmem bit though, replying below:
+> [ ... ]
 > 
-> >
-> > [1] https://lore.kernel.org/kvm/alE3jRLtYeq-WesA@kernel.org/
-> >
-> > >    whether it might be possible to, on SPE first run, prefault the ranges
-> > >    there, and make that a condition of using it? Relatedly, KVM could
-> > >    reject non-guest_memfd memslots for an SPE VM rather than trusting
-> > >    userspace there too.
-> >
-> > I'm not sure that's the best idea. Mainly two reasons:
-> >
-> > 1. KVM will be imposing the condition that *all* writable memslots be backed by
-> > guest_memfd, and *all* memory backing these memslots be pre-faulted and
-> > effectively pinned.
+>> @@ -154,12 +291,94 @@ static int realm_tear_down_rtt_range(struct realm *realm,
+>>  					 start, end);
+>>  }
+>>  
+>> +/*
+>> + * Returns 0 on successful fold, a negative value on error, a positive value if
+>> + * we were not able to fold all tables at this level.
+>> + */
+>> +static int realm_fold_rtt_level(struct realm *realm, int level,
+>> +				unsigned long start, unsigned long end)
+>> +{
+>> +	int not_folded = 0;
+>> +	ssize_t map_size;
+>> +	unsigned long addr, next_addr;
+>> +
+>> +	if (WARN_ON(level > KVM_PGTABLE_LAST_LEVEL))
+>> +		return -EINVAL;
 > 
-> I mean this really is a requirement for SPE to work at all, since the guest is
-
-Broadly speaking, yes. The requirement is that when running in a VM, the
-buffer shouldn't encounter faults that wouldn't happen when running on
-baremetal. This translates into when the guest attempts to write a record
-to memory that is valid and writable from the guest's point of view, there
-shouldn't be any faults due to that memory not being mapped at stage 2.
-
-The only reasonable way for KVM to achieve this with the current
-architecture is to map at stage 2 all the memory that the SPE buffer might
-be expected to use.
-
-> effectively deciding which memory is being used for SPE (I think it's perf AUX
-> memory right?)
-
-Yes, it's from the AUX buffer, and in the current version of Linux, perf
-core hands it over to the SPE driver to program the buffer with.
-
+> [Severity: Medium]
+> On a CONFIG_ARM64_64K_PAGES kernel, can realm_fold_rtt_level() be called
+> with level == 4 and trigger this WARN_ON()?
 > 
-> I think given that it's guest-designated _and_ the guest has no idea which parts
-> of memory are 'SPE safe' and 'SPE unsafe', this is a requirement.
-
-KVM's job, broadly speaking, is to virtualize the architecture. KVM doesn't
-get to decide what guest is running, that is all on the host userspace.
-Host userspace can run a version of Linux much older than the host, or much
-newer. Host userspace can run another operation system (Windows, FreeBSD,
-etc), or something that is not a conventional operating system at all (like
-kvm-unit-tests). Host userspace is also responsible for configuring the
-guest VM, and describing the virtualized hardware to the guest.
-
-Can you guarantee that such a guest, that doesn't know which memory is safe
-for SPE, doesn't exist and will never exist?
-
-Because without that guarantee, my point is that userspace is in the best
-position to know what a guest can, and cannot do, and I think it's best to
-let userspace decide which memslots to pre-fault.
-
-I guess this all sounds theoretical and quite thin. So, an example, though
-a rather hand-wavy one: add a new command line parameter in Linux that
-works somewhat similar to hugetlb_cma, but for aux buffer allocations, and
-use it to describe a slice of guest physical memory which will be used by
-the SPE buffer. KVM will be none the wiser about all of this, because it's
-the host userspace that decides what operating system to run inside a VM
-and how command line parameters are supplied to the guest OS. With this
-approach, host userspace can decide to create a separate memslot to
-describe this guest memory, use guest_memfd as the memory provider for the
-memslot, and pre-fault this memslot only, not the other memslots that
-describe system memory.
-
+> For a 32-bit or 33-bit IPA, stage2_pgtable_levels(realm->ia_bits) returns
+> 1 on 64K pages, so get_start_level() returns 4 - 1 = 3
+> (KVM_PGTABLE_LAST_LEVEL) even though kvm_get_vtcr() clamps stage-2 tables
+> to at least 2 levels (start_level = 2).  When realm_unmap_shared_range()
+> or realm_unmap_private_range() then calls realm_fold_rtt_level(realm,
+> get_start_level(realm) + 1, start, end), level is 4, triggering the
+> warning and skipping RTT folding (and similarly in
+> realm_tear_down_rtt_range()).
 > 
-> >
-> > There are use cases for writable memslots to describe guest memory that won't be
-> > used by SPE. First thing that comes to mind would be paravirtualized interfaces
-> > between host userspace and the guest. For example, pvtime - kvmtool creates a
-> > RAM memslot for pvtime (i.e, non-read-only memslot), and it looks to me that
-> > qemu does the same (but my knowledge of qemu is severely limited, so I might be
-> > completely wrong).
+> [ ... ]
+
+Already discussed in previous email about get_start_level().
+
+>> @@ -189,6 +408,208 @@ int kvm_realm_teardown_stage2(struct kvm *kvm)
+>>  	return 0;
+>>  }
+>>  
+>> +static bool realm_unmap_cache_topup(struct kvm *kvm,
+>> +				    struct kvm_mmu_memory_cache *mc, int needed)
+>> +{
+>> +	int ret;
+>> +
+>> +	if (!mc || kvm_mmu_memory_cache_nr_free_objects(mc) >= needed)
+>> +		return false;
+>> +
+>> +	lockdep_assert_held_write(&kvm->mmu_lock);
+>> +	write_unlock(&kvm->mmu_lock);
+>> +	ret = __kvm_mmu_topup_memory_cache(mc, KVM_PGTABLE_LAST_LEVEL, needed);
+>> +	write_lock(&kvm->mmu_lock);
+>> +
+>> +	return !ret;
+>> +}
+>> +
+>> +static void realm_unmap_shared_range(struct kvm *kvm,
+>> +				     unsigned long start,
+>> +				     unsigned long end,
+>> +				     bool may_block,
+>> +				     struct kvm_mmu_memory_cache *mc)
+>> +{
+>> +	struct realm *realm = &kvm->arch.realm;
+>> +	unsigned long rd = realm->rd_phys;
+>> +	unsigned long next_addr, addr;
+>> +	unsigned long shared_bit = BIT(realm->ia_bits - 1);
+>> +
+>> +	if (start >= end)
+>> +		return;
+>> +
+>> +	/*
+>> +	 * Callers may pass either an IPA range or its shared alias. Add the
+>> +	 * shared bit only for the former. Use addition so an exclusive end at
+>> +	 * shared_bit advances to the end of the IPA space.
+>> +	 */
+>> +	if (start < shared_bit) {
+>> +		start += shared_bit;
+>> +		end += shared_bit;
+>> +	}
+>> +
+>> +	for (addr = start; addr < end; addr = next_addr) {
+>> +		long ret;
+>> +
+>> +		ret = rmi_rtt_unprot_unmap(rd, addr, end, RMI_ADDR_TYPE_NONE,
+>> +					   0, &next_addr, NULL, NULL);
+>> +		if (WARN_ON(ret < 0))
+>> +			return;
+>> +
+>> +		switch (RMI_RESULT_STATUS(ret)) {
+>> +		case RMI_SUCCESS:
+>> +			break;
+>> +		case RMI_ERROR_RTT: {
+>> +			int err_level = RMI_RESULT_DATA_LEVEL(ret);
+>> +			int level = find_map_level(realm, addr, end);
+>> +
+>> +			if (WARN_ON(err_level < get_start_level(realm) ||
+>> +				    err_level > KVM_PGTABLE_LAST_LEVEL))
+>> +				return;
+>> +
+>> +			if (err_level >= level) {
+>> +				/* Nothing present, so skip */
+>> +				next_addr = ALIGN(addr + 1,
+>> +						  kvm_granule_size(err_level));
+>> +				break;
+>> +			}
 > 
-> I don't think any of this is disallowed by the gmem requirement.
+> [Severity: Low]
+> This question rests on an RMM architecture detail that could not be
+> confirmed from the kernel source: can SMC_RMI_RTT_UNPROT_UNMAP or
+> SMC_RMI_RTT_DATA_UNMAP return RMI_ERROR_RTT with err_level < level when
+> the RTT walk stops at an unassigned ancestor entry (where neither a child
+> RTT nor a block mapping exists), rather than advancing next_addr across
+> the unmapped ancestor and returning RMI_SUCCESS?
 
-It's not, but why should all of the virtual machine managers that have
-these paravirtualized interfaces, interfaces that have worked just fine
-until now, be required to modify them just so they can enable SPE?
+As per the spec:
 
-Or have I misunderstood what you are proposing?
+IQTXJY: A Range-based memory unmapping operation skips over RTT entries
+within the target IPA range whose state is already equal to the target
+value.
 
+So no it won't stop at an unassigned entry.
+
+> If yes, unmapping a sub-block range (such as a single page where level is
+> KVM_PGTABLE_LAST_LEVEL) in an unpopulated region will fall through to
+> realm_create_rtt_levels() in both realm_unmap_shared_range() and
+> realm_unmap_private_range(), allocating and delegating intermediate RTTs
+> only to fold them again at the end of the function, and hitting
+> KVM_BUG_ON(1, kvm) in realm_unmap_private_range() if that allocation
+> fails.
 > 
-> >
-> > Then there's also the possibility that a guest might want to assign a slice of
-> > RAM for use by SPE, to avoid pre-faulting and pinning the entire VM memory. In
-> > this case, userspace will want to have *only* the memslot describing that slice
-> > pre-faulted and pinned, and not the rest of system memory.
+>> +
+>> +			if (may_block && realm_unmap_cache_topup(kvm, mc,
+>> +								 level - err_level)) {
+>> +				next_addr = addr;
+>> +				break;
+>> +			}
+>> +
+>> +			ret = realm_create_rtt_levels(realm, addr, err_level,
+>> +						      level, mc);
 > 
-> As above, there's just no way for userspace to know which bits of memory are SPE
-> safe and which are not. So I don't think this works.
-
-As above, I disagree :P.
-
+> [Severity: Medium]
+> Can realm_create_rtt_levels() run with a stale err_level if
+> __kvm_mmu_topup_memory_cache() fails inside realm_unmap_cache_topup()?
 > 
-> >
-> > 2. Perfomance - userspace can pre-fault in parallel, KVM cannot easily do that.
-> >
-> > arm64 now has support for KVM_PRE_FAULT_MEMORY, I say let's use that :)
+> When the cache has fewer than needed objects and topup fails with
+> -ENOMEM, realm_unmap_cache_topup() still drops and re-acquires
+> kvm->mmu_lock before returning false.  If another thread folds or modifies
+> the RTTs while mmu_lock is dropped, continuing into
+> realm_create_rtt_levels() with the pre-unlock err_level (in both
+> realm_unmap_shared_range() and realm_unmap_private_range()) can fail with
+> RMI_ERROR_RTT at an ancestor level and trigger the WARN() in
+> realm_create_rtt_levels().
+
+I don't really get how this could sensibly be improved. In the event
+that the cache top-up fails then we're already critically low on memory.
+Looping round to have an up-to-date err_level would (most likely) put us
+back in the same situation of needing to top-up the cache (and failing).
+
+Continuing does indeed use a potentially stale err_level in the call to
+realm_create_rtt_levels(). The only issue here is if another thread had
+folded (if the RTTs had been created then we already handle that case
+gracefully). In that case we'd need even more memory so the operation
+would almost certainly fail.
+
+And if realm_create_rtt_levels() fails then we fall to unmapping the
+entire block - which isn't ideal but regains memory (which we're
+apparently very short on).
+
+There's perhaps an argument that the WARN_ON() below might be able to
+trigger, but then under these extreme memory allocation failures we
+should already have the allocator WARNing. So I don't think that's a
+real consideration either.
+
+>> +			if (!ret) {
+>> +				/* Retry with the RTT levels in place. */
+>> +				next_addr = addr;
+>> +				break;
+>> +			}
+>> +			WARN_ON(ret != -ENOMEM);
+>> +
+>> +			/* Splitting failed; unmap the entire existing block. */
+>> +			next_addr = ALIGN_DOWN(addr, kvm_granule_size(err_level));
+>> +			end = max(end, next_addr + kvm_granule_size(err_level));
+>> +			break;
 > 
-> :) right.
+> [Severity: Medium]
+> If realm_create_rtt_levels() fails partway through a multi-level split
+> (for example, after creating a level-2 RTT to split a 1 GiB level-1 block,
+> then failing with -ENOMEM at level 3), doesn't this fallback use the
+> initial err_level and widen the unmap to the full 1 GiB block instead of
+> the 2 MiB block at the last level created?
 > 
-> OK, so maybe the right path then is to keep the prefaulting with userspace, but
-> I really do think we have to have KVM reject a writable non-gmem memslot once
-> SPE is enabled for the VM (and reject enabling SPE if one already exists).
+> Also, when next_addr is aligned down below start, start is not updated, so
+> the realm_fold_rtt_level() call after the loop starts at the original
+> start and skips folding RTTs in [next_addr, start).  Both issues also
+> apply to the fallback in realm_unmap_private_range().
+
+This is technically correct. But equally this is a "shouldn't happen in
+practice" situation. If we can't split then we can't unmap the requested
+range. While there are corner cases like Sashiko describes which could
+be improved on slightly, I don't see the point in unnecessarily
+complicating the code for them. Ultimately if we get here then we're
+unmapping too much - and we just have to hope that the system as a whole
+can recover at the cost of the VM.
+
+Certainly in the case of realm_unmap_private_range() the VM can't
+recover (hence KVM_BUG_ON()). For the shared memory case we can at least
+fault the memory back in if memory pressure has reduced sufficiently.
+
+> [ ... ]
 > 
-> That should be relatively straightforward and avoids at least the most broken
-> userland mistakes.
-
-I understand where you're coming from, and I do agree that KVM should do
-something if userspace doesn't pre-fault guest memory. But I think we have
-different opinions about what exactly KVM should do in this case.
-
-I had a chat with Mark Rutland about patch #26 from this series ("KVM:
-arm64: Map memory on a SPE stage 2 fault"), and he suggested something that
-I find very appealing, which I think solves this problem: when SPE reports
-a stage 2 fault, instead of KVM mapping the memory at stage 2 and trying to
-pretend like it never happened, KVM_RUN returns to userspace with an error
-describing the fault.
-
-If the stage 2 fault was caused by a bug in KVM, then this lets userspace
-know that something is wrong with KVM and SPE might be unreliable.
-
-If the fault was caused by a bug in the virtual machine manager (by not
-pre-faulting the memory, or because it punched a hole in the guest_memfd
-file, or something else) then userspace will know that something is wrong
-with the virtual machine manager.
-
-It might even be on purpose - for example, host userspace wasn't sure that
-the guest will use SPE and didn't want to pay the cost of pinning the
-memory upfront. Now that the guest has started using SPE, userspace can
-pre-fault that memory.
-
-In all cases, userspace will be in the best position to take corrective
-measures - resume (and possibly log the error to be investigated later),
-kill the VM, or anything else in between.
-
-I really like this idea. Thoughts?
-
+>> +static void realm_unmap_private_range(struct kvm *kvm,
+>> +				      unsigned long start,
+>> +				      unsigned long end,
+>> +				      bool may_block,
+>> +				      struct kvm_mmu_memory_cache *mc)
+>> +{
 > 
-> >
-> > >
-> > > 4. Dirty page logging - patch 27/28 relies on series [1] being landed,
-> > >    which is also an RFC, and allows migration of SPE VMs. So we need to
-> > >    decide - do we want this migration? Additionally, I think it's
-> > >    reasonable to, if we want it, send both [1] and patch 27/28 as a follow
-> > >    up separate from the v1 non-RFC of the series.
-> >
-> > For background, I started this conversation in the LOG_DIRTY_PAGES support for
-> > guest_memfd series [2]. Oliver had some concerns, but he didn't follow up on my
-> > explanations, so I decided to send migration support as part of SPE so people
-> > can have a more complete picture of how everything fits together.
-> >
-> > I would be very happy to get basic support for SPE merged in KVM, and, if we
-> > decide it's useful, migration implemented as a follow up, as that involves
-> > landing dirty page logging support for guest_memfd.
+> [ ... ]
 > 
-> Ack, thanks, let's treat that as a follow-up then, I think best thing here is
-> definitely to focus on getting the fundamental bits in for SPE first.
+>> +			ret = realm_create_rtt_levels(realm, addr, err_level,
+>> +						      level, mc);
+>> +			if (!ret) {
+>> +				next_addr = addr;
+>> +				break;
+>> +			}
+>> +
+>> +			/* A failed split cannot leave the backing pages mapped. */\n> +			KVM_BUG_ON(1, kvm);
 > 
-> >
-> > [2] https://lore.kernel.org/kvm/alAFmiAsNf6Xm49_@kernel.org/
-> >
-> > >
-> > > 5. Errata handling - the default already disallows SPE on the affected
-> > >    silicon, which seems right. I wonder whether kvm-arm.ignore_spe_errata
-> > >    should exist at all though, other than in some sort of debug mode.
-> >
-> > It is intended as a debug/development option, to be used only when the VMs are
-> > trusted. As to why it's there, it's there because without it, SPE would be
-> > disabled on all the machines that I have access to, and I suspect systems not
-> > affected are few and rare between.
-> 
-> Ack ok that clarifies that :) let's then clearly mark that as such
-> e.g. 'debug/development only, trusted VMs only' in the documentation, and
-> tainting the kernel if it's enabled, I think, would be sensible.
+> [Severity: Medium]
+> Can an RTT allocation failure (-ENOMEM) in realm_create_rtt_levels()
+> trigger a host WARN_ON_ONCE() via KVM_BUG_ON()?
 
-Agreed, this needs better documentation :)
+Yes.
+
+> Both __kvm_mmu_topup_memory_cache() and alloc_delegated_granule() use
+> __GFP_ACCOUNT, so a host VMM hitting its memcg limit or host memory
+> pressure can cause realm_create_rtt_levels() to return -ENOMEM.  Unlike
+> realm_unmap_shared_range(), which guards its warning with WARN_ON(ret !=
+> -ENOMEM), KVM_BUG_ON(1, kvm) unconditionally warns even on -ENOMEM; using
+> WARN_ON(ret != -ENOMEM) and marking the VM dead or bugged without warning
+> on allocation failure would avoid a user-triggerable kernel warning.
+> 
+
+So the cache topup can fail (silently) due to memcg limits. However
+alloc_delegated_granule() falls back to __get_free_page(GFP_ATOMIC |
+__GFP_ZERO | __GFP_ACCOUNT) which AFAICT will not be subject to the
+memcg limit and will WARN itself before failing.
+
+So unless I've misunderstood something the only path that can trigger
+the WARN_ON_ONCE in KVM_BUG_ON() is one which has already triggered a WARN.
+
+As above this isn't a case I expect to happen, and it would be good to
+be fairly noisy about it because we've just killed off the VM (most
+likely due to no fault of the VM or VMM). But I'm open to suggestions to
+improve this if anyone has them.
 
 Thanks,
-Alex
+Steve
