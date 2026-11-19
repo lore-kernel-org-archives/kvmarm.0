@@ -1,49 +1,87 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.133.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795107678;
-	b=zeFS1GIgFeXS+DkqynaUxzJperXe0lyAKbiBqglM6f3OYtPyZ6Av6Sv/fFU7x0fidzFQ
-	 kJy4wJZN3NLdPxh7F8Voo6V0UbvO/7Ad6s87xdBTe2KVj9yxWETPQweCO/xBWqxFXhI91
-	 5JhVcaDAoc+FKthEJnl4rU1HoSGJ8m5cr+wJjZXB6gAVnxntuXOEsQiyzGMEEpnEivVOY
-	 cCzQPs8xns1un1o7qZvecetxZdC2J23r3jKHaXBLVQyvVFIrl8W/h2/kklXjx+IMMCtUM
-	 t9xLw5jwySaoR8wa3K/SV5hHXdAagfOo3GKAyKf3vl2TwAVoqrwkWbKZvALHINFMLyA==
+	t=1795107750;
+	b=iyNG+3Vh6X2+v7+O3oPn8pD1AhHSspJaI6BOtKsHWlWT2LnqkSO5aQSwfRK1/7/QMdAx
+	 FLHjhIvHj+AxG9Ao39Q5pN2lNgkptkm2l7XgaAfnRSSQaqe4cirOnvT1AjsiUfhZM266p
+	 5N7GZkBBv7U2UUjUKZsnsSGq8bagP1rhu9fkyLstQIouLriOI9R79EQUG1g3to1EBPoMN
+	 w4Y7pJwUfaSJ84YMpOtALYiWbuQoaIeWQJ3xPQ2ipu/U9HWjKgDdOCXO350rEqWeRlNaF
+	 xt22FfU7zACsmQgIoeuA2x8qZFoEBKea/ywmWNql0tzXqbiMxhwQ7YJdajxUNYAXZtA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795107678;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
-	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=HuvbqePajCm3jKp9iOjUnXA/SrQymMd79cA69qsQnQI=;
-	b=GRSsNs8ewjGuh7nkBnLIx9nGHcSiIkfCVE5bkNUfzCl/CUf0cugxxzQ+l20xddqVqIPj
-	 zS5c86nwACyoVEWWKqtdyMpuSSxyCSSh1TmMzsBzJBkinstGksRT4b0XzoVgBBFNMlRKl
-	 pyusiD7wjdkNrIZM46CbrtrHJTeT81C8RwcsSjKD+zj5nalXng7PP4Rr6pwyhugdqThUC
-	 CHCDBCCacOURUDfME5qE0adZzInb4nVo9PqxuOExLGyuy5g+yX9n2cncrmSXzqHahgZM7
-	 iYjyZmBrAihCWpZ9GvQunzR3+3x5QreVW3DkToAhcZJI2FCM5hn3JamD4XeH1NURWYA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795107750;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 X-Received:MIME-Version:References:In-Reply-To:From:Date:
+	 X-Gm-Features:Message-ID:Subject:To:Cc:X-Mimecast-Spam-Score:
+	 X-Mimecast-MFC-PROC-ID:X-Mimecast-Originator:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=TgkiQXt0qEd5fAMe/LFsA1xI2CJ6D6D3/EwyFO8PrhI=;
+	b=iq8MBRRo0NVR15rm4YRrqWZVVj7vLe+vcg5DxxsNV1kyHZTp1iZhiUaUj71UJwE7Jva3
+	 07J41LFoEvZcwL77C/jZcj7kJZHFIawfo6xpwL24gypAKawKeGOmvnvs3HV2SdYuC5AOq
+	 nzh/CR680zYupYRFcnf7uAUKY5dFOz9blRCorABZ+Hef+3E/5Tz/WDDWpmttiS8P/CAgq
+	 pf0x7J35FLAh797n56ljD9IW7SdHYLI/GyIncbG2Xm1Ya/jfMl6UshFtz07BN2Utu8JtM
+	 5qM1ZqUJiUiV1+oSqk8wroZ5rvCN9v+WSdJo+h7wI4oqlTO5khw+jTIx4yrp9Lvd96w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b="Ow/Bbh3a";
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED41E606A324;
-	Thu, 19 Nov 2026 17:01:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ED41E606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b="H/kXk6lT";
+	arc=none smtp.remote-ip=170.10.133.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F64606A324
+	for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 17:02:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 19F64606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Ow/Bbh3a
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 548EC1575;
-	Thu, 19 Nov 2026 09:01:14 -0800 (PST)
-Received: from [10.0.129.37] (e122027.cambridge.arm.com [10.0.129.37])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A32483F673;
-	Thu, 19 Nov 2026 09:01:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795107677; bh=Yb/X4lEMD/TYhBRp9Ovm5Bp1Hk6z6MRsu5RbwGNenBw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ow/Bbh3agrnb3+CsDs6QKApKERkYiMWf301VWP/bOwjWZBQEkVRYePRhAC2T3DmGN
-	 awlzauDaMWP4kiGf8To7uBXM8+Ku4XjJ3N5kxbs/QsbCuq/n1q/dSTa+itAP4L8Gh3
-	 +odwVNoQgClJtQNTEd4R04QKcKENjcXPEx/y6dp0=
-Message-ID: <bf4da8b7-0714-4253-9841-cf83cb65b92d@arm.com>
-Date: Thu, 19 Nov 2026 17:01:10 +0000
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=H/kXk6lT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1795107749;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TgkiQXt0qEd5fAMe/LFsA1xI2CJ6D6D3/EwyFO8PrhI=;
+	b=H/kXk6lTEjg8VX49dn+wam8sjiezdJLzBe5HrymWCpkEfUwuh1JY2amMYgSIiIKrmQsB4l
+	taYIC1YTvrkwDTQqxwe58bhrjdTcs1WgeLiaVFW/Ylt8remZn195IyqTErIqS1e6dzPqpu
+	a0ETweBbUGomEF6Z/zslmSkj7jNacXg=
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
+ [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-650-hUrN5J5QMqWWhyiJAlKQ3Q-1; Thu, 19 Nov 2026 12:02:26 -0500
+X-MC-Unique: hUrN5J5QMqWWhyiJAlKQ3Q-1
+X-Mimecast-MFC-AGG-ID: hUrN5J5QMqWWhyiJAlKQ3Q_1795107745
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-cdd769cc9deso1358547a12.0
+        for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 09:02:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795107745; x=1795712545;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=TgkiQXt0qEd5fAMe/LFsA1xI2CJ6D6D3/EwyFO8PrhI=;
+        b=fmQK1JUagJ3TuZPw3EIB1NcfG6d0XmZt9TaAytXtxq4DuBeqV8/juvZQrKcnUFmjON
+         ky4ktXIafqmQHwuI/EmstZ5IEDuKWHFwhWqrGsgGk1aSAblXh7llvjJxDdkZ4X4wY8re
+         MaSJlW73QHGDGiJbWY3QigZ1HSkcBlteRuGMYDvt5NpUg3Rf0D6tR54YDF5HOrNm6Xds
+         oJaID+WnxyxaNMZxd8vkbrjXccidTx/BA+qPG1KEJmlP7VsTzf+lKecDQ1zpnMPDG43e
+         wCiHW4b2R5bKGDWYGHOfxpG8C9UHH0nOk8rDtP7nbmKzZhH1aq5gIyzMmS/OgNVrHJ6p
+         zE9g==
+X-Forwarded-Encrypted: i=1; AL+hErFPpbpas71faz8Jk+WoLfgEMGHFeVVokVWGAwyfqMse8NlH1Tqlruj/9hHPkZktS4cXKQlsKvQ=@lists.linux.dev
+X-Gm-Message-State: APuU4Z8Oe3/PFjaZsOXl5aUOT5EcYjso9sRHzQgtOQ4Du4HQwqW6SgPG
+	zwYGNAzMqe+XVqAAGudcvU9rPjmdslAEr3DTZi+B1sen3R/LYJ6qzUrwDtRV2HxgqozumgxW/Hw
+	TsWCrGqci/VTfzI7jPJe5PLoy+89h+LoV5kV3C+8KV+52e6+2BpSJl2UbL4Kr9XN9qa4oBMZJsF
+	XqRNHRBCUskJZ2ApiCrnwe6AKYTp6OpOw4
+X-Gm-Gg: AZFdTZfgGbi6eVyvmxq9vuD+x/IfjPy9J4fYNZvT9pN+hBI1Iaj0hNOqMq4B383b+io
+	Bd7vfI5FIM9/hr0lnOin2lUzMCavSCNahIGnLGTzXDgpHXvdRQn14y3aQqlI4WeWqqt27fXcJZN
+	n57oKJ0uB8pGe9JAbd4tJ+rSfEt54gi6IdgiEIY2POyfOIeQiJf7aGX3DVw582r+G1TSeXnuuNo
+	N1iA8C4r5Or9F4iD9okvDqnBaaJLUlKse27BD9n4xc75hXkKwq8jFqGNOH7
+X-Received: by 2002:a17:90b:4a48:b0:3b3:af45:6a6b with SMTP id 98e67ed59e1d1-3b41c7b5e76mr10172a91.3.1795107744877;
+        Thu, 19 Nov 2026 09:02:24 -0800 (PST)
+X-Received: by 2002:a17:90b:4a48:b0:3b3:af45:6a6b with SMTP id
+ 98e67ed59e1d1-3b41c7b5e76mr9946a91.3.1795107742662; Thu, 19 Nov 2026 09:02:22
+ -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,281 +91,286 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 09/11] KVM: arm64: CCA: Support runtime faulting of
- memory
-To: Wei-Lin Chang <weilin.chang@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Kohei Enju <enju.kohei@fujitsu.com>
-References: <20261116164358.142785-1-steven.price@arm.com>
- <20261116164358.142785-10-steven.price@arm.com>
- <hwmtiumovuqyu7js5eqd4xt3h2zsuhjwkcygnw62hp5rrar5ph@5fhmv46iio2r>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <hwmtiumovuqyu7js5eqd4xt3h2zsuhjwkcygnw62hp5rrar5ph@5fhmv46iio2r>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20261106172107.3263617-1-maz@kernel.org>
+In-Reply-To: <20261106172107.3263617-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 19 Nov 2026 18:02:11 +0100
+X-Gm-Features: AclHuK-Qf3LMzbseiJS1i8JmdlMZFytktE3YbrYDCN516IglzImVS7C0HGuzIqI
+Message-ID: <CABgObfbFo3+qfpNe4tZX4jnD=GtoN43b1xMHwtbeV39Vr+LeUA@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 7.4, take #2
+To: Marc Zyngier <maz@kernel.org>
+Cc: Ard Biesheuvel <ardb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Colton Lewis <coltonlewis@google.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
+	Gavin Shan <gshan@redhat.com>, Hyunwoo Kim <imv4bel@gmail.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Leonardo Bras <leo.bras@arm.com>, Lorenzo Stoakes <ljs@kernel.org>, Mark Brown <broonie@kernel.org>, 
+	Matthias Goergens <matthias.goergens@gmail.com>, Oculytic <oculytic@gmail.com>, 
+	Oliver Upton <oupton@kernel.org>, Sascha Bischoff <sascha.bischoff@arm.com>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Vincent Donnefort <vdonnefort@google.com>, Wei-Lin Chang <weilin.chang@arm.com>, 
+	Will Deacon <will@kernel.org>, Xuheng Li <xuheng@cs.columbia.edu>, 
+	Yuan Yao <yaoyuan@linux.alibaba.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: ImsBOMtCRn4l3QxuqzROQ3gJaUxcqM7KFoc10Lm2KyQ_1795107745
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 19/11/2026 07:48, Wei-Lin Chang wrote:
-> Hi Steven,
-> 
-> On Mon, Nov 16, 2026 at 04:43:55PM +0000, Steven Price wrote:
-> 
-> [...]
-> 
->> @@ -1791,12 +1799,18 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd,
->>  	void *memcache = NULL;
->>  	gfn_t canonical_gfn;
->>  	int ret;
->> +	bool is_private = false;
->>  
->> -	if (!perm_fault) {
->> +	if (KVM_BUG_ON(!kvm_slot_has_gmem(s2fd->memslot), kvm))
->> +		return -EINVAL;
-> 
-> I feel this is being too cautious, gmem_abort is always run after a
-> kvm_slot_has_gmem() check.
+On Fri, Nov 6, 2026 at 6:21=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Paolo,
+>
+> Here's the second set of KVM/arm64 fixes for 7.4, which is a pretty
+> large set as Fuad has made his mission to address each and every
+> Sashiko utterance. This is great work, in all the meanings of the word
+> Great.
+>
+> We also have a couple of more "amusing" fixes, such as the livelock
+> issue that Ard managed to debug and elegantly address.
+>
+> As usual, details in the tag below. I'll be at KVM Forum next week, so
+> I'll probably come back with another PR in time for -rc4 (I've already
+> earmarked a number of patches...).
+>
+> Please pull,
 
-Fair point - I'll drop that.
+Pulled, thanks.
 
->> +
->> +	if (!perm_fault || kvm_arch_has_private_mem(kvm)) {
->>  		memcache = get_mmu_memcache(s2fd->vcpu);
->>  		ret = topup_mmu_memcache(s2fd->mmu, memcache);
->>  		if (ret)
->>  			return ret;
->> +	}
->> +	if (!perm_fault) {
->>  		if (kvm_is_nested_s2_mmu(kvm, pgt->mmu)) {
->>  			mapping = kmalloc_obj(struct kvm_guest_s2_mapping, GFP_KERNEL_ACCOUNT);
->>  			if (!mapping)
->> @@ -1805,7 +1819,7 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd,
->>  	}
->>  
->>  	s2vi.vma_pagesize = PAGE_SIZE;
->> -	s2vi.gfn = ALIGN_DOWN(s2fd->fault_ipa, s2vi.vma_pagesize) >> PAGE_SHIFT;
->> +	s2vi.gfn = gpa_to_gfn(kvm_gpa_from_fault(kvm, s2fd->fault_ipa));
->>  	canonical_gfn = get_canonical_gfn(s2fd, &s2vi);
->>  
->>  	write_fault = kvm_s2_fault_is_write(s2fd);
->> @@ -1817,13 +1831,35 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd,
->>  	/* Pairs with the smp_wmb() in kvm_mmu_invalidate_end(). */
->>  	smp_rmb();
->>  
->> +	if (kvm_arch_has_private_mem(kvm)) {
->> +		switch (kvm->arch.vm_flavor) {
->> +		case VM_REALM:
->> +			is_private = kvm_realm_is_private_address(&kvm->arch.realm,
->> +								  s2fd->fault_ipa);
->> +			break;
->> +		default:
->> +			break;
->> +		}
->> +
->> +		if (is_private != kvm_gmem_is_private_gfn(kvm, canonical_gfn)) {
->> +			if (!result)
->> +				kvm_prepare_memory_fault_exit(s2fd->vcpu,
->> +							      gfn_to_gpa(canonical_gfn),
->> +							      PAGE_SIZE,
->> +							      write_fault, exec_fault,
->> +							      is_private);
->> +			kfree(mapping);
->> +			return -EFAULT;
->> +		}
->> +	}
->> +
->>  	ret = kvm_gmem_get_pfn(kvm, s2fd->memslot, canonical_gfn, &s2vi.pfn, NULL);
->>  	if (ret) {
->>  		/* If result is non-NULL this is a synthetic fault. */
->>  		if (!result)
->>  			kvm_prepare_memory_fault_exit(s2fd->vcpu, gfn_to_gpa(canonical_gfn),
->>  						      s2vi.vma_pagesize, write_fault, exec_fault,
->> -						      false);
->> +						      is_private);
->>  		kfree(mapping);
->>  		return ret;
->>  	}
->> @@ -1846,6 +1882,16 @@ static int gmem_abort(const struct kvm_s2_fault_desc *s2fd,
->>  		goto out_unlock;
->>  	}
->>  
->> +	switch (kvm->arch.vm_flavor) {
->> +	case VM_REALM:
->> +		prot &= ~KVM_PGTABLE_PROT_X;
->> +		ret = realm_map_ipa(kvm, s2fd->fault_ipa, s2vi.pfn,
->> +				    PAGE_SIZE, prot, memcache);
->> +		goto out_unlock;
->> +	default:
->> +		break;
->> +	}
->> +
->>  	if (perm_fault) {
->>  		/*
->>  		 * Drop the SW bits in favour of those stored in the
->> @@ -2047,7 +2093,8 @@ static int kvm_s2_fault_get_vma_info(const struct kvm_s2_fault_desc *s2fd,
->>  	 * mapping size to ensure we find the right PFN and lay down the
->>  	 * mapping in the right place.
->>  	 */
->> -	s2vi->gfn = ALIGN_DOWN(s2fd->fault_ipa, s2vi->vma_pagesize) >> PAGE_SHIFT;
->> +	s2vi->gfn = kvm_gfn_from_fault(kvm, ALIGN_DOWN(s2fd->fault_ipa,
->> +						       s2vi->vma_pagesize));
->>  
->>  	s2vi->mte_allowed = kvm_vma_mte_allowed(vma);
->>  
->> @@ -2227,7 +2274,7 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
->>  	 * possible.
->>  	 */
->>  	if (mapping_size == PAGE_SIZE && s2vi->max_map_size != PAGE_SIZE) {
->> -		if (perm_fault_granule > PAGE_SIZE) {
->> +		if (perm_fault_granule > PAGE_SIZE && !kvm_vm_is_realm(kvm)) {
->>  			mapping_size = perm_fault_granule;
->>  		} else {
->>  			mapping_size = transparent_hugepage_adjust(s2fd, &pfn, &gfn);
->> @@ -2242,12 +2289,15 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
->>  	if (!perm_fault_granule && !s2vi->map_non_cacheable && kvm_has_mte(kvm))
->>  		sanitise_mte_tags(kvm, pfn, mapping_size);
->>  
->> -	/*
->> -	 * Under the premise of getting a FSC_PERM fault, we just need to relax
->> -	 * permissions only if mapping_size equals perm_fault_granule. Otherwise,
->> -	 * kvm_pgtable_stage2_map() should be called to change block size.
->> -	 */
->> -	if (mapping_size == perm_fault_granule) {
->> +	if (kvm_vm_is_realm(kvm)) {
->> +		ret = realm_map_ipa(kvm, s2fd->fault_ipa, pfn, mapping_size,
->> +				    prot, memcache);
->> +	} else if (mapping_size == perm_fault_granule) {
->> +		/*
->> +		 * Under the premise of getting a FSC_PERM fault, we just need to relax
->> +		 * permissions only if mapping_size equals perm_fault_granule. Otherwise,
->> +		 * kvm_pgtable_stage2_map() should be called to change block size.
->> +		 */
->>  		/*
->>  		 * Drop the SW bits in favour of those stored in the
->>  		 * PTE, which will be preserved.
->> @@ -2306,15 +2356,16 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd,
->>  	/*
->>  	 * Permission faults just need to update the existing leaf entry,
->>  	 * and so normally don't require allocations from the memcache. The
->> -	 * only exception to this is when dirty logging is enabled at runtime
->> +	 * exceptions are when dirty logging is enabled at runtime
->>  	 * and a fault needs to collapse a block entry into a table.
->> +	 * Realms can also require new RTT levels when replacing a mapping.
->>  	 * Under pKVM a permission fault can also collapse pages into a block,
->>  	 * which needs a fresh mapping object, and the hypervisor requires the
->>  	 * min-pages memcache even when the install allocates nothing.
->>  	 */
->>  	memcache = get_mmu_memcache(s2fd->vcpu);
->>  	if (!perm_fault || memslot_is_logging(s2fd->memslot) ||
->> -	    is_protected_kvm_enabled()) {
->> +	    is_protected_kvm_enabled() || kvm_vm_is_realm(s2fd->vcpu->kvm)) {
->>  		ret = topup_mmu_memcache(s2fd->mmu, memcache);
->>  		if (ret)
->>  			return ret;
->> @@ -2340,12 +2391,22 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd,
->>  	return kvm_s2_fault_map(s2fd, &s2vi, prot, memcache, result);
->>  }
-> 
-> I see that the changes to gmem_abort() and kvm_s2_fault_map() are more
-> significant, and can possibly be turned into its realm version leaving
-> the original unchanged. With this can we give realm_vm_s2_ops its own
-> .vm_mem_abort? Something like:
-> 
-> First, make user_mem_abort() take a function pointer, call it at the
-> current kvm_s2_fault_map() place.
-> 
-> Then realm_vm_s2_ops.vm_mem_abort = realm_mem_abort()
-> 
-> And in realm_mem_abort() do:
-> 
-> realm_mem_abort()
->   if gmem slot:    realm_gmem_abort()
->   if regular slot: user_mem_abort(kvm_realm_fault_map)
-> 
-> realm_gmem_abort() and kvm_realm_fault_map() are just the realm version
-> of gmem_abort() and kvm_s2_fault_map(). For example they won't need NV
-> related code, and vm_flavor switch case.
-> 
-> Proposing this because I think we would like the CCA changes more
-> self-contained.
+Paolo
 
-It's a little marginal - there's quite a bit of common code between the
-realm path and the normal path. But it does have the advantage that you
-mention of making CCA more self contained. So it's probably worth it.
-
-Thanks,
-Steve
-
-> Thanks,
-> Wei-Lin Chang
-> 
->>  
->> +static bool private_ipa_fault(struct kvm *kvm, phys_addr_t fault_ipa)
->> +{
->> +	return kvm_vm_is_realm(kvm) &&
->> +		kvm_realm_is_private_address(&kvm->arch.realm, fault_ipa);
->> +}
->> +
->>  static int kvm_vm_mem_abort(const struct kvm_s2_fault_desc *s2fd)
->>  {
->>  	VM_WARN_ON_ONCE(kvm_s2_fault_is_perm(s2fd) &&
->>  			!esr_abt_is_write_fault(s2fd->esr) &&
->>  			!kvm_s2_fault_is_exec(s2fd));
->>  
->> +	if (private_ipa_fault(s2fd->vcpu->kvm, s2fd->fault_ipa) &&
->> +	    !kvm_slot_has_gmem(s2fd->memslot))
->> +		return -EINVAL;
->> +
->>  	if (kvm_slot_has_gmem(s2fd->memslot))
->>  		return gmem_abort(s2fd, NULL);
->>  	else
->> @@ -2458,10 +2519,10 @@ int kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
->>   */
->>  int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->>  {
->> +	struct kvm *kvm = vcpu->kvm;
->>  	struct kvm_s2_trans nested_trans, *nested = NULL;
->>  	unsigned long esr = kvm_vcpu_get_esr(vcpu);
->>  	struct kvm_s2_mmu *mmu = vcpu->arch.hw_mmu;
->> -	struct kvm *kvm = vcpu->kvm;
->>  	phys_addr_t fault_ipa; /* The address we faulted on */
->>  	phys_addr_t ipa; /* Always the IPA in the L1 guest phys space */
->>  	struct kvm_memory_slot *memslot;
->> @@ -2554,8 +2615,9 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->>  		nested = &nested_trans;
->>  	}
->>  
->> -	gfn = ipa >> PAGE_SHIFT;
->> +	gfn = kvm_gfn_from_fault(kvm, ipa);
->>  	memslot = gfn_to_memslot(kvm, gfn);
->> +
->>  	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
->>  	write_fault = esr_abt_is_write_fault(esr);
->>  	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
->> @@ -2598,7 +2660,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->>  		 * of the page size.
->>  		 */
->>  		ipa |= FAR_TO_FIPA_OFFSET(kvm_vcpu_get_hfar(vcpu));
->> -		ret = io_mem_abort(vcpu, ipa);
->> +		ret = io_mem_abort(vcpu, kvm_gpa_from_fault(kvm, ipa));
->>  		goto out_unlock;
->>  	}
->>  
-> 
-> [...]
+>
+>         M.
+>
+> The following changes since commit 6628e7d4c6b25c8d18f1345e3a20d21829aae7=
+e4:
+>
+>   Linux 7.4-rc1 (2026-11-01 13:26:31 -0800)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
+marm-fixes-7.4-2
+>
+> for you to fetch changes up to 181a701fc14d3d468c603b5ecfb9f12115c5fb72:
+>
+>   Merge branch kvm-arm64/misc-7.4-1 into kvmarm-master/fixes (2026-11-03 =
+18:14:37 +0000)
+>
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for 7.4, take #2
+>
+> * MMU fixes:
+>
+>   - Correctly sanitise the TCR_EL2 register
+>
+>   - Stop advertising LPA2 to NV guest when it isn't supported
+>
+>   - Correctly convert EH2=3D=3D0's view of TCR_EL2 into the E2H=3D=3D1 fo=
+rmat
+>
+>   - Make sure an EL2 mapping is immediately visible to the hypervisor
+>     code, as we don't necessarily require ETS
+>
+>   - Address a horrible situation where a guest can livelock when
+>     trying to solve a permission fault whilst the underlying S2 PTs
+>     have AF=3D0
+>
+>   - Correctly wipe MTE tags for large mappings instead of just the
+>     head page, providing a convenient helper for this
+>
+>   - Fix dirty logging detection in ring-only mode
+>
+>   - Use ATS1A whenever FEAT_S1PIE is present
+>
+> * VGIC fixes:
+>
+>   - Fix a bunch of low-impact issues with GICv4, avoiding leaks on
+>     unlikely failure paths
+>
+>   - Use a separate lockdep class for vPE doorbells, and guarantee that
+>     they are never threaded
+>
+>   - Avoid spurious allocation of VPEs when userspace decided not to
+>     expose nASSGIcap
+>
+>   - Fix spurious preservation of the pending state after DISCARD
+>     and CLEAR ITS commands
+>
+>   - Make sure GITS_CTLR.Enabled is updated under the its_lock
+>
+>   - Serialise vgic CTRL_INIT against vCPU creation
+>
+>   - Make the forwarding of LPIs tobust against LPIs being disabled
+>     on the target redistributor
+>
+> * pKVM fixes:
+>
+>    - Fix the reset of GICv3 LRs for pKVM, de-uglifying the PM paths
+>      whilst at it
+>
+>    - Fix PMU handling for both protected and non-protected guests,
+>      fixing the synchronisation of kvm_host_data in the process
+>
+>    - Correctly invalidate TLBs and I-cache when multiplexing multiple
+>      vcpus of the same VM on a single physical CPU
+>
+> * Feature visibility fixes:
+>
+>   - Correctly handle ACCDATA_EL1 being exposed to guests, plugging a
+>     potential communication channel between guests.
+>
+> * Misc fixes:
+>
+>   - Correctly clear the vcpu feature set on init failure
+>
+>   - Clear PSTATE.TCO on exit from the guest when MTE is enabled
+>     for the kernel
+>
+>   - Let the L0 hypervisor always deal with FEAT_MOPS A/B nonsense when
+>     taking such exception, instead of potentially forwarding it
+>
+>   - Add a "maintainer profile" for KVM/arm64
+>
+>   - Add testing for the MOVI and MOVALL commands
+>
+> ----------------------------------------------------------------
+> Ard Biesheuvel (1):
+>       KVM: arm64: Don't livelock when AT can't resolve a fault IPA
+>
+> Colton Lewis (1):
+>       irqchip/gic-v4: Use a separate lockdep class for vPE doorbell IRQs
+>
+> Fuad Tabba (25):
+>       irqchip/gic-v4: Clear the domain and fwnode pointers after freeing =
+them
+>       irqchip/gic-v4: Unwind what its_alloc_vcpu_irqs() allocated on fail=
+ure
+>       KVM: arm64: vgic: Tear down what vgic_init() created when it fails
+>       KVM: arm64: vgic-v4: Restore nr_vpes before freeing the vPE resourc=
+es
+>       KVM: arm64: vgic-its: Clear an unqueued LPI before dropping its loc=
+k
+>       KVM: arm64: vgic-its: Remove the pending state of a cleared LPI
+>       KVM: arm64: vgic-its: Update GITS_CTLR.Enabled under its_lock
+>       KVM: arm64: vgic-v4: Don't allocate vPEs for a GICv2 VM
+>       KVM: arm64: vgic-v4: Don't allocate vPEs when userspace clears nASS=
+GIcap
+>       KVM: arm64: vgic: Don't forward LPIs to a redistributor with LPIs d=
+isabled
+>       KVM: arm64: vgic-v3: Don't drop a pending LPI mapped with LPIs disa=
+bled
+>       KVM: arm64: selftests: Add MOVI and MOVALL commands to the ITS libr=
+ary
+>       KVM: arm64: selftests: Build a VM per test in vgic_lpi_stress
+>       KVM: arm64: selftests: Test MOVI and MOVALL on a pending LPI
+>       KVM: arm64: Disable host PMU counters for protected guests
+>       KVM: arm64: Ensure TLBs and I-cache are private to each vCPU in pKV=
+M
+>       arm64: Add override for ID_AA64ISAR1_EL1.LS64
+>       KVM: arm64: Enable ST64BV0 for guests with FEAT_LS64_ACCDATA
+>       KVM: arm64: selftests: Add ACCDATA_EL1 to get-reg-list
+>       KVM: arm64: Clear the VM's feature bitmap when kvm_setup_vcpu() fai=
+ls
+>       KVM: arm64: Clear the default PMU when kvm_setup_vcpu() fails
+>       KVM: arm64: Clear the whole hugetlb folio when sanitising MTE tags
+>       KVM: arm64: Clear the whole hugetlb folio when storing MTE tags
+>       KVM: arm64: Sanitise MTE tags when a permission fault installs a ma=
+pping
+>       arm64: mte: Add mte_clear_folio_tags()
+>
+> Marc Zyngier (11):
+>       Merge branch kvm-arm64/vgic-fixes-7.4-1 into kvmarm-master/fixes
+>       KVM: arm64: Reset TCR_EL2 according to guest's E2H mode
+>       KVM: arm64: Add ACCDATA_EL1 to the sysreg array
+>       KVM: arm64: Add context-switch of ACCDATA_EL1
+>       arm64: Add return value to mte_disable_tco_entry()
+>       KVM: arm64: Reenable MTE tag checking on exit from guest when runni=
+ng VHE
+>       KVM: arm64: Don't let a guest overwrite HCRX_EL2.MCE2
+>       Merge branch kvm-arm64/mmu-fixes-7.4-1 into kvmarm-master/fixes
+>       Merge branch kvm-arm64/pkvm-fixes-7.4-1 into kvmarm-master/fixes
+>       Merge branch kvm-arm64/ls64-accdata into kvmarm-master/fixes
+>       Merge branch kvm-arm64/misc-7.4-1 into kvmarm-master/fixes
+>
+> Matthias Goergens (1):
+>       Documentation/process: Add a maintainer entry profile for KVM/arm64
+>
+> Oliver Upton (2):
+>       KVM: arm64: nv: Correctly compute the effective TCR_EL1 for nVHE TC=
+R_EL2
+>       KVM: arm64: Pass the PMU events to the hyp vCPU of non-protected gu=
+ests
+>
+> Sascha Bischoff (1):
+>       KVM: arm64: vgic: Serialise CTRL_INIT against vCPU creation
+>
+> Vincent Donnefort (4):
+>       KVM: arm64: Make __vgic_v3_init_lrs HVC always available
+>       KVM: arm64: pkvm: Fix missing reset of GICv3 LRs
+>       KVM: arm64: pkvm: Reset GICv3 LRs in the hypervisor
+>       KVM: arm64: Synchronise kvm_host_data before host deprivileging
+>
+> Wei-Lin Chang (5):
+>       KVM: arm64: nv: Don't advertise FEAT_LPA2 for guest stage-1
+>       arm64: sysreg: Add TCR_EL2 to sysreg infrastructure
+>       KVM: arm64: Convert TCR_EL2 to config-driven sanitisation
+>       KVM: arm64: Fix dirty logging detection in ring-only mode
+>       KVM: arm64: Remove stale remark on canonical IPA alignment
+>
+> Will Deacon (1):
+>       KVM: arm64: Use S1E1A when Stage-1 PIE is supported
+>
+> Xuheng Li (1):
+>       KVM: arm64: Add an ISB after mapping a hyp fixmap slot
+>
+>  Documentation/admin-guide/kernel-parameters.txt    |   3 +
+>  Documentation/process/maintainer-kvm-arm64.rst     | 181 +++++++++++++++
+>  MAINTAINERS                                        |   2 +
+>  arch/arm64/include/asm/cpufeature.h                |   5 +
+>  arch/arm64/include/asm/kvm_arm.h                   |  13 --
+>  arch/arm64/include/asm/kvm_asm.h                   |   2 +-
+>  arch/arm64/include/asm/kvm_emulate.h               |   3 +
+>  arch/arm64/include/asm/kvm_host.h                  |   5 +-
+>  arch/arm64/include/asm/kvm_nested.h                |  38 ++-
+>  arch/arm64/include/asm/mte.h                       |  14 +-
+>  arch/arm64/include/asm/sysreg.h                    |   1 -
+>  arch/arm64/include/asm/virt.h                      |   2 +-
+>  arch/arm64/kernel/cpufeature.c                     |   7 +
+>  arch/arm64/kernel/mte.c                            |  15 +-
+>  arch/arm64/kernel/pi/idreg-override.c              |   2 +
+>  arch/arm64/kvm/arm.c                               |  60 +++--
+>  arch/arm64/kvm/config.c                            | 112 +++++++++
+>  arch/arm64/kvm/guest.c                             |  11 +-
+>  arch/arm64/kvm/hyp/include/hyp/fault.h             |   5 +-
+>  arch/arm64/kvm/hyp/include/hyp/switch.h            |  24 +-
+>  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h         |  23 ++
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c                 |  16 +-
+>  arch/arm64/kvm/hyp/nvhe/mm.c                       |   1 +
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c                     |  22 +-
+>  arch/arm64/kvm/hyp/nvhe/psci-relay.c               |   4 +
+>  arch/arm64/kvm/hyp/nvhe/switch.c                   |  24 ++
+>  arch/arm64/kvm/hyp/vhe/switch.c                    |   7 +
+>  arch/arm64/kvm/mmu.c                               |  21 +-
+>  arch/arm64/kvm/nested.c                            |  15 ++
+>  arch/arm64/kvm/pkvm.c                              |   6 +
+>  arch/arm64/kvm/sys_regs.c                          |  22 +-
+>  arch/arm64/kvm/vgic/vgic-init.c                    |  21 +-
+>  arch/arm64/kvm/vgic/vgic-its.c                     |  68 +++---
+>  arch/arm64/kvm/vgic/vgic-kvm-device.c              |   2 +
+>  arch/arm64/kvm/vgic/vgic-mmio-v3.c                 |  40 ++--
+>  arch/arm64/kvm/vgic/vgic-v3.c                      |   3 +-
+>  arch/arm64/kvm/vgic/vgic-v4.c                      |   5 +-
+>  arch/arm64/kvm/vgic/vgic.c                         |  12 +-
+>  arch/arm64/kvm/vgic/vgic.h                         |   1 +
+>  arch/arm64/tools/cpucaps                           |   1 +
+>  arch/arm64/tools/sysreg                            | 125 ++++++++++
+>  drivers/irqchip/irq-gic-v4.c                       |  39 +++-
+>  tools/testing/selftests/kvm/arm64/get-reg-list.c   |   2 +
+>  .../testing/selftests/kvm/arm64/vgic_lpi_stress.c  | 258 +++++++++++++++=
+++++--
+>  .../selftests/kvm/include/arm64/gic_v3_its.h       |   2 +
+>  tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c |  28 +++
+>  46 files changed, 1099 insertions(+), 174 deletions(-)
+>  create mode 100644 Documentation/process/maintainer-kvm-arm64.rst
+>
 
