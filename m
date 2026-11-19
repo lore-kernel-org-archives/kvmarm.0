@@ -1,49 +1,105 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795085497;
-	b=4IYPSvZY5TCRCuVKTAG6v9Gy/FAoG183viF8kfVpay/+uXPt6Xw4+anQ2u0ZQrms6Jhe
-	 am+bHqMmAk7k482UKitJhSQX+gbaFHTz+IT2M0WWS1HSSakWoFVPO6tzlyWmqSaiiEbdO
-	 wz07lRM+vK+FXT7kkyZAKgmd7WwRSSDhP3nosnJUZGvmFhE0BKnxSZiYSluRXWQCJyEfq
-	 pMRyeq//oGUIXwfJyn0uOaQ+3eVb9gJ/Lfu3yasdgGIKLwwUOTLufmRT0Aqqghc5nunBo
-	 1jom/1junwFjGl2et+jPfYLLhHoFWMDVhtRg4JPwDoqtGVVX+PS4R+DUTyLrSvtjlIg==
+	t=1795087089;
+	b=JFxeLBnq/lVIbMChhJtpgsENxPBOaW5zzw4pFzcOYQnDSHlKVN+c/uW+cZ4HZCENL7be
+	 ZT0+dH/Tft3X4lsZWwg9+N6L0p5DESG5RqD9Ma1PCMI3XQ1dX5kwyUrjnwp0gE9m86mhF
+	 3Sjdb8r3XbNi3IToNM0aBgIy65UnvBWdu9Je9ENhZVENrcl7KlMMefGX1Wael4F1xGR4b
+	 8EYRYD/YsCWzG6xGqPqo2jQX7+6kgL+hToYXDORjFcB6xr3Z+RCGnqmZMaVv8sMJ7D9+G
+	 FRzuTOOmcwL3kflFbtZ/zwFQsmFON4gChs4x/RG73/1YxtYoWog2diOhW86oMxbmIrw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795085497;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:Content-Language:To:Cc:References:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=3OUB5fmOU7ug3lU8YcPzZnegi9a0IaqNcDVNlCLUAos=;
-	b=dliAywbldzYDkMRP5sz0qoQXM7ciH71wdDKHVMJwFSpeBq5Byk6fpUlEfoWf7nt6oaiI
-	 ELy6f7irOv2I/IM4WL1JHecOga62s6FQ3h/HBNRc0JJcbUIrFWA/y8437aQcFPc83ZyR3
-	 EMfJF6bFSm32blgJ1+aR+qZz1Li2lImn2iH9DjmT6mnbjBn69f0Xf3GVOBkE4U45t49HV
-	 MwKZpsqnFq156iNqtRq8oKQdw44sIYwUPAfj0wx7W/qgXFOLgLOhh5UPOKwEB7JZItwQ5
-	 G2is1VtMGALuNL238jn3/smeIR1+W4waYjHGMi1ScaiIUZ0ShQkdxHjtddYcmMxMl0A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795087089;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=fY+Pd4NWLtkS0HB6qP6ih+nJNWbdv9Us893L8bxy/2g=;
+	b=j7TrWsUcOZ+Oss6hsA5V/OJeXVsLFPEoqKC1xeo0uWxIzCSSjnAeiv5dS43QrqmJ7dEC
+	 DxMcOjxu4pNjT9KeHUi4TwjCHPA/fymHe4QWaNrdyaWFecuZIXOrp7BrEmxLd+XkpXLTs
+	 zazwJ+ofx6SgabU6TXQbXCCMR7H+H63qrF8PPJYywAx1kI5WasOHTVa6qVE8biJKi77FX
+	 FNuAO2CsoPsPPntoDUau+5XRG8GqH7yyRx1HyAfK4aU9S+AspwlGppw1nvjcxxeXPSg5+
+	 g9RwMSNPDEhI/wrmzqpUKYcJVsZPwS0DgtZVqzBDV61Kao+mR7CJTgTFJlAce59SL7w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=SwuMuaHn;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B8E9606A32A;
-	Thu, 19 Nov 2026 10:51:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1B8E9606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=WA81r6MS;
+	arc=none smtp.remote-ip=209.85.128.50
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91DB8606A325
+	for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 11:18:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 91DB8606A325
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=SwuMuaHn
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 477EC1575;
-	Thu, 19 Nov 2026 02:51:33 -0800 (PST)
-Received: from [10.0.129.3] (Suzukis-MBP.cambridge.arm.com [10.0.129.3])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4A3183F673;
-	Thu, 19 Nov 2026 02:51:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795085496; bh=olpUpD1ZpWuwsmESadH3KU0hnzZjwYcqGaa8xYqJ9ik=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SwuMuaHnOInliHRxHSwZYQzqKqlNqrN5COh/C9okFVbuQ49HupXE3wUsHr5EsINeg
-	 teuPp8IZ1w17tudDkcVolTOxwQBnXood/8hwOF9oxPwvsqN4OnNtWbtkW5XUbNcFhf
-	 iU1WFN0k/5AnT0rn5pIsqZwOLSWl6kANHvSnTYro=
-Message-ID: <bbd8332b-1b2a-4a87-9232-4463d5e5a904@arm.com>
-Date: Thu, 19 Nov 2026 10:51:33 +0000
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=WA81r6MS
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4bb845433b8so33975e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 03:18:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1795087088; x=1795691888; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=fY+Pd4NWLtkS0HB6qP6ih+nJNWbdv9Us893L8bxy/2g=;
+        b=WA81r6MSiZyL/7N4cerevc+t1AZ7FUivSwelz4OSyQilRMCalwUOa8KzpFCsVhR+5U
+         PFl6htnT0KWEfstnPd3UhDmYOETvDb+pza41VeqL6FuxyB93q1Qbi4hl2yfHSteaEw7Q
+         N0R+zQ4oDDTRnumyC79V8T9t0IXEPEnFJOe+OyJ+AUWBe5+8yl2npv07OVADapFlim2B
+         PeCUFJLvXWUurB/SWs3jLUNT3H6ywtoynA3Hb28H7B8EO82HTFwrbn3pgKVYYK2GwGcS
+         /+EOJSvjzJLvtwHeKi24BolhXdNK/uw9ONKFWibbxdDgkibHnv6lowvAgxCY/huk0Q/U
+         FwGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795087088; x=1795691888;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=fY+Pd4NWLtkS0HB6qP6ih+nJNWbdv9Us893L8bxy/2g=;
+        b=QfAHpRXYAaoxfEooDtW+4vElmDES2g0Gxr+6ZI8DHxMzyOvP6wgy6FW+USSMC/PDgY
+         rAUF7SeYUreec9u0hmTApE57Nbu3hSAob85qowrSJEOGpyD8iInRCLzj4Yzmaw1iYFx2
+         /GFloZnnuFfum4JDnvC7ynDNVRfPjQbfbVWR1zK4grNJ3LJSvcYZFeOaRaYABdE3ZwBq
+         ZHO1BEEfCQXy7dFCX0C+EaGV32lRjfFmj7wuiTIvk8rJ0DCuWA1AEZqEYjCJVuEl3jyZ
+         fR0D9F5W6Wuu4HortCxuWUusQoTyUDkBusmpS3Tek+aG29ODaHdoYNCTmUebxKjcXpIv
+         pxLg==
+X-Forwarded-Encrypted: i=1; AL+hErFrmJFcpzcBaCnReELSuAsjqYxkWwvB69UdY75FPBDe0n/vi/EiLS6Mu5kTnxikhzNexWzbVW4=@lists.linux.dev
+X-Gm-Message-State: APuU4Z9tnr6sI19/K1IZHmWkwhcqDbPOKo751vc+UiGy/sZeaY+upTsG
+	357f5V8WN8KNG1k3cfTYtGMqXa2HEBBJrpv6ie6YTJnXUfNzTV1+0UGK11JMoZGClA==
+X-Gm-Gg: AYBFou2/dEFdTsuoGxW++48dDjaVajKcgZNeJQ2YiBucCIXtaSYpDv8yX/GpXZB/Xzf
+	UPVyDlQijClOPum8UEnuY8Kuf8/LlasGxnu0/9KFq4jCGzLdILuOZW6ceoCfiM0wVO7a/Yz9ShF
+	tcOYTl44Y+GxtufK0jPczHFExxGf8ViBOzuQXWf0jZrc+kTd9tychbn8+U2fO4n10AxHxZKHzHY
+	s+j5vOtkYxqLCq9mk9Jt4zZzXciOnfQkA4oAbt1worXzCezdo/eAmXrHGR1a66up7DHVaTH5rXD
+	kBfJvvBbxeZri8bGQhQR+OPtdUbe6i9YWUZoP25njLA871r3RGypNvdBP308OhUbI0OFGgEMjcI
+	CgxrQKs9AiP/jhZB+cz/OWhfm5utT5G07JSx9/nM0b4z0blwteuB6EgYCb9SGvBgD99XsUPrXfO
+	PGsrpI7UpsVIIatTDn5RYfN2s04S5rcWoD49TJN/fPp+YVeRn/7P48zAlCWY9/Bxx2Vxxq4e342
+	bn274HZ8AOSlKUuMtzMQNYJRElO9ooZZJgNgXsY2FxQ2RNdfEFMPayeUUzDwSUFXoiy8ibI3OuS
+	J0YaLgFqDiKyO06Sog4zulI6J4X0KqoAURrWy1SqjwUHFoEOwLVriEo1xVBe9JKyWWHa/Iw=
+X-Received: by 2002:a05:600c:a10e:b0:4bb:5e6b:2dfc with SMTP id 5b1f17b1804b1-4bb851b6663mr297035e9.13.1795087087341;
+        Thu, 19 Nov 2026 03:18:07 -0800 (PST)
+Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4a655db6d45sm9766011f8f.33.2026.11.19.03.18.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Nov 2026 03:18:05 -0800 (PST)
+Date: Thu, 19 Nov 2026 11:18:01 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Nicolin Chen <nicolinc@nvidia.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joro@8bytes.org, jgg@ziepe.ca,
+	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
+	vdonnefort@google.com
+Subject: Re: [PATCH v9 11/25] iommu/arm-smmu-v3-kvm: Add the kernel driver
+Message-ID: <av7a6RNSDSFH8t6m@google.com>
+References: <20261015200903.2735565-1-smostafa@google.com>
+ <20261015200903.2735565-12-smostafa@google.com>
+ <auzvygiGRTWgJXzF@nvidia.com>
+ <avGk0ilyJh3obmKx@google.com>
+ <avJidXM9yQOX4VBJ@nvidia.com>
+ <avL016l_xASN5paR@google.com>
+ <avNhekBYqiiZ9IM2@nvidia.com>
+ <avW_9A48mtnK383x@google.com>
+ <avdI5olRpBdKeE9C@nvidia.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -53,204 +109,52 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 05/11] KVM: arm64: CCA: Tear down RTTs
-Content-Language: en-GB
-To: sashiko-reviews@lists.linux.dev, Steven Price <steven.price@arm.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
-References: <20261116164358.142785-1-steven.price@arm.com>
- <20261116164358.142785-6-steven.price@arm.com>
- <sashiko-outbox-217410@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <sashiko-outbox-217410@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <avdI5olRpBdKeE9C@nvidia.com>
 
-On 16/11/2026 17:08, sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found 4 potential
-> issues to consider:
-> - [High] KVM: arm64: unclamped stage-2 levels in get_start_level() on
->    64K pages
-> - [Medium] KVM: arm64: CCA: unlocked kvm_realm_is_created() check in
->    kvm_uninit_stage2_mmu()
-> - [Low] KVM: arm64: mix of guard() and goto cleanup in
->    kvm_destroy_realm()
-> - [Low] KVM: arm64: possible skipped parent retry in
->    realm_tear_down_rtt_level()
-> --
+On Fri, Nov 13, 2026 at 09:29:10AM -0800, Nicolin Chen wrote:
+> On Thu, Nov 12, 2026 at 01:32:36PM +0000, Mostafa Saleh wrote:
+> > On Tue, Nov 10, 2026 at 10:24:58AM -0800, Nicolin Chen wrote:
+> > > On Tue, Nov 10, 2026 at 10:41:27AM +0000, Mostafa Saleh wrote:
+> > > > In Android, in that case, pKVM clears the FW (called pvmfw) that loads
+> > > > the protected VM and authenticate it so any protected VM knows the
+> > > > system is not trusted. This part is not upstream yet. [1]
+> > > 
+> > > You might want to double check a dual-SMMU case, where one gets
+> > > accepted by pkvm driver and the other fails and so bound to the
+> > > main driver.
+> > > 
+> > > It seems the pkvm driver would still pkvm_iommu_register_driver
+> > > and carry on with an untrusted SMMU. Would it also clear the FW
+> > > and mark the system as not trusted?
+> > > 
+> > 
+> > That shouldn't be possible, if one SMMU fail the whole thing will
+> > and the driver should clean up after as the probe is done through:
+> > 	ret = platform_driver_probe(&smmuv3_nesting_driver, smmuv3_nesting_probe);
 > 
-> commit 80a462fb8b46e04c72060d069b1296caf72d83ff
-> Author: Steven Price <steven.price@arm.com>
-> 
-> KVM: arm64: CCA: Tear down RTTs
-> 
-> This commit adds stage-2 unmapping and Realm Translation Table (RTT)
-> teardown for Arm CCA Realms during stage-2 MMU uninitialization and final
-> Realm destruction.
-> 
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index ac72db3d4505f..9baf2352d2a8f 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -1145,9 +1145,25 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
->>   	return err;
->>   }
->>   
->> +static void kvm_realm_uninit_stage2(struct kvm_s2_mmu *mmu)
->> +{
->> +	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
->> +
->> +	mutex_lock(&kvm->arch.config_lock);
->> +	if (kvm_realm_state(kvm) == REALM_STATE_NEW ||
->> +	    kvm_realm_state(kvm) == REALM_STATE_ACTIVE) {
->> +		kvm_set_realm_state(kvm, REALM_STATE_DYING);
->> +		WARN_ON(kvm_realm_teardown_stage2(kvm));
->> +	}
->> +	mutex_unlock(&kvm->arch.config_lock);
->> +}
->> +
->>   void kvm_uninit_stage2_mmu(struct kvm *kvm)
->>   {
->> -	kvm_free_stage2_pgd(&kvm->arch.mmu);
->> +	if (kvm_realm_is_created(kvm))
->> +		kvm_realm_uninit_stage2(&kvm->arch.mmu);
->> +	else
->> +		kvm_free_stage2_pgd(&kvm->arch.mmu);
->>   	kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
->>   }
-> 
-> [Severity: Medium]
-> Can kvm_uninit_stage2_mmu() race with Realm creation by checking
-> kvm_realm_is_created() outside kvm->arch.config_lock?
-> 
-> If kvm_mmu_notifier_release() -> kvm_arch_flush_shadow_all() runs before
-> or concurrently with Realm creation, kvm_uninit_stage2_mmu() takes the
-> else branch without holding config_lock, freeing mmu->pgt and clearing
-> mmu->pgd_phys while leaving realm.state at REALM_STATE_NONE.  Checking
-> kvm_vm_is_realm(kvm) here and handling all realm.state transitions inside
-> kvm_realm_uninit_stage2() under config_lock (including moving
-> REALM_STATE_NONE to REALM_STATE_DEAD and freeing the PGD) would avoid the
-> race.
-> 
->> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
->> index 57f59b618a96e..74b89da4e8015 100644
->> --- a/arch/arm64/kvm/rmi.c
->> +++ b/arch/arm64/kvm/rmi.c
->> @@ -16,22 +16,213 @@ u32 kvm_rmm_ipa_limit(void)
->>   	return u64_get_bits(rmi_feat_reg(0), RMI_FEATURE_REGISTER_0_S2SZ);
->>   }
->>   
->> +static int get_start_level(struct realm *realm)
->> +{
->> +	/*
->> +	 * kvm_init_ipa_range() enforces a minimum of 32 IPA bits
->> +	 * (ARM64_MIN_PARANGE_BITS).
->> +	 */
->> +	return 4 - stage2_pgtable_levels(realm->ia_bits);
->> +}
-> 
-> [Severity: High]
-> Does get_start_level() return 3 instead of 2 for a 32-bit or 33-bit IPA
-> Realm on CONFIG_ARM64_64K_PAGES?
-> 
-> stage2_pgtable_levels(ipa) evaluates ARM64_HW_PGTABLE_LEVELS((ipa) - 4),
-> which is 1 for 32 or 33 IPA bits with 64K pages, whereas kvm_get_vtcr()
-> clamps the stage-2 levels to at least 2:
-> 
-> arch/arm64/kvm/hyp/pgtable.c:kvm_get_vtcr() {
->      ...
-> 	lvls = stage2_pgtable_levels(phys_shift);
-> 	if (lvls < 2)
-> 		lvls = 2;
->      ...
-> }
-> 
-> When get_start_level() returns 3, realm_tear_down_rtt_range() calls
-> realm_tear_down_rtt_level() with level = 4 (> KVM_PGTABLE_LAST_LEVEL),
-> triggering WARN_ON() and returning -EINVAL, which causes
-> kvm_destroy_realm() to abort and leak the Realm Descriptor, RTT granules
-> and stage-2 PGD pages.
+> Hmm, if I read __platform_driver_probe correctly:
+>  * __driver_attach() doesn't propagate ret from driver_probe_device()
+>    via bus_for_each_dev to the caller
+>  * bus_for_each_dev(..., is_bound_to_driver) at the end also returns
+>    true, as one SMMU is bound to the driver while the other failed
+> ?
 
-My bad. There is already a helper, VTCR_EL2_LVLS() to convert vtcr back 
-to levels. We could as well save it in realm, as we seem to need it
-more than once.
+I double checked, you are right. In android we have the following:
+	ret = platform_driver_probe(&kvm_arm_smmu_driver, kvm_arm_smmu_probe);
+	if (ret)
+		goto err_free;
+	if (kvm_arm_smmu_cur != kvm_arm_smmu_count) {
+		/* A device exists but failed to probe */
+		ret = -EUNATCH;
+		goto err_free;
+	}
+
+We need that also here, I will add it in the next version.
+
+Thanks,
+Mostafa
 
 > 
-> [ ... ]
-> 
->> +static int realm_tear_down_rtt_level(struct realm *realm, int level,
->> +				     unsigned long start, unsigned long end)
->> +{
->> +	ssize_t map_size;
->> +	unsigned long addr, next_addr;
->> +
->> +	if (WARN_ON(level > KVM_PGTABLE_LAST_LEVEL))
->> +		return -EINVAL;
->> +
->> +	map_size = kvm_granule_size(level - 1);
->> +	if (WARN_ON(!IS_ALIGNED(start, map_size)))
->> +		return -EINVAL;
->> +
->> +	for (addr = start; addr < end; addr = next_addr) {
->> +		phys_addr_t rtt_granule;
->> +		long ret;
->> +		unsigned long align_addr = ALIGN(addr, map_size);
->> +
->> +		next_addr = ALIGN(addr + 1, map_size);
->> +
->> +		if (next_addr > end || align_addr != addr) {
->> +			/*
->> +			 * The target range is smaller than what this level
->> +			 * covers, recurse deeper.
->> +			 */
->> +			ret = realm_tear_down_rtt_level(realm,
->> +							level + 1,
->> +							addr,
->> +							min(next_addr, end));
->> +			if (ret)
->> +				return ret;
->> +			continue;
->> +		}
->> +
->> +		ret = realm_rtt_destroy(realm, addr, level,
->> +					&rtt_granule, &next_addr);
->> +		if (ret < 0)
->> +			return ret;
->> +
->> +		switch (RMI_RESULT_STATUS(ret)) {
->> +		case RMI_SUCCESS:
->> +			free_rtt(rtt_granule);
->> +			break;
->> +		case RMI_ERROR_RTT:
->> +			if (next_addr > addr) {
->> +				/* Missing RTT, skip */
->> +				break;
->> +			}
->> +			/*
->> +			 * We tear down the RTT range for the full IPA
->> +			 * space, after everything is unmapped. Also we
->> +			 * descend down only if we cannot tear down a
->> +			 * top level RTT. Thus RMM must be able to walk
->> +			 * to the requested level. e.g., a block mapping
->> +			 * exists at L1 or L2.
->> +			 */
->> +			if (WARN_ON(RMI_RESULT_DATA_LEVEL(ret) != level))
->> +				return -EBUSY;
-> 
-> [Severity: Low]
-> This question rests on an Arm CCA RMM specification detail that could not
-> be confirmed from the kernel source: when SMC_RMI_RTT_DESTROY fails with
-> RMI_ERROR_RTT because the RTT at @level still has live child table
-
-If the RTT entry at @level is live, RMM returns (RMI_ERROR_RTT, level) 
-with out_top == addr.
-
-
-> entries, can the RMM return out_top > addr (with addr < next_addr <
-> addr + map_size) if the initial entries in that RTT are non-live, or report
-> RMI_RESULT_DATA_LEVEL(ret) == level - 1?
-
-
-Suzuki
-
+> Nicolin
