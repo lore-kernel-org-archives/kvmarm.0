@@ -1,105 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795087089;
-	b=JFxeLBnq/lVIbMChhJtpgsENxPBOaW5zzw4pFzcOYQnDSHlKVN+c/uW+cZ4HZCENL7be
-	 ZT0+dH/Tft3X4lsZWwg9+N6L0p5DESG5RqD9Ma1PCMI3XQ1dX5kwyUrjnwp0gE9m86mhF
-	 3Sjdb8r3XbNi3IToNM0aBgIy65UnvBWdu9Je9ENhZVENrcl7KlMMefGX1Wael4F1xGR4b
-	 8EYRYD/YsCWzG6xGqPqo2jQX7+6kgL+hToYXDORjFcB6xr3Z+RCGnqmZMaVv8sMJ7D9+G
-	 FRzuTOOmcwL3kflFbtZ/zwFQsmFON4gChs4x/RG73/1YxtYoWog2diOhW86oMxbmIrw==
+	t=1795087136;
+	b=fEqmBy8RAD5mDqaYJokXHoBPyuJYAwkZt7UZUg/2V4DFLK5y2D3/l8psKGk8KDjm+9uU
+	 IQ8sa7/Co305U+oiDttO6n6WKbqEI69aNIEJGfDMjWyLYdxhvmVM3gLuxBpwzUaIYO0gc
+	 g+DLb8X4aTxT5aK2cqVU1T/Jc5ENQieZwWHNaN2XgmBolnkx+TEAMEMl/wxofmAwI2cW4
+	 yDT2BwupJIXxlGihm2DzKq3UKDMto42X5nuIws24U+tj2KGwN0Odw4HDTzYVdowwgiEPz
+	 C11P5/A6NlQb3BOvrH72SeZe7aeL33VZawpGOwbUqjQmyX3ZRPdBgZDOvIf4auYIHDQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795087089;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=fY+Pd4NWLtkS0HB6qP6ih+nJNWbdv9Us893L8bxy/2g=;
-	b=j7TrWsUcOZ+Oss6hsA5V/OJeXVsLFPEoqKC1xeo0uWxIzCSSjnAeiv5dS43QrqmJ7dEC
-	 DxMcOjxu4pNjT9KeHUi4TwjCHPA/fymHe4QWaNrdyaWFecuZIXOrp7BrEmxLd+XkpXLTs
-	 zazwJ+ofx6SgabU6TXQbXCCMR7H+H63qrF8PPJYywAx1kI5WasOHTVa6qVE8biJKi77FX
-	 FNuAO2CsoPsPPntoDUau+5XRG8GqH7yyRx1HyAfK4aU9S+AspwlGppw1nvjcxxeXPSg5+
-	 g9RwMSNPDEhI/wrmzqpUKYcJVsZPwS0DgtZVqzBDV61Kao+mR7CJTgTFJlAce59SL7w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795087136;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=hdo31yiX1NgSplArPnMAKiWS3jJZJbo/7jmD/8lHOoY=;
+	b=VuqaQTikJ7+X3jPNFqSu2r4Dr/YbD0sY2Bqh/SeevOLhQ5R2RzgQGS70XWDhpoYa0lMx
+	 VhXsQXmp/aZ4unAVbQC35zDS6LgjvFicGPlR8os64q5SV2gDGELimyd8ri1Hk0czhOOFo
+	 Gp4agHAdB+o5AWmXqYXtbrVLHX0swjZ7XYVTqGqSq9cHnU3fMV/l0GvNi3xK4VmEFxgeL
+	 /06k5ZnCSy7+9s9HpHg0dK7FGJSL7Gr8vIT4S+aZx0rVE8L/q2RcmeGgmwc69jjfw43jV
+	 7ma4hDz+wKVOxrzltBjMUKheBKWigcubdY0o53XIJcMXg4DYBhp3KlkV3pS2vDAJl2g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=WA81r6MS;
-	arc=none smtp.remote-ip=209.85.128.50
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ddrhrIw1;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91DB8606A325
-	for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 11:18:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 91DB8606A325
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D625606A325;
+	Thu, 19 Nov 2026 11:18:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=WA81r6MS
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4bb845433b8so33975e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 03:18:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1795087088; x=1795691888; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=fY+Pd4NWLtkS0HB6qP6ih+nJNWbdv9Us893L8bxy/2g=;
-        b=WA81r6MSiZyL/7N4cerevc+t1AZ7FUivSwelz4OSyQilRMCalwUOa8KzpFCsVhR+5U
-         PFl6htnT0KWEfstnPd3UhDmYOETvDb+pza41VeqL6FuxyB93q1Qbi4hl2yfHSteaEw7Q
-         N0R+zQ4oDDTRnumyC79V8T9t0IXEPEnFJOe+OyJ+AUWBe5+8yl2npv07OVADapFlim2B
-         PeCUFJLvXWUurB/SWs3jLUNT3H6ywtoynA3Hb28H7B8EO82HTFwrbn3pgKVYYK2GwGcS
-         /+EOJSvjzJLvtwHeKi24BolhXdNK/uw9ONKFWibbxdDgkibHnv6lowvAgxCY/huk0Q/U
-         FwGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795087088; x=1795691888;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=fY+Pd4NWLtkS0HB6qP6ih+nJNWbdv9Us893L8bxy/2g=;
-        b=QfAHpRXYAaoxfEooDtW+4vElmDES2g0Gxr+6ZI8DHxMzyOvP6wgy6FW+USSMC/PDgY
-         rAUF7SeYUreec9u0hmTApE57Nbu3hSAob85qowrSJEOGpyD8iInRCLzj4Yzmaw1iYFx2
-         /GFloZnnuFfum4JDnvC7ynDNVRfPjQbfbVWR1zK4grNJ3LJSvcYZFeOaRaYABdE3ZwBq
-         ZHO1BEEfCQXy7dFCX0C+EaGV32lRjfFmj7wuiTIvk8rJ0DCuWA1AEZqEYjCJVuEl3jyZ
-         fR0D9F5W6Wuu4HortCxuWUusQoTyUDkBusmpS3Tek+aG29ODaHdoYNCTmUebxKjcXpIv
-         pxLg==
-X-Forwarded-Encrypted: i=1; AL+hErFrmJFcpzcBaCnReELSuAsjqYxkWwvB69UdY75FPBDe0n/vi/EiLS6Mu5kTnxikhzNexWzbVW4=@lists.linux.dev
-X-Gm-Message-State: APuU4Z9tnr6sI19/K1IZHmWkwhcqDbPOKo751vc+UiGy/sZeaY+upTsG
-	357f5V8WN8KNG1k3cfTYtGMqXa2HEBBJrpv6ie6YTJnXUfNzTV1+0UGK11JMoZGClA==
-X-Gm-Gg: AYBFou2/dEFdTsuoGxW++48dDjaVajKcgZNeJQ2YiBucCIXtaSYpDv8yX/GpXZB/Xzf
-	UPVyDlQijClOPum8UEnuY8Kuf8/LlasGxnu0/9KFq4jCGzLdILuOZW6ceoCfiM0wVO7a/Yz9ShF
-	tcOYTl44Y+GxtufK0jPczHFExxGf8ViBOzuQXWf0jZrc+kTd9tychbn8+U2fO4n10AxHxZKHzHY
-	s+j5vOtkYxqLCq9mk9Jt4zZzXciOnfQkA4oAbt1worXzCezdo/eAmXrHGR1a66up7DHVaTH5rXD
-	kBfJvvBbxeZri8bGQhQR+OPtdUbe6i9YWUZoP25njLA871r3RGypNvdBP308OhUbI0OFGgEMjcI
-	CgxrQKs9AiP/jhZB+cz/OWhfm5utT5G07JSx9/nM0b4z0blwteuB6EgYCb9SGvBgD99XsUPrXfO
-	PGsrpI7UpsVIIatTDn5RYfN2s04S5rcWoD49TJN/fPp+YVeRn/7P48zAlCWY9/Bxx2Vxxq4e342
-	bn274HZ8AOSlKUuMtzMQNYJRElO9ooZZJgNgXsY2FxQ2RNdfEFMPayeUUzDwSUFXoiy8ibI3OuS
-	J0YaLgFqDiKyO06Sog4zulI6J4X0KqoAURrWy1SqjwUHFoEOwLVriEo1xVBe9JKyWWHa/Iw=
-X-Received: by 2002:a05:600c:a10e:b0:4bb:5e6b:2dfc with SMTP id 5b1f17b1804b1-4bb851b6663mr297035e9.13.1795087087341;
-        Thu, 19 Nov 2026 03:18:07 -0800 (PST)
-Received: from google.com (250.192.189.35.bc.googleusercontent.com. [35.189.192.250])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4a655db6d45sm9766011f8f.33.2026.11.19.03.18.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Nov 2026 03:18:05 -0800 (PST)
-Date: Thu, 19 Nov 2026 11:18:01 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Nicolin Chen <nicolinc@nvidia.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
-	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, joro@8bytes.org, jgg@ziepe.ca,
-	mark.rutland@arm.com, qperret@google.com, tabba@google.com,
-	vdonnefort@google.com
-Subject: Re: [PATCH v9 11/25] iommu/arm-smmu-v3-kvm: Add the kernel driver
-Message-ID: <av7a6RNSDSFH8t6m@google.com>
-References: <20261015200903.2735565-1-smostafa@google.com>
- <20261015200903.2735565-12-smostafa@google.com>
- <auzvygiGRTWgJXzF@nvidia.com>
- <avGk0ilyJh3obmKx@google.com>
- <avJidXM9yQOX4VBJ@nvidia.com>
- <avL016l_xASN5paR@google.com>
- <avNhekBYqiiZ9IM2@nvidia.com>
- <avW_9A48mtnK383x@google.com>
- <avdI5olRpBdKeE9C@nvidia.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ddrhrIw1
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A29CC1F000C5;
+	Thu, 19 Nov 2026 11:18:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795087136;
+	bh=hdo31yiX1NgSplArPnMAKiWS3jJZJbo/7jmD/8lHOoY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=ddrhrIw1o9OVE4VgtDLgA5LFH4se0zgUcw/IhmX6IlqCklkfPIUaTJdcseNoMuXGV
+	 M8l22jgHiVbDAEcRccHDsU6jQcY3+iHpd8WImqjSMBF+Vu0ryJYnED7Dh3GCxIXVKg
+	 FWX4eHPzDkvkk70inKrKaXzsAWc/+aqZqS+tB4z6y4clAvMdmr/vAOj2uIqYfXfkek
+	 MWER2rFzg/1eir/OJH2OricpYI5bxvk9z/EtjL2ctHgCC2sOT1KFkzZL74vsWKuTnY
+	 Kk5YfVowFmViXJSMQt9xWFHlnGXSg0h16loCM4LsZwuh7RjVTBy6/XP5wnGcoHP2yt
+	 dtfLZgk7v0jmw==
+Date: Thu, 19 Nov 2026 11:18:48 +0000
+From: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>
+To: Fuad Tabba <fuad.tabba@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, kvmarm@lists.linux.dev, 
+	Wei-Lin Chang <weilin.chang@arm.com>, Will Deacon <will@kernel.org>, stable@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] KVM: Stop KVM_PRE_FAULT_MEMORY when the vCPU's
+ dirty ring is full
+Message-ID: <av7S4fY7f6H_bW8t@gremlin>
+References: <20261117074428.7544-1-fuad.tabba@linux.dev>
+ <20261117074428.7544-2-fuad.tabba@linux.dev>
+ <avxfgWNePsGPK9mm@gremlin>
+ <CA+EHjTzUrDxLSMEo6X66XhKtQ-=ew3zZhMdFWR6U9Ga17WLWkw@mail.gmail.com>
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -111,50 +67,138 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <avdI5olRpBdKeE9C@nvidia.com>
+In-Reply-To: <CA+EHjTzUrDxLSMEo6X66XhKtQ-=ew3zZhMdFWR6U9Ga17WLWkw@mail.gmail.com>
 
-On Fri, Nov 13, 2026 at 09:29:10AM -0800, Nicolin Chen wrote:
-> On Thu, Nov 12, 2026 at 01:32:36PM +0000, Mostafa Saleh wrote:
-> > On Tue, Nov 10, 2026 at 10:24:58AM -0800, Nicolin Chen wrote:
-> > > On Tue, Nov 10, 2026 at 10:41:27AM +0000, Mostafa Saleh wrote:
-> > > > In Android, in that case, pKVM clears the FW (called pvmfw) that loads
-> > > > the protected VM and authenticate it so any protected VM knows the
-> > > > system is not trusted. This part is not upstream yet. [1]
-> > > 
-> > > You might want to double check a dual-SMMU case, where one gets
-> > > accepted by pkvm driver and the other fails and so bound to the
-> > > main driver.
-> > > 
-> > > It seems the pkvm driver would still pkvm_iommu_register_driver
-> > > and carry on with an untrusted SMMU. Would it also clear the FW
-> > > and mark the system as not trusted?
-> > > 
-> > 
-> > That shouldn't be possible, if one SMMU fail the whole thing will
-> > and the driver should clean up after as the probe is done through:
-> > 	ret = platform_driver_probe(&smmuv3_nesting_driver, smmuv3_nesting_probe);
-> 
-> Hmm, if I read __platform_driver_probe correctly:
->  * __driver_attach() doesn't propagate ret from driver_probe_device()
->    via bus_for_each_dev to the caller
->  * bus_for_each_dev(..., is_bound_to_driver) at the end also returns
->    true, as one SMMU is bound to the driver while the other failed
-> ?
+On Tue, Nov 17, 2026 at 05:05:49PM +0000, Fuad Tabba wrote:
+> Hi Lorenzo,
+>
+> On Tue, 17 Nov 2026 14:23:09 +0000, "Lorenzo Stoakes (ARM)"
+> <ljs@kernel.org> wrote:
+> [...]
+> > > The check also sets run->exit_reason, and arm64's KVM_RUN completes a
+> > > pending MMIO exit only if exit_reason is still KVM_EXIT_MMIO. If a
+> > > pre-fault stops on a full ring while an MMIO exit is pending, the next
+> > > KVM_RUN doesn't complete the exit and the guest repeats the MMIO
+> > > access. Userspace can avoid that by completing the exit with KVM_RUN
+> > > before it pre-faults.
+> >
+> > That's also true for riscv:
+> >
+> >         switch (run->exit_reason) {
+> >         case KVM_EXIT_MMIO:
+> >                 /* Process MMIO value returned from user-space */
+> >                 ret = kvm_riscv_vcpu_mmio_return(vcpu, vcpu->run);
+> >                 break;
+> >         case KVM_EXIT_RISCV_SBI:
+> >                 /* Process SBI value returned from user-space */
+> >                 ret = kvm_riscv_vcpu_sbi_return(vcpu, vcpu->run);
+> >                 break;
+> >         case KVM_EXIT_RISCV_CSR:
+> >                 /* Process CSR value returned from user-space */
+> >                 ret = kvm_riscv_vcpu_csr_return(vcpu, vcpu->run);
+> >                 break;
+> >         }
+> >
+> > (note that it skips CSR, SBI also with a changed exit_reason).
+>
+> Ack.
 
-I double checked, you are right. In android we have the following:
-	ret = platform_driver_probe(&kvm_arm_smmu_driver, kvm_arm_smmu_probe);
-	if (ret)
-		goto err_free;
-	if (kvm_arm_smmu_cur != kvm_arm_smmu_count) {
-		/* A device exists but failed to probe */
-		ret = -EUNATCH;
-		goto err_free;
-	}
+Probably worth referencing in commit msg I guess?
 
-We need that also here, I will add it in the next version.
+>
+> > But the overflow bug only applies to x86 (see below), so is this something
+> > we should worry about at all?
+>
+> The ring overflows on arm64 too (below). As for exit_reason, I asked
+> Sean about the arm64 MMIO case on v1, and his answer was that a VMM
+> that pre-faults between a KVM_EXIT_MMIO return and the next KVM_RUN
+> "gets to deal with the fallout" [1]. I think the same goes for riscv's
+> exits.
 
-Thanks,
-Mostafa
+I mean generally yeah, users doing silly things can expect silly results I
+guess! :)
 
-> 
-> Nicolin
+>
+> [...]
+> > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> [...]
+> > >  The dirty ring can get full.  When it happens, the KVM_RUN of the
+> > > -vcpu will return with exit reason KVM_EXIT_DIRTY_RING_FULL.
+> > > +vcpu will return with exit reason KVM_EXIT_DIRTY_RING_FULL, and
+> > > +KVM_PRE_FAULT_MEMORY on the vcpu will process no more pages until the
+> > > +ring has been harvested and reset.
+> >
+> > Maybe worth mentioning the exit_reason thing if we keep this arch-generic?
+>
+> Sure, I'll document that userspace should complete a pending exit with
+> KVM_RUN before it pre-faults on that vCPU.
+
+Thanks!
+
+>
+> [...]
+> > I wonder if this shouldn't just be an x86-only fix, since no other arch is
+> > impacted AFAICT.
+> >
+> > arm64 and riscv never map a dirty-logged memslot writable, so they're never
+> > pushed to the rin, and s390 doesn't have a dirty ring at all:
+> >
+> > arm64:
+> >
+> > static int kvm_s2_fault_compute_prot(const struct kvm_s2_fault_desc *s2fd,
+> >                                      const struct kvm_s2_fault_vma_info *s2vi,
+> >                                      enum kvm_pgtable_prot *prot)
+> > {
+> >         ...
+> >         if (s2vi->map_writable && (s2vi->device ||
+> >                                    !memslot_is_logging(s2fd->memslot) ||
+> >                                    kvm_s2_fault_is_write(s2fd)))
+> >                 *prot |= KVM_PGTABLE_PROT_W;
+> >         ...
+> > }
+>
+> arm64 does map a logged slot as writable today. memslot_is_logging()
+> tests memslot->dirty_bitmap, which isn't allocated when only the dirty
+> ring is enabled, and patch 2's selftest triggers the WARN in
+> kvm_dirty_ring_push() on arm64 without patch 1. Wei-Lin's fix to
+> memslot_is_logging() [2] is in kvmarm/fixes, not in mainline yet.
+
+But Wei-Lin's fix was taken? So I don't think predicating things on the
+basis of it not being there really makes any sense.
+
+However...
+
+>
+> With it, the s2vi->device case above still maps a device page writable
+> on a read fault in a logged slot. kvm_arch_prepare_memory_region()
+> rejects logging on a VM_PFNMAP VMA, so that requires userspace to map
+> the device under the slot after creating it (I haven't tested it).
+
+...Given that this possibility exists and device pages are unconditionally
+marked writable (even if it's mildly contrived to get there), it's fair
+enough to put it in the generic code.
+
+>
+> So I think the check should be in the generic loop.
+>
+> [...]
+> > An x86-only version would be pretty simple, something like the below.
+> >
+> > This also covers off the retry (RET_PF_RETRY) loop which a generic version
+> > doesn't.
+>
+> True. To overflow there, the retries for one page would have to push
+> more entries than the ring has in reserve (at least 64), and I don't
+> see a way to get that, so I left it alone.
+
+Yep that's fair enough!
+
+>
+> Cheers,
+> /fuad
+>
+> [1] https://lore.kernel.org/all/avs5UD79FB_DG1Vs@seanjc-mac.roam.internal/
+> [2] https://lore.kernel.org/all/20261029175238.3214788-2-weilin.chang@arm.com/
+
+--
+Cheers, Lorenzo
