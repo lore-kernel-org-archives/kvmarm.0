@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795085011;
-	b=JO8+/ANRyxRYGfXRWmaFAFu5NhRco58eg3YQK8OnnON0Aml4/tamQblgvfaWC8p3kZez
-	 UVM7XIitv1KtjIsesQskB/VaApWIhADVBJNBnAHkebht3MrMisnePH81gKGnLvbdYf9f6
-	 /rZzk9GVmK0Jun+MY24kpcRgbxzvk3wPrhPLXG7sMkZHVT86DRLPyDAqZ0WAC6BxVUSu8
-	 AmtqctgRMQtzp1JC9aG2iTsJciH2UlERU7EsdawSQ/LKnXTPp9NuTU6JuIMRNUwqkYEZ2
-	 qGQzZrJbAJRJwGZigkDBKPKIhhK7NVcjDHOV//zHTY5hjCZrvftsoHffYr1S4V9+v5A==
+	t=1795085497;
+	b=4IYPSvZY5TCRCuVKTAG6v9Gy/FAoG183viF8kfVpay/+uXPt6Xw4+anQ2u0ZQrms6Jhe
+	 am+bHqMmAk7k482UKitJhSQX+gbaFHTz+IT2M0WWS1HSSakWoFVPO6tzlyWmqSaiiEbdO
+	 wz07lRM+vK+FXT7kkyZAKgmd7WwRSSDhP3nosnJUZGvmFhE0BKnxSZiYSluRXWQCJyEfq
+	 pMRyeq//oGUIXwfJyn0uOaQ+3eVb9gJ/Lfu3yasdgGIKLwwUOTLufmRT0Aqqghc5nunBo
+	 1jom/1junwFjGl2et+jPfYLLhHoFWMDVhtRg4JPwDoqtGVVX+PS4R+DUTyLrSvtjlIg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795085011;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795085497;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
+	 MIME-Version:User-Agent:Subject:Content-Language:To:Cc:References:
 	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=vJKXxfdGCv+61w/aHQxKpufdz3oBLb6/8bJF+wXFtek=;
-	b=oymesShKPGC/1Rzo+MliDZFTHZzKj7c+HHNZBE7zrt4UK1Zt1FFSADm4nYP8NNEdhbTV
-	 Cy6ihsjYVEaieQL0RCAYR+8xk0Ly58GR3IamdHcLMA461AimjEz1kubfvp1Q/bqcxXLjL
-	 QL2zyzVgZIvAnyoQimhgEDZLL96+V+8vHrNyRglsWqhepWoXJTejkKkQGlhUT1mEkMPUV
-	 aoA/EJaaf6M0RYbQx6ef9WujcrueXCkv0tXVoMr+E5XOY4rqNOKv54p47a8YLoLNEg8Le
-	 XrfrNzsT2ZKrh/f0uyZMnIrUevg0oNbGuoZ1JTHRYV6YggIgwPhsV+QabMLLSFLoAyQ==
+	bh=3OUB5fmOU7ug3lU8YcPzZnegi9a0IaqNcDVNlCLUAos=;
+	b=dliAywbldzYDkMRP5sz0qoQXM7ciH71wdDKHVMJwFSpeBq5Byk6fpUlEfoWf7nt6oaiI
+	 ELy6f7irOv2I/IM4WL1JHecOga62s6FQ3h/HBNRc0JJcbUIrFWA/y8437aQcFPc83ZyR3
+	 EMfJF6bFSm32blgJ1+aR+qZz1Li2lImn2iH9DjmT6mnbjBn69f0Xf3GVOBkE4U45t49HV
+	 MwKZpsqnFq156iNqtRq8oKQdw44sIYwUPAfj0wx7W/qgXFOLgLOhh5UPOKwEB7JZItwQ5
+	 G2is1VtMGALuNL238jn3/smeIR1+W4waYjHGMi1ScaiIUZ0ShQkdxHjtddYcmMxMl0A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Ene0Ho72;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=SwuMuaHn;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94900606A32A
-	for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 10:43:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 94900606A32A
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B8E9606A32A;
+	Thu, 19 Nov 2026 10:51:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1B8E9606A32A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Ene0Ho72
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=SwuMuaHn
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EB5421575;
-	Thu, 19 Nov 2026 02:43:26 -0800 (PST)
-Received: from [10.0.154.42] (e121487-lin.cambridge.arm.com [10.0.154.42])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 207503F632;
-	Thu, 19 Nov 2026 02:43:27 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 477EC1575;
+	Thu, 19 Nov 2026 02:51:33 -0800 (PST)
+Received: from [10.0.129.3] (Suzukis-MBP.cambridge.arm.com [10.0.129.3])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4A3183F673;
+	Thu, 19 Nov 2026 02:51:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795085009; bh=M21UZJyP9+AnwX4YTlB02md3WrtwshYZO/zb5ElQivE=;
+	t=1795085496; bh=olpUpD1ZpWuwsmESadH3KU0hnzZjwYcqGaa8xYqJ9ik=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ene0Ho72kp0RATv46ILCov4k9hcuarmkOfaPurGM4w/6l/Y6aJHslTK4RpLiJp/lE
-	 T/hxEiGr8xTmaeKk5W/tJUJkE3jI99INFdON3wp+hRjqSjMf5TthY53QNzYz5LnOzu
-	 mb+vo+2tuZ3vYmIeuNCmYM6NDY/Bh0wGTgO9a/4I=
-Message-ID: <6b61fcb7-e9ee-4f25-9484-5bf7e000f148@arm.com>
-Date: Thu, 19 Nov 2026 10:43:25 +0000
+	b=SwuMuaHnOInliHRxHSwZYQzqKqlNqrN5COh/C9okFVbuQ49HupXE3wUsHr5EsINeg
+	 teuPp8IZ1w17tudDkcVolTOxwQBnXood/8hwOF9oxPwvsqN4OnNtWbtkW5XUbNcFhf
+	 iU1WFN0k/5AnT0rn5pIsqZwOLSWl6kANHvSnTYro=
+Message-ID: <bbd8332b-1b2a-4a87-9232-4463d5e5a904@arm.com>
+Date: Thu, 19 Nov 2026 10:51:33 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -54,88 +54,203 @@ List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kvmtool v5 15/23] arm64: Describe the GICv5 IRS in the DT
-To: Sascha Bischoff <sascha.bischoff@arm.com>, will@kernel.org,
- julien.thierry.kdev@gmail.com
-Cc: maz@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- timothy.hayes@arm.com, Peter Maydell <peter.maydell@linaro.org>
-References: <20261118175755.1946977-1-sascha.bischoff@arm.com>
- <20261118175755.1946977-16-sascha.bischoff@arm.com>
+Subject: Re: [PATCH v3 05/11] KVM: arm64: CCA: Tear down RTTs
 Content-Language: en-GB
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-In-Reply-To: <20261118175755.1946977-16-sascha.bischoff@arm.com>
-Content-Type: text/plain; charset=UTF-8
+To: sashiko-reviews@lists.linux.dev, Steven Price <steven.price@arm.com>,
+ kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
+References: <20261116164358.142785-1-steven.price@arm.com>
+ <20261116164358.142785-6-steven.price@arm.com>
+ <sashiko-outbox-217410@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <sashiko-outbox-217410@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11/18/26 17:57, Sascha Bischoff wrote:
-> Describe the IRS CONFIG and SETLPI frames and associate each CPU
-> phandle with its IAFFID. This lets the guest discover and configure
-> the IRS for shared interrupts.
+On 16/11/2026 17:08, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 4 potential
+> issues to consider:
+> - [High] KVM: arm64: unclamped stage-2 levels in get_start_level() on
+>    64K pages
+> - [Medium] KVM: arm64: CCA: unlocked kvm_realm_is_created() check in
+>    kvm_uninit_stage2_mmu()
+> - [Low] KVM: arm64: mix of guard() and goto cleanup in
+>    kvm_destroy_realm()
+> - [Low] KVM: arm64: possible skipped parent retry in
+>    realm_tear_down_rtt_level()
+> --
 > 
-> Tested-by: Vladimir Murzin <vladimir.murzin@arm.com>
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> ---
->  arm64/gic.c | 35 +++++++++++++++++++++++++++++++++++
->  1 file changed, 35 insertions(+)
+> commit 80a462fb8b46e04c72060d069b1296caf72d83ff
+> Author: Steven Price <steven.price@arm.com>
 > 
-> diff --git a/arm64/gic.c b/arm64/gic.c
-> index 9a8f9916..e5a26252 100644
-> --- a/arm64/gic.c
-> +++ b/arm64/gic.c
-> @@ -588,6 +588,16 @@ void gic__generate_fdt_nodes(void *fdt, struct kvm *kvm)
->  
->  static void gic__generate_gicv5_fdt_nodes(void *fdt, struct kvm *kvm)
->  {
-> +	char node_at_addr[64];
-> +	u32 cpus[kvm->nrcpus];
-> +	u16 iaffids[kvm->nrcpus];
-> +	u64 irs_reg_prop[] = {
-> +		cpu_to_fdt64(ARM_GICV5_IRS_CONFIG_BASE),
-> +		cpu_to_fdt64(ARM_GICV5_IRS_CONFIG_SIZE),
-> +		cpu_to_fdt64(ARM_GICV5_IRS_SETLPI_BASE),
-> +		cpu_to_fdt64(ARM_GICV5_IRS_SETLPI_SIZE)
-> +	};
-> +
->  	_FDT(fdt_begin_node(fdt, "gicv5-cpuif"));
->  	_FDT(fdt_property_string(fdt, "compatible", "arm,gic-v5"));
->  	_FDT(fdt_property_cell(fdt, "#interrupt-cells", GIC_FDT_IRQ_NUM_CELLS));
-> @@ -599,6 +609,31 @@ static void gic__generate_gicv5_fdt_nodes(void *fdt, struct kvm *kvm)
->  	/* Use a hard-coded phandle for the GIC to help wire things up */
->  	_FDT(fdt_property_cell(fdt, "phandle", PHANDLE_GIC));
->  
-> +	/*
-> +	 * GICv5 IRS node
-> +	 */
-> +	snprintf(node_at_addr, sizeof(node_at_addr), "irs@%llx",
-> +		 (unsigned long long)ARM_GICV5_IRS_CONFIG_BASE);
-> +	_FDT(fdt_begin_node(fdt, node_at_addr));
-> +	_FDT(fdt_property_string(fdt, "compatible", "arm,gic-v5-irs"));
-> +	_FDT(fdt_property_cell(fdt, "#address-cells", 2));
-> +	_FDT(fdt_property_cell(fdt, "#size-cells", 2));
-> +	_FDT(fdt_property(fdt, "ranges", NULL, 0));
-> +
-> +	_FDT(fdt_property(fdt, "reg", irs_reg_prop, sizeof(irs_reg_prop)));
-> +	_FDT(fdt_property(fdt, "reg-names", "ns-config\0ns-setlpi",
-> +			  sizeof("ns-config\0ns-setlpi")));
-> +
-> +	for (int cpu = 0; cpu < kvm->nrcpus; cpu++) {
-> +		cpus[cpu] = cpu_to_fdt32(PHANDLE_CPU_BASE + cpu);
-> +		iaffids[cpu] = cpu_to_fdt16(cpu);
-> +	}
-> +
-> +	_FDT(fdt_property(fdt, "cpus", cpus, sizeof(u32) * kvm->nrcpus));
-> +	_FDT(fdt_property(fdt, "arm,iaffids", iaffids, sizeof(u16) * kvm->nrcpus));
-> +
-> +	_FDT(fdt_end_node(fdt));
-> +
->  	_FDT(fdt_end_node(fdt));
->  }
->  
-> -- 2.34.1
+> KVM: arm64: CCA: Tear down RTTs
 > 
+> This commit adds stage-2 unmapping and Realm Translation Table (RTT)
+> teardown for Arm CCA Realms during stage-2 MMU uninitialization and final
+> Realm destruction.
+> 
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index ac72db3d4505f..9baf2352d2a8f 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -1145,9 +1145,25 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+>>   	return err;
+>>   }
+>>   
+>> +static void kvm_realm_uninit_stage2(struct kvm_s2_mmu *mmu)
+>> +{
+>> +	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+>> +
+>> +	mutex_lock(&kvm->arch.config_lock);
+>> +	if (kvm_realm_state(kvm) == REALM_STATE_NEW ||
+>> +	    kvm_realm_state(kvm) == REALM_STATE_ACTIVE) {
+>> +		kvm_set_realm_state(kvm, REALM_STATE_DYING);
+>> +		WARN_ON(kvm_realm_teardown_stage2(kvm));
+>> +	}
+>> +	mutex_unlock(&kvm->arch.config_lock);
+>> +}
+>> +
+>>   void kvm_uninit_stage2_mmu(struct kvm *kvm)
+>>   {
+>> -	kvm_free_stage2_pgd(&kvm->arch.mmu);
+>> +	if (kvm_realm_is_created(kvm))
+>> +		kvm_realm_uninit_stage2(&kvm->arch.mmu);
+>> +	else
+>> +		kvm_free_stage2_pgd(&kvm->arch.mmu);
+>>   	kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
+>>   }
+> 
+> [Severity: Medium]
+> Can kvm_uninit_stage2_mmu() race with Realm creation by checking
+> kvm_realm_is_created() outside kvm->arch.config_lock?
+> 
+> If kvm_mmu_notifier_release() -> kvm_arch_flush_shadow_all() runs before
+> or concurrently with Realm creation, kvm_uninit_stage2_mmu() takes the
+> else branch without holding config_lock, freeing mmu->pgt and clearing
+> mmu->pgd_phys while leaving realm.state at REALM_STATE_NONE.  Checking
+> kvm_vm_is_realm(kvm) here and handling all realm.state transitions inside
+> kvm_realm_uninit_stage2() under config_lock (including moving
+> REALM_STATE_NONE to REALM_STATE_DEAD and freeing the PGD) would avoid the
+> race.
+> 
+>> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+>> index 57f59b618a96e..74b89da4e8015 100644
+>> --- a/arch/arm64/kvm/rmi.c
+>> +++ b/arch/arm64/kvm/rmi.c
+>> @@ -16,22 +16,213 @@ u32 kvm_rmm_ipa_limit(void)
+>>   	return u64_get_bits(rmi_feat_reg(0), RMI_FEATURE_REGISTER_0_S2SZ);
+>>   }
+>>   
+>> +static int get_start_level(struct realm *realm)
+>> +{
+>> +	/*
+>> +	 * kvm_init_ipa_range() enforces a minimum of 32 IPA bits
+>> +	 * (ARM64_MIN_PARANGE_BITS).
+>> +	 */
+>> +	return 4 - stage2_pgtable_levels(realm->ia_bits);
+>> +}
+> 
+> [Severity: High]
+> Does get_start_level() return 3 instead of 2 for a 32-bit or 33-bit IPA
+> Realm on CONFIG_ARM64_64K_PAGES?
+> 
+> stage2_pgtable_levels(ipa) evaluates ARM64_HW_PGTABLE_LEVELS((ipa) - 4),
+> which is 1 for 32 or 33 IPA bits with 64K pages, whereas kvm_get_vtcr()
+> clamps the stage-2 levels to at least 2:
+> 
+> arch/arm64/kvm/hyp/pgtable.c:kvm_get_vtcr() {
+>      ...
+> 	lvls = stage2_pgtable_levels(phys_shift);
+> 	if (lvls < 2)
+> 		lvls = 2;
+>      ...
+> }
+> 
+> When get_start_level() returns 3, realm_tear_down_rtt_range() calls
+> realm_tear_down_rtt_level() with level = 4 (> KVM_PGTABLE_LAST_LEVEL),
+> triggering WARN_ON() and returning -EINVAL, which causes
+> kvm_destroy_realm() to abort and leak the Realm Descriptor, RTT granules
+> and stage-2 PGD pages.
 
-With SETLPI dropped form DT (and commit message) as agreed [1], feel free to add
+My bad. There is already a helper, VTCR_EL2_LVLS() to convert vtcr back 
+to levels. We could as well save it in realm, as we seem to need it
+more than once.
 
-Reviewed-by: Vladimir Murzin <vladimir.murzin@arm.com>
+> 
+> [ ... ]
+> 
+>> +static int realm_tear_down_rtt_level(struct realm *realm, int level,
+>> +				     unsigned long start, unsigned long end)
+>> +{
+>> +	ssize_t map_size;
+>> +	unsigned long addr, next_addr;
+>> +
+>> +	if (WARN_ON(level > KVM_PGTABLE_LAST_LEVEL))
+>> +		return -EINVAL;
+>> +
+>> +	map_size = kvm_granule_size(level - 1);
+>> +	if (WARN_ON(!IS_ALIGNED(start, map_size)))
+>> +		return -EINVAL;
+>> +
+>> +	for (addr = start; addr < end; addr = next_addr) {
+>> +		phys_addr_t rtt_granule;
+>> +		long ret;
+>> +		unsigned long align_addr = ALIGN(addr, map_size);
+>> +
+>> +		next_addr = ALIGN(addr + 1, map_size);
+>> +
+>> +		if (next_addr > end || align_addr != addr) {
+>> +			/*
+>> +			 * The target range is smaller than what this level
+>> +			 * covers, recurse deeper.
+>> +			 */
+>> +			ret = realm_tear_down_rtt_level(realm,
+>> +							level + 1,
+>> +							addr,
+>> +							min(next_addr, end));
+>> +			if (ret)
+>> +				return ret;
+>> +			continue;
+>> +		}
+>> +
+>> +		ret = realm_rtt_destroy(realm, addr, level,
+>> +					&rtt_granule, &next_addr);
+>> +		if (ret < 0)
+>> +			return ret;
+>> +
+>> +		switch (RMI_RESULT_STATUS(ret)) {
+>> +		case RMI_SUCCESS:
+>> +			free_rtt(rtt_granule);
+>> +			break;
+>> +		case RMI_ERROR_RTT:
+>> +			if (next_addr > addr) {
+>> +				/* Missing RTT, skip */
+>> +				break;
+>> +			}
+>> +			/*
+>> +			 * We tear down the RTT range for the full IPA
+>> +			 * space, after everything is unmapped. Also we
+>> +			 * descend down only if we cannot tear down a
+>> +			 * top level RTT. Thus RMM must be able to walk
+>> +			 * to the requested level. e.g., a block mapping
+>> +			 * exists at L1 or L2.
+>> +			 */
+>> +			if (WARN_ON(RMI_RESULT_DATA_LEVEL(ret) != level))
+>> +				return -EBUSY;
+> 
+> [Severity: Low]
+> This question rests on an Arm CCA RMM specification detail that could not
+> be confirmed from the kernel source: when SMC_RMI_RTT_DESTROY fails with
+> RMI_ERROR_RTT because the RTT at @level still has live child table
 
-[1] https://lore.kernel.org/kvmarm/d0e948c8-0d25-4207-bc04-01bc2bb6b7ec@arm.com/T/#m0dd67277b59609783e294e30cc681ee1a97a966a
+If the RTT entry at @level is live, RMM returns (RMI_ERROR_RTT, level) 
+with out_top == addr.
+
+
+> entries, can the RMM return out_top > addr (with addr < next_addr <
+> addr + map_size) if the initial entries in that RTT are non-live, or report
+> RMI_RESULT_DATA_LEVEL(ret) == level - 1?
+
+
+Suzuki
+
