@@ -1,13 +1,13 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795107750;
-	b=iyNG+3Vh6X2+v7+O3oPn8pD1AhHSspJaI6BOtKsHWlWT2LnqkSO5aQSwfRK1/7/QMdAx
-	 FLHjhIvHj+AxG9Ao39Q5pN2lNgkptkm2l7XgaAfnRSSQaqe4cirOnvT1AjsiUfhZM266p
-	 5N7GZkBBv7U2UUjUKZsnsSGq8bagP1rhu9fkyLstQIouLriOI9R79EQUG1g3to1EBPoMN
-	 w4Y7pJwUfaSJ84YMpOtALYiWbuQoaIeWQJ3xPQ2ipu/U9HWjKgDdOCXO350rEqWeRlNaF
-	 xt22FfU7zACsmQgIoeuA2x8qZFoEBKea/ywmWNql0tzXqbiMxhwQ7YJdajxUNYAXZtA==
+	t=1795107773;
+	b=i8k4y1ckT3it763LupVmF4s8Mc0dA7HitZ+AUsu8MjhuxSn9avbgFSF9tJMHCSVPeTbM
+	 cCvDzE71xWftyFtCYf5FzE2HoI6Ba7SDRQ3EQy5NcHUOTejup7Nq20waoMVOa7Jn3i7yQ
+	 QAWxNDMqLiKz5yVt64G7kzft/9pl66MTc5he4dtzYqn7jcZpTJ0+yh/xlLLr5aJ/AoLcX
+	 oCzNwZpnvrDRMFM3rzFe5QY3eTwUNJ7sZQdS+GBJptdGz15YwUQTzfYEj4TSNAGD6FVYd
+	 FGGH6kLQ3LxitHCFquGjTt8LlSWH9CngnABvE7nlLlNLJPAAzsgPStcNibqtPdwgsiw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795107750;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795107773;
 	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
 	 X-Mimecast-MFC-AGG-ID:Received:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
@@ -15,73 +15,73 @@ ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	 X-Gm-Features:Message-ID:Subject:To:Cc:X-Mimecast-Spam-Score:
 	 X-Mimecast-MFC-PROC-ID:X-Mimecast-Originator:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=TgkiQXt0qEd5fAMe/LFsA1xI2CJ6D6D3/EwyFO8PrhI=;
-	b=iq8MBRRo0NVR15rm4YRrqWZVVj7vLe+vcg5DxxsNV1kyHZTp1iZhiUaUj71UJwE7Jva3
-	 07J41LFoEvZcwL77C/jZcj7kJZHFIawfo6xpwL24gypAKawKeGOmvnvs3HV2SdYuC5AOq
-	 nzh/CR680zYupYRFcnf7uAUKY5dFOz9blRCorABZ+Hef+3E/5Tz/WDDWpmttiS8P/CAgq
-	 pf0x7J35FLAh797n56ljD9IW7SdHYLI/GyIncbG2Xm1Ya/jfMl6UshFtz07BN2Utu8JtM
-	 5qM1ZqUJiUiV1+oSqk8wroZ5rvCN9v+WSdJo+h7wI4oqlTO5khw+jTIx4yrp9Lvd96w==
+	bh=tuaICnb7sTsU3uMtAf1IdzJMLdxwJHMKKBVbfNsG8e0=;
+	b=C0BxPgAXJ3GCZ7qq4GMR1pfIYrueiMavNiSKZn/jkJLq5XFjGVGUH1bSdrnjKd6Cj+z3
+	 ++kXSdK/RUprvsMl+JWCAbqO7jhB8MckXDgrKvcL/BFc93R9IfKoujGHoB6rEbmLTZHjM
+	 PTQo2VGSfDKFYAvMXqzPnmc1xwTgwiVnq/WrSclS+V5VWssndHPlz1Obg9jklmG6aPXkb
+	 WISBkomLq+2BPKwdY85WEceJek7pIxnRf9X4SEWwZwDwkIguglHg0x/zpiVe8yIMQLFfm
+	 Ew6DMzhMzYziZjsMy3aUCgmVEFfq0rrN99EFNP211ETQmyl6ZRLhcXxIVdGb8fVuaBQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=redhat.com;
 	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b="H/kXk6lT";
-	arc=none smtp.remote-ip=170.10.133.124
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=ICYGkKDh;
+	arc=none smtp.remote-ip=170.10.129.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F64606A324
-	for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 17:02:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 19F64606A324
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC20C606A324
+	for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 17:02:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DC20C606A324
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=H/kXk6lT
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=ICYGkKDh
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1795107749;
+	s=mimecast20190719; t=1795107771;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=TgkiQXt0qEd5fAMe/LFsA1xI2CJ6D6D3/EwyFO8PrhI=;
-	b=H/kXk6lTEjg8VX49dn+wam8sjiezdJLzBe5HrymWCpkEfUwuh1JY2amMYgSIiIKrmQsB4l
-	taYIC1YTvrkwDTQqxwe58bhrjdTcs1WgeLiaVFW/Ylt8remZn195IyqTErIqS1e6dzPqpu
-	a0ETweBbUGomEF6Z/zslmSkj7jNacXg=
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
- [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=tuaICnb7sTsU3uMtAf1IdzJMLdxwJHMKKBVbfNsG8e0=;
+	b=ICYGkKDh04Lulop5yJc7OBezrOoW7weJu90F0CpPqCvjzhoAYGsB+PUuUURpqZgxgjkvFy
+	30OMS3bjkSbJqFZm0f1k6oskKp10RdVNEfCm+eODbuLd6JFPufXCuEY4BuPa/DSyZG29/c
+	8H3boQ7lkWBruUL1jB9ucFN9ajIXqek=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-650-hUrN5J5QMqWWhyiJAlKQ3Q-1; Thu, 19 Nov 2026 12:02:26 -0500
-X-MC-Unique: hUrN5J5QMqWWhyiJAlKQ3Q-1
-X-Mimecast-MFC-AGG-ID: hUrN5J5QMqWWhyiJAlKQ3Q_1795107745
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-cdd769cc9deso1358547a12.0
-        for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 09:02:26 -0800 (PST)
+ us-mta-297-ngZT-CSgNUyAEsHWSr941g-1; Thu, 19 Nov 2026 12:02:49 -0500
+X-MC-Unique: ngZT-CSgNUyAEsHWSr941g-1
+X-Mimecast-MFC-AGG-ID: ngZT-CSgNUyAEsHWSr941g_1795107768
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-cdaf2073b0cso568a12.0
+        for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 09:02:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795107745; x=1795712545;
+        d=1e100.net; s=20260707; t=1795107768; x=1795712568;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=TgkiQXt0qEd5fAMe/LFsA1xI2CJ6D6D3/EwyFO8PrhI=;
-        b=fmQK1JUagJ3TuZPw3EIB1NcfG6d0XmZt9TaAytXtxq4DuBeqV8/juvZQrKcnUFmjON
-         ky4ktXIafqmQHwuI/EmstZ5IEDuKWHFwhWqrGsgGk1aSAblXh7llvjJxDdkZ4X4wY8re
-         MaSJlW73QHGDGiJbWY3QigZ1HSkcBlteRuGMYDvt5NpUg3Rf0D6tR54YDF5HOrNm6Xds
-         oJaID+WnxyxaNMZxd8vkbrjXccidTx/BA+qPG1KEJmlP7VsTzf+lKecDQ1zpnMPDG43e
-         wCiHW4b2R5bKGDWYGHOfxpG8C9UHH0nOk8rDtP7nbmKzZhH1aq5gIyzMmS/OgNVrHJ6p
-         zE9g==
-X-Forwarded-Encrypted: i=1; AL+hErFPpbpas71faz8Jk+WoLfgEMGHFeVVokVWGAwyfqMse8NlH1Tqlruj/9hHPkZktS4cXKQlsKvQ=@lists.linux.dev
-X-Gm-Message-State: APuU4Z8Oe3/PFjaZsOXl5aUOT5EcYjso9sRHzQgtOQ4Du4HQwqW6SgPG
-	zwYGNAzMqe+XVqAAGudcvU9rPjmdslAEr3DTZi+B1sen3R/LYJ6qzUrwDtRV2HxgqozumgxW/Hw
-	TsWCrGqci/VTfzI7jPJe5PLoy+89h+LoV5kV3C+8KV+52e6+2BpSJl2UbL4Kr9XN9qa4oBMZJsF
-	XqRNHRBCUskJZ2ApiCrnwe6AKYTp6OpOw4
-X-Gm-Gg: AZFdTZfgGbi6eVyvmxq9vuD+x/IfjPy9J4fYNZvT9pN+hBI1Iaj0hNOqMq4B383b+io
-	Bd7vfI5FIM9/hr0lnOin2lUzMCavSCNahIGnLGTzXDgpHXvdRQn14y3aQqlI4WeWqqt27fXcJZN
-	n57oKJ0uB8pGe9JAbd4tJ+rSfEt54gi6IdgiEIY2POyfOIeQiJf7aGX3DVw582r+G1TSeXnuuNo
-	N1iA8C4r5Or9F4iD9okvDqnBaaJLUlKse27BD9n4xc75hXkKwq8jFqGNOH7
-X-Received: by 2002:a17:90b:4a48:b0:3b3:af45:6a6b with SMTP id 98e67ed59e1d1-3b41c7b5e76mr10172a91.3.1795107744877;
-        Thu, 19 Nov 2026 09:02:24 -0800 (PST)
-X-Received: by 2002:a17:90b:4a48:b0:3b3:af45:6a6b with SMTP id
- 98e67ed59e1d1-3b41c7b5e76mr9946a91.3.1795107742662; Thu, 19 Nov 2026 09:02:22
- -0800 (PST)
+        bh=tuaICnb7sTsU3uMtAf1IdzJMLdxwJHMKKBVbfNsG8e0=;
+        b=ooGFkJ3FUFM2MVTcmz4+Xinf+6V7AeoBOPB1BI2v10u2Wmt7e3f7lcEeso7hA9o4q4
+         af4K2862ZatiCDgIbvWFqao1/1nWakB8lPU4DKsRi5OHfNb6PE44gJ7ctwtcxvJKtpUx
+         xkppqon7CfwRIftLgHvBwXeGX7avnDP1WX9g5nxIT85MxLYhs9E490DAlgxDzTb5jrfc
+         QwcwJbD1auyqUQqy45CqFK04u2QZsxT+4DHW37669naKtToQNbeV4jclFs1dlxwzxKG7
+         uAcoBAf5hPEjoBM9y87kxe3coI79h17UjvtTqOdS+smNEQtv+10iEflbymP0EaXMHnwq
+         UzYw==
+X-Forwarded-Encrypted: i=1; AL+hErHOpxtE32s4GHGmEkK7LLSRKl0RXkad90Ih6209kga3ZgytSLCt51ZQrNzBbXYsuG0Aa6ICIi4=@lists.linux.dev
+X-Gm-Message-State: APuU4Z8y7H99Pi4e5r/4N58Ef8RS5kd6uWHtsxJsqDCMgjJASTBKhbBP
+	NopvlBrrgXpMkIyaAw9uesO5403+lLimRwWKBN5jsMUZO7hKDl0XlXh/0jISD6Ha44nys2uKZXF
+	254WeBFfHZdFpiOmhUU6iKWxv9WtvVKphwEhb4EdB0qoYc9o/o67a70nrG6VxHO3bj9OmH/Vly1
+	0HiofoDELp6NvAcRPRloL+FlWhBe9u26bd
+X-Gm-Gg: AZFdTZdHDi+JEuOwLXgNEmPXkdgTJVroglmfbxCXbBYoddnjJZZ65M9j7cbWOonbtrq
+	DUUVNqQ/iTqnfqsUGUX8i93wtRv4i83wKobt0irRHnoTJkY/CAA5lWy+3mHMPBlyXcAjeq1TMYi
+	PZCelttk5uMhr7dKqqdAkHr74yW7nOOLlGEKzTHVLDxh/sH1bQaFFN8U5fzdLPvtrkX9MGnxcJe
+	DQQ6klqf2OMsqdpXPo3nVMkwQSMQFTErVmotifhi9JLZpUhPkVmj2aQy3Az
+X-Received: by 2002:a17:903:1c9:b0:2e9:6352:6c61 with SMTP id d9443c01a7336-2f03f15511fmr4875125ad.19.1795107767401;
+        Thu, 19 Nov 2026 09:02:47 -0800 (PST)
+X-Received: by 2002:a17:903:1c9:b0:2e9:6352:6c61 with SMTP id
+ d9443c01a7336-2f03f15511fmr4874595ad.19.1795107766796; Thu, 19 Nov 2026
+ 09:02:46 -0800 (PST)
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -91,286 +91,172 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
-References: <20261106172107.3263617-1-maz@kernel.org>
-In-Reply-To: <20261106172107.3263617-1-maz@kernel.org>
+References: <20261119125608.3939330-1-maz@kernel.org>
+In-Reply-To: <20261119125608.3939330-1-maz@kernel.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 19 Nov 2026 18:02:11 +0100
-X-Gm-Features: AclHuK-Qf3LMzbseiJS1i8JmdlMZFytktE3YbrYDCN516IglzImVS7C0HGuzIqI
-Message-ID: <CABgObfbFo3+qfpNe4tZX4jnD=GtoN43b1xMHwtbeV39Vr+LeUA@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 7.4, take #2
+Date: Thu, 19 Nov 2026 18:02:34 +0100
+X-Gm-Features: AclHuK9gLqjDXNyNzrRYpnTsqE3NQnqKer4SP-4ZAj4I36D5tykUXBkj1PxU_-4
+Message-ID: <CABgObfaXpZsZ32L7gkW1EhuYwt0mkwTueyW9=BDBpZr71NCmuw@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 7.4, take #3
 To: Marc Zyngier <maz@kernel.org>
-Cc: Ard Biesheuvel <ardb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Colton Lewis <coltonlewis@google.com>, Fuad Tabba <fuad.tabba@linux.dev>, 
-	Gavin Shan <gshan@redhat.com>, Hyunwoo Kim <imv4bel@gmail.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Leonardo Bras <leo.bras@arm.com>, Lorenzo Stoakes <ljs@kernel.org>, Mark Brown <broonie@kernel.org>, 
-	Matthias Goergens <matthias.goergens@gmail.com>, Oculytic <oculytic@gmail.com>, 
-	Oliver Upton <oupton@kernel.org>, Sascha Bischoff <sascha.bischoff@arm.com>, 
-	Steffen Eiden <seiden@linux.ibm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Vincent Donnefort <vdonnefort@google.com>, Wei-Lin Chang <weilin.chang@arm.com>, 
-	Will Deacon <will@kernel.org>, Xuheng Li <xuheng@cs.columbia.edu>, 
-	Yuan Yao <yaoyuan@linux.alibaba.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Colton Lewis <coltonlewis@google.com>, 
+	Dan Carpenter <dan@pereq.eu>, Fuad Tabba <fuad.tabba@linux.dev>, 
+	Michael Reeves <michael.reeves077@gmail.com>, Mostafa Saleh <smostafa@google.com>, 
+	Myria Sarvay <myrialsarvay@gmail.com>, Oliver Upton <oupton@kernel.org>, 
+	Vincent Donnefort <vdonnefort@google.com>, Will Deacon <will@kernel.org>, 
+	Xuheng Li <xuheng@cs.columbia.edu>, Yureka Lilian <yureka@cyberchaos.dev>, 
+	Steffen Eiden <seiden@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: ImsBOMtCRn4l3QxuqzROQ3gJaUxcqM7KFoc10Lm2KyQ_1795107745
+X-Mimecast-MFC-PROC-ID: XO3Pje2wUuXGn9_If0au-hdz2aVM0dZ3qkboPXWeOq0_1795107768
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 6, 2026 at 6:21=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote:
+On Thu, Nov 19, 2026 at 1:56=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
+:
 >
 > Paolo,
 >
-> Here's the second set of KVM/arm64 fixes for 7.4, which is a pretty
-> large set as Fuad has made his mission to address each and every
-> Sashiko utterance. This is great work, in all the meanings of the word
-> Great.
+> As promissed in my previous missive, I'm back with a few more
+> presents...
 >
-> We also have a couple of more "amusing" fixes, such as the livelock
-> issue that Ard managed to debug and elegantly address.
+> This round of fixes is mostly a Dan Carpenter special, as they seem to
+> have hit the jackpot with some new formal analysis tool, and found a
+> number of issues in NV. I am very surprised (/s).
 >
-> As usual, details in the tag below. I'll be at KVM Forum next week, so
-> I'll probably come back with another PR in time for -rc4 (I've already
-> earmarked a number of patches...).
->
-> Please pull,
+> The rest is a bunch of pKVM fixes and workarounds for ugly hardware.
 
 Pulled, thanks.
 
+> I will be back next week same time for more of the same!
+
+I can't wait for it!
+
 Paolo
 
+> Please pull,
 >
 >         M.
 >
-> The following changes since commit 6628e7d4c6b25c8d18f1345e3a20d21829aae7=
-e4:
->
->   Linux 7.4-rc1 (2026-11-01 13:26:31 -0800)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
-marm-fixes-7.4-2
->
-> for you to fetch changes up to 181a701fc14d3d468c603b5ecfb9f12115c5fb72:
+> The following changes since commit 181a701fc14d3d468c603b5ecfb9f12115c5fb=
+72:
 >
 >   Merge branch kvm-arm64/misc-7.4-1 into kvmarm-master/fixes (2026-11-03 =
 18:14:37 +0000)
 >
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
+marm-fixes-7.4-3
+>
+> for you to fetch changes up to 3385a832525527801012f5993d1f6a7a3d23092c:
+>
+>   Merge branch kvm-arm64/mmu-fixes-7.4-2 into kvmarm-master/fixes (2026-1=
+1-19 11:16:29 +0000)
+>
 > ----------------------------------------------------------------
-> KVM/arm64 fixes for 7.4, take #2
+> KVM/arm64 fixes for 7.4, take #3
 >
 > * MMU fixes:
 >
->   - Correctly sanitise the TCR_EL2 register
+>   - Fix arbitrary truncation to 32bit when dealing with pool size
 >
->   - Stop advertising LPA2 to NV guest when it isn't supported
+>   - Correctly order page pin refconting
 >
->   - Correctly convert EH2=3D=3D0's view of TCR_EL2 into the E2H=3D=3D1 fo=
-rmat
+>   - Prevent a HYP block mapping from being replaced with a table
 >
->   - Make sure an EL2 mapping is immediately visible to the hypervisor
->     code, as we don't necessarily require ETS
+>   - Fix NV Range invalidation by extending the boundaries to the
+>     next block mapping
 >
->   - Address a horrible situation where a guest can livelock when
->     trying to solve a permission fault whilst the underlying S2 PTs
->     have AF=3D0
+>   - Make sure the correct hw_mmu gets picked on the first run,
+>     should userspace restore a nested context between init and
+>     the first vcpu_load().
 >
->   - Correctly wipe MTE tags for large mappings instead of just the
->     head page, providing a convenient helper for this
+>   - Reject TLBI IPAS2E1 that fall outside of the S2 range
 >
->   - Fix dirty logging detection in ring-only mode
+> * System register fixes:
 >
->   - Use ATS1A whenever FEAT_S1PIE is present
+>   - Correctly forward POE/PIE/TVAL EL2 register traps
 >
-> * VGIC fixes:
+>   - Add a sanity check for missing trap forwarding
 >
->   - Fix a bunch of low-impact issues with GICv4, avoiding leaks on
->     unlikely failure paths
+>   - Correctly hide generic PAuth for pKVM protected guests when
+>     the feature PAuth has been exluced from the feature set
 >
->   - Use a separate lockdep class for vPE doorbells, and guarantee that
->     they are never threaded
->
->   - Avoid spurious allocation of VPEs when userspace decided not to
->     expose nASSGIcap
->
->   - Fix spurious preservation of the pending state after DISCARD
->     and CLEAR ITS commands
->
->   - Make sure GITS_CTLR.Enabled is updated under the its_lock
->
->   - Serialise vgic CTRL_INIT against vCPU creation
->
->   - Make the forwarding of LPIs tobust against LPIs being disabled
->     on the target redistributor
->
-> * pKVM fixes:
->
->    - Fix the reset of GICv3 LRs for pKVM, de-uglifying the PM paths
->      whilst at it
->
->    - Fix PMU handling for both protected and non-protected guests,
->      fixing the synchronisation of kvm_host_data in the process
->
->    - Correctly invalidate TLBs and I-cache when multiplexing multiple
->      vcpus of the same VM on a single physical CPU
->
-> * Feature visibility fixes:
->
->   - Correctly handle ACCDATA_EL1 being exposed to guests, plugging a
->     potential communication channel between guests.
+>   - Make sure that HCR_EL2.NV1 is always RES0
 >
 > * Misc fixes:
 >
->   - Correctly clear the vcpu feature set on init failure
+>   - Flag Apple M3, M4 and M6 CPUs as having a broken vgic and
+>     a wonky PMUv3 emulation.
 >
->   - Clear PSTATE.TCO on exit from the guest when MTE is enabled
->     for the kernel
+>   - Correctly handle 64bit offsets into an MMIO region from
+>     userspace
 >
->   - Let the L0 hypervisor always deal with FEAT_MOPS A/B nonsense when
->     taking such exception, instead of potentially forwarding it
->
->   - Add a "maintainer profile" for KVM/arm64
->
->   - Add testing for the MOVI and MOVALL commands
+>   - Ensure that a vcpu is loaded when injecting an event
 >
 > ----------------------------------------------------------------
-> Ard Biesheuvel (1):
->       KVM: arm64: Don't livelock when AT can't resolve a fault IPA
+> Colton Lewis (2):
+>       KVM: arm64: Force HCR_EL2.NV1 to RES0 unconditionally
+>       KVM: arm64: selftests: Verify HCR_EL2.NV1 is RES0 when E2H0 is NI_N=
+V1
 >
-> Colton Lewis (1):
->       irqchip/gic-v4: Use a separate lockdep class for vPE doorbell IRQs
+> Dan Carpenter (9):
+>       KVM: arm64: nv: Invalidate whole L1 blocks on TLBI RIPAS2E1
+>       KVM: arm64: vgic: Don't truncate offsets in vgic_find_mmio_region()
+>       KVM: arm64: nv: Initialize hw_mmu to NULL for nested vCPUs
+>       KVM: arm64: nv: Forward PIR_EL2, PIRE0_EL2 and POR_EL2 traps
+>       KVM: arm64: nv: Forward CNTP_TVAL_EL02 and CNTV_TVAL_EL02 traps
+>       KVM: arm64: nv: Report EL2 registers with no trap forwarding
+>       KVM: arm64: Load the vcpu in KVM_SET_VCPU_EVENTS
+>       KVM: arm64: nv: Fix NULL dereference in kvm_pmu_nested_transition()
+>       KVM: arm64: nv: Ignore TLBI IPAS2E1 above the IPA limit
 >
-> Fuad Tabba (25):
->       irqchip/gic-v4: Clear the domain and fwnode pointers after freeing =
-them
->       irqchip/gic-v4: Unwind what its_alloc_vcpu_irqs() allocated on fail=
-ure
->       KVM: arm64: vgic: Tear down what vgic_init() created when it fails
->       KVM: arm64: vgic-v4: Restore nr_vpes before freeing the vPE resourc=
-es
->       KVM: arm64: vgic-its: Clear an unqueued LPI before dropping its loc=
-k
->       KVM: arm64: vgic-its: Remove the pending state of a cleared LPI
->       KVM: arm64: vgic-its: Update GITS_CTLR.Enabled under its_lock
->       KVM: arm64: vgic-v4: Don't allocate vPEs for a GICv2 VM
->       KVM: arm64: vgic-v4: Don't allocate vPEs when userspace clears nASS=
-GIcap
->       KVM: arm64: vgic: Don't forward LPIs to a redistributor with LPIs d=
-isabled
->       KVM: arm64: vgic-v3: Don't drop a pending LPI mapped with LPIs disa=
-bled
->       KVM: arm64: selftests: Add MOVI and MOVALL commands to the ITS libr=
-ary
->       KVM: arm64: selftests: Build a VM per test in vgic_lpi_stress
->       KVM: arm64: selftests: Test MOVI and MOVALL on a pending LPI
->       KVM: arm64: Disable host PMU counters for protected guests
->       KVM: arm64: Ensure TLBs and I-cache are private to each vCPU in pKV=
-M
->       arm64: Add override for ID_AA64ISAR1_EL1.LS64
->       KVM: arm64: Enable ST64BV0 for guests with FEAT_LS64_ACCDATA
->       KVM: arm64: selftests: Add ACCDATA_EL1 to get-reg-list
->       KVM: arm64: Clear the VM's feature bitmap when kvm_setup_vcpu() fai=
-ls
->       KVM: arm64: Clear the default PMU when kvm_setup_vcpu() fails
->       KVM: arm64: Clear the whole hugetlb folio when sanitising MTE tags
->       KVM: arm64: Clear the whole hugetlb folio when storing MTE tags
->       KVM: arm64: Sanitise MTE tags when a permission fault installs a ma=
-pping
->       arm64: mte: Add mte_clear_folio_tags()
+> Fuad Tabba (1):
+>       KVM: arm64: Hide generic ptrauth from protected VMs without ptrauth
 >
-> Marc Zyngier (11):
->       Merge branch kvm-arm64/vgic-fixes-7.4-1 into kvmarm-master/fixes
->       KVM: arm64: Reset TCR_EL2 according to guest's E2H mode
->       KVM: arm64: Add ACCDATA_EL1 to the sysreg array
->       KVM: arm64: Add context-switch of ACCDATA_EL1
->       arm64: Add return value to mte_disable_tco_entry()
->       KVM: arm64: Reenable MTE tag checking on exit from guest when runni=
-ng VHE
->       KVM: arm64: Don't let a guest overwrite HCRX_EL2.MCE2
->       Merge branch kvm-arm64/mmu-fixes-7.4-1 into kvmarm-master/fixes
->       Merge branch kvm-arm64/pkvm-fixes-7.4-1 into kvmarm-master/fixes
->       Merge branch kvm-arm64/ls64-accdata into kvmarm-master/fixes
->       Merge branch kvm-arm64/misc-7.4-1 into kvmarm-master/fixes
+> Marc Zyngier (3):
+>       Merge branch kvm-arm64/misc-7.4-2 into kvmarm-master/fixes
+>       Merge branch kvm-arm64/sysreg-fixes-7.4-2 into kvmarm-master/fixes
+>       Merge branch kvm-arm64/mmu-fixes-7.4-2 into kvmarm-master/fixes
 >
-> Matthias Goergens (1):
->       Documentation/process: Add a maintainer entry profile for KVM/arm64
+> Michael Reeves (1):
+>       arm64: Apply existing Apple Silicon CPU workarounds to newer CPUs
 >
-> Oliver Upton (2):
->       KVM: arm64: nv: Correctly compute the effective TCR_EL1 for nVHE TC=
-R_EL2
->       KVM: arm64: Pass the PMU events to the hyp vCPU of non-protected gu=
-ests
+> Mostafa Saleh (1):
+>       KVM: arm64: Use consistent type for pool size
 >
-> Sascha Bischoff (1):
->       KVM: arm64: vgic: Serialise CTRL_INIT against vCPU creation
+> Myria Sarvay (1):
+>       arm64: Add CPU part numbers for newer Apple Silicon CPUs
 >
-> Vincent Donnefort (4):
->       KVM: arm64: Make __vgic_v3_init_lrs HVC always available
->       KVM: arm64: pkvm: Fix missing reset of GICv3 LRs
->       KVM: arm64: pkvm: Reset GICv3 LRs in the hypervisor
->       KVM: arm64: Synchronise kvm_host_data before host deprivileging
+> Xuheng Li (2):
+>       KVM: arm64: Don't replace a valid hyp block mapping with a table
+>       KVM: arm64: Order a later pinner's accesses after the hyp mapping
 >
-> Wei-Lin Chang (5):
->       KVM: arm64: nv: Don't advertise FEAT_LPA2 for guest stage-1
->       arm64: sysreg: Add TCR_EL2 to sysreg infrastructure
->       KVM: arm64: Convert TCR_EL2 to config-driven sanitisation
->       KVM: arm64: Fix dirty logging detection in ring-only mode
->       KVM: arm64: Remove stale remark on canonical IPA alignment
->
-> Will Deacon (1):
->       KVM: arm64: Use S1E1A when Stage-1 PIE is supported
->
-> Xuheng Li (1):
->       KVM: arm64: Add an ISB after mapping a hyp fixmap slot
->
->  Documentation/admin-guide/kernel-parameters.txt    |   3 +
->  Documentation/process/maintainer-kvm-arm64.rst     | 181 +++++++++++++++
->  MAINTAINERS                                        |   2 +
->  arch/arm64/include/asm/cpufeature.h                |   5 +
->  arch/arm64/include/asm/kvm_arm.h                   |  13 --
->  arch/arm64/include/asm/kvm_asm.h                   |   2 +-
->  arch/arm64/include/asm/kvm_emulate.h               |   3 +
->  arch/arm64/include/asm/kvm_host.h                  |   5 +-
->  arch/arm64/include/asm/kvm_nested.h                |  38 ++-
->  arch/arm64/include/asm/mte.h                       |  14 +-
->  arch/arm64/include/asm/sysreg.h                    |   1 -
->  arch/arm64/include/asm/virt.h                      |   2 +-
->  arch/arm64/kernel/cpufeature.c                     |   7 +
->  arch/arm64/kernel/mte.c                            |  15 +-
->  arch/arm64/kernel/pi/idreg-override.c              |   2 +
->  arch/arm64/kvm/arm.c                               |  60 +++--
->  arch/arm64/kvm/config.c                            | 112 +++++++++
->  arch/arm64/kvm/guest.c                             |  11 +-
->  arch/arm64/kvm/hyp/include/hyp/fault.h             |   5 +-
->  arch/arm64/kvm/hyp/include/hyp/switch.h            |  24 +-
->  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h         |  23 ++
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c                 |  16 +-
->  arch/arm64/kvm/hyp/nvhe/mm.c                       |   1 +
->  arch/arm64/kvm/hyp/nvhe/pkvm.c                     |  22 +-
->  arch/arm64/kvm/hyp/nvhe/psci-relay.c               |   4 +
->  arch/arm64/kvm/hyp/nvhe/switch.c                   |  24 ++
->  arch/arm64/kvm/hyp/vhe/switch.c                    |   7 +
->  arch/arm64/kvm/mmu.c                               |  21 +-
->  arch/arm64/kvm/nested.c                            |  15 ++
->  arch/arm64/kvm/pkvm.c                              |   6 +
->  arch/arm64/kvm/sys_regs.c                          |  22 +-
->  arch/arm64/kvm/vgic/vgic-init.c                    |  21 +-
->  arch/arm64/kvm/vgic/vgic-its.c                     |  68 +++---
->  arch/arm64/kvm/vgic/vgic-kvm-device.c              |   2 +
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c                 |  40 ++--
->  arch/arm64/kvm/vgic/vgic-v3.c                      |   3 +-
->  arch/arm64/kvm/vgic/vgic-v4.c                      |   5 +-
->  arch/arm64/kvm/vgic/vgic.c                         |  12 +-
->  arch/arm64/kvm/vgic/vgic.h                         |   1 +
->  arch/arm64/tools/cpucaps                           |   1 +
->  arch/arm64/tools/sysreg                            | 125 ++++++++++
->  drivers/irqchip/irq-gic-v4.c                       |  39 +++-
->  tools/testing/selftests/kvm/arm64/get-reg-list.c   |   2 +
->  .../testing/selftests/kvm/arm64/vgic_lpi_stress.c  | 258 +++++++++++++++=
-++++--
->  .../selftests/kvm/include/arm64/gic_v3_its.h       |   2 +
->  tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c |  28 +++
->  46 files changed, 1099 insertions(+), 174 deletions(-)
->  create mode 100644 Documentation/process/maintainer-kvm-arm64.rst
+>  arch/arm64/include/asm/cputype.h              | 28 +++++++++++++++++++
+>  arch/arm64/include/asm/kvm_host.h             |  2 +-
+>  arch/arm64/include/asm/kvm_pgtable.h          |  2 +-
+>  arch/arm64/kernel/cpu_errata.c                | 12 +++++++++
+>  arch/arm64/kernel/cpufeature.c                | 12 +++++++++
+>  arch/arm64/kvm/arm.c                          |  8 ++++--
+>  arch/arm64/kvm/config.c                       |  7 +----
+>  arch/arm64/kvm/emulate-nested.c               | 10 ++++++-
+>  arch/arm64/kvm/hyp/include/nvhe/early_alloc.h |  2 +-
+>  arch/arm64/kvm/hyp/include/nvhe/gfp.h         |  4 +--
+>  arch/arm64/kvm/hyp/nvhe/early_alloc.c         |  2 +-
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  8 ++++++
+>  arch/arm64/kvm/hyp/nvhe/page_alloc.c          |  6 ++---
+>  arch/arm64/kvm/hyp/nvhe/sys_regs.c            |  4 +--
+>  arch/arm64/kvm/hyp/pgtable.c                  | 10 ++++++-
+>  arch/arm64/kvm/nested.c                       |  8 ++++++
+>  arch/arm64/kvm/pmu-emul.c                     |  3 +++
+>  arch/arm64/kvm/sys_regs.c                     | 39 +++++++++++++++++++++=
++++---
+>  arch/arm64/kvm/vgic/vgic-mmio.c               |  4 +--
+>  arch/arm64/kvm/vgic/vgic-mmio.h               |  2 +-
+>  tools/testing/selftests/kvm/arm64/hello_el2.c | 15 +++++++++++
+>  21 files changed, 161 insertions(+), 27 deletions(-)
 >
 
