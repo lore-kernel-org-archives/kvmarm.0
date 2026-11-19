@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795083044;
-	b=gwWm2vNHjoCbEBxmnYfGzCbEczJRvhCK/RKn0D3xa4olUN85PnSYQv18xK9/6wIkTstg
-	 IvY+EDQZNwxIsttupfqZh/YrYbJXA6qKf4Ukfm21/YlxMgW1QnB0ONuC2wfx08erie931
-	 xXvCT5nNriYHMaez3CMgXabTzT1jQ60S0mGFei2qp5ydbR+WL7x75dDt13uNbrYH5TVv6
-	 2htuCR8aNrloMwBjGuQSFrooV+ZuO7hMysOA9qUtxyCNUbv/C+FYVaZXA1Wv+m/0+RcI+
-	 p4dWtEa1GwDCVL+DM9zy08cBqb3OUfFKD+3g33sVKuSHQ91Xq0DJBP7RMJdyxYKvXSg==
+	t=1795084510;
+	b=V+iLDBKUDp8DafeGQeXhdMZ1pGLjUuqttcYGmBaeSKSk8OPqLo9p4vRA0ZDWqEaO6xsb
+	 rJEGHRohVMXev604qRj2kUwyj5i+RtI5dFkiuMlwcoeK5eTw74AZnnP+qopQD2FayaIIb
+	 +42jgRUb9JtwqxqZcMWgi395a9BUGnfjysLPGWqrxlXWjpndC/jYdy3BGrxMrZLzunKoT
+	 SafWpleX4ZJW/7ALVQpqk3KnBTE92MF8uw98Hu8/7h3f5p7rV+XA9fBTZXB8Y0NYiS2XS
+	 s4Pi7Z402dBMNzLI6aT/MToi+NyFPY1QbthrLK9SRggjecO4jI+FT83M3UvsEmAQjsQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795083044;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795084510;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:Content-Language:To:Cc:References:
+	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
 	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=o0xJIki+mFoJUWoYjAhFxPBVjnzW6F1WhyTl0VK8FZs=;
-	b=vhzkwbFvTWyNTsaxcDLm1u74nt8HvoVILYogAMuvJQmTKGe0YGIglhFRLOfpnQzmiLsb
-	 yaWtE4cuCZK2PHAFtQYyYwsAvRVEDe/Xvz8SwKoNjhKj5z+m3LjI3CiI1ALRHtM+lCXng
-	 qSAXxT9yGVUolyJzYZIIuds0/bLLOyT3G1b9YlI+d+zoYDTxZsHCU87rqkMdysA1TJp5K
-	 89Pv3+4cT8bhOa+if+xiWrfKHXd0gi8vFkexXsA/pAYKe0anRoulAum8sKSFtbrSTBBY1
-	 TvIEkXaDyt4ZcfFYgMTXaa7mC3FGv8GbhK0eypLUAgqvLYRB98/eOngUMMhZQG4/WUw==
+	bh=qUBGosQXygaRBrh7YIIWL4dTbzLPidnx+0MI7jijNTg=;
+	b=spGYl/nWdQkyRhcnPBQbEAdX/z95P+J4BGTdeNMhXBQKuISwiS6sGO94JM4skvKHBQwP
+	 OFybABH562C8NKe3oTmMfG0suiJKOP0cJHeKaBDF7BHpQK9vAT66UkXavhLY/bYnDmatZ
+	 sXlYeyEWrh0CfNS4xnCbGoia4mCph8Gpa3tOpNUOjyAwgo4ZSkk/9jyTps5fl0SQP1G+j
+	 pu1LFV9I6ykLW9/wUmabqbN0K1fkvAqeWgVRmi8WGxgpYTKfa5nCU61888KSbgoEJjiOf
+	 JSVDM7BI/pFnftB4eeIHBfx/l9nQknIsvPPorJpyNB74KQ6nl5d2OwHYA4FARJocnmg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=arm.com;
 	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Q5XwbQpl;
+	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=i77k2lpw;
 	arc=none smtp.remote-ip=217.140.110.172
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F64606A324;
-	Thu, 19 Nov 2026 10:10:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D7F64606A324
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2010606A324
+	for <kvmarm@lists.linux.dev>; Thu, 19 Nov 2026 10:35:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C2010606A324
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=Q5XwbQpl
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=i77k2lpw
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 021D81575;
-	Thu, 19 Nov 2026 02:10:40 -0800 (PST)
-Received: from [10.0.129.3] (Suzukis-MBP.cambridge.arm.com [10.0.129.3])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 90FB23F632;
-	Thu, 19 Nov 2026 02:10:39 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 046271575;
+	Thu, 19 Nov 2026 02:35:06 -0800 (PST)
+Received: from [10.0.136.98] (M0PRX50XMG.cambridge.arm.com [10.0.136.98])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E72D83F632;
+	Thu, 19 Nov 2026 02:35:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795083042; bh=7YWcBLhIPYqKWe2ix2RQNC66Zd0lpOfLCGPkdsJOsBM=;
+	t=1795084508; bh=x1y59sCR9yQXdJGlnshQjkwI0/FKpAuxOd5Os8IVMx8=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Q5XwbQpl4Z1MWetRAjz0CoLEMc7Y0wB+bliAGEGpeV6ErsaD+ydzUiBaPjwO5jKrs
-	 LlqFQ54UaiKTsXHzDr16BV58dhQs/9gv5/7o1EOMNLdON/YbPP7A8pIzJRRaCBTSEb
-	 pBoo0+42pwwdHFFOu29tYezIaJbmqXPp6sfM/iK0=
-Message-ID: <120ad525-efa5-4129-9d97-fa6fa5db747f@arm.com>
-Date: Thu, 19 Nov 2026 10:10:38 +0000
+	b=i77k2lpw71ObP0izMd86osmQda3kbDOWK1h5AJZa3/uBQMJzwIBxf6QzxhnNIhTjb
+	 cIGvgajmYhjmVn1ZRAbxV8qRSnY8qpsxekfADm3btBGl27OT2YuHjsV/rHCQy6oqZU
+	 Hqo7zeUI8PcUA6HMvx/BzPOOtJXKVwKagt44psfo=
+Message-ID: <41ee982a-cabe-477d-80f0-fabece8637c2@arm.com>
+Date: Thu, 19 Nov 2026 10:35:06 +0000
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Post: <mailto:kvmarm@lists.linux.dev>
@@ -54,112 +54,86 @@ List-Owner: <mailto:kvmarm+owner@lists.linux.dev>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 01/11] KVM: arm64: guest_memfd: Check mmap support when
- preparing memslot
+Subject: Re: [PATCH kvmtool v3 13/21] arm64: Describe the GICv5 IRS in the DT
+To: Vladimir Murzin <vladimir.murzin@arm.com>, will@kernel.org,
+ julien.thierry.kdev@gmail.com
+Cc: maz@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ timothy.hayes@arm.com, Peter Maydell <peter.maydell@linaro.org>
+References: <20261016153939.913764-1-sascha.bischoff@arm.com>
+ <20261016153939.913764-14-sascha.bischoff@arm.com>
+ <412dc63b-df1f-4748-8235-542ecfc23894@arm.com>
+ <a9f3e466-ab2b-4c98-a237-d8bd6810e06c@arm.com>
+ <a991250c-946b-456f-bf61-f1ab536365bf@arm.com>
+ <b33b0ca9-0134-4dad-aceb-8c9cb4ada9a2@arm.com>
 Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, Fuad Tabba <tabba@google.com>,
- Ackerley Tng <ackerleytng@google.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>, WeiLin.Chang@arm.com,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Kohei Enju <enju.kohei@fujitsu.com>
-References: <20261116164358.142785-1-steven.price@arm.com>
- <20261116164358.142785-2-steven.price@arm.com>
- <CA+EHjTy5xBmavNWSYPjqU9qXtssV3ZHzsUr1s_4bVOt1GnDLVg@mail.gmail.com>
- <6bb490cd-ebbe-41d7-adf3-d6eaf0e53478@arm.com>
- <b1ef7241-54b0-4a17-83b6-0008e722f2f6@arm.com>
- <8a095a42-662a-416d-a5d7-79e10161201c@arm.com>
- <cc27e6a8-6bfa-4c82-92a7-33175baf6803@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <cc27e6a8-6bfa-4c82-92a7-33175baf6803@arm.com>
+From: Sascha Bischoff <sascha.bischoff@arm.com>
+In-Reply-To: <b33b0ca9-0134-4dad-aceb-8c9cb4ada9a2@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Cc: Ackerley, Sean
+Hey Vladimir,
 
-On 18/11/2026 15:18, Steven Price wrote:
-> On 18/11/2026 12:04, Suzuki K Poulose wrote:
->> On 18/11/2026 11:14, Steven Price wrote:
->>> On 18/11/2026 10:34, Suzuki K Poulose wrote:
->>>> Hi Steven
->>>>
->>>> On 17/11/2026 14:05, Fuad Tabba wrote:
->>>>> Hi Steven,
->>>>>
->>>>> On Mon, 16 Nov 2026 16:43:47 +0000, Steven Price
->>>>> <steven.price@arm.com> wrote:
->>>>>> Check the guest_memfd backing file when deciding whether an arm64
->>>>>> memslot has mappable memory rather than checking whether the slot is
->>>>>> gmem only. A public helper function is added to be able to reuse the
->>>>>> static kvm_gmem_supports_mmap() function.
->>>>>
->>>>> nit: could the message say why this is needed? It's a no-op until
->>>>> patch 8 defines kvm_arch_has_private_mem(), which makes every
->>>>> guest_memfd slot gmem-only.
->>>>
->>>> I still don't understand why this is needed. For arm64 we have always
->>>> prevented guest_memfd without MMAP, in kvm_arch_prepare_memory_region().
+I'm so sorry that I missed this.
+
+On 10/11/2026 15:45, Vladimir Murzin wrote:
+> Hi Sascha,
+> 
+> On 11/10/26 14:57, Vladimir Murzin wrote:
+>> Hi Sascha,
+>>
+>> On 11/2/26 20:51, Sascha Bischoff wrote:
+>>> On 26/10/2026 13:03, Vladimir Murzin wrote:
+>>>> On 10/16/26 16:39, Sascha Bischoff wrote:
+>>>>> Describe the IRS CONFIG and SETLPI frames and associate each CPU
+>>>>> phandle with its IAFFID. This lets the guest discover and configure
+>>>>> the IRS for shared interrupts.
+>>> Hi Vladimir,
 >>>
->>> Fuad is correct, this isn't really needed until patch 8. Patch 8 defines
->>> kvm_arch_has_private_mem() - that means that gmem_in_place_conversion
->>> becomes true (see include/linux/kvm_host.h). That in turn means that
+>>>> Out of curiosity why do we expose SETLPI frame to a guest?
+>>> Frankly, in case we want to make use of it one day. The intent for the SETLPI frame is that is allows the injection of LPIs by a device without an ITS being present. Effectively, it gives MSI support without translation.
+>>>
+>>> Rather than writing an EventID/DeviceID pair to the ITS_TRANSLATE_FRAME (specifically the ITS_TRANSLATER or ITS_RL_TRANSLATER) and having the (virtual) ITS translate them using the Device- and Interrupt-Translation-Tables, an implementation that includes the SETLPI_FRAME allows a device to directly write the LPI to make pending.
+>>>
+>>> This isn't something intended for use on the physical side, so we don't strictly expect any physical implementations to include the SETLPI_FRAME (famous last words?). However, it is something that an emulated GICv5 implementation can go and do if it doesn't want the complexity of emulating an ITS.
+>>>
+>>> When initially prototyping the GICv5 support, I did have a SETLPI driver that tested this mechanism, as software buy-in is also required for this to work. Instead of programming the DT/ITT with the translation, it just gives the device the desired LPI as the "event" instead.
+>>>
+>>> Does that answer your question?
+>>>
 >>
->>> every guest_memfd slot is KVM_MEMSLOT_GMEM_ONLY including slots backed
->>> by a file without mmap support.
+>> Yes, I was mostly wondering if we are going to have any user for that, but
+>> now I realised that it could be user (selftest and/or kvm-unit-test) which
+>> make sure that SETLPI stays unimplemented :D
 >>
->> But we dont support slots without MMAP anyways even without this series.
->>   So, does it really matter for arm64 ?
 > 
-> So ChatGPT produced the attached test. It creates a non-mappable gmem
-> and tries to add it to a normal (non-realm/non-pkvm) VM. With v7.4-rc1
-> it is rejected. However without this patch it succeeds.
-> 
-> The issue is that gmem_in_place_conversion changes the behaviour for
-> normal VMs.
+> Just checking, are we permitted to expose SETLPI frame with IRS_IDR0.SETLPI set to 0
+> (IIUC it is what KVM currently sets)?
 
-I see, thanks Steven. For context:
+That's a really valid point, and I don't think I should do this. For 
+whatever reason, this didn't click until just now.
 
-Arm64 currently (without inplace conversion support) only allows GMEM
-with MMAP flags only and relies on kvm_slot_gmem_only() to detect that
-the GMEM has MMAP flag. But, when we enable inplace conversion,
-we can't reliably reject the slots by kvm_slot_gmem_only(), because
-all GMEM slots are marked GMEM only with inplace conversion.
+I was thinking along the lines of "KVM carves out the memory for SETLPI 
+so we should convey it in the DT", but that's silly. We shouldn't give 
+the guest what is effectively a broken DT for the system it sees. KVM 
+indeed doesn't expose the SETLPI feature to a guest via the emulated 
+IRS's MMIO, so this would be a mismatch.
 
-Also, from the API Documentation,
+I'll drop the SETLPI frame part when I post a v6. Doh!
 
-"When the KVM MMU performs a PFN lookup to service a guest fault, the 
-fault will
-always be consumed from guest_memfd, regardless of whether it is a 
-shared or a
-private fault (unless in-place conversion is disabled and the backing
-guest_memfd does not have the GUEST_MEMFD_FLAG_MMAP flag set)."
-
-So, in effect, with in-place conversion enabled a KVM_CREATE_GUEST_MEMFD
-without GUEST_MEMFD_FLAG_MMAP is an error and thats what this patch
-is trying to fix in arm64 KVM. The question is:
-
-1) Should this be fixed ? How does TDX/SNP support older VMMs with
-inplace conversion ? What was the conclusion on this breakage ?
-
-2) If it should be, then shouldn't it be done in kvm_gmem_create() ?
-
-Suzuki
-
+Thank you!
+Sascha
 
 > 
-> Thanks,
-> Steve
+> Thanks
+> Vladimir
+> 
+>> Cheers
+>> Vladimir
+>>
+>>>> Thanks
+>>>> Vladimir
+>>> Thanks,
+>>> Sascha
+>>
 > 
 
